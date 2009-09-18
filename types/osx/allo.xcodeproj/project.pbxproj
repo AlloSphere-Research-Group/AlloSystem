@@ -26,10 +26,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		08FB7796FE84155DC02AAC07 /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
-		3692EBB81017DA7B000BDB05 /* allo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = allo.h; sourceTree = "<group>"; };
-		3692F0431017E069000BDB05 /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
-		3692F0831017E74A000BDB05 /* allocpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = allocpp.h; sourceTree = "<group>"; };
+		08FB7796FE84155DC02AAC07 /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = test.c; path = ../test/test.c; sourceTree = "<group>"; };
+		3692EBB81017DA7B000BDB05 /* allo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = allo.h; path = ../include/allo.h; sourceTree = "<group>"; };
+		3692F0431017E069000BDB05 /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test.cpp; path = ../test/test.cpp; sourceTree = "<group>"; };
+		3692F0831017E74A000BDB05 /* allocpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = allocpp.h; path = ../include/allocpp.h; sourceTree = "<group>"; };
 		8DD76F6C0486A84900D96B5E /* allo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = allo; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6859E8B029090EE04C91782 /* allo.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = allo.1; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -48,6 +48,7 @@
 		08FB7794FE84155DC02AAC07 /* allo */ = {
 			isa = PBXGroup;
 			children = (
+				36CDB61A106454A80057E0F4 /* include */,
 				08FB7795FE84155DC02AAC07 /* Source */,
 				C6859E8C029090F304C91782 /* Documentation */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
@@ -58,8 +59,6 @@
 		08FB7795FE84155DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				3692EBB81017DA7B000BDB05 /* allo.h */,
-				3692F0831017E74A000BDB05 /* allocpp.h */,
 				08FB7796FE84155DC02AAC07 /* test.c */,
 				3692F0431017E069000BDB05 /* test.cpp */,
 			);
@@ -72,6 +71,15 @@
 				8DD76F6C0486A84900D96B5E /* allo */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		36CDB61A106454A80057E0F4 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				3692EBB81017DA7B000BDB05 /* allo.h */,
+				3692F0831017E74A000BDB05 /* allocpp.h */,
+			);
+			name = include;
 			sourceTree = "<group>";
 		};
 		C6859E8C029090F304C91782 /* Documentation */ = {
