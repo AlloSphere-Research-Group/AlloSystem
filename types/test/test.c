@@ -1,6 +1,6 @@
 #include "stdio.h"
 
-#include "allo.h"
+#include "allo_types.h"
 
 extern void maincpp(AlloLattice * lat);
 

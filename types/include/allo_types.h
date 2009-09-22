@@ -28,10 +28,10 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#ifndef INCLUDE_ALLO_H
-#define INCLUDE_ALLO_H 1
+#ifndef INCLUDE_ALLO_TYPES_H
+#define INCLUDE_ALLO_TYPES_H 1
 
-#define INCLUDE_ALLO_VERSION 0.001
+#define INCLUDE_ALLO_TYPES_VERSION 0.001
 
 #if defined(WIN32) || defined(__WINDOWS_MM__)
 	#define ALLO_WIN32
@@ -50,6 +50,7 @@
 extern "C" {
 #endif
 
+#pragma mark AlloTy
 /*
 	Unique identifiers for principal types 
 		(inspired by SDIF; higher bits represent semantics, lower bits represent size)
@@ -84,14 +85,9 @@ enum {
 	AlloPointer64Ty		= 0x2F08,
 };
 
-typedef uint8_t AlloTy;
+typedef uint16_t AlloTy;
 
-/*
-	Maximum number of dimensions a lattice may represent
-	To model higher dimensional spaces, use a nested lattice descriptor
-*/
-#define ALLO_LATTICE_MAX_DIMS (4)
-
+#pragma mark AlloLattice
 /*
 	AlloLattice is a general purpose descriptor of data in a regular dimensional layout
 	It is a pointer to data followed by meta-data to describe its type and layout.
@@ -100,10 +96,15 @@ typedef uint8_t AlloTy;
 		- a specific layout can be defined and checked against
 	
 */
+/*
+	Maximum number of dimensions a lattice may represent
+	To model higher dimensional spaces, use a nested lattice descriptor
+*/
+#define ALLO_LATTICE_MAX_DIMS (4)
 typedef struct {
 	
 	/* The type of data stored (see enums above) */
-	uint16_t type;
+	AlloTy type;
 	
 	/*
 		The number of values per cell
@@ -161,6 +162,42 @@ typedef struct {
 	AlloLatticeHeader header;
 		
 } AlloLattice;
+
+#pragma mark AlloGraph
+/*
+	AlloGraph type.
+	Stores a set of nodes (vertices) and a set of arcs (edges) as node pairs.
+	Graphs may be directed or undirected. 
+	Graphs can be translated into 2D adjacency matrices, of dimensions NxN (where N = no. of nodes)
+*/
+typedef struct {
+	uint16_t type;
+	union{
+		void * ptr;
+		uint64_t pad;
+	} data;
+} AlloGraphNode;
+
+typedef struct {
+	uint16_t a, b;
+} AlloGraphEdge;
+
+typedef struct {
+	/* the number of nodes */
+	uint16_t nodecount;
+	
+	/* the number of edges */
+	uint16_t edgecount; 
+	
+	AlloGraphNode * nodes;
+	AlloGraphEdge * edges;
+
+} AlloGraph;
+
+#pragma mark -
+/*
+********** INLINE IMPLEMENTATION BELOW ***********
+*/
 
 /*
 	Return the size for a given type

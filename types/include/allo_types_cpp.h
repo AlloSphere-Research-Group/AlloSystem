@@ -28,10 +28,10 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#ifndef INCLUDE_ALLO_CPP_H
-#define INCLUDE_ALLO_CPP_H 1
+#ifndef INCLUDE_ALLO_TYPES_CPP_H
+#define INCLUDE_ALLO_TYPES_CPP_H 1
 
-#include "allo.h"
+#include "allo_types.h"
 
 namespace allo {
 
@@ -75,4 +75,4 @@ public:
 
 } // ::allo::
 
-#endif /* INCLUDE_ALLO_CPP_H */
+#endif /* INCLUDE_ALLO_TYPES_CPP_H */
