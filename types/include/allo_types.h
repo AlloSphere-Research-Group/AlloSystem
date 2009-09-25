@@ -239,7 +239,7 @@ inline size_t allo_lattice_size(const AlloLattice * lat) {
 	size_t i; 
 	size_t sz = 1;
 	for (i=0; i < lat->header.dimcount; i++) {
-		printf("%i %i %i\n", lat->header.stride[i], i, sz);
+		//printf("%i %i %i\n", lat->header.stride[i], i, sz);
 		sz *= lat->header.stride[i];
 	}
 	return sz;
