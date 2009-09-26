@@ -1,7 +1,7 @@
 
 #include "allo_types_cpp.h"
 
-#include "stdio.h"
+#include <stdio.h>
 #include <complex>
 
 static std::complex<double> foo;

@@ -82,7 +82,7 @@ enum {
 	
 	/* pointer types */
 	AlloPointer32Ty		= 0x2F04,
-	AlloPointer64Ty		= 0x2F08,
+	AlloPointer64Ty		= 0x2F08
 };
 
 typedef uint16_t AlloTy;
@@ -202,7 +202,7 @@ typedef struct {
 /*
 	Return the size for a given type
 */
-inline size_t allo_type_size(const AlloTy ty) {
+static inline size_t allo_type_size(const AlloTy ty) {
 	switch(ty) {
 		case AlloUInt8Ty:		return sizeof(uint8_t);	
 		case AlloUInt16Ty:		return sizeof(uint16_t);
@@ -225,7 +225,7 @@ inline size_t allo_type_size(const AlloTy ty) {
 /*
 	Return the number of elements (cells) in a lattice
 */
-inline uint32_t allo_lattice_elements(const AlloLattice * lat) {
+static inline uint32_t allo_lattice_elements(const AlloLattice * lat) {
 	uint32_t i, elements = 1;
 	for (i=0; i<lat->header.dimcount; i++) 
 		elements *= lat->header.dim[i];
@@ -235,7 +235,7 @@ inline uint32_t allo_lattice_elements(const AlloLattice * lat) {
 /*
 	Return the memory footprint of a lattice
 */
-inline size_t allo_lattice_size(const AlloLattice * lat) {
+static inline size_t allo_lattice_size(const AlloLattice * lat) {
 	size_t i; 
 	size_t sz = 1;
 	for (i=0; i < lat->header.dimcount; i++) {
@@ -248,7 +248,7 @@ inline size_t allo_lattice_size(const AlloLattice * lat) {
 /*
 	Set a lattice header, e.g. just after allocating
 */
-inline void allo_lattice_setheader(AlloLattice * lat, const AlloLatticeHeader * header) {
+static inline void allo_lattice_setheader(AlloLattice * lat, const AlloLatticeHeader * header) {
 	memcpy(&lat->header, header, sizeof(AlloLatticeHeader));
 }
 
