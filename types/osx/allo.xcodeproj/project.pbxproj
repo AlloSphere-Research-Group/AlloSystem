@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		163301D4106D951B00870B1F /* test.c in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* test.c */; };
 		3692F0441017E069000BDB05 /* test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3692F0431017E069000BDB05 /* test.cpp */; };
+		36C8F9C4107062F2003EC91B /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36C8F9C3107062F2003EC91B /* libportaudio.a */; };
+		36C8F9C6107062FF003EC91B /* test_portaudio.c in Sources */ = {isa = PBXBuildFile; fileRef = 36C8F9C5107062FF003EC91B /* test_portaudio.c */; };
 		8DD76F6A0486A84900D96B5E /* allo.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* allo.1 */; };
 /* End PBXBuildFile section */
 
@@ -31,11 +33,23 @@
 		3692EBB81017DA7B000BDB05 /* allo_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = allo_types.h; path = ../include/allo_types.h; sourceTree = "<group>"; };
 		3692F0431017E069000BDB05 /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test.cpp; path = ../test/test.cpp; sourceTree = "<group>"; };
 		3692F0831017E74A000BDB05 /* allo_types_cpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = allo_types_cpp.h; path = ../include/allo_types_cpp.h; sourceTree = "<group>"; };
+		36C8F9BE107062CE003EC91B /* lattice_portaudio */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = lattice_portaudio; sourceTree = BUILT_PRODUCTS_DIR; };
+		36C8F9C3107062F2003EC91B /* libportaudio.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libportaudio.a; path = /usr/local/lib/libportaudio.a; sourceTree = "<absolute>"; };
+		36C8F9C5107062FF003EC91B /* test_portaudio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = test_portaudio.c; path = ../test/test_portaudio.c; sourceTree = "<group>"; };
+		36C8F9C91070635C003EC91B /* portaudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = portaudio.h; path = /usr/local/include/portaudio.h; sourceTree = "<absolute>"; };
 		8DD76F6C0486A84900D96B5E /* allo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = allo; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6859E8B029090EE04C91782 /* allo.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = allo.1; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		36C8F9BC107062CE003EC91B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				36C8F9C4107062F2003EC91B /* libportaudio.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DD76F660486A84900D96B5E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -49,6 +63,7 @@
 		08FB7794FE84155DC02AAC07 /* allo */ = {
 			isa = PBXGroup;
 			children = (
+				36C8F9C3107062F2003EC91B /* libportaudio.a */,
 				36CDB61A106454A80057E0F4 /* include */,
 				08FB7795FE84155DC02AAC07 /* Source */,
 				C6859E8C029090F304C91782 /* Documentation */,
@@ -60,9 +75,11 @@
 		08FB7795FE84155DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				36C8F9C91070635C003EC91B /* portaudio.h */,
 				08FB7796FE84155DC02AAC07 /* test.c */,
 				3692F0431017E069000BDB05 /* test.cpp */,
 				163301B3106D859000870B1F /* unitTest.cpp */,
+				36C8F9C5107062FF003EC91B /* test_portaudio.c */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -71,6 +88,7 @@
 			isa = PBXGroup;
 			children = (
 				8DD76F6C0486A84900D96B5E /* allo */,
+				36C8F9BE107062CE003EC91B /* lattice_portaudio */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,6 +113,22 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		36C8F9BD107062CE003EC91B /* lattice_portaudio */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 36C8F9C2107062EE003EC91B /* Build configuration list for PBXNativeTarget "lattice_portaudio" */;
+			buildPhases = (
+				36C8F9BB107062CE003EC91B /* Sources */,
+				36C8F9BC107062CE003EC91B /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = lattice_portaudio;
+			productName = lattice_portaudio;
+			productReference = 36C8F9BE107062CE003EC91B /* lattice_portaudio */;
+			productType = "com.apple.product-type.tool";
+		};
 		8DD76F620486A84900D96B5E /* allo */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "allo" */;
@@ -126,11 +160,20 @@
 			projectRoot = "";
 			targets = (
 				8DD76F620486A84900D96B5E /* allo */,
+				36C8F9BD107062CE003EC91B /* lattice_portaudio */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		36C8F9BB107062CE003EC91B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				36C8F9C6107062FF003EC91B /* test_portaudio.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DD76F640486A84900D96B5E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -202,6 +245,38 @@
 			};
 			name = Release;
 		};
+		36C8F9C0107062CF003EC91B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = lattice_portaudio;
+			};
+			name = Debug;
+		};
+		36C8F9C1107062CF003EC91B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = lattice_portaudio;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -219,6 +294,15 @@
 			buildConfigurations = (
 				1DEB923608733DC60010E9CD /* Debug */,
 				1DEB923708733DC60010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		36C8F9C2107062EE003EC91B /* Build configuration list for PBXNativeTarget "lattice_portaudio" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				36C8F9C0107062CF003EC91B /* Debug */,
+				36C8F9C1107062CF003EC91B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
