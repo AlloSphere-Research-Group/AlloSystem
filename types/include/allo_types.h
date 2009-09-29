@@ -152,7 +152,7 @@ typedef struct {
 		Stride is necessary for lattices that are 4 or 8 byte aligned
 	*/
 	union{
-		void * ptr;
+		char * ptr;
 		uint64_t pad;
 	} data;
 	
