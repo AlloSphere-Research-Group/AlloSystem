@@ -15,7 +15,7 @@
 	al_main_t * main;
 }
 
-- (id)initWithInterval:(double)ti;
+- (id)initWithInterval:(al_s)ti;
 - (void)dealloc;
 - (void)tick;
 
@@ -28,7 +28,7 @@
 	al_main_tick();
 }
 
-- (id)initWithInterval:(double)interval;
+- (id)initWithInterval:(al_s)interval;
 {
 	if (self = [super init])
 	{
@@ -66,7 +66,7 @@ static OSClock * gClock;
 */
 #pragma mark Main impl
 
-void al_main_platform_attach(double interval) {
+void al_main_platform_attach(al_s interval) {
 	if (!gClock) {
 		gClock = [[OSClock alloc] initWithInterval:interval];	
 	} else {
@@ -74,7 +74,7 @@ void al_main_platform_attach(double interval) {
 	}
 }
 
-int al_main_platform_enter(double interval) {
+int al_main_platform_enter(al_s interval) {
 	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 	// create a new runloop if it doesn't exist:
 	NSRunLoop * rl = [NSRunLoop currentRunLoop];

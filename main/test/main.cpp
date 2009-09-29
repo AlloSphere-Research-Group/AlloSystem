@@ -3,7 +3,7 @@
 
 void tick(al_ns time, void * userdata) {
 	
-	double t = al_ns2s(time);
+	al_s t = al_ns2s(time);
 	printf("%f\n", al_now());
 	if (t > 3.0) {
 		al_main_exit();

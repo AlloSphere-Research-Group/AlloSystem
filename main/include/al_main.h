@@ -59,7 +59,7 @@ typedef double al_s;
 #define AL_ALMOST_NEVER (AL_NEVER-1)
 
 /*! convert nanoseconds/seconds */
-inline double al_ns2s(al_ns ns) { return ((double)(ns)) * 1.0e-9; }
+inline al_s al_ns2s(al_ns ns) { return ((al_s)(ns)) * 1.0e-9; }
 inline al_ns al_s2ns(double s) { return (al_ns) (s * 1.0e9); }
 
 /*! get current system clock time */
