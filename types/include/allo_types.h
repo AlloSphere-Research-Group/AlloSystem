@@ -119,8 +119,7 @@ typedef struct {
 	uint32_t dim[ALLO_LATTICE_MAX_DIMS];
 	
 	/* 
-		The step advancement for each dimension (loop pointer increment) 
-		stride is typically the dim * type size * components
+		# of bytes between elements of that dimension
 	*/
 	uint32_t stride[ALLO_LATTICE_MAX_DIMS];
 	
@@ -236,13 +235,8 @@ static inline uint32_t allo_lattice_elements(const AlloLattice * lat) {
 	Return the memory footprint of a lattice
 */
 static inline size_t allo_lattice_size(const AlloLattice * lat) {
-	size_t i; 
-	size_t sz = 1;
-	for (i=0; i < lat->header.dimcount; i++) {
-		//printf("%i %i %i\n", lat->header.stride[i], i, sz);
-		sz *= lat->header.stride[i];
-	}
-	return sz;
+	int idx = lat->header.dimcount-1;
+	return lat->header.stride[idx] * lat->header.dim[idx];
 }
 
 /*

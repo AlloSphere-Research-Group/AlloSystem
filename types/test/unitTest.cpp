@@ -14,7 +14,7 @@ int main(){
 		const int size0 = 2;	// no. elements in dimension 1
 		const int size1 = 64;	// no. elements in dimension 2
 		const int stride0 = comps * sizeof(data_t);	// byte offset at dim 0
-		const int stride1 = size1;
+		const int stride1 = stride0*size0;
 
 		data_t data[comps*size0*size1];
 	
@@ -28,7 +28,7 @@ int main(){
 		hdr.stride[1] = stride1;
 		
 		AlloLattice lat;
-		lat.data.ptr = &data;
+		lat.data.ptr = (char *)&data;
 		
 		allo_lattice_setheader(&lat, &hdr);
 
