@@ -5,8 +5,8 @@
 	Platform specific implementations
 		(implemented in separate file)
 */
-extern void al_main_platform_attach(al_s interval);
-extern int al_main_platform_enter(al_s interval);
+extern void al_main_platform_attach(al_sec interval);
+extern int al_main_platform_enter(al_sec interval);
 
 /*
 	If there is anything that is a singleton, it's the main loop!
@@ -31,7 +31,7 @@ void al_quit() {
 	}
 }
 
-int al_main_enter(al_s interval, main_tick_handler handler, void * userdata) {
+int al_main_enter(al_sec interval, main_tick_handler handler, void * userdata) {
 	al_init();	
 	if (!g_main->isRunning) {
 		g_main->interval = interval;
@@ -49,7 +49,7 @@ void al_main_exit() {
 	}
 }
 
-void al_main_attach(al_s interval, main_tick_handler handler, void * userdata) {
+void al_main_attach(al_sec interval, main_tick_handler handler, void * userdata) {
 	if (!g_main->isRunning) {
 		g_main->interval = interval;
 		g_main->isRunning = 1;
@@ -65,6 +65,6 @@ void al_main_tick() {
 	(g_main->handler)(g_main->logicaltime, g_main->userdata);
 }
 
-al_ns al_time() {
+al_nsec al_time() {
 	return g_main->logicaltime;
 }

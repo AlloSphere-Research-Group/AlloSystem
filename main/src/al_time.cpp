@@ -10,7 +10,7 @@
 		Current time: AudioConvertHostTimeToNanos(AudioGetCurrentHostTime()); 
 		CoreAudio also gives us a minimum resolution: AudioConvertHostTimeToNanos(AudioGetHostClockMinimumTimeDelta());
 	*/
-	al_ns al_time_cpu() {
+	al_nsec al_time_cpu() {
 		return AudioConvertHostTimeToNanos(AudioGetCurrentHostTime());
 	}
 
@@ -20,11 +20,11 @@
 	
 	#include <time.h>
 	
-	void al_sleep(al_s len) {
-		al_ns ns = al_s2ns(len);
+	void al_sleep(al_sec len) {
+		al_nsec nsec = al_sec2nsec(len);
 		struct timespec req = { 0, 0 };
 		req.tv_sec = (time_t)(len);
-		req.tv_nsec = (ns - (req.tv_sec * 1e9));
+		req.tv_nsec = (nsec - (req.tv_sec * 1e9));
 		
 		while (nanosleep(&req, &req) == -1)
 			continue;

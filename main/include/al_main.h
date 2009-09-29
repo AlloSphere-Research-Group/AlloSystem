@@ -24,7 +24,7 @@
 	REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
 	THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
 	PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
-	HEREUNDER IS PROVIDED "AS IS". REGENTS HAS NO OBLIGATION TO PROVIDE
+	HEREUNDER IS PROVIDED "AS IS". REGENTS HAS  NO OBLIGATION TO PROVIDE
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
@@ -51,36 +51,43 @@ extern "C" {
 /*! 
 	Timing uses 64-bit unsigned ints for nanosecond units, doubles for second units. 
 */
-typedef unsigned long long int al_ns;
-typedef double al_s;
+typedef long long int al_nsec;
+typedef double al_sec;
+
+#ifdef __cplusplus 
+namespace allo {
+	typedef al_nsec nsec_t;
+	typedef al_sec	sec_t;
+}
+#endif
 
 /*! temporal limits */
 #define AL_NEVER (ULLONG_MAX)
 #define AL_ALMOST_NEVER (AL_NEVER-1)
 
 /*! convert nanoseconds/seconds */
-inline al_s al_ns2s(al_ns ns) { return ((al_s)(ns)) * 1.0e-9; }
-inline al_ns al_s2ns(double s) { return (al_ns) (s * 1.0e9); }
+inline al_sec al_nsec2sec(al_nsec ns) { return ((al_sec)(ns)) * 1.0e-9; }
+inline al_nsec al_sec2nsec(double s) { return (al_nsec) (s * 1.0e9); }
 
 /*! get current system clock time */
-extern al_ns al_time_cpu();
-#define al_now_cpu() (al_ns2s(al_time_cpu()))
+extern al_nsec al_time_cpu();
+#define al_now_cpu() (al_nsec2sec(al_time_cpu()))
 
 /*! 
 	get current scheduler (logical) time 
 		(zero at al_init())
 */
-extern al_ns al_time();
-#define al_now() (al_ns2s(al_time()))
+extern al_nsec al_time();
+#define al_now() (al_nsec2sec(al_time()))
 
 /*! 
 	sleep current thread (expressed in seconds, not nanoseconds, since exact amounts are not guaranteed) 
 */
-extern void al_sleep(al_s len);
+extern void al_sleep(al_sec len);
 
 #pragma mark mainloop
 
-typedef void (*main_tick_handler)(al_ns time, void * userdata);
+typedef void (*main_tick_handler)(al_nsec time, void * userdata);
 
 /*
 	Global state in the main loop
@@ -88,7 +95,7 @@ typedef void (*main_tick_handler)(al_ns time, void * userdata);
 typedef struct {
 	int isRunning;				/* flag true (1) when in the main loop */
 	double interval;			/* in seconds */
-	al_ns t0, logicaltime;		/* birth time (wall clock), scheduler time (logical) */
+	al_nsec t0, logicaltime;		/* birth time (wall clock), scheduler time (logical) */
 	main_tick_handler handler;	/* user-supplied event handler */
 	void * userdata;			/* passed to the handler */
 } al_main_t;

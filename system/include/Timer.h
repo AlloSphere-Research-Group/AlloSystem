@@ -14,6 +14,9 @@ namespace allo{
 	#include <windows.h>
 	typedef __int64 nsec_t;		///< nanoseconds type
 	
+	// like this:
+	//typedef al_nsec nsec_t;
+	
 // Posix (Mac, Linux)
 #else
 	#include <sys/time.h>
