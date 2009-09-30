@@ -246,6 +246,25 @@ static inline void allo_lattice_setheader(AlloLattice * lat, const AlloLatticeHe
 	memcpy(&lat->header, header, sizeof(AlloLatticeHeader));
 }
 
+/*
+	Set stride factors based on a specific byte alignment
+*/
+static inline void allo_lattice_setstride(AlloLatticeHeader * h, unsigned alignSize){
+	unsigned typeSize = allo_type_size(h->type);
+	unsigned numDims = h->dimcount;
+	h->stride[0] = h->components * typeSize;
+	
+	if(numDims>1){
+		h->stride[1] = h->stride[0] * h->dim[0];		// compute ideal row stride amount
+		unsigned remain = h->stride[1] % alignSize;		// compute pad bytes
+		if(remain){ h->stride[1] += alignSize - remain;}// add pad bytes (if any)
+		
+		unsigned i=2;
+		for(; i<numDims; ++i){ h->stride[i] = h->stride[i-1] * h->dim[i-1]; }
+	}
+}
+
+
 #ifdef __cplusplus
 }
 #endif

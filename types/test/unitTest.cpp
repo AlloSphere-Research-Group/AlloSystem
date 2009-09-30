@@ -1,7 +1,7 @@
 #include <assert.h>
+#include <stdio.h>
 #include "allo_types.h"
 #include "allo_types_cpp.h"
-#include "stdio.h"
 
 typedef double data_t;
 
@@ -34,6 +34,32 @@ int main(){
 
 		assert(allo_lattice_elements(&lat) == size0*size1);
 		assert(allo_lattice_size(&lat) == sizeof(data));
+	}
+	
+	{
+		AlloLatticeHeader hdr;
+		hdr.type = AlloSInt8Ty;
+		hdr.components = 1;
+		hdr.dim[0] = 7;
+		hdr.dim[1] = 7;
+
+		// 2D test
+		hdr.dimcount = 2;
+		
+		allo_lattice_setstride(&hdr, 1);
+		assert(hdr.stride[0] == 1);
+		assert(hdr.stride[1] == 7);
+
+		allo_lattice_setstride(&hdr, 4);
+		assert(hdr.stride[1] == 8);
+		
+		allo_lattice_setstride(&hdr, 8);
+		assert(hdr.stride[1] == 8);
+		
+		// 3D test
+		hdr.dimcount = 3;
+		allo_lattice_setstride(&hdr, 4);
+		assert(hdr.stride[2] == 8*7);
 	}
 
 	return 0;
