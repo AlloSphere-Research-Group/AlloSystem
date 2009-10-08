@@ -17,7 +17,7 @@ void glutTick() {
 int main (int argc, char * const argv[]) {
     
 	printf("enter main loop\n");
-	//al_main_enter(0.01, tick, NULL);
+	al_main_enter(0.01, tick, NULL);
 	
 	// OSX:
 	//al_main_attach(0.01, tick, NUUL);
