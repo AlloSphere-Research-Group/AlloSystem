@@ -131,6 +131,7 @@ public:
 	OSCSend(const char * remoteIP, int port, int maxPacketSizeBytes=4096);
 	~OSCSend();
 
+	/// Add a component to an outbound packet
 	template <class T>
 	OutboundPacketStream& operator << (T data){ return (*mStream) << data; }
 	
@@ -140,8 +141,20 @@ public:
 	/// Set maximum outbound packet size
 	void maxPacketSize(int bytes);
 	
-	/// Sends the current outbound packet and then clears it.
+	/// Sends the current internal outbound packet and then clears it
 	void send();
+	
+	/// Send address pattern along with 1 argument immediately
+	template <class T1>
+	void send(const std::string& addressPattern, const T1& arg1);
+
+	/// Send address pattern along with 2 arguments immediately
+	template <class T1, class T2>
+	void send(const std::string& addressPattern, const T1& arg1, const T2& arg2);
+	
+	/// Send address pattern along with 3 arguments immediately
+	template <class T1, class T2, class T3>
+	void send(const std::string& addressPattern, const T1& arg1, const T2& arg2, const T3& arg3);
 
 private:	
 	char * mBuffer;
@@ -149,6 +162,24 @@ private:
 	OutboundPacketStream * mStream;
 	UdpSocket mSocket;
 };
+
+
+
+template <class T1>
+void OSCSend::send(const std::string& p, const T1& a1){
+	((*this) << osc::BeginMessage(p.c_str()) << a1 << osc::EndMessage); send();
+}
+
+template <class T1, class T2>
+void OSCSend::send(const std::string& p, const T1& a1, const T2& a2){
+	((*this) << osc::BeginMessage(p.c_str()) << a1<<a2 << osc::EndMessage); send();
+}
+
+template <class T1, class T2, class T3>
+void OSCSend::send(const std::string& p, const T1& a1, const T2& a2, const T3& a3){
+	((*this) << osc::BeginMessage(p.c_str()) << a1<<a2<<a3 << osc::EndMessage); send();
+}
+
 
 } // osc::
 
