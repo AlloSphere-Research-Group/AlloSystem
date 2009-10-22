@@ -1,5 +1,6 @@
 #include <assert.h>
-#include "Thread.h"
+#include "al_thread.h"
+#include "al_time.h"
 
 using namespace allo;
 
@@ -15,6 +16,8 @@ int main(int argc, char* argv[]){
 		t.wait();
 		assert(x == 1);
 	}
+	
+	al_sleep_sec(1);
 
 	return 0;
 }

@@ -23,26 +23,29 @@
 */
 /***************************************************/
 
-namespace allo{
 
 #define USE_PTHREAD		(defined (__APPLE__) || defined (OSX) || defined (__LINUX__) || defined (__UNIX__))
 #define USE_THREADEX	(defined(WIN32))
 
 #if USE_PTHREAD
 	#include <pthread.h>
-	typedef pthread_t ThreadHandle;
-	typedef void * (*ThreadFunction)(void *);
-	#define THREAD_FUNCTION(name) void * name(void * user)
-
 #elif USE_THREADEX
 	#include <windows.h>
 	#include <process.h>
+#endif
+
+
+namespace allo{
+
+#if USE_PTHREAD
+	typedef pthread_t ThreadHandle;
+	typedef void * (*ThreadFunction)(void *);
+	#define THREAD_FUNCTION(name) void * name(void * user)
+#elif USE_THREADEX
 	typedef unsigned long ThreadHandle;
 	typedef unsigned (__stdcall *ThreadFunction)(void *);
 	#define THREAD_FUNCTION(name) unsigned _stdcall * name(void * user)
-
 #endif
-
 
 
 class Thread{

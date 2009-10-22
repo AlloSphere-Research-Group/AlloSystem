@@ -1,6 +1,6 @@
 #ifndef AL_TIME_H_INC
 #define AL_TIME_H_INC
-whut
+
 /*
 Timing and sleep functions with millisecond (Win32) or nanosecond (Unix)
 resolution. Win32 requires linking to winmm.lib for multimedia timers.
@@ -9,9 +9,6 @@ resolution. Win32 requires linking to winmm.lib for multimedia timers.
 #ifdef WIN32
 	#include <windows.h>
 	//typedef __int64 al_nsec;		/**< nanoseconds type (accurate to +/- 292.5 years) */
-	
-	// like this:
-	//typedef al_nsec al_nsec;
 #else
 	#include <sys/time.h>
 	#include <time.h>
@@ -26,14 +23,14 @@ extern "C" {
 typedef long long int al_nsec;				/**< nanoseconds type (accurate to +/- 292.5 years) */
 typedef double al_sec;						/**< seconds type */
 
-void al_timing_init();				/**< Called once on application start (C only) */
-void al_timing_quit();				/**< Called once on application exit (C only) */
-al_nsec al_time();					/**< Get current time from OS */
-void al_sleep(al_nsec dt);			/**< Suspend calling thread's execution for dt nsec */
-void al_sleep_sec(al_sec dt);		/**< Suspend calling thread's execution for dt sec */
-al_nsec al_sleep_until(al_nsec t);	/**< Suspend calling thread's execution until absolute time, t. Returns ns slept. */
-al_sec al_nsec2sec(al_nsec nsec);	/**< Convert nsec to sec */
-al_nsec al_sec2nsec(al_sec sec);		/**< Convert sec to nsec */
+static void al_timing_init();				/**< Called once on application start (C only) */
+static void al_timing_quit();				/**< Called once on application exit (C only) */
+static al_nsec al_time();					/**< Get current time from OS */
+static void al_sleep(al_nsec dt);			/**< Suspend calling thread's execution for dt nsec */
+static void al_sleep_sec(al_sec dt);		/**< Suspend calling thread's execution for dt sec */
+static al_nsec al_sleep_until(al_nsec t);	/**< Suspend calling thread's execution until absolute time, t. Returns ns slept. */
+static al_sec al_nsec2sec(al_nsec nsec);	/**< Convert nsec to sec */
+static al_nsec al_sec2nsec(al_sec sec);		/**< Convert sec to nsec */
 
 #ifdef __cplusplus
 } /* extern "C" */
@@ -71,9 +68,9 @@ extern "C" {
 #endif
 
 static inline double al_nsec2sec(al_nsec v){ return al_sec(v * 1e-9); }
-static inline al_sec al_sec2nsec(al_sec v){ return al_nsec(v * 1e9); }
-static inline void sleepSec(al_sec v){ al_sleep(al_sec2nsec(v)); }
-static inline al_nsec sleepUntil(al_nsec v){
+static inline al_nsec al_sec2nsec(al_sec v){ return al_nsec(v * 1e9); }
+static inline void al_sleep_sec(al_sec v){ al_sleep(al_sec2nsec(v)); }
+static inline al_nsec al_sleep_until(al_nsec v){
 	al_nsec now = al_time();
 	if(v > now) al_sleep(v - now);
 	return v - now;
@@ -91,21 +88,21 @@ static inline al_nsec sleepUntil(al_nsec v){
 	other timing calls, such as CreateWaitableTimer() and WaitForSingleObject().
 	*/
 
-	static inline void timingInit(){ timeBeginPeriod(1); }
-	static inline void timingQuit(){ timeEndPeriod(1); }
+	static inline void al_timing_init(){ timeBeginPeriod(1); }
+	static inline void al_timing_quit(){ timeEndPeriod(1); }
 
 	static inline al_nsec al_time(){
 		return (al_nsec)timeGetTime() * (al_nsec)1e6;
 	}
 
-	static inline void al_sleep(al_nsec dt){
-		Sleep((DWORD)(dt / (al_nsec)1e6));
+	static inline void al_sleep(al_nsec v){
+		Sleep((DWORD)(v / (al_nsec)1e6));
 	}
 
 #else
 
-	static inline void timingInit(){}
-	static inline void timingQuit(){}
+	static inline void al_timing_init(){}
+	static inline void al_timing_quit(){}
 
 	#define NS_S (al_nsec)1e9
 
@@ -115,9 +112,9 @@ static inline al_nsec sleepUntil(al_nsec v){
 		return ((al_nsec)t.tv_sec) * NS_S + (al_nsec)(t.tv_usec * 1000);
 	}
 
-	static inline void al_sleep(al_nsec t){
-		time_t sec = (time_t)(t / NS_S);
-		timespec tspec = { sec, (long)(t - ((al_nsec)sec * NS_S)) }; // { sec, nsec }
+	static inline void al_sleep(al_nsec v){
+		time_t sec = (time_t)(v / NS_S);
+		timespec tspec = { sec, (long)(v - ((al_nsec)sec * NS_S)) }; // { sec, nsec }
 		nanosleep(&tspec, NULL);
 	}
 
@@ -133,15 +130,13 @@ static inline al_nsec sleepUntil(al_nsec v){
 namespace allo{
 namespace{
 struct TimeSingleton{
-	TimeSingleton(){ timingInit(); }
-	~TimeSingleton(){ timingQuit(); }
+	TimeSingleton(){ al_timing_init(); }
+	~TimeSingleton(){ al_timing_quit(); }
 };
 static TimeSingleton timeSingleton;
 }
 }
 #endif
-
-} // allo::
 
 #endif
 
