@@ -47,8 +47,6 @@ public:
 
 	al_nsec elapsed(){ return mStop - mStart; }					///< Returns nsec between start() and stop() calls
 	al_sec elapsedSec(){ return al_nsec2sec(elapsed()); }		///< Returns  sec between start() and stop() calls
-	//al_sec elapsedMSec(){ return ((al_sec)elapsed()*1e-6); }	///< Returns msec between start() and stop() calls
-	al_sec elapsedMSec(){ return elapsed()*1e-6; }
 	void start(){ mStart=al_time(); }							///< Set start time as current time
 	void stop(){ mStop=al_time(); }								///< Set stop time as current time
 
