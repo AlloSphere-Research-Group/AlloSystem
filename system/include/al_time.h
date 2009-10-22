@@ -26,8 +26,8 @@ typedef double al_sec;						/**< seconds type */
 static void al_timing_init();				/**< Called once on application start (C only) */
 static void al_timing_quit();				/**< Called once on application exit (C only) */
 static al_nsec al_time();					/**< Get current time from OS */
-static void al_sleep(al_nsec dt);			/**< Suspend calling thread's execution for dt nsec */
-static void al_sleep_sec(al_sec dt);		/**< Suspend calling thread's execution for dt sec */
+static void al_sleep(al_sec dt);			/**< Suspend calling thread's execution for dt sec */
+static void al_sleep_nsec(al_nsec dt);		/**< Suspend calling thread's execution for dt nsec */
 static al_nsec al_sleep_until(al_nsec t);	/**< Suspend calling thread's execution until absolute time, t. Returns ns slept. */
 static al_sec al_nsec2sec(al_nsec nsec);	/**< Convert nsec to sec */
 static al_nsec al_sec2nsec(al_sec sec);		/**< Convert sec to nsec */
@@ -68,10 +68,10 @@ extern "C" {
 
 static inline double al_nsec2sec(al_nsec v){ return al_sec(v * 1e-9); }
 static inline al_nsec al_sec2nsec(al_sec v){ return al_nsec(v * 1e9); }
-static inline void al_sleep_sec(al_sec v){ al_sleep(al_sec2nsec(v)); }
+static inline void al_sleep(al_sec v){ al_sleep_nsec(al_sec2nsec(v)); }
 static inline al_nsec al_sleep_until(al_nsec v){
 	al_nsec now = al_time();
-	if(v > now) al_sleep(v - now);
+	if(v > now) al_sleep_nsec(v - now);
 	return v - now;
 }
 
@@ -94,7 +94,7 @@ static inline al_nsec al_sleep_until(al_nsec v){
 		return (al_nsec)timeGetTime() * (al_nsec)1e6;
 	}
 
-	static inline void al_sleep(al_nsec v){
+	static inline void al_sleep_nsec(al_nsec v){
 		Sleep((DWORD)(v / (al_nsec)1e6));
 	}
 
@@ -111,7 +111,7 @@ static inline al_nsec al_sleep_until(al_nsec v){
 		return ((al_nsec)t.tv_sec) * NS_S + (al_nsec)(t.tv_usec * 1000);
 	}
 
-	static inline void al_sleep(al_nsec v){
+	static inline void al_sleep_nsec(al_nsec v){
 		time_t sec = (time_t)(v / NS_S);
 		timespec tspec = { sec, (long)(v - ((al_nsec)sec * NS_S)) }; // { sec, nsec }
 		nanosleep(&tspec, NULL);

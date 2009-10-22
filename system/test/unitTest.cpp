@@ -35,12 +35,12 @@ int main(int argc, char* argv[]){
 		al_nsec t,dt;
 		
 		t = al_time();
-		al_sleep(sleepns);
+		al_sleep_nsec(sleepns);
 		dt = al_time() - t;
 		assert(aboutEqual(dt, sleepns, slop));
 
 		t = al_time();
-		al_sleep_sec(al_nsec2sec(sleepns));
+		al_sleep(al_nsec2sec(sleepns));
 		dt = al_time() - t;
 		assert(aboutEqual(dt, sleepns, slop));
 
@@ -52,7 +52,7 @@ int main(int argc, char* argv[]){
 		Timer tm;
 		
 		tm.start();
-		al_sleep(sleepns);
+		al_sleep_nsec(sleepns);
 		tm.stop();
 		dt = tm.elapsed();
 		assert(aboutEqual(dt, sleepns, slop));
