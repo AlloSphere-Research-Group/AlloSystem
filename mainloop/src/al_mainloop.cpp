@@ -15,7 +15,7 @@ static al_main_t * g_main;
 
 #pragma mark C API
 
-al_main_t * al_init() {
+al_main_t * al_main_init() {
 	if (g_main == 0) {
 		g_main = (al_main_t *)malloc(sizeof(al_main_t));
 		assert(g_main != 0); /* if this fails, then your OS is probably going down */
@@ -24,15 +24,16 @@ al_main_t * al_init() {
 	return g_main;
 }
 
-void al_quit() {
+int al_main_quit() {
 	if (g_main != 0) {
 		free(g_main);
 		g_main = 0;
 	}
+	return 0;
 }
 
 int al_main_enter(al_sec interval, main_tick_handler handler, void * userdata) {
-	al_init();	
+	al_main_init();	
 	if (!g_main->isRunning) {
 		g_main->interval = interval;
 		g_main->isRunning = 1;

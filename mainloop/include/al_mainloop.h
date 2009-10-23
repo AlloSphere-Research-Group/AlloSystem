@@ -3,7 +3,7 @@
 
 /*
  *  A collection of functions and classes related to application mainloops
- *  Graham Wakefield, AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
+ *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
  */
 
 /*
@@ -28,50 +28,11 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-/* stdint for portable sized datatypes */
-#if defined(WIN32) || defined(__WINDOWS_MM__)
-	#define AL_WIN32
-	#include <windows.h>
-#elif defined( __APPLE__ ) && defined( __MACH__ )
-	#define AL_OSX
-	#include <Carbon/Carbon.h>
-#else
-	#define AL_LINUX
-#endif
-
-#include <limits.h>
-#include <math.h>
+#include "al_time.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#pragma mark time
-
-/*! 
-	Timing uses 64-bit unsigned ints for nanosecond units, doubles for second units. 
-*/
-typedef long long int al_nsec;
-typedef double al_sec;
-
-#ifdef __cplusplus 
-namespace allo {
-	typedef al_nsec nsec_t;
-	typedef al_sec	sec_t;
-}
-#endif
-
-/*! temporal limits */
-#define AL_NEVER (ULLONG_MAX)
-#define AL_ALMOST_NEVER (AL_NEVER-1)
-
-/*! convert nanoseconds/seconds */
-inline al_sec al_nsec2sec(al_nsec ns) { return ((al_sec)(ns)) * 1.0e-9; }
-inline al_nsec al_sec2nsec(double s) { return (al_nsec) (s * 1.0e9); }
-
-/*! get current system clock time */
-extern al_nsec al_time_cpu();
-#define al_now_cpu() (al_nsec2sec(al_time_cpu()))
 
 /*! 
 	get current scheduler (logical) time 
@@ -80,10 +41,6 @@ extern al_nsec al_time_cpu();
 extern al_nsec al_time();
 #define al_now() (al_nsec2sec(al_time()))
 
-/*! 
-	sleep current thread (expressed in seconds, not nanoseconds, since exact amounts are not guaranteed) 
-*/
-extern void al_sleep(al_sec len);
 
 #pragma mark mainloop
 
@@ -103,8 +60,8 @@ typedef struct {
 /*!
 	Main initialization and termination
 */
-extern al_main_t * al_init();
-extern void al_quit();
+extern al_main_t * al_main_init();
+extern int al_main_quit();
 
 /*!
 	al_main can be used within an existing application mainloop, or can create its own

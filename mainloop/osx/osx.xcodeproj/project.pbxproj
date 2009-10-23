@@ -7,11 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		36C8FA26107135F3003EC91B /* al_main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36C8FA25107135F3003EC91B /* al_main.cpp */; };
+		36C8FA26107135F3003EC91B /* al_mainloop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36C8FA25107135F3003EC91B /* al_mainloop.cpp */; };
 		36C8FA5E10713737003EC91B /* al_time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36C8FA5D10713737003EC91B /* al_time.cpp */; };
-		36C8FA6010713767003EC91B /* al_main_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 36C8FA5F10713767003EC91B /* al_main_osx.mm */; };
+		36C8FA6010713767003EC91B /* al_mainloop_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 36C8FA5F10713767003EC91B /* al_mainloop_osx.mm */; };
 		36C8FA7D1071417A003EC91B /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36C8FA7B1071417A003EC91B /* Carbon.framework */; };
-		36C8FA7E1071417A003EC91B /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36C8FA7C1071417A003EC91B /* CoreAudio.framework */; };
 		36C8FA88107141D6003EC91B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36C8FA87107141D6003EC91B /* Cocoa.framework */; };
 		8DD76F650486A84900D96B5E /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* main.cpp */; settings = {ATTRIBUTES = (); }; };
 		8DD76F6A0486A84900D96B5E /* osx.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* osx.1 */; };
@@ -32,13 +31,13 @@
 
 /* Begin PBXFileReference section */
 		08FB7796FE84155DC02AAC07 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		36C8FA24107135E8003EC91B /* al_main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_main.h; sourceTree = "<group>"; };
-		36C8FA25107135F3003EC91B /* al_main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_main.cpp; sourceTree = "<group>"; };
+		36C8FA24107135E8003EC91B /* al_mainloop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_mainloop.h; sourceTree = "<group>"; };
+		36C8FA25107135F3003EC91B /* al_mainloop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_mainloop.cpp; sourceTree = "<group>"; };
 		36C8FA5D10713737003EC91B /* al_time.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_time.cpp; sourceTree = "<group>"; };
-		36C8FA5F10713767003EC91B /* al_main_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = al_main_osx.mm; sourceTree = "<group>"; };
+		36C8FA5F10713767003EC91B /* al_mainloop_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = al_mainloop_osx.mm; sourceTree = "<group>"; };
 		36C8FA7B1071417A003EC91B /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
-		36C8FA7C1071417A003EC91B /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = /System/Library/Frameworks/CoreAudio.framework; sourceTree = "<absolute>"; };
 		36C8FA87107141D6003EC91B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		36D3291110926BE800E542CA /* al_time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_time.h; sourceTree = "<group>"; };
 		8DD76F6C0486A84900D96B5E /* osx */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = osx; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6859E8B029090EE04C91782 /* osx.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = osx.1; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -49,7 +48,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				36C8FA7D1071417A003EC91B /* Carbon.framework in Frameworks */,
-				36C8FA7E1071417A003EC91B /* CoreAudio.framework in Frameworks */,
 				36C8FA88107141D6003EC91B /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -65,7 +63,6 @@
 				08FB7795FE84155DC02AAC07 /* test */,
 				C6859E8C029090F304C91782 /* Documentation */,
 				36C8FA7B1071417A003EC91B /* Carbon.framework */,
-				36C8FA7C1071417A003EC91B /* CoreAudio.framework */,
 				36C8FA87107141D6003EC91B /* Cocoa.framework */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
 			);
@@ -92,7 +89,8 @@
 		36C8FA22107135DE003EC91B /* include */ = {
 			isa = PBXGroup;
 			children = (
-				36C8FA24107135E8003EC91B /* al_main.h */,
+				36D3291110926BE800E542CA /* al_time.h */,
+				36C8FA24107135E8003EC91B /* al_mainloop.h */,
 			);
 			name = include;
 			path = ../include;
@@ -101,9 +99,9 @@
 		36C8FA23107135DE003EC91B /* src */ = {
 			isa = PBXGroup;
 			children = (
-				36C8FA25107135F3003EC91B /* al_main.cpp */,
 				36C8FA5D10713737003EC91B /* al_time.cpp */,
-				36C8FA5F10713767003EC91B /* al_main_osx.mm */,
+				36C8FA25107135F3003EC91B /* al_mainloop.cpp */,
+				36C8FA5F10713767003EC91B /* al_mainloop_osx.mm */,
 			);
 			name = src;
 			path = ../src;
@@ -161,9 +159,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				8DD76F650486A84900D96B5E /* main.cpp in Sources */,
-				36C8FA26107135F3003EC91B /* al_main.cpp in Sources */,
+				36C8FA26107135F3003EC91B /* al_mainloop.cpp in Sources */,
 				36C8FA5E10713737003EC91B /* al_time.cpp in Sources */,
-				36C8FA6010713767003EC91B /* al_main_osx.mm in Sources */,
+				36C8FA6010713767003EC91B /* al_mainloop_osx.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

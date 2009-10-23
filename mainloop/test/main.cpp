@@ -23,7 +23,5 @@ int main (int argc, char * const argv[]) {
 	//al_main_attach(0.01, tick, NUUL);
 	
 	printf("done\n");
-	al_quit();
-	
-	return 0;
+	return al_main_quit();
 }

@@ -1,33 +1,34 @@
-#include "al_main.h"
+#include "al_time.h"
 
-#ifdef AL_OSX
-
-	#include <CoreAudio/HostTime.h>
+/* Windows */
+#ifdef AL_WIN32
+	#include <windows.h>
 	
-	/*
-		Rather than using a system call (gettimeofday()) we make use of CoreAudio, which is cheap & high resolution.
-		A side-benefit of this is that it will correspond directly with the audio processing.
-		Current time: AudioConvertHostTimeToNanos(AudioGetCurrentHostTime()); 
-		CoreAudio also gives us a minimum resolution: AudioConvertHostTimeToNanos(AudioGetHostClockMinimumTimeDelta());
-	*/
 	al_nsec al_time_cpu() {
-		return AudioConvertHostTimeToNanos(AudioGetCurrentHostTime());
+		return al_sec2nsec(timeGetTime());
 	}
-
-#endif
-
-#ifdef AL_OSX || AL_LINUX
 	
+	void al_time_sleep(al_sec len) {
+		Sleep((DWORD)(al_nsec2sec(len));
+	}
+	
+/* Posix (Mac, Linux) */
+#else
+	#include <sys/time.h>
 	#include <time.h>
 	
-	void al_sleep(al_sec len) {
-		al_nsec nsec = al_sec2nsec(len);
-		struct timespec req = { 0, 0 };
-		req.tv_sec = (time_t)(len);
-		req.tv_nsec = (nsec - (req.tv_sec * 1e9));
-		
-		while (nanosleep(&req, &req) == -1)
+	al_nsec al_time_cpu() {
+		timeval t;
+		gettimeofday(&t, NULL);	
+		return al_sec2nsec(t.tv_sec) + (al_nsec)(t.tv_usec * 1000);
+	}
+	
+	void al_time_sleep(al_sec len) {
+		time_t sec = (time_t)len;
+		al_nsec nsec = al_sec2nsec(len - (al_sec)sec);
+		timespec tspec = { sec, nsec }; 
+		while (nanosleep(&tspec, &tspec) == -1)
 			continue;
 	}
 	
-#endif
+#endif /* platform specific */
