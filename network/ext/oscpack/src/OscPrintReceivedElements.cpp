@@ -29,6 +29,7 @@
 */
 #include "OscPrintReceivedElements.h"
 
+#include <string.h>
 #include <iostream>
 #include <iomanip>
 #include <ctime>

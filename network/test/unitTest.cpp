@@ -1,6 +1,7 @@
 #include <assert.h>
+#include <string.h>
 #include "OSC.h"
-#include "Timer.h"
+#include "al_time.h"
 
 using namespace allo;
 
@@ -41,7 +42,7 @@ int main(int argc, char* argv[]){
 
 	Data data;
 	
-	struct wait{ wait(double t=0.01){ Timer::sleepSec(t); }};
+	struct wait{ wait(double t=0.01){ al_sleep(t); }};
 
 	osc::OSCRecv r(12000, onRecv, &data);
 	r.start();

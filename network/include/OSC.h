@@ -39,7 +39,7 @@ Example send code:
 #include "osc/OscPacketListener.h"
 #include "osc/OscReceivedElements.h"
 #include "osc/OscTypes.h"
-#include "Thread.h"
+#include "al_thread.h"
 
 //namespace allo{
 
