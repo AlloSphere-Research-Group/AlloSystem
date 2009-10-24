@@ -1,0 +1,235 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		36752B2C1093917100FF5627 /* al_time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36C8FA5D10713737003EC91B /* al_time.cpp */; };
+		36752B2D1093917100FF5627 /* al_mainloop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36C8FA25107135F3003EC91B /* al_mainloop.cpp */; };
+		36752B2E1093917100FF5627 /* al_mainloop_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 36C8FA5F10713767003EC91B /* al_mainloop_osx.mm */; };
+		36752B2F1093917500FF5627 /* al_time.h in Headers */ = {isa = PBXBuildFile; fileRef = 36D3291110926BE800E542CA /* al_time.h */; };
+		36752B301093917500FF5627 /* al_mainloop.h in Headers */ = {isa = PBXBuildFile; fileRef = 36C8FA24107135E8003EC91B /* al_mainloop.h */; };
+		36752B311093917500FF5627 /* al_time_cpp.h in Headers */ = {isa = PBXBuildFile; fileRef = 369568E8109382D700FD4312 /* al_time_cpp.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		36752B291093915A00FF5627 /* libalsystem.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libalsystem.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		369568E8109382D700FD4312 /* al_time_cpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_time_cpp.h; sourceTree = "<group>"; };
+		36C8FA24107135E8003EC91B /* al_mainloop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_mainloop.h; sourceTree = "<group>"; };
+		36C8FA25107135F3003EC91B /* al_mainloop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_mainloop.cpp; sourceTree = "<group>"; };
+		36C8FA5D10713737003EC91B /* al_time.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_time.cpp; sourceTree = "<group>"; };
+		36C8FA5F10713767003EC91B /* al_mainloop_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = al_mainloop_osx.mm; sourceTree = "<group>"; };
+		36D3291110926BE800E542CA /* al_time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_time.h; sourceTree = "<group>"; };
+		C6859E8B029090EE04C91782 /* osx.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = osx.1; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		36752B271093915A00FF5627 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		08FB7794FE84155DC02AAC07 /* osx */ = {
+			isa = PBXGroup;
+			children = (
+				36C8FA22107135DE003EC91B /* include */,
+				36C8FA23107135DE003EC91B /* src */,
+				C6859E8C029090F304C91782 /* Documentation */,
+				1AB674ADFE9D54B511CA2CBB /* Products */,
+			);
+			name = osx;
+			sourceTree = "<group>";
+		};
+		1AB674ADFE9D54B511CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				36752B291093915A00FF5627 /* libalsystem.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		36C8FA22107135DE003EC91B /* include */ = {
+			isa = PBXGroup;
+			children = (
+				36D3291110926BE800E542CA /* al_time.h */,
+				36C8FA24107135E8003EC91B /* al_mainloop.h */,
+				369568E8109382D700FD4312 /* al_time_cpp.h */,
+			);
+			name = include;
+			path = ../../system/include;
+			sourceTree = SOURCE_ROOT;
+		};
+		36C8FA23107135DE003EC91B /* src */ = {
+			isa = PBXGroup;
+			children = (
+				36C8FA5D10713737003EC91B /* al_time.cpp */,
+				36C8FA25107135F3003EC91B /* al_mainloop.cpp */,
+				36C8FA5F10713767003EC91B /* al_mainloop_osx.mm */,
+			);
+			name = src;
+			path = ../../system/src;
+			sourceTree = SOURCE_ROOT;
+		};
+		C6859E8C029090F304C91782 /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+				C6859E8B029090EE04C91782 /* osx.1 */,
+			);
+			name = Documentation;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		36752B251093915A00FF5627 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				36752B2F1093917500FF5627 /* al_time.h in Headers */,
+				36752B301093917500FF5627 /* al_mainloop.h in Headers */,
+				36752B311093917500FF5627 /* al_time_cpp.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		36752B281093915A00FF5627 /* alsystem */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 36752B4B1093919600FF5627 /* Build configuration list for PBXNativeTarget "alsystem" */;
+			buildPhases = (
+				36752B251093915A00FF5627 /* Headers */,
+				36752B261093915A00FF5627 /* Sources */,
+				36752B271093915A00FF5627 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = alsystem;
+			productName = alsystem;
+			productReference = 36752B291093915A00FF5627 /* libalsystem.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "osx" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 1;
+			mainGroup = 08FB7794FE84155DC02AAC07 /* osx */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				36752B281093915A00FF5627 /* alsystem */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		36752B261093915A00FF5627 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				36752B2C1093917100FF5627 /* al_time.cpp in Sources */,
+				36752B2D1093917100FF5627 /* al_mainloop.cpp in Sources */,
+				36752B2E1093917100FF5627 /* al_mainloop_osx.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB923608733DC60010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx10.5;
+			};
+			name = Debug;
+		};
+		1DEB923708733DC60010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx10.5;
+			};
+			name = Release;
+		};
+		36752B2A1093915B00FF5627 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = alsystem;
+				SYMROOT = ../../build;
+			};
+			name = Debug;
+		};
+		36752B2B1093915B00FF5627 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = alsystem;
+				SYMROOT = ../../build;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "osx" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB923608733DC60010E9CD /* Debug */,
+				1DEB923708733DC60010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		36752B4B1093919600FF5627 /* Build configuration list for PBXNativeTarget "alsystem" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				36752B2A1093915B00FF5627 /* Debug */,
+				36752B2B1093915B00FF5627 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}
