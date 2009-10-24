@@ -1,4 +1,4 @@
-#include "al_main.h"
+#include "al_mainloop.h"
 #include "stdio.h"
 
 void tick(al_nsec time, void * userdata) {

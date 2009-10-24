@@ -4,7 +4,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include "al_main.h"
+#include "al_mainloop.h"
 
 
 /*

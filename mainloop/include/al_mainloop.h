@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_MAIN_H
-#define INCLUDE_AL_MAIN_H
+#ifndef INCLUDE_AL_MAINLOOP_H
+#define INCLUDE_AL_MAINLOOP_H
 
 /*
  *  A collection of functions and classes related to application mainloops
@@ -40,9 +40,6 @@ extern "C" {
 */
 extern al_nsec al_time();
 #define al_now() (al_nsec2sec(al_time()))
-
-
-#pragma mark mainloop
 
 typedef void (*main_tick_handler)(al_nsec time, void * userdata);
 
@@ -88,12 +85,12 @@ extern int al_main_quit();
 				Returns immediately.
 		
 		b) When the runloop exits, it is your responsibility to call:
-			al_quit()
+			al_main_quit()
 	
 	3. Using an existing application mainloop with manual timer (e.g. GLUT apps)
 		
 		a) Manually initialize delta during startup:
-			al_init() 
+			al_main_init() 
 				You must call this before calling al_main_tick()
 				
 		b) Manually trigger delta at frequent intervals:
@@ -101,7 +98,7 @@ extern int al_main_quit();
 				Call this function frequently, e.g. in a draw callback 
 				
 		c) Manually release delta once the application is closing:
-			al_quit()
+			al_main_quit()
 				You must not make any other calls into delta after al_quit()
 */
 extern int al_main_enter(double interval, main_tick_handler handler, void * userdata);
@@ -114,4 +111,4 @@ extern void al_main_exit();
 } // extern "C"
 #endif
 
-#endif /* INCLUDE_AL_MAIN_H */
+#endif /* INCLUDE_AL_MAINLOOP_H */

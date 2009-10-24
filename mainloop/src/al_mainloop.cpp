@@ -1,4 +1,4 @@
-#include "al_main.h"
+#include "al_mainloop.h"
 #include "stdlib.h"
 
 /*
@@ -20,6 +20,10 @@ al_main_t * al_main_init() {
 		g_main = (al_main_t *)malloc(sizeof(al_main_t));
 		assert(g_main != 0); /* if this fails, then your OS is probably going down */
 		g_main->t0 = al_time_cpu();
+		g_main->isRunning = 0;
+		g_main->userdata = NULL;
+		g_main->interval = 1;
+		g_main->handler = NULL;
 	}
 	return g_main;
 }

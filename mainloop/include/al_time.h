@@ -69,8 +69,8 @@ namespace allo {
 #define AL_ALMOST_NEVER (AL_NEVER-1)
 
 /*! convert nanoseconds/seconds */
-inline al_sec al_nsec2sec(al_nsec ns) { return ((al_sec)(ns)) * 1.0e-9; }
-inline al_nsec al_sec2nsec(double s) { return (al_nsec) (s * 1.0e9); }
+#define al_nsec2sec(ns)		(((al_sec)(ns)) * 1.0e-9)
+#define al_sec2nsec(s)		((al_nsec)(s * 1.0e9))
 
 /*! get current system clock time */
 extern al_nsec al_time_cpu();
