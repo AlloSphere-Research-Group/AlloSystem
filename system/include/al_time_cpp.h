@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_TIME_H
-#define INCLUDE_AL_TIME_H
+#ifndef INCLUDE_AL_TIME_CPP_H
+#define INCLUDE_AL_TIME_CPP_H
 
 /*
  *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
@@ -28,38 +28,29 @@
 */
 
 /*
-	Timing and sleep functions with millisecond (Win32) or nanosecond (Unix)
-	resolution. Win32 requires linking to winmm.lib for multimedia timers.
+	C++ helper wrapeprs for al_time
 */
 
-#include <limits.h>
-#include <math.h>
+#include "al_time.h"
 
-#ifdef __cplusplus
-extern "C" {
+namespace allo{
+
+/// Timer with stopwatch-like functionality for benchmarking, etc.
+class Timer {
+public:
+	Timer(): mStart(0), mStop(0){}
+
+	al_nsec elapsed(){ return mStop - mStart; }					///< Returns nsec between start() and stop() calls
+	al_sec elapsedSec(){ return al_time_ns2s * elapsed(); }		///< Returns  sec between start() and stop() calls
+	void start(){ mStart=al_time(); }							///< Set start time as current time
+	void stop(){ mStop=al_time(); }								///< Set stop time as current time
+
+private:
+	al_nsec mStart, mStop;	// start and stop times
+};
+
+} // allo::
 #endif
 
-typedef long long int al_nsec;				/**< nanoseconds type (accurate to +/- 292.5 years) */
-typedef double al_sec;						/**< seconds type */
-
-/**! temporal limits */
-#define AL_TIME_NSEC_NEVER (ULLONG_MAX)
-
-/**! conversion factors for nanoseconds/seconds */
-#define al_time_ns2s		1.0e-9
-#define al_time_s2ns		1.0e9
-
-/**! Get current time from OS */
-extern al_sec al_time();					
-extern al_nsec al_time_nsec();				
-
-/**! Suspend calling thread's execution for dt sec/nsec */
-extern void al_sleep(al_sec dt);		
-extern void al_sleep_nsec(al_nsec dt);	
-
-#ifdef __cplusplus
-} /* extern "C" */
-#endif
-
-#endif /* INCLUDE_AL_TIME_H */
+#endif /* INCLUDE_AL_TIME_CPP_H */
 

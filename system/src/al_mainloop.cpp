@@ -1,5 +1,6 @@
 #include "al_mainloop.h"
 #include "stdlib.h"
+#include "assert.h"
 
 /*
 	Platform specific implementations
@@ -19,7 +20,7 @@ al_main_t * al_main_init() {
 	if (g_main == 0) {
 		g_main = (al_main_t *)malloc(sizeof(al_main_t));
 		assert(g_main != 0); /* if this fails, then your OS is probably going down */
-		g_main->t0 = al_time_cpu();
+		g_main->t0 = al_time_nsec();
 		g_main->isRunning = 0;
 		g_main->userdata = NULL;
 		g_main->interval = 1;
@@ -65,11 +66,11 @@ void al_main_attach(al_sec interval, main_tick_handler handler, void * userdata)
 }
 
 void al_main_tick() {
-	g_main->logicaltime = al_time_cpu() - g_main->t0;
+	g_main->logicaltime = al_time_nsec() - g_main->t0;
 	// pass control to user-specified mainloop:
 	(g_main->handler)(g_main->logicaltime, g_main->userdata);
 }
 
-al_nsec al_time() {
+al_nsec al_main_time_nsec() {
 	return g_main->logicaltime;
 }

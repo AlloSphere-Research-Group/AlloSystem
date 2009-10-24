@@ -38,8 +38,8 @@ extern "C" {
 	get current scheduler (logical) time 
 		(zero at al_init())
 */
-extern al_nsec al_time();
-#define al_now() (al_nsec2sec(al_time()))
+extern al_nsec al_main_time_nsec();
+#define al_main_time_sec() (al_main_time_nsec() * al_time_ns2s)
 
 typedef void (*main_tick_handler)(al_nsec time, void * userdata);
 
