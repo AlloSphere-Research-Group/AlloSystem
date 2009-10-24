@@ -133,7 +133,7 @@
 				36D32D05109279BE00E542CA /* al_time.h */,
 			);
 			name = include;
-			path = ../../include;
+			path = ../../system/include;
 			sourceTree = SOURCE_ROOT;
 		};
 		36D32D06109279BE00E542CA /* src */ = {
@@ -144,7 +144,7 @@
 				36D32D09109279BE00E542CA /* al_time.cpp */,
 			);
 			name = src;
-			path = ../../src;
+			path = ../../system/src;
 			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
@@ -247,6 +247,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = CocoaExample;
+				SYMROOT = ../../build;
 			};
 			name = Debug;
 		};
@@ -262,6 +263,7 @@
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = CocoaExample;
+				SYMROOT = ../../build;
 			};
 			name = Release;
 		};

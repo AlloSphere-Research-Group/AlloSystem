@@ -12,7 +12,7 @@
 #include "al_mainloop.h"
 
 void tick(al_nsec t, void * userdata) {
-	NSLog(@"time %f\n", al_nsec2sec(t));
+	NSLog(@"time %f\n", al_time_ns2s * t);
 }
 
 @implementation TestController

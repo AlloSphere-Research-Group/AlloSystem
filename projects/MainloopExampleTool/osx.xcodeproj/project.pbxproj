@@ -15,7 +15,7 @@
 		36D32D8010927C9600E542CA /* al_time.h in Headers */ = {isa = PBXBuildFile; fileRef = 36D3291110926BE800E542CA /* al_time.h */; };
 		36D32D8110927C9600E542CA /* al_mainloop.h in Headers */ = {isa = PBXBuildFile; fileRef = 36C8FA24107135E8003EC91B /* al_mainloop.h */; };
 		36D32D8B10927CC200E542CA /* libalmainloop.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36D32D7910927C8600E542CA /* libalmainloop.a */; };
-		8DD76F650486A84900D96B5E /* mainloop_example.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* mainloop_example.cpp */; settings = {ATTRIBUTES = (); }; };
+		8DD76F650486A84900D96B5E /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* main.cpp */; settings = {ATTRIBUTES = (); }; };
 		8DD76F6A0486A84900D96B5E /* osx.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* osx.1 */; };
 /* End PBXBuildFile section */
 
@@ -43,7 +43,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		08FB7796FE84155DC02AAC07 /* mainloop_example.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mainloop_example.cpp; path = ../projects/mainloop_example.cpp; sourceTree = "<group>"; };
+		08FB7796FE84155DC02AAC07 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		369568E8109382D700FD4312 /* al_time_cpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_time_cpp.h; sourceTree = "<group>"; };
 		36C8FA24107135E8003EC91B /* al_mainloop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_mainloop.h; sourceTree = "<group>"; };
 		36C8FA25107135F3003EC91B /* al_mainloop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_mainloop.cpp; sourceTree = "<group>"; };
@@ -93,7 +93,7 @@
 			isa = PBXGroup;
 			children = (
 				36D32A1C10926E8800E542CA /* Cocoa.framework */,
-				08FB7796FE84155DC02AAC07 /* mainloop_example.cpp */,
+				08FB7796FE84155DC02AAC07 /* main.cpp */,
 			);
 			name = projects;
 			sourceTree = "<group>";
@@ -115,7 +115,7 @@
 				369568E8109382D700FD4312 /* al_time_cpp.h */,
 			);
 			name = include;
-			path = ../system/include;
+			path = ../../system/include;
 			sourceTree = SOURCE_ROOT;
 		};
 		36C8FA23107135DE003EC91B /* src */ = {
@@ -126,7 +126,7 @@
 				36C8FA5F10713767003EC91B /* al_mainloop_osx.mm */,
 			);
 			name = src;
-			path = ../system/src;
+			path = ../../system/src;
 			sourceTree = SOURCE_ROOT;
 		};
 		C6859E8C029090F304C91782 /* Documentation */ = {
@@ -221,7 +221,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8DD76F650486A84900D96B5E /* mainloop_example.cpp in Sources */,
+				8DD76F650486A84900D96B5E /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -249,14 +249,15 @@
 					"_GLIBCXX_DEBUG=1",
 					"_GLIBCXX_DEBUG_PEDANTIC=1",
 				);
-				HEADER_SEARCH_PATHS = ../include;
+				HEADER_SEARCH_PATHS = ../../include;
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/build/Debug\"",
+					"\"$(SRCROOT)/$(BUILD_DIR)/$(CONFIGURATION)\"",
 				);
 				OTHER_CFLAGS = "-DDELTA_OSX";
 				PRODUCT_NAME = osx;
+				SYMROOT = ../../build;
 			};
 			name = Debug;
 		};
@@ -266,14 +267,15 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;
-				HEADER_SEARCH_PATHS = ../include;
+				HEADER_SEARCH_PATHS = ../../include;
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/build/Debug\"",
+					"\"$(SRCROOT)/$(BUILD_DIR)/$(CONFIGURATION)\"",
 				);
 				OTHER_CFLAGS = "-DDELTA_OSX";
 				PRODUCT_NAME = osx;
+				SYMROOT = ../../build;
 			};
 			name = Release;
 		};
@@ -315,6 +317,7 @@
 				INSTALL_PATH = /usr/local/lib;
 				PREBINDING = NO;
 				PRODUCT_NAME = almainloop;
+				SYMROOT = ../../build;
 			};
 			name = Debug;
 		};
@@ -329,6 +332,7 @@
 				INSTALL_PATH = /usr/local/lib;
 				PREBINDING = NO;
 				PRODUCT_NAME = almainloop;
+				SYMROOT = ../../build;
 				ZERO_LINK = NO;
 			};
 			name = Release;
