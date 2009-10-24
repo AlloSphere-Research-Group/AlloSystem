@@ -41,7 +41,7 @@
 		36C8FA5F10713767003EC91B /* al_mainloop_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = al_mainloop_osx.mm; sourceTree = "<group>"; };
 		36D3291110926BE800E542CA /* al_time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_time.h; sourceTree = "<group>"; };
 		36D32A1C10926E8800E542CA /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
-		8DD76F6C0486A84900D96B5E /* osx */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = osx; sourceTree = BUILT_PRODUCTS_DIR; };
+		8DD76F6C0486A84900D96B5E /* MainloopExampleGLUT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MainloopExampleGLUT; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6859E8B029090EE04C91782 /* osx.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = osx.1; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -85,7 +85,7 @@
 		1AB674ADFE9D54B511CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8DD76F6C0486A84900D96B5E /* osx */,
+				8DD76F6C0486A84900D96B5E /* MainloopExampleGLUT */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -123,9 +123,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		8DD76F620486A84900D96B5E /* osx */ = {
+		8DD76F620486A84900D96B5E /* MainloopExampleGLUT */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "osx" */;
+			buildConfigurationList = 1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "MainloopExampleGLUT" */;
 			buildPhases = (
 				8DD76F640486A84900D96B5E /* Sources */,
 				8DD76F660486A84900D96B5E /* Frameworks */,
@@ -135,10 +135,10 @@
 			);
 			dependencies = (
 			);
-			name = osx;
+			name = MainloopExampleGLUT;
 			productInstallPath = "$(HOME)/bin";
 			productName = osx;
-			productReference = 8DD76F6C0486A84900D96B5E /* osx */;
+			productReference = 8DD76F6C0486A84900D96B5E /* MainloopExampleGLUT */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -153,7 +153,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				8DD76F620486A84900D96B5E /* osx */,
+				8DD76F620486A84900D96B5E /* MainloopExampleGLUT */,
 			);
 		};
 /* End PBXProject section */
@@ -193,7 +193,7 @@
 					"\"$(SRCROOT)/$(BUILD_DIR)/$(CONFIGURATION)\"",
 				);
 				OTHER_CFLAGS = "-DDELTA_OSX";
-				PRODUCT_NAME = osx;
+				PRODUCT_NAME = $TARGET_NAME;
 				SYMROOT = ../../build;
 			};
 			name = Debug;
@@ -211,7 +211,7 @@
 					"\"$(SRCROOT)/$(BUILD_DIR)/$(CONFIGURATION)\"",
 				);
 				OTHER_CFLAGS = "-DDELTA_OSX";
-				PRODUCT_NAME = osx;
+				PRODUCT_NAME = $TARGET_NAME;
 				SYMROOT = ../../build;
 			};
 			name = Release;
@@ -245,7 +245,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "osx" */ = {
+		1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "MainloopExampleGLUT" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1DEB923208733DC60010E9CD /* Debug */,
