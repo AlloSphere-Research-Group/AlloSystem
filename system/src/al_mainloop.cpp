@@ -56,12 +56,22 @@ void al_main_exit() {
 }
 
 void al_main_attach(al_sec interval, main_tick_handler handler, void * userdata) {
+	al_main_init();	
 	if (!g_main->isRunning) {
 		g_main->interval = interval;
 		g_main->isRunning = 1;
 		g_main->handler = handler;
 		g_main->userdata = userdata;
 		al_main_platform_attach(interval);
+	}
+}
+
+void al_main_register(main_tick_handler handler, void * userdata) {
+	al_main_init();
+	if (!g_main->isRunning) {
+		g_main->isRunning = 1;
+		g_main->handler = handler;
+		g_main->userdata = userdata;
 	}
 }
 

@@ -34,15 +34,15 @@
 #define INCLUDE_ALLO_TYPES_VERSION 0.001
 
 #if defined(WIN32) || defined(__WINDOWS_MM__)
-	#define ALLO_WIN32
+	#define AL_WIN32
 	#include <windows.h>
 	#include "pstdint.h"
 #elif defined( __APPLE__ ) && defined( __MACH__ )
-	#define ALLO_OSX
+	#define AL_OSX
 	#include <Carbon/Carbon.h>
 	#include <stdint.h>
 #else
-	#define ALLO_LINUX
+	#define AL_LINUX
 	#include <stdint.h>
 #endif
 

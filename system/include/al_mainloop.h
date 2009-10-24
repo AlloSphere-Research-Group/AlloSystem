@@ -28,6 +28,15 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
+#if defined(WIN32) || defined(__WINDOWS_MM__)
+	#define AL_WIN32
+	#include <windows.h>
+#elif defined( __APPLE__ ) && defined( __MACH__ )
+	#define AL_OSX
+#else
+	#define AL_LINUX
+#endif
+
 #include "al_time.h"
 
 #ifdef __cplusplus
@@ -89,20 +98,21 @@ extern int al_main_quit();
 	
 	3. Using an existing application mainloop with manual timer (e.g. GLUT apps)
 		
-		a) Manually initialize delta during startup:
-			al_main_init() 
+		a) Manually initialize mainloop during startup:
+			al_main_register() 
 				You must call this before calling al_main_tick()
 				
-		b) Manually trigger delta at frequent intervals:
+		b) Manually trigger mainloop at frequent intervals:
 			al_main_tick()
 				Call this function frequently, e.g. in a draw callback 
 				
-		c) Manually release delta once the application is closing:
+		c) Manually release mainloop once the application is closing:
 			al_main_quit()
-				You must not make any other calls into delta after al_quit()
+				You must not make any other calls into mainloop after al_quit()
 */
 extern int al_main_enter(double interval, main_tick_handler handler, void * userdata);
 extern void al_main_attach(double interval, main_tick_handler handler, void * userdata);
+extern void al_main_register(main_tick_handler handler, void * userdata);
 extern void al_main_tick();
 extern void al_main_exit();
 
