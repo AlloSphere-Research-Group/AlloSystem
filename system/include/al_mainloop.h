@@ -43,31 +43,12 @@
 extern "C" {
 #endif
 
-/*! 
-	get current scheduler (logical) time 
-		(zero at al_init())
+/*
+	Unified mainloop interface accross various hosts/platforms. 
+	OSX binding requires linking to Cocoa for NSRunLoop (internal).
 */
-extern al_nsec al_main_time_nsec();
-#define al_main_time_sec() (al_main_time_nsec() * al_time_ns2s)
 
 typedef void (*main_tick_handler)(al_nsec time, void * userdata);
-
-/*
-	Global state in the main loop
-*/
-typedef struct {
-	int isRunning;				/* flag true (1) when in the main loop */
-	double interval;			/* in seconds */
-	al_nsec t0, logicaltime;		/* birth time (wall clock), scheduler time (logical) */
-	main_tick_handler handler;	/* user-supplied event handler */
-	void * userdata;			/* passed to the handler */
-} al_main_t;
-
-/*!
-	Main initialization and termination
-*/
-extern al_main_t * al_main_init();
-extern int al_main_quit();
 
 /*!
 	al_main can be used within an existing application mainloop, or can create its own
@@ -76,25 +57,24 @@ extern int al_main_quit();
 		
 		a) Enter the mainloop using:
 			al_main_enter()
-				This will implicitly call al_init() in case it hadn't already been called.
+				This will implicitly call al_main_init() in case it hadn't already been called.
 				This function does not return until al_main_exit() is called.
 				Until it returns it makes frequent implicit calls to al_main_tick()
 		
 		b) Manually trigger the mainloop to exit by calling:
 			al_main_exit()
-				This will implicitly call al_quit() once the active task has completed,
-				and al_main_enter() will return.
+				This will implicitly release the main loop, and al_main_enter() will return.
 	
 	2. Using an existing application mainloop with built-in timer (e.g. OSX apps)
 	
 		a) Attach to the current OS runloop using:
 			al_main_attach()
-				This will implicitly call al_init() in case it hadn't already been called.
+				This will implicitly call al_main_init() in case it hadn't already been called.
 				It attaches a timer to the current OS runloop to implicitly call al_main_tick()
 				Returns immediately.
 		
 		b) When the runloop exits, it is your responsibility to call:
-			al_main_quit()
+			al_main_exit()
 	
 	3. Using an existing application mainloop with manual timer (e.g. GLUT apps)
 		
@@ -107,8 +87,8 @@ extern int al_main_quit();
 				Call this function frequently, e.g. in a draw callback 
 				
 		c) Manually release mainloop once the application is closing:
-			al_main_quit()
-				You must not make any other calls into mainloop after al_quit()
+			al_main_exit()
+				You must not make any other calls into mainloop after al_main_quit()
 */
 extern int al_main_enter(double interval, main_tick_handler handler, void * userdata);
 extern void al_main_attach(double interval, main_tick_handler handler, void * userdata);
@@ -116,6 +96,28 @@ extern void al_main_register(main_tick_handler handler, void * userdata);
 extern void al_main_tick();
 extern void al_main_exit();
 
+
+/*! 
+	get current scheduler (logical) time 
+		(zero at al_init())
+*/
+extern al_nsec al_main_time_nsec();
+#define al_main_time_sec() (al_main_time_nsec() * al_time_ns2s)
+
+
+/*
+	Global state in the main loop
+	(private: do not modify)
+*/
+typedef struct {
+	int isRunning;				/* flag true (1) when in the main loop */
+	double interval;			/* in seconds */
+	al_nsec t0, logicaltime;		/* birth time (wall clock), scheduler time (logical) */
+	main_tick_handler handler;	/* user-supplied event handler */
+	void * userdata;			/* passed to the handler */
+} al_main_t;
+
+extern al_main_t * al_main_get();
 
 #ifdef __cplusplus
 } // extern "C"

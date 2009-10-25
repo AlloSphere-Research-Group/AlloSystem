@@ -1,7 +1,8 @@
 #include <assert.h>
 #include <stdio.h>
-#include "al_thread.h"
 #include "al_time.h"
+#include "al_time_cpp.h"
+#include "al_thread.h"
 
 using namespace allo;
 
@@ -24,30 +25,31 @@ int main(int argc, char* argv[]){
 	
 	// Timing
 	{
-		al_timing_init();
-	
-		al_nsec slop = 1e6;
+		al_nsec slop = 1e7;
 		al_nsec sleepns = 1e8;
+		al_sec sleeps = 0.5;
+		al_sec slops = 0.005;
 
-		assert(al_nsec2sec(1e9) == 1);
-		assert(al_sec2nsec(1) == 1e9);
+		assert(al_time_ns2s * 1e9 == 1);
+		assert(al_time_s2ns * 1 == 1e9);
 		
-		al_nsec t,dt;
+		al_nsec t, dt;
+		al_sec now, dts;
 		
-		t = al_time();
+		t = al_time_nsec();
 		al_sleep_nsec(sleepns);
-		dt = al_time() - t;
+		dt = al_time_nsec() - t;
 		assert(aboutEqual(dt, sleepns, slop));
 
-		t = al_time();
-		al_sleep(al_nsec2sec(sleepns));
-		dt = al_time() - t;
+		t = al_time_nsec();
+		al_sleep(al_time_ns2s * sleepns);
+		dt = al_time_nsec() - t;
 		assert(aboutEqual(dt, sleepns, slop));
 
-		t = al_time();
-		al_sleep_until(t+sleepns);
-		dt = al_time() - t;
-		assert(aboutEqual(dt, sleepns, slop));
+		now = al_time();
+		al_sleep_until(now + sleeps);
+		dts = al_time() - now;
+		assert(aboutEqual(dts, sleeps, slops));
 
 		Timer tm;
 		
@@ -56,9 +58,7 @@ int main(int argc, char* argv[]){
 		tm.stop();
 		dt = tm.elapsed();
 		assert(aboutEqual(dt, sleepns, slop));
-		assert(al_nsec2sec(tm.elapsed()) == tm.elapsedSec());
-
-		al_timing_quit();
+		assert(al_time_ns2s * tm.elapsed() == tm.elapsedSec());
 	}
 
 	return 0;

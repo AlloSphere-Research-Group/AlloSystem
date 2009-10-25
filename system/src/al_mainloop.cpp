@@ -6,17 +6,22 @@
 	Platform specific implementations
 		(implemented in separate file)
 */
-extern void al_main_platform_attach(al_sec interval);
-extern int al_main_platform_enter(al_sec interval);
+void al_main_platform_attach(al_sec interval);
+int al_main_platform_enter(al_sec interval);
 
 /*
 	If there is anything that is a singleton, it's the main loop!
 */	
 static al_main_t * g_main;
 
+/*!
+	Main initialization and termination
+*/
+static int al_main_quit();
+
 #pragma mark C API
 
-al_main_t * al_main_init() {
+al_main_t * al_main_get() {
 	if (g_main == 0) {
 		g_main = (al_main_t *)malloc(sizeof(al_main_t));
 		assert(g_main != 0); /* if this fails, then your OS is probably going down */
@@ -38,7 +43,7 @@ int al_main_quit() {
 }
 
 int al_main_enter(al_sec interval, main_tick_handler handler, void * userdata) {
-	al_main_init();	
+	al_main_get();	
 	if (!g_main->isRunning) {
 		g_main->interval = interval;
 		g_main->isRunning = 1;
@@ -56,7 +61,7 @@ void al_main_exit() {
 }
 
 void al_main_attach(al_sec interval, main_tick_handler handler, void * userdata) {
-	al_main_init();	
+	al_main_get();	
 	if (!g_main->isRunning) {
 		g_main->interval = interval;
 		g_main->isRunning = 1;
@@ -67,7 +72,7 @@ void al_main_attach(al_sec interval, main_tick_handler handler, void * userdata)
 }
 
 void al_main_register(main_tick_handler handler, void * userdata) {
-	al_main_init();
+	al_main_get();
 	if (!g_main->isRunning) {
 		g_main->isRunning = 1;
 		g_main->handler = handler;

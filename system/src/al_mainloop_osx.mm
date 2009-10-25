@@ -32,7 +32,7 @@
 {
 	if (self = [super init])
 	{
-		main = al_main_init();
+		main = al_main_get();
 		timer = [NSTimer timerWithTimeInterval:(NSTimeInterval)interval
 									target:self 
 									selector:@selector(tick) 
@@ -79,7 +79,7 @@ int al_main_platform_enter(al_sec interval) {
 	// create a new runloop if it doesn't exist:
 	NSRunLoop * rl = [NSRunLoop currentRunLoop];
 	
-	al_main_t * main = al_main_init();
+	al_main_t * main = al_main_get();
 	al_main_platform_attach(interval);
 	
 	// main loop:

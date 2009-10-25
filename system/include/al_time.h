@@ -57,6 +57,9 @@ extern al_nsec al_time_nsec();
 extern void al_sleep(al_sec dt);		
 extern void al_sleep_nsec(al_nsec dt);	
 
+/**! convenience function to sleep until a target wall-clock time */
+extern void al_sleep_until(al_sec target);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

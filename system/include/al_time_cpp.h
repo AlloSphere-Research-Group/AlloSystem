@@ -42,15 +42,14 @@ public:
 
 	al_nsec elapsed(){ return mStop - mStart; }					///< Returns nsec between start() and stop() calls
 	al_sec elapsedSec(){ return al_time_ns2s * elapsed(); }		///< Returns  sec between start() and stop() calls
-	void start(){ mStart=al_time(); }							///< Set start time as current time
-	void stop(){ mStop=al_time(); }								///< Set stop time as current time
+	void start(){ mStart=al_time_nsec(); }							///< Set start time as current time
+	void stop(){ mStop=al_time_nsec(); }								///< Set stop time as current time
 
 private:
 	al_nsec mStart, mStop;	// start and stop times
 };
 
 } // allo::
-#endif
 
 #endif /* INCLUDE_AL_TIME_CPP_H */
 
