@@ -1,5 +1,8 @@
 #include "delta_lua.h"
 
+#define ddebug(...) 
+//#define ddebug(...) printf(__VA_ARGS__)
+
 static delta_main audiomain = NULL;
 
 //param luaL_optparam(lua_State * L, int idx, param def) {

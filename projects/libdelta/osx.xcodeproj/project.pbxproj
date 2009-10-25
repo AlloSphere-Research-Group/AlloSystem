@@ -18,6 +18,15 @@
 		36F520AD1094064C0019CA9B /* delta_pq.c in Sources */ = {isa = PBXBuildFile; fileRef = 36F520AC1094064C0019CA9B /* delta_pq.c */; };
 		36F520BF109407830019CA9B /* delta_proclist.c in Sources */ = {isa = PBXBuildFile; fileRef = 36F520BE109407830019CA9B /* delta_proclist.c */; };
 		36F520C7109409420019CA9B /* delta_bus.c in Sources */ = {isa = PBXBuildFile; fileRef = 36F520C6109409420019CA9B /* delta_bus.c */; };
+		36F5216E10940FE70019CA9B /* libalsystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F51F771093F8120019CA9B /* libalsystem.a */; };
+		36F5216F10940FE70019CA9B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F51EA21093F0DB0019CA9B /* Cocoa.framework */; };
+		36F5217010940FE70019CA9B /* libdelta.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36752B291093915A00FF5627 /* libdelta.a */; };
+		36F5217110940FE70019CA9B /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F51FA71093F9FF0019CA9B /* libportaudio.a */; };
+		36F521781094101A0019CA9B /* delta_luaTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F521771094101A0019CA9B /* delta_luaTest.cpp */; };
+		36F5217A109410330019CA9B /* liblua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F52179109410330019CA9B /* liblua.a */; };
+		36F5217E1094104C0019CA9B /* delta_lua.c in Sources */ = {isa = PBXBuildFile; fileRef = 36F520EE109409DA0019CA9B /* delta_lua.c */; };
+		36F5217F1094104C0019CA9B /* delta_lua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F520F510940A7E0019CA9B /* delta_lua.cpp */; };
+		36F5219B1094289F0019CA9B /* test_delta.lua in CopyFiles */ = {isa = PBXBuildFile; fileRef = 36F5219A1094289F0019CA9B /* test_delta.lua */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -28,14 +37,34 @@
 			remoteGlobalIDString = 36752B281093915A00FF5627;
 			remoteInfo = alsystem;
 		};
+		36F5216A10940FE70019CA9B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 36752B281093915A00FF5627;
+			remoteInfo = alsystem;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		36F521AA109428E60019CA9B /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				36F5219B1094289F0019CA9B /* test_delta.lua in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		36752B291093915A00FF5627 /* libdelta.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdelta.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		369568E8109382D700FD4312 /* al_time_cpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_time_cpp.h; sourceTree = "<group>"; };
 		36C8FA24107135E8003EC91B /* al_mainloop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_mainloop.h; sourceTree = "<group>"; };
 		36D3291110926BE800E542CA /* al_time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_time.h; sourceTree = "<group>"; };
-		36F51E501093ECB70019CA9B /* unitTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = unitTest; sourceTree = BUILT_PRODUCTS_DIR; };
+		36F51E501093ECB70019CA9B /* delta_unitTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = delta_unitTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		36F51E591093ECDF0019CA9B /* al_thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_thread.h; sourceTree = "<group>"; };
 		36F51EA21093F0DB0019CA9B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		36F51F771093F8120019CA9B /* libalsystem.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libalsystem.a; path = ../../build/Release/libalsystem.a; sourceTree = SOURCE_ROOT; };
@@ -51,6 +80,13 @@
 		36F520C6109409420019CA9B /* delta_bus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = delta_bus.c; sourceTree = "<group>"; };
 		36F520EE109409DA0019CA9B /* delta_lua.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = delta_lua.c; sourceTree = "<group>"; };
 		36F520F510940A7E0019CA9B /* delta_lua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = delta_lua.cpp; sourceTree = "<group>"; };
+		36F5217510940FE70019CA9B /* delta_luaTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = delta_luaTest; sourceTree = BUILT_PRODUCTS_DIR; };
+		36F521771094101A0019CA9B /* delta_luaTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = delta_luaTest.cpp; sourceTree = "<group>"; };
+		36F52179109410330019CA9B /* liblua.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua.a; path = /usr/local/lib/liblua.a; sourceTree = "<absolute>"; };
+		36F5217B109410430019CA9B /* lauxlib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lauxlib.h; path = /usr/local/include/lauxlib.h; sourceTree = "<absolute>"; };
+		36F5217C109410430019CA9B /* lua.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lua.h; path = /usr/local/include/lua.h; sourceTree = "<absolute>"; };
+		36F5217D109410430019CA9B /* lualib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lualib.h; path = /usr/local/include/lualib.h; sourceTree = "<absolute>"; };
+		36F5219A1094289F0019CA9B /* test_delta.lua */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lua; path = test_delta.lua; sourceTree = "<group>"; };
 		C6859E8B029090EE04C91782 /* osx.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = osx.1; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -73,6 +109,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		36F5216D10940FE70019CA9B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				36F5216E10940FE70019CA9B /* libalsystem.a in Frameworks */,
+				36F5216F10940FE70019CA9B /* Cocoa.framework in Frameworks */,
+				36F5217010940FE70019CA9B /* libdelta.a in Frameworks */,
+				36F5217110940FE70019CA9B /* libportaudio.a in Frameworks */,
+				36F5217A109410330019CA9B /* liblua.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -92,7 +140,8 @@
 			isa = PBXGroup;
 			children = (
 				36752B291093915A00FF5627 /* libdelta.a */,
-				36F51E501093ECB70019CA9B /* unitTest */,
+				36F51E501093ECB70019CA9B /* delta_unitTest */,
+				36F5217510940FE70019CA9B /* delta_luaTest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -154,6 +203,10 @@
 		36F51F761093F7F60019CA9B /* libraries */ = {
 			isa = PBXGroup;
 			children = (
+				36F5217B109410430019CA9B /* lauxlib.h */,
+				36F5217C109410430019CA9B /* lua.h */,
+				36F5217D109410430019CA9B /* lualib.h */,
+				36F52179109410330019CA9B /* liblua.a */,
 				36F51FA91093FA120019CA9B /* portaudio.h */,
 				36F51FA71093F9FF0019CA9B /* libportaudio.a */,
 				36F51F771093F8120019CA9B /* libalsystem.a */,
@@ -166,6 +219,8 @@
 			isa = PBXGroup;
 			children = (
 				36F51F7C1093F88C0019CA9B /* delta_unitTest.cpp */,
+				36F521771094101A0019CA9B /* delta_luaTest.cpp */,
+				36F5219A1094289F0019CA9B /* test_delta.lua */,
 			);
 			path = test;
 			sourceTree = "<group>";
@@ -223,7 +278,25 @@
 			);
 			name = delta_unitTest;
 			productName = unitTest;
-			productReference = 36F51E501093ECB70019CA9B /* unitTest */;
+			productReference = 36F51E501093ECB70019CA9B /* delta_unitTest */;
+			productType = "com.apple.product-type.tool";
+		};
+		36F5216810940FE70019CA9B /* delta_luaTest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 36F5217210940FE70019CA9B /* Build configuration list for PBXNativeTarget "delta_luaTest" */;
+			buildPhases = (
+				36F5216B10940FE70019CA9B /* Sources */,
+				36F5216D10940FE70019CA9B /* Frameworks */,
+				36F521AA109428E60019CA9B /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				36F5216910940FE70019CA9B /* PBXTargetDependency */,
+			);
+			name = delta_luaTest;
+			productName = unitTest;
+			productReference = 36F5217510940FE70019CA9B /* delta_luaTest */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -240,6 +313,7 @@
 			targets = (
 				36752B281093915A00FF5627 /* delta */,
 				36F51E4F1093ECB70019CA9B /* delta_unitTest */,
+				36F5216810940FE70019CA9B /* delta_luaTest */,
 			);
 		};
 /* End PBXProject section */
@@ -265,6 +339,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		36F5216B10940FE70019CA9B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				36F5217E1094104C0019CA9B /* delta_lua.c in Sources */,
+				36F5217F1094104C0019CA9B /* delta_lua.cpp in Sources */,
+				36F521781094101A0019CA9B /* delta_luaTest.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -272,6 +356,11 @@
 			isa = PBXTargetDependency;
 			target = 36752B281093915A00FF5627 /* delta */;
 			targetProxy = 36F51E561093ECCC0019CA9B /* PBXContainerItemProxy */;
+		};
+		36F5216910940FE70019CA9B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 36752B281093915A00FF5627 /* delta */;
+			targetProxy = 36F5216A10940FE70019CA9B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -362,7 +451,7 @@
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = "$(PRODUCT_DIR)/$(BUILD_DIR)/$CONFIGURATION/";
 				PREBINDING = NO;
-				PRODUCT_NAME = unitTest;
+				PRODUCT_NAME = $TARGET_NAME;
 				SYMROOT = ../../build;
 			};
 			name = Debug;
@@ -383,7 +472,53 @@
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = "$(PRODUCT_DIR)/$(BUILD_DIR)/$CONFIGURATION/";
 				PREBINDING = NO;
-				PRODUCT_NAME = unitTest;
+				PRODUCT_NAME = $TARGET_NAME;
+				SYMROOT = ../../build;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		36F5217310940FE70019CA9B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					$PROJECT_DIR/../../delta/include,
+					$PROJECT_DIR/../../system/include,
+				);
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = "$(PRODUCT_DIR)/$(BUILD_DIR)/$CONFIGURATION/";
+				PREBINDING = NO;
+				PRODUCT_NAME = $TARGET_NAME;
+				SYMROOT = ../../build;
+			};
+			name = Debug;
+		};
+		36F5217410940FE70019CA9B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = "";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					$PROJECT_DIR/../../delta/include,
+					$PROJECT_DIR/../../system/include,
+				);
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = "$(PRODUCT_DIR)/$(BUILD_DIR)/$CONFIGURATION/";
+				PREBINDING = NO;
+				PRODUCT_NAME = $TARGET_NAME;
 				SYMROOT = ../../build;
 				ZERO_LINK = NO;
 			};
@@ -415,6 +550,15 @@
 			buildConfigurations = (
 				36F51E521093ECB80019CA9B /* Debug */,
 				36F51E531093ECB80019CA9B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		36F5217210940FE70019CA9B /* Build configuration list for PBXNativeTarget "delta_luaTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				36F5217310940FE70019CA9B /* Debug */,
+				36F5217410940FE70019CA9B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

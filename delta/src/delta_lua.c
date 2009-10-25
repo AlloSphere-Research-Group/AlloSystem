@@ -1,6 +1,8 @@
 #include "delta_lua.h"
-
 #include "math.h"
+
+#define ddebug(...) 
+//#define ddebug(...) printf(__VA_ARGS__)
 
 static const char * DELTA_LUA_CORO_CACHE = "coro_cache";
 static const char * DELTA_LUA_CORO_META = "coro_meta";
@@ -262,6 +264,8 @@ static int scheduler(lua_State * L) {
 //}	
 
 int luaopen_delta(lua_State * L) {
+
+	delta_init();
 
 	const char * libname = lua_tostring(L, -1);
 	

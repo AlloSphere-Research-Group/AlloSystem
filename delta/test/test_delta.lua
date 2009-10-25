@@ -1,0 +1,3 @@
+require "delta"
+
+print(delta)
