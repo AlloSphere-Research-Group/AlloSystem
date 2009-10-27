@@ -20,7 +20,6 @@ void tick(al_nsec t, void * userdata) {
 {
   self = [super init];
   if (self != nil) {
-	al_main_init();
 	al_main_attach(0.01, tick, NULL);
   }
   return self;

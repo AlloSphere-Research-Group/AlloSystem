@@ -12,7 +12,8 @@
 		36752B2E1093917100FF5627 /* al_mainloop_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 36C8FA5F10713767003EC91B /* al_mainloop_osx.mm */; };
 		36752B2F1093917500FF5627 /* al_time.h in Headers */ = {isa = PBXBuildFile; fileRef = 36D3291110926BE800E542CA /* al_time.h */; };
 		36752B301093917500FF5627 /* al_mainloop.h in Headers */ = {isa = PBXBuildFile; fileRef = 36C8FA24107135E8003EC91B /* al_mainloop.h */; };
-		36752B311093917500FF5627 /* al_time_cpp.h in Headers */ = {isa = PBXBuildFile; fileRef = 369568E8109382D700FD4312 /* al_time_cpp.h */; };
+		36752B311093917500FF5627 /* al_time.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 369568E8109382D700FD4312 /* al_time.hpp */; };
+		36B7D786109783C20013EF88 /* al_config.h in Headers */ = {isa = PBXBuildFile; fileRef = 36B7D785109783C20013EF88 /* al_config.h */; };
 		36F51E541093ECC40019CA9B /* libalsystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36752B291093915A00FF5627 /* libalsystem.a */; };
 		36F51E551093ECC80019CA9B /* unitTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F51E4C1093ECAB0019CA9B /* unitTest.cpp */; };
 		36F51E5A1093ECDF0019CA9B /* al_thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 36F51E591093ECDF0019CA9B /* al_thread.h */; };
@@ -32,7 +33,8 @@
 
 /* Begin PBXFileReference section */
 		36752B291093915A00FF5627 /* libalsystem.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libalsystem.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		369568E8109382D700FD4312 /* al_time_cpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_time_cpp.h; sourceTree = "<group>"; };
+		369568E8109382D700FD4312 /* al_time.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_time.hpp; sourceTree = "<group>"; };
+		36B7D785109783C20013EF88 /* al_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_config.h; sourceTree = "<group>"; };
 		36C8FA24107135E8003EC91B /* al_mainloop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_mainloop.h; sourceTree = "<group>"; };
 		36C8FA25107135F3003EC91B /* al_mainloop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_mainloop.cpp; sourceTree = "<group>"; };
 		36C8FA5D10713737003EC91B /* al_time.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_time.cpp; sourceTree = "<group>"; };
@@ -69,7 +71,7 @@
 		08FB7794FE84155DC02AAC07 /* osx */ = {
 			isa = PBXGroup;
 			children = (
-				36C8FA22107135DE003EC91B /* include */,
+				36C8FA22107135DE003EC91B /* system */,
 				36C8FA23107135DE003EC91B /* src */,
 				36F51E4B1093ECAB0019CA9B /* test */,
 				36F51EA21093F0DB0019CA9B /* Cocoa.framework */,
@@ -88,16 +90,17 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		36C8FA22107135DE003EC91B /* include */ = {
+		36C8FA22107135DE003EC91B /* system */ = {
 			isa = PBXGroup;
 			children = (
+				36B7D785109783C20013EF88 /* al_config.h */,
 				36C8FA24107135E8003EC91B /* al_mainloop.h */,
 				36D3291110926BE800E542CA /* al_time.h */,
-				369568E8109382D700FD4312 /* al_time_cpp.h */,
+				369568E8109382D700FD4312 /* al_time.hpp */,
 				36F51E591093ECDF0019CA9B /* al_thread.h */,
 			);
-			name = include;
-			path = ../../system/include;
+			name = system;
+			path = ../../include/system;
 			sourceTree = SOURCE_ROOT;
 		};
 		36C8FA23107135DE003EC91B /* src */ = {
@@ -137,8 +140,9 @@
 			files = (
 				36752B2F1093917500FF5627 /* al_time.h in Headers */,
 				36752B301093917500FF5627 /* al_mainloop.h in Headers */,
-				36752B311093917500FF5627 /* al_time_cpp.h in Headers */,
+				36752B311093917500FF5627 /* al_time.hpp in Headers */,
 				36F51E5A1093ECDF0019CA9B /* al_thread.h in Headers */,
+				36B7D786109783C20013EF88 /* al_config.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -263,10 +267,12 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GENERATE_MASTER_OBJECT_FILE = YES;
+				HEADER_SEARCH_PATHS = "";
 				INSTALL_PATH = /usr/local/lib;
 				PREBINDING = NO;
 				PRODUCT_NAME = alsystem;
 				SYMROOT = ../../build;
+				USER_HEADER_SEARCH_PATHS = $PROJECT_DIR/../../include;
 			};
 			name = Debug;
 		};
@@ -278,10 +284,12 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
+				HEADER_SEARCH_PATHS = "";
 				INSTALL_PATH = /usr/local/lib;
 				PREBINDING = NO;
 				PRODUCT_NAME = alsystem;
 				SYMROOT = ../../build;
+				USER_HEADER_SEARCH_PATHS = $PROJECT_DIR/../../include;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -296,12 +304,13 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				HEADER_SEARCH_PATHS = $PROJECT_DIR/../../system/include;
+				HEADER_SEARCH_PATHS = "";
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = "$(PRODUCT_DIR)/$(BUILD_DIR)/$CONFIGURATION/";
 				PREBINDING = NO;
 				PRODUCT_NAME = unitTest;
 				SYMROOT = ../../build;
+				USER_HEADER_SEARCH_PATHS = $PROJECT_DIR/../../include;
 			};
 			name = Debug;
 		};
@@ -314,12 +323,13 @@
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
-				HEADER_SEARCH_PATHS = $PROJECT_DIR/../../system/include;
+				HEADER_SEARCH_PATHS = "";
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = "$(PRODUCT_DIR)/$(BUILD_DIR)/$CONFIGURATION/";
 				PREBINDING = NO;
 				PRODUCT_NAME = unitTest;
 				SYMROOT = ../../build;
+				USER_HEADER_SEARCH_PATHS = $PROJECT_DIR/../../include;
 				ZERO_LINK = NO;
 			};
 			name = Release;

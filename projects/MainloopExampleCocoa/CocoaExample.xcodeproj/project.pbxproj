@@ -26,6 +26,8 @@
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		32CA4F630368D1EE00C91783 /* CocoaExample_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CocoaExample_Prefix.pch; sourceTree = "<group>"; };
+		36B7DC84109789AD0013EF88 /* al_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_config.h; sourceTree = "<group>"; };
+		36B7DC85109789AD0013EF88 /* al_time.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_time.hpp; sourceTree = "<group>"; };
 		36D32CCE109277E500E542CA /* TestController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestController.h; sourceTree = "<group>"; };
 		36D32CCF109277E500E542CA /* TestController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestController.m; sourceTree = "<group>"; };
 		36D32D04109279BE00E542CA /* al_mainloop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_mainloop.h; sourceTree = "<group>"; };
@@ -85,7 +87,7 @@
 		29B97314FDCFA39411CA2CEA /* CocoaExample */ = {
 			isa = PBXGroup;
 			children = (
-				36D32D03109279BE00E542CA /* include */,
+				36D32D03109279BE00E542CA /* system */,
 				36D32D06109279BE00E542CA /* src */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
@@ -126,14 +128,16 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		36D32D03109279BE00E542CA /* include */ = {
+		36D32D03109279BE00E542CA /* system */ = {
 			isa = PBXGroup;
 			children = (
+				36B7DC84109789AD0013EF88 /* al_config.h */,
+				36B7DC85109789AD0013EF88 /* al_time.hpp */,
 				36D32D04109279BE00E542CA /* al_mainloop.h */,
 				36D32D05109279BE00E542CA /* al_time.h */,
 			);
-			name = include;
-			path = ../../system/include;
+			name = system;
+			path = ../../include/system;
 			sourceTree = SOURCE_ROOT;
 		};
 		36D32D06109279BE00E542CA /* src */ = {

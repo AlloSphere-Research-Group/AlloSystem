@@ -1,4 +1,4 @@
-#include "al_mainloop.h"
+#include "system/al_mainloop.h"
 
 #ifdef AL_OSX
 #include <OpenGL/OpenGL.h>
@@ -62,5 +62,6 @@ int main (int argc, char * argv[]) {
 	printf("enter main loop\n");
 	glutMainLoop();
 	printf("done\n");
-	return al_main_quit();
+	al_main_exit();
+	return 0;
 }

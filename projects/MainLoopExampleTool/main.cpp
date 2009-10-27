@@ -17,5 +17,6 @@ int main (int argc, char * argv[]) {
 	// enter main loop
 	al_main_enter(0.01, tick, NULL);
 	
-	return al_main_quit();
+	al_main_exit();
+	return 0;
 }

@@ -1,4 +1,4 @@
-#include "al_time.h"
+#include "system/al_time.h"
 
 #define al_nsec2sec(ns)		(((al_sec)(ns)) * al_time_ns2s)
 #define al_sec2nsec(s)		((al_nsec)(s * al_time_s2ns))

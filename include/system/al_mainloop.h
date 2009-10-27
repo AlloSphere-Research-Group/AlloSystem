@@ -28,16 +28,8 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#if defined(WIN32) || defined(__WINDOWS_MM__)
-	#define AL_WIN32
-	#include <windows.h>
-#elif defined( __APPLE__ ) && defined( __MACH__ )
-	#define AL_OSX
-#else
-	#define AL_LINUX
-#endif
-
-#include "al_time.h"
+#include "system/al_config.h"
+#include "system/al_time.h"
 
 #ifdef __cplusplus
 extern "C" {

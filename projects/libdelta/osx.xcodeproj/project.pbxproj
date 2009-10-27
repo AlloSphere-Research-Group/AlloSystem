@@ -61,7 +61,7 @@
 
 /* Begin PBXFileReference section */
 		36752B291093915A00FF5627 /* libdelta.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdelta.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		369568E8109382D700FD4312 /* al_time_cpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_time_cpp.h; sourceTree = "<group>"; };
+		369568E8109382D700FD4312 /* al_time.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_time.hpp; sourceTree = "<group>"; };
 		36C8FA24107135E8003EC91B /* al_mainloop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_mainloop.h; sourceTree = "<group>"; };
 		36D3291110926BE800E542CA /* al_time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_time.h; sourceTree = "<group>"; };
 		36DD34B71096C5E8008B6B87 /* allo_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = allo_types.h; sourceTree = "<group>"; };
@@ -153,16 +153,16 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		36C8FA22107135DE003EC91B /* include */ = {
+		36C8FA22107135DE003EC91B /* system */ = {
 			isa = PBXGroup;
 			children = (
 				36C8FA24107135E8003EC91B /* al_mainloop.h */,
 				36D3291110926BE800E542CA /* al_time.h */,
-				369568E8109382D700FD4312 /* al_time_cpp.h */,
+				369568E8109382D700FD4312 /* al_time.hpp */,
 				36F51E591093ECDF0019CA9B /* al_thread.h */,
 			);
-			name = include;
-			path = ../../system/include;
+			name = system;
+			path = ../../include/system;
 			sourceTree = SOURCE_ROOT;
 		};
 		36DD34B51096C5E8008B6B87 /* types */ = {
@@ -198,7 +198,7 @@
 		36F51F6A1093F7A20019CA9B /* system */ = {
 			isa = PBXGroup;
 			children = (
-				36C8FA22107135DE003EC91B /* include */,
+				36C8FA22107135DE003EC91B /* system */,
 			);
 			name = system;
 			sourceTree = "<group>";
@@ -206,7 +206,7 @@
 		36F51F731093F7C40019CA9B /* delta */ = {
 			isa = PBXGroup;
 			children = (
-				36F51F741093F7C40019CA9B /* include */,
+				36F51F741093F7C40019CA9B /* delta */,
 				36F51F751093F7C40019CA9B /* src */,
 				36F51F7B1093F87E0019CA9B /* test */,
 			);
@@ -214,13 +214,14 @@
 			path = ../../delta;
 			sourceTree = SOURCE_ROOT;
 		};
-		36F51F741093F7C40019CA9B /* include */ = {
+		36F51F741093F7C40019CA9B /* delta */ = {
 			isa = PBXGroup;
 			children = (
 				36F51F831093F9480019CA9B /* delta.h */,
 				36F5206F1094056C0019CA9B /* delta_lua.h */,
 			);
-			path = include;
+			name = delta;
+			path = ../include/delta;
 			sourceTree = "<group>";
 		};
 		36F51F751093F7C40019CA9B /* src */ = {
@@ -483,13 +484,13 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
-					$PROJECT_DIR/../../system/include,
 				);
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = "$(PRODUCT_DIR)/$(BUILD_DIR)/$CONFIGURATION/";
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				SYMROOT = ../../build;
+				USER_HEADER_SEARCH_PATHS = $PROJECT_DIR/../../include;
 			};
 			name = Debug;
 		};
@@ -504,13 +505,13 @@
 				GCC_MODEL_TUNING = G5;
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
-					$PROJECT_DIR/../../system/include,
 				);
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = "$(PRODUCT_DIR)/$(BUILD_DIR)/$CONFIGURATION/";
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				SYMROOT = ../../build;
+				USER_HEADER_SEARCH_PATHS = $PROJECT_DIR/../../include;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -527,14 +528,13 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
-					$PROJECT_DIR/../../delta/include,
-					$PROJECT_DIR/../../system/include,
 				);
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = "$(PRODUCT_DIR)/$(BUILD_DIR)/$CONFIGURATION/";
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				SYMROOT = ../../build;
+				USER_HEADER_SEARCH_PATHS = "$PROJECT_DIR/../../delta/include $PROJECT_DIR/../../include";
 			};
 			name = Debug;
 		};
@@ -549,14 +549,13 @@
 				GCC_MODEL_TUNING = G5;
 				HEADER_SEARCH_PATHS = (
 					/usr/local/include,
-					$PROJECT_DIR/../../delta/include,
-					$PROJECT_DIR/../../system/include,
 				);
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = "$(PRODUCT_DIR)/$(BUILD_DIR)/$CONFIGURATION/";
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				SYMROOT = ../../build;
+				USER_HEADER_SEARCH_PATHS = "$PROJECT_DIR/../../delta/include $PROJECT_DIR/../../include";
 				ZERO_LINK = NO;
 			};
 			name = Release;

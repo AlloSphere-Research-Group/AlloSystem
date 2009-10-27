@@ -32,6 +32,7 @@
 	resolution. Win32 requires linking to winmm.lib for multimedia timers.
 */
 
+#include "system/al_config.h"
 #include <limits.h>
 #include <math.h>
 

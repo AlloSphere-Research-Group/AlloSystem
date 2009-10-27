@@ -42,9 +42,9 @@
 /* Begin PBXFileReference section */
 		08FB7796FE84155DC02AAC07 /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = test.c; path = ../test/test.c; sourceTree = "<group>"; };
 		163301B3106D859000870B1F /* unitTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = unitTest.cpp; path = ../test/unitTest.cpp; sourceTree = SOURCE_ROOT; };
-		3692EBB81017DA7B000BDB05 /* allo_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = allo_types.h; path = ../include/allo_types.h; sourceTree = "<group>"; };
+		3692EBB81017DA7B000BDB05 /* allo_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = allo_types.h; sourceTree = "<group>"; };
 		3692F0431017E069000BDB05 /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = test.cpp; path = ../test/test.cpp; sourceTree = "<group>"; };
-		3692F0831017E74A000BDB05 /* allo_types_cpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = allo_types_cpp.h; path = ../include/allo_types_cpp.h; sourceTree = "<group>"; };
+		3692F0831017E74A000BDB05 /* allo_types_cpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = allo_types_cpp.h; sourceTree = "<group>"; };
 		36C8F9BE107062CE003EC91B /* lattice_portaudio */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = lattice_portaudio; sourceTree = BUILT_PRODUCTS_DIR; };
 		36C8F9C3107062F2003EC91B /* libportaudio.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libportaudio.a; path = /usr/local/lib/libportaudio.a; sourceTree = "<absolute>"; };
 		36C8F9C5107062FF003EC91B /* test_portaudio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = test_portaudio.c; path = ../test/test_portaudio.c; sourceTree = "<group>"; };
@@ -88,7 +88,7 @@
 			children = (
 				36C8F9C3107062F2003EC91B /* libportaudio.a */,
 				B92F0DE31072603F00250663 /* Muro.framework */,
-				36CDB61A106454A80057E0F4 /* include */,
+				36CDB61A106454A80057E0F4 /* types */,
 				08FB7795FE84155DC02AAC07 /* Source */,
 				C6859E8C029090F304C91782 /* Documentation */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
@@ -119,13 +119,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		36CDB61A106454A80057E0F4 /* include */ = {
+		36CDB61A106454A80057E0F4 /* types */ = {
 			isa = PBXGroup;
 			children = (
 				3692EBB81017DA7B000BDB05 /* allo_types.h */,
 				3692F0831017E74A000BDB05 /* allo_types_cpp.h */,
 			);
-			name = include;
+			name = types;
+			path = ../../include/types;
 			sourceTree = "<group>";
 		};
 		C6859E8C029090F304C91782 /* Documentation */ = {
