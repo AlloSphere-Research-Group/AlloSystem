@@ -1,7 +1,6 @@
 #include <assert.h>
 #include <stdio.h>
-#include "allo_types.h"
-#include "allo_types_cpp.h"
+#include "al_types.hpp"
 
 typedef double data_t;
 

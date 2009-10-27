@@ -12,19 +12,19 @@
 /* 
 	Simple demo functions to schedule:
 */
-int printer(delta_sec t, char * args) {
+int printer(al_sec t, char * args) {
 	printf("tube msg: %s\n", args);
 	return 0;
 }
 
-int audioprinter(delta_sec t, char * args) {
-	printf("pq msg of %d: %s\n", delta_pq_used(delta_pq_main()), args);
+int audioprinter(al_sec t, char * args) {
+	printf("pq msg of %d: %s\n", al_pq_used(al_pq_main()), args);
 	
 	// test: forward this stuff to the audio system:
-	char * buf = delta_tube_write_head_mem(delta_main_get()->inbox);
+	char * buf = al_tube_write_head_mem(delta_main_get()->inbox);
 	if (buf) {
 		sprintf(buf, "%s", args); // or memcpy(buf, args, DELTA_TUBE_ARGS_SIZE);
-		delta_tube_write_send(delta_main_get()->inbox, t, printer);
+		al_tube_write_send(delta_main_get()->inbox, t, printer);
 	} else {
 		return 1;
 	}
@@ -72,15 +72,15 @@ int main(int ac, char * av) {
 	
 	/* queue up some messages: */
 	for (i=0; i<10; i++) {
-		buf = delta_pq_msg(delta_pq_main());
+		buf = al_pq_msg(al_pq_main());
 		if (buf) {
 			sprintf(buf, "print %i\n", i);
-			delta_pq_sched(delta_pq_main(), i, printer);
+			al_pq_sched(al_pq_main(), i, printer);
 		}
-		buf = delta_pq_msg(delta_pq_main());
+		buf = al_pq_msg(al_pq_main());
 		if (buf) {
 			sprintf(buf, "audioprint %i\n", i);
-			delta_pq_sched(delta_pq_main(), i, audioprinter);
+			al_pq_sched(al_pq_main(), i, audioprinter);
 		}
 	}
 

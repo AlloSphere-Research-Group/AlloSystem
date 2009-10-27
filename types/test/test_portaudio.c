@@ -1,5 +1,5 @@
 
-#include "allo_types.h"
+#include "al_types.h"
 #include "portaudio.h"
 
 PaError err;

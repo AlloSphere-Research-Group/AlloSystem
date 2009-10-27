@@ -39,6 +39,7 @@
 */
 
 #include "system/al_time.h"
+
 #include "types/al_pq.h"
 #include "types/al_tube.h"
 
@@ -133,6 +134,9 @@ typedef struct {
 } delta_main_t;
 typedef delta_main_t * delta_main;
 
+/* singleton main, probably better not to access */
+extern delta_main delta_main_get();
+
 
 /*
 	Methods
@@ -142,16 +146,15 @@ typedef delta_main_t * delta_main;
 extern void delta_main_init();
 extern void delta_main_quit();
 
-/**! Entry point from main thread; e.g. main loop */
-extern void delta_main_tick();
-
 /**! Current main-thread logical time */
 extern al_sec delta_main_now();
+
+/**! Entry point from main thread; e.g. main loop */
+extern void delta_main_tick();
 
 /**! Entry point from audio thread; e.g. audio callback */
 extern void delta_audio_tick(delta_samplestamp frames);
 
-extern delta_main delta_main_get();
 
 /* create/destroy a proclist */
 extern proclist delta_proclist_create();

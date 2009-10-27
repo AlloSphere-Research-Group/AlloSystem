@@ -31,7 +31,7 @@
 #ifndef INCLUDE_ALLO_TYPES_CPP_H
 #define INCLUDE_ALLO_TYPES_CPP_H 1
 
-#include "allo_types.h"
+#include "al_types.h"
 
 namespace allo {
 
