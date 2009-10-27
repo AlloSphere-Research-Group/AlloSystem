@@ -194,7 +194,7 @@ static int scheduler_update(lua_State * L) {
 	delta_sec until = (delta_sec)(fabs(luaL_optnumber(L, 1, 1.)));
 	int defer = lua_toboolean(L, 2);
 	pq scheduler = *(pq *)lua_touserdata(L, lua_upvalueindex(1));
-	delta_pq_advance(scheduler, until, defer);
+	delta_pq_update(scheduler, until, defer);
 	lua_pushnumber(L, scheduler->now);
 	return 1;
 }
@@ -203,7 +203,7 @@ static int scheduler_advance(lua_State * L) {
 	delta_sec period = (delta_sec)(fabs(luaL_optnumber(L, 1, 1.)));
 	int defer = lua_toboolean(L, 2);
 	pq scheduler = *(pq *)lua_touserdata(L, lua_upvalueindex(1));
-	delta_pq_advance(scheduler, scheduler->now + period, defer);
+	delta_pq_advance(scheduler, period, defer);
 	lua_pushnumber(L, scheduler->now);
 	return 1;
 }

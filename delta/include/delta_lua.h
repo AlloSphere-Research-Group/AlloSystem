@@ -5,19 +5,18 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#include "delta.h"
+
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
 
 extern int luaopen_delta(lua_State * L);
-
-#include "delta.h"
+extern int luaopen_audio(lua_State * L);
 
 /* Lua/Audio API */
 #define AUDIO_PROCESS_LITERAL "__delta_audio_process"
 #define AUDIO_BUS_LITERAL "__delta_audio_bus"
-
-extern int lua_audio_init(lua_State * L);
 
 /* simplifies lua_to* lua_push* lua_opt* in codegen */
 typedef double number;

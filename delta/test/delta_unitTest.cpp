@@ -46,24 +46,6 @@ int callback(const void *input, void *output, unsigned long frameCount, const Pa
 	delta_audio_tick((delta_samplestamp)frameCount);
 	
 	// TODO: read delta outbusses into audio outbufs
-	
-	
-	///* convert stream data to AlloLatticeTy */
-//	inputlattice.data.ptr = (void *)input;
-//	outputlattice.data.ptr = output;
-//	
-//	/* do any processing here: */
-//	assert(frameCount == outputlattice.header.dim[1]);
-//	
-//	char * outp = outputlattice.data.ptr;
-//	int frame_stride = outputlattice.header.stride[1];
-//	for (int i=0; i<outputlattice.header.dim[1]; i++) {
-//		float * out = (float *)(outp + frame_stride * i);
-//		out[1] = sin(pincr * (phase+i));
-//		phase += 0.01;
-//	}
-//	
-//	phase += frameCount;
 
 	return 0;
 }
@@ -77,7 +59,7 @@ void tick(al_nsec ns, void * u) {
 	/* 
 		Resume any scheduled events in the main thread priority queue:
 	*/
-	delta_main_tick(t);
+	delta_main_tick();
 	
 	if (t > 3.) al_main_exit();
 }

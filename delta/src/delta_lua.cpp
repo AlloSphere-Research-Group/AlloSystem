@@ -169,7 +169,10 @@ bus lua_pushbus(lua_State * L, bus self) {
 	return self;
 }
 
-int lua_audio_init(lua_State * L) {
+int luaopen_audio(lua_State * L) {
+
+	const char * libname = lua_tostring(L, 1);
+
 	/* ensure it exists */
 	audiomain = delta_main_get();
 	
@@ -188,21 +191,24 @@ int lua_audio_init(lua_State * L) {
 	lua_setfield(L, -2, AUDIO_BUS_LITERAL);	
 	lua_pop(L, 1);
 	
-	/* create a creator */
-	lua_pushcfunction(L, lua_bus_create);
-	lua_setglobal(L, "bus");
+	/* define module */
+	struct luaL_reg module_lib[] = {
+		{ "bus", lua_bus_create },
+		{ NULL, NULL }
+	};
+	luaL_register(L, libname, module_lib);
 	
 	/* make the main IO public: */
 	for (int i=0; i<AUDIO_INPUTS; i++) {
 		lua_pushfstring(L, "in%d", i+1);
 		lua_pushbus(L, audiomain->inputs[i]);
-		lua_settable(L, LUA_GLOBALSINDEX); 
+		lua_settable(L, -3); 
 	}
 	for (int i=0; i<AUDIO_OUTPUTS; i++) {
 		lua_pushfstring(L, "out%d", i+1);
 		lua_pushbus(L, audiomain->outputs[i]);
-		lua_settable(L, LUA_GLOBALSINDEX); 
+		lua_settable(L, -3); 
 	}
 	
-	return 0;
+	return 1;
 }

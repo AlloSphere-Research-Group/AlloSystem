@@ -64,6 +64,12 @@
 		369568E8109382D700FD4312 /* al_time_cpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_time_cpp.h; sourceTree = "<group>"; };
 		36C8FA24107135E8003EC91B /* al_mainloop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_mainloop.h; sourceTree = "<group>"; };
 		36D3291110926BE800E542CA /* al_time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_time.h; sourceTree = "<group>"; };
+		36DD34B71096C5E8008B6B87 /* allo_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = allo_types.h; sourceTree = "<group>"; };
+		36DD34B81096C5E8008B6B87 /* allo_types_cpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = allo_types_cpp.h; sourceTree = "<group>"; };
+		36DD35091096C5E9008B6B87 /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
+		36DD350A1096C5E9008B6B87 /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
+		36DD350B1096C5E9008B6B87 /* test_portaudio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_portaudio.c; sourceTree = "<group>"; };
+		36DD350C1096C5E9008B6B87 /* unitTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = unitTest.cpp; sourceTree = "<group>"; };
 		36F51E501093ECB70019CA9B /* delta_unitTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = delta_unitTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		36F51E591093ECDF0019CA9B /* al_thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_thread.h; sourceTree = "<group>"; };
 		36F51EA21093F0DB0019CA9B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
@@ -128,6 +134,7 @@
 			isa = PBXGroup;
 			children = (
 				36F51F731093F7C40019CA9B /* delta */,
+				36DD34B51096C5E8008B6B87 /* types */,
 				36F51F6A1093F7A20019CA9B /* system */,
 				36F51F761093F7F60019CA9B /* libraries */,
 				C6859E8C029090F304C91782 /* Documentation */,
@@ -157,6 +164,36 @@
 			name = include;
 			path = ../../system/include;
 			sourceTree = SOURCE_ROOT;
+		};
+		36DD34B51096C5E8008B6B87 /* types */ = {
+			isa = PBXGroup;
+			children = (
+				36DD34B61096C5E8008B6B87 /* include */,
+				36DD35081096C5E9008B6B87 /* test */,
+			);
+			name = types;
+			path = ../../types;
+			sourceTree = SOURCE_ROOT;
+		};
+		36DD34B61096C5E8008B6B87 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				36DD34B71096C5E8008B6B87 /* allo_types.h */,
+				36DD34B81096C5E8008B6B87 /* allo_types_cpp.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		36DD35081096C5E9008B6B87 /* test */ = {
+			isa = PBXGroup;
+			children = (
+				36DD35091096C5E9008B6B87 /* test.c */,
+				36DD350A1096C5E9008B6B87 /* test.cpp */,
+				36DD350B1096C5E9008B6B87 /* test_portaudio.c */,
+				36DD350C1096C5E9008B6B87 /* unitTest.cpp */,
+			);
+			path = test;
+			sourceTree = "<group>";
 		};
 		36F51F6A1093F7A20019CA9B /* system */ = {
 			isa = PBXGroup;

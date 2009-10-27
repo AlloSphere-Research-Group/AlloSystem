@@ -206,7 +206,7 @@ pq_msg delta_pq_pop(pq x) {
 void delta_pq_update(pq x, delta_sec until, int defer) {
 	int result;
 	pq_msg m = delta_pq_top(x);
-	ddebug("advance %f\n", until);
+	ddebug("update to %f\n", until);
 	while (m && m->msg.t <= until) {
 		x->now = MAX(x->now, m->msg.t); 
 		delta_pq_pop(x);

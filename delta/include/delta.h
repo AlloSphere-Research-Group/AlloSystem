@@ -177,7 +177,10 @@ extern void delta_init();
 extern void delta_quit();
 
 /**! Entry point from main thread; e.g. main loop */
-extern void delta_main_tick(delta_sec cputime);
+extern void delta_main_tick();
+
+/**! Current main-thread logical time */
+extern delta_sec delta_main_now();
 
 /**! Entry point from audio thread; e.g. audio callback */
 extern void delta_audio_tick(delta_samplestamp frames);

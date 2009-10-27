@@ -56,7 +56,7 @@ void delta_quit() {
 }	
 
 void delta_audio_tick(delta_samplestamp frames) {
-	printf(".");
+	//printf(".");
 	
 	g_main->elapsed += frames;
 	delta_sec t = g_main->elapsed / g_main->samplerate;
@@ -74,8 +74,8 @@ void delta_audio_tick(delta_samplestamp frames) {
 	}
 }
 
-void delta_main_tick(delta_sec cputime) {
-	printf(">");
+void delta_main_tick() {
+	//printf(">");
 	
 	/* 
 		figure out our desired target time
@@ -90,6 +90,10 @@ void delta_main_tick(delta_sec cputime) {
 	delta_tube_pq_transfer(g_main->outbox, g_main->mainpq, t);
 	delta_pq_update(g_main->mainpq, t, 0);
 }	
+
+delta_sec delta_main_now() {
+	return g_main->mainpq->now;
+}
 
 sample * delta_audio_output(int channel) {
 	/* TODO: bounds-check on channel? */
