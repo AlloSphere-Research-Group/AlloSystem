@@ -7,15 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		36B7DD2910978EC30013EF88 /* al_pq.c in Sources */ = {isa = PBXBuildFile; fileRef = 36B7DD2810978DFA0013EF88 /* al_pq.c */; };
+		36B7DD38109792800013EF88 /* delta_lua.c in Sources */ = {isa = PBXBuildFile; fileRef = 36B7DD36109792800013EF88 /* delta_lua.c */; };
+		36B7DD39109792800013EF88 /* delta_lua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36B7DD37109792800013EF88 /* delta_lua.cpp */; };
+		36B7DD3B109792A20013EF88 /* al_tube.h in Headers */ = {isa = PBXBuildFile; fileRef = 36B7DD3A109792A20013EF88 /* al_tube.h */; };
+		36B7DD3D109792AF0013EF88 /* al_tube.c in Sources */ = {isa = PBXBuildFile; fileRef = 36B7DD3C109792AF0013EF88 /* al_tube.c */; };
 		36F51E541093ECC40019CA9B /* libdelta.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36752B291093915A00FF5627 /* libdelta.a */; };
 		36F51EAC1093F0E90019CA9B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F51EA21093F0DB0019CA9B /* Cocoa.framework */; };
 		36F51F791093F81B0019CA9B /* libalsystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F51F771093F8120019CA9B /* libalsystem.a */; };
 		36F51F7D1093F88C0019CA9B /* delta_unitTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F51F7C1093F88C0019CA9B /* delta_unitTest.cpp */; };
-		36F51F841093F9480019CA9B /* delta.h in Headers */ = {isa = PBXBuildFile; fileRef = 36F51F831093F9480019CA9B /* delta.h */; };
 		36F51F851093F94C0019CA9B /* delta.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F51F811093F9410019CA9B /* delta.cpp */; };
 		36F51FA81093F9FF0019CA9B /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F51FA71093F9FF0019CA9B /* libportaudio.a */; };
-		36F520AB1094062A0019CA9B /* delta_tube.c in Sources */ = {isa = PBXBuildFile; fileRef = 36F520AA1094062A0019CA9B /* delta_tube.c */; };
-		36F520AD1094064C0019CA9B /* delta_pq.c in Sources */ = {isa = PBXBuildFile; fileRef = 36F520AC1094064C0019CA9B /* delta_pq.c */; };
 		36F520BF109407830019CA9B /* delta_proclist.c in Sources */ = {isa = PBXBuildFile; fileRef = 36F520BE109407830019CA9B /* delta_proclist.c */; };
 		36F520C7109409420019CA9B /* delta_bus.c in Sources */ = {isa = PBXBuildFile; fileRef = 36F520C6109409420019CA9B /* delta_bus.c */; };
 		36F5216E10940FE70019CA9B /* libalsystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F51F771093F8120019CA9B /* libalsystem.a */; };
@@ -24,8 +26,6 @@
 		36F5217110940FE70019CA9B /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F51FA71093F9FF0019CA9B /* libportaudio.a */; };
 		36F521781094101A0019CA9B /* delta_luaTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F521771094101A0019CA9B /* delta_luaTest.cpp */; };
 		36F5217A109410330019CA9B /* liblua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F52179109410330019CA9B /* liblua.a */; };
-		36F5217E1094104C0019CA9B /* delta_lua.c in Sources */ = {isa = PBXBuildFile; fileRef = 36F520EE109409DA0019CA9B /* delta_lua.c */; };
-		36F5217F1094104C0019CA9B /* delta_lua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F520F510940A7E0019CA9B /* delta_lua.cpp */; };
 		36F5219B1094289F0019CA9B /* test_delta.lua in CopyFiles */ = {isa = PBXBuildFile; fileRef = 36F5219A1094289F0019CA9B /* test_delta.lua */; };
 /* End PBXBuildFile section */
 
@@ -61,31 +61,39 @@
 
 /* Begin PBXFileReference section */
 		36752B291093915A00FF5627 /* libdelta.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdelta.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		369568E8109382D700FD4312 /* al_time.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_time.hpp; sourceTree = "<group>"; };
-		36C8FA24107135E8003EC91B /* al_mainloop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_mainloop.h; sourceTree = "<group>"; };
-		36D3291110926BE800E542CA /* al_time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_time.h; sourceTree = "<group>"; };
-		36DD34B71096C5E8008B6B87 /* allo_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = allo_types.h; sourceTree = "<group>"; };
-		36DD34B81096C5E8008B6B87 /* allo_types_cpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = allo_types_cpp.h; sourceTree = "<group>"; };
+		36B7DD1110978CF70013EF88 /* delta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = delta.h; sourceTree = "<group>"; };
+		36B7DD1210978CF70013EF88 /* delta_lua.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = delta_lua.h; sourceTree = "<group>"; };
+		36B7DD1410978CF70013EF88 /* OSC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSC.h; sourceTree = "<group>"; };
+		36B7DD1610978CF70013EF88 /* al_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_config.h; sourceTree = "<group>"; };
+		36B7DD1710978CF70013EF88 /* al_mainloop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_mainloop.h; sourceTree = "<group>"; };
+		36B7DD1810978CF70013EF88 /* al_thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_thread.h; sourceTree = "<group>"; };
+		36B7DD1910978CF70013EF88 /* al_time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_time.h; sourceTree = "<group>"; };
+		36B7DD1A10978CF70013EF88 /* al_time.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_time.hpp; sourceTree = "<group>"; };
+		36B7DD1C10978CF70013EF88 /* allo_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = allo_types.h; sourceTree = "<group>"; };
+		36B7DD1D10978CF70013EF88 /* allo_types_cpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = allo_types_cpp.h; sourceTree = "<group>"; };
+		36B7DD2010978D5D0013EF88 /* al_pq.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_pq.h; sourceTree = "<group>"; };
+		36B7DD2210978DDB0013EF88 /* al_mainloop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_mainloop.cpp; sourceTree = "<group>"; };
+		36B7DD2310978DDB0013EF88 /* al_mainloop_osx.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = al_mainloop_osx.mm; sourceTree = "<group>"; };
+		36B7DD2410978DDB0013EF88 /* al_time.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_time.cpp; sourceTree = "<group>"; };
+		36B7DD2610978DDB0013EF88 /* unitTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = unitTest.cpp; sourceTree = "<group>"; };
+		36B7DD2810978DFA0013EF88 /* al_pq.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = al_pq.c; sourceTree = "<group>"; };
+		36B7DD36109792800013EF88 /* delta_lua.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = delta_lua.c; sourceTree = "<group>"; };
+		36B7DD37109792800013EF88 /* delta_lua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = delta_lua.cpp; sourceTree = "<group>"; };
+		36B7DD3A109792A20013EF88 /* al_tube.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_tube.h; sourceTree = "<group>"; };
+		36B7DD3C109792AF0013EF88 /* al_tube.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = al_tube.c; sourceTree = "<group>"; };
 		36DD35091096C5E9008B6B87 /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
 		36DD350A1096C5E9008B6B87 /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
 		36DD350B1096C5E9008B6B87 /* test_portaudio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_portaudio.c; sourceTree = "<group>"; };
 		36DD350C1096C5E9008B6B87 /* unitTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = unitTest.cpp; sourceTree = "<group>"; };
 		36F51E501093ECB70019CA9B /* delta_unitTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = delta_unitTest; sourceTree = BUILT_PRODUCTS_DIR; };
-		36F51E591093ECDF0019CA9B /* al_thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_thread.h; sourceTree = "<group>"; };
 		36F51EA21093F0DB0019CA9B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		36F51F771093F8120019CA9B /* libalsystem.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libalsystem.a; path = ../../build/Release/libalsystem.a; sourceTree = SOURCE_ROOT; };
 		36F51F7C1093F88C0019CA9B /* delta_unitTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = delta_unitTest.cpp; sourceTree = "<group>"; };
 		36F51F811093F9410019CA9B /* delta.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = delta.cpp; sourceTree = "<group>"; };
-		36F51F831093F9480019CA9B /* delta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = delta.h; sourceTree = "<group>"; };
 		36F51FA71093F9FF0019CA9B /* libportaudio.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libportaudio.a; path = /usr/local/lib/libportaudio.a; sourceTree = "<absolute>"; };
 		36F51FA91093FA120019CA9B /* portaudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = portaudio.h; path = /usr/local/include/portaudio.h; sourceTree = "<absolute>"; };
-		36F5206F1094056C0019CA9B /* delta_lua.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = delta_lua.h; sourceTree = "<group>"; };
-		36F520AA1094062A0019CA9B /* delta_tube.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = delta_tube.c; sourceTree = "<group>"; };
-		36F520AC1094064C0019CA9B /* delta_pq.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = delta_pq.c; sourceTree = "<group>"; };
 		36F520BE109407830019CA9B /* delta_proclist.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = delta_proclist.c; sourceTree = "<group>"; };
 		36F520C6109409420019CA9B /* delta_bus.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = delta_bus.c; sourceTree = "<group>"; };
-		36F520EE109409DA0019CA9B /* delta_lua.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = delta_lua.c; sourceTree = "<group>"; };
-		36F520F510940A7E0019CA9B /* delta_lua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = delta_lua.cpp; sourceTree = "<group>"; };
 		36F5217510940FE70019CA9B /* delta_luaTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = delta_luaTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		36F521771094101A0019CA9B /* delta_luaTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = delta_luaTest.cpp; sourceTree = "<group>"; };
 		36F52179109410330019CA9B /* liblua.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua.a; path = /usr/local/lib/liblua.a; sourceTree = "<absolute>"; };
@@ -133,6 +141,8 @@
 		08FB7794FE84155DC02AAC07 /* osx */ = {
 			isa = PBXGroup;
 			children = (
+				36B7DD34109792800013EF88 /* lua */,
+				36B7DD0F10978CF70013EF88 /* include */,
 				36F51F731093F7C40019CA9B /* delta */,
 				36DD34B51096C5E8008B6B87 /* types */,
 				36F51F6A1093F7A20019CA9B /* system */,
@@ -153,36 +163,114 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		36C8FA22107135DE003EC91B /* system */ = {
+		36B7DD0F10978CF70013EF88 /* include */ = {
 			isa = PBXGroup;
 			children = (
-				36C8FA24107135E8003EC91B /* al_mainloop.h */,
-				36D3291110926BE800E542CA /* al_time.h */,
-				369568E8109382D700FD4312 /* al_time.hpp */,
-				36F51E591093ECDF0019CA9B /* al_thread.h */,
+				36B7DD1010978CF70013EF88 /* delta */,
+				36B7DD1310978CF70013EF88 /* network */,
+				36B7DD1510978CF70013EF88 /* system */,
+				36B7DD1B10978CF70013EF88 /* types */,
 			);
-			name = system;
-			path = ../../include/system;
+			name = include;
+			path = ../../include;
 			sourceTree = SOURCE_ROOT;
+		};
+		36B7DD1010978CF70013EF88 /* delta */ = {
+			isa = PBXGroup;
+			children = (
+				36B7DD1110978CF70013EF88 /* delta.h */,
+				36B7DD1210978CF70013EF88 /* delta_lua.h */,
+			);
+			path = delta;
+			sourceTree = "<group>";
+		};
+		36B7DD1310978CF70013EF88 /* network */ = {
+			isa = PBXGroup;
+			children = (
+				36B7DD1410978CF70013EF88 /* OSC.h */,
+			);
+			path = network;
+			sourceTree = "<group>";
+		};
+		36B7DD1510978CF70013EF88 /* system */ = {
+			isa = PBXGroup;
+			children = (
+				36B7DD1610978CF70013EF88 /* al_config.h */,
+				36B7DD1710978CF70013EF88 /* al_mainloop.h */,
+				36B7DD1810978CF70013EF88 /* al_thread.h */,
+				36B7DD1910978CF70013EF88 /* al_time.h */,
+				36B7DD1A10978CF70013EF88 /* al_time.hpp */,
+			);
+			path = system;
+			sourceTree = "<group>";
+		};
+		36B7DD1B10978CF70013EF88 /* types */ = {
+			isa = PBXGroup;
+			children = (
+				36B7DD1C10978CF70013EF88 /* allo_types.h */,
+				36B7DD1D10978CF70013EF88 /* allo_types_cpp.h */,
+				36B7DD2010978D5D0013EF88 /* al_pq.h */,
+				36B7DD3A109792A20013EF88 /* al_tube.h */,
+			);
+			path = types;
+			sourceTree = "<group>";
+		};
+		36B7DD2110978DDB0013EF88 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				36B7DD2210978DDB0013EF88 /* al_mainloop.cpp */,
+				36B7DD2310978DDB0013EF88 /* al_mainloop_osx.mm */,
+				36B7DD2410978DDB0013EF88 /* al_time.cpp */,
+			);
+			name = src;
+			path = ../../system/src;
+			sourceTree = SOURCE_ROOT;
+		};
+		36B7DD2510978DDB0013EF88 /* test */ = {
+			isa = PBXGroup;
+			children = (
+				36B7DD2610978DDB0013EF88 /* unitTest.cpp */,
+			);
+			name = test;
+			path = ../../system/test;
+			sourceTree = SOURCE_ROOT;
+		};
+		36B7DD2710978DF10013EF88 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				36B7DD2810978DFA0013EF88 /* al_pq.c */,
+				36B7DD3C109792AF0013EF88 /* al_tube.c */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		36B7DD34109792800013EF88 /* lua */ = {
+			isa = PBXGroup;
+			children = (
+				36B7DD35109792800013EF88 /* delta */,
+			);
+			name = lua;
+			path = ../../lua;
+			sourceTree = SOURCE_ROOT;
+		};
+		36B7DD35109792800013EF88 /* delta */ = {
+			isa = PBXGroup;
+			children = (
+				36B7DD36109792800013EF88 /* delta_lua.c */,
+				36B7DD37109792800013EF88 /* delta_lua.cpp */,
+			);
+			path = delta;
+			sourceTree = "<group>";
 		};
 		36DD34B51096C5E8008B6B87 /* types */ = {
 			isa = PBXGroup;
 			children = (
-				36DD34B61096C5E8008B6B87 /* include */,
+				36B7DD2710978DF10013EF88 /* src */,
 				36DD35081096C5E9008B6B87 /* test */,
 			);
 			name = types;
 			path = ../../types;
 			sourceTree = SOURCE_ROOT;
-		};
-		36DD34B61096C5E8008B6B87 /* include */ = {
-			isa = PBXGroup;
-			children = (
-				36DD34B71096C5E8008B6B87 /* allo_types.h */,
-				36DD34B81096C5E8008B6B87 /* allo_types_cpp.h */,
-			);
-			path = include;
-			sourceTree = "<group>";
 		};
 		36DD35081096C5E9008B6B87 /* test */ = {
 			isa = PBXGroup;
@@ -198,7 +286,8 @@
 		36F51F6A1093F7A20019CA9B /* system */ = {
 			isa = PBXGroup;
 			children = (
-				36C8FA22107135DE003EC91B /* system */,
+				36B7DD2110978DDB0013EF88 /* src */,
+				36B7DD2510978DDB0013EF88 /* test */,
 			);
 			name = system;
 			sourceTree = "<group>";
@@ -206,7 +295,6 @@
 		36F51F731093F7C40019CA9B /* delta */ = {
 			isa = PBXGroup;
 			children = (
-				36F51F741093F7C40019CA9B /* delta */,
 				36F51F751093F7C40019CA9B /* src */,
 				36F51F7B1093F87E0019CA9B /* test */,
 			);
@@ -214,26 +302,12 @@
 			path = ../../delta;
 			sourceTree = SOURCE_ROOT;
 		};
-		36F51F741093F7C40019CA9B /* delta */ = {
-			isa = PBXGroup;
-			children = (
-				36F51F831093F9480019CA9B /* delta.h */,
-				36F5206F1094056C0019CA9B /* delta_lua.h */,
-			);
-			name = delta;
-			path = ../include/delta;
-			sourceTree = "<group>";
-		};
 		36F51F751093F7C40019CA9B /* src */ = {
 			isa = PBXGroup;
 			children = (
 				36F51F811093F9410019CA9B /* delta.cpp */,
-				36F520AA1094062A0019CA9B /* delta_tube.c */,
-				36F520AC1094064C0019CA9B /* delta_pq.c */,
 				36F520BE109407830019CA9B /* delta_proclist.c */,
 				36F520C6109409420019CA9B /* delta_bus.c */,
-				36F520EE109409DA0019CA9B /* delta_lua.c */,
-				36F520F510940A7E0019CA9B /* delta_lua.cpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -278,7 +352,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				36F51F841093F9480019CA9B /* delta.h in Headers */,
+				36B7DD3B109792A20013EF88 /* al_tube.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -361,11 +435,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36B7DD2910978EC30013EF88 /* al_pq.c in Sources */,
 				36F51F851093F94C0019CA9B /* delta.cpp in Sources */,
-				36F520AB1094062A0019CA9B /* delta_tube.c in Sources */,
-				36F520AD1094064C0019CA9B /* delta_pq.c in Sources */,
 				36F520BF109407830019CA9B /* delta_proclist.c in Sources */,
 				36F520C7109409420019CA9B /* delta_bus.c in Sources */,
+				36B7DD38109792800013EF88 /* delta_lua.c in Sources */,
+				36B7DD39109792800013EF88 /* delta_lua.cpp in Sources */,
+				36B7DD3D109792AF0013EF88 /* al_tube.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -381,8 +457,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				36F5217E1094104C0019CA9B /* delta_lua.c in Sources */,
-				36F5217F1094104C0019CA9B /* delta_lua.cpp in Sources */,
 				36F521781094101A0019CA9B /* delta_luaTest.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -448,6 +522,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				SYMROOT = ../../build;
+				USER_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../../include";
 			};
 			name = Debug;
 		};
@@ -468,6 +543,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = alsystem;
 				SYMROOT = ../../build;
+				USER_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/../../include";
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -482,9 +558,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
-				);
+				HEADER_SEARCH_PATHS = /usr/local/include;
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = "$(PRODUCT_DIR)/$(BUILD_DIR)/$CONFIGURATION/";
 				PREBINDING = NO;
@@ -503,9 +577,7 @@
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
-				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
-				);
+				HEADER_SEARCH_PATHS = /usr/local/include;
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = "$(PRODUCT_DIR)/$(BUILD_DIR)/$CONFIGURATION/";
 				PREBINDING = NO;
@@ -526,9 +598,7 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
-				);
+				HEADER_SEARCH_PATHS = /usr/local/include;
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = "$(PRODUCT_DIR)/$(BUILD_DIR)/$CONFIGURATION/";
 				PREBINDING = NO;
@@ -547,9 +617,7 @@
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
-				HEADER_SEARCH_PATHS = (
-					/usr/local/include,
-				);
+				HEADER_SEARCH_PATHS = /usr/local/include;
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = "$(PRODUCT_DIR)/$(BUILD_DIR)/$CONFIGURATION/";
 				PREBINDING = NO;

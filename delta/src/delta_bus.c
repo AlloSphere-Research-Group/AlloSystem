@@ -3,7 +3,7 @@
 #include "string.h"
 #include "stdio.h"
 
-int bus_proc(delta_sec t, char * args) {
+int bus_proc(al_sec t, char * args) {
 	bus x = *(bus *)args;	
 	/* swap buffers */
 	x->front = !x->front; 
@@ -13,14 +13,14 @@ int bus_proc(delta_sec t, char * args) {
 	return 0;
 }
 
-int bus_free_msg(delta_sec t, char * args) {
+int bus_free_msg(al_sec t, char * args) {
 	bus x = *(bus *)args;
 	printf("bus free %p\n", x);
 	free(x);
 	return 0;
 }
 
-int bus_nofree_msg(delta_sec t, char * args) {
+int bus_nofree_msg(al_sec t, char * args) {
 	//bus x = *(bus *)args;
 	return 0;
 }

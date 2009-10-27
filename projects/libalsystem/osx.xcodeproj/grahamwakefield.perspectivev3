@@ -233,6 +233,8 @@
 			<key>Layout</key>
 			<array>
 				<dict>
+					<key>BecomeActive</key>
+					<true/>
 					<key>ContentConfiguration</key>
 					<dict>
 						<key>PBXBottomSmartGroupGIDs</key>
@@ -280,8 +282,8 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>21</integer>
-									<integer>19</integer>
+									<integer>7</integer>
+									<integer>0</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
@@ -313,8 +315,6 @@
 					<key>Dock</key>
 					<array>
 						<dict>
-							<key>BecomeActive</key>
-							<true/>
 							<key>ContentConfiguration</key>
 							<dict>
 								<key>PBXProjectModuleGUID</key>
@@ -332,7 +332,7 @@
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>36B7DCCF10978B930013EF88</string>
+										<string>36B7DDC61097952A0013EF88</string>
 										<key>history</key>
 										<array>
 											<string>36F51F111093F4A00019CA9B</string>
@@ -340,7 +340,7 @@
 											<string>36B7DCC710978B930013EF88</string>
 											<string>36B7DCC810978B930013EF88</string>
 											<string>36B7DCC910978B930013EF88</string>
-											<string>36B7DCCA10978B930013EF88</string>
+											<string>36B7DDB91097951D0013EF88</string>
 										</array>
 										<key>prevStack</key>
 										<array>
@@ -387,6 +387,8 @@
 									<dict>
 										<key>Frame</key>
 										<string>{{10, 27}, {694, 208}}</string>
+										<key>RubberWindowFrame</key>
+										<string>296 50 1007 828 0 0 1440 878 </string>
 									</dict>
 									<key>Module</key>
 									<string>XCDetailModule</string>
@@ -441,8 +443,6 @@
 									<dict>
 										<key>Frame</key>
 										<string>{{10, 27}, {694, 208}}</string>
-										<key>RubberWindowFrame</key>
-										<string>296 50 1007 828 0 0 1440 878 </string>
 									</dict>
 									<key>Module</key>
 									<string>PBXBuildResultsModule</string>
@@ -470,11 +470,11 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>36B7D7D4109787230013EF88</string>
+				<string>36B7DDC71097952A0013EF88</string>
 				<string>1CA23ED40692098700951B8B</string>
-				<string>36B7D7D5109787230013EF88</string>
+				<string>36B7DDC81097952A0013EF88</string>
 				<string>36C8FA17107135BC003EC91B</string>
-				<string>36B7D7D6109787230013EF88</string>
+				<string>36B7DDC91097952A0013EF88</string>
 				<string>1CA23EDF0692099D00951B8B</string>
 				<string>1CA23EE00692099D00951B8B</string>
 				<string>1CA23EE10692099D00951B8B</string>

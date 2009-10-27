@@ -68,7 +68,7 @@ int main(int ac, char * av) {
 	char * buf;
 	int i;
 	
-	delta_init();
+	delta_main_init();
 	
 	/* queue up some messages: */
 	for (i=0; i<10; i++) {
@@ -109,7 +109,7 @@ int main(int ac, char * av) {
 	err = Pa_Terminate();
 	if (err != paNoError) goto pa_out;
 	
-	delta_quit();
+	delta_main_quit();
 	return 0;
 	
 pa_out:

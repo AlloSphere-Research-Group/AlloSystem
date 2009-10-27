@@ -30,18 +30,18 @@ void script_run(lua_State * L, char * file) {
 }
 
 int main(int ac, char * av) {
+	
+	delta_main_init();
 
 	lua_State * L = lua_open();
 	luaL_openlibs(L);
-	
 	script_preload(L, "audio", luaopen_audio);
 	script_preload(L, "delta", luaopen_delta);
-	
 	script_run(L, "test_delta.lua");
 	
 	while (delta_main_now() < 3) {
 		delta_main_tick();
-		//printf(" %5.2f\n", delta_main_now());
+		printf(" %5.2f\n", delta_main_now());
 		
 		// simulate audio thread (non-realtime)
 		delta_audio_tick(441);
@@ -49,6 +49,9 @@ int main(int ac, char * av) {
 		// simulate realtime
 		//al_sleep(0.01);
 	}
+	
+	lua_close(L);
+	delta_main_quit();
 	
 	return 0;
 }

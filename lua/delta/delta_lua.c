@@ -10,7 +10,7 @@ static const char * DELTA_LUA_CORO_META = "coro_meta";
 /*
 	Routine for coroutines
  */
-static int resume(delta_sec t, char * data) {
+static int resume(al_sec t, char * data) {
 	lua_State * C = *(lua_State **)data;
 	
 	ddebug("resume %f\n", t);
@@ -80,7 +80,7 @@ static int coro_abort(lua_State * L) {
 	lua_rawget(L, lua_upvalueindex(1));	// DELTA_LUA_CORO_CACHE
 	pq * u = (pq *)lua_touserdata(L, -1);
 	if (u) {
-		delta_pq_cancel_ptr(*u, lua_tothread(L, -2));
+		al_pq_cancel_ptr(*u, lua_tothread(L, -2));
 	}
 	lua_pop(L, 1);
 	
@@ -98,7 +98,7 @@ static int scheduler_tostring(lua_State * L) {
 
 static int scheduler_gc(lua_State * L) {
 	pq scheduler = *(pq *)lua_touserdata(L, 1);
-	delta_pq_free(&scheduler);
+	al_pq_free(&scheduler, 0);
 	// ensure we can't double-free
 	lua_pushnil(L);
 	lua_setmetatable(L, -2);
@@ -114,9 +114,9 @@ static int scheduler_go(lua_State * L) {
 	lua_State ** buf;
 	pq scheduler = *(pq *)lua_touserdata(L, lua_upvalueindex(1));
 	
-	delta_sec t = 0; 
+	al_sec t = 0; 
 	if (lua_isnumber(L, 1)) {
-		t = (delta_sec)lua_tonumber(L, 1);
+		t = (al_sec)lua_tonumber(L, 1);
 		lua_remove(L, 1);
 	}	
 	
@@ -146,11 +146,11 @@ static int scheduler_go(lua_State * L) {
 	
 	// insert C into the clock schedule at delay t
 	t += scheduler->now;
-	buf = (lua_State **)delta_pq_msg(scheduler);
+	buf = (lua_State **)al_pq_msg(scheduler);
 	if (buf) {
 		// copy C into buf:
 		*buf = C;
-		delta_pq_sched(scheduler, t, resume);
+		al_pq_sched(scheduler, t, resume);
 		ddebug("go scheduled %f\n", t);
 	} else {
 		return luaL_error(L, "go: failed to allocate message");
@@ -161,7 +161,7 @@ static int scheduler_go(lua_State * L) {
 static int scheduler_wait(lua_State * C) {
 	// get the wait period (seconds) & convert to ns:
 	lua_State ** buf;
-	delta_sec t = (delta_sec)(fabs(luaL_optnumber(C, 1, 1.0)));
+	al_sec t = (al_sec)(fabs(luaL_optnumber(C, 1, 1.0)));
 	pq scheduler = *(pq *)lua_touserdata(C, lua_upvalueindex(1));
 	
 	// register with this scheduler:
@@ -170,11 +170,11 @@ static int scheduler_wait(lua_State * C) {
 	lua_rawset(C, lua_upvalueindex(2));	// DELTA_LUA_CORO_CACHE
 	
 	t += scheduler->now;
-	buf = (lua_State **)delta_pq_msg(scheduler);
+	buf = (lua_State **)al_pq_msg(scheduler);
 	if (buf) {
 		// copy C into buf:
 		*buf = C;
-		delta_pq_sched(scheduler, t, resume);
+		al_pq_sched(scheduler, t, resume);
 		ddebug("wait scheduled %f\n", t);
 	} else {
 		return luaL_error(C, "wait: failed to allocate message");
@@ -191,26 +191,26 @@ static int scheduler_now(lua_State * L) {
 }
 
 static int scheduler_update(lua_State * L) {
-	delta_sec until = (delta_sec)(fabs(luaL_optnumber(L, 1, 1.)));
+	al_sec until = (al_sec)(fabs(luaL_optnumber(L, 1, 1.)));
 	int defer = lua_toboolean(L, 2);
 	pq scheduler = *(pq *)lua_touserdata(L, lua_upvalueindex(1));
-	delta_pq_update(scheduler, until, defer);
+	al_pq_update(scheduler, until, defer);
 	lua_pushnumber(L, scheduler->now);
 	return 1;
 }
 
 static int scheduler_advance(lua_State * L) {
-	delta_sec period = (delta_sec)(fabs(luaL_optnumber(L, 1, 1.)));
+	al_sec period = (al_sec)(fabs(luaL_optnumber(L, 1, 1.)));
 	int defer = lua_toboolean(L, 2);
 	pq scheduler = *(pq *)lua_touserdata(L, lua_upvalueindex(1));
-	delta_pq_advance(scheduler, period, defer);
+	al_pq_advance(scheduler, period, defer);
 	lua_pushnumber(L, scheduler->now);
 	return 1;
 }
 
 static int scheduler(lua_State * L) {	
 	// TODO: grab size & birth args from stack?
-	pq scheduler = delta_pq_create(1000, 0);
+	pq scheduler = al_pq_create(1000, 0);
 	pq * u = (pq *)lua_newuserdata(L, sizeof(pq));
 	*u = scheduler;
 	
@@ -265,7 +265,7 @@ static int scheduler(lua_State * L) {
 
 int luaopen_delta(lua_State * L) {
 
-	delta_init();
+	delta_main_init();
 
 	const char * libname = lua_tostring(L, -1);
 	
@@ -314,7 +314,7 @@ int luaopen_delta(lua_State * L) {
 	 */
 	pq * u = (pq *)lua_newuserdata(L, sizeof(pq));
 	// TODO: store this as singleton instance, or use existing singleton?
-	*u = delta_pq_main(); //delta_pq_create(10, 0);
+	*u = al_pq_main(); //al_pq_create(10, 0);
 	
 	lua_pushvalue(L, -2); // the module table also becomes the metatable of the main scheduler
 	lua_pushvalue(L, -2);

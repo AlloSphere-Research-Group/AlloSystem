@@ -38,6 +38,10 @@
 	The host audio driver must provide a repeated callback (from a single thread)	
 */
 
+#include "system/al_time.h"
+#include "types/al_pq.h"
+#include "types/al_tube.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -45,9 +49,6 @@ extern "C" {
 /*
 	Types
 */
-
-/**! public timestamps in terms of seconds */
-typedef double delta_sec;
 
 /**! internal timestamps in terms of samples */
 typedef long long int delta_samplestamp;
@@ -60,46 +61,24 @@ typedef double sample;
 #define AUDIO_INPUTS 2
 #define AUDIO_OUTPUTS 2
 
-/* Maximum memory footprint of a message */
-#define DELTA_MSG_ARGS_SIZE (52)
-
-/* Standard function signature for the handler of a message */
-typedef int (*delta_msg_func)(delta_sec t, char *);
-
-struct delta_msg {
-	delta_sec t;
-	delta_msg_func func;
-	char mem[DELTA_MSG_ARGS_SIZE];
-};
-typedef struct delta_msg * msg;
-
-/*
-	A priority queue
-		random access insertion, sorted access retrieval/removal
-		for single-threaded application
-		sorts on insertion, with fast-path for first/last positions
-*/
-/* A message in the queue */
-struct delta_pq_msg {
-	struct delta_msg msg;
-	struct delta_pq_msg * next;
-};
-typedef struct delta_pq_msg * pq_msg;
-
-struct delta_pq {
-	delta_sec now; /* scheduler logical time */
-	pq_msg head, tail, pool;
-	int len;
-	delta_sec retry_period; /* if a message call fails */
-};
-typedef struct delta_pq * pq;
+///* Standard function signature for the handler of a message */
+//typedef int (*al_msg_func)(al_sec t, char *);
+//
+///* Maximum memory footprint of a message */
+//#define DELTA_MSG_ARGS_SIZE (52)
+//struct al_msg {
+//	al_sec t;
+//	al_msg_func func;
+//	char mem[DELTA_MSG_ARGS_SIZE];
+//};
+//typedef struct al_msg * msg;
 
 /*
-	delta_process header is itself a delta_msg; suitable for insertion in a proclist:
+	delta_process header is itself a al_msg; suitable for insertion in a proclist:
 */
 struct delta_process {
-	struct delta_msg msg;
-	delta_msg_func freefunc;
+	struct al_msg msg;
+	al_msg_func freefunc;
 	struct delta_process * next;
 	unsigned int id; /* assigned by whichever proclist contains it, zero otherwise */
 };
@@ -110,19 +89,6 @@ struct delta_proclist {
 	unsigned int nextid;
 };
 typedef struct delta_proclist * proclist;
-
-/*
-	Single-writer / single-reader wait-free fifo for sending messages between a pair of threads
-	
-	|||||||||||||||||||||||||||||
-				rw 
-	 send packets (thread 1)
-				r......w
-	 receive packets (thread 2)
-				 .....rw
-	|||||||||||||||||||||||||||||
-*/
-typedef struct delta_tube * tube;
 
 /*
 	Bus
@@ -145,7 +111,7 @@ typedef struct {
 	/* time since birth in samples */
 	delta_samplestamp elapsed;	
 	/* suggested latency */	
-	delta_sec latency;		
+	al_sec latency;		
 	
 	/* main/audio thread scheduled events */
 	pq mainpq, audiopq;
@@ -173,47 +139,19 @@ typedef delta_main_t * delta_main;
 */
 
 /**! Library init/close */
-extern void delta_init();
-extern void delta_quit();
+extern void delta_main_init();
+extern void delta_main_quit();
 
 /**! Entry point from main thread; e.g. main loop */
 extern void delta_main_tick();
 
 /**! Current main-thread logical time */
-extern delta_sec delta_main_now();
+extern al_sec delta_main_now();
 
 /**! Entry point from audio thread; e.g. audio callback */
 extern void delta_audio_tick(delta_samplestamp frames);
 
 extern delta_main delta_main_get();
-
-/* return the singleton main pq */
-extern pq delta_pq_main();
-
-/* allocate a new priority queue */
-extern pq delta_pq_create(int size, delta_sec birth);
-/* free a priority queue */
-extern void delta_pq_free(pq * ptr);
-
-extern int delta_pq_used(pq x);
-
-/* grab memory for the next message */
-extern char * delta_pq_msg(pq x);
-/* schedule it */
-extern void delta_pq_sched(pq x, delta_sec t, delta_msg_func f);
-
-/* remove any scheduled messages with *mem == ptr (matching addresses) */
-extern void delta_pq_cancel_ptr(pq x, void * ptr);
-
-/* read the top message */
-extern pq_msg delta_pq_top(pq x);
-/* pop the top message, return the next */
-extern pq_msg delta_pq_pop(pq x);
-
-/* alternative API: */
-/* convenience wrapper to call all scheduled functions up to a given timestamp */
-extern void delta_pq_update(pq x, delta_sec until, int defer);
-extern void delta_pq_advance(pq x, delta_sec step, int defer);
 
 /* create/destroy a proclist */
 extern proclist delta_proclist_create();
@@ -224,50 +162,20 @@ extern void delta_proclist_append(proclist x, process p);
 extern void delta_proclist_prepend(proclist x, process p);
 extern void delta_proclist_remove(proclist x, process p);
 
-/* create tube with 2^N message slots */
-extern tube delta_tube_create(int nbits);
 
-/* free a tube */
-extern void delta_tube_free(tube * x);
-
-/* return number of scheduled messages in the tube */
-extern int delta_tube_used(tube x);
-
-/* get pointer next sendable message */
-extern msg delta_tube_write_head(tube x);
-/* after filling the message, send it */
-extern void delta_tube_write_send_msg(tube x);
-
-/* alternative API: */
-/* get pointer to data of next sendable message */
-extern char * delta_tube_write_head_mem(tube x);
-/* after filling the message data, assign the function to call, and send it */
-extern void delta_tube_write_send(tube x, delta_sec t, delta_msg_func f);
-
-/* get pointer to memory of next receivable message */
-extern msg delta_tube_reader_head(tube x);
-/* after handling the message, return it */
-extern void delta_tube_reader_done(tube x);
-
-/* alternative API: */
-/* convenience wrapper to call all scheduled functions up to a given timestamp */
-extern void delta_tube_reader_advance(tube x, delta_sec until);
-
-/* convenience wrapper to shunt message from an incoming tube to a local priority queue */
-extern void delta_tube_pq_transfer(tube x, pq q, delta_sec until);
 
 /* bus definition */
-extern int bus_proc(delta_sec t, char * args);
-extern int bus_free_msg(delta_sec t, char * args);
+extern int bus_proc(al_sec t, char * args);
+extern int bus_free_msg(al_sec t, char * args);
 extern bus bus_create();
 extern sample * bus_read(bus self, process reader);
 
 extern sample * delta_audio_output(int channel);
 
-extern int delta_audio_proc_init(process x, delta_msg_func procmsg, delta_msg_func freemsg);
+extern int delta_audio_proc_init(process x, al_msg_func procmsg, al_msg_func freemsg);
 extern int delta_audio_proc_gc(process * ptr);
 
-extern int bus_nofree_msg(delta_sec t, char * args);
+extern int bus_nofree_msg(al_sec t, char * args);
 
 
 #ifdef __cplusplus
