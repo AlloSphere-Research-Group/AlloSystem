@@ -42,11 +42,11 @@ extern "C" {
 typedef int (*al_msg_func)(al_sec t, char *);
 
 /* Maximum memory footprint of a message */
-#define DELTA_MSG_ARGS_SIZE (52)
+#define AL_PQ_MSG_ARGS_SIZE (52)
 struct al_msg {
 	al_sec t;
 	al_msg_func func;
-	char mem[DELTA_MSG_ARGS_SIZE];
+	char mem[AL_PQ_MSG_ARGS_SIZE];
 };
 typedef struct al_msg * msg;
 
@@ -70,9 +70,6 @@ struct al_pq {
 	al_sec retry_period; /* if a message call fails */
 };
 typedef struct al_pq * pq;
-
-/* return the singleton main pq */
-extern pq al_pq_main();
 
 /* allocate a new priority queue */
 extern pq al_pq_create(int size, al_sec birth);

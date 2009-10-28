@@ -35,11 +35,23 @@
 	The main thread is assumed to be 'ahead' of the audio thread by some ideal latency.
 	
 	It should be possible to drive Delta from any audio system, e.g. portaudio, VST, etc.
-	The host audio driver must provide a repeated callback (from a single thread)	
+	
+	Usage:
+	
+	Initalize with delta_main_init()
+	
+	The host audio driver (single thread) must trigger delta_audio_tick() repeatedly
+	
+	The host (main thread) must also trigger delta_main_tick() repeatedly
+	
+	Once the audio driver triggers have ended (e.g. audio thread joined), 
+		release resources with delta_main_quit()
 */
 
+/*
+	Dependencies
+*/
 #include "system/al_time.h"
-
 #include "types/al_pq.h"
 #include "types/al_tube.h"
 
@@ -47,38 +59,44 @@
 extern "C" {
 #endif
 
+#define DELTA_SIGNAL_DIM (64)
+
 /*
 	Types
 */
 
+/*
+	An opaque struct passed to process callbacks
+*/
+typedef struct delta_state * delta;
+
 /**! internal timestamps in terms of samples */
-typedef long long int delta_samplestamp;
+typedef long long int samplestamp;
 
 /**! 64-bit processing */
 typedef double sample;
 
-/* these will not remain macros */
-#define SIGNAL_DIM (64)
-#define AUDIO_INPUTS 2
-#define AUDIO_OUTPUTS 2
+/* 
+	Standard function signature for an audio process 
+*/
+typedef samplestamp (*delta_proc_func)(delta D, char *);
 
-///* Standard function signature for the handler of a message */
-//typedef int (*al_msg_func)(al_sec t, char *);
-//
-///* Maximum memory footprint of a message */
-//#define DELTA_MSG_ARGS_SIZE (52)
-//struct al_msg {
-//	al_sec t;
-//	al_msg_func func;
-//	char mem[DELTA_MSG_ARGS_SIZE];
-//};
-//typedef struct al_msg * msg;
+/* Maximum memory footprint of a message */
+#define DELTA_PROC_ARGS_SIZE (52)
+struct delta_proc {
+	samplestamp t;
+	delta_proc_func func;
+	char mem[DELTA_PROC_ARGS_SIZE];
+};
+typedef struct delta_proc * proc;
+
+
 
 /*
 	delta_process header is itself a al_msg; suitable for insertion in a proclist:
 */
 struct delta_process {
-	struct al_msg msg;
+	struct delta_proc proc;
 	al_msg_func freefunc;
 	struct delta_process * next;
 	unsigned int id; /* assigned by whichever proclist contains it, zero otherwise */
@@ -97,63 +115,101 @@ typedef struct delta_proclist * proclist;
 struct delta_bus {
 	struct delta_process proc;
 	sample * data;
-	sample doublebuffer[SIGNAL_DIM * 2];
+	sample doublebuffer[DELTA_SIGNAL_DIM * 2];
 	int front; /* 0 or 1 */
 };
 typedef struct delta_bus * bus;
 
 
-/*
-	Main singleton object
+
+
+/**! Library init/close */
+extern delta delta_main_init(double samplerate, al_sec latency);
+extern void delta_main_quit(delta * D);
+
+/* 
+	singleton delta state 
 */
-typedef struct {
-	/* flag true (1) between start & stop */
-	int isRunning;					
-	/* time since birth in samples */
-	delta_samplestamp elapsed;	
-	/* suggested latency */	
-	al_sec latency;		
-	
-	/* main/audio thread scheduled events */
-	pq mainpq, audiopq;
-	/* messaging to and from audio thread */
-	tube inbox, outbox;
-	/* registered audio processes (visited per callback) */
-	proclist procs;
-	
-	/* settings */
-	double samplerate;
-	
-	/* audio IO busses */
-	bus inputs[AUDIO_INPUTS];
-	bus outputs[AUDIO_OUTPUTS];	
-	
-	/* future use? */
-	void * userdata;	
+extern delta delta_get();
 
-} delta_main_t;
-typedef delta_main_t * delta_main;
+/**! Entry point from main thread; e.g. main loop */
+extern void delta_main_tick(delta D);
 
-/* singleton main, probably better not to access */
-extern delta_main delta_main_get();
+/**! 
+	Entry point from audio thread; e.g. audio callback 
+	Assumes IO frame increment equal to delta_blocksize(); 
+		(you need to ringbuffer etc. if not)
+*/
+extern void delta_audio_tick(delta D);
+
+/**! Current main-thread logical time */
+extern al_sec delta_main_now(delta D);
+
+/**! 
+	Get/Set the main-thread latency 
+		Main thread logical time will attempt to run ahead of audio thread by this amount
+		It should approximate the period at which delta_main_tick() is called
+*/
+extern al_sec delta_latency(delta D);
+extern void delta_set_latency(delta D, al_sec latency);
+
+/**! Current audio-thread elapsed time */
+extern samplestamp delta_audio_samplestamp(delta D);
+
+/**! Global accessors: */
+extern double delta_samplerate(delta D);
+extern samplestamp delta_blocksize(delta D);
+extern int delta_inchannels(delta D);
+extern int delta_outchannels(delta D);
+
+
+
+/**!
+	Messaging
+		inbox is for sending messages from main to audio thread
+		outbox is for sending messages from audio to main thread
+*/
+extern pq delta_main_pq(delta D);
+extern pq delta_audio_pq(delta D);
+extern tube delta_inbox(delta D);
+extern tube delta_outbox(delta D);
+
+
+/**!
+	Audio IO
+*/
+extern bus delta_audio_outbus(delta D, int channel);
+extern bus delta_audio_inbus(delta D, int channel);
+extern sample * delta_audio_output(delta D, int channel);
+extern sample * delta_audio_input(delta D, int channel);
+
+
+
+/* these will not remain macros */
+#define AUDIO_INPUTS 2
+#define AUDIO_OUTPUTS 2
+
+///* Standard function signature for the handler of a message */
+//typedef int (*al_msg_func)(al_sec t, char *);
+//
+///* Maximum memory footprint of a message */
+//#define DELTA_MSG_ARGS_SIZE (52)
+//struct al_msg {
+//	al_sec t;
+//	al_msg_func func;
+//	char mem[DELTA_MSG_ARGS_SIZE];
+//};
+//typedef struct al_msg * msg;
+
+
+
+
+
 
 
 /*
 	Methods
 */
-
-/**! Library init/close */
-extern void delta_main_init();
-extern void delta_main_quit();
-
-/**! Current main-thread logical time */
-extern al_sec delta_main_now();
-
-/**! Entry point from main thread; e.g. main loop */
-extern void delta_main_tick();
-
-/**! Entry point from audio thread; e.g. audio callback */
-extern void delta_audio_tick(delta_samplestamp frames);
 
 
 /* create/destroy a proclist */
@@ -168,15 +224,14 @@ extern void delta_proclist_remove(proclist x, process p);
 
 
 /* bus definition */
-extern int bus_proc(al_sec t, char * args);
+extern samplestamp bus_proc(delta D, char * args);
 extern int bus_free_msg(al_sec t, char * args);
-extern bus bus_create();
+extern bus bus_create(delta D);
+extern void bus_free(bus * x);
 extern sample * bus_read(bus self, process reader);
 
-extern sample * delta_audio_output(int channel);
-
-extern int delta_audio_proc_init(process x, al_msg_func procmsg, al_msg_func freemsg);
-extern int delta_audio_proc_gc(process * ptr);
+extern int delta_audio_proc_init(delta D, process x, delta_proc_func procmsg, al_msg_func freemsg);
+extern int delta_audio_proc_gc(delta D, process * ptr);
 
 extern int bus_nofree_msg(al_sec t, char * args);
 

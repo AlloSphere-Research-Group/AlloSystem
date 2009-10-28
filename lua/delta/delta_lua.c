@@ -265,7 +265,7 @@ static int scheduler(lua_State * L) {
 
 int luaopen_delta(lua_State * L) {
 
-	delta_main_init();
+	delta D = delta_get();
 
 	const char * libname = lua_tostring(L, -1);
 	
@@ -314,7 +314,7 @@ int luaopen_delta(lua_State * L) {
 	 */
 	pq * u = (pq *)lua_newuserdata(L, sizeof(pq));
 	// TODO: store this as singleton instance, or use existing singleton?
-	*u = al_pq_main(); //al_pq_create(10, 0);
+	*u = delta_main_pq(D);
 	
 	lua_pushvalue(L, -2); // the module table also becomes the metatable of the main scheduler
 	lua_pushvalue(L, -2);

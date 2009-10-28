@@ -3,7 +3,7 @@
 #define ddebug(...) 
 //#define ddebug(...) printf(__VA_ARGS__)
 
-static delta_main audiomain = NULL;
+//static delta_main audiomain = NULL;
 
 //param luaL_optparam(lua_State * L, int idx, param def) {
 //	double x, a;
@@ -38,7 +38,12 @@ process lua_toprocess(lua_State * L, int idx) {
 int lua_audio_gc(lua_State * L) {
 	process self = lua_toprocess(L, 1);
 	if (self) {
-		if (delta_audio_proc_gc(&self)) {
+		
+		lua_getfield(L, LUA_REGISTRYINDEX, DELTA_INSTANCE_LITERAL);
+		delta D = (delta)lua_touserdata(L, -1);
+		lua_pop(L, 1);
+		
+		if (delta_audio_proc_gc(D, &self)) {
 			return luaL_error(L, "failed to send gc event for @name %p", self);
 		}	
 		/* trash the env */
@@ -146,7 +151,12 @@ static int lua_bus_tostring(lua_State * L) {
 }
 
 static int lua_bus_create(lua_State * L) {
-	bus self = bus_create();
+
+	lua_getfield(L, LUA_REGISTRYINDEX, DELTA_INSTANCE_LITERAL);
+	delta D = (delta)lua_touserdata(L, -1);
+	lua_pop(L, 1);
+
+	bus self = bus_create(D);
 	if (!self) {
 		return luaL_error(L, "failed to allocate bus");
 	}
@@ -174,7 +184,9 @@ int luaopen_audio(lua_State * L) {
 	const char * libname = lua_tostring(L, 1);
 
 	/* ensure it exists */
-	audiomain = delta_main_get();
+	delta D = delta_get();
+	lua_pushlightuserdata(L, D);
+	lua_setfield(L, LUA_REGISTRYINDEX, DELTA_INSTANCE_LITERAL);
 	
 	/* define bus metatable */
 	struct luaL_reg meta_bus_lib[] = {
@@ -201,12 +213,12 @@ int luaopen_audio(lua_State * L) {
 	/* make the main IO public: */
 	for (int i=0; i<AUDIO_INPUTS; i++) {
 		lua_pushfstring(L, "in%d", i+1);
-		lua_pushbus(L, audiomain->inputs[i]);
+		lua_pushbus(L, delta_audio_inbus(D, i));
 		lua_settable(L, -3); 
 	}
 	for (int i=0; i<AUDIO_OUTPUTS; i++) {
 		lua_pushfstring(L, "out%d", i+1);
-		lua_pushbus(L, audiomain->outputs[i]);
+		lua_pushbus(L, delta_audio_outbus(D, i));
 		lua_settable(L, -3); 
 	}
 	

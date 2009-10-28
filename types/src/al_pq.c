@@ -25,7 +25,7 @@ pq al_pq_create(int size, al_sec birth) {
 	if (x && array) {
 		x->head = x->tail = NULL;
 		for (i=0; i<size; i++) {
-			memset(array[i].msg.mem, 0, DELTA_MSG_ARGS_SIZE);
+			memset(array[i].msg.mem, 0, AL_PQ_MSG_ARGS_SIZE);
 			array[i].msg.func = NULL;
 			if (i==size-1) {
 				array[i].next = NULL;

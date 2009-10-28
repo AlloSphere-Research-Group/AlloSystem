@@ -21,10 +21,10 @@ int audioprinter(al_sec t, char * args) {
 	printf("pq msg of %d: %s\n", al_pq_used(al_pq_main()), args);
 	
 	// test: forward this stuff to the audio system:
-	char * buf = al_tube_write_head_mem(delta_main_get()->inbox);
+	char * buf = al_tube_write_head_mem(delta_inbox());
 	if (buf) {
 		sprintf(buf, "%s", args); // or memcpy(buf, args, DELTA_TUBE_ARGS_SIZE);
-		al_tube_write_send(delta_main_get()->inbox, t, printer);
+		al_tube_write_send(delta_inbox(), t, printer);
 	} else {
 		return 1;
 	}
@@ -43,7 +43,7 @@ int callback(const void *input, void *output, unsigned long frameCount, const Pa
 		Resume any scheduled events in the main thread priority queue,
 		+ Execute any processes in the proclist:
 	*/
-	delta_audio_tick((delta_samplestamp)frameCount);
+	delta_audio_tick();
 	
 	// TODO: read delta outbusses into audio outbufs
 
@@ -68,7 +68,7 @@ int main(int ac, char * av) {
 	char * buf;
 	int i;
 	
-	delta_main_init();
+	delta_main_init(44100.0, 0.03);
 	
 	/* queue up some messages: */
 	for (i=0; i<10; i++) {
@@ -91,8 +91,8 @@ int main(int ac, char * av) {
                               2,
                               2,
                               paFloat32,
-                              44100.0,
-                              64,
+                              delta_samplerate(),
+                              delta_blocksize(),
                               callback,
                               NULL );
 	if (err != paNoError) goto pa_out;

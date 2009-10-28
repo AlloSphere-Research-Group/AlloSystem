@@ -114,7 +114,7 @@ extern void al_tube_pq_transfer(tube x, pq q, al_sec until) {
 		// copy to pq:
 		buf = al_pq_msg(q);
 		if (buf) {
-			memcpy(buf, m->mem, DELTA_MSG_ARGS_SIZE);
+			memcpy(buf, m->mem, AL_PQ_MSG_ARGS_SIZE);
 			al_pq_sched(q, m->t, m->func);
 		} else {
 			printf("pq empty\n"); /* retry? */
