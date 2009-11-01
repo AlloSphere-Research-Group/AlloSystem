@@ -222,17 +222,17 @@ extern void delta_proclist_prepend(proclist x, process p);
 extern void delta_proclist_remove(proclist x, process p);
 
 
+/* internal use */
+extern int delta_audio_proc_init(delta D, process x, delta_proc_func procmsg, al_msg_func freemsg);
+extern int delta_audio_proc_gc(delta D, process * ptr);
 
 /* bus definition */
-extern samplestamp bus_proc(delta D, char * args);
-extern int bus_free_msg(al_sec t, char * args);
 extern bus bus_create(delta D);
 extern void bus_free(bus * x);
 extern sample * bus_read(bus self, process reader);
 
-extern int delta_audio_proc_init(delta D, process x, delta_proc_func procmsg, al_msg_func freemsg);
-extern int delta_audio_proc_gc(delta D, process * ptr);
-
+extern samplestamp bus_proc(delta D, char * args);
+extern int bus_free_msg(al_sec t, char * args);
 extern int bus_nofree_msg(al_sec t, char * args);
 
 

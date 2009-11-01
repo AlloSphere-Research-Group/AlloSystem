@@ -691,16 +691,6 @@
 		364009D2109156E500C4D35B /* User.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
 		364009D3109156E500C4D35B /* Value.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Value.h; sourceTree = "<group>"; };
 		364009D4109156E500C4D35B /* ValueSymbolTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ValueSymbolTable.h; sourceTree = "<group>"; };
-		364009D6109156E500C4D35B /* Analysis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Analysis.h; sourceTree = "<group>"; };
-		364009D7109156E500C4D35B /* BitReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BitReader.h; sourceTree = "<group>"; };
-		364009D8109156E500C4D35B /* BitWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BitWriter.h; sourceTree = "<group>"; };
-		364009D9109156E500C4D35B /* Core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Core.h; sourceTree = "<group>"; };
-		364009DA109156E500C4D35B /* ExecutionEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExecutionEngine.h; sourceTree = "<group>"; };
-		364009DB109156E500C4D35B /* LinkTimeOptimizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LinkTimeOptimizer.h; sourceTree = "<group>"; };
-		364009DC109156E500C4D35B /* lto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lto.h; sourceTree = "<group>"; };
-		364009DD109156E500C4D35B /* Target.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Target.h; sourceTree = "<group>"; };
-		364009DF109156E500C4D35B /* IPO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IPO.h; sourceTree = "<group>"; };
-		364009E0109156E500C4D35B /* Scalar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scalar.h; sourceTree = "<group>"; };
 		364009E4109156FD00C4D35B /* .dir */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .dir; sourceTree = "<group>"; };
 		364009E5109156FD00C4D35B /* emmintrin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = emmintrin.h; sourceTree = "<group>"; };
 		364009E6109156FD00C4D35B /* float.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = float.h; sourceTree = "<group>"; };
@@ -728,19 +718,14 @@
 		364009FC109156FD00C4D35B /* libclangRewrite.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libclangRewrite.a; sourceTree = "<group>"; };
 		364009FD109156FD00C4D35B /* libclangSema.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libclangSema.a; sourceTree = "<group>"; };
 		364009FE109156FD00C4D35B /* libCompilerDriver.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libCompilerDriver.a; sourceTree = "<group>"; };
-		364009FF109156FD00C4D35B /* libGoogleTest.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libGoogleTest.a; sourceTree = "<group>"; };
 		36400A03109156FD00C4D35B /* libLLVMAnalysis.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMAnalysis.a; sourceTree = "<group>"; };
 		36400A04109156FD00C4D35B /* libLLVMArchive.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMArchive.a; sourceTree = "<group>"; };
 		36400A08109156FD00C4D35B /* libLLVMAsmParser.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMAsmParser.a; sourceTree = "<group>"; };
 		36400A09109156FD00C4D35B /* libLLVMAsmPrinter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMAsmPrinter.a; sourceTree = "<group>"; };
 		36400A0A109156FD00C4D35B /* libLLVMBitReader.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMBitReader.a; sourceTree = "<group>"; };
 		36400A0B109156FD00C4D35B /* libLLVMBitWriter.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMBitWriter.a; sourceTree = "<group>"; };
-		36400A0F109156FD00C4D35B /* libLLVMCBackend.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMCBackend.a; sourceTree = "<group>"; };
-		36400A10109156FD00C4D35B /* libLLVMCBackendInfo.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMCBackendInfo.a; sourceTree = "<group>"; };
 		36400A14109156FD00C4D35B /* libLLVMCodeGen.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMCodeGen.a; sourceTree = "<group>"; };
 		36400A15109156FD00C4D35B /* libLLVMCore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMCore.a; sourceTree = "<group>"; };
-		36400A16109156FD00C4D35B /* libLLVMCppBackend.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMCppBackend.a; sourceTree = "<group>"; };
-		36400A17109156FD00C4D35B /* libLLVMCppBackendInfo.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMCppBackendInfo.a; sourceTree = "<group>"; };
 		36400A18109156FD00C4D35B /* libLLVMDebugger.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMDebugger.a; sourceTree = "<group>"; };
 		36400A19109156FD00C4D35B /* libLLVMExecutionEngine.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMExecutionEngine.a; sourceTree = "<group>"; };
 		36400A1A109156FD00C4D35B /* libLLVMInstrumentation.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMInstrumentation.a; sourceTree = "<group>"; };
@@ -750,8 +735,6 @@
 		36400A1E109156FD00C4D35B /* libLLVMJIT.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMJIT.a; sourceTree = "<group>"; };
 		36400A1F109156FD00C4D35B /* libLLVMLinker.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMLinker.a; sourceTree = "<group>"; };
 		36400A20109156FD00C4D35B /* libLLVMMC.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMMC.a; sourceTree = "<group>"; };
-		36400A24109156FD00C4D35B /* libLLVMMSIL.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMMSIL.a; sourceTree = "<group>"; };
-		36400A25109156FD00C4D35B /* libLLVMMSILInfo.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMMSILInfo.a; sourceTree = "<group>"; };
 		36400A2F109156FD00C4D35B /* libLLVMScalarOpts.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMScalarOpts.a; sourceTree = "<group>"; };
 		36400A30109156FD00C4D35B /* libLLVMSelectionDAG.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMSelectionDAG.a; sourceTree = "<group>"; };
 		36400A34109156FD00C4D35B /* libLLVMSupport.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMSupport.a; sourceTree = "<group>"; };
@@ -764,7 +747,6 @@
 		36400A3E109156FD00C4D35B /* libLLVMX86Info.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLLVMX86Info.a; sourceTree = "<group>"; };
 		36400A44109156FD00C4D35B /* libplugin_llvmc_Base.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libplugin_llvmc_Base.a; sourceTree = "<group>"; };
 		36400A45109156FD00C4D35B /* libplugin_llvmc_Clang.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libplugin_llvmc_Clang.a; sourceTree = "<group>"; };
-		36400A47109156FD00C4D35B /* profile_rt.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = profile_rt.dylib; sourceTree = "<group>"; };
 		36400AC0109157C600C4D35B /* test_clang.lua */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lua; path = test_clang.lua; sourceTree = "<group>"; };
 		365B30ED109161E500DE5207 /* lauxlib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lauxlib.h; path = /usr/local/include/lauxlib.h; sourceTree = "<absolute>"; };
 		365B30EE109161E500DE5207 /* lua.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lua.h; path = /usr/local/include/lua.h; sourceTree = "<absolute>"; };
@@ -869,19 +851,14 @@
 				364009FC109156FD00C4D35B /* libclangRewrite.a */,
 				364009FD109156FD00C4D35B /* libclangSema.a */,
 				364009FE109156FD00C4D35B /* libCompilerDriver.a */,
-				364009FF109156FD00C4D35B /* libGoogleTest.a */,
 				36400A03109156FD00C4D35B /* libLLVMAnalysis.a */,
 				36400A04109156FD00C4D35B /* libLLVMArchive.a */,
 				36400A08109156FD00C4D35B /* libLLVMAsmParser.a */,
 				36400A09109156FD00C4D35B /* libLLVMAsmPrinter.a */,
 				36400A0A109156FD00C4D35B /* libLLVMBitReader.a */,
 				36400A0B109156FD00C4D35B /* libLLVMBitWriter.a */,
-				36400A0F109156FD00C4D35B /* libLLVMCBackend.a */,
-				36400A10109156FD00C4D35B /* libLLVMCBackendInfo.a */,
 				36400A14109156FD00C4D35B /* libLLVMCodeGen.a */,
 				36400A15109156FD00C4D35B /* libLLVMCore.a */,
-				36400A16109156FD00C4D35B /* libLLVMCppBackend.a */,
-				36400A17109156FD00C4D35B /* libLLVMCppBackendInfo.a */,
 				36400A18109156FD00C4D35B /* libLLVMDebugger.a */,
 				36400A19109156FD00C4D35B /* libLLVMExecutionEngine.a */,
 				36400A1A109156FD00C4D35B /* libLLVMInstrumentation.a */,
@@ -891,8 +868,6 @@
 				36400A1E109156FD00C4D35B /* libLLVMJIT.a */,
 				36400A1F109156FD00C4D35B /* libLLVMLinker.a */,
 				36400A20109156FD00C4D35B /* libLLVMMC.a */,
-				36400A24109156FD00C4D35B /* libLLVMMSIL.a */,
-				36400A25109156FD00C4D35B /* libLLVMMSILInfo.a */,
 				36400A2F109156FD00C4D35B /* libLLVMScalarOpts.a */,
 				36400A30109156FD00C4D35B /* libLLVMSelectionDAG.a */,
 				36400A34109156FD00C4D35B /* libLLVMSupport.a */,
@@ -905,7 +880,6 @@
 				36400A3E109156FD00C4D35B /* libLLVMX86Info.a */,
 				36400A44109156FD00C4D35B /* libplugin_llvmc_Base.a */,
 				36400A45109156FD00C4D35B /* libplugin_llvmc_Clang.a */,
-				36400A47109156FD00C4D35B /* profile_rt.dylib */,
 			);
 			name = lib_osx;
 			path = ../lib_osx;
@@ -931,7 +905,6 @@
 				365B30F0109161E500DE5207 /* lualib.h */,
 				36400754109156E400C4D35B /* clang */,
 				3640084C109156E400C4D35B /* llvm */,
-				364009D5109156E500C4D35B /* llvm-c */,
 			);
 			name = lib_include;
 			path = ../lib_include;
@@ -1819,31 +1792,6 @@
 				364009CE109156E500C4D35B /* ValueMapper.h */,
 			);
 			path = Utils;
-			sourceTree = "<group>";
-		};
-		364009D5109156E500C4D35B /* llvm-c */ = {
-			isa = PBXGroup;
-			children = (
-				364009D6109156E500C4D35B /* Analysis.h */,
-				364009D7109156E500C4D35B /* BitReader.h */,
-				364009D8109156E500C4D35B /* BitWriter.h */,
-				364009D9109156E500C4D35B /* Core.h */,
-				364009DA109156E500C4D35B /* ExecutionEngine.h */,
-				364009DB109156E500C4D35B /* LinkTimeOptimizer.h */,
-				364009DC109156E500C4D35B /* lto.h */,
-				364009DD109156E500C4D35B /* Target.h */,
-				364009DE109156E500C4D35B /* Transforms */,
-			);
-			path = "llvm-c";
-			sourceTree = "<group>";
-		};
-		364009DE109156E500C4D35B /* Transforms */ = {
-			isa = PBXGroup;
-			children = (
-				364009DF109156E500C4D35B /* IPO.h */,
-				364009E0109156E500C4D35B /* Scalar.h */,
-			);
-			path = Transforms;
 			sourceTree = "<group>";
 		};
 		364009E1109156FD00C4D35B /* clang */ = {

@@ -19,7 +19,10 @@ int main(int ac, char ** av) {
 
 ]==]
 
-print(clang.compile(src, "test"))
+local mod = clang.compile(src, "test")
+local emp = clang.ModuleProvider.create(mod)
+
+print(mod, emp)
 
 
 

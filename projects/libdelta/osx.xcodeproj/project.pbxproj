@@ -60,6 +60,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		360980C510981F5700573293 /* notes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = notes.txt; sourceTree = "<group>"; };
 		36752B291093915A00FF5627 /* libdelta.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdelta.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		36B7DD1110978CF70013EF88 /* delta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = delta.h; sourceTree = "<group>"; };
 		36B7DD1210978CF70013EF88 /* delta_lua.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = delta_lua.h; sourceTree = "<group>"; };
@@ -308,6 +309,7 @@
 				36F51F811093F9410019CA9B /* delta.cpp */,
 				36F520BE109407830019CA9B /* delta_proclist.c */,
 				36F520C6109409420019CA9B /* delta_bus.c */,
+				360980C510981F5700573293 /* notes.txt */,
 			);
 			path = src;
 			sourceTree = "<group>";

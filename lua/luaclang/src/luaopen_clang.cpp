@@ -56,8 +56,16 @@
 
 using namespace llvm;
 
+/*
+	Globals (should they be statics, or per Lua universe?)
+*/
 static LLVMContext ctx;
+static ExecutionEngine * EE = 0;
 
+/* 
+	Module
+*/
+#pragma mark Module
 template<> const char * Glue<Module>::usr_name() { return "Module"; }
 template<> int Glue<Module>::usr_tostring(lua_State * L, Module * u) {
 	lua_pushfstring(L, "%s: %s(%p)", usr_name(), u->getModuleIdentifier().c_str(), u);
@@ -65,6 +73,21 @@ template<> int Glue<Module>::usr_tostring(lua_State * L, Module * u) {
 }
 template<> Module * Glue<Module>::usr_new(lua_State * L) {
 	return new Module(luaL_checkstring(L, 1), ctx); 
+}
+
+
+/* 
+	ModuleProvider
+*/
+#pragma mark ModuleProvider
+template<> const char * Glue<ModuleProvider>::usr_name() { return "ModuleProvider"; }
+template<> int Glue<ModuleProvider>::usr_tostring(lua_State * L, ModuleProvider * u) {
+	lua_pushfstring(L, "%s: %s(%p)", usr_name(), u->getModule()->getModuleIdentifier().c_str(), u);
+	return 1;
+}
+template<> ModuleProvider * Glue<ModuleProvider>::usr_new(lua_State * L) {
+	Module * m = Glue<Module>::checkto(L, 1);
+	return new ExistingModuleProvider(m);
 }
 
 
@@ -173,7 +196,9 @@ int luaopen_clang(lua_State * L) {
 	luaL_register(L, libname, lib);
 	
 	
-	Glue<Module>::publish(L); lua_pop(L, 1);
+	Glue<Module>::publish(L); 
+	Glue<ModuleProvider>::publish(L);
+	
 	lua_pushstring(L, "main");
 	lua_insert(L, 1);
 	Glue<Module>::create(L);

@@ -13,6 +13,40 @@ extern "C" {
 }
 #endif
 
+namespace lua {
+
+static void dump(lua_State * L, const char * msg) {
+	printf("DUMP lua_State (%p) %s\n", L, msg);
+	int top = lua_gettop(L);
+	for (int i=1; i<=top; i++) {
+		switch(lua_type(L, i)) {
+			case LUA_TNIL:
+				printf("%i (-%i): nil\n", i, top+1-i); break;
+			case LUA_TBOOLEAN:
+				printf("%i (-%i): boolean (%s)\n", i, top+1-i, lua_toboolean(L, i) ? "true" : "false"); break;
+			case LUA_TLIGHTUSERDATA:
+				printf("%i (-%i): lightuserdata (%p)\n", i, top+1-i, lua_topointer(L, i)); break;
+			case LUA_TNUMBER:
+				printf("%i (-%i): number (%f)\n", i, top+1-i, lua_tonumber(L, i)); break;
+			case LUA_TSTRING:
+				printf("%i (-%i): string (%s)\n", i, top+1-i, lua_tostring(L, i)); break;
+			case LUA_TUSERDATA:
+				//printf("%i (-%i): userdata (%p)\n", i, top+1-i, lua_topointer(L, i)); break;
+				lua_pushvalue(L, i);
+				lua_getglobal(L, "tostring");
+				lua_call(L, 1, 1);
+				printf("%i: %s\n", i, lua_tostring(L, -1));
+				lua_pop(L, 1);
+				break;
+			default:{
+				printf("%i (-%i): %s (%p)\n", i, top+1-i, lua_typename(L, lua_type(L, i)), lua_topointer(L, i));
+			}
+		}
+	}
+}
+
+} //lua::
+
 /*
 	Glue
 	template annotation class to bind C++ types to Lua
@@ -33,7 +67,7 @@ public:
 	static int usr_tostring(lua_State * L, T * u);
 
 	// utility methods:
-	static void publish(lua_State * L, const char * superclass = NULL);
+	static void publish(lua_State * L, bool install = true, const char * superclass = NULL);
 	static int push(lua_State * L, T * u);
 	static T * to(lua_State * L, int idx = 1);
 	static T * checkto(lua_State * L, int idx = 1);
@@ -109,7 +143,7 @@ template <typename T> T * Glue<T> :: checkto(lua_State * L, int idx) {
 	if (u == 0) luaL_error(L, "%s not found (index %d)", usr_name(), idx);
 	return u;
 }
-template <typename T> void Glue<T> :: publish(lua_State * L, const char * superclass) {
+template <typename T> void Glue<T> :: publish(lua_State * L, bool install, const char * superclass) {
 	luaL_newmetatable(L, mt_name(L));
 	lua_pushstring(L, Glue<T>::usr_name());
 	lua_pushboolean(L, true);
@@ -127,10 +161,17 @@ template <typename T> void Glue<T> :: publish(lua_State * L, const char * superc
 	lua_setfield(L, -2, "__tostring");
 	lua_pushcfunction(L, gc);
 	lua_setfield(L, -2, "__gc");
+	lua_pushcfunction(L, create);
+	lua_setfield(L, -2, "create");
 
 	int mt = lua_gettop(L);
 	usr_mt(L);
 	lua_settop(L, mt);
+	if (install) {	
+		lua_setfield(L, -2, usr_name());
+	} else {
+		lua_pop(L, 1);
+	}
 }
 template <typename T> int Glue<T> :: gc(lua_State * L) { T * u = to(L, 1); if (u) { Glue<T>::usr_gc(L, u); } return 0; }
 template <typename T> int Glue<T> :: tostring(lua_State * L) {
