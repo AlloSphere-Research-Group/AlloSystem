@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3635DA6410AA269B00C26E3C /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3635DA6110AA269B00C26E3C /* AudioToolbox.framework */; };
+		3635DA6510AA269B00C26E3C /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3635DA6210AA269B00C26E3C /* AudioUnit.framework */; };
+		3635DA6610AA269C00C26E3C /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3635DA6310AA269B00C26E3C /* CoreAudio.framework */; };
+		3635DA6710AA269C00C26E3C /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3635DA6110AA269B00C26E3C /* AudioToolbox.framework */; };
+		3635DA6810AA269C00C26E3C /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3635DA6210AA269B00C26E3C /* AudioUnit.framework */; };
+		3635DA6910AA269C00C26E3C /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3635DA6310AA269B00C26E3C /* CoreAudio.framework */; };
 		36B7DECB109798940013EF88 /* delta_lua.c in Sources */ = {isa = PBXBuildFile; fileRef = 36B7DD36109792800013EF88 /* delta_lua.c */; };
 		36B7DECC109798940013EF88 /* delta_lua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36B7DD37109792800013EF88 /* delta_lua.cpp */; };
 		36E1812C10A141F700C2CF8A /* delta.h in Headers */ = {isa = PBXBuildFile; fileRef = 36B7DD1110978CF70013EF88 /* delta.h */; };
@@ -62,6 +68,9 @@
 
 /* Begin PBXFileReference section */
 		360980C510981F5700573293 /* notes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = notes.txt; sourceTree = "<group>"; };
+		3635DA6110AA269B00C26E3C /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
+		3635DA6210AA269B00C26E3C /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
+		3635DA6310AA269B00C26E3C /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = /System/Library/Frameworks/CoreAudio.framework; sourceTree = "<absolute>"; };
 		36752B291093915A00FF5627 /* libdelta.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdelta.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		36B7DD1110978CF70013EF88 /* delta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = delta.h; sourceTree = "<group>"; };
 		36B7DD1210978CF70013EF88 /* delta_lua.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = delta_lua.h; sourceTree = "<group>"; };
@@ -122,6 +131,9 @@
 				36F51EAC1093F0E90019CA9B /* Cocoa.framework in Frameworks */,
 				36F51E541093ECC40019CA9B /* libdelta.a in Frameworks */,
 				36F51FA81093F9FF0019CA9B /* libportaudio.a in Frameworks */,
+				3635DA6710AA269C00C26E3C /* AudioToolbox.framework in Frameworks */,
+				3635DA6810AA269C00C26E3C /* AudioUnit.framework in Frameworks */,
+				3635DA6910AA269C00C26E3C /* CoreAudio.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -134,6 +146,9 @@
 				36F5217010940FE70019CA9B /* libdelta.a in Frameworks */,
 				36F5217110940FE70019CA9B /* libportaudio.a in Frameworks */,
 				36F5217A109410330019CA9B /* liblua.a in Frameworks */,
+				3635DA6410AA269B00C26E3C /* AudioToolbox.framework in Frameworks */,
+				3635DA6510AA269B00C26E3C /* AudioUnit.framework in Frameworks */,
+				3635DA6610AA269C00C26E3C /* CoreAudio.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -318,6 +333,9 @@
 		36F51F761093F7F60019CA9B /* libraries */ = {
 			isa = PBXGroup;
 			children = (
+				3635DA6110AA269B00C26E3C /* AudioToolbox.framework */,
+				3635DA6210AA269B00C26E3C /* AudioUnit.framework */,
+				3635DA6310AA269B00C26E3C /* CoreAudio.framework */,
 				36F5217B109410430019CA9B /* lauxlib.h */,
 				36F5217C109410430019CA9B /* lua.h */,
 				36F5217D109410430019CA9B /* lualib.h */,
