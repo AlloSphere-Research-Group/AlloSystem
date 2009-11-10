@@ -275,10 +275,6 @@
 								<string>08FB7795FE84155DC02AAC07</string>
 								<string>1AB674ADFE9D54B511CA2CBB</string>
 								<string>1C37FBAC04509CD000000102</string>
-								<string>361CD6EF109D591E0000EEF5</string>
-								<string>361CD710109D59F40000EEF5</string>
-								<string>361CD711109D59F40000EEF5</string>
-								<string>361CD70F109D59E90000EEF5</string>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
@@ -335,14 +331,14 @@
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>361CDB9B109D5D080000EEF5</string>
+										<string>364EA1F110A6244B00736B75</string>
 										<key>history</key>
 										<array>
 											<string>361CD712109D59F40000EEF5</string>
 											<string>361CD713109D59F40000EEF5</string>
 											<string>361CD714109D59F40000EEF5</string>
 											<string>361CD72C109D5A5C0000EEF5</string>
-											<string>361CD748109D5C020000EEF5</string>
+											<string>36EED6E7109F79AE009A29FD</string>
 										</array>
 										<key>prevStack</key>
 										<array>
@@ -350,9 +346,7 @@
 											<string>361CD718109D59F40000EEF5</string>
 											<string>361CD719109D59F40000EEF5</string>
 											<string>361CD71A109D59F40000EEF5</string>
-											<string>361CD71B109D59F40000EEF5</string>
 											<string>361CD724109D5A020000EEF5</string>
-											<string>361CD72E109D5A5C0000EEF5</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -391,7 +385,9 @@
 									<key>GeometryConfiguration</key>
 									<dict>
 										<key>Frame</key>
-										<string>{{10, 27}, {885, 227}}</string>
+										<string>{{10, 27}, {885, -27}}</string>
+										<key>RubberWindowFrame</key>
+										<string>242 50 1092 828 0 0 1440 878 </string>
 									</dict>
 									<key>Module</key>
 									<string>XCDetailModule</string>
@@ -446,8 +442,6 @@
 									<dict>
 										<key>Frame</key>
 										<string>{{10, 27}, {885, -27}}</string>
-										<key>RubberWindowFrame</key>
-										<string>242 50 1092 828 0 0 1440 878 </string>
 									</dict>
 									<key>Module</key>
 									<string>PBXBuildResultsModule</string>
@@ -475,11 +469,11 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>361CD71D109D59F40000EEF5</string>
+				<string>364EA1F210A6244B00736B75</string>
 				<string>1CA23ED40692098700951B8B</string>
-				<string>361CD71E109D59F40000EEF5</string>
+				<string>364EA1F310A6244B00736B75</string>
 				<string>366E4AFC109D3C07008766F3</string>
-				<string>361CD71F109D59F40000EEF5</string>
+				<string>364EA1F410A6244B00736B75</string>
 				<string>1CA23EDF0692099D00951B8B</string>
 				<string>1CA23EE00692099D00951B8B</string>
 				<string>1CA23EE10692099D00951B8B</string>

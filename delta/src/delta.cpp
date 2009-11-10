@@ -8,11 +8,12 @@
 //#define ddebug(...) printf(__VA_ARGS__)
 
 /*
-	Main singleton object
+	Main object
 */
 struct delta_state {
 	/* flag true (1) between start & stop */
-	int isRunning;					
+	int isRunning;		
+	int isAudioRunning;	
 	/* time since birth in samples */
 	samplestamp elapsed;	
 	/* suggested latency */	
@@ -46,6 +47,7 @@ delta delta_main_init(double samplerate, al_sec latency) {
 	int i;
 	delta D = (delta_state *)calloc(1, sizeof(delta_state));
 	D->isRunning = 0;
+	D->isAudioRunning = 0;
 	D->elapsed = 0;
 	D->userdata = 0;
 	
@@ -110,6 +112,13 @@ void delta_main_quit(delta * ptr) {
 void delta_audio_tick(delta D) {
 	//printf(".");
 	
+	/*
+		first pass:
+	*/
+	if (!D->isAudioRunning) {
+		D->isAudioRunning = 1;
+	}
+	
 	D->elapsed += D->blocksize;
 	al_sec t = D->elapsed / D->samplerate;
 	
@@ -126,19 +135,24 @@ void delta_audio_tick(delta D) {
 	}
 }
 
-void delta_main_tick(delta D) {
+al_sec delta_main_tick(delta D) {
 	int i;
-	static int loops = 2;
 	al_sec t;
+	D->isRunning = 1;
 	
 	/* 
-		run this tick a couple of times, 
+		run this tick a few times, 
 			since audio thread usually recurrs more frequently than main
 			(recalculate t a couple of times)
 	*/
-	for (i=0; i<loops; i++) {
+	static int loops = 2;
+	for (i=0; i<loops; i++) 
+	{
 		/* 
 			figure out our desired target time
+				- note that the main thread here *follows* the audio thread
+			
+			TODO: handle cases where actual latency is too big / too small
 		*/
 		t = (D->elapsed / D->samplerate) - D->latency;
 		
@@ -149,6 +163,8 @@ void delta_main_tick(delta D) {
 		al_tube_pq_transfer(D->outbox, D->mainpq, t);
 		al_pq_update(D->mainpq, t, 0);
 	}
+	
+	return t;
 }	
 
 al_sec delta_main_now(delta D) {

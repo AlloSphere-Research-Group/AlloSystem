@@ -132,8 +132,11 @@ extern void delta_main_quit(delta * D);
 */
 extern delta delta_get();
 
-/**! Entry point from main thread; e.g. main loop */
-extern void delta_main_tick(delta D);
+/**! 
+	Entry point from main thread; e.g. main loop
+	 
+*/
+extern al_sec delta_main_tick(delta D);
 
 /**! 
 	Entry point from audio thread; e.g. audio callback 

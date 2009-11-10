@@ -56,22 +56,46 @@ static void dump(lua_State * L, const char * msg) {
 template <typename T>
 class Glue {
 public:
-	// override this:
+	/*	required hook to define metatable name
+	*/
 	static const char * usr_name();
-	// and optionally these:
+	/*	optional hook to define a create function (default returns NULL)
+		arguments at stack indices 1+
+	*/
 	static T * usr_new(lua_State * L);
+	/*	optional hook to convert non-userdata value at stack index idx to a T */
 	static T * usr_reinterpret(lua_State * L, int idx);
+	/*	optional hook to add additional fields to metatable
+		metatable is at stack index -1
+	*/
 	static void usr_mt(lua_State * L);
-	static void usr_lib(lua_State * L, const luaL_Reg * lib);
+	/*	optional hook to specify __gc method (default is no action) */
 	static void usr_gc(lua_State * L, T * u);
+	/*	optional hook to override the default __tostring method */
 	static int usr_tostring(lua_State * L, T * u);
+	/*	optional hook to apply additional behavior when pushing a T type into Lua space 
+		userdata is at stack index -1
+	*/
+	static void usr_push(lua_State * L, T * u);
 
-	// utility methods:
+	/*	create the metatable 
+		if install == true, constructor will be installed in the table at stack index -1 
+			(e.g. module table)
+		if superclass != NULL, metatable will inherit from the superclass metatable 
+			(which must already be published)
+	*/
 	static void publish(lua_State * L, bool install = true, const char * superclass = NULL);
+	/*	Install additional methods to metatable via a luaL_Reg array */
+	static void usr_lib(lua_State * L, const luaL_Reg * lib);
+	/*	push a T pointer to the Lua space (also calls usr_push if defined) */
 	static int push(lua_State * L, T * u);
+	/*	if index idx is a T (checks metatable key), returns it, else return NULL */
 	static T * to(lua_State * L, int idx = 1);
+	/*	as above but throws error if not found */
 	static T * checkto(lua_State * L, int idx = 1);
+	/*	Lua bound constructor (usr_new must be defined) */
 	static int create(lua_State * L);
+	/*	zero the pointer in the userdata */
 	static void erase(lua_State * L, int idx);
 
 	// internal methods:
@@ -99,15 +123,16 @@ template <typename T> void Glue<T> :: usr_lib(lua_State * L, const luaL_Reg * li
 }
 template <typename T> void Glue<T> :: usr_gc(lua_State * L, T * u) {}
 template <typename T> int Glue<T> :: usr_tostring(lua_State * L, T * u) { lua_pushfstring(L, "%s: %p", Glue<T>::usr_name(), u); return 1; }
+template <typename T> void Glue<T> :: usr_push(lua_State * L, T * u) {}
 
 template <typename T> int Glue<T> :: push(lua_State * L, T * u) {
 	if (u==0)
 		return luaL_error(L, "Cannot create null %s", usr_name());
 	T ** udata = (T**)lua_newuserdata(L, sizeof(T*));
 	luaL_getmetatable(L, mt_name(L));
-	//lua::dump(L, usr_name());
 	lua_setmetatable(L, -2);
 	*udata = u;
+	usr_push(L, u);	
 	return 1;
 }
 template <typename T> int Glue<T> :: create(lua_State * L) {
@@ -161,19 +186,29 @@ template <typename T> void Glue<T> :: publish(lua_State * L, bool install, const
 	lua_setfield(L, -2, "__tostring");
 	lua_pushcfunction(L, gc);
 	lua_setfield(L, -2, "__gc");
+	lua_pushcfunction(L, gc);
+	lua_setfield(L, -2, "close");	/* equivalent to __gc but manually called */
 	lua_pushcfunction(L, create);
 	lua_setfield(L, -2, "create");
 
-	int mt = lua_gettop(L);
+	int u_mt = lua_gettop(L);
 	usr_mt(L);
-	lua_settop(L, mt);
+	lua_settop(L, u_mt-1);
+	
 	if (install) {	
+		lua_pushcfunction(L, Glue<T>::create);
 		lua_setfield(L, -2, usr_name());
-	} else {
-		lua_pop(L, 1);
 	}
 }
-template <typename T> int Glue<T> :: gc(lua_State * L) { T * u = to(L, 1); if (u) { Glue<T>::usr_gc(L, u); } return 0; }
+template <typename T> int Glue<T> :: gc(lua_State * L) { 
+	T * u = to(L, 1); 
+	if (u) { 
+		Glue<T>::usr_gc(L, u); 
+		lua_pushnil(L);
+		lua_setmetatable(L, 1);
+	} 
+	return 0; 
+}
 template <typename T> int Glue<T> :: tostring(lua_State * L) {
 	T * u = to(L, 1);
 	if (u)

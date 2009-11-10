@@ -821,9 +821,9 @@
 				36400753109156E400C4D35B /* lib_include */,
 				364002DC1091556800C4D35B /* lib_osx */,
 				364002DD1091556800C4D35B /* src */,
+				36400AC0109157C600C4D35B /* test_clang.lua */,
 				0867D69AFE84028FC02AAC07 /* External Frameworks and Libraries */,
 				034768DFFF38A50411DB9C8B /* Products */,
-				36400AC0109157C600C4D35B /* test_clang.lua */,
 			);
 			name = osx;
 			sourceTree = "<group>";

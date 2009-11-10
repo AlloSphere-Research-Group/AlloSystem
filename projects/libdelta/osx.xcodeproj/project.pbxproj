@@ -7,11 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		36B7DD2910978EC30013EF88 /* al_pq.c in Sources */ = {isa = PBXBuildFile; fileRef = 36B7DD2810978DFA0013EF88 /* al_pq.c */; };
-		36B7DD3B109792A20013EF88 /* al_tube.h in Headers */ = {isa = PBXBuildFile; fileRef = 36B7DD3A109792A20013EF88 /* al_tube.h */; };
-		36B7DD3D109792AF0013EF88 /* al_tube.c in Sources */ = {isa = PBXBuildFile; fileRef = 36B7DD3C109792AF0013EF88 /* al_tube.c */; };
 		36B7DECB109798940013EF88 /* delta_lua.c in Sources */ = {isa = PBXBuildFile; fileRef = 36B7DD36109792800013EF88 /* delta_lua.c */; };
 		36B7DECC109798940013EF88 /* delta_lua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36B7DD37109792800013EF88 /* delta_lua.cpp */; };
+		36E1812C10A141F700C2CF8A /* delta.h in Headers */ = {isa = PBXBuildFile; fileRef = 36B7DD1110978CF70013EF88 /* delta.h */; };
+		36E1812D10A141F700C2CF8A /* delta_lua.h in Headers */ = {isa = PBXBuildFile; fileRef = 36B7DD1210978CF70013EF88 /* delta_lua.h */; };
+		36E1818110A145F500C2CF8A /* al_pq.c in Sources */ = {isa = PBXBuildFile; fileRef = 36B7DD2810978DFA0013EF88 /* al_pq.c */; };
+		36E1818210A145F500C2CF8A /* al_tube.c in Sources */ = {isa = PBXBuildFile; fileRef = 36B7DD3C109792AF0013EF88 /* al_tube.c */; };
 		36F51E541093ECC40019CA9B /* libdelta.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36752B291093915A00FF5627 /* libdelta.a */; };
 		36F51EAC1093F0E90019CA9B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F51EA21093F0DB0019CA9B /* Cocoa.framework */; };
 		36F51F791093F81B0019CA9B /* libalsystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F51F771093F8120019CA9B /* libalsystem.a */; };
@@ -88,7 +89,7 @@
 		36DD350C1096C5E9008B6B87 /* unitTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = unitTest.cpp; sourceTree = "<group>"; };
 		36F51E501093ECB70019CA9B /* delta_unitTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = delta_unitTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		36F51EA21093F0DB0019CA9B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
-		36F51F771093F8120019CA9B /* libalsystem.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libalsystem.a; path = ../../build/Release/libalsystem.a; sourceTree = SOURCE_ROOT; };
+		36F51F771093F8120019CA9B /* libalsystem.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libalsystem.a; path = ../../build/Debug/libalsystem.a; sourceTree = SOURCE_ROOT; };
 		36F51F7C1093F88C0019CA9B /* delta_unitTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = delta_unitTest.cpp; sourceTree = "<group>"; };
 		36F51F811093F9410019CA9B /* delta.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = delta.cpp; sourceTree = "<group>"; };
 		36F51FA71093F9FF0019CA9B /* libportaudio.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libportaudio.a; path = /usr/local/lib/libportaudio.a; sourceTree = "<absolute>"; };
@@ -354,7 +355,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				36B7DD3B109792A20013EF88 /* al_tube.h in Headers */,
+				36E1812C10A141F700C2CF8A /* delta.h in Headers */,
+				36E1812D10A141F700C2CF8A /* delta_lua.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -437,11 +439,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				36B7DD2910978EC30013EF88 /* al_pq.c in Sources */,
+				36E1818110A145F500C2CF8A /* al_pq.c in Sources */,
+				36E1818210A145F500C2CF8A /* al_tube.c in Sources */,
 				36F51F851093F94C0019CA9B /* delta.cpp in Sources */,
 				36F520BF109407830019CA9B /* delta_proclist.c in Sources */,
 				36F520C7109409420019CA9B /* delta_bus.c in Sources */,
-				36B7DD3D109792AF0013EF88 /* al_tube.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -59,18 +59,30 @@ int callback(const void *input, void *output, unsigned long frameCount, const Pa
 
 /* main thread entry point */
 void tick(al_nsec ns, void * u) {
+	al_sec td;
 	al_sec t = al_time_ns2s * ns;
 	delta D = (delta)u;
-
-	printf("@%06.3f\n", t);
 	
 	/* 
 		Resume any scheduled events in the main thread priority queue:
+			returns delta's main-thread logical time
 	*/
-	delta_main_tick(D);
+	td = delta_main_tick(D);
+	
+	/*
+		Handle latency difference here. 
+		
+		ratio of latency_actual / delta_latency() should be near to 1.
+		it will gradually drift as audio/cpu clocks are not accurate;
+			it may be necessary to have a gradual offset to account for this.
+		if it starts growing excessively, the audio thread has probably stalled and we may want instead to switch to the cpu as the time source.
+		
+	*/
+	//al_sec latency_actual = (t-td);
+	//printf("@%06.3f	latency: %06.6f%\n", t, 100. * latency_actual / delta_latency(D));
 	
 	// quit after N seconds:
-	if (t > 3.) al_main_exit();
+	//if (t > 3.) al_main_exit();
 }
 
 
@@ -131,18 +143,6 @@ int main(int ac, char * av) {
 	if (err != paNoError) goto pa_out;
 	err = Pa_Terminate();
 	if (err != paNoError) goto pa_out;
-
-//	// non-realtime example:
-//	while (delta_main_now() < 3) {
-//		delta_main_tick();
-//		printf(" %5.2f\n", delta_main_now());
-//		
-//		// simulate audio thread (non-realtime)
-//		delta_audio_tick(441);
-//		
-//		// simulate realtime
-//		//al_sleep(0.01);
-//	}
 	
 	lua_close(L);
 	delta_main_quit(&D);
