@@ -1,0 +1,12 @@
+
+Opportunity to run audio thread priority queue based on samplestamp times rather than seconds/nsecs. There would be no need for a separate process list.
+
+Example 1:
+	FFT inputs could trigger at arbitrary control rates, but still sample-locked. Of course, the FFT	itself needs to sample at block-rate, but accumulate internally.
+	HOWEVER, we may need objects whose inputs run at different rates. Starting to think that it is the	inputs themselves which need to be block-rate triggered; one of which is 'hot'?
+
+Example 2:
+	Granular events could trigger at the exact onset and retrigger until done.
+	HMMM, only the onset (and close) need to be accurate; in between it runs at normal block rate.
+
+Next step is definitely dealing with packet management. 
