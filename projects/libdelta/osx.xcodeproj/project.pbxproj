@@ -111,7 +111,7 @@
 		36F5217B109410430019CA9B /* lauxlib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lauxlib.h; path = /usr/local/include/lauxlib.h; sourceTree = "<absolute>"; };
 		36F5217C109410430019CA9B /* lua.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lua.h; path = /usr/local/include/lua.h; sourceTree = "<absolute>"; };
 		36F5217D109410430019CA9B /* lualib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lualib.h; path = /usr/local/include/lualib.h; sourceTree = "<absolute>"; };
-		36F5219A1094289F0019CA9B /* test_delta.lua */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.lua; path = test_delta.lua; sourceTree = "<group>"; };
+		36F5219A1094289F0019CA9B /* test_delta.lua */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = test_delta.lua; sourceTree = "<group>"; };
 		C6859E8B029090EE04C91782 /* osx.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = osx.1; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 

@@ -4,8 +4,8 @@
 
 #include "portaudio.h"
 
-#include "unistd.h"
-#include "stdio.h"
+#include <unistd.h>
+#include <stdio.h>
 
 PaError err;
 

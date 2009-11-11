@@ -154,7 +154,7 @@ al_sec delta_main_tick(delta D) {
 			
 			TODO: handle cases where actual latency is too big / too small
 		*/
-		t = (D->elapsed / D->samplerate) - D->latency;
+		t = (D->elapsed / D->samplerate) + D->latency;
 		
 		/* 
 			handle any events to the current timestamp in the main priority queue: 
