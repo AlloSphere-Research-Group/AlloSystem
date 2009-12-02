@@ -60,6 +60,7 @@ typedef struct al_msg * msg;
 struct al_pq_msg {
 	struct al_msg msg;
 	struct al_pq_msg * next;
+	al_sec retry;	// retry period, or 0 for non-deferable messages
 };
 typedef struct al_pq_msg * pq_msg;
 
@@ -81,7 +82,7 @@ extern int al_pq_used(pq x);
 /* grab memory for the next message */
 extern char * al_pq_msg(pq x);
 /* schedule it */
-extern void al_pq_sched(pq x, al_sec t, al_msg_func f);
+extern void al_pq_sched(pq x, al_sec t, al_sec retry, al_msg_func f);
 
 /* remove any scheduled messages with *mem == ptr (matching addresses) */
 extern void al_pq_cancel_ptr(pq x, void * ptr);

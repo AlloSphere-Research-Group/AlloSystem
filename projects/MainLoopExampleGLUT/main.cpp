@@ -12,13 +12,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void tick(al_nsec time, void * userdata) {
-	
+void ontick(al_nsec time, void * userdata) {
 	al_sec t = time * al_time_ns2s;
-	printf("%f\n", al_main_time_sec());
+	printf("%f\n", t);
 	if (t > 3.0) {
 		al_main_exit();
 	}
+}
+
+void onquit(void * userdata) {
+	exit(0);
 }
 
 void idle(void) 
@@ -56,7 +59,7 @@ int main (int argc, char * argv[]) {
 	glutIdleFunc (idle);
 	
 	// initialize mainloop code
-	al_main_register(tick, NULL);
+	al_main_register(ontick, NULL, onquit);
 	
 	// Turn the flow of control over to GLUT
 	printf("enter main loop\n");

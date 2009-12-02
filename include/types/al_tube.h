@@ -28,8 +28,7 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#include "system/al_time.h"
-#include "types/al_pq.h"
+#include "al_pq.h"
 
 #include <limits.h>
 #include <math.h>

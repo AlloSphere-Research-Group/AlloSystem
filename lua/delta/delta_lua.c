@@ -4,9 +4,6 @@
 #define ddebug(...) 
 //#define ddebug(...) printf(__VA_ARGS__)
 
-static const char * DELTA_LUA_CORO_CACHE = "coro_cache";
-static const char * DELTA_LUA_CORO_META = "coro_meta";
-
 /*
 	Routine for coroutines
  */
@@ -30,7 +27,7 @@ static int resume(al_sec t, char * data) {
 	
 	if (result != LUA_YIELD) {
 		// unref the task to allow __gc
-		lua_getfield(C, LUA_REGISTRYINDEX, DELTA_LUA_CORO_CACHE);
+		lua_getfield(C, LUA_REGISTRYINDEX, DELTA_LUA_CORO_CACHE_LITERAL);
 		lua_pushthread(C);
 		lua_pushnil(C);
 		lua_rawset(C, -3);
@@ -77,7 +74,7 @@ static int coro_abort(lua_State * L) {
 	lua_pushvalue(L, -1);
 	
 	// use first copy to retrieve associated clock:
-	lua_rawget(L, lua_upvalueindex(1));	// DELTA_LUA_CORO_CACHE
+	lua_rawget(L, lua_upvalueindex(1));	// DELTA_LUA_CORO_CACHE_LITERAL
 	pq * u = (pq *)lua_touserdata(L, -1);
 	if (u) {
 		al_pq_cancel_ptr(*u, lua_tothread(L, -2));
@@ -86,7 +83,7 @@ static int coro_abort(lua_State * L) {
 	
 	// use 2nd copy to remove from registry (allow __gc)
 	lua_pushnil(L);
-	lua_rawset(L, lua_upvalueindex(1));	// DELTA_LUA_CORO_CACHE
+	lua_rawset(L, lua_upvalueindex(1));	// DELTA_LUA_CORO_CACHE_LITERAL
 	
 	return 0;
 }
@@ -122,13 +119,13 @@ static int scheduler_go(lua_State * L) {
 	
 	// create a new coro:
 	lua_State * C = lua_newthread(L);
-	luaL_getmetatable(L, DELTA_LUA_CORO_META);
+	luaL_getmetatable(L, DELTA_LUA_CORO_META_LITERAL);
 	lua_setmetatable(L, -2);
 	
 	// insert a userdata proxy to get __gc callbacks on the coro:
 	lua_State ** proxy = (lua_State **)lua_newuserdata(C, sizeof(lua_State *));
 	*proxy = C;
-	luaL_getmetatable(C, DELTA_LUA_CORO_META);
+	luaL_getmetatable(C, DELTA_LUA_CORO_META_LITERAL);
 	lua_setmetatable(C, -2);
 	// store in a hidden place:
 	lua_pushthread(C);
@@ -142,7 +139,7 @@ static int scheduler_go(lua_State * L) {
 	// register with scheduler (prevents __gc, and provides a reference back to scheduler when the coro yields)
 	lua_pushvalue(L, -1);
 	lua_pushvalue(L, lua_upvalueindex(1));	// this Scheduler
-	lua_rawset(L, lua_upvalueindex(2));	// DELTA_LUA_CORO_CACHE
+	lua_rawset(L, lua_upvalueindex(2));	// DELTA_LUA_CORO_CACHE_LITERAL
 	
 	// insert C into the clock schedule at delay t
 	t += scheduler->now;
@@ -150,7 +147,7 @@ static int scheduler_go(lua_State * L) {
 	if (buf) {
 		// copy C into buf:
 		*buf = C;
-		al_pq_sched(scheduler, t, resume);
+		al_pq_sched(scheduler, t, 0, resume);
 		ddebug("go scheduled %f\n", t);
 	} else {
 		return luaL_error(L, "go: failed to allocate message");
@@ -167,14 +164,14 @@ static int scheduler_wait(lua_State * C) {
 	// register with this scheduler:
 	lua_pushthread(C);
 	lua_pushvalue(C, lua_upvalueindex(1));	// this Scheduler
-	lua_rawset(C, lua_upvalueindex(2));	// DELTA_LUA_CORO_CACHE
+	lua_rawset(C, lua_upvalueindex(2));	// DELTA_LUA_CORO_CACHE_LITERAL
 	
 	t += scheduler->now;
 	buf = (lua_State **)al_pq_msg(scheduler);
 	if (buf) {
 		// copy C into buf:
 		*buf = C;
-		al_pq_sched(scheduler, t, resume);
+		al_pq_sched(scheduler, t, 0, resume);
 		ddebug("wait scheduled %f\n", t);
 	} else {
 		return luaL_error(C, "wait: failed to allocate message");
@@ -233,7 +230,7 @@ static int scheduler(lua_State * L) {
 	lua_setfield(L, -2, "now");
 	
 	lua_pushvalue(L, -2);
-	lua_getfield(L, LUA_REGISTRYINDEX, DELTA_LUA_CORO_CACHE);
+	lua_getfield(L, LUA_REGISTRYINDEX, DELTA_LUA_CORO_CACHE_LITERAL);
 	lua_pushcclosure(L, scheduler_go, 2);
 	lua_setfield(L, -2, "go");
 	
@@ -246,7 +243,7 @@ static int scheduler(lua_State * L) {
 	lua_setfield(L, -2, "advance");
 	
 	lua_pushvalue(L, -2);
-	lua_getfield(L, LUA_REGISTRYINDEX, DELTA_LUA_CORO_CACHE);
+	lua_getfield(L, LUA_REGISTRYINDEX, DELTA_LUA_CORO_CACHE_LITERAL);
 	lua_pushcclosure(L, scheduler_wait, 2);
 	lua_setfield(L, -2, "wait");
 	
@@ -259,15 +256,27 @@ static int scheduler(lua_State * L) {
 }
 
 //int cache(lua_State * L) {
-//	lua_getfield(L, LUA_REGISTRYINDEX, DELTA_LUA_CORO_CACHE);
+//	lua_getfield(L, LUA_REGISTRYINDEX, DELTA_LUA_CORO_CACHE_LITERAL);
 //	return 1;
 //}	
 
+delta lua_getdelta(lua_State * L) {
+	lua_getfield(L, LUA_REGISTRYINDEX, DELTA_INSTANCE_LITERAL);
+	delta D = (delta)lua_touserdata(L, -1);
+	lua_pop(L, 1);
+	return D;
+}
+
 int luaopen_delta(lua_State * L) {
 
-	delta D = delta_get();
-
 	const char * libname = lua_tostring(L, -1);
+		
+	/* TODO: read user options */
+	// delta_configure()
+	
+	delta D = delta_create(L);
+	lua_pushlightuserdata(L, D);
+	lua_setfield(L, LUA_REGISTRYINDEX, DELTA_INSTANCE_LITERAL);
 	
 	// create weak-valued Scheduler lookup table:
 	lua_newtable(L);
@@ -277,12 +286,12 @@ int luaopen_delta(lua_State * L) {
 	lua_setfield(L, -2, "__index");
 	lua_pushstring(L, "v");
 	lua_setfield(L, -2, "__mode");
-	lua_setfield(L, LUA_REGISTRYINDEX, DELTA_LUA_CORO_CACHE);
+	lua_setfield(L, LUA_REGISTRYINDEX, DELTA_LUA_CORO_CACHE_LITERAL);
 	
 	/*
 	 create metatable for coroutines created by the Scheduler:
 	 */
-	luaL_newmetatable(L, DELTA_LUA_CORO_META);
+	luaL_newmetatable(L, DELTA_LUA_CORO_META_LITERAL);
 	lua_pushvalue(L, -1);
 	lua_setfield(L, -2, "__index");
 	lua_pushcfunction(L, coro_tostring);
@@ -292,7 +301,7 @@ int luaopen_delta(lua_State * L) {
 	lua_setfield(L, -2, "__gc"); 
 	 */
 	// the coro functions use the Scheduler table as upvalueindex(1) for rapid access:
-	lua_getfield(L, LUA_REGISTRYINDEX, DELTA_LUA_CORO_CACHE);
+	lua_getfield(L, LUA_REGISTRYINDEX, DELTA_LUA_CORO_CACHE_LITERAL);
 	lua_pushcclosure(L, coro_abort, 1);
 	lua_setfield(L, -2, "abort");
 	// clear Coro metatable:
@@ -322,12 +331,12 @@ int luaopen_delta(lua_State * L) {
 	lua_setfield(L, -2, "now");
 	
 	lua_pushvalue(L, -2);
-	lua_getfield(L, LUA_REGISTRYINDEX, DELTA_LUA_CORO_CACHE);
+	lua_getfield(L, LUA_REGISTRYINDEX, DELTA_LUA_CORO_CACHE_LITERAL);
 	lua_pushcclosure(L, scheduler_go, 2);
 	lua_setfield(L, -2, "go");
 	
 	lua_pushvalue(L, -2);
-	lua_getfield(L, LUA_REGISTRYINDEX, DELTA_LUA_CORO_CACHE);
+	lua_getfield(L, LUA_REGISTRYINDEX, DELTA_LUA_CORO_CACHE_LITERAL);
 	lua_pushcclosure(L, scheduler_wait, 2);
 	lua_setfield(L, -2, "wait");
 	

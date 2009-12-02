@@ -4,20 +4,38 @@
 #include "stdlib.h"
 #include "string.h"
 
+#include <list>
+#include <vector>
+
 #define ddebug(...) 
 //#define ddebug(...) printf(__VA_ARGS__)
 
 /*
 	Main object
 */
-struct delta_state {
+struct delta_root {
+	
+	/* settings */
+	delta_config config;
+	
+	/* registered sub-states */
+	std::list<delta> states;
+	
+	/* audio IO busses */
+	std::vector<bus> inputs;
+	std::vector<bus> outputs;
+	
 	/* flag true (1) between start & stop */
 	int isRunning;		
 	int isAudioRunning;	
+};
+typedef struct delta_root * root;
+
+static root g_root = NULL;
+
+struct delta_state {
 	/* time since birth in samples */
 	samplestamp elapsed;	
-	/* suggested latency */	
-	al_sec latency;		
 	
 	/* main/audio thread scheduled events */
 	pq mainpq, audiopq;
@@ -26,145 +44,172 @@ struct delta_state {
 	/* registered audio processes (visited per callback) */
 	proclist procs;
 	
-	/* settings */
-	double samplerate;
-	samplestamp blocksize;
-	int inchannels, outchannels;
-	
-	/* audio IO busses */
-	bus * inputs;
-	bus * outputs;	
-	
 	/* future use? */
 	void * userdata;	
 
 };
 
-static delta g_main = NULL;
+void delta_init() {
+	if (g_root == NULL) {
+		g_root = new struct delta_root;
+		g_root->config.inchannels = 0;
+		g_root->config.outchannels = 0;
+		delta_configure(delta_config_default());
+	}
+}
+
+void delta_exit() {
+	if (g_root != NULL) {
+		
+		for (int i=0; i<g_root->config.inchannels; i++) {
+			bus_free(&g_root->inputs[i]);
+		}
+		
+		for (int i=0; i<g_root->config.outchannels; i++) {
+			bus_free(&g_root->outputs[i]);
+		}
+		
+		std::list<delta>::iterator it = g_root->states.begin();
+		while (it != g_root->states.end()) {
+			delta D = *it;
+			delta_close(&D);
+			it = g_root->states.erase(it);
+		}
+	
+		delete g_root;
+		g_root = NULL;
+	}
+}
 
 
-delta delta_main_init(double samplerate, al_sec latency) {
-	int i;
-	delta D = (delta_state *)calloc(1, sizeof(delta_state));
-	D->isRunning = 0;
-	D->isAudioRunning = 0;
-	D->elapsed = 0;
-	D->userdata = 0;
+const delta_config delta_config_current() {
+	delta_init();
+	return g_root->config;
+}
+const delta_config delta_config_default() {
+	const delta_config config = { 44100.0, 64, 2, 2, 0.03 };
+	return config;
+}
+void delta_configure(delta_config config) {
+	delta_init();
 	
-	D->mainpq = al_pq_create(1000, 0);
-	D->audiopq = al_pq_create(1000, 0);
-	D->inbox = al_tube_create(10);
-	D->outbox = al_tube_create(10);
-	D->procs = delta_proclist_create();
+	/* only a multiple of 64 is safe */
+	config.blocksize = config.blocksize - (config.blocksize % DELTA_SIGNAL_DIM);
+	config.blocksize = config.blocksize < DELTA_SIGNAL_DIM ? DELTA_SIGNAL_DIM : config.blocksize;
 	
-	D->latency = latency; 
-	D->samplerate = samplerate;
-	D->blocksize = DELTA_SIGNAL_DIM;
-	D->inchannels = AUDIO_INPUTS;
-	D->outchannels = AUDIO_OUTPUTS;
+	/* this shouldn't be called during audio execution!! */
+	g_root->isRunning = 0;
+	g_root->isAudioRunning = 0;
+	g_root->config.latency = config.latency; 
+	g_root->config.samplerate = config.samplerate;
+	g_root->config.blocksize = config.blocksize;
 	
-	D->inputs = (bus *)malloc(sizeof(bus) * D->inchannels);
-	for (i=0; i<D->inchannels; i++) {
-		D->inputs[i] = bus_create(D);
+	/* we only ever expand the channel count: */
+	if (config.inchannels > g_root->config.inchannels)
+		g_root->inputs.resize(config.inchannels);
+	if (config.outchannels > g_root->config.outchannels)
+		g_root->outputs.resize(config.outchannels);
+	for (int i=g_root->config.inchannels; i<config.inchannels; i++) {
+		g_root->inputs[i] = bus_create(NULL);
 	}
+	for (int i=g_root->config.outchannels; i<config.outchannels; i++) {
+		g_root->outputs[i] = bus_create(NULL);
+	}	
+	g_root->config.inchannels = config.inchannels;
+	g_root->config.outchannels = config.outchannels;
+}
+
+
+delta delta_create(void * userdata) {
+	delta_init();
 	
-	D->outputs = (bus *)malloc(sizeof(bus) * D->outchannels);
-	for (i=0; i<D->outchannels; i++) {
-		D->outputs[i] = bus_create(D);
-	}
-	
-	if (g_main == NULL) {
-		g_main = D;
+	delta D = new struct delta_state();
+	if (D) {
+		g_root->states.push_back(D);
+		D->mainpq = al_pq_create(1000, 0);
+		D->audiopq = al_pq_create(1000, 0);
+		D->inbox = al_tube_create(10);
+		D->outbox = al_tube_create(10);
+		D->procs = delta_proclist_create();
+		D->userdata = userdata;
 	}
 	return D;
 }
 
-delta delta_get() {
-	return g_main;
-}
-
-void delta_main_quit(delta * ptr) {
-	int i;
+void delta_close(delta * ptr) {
 	delta D;
 	if (ptr && *ptr) {
-		D = *ptr;
+		D = *ptr;		
+		g_root->states.remove(D);		
 		/* TODO: flush all data */
 		al_pq_free(&D->audiopq, 0);
 		al_pq_free(&D->mainpq, 0);
 		al_tube_free(&D->inbox);
 		al_tube_free(&D->outbox);
-		delta_proclist_free(&D->procs);
-		
-		for (i=0; i<D->inchannels; i++) {
-			bus_free(&D->inputs[i]);
-		}
-		for (i=0; i<D->outchannels; i++) {
-			bus_free(&D->outputs[i]);
-		}
-		free(D->inputs);
-		free(D->outputs);
-		
-		free(D);
+		delta_proclist_free(&D->procs);		
+		delete D;
 		*ptr = NULL;
 	}
-}	
+}
 
-void delta_audio_tick(delta D) {
-	//printf(".");
+
+void delta_audio_tick() {
 	
 	/*
 		first pass:
 	*/
-	if (!D->isAudioRunning) {
-		D->isAudioRunning = 1;
+	if (!g_root->isAudioRunning) {
+		g_root->isAudioRunning = 1;
 	}
 	
-	D->elapsed += D->blocksize;
-	al_sec t = D->elapsed / D->samplerate;
+	std::list<delta>::iterator it = g_root->states.begin();
+	while (it != g_root->states.end()) {
+		delta d = *it++;
 	
-	// copy incoming tube messages to the thread-local priority queue (ensures deterministic ordering)
-	al_tube_pq_transfer(D->inbox, D->audiopq, t);
-	al_pq_update(D->audiopq, t, 0);
+		d->elapsed += g_root->config.blocksize;
+		al_sec t = d->elapsed / g_root->config.samplerate;
 	
-	// trigger processing:
-	process p = D->procs->first;
-	while (p) {
-		// TODO: handle return values (schedule unregister & free message?)
-		p->proc.func((delta)D, p->proc.mem);
-		p = p->next;
+		// copy incoming tube messages to the thread-local priority queue (ensures deterministic ordering)
+		al_tube_pq_transfer(d->inbox, d->audiopq, t);
+		al_pq_update(d->audiopq, t, 0);
+		
+		// trigger processing:
+		process p = d->procs->first;
+		while (p) {
+			// TODO: handle return values (schedule unregister & free message?)
+			p->proc.func((delta)d, p->proc.mem);
+			p = p->next;
+		}
 	}
 }
 
-al_sec delta_main_tick(delta D) {
-	int i;
+void delta_main_tick() {
 	al_sec t;
-	D->isRunning = 1;
+	g_root->isRunning = 1;
 	
-	/* 
-		run this tick a few times, 
-			since audio thread usually recurrs more frequently than main
-			(recalculate t a couple of times)
-	*/
-	static int loops = 2;
-	for (i=0; i<loops; i++) 
-	{
+	std::list<delta>::iterator it = g_root->states.begin();
+	while (it != g_root->states.end()) {
+		delta d = *it++;
+		
 		/* 
 			figure out our desired target time
 				- note that the main thread here *follows* the audio thread
 			
 			TODO: handle cases where actual latency is too big / too small
 		*/
+<<<<<<< .mine
+		t = (d->elapsed / g_root->config.samplerate) + g_root->config.latency;
+=======
 		t = (D->elapsed / D->samplerate) + D->latency;
+>>>>>>> .r978
 		
 		/* 
 			handle any events to the current timestamp in the main priority queue: 
 				(first, transfer in any incoming tube messages)
 		*/
-		al_tube_pq_transfer(D->outbox, D->mainpq, t);
-		al_pq_update(D->mainpq, t, 0);
+		al_tube_pq_transfer(d->outbox, d->mainpq, t);
+		al_pq_update(d->mainpq, t, 0);
 	}
-	
-	return t;
 }	
 
 al_sec delta_main_now(delta D) {
@@ -172,11 +217,11 @@ al_sec delta_main_now(delta D) {
 }
 
 al_sec delta_latency(delta D) {
-	return D->latency;
+	return g_root->config.latency;
 }
 
 void delta_set_latency(delta D, al_sec latency) {
-	D->latency = latency;
+	g_root->config.latency = latency;
 }
 
 samplestamp delta_audio_samplestamp(delta D) {
@@ -184,37 +229,37 @@ samplestamp delta_audio_samplestamp(delta D) {
 }
 
 double delta_samplerate(delta D) {
-	return D->samplerate;
+	return g_root->config.samplerate;
 }
 
 samplestamp delta_blocksize(delta D) {
-	return D->blocksize;
+	return g_root->config.blocksize;
 }
 
 int delta_inchannels(delta D) {
-	return D->inchannels;
+	return g_root->config.inchannels;
 }
 int delta_outchannels(delta D) {
-	return D->outchannels;
+	return g_root->config.outchannels;
 }
 
 sample * delta_audio_output(delta D, int channel) {
 	/* TODO: bounds-check on channel? */
-	return D->outputs[channel]->data;
+	return g_root->outputs[channel]->data;
 }
 
 sample * delta_audio_input(delta D, int channel) {
 	/* TODO: bounds-check on channel? */
-	return D->inputs[channel]->data;
+	return g_root->inputs[channel]->data;
 }
 
 bus delta_audio_outbus(delta D, int channel) {
 	/* TODO: bounds-check on channel? */
-	return D->outputs[channel];
+	return g_root->outputs[channel];
 }
 bus delta_audio_inbus(delta D, int channel) {
 	/* TODO: bounds-check on channel? */
-	return D->inputs[channel];
+	return g_root->inputs[channel];
 }
 
 pq delta_main_pq(delta D) {

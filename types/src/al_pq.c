@@ -5,6 +5,10 @@
 #include "stdio.h"
 #include "math.h"
 
+#ifndef HUGE_VALF
+	#define HUGE_VALF 1e38f
+#endif
+
 #if !defined(MIN)
     #define MIN(A,B)	({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __a : __b; })
 #endif
@@ -27,6 +31,7 @@ pq al_pq_create(int size, al_sec birth) {
 		for (i=0; i<size; i++) {
 			memset(array[i].msg.mem, 0, AL_PQ_MSG_ARGS_SIZE);
 			array[i].msg.func = NULL;
+			array[i].retry = 0;
 			if (i==size-1) {
 				array[i].next = NULL;
 			} else {
@@ -37,7 +42,7 @@ pq al_pq_create(int size, al_sec birth) {
 		x->len = 0;
 		x->now = birth;
 		x->retry_period = 1;
-		printf("pq using %i bytes\n", sizeof(struct al_pq) + sizeof(struct al_pq_msg) * size);
+		ddebug("pq using %i bytes\n", sizeof(struct al_pq) + sizeof(struct al_pq_msg) * size);
 	}
 	return x;
 }
@@ -117,7 +122,7 @@ void al_pq_sched_msg(pq x, pq_msg m) {
 }
 
 /* schedule a new message */
-void al_pq_sched(pq x, al_sec t, al_msg_func f) {
+void al_pq_sched(pq x, al_sec t, al_sec retry, al_msg_func f) {
 	pq_msg m;
 	
 	/* pop from pool */
@@ -133,6 +138,7 @@ void al_pq_sched(pq x, al_sec t, al_msg_func f) {
 	m->next = NULL;
 	m->msg.t = t;
 	m->msg.func = f;
+	m->retry = retry;
 	
 	/* insert into queue */
 	al_pq_sched_msg(x, m);
@@ -214,13 +220,20 @@ void al_pq_update(pq x, al_sec until, int defer) {
 		x->now = MAX(x->now, m->msg.t); 
 		al_pq_pop(x);
 		ddebug("call next %f\n", m->msg.t);
-		result = m->msg.func(m->msg.t, m->msg.mem);
-		if (result) {
-			/* message was not handled; reschedule it: */
-			m->msg.t = x->now + x->retry_period;
+		
+		// deferable?
+		if (defer && m->retry > 0.) {
+			m->msg.t = x->now + m->retry;
 			al_pq_sched_msg(x, m);
-		} else {
-			al_pq_recycle(x, m);
+		} else {	
+			result = m->msg.func(m->msg.t, m->msg.mem);
+			if (result) {
+				/* message was not handled; reschedule it: */
+				m->msg.t = x->now + x->retry_period;
+				al_pq_sched_msg(x, m);
+			} else {
+				al_pq_recycle(x, m);
+			}
 		}
 		m = al_pq_top(x);
 	}

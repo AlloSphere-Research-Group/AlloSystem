@@ -15,6 +15,10 @@ extern "C" void maincpp(AlloLattice * lat) {
 	
 	printf("lat is double? %i\n", lattice->checkType<double>());
 	printf("lat is float? %i\n", lattice->checkType<float>());
+	
+	double vals[2];
+	lattice->interp(vals, 1, 2, 3);
+	printf("value at 1, 2, 3: %f %f\n", vals[0], vals[1]);
 		
 	// create a new header:
 	uint32_t dims[] = {740, 480};

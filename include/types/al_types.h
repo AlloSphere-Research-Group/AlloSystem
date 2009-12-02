@@ -31,20 +31,7 @@
 #ifndef INCLUDE_ALLO_TYPES_H
 #define INCLUDE_ALLO_TYPES_H 1
 
-#define INCLUDE_ALLO_TYPES_VERSION 0.001
-
-#if defined(WIN32) || defined(__WINDOWS_MM__)
-	#define AL_WIN32
-	#include <windows.h>
-	#include "pstdint.h"
-#elif defined( __APPLE__ ) && defined( __MACH__ )
-	#define AL_OSX
-	#include <Carbon/Carbon.h>
-	#include <stdint.h>
-#else
-	#define AL_LINUX
-	#include <stdint.h>
-#endif
+#include "system/al_config.h"
 
 #ifdef __cplusplus
 extern "C" {

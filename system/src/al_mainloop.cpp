@@ -29,7 +29,8 @@ al_main_t * al_main_get() {
 		g_main->isRunning = 0;
 		g_main->userdata = NULL;
 		g_main->interval = 1;
-		g_main->handler = NULL;
+		g_main->tickhandler = NULL;
+		g_main->quithandler = NULL;
 	}
 	return g_main;
 }
@@ -42,12 +43,13 @@ int al_main_quit() {
 	return 0;
 }
 
-int al_main_enter(al_sec interval, main_tick_handler handler, void * userdata) {
+int al_main_enter(al_sec interval, main_tick_handler tickhandler, void * userdata, main_quit_handler quithandler) {
 	al_main_get();	
 	if (!g_main->isRunning) {
 		g_main->interval = interval;
 		g_main->isRunning = 1;
-		g_main->handler = handler;
+		g_main->tickhandler = tickhandler;
+		g_main->quithandler = quithandler;
 		g_main->userdata = userdata;
 		return al_main_platform_enter(interval);
 	}
@@ -57,25 +59,30 @@ int al_main_enter(al_sec interval, main_tick_handler handler, void * userdata) {
 void al_main_exit() {
 	if (g_main->isRunning) {
 		g_main->isRunning = 0;
+		if (g_main->quithandler)
+			g_main->quithandler(g_main->userdata);
 	}
 }
 
-void al_main_attach(al_sec interval, main_tick_handler handler, void * userdata) {
+void al_main_attach(al_sec interval, main_tick_handler tickhandler, void * userdata, main_quit_handler quithandler) {
 	al_main_get();	
 	if (!g_main->isRunning) {
 		g_main->interval = interval;
 		g_main->isRunning = 1;
-		g_main->handler = handler;
+		g_main->tickhandler = tickhandler;
+		g_main->quithandler = quithandler;
 		g_main->userdata = userdata;
 		al_main_platform_attach(interval);
 	}
 }
 
-void al_main_register(main_tick_handler handler, void * userdata) {
+void al_main_register(main_tick_handler tickhandler, void * userdata, main_quit_handler quithandler) {
 	al_main_get();
 	if (!g_main->isRunning) {
 		g_main->isRunning = 1;
-		g_main->handler = handler;
+		g_main->tickhandler = tickhandler;
+		
+		g_main->quithandler = quithandler;
 		g_main->userdata = userdata;
 	}
 }
@@ -83,7 +90,7 @@ void al_main_register(main_tick_handler handler, void * userdata) {
 void al_main_tick() {
 	g_main->logicaltime = al_time_nsec() - g_main->t0;
 	// pass control to user-specified mainloop:
-	(g_main->handler)(g_main->logicaltime, g_main->userdata);
+	(g_main->tickhandler)(g_main->logicaltime, g_main->userdata);
 }
 
 al_nsec al_main_time_nsec() {

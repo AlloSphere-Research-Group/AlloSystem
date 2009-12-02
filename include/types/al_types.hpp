@@ -1,9 +1,5 @@
 /*
- *  allocpp.h
- *  C++ helper functions for allo.h
- *
- *  AlloSphere, Media Arts & Technology, UCSB
- *
+ *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
  */
  
 /*
@@ -32,8 +28,9 @@
 #define INCLUDE_ALLO_TYPES_CPP_H 1
 
 #include "al_types.h"
+#include <stdlib.h>
 
-namespace allo {
+namespace al {
 
 /*
 	Partial specialization function to get type
@@ -52,7 +49,7 @@ template<> AlloTy getType<float>() { return AlloFloat32Ty; }
 template<> AlloTy getType<double>() { return AlloFloat64Ty; }
 template<> AlloTy getType<AlloLattice>() { return AlloLatticeTy; }
 // TODO: #define for platform ptrsize
-template<> AlloTy getType<void *>() { return AlloPointer32Ty; }
+//template<> AlloTy getType<void *>() { return AlloPointer32Ty; }
 //template<> AlloTy getType<void *>() { return AlloPointer32Ty; }
 
 /*
@@ -68,9 +65,215 @@ class Lattice : public AlloLattice {
 protected:
 	
 public:
+
+	inline size_t size() { return allo_lattice_size(this); }
 	
-	// an example method:
-	template<typename T> bool checkType() { return allo::checkType<T>(header.type); }
+	inline void data_calloc() {
+		data.ptr = (char *)calloc(1, size());
+	}
+	inline void data_free() {
+		free(data.ptr);
+	}
+
+	template<typename T> inline void define1d(uint32_t components, uint32_t dimx, size_t align = 4) {
+		header.type = getType<T>();
+		header.components = components;
+		header.dimcount = 1;
+		header.dim[0] = dimx;
+		allo_lattice_setstride(&header, align);
+	}
+	
+	template<typename T> inline void define2d(uint32_t components, uint32_t dimx, uint32_t dimy, size_t align = 4) {
+		header.type = getType<T>();
+		header.components = components;
+		header.dimcount = 2;
+		header.dim[0] = dimx;
+		header.dim[1] = dimy;
+		allo_lattice_setstride(&header, align);
+	}
+	
+	template<typename T> inline void define3d(uint32_t components, uint32_t dimx, uint32_t dimy, uint32_t dimz, size_t align = 4) {
+		header.type = getType<T>();
+		header.components = components;
+		header.dimcount = 3;
+		header.dim[0] = dimx;
+		header.dim[1] = dimy;
+		header.dim[2] = dimz;
+		allo_lattice_setstride(&header, align);
+	}
+	
+	/*
+		Use a function to fill a lattice with data:
+	*/
+	template<typename T> inline void fill1d(void (*func)(T * values, double normx)) {
+		int d0 = header.dim[0];
+		double inv_d0 = 1.0/(double)d0;
+		int components = header.components;
+			
+		T * vals = (T *)(data.ptr);
+		for(int i=0; i < d0; i++) {
+			for (int c=0; c<components; c++) {
+				func(vals, inv_d0 * (double)i);
+			}
+			vals += components;
+		}
+	}
+	
+	
+	template<typename T> inline T * data1d(uint32_t x) {
+		uint32_t fieldstride_x = header.stride[0];
+		return (T *)(data.ptr + x*fieldstride_x);
+	}
+	
+	
+	// check whether the internal lattice data is of type T:
+	template<typename T> inline bool checkType() { return al::checkType<T>(header.type); }
+	
+	// linear interpolated lookup (virtual lattice index x, y)
+	// writes the linearly interpolated plane values into val array
+	template<typename T> inline void interp1d(T* val, double x) {
+		
+		#define DOUBLE_FLOOR(v) ( (long)(v) - ((v)<0.0 && (v)!=(long)(v)) )
+		#define DOUBLE_CEIL(v) ( (((v)>0.0)&&((v)!=(long)(v))) ? 1+(v) : (v) )
+		#define DOUBLE_FRAC(v) ( ((v)>=0.0) ? (v)-(long)(v) : (-v)-(long)(v) )
+		
+		// convert 0..1 field indices to 0..(d-1) cell indices
+		uint32_t xa = (uint32_t)DOUBLE_FLOOR(x);	
+		uint32_t xb = (uint32_t)DOUBLE_CEIL (x);			
+		
+		// get the normalized 0..1 interp factors, of x,y,z:
+		double fa = DOUBLE_FRAC(x);
+		double fb = 1.f - fa;
+
+		// get the cell addresses for each neighbor:
+		uint32_t fieldstride_x = header.stride[0];
+		T * pa = (T *)(data.ptr + xa*fieldstride_x); 
+		T * pb = (T *)(data.ptr + xb*fieldstride_x); 
+
+		// for each plane of the field, do the 3D interp:
+		for (uint8_t p=0; p<header.components; p++) {		
+			val[p] =	(pa[p] * fa) +
+						(pb[p] * fb);
+		}
+		
+		#undef DOUBLE_FLOOR
+		#undef DOUBLE_CEIL
+		#undef DOUBLE_FRAC
+	}
+	
+	// bilinear interpolated lookup (virtual lattice index x, y)
+	// writes the linearly interpolated plane values into val array
+	template<typename T> inline void interp2d(T* val, double x, double y) {
+		
+		#define DOUBLE_FLOOR(v) ( (long)(v) - ((v)<0.0 && (v)!=(long)(v)) )
+		#define DOUBLE_CEIL(v) ( (((v)>0.0)&&((v)!=(long)(v))) ? 1+(v) : (v) )
+		#define DOUBLE_FRAC(v) ( ((v)>=0.0) ? (v)-(long)(v) : (-v)-(long)(v) )
+		
+		// convert 0..1 field indices to 0..(d-1) cell indices
+		uint32_t xa = (uint32_t)DOUBLE_FLOOR(x);	
+		uint32_t xb = (uint32_t)DOUBLE_CEIL (x);
+		uint32_t ya = (uint32_t)DOUBLE_FLOOR(y);	
+		uint32_t yb = (uint32_t)DOUBLE_CEIL (y);			
+		
+		// get the normalized 0..1 interp factors, of x,y,z:
+		double xbf = DOUBLE_FRAC(x);
+		double xaf = 1.f - xbf;
+		double ybf = DOUBLE_FRAC(y);
+		double yaf = 1.f - ybf;
+		
+		// get the interpolation corner weights:
+		double faa = xaf * yaf;
+		double fab = xaf * ybf;
+		double fba = xbf * yaf;
+		double fbb = xbf * ybf;
+
+		// get the cell addresses for each neighbor:
+		uint32_t fieldstride_x = header.stride[0];
+		uint32_t fieldstride_y = header.stride[1];
+		T * paa = (T *)(data.ptr + xa*fieldstride_x + ya*fieldstride_y); 
+		T * pab = (T *)(data.ptr + xa*fieldstride_x + yb*fieldstride_y); 
+		T * pba = (T *)(data.ptr + xb*fieldstride_x + ya*fieldstride_y); 
+		T * pbb = (T *)(data.ptr + xb*fieldstride_x + yb*fieldstride_y); 
+
+		// for each plane of the field, do the 3D interp:
+		for (uint8_t p=0; p<header.components; p++) {		
+			val[p] =	(paa[p] * faa) +
+						(pba[p] * fba) + 
+						(pab[p] * fab) + 
+						(pbb[p] * fbb);
+		}
+		
+		#undef DOUBLE_FLOOR
+		#undef DOUBLE_CEIL
+		#undef DOUBLE_FRAC
+	}
+
+
+	// trilinear interpolated lookup (virtual lattice index x, y, z)
+	// writes the linearly interpolated plane values into val array
+	template<typename T> inline void interp3d(T* val, double x, double y, double z) {
+		
+		#define DOUBLE_FLOOR(v) ( (long)(v) - ((v)<0.0 && (v)!=(long)(v)) )
+		#define DOUBLE_CEIL(v) ( (((v)>0.0)&&((v)!=(long)(v))) ? 1+(v) : (v) )
+		#define DOUBLE_FRAC(v) ( ((v)>=0.0) ? (v)-(long)(v) : (-v)-(long)(v) )
+		
+		// convert 0..1 field indices to 0..(d-1) cell indices
+		uint32_t xa = (uint32_t)DOUBLE_FLOOR(x);	
+		uint32_t xb = (uint32_t)DOUBLE_CEIL (x);
+		uint32_t ya = (uint32_t)DOUBLE_FLOOR(y);	
+		uint32_t yb = (uint32_t)DOUBLE_CEIL (y);
+		uint32_t za = (uint32_t)DOUBLE_FLOOR(z);	
+		uint32_t zb = (uint32_t)DOUBLE_CEIL (z);				
+		
+		// get the normalized 0..1 interp factors, of x,y,z:
+		double xbf = DOUBLE_FRAC(x);
+		double xaf = 1.f - xbf;
+		double ybf = DOUBLE_FRAC(y);
+		double yaf = 1.f - ybf;
+		double zbf = DOUBLE_FRAC(z);
+		double zaf = 1.f - zbf;
+		
+		// get the interpolation corner weights:
+		double faaa = xaf * yaf * zaf;
+		double faab = xaf * yaf * zbf;
+		double faba = xaf * ybf * zaf;
+		double fabb = xaf * ybf * zbf;
+		double fbaa = xbf * yaf * zaf;
+		double fbab = xbf * yaf * zbf;
+		double fbba = xbf * ybf * zaf;
+		double fbbb = xbf * ybf * zbf;
+
+		// get the cell addresses for each neighbor:
+		uint32_t fieldstride_x = header.stride[0];
+		uint32_t fieldstride_y = header.stride[1];
+		uint32_t fieldstride_z = header.stride[2];
+		T * paaa = (T *)(data.ptr + xa*fieldstride_x + ya*fieldstride_y + za*fieldstride_z); 
+		T * paab = (T *)(data.ptr + xa*fieldstride_x + ya*fieldstride_y + zb*fieldstride_z); 
+		T * paba = (T *)(data.ptr + xa*fieldstride_x + yb*fieldstride_y + za*fieldstride_z); 
+		T * pabb = (T *)(data.ptr + xa*fieldstride_x + yb*fieldstride_y + zb*fieldstride_z); 
+		T * pbaa = (T *)(data.ptr + xb*fieldstride_x + ya*fieldstride_y + za*fieldstride_z); 
+		T * pbab = (T *)(data.ptr + xb*fieldstride_x + ya*fieldstride_y + zb*fieldstride_z); 
+		T * pbba = (T *)(data.ptr + xb*fieldstride_x + yb*fieldstride_y + za*fieldstride_z); 
+		T * pbbb = (T *)(data.ptr + xb*fieldstride_x + yb*fieldstride_y + zb*fieldstride_z); 
+
+		// for each plane of the field, do the 3D interp:
+		for (uint8_t p=0; p<header.components; p++) {		
+			val[p] =	(paaa[p] * faaa) +
+						(pbaa[p] * fbaa) + 
+						(paba[p] * faba) + 
+						(paab[p] * faab) +
+						(pbab[p] * fbab) + 
+						(pabb[p] * fabb) + 
+						(pbba[p] * fbba) + 
+						(pbbb[p] * fbbb);
+		}
+		
+		#undef DOUBLE_FLOOR
+		#undef DOUBLE_CEIL
+		#undef DOUBLE_FRAC
+	}
+	
+	
 };
 
 } // ::allo::

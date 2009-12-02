@@ -41,7 +41,7 @@ int callback(const void *input, void *output, unsigned long frameCount, const Pa
 			Resume any scheduled events in the audio thread priority queue,
 			+ Execute any processes in the proclist:
 		*/
-		delta_audio_tick(D);
+		delta_audio_tick();
 		
 		/*
 			read delta outbusses into audio outbufs as interleaved
@@ -59,7 +59,6 @@ int callback(const void *input, void *output, unsigned long frameCount, const Pa
 
 /* main thread entry point */
 void tick(al_nsec ns, void * u) {
-	al_sec td;
 	al_sec t = al_time_ns2s * ns;
 	delta D = (delta)u;
 	
@@ -67,7 +66,7 @@ void tick(al_nsec ns, void * u) {
 		Resume any scheduled events in the main thread priority queue:
 			returns delta's main-thread logical time
 	*/
-	td = delta_main_tick(D);
+	delta_main_tick();
 	
 	/*
 		Handle latency difference here. 
@@ -93,6 +92,13 @@ void script_preload(lua_State * L, const char * name, lua_CFunction func) {
 	lua_setfield(L, -2, name);
 	lua_settop(L, 0);
 }
+void script_load(lua_State * L, const char * name, lua_CFunction func) {
+	lua_pushcfunction(L, func);
+	lua_pushstring(L, name);
+	if (lua_pcall(L, 1, 1, 0))
+		printf("error: %s", lua_tostring(L, -1));
+	lua_settop(L, 0);
+}
 
 void script_run(lua_State * L, char * file) {
 	char path[256];
@@ -110,14 +116,15 @@ void script_run(lua_State * L, char * file) {
 }
 
 int main(int ac, char * av) {
-	
-	delta D = delta_main_init(44100.0, 0.03);
 
 	lua_State * L = lua_open();
 	luaL_openlibs(L);
-	script_preload(L, "audio", luaopen_audio);
 	script_preload(L, "delta", luaopen_delta);
+	//script_preload(L, "audio", luaopen_audio);
 	script_run(L, "test_delta.lua");
+	
+	
+	delta D = lua_getdelta(L);
 	
 	PaStream* stream;
 	err = Pa_Initialize();
@@ -134,7 +141,7 @@ int main(int ac, char * av) {
 	err = Pa_StartStream(stream);
 	if (err != paNoError) goto pa_out;
 
-	al_main_enter(0.01, tick, D);
+	al_main_enter(0.01, tick, D, NULL);
 	
 	
 	err = Pa_StopStream(stream);
@@ -145,7 +152,7 @@ int main(int ac, char * av) {
 	if (err != paNoError) goto pa_out;
 	
 	lua_close(L);
-	delta_main_quit(&D);
+	delta_close(&D);
 	return 0;
 	
 pa_out:

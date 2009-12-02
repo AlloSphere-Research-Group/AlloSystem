@@ -42,6 +42,8 @@ extern "C" {
 
 typedef void (*main_tick_handler)(al_nsec time, void * userdata);
 
+typedef void (*main_quit_handler)(void * userdata);
+
 /*!
 	al_main can be used within an existing application mainloop, or can create its own
 	
@@ -56,6 +58,7 @@ typedef void (*main_tick_handler)(al_nsec time, void * userdata);
 		b) Manually trigger the mainloop to exit by calling:
 			al_main_exit()
 				This will implicitly release the main loop, and al_main_enter() will return.
+				Also calls the main_quit_handler (if supplied)
 	
 	2. Using an existing application mainloop with built-in timer (e.g. OSX apps)
 	
@@ -67,6 +70,7 @@ typedef void (*main_tick_handler)(al_nsec time, void * userdata);
 		
 		b) When the runloop exits, it is your responsibility to call:
 			al_main_exit()
+				Also calls the main_quit_handler (if supplied)
 	
 	3. Using an existing application mainloop with manual timer (e.g. GLUT apps)
 		
@@ -80,11 +84,12 @@ typedef void (*main_tick_handler)(al_nsec time, void * userdata);
 				
 		c) Manually release mainloop once the application is closing:
 			al_main_exit()
-				You must not make any other calls into mainloop after al_main_quit()
+				You must not make any other calls into mainloop after al_main_exit()
+				Also calls the main_quit_handler (if supplied)
 */
-extern int al_main_enter(double interval, main_tick_handler handler, void * userdata);
-extern void al_main_attach(double interval, main_tick_handler handler, void * userdata);
-extern void al_main_register(main_tick_handler handler, void * userdata);
+extern int al_main_enter(double interval, main_tick_handler tickhandler, void * userdata, main_quit_handler quithandler);
+extern void al_main_attach(double interval, main_tick_handler handler, void * userdata, main_quit_handler quithandler);
+extern void al_main_register(main_tick_handler handler, void * userdata, main_quit_handler quithandler);
 extern void al_main_tick();
 extern void al_main_exit();
 
@@ -105,7 +110,8 @@ typedef struct {
 	int isRunning;				/* flag true (1) when in the main loop */
 	double interval;			/* in seconds */
 	al_nsec t0, logicaltime;		/* birth time (wall clock), scheduler time (logical) */
-	main_tick_handler handler;	/* user-supplied event handler */
+	main_tick_handler tickhandler;	/* user-supplied event handler */
+	main_quit_handler quithandler; /* (optional) user-supplied quit handler */
 	void * userdata;			/* passed to the handler */
 } al_main_t;
 

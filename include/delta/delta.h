@@ -32,6 +32,7 @@
 	
 	Delta offers a basic set of scheduling primitives
 	Audio is used as the principal clock source, due to its stability.
+		(TODO: provide option to choose between audio clock and cpu clock)
 	The main thread is assumed to be 'ahead' of the audio thread by some ideal latency.
 	
 	It should be possible to drive Delta from any audio system, e.g. portaudio, VST, etc.
@@ -59,6 +60,9 @@
 extern "C" {
 #endif
 
+/* these will not remain macros */
+#define AUDIO_INPUTS 2
+#define AUDIO_OUTPUTS 2
 #define DELTA_SIGNAL_DIM (64)
 
 /*
@@ -66,7 +70,7 @@ extern "C" {
 */
 
 /*
-	An opaque struct passed to process callbacks
+	An opaque struct for a main/audio scheduler
 */
 typedef struct delta_state * delta;
 
@@ -75,6 +79,16 @@ typedef long long int samplestamp;
 
 /**! 64-bit processing */
 typedef double sample;
+
+/*
+	A struct used to get/set global configuration:
+*/
+typedef struct {
+	double samplerate;
+	samplestamp blocksize;		/* should be a power of 2 */
+	unsigned int inchannels, outchannels;
+	al_sec latency;
+} delta_config;
 
 /* 
 	Standard function signature for an audio process 
@@ -123,27 +137,37 @@ typedef struct delta_bus * bus;
 
 
 
-/**! Library init/close */
-extern delta delta_main_init(double samplerate, al_sec latency);
-extern void delta_main_quit(delta * D);
+/*
+	init/close
+*/
+extern void delta_init();
+extern void delta_exit();
 
 /* 
-	singleton delta state 
+	retrieve current and default audio configurations
 */
-extern delta delta_get();
+extern const delta_config delta_config_current();
+extern const delta_config delta_config_default();
+/*
+	Warning: this call is not safe to make while audio processing is occuring!
+*/
+extern void delta_configure(delta_config config);
+
+extern delta delta_create(void * userdata);
+extern void delta_close(delta * D);
 
 /**! 
 	Entry point from main thread; e.g. main loop
 	 
 */
-extern al_sec delta_main_tick(delta D);
+extern void delta_main_tick();
 
 /**! 
 	Entry point from audio thread; e.g. audio callback 
 	Assumes IO frame increment equal to delta_blocksize(); 
 		(you need to ringbuffer etc. if not)
 */
-extern void delta_audio_tick(delta D);
+extern void delta_audio_tick();
 
 /**! Current main-thread logical time */
 extern al_sec delta_main_now(delta D);
@@ -185,28 +209,6 @@ extern bus delta_audio_outbus(delta D, int channel);
 extern bus delta_audio_inbus(delta D, int channel);
 extern sample * delta_audio_output(delta D, int channel);
 extern sample * delta_audio_input(delta D, int channel);
-
-
-
-/* these will not remain macros */
-#define AUDIO_INPUTS 2
-#define AUDIO_OUTPUTS 2
-
-///* Standard function signature for the handler of a message */
-//typedef int (*al_msg_func)(al_sec t, char *);
-//
-///* Maximum memory footprint of a message */
-//#define DELTA_MSG_ARGS_SIZE (52)
-//struct al_msg {
-//	al_sec t;
-//	al_msg_func func;
-//	char mem[DELTA_MSG_ARGS_SIZE];
-//};
-//typedef struct al_msg * msg;
-
-
-
-
 
 
 

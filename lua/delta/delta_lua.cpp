@@ -179,14 +179,12 @@ bus lua_pushbus(lua_State * L, bus self) {
 	return self;
 }
 
-int luaopen_audio(lua_State * L) {
+int luaopen_delta_audio(lua_State * L) {
 
 	const char * libname = lua_tostring(L, 1);
-
-	/* ensure it exists */
-	delta D = delta_get();
-	lua_pushlightuserdata(L, D);
-	lua_setfield(L, LUA_REGISTRYINDEX, DELTA_INSTANCE_LITERAL);
+	
+	delta D = lua_getdelta(L);
+	if (!D) luaL_error(L, "delta not found; did you require 'delta' ?");
 	
 	/* define bus metatable */
 	struct luaL_reg meta_bus_lib[] = {

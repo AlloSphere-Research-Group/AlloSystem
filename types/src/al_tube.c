@@ -5,6 +5,9 @@
 #include "stdio.h"
 #include "math.h"
 
+#define ddebug(...) 
+//#define ddebug(...) printf(__VA_ARGS__)
+
 /* wait-free single-reader single-writer fifo */
 struct al_tube {
 	unsigned int writer, reader;
@@ -23,7 +26,7 @@ tube al_tube_create(int nbits) {
 		x->wrap = x->size-1;
 		x->packets = (msg)calloc(x->size, sizeof(struct al_msg));
 		//x->blocked = 0;
-		printf("tube using %i bytes\n", sizeof(struct al_tube) + sizeof(struct al_msg) * x->size);
+		ddebug("tube using %i bytes\n", sizeof(struct al_tube) + sizeof(struct al_msg) * x->size);
 	}
 	return x;
 }
@@ -115,7 +118,7 @@ extern void al_tube_pq_transfer(tube x, pq q, al_sec until) {
 		buf = al_pq_msg(q);
 		if (buf) {
 			memcpy(buf, m->mem, AL_PQ_MSG_ARGS_SIZE);
-			al_pq_sched(q, m->t, m->func);
+			al_pq_sched(q, m->t, 0, m->func);
 		} else {
 			printf("pq empty\n"); /* retry? */
 		}

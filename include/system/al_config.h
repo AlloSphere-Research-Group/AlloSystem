@@ -30,7 +30,7 @@
 #define AL_SYSTEM_LIB_VERSION 0.01
 
 #if defined(WIN32) || defined(__WINDOWS_MM__)
-	#define AL_WIN32
+	#define AL_WIN32 1
 	#include <windows.h>
 	#ifdef AL_EXPORTS
 		#define AL_API __declspec(dllexport)
@@ -38,10 +38,10 @@
 		#define AL_API __declspec(dllimport)
 	#endif
 #elif defined( __APPLE__ ) && defined( __MACH__ )
-	#define AL_OSX
+	#define AL_OSX 1
 	#define AL_API extern
 #else
-	#define AL_LINUX
+	#define AL_LINUX 1
 	#define AL_API extern
 #endif
 

@@ -60,7 +60,16 @@ int main(){
 		allo_lattice_setstride(&hdr, 4);
 		assert(hdr.stride[2] == 8*7);
 	}
+	
+	{
+		allo::Lattice lat;
+		lat.setpacked3d<double>(2, 8, 8, 8);
+		lat.data.ptr = (char *)calloc(1, lat.size());
 
+		double vals[2];
+		lat.interp(vals, 1, 2, 3);
+		printf("value at 1, 2, 3: %f %f\n", vals[0], vals[1]);
+	}
 	return 0;
 }
 

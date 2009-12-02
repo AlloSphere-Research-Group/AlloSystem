@@ -72,6 +72,7 @@
 		3635DA6210AA269B00C26E3C /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
 		3635DA6310AA269B00C26E3C /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = /System/Library/Frameworks/CoreAudio.framework; sourceTree = "<absolute>"; };
 		36752B291093915A00FF5627 /* libdelta.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libdelta.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		36834ED210C5FB9B0047FB8D /* al_tube.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_tube.hpp; sourceTree = "<group>"; };
 		36B7DD1110978CF70013EF88 /* delta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = delta.h; sourceTree = "<group>"; };
 		36B7DD1210978CF70013EF88 /* delta_lua.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = delta_lua.h; sourceTree = "<group>"; };
 		36B7DD1410978CF70013EF88 /* OSC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OSC.h; sourceTree = "<group>"; };
@@ -92,6 +93,7 @@
 		36B7DD3C109792AF0013EF88 /* al_tube.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = al_tube.c; sourceTree = "<group>"; };
 		36B7DE0D109797EB0013EF88 /* al_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_types.h; sourceTree = "<group>"; };
 		36B7DE0E109797EB0013EF88 /* al_types.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_types.hpp; sourceTree = "<group>"; };
+		36BEC52310B1CF79001AC837 /* al_pq.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_pq.hpp; sourceTree = "<group>"; };
 		36DD35091096C5E9008B6B87 /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
 		36DD350A1096C5E9008B6B87 /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
 		36DD350B1096C5E9008B6B87 /* test_portaudio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_portaudio.c; sourceTree = "<group>"; };
@@ -227,7 +229,9 @@
 				36B7DE0D109797EB0013EF88 /* al_types.h */,
 				36B7DE0E109797EB0013EF88 /* al_types.hpp */,
 				36B7DD2010978D5D0013EF88 /* al_pq.h */,
+				36BEC52310B1CF79001AC837 /* al_pq.hpp */,
 				36B7DD3A109792A20013EF88 /* al_tube.h */,
+				36834ED210C5FB9B0047FB8D /* al_tube.hpp */,
 			);
 			path = types;
 			sourceTree = "<group>";

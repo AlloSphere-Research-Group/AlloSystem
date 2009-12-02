@@ -12,12 +12,16 @@ extern "C" {
 #include "lauxlib.h"
 
 extern int luaopen_delta(lua_State * L);
-extern int luaopen_audio(lua_State * L);
+extern int luaopen_delta_audio(lua_State * L);
+
+extern delta lua_getdelta(lua_State * L);
 
 /* Lua/Audio API */
 #define DELTA_INSTANCE_LITERAL "__delta_instance"
 #define AUDIO_PROCESS_LITERAL "__delta_audio_process"
 #define AUDIO_BUS_LITERAL "__delta_audio_bus"
+#define DELTA_LUA_CORO_CACHE_LITERAL "__delta_coro_cache"
+#define DELTA_LUA_CORO_META_LITERAL "__delta_coro_meta"
 
 /* simplifies lua_to* lua_push* lua_opt* in codegen */
 typedef double number;

@@ -35,7 +35,7 @@ bus bus_create(delta D) {
 		x->data = x->doublebuffer;
 		
 		/* defined above: */
-		delta_audio_proc_init(D, (process)x, bus_proc, bus_free_msg); 
+		if (D) delta_audio_proc_init(D, (process)x, bus_proc, bus_free_msg); 
 	}
 	return x;
 }

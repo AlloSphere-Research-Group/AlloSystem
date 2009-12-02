@@ -53,13 +53,14 @@ int callback(const void *input, void *output, unsigned long frameCount, const Pa
 /* main thread entry point */
 void tick(al_nsec ns, void * u) {
 	al_sec t = al_time_ns2s * ns;
+	delta D = (delta)u;
 
 	printf("@%06.3f\n", t);
 	
 	/* 
 		Resume any scheduled events in the main thread priority queue:
 	*/
-	delta_main_tick();
+	delta_main_tick(D);
 	
 	if (t > 3.) al_main_exit();
 }
@@ -68,7 +69,7 @@ int main(int ac, char * av) {
 	char * buf;
 	int i;
 	
-	delta_main_init(44100.0, 0.03);
+	delta D = delta_main_init(44100.0, 0.03);
 	
 	/* queue up some messages: */
 	for (i=0; i<10; i++) {
@@ -88,18 +89,18 @@ int main(int ac, char * av) {
 	err = Pa_Initialize();
 	if (err != paNoError) goto pa_out;
 	err = Pa_OpenDefaultStream( &stream,
-                              2,
-                              2,
+                              delta_inchannels(D),
+                              delta_outchannels(D),
                               paFloat32,
-                              delta_samplerate(),
-                              delta_blocksize(),
+                              delta_samplerate(D),
+                              delta_blocksize(D),
                               callback,
-                              NULL );
+                              D );
 	if (err != paNoError) goto pa_out;
 	err = Pa_StartStream(stream);
 	if (err != paNoError) goto pa_out;
 
-	al_main_enter(0.01, tick, NULL);
+	al_main_enter(0.01, tick, D);
 	
 	
 	err = Pa_StopStream(stream);
