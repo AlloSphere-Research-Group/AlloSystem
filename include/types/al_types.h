@@ -32,10 +32,12 @@
 #define INCLUDE_ALLO_TYPES_H 1
 
 #include "system/al_config.h"
+#include "string.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 #pragma mark AlloTy
 /*
