@@ -46,6 +46,14 @@ typedef double al_sec;						/**< seconds type */
 /**! temporal limits */
 #define AL_TIME_NSEC_NEVER (ULLONG_MAX)
 
+#ifdef AL_WIN32
+/**! print format for al_nsec */
+#define AL_NSEC_FMT "I64d"
+#else
+/**! print format for al_nsec */
+#define AL_NSEC_FMT "lld"
+#endif
+
 /**! conversion factors for nanoseconds/seconds */
 #define al_time_ns2s		1.0e-9
 #define al_time_s2ns		1.0e9

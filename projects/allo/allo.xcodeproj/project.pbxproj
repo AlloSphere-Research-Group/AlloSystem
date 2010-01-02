@@ -8,17 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		36B4129910EFF864007B16D0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
-		36B412A910EFF8E5007B16D0 /* al_mainloop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36B4125A10EFF7CB007B16D0 /* al_mainloop.cpp */; };
-		36B412AB10EFF8E5007B16D0 /* al_time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36B4125C10EFF7CB007B16D0 /* al_time.cpp */; };
-		36B412AD10EFF8F0007B16D0 /* al_mainloop_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 36B4125B10EFF7CB007B16D0 /* al_mainloop_osx.mm */; };
 		36B412B010EFF916007B16D0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
-		36B412BE10EFF930007B16D0 /* al_pq.c in Sources */ = {isa = PBXBuildFile; fileRef = 36B4126310EFF7CB007B16D0 /* al_pq.c */; };
-		36B412BF10EFF930007B16D0 /* al_tube.c in Sources */ = {isa = PBXBuildFile; fileRef = 36B4126410EFF7CB007B16D0 /* al_tube.c */; };
 		36B4131210EFFAA1007B16D0 /* al_mainloop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36B4125A10EFF7CB007B16D0 /* al_mainloop.cpp */; };
 		36B4131310EFFAA1007B16D0 /* al_mainloop_osx.mm in Sources */ = {isa = PBXBuildFile; fileRef = 36B4125B10EFF7CB007B16D0 /* al_mainloop_osx.mm */; };
-		36B4131410EFFAA1007B16D0 /* al_time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36B4125C10EFF7CB007B16D0 /* al_time.cpp */; };
 		36B4131510EFFAA1007B16D0 /* al_pq.c in Sources */ = {isa = PBXBuildFile; fileRef = 36B4126310EFF7CB007B16D0 /* al_pq.c */; };
 		36B4131610EFFAA1007B16D0 /* al_tube.c in Sources */ = {isa = PBXBuildFile; fileRef = 36B4126410EFF7CB007B16D0 /* al_tube.c */; };
+		36B4137D10EFFCC5007B16D0 /* liballo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballo.a */; };
+		36B4142010F00CBB007B16D0 /* al_time_apr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36B4141F10F00CBB007B16D0 /* al_time_apr.cpp */; };
 		8DD76F650486A84900D96B5E /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* main.cpp */; settings = {ATTRIBUTES = (); }; };
 		8DD76F6A0486A84900D96B5E /* alscheduling.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* alscheduling.1 */; };
 /* End PBXBuildFile section */
@@ -28,7 +24,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 36B4130E10EFFA8D007B16D0 /* libal */;
+			remoteGlobalIDString = 36B4130E10EFFA8D007B16D0;
 			remoteInfo = libal;
 		};
 /* End PBXContainerItemProxy section */
@@ -108,7 +104,9 @@
 		36B4129610EFF864007B16D0 /* apr_want.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = apr_want.h; sourceTree = "<group>"; };
 		36B4129810EFF864007B16D0 /* libapr-1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libapr-1.a"; sourceTree = "<group>"; };
 		36B412AF10EFF916007B16D0 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
-		36B4130F10EFFA8D007B16D0 /* liblibal.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblibal.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		36B4130F10EFFA8D007B16D0 /* liballo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liballo.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		36B4139610EFFD4C007B16D0 /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
+		36B4141F10F00CBB007B16D0 /* al_time_apr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_time_apr.cpp; sourceTree = "<group>"; };
 		8DD76F6C0486A84900D96B5E /* alscheduling */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = alscheduling; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6859E8B029090EE04C91782 /* alscheduling.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = alscheduling.1; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -125,6 +123,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36B4137D10EFFCC5007B16D0 /* liballo.a in Frameworks */,
 				36B4129910EFF864007B16D0 /* libapr-1.a in Frameworks */,
 				36B412B010EFF916007B16D0 /* Cocoa.framework in Frameworks */,
 			);
@@ -150,6 +149,7 @@
 		08FB7795FE84155DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				36B4139610EFFD4C007B16D0 /* main.h */,
 				08FB7796FE84155DC02AAC07 /* main.cpp */,
 			);
 			name = Source;
@@ -159,7 +159,7 @@
 			isa = PBXGroup;
 			children = (
 				8DD76F6C0486A84900D96B5E /* alscheduling */,
-				36B4130F10EFFA8D007B16D0 /* liblibal.a */,
+				36B4130F10EFFA8D007B16D0 /* liballo.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -224,6 +224,7 @@
 				36B4125A10EFF7CB007B16D0 /* al_mainloop.cpp */,
 				36B4125B10EFF7CB007B16D0 /* al_mainloop_osx.mm */,
 				36B4125C10EFF7CB007B16D0 /* al_time.cpp */,
+				36B4141F10F00CBB007B16D0 /* al_time_apr.cpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -371,7 +372,7 @@
 			);
 			name = allo;
 			productName = libal;
-			productReference = 36B4130F10EFFA8D007B16D0 /* liblibal.a */;
+			productReference = 36B4130F10EFFA8D007B16D0 /* liballo.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		8DD76F620486A84900D96B5E /* alscheduling */ = {
@@ -398,7 +399,7 @@
 /* Begin PBXProject section */
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
-			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "alscheduling" */;
+			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "allo" */;
 			compatibilityVersion = "Xcode 3.1";
 			hasScannedForEncodings = 1;
 			mainGroup = 08FB7794FE84155DC02AAC07 /* alscheduling */;
@@ -418,9 +419,9 @@
 			files = (
 				36B4131210EFFAA1007B16D0 /* al_mainloop.cpp in Sources */,
 				36B4131310EFFAA1007B16D0 /* al_mainloop_osx.mm in Sources */,
-				36B4131410EFFAA1007B16D0 /* al_time.cpp in Sources */,
 				36B4131510EFFAA1007B16D0 /* al_pq.c in Sources */,
 				36B4131610EFFAA1007B16D0 /* al_tube.c in Sources */,
+				36B4142010F00CBB007B16D0 /* al_time_apr.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -428,11 +429,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				36B412A910EFF8E5007B16D0 /* al_mainloop.cpp in Sources */,
-				36B412AD10EFF8F0007B16D0 /* al_mainloop_osx.mm in Sources */,
-				36B412AB10EFF8E5007B16D0 /* al_time.cpp in Sources */,
-				36B412BE10EFF930007B16D0 /* al_pq.c in Sources */,
-				36B412BF10EFF930007B16D0 /* al_tube.c in Sources */,
 				8DD76F650486A84900D96B5E /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -466,9 +462,13 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../../dev_osx/lib\"",
 				);
+				OTHER_CFLAGS = (
+					"-DAPR_FAST_COMPAT",
+					"-DAPR_STRICT",
+				);
 				PRODUCT_NAME = alscheduling;
 				SYMROOT = ../../build;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\"/** \"$(SRCROOT)/../../dev_osx/include\"/**";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../dev_osx/include\"/**";
 			};
 			name = Debug;
 		};
@@ -483,9 +483,13 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../../dev_osx/lib\"",
 				);
+				OTHER_CFLAGS = (
+					"-DAPR_FAST_COMPAT",
+					"-DAPR_STRICT",
+				);
 				PRODUCT_NAME = alscheduling;
 				SYMROOT = ../../build;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\"/** \"$(SRCROOT)/../../dev_osx/include\"/**";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../dev_osx/include\"/**";
 			};
 			name = Release;
 		};
@@ -567,7 +571,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "alscheduling" */ = {
+		1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "allo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1DEB923608733DC60010E9CD /* Debug */,
