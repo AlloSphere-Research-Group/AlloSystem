@@ -1,3 +1,0 @@
-vsl 
-
-an attempt to use luajit within an audio thread
