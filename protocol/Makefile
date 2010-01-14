@@ -1,29 +1,23 @@
 #=========================================================================
-# Allo Network makefile
+# AlloCore Protocol makefile
 #=========================================================================
 
 include ../Makefile.config
 include  ./Makefile.config
 
-SRC =	$(OSC_SRC) \
-	test/unitTest.cpp
-
-OBJS = $(SRC:.cpp=.o)
-
 .cpp.o:
 	@echo CC $<
 	@$(CC) -c $(CFLAGS) -o $*.o $<
 
-testNetwork: $(OBJS)
+testOSC: $(OSC_OBJ)
 	@echo $@
-	@$(CC) $(CFLAGS) -o $@ $(OBJS) $(LFLAGS)
+	@$(CC) $(CFLAGS) ../$(SYS_DIR)/src/al_time.cpp test/testOSC.cpp -o $@ $(OSC_OBJ) $(LFLAGS)
 
+.PHONY: clean
 clean:	
-	@rm -f *.o
-	@rm -f $(OSC_DIR_SRC)/*.o
-	@rm -f $(OSC_DIR_SRC)/$(OSC_DIR_PF)/*.o
 	@rm -f src/*.o
 	@rm -f test/*.o
+	@rm -f $(OSC_OBJ)
 	@cd ../$(SYS_DIR) && make clean
 
 

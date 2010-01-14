@@ -1,5 +1,6 @@
-#include "OSC.h"
+#include "protocol/al_OSC.h"
 
+//namespace allo{
 namespace osc{
 
 OSCRecv::OSCRecv(networkRecvCB cb, void * userData)
@@ -99,3 +100,4 @@ void OSCSend::send(){
 }
 
 } // osc::
+//} // allo::

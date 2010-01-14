@@ -1,5 +1,5 @@
-#ifndef OSC_H_INC
-#define OSC_H_INC
+#ifndef INCLUDE_AL_OSC_H
+#define INCLUDE_AL_OSC_H
 
 /*
 Example receive code:
@@ -34,15 +34,14 @@ Example send code:
 #include <string>
 #include <vector>
 #include <stdio.h>
-#include "ip/UdpSocket.h"
-#include "osc/OscOutboundPacketStream.h"
-#include "osc/OscPacketListener.h"
-#include "osc/OscReceivedElements.h"
-#include "osc/OscTypes.h"
-#include "al_thread.h"
+#include "oscpack/ip/UdpSocket.h"
+#include "oscpack/osc/OscOutboundPacketStream.h"
+#include "oscpack/osc/OscPacketListener.h"
+#include "oscpack/osc/OscReceivedElements.h"
+#include "oscpack/osc/OscTypes.h"
+#include "system/al_thread.h"
 
 //namespace allo{
-
 namespace osc{
 
 // Simplified names
@@ -79,6 +78,9 @@ struct RecvPacket{
 
 
 /// Open Sound Control Receiver
+
+/// Start its own listening thread and calls callback in its own thread.
+///
 class OSCRecv : public osc::OscPacketListener {
 public:
 	typedef void (* networkRecvCB)(const RecvPacket& p, void * user);
@@ -131,7 +133,6 @@ public:
 	OSCSend(const char * remoteIP, int port, int maxPacketSizeBytes=4096);
 	~OSCSend();
 
-	/// Add a component to an outbound packet
 	template <class T>
 	OutboundPacketStream& operator << (T data){ return (*mStream) << data; }
 	
@@ -141,9 +142,9 @@ public:
 	/// Set maximum outbound packet size
 	void maxPacketSize(int bytes);
 	
-	/// Sends the current internal outbound packet and then clears it
+	/// Sends the current outbound packet and then clears it.
 	void send();
-	
+
 	/// Send address pattern along with 1 argument immediately
 	template <class T1>
 	void send(const std::string& addressPattern, const T1& arg1);
@@ -182,7 +183,6 @@ void OSCSend::send(const std::string& p, const T1& a1, const T2& a2, const T3& a
 
 
 } // osc::
-
 //} // allo::
 	
 #endif
