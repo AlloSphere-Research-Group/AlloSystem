@@ -1,4 +1,4 @@
-#include "protocol/al_OSC.h"
+#include "protocol/al_OSC.hpp"
 
 //namespace allo{
 namespace osc{

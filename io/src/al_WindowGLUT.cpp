@@ -11,7 +11,7 @@
 #include <stdio.h>		// snprintf
 #include <stdlib.h>		// exit
 #include <map>
-#include "io/al_WindowGL.h"
+#include "io/al_WindowGL.hpp"
 
 
 namespace allo{

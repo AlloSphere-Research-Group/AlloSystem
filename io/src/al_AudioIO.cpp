@@ -6,7 +6,7 @@
 #include <strings.h>
 #include <math.h>
 
-#include "io/al_AudioIO.h"
+#include "io/al_AudioIO.hpp"
 
 //#define SAFE_FREE(ptr) if(ptr){ free(ptr); ptr = 0; }
 

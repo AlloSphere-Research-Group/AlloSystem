@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <string.h>
-#include "protocol/al_OSC.h"
+#include "protocol/al_OSC.hpp"
 #include "system/al_time.h"
 
 using namespace allo;

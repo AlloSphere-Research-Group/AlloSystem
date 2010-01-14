@@ -1,4 +1,4 @@
-#include "io/al_WindowGL.h"
+#include "io/al_WindowGL.hpp"
 
 namespace allo{
 

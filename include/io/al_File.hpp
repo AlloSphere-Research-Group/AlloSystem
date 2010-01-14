@@ -1,9 +1,9 @@
-#ifndef IO_FILE_H_INC
-#define IO_FILE_H_INC
+#ifndef INCLUDE_AL_FILE_H
+#define INCLUDE_AL_FILE_H
 
 #include <stdio.h>
 
-namespace io{
+namespace allo{
 
 class File{
 public:
@@ -57,7 +57,7 @@ protected:
 
 
 
-} // io::
+} // allo::
 
 #endif
 
