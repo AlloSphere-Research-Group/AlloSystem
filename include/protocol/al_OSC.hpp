@@ -66,7 +66,7 @@ Example send code:
 #include "oscpack/osc/OscPacketListener.h"
 #include "oscpack/osc/OscReceivedElements.h"
 #include "oscpack/osc/OscTypes.h"
-#include "system/al_thread.h"
+#include "system/al_Thread.hpp"
 
 //namespace allo{
 namespace osc{

@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_FILE_H
-#define INCLUDE_AL_FILE_H
+#ifndef INCLUDE_AL_FILE_HPP
+#define INCLUDE_AL_FILE_HPP
 
 #include <stdio.h>
 

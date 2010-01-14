@@ -17,6 +17,8 @@ testWindowGL: $(OBJ_WINDOW) test/testWindowGL.o
 	@echo $@
 	@$(CC) $(CFLAGS) -o $@ $(filter %.o, $^) $(LFLAGS) $(LFLAGS_WINDOW)
 
+tests: testAudioIO testWindowGL
+
 .PHONY: clean
 clean:	
 	@rm -f src/*.o

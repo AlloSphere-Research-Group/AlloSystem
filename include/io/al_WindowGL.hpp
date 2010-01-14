@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_WINDOWGL_H
-#define INCLUDE_AL_WINDOWGL_H
+#ifndef INCLUDE_AL_WINDOWGL_HPP
+#define INCLUDE_AL_WINDOWGL_HPP
 
 /*
  *	OpenGL window

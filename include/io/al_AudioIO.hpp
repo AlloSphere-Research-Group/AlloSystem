@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_AUDIO_IO_H
-#define INCLUDE_AL_AUDIO_IO_H
+#ifndef INCLUDE_AL_AUDIO_IO_HPP
+#define INCLUDE_AL_AUDIO_IO_HPP
 
 /*
  *	Audio device and input/output streaming
