@@ -27,6 +27,11 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
+#ifndef __STDC_CONSTANT_MACROS
+#define __STDC_CONSTANT_MACROS
+
+#include "pstdint.h"
+
 #define AL_SYSTEM_LIB_VERSION 0.01
 
 #if defined(WIN32) || defined(__WINDOWS_MM__)
