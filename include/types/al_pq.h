@@ -43,11 +43,12 @@ typedef int (*al_msg_func)(al_sec t, char *);
 
 /* Maximum memory footprint of a message */
 #define AL_PQ_MSG_ARGS_SIZE (52)
-struct al_msg {
-	al_sec t;
-	al_msg_func func;
-	char mem[AL_PQ_MSG_ARGS_SIZE];
-};
+//struct al_msg {
+//	al_sec t;
+//	al_msg_func func;
+//	char mem[AL_PQ_MSG_ARGS_SIZE];
+//	// size_t size;
+//};
 typedef struct al_msg * msg;
 
 /*
@@ -57,19 +58,19 @@ typedef struct al_msg * msg;
 		sorts on insertion, with fast-path for first/last positions
 */
 /* A message in the queue */
-struct al_pq_msg {
-	struct al_msg msg;
-	struct al_pq_msg * next;
-	al_sec retry;	// retry period, or 0 for non-deferable messages
-};
+//struct al_pq_msg {
+//	struct al_msg msg;
+//	struct al_pq_msg * next;
+//	al_sec retry;	// retry period, or 0 for non-deferable messages
+//};
 typedef struct al_pq_msg * pq_msg;
 
-struct al_pq {
-	al_sec now; /* scheduler logical time */
-	pq_msg head, tail, pool;
-	int len;
-	al_sec retry_period; /* if a message call fails */
-};
+//struct al_pq {
+//	al_sec now; /* scheduler logical time */
+//	pq_msg head, tail, pool;
+//	int len;
+//	al_sec retry_period; /* if a message call fails */
+//};
 typedef struct al_pq * pq;
 
 /* allocate a new priority queue */

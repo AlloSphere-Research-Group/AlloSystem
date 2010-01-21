@@ -165,9 +165,13 @@ public:
 	
 	/// Adds a remote endpoint to receive messages
 	OSCSend& add(const char * remoteIP, int port);
+	
+	void clearEndpoints() { mEndpoints.clear(); }
 
 	/// Set maximum outbound packet size
 	void maxPacketSize(int bytes);
+	
+	std::vector<NetAddr>& endpoints() { return mEndpoints; }
 	
 	/// Sends the current outbound packet and then clears it.
 	void send();

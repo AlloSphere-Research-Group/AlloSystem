@@ -17,6 +17,8 @@
 		36AF668E10F13C8400C95081 /* al_runloop_osx.m in Sources */ = {isa = PBXBuildFile; fileRef = 36AF668D10F13C8400C95081 /* al_runloop_osx.m */; };
 		36AF677A10F1538200C95081 /* AlOpenGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 36AF677910F1538200C95081 /* AlOpenGLView.m */; };
 		36AF682D10F15C1D00C95081 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36AF682C10F15C1D00C95081 /* OpenGL.framework */; };
+		36AF69C810F1823A00C95081 /* AlOpenGlWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 36AF69C710F1823A00C95081 /* AlOpenGlWindow.m */; };
+		36AF69F110F18D1C00C95081 /* AlOpenGLSurface.m in Sources */ = {isa = PBXBuildFile; fileRef = 36AF69F010F18D1C00C95081 /* AlOpenGLSurface.m */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
@@ -94,6 +96,10 @@
 		36AF677910F1538200C95081 /* AlOpenGLView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlOpenGLView.m; sourceTree = "<group>"; };
 		36AF67FB10F1591D00C95081 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/OpenGLWindow.xib; sourceTree = "<group>"; };
 		36AF682C10F15C1D00C95081 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
+		36AF69C610F1823A00C95081 /* AlOpenGlWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlOpenGlWindow.h; sourceTree = "<group>"; };
+		36AF69C710F1823A00C95081 /* AlOpenGlWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlOpenGlWindow.m; sourceTree = "<group>"; };
+		36AF69EF10F18D1C00C95081 /* AlOpenGLSurface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlOpenGLSurface.h; sourceTree = "<group>"; };
+		36AF69F010F18D1C00C95081 /* AlOpenGLSurface.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlOpenGLSurface.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* threadedapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = threadedapp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -170,8 +176,12 @@
 				29B97316FDCFA39411CA2CEA /* main.m */,
 				36AF668C10F13C8400C95081 /* al_runloop.h */,
 				36AF668D10F13C8400C95081 /* al_runloop_osx.m */,
+				36AF69EF10F18D1C00C95081 /* AlOpenGLSurface.h */,
+				36AF69F010F18D1C00C95081 /* AlOpenGLSurface.m */,
 				36AF677810F1538200C95081 /* AlOpenGLView.h */,
 				36AF677910F1538200C95081 /* AlOpenGLView.m */,
+				36AF69C610F1823A00C95081 /* AlOpenGlWindow.h */,
+				36AF69C710F1823A00C95081 /* AlOpenGlWindow.m */,
 			);
 			name = "Other Sources";
 			sourceTree = "<group>";
@@ -411,6 +421,8 @@
 				36AF666010F12E0B00C95081 /* al_msg.cpp in Sources */,
 				36AF668E10F13C8400C95081 /* al_runloop_osx.m in Sources */,
 				36AF677A10F1538200C95081 /* AlOpenGLView.m in Sources */,
+				36AF69C810F1823A00C95081 /* AlOpenGlWindow.m in Sources */,
+				36AF69F110F18D1C00C95081 /* AlOpenGLSurface.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -78,10 +78,10 @@
 {
 	NSLog(@"prepareOpenGL");
     
-//    // set to vbl sync
-//	GLint swapInt = 1;
-//	[context setValues: &swapInt
-//          forParameter: NSOpenGLCPSwapInterval];
+    // set to vbl sync
+	GLint swapInt = 1;
+	[context setValues: &swapInt
+          forParameter: NSOpenGLCPSwapInterval];
 		  
 		  
     // init GL stuff here
