@@ -71,7 +71,19 @@ OSCSend::OSCSend(const char * remoteIP, int port, int maxPacketSizeBytes)
 OSCSend::~OSCSend(){ delete[] mBuffer; delete mStream; }
 
 OSCSend& OSCSend::add(const char * remoteIP, int port){
-	mEndpoints.push_back(IpEndpointName(remoteIP, port));
+	mEndpoints.push_back(NetAddr(remoteIP, port));
+	return *this;
+}
+
+OSCSend& OSCSend::remove(const char * remoteIP, int port){
+
+	NetAddr v(remoteIP, port);
+	
+	std::vector<NetAddr>::iterator it = mEndpoints.begin();
+	for(; it<mEndpoints.end(); it++){
+		if(v == *it) mEndpoints.erase(it);
+	}
+	
 	return *this;
 }
 

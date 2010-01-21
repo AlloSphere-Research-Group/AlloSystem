@@ -40,15 +40,18 @@ void onRecv(const osc::RecvPacket& p, void * user){
 
 int main(int argc, char* argv[]){
 
+	const int port = 12000;
+	const char * ip = "127.0.0.1";
+
 	Data data;
 	
 	struct wait{ wait(double t=0.01){ al_sleep(t); }};
 
-	osc::OSCRecv r(12000, onRecv, &data);
+	osc::OSCRecv r(port, onRecv, &data);
 	r.start();
 	wait(0.5);
 
-	osc::OSCSend s("127.0.0.1", 12000);
+	osc::OSCSend s(ip, port);
 
 	// Send single message
 	s << osc::BeginMessage("/test") << true << 1.f << 1. << 1 << "1" << osc::EndMessage;
@@ -77,6 +80,12 @@ int main(int argc, char* argv[]){
 	s.send("/test", 1.f);		wait(); assert(data.f==1);
 	s.send("/test", 0.f, 1.);	wait(); assert(data.f==0 && data.d==1);
 	s.send("/test", 1.f, 0.,1);	wait(); assert(data.f==1 && data.d==0 && data.i==1);
+
+
+	// check remove endpoint
+	s.remove(ip, port);
+	data.clear();
+	s.send("/test", 1.f);		wait(); assert(data.f!=1);
 
 	return 0;
 }

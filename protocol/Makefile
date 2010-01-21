@@ -13,15 +13,15 @@ include  ./Makefile.config
 #	@echo $@
 #	@$(CC) $(CFLAGS) ../$(SYS_DIR)/src/al_Time.cpp test/testOSC.cpp -o $@ $(OSC_OBJ) $(LFLAGS)
 
-test/testOSC.cpp: $(OSC_OBJ)
-	@echo $@
+FORCE:
+
+test/testOSC.cpp: $(OSC_OBJ) FORCE
 	@$(CC) $(CFLAGS) ../$(SYS_DIR)/src/al_Time.cpp $@ -o $(*F) $(OSC_OBJ) $(LFLAGS)
+	@./$(*F)
 
 test/testSerialize.cpp: FORCE
-	@echo $@
 	@$(CC) $(CFLAGS) src/al_Serialize.c src/al_Serialize.cpp $@ -o $(*F) $(LFLAGS)
-
-FORCE:
+	@./$(*F)
 
 .PHONY: clean
 clean:	
