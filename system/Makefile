@@ -15,7 +15,7 @@ OBJS = $(SRC:.cpp=.o)
 
 testSystem: $(OBJS)
 	@echo $@
-	@$(CC) $(CFLAGS) -o $@ $(OBJS) $(LFLAGS)
+	@$(CC) $(CFLAGS) src/al_Time.cpp -o $@ $(OBJS) $(LFLAGS)
 
 clean:	
 	@rm -f *.o

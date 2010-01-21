@@ -1,8 +1,8 @@
 #include <assert.h>
 #include <stdio.h>
-#include "al_Time.h"
-#include "al_Time.hpp"
-#include "al_Thread.h"
+#include "system/al_Time.h"
+#include "system/al_Time.hpp"
+#include "system/al_Thread.hpp"
 
 using namespace allo;
 
