@@ -1,6 +1,6 @@
-#include "system/al_mainloop.h"
-#include "stdlib.h"
-#include "assert.h"
+#include "system/al_MainLoop.h"
+#include <stdlib.h>
+#include <assert.h>
 
 /*
 	Platform specific implementations

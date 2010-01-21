@@ -28,8 +28,8 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#include "system/al_config.h"
-#include "system/al_time.h"
+#include "system/al_Config.h"
+#include "system/al_Time.h"
 
 #ifdef __cplusplus
 extern "C" {

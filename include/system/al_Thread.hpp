@@ -28,7 +28,7 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#include "system/al_time.h"
+#include "system/al_Time.h"
 
 #include <limits.h>
 #include <math.h>

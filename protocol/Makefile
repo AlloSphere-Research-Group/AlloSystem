@@ -11,11 +11,11 @@ include  ./Makefile.config
 
 #testOSC: $(OSC_OBJ)
 #	@echo $@
-#	@$(CC) $(CFLAGS) ../$(SYS_DIR)/src/al_time.cpp test/testOSC.cpp -o $@ $(OSC_OBJ) $(LFLAGS)
+#	@$(CC) $(CFLAGS) ../$(SYS_DIR)/src/al_Time.cpp test/testOSC.cpp -o $@ $(OSC_OBJ) $(LFLAGS)
 
 test/testOSC.cpp: $(OSC_OBJ)
 	@echo $@
-	@$(CC) $(CFLAGS) ../$(SYS_DIR)/src/al_time.cpp $@ -o $(*F) $(OSC_OBJ) $(LFLAGS)
+	@$(CC) $(CFLAGS) ../$(SYS_DIR)/src/al_Time.cpp $@ -o $(*F) $(OSC_OBJ) $(LFLAGS)
 
 test/testSerialize.cpp: FORCE
 	@echo $@

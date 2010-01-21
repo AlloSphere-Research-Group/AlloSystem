@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_TIME_CPP_H
-#define INCLUDE_AL_TIME_CPP_H
+#ifndef INCLUDE_AL_TIME_HPP
+#define INCLUDE_AL_TIME_HPP
 
 /*
  *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
@@ -31,7 +31,7 @@
 	C++ helper wrapeprs for al_time
 */
 
-#include "system/al_time.h"
+#include "system/al_Time.h"
 
 namespace allo{
 

@@ -44,7 +44,7 @@
 
 #include <stddef.h>
 #include <string.h>
-#include "system/al_config.h"
+#include "system/al_Config.h"
 
 
 //#define SER_IS_BIG_ENDIAN
