@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_OSC_H
-#define INCLUDE_AL_OSC_H
+#ifndef INCLUDE_AL_OSC_HPP
+#define INCLUDE_AL_OSC_HPP
 
 /*
  *	OSC (Open Sound Control) send/receive

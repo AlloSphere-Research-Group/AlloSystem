@@ -29,6 +29,7 @@
 
 #ifndef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS
+#endif
 
 #include "pstdint.h"
 
