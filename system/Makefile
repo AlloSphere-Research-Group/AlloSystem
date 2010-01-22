@@ -5,17 +5,11 @@
 include ../Makefile.config
 include  ./Makefile.config
 
-SRC =	test/unitTest.cpp
+test/testSystem.cpp: $(OBJS) FORCE
+	@$(CC) $(CFLAGS) src/al_Time.cpp $@ -o $(*F) $(LFLAGS)
+	@$(RUN_TEST)
 
-OBJS = $(SRC:.cpp=.o)
-
-.cpp.o:
-	@echo CC $<
-	@$(CC) -c $(CFLAGS) -o $*.o $<
-
-testSystem: $(OBJS)
-	@echo $@
-	@$(CC) $(CFLAGS) src/al_Time.cpp -o $@ $(OBJS) $(LFLAGS)
+tests: test/testSystem.cpp
 
 clean:	
 	@rm -f *.o
