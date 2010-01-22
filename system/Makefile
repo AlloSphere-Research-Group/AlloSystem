@@ -6,7 +6,7 @@ include ../Makefile.config
 include  ./Makefile.config
 
 test/testSystem.cpp: $(OBJS) FORCE
-	@$(CC) $(CFLAGS) src/al_Time.cpp $@ -o $(*F) $(LFLAGS)
+	@$(CC) $(CFLAGS) src/al_Time.cpp $@ -o $(TEST_EXEC) $(LFLAGS)
 	@$(RUN_TEST)
 
 tests: test/testSystem.cpp
