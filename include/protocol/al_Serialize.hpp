@@ -48,7 +48,7 @@ DEF(int16_t, Int16,)
 DEF(int32_t, Int32,)
 DEF(int64_t, Int64,)
 DEF(uint8_t, UInt8,)
-DEF(bool,    Bool,)
+/* DEF(bool,    Bool,) */
 DEF(uint16_t,UInt16,)
 DEF(uint32_t,UInt32,)
 DEF(uint64_t,UInt64,)

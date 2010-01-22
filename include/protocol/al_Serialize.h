@@ -68,10 +68,10 @@ enum{
 #define SER_HEADER_SIZE 5
 
 /* Serialized data header */
-struct SerHeader{
+typedef struct _SerHeader {
 	uint8_t type;		/* type of data */
 	uint32_t num;		/* number of data elements */
-};
+} SerHeader;
 
 
 /* Serialized data header. Don't think this is needed... */
@@ -148,7 +148,9 @@ inline uint32_t serEncodeInt8   (char * b, const int8_t * v  , uint32_t n){ retu
 inline uint32_t serEncodeInt16  (char * b, const int16_t * v , uint32_t n){ return serEncode2(SER_INT16  , b,v,n); }
 inline uint32_t serEncodeInt32  (char * b, const int32_t * v , uint32_t n){ return serEncode4(SER_INT32  , b,v,n); }
 inline uint32_t serEncodeInt64  (char * b, const int64_t * v , uint32_t n){ return serEncode8(SER_INT64  , b,v,n); }
+/* no bool in C
 inline uint32_t serEncodeBool   (char * b, const bool * v    , uint32_t n){ return serEncode1(SER_UINT8  , b,v,n); }
+*/
 inline uint32_t serEncodeUInt8  (char * b, const uint8_t * v , uint32_t n){ return serEncode1(SER_UINT8  , b,v,n); }
 inline uint32_t serEncodeUInt16 (char * b, const uint16_t * v, uint32_t n){ return serEncode2(SER_UINT16 , b,v,n); }
 inline uint32_t serEncodeUInt32 (char * b, const uint32_t * v, uint32_t n){ return serEncode4(SER_UINT32 , b,v,n); }
