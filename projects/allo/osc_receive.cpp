@@ -12,6 +12,7 @@
 #include "apr_network_io.h"
 
 /* oscpack */
+#include "protocol/oscpack/osc/OscOutboundPacketStream.h"
 #include "protocol/oscpack/osc/OscReceivedElements.h"
 
 #include "stdlib.h"
@@ -54,8 +55,6 @@ void osc_parse(const char * buf, size_t size) {
 }
 
 int main (int argc, char * argv[]) {
-
-
 	apr_status_t err;
 	apr_pool_t * pool;
 	
@@ -76,15 +75,8 @@ int main (int argc, char * argv[]) {
 	check_apr(apr_sockaddr_info_get(&sa, NULL, APR_INET, port, 0, pool));
 	// for TCP, use SOCK_STREAM and APR_PROTO_TCP instead
 	check_apr(apr_socket_create(&sock, sa->family, SOCK_DGRAM, APR_PROTO_UDP, pool));
-	// bind socket to address:
 	check_apr(apr_socket_bind(sock, sa));
-	
-	//check_apr(apr_socket_opt_set(sock, APR_SO_NONBLOCK, 1));
-    //apr_socket_timeout_set(s, DEF_SOCK_TIMEOUT);
-	//check_apr(apr_socket_listen(sock, SOMAXCONN));	
-//	// handle connections from remote clients:
-//	apr_socket_t * remote; /* accepted socket */
-//	check_apr(apr_socket_accept(&remote, sock, pool));
+	check_apr(apr_socket_opt_set(sock, APR_SO_NONBLOCK, 1));
 
 	// receive data:
 	for (int i=0; i<1000; i++) {
@@ -95,13 +87,10 @@ int main (int argc, char * argv[]) {
 			check_apr(apr_socket_recv(sock, data, &len));
 			if (len) osc_parse(data, len); 
 		} while (len > 0);
-		
 		al_sleep(0.01);
 	}
 	
 	check_apr(apr_socket_close(sock));
-	
-	// program end:
 	apr_pool_destroy(pool);
 	return 0;
 }

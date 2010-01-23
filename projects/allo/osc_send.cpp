@@ -12,7 +12,6 @@
 #include "apr_network_io.h"
 
 /* oscpack */
-#include "protocol/oscpack/osc/OscReceivedElements.h"
 #include "protocol/oscpack/osc/OscOutboundPacketStream.h"
 
 #include "stdlib.h"
@@ -27,31 +26,6 @@ static apr_status_t check_apr(apr_status_t err) {
 		fprintf(stderr, "apr error: %s\n", errstr);
 	}
 	return err;
-}
-
-/* OSC packet parser */
-void osc_parsemessage(const osc::ReceivedMessage & p) {
-	printf("address %s tags %s args %d\n", p.AddressPattern(), p.TypeTags(), p.ArgumentCount());
-	// etc.
-}
-
-void osc_parsebundle(const osc::ReceivedBundle & p) {
-	for(osc::ReceivedBundle::const_iterator i=p.ElementsBegin(); i != p.ElementsEnd(); ++i) {
-		if(i->IsBundle()) {
-			osc_parsebundle(osc::ReceivedBundle(*i));
-		} else {
-			osc_parsemessage(osc::ReceivedMessage(*i));
-		}
-	}
-}
-
-void osc_parse(const char * buf, size_t size) {
-	osc::ReceivedPacket p(buf, size);
-	if(p.IsBundle()) {
-		osc_parsebundle(osc::ReceivedBundle(p));
-	} else {
-		osc_parsemessage(osc::ReceivedMessage(p));
-	}
 }
 
 int main (int argc, char * argv[]) {
@@ -70,7 +44,6 @@ int main (int argc, char * argv[]) {
 	apr_allocator_max_free_set(apr_pool_allocator_get(pool), 1024);
 
 	/* @see http://dev.ariel-networks.com/apr/apr-tutorial/html/apr-tutorial-13.html */
-	// create socket:
 	apr_sockaddr_t * sa;
 	apr_socket_t * sock;
 	apr_port_t port = 7009;
@@ -78,14 +51,12 @@ int main (int argc, char * argv[]) {
 	check_apr(apr_sockaddr_info_get(&sa, host, APR_INET, port, 0, pool));
 	// for TCP, use SOCK_STREAM and APR_PROTO_TCP instead
 	check_apr(apr_socket_create(&sock, sa->family, SOCK_DGRAM, APR_PROTO_UDP, pool));
-	// bind socket to address:
-	//check_apr(apr_socket_bind(sock, sa));
+	check_apr(apr_socket_opt_set(sock, APR_SO_NONBLOCK, 1));
 	
 	check_apr(apr_socket_connect(sock, sa));
 	
 	char data[MAX_MESSAGE_LEN];
 	osc::OutboundPacketStream packet(data, MAX_MESSAGE_LEN);
-	
 	for (int i=0; i<10; i++) {
 	
 		packet << osc::BeginMessage("/foo");
@@ -99,9 +70,8 @@ int main (int argc, char * argv[]) {
 		al_sleep(0.1);
 	}
 	
-	check_apr(apr_socket_close(sock));
-	
 	// program end:
+	check_apr(apr_socket_close(sock));
 	apr_pool_destroy(pool);
 	return 0;
 }
