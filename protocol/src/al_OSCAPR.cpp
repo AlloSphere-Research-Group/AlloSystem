@@ -87,13 +87,15 @@ Send::~Send() {
 
 size_t Send::send(const char * buffer, size_t len) {
 	apr_size_t size = len;
-	check_apr(apr_socket_send(mSock, buffer, &size));
+	//check_apr(apr_socket_send(mSock, buffer, &size));
+	apr_socket_send(mSock, buffer, &size);
 	return size;
 }
 
 size_t Send::send(const osc::OutboundPacketStream & packet) {
 	apr_size_t size = packet.Size();
-	check_apr(apr_socket_send(mSock, packet.Data(), &size));
+	//check_apr(apr_socket_send(mSock, packet.Data(), &size));
+	apr_socket_send(mSock, packet.Data(), &size);
 	return size;
 }
 	
