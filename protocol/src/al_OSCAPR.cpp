@@ -6,6 +6,7 @@ static apr_status_t check_apr(apr_status_t err) {
 	char errstr[1024];
 	if (err != APR_SUCCESS) {
 		apr_strerror(err, errstr, 1024);
+		fprintf(stderr, errstr);
 		throw new osc::Exception(errstr);
 	}
 	return err;
