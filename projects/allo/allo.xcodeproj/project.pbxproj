@@ -755,13 +755,15 @@
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\\\"$(SRCROOT)/../../dev_osx/lib\\\"",
+					"\"$(SRCROOT)/../../dev_osx/lib\"",
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-DAPR_FAST_COMPAT",
 					"-DAPR_STRICT",
 				);
 				PRODUCT_NAME = $TARGET_NAME;
+				SDKROOT = macosx10.4;
 				SYMROOT = ../../build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../dev_osx/include\"/**";
 			};
@@ -776,13 +778,15 @@
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\\\"$(SRCROOT)/../../dev_osx/lib\\\"",
+					"\"$(SRCROOT)/../../dev_osx/lib\"",
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-DAPR_FAST_COMPAT",
 					"-DAPR_STRICT",
 				);
 				PRODUCT_NAME = $TARGET_NAME;
+				SDKROOT = macosx10.4;
 				SYMROOT = ../../build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../dev_osx/include\"/**";
 			};
@@ -800,9 +804,11 @@
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				INSTALL_PATH = /usr/local/lib;
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../../dev_osx/lib\"";
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "-DOSC_HOST_LITTLE_ENDIAN";
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
+				SDKROOT = macosx10.4;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
 				SYMROOT = ../../build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\"/** \"$(SRCROOT)/../../dev_osx/include\"/**";
@@ -820,9 +826,11 @@
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				INSTALL_PATH = /usr/local/lib;
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../../dev_osx/lib\"";
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "-DOSC_HOST_LITTLE_ENDIAN";
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
+				SDKROOT = macosx10.4;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
 				SYMROOT = ../../build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\"/** \"$(SRCROOT)/../../dev_osx/include\"/**";

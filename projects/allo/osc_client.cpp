@@ -38,7 +38,7 @@ void osc_parsebundle(const osc::ReceivedBundle & p) {
 			osc_parsebundle(osc::ReceivedBundle(*i));
 		} else {
 			osc_parsemessage(osc::ReceivedMessage(*i));
-        }
+		}
 	}
 }
 
@@ -79,16 +79,13 @@ int main (int argc, char * argv[]) {
 	
 	check_apr(apr_socket_opt_set(sock, APR_SO_NONBLOCK, 1));
     //apr_socket_timeout_set(s, DEF_SOCK_TIMEOUT);
-	
-	//check_apr(apr_socket_listen(sock, SOMAXCONN));
-	
+	//check_apr(apr_socket_listen(sock, SOMAXCONN));	
 //	// handle connections from remote clients:
 //	apr_socket_t * remote; /* accepted socket */
 //	check_apr(apr_socket_accept(&remote, sock, pool));
 
 	// receive data:
 	for (int i=0; i<1000; i++) {
-		printf("______________\n");
 		apr_size_t len;
 		char data[len];
 		do {
@@ -97,9 +94,10 @@ int main (int argc, char * argv[]) {
 			if (len) osc_parse(data, len); 
 		} while (len > 0);
 		
-		al_sleep(1.);
+		al_sleep(0.01);
 	}
 	
+	check_apr(apr_socket_close(sock));
 	
 	// program end:
 	apr_pool_destroy(pool);
