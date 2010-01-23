@@ -13,6 +13,7 @@
 
 /* oscpack */
 #include "protocol/oscpack/osc/OscReceivedElements.h"
+#include "protocol/oscpack/osc/OscOutboundPacketStream.h"
 
 #include "stdlib.h"
 
@@ -72,31 +73,30 @@ int main (int argc, char * argv[]) {
 	// create socket:
 	apr_sockaddr_t * sa;
 	apr_socket_t * sock;
-	apr_port_t port = 7007;
-	check_apr(apr_sockaddr_info_get(&sa, NULL, APR_INET, port, 0, pool));
+	apr_port_t port = 7009;
+	const char * host = "localhost";
+	check_apr(apr_sockaddr_info_get(&sa, host, APR_INET, port, 0, pool));
 	// for TCP, use SOCK_STREAM and APR_PROTO_TCP instead
 	check_apr(apr_socket_create(&sock, sa->family, SOCK_DGRAM, APR_PROTO_UDP, pool));
 	// bind socket to address:
-	check_apr(apr_socket_bind(sock, sa));
+	//check_apr(apr_socket_bind(sock, sa));
 	
-	//check_apr(apr_socket_opt_set(sock, APR_SO_NONBLOCK, 1));
-    //apr_socket_timeout_set(s, DEF_SOCK_TIMEOUT);
-	//check_apr(apr_socket_listen(sock, SOMAXCONN));	
-//	// handle connections from remote clients:
-//	apr_socket_t * remote; /* accepted socket */
-//	check_apr(apr_socket_accept(&remote, sock, pool));
-
-	// receive data:
-	for (int i=0; i<1000; i++) {
-		apr_size_t len;
-		char data[MAX_MESSAGE_LEN];
-		do {
-			len = MAX_MESSAGE_LEN;
-			check_apr(apr_socket_recv(sock, data, &len));
-			if (len) osc_parse(data, len); 
-		} while (len > 0);
+	check_apr(apr_socket_connect(sock, sa));
+	
+	char data[MAX_MESSAGE_LEN];
+	osc::OutboundPacketStream packet(data, MAX_MESSAGE_LEN);
+	
+	for (int i=0; i<10; i++) {
+	
+		packet << osc::BeginMessage("/foo");
+		packet << i;
+		packet << osc::EndMessage;
 		
-		al_sleep(0.01);
+		apr_size_t size = packet.Size();
+		apr_socket_send(sock, packet.Data(), &size);
+		packet.Clear();
+		printf("sent %d bytes\n", size);
+		al_sleep(0.1);
 	}
 	
 	check_apr(apr_socket_close(sock));
