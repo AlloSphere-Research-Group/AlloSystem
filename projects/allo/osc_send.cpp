@@ -1,12 +1,7 @@
 /* allocore */
 #include "system/al_mainloop.h"
 #include "system/al_time.h"
-#include "types/al_types.h"
-
 #include "protocol/al_OSCAPR.hpp"
-
-/* oscpack */
-#include "protocol/oscpack/osc/OscOutboundPacketStream.h"
 
 #include "stdlib.h"
 
