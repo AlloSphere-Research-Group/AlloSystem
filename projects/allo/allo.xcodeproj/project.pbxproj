@@ -29,6 +29,8 @@
 		36B4137D10EFFCC5007B16D0 /* liballo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballo.a */; };
 		36B4142010F00CBB007B16D0 /* al_TimeAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36B4141F10F00CBB007B16D0 /* al_TimeAPR.cpp */; };
 		36B4145E10F01D28007B16D0 /* al_msg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36B4145D10F01D28007B16D0 /* al_msg.cpp */; };
+		36B4BF08110E55BE00F789A8 /* al_Socket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36B4BF07110E55BE00F789A8 /* al_Socket.cpp */; };
+		36B4BF0A110E562200F789A8 /* al_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36B4BF09110E562200F789A8 /* al_config.cpp */; };
 		36F464DE110B85E40082D21E /* liballo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballo.a */; };
 		36F464DF110B85E40082D21E /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		36F464E0110B85E40082D21E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
@@ -121,7 +123,7 @@
 /* Begin PBXFileReference section */
 		08FB7796FE84155DC02AAC07 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		3602B4C7110A67B6005DC3D0 /* osc_receive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = osc_receive.cpp; sourceTree = "<group>"; };
-		3602B4D8110A67C9005DC3D0 /* oscclient */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = oscclient; sourceTree = BUILT_PRODUCTS_DIR; };
+		3602B4D8110A67C9005DC3D0 /* oscreceive */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = oscreceive; sourceTree = BUILT_PRODUCTS_DIR; };
 		3602B53C110A6D3D005DC3D0 /* al_OSC.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OSC.hpp; sourceTree = "<group>"; };
 		3602B53D110A6D3D005DC3D0 /* al_Serialize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Serialize.h; sourceTree = "<group>"; };
 		3602B53E110A6D3D005DC3D0 /* al_Serialize.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Serialize.hpp; sourceTree = "<group>"; };
@@ -221,6 +223,9 @@
 		36B4139610EFFD4C007B16D0 /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
 		36B4141F10F00CBB007B16D0 /* al_TimeAPR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_TimeAPR.cpp; sourceTree = "<group>"; };
 		36B4145D10F01D28007B16D0 /* al_msg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_msg.cpp; sourceTree = "<group>"; };
+		36B4BF06110E55AF00F789A8 /* al_Socket.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Socket.hpp; sourceTree = "<group>"; };
+		36B4BF07110E55BE00F789A8 /* al_Socket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Socket.cpp; sourceTree = "<group>"; };
+		36B4BF09110E562200F789A8 /* al_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_config.cpp; sourceTree = "<group>"; };
 		36F464E6110B85E40082D21E /* vein */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = vein; sourceTree = BUILT_PRODUCTS_DIR; };
 		36F464E8110B86120082D21E /* vein.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vein.cpp; sourceTree = "<group>"; };
 		36F4662B110B9B720082D21E /* al_socktube.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_socktube.h; sourceTree = "<group>"; };
@@ -327,7 +332,7 @@
 			children = (
 				8DD76F6C0486A84900D96B5E /* alscheduling */,
 				36B4130F10EFFA8D007B16D0 /* liballo.a */,
-				3602B4D8110A67C9005DC3D0 /* oscclient */,
+				3602B4D8110A67C9005DC3D0 /* oscreceive */,
 				3602B736110A9770005DC3D0 /* oscsend */,
 				36F464E6110B85E40082D21E /* vein */,
 			);
@@ -498,6 +503,7 @@
 		36B4125910EFF7CB007B16D0 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				36B4BF09110E562200F789A8 /* al_config.cpp */,
 				36B4125A10EFF7CB007B16D0 /* al_mainloop.cpp */,
 				36B4125B10EFF7CB007B16D0 /* al_mainloop_osx.mm */,
 				36B4125C10EFF7CB007B16D0 /* al_time.cpp */,
@@ -624,6 +630,7 @@
 				36F46821110BE2E90082D21E /* al_AudioIO.hpp */,
 				36F46822110BE2E90082D21E /* al_File.hpp */,
 				36F46823110BE2E90082D21E /* al_WindowGL.hpp */,
+				36B4BF06110E55AF00F789A8 /* al_Socket.hpp */,
 			);
 			path = io;
 			sourceTree = "<group>";
@@ -647,6 +654,7 @@
 				36F4682C110BE2FA0082D21E /* al_File.cpp */,
 				36F4682D110BE2FA0082D21E /* al_WindowGL.cpp */,
 				36F4682E110BE2FA0082D21E /* al_WindowGLUT.cpp */,
+				36B4BF07110E55BE00F789A8 /* al_Socket.cpp */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -700,7 +708,7 @@
 			name = oscreceive;
 			productInstallPath = "$(HOME)/bin";
 			productName = alscheduling;
-			productReference = 3602B4D8110A67C9005DC3D0 /* oscclient */;
+			productReference = 3602B4D8110A67C9005DC3D0 /* oscreceive */;
 			productType = "com.apple.product-type.tool";
 		};
 		3602B728110A9770005DC3D0 /* oscsend */ = {
@@ -830,6 +838,8 @@
 				3602B56D110A6D5B005DC3D0 /* OscTypes.cpp in Sources */,
 				36A20CFE110ACB0B0075A21C /* al_OSCAPR.cpp in Sources */,
 				36F4662D110B9B830082D21E /* al_socktube.c in Sources */,
+				36B4BF08110E55BE00F789A8 /* al_Socket.cpp in Sources */,
+				36B4BF0A110E562200F789A8 /* al_config.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

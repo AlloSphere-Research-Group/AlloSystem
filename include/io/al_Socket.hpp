@@ -1,7 +1,8 @@
-#ifndef INCLUDE_AL_SYSTEM_CONFIG_H
-#define INCLUDE_AL_SYSTEM_CONFIG_H 1
+#ifndef INCLUDE_AL_IO_SOCKET_HPP
+#define INCLUDE_AL_IO_SOCKET_HPP 1
 
 /*
+ *	Audio device and input/output streaming
  *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
  */
 
@@ -27,46 +28,11 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#ifndef __STDC_CONSTANT_MACROS
-#define __STDC_CONSTANT_MACROS
-#endif
-
-#include "pstdint.h"
-
-#define AL_SYSTEM_LIB_VERSION 0.01
-
-#if defined(WIN32) || defined(__WINDOWS_MM__)
-	#define AL_WIN32 1
-	#include <windows.h>
-	#ifdef AL_EXPORTS
-		#define AL_API __declspec(dllexport)
-	#else
-		#define AL_API __declspec(dllimport)
-	#endif
-#elif defined( __APPLE__ ) && defined( __MACH__ )
-	#define AL_OSX 1
-	#define AL_API extern
-	#include "stdint.h"
-#else
-	#define AL_LINUX 1
-	#define AL_API extern
-	#include "stdint.h"
-#endif
-
-#if !defined(MIN)
-    #define MIN(A,B)	({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __a : __b; })
-#endif
-
-#if !defined(MAX)
-    #define MAX(A,B)	({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __b : __a; })
-#endif
-
 /*
-	Library initalization / tear-down
-	It is safe to call al_initialize() multiple times.
-	al_terminate() must be called only once.
+	What would a basic socket class need?
+	
+	binding methods for UDP and TCP are very different
+	receive-only or send-only or duplex?
 */
-AL_API int al_initialize();
-AL_API int al_terminate();
 
-#endif /* INCLUDE_AL_SYSTEM_CONFIG_H */
+#endif /* include guard */

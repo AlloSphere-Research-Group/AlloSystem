@@ -29,6 +29,7 @@ static void osc_parsebundle(const osc::ReceivedBundle & p, Recv::MessageParser h
 
 Recv::Recv(unsigned int port) 
 : mPort(port) {
+	al_initialize();
 	
 	check_apr(apr_pool_initialize());
 	check_apr(apr_pool_create(&mPool, NULL));
@@ -57,9 +58,10 @@ size_t Recv::recv(char * buffer, size_t maxlen) {
 }
 
 size_t Recv::recv(MessageParser handler, void * userdata, size_t maxlen) {
-	char buffer[maxlen];apr_size_t len = maxlen;
-	check_apr(apr_socket_recv(mSock, buffer, &len));
-	if (len) {
+	char buffer[maxlen];
+	apr_size_t len = maxlen;
+	apr_status_t res = apr_socket_recv(mSock, buffer, &len);
+	if (res == 0 && len) {
 		osc::ReceivedPacket p(buffer, len);
 		if(p.IsBundle()) {
 			osc_parsebundle(osc::ReceivedBundle(p), handler, userdata);
@@ -72,6 +74,7 @@ size_t Recv::recv(MessageParser handler, void * userdata, size_t maxlen) {
 	
 Send::Send(const char * address, unsigned int port) 
 : mPort(port) {
+	al_initialize();
 
 	check_apr(apr_pool_initialize());
 	check_apr(apr_pool_create(&mPool, NULL));

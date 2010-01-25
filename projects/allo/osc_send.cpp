@@ -4,11 +4,7 @@
 
 int main (int argc, char * argv[]) {
 	
-	// init APR:
-	apr_initialize();
-	atexit(apr_terminate);	// ensure apr tear-down
-	
-	osc::Send * sender = new osc::Send("localhost", 7009);
+	osc::Send sender("localhost", 7009);
 	
 	char data[OSC_DEFAULT_MAX_MESSAGE_LEN];
 	osc::OutboundPacketStream packet(data, OSC_DEFAULT_MAX_MESSAGE_LEN);
@@ -18,12 +14,11 @@ int main (int argc, char * argv[]) {
 		packet << i;
 		packet << osc::EndMessage;
 		
-		printf("sent %d bytes\n", sender->send(packet));
-		packet.Clear();
+		printf("sent %d bytes\n", sender.send(packet));
 		
+		packet.Clear();
 		al_sleep(0.1);
 	}
 	
-	delete sender;
 	return 0;
 }

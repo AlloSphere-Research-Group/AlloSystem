@@ -8,23 +8,17 @@ void osc_parsemessage(const osc::ReceivedMessage & p, void * userdata) {
 }
 
 int main (int argc, char * argv[]) {
-	// init APR:
-	apr_initialize();
-	atexit(apr_terminate);	// ensure apr tear-down
 	
 	unsigned int port = 7007;
-	osc::Recv * receiver = new osc::Recv(port);
-
-	// receive data:
+	osc::Recv receiver(port);
+	
 	for (int i=0; i<1000; i++) {
-		apr_size_t len;
-		char data[OSC_DEFAULT_MAX_MESSAGE_LEN];
-		do {
-			len = receiver->recv(osc_parsemessage, NULL);
-		} while (len > 0);
 		al_sleep(0.01);
+		size_t len = 0;
+		do {
+			len = receiver.recv(osc_parsemessage, NULL);
+		} while (len > 0);
 	}
 	
-	delete receiver;
 	return 0;
 }
