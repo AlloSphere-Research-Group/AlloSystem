@@ -61,7 +61,7 @@
 
 #include <string>
 #include <string.h>		/* memset() */
-#include <portaudio.h>
+#include "portaudio.h"
 
 
 namespace allo{

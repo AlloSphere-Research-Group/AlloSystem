@@ -4,6 +4,8 @@
 #include "types/al_types.h"
 #include "types/al_socktube.h"
 
+#include "io/al_AudioIO.hpp"
+
 /* Apache Portable Runtime */
 #include "apr_general.h"
 #include "apr_errno.h"
@@ -13,7 +15,7 @@
 
 #include "stdlib.h"
 
-#define MAX_MESSAGE_LEN (4096)
+#define MAX_MESSAGE_LEN (AL_SOCKTUBE_MAXPACKETSIZE+1)
 
 int active = 1;
 al_socktube sock = NULL;
@@ -22,9 +24,6 @@ int childcount = 0;
 
 /* APR threads/mutexes require a memory pool */
 static apr_pool_t * main_mempool;
-static apr_thread_mutex_t * sub_mutex;
-static apr_threadattr_t * sub_thread_attr;
-static apr_thread_t * sub_thread;
 
 static apr_status_t check_apr(apr_status_t err) {
 	char errstr[1024];
@@ -35,64 +34,67 @@ static apr_status_t check_apr(apr_status_t err) {
 	return err;
 }
 
-
-void * subthreadfunc(apr_thread_t * thread, void * userdata) {
+void audioCB(allo::AudioIOData& io){
+	char imsg[MAX_MESSAGE_LEN];
+	char omsg[MAX_MESSAGE_LEN];
+	
+	printf("~");
+	memset(imsg, 0, MAX_MESSAGE_LEN);		
+	int readbytes = al_socktube_child_read(sock, imsg);
+	while (readbytes > 0) {
+		//printf("child read %d %d '%s'\n", readbytes, strlen(imsg), imsg);
 		
-	while(active) {
-		al_sleep(0.001);
-//		check_apr(apr_thread_mutex_lock(sub_mutex));
-//		check_apr(apr_thread_mutex_unlock(sub_mutex));
-		
-		char imsg[MAX_MESSAGE_LEN];
-		char omsg[MAX_MESSAGE_LEN];
-		
-		size_t len = 0;
-		do {
-			memset(imsg, 0, MAX_MESSAGE_LEN);
-			len = al_socktube_child_read(sock, imsg, MAX_MESSAGE_LEN);
-			while (len) {
-				printf("child read %d '%s'\n", len, imsg);
-				
-				memset(omsg, 0, MAX_MESSAGE_LEN);
-				sprintf(omsg, "reply %d \n", childcount++);
-				if (al_socktube_child_write(sock, omsg, 1+strlen(omsg))) {
-					printf("child write error\n");
-				}
-				
-				memset(imsg, 0, MAX_MESSAGE_LEN);
-				len = al_socktube_child_read(sock, imsg, MAX_MESSAGE_LEN);
-			}
-		} while(len);
-		
-		apr_thread_yield();
+		memset(imsg, 0, MAX_MESSAGE_LEN);
+		readbytes = al_socktube_child_read(sock, imsg);
 	}
-	apr_thread_exit(thread, 0);
-	return NULL;
+	
+	// write a ping
+	memset(omsg, 0, MAX_MESSAGE_LEN);
+	sprintf(omsg, "audio %d", childcount++);
+	if (al_socktube_child_write(sock, omsg, strlen(omsg))) {
+		printf("child write error\n");
+	}
+	
+	
+//	size_t len = 0;
+//	do {
+//		memset(imsg, 0, MAX_MESSAGE_LEN);
+//		len = al_socktube_child_read(sock, imsg);
+//		while (len) {
+//			//printf("child read %d %d '%s'\n", len, strlen(imsg), imsg);
+//			
+//			memset(omsg, 0, MAX_MESSAGE_LEN);
+//			sprintf(omsg, "reply %d ", childcount++);
+//			if (al_socktube_child_write(sock, omsg, strlen(omsg))) {
+//				printf("child write error\n");
+//			}
+//			
+//			memset(imsg, 0, MAX_MESSAGE_LEN);
+//			len = al_socktube_child_read(sock, imsg);
+//		}
+//	} while(len);
 }
 
 void ontick(al_nsec time, void * userdata) {
 	
 	al_sec t = time * al_time_ns2s;
-//	if (!APR_STATUS_IS_EBUSY(apr_thread_mutex_trylock(sub_mutex))) {
-//		check_apr(apr_thread_mutex_unlock(sub_mutex));
-//	} else {
-//		printf("busy\n");
-//	}
+	
+	printf(".");
 
 	char imsg[MAX_MESSAGE_LEN];
 	memset(imsg, 0, MAX_MESSAGE_LEN);
-	size_t len = al_socktube_parent_read(sock, imsg, MAX_MESSAGE_LEN);
+	size_t len = al_socktube_parent_read(sock, (void *)imsg);
 	while (len) {
 		printf("parent read %d '%s'\n", len, imsg);
-		len = al_socktube_parent_read(sock, imsg, MAX_MESSAGE_LEN);
+		len = al_socktube_parent_read(sock, imsg);
 	}
 	
-	for (int i=0; i<4; i++) {
+	for (int i=0; i<1000; i++) {
 		char omsg[MAX_MESSAGE_LEN];
 		memset(omsg, 0, MAX_MESSAGE_LEN);
-		sprintf(omsg, "sent %d @%f \n", parentcount++, t);
+		sprintf(omsg, "sent %d @%f ", parentcount++, t);
 		if (al_socktube_parent_write(sock, omsg, strlen(omsg))) {
-			printf("write error\n");
+			printf("parent write error\n");
 		}
 	}
 		
@@ -102,17 +104,7 @@ void ontick(al_nsec time, void * userdata) {
 	}
 }
 
-void onquit(void * userdata) {
-	apr_status_t err;
-	
-	// wait for subthread to finish:
-	check_apr(apr_thread_join(&err, sub_thread));
-	
-	// free main memory pool:
-	apr_pool_destroy(main_mempool);
-	
-	printf("terminated\n");
-}
+void onquit(void * userdata) {}
 
 int main (int argc, char * argv[]) {
 	
@@ -126,18 +118,19 @@ int main (int argc, char * argv[]) {
 	apr_allocator_max_free_set(apr_pool_allocator_get(main_mempool), 1024);
 
 	sock = al_socktube_create(); 
-
-	// create subthread:
-	check_apr(apr_threadattr_create(&sub_thread_attr, main_mempool));
-	check_apr(apr_threadattr_detach_set(sub_thread_attr, 0)); // detached was the default
-	check_apr(apr_thread_mutex_create(&sub_mutex, APR_THREAD_MUTEX_DEFAULT, main_mempool));
-	check_apr(apr_thread_create(&sub_thread, sub_thread_attr, subthreadfunc, NULL, main_mempool));
 	
+	allo::AudioIO audioIO(64, 44100, audioCB, NULL, 2,2);
+	audioIO.start();
 
 	// enter main loop
 	al_main_enter(0.01, ontick, NULL, onquit);
 
+	audioIO.stop();
+	
 	al_socktube_free(&sock);
+	
+	// free main memory pool:
+	apr_pool_destroy(main_mempool);
 	
 	return 0;
 }

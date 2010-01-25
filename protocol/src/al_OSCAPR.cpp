@@ -27,15 +27,18 @@ static void osc_parsebundle(const osc::ReceivedBundle & p, Recv::MessageParser h
 	}
 }
 
-Recv::Recv(apr_pool_t * pool, unsigned int port) 
-: mPool(pool), mPort(port) {
-
+Recv::Recv(unsigned int port) 
+: mPort(port) {
+	
+	check_apr(apr_pool_initialize());
+	check_apr(apr_pool_create(&mPool, NULL));
+	
 	/* @see http://dev.ariel-networks.com/apr/apr-tutorial/html/apr-tutorial-13.html */
 	// create socket:
 	apr_sockaddr_t * sa;
 	apr_socket_t * sock;
-	check_apr(apr_sockaddr_info_get(&sa, NULL, APR_INET, port, 0, pool));
-	check_apr(apr_socket_create(&sock, sa->family, SOCK_DGRAM, APR_PROTO_UDP, pool));
+	check_apr(apr_sockaddr_info_get(&sa, NULL, APR_INET, port, 0, mPool));
+	check_apr(apr_socket_create(&sock, sa->family, SOCK_DGRAM, APR_PROTO_UDP, mPool));
 	check_apr(apr_socket_bind(sock, sa));
 	check_apr(apr_socket_opt_set(sock, APR_SO_NONBLOCK, 1));
 	mAddress = sa;
@@ -44,6 +47,7 @@ Recv::Recv(apr_pool_t * pool, unsigned int port)
 
 Recv::~Recv() {
 	apr_socket_close(mSock);
+	apr_pool_destroy(mPool);
 }
 
 size_t Recv::recv(char * buffer, size_t maxlen) {
@@ -66,15 +70,18 @@ size_t Recv::recv(MessageParser handler, void * userdata, size_t maxlen) {
 	return len;
 }
 	
-Send::Send(apr_pool_t * pool, const char * address, unsigned int port) 
-: mPool(pool), mPort(port) {
+Send::Send(const char * address, unsigned int port) 
+: mPort(port) {
+
+	check_apr(apr_pool_initialize());
+	check_apr(apr_pool_create(&mPool, NULL));
 
 	/* @see http://dev.ariel-networks.com/apr/apr-tutorial/html/apr-tutorial-13.html */
 	// create socket:
 	apr_sockaddr_t * sa;
 	apr_socket_t * sock;
-	check_apr(apr_sockaddr_info_get(&sa, address, APR_INET, port, 0, pool));
-	check_apr(apr_socket_create(&sock, sa->family, SOCK_DGRAM, APR_PROTO_UDP, pool));
+	check_apr(apr_sockaddr_info_get(&sa, address, APR_INET, port, 0, mPool));
+	check_apr(apr_socket_create(&sock, sa->family, SOCK_DGRAM, APR_PROTO_UDP, mPool));
 	check_apr(apr_socket_connect(sock, sa));
 	check_apr(apr_socket_opt_set(sock, APR_SO_NONBLOCK, 1));
 	mAddress = sa;
@@ -83,6 +90,7 @@ Send::Send(apr_pool_t * pool, const char * address, unsigned int port)
 
 Send::~Send() {
 	apr_socket_close(mSock);
+	apr_pool_destroy(mPool);
 }
 
 size_t Send::send(const char * buffer, size_t len) {

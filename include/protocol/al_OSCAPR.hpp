@@ -58,7 +58,7 @@ public:
 	/* 
 		Throws exception on error
 	*/
-	Recv(apr_pool_t * pool, unsigned int port = 7007);
+	Recv(unsigned int port = 7007);
 	~Recv();
 	
 	/*
@@ -90,7 +90,7 @@ public:
 	/* 
 		Throws exception on error
 	*/
-	Send(apr_pool_t * pool, const char * address = "localhost", unsigned int port = 7007);
+	Send(const char * address = "localhost", unsigned int port = 7007);
 	~Send();
 	
 	/*

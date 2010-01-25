@@ -28,10 +28,10 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#include "al_pq.h"
+#include "system/al_config.h"
+#include <stdio.h>
 
-#include <limits.h>
-#include <math.h>
+#define AL_SOCKTUBE_MAXPACKETSIZE (255)
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,7 +44,6 @@ extern "C" {
 */
 typedef struct al_socktube_struct {
 	int socks[2];
-	
 } al_socktube_t;
 typedef al_socktube_t * al_socktube;
 
@@ -53,17 +52,18 @@ AL_API void al_socktube_free(al_socktube * x);
 
 /*
 	read data from the socktube (up to maximum length len)
-	returns bytes read
+	returns size of data read, or 0 if there is no data to read
 */
-AL_API int al_socktube_parent_read(al_socktube x, char * buffer, size_t len);
-AL_API int al_socktube_child_read(al_socktube x, char * buffer, size_t len);
+AL_API int al_socktube_parent_read(al_socktube x, void * buffer);
+AL_API int al_socktube_child_read(al_socktube x, void * buffer);
 
 /*
-	write data to the socktube (of length len)
-	returns 0 on successful write
+	write data packet to the socktube (of length len)
+		data packets should be terminated with a '\n' newline character
+	returns 0 on successful write, -1 on failure
 */
-AL_API int al_socktube_parent_write(al_socktube x, char * buffer, size_t len);
-AL_API int al_socktube_child_write(al_socktube x, char * buffer, size_t len);
+AL_API int al_socktube_parent_write(al_socktube x, void * buffer, size_t size);
+AL_API int al_socktube_child_write(al_socktube x, void * buffer, size_t size);
 
 
 #ifdef __cplusplus
