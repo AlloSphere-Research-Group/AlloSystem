@@ -2,7 +2,7 @@
 #include "protocol/al_Serialize.h"
 
 uint32_t serDecode(const char * b, void * data){
-	SerHeader h = serGetHeader(b);
+	struct SerHeader h = serGetHeader(b);
 	uint32_t SOH = serHeaderSize();
 	uint32_t r = SOH;
 	switch(h.type){
@@ -21,18 +21,18 @@ uint32_t serDecode(const char * b, void * data){
 	return r;
 }
 
-uint32_t serElementsSize(const SerHeader * h){
+uint32_t serElementsSize(const struct SerHeader * h){
 	return serTypeSize(h->type) * h->num;
 }
 
-SerHeader serGetHeader(const char * buf){
-	SerHeader h;
+struct SerHeader serGetHeader(const char * buf){
+	struct SerHeader h;
 	h.type = buf[0];
 	serCopy4(&h.num, buf+1, 1);
 	return h;
 }
 
-const char * serStringifyHeader(const SerHeader * h){
+const char * serStringifyHeader(const struct SerHeader * h){
 	static char s[32];
 	sprintf(s, "%s %d", serStringifyType(h->type), h->num);
 	return s;

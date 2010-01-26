@@ -47,6 +47,10 @@
 #include "system/al_Config.h"
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //#define SER_IS_BIG_ENDIAN
 
 /* Serialization data types */
@@ -68,10 +72,10 @@ enum{
 #define SER_HEADER_SIZE 5
 
 /* Serialized data header */
-typedef struct _SerHeader {
+struct SerHeader{
 	uint8_t type;		/* type of data */
 	uint32_t num;		/* number of data elements */
-} SerHeader;
+};
 
 
 /* Serialized data header. Don't think this is needed... */
@@ -82,38 +86,38 @@ typedef struct _SerHeader {
 
 
 /* Copy 1-byte elements */
-uint32_t serCopy1(void * dst, const void * src, uint32_t num);
+static uint32_t serCopy1(void * dst, const void * src, uint32_t num);
 
 /* Copy 2-byte elements in little endian byte order */
-uint32_t serCopy2(void * dst, const void * src, uint32_t num);
+static uint32_t serCopy2(void * dst, const void * src, uint32_t num);
 
 /* Copy 4-byte elements in little endian byte order */
-uint32_t serCopy4(void * dst, const void * src, uint32_t num);
+static uint32_t serCopy4(void * dst, const void * src, uint32_t num);
 
 /* Copy 8-byte elements in little endian byte order */
-uint32_t serCopy8(void * dst, const void * src, uint32_t num);
+static uint32_t serCopy8(void * dst, const void * src, uint32_t num);
 
 /* Decode serialized data. Returns number of bytes parsed */
 uint32_t serDecode(const char * b, void * data);
 
 /*  */
-SerHeader serGetHeader(const char * buf);
+struct SerHeader serGetHeader(const char * buf);
 
 /* Returns header size in bytes */
-inline int serHeaderSize(){ return SER_HEADER_SIZE; }
+static inline int serHeaderSize(){ return SER_HEADER_SIZE; }
 
 /* Returns size of data type in bytes */
 int serTypeSize(uint8_t t);
 
-uint32_t serElementsSize(const SerHeader * h);
+uint32_t serElementsSize(const struct SerHeader * h);
 
-void serSwap(char * a, char * b);
-void serSwapBytes2(void * v);
-void serSwapBytes4(void * v);
-void serSwapBytes8(void * v);
+static void serSwap(char * a, char * b);
+static void serSwapBytes2(void * v);
+static void serSwapBytes4(void * v);
+static void serSwapBytes8(void * v);
 
 /* Returns human-readable string of header */
-const char * serStringifyHeader(const SerHeader * h);
+const char * serStringifyHeader(const struct SerHeader * h);
 
 /* Returns human-readable string of type */
 const char * serStringifyType(uint8_t t);
@@ -128,7 +132,7 @@ const char * serStringifyType(uint8_t t);
 
 #define SOH serHeaderSize()
 
-inline void serHeaderWrite(char * b, uint8_t type, uint32_t num){
+static inline void serHeaderWrite(char * b, uint8_t type, uint32_t num){
 	b[0] = type;
 	serCopy4(b+1, &num, 1);
 }
@@ -136,43 +140,40 @@ inline void serHeaderWrite(char * b, uint8_t type, uint32_t num){
 #define DO(B, N)\
 	serHeaderWrite(b, type, N);\
 	return SOH + serCopy##B(b+SOH, v, N)
-inline uint32_t serEncode1(uint8_t type, char * b, const void * v, uint32_t n){ DO(1,n); }
-inline uint32_t serEncode2(uint8_t type, char * b, const void * v, uint32_t n){ DO(2,n); }
-inline uint32_t serEncode4(uint8_t type, char * b, const void * v, uint32_t n){ DO(4,n); }
-inline uint32_t serEncode8(uint8_t type, char * b, const void * v, uint32_t n){ DO(8,n); }
+static inline uint32_t serEncode1(uint8_t type, char * b, const void * v, uint32_t n){ DO(1,n); }
+static inline uint32_t serEncode2(uint8_t type, char * b, const void * v, uint32_t n){ DO(2,n); }
+static inline uint32_t serEncode4(uint8_t type, char * b, const void * v, uint32_t n){ DO(4,n); }
+static inline uint32_t serEncode8(uint8_t type, char * b, const void * v, uint32_t n){ DO(8,n); }
 #undef DO
 
-inline uint32_t serEncodeFloat32(char * b, const float * v   , uint32_t n){ return serEncode4(SER_FLOAT32, b,v,n); }
-inline uint32_t serEncodeFloat64(char * b, const double * v  , uint32_t n){ return serEncode8(SER_FLOAT64, b,v,n); }
-inline uint32_t serEncodeInt8   (char * b, const int8_t * v  , uint32_t n){ return serEncode1(SER_INT8   , b,v,n); }
-inline uint32_t serEncodeInt16  (char * b, const int16_t * v , uint32_t n){ return serEncode2(SER_INT16  , b,v,n); }
-inline uint32_t serEncodeInt32  (char * b, const int32_t * v , uint32_t n){ return serEncode4(SER_INT32  , b,v,n); }
-inline uint32_t serEncodeInt64  (char * b, const int64_t * v , uint32_t n){ return serEncode8(SER_INT64  , b,v,n); }
-/* no bool in C
-inline uint32_t serEncodeBool   (char * b, const bool * v    , uint32_t n){ return serEncode1(SER_UINT8  , b,v,n); }
-*/
-inline uint32_t serEncodeUInt8  (char * b, const uint8_t * v , uint32_t n){ return serEncode1(SER_UINT8  , b,v,n); }
-inline uint32_t serEncodeUInt16 (char * b, const uint16_t * v, uint32_t n){ return serEncode2(SER_UINT16 , b,v,n); }
-inline uint32_t serEncodeUInt32 (char * b, const uint32_t * v, uint32_t n){ return serEncode4(SER_UINT32 , b,v,n); }
-inline uint32_t serEncodeUInt64 (char * b, const uint64_t * v, uint32_t n){ return serEncode8(SER_UINT64 , b,v,n); }
+static inline uint32_t serEncodeFloat32(char * b, const float * v   , uint32_t n){ return serEncode4(SER_FLOAT32, b,v,n); }
+static inline uint32_t serEncodeFloat64(char * b, const double * v  , uint32_t n){ return serEncode8(SER_FLOAT64, b,v,n); }
+static inline uint32_t serEncodeInt8   (char * b, const int8_t * v  , uint32_t n){ return serEncode1(SER_INT8   , b,v,n); }
+static inline uint32_t serEncodeInt16  (char * b, const int16_t * v , uint32_t n){ return serEncode2(SER_INT16  , b,v,n); }
+static inline uint32_t serEncodeInt32  (char * b, const int32_t * v , uint32_t n){ return serEncode4(SER_INT32  , b,v,n); }
+static inline uint32_t serEncodeInt64  (char * b, const int64_t * v , uint32_t n){ return serEncode8(SER_INT64  , b,v,n); }
+static inline uint32_t serEncodeUInt8  (char * b, const uint8_t * v , uint32_t n){ return serEncode1(SER_UINT8  , b,v,n); }
+static inline uint32_t serEncodeUInt16 (char * b, const uint16_t * v, uint32_t n){ return serEncode2(SER_UINT16 , b,v,n); }
+static inline uint32_t serEncodeUInt32 (char * b, const uint32_t * v, uint32_t n){ return serEncode4(SER_UINT32 , b,v,n); }
+static inline uint32_t serEncodeUInt64 (char * b, const uint64_t * v, uint32_t n){ return serEncode8(SER_UINT64 , b,v,n); }
 
 
 
 
-inline void serSwap(char * a, char * b){ char t=*a; *a=*b; *b=t; }
+static inline void serSwap(char * a, char * b){ char t=*a; *a=*b; *b=t; }
 
-inline void serSwapBytes2(void * v){	
+static inline void serSwapBytes2(void * v){	
 	char * b = (char *)v;
 	serSwap(b  , b+1);
 }
 
-inline void serSwapBytes4(void * v){	
+static inline void serSwapBytes4(void * v){	
 	char * b = (char *)v;
 	serSwap(b  , b+3);
 	serSwap(b+1, b+2);
 }
 
-inline void serSwapBytes8(void * v){	
+static inline void serSwapBytes8(void * v){	
 	char * b = (char *)v;
 	serSwap(b  , b+7);
 	serSwap(b+1, b+6);
@@ -181,19 +182,19 @@ inline void serSwapBytes8(void * v){
 }
 
 
-inline uint32_t serCopy1(void * d, const void * s, uint32_t n){
+static inline uint32_t serCopy1(void * d, const void * s, uint32_t n){
 	memcpy(d,s,n); return n;
 }
 
 #define DEF_LE(B, S)\
-inline uint32_t serCopy##B(void * d, const void * s, uint32_t n){\
+static inline uint32_t serCopy##B(void * d, const void * s, uint32_t n){\
 	n = n<<S;\
 	memcpy(d,s,n);\
 	return n;\
 }
 
 #define DEF_BE(p, B, S)\
-inline uint32_t serCopy##B(void * d, const void * s, uint32_t n){\
+static inline uint32_t serCopy##B(void * d, const void * s, uint32_t n){\
 	n = n<<S;\
 	memcpy(d,s,n);\
 	char * t = (char *)d;\
@@ -211,5 +212,9 @@ DEF_LE(2,1) DEF_LE(4,2) DEF_LE(8,3)
 #undef DEF_LE
 
 #undef SOH
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
