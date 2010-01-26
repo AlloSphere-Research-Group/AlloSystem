@@ -211,6 +211,8 @@ public:
 	const Keyboard& keyboard(){ return mKeyboard; }
 	const Mouse& mouse(){ return mMouse; }
 
+	void doFrame();										///< Calls onFrame() and swaps buffers
+
 	WindowGL& cursor(Cursor::t v);						///< Set cursor type
 	WindowGL& cursorHide(bool v);						///< Set cursor hiding
 	WindowGL& dimensions(const Dim& v);

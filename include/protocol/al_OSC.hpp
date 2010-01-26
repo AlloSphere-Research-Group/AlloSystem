@@ -88,12 +88,8 @@ struct RecvPacket{
 	osc::ReceivedMessageArgumentStream args() const { return msg.ArgumentStream(); }
 	osc::ReceivedMessage::const_iterator argi() const { return msg.ArgumentsBegin(); }
 
-	void print(FILE * f=stdout) const {
-		fprintf(f,"sender:    %s %d\n", remoteIP().c_str(), remotePort());
-		fprintf(f,"time:      %lld\n", time);
-		fprintf(f,"arguments: %ld\n", argc());
-		fprintf(f,"message:   %s %s\n", addr().c_str(), tags().c_str());
-	}
+	void print(FILE * f=stdout) const;
+	void printVerbose(FILE * f=stdout) const;
 	
 	std::string remoteIP() const { char b[32]; remote.AddressAsString(b); return b; }
 	int remotePort() const { return remote.port; }

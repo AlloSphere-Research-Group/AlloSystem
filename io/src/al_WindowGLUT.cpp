@@ -366,17 +366,31 @@ private:
 		
 		// If there is a valid implementation, then draw and schedule next draw...
 		if(impl){
-			int current = glutGetWindow();
-			if(winID != current) glutSetWindow(winID);
-			
-			WindowGL * win = getWindow();
+//			int current = glutGetWindow();
+//			if(winID != current) glutSetWindow(winID);
+//			
+//			WindowGL * win = getWindow();
+//			if(win){
+//				win->doFrame();
+//				if(win->fps() > 0){
+//					glutTimerFunc((unsigned int)(1000.0/win->fps()), scheduleDrawStatic, winID);
+//				}
+//			}
+//			
+//			if(current) glutSetWindow(current);
+
+
+			WindowGL * win = impl->mWindow;
+
 			if(win){
-				win->onFrame();
-				glutSwapBuffers();
-				glutTimerFunc((unsigned int)(1000.0/win->fps()), scheduleDrawStatic, winID);
+				win->doFrame();
+				if(win->fps() > 0){
+					glutTimerFunc((unsigned int)(1000.0/win->fps()), scheduleDrawStatic, winID);
+				}
 			}
 			
-			if(current) glutSetWindow(current);
+			//if(current) glutSetWindow(current);
+
 		}
 	}
 
@@ -513,7 +527,19 @@ WindowGL& WindowGL::dimensions(const Dim& v){
 	return *this;
 }
 
-WindowGL& WindowGL::fps(double v){ mImpl->mFPS = v; return *this; }
+void WindowGL::doFrame(){
+	int winID = mImpl->mID;
+	int current = glutGetWindow();
+	if(winID != current) glutSetWindow(winID);
+	onFrame();
+	glutSwapBuffers();
+}
+
+WindowGL& WindowGL::fps(double v){
+	if(mImpl->mFPS <= 0 && v > 0) mImpl->scheduleDraw();
+	mImpl->mFPS = v;
+	return *this;
+}
 
 WindowGL& WindowGL::fullScreen(bool v){
 

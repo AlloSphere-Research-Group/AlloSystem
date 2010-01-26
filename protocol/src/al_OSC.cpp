@@ -3,6 +3,19 @@
 //namespace allo{
 namespace osc{
 
+void RecvPacket::print(FILE * f) const {
+	fprintf(f,"[%15s %d] %s %s\n", remoteIP().c_str(), remotePort(), addr().c_str(), tags().c_str());
+}
+
+void RecvPacket::printVerbose(FILE * f) const {
+	fprintf(f,"sender:    %s %d\n", remoteIP().c_str(), remotePort());
+	fprintf(f,"time:      %lld\n", time);
+	fprintf(f,"arguments: %ld\n", argc());
+	fprintf(f,"message:   %s %s\n", addr().c_str(), tags().c_str());
+}
+
+
+
 OSCRecv::OSCRecv(networkRecvCB cb, void * userData)
 :	callback(cb), user(userData), mPort(0), mTime(1), mStarted(false)
 {}
