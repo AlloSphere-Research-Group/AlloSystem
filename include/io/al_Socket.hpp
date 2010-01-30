@@ -2,7 +2,7 @@
 #define INCLUDE_AL_IO_SOCKET_HPP 1
 
 /*
- *	Audio device and input/output streaming
+ *	Network I/O
  *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
  */
 
@@ -34,5 +34,14 @@
 	binding methods for UDP and TCP are very different
 	receive-only or send-only or duplex?
 */
+
+#include <string>
+
+namespace allo{
+
+/// Get name of current host
+std::string getHostName();
+
+} // allo::
 
 #endif /* include guard */
