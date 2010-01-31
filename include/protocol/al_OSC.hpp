@@ -162,6 +162,9 @@ public:
 
 	/// Add string to current packet
 	OSCSend& operator << (const std::string& v){ (*mStream) << v.c_str(); return *this; }
+
+	/// Add unsigned integer to current packet
+	OSCSend& operator << (unsigned int v){ (*mStream) << osc::int32(v); return *this; }
 	
 	/// Adds a remote endpoint to receive messages
 	OSCSend& add(const char * remoteIP, int port);
