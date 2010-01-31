@@ -3,8 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static int initialized = 0;
-
 static apr_status_t check_apr(apr_status_t err) {
 	char errstr[1024];
 	if (err != APR_SUCCESS) {
@@ -15,19 +13,25 @@ static apr_status_t check_apr(apr_status_t err) {
 	return err;
 }
 
+static void initialize(int on) {
+	/* safe way to ensure static initialization */
+	static int initialized = 0;
+
+	if (on && initialized == 0) {
+		check_apr(apr_initialize());
+	} else if (!on && initialized == 1) {
+		apr_terminate();
+	}
+	
+	initialized = on;
+}
+
 int al_initialize() {
-	if (initialized) return initialized;
-	
-	check_apr(apr_initialize());
-	initialized = 1;
-	
-	return initialized;
+	initialize(1);
+	return 1;
 }
 
 int al_terminate() {
-	if (initialized) {
-		apr_terminate();
-		initialized = 0;
-	}
-	return initialized;
+	initialize(0);
+	return 0;
 }
