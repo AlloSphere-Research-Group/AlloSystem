@@ -156,8 +156,12 @@ public:
 	OSCSend(const char * remoteIP, int port, int maxPacketSizeBytes=4096);
 	~OSCSend();
 
+	/// Add data to current packet
 	template <class T>
-	OutboundPacketStream& operator << (T data){ return (*mStream) << data; }
+	OSCSend& operator << (T data){ (*mStream) << data; return *this; }
+
+	/// Add string to current packet
+	OSCSend& operator << (const std::string& v){ (*mStream) << v.c_str(); return *this; }
 	
 	/// Adds a remote endpoint to receive messages
 	OSCSend& add(const char * remoteIP, int port);
