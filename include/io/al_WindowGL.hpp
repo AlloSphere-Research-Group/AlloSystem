@@ -226,6 +226,7 @@ public:
 	WindowGL& fullScreenToggle();
 	WindowGL& hide();
 	WindowGL& iconify();
+	WindowGL& makeActive();
 	WindowGL& show();
 	WindowGL& title(const std::string& v);
 

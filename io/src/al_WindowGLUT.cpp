@@ -576,6 +576,7 @@ WindowGL& WindowGL::fullScreenToggle(){
 
 WindowGL& WindowGL::hide(){ glutHideWindow(); return *this; }
 WindowGL& WindowGL::iconify(){ glutIconifyWindow(); return *this; }
+WindowGL& WindowGL::makeActive(){ glutSetWindow(mImpl->mID); return *this; }
 WindowGL& WindowGL::show(){ glutShowWindow(); return *this; }
 
 WindowGL& WindowGL::title(const std::string& v){
