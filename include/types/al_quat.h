@@ -20,7 +20,26 @@ typedef struct al_quat {
 
 al_quat * al_quat_create(double w, double x, double y, double z);
 void al_quat_free(al_quat ** q);
+
+void al_quat_from_quat(al_quat * dst, double w, double x, double y, double z);
+void al_quat_from_axisangle(al_quat * dst, double theta, double x, double y, double z);
+void al_quat_from_euler(al_quat * dst, double az, double el, double ba);
+
+void al_quat_to_vector_x(al_quat * q, double * x, double * y, double * z);
+void al_quat_to_vector_y(al_quat * q, double * x, double * y, double * z);
+void al_quat_to_vector_z(al_quat * q, double * x, double * y, double * z);
+void al_quat_to_matrix(al_quat * q, double * mat);
+
 void al_quat_normalize(al_quat * q);
 void al_quat_reset(al_quat * q);
+
+void al_quat_multiply_inplace(al_quat * q, al_quat * q2);
+void al_quat_multiply(al_quat * q, al_quat * q2, al_quat * result);
+void al_quat_inverse(al_quat * q, al_quat * result);
+void al_quat_rotate(al_quat * q, al_quat * q2);
+
+void al_quat_rotate_vector(al_quat * q, double * src, double * dst);
+void al_quat_rotate_vector_transposed(al_quat * q, double * src, double * dst);
+
 
 #endif /* include guard */

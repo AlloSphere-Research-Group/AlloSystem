@@ -46,7 +46,7 @@ inline Quat<T> :: Quat(T w, T x, T y, T z)
 
 template<typename T>
 inline Quat<T> :: Quat(const Quat & src) {
-	w = src->w; x = src->x; y = src->y; z = src->z;
+	w = src.w; x = src.x; y = src.y; z = src.z;
 }
 
 template<typename T>
@@ -84,14 +84,14 @@ inline void Quat<T> :: multiply(Quat * q1, Quat * q2) {
 
 template<typename T>
 inline void Quat<T> :: multiply(Quat * q1) {
-	Quat * q = new Quat(this);
+	Quat * q = new Quat(*this);
 	multiply(q1, q);
 	delete q;
 }
 
 template<typename T>
 inline void Quat<T> :: rotateby(Quat * dq) {
-	Quat * q = new Quat(this);
+	Quat * q = new Quat(*this);
 	multiply(q, dq);
 	delete q;
 }
