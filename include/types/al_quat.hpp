@@ -5,6 +5,10 @@
 
 namespace al {
 
+/*
+	Quat<double> is equivalent to struct al_quat
+*/
+
 template<typename T=double>
 class Quat {	
 public:
