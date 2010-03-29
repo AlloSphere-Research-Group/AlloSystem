@@ -18,4 +18,9 @@ typedef struct al_quat {
 	double z;
 } al_quat;
 
+al_quat * al_quat_create(double w, double x, double y, double z);
+void al_quat_free(al_quat ** q);
+void al_quat_normalize(al_quat * q);
+void al_quat_reset(al_quat * q);
+
 #endif /* include guard */
