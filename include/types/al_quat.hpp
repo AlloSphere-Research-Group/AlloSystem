@@ -9,10 +9,6 @@ class Quat : public al_quat {
 	Quat(double w = 1.0, double x = 0.0, double y = 0.0, double z = 0.0);
 	Quat(Quat * src);
 
-	double w;
-	double x;
-	double y;
-	double z;
 	int normcount;
 	static int normrate;
 	
