@@ -31,7 +31,6 @@ Recv::Recv(unsigned int port)
 : mPort(port) {
 	al_initialize();
 	
-	check_apr(apr_pool_initialize());
 	check_apr(apr_pool_create(&mPool, NULL));
 	
 	/* @see http://dev.ariel-networks.com/apr/apr-tutorial/html/apr-tutorial-13.html */
@@ -76,7 +75,6 @@ Send::Send(const char * address, unsigned int port)
 : mPort(port) {
 	al_initialize();
 
-	check_apr(apr_pool_initialize());
 	check_apr(apr_pool_create(&mPool, NULL));
 
 	/* @see http://dev.ariel-networks.com/apr/apr-tutorial/html/apr-tutorial-13.html */
