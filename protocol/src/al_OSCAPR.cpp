@@ -13,7 +13,7 @@ static apr_status_t check_apr(apr_status_t err) {
 }
 
 static void osc_parsemessage(const osc::ReceivedMessage & p) {
-	printf("address %s tags %s args %d\n", p.AddressPattern(), p.TypeTags(), p.ArgumentCount());
+	printf("address %s tags %s args %ld\n", p.AddressPattern(), p.TypeTags(), p.ArgumentCount());
 	// etc.
 }
 

@@ -58,8 +58,8 @@ void interleave(T * dst, const T * src, int numFrames, int numChannels){
 
 
 
-AudioIOData::AudioIOData(void * user) :
-	user(user),
+AudioIOData::AudioIOData(void * userData) :
+	user(userData),
 	mStream(0),
 	mFramesPerBuffer(0), mFramesPerSecond(0),
 	mBufI(0), mBufO(0), mBufA(0), mBufT(0), mNumI(0), mNumO(0), mNumA(0)
@@ -174,9 +174,9 @@ void AudioDevice::printAll(){
 //void (* AudioIO::callback)(AudioIOData &) = 0;
 
 AudioIO::AudioIO(
-	int framesPerBuf, double framesPerSec, void (* callbackA)(AudioIOData &), void * user,
+	int framesPerBuf, double framesPerSec, void (* callbackA)(AudioIOData &), void * userData,
 	int outChansA, int inChansA )
-:	AudioIOData(user),
+:	AudioIOData(userData),
 	callback(callbackA),
 	mErrNum(0),
 	mInDevice(AudioDevice::defaultInput()), mOutDevice(AudioDevice::defaultOutput()),
