@@ -33,7 +33,7 @@ int utSystem(){
 		al_nsec t, dt;
 		al_sec now, dts;
 
-	UT_PRINTF("\tSleeping %ld nsec... ", sleepns);
+	UT_PRINTF("\tSleeping %ld nsec... ", (long int)sleepns);
 		t = al_time_nsec();
 		al_sleep_nsec(sleepns);
 		dt = al_time_nsec() - t;

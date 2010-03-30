@@ -22,9 +22,9 @@ SRCS = $(IO_SRC) $(PRO_SRC) $(SYS_SRC) $(TYPES_SRC)
 OBJS = $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
 
-#----------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 # Targets
-#----------------------------------------------------------------------------
+#--------------------------------------------------------------------------
 $(OBJ_DIR)/%.o: %.cpp
 	@echo CC $< $@
 	@$(CC) -c $(CFLAGS) $< -o $@
@@ -60,7 +60,7 @@ cleanall:
 	@find $(BUILD_DIR) -type f ! -path '*.svn*' | xargs rm
 
 # Build (and run) all the unit tests
-#te
+#tests:
 #	@cd $(IO_DIR) && make tests
 #	@cd $(PRO_DIR) && make tests
 #	@cd $(SYS_DIR) && make tests
