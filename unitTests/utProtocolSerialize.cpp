@@ -5,6 +5,7 @@ using namespace al;
 int utProtocolSerialize(){
 
 	// Serialization
+	UT_PRINTF("protocol: serialization\n");
 	{	using namespace ser;
 
 		// Single element tests

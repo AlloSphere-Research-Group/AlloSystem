@@ -53,6 +53,9 @@ struct MyWindow : WindowGL{
 
 
 int utIOWindowGL(){
+
+	UT_PRINTF("io: window gl\n");
+
 	MyWindow win, win2;
 
 //	struct Func:TimedFunction{

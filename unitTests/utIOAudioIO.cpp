@@ -34,6 +34,7 @@ void audioCB(AudioIOData& io){
 
 int utIOAudioIO(){
 
+	UT_PRINTF("io: audio io\n");
 	AudioDevice::printAll();
 	AudioIO audioIO(128, 44100, audioCB, 0, 2, 1);
 	audioIO.start();

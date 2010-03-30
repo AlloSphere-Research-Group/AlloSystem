@@ -14,6 +14,12 @@
 #include "types/al_types.h"
 #include "types/al_types.hpp"
 
+#ifdef AL_UT_NOPRINT	/* disable printing to stdout */
+	#define UT_PRINTF	//
+#else
+	#define UT_PRINTF	printf
+#endif
+
 int utIOAudioIO();
 int utIOWindowGL();
 int utProtocolOSC();

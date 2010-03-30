@@ -4,6 +4,8 @@ typedef double data_t;
 
 int utTypes(){
 
+	UT_PRINTF("types: lattice\n");
+
 	// test the basic C functionality
 	{
 		const int comps = 1;	//
