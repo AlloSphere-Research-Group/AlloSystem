@@ -50,17 +50,17 @@ unitTests: $(BIN_DIR)/$(SLIB_FILE)
 .PHONY: clean
 clean:
 #	@echo $(VPATH)
-	@find $(BIN_DIR) -type f | xargs rm
+	@find $(BIN_DIR) -type f ! -path '*.svn*' | xargs rm
 #	@cd $(IO_DIR) && make clean
 #	@cd $(PRO_DIR) && make clean
 #	@cd $(SYS_DIR) && make clean
 
 .PHONY: cleanall
 cleanall:
-	@find $(BUILD_DIR) -type f | xargs rm
+	@find $(BUILD_DIR) -type f ! -path '*.svn*' | xargs rm
 
 # Build (and run) all the unit tests
-#tests:
+#te
 #	@cd $(IO_DIR) && make tests
 #	@cd $(PRO_DIR) && make tests
 #	@cd $(SYS_DIR) && make tests
