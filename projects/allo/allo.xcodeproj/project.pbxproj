@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		168EC8F11161CA2C00FCACC7 /* al_Time.h in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8EB1161CA2C00FCACC7 /* al_Time.h */; };
+		168EC8F21161CA2C00FCACC7 /* al_MainLoop.h in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8EC1161CA2C00FCACC7 /* al_MainLoop.h */; };
+		168EC8F31161CA2C00FCACC7 /* al_Config.h in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8ED1161CA2C00FCACC7 /* al_Config.h */; };
+		168EC8F41161CA2C00FCACC7 /* al_Time.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8EE1161CA2C00FCACC7 /* al_Time.hpp */; };
+		168EC8F51161CA2C00FCACC7 /* al_Thread.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8EF1161CA2C00FCACC7 /* al_Thread.hpp */; };
+		168EC8F61161CA2C00FCACC7 /* al_Thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8F01161CA2C00FCACC7 /* al_Thread.h */; };
 		3602B4D0110A67C9005DC3D0 /* liballo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballo.a */; };
 		3602B4D1110A67C9005DC3D0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		3602B4D2110A67C9005DC3D0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
@@ -125,6 +131,12 @@
 
 /* Begin PBXFileReference section */
 		08FB7796FE84155DC02AAC07 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		168EC8EB1161CA2C00FCACC7 /* al_Time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Time.h; sourceTree = "<group>"; };
+		168EC8EC1161CA2C00FCACC7 /* al_MainLoop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_MainLoop.h; sourceTree = "<group>"; };
+		168EC8ED1161CA2C00FCACC7 /* al_Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Config.h; sourceTree = "<group>"; };
+		168EC8EE1161CA2C00FCACC7 /* al_Time.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Time.hpp; sourceTree = "<group>"; };
+		168EC8EF1161CA2C00FCACC7 /* al_Thread.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Thread.hpp; sourceTree = "<group>"; };
+		168EC8F01161CA2C00FCACC7 /* al_Thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Thread.h; sourceTree = "<group>"; };
 		3602B4C7110A67B6005DC3D0 /* osc_receive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = osc_receive.cpp; sourceTree = "<group>"; };
 		3602B4D8110A67C9005DC3D0 /* oscreceive */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = oscreceive; sourceTree = BUILT_PRODUCTS_DIR; };
 		3602B53C110A6D3D005DC3D0 /* al_OSC.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OSC.hpp; sourceTree = "<group>"; };
@@ -166,11 +178,6 @@
 		365FA6C21161380F00A49D3F /* al_quat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_quat.cpp; sourceTree = "<group>"; };
 		36A20CFC110ACA0E0075A21C /* al_OSCAPR.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OSCAPR.hpp; sourceTree = "<group>"; };
 		36A20CFD110ACB0B0075A21C /* al_OSCAPR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_OSCAPR.cpp; sourceTree = "<group>"; };
-		36B4124810EFF7B8007B16D0 /* al_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_config.h; sourceTree = "<group>"; };
-		36B4124910EFF7B8007B16D0 /* al_mainloop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_mainloop.h; sourceTree = "<group>"; };
-		36B4124A10EFF7B8007B16D0 /* al_thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_thread.h; sourceTree = "<group>"; };
-		36B4124B10EFF7B8007B16D0 /* al_time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_time.h; sourceTree = "<group>"; };
-		36B4124C10EFF7B8007B16D0 /* al_time.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_time.hpp; sourceTree = "<group>"; };
 		36B4124E10EFF7B8007B16D0 /* al_pq.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_pq.h; sourceTree = "<group>"; };
 		36B4124F10EFF7B8007B16D0 /* al_pq.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_pq.hpp; sourceTree = "<group>"; };
 		36B4125010EFF7B8007B16D0 /* al_tube.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_tube.h; sourceTree = "<group>"; };
@@ -473,11 +480,12 @@
 		36B4124710EFF7B8007B16D0 /* system */ = {
 			isa = PBXGroup;
 			children = (
-				36B4124810EFF7B8007B16D0 /* al_config.h */,
-				36B4124910EFF7B8007B16D0 /* al_mainloop.h */,
-				36B4124A10EFF7B8007B16D0 /* al_thread.h */,
-				36B4124B10EFF7B8007B16D0 /* al_time.h */,
-				36B4124C10EFF7B8007B16D0 /* al_time.hpp */,
+				168EC8EB1161CA2C00FCACC7 /* al_Time.h */,
+				168EC8EC1161CA2C00FCACC7 /* al_MainLoop.h */,
+				168EC8ED1161CA2C00FCACC7 /* al_Config.h */,
+				168EC8EE1161CA2C00FCACC7 /* al_Time.hpp */,
+				168EC8EF1161CA2C00FCACC7 /* al_Thread.hpp */,
+				168EC8F01161CA2C00FCACC7 /* al_Thread.h */,
 			);
 			path = system;
 			sourceTree = "<group>";
@@ -697,6 +705,12 @@
 				36F46826110BE2E90082D21E /* al_WindowGL.hpp in Headers */,
 				365FA5F811612EA500A49D3F /* al_quat.hpp in Headers */,
 				365FA5FF116131C200A49D3F /* al_quat.h in Headers */,
+				168EC8F11161CA2C00FCACC7 /* al_Time.h in Headers */,
+				168EC8F21161CA2C00FCACC7 /* al_MainLoop.h in Headers */,
+				168EC8F31161CA2C00FCACC7 /* al_Config.h in Headers */,
+				168EC8F41161CA2C00FCACC7 /* al_Time.hpp in Headers */,
+				168EC8F51161CA2C00FCACC7 /* al_Thread.hpp in Headers */,
+				168EC8F61161CA2C00FCACC7 /* al_Thread.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -741,9 +755,9 @@
 			productReference = 3602B736110A9770005DC3D0 /* oscsend */;
 			productType = "com.apple.product-type.tool";
 		};
-		36B4130E10EFFA8D007B16D0 /* allo */ = {
+		36B4130E10EFFA8D007B16D0 /* allocore */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 36B4131A10EFFAC3007B16D0 /* Build configuration list for PBXNativeTarget "allo" */;
+			buildConfigurationList = 36B4131A10EFFAC3007B16D0 /* Build configuration list for PBXNativeTarget "allocore" */;
 			buildPhases = (
 				36B4130B10EFFA8D007B16D0 /* Headers */,
 				36B4130C10EFFA8D007B16D0 /* Sources */,
@@ -753,7 +767,7 @@
 			);
 			dependencies = (
 			);
-			name = allo;
+			name = allocore;
 			productName = libal;
 			productReference = 36B4130F10EFFA8D007B16D0 /* liballo.a */;
 			productType = "com.apple.product-type.library.static";
@@ -808,7 +822,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				36B4130E10EFFA8D007B16D0 /* allo */,
+				36B4130E10EFFA8D007B16D0 /* allocore */,
 				8DD76F620486A84900D96B5E /* alscheduling */,
 				3602B4CA110A67C9005DC3D0 /* oscreceive */,
 				3602B728110A9770005DC3D0 /* oscsend */,
@@ -876,22 +890,22 @@
 /* Begin PBXTargetDependency section */
 		3602B4CB110A67C9005DC3D0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 36B4130E10EFFA8D007B16D0 /* allo */;
+			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
 			targetProxy = 3602B4CC110A67C9005DC3D0 /* PBXContainerItemProxy */;
 		};
 		3602B729110A9770005DC3D0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 36B4130E10EFFA8D007B16D0 /* allo */;
+			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
 			targetProxy = 3602B72A110A9770005DC3D0 /* PBXContainerItemProxy */;
 		};
 		36B4131810EFFAA5007B16D0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 36B4130E10EFFA8D007B16D0 /* allo */;
+			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
 			targetProxy = 36B4131710EFFAA5007B16D0 /* PBXContainerItemProxy */;
 		};
 		36F464D9110B85E40082D21E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 36B4130E10EFFA8D007B16D0 /* allo */;
+			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
 			targetProxy = 36F464DA110B85E40082D21E /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -1299,7 +1313,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		36B4131A10EFFAC3007B16D0 /* Build configuration list for PBXNativeTarget "allo" */ = {
+		36B4131A10EFFAC3007B16D0 /* Build configuration list for PBXNativeTarget "allocore" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				36B4131010EFFA8E007B16D0 /* Debug */,
