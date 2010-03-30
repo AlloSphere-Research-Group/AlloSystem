@@ -42,7 +42,7 @@ extern "C" {
 } /* extern "C" */
 #endif
 
-#endif /* include guard */
+
 
 
 
@@ -213,3 +213,4 @@ void Thread::testCancel(void){
 
 } // al::
 
+#endif /* include guard */
