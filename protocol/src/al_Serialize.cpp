@@ -44,7 +44,6 @@ char * Deserializer::bufDec(){ return &mBuf[mStart]; }
 } // al::
 #endif
 
-
 uint32_t serDecode(const char * b, void * data){
 	struct SerHeader h = serGetHeader(b);
 	uint32_t SOH = serHeaderSize();
