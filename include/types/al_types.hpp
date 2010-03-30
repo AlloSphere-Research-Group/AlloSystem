@@ -36,18 +36,18 @@ namespace al {
 	Partial specialization function to get type
 	This demonstrates the principle by which a runtime type can be understood by templates
 */
-template<typename T> AlloTy getType() { return 0; }
-template<> AlloTy getType<uint8_t>() { return AlloUInt8Ty; }
-template<> AlloTy getType<uint16_t>() { return AlloUInt16Ty; }
-template<> AlloTy getType<uint32_t>() { return AlloUInt32Ty; }
-template<> AlloTy getType<uint64_t>() { return AlloUInt64Ty; }
-template<> AlloTy getType<int8_t>() { return AlloSInt8Ty; }
-template<> AlloTy getType<int16_t>() { return AlloSInt16Ty; }
-template<> AlloTy getType<int32_t>() { return AlloSInt32Ty; }
-template<> AlloTy getType<int64_t>() { return AlloSInt64Ty; }
-template<> AlloTy getType<float>() { return AlloFloat32Ty; }
-template<> AlloTy getType<double>() { return AlloFloat64Ty; }
-template<> AlloTy getType<AlloLattice>() { return AlloLatticeTy; }
+template<typename T> inline AlloTy getType() { return 0; }
+template<> inline AlloTy getType<uint8_t>() { return AlloUInt8Ty; }
+template<> inline AlloTy getType<uint16_t>() { return AlloUInt16Ty; }
+template<> inline AlloTy getType<uint32_t>() { return AlloUInt32Ty; }
+template<> inline AlloTy getType<uint64_t>() { return AlloUInt64Ty; }
+template<> inline AlloTy getType<int8_t>() { return AlloSInt8Ty; }
+template<> inline AlloTy getType<int16_t>() { return AlloSInt16Ty; }
+template<> inline AlloTy getType<int32_t>() { return AlloSInt32Ty; }
+template<> inline AlloTy getType<int64_t>() { return AlloSInt64Ty; }
+template<> inline AlloTy getType<float>() { return AlloFloat32Ty; }
+template<> inline AlloTy getType<double>() { return AlloFloat64Ty; }
+template<> inline AlloTy getType<AlloLattice>() { return AlloLatticeTy; }
 // TODO: #define for platform ptrsize
 //template<> AlloTy getType<void *>() { return AlloPointer32Ty; }
 //template<> AlloTy getType<void *>() { return AlloPointer32Ty; }
@@ -55,7 +55,7 @@ template<> AlloTy getType<AlloLattice>() { return AlloLatticeTy; }
 /*
 	E.g., verify a type:
 */
-template<typename T> bool checkType(AlloTy ty) { return getType<T>() && ty == getType<T>(); }
+template<typename T> inline bool checkType(AlloTy ty) { return getType<T>() && ty == getType<T>(); }
 
 /*
 	Derived type
@@ -66,16 +66,16 @@ protected:
 	
 public:
 
-	inline size_t size() { return allo_lattice_size(this); }
+	size_t size() { return allo_lattice_size(this); }
 	
-	inline void data_calloc() {
+	void data_calloc() {
 		data.ptr = (char *)calloc(1, size());
 	}
-	inline void data_free() {
+	void data_free() {
 		free(data.ptr);
 	}
 
-	template<typename T> inline void define1d(uint32_t components, uint32_t dimx, size_t align = 4) {
+	template<typename T> void define1d(uint32_t components, uint32_t dimx, size_t align = 4) {
 		header.type = getType<T>();
 		header.components = components;
 		header.dimcount = 1;
@@ -83,7 +83,7 @@ public:
 		allo_lattice_setstride(&header, align);
 	}
 	
-	template<typename T> inline void define2d(uint32_t components, uint32_t dimx, uint32_t dimy, size_t align = 4) {
+	template<typename T> void define2d(uint32_t components, uint32_t dimx, uint32_t dimy, size_t align = 4) {
 		header.type = getType<T>();
 		header.components = components;
 		header.dimcount = 2;
@@ -92,7 +92,7 @@ public:
 		allo_lattice_setstride(&header, align);
 	}
 	
-	template<typename T> inline void define3d(uint32_t components, uint32_t dimx, uint32_t dimy, uint32_t dimz, size_t align = 4) {
+	template<typename T> void define3d(uint32_t components, uint32_t dimx, uint32_t dimy, uint32_t dimz, size_t align = 4) {
 		header.type = getType<T>();
 		header.components = components;
 		header.dimcount = 3;
@@ -105,7 +105,7 @@ public:
 	/*
 		Use a function to fill a lattice with data:
 	*/
-	template<typename T> inline void fill1d(void (*func)(T * values, double normx)) {
+	template<typename T> void fill1d(void (*func)(T * values, double normx)) {
 		int d0 = header.dim[0];
 		double inv_d0 = 1.0/(double)d0;
 		int components = header.components;
@@ -120,18 +120,18 @@ public:
 	}
 	
 	
-	template<typename T> inline T * data1d(uint32_t x) {
+	template<typename T> T * data1d(uint32_t x) {
 		uint32_t fieldstride_x = header.stride[0];
 		return (T *)(data.ptr + x*fieldstride_x);
 	}
 	
 	
 	// check whether the internal lattice data is of type T:
-	template<typename T> inline bool checkType() { return al::checkType<T>(header.type); }
+	template<typename T> bool checkType() { return al::checkType<T>(header.type); }
 	
 	// linear interpolated lookup (virtual lattice index x, y)
 	// writes the linearly interpolated plane values into val array
-	template<typename T> inline void interp1d(T* val, double x) {
+	template<typename T> void interp1d(T* val, double x) {
 		
 		#define DOUBLE_FLOOR(v) ( (long)(v) - ((v)<0.0 && (v)!=(long)(v)) )
 		#define DOUBLE_CEIL(v) ( (((v)>0.0)&&((v)!=(long)(v))) ? 1+(v) : (v) )
@@ -163,7 +163,7 @@ public:
 	
 	// bilinear interpolated lookup (virtual lattice index x, y)
 	// writes the linearly interpolated plane values into val array
-	template<typename T> inline void interp2d(T* val, double x, double y) {
+	template<typename T> void interp2d(T* val, double x, double y) {
 		
 		#define DOUBLE_FLOOR(v) ( (long)(v) - ((v)<0.0 && (v)!=(long)(v)) )
 		#define DOUBLE_CEIL(v) ( (((v)>0.0)&&((v)!=(long)(v))) ? 1+(v) : (v) )
@@ -211,7 +211,7 @@ public:
 
 	// trilinear interpolated lookup (virtual lattice index x, y, z)
 	// writes the linearly interpolated plane values into val array
-	template<typename T> inline void interp3d(T* val, double x, double y, double z) {
+	template<typename T> void interp3d(T* val, double x, double y, double z) {
 		
 		#define DOUBLE_FLOOR(v) ( (long)(v) - ((v)<0.0 && (v)!=(long)(v)) )
 		#define DOUBLE_CEIL(v) ( (((v)>0.0)&&((v)!=(long)(v))) ? 1+(v) : (v) )
@@ -276,6 +276,6 @@ public:
 	
 };
 
-} // ::allo::
+} // ::al::
 
 #endif /* INCLUDE_ALLO_TYPES_CPP_H */
