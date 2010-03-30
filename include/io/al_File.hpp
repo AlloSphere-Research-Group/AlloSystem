@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-namespace allo{
+namespace al{
 
 class File{
 public:
@@ -57,7 +57,7 @@ protected:
 
 
 
-} // allo::
+} // al::
 
 #endif
 

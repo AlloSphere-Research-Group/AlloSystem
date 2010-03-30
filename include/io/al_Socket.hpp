@@ -37,11 +37,11 @@
 
 #include <string>
 
-namespace allo{
+namespace al{
 
 /// Get name of current host
 std::string getHostName();
 
-} // allo::
+} // al::
 
 #endif /* include guard */

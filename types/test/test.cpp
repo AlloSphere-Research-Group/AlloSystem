@@ -11,7 +11,7 @@ void test (uint32_t * x) {}
 extern "C" void maincpp(AlloLattice * lat) {
     
 	// coerce the C struct into a C++ class:
-	allo::Lattice * lattice = (allo::Lattice *)lat;
+	al::Lattice * lattice = (al::Lattice *)lat;
 	
 	printf("lat is double? %i\n", lattice->checkType<double>());
 	printf("lat is float? %i\n", lattice->checkType<float>());

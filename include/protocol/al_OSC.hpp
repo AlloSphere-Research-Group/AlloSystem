@@ -61,14 +61,14 @@ Example send code:
 #include <string>
 #include <vector>
 #include <stdio.h>
-#include "oscpack/ip/UdpSocket.h"
-#include "oscpack/osc/OscOutboundPacketStream.h"
-#include "oscpack/osc/OscPacketListener.h"
-#include "oscpack/osc/OscReceivedElements.h"
-#include "oscpack/osc/OscTypes.h"
+#include "protocol/oscpack/ip/UdpSocket.h"
+#include "protocol/oscpack/osc/OscOutboundPacketStream.h"
+#include "protocol/oscpack/osc/OscPacketListener.h"
+#include "protocol/oscpack/osc/OscReceivedElements.h"
+#include "protocol/oscpack/osc/OscTypes.h"
 #include "system/al_Thread.hpp"
 
-//namespace allo{
+//namespace al{
 namespace osc{
 
 // Simplified names
@@ -135,7 +135,7 @@ public:
 	bool started() const { return mStarted; }
 	
 protected:
-	allo::Thread mThread;
+	al::Thread mThread;
 	unsigned int mPort;
 	osc::uint64 mTime;
 	UdpListeningReceiveSocket * mSocket;
@@ -224,7 +224,7 @@ void OSCSend::send(const std::string& p, const T1& a1, const T2& a2, const T3& a
 
 
 } // osc::
-//} // allo::
+//} // al::
 	
 #endif
 	

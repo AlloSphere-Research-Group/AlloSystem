@@ -7,7 +7,7 @@
 	#include <unistd.h>
 #endif
 
-namespace allo{
+namespace al{
 
 std::string getHostName(){
 	const int len = 256;
@@ -21,4 +21,4 @@ std::string getHostName(){
 	return "\0";						// there was an error...
 }
 
-} // allo::
+} // al::

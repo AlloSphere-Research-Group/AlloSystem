@@ -33,7 +33,7 @@
 
 #include "system/al_Time.h"
 
-namespace allo{
+namespace al{
 
 /// Timer with stopwatch-like functionality for benchmarking, etc.
 class Timer {
@@ -49,7 +49,7 @@ private:
 	al_nsec mStart, mStop;	// start and stop times
 };
 
-} // allo::
+} // al::
 
 #endif /* INCLUDE_AL_TIME_CPP_H */
 

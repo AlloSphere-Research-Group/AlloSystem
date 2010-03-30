@@ -34,7 +34,7 @@ static apr_status_t check_apr(apr_status_t err) {
 	return err;
 }
 
-void audioCB(allo::AudioIOData& io){
+void audioCB(al::AudioIOData& io){
 	char imsg[MAX_MESSAGE_LEN];
 	char omsg[MAX_MESSAGE_LEN];
 	
@@ -119,7 +119,7 @@ int main (int argc, char * argv[]) {
 
 	sock = al_socktube_create(); 
 	
-	allo::AudioIO audioIO(64, 44100, audioCB, NULL, 2,2);
+	al::AudioIO audioIO(64, 44100, audioCB, NULL, 2,2);
 	audioIO.start();
 
 	// enter main loop

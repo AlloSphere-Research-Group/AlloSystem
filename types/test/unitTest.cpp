@@ -62,7 +62,7 @@ int main(){
 	}
 	
 	{
-		allo::Lattice lat;
+		al::Lattice lat;
 		lat.setpacked3d<double>(2, 8, 8, 8);
 		lat.data.ptr = (char *)calloc(1, lat.size());
 

@@ -8,7 +8,7 @@
 	#include <windows.h>
 
 	/* singleton object to force init/quit of timing */
-	namespace allo{
+	namespace al{
 		namespace{
 			struct TimeSingleton{
 				TimeSingleton(){ timeBeginPeriod(1); }

@@ -80,7 +80,7 @@ extern "C" {
 #endif
 
 
-namespace allo{
+namespace al{
 
 #if USE_PTHREAD
 	typedef pthread_t ThreadHandle;
@@ -211,5 +211,5 @@ void Thread::testCancel(void){
 
 #endif
 
-} // allo::
+} // al::
 

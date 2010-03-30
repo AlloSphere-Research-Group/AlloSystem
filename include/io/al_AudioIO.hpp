@@ -64,7 +64,7 @@
 #include "portaudio.h"
 
 
-namespace allo{
+namespace al{
 
 
 /// Audio data to be sent to callback
@@ -247,6 +247,6 @@ private:
 
 };
 
-} // allo::
+} // al::
 
 #endif

@@ -14,7 +14,7 @@
 #include "io/al_WindowGL.hpp"
 
 
-namespace allo{
+namespace al{
 
 static void timerFunc(int value){
 	TimedFunction * f = (TimedFunction *)value;
@@ -597,5 +597,5 @@ void WindowGL::stopLoop(){
 	exit(0);
 }
 
-} // allo::
+} // al::
 

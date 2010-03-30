@@ -2,7 +2,7 @@
 #include "protocol/al_Serialize.hpp"
 
 
-namespace allo{
+namespace al{
 
 Serializer& Serializer::operator<< (const char * v){
 	return add(v, strlen(v)+1);
@@ -39,4 +39,4 @@ const std::vector<char>& Deserializer::buf() const { return mBuf; }
 
 char * Deserializer::bufDec(){ return &mBuf[mStart]; }
 
-} // allo::
+} // al::

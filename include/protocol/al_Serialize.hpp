@@ -32,7 +32,7 @@
 #include <vector>
 #include <string>
 
-namespace allo{
+namespace al{
 
 namespace ser{
 
@@ -225,7 +225,7 @@ template <class T> Deserializer& Deserializer::operator>> (T& v){
 //	return *this;		
 //}
 
-} // allo::
+} // al::
 
 
 #endif

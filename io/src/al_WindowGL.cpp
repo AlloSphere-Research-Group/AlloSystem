@@ -1,6 +1,6 @@
 #include "io/al_WindowGL.hpp"
 
-namespace allo{
+namespace al{
 
 Keyboard::Keyboard()
 :	mKeycode(-1), mDown(false)
@@ -50,4 +50,4 @@ void WindowGL::init(){
 	
 }
 
-} // allo::
+} // al::

@@ -1,6 +1,6 @@
 #include "protocol/al_OSC.hpp"
 
-//namespace allo{
+//namespace al{
 namespace osc{
 
 void RecvPacket::print(FILE * f) const {
@@ -125,4 +125,4 @@ void OSCSend::send(){
 }
 
 } // osc::
-//} // allo::
+//} // al::

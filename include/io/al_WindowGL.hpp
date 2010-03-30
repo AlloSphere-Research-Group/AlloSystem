@@ -31,7 +31,7 @@
 #include <vector>
 #include <string>
 
-namespace allo{
+namespace al{
 
 // can redefine, but should be at least 4
 #ifndef AL_MOUSE_MAX_BUTTONS
@@ -248,6 +248,6 @@ private:
 
 
 
-} // allo::
+} // al::
 
 #endif

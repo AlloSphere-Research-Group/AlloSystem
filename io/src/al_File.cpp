@@ -1,6 +1,6 @@
 #include "io/al_File.hpp"
 
-namespace allo{
+namespace al{
 
 File::File(const char * path, const char * mode, bool open_)
 :	mPath(path), mMode(mode), mContent(0), mSizeBytes(0), mFP(0)
@@ -62,5 +62,5 @@ int File::write(const char * path, const void * v, int size, int items){
 bool File::exists(const char * path){ File f(path, "r"); return f.open(); }
 
 
-} // allo::
+} // al::
 

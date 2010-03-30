@@ -10,7 +10,7 @@
 
 //#define SAFE_FREE(ptr) if(ptr){ free(ptr); ptr = 0; }
 
-namespace allo{
+namespace al{
 
 void err(const char * msg, const char * src, bool exits){
 	fprintf(stderr, "%s%serror: %s\n", src, src[0]?" ":"", msg);
@@ -369,8 +369,8 @@ int AudioIO::paCallback(const void *input,
 	bool deinterleave = true;
 
 	if(deinterleave){
-		allo::deinterleave((float *)io.in(0),  paI, io.framesPerBuffer(), io.channelsInDevice() );
-		allo::deinterleave(io.out(0), paO, io.framesPerBuffer(), io.channelsOutDevice());
+		al::deinterleave((float *)io.in(0),  paI, io.framesPerBuffer(), io.channelsInDevice() );
+		al::deinterleave(io.out(0), paO, io.framesPerBuffer(), io.channelsOutDevice());
 	}
 
 	io();	// call callback
@@ -556,4 +556,4 @@ PaDeviceIndex AudioIO::defaultInDevice(){ return Pa_GetDefaultInputDevice(); }
 PaDeviceIndex AudioIO::defaultOutDevice(){ return Pa_GetDefaultOutputDevice(); }
 
 
-} // allo::
+} // al::
