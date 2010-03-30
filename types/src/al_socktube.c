@@ -57,7 +57,7 @@ int al_socktube_parent_read(al_socktube x, void * buffer) {
 	//ssize_t r = read(x->socks[0], buffer, size);
 	ssize_t r = recv(x->socks[0], buffer, size, MSG_DONTWAIT);
 	if (r != size) {
-		printf("parent read %d %d\n", r, size);
+		printf("parent read %d %d\n", (int)r, size);
 		perror("parent read bad data");
 		return 0;
 	}
@@ -72,7 +72,7 @@ int al_socktube_child_read(al_socktube x, void * buffer) {
 	}
 	ssize_t r = read(x->socks[1], buffer, size);
 	if (r != size) {
-		printf("child read %d %d\n", r, size);
+		printf("child read %d %d\n", (int)r, size);
 		perror("child read bad data");
 		return 0;
 	}
@@ -90,8 +90,8 @@ int al_socktube_parent_write(al_socktube x, void * buffer, size_t size) {
 		//r = write(x->socks[0], data, size);
 		r = send(x->socks[0], data, size, MSG_DONTWAIT);
 	//} while (r == -1);
-	if (r != size) {
-		printf("parent write %d %d\n", r, size);
+	if (r != (ssize_t)size) {
+		printf("parent write %d %d\n", (int)r, (int)size);
 		perror("failed to write data");
 		return -1;
 	}
@@ -108,8 +108,8 @@ int al_socktube_child_write(al_socktube x, void * buffer, size_t size) {
 	//do {
 		r = write(x->socks[0], data, size);
 	//} while (r == -1);
-	if (r != size) {
-		printf("child write %d %d\n", r, size);
+	if (r != (ssize_t)size) {
+		printf("child write %d %d\n", (int)r, (int)size);
 		perror("failed to write data");
 		return -1;
 	}
