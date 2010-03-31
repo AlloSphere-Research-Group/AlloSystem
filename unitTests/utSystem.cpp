@@ -1,7 +1,5 @@
 #include "utAllocore.h"
 
-using namespace al;
-
 THREAD_FUNCTION(threadFunc){
 	*(int *)user = 1; return NULL;
 }

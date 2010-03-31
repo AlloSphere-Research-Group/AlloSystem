@@ -59,6 +59,7 @@
 		16AC5379116293EF0076AA8B /* al_types.h in Headers */ = {isa = PBXBuildFile; fileRef = 36B4125210EFF7B8007B16D0 /* al_types.h */; };
 		16AC537A116293F00076AA8B /* al_types.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36B4125310EFF7B8007B16D0 /* al_types.hpp */; };
 		16AC53BA116297250076AA8B /* al_Serialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC53B9116297250076AA8B /* al_Serialize.cpp */; };
+		16AC54BD1162BCA00076AA8B /* al_Vec.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 16AC54BC1162BCA00076AA8B /* al_Vec.hpp */; };
 		3602B4D0110A67C9005DC3D0 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
 		3602B4D1110A67C9005DC3D0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		3602B4D2110A67C9005DC3D0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
@@ -205,6 +206,7 @@
 		16AC5312116290AA0076AA8B /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
 		16AC531A116290BE0076AA8B /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
 		16AC53B9116297250076AA8B /* al_Serialize.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Serialize.cpp; sourceTree = "<group>"; };
+		16AC54BC1162BCA00076AA8B /* al_Vec.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Vec.hpp; sourceTree = "<group>"; };
 		3602B4C7110A67B6005DC3D0 /* osc_receive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = osc_receive.cpp; sourceTree = "<group>"; };
 		3602B4D8110A67C9005DC3D0 /* oscreceive */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = oscreceive; sourceTree = BUILT_PRODUCTS_DIR; };
 		3602B53C110A6D3D005DC3D0 /* al_OSC.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OSC.hpp; sourceTree = "<group>"; };
@@ -454,8 +456,8 @@
 		3602B53B110A6D3D005DC3D0 /* protocol */ = {
 			isa = PBXGroup;
 			children = (
-				36A20CFC110ACA0E0075A21C /* al_OSCAPR.hpp */,
 				3602B53C110A6D3D005DC3D0 /* al_OSC.hpp */,
+				36A20CFC110ACA0E0075A21C /* al_OSCAPR.hpp */,
 				3602B53D110A6D3D005DC3D0 /* al_Serialize.h */,
 				3602B53E110A6D3D005DC3D0 /* al_Serialize.hpp */,
 				3602B53F110A6D3D005DC3D0 /* oscpack */,
@@ -558,12 +560,12 @@
 		36B4124710EFF7B8007B16D0 /* system */ = {
 			isa = PBXGroup;
 			children = (
-				168EC8EB1161CA2C00FCACC7 /* al_Time.h */,
-				168EC8EC1161CA2C00FCACC7 /* al_MainLoop.h */,
 				168EC8ED1161CA2C00FCACC7 /* al_Config.h */,
-				168EC8EE1161CA2C00FCACC7 /* al_Time.hpp */,
-				168EC8EF1161CA2C00FCACC7 /* al_Thread.hpp */,
+				168EC8EC1161CA2C00FCACC7 /* al_MainLoop.h */,
 				168EC8F01161CA2C00FCACC7 /* al_Thread.h */,
+				168EC8EF1161CA2C00FCACC7 /* al_Thread.hpp */,
+				168EC8EB1161CA2C00FCACC7 /* al_Time.h */,
+				168EC8EE1161CA2C00FCACC7 /* al_Time.hpp */,
 			);
 			path = system;
 			sourceTree = "<group>";
@@ -573,13 +575,14 @@
 			children = (
 				36B4124E10EFF7B8007B16D0 /* al_pq.h */,
 				36B4124F10EFF7B8007B16D0 /* al_pq.hpp */,
+				365FA5FE116131C200A49D3F /* al_quat.h */,
+				365FA5F711612EA500A49D3F /* al_quat.hpp */,
+				36F4662B110B9B720082D21E /* al_socktube.h */,
 				36B4125010EFF7B8007B16D0 /* al_tube.h */,
 				36B4125110EFF7B8007B16D0 /* al_tube.hpp */,
 				36B4125210EFF7B8007B16D0 /* al_types.h */,
 				36B4125310EFF7B8007B16D0 /* al_types.hpp */,
-				36F4662B110B9B720082D21E /* al_socktube.h */,
-				365FA5FE116131C200A49D3F /* al_quat.h */,
-				365FA5F711612EA500A49D3F /* al_quat.hpp */,
+				16AC54BC1162BCA00076AA8B /* al_Vec.hpp */,
 			);
 			path = types;
 			sourceTree = "<group>";
@@ -717,8 +720,8 @@
 			children = (
 				36F46821110BE2E90082D21E /* al_AudioIO.hpp */,
 				36F46822110BE2E90082D21E /* al_File.hpp */,
-				36F46823110BE2E90082D21E /* al_WindowGL.hpp */,
 				36B4BF06110E55AF00F789A8 /* al_Socket.hpp */,
+				36F46823110BE2E90082D21E /* al_WindowGL.hpp */,
 			);
 			path = io;
 			sourceTree = "<group>";
@@ -784,6 +787,7 @@
 				16AC5378116293EE0076AA8B /* al_tube.hpp in Headers */,
 				16AC5379116293EF0076AA8B /* al_types.h in Headers */,
 				16AC537A116293F00076AA8B /* al_types.hpp in Headers */,
+				16AC54BD1162BCA00076AA8B /* al_Vec.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1155,6 +1159,9 @@
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_INPUT_FILETYPE = automatic;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_STRICT_ALIASING = YES;
+				GCC_UNROLL_LOOPS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;

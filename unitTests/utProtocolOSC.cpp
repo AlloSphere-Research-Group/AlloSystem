@@ -1,7 +1,5 @@
 #include "utAllocore.h"
 
-using namespace al;
-
 // Data structure containing the possible OSC data types
 struct Data{
 	Data(){ clear(); }
@@ -36,8 +34,6 @@ void onRecv(const osc::RecvPacket& p, void * user){
 
 
 int utProtocolOSC(){
-
-	UT_PRINTF("protocol: OSC\n");
 
 	const int port = 12000;
 	const char * ip = "127.0.0.1";

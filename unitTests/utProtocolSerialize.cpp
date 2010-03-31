@@ -1,11 +1,8 @@
 #include "utAllocore.h"
 
-using namespace al;
-
 int utProtocolSerialize(){
 
 	// Serialization
-	UT_PRINTF("protocol: serialization\n");
 	{	using namespace ser;
 
 		// Single element tests
@@ -92,7 +89,7 @@ int utProtocolSerialize(){
 			ASSERT(iun, oun);
 			ASSERT(iUn, oUn);
 		}
-		
+
 		{
 			float vf1=1, vf2=1;
 			SyncedMemory sm1(&vf1, 'f');

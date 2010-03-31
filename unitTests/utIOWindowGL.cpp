@@ -1,7 +1,5 @@
 #include "utAllocore.h"
 
-using namespace al;
-
 struct MyWindow : WindowGL{
 
 	void onCreate(){					printf("onCreate\n"); }
@@ -53,8 +51,6 @@ struct MyWindow : WindowGL{
 
 
 int utIOWindowGL(){
-
-	UT_PRINTF("io: window gl\n");
 
 	MyWindow win, win2;
 

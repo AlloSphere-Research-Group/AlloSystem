@@ -1,7 +1,5 @@
 #include "utAllocore.h"
 
-using namespace al;
-
 struct LowPass{
 	LowPass(): p(0){}
 	float operator()(float v, float f){ return p = p*(1-f) + v*f; }
@@ -34,7 +32,6 @@ void audioCB(AudioIOData& io){
 
 int utIOAudioIO(){
 
-	UT_PRINTF("io: audio io\n");
 	AudioDevice::printAll();
 	AudioIO audioIO(128, 44100, audioCB, 0, 2, 1);
 	audioIO.start();

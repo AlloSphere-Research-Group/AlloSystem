@@ -13,6 +13,7 @@
 #include "system/al_Thread.hpp"
 #include "types/al_types.h"
 #include "types/al_types.hpp"
+#include "types/al_Vec.hpp"
 
 #ifdef AL_UT_NOPRINT	/* disable printing to stdout */
 	#define UT_PRINTF	//
@@ -20,12 +21,13 @@
 	#define UT_PRINTF	printf
 #endif
 
+using namespace al;
+
 int utIOAudioIO();
 int utIOWindowGL();
 int utProtocolOSC();
 int utProtocolSerialize();
 int utSystem();
 int utTypes();
-
 
 #endif
