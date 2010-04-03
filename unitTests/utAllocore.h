@@ -8,7 +8,7 @@
 #include "io/al_WindowGL.hpp"
 #include "protocol/al_OSC.hpp"
 #include "protocol/al_Serialize.hpp"
-#include "system/al_time.h"
+#include "system/al_Time.h"
 #include "system/al_Time.hpp"
 #include "system/al_Thread.hpp"
 #include "types/al_types.h"

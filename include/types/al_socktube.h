@@ -28,7 +28,7 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#include "system/al_config.h"
+#include "system/al_Config.h"
 #include <stdio.h>
 
 #define AL_SOCKTUBE_MAXPACKETSIZE (255)

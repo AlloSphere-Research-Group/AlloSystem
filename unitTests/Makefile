@@ -3,7 +3,7 @@
 #=========================================================================
 
 include ../Makefile.config
-include ../$(IO_DIR)/Makefile.config
+include ../$(SRC_DIR)/$(IO_DIR)/Makefile.config
 
 #VPATH += 
 

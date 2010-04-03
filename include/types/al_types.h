@@ -31,8 +31,8 @@
 #ifndef INCLUDE_ALLO_TYPES_H
 #define INCLUDE_ALLO_TYPES_H 1
 
-#include "system/al_config.h"
-#include "string.h"
+#include "system/al_Config.h"
+#include <string.h>
 
 #ifdef __cplusplus
 extern "C" {
