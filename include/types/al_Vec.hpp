@@ -290,6 +290,38 @@ public:
 };
 
 
+
+
+// Non-member binary arithmetic operations
+
+template <int N, class T>
+inline Vec<N,T> operator + (T s, const Vec<N,T>& v){ return  v+s; }
+
+template <int N, class T>
+inline Vec<N,T> operator - (T s, const Vec<N,T>& v){ return -v+s; }
+
+template <int N, class T>
+inline Vec<N,T> operator * (T s, const Vec<N,T>& v){ return  v*s; }
+
+template <int N, class T>
+inline Vec<N,T> operator / (T s, const Vec<N,T>& v){
+	Vec<N,T> r; IT(N){ r[i] = s/v[i]; } return r;
+}
+
+//template <int N, class T, class F>
+//inline Vec<N,T> binaryOp(const Vec<N,T>& a, const Vec<N,T>& b, const F& func){
+//	Vec<N,T> r;
+//	IT(N){ r[i] = func(a[0], b[0]); }
+//	return r;
+//}
+
+//template <int N, class T>
+//inline Vec<N,T> binaryOp(const Vec<N,T>& a, const Vec<N,T>& b, T (* const func)(const T&, const T&)){
+//	Vec<N,T> r;
+//	IT(N){ r[i] = func(a[0], b[0]); }
+//	return r;
+//}
+
 template <int N, class T>
 inline Mat<N,T> operator* (const Mat<N,T>& a, const Mat<N,T>& b){
 	Mat<N,T> r; return Mat<N,T>::multiply(r, a,b);
@@ -306,61 +338,6 @@ inline Vec<N,T> operator* (const Vec<N,T>& vRow, const Mat<N,T>& m){
 }
 
 
-
-// Binary operations
-//
-///// Return true if objects are element-wise equal, false otherwise
-//template <int N, class T>
-//inline bool operator ==(const Vec<N,T>& a, const Vec<N,T>& b){ IT(N){ if(a[i] != b[i]) return false; } return true; }
-//
-///// Return true if all elements are equal to value, false otherwise
-//template <int N, class T>
-//inline bool operator ==(const Vec<N,T>& a, const T& b){ IT(N){ if(a[i] != b) return false; } return true; }
-//
-///// Return true if all elements are equal to value, false otherwise
-//template <int N, class T>
-//inline bool operator ==(const T& a, const Vec<N,T>& b){ IT(N){ if(a != b[i]) return false; } return true; }
-//
-///// Return true if objects are not element-wise equal, false otherwise
-//template <int N, class T>
-//inline bool operator !=(const Vec<N,T>& a, const Vec<N,T>& b){ return !(a == b); }
-//
-///// Return true if objects are not element-wise equal, false otherwise
-//template <int N, class T>
-//inline bool operator !=(const Vec<N,T>& a, const T& b){ return !(a == b); }
-//
-///// Return true if objects are not element-wise equal, false otherwise
-//template <int N, class T>
-//inline bool operator !=(const T& a, const Vec<N,T>& b){ return !(a == b); }
-
-template <int N, class T>
-inline Vec<N,T> operator + (T s, const Vec<N,T>& v){ return  v+s; }
-
-template <int N, class T>
-inline Vec<N,T> operator - (T s, const Vec<N,T>& v){ return -v+s; }
-
-template <int N, class T>
-inline Vec<N,T> operator * (T s, const Vec<N,T>& v){ return  v*s; }
-
-template <int N, class T>
-inline Vec<N,T> operator / (T s, const Vec<N,T>& v){
-	Vec<N,T> r; IT(N){ r[i] = s/v[i]; } return r;
-}
-
-
-//template <int N, class T, class F>
-//inline Vec<N,T> binaryOp(const Vec<N,T>& a, const Vec<N,T>& b, const F& func){
-//	Vec<N,T> r;
-//	IT(N){ r[i] = func(a[0], b[0]); }
-//	return r;
-//}
-
-//template <int N, class T>
-//inline Vec<N,T> binaryOp(const Vec<N,T>& a, const Vec<N,T>& b, T (* const func)(const T&, const T&)){
-//	Vec<N,T> r;
-//	IT(N){ r[i] = func(a[0], b[0]); }
-//	return r;
-//}
 
 
 // Specialized vector functions
