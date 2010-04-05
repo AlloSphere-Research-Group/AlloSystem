@@ -129,6 +129,12 @@ int utTypes(){
 		a = b;
 			assert(a == b);
 	}
+	
+	{
+		Mat<3,double> a;
+		
+		a(0,1) = a(1,0);
+	}
 
 
 	// test the basic C functionality

@@ -31,9 +31,13 @@
 
 namespace al {
 
+template <int N, class T> class Mat;
+template <int N, class T> class Vec;
 
-// Forward iterates from 0 to N-1. Current index is 'i'.
-#define IT for(int i=0; i<N; ++i)
+
+// Forward iterates from 0 to n-1. Current index is 'i'.
+#define IT(n) for(int i=0; i<n; ++i)
+
 
 
 ///< N-vector
@@ -42,22 +46,30 @@ namespace al {
 /// by the compiler and to avoid an extra 'size' data member for small-sized
 /// arrays.
 template <int N, class T>
-struct Vec{
+class Vec{
+public:
 
 	typedef T value_type; 
 
+	/// Element values
 	T elems[N];
 
 
+	/// Constructor. Elements are not initialized.
 	Vec(){}
 
+	/// @param[in] v		value to initialize all elements to
 	Vec(const T& v){ set(v); }
 
+	/// @param[in] v		vector to initialize all elements to
 	template <class T2>
 	Vec(const Vec<N, T2> &v){ set(v); }
 
+	/// @param[in] v		pointer to array to initialize all elements to
+	/// @param[in] stride	stride factor through array
 	template <class T2>
-	Vec(const T2 * v){ set(v); }
+	Vec(const T2 * v, int stride=1){ set(v,stride); }
+
 	
 	/// Set element at index with no bounds checking
 	T& operator[](int i){ return elems[i];}
@@ -66,10 +78,10 @@ struct Vec{
 	const T& operator[](int i) const { return elems[i]; }
 
 	/// Return true if objects are element-wise equal, false otherwise
-	bool operator ==(const Vec& v) const { IT{ if((*this)[i] != v[i]) return false; } return true; }
+	bool operator ==(const Vec& v) const { IT(N){ if((*this)[i] != v[i]) return false; } return true; }
 	
 	/// Return true if all elements are equal to value, false otherwise
-	bool operator ==(const T& v) const { IT{ if((*this)[i] != v   ) return false; } return true; }
+	bool operator ==(const T& v) const { IT(N){ if((*this)[i] != v   ) return false; } return true; }
 
 	/// Return true if objects are not element-wise equal, false otherwise
 	bool operator !=(const Vec& v) const { return !(*this == v); }
@@ -79,14 +91,14 @@ struct Vec{
 	
 	Vec& operator  =(const Vec& v){ return set(v); }
 	Vec& operator  =(const   T& v){ return set(v); }
-	Vec& operator +=(const Vec& v){ IT (*this)[i] += v[i]; return *this; }
-	Vec& operator +=(const   T& v){ IT (*this)[i] += v;    return *this; }
-	Vec& operator -=(const Vec& v){ IT (*this)[i] -= v[i]; return *this; }
-	Vec& operator -=(const   T& v){ IT (*this)[i] -= v;    return *this; }
-	Vec& operator *=(const Vec& v){ IT (*this)[i] *= v[i]; return *this; }
-	Vec& operator *=(const   T& v){ IT (*this)[i] *= v;    return *this; }
-	Vec& operator /=(const Vec& v){ IT (*this)[i] /= v[i]; return *this; }
-	Vec& operator /=(const   T& v){ IT (*this)[i] /= v;    return *this; }
+	Vec& operator +=(const Vec& v){ IT(N) (*this)[i] += v[i]; return *this; }
+	Vec& operator +=(const   T& v){ IT(N) (*this)[i] += v;    return *this; }
+	Vec& operator -=(const Vec& v){ IT(N) (*this)[i] -= v[i]; return *this; }
+	Vec& operator -=(const   T& v){ IT(N) (*this)[i] -= v;    return *this; }
+	Vec& operator *=(const Vec& v){ IT(N) (*this)[i] *= v[i]; return *this; }
+	Vec& operator *=(const   T& v){ IT(N) (*this)[i] *= v;    return *this; }
+	Vec& operator /=(const Vec& v){ IT(N) (*this)[i] /= v[i]; return *this; }
+	Vec& operator /=(const   T& v){ IT(N) (*this)[i] /= v;    return *this; }
 
 	Vec operator + (const Vec& v) const { return Vec(*this) += v; }
 	Vec operator + (const   T& v) const { return Vec(*this) += v; }
@@ -98,7 +110,7 @@ struct Vec{
 	Vec operator / (const   T& v) const { return Vec(*this) /= v; }
 	Vec operator - () const { return Vec(*this).negate(); }
 
-	/// Returns dot (inner) product between objects
+	/// Returns dot (inner) product between vectors
 	T dot(const Vec& v) const {
 		T r = (*this)[0] * v[0];
 		for(int i=1; i<N; ++i){ r += (*this)[i] * v[i]; }
@@ -146,29 +158,53 @@ struct Vec{
 	}
 
 	/// Negates all elements
-	Vec& negate(){ IT{ (*this)[i] = -(*this)[i]; } return *this; }
+	Vec& negate(){ IT(N){ (*this)[i] = -(*this)[i]; } return *this; }
 
 	/// Scales elements evenly so magnitude is one
 	Vec& normalize(){ return *this/=mag(); }
 
 	/// Set elements from another vector
 	template <class T2>
-	Vec& set(const Vec<N, T2> &v){ IT{ (*this)[i] = T(v[i]); } return *this; }
+	Vec& set(const Vec<N, T2> &v){ IT(N){ (*this)[i] = T(v[i]); } return *this; }
 	
 	/// Set all elements to the same value
-	Vec& set(const T& v){ IT{ (*this)[i] = v; } return *this; }
+	Vec& set(const T& v){ IT(N){ (*this)[i] = v; } return *this; }
 
 	/// Set elements from raw C-pointer
 	template <class T2>
 	Vec& set(const T2 * v){
-		IT{ (*this)[i] = T(v[i]); }
+		IT(N){ (*this)[i] = T(v[i]); }
 		return *this;
 	}
 	
 	/// Set elements from strided raw C-pointer
 	template <class T2>
 	Vec& set(const T2 * v, int stride){
-		IT{ (*this)[i] = T(v[i*stride]); }
+		IT(N){ (*this)[i] = T(v[i*stride]); }
+		return *this;
+	}
+
+	Vec& set(const T& v1, const T& v2){
+		return set(v1,v2,v1,v1,v1,v1); }
+
+	Vec& set(const T& v1, const T& v2, const T& v3){
+		return set(v1,v2,v3,v1,v1,v1); }
+
+	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4){
+		return set(v1,v2,v3,v4,v1,v1); }
+
+	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5){
+		return set(v1,v2,v3,v4,v5,v1); }
+
+	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6){		
+		switch(N){
+		default:(*this)[5] = v6;
+		case 5: (*this)[4] = v5;
+		case 4: (*this)[3] = v4;
+		case 3: (*this)[2] = v3;
+		case 2: (*this)[1] = v2;
+		case 1: (*this)[0] = v1;
+		}
 		return *this;
 	}
 
@@ -189,34 +225,140 @@ struct Vec{
 
 
 
-// Arithmetic operations with scalar as first operand
+// N x N matrix
+template <int N, class T>
+class Mat{
+public:
+
+	/// column-major array
+	T elems[N*N];
+
+
+	/// Set element at index with no bounds checking
+	T& operator[](int i){ return elems[i];}
+	
+	/// Get element at index with no bounds checking
+	const T& operator[](int i) const { return elems[i]; }
+
+	/// Set element at row i, column j
+	T& operator()(int i, int j){ return elems[j*N+i]; }
+	
+	/// Get element at row i, column j
+	const T& operator()(int i, int j) const { return elems[j*N+i]; }
+
+	/// Return column i as vector
+	Vec<N,T> col(int i) const { return Vec<N,T>(elems + i*N); }
+
+	/// Return row i as vector
+	Vec<N,T> row(int i) const { return Vec<N,T>(elems+i, N); }
+	
+	/// Return diagonal
+	Vec<N,T> diagonal() const { return Vec<N,T>(elems, N+1); }
+
+	Mat& operator *=(const Mat& v){ return multiply(*this, Mat(*this),v); }
+	Mat& operator +=(const Mat& v){ IT(N*N){ (*this)[i] += v[i]; } }
+	Mat& operator -=(const Mat& v){ IT(N*N){ (*this)[i] -= v[i]; } }
+
+	T trace(){ return diagonal().sum(); }
+
+	/// Computes matrix product r = a * b
+	
+	/// Returns reference to result
+	///
+	static Mat& multiply(Mat& r, const Mat& a, const Mat& b){
+		for(int j=0; j<N; ++j){
+			const Vec<N,T>& bcol = b.col(j);
+			for(int i=0; i<N; ++i){
+				r(i,j) = a.row(i).dot(bcol);
+			}
+		}
+		return r;
+	}
+	
+	/// Computes product of matrix multiplied by column vector, r = m * vCol
+	static Vec<N,T>& multiply(Vec<N,T>& r, const Mat& m, const Vec<N,T>& vCol){
+		IT(N){ r[i] = m.row(i).dot(vCol); }
+		return r;
+	}
+
+	/// Computes product of row vector multiplied by matrix, r = vRow * m
+	static Vec<N,T>& multiply(Vec<N,T>& r, const Vec<N,T>& vRow, const Mat& m){
+		IT(N){ r[i] = vRow.dot(m.col(i)); }
+		return r;
+	}
+
+};
+
 
 template <int N, class T>
-Vec<N,T> operator + (T s, const Vec<N,T>& v){ return  v+s; }
+inline Mat<N,T> operator* (const Mat<N,T>& a, const Mat<N,T>& b){
+	Mat<N,T> r; return Mat<N,T>::multiply(r, a,b);
+}
 
 template <int N, class T>
-Vec<N,T> operator - (T s, const Vec<N,T>& v){ return -v+s; }
+inline Vec<N,T> operator* (const Mat<N,T>& m, const Vec<N,T>& vCol){
+	Vec<N,T> r; return Mat<N,T>::multiply(r, m,vCol);
+}
 
 template <int N, class T>
-Vec<N,T> operator * (T s, const Vec<N,T>& v){ return  v*s; }
+inline Vec<N,T> operator* (const Vec<N,T>& vRow, const Mat<N,T>& m){
+	Vec<N,T> r; return Mat<N,T>::multiply(r, vRow,m);
+}
+
+
+
+// Binary operations
+//
+///// Return true if objects are element-wise equal, false otherwise
+//template <int N, class T>
+//inline bool operator ==(const Vec<N,T>& a, const Vec<N,T>& b){ IT(N){ if(a[i] != b[i]) return false; } return true; }
+//
+///// Return true if all elements are equal to value, false otherwise
+//template <int N, class T>
+//inline bool operator ==(const Vec<N,T>& a, const T& b){ IT(N){ if(a[i] != b) return false; } return true; }
+//
+///// Return true if all elements are equal to value, false otherwise
+//template <int N, class T>
+//inline bool operator ==(const T& a, const Vec<N,T>& b){ IT(N){ if(a != b[i]) return false; } return true; }
+//
+///// Return true if objects are not element-wise equal, false otherwise
+//template <int N, class T>
+//inline bool operator !=(const Vec<N,T>& a, const Vec<N,T>& b){ return !(a == b); }
+//
+///// Return true if objects are not element-wise equal, false otherwise
+//template <int N, class T>
+//inline bool operator !=(const Vec<N,T>& a, const T& b){ return !(a == b); }
+//
+///// Return true if objects are not element-wise equal, false otherwise
+//template <int N, class T>
+//inline bool operator !=(const T& a, const Vec<N,T>& b){ return !(a == b); }
 
 template <int N, class T>
-Vec<N,T> operator / (T s, const Vec<N,T>& v){
-	Vec<N,T> r; IT{ r[i] = s/v[i]; } return r;
+inline Vec<N,T> operator + (T s, const Vec<N,T>& v){ return  v+s; }
+
+template <int N, class T>
+inline Vec<N,T> operator - (T s, const Vec<N,T>& v){ return -v+s; }
+
+template <int N, class T>
+inline Vec<N,T> operator * (T s, const Vec<N,T>& v){ return  v*s; }
+
+template <int N, class T>
+inline Vec<N,T> operator / (T s, const Vec<N,T>& v){
+	Vec<N,T> r; IT(N){ r[i] = s/v[i]; } return r;
 }
 
 
 //template <int N, class T, class F>
 //inline Vec<N,T> binaryOp(const Vec<N,T>& a, const Vec<N,T>& b, const F& func){
 //	Vec<N,T> r;
-//	IT{ r[i] = func(a[0], b[0]); }
+//	IT(N){ r[i] = func(a[0], b[0]); }
 //	return r;
 //}
 
 //template <int N, class T>
 //inline Vec<N,T> binaryOp(const Vec<N,T>& a, const Vec<N,T>& b, T (* const func)(const T&, const T&)){
 //	Vec<N,T> r;
-//	IT{ r[i] = func(a[0], b[0]); }
+//	IT(N){ r[i] = func(a[0], b[0]); }
 //	return r;
 //}
 
@@ -309,7 +451,7 @@ inline void normal(Vec<3,T>& n, const Vec<3,T>& p1, const Vec<3,T>& p2, const Ve
 template <int N, class T>
 inline Vec<N,T> vmin(const Vec<N,T>& a, const Vec<N,T>& b){
 	Vec<N,T> r;
-	IT{ r[i] = a[i] > b[i] ? b[i] : a[i]; }
+	IT(N){ r[i] = a[i] > b[i] ? b[i] : a[i]; }
 	return r;
 }
 
@@ -318,7 +460,7 @@ inline Vec<N,T> vmin(const Vec<N,T>& a, const Vec<N,T>& b){
 template <int N, class T>
 inline Vec<N,T> vmax(const Vec<N,T>& a, const Vec<N,T>& b){	
 	Vec<N,T> r;
-	IT{ r[i] = a[i] < b[i] ? b[i] : a[i]; }
+	IT(N){ r[i] = a[i] < b[i] ? b[i] : a[i]; }
 	return r;
 }
 
@@ -335,12 +477,6 @@ struct Vec3 : public Vec<3,T> {
 	
 	Vec3& operator= (const Base& v){ Base::set(v); return *this; }
 
-	Vec3& set(const T& x, const T& y, const T& z){
-		(*this)[0] = x;
-		(*this)[1] = y;
-		(*this)[2] = z;
-		return *this;
-	}
 };
 
 
