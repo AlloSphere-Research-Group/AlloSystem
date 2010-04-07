@@ -14,7 +14,7 @@ int main (int argc, char * argv[]) {
 		packet << i;
 		packet << osc::EndMessage;
 		
-		printf("sent %d bytes\n", sender.send(packet));
+		printf("sent %d bytes\n", (int)sender.send(packet));
 		
 		packet.Clear();
 		al_sleep(0.1);

@@ -66,7 +66,7 @@ void onquit(void * userdata) {
 
 int main (int argc, char * argv[]) {
 
-	apr_status_t err;
+	//apr_status_t err;
 	// init APR:
 	check_apr(apr_initialize());
 	atexit(apr_terminate);	// ensure apr tear-down

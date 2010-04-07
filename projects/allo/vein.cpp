@@ -85,7 +85,7 @@ void ontick(al_nsec time, void * userdata) {
 	memset(imsg, 0, MAX_MESSAGE_LEN);
 	size_t len = al_socktube_parent_read(sock, (void *)imsg);
 	while (len) {
-		printf("parent read %d '%s'\n", len, imsg);
+		printf("parent read %d '%s'\n", (int)len, imsg);
 		len = al_socktube_parent_read(sock, imsg);
 	}
 	

@@ -3,8 +3,8 @@
 int main(){
 
 	utTypes();
-//	utSystem();
-//	utProtocolOSC();
+	utSystem();
+	utProtocolOSC();
 //	utProtocolSerialize();
 //
 //	utIOAudioIO();

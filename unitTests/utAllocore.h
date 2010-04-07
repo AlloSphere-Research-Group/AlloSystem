@@ -7,6 +7,7 @@
 #include "io/al_AudioIO.hpp"
 #include "io/al_WindowGL.hpp"
 #include "protocol/al_OSC.hpp"
+#include "protocol/al_OSCAPR.hpp"
 #include "protocol/al_Serialize.hpp"
 #include "system/al_Time.h"
 #include "system/al_Time.hpp"

@@ -3,7 +3,7 @@
 #include "stdlib.h"
 
 void osc_parsemessage(const osc::ReceivedMessage & p, void * userdata) {
-	printf("address %s tags %s args %d\n", p.AddressPattern(), p.TypeTags(), p.ArgumentCount());
+	printf("address %s tags %s args %d\n", p.AddressPattern(), p.TypeTags(), (int)p.ArgumentCount());
 	// etc.
 }
 

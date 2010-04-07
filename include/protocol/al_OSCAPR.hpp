@@ -46,12 +46,6 @@
 namespace osc {
 
 class Recv {
-protected:
-	apr_pool_t * mPool;
-	apr_sockaddr_t * mAddress;
-	apr_socket_t * mSock;
-	unsigned int mPort;
-	
 public:
 	typedef void (*MessageParser)(const osc::ReceivedMessage & p, void * userdata);
 	
@@ -77,15 +71,15 @@ public:
 	size_t recv(MessageParser handler, void * userdata, size_t maxlen = OSC_DEFAULT_MAX_MESSAGE_LEN);
 	
 	unsigned int port() { return mPort; }
-};
 	
-class Send {
 protected:
 	apr_pool_t * mPool;
 	apr_sockaddr_t * mAddress;
 	apr_socket_t * mSock;
 	unsigned int mPort;
-
+};
+	
+class Send {
 public:
 	/* 
 		Throws exception on error
@@ -108,6 +102,12 @@ public:
 	size_t send(const osc::OutboundPacketStream & packet);
 	
 	unsigned int port() { return mPort; }
+	
+protected:
+	apr_pool_t * mPool;
+	apr_sockaddr_t * mAddress;
+	apr_socket_t * mSock;
+	unsigned int mPort;
 };
 	
 } // namespace
