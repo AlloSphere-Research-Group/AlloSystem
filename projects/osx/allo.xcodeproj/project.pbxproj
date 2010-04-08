@@ -113,6 +113,15 @@
 		3622C0B2116D586200928703 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3622C0AF116D586200928703 /* MainMenu.xib */; };
 		365FA5F811612EA500A49D3F /* al_quat.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 365FA5F711612EA500A49D3F /* al_quat.hpp */; };
 		365FA5FF116131C200A49D3F /* al_quat.h in Headers */ = {isa = PBXBuildFile; fileRef = 365FA5FE116131C200A49D3F /* al_quat.h */; };
+		369EA39B116D5F5F00EB1934 /* exMainloopGLUT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BFA3116D556B00928703 /* exMainloopGLUT.cpp */; };
+		369EA39D116D5F5F00EB1934 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
+		369EA39E116D5F5F00EB1934 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
+		369EA39F116D5F5F00EB1934 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
+		369EA3A0116D5F5F00EB1934 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC53081162907D0076AA8B /* CoreAudio.framework */; };
+		369EA3A1116D5F5F00EB1934 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
+		369EA3A2116D5F5F00EB1934 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
+		369EA3A3116D5F5F00EB1934 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
+		369EA3AB116D5F7200EB1934 /* exCameraGLUT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 369EA3AA116D5F7200EB1934 /* exCameraGLUT.cpp */; };
 		36B4129910EFF864007B16D0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		36B412B010EFF916007B16D0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		36B4137D10EFFCC5007B16D0 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
@@ -154,6 +163,13 @@
 			remoteInfo = allocore;
 		};
 		3622BFD8116D55DD00928703 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 36B4130E10EFFA8D007B16D0;
+			remoteInfo = allocore;
+		};
+		369EA399116D5F5F00EB1934 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
@@ -226,7 +242,7 @@
 		16AC531A116290BE0076AA8B /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
 		16AC54BC1162BCA00076AA8B /* al_Vec.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Vec.hpp; sourceTree = "<group>"; };
 		3602B4C7110A67B6005DC3D0 /* exOscRecv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exOscRecv.cpp; sourceTree = "<group>"; };
-		3602B4D8110A67C9005DC3D0 /* oscreceive */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = oscreceive; sourceTree = BUILT_PRODUCTS_DIR; };
+		3602B4D8110A67C9005DC3D0 /* exOscRecv */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exOscRecv; sourceTree = BUILT_PRODUCTS_DIR; };
 		3602B53C110A6D3D005DC3D0 /* al_OSC.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OSC.hpp; sourceTree = "<group>"; };
 		3602B53D110A6D3D005DC3D0 /* al_Serialize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Serialize.h; sourceTree = "<group>"; };
 		3602B53E110A6D3D005DC3D0 /* al_Serialize.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Serialize.hpp; sourceTree = "<group>"; };
@@ -243,7 +259,7 @@
 		3602B54C110A6D3D005DC3D0 /* OscPrintReceivedElements.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OscPrintReceivedElements.h; sourceTree = "<group>"; };
 		3602B54D110A6D3D005DC3D0 /* OscReceivedElements.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OscReceivedElements.h; sourceTree = "<group>"; };
 		3602B54E110A6D3D005DC3D0 /* OscTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OscTypes.h; sourceTree = "<group>"; };
-		3602B736110A9770005DC3D0 /* oscsend */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = oscsend; sourceTree = BUILT_PRODUCTS_DIR; };
+		3602B736110A9770005DC3D0 /* exOscSend */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exOscSend; sourceTree = BUILT_PRODUCTS_DIR; };
 		3602B739110A9785005DC3D0 /* exOscSend.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exOscSend.cpp; sourceTree = "<group>"; };
 		3622BEB6116D516100928703 /* exMainloopGLUT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exMainloopGLUT; sourceTree = BUILT_PRODUCTS_DIR; };
 		3622BEDE116D527D00928703 /* al_AudioIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_AudioIO.cpp; sourceTree = "<group>"; };
@@ -291,6 +307,9 @@
 		3622C0B0116D586200928703 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		365FA5F711612EA500A49D3F /* al_quat.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_quat.hpp; sourceTree = "<group>"; };
 		365FA5FE116131C200A49D3F /* al_quat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_quat.h; sourceTree = "<group>"; };
+		369EA3A7116D5F5F00EB1934 /* exMainloopGLUT copy */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "exMainloopGLUT copy"; sourceTree = BUILT_PRODUCTS_DIR; };
+		369EA3AA116D5F7200EB1934 /* exCameraGLUT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exCameraGLUT.cpp; sourceTree = "<group>"; };
+		369EA3B0116D60CE00EB1934 /* liballoutil.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liballoutil.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		36A20CFC110ACA0E0075A21C /* al_OSCAPR.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OSCAPR.hpp; sourceTree = "<group>"; };
 		36B4124E10EFF7B8007B16D0 /* al_pq.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_pq.h; sourceTree = "<group>"; };
 		36B4124F10EFF7B8007B16D0 /* al_pq.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_pq.hpp; sourceTree = "<group>"; };
@@ -428,6 +447,27 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		369EA39C116D5F5F00EB1934 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				369EA39D116D5F5F00EB1934 /* OpenGL.framework in Frameworks */,
+				369EA39E116D5F5F00EB1934 /* AudioToolbox.framework in Frameworks */,
+				369EA39F116D5F5F00EB1934 /* AudioUnit.framework in Frameworks */,
+				369EA3A0116D5F5F00EB1934 /* CoreAudio.framework in Frameworks */,
+				369EA3A1116D5F5F00EB1934 /* liballocore.a in Frameworks */,
+				369EA3A2116D5F5F00EB1934 /* Cocoa.framework in Frameworks */,
+				369EA3A3116D5F5F00EB1934 /* GLUT.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		369EA3AE116D60CE00EB1934 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		36B4130D10EFFA8D007B16D0 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -493,12 +533,14 @@
 			children = (
 				8DD76F6C0486A84900D96B5E /* exScheduling */,
 				36B4130F10EFFA8D007B16D0 /* liballocore.a */,
-				3602B4D8110A67C9005DC3D0 /* oscreceive */,
-				3602B736110A9770005DC3D0 /* oscsend */,
+				3602B4D8110A67C9005DC3D0 /* exOscRecv */,
+				3602B736110A9770005DC3D0 /* exOscSend */,
 				16AC529711628D0E0076AA8B /* unitTests */,
 				3622BEB6116D516100928703 /* exMainloopGLUT */,
 				3622BFE6116D55DD00928703 /* exMainloopTool */,
 				3622C079116D575700928703 /* exMainloopCocoa.app */,
+				369EA3A7116D5F5F00EB1934 /* exMainloopGLUT copy */,
+				369EA3B0116D60CE00EB1934 /* liballoutil.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -561,6 +603,7 @@
 				3602B739110A9785005DC3D0 /* exOscSend.cpp */,
 				3622BFA3116D556B00928703 /* exMainloopGLUT.cpp */,
 				3622C02C116D561300928703 /* exMainloopTool.cpp */,
+				369EA3AA116D5F7200EB1934 /* exCameraGLUT.cpp */,
 			);
 			name = examples;
 			path = ../../examples;
@@ -825,6 +868,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		369EA3AC116D60CE00EB1934 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		36B4130B10EFFA8D007B16D0 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -892,7 +942,7 @@
 			name = exOscRecv;
 			productInstallPath = "$(HOME)/bin";
 			productName = alscheduling;
-			productReference = 3602B4D8110A67C9005DC3D0 /* oscreceive */;
+			productReference = 3602B4D8110A67C9005DC3D0 /* exOscRecv */;
 			productType = "com.apple.product-type.tool";
 		};
 		3602B728110A9770005DC3D0 /* exOscSend */ = {
@@ -911,7 +961,7 @@
 			name = exOscSend;
 			productInstallPath = "$(HOME)/bin";
 			productName = alscheduling;
-			productReference = 3602B736110A9770005DC3D0 /* oscsend */;
+			productReference = 3602B736110A9770005DC3D0 /* exOscSend */;
 			productType = "com.apple.product-type.tool";
 		};
 		3622BEA0116D516100928703 /* exMainloopGLUT */ = {
@@ -965,6 +1015,40 @@
 			productReference = 3622C079116D575700928703 /* exMainloopCocoa.app */;
 			productType = "com.apple.product-type.application";
 		};
+		369EA397116D5F5F00EB1934 /* exCameraGLUT */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 369EA3A4116D5F5F00EB1934 /* Build configuration list for PBXNativeTarget "exCameraGLUT" */;
+			buildPhases = (
+				369EA39A116D5F5F00EB1934 /* Sources */,
+				369EA39C116D5F5F00EB1934 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				369EA398116D5F5F00EB1934 /* PBXTargetDependency */,
+			);
+			name = exCameraGLUT;
+			productName = unitTests;
+			productReference = 369EA3A7116D5F5F00EB1934 /* exMainloopGLUT copy */;
+			productType = "com.apple.product-type.tool";
+		};
+		369EA3AF116D60CE00EB1934 /* alloutil */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 369EA3B4116D613100EB1934 /* Build configuration list for PBXNativeTarget "alloutil" */;
+			buildPhases = (
+				369EA3AC116D60CE00EB1934 /* Headers */,
+				369EA3AD116D60CE00EB1934 /* Sources */,
+				369EA3AE116D60CE00EB1934 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = alloutil;
+			productName = alloutil;
+			productReference = 369EA3B0116D60CE00EB1934 /* liballoutil.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		36B4130E10EFFA8D007B16D0 /* allocore */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 36B4131A10EFFAC3007B16D0 /* Build configuration list for PBXNativeTarget "allocore" */;
@@ -1014,6 +1098,7 @@
 			projectRoot = "";
 			targets = (
 				36B4130E10EFFA8D007B16D0 /* allocore */,
+				369EA3AF116D60CE00EB1934 /* alloutil */,
 				16AC529611628D0E0076AA8B /* unitTests */,
 				8DD76F620486A84900D96B5E /* exScheduling */,
 				3602B4CA110A67C9005DC3D0 /* exOscRecv */,
@@ -1021,6 +1106,7 @@
 				3622BEA0116D516100928703 /* exMainloopGLUT */,
 				3622BFD6116D55DD00928703 /* exMainloopTool */,
 				3622C078116D575700928703 /* exMainloopCocoa */,
+				369EA397116D5F5F00EB1934 /* exCameraGLUT */,
 			);
 		};
 /* End PBXProject section */
@@ -1093,6 +1179,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		369EA39A116D5F5F00EB1934 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				369EA39B116D5F5F00EB1934 /* exMainloopGLUT.cpp in Sources */,
+				369EA3AB116D5F7200EB1934 /* exCameraGLUT.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		369EA3AD116D60CE00EB1934 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		36B4130C10EFFA8D007B16D0 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1157,6 +1259,11 @@
 			isa = PBXTargetDependency;
 			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
 			targetProxy = 3622BFD8116D55DD00928703 /* PBXContainerItemProxy */;
+		};
+		369EA398116D5F5F00EB1934 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
+			targetProxy = 369EA399116D5F5F00EB1934 /* PBXContainerItemProxy */;
 		};
 		36B4131810EFFAA5007B16D0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1281,6 +1388,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_INPUT_FILETYPE = automatic;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
@@ -1298,14 +1406,16 @@
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = ../../include;
+				HEADER_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = (
-					../../dev_osx,
-					"../../build/**",
+					$PROJECT_DIR/../../dev_osx,
+					$PROJECT_DIR/../../build/$CONFIGURATION,
 				);
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
+				PRODUCT_NAME = $TARGET_NAME;
 				SDKROOT = macosx10.4;
+				USER_HEADER_SEARCH_PATHS = ../../include;
 			};
 			name = Debug;
 		};
@@ -1314,6 +1424,7 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_INPUT_FILETYPE = automatic;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_STRICT_ALIASING = YES;
@@ -1333,14 +1444,16 @@
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VALUE = NO;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = ../../include;
+				HEADER_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = (
-					../../dev_osx,
-					"../../build/**",
+					$PROJECT_DIR/../../dev_osx,
+					$PROJECT_DIR/../../build/$CONFIGURATION,
 				);
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
+				PRODUCT_NAME = $TARGET_NAME;
 				SDKROOT = macosx10.4;
+				USER_HEADER_SEARCH_PATHS = ../../include;
 			};
 			name = Release;
 		};
@@ -1638,6 +1751,94 @@
 			};
 			name = Release;
 		};
+		369EA3A5116D5F5F00EB1934 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = "";
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\\\\\\\"$(SRCROOT)/../../dev_osx/lib\\\\\\\"",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = $TARGET_NAME;
+				USER_HEADER_SEARCH_PATHS = ../../include;
+			};
+			name = Debug;
+		};
+		369EA3A6116D5F5F00EB1934 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				HEADER_SEARCH_PATHS = "";
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\\\\\\\"$(SRCROOT)/../../dev_osx/lib\\\\\\\"",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = $TARGET_NAME;
+				USER_HEADER_SEARCH_PATHS = ../../include;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		369EA3B1116D60CF00EB1934 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = /usr/local/lib;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = $TARGET_NAME;
+			};
+			name = Debug;
+		};
+		369EA3B2116D60CF00EB1934 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = /usr/local/lib;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = $TARGET_NAME;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		36B4131010EFFA8E007B16D0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1775,6 +1976,24 @@
 			buildConfigurations = (
 				3622C07C116D575800928703 /* Debug */,
 				3622C07D116D575800928703 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		369EA3A4116D5F5F00EB1934 /* Build configuration list for PBXNativeTarget "exCameraGLUT" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				369EA3A5116D5F5F00EB1934 /* Debug */,
+				369EA3A6116D5F5F00EB1934 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		369EA3B4116D613100EB1934 /* Build configuration list for PBXNativeTarget "alloutil" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				369EA3B1116D60CF00EB1934 /* Debug */,
+				369EA3B2116D60CF00EB1934 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
