@@ -50,7 +50,7 @@ void onRecv2(const osc::ReceivedMessage & p, void * userdata) {
 	}
 }
 
-#define USE_APR
+//#define USE_APR
 
 int utProtocolOSC(){
 

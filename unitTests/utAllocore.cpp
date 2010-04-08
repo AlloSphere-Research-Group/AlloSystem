@@ -5,10 +5,10 @@ int main(){
 	utTypes();
 	utSystem();
 	utProtocolOSC();
-//	utProtocolSerialize();
-//
-//	utIOAudioIO();
-//	utIOWindowGL();
+	utProtocolSerialize();
+
+	utIOAudioIO();
+	utIOWindowGL();
 
 	return 0;
 }

@@ -30,7 +30,9 @@
 
 - (id)initWithInterval:(al_sec)interval;
 {
-	if (self = [super init])
+	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+	
+	if ((self = [super init]))
 	{
 		main = al_main_get();
 		timer = [NSTimer timerWithTimeInterval:(NSTimeInterval)interval
@@ -45,6 +47,7 @@
 		[[NSRunLoop currentRunLoop] addTimer:timer forMode:NSModalPanelRunLoopMode]; 
 		[[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode]; 
 	}
+	[pool release];
 	return self;
 }
 

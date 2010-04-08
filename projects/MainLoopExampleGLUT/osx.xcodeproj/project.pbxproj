@@ -64,7 +64,7 @@
 			isa = PBXGroup;
 			children = (
 				36C8FA22107135DE003EC91B /* system */,
-				36C8FA23107135DE003EC91B /* src */,
+				36C8FA23107135DE003EC91B /* system */,
 				08FB7795FE84155DC02AAC07 /* projects */,
 				C6859E8C029090F304C91782 /* Documentation */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
@@ -103,15 +103,15 @@
 			path = ../../include/system;
 			sourceTree = SOURCE_ROOT;
 		};
-		36C8FA23107135DE003EC91B /* src */ = {
+		36C8FA23107135DE003EC91B /* system */ = {
 			isa = PBXGroup;
 			children = (
 				36C8FA5D10713737003EC91B /* al_time.cpp */,
 				36C8FA25107135F3003EC91B /* al_mainloop.cpp */,
 				36C8FA5F10713767003EC91B /* al_mainloop_osx.mm */,
 			);
-			name = src;
-			path = ../../system/src;
+			name = system;
+			path = ../../src/system;
 			sourceTree = SOURCE_ROOT;
 		};
 		C6859E8C029090F304C91782 /* Documentation */ = {
