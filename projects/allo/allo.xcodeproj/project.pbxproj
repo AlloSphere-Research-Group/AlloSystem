@@ -106,7 +106,7 @@
 		36F46825110BE2E90082D21E /* al_File.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36F46822110BE2E90082D21E /* al_File.hpp */; };
 		36F46826110BE2E90082D21E /* al_WindowGL.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36F46823110BE2E90082D21E /* al_WindowGL.hpp */; };
 		36F46846110BE3520082D21E /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
-		8DD76F650486A84900D96B5E /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* main.cpp */; settings = {ATTRIBUTES = (); }; };
+		8DD76F650486A84900D96B5E /* alscheduling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* alscheduling.cpp */; settings = {ATTRIBUTES = (); }; };
 		8DD76F6A0486A84900D96B5E /* alscheduling.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* alscheduling.1 */; };
 /* End PBXBuildFile section */
 
@@ -182,7 +182,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		08FB7796FE84155DC02AAC07 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		08FB7796FE84155DC02AAC07 /* alscheduling.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = alscheduling.cpp; sourceTree = "<group>"; };
 		168EC8EB1161CA2C00FCACC7 /* al_Time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Time.h; sourceTree = "<group>"; };
 		168EC8EC1161CA2C00FCACC7 /* al_MainLoop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_MainLoop.h; sourceTree = "<group>"; };
 		168EC8ED1161CA2C00FCACC7 /* al_Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Config.h; sourceTree = "<group>"; };
@@ -401,8 +401,8 @@
 		08FB7794FE84155DC02AAC07 /* alscheduling */ = {
 			isa = PBXGroup;
 			children = (
-				3622BEDC116D527D00928703 /* src */,
 				36B4124410EFF7B8007B16D0 /* include */,
+				3622BEDC116D527D00928703 /* src */,
 				3622BEDB116D526700928703 /* examples */,
 				16AC528F11628CD50076AA8B /* unitTests */,
 				36B4127010EFF864007B16D0 /* dev_osx */,
@@ -492,7 +492,7 @@
 			isa = PBXGroup;
 			children = (
 				36B4139610EFFD4C007B16D0 /* main.h */,
-				08FB7796FE84155DC02AAC07 /* main.cpp */,
+				08FB7796FE84155DC02AAC07 /* alscheduling.cpp */,
 				3602B4C7110A67B6005DC3D0 /* osc_receive.cpp */,
 				3602B739110A9785005DC3D0 /* osc_send.cpp */,
 			);
@@ -987,7 +987,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8DD76F650486A84900D96B5E /* main.cpp in Sources */,
+				8DD76F650486A84900D96B5E /* alscheduling.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
