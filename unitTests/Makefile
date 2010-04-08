@@ -17,6 +17,7 @@ SRCS =	utIOAudioIO.cpp \
 
 OBJS = $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
+CFLAGS += $(addprefix -I../, $(INC_DIRS))
 LFLAGS += -L../$(BIN_DIR) -L../$(DEV_DIR)/lib -lallocore
 
 ../$(OBJ_DIR)/%.o: %.cpp

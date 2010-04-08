@@ -21,6 +21,7 @@ SYS_SRC		:= $(addprefix $(SRC_DIR)/$(SYS_DIR)/, $(SYS_SRC))
 SRCS = $(IO_SRC) $(PRO_SRC) $(SYS_SRC) $(TYPES_SRC)
 OBJS = $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
+CFLAGS += $(addprefix -I./, $(INC_DIRS))
 
 #--------------------------------------------------------------------------
 # Targets
@@ -38,9 +39,9 @@ $(OBJ_DIR)/%.o: %.c
 all: $(BIN_DIR)/$(SLIB_FILE)
 
 # Build static library
-$(BIN_DIR)/$(SLIB_FILE): $(addprefix $(OBJ_DIR)/, $(OBJS))
+$(BIN_DIR)/$(SLIB_FILE): createFolders $(addprefix $(OBJ_DIR)/, $(OBJS))
 	@echo AR $@
-	@$(AR) $@ $^
+	@$(AR) $@ $(filter %.o, $^)
 	@$(RANLIB) $@
 
 # Build dynamic (shared) library
@@ -55,7 +56,7 @@ test: $(BIN_DIR)/$(SLIB_FILE)
 
 # Remove active build configuration binary files
 .PHONY: clean
-clean:
+clean: createFolders
 #	@echo $(VPATH)
 	@find $(BIN_DIR) -type f ! -path '*.svn*' | xargs rm -f
 #	@cd $(IO_DIR) && make clean
@@ -66,4 +67,7 @@ clean:
 .PHONY: cleanall
 cleanall:
 	@find $(BUILD_DIR) -type f ! -path '*.svn*' | xargs rm -f
+
+createFolders:
+	@mkdir -p $(OBJ_DIR)
 
