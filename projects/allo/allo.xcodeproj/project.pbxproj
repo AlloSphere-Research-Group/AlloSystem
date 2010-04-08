@@ -100,7 +100,7 @@
 		3622C045116D566C00928703 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
 		3622C046116D566C00928703 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC53081162907D0076AA8B /* CoreAudio.framework */; };
 		3622C047116D566C00928703 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
-		3622C083116D579D00928703 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3622C080116D579D00928703 /* main.m */; };
+		3622C083116D579D00928703 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3622C080116D579D00928703 /* main.mm */; };
 		3622C084116D579D00928703 /* TestController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3622C082116D579D00928703 /* TestController.m */; };
 		3622C087116D57B300928703 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		3622C088116D57B300928703 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
@@ -284,7 +284,7 @@
 		3622C079116D575700928703 /* exMainloopCocoa.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = exMainloopCocoa.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3622C07B116D575700928703 /* exMainloopCocoa-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "exMainloopCocoa-Info.plist"; sourceTree = "<group>"; };
 		3622C07F116D579D00928703 /* CocoaExample_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CocoaExample_Prefix.pch; sourceTree = "<group>"; };
-		3622C080116D579D00928703 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		3622C080116D579D00928703 /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
 		3622C081116D579D00928703 /* TestController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestController.h; sourceTree = "<group>"; };
 		3622C082116D579D00928703 /* TestController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestController.m; sourceTree = "<group>"; };
 		3622C0AE116D586200928703 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -676,7 +676,7 @@
 				3622C0AD116D586200928703 /* InfoPlist.strings */,
 				3622C0AF116D586200928703 /* MainMenu.xib */,
 				3622C07F116D579D00928703 /* CocoaExample_Prefix.pch */,
-				3622C080116D579D00928703 /* main.m */,
+				3622C080116D579D00928703 /* main.mm */,
 				3622C081116D579D00928703 /* TestController.h */,
 				3622C082116D579D00928703 /* TestController.m */,
 				3622C07B116D575700928703 /* exMainloopCocoa-Info.plist */,
@@ -1088,7 +1088,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3622C083116D579D00928703 /* main.m in Sources */,
+				3622C083116D579D00928703 /* main.mm in Sources */,
 				3622C084116D579D00928703 /* TestController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
