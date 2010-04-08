@@ -1,5 +1,11 @@
 #include "system/al_mainloop.h"
 
+/*
+
+	TODO: Combine this mainloop stuff with the alWindowGLUT stuff
+
+*/
+
 #ifdef AL_OSX
 #include <OpenGL/OpenGL.h>
 #include <OpenGL/gl.h>
