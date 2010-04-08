@@ -245,7 +245,7 @@
 		3602B54E110A6D3D005DC3D0 /* OscTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OscTypes.h; sourceTree = "<group>"; };
 		3602B736110A9770005DC3D0 /* oscsend */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = oscsend; sourceTree = BUILT_PRODUCTS_DIR; };
 		3602B739110A9785005DC3D0 /* exOscSend.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exOscSend.cpp; sourceTree = "<group>"; };
-		3622BEB6116D516100928703 /* unitTests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = unitTests; sourceTree = BUILT_PRODUCTS_DIR; };
+		3622BEB6116D516100928703 /* exMainloopGLUT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exMainloopGLUT; sourceTree = BUILT_PRODUCTS_DIR; };
 		3622BEDE116D527D00928703 /* al_AudioIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_AudioIO.cpp; sourceTree = "<group>"; };
 		3622BEDF116D527D00928703 /* al_File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_File.cpp; sourceTree = "<group>"; };
 		3622BEE0116D527D00928703 /* al_Socket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Socket.cpp; sourceTree = "<group>"; };
@@ -279,7 +279,7 @@
 		3622BF04116D527D00928703 /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
 		3622BF05116D527D00928703 /* test_portaudio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_portaudio.c; sourceTree = "<group>"; };
 		3622BFA3116D556B00928703 /* exMainloopGLUT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exMainloopGLUT.cpp; sourceTree = "<group>"; };
-		3622BFE6116D55DD00928703 /* unitTests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = unitTests; sourceTree = BUILT_PRODUCTS_DIR; };
+		3622BFE6116D55DD00928703 /* exMainloopTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exMainloopTool; sourceTree = BUILT_PRODUCTS_DIR; };
 		3622C02C116D561300928703 /* exMainloopTool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exMainloopTool.cpp; sourceTree = "<group>"; };
 		3622C079116D575700928703 /* exMainloopCocoa.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = exMainloopCocoa.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3622C07B116D575700928703 /* exMainloopCocoa-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "exMainloopCocoa-Info.plist"; sourceTree = "<group>"; };
@@ -345,7 +345,7 @@
 		36F46823110BE2E90082D21E /* al_WindowGL.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_WindowGL.hpp; sourceTree = "<group>"; };
 		36F46844110BE34D0082D21E /* libportaudio.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libportaudio.a; sourceTree = "<group>"; };
 		36F46847110BE3640082D21E /* portaudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = portaudio.h; sourceTree = "<group>"; };
-		8DD76F6C0486A84900D96B5E /* alscheduling */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = alscheduling; sourceTree = BUILT_PRODUCTS_DIR; };
+		8DD76F6C0486A84900D96B5E /* exScheduling */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exScheduling; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6859E8B029090EE04C91782 /* alscheduling.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = alscheduling.1; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -491,13 +491,13 @@
 		1AB674ADFE9D54B511CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8DD76F6C0486A84900D96B5E /* alscheduling */,
+				8DD76F6C0486A84900D96B5E /* exScheduling */,
 				36B4130F10EFFA8D007B16D0 /* liballocore.a */,
 				3602B4D8110A67C9005DC3D0 /* oscreceive */,
 				3602B736110A9770005DC3D0 /* oscsend */,
 				16AC529711628D0E0076AA8B /* unitTests */,
-				3622BEB6116D516100928703 /* unitTests */,
-				3622BFE6116D55DD00928703 /* unitTests */,
+				3622BEB6116D516100928703 /* exMainloopGLUT */,
+				3622BFE6116D55DD00928703 /* exMainloopTool */,
 				3622C079116D575700928703 /* exMainloopCocoa.app */,
 			);
 			name = Products;
@@ -876,9 +876,9 @@
 			productReference = 16AC529711628D0E0076AA8B /* unitTests */;
 			productType = "com.apple.product-type.tool";
 		};
-		3602B4CA110A67C9005DC3D0 /* oscreceive */ = {
+		3602B4CA110A67C9005DC3D0 /* exOscRecv */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3602B4D5110A67C9005DC3D0 /* Build configuration list for PBXNativeTarget "oscreceive" */;
+			buildConfigurationList = 3602B4D5110A67C9005DC3D0 /* Build configuration list for PBXNativeTarget "exOscRecv" */;
 			buildPhases = (
 				3602B4CD110A67C9005DC3D0 /* Sources */,
 				3602B4CF110A67C9005DC3D0 /* Frameworks */,
@@ -889,15 +889,15 @@
 			dependencies = (
 				3602B4CB110A67C9005DC3D0 /* PBXTargetDependency */,
 			);
-			name = oscreceive;
+			name = exOscRecv;
 			productInstallPath = "$(HOME)/bin";
 			productName = alscheduling;
 			productReference = 3602B4D8110A67C9005DC3D0 /* oscreceive */;
 			productType = "com.apple.product-type.tool";
 		};
-		3602B728110A9770005DC3D0 /* oscsend */ = {
+		3602B728110A9770005DC3D0 /* exOscSend */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3602B733110A9770005DC3D0 /* Build configuration list for PBXNativeTarget "oscsend" */;
+			buildConfigurationList = 3602B733110A9770005DC3D0 /* Build configuration list for PBXNativeTarget "exOscSend" */;
 			buildPhases = (
 				3602B72B110A9770005DC3D0 /* Sources */,
 				3602B72D110A9770005DC3D0 /* Frameworks */,
@@ -908,7 +908,7 @@
 			dependencies = (
 				3602B729110A9770005DC3D0 /* PBXTargetDependency */,
 			);
-			name = oscsend;
+			name = exOscSend;
 			productInstallPath = "$(HOME)/bin";
 			productName = alscheduling;
 			productReference = 3602B736110A9770005DC3D0 /* oscsend */;
@@ -928,7 +928,7 @@
 			);
 			name = exMainloopGLUT;
 			productName = unitTests;
-			productReference = 3622BEB6116D516100928703 /* unitTests */;
+			productReference = 3622BEB6116D516100928703 /* exMainloopGLUT */;
 			productType = "com.apple.product-type.tool";
 		};
 		3622BFD6116D55DD00928703 /* exMainloopTool */ = {
@@ -945,7 +945,7 @@
 			);
 			name = exMainloopTool;
 			productName = unitTests;
-			productReference = 3622BFE6116D55DD00928703 /* unitTests */;
+			productReference = 3622BFE6116D55DD00928703 /* exMainloopTool */;
 			productType = "com.apple.product-type.tool";
 		};
 		3622C078116D575700928703 /* exMainloopCocoa */ = {
@@ -982,9 +982,9 @@
 			productReference = 36B4130F10EFFA8D007B16D0 /* liballocore.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		8DD76F620486A84900D96B5E /* alscheduling */ = {
+		8DD76F620486A84900D96B5E /* exScheduling */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "alscheduling" */;
+			buildConfigurationList = 1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "exScheduling" */;
 			buildPhases = (
 				8DD76F640486A84900D96B5E /* Sources */,
 				8DD76F660486A84900D96B5E /* Frameworks */,
@@ -995,10 +995,10 @@
 			dependencies = (
 				36B4131810EFFAA5007B16D0 /* PBXTargetDependency */,
 			);
-			name = alscheduling;
+			name = exScheduling;
 			productInstallPath = "$(HOME)/bin";
 			productName = alscheduling;
-			productReference = 8DD76F6C0486A84900D96B5E /* alscheduling */;
+			productReference = 8DD76F6C0486A84900D96B5E /* exScheduling */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -1015,9 +1015,9 @@
 			targets = (
 				36B4130E10EFFA8D007B16D0 /* allocore */,
 				16AC529611628D0E0076AA8B /* unitTests */,
-				8DD76F620486A84900D96B5E /* alscheduling */,
-				3602B4CA110A67C9005DC3D0 /* oscreceive */,
-				3602B728110A9770005DC3D0 /* oscsend */,
+				8DD76F620486A84900D96B5E /* exScheduling */,
+				3602B4CA110A67C9005DC3D0 /* exOscRecv */,
+				3602B728110A9770005DC3D0 /* exOscSend */,
 				3622BEA0116D516100928703 /* exMainloopGLUT */,
 				3622BFD6116D55DD00928703 /* exMainloopTool */,
 				3622C078116D575700928703 /* exMainloopCocoa */,
@@ -1249,7 +1249,7 @@
 					"-DAPR_FAST_COMPAT",
 					"-DAPR_STRICT",
 				);
-				PRODUCT_NAME = alscheduling;
+				PRODUCT_NAME = $TARGET_NAME;
 				SYMROOT = ../../build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../dev_osx/include\"/**";
 			};
@@ -1270,7 +1270,7 @@
 					"-DAPR_FAST_COMPAT",
 					"-DAPR_STRICT",
 				);
-				PRODUCT_NAME = alscheduling;
+				PRODUCT_NAME = $TARGET_NAME;
 				SYMROOT = ../../build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../dev_osx/include\"/**";
 			};
@@ -1508,7 +1508,7 @@
 					"\\\"$(SRCROOT)/../../dev_osx/lib\\\"",
 				);
 				PREBINDING = NO;
-				PRODUCT_NAME = unitTests;
+				PRODUCT_NAME = $TARGET_NAME;
 				USER_HEADER_SEARCH_PATHS = ../../include;
 			};
 			name = Debug;
@@ -1528,7 +1528,7 @@
 					"\\\"$(SRCROOT)/../../dev_osx/lib\\\"",
 				);
 				PREBINDING = NO;
-				PRODUCT_NAME = unitTests;
+				PRODUCT_NAME = $TARGET_NAME;
 				USER_HEADER_SEARCH_PATHS = ../../include;
 				ZERO_LINK = NO;
 			};
@@ -1550,7 +1550,7 @@
 					"\\\\\\\"$(SRCROOT)/../../dev_osx/lib\\\\\\\"",
 				);
 				PREBINDING = NO;
-				PRODUCT_NAME = unitTests;
+				PRODUCT_NAME = $TARGET_NAME;
 				USER_HEADER_SEARCH_PATHS = ../../include;
 			};
 			name = Debug;
@@ -1570,7 +1570,7 @@
 					"\\\\\\\"$(SRCROOT)/../../dev_osx/lib\\\\\\\"",
 				);
 				PREBINDING = NO;
-				PRODUCT_NAME = unitTests;
+				PRODUCT_NAME = $TARGET_NAME;
 				USER_HEADER_SEARCH_PATHS = ../../include;
 				ZERO_LINK = NO;
 			};
@@ -1716,7 +1716,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "alscheduling" */ = {
+		1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "exScheduling" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1DEB923208733DC60010E9CD /* Debug */,
@@ -1734,7 +1734,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3602B4D5110A67C9005DC3D0 /* Build configuration list for PBXNativeTarget "oscreceive" */ = {
+		3602B4D5110A67C9005DC3D0 /* Build configuration list for PBXNativeTarget "exOscRecv" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3602B4D6110A67C9005DC3D0 /* Debug */,
@@ -1743,7 +1743,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3602B733110A9770005DC3D0 /* Build configuration list for PBXNativeTarget "oscsend" */ = {
+		3602B733110A9770005DC3D0 /* Build configuration list for PBXNativeTarget "exOscSend" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3602B734110A9770005DC3D0 /* Debug */,
