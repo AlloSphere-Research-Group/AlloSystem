@@ -46,14 +46,14 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 369EAEC7116D688300EB1934 /* threadedapp.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 8D1107320486CEB800E47090 /* threadedapp.app */;
+			remoteGlobalIDString = 8D1107320486CEB800E47090;
 			remoteInfo = threadedapp;
 		};
 		369EAEDA116D68B400EB1934 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 369EAED5116D68AA00EB1934 /* allocore */;
+			remoteGlobalIDString = 369EAED5116D68AA00EB1934;
 			remoteInfo = allocore;
 		};
 /* End PBXContainerItemProxy section */

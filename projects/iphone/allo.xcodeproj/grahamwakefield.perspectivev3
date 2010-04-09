@@ -210,17 +210,16 @@
 			<array>
 				<string>XCToolbarPerspectiveControl</string>
 				<string>NSToolbarSeparatorItem</string>
+				<string>active-combo-popup</string>
 				<string>toggle-editor</string>
-				<string>active-target-popup</string>
-				<string>active-buildstyle-popup</string>
-				<string>active-executable-popup</string>
 				<string>NSToolbarFlexibleSpaceItem</string>
-				<string>buildOrClean</string>
-				<string>build-and-goOrGo</string>
+				<string>build-and-go</string>
 				<string>clean-target</string>
 				<string>clean</string>
-				<string>go-debug</string>
 				<string>com.apple.ide.PBXToolbarStopButton</string>
+				<string>get-info</string>
+				<string>NSToolbarFlexibleSpaceItem</string>
+				<string>com.apple.pbx.toolbar.searchfield</string>
 			</array>
 			<key>ControllerClassBaseName</key>
 			<string></string>
@@ -241,7 +240,6 @@
 						<array>
 							<string>1C37FBAC04509CD000000102</string>
 							<string>1C37FAAC04509CD000000102</string>
-							<string>1C08E77C0454961000C914BD</string>
 							<string>1C37FABC05509CD000000102</string>
 							<string>1C37FABC05539CD112110102</string>
 							<string>E2644B35053B69B200211256</string>
@@ -275,39 +273,20 @@
 								<string>369EAE0E116D686E00EB1934</string>
 								<string>19C28FACFE9D520D11CA2CBB</string>
 								<string>1C37FBAC04509CD000000102</string>
-								<string>369EAEE5116D68E700EB1934</string>
-								<string>369EAEE6116D68E700EB1934</string>
-								<string>369EAEE7116D68E700EB1934</string>
-								<string>369EAEE8116D68E700EB1934</string>
-								<string>369EAEE9116D68E700EB1934</string>
-								<string>369EAEEA116D68E700EB1934</string>
-								<string>369EAEEB116D68E700EB1934</string>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
 									<integer>16</integer>
-									<integer>15</integer>
-									<integer>13</integer>
-									<integer>12</integer>
 								</array>
 								<array>
 									<integer>17</integer>
-									<integer>15</integer>
-									<integer>13</integer>
-									<integer>12</integer>
 								</array>
 								<array>
 									<integer>18</integer>
-									<integer>15</integer>
-									<integer>13</integer>
-									<integer>12</integer>
 								</array>
 								<array>
 									<integer>19</integer>
-									<integer>15</integer>
-									<integer>13</integer>
-									<integer>12</integer>
 								</array>
 							</array>
 							<key>PBXSmartGroupTreeModuleOutlineStateVisibleRectKey</key>
@@ -344,13 +323,15 @@
 								<key>PBXProjectModuleGUID</key>
 								<string>369EAD29116D65E000EB1934</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>&lt;No Editor&gt;</string>
+								<string></string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
 									<dict>
 										<key>PBXProjectModuleGUID</key>
 										<string>369EAD2A116D65E000EB1934</string>
+										<key>PBXProjectModuleLabel</key>
+										<string></string>
 									</dict>
 									<key>SplitCount</key>
 									<string>1</string>
@@ -435,7 +416,7 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>XCMainBuildResultsModuleGUID</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>Build</string>
+										<string>Build Results</string>
 										<key>XCBuildResultsTrigger_Collapse</key>
 										<integer>1021</integer>
 										<key>XCBuildResultsTrigger_Open</key>
@@ -444,7 +425,7 @@
 									<key>GeometryConfiguration</key>
 									<dict>
 										<key>Frame</key>
-										<string>{{10, 27}, {637, -27}}</string>
+										<string>{{0, 0}, {568, 405}}</string>
 									</dict>
 									<key>Module</key>
 									<string>PBXBuildResultsModule</string>
@@ -472,16 +453,18 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>369EAD7D116D673E00EB1934</string>
+				<string>3625B4FD116EEC3F00C685B7</string>
 				<string>1CA23ED40692098700951B8B</string>
-				<string>369EAD7E116D673E00EB1934</string>
+				<string>3625B4FE116EEC3F00C685B7</string>
 				<string>369EAD29116D65E000EB1934</string>
-				<string>369EAD7F116D673E00EB1934</string>
+				<string>3625B4FF116EEC3F00C685B7</string>
 				<string>1CA23EDF0692099D00951B8B</string>
 				<string>1CA23EE00692099D00951B8B</string>
 				<string>1CA23EE10692099D00951B8B</string>
 				<string>XCMainBuildResultsModuleGUID</string>
 			</array>
+			<key>ToolbarConfigUserDefaultsMinorVersion</key>
+			<string>2</string>
 			<key>ToolbarConfiguration</key>
 			<string>xcode.toolbar.config.defaultV3</string>
 		</dict>

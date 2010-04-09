@@ -305,9 +305,11 @@
 		3622C082116D579D00928703 /* TestController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestController.m; sourceTree = "<group>"; };
 		3622C0AE116D586200928703 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		3622C0B0116D586200928703 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		3625B540116EEDEF00C685B7 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../Makefile; sourceTree = SOURCE_ROOT; };
+		3625B541116EEDEF00C685B7 /* Makefile.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.config; path = ../../Makefile.config; sourceTree = SOURCE_ROOT; };
 		365FA5F711612EA500A49D3F /* al_quat.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_quat.hpp; sourceTree = "<group>"; };
 		365FA5FE116131C200A49D3F /* al_quat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_quat.h; sourceTree = "<group>"; };
-		369EA3A7116D5F5F00EB1934 /* exMainloopGLUT copy */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "exMainloopGLUT copy"; sourceTree = BUILT_PRODUCTS_DIR; };
+		369EA3A7116D5F5F00EB1934 /* exCameraGLUT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exCameraGLUT; sourceTree = BUILT_PRODUCTS_DIR; };
 		369EA3AA116D5F7200EB1934 /* exCameraGLUT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exCameraGLUT.cpp; sourceTree = "<group>"; };
 		369EA3B0116D60CE00EB1934 /* liballoutil.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liballoutil.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		36A20CFC110ACA0E0075A21C /* al_OSCAPR.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OSCAPR.hpp; sourceTree = "<group>"; };
@@ -502,11 +504,13 @@
 		08FB7794FE84155DC02AAC07 /* alscheduling */ = {
 			isa = PBXGroup;
 			children = (
+				3625B540116EEDEF00C685B7 /* Makefile */,
+				3625B541116EEDEF00C685B7 /* Makefile.config */,
 				36B4124410EFF7B8007B16D0 /* include */,
 				3622BEDC116D527D00928703 /* src */,
 				3622BEDB116D526700928703 /* examples */,
 				16AC528F11628CD50076AA8B /* unitTests */,
-				36B4127010EFF864007B16D0 /* dev_osx */,
+				36B4127010EFF864007B16D0 /* osx */,
 				C6859E8C029090F304C91782 /* Documentation */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
 			);
@@ -539,7 +543,7 @@
 				3622BEB6116D516100928703 /* exMainloopGLUT */,
 				3622BFE6116D55DD00928703 /* exMainloopTool */,
 				3622C079116D575700928703 /* exMainloopCocoa.app */,
-				369EA3A7116D5F5F00EB1934 /* exMainloopGLUT copy */,
+				369EA3A7116D5F5F00EB1934 /* exCameraGLUT */,
 				369EA3B0116D60CE00EB1934 /* liballoutil.a */,
 			);
 			name = Products;
@@ -769,7 +773,7 @@
 			path = types;
 			sourceTree = "<group>";
 		};
-		36B4127010EFF864007B16D0 /* dev_osx */ = {
+		36B4127010EFF864007B16D0 /* osx */ = {
 			isa = PBXGroup;
 			children = (
 				16AC531A116290BE0076AA8B /* AudioToolbox.framework */,
@@ -781,8 +785,8 @@
 				36B4127110EFF864007B16D0 /* include */,
 				36B4129710EFF864007B16D0 /* lib */,
 			);
-			name = dev_osx;
-			path = ../../dev_osx;
+			name = osx;
+			path = ../../dev/osx;
 			sourceTree = SOURCE_ROOT;
 		};
 		36B4127110EFF864007B16D0 /* include */ = {
@@ -1029,7 +1033,7 @@
 			);
 			name = exCameraGLUT;
 			productName = unitTests;
-			productReference = 369EA3A7116D5F5F00EB1934 /* exMainloopGLUT copy */;
+			productReference = 369EA3A7116D5F5F00EB1934 /* exCameraGLUT */;
 			productType = "com.apple.product-type.tool";
 		};
 		369EA3AF116D60CE00EB1934 /* alloutil */ = {
@@ -1391,6 +1395,7 @@
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_INPUT_FILETYPE = automatic;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_VERSION = 4.0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -1408,14 +1413,14 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = (
-					$PROJECT_DIR/../../dev_osx,
+					$PROJECT_DIR/../../dev/osx/lib,
 					$PROJECT_DIR/../../build/$CONFIGURATION,
 				);
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				SDKROOT = macosx10.4;
-				USER_HEADER_SEARCH_PATHS = ../../include;
+				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../include";
 			};
 			name = Debug;
 		};
@@ -1429,6 +1434,7 @@
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_STRICT_ALIASING = YES;
 				GCC_UNROLL_LOOPS = YES;
+				GCC_VERSION = 4.0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -1446,14 +1452,14 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
 				LIBRARY_SEARCH_PATHS = (
-					$PROJECT_DIR/../../dev_osx,
+					$PROJECT_DIR/../../dev/osx/lib,
 					$PROJECT_DIR/../../build/$CONFIGURATION,
 				);
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				SDKROOT = macosx10.4;
-				USER_HEADER_SEARCH_PATHS = ../../include;
+				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../include";
 			};
 			name = Release;
 		};
@@ -1850,7 +1856,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				INSTALL_PATH = /usr/local/lib;
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../../dev_osx/lib\"";
+				LIBRARY_SEARCH_PATHS = ../../dev/osx/lib;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "-DOSC_HOST_LITTLE_ENDIAN";
 				OTHER_LDFLAGS = (
@@ -1868,7 +1874,7 @@
 				SDKROOT = macosx10.4;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
 				SYMROOT = ../../build;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\"/** \"$(SRCROOT)/../../dev_osx/include\"/**";
+				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../include";
 			};
 			name = Debug;
 		};
@@ -1882,7 +1888,7 @@
 				GCC_MODEL_TUNING = G5;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				INSTALL_PATH = /usr/local/lib;
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../../dev_osx/lib\"";
+				LIBRARY_SEARCH_PATHS = ../../dev/osx/lib;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "-DOSC_HOST_LITTLE_ENDIAN";
 				OTHER_LDFLAGS = (
@@ -1900,7 +1906,7 @@
 				SDKROOT = macosx10.4;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
 				SYMROOT = ../../build;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\"/** \"$(SRCROOT)/../../dev_osx/include\"/**";
+				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../include";
 				ZERO_LINK = NO;
 			};
 			name = Release;
