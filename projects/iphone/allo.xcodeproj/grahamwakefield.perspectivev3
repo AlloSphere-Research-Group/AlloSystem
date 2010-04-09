@@ -344,40 +344,13 @@
 								<key>PBXProjectModuleGUID</key>
 								<string>369EAD29116D65E000EB1934</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>al_AudioIO.cpp</string>
+								<string>&lt;No Editor&gt;</string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
 									<dict>
 										<key>PBXProjectModuleGUID</key>
 										<string>369EAD2A116D65E000EB1934</string>
-										<key>PBXProjectModuleLabel</key>
-										<string>al_AudioIO.cpp</string>
-										<key>_historyCapacity</key>
-										<integer>0</integer>
-										<key>bookmark</key>
-										<string>369EAF13116D693B00EB1934</string>
-										<key>history</key>
-										<array>
-											<string>369EAF04116D693B00EB1934</string>
-											<string>369EAF05116D693B00EB1934</string>
-											<string>369EAF06116D693B00EB1934</string>
-											<string>369EAF07116D693B00EB1934</string>
-											<string>369EAF08116D693B00EB1934</string>
-											<string>369EAF09116D693B00EB1934</string>
-											<string>369EAF0A116D693B00EB1934</string>
-											<string>369EAF0B116D693B00EB1934</string>
-										</array>
-										<key>prevStack</key>
-										<array>
-											<string>369EAF0C116D693B00EB1934</string>
-											<string>369EAF0D116D693B00EB1934</string>
-											<string>369EAF0E116D693B00EB1934</string>
-											<string>369EAF0F116D693B00EB1934</string>
-											<string>369EAF10116D693B00EB1934</string>
-											<string>369EAF11116D693B00EB1934</string>
-											<string>369EAF12116D693B00EB1934</string>
-										</array>
 									</dict>
 									<key>SplitCount</key>
 									<string>1</string>
@@ -390,18 +363,18 @@
 							<key>GeometryConfiguration</key>
 							<dict>
 								<key>Frame</key>
-								<string>{{0, 0}, {637, 225}}</string>
+								<string>{{0, 0}, {637, 0}}</string>
 								<key>RubberWindowFrame</key>
 								<string>331 83 960 795 0 0 1440 878 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
 							<key>Proportion</key>
-							<string>225pt</string>
+							<string>0pt</string>
 						</dict>
 						<dict>
 							<key>Proportion</key>
-							<string>524pt</string>
+							<string>749pt</string>
 							<key>Tabs</key>
 							<array>
 								<dict>
@@ -415,7 +388,7 @@
 									<key>GeometryConfiguration</key>
 									<dict>
 										<key>Frame</key>
-										<string>{{10, 27}, {637, 497}}</string>
+										<string>{{10, 27}, {637, 722}}</string>
 										<key>RubberWindowFrame</key>
 										<string>331 83 960 795 0 0 1440 878 </string>
 									</dict>
