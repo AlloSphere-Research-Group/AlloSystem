@@ -2,12 +2,12 @@
 
 int main(){
 
-	utTypes();
-	utSystem();
-	utProtocolOSC();
-	utProtocolSerialize();
-
-	utIOAudioIO();
+//	utTypes();
+//	utSystem();
+//	utProtocolOSC();
+//	utProtocolSerialize();
+//
+//	utIOAudioIO();
 	utIOWindowGL();
 
 	return 0;

@@ -60,6 +60,10 @@
 		3602B730110A9770005DC3D0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		3602B732110A9770005DC3D0 /* alscheduling.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* alscheduling.1 */; };
 		3602B73A110A9785005DC3D0 /* exOscSend.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3602B739110A9785005DC3D0 /* exOscSend.cpp */; };
+		362127C91173CDBB009CB6FC /* al_Graphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 362127C81173CDBB009CB6FC /* al_Graphics.cpp */; };
+		362127DE1173D5A2009CB6FC /* al_GraphicsOpenGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 362127DD1173D5A2009CB6FC /* al_GraphicsOpenGL.cpp */; };
+		362128BD1173E372009CB6FC /* al_GraphicsOpenGLES1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 362128BC1173E372009CB6FC /* al_GraphicsOpenGLES1.cpp */; };
+		362128BF1173E382009CB6FC /* al_GraphicsOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 362128BE1173E382009CB6FC /* al_GraphicsOpenGLES2.cpp */; };
 		3622BEAC116D516100928703 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		3622BEAD116D516100928703 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
 		3622BEAE116D516100928703 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC53081162907D0076AA8B /* CoreAudio.framework */; };
@@ -113,7 +117,6 @@
 		3622C0B2116D586200928703 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3622C0AF116D586200928703 /* MainMenu.xib */; };
 		365FA5F811612EA500A49D3F /* al_quat.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 365FA5F711612EA500A49D3F /* al_quat.hpp */; };
 		365FA5FF116131C200A49D3F /* al_quat.h in Headers */ = {isa = PBXBuildFile; fileRef = 365FA5FE116131C200A49D3F /* al_quat.h */; };
-		369EA39B116D5F5F00EB1934 /* exMainloopGLUT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BFA3116D556B00928703 /* exMainloopGLUT.cpp */; };
 		369EA39D116D5F5F00EB1934 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		369EA39E116D5F5F00EB1934 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		369EA39F116D5F5F00EB1934 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
@@ -261,6 +264,11 @@
 		3602B54E110A6D3D005DC3D0 /* OscTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OscTypes.h; sourceTree = "<group>"; };
 		3602B736110A9770005DC3D0 /* exOscSend */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exOscSend; sourceTree = BUILT_PRODUCTS_DIR; };
 		3602B739110A9785005DC3D0 /* exOscSend.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exOscSend.cpp; sourceTree = "<group>"; };
+		362127C71173CD72009CB6FC /* al_Graphics.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Graphics.hpp; sourceTree = "<group>"; };
+		362127C81173CDBB009CB6FC /* al_Graphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Graphics.cpp; sourceTree = "<group>"; };
+		362127DD1173D5A2009CB6FC /* al_GraphicsOpenGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GraphicsOpenGL.cpp; sourceTree = "<group>"; };
+		362128BC1173E372009CB6FC /* al_GraphicsOpenGLES1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GraphicsOpenGLES1.cpp; sourceTree = "<group>"; };
+		362128BE1173E382009CB6FC /* al_GraphicsOpenGLES2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GraphicsOpenGLES2.cpp; sourceTree = "<group>"; };
 		3622BEB6116D516100928703 /* exMainloopGLUT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exMainloopGLUT; sourceTree = BUILT_PRODUCTS_DIR; };
 		3622BEDE116D527D00928703 /* al_AudioIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_AudioIO.cpp; sourceTree = "<group>"; };
 		3622BEDF116D527D00928703 /* al_File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_File.cpp; sourceTree = "<group>"; };
@@ -552,6 +560,7 @@
 		3602B53B110A6D3D005DC3D0 /* protocol */ = {
 			isa = PBXGroup;
 			children = (
+				362127C71173CD72009CB6FC /* al_Graphics.hpp */,
 				3602B53C110A6D3D005DC3D0 /* al_OSC.hpp */,
 				36A20CFC110ACA0E0075A21C /* al_OSCAPR.hpp */,
 				3602B53D110A6D3D005DC3D0 /* al_Serialize.h */,
@@ -641,6 +650,10 @@
 		3622BEE4116D527D00928703 /* protocol */ = {
 			isa = PBXGroup;
 			children = (
+				362127C81173CDBB009CB6FC /* al_Graphics.cpp */,
+				362127DD1173D5A2009CB6FC /* al_GraphicsOpenGL.cpp */,
+				362128BC1173E372009CB6FC /* al_GraphicsOpenGLES1.cpp */,
+				362128BE1173E382009CB6FC /* al_GraphicsOpenGLES2.cpp */,
 				3622BEE5116D527D00928703 /* al_OSC.cpp */,
 				3622BEE6116D527D00928703 /* al_OSCAPR.cpp */,
 				3622BEE7116D527D00928703 /* al_Serialize.cpp */,
@@ -1187,7 +1200,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				369EA39B116D5F5F00EB1934 /* exMainloopGLUT.cpp in Sources */,
 				369EA3AB116D5F7200EB1934 /* exCameraGLUT.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1225,6 +1237,10 @@
 				3622BF42116D530600928703 /* OscTypes.cpp in Sources */,
 				3622BF3C116D530100928703 /* NetworkingUtils.cpp in Sources */,
 				3622BF3D116D530100928703 /* UdpSocket.cpp in Sources */,
+				362127C91173CDBB009CB6FC /* al_Graphics.cpp in Sources */,
+				362127DE1173D5A2009CB6FC /* al_GraphicsOpenGL.cpp in Sources */,
+				362128BD1173E372009CB6FC /* al_GraphicsOpenGLES1.cpp in Sources */,
+				362128BF1173E382009CB6FC /* al_GraphicsOpenGLES2.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

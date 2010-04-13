@@ -1,5 +1,39 @@
 #include "utAllocore.h"
 
+#include "protocol/al_Graphics.hpp"
+
+// OpenGL platform-dependent includes
+#if defined (__APPLE__) || defined (OSX)
+	#define AL_GRAPHICS_USE_OPENGL
+
+	#include <OpenGL/OpenGL.h>
+	#include <OpenGL/gl.h>
+	#include <OpenGL/glext.h>
+	#include <OpenGL/glu.h>
+	
+#elif defined(__linux__)
+	#define AL_GRAPHICS_USE_OPENGL
+
+	#include <GL/glew.h>
+	#include <GL/gl.h>
+	#include <GL/glext.h>
+	#include <GL/glu.h>
+	#include <time.h>
+	
+#elif defined(WIN32)
+	#define AL_GRAPHICS_USE_OPENGL
+
+	#include <windows.h>
+	#include <gl/gl.h>
+	#include <gl/glu.h>
+	#pragma comment( lib, "winmm.lib")
+	#pragma comment( lib, "opengl32.lib" )
+	#pragma comment( lib, "glu32.lib" )
+	
+#endif
+
+al::Graphics gl;
+
 struct MyWindow : WindowGL{
 
 	void onCreate(){					printf("onCreate\n"); }
@@ -34,17 +68,17 @@ struct MyWindow : WindowGL{
 	}
 
 	void onFrame(){
-//		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//		glLoadIdentity();
-//		
-//		glBegin(GL_TRIANGLE_STRIP);
-//			for(int i=0; i<9; ++i){
-//				float p = i/8.;
-//				glColor3f(1, p, p);
-//				p *= 6.2832;
-//				glVertex3f(cos(p), sin(p), 0);
-//			}
-//		glEnd();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glLoadIdentity();
+		
+		gl.begin(GL_TRIANGLE_STRIP);
+			for(int i=0; i<9; ++i){
+				float p = i/8.;
+				gl.color(1, p, p);
+				p *= 6.2832;
+				gl.vertex(cos(p), sin(p), 0);
+			}
+		gl.end();
 	}
 };
 
@@ -53,6 +87,10 @@ struct MyWindow : WindowGL{
 int utIOWindowGL(){
 
 	MyWindow win, win2;
+	
+	gl.setBackend(GraphicsBackend::None);
+	
+//	printf("setBackendOpenGL %d\n", setBackendOpenGL(&gl));
 
 //	struct Func:TimedFunction{
 //		void onExecute(){ printf("hello\n"); }
