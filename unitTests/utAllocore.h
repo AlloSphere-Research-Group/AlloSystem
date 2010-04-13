@@ -12,6 +12,7 @@
 #include "system/al_Time.h"
 #include "system/al_Time.hpp"
 #include "system/al_Thread.hpp"
+#include "types/al_Buffer.hpp"
 #include "types/al_types.h"
 #include "types/al_types.hpp"
 #include "types/al_Vec.hpp"

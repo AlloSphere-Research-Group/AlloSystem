@@ -2,13 +2,13 @@
 
 int main(){
 
-//	utTypes();
+	utTypes();
 //	utSystem();
 //	utProtocolOSC();
 //	utProtocolSerialize();
 //
 //	utIOAudioIO();
-	utIOWindowGL();
+//	utIOWindowGL();
 
 	return 0;
 }

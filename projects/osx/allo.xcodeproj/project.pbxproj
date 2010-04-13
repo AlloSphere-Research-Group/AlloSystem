@@ -223,6 +223,7 @@
 
 /* Begin PBXFileReference section */
 		08FB7796FE84155DC02AAC07 /* exScheduling.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exScheduling.cpp; sourceTree = "<group>"; };
+		16198FF31173E39B006FBADF /* al_Buffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Buffer.hpp; sourceTree = "<group>"; };
 		168EC8EB1161CA2C00FCACC7 /* al_Time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Time.h; sourceTree = "<group>"; };
 		168EC8EC1161CA2C00FCACC7 /* al_MainLoop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_MainLoop.h; sourceTree = "<group>"; };
 		168EC8ED1161CA2C00FCACC7 /* al_Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Config.h; sourceTree = "<group>"; };
@@ -772,6 +773,7 @@
 		36B4124D10EFF7B8007B16D0 /* types */ = {
 			isa = PBXGroup;
 			children = (
+				16198FF31173E39B006FBADF /* al_Buffer.hpp */,
 				36B4124E10EFF7B8007B16D0 /* al_pq.h */,
 				36B4124F10EFF7B8007B16D0 /* al_pq.hpp */,
 				365FA5FE116131C200A49D3F /* al_quat.h */,

@@ -137,6 +137,61 @@ int utTypes(){
 	}
 
 
+	{
+		Buffer<int> a(2);
+		assert(a.size() == 0);
+		assert(a.capacity() == 2);
+		assert(a.fill() == 0);
+		
+		a.append(1);
+		assert(a[0] == 1);
+		assert(a.atAbs(0) == 1);
+		assert(a.size() == 1);
+		
+		a.append(2);
+		a.append(3);
+		assert(a.size() == 3);
+		assert(a.capacity() == 4);
+		
+		a.clear();
+		assert(a.size() == 0);
+		assert(a.capacity() == 4);
+
+
+		// Test ring buffering
+		a.resize(4);
+		assert(a.size() == 4);
+
+		a.write(1);
+		a.write(2);
+		assert(a.fill() == 2);
+		
+		a.write(3);
+		a.write(4);
+		
+		assert(a.pos() == 3);
+		
+		assert(a[0] == 1);
+		assert(a[1] == 2);
+		assert(a[2] == 3);
+		assert(a[3] == 4);
+		
+		assert(a.atRel(0) == 4);
+		assert(a.atRel(1) == 3);
+		assert(a.atRel(2) == 2);
+		assert(a.atRel(3) == 1);
+		
+		assert(a.fill() == 4);
+		a.write(5);
+		assert(a.fill() == 4);
+		assert(a[0] == 5);
+		assert(a.atRel(0) == 5);
+		assert(a.atRel(1) == 4);
+		assert(a.atRel(2) == 3);
+		assert(a.atRel(3) == 2);
+	}
+
+
 	// test the basic C functionality
 	{
 		const int comps = 1;	//
