@@ -60,6 +60,12 @@
 		16AC5378116293EE0076AA8B /* al_tube.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36B4125110EFF7B8007B16D0 /* al_tube.hpp */; };
 		16AC5379116293EF0076AA8B /* al_types.h in Headers */ = {isa = PBXBuildFile; fileRef = 36B4125210EFF7B8007B16D0 /* al_types.h */; };
 		16AC537A116293F00076AA8B /* al_types.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36B4125310EFF7B8007B16D0 /* al_types.hpp */; };
+		16BC66A4117770BF002A0C18 /* al_Constants.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 16BC66A1117770BF002A0C18 /* al_Constants.hpp */; };
+		16BC66A5117770BF002A0C18 /* al_Functions.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 16BC66A2117770BF002A0C18 /* al_Functions.hpp */; };
+		16BC66A6117770BF002A0C18 /* al_Interpolation.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 16BC66A3117770BF002A0C18 /* al_Interpolation.hpp */; };
+		16BC66A7117770BF002A0C18 /* al_Constants.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 16BC66A1117770BF002A0C18 /* al_Constants.hpp */; };
+		16BC66A8117770BF002A0C18 /* al_Functions.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 16BC66A2117770BF002A0C18 /* al_Functions.hpp */; };
+		16BC66A9117770BF002A0C18 /* al_Interpolation.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 16BC66A3117770BF002A0C18 /* al_Interpolation.hpp */; };
 		3602B4D0110A67C9005DC3D0 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
 		3602B4D1110A67C9005DC3D0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		3602B4D2110A67C9005DC3D0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
@@ -260,6 +266,9 @@
 		16AC53081162907D0076AA8B /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = /System/Library/Frameworks/CoreAudio.framework; sourceTree = "<absolute>"; };
 		16AC5312116290AA0076AA8B /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
 		16AC531A116290BE0076AA8B /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
+		16BC66A1117770BF002A0C18 /* al_Constants.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Constants.hpp; sourceTree = "<group>"; };
+		16BC66A2117770BF002A0C18 /* al_Functions.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Functions.hpp; sourceTree = "<group>"; };
+		16BC66A3117770BF002A0C18 /* al_Interpolation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Interpolation.hpp; sourceTree = "<group>"; };
 		3602B4C7110A67B6005DC3D0 /* exOscRecv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exOscRecv.cpp; sourceTree = "<group>"; };
 		3602B4D8110A67C9005DC3D0 /* exOscRecv */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exOscRecv; sourceTree = BUILT_PRODUCTS_DIR; };
 		3602B53C110A6D3D005DC3D0 /* al_OSC.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OSC.hpp; sourceTree = "<group>"; };
@@ -544,6 +553,9 @@
 			isa = PBXGroup;
 			children = (
 				1697338611768B6E0025299C /* al_Complex.hpp */,
+				16BC66A1117770BF002A0C18 /* al_Constants.hpp */,
+				16BC66A2117770BF002A0C18 /* al_Functions.hpp */,
+				16BC66A3117770BF002A0C18 /* al_Interpolation.hpp */,
 				1697337311768B040025299C /* al_Quat.h */,
 				1697337411768B040025299C /* al_Quat.hpp */,
 				1697336C11768ABD0025299C /* al_Vec.hpp */,
@@ -922,6 +934,9 @@
 				1697337711768B040025299C /* al_Quat.h in Headers */,
 				1697337811768B040025299C /* al_Quat.hpp in Headers */,
 				1697338811768B6E0025299C /* al_Complex.hpp in Headers */,
+				16BC66A7117770BF002A0C18 /* al_Constants.hpp in Headers */,
+				16BC66A8117770BF002A0C18 /* al_Functions.hpp in Headers */,
+				16BC66A9117770BF002A0C18 /* al_Interpolation.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -955,6 +970,9 @@
 				1697337611768B040025299C /* al_Quat.hpp in Headers */,
 				1697338711768B6E0025299C /* al_Complex.hpp in Headers */,
 				362129FA11741A67009CB6FC /* al_VectorBuffer.hpp in Headers */,
+				16BC66A4117770BF002A0C18 /* al_Constants.hpp in Headers */,
+				16BC66A5117770BF002A0C18 /* al_Functions.hpp in Headers */,
+				16BC66A6117770BF002A0C18 /* al_Interpolation.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
