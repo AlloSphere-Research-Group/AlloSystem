@@ -1,5 +1,5 @@
 
-#include "al_Graphics.hpp"
+#include "protocol/al_Graphics.hpp"
 
 // OpenGL platform-dependent includes
 #if defined (__APPLE__) || defined (OSX)

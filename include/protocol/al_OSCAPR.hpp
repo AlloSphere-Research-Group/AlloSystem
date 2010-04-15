@@ -32,10 +32,10 @@
 #include "system/al_time.h"
 
 /* Apache Portable Runtime */
-#include "apr_general.h"
-#include "apr_errno.h"
-#include "apr_pools.h"
-#include "apr_network_io.h"
+#include "apr-1/apr_general.h"
+#include "apr-1/apr_errno.h"
+#include "apr-1/apr_pools.h"
+#include "apr-1/apr_network_io.h"
 
 /* oscpack */
 #include "protocol/oscpack/osc/OscOutboundPacketStream.h"

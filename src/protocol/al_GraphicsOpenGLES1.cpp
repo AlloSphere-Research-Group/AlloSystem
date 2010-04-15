@@ -1,4 +1,4 @@
-#include "al_Graphics.hpp"
+#include "protocol/al_Graphics.hpp"
 
 #if defined(__IPHONE_3_0)
 	#define AL_GRAPHICS_USE_OPENGLES1

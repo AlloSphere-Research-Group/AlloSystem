@@ -88,7 +88,7 @@ int utIOWindowGL(){
 
 	MyWindow win, win2;
 	
-	gl.setBackend(GraphicsBackend::None);
+//	gl.setBackend(GraphicsBackend::None);
 	
 //	printf("setBackendOpenGL %d\n", setBackendOpenGL(&gl));
 
