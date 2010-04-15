@@ -55,39 +55,43 @@ namespace GraphicsBackend{
 
 class Graphics {
 public:
-
-	int POINTS, LINES, LINE_LOOP, LINE_STRIP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP, POLYGON;
 	
+
+	struct VertexData {
+		al::Vec3f position;
+		al::Vec3f normal;
+		al::Vec4f color;
+		float u, v;
+	};
+
 	Graphics(GraphicsBackend::type backend = GraphicsBackend::AutoDetect);
 	~Graphics();
 
 	void begin(int mode) { s_begin(this, mode); }
 	void end() { s_end(this); }
 	
-	void vertex(double x, double y, double z) { s_vertex3d(this, x, y, z); }
-	void color(double r, double g, double b) { s_color4d(this, r, g, b, 1.); }
-	void color(double r, double g, double b, double a) { s_color4d(this, r, g, b, a); }
-	
+	void vertex(double x, double y, double z=0.) { s_vertex3d(this, x, y, z); }
+	void normal(double x, double y, double z=0.) { s_normal3d(this, x, y, z); }
+	void color(double r, double g, double b, double a=1.) { s_color4d(this, r, g, b, a); }
 	
 	bool setBackend(GraphicsBackend::type backend);
 	
 	GraphicsBackend::type mBackend;
+	int POINTS, LINES, LINE_LOOP, LINE_STRIP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP, POLYGON;
 	
-	al::VectorBuffer<al::Vec3f> mVertexBuffer;
-	al::VectorBuffer<al::Vec4f> mColorBuffer;
+	al::VectorBuffer<VertexData> mVertexBuffer;
 	int mMode;
 	
 	void (*s_begin)(Graphics * g, int mode);
 	void (*s_end)(Graphics * g);
 	void (*s_vertex3d)(Graphics * g, double x, double y, double z);
+	void (*s_normal3d)(Graphics * g, double x, double y, double z);
 	void (*s_color4d)(Graphics * g, double x, double y, double z, double a);
 };
 
 extern bool setBackendNone(Graphics * g);
-
 extern bool setBackendOpenGL(Graphics * g);
 extern bool setBackendOpenGLES(Graphics * g);
-
 extern bool setBackendOpenGLES1(Graphics * g);
 extern bool setBackendOpenGLES2(Graphics * g);
 

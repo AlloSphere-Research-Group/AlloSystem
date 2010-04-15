@@ -36,6 +36,8 @@ bool setBackendOpenGLES2(Graphics * g) {
 	g->QUAD_STRIP = 0;
 	g->POLYGON = 0;
 	
+	g->mMode = GL_POINTS;
+	
 	printf("using GraphicsBackend::OpenGLES2\n");
 	g->mBackend = GraphicsBackend::OpenGLES2;
 	return true;

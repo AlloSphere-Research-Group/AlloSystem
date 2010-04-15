@@ -65,14 +65,15 @@ al::Graphics gl(al::GraphicsBackend::None);
 {
 	NSLog(@".");
 	
-	gl.begin(gl.LINES);
-		for (float x = -1; x<1.; x+=0.1) {
-		for (float y = -1; y<1.; y+=0.1) {
-		for (float z = -1; z<1.; z+=0.1) {
-			gl.color(x+1, y+1, z+1);
-			gl.vertex(x, y, z);
-		}}}
-	gl.end();
+		gl.begin(gl.LINE_STRIP);
+			static float limit = 120;
+			for (float i = 0; i<limit; i++) {
+				float p = i / limit;
+				gl.color(1, p, 1-p);
+				p *= M_PI * 2.0;
+				gl.vertex(cos(p), sin(p*2), 0);
+			}
+		gl.end();
 	
 	
 //    static      GLfloat rot = 0.0;

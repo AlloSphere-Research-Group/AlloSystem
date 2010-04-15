@@ -7,12 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "alloGLView.h"
 
 @interface AppDelegate_Phone : NSObject <UIApplicationDelegate> {
     UIWindow *window;
+	alloGLView *glView;
 }
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
+@property (nonatomic, retain) IBOutlet alloGLView *glView;
 
 @end
 

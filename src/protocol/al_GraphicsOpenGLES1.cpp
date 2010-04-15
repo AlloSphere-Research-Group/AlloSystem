@@ -16,27 +16,41 @@ static void gl_begin(Graphics * g, int mode) {
 }
 static void gl_end(Graphics * g) { 
 	//  TODO: drawarrays
+	int nvertices = g->mVertexBuffer.size() - 1; // always have 1 extra	
+	Graphics::VertexData * data = g->mVertexBuffer.data();
 	
-	glVertexPointer(3, GL_FLOAT, 0, g->mVertexBuffer.data());
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glColorPointer(4, GL_FLOAT, 0, g->mColorBuffer.data());
+	glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
+
+	glVertexPointer(3, GL_FLOAT, sizeof(Graphics::VertexData), &data[0].position);
+	glNormalPointer(3, sizeof(Graphics::VertexData), &data[0].normal);
+	glColorPointer(4, GL_FLOAT, sizeof(Graphics::VertexData), &data[0].color);
+	//glTexturePointer(2, GL_FLOAT, sizeof(Graphics::Vertex), &data[0].texcoord);
 	
-	glDrawArrays(g->mMode, 0, g->mVertexBuffer.size());
+	glDrawArrays(g->mMode, 0, nvertices);
 	
-	printf("drawn\n");
+	g->mVertexBuffer.clear();
+	g->mVertexBuffer.extend(); // always have 1
+}
+
+static void gl_color4d(Graphics * G, double r, double g, double b, double a) { 
+	G->mVertexBuffer.top().color.set(r, g, b, a);
+}
+static void gl_normal3d(Graphics * g, double x, double y, double z) { 
+	g->mVertexBuffer.top().normal.set(x, y, z);
 }
 static void gl_vertex3d(Graphics * g, double x, double y, double z) { 
-	g->mVertexBuffer.append(Vec3f(x, y, z)); 
-}
-static void gl_color4d(Graphics * G, double r, double g, double b, double a) { 
-	G->mColorBuffer.append(Vec4f(r, g, b, a)); 
+	g->mVertexBuffer.top().position.set(x, y, z);
+	// done with top element; create a new top:
+	g->mVertexBuffer.extend();
 }
 
 bool setBackendOpenGLES1(Graphics * g) {
 	g->s_begin = gl_begin;
 	g->s_end = gl_end;
 	g->s_vertex3d = gl_vertex3d;
+	g->s_normal3d = gl_normal3d;
 	g->s_color4d = gl_color4d;
 	
 	#define SET_GL_ENUM(x) g->x = GL_##x

@@ -48,6 +48,14 @@ public:
 		mBuffer[mSize] = v;
 		mSize++;
 	}
+	
+	void extend() {
+		if(mSize >= mBuffer.size()) {
+			mBuffer.reserve(2*(mSize ? mSize : 4));
+		}
+		mSize++;
+	}
+	T & top() { return mBuffer[mSize-1]; }
 
 	int size() {return mSize;}
 	T * data() {return &(mBuffer.front());}

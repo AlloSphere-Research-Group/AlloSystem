@@ -67,8 +67,8 @@
     glLoadIdentity();
     glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-    glTranslatef(0.0f, (GLfloat)(sinf(transY)/2.0f), 0.0f);
-	transY += 0.075f;
+    //glTranslatef(0.0f, (GLfloat)(sinf(transY)/2.0f), 0.0f);
+	//transY += 0.075f;
 	
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);

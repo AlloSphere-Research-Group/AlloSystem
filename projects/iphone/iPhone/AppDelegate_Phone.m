@@ -11,13 +11,16 @@
 @implementation AppDelegate_Phone
 
 @synthesize window;
-
+@synthesize glView;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
 	
     // Override point for customization after application launch
 	
     [window makeKeyAndVisible];
+	
+	glView.animationFrameInterval = 1.0 / 15.0;
+	[glView startAnimation];
 	
 	return YES;
 }

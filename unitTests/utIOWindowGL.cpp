@@ -71,12 +71,13 @@ struct MyWindow : WindowGL{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glLoadIdentity();
 		
-		gl.begin(GL_TRIANGLE_STRIP);
-			for(int i=0; i<9; ++i){
-				float p = i/8.;
-				gl.color(1, p, p);
-				p *= 6.2832;
-				gl.vertex(cos(p), sin(p), 0);
+		gl.begin(gl.LINE_STRIP);
+			static float limit = 120;
+			for (float i = 0; i<limit; i++) {
+				float p = i / limit;
+				gl.color(1, p, 1-p);
+				p *= M_PI * 2.0;
+				gl.vertex(cos(p), sin(p*2), 0);
 			}
 		gl.end();
 	}
@@ -99,8 +100,8 @@ int utIOWindowGL(){
 //	Func tf;
 //	tf(1000);
 
-	win.create(WindowGL::Dim(200,200,200), "Window 1", 40);
-	win2.create(WindowGL::Dim(200,200,400), "Window 2", 40, SingleBuf);
+	win.create(WindowGL::Dim(200,200,000), "Window 1", 40);
+	win2.create(WindowGL::Dim(200,200,200), "Window 2", 40, SingleBuf);
 
 	WindowGL::startLoop();
 	return 0;
