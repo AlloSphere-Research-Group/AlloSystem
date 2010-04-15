@@ -1,7 +1,151 @@
 #include "utAllocore.h"
 
+inline bool eq(double x, double y, double eps=0.000001){ return abs(x-y) < eps; }
+
 int utMath(){
 
+	// Functions
+	{
+	const double pinf = 1e800;			// + infinity
+	const double ninf = -pinf;			// - infinity
+
+	#define T(x,y, r) assert(al::atLeast(x,y) == r);
+	T(0.,1., 1.) T(+0.1,1., 1.) T(-0.1,1., -1.)
+	#undef T
+
+	#define T(x, y) assert(al::clip(x) == y);
+	T(0., 0.) T(0.5, 0.5) T(1., 1.) T(1.2, 1.) T(-0.5, 0.) T(pinf, 1.) T(ninf, 0.)
+	#undef T
+
+	#define T(x, y) assert(al::clipS(x) == y);
+	T(0., 0.) T(0.5, 0.5) T(1., 1.) T(1.2, 1.) T(-0.5, -0.5) T(-1., -1) T(-1.2, -1.)
+	#undef T
+	
+	#define T(x,r) assert(al::even(x) == r);
+	T(0,true) T(1,false) T(-2,true)
+	#undef T
+
+	#define T(x, y) assert(eq(al::fold(x), y));
+	T(0., 0.) T(0.5, 0.5) T(1., 1.) T(1.2, 0.8) T(-0.2, 0.2)
+	T(2.2, 0.2) T(3.2, 0.8) T(4.2, 0.2) T(5.2, 0.8)
+	#undef T
+	
+	#define T(x,y,r) assert(al::gcd(x,y) == r);
+	T(7,7,7) T(7,4,1) T(8,4,4)
+	#undef T
+
+	#define T(x,y,r) assert(al::lcm(x,y)==r);
+	T(7,3,21) T(8,4,8) T(3,1,3)
+	#undef T
+
+	#define T(x,y,r) assert(al::lessAbs(x,y)==r);
+	T(0.1,1., true) T(-0.1,1., true) T(1.,1., false) T(-1.,1., false)
+	#undef T
+
+	#define T(x) assert(al::log2(1<<x) == x);
+	T(0) T(1) T(2) T(3) T(4) T(29) T(30) T(31)
+	#undef T
+
+	#define T(x,y,r) assert(al::max(x,y)==r);
+	T(0,0,0) T(0,1,1) T(1,0,1) T(-1,1,1)
+	#undef T
+
+	#define T(x,y,z,r) assert(al::max(x,y,z)==r);
+	T(0,0,0, 0) T(0,1,2, 2) T(1,2,0, 2) T(2,1,0, 2)
+	#undef T
+	
+	assert(al::mean(-1., 1.) == 0.);
+
+	#define T(x,y,r) assert(al::min(x,y)==r);
+	T(0,0,0) T(0,1,0) T(1,0,0) T(-1,1,-1)
+	#undef T
+
+	#define T(x,r) assert(al::odd(x) == r);
+	T(0,false) T(1,true) T(-2,false)
+	#undef T
+
+	#define T(x) assert(al::pow2(x) == x*x);
+	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
+	#undef T
+
+	#define T(x) assert(al::pow2S(x) == x*al::abs(x));
+	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
+	#undef T
+
+	#define T(x) assert(al::pow3(x) == x*x*x);
+	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
+	#undef T
+
+	#define T(x) assert(al::pow3Abs(x) == al::abs(x*x*x));
+	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
+	#undef T
+
+	#define T(x) assert(al::pow4(x) == x*x*x*x);
+	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
+	#undef T
+
+	#define T(x) assert(al::pow5(x) == x*x*x*x*x);
+	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
+	#undef T
+	
+	#define T(x) assert(al::pow6(x) == x*x*x*x*x*x);
+	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
+	#undef T
+
+	#define T(x) assert(al::pow8(x) == x*x*x*x*x*x*x*x);
+	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
+	#undef T
+
+	#define T(x) assert(al::pow16(x) == x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x);
+	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
+	#undef T
+
+	#define T(x) assert(eq(al::pow64(x), x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x, 10));
+	T(0.) T(1.) T(1.01) T(1.02) T(-1.) T(-1.01) T(-1.02)
+	#undef T
+
+//	#define T(x,r) assert(al::powerOf2(x) == r);
+//	T(0, false) T(1, true) T(2, true) T(3, false) T(4, true)
+//	#undef T
+	
+	#define T(x,y,r) assert(al::remainder(x,y) == r);
+	T(7,7,0) T(7,1,0) T(7,4,3) T(7,3,1) T(14,3,2)
+	#undef T
+
+	#define T(x,r) assert(al::sgn(x) == r);
+	T(0., 1.) T(0.1, 1.) T(-0.1, -1.)
+	#undef T
+
+	#define T(x1,y1,x2,y2, r) assert(al::slope(x1,y1,x2,y2) == r);
+	T(3.,3.,4.,4., 1.) T(3.,-3.,4.,-4., -1.)
+	#undef T
+
+	{	double x=1, y=0;
+		sort(x,y); assert(x==0 && y==1);
+		sort(x,y); assert(x==0 && y==1);
+	}
+
+	#define T(x,y) assert(al::sumOfSquares(x) == y);
+	T(1., 1.) T(2., 1*1+2*2) T(3., 1*1+2*2+3*3) T(4., 1*1+2*2+3*3+4*4) T(5., 1*1+2*2+3*3+4*4+5*5)
+	#undef T
+
+	#define T(x,r) assert(al::trailingZeroes(x) == r);
+	T(0, 0) T(1, 0) T(2, 1) T(3, 0) T(4, 2) T(8, 3) T(9, 0)
+	#undef T
+
+	#define T(x,l,h,r) assert(al::within(x,l,h)==r);
+	T(0,0,1, true) T(1,0,1, true)
+	#undef T
+
+	#define T(x, y) assert(eq(al::wrap(x, 1., -1.), y));
+	T(0., 0.)	T( 0.5, 0.5) T( 1.,-1.) T( 1.2,-0.8) T( 2.2, 0.2)
+				T(-0.5,-0.5) T(-1.,-1.) T(-1.2, 0.8) T(-2.2,-0.2)
+	#undef T
+	}
+
+
+
+	// Vec
 	{
 		const int N = 4;
 
@@ -115,6 +259,8 @@ int utMath(){
 		
 	}
 	
+	
+	// Vec3
 	{
 		Vec3d a, b, c;
 
@@ -128,11 +274,41 @@ int utMath(){
 			assert(a == b);
 	}
 	
+	
+	// Mat
 	{
 		Mat<3,double> a;
 		
 		a(0,1) = a(1,0);
 	}
+
+
+	{	Complexd c(0,0);
+		#define T(x, y) assert(x == y);
+		T(c, Complexd(0,0))
+		c.fromPolar(1, 0.2);	T(c, Polard(0.2))
+		c.fromPhase(2.3);		T(c, Polard(2.3))
+		T(c != Complexd(0,0), true)
+		T(c.conj(), Complexd(c.r, -c.i))
+		#undef T
+
+//		#define T(x, y) assert(almostEqual(x,y,2));
+//		c.normalize();			T(c.norm(), 1)
+//		double p=0.1; c(1,0); c *= Polard(1, p); T(c.arg(), p)
+//
+//		c.fromPolar(4,0.2);
+//		T(c.sqrt().norm(), 2)
+//		T(c.sqrt().arg(), 0.1)
+//		#undef T
+	}
+
+//	{	Quatd q(0,0,0,0);
+//		#define T(x, y) assert(x == y);
+//		T(q, Quatd(0,0,0,0))
+//		T(q.conj(), Quatd(q.r, -q.i, -q.j, -q.k))
+//		#undef T
+//	}
+
 
 	return 0;
 }

@@ -9,7 +9,7 @@ int main(){
 //	utProtocolSerialize();
 //
 //	utIOAudioIO();
-	utIOWindowGL();
+//	utIOWindowGL();
 
 	return 0;
 }

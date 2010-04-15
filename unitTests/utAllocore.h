@@ -7,6 +7,8 @@
 #include "io/al_AudioIO.hpp"
 #include "io/al_WindowGL.hpp"
 #include "math/al_Complex.hpp"
+#include "math/al_Functions.hpp"
+#include "math/al_Interpolation.hpp"
 #include "math/al_Quat.hpp"
 #include "math/al_Vec.hpp"
 #include "protocol/al_OSC.hpp"
