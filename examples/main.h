@@ -16,7 +16,7 @@
 #include "system/al_MainLoop.h"
 #include "types/al_types.h"
 #include "types/al_types.hpp"
-#include "types/al_Vec.hpp"
+#include "math/al_Vec.hpp"
 
 #ifdef AL_UT_NOPRINT	/* disable printing to stdout */
 	#define UT_PRINTF	//
