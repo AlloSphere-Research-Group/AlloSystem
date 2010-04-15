@@ -8,10 +8,9 @@
 	#import <OpenGLES/ES2/glext.h>
 #endif
 
+namespace al {
 
 #ifdef AL_GRAPHICS_USE_OPENGLES2
-
-namespace al {
 
 bool setBackendOpenGLES2(Graphics * g) {
 	
@@ -25,21 +24,28 @@ bool setBackendOpenGLES2(Graphics * g) {
 		return false;
 	} 
 	
+	#define SET_GL_ENUM(x) Graphics::x = GL_##x
+	SET_GL_ENUM(POINTS);
+	SET_GL_ENUM(LINES);
+	SET_GL_ENUM(LINE_LOOP);
+	SET_GL_ENUM(LINE_STRIP);
+	SET_GL_ENUM(TRIANGLES);
+	SET_GL_ENUM(TRIANGLE_STRIP);
+	SET_GL_ENUM(TRIANGLE_FAN);
+	
+	printf("set GraphicsBackend::OpenGLES2");
+	
 	g->mBackend = GraphicsBackend::OpenGLES2;
 	return true;
 }
 
-} // al::
-
 #else
-
-namespace al {
 
 bool setBackendOpenGLES2(Graphics * g) {
 	return false;
 }
 
-} // al::
-
 #endif
+
+} // al::
 

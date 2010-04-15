@@ -1,35 +1,22 @@
 #include "protocol/al_Graphics.hpp"
 
-#if defined(GL_VERSION_ES_CM_1_0) || defined(GL_VERSION_ES_CL_1_0) || defined(GL_VERSION_ES_CM_1_1) || defined(GL_VERSION_ES_CL_1_1)
-	#define AL_GRAPHICS_DETECTED_BACKEND_OPENGLES1
-#endif 
-#ifdef GL_ES_VERSION_2_0
-	#define AL_GRAPHICS_DETECTED_BACKEND_OPENGLES2
-#endif
-#if defined (__APPLE__) || defined (OSX)	
-	#define AL_GRAPHICS_DETECTED_BACKEND_OPENGL
-#endif 
-#if defined(__linux__)		
-	#define AL_GRAPHICS_DETECTED_BACKEND_OPENGL
-#endif 
-#if defined(WIN32)	
-	#define AL_GRAPHICS_DETECTED_BACKEND_OPENGL
-#endif
-
-#if defined(AL_GRAPHICS_DETECTED_BACKEND_OPENGLES2)
-	#define AL_GRAPHICS_DEFAULT_BACKEND		(GraphicsBackend::OpenGLES2)
-#elif defined(AL_GRAPHICS_DETECTED_BACKEND_OPENGLES1)
-	#define AL_GRAPHICS_DEFAULT_BACKEND		(GraphicsBackend::OpenGLES1)
-#elif defined(AL_GRAPHICS_DETECTED_BACKEND_OPENGL)
-	#define AL_GRAPHICS_DEFAULT_BACKEND		(GraphicsBackend::OpenGL)
-#endif
-
 namespace al {
+
+int Graphics::POINTS = 0;
+int Graphics::LINES = 0;
+int Graphics::LINE_LOOP = 0;
+int Graphics::LINE_STRIP = 0;
+int Graphics::TRIANGLES = 0;
+int Graphics::TRIANGLE_STRIP = 0;
+int Graphics::TRIANGLE_FAN = 0;
+int Graphics::QUADS = 0;
+int Graphics::QUAD_STRIP = 0;
+int Graphics::POLYGON = 0;
 
 static void gl_begin(Graphics * g, int mode) {}
 static void gl_end(Graphics * g) {}
 static void gl_vertex3d(Graphics * g, double x, double y, double z) {}
-static void gl_color3d(Graphics * g, double x, double y, double z) {}
+static void gl_color4d(Graphics * g, double x, double y, double z, double a) {}
 
 
 
@@ -37,7 +24,7 @@ bool setBackendNone(Graphics * g) {
 	g->s_begin = gl_begin;
 	g->s_end = gl_end;
 	g->s_vertex3d = gl_vertex3d;
-	g->s_color3d = gl_color3d;
+	g->s_color4d = gl_color4d;
 	
 	
 	g->mBackend = GraphicsBackend::None;

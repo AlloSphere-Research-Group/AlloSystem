@@ -56,6 +56,8 @@ namespace GraphicsBackend{
 class Graphics {
 public:
 
+	static int Graphics::POINTS, LINES, LINE_LOOP, LINE_STRIP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP, POLYGON;
+	
 	Graphics(GraphicsBackend::type backend = GraphicsBackend::AutoDetect);
 	~Graphics();
 
@@ -63,21 +65,22 @@ public:
 	void end() { s_end(this); }
 	
 	void vertex(double x, double y, double z) { s_vertex3d(this, x, y, z); }
-	void color(double x, double y, double z) { s_color3d(this, x, y, z); }
+	void color(double r, double g, double b) { s_color4d(this, r, g, b, 1.); }
+	void color(double r, double g, double b, double a) { s_color4d(this, r, g, b, a); }
 	
 	
 	bool setBackend(GraphicsBackend::type backend);
 	
 	GraphicsBackend::type mBackend;
 	
-	al::VectorBuffer<al::Vec3d> mVertexBuffer;
-	al::VectorBuffer<al::Vec4d> mColorBuffer;
+	al::VectorBuffer<al::Vec3f> mVertexBuffer;
+	al::VectorBuffer<al::Vec4f> mColorBuffer;
 	int mMode;
 	
 	void (*s_begin)(Graphics * g, int mode);
 	void (*s_end)(Graphics * g);
 	void (*s_vertex3d)(Graphics * g, double x, double y, double z);
-	void (*s_color3d)(Graphics * g, double x, double y, double z);
+	void (*s_color4d)(Graphics * g, double x, double y, double z, double a);
 };
 
 extern bool setBackendNone(Graphics * g);
