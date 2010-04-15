@@ -6,6 +6,9 @@
 
 #include "io/al_AudioIO.hpp"
 #include "io/al_WindowGL.hpp"
+#include "math/al_Complex.hpp"
+#include "math/al_Quat.hpp"
+#include "math/al_Vec.hpp"
 #include "protocol/al_OSC.hpp"
 #include "protocol/al_OSCAPR.hpp"
 #include "protocol/al_Serialize.hpp"
@@ -15,7 +18,7 @@
 #include "types/al_Buffer.hpp"
 #include "types/al_types.h"
 #include "types/al_types.hpp"
-#include "types/al_Vec.hpp"
+
 
 #ifdef AL_UT_NOPRINT	/* disable printing to stdout */
 	#define UT_PRINTF	//
@@ -27,6 +30,7 @@ using namespace al;
 
 int utIOAudioIO();
 int utIOWindowGL();
+int utMath();
 int utProtocolOSC();
 int utProtocolSerialize();
 int utSystem();

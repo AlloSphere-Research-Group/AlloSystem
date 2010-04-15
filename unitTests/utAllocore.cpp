@@ -2,6 +2,7 @@
 
 int main(){
 
+	utMath();
 	utTypes();
 //	utSystem();
 //	utProtocolOSC();
