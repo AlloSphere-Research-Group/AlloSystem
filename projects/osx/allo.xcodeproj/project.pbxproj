@@ -125,8 +125,6 @@
 		3622C08E116D57B300928703 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
 		3622C0B1116D586200928703 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 3622C0AD116D586200928703 /* InfoPlist.strings */; };
 		3622C0B2116D586200928703 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3622C0AF116D586200928703 /* MainMenu.xib */; };
-		365FA5F811612EA500A49D3F /* al_quat.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 365FA5F711612EA500A49D3F /* al_quat.hpp */; };
-		365FA5FF116131C200A49D3F /* al_quat.h in Headers */ = {isa = PBXBuildFile; fileRef = 365FA5FE116131C200A49D3F /* al_quat.h */; };
 		369EA39D116D5F5F00EB1934 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		369EA39E116D5F5F00EB1934 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		369EA39F116D5F5F00EB1934 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
@@ -332,8 +330,6 @@
 		3622C0B0116D586200928703 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		3625B540116EEDEF00C685B7 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../Makefile; sourceTree = SOURCE_ROOT; };
 		3625B541116EEDEF00C685B7 /* Makefile.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.config; path = ../../Makefile.config; sourceTree = SOURCE_ROOT; };
-		365FA5F711612EA500A49D3F /* al_quat.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_quat.hpp; sourceTree = "<group>"; };
-		365FA5FE116131C200A49D3F /* al_quat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_quat.h; sourceTree = "<group>"; };
 		369EA3A7116D5F5F00EB1934 /* exCameraGLUT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exCameraGLUT; sourceTree = BUILT_PRODUCTS_DIR; };
 		369EA3AA116D5F7200EB1934 /* exCameraGLUT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exCameraGLUT.cpp; sourceTree = "<group>"; };
 		369EA3B0116D60CE00EB1934 /* liballoutil.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liballoutil.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -807,8 +803,6 @@
 				1619909B11743914006FBADF /* al_Color.hpp */,
 				36B4124E10EFF7B8007B16D0 /* al_pq.h */,
 				36B4124F10EFF7B8007B16D0 /* al_pq.hpp */,
-				365FA5FE116131C200A49D3F /* al_quat.h */,
-				365FA5F711612EA500A49D3F /* al_quat.hpp */,
 				36F4662B110B9B720082D21E /* al_socktube.h */,
 				36B4125010EFF7B8007B16D0 /* al_tube.h */,
 				36B4125110EFF7B8007B16D0 /* al_tube.hpp */,
@@ -935,8 +929,6 @@
 				36F46824110BE2E90082D21E /* al_AudioIO.hpp in Headers */,
 				36F46825110BE2E90082D21E /* al_File.hpp in Headers */,
 				36F46826110BE2E90082D21E /* al_WindowGL.hpp in Headers */,
-				365FA5F811612EA500A49D3F /* al_quat.hpp in Headers */,
-				365FA5FF116131C200A49D3F /* al_quat.h in Headers */,
 				168EC8F11161CA2C00FCACC7 /* al_Time.h in Headers */,
 				168EC8F21161CA2C00FCACC7 /* al_MainLoop.h in Headers */,
 				168EC8F31161CA2C00FCACC7 /* al_Config.h in Headers */,

@@ -59,6 +59,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		169733C211768F0F0025299C /* al_Complex.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Complex.hpp; sourceTree = "<group>"; };
+		169733C311768F0F0025299C /* al_Quat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Quat.h; sourceTree = "<group>"; };
+		169733C411768F0F0025299C /* al_Quat.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Quat.hpp; sourceTree = "<group>"; };
+		169733C511768F0F0025299C /* al_Vec.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Vec.hpp; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* iphoneAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iphoneAppDelegate.h; sourceTree = "<group>"; };
 		1D3623250D0F684500981E51 /* iphoneAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iphoneAppDelegate.m; sourceTree = "<group>"; };
@@ -103,14 +107,11 @@
 		369EAE30116D686E00EB1934 /* pstdint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pstdint.h; sourceTree = "<group>"; };
 		369EAE32116D686E00EB1934 /* al_pq.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_pq.h; sourceTree = "<group>"; };
 		369EAE33116D686E00EB1934 /* al_pq.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_pq.hpp; sourceTree = "<group>"; };
-		369EAE34116D686E00EB1934 /* al_quat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_quat.h; sourceTree = "<group>"; };
-		369EAE35116D686E00EB1934 /* al_quat.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_quat.hpp; sourceTree = "<group>"; };
 		369EAE36116D686E00EB1934 /* al_socktube.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_socktube.h; sourceTree = "<group>"; };
 		369EAE37116D686E00EB1934 /* al_tube.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_tube.h; sourceTree = "<group>"; };
 		369EAE38116D686E00EB1934 /* al_tube.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_tube.hpp; sourceTree = "<group>"; };
 		369EAE39116D686E00EB1934 /* al_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_types.h; sourceTree = "<group>"; };
 		369EAE3A116D686E00EB1934 /* al_types.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_types.hpp; sourceTree = "<group>"; };
-		369EAE3B116D686E00EB1934 /* al_Vec.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Vec.hpp; sourceTree = "<group>"; };
 		369EAE3E116D686E00EB1934 /* al_AudioIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_AudioIO.cpp; sourceTree = "<group>"; };
 		369EAE3F116D686E00EB1934 /* al_File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_File.cpp; sourceTree = "<group>"; };
 		369EAE40116D686E00EB1934 /* al_Socket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Socket.cpp; sourceTree = "<group>"; };
@@ -206,8 +207,8 @@
 		369EAEB6116D688300EB1934 /* pbxindex.header */ = {isa = PBXFileReference; lastKnownFileType = file; path = pbxindex.header; sourceTree = "<group>"; };
 		369EAEB7116D688300EB1934 /* protocols.pbxbtree */ = {isa = PBXFileReference; lastKnownFileType = file; path = protocols.pbxbtree; sourceTree = "<group>"; };
 		369EAEB8116D688300EB1934 /* refs.pbxbtree */ = {isa = PBXFileReference; lastKnownFileType = file; path = refs.pbxbtree; sourceTree = "<group>"; };
-		369EAEBA116D688300EB1934 /* control */ = {isa = PBXFileReference; lastKnownFileType = file; path = control; sourceTree = "<group>"; };
-		369EAEBB116D688300EB1934 /* strings */ = {isa = PBXFileReference; lastKnownFileType = file; path = strings; sourceTree = "<group>"; };
+		369EAEBA116D688300EB1934 /* control */ = {isa = PBXFileReference; lastKnownFileType = text; path = control; sourceTree = "<group>"; };
+		369EAEBB116D688300EB1934 /* strings */ = {isa = PBXFileReference; lastKnownFileType = text; path = strings; sourceTree = "<group>"; };
 		369EAEBC116D688300EB1934 /* subclasses.pbxbtree */ = {isa = PBXFileReference; lastKnownFileType = file; path = subclasses.pbxbtree; sourceTree = "<group>"; };
 		369EAEBD116D688300EB1934 /* symbols0.pbxsymbols */ = {isa = PBXFileReference; lastKnownFileType = file; path = symbols0.pbxsymbols; sourceTree = "<group>"; };
 		369EAEBF116D688300EB1934 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -248,6 +249,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		169733C111768F0F0025299C /* math */ = {
+			isa = PBXGroup;
+			children = (
+				169733C211768F0F0025299C /* al_Complex.hpp */,
+				169733C311768F0F0025299C /* al_Quat.h */,
+				169733C411768F0F0025299C /* al_Quat.hpp */,
+				169733C511768F0F0025299C /* al_Vec.hpp */,
+			);
+			path = math;
+			sourceTree = "<group>";
+		};
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -309,6 +321,7 @@
 		369EAE0E116D686E00EB1934 /* include */ = {
 			isa = PBXGroup;
 			children = (
+				169733C111768F0F0025299C /* math */,
 				369EAE0F116D686E00EB1934 /* io */,
 				369EAE14116D686E00EB1934 /* protocol */,
 				369EAE29116D686E00EB1934 /* system */,
@@ -396,14 +409,11 @@
 			children = (
 				369EAE32116D686E00EB1934 /* al_pq.h */,
 				369EAE33116D686E00EB1934 /* al_pq.hpp */,
-				369EAE34116D686E00EB1934 /* al_quat.h */,
-				369EAE35116D686E00EB1934 /* al_quat.hpp */,
 				369EAE36116D686E00EB1934 /* al_socktube.h */,
 				369EAE37116D686E00EB1934 /* al_tube.h */,
 				369EAE38116D686E00EB1934 /* al_tube.hpp */,
 				369EAE39116D686E00EB1934 /* al_types.h */,
 				369EAE3A116D686E00EB1934 /* al_types.hpp */,
-				369EAE3B116D686E00EB1934 /* al_Vec.hpp */,
 			);
 			path = types;
 			sourceTree = "<group>";
