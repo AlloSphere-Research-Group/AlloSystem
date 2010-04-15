@@ -56,7 +56,7 @@ namespace GraphicsBackend{
 class Graphics {
 public:
 
-	static int Graphics::POINTS, LINES, LINE_LOOP, LINE_STRIP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP, POLYGON;
+	int POINTS, LINES, LINE_LOOP, LINE_STRIP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP, POLYGON;
 	
 	Graphics(GraphicsBackend::type backend = GraphicsBackend::AutoDetect);
 	~Graphics();

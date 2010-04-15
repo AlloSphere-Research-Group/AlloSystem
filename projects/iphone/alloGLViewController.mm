@@ -65,7 +65,7 @@ al::Graphics gl(al::GraphicsBackend::None);
 {
 	NSLog(@".");
 	
-	gl.begin(gl.TRIANGLES);
+	gl.begin(gl.LINES);
 		for (float x = -1; x<1.; x+=0.1) {
 		for (float y = -1; y<1.; y+=0.1) {
 		for (float z = -1; z<1.; z+=0.1) {

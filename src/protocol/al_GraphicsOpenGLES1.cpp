@@ -39,7 +39,7 @@ bool setBackendOpenGLES1(Graphics * g) {
 	g->s_vertex3d = gl_vertex3d;
 	g->s_color4d = gl_color4d;
 	
-	#define SET_GL_ENUM(x) Graphics::x = GL_##x
+	#define SET_GL_ENUM(x) g->x = GL_##x
 	SET_GL_ENUM(POINTS);
 	SET_GL_ENUM(LINES);
 	SET_GL_ENUM(LINE_LOOP);
@@ -47,10 +47,13 @@ bool setBackendOpenGLES1(Graphics * g) {
 	SET_GL_ENUM(TRIANGLES);
 	SET_GL_ENUM(TRIANGLE_STRIP);
 	SET_GL_ENUM(TRIANGLE_FAN);
+	g->QUADS = 0;
+	g->QUAD_STRIP = 0;
+	g->POLYGON = 0;
 	
-	// init defaults:
 	g->mMode = GL_POINTS;
-	printf("set GraphicsBackend::OpenGLES1");
+	
+	printf("using GraphicsBackend::OpenGLES1\n");
 	g->mBackend = GraphicsBackend::OpenGLES1;
 	return true;
 }

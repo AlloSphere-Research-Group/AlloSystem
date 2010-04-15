@@ -157,6 +157,9 @@
 		36CE04491177919E00650B45 /* ESRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ESRenderer.h; sourceTree = "<group>"; };
 		36CE0496117793DF00650B45 /* Shader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = Shader.fsh; sourceTree = "<group>"; };
 		36CE0498117793EA00650B45 /* Shader.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = Shader.vsh; sourceTree = "<group>"; };
+		36CE05DE11779D8A00650B45 /* al_Constants.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Constants.hpp; sourceTree = "<group>"; };
+		36CE05DF11779D8A00650B45 /* al_Functions.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Functions.hpp; sourceTree = "<group>"; };
+		36CE05E011779D8A00650B45 /* al_Interpolation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Interpolation.hpp; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* allo-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "allo-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -300,6 +303,9 @@
 				363E41371176B40500AA74DF /* al_Complex.hpp */,
 				363E41381176B40500AA74DF /* al_Quat.h */,
 				363E41391176B40500AA74DF /* al_Quat.hpp */,
+				36CE05DE11779D8A00650B45 /* al_Constants.hpp */,
+				36CE05DF11779D8A00650B45 /* al_Functions.hpp */,
+				36CE05E011779D8A00650B45 /* al_Interpolation.hpp */,
 			);
 			path = math;
 			sourceTree = "<group>";

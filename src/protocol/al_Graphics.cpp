@@ -2,17 +2,6 @@
 
 namespace al {
 
-int Graphics::POINTS = 0;
-int Graphics::LINES = 0;
-int Graphics::LINE_LOOP = 0;
-int Graphics::LINE_STRIP = 0;
-int Graphics::TRIANGLES = 0;
-int Graphics::TRIANGLE_STRIP = 0;
-int Graphics::TRIANGLE_FAN = 0;
-int Graphics::QUADS = 0;
-int Graphics::QUAD_STRIP = 0;
-int Graphics::POLYGON = 0;
-
 static void gl_begin(Graphics * g, int mode) {}
 static void gl_end(Graphics * g) {}
 static void gl_vertex3d(Graphics * g, double x, double y, double z) {}
