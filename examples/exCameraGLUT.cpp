@@ -56,7 +56,7 @@ void display(void)
    
    gl.begin(GL_POINTS);
    for (double i=-1; i<1.; i += 0.1) {
-		gl.vertex3d(i, i, i);
+		gl.vertex(i, i, i);
 	}
    gl.end();
    

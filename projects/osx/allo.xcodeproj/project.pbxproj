@@ -74,6 +74,7 @@
 		362127DE1173D5A2009CB6FC /* al_GraphicsOpenGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 362127DD1173D5A2009CB6FC /* al_GraphicsOpenGL.cpp */; };
 		362128BD1173E372009CB6FC /* al_GraphicsOpenGLES1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 362128BC1173E372009CB6FC /* al_GraphicsOpenGLES1.cpp */; };
 		362128BF1173E382009CB6FC /* al_GraphicsOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 362128BE1173E382009CB6FC /* al_GraphicsOpenGLES2.cpp */; };
+		362129FA11741A67009CB6FC /* al_VectorBuffer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 362129F911741A67009CB6FC /* al_VectorBuffer.hpp */; };
 		3622BEAC116D516100928703 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		3622BEAD116D516100928703 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
 		3622BEAE116D516100928703 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC53081162907D0076AA8B /* CoreAudio.framework */; };
@@ -284,6 +285,7 @@
 		362127DD1173D5A2009CB6FC /* al_GraphicsOpenGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GraphicsOpenGL.cpp; sourceTree = "<group>"; };
 		362128BC1173E372009CB6FC /* al_GraphicsOpenGLES1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GraphicsOpenGLES1.cpp; sourceTree = "<group>"; };
 		362128BE1173E382009CB6FC /* al_GraphicsOpenGLES2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GraphicsOpenGLES2.cpp; sourceTree = "<group>"; };
+		362129F911741A67009CB6FC /* al_VectorBuffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_VectorBuffer.hpp; sourceTree = "<group>"; };
 		3622BEB6116D516100928703 /* exMainloopGLUT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exMainloopGLUT; sourceTree = BUILT_PRODUCTS_DIR; };
 		3622BEDE116D527D00928703 /* al_AudioIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_AudioIO.cpp; sourceTree = "<group>"; };
 		3622BEDF116D527D00928703 /* al_File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_File.cpp; sourceTree = "<group>"; };
@@ -808,6 +810,7 @@
 				36B4125110EFF7B8007B16D0 /* al_tube.hpp */,
 				36B4125210EFF7B8007B16D0 /* al_types.h */,
 				36B4125310EFF7B8007B16D0 /* al_types.hpp */,
+				362129F911741A67009CB6FC /* al_VectorBuffer.hpp */,
 			);
 			path = types;
 			sourceTree = "<group>";
@@ -951,6 +954,7 @@
 				1697337511768B040025299C /* al_Quat.h in Headers */,
 				1697337611768B040025299C /* al_Quat.hpp in Headers */,
 				1697338711768B6E0025299C /* al_Complex.hpp in Headers */,
+				362129FA11741A67009CB6FC /* al_VectorBuffer.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1363,7 +1367,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = unitTests;
-				USER_HEADER_SEARCH_PATHS = ../../include;
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
 			};
 			name = Debug;
 		};
@@ -1383,7 +1387,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = unitTests;
-				USER_HEADER_SEARCH_PATHS = ../../include;
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
 				ZERO_LINK = NO;
 			};
 			name = Release;

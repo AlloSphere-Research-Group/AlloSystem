@@ -10,19 +10,20 @@
 
 #ifdef AL_GRAPHICS_USE_OPENGLES1
 
+static void gl_begin(Graphics * g, int mode) { mMode = mode; }
+static void gl_end(Graphics * g) { 
+	//  TODO: drawarrays
+}
+static void gl_vertex3d(Graphics * g, double x, double y, double z) { g->mVertexBuffer.append(Vec3d(x, y, z)); }
+static void gl_color3d(Graphics * g, double r, double g, double b) { g->mColorBuffer.append(Vec3d(r, g, b, 1)); }
+
 namespace al {
 
-//static void gl_begin(Graphics * g, int mode) { glBegin(mode); }
-//static void gl_end(Graphics * g) { glEnd(); }
-//static void gl_vertex3d(Graphics * g, double x, double y, double z) { glVertex3d(x, y, z); }
-//static void gl_color3d(Graphics * g, double x, double y, double z) { glColor3d(x, y, z); }
-
 bool setBackendOpenGLES1(Graphics * g) {
-
-//	g->s_begin = gl_begin;
-//	g->s_end = gl_end;
-//	g->s_vertex3d = gl_vertex3d;
-//	g->s_color3d = gl_color3d;	
+	g->s_begin = gl_begin;
+	g->s_end = gl_end;
+	g->s_vertex3d = gl_vertex3d;
+	g->s_color3d = gl_color3d;
 
 	g->mBackend = GraphicsBackend::OpenGLES1;
 	return true;

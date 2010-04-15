@@ -460,6 +460,22 @@ struct Vec3 : public Vec<3,T> {
 typedef Vec3<float> Vec3f;
 typedef Vec3<double> Vec3d;
 
+/// 4-vector
+template <class T>
+struct Vec4 : public Vec<4,T> {
+
+	typedef Vec<4,T> Base;
+	
+	Vec4(const T& x=T(), const T& y=T(), const T& z=T(), const T& w=T()){ set(x,y,z,w); }
+	
+	Vec4& operator= (const Base& v){ Base::set(v); return *this; }
+
+};
+
+
+typedef Vec4<float> Vec4f;
+typedef Vec4<double> Vec4d;
+
 #undef IT
 
 } // ::al::

@@ -38,6 +38,8 @@
 	gl.end();
 */
 
+#include "math/al_Vec.hpp"
+#include "types/al_VectorBuffer.hpp"
 
 namespace al{
 
@@ -67,6 +69,9 @@ public:
 	bool setBackend(GraphicsBackend::type backend);
 	
 	GraphicsBackend::type mBackend;
+	
+	al::VectorBuffer<al::Vec3d> mVertexBuffer;
+	al::VectorBuffer<al::Vec4d> mColorBuffer;
 	int mMode;
 	
 	void (*s_begin)(Graphics * g, int mode);
