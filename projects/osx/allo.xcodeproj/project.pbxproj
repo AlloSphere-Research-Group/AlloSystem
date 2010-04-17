@@ -341,6 +341,7 @@
 		3622C0B0116D586200928703 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		3625B540116EEDEF00C685B7 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../Makefile; sourceTree = SOURCE_ROOT; };
 		3625B541116EEDEF00C685B7 /* Makefile.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.config; path = ../../Makefile.config; sourceTree = SOURCE_ROOT; };
+		3675276611795C4400FF598E /* al_Camera.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Camera.hpp; sourceTree = "<group>"; };
 		369EA3A7116D5F5F00EB1934 /* exCameraGLUT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exCameraGLUT; sourceTree = BUILT_PRODUCTS_DIR; };
 		369EA3AA116D5F7200EB1934 /* exCameraGLUT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exCameraGLUT.cpp; sourceTree = "<group>"; };
 		369EA3B0116D60CE00EB1934 /* liballoutil.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liballoutil.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -823,6 +824,7 @@
 				36B4125210EFF7B8007B16D0 /* al_types.h */,
 				36B4125310EFF7B8007B16D0 /* al_types.hpp */,
 				362129F911741A67009CB6FC /* al_VectorBuffer.hpp */,
+				3675276611795C4400FF598E /* al_Camera.hpp */,
 			);
 			path = types;
 			sourceTree = "<group>";

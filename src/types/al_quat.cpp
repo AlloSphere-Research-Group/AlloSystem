@@ -33,20 +33,8 @@ void al_quat_reset(al_quat * q) {
 	(TO_QUAT_PTR(q))->reset();
 }
 
-void al_quat_multiply_inplace(al_quat * q, al_quat * q2) {
-	(TO_QUAT_PTR(q))->multiply((TO_QUAT_PTR(q2)));
-}
-
-void al_quat_multiply(al_quat * q, al_quat * q2, al_quat * result) {
-	(TO_QUAT_PTR(q))->multiply((TO_QUAT_PTR(q2)), (TO_QUAT_PTR(result)));
-}
-
-void al_quat_rotate(al_quat * q, al_quat * q2) {
-	(TO_QUAT_PTR(q))->rotateby(TO_QUAT_PTR(q2));
-}
-
-void al_quat_inverse(al_quat * q, al_quat * result) {
-	(TO_QUAT_PTR(q))->inverse((TO_QUAT_PTR(result)));
+void al_quat_conjugate(al_quat * q, al_quat * result) {
+	*(TO_QUAT_PTR(result)) = (TO_QUAT_PTR(q))->conjugate();
 }
 
 void al_quat_from_quat(al_quat * dst, double w, double x, double y, double z) {

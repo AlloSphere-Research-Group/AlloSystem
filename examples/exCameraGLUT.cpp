@@ -1,6 +1,7 @@
 #include "system/al_mainloop.h"
 
 #include "protocol/al_Graphics.hpp"
+#include "types/al_Camera.hpp"
 
 /*
 

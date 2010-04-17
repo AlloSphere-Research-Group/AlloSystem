@@ -35,7 +35,7 @@ void al_quat_reset(al_quat * q);
 
 void al_quat_multiply_inplace(al_quat * q, al_quat * q2);
 void al_quat_multiply(al_quat * q, al_quat * q2, al_quat * result);
-void al_quat_inverse(al_quat * q, al_quat * result);
+void al_quat_conjugate(al_quat * q, al_quat * result);
 void al_quat_rotate(al_quat * q, al_quat * q2);
 
 void al_quat_rotate_vector(al_quat * q, double * src, double * dst);
