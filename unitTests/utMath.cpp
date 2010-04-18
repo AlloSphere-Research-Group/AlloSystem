@@ -250,6 +250,13 @@ int utMath(){
 		
 		normal(r, Vec3d(1,0,0), Vec3d(0,1,0), Vec3d(-1,0,0));
 		assert(r == Vec3d(0,0,1));
+		
+		Vec3d pos(1,2,3);
+		Vec3d to(4,5,6);
+		Vec3d rel = to - pos;
+		
+		assert(rel[0]==3 && rel[1]==3 && rel[2]==3);
+		
 		}
 		
 		a = 0;

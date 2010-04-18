@@ -63,7 +63,7 @@ public:
 
 	/// @param[in] v		vector to initialize all elements to
 	template <class T2>
-	Vec(const Vec<N, T2> &v){ set(v); }
+	Vec(const Vec<N, T2>& v){ set(v); }
 
 	/// @param[in] v		pointer to array to initialize all elements to
 	/// @param[in] stride	stride factor through array
@@ -449,11 +449,11 @@ template <class T>
 struct Vec3 : public Vec<3,T> {
 
 	typedef Vec<3,T> Base;
-	
-	Vec3(const T& x=T(), const T& y=T(), const T& z=T()){ set(x,y,z); }
-	
-	Vec3& operator= (const Base& v){ Base::set(v); return *this; }
 
+	Vec3(const Base& v){ *this = v; }
+	Vec3(const T& x=T(), const T& y=T(), const T& z=T()){ set(x,y,z); }
+
+	Vec3& operator= (const Base& v){ Base::set(v); return *this; }
 };
 
 
@@ -466,6 +466,7 @@ struct Vec4 : public Vec<4,T> {
 
 	typedef Vec<4,T> Base;
 	
+	Vec4(const Base& v){ *this = v; }
 	Vec4(const T& x=T(), const T& y=T(), const T& z=T(), const T& w=T()){ set(x,y,z,w); }
 	
 	Vec4& operator= (const Base& v){ Base::set(v); return *this; }
