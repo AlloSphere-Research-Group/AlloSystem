@@ -66,6 +66,9 @@ struct Color{
 	:	a(a)
 	{	*this = hsv; }
 
+	Color& set(float re, float gr, float bl, float al){
+		r=re; g=gr; b=bl; a=al; return *this;
+	}
 
 	template <class V4>
 	Color& operator=(const V4& v){ r=v[0]; g=v[1]; b=v[2]; a=v[3]; return *this; }

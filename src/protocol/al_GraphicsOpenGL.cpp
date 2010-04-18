@@ -40,9 +40,9 @@ namespace al {
 #if 0
 static void gl_begin(Graphics * g, int mode) { glBegin(mode); }
 static void gl_end(Graphics * g) { glEnd(); }
-static void gl_vertex3d(Graphics * g, double x, double y, double z) { glVertex3d(x, y, z); }
-static void gl_normal3d(Graphics * g, double x, double y, double z) { glNormal3d(x, y, z); }
-static void gl_color4d(Graphics * g, double x, double y, double z, double a) { glColor4d(x, y, z, a); }
+static void gl_vertex(Graphics * g, double x, double y, double z) { glVertex3d(x, y, z); }
+static void gl_normal(Graphics * g, double x, double y, double z) { glNormal3d(x, y, z); }
+static void gl_color(Graphics * g, double x, double y, double z, double a) { glColor4d(x, y, z, a); }
 #else
 static void gl_begin(Graphics * g, int mode) { 
 	g->mMode = mode; 
@@ -67,13 +67,13 @@ static void gl_end(Graphics * g) {
 	g->mVertexBuffer.extend(); // always have 1
 }
 
-static void gl_color4d(Graphics * G, double r, double g, double b, double a) { 
+static void gl_color(Graphics * G, double r, double g, double b, double a) { 
 	G->mVertexBuffer.top().color.set(r, g, b, a);
 }
-static void gl_normal3d(Graphics * g, double x, double y, double z) { 
+static void gl_normal(Graphics * g, double x, double y, double z) { 
 	g->mVertexBuffer.top().normal.set(x, y, z);
 }
-static void gl_vertex3d(Graphics * g, double x, double y, double z) { 
+static void gl_vertex(Graphics * g, double x, double y, double z) { 
 	g->mVertexBuffer.top().position.set(x, y, z);
 	// done with top element; create a new top:
 	g->mVertexBuffer.extend();
@@ -85,9 +85,9 @@ bool setBackendOpenGL(Graphics * g) {
 	
 	g->s_begin = gl_begin;
 	g->s_end = gl_end;
-	g->s_vertex3d = gl_vertex3d;
-	g->s_normal3d = gl_normal3d;
-	g->s_color4d = gl_color4d;
+	g->s_vertex = gl_vertex;
+	g->s_normal = gl_normal;
+	g->s_color = gl_color;
 
 	#define SET_GL_ENUM(x) g->x = GL_##x
 	SET_GL_ENUM(POINTS);
