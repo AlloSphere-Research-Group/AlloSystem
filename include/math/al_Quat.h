@@ -3,6 +3,10 @@
 
 #include <math.h>
 
+/*!
+	C binding for al::Quat<double> (@see al_Quat.hpp)
+*/
+
 #define QUAT_ACCURACY_MAX (1.000001)
 #define QUAT_ACCURACY_MIN (0.999999)
 #define QUAT_EPSILON (0.000001)
@@ -11,12 +15,7 @@
 #define QUAT_DEG2RAD_BY2 (0.00872664626)
 #define QUAT_PIBY2 (1.57079632679)
 
-typedef struct al_quat {
-	double w;
-	double x;
-	double y;
-	double z;
-} al_quat;
+typedef struct al_quat al_quat;
 
 al_quat * al_quat_create(double w, double x, double y, double z);
 void al_quat_free(al_quat ** q);

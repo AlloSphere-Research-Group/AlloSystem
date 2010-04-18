@@ -17,7 +17,6 @@ namespace al {
 template<typename T=double>
 class Quat {	
 public:
-	
 	union{
 		struct{
 			T w;
