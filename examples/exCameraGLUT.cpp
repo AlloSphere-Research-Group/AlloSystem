@@ -75,7 +75,7 @@ void display(void)
 }
 
 int main (int argc, char * argv[]) {
-	
+
 	printf("setBackendOpenGL %d\n", setBackendOpenGL(&gl));
 	 
 	// GLUT Window Initialization:

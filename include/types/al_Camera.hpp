@@ -212,27 +212,61 @@ protected:
 //	Camera(double focalLen=6, double aper=30, double eyeSep=0.02, double nearCut=0.01, double farCut=100);
 //};
 
+//Plane::Plane(const Vec3d &v1, const Vec3d &v2, const Vec3d &v3){
+//	set3Points(v1,v2,v3);
+//}
+//
+//void Plane::set3Points(const Vec3d &v1, const Vec3d &v2, const Vec3d &v3){
+//	Vec3d aux1, aux2;
+//
+//	aux1 = v1 - v2;
+//	aux2 = v3 - v2;
+//
+//	normal = aux2.cross(aux1);
+//
+//	normal.normalize();
+//	point = v2;
+//	d = -(normal.dot(point));
+//}
+//
+//void Plane::setNormalAndPoint(const Vec3d &nrm, const Vec3d &point){
+//	normal = nrm.sgn();
+//	d = -(normal.dot(point));
+//}
+//
+//void Plane::setCoefficients(double a, double b, double c, double d_){
+//	normal(a,b,c);
+//	double l = normal.norm();
+//	normal(a/l,b/l,c/l);
+//	d = d_/l;
+//}
+//
+//double Plane::distance(const Vec3d &p) const{
+//	return (d + normal.dot(p));
+//}
+
+
 void Nav :: toAED(const Vec3d & to, double azimuth, double elevation, double distance) {
 	
-//	Vec3d rel = to - mPos;
-//	distance = rel.mag();
-//	
-//	if (distance > QUAT_EPSILON*2) 
-//	{
-//		rel.normalize();
-//		
-//		// dot product of A & B vectors is the similarity or cosine:
-//		double xness = rel.dot(mUX); 
-//		double yness = rel.dot(mUY);
-//		double zness = rel.dot(mUZ);
-//		
-//		azimuth = -atan2(xness, zness);
-//		elevation = asin(yness);
-//	} else {
-//		// near origin; might as well assume 0 to avoid denormals
-//		// do not set az/el; they may already have more meaningful values
-//		distance = 0.0;
-//	}
+	Vec3d rel = to - mPos;
+	distance = rel.mag();
+	
+	if (distance > QUAT_EPSILON*2) 
+	{
+		rel.normalize();
+		
+		// dot product of A & B vectors is the similarity or cosine:
+		double xness = rel.dot(mUX); 
+		double yness = rel.dot(mUY);
+		double zness = rel.dot(mUZ);
+		
+		azimuth = -atan2(xness, zness);
+		elevation = asin(yness);
+	} else {
+		// near origin; might as well assume 0 to avoid denormals
+		// do not set az/el; they may already have more meaningful values
+		distance = 0.0;
+	}
 
 }
 
@@ -267,38 +301,6 @@ void Nav :: step(double dt) {
 	}
 }
 
-//Plane::Plane(const Vec3d &v1, const Vec3d &v2, const Vec3d &v3){
-//	set3Points(v1,v2,v3);
-//}
-//
-//void Plane::set3Points(const Vec3d &v1, const Vec3d &v2, const Vec3d &v3){
-//	Vec3d aux1, aux2;
-//
-//	aux1 = v1 - v2;
-//	aux2 = v3 - v2;
-//
-//	normal = aux2.cross(aux1);
-//
-//	normal.normalize();
-//	point = v2;
-//	d = -(normal.dot(point));
-//}
-//
-//void Plane::setNormalAndPoint(const Vec3d &nrm, const Vec3d &point){
-//	normal = nrm.sgn();
-//	d = -(normal.dot(point));
-//}
-//
-//void Plane::setCoefficients(double a, double b, double c, double d_){
-//	normal(a,b,c);
-//	double l = normal.norm();
-//	normal(a/l,b/l,c/l);
-//	d = d_/l;
-//}
-//
-//double Plane::distance(const Vec3d &p) const{
-//	return (d + normal.dot(p));
-//}
 
 
 

@@ -17,10 +17,16 @@ namespace al {
 template<typename T=double>
 class Quat {	
 public:
-	T w;
-	T x;
-	T y; 
-	T z;
+	
+	union{
+		struct{
+			T w;
+			T x;
+			T y; 
+			T z;
+		};
+		T components[4];
+	};
 
 	Quat(T w = 1.0, T x = 0.0, T y = 0.0, T z = 0.0);
 	Quat(const Quat & src);
