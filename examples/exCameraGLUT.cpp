@@ -2,6 +2,7 @@
 
 #include "protocol/al_Graphics.hpp"
 #include "types/al_Camera.hpp"
+#include "types/al_MsgTube.hpp"
 
 /*
 
@@ -23,6 +24,7 @@
 
 
 al::Graphics gl;
+al::MsgTube inbox, outbox;
 
 void ontick(al_nsec time, void * userdata) {
 	al_sec t = time * al_time_ns2s;
