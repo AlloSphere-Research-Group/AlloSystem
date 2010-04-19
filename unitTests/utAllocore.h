@@ -18,6 +18,7 @@
 #include "system/al_Time.hpp"
 #include "system/al_Thread.hpp"
 #include "types/al_Buffer.hpp"
+#include "types/al_Conversion.hpp"
 #include "types/al_types.h"
 #include "types/al_types.hpp"
 
@@ -37,5 +38,6 @@ int utProtocolOSC();
 int utProtocolSerialize();
 int utSystem();
 int utTypes();
+int utTypesConversion();
 
 #endif

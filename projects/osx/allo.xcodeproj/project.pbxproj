@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		1619909E11743990006FBADF /* al_Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1619909C11743990006FBADF /* al_Color.cpp */; };
 		1619909F11743990006FBADF /* al_Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1619909C11743990006FBADF /* al_Color.cpp */; };
+		166DD742117CDB6000A8BA12 /* al_Conversion.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 166DD741117CDB6000A8BA12 /* al_Conversion.hpp */; };
+		166DD743117CDB6000A8BA12 /* al_Conversion.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 166DD741117CDB6000A8BA12 /* al_Conversion.hpp */; };
+		166DD745117CDBFD00A8BA12 /* utTypesConversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 166DD744117CDBFD00A8BA12 /* utTypesConversion.cpp */; };
 		168EC8F11161CA2C00FCACC7 /* al_Time.h in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8EB1161CA2C00FCACC7 /* al_Time.h */; };
 		168EC8F21161CA2C00FCACC7 /* al_MainLoop.h in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8EC1161CA2C00FCACC7 /* al_MainLoop.h */; };
 		168EC8F31161CA2C00FCACC7 /* al_Config.h in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8ED1161CA2C00FCACC7 /* al_Config.h */; };
@@ -242,6 +245,9 @@
 		16198FF31173E39B006FBADF /* al_Buffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Buffer.hpp; sourceTree = "<group>"; };
 		1619909B11743914006FBADF /* al_Color.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Color.hpp; sourceTree = "<group>"; };
 		1619909C11743990006FBADF /* al_Color.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Color.cpp; sourceTree = "<group>"; };
+		166DD741117CDB6000A8BA12 /* al_Conversion.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Conversion.hpp; sourceTree = "<group>"; };
+		166DD744117CDBFD00A8BA12 /* utTypesConversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utTypesConversion.cpp; path = ../../unitTests/utTypesConversion.cpp; sourceTree = SOURCE_ROOT; };
+		166DD78D117CDF1800A8BA12 /* pstdint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pstdint.h; sourceTree = "<group>"; };
 		168EC8EB1161CA2C00FCACC7 /* al_Time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Time.h; sourceTree = "<group>"; };
 		168EC8EC1161CA2C00FCACC7 /* al_MainLoop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_MainLoop.h; sourceTree = "<group>"; };
 		168EC8ED1161CA2C00FCACC7 /* al_Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Config.h; sourceTree = "<group>"; };
@@ -581,6 +587,7 @@
 				16AC52A411628D4D0076AA8B /* utProtocolOSC.cpp */,
 				16AC52A211628D4D0076AA8B /* utSystem.cpp */,
 				16AC52A611628D4D0076AA8B /* utTypes.cpp */,
+				166DD744117CDBFD00A8BA12 /* utTypesConversion.cpp */,
 			);
 			name = unitTests;
 			sourceTree = "<group>";
@@ -830,6 +837,7 @@
 				168EC8EF1161CA2C00FCACC7 /* al_Thread.hpp */,
 				168EC8EB1161CA2C00FCACC7 /* al_Time.h */,
 				168EC8EE1161CA2C00FCACC7 /* al_Time.hpp */,
+				166DD78D117CDF1800A8BA12 /* pstdint.h */,
 			);
 			path = system;
 			sourceTree = "<group>";
@@ -840,6 +848,7 @@
 				3659D751117B8AC60065EBE4 /* jack */,
 				16198FF31173E39B006FBADF /* al_Buffer.hpp */,
 				1619909B11743914006FBADF /* al_Color.hpp */,
+				166DD741117CDB6000A8BA12 /* al_Conversion.hpp */,
 				36B4124E10EFF7B8007B16D0 /* al_pq.h */,
 				36B4124F10EFF7B8007B16D0 /* al_pq.hpp */,
 				36F4662B110B9B720082D21E /* al_socktube.h */,
@@ -964,6 +973,7 @@
 				16BC66A7117770BF002A0C18 /* al_Constants.hpp in Headers */,
 				16BC66A8117770BF002A0C18 /* al_Functions.hpp in Headers */,
 				16BC66A9117770BF002A0C18 /* al_Interpolation.hpp in Headers */,
+				166DD743117CDB6000A8BA12 /* al_Conversion.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1000,6 +1010,7 @@
 				16BC66A4117770BF002A0C18 /* al_Constants.hpp in Headers */,
 				16BC66A5117770BF002A0C18 /* al_Functions.hpp in Headers */,
 				16BC66A6117770BF002A0C18 /* al_Interpolation.hpp in Headers */,
+				166DD742117CDB6000A8BA12 /* al_Conversion.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1233,6 +1244,7 @@
 				16AC52AC11628D4D0076AA8B /* utIOWindowGL.cpp in Sources */,
 				16AC52AD11628D4D0076AA8B /* utTypes.cpp in Sources */,
 				1697339B11768CDF0025299C /* utMath.cpp in Sources */,
+				166DD745117CDBFD00A8BA12 /* utTypesConversion.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1489,6 +1501,10 @@
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_INPUT_FILETYPE = automatic;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					__STDC_CONSTANT_MACROS,
+					__STDC_LIMIT_MACROS,
+				);
 				GCC_VERSION = 4.0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
@@ -1526,6 +1542,10 @@
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_INPUT_FILETYPE = automatic;
 				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					__STDC_CONSTANT_MACROS,
+					__STDC_LIMIT_MACROS,
+				);
 				GCC_STRICT_ALIASING = YES;
 				GCC_UNROLL_LOOPS = YES;
 				GCC_VERSION = 4.0;

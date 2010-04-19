@@ -31,7 +31,11 @@
 #define __STDC_CONSTANT_MACROS
 #endif
 
-#include "pstdint.h"
+#ifndef __STDC_LIMIT_MACROS
+#define __STDC_LIMIT_MACROS
+#endif
+
+#include "system/pstdint.h"
 
 #define AL_SYSTEM_LIB_VERSION 0.01
 
@@ -46,12 +50,11 @@
 #elif defined( __APPLE__ ) && defined( __MACH__ )
 	#define AL_OSX 1
 	#define AL_API extern
-	#include "stdint.h"
 #else
 	#define AL_LINUX 1
 	#define AL_API extern
-	#include "stdint.h"
 #endif
+
 
 #if !defined(MIN)
     #define MIN(A,B)	({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __a : __b; })

@@ -4,12 +4,13 @@ int main(){
 
 	utMath();
 	utTypes();
+	utTypesConversion();
 //	utSystem();
 //	utProtocolOSC();
 //	utProtocolSerialize();
 //
 //	utIOAudioIO();
-	utIOWindowGL();
+//	utIOWindowGL();
 
 	return 0;
 }

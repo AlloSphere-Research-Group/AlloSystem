@@ -14,6 +14,7 @@ SRCS =	utIOAudioIO.cpp \
 	utProtocolSerialize.cpp \
 	utSystem.cpp \
 	utTypes.cpp \
+	utTypesConversion.cpp \
 	utAllocore.cpp
 
 OBJS = $(addsuffix .o, $(basename $(notdir $(SRCS))))
