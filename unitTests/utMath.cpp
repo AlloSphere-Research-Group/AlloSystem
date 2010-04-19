@@ -9,8 +9,22 @@ int utMath(){
 	const double pinf = 1e800;			// + infinity
 	const double ninf = -pinf;			// - infinity
 
+	#define T(x) assert(al::abs(x) == (x<0?-x:x));
+	T(0.) T(1.) T(-1.)
+	T(0) T(1) T(-1)
+	#undef T	
+
 	#define T(x,y, r) assert(al::atLeast(x,y) == r);
 	T(0.,1., 1.) T(+0.1,1., 1.) T(-0.1,1., -1.)
+	#undef T
+
+	#define T(x,y) assert(al::abs(al::atan2Fast(x,y) - std::atan2(x,y)) < 1e-5);
+	T(1.,0.) T(1.,1.) T(0.,1.) T(-1.,1.) T(-1.,0.) T(-1.,-1.) T(0.,-1.) T(1.,-1.)
+	#undef T
+
+	#define T(x, y) assert(al::ceil(x) == y);
+	T(0., 0.)	T( 1., 1.) T( 1.2, 2.) T( 1.8, 2.) T( 1000.1, 1001.)
+				T(-1.,-1.) T(-1.2,-1.) T(-1.8,-1.) T(-1000.1,-1000.)
 	#undef T
 
 	#define T(x, y) assert(al::clip(x) == y);
@@ -23,6 +37,18 @@ int utMath(){
 	
 	#define T(x,r) assert(al::even(x) == r);
 	T(0,true) T(1,false) T(-2,true)
+	#undef T
+
+	#define T(x, y) assert(al::factorial(x) == y);
+	T(0, 1) T(1, 1) T(2, 2*1) T(3, 3*2*1) T(4, 4*3*2*1)
+	T(5, 5*4*3*2*1) T(6, 6*5*4*3*2*1) T(7, 7*6*5*4*3*2*1) T(8, 8*7*6*5*4*3*2*1)
+	T(9, 9*8*7*6*5*4*3*2*1) T(10, 10*9*8*7*6*5*4*3*2*1) T(11, 11*10*9*8*7*6*5*4*3*2*1)
+	T(12, 12*11*10*9*8*7*6*5*4*3*2*1)
+	#undef T
+
+	#define T(x, y) assert(al::floor(x) == y);
+	T(0., 0.)	T( 1., 1.) T( 1.2, 1.) T( 1.8, 1.) T( 1000.1, 1000.)
+				T(-1.,-1.) T(-1.2,-2.) T(-1.8,-2.) T(-1000.1,-1001.)
 	#undef T
 
 	#define T(x, y) assert(eq(al::fold(x), y));
@@ -111,6 +137,19 @@ int utMath(){
 	#define T(x,y,r) assert(al::remainder(x,y) == r);
 	T(7,7,0) T(7,1,0) T(7,4,3) T(7,3,1) T(14,3,2)
 	#undef T
+	
+	#define T(x,y) assert(al::round(x) == y);
+	T(0.f, 0.f) T(0.2f, 0.f) T(0.8f, 1.f) T(-0.2f, 0.f) T(-0.8f,-1.f) T(0.5f, 0.f) T(-0.5f, 0.f)
+	T(0.0, 0.0) T(0.20, 0.0) T(0.80, 1.0) T(-0.20, 0.0) T(-0.80,-1.0) T(0.50, 0.0) T(-0.50, 0.0)
+	#undef T
+
+	#define T(x,y,r) assert(al::round(x,y) == r);
+	T(0.0,0.1, 0.0) T(0.1,0.1, 0.1) T(0.15,0.1, 0.1) T(-0.15,0.1, -0.1)
+	#undef T
+
+	#define T(x,y,r) assert(al::roundAway(x,y) == r);
+	T(0.0,0.1, 0.0) T(0.1,0.1, 0.1) T(0.15,0.1, 0.2) T(-0.15,0.1, -0.2)
+	#undef T
 
 	#define T(x,r) assert(al::sgn(x) == r);
 	T(0., 1.) T(0.1, 1.) T(-0.1, -1.)
@@ -131,6 +170,11 @@ int utMath(){
 
 	#define T(x,r) assert(al::trailingZeroes(x) == r);
 	T(0, 0) T(1, 0) T(2, 1) T(3, 0) T(4, 2) T(8, 3) T(9, 0)
+	#undef T
+
+	#define T(x,y) assert(al::trunc(x) == y);
+	T(0.f, 0.f) T(0.2f, 0.f) T(0.8f, 0.f) T(-0.2f, 0.f) T(-0.8f, 0.f) T(0.5f, 0.f) T(-0.5f, 0.f)
+	T(0.0, 0.0) T(0.20, 0.0) T(0.80, 0.0) T(-0.20, 0.0) T(-0.80, 0.0) T(0.50, 0.0) T(-0.50, 0.0)
 	#undef T
 
 	#define T(x,l,h,r) assert(al::within(x,l,h)==r);

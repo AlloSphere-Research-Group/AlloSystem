@@ -52,11 +52,22 @@ template<class T> T abs(T v);
 /// Returns value clipped ouside of range [-eps, eps]
 template<class T> T atLeast(T v, T eps);
 
+/// Fast approximation to atan2().
+
+// Author: Jim Shima, http://www.dspguru.com/comp.dsp/tricks/alg/fxdatan2.htm.
+// |error| < 0.01 rad
+template<class T> T atan2Fast(T y, T x);
+
 /// Returns number of bits set to 1.
 
 /// From "Bit Twiddling Hacks", 
 /// http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
 uint32_t bitsSet(uint32_t v);
+
+/// Returns floating point value rounded to next highest integer.
+template<class T> T ceil(T val);
+template<class T> T ceil(T val, T step);
+template<class T> T ceil(T val, T step, T recStep);
 
 /// Returns power of two ceiling of value
 
@@ -79,6 +90,14 @@ template<class T> T clipS(T value, T hi=T(1));
 
 /// Returns whether or not an integer value is even.
 template<class T> bool even(T v);
+
+/// Returns factorial. Argument must be less than or equal to 12.
+uint32_t factorial(uint32_t v);
+
+/// Returns floor of floating point value.
+template<class T> T floor(T val);
+template<class T> T floor(T val, T step);
+template<class T> T floor(T val, T step, T recStep);
 
 /// Returns power of two floor of value
 
@@ -171,8 +190,26 @@ template<class T> T pow8(T v);			///< Returns value to the 8th power.
 template<class T> T pow16(T v);			///< Returns value to the 16th power.
 template<class T> T pow64(T v);			///< Returns value to the 64th power.
 
+/// Returns (n+1)th prime number up to n=53.
+unsigned char prime(uint32_t n);
+
 /// Returns the value r such that r = x - n*y.
 template<class T> T remainder(const T& x, const T& y);
+
+/// Returns value rounded to nearest integer towards zero.
+template<class T> T round(T v);
+
+/// Returns value rounded to nearest integer multiple of 'step' towards zero.
+template<class T> T round(T v, T step);
+
+/// Returns value rounded to nearest integer multiple of 'step' towards zero. Faster version to avoid 1/step divide.
+template<class T> T round(T v, T step, T recStep);
+
+/// Returns value rounded to nearest integer away from zero.
+template<class T> T roundAway(T v);
+
+/// Returns value rounded to nearest to nearest integer multiple of 'step' away from zero.
+template<class T> T roundAway(T v, T step);
 
 /// Signum function for real numbers
 template<class T> T sgn(const T& v, const T& norm=T(1));
@@ -195,6 +232,15 @@ template<class T> T sumOfSquares(T n);
 /// "Using de Bruijn Sequences to Index 1 in a Computer Word"
 /// by Charles E. Leiserson, Harald Prokof, and Keith H. Randall.
 uint32_t trailingZeroes(uint32_t v);
+
+/// Truncates floating point value at decimal.
+template<class T> T trunc(T v);
+
+/// Truncates floating point value to step.
+template<class T> T trunc(T v, T step);
+
+/// Truncates floating point value to step. Faster version to avoid 1/step divide.
+template<class T> T trunc(T v, T step, T recStep);
 
 /// Returns whether value is in interval [lo, hi].
 template<class T> bool within(T v, T lo, T hi);
@@ -236,14 +282,35 @@ template<class T> T wrapPhaseOnce(T radians);
 
 #define TEM template<class T>
 
+namespace{
+	template<class T> const T roundEps();
+	template<> inline const float  roundEps<float >(){ return 0.499999925f; }
+	template<> inline const double roundEps<double>(){ return 0.499999985; }
 
-inline uint32_t deBruijn(uint32_t v){
-	static const uint32_t deBruijnBitPosition[32] = {
-		 0, 1,28, 2,29,14,24, 3,30,22,20,15,25,17, 4, 8, 
-		31,27,13,23,21,19,16, 7,26,12,18, 6,11, 5,10, 9
+	inline uint32_t deBruijn(uint32_t v){
+		static const uint32_t deBruijnBitPosition[32] = {
+			 0, 1,28, 2,29,14,24, 3,30,22,20,15,25,17, 4, 8, 
+			31,27,13,23,21,19,16, 7,26,12,18, 6,11, 5,10, 9
+		};
+		return deBruijnBitPosition[(uint32_t(v * 0x077CB531UL)) >> 27];
+	}
+	
+	const uint32_t mFactorial12u[13] = {
+		1, 1, 2, 6, 24, 120, 720, 5040, 40320, 
+		362880, 3628800, 39916800, 479001600
 	};
-	return deBruijnBitPosition[(uint32_t(v * 0x077CB531UL)) >> 27];
+
+	const uint8_t mPrimes54[54] = {
+	/*	  0    1    2    3    4    5    6    7    8    9   */
+		  2,   3,   5,   7,  11,  13,  17,  19,  23,  29, // 0
+		 31,  37,  41,  43,  47,  53,  59,  61,	 67,  71, // 1
+		 73,  79,  83,  89,  97, 101, 103, 107, 109, 113, // 2
+		127, 131, 137, 139, 149, 151, 157, 163, 167, 173, // 3
+		179, 181, 191, 193, 197, 199, 211, 223, 227, 229, // 4
+		233, 239, 241, 251								  // 5
+	};
 }
+
 
 
 /// Returns absolute value
@@ -251,11 +318,33 @@ TEM inline T abs(T v){ return std::abs(v); }
 
 TEM inline T atLeast(T v, T e){	return (v >= T(0)) ? max(v, e) : min(v, -e); }
 
+TEM T atan2Fast(T y, T x){
+	
+	T r, angle;
+	T ay = al::abs(y) + T(1e-10);      // kludge to prevent 0/0 condition
+	
+	if(x < T(0)){
+		r = (x + ay) / (ay - x);
+		angle = T(M_3PI_4);
+	}
+	else{
+		r = (x - ay) / (x + ay);
+		angle = T(M_PI_4);
+	}
+	
+	angle += (T(0.1963)*r*r - T(0.9817))*r;
+	return y < T(0) ? -angle : angle;
+}
+
 inline uint32_t bitsSet(uint32_t v){
 	v = v - ((v >> 1) & 0x55555555);                    // reuse input as temporary
 	v = (v & 0x33333333) + ((v >> 2) & 0x33333333);     // temp
 	return ((v + ((v >> 4) & 0xF0F0F0F)) * 0x1010101) >> 24; // count
 }
+
+TEM inline T ceil(T v){ return round(v + roundEps<T>()); }
+TEM inline T ceil(T v, T s){ return ceil(v/s)*s; }
+TEM inline T ceil(T v, T s, T r){ return ceil(v*r)*s; }
 
 inline uint32_t ceilPow2(uint32_t v){
 	v--;
@@ -280,9 +369,15 @@ TEM inline T clip(T v, int & clipFlag, T hi, T lo){
 	return v;
 }
 
-TEM inline T clipS(T v, T hi){ return clip(v, hi, -hi); }
+TEM inline T clipS(T v, T hi){ return al::clip(v, hi, -hi); }
 
-TEM inline bool even(T v){ return 0 == odd(v); }
+TEM inline bool even(T v){ return 0 == al::odd(v); }
+
+inline uint32_t factorial(uint32_t v){ return mFactorial12u[v]; }
+
+TEM inline T floor(T v){ return al::round(v - roundEps<T>()); }
+TEM inline T floor(T v, T s){ return al::floor(v/s)*s; }
+TEM inline T floor(T v, T s, T r){ return al::floor(v*r)*s; }
 
 inline uint32_t floorPow2(uint32_t v){
 	v |= v >> 1;
@@ -295,7 +390,7 @@ inline uint32_t floorPow2(uint32_t v){
 
 TEM inline T fold(T v, T hi, T lo){
 	long numWraps;
-	v = wrap(v, numWraps, hi, lo);
+	v = al::wrap(v, numWraps, hi, lo);
 	if(numWraps & 1) v = hi + lo - v;
 	return v;
 }
@@ -310,7 +405,7 @@ TEM inline T gaussian(T v){ return ::exp(-v*v); }
 
 TEM T gcd(const T& x, const T& y){
 	if(y==T(0)) return x;
-	return gcd(y, remainder(x,y));
+	return al::gcd(y, al::remainder(x,y));
 }
 
 TEM T laguerre(int n, int k, T x) {
@@ -323,7 +418,7 @@ TEM T laguerre(int n, int k, T x) {
 	return res;
 }
 
-TEM inline T lcm(const T& x, const T& y){ return (x*y)/gcd(x,y); }
+TEM inline T lcm(const T& x, const T& y){ return (x*y)/al::gcd(x,y); }
 
 TEM T legendre(int l, int m, T ct, T st){
 
@@ -337,7 +432,7 @@ TEM T legendre(int l, int m, T ct, T st){
 	//		P_{m+1}^m(x) = x(2m+1) P_m^m(x).
 
 	T P = 0;
-	int mm = std::abs(m);			/*   mm = |m|   */
+	int mm = al::abs(m);			/*   mm = |m|   */
 	T y1 = 1.;
 	
 	for(int i=1; i<=mm; ++i)
@@ -374,18 +469,18 @@ TEM T legendre(int l, int m, T ct, T st){
 
 
 TEM T legendre(int l, int m, T t){
-	return legendre(l,m, std::cos(t), std::sin(t));
+	return al::legendre(l,m, std::cos(t), std::sin(t));
 }
 
-TEM inline bool lessAbs(T v, T eps){ return std::abs(v) < eps; }
+TEM inline bool lessAbs(T v, T eps){ return al::abs(v) < eps; }
 
-inline uint32_t log2(uint32_t v){ return deBruijn(ceilPow2(v)); }
+inline uint32_t log2(uint32_t v){ return deBruijn(al::ceilPow2(v)); }
 
 TEM inline T max(T v1, T v2){ return v1<v2?v2:v1; }
-TEM inline T max(T v1, T v2, T v3){ return max(max(v1,v2),v3); }
+TEM inline T max(T v1, T v2, T v3){ return al::max(al::max(v1,v2),v3); }
 TEM inline T mean(T v1, T v2){ return (v1 + v2) * T(0.5); }
 TEM inline T min(T v1, T v2){ return v1<v2?v1:v2; }
-TEM inline T min(T v1, T v2, T v3){ return min(min(v1,v2),v3); }
+TEM inline T min(T v1, T v2, T v3){ return al::min(al::min(v1,v2),v3); }
 
 TEM inline T nextAfter(T x, T y){ return x<y ? x+1 : x-1; }
 template<> inline float nextAfter(float x, float y){ return nextafterf(x,y); }
@@ -398,9 +493,9 @@ TEM inline T poly(T v, T a0, T a1, T a2){ return a0 + v*(a1 + v*a2); }
 TEM inline T poly(T v, T a0, T a1, T a2, T a3){ return a0 + v*(a1 + v*(a2 + v*a3)); }
 
 TEM inline T pow2 (T v){ return v*v; }
-TEM inline T pow2S(T v){ return v*std::abs(v); }
+TEM inline T pow2S(T v){ return v*al::abs(v); }
 TEM inline T pow3 (T v){ return v*v*v; }
-TEM inline T pow3Abs(T v){ return std::abs(pow3(v)); }
+TEM inline T pow3Abs(T v){ return al::abs(pow3(v)); }
 TEM inline T pow4 (T v){ return pow2(pow2(v)); }
 TEM inline T pow5 (T v){ return v * pow4(v); }
 TEM inline T pow6 (T v){ return pow3(pow2(v)); }
@@ -408,14 +503,26 @@ TEM inline T pow8 (T v){ return pow4(pow2(v)); }
 TEM inline T pow16(T v){ return pow4(pow4(v)); }
 TEM inline T pow64(T v){ return pow8(pow8(v)); }
 
+inline uint8_t prime(uint32_t n){ return mPrimes54[n]; }
+
 template<> inline float remainder<float>(const float& x, const float& y){ return ::remainderf(x,y); }
 template<> inline double remainder<double>(const double& x, const double& y){ return ::remainder(x,y); }
 template<> inline long double remainder<long double>(const long double& x, const long double& y){ return ::remainderl(x,y); }
 TEM inline T remainder(const T& x, const T& y){ return x-(x/y)*y; }
 
+TEM inline T round(T v){
+	static const double roundMagic = 6755399441055744.; // 2^52 * 1.5
+	double r=v;
+	return (r + roundMagic) - roundMagic;
+}
+TEM inline T round(T v, T s){ return round<double>(v/s) * s; }
+TEM inline T round(T v, T s, T r){ return round<T>(v * r) * s; }
+TEM inline T roundAway(T v){ return v<T(0) ? al::floor(v) : al::ceil(v); }
+TEM inline T roundAway(T v, T s){ return v<T(0) ? al::floor(v,s) : al::ceil(v,s); }
+
 TEM inline T sgn(const T& v, const T& norm=T(1)){ return v<T(0) ? -norm : norm; }
 
-TEM inline T sinc(T r, T eps){ return (std::abs(r) > eps) ? sin(r)/r : cos(r); }
+TEM inline T sinc(T r, T eps){ return (al::abs(r) > eps) ? std::sin(r)/r : std::cos(r); }
 
 TEM inline T slope(T x1, T y1, T x2, T y2){ return (y2 - y1) / (x2 - x1); }
 
@@ -429,11 +536,15 @@ TEM inline T sumOfSquares(T n){
 
 inline uint32_t trailingZeroes(uint32_t v){ return deBruijn(v & -v); }
 
+TEM inline T trunc(T v){ return al::round( (v > (T)0) ? v-roundEps<T>() : v+roundEps<T>() ); }
+TEM inline T trunc(T v, T s){ return al::trunc(v/s)*s; }
+TEM inline T trunc(T v, T s, T r){ return al::trunc(v*r)*s; }
+
 TEM inline bool within  (T v, T lo, T hi){ return !((v < lo) || (v > hi)); }
 TEM inline bool withinIE(T v, T lo, T hi){ return (!(v < lo)) && (v < hi); }
 
 TEM inline bool within3(T v1, T v2, T v3, T lo, T hi){
-	return within(v1,lo,hi) && within(v2,lo,hi) && within(v3,lo,hi);
+	return al::within(v1,lo,hi) && al::within(v2,lo,hi) && al::within(v3,lo,hi);
 }
 
 TEM inline T wrap(T v, T hi, T lo){
@@ -449,7 +560,7 @@ TEM inline T wrap(T v, T hi, T lo){
 		T diff = hi - lo;
 		v += diff;	// this might give diff if range is too large, so check at end of block...
 		if(v < lo) v += diff * (T)(uint32_t)(((lo - v)/diff) + 1);
-		if(v==diff) return nextAfter(v, lo);
+		if(v==diff) return al::nextAfter(v, lo);
 	}
 	return v;
 }
@@ -502,7 +613,7 @@ TEM inline T wrapPhase(T r){
 	}
 	else return r;
 	
-	return r - T(M_2PI) * (long)((r + T(M_PI)) * (T)M_1_2PI);
+	return r - T(M_2PI) * (long)((r + T(M_PI)) * T(M_1_2PI));
 }
 
 TEM inline T wrapPhaseOnce(T r){
