@@ -57,7 +57,12 @@ namespace GraphicsBackend{
 class Graphics {
 public:
 	
-	// TODO: LJP: should these be generic structs to avoid extra dependencies?
+	// TODO: LJP: should we use generic structs to avoid extra dependencies?
+//	typedef float Vertex[3];
+//	typedef float Normal[3];
+//	typedef float Color[4];
+//	typedef float TexCoord[2];
+	
 	// TODO: LJP: should these have their own separate buffers? We may not
 	//		want to assume every drawArrays is going to send colors, normals,
 	//		tex coords, etc.
@@ -86,6 +91,13 @@ public:
 	
 	// TODO: LJP: implement support for indexed buffers
 	//al::VectorBuffer<int> mVertexIndices;
+	
+	// TODO: LJP: separate buffers for vertex data
+	//		Only send those buffers that are populated.
+//	al::VectorBuffer<Vertex> mVertices;
+//	al::VectorBuffer<Normal> mNormals;
+//	al::VectorBuffer<Color> mColors;
+//	al::VectorBuffer<TexCoord> mTexCoords;
 	
 	al::VectorBuffer<VertexData> mVertexBuffer;
 	int mMode;
