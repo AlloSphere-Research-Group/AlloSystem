@@ -57,7 +57,10 @@ namespace GraphicsBackend{
 class Graphics {
 public:
 	
-
+	// TODO: LJP: should these be generic structs to avoid extra dependencies?
+	// TODO: LJP: should these have their own separate buffers? We may not
+	//		want to assume every drawArrays is going to send colors, normals,
+	//		tex coords, etc.
 	struct VertexData {
 		al::Vec3f position;
 		al::Vec3f normal;
@@ -80,6 +83,9 @@ public:
 	
 	GraphicsBackend::type mBackend;
 	int POINTS, LINES, LINE_LOOP, LINE_STRIP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP, POLYGON;
+	
+	// TODO: LJP: implement support for indexed buffers
+	//al::VectorBuffer<int> mVertexIndices;
 	
 	al::VectorBuffer<VertexData> mVertexBuffer;
 	int mMode;

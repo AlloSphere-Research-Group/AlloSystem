@@ -155,8 +155,8 @@
 		36CE04461177917600650B45 /* ES2Renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ES2Renderer.h; sourceTree = "<group>"; };
 		36CE04471177917600650B45 /* ES2Renderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ES2Renderer.m; sourceTree = "<group>"; };
 		36CE04491177919E00650B45 /* ESRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ESRenderer.h; sourceTree = "<group>"; };
-		36CE0496117793DF00650B45 /* Shader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = Shader.fsh; sourceTree = "<group>"; };
-		36CE0498117793EA00650B45 /* Shader.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = Shader.vsh; sourceTree = "<group>"; };
+		36CE0496117793DF00650B45 /* Shader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Shader.fsh; sourceTree = "<group>"; };
+		36CE0498117793EA00650B45 /* Shader.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Shader.vsh; sourceTree = "<group>"; };
 		36CE05DE11779D8A00650B45 /* al_Constants.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Constants.hpp; sourceTree = "<group>"; };
 		36CE05DF11779D8A00650B45 /* al_Functions.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Functions.hpp; sourceTree = "<group>"; };
 		36CE05E011779D8A00650B45 /* al_Interpolation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Interpolation.hpp; sourceTree = "<group>"; };

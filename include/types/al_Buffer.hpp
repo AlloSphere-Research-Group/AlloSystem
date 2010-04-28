@@ -78,6 +78,9 @@ public:
 	/// Get element at relative index
 	const T& atRel(int i) const { return mElems[wrapOnce(pos()-i, size())]; }
 
+//	/// Get last element
+//	const T& last() const { return mElems[mSize-1]; }
+
 	/// Clear
 	void clear(){ mSize=mFill=0; mPos=-1; }
 
