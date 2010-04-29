@@ -40,9 +40,15 @@ public:
 
 	~VectorBuffer() {}
 
+	/// Set element at absolute index
+	T& operator[](int i){ return mBuffer[i]; }
+	
+	/// Get element at absolute index
+	const T& operator[](int i) const { return mBuffer[i]; }
+
 	void clear() {mSize = 0;}
 	void append(const T &v) {
-		if(mSize >= mBuffer.size()) {
+		if(mSize >= (int)mBuffer.size()) {
 			mBuffer.reserve(2*(mSize ? mSize : 4));
 		}
 		mBuffer[mSize] = v;
@@ -50,15 +56,17 @@ public:
 	}
 	
 	void extend() {
-		if(mSize >= mBuffer.size()) {
+		if(mSize >= (int)mBuffer.size()) {
 			mBuffer.reserve(2*(mSize ? mSize : 4));
 		}
 		mSize++;
 	}
 	T & top() { return mBuffer[mSize-1]; }
 
-	int size() {return mSize;}
+	int size() const {return mSize;}
+
 	T * data() {return &(mBuffer.front());}
+	const T * data() const {return &(mBuffer.front());}
 
 protected:
 	int				mSize;
