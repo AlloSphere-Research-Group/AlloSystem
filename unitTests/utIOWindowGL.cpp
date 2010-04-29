@@ -1,38 +1,5 @@
 #include "utAllocore.h"
 
-#include "protocol/al_Graphics.hpp"
-
-// OpenGL platform-dependent includes
-#if defined (__APPLE__) || defined (OSX)
-	#define AL_GRAPHICS_USE_OPENGL
-
-	#include <OpenGL/OpenGL.h>
-	#include <OpenGL/gl.h>
-	#include <OpenGL/glext.h>
-	#include <OpenGL/glu.h>
-	
-#elif defined(__linux__)
-	#define AL_GRAPHICS_USE_OPENGL
-
-	#include <GL/glew.h>
-	#include <GL/gl.h>
-	#include <GL/glext.h>
-	#include <GL/glu.h>
-	#include <time.h>
-	
-#elif defined(WIN32)
-	#define AL_GRAPHICS_USE_OPENGL
-
-	#include <windows.h>
-	#include <gl/gl.h>
-	#include <gl/glu.h>
-	#pragma comment( lib, "winmm.lib")
-	#pragma comment( lib, "opengl32.lib" )
-	#pragma comment( lib, "glu32.lib" )
-	
-#endif
-
-al::Graphics gl;
 
 struct MyWindow : WindowGL{
 
@@ -68,8 +35,9 @@ struct MyWindow : WindowGL{
 	}
 
 	void onFrame(){
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glLoadIdentity();
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		gl.loadIdentity();
+		gl.viewport(0,0, dimensions().w, dimensions().h);
 		
 		gl.begin(gl.LINE_STRIP);
 			static float limit = 120;
@@ -81,6 +49,8 @@ struct MyWindow : WindowGL{
 			}
 		gl.end();
 	}
+	
+	gfx::Graphics gl;
 };
 
 
@@ -100,8 +70,8 @@ int utIOWindowGL(){
 //	Func tf;
 //	tf(1000);
 
-	win.create(WindowGL::Dim(200,200,000), "Window 1", 40);
-	win2.create(WindowGL::Dim(200,200,200), "Window 2", 40, SingleBuf);
+	win.create(WindowGL::Dim(200,200,100), "Window 1", 40);
+	win2.create(WindowGL::Dim(200,200,300), "Window 2", 40, SingleBuf);
 
 	WindowGL::startLoop();
 	return 0;

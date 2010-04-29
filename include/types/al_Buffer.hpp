@@ -40,7 +40,7 @@ class Buffer : protected Alloc{
 public:
 
 	/// @param[in] size			Initial size
-	Buffer(int size)
+	Buffer(int size=0)
 	:	mSize(size), mFill(0), mPos(size-1), mElems(size)
 	{}
 
@@ -85,12 +85,17 @@ public:
 	void clear(){ mSize=mFill=0; mPos=-1; }
 
 	/// Resize
-	void resize(int n){ mElems.resize(n); mSize=n; mFill=0; mPos=n-1; }
+	void resize(int n){
+		mElems.resize(n);
+		mSize=n;
+		if(mFill >= n) mFill = n-1;
+		if(mPos  >= n) mPos  = n-1;
+	}
 
 	/// Appends element to end of array doubling array size if necessary
 	void append(const T &v){
 		if(size() >= capacity()){	// double array size if too small
-			mElems.reserve((size() ? size() : 4)*2);
+			mElems.resize((size() ? size() : 4)*2);
 		}
 		construct(elems()+size(), v);
 		++mSize;

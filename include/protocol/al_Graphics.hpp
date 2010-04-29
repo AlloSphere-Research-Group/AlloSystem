@@ -39,12 +39,15 @@
 */
 
 #include "math/al_Vec.hpp"
+#include "types/al_Buffer.hpp"
 #include "types/al_VectorBuffer.hpp"
 #include "types/al_Color.hpp"
 
 namespace al{
+namespace gfx{
 
-namespace GraphicsBackend{
+
+namespace Backend{
 	enum type{
 		None = 0,
 		AutoDetect,
@@ -54,28 +57,92 @@ namespace GraphicsBackend{
 	};
 }
 
-class Graphics {
-public:
-	
-	// TODO: LJP: should we use generic structs to avoid extra dependencies?
-//	typedef float Vertex[3];
-//	typedef float Normal[3];
-//	typedef float Color[4];
-//	typedef float TexCoord[2];
-	
-	// TODO: LJP: should these have their own separate buffers? We may not
-	//		want to assume every drawArrays is going to send colors, normals,
-	//		tex coords, etc.
-	struct VertexData {
-		al::Vec3f position;
-		al::Vec3f normal;
-		al::Color color;
-		//al::Vec4f color;
-		float u, v;
-	};
 
-	Graphics(GraphicsBackend::type backend = GraphicsBackend::AutoDetect);
+
+template <int N, class T>
+struct ArrayN{
+	ArrayN(const T& v=T()){ for(int i=0; i<N; ++i) mElems[i]=v; }
+	ArrayN(const T& a, const T& b){ mElems[0]=a; mElems[1]=b; }
+	ArrayN(const T& a, const T& b, const T& c){ mElems[0]=a; mElems[1]=b; mElems[2]=c; }
+	ArrayN(const T& a, const T& b, const T& c, const T& d){ mElems[0]=a; mElems[1]=b; mElems[2]=c; mElems[3]=d; }
+	T& operator[](int i){ return mElems[i]; }
+	const T& operator[](int i) const { return mElems[i]; }
+	T mElems[N];
+};
+
+
+class GraphicsData{
+public:
+
+	typedef ArrayN<3,float>	Vertex;
+	typedef ArrayN<3,float>	Normal;
+	typedef ArrayN<4,float>	Color;
+	typedef ArrayN<2,float>	TexCoord2;
+	typedef ArrayN<3,float>	TexCoord3;
+	typedef unsigned int	Index;
+
+	/// Reset all buffers
+	void resetBuffers();
+
+	int primitive() const { return mPrimitive; } 
+	const Buffer<Vertex>& vertices() const { return mVertices; }
+	const Buffer<Normal>& normals() const { return mNormals; }
+	const Buffer<Color>& colors() const { return mColors; }
+	const Buffer<TexCoord2>& texCoord2s() const { return mTexCoord2s; }
+	const Buffer<TexCoord3>& texCoord3s() const { return mTexCoord3s; }
+	const Buffer<Index>& indices() const { return mIndices; }
+
+	void addIndex(unsigned int i){ indices().append(i); }
+	void addColor(float r, float g, float b, float a=1){ colors().append(Color(r,g,b,a)); }
+	void addNormal(float x, float y, float z=0){ normals().append(Normal(x,y,z)); }
+	void addTexCoord(float u, float v){ texCoord2s().append(TexCoord2(u,v)); }
+	void addTexCoord(float u, float v, float w){ texCoord3s().append(TexCoord3(u,v,w)); }
+	void addVertex(float x, float y, float z=0){ vertices().append(Vertex(x,y,z)); }
+	void primitive(int prim){ mPrimitive=prim; }
+
+	Buffer<Vertex>& vertices(){ return mVertices; }
+	Buffer<Normal>& normals(){ return mNormals; }
+	Buffer<Color>& colors(){ return mColors; }
+	Buffer<TexCoord2>& texCoord2s(){ return mTexCoord2s; }
+	Buffer<TexCoord3>& texCoord3s(){ return mTexCoord3s; }
+	Buffer<Index>& indices(){ return mIndices; }
+
+protected:
+
+	// Only populated (size>0) buffers will be used
+	Buffer<Vertex> mVertices;
+	Buffer<Normal> mNormals;
+	Buffer<Color> mColors;
+	Buffer<TexCoord2> mTexCoord2s;
+	Buffer<TexCoord3> mTexCoord3s;
+	
+	Buffer<Index> mIndices;
+
+	int mPrimitive;
+};
+
+
+
+class Graphics : public GraphicsData {
+public:
+
+//	struct VertexData {
+//		al::Vec3f position;
+//		al::Vec3f normal;
+//		al::Color color;
+//		//al::Vec4f color;
+//		float u, v;
+//	};
+
+	Graphics(gfx::Backend::type backend = gfx::Backend::AutoDetect);
 	~Graphics();
+
+	void clear(int attribMask){ s_clear(attribMask); }
+	void clearColor(float r, float g, float b, float a){ s_clearColor(r,g,b,a); }
+	void loadIdentity(){ s_loadIdentity(); }
+	void draw(const GraphicsData& v){ s_draw(v); }
+	void draw(){ draw(*this); }
+	void viewport(int x, int y, int width, int height){ s_viewport(x,y,width,height); }
 
 	void begin(int mode) { s_begin(this, mode); }
 	void end() { s_end(this); }
@@ -84,23 +151,21 @@ public:
 	void normal(double x, double y, double z=0.) { s_normal(this, x, y, z); }
 	void color(double r, double g, double b, double a=1.) { s_color(this, r, g, b, a); }
 	
-	bool setBackend(GraphicsBackend::type backend);
+	bool setBackend(gfx::Backend::type backend);
 	
-	GraphicsBackend::type mBackend;
+	gfx::Backend::type mBackend;
 	int POINTS, LINES, LINE_LOOP, LINE_STRIP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP, POLYGON;
+	int COLOR_BUFFER_BIT, DEPTH_BUFFER_BIT;
+
+//	al::VectorBuffer<VertexData> mVertexBuffer;
+//	int mMode;
+
 	
-	// TODO: LJP: implement support for indexed buffers
-	//al::VectorBuffer<int> mVertexIndices;
-	
-	// TODO: LJP: separate buffers for vertex data
-	//		Only send those buffers that are populated.
-//	al::VectorBuffer<Vertex> mVertices;
-//	al::VectorBuffer<Normal> mNormals;
-//	al::VectorBuffer<Color> mColors;
-//	al::VectorBuffer<TexCoord> mTexCoords;
-	
-	al::VectorBuffer<VertexData> mVertexBuffer;
-	int mMode;
+	void (*s_draw)(const GraphicsData& v);
+	void (*s_clear)(int mask);
+	void (*s_clearColor)(float r, float g, float b, float a);
+	void (*s_loadIdentity)();
+	void (*s_viewport)(int x, int y, int w, int h);
 	
 	void (*s_begin)(Graphics * g, int mode);
 	void (*s_end)(Graphics * g);
@@ -115,7 +180,9 @@ extern bool setBackendOpenGLES(Graphics * g);
 extern bool setBackendOpenGLES1(Graphics * g);
 extern bool setBackendOpenGLES2(Graphics * g);
 
-} // al::
+
+} // ::al::gfx
+} // ::al
 	
 #endif
 	

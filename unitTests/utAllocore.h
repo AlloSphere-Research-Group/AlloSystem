@@ -11,6 +11,7 @@
 #include "math/al_Interpolation.hpp"
 #include "math/al_Quat.hpp"
 #include "math/al_Vec.hpp"
+#include "protocol/al_Graphics.hpp"
 #include "protocol/al_OSC.hpp"
 #include "protocol/al_OSCAPR.hpp"
 #include "protocol/al_Serialize.hpp"
@@ -34,6 +35,7 @@ using namespace al;
 int utIOAudioIO();
 int utIOWindowGL();
 int utMath();
+int utProtocolGraphics();
 int utProtocolOSC();
 int utProtocolSerialize();
 int utSystem();

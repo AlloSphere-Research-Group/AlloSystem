@@ -66,7 +66,6 @@ public:
 	int size() const {return mSize;}
 
 	T * data() {return &(mBuffer.front());}
-	const T * data() const {return &(mBuffer.front());}
 
 protected:
 	int				mSize;
