@@ -66,25 +66,6 @@ struct Color{
 	:	a(a)
 	{	*this = hsv; }
 
-	Color& set(float re, float gr, float bl, float al){
-		r=re; g=gr; b=bl; a=al; return *this;
-	}
-
-	template <class V4>
-	Color& operator=(const V4& v){ r=v[0]; g=v[1]; b=v[2]; a=v[3]; return *this; }
-
-	/// Set RGBA components
-	Color& operator()(float re, float gr, float bl, float al){
-		r=re; g=gr; b=bl; a=al; return *this;
-	}
-
-	/// Set RGB components
-	Color& operator()(float re, float gr, float bl){ r=re; g=gr; b=bl; return *this; }
-
-	/// Copy another Color's RGB components scaled
-	Color& operator()(const Color& c, float mulRGB=1){
-		return (*this)(c.r*mulRGB, c.g*mulRGB, c.b*mulRGB, c.a);
-	}
 
 	/// Set color component at index with no bounds checking
 	float& operator[](int i){ return components[i]; }
@@ -92,29 +73,47 @@ struct Color{
 	/// Get color component at index with no bounds checking
 	const float& operator[](int i) const { return components[i]; }
 
-	/// Set as gray
-	Color& operator()(float v){ return (*this)(v,v,v); }
 
-	///< Set as gray with alpha
-	Color& operator()(float v, float al){ return (*this)(v,v,v,al); }
+	/// Set RGBA components
+	Color& set(float re, float gr, float bl, float al){ a=al; return set(re,gr,bl); }
 
-	/// Set gray value
-	Color& operator= (const float& v){ r=v; g=v; b=v; return *this; }
+	/// Set RGB components
+	Color& set(float re, float gr, float bl){ r=re; g=gr; b=bl; return *this; }
+
+	/// Set from gray value
+	Color& set(float v){ return set(v,v,v); }
+
+	/// Set from gray value and alpha
+	Color& set(float v, float al){ return set(v,al); }
+
+	/// Set components from tightly packed RGBA array
+	template <class Array4>
+	Color& operator=(const Array4& v){ return set(v[0], v[1], v[2], v[3]); }
+
+	/// Set from gray value
+	Color& operator= (float v){ return set(v); }
 
 	/// Set RGB components from HSV
 	Color& operator= (const HSV& v);
 
-	/// Adds argument RGBA components
-	Color operator+ (const Color& c) const { return Color(r+c.r, g+c.g, b+c.b, a+c.a); }
-	
-	/// Subtracts argument RGBA components
-	Color operator- (const Color& c) const { return Color(r-c.r, g-c.g, b-c.b, a-c.a); }
+	Color& operator+= (const Color& v){ return set(r+v.r, g+v.g, b+v.b, a+v.a); }
+	Color& operator-= (const Color& v){ return set(r-v.r, g-v.g, b-v.b, a-v.a); }
+	Color& operator*= (const Color& v){ return set(r*v.r, g*v.g, b*v.b, a*v.a); }
+	Color& operator/= (const Color& v){ return set(r/v.r, g/v.g, b/v.b, a/v.a); }
+	Color& operator+= (float v){ return set(r+v, g+v, b+v, a+v); }
+	Color& operator-= (float v){ return set(r-v, g-v, b-v, a-v); }
+	Color& operator*= (float v){ return set(r*v, g*v, b*v, a*v); }
+	Color& operator/= (float v){ return set(r/v, g/v, b/v, a/v); }
 
-	/// Multiply RGBA values by argument
-	Color& operator*=(float v){ (*this)(r*v, g*v, b*v, a*v); return *this; }
-	
-	/// Multiply RGBA components
+	Color operator- () const { return Color(-r,-g,-b,-a); }
+	Color operator+ (const Color& v) const { return Color(*this)+=v; }
+	Color operator- (const Color& v) const { return Color(*this)-=v; }
+	Color operator* (const Color& v) const { return Color(*this)*=v; }
+	Color operator/ (const Color& v) const { return Color(*this)/=v; }
+	Color operator+ (float v) const { return Color(*this)+=v; }
+	Color operator- (float v) const { return Color(*this)-=v; }
 	Color operator* (float v) const { return Color(*this)*=v; }
+	Color operator/ (float v) const { return Color(*this)/=v; }
 
 	/// Returns nearest black or white color
 	Color blackAndWhite() const { return Color(luminance()>0.5f?1.f:0.f); }
@@ -131,30 +130,16 @@ struct Color{
 	Color inverse() const { return Color(1.f-r, 1.f-g, 1.f-b, a); }
 	
 	/// Invert RGB components
-	Color& invert(){ return (*this)(1.f-r, 1.f-g, 1.f-b); }
+	Color& invert(){ return set(1.f-r, 1.f-g, 1.f-b); }
 	
 	/// Returns luminance value
 	float luminance() const { return r*0.3f+g*0.59f+b*0.11f; }
-
-
-//	void setHSV(float h, float s, float v){ setHSV6(h * 6.f, s, v);	}
-//
-//	void getHSV(float &h, float &s, float &v) const{ getHSV6(h,s,v); h *= 0.166666667f; }
-
-//
-//	
-//	/// Set color from HSV values in [0, 1]
-//	void setHSV(float h, float s, float v);
-//
-//	/// Get HSV values in [0, 1] from color
-//	void getHSV(float &h, float &s, float &v) const;
-//
-//	/// Set color from H value in [0, 6] and SV values in [0, 1].
-//	void setHSV6(float h, float s, float v);
-//
-//	/// Get H value in [0, 6] and SV values in [0, 1] from color.
-//	void getHSV6(float &h, float &s, float &v) const;
 };
+
+inline Color operator + (float s, const Color& c){ return  c+s; }
+inline Color operator - (float s, const Color& c){ return -c+s; }
+inline Color operator * (float s, const Color& c){ return  c*s; }
+inline Color operator / (float s, const Color& c){ return Color(s/c.r, s/c.g, s/c.b, s/c.a); }
 
 
 struct HSV{

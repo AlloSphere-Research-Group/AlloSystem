@@ -7,7 +7,7 @@ Color& Color::operator= (const HSV& hsv){
 	float h=hsv.h*6.f, s=hsv.s, v=hsv.v;
 	
 	if(s == 0.f){	// achromatic (gray)
-		return (*this)(v);
+		return set(v);
 	}
 										// sector 0 to 5
 	unsigned int i = (unsigned int)(h);	// integer part of h
