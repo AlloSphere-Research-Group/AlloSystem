@@ -255,10 +255,34 @@ public:
 	/// Return diagonal
 	Vec<N,T> diagonal() const { return Vec<N,T>(elems, N+1); }
 
-	Mat& operator *=(const Mat& v){ return multiply(*this, Mat(*this),v); }
-	Mat& operator +=(const Mat& v){ IT(N*N){ (*this)[i] += v[i]; } }
-	Mat& operator -=(const Mat& v){ IT(N*N){ (*this)[i] -= v[i]; } }
+	Mat& operator *= (const Mat& v){ return multiply(*this, Mat(*this),v); }
+	Mat& operator += (const Mat& v){ IT(size()){ (*this)[i] += v[i]; } return *this; }
+	Mat& operator -= (const Mat& v){ IT(size()){ (*this)[i] -= v[i]; } return *this; }
+	Mat& operator += (const T& v){ IT(size()){ (*this)[i] += v; } return *this; }
+	Mat& operator -= (const T& v){ IT(size()){ (*this)[i] -= v; } return *this; }
+	Mat& operator *= (const T& v){ IT(size()){ (*this)[i] *= v; } return *this; }
+	Mat& operator /= (const T& v){ IT(size()){ (*this)[i] /= v; } return *this; }
 
+	Mat operator - () const { Mat r; IT(size()){ r[i]=-(*this)[i]; } return r; }
+	Mat operator + (const Mat& v) const { return Mat(*this) += v; }
+	Mat operator - (const Mat& v) const { return Mat(*this) -= v; }
+	Mat operator * (const Mat& v) const { return Mat(*this) *= v; }
+	Mat operator + (const T& v) const { return Mat(*this) += v; }
+	Mat operator - (const T& v) const { return Mat(*this) -= v; }
+	Mat operator * (const T& v) const { return Mat(*this) *= v; }
+	Mat operator / (const T& v) const { return Mat(*this) /= v; }
+
+
+	/// Set elements on diagonal to one and all others to zero
+	Mat& identity(){
+		IT(size()){ (*this)[i] = (i%(N+1)) ? T(0) : T(1); }
+		return *this;
+	}
+	
+	/// Set all elements to value
+	Mat& set(const T& v){ IT(size()){ (*this)[i]=v; } return *this; }
+
+	/// Get trace (sum of diagonal elements)
 	T trace(){ return diagonal().sum(); }
 
 	/// Computes matrix product r = a * b
@@ -287,6 +311,9 @@ public:
 		return r;
 	}
 
+	/// Returns total number of elements
+	static int size(){ return N*N; }
+
 };
 
 
@@ -294,6 +321,7 @@ public:
 
 // Non-member binary arithmetic operations
 
+// Vec
 template <int N, class T>
 inline Vec<N,T> operator + (T s, const Vec<N,T>& v){ return  v+s; }
 
@@ -322,11 +350,23 @@ inline Vec<N,T> operator / (T s, const Vec<N,T>& v){
 //	return r;
 //}
 
-template <int N, class T>
-inline Mat<N,T> operator* (const Mat<N,T>& a, const Mat<N,T>& b){
-	Mat<N,T> r; return Mat<N,T>::multiply(r, a,b);
-}
+//template <int N, class T>
+//inline Mat<N,T> operator* (const Mat<N,T>& a, const Mat<N,T>& b){
+//	Mat<N,T> r; return Mat<N,T>::multiply(r, a,b);
+//}
 
+// Mat
+template <int N, class T>
+inline Mat<N,T> operator + (T s, const Mat<N,T>& v){ return  v+s; }
+
+template <int N, class T>
+inline Mat<N,T> operator - (T s, const Mat<N,T>& v){ return -v+s; }
+
+template <int N, class T>
+inline Mat<N,T> operator * (T s, const Mat<N,T>& v){ return  v*s; }
+
+
+// Vec/Mat
 template <int N, class T>
 inline Vec<N,T> operator* (const Mat<N,T>& m, const Vec<N,T>& vCol){
 	Vec<N,T> r; return Mat<N,T>::multiply(r, m,vCol);
