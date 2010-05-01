@@ -59,11 +59,15 @@ public:
 	
 	/// Returns uniform random in [-1,1)
 	float uniformS(){ return al::uintToUnitS<float>(mRNG()); }
+
+	/// Returns uniform random in [0, hi)
+	template <class T>
+	T uniform(const T& hi){ return hi*uniform();  }
 	
 	/// Returns uniform random in [lo, hi)
 	template <class T>
 	T uniform(const T& hi, const T& lo){ return (hi-lo)*uniform() + lo;  }
-	
+
 	/// Returns random Gaussian
 	float gaussian(){ float r; gaussian(r,r); return r; }
 
@@ -74,9 +78,9 @@ public:
 	/// Returns true with a probability of p.
 	bool prob(float p=0.5f){ return uniform() < p; }
 
-	/// Randomly permutes (shuffles) elements in array.
+	/// Randomly shuffles elements in array.
 	template <class T>
-	void permute(T * arr, uint32_t len);
+	void shuffle(T * arr, uint32_t len);
 
 protected:
 	RNG mRNG;
@@ -221,10 +225,16 @@ template <class T> void Random<RNG>::gaussian(T& y1, T& y2){
 }
 
 
+// Fisher-Yates shuffle
 template <class RNG>
 template <class T>
-void Random<RNG>::permute(T * arr, uint32_t len){
-
+void Random<RNG>::shuffle(T * arr, uint32_t len){
+	for(uint32_t i=len-1; i>0; --i){
+		uint32_t j = uniform(i+1);
+		T t = arr[i];
+		arr[i] = arr[j];
+		arr[j] = t;
+	}
 }
 
 

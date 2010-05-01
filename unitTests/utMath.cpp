@@ -452,6 +452,11 @@ int utMath(){
 		//for(int i=0; i<32; ++i) printf("% g ", r.uniformS());
 		//for(int i=0; i<32; ++i) printf("%d ", r.prob(0.1));
 		//for(int i=0; i<128; ++i) printf("% g\n", r.gaussian());
+		
+		int arr[] = {1,2,3,4,5,6,7,8};
+		r.shuffle(arr, 8);
+		for(int i=0; i<8; ++i) printf("%d\n", arr[i]);
+		
 		printf("\n");
 	}
 
