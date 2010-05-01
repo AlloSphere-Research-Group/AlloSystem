@@ -40,7 +40,7 @@ class Buffer : protected Alloc{
 public:
 
 	/// @param[in] size			Initial size
-	Buffer(int size=0)
+	explicit Buffer(int size=0)
 	:	mSize(size), mFill(0), mPos(size-1), mElems(size)
 	{}
 

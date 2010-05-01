@@ -298,6 +298,8 @@
 		16BC66A1117770BF002A0C18 /* al_Constants.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Constants.hpp; sourceTree = "<group>"; };
 		16BC66A2117770BF002A0C18 /* al_Functions.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Functions.hpp; sourceTree = "<group>"; };
 		16BC66A3117770BF002A0C18 /* al_Interpolation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Interpolation.hpp; sourceTree = "<group>"; };
+		16FFCB51118BA96500D4C1BD /* al_Random.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Random.hpp; sourceTree = "<group>"; };
+		16FFCB53118BAA8300D4C1BD /* al_Generators.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Generators.hpp; sourceTree = "<group>"; };
 		3602B4C7110A67B6005DC3D0 /* exOscRecv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exOscRecv.cpp; sourceTree = "<group>"; };
 		3602B4D8110A67C9005DC3D0 /* exOscRecv */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exOscRecv; sourceTree = BUILT_PRODUCTS_DIR; };
 		3602B53C110A6D3D005DC3D0 /* al_OSC.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OSC.hpp; sourceTree = "<group>"; };
@@ -588,7 +590,9 @@
 				1697338611768B6E0025299C /* al_Complex.hpp */,
 				16BC66A1117770BF002A0C18 /* al_Constants.hpp */,
 				16BC66A2117770BF002A0C18 /* al_Functions.hpp */,
+				16FFCB53118BAA8300D4C1BD /* al_Generators.hpp */,
 				16BC66A3117770BF002A0C18 /* al_Interpolation.hpp */,
+				16FFCB51118BA96500D4C1BD /* al_Random.hpp */,
 				1697337311768B040025299C /* al_Quat.h */,
 				1697337411768B040025299C /* al_Quat.hpp */,
 				1697336C11768ABD0025299C /* al_Vec.hpp */,
