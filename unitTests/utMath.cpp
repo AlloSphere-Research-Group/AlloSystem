@@ -459,6 +459,11 @@ int utMath(){
 		
 		printf("\n");
 	}
+	
+	
+	{
+		al::Plane<double> p(Vec3d(), Vec3d(), Vec3d());
+	}
 
 	return 0;
 }

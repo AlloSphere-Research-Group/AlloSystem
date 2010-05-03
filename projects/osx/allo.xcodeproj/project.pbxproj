@@ -97,6 +97,8 @@
 		16BC66A7117770BF002A0C18 /* al_Constants.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 16BC66A1117770BF002A0C18 /* al_Constants.hpp */; };
 		16BC66A8117770BF002A0C18 /* al_Functions.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 16BC66A2117770BF002A0C18 /* al_Functions.hpp */; };
 		16BC66A9117770BF002A0C18 /* al_Interpolation.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 16BC66A3117770BF002A0C18 /* al_Interpolation.hpp */; };
+		16D46564118F57970039A84C /* al_Printing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16D46563118F57970039A84C /* al_Printing.cpp */; };
+		16D46565118F57970039A84C /* al_Printing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16D46563118F57970039A84C /* al_Printing.cpp */; };
 		3602B4D0110A67C9005DC3D0 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
 		3602B4D1110A67C9005DC3D0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		3602B4D2110A67C9005DC3D0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
@@ -298,6 +300,9 @@
 		16BC66A1117770BF002A0C18 /* al_Constants.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Constants.hpp; sourceTree = "<group>"; };
 		16BC66A2117770BF002A0C18 /* al_Functions.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Functions.hpp; sourceTree = "<group>"; };
 		16BC66A3117770BF002A0C18 /* al_Interpolation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Interpolation.hpp; sourceTree = "<group>"; };
+		16D46542118F4ADA0039A84C /* al_Plane.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Plane.hpp; sourceTree = "<group>"; };
+		16D46562118F55790039A84C /* al_Printing.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Printing.hpp; sourceTree = "<group>"; };
+		16D46563118F57970039A84C /* al_Printing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Printing.cpp; sourceTree = "<group>"; };
 		16FFCB51118BA96500D4C1BD /* al_Random.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Random.hpp; sourceTree = "<group>"; };
 		16FFCB53118BAA8300D4C1BD /* al_Generators.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Generators.hpp; sourceTree = "<group>"; };
 		3602B4C7110A67B6005DC3D0 /* exOscRecv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exOscRecv.cpp; sourceTree = "<group>"; };
@@ -592,6 +597,7 @@
 				16BC66A2117770BF002A0C18 /* al_Functions.hpp */,
 				16FFCB53118BAA8300D4C1BD /* al_Generators.hpp */,
 				16BC66A3117770BF002A0C18 /* al_Interpolation.hpp */,
+				16D46542118F4ADA0039A84C /* al_Plane.hpp */,
 				16FFCB51118BA96500D4C1BD /* al_Random.hpp */,
 				1697337311768B040025299C /* al_Quat.h */,
 				1697337411768B040025299C /* al_Quat.hpp */,
@@ -769,6 +775,7 @@
 				3622BEF6116D527D00928703 /* al_Config.cpp */,
 				3622BEF7116D527D00928703 /* al_MainLoop.cpp */,
 				3622BEF9116D527D00928703 /* al_MainLoopOSX.mm */,
+				16D46563118F57970039A84C /* al_Printing.cpp */,
 				3622BEFA116D527D00928703 /* al_Time.cpp */,
 				3622BEFB116D527D00928703 /* al_TimeAPR.cpp */,
 				3622BEFC116D527D00928703 /* Makefile.config */,
@@ -849,6 +856,7 @@
 			children = (
 				168EC8ED1161CA2C00FCACC7 /* al_Config.h */,
 				168EC8EC1161CA2C00FCACC7 /* al_MainLoop.h */,
+				16D46562118F55790039A84C /* al_Printing.hpp */,
 				168EC8F01161CA2C00FCACC7 /* al_Thread.h */,
 				168EC8EF1161CA2C00FCACC7 /* al_Thread.hpp */,
 				168EC8EB1161CA2C00FCACC7 /* al_Time.h */,
@@ -1287,6 +1295,7 @@
 				166DD745117CDBFD00A8BA12 /* utTypesConversion.cpp in Sources */,
 				16B5BF8D1188D0E90090CE80 /* utProtocolGraphics.cpp in Sources */,
 				16B5BFEF1188E8B60090CE80 /* utIOWindowGL.cpp in Sources */,
+				16D46564118F57970039A84C /* al_Printing.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1379,6 +1388,7 @@
 				362128BF1173E382009CB6FC /* al_GraphicsOpenGLES2.cpp in Sources */,
 				1619909E11743990006FBADF /* al_Color.cpp in Sources */,
 				3659D756117B8AFA0065EBE4 /* ringbuffer.c in Sources */,
+				16D46565118F57970039A84C /* al_Printing.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
