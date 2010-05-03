@@ -27,6 +27,10 @@
 		1697338711768B6E0025299C /* al_Complex.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1697338611768B6E0025299C /* al_Complex.hpp */; };
 		1697338811768B6E0025299C /* al_Complex.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1697338611768B6E0025299C /* al_Complex.hpp */; };
 		1697339B11768CDF0025299C /* utMath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1697339A11768CDF0025299C /* utMath.cpp */; };
+		16AA95F6118F74FB00B98EC3 /* al_Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95F2118F74FB00B98EC3 /* al_Light.cpp */; };
+		16AA9600118F76B800B98EC3 /* al_Debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95FF118F76B800B98EC3 /* al_Debug.cpp */; };
+		16AA960A118F774800B98EC3 /* al_Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA9609118F774800B98EC3 /* al_Texture.cpp */; };
+		16AA9680118F7D6600B98EC3 /* al_Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA967F118F7D6600B98EC3 /* al_Shader.cpp */; };
 		16AC52A711628D4D0076AA8B /* utAllocore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC529F11628D4D0076AA8B /* utAllocore.cpp */; };
 		16AC52A811628D4D0076AA8B /* utIOAudioIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC52A011628D4D0076AA8B /* utIOAudioIO.cpp */; };
 		16AC52A911628D4D0076AA8B /* utSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC52A211628D4D0076AA8B /* utSystem.cpp */; };
@@ -282,6 +286,18 @@
 		1697337411768B040025299C /* al_Quat.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Quat.hpp; sourceTree = "<group>"; };
 		1697338611768B6E0025299C /* al_Complex.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Complex.hpp; sourceTree = "<group>"; };
 		1697339A11768CDF0025299C /* utMath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utMath.cpp; path = ../../unitTests/utMath.cpp; sourceTree = SOURCE_ROOT; };
+		16AA95E5118F6EEF00B98EC3 /* al_Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Config.h; sourceTree = "<group>"; };
+		16AA95E8118F6EEF00B98EC3 /* al_Common.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Common.hpp; sourceTree = "<group>"; };
+		16AA95E9118F6EEF00B98EC3 /* al_GPUObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_GPUObject.hpp; sourceTree = "<group>"; };
+		16AA95EA118F6EEF00B98EC3 /* al_Light.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Light.hpp; sourceTree = "<group>"; };
+		16AA95ED118F6FB800B98EC3 /* OpenGLSupport.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = OpenGLSupport.txt; sourceTree = "<group>"; };
+		16AA95F2118F74FB00B98EC3 /* al_Light.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Light.cpp; sourceTree = "<group>"; };
+		16AA95FE118F760C00B98EC3 /* al_Debug.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Debug.hpp; sourceTree = "<group>"; };
+		16AA95FF118F76B800B98EC3 /* al_Debug.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Debug.cpp; sourceTree = "<group>"; };
+		16AA9609118F774800B98EC3 /* al_Texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Texture.cpp; sourceTree = "<group>"; };
+		16AA960B118F775E00B98EC3 /* al_Texture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Texture.hpp; sourceTree = "<group>"; };
+		16AA967E118F7D5700B98EC3 /* al_Shader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Shader.hpp; sourceTree = "<group>"; };
+		16AA967F118F7D6600B98EC3 /* al_Shader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Shader.cpp; sourceTree = "<group>"; };
 		16AC529711628D0E0076AA8B /* unitTests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = unitTests; sourceTree = BUILT_PRODUCTS_DIR; };
 		16AC529F11628D4D0076AA8B /* utAllocore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utAllocore.cpp; path = ../../unitTests/utAllocore.cpp; sourceTree = SOURCE_ROOT; };
 		16AC52A011628D4D0076AA8B /* utIOAudioIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utIOAudioIO.cpp; path = ../../unitTests/utIOAudioIO.cpp; sourceTree = SOURCE_ROOT; };
@@ -606,6 +622,32 @@
 			path = math;
 			sourceTree = "<group>";
 		};
+		16AA95E3118F6EEF00B98EC3 /* graphics */ = {
+			isa = PBXGroup;
+			children = (
+				16AA95E5118F6EEF00B98EC3 /* al_Config.h */,
+				16AA95E8118F6EEF00B98EC3 /* al_Common.hpp */,
+				16AA95FE118F760C00B98EC3 /* al_Debug.hpp */,
+				16AA95E9118F6EEF00B98EC3 /* al_GPUObject.hpp */,
+				16AA95EA118F6EEF00B98EC3 /* al_Light.hpp */,
+				16AA967E118F7D5700B98EC3 /* al_Shader.hpp */,
+				16AA960B118F775E00B98EC3 /* al_Texture.hpp */,
+				16AA95ED118F6FB800B98EC3 /* OpenGLSupport.txt */,
+			);
+			path = graphics;
+			sourceTree = "<group>";
+		};
+		16AA95F0118F74FB00B98EC3 /* graphics */ = {
+			isa = PBXGroup;
+			children = (
+				16AA95FF118F76B800B98EC3 /* al_Debug.cpp */,
+				16AA95F2118F74FB00B98EC3 /* al_Light.cpp */,
+				16AA9609118F774800B98EC3 /* al_Texture.cpp */,
+				16AA967F118F7D6600B98EC3 /* al_Shader.cpp */,
+			);
+			path = graphics;
+			sourceTree = "<group>";
+		};
 		16AC528F11628CD50076AA8B /* unitTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -709,6 +751,7 @@
 		3622BEDC116D527D00928703 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				16AA95F0118F74FB00B98EC3 /* graphics */,
 				3622BEDD116D527D00928703 /* io */,
 				3622BEE4116D527D00928703 /* protocol */,
 				3622BEF5116D527D00928703 /* system */,
@@ -841,6 +884,7 @@
 		36B4124410EFF7B8007B16D0 /* include */ = {
 			isa = PBXGroup;
 			children = (
+				16AA95E3118F6EEF00B98EC3 /* graphics */,
 				36F46820110BE2E90082D21E /* io */,
 				1697336B11768ABD0025299C /* math */,
 				3602B53B110A6D3D005DC3D0 /* protocol */,
@@ -1389,6 +1433,10 @@
 				1619909E11743990006FBADF /* al_Color.cpp in Sources */,
 				3659D756117B8AFA0065EBE4 /* ringbuffer.c in Sources */,
 				16D46565118F57970039A84C /* al_Printing.cpp in Sources */,
+				16AA95F6118F74FB00B98EC3 /* al_Light.cpp in Sources */,
+				16AA9600118F76B800B98EC3 /* al_Debug.cpp in Sources */,
+				16AA960A118F774800B98EC3 /* al_Texture.cpp in Sources */,
+				16AA9680118F7D6600B98EC3 /* al_Shader.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -2,11 +2,6 @@
 #define INCLUDE_AL_GRAPHICS_HPP
 
 /*
- *	OSC (Open Sound Control) send/receive
- *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
- */
-
-/*
 	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
 	All Rights Reserved.
 

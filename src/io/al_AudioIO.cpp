@@ -1,6 +1,3 @@
-/*	Gamma - Generic processing library
-	See COPYRIGHT file for authors and license information */
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <strings.h>
