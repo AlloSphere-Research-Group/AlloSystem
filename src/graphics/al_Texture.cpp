@@ -6,7 +6,7 @@ namespace al {
 namespace gfx{
 
 
-TextureBase::TextureBase(Format::t format, DataType::t dataType, WrapMode::t wm)
+TextureBase::TextureBase(ColorFormat::t format, DataType::t dataType, WrapMode::t wm)
 :	mPixels(0), mBuffer(0),
 	mFormat(format), mIpol(IpolMode::Linear), mType(dataType), mWrap(wm)
 {}
@@ -39,7 +39,7 @@ const TextureBase& TextureBase::send() const{
 }
 
 TextureBase& TextureBase::dataType(DataType::t v){ mType=v; return *this; }
-TextureBase& TextureBase::format(Format::t v){ mFormat=v; return *this; }
+TextureBase& TextureBase::format(ColorFormat::t v){ mFormat=v; return *this; }
 TextureBase& TextureBase::ipolMode(IpolMode::t v){ mIpol=v; return *this; }
 TextureBase& TextureBase::wrapMode(WrapMode::t v){ mWrap=v; return *this; }
 
@@ -60,7 +60,7 @@ void TextureBase::onDestroy(){
 }
 
 
-Texture2::Texture2(int w, int h, Format::t format, DataType::t type, WrapMode::t wrap)
+Texture2::Texture2(int w, int h, ColorFormat::t format, DataType::t type, WrapMode::t wrap)
 :	TextureBase(format, type, wrap), w(w), h(h)
 {	allocMem(); }
 
@@ -99,7 +99,7 @@ void Texture2::texWrap() const {
 
 
 
-Texture3::Texture3(int _w, int _h, int _d, Format::t format, DataType::t type, WrapMode::t wrap)
+Texture3::Texture3(int _w, int _h, int _d, ColorFormat::t format, DataType::t type, WrapMode::t wrap)
 :	TextureBase(format, type, wrap), w(_w), h(_h), d(_d)
 {	allocMem(); }
 

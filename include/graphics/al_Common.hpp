@@ -95,6 +95,21 @@ means the data will be copied internally on the GPU.
 //	};
 //}
 
+namespace ColorFormat{
+	enum t{
+		DepthComponent	= GL_DEPTH_COMPONENT,
+		Luminance		= GL_LUMINANCE,
+		LuminanceAlpha	= GL_LUMINANCE_ALPHA,
+		Red				= GL_RED,
+		Green			= GL_GREEN,
+		Blue			= GL_BLUE,
+		Alpha			= GL_ALPHA,
+		RGB				= GL_RGB,
+		RGBA			= GL_RGBA,
+		GBRA			= GL_BGRA
+	};
+}
+
 //namespace Comparison{
 //	enum t{
 //		Never			= GL_NEVER,
@@ -139,21 +154,6 @@ namespace DataType{
 //		FrontAndBack	= GL_FRONT_AND_BACK
 //	};
 //}
-
-namespace Format{
-	enum t{
-		DepthComponent	= GL_DEPTH_COMPONENT,
-		Luminance		= GL_LUMINANCE,
-		LuminanceAlpha	= GL_LUMINANCE_ALPHA,
-		Red				= GL_RED,
-		Green			= GL_GREEN,
-		Blue			= GL_BLUE,
-		Alpha			= GL_ALPHA,
-		RGB				= GL_RGB,
-		RGBA			= GL_RGBA,
-		GBRA			= GL_BGRA
-	};
-}
 
 namespace IpolMode{
 	enum t{
@@ -210,26 +210,27 @@ namespace WrapMode{
 //using namespace BufferType;
 //using namespace BufferUsage;
 //using namespace Cap;
+using namespace ColorFormat;
 using namespace DataType;
 //using namespace DrawBufferMode;
-using namespace Format;
+
 using namespace IpolMode;
 //using namespace MatrixMode;
 using namespace Prim;
 using namespace WrapMode;
 
 
-inline int numComponents(Format::t f){
+inline int numComponents(ColorFormat::t f){
 	switch(f){
-		case Format::RGB:				return 3;
-		case Format::RGBA:				return 4;
-		case Format::Luminance:	
-		case Format::Red:
-		case Format::Green:
-		case Format::Blue:
-		case Format::Alpha:				return 1;
-		case Format::LuminanceAlpha:	return 2;
-		default:						return 0;
+		case ColorFormat::RGB:				return 3;
+		case ColorFormat::RGBA:				return 4;
+		case ColorFormat::Luminance:	
+		case ColorFormat::Red:
+		case ColorFormat::Green:
+		case ColorFormat::Blue:
+		case ColorFormat::Alpha:			return 1;
+		case ColorFormat::LuminanceAlpha:	return 2;
+		default:							return 0;
 	};
 }
 

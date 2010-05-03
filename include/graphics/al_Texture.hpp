@@ -13,7 +13,7 @@ namespace gfx{
 ///
 class TextureBase : public GPUObject{
 public:
-	TextureBase(Format::t format, DataType::t type, WrapMode::t wrap);
+	TextureBase(ColorFormat::t format, DataType::t type, WrapMode::t wrap);
 
 	virtual ~TextureBase();
 
@@ -25,14 +25,14 @@ public:
 	const TextureBase& begin() const;						///< Bind self to current context
 	const TextureBase& bind() const;						///< Bind self to current context (alias of begin())
 	void end() const;										///< Binds default texture
-	TextureBase& format(Format::t v);						///< Set the color format
+	TextureBase& format(ColorFormat::t v);					///< Set the color format
 	TextureBase& ipolMode(IpolMode::t v);					///< Set interpolation mode
 	TextureBase& dataType(DataType::t v);					///< Set the color data type
 	TextureBase& wrapMode(WrapMode::t v);					///< Set wrapping mode
 	
 	const TextureBase& send() const;						///< Send pointed to pixels to GPU
 
-	Format::t format() const { return mFormat; }
+	ColorFormat::t format() const { return mFormat; }
 	IpolMode::t ipolMode() const { return mIpol; }
 	DataType::t dataType() const { return mType; }
 	WrapMode::t wrapMode() const { return mWrap; }
@@ -40,7 +40,7 @@ public:
 protected:
 	void * mPixels;		// pointer to the client-side pixel data (0 if none)
 	void * mBuffer;		// internally allocated pixel buffer
-	Format::t mFormat;	// format of the pixel data:
+	ColorFormat::t mFormat;	// format of the pixel data:
 						//   GL_COLOR_INDEX, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, 
 						//   GL_RGB, GL_BGR, GL_RGBA, GL_BGRA, GL_LUMINANCE, and GL_LUMINANCE_ALPHA
 	IpolMode::t mIpol;	// interpolation mode
@@ -67,7 +67,7 @@ public:
 
 	/// This constructor will allocate an internal pixel buffer
 	Texture2(	int width, int height, 
-				Format::t format=gfx::RGB, 
+				ColorFormat::t format=gfx::RGB, 
 				DataType::t type=gfx::UByte,
 				WrapMode::t wrap=gfx::Repeat);
 
@@ -100,7 +100,7 @@ public:
 
 	/// This constructor will allocate an internal pixel buffer
 	Texture3(	int width, int height, int depth,
-				Format::t format=gfx::RGB, 
+				ColorFormat::t format=gfx::RGB, 
 				DataType::t type=gfx::UByte,
 				WrapMode::t wrap=gfx::Repeat);
 
