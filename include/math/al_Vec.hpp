@@ -31,9 +31,20 @@
 
 namespace al {
 
-template <int N, class T> class Mat;
-template <int N, class T> class Vec;
 
+template <int N, class T> class Vec;
+template <class T> class Vec3;
+template <class T> class Vec4;
+template <int N, class T> class Mat;
+
+typedef Vec3<float>		Vec3f;
+typedef Vec3<double>	Vec3d;
+typedef Vec4<float>		Vec4f;
+typedef Vec4<double>	Vec4d;
+typedef Mat<3,float>	Mat3f;
+typedef Mat<3,double>	Mat3d;
+typedef Mat<4,float>	Mat4f;
+typedef Mat<4,double>	Mat4d;
 
 // Forward iterates from 0 to n-1. Current index is 'i'.
 #define IT(n) for(int i=0; i<n; ++i)
@@ -497,9 +508,6 @@ struct Vec3 : public Vec<3,T> {
 };
 
 
-typedef Vec3<float> Vec3f;
-typedef Vec3<double> Vec3d;
-
 /// 4-vector
 template <class T>
 struct Vec4 : public Vec<4,T> {
@@ -513,9 +521,6 @@ struct Vec4 : public Vec<4,T> {
 
 };
 
-
-typedef Vec4<float> Vec4f;
-typedef Vec4<double> Vec4d;
 
 #undef IT
 
