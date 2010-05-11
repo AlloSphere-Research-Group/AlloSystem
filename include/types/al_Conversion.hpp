@@ -78,6 +78,9 @@ float blockSubnormal(float v);
 /// Sets argument to zero if subnormal
 double blockSubnormal(double v);
 
+/// Returns 1 if little endian
+int endian();
+
 /// Returns biased decimal value of 32-bit float exponent field.
 
 /// The true exponent is the return value minus 127.
@@ -188,6 +191,11 @@ inline double blockSubnormal(double v){
 	const uint64_t expo = i & MaskExpo<double>(); 
 	if(expo == 0 && frac != 0) v = 0.;
 	return v;
+}
+
+inline int endian(){
+	static int x=1;
+	return *(char *)&x;
 }
 
 inline uint32_t floatExponent(float v){
