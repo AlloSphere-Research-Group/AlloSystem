@@ -32,6 +32,7 @@ Light::Light(float x, float y, float z)
 {
 	mPos[3]=1;
 	pos(x,y,z);
+	attenuation(1,0,0);
 }
 
 Light::~Light(){
@@ -46,9 +47,17 @@ Light& Light::operator()(){
 	glLightfv(glID, GL_DIFFUSE,		mDiffuse.components);
 	glLightfv(glID, GL_SPECULAR,	mSpecular.components);
 	glLightfv(glID, GL_POSITION,	mPos);
+    glLightf(glID, GL_CONSTANT_ATTENUATION,	mAtten[0]);
+    glLightf(glID, GL_LINEAR_ATTENUATION,	mAtten[1]);
+    glLightf(glID, GL_QUADRATIC_ATTENUATION,mAtten[2]);
+	
 	glEnable(glID); // MUST enable each light source after configuration
 	//glShadeModel(GL_FLAT);
 	return *this;
+}
+
+Light& Light::attenuation(float c0, float c1, float c2){
+	mAtten[0]=c0; mAtten[1]=c1; mAtten[2]=c2; return *this;
 }
 
 Light& Light::ambient(const Color& v){ mAmbient=v; return *this; }
@@ -56,7 +65,11 @@ Light& Light::diffuse(const Color& v){ mDiffuse=v; return *this; }
 Light& Light::specular(const Color& v){ mSpecular=v; return *this; }
 
 Light& Light::pos(float x, float y, float z){
-	mPos[0]=x; mPos[1]=y; mPos[2]=z;
+	return pos(x,y,z, mPos[3]);
+}
+
+Light& Light::pos(float x, float y, float z, float w){
+	mPos[0]=x; mPos[1]=y; mPos[2]=z; mPos[3]=w;
 	return *this;
 }
 
