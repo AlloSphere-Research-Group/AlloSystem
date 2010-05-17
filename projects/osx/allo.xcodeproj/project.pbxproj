@@ -27,6 +27,8 @@
 		1697338711768B6E0025299C /* al_Complex.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1697338611768B6E0025299C /* al_Complex.hpp */; };
 		1697338811768B6E0025299C /* al_Complex.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1697338611768B6E0025299C /* al_Complex.hpp */; };
 		1697339B11768CDF0025299C /* utMath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1697339A11768CDF0025299C /* utMath.cpp */; };
+		169A33E611A205B200479AE0 /* al_Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 169A33E511A205B200479AE0 /* al_Camera.cpp */; };
+		169A33E711A205B200479AE0 /* al_Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 169A33E511A205B200479AE0 /* al_Camera.cpp */; };
 		16AA95F6118F74FB00B98EC3 /* al_Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95F2118F74FB00B98EC3 /* al_Light.cpp */; };
 		16AA9600118F76B800B98EC3 /* al_Debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95FF118F76B800B98EC3 /* al_Debug.cpp */; };
 		16AA960A118F774800B98EC3 /* al_Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA9609118F774800B98EC3 /* al_Texture.cpp */; };
@@ -286,6 +288,7 @@
 		1697337411768B040025299C /* al_Quat.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Quat.hpp; sourceTree = "<group>"; };
 		1697338611768B6E0025299C /* al_Complex.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Complex.hpp; sourceTree = "<group>"; };
 		1697339A11768CDF0025299C /* utMath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utMath.cpp; path = ../../unitTests/utMath.cpp; sourceTree = SOURCE_ROOT; };
+		169A33E511A205B200479AE0 /* al_Camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Camera.cpp; sourceTree = "<group>"; };
 		16AA95E5118F6EEF00B98EC3 /* al_Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Config.h; sourceTree = "<group>"; };
 		16AA95E8118F6EEF00B98EC3 /* al_Common.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Common.hpp; sourceTree = "<group>"; };
 		16AA95E9118F6EEF00B98EC3 /* al_GPUObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_GPUObject.hpp; sourceTree = "<group>"; };
@@ -830,6 +833,7 @@
 			isa = PBXGroup;
 			children = (
 				3659D754117B8AFA0065EBE4 /* jack */,
+				169A33E511A205B200479AE0 /* al_Camera.cpp */,
 				1619909C11743990006FBADF /* al_Color.cpp */,
 				3622BEFE116D527D00928703 /* al_msg.cpp */,
 				3622BEFF116D527D00928703 /* al_quat.cpp */,
@@ -915,8 +919,10 @@
 			children = (
 				3659D751117B8AC60065EBE4 /* jack */,
 				16198FF31173E39B006FBADF /* al_Buffer.hpp */,
+				3675276611795C4400FF598E /* al_Camera.hpp */,
 				1619909B11743914006FBADF /* al_Color.hpp */,
 				166DD741117CDB6000A8BA12 /* al_Conversion.hpp */,
+				3659D750117B8A980065EBE4 /* al_MsgTube.hpp */,
 				36B4124E10EFF7B8007B16D0 /* al_pq.h */,
 				36B4124F10EFF7B8007B16D0 /* al_pq.hpp */,
 				36F4662B110B9B720082D21E /* al_socktube.h */,
@@ -925,8 +931,6 @@
 				36B4125210EFF7B8007B16D0 /* al_types.h */,
 				36B4125310EFF7B8007B16D0 /* al_types.hpp */,
 				362129F911741A67009CB6FC /* al_VectorBuffer.hpp */,
-				3675276611795C4400FF598E /* al_Camera.hpp */,
-				3659D750117B8A980065EBE4 /* al_MsgTube.hpp */,
 			);
 			path = types;
 			sourceTree = "<group>";
@@ -1340,6 +1344,7 @@
 				16B5BF8D1188D0E90090CE80 /* utProtocolGraphics.cpp in Sources */,
 				16B5BFEF1188E8B60090CE80 /* utIOWindowGL.cpp in Sources */,
 				16D46564118F57970039A84C /* al_Printing.cpp in Sources */,
+				169A33E711A205B200479AE0 /* al_Camera.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1437,6 +1442,7 @@
 				16AA9600118F76B800B98EC3 /* al_Debug.cpp in Sources */,
 				16AA960A118F774800B98EC3 /* al_Texture.cpp in Sources */,
 				16AA9680118F7D6600B98EC3 /* al_Shader.cpp in Sources */,
+				169A33E611A205B200479AE0 /* al_Camera.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -93,8 +93,8 @@ public:
 	void rotateVectorTransposed(T * src, T * dst);
 	void rotateVectorTransposed(Vec3<T> & src, Vec3<T> & dst);
 	
-	Quat & slerp(Quat &target, T amt) { return slerp(*this, target, amt); }
-	static Quat & slerp(Quat &input, Quat &target, T amt);
+	Quat slerp(Quat &target, T amt) { return slerp(*this, target, amt); }
+	static Quat slerp(Quat &input, Quat &target, T amt);
 	
 	///< Get the quaternion from a given point and quaterion toward another point
 	void toward_point(Vec3<T> &pos, Quat<T> &q, Vec3<T> &v, float amt);
@@ -395,7 +395,7 @@ inline void Quat<T> :: rotateVectorTransposed(Vec3<T> & src, Vec3<T> & dst) {
 */
 
 template<typename T>
-Quat<T> & Quat<T> :: slerp(Quat &input, Quat &target, T amt) {
+Quat<T> Quat<T> :: slerp(Quat &input, Quat &target, T amt) {
 	Quat<T> result;
 	int bflip = 0;
 	T dot_prod = input.w*target.w + input.x*target.x + input.y*target.y + input.z*target.z;
