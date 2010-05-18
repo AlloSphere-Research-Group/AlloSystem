@@ -37,6 +37,8 @@ template <class T> class Vec3;
 template <class T> class Vec4;
 template <int N, class T> class Mat;
 
+typedef Vec<2,float>	Vec2f;
+typedef Vec<2,double>	Vec2d;
 typedef Vec3<float>		Vec3f;
 typedef Vec3<double>	Vec3d;
 typedef Vec4<float>		Vec4f;
@@ -154,6 +156,12 @@ public:
 	/// Returns closest vector on unit N-sphere
 	Vec sgn() const { return Vec(*this).normalize(); }
 
+	/// Get a subvector
+	template <int M>
+	Vec<M,T> sub(int begin=0){
+		return Vec<M,T>(ptr()+begin);
+	}
+
 	/// Returns sum of elements
 	T sum() const {
 		T r = (*this)[0];
@@ -172,7 +180,7 @@ public:
 	Vec& negate(){ IT(N){ (*this)[i] = -(*this)[i]; } return *this; }
 
 	/// Scales elements evenly so magnitude is one
-	Vec& normalize(){ return *this/=mag(); }
+	Vec& normalize();
 
 	/// Set elements from another vector
 	template <class T2>
@@ -244,6 +252,16 @@ public:
 	/// column-major array
 	T elems[N*N];
 
+	Mat(){ set(0); }
+
+	Mat(
+		const T& v11, const T& v12, const T& v13,
+		const T& v21, const T& v22, const T& v23,
+		const T& v31, const T& v32, const T& v33
+	){
+		set(v11,v12,v13, v21,v22,v23, v31,v32,v33);
+	}
+
 
 	/// Set element at index with no bounds checking
 	T& operator[](int i){ return elems[i];}
@@ -292,6 +310,17 @@ public:
 	
 	/// Set all elements to value
 	Mat& set(const T& v){ IT(size()){ (*this)[i]=v; } return *this; }
+	
+	Mat& set(
+		const T& v11, const T& v12, const T& v13,
+		const T& v21, const T& v22, const T& v23,
+		const T& v31, const T& v32, const T& v33
+	){
+		elems[0] = v11; elems[3] = v12; elems[6] = v13;
+		elems[1] = v21; elems[4] = v22; elems[7] = v23;
+		elems[2] = v31; elems[5] = v32; elems[8] = v33;
+		return *this;
+	}
 
 	/// Get trace (sum of diagonal elements)
 	T trace(){ return diagonal().sum(); }
@@ -400,13 +429,6 @@ inline Vec<N1+N2, T1> concat(const Vec<N1,T1>& a, const Vec<N2,T2>& b){
 	r.set(a.ptr());
 	for(int i=0; i<N2; ++i) r[i+N1] = T1(b[i]);
 	return r;
-}
-
-
-/// Get a subvector
-template <int M, int N, class T>
-inline Vec<M,T> sub(const Vec<N,T>& v, int begin=0){
-	return Vec<M,T>(v.ptr()+begin);
 }
 
 
@@ -520,6 +542,23 @@ struct Vec4 : public Vec<4,T> {
 	Vec4& operator= (const Base& v){ Base::set(v); return *this; }
 
 };
+
+
+
+// Implementation
+
+template <int N, class T>
+Vec<N,T>& Vec<N,T>::normalize(){
+	float m = mag();
+	if(m > T(1e-20)){
+		(*this) /= m;
+	}
+	else{
+		set(T(0));
+		elems[0] = T(1);
+	}
+	return *this;
+}
 
 
 #undef IT
