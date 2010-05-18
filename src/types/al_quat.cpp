@@ -30,7 +30,7 @@ void al_quat_normalize(al_quat * q) {
 }
 
 void al_quat_reset(al_quat * q) {
-	(TO_QUAT_PTR(q))->reset();
+	(TO_QUAT_PTR(q))->identity();
 }
 
 void al_quat_conjugate(al_quat * q, al_quat * result) {
@@ -38,7 +38,7 @@ void al_quat_conjugate(al_quat * q, al_quat * result) {
 }
 
 void al_quat_from_quat(al_quat * dst, double w, double x, double y, double z) {
-	(TO_QUAT_PTR(dst))->fromQuat(w, x, y, z);
+	(TO_QUAT_PTR(dst))->set(w, x, y, z);
 }
 
 void al_quat_from_axisangle(al_quat * dst, double theta, double x, double y, double z) {
