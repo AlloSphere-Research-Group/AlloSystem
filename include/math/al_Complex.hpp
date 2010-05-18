@@ -32,6 +32,12 @@
 namespace al {
 
 template <class T> class Complex;
+template <class T> class Polar;
+
+typedef Polar<float>	Polarf;
+typedef Polar<double>	Polard;
+typedef Complex<float>	Complexf;
+typedef Complex<double>	Complexd;
 
 
 
@@ -146,11 +152,18 @@ TEM Complex<T> operator / (T r, const Complex<T>& c){ return  c.conj()*(r/c.norm
 #undef TEM
 
 
-typedef Polar<float>	Polarf;
-typedef Polar<double>	Polard;
-typedef Complex<float>	Complexf;
-typedef Complex<double>	Complexd;
+template <class VecN, class T>
+VecN rotate(const VecN& v, const VecN& p, const Complex<T>& a){
+	return v*a.r + p*a.i;
+}
 
+/// Rotates two vectors by angle in plane formed from bivector v1 ^ v2
+template <class VecN, class T>
+void rotatePlane(VecN& v1, VecN& v2, const Complex<T>& a){
+	VecN t = al::rotate(v1, v2, a);
+	v2 = al::rotate(v2, VecN(-v1), a);
+	v1 = t;
+}
 
 } // ::al::
 
