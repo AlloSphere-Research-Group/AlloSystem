@@ -95,8 +95,8 @@ int utMath(){
 		for(int i=0; i<a.size(); ++i) a[i]=i;
 		
 		Vec<2, double> t;
-		t = sub<2>(a);			assert(t[0] == 0 && t[1] == 1);
-		t = sub<2>(a,2);		assert(t[0] == 2 && t[1] == 3);
+		t = a.sub<2>();			assert(t[0] == 0 && t[1] == 1);
+		t = a.sub<2>(2);		assert(t[0] == 2 && t[1] == 3);
 		}
 		
 		assert(angle(Vec3d(1,0,0), Vec3d(1,0,0)) == 0);
@@ -172,6 +172,18 @@ int utMath(){
 		a = 4.-a;	CHECK(a, 1,2,2, 2,1,2, 2,2,1);
 		a = 2.*a;	CHECK(a, 2,4,4, 4,2,4, 4,4,2);
 
+		a.set(	1,2,3,
+				4,5,6,
+				7,8,9
+		);
+
+		assert(a.col(0) == Vec3d(1,4,7));
+		assert(a.col(1) == Vec3d(2,5,8));
+		assert(a.col(2) == Vec3d(3,6,9));
+		assert(a.row(0) == Vec3d(1,2,3));
+		assert(a.row(1) == Vec3d(4,5,6));
+		assert(a.row(2) == Vec3d(7,8,9));
+		
 		#undef CHECK
 	}
 

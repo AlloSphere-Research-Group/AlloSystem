@@ -63,8 +63,8 @@ public:
 	void	pushY(double amount) { mVel.mPos[1] += amount; }
 	void	pushZ(double amount) { mVel.mPos[2] += amount; }
 	
-	void	halt() { mVel.mQuat.reset(); mVel.mPos.set(0); }
-	void	home() { mQuat.reset(); mPos.set(0); updateUnitVectors(); }
+	void	halt() { mVel.mQuat.identity(); mVel.mPos.set(0); }
+	void	home() { mQuat.identity(); mPos.set(0); updateUnitVectors(); }
 	
 	// get the azimuth, elevation & distance from this to another point
 	void toAED(const Vec3d & to, double azimuth, double elevation, double distance);

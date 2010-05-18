@@ -12,9 +12,9 @@ Feedback is not supported.
 Display lists are not supported.
 
 Supported:
-POINTS, LINES, LINE STRIP, LINE LOOP, TRIANGLES, TRIANGLE STRIP, and TRIANGLE FAN
-BYTE, UNSIGNED BYTE, SHORT, UNSIGNED SHORT, FLOAT, FIXED
-TEXTURE_2D,TEXTURE_CUBE_MAP, TEXTURE_MIN_FILTER, TEXTURE_MAG_FILTER, TEXTURE_WRAP_S, TEXTURE_WRAP_T
+POINTS, LINES, LINE_STRIP, LINE_LOOP, TRIANGLES, TRIANGLE_STRIP, and TRIANGLE_FAN
+BYTE, UNSIGNED_BYTE, SHORT, UNSIGNED_SHORT, FLOAT, FIXED
+TEXTURE_2D, TEXTURE_CUBE_MAP, TEXTURE_MIN_FILTER, TEXTURE_MAG_FILTER, TEXTURE_WRAP_S, TEXTURE_WRAP_T
 VertexAttrib{1234}f[v]
 VertexAttribPointer
 EnableVertexAttribArray
@@ -25,7 +25,8 @@ DepthRangef
 Viewport
 LineWidth
 CullFace
-TexImage2D, TexSubImage2D, CopyTexImage2D, CopyTexSubImage2D, CompressedTexImage2D, CompressedTexSubImage2D,  TexParameter{if}[v]
+TexImage2D, TexSubImage2D, CopyTexImage2D, CopyTexSubImage2D, CompressedTexImage2D, 
+	CompressedTexSubImage2D,  TexParameter{if}[v]
 DeleteTextures, GenTextures
 Scissor
 DepthFunc

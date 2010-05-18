@@ -129,13 +129,13 @@ namespace DataType{
 		UByte			= GL_UNSIGNED_BYTE,
 		Short			= GL_SHORT,
 		UShort			= GL_UNSIGNED_SHORT,
-		Int				= GL_INT,
-		UInt			= GL_UNSIGNED_INT,
+//		Int				= GL_INT,
+//		UInt			= GL_UNSIGNED_INT,
 		Float			= GL_FLOAT,
-		Bytes2			= GL_2_BYTES,                  
-		Bytes3			= GL_3_BYTES,
-		Bytes4			= GL_4_BYTES,
-		Double			= GL_DOUBLE,
+//		Bytes2			= GL_2_BYTES,                  
+//		Bytes3			= GL_3_BYTES,
+//		Bytes4			= GL_4_BYTES,
+//		Double			= GL_DOUBLE,
 		Unknown
 	};
 }
