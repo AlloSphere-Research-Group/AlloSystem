@@ -1,6 +1,7 @@
 #ifndef INCLUDE_AL_CAMERA_HPP
 #define INCLUDE_AL_CAMERA_HPP
 
+#include "math/al_Frustum.hpp"
 #include "math/al_Plane.hpp"
 #include "math/al_Vec.hpp"
 #include "math/al_Quat.hpp"
@@ -74,42 +75,6 @@ protected:
 
 
 
-/// Frustum geometry
-class FrustumG{
-public:
-
-	enum{ OUTSIDE, INTERSECT, INSIDE };
-
-	Plane<double> pl[6];
-	Vec3d ntl,ntr,nbl,nbr,ftl,ftr,fbl,fbr;	// frustrum vertices
-	float mNear, mFar, mRatio, mAngle, mTanFOV;
-	float nw,nh,fw,fh;						// near and far plane dimensions
-
-	FrustumG(){}
-	~FrustumG(){}
-
-	/// Set
-	void setCamInternals(float angle, float ratio, float nearDist, float farDist);
-	
-	/// Set from camera position, look, and up vectors
-	void setCamDef(const Vec3d& pos, const Vec3d& look, const Vec3d& up);
-
-
-	int pointInFrustum(const Vec3d& p) const;
-	int sphereInFrustum(const Vec3d& p, float raio) const;
-	//int boxInFrustum(AABox &b);
-
-	void drawPoints();
-	void drawLines();
-	void drawPlanes();
-	void drawNormals();
-
-private:
-	enum{ TOP=0, BOTTOM, LEFT, RIGHT, NEARP, FARP };
-};
-
-
-
 /*
 Steve Baker's Golden Rule for OpenGL cameras:
 
@@ -137,7 +102,7 @@ public:
 		RightEye	/**< Right eye only */
 	};
 	
-	struct Frustum{
+	struct FrustumGL{
 		double left, right, bottom, top, near, far;
 	};
 
@@ -158,8 +123,8 @@ public:
 	Camera& stereo(bool v){ mStereo=v; return *this; }		///< Set stereographic active
 	Camera& zoom(double v){ mZoom=v; return *this; }		///< Set zoom amount
 
-	FrustumG& computeTestFrustum();
-	FrustumG& testFrustum(){ return mFrustumG; }
+	Frustumd& computeTestFrustum();
+	Frustumd& testFrustum(){ return mFrustum; }
 
 	const Vec3d& pos() const { return mPos; }				///< Get position
 	const Vec3d& vf() const { return mUZ; }					///< Get forward vector
@@ -168,7 +133,7 @@ public:
 	double focalLength() const { return mFocalLength; }		///< Get focal length
 	double aperture() const { return mAperture; }			///< Get vertical field of view, in degrees
 	double eyeSep() const { return mEyeSep; }				///< Get eye separation
-	Frustum frustum(double eyePos=0) const;					///< Get frustum from an eye position
+	FrustumGL frustum(double eyePos=0) const;				///< Get frustum from an eye position
 	double near() const { return mNear; }					///< Get frustum near plane distance
 	double nearTop() const;									///< Get frustum near plane top
 	double nearRight() const;								///< Get frustum near plane right
@@ -200,11 +165,10 @@ protected:
 	double mTanFOV;
 	double mZoom;
 	double mNearOverFocalLength;
-//	double ndfl;				// ???
 	Vec3d mStereoOffset;					// eye offset vector (right eye; left eye is inverse), usually (1, 0, 0)
 	double mLeft, mBottom, mWidth, mHeight;
 	StereoMode mMode;
-	FrustumG mFrustumG;
+	Frustumd mFrustum;
 	bool mStereo;
 
 	void calcFrustum();

@@ -110,7 +110,7 @@ void Camera::calcFrustum(){
 	mStereoOffset = mUX * (eyeSep()*0.5);
 
 	// TODO: this is redundant
-	mFrustumG.setCamInternals(aperture(), ratio(), near(), far());
+	mFrustum.setCamInternals(aperture(), ratio(), near(), far());
 }
 
 
@@ -178,8 +178,8 @@ int Camera::eyeEnd() const {
 	else return 2;
 }
 
-Camera::Frustum Camera::frustum(double sep) const{
-	Frustum f;
+Camera::FrustumGL Camera::frustum(double sep) const{
+	FrustumGL f;
 	double sep_ndfl = sep*mNearOverFocalLength;
 	
 	f.left	=-nearRight() + sep_ndfl;
@@ -198,7 +198,7 @@ void Camera::setFrustum(double sep){
 	//matrixMode(Projection); identity();
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	Frustum f = frustum(sep);
+	FrustumGL f = frustum(sep);
 
 	//frustum(l,r,b,t near, far)
 	//glw::frustum(f.left, f.right, f.bottom, f.top, f.near, f.far);
@@ -319,87 +319,16 @@ void Camera::setLookAt(double tx, double ty, double tz){
 
 
 
-FrustumG& Camera::computeTestFrustum(){
+Frustumd& Camera::computeTestFrustum(){
 	// TODO: this should take the eye vector into account
 	Vec3d vl = pos()+vf();
-	mFrustumG.setCamDef(pos(), vl, vu());
-	return mFrustumG;
+	mFrustum.setCamDef(pos(), vl, vu());
+	return mFrustum;
 }
 
 
 
-void FrustumG::setCamInternals(float angle, float ratio, float nearD, float farD){
-	mRatio = ratio;
-	mAngle = angle;
-	mNear = nearD;
-	mFar = farD;
 
-	static double const tanCoef = 0.01745329252*0.5;	// degree-to-radian over /2
-	mTanFOV = (float)tan(mAngle * tanCoef);
-	nh = mNear * mTanFOV;
-	nw = nh * mRatio; 
-	fh = mFar  * mTanFOV;
-	fw = fh * mRatio;
-}
-
-void FrustumG::setCamDef(const Vec3d& p, const Vec3d& l, const Vec3d& u){
-
-	Vec3d Z = (p-l).normalize();
-	Vec3d X = cross(u,Z).normalize();
-	Vec3d Y = cross(Z,X);
-
-	Vec3d nc = p - Z * mNear;
-	Vec3d fc = p - Z * mFar;
-
-	ntl = nc + Y * nh - X * nw;
-	ntr = nc + Y * nh + X * nw;
-	nbl = nc - Y * nh - X * nw;
-	nbr = nc - Y * nh + X * nw;
-
-	ftl = fc + Y * fh - X * fw;
-	ftr = fc + Y * fh + X * fw;
-	fbl = fc - Y * fh - X * fw;
-	fbr = fc - Y * fh + X * fw;
-
-	pl[TOP].set3Points(ntr,ntl,ftl);
-	pl[BOTTOM].set3Points(nbl,nbr,fbr);
-	pl[LEFT].set3Points(ntl,nbl,fbl);
-	pl[RIGHT].set3Points(nbr,ntr,fbr);
-	pl[NEARP].set3Points(ntl,ntr,nbr);
-	pl[FARP].set3Points(ftr,ftl,fbl);
-}
-
-int FrustumG::pointInFrustum(const Vec3d& p) const {
-	int result = INSIDE;
-	for(int i=0; i<6; ++i){
-		if(pl[i].distance(p) < 0)
-			return OUTSIDE;
-	}
-	return result;
-}
-
-int FrustumG::sphereInFrustum(const Vec3d& p, float raio) const {
-	int result = INSIDE;
-	for(int i=0; i<6; ++i){
-		float distance = pl[i].distance(p);
-		if(distance < -raio)
-			return OUTSIDE;
-		else if(distance < raio)
-			result = INTERSECT;
-	}
-	return result;
-}
-
-//int FrustumG::boxInFrustum(AABox &b) const {
-//	int result = INSIDE;
-//	for(int i=0; i < 6; i++){
-//		if(pl[i].distance(b.getVertexP(pl[i].normal)) < 0)
-//			return OUTSIDE;
-//		else if(pl[i].distance(b.getVertexN(pl[i].normal)) < 0)
-//			result =  INTERSECT;
-//	}
-//	return result;
-//}
 
 
 } // al::

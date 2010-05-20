@@ -53,6 +53,8 @@ public:
 	/// Returns distance from plane to point
 	T distance(const Vec3& p) const;
 
+	const Vec3& normal() const { return mNormal; }
+
 protected:
 	Vec3 mNormal, mPoint;
 	T mD;
