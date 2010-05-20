@@ -19,7 +19,7 @@
 	#pragma comment( lib, "glu32.lib" )	
 #endif
 
-#include "types/al_Camera.hpp"
+#include "graphics/al_Camera.hpp"
 
 
 namespace al{

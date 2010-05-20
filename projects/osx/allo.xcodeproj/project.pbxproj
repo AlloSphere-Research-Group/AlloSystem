@@ -12,6 +12,9 @@
 		166DD742117CDB6000A8BA12 /* al_Conversion.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 166DD741117CDB6000A8BA12 /* al_Conversion.hpp */; };
 		166DD743117CDB6000A8BA12 /* al_Conversion.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 166DD741117CDB6000A8BA12 /* al_Conversion.hpp */; };
 		166DD745117CDBFD00A8BA12 /* utTypesConversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 166DD744117CDBFD00A8BA12 /* utTypesConversion.cpp */; };
+		16885C9711A5E79800071F90 /* al_Camera.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 16885C9611A5E79800071F90 /* al_Camera.hpp */; };
+		16885C9911A5E7A500071F90 /* al_Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16885C9811A5E7A500071F90 /* al_Camera.cpp */; };
+		16885C9A11A5E7A500071F90 /* al_Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16885C9811A5E7A500071F90 /* al_Camera.cpp */; };
 		168EC8F11161CA2C00FCACC7 /* al_Time.h in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8EB1161CA2C00FCACC7 /* al_Time.h */; };
 		168EC8F21161CA2C00FCACC7 /* al_MainLoop.h in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8EC1161CA2C00FCACC7 /* al_MainLoop.h */; };
 		168EC8F31161CA2C00FCACC7 /* al_Config.h in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8ED1161CA2C00FCACC7 /* al_Config.h */; };
@@ -27,8 +30,6 @@
 		1697338711768B6E0025299C /* al_Complex.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1697338611768B6E0025299C /* al_Complex.hpp */; };
 		1697338811768B6E0025299C /* al_Complex.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1697338611768B6E0025299C /* al_Complex.hpp */; };
 		1697339B11768CDF0025299C /* utMath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1697339A11768CDF0025299C /* utMath.cpp */; };
-		169A33E611A205B200479AE0 /* al_Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 169A33E511A205B200479AE0 /* al_Camera.cpp */; };
-		169A33E711A205B200479AE0 /* al_Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 169A33E511A205B200479AE0 /* al_Camera.cpp */; };
 		16AA95F6118F74FB00B98EC3 /* al_Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95F2118F74FB00B98EC3 /* al_Light.cpp */; };
 		16AA9600118F76B800B98EC3 /* al_Debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95FF118F76B800B98EC3 /* al_Debug.cpp */; };
 		16AA960A118F774800B98EC3 /* al_Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA9609118F774800B98EC3 /* al_Texture.cpp */; };
@@ -277,6 +278,8 @@
 		166DD741117CDB6000A8BA12 /* al_Conversion.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Conversion.hpp; sourceTree = "<group>"; };
 		166DD744117CDBFD00A8BA12 /* utTypesConversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utTypesConversion.cpp; path = ../../unitTests/utTypesConversion.cpp; sourceTree = SOURCE_ROOT; };
 		166DD78D117CDF1800A8BA12 /* pstdint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pstdint.h; sourceTree = "<group>"; };
+		16885C9611A5E79800071F90 /* al_Camera.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Camera.hpp; sourceTree = "<group>"; };
+		16885C9811A5E7A500071F90 /* al_Camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Camera.cpp; sourceTree = "<group>"; };
 		168EC8EB1161CA2C00FCACC7 /* al_Time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Time.h; sourceTree = "<group>"; };
 		168EC8EC1161CA2C00FCACC7 /* al_MainLoop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_MainLoop.h; sourceTree = "<group>"; };
 		168EC8ED1161CA2C00FCACC7 /* al_Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Config.h; sourceTree = "<group>"; };
@@ -288,7 +291,6 @@
 		1697337411768B040025299C /* al_Quat.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Quat.hpp; sourceTree = "<group>"; };
 		1697338611768B6E0025299C /* al_Complex.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Complex.hpp; sourceTree = "<group>"; };
 		1697339A11768CDF0025299C /* utMath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utMath.cpp; path = ../../unitTests/utMath.cpp; sourceTree = SOURCE_ROOT; };
-		169A33E511A205B200479AE0 /* al_Camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Camera.cpp; sourceTree = "<group>"; };
 		16AA95E5118F6EEF00B98EC3 /* al_Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Config.h; sourceTree = "<group>"; };
 		16AA95E8118F6EEF00B98EC3 /* al_Common.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Common.hpp; sourceTree = "<group>"; };
 		16AA95E9118F6EEF00B98EC3 /* al_GPUObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_GPUObject.hpp; sourceTree = "<group>"; };
@@ -398,7 +400,6 @@
 		3659D752117B8AC60065EBE4 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		3659D753117B8AC60065EBE4 /* ringbuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ringbuffer.h; sourceTree = "<group>"; };
 		3659D755117B8AFA0065EBE4 /* ringbuffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ringbuffer.c; sourceTree = "<group>"; };
-		3675276611795C4400FF598E /* al_Camera.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Camera.hpp; sourceTree = "<group>"; };
 		369EA3A7116D5F5F00EB1934 /* exCameraGLUT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exCameraGLUT; sourceTree = BUILT_PRODUCTS_DIR; };
 		369EA3AA116D5F7200EB1934 /* exCameraGLUT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exCameraGLUT.cpp; sourceTree = "<group>"; };
 		369EA3B0116D60CE00EB1934 /* liballoutil.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liballoutil.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -628,6 +629,7 @@
 		16AA95E3118F6EEF00B98EC3 /* graphics */ = {
 			isa = PBXGroup;
 			children = (
+				16885C9611A5E79800071F90 /* al_Camera.hpp */,
 				16AA95E5118F6EEF00B98EC3 /* al_Config.h */,
 				16AA95E8118F6EEF00B98EC3 /* al_Common.hpp */,
 				16AA95FE118F760C00B98EC3 /* al_Debug.hpp */,
@@ -643,6 +645,7 @@
 		16AA95F0118F74FB00B98EC3 /* graphics */ = {
 			isa = PBXGroup;
 			children = (
+				16885C9811A5E7A500071F90 /* al_Camera.cpp */,
 				16AA95FF118F76B800B98EC3 /* al_Debug.cpp */,
 				16AA95F2118F74FB00B98EC3 /* al_Light.cpp */,
 				16AA9609118F774800B98EC3 /* al_Texture.cpp */,
@@ -833,7 +836,6 @@
 			isa = PBXGroup;
 			children = (
 				3659D754117B8AFA0065EBE4 /* jack */,
-				169A33E511A205B200479AE0 /* al_Camera.cpp */,
 				1619909C11743990006FBADF /* al_Color.cpp */,
 				3622BEFE116D527D00928703 /* al_msg.cpp */,
 				3622BEFF116D527D00928703 /* al_quat.cpp */,
@@ -919,7 +921,6 @@
 			children = (
 				3659D751117B8AC60065EBE4 /* jack */,
 				16198FF31173E39B006FBADF /* al_Buffer.hpp */,
-				3675276611795C4400FF598E /* al_Camera.hpp */,
 				1619909B11743914006FBADF /* al_Color.hpp */,
 				166DD741117CDB6000A8BA12 /* al_Conversion.hpp */,
 				3659D750117B8A980065EBE4 /* al_MsgTube.hpp */,
@@ -1083,6 +1084,7 @@
 				16BC66A5117770BF002A0C18 /* al_Functions.hpp in Headers */,
 				16BC66A6117770BF002A0C18 /* al_Interpolation.hpp in Headers */,
 				166DD742117CDB6000A8BA12 /* al_Conversion.hpp in Headers */,
+				16885C9711A5E79800071F90 /* al_Camera.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1344,7 +1346,7 @@
 				16B5BF8D1188D0E90090CE80 /* utProtocolGraphics.cpp in Sources */,
 				16B5BFEF1188E8B60090CE80 /* utIOWindowGL.cpp in Sources */,
 				16D46564118F57970039A84C /* al_Printing.cpp in Sources */,
-				169A33E711A205B200479AE0 /* al_Camera.cpp in Sources */,
+				16885C9A11A5E7A500071F90 /* al_Camera.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1442,7 +1444,7 @@
 				16AA9600118F76B800B98EC3 /* al_Debug.cpp in Sources */,
 				16AA960A118F774800B98EC3 /* al_Texture.cpp in Sources */,
 				16AA9680118F7D6600B98EC3 /* al_Shader.cpp in Sources */,
-				169A33E611A205B200479AE0 /* al_Camera.cpp in Sources */,
+				16885C9911A5E7A500071F90 /* al_Camera.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
