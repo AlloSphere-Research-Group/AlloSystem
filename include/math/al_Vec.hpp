@@ -252,7 +252,9 @@ public:
 	/// column-major array
 	T elems[N*N];
 
-	Mat(){ set(0); }
+	Mat(){ set(T(0)); }
+
+	Mat(const T * arr){ set(arr); }
 
 	Mat(
 		const T& v11, const T& v12, const T& v13,
@@ -311,6 +313,9 @@ public:
 	/// Set all elements to value
 	Mat& set(const T& v){ IT(size()){ (*this)[i]=v; } return *this; }
 	
+	/// Set elements in column-major order from C array
+	Mat& set(const T * arr){ IT(size()){ (*this)[i]=arr[i]; } return *this; }
+	
 	Mat& set(
 		const T& v11, const T& v12, const T& v13,
 		const T& v21, const T& v22, const T& v23,
@@ -321,9 +326,21 @@ public:
 		elems[2] = v31; elems[5] = v32; elems[8] = v33;
 		return *this;
 	}
+	
+	Mat& transpose(){
+		for(int j=0; j<N-1; ++j){		// row and column
+		for(int i=j+1; i<N; ++i){	// offset into row or column
+			int i1 = j*N + i;
+			int i2 = j + i*N;
+			T t = elems[i1];
+			elems[i1] = elems[i2];
+			elems[i2] = t;
+		}} return *this;
+	}
+
 
 	/// Get trace (sum of diagonal elements)
-	T trace(){ return diagonal().sum(); }
+	T trace() const { return diagonal().sum(); }
 
 	/// Computes matrix product r = a * b
 	
