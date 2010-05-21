@@ -67,12 +67,8 @@ public:
 	/// Element values
 	T elems[N];
 
-
-	/// Constructor. Elements are not initialized.
-	Vec(){}
-
 	/// @param[in] v		value to initialize all elements to
-	Vec(const T& v){ set(v); }
+	Vec(const T& v=T()){ set(v); }
 
 	/// @param[in] v		vector to initialize all elements to
 	template <class T2>
@@ -540,8 +536,8 @@ struct Vec3 : public Vec<3,T> {
 
 	typedef Vec<3,T> Base;
 
-	Vec3(const Base& v){ *this = v; }
-	Vec3(const T& x=T(), const T& y=T(), const T& z=T()){ set(x,y,z); }
+	Vec3(const Base& v=Base()){ *this = v; }
+	Vec3(const T& x, const T& y, const T& z){ set(x,y,z); }
 
 	Vec3& operator= (const Base& v){ Base::set(v); return *this; }
 };
@@ -553,8 +549,8 @@ struct Vec4 : public Vec<4,T> {
 
 	typedef Vec<4,T> Base;
 	
-	Vec4(const Base& v){ *this = v; }
-	Vec4(const T& x=T(), const T& y=T(), const T& z=T(), const T& w=T()){ set(x,y,z,w); }
+	Vec4(const Base& v=Base()){ *this = v; }
+	Vec4(const T& x, const T& y, const T& z, const T& w){ set(x,y,z,w); }
 	
 	Vec4& operator= (const Base& v){ Base::set(v); return *this; }
 
