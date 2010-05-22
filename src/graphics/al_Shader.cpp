@@ -26,7 +26,7 @@ Shader& Shader::compile(){ glCompileShader(id()); return *this; }
 
 bool Shader::compiled() const {
 	GLint v;
-	glGetObjectParameterivARB((void *)&mID, GL_COMPILE_STATUS, &v);
+	glGetObjectParameterivARB((GLhandleARB)&mID, GL_COMPILE_STATUS, &v);
 	return v;
 }
 
