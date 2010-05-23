@@ -28,6 +28,7 @@
 */
 
 #include <cmath>
+#include "system/al_Config.h"
 #include "math/al_Constants.hpp"
 
 
