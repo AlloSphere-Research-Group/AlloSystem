@@ -28,6 +28,7 @@
 */
 
 #include <cmath>
+#include "system/al_Config.h"
 
 namespace al {
 
@@ -43,7 +44,8 @@ typedef Complex<double>	Complexd;
 
 /// Polar number
 template <class T>
-struct Polar{
+class Polar{
+public:
 	Polar(const T& p): m(1.), p(p){}
 	Polar(const T& m, const T& p): m(m), p(p){}
 	Polar(const Complex<T>& v){ *this = v; }
@@ -56,8 +58,8 @@ struct Polar{
 
 /// Complex number
 template <class T>
-struct Complex{
-
+class Complex{
+public:
 	typedef Complex<T> C;
 
 	union{

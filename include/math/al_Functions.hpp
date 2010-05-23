@@ -28,6 +28,8 @@
 */
 
 #include <cmath>
+#include <math.h>
+#include <stdlib.h>
 #include "system/al_Config.h"
 #include "math/al_Constants.hpp"
 
@@ -315,7 +317,14 @@ namespace{
 
 
 /// Returns absolute value
-TEM inline T abs(T v){ return std::abs(v); }
+//TEM inline T abs(T v){ return std::fabs(v); }
+template<> inline float abs(float v){ return fabsf(v); }
+template<> inline double abs(double v){ return fabs(v); }
+template<> inline char abs(char v){ return labs(v); }
+template<> inline short abs(short v){ return labs(v); }
+template<> inline int abs(int v){ return labs(v); }
+template<> inline long abs(long v){ return labs(v); }
+template<> inline long long abs(long long v){ return llabs(v); }
 
 TEM inline T atLeast(T v, T e){	return (v >= T(0)) ? max(v, e) : min(v, -e); }
 
