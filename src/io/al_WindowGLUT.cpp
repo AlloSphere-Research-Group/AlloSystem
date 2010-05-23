@@ -465,6 +465,7 @@ void WindowGL::create(
 //	printf("%d\n", stat);
 
 	mImpl->mID = glutCreateWindow(mImpl->mTitle.c_str());
+
 	glutSetWindow(mImpl->mID);
 	glutIgnoreKeyRepeat(1);
 	WindowImpl::registerCBs();

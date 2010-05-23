@@ -7,24 +7,24 @@
 namespace al {
 namespace gfx{
 
-//namespace AccessMode{
-//	enum t{
-//		ReadOnly		= GL_READ_ONLY,
-//		WriteOnly		= GL_WRITE_ONLY, 
-//		ReadWrite		= GL_READ_WRITE
-//	};
-//}
+namespace AccessMode{
+	enum t{
+		ReadOnly		= GL_READ_ONLY,
+		WriteOnly		= GL_WRITE_ONLY, 
+		ReadWrite		= GL_READ_WRITE
+	};
+}
 
-//namespace ArrayType{
-//	enum t{
-//		VertexArray			= GL_VERTEX_ARRAY,
-//		NormalArray			= GL_NORMAL_ARRAY,
-//		ColorArray			= GL_COLOR_ARRAY,
-//		IndexArray			= GL_INDEX_ARRAY,
-//		TextureCoordArray	= GL_TEXTURE_COORD_ARRAY,
-//		EdgeFlagArray		= GL_EDGE_FLAG_ARRAY
-//	};
-//}
+namespace ArrayType{
+	enum t{
+		VertexArray			= GL_VERTEX_ARRAY,
+		NormalArray			= GL_NORMAL_ARRAY,
+		ColorArray			= GL_COLOR_ARRAY,
+		IndexArray			= GL_INDEX_ARRAY,
+		TextureCoordArray	= GL_TEXTURE_COORD_ARRAY,
+		EdgeFlagArray		= GL_EDGE_FLAG_ARRAY
+	};
+}
 
 // attribute masks
 //namespace Attribute{
@@ -37,14 +37,14 @@ namespace gfx{
 //	inline t operator| (const t& a, const t& b){ return t(int(a) | int(b)); }
 //}
 
-//namespace BufferType{
-//	enum t{
-//		ArrayBuffer		= GL_ARRAY_BUFFER,
-//		ElementArray	= GL_ELEMENT_ARRAY_BUFFER,
-//		PixelPack		= GL_PIXEL_PACK_BUFFER,			/**< Transfer to PBO */
-//		PixelUnpack		= GL_PIXEL_UNPACK_BUFFER		/**< Transfer from PBO */
-//	};
-//}
+namespace BufferType{
+	enum t{
+		ArrayBuffer		= GL_ARRAY_BUFFER,
+		ElementArray	= GL_ELEMENT_ARRAY_BUFFER,
+		PixelPack		= GL_PIXEL_PACK_BUFFER,			/**< Transfer to PBO */
+		PixelUnpack		= GL_PIXEL_UNPACK_BUFFER		/**< Transfer from PBO */
+	};
+}
 
 
 /*
@@ -54,19 +54,19 @@ frame. "Draw" means the data will be sent to the GPU from the application,
 "Read" means the data will be read by the application from the GPU, and "Copy"
 means the data will be copied internally on the GPU.
 */
-//namespace BufferUsage{
-//	enum t{
-//		StreamDraw		= GL_STREAM_DRAW,
+namespace BufferUsage{
+	enum t{
+		StreamDraw		= GL_STREAM_DRAW,
 //		StreamRead		= GL_STREAM_READ,
 //		StreamCopy		= GL_STREAM_COPY,
-//		StaticDraw		= GL_STATIC_DRAW,
+		StaticDraw		= GL_STATIC_DRAW,
 //		StaticRead		= GL_STATIC_READ,
 //		StaticCopy		= GL_STATIC_COPY,
-//		DynamicDraw		= GL_DYNAMIC_DRAW,
+		DynamicDraw		= GL_DYNAMIC_DRAW,
 //		DynamicRead		= GL_DYNAMIC_READ,
 //		DynamicCopy		= GL_DYNAMIC_COPY
-//	};
-//}
+	};
+}
 
 //namespace Cap{
 //	enum t{
@@ -129,13 +129,13 @@ namespace DataType{
 		UByte			= GL_UNSIGNED_BYTE,
 		Short			= GL_SHORT,
 		UShort			= GL_UNSIGNED_SHORT,
-//		Int				= GL_INT,
-//		UInt			= GL_UNSIGNED_INT,
+		Int				= GL_INT,
+		UInt			= GL_UNSIGNED_INT,
 		Float			= GL_FLOAT,
-//		Bytes2			= GL_2_BYTES,                  
-//		Bytes3			= GL_3_BYTES,
-//		Bytes4			= GL_4_BYTES,
-//		Double			= GL_DOUBLE,
+		Bytes2			= GL_2_BYTES,                  
+		Bytes3			= GL_3_BYTES,
+		Bytes4			= GL_4_BYTES,
+		Double			= GL_DOUBLE,
 		Unknown
 	};
 }
@@ -204,11 +204,11 @@ namespace WrapMode{
 
 // Use namespaces so that enum names can be accessed via glw::name. In case of
 // conflicts, the full namespace can be used.
-//using namespace AccessMode;
+using namespace AccessMode;
 //using namespace ArrayType;
 //using namespace Attribute;
-//using namespace BufferType;
-//using namespace BufferUsage;
+using namespace BufferType;
+using namespace BufferUsage;
 //using namespace Cap;
 using namespace ColorFormat;
 using namespace DataType;
