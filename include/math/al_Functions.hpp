@@ -173,6 +173,9 @@ template<class T> T min(T v1, T v2, T v3);
 /// Returns the next representable floating-point or integer value following x in the direction of y
 template<class T> T nextAfter(T x, T y);
 
+/// Returns the number of digits in the integer portion
+template<class T> T numInt(const T& v);
+
 /// Returns whether or not an integer value is odd.
 template<class T> bool odd(T v);
 
@@ -496,6 +499,8 @@ TEM inline T nextAfter(T x, T y){ return x<y ? x+1 : x-1; }
 template<> inline float nextAfter(float x, float y){ return nextafterf(x,y); }
 template<> inline double nextAfter(double x, double y){ return nextafter(x,y); }
 template<> inline long double nextAfter(long double x, long double y){ return nextafterl(x,y); }
+
+TEM inline T numInt(const T& v){ return al::floor(::log10(v)) + 1; }
 
 TEM inline bool odd(T v){ return v & T(1); }
 
