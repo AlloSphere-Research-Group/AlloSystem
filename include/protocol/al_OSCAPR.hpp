@@ -28,8 +28,8 @@
 */
 
 /* allocore */
-#include "system/al_config.h"
-#include "system/al_time.h"
+#include "system/al_Config.h"
+#include "system/al_Time.h"
 
 /* Apache Portable Runtime */
 #include "apr-1/apr_general.h"
