@@ -47,7 +47,18 @@ void Mouse::position(int x, int y){ mX=x; mY=y; }
 
 
 void WindowGL::init(){
-	
+
 }
+
+WindowGL& WindowGL::cursorHideToggle(){
+	cursorHide(!cursorHide());
+	return *this;
+}
+
+WindowGL& WindowGL::fullScreenToggle(){
+	fullScreen(!fullScreen());
+	return *this;
+}
+
 
 } // al::

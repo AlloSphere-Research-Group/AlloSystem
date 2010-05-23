@@ -215,6 +215,7 @@ public:
 
 	WindowGL& cursor(Cursor::t v);						///< Set cursor type
 	WindowGL& cursorHide(bool v);						///< Set cursor hiding
+	WindowGL& cursorHideToggle();						///< Toggle cursor hiding
 	WindowGL& dimensions(const Dim& v);
 	WindowGL& fps(double v);							///< Set frames/second
 	

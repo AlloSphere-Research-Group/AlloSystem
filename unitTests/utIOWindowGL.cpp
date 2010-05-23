@@ -3,7 +3,7 @@
 
 struct MyWindow : WindowGL{
 
-	void onCreate(){					printf("onCreate\n"); }
+	void onCreate(){ 					printf("onCreate\n"); }
 	void onDestroy(){					printf("onDestroy\n"); }
 	void onResize(int w, int h){		printf("onResize     %d, %d\n", w, h); }
 	void onVisibility(bool v){			printf("onVisibility %s\n", v?"true":"false"); }
@@ -15,6 +15,7 @@ struct MyWindow : WindowGL{
 			case 'w': if(k.ctrl()) destroy(); break;
 			case 'h': if(k.ctrl()) hide(); break;
 			case 'm': if(k.ctrl()) iconify(); break;
+			case 'c': if(k.ctrl()) cursorHideToggle(); break;
 		}
 	}
 	void onKeyUp(const Keyboard& k){	printf("onKeyUp      "); printKey(); }
@@ -44,15 +45,18 @@ struct MyWindow : WindowGL{
 			for (float i = 0; i<limit; i++) {
 				float p = i / limit;
 				gl.color(1, p, 1-p);
-				p *= M_PI * 2.0;
-				gl.vertex(cos(p), sin(p*2), 0);
+				p *= 6.283185308;
+				gl.vertex(cos(p*freq1), sin(p*freq2), 0);
 			}
 		gl.end();
+//printf("%p: %d x %d\n", this, dimensions().w, dimensions().h);
 	}
 	
-	gfx::Graphics gl;
-};
+	void freqs(float v1, float v2){ freq1=v1; freq2=v2; }
 
+	gfx::Graphics gl;
+	float freq1, freq2;
+};
 
 
 int utIOWindowGL(){
@@ -71,7 +75,13 @@ int utIOWindowGL(){
 //	tf(1000);
 
 	win.create(WindowGL::Dim(200,200,100), "Window 1", 40);
-	win2.create(WindowGL::Dim(200,200,300), "Window 2", 40, SingleBuf);
+	win2.create(WindowGL::Dim(200,200,300), "Window 2", 40);
+//	win2.create(WindowGL::Dim(200,200,300), "Window 2", 40, SingleBuf);
+
+	win.freqs(1,2);
+	win2.freqs(3,4);
+
+//win.cursorHide(true);
 
 	WindowGL::startLoop();
 	return 0;

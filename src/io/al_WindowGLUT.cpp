@@ -1,17 +1,35 @@
-#if defined (__APPLE__) || defined (OSX)
-	#include <GLUT/glut.h>
-#endif
-#if defined(__linux__)
-	#include <GL/glut.h>
-#endif
-#ifdef WIN32
-	#include <GL/glut.h>
-#endif
-
 #include <stdio.h>		// snprintf
 #include <stdlib.h>		// exit
 #include <map>
 #include "io/al_WindowGL.hpp"
+#include "system/al_Config.h"
+
+#ifdef AL_OSX
+	#include <GLUT/glut.h>
+	#define AL_GRAPHICS_INIT_CONTEXT\
+		/* prevents tearing */ \
+		{	GLint MacHackVBL = 1;\
+			CGLContextObj ctx = CGLGetCurrentContext();\
+			CGLSetParameter(ctx,  kCGLCPSwapInterval, &MacHackVBL); }
+#endif
+#ifdef AL_LINUX
+	#include <GL/glew.h>
+	#include <GL/glut.h>
+
+	#define AL_GRAPHICS_INIT_CONTEXT\
+		{	GLenum err = glewInit();\
+			if (GLEW_OK != err){\
+  				/* Problem: glewInit failed, something is seriously wrong. */\
+  				fprintf(stderr, "GLEW Init Error: %s\n", glewGetErrorString(err));\
+			}\
+		}
+#endif
+#ifdef AL_WIN32
+	#include <windows.h>
+	#include <GL/glut.h>
+
+	#define AL_GRAPHICS_INIT_CONTEXT
+#endif
 
 
 namespace al{
@@ -56,10 +74,10 @@ public:
 	void destroy(){
 		if(created()){
 			glutDestroyWindow(mID);
-			windows().erase(mID);
-			if(mInGameMode) windows().erase(mIDGameMode);
+			windows().erase(id());
 			mID = -1;
 			mIDGameMode = -1;
+			mInGameMode = false;
 		}
 	}
 
@@ -116,8 +134,10 @@ public:
 			}
 
 			mIDGameMode = glutEnterGameMode();
+			windows().erase(mID);
 			windows()[mIDGameMode] = this;
 			mInGameMode = true;
+			glutSetWindow(id());
 			registerCBs();
 			scheduleDraw();
 		}
@@ -125,9 +145,11 @@ public:
 		// Exit game mode
 		else{
 			windows().erase(mIDGameMode);
+			windows()[mID] = this;
 			mInGameMode = false;
-			glutSetWindow(mID); // freeglut requires this before leaving game mode
+			glutSetWindow(id()); // freeglut requires this before leaving game mode
 			glutLeaveGameMode();
+			scheduleDraw();
 		}
 	}
 
@@ -203,7 +225,7 @@ public:
 //			}
 
 			// Reassign keycodes when CTRL is down
-			//#ifdef GLV_PLATFORM_OSX
+			//#ifdef AL_OSX
 
 			bool ctrl = glutGetModifiers() & GLUT_ACTIVE_CTRL;
 
@@ -218,7 +240,7 @@ public:
 				//BackSpace	=8
 				//Tab		=9
 				//Return	=13
-				//Escape	=27
+				//Escape	=27glutPostRedisplay();
 				
 				if(key <= 26){ key += 96; }
 				
@@ -366,19 +388,7 @@ private:
 		
 		// If there is a valid implementation, then draw and schedule next draw...
 		if(impl){
-//			int current = glutGetWindow();
-//			if(winID != current) glutSetWindow(winID);
-//			
-//			WindowGL * win = getWindow();
-//			if(win){
-//				win->doFrame();
-//				if(win->fps() > 0){
-//					glutTimerFunc((unsigned int)(1000.0/win->fps()), scheduleDrawStatic, winID);
-//				}
-//			}
-//			
-//			if(current) glutSetWindow(current);
-
+//printf("schedule draw: %d from (%d, %d)\n", winID, impl->mID, impl->mIDGameMode);
 
 			WindowGL * win = impl->mWindow;
 
@@ -388,9 +398,6 @@ private:
 					glutTimerFunc((unsigned int)(1000.0/win->fps()), scheduleDrawStatic, winID);
 				}
 			}
-			
-			//if(current) glutSetWindow(current);
-
 		}
 	}
 
@@ -461,14 +468,17 @@ void WindowGL::create(
 	glutSetWindow(mImpl->mID);
 	glutIgnoreKeyRepeat(1);
 	WindowImpl::registerCBs();
-	
 	WindowImpl::windows()[mImpl->mID] = mImpl;
 
-	onCreate();
+	AL_GRAPHICS_INIT_CONTEXT;
+	onCreate();	
 	mImpl->scheduleDraw();
 }
 
-void WindowGL::destroy(){ onDestroy(); mImpl->destroy(); }
+void WindowGL::destroy(){
+	onDestroy();
+	mImpl->destroy();
+}
 
 void WindowGL::destroyAll(){
 	WindowImpl::WindowsMap::iterator it = WindowImpl::windows().begin();
@@ -502,8 +512,8 @@ WindowGL& WindowGL::cursor(Cursor::t v){
 	
 	if(mImpl->created() && !mImpl->mCursorHide){
 		switch(v){
-			case Cursor::CrossHair:	glutSetCursor(GLUT_CURSOR_CROSSHAIR);
-			case Cursor::Pointer:	glutSetCursor(GLUT_CURSOR_INHERIT);
+			case Cursor::CrossHair:	makeActive(); glutSetCursor(GLUT_CURSOR_CROSSHAIR);
+			case Cursor::Pointer:	makeActive(); glutSetCursor(GLUT_CURSOR_INHERIT);
 			default:;
 		}
 	}
@@ -511,7 +521,8 @@ WindowGL& WindowGL::cursor(Cursor::t v){
 }
 
 WindowGL& WindowGL::cursorHide(bool v){
-	mImpl->mCursorHide = v; 
+	mImpl->mCursorHide = v;
+	makeActive();
 	if(mImpl->created() && v)	glutSetCursor(GLUT_CURSOR_NONE);
 	else						cursor(mImpl->mCursor);
 	return *this;
@@ -528,11 +539,14 @@ WindowGL& WindowGL::dimensions(const Dim& v){
 }
 
 void WindowGL::doFrame(){
-	int winID = mImpl->mID;
-	int current = glutGetWindow();
+	const int winID = mImpl->id();
+	const int current = glutGetWindow();
 	if(winID != current) glutSetWindow(winID);
+//	glutPostRedisplay();
 	onFrame();
+
 	glutSwapBuffers();
+//	if(current > 0) glutSetWindow(current);
 }
 
 WindowGL& WindowGL::fps(double v){
@@ -545,8 +559,10 @@ WindowGL& WindowGL::fullScreen(bool v){
 
 	// exit full screen
 	if(mImpl->mFullScreen && !v){
-		#if defined(__LINUX__)
-			mImpl->gameMode(v);
+		#ifdef AL_LINUX
+			onDestroy();
+			mImpl->gameMode(false);
+			onCreate();
 		#else
 			dimensions(mImpl->mWinDim);	// glutReshapeWindow leaves full screen
 		#endif
@@ -557,8 +573,11 @@ WindowGL& WindowGL::fullScreen(bool v){
 	
 		mImpl->mWinDim = dimensions();
 	
-		#if defined(__LINUX__)
-			mImpl->gameMode(v);
+		#ifdef AL_LINUX
+			onDestroy();
+			mImpl->gameMode(true);
+			onCreate();
+			cursorHide(cursorHide());
 		#else
 			glutSetWindow(mImpl->mID);
 			glutFullScreen();
@@ -569,15 +588,10 @@ WindowGL& WindowGL::fullScreen(bool v){
 	return *this;
 }
 
-WindowGL& WindowGL::fullScreenToggle(){
-	fullScreen(!fullScreen());
-	return *this;
-}
-
-WindowGL& WindowGL::hide(){ glutHideWindow(); return *this; }
-WindowGL& WindowGL::iconify(){ glutIconifyWindow(); return *this; }
-WindowGL& WindowGL::makeActive(){ glutSetWindow(mImpl->mID); return *this; }
-WindowGL& WindowGL::show(){ glutShowWindow(); return *this; }
+WindowGL& WindowGL::hide(){ makeActive(); glutHideWindow(); return *this; }
+WindowGL& WindowGL::iconify(){ makeActive(); glutIconifyWindow(); return *this; }
+WindowGL& WindowGL::makeActive(){ glutSetWindow(mImpl->id()); return *this; }
+WindowGL& WindowGL::show(){ makeActive(); glutShowWindow(); return *this; }
 
 WindowGL& WindowGL::title(const std::string& v){
 	mImpl->mTitle = v;
@@ -586,9 +600,6 @@ WindowGL& WindowGL::title(const std::string& v){
 	//printf("WindowGL::title(%s)\n", mImpl->mTitle.c_str());
 	return *this;
 }
-
-
-
 
 void WindowGL::startLoop(){ glutMainLoop(); }
 
