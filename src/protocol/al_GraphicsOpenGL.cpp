@@ -103,6 +103,7 @@ static void gl_vertex(Graphics * g, double x, double y, double z) {
 
 // TODO: Common to OpenGL and OpenGL ES1
 static void gl_draw(const GraphicsData& v){
+
 	int Nv = v.vertices().size();
 	if(0 == Nv) return;
 	
@@ -111,10 +112,6 @@ static void gl_draw(const GraphicsData& v){
 	int Nt2= v.texCoord2s().size();
 	int Nt3= v.texCoord3s().size();
 	int Ni = v.indices().size();
-
-
-	unsigned vs=0, ve=Nv;	// range of vertex indices to prefetch
-	unsigned is=0, ie=Ni;	// range of indices to draw
 
 	// Enable arrays and set pointers...
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -138,7 +135,13 @@ static void gl_draw(const GraphicsData& v){
 	
 	// Send the package over...
 	if(Ni){
-		glDrawRangeElements(v.primitive(), vs, ve, ie-is, GL_UNSIGNED_INT, &v.indices()[is]);
+		//unsigned vs=0, ve=Nv;	// range of vertex indices to prefetch
+								// NOTE:	if this range exceeds the number of vertices,
+								//			expect a segmentation fault...
+		unsigned is=0, ie=Ni;	// range of indices to draw
+
+//		glDrawRangeElements(v.primitive(), vs, ve, ie-is, GL_UNSIGNED_INT, &v.indices()[is]);
+		glDrawElements(v.primitive(), ie-is, GL_UNSIGNED_INT, &v.indices()[is]);
 	}
 	else{
 		glDrawArrays(v.primitive(), 0, v.vertices().size());
@@ -148,6 +151,7 @@ static void gl_draw(const GraphicsData& v){
 	if(Nn) glDisableClientState(GL_NORMAL_ARRAY);
 	if(Nc) glDisableClientState(GL_COLOR_ARRAY);
 	if(Nt2 || Nt3) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
 }
 
 #endif

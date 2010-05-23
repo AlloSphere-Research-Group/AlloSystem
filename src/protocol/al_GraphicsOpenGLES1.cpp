@@ -47,10 +47,6 @@ static void gl_draw(const GraphicsData& v){
 	int Nt3= v.texCoord3s().size();
 	int Ni = v.indices().size();
 
-
-	unsigned vs=0, ve=Nv;	// range of vertex indices to prefetch
-	unsigned is=0, ie=Ni;	// range of indices to draw
-
 	// Enable arrays and set pointers...
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, 0, &v.vertices()[0]);
@@ -73,11 +69,13 @@ static void gl_draw(const GraphicsData& v){
 	
 	// Send the package over...
 	if(Ni){
-		// If not supported...
-		glDrawRangeElements(v.primitive(), vs, ve, ie-is, GL_UNSIGNED_INT, &v.indices()[is]);
-		
-		// ... use this
-		//glDrawElements(v.primitive(), ie-is, GL_UNSIGNED_INT, &v.indices()[is]);
+		//unsigned vs=0, ve=Nv;	// range of vertex indices to prefetch
+								// NOTE:	if this range exceeds the number of vertices,
+								//			expect a segmentation fault...
+		unsigned is=0, ie=Ni;	// range of indices to draw
+
+//		glDrawRangeElements(v.primitive(), vs, ve, ie-is, GL_UNSIGNED_INT, &v.indices()[is]);
+		glDrawElements(v.primitive(), ie-is, GL_UNSIGNED_INT, &v.indices()[is]);
 	}
 	else{
 		glDrawArrays(v.primitive(), 0, v.vertices().size());

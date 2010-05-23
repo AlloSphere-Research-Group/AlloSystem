@@ -5,7 +5,7 @@ struct MyWindow2 : WindowGL{
 
 	void onFrame(){
 		using namespace al::gfx;
-		
+	
 		gl.setBackend(Backend::OpenGL);
 
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -13,7 +13,8 @@ struct MyWindow2 : WindowGL{
 		gl.loadIdentity();
 		
 		gl.resetBuffers();
-		
+	
+		// test vertices and colors
 		int N=19;
 		for(int i=0; i<=N; ++i){
 			float p = float(i)/N;
@@ -21,6 +22,7 @@ struct MyWindow2 : WindowGL{
 			gl.addColor(p, p, 1);
 		}
 
+		// test rendering from index array
 		for(int i=0; i<=N; ++i){
 			gl.addIndex((i*(N/2-1)) % N);
 		}
@@ -29,6 +31,7 @@ struct MyWindow2 : WindowGL{
 		gl.primitive(gl.LINE_STRIP);
 
 		gl.draw();
+
 	}
 	
 	gfx::Graphics gl;
