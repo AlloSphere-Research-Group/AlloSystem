@@ -5,6 +5,7 @@
 #include "system/al_Config.h"
 
 #ifdef AL_OSX
+	#include <OpenGL/OpenGL.h>
 	#include <GLUT/glut.h>
 	#define AL_GRAPHICS_INIT_CONTEXT\
 		/* prevents tearing */ \
