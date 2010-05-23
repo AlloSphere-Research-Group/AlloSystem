@@ -10,6 +10,7 @@ include ../$(SRC_DIR)/$(IO_DIR)/Makefile.config
 SRCS =	utIOAudioIO.cpp \
 	utIOWindowGL.cpp \
 	utMath.cpp \
+	utProtocolGraphics.cpp \
 	utProtocolOSC.cpp \
 	utProtocolSerialize.cpp \
 	utSystem.cpp \
