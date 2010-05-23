@@ -61,7 +61,8 @@ struct MyWindow : WindowGL{
 
 int utIOWindowGL(){
 
-	MyWindow win, win2;
+	MyWindow win;
+	MyWindow win2;
 	
 //	gl.setBackend(GraphicsBackend::None);
 	

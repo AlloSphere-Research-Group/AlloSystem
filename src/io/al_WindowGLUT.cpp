@@ -134,22 +134,27 @@ public:
 				glutGameModeString("1024x768:24");
 			}
 
-			mIDGameMode = glutEnterGameMode();
-			windows().erase(mID);
+			windows().erase(mID);	// erase ID to stop draw scheduling...
+			mIDGameMode = glutEnterGameMode();	
+			mInGameMode = true;			
 			windows()[mIDGameMode] = this;
-			mInGameMode = true;
-			glutSetWindow(id());
-			registerCBs();
+			
+			glutSetWindow(mIDGameMode);
+			registerCBs();	// need to register callbacks since new window
 			scheduleDraw();
 		}
 	
 		// Exit game mode
+		// All previously created windows are restored...
 		else{
-			windows().erase(mIDGameMode);
-			windows()[mID] = this;
-			mInGameMode = false;
-			glutSetWindow(id()); // freeglut requires this before leaving game mode
+			windows().erase(mIDGameMode); // erase ID to stop draw scheduling...
+			//glutSetWindow(mIDGameMode); // freeglut requires this before leaving game mode
 			glutLeaveGameMode();
+			mInGameMode = false;
+			windows()[mID] = this;
+
+			glutSetWindow(mID);
+			//registerCBs();
 			scheduleDraw();
 		}
 	}
@@ -176,8 +181,7 @@ public:
 	// Returns the currently selected window or 0 if invalid
 	static WindowGL * getWindow(){
 		WindowImpl * w = getWindowImpl();
-		if(w) return w->mWindow;
-		return 0;
+		return w ? w->mWindow : 0;
 	}
 
 	static void setModifiers(Keyboard& k){
@@ -269,6 +273,7 @@ public:
 	}
 
 	static void cbKeyboard(unsigned char key, int x, int y){
+//printf("GLUT key down:\n");
 		WindowGL * win = getWindow();
 		if(win){
 			key = remapKey(key, false);
@@ -352,6 +357,7 @@ public:
 	static void cbReshape(int w, int h){
 		WindowGL * win = getWindow();
 		if(win){
+			win->makeActive();
 			win->onResize(w, h);
 			win->title(win->title());	// TODO: need this hack to get title back
 										// after exiting full screen
@@ -548,7 +554,7 @@ void WindowGL::doFrame(){
 	onFrame();
 
 	glutSwapBuffers();
-//	if(current > 0) glutSetWindow(current);
+//	if(current > 0 && current != winID) glutSetWindow(current);
 }
 
 WindowGL& WindowGL::fps(double v){
@@ -565,6 +571,8 @@ WindowGL& WindowGL::fullScreen(bool v){
 			onDestroy();
 			mImpl->gameMode(false);
 			onCreate();
+			onResize(mImpl->mWinDim.w, mImpl->mWinDim.h);
+			hide(); show(); // need to force focus to get key callbacks to work
 		#else
 			dimensions(mImpl->mWinDim);	// glutReshapeWindow leaves full screen
 		#endif
