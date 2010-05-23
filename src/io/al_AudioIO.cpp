@@ -9,10 +9,12 @@
 
 namespace al{
 
+/*
 static void err(const char * msg, const char * src, bool exits){
 	fprintf(stderr, "%s%serror: %s\n", src, src[0]?" ":"", msg);
 	if(exits) exit(EXIT_FAILURE);
 }
+*/
 
 static void warn(const char * msg, const char * src){
 	fprintf(stderr, "%s%swarning: %s\n", src, src[0]?" ":"", msg);
