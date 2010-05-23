@@ -9,8 +9,8 @@ int main(){
 //	utProtocolOSC();
 //	utProtocolSerialize();
 //
-//	utIOAudioIO();
-	utIOWindowGL();
+	utIOAudioIO();
+//	utIOWindowGL();
 	
 //	utProtocolGraphics();
 

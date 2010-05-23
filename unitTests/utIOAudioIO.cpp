@@ -6,6 +6,12 @@ struct LowPass{
 	float p;
 } lpf;
 
+struct SineWave{
+	SineWave(float freq): p(0), f(freq){}
+	float operator()(){ p+=f; p=p>1?p-1:(p<0?p+1:p); return sin(p*M_2PI); }
+	float p,f;
+} sine(440./44100.);
+
 template <int N=20000>
 struct DelayLine{
 	DelayLine(): tap(0) { for(int i=0; i<N; ++i) buf[i]=0; }
@@ -21,7 +27,8 @@ void audioCB(AudioIOData& io){
 		float s = io.in(0)[i];
 		s = delay(lpf(s, 0.2));
 		//s = float(i)/io.framesPerBuffer();
-		//s = 0;		
+		//s = 0;
+		s += sine()*0.1;
 
 		io.out(0)[i] = s;
 		io.out(1)[i] = s;
@@ -33,7 +40,7 @@ void audioCB(AudioIOData& io){
 int utIOAudioIO(){
 
 	AudioDevice::printAll();
-	AudioIO audioIO(128, 44100, audioCB, 0, 2, 1);
+	AudioIO audioIO(256, 44100, audioCB, 0, 2, 1);
 	audioIO.start();
 
 	printf("\nPress 'enter' to quit...\n"); getchar();

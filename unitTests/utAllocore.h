@@ -2,6 +2,7 @@
 #define INCLUDE_UT_ALLOCORE_H
 
 #include <assert.h>
+#include <math.h>
 #include <stdio.h>
 
 #include "io/al_AudioIO.hpp"
