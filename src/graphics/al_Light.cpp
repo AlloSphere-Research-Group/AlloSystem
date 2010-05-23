@@ -73,5 +73,9 @@ Light& Light::pos(float x, float y, float z, float w){
 	return *this;
 }
 
+void Light::twoSided(bool v){
+	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, v ? GL_TRUE : GL_FALSE);
+}
+
 } // ::al::gfx
 } // ::al

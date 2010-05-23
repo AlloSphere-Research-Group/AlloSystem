@@ -31,6 +31,8 @@ public:
 	const Color& diffuse() const { return mDiffuse; }
 	const Color& specular() const { return mSpecular; }
 
+	static void twoSided(bool v);
+
 protected:
 	int mID;
 	Color mAmbient;
