@@ -4,6 +4,27 @@
 namespace al {
 namespace gfx{
 
+Material::Material(Face::t f)
+:	mAmbient(0), mDiffuse(1), mEmission(0), mSpecular(0),
+	mShine(0), mFace(f)
+{
+	
+}
+void Material::operator()() const {
+	glMaterialfv(mFace, GL_AMBIENT, mAmbient.components);
+	glMaterialfv(mFace, GL_DIFFUSE, mDiffuse.components);
+	glMaterialfv(mFace, GL_EMISSION, mEmission.components);
+	glMaterialfv(mFace, GL_SPECULAR, mSpecular.components);
+	glMaterialf(mFace, GL_SHININESS, mShine);
+}
+Material& Material::ambientAndDiffuse(const Color& v){ ambient(v); return diffuse(v); }
+Material& Material::ambient(const Color& v){ mAmbient=v; return *this; }
+Material& Material::diffuse(const Color& v){ mDiffuse=v; return *this; }
+Material& Material::emission(const Color& v){ mEmission=v; return *this; }
+Material& Material::specular(const Color& v){ mSpecular=v; return *this; }
+Material& Material::shininess(float v){ mShine=v; return *this; }
+Material& Material::face(Face::t f){ mFace=f; }
+
 static bool * lightPool(){
 	static bool x[8] = {0};
 	return x;
@@ -39,7 +60,7 @@ Light::~Light(){
 	freeID(mID);
 }
 
-Light& Light::operator()(){
+void Light::operator()() const {
 	glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
 	int glID = lightID(mID);
@@ -53,7 +74,6 @@ Light& Light::operator()(){
 	
 	glEnable(glID); // MUST enable each light source after configuration
 	//glShadeModel(GL_FLAT);
-	return *this;
 }
 
 Light& Light::attenuation(float c0, float c1, float c2){
@@ -72,6 +92,10 @@ Light& Light::dir(float x, float y, float z){
 Light& Light::pos(float x, float y, float z){
 	mPos[0]=x; mPos[1]=y; mPos[2]=z; mPos[3]=1;
 	return *this;
+}
+
+void Light::localViewer(bool v){
+	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, v ? GL_TRUE : GL_FALSE);
 }
 
 void Light::twoSided(bool v){

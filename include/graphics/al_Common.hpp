@@ -155,6 +155,14 @@ namespace DataType{
 //	};
 //}
 
+namespace Face{
+	enum t{
+		Front			= GL_FRONT,
+		Back			= GL_BACK,
+		FrontAndBack	= GL_FRONT_AND_BACK
+	};
+}
+
 namespace IpolMode{
 	enum t{
 		Nearest			= GL_NEAREST,
