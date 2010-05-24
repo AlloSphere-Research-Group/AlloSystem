@@ -18,14 +18,16 @@ public:
 	Light& ambient(const Color& v);
 	Light& diffuse(const Color& v);
 	Light& specular(const Color& v);
+	
+	Light& dir(float x, float y, float z);
+
+	template <class VEC3>
+	Light& dir(const VEC3& v){ return dir(v[0], v[1], v[2]); }
+
 	Light& pos(float x, float y, float z);
-	Light& pos(float x, float y, float z, float w);
 
 	template <class VEC3>
 	Light& pos(const VEC3& v){ return pos(v[0], v[1], v[2]); }
-
-	template <class VEC3>
-	Light& pos(const VEC3& v, float w){ return pos(v[0], v[1], v[2], w); }
 
 	const Color& ambient() const { return mAmbient; }
 	const Color& diffuse() const { return mDiffuse; }

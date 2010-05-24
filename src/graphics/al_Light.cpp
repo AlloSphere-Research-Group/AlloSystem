@@ -64,12 +64,13 @@ Light& Light::ambient(const Color& v){ mAmbient=v; return *this; }
 Light& Light::diffuse(const Color& v){ mDiffuse=v; return *this; }
 Light& Light::specular(const Color& v){ mSpecular=v; return *this; }
 
-Light& Light::pos(float x, float y, float z){
-	return pos(x,y,z, mPos[3]);
+Light& Light::dir(float x, float y, float z){
+	mPos[0]=x; mPos[1]=y; mPos[2]=z; mPos[3]=0;
+	return *this;
 }
 
-Light& Light::pos(float x, float y, float z, float w){
-	mPos[0]=x; mPos[1]=y; mPos[2]=z; mPos[3]=w;
+Light& Light::pos(float x, float y, float z){
+	mPos[0]=x; mPos[1]=y; mPos[2]=z; mPos[3]=1;
 	return *this;
 }
 
