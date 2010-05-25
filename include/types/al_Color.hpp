@@ -146,6 +146,9 @@ struct HSV{
 
 	float h, s, v;
 
+	template<class T>
+	HSV(T * hsv): h(hsv[0]), s(hsv[1]), v(hsv[2]){}
+
 	HSV(float h=0, float s=1, float v=1): h(h), s(s), v(v){}	
 	HSV(const Color& c){ *this = c; }
 
