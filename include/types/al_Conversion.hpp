@@ -121,6 +121,10 @@ inline   double punIF( int64_t v){ Twiddle<double> u(v); return u.f; }
 /// Convert numerical type to a string
 template <class T> std::string toString(const T& v);
 
+/// Convert array of numerical types to a comma separated string
+template <class T>
+std::string toString(const T * v, int num, int stride=1);
+
 /// Convert 32-bit unsigned integer to unit float in [0, 1)
 template<class T> T uintToUnit (uint32_t v);
 
@@ -216,6 +220,16 @@ inline float fraction(uint32_t bits, uint32_t phase){
 inline float intToUnit(int16_t v){
 	uint32_t vu = (((uint32_t)v) + 0x808000) << 7; // set fraction in float [2, 4)
 	return punUF(vu) - 3.f;
+}
+
+template <class T>
+std::string toString(const T * v, int n, int s){
+	std::string r;
+	for(int i=0; i<n; ++i){
+		r += toString(v[i*s]);
+		if(i<(n-1)) r += ", ";
+	}
+	return r;
 }
 
 template <class T>

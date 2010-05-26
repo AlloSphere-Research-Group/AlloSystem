@@ -349,7 +349,7 @@ inline void Quat<T> :: toEuler(T * e) const {
 	T sqz = z*z;
 	e[0] = QUAT_RAD2DEG * asin(-2.0 * (x*z - w*y));
 	e[1] = QUAT_RAD2DEG * atan2(2.0 * (y*z + w*x),(sqw - sqx - sqy + sqz));
-	e[3] = QUAT_RAD2DEG * atan2(2.0 * (x*y + w*z), (sqw + sqx - sqy - sqz));
+	e[2] = QUAT_RAD2DEG * atan2(2.0 * (x*y + w*z), (sqw + sqx - sqy - sqz));
 }
 
 template<typename T>
