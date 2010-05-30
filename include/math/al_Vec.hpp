@@ -149,6 +149,13 @@ public:
 	/// Return 2-norm of elements
 	T norm2() const { return mag(); }
 
+	/// Returns product of elements
+	T product() const {
+		T r = (*this)[0];
+		for(int i=1; i<N; ++i){ r *= (*this)[i]; }
+		return r;
+	}
+
 	/// Returns closest vector on unit N-sphere
 	Vec sgn() const { return Vec(*this).normalize(); }
 
