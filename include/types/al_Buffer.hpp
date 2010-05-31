@@ -66,6 +66,9 @@ public:
 	/// Get element at absolute index
 	const T& operator[](int i) const { return atAbs(i); }
 
+
+	void assign(int n, const T& v){ mElems.assign(n,v); }
+
 	/// Set element at absolute index
 	T& atAbs(int i){ return mElems[i]; }
 	
@@ -87,9 +90,13 @@ public:
 	/// Resize
 	void resize(int n){
 		mElems.resize(n);
-		mSize=n;
-		if(mFill >= n) mFill = n-1;
-		if(mPos  >= n) mPos  = n-1;
+		setSize(n);
+	}
+	
+	/// Resize only if current size is less than requested size
+	void upsize(int n){
+		if(capacity() < n) resize(n);
+		else setSize(n);
 	}
 
 	/// Appends element to end of array doubling array size if necessary
@@ -113,6 +120,12 @@ private:
 	int	mFill;		// number of elements written to buffer (up to size())
 	int mPos;		// circular buffer write position
 	std::vector<T, Alloc> mElems;
+	
+	void setSize(int n){
+		mSize=n;
+		if(mFill>=n) mFill = n-1;
+		if(mPos >=n) mPos  = n-1;	
+	}
 	
 	// Moves value one period closer to interval [0, max)
 	static int wrapOnce(int v, int max){
