@@ -100,9 +100,9 @@ public:
 	}
 
 	/// Appends element to end of array doubling array size if necessary
-	void append(const T &v, double incFactor=2){
+	void append(const T &v, double growFactor=2){
 		if(size() >= capacity()){	// double array size if too small
-			mElems.resize((size() ? size() : 4)*incFactor);
+			mElems.resize((size() ? size() : 4)*growFactor);
 		}
 		construct(elems()+size(), v);
 		++mSize;
