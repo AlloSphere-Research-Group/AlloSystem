@@ -34,18 +34,29 @@ void Shader::get(int pname, void * params) const { glGetShaderiv(id(), pname, (G
 
 void Shader::onCreate(){
 	mID = glCreateShader(mType);
-	source(); compile();
+	if(mSource[0]){
+		sendSource(); compile();
+	}
 }
 
 void Shader::onDestroy(){ glDeleteShader(id()); }
 
-void Shader::source(){
+void Shader::sendSource(){
 	const char * s = mSource.c_str();
 	glShaderSource(id(), 1, &s, NULL);
 }
 
 Shader& Shader::source(const std::string& v){
-	mSource = v; source(); return *this;
+	mSource = v;
+	if(created()){
+		sendSource();
+		compile();
+	}
+	return *this;
+}
+
+Shader& Shader::source(const std::string& src, ShaderType::t type){
+	mType=type; return source(src);
 }
 	
 

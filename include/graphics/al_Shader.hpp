@@ -34,20 +34,21 @@ protected:
 class Shader : public ShaderBase{
 public:
 
-	Shader(const std::string& source, ShaderType::t type);
+	Shader(const std::string& source="", ShaderType::t type=ShaderType::Fragment);
 	
 	/// This will automatically delete the shader object when it is no longer 
 	/// attached to any program object.
-	virtual ~Shader(){}
+	virtual ~Shader(){ destroy(); }
 
 	Shader& source(const std::string& v);
+	Shader& source(const std::string& v, ShaderType::t type);
 	Shader& compile();
 	bool compiled() const;
 
 private:
 	std::string mSource;
 	GLenum mType;
-	void source();
+	void sendSource();
 
 	virtual void get(int pname, void * params) const;
 	
@@ -63,7 +64,7 @@ public:
 	ShaderProgram(){}
 	
 	/// Any attached shaders will automatically be detached, but not deleted.
-	virtual ~ShaderProgram(){}
+	virtual ~ShaderProgram(){ destroy(); }
 	
 	const ShaderProgram& attach(const Shader& s) const;
 	const ShaderProgram& detach(const Shader& s) const;
