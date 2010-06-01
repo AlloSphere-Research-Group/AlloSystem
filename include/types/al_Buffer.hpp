@@ -66,7 +66,11 @@ public:
 	/// Get element at absolute index
 	const T& operator[](int i) const { return atAbs(i); }
 
+	/// Assign value to elements
 
+	/// This function fills a Buffer with n copies of the given value. Note that
+	/// the assignment completely changes the buffer and that the resulting size
+	/// is the same as the number of elements assigned.  Old data may be lost.
 	void assign(int n, const T& v){ mElems.assign(n,v); }
 
 	/// Set element at absolute index
@@ -81,30 +85,39 @@ public:
 	/// Get element at relative index
 	const T& atRel(int i) const { return mElems[wrapOnce(pos()-i, size())]; }
 
-//	/// Get last element
-//	const T& last() const { return mElems[mSize-1]; }
+	/// Get last element
+	const T& last() const { return mElems[mPos-1]; }
 
 	/// Clear
 	void clear(){ mSize=mFill=0; mPos=-1; }
 
-	/// Resize
+	/// Resize buffer
+	
+	/// This will set both the size and capacity of the buffer to the requested 
+	/// size. If the number is smaller than the current size the buffer is 
+	/// truncated, otherwise the buffer is extended and new elements are
+	/// default-constructed.
 	void resize(int n){
 		mElems.resize(n);
 		setSize(n);
 	}
 	
-	/// Resize only if current size is less than requested size
-	void upsize(int n){
+	/// Set size of buffer
+	
+	/// If the requested size is larger than the current capacity, then the 
+	/// buffer will be resized.
+	void size(int n){
 		if(capacity() < n) resize(n);
 		else setSize(n);
 	}
 
-	/// Appends element to end of array doubling array size if necessary
+	/// Appends element to end of buffer growing its size if necessary
 	void append(const T &v, double growFactor=2){
 		if(size() >= capacity()){	// double array size if too small
 			mElems.resize((size() ? size() : 4)*growFactor);
 		}
 		construct(elems()+size(), v);
+		mPos=mSize;
 		++mSize;
 	}
 
