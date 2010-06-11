@@ -40,7 +40,48 @@
 namespace al{
 
 /// Get name of current host
-std::string getHostName();
+//std::string getHostName();
+
+
+class Socket{
+public:
+
+	Socket(unsigned int port, const char * address, bool sender);
+	virtual ~Socket();
+
+	unsigned int port() const { return mPort; }
+	
+protected:
+	unsigned int mPort;
+
+	size_t recv(char * buffer, size_t maxlen);
+	size_t send(const char * buffer, size_t len);
+
+private:
+	class Impl; Impl * mImpl;
+};
+
+
+class SocketSend : public Socket {
+public:
+	SocketSend(const char * address, unsigned int port)
+	:	Socket(port, address, true)
+	{}
+	
+	size_t send(const char * buffer, size_t len){ return Socket::send(buffer, len); }
+};
+
+
+
+class SocketRecv : public Socket {
+public:
+	SocketRecv(unsigned int port)
+	:	Socket(port, NULL, false)
+	{}
+	
+	size_t recv(char * buffer, size_t maxlen){ return Socket::recv(buffer, maxlen); }
+};
+
 
 } // al::
 

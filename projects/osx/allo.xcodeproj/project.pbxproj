@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		160DAE1011C1B15C00C6905A /* utIOSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160DAE0F11C1B15C00C6905A /* utIOSocket.cpp */; };
+		160DAE1311C1B1FE00C6905A /* al_SocketAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160DAE1211C1B1FE00C6905A /* al_SocketAPR.cpp */; };
+		160DAE1411C1B1FE00C6905A /* al_SocketAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160DAE1211C1B1FE00C6905A /* al_SocketAPR.cpp */; };
 		1619909E11743990006FBADF /* al_Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1619909C11743990006FBADF /* al_Color.cpp */; };
 		1619909F11743990006FBADF /* al_Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1619909C11743990006FBADF /* al_Color.cpp */; };
 		166DD742117CDB6000A8BA12 /* al_Conversion.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 166DD741117CDB6000A8BA12 /* al_Conversion.hpp */; };
@@ -76,7 +79,6 @@
 		16B5C156118901680090CE80 /* al_Serialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE7116D527D00928703 /* al_Serialize.cpp */; };
 		16B5C157118901720090CE80 /* al_AudioIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEDE116D527D00928703 /* al_AudioIO.cpp */; };
 		16B5C158118901720090CE80 /* al_File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEDF116D527D00928703 /* al_File.cpp */; };
-		16B5C159118901720090CE80 /* al_Socket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE0116D527D00928703 /* al_Socket.cpp */; };
 		16B5C15A118901720090CE80 /* al_WindowGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE1116D527D00928703 /* al_WindowGL.cpp */; };
 		16B5C15B118901720090CE80 /* al_WindowGLUT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE2116D527D00928703 /* al_WindowGLUT.cpp */; };
 		16B5C15C118901820090CE80 /* al_Config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF6116D527D00928703 /* al_Config.cpp */; };
@@ -272,6 +274,8 @@
 
 /* Begin PBXFileReference section */
 		08FB7796FE84155DC02AAC07 /* exScheduling.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exScheduling.cpp; sourceTree = "<group>"; };
+		160DAE0F11C1B15C00C6905A /* utIOSocket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utIOSocket.cpp; path = ../../unitTests/utIOSocket.cpp; sourceTree = SOURCE_ROOT; };
+		160DAE1211C1B1FE00C6905A /* al_SocketAPR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_SocketAPR.cpp; sourceTree = "<group>"; };
 		16198FF31173E39B006FBADF /* al_Buffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Buffer.hpp; sourceTree = "<group>"; };
 		1619909B11743914006FBADF /* al_Color.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Color.hpp; sourceTree = "<group>"; };
 		1619909C11743990006FBADF /* al_Color.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Color.cpp; sourceTree = "<group>"; };
@@ -660,6 +664,7 @@
 				16AC52A111628D4D0076AA8B /* utAllocore.h */,
 				16AC529F11628D4D0076AA8B /* utAllocore.cpp */,
 				16AC52A011628D4D0076AA8B /* utIOAudioIO.cpp */,
+				160DAE0F11C1B15C00C6905A /* utIOSocket.cpp */,
 				16AC52A511628D4D0076AA8B /* utIOWindowGL.cpp */,
 				1697339A11768CDF0025299C /* utMath.cpp */,
 				16B5BF8C1188D0E90090CE80 /* utProtocolGraphics.cpp */,
@@ -773,6 +778,7 @@
 				3622BEDE116D527D00928703 /* al_AudioIO.cpp */,
 				3622BEDF116D527D00928703 /* al_File.cpp */,
 				3622BEE0116D527D00928703 /* al_Socket.cpp */,
+				160DAE1211C1B1FE00C6905A /* al_SocketAPR.cpp */,
 				3622BEE1116D527D00928703 /* al_WindowGL.cpp */,
 				3622BEE2116D527D00928703 /* al_WindowGLUT.cpp */,
 				3622BEE3116D527D00928703 /* Makefile.config */,
@@ -1321,7 +1327,6 @@
 				16B5C16A118901BF0090CE80 /* OscTypes.cpp in Sources */,
 				16B5C157118901720090CE80 /* al_AudioIO.cpp in Sources */,
 				16B5C158118901720090CE80 /* al_File.cpp in Sources */,
-				16B5C159118901720090CE80 /* al_Socket.cpp in Sources */,
 				16B5C15A118901720090CE80 /* al_WindowGL.cpp in Sources */,
 				16B5C15B118901720090CE80 /* al_WindowGLUT.cpp in Sources */,
 				16B5C153118901680090CE80 /* al_Graphics.cpp in Sources */,
@@ -1347,6 +1352,8 @@
 				16B5BFEF1188E8B60090CE80 /* utIOWindowGL.cpp in Sources */,
 				16D46564118F57970039A84C /* al_Printing.cpp in Sources */,
 				16885C9A11A5E7A500071F90 /* al_Camera.cpp in Sources */,
+				160DAE1011C1B15C00C6905A /* utIOSocket.cpp in Sources */,
+				160DAE1311C1B1FE00C6905A /* al_SocketAPR.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1445,6 +1452,7 @@
 				16AA960A118F774800B98EC3 /* al_Texture.cpp in Sources */,
 				16AA9680118F7D6600B98EC3 /* al_Shader.cpp in Sources */,
 				16885C9911A5E7A500071F90 /* al_Camera.cpp in Sources */,
+				160DAE1411C1B1FE00C6905A /* al_SocketAPR.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -4,8 +4,10 @@
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "io/al_AudioIO.hpp"
+#include "io/al_Socket.hpp"
 #include "io/al_WindowGL.hpp"
 #include "math/al_Complex.hpp"
 #include "math/al_Functions.hpp"
@@ -37,6 +39,7 @@
 using namespace al;
 
 int utIOAudioIO();
+int utIOSocket();
 int utIOWindowGL();
 int utMath();
 int utProtocolGraphics();
