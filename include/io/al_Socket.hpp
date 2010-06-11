@@ -50,6 +50,9 @@ public:
 
 	/// Get name of current host
 	static std::string hostName();
+	
+	/// IP address of current host
+	static std::string hostIP();
 
 protected:
 	unsigned int mPort;

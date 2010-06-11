@@ -7,14 +7,16 @@
 #include "apr-1/apr_pools.h"
 #include "apr-1/apr_network_io.h"
 
+#define PRINT_SOCKADDR(s)\
+	printf("%s %s\n", s->hostname, s->servname);
+
 namespace al{
 
 static apr_status_t check_apr(apr_status_t err) {
 	char errstr[1024];
 	if (err != APR_SUCCESS) {
-		apr_strerror(err, errstr, 1024);
+		apr_strerror(err, errstr, sizeof(errstr));
 		fprintf(stderr, errstr);
-		//throw new osc::Exception(errstr);
 	}
 	return err;
 }
@@ -39,6 +41,15 @@ struct Socket::Impl{
 		check_apr(apr_socket_opt_set(sock, APR_SO_NONBLOCK, 1));
 		mAddress = sa;
 		mSock = sock;
+
+//		char * buf;		
+////		apr_sockaddr_ip_get(&buf, mAddress);
+//		apr_getnameinfo(&buf, sa, 0);	
+////		char * scopeid;
+////		apr_port_t p = port;
+////		apr_parse_addr_port(&buf, &scopeid, &p, "localhost", defaultPool());
+//		printf("%s\n", buf);
+
 	}
 	
 	~Impl(){
@@ -81,8 +92,17 @@ size_t Socket::send(const char * buffer, size_t len) {
 	return size;
 }
 
+
+std::string Socket::hostIP(){
+	apr_sockaddr_t * sa;
+	apr_sockaddr_info_get(&sa, hostName().c_str(), APR_INET, 7007, 0, Impl::defaultPool());
+	char * addr;
+	apr_sockaddr_ip_get(&addr, sa);
+	return addr;
+}
+
 std::string Socket::hostName(){
-	char buf[256];
+	char buf[APRMAXHOSTLEN+1];
 	check_apr(apr_gethostname(buf, sizeof(buf), Impl::defaultPool()));
 	return buf;
 }
