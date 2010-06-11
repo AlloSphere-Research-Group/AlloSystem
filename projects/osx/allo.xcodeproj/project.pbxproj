@@ -131,7 +131,6 @@
 		3622BEB2116D516100928703 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
 		3622BF07116D52AB00928703 /* al_AudioIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEDE116D527D00928703 /* al_AudioIO.cpp */; };
 		3622BF08116D52AB00928703 /* al_File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEDF116D527D00928703 /* al_File.cpp */; };
-		3622BF09116D52AB00928703 /* al_Socket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE0116D527D00928703 /* al_Socket.cpp */; };
 		3622BF0A116D52AB00928703 /* al_WindowGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE1116D527D00928703 /* al_WindowGL.cpp */; };
 		3622BF0B116D52AB00928703 /* al_WindowGLUT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE2116D527D00928703 /* al_WindowGLUT.cpp */; };
 		3622BF0C116D52AF00928703 /* al_OSC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE5116D527D00928703 /* al_OSC.cpp */; };
@@ -359,7 +358,6 @@
 		3622BEB6116D516100928703 /* exMainloopGLUT */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exMainloopGLUT; sourceTree = BUILT_PRODUCTS_DIR; };
 		3622BEDE116D527D00928703 /* al_AudioIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_AudioIO.cpp; sourceTree = "<group>"; };
 		3622BEDF116D527D00928703 /* al_File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_File.cpp; sourceTree = "<group>"; };
-		3622BEE0116D527D00928703 /* al_Socket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Socket.cpp; sourceTree = "<group>"; };
 		3622BEE1116D527D00928703 /* al_WindowGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_WindowGL.cpp; sourceTree = "<group>"; };
 		3622BEE2116D527D00928703 /* al_WindowGLUT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_WindowGLUT.cpp; sourceTree = "<group>"; };
 		3622BEE3116D527D00928703 /* Makefile.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.config; sourceTree = "<group>"; };
@@ -777,7 +775,6 @@
 			children = (
 				3622BEDE116D527D00928703 /* al_AudioIO.cpp */,
 				3622BEDF116D527D00928703 /* al_File.cpp */,
-				3622BEE0116D527D00928703 /* al_Socket.cpp */,
 				160DAE1211C1B1FE00C6905A /* al_SocketAPR.cpp */,
 				3622BEE1116D527D00928703 /* al_WindowGL.cpp */,
 				3622BEE2116D527D00928703 /* al_WindowGLUT.cpp */,
@@ -1427,7 +1424,6 @@
 				3622BF0E116D52AF00928703 /* al_Serialize.cpp in Sources */,
 				3622BF07116D52AB00928703 /* al_AudioIO.cpp in Sources */,
 				3622BF08116D52AB00928703 /* al_File.cpp in Sources */,
-				3622BF09116D52AB00928703 /* al_Socket.cpp in Sources */,
 				3622BF0A116D52AB00928703 /* al_WindowGL.cpp in Sources */,
 				3622BF0B116D52AB00928703 /* al_WindowGLUT.cpp in Sources */,
 				3622BF15116D52B800928703 /* al_msg.cpp in Sources */,
