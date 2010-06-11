@@ -68,6 +68,7 @@ public:
 	:	Socket(port, address, true)
 	{}
 	
+	/// Send data over a network
 	size_t send(const char * buffer, size_t len){ return Socket::send(buffer, len); }
 };
 
@@ -79,6 +80,7 @@ public:
 	:	Socket(port, NULL, false)
 	{}
 	
+	/// Read data from a network
 	size_t recv(char * buffer, size_t maxlen){ return Socket::recv(buffer, maxlen); }
 };
 
