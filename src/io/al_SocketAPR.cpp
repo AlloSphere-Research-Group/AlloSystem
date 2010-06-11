@@ -7,6 +7,8 @@
 #include "apr-1/apr_pools.h"
 #include "apr-1/apr_network_io.h"
 
+#include "../private/al_ImplAPR.h"
+
 #define PRINT_SOCKADDR(s)\
 	printf("%s %s\n", s->hostname, s->servname);
 

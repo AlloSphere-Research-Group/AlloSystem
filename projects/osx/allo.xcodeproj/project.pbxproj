@@ -281,6 +281,7 @@
 		166DD741117CDB6000A8BA12 /* al_Conversion.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Conversion.hpp; sourceTree = "<group>"; };
 		166DD744117CDBFD00A8BA12 /* utTypesConversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utTypesConversion.cpp; path = ../../unitTests/utTypesConversion.cpp; sourceTree = SOURCE_ROOT; };
 		166DD78D117CDF1800A8BA12 /* pstdint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pstdint.h; sourceTree = "<group>"; };
+		1685D3C111C2EDB5009F676C /* al_ImplAPR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_ImplAPR.h; sourceTree = "<group>"; };
 		16885C9611A5E79800071F90 /* al_Camera.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Camera.hpp; sourceTree = "<group>"; };
 		16885C9811A5E7A500071F90 /* al_Camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Camera.cpp; sourceTree = "<group>"; };
 		168EC8EB1161CA2C00FCACC7 /* al_Time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Time.h; sourceTree = "<group>"; };
@@ -611,6 +612,14 @@
 			name = alscheduling;
 			sourceTree = "<group>";
 		};
+		1685D3C011C2EDB5009F676C /* private */ = {
+			isa = PBXGroup;
+			children = (
+				1685D3C111C2EDB5009F676C /* al_ImplAPR.h */,
+			);
+			path = private;
+			sourceTree = "<group>";
+		};
 		1697336B11768ABD0025299C /* math */ = {
 			isa = PBXGroup;
 			children = (
@@ -760,6 +769,7 @@
 		3622BEDC116D527D00928703 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				1685D3C011C2EDB5009F676C /* private */,
 				16AA95F0118F74FB00B98EC3 /* graphics */,
 				3622BEDD116D527D00928703 /* io */,
 				3622BEE4116D527D00928703 /* protocol */,
