@@ -1,16 +1,18 @@
 #include "protocol/al_OSCAPR.hpp"
 
+#include "../private/al_ImplAPR.h"
+
 namespace osc {
 
-static apr_status_t check_apr(apr_status_t err) {
-	char errstr[1024];
-	if (err != APR_SUCCESS) {
-		apr_strerror(err, errstr, 1024);
-		fprintf(stderr, errstr);
-		throw new osc::Exception(errstr);
-	}
-	return err;
-}
+//static apr_status_t check_apr(apr_status_t err) {
+//	char errstr[1024];
+//	if (err != APR_SUCCESS) {
+//		apr_strerror(err, errstr, 1024);
+//		fprintf(stderr, errstr);
+//		throw new osc::Exception(errstr);
+//	}
+//	return err;
+//}
 
 static void osc_parsemessage(const osc::ReceivedMessage & p) {
 	printf("address %s tags %s args %ld\n", p.AddressPattern(), p.TypeTags(), p.ArgumentCount());
@@ -26,6 +28,8 @@ static void osc_parsebundle(const osc::ReceivedBundle & p, Recv::MessageParser h
 		}
 	}
 }
+
+using namespace al;
 
 Recv::Recv(unsigned int port) 
 : mPort(port) {

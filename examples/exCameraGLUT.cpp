@@ -23,7 +23,7 @@
 #include <stdlib.h>
 
 
-al::Graphics gl;
+al::gfx::Graphics gl;
 al::MsgTube inbox, outbox;
 
 void ontick(al_nsec time, void * userdata) {

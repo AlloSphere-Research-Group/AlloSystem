@@ -2,34 +2,18 @@
 #include "io/al_Socket.hpp"
 #include "system/al_Config.h"
 
-#include "apr-1/apr_general.h"
-#include "apr-1/apr_errno.h"
-#include "apr-1/apr_pools.h"
-#include "apr-1/apr_network_io.h"
-
 #include "../private/al_ImplAPR.h"
+#include "apr-1/apr_network_io.h"
 
 #define PRINT_SOCKADDR(s)\
 	printf("%s %s\n", s->hostname, s->servname);
 
 namespace al{
 
-static apr_status_t check_apr(apr_status_t err) {
-	char errstr[1024];
-	if (err != APR_SUCCESS) {
-		apr_strerror(err, errstr, sizeof(errstr));
-		fprintf(stderr, errstr);
-	}
-	return err;
-}
+struct Socket::Impl : public ImplAPR {
 
-
-struct Socket::Impl{
-
-	Impl(unsigned int port, const char * address, bool sender){
-		al_initialize();
-		check_apr(apr_pool_create(&mPool, NULL));
-	
+	Impl(unsigned int port, const char * address, bool sender) : ImplAPR() {
+		
 		/* @see http://dev.ariel-networks.com/apr/apr-tutorial/html/apr-tutorial-13.html */
 		// create socket:
 		apr_sockaddr_t * sa;
@@ -56,17 +40,8 @@ struct Socket::Impl{
 	
 	~Impl(){
 		apr_socket_close(mSock);
-		apr_pool_destroy(mPool);
 	}
 
-
-	static apr_pool_t * defaultPool(){
-		static apr_pool_t * p = 0;
-		if(!p) check_apr(apr_pool_create(&p, NULL));
-		return p;
-	}
-
-	apr_pool_t * mPool;
 	apr_sockaddr_t * mAddress;
 	apr_socket_t * mSock;
 };
@@ -96,16 +71,22 @@ size_t Socket::send(const char * buffer, size_t len) {
 
 
 std::string Socket::hostIP(){
-	apr_sockaddr_t * sa;
-	apr_sockaddr_info_get(&sa, hostName().c_str(), APR_INET, 7007, 0, Impl::defaultPool());
+	ImplAPR apr;
 	char * addr;
-	apr_sockaddr_ip_get(&addr, sa);
+	apr_sockaddr_t * sa;
+	apr_sockaddr_info_get(&sa, hostName().c_str(), APR_INET, 8000, 0, apr.pool());
+	while(sa) {
+		apr_sockaddr_ip_get(&addr, sa);
+		printf("%s %s %s %d %d\n", addr, sa->hostname, sa->servname, sa->port, sa->family);
+		sa = sa->next;
+	}
 	return addr;
 }
 
 std::string Socket::hostName(){
 	char buf[APRMAXHOSTLEN+1];
-	check_apr(apr_gethostname(buf, sizeof(buf), Impl::defaultPool()));
+	ImplAPR apr;
+	check_apr(apr_gethostname(buf, sizeof(buf), apr.pool()));
 	return buf;
 }
 

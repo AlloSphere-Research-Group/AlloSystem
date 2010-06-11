@@ -43,9 +43,6 @@ namespace al{
 class Socket{
 public:
 
-	Socket(unsigned int port, const char * address, bool sender);
-	virtual ~Socket();
-
 	unsigned int port() const { return mPort; }
 
 	/// Get name of current host
@@ -54,6 +51,12 @@ public:
 	/// IP address of current host
 	static std::string hostIP();
 
+protected:
+	
+	/// @sender: true if Socket will send
+	Socket(unsigned int port, const char * address, bool sender);
+	virtual ~Socket();
+	
 protected:
 	unsigned int mPort;
 
@@ -67,7 +70,7 @@ private:
 
 class SocketSend : public Socket {
 public:
-	SocketSend(const char * address, unsigned int port)
+	SocketSend(unsigned int port, const char * address = "localhost")
 	:	Socket(port, address, true)
 	{}
 	

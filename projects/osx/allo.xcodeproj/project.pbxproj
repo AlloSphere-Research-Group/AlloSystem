@@ -7,17 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		160DAE1011C1B15C00C6905A /* utIOSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160DAE0F11C1B15C00C6905A /* utIOSocket.cpp */; };
-		160DAE1311C1B1FE00C6905A /* al_SocketAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160DAE1211C1B1FE00C6905A /* al_SocketAPR.cpp */; };
 		160DAE1411C1B1FE00C6905A /* al_SocketAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160DAE1211C1B1FE00C6905A /* al_SocketAPR.cpp */; };
 		1619909E11743990006FBADF /* al_Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1619909C11743990006FBADF /* al_Color.cpp */; };
 		1619909F11743990006FBADF /* al_Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1619909C11743990006FBADF /* al_Color.cpp */; };
 		166DD742117CDB6000A8BA12 /* al_Conversion.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 166DD741117CDB6000A8BA12 /* al_Conversion.hpp */; };
 		166DD743117CDB6000A8BA12 /* al_Conversion.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 166DD741117CDB6000A8BA12 /* al_Conversion.hpp */; };
-		166DD745117CDBFD00A8BA12 /* utTypesConversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 166DD744117CDBFD00A8BA12 /* utTypesConversion.cpp */; };
 		16885C9711A5E79800071F90 /* al_Camera.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 16885C9611A5E79800071F90 /* al_Camera.hpp */; };
 		16885C9911A5E7A500071F90 /* al_Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16885C9811A5E7A500071F90 /* al_Camera.cpp */; };
-		16885C9A11A5E7A500071F90 /* al_Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16885C9811A5E7A500071F90 /* al_Camera.cpp */; };
 		168EC8F11161CA2C00FCACC7 /* al_Time.h in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8EB1161CA2C00FCACC7 /* al_Time.h */; };
 		168EC8F21161CA2C00FCACC7 /* al_MainLoop.h in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8EC1161CA2C00FCACC7 /* al_MainLoop.h */; };
 		168EC8F31161CA2C00FCACC7 /* al_Config.h in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8ED1161CA2C00FCACC7 /* al_Config.h */; };
@@ -32,17 +28,10 @@
 		1697337811768B040025299C /* al_Quat.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1697337411768B040025299C /* al_Quat.hpp */; };
 		1697338711768B6E0025299C /* al_Complex.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1697338611768B6E0025299C /* al_Complex.hpp */; };
 		1697338811768B6E0025299C /* al_Complex.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1697338611768B6E0025299C /* al_Complex.hpp */; };
-		1697339B11768CDF0025299C /* utMath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1697339A11768CDF0025299C /* utMath.cpp */; };
 		16AA95F6118F74FB00B98EC3 /* al_Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95F2118F74FB00B98EC3 /* al_Light.cpp */; };
 		16AA9600118F76B800B98EC3 /* al_Debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95FF118F76B800B98EC3 /* al_Debug.cpp */; };
 		16AA960A118F774800B98EC3 /* al_Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA9609118F774800B98EC3 /* al_Texture.cpp */; };
 		16AA9680118F7D6600B98EC3 /* al_Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA967F118F7D6600B98EC3 /* al_Shader.cpp */; };
-		16AC52A711628D4D0076AA8B /* utAllocore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC529F11628D4D0076AA8B /* utAllocore.cpp */; };
-		16AC52A811628D4D0076AA8B /* utIOAudioIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC52A011628D4D0076AA8B /* utIOAudioIO.cpp */; };
-		16AC52A911628D4D0076AA8B /* utSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC52A211628D4D0076AA8B /* utSystem.cpp */; };
-		16AC52AA11628D4D0076AA8B /* utProtocolSerialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC52A311628D4D0076AA8B /* utProtocolSerialize.cpp */; };
-		16AC52AB11628D4D0076AA8B /* utProtocolOSC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC52A411628D4D0076AA8B /* utProtocolOSC.cpp */; };
-		16AC52AD11628D4D0076AA8B /* utTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC52A611628D4D0076AA8B /* utTypes.cpp */; };
 		16AC52C911628EC50076AA8B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		16AC52D511628F860076AA8B /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
 		16AC52D611628F870076AA8B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
@@ -71,42 +60,14 @@
 		16AC5378116293EE0076AA8B /* al_tube.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36B4125110EFF7B8007B16D0 /* al_tube.hpp */; };
 		16AC5379116293EF0076AA8B /* al_types.h in Headers */ = {isa = PBXBuildFile; fileRef = 36B4125210EFF7B8007B16D0 /* al_types.h */; };
 		16AC537A116293F00076AA8B /* al_types.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36B4125310EFF7B8007B16D0 /* al_types.hpp */; };
-		16B5BF8D1188D0E90090CE80 /* utProtocolGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16B5BF8C1188D0E90090CE80 /* utProtocolGraphics.cpp */; };
-		16B5BFEF1188E8B60090CE80 /* utIOWindowGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC52A511628D4D0076AA8B /* utIOWindowGL.cpp */; };
-		16B5C153118901680090CE80 /* al_Graphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 362127C81173CDBB009CB6FC /* al_Graphics.cpp */; };
-		16B5C154118901680090CE80 /* al_GraphicsOpenGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 362127DD1173D5A2009CB6FC /* al_GraphicsOpenGL.cpp */; };
-		16B5C155118901680090CE80 /* al_OSC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE5116D527D00928703 /* al_OSC.cpp */; };
-		16B5C156118901680090CE80 /* al_Serialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE7116D527D00928703 /* al_Serialize.cpp */; };
-		16B5C157118901720090CE80 /* al_AudioIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEDE116D527D00928703 /* al_AudioIO.cpp */; };
-		16B5C158118901720090CE80 /* al_File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEDF116D527D00928703 /* al_File.cpp */; };
-		16B5C15A118901720090CE80 /* al_WindowGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE1116D527D00928703 /* al_WindowGL.cpp */; };
-		16B5C15B118901720090CE80 /* al_WindowGLUT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE2116D527D00928703 /* al_WindowGLUT.cpp */; };
-		16B5C15C118901820090CE80 /* al_Config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF6116D527D00928703 /* al_Config.cpp */; };
-		16B5C15D118901820090CE80 /* al_MainLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF7116D527D00928703 /* al_MainLoop.cpp */; };
-		16B5C15E118901820090CE80 /* al_Time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFA116D527D00928703 /* al_Time.cpp */; };
-		16B5C15F118901950090CE80 /* al_Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1619909C11743990006FBADF /* al_Color.cpp */; };
-		16B5C160118901950090CE80 /* al_msg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFE116D527D00928703 /* al_msg.cpp */; };
-		16B5C161118901950090CE80 /* al_quat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFF116D527D00928703 /* al_quat.cpp */; };
-		16B5C162118901950090CE80 /* al_socktube.c in Sources */ = {isa = PBXBuildFile; fileRef = 3622BF00116D527D00928703 /* al_socktube.c */; };
-		16B5C166118901BF0090CE80 /* IpEndpointName.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEEA116D527D00928703 /* IpEndpointName.cpp */; };
-		16B5C167118901BF0090CE80 /* OscOutboundPacketStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEEB116D527D00928703 /* OscOutboundPacketStream.cpp */; };
-		16B5C168118901BF0090CE80 /* OscPrintReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEEC116D527D00928703 /* OscPrintReceivedElements.cpp */; };
-		16B5C169118901BF0090CE80 /* OscReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEED116D527D00928703 /* OscReceivedElements.cpp */; };
-		16B5C16A118901BF0090CE80 /* OscTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEEE116D527D00928703 /* OscTypes.cpp */; };
-		16B5C16B118901C30090CE80 /* NetworkingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF0116D527D00928703 /* NetworkingUtils.cpp */; };
-		16B5C16C118901C30090CE80 /* UdpSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF1116D527D00928703 /* UdpSocket.cpp */; };
 		16B5C1731189020B0090CE80 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
 		16B5C1741189020B0090CE80 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
-		16B5C1781189022A0090CE80 /* al_GraphicsOpenGLES1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 362128BC1173E372009CB6FC /* al_GraphicsOpenGLES1.cpp */; };
-		16B5C1791189022A0090CE80 /* al_GraphicsOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 362128BE1173E382009CB6FC /* al_GraphicsOpenGLES2.cpp */; };
-		16B5C17E1189026C0090CE80 /* al_MainLoopOSX.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF9116D527D00928703 /* al_MainLoopOSX.mm */; };
 		16BC66A4117770BF002A0C18 /* al_Constants.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 16BC66A1117770BF002A0C18 /* al_Constants.hpp */; };
 		16BC66A5117770BF002A0C18 /* al_Functions.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 16BC66A2117770BF002A0C18 /* al_Functions.hpp */; };
 		16BC66A6117770BF002A0C18 /* al_Interpolation.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 16BC66A3117770BF002A0C18 /* al_Interpolation.hpp */; };
 		16BC66A7117770BF002A0C18 /* al_Constants.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 16BC66A1117770BF002A0C18 /* al_Constants.hpp */; };
 		16BC66A8117770BF002A0C18 /* al_Functions.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 16BC66A2117770BF002A0C18 /* al_Functions.hpp */; };
 		16BC66A9117770BF002A0C18 /* al_Interpolation.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 16BC66A3117770BF002A0C18 /* al_Interpolation.hpp */; };
-		16D46564118F57970039A84C /* al_Printing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16D46563118F57970039A84C /* al_Printing.cpp */; };
 		16D46565118F57970039A84C /* al_Printing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16D46563118F57970039A84C /* al_Printing.cpp */; };
 		3602B4D0110A67C9005DC3D0 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
 		3602B4D1110A67C9005DC3D0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
@@ -185,6 +146,52 @@
 		36B4129910EFF864007B16D0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		36B412B010EFF916007B16D0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		36B4137D10EFFCC5007B16D0 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
+		36BAE05411C2EEBC009A8BBD /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
+		36BAE06011C2F00F009A8BBD /* utAllocore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC529F11628D4D0076AA8B /* utAllocore.cpp */; };
+		36BAE06111C2F00F009A8BBD /* utIOAudioIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC52A011628D4D0076AA8B /* utIOAudioIO.cpp */; };
+		36BAE06211C2F00F009A8BBD /* utIOSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160DAE0F11C1B15C00C6905A /* utIOSocket.cpp */; };
+		36BAE06311C2F00F009A8BBD /* utIOWindowGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC52A511628D4D0076AA8B /* utIOWindowGL.cpp */; };
+		36BAE06411C2F00F009A8BBD /* utMath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1697339A11768CDF0025299C /* utMath.cpp */; };
+		36BAE06511C2F00F009A8BBD /* utProtocolGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16B5BF8C1188D0E90090CE80 /* utProtocolGraphics.cpp */; };
+		36BAE06611C2F00F009A8BBD /* utProtocolOSC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC52A411628D4D0076AA8B /* utProtocolOSC.cpp */; };
+		36BAE06711C2F00F009A8BBD /* utProtocolSerialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC52A311628D4D0076AA8B /* utProtocolSerialize.cpp */; };
+		36BAE06811C2F00F009A8BBD /* utSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC52A211628D4D0076AA8B /* utSystem.cpp */; };
+		36BAE06911C2F00F009A8BBD /* utTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC52A611628D4D0076AA8B /* utTypes.cpp */; };
+		36BAE06A11C2F00F009A8BBD /* utTypesConversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 166DD744117CDBFD00A8BA12 /* utTypesConversion.cpp */; };
+		36BAE1C311C2FAFF009A8BBD /* al_Config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF6116D527D00928703 /* al_Config.cpp */; };
+		36BAE1C411C2FAFF009A8BBD /* al_MainLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF7116D527D00928703 /* al_MainLoop.cpp */; };
+		36BAE1C511C2FAFF009A8BBD /* al_MainLoopOSX.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF9116D527D00928703 /* al_MainLoopOSX.mm */; };
+		36BAE1C611C2FAFF009A8BBD /* al_TimeAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFB116D527D00928703 /* al_TimeAPR.cpp */; };
+		36BAE1C711C2FAFF009A8BBD /* al_OSC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE5116D527D00928703 /* al_OSC.cpp */; };
+		36BAE1C811C2FAFF009A8BBD /* al_OSCAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE6116D527D00928703 /* al_OSCAPR.cpp */; };
+		36BAE1C911C2FAFF009A8BBD /* al_Serialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE7116D527D00928703 /* al_Serialize.cpp */; };
+		36BAE1CA11C2FAFF009A8BBD /* al_AudioIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEDE116D527D00928703 /* al_AudioIO.cpp */; };
+		36BAE1CB11C2FAFF009A8BBD /* al_File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEDF116D527D00928703 /* al_File.cpp */; };
+		36BAE1CC11C2FAFF009A8BBD /* al_WindowGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE1116D527D00928703 /* al_WindowGL.cpp */; };
+		36BAE1CD11C2FAFF009A8BBD /* al_WindowGLUT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE2116D527D00928703 /* al_WindowGLUT.cpp */; };
+		36BAE1CE11C2FAFF009A8BBD /* al_msg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFE116D527D00928703 /* al_msg.cpp */; };
+		36BAE1CF11C2FAFF009A8BBD /* al_quat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFF116D527D00928703 /* al_quat.cpp */; };
+		36BAE1D011C2FAFF009A8BBD /* al_socktube.c in Sources */ = {isa = PBXBuildFile; fileRef = 3622BF00116D527D00928703 /* al_socktube.c */; };
+		36BAE1D111C2FAFF009A8BBD /* IpEndpointName.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEEA116D527D00928703 /* IpEndpointName.cpp */; };
+		36BAE1D211C2FAFF009A8BBD /* OscOutboundPacketStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEEB116D527D00928703 /* OscOutboundPacketStream.cpp */; };
+		36BAE1D311C2FAFF009A8BBD /* OscPrintReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEEC116D527D00928703 /* OscPrintReceivedElements.cpp */; };
+		36BAE1D411C2FAFF009A8BBD /* OscReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEED116D527D00928703 /* OscReceivedElements.cpp */; };
+		36BAE1D511C2FAFF009A8BBD /* OscTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEEE116D527D00928703 /* OscTypes.cpp */; };
+		36BAE1D611C2FAFF009A8BBD /* NetworkingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF0116D527D00928703 /* NetworkingUtils.cpp */; };
+		36BAE1D711C2FAFF009A8BBD /* UdpSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF1116D527D00928703 /* UdpSocket.cpp */; };
+		36BAE1D811C2FAFF009A8BBD /* al_Graphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 362127C81173CDBB009CB6FC /* al_Graphics.cpp */; };
+		36BAE1D911C2FAFF009A8BBD /* al_GraphicsOpenGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 362127DD1173D5A2009CB6FC /* al_GraphicsOpenGL.cpp */; };
+		36BAE1DA11C2FAFF009A8BBD /* al_GraphicsOpenGLES1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 362128BC1173E372009CB6FC /* al_GraphicsOpenGLES1.cpp */; };
+		36BAE1DB11C2FAFF009A8BBD /* al_GraphicsOpenGLES2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 362128BE1173E382009CB6FC /* al_GraphicsOpenGLES2.cpp */; };
+		36BAE1DC11C2FAFF009A8BBD /* al_Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1619909C11743990006FBADF /* al_Color.cpp */; };
+		36BAE1DD11C2FAFF009A8BBD /* ringbuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 3659D755117B8AFA0065EBE4 /* ringbuffer.c */; };
+		36BAE1DE11C2FAFF009A8BBD /* al_Printing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16D46563118F57970039A84C /* al_Printing.cpp */; };
+		36BAE1DF11C2FAFF009A8BBD /* al_Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95F2118F74FB00B98EC3 /* al_Light.cpp */; };
+		36BAE1E011C2FAFF009A8BBD /* al_Debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95FF118F76B800B98EC3 /* al_Debug.cpp */; };
+		36BAE1E111C2FAFF009A8BBD /* al_Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA9609118F774800B98EC3 /* al_Texture.cpp */; };
+		36BAE1E211C2FAFF009A8BBD /* al_Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA967F118F7D6600B98EC3 /* al_Shader.cpp */; };
+		36BAE1E311C2FAFF009A8BBD /* al_Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16885C9811A5E7A500071F90 /* al_Camera.cpp */; };
+		36BAE1E411C2FAFF009A8BBD /* al_SocketAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160DAE1211C1B1FE00C6905A /* al_SocketAPR.cpp */; };
 		36F46824110BE2E90082D21E /* al_AudioIO.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36F46821110BE2E90082D21E /* al_AudioIO.hpp */; };
 		36F46825110BE2E90082D21E /* al_File.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36F46822110BE2E90082D21E /* al_File.hpp */; };
 		36F46826110BE2E90082D21E /* al_WindowGL.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36F46823110BE2E90082D21E /* al_WindowGL.hpp */; };
@@ -469,6 +476,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36BAE05411C2EEBC009A8BBD /* liballocore.a in Frameworks */,
 				3622BFC1116D55B500928703 /* OpenGL.framework in Frameworks */,
 				16AC531D116290BE0076AA8B /* AudioToolbox.framework in Frameworks */,
 				16AC5315116290AA0076AA8B /* AudioUnit.framework in Frameworks */,
@@ -1322,45 +1330,51 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				16B5C17E1189026C0090CE80 /* al_MainLoopOSX.mm in Sources */,
-				16B5C1781189022A0090CE80 /* al_GraphicsOpenGLES1.cpp in Sources */,
-				16B5C1791189022A0090CE80 /* al_GraphicsOpenGLES2.cpp in Sources */,
-				16B5C16B118901C30090CE80 /* NetworkingUtils.cpp in Sources */,
-				16B5C16C118901C30090CE80 /* UdpSocket.cpp in Sources */,
-				16B5C166118901BF0090CE80 /* IpEndpointName.cpp in Sources */,
-				16B5C167118901BF0090CE80 /* OscOutboundPacketStream.cpp in Sources */,
-				16B5C168118901BF0090CE80 /* OscPrintReceivedElements.cpp in Sources */,
-				16B5C169118901BF0090CE80 /* OscReceivedElements.cpp in Sources */,
-				16B5C16A118901BF0090CE80 /* OscTypes.cpp in Sources */,
-				16B5C157118901720090CE80 /* al_AudioIO.cpp in Sources */,
-				16B5C158118901720090CE80 /* al_File.cpp in Sources */,
-				16B5C15A118901720090CE80 /* al_WindowGL.cpp in Sources */,
-				16B5C15B118901720090CE80 /* al_WindowGLUT.cpp in Sources */,
-				16B5C153118901680090CE80 /* al_Graphics.cpp in Sources */,
-				16B5C154118901680090CE80 /* al_GraphicsOpenGL.cpp in Sources */,
-				16B5C155118901680090CE80 /* al_OSC.cpp in Sources */,
-				16B5C156118901680090CE80 /* al_Serialize.cpp in Sources */,
-				16B5C15C118901820090CE80 /* al_Config.cpp in Sources */,
-				16B5C15D118901820090CE80 /* al_MainLoop.cpp in Sources */,
-				16B5C15E118901820090CE80 /* al_Time.cpp in Sources */,
-				16B5C15F118901950090CE80 /* al_Color.cpp in Sources */,
-				16B5C160118901950090CE80 /* al_msg.cpp in Sources */,
-				16B5C161118901950090CE80 /* al_quat.cpp in Sources */,
-				16B5C162118901950090CE80 /* al_socktube.c in Sources */,
-				16AC52A711628D4D0076AA8B /* utAllocore.cpp in Sources */,
-				16AC52A811628D4D0076AA8B /* utIOAudioIO.cpp in Sources */,
-				16AC52A911628D4D0076AA8B /* utSystem.cpp in Sources */,
-				16AC52AA11628D4D0076AA8B /* utProtocolSerialize.cpp in Sources */,
-				16AC52AB11628D4D0076AA8B /* utProtocolOSC.cpp in Sources */,
-				16AC52AD11628D4D0076AA8B /* utTypes.cpp in Sources */,
-				1697339B11768CDF0025299C /* utMath.cpp in Sources */,
-				166DD745117CDBFD00A8BA12 /* utTypesConversion.cpp in Sources */,
-				16B5BF8D1188D0E90090CE80 /* utProtocolGraphics.cpp in Sources */,
-				16B5BFEF1188E8B60090CE80 /* utIOWindowGL.cpp in Sources */,
-				16D46564118F57970039A84C /* al_Printing.cpp in Sources */,
-				16885C9A11A5E7A500071F90 /* al_Camera.cpp in Sources */,
-				160DAE1011C1B15C00C6905A /* utIOSocket.cpp in Sources */,
-				160DAE1311C1B1FE00C6905A /* al_SocketAPR.cpp in Sources */,
+				36BAE1C311C2FAFF009A8BBD /* al_Config.cpp in Sources */,
+				36BAE1C411C2FAFF009A8BBD /* al_MainLoop.cpp in Sources */,
+				36BAE1C511C2FAFF009A8BBD /* al_MainLoopOSX.mm in Sources */,
+				36BAE1C611C2FAFF009A8BBD /* al_TimeAPR.cpp in Sources */,
+				36BAE1C711C2FAFF009A8BBD /* al_OSC.cpp in Sources */,
+				36BAE1C811C2FAFF009A8BBD /* al_OSCAPR.cpp in Sources */,
+				36BAE1C911C2FAFF009A8BBD /* al_Serialize.cpp in Sources */,
+				36BAE1CA11C2FAFF009A8BBD /* al_AudioIO.cpp in Sources */,
+				36BAE1CB11C2FAFF009A8BBD /* al_File.cpp in Sources */,
+				36BAE1CC11C2FAFF009A8BBD /* al_WindowGL.cpp in Sources */,
+				36BAE1CD11C2FAFF009A8BBD /* al_WindowGLUT.cpp in Sources */,
+				36BAE1CE11C2FAFF009A8BBD /* al_msg.cpp in Sources */,
+				36BAE1CF11C2FAFF009A8BBD /* al_quat.cpp in Sources */,
+				36BAE1D011C2FAFF009A8BBD /* al_socktube.c in Sources */,
+				36BAE1D111C2FAFF009A8BBD /* IpEndpointName.cpp in Sources */,
+				36BAE1D211C2FAFF009A8BBD /* OscOutboundPacketStream.cpp in Sources */,
+				36BAE1D311C2FAFF009A8BBD /* OscPrintReceivedElements.cpp in Sources */,
+				36BAE1D411C2FAFF009A8BBD /* OscReceivedElements.cpp in Sources */,
+				36BAE1D511C2FAFF009A8BBD /* OscTypes.cpp in Sources */,
+				36BAE1D611C2FAFF009A8BBD /* NetworkingUtils.cpp in Sources */,
+				36BAE1D711C2FAFF009A8BBD /* UdpSocket.cpp in Sources */,
+				36BAE1D811C2FAFF009A8BBD /* al_Graphics.cpp in Sources */,
+				36BAE1D911C2FAFF009A8BBD /* al_GraphicsOpenGL.cpp in Sources */,
+				36BAE1DA11C2FAFF009A8BBD /* al_GraphicsOpenGLES1.cpp in Sources */,
+				36BAE1DB11C2FAFF009A8BBD /* al_GraphicsOpenGLES2.cpp in Sources */,
+				36BAE1DC11C2FAFF009A8BBD /* al_Color.cpp in Sources */,
+				36BAE1DD11C2FAFF009A8BBD /* ringbuffer.c in Sources */,
+				36BAE1DE11C2FAFF009A8BBD /* al_Printing.cpp in Sources */,
+				36BAE1DF11C2FAFF009A8BBD /* al_Light.cpp in Sources */,
+				36BAE1E011C2FAFF009A8BBD /* al_Debug.cpp in Sources */,
+				36BAE1E111C2FAFF009A8BBD /* al_Texture.cpp in Sources */,
+				36BAE1E211C2FAFF009A8BBD /* al_Shader.cpp in Sources */,
+				36BAE1E311C2FAFF009A8BBD /* al_Camera.cpp in Sources */,
+				36BAE1E411C2FAFF009A8BBD /* al_SocketAPR.cpp in Sources */,
+				36BAE06011C2F00F009A8BBD /* utAllocore.cpp in Sources */,
+				36BAE06111C2F00F009A8BBD /* utIOAudioIO.cpp in Sources */,
+				36BAE06211C2F00F009A8BBD /* utIOSocket.cpp in Sources */,
+				36BAE06311C2F00F009A8BBD /* utIOWindowGL.cpp in Sources */,
+				36BAE06411C2F00F009A8BBD /* utMath.cpp in Sources */,
+				36BAE06511C2F00F009A8BBD /* utProtocolGraphics.cpp in Sources */,
+				36BAE06611C2F00F009A8BBD /* utProtocolOSC.cpp in Sources */,
+				36BAE06711C2F00F009A8BBD /* utProtocolSerialize.cpp in Sources */,
+				36BAE06811C2F00F009A8BBD /* utSystem.cpp in Sources */,
+				36BAE06911C2F00F009A8BBD /* utTypes.cpp in Sources */,
+				36BAE06A11C2F00F009A8BBD /* utTypesConversion.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1628,7 +1642,7 @@
 					__STDC_CONSTANT_MACROS,
 					__STDC_LIMIT_MACROS,
 				);
-				GCC_VERSION = 4.0;
+				GCC_VERSION = 4.2;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -1652,7 +1666,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
-				SDKROOT = macosx10.4;
+				SDKROOT = macosx10.5;
 				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../include";
 			};
 			name = Debug;
@@ -1671,7 +1685,7 @@
 				);
 				GCC_STRICT_ALIASING = YES;
 				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = 4.0;
+				GCC_VERSION = 4.2;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -1695,7 +1709,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
-				SDKROOT = macosx10.4;
+				SDKROOT = macosx10.5;
 				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../include";
 			};
 			name = Release;
@@ -1735,7 +1749,7 @@
 					Carbon,
 				);
 				PRODUCT_NAME = $TARGET_NAME;
-				SDKROOT = macosx10.4;
+				SDKROOT = $inherited;
 				SYMROOT = ../../build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../dev_osx/include\"/**";
 			};
@@ -1769,7 +1783,7 @@
 					Carbon,
 				);
 				PRODUCT_NAME = $TARGET_NAME;
-				SDKROOT = macosx10.4;
+				SDKROOT = $inherited;
 				SYMROOT = ../../build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../dev_osx/include\"/**";
 			};
@@ -1809,7 +1823,7 @@
 					Carbon,
 				);
 				PRODUCT_NAME = $TARGET_NAME;
-				SDKROOT = macosx10.4;
+				SDKROOT = $inherited;
 				SYMROOT = ../../build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../dev_osx/include\"/**";
 			};
@@ -1842,7 +1856,7 @@
 					Carbon,
 				);
 				PRODUCT_NAME = $TARGET_NAME;
-				SDKROOT = macosx10.4;
+				SDKROOT = $inherited;
 				SYMROOT = ../../build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../dev_osx/include\"/**";
 			};
@@ -2108,7 +2122,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
-				SDKROOT = macosx10.4;
+				SDKROOT = $inherited;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
 				SYMROOT = ../../build;
 				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../include";
@@ -2140,7 +2154,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
-				SDKROOT = macosx10.4;
+				SDKROOT = $inherited;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
 				SYMROOT = ../../build;
 				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../include";
