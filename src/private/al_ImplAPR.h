@@ -42,7 +42,7 @@ static apr_status_t check_apr(apr_status_t err) {
 	char errstr[1024];
 	if (err != APR_SUCCESS) {
 		apr_strerror(err, errstr, sizeof(errstr));
-		fprintf(stderr, errstr);
+		fprintf(stderr, "%s\n", errstr);
 	}
 	return err;
 }
@@ -54,6 +54,7 @@ static apr_status_t check_apr(apr_status_t err) {
 inline void initialize_apr() {
 	static bool initialized = false;
 	if (!initialized) {
+		initialized = true;
 		check_apr(apr_initialize());
 		atexit(apr_terminate);
 	}
@@ -70,7 +71,6 @@ public:
 	}	
 
 	~ImplAPR() {
-		printf("~ImplAPR\n");
 		apr_pool_destroy(mPool);
 	}
 	
