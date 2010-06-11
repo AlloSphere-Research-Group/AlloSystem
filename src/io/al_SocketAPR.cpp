@@ -46,13 +46,20 @@ struct Socket::Impl{
 		apr_pool_destroy(mPool);
 	}
 
+
+	static apr_pool_t * defaultPool(){
+		static apr_pool_t * p = 0;
+		if(!p) check_apr(apr_pool_create(&p, NULL));
+		return p;
+	}
+
 	apr_pool_t * mPool;
 	apr_sockaddr_t * mAddress;
 	apr_socket_t * mSock;
 };
 
 
-// address == NULL for receiver
+
 
 Socket::Socket(unsigned int port, const char * address, bool sender) 
 : mImpl(new Impl(port, address, sender))
@@ -72,6 +79,12 @@ size_t Socket::send(const char * buffer, size_t len) {
 	//check_apr(apr_socket_send(mSock, buffer, &size));
 	apr_socket_send(mImpl->mSock, buffer, &size);
 	return size;
+}
+
+std::string Socket::hostName(){
+	char buf[256];
+	check_apr(apr_gethostname(buf, sizeof(buf), Impl::defaultPool()));
+	return buf;
 }
 
 } // al::

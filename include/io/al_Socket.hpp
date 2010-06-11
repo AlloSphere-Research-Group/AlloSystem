@@ -39,9 +39,6 @@
 
 namespace al{
 
-/// Get name of current host
-//std::string getHostName();
-
 
 class Socket{
 public:
@@ -50,7 +47,10 @@ public:
 	virtual ~Socket();
 
 	unsigned int port() const { return mPort; }
-	
+
+	/// Get name of current host
+	static std::string hostName();
+
 protected:
 	unsigned int mPort;
 

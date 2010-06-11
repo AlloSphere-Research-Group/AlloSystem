@@ -16,6 +16,10 @@ int utIOSocket(){
 
 	assert(0 == strcmp(dataSend, dataRecv));
 
+	{
+		std::string v = Socket::hostName();
+		printf("%s\n", v.c_str());
+	}
 
 	return 0;
 }
