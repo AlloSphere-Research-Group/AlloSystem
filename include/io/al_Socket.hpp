@@ -74,33 +74,41 @@ private:
 
 
 
-/// Sending socket
+/// Socket for sending data over a network
 class SocketSend : public Socket {
 public:
 
 	/// @param[in] port		Port number
 	/// @param[in] address	IP address
+	/// @param[in] timeout	< 0: block forever; = 0: no blocking; > 0 block with timeout
 	SocketSend(unsigned int port, const char * address = "localhost", al_sec timeout=0)
 	:	Socket(port, address, timeout, true)
 	{}
 	
 	/// Send data over a network
+	
+	/// @param[in] buffer	The buffer of data to send
+	/// @param[in] len		The length, in bytes, of the buffer
 	size_t send(const char * buffer, size_t len){ return Socket::send(buffer, len); }
 };
 
 
 
-/// Receiving socket
+/// Socket for receiving data over a network
 class SocketRecv : public Socket {
 public:
 
 	/// @param[in] port		Port number
 	/// @param[in] address	IP address. If 0, will bind all network interfaces to socket.
+	/// @param[in] timeout	< 0: block forever; = 0: no blocking; > 0 block with timeout
 	SocketRecv(unsigned int port, const char * address = 0, al_sec timeout=0)
 	:	Socket(port, address, timeout, false)
 	{}
 	
 	/// Read data from a network
+
+	/// @param[in] buffer	A buffer to copy the received data into
+	/// @param[in] maxlen	The maximum length, in bytes, of data to copy
 	size_t recv(char * buffer, size_t maxlen){ return Socket::recv(buffer, maxlen); }
 };
 
