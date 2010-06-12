@@ -43,6 +43,10 @@ namespace al{
 class Socket{
 public:
 
+	/// Close the socket
+	void close();
+
+	/// Get port number
 	unsigned int port() const { return mPort; }
 
 	/// Get name of current host

@@ -37,10 +37,6 @@ struct Socket::Impl : public ImplAPR {
 //		printf("%s\n", buf);
 
 	}
-	
-	~Impl(){
-		apr_socket_close(mSock);
-	}
 
 	apr_sockaddr_t * mAddress;
 	apr_socket_t * mSock;
@@ -54,11 +50,21 @@ Socket::Socket(unsigned int port, const char * address, bool sender)
 {
 }
 
-Socket::~Socket(){ delete mImpl; }
+Socket::~Socket(){
+	close();
+	delete mImpl;
+}
+
+void Socket::close(){
+	apr_socket_close(mImpl->mSock);
+}
 
 size_t Socket::recv(char * buffer, size_t maxlen) {
 	apr_size_t len = maxlen;
-	check_apr(apr_socket_recv(mImpl->mSock, buffer, &len));
+	apr_status_t r = apr_socket_recv(mImpl->mSock, buffer, &len);
+	
+	// only error check if not error# 35: Resource temporarily unavailable
+	if(len){ check_apr(r); }
 	return len;
 }
 
