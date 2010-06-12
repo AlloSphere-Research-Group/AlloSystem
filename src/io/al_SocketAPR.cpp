@@ -77,7 +77,7 @@ std::string Socket::hostIP(){
 	apr_sockaddr_info_get(&sa, hostName().c_str(), APR_INET, 8000, 0, apr.pool());
 	while(sa) {
 		apr_sockaddr_ip_get(&addr, sa);
-		printf("%s %s %s %d %d\n", addr, sa->hostname, sa->servname, sa->port, sa->family);
+		//printf("%s %s %s %d %d\n", addr, sa->hostname, sa->servname, sa->port, sa->family);
 		sa = sa->next;
 	}
 	return addr;

@@ -68,8 +68,13 @@ private:
 };
 
 
+
+/// Sending socket
 class SocketSend : public Socket {
 public:
+
+	/// @param[in] port		Port number
+	/// @param[in] address	IP address
 	SocketSend(unsigned int port, const char * address = "localhost")
 	:	Socket(port, address, true)
 	{}
@@ -80,10 +85,14 @@ public:
 
 
 
+/// Receiving socket
 class SocketRecv : public Socket {
 public:
-	SocketRecv(unsigned int port)
-	:	Socket(port, NULL, false)
+
+	/// @param[in] port		Port number
+	/// @param[in] address	IP address. If 0, will bind all network interfaces to socket.
+	SocketRecv(unsigned int port, const char * address = 0)
+	:	Socket(port, address, false)
 	{}
 	
 	/// Read data from a network
