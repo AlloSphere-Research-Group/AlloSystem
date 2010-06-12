@@ -55,6 +55,12 @@
 	#define AL_API extern
 #endif
 
+/* 
+	primitive typedefs
+*/
+typedef long long int al_nsec;				/**< nanoseconds type (accurate to +/- 292.5 years) */
+typedef double al_sec;						/**< seconds type */
+
 
 #if !defined(MIN)
     #define MIN(A,B)	({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __a : __b; })
@@ -63,13 +69,5 @@
 #if !defined(MAX)
     #define MAX(A,B)	({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __b : __a; })
 #endif
-
-/*
-	Library initalization / tear-down
-	It is safe to call al_initialize() multiple times.
-	al_terminate() must be called only once.
-*/
-AL_API int al_initialize();
-AL_API int al_terminate();
 
 #endif /* INCLUDE_AL_SYSTEM_CONFIG_H */

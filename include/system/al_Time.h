@@ -40,9 +40,6 @@
 extern "C" {
 #endif
 
-typedef long long int al_nsec;				/**< nanoseconds type (accurate to +/- 292.5 years) */
-typedef double al_sec;						/**< seconds type */
-
 /**! temporal limits */
 #define AL_TIME_NSEC_NEVER (ULLONG_MAX)
 

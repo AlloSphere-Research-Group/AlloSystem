@@ -33,7 +33,6 @@ using namespace al;
 
 Recv::Recv(unsigned int port) 
 : mPort(port) {
-	al_initialize();
 	
 	check_apr(apr_pool_create(&mPool, NULL));
 	
@@ -77,7 +76,6 @@ size_t Recv::recv(MessageParser handler, void * userdata, size_t maxlen) {
 	
 Send::Send(const char * address, unsigned int port) 
 : mPort(port) {
-	al_initialize();
 
 	check_apr(apr_pool_create(&mPool, NULL));
 
