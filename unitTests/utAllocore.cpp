@@ -6,7 +6,7 @@
 int main(){
 
 	
-	osc::Recv recv;	// uses apr
+	//osc::Recv recv;	// uses apr
 	al::SocketSend sock(9000);	// uses apr
 
 	utMath();

@@ -36,6 +36,7 @@
 */
 
 #include <string>
+#include "system/al_Config.h"
 
 namespace al{
 
@@ -58,7 +59,7 @@ public:
 protected:
 	
 	/// @sender: true if Socket will send
-	Socket(unsigned int port, const char * address, double timeout, bool sender);
+	Socket(unsigned int port, const char * address, al_sec timeout, bool sender);
 	virtual ~Socket();
 
 protected:
@@ -79,7 +80,7 @@ public:
 
 	/// @param[in] port		Port number
 	/// @param[in] address	IP address
-	SocketSend(unsigned int port, const char * address = "localhost", double timeout=0)
+	SocketSend(unsigned int port, const char * address = "localhost", al_sec timeout=0)
 	:	Socket(port, address, timeout, true)
 	{}
 	
@@ -95,7 +96,7 @@ public:
 
 	/// @param[in] port		Port number
 	/// @param[in] address	IP address. If 0, will bind all network interfaces to socket.
-	SocketRecv(unsigned int port, const char * address = 0, double timeout=0)
+	SocketRecv(unsigned int port, const char * address = 0, al_sec timeout=0)
 	:	Socket(port, address, timeout, false)
 	{}
 	

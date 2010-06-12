@@ -31,8 +31,7 @@ static void osc_parsebundle(const osc::ReceivedBundle & p, Recv::MessageParser h
 
 using namespace al;
 
-Recv::Recv(unsigned int port) 
-: mPort(port) {
+Recv::Recv(unsigned int port) {
 	
 	check_apr(apr_pool_create(&mPool, NULL));
 	

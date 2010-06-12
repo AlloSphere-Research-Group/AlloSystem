@@ -12,7 +12,9 @@ namespace al{
 
 struct Socket::Impl : public ImplAPR {
 
-	Impl(unsigned int port, const char * address, bool sender) : ImplAPR() {
+	Impl(unsigned int port, const char * address, al_sec timeout, bool sender) : ImplAPR() {
+	
+		// TODO: check_apr results should jump to an err label and return an uninitialized socket!
 		
 		/* @see http://dev.ariel-networks.com/apr/apr-tutorial/html/apr-tutorial-13.html */
 		// create socket:
@@ -21,32 +23,25 @@ struct Socket::Impl : public ImplAPR {
 		check_apr(apr_sockaddr_info_get(&sa, address, APR_INET, port, 0, mPool));
 		check_apr(apr_socket_create(&sock, sa->family, SOCK_DGRAM, APR_PROTO_UDP, mPool));
 		
+		if (timeout == 0) {
+			// non-blocking:			APR_SO_NONBLOCK==1(on),  then timeout=0
+			check_apr(apr_socket_opt_set(sock, APR_SO_NONBLOCK, 1));
+			check_apr(apr_socket_timeout_set(sock, 0));
+		} else if (timeout > 0) {
+			// blocking-with-timeout:	APR_SO_NONBLOCK==0(off), then timeout>0
+			check_apr(apr_socket_opt_set(sock, APR_SO_NONBLOCK, 0));
+			check_apr(apr_socket_timeout_set(sock, (apr_interval_time_t)(timeout * 1.0e6)));
+		
+		} else {
+			// blocking-forever:		APR_SO_NONBLOCK==0(off), then timeout<0
+			check_apr(apr_socket_opt_set(sock, APR_SO_NONBLOCK, 0));
+			check_apr(apr_socket_timeout_set(sock, -1));
+		}
+
+		
 		if(sender)	check_apr(apr_socket_connect(sock, sa));
 		else		check_apr(apr_socket_bind(sock, sa));
-		
-		// non-blocking
-		check_apr(apr_socket_opt_set(sock, APR_SO_NONBLOCK, 1));
-		check_apr(apr_socket_timeout_set(sock, 0));
-		
-		// blocking-forever
-//		check_apr(apr_socket_opt_set(sock, APR_SO_NONBLOCK, 0));
-//		check_apr(apr_socket_timeout_set(sock, -1));
-
-/*		
-		non-blocking:			APR_SO_NONBLOCK==1(on),  then timeout=0
-		blocking-with-timeout:	APR_SO_NONBLOCK==0(off), then timeout>0
-		blocking-forever:		APR_SO_NONBLOCK==0(off), then timeout<0
-
-		intervals for I/O timeouts, in microseconds
-
-		t > 0  -- read and write calls return APR_TIMEUP if specified time
-					elapsess with no data read or written
-		t == 0 -- read and write calls never block
-		t < 0  -- read and write calls block
-*/
-
-
-		
+				
 		mAddress = sa;
 		mSock = sock;
 
@@ -67,8 +62,8 @@ struct Socket::Impl : public ImplAPR {
 
 
 
-Socket::Socket(unsigned int port, const char * address, double timeout, bool sender) 
-: mImpl(new Impl(port, address, sender))
+Socket::Socket(unsigned int port, const char * address, al_sec timeout, bool sender) 
+: mImpl(new Impl(port, address, timeout, sender))
 {
 }
 
