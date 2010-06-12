@@ -16,6 +16,7 @@ int utIOSocket(){
 	
 	while(true){
 		al_sleep(0.1);
+		printf(".");
 		dataRecv[0] = '\0';
 		r.recv(dataRecv, sizeof(dataRecv));
 		if(dataRecv[0]) printf("%s\n", dataRecv);

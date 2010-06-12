@@ -58,9 +58,9 @@ public:
 protected:
 	
 	/// @sender: true if Socket will send
-	Socket(unsigned int port, const char * address, bool sender);
+	Socket(unsigned int port, const char * address, double timeout, bool sender);
 	virtual ~Socket();
-	
+
 protected:
 	unsigned int mPort;
 
@@ -79,8 +79,8 @@ public:
 
 	/// @param[in] port		Port number
 	/// @param[in] address	IP address
-	SocketSend(unsigned int port, const char * address = "localhost")
-	:	Socket(port, address, true)
+	SocketSend(unsigned int port, const char * address = "localhost", double timeout=0)
+	:	Socket(port, address, timeout, true)
 	{}
 	
 	/// Send data over a network
@@ -95,8 +95,8 @@ public:
 
 	/// @param[in] port		Port number
 	/// @param[in] address	IP address. If 0, will bind all network interfaces to socket.
-	SocketRecv(unsigned int port, const char * address = 0)
-	:	Socket(port, address, false)
+	SocketRecv(unsigned int port, const char * address = 0, double timeout=0)
+	:	Socket(port, address, timeout, false)
 	{}
 	
 	/// Read data from a network
