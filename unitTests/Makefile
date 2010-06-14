@@ -5,9 +5,8 @@
 include ../Makefile.config
 include ../$(SRC_DIR)/$(IO_DIR)/Makefile.config
 
-#VPATH += 
-
 SRCS =	utIOAudioIO.cpp \
+	utIOSocket.cpp \
 	utIOWindowGL.cpp \
 	utMath.cpp \
 	utProtocolGraphics.cpp \

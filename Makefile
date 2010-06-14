@@ -8,17 +8,19 @@ include ./Makefile.config
 # TODO: Permit selective inclusive of modules for building a library
 # and doing unit tests.
 include ./$(SRC_DIR)/$(IO_DIR)/Makefile.config
+include ./$(SRC_DIR)/$(MATH_DIR)/Makefile.config
 include ./$(SRC_DIR)/$(PRO_DIR)/Makefile.config
 include ./$(SRC_DIR)/$(SYS_DIR)/Makefile.config
 include ./$(SRC_DIR)/$(TYPES_DIR)/Makefile.config
 
 # prefix full path to source files
 IO_SRC		:= $(addprefix $(SRC_DIR)/$(IO_DIR)/, $(IO_SRC))
+MATH_SRC	:= $(addprefix $(SRC_DIR)/$(MATH_DIR)/, $(MATH_SRC))
 PRO_SRC		:= $(addprefix $(SRC_DIR)/$(PRO_DIR)/, $(PRO_SRC))
 TYPES_SRC	:= $(addprefix $(SRC_DIR)/$(TYPES_DIR)/, $(TYPES_SRC))
 SYS_SRC		:= $(addprefix $(SRC_DIR)/$(SYS_DIR)/, $(SYS_SRC))
 
-SRCS = $(IO_SRC) $(PRO_SRC) $(SYS_SRC) $(TYPES_SRC)
+SRCS = $(IO_SRC) $(PRO_SRC) $(MATH_SRC) $(SYS_SRC) $(TYPES_SRC)
 OBJS = $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
 CFLAGS += $(addprefix -I./, $(INC_DIRS))
