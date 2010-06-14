@@ -28,6 +28,8 @@
 		1697337811768B040025299C /* al_Quat.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1697337411768B040025299C /* al_Quat.hpp */; };
 		1697338711768B6E0025299C /* al_Complex.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1697338611768B6E0025299C /* al_Complex.hpp */; };
 		1697338811768B6E0025299C /* al_Complex.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1697338611768B6E0025299C /* al_Complex.hpp */; };
+		16AA8EDE11C6F1D20053EFE1 /* al_Quat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA8EDD11C6F1D20053EFE1 /* al_Quat.cpp */; };
+		16AA8EDF11C6F1D20053EFE1 /* al_Quat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA8EDD11C6F1D20053EFE1 /* al_Quat.cpp */; };
 		16AA95F6118F74FB00B98EC3 /* al_Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95F2118F74FB00B98EC3 /* al_Light.cpp */; };
 		16AA9600118F76B800B98EC3 /* al_Debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95FF118F76B800B98EC3 /* al_Debug.cpp */; };
 		16AA960A118F774800B98EC3 /* al_Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA9609118F774800B98EC3 /* al_Texture.cpp */; };
@@ -101,7 +103,6 @@
 		3622BF10116D52B400928703 /* al_MainLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF7116D527D00928703 /* al_MainLoop.cpp */; };
 		3622BF14116D52B400928703 /* al_TimeAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFB116D527D00928703 /* al_TimeAPR.cpp */; };
 		3622BF15116D52B800928703 /* al_msg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFE116D527D00928703 /* al_msg.cpp */; };
-		3622BF16116D52B800928703 /* al_quat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFF116D527D00928703 /* al_quat.cpp */; };
 		3622BF17116D52B800928703 /* al_socktube.c in Sources */ = {isa = PBXBuildFile; fileRef = 3622BF00116D527D00928703 /* al_socktube.c */; };
 		3622BF3C116D530100928703 /* NetworkingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF0116D527D00928703 /* NetworkingUtils.cpp */; };
 		3622BF3D116D530100928703 /* UdpSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF1116D527D00928703 /* UdpSocket.cpp */; };
@@ -170,7 +171,6 @@
 		36BAE1CC11C2FAFF009A8BBD /* al_WindowGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE1116D527D00928703 /* al_WindowGL.cpp */; };
 		36BAE1CD11C2FAFF009A8BBD /* al_WindowGLUT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE2116D527D00928703 /* al_WindowGLUT.cpp */; };
 		36BAE1CE11C2FAFF009A8BBD /* al_msg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFE116D527D00928703 /* al_msg.cpp */; };
-		36BAE1CF11C2FAFF009A8BBD /* al_quat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFF116D527D00928703 /* al_quat.cpp */; };
 		36BAE1D011C2FAFF009A8BBD /* al_socktube.c in Sources */ = {isa = PBXBuildFile; fileRef = 3622BF00116D527D00928703 /* al_socktube.c */; };
 		36BAE1D111C2FAFF009A8BBD /* IpEndpointName.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEEA116D527D00928703 /* IpEndpointName.cpp */; };
 		36BAE1D211C2FAFF009A8BBD /* OscOutboundPacketStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEEB116D527D00928703 /* OscOutboundPacketStream.cpp */; };
@@ -302,6 +302,7 @@
 		1697337411768B040025299C /* al_Quat.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Quat.hpp; sourceTree = "<group>"; };
 		1697338611768B6E0025299C /* al_Complex.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Complex.hpp; sourceTree = "<group>"; };
 		1697339A11768CDF0025299C /* utMath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utMath.cpp; path = ../../unitTests/utMath.cpp; sourceTree = SOURCE_ROOT; };
+		16AA8EDD11C6F1D20053EFE1 /* al_Quat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = al_Quat.cpp; path = math/al_Quat.cpp; sourceTree = "<group>"; };
 		16AA95E5118F6EEF00B98EC3 /* al_Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Config.h; sourceTree = "<group>"; };
 		16AA95E8118F6EEF00B98EC3 /* al_Common.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Common.hpp; sourceTree = "<group>"; };
 		16AA95E9118F6EEF00B98EC3 /* al_GPUObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_GPUObject.hpp; sourceTree = "<group>"; };
@@ -387,7 +388,6 @@
 		3622BEFB116D527D00928703 /* al_TimeAPR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_TimeAPR.cpp; sourceTree = "<group>"; };
 		3622BEFC116D527D00928703 /* Makefile.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.config; sourceTree = "<group>"; };
 		3622BEFE116D527D00928703 /* al_msg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_msg.cpp; sourceTree = "<group>"; };
-		3622BEFF116D527D00928703 /* al_quat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_quat.cpp; sourceTree = "<group>"; };
 		3622BF00116D527D00928703 /* al_socktube.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = al_socktube.c; sourceTree = "<group>"; };
 		3622BF01116D527D00928703 /* Makefile.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.config; sourceTree = "<group>"; };
 		3622BF03116D527D00928703 /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
@@ -645,6 +645,14 @@
 			path = math;
 			sourceTree = "<group>";
 		};
+		16AA8ED811C6F1BB0053EFE1 /* math */ = {
+			isa = PBXGroup;
+			children = (
+				16AA8EDD11C6F1D20053EFE1 /* al_Quat.cpp */,
+			);
+			name = math;
+			sourceTree = "<group>";
+		};
 		16AA95E3118F6EEF00B98EC3 /* graphics */ = {
 			isa = PBXGroup;
 			children = (
@@ -780,6 +788,7 @@
 				1685D3C011C2EDB5009F676C /* private */,
 				16AA95F0118F74FB00B98EC3 /* graphics */,
 				3622BEDD116D527D00928703 /* io */,
+				16AA8ED811C6F1BB0053EFE1 /* math */,
 				3622BEE4116D527D00928703 /* protocol */,
 				3622BEF5116D527D00928703 /* system */,
 				3622BEFD116D527D00928703 /* types */,
@@ -859,7 +868,6 @@
 				3659D754117B8AFA0065EBE4 /* jack */,
 				1619909C11743990006FBADF /* al_Color.cpp */,
 				3622BEFE116D527D00928703 /* al_msg.cpp */,
-				3622BEFF116D527D00928703 /* al_quat.cpp */,
 				3622BF00116D527D00928703 /* al_socktube.c */,
 				3622BF01116D527D00928703 /* Makefile.config */,
 				3622BF02116D527D00928703 /* test */,
@@ -1342,7 +1350,6 @@
 				36BAE1CC11C2FAFF009A8BBD /* al_WindowGL.cpp in Sources */,
 				36BAE1CD11C2FAFF009A8BBD /* al_WindowGLUT.cpp in Sources */,
 				36BAE1CE11C2FAFF009A8BBD /* al_msg.cpp in Sources */,
-				36BAE1CF11C2FAFF009A8BBD /* al_quat.cpp in Sources */,
 				36BAE1D011C2FAFF009A8BBD /* al_socktube.c in Sources */,
 				36BAE1D111C2FAFF009A8BBD /* IpEndpointName.cpp in Sources */,
 				36BAE1D211C2FAFF009A8BBD /* OscOutboundPacketStream.cpp in Sources */,
@@ -1375,6 +1382,7 @@
 				36BAE06811C2F00F009A8BBD /* utSystem.cpp in Sources */,
 				36BAE06911C2F00F009A8BBD /* utTypes.cpp in Sources */,
 				36BAE06A11C2F00F009A8BBD /* utTypesConversion.cpp in Sources */,
+				16AA8EDE11C6F1D20053EFE1 /* al_Quat.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1451,7 +1459,6 @@
 				3622BF0A116D52AB00928703 /* al_WindowGL.cpp in Sources */,
 				3622BF0B116D52AB00928703 /* al_WindowGLUT.cpp in Sources */,
 				3622BF15116D52B800928703 /* al_msg.cpp in Sources */,
-				3622BF16116D52B800928703 /* al_quat.cpp in Sources */,
 				3622BF17116D52B800928703 /* al_socktube.c in Sources */,
 				3622BF3E116D530600928703 /* IpEndpointName.cpp in Sources */,
 				3622BF3F116D530600928703 /* OscOutboundPacketStream.cpp in Sources */,
@@ -1473,6 +1480,7 @@
 				16AA9680118F7D6600B98EC3 /* al_Shader.cpp in Sources */,
 				16885C9911A5E7A500071F90 /* al_Camera.cpp in Sources */,
 				160DAE1411C1B1FE00C6905A /* al_SocketAPR.cpp in Sources */,
+				16AA8EDF11C6F1D20053EFE1 /* al_Quat.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

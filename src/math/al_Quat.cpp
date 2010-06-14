@@ -1,4 +1,4 @@
-#include "al_quat.hpp"
+#include "math/al_Quat.hpp"
 
 /*
 	C-binding implementation:
