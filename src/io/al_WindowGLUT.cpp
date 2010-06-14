@@ -1,8 +1,8 @@
 #include <stdio.h>		// snprintf
 #include <stdlib.h>		// exit
 #include <map>
-#include "io/al_WindowGL.hpp"
 #include "system/al_Config.h"
+#include "io/al_WindowGL.hpp"
 
 #ifdef AL_OSX
 	#include <OpenGL/OpenGL.h>
@@ -41,7 +41,7 @@ static void timerFunc(int value){
 }
 
 void TimedFunction::operator()(float ms){
-	glutTimerFunc((unsigned int)ms, timerFunc, int(this));
+	glutTimerFunc((unsigned int)ms, timerFunc, (int)this);
 }
 
 
@@ -615,6 +615,10 @@ void WindowGL::startLoop(){ glutMainLoop(); }
 
 void WindowGL::stopLoop(){
 	WindowGL::destroyAll();
+	/* 
+		Note. library code should never call exit(); at best, call a user-installed exit handler 
+		ergo GLUT sucks.
+	*/
 	exit(0);
 }
 

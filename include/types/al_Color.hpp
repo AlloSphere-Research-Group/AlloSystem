@@ -51,14 +51,14 @@ struct Color{
 	/// @param[in] b			blue component
 	/// @param[in] a			alpha component
 	Color(float r, float g, float b, float a=1.f)
-	:	r(r), g(g), b(b), a(a)
-	{}
+	//:	r(r), g(g), b(b), a(a)	<< Clang can't handle it
+	{ this->r=r;  this->g=g; this->b=b; this->a=a; }
 
 	/// @param[in] gray			red/green/blue components
 	/// @param[in] a			alpha component
 	Color(float gray=1.f, float a=1.f)
-	:	r(gray), g(gray), b(gray), a(a)
-	{}
+	//:	r(gray), g(gray), b(gray), a(a)	<< Clang can't handle it
+	{ this->r=gray;  this->g=gray; this->b=gray; this->a=a; }
 
 	/// @param[in] hsv			HSV value
 	/// @param[in] a			alpha component

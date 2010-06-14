@@ -68,7 +68,7 @@ inline char intensityToASCII(float v){
 	return map[int(N*v)];
 }
 
-template<class T> void print2D(T* pix, int nx, int ny, FILE * fp=stdout){
+template<class T> void print2D(T* pix, int nx, int ny, FILE * fp){
 	for(int j=0; j<nx; ++j){
 	for(int i=0; i<ny; ++i){
 		float v = pix[j*nx + i];

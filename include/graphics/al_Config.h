@@ -5,21 +5,7 @@
 
 // OpenGL platform-dependent includes
 
-#if defined(__IPHONE_2_0)
-	#define AL_GRAPHICS_USE_OPENGLES1
-	
-	#import <OpenGLES/ES1/gl.h>
-	#import <OpenGLES/ES1/glext.h>
-#endif
-
-#if defined(__IPHONE_3_0)
-	#define AL_GRAPHICS_USE_OPENGLES2
-	
-	#import <OpenGLES/ES2/gl.h>
-	#import <OpenGLES/ES2/glext.h>
-#endif
-
-#ifdef AL_OSX
+#if defined(AL_OSX)
 	#include <OpenGL/OpenGL.h>
 	#include <OpenGL/gl.h>
 	#include <OpenGL/glext.h>
@@ -30,9 +16,7 @@
 		{	GLint MacHackVBL = 1;\
 			CGLContextObj ctx = CGLGetCurrentContext();\
 			CGLSetParameter(ctx,  kCGLCPSwapInterval, &MacHackVBL); }
-#endif
-
-#ifdef AL_LINUX
+#elif defined(AL_LINUX)
 	#include <GL/glew.h>
 	#include <GL/gl.h>
 	#include <GL/glext.h>
@@ -46,9 +30,7 @@
   				fprintf(stderr, "GLEW Init Error: %s\n", glewGetErrorString(err));\
 			}\
 		}
-#endif
-
-#ifdef AL_WIN32
+#elif defined(AL_WIN32
 	#include <windows.h>
 	#include <gl/gl.h>
 	#include <gl/glu.h>
@@ -57,6 +39,22 @@
 	#pragma comment( lib, "glu32.lib" )
 	
 	#define AL_GRAPHICS_INIT_CONTEXT
+	
+#else
+
+	#ifdef __IPHONE_2_0
+		#define AL_GRAPHICS_USE_OPENGLES1
+		
+		#import <OpenGLES/ES1/gl.h>
+		#import <OpenGLES/ES1/glext.h>
+	#endif
+
+	#ifdef __IPHONE_3_0
+		#define AL_GRAPHICS_USE_OPENGLES2
+		
+		#import <OpenGLES/ES2/gl.h>
+		#import <OpenGLES/ES2/glext.h>
+	#endif
 
 #endif
 

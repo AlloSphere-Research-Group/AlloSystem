@@ -535,7 +535,7 @@ TEM inline T round(T v, T s, T r){ return round<T>(v * r) * s; }
 TEM inline T roundAway(T v){ return v<T(0) ? al::floor(v) : al::ceil(v); }
 TEM inline T roundAway(T v, T s){ return v<T(0) ? al::floor(v,s) : al::ceil(v,s); }
 
-TEM inline T sgn(const T& v, const T& norm=T(1)){ return v<T(0) ? -norm : norm; }
+TEM inline T sgn(const T& v, const T& norm){ return v<T(0) ? -norm : norm; }
 
 TEM inline T sinc(T r, T eps){ return (al::abs(r) > eps) ? std::sin(r)/r : std::cos(r); }
 

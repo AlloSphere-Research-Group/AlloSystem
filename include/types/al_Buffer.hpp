@@ -37,6 +37,7 @@ namespace al{
 ///
 template <class T, class Alloc=std::allocator<T> >
 class Buffer : protected Alloc{
+	typedef Alloc super;
 public:
 
 	/// @param[in] size			Initial size
@@ -116,7 +117,7 @@ public:
 		if(size() >= capacity()){	// double array size if too small
 			mElems.resize((size() ? size() : 4)*growFactor);
 		}
-		construct(elems()+size(), v);
+		super::construct(elems()+size(), v);
 		mPos=mSize;
 		++mSize;
 	}
@@ -124,7 +125,7 @@ public:
 	/// Write new element to ring buffer
 	void write(const T& v){
 		++mPos; if(pos() == size()){ mPos=0; }
-		construct(elems()+pos(), v);
+		Alloc::construct(elems()+pos(), v);
 		if(fill() < size()) ++mFill; 
 	}
 
