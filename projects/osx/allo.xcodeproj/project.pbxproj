@@ -194,7 +194,6 @@
 		36F46824110BE2E90082D21E /* al_AudioIO.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36F46821110BE2E90082D21E /* al_AudioIO.hpp */; };
 		36F46825110BE2E90082D21E /* al_File.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36F46822110BE2E90082D21E /* al_File.hpp */; };
 		36F46826110BE2E90082D21E /* al_WindowGL.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36F46823110BE2E90082D21E /* al_WindowGL.hpp */; };
-		36F46846110BE3520082D21E /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
 		8DD76F650486A84900D96B5E /* exScheduling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* exScheduling.cpp */; settings = {ATTRIBUTES = (); }; };
 		8DD76F6A0486A84900D96B5E /* alscheduling.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* alscheduling.1 */; };
 /* End PBXBuildFile section */
@@ -474,6 +473,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				16B5C1731189020B0090CE80 /* libportaudio.a in Frameworks */,
 				36BAE05411C2EEBC009A8BBD /* liballocore.a in Frameworks */,
 				3622BFC1116D55B500928703 /* OpenGL.framework in Frameworks */,
 				16AC531D116290BE0076AA8B /* AudioToolbox.framework in Frameworks */,
@@ -481,7 +481,6 @@
 				16AC5368116293270076AA8B /* CoreAudio.framework in Frameworks */,
 				16AC52C911628EC50076AA8B /* Cocoa.framework in Frameworks */,
 				16AC5365116293100076AA8B /* GLUT.framework in Frameworks */,
-				16B5C1731189020B0090CE80 /* libportaudio.a in Frameworks */,
 				16B5C1741189020B0090CE80 /* libapr-1.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -576,7 +575,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3622BFA7116D558500928703 /* libapr-1.a in Frameworks */,
-				36F46846110BE3520082D21E /* libportaudio.a in Frameworks */,
 				16AC52D511628F860076AA8B /* GLUT.framework in Frameworks */,
 				16AC52D611628F870076AA8B /* OpenGL.framework in Frameworks */,
 				16AC53091162907D0076AA8B /* CoreAudio.framework in Frameworks */,
@@ -1671,6 +1669,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				SDKROOT = macosx10.5;
+				SYMROOT = ../../build;
 				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../include";
 			};
 			name = Debug;
@@ -1714,6 +1713,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				SDKROOT = macosx10.5;
+				SYMROOT = ../../build;
 				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../include";
 			};
 			name = Release;
@@ -2128,7 +2128,7 @@
 				PRODUCT_NAME = $TARGET_NAME;
 				SDKROOT = $inherited;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
-				SYMROOT = ../../build;
+				SYMROOT = $inherited;
 				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../include";
 			};
 			name = Debug;
@@ -2160,7 +2160,7 @@
 				PRODUCT_NAME = $TARGET_NAME;
 				SDKROOT = $inherited;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
-				SYMROOT = ../../build;
+				SYMROOT = $inherited;
 				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../include";
 				ZERO_LINK = NO;
 			};
