@@ -1,19 +1,28 @@
 #include "system/al_Compiler.hpp"
+#include "system/al_Time.hpp"
 
-typedef double (*vfptr)(double x);
+#include "io/al_AudioIO.hpp"
+
+typedef int (*vfptr)(int ac, char ** av);
 
 char * src = "\n"
 	"#include <math.h>\n"
 	"#include <stdio.h>\n"
 	"#include <stdarg.h>\n"
 	"\n"
+	"class Bar { Bar() { printf(\"MADE A Bar!\"); } }; \n"
+	"Bar bar; \n"
 	"#ifdef __cplusplus \n"
 	"extern \"C\" { \n"
 	"#endif \n"
+	"int x = 3; \n"
+	"\n"
+	"extern int test2(int x); \n"
 	" \n"
-	"double zap(double x) { \n"
-	"	printf(\"%f -> %f \\n\", x, sin(x)); \n"
-	"	return sqrt(x); \n"
+	"int z00(int ac, char ** av) { \n"
+	"	printf(\"%f %d\\n\", sin(3.14), x); \n"
+	"	test2(0); \n"
+	"	return 0; \n"
 	"} \n"
 	" \n"
 	"#ifdef __cplusplus \n"
@@ -39,11 +48,11 @@ int main (int argc, const char * argv[]) {
 			fread(buf,len,1,fp); //read into buffer
 			fclose(fp);
 			buf[len] = '\0';
-			printf("compiling %s\n", buf);
+			//printf("compiling %s\n", buf);
 			code = buf;
 		}
 	} else {
-		printf("compiling %s\n", src);
+		//printf("compiling %s\n", src);
 		code = src;
 	}
 
@@ -68,12 +77,24 @@ int main (int argc, const char * argv[]) {
 	
 	
 	bool ok = C.compile(code);
-	f = (vfptr)C.getfunctionptr("zap");
+	f = (vfptr)C.getfunctionptr("main");
 	
 	
-	printf("%d \n", ok);
-	for (int i=1; i<10; i++) printf("%d %f\n", i, f(i));
+	printf("compiled? %d (f=%p) \n", ok, f);
+	if (f) {
+		f(0, 0);
+	}
+	C.compile(src);
 	
+	f = (vfptr)C.getfunctionptr("z00");
+	f(0, 0);
+	
+//	al::AudioIO io; //
+//	printf("open %d\n", io.open());
+//	printf("start %d\n", io.start());
+//	al_sleep(1);
+//	io.print();								///< Prints info about current i/o devices to stdout.
+//	io.printError();
 	
 	return 0;
 }

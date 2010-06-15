@@ -72,7 +72,7 @@
 #include "io/al_File.hpp"
 #include "io/al_Socket.hpp"
 #include "io/al_WindowGL.hpp"
-#include "graphics/al_Camera.hpp"
+#include "spatial/al_Camera.hpp"
 #include "graphics/al_Config.h"
 #include "graphics/al_Common.hpp"
 #include "graphics/al_Debug.hpp"
@@ -84,7 +84,9 @@
 #ifdef __cplusplus
 
 class Foo {
-
+	Foo() {
+		printf("MADE A FOO!");
+	}
 };
 Foo foo;
 
@@ -92,7 +94,7 @@ extern "C" {
 #endif
 
 
-int test(int x) {
+extern int test(int x) {
 	printf("test %d\n", (int)fabs(3.14));
 	printf("test-1 %d\n", (int)fabs(3.14));
 	printf("test-2 %d\n", (int)fabs(3.14));
@@ -101,22 +103,25 @@ int test(int x) {
 	return 0;
 }
 
-int test2(int x) {
+extern int test2(int x) {
 	printf("test2 %d\n", (int)fabs(3.14));
 	return 0;
 }
 
-void callback(gam::AudioIOData &io) {
+void callback(al::AudioIOData &io) {
 	printf(".");
 }
 
-//gam::AudioIO io(64, 44100.0, callback);
+al::AudioIO io; //(64, 44100.0, callback);
 	
 int main(int ac, char ** av) {
 
-//	io.start();
-//	printf("cpu %f\n", io.cpu());
-//	
+	printf("open %d\n", io.open());
+	printf("start %d\n", io.start());
+	al_sleep(1);
+	io.print();								///< Prints info about current i/o devices to stdout.
+	io.printError();
+	
 //	//gam::Accum<> acc;
 //	
 //	float buf[64];
@@ -136,7 +141,10 @@ int main(int ac, char ** av) {
 	test(0);
 	test2(1);
 	
-	al_sleep(1);
+	al_sleep(3);
+	printf("cpu %f\n", io.cpu());
+	io.close();
+	
 	return 0;
 }	
 

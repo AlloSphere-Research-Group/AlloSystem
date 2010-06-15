@@ -55,7 +55,7 @@ public:
 		successive compiles are linked together.
 	*/
 	bool compile(std::string code);	
-	bool readbitcode(std::string path);		
+	bool readbitcode(std::string path);	
 	
 	void * getfunctionptr(std::string funcname);
 	void * getglobalptr(std::string globalname);

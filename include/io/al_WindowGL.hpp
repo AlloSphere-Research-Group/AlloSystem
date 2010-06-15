@@ -39,11 +39,7 @@ namespace al{
 #endif
 
 
-struct TimedFunction{
-	virtual ~TimedFunction(){}
-	void operator()(float ms);
-	virtual void onExecute(){}
-};
+
 
 
 
@@ -247,6 +243,12 @@ private:
 	void init();
 };
 
+
+//struct TimedFunction{
+//	virtual ~TimedFunction(){}
+//	void operator()(float ms);
+//	virtual void onExecute(){}
+//};
 
 
 } // al::

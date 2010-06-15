@@ -35,14 +35,14 @@
 
 namespace al{
 
-static void timerFunc(int value){
-	TimedFunction * f = (TimedFunction *)value;
-	f->onExecute();
-}
+//static void timerFunc(int value){
+//	TimedFunction * f = (TimedFunction *)value;
+//	f->onExecute();
+//}
 
-void TimedFunction::operator()(float ms){
-	glutTimerFunc((unsigned int)ms, timerFunc, (int)this);
-}
+//void TimedFunction::operator()(float ms){
+//	glutTimerFunc((unsigned int)ms, timerFunc, (int)this);
+//}
 
 
 

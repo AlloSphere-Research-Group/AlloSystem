@@ -96,8 +96,30 @@ public:
 	llvm::LLVMContext llvmContext;
 	
 	CompilerImpl(std::string name) {
-		std::string err;
 		mainModule = new llvm::Module(name, llvmContext);
+		jit(mainModule);
+	}
+	
+	~CompilerImpl() {
+		/*	Removing the functions one by one. */
+		llvm::Module::FunctionListType & flist = mainModule->getFunctionList();
+		for (llvm::Module::FunctionListType::iterator iter= flist.begin(); iter != flist.end(); iter++) {
+			//printf("function %s %d\n", iter->getName().data(), iter->isIntrinsic());
+			EE->freeMachineCodeForFunction(iter);
+		}
+		/* free any statics allocated in the code */
+		EE->runStaticConstructorsDestructors(mainModule, true);
+		EE->clearGlobalMappingsFromModule(mainModule);
+		/* EE forgets about module */
+		EE->removeModule(mainModule);	
+		/* should be safe */
+		delete mainModule;
+	}
+	
+	llvm::Module * module() { return mainModule; }
+	
+	void jit(llvm::Module * module) {
+		std::string err;
 		if (EE==0) {
 			llvm::InitializeAllTargets();
 			llvm::InitializeAllAsmPrinters();
@@ -118,28 +140,12 @@ public:
 			EE->RegisterJITEventListener(&gJITEventListener);
 			//EE->InstallLazyFunctionCreator(lazyfunctioncreator);
 			//EE->DisableGVCompilation();
+		} else {
+			EE->addModule(module);
 		}
-		EE->addModule(mainModule);
-		EE->runStaticConstructorsDestructors(mainModule, false);
+		EE->runStaticConstructorsDestructors(module, false);
+		//EE->DisableLazyCompilation();
 	}
-	
-	~CompilerImpl() {
-		/*	Removing the functions one by one. */
-		llvm::Module::FunctionListType & flist = mainModule->getFunctionList();
-		for (llvm::Module::FunctionListType::iterator iter= flist.begin(); iter != flist.end(); iter++) {
-			//printf("function %s %d\n", iter->getName().data(), iter->isIntrinsic());
-			EE->freeMachineCodeForFunction(iter);
-		}
-		/* free any statics allocated in the code */
-		EE->runStaticConstructorsDestructors(mainModule, true);
-		EE->clearGlobalMappingsFromModule(mainModule);
-		/* EE forgets about module */
-		EE->removeModule(mainModule);	
-		/* should be safe */
-		delete mainModule;
-	}
-	
-	llvm::Module * module() { return mainModule; }
 	
 	void link(llvm::Module * child) {
 		std::string err;
@@ -235,6 +241,7 @@ public:
 		delete codegen;
 		
 		if (module) {
+			jit(module);
 			link(module);
 			return true;
 		}

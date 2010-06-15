@@ -57,7 +57,15 @@
 		36C9F24B11C6AA53004FEBE3 /* libplugin_llvmc_Clang.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36C9F1B911C6A79C004FEBE3 /* libplugin_llvmc_Clang.a */; };
 		36C9F71811C6F31A004FEBE3 /* al_Compiler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36C9F71711C6F31A004FEBE3 /* al_Compiler.cpp */; };
 		36C9F71911C6F31A004FEBE3 /* al_Compiler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36C9F71711C6F31A004FEBE3 /* al_Compiler.cpp */; };
-		36C9F84311C6FF55004FEBE3 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36C9F84211C6FF55004FEBE3 /* liballocore.a */; };
+		36DDA14811C7064900C2A6B3 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36C9F84211C6FF55004FEBE3 /* liballocore.a */; };
+		36DDA1B411C7075400C2A6B3 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36DDA1B211C7075400C2A6B3 /* libapr-1.a */; };
+		36DDA1B511C7075400C2A6B3 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36DDA1B311C7075400C2A6B3 /* libportaudio.a */; };
+		36DDA1B911C7078700C2A6B3 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36DDA1B811C7078700C2A6B3 /* Cocoa.framework */; };
+		36DDA1BB11C7078700C2A6B3 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36DDA1BA11C7078700C2A6B3 /* GLUT.framework */; };
+		36DDA1BD11C7078700C2A6B3 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36DDA1BC11C7078700C2A6B3 /* OpenGL.framework */; };
+		36DDA1F111C70A1300C2A6B3 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36DDA1F011C70A1300C2A6B3 /* AudioToolbox.framework */; };
+		36DDA1F311C70A1300C2A6B3 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36DDA1F211C70A1300C2A6B3 /* AudioUnit.framework */; };
+		36DDA1F511C70A1300C2A6B3 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36DDA1F411C70A1300C2A6B3 /* CoreAudio.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -795,6 +803,14 @@
 		36C9F7CF11C6FAF3004FEBE3 /* clangVersion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = clangVersion.cpp; sourceTree = "<group>"; };
 		36C9F84211C6FF55004FEBE3 /* liballocore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liballocore.a; path = ../../build/Debug/liballocore.a; sourceTree = SOURCE_ROOT; };
 		36DDA0BA11C701AD00C2A6B3 /* input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = input.cpp; path = ../examples/alloplay/input.cpp; sourceTree = "<group>"; };
+		36DDA1B211C7075400C2A6B3 /* libapr-1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libapr-1.a"; path = "lib/libapr-1.a"; sourceTree = "<group>"; };
+		36DDA1B311C7075400C2A6B3 /* libportaudio.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libportaudio.a; path = lib/libportaudio.a; sourceTree = "<group>"; };
+		36DDA1B811C7078700C2A6B3 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		36DDA1BA11C7078700C2A6B3 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
+		36DDA1BC11C7078700C2A6B3 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		36DDA1F011C70A1300C2A6B3 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		36DDA1F211C70A1300C2A6B3 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
+		36DDA1F411C70A1300C2A6B3 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		D2AAC046055464E500DB518D /* liballocompiler.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liballocompiler.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -803,6 +819,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36DDA14811C7064900C2A6B3 /* liballocore.a in Frameworks */,
 				36C9F21911C6AA53004FEBE3 /* libCIndex.a in Frameworks */,
 				36C9F21B11C6AA53004FEBE3 /* libclangAnalysis.a in Frameworks */,
 				36C9F21C11C6AA53004FEBE3 /* libclangAST.a in Frameworks */,
@@ -849,7 +866,14 @@
 				36C9F24711C6AA53004FEBE3 /* libLLVMX86Info.a in Frameworks */,
 				36C9F24A11C6AA53004FEBE3 /* libplugin_llvmc_Base.a in Frameworks */,
 				36C9F24B11C6AA53004FEBE3 /* libplugin_llvmc_Clang.a in Frameworks */,
-				36C9F84311C6FF55004FEBE3 /* liballocore.a in Frameworks */,
+				36DDA1B411C7075400C2A6B3 /* libapr-1.a in Frameworks */,
+				36DDA1B511C7075400C2A6B3 /* libportaudio.a in Frameworks */,
+				36DDA1B911C7078700C2A6B3 /* Cocoa.framework in Frameworks */,
+				36DDA1BB11C7078700C2A6B3 /* GLUT.framework in Frameworks */,
+				36DDA1BD11C7078700C2A6B3 /* OpenGL.framework in Frameworks */,
+				36DDA1F111C70A1300C2A6B3 /* AudioToolbox.framework in Frameworks */,
+				36DDA1F311C70A1300C2A6B3 /* AudioUnit.framework in Frameworks */,
+				36DDA1F511C70A1300C2A6B3 /* CoreAudio.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -866,13 +890,19 @@
 		08FB7794FE84155DC02AAC07 /* allocompiler */ = {
 			isa = PBXGroup;
 			children = (
-				36C9F84211C6FF55004FEBE3 /* liballocore.a */,
 				36C9EEB511C6A79B004FEBE3 /* osx */,
 				36C9EEA111C6A6F1004FEBE3 /* include */,
 				36C9EEA211C6A6F1004FEBE3 /* src */,
 				08FB7795FE84155DC02AAC07 /* unitTests */,
 				C6A0FF2B0290797F04C91782 /* Documentation */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
+				36DDA1B811C7078700C2A6B3 /* Cocoa.framework */,
+				36DDA1BA11C7078700C2A6B3 /* GLUT.framework */,
+				36DDA1BC11C7078700C2A6B3 /* OpenGL.framework */,
+				36DDA1F011C70A1300C2A6B3 /* AudioToolbox.framework */,
+				36DDA1F211C70A1300C2A6B3 /* AudioUnit.framework */,
+				36DDA1F411C70A1300C2A6B3 /* CoreAudio.framework */,
+				36C9F84211C6FF55004FEBE3 /* liballocore.a */,
 			);
 			name = allocompiler;
 			sourceTree = "<group>";
@@ -918,6 +948,7 @@
 			isa = PBXGroup;
 			children = (
 				36C9EEB611C6A79B004FEBE3 /* include */,
+				36DDA1B111C7074100C2A6B3 /* lib */,
 				36C9F16311C6A79C004FEBE3 /* llvm */,
 			);
 			name = osx;
@@ -2043,6 +2074,15 @@
 			path = system;
 			sourceTree = "<group>";
 		};
+		36DDA1B111C7074100C2A6B3 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				36DDA1B211C7075400C2A6B3 /* libapr-1.a */,
+				36DDA1B311C7075400C2A6B3 /* libportaudio.a */,
+			);
+			name = lib;
+			sourceTree = "<group>";
+		};
 		C6A0FF2B0290797F04C91782 /* Documentation */ = {
 			isa = PBXGroup;
 			children = (
@@ -2165,6 +2205,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
@@ -2204,6 +2245,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_ENABLE_CPP_EXCEPTIONS = NO;
 				GCC_ENABLE_CPP_RTTI = NO;
@@ -2243,17 +2285,21 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					$CONFIGURATION_BUILD_DIR,
+					"\"$(SRCROOT)/../../build/Debug\"",
 					"\"$(SRCROOT)/../../dev/osx/lib\"",
-					"\"$(SRCROOT)/../../../trunk/build/Debug\"",
 				);
 				PREBINDING = NO;
-				PRODUCT_NAME = utCompiler;
+				PRODUCT_NAME = $TARGET_NAME;
+				STRIP_INSTALLED_PRODUCT = YES;
 			};
 			name = Debug;
 		};
@@ -2261,18 +2307,23 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = YES;
+				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_MODEL_TUNING = G5;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					$CONFIGURATION_BUILD_DIR,
+					"\"$(SRCROOT)/../../build/Debug\"",
 					"\"$(SRCROOT)/../../dev/osx/lib\"",
-					"\"$(SRCROOT)/../../../trunk/build/Debug\"",
 				);
 				PREBINDING = NO;
-				PRODUCT_NAME = utCompiler;
+				PRODUCT_NAME = $TARGET_NAME;
+				STRIP_INSTALLED_PRODUCT = YES;
 				ZERO_LINK = NO;
 			};
 			name = Release;
