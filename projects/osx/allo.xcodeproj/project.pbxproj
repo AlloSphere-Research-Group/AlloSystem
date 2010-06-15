@@ -12,8 +12,6 @@
 		1619909F11743990006FBADF /* al_Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1619909C11743990006FBADF /* al_Color.cpp */; };
 		166DD742117CDB6000A8BA12 /* al_Conversion.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 166DD741117CDB6000A8BA12 /* al_Conversion.hpp */; };
 		166DD743117CDB6000A8BA12 /* al_Conversion.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 166DD741117CDB6000A8BA12 /* al_Conversion.hpp */; };
-		16885C9711A5E79800071F90 /* al_Camera.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 16885C9611A5E79800071F90 /* al_Camera.hpp */; };
-		16885C9911A5E7A500071F90 /* al_Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16885C9811A5E7A500071F90 /* al_Camera.cpp */; };
 		168EC8F11161CA2C00FCACC7 /* al_Time.h in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8EB1161CA2C00FCACC7 /* al_Time.h */; };
 		168EC8F21161CA2C00FCACC7 /* al_MainLoop.h in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8EC1161CA2C00FCACC7 /* al_MainLoop.h */; };
 		168EC8F31161CA2C00FCACC7 /* al_Config.h in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8ED1161CA2C00FCACC7 /* al_Config.h */; };
@@ -30,6 +28,11 @@
 		1697338811768B6E0025299C /* al_Complex.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1697338611768B6E0025299C /* al_Complex.hpp */; };
 		16AA8EDE11C6F1D20053EFE1 /* al_Quat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA8EDD11C6F1D20053EFE1 /* al_Quat.cpp */; };
 		16AA8EDF11C6F1D20053EFE1 /* al_Quat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA8EDD11C6F1D20053EFE1 /* al_Quat.cpp */; };
+		16AA8EFC11C6FD200053EFE1 /* al_CoordinateFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA8EFB11C6FD200053EFE1 /* al_CoordinateFrame.cpp */; };
+		16AA8EFD11C6FD200053EFE1 /* al_CoordinateFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA8EFB11C6FD200053EFE1 /* al_CoordinateFrame.cpp */; };
+		16AA8F0211C6FE0B0053EFE1 /* al_Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA8F0111C6FE0B0053EFE1 /* al_Camera.cpp */; };
+		16AA8F0311C6FE0B0053EFE1 /* al_Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA8F0111C6FE0B0053EFE1 /* al_Camera.cpp */; };
+		16AA8F0F11C6FE6C0053EFE1 /* utSpatial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA8F0E11C6FE6C0053EFE1 /* utSpatial.cpp */; };
 		16AA95F6118F74FB00B98EC3 /* al_Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95F2118F74FB00B98EC3 /* al_Light.cpp */; };
 		16AA9600118F76B800B98EC3 /* al_Debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95FF118F76B800B98EC3 /* al_Debug.cpp */; };
 		16AA960A118F774800B98EC3 /* al_Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA9609118F774800B98EC3 /* al_Texture.cpp */; };
@@ -189,7 +192,6 @@
 		36BAE1E011C2FAFF009A8BBD /* al_Debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95FF118F76B800B98EC3 /* al_Debug.cpp */; };
 		36BAE1E111C2FAFF009A8BBD /* al_Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA9609118F774800B98EC3 /* al_Texture.cpp */; };
 		36BAE1E211C2FAFF009A8BBD /* al_Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA967F118F7D6600B98EC3 /* al_Shader.cpp */; };
-		36BAE1E311C2FAFF009A8BBD /* al_Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16885C9811A5E7A500071F90 /* al_Camera.cpp */; };
 		36BAE1E411C2FAFF009A8BBD /* al_SocketAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160DAE1211C1B1FE00C6905A /* al_SocketAPR.cpp */; };
 		36F46824110BE2E90082D21E /* al_AudioIO.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36F46821110BE2E90082D21E /* al_AudioIO.hpp */; };
 		36F46825110BE2E90082D21E /* al_File.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36F46822110BE2E90082D21E /* al_File.hpp */; };
@@ -287,8 +289,6 @@
 		166DD744117CDBFD00A8BA12 /* utTypesConversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utTypesConversion.cpp; path = ../../unitTests/utTypesConversion.cpp; sourceTree = SOURCE_ROOT; };
 		166DD78D117CDF1800A8BA12 /* pstdint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pstdint.h; sourceTree = "<group>"; };
 		1685D3C111C2EDB5009F676C /* al_ImplAPR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_ImplAPR.h; sourceTree = "<group>"; };
-		16885C9611A5E79800071F90 /* al_Camera.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Camera.hpp; sourceTree = "<group>"; };
-		16885C9811A5E7A500071F90 /* al_Camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Camera.cpp; sourceTree = "<group>"; };
 		168EC8EB1161CA2C00FCACC7 /* al_Time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Time.h; sourceTree = "<group>"; };
 		168EC8EC1161CA2C00FCACC7 /* al_MainLoop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_MainLoop.h; sourceTree = "<group>"; };
 		168EC8ED1161CA2C00FCACC7 /* al_Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Config.h; sourceTree = "<group>"; };
@@ -301,6 +301,11 @@
 		1697338611768B6E0025299C /* al_Complex.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Complex.hpp; sourceTree = "<group>"; };
 		1697339A11768CDF0025299C /* utMath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utMath.cpp; path = ../../unitTests/utMath.cpp; sourceTree = SOURCE_ROOT; };
 		16AA8EDD11C6F1D20053EFE1 /* al_Quat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = al_Quat.cpp; path = math/al_Quat.cpp; sourceTree = "<group>"; };
+		16AA8EEF11C6F9290053EFE1 /* al_CoordinateFrame.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = al_CoordinateFrame.hpp; path = spatial/al_CoordinateFrame.hpp; sourceTree = "<group>"; };
+		16AA8EFB11C6FD200053EFE1 /* al_CoordinateFrame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = al_CoordinateFrame.cpp; path = spatial/al_CoordinateFrame.cpp; sourceTree = "<group>"; };
+		16AA8F0011C6FDE10053EFE1 /* al_Camera.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = al_Camera.hpp; path = spatial/al_Camera.hpp; sourceTree = "<group>"; };
+		16AA8F0111C6FE0B0053EFE1 /* al_Camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = al_Camera.cpp; path = spatial/al_Camera.cpp; sourceTree = "<group>"; };
+		16AA8F0E11C6FE6C0053EFE1 /* utSpatial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utSpatial.cpp; path = ../../unitTests/utSpatial.cpp; sourceTree = SOURCE_ROOT; };
 		16AA95E5118F6EEF00B98EC3 /* al_Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Config.h; sourceTree = "<group>"; };
 		16AA95E8118F6EEF00B98EC3 /* al_Common.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Common.hpp; sourceTree = "<group>"; };
 		16AA95E9118F6EEF00B98EC3 /* al_GPUObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_GPUObject.hpp; sourceTree = "<group>"; };
@@ -649,10 +654,27 @@
 			name = math;
 			sourceTree = "<group>";
 		};
+		16AA8EE511C6F76B0053EFE1 /* spatial */ = {
+			isa = PBXGroup;
+			children = (
+				16AA8F0011C6FDE10053EFE1 /* al_Camera.hpp */,
+				16AA8EEF11C6F9290053EFE1 /* al_CoordinateFrame.hpp */,
+			);
+			name = spatial;
+			sourceTree = "<group>";
+		};
+		16AA8EF111C6FCE70053EFE1 /* spatial */ = {
+			isa = PBXGroup;
+			children = (
+				16AA8F0111C6FE0B0053EFE1 /* al_Camera.cpp */,
+				16AA8EFB11C6FD200053EFE1 /* al_CoordinateFrame.cpp */,
+			);
+			name = spatial;
+			sourceTree = "<group>";
+		};
 		16AA95E3118F6EEF00B98EC3 /* graphics */ = {
 			isa = PBXGroup;
 			children = (
-				16885C9611A5E79800071F90 /* al_Camera.hpp */,
 				16AA95E5118F6EEF00B98EC3 /* al_Config.h */,
 				16AA95E8118F6EEF00B98EC3 /* al_Common.hpp */,
 				16AA95FE118F760C00B98EC3 /* al_Debug.hpp */,
@@ -668,7 +690,6 @@
 		16AA95F0118F74FB00B98EC3 /* graphics */ = {
 			isa = PBXGroup;
 			children = (
-				16885C9811A5E7A500071F90 /* al_Camera.cpp */,
 				16AA95FF118F76B800B98EC3 /* al_Debug.cpp */,
 				16AA95F2118F74FB00B98EC3 /* al_Light.cpp */,
 				16AA9609118F774800B98EC3 /* al_Texture.cpp */,
@@ -689,6 +710,7 @@
 				16B5BF8C1188D0E90090CE80 /* utProtocolGraphics.cpp */,
 				16AC52A411628D4D0076AA8B /* utProtocolOSC.cpp */,
 				16AC52A311628D4D0076AA8B /* utProtocolSerialize.cpp */,
+				16AA8F0E11C6FE6C0053EFE1 /* utSpatial.cpp */,
 				16AC52A211628D4D0076AA8B /* utSystem.cpp */,
 				16AC52A611628D4D0076AA8B /* utTypes.cpp */,
 				166DD744117CDBFD00A8BA12 /* utTypesConversion.cpp */,
@@ -786,6 +808,7 @@
 				3622BEDD116D527D00928703 /* io */,
 				16AA8ED811C6F1BB0053EFE1 /* math */,
 				3622BEE4116D527D00928703 /* protocol */,
+				16AA8EF111C6FCE70053EFE1 /* spatial */,
 				3622BEF5116D527D00928703 /* system */,
 				3622BEFD116D527D00928703 /* types */,
 			);
@@ -919,6 +942,7 @@
 				36F46820110BE2E90082D21E /* io */,
 				1697336B11768ABD0025299C /* math */,
 				3602B53B110A6D3D005DC3D0 /* protocol */,
+				16AA8EE511C6F76B0053EFE1 /* spatial */,
 				36B4124710EFF7B8007B16D0 /* system */,
 				36B4124D10EFF7B8007B16D0 /* types */,
 			);
@@ -1107,7 +1131,6 @@
 				16BC66A5117770BF002A0C18 /* al_Functions.hpp in Headers */,
 				16BC66A6117770BF002A0C18 /* al_Interpolation.hpp in Headers */,
 				166DD742117CDB6000A8BA12 /* al_Conversion.hpp in Headers */,
-				16885C9711A5E79800071F90 /* al_Camera.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1363,7 +1386,6 @@
 				36BAE1E011C2FAFF009A8BBD /* al_Debug.cpp in Sources */,
 				36BAE1E111C2FAFF009A8BBD /* al_Texture.cpp in Sources */,
 				36BAE1E211C2FAFF009A8BBD /* al_Shader.cpp in Sources */,
-				36BAE1E311C2FAFF009A8BBD /* al_Camera.cpp in Sources */,
 				36BAE1E411C2FAFF009A8BBD /* al_SocketAPR.cpp in Sources */,
 				36BAE06011C2F00F009A8BBD /* utAllocore.cpp in Sources */,
 				36BAE06111C2F00F009A8BBD /* utIOAudioIO.cpp in Sources */,
@@ -1377,6 +1399,9 @@
 				36BAE06911C2F00F009A8BBD /* utTypes.cpp in Sources */,
 				36BAE06A11C2F00F009A8BBD /* utTypesConversion.cpp in Sources */,
 				16AA8EDE11C6F1D20053EFE1 /* al_Quat.cpp in Sources */,
+				16AA8EFC11C6FD200053EFE1 /* al_CoordinateFrame.cpp in Sources */,
+				16AA8F0211C6FE0B0053EFE1 /* al_Camera.cpp in Sources */,
+				16AA8F0F11C6FE6C0053EFE1 /* utSpatial.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1472,9 +1497,10 @@
 				16AA9600118F76B800B98EC3 /* al_Debug.cpp in Sources */,
 				16AA960A118F774800B98EC3 /* al_Texture.cpp in Sources */,
 				16AA9680118F7D6600B98EC3 /* al_Shader.cpp in Sources */,
-				16885C9911A5E7A500071F90 /* al_Camera.cpp in Sources */,
 				160DAE1411C1B1FE00C6905A /* al_SocketAPR.cpp in Sources */,
 				16AA8EDF11C6F1D20053EFE1 /* al_Quat.cpp in Sources */,
+				16AA8EFD11C6FD200053EFE1 /* al_CoordinateFrame.cpp in Sources */,
+				16AA8F0311C6FE0B0053EFE1 /* al_Camera.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -21,6 +21,8 @@
 #include "protocol/al_OSC.hpp"
 #include "protocol/al_OSCAPR.hpp"
 #include "protocol/al_Serialize.hpp"
+#include "spatial/al_Camera.hpp"
+#include "spatial/al_CoordinateFrame.hpp"
 #include "system/al_Time.h"
 #include "system/al_Time.hpp"
 #include "system/al_Thread.hpp"
@@ -45,6 +47,7 @@ int utMath();
 int utProtocolGraphics();
 int utProtocolOSC();
 int utProtocolSerialize();
+int utSpatial();
 int utSystem();
 int utTypes();
 int utTypesConversion();
