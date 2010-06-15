@@ -35,7 +35,6 @@
 
 #include "math/al_Vec.hpp"
 #include "types/al_Buffer.hpp"
-#include "types/al_VectorBuffer.hpp"
 #include "types/al_Color.hpp"
 
 namespace al{
