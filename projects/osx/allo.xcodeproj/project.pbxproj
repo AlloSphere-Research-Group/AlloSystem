@@ -306,6 +306,7 @@
 		16AA8F0011C6FDE10053EFE1 /* al_Camera.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = al_Camera.hpp; path = spatial/al_Camera.hpp; sourceTree = "<group>"; };
 		16AA8F0111C6FE0B0053EFE1 /* al_Camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = al_Camera.cpp; path = spatial/al_Camera.cpp; sourceTree = "<group>"; };
 		16AA8F0E11C6FE6C0053EFE1 /* utSpatial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utSpatial.cpp; path = ../../unitTests/utSpatial.cpp; sourceTree = SOURCE_ROOT; };
+		16AA8FA211C713890053EFE1 /* al_Frustum.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Frustum.hpp; sourceTree = "<group>"; };
 		16AA95E5118F6EEF00B98EC3 /* al_Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Config.h; sourceTree = "<group>"; };
 		16AA95E8118F6EEF00B98EC3 /* al_Common.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Common.hpp; sourceTree = "<group>"; };
 		16AA95E9118F6EEF00B98EC3 /* al_GPUObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_GPUObject.hpp; sourceTree = "<group>"; };
@@ -634,6 +635,7 @@
 			children = (
 				1697338611768B6E0025299C /* al_Complex.hpp */,
 				16BC66A1117770BF002A0C18 /* al_Constants.hpp */,
+				16AA8FA211C713890053EFE1 /* al_Frustum.hpp */,
 				16BC66A2117770BF002A0C18 /* al_Functions.hpp */,
 				16FFCB53118BAA8300D4C1BD /* al_Generators.hpp */,
 				16BC66A3117770BF002A0C18 /* al_Interpolation.hpp */,

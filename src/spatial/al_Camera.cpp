@@ -249,11 +249,11 @@ void Camera::setLookAt(double tx, double ty, double tz){
 	glLoadIdentity();
 	
 	//gl.lookAt(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ)
-	gluLookAt(tx + mPos[0], ty + mPos[1], tz + mPos[2],
-			tx + (mPos[0] + mUZ[0]*mFocalLength),
-			ty + (mPos[1] + mUZ[1]*mFocalLength),
-			tz + (mPos[2] + mUZ[2]*mFocalLength),
-			mUY[0], mUY[1], mUY[2]);
+	gluLookAt(tx + vec()[0], ty + vec()[1], tz + vec()[2],
+			tx + (vec()[0] + uz()[0]*mFocalLength),
+			ty + (vec()[1] + uz()[1]*mFocalLength),
+			tz + (vec()[2] + uz()[2]*mFocalLength),
+			uy()[0], uy()[1], uy()[2]);
 }
 
 

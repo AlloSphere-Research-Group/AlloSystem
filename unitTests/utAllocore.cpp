@@ -18,7 +18,7 @@ int main(){
 //
 //	utIOAudioIO();
 //	utIOWindowGL();
-	utIOSocket();
+//	utIOSocket();
 	
 //	utProtocolGraphics();
 

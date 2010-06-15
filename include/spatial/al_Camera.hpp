@@ -61,10 +61,10 @@ public:
 	Frustumd& computeTestFrustum();
 	Frustumd& testFrustum(){ return mFrustum; }
 
-	const Vec3d& pos() const { return mPos; }				///< Get position
-	const Vec3d& vf() const { return mUZ; }					///< Get forward vector
-	const Vec3d& vu() const { return mUY; }					///< Get up vector
-	const Vec3d& vr() const { return mUX; }					///< Get right vector
+	const Vec3d& pos() const { return vec(); }				///< Get position
+	const Vec3d& vf() const { return uz(); }				///< Get forward vector
+	const Vec3d& vu() const { return uy(); }				///< Get up vector
+	const Vec3d& vr() const { return ux(); }				///< Get right vector
 	double focalLength() const { return mFocalLength; }		///< Get focal length
 	double aperture() const { return mAperture; }			///< Get vertical field of view, in degrees
 	double eyeSep() const { return mEyeSep; }				///< Get eye separation

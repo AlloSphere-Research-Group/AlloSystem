@@ -2,9 +2,9 @@
 
 namespace al{
 
-void Nav :: toAED(const Vec3d & to, double azimuth, double elevation, double distance) {
+void Nav :: toAED(const Vec3d& to, double& azimuth, double& elevation, double& distance) const {
 	
-	Vec3d rel = to - mPos;
+	Vec3d rel = to - vec();
 	distance = rel.mag();
 	
 	if (distance > QUAT_EPSILON*2) 
@@ -34,26 +34,26 @@ void Nav :: updateUnitVectors() {
 
 void Nav :: step() {
 	// accumulate orientation:
-	mQuat *= mVel.mQuat;
+	mQuat *= vel().quat();
 	updateUnitVectors();
 	
 	// accumulate position:
 	for (int i=0; i<3; i++) {
-		mPos[i] += mVel.mPos[0] * mUX[i] + mVel.mPos[1] * mUY[i] + mVel.mPos[2] * mUZ[i];
+		vec()[i] += vel().vec().dot(Vec3d(ux()[i], uy()[i], uz()[i]));
 	}
 
 }
 
 void Nav :: step(double dt) {
 	// accumulate orientation:
-	Quatd q2(mQuat);
-	q2 *= mVel.mQuat;
+	Quatd q2(quat());
+	q2 *= vel().quat();
 	mQuat.slerp(q2, dt);
 	updateUnitVectors();
 	
 	// accumulate position:
 	for (int i=0; i<3; i++) {
-		mPos[i] += dt * (mVel.mPos[0] * mUX[i] + mVel.mPos[1] * mUY[i] + mVel.mPos[2] * mUZ[i]);
+		vec()[i] += dt * vel().vec().dot(Vec3d(ux()[i], uy()[i], uz()[i]));
 	}
 }
 
