@@ -794,6 +794,7 @@
 		36C9F71711C6F31A004FEBE3 /* al_Compiler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Compiler.cpp; sourceTree = "<group>"; };
 		36C9F7CF11C6FAF3004FEBE3 /* clangVersion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = clangVersion.cpp; sourceTree = "<group>"; };
 		36C9F84211C6FF55004FEBE3 /* liballocore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liballocore.a; path = ../../build/Debug/liballocore.a; sourceTree = SOURCE_ROOT; };
+		36DDA0BA11C701AD00C2A6B3 /* input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = input.cpp; path = ../examples/alloplay/input.cpp; sourceTree = "<group>"; };
 		D2AAC046055464E500DB518D /* liballocompiler.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liballocompiler.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -880,6 +881,7 @@
 			isa = PBXGroup;
 			children = (
 				36C9F1CC11C6A7E9004FEBE3 /* utCompiler.cpp */,
+				36DDA0BA11C701AD00C2A6B3 /* input.cpp */,
 			);
 			name = unitTests;
 			path = ../../unitTests;
