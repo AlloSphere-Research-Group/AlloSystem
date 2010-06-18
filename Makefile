@@ -20,10 +20,12 @@ PRO_SRC		:= $(addprefix $(SRC_DIR)/$(PRO_DIR)/, $(PRO_SRC))
 TYPES_SRC	:= $(addprefix $(SRC_DIR)/$(TYPES_DIR)/, $(TYPES_SRC))
 SYS_SRC		:= $(addprefix $(SRC_DIR)/$(SYS_DIR)/, $(SYS_SRC))
 
-SRCS = $(IO_SRC) $(PRO_SRC) $(MATH_SRC) $(SYS_SRC) $(TYPES_SRC)
-OBJS = $(addsuffix .o, $(basename $(notdir $(SRCS))))
+SRCS		= $(IO_SRC) $(PRO_SRC) $(MATH_SRC) $(SYS_SRC) $(TYPES_SRC)
+OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
-CFLAGS += $(addprefix -I./, $(INC_DIRS))
+CFLAGS		+= $(addprefix -I./, $(INC_DIRS))
+DLIB_FILE 	:= $(addprefix $(BIN_DIR)/, $(DLIB_FILE))
+SLIB_FILE 	:= $(addprefix $(BIN_DIR)/, $(SLIB_FILE))
 
 #--------------------------------------------------------------------------
 # Targets
@@ -38,22 +40,30 @@ $(OBJ_DIR)/%.o: %.c
 	@echo CC $< $@
 	@$(CC) -c $(CFLAGS) $< -o $@
 
-all: $(BIN_DIR)/$(SLIB_FILE)
+all: $(SLIB_FILE)
 
 # Build static library
-$(BIN_DIR)/$(SLIB_FILE): createFolders $(addprefix $(OBJ_DIR)/, $(OBJS))
+$(SLIB_FILE): createFolders $(addprefix $(OBJ_DIR)/, $(OBJS))
 	@echo AR $@
+	@rm -f $@
 	@$(AR) $@ $(filter %.o, $^)
 	@$(RANLIB) $@
 
 # Build dynamic (shared) library
 # TODO: implement
-#$(DLIB_FILE): $(addprefix $(OBJ_DIR)/, $(OBJS))
+#$(DLIB_FILE): createFolders $(addprefix $(OBJ_DIR)/, $(OBJS))
 
+# Dummy target to force rebuilds
+FORCE:
+
+# Compile and run source files in examples/ folder
+examples/%.cpp: $(SLIB_FILE) FORCE
+	@$(CC) $(CFLAGS) -o $(BIN_DIR)/$(*F) $@ $(LFLAGS) $(SLIB_FILE) $(LIB_EXT)
+	@./$(BIN_DIR)/$(*F) &
 
 # Build unit tests
 .PHONY: test
-test: $(BIN_DIR)/$(SLIB_FILE)
+test: $(SLIB_FILE)
 	@make --directory $(TEST_DIR)
 
 # Remove active build configuration binary files
