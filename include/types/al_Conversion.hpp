@@ -30,6 +30,7 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <limits.h>
 #include <sstream>		/* string conversion */
 #include "system/al_Config.h"
 
@@ -258,23 +259,19 @@ inline uint32_t unitToUInt(float v){
 }
 
 inline uint32_t unitToUInt2(float v){
-	uint32_t normalU = (punFU(v) & 0xffffffffUL);
-	uint32_t rbs = 126UL - ((normalU >> 23UL) & 0x7fffffUL);
+	uint32_t normalU = punFU(v);
+	uint32_t rbs = 126UL - (normalU >> 23UL);
 //	printf("%x %lu\n", (normalU | 0x800000) << 8, rbs);
 //	printf("%x\n", 0x80000000UL >> rbs);
-	return ((normalU | 0x800000UL) << 8UL) >> rbs;
+	return (((normalU | 0x800000UL) << 8UL) & (~ULONG_MAX | 0xffffffffUL)) >> rbs;
 
 //	uint32_t normalU = punFU(v);
-//	uint32_t rbs = 118UL - ((normalU >> 23UL) & 0x7fffffUL);
+//	uint32_t rbs = 118UL - ((normalU >> 23UL) & (~ULONG_MAX | 0x7fffffUL));
 ////	printf("%x %lu\n", (normalU | 0x800000) << 8, rbs);
 ////	printf("%x\n", 0x80000000UL >> rbs);
-//	return ((normalU & 0xffffffUL) | 0x800000UL) >> rbs;
+//	return ((normalU & (~ULONG_MAX | 0xffffffUL)) | 0x800000UL) >> rbs;
+////	return (((normalU | 0x800000UL) << 8UL) & (~ULONG_MAX | 0xffffffffUL)) >> rbs;
 
-//	uint32_t normalU = punFU(v);
-//	uint32_t rbs = 118UL - ((normalU >> 23UL) & 0x7fffffUL);
-////	printf("%x %lu\n", (normalU | 0x800000) << 8, rbs);
-////	printf("%x\n", 0x80000000UL >> rbs);
-//	return (((normalU & 0xffffffUL) | 0x800000UL)) >> rbs;
 //Her00	
 //float y = v + 1.f; 
 //return ((unsigned long&)v) & 0x7FFFFF;      // last 23 bits 
