@@ -23,7 +23,7 @@ Material& Material::diffuse(const Color& v){ mDiffuse=v; return *this; }
 Material& Material::emission(const Color& v){ mEmission=v; return *this; }
 Material& Material::specular(const Color& v){ mSpecular=v; return *this; }
 Material& Material::shininess(float v){ mShine=v; return *this; }
-Material& Material::face(Face::t f){ mFace=f; }
+Material& Material::face(Face::t f){ mFace=f; return *this; }
 
 static bool * lightPool(){
 	static bool x[8] = {0};
