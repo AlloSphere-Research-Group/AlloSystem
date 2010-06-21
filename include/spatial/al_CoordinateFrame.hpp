@@ -79,8 +79,11 @@ protected:
 
 
 
-class NavNode : public Nav {
+class NavRef : public Nav {
 public:
+	NavRef()
+	: mParent(0)
+	{}
 
 	void parent(Nav * v){ mParent = v; }
 

@@ -26,7 +26,7 @@ etc to determine the near and far clip planes.
 */
 ///<	Utility wrapper of Pose for use as a 3D camera
 ///		
-class Camera : public Nav {
+class Camera : public NavRef {
 public:
 
 	enum StereoMode{

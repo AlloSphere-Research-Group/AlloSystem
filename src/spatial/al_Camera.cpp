@@ -26,8 +26,7 @@ namespace al{
 
 Camera :: Camera(double aper, double nearClip, double farClip, double focalLen, double eyeSep)
 :	mFocalLength(focalLen), mEyeSep(eyeSep), mNear(nearClip), mFar(farClip),
-	mStereo(false), mMode(Anaglyph), 
-	mZoom(0)
+	mZoom(0), mMode(Anaglyph), mStereo(false)
 {
 	aperture(aper);
 	dimensions(4,3,0,0);
