@@ -30,10 +30,17 @@
 #include <vector>
 #include <string>
 
-namespace al {
-
 /*
 	A wrapper around the LLVM/Clang APIs
+*/	
+
+namespace al {
+
+class JIT;
+class ModuleImpl;
+
+/*
+	Compiler is responsible for compiling, reading, and linking different sources
 */	
 class Compiler {
 public: 
@@ -45,27 +52,56 @@ public:
 		Options() 
 			: CPlusPlus(1) {}
 	};
-	
 	Compiler::Options options;
 	
-	Compiler(std::string name = "untitled");
+	Compiler();
 	~Compiler();
 
 	/*
-		successive compiles are linked together.
+		Note: successive compiles/bitcode reads are linked together.
 	*/
 	bool compile(std::string code);	
 	bool readbitcode(std::string path);	
+	bool writebitcode(std::string path);	
+	void optimize(std::string flag = "02");
 	
+	/*
+		discards any code compiled so far.
+	*/
+	void clear();
+	
+	/*
+		transfers code compiled so far into the JIT engine 
+		runs any static constructors for this code at this point
+		calls clear() to reset this Compiler
+	*/
+	JIT * jit();	
+				
+private:
+	friend class ModuleImpl;
+	class ModuleImpl * mImpl;
+};
+
+/*
+	JIT is responsible for retrieving pointers and functions 
+	from the code registered with the run-time execution engine
+*/	
+class JIT {
+private:
+	friend class Compiler;
+	JIT();
+public:
+	~JIT();	// when a JIT is freed, the functions/pointers associated with it are freed to
+	
+	// TODO: maybe also offer a per-function optimize here?
 	void * getfunctionptr(std::string funcname);
 	void * getglobalptr(std::string globalname);
-	
-	bool writebitcode(std::string path);				
-
 private:
-	friend class CompilerImpl;
-	class CompilerImpl * mImpl;
+	friend class ModuleImpl;
+	class ModuleImpl * mImpl;
 };
+
+
 
 
 } // al::

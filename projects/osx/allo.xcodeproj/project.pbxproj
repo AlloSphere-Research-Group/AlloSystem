@@ -193,6 +193,17 @@
 		36BAE1E111C2FAFF009A8BBD /* al_Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA9609118F774800B98EC3 /* al_Texture.cpp */; };
 		36BAE1E211C2FAFF009A8BBD /* al_Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA967F118F7D6600B98EC3 /* al_Shader.cpp */; };
 		36BAE1E411C2FAFF009A8BBD /* al_SocketAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160DAE1211C1B1FE00C6905A /* al_SocketAPR.cpp */; };
+		36C13ECF11D15D30006196FC /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
+		36C13ED011D15D30006196FC /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
+		36C13ED111D15D30006196FC /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
+		36C13ED211D15D30006196FC /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC53081162907D0076AA8B /* CoreAudio.framework */; };
+		36C13ED311D15D30006196FC /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
+		36C13ED411D15D30006196FC /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
+		36C13ED511D15D30006196FC /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
+		36C13EDC11D15D45006196FC /* exReverb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36C13EDB11D15D45006196FC /* exReverb.cpp */; };
+		36C13EE711D15D8A006196FC /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
+		36C13EFF11D15E1A006196FC /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
+		36C13F0211D15E33006196FC /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
 		36F46824110BE2E90082D21E /* al_AudioIO.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36F46821110BE2E90082D21E /* al_AudioIO.hpp */; };
 		36F46825110BE2E90082D21E /* al_File.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36F46822110BE2E90082D21E /* al_File.hpp */; };
 		36F46826110BE2E90082D21E /* al_WindowGL.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36F46823110BE2E90082D21E /* al_WindowGL.hpp */; };
@@ -242,6 +253,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 36B4130E10EFFA8D007B16D0;
 			remoteInfo = libal;
+		};
+		36C13ECB11D15D30006196FC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 36B4130E10EFFA8D007B16D0;
+			remoteInfo = allocore;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -464,6 +482,10 @@
 		36B4130F10EFFA8D007B16D0 /* liballocore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liballocore.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		36B4139610EFFD4C007B16D0 /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
 		36B4BF06110E55AF00F789A8 /* al_Socket.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Socket.hpp; sourceTree = "<group>"; };
+		36C13ED911D15D30006196FC /* exReverb */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exReverb; sourceTree = BUILT_PRODUCTS_DIR; };
+		36C13EDB11D15D45006196FC /* exReverb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exReverb.cpp; sourceTree = "<group>"; };
+		36C13F0D11D15FA9006196FC /* al_Ambisonics.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Ambisonics.hpp; sourceTree = "<group>"; };
+		36C13F0E11D15FA9006196FC /* al_Reverb.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Reverb.hpp; sourceTree = "<group>"; };
 		36F4662B110B9B720082D21E /* al_socktube.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_socktube.h; sourceTree = "<group>"; };
 		36F46821110BE2E90082D21E /* al_AudioIO.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_AudioIO.hpp; sourceTree = "<group>"; };
 		36F46822110BE2E90082D21E /* al_File.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_File.hpp; sourceTree = "<group>"; };
@@ -580,12 +602,29 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36C13F0211D15E33006196FC /* libportaudio.a in Frameworks */,
 				3622BFA7116D558500928703 /* libapr-1.a in Frameworks */,
 				16AC52D511628F860076AA8B /* GLUT.framework in Frameworks */,
 				16AC52D611628F870076AA8B /* OpenGL.framework in Frameworks */,
 				16AC53091162907D0076AA8B /* CoreAudio.framework in Frameworks */,
 				16AC5313116290AA0076AA8B /* AudioUnit.framework in Frameworks */,
 				16AC531B116290BE0076AA8B /* AudioToolbox.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		36C13ECE11D15D30006196FC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				36C13ECF11D15D30006196FC /* OpenGL.framework in Frameworks */,
+				36C13ED011D15D30006196FC /* AudioToolbox.framework in Frameworks */,
+				36C13ED111D15D30006196FC /* AudioUnit.framework in Frameworks */,
+				36C13ED211D15D30006196FC /* CoreAudio.framework in Frameworks */,
+				36C13EE711D15D8A006196FC /* libapr-1.a in Frameworks */,
+				36C13EFF11D15E1A006196FC /* libportaudio.a in Frameworks */,
+				36C13ED311D15D30006196FC /* liballocore.a in Frameworks */,
+				36C13ED411D15D30006196FC /* Cocoa.framework in Frameworks */,
+				36C13ED511D15D30006196FC /* GLUT.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -733,6 +772,7 @@
 				3622C079116D575700928703 /* exMainloopCocoa.app */,
 				369EA3A7116D5F5F00EB1934 /* exCameraGLUT */,
 				369EA3B0116D60CE00EB1934 /* liballoutil.a */,
+				36C13ED911D15D30006196FC /* exReverb */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -789,6 +829,7 @@
 		3622BEDB116D526700928703 /* examples */ = {
 			isa = PBXGroup;
 			children = (
+				36C13EDB11D15D45006196FC /* exReverb.cpp */,
 				3622C06B116D56A500928703 /* exMainloopCocoa */,
 				36B4139610EFFD4C007B16D0 /* main.h */,
 				08FB7796FE84155DC02AAC07 /* exScheduling.cpp */,
@@ -940,6 +981,7 @@
 		36B4124410EFF7B8007B16D0 /* include */ = {
 			isa = PBXGroup;
 			children = (
+				36C13F0C11D15FA9006196FC /* sound */,
 				16AA95E3118F6EEF00B98EC3 /* graphics */,
 				36F46820110BE2E90082D21E /* io */,
 				1697336B11768ABD0025299C /* math */,
@@ -1061,6 +1103,15 @@
 				36B4129810EFF864007B16D0 /* libapr-1.a */,
 			);
 			path = lib;
+			sourceTree = "<group>";
+		};
+		36C13F0C11D15FA9006196FC /* sound */ = {
+			isa = PBXGroup;
+			children = (
+				36C13F0D11D15FA9006196FC /* al_Ambisonics.hpp */,
+				36C13F0E11D15FA9006196FC /* al_Reverb.hpp */,
+			);
+			path = sound;
 			sourceTree = "<group>";
 		};
 		36F46820110BE2E90082D21E /* io */ = {
@@ -1295,6 +1346,23 @@
 			productReference = 36B4130F10EFFA8D007B16D0 /* liballocore.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		36C13EC911D15D30006196FC /* exReverb */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 36C13ED611D15D30006196FC /* Build configuration list for PBXNativeTarget "exReverb" */;
+			buildPhases = (
+				36C13ECC11D15D30006196FC /* Sources */,
+				36C13ECE11D15D30006196FC /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				36C13ECA11D15D30006196FC /* PBXTargetDependency */,
+			);
+			name = exReverb;
+			productName = unitTests;
+			productReference = 36C13ED911D15D30006196FC /* exReverb */;
+			productType = "com.apple.product-type.tool";
+		};
 		8DD76F620486A84900D96B5E /* exScheduling */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "exScheduling" */;
@@ -1336,6 +1404,7 @@
 				3622BFD6116D55DD00928703 /* exMainloopTool */,
 				3622C078116D575700928703 /* exMainloopCocoa */,
 				369EA397116D5F5F00EB1934 /* exCameraGLUT */,
+				36C13EC911D15D30006196FC /* exReverb */,
 			);
 		};
 /* End PBXProject section */
@@ -1506,6 +1575,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		36C13ECC11D15D30006196FC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				36C13EDC11D15D45006196FC /* exReverb.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DD76F640486A84900D96B5E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1546,6 +1623,11 @@
 			isa = PBXTargetDependency;
 			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
 			targetProxy = 36B4131710EFFAA5007B16D0 /* PBXContainerItemProxy */;
+		};
+		36C13ECA11D15D30006196FC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
+			targetProxy = 36C13ECB11D15D30006196FC /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2139,7 +2221,10 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				INSTALL_PATH = /usr/local/lib;
-				LIBRARY_SEARCH_PATHS = ../../dev/osx/lib;
+				LIBRARY_SEARCH_PATHS = (
+					../../dev/osx/lib,
+					"\"$(SRCROOT)/../../dev/osx/lib\"",
+				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DOSC_HOST_LITTLE_ENDIAN";
 				OTHER_LDFLAGS = (
@@ -2171,7 +2256,10 @@
 				GCC_MODEL_TUNING = G5;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				INSTALL_PATH = /usr/local/lib;
-				LIBRARY_SEARCH_PATHS = ../../dev/osx/lib;
+				LIBRARY_SEARCH_PATHS = (
+					../../dev/osx/lib,
+					"\"$(SRCROOT)/../../dev/osx/lib\"",
+				);
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DOSC_HOST_LITTLE_ENDIAN";
 				OTHER_LDFLAGS = (
@@ -2190,6 +2278,48 @@
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
 				SYMROOT = $inherited;
 				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../include";
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		36C13ED711D15D30006196FC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = "";
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../dev/osx/lib\"",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = $TARGET_NAME;
+				USER_HEADER_SEARCH_PATHS = ../../include;
+			};
+			name = Debug;
+		};
+		36C13ED811D15D30006196FC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				HEADER_SEARCH_PATHS = "";
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../dev/osx/lib\"",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = $TARGET_NAME;
+				USER_HEADER_SEARCH_PATHS = ../../include;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -2292,6 +2422,15 @@
 			buildConfigurations = (
 				36B4131010EFFA8E007B16D0 /* Debug */,
 				36B4131110EFFA8E007B16D0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		36C13ED611D15D30006196FC /* Build configuration list for PBXNativeTarget "exReverb" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				36C13ED711D15D30006196FC /* Debug */,
+				36C13ED811D15D30006196FC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

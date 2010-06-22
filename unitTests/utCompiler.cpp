@@ -3,6 +3,45 @@
 
 #include "io/al_AudioIO.hpp"
 
+#include <list>
+
+
+//struct AudioProcess {
+//	void (*onProcess)(AudioProcess * handle, void * userdata);
+//	void (*onFree)(AudioProcess * handle, void * userdata);
+//	void * userdata;
+//	int isDone;
+//};
+//
+//std::list<AudioProcess *> audio_processes;
+//
+//extern "C" void audioProcessRegister(AudioProcess * proc) {
+//	proc->isDone = 0;
+//	// TODO: this should be in the audio thread:
+//	audio_processes.push_back(proc);
+//}
+//
+//extern "C" void audioProcessUnregister(AudioProcess * proc) {
+//	proc->isDone = 1;
+//}
+//
+//void callback(al::AudioIOData &io) {
+//	printf(".");
+//	for (std::list<AudioProcess *>::iterator it = audio_processes.begin(); it != audio_processes.end(); ) {
+//		AudioProcess * handle = *it;
+//		if (handle->isDone) {
+//			it = audio_processes.erase(it);
+//			// TODO: notify main thread to call (handle->onFree)(handle, handle->userdata);
+//		} else {
+//			(handle->onProcess)(handle, handle->userdata);
+//			it++;
+//		}
+//	}
+//}
+//
+//
+//al::AudioIO audio(64, 44100., callback);
+
 typedef int (*vfptr)(int ac, char ** av);
 
 char * src = "\n"
@@ -77,7 +116,8 @@ int main (int argc, const char * argv[]) {
 	
 	
 	bool ok = C.compile(code);
-	f = (vfptr)C.getfunctionptr("main");
+	al::JIT * jit = C.jit();
+	f = (vfptr)jit->getfunctionptr("main");
 	
 	
 	printf("compiled? %d (f=%p) \n", ok, f);
@@ -85,16 +125,16 @@ int main (int argc, const char * argv[]) {
 		f(0, 0);
 	}
 	C.compile(src);
+	al::JIT * jit2 = C.jit();
 	
-	f = (vfptr)C.getfunctionptr("z00");
+	f = (vfptr)jit2->getfunctionptr("z00");
 	f(0, 0);
 	
-//	al::AudioIO io; //
-//	printf("open %d\n", io.open());
-//	printf("start %d\n", io.start());
-//	al_sleep(1);
-//	io.print();								///< Prints info about current i/o devices to stdout.
-//	io.printError();
+//	audio.print();	
+//	printf("open %d\n", audio.open());
+//	printf("start %d\n", audio.start());
+//	al_sleep(2);							
+//	audio.printError();
 	
 	return 0;
 }

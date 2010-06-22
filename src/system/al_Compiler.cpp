@@ -86,47 +86,177 @@ static JITListener gJITEventListener;
 static void llvmErrorHandler(void * user_data, const std::string& reason) {
 	printf("llvm error %s\n", reason.data());
 }
+static void llvmInit() {
+	static bool initialized = false;
+	if (!initialized) {
+		llvm::InitializeAllTargets();
+		llvm::InitializeAllAsmPrinters();
+		llvm::llvm_install_error_handler(llvmErrorHandler, NULL);
+		initialized = true;
+	}
+}
 
 
 namespace al {
 
-class CompilerImpl {
+class ModuleImpl {
 public:
-	llvm::Module * mainModule;
+	llvm::Module * module;
 	llvm::LLVMContext llvmContext;
 	
-	CompilerImpl(std::string name) {
-		mainModule = new llvm::Module(name, llvmContext);
-		jit(mainModule);
-	}
+	ModuleImpl() : module(NULL) {}
 	
-	~CompilerImpl() {
-		/*	Removing the functions one by one. */
-		llvm::Module::FunctionListType & flist = mainModule->getFunctionList();
-		for (llvm::Module::FunctionListType::iterator iter= flist.begin(); iter != flist.end(); iter++) {
-			//printf("function %s %d\n", iter->getName().data(), iter->isIntrinsic());
-			EE->freeMachineCodeForFunction(iter);
-		}
-		/* free any statics allocated in the code */
-		EE->runStaticConstructorsDestructors(mainModule, true);
-		EE->clearGlobalMappingsFromModule(mainModule);
-		/* EE forgets about module */
-		EE->removeModule(mainModule);	
-		/* should be safe */
-		delete mainModule;
-	}
-	
-	llvm::Module * module() { return mainModule; }
-	
-	void jit(llvm::Module * module) {
+	bool link(llvm::Module * child) {
 		std::string err;
+		if (module == NULL) {
+			module = child;
+		} else {
+			llvm::Linker::LinkModules(module, child, &err);
+		}
+		if (err.length()) {
+			printf("link error %s\n", err.data());
+			return false;
+		}
+		return true;
+	}
+};
+
+Compiler::Compiler() : mImpl(NULL) { llvmInit(); }
+
+Compiler::~Compiler() {
+	clear();
+}
+
+void Compiler :: clear() {
+	if (mImpl) {
+		delete mImpl->module;
+		delete mImpl;
+		mImpl = NULL;
+	}
+}
+
+bool Compiler :: compile(std::string code) {
+	if (!mImpl) mImpl = new ModuleImpl;
+	
+	const char * src = code.data();
+	llvm::MemoryBuffer *buffer = llvm::MemoryBuffer::getMemBufferCopy(src, src+strlen(src), "src");
+	if(!buffer) {
+		printf("couldn't create buffer\n");
+	}
+	
+	CompilerInstance CI;
+	CI.createDiagnostics(0, NULL);
+	Diagnostic & Diags = CI.getDiagnostics();	
+	TextDiagnosticBuffer client;
+	Diags.setClient(&client);
+	CompilerInvocation::CreateFromArgs(CI.getInvocation(), NULL, NULL, Diags);
+	
+//	// list standard invocation args:
+//	std::vector<std::string> Args;
+//	Compiler.getInvocation().toArgs(Args);
+//	for (int i=0; i<Args.size(); i++) {
+//		printf("%d %s\n", i, Args[i].data());
+//	}
+	
+
+	
+	LangOptions& lang = CI.getInvocation().getLangOpts();
+	// The fateful line
+	lang.CPlusPlus = options.CPlusPlus;
+	lang.Bool = 1;
+	lang.BCPLComment = 1;
+	lang.RTTI = 0;
+	lang.PICLevel = 1;
+	
+
+	CI.createSourceManager();
+	CI.getSourceManager().createMainFileIDForMemBuffer(buffer);
+	CI.createFileManager();
+	
+	// Create the target instance.
+	CI.setTarget(TargetInfo::CreateTargetInfo(CI.getDiagnostics(), CI.getTargetOpts()));
+//	TargetOptions targetopts = Compiler.getTargetOpts();
+//	printf("triple %s\n", targetopts.Triple.data());
+//	printf("CPU %s\n", targetopts.CPU.data());
+//	printf("ABI %s\n", targetopts.ABI.data());
+//	for (int i=0; i<targetopts.Features.size(); i++)
+//		printf("Feature %s\n", targetopts.Features[i].data());
+	
+	CI.createPreprocessor();
+	Preprocessor &PP = CI.getPreprocessor();
+	
+	// Header paths:
+	HeaderSearchOptions& headeropts = CI.getHeaderSearchOpts();
+	for (int i=0; i<options.system_includes.size(); i++) {
+		headeropts.AddPath(options.system_includes[i], clang::frontend::Angled, true, false);
+	}
+	for (int i=0; i<options.user_includes.size(); i++) {
+		headeropts.AddPath(options.user_includes[i], clang::frontend::Quoted, true, false);
+	}
+	ApplyHeaderSearchOptions(PP.getHeaderSearchInfo(), headeropts, lang, CI.getTarget().getTriple());
+	
+	PP.getBuiltinInfo().InitializeBuiltins(PP.getIdentifierTable(), PP.getLangOptions().NoBuiltin);
+	
+			
+	
+	CI.createASTContext();
+//	llvm::SmallVector<const char *, 32> BuiltinNames;
+//	printf("NoBuiltins: %d\n", Compiler.getASTContext().getLangOptions().NoBuiltin);
+//	Compiler.getASTContext().BuiltinInfo.GetBuiltinNames(BuiltinNames, Compiler.getASTContext().getLangOptions().NoBuiltin);
+//	for (int i = 0; i<BuiltinNames.size(); i++) {
+//		printf("Builtin %s\n", BuiltinNames[i]);
+//	}
+	
+			
+	CodeGenOptions CGO;
+	CodeGenerator * codegen = CreateLLVMCodeGen(Diags, "mymodule", CGO, mImpl->llvmContext );
+
+	
+	ParseAST(CI.getPreprocessor(),
+			codegen,
+			CI.getASTContext(),
+			/* PrintState= */ false,
+			true,
+			0);
+	
+	llvm::Module* module = codegen->ReleaseModule();
+	delete codegen;
+	
+	if (module) {
+		mImpl->link(module);
+		return true;
+	}
+	
+	printf("compile errors\n");
+	
+	int ecount = 0;
+	for(TextDiagnosticBuffer::const_iterator it = client.err_begin();
+		it != client.err_end();
+		++it)
+	{
+		FullSourceLoc SourceLoc = FullSourceLoc(it->first, CI.getSourceManager());
+		int LineNum = SourceLoc.getInstantiationLineNumber();
+		int ColNum = SourceLoc.getInstantiationColumnNumber();
+		const char * bufname = SourceLoc.getManager().getBufferName(SourceLoc);
+		printf("error %s line %d col %d: %s\n", bufname, LineNum, ColNum, it->second.data());
+		ecount++;
+		if(ecount > 250) break;
+	}
+	clear();
+	return false;
+}
+
+bool Compiler :: readbitcode(std::string path) {
+	//if (!mImpl) mImpl = new ModuleImpl; //etc.
+	return true;
+}
+
+JIT * Compiler :: jit() {
+	std::string err;
+	if (mImpl) {
 		if (EE==0) {
-			llvm::InitializeAllTargets();
-			llvm::InitializeAllAsmPrinters();
-			llvm::llvm_install_error_handler(llvmErrorHandler, NULL);
-		
 			EE = llvm::ExecutionEngine::createJIT(
-				mainModule,	// module provider
+				mImpl->module,	
 				&err,		// error string
 				0,			// JITMemoryManager
 				llvm::CodeGenOpt::Default,	// JIT slowly (None, Default, Aggressive)
@@ -134,165 +264,55 @@ public:
 			);
 			if (EE == 0) {
 				printf("Failed to create Execution Engine: %s", err.data());
+				return 0;
 			}
 			
 			// turn this off when not debugging:
 			EE->RegisterJITEventListener(&gJITEventListener);
 			//EE->InstallLazyFunctionCreator(lazyfunctioncreator);
 			//EE->DisableGVCompilation();
+		
 		} else {
-			EE->addModule(module);
+			EE->addModule(mImpl->module);
 		}
-		EE->runStaticConstructorsDestructors(module, false);
-		//EE->DisableLazyCompilation();
+		EE->runStaticConstructorsDestructors(mImpl->module, false);
+		// create JIT and transfer ownership of module to it:
+		mImpl->module->dump();
+		JIT * jit = new JIT;
+		jit->mImpl = mImpl;
+		mImpl = NULL;
+		return jit;
 	}
-	
-	void link(llvm::Module * child) {
-		std::string err;
-		llvm::Linker::LinkModules(mainModule, child, &err);
-		if (err.length()) {
-			printf("link error %s\n", err.data());
-		}
-	}
-	
-	bool compile(std::string code, Compiler::Options& options) {
-		const char * src = code.data();
-		llvm::MemoryBuffer *buffer = llvm::MemoryBuffer::getMemBufferCopy(src, src+strlen(src), "src");
-		if(!buffer) {
-			printf("couldn't create buffer\n");
-		}
-		
-		CompilerInstance CI;
-		CI.createDiagnostics(0, NULL);
-		Diagnostic & Diags = CI.getDiagnostics();	
-		TextDiagnosticBuffer client;
-		Diags.setClient(&client);
-		CompilerInvocation::CreateFromArgs(CI.getInvocation(), NULL, NULL, Diags);
-		
-	//	// list standard invocation args:
-	//	std::vector<std::string> Args;
-	//	Compiler.getInvocation().toArgs(Args);
-	//	for (int i=0; i<Args.size(); i++) {
-	//		printf("%d %s\n", i, Args[i].data());
-	//	}
-		
-
-		
-		LangOptions& lang = CI.getInvocation().getLangOpts();
-		// The fateful line
-		lang.CPlusPlus = options.CPlusPlus;
-		lang.Bool = 1;
-		lang.BCPLComment = 1;
-		lang.RTTI = 0;
-		lang.PICLevel = 1;
-		
-
-		CI.createSourceManager();
-		CI.getSourceManager().createMainFileIDForMemBuffer(buffer);
-		CI.createFileManager();
-		
-		// Create the target instance.
-		CI.setTarget(TargetInfo::CreateTargetInfo(CI.getDiagnostics(), CI.getTargetOpts()));
-	//	TargetOptions targetopts = Compiler.getTargetOpts();
-	//	printf("triple %s\n", targetopts.Triple.data());
-	//	printf("CPU %s\n", targetopts.CPU.data());
-	//	printf("ABI %s\n", targetopts.ABI.data());
-	//	for (int i=0; i<targetopts.Features.size(); i++)
-	//		printf("Feature %s\n", targetopts.Features[i].data());
-		
-		CI.createPreprocessor();
-		Preprocessor &PP = CI.getPreprocessor();
-		
-		// Header paths:
-		HeaderSearchOptions& headeropts = CI.getHeaderSearchOpts();
-		for (int i=0; i<options.system_includes.size(); i++) {
-			headeropts.AddPath(options.system_includes[i], clang::frontend::Angled, true, false);
-		}
-		for (int i=0; i<options.user_includes.size(); i++) {
-			headeropts.AddPath(options.user_includes[i], clang::frontend::Quoted, true, false);
-		}
-		ApplyHeaderSearchOptions(PP.getHeaderSearchInfo(), headeropts, lang, CI.getTarget().getTriple());
-		
-		PP.getBuiltinInfo().InitializeBuiltins(PP.getIdentifierTable(), PP.getLangOptions().NoBuiltin);
-		
-				
-		
-		CI.createASTContext();
-	//	llvm::SmallVector<const char *, 32> BuiltinNames;
-	//	printf("NoBuiltins: %d\n", Compiler.getASTContext().getLangOptions().NoBuiltin);
-	//	Compiler.getASTContext().BuiltinInfo.GetBuiltinNames(BuiltinNames, Compiler.getASTContext().getLangOptions().NoBuiltin);
-	//	for (int i = 0; i<BuiltinNames.size(); i++) {
-	//		printf("Builtin %s\n", BuiltinNames[i]);
-	//	}
-		
-				
-		CodeGenOptions CGO;
-		CodeGenerator * codegen = CreateLLVMCodeGen(Diags, "mymodule", CGO,llvmContext );
-
-		
-		ParseAST(CI.getPreprocessor(),
-				codegen,
-				CI.getASTContext(),
-				/* PrintState= */ false,
-				true,
-				0);
-		
-		llvm::Module* module = codegen->ReleaseModule();
-		delete codegen;
-		
-		if (module) {
-			jit(module);
-			link(module);
-			return true;
-		}
-		
-		printf("compile errors\n");
-		
-		int ecount = 0;
-		for(TextDiagnosticBuffer::const_iterator it = client.err_begin();
-			it != client.err_end();
-			++it)
-		{
-			FullSourceLoc SourceLoc = FullSourceLoc(it->first, CI.getSourceManager());
-			int LineNum = SourceLoc.getInstantiationLineNumber();
-			int ColNum = SourceLoc.getInstantiationColumnNumber();
-			const char * bufname = SourceLoc.getManager().getBufferName(SourceLoc);
-			printf("error %s line %d col %d: %s\n", bufname, LineNum, ColNum, it->second.data());
-			ecount++;
-			if(ecount > 250) break;
-		}
-		return false;
-	}
-};
-	
-} // al::
-
-using namespace al;
-
-Compiler::Compiler(std::string name) {
-	mImpl = new CompilerImpl(name);
+	return NULL;
 }
 
-Compiler::~Compiler() {
+JIT::JIT() {}
+
+JIT::~JIT() {
+	/*	Removing the functions one by one. */
+	llvm::Module::FunctionListType & flist = mImpl->module->getFunctionList();
+	for (llvm::Module::FunctionListType::iterator iter= flist.begin(); iter != flist.end(); iter++) {
+		//printf("function %s %d\n", iter->getName().data(), iter->isIntrinsic());
+		EE->freeMachineCodeForFunction(iter);
+	}
+	/* free any statics allocated in the code */
+	EE->runStaticConstructorsDestructors(mImpl->module, true);
+	EE->clearGlobalMappingsFromModule(mImpl->module);
+	/* EE forgets about module */
+	EE->removeModule(mImpl->module);	
+	/* should be safe */
+	delete mImpl->module;
 	delete mImpl;
 }
 
-bool Compiler :: compile(std::string code) {
-	return mImpl->compile(code, options);
-}
-
-bool Compiler :: readbitcode(std::string path) {
-	return true;
-}
-
-void * Compiler :: getfunctionptr(std::string funcname) {
-	llvm::Function * f = mImpl->module()->getFunction(funcname);
+void * JIT :: getfunctionptr(std::string funcname) {
+	llvm::Function * f = mImpl->module->getFunction(funcname);
 	if (f) {
 		return EE->getPointerToFunction(f);
 	}
 	return NULL;
 }
-void * Compiler :: getglobalptr(std::string globalname) {
+void * JIT :: getglobalptr(std::string globalname) {
 	return NULL;
 }
 
@@ -307,3 +327,4 @@ bool Compiler :: writebitcode(std::string path) {
 	return true;
 }	
 
+} // al::

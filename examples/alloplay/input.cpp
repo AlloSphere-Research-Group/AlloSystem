@@ -81,20 +81,17 @@
 #include "graphics/al_Shader.hpp"
 #include "graphics/al_Texture.hpp"
 
-#ifdef __cplusplus
 
 class Foo {
-	Foo() {
-		printf("MADE A FOO!");
-	}
+public:
+	Foo(int x) :x(x) { printf("MADEAFOO!\n"); }
+	
+	int x;
 };
-Foo foo;
-
-extern "C" {
-#endif
+Foo foo(100);
 
 
-extern int test(int x) {
+extern "C" int test(int x) {
 	printf("test %d\n", (int)fabs(3.14));
 	printf("test-1 %d\n", (int)fabs(3.14));
 	printf("test-2 %d\n", (int)fabs(3.14));
@@ -103,7 +100,7 @@ extern int test(int x) {
 	return 0;
 }
 
-extern int test2(int x) {
+extern "C" int test2(int x) {
 	printf("test2 %d\n", (int)fabs(3.14));
 	return 0;
 }
@@ -112,15 +109,10 @@ void callback(al::AudioIOData &io) {
 	printf(".");
 }
 
-al::AudioIO io; //(64, 44100.0, callback);
+al::AudioIO audio(64, 44100., callback);
 	
-int main(int ac, char ** av) {
+extern "C" int main(int ac, char ** av) {
 
-	printf("open %d\n", io.open());
-	printf("start %d\n", io.start());
-	al_sleep(1);
-	io.print();								///< Prints info about current i/o devices to stdout.
-	io.printError();
 	
 //	//gam::Accum<> acc;
 //	
@@ -141,14 +133,23 @@ int main(int ac, char ** av) {
 	test(0);
 	test2(1);
 	
-	al_sleep(3);
-	printf("cpu %f\n", io.cpu());
-	io.close();
+	printf("Foox %d\n", foo.x);
+	
+	audio.deviceIn(al::AudioDevice::defaultInput());
+	audio.deviceOut(al::AudioDevice::defaultOutput());
+	
+	printf("pa_init %d\n", Pa_Initialize());
+	al::AudioDevice::printAll();
+	al::AudioDevice::defaultInput().print();
+	al::AudioDevice::defaultOutput().print();
+	printf("________\n");
+	audio.print();	
+	printf("________\n");
+	printf("open %d\n", audio.open());
+	printf("start %d\n", audio.start());
+	al_sleep(2);							
+	audio.printError();
 	
 	return 0;
 }	
-
-#ifdef __cplusplus
-}
-#endif
 
