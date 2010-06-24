@@ -1,4 +1,83 @@
+
+
+#include <list>
+#include <string>
+
 #include "system/al_mainloop.h"
+#include "graphics/al_Context.hpp"
+
+namespace al {
+
+
+namespace DisplayMode{
+	enum t{
+		SingleBuf	= 1<<0,		/**< Single-buffered */
+		DoubleBuf	= 1<<1,		/**< Double-buffered */
+		StereoBuf	= 1<<2,		/**< Do left-right stereo buffering */
+		AccumBuf	= 1<<3,		/**< Use accumulation buffer */
+		AlphaBuf	= 1<<4,		/**< Use alpha buffer */
+		DepthBuf	= 1<<5,		/**< Use depth buffer */
+		StencilBuf	= 1<<6,		/**< Use stencil buffer */
+		Multisample = 1<<7,		/**< Multisampling support */
+		DefaultBuf	= DoubleBuf|AlphaBuf|DepthBuf /**< Default display mode */
+	};
+	inline t operator| (const t& a, const t& b){ return t(int(a) | int(b)); }
+	inline t operator& (const t& a, const t& b){ return t(int(a) & int(b)); }
+}
+
+
+class WindowGLUT : public Context {
+public:
+
+
+protected:
+	friend class MainLoopGLUT;
+	
+	class MainLoopGLUT * mManager;	
+	
+	/// protected constructor - a WindowGLUT is managed by a MainLoopGLUT
+	WindowGLUT();
+	~WindowGLUT();
+};
+
+
+class MainLoopGLUT {
+public:
+
+	struct Dim{
+		Dim(int w_, int h_, int l_=0, int t_=0): l(l_), t(t_), w(w_), h(h_){}
+		Dim(int v=0): l(0), t(0), w(v), h(v){}
+		int l,t,w,h;
+	};
+
+	MainLoopGLUT() {
+		
+	}
+
+	WindowGLUT * newWindow(
+		const Dim& dim,
+		const std::string title,
+		double fps=40,
+		DisplayMode::t mode = DisplayMode::DefaultBuf
+	) {
+		return new WindowGLUT();
+	}
+	
+	/// invalidates the win pointer
+	void removeWindow(WindowGLUT * win) {
+		mWindows.remove(win); 
+		delete win;
+	}
+	
+protected:
+	std::list<WindowGLUT *> mWindows;
+};
+
+
+
+
+} // al::
+
 
 /*
 
@@ -62,7 +141,7 @@ int main (int argc, char * argv[]) {
 
 	// Register callbacks:
 	glutDisplayFunc (display);
-	glutIdleFunc (idle);
+	glutIdleFunc (al_main_tick);
 	
 	// initialize mainloop code
 	al_main_register(ontick, NULL, onquit);

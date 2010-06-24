@@ -1,6 +1,38 @@
 #include "system/al_MainLoop.h"
+#include "system/al_MainLoop.hpp"
 #include <stdlib.h>
 #include <assert.h>
+
+namespace al {
+
+MainLoop :: MainLoop(main_tick_handler tickhandler, main_quit_handler quithandler, void * userdata) 
+:	mTickHandler(tickhandler), mQuitHandler(quithandler), mUserData(userdata),
+	mIsRunning(0), mInterval(1), mT0(al_time_nsec())
+{}
+
+void MainLoop :: tick() {
+	mLogicalTime = al_time_nsec() - mT0;
+	
+	// trigger any scheduled functions:
+	mQueue.update(mLogicalTime);
+	
+	// pass control to user-specified mainloop:
+	(mTickHandler)(mLogicalTime, mUserData);
+}
+
+void MainLoop :: enter() {
+
+}
+
+void MainLoop :: exit() {
+	if (mIsRunning) {
+		mIsRunning = 0;
+		if (mQuitHandler)
+			(mQuitHandler)(mUserData);
+	}
+}
+
+} // al::
 
 /*
 	Platform specific implementations

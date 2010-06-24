@@ -8,7 +8,7 @@
 #include "math/al_Vec.hpp"
 #include "math/al_Quat.hpp"
 #include "math/al_Matrix4.hpp"
-#include "spatial/al_Camera2.hpp"
+#include "spatial/al_Camera.hpp"
 #include "graphics/al_Config.h"
 
 namespace al {

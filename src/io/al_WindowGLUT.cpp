@@ -2,6 +2,7 @@
 #include <stdlib.h>		// exit
 #include <map>
 #include "system/al_Config.h"
+#include "system/al_MainLoop.h"
 #include "io/al_WindowGL.hpp"
 
 #ifdef AL_OSX
@@ -402,6 +403,7 @@ private:
 			if(win){
 				win->doFrame();
 				if(win->fps() > 0){
+					// use mainloop instead
 					glutTimerFunc((unsigned int)(1000.0/win->fps()), scheduleDrawStatic, winID);
 				}
 			}
@@ -411,8 +413,8 @@ private:
 	// Map of windows constructed on first use to avoid static intialization
 	// order problems.
 	static WindowsMap& windows(){
-		static WindowsMap* ans = new WindowsMap;
-		return *ans;
+		static WindowsMap* windowsmap = new WindowsMap;
+		return *windowsmap;
 	}
 
 	WindowGL * mWindow;
@@ -611,10 +613,14 @@ WindowGL& WindowGL::title(const std::string& v){
 	return *this;
 }
 
-void WindowGL::startLoop(){ glutMainLoop(); }
+void WindowGL::startLoop(){ 	
+	glutIdleFunc(al_main_tick);
+	glutMainLoop(); 
+}
 
 void WindowGL::stopLoop(){
 	WindowGL::destroyAll();
+	al_main_exit();
 	/* 
 		Note. library code should never call exit(); at best, call a user-installed exit handler 
 		ergo GLUT sucks.

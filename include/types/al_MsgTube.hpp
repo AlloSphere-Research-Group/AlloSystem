@@ -48,7 +48,6 @@ class MsgTube {
 public:
 	/* 
 		Timestamp applied to sent messages (should increase monotonically)
-		TODO: set time of messages automatically from current time
 	*/
 	al_sec now;
 
