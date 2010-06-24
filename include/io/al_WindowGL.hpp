@@ -162,7 +162,7 @@ private:
 
 
 /// OpenGL Window interface
-class WindowGL{
+class WindowGL {
 public:
 
 	struct Dim{

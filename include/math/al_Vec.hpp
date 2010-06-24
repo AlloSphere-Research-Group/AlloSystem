@@ -330,6 +330,19 @@ public:
 		return *this;
 	}
 	
+	Mat& set(
+		const T& v11, const T& v12, const T& v13, const T& v14,
+		const T& v21, const T& v22, const T& v23, const T& v24,
+		const T& v31, const T& v32, const T& v33, const T& v34,
+		const T& v41, const T& v42, const T& v43, const T& v44
+	){
+		elems[0] = v11; elems[4] = v12; elems[8] = v13; elems[12] = v14;
+		elems[1] = v21; elems[5] = v22; elems[9] = v23; elems[13] = v24;
+		elems[2] = v31; elems[6] = v32; elems[10] = v33; elems[14] = v34;
+		elems[3] = v41; elems[7] = v42; elems[11] = v43; elems[15] = v44;
+		return *this;
+	}
+	
 	Mat& transpose(){
 		for(int j=0; j<N-1; ++j){		// row and column
 		for(int i=j+1; i<N; ++i){	// offset into row or column

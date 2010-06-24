@@ -82,6 +82,7 @@ protected:
 /// Design from:
 /// Dattorro, J. (1997). Effect design: Part 1: Reverberator and other filters. 
 /// Journal of the Audio Engineering Society, 45(9):660Ð684.
+/// https://ccrma.stanford.edu/~dattorro/EffectDesignPart1.pdf
 template <class T, class A=std::allocator<T> >
 class Reverb{
 public:

@@ -14,10 +14,10 @@ int main(){
 	utSpatial();
 //	utSystem();
 //	utProtocolOSC();
-	utProtocolSerialize();
+//	utProtocolSerialize();
 //
 //	utIOAudioIO();
-//	utIOWindowGL();
+	utIOWindowGL();
 //	utIOSocket();
 	
 //	utProtocolGraphics();

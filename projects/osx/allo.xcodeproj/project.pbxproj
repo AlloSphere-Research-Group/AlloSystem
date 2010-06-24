@@ -84,6 +84,9 @@
 		3602B730110A9770005DC3D0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		3602B732110A9770005DC3D0 /* alscheduling.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* alscheduling.1 */; };
 		3602B73A110A9785005DC3D0 /* exOscSend.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3602B739110A9785005DC3D0 /* exOscSend.cpp */; };
+		360C404111D32D3E002FE91F /* al_Context.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 360C404011D32D3E002FE91F /* al_Context.hpp */; };
+		360C404711D32DDA002FE91F /* al_Context.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 360C404511D32DDA002FE91F /* al_Context.cpp */; };
+		360C404F11D32FED002FE91F /* al_Matrix4.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 360C404E11D32FED002FE91F /* al_Matrix4.hpp */; };
 		362127C91173CDBB009CB6FC /* al_Graphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 362127C81173CDBB009CB6FC /* al_Graphics.cpp */; };
 		362127DE1173D5A2009CB6FC /* al_GraphicsOpenGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 362127DD1173D5A2009CB6FC /* al_GraphicsOpenGL.cpp */; };
 		362128BD1173E372009CB6FC /* al_GraphicsOpenGLES1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 362128BC1173E372009CB6FC /* al_GraphicsOpenGLES1.cpp */; };
@@ -319,9 +322,9 @@
 		1697338611768B6E0025299C /* al_Complex.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Complex.hpp; sourceTree = "<group>"; };
 		1697339A11768CDF0025299C /* utMath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utMath.cpp; path = ../../unitTests/utMath.cpp; sourceTree = SOURCE_ROOT; };
 		16AA8EDD11C6F1D20053EFE1 /* al_Quat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = al_Quat.cpp; path = math/al_Quat.cpp; sourceTree = "<group>"; };
-		16AA8EEF11C6F9290053EFE1 /* al_CoordinateFrame.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = al_CoordinateFrame.hpp; path = spatial/al_CoordinateFrame.hpp; sourceTree = "<group>"; };
+		16AA8EEF11C6F9290053EFE1 /* al_CoordinateFrame.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_CoordinateFrame.hpp; sourceTree = "<group>"; };
 		16AA8EFB11C6FD200053EFE1 /* al_CoordinateFrame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = al_CoordinateFrame.cpp; path = spatial/al_CoordinateFrame.cpp; sourceTree = "<group>"; };
-		16AA8F0011C6FDE10053EFE1 /* al_Camera.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = al_Camera.hpp; path = spatial/al_Camera.hpp; sourceTree = "<group>"; };
+		16AA8F0011C6FDE10053EFE1 /* al_Camera.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Camera.hpp; sourceTree = "<group>"; };
 		16AA8F0111C6FE0B0053EFE1 /* al_Camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = al_Camera.cpp; path = spatial/al_Camera.cpp; sourceTree = "<group>"; };
 		16AA8F0E11C6FE6C0053EFE1 /* utSpatial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utSpatial.cpp; path = ../../unitTests/utSpatial.cpp; sourceTree = SOURCE_ROOT; };
 		16AA8FA211C713890053EFE1 /* al_Frustum.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Frustum.hpp; sourceTree = "<group>"; };
@@ -380,6 +383,10 @@
 		3602B54E110A6D3D005DC3D0 /* OscTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OscTypes.h; sourceTree = "<group>"; };
 		3602B736110A9770005DC3D0 /* exOscSend */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exOscSend; sourceTree = BUILT_PRODUCTS_DIR; };
 		3602B739110A9785005DC3D0 /* exOscSend.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exOscSend.cpp; sourceTree = "<group>"; };
+		360C400011D2F688002FE91F /* graphics.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = graphics.txt; sourceTree = "<group>"; };
+		360C404011D32D3E002FE91F /* al_Context.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Context.hpp; sourceTree = "<group>"; };
+		360C404511D32DDA002FE91F /* al_Context.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Context.cpp; sourceTree = "<group>"; };
+		360C404E11D32FED002FE91F /* al_Matrix4.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Matrix4.hpp; sourceTree = "<group>"; };
 		362127C71173CD72009CB6FC /* al_Graphics.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Graphics.hpp; sourceTree = "<group>"; };
 		362127C81173CDBB009CB6FC /* al_Graphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Graphics.cpp; sourceTree = "<group>"; };
 		362127DD1173D5A2009CB6FC /* al_GraphicsOpenGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GraphicsOpenGL.cpp; sourceTree = "<group>"; };
@@ -648,6 +655,7 @@
 		08FB7794FE84155DC02AAC07 /* alscheduling */ = {
 			isa = PBXGroup;
 			children = (
+				360C400011D2F688002FE91F /* graphics.txt */,
 				3625B540116EEDEF00C685B7 /* Makefile */,
 				3625B541116EEDEF00C685B7 /* Makefile.config */,
 				36B4124410EFF7B8007B16D0 /* include */,
@@ -678,6 +686,7 @@
 				16BC66A2117770BF002A0C18 /* al_Functions.hpp */,
 				16FFCB53118BAA8300D4C1BD /* al_Generators.hpp */,
 				16BC66A3117770BF002A0C18 /* al_Interpolation.hpp */,
+				360C404E11D32FED002FE91F /* al_Matrix4.hpp */,
 				16D46542118F4ADA0039A84C /* al_Plane.hpp */,
 				16FFCB51118BA96500D4C1BD /* al_Random.hpp */,
 				1697337311768B040025299C /* al_Quat.h */,
@@ -701,7 +710,7 @@
 				16AA8F0011C6FDE10053EFE1 /* al_Camera.hpp */,
 				16AA8EEF11C6F9290053EFE1 /* al_CoordinateFrame.hpp */,
 			);
-			name = spatial;
+			path = spatial;
 			sourceTree = "<group>";
 		};
 		16AA8EF111C6FCE70053EFE1 /* spatial */ = {
@@ -717,6 +726,7 @@
 			isa = PBXGroup;
 			children = (
 				16AA95E5118F6EEF00B98EC3 /* al_Config.h */,
+				360C404011D32D3E002FE91F /* al_Context.hpp */,
 				16AA95E8118F6EEF00B98EC3 /* al_Common.hpp */,
 				16AA95FE118F760C00B98EC3 /* al_Debug.hpp */,
 				16AA95E9118F6EEF00B98EC3 /* al_GPUObject.hpp */,
@@ -731,6 +741,7 @@
 		16AA95F0118F74FB00B98EC3 /* graphics */ = {
 			isa = PBXGroup;
 			children = (
+				360C404511D32DDA002FE91F /* al_Context.cpp */,
 				16AA95FF118F76B800B98EC3 /* al_Debug.cpp */,
 				16AA95F2118F74FB00B98EC3 /* al_Light.cpp */,
 				16AA9609118F774800B98EC3 /* al_Texture.cpp */,
@@ -1184,6 +1195,8 @@
 				16BC66A5117770BF002A0C18 /* al_Functions.hpp in Headers */,
 				16BC66A6117770BF002A0C18 /* al_Interpolation.hpp in Headers */,
 				166DD742117CDB6000A8BA12 /* al_Conversion.hpp in Headers */,
+				360C404111D32D3E002FE91F /* al_Context.hpp in Headers */,
+				360C404F11D32FED002FE91F /* al_Matrix4.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1572,6 +1585,7 @@
 				16AA8EDF11C6F1D20053EFE1 /* al_Quat.cpp in Sources */,
 				16AA8EFD11C6FD200053EFE1 /* al_CoordinateFrame.cpp in Sources */,
 				16AA8F0311C6FE0B0053EFE1 /* al_Camera.cpp in Sources */,
+				360C404711D32DDA002FE91F /* al_Context.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
