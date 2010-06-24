@@ -75,16 +75,16 @@ public:
 		free(data.ptr);
 	}
 
-	template<typename T> void define1d(uint32_t components, uint32_t dimx, size_t align = 4) {
-		header.type = getType<T>();
+	void define1d(uint32_t components, AlloTy ty, uint32_t dimx, size_t align = 4) {
+		header.type = ty;
 		header.components = components;
 		header.dimcount = 1;
 		header.dim[0] = dimx;
 		allo_lattice_setstride(&header, align);
 	}
 	
-	template<typename T> void define2d(uint32_t components, uint32_t dimx, uint32_t dimy, size_t align = 4) {
-		header.type = getType<T>();
+	void define2d(uint32_t components, AlloTy ty, uint32_t dimx, uint32_t dimy, size_t align = 4) {
+		header.type = ty;
 		header.components = components;
 		header.dimcount = 2;
 		header.dim[0] = dimx;
@@ -92,8 +92,8 @@ public:
 		allo_lattice_setstride(&header, align);
 	}
 	
-	template<typename T> void define3d(uint32_t components, uint32_t dimx, uint32_t dimy, uint32_t dimz, size_t align = 4) {
-		header.type = getType<T>();
+	void define3d(uint32_t components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, size_t align = 4) {
+		header.type = ty;
 		header.components = components;
 		header.dimcount = 3;
 		header.dim[0] = dimx;
