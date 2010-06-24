@@ -97,9 +97,9 @@ public:
 //		damping(0.0005);
 //		diffusion(0.75, 0.625, 0.7, 0.5);
 		bandwidth(0.9995);
-		decay(0.9);
-		damping(0.5);
-		diffusion(0.75, 0.625, 0.707, 0.571);
+		decay(0.85);
+		damping(0.4);
+		diffusion(0.76, 0.666, 0.707, 0.571);
 	}
 
 	/// Set input signal bandwidth, [0,1]

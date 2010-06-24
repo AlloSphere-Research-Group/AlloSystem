@@ -25,7 +25,7 @@ SYS_SRC		:= $(addprefix $(SRC_DIR)/$(SYS_DIR)/, $(SYS_SRC))
 SRCS		= $(IO_SRC) $(PRO_SRC) $(MATH_SRC) $(SPA_SRC) $(SYS_SRC) $(TYPES_SRC)
 OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
-CFLAGS		+= $(addprefix -I./, $(INC_DIRS))
+CFLAGS		+= $(addprefix -iquote./, $(INC_DIRS))
 DLIB_FILE 	:= $(addprefix $(BIN_DIR)/, $(DLIB_FILE))
 SLIB_FILE 	:= $(addprefix $(BIN_DIR)/, $(SLIB_FILE))
 
@@ -35,7 +35,7 @@ SLIB_FILE 	:= $(addprefix $(BIN_DIR)/, $(SLIB_FILE))
 # Build object file from C++ source
 $(OBJ_DIR)/%.o: %.cpp
 	@echo CC $< $@
-	@$(CC) -c $(CFLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $< -o $@
 
 # Build object file from C source
 $(OBJ_DIR)/%.o: %.c

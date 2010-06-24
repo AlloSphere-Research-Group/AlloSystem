@@ -1,12 +1,6 @@
 
 #include "protocol/al_Graphics.hpp"
-
-#if defined(__IPHONE_3_0)
-	#define AL_GRAPHICS_USE_OPENGLES2
-	
-	#import <OpenGLES/ES2/gl.h>
-	#import <OpenGLES/ES2/glext.h>
-#endif
+#include "graphics/al_Config.h"
 
 namespace al {
 namespace gfx{

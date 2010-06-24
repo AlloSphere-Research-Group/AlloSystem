@@ -30,7 +30,7 @@
   				fprintf(stderr, "GLEW Init Error: %s\n", glewGetErrorString(err));\
 			}\
 		}
-#elif defined(AL_WIN32
+#elif defined(AL_WIN32)
 	#include <windows.h>
 	#include <gl/gl.h>
 	#include <gl/glu.h>

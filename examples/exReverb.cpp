@@ -16,8 +16,8 @@ void audioCB(AudioIOData& io){
 
 		float sl, sr;
 		reverb(s, sl, sr);
-		sl = s + 0.2*sl;
-		sr = s + 0.2*sr;
+		sl = 0.2*sl;
+		sr = 0.2*sr;
 
 		io.out(0)[i] = sl;
 		io.out(1)[i] = sr;
