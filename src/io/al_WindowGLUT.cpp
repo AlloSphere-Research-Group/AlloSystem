@@ -433,7 +433,7 @@ private:
 
 
 
-WindowGL::WindowGL(): mImpl(new WindowImpl(this)){}
+WindowGL::WindowGL(): Context(), mImpl(new WindowImpl(this)){}
 
 WindowGL::~WindowGL(){
 	destroy();

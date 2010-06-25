@@ -2,6 +2,7 @@
 #define INCLUDE_AL_CONTEXT_HPP
 
 #include <list>
+#include <vector>
 
 #include "math/al_Frustum.hpp"
 #include "math/al_Plane.hpp"
@@ -26,6 +27,10 @@ public:
 	/// Set viewport dimensions in screen coordinates
 	ViewPort& dimensions(double w, double h);
 	ViewPort& dimensions(double w, double h, double x, double y);
+	
+	/// Tell this viewport which camera to use.
+	/// Note: no memory-management is done, but the camera must live as long as this viewport uses it!
+	ViewPort& camera(Camera * cam) { mCamera = cam; }
 
 	double eyeSep() const { return mEyeSep; }				///< Get eye separation
 	double ratio() const { return mRatio; }					///< Get aspect ratio (width/height)
@@ -41,6 +46,9 @@ public:
 	Frustumd& leftFrustum(Context * ctx);
 	Frustumd& rightFrustum(Context * ctx);
 	Frustumd& biFrustum(Context * ctx);		// wide enough to encompass both left & right frusti
+	
+	
+	void setLookAt(double tx, double ty, double tz);
 
 protected:
 	Camera * mCamera;					// world-space view position & orientation
@@ -62,7 +70,7 @@ public:
 	};
 	
 	Context() : mStereo(false), mMode(Anaglyph), mStereoOffset(Vec3d(1, 0, 0)) {
-		
+		mViewPorts.resize(1);	/// every context has at least one viewport
 	}
 	
 	Context& mode(StereoMode v){ mMode=v; return *this; }	///< Set stereographic mode
@@ -70,6 +78,9 @@ public:
 	
 	StereoMode mode() const { return mMode; }				///< Get stereographic mode
 	bool stereo() const { return mStereo; }					///< Get stereographic active
+	
+	/// most contexts will only have one viewport. This is a handy accessor for the 'default' viewport.
+	ViewPort& viewport() { return mViewPorts.front(); }
 
 protected:
 	Vec3d mStereoOffset;					// eye offset vector (right eye; left eye is inverse), usually (1, 0, 0)

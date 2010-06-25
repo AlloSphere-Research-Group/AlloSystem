@@ -31,6 +31,8 @@
 #include <vector>
 #include <string>
 
+#include "graphics/al_Context.hpp"
+
 namespace al{
 
 // can redefine, but should be at least 4
@@ -162,7 +164,7 @@ private:
 
 
 /// OpenGL Window interface
-class WindowGL {
+class WindowGL : public Context {
 public:
 
 	struct Dim{

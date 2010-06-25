@@ -9,6 +9,9 @@
 
 namespace al {
 
+/*
+	Camera lives in World-space; it shouldn't know anything about rendering, just its own configuration
+*/
 
 /*
 Steve Baker's Golden Rule for OpenGL cameras:
@@ -88,6 +91,11 @@ public:
 	int eyeEnd() const;
 	int eyeStart() const;
 	void setEye(int i);
+	
+	static Camera * defaultCamera() {
+		static Camera def;
+		return &def;
+	}
 
 protected:
 	double mFocalLength;		// Focal length along vd
