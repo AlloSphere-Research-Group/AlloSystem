@@ -35,36 +35,125 @@
 namespace al {
 
 // messages that are larger than this will be heap copied
-#define AL_PQ_MSG_ARGS_SIZE (52)
+#define AL_MSGQUEUE_ARGS_SIZE (44)
 
 class MsgQueue {
 public:	
 
 	typedef void (*msg_func)(al_sec t, char * args);
+	typedef void * (*malloc_func)(size_t size);
+	typedef void (*free_func)(void * ptr);
 	
-	MsgQueue(al_sec birth = 0, int size = 256);
+	MsgQueue(int size = 256, malloc_func mfunc = NULL, free_func ffunc = NULL);
+	~MsgQueue();
 	
 	// for truly accurate scheduling, always use this as logical time:
 	al_sec now() { return mNow; }
-
+	
+	// trigger registered callbacks
 	void update(al_sec until, bool defer = false);
 	void advance(al_sec period, bool defer = false) { update(mNow + period, defer); }
 	
+	// how many messages are scheduled?
+	int len() { return mLen; }
+	
+	// template wrappers for multi-argument functions
+	// be sure to cast the send arguments to exactly match the function argument types!
+	template<typename A1>
+	void send(al_sec at, void (*f)(al_sec t, A1 a1), A1 a1) {
+		struct Data {
+			void (*f)(al_sec t, A1 a1);
+			A1 a1;
+			static void call(al_sec t, char * args) {
+				const Data * d = (Data *)args;
+				(d->f)(t, d->a1);
+			}
+		};
+		Data data = { f, a1 };
+		sched(at, &Data::call, (char *)(&data), sizeof(Data));
+	}
+	
+	template<typename A1, typename A2>
+	void send(al_sec at, void (*f)(al_sec t, A1 a1, A2 a2), A1 a1, A2 a2) {
+		struct Data {
+			void (*f)(al_sec t, A1 a1, A2 a2);
+			A1 a1; A2 a2;
+			static void call(al_sec t, char * args) {
+				const Data * d = (Data *)args;
+				(d->f)(t, d->a1, d->a2);
+			}
+		};
+		Data data = { f, a1, a2 };
+		sched(at, &Data::call, (char *)(&data), sizeof(Data));
+	}
+	
+	template<typename A1, typename A2, typename A3>
+	void send(al_sec at, void (*f)(al_sec t, A1 a1, A2 a2, A3 a3), A1 a1, A2 a2, A3 a3) {
+		struct Data {
+			void (*f)(al_sec t, A1 a1, A2 a2, A3 a3);
+			A1 a1; A2 a2; A3 a3; 
+			static void call(al_sec t, char * args) {
+				const Data * d = (Data *)args;
+				(d->f)(t, d->a1, d->a2, d->a3);
+			}
+		};
+		Data data = { f, a1, a2, a3 };
+		sched(at, &Data::call, (char *)(&data), sizeof(Data));
+	}
+	
+	template<typename A1, typename A2, typename A3, typename A4>
+	void send(al_sec at, void (*f)(al_sec t, A1 a1, A2 a2, A3 a3, A4 a4 ), A1 a1, A2 a2, A3 a3, A4 a4 ) {
+		struct Data {
+			void (*f)(al_sec t, A1 a1, A2 a2, A3 a3, A4 a4 );
+			A1 a1; A2 a2; A3 a3; A4 a4; 
+			static void call(al_sec t, char * args) {
+				const Data * d = (Data *)args;
+				(d->f)(t, d->a1, d->a2, d->a3, d->a4 );
+			}
+		};
+		Data data = { f, a1, a2, a3, a4 };
+		sched(at, &Data::call, (char *)(&data), sizeof(Data));
+	}
+	
+	template<typename A1, typename A2, typename A3, typename A4, typename A5>
+	void send(al_sec at, void (*f)(al_sec t, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5), A1 a1, A2 a2, A3 a3, A4 a4, A5 a5) {
+		struct Data {
+			void (*f)(al_sec t, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5);
+			A1 a1; A2 a2; A3 a3; A4 a4; A5 a5;
+			static void call(al_sec t, char * args) {
+				const Data * d = (Data *)args;
+				(d->f)(t, d->a1, d->a2, d->a3, d->a4, d->a5);
+			}
+		};
+		Data data = { f, a1, a2, a3, a4, a5 };
+		sched(at, &Data::call, (char *)(&data), sizeof(Data));
+	}
+	
+	template<typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
+	void send(al_sec at, void (*f)(al_sec t, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6), A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6) {
+		struct Data {
+			void (*f)(al_sec t, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6);
+			A1 a1; A2 a2; A3 a3; A4 a4; A5 a5; A6 a6;
+			static void call(al_sec t, char * args) {
+				const Data * d = (Data *)args;
+				(d->f)(t, d->a1, d->a2, d->a3, d->a4, d->a5, d->a6);
+			}
+		};
+		Data data = { f, a1, a2, a3, a4, a5, a6 };
+		sched(at, &Data::call, (char *)(&data), sizeof(Data));
+	}
+
+	// generic method to schedule a callback
 	void sched(al_sec at, msg_func func, char * data, size_t size);
-	
-	// removes any scheduled msg with matching func & data pointers:
-	void cancel(msg_func func, void * data);
-	
 	
 protected:
 
-	// Messages in the queue have the following structure:
 	struct Msg {
 		struct Msg * next;
 		size_t size;
 		al_sec t;
 		msg_func func;
-		char * mem;
+		char args[AL_MSGQUEUE_ARGS_SIZE];
 	};
 	
 	Msg * mHead;
@@ -72,6 +161,8 @@ protected:
 	Msg * mPool;
 	int mLen, mChunkSize;
 	al_sec mNow;
+	malloc_func mMalloc;
+	free_func mFree;
 	
 	void growPool();
 	void recycle(Msg * m);

@@ -2,7 +2,8 @@
 #include <stdlib.h>		// exit
 #include <map>
 #include "system/al_Config.h"
-#include "system/al_MainLoop.h"
+#include "system/al_MainLoop.hpp"
+#include "types/al_MsgQueue.hpp"
 #include "io/al_WindowGL.hpp"
 
 #ifdef AL_OSX
@@ -58,13 +59,8 @@ public:
 		mCursor(Cursor::Pointer),
 		mInGameMode(false), mVisible(true), mFullScreen(false), mCursorHide(false)
 	{
-		static bool doInit=true;
-		if(doInit){
-			doInit=false;
-			int argc = 0;
-			char * argv[] = {0};
-			glutInit(&argc,argv);
-		}
+		//
+		MainLoop::get();
 	}
 	
 	~WindowImpl(){
@@ -163,7 +159,7 @@ public:
 	int id(){ return mInGameMode ? mIDGameMode : mID; }
 
 	void scheduleDraw(){
-		scheduleDrawStatic(id());
+		scheduleDrawStatic(0, id());
 	}
 	
 	void visible(bool v){ mVisible=v; }
@@ -391,7 +387,7 @@ private:
 	friend class MainLoop;
 
 	// schedule draws of a specific window
-	static void scheduleDrawStatic(int winID){
+	static void scheduleDrawStatic(al_sec t, int winID){
 		WindowImpl *impl = getWindowImpl(winID);
 		
 		// If there is a valid implementation, then draw and schedule next draw...
@@ -404,7 +400,9 @@ private:
 				win->doFrame();
 				if(win->fps() > 0){
 					// use mainloop instead
-					glutTimerFunc((unsigned int)(1000.0/win->fps()), scheduleDrawStatic, winID);
+					 //glutTimerFunc((unsigned int)(1000.0/win->fps()), scheduleDrawStatic, winID);
+					MsgQueue& q = MainLoop::get().queue();
+					q.send(t + 1.0/win->fps(), scheduleDrawStatic, winID);
 				}
 			}
 		}
@@ -614,18 +612,14 @@ WindowGL& WindowGL::title(const std::string& v){
 }
 
 void WindowGL::startLoop(){ 	
-	glutIdleFunc(al_main_tick);
-	glutMainLoop(); 
+	MainLoop::get().start();
+//	glutIdleFunc(al_main_tick);
+//	glutMainLoop(); 
 }
 
 void WindowGL::stopLoop(){
 	WindowGL::destroyAll();
-	al_main_exit();
-	/* 
-		Note. library code should never call exit(); at best, call a user-installed exit handler 
-		ergo GLUT sucks.
-	*/
-	exit(0);
+	MainLoop::get().stop();
 }
 
 } // al::

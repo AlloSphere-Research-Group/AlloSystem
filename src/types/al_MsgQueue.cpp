@@ -1,20 +1,37 @@
+#include <stdio.h>
+#include <string>
+
 #include "types/al_MsgQueue.hpp"
 
 using namespace al;
 
-MsgQueue :: MsgQueue(al_sec birth, int size) 
-:	mHead(NULL), mTail(NULL), mLen(0), mChunkSize(size), mNow(birth)
+MsgQueue :: MsgQueue(int size, malloc_func mfunc, free_func ffunc) 
+:	mHead(NULL), mTail(NULL), mLen(0), mChunkSize(size), mNow(0), 
+	mMalloc(mfunc ? mfunc : malloc), mFree(ffunc ? ffunc : free)
 {
-	// initialize pool:
 	growPool();
+}
+
+MsgQueue :: ~MsgQueue() {
+	Msg * m;
+	while (mHead) {
+		m = mHead->next;
+		recycle(mHead);
+		mHead = m;
+	}
+	while (mPool) {
+		m = mPool->next;
+		mFree(m);
+		mPool = m;
+	}
 }
 
 void MsgQueue :: growPool() {
 	int size = mChunkSize;
-	mPool = new Msg;
+	mPool = (Msg *)mMalloc(sizeof(Msg));
 	Msg * m = mPool;
 	while (size--) {
-		m->next = new Msg;
+		m->next = (Msg *)mMalloc(sizeof(Msg));
 		m = m->next;
 	}
 	m->next = NULL;
@@ -24,11 +41,15 @@ void MsgQueue :: growPool() {
 void MsgQueue :: recycle(Msg * m) {
 	m->next = mPool;
 	mPool = m;
+	if (m->size > AL_MSGQUEUE_ARGS_SIZE) {
+		char * args = *(char **)(m->args);
+		mFree(args);
+	}
 }
 
 /* schedule a new message */
 void MsgQueue :: sched(al_sec at, msg_func func, char * data, size_t size) {
-	
+
 	// get a message-holder from the pool:
 	if (mPool == NULL) growPool();
 	Msg * m = mPool;
@@ -38,8 +59,15 @@ void MsgQueue :: sched(al_sec at, msg_func func, char * data, size_t size) {
 	m->next = NULL;
 	m->t = at;
 	m->func = func;
-	m->mem = data;
 	m->size = size;
+	if (size > AL_MSGQUEUE_ARGS_SIZE) {
+		// too big to fit in the Msg.
+		char * args = (char *)mMalloc(size);
+		memcpy(args, data, size);
+		*(char **)(m->args) = args;
+	} else {
+		memcpy(m->args, data, size);
+	}
 	
 	// insert into queue
 	
@@ -80,29 +108,7 @@ void MsgQueue :: sched(al_sec at, msg_func func, char * data, size_t size) {
 	mLen++;
 }
 
-void MsgQueue :: cancel(msg_func func, void * ptr) {
-	// iterate entire queue
-	Msg * p, * n, * m;
-	p = mHead;
-	if (p) {	
-		n = p->next;
-		while (n) {
-			if (static_cast<void *>(n->mem) == ptr && func == n->func) {
-				// todo: verify this
-				m = n->next;
-				p->next = m;
-				recycle(n);
-				n = m;
-			} else {
-				p = n;
-				n = n->next;
-			}
-		}
-	}
-}
-
 void MsgQueue :: update(al_sec until, bool defer) {
-	
 	Msg * m = mHead;
 	while (m && m->t <= until) { 
 		mHead = m->next;
@@ -111,9 +117,14 @@ void MsgQueue :: update(al_sec until, bool defer) {
 //			m->msg.t = x->now + m->retry;
 //			al_pq_sched_msg(x, m);
 //		} else {	
-		
+
 		mNow = MAX(mNow, m->t); 
-		(m->func)(m->t, m->mem);
+		if (m->size > AL_MSGQUEUE_ARGS_SIZE) {
+			char * args = *(char **)(m->args);
+			(m->func)(mNow, args);
+		} else {
+			(m->func)(mNow, m->args);
+		}
 		
 		recycle(m);
 		m = mHead;

@@ -33,34 +33,50 @@ namespace al {
 /// Typically a single instance in the main thread
 class MainLoop {
 public:
-
-	MainLoop(main_tick_handler tickhandler, main_quit_handler quithandler, void * userdata);
+	
+	/// mainloop is a singleton; this is how to access it:
+	static MainLoop& get();
 
 	/// takes over control of the current thread
-	void enter();
+	static void start();
 	
 	/// releases control of the current thread 
 	/// in some implementations, may exit the application
-	void exit();
+	static void stop();
 	
-	/// current scheduler logical time
-	al_nsec time_nsec() { return mLogicalTime; }
-	al_sec time() { return time_nsec() * al_time_ns2s; }
+	/// current scheduler time
+	static al_sec now() { return get().mQueue.now(); }
+	
+	/// use this to schedule timed functions in this mainloop
+	/// (the mainloop itself will take care of updating this queue)
+	static MsgQueue& queue() { return get().mQueue; }
+	
+	/// set tick period. actual behavior is implementation dependent
+	static void interval(al_sec interval);
+	static al_sec interval() { return get().mInterval; }
+	
+	/// trigger a mainloop step (typically for implementation use only)
+	void tick();
 
 protected:
 
+	friend class MainLoopImpl;
+	class MainLoopImpl * mImpl;
+
 	bool mIsRunning;				/* flag true (1) when in the main loop */
-	double mInterval;			/* in seconds */
-	al_nsec mT0, mLogicalTime;		/* birth time (wall clock), scheduler time (logical) */
-	main_tick_handler mTickHandler;	/* user-supplied event handler */
-	main_quit_handler mQuitHandler; /* (optional) user-supplied quit handler */
-	void * mUserData;			/* passed to the handler */
+	double mInterval;				/* in seconds */
+	al_sec mT0;						/* birth time (wall clock), scheduler time (logical) */
 	
-	MsgQueue mQueue;			/// functor scheduler attached to the main loop
-
-	void tick();
-
+	MsgQueue mQueue;				/// functor scheduler attached to the main loop
+	
+	MainLoop();
+	virtual ~MainLoop();
 };
+
+inline MainLoop& MainLoop :: get() {
+	static MainLoop mainloop;
+	return mainloop;
+}
 
 } // al::
 
