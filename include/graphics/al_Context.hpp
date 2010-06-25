@@ -61,6 +61,10 @@ public:
 		RightEye	/**< Right eye only */
 	};
 	
+	Context() : mStereo(false), mMode(Anaglyph), mStereoOffset(Vec3d(1, 0, 0)) {
+		
+	}
+	
 	Context& mode(StereoMode v){ mMode=v; return *this; }	///< Set stereographic mode
 	Context& stereo(bool v){ mStereo=v; return *this; }		///< Set stereographic active
 	
