@@ -56,13 +56,8 @@
 		16AC536C116293580076AA8B /* al_Serialize.h in Headers */ = {isa = PBXBuildFile; fileRef = 3602B53D110A6D3D005DC3D0 /* al_Serialize.h */; };
 		16AC536D116293590076AA8B /* al_Serialize.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3602B53E110A6D3D005DC3D0 /* al_Serialize.hpp */; };
 		16AC536E1162935E0076AA8B /* al_Socket.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36B4BF06110E55AF00F789A8 /* al_Socket.hpp */; };
-		16AC536F116293630076AA8B /* al_socktube.h in Headers */ = {isa = PBXBuildFile; fileRef = 36F4662B110B9B720082D21E /* al_socktube.h */; };
 		16AC5371116293DC0076AA8B /* al_OSCAPR.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36A20CFC110ACA0E0075A21C /* al_OSCAPR.hpp */; };
 		16AC5372116293DD0076AA8B /* al_OSC.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3602B53C110A6D3D005DC3D0 /* al_OSC.hpp */; };
-		16AC5374116293E40076AA8B /* al_pq.h in Headers */ = {isa = PBXBuildFile; fileRef = 36B4124E10EFF7B8007B16D0 /* al_pq.h */; };
-		16AC5375116293E50076AA8B /* al_pq.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36B4124F10EFF7B8007B16D0 /* al_pq.hpp */; };
-		16AC5377116293EE0076AA8B /* al_tube.h in Headers */ = {isa = PBXBuildFile; fileRef = 36B4125010EFF7B8007B16D0 /* al_tube.h */; };
-		16AC5378116293EE0076AA8B /* al_tube.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36B4125110EFF7B8007B16D0 /* al_tube.hpp */; };
 		16AC5379116293EF0076AA8B /* al_types.h in Headers */ = {isa = PBXBuildFile; fileRef = 36B4125210EFF7B8007B16D0 /* al_types.h */; };
 		16AC537A116293F00076AA8B /* al_types.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36B4125310EFF7B8007B16D0 /* al_types.hpp */; };
 		16B5C1731189020B0090CE80 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
@@ -101,8 +96,6 @@
 		3622BF0F116D52B400928703 /* al_Config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF6116D527D00928703 /* al_Config.cpp */; };
 		3622BF10116D52B400928703 /* al_MainLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF7116D527D00928703 /* al_MainLoop.cpp */; };
 		3622BF14116D52B400928703 /* al_TimeAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFB116D527D00928703 /* al_TimeAPR.cpp */; };
-		3622BF15116D52B800928703 /* al_msg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFE116D527D00928703 /* al_msg.cpp */; };
-		3622BF17116D52B800928703 /* al_socktube.c in Sources */ = {isa = PBXBuildFile; fileRef = 3622BF00116D527D00928703 /* al_socktube.c */; };
 		3622BF3C116D530100928703 /* NetworkingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF0116D527D00928703 /* NetworkingUtils.cpp */; };
 		3622BF3D116D530100928703 /* UdpSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF1116D527D00928703 /* UdpSocket.cpp */; };
 		3622BF3E116D530600928703 /* IpEndpointName.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEEA116D527D00928703 /* IpEndpointName.cpp */; };
@@ -163,8 +156,6 @@
 		36BAE1CB11C2FAFF009A8BBD /* al_File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEDF116D527D00928703 /* al_File.cpp */; };
 		36BAE1CC11C2FAFF009A8BBD /* al_WindowGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE1116D527D00928703 /* al_WindowGL.cpp */; };
 		36BAE1CD11C2FAFF009A8BBD /* al_WindowGLUT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE2116D527D00928703 /* al_WindowGLUT.cpp */; };
-		36BAE1CE11C2FAFF009A8BBD /* al_msg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFE116D527D00928703 /* al_msg.cpp */; };
-		36BAE1D011C2FAFF009A8BBD /* al_socktube.c in Sources */ = {isa = PBXBuildFile; fileRef = 3622BF00116D527D00928703 /* al_socktube.c */; };
 		36BAE1D111C2FAFF009A8BBD /* IpEndpointName.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEEA116D527D00928703 /* IpEndpointName.cpp */; };
 		36BAE1D211C2FAFF009A8BBD /* OscOutboundPacketStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEEB116D527D00928703 /* OscOutboundPacketStream.cpp */; };
 		36BAE1D311C2FAFF009A8BBD /* OscPrintReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEEC116D527D00928703 /* OscPrintReceivedElements.cpp */; };
@@ -416,8 +407,6 @@
 		3622BEFA116D527D00928703 /* al_Time.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Time.cpp; sourceTree = "<group>"; };
 		3622BEFB116D527D00928703 /* al_TimeAPR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_TimeAPR.cpp; sourceTree = "<group>"; };
 		3622BEFC116D527D00928703 /* Makefile.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.config; sourceTree = "<group>"; };
-		3622BEFE116D527D00928703 /* al_msg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_msg.cpp; sourceTree = "<group>"; };
-		3622BF00116D527D00928703 /* al_socktube.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = al_socktube.c; sourceTree = "<group>"; };
 		3622BF01116D527D00928703 /* Makefile.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.config; sourceTree = "<group>"; };
 		3622BF03116D527D00928703 /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
 		3622BF04116D527D00928703 /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
@@ -444,10 +433,6 @@
 		369EA3B0116D60CE00EB1934 /* liballoutil.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liballoutil.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		36A20CFC110ACA0E0075A21C /* al_OSCAPR.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OSCAPR.hpp; sourceTree = "<group>"; };
 		36AED02511D4638F000D98C9 /* al_MainLoopGLUT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_MainLoopGLUT.cpp; sourceTree = "<group>"; };
-		36B4124E10EFF7B8007B16D0 /* al_pq.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_pq.h; sourceTree = "<group>"; };
-		36B4124F10EFF7B8007B16D0 /* al_pq.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_pq.hpp; sourceTree = "<group>"; };
-		36B4125010EFF7B8007B16D0 /* al_tube.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_tube.h; sourceTree = "<group>"; };
-		36B4125110EFF7B8007B16D0 /* al_tube.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_tube.hpp; sourceTree = "<group>"; };
 		36B4125210EFF7B8007B16D0 /* al_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_types.h; sourceTree = "<group>"; };
 		36B4125310EFF7B8007B16D0 /* al_types.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_types.hpp; sourceTree = "<group>"; };
 		36B4127310EFF864007B16D0 /* apr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = apr.h; sourceTree = "<group>"; };
@@ -497,7 +482,6 @@
 		36C13EDB11D15D45006196FC /* exReverb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exReverb.cpp; sourceTree = "<group>"; };
 		36C13F0D11D15FA9006196FC /* al_Ambisonics.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Ambisonics.hpp; sourceTree = "<group>"; };
 		36C13F0E11D15FA9006196FC /* al_Reverb.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Reverb.hpp; sourceTree = "<group>"; };
-		36F4662B110B9B720082D21E /* al_socktube.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_socktube.h; sourceTree = "<group>"; };
 		36F46821110BE2E90082D21E /* al_AudioIO.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_AudioIO.hpp; sourceTree = "<group>"; };
 		36F46822110BE2E90082D21E /* al_File.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_File.hpp; sourceTree = "<group>"; };
 		36F46823110BE2E90082D21E /* al_WindowGL.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_WindowGL.hpp; sourceTree = "<group>"; };
@@ -932,8 +916,6 @@
 				3659D754117B8AFA0065EBE4 /* jack */,
 				1619909C11743990006FBADF /* al_Color.cpp */,
 				365599FB11D4013600BA01E8 /* al_MsgQueue.cpp */,
-				3622BEFE116D527D00928703 /* al_msg.cpp */,
-				3622BF00116D527D00928703 /* al_socktube.c */,
 				3622BF01116D527D00928703 /* Makefile.config */,
 				3622BF02116D527D00928703 /* test */,
 			);
@@ -1022,11 +1004,6 @@
 				166DD741117CDB6000A8BA12 /* al_Conversion.hpp */,
 				362FA89811D3FA6700AA2DC4 /* al_MsgQueue.hpp */,
 				3659D750117B8A980065EBE4 /* al_MsgTube.hpp */,
-				36B4124E10EFF7B8007B16D0 /* al_pq.h */,
-				36B4124F10EFF7B8007B16D0 /* al_pq.hpp */,
-				36F4662B110B9B720082D21E /* al_socktube.h */,
-				36B4125010EFF7B8007B16D0 /* al_tube.h */,
-				36B4125110EFF7B8007B16D0 /* al_tube.hpp */,
 				36B4125210EFF7B8007B16D0 /* al_types.h */,
 				36B4125310EFF7B8007B16D0 /* al_types.hpp */,
 			);
@@ -1172,13 +1149,8 @@
 				16AC536C116293580076AA8B /* al_Serialize.h in Headers */,
 				16AC536D116293590076AA8B /* al_Serialize.hpp in Headers */,
 				16AC536E1162935E0076AA8B /* al_Socket.hpp in Headers */,
-				16AC536F116293630076AA8B /* al_socktube.h in Headers */,
 				16AC5371116293DC0076AA8B /* al_OSCAPR.hpp in Headers */,
 				16AC5372116293DD0076AA8B /* al_OSC.hpp in Headers */,
-				16AC5374116293E40076AA8B /* al_pq.h in Headers */,
-				16AC5375116293E50076AA8B /* al_pq.hpp in Headers */,
-				16AC5377116293EE0076AA8B /* al_tube.h in Headers */,
-				16AC5378116293EE0076AA8B /* al_tube.hpp in Headers */,
 				16AC5379116293EF0076AA8B /* al_types.h in Headers */,
 				16AC537A116293F00076AA8B /* al_types.hpp in Headers */,
 				1697336D11768ABD0025299C /* al_Vec.hpp in Headers */,
@@ -1430,8 +1402,6 @@
 				36BAE1CB11C2FAFF009A8BBD /* al_File.cpp in Sources */,
 				36BAE1CC11C2FAFF009A8BBD /* al_WindowGL.cpp in Sources */,
 				36BAE1CD11C2FAFF009A8BBD /* al_WindowGLUT.cpp in Sources */,
-				36BAE1CE11C2FAFF009A8BBD /* al_msg.cpp in Sources */,
-				36BAE1D011C2FAFF009A8BBD /* al_socktube.c in Sources */,
 				36BAE1D111C2FAFF009A8BBD /* IpEndpointName.cpp in Sources */,
 				36BAE1D211C2FAFF009A8BBD /* OscOutboundPacketStream.cpp in Sources */,
 				36BAE1D311C2FAFF009A8BBD /* OscPrintReceivedElements.cpp in Sources */,
@@ -1524,8 +1494,6 @@
 				3622BF08116D52AB00928703 /* al_File.cpp in Sources */,
 				3622BF0A116D52AB00928703 /* al_WindowGL.cpp in Sources */,
 				3622BF0B116D52AB00928703 /* al_WindowGLUT.cpp in Sources */,
-				3622BF15116D52B800928703 /* al_msg.cpp in Sources */,
-				3622BF17116D52B800928703 /* al_socktube.c in Sources */,
 				3622BF3E116D530600928703 /* IpEndpointName.cpp in Sources */,
 				3622BF3F116D530600928703 /* OscOutboundPacketStream.cpp in Sources */,
 				3622BF40116D530600928703 /* OscPrintReceivedElements.cpp in Sources */,
