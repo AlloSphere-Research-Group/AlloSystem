@@ -116,6 +116,10 @@ public:
 	void drawDual(void (*draw)(void *), void * userdata);
 	void drawLeft(void (*draw)(void *), void * userdata);
 	void drawRight(void (*draw)(void *), void * userdata);
+	
+	/// Blue line sync for active stereo (for those projectors that need it)
+	/// add this call at the end of rendering (just before the swap buffers call)
+	void drawBlueLine(int window_width, int window_height);
 
 protected:
 	Vec3d mStereoOffset;					// eye offset vector (right eye; left eye is inverse), usually (1, 0, 0)

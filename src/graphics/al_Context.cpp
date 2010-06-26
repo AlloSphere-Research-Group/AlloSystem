@@ -508,6 +508,81 @@ void Context :: drawRight(void (*draw)(void *), void * userdata)
 	glPopAttrib();
 }
 
+/// blue line sync for active stereo
+/// @see http://local.wasp.uwa.edu.au/~pbourke/miscellaneous/stereographics/stereorender/GLUTStereo/glutStereo.cpp
+void Context :: drawBlueLine(int window_width, int window_height) 
+{
+	GLint i;
+	unsigned long buffer;
+	
+	glPushAttrib(GL_ALL_ATTRIB_BITS);
+	
+	glDisable(GL_ALPHA_TEST);
+	glDisable(GL_BLEND);
+	for(i = 0; i < 6; i++) glDisable(GL_CLIP_PLANE0 + i);
+	glDisable(GL_COLOR_LOGIC_OP);
+	glDisable(GL_COLOR_MATERIAL);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_DITHER);
+	glDisable(GL_FOG);
+	glDisable(GL_LIGHTING);
+	glDisable(GL_LINE_SMOOTH);
+	glDisable(GL_LINE_STIPPLE);
+	glDisable(GL_SCISSOR_TEST);
+	glDisable(GL_SHARED_TEXTURE_PALETTE_EXT);
+	glDisable(GL_STENCIL_TEST);
+	glDisable(GL_TEXTURE_1D);
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_TEXTURE_3D);
+	glDisable(GL_TEXTURE_CUBE_MAP);
+	glDisable(GL_TEXTURE_RECTANGLE_EXT);
+	glDisable(GL_VERTEX_PROGRAM_ARB);
+		
+	for(buffer = GL_BACK_LEFT; buffer <= GL_BACK_RIGHT; buffer++) {
+		GLint matrixMode;
+		GLint vp[4];
+		
+		glDrawBuffer(buffer);
+		
+		glGetIntegerv(GL_VIEWPORT, vp);
+		glViewport(0, 0, window_width, window_height);
+		
+		glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
+		glMatrixMode(GL_PROJECTION);
+		glPushMatrix();
+		glLoadIdentity();
+		
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+		glLoadIdentity();
+		glScalef(2.0f / window_width, -2.0f / window_height, 1.0f);
+		glTranslatef(-window_width / 2.0f, -window_height / 2.0f, 0.0f);
+	
+		// draw sync lines
+		glColor3d(0.0f, 0.0f, 0.0f);
+		glBegin(GL_LINES); // Draw a background line
+			glVertex3f(0.0f, window_height - 0.5f, 0.0f);
+			glVertex3f(window_width, window_height - 0.5f, 0.0f);
+		glEnd();
+		glColor3d(0.0f, 0.0f, 1.0f);
+		glBegin(GL_LINES); // Draw a line of the correct length (the cross over is about 40% across the screen from the left
+			glVertex3f(0.0f, window_height - 0.5f, 0.0f);
+			if(buffer == GL_BACK_LEFT)
+				glVertex3f(window_width * 0.30f, window_height - 0.5f, 0.0f);
+			else
+				glVertex3f(window_width * 0.80f, window_height - 0.5f, 0.0f);
+		glEnd();
+	
+		glPopMatrix();
+		glMatrixMode(GL_PROJECTION);
+		glPopMatrix();
+		glMatrixMode(matrixMode);
+		
+		glViewport(vp[0], vp[1], vp[2], vp[3]);
+	}	
+	glPopAttrib();
+
+}
 
 
 
