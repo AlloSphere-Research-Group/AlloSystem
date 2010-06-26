@@ -77,23 +77,26 @@ MyWindow win;
 void set_freqs(al_sec t, double offset) {
 	win.freqs(t, t+offset);
 	printf("set_freqs @%f, fps %f\n", t, 1.0/win.avg);
-	MainLoop::queue().send(t+1., set_freqs, offset);
+	MainLoop::queue().send(t+0.1, set_freqs, offset);
 }
 
 int main (int argc, char * argv[]) {
+
+	printf("%d\n", sizeof(Pose));
 
 	/// Mainloop is created implicitly by the first reference to it; 
 	/// e.g., the creation of a WindowGL, or directly via MainLoop:: calls.
 	
 	/// decreasing the interval may lead to more accurate timing, but more expensive
 	/// reducing it to near the refresh rate may cause jerky animation
-	MainLoop::interval(0.0025); 
+	//MainLoop::interval(0.01); 
 	
 	win.create(WindowGL::Dim(200,200,100), "Window 1", 40);
 	win.freqs(1,2);
 	win.avg = 0;
 
 	MainLoop::queue().send(1.0, set_freqs, 1.);
+	
 	MainLoop::start();
 
 	return 0;

@@ -22,40 +22,55 @@ public:
 	ViewPort(double eyeSep = 0.0);
 	~ViewPort();
 	
-	ViewPort& eyeSep(double v){ mEyeSep=v; return *this; }	///< Set eye separation
-	
 	/// Set viewport dimensions in screen coordinates
 	ViewPort& dimensions(double w, double h);
 	ViewPort& dimensions(double w, double h, double x, double y);
 	
 	/// Tell this viewport which camera to use.
 	/// Note: no memory-management is done, but the camera must live as long as this viewport uses it!
-	ViewPort& camera(Camera * cam) { mCamera = cam; }
-
+	ViewPort& camera(Camera * cam) { mCamera = cam; return *this; }
+	
+	ViewPort& eyeSep(double v){ mEyeSep=v; return *this; }	///< Set eye separation
+	
 	double eyeSep() const { return mEyeSep; }				///< Get eye separation
-	double ratio() const { return mRatio; }					///< Get aspect ratio (width/height)
+	double ratio() const { return mAspect; }					///< Get aspect ratio (width/height)
+	double aspect() const { return mAspect; }					///< Get aspect ratio (width/height)
 	double nearTop() const;									///< Get frustum near plane top
 	double nearRight() const;								///< Get frustum near plane right
 	double farTop() const;									///< Get frustum far plane top
 	double farRight() const;								///< Get frustum far plane right
 	
+	
+	double left() const { return mLeft; }					///< Screen Co-ordinates
+	double bottom() const { return mLeft; }					///< Screen Co-ordinates
+	double width() const { return mLeft; }					///< Screen Co-ordinates
+	double height() const { return mLeft; }					///< Screen Co-ordinates
+	
+	Camera& camera() { return *mCamera; }
+	
 	/// use this to apply a transform to the projection matrix
 	Matrix4d& userProjectionTransform() { return mUserProjectionTransform; }
+	
+	void applyFrustumStereo(double eyesep);
 
-	Frustumd& monoFrustum();
-	Frustumd& leftFrustum(Context * ctx);
-	Frustumd& rightFrustum(Context * ctx);
-	Frustumd& biFrustum(Context * ctx);		// wide enough to encompass both left & right frusti
+	Frustumd monoFrustum();
+	Frustumd leftFrustum(Context * ctx);
+	Frustumd rightFrustum(Context * ctx);
+	Frustumd biFrustum(Context * ctx);		// wide enough to encompass both left & right frusti	
 	
-	
-	void setLookAt(double tx, double ty, double tz);
+	/// dispatch the GL commands to apply a camera's orientation (i.e. gluLookAt)
+	void view(double eyesep);
 
 protected:
-	Camera * mCamera;					// world-space view position & orientation
-	Matrix4d mUserProjectionTransform;	// user-defined projection transform
+	
 	double mLeft, mBottom, mWidth, mHeight;	// screen coordinates
-	double mRatio;						// aspect ratio
-	double mEyeSep;						// Eye separation for stereo
+	double mAspect;						// aspect ratio
+
+
+	Camera * mCamera;					// world-space view position & orientation
+	Frustum<double> mFrustum;
+	Matrix4d mUserProjectionTransform;	// user-defined projection transform
+	double mEyeSep;						// Eye separation for stereo. AKA IOD (inter ocular distance)
 };
 
 
@@ -69,9 +84,18 @@ public:
 		RightEye	/**< Right eye only */
 	};
 	
-	Context() : mStereo(false), mMode(Anaglyph), mStereoOffset(Vec3d(1, 0, 0)) {
-		mViewPorts.resize(1);	/// every context has at least one viewport
-	}
+	enum AnaglyphMode {
+		RedBlue = 0,
+		RedGreen,
+		RedCyan,
+		BlueRed,
+		GreenRed,
+		CyanRed
+	};
+	
+	Context() 
+	: mStereo(false), mMode(Anaglyph), mAnaglyphMode(RedBlue), mStereoOffset(Vec3d(1, 0, 0)) 
+	{}
 	
 	Context& mode(StereoMode v){ mMode=v; return *this; }	///< Set stereographic mode
 	Context& stereo(bool v){ mStereo=v; return *this; }		///< Set stereographic active
@@ -79,15 +103,29 @@ public:
 	StereoMode mode() const { return mMode; }				///< Get stereographic mode
 	bool stereo() const { return mStereo; }					///< Get stereographic active
 	
-	/// most contexts will only have one viewport. This is a handy accessor for the 'default' viewport.
-	ViewPort& viewport() { return mViewPorts.front(); }
+	/// This is a handy accessor for the (principal) viewport.
+	ViewPort& viewport() { return mViewPort; /*return mViewPorts.front();*/ }
+	
+	/// selects the appropriate draw method according to stereo setting:
+	void draw(void (*draw)(void *), void * userdata);
+	
+	/// So many different ways to draw :-)
+	void drawMono(void (*draw)(void *), void * userdata);
+	void drawActive(void (*draw)(void *), void * userdata);
+	void drawAnaglyph(void (*draw)(void *), void * userdata);
+	void drawDual(void (*draw)(void *), void * userdata);
+	void drawLeft(void (*draw)(void *), void * userdata);
+	void drawRight(void (*draw)(void *), void * userdata);
 
 protected:
 	Vec3d mStereoOffset;					// eye offset vector (right eye; left eye is inverse), usually (1, 0, 0)
 	StereoMode mMode;
+	AnaglyphMode mAnaglyphMode;
 	bool mStereo;
 	
-	std::list<ViewPort> mViewPorts;
+	ViewPort mViewPort;			// every context has a viewport
+	//std::list<ViewPort> mViewPorts;	// future support for multiple viewports per context
+	
 //	Notifier<onCreate>
 //	Notifier<onDestroy>
 };

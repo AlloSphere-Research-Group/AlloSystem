@@ -49,12 +49,12 @@ void Camera::calcFrustum(){
 	mStereoOffset = mUX * (eyeSep()*0.5);
 
 	// TODO: this is redundant
-	mFrustum.setCamInternals(aperture(), ratio(), near(), far());
+	//mFrustum.setCamInternals(aperture(), ratio(), near(), far());
 }
 
 
 Camera& Camera::aperture(double v){
-	mAperture=v;
+	mFOVY=v;
 	static double const tanCoef = 0.01745329252*0.5;	// degree-to-radian over /2
 	mTanFOV = tan(tanCoef * aperture());
 	return *this;
@@ -258,12 +258,12 @@ void Camera::setLookAt(double tx, double ty, double tz){
 
 
 
-Frustumd& Camera::computeTestFrustum(){
-	// TODO: this should take the eye vector into account
-	Vec3d vl = pos()+vf();
-	mFrustum.setCamDef(pos(), vl, vu());
-	return mFrustum;
-}
+//Frustumd& Camera::computeTestFrustum(){
+//	// TODO: this should take the eye vector into account
+//	Vec3d vl = pos()+vf();
+//	mFrustum.setCamDef(pos(), vl, vu());
+//	return mFrustum;
+//}
 
 
 

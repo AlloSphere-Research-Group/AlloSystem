@@ -387,7 +387,7 @@ private:
 	friend class MainLoop;
 
 	// schedule draws of a specific window
-	static void scheduleDrawStatic(al_sec t, int winID){
+	static void scheduleDrawStatic(al_sec t, int winID) {
 		WindowImpl *impl = getWindowImpl(winID);
 		
 		// If there is a valid implementation, then draw and schedule next draw...

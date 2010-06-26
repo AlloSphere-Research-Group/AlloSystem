@@ -8,16 +8,60 @@
 #include "protocol/al_Graphics.hpp"
 #include "math/al_Random.hpp"
 
+#define deg2rad(deg) (deg*0.0174532925)
+
 using namespace al;
 
-Camera cam;
+
+class Cam : public Nav {
+public:
+	double focal, near, far, fovy;
+	
+};
+
+Cam cam;
+Camera camera;
+
+static void setStereoFrustum(Camera& cam, double aspect, double eyesep) {
+	
+	// typically choose IOD to be 1/30 of the focal length
+	double IOD = eyesep * cam.focalLength()/30.0;
+	double top = cam.near() * tan( deg2rad( cam.fovy() / 2 ));	
+	double right = aspect * top;				
+	double frustumshift = (IOD/2)*cam.near()/cam.focalLength();
+	double l, r, t, b, n, f;
+	
+	t = top;
+	b = -top;
+	l = -right + frustumshift;
+	r = right + frustumshift;
+	n = cam.near();
+	f = cam.far();
+	
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();                                       //reset projection matrix
+	glFrustum(l, r, b, t, n, f);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glLoadIdentity();
+	const Vec3d& vec = camera.vec();
+	const Vec3d& ux  = camera.ux();
+	const Vec3d& uy  = camera.uy();
+	const Vec3d& uz  = camera.uz();
+	const Vec3d eye = vec + (ux * IOD/2);
+	const Vec3d at = eye + (uz * cam.focalLength());
+	gluLookAt(	eye[0],	eye[1],	eye[2],
+				at[0],	at[1],	at[2],
+				uy[0],	uy[1],	uy[2]);
+	
+}
 
 // invent some kind of scene:
 struct vertex {
 	float x, y, z;
 	float r, g, b;
 };
-#define NUM_VERTICES (1024)
+#define NUM_VERTICES (256)
 static vertex vertices[NUM_VERTICES];
 
 struct MyWindow : WindowGL{
@@ -55,15 +99,27 @@ struct MyWindow : WindowGL{
 	}
 
 	void onFrame(){
+		
+		//viewport().camera()->focalLength(10 * sin(al_time()));
+		viewport().camera().vec()[0] = 10 * sin(al_time());
+		
+		viewport().dimensions(dimensions().w, dimensions().h);
+		viewport().applyFrustumStereo(eyesep);
+		
+		glDrawBuffer(GL_BACK);                                   //draw into both back buffers
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);     //clear color and depth buffers
+		gl.loadIdentity();
+		
+		
 		al_sec t = al_time();
 		avg += 0.1*((t-last)-avg);
 		last = t;
 		
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		gl.loadIdentity();
-		gl.viewport(0,0, dimensions().w, dimensions().h);
+//		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+//		gl.loadIdentity();
+//		gl.viewport(0,0, dimensions().w, dimensions().h);
 		
-		gl.begin(gl.LINE_STRIP);
+		gl.begin(gl.LINES);
 			static float limit = NUM_VERTICES;
 			for (int i = 0; i<NUM_VERTICES; i++) {
 				float p = i / limit;
@@ -81,61 +137,59 @@ struct MyWindow : WindowGL{
 	float freq1, freq2;
 	al_sec last;
 	al_sec avg;
+	
+	double eyesep;
 };
 
 MyWindow win;
 MyWindow win2;
-
-void set_freqs(al_sec t, double offset) {
-	win.freqs(t, t+offset);
-	win2.freqs(t, t+offset);
-	printf("set_freqs @%f, fps %f\n", t, 1.0/win.avg);
-	MainLoop::queue().send(t+1., set_freqs, offset);
-}
 
 int main (int argc, char * argv[]) {
 
 	rnd::Random<> rng;
 
 	/// define the scene - a semi random walk
-	vertex v0 = { 
-		0, 0, 0,
-		rng.uniform(), rng.uniform(), rng.uniform()
-	};
-	for (int i=1; i<NUM_VERTICES; i++) {
-		float ratio = 0.5 * sin(2.0*M_PI*sin(i));
-		float antiratio = 0.5 * cos(2.0*M_PI*sin(i));
-		float scale = 3;
-		vertices[i].x = v0.x + antiratio * (scale * vertices[i-1].r) + ratio * vertices[i-1].x;
-		vertices[i].y = v0.y + antiratio * (scale * vertices[i-1].g) + ratio * vertices[i-1].y;
-		vertices[i].z = v0.z + antiratio * (scale * vertices[i-1].b) + ratio * vertices[i-1].z;
+	for (int i=0; i<NUM_VERTICES; i++) {
+	
+		double r, g, b, x, y, z;
 		
-		float twist = 0.25;
-		vertices[i].r = vertices[i-1].r + twist * (rng.uniform() - vertices[i-1].r);
-		vertices[i].g = vertices[i-1].g + twist * (rng.uniform() - vertices[i-1].g);
-		vertices[i].b = vertices[i-1].b + twist * (rng.uniform() - vertices[i-1].b);
-
-	}
-
-	/// Mainloop is created implicitly by the first reference to it; 
-	/// e.g., the creation of a WindowGL, or directly via MainLoop:: calls.
+		double p = i/(double)NUM_VERTICES;
+		r = p;
+		g = 1-p;
+		b = sin(p * 6 * M_PI);
 	
-	/// decreasing the interval may lead to more accurate timing, but more expensive
-	/// reducing it to near the refresh rate may cause jerky animation
-	MainLoop::interval(0.0025); 
+		y = b;
+		z = -5 + sin(p * 2 * M_PI);
+		
+		vertices[i].x = -1;
+		vertices[i].y = y;
+		vertices[i].z = z;
+		vertices[i].r = r;
+		vertices[i].g = g;
+		vertices[i].b = b;
+		
+		i++;
+		
+		vertices[i].x = 1;
+		vertices[i].y = y;
+		vertices[i].z = z;
+		vertices[i].r = r;
+		vertices[i].g = g;
+		vertices[i].b = b;
+
+	} 
 	
-	win.create(WindowGL::Dim(200,200,0), "left", 40);
-	win2.create(WindowGL::Dim(200,200,200), "right", 40);
-	win.freqs(1,2);
-	win.freqs(1,2);
+	win.create(WindowGL::Dim(640,480,0), "left", 40);
+	win2.create(WindowGL::Dim(640,480,640), "right", 40);
 	win.avg = 0;
 	
+	win.eyesep = 2;
+	win2.eyesep = -win.eyesep;
+	
 	/// set these windows to use the same camera:
-	win.viewport().camera(&cam);
-	win2.viewport().camera(&cam);
+	win.viewport().camera(&camera);
+	win2.viewport().camera(&camera);
 
-	MainLoop::queue().send(1.0, set_freqs, 1.);
 	MainLoop::start();
-
 	return 0;
 }

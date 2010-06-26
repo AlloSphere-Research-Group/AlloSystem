@@ -35,7 +35,7 @@
 namespace al {
 
 // messages that are larger than this will be heap copied
-#define AL_MSGQUEUE_ARGS_SIZE (44)
+#define AL_MSGQUEUE_ARGS_SIZE (76)
 
 class MsgQueue {
 public:	
@@ -44,7 +44,7 @@ public:
 	typedef void * (*malloc_func)(size_t size);
 	typedef void (*free_func)(void * ptr);
 	
-	MsgQueue(int size = 256, malloc_func mfunc = NULL, free_func ffunc = NULL);
+	MsgQueue(int size = 128, malloc_func mfunc = NULL, free_func ffunc = NULL);
 	~MsgQueue();
 	
 	// for truly accurate scheduling, always use this as logical time:

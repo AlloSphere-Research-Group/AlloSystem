@@ -69,7 +69,8 @@ public:
 	const Vec3d& vu() const { return uy(); }				///< Get up vector
 	const Vec3d& vr() const { return ux(); }				///< Get right vector
 	double focalLength() const { return mFocalLength; }		///< Get focal length
-	double aperture() const { return mAperture; }			///< Get vertical field of view, in degrees
+	double fovy() const { return mFOVY; }				///< Get vertical field of view, in degrees
+	double aperture() const { return mFOVY; }			///< Get vertical field of view, in degrees
 	double eyeSep() const { return mEyeSep; }				///< Get eye separation
 	FrustumGL frustum(double eyePos=0) const;				///< Get frustum from an eye position
 	double near() const { return mNear; }					///< Get frustum near plane distance
@@ -99,7 +100,7 @@ public:
 
 protected:
 	double mFocalLength;		// Focal length along vd
-	double mAperture;			// Camera aperture (degrees)
+	double mFOVY;			// Camera aperture (degrees)
 	double mEyeSep;				// Eye separation
 	double mNear, mFar;			// Cutting plane distances
 	double mRatio;				// frustum aspect ratio 
