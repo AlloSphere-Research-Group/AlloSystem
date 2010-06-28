@@ -41,7 +41,7 @@ void MsgQueue :: growPool() {
 void MsgQueue :: recycle(Msg * m) {
 	m->next = mPool;
 	mPool = m;
-	if (m->size > AL_MSGQUEUE_ARGS_SIZE) {
+	if (m->isBigMessage()) {
 		char * args = *(char **)(m->args);
 		mFree(args);
 	}
@@ -60,7 +60,7 @@ void MsgQueue :: sched(al_sec at, msg_func func, char * data, size_t size) {
 	m->t = at;
 	m->func = func;
 	m->size = size;
-	if (size > AL_MSGQUEUE_ARGS_SIZE) {
+	if (m->isBigMessage()) {
 		// too big to fit in the Msg.
 		char * args = (char *)mMalloc(size);
 		memcpy(args, data, size);
@@ -119,7 +119,7 @@ void MsgQueue :: update(al_sec until, bool defer) {
 //		} else {	
 
 		mNow = MAX(mNow, m->t); 
-		if (m->size > AL_MSGQUEUE_ARGS_SIZE) {
+		if (m->isBigMessage()) {
 			char * args = *(char **)(m->args);
 			(m->func)(mNow, args);
 		} else {

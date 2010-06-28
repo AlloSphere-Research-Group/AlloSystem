@@ -50,7 +50,15 @@ void ViewPort::view(double aspect, double eyesep) {
 		near, 
 		far
 	);
-	glMultMatrixd(userProjectionTransform().elems);
+//	Matrix4d m = Matrix4d::UnPerspective(
+//		-right + shift, 
+//		right + shift, 
+//		-top, 
+//		top, 
+//		near, 
+//		far);
+//	glMultMatrixd(m.elems);
+	//glMultMatrixd(userProjectionTransform().elems);
 	
 	// set perspective; uses cam(focal, vec, uz, uy, ux)
 	//gl.MatrixMode(gl.ModelView);

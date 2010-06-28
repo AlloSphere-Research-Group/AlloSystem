@@ -399,10 +399,16 @@ private:
 			if(win){
 				win->doFrame();
 				if(win->fps() > 0){
-					// use mainloop instead
-					 //glutTimerFunc((unsigned int)(1000.0/win->fps()), scheduleDrawStatic, winID);
-					MsgQueue& q = MainLoop::get().queue();
-					q.send(t + 1.0/win->fps(), scheduleDrawStatic, winID);
+					al_sec frameperiod = 1.0/win->fps();
+					al_sec rt = MainLoop::realtime();
+					
+					MainLoop::queue().send(rt + frameperiod, scheduleDrawStatic, winID);
+					
+					// not clear if this version is better or worse...
+//					al_sec littlegap = 0.1 * frameperiod;	// 10% of frameperiod
+//					int nextframeid = (int)((rt + littlegap + frameperiod) / frameperiod);
+//					al_sec next_t = nextframeid * frameperiod;
+//					MainLoop::queue().send(next_t, scheduleDrawStatic, winID);
 				}
 			}
 		}

@@ -44,8 +44,13 @@ public:
 	/// in some implementations, may exit the application
 	static void stop();
 	
-	/// current scheduler time
+	/// current scheduler (logical) time
+	/// (seconds since MainLoop::start())
 	static al_sec now() { return get().mQueue.now(); }
+	
+	/// real time
+	/// (seconds since MainLoop::start())
+	static al_sec realtime() { return al_time() - get().mT0; }
 	
 	/// use this to schedule timed functions in this mainloop
 	/// (the mainloop itself will take care of updating this queue)

@@ -166,6 +166,8 @@ protected:
 		al_sec t;
 		msg_func func;
 		char args[AL_MSGQUEUE_ARGS_SIZE];
+		
+		bool isBigMessage() { return size > AL_MSGQUEUE_ARGS_SIZE; }
 	};
 	
 	Msg * mHead;

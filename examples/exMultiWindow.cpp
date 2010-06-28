@@ -99,7 +99,7 @@ MyWindow win4;
 	If the last frame overflowed (cpu > 1.0), the current frame will be skipped
 	(if frames were not skipped, the scheduler could end up clogging up and freezing the app)
 */
-al_sec step_period = 1./60;
+al_sec step_period = 1./200;
 al_sec overtime = 0;
 al_sec lastframe = 0;
 void step(al_sec t) {
@@ -116,21 +116,21 @@ void step(al_sec t) {
 	);	
 	
 	// only render if we are keeping to our deadlines:
-	if (overtime <= 0) {		///< the right way to do it
+	//if (overtime <= 0) {		///< the right way to do it
 	//if (MainLoop::cpu() < 1) {	///< the lazy way to do it
 		
 		camera.vec()[2] = sin(t);
 		camera.step();
 		/* we set fps to zero for both windows, so that we can drive them from here instead */
-		win1.doFrame();
-		win2.doFrame();
-		win3.doFrame();
-		win4.doFrame();
+//		win1.doFrame();
+//		win2.doFrame();
+//		win3.doFrame();
+//		win4.doFrame();
 		
 //		al_sec frt = al_time() - MainLoop::T0();		// actual time now
 //		fps = 1./(frt-lastframe);
 //		lastframe = frt;
-	} 
+	//} 
 	
 	// for the right way:
 	// test whether we are keeping to our deadlines:
@@ -140,11 +140,13 @@ void step(al_sec t) {
 	overtime = rt - next_t;						
 	// note: this measurement is also affected by any other processes in the scheduler!
 	al_sec cpu = (overtime/step_period)+1.;
-	//printf("step/frame cpu: %6.2f%%, main cpu: %6.2f%%\n", cpu*100, MainLoop::cpu()*100);
+	printf("step/frame cpu: %6.2f%%, main cpu: %6.2f%%\n", cpu*100, MainLoop::cpu()*100);
 	
 
-	MainLoop::queue().send(next_t, step);
+	MainLoop::queue().send(rt + step_period, step);
 }
+
+double fps = 200;
 
 int main (int argc, char * argv[]) {
 
@@ -182,20 +184,20 @@ int main (int argc, char * argv[]) {
 	} 
 	
 	// set fps == 0, and drive frame rendering manually instead
-	win1.create(WindowGL::Dim(320,240,0,40), "win1", 0);
+	win1.create(WindowGL::Dim(320,240,0,40), "win1", fps);
 	win1.mode(WindowGL::Dual);
 	win1.stereo(true);
 	win1.viewport().camera(&camera);
 	
-	win2.create(WindowGL::Dim(320,240,0,320), "win2", 0);
+	win2.create(WindowGL::Dim(320,240,0,320), "win2", fps);
 	win2.mode(WindowGL::Anaglyph);
-	win2.anaglyphMode(WindowGL::RedCyan);
+	//win2.anaglyphMode(WindowGL::RedCyan);
 	win2.stereo(true);
 	win2.viewport().camera(&camera);
 	
-	win3.create(WindowGL::Dim(320,240,0,560), "win3", 0);
+	win3.create(WindowGL::Dim(320,240,0,560), "win3", fps);
 	win3.mode(WindowGL::LeftEye);
-	win3.stereo(false);
+	win3.stereo(true);
 	win3.viewport().camera(&camera);
 	//win3.viewport().userProjectionTransform().set(Matrix4d::Scale(1, 0.5, 1));
 //	win3.viewport().userProjectionTransform().set(
@@ -204,9 +206,9 @@ int main (int argc, char * argv[]) {
 //		Matrix4d::Translate(0.5, 0, 0)
 //	);
 	
-	win4.create(WindowGL::Dim(320,240,320,560), "win4", 0);
+	win4.create(WindowGL::Dim(320,240,320,560), "win4", fps);
 	win4.mode(WindowGL::RightEye);
-	win4.stereo(false);
+	win4.stereo(true);
 	win4.viewport().camera(&camera);
 
 	

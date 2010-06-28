@@ -35,14 +35,6 @@
 
 namespace al{
 
-static void onIdle() {
-	MainLoop::get().tick();
-}
-
-static void timerFunc(int id) {
-	MainLoop::get().tick();
-}
-
 /// implementation of MainLoop for the GLUT target
 
 MainLoop :: MainLoop() 
@@ -59,6 +51,8 @@ MainLoop :: MainLoop()
 }
 
 MainLoop :: ~MainLoop() {}
+
+static void timerFunc(int id) { MainLoop::get().tick(); }
 
 void MainLoop :: tick() {
 	al_sec realtime = al_time();	
