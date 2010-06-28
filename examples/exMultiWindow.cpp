@@ -8,53 +8,12 @@
 #include "protocol/al_Graphics.hpp"
 #include "math/al_Random.hpp"
 
-#define deg2rad(deg) (deg*0.0174532925)
-
 using namespace al;
 
-
-class Cam : public Nav {
-public:
-	double focal, near, far, fovy;
-	
-};
-
-Cam cam;
 Camera camera;
-
-static void setStereoFrustum(Camera& cam, double aspect, double eyesep) {
-	
-	// typically choose IOD to be 1/30 of the focal length
-	double IOD = eyesep * cam.focalLength()/30.0;
-	double top = cam.near() * tan( deg2rad( cam.fovy() / 2 ));	
-	double right = aspect * top;				
-	double frustumshift = (IOD/2)*cam.near()/cam.focalLength();
-	double l, r, t, b, n, f;
-	
-	t = top;
-	b = -top;
-	l = -right + frustumshift;
-	r = right + frustumshift;
-	n = cam.near();
-	f = cam.far();
-	
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();                                       //reset projection matrix
-	glFrustum(l, r, b, t, n, f);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glLoadIdentity();
-	const Vec3d& vec = camera.vec();
-	const Vec3d& ux  = camera.ux();
-	const Vec3d& uy  = camera.uy();
-	const Vec3d& uz  = camera.uz();
-	const Vec3d eye = vec + (ux * IOD/2);
-	const Vec3d at = eye + (uz * cam.focalLength());
-	gluLookAt(	eye[0],	eye[1],	eye[2],
-				at[0],	at[1],	at[2],
-				uy[0],	uy[1],	uy[2]);
-	
-}
+gfx::Graphics gl;
+double eyesep = 1;
+		
 
 // invent some kind of scene:
 struct vertex {
@@ -63,6 +22,31 @@ struct vertex {
 };
 #define NUM_VERTICES (256)
 static vertex vertices[NUM_VERTICES];
+
+		
+static void drawScene(void * self) {
+
+	glEnable(GL_BLEND);
+	glEnable(GL_LINE_SMOOTH);
+//	gl.begin(gl.LINES);
+//		for (double z = -10; z<10; z += 1) {
+//		for (double y = 0; y<1; y += .1) {
+//		for (double x = 0; x<1; x += .1) {
+//			gl.color(abs(cos(M_PI * (x-y))), 0.5, abs(sin(M_PI * (x+y))));
+//			gl.vertex(cos(M_PI * (x-y)), sin(M_PI * (x+y)), z*8);
+//		}}}
+//	gl.end();
+	
+	gl.begin(gl.LINES);
+		for (int i=0; i<NUM_VERTICES; i++) {
+			vertex& v = vertices[i];
+			gl.color(v.r, v.g, v.b, 0.5);
+			gl.vertex(v.x, v.y, v.z);
+		}
+	gl.end();
+}
+
+
 
 struct MyWindow : WindowGL{
 
@@ -99,50 +83,68 @@ struct MyWindow : WindowGL{
 	}
 
 	void onFrame(){
-		
-		//viewport().camera()->focalLength(10 * sin(al_time()));
-		viewport().camera().vec()[0] = 10 * sin(al_time());
-		
-		viewport().dimensions(dimensions().w, dimensions().h);
-		viewport().applyFrustumStereo(eyesep);
-		
-		glDrawBuffer(GL_BACK);                                   //draw into both back buffers
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);     //clear color and depth buffers
-		gl.loadIdentity();
-		
-		
-		al_sec t = al_time();
-		avg += 0.1*((t-last)-avg);
-		last = t;
-		
-//		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-//		gl.loadIdentity();
-//		gl.viewport(0,0, dimensions().w, dimensions().h);
-		
-		gl.begin(gl.LINES);
-			static float limit = NUM_VERTICES;
-			for (int i = 0; i<NUM_VERTICES; i++) {
-				float p = i / limit;
-				vertex& v = vertices[i];
-				gl.color(v.r, v.g, v.b);
-				gl.vertex(v.x, v.y, v.z);
-			}
-		gl.end();
-//printf("%p: %d x %d\n", this, dimensions().w, dimensions().h);
+		//drawScene(this);
+		Context::draw(drawScene, dimensions().w, dimensions().h, this);
 	}
-	
-	void freqs(float v1, float v2){ freq1=v1; freq2=v2; }
-
-	gfx::Graphics gl;
-	float freq1, freq2;
-	al_sec last;
-	al_sec avg;
-	
-	double eyesep;
 };
 
-MyWindow win;
+MyWindow win1;
 MyWindow win2;
+MyWindow win3;
+MyWindow win4;
+
+/*
+	Here's one way to skip processing if the engine can't keep up.
+	The actual time taken to render is measured against the desired frame rate
+	If the last frame overflowed (cpu > 1.0), the current frame will be skipped
+	(if frames were not skipped, the scheduler could end up clogging up and freezing the app)
+*/
+al_sec step_period = 1./60;
+al_sec overtime = 0;
+al_sec lastframe = 0;
+void step(al_sec t) {
+	// logical time of next step
+	al_sec next_t = t+step_period;				
+	
+//	al_sec fps = 0;
+
+	win3.viewport().userProjectionTransform().set(
+		//Matrix4d::ShearYZ(0, sin(al_time())) 
+		//* 
+		Matrix4d::Scale(2, 1, 1) 
+		* Matrix4d::Translate(-1, 0, 0)
+	);	
+	
+	// only render if we are keeping to our deadlines:
+	if (overtime <= 0) {		///< the right way to do it
+	//if (MainLoop::cpu() < 1) {	///< the lazy way to do it
+		
+		camera.vec()[2] = sin(t);
+		camera.step();
+		/* we set fps to zero for both windows, so that we can drive them from here instead */
+		win1.doFrame();
+		win2.doFrame();
+		win3.doFrame();
+		win4.doFrame();
+		
+//		al_sec frt = al_time() - MainLoop::T0();		// actual time now
+//		fps = 1./(frt-lastframe);
+//		lastframe = frt;
+	} 
+	
+	// for the right way:
+	// test whether we are keeping to our deadlines:
+	al_sec rt = al_time() - MainLoop::T0();		// actual time now
+	// overtime<0 indicates that we are keeping up
+	// overtime>0 indicates that we cannot keep up
+	overtime = rt - next_t;						
+	// note: this measurement is also affected by any other processes in the scheduler!
+	al_sec cpu = (overtime/step_period)+1.;
+	//printf("step/frame cpu: %6.2f%%, main cpu: %6.2f%%\n", cpu*100, MainLoop::cpu()*100);
+	
+
+	MainLoop::queue().send(next_t, step);
+}
 
 int main (int argc, char * argv[]) {
 
@@ -159,9 +161,9 @@ int main (int argc, char * argv[]) {
 		b = sin(p * 6 * M_PI);
 	
 		y = b;
-		z = -5 + sin(p * 2 * M_PI);
+		z = 5 + 2*sin(p * 2 * M_PI);
 		
-		vertices[i].x = -1;
+		vertices[i].x = -1.5;
 		vertices[i].y = y;
 		vertices[i].z = z;
 		vertices[i].r = r;
@@ -170,7 +172,7 @@ int main (int argc, char * argv[]) {
 		
 		i++;
 		
-		vertices[i].x = 1;
+		vertices[i].x = 1.5;
 		vertices[i].y = y;
 		vertices[i].z = z;
 		vertices[i].r = r;
@@ -179,17 +181,38 @@ int main (int argc, char * argv[]) {
 
 	} 
 	
-	win.create(WindowGL::Dim(640,480,0), "left", 40);
-	win2.create(WindowGL::Dim(640,480,640), "right", 40);
-	win.avg = 0;
+	// set fps == 0, and drive frame rendering manually instead
+	win1.create(WindowGL::Dim(320,240,0,40), "win1", 0);
+	win1.mode(WindowGL::Dual);
+	win1.stereo(true);
+	win1.viewport().camera(&camera);
 	
-	win.eyesep = 2;
-	win2.eyesep = -win.eyesep;
-	
-	/// set these windows to use the same camera:
-	win.viewport().camera(&camera);
+	win2.create(WindowGL::Dim(320,240,0,320), "win2", 0);
+	win2.mode(WindowGL::Anaglyph);
+	win2.anaglyphMode(WindowGL::RedCyan);
+	win2.stereo(true);
 	win2.viewport().camera(&camera);
+	
+	win3.create(WindowGL::Dim(320,240,0,560), "win3", 0);
+	win3.mode(WindowGL::LeftEye);
+	win3.stereo(false);
+	win3.viewport().camera(&camera);
+	//win3.viewport().userProjectionTransform().set(Matrix4d::Scale(1, 0.5, 1));
+//	win3.viewport().userProjectionTransform().set(
+//		//Matrix4d::Scale(0.5, 1, 1) *
+//		Matrix4d::ShearZ(0.5, 0.) *
+//		Matrix4d::Translate(0.5, 0, 0)
+//	);
+	
+	win4.create(WindowGL::Dim(320,240,320,560), "win4", 0);
+	win4.mode(WindowGL::RightEye);
+	win4.stereo(false);
+	win4.viewport().camera(&camera);
 
+	
+	camera.turn(Quatd::fromEuler(0., 0., 0.1));
+	MainLoop::queue().send(0., step);
+	MainLoop::interval(0.01);
 	MainLoop::start();
 	return 0;
 }

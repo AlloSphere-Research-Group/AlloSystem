@@ -376,7 +376,7 @@
 		3602B54E110A6D3D005DC3D0 /* OscTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OscTypes.h; sourceTree = "<group>"; };
 		3602B736110A9770005DC3D0 /* exOscSend */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exOscSend; sourceTree = BUILT_PRODUCTS_DIR; };
 		3602B739110A9785005DC3D0 /* exOscSend.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exOscSend.cpp; sourceTree = "<group>"; };
-		360C400011D2F688002FE91F /* graphics.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = graphics.txt; sourceTree = "<group>"; };
+		360C400011D2F688002FE91F /* notes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = notes.txt; sourceTree = "<group>"; };
 		360C404011D32D3E002FE91F /* al_Context.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Context.hpp; sourceTree = "<group>"; };
 		360C404511D32DDA002FE91F /* al_Context.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Context.cpp; sourceTree = "<group>"; };
 		360C404E11D32FED002FE91F /* al_Matrix4.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Matrix4.hpp; sourceTree = "<group>"; };
@@ -476,6 +476,7 @@
 		36B4130F10EFFA8D007B16D0 /* liballocore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liballocore.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		36B4139610EFFD4C007B16D0 /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
 		36B4BF06110E55AF00F789A8 /* al_Socket.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Socket.hpp; sourceTree = "<group>"; };
+		36B5D3E611D81D2C004D228D /* TODO */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO; sourceTree = "<group>"; };
 		36C079BF11D4966500764E50 /* exMultiWindow */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exMultiWindow; sourceTree = BUILT_PRODUCTS_DIR; };
 		36C079C111D4967B00764E50 /* exMultiWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exMultiWindow.cpp; sourceTree = "<group>"; };
 		36C13ED911D15D30006196FC /* exReverb */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exReverb; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -631,7 +632,8 @@
 		08FB7794FE84155DC02AAC07 /* alscheduling */ = {
 			isa = PBXGroup;
 			children = (
-				360C400011D2F688002FE91F /* graphics.txt */,
+				36B5D3E611D81D2C004D228D /* TODO */,
+				360C400011D2F688002FE91F /* notes.txt */,
 				3625B540116EEDEF00C685B7 /* Makefile */,
 				3625B541116EEDEF00C685B7 /* Makefile.config */,
 				36B4124410EFF7B8007B16D0 /* include */,

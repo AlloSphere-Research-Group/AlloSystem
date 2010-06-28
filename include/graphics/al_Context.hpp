@@ -33,39 +33,36 @@ public:
 	ViewPort& eyeSep(double v){ mEyeSep=v; return *this; }	///< Set eye separation
 	
 	double eyeSep() const { return mEyeSep; }				///< Get eye separation
-	double ratio() const { return mAspect; }					///< Get aspect ratio (width/height)
-	double aspect() const { return mAspect; }					///< Get aspect ratio (width/height)
-	double nearTop() const;									///< Get frustum near plane top
-	double nearRight() const;								///< Get frustum near plane right
-	double farTop() const;									///< Get frustum far plane top
-	double farRight() const;								///< Get frustum far plane right
+//	double ratio() const { return mAspect; }				///< Get aspect ratio (width/height)
+//	double aspect() const { return mAspect; }				///< Get aspect ratio (width/height)
+//	double nearTop() const;									///< Get frustum near plane top
+//	double nearRight() const;								///< Get frustum near plane right
+//	double farTop() const;									///< Get frustum far plane top
+//	double farRight() const;								///< Get frustum far plane right
 	
 	
 	double left() const { return mLeft; }					///< Screen Co-ordinates
-	double bottom() const { return mLeft; }					///< Screen Co-ordinates
-	double width() const { return mLeft; }					///< Screen Co-ordinates
-	double height() const { return mLeft; }					///< Screen Co-ordinates
+	double bottom() const { return mBottom; }				///< Screen Co-ordinates
+	double width() const { return mWidth; }					///< Screen Co-ordinates
+	double height() const { return mHeight; }				///< Screen Co-ordinates
 	
 	Camera& camera() { return *mCamera; }
 	
 	/// use this to apply a transform to the projection matrix
 	Matrix4d& userProjectionTransform() { return mUserProjectionTransform; }
-	
-	void applyFrustumStereo(double eyesep);
-
+		
 	Frustumd monoFrustum();
 	Frustumd leftFrustum(Context * ctx);
 	Frustumd rightFrustum(Context * ctx);
 	Frustumd biFrustum(Context * ctx);		// wide enough to encompass both left & right frusti	
 	
-	/// dispatch the GL commands to apply a camera's orientation (i.e. gluLookAt)
-	void view(double eyesep);
+	/// dispatch the GL commands to apply a camera's orientation (i.e. glFrustum, gluLookAt)
+	void view(double aspect, double eyesep);
 
 protected:
 	
 	double mLeft, mBottom, mWidth, mHeight;	// screen coordinates
-	double mAspect;						// aspect ratio
-
+	//double mAspect;						// aspect ratio
 
 	Camera * mCamera;					// world-space view position & orientation
 	Frustum<double> mFrustum;
@@ -73,7 +70,8 @@ protected:
 	double mEyeSep;						// Eye separation for stereo. AKA IOD (inter ocular distance)
 };
 
-
+/// for OpenGL stereographics, you can't do better than to look here:
+/// http://local.wasp.uwa.edu.au/~pbourke/miscellaneous/stereographics/stereorender/
 class Context {
 public:
 	enum StereoMode{
@@ -83,7 +81,6 @@ public:
 		LeftEye,	/**< Left eye only */
 		RightEye	/**< Right eye only */
 	};
-	
 	enum AnaglyphMode {
 		RedBlue = 0,
 		RedGreen,
@@ -99,23 +96,25 @@ public:
 	
 	Context& mode(StereoMode v){ mMode=v; return *this; }	///< Set stereographic mode
 	Context& stereo(bool v){ mStereo=v; return *this; }		///< Set stereographic active
+	Context& anaglyphMode(AnaglyphMode v) { mAnaglyphMode=v; return *this; }	///< set glasses type
 	
 	StereoMode mode() const { return mMode; }				///< Get stereographic mode
 	bool stereo() const { return mStereo; }					///< Get stereographic active
+	AnaglyphMode anaglyphMode() const { return mAnaglyphMode; }	///< get anaglyph glasses type
 	
 	/// This is a handy accessor for the (principal) viewport.
 	ViewPort& viewport() { return mViewPort; /*return mViewPorts.front();*/ }
 	
 	/// selects the appropriate draw method according to stereo setting:
-	void draw(void (*draw)(void *), void * userdata);
+	void draw(void (*draw)(void *), int width, int height, void * userdata);
 	
 	/// So many different ways to draw :-)
-	void drawMono(void (*draw)(void *), void * userdata);
-	void drawActive(void (*draw)(void *), void * userdata);
-	void drawAnaglyph(void (*draw)(void *), void * userdata);
-	void drawDual(void (*draw)(void *), void * userdata);
-	void drawLeft(void (*draw)(void *), void * userdata);
-	void drawRight(void (*draw)(void *), void * userdata);
+	void drawMono(void (*draw)(void *), int width, int height, void * userdata);
+	void drawActive(void (*draw)(void *), int width, int height, void * userdata);
+	void drawAnaglyph(void (*draw)(void *), int width, int height, void * userdata);
+	void drawDual(void (*draw)(void *), int width, int height, void * userdata);
+	void drawLeft(void (*draw)(void *), int width, int height, void * userdata);
+	void drawRight(void (*draw)(void *), int width, int height, void * userdata);
 	
 	/// Blue line sync for active stereo (for those projectors that need it)
 	/// add this call at the end of rendering (just before the swap buffers call)

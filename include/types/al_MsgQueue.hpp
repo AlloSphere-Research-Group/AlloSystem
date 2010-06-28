@@ -59,6 +59,18 @@ public:
 	
 	// template wrappers for multi-argument functions
 	// be sure to cast the send arguments to exactly match the function argument types!
+	void send(al_sec at, void (*f)(al_sec t)) {
+		struct Data {
+			void (*f)(al_sec t);
+			static void call(al_sec t, char * args) {
+				const Data * d = (Data *)args;
+				(d->f)(t);
+			}
+		};
+		Data data = { f };
+		sched(at, &Data::call, (char *)(&data), sizeof(Data));
+	}
+	
 	template<typename A1>
 	void send(al_sec at, void (*f)(al_sec t, A1 a1), A1 a1) {
 		struct Data {

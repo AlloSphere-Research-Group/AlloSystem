@@ -55,6 +55,20 @@ public:
 	static void interval(al_sec interval);
 	static al_sec interval() { return get().mInterval; }
 	
+	/// performance monitoring:
+	/* 
+		Measures relationship between ideal tick interval (mInterval), 
+			and the actual duration between ticks.
+		Thus, it measures cost of both mQueue.update(), 
+			plus every other activity in this thread between successive ticks
+		Depending on the implementation, setting the interval to small values 
+			will report a very high CPU measurement
+	*/
+	static double cpu() { return get().mCPU; }
+	
+	///< al_time() when mainloop was created
+	static al_sec T0() { return get().mT0; }	
+	
 	/// trigger a mainloop step (typically for implementation use only)
 	void tick();
 
@@ -64,8 +78,11 @@ protected:
 	class MainLoopImpl * mImpl;
 
 	bool mIsRunning;				/* flag true (1) when in the main loop */
-	double mInterval;				/* in seconds */
+	al_sec mInterval, mActualInterval;				
 	al_sec mT0;						/* birth time (wall clock), scheduler time (logical) */
+	al_sec mLastTickTime;			/* used to measure performance */
+	
+	al_sec mCPU;					/* running average performance monitor: this thread */
 	
 	MsgQueue mQueue;				/// functor scheduler attached to the main loop
 	

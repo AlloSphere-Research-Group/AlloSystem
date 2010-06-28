@@ -19,9 +19,9 @@ public:
 
 	Matrix4() { set(Identity()); }
 	Matrix4(const T * src) { Base::set(src); }
-	Matrix4(const Matrix4 & src) { set(src); }
+	Matrix4(const Base & src) { set(src); }
 	
-	Matrix4& set(const Matrix4 & src) { Base::set(src.elems); return *this; }
+	Matrix4& set(const Base & src) { Base::set(src.elems); return *this; }
 	
 	Quat<T>& toQuat() {
 		Quat<T> q;
@@ -54,7 +54,7 @@ public:
 		return Matrix4(m);
 	}
 	
-	static const Matrix4 RotateX(T theta) {
+	static const Matrix4 RotateYZ(T theta) {
 		const T C = cos(theta); 
 		const T S = sin(theta);
 		const T m[] = {	1,	0,	0,	0, 
@@ -63,21 +63,21 @@ public:
 						0,	0,	0,	1 };
 		return Matrix4(m);
 	}
-	static const Matrix4 RotateY(T theta) {
+	static const Matrix4 RotateZX(T theta) {
 		const T C = cos(theta); 
 		const T S = sin(theta);
 		const T m[] = {	C,	0,	S,	0, 
-						0,	0,	0,	0, 
+						0,	1,	0,	0, 
 						-S,	0,	C,	0, 
 						0,	0,	0,	1 };
 		return Matrix4(m);
 	}
-	static const Matrix4& RotateZ(T theta) {
+	static const Matrix4& RotateXY(T theta) {
 		const T C = cos(theta); 
 		const T S = sin(theta);
 		const T m[] = {	C,	-S,	0,	0, 
 						S,	C,	0,	0, 
-						0,	0,	C,	0, 
+						0,	0,	1,	0, 
 						0,	0,	0,	1 };
 		return Matrix4(m);
 	}
@@ -90,21 +90,21 @@ public:
 //		return Matrix4(m);
 //	}
 	
-	static const Matrix4 ShearX(T y, T z) {
+	static const Matrix4 ShearYZ(T y, T z) {
 		const T m[] = {	1,	0,	0,	0, 
 						y,	1,	0,	0, 
 						z,	0,	1,	0, 
 						0,	0,	0,	1 };
 		return Matrix4(m);
 	}
-	static const Matrix4 ShearY(T x, T z) {
+	static const Matrix4 ShearZX(T z, T x) {
 		const T m[] = {	1,	x,	0,	0, 
 						0,	1,	0,	0, 
 						0,	z,	1,	0, 
 						0,	0,	0,	1 };
 		return Matrix4(m);
 	}
-	static const Matrix4 ShearZ(T x, T y) {
+	static const Matrix4 ShearXY(T x, T y) {
 		const T m[] = {	1,	0,	x,	0, 
 						0,	1,	y,	0, 
 						0,	0,	1,	0, 

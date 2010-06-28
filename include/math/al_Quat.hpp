@@ -96,8 +96,6 @@ public:
 
 	Quat multiply(const Quat & q2) const;
 	Quat reverseMultiply(const Quat & q2) const;
-	
-
 
 	/// Set to identity (1,0,0,0)
 	Quat& identity(){ return set(1,0,0,0); }
@@ -113,10 +111,10 @@ public:
 
 	/// Set from other quaternion
 	Quat& set(const Quat& q){ return set(q.w, q.x, q.y, q.z); }
-
-	Quat& fromAxisAngle(T theta, T x1, T y1, T z1);
-	Quat& fromEuler(T a, T e, T b);
-	Quat& fromMatrix(T * matrix);
+	
+	static Quat fromAxisAngle(T theta, T x1, T y1, T z1);
+	static Quat fromEuler(T a, T e, T b);
+	static Quat fromMatrix(T * matrix);
 	
 	/// Convert to 4x4 column-major matrix
 	void toMatrix(T * matrix) const;
@@ -214,18 +212,19 @@ inline Quat<T> Quat<T> :: reverseMultiply(const Quat<T> & q2) const {
 }
 
 template<typename T>
-inline Quat<T>& Quat<T> :: fromAxisAngle(T theta, T x1, T y1, T z1) {
+inline Quat<T> Quat<T> :: fromAxisAngle(T theta, T x1, T y1, T z1) {
+	Quat q;
 	T t2 = theta * 0.00872664626; // * 0.5 * 180/PI
 	T sinft2 = sin(t2);
-	w = cos(t2);
-	x = x1 * sinft2;
-	y = y1 * sinft2;
-	z = z1 * sinft2;
-	return normalize();
+	q.w = cos(t2);
+	q.x = x1 * sinft2;
+	q.y = y1 * sinft2;
+	q.z = z1 * sinft2;
+	return q.normalize();
 }
 
 template<typename T>
-inline Quat<T>& Quat<T> :: fromEuler(T az, T el, T ba) {
+inline Quat<T> Quat<T> :: fromEuler(T az, T el, T ba) {
 	//http://vered.rose.utoronto.ca/people/david_dir/GEMS/GEMS.html
 	//Converting from Euler angles to a quaternion is slightly more tricky, as the order of operations 
 	//must be correct. Since you can convert the Euler angles to three independent quaternions by 
@@ -252,47 +251,49 @@ inline Quat<T>& Quat<T> :: fromEuler(T az, T el, T ba) {
 	T tz = - s1*s2;
 	
 	// equiv quat_multiply(&Q1, &Qz, &Q2); // since many terms are zero
-	w = tw*c3 - tz*s3;
-	x = tx*c3 + ty*s3;
-	y = ty*c3 - tx*s3;
-	z = tw*s3 + tz*c3;
-	return normalize();
+	Quat q;
+	q.w = tw*c3 - tz*s3;
+	q.x = tx*c3 + ty*s3;
+	q.y = ty*c3 - tx*s3;
+	q.z = tw*s3 + tz*c3;
+	return q.normalize();
 }
 
 template<typename T>
-inline Quat<T>& Quat<T> :: fromMatrix(T *m) {
+inline Quat<T> Quat<T> :: fromMatrix(T *m) {
+	Quat q;
 	T trace = m[0]+m[5]+m[10];
-	w = sqrt(1. + trace)*0.5;
+	q.w = sqrt(1. + trace)*0.5;
 	
 	if(trace > 0.) {
-		x = (m[6] - m[9])/(4.*w);
-		y = (m[8] - m[2])/(4.*w);
-		z = (m[1] - m[4])/(4.*w);
+		q.x = (m[6] - m[9])/(4.*q.w);
+		q.y = (m[8] - m[2])/(4.*q.w);
+		q.z = (m[1] - m[4])/(4.*q.w);
 	}
 	else {
 		if(m[0] > m[5] && m[0] > m[10]) {
 			// m[0] is greatest
-			x = sqrt(1. + m[0]-m[5]-m[10])*0.5;
-			w = (m[6] - m[9])/(4.*x);
-			y = (m[1] + m[4])/(4.*x);
-			z = (m[2] + m[8])/(4.*x);
+			q.x = sqrt(1. + m[0]-m[5]-m[10])*0.5;
+			q.w = (m[6] - m[9])/(4.*q.x);
+			q.y = (m[1] + m[4])/(4.*q.x);
+			q.z = (m[2] + m[8])/(4.*q.x);
 		}
 		else if(m[5] > m[0] && m[5] > m[10]) {
 			// m[1] is greatest
-			y = sqrt(1. + m[5]-m[0]-m[10])*0.5;
-			w = (m[8] - m[2])/(4.*y);
-			x = (m[1] + m[4])/(4.*y);
-			z = (m[6] + m[9])/(4.*y);
+			q.y = sqrt(1. + m[5]-m[0]-m[10])*0.5;
+			q.w = (m[8] - m[2])/(4.*q.y);
+			q.x = (m[1] + m[4])/(4.*q.y);
+			q.z = (m[6] + m[9])/(4.*q.y);
 		}
 		else { //if(m[10] > m[0] && m[10] > m[5]) {
 			// m[2] is greatest
-			z = sqrt(1. + m[10]-m[0]-m[5])*0.5;
-			w = (m[1] - m[4])/(4.*z);
-			x = (m[2] + m[8])/(4.*z);
-			y = (m[6] + m[9])/(4.*z);
+			q.z = sqrt(1. + m[10]-m[0]-m[5])*0.5;
+			q.w = (m[1] - m[4])/(4.*q.z);
+			q.x = (m[2] + m[8])/(4.*q.z);
+			q.y = (m[6] + m[9])/(4.*q.z);
 		}
 	}
-	return *this;
+	return q;
 }
 
 template<typename T>
