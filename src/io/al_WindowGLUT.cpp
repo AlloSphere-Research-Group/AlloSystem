@@ -392,13 +392,10 @@ private:
 		
 		// If there is a valid implementation, then draw and schedule next draw...
 		if(impl){
-//printf("schedule draw: %d from (%d, %d)\n", winID, impl->mID, impl->mIDGameMode);
-
 			WindowGL * win = impl->mWindow;
-
 			if(win){
 				win->doFrame();
-				if(win->fps() > 0){
+				if(win->fps() > 0) {
 					al_sec frameperiod = 1.0/win->fps();
 					al_sec rt = MainLoop::realtime();
 					

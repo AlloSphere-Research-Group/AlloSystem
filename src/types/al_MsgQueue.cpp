@@ -42,7 +42,7 @@ void MsgQueue :: recycle(Msg * m) {
 	m->next = mPool;
 	mPool = m;
 	if (m->isBigMessage()) {
-		char * args = *(char **)(m->args);
+		char * args = *(char **)(m->mArgs);
 		mFree(args);
 	}
 }
@@ -64,9 +64,9 @@ void MsgQueue :: sched(al_sec at, msg_func func, char * data, size_t size) {
 		// too big to fit in the Msg.
 		char * args = (char *)mMalloc(size);
 		memcpy(args, data, size);
-		*(char **)(m->args) = args;
+		*(char **)(m->mArgs) = args;
 	} else {
-		memcpy(m->args, data, size);
+		memcpy(m->mArgs, data, size);
 	}
 	
 	// insert into queue
@@ -119,12 +119,7 @@ void MsgQueue :: update(al_sec until, bool defer) {
 //		} else {	
 
 		mNow = MAX(mNow, m->t); 
-		if (m->isBigMessage()) {
-			char * args = *(char **)(m->args);
-			(m->func)(mNow, args);
-		} else {
-			(m->func)(mNow, m->args);
-		}
+		(m->func)(mNow, m->args());
 		
 		recycle(m);
 		m = mHead;

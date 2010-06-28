@@ -29,6 +29,7 @@
 */
 
 #include <string.h>
+#include <list>
 
 #include "system/al_Config.h"
 
@@ -165,9 +166,10 @@ protected:
 		size_t size;
 		al_sec t;
 		msg_func func;
-		char args[AL_MSGQUEUE_ARGS_SIZE];
+		char mArgs[AL_MSGQUEUE_ARGS_SIZE];
 		
 		bool isBigMessage() { return size > AL_MSGQUEUE_ARGS_SIZE; }
+		char * args() { return isBigMessage() ? *(char **)(mArgs) : mArgs; }
 	};
 	
 	Msg * mHead;
@@ -181,6 +183,10 @@ protected:
 	void growPool();
 	void recycle(Msg * m);
 };
+
+
+
+
 
 
 	

@@ -204,6 +204,7 @@ public:
 	bool enabled(DisplayMode::t v) const;				///<
 	bool fullScreen() const;
 	double fps() const;									///< Returns frames/second
+	al_sec spf() const { return (al_sec)1./fps(); }				///< Returns seconds/frame
 	const std::string& title() const;
 	bool visible() const;
 	const Keyboard& keyboard(){ return mKeyboard; }
