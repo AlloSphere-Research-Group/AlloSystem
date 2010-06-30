@@ -1,35 +1,15 @@
 #include "protocol/al_Graphics.hpp"
+#include "graphics/al_Config.h"
 
 // OpenGL platform-dependent includes
 #if defined (__IPHONE_2_0)
-
-#elif defined (__APPLE__) || defined (OSX)
-	#define AL_GRAPHICS_USE_OPENGL
-
-	#include <OpenGL/OpenGL.h>
-	#include <OpenGL/gl.h>
-	#include <OpenGL/glext.h>
-	#include <OpenGL/glu.h>
 	
+#elif defined (__APPLE__) || defined (OSX)
+	#define AL_GRAPHICS_USE_OPENGL	
 #elif defined(__linux__)
 	#define AL_GRAPHICS_USE_OPENGL
-
-	#include <GL/glew.h>
-	#include <GL/gl.h>
-	#include <GL/glext.h>
-	#include <GL/glu.h>
-	#include <time.h>
-	
 #elif defined(WIN32)
 	#define AL_GRAPHICS_USE_OPENGL
-
-	#include <windows.h>
-	#include <gl/gl.h>
-	#include <gl/glu.h>
-	#pragma comment( lib, "winmm.lib")
-	#pragma comment( lib, "opengl32.lib" )
-	#pragma comment( lib, "glu32.lib" )
-	
 #endif
 
 

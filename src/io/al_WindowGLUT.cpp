@@ -5,33 +5,16 @@
 #include "system/al_MainLoop.hpp"
 #include "types/al_MsgQueue.hpp"
 #include "io/al_WindowGL.hpp"
+#include "graphics/al_Config.h"
 
 #ifdef AL_OSX
-	#include <OpenGL/OpenGL.h>
 	#include <GLUT/glut.h>
-	#define AL_GRAPHICS_INIT_CONTEXT\
-		/* prevents tearing */ \
-		{	GLint MacHackVBL = 1;\
-			CGLContextObj ctx = CGLGetCurrentContext();\
-			CGLSetParameter(ctx,  kCGLCPSwapInterval, &MacHackVBL); }
 #endif
 #ifdef AL_LINUX
-	#include <GL/glew.h>
 	#include <GL/glut.h>
-
-	#define AL_GRAPHICS_INIT_CONTEXT\
-		{	GLenum err = glewInit();\
-			if (GLEW_OK != err){\
-  				/* Problem: glewInit failed, something is seriously wrong. */\
-  				fprintf(stderr, "GLEW Init Error: %s\n", glewGetErrorString(err));\
-			}\
-		}
 #endif
 #ifdef AL_WIN32
-	#include <windows.h>
 	#include <GL/glut.h>
-
-	#define AL_GRAPHICS_INIT_CONTEXT
 #endif
 
 
