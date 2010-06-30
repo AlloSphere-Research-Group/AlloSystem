@@ -96,6 +96,43 @@ struct RMulAdd: public Val<T>{ INHERIT;
 };
 
 
+/// Sinusoidal generator based on recursive formula x0 = c x1 - x2
+template <class T>
+struct RSin : public Val<T>{ INHERIT;
+
+	/// Constructor
+	RSin(const T& frq=T(0), const T& phs=T(0), const T& amp=T(1))
+	:	val2(0), mul(0){ set(frq,phs,amp); }
+
+	/// Generate next value.
+	T operator()() const {
+		T v0 = mul * val - val2;
+		val2 = val;
+		return val = v0;
+	}
+
+	void next3(T& o2, T& o1, T& o0) const {
+		T v0 = o0 = mul * val  - val2;
+		o2 = val2 = mul * v0   - val;
+		o1 = val  = mul * val2 - v0;
+	}
+	
+	T freq() const { return acos(mul*0.5) * M_1_2PI; }
+	
+	/// Set parameters from unit freq, phase, and amplitude.
+	RSin& set(const T& frq, const T& phs, const T& amp=T(1)){
+		T f=frq*M_2PI, p=phs*M_2PI;
+		mul  = (T)2 * (T)cos(f);
+		val2 = (T)sin(p - f * T(2))*amp;
+		val  = (T)sin(p - f       )*amp;
+		return *this;
+	}
+
+	mutable T val2;
+	T mul;			///< Multiplication factor. [-2, 2] range gives stable sinusoids.
+};
+
+
 #undef INHERIT
 
 } // ::al::gen::
