@@ -52,7 +52,6 @@ int AmbiBase::channelsToUniformOrder(int channels){
 }
 
 
-// Compute spherical harmonic weights based on a position in space
 void AmbiBase::encodeWeightsFuMa(float * ws, int dim, int order, float x, float y, float z){
 	*ws++ = c1_sqrt2;								// W = 1/sqrt(2)
 	

@@ -29,7 +29,10 @@ public:
 	
 	static int channelsToUniformOrder(int channels);
 	
+	/// Compute spherical harmonic weights based on azimuth and elevation
 	static void encodeWeightsFuMa(float * weights, int dim, int order, float azimuth, float elevation);
+	
+	/// Compute spherical harmonic weights based on unit direction vector
 	static void encodeWeightsFuMa(float * ws, int dim, int order, float x, float y, float z);
 	
 	/// Brute force 3rd order.  Weights must be of size 16.
@@ -61,16 +64,16 @@ public:
 	void decode(float ** dec, const float ** enc, int numDecFrames);
 
 	void flavor(int type);
-	void numSpeakers(int num);	///< Set number of speakers.  Positions are zeroed upon resize.
+	void numSpeakers(int num);		///< Set number of speakers.  Positions are zeroed upon resize.
 	void setSpeaker(int index, float azimuth, float elevation=0);
 	void setSpeakerDegrees(int index, float azimuth, float elevation=0);
-	void zero();				///< Zeroes out internal ambisonic frame.
+	void zero();					///< Zeroes out internal ambisonic frame.
 
 	float * azimuths();				///< Returns pointer to speaker azimuths.
 	float * elevations();			///< Returns pointer to speaker elevations.
 	float * frame() const;			///< Returns pointer to ambisonic channel frame used by decode(int)
-	int numSpeakers();		///< Returns number of speakers.
-	int flavor();			///< Returns decode flavor.
+	int numSpeakers();				///< Returns number of speakers.
+	int flavor();					///< Returns decode flavor.
 
 	virtual void onChannelsChange();
 	
@@ -110,13 +113,44 @@ public:
 	void encodeAdd(const AmbiDecode &dec, float input);
 
 	template <class XYZ>
-	void encode(float ** ambiChans, const XYZ * pos, const float * input, int numFrames){	
-		for(int c=0; c<channels(); ++c){
-			float * ambi = ambiChans[c];
-			//T
+	void encode(float ** ambiChans, const XYZ * pos, const float * input, int numFrames){
+	
+		// TODO: how can we efficiently encode a moving source?
+		
+		// Changing the position recomputes ALL the spherical harmonic weights.
+		// Ideally we only want to change the position for each time sample.
+		// However, for our loops to be most efficient, we want the inner loop
+		// to process over time since it will have around 64-512 iterations
+		// while the spatial loop will have at most 16 iterations.
+
+//		// outer-space, inner-time
+//		for(int c=0; c<channels(); ++c){
+//			float * ambi = ambiChans[c];
+//			//T
+//			
+//			for(int i=0; i<numFrames; ++i){
+//				position(pos[i][0], pos[i][1], pos[i][2]);
+//				ambi[i] += weights()[c] * input[i];
+//			}
+//		}
+
+		// outer-time, inner-space
+		for(int i=0; i<numFrames; ++i){
+
+			position(pos[i][0], pos[i][1], pos[i][2]);
 			
-			for(int i=0; i<numFrames; ++i){
-				ambi[i] = weights()[c] * input[i];
+			// iterate spherical harmonics
+//			for(int c=0; c<channels(); ++c){
+//				ambiChans[c][i] += weights()[c] * input[i];
+//			}
+			
+			// Duff's device
+			// This requires only a simple jump per time sample.
+			#define CS(n) case n: ambiChans[n][i] += weights()[n] * input[i];
+			switch(channels()-1){
+				CS(15) CS(14) CS(13) CS(12) CS(11) CS(10) CS( 9) CS( 8)
+				CS( 7) CS( 6) CS( 5) CS( 4) CS( 3) CS( 2) CS( 1) CS( 0)
+			default:;
 			}
 		}
 	}
