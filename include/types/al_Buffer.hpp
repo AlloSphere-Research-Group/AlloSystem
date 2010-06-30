@@ -149,6 +149,63 @@ private:
 	}
 };
 
+
+
+
+template <uint32_t N, class T>
+struct Multi{
+	typedef Multi M;
+//	Multi(){}
+//	Multi(const T& e ){ mem::set(elems, N, e); }
+//	Multi(const T* es){ mem::copy(elems, es, N); }
+
+	T elems[N];
+	
+	/// Set element at index with no bounds checking
+	T& operator[](uint32_t i){ return elems[i];}
+	
+	/// Get element at index with no bounds checking
+	const T& operator[](uint32_t i) const { return elems[i]; }
+
+	#define DO for(uint32_t i=0; i<N; ++i)
+
+	bool operator !=(const M& v){ DO{ if((*this)[i] == v[i]) return false; } return true; }
+	bool operator !=(const T& v){ DO{ if((*this)[i] == v   ) return false; } return true; }
+	M& operator   = (const M& v){ DO{ (*this)[i] = v[i]; } return *this; }
+	M& operator   = (const T& v){ DO{ (*this)[i] = v;    } return *this; }
+	bool operator ==(const M& v){ DO{ if((*this)[i] != v[i]) return false; } return true; }
+	bool operator ==(const T& v){ DO{ if((*this)[i] != v   ) return false; } return true; }
+
+	#undef DO
+
+	/// Returns size of array
+	static uint32_t size(){ return N; }
+
+	/// Zeros all elements.
+	void zero(){ memset(elems, 0, N * sizeof(T)); }
+};
+
+
+/// Fixed size shift buffer
+template <int N, class T>
+struct ShiftBuffer : public Multi<N,T>{
+
+	typedef Multi<N,T> Base;
+	using Base::elems;
+	using Base::operator=;
+
+	ShiftBuffer(const T& v=T()){ *this = v; }
+
+	/// Push new element onto buffer. Newest element is at index 0.
+	void operator()(const T& v){
+		for(int i=N-1; i>0; --i) elems[i] = elems[i-1];
+		elems[0]=v;
+	}
+};
+
+
+
+
 } // al::
 
 #endif
