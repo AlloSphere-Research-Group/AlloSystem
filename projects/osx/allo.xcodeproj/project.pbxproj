@@ -69,6 +69,10 @@
 		16BC66A8117770BF002A0C18 /* al_Functions.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 16BC66A2117770BF002A0C18 /* al_Functions.hpp */; };
 		16BC66A9117770BF002A0C18 /* al_Interpolation.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 16BC66A3117770BF002A0C18 /* al_Interpolation.hpp */; };
 		16D46565118F57970039A84C /* al_Printing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16D46563118F57970039A84C /* al_Printing.cpp */; };
+		16FE4B2111DB05AF002D3847 /* al_MainLoopGLUT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36AED02511D4638F000D98C9 /* al_MainLoopGLUT.cpp */; };
+		16FE4B2311DB05C1002D3847 /* al_MsgQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 365599FB11D4013600BA01E8 /* al_MsgQueue.cpp */; };
+		16FE4B2511DB05EE002D3847 /* al_Context.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 360C404511D32DDA002FE91F /* al_Context.cpp */; };
+		16FE4B3F11DB0E62002D3847 /* al_Ambisonics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16FE4B3E11DB0E62002D3847 /* al_Ambisonics.cpp */; };
 		3602B4D0110A67C9005DC3D0 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
 		3602B4D1110A67C9005DC3D0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		3602B4D2110A67C9005DC3D0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
@@ -134,7 +138,6 @@
 		36B4129910EFF864007B16D0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		36B412B010EFF916007B16D0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		36B4137D10EFFCC5007B16D0 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
-		36BAE05411C2EEBC009A8BBD /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
 		36BAE06011C2F00F009A8BBD /* utAllocore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC529F11628D4D0076AA8B /* utAllocore.cpp */; };
 		36BAE06111C2F00F009A8BBD /* utIOAudioIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC52A011628D4D0076AA8B /* utIOAudioIO.cpp */; };
 		36BAE06211C2F00F009A8BBD /* utIOSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160DAE0F11C1B15C00C6905A /* utIOSocket.cpp */; };
@@ -354,6 +357,7 @@
 		16D46542118F4ADA0039A84C /* al_Plane.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Plane.hpp; sourceTree = "<group>"; };
 		16D46562118F55790039A84C /* al_Printing.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Printing.hpp; sourceTree = "<group>"; };
 		16D46563118F57970039A84C /* al_Printing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Printing.cpp; sourceTree = "<group>"; };
+		16FE4B3E11DB0E62002D3847 /* al_Ambisonics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = al_Ambisonics.cpp; path = sound/al_Ambisonics.cpp; sourceTree = "<group>"; };
 		16FFCB51118BA96500D4C1BD /* al_Random.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Random.hpp; sourceTree = "<group>"; };
 		16FFCB53118BAA8300D4C1BD /* al_Generators.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Generators.hpp; sourceTree = "<group>"; };
 		3602B4C7110A67B6005DC3D0 /* exOscRecv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exOscRecv.cpp; sourceTree = "<group>"; };
@@ -496,7 +500,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				16B5C1731189020B0090CE80 /* libportaudio.a in Frameworks */,
-				36BAE05411C2EEBC009A8BBD /* liballocore.a in Frameworks */,
 				3622BFC1116D55B500928703 /* OpenGL.framework in Frameworks */,
 				16AC531D116290BE0076AA8B /* AudioToolbox.framework in Frameworks */,
 				16AC5315116290AA0076AA8B /* AudioUnit.framework in Frameworks */,
@@ -745,6 +748,14 @@
 			name = unitTests;
 			sourceTree = "<group>";
 		};
+		16FE4B3D11DB0E47002D3847 /* sound */ = {
+			isa = PBXGroup;
+			children = (
+				16FE4B3E11DB0E62002D3847 /* al_Ambisonics.cpp */,
+			);
+			name = sound;
+			sourceTree = "<group>";
+		};
 		1AB674ADFE9D54B511CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -836,6 +847,7 @@
 				16AA8ED811C6F1BB0053EFE1 /* math */,
 				3622BEE4116D527D00928703 /* protocol */,
 				16AA8EF111C6FCE70053EFE1 /* spatial */,
+				16FE4B3D11DB0E47002D3847 /* sound */,
 				3622BEF5116D527D00928703 /* system */,
 				3622BEFD116D527D00928703 /* types */,
 			);
@@ -1389,8 +1401,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				36BAE1C311C2FAFF009A8BBD /* al_Config.cpp in Sources */,
 				36BAE1C411C2FAFF009A8BBD /* al_MainLoop.cpp in Sources */,
+				16FE4B2111DB05AF002D3847 /* al_MainLoopGLUT.cpp in Sources */,
+				16FE4B2311DB05C1002D3847 /* al_MsgQueue.cpp in Sources */,
+				16FE4B2511DB05EE002D3847 /* al_Context.cpp in Sources */,
+				36BAE1C311C2FAFF009A8BBD /* al_Config.cpp in Sources */,
 				36BAE1C511C2FAFF009A8BBD /* al_MainLoopOSX.mm in Sources */,
 				360BB6E611DB06E2000C2A42 /* al_Time.cpp in Sources */,
 				36BAE1C711C2FAFF009A8BBD /* al_OSC.cpp in Sources */,
@@ -1434,6 +1449,7 @@
 				16AA8EFC11C6FD200053EFE1 /* al_CoordinateFrame.cpp in Sources */,
 				16AA8F0211C6FE0B0053EFE1 /* al_Camera.cpp in Sources */,
 				16AA8F0F11C6FE6C0053EFE1 /* utSpatial.cpp in Sources */,
+				16FE4B3F11DB0E62002D3847 /* al_Ambisonics.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
