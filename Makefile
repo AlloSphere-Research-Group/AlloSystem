@@ -35,7 +35,7 @@ SLIB_FILE 	:= $(addprefix $(BIN_DIR)/, $(SLIB_FILE))
 # Build object file from C++ source
 $(OBJ_DIR)/%.o: %.cpp
 	@echo CC $< $@
-	$(CC) -c $(CFLAGS) $< -o $@
+	@$(CC) -c $(CFLAGS) $< -o $@
 
 # Build object file from C source
 $(OBJ_DIR)/%.o: %.c
