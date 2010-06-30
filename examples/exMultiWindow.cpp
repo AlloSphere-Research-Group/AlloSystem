@@ -7,13 +7,13 @@
 #include "io/al_WindowGL.hpp"
 #include "protocol/al_Graphics.hpp"
 #include "math/al_Random.hpp"
+#include "system/al_Time.hpp"
 
 using namespace al;
 
 Camera camera;
 gfx::Graphics gl;
 double eyesep = 1;
-
 
 // synchronize window updates with a Clock. 
 // every window has a clock, but can be optionally slaved to an external clock. 
@@ -35,10 +35,10 @@ protected:
 	Clock * mClock;
 };
 
-
 class Clock {
 public:
-	Clock(al_sec period) : mIsRunning(false), mPeriod(period) {}
+	Clock(al_sec period) : mDLL(period, 0.5), mIsRunning(false), mPeriod(period)
+	{}
 	
 	Clock& period(al_sec p) { mPeriod = p; return *this; }
 	al_sec period() const { return mPeriod; }
@@ -70,23 +70,31 @@ public:
 		return *this;
 	}
 	
-	static void notify(al_sec t, Clock * self) {
-		if (self->mIsRunning) {
-			for (std::list<ClockListener *>::iterator it = self->mListeners.begin(); it != self->mListeners.end(); ) {
+	static void notify(al_sec t, Clock * self) { self->step(t); }
+	
+	void step(al_sec t) {
+		if (mIsRunning) {
+			for (std::list<ClockListener *>::iterator it = mListeners.begin(); it != mListeners.end(); ) {
 				ClockListener * listener = *it;
-				
 				// removing this way makes it safe to remove during iteration:
-				if (listener->clock() != self) {
-					it = self->mListeners.erase(it);
+				if (listener->clock() != this) {
+					it = mListeners.erase(it);
 				} else {
-					listener->clockNotify(t, self);
+					listener->clockNotify(t, this);
 					it++;
 				}
 			}
 			
-			// using rt for a 'sloppy' clock (won't eat up all the CPU)
 			al_sec rt = MainLoop::realtime();
-			MainLoop::queue().send(rt + self->mPeriod, notify, self);
+			al_sec deadline = t+mPeriod;
+			mDLL.step(rt);		
+							
+			if (rt > deadline) {
+				// can't keep up; slip with respect to logical time				
+				MainLoop::queue().send(rt+mPeriod*0.5, notify, this);
+			} else {
+				MainLoop::queue().send(deadline, notify, this);
+			}
 		}
 	}
 
@@ -94,11 +102,19 @@ protected:
 	bool mIsRunning;
 	al_sec mPeriod;
 	std::list<ClockListener *> mListeners;
+	DelayLockedLoop mDLL;
 };
 
 void ClockListener::setClock(Clock * c) {
 	c->add(this);
 }	
+
+
+
+
+al_sec period = 1./300;
+Clock klock(period);
+
 
 // invent some kind of scene:
 struct vertex {
@@ -252,11 +268,11 @@ class FrameClock : public ClockListener {
 		al_sec next_t = t+clock->period();	
 		al_sec overtime = rt - next_t;						
 		al_sec cpu = (overtime/clock->period())+1.;
-		printf("step/frame cpu: %6.2f%%, main cpu: %6.2f%%\n", cpu*100, MainLoop::cpu()*100);
+		//printf("step/frame cpu: %6.2f%%, main cpu: %6.2f%%\n", cpu*100, MainLoop::cpu()*100);
+		
 	}
 };
 
-Clock klock(1/60);
 FrameClock frameclock;
 
 double fps = 0;

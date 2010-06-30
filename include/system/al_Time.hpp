@@ -49,6 +49,58 @@ private:
 	al_nsec mStart, mStop;	// start and stop times
 };
 
+
+
+/* 
+	Helper object for events intended to run at a particular rate/period,
+		but which might be subject to drift, latency and jitter.
+	A curve mapping logical to real time can be drawn over an event period 
+		by interpolating between t0 and t1
+	@see http://www.kokkinizita.net/papers/usingdll.pdf
+*/
+class DelayLockedLoop {
+public:
+	
+	DelayLockedLoop(al_sec step_period, double bandwidth = 0.5) {
+		tperiod = step_period;
+		setBandwidth(bandwidth);
+		mReset = true;
+	}
+	
+	// degree of smoothing
+	void setBandwidth(double bandwidth);
+	
+	// call this after an xrun: will reset the timing adjustments
+	void reset() { mReset = true; }
+	
+	// trigger this from the periodic event
+	// realtime is the source time that we are trying to smoothly follow
+	void step(al_sec realtime);
+	
+	// retrieve the current period/rate estimation (smoothed) 
+	al_sec period_smoothed() const { return t2; }
+	al_sec rate_smoothed() const { return 1./t2; }
+	// retrieve the ideal period/rate
+	al_sec period_ideal() const { return tperiod; }
+	al_sec rate_ideal() const { return 1./tperiod; }
+	
+	// returns an estimate of corresponding real-time between current event & next
+	// by linear interpolation of current event timestamp & projected next event timestamp
+	al_sec realtime_interp(double alpha) const { return t0 + alpha*(t1-t0); }
+
+protected:
+	al_sec tperiod;	// event period in seconds
+	al_sec t0;		// 0th-order component: timestamp of the current event
+	al_sec t1;		// 1st-order component: ideally the timestamp of the next event
+	al_sec t2;		// 2nd-order component (akin to acceleration, or smoothed event period)
+	double mB, mC;	// 1st & 2nd order weights	
+	bool mReset;
+};
+
+
+
+
+
 } // al::
 
 #endif /* INCLUDE_AL_TIME_CPP_H */

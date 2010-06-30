@@ -79,6 +79,8 @@
 		3602B730110A9770005DC3D0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		3602B732110A9770005DC3D0 /* alscheduling.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* alscheduling.1 */; };
 		3602B73A110A9785005DC3D0 /* exOscSend.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3602B739110A9785005DC3D0 /* exOscSend.cpp */; };
+		360BB6E511DB06D4000C2A42 /* al_Time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFA116D527D00928703 /* al_Time.cpp */; };
+		360BB6E611DB06E2000C2A42 /* al_Time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFA116D527D00928703 /* al_Time.cpp */; };
 		360C404111D32D3E002FE91F /* al_Context.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 360C404011D32D3E002FE91F /* al_Context.hpp */; };
 		360C404711D32DDA002FE91F /* al_Context.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 360C404511D32DDA002FE91F /* al_Context.cpp */; };
 		360C404F11D32FED002FE91F /* al_Matrix4.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 360C404E11D32FED002FE91F /* al_Matrix4.hpp */; };
@@ -95,7 +97,6 @@
 		3622BF0E116D52AF00928703 /* al_Serialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE7116D527D00928703 /* al_Serialize.cpp */; };
 		3622BF0F116D52B400928703 /* al_Config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF6116D527D00928703 /* al_Config.cpp */; };
 		3622BF10116D52B400928703 /* al_MainLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF7116D527D00928703 /* al_MainLoop.cpp */; };
-		3622BF14116D52B400928703 /* al_TimeAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFB116D527D00928703 /* al_TimeAPR.cpp */; };
 		3622BF3C116D530100928703 /* NetworkingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF0116D527D00928703 /* NetworkingUtils.cpp */; };
 		3622BF3D116D530100928703 /* UdpSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF1116D527D00928703 /* UdpSocket.cpp */; };
 		3622BF3E116D530600928703 /* IpEndpointName.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEEA116D527D00928703 /* IpEndpointName.cpp */; };
@@ -148,7 +149,6 @@
 		36BAE1C311C2FAFF009A8BBD /* al_Config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF6116D527D00928703 /* al_Config.cpp */; };
 		36BAE1C411C2FAFF009A8BBD /* al_MainLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF7116D527D00928703 /* al_MainLoop.cpp */; };
 		36BAE1C511C2FAFF009A8BBD /* al_MainLoopOSX.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF9116D527D00928703 /* al_MainLoopOSX.mm */; };
-		36BAE1C611C2FAFF009A8BBD /* al_TimeAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFB116D527D00928703 /* al_TimeAPR.cpp */; };
 		36BAE1C711C2FAFF009A8BBD /* al_OSC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE5116D527D00928703 /* al_OSC.cpp */; };
 		36BAE1C811C2FAFF009A8BBD /* al_OSCAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE6116D527D00928703 /* al_OSCAPR.cpp */; };
 		36BAE1C911C2FAFF009A8BBD /* al_Serialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE7116D527D00928703 /* al_Serialize.cpp */; };
@@ -404,7 +404,6 @@
 		3622BEF7116D527D00928703 /* al_MainLoop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_MainLoop.cpp; sourceTree = "<group>"; };
 		3622BEF9116D527D00928703 /* al_MainLoopOSX.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = al_MainLoopOSX.mm; sourceTree = "<group>"; };
 		3622BEFA116D527D00928703 /* al_Time.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Time.cpp; sourceTree = "<group>"; };
-		3622BEFB116D527D00928703 /* al_TimeAPR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_TimeAPR.cpp; sourceTree = "<group>"; };
 		3622BEFC116D527D00928703 /* Makefile.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.config; sourceTree = "<group>"; };
 		3622BF01116D527D00928703 /* Makefile.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.config; sourceTree = "<group>"; };
 		3622BF03116D527D00928703 /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
@@ -904,7 +903,6 @@
 				3622BEF9116D527D00928703 /* al_MainLoopOSX.mm */,
 				16D46563118F57970039A84C /* al_Printing.cpp */,
 				3622BEFA116D527D00928703 /* al_Time.cpp */,
-				3622BEFB116D527D00928703 /* al_TimeAPR.cpp */,
 				3622BEFC116D527D00928703 /* Makefile.config */,
 			);
 			path = system;
@@ -1394,7 +1392,7 @@
 				36BAE1C311C2FAFF009A8BBD /* al_Config.cpp in Sources */,
 				36BAE1C411C2FAFF009A8BBD /* al_MainLoop.cpp in Sources */,
 				36BAE1C511C2FAFF009A8BBD /* al_MainLoopOSX.mm in Sources */,
-				36BAE1C611C2FAFF009A8BBD /* al_TimeAPR.cpp in Sources */,
+				360BB6E611DB06E2000C2A42 /* al_Time.cpp in Sources */,
 				36BAE1C711C2FAFF009A8BBD /* al_OSC.cpp in Sources */,
 				36BAE1C811C2FAFF009A8BBD /* al_OSCAPR.cpp in Sources */,
 				36BAE1C911C2FAFF009A8BBD /* al_Serialize.cpp in Sources */,
@@ -1486,7 +1484,7 @@
 			files = (
 				3622BF0F116D52B400928703 /* al_Config.cpp in Sources */,
 				3622BF10116D52B400928703 /* al_MainLoop.cpp in Sources */,
-				3622BF14116D52B400928703 /* al_TimeAPR.cpp in Sources */,
+				360BB6E511DB06D4000C2A42 /* al_Time.cpp in Sources */,
 				3622BF0C116D52AF00928703 /* al_OSC.cpp in Sources */,
 				3622BF0D116D52AF00928703 /* al_OSCAPR.cpp in Sources */,
 				3622BF0E116D52AF00928703 /* al_Serialize.cpp in Sources */,
