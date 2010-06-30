@@ -101,13 +101,15 @@ public:
 protected:
 	double mFocalLength;		// Focal length along vd
 	double mFOVY;			// Camera aperture (degrees)
+	double mTanFOV;
+	double mZoom;
+
 	double mEyeSep;				// Eye separation
 	double mNear, mFar;			// Cutting plane distances
 	double mRatio;				// frustum aspect ratio 
 	double mNearTop;			// frustum near plane top
 	double mFarTop;				// frustum far plane top
-	double mTanFOV;
-	double mZoom;
+
 	double mNearOverFocalLength;
 	Vec3d mStereoOffset;					// eye offset vector (right eye; left eye is inverse), usually (1, 0, 0)
 	double mLeft, mBottom, mWidth, mHeight;

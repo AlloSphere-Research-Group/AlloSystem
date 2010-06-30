@@ -25,8 +25,8 @@
 namespace al{
 
 Camera :: Camera(double aper, double nearClip, double farClip, double focalLen, double eyeSep)
-:	mFocalLength(focalLen), mEyeSep(eyeSep), mNear(nearClip), mFar(farClip),
-	mZoom(0), mMode(Anaglyph), mStereo(false)
+:	mFocalLength(focalLen), mZoom(0), mEyeSep(eyeSep), mNear(nearClip), mFar(farClip),
+	mMode(Anaglyph), mStereo(false)
 {
 	aperture(aper);
 	dimensions(4,3,0,0);
@@ -159,7 +159,7 @@ void Camera::left(){
 	
 	setFrustum(eyeSep());
 	
-		switch(mMode){
+	switch(mMode){
 		case Active:
 			//drawBuffer(BackLeft);
 			glDrawBuffer(GL_BACK_LEFT);
