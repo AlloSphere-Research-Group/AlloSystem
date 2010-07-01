@@ -7,7 +7,7 @@
 #include "spatial/al_CoordinateFrame.hpp"
 #include "sound/al_Ambisonics.hpp"
 #include "sound/al_Reverb.hpp"
-
+#include "math/al_Interpolation.hpp"
 
 namespace al{
 
@@ -16,15 +16,22 @@ namespace al{
 class Listener : public NavRef {
 public:
 
-	int numSpeakers() const { return mDecoder.numSpeakers(); }
-
 	Listener& numSpeakers(int num){ mDecoder.numSpeakers(num); return *this; }
+	Listener& speakerPos(int ind, T az, T el=0){ mDecoder.setSpeakerDegrees(ind, az, el); return *this; }
 
-	Listener& speakerPos(int ind, T az, T el=0){ mDecoder.setSpeakerDegrees(ind,az,el); return *this; }
-
+	int numSpeakers() const { return mDecoder.numSpeakers(); }
+	const float ** ambiChans() { return mAmbiDomainChannels; }
+	
 protected:
 	friend class AudioScene;
 	AmbiDecode<float> mDecoder;
+	
+	float ** mAmbiDomainChannels;
+	
+	ShiftBuffer<4, Vec3d> mPosHistory;	// position in previous blocks
+	Quatd mQuatPrev;					// orientation in previous block
+	Quatd * mQuatHistory;				// buffer of slerped orientations
+	
 };
 
 
@@ -38,30 +45,76 @@ public:
 
 protected:
 	Buffer<float> mSound;	// spherical wave around position
-};
+	
+	ShiftBuffer<4, Vec3d> mPosHistory; // previous positions
+	
+};	
 
 
 
 class AudioScene {
 public:
 
-	/// Encode sources
+	Listener & addListener() {
+		mListeners[mListeners.size] = Listener();
+		return mListeners[mListeners.size-1];
+	}
+
+	/// encode sources (per listener)
+	void encode(const int& numFrames) {
 	
-	/// 
-	///
-	void encode(float ** ambiChans, const int& numFrames){
-		
-	}
-
-	void addListener(){
-		//mListeners.push_back
-	}
-
-	void render(float ** outs, const float ** ambiChans, const int& numFrames){
-
+		// update source history data:
+		for(int s=0; s<mSources.size(); ++s){
+			Source& src = mSources[s];
+			s.mHistory(s.vec());
+		}
+	
 		for(int il=0; il<mListeners.size(); ++il){
-
 			Listener& l = mListeners[il];
+			
+			// update listener history data:
+			Quatd qnew = l.quat();
+			Quatd::slerp_buffer(l.mQuatPrev, qnew, l.mQuatHistory, numFrames);
+			l.mQuatPrev = qnew;
+			l.mHistory(l.vec());
+			
+			const float ** ambiChans = l.ambiChans();
+			
+			for(int s=0; s<mSources.size(); ++s){
+				Source& src = mSources[s];
+				
+				for(unsigned int i=0; i<numFrames; ++i) {
+					
+					// interpolated source position relative to listener
+					float alpha = i/(float)numFrames;
+					Vec3d relpos = ipl::cubic(
+						alpha, 
+						src.mHistory[3]-l.mHistory[3], 
+						src.mHistory[2]-l.mHistory[2], 
+						src.mHistory[1]-l.mHistory[1], 
+						src.mHistory[0]-l.mHistory[0]
+					);
+					
+					// TODO: transform relpos by listener's perspective
+					// to derive x,y,z in listener's coordinate frame (or az/el/dist)
+					Quatd q = l.mQuatHistory[i];
+					//...
+
+				}
+				
+				//mEncoder.encode<Vec3d>(ambiChans, mSource);void encode(float ** ambiChans, const XYZ * pos, const float * input, numFrames)
+			}
+			
+		}
+	}
+	
+	/// between encode & decode, can apply optional processing to ambi domain signals (e.g. reverb)
+
+	/// decode sources (per listener) to output channels
+	void render(float ** outs, const int& numFrames) {
+		for(int il=0; il<mListeners.size(); ++il){
+			Listener& l = mListeners[il];
+			const float ** ambiChans = l->ambiChans();
 
 			// loop speakers
 			for(int is=0; is<l.numSpeakers(); ++is){

@@ -112,6 +112,7 @@ public:
 	/// Set from other quaternion
 	Quat& set(const Quat& q){ return set(q.w, q.x, q.y, q.z); }
 	
+	/// Warning: Assumes that axes are normalized.
 	static Quat fromAxisAngle(T theta, T x1, T y1, T z1);
 	static Quat fromEuler(T a, T e, T b);
 	static Quat fromMatrix(T * matrix);
@@ -140,6 +141,9 @@ public:
 	
 	/// Spherical interpolation
 	Quat slerp(const Quat& target, T amt) const { return slerp(*this, target, amt); }
+	
+	/// Fill an array of Quats with a full spherical interpolation:
+	static void slerp_buffer(const Quat& input, const Quat& target, Quat<T> * buffer, int numFrames);
 
 	/*!
 		Spherical linear interpolation of a quaternion
@@ -464,6 +468,82 @@ Quat<T> Quat<T> :: slerp(const Quat& input, const Quat& target, T amt){
 
 	result.normalize();
 	return result;
+}
+
+template<typename T>
+void Quat<T> :: slerp_buffer(const Quat& input, const Quat& target, Quat<T> * buffer, int numFrames){
+
+
+	/// Sinusoidal generator based on recursive formula x0 = c x1 - x2
+	struct RSin {
+
+		/// Constructor
+		RSin(const T& frq=T(0), const T& phs=T(0), const T& amp=T(1))
+		:	val2(0), mul(0){ 
+			T f=frq, p=phs;
+			mul  = (T)2 * (T)cos(f);
+			val2 = (T)sin(p - f * T(2))*amp;
+			val  = (T)sin(p - f       )*amp;
+		}
+
+		/// Generate next value.
+		T operator()() const {
+			T v0 = mul * val - val2;
+			val2 = val;
+			return val = v0;
+		}
+
+		mutable T val;
+		mutable T val2;
+		T mul;			///< Multiplication factor. [-2, 2] range gives stable sinusoids.
+	};
+
+
+	int bflip = 1;
+	T dot_prod = input.dot(target);
+
+	//clamp
+	dot_prod = (dot_prod < -1) ? -1 : ((dot_prod > 1) ? 1 : dot_prod);
+
+	// if B is on opposite hemisphere from A, use -B instead
+	if (dot_prod < 0.0) {
+		dot_prod = -dot_prod;
+		bflip = -1;
+	}
+
+	const T cos_angle = acos(dot_prod);
+	const T inv_frames = 1./((T)numFrames);
+		
+	if(ABS(cos_angle) > QUAT_EPSILON) 
+	{
+		const T sine = sin(cos_angle);
+		const T inv_sine = 1./sine;
+		RSin sinA(-cos_angle*inv_frames, cos_angle, inv_sine);
+		RSin sinB(cos_angle*inv_frames, 0, inv_sine * bflip);
+
+		for (int i=0; i<numFrames; i++) {
+			T amt = i*inv_frames;
+			T a = sinA();
+			T b = sinB();
+
+			buffer[i].w = a*input.w + b*target.w;
+			buffer[i].x = a*input.x + b*target.x;
+			buffer[i].y = a*input.y + b*target.y;
+			buffer[i].z = a*input.z + b*target.z;
+			buffer[i].normalize();
+		}
+	} else {
+		for (int i=0; i<numFrames; i++) {
+			T a = i*inv_frames;
+			T b = 1.-a;
+			
+			buffer[i].w = a*input.w + b*target.w;
+			buffer[i].x = a*input.x + b*target.x;
+			buffer[i].y = a*input.y + b*target.y;
+			buffer[i].z = a*input.z + b*target.z;
+			buffer[i].normalize();
+		}
+	}
 }
 
 /*!

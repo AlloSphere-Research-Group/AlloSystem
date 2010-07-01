@@ -32,12 +32,13 @@ public:
 	/// Compute spherical harmonic weights based on azimuth and elevation
 	static void encodeWeightsFuMa(float * weights, int dim, int order, float azimuth, float elevation);
 	
-	/// Compute spherical harmonic weights based on unit direction vector
+	/// Compute spherical harmonic weights based on unit direction vector (in the listener's coordinate frame)
 	static void encodeWeightsFuMa(float * ws, int dim, int order, float x, float y, float z);
 	
 	/// Brute force 3rd order.  Weights must be of size 16.
 	static void encodeWeightsFuMa16(float * weights, float azimuth, float elevation);
-	static void encodeWeightsFuMa16(float * ws, float x, float y, float z);
+	/// (x,y,z unit vector in the listener's coordinate frame)
+	static void encodeWeightsFuMa16(float * ws, float x, float y, float z);	
 	
 	static int orderToChannels(int dim, int order);
 	static int orderToChannelsH(int orderH);
@@ -112,6 +113,8 @@ public:
 	/// Encode input sample and add to decoder frame.
 	void encodeAdd(const AmbiDecode &dec, float input);
 
+	
+	/// (x,y,z unit vector in the listener's coordinate frame)
 	template <class XYZ>
 	void encode(float ** ambiChans, const XYZ * pos, const float * input, int numFrames){
 	
@@ -147,7 +150,8 @@ public:
 			// Duff's device
 			// This requires only a simple jump per time sample.
 			#define CS(n) case n: ambiChans[n][i] += weights()[n] * input[i];
-			switch(channels()-1){
+			int ch = channels()-1;
+			switch(ch){
 				CS(15) CS(14) CS(13) CS(12) CS(11) CS(10) CS( 9) CS( 8)
 				CS( 7) CS( 6) CS( 5) CS( 4) CS( 3) CS( 2) CS( 1) CS( 0)
 			default:;
@@ -155,10 +159,11 @@ public:
 		}
 	}
 	
-	/// Set spherical position of source to be encoded
+	/// Set spherical direction of source to be encoded
 	void position(float az, float el);
 	
-	/// Set Cartesian position of source to be encoded
+	/// Set Cartesian direction of source to be encoded
+	/// (x,y,z unit vector in the listener's coordinate frame)
 	void position(float x, float y, float z);
 };
 

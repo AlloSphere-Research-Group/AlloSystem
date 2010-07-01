@@ -258,6 +258,7 @@ inline uint32_t unitToUInt(float v){
 	return punFU(v) << 9;
 }
 
+// TODO: make 64-bit ready
 inline uint32_t unitToUInt2(float v){
 	uint32_t normalU = punFU(v);
 	uint32_t rbs = 126UL - (normalU >> 23UL);

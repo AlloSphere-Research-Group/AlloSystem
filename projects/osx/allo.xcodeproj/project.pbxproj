@@ -383,6 +383,7 @@
 		360C404011D32D3E002FE91F /* al_Context.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Context.hpp; sourceTree = "<group>"; };
 		360C404511D32DDA002FE91F /* al_Context.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Context.cpp; sourceTree = "<group>"; };
 		360C404E11D32FED002FE91F /* al_Matrix4.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Matrix4.hpp; sourceTree = "<group>"; };
+		361F442911DBF07F00A5458D /* al_AudioScene.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_AudioScene.hpp; sourceTree = "<group>"; };
 		362127C71173CD72009CB6FC /* al_Graphics.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Graphics.hpp; sourceTree = "<group>"; };
 		362127C81173CDBB009CB6FC /* al_Graphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Graphics.cpp; sourceTree = "<group>"; };
 		362127DD1173D5A2009CB6FC /* al_GraphicsOpenGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GraphicsOpenGL.cpp; sourceTree = "<group>"; };
@@ -1100,6 +1101,7 @@
 		36C13F0C11D15FA9006196FC /* sound */ = {
 			isa = PBXGroup;
 			children = (
+				361F442911DBF07F00A5458D /* al_AudioScene.hpp */,
 				36C13F0D11D15FA9006196FC /* al_Ambisonics.hpp */,
 				36C13F0E11D15FA9006196FC /* al_Reverb.hpp */,
 			);

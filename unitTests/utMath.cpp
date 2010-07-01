@@ -5,6 +5,8 @@ inline bool eq(double x, double y, double eps=0.000001){ return abs(x-y) < eps; 
 
 int utMath(){
 
+	
+
 
 	// Vec
 	{
@@ -208,12 +210,25 @@ int utMath(){
 //		#undef T
 	}
 
-//	{	Quatd q(0,0,0,0);
+	// Quat
+	{	
+//		Quatd q(0,0,0,0);
 //		#define T(x, y) assert(x == y);
 //		T(q, Quatd(0,0,0,0))
 //		T(q.conj(), Quatd(q.r, -q.i, -q.j, -q.k))
 //		#undef T
-//	}
+
+//		int smps = 100;
+//		Quatd q1 = Quatd::fromAxisAngle(10, .707, .707, 0);
+//		Quatd q2 = Quatd::fromAxisAngle(60, .707, 0, .707);
+//		Quatd buf[smps];
+//		Quatd::slerp_buffer(q1, q2, buf, smps);
+//		for (int i=0; i<smps; i++) {
+//			double t, x, y, z;
+//			buf[i].toAxisAngle(&t, &x, &y, &z);
+//			//printf("%f %f %f %f\n", t, x, y, z);
+//		}
+	}
 
 
 

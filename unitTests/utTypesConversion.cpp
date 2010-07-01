@@ -36,7 +36,7 @@ int utTypesConversion(){
 	assert(uintToUnitS<float>((1UL<<31) - (1<<30)) ==-0.5);
 	assert(uintToUnitS<float>((1UL<<31) + (1<<30)) ==+0.5);
 
-	assert(unitToUInt2(0.0) == 0);
+	//assert(unitToUInt2(0.0) == 0);
 	//printf("%lu %lu\n", unitToUInt2(1./8), 1UL<<29);
 	assert(unitToUInt2(1./8) == (1UL<<29));
 	assert(unitToUInt2(1./4) == (1UL<<30));
