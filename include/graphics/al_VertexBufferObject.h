@@ -16,17 +16,33 @@ VBOs provide an interface to access these buffers in a similar fashion to vertex
 Unlike display lists, the data in vertex buffer object can be read and updated by mapping the buffer into client's memory space.
 
 Another important advantage of VBO is sharing the buffer objects with many clients, like display lists and textures. Since VBO is on the server's side, multiple clients will be able to access the same buffer with the corresponding identifier.
+
+		// bind VBOs for vertex array and index array
+		VBOv.bind();
+		VBOi.bind();
+
+		// do same as vertex array except pointer
+		glEnableClientState(ArrayType::VertexArray);      // activate vertex coords array
+		glVertexPointer(3, GL_FLOAT, 0, 0);               // last param is offset, not ptr
+
+		// draw 6 quads using offset of index array
+		glDrawElements(GL_QUADS, 24, GL_UNSIGNED_BYTE, 0);
+
+		glDisableClientState(ArrayType::VertexArray);     // deactivate vertex array
+
+		// switch back to normal pointer operation
+		VBOv.unbind();
+		VBOi.unbind();
+
 */
 
 class VBO : public GPUObject{
 public:
 
-	VBO() : mBufferID(0), mTarget(BufferType::ArrayBuffer), mUsage(BufferUsage::DynamicDraw) {}
+	VBO() 
+	: GPUObject(), mBufferID(0), mTarget(BufferType::ArrayBuffer), mUsage(BufferUsage::DynamicDraw) 
+	{}
 
-	void upload(const void * data, size_t size) {
-		glBufferDataARB(mTarget, (GLsizei)size, data, mUsage);
-	}
-	
 	virtual void onCreate() {
 		const GLsizei num_buffers = 1;
 		glGenBuffersARB(num_buffers, &mBufferID);
@@ -34,8 +50,25 @@ public:
 	}
 	
 	virtual void onDestroy() {
-		
+		const GLsizei num_buffers = 1;
+		glDeleteBuffersARB(num_buffers, &mBufferID);
 	}
+	
+	// upload new data (allocate if necessary)
+	// after uploading, the CPU data can be deleted or recycled for other purposes
+	void upload(const void * data, size_t size) {
+		glBufferDataARB(mTarget, (GLsizei)size, data, mUsage);
+	}
+	
+	// upload a range into an *existing* buffer (using upload())
+	void uploadRange(const void * data, size_t size, GLint offset) {
+		glBufferSubDataARB(mTarget, offset, (GLsizei)size, data);
+	}
+	
+	void bind() { glBindBufferARB(mTarget, mBufferID); }
+	
+	void unbind() { glBindBufferARB(mTarget, 0); }
+	
 	
 protected:
 	GLuint mBufferID;
