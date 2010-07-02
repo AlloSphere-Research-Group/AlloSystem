@@ -51,11 +51,11 @@ public:
 	/// After using the pointer, call unmap() as soon as possible
 	void * map(){ bind(); return glMapBuffer(mType, mMapMode); }
 
-	
 	/// Map data store to client address space.
 	
 	/// If successful, returns true and sets argument to address of data,
 	/// otherwise, returns false and leaves argument unaffected.
+	/// After using the pointer, call unmap() as soon as possible
 	template <class T>
 	bool map(T *& buf){
 		if(asType<T>() == mDataType){
