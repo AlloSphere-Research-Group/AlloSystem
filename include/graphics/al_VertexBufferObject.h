@@ -21,18 +21,15 @@ Another important advantage of VBO is sharing the buffer objects with many clien
 class VBO : public GPUObject{
 public:
 
-	VBO() : mBufferID(0), mTarget(GL_ARRAY_BUFFER_ARB), mUsage(GL_DYNAMIC_DRAW_ARB) {}
+	VBO() : mBufferID(0), mTarget(BufferType::ArrayBuffer), mUsage(BufferUsage::DynamicDraw) {}
 
 	void upload(const void * data, size_t size) {
-		mUsage = GL_STATIC_DRAW_ARB;
-		glBufferDataARB(mTarget, (GLsizei)size, const void* data, mUsage);
+		glBufferDataARB(mTarget, (GLsizei)size, data, mUsage);
 	}
 	
 	virtual void onCreate() {
 		const GLsizei num_buffers = 1;
 		glGenBuffersARB(num_buffers, &mBufferID);
-		
-		mTarget = GL_ARRAY_BUFFER_ARB;			// vertex data
 		glBindBufferARB(mTarget, mBufferID);
 	}
 	
@@ -43,7 +40,7 @@ public:
 protected:
 	GLuint mBufferID;
 	// GL_ARRAY_BUFFER_ARB for vertex data, GL_ELEMENT_ARRAY_BUFFER_ARB for index data
-	GLenum mTarget;
+	BufferType::t mTarget;
 	// GL_{STATIC|DYNAMIC|STREAM}_{DRAW|READ|COPY}_ARB
 	// STATIC: specified once and used many times
 	// DYNAMIC: specified and used repeatedly
@@ -53,6 +50,7 @@ protected:
 	// COPY: GL -> GL			(for PBO and FBO)
 	BufferUsage::t mUsage;
 	
+
 
 };
 
