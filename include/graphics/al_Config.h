@@ -6,6 +6,8 @@
 // OpenGL platform-dependent includes
 
 #if defined(AL_OSX)
+	#define AL_GRAPHICS_USE_OPENGL
+	
 	#include <OpenGL/OpenGL.h>
 	#include <OpenGL/gl.h>
 	#include <OpenGL/glext.h>
@@ -16,7 +18,10 @@
 		{	GLint MacHackVBL = 1;\
 			CGLContextObj ctx = CGLGetCurrentContext();\
 			CGLSetParameter(ctx,  kCGLCPSwapInterval, &MacHackVBL); }
+			
 #elif defined(AL_LINUX)
+	#define AL_GRAPHICS_USE_OPENGL
+	
 	#include <GL/glew.h>
 	#include <GL/gl.h>
 	#include <GL/glext.h>
@@ -31,6 +36,8 @@
 			}\
 		}
 #elif defined(AL_WIN32)
+	#define AL_GRAPHICS_USE_OPENGL
+	
 	#include <windows.h>
 	#include <gl/gl.h>
 	#include <gl/glu.h>
