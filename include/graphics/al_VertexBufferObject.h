@@ -23,6 +23,7 @@ Another important advantage of VBO is sharing the buffer objects with many clien
 
 		// do same as vertex array except pointer
 		glEnableClientState(ArrayType::VertexArray);      // activate vertex coords array
+		// this is the most expensive call; best to minimize it:
 		glVertexPointer(3, GL_FLOAT, 0, 0);               // last param is offset, not ptr
 
 		// draw 6 quads using offset of index array
@@ -63,6 +64,21 @@ public:
 	// upload a range into an *existing* buffer (using upload())
 	void uploadRange(const void * data, size_t size, GLint offset) {
 		glBufferSubDataARB(mTarget, offset, (GLsizei)size, data);
+	}
+	
+	// map gives a void * pointer to the VBO memory, to manipulate data directly instead of upload()
+	// call bind() before map().
+	// returns NULL on failure. 
+	// after filling the buffer, use unmap()
+	// the pointer will no longer be valid after unmap()
+	void * map(AccessMode::t access) {
+		upload(NULL, 0);	// avoids a GPU sync; allows the GPU to keep using the old data
+		void* glMapBufferARB(mTarget, access)
+	}
+	
+	// returns false if the mapped buffer uploading failed (e.g. context changed)
+	bool unmap() {
+		return (glUnmapBufferARB(mTarget) == GL_TRUE);
 	}
 	
 	void bind() { glBindBufferARB(mTarget, mBufferID); }
