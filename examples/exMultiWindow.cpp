@@ -8,6 +8,7 @@
 #include "protocol/al_Graphics.hpp"
 #include "math/al_Random.hpp"
 #include "system/al_Time.hpp"
+#include "graphics/al_VertexBufferObject.h"
 
 using namespace al;
 

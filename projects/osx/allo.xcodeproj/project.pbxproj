@@ -428,6 +428,7 @@
 		3625B541116EEDEF00C685B7 /* Makefile.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.config; path = ../../Makefile.config; sourceTree = SOURCE_ROOT; };
 		362FA88C11D3F5CC00AA2DC4 /* al_MainLoop.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_MainLoop.hpp; sourceTree = "<group>"; };
 		362FA89811D3FA6700AA2DC4 /* al_MsgQueue.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_MsgQueue.hpp; sourceTree = "<group>"; };
+		3640453511DE8D9900D6D015 /* al_VertexBufferObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_VertexBufferObject.h; sourceTree = "<group>"; };
 		365599FB11D4013600BA01E8 /* al_MsgQueue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_MsgQueue.cpp; sourceTree = "<group>"; };
 		3659D750117B8A980065EBE4 /* al_MsgTube.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_MsgTube.hpp; sourceTree = "<group>"; };
 		3659D752117B8AC60065EBE4 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
@@ -712,6 +713,7 @@
 				16AA95EA118F6EEF00B98EC3 /* al_Light.hpp */,
 				16AA967E118F7D5700B98EC3 /* al_Shader.hpp */,
 				16AA960B118F775E00B98EC3 /* al_Texture.hpp */,
+				3640453511DE8D9900D6D015 /* al_VertexBufferObject.h */,
 				16AA95ED118F6FB800B98EC3 /* OpenGLSupport.txt */,
 			);
 			path = graphics;

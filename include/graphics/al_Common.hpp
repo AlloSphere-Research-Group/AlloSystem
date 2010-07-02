@@ -53,18 +53,19 @@ will be changed frequently, and "Stream" means the data will be changed every
 frame. "Draw" means the data will be sent to the GPU from the application,
 "Read" means the data will be read by the application from the GPU, and "Copy"
 means the data will be copied internally on the GPU.
+Read and Copy are used for PBOs and FBOs.
 */
 namespace BufferUsage{
 	enum t{
 		StreamDraw		= GL_STREAM_DRAW,
-//		StreamRead		= GL_STREAM_READ,
-//		StreamCopy		= GL_STREAM_COPY,
+		StreamRead		= GL_STREAM_READ,
+		StreamCopy		= GL_STREAM_COPY,
 		StaticDraw		= GL_STATIC_DRAW,
-//		StaticRead		= GL_STATIC_READ,
-//		StaticCopy		= GL_STATIC_COPY,
+		StaticRead		= GL_STATIC_READ,
+		StaticCopy		= GL_STATIC_COPY,
 		DynamicDraw		= GL_DYNAMIC_DRAW,
-//		DynamicRead		= GL_DYNAMIC_READ,
-//		DynamicCopy		= GL_DYNAMIC_COPY
+		DynamicRead		= GL_DYNAMIC_READ,
+		DynamicCopy		= GL_DYNAMIC_COPY
 	};
 }
 
