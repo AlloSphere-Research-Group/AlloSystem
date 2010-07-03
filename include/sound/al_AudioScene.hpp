@@ -2,6 +2,7 @@
 #define INCLUDE_AL_AUDIOSCENE_HPP
 
 #include <vector>
+#include <list>
 #include "types/al_Buffer.hpp"
 #include "math/al_Vec.hpp"
 #include "spatial/al_CoordinateFrame.hpp"
@@ -17,20 +18,28 @@ class Listener : public NavRef {
 public:
 
 	Listener& numSpeakers(int num){ mDecoder.numSpeakers(num); return *this; }
-	Listener& speakerPos(int ind, T az, T el=0){ mDecoder.setSpeakerDegrees(ind, az, el); return *this; }
+	Listener& speakerPos(int speakerNum, int deviceChannel, double az, double el=0){ mDecoder.setSpeaker(speakerNum, deviceChannel, az, el); return *this; }
 
 	int numSpeakers() const { return mDecoder.numSpeakers(); }
-	const float ** ambiChans() { return mAmbiDomainChannels; }
+	float * ambiChans() { return &mAmbiDomainChannels[0]; }
 	
 protected:
 	friend class AudioScene;
-	AmbiDecode<float> mDecoder;
 	
-	float ** mAmbiDomainChannels;
+	Listener(int dim, int order, int numspeakers, int flavor, int numFrames) 
+	:	mDecoder(dim, order, numspeakers, flavor) 
+	{
+		mQuatHistory.resize(numFrames);
+		mAmbiDomainChannels.resize(mDecoder.channels() * numFrames);
+	}
 	
+	friend class AudioScene;
+	AmbiDecode mDecoder;
+	
+	std::vector<float> mAmbiDomainChannels;
+	std::vector<Quatd> mQuatHistory;				// buffer of slerped orientations
 	ShiftBuffer<4, Vec3d> mPosHistory;	// position in previous blocks
 	Quatd mQuatPrev;					// orientation in previous block
-	Quatd * mQuatHistory;				// buffer of slerped orientations
 	
 };
 
@@ -42,10 +51,27 @@ public:
 	{}
 
 	void writeSample(const float& v){ mSound.write(v); }
+	
+	float readSample(double index) {
+		float a = atRel(index);
+		float b = atRel(index+1);
+		float frac = index - (int)index;
+		return ipl::linear(frac, a, b);
+	}
+	
+	double delay2index(al_sec delay, double samplerate) {
+		return delay * samplerate;
+	}
+	
+	al_sec maxDelay(double samplerate) {
+		mSound.size() / samplerate;
+	}
+	double maxIndex() { return mSound.size(); }
 
 protected:
-	Buffer<float> mSound;	// spherical wave around position
+	friend class AudioScene;
 	
+	Buffer<float> mSound;	// spherical wave around position
 	ShiftBuffer<4, Vec3d> mPosHistory; // previous positions
 	
 };	
@@ -55,33 +81,52 @@ protected:
 class AudioScene {
 public:
 
-	Listener & addListener() {
-		mListeners[mListeners.size] = Listener();
-		return mListeners[mListeners.size-1];
+	AudioScene(int dim, int order, int numFrames) 
+	:	mEncoder(dim, order), mNumFrames(numFrames), mSpeedOfSound(343), mNearClip(0.1), mFarClip(100)
+	{}
+	
+	int dim() { return mEncoder.dim(); }
+	int order() { return mEncoder.order(); }
+	
+	// TODO: setNumFrames
+
+	Listener& createListener(int numspeakers) {
+		mListeners.push_back(new Listener(dim(), order(), numspeakers, 1, mNumFrames));
+		return *mListeners.back();
+	}
+	
+	void addSource(SoundSource & src) {
+		mSources.push_back(&src);
+	}
+	
+	void removeSource(SoundSource & src) {
+		mSources.remove(&src);
 	}
 
 	/// encode sources (per listener)
-	void encode(const int& numFrames) {
+	void encode(const int& numFrames, double samplerate) {
+	
+		const invClipRange = mFarClip - mNearClip;
 	
 		// update source history data:
-		for(int s=0; s<mSources.size(); ++s){
-			Source& src = mSources[s];
-			s.mHistory(s.vec());
+		for(std::list<SoundSource *>::iterator it = mSources.begin(); it != mSources.end(); it++) {
+			SoundSource& src = *(*it);
+			src.mPosHistory(src.vec());
 		}
 	
 		for(int il=0; il<mListeners.size(); ++il){
-			Listener& l = mListeners[il];
+			Listener& l = *mListeners[il];
 			
 			// update listener history data:
 			Quatd qnew = l.quat();
-			Quatd::slerp_buffer(l.mQuatPrev, qnew, l.mQuatHistory, numFrames);
+			Quatd::slerp_buffer(l.mQuatPrev, qnew, &l.mQuatHistory[0], numFrames);
 			l.mQuatPrev = qnew;
-			l.mHistory(l.vec());
+			l.mPosHistory(l.vec());
 			
-			const float ** ambiChans = l.ambiChans();
+			float * ambiChans = l.ambiChans();
 			
-			for(int s=0; s<mSources.size(); ++s){
-				Source& src = mSources[s];
+			for(std::list<SoundSource *>::iterator it = mSources.begin(); it != mSources.end(); it++) {
+				SoundSource& src = *(*it);
 				
 				for(unsigned int i=0; i<numFrames; ++i) {
 					
@@ -89,17 +134,40 @@ public:
 					float alpha = i/(float)numFrames;
 					Vec3d relpos = ipl::cubic(
 						alpha, 
-						src.mHistory[3]-l.mHistory[3], 
-						src.mHistory[2]-l.mHistory[2], 
-						src.mHistory[1]-l.mHistory[1], 
-						src.mHistory[0]-l.mHistory[0]
+						src.mPosHistory[3]-l.mPosHistory[3], 
+						src.mPosHistory[2]-l.mPosHistory[2], 
+						src.mPosHistory[1]-l.mPosHistory[1], 
+						src.mPosHistory[0]-l.mPosHistory[0]
 					);
 					
-					// TODO: transform relpos by listener's perspective
-					// to derive x,y,z in listener's coordinate frame (or az/el/dist)
-					Quatd q = l.mQuatHistory[i];
-					//...
-
+					double distance = relpos.mag();
+					double index = samplerate * (distance / mSpeedOfSound);
+					double x = distance - mFarClip;
+					if (x >= 0. || index < src.maxIndex) {
+						
+						double amp = 1;
+						// TODO: amplitude rolloff
+						if (distance > mNearClip) {
+							
+							// 
+							amp = 
+							
+							const double c = 
+							const double f = mFarClip;
+							
+							double denom = cf + f - x;
+							
+							// smooth to zero at farcilp:
+							amp *= (1 - (cx) / (cf - f + x));
+						}
+					
+						// TODO: transform relpos by listener's perspective
+						// to derive x,y,z in listener's coordinate frame (or az/el/dist)
+						Quatd q = l.mQuatHistory[i];
+						//...
+						
+					
+					} // otherwise, it's too far away for the doppler.... (culled)
 				}
 				
 				//mEncoder.encode<Vec3d>(ambiChans, mSource);void encode(float ** ambiChans, const XYZ * pos, const float * input, numFrames)
@@ -109,34 +177,50 @@ public:
 	}
 	
 	/// between encode & decode, can apply optional processing to ambi domain signals (e.g. reverb)
+	
 
 	/// decode sources (per listener) to output channels
-	void render(float ** outs, const int& numFrames) {
+	void render(float * outs, const int& numFrames) {
 		for(int il=0; il<mListeners.size(); ++il){
-			Listener& l = mListeners[il];
-			const float ** ambiChans = l->ambiChans();
-
-			// loop speakers
-			for(int is=0; is<l.numSpeakers(); ++is){
-				float * out = outs[is]; // may have to do a channel mapping  //io.out(chanMap[s]);
-				
-				// loop ambi channels
-				for(unsigned int ic=0; ic<l.mDecoder.numChannels(); ++ic){
-					const float * in = ambiChans[ic]; // io.aux(c + AMBI_NUM_SOURCES);
-					float w = l.mDecoder.decodeWeight(is, ic);
-					
-					for(unsigned int i=0; i<numFrames; ++i) out[i] += in[i] * w * 8.f;
-				}		
-			}
+			Listener& l = *mListeners[il];
+			l.mDecoder.decode(outs, l.ambiChans(), numFrames);
 		}
 	}
 
 protected:
-	std::vector<Listener> mListeners;
-	std::vector<Source> mSources;
-	AmbiEncode<float> mEncoder;
+	std::vector<Listener *> mListeners;
+	std::list<SoundSource *> mSources;
+	AmbiEncode mEncoder;
+	int mNumFrames;			// audio frames per block
+	double mSpeedOfSound;	// distance per second
+	double mNearClip, mFarClip;
 	
-	int numAmbiChans(){ return 16; }
+	// how slowly amplitude decays away from mNearClip. 
+	// 1-> 50% at farclip, 10 -> 10% at farclip, 100 -> 1% at farclip, 1000 -> 0.1%  
+	// (if mKneeSmoothness is near zero; as d increases, amplitude at farclip increases slightly
+	double mRollOff;	
+	
+	// how much the curve approximates 1/(1+x)
+	// 0 -> (1/1+x), 1 -> (1+1)/(x^2+x+1); typical might be 0.2 - 100 
+	// (increasing mRollOff allows us to increase mKneeSmoothness)
+	double mKneeSmoothness;
+	
+	// how sharply amplitude curves to zero near mFarClip.
+	// 0 -> no fadeout, 1 is already quite a strong fadeout, default 0.01
+	double mFarFadeOut;		
+	
+	// approx to (1/(1+x)):
+	// x = distance-mNearClip
+	// f = mFarClip-mNearClip
+	// n = x/f (normalized distance)
+	// g = mRollOff
+	// d = mKneeSmoothness
+	// h = gn
+	// y = (h+d)/(h^2+h+d)
+	
+	// rolloff scalar:
+	// c = mFarFadeOut
+	// y *= 1-(cn)/(c+1+n)
 };
 
 

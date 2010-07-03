@@ -24,17 +24,11 @@ static double c40_11	= 40./11.;
 // AmbiBase
 
 AmbiBase::AmbiBase(int dim, int order)
-:	mDim(dim), mWeights(0)
+:	mDim(dim), mOrder(0), mWeights(0)
 {	this->order(order); }
 
 AmbiBase::~AmbiBase(){
 	delete[] mWeights;
-}
-
-void AmbiBase::resize(float * a, int n){
-	delete[] a;
-	a = new float[n];
-	memset(a, 0, n*sizeof(float));
 }
 
 void AmbiBase::order(int o){
@@ -181,7 +175,7 @@ float AmbiDecode::flavorWeights[4][5][5] = {
 
 AmbiDecode::AmbiDecode(int dim, int order, int numSpeakers, int flavor)
 	: AmbiBase(dim, order),
-	mNumSpeakers(0), mDecodeMatrix(0), mPositions(0), mFrame(0)
+	mNumSpeakers(0), mDecodeMatrix(0), mSpeakers(0) //mFrame(0)
 {
 	resizeArrays(channels(), numSpeakers);
 	this->flavor(flavor);
@@ -189,18 +183,19 @@ AmbiDecode::AmbiDecode(int dim, int order, int numSpeakers, int flavor)
 
 AmbiDecode::~AmbiDecode(){
 	delete[] mDecodeMatrix;
-	delete[] mPositions;
+	//delete[] mPositions;
+	delete[] mSpeakers;
 }
 
-void AmbiDecode::decode(float ** dec, const float ** enc, int numDecFrames){
+void AmbiDecode::decode(float * dec, const float * enc, int numDecFrames){
 		
 	// iterate speakers
 	for(int s=0; s<numSpeakers(); ++s){
-		float * out = dec[s];
+		float * out = dec + mSpeakers[s].deviceChannel * numDecFrames;
 		
 		// iterate ambi channels
 		for(int c=0; c<channels(); c++){
-			const float * in = enc[c];
+			const float * in = enc + c * numDecFrames;
 			float w = decodeWeight(s, c);
 			for(int i=0; i<numDecFrames; ++i) out[i] += in[i] * w;		
 		}		
@@ -219,12 +214,15 @@ void AmbiDecode::numSpeakers(int num){
 	resizeArrays(channels(), num);
 }
 
-void AmbiDecode::zero(){ memset(mFrame, 0, channels()*sizeof(float)); }
+//void AmbiDecode::zero(){ memset(mFrame, 0, channels()*sizeof(float)); }
 
-void AmbiDecode::setSpeaker(int index, float az, float el){
+void AmbiDecode::setSpeakerRadians(int index, int deviceChannel, float az, float el){
 	if(index < numSpeakers()){		// verify speaker index
-		azimuths()  [index] = az;	// update speaker location	
-		elevations()[index] = el;
+//		azimuths()  [index] = az;	// update speaker location	
+//		elevations()[index] = el;
+		mSpeakers[index].azimuth = az;
+		mSpeakers[index].elevation = el;
+		mSpeakers[index].deviceChannel = deviceChannel;
 		
 		// update encoding weights
 		//mDecodeMatrix[index][0] *= AmbiBase::c1_sqrt2;
@@ -232,8 +230,8 @@ void AmbiDecode::setSpeaker(int index, float az, float el){
 	}	
 }
 
-void AmbiDecode::setSpeakerDegrees(int index, float az, float el){
-	setSpeaker(index, az * float(0.01745329252), el * float(0.01745329252));
+void AmbiDecode::setSpeaker(int index, int deviceChannel, float az, float el){
+	setSpeaker(index, deviceChannel, az * float(0.01745329252), el * float(0.01745329252));
 }
 
 void AmbiDecode::updateChanWeights(){
@@ -278,20 +276,20 @@ void AmbiDecode::resizeArrays(int numChannels, int numSpeakers){
 	if(oldSize != newSize){
 
 		resize(mDecodeMatrix, newSize);
-		resize(mFrame, newSize);
+		//resize(mFrame, newSize);
 		
 		// resize number of speakers (?)
 		if(numSpeakers != mNumSpeakers){
 			mNumSpeakers = numSpeakers;
-			resize(mPositions, numSpeakers * 2);
+			resize(mSpeakers, numSpeakers);
 		}
 		
-		// recompute decode matrix weights
-		for(int i=0; i<numSpeakers; i++){
-			setSpeaker(i, azimuths()[i], elevations()[i]);
-		}
-		
-		updateChanWeights();
+//		// recompute decode matrix weights
+//		for(int i=0; i<numSpeakers; i++){
+//			setSpeaker(i, azimuths()[i], elevations()[i]);
+//		}
+//		
+//		updateChanWeights();
 	}
 
 	mChannels = numChannels;

@@ -50,31 +50,42 @@ protected:
 	int mChannels;		// cached for efficiency
 	float * mWeights;	// weights for each ambi channel
 	
-	static void resize(float * a, int n);
+	template<typename T>
+	static void resize(T *& a, int n);
 };
 
 
 /// Higher Order Ambisonic Decoding class
 class AmbiDecode : public AmbiBase{
 public:
+
+	struct Speaker {
+		float azimuth;
+		float elevation;
+		int deviceChannel;	// index in the output device channels array
+	};
+
 	AmbiDecode(int dim, int order, int numSpeakers, int flavor=1);
 	virtual ~AmbiDecode();
 
-	float decode(int speakerNum);	///< Decode speaker's sample from stored ambisonic frame.
-
-	void decode(float ** dec, const float ** enc, int numDecFrames);
+	//float decode(int speakerNum);	///< Decode speaker's sample from stored ambisonic frame.
+	
+	// dec is a flat array (non-interleaved) of the device output channels (as indexed by deviceChannel)
+	// enc is a flat array (non-interleaved) of the Ambisonic domain channels
+	void decode(float * dec, const float * enc, int numDecFrames);
 
 	void flavor(int type);
 	void numSpeakers(int num);		///< Set number of speakers.  Positions are zeroed upon resize.
-	void setSpeaker(int index, float azimuth, float elevation=0);
-	void setSpeakerDegrees(int index, float azimuth, float elevation=0);
+	void setSpeakerRadians(int index, int deviceChannel, float azimuth, float elevation);
+	void setSpeaker(int index, int deviceChannel, float azimuth, float elevation=0);
 	void zero();					///< Zeroes out internal ambisonic frame.
 
-	float * azimuths();				///< Returns pointer to speaker azimuths.
-	float * elevations();			///< Returns pointer to speaker elevations.
-	float * frame() const;			///< Returns pointer to ambisonic channel frame used by decode(int)
-	int numSpeakers();				///< Returns number of speakers.
-	int flavor();					///< Returns decode flavor.
+//	float * azimuths();				///< Returns pointer to speaker azimuths.
+//	float * elevations();			///< Returns pointer to speaker elevations.
+//	float * frame() const;			///< Returns pointer to ambisonic channel frame used by decode(int)
+	Speaker & speaker(int num) { return mSpeakers[num]; }
+	int numSpeakers() const { return mNumSpeakers; };	///< Returns number of speakers.
+	int flavor() { return mFlavor; };					///< Returns decode flavor.
 
 	virtual void onChannelsChange();
 	
@@ -91,8 +102,9 @@ protected:
 	float * mDecodeMatrix;		// deccoding matrix for each ambi channel & speaker
 								// cols are channels and rows are speakers								
 	float mWOrder[5];			// weights for each order
-	float * mPositions;			// speakers' azimuths + elevations
-	float * mFrame;				// an ambisonic channel frame used for decode(int)
+	Speaker * mSpeakers;
+	//float * mPositions;			// speakers' azimuths + elevations
+	//float * mFrame;				// an ambisonic channel frame used for decode(int)
 
 	void updateChanWeights();
 	void resizeArrays(int numChannels, int numSpeakers);
@@ -107,11 +119,13 @@ protected:
 class AmbiEncode : public AmbiBase{
 public:
 
-	/// Encode input sample and set decoder frame.
-	void encode   (const AmbiDecode &dec, float input);
-	
-	/// Encode input sample and add to decoder frame.
-	void encodeAdd(const AmbiDecode &dec, float input);
+	AmbiEncode(int dim, int order) : AmbiBase(dim, order) {}
+
+//	/// Encode input sample and set decoder frame.
+//	void encode   (const AmbiDecode &dec, float input);
+//	
+//	/// Encode input sample and add to decoder frame.
+//	void encodeAdd(const AmbiDecode &dec, float input);
 
 	
 	/// (x,y,z unit vector in the listener's coordinate frame)
@@ -185,13 +199,13 @@ inline int AmbiBase::orderToChannelsV(int orderV){ return orderV * orderV; }
 
 
 // AmbiEncode
-inline void AmbiEncode::encode(const AmbiDecode &dec, float input){	
-	for(int c=0; c<dec.channels(); ++c) dec.frame()[c] = weights()[c] * input;
-}
-
-inline void AmbiEncode::encodeAdd(const AmbiDecode &dec, float input){
-	for(int c=0; c<dec.channels(); ++c) dec.frame()[c] += weights()[c] * input;
-}
+//inline void AmbiEncode::encode(const AmbiDecode &dec, float input){	
+//	for(int c=0; c<dec.channels(); ++c) dec.frame()[c] = weights()[c] * input;
+//}
+//
+//inline void AmbiEncode::encodeAdd(const AmbiDecode &dec, float input){
+//	for(int c=0; c<dec.channels(); ++c) dec.frame()[c] += weights()[c] * input;
+//}
 
 inline void AmbiEncode::position(float az, float el){
 	AmbiBase::encodeWeightsFuMa(mWeights, mDim, mOrder, az, el);
@@ -213,15 +227,20 @@ inline float AmbiDecode::decode(float * encFrame, int encNumChannels, int speake
 	return smp;
 }
 
-inline float AmbiDecode::decode(int speakerNum){
-	return decode(mFrame, channels(), speakerNum);
-}
+//inline float AmbiDecode::decode(int speakerNum){
+//	return decode(mFrame, channels(), speakerNum);
+//}
 
-inline float * AmbiDecode::azimuths(){ return mPositions; }
-inline float * AmbiDecode::elevations(){ return mPositions + mNumSpeakers; }
-inline float * AmbiDecode::frame() const { return mFrame; }
-inline int AmbiDecode::flavor(){ return mFlavor; }
-inline int AmbiDecode::numSpeakers(){ return mNumSpeakers; }
+//inline float * AmbiDecode::azimuths(){ return mPositions; }
+//inline float * AmbiDecode::elevations(){ return mPositions + mNumSpeakers; }
+//inline float * AmbiDecode::frame() const { return mFrame; }
+
+template<typename T>
+inline void AmbiBase::resize(T *& a, int n){
+	delete[] a;
+	a = new T[n];
+	memset(a, 0, n*sizeof(T));
+}
 
 } // al::
 #endif
