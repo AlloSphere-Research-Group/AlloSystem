@@ -1711,10 +1711,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = "";
 				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../dev/osx/lib\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PREBINDING = NO;
 				PRODUCT_NAME = unitTests;
 				USER_HEADER_SEARCH_PATHS = "$(inherited)";
@@ -1731,10 +1728,7 @@
 				GCC_MODEL_TUNING = G5;
 				HEADER_SEARCH_PATHS = "";
 				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../dev/osx/lib\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PREBINDING = NO;
 				PRODUCT_NAME = unitTests;
 				USER_HEADER_SEARCH_PATHS = "$(inherited)";
@@ -1756,17 +1750,14 @@
 					"_GLIBCXX_DEBUG_PEDANTIC=1",
 				);
 				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../dev_osx/lib\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_CFLAGS = (
 					"-DAPR_FAST_COMPAT",
 					"-DAPR_STRICT",
 				);
 				PRODUCT_NAME = $TARGET_NAME;
 				SYMROOT = ../../build;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../dev_osx/include\"/**";
+				USER_HEADER_SEARCH_PATHS = $inherited;
 			};
 			name = Debug;
 		};
@@ -1777,17 +1768,14 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../dev_osx/lib\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_CFLAGS = (
 					"-DAPR_FAST_COMPAT",
 					"-DAPR_STRICT",
 				);
 				PRODUCT_NAME = $TARGET_NAME;
 				SYMROOT = ../../build;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../dev_osx/include\"/**";
+				USER_HEADER_SEARCH_PATHS = $inherited;
 			};
 			name = Release;
 		};
@@ -1894,10 +1882,7 @@
 				);
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../dev_osx/lib\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-DAPR_FAST_COMPAT",
@@ -1916,7 +1901,7 @@
 				PRODUCT_NAME = $TARGET_NAME;
 				SDKROOT = $inherited;
 				SYMROOT = ../../build;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../dev_osx/include\"/**";
+				USER_HEADER_SEARCH_PATHS = $inherited;
 			};
 			name = Debug;
 		};
@@ -1928,10 +1913,7 @@
 				GCC_MODEL_TUNING = G5;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../dev_osx/lib\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-DAPR_FAST_COMPAT",
@@ -1950,7 +1932,7 @@
 				PRODUCT_NAME = $TARGET_NAME;
 				SDKROOT = $inherited;
 				SYMROOT = ../../build;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../dev_osx/include\"/**";
+				USER_HEADER_SEARCH_PATHS = $inherited;
 			};
 			name = Release;
 		};
@@ -1968,10 +1950,7 @@
 					"_GLIBCXX_DEBUG_PEDANTIC=1",
 				);
 				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../dev_osx/lib\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-DAPR_FAST_COMPAT",
@@ -1990,7 +1969,7 @@
 				PRODUCT_NAME = $TARGET_NAME;
 				SDKROOT = $inherited;
 				SYMROOT = ../../build;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../dev_osx/include\"/**";
+				USER_HEADER_SEARCH_PATHS = $inherited;
 			};
 			name = Debug;
 		};
@@ -2001,10 +1980,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../dev_osx/lib\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-DAPR_FAST_COMPAT",
@@ -2023,7 +1999,7 @@
 				PRODUCT_NAME = $TARGET_NAME;
 				SDKROOT = $inherited;
 				SYMROOT = ../../build;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../dev_osx/include\"/**";
+				USER_HEADER_SEARCH_PATHS = $inherited;
 			};
 			name = Release;
 		};
@@ -2074,13 +2050,10 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = "";
 				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\\\\\\\"$(SRCROOT)/../../dev_osx/lib\\\\\\\"",
-				);
+				LIBRARY_SEARCH_PATHS = $inherited;
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
-				USER_HEADER_SEARCH_PATHS = ../../include;
+				USER_HEADER_SEARCH_PATHS = $inherited;
 			};
 			name = Debug;
 		};
@@ -2094,13 +2067,10 @@
 				GCC_MODEL_TUNING = G5;
 				HEADER_SEARCH_PATHS = "";
 				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\\\\\\\"$(SRCROOT)/../../dev_osx/lib\\\\\\\"",
-				);
+				LIBRARY_SEARCH_PATHS = $inherited;
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
-				USER_HEADER_SEARCH_PATHS = ../../include;
+				USER_HEADER_SEARCH_PATHS = $inherited;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -2120,10 +2090,7 @@
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "$PROJECT_DIR/../../examples/exMainloopCocoa/exMainloopCocoa-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../dev_osx/lib\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -2132,7 +2099,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = exMainloopCocoa;
-				USER_HEADER_SEARCH_PATHS = ../../include;
+				USER_HEADER_SEARCH_PATHS = $inherited;
 			};
 			name = Debug;
 		};
@@ -2150,10 +2117,7 @@
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = "$PROJECT_DIR/../../examples/exMainloopCocoa/exMainloopCocoa-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../dev_osx/lib\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -2162,7 +2126,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = exMainloopCocoa;
-				USER_HEADER_SEARCH_PATHS = ../../include;
+				USER_HEADER_SEARCH_PATHS = $inherited;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -2293,17 +2257,14 @@
 					"_GLIBCXX_DEBUG_PEDANTIC=1",
 				);
 				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\\\"$(SRCROOT)/../../dev_osx/lib\\\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_CFLAGS = (
 					"-DAPR_FAST_COMPAT",
 					"-DAPR_STRICT",
 				);
 				PRODUCT_NAME = $TARGET_NAME;
 				SYMROOT = ../../build;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../dev_osx/include\"/**";
+				USER_HEADER_SEARCH_PATHS = $inherited;
 			};
 			name = Debug;
 		};
@@ -2314,17 +2275,14 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\\\"$(SRCROOT)/../../dev_osx/lib\\\"",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_CFLAGS = (
 					"-DAPR_FAST_COMPAT",
 					"-DAPR_STRICT",
 				);
 				PRODUCT_NAME = $TARGET_NAME;
 				SYMROOT = ../../build;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../include\" \"$(SRCROOT)/../../dev_osx/include\"/**";
+				USER_HEADER_SEARCH_PATHS = $inherited;
 			};
 			name = Release;
 		};
@@ -2339,13 +2297,10 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = "";
 				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../dev/osx/lib\"",
-				);
+				LIBRARY_SEARCH_PATHS = $inherited;
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
-				USER_HEADER_SEARCH_PATHS = ../../include;
+				USER_HEADER_SEARCH_PATHS = $inherited;
 			};
 			name = Debug;
 		};
@@ -2359,13 +2314,10 @@
 				GCC_MODEL_TUNING = G5;
 				HEADER_SEARCH_PATHS = "";
 				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../../dev/osx/lib\"",
-				);
+				LIBRARY_SEARCH_PATHS = $inherited;
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
-				USER_HEADER_SEARCH_PATHS = ../../include;
+				USER_HEADER_SEARCH_PATHS = $inherited;
 				ZERO_LINK = NO;
 			};
 			name = Release;
