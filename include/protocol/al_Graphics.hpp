@@ -116,17 +116,12 @@ protected:
 };
 
 
-
-class Graphics : public GraphicsData {
+/*
+	Graphics knows how to draw GraphicsData
+	It also owns a GraphicsData, to simulate immediate mode (where it draws its own data)
+*/	
+class Graphics {
 public:
-
-//	struct VertexData {
-//		al::Vec3f position;
-//		al::Vec3f normal;
-//		al::Color color;
-//		//al::Vec4f color;
-//		float u, v;
-//	};
 
 	Graphics(gfx::Backend::type backend = gfx::Backend::AutoDetect);
 	~Graphics();
@@ -135,7 +130,7 @@ public:
 	void clearColor(float r, float g, float b, float a){ s_clearColor(r,g,b,a); }
 	void loadIdentity(){ s_loadIdentity(); }
 	void draw(const GraphicsData& v){ s_draw(v); }
-	void draw(){ draw(*this); }
+	void draw(){ draw(mGraphicsData); }
 	void viewport(int x, int y, int width, int height){ s_viewport(x,y,width,height); }
 
 	void begin(int mode) { s_begin(this, mode); }
@@ -150,10 +145,6 @@ public:
 	gfx::Backend::type mBackend;
 	int POINTS, LINES, LINE_LOOP, LINE_STRIP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP, POLYGON;
 	int COLOR_BUFFER_BIT, DEPTH_BUFFER_BIT;
-
-//	al::VectorBuffer<VertexData> mVertexBuffer;
-//	int mMode;
-
 	
 	void (*s_draw)(const GraphicsData& v);
 	void (*s_clear)(int mask);
@@ -166,6 +157,11 @@ public:
 	void (*s_vertex)(Graphics * g, double x, double y, double z);
 	void (*s_normal)(Graphics * g, double x, double y, double z);
 	void (*s_color)(Graphics * g, double x, double y, double z, double a);
+	
+	GraphicsData& data() { return mGraphicsData; }
+	
+protected:
+	GraphicsData mGraphicsData;	// used for immediate mode style rendering
 };
 
 extern bool setBackendNone(Graphics * g);

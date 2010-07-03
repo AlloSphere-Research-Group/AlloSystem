@@ -20,7 +20,7 @@ int main(){
 //	utIOWindowGL();
 //	utIOSocket();
 	
-//	utProtocolGraphics();
+	utProtocolGraphics();
 
 	return 0;
 }

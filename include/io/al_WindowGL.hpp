@@ -31,8 +31,6 @@
 #include <vector>
 #include <string>
 
-#include "graphics/al_Context.hpp"
-
 namespace al{
 
 // can redefine, but should be at least 4
@@ -161,10 +159,10 @@ private:
 	void position(int x, int y);
 };
 
-
+/// TODO: rename to Window
 
 /// OpenGL Window interface
-class WindowGL : public Context {
+class WindowGL {
 public:
 
 	struct Dim{
@@ -204,7 +202,7 @@ public:
 	bool enabled(DisplayMode::t v) const;				///<
 	bool fullScreen() const;
 	double fps() const;									///< Returns frames/second
-	al_sec spf() const { return (al_sec)1./fps(); }				///< Returns seconds/frame
+	double spf() const { return 1./fps(); }				///< Returns seconds/frame
 	const std::string& title() const;
 	bool visible() const;
 	const Keyboard& keyboard(){ return mKeyboard; }

@@ -11,6 +11,7 @@
 #include "math/al_Matrix4.hpp"
 #include "spatial/al_Camera.hpp"
 #include "graphics/al_Config.h"
+#include "graphics/al_GPUObject.hpp"
 
 namespace al {
 

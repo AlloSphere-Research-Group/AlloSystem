@@ -8,7 +8,7 @@
 #include "protocol/al_Graphics.hpp"
 #include "math/al_Random.hpp"
 #include "system/al_Time.hpp"
-#include "graphics/al_VertexBufferObject.h"
+#include "graphics/al_Context.hpp"
 
 using namespace al;
 
@@ -186,8 +186,11 @@ struct MyWindow : WindowGL{
 
 	void onFrame(){
 		//drawScene(this);
-		Context::draw(drawScene, dimensions().w, dimensions().h, this);
+		ctx.draw(drawScene, dimensions().w, dimensions().h, this);
 	}
+	
+	Context ctx;
+	//GPUObjectList objects;
 };
 
 MyWindow win1;
@@ -315,20 +318,20 @@ int main (int argc, char * argv[]) {
 	
 	// set fps == 0, and drive frame rendering manually instead
 	win1.create(WindowGL::Dim(320,240,0,40), "win1", fps);
-	win1.mode(WindowGL::Dual);
-	win1.stereo(true);
-	win1.viewport().camera(&camera);
+	win1.ctx.mode(Context::Dual);
+	win1.ctx.stereo(true);
+	win1.ctx.viewport().camera(&camera);
 	
 	win2.create(WindowGL::Dim(320,240,0,320), "win2", fps);
-	win2.mode(WindowGL::Anaglyph);
+	win2.ctx.mode(Context::Anaglyph);
 	//win2.anaglyphMode(WindowGL::RedCyan);
-	win2.stereo(true);
-	win2.viewport().camera(&camera);
+	win2.ctx.stereo(true);
+	win2.ctx.viewport().camera(&camera);
 	
 	win3.create(WindowGL::Dim(320,240,0,560), "win3", fps);
-	win3.mode(WindowGL::LeftEye);
-	win3.stereo(true);
-	win3.viewport().camera(&camera);
+	win3.ctx.mode(Context::LeftEye);
+	win3.ctx.stereo(true);
+	win3.ctx.viewport().camera(&camera);
 	//win3.viewport().userProjectionTransform().set(Matrix4d::Scale(1, 0.5, 1));
 //	win3.viewport().userProjectionTransform().set(
 //		//Matrix4d::Scale(0.5, 1, 1) *
@@ -337,9 +340,9 @@ int main (int argc, char * argv[]) {
 //	);
 	
 	win4.create(WindowGL::Dim(320,240,320,560), "win4", fps);
-	win4.mode(WindowGL::RightEye);
-	win4.stereo(true);
-	win4.viewport().camera(&camera);
+	win4.ctx.mode(Context::RightEye);
+	win4.ctx.stereo(true);
+	win4.ctx.viewport().camera(&camera);
 
 	
 	camera.turn(Quatd::fromEuler(0., 0., 0.1));

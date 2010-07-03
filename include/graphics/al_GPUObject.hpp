@@ -1,6 +1,8 @@
 #ifndef INCLUDE_AL_GRAPHICS_GPUOBJECT_H
 #define INCLUDE_AL_GRAPHICS_GPUOBJECT_H
 
+#include <list>
+
 namespace al {
 namespace gfx{
 
@@ -28,6 +30,30 @@ protected:
 	uint32_t mID;
 	virtual void onCreate() = 0;
 	virtual void onDestroy() = 0;
+};
+
+/*
+	Utility object
+*/
+class GPUObjectList {
+	
+	void add(GPUObject & gpuObject) { mObjects.push_back(&gpuObject); }
+	void remove(GPUObject & gpuObject) { mObjects.remove(&gpuObject); }
+	
+	void create() {
+		for (std::list<GPUObject *>::iterator it = mObjects.begin(); it != mObjects.end(); it++) {
+			(*it)->create();
+		}
+	}
+	
+	void destroy() {
+		for (std::list<GPUObject *>::iterator it = mObjects.begin(); it != mObjects.end(); it++) {
+			(*it)->destroy();
+		}
+	}
+	
+protected:
+	std::list<GPUObject *> mObjects;
 };
 
 } // ::al::gfx

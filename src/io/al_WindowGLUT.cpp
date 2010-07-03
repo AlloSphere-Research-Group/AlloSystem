@@ -1,11 +1,12 @@
 #include <stdio.h>		// snprintf
 #include <stdlib.h>		// exit
 #include <map>
-#include "system/al_Config.h"
-#include "system/al_MainLoop.hpp"
-#include "types/al_MsgQueue.hpp"
+
 #include "io/al_WindowGL.hpp"
-#include "graphics/al_Config.h"
+
+#include "system/al_Config.h"		// system defines
+#include "system/al_MainLoop.hpp"	// start/stop loop, rendering
+#include "graphics/al_Config.h"		// OpenGL headers
 
 #ifdef AL_OSX
 	#include <GLUT/glut.h>
@@ -419,7 +420,7 @@ private:
 
 
 
-WindowGL::WindowGL(): Context(), mImpl(new WindowImpl(this)){}
+WindowGL::WindowGL(): mImpl(new WindowImpl(this)){}
 
 WindowGL::~WindowGL(){
 	destroy();

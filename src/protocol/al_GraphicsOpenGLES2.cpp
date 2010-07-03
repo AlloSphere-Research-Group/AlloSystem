@@ -20,22 +20,22 @@ static void gl_clearColor(float r, float g, float b, float a){ glClearColor(r,g,
 static void gl_loadIdentity(){ glLoadIdentity(); }
 static void gl_viewport(int x, int y, int w, int h){ glViewport(x,y,w,h); }
 static void gl_begin(Graphics * g, int mode) {
-	g->resetBuffers();
-	g->primitive(mode);
+	g->data().resetBuffers();
+	g->data().primitive(mode);
 }
 static void gl_end(Graphics * g) {
 	g->draw();
-	g->resetBuffers();
+	g->data().resetBuffers();
 }
 
 static void gl_color(Graphics * G, double r, double g, double b, double a) {
-	G->addColor(r,g,b,a);
+	G->data().addColor(r,g,b,a);
 }
 static void gl_normal(Graphics * g, double x, double y, double z) {
-	g->addNormal(x,y,z);
+	g->data().addNormal(x,y,z);
 }
 static void gl_vertex(Graphics * g, double x, double y, double z) {
-	g->addVertex(x,y,z);
+	g->data().addVertex(x,y,z);
 }
 
 
