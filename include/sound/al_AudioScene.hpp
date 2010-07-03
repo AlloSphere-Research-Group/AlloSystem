@@ -53,8 +53,8 @@ public:
 	void writeSample(const float& v){ mSound.write(v); }
 	
 	float readSample(double index) {
-		float a = atRel(index);
-		float b = atRel(index+1);
+		float a = mSound.atRel(index);
+		float b = mSound.atRel(index+1);
 		float frac = index - (int)index;
 		return ipl::linear(frac, a, b);
 	}
@@ -106,7 +106,7 @@ public:
 	/// encode sources (per listener)
 	void encode(const int& numFrames, double samplerate) {
 	
-		const invClipRange = mFarClip - mNearClip;
+		const double invClipRange = mFarClip - mNearClip;
 	
 		// update source history data:
 		for(std::list<SoundSource *>::iterator it = mSources.begin(); it != mSources.end(); it++) {
@@ -143,22 +143,22 @@ public:
 					double distance = relpos.mag();
 					double index = samplerate * (distance / mSpeedOfSound);
 					double x = distance - mFarClip;
-					if (x >= 0. || index < src.maxIndex) {
+					if (x >= 0. || index < src.maxIndex()) {
 						
 						double amp = 1;
 						// TODO: amplitude rolloff
 						if (distance > mNearClip) {
 							
-							// 
-							amp = 
-							
-							const double c = 
-							const double f = mFarClip;
-							
-							double denom = cf + f - x;
-							
-							// smooth to zero at farcilp:
-							amp *= (1 - (cx) / (cf - f + x));
+//							// 
+//							amp = 
+//							
+//							const double c = 
+//							const double f = mFarClip;
+//							
+//							double denom = cf + f - x;
+//							
+//							// smooth to zero at farcilp:
+//							amp *= (1 - (cx) / (cf - f + x));
 						}
 					
 						// TODO: transform relpos by listener's perspective

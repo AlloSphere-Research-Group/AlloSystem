@@ -41,7 +41,7 @@ void audioCB(AudioIOData& io){
 		src.writeSample(randy.uniformS());
 	}
 	
-	scene.encode(numFrames);
+	scene.encode(numFrames, io.framesPerSecond());
 	scene.render(io.out(0), numFrames);
 }
 
