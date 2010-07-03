@@ -7,6 +7,26 @@ DEPENDENCY BUILD NOTES
 OSX
 ===
 
+libapr
+--------------
+As of version 1.4.2 libber doesn't properly compile on OSX.  Here are the steps:
+
+1) ./configure
+2) edit apr-1.4.2/include/arch/unix/apr_private.h by changing:
+/* Define to 1 if you have the `fdatasync' function. */
+#define HAVE_FDATASYNC 1
+
+To:
+
+/* Define to 1 if you have the `fdatasync' function. */
+/*#define HAVE_FDATASYNC 1*/
+
+3) make
+
+To create a multi-architecture ("fat" file) use lip:
+lipo -create -arch i386 arch_i386_libapr-1.a -arch x86_64 arch_x86_64_libapr-1.a -output libapr-1.a
+
+
 LLVM/Clang 2.7
 --------------
 
