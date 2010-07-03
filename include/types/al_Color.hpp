@@ -73,6 +73,7 @@ struct Color{
 	/// Get color component at index with no bounds checking
 	const float& operator[](int i) const { return components[i]; }
 
+	const float * to_ptr() const {return components;}
 
 	/// Set RGBA components
 	Color& set(float re, float gr, float bl, float al){ a=al; return set(re,gr,bl); }
