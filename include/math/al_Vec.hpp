@@ -260,11 +260,11 @@ public:
 	Mat(const T * arr){ set(arr); }
 
 	Mat(
-		const T& v11, const T& v12, const T& v13,
-		const T& v21, const T& v22, const T& v23,
-		const T& v31, const T& v32, const T& v33
+		const T& v11, const T& v21, const T& v31,
+		const T& v12, const T& v22, const T& v32,
+		const T& v13, const T& v23, const T& v33
 	){
-		set(v11,v12,v13, v21,v22,v23, v31,v32,v33);
+		set(v11,v21,v31, v12,v22,v32, v13,v23,v33);
 	}
 
 
@@ -320,9 +320,9 @@ public:
 	Mat& set(const T * arr){ IT(size()){ (*this)[i]=arr[i]; } return *this; }
 	
 	Mat& set(
-		const T& v11, const T& v12, const T& v13,
-		const T& v21, const T& v22, const T& v23,
-		const T& v31, const T& v32, const T& v33
+		const T& v11, const T& v21, const T& v31,
+		const T& v12, const T& v22, const T& v32,
+		const T& v13, const T& v23, const T& v33
 	){
 		elems[0] = v11; elems[3] = v12; elems[6] = v13;
 		elems[1] = v21; elems[4] = v22; elems[7] = v23;
