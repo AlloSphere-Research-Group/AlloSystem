@@ -7,8 +7,8 @@ DEPENDENCY BUILD NOTES
 OSX
 ===
 
-LLVM/Clang
-----------
+LLVM/Clang 2.7
+--------------
 
 Grab the 2.7 release from http://www.llvm.org/releases/download.html#2.7
 The clang-2.7 folder should be renamed 'clang' and copied into llvm-2.7/tools/
@@ -18,3 +18,11 @@ env MACOSX_DEPLOYMENT_TARGET=10.5 ./configure --enable-targets=x86,x86_64 --enab
 env MACOSX_DEPLOYMENT_TARGET=10.5 sudo make DARWIN_VERSION=10.5 UNIVERSAL=1 UNIVERSAL_ARCH="i386 x86_64" UNIVERSAL_SDK_PATH=/Developer/SDKs/MacOSX10.5.sdk/
 sudo make install
 
+
+
+
+
+Linux
+=====
+
+TODO: put apt-get command line here (for libapr, libportaudio, llvm/clang2.7 etc.
