@@ -17,9 +17,36 @@ class Matrix4 : public Mat<4, T> {
 public:
 	typedef Mat<4, T> Base;
 
-	Matrix4() { set(Identity()); }
-	Matrix4(const T * src) { Base::set(src); }
-	Matrix4(const Base & src) { set(src); }
+	Matrix4()
+	: Base(
+		1, 0, 0, 0, 
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1
+	)
+	{}
+	
+	Matrix4(
+		const T& v11, const T& v21, const T& v31, const T& v41,
+		const T& v12, const T& v22, const T& v32, const T& v42,
+		const T& v13, const T& v23, const T& v33, const T& v43,
+		const T& v14, const T& v24, const T& v34, const T& v44
+	)
+	:	Base(
+			v11, v12, v13, v14,
+			v21, v22, v23, v24,
+			v31, v32, v33, v34,
+			v41, v42, v43, v44
+		)
+	{}
+	
+	Matrix4(const T * src)
+	:	Base(src)
+	{}
+	
+	Matrix4(const Base & src)
+	:	Base(src)
+	{}
 	
 	Matrix4& set(const Base & src) { Base::set(src.elems); return *this; }
 	
@@ -31,27 +58,34 @@ public:
 	void fromQuat(Quat<T>& q) { q.toMatrix(Base::elems); }
 		
 	static const Matrix4 Identity() {
-		const T m[] = {	1,	0,	0,	0, 
-						0,	1,	0,	0, 
-						0,	0,	1,	0, 
-						0,	0,	0,	1 };
-		return Matrix4(m);
+		Matrix4 m(
+			1,	0,	0,	0, 
+			0,	1,	0,	0, 
+			0,	0,	1,	0, 
+			0,	0,	0,	1
+		);
+		return m;
 	}
 	
 	static const Matrix4 Translate(T x, T y, T z) {
-		const T m[] = {	1,	0,	0,	x, 
-						0,	1,	0,	y, 
-						0,	0,	1,	z, 
-						0,	0,	0,	1 };
-		return Matrix4(m);
+		Matrix4 m(
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			x, y, z, 1
+		);
+		return m;
 	}	
 	
 	static const Matrix4 Scale(T x, T y, T z) {
-		const T m[] = {	x,	0,	0,	0, 
-						0,	y,	0,	0, 
-						0,	0,	z,	0, 
-						0,	0,	0,	1 };
-		return Matrix4(m);
+		Matrix4 m;/*(
+			x,	0,	0,	0,
+			0,	y,	0,	0, 
+			0,	0,	z,	0, 
+			0,	0,	0,	1
+		);*/
+		
+		return m;
 	}
 	
 	static const Matrix4 RotateYZ(T theta) {
@@ -72,7 +106,7 @@ public:
 						0,	0,	0,	1 };
 		return Matrix4(m);
 	}
-	static const Matrix4& RotateXY(T theta) {
+	static const Matrix4 RotateXY(T theta) {
 		const T C = cos(theta); 
 		const T S = sin(theta);
 		const T m[] = {	C,	-S,	0,	0, 
@@ -82,13 +116,34 @@ public:
 		return Matrix4(m);
 	}
 
-//	static const Matrix4& Rotate(T a, T x, T y, T z) {
-//		Vec<3, T> v(x, y, z);
-//		Vec<3, T> u(v); u.normalize();
-//		Mat<3, T> S(0, -u[2], u[1], u[2], 0, -u[0], -u[1], u[0], 0);
-//		const T m[] = {	};
-//		return Matrix4(m);
-//	}
+	static const Matrix4 rotate(float angle, const Vec<3, T> &v) {
+		Vec<3, T> axis(v);
+		axis.normalize();
+		
+		float c = cos(angle*QUAT_DEG2RAD);
+		float s = sin(angle*QUAT_DEG2RAD);
+			
+		Matrix4 m(
+			axis[0]*axis[0]*(1-c)+c,
+			axis[1]*axis[0]*(1-c)+axis[2]*s,
+			axis[0]*axis[2]*(1-c)-axis[1]*s,
+			0,
+			
+			axis[0]*axis[1]*(1-c)-axis[2]*s,
+			axis[1]*axis[1]*(1-c)+c,
+			axis[1]*axis[2]*(1-c)+axis[0]*s,
+			0,
+
+			axis[0]*axis[2]*(1-c)+axis[1]*s,
+			axis[1]*axis[2]*(1-c)-axis[0]*s,
+			axis[2]*axis[2]*(1-c)+c,
+			0,
+			
+			0, 0, 0, 1
+		);
+		
+		return m;
+	}
 	
 	static const Matrix4 ShearYZ(T y, T z) {
 		const T m[] = {	1,	0,	0,	0, 

@@ -267,6 +267,14 @@ public:
 		set(v11,v21,v31, v12,v22,v32, v13,v23,v33);
 	}
 
+	Mat(
+		const T& v11, const T& v21, const T& v31, const T& v41,
+		const T& v12, const T& v22, const T& v32, const T& v42,
+		const T& v13, const T& v23, const T& v33, const T& v43,
+		const T& v14, const T& v24, const T& v34, const T& v44
+	){
+		set(v11,v21,v31,v41, v12,v22,v32,v42, v13,v23,v33,v43, v14,v24,v34,v44);
+	}
 
 	/// Set element at index with no bounds checking
 	T& operator[](int i){ return elems[i];}
@@ -331,10 +339,10 @@ public:
 	}
 	
 	Mat& set(
-		const T& v11, const T& v12, const T& v13, const T& v14,
-		const T& v21, const T& v22, const T& v23, const T& v24,
-		const T& v31, const T& v32, const T& v33, const T& v34,
-		const T& v41, const T& v42, const T& v43, const T& v44
+		const T& v11, const T& v21, const T& v31, const T& v41,
+		const T& v12, const T& v22, const T& v32, const T& v42,
+		const T& v13, const T& v23, const T& v33, const T& v43,
+		const T& v14, const T& v24, const T& v34, const T& v44
 	){
 		elems[0] = v11; elems[4] = v12; elems[8] = v13; elems[12] = v14;
 		elems[1] = v21; elems[5] = v22; elems[9] = v23; elems[13] = v24;
