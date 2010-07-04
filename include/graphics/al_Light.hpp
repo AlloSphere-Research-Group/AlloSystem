@@ -56,15 +56,31 @@ public:
 	Light& diffuse(const Color& v);
 	Light& specular(const Color& v);
 	
+	/// Set directional light direction
 	Light& dir(float x, float y, float z);
 
+	/// Set directional light direction
 	template <class VEC3>
-	Light& dir(const VEC3& v){ return dir(v[0], v[1], v[2]); }
+	Light& dir(const VEC3& v){ return dir(v[0],v[1],v[2]); }
 
+	/// Set positional light position
 	Light& pos(float x, float y, float z);
 
+	/// Set positional light position
 	template <class VEC3>
-	Light& pos(const VEC3& v){ return pos(v[0], v[1], v[2]); }
+	Light& pos(const VEC3& v){ return pos(v[0],v[1],v[2]); }
+
+	/// Set spotlight parameters
+	
+	/// @param[in] xDir		x direction
+	/// @param[in] yDir		y direction
+	/// @param[in] zDir		z direction
+	/// @param[in] cutoff	angle of the cone light emitted by the spot; [0, 90], 180 (uniform)
+	/// @param[in] expo		the intensity distribution of the light; [0, 128]	
+	Light& spot(float xDir, float yDir, float zDir, float cutoff, float expo=15);
+
+	template <class VEC3>
+	Light& spot(const VEC3& v, float cutoff, float expo=15){ return spot(v[0],v[1],v[2],cutoff,expo); }
 
 	const Color& ambient() const { return mAmbient; }
 	const Color& diffuse() const { return mDiffuse; }

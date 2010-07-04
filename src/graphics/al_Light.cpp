@@ -63,6 +63,7 @@ Light::~Light(){
 void Light::operator()() const {
 	glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
+	//glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	int glID = lightID(mID);
 	glLightfv(glID, GL_AMBIENT,		mAmbient.components);
 	glLightfv(glID, GL_DIFFUSE,		mDiffuse.components);
@@ -73,7 +74,7 @@ void Light::operator()() const {
     glLightf(glID, GL_QUADRATIC_ATTENUATION,mAtten[2]);
 	
 	glEnable(glID); // MUST enable each light source after configuration
-	//glShadeModel(GL_FLAT);
+//	glShadeModel(GL_FLAT);
 }
 
 Light& Light::attenuation(float c0, float c1, float c2){
@@ -83,6 +84,15 @@ Light& Light::attenuation(float c0, float c1, float c2){
 Light& Light::ambient(const Color& v){ mAmbient=v; return *this; }
 Light& Light::diffuse(const Color& v){ mDiffuse=v; return *this; }
 Light& Light::specular(const Color& v){ mSpecular=v; return *this; }
+
+Light& Light::spot(float xDir, float yDir, float zDir, float cutoff, float expo){
+	int glID = lightID(mID);
+	float direction[] = {xDir, yDir, yDir};
+	glLightfv(glID, GL_SPOT_DIRECTION, direction);
+	glLightf(glID, GL_SPOT_CUTOFF, cutoff);
+	glLightf(glID, GL_SPOT_EXPONENT, expo);
+	return *this;
+}
 
 Light& Light::dir(float x, float y, float z){
 	mPos[0]=x; mPos[1]=y; mPos[2]=z; mPos[3]=0;
