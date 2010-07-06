@@ -6,7 +6,7 @@
 #define AL_TIME_USE_APR 1
 #ifdef AL_TIME_USE_APR
 
-	#include "apr_time.h"
+	#include "apr-1/apr_time.h"
 	
 	/*
 	APR API documentation

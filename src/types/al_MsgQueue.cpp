@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string>
 
 #include "types/al_MsgQueue.hpp"

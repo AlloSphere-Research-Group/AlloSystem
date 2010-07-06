@@ -152,7 +152,7 @@ private:
 
 
 
-template <uint32_t N, class T>
+template <int N, class T>
 struct Multi{
 	typedef Multi M;
 //	Multi(){}
@@ -162,12 +162,12 @@ struct Multi{
 	T elems[N];
 	
 	/// Set element at index with no bounds checking
-	T& operator[](uint32_t i){ return elems[i];}
+	T& operator[](int i){ return elems[i];}
 	
 	/// Get element at index with no bounds checking
-	const T& operator[](uint32_t i) const { return elems[i]; }
+	const T& operator[](int i) const { return elems[i]; }
 
-	#define DO for(uint32_t i=0; i<N; ++i)
+	#define DO for(int i=0; i<N; ++i)
 
 	bool operator !=(const M& v){ DO{ if((*this)[i] == v[i]) return false; } return true; }
 	bool operator !=(const T& v){ DO{ if((*this)[i] == v   ) return false; } return true; }
@@ -179,7 +179,7 @@ struct Multi{
 	#undef DO
 
 	/// Returns size of array
-	static uint32_t size(){ return N; }
+	static int size(){ return N; }
 
 	/// Zeros all elements.
 	void zero(){ memset(elems, 0, N * sizeof(T)); }

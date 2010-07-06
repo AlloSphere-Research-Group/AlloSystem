@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_PRIVATE_IMPL_APR 1
-#define INCLUDE_AL_PRIVATE_IMPL_APR 1
+#ifndef INCLUDE_AL_PRIVATE_IMPL_APR
+#define INCLUDE_AL_PRIVATE_IMPL_APR
 
 /*
  *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
@@ -27,7 +27,8 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#include "stdlib.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "apr-1/apr_general.h"
 #include "apr-1/apr_errno.h"
