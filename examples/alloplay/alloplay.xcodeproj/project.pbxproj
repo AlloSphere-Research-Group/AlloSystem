@@ -68,6 +68,16 @@
 		36DDA1F511C70A1300C2A6B3 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36DDA1F411C70A1300C2A6B3 /* CoreAudio.framework */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		360C23CE11E658A4000FF335 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC045055464E500DB518D;
+			remoteInfo = allocompiler;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		360C83DE11C9615700AA1E85 /* notes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = notes.txt; sourceTree = "<group>"; };
 		36717DC911CB5F8300427A07 /* al_BufferObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_BufferObject.hpp; sourceTree = "<group>"; };
@@ -2594,6 +2604,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				360C23CF11E658A4000FF335 /* PBXTargetDependency */,
 			);
 			name = utCompiler;
 			productName = utCompiler;
@@ -2655,6 +2666,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		360C23CF11E658A4000FF335 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D2AAC045055464E500DB518D /* allocompiler */;
+			targetProxy = 360C23CE11E658A4000FF335 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
 		1DEB91EC08733DB70010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -2666,6 +2685,7 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/lib;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = allocompiler;
 			};
 			name = Debug;
@@ -2676,7 +2696,19 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
 				INSTALL_PATH = /usr/local/lib;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_LDFLAGS = (
+					"-lm",
+					"-lpthread",
+					"-all_load",
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
 				PRODUCT_NAME = allocompiler;
 			};
 			name = Release;

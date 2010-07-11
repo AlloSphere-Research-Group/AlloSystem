@@ -76,6 +76,11 @@ public:
 		calls clear() to reset this Compiler
 	*/
 	JIT * jit();	
+	
+	/*
+		print module to stdout
+	*/
+	void dump();
 				
 private:
 	friend class ModuleImpl;

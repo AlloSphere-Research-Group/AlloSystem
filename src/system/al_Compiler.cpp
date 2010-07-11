@@ -251,6 +251,10 @@ bool Compiler :: readbitcode(std::string path) {
 	return true;
 }
 
+void Compiler :: dump() {
+	mImpl->module->dump();
+}
+
 JIT * Compiler :: jit() {
 	std::string err;
 	if (mImpl) {
@@ -277,7 +281,6 @@ JIT * Compiler :: jit() {
 		}
 		EE->runStaticConstructorsDestructors(mImpl->module, false);
 		// create JIT and transfer ownership of module to it:
-		mImpl->module->dump();
 		JIT * jit = new JIT;
 		jit->mImpl = mImpl;
 		mImpl = NULL;
