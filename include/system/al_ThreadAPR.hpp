@@ -50,16 +50,6 @@ public:
 	*/
 	bool start(ThreadFunction routine, void * ptr = NULL);
 
-	//! Signal cancellation of a thread routine, returning \e true on success.
-	/*!
-	This function only signals thread cancellation.  It does not
-	wait to verify actual routine termination.  A \e true return value
-	only signifies that the cancellation signal was properly executed,
-	not thread cancellation.  A thread routine may need to make use of
-	the testCancel() function to specify a cancellation point.
-	*/
-	bool cancel();
-
 	//! Block the calling routine indefinitely until the thread terminates.
 	/*!
 	This function suspends execution of the calling routine until the thread has 

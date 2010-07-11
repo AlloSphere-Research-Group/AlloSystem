@@ -5,9 +5,7 @@
 #include "apr_general.h"
 #include "apr_thread_proc.h"
 
-using namespace al;
-
-
+namespace al {
 
 struct ThreadAPR::Impl : public ImplAPR {
 	Impl(void * ud = NULL) : ImplAPR() {
@@ -15,27 +13,23 @@ struct ThreadAPR::Impl : public ImplAPR {
 	}
 	
 	bool start(ThreadFunction routine, void * ptr) {
+		if (mThread) return false;	// can't start already started!
 		mRoutine = routine;
 		mUserdata = ptr;
-		apr_status_t rv = apr_thread_create(&mThread, mThreadAttr, threadfunc, ptr, mPool);
+		apr_status_t rv = apr_thread_create(&mThread, mThreadAttr, threadfunc, this, mPool);
 		check_apr(rv);
-		return rv == APR_SUCCESS;
-	}
-	
-	bool cancel() {
-		apr_status_t rv = APR_SUCCESS;
-		rv = check_apr(apr_thread_exit(mThread, rv));
 		return rv == APR_SUCCESS;
 	}
 	
 	bool wait() {
 		apr_status_t rv = APR_SUCCESS;
 		rv = check_apr(apr_thread_join(&rv, mThread));
+		mThread = 0;
 		return rv == APR_SUCCESS;
 	}
 	
 	~Impl() {
-		cancel();
+		if (mThread) wait();
 	}
 	
 	apr_thread_t * mThread;
@@ -72,11 +66,8 @@ bool ThreadAPR :: start(ThreadFunction routine, void * ptr) {
 	return mImpl->start(routine, ptr);
 }
 
-bool ThreadAPR :: cancel() {
-	return mImpl->cancel();
-}
-
 bool ThreadAPR :: wait() {
 	return mImpl->wait();
 }
 
+} // al::

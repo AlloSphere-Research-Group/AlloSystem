@@ -51,5 +51,6 @@ int utSpatial();
 int utSystem();
 int utTypes();
 int utTypesConversion();
+int utThreadAPR();
 
 #endif
