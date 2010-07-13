@@ -69,6 +69,7 @@ protected:
 	Frustum<double> mFrustum;
 	Matrix4d mUserProjectionTransform;	// user-defined projection transform
 	double mEyeSep;						// Eye separation for stereo. AKA IOD (inter ocular distance)
+										// TODO: This should be 1/30 the focal length
 };
 
 /// for OpenGL stereographics, you can't do better than to look here:
