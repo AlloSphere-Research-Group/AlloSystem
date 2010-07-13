@@ -99,8 +99,8 @@ public:
 	}
 
 protected:
-	double mFocalLength;		// Focal length along vd
-	double mFOVY;			// Camera aperture (degrees)
+	double mFocalLength;		// Focal length along vd (determines zero parallax)
+	double mFOVY;				// Camera aperture (degrees)
 	double mTanFOV;
 	double mZoom;
 
