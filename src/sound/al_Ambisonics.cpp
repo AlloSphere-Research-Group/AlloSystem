@@ -16,9 +16,9 @@
 
 namespace al{
 
-static double c1_sqrt2	= 0.707106781186548;
-static double c8_11		= 8./11.;
-static double c40_11	= 40./11.;
+static const double c1_sqrt2	= 0.707106781186548;
+static const double c8_11		= 8./11.;
+static const double c40_11		= 40./11.;
 
 
 // AmbiBase

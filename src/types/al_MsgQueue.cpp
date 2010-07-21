@@ -4,7 +4,7 @@
 
 #include "types/al_MsgQueue.hpp"
 
-using namespace al;
+namespace al{
 
 MsgQueue :: MsgQueue(int size, malloc_func mfunc, free_func ffunc) 
 :	mHead(NULL), mTail(NULL), mLen(0), mChunkSize(size), mNow(0), 
@@ -128,3 +128,4 @@ void MsgQueue :: update(al_sec until, bool defer) {
 	mNow = until;
 }
 
+} // al::

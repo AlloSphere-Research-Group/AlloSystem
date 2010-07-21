@@ -1,6 +1,6 @@
 #include "graphics/al_Context.hpp"
 
-using namespace al;
+namespace al{
 
 ViewPort :: ViewPort(double eyeSep) 
 :	mEyeSep(eyeSep), mCamera(Camera::defaultCamera())
@@ -541,7 +541,8 @@ Frustumd ViewPort::monoFrustum() {
 	
 	return f;
 }
-	
+
+} // al::	
 
 
 

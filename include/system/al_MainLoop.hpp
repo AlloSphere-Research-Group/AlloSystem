@@ -78,18 +78,15 @@ public:
 	void tick();
 
 protected:
-
 	friend class MainLoopImpl;
 	class MainLoopImpl * mImpl;
 
-	bool mIsRunning;				/* flag true (1) when in the main loop */
 	al_sec mInterval, mActualInterval;				
 	al_sec mT0;						/* birth time (wall clock), scheduler time (logical) */
 	al_sec mLastTickTime;			/* used to measure performance */
-	
-	al_sec mCPU;					/* running average performance monitor: this thread */
-	
-	MsgQueue mQueue;				/// functor scheduler attached to the main loop
+	al_sec mCPU;					/* running average performance monitor: this thread */	
+	MsgQueue mQueue;				// functor scheduler attached to the main loop
+	bool mIsRunning;				/* flag true (1) when in the main loop */
 	
 	MainLoop();
 	virtual ~MainLoop();

@@ -38,8 +38,11 @@ namespace al{
 /// implementation of MainLoop for the GLUT target
 
 MainLoop :: MainLoop() 
-:	mIsRunning(0), mInterval(0.01), mT0(al_time()),
-	mImpl(NULL), mCPU(0), mLastTickTime(mT0), mActualInterval(0)
+:	mImpl(NULL),
+	mInterval(0.01), mActualInterval(0),
+	mT0(al_time()), mLastTickTime(mT0),
+	mCPU(0),
+	mIsRunning(false)
 {
 	static bool doInit=true;
 	if(doInit){

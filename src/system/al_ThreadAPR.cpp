@@ -2,8 +2,8 @@
 
 #include "system/al_ThreadAPR.hpp"
 
-#include "apr_general.h"
-#include "apr_thread_proc.h"
+#include "apr-1/apr_general.h"
+#include "apr-1/apr_thread_proc.h"
 
 namespace al {
 

@@ -98,5 +98,5 @@ size_t Send::send(const osc::OutboundPacketStream & packet) {
 	apr_socket_send(mSock, packet.Data(), &size);
 	return size;
 }
-	
-} // namespace
+
+} // osc::
