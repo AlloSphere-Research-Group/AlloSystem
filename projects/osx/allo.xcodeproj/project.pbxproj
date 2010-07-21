@@ -17,7 +17,6 @@
 		168EC8F31161CA2C00FCACC7 /* al_Config.h in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8ED1161CA2C00FCACC7 /* al_Config.h */; };
 		168EC8F41161CA2C00FCACC7 /* al_Time.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8EE1161CA2C00FCACC7 /* al_Time.hpp */; };
 		168EC8F51161CA2C00FCACC7 /* al_Thread.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8EF1161CA2C00FCACC7 /* al_Thread.hpp */; };
-		168EC8F61161CA2C00FCACC7 /* al_Thread.h in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8F01161CA2C00FCACC7 /* al_Thread.h */; };
 		1697336D11768ABD0025299C /* al_Vec.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1697336C11768ABD0025299C /* al_Vec.hpp */; };
 		1697336E11768ABD0025299C /* al_Vec.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1697336C11768ABD0025299C /* al_Vec.hpp */; };
 		1697337511768B040025299C /* al_Quat.h in Headers */ = {isa = PBXBuildFile; fileRef = 1697337311768B040025299C /* al_Quat.h */; };
@@ -170,7 +169,6 @@
 		3622BF0C116D52AF00928703 /* al_OSC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE5116D527D00928703 /* al_OSC.cpp */; };
 		3622BF0D116D52AF00928703 /* al_OSCAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE6116D527D00928703 /* al_OSCAPR.cpp */; };
 		3622BF0E116D52AF00928703 /* al_Serialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE7116D527D00928703 /* al_Serialize.cpp */; };
-		3622BF0F116D52B400928703 /* al_Config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF6116D527D00928703 /* al_Config.cpp */; };
 		3622BF10116D52B400928703 /* al_MainLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF7116D527D00928703 /* al_MainLoop.cpp */; };
 		3622BF3C116D530100928703 /* NetworkingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF0116D527D00928703 /* NetworkingUtils.cpp */; };
 		3622BF3D116D530100928703 /* UdpSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF1116D527D00928703 /* UdpSocket.cpp */; };
@@ -220,7 +218,6 @@
 		36BAE06811C2F00F009A8BBD /* utSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC52A211628D4D0076AA8B /* utSystem.cpp */; };
 		36BAE06911C2F00F009A8BBD /* utTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC52A611628D4D0076AA8B /* utTypes.cpp */; };
 		36BAE06A11C2F00F009A8BBD /* utTypesConversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 166DD744117CDBFD00A8BA12 /* utTypesConversion.cpp */; };
-		36BAE1C311C2FAFF009A8BBD /* al_Config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF6116D527D00928703 /* al_Config.cpp */; };
 		36BAE1C411C2FAFF009A8BBD /* al_MainLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF7116D527D00928703 /* al_MainLoop.cpp */; };
 		36BAE1C511C2FAFF009A8BBD /* al_MainLoopOSX.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF9116D527D00928703 /* al_MainLoopOSX.mm */; };
 		36BAE1C711C2FAFF009A8BBD /* al_OSC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE5116D527D00928703 /* al_OSC.cpp */; };
@@ -416,7 +413,6 @@
 		168EC8ED1161CA2C00FCACC7 /* al_Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Config.h; sourceTree = "<group>"; };
 		168EC8EE1161CA2C00FCACC7 /* al_Time.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Time.hpp; sourceTree = "<group>"; };
 		168EC8EF1161CA2C00FCACC7 /* al_Thread.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Thread.hpp; sourceTree = "<group>"; };
-		168EC8F01161CA2C00FCACC7 /* al_Thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Thread.h; sourceTree = "<group>"; };
 		1697336C11768ABD0025299C /* al_Vec.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Vec.hpp; sourceTree = "<group>"; };
 		1697337311768B040025299C /* al_Quat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Quat.h; sourceTree = "<group>"; };
 		1697337411768B040025299C /* al_Quat.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Quat.hpp; sourceTree = "<group>"; };
@@ -597,7 +593,6 @@
 		3622BEEE116D527D00928703 /* OscTypes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OscTypes.cpp; sourceTree = "<group>"; };
 		3622BEF0116D527D00928703 /* NetworkingUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkingUtils.cpp; sourceTree = "<group>"; };
 		3622BEF1116D527D00928703 /* UdpSocket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UdpSocket.cpp; sourceTree = "<group>"; };
-		3622BEF6116D527D00928703 /* al_Config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Config.cpp; sourceTree = "<group>"; };
 		3622BEF7116D527D00928703 /* al_MainLoop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_MainLoop.cpp; sourceTree = "<group>"; };
 		3622BEF9116D527D00928703 /* al_MainLoopOSX.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = al_MainLoopOSX.mm; sourceTree = "<group>"; };
 		3622BEFA116D527D00928703 /* al_Time.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Time.cpp; sourceTree = "<group>"; };
@@ -1343,7 +1338,6 @@
 			children = (
 				360C23FD11E6591C000FF335 /* al_Compiler.cpp */,
 				360C23FE11E6591C000FF335 /* clangversion.cpp */,
-				3622BEF6116D527D00928703 /* al_Config.cpp */,
 				3622BEF7116D527D00928703 /* al_MainLoop.cpp */,
 				36AED02511D4638F000D98C9 /* al_MainLoopGLUT.cpp */,
 				3622BEF9116D527D00928703 /* al_MainLoopOSX.mm */,
@@ -1432,7 +1426,6 @@
 				168EC8EC1161CA2C00FCACC7 /* al_MainLoop.h */,
 				362FA88C11D3F5CC00AA2DC4 /* al_MainLoop.hpp */,
 				16D46562118F55790039A84C /* al_Printing.hpp */,
-				168EC8F01161CA2C00FCACC7 /* al_Thread.h */,
 				168EC8EF1161CA2C00FCACC7 /* al_Thread.hpp */,
 				36E4156411E99DB000A8A63D /* al_ThreadAPR.hpp */,
 				168EC8EB1161CA2C00FCACC7 /* al_Time.h */,
@@ -1601,7 +1594,6 @@
 				168EC8F31161CA2C00FCACC7 /* al_Config.h in Headers */,
 				168EC8F41161CA2C00FCACC7 /* al_Time.hpp in Headers */,
 				168EC8F51161CA2C00FCACC7 /* al_Thread.hpp in Headers */,
-				168EC8F61161CA2C00FCACC7 /* al_Thread.h in Headers */,
 				16AC536C116293580076AA8B /* al_Serialize.h in Headers */,
 				16AC536D116293590076AA8B /* al_Serialize.hpp in Headers */,
 				16AC536E1162935E0076AA8B /* al_Socket.hpp in Headers */,
@@ -1909,7 +1901,6 @@
 				16FE4B2111DB05AF002D3847 /* al_MainLoopGLUT.cpp in Sources */,
 				16FE4B2311DB05C1002D3847 /* al_MsgQueue.cpp in Sources */,
 				16FE4B2511DB05EE002D3847 /* al_Context.cpp in Sources */,
-				36BAE1C311C2FAFF009A8BBD /* al_Config.cpp in Sources */,
 				36BAE1C511C2FAFF009A8BBD /* al_MainLoopOSX.mm in Sources */,
 				360BB6E611DB06E2000C2A42 /* al_Time.cpp in Sources */,
 				36BAE1C711C2FAFF009A8BBD /* al_OSC.cpp in Sources */,
@@ -2028,7 +2019,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3622BF0F116D52B400928703 /* al_Config.cpp in Sources */,
 				3622BF10116D52B400928703 /* al_MainLoop.cpp in Sources */,
 				360BB6E511DB06D4000C2A42 /* al_Time.cpp in Sources */,
 				3622BF0C116D52AF00928703 /* al_OSC.cpp in Sources */,
