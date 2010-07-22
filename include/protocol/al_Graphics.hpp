@@ -68,11 +68,11 @@ struct ArrayN{
 class GraphicsData{
 public:
 
-	typedef ArrayN<3,float>	Vertex;
-	typedef ArrayN<3,float>	Normal;
-	typedef ArrayN<4,float>	Color;
-	typedef ArrayN<2,float>	TexCoord2;
-	typedef ArrayN<3,float>	TexCoord3;
+	typedef Vec3<float>		Vertex;
+	typedef Vec3<float>		Normal;
+	typedef Vec4<float>		Color;
+	typedef Vec2<float>		TexCoord2;
+	typedef Vec3<float>		TexCoord3;
 	typedef unsigned int	Index;
 
 	/// Reset all buffers

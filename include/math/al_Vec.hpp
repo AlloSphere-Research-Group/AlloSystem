@@ -558,6 +558,19 @@ inline Vec<N,T> vmax(const Vec<N,T>& a, const Vec<N,T>& b){
 
 // Specialized vector classes
 
+/// 2-vector
+template <class T>
+struct Vec2 : public Vec<2,T> {
+
+	typedef Vec<2,T> Base;
+
+	Vec2(const Base& v=Base()){ *this = v; }
+	Vec2(const T& x, const T& y){ set(x,y); }
+
+	Vec2& operator= (const Base& v){ Base::set(v); return *this; }
+};
+
+
 /// 3-vector
 template <class T>
 struct Vec3 : public Vec<3,T> {

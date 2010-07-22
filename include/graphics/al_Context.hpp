@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_CONTEXT_HPP
-#define INCLUDE_AL_CONTEXT_HPP
+#ifndef INCLUDE_AL_GRAPHICS_CONTEXT_HPP
+#define INCLUDE_AL_GRAPHICS_CONTEXT_HPP
 
 #include <list>
 #include <vector>
