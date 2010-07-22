@@ -1,5 +1,5 @@
 #include "utAllocore.h"
-#include "system/al_ThreadAPR.hpp"
+#include "system/al_Thread.hpp"
 
 int active = 1;
 
@@ -14,7 +14,7 @@ void * threadfunc1(void * ud) {
 
 
 int utThreadAPR() {
-	ThreadAPR thd(threadfunc1, 0);
+	Thread thd(threadfunc1, 0);
 	al_sleep(0.2);
 	active = 0;
 	thd.wait();

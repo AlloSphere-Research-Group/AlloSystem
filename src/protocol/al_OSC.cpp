@@ -55,7 +55,8 @@ void OSCRecv::stop(){
 	mStarted=false;
 }
 
-THREAD_FUNCTION(OSCRecv::threadFunc){
+//THREAD_FUNCTION(OSCRecv::threadFunc){
+void * OSCRecv::threadFunc(void * user){
 	OSCRecv * oscRecv = (OSCRecv *)user;
 	UdpListeningReceiveSocket listeningSocket(
 		NetAddr(NetAddr::ANY_ADDRESS, oscRecv->port()), oscRecv);

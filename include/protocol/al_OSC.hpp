@@ -141,7 +141,8 @@ protected:
 	UdpListeningReceiveSocket * mSocket;
 	bool mStarted;
 	
-	static THREAD_FUNCTION(threadFunc);
+	//static THREAD_FUNCTION(threadFunc);
+	static void * threadFunc(void * user);
 	virtual void ProcessMessage(const OSCMsg& m, const NetAddr& remote);
 	virtual void ProcessBundle(const OSCBundle& b, const NetAddr& remote);
 };

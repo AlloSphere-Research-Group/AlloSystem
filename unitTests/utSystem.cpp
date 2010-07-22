@@ -1,6 +1,6 @@
 #include "utAllocore.h"
 
-THREAD_FUNCTION(threadFunc){
+void * threadFunc(void * user){
 	*(int *)user = 1; return NULL;
 }
 
