@@ -1,9 +1,13 @@
 #include <math.h>
 #include "io/al_WindowGL.hpp"
 #include "protocol/al_Graphics.hpp"
+#include "protocol/al_GraphicsBackendOpenGL.hpp"
 #include "graphics/al_Isosurface.hpp"
 
 using namespace al;
+
+gfx::GraphicsBackendOpenGL backend;
+gfx::Graphics gl(&backend);
 
 const int N = 32;
 float volData[N*N*N];
@@ -46,8 +50,6 @@ struct MyWindow : WindowGL{
 		iso.generate(volData, N, 1./N);
 		gl.draw(iso);
 	}
-
-	gfx::Graphics gl;
 
 };
 
