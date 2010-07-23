@@ -56,7 +56,7 @@ void warn(const char * msg, const char * src="");
 
 
 
-// Implementation --------------------------------------------------------------
+// StateChange --------------------------------------------------------------
 
 inline char intensityToASCII(float v){
 	static const char map[] =
