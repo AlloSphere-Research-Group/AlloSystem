@@ -599,7 +599,7 @@ struct Vec3 : public Vec<3,T> {
 	typedef Vec<3,T> Base;
 
 	Vec3(const Base& v=Base()){ *this = v; }
-	Vec3(const T& x, const T& y, const T& z){ set(x,y,z); }
+	Vec3(const T& x, const T& y, const T& z){ Base::set(x,y,z); }
 
 	Vec3& operator= (const Base& v){ Base::set(v); return *this; }
 };

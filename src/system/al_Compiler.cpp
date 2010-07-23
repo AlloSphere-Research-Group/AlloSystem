@@ -76,9 +76,8 @@ public:
 		printf("JIT emitted Function %s at %p, size %d\n", 
 			F.getName().data(), Code, (int)Size);
 	}
-	virtual void NotifyFreeingMachineCode(const llvm::Function &F, void *OldPtr) {
-		printf("JIT freed Function %s at %p\n", 
-			F.getName().data(), OldPtr);
+	virtual void NotifyFreeingMachineCode(void *OldPtr) {
+		printf("JIT freed %p\n", OldPtr);
 	}
 };
 static JITListener gJITEventListener;
@@ -187,10 +186,10 @@ bool Compiler :: compile(std::string code) {
 	
 	// Header paths:
 	HeaderSearchOptions& headeropts = CI.getHeaderSearchOpts();
-	for (int i=0; i<options.system_includes.size(); i++) {
+	for (unsigned int i=0; i<options.system_includes.size(); i++) {
 		headeropts.AddPath(options.system_includes[i], clang::frontend::Angled, true, false);
 	}
-	for (int i=0; i<options.user_includes.size(); i++) {
+	for (unsigned int i=0; i<options.user_includes.size(); i++) {
 		headeropts.AddPath(options.user_includes[i], clang::frontend::Quoted, true, false);
 	}
 	ApplyHeaderSearchOptions(PP.getHeaderSearchInfo(), headeropts, lang, CI.getTarget().getTriple());
