@@ -29,9 +29,11 @@
 
 #include <map>
 #include <vector>
-#include <ext/hash_map>
-#include <ext/hash_set>
-namespace std { using namespace __gnu_cxx; }
+#if defined(WIN32) || defined(__WINDOWS_MM__)
+#include <unordered_map>
+#else
+#include <tr1/unordered_map>
+#endif
 #include "types/al_Buffer.hpp"
 #include "protocol/al_Graphics.hpp"
 
@@ -115,9 +117,9 @@ public:
 
 protected:	
 	struct TRIANGLE{ int indices[3]; };
-	typedef std::hash_map<int, PointID, IsosurfaceHashInt> ID2PointID;
+	typedef std::tr1::unordered_map<int, PointID, IsosurfaceHashInt> ID2PointID;
+//	typedef std::hash_map<int, PointID, IsosurfaceHashInt> ID2PointID;
 //	typedef std::map<int, PointID> ID2PointID;
-	typedef std::hash_set<int, IsosurfaceHashInt> IndexSet;
 
 	ID2PointID mID2PointID;				// Map of POINT3Ds which form the isosurface
 	al::Buffer<TRIANGLE> mTriangles;	// Array of TRIANGLES indices which form the triangulation of the isosurface
