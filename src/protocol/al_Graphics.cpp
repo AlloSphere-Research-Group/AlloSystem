@@ -76,28 +76,28 @@ void Graphics::compareState(State &prev_state, State &state) {
 		prev_state.blend_src != state.blend_src || 
 		prev_state.blend_dst != state.blend_dst)
 	{
-		mStateDelta.blending = true;
+		mStateChange.blending = true;
 	}
 	
 	// lighting
 	if(prev_state.lighting_enable != state.lighting_enable) {
-		mStateDelta.lighting = true;
+		mStateChange.lighting = true;
 	}
 	
 	// depth testing
 	if(prev_state.depth_enable != state.depth_enable) {
-		mStateDelta.depth_testing = true;
+		mStateChange.depth_testing = true;
 	}
 	
 	// polygon mode
 	if(prev_state.polygon_mode != state.polygon_mode) {
-		mStateDelta.polygon_mode = true;
+		mStateChange.polygon_mode = true;
 	}
 	
 	// anti-aliasing
 	/*
 	if() {
-		mStateDelta.antialiasing = true;
+		mStateChange.antialiasing = true;
 	}
 	*/
 }
@@ -222,41 +222,41 @@ void Graphics::color(double r, double g, double b, double a) {
 void Graphics::enableState() {
 	State &state = mState.top();
 	
-	if(mStateDelta.blending) {
+	if(mStateChange.blending) {
 		mBackend->enableBlending(
 			state.blend_enable,
 			state.blend_src,
 			state.blend_dst
 		);
-		mStateDelta.blending = false;
+		mStateChange.blending = false;
 	}
 	
-	if(mStateDelta.lighting) {
+	if(mStateChange.lighting) {
 		mBackend->enableLighting(
 			state.lighting_enable
 		);
-		mStateDelta.lighting = false;
+		mStateChange.lighting = false;
 	}
 	
-	if(mStateDelta.depth_testing) {
+	if(mStateChange.depth_testing) {
 		mBackend->enableDepthTesting(
 			state.depth_enable
 		);
-		mStateDelta.depth_testing = false;
+		mStateChange.depth_testing = false;
 	}
 	
-	if(mStateDelta.polygon_mode) {
+	if(mStateChange.polygon_mode) {
 		mBackend->setPolygonMode(
 			state.polygon_mode
 		);
-		mStateDelta.polygon_mode = false;
+		mStateChange.polygon_mode = false;
 	}
 	
-	if(mStateDelta.antialiasing) {
+	if(mStateChange.antialiasing) {
 		//mBackend->set_antialiasing(
 		//	state.???
 		//);
-		mStateDelta.antialiasing = false;
+		mStateChange.antialiasing = false;
 	}
 }
 

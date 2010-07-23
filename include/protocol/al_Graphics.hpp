@@ -81,8 +81,8 @@ enum AttributeBit {
 	VIEWPORT_BIT = 1<<3
 };
 
-struct StateDelta {
-	StateDelta()
+struct StateChange {
+	StateChange()
 	:	blending(false),
 		lighting(false),
 		depth_testing(false),
@@ -90,7 +90,7 @@ struct StateDelta {
 		antialiasing(false)
 	{}
 	
-	~StateDelta(){}
+	~StateChange(){}
 
 	bool blending;
 	bool lighting;
@@ -253,7 +253,7 @@ protected:
 	MatrixMode			mMatrixMode;		// matrix stack to use
 	stack<Matrix4d>		mProjectionMatrix;	// projection matrix stack
 	stack<Matrix4d>		mModelViewMatrix;	// modelview matrix stack
-	StateDelta			mStateDelta;		// state difference to mark changes
+	StateChange			mStateChange;		// state difference to mark changes
 	stack<State>		mState;				// state stack
 	
 };
