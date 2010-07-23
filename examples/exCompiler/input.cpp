@@ -62,6 +62,7 @@
 
 using namespace al;
 
+rnd::Random<> rng;
 gfx::GraphicsBackendOpenGL backend;
 gfx::Graphics gl(&backend);
 
@@ -104,9 +105,8 @@ struct MyWindow : WindowGL{
 	void onFrame(){
 		gl.begin(gfx::LINES);
 			for (int i=0; i< NUM_VERTICES; i++) {
-				vertex& v = vertices[i];
-				gl.color(v.r, v.g, v.b, 0.5);
-				gl.vertex(v.x, v.y, v.z);
+				gl.color(rng.uniform(), rng.uniform(), rng.uniform(), 0.5);
+				gl.vertex(rng.uniformS(), rng.uniformS(), rng.uniformS());
 			}
 			
 			gl.color(1, 0, 0.5, 1);

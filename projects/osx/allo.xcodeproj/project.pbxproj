@@ -637,6 +637,7 @@
 		3659D752117B8AC60065EBE4 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		3659D753117B8AC60065EBE4 /* ringbuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ringbuffer.h; sourceTree = "<group>"; };
 		3659D755117B8AFA0065EBE4 /* ringbuffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ringbuffer.c; sourceTree = "<group>"; };
+		3687E26611FA366E00EC6706 /* input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = input.cpp; sourceTree = "<group>"; };
 		369EA3B0116D60CE00EB1934 /* liballoutil.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liballoutil.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		36A20CFC110ACA0E0075A21C /* al_OSCAPR.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OSCAPR.hpp; sourceTree = "<group>"; };
 		36AED02511D4638F000D98C9 /* al_MainLoopGLUT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_MainLoopGLUT.cpp; sourceTree = "<group>"; };
@@ -1280,6 +1281,7 @@
 			isa = PBXGroup;
 			children = (
 				360C274E11E67E2E000FF335 /* exCompiler.cpp */,
+				3687E26611FA366E00EC6706 /* input.cpp */,
 			);
 			path = exCompiler;
 			sourceTree = "<group>";
