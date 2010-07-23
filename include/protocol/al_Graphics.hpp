@@ -74,6 +74,13 @@ enum Primitive {
 	POLYGON
 };
 
+enum AttributeBit {
+	COLOR_BUFFER_BIT = 1<<0,
+	DEPTH_BUFFER_BIT = 1<<1,
+	ENABLE_BIT = 1<<2,
+	VIEWPORT_BIT = 1<<3
+};
+
 struct StateDelta {
 	StateDelta()
 	:	blending(false),

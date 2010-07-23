@@ -112,7 +112,15 @@ void GraphicsBackendOpenGL::color(const Color &c) {
 
 // Frame
 void GraphicsBackendOpenGL::clear(int attribMask) {
-	glClear(attribMask);
+	if (attribMask & COLOR_BUFFER_BIT != 0) {
+		glClear(GL_COLOR_BUFFER_BIT);
+	} else if (attribMask & DEPTH_BUFFER_BIT != 0) {
+		glClear(GL_DEPTH_BUFFER_BIT);
+	} else if (attribMask & ENABLE_BIT != 0) {
+		glClear(GL_ENABLE_BIT);
+	} else if (attribMask & VIEWPORT_BIT != 0) {
+		glClear(GL_VIEWPORT_BIT);
+	}
 }
 
 void GraphicsBackendOpenGL::clearColor(float r, float g, float b, float a) {

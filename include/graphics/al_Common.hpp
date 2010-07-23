@@ -27,15 +27,15 @@ namespace ArrayType{
 }
 
 // attribute masks
-//namespace Attribute{
-//	enum t{
-//		ColorBufferBit	= GL_COLOR_BUFFER_BIT,
-//		DepthBufferBit	= GL_DEPTH_BUFFER_BIT,
-//		EnableBit		= GL_ENABLE_BIT,
-//		ViewPortBit		= GL_VIEWPORT_BIT
-//	};
-//	inline t operator| (const t& a, const t& b){ return t(int(a) | int(b)); }
-//}
+namespace Attribute{
+	enum t{
+		ColorBufferBit	= GL_COLOR_BUFFER_BIT,
+		DepthBufferBit	= GL_DEPTH_BUFFER_BIT,
+		EnableBit		= GL_ENABLE_BIT,
+		ViewPortBit		= GL_VIEWPORT_BIT
+	};
+	inline t operator| (const t& a, const t& b){ return t(int(a) | int(b)); }
+}
 
 namespace BufferType{
 	enum t{
