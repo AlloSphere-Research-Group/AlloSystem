@@ -1,5 +1,7 @@
 #include "utAllocore.h"
 
+static gfx::GraphicsBackendOpenGL backend;
+static gfx::Graphics gl(&backend);
 
 struct MyWindow : WindowGL{
 
@@ -36,11 +38,11 @@ struct MyWindow : WindowGL{
 	}
 
 	void onFrame(){
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 		gl.loadIdentity();
 		gl.viewport(0,0, dimensions().w, dimensions().h);
 		
-		gl.begin(gl.LINE_STRIP);
+		gl.begin(gfx::LINE_STRIP);
 			static float limit = 120;
 			for (float i = 0; i<limit; i++) {
 				float p = i / limit;
@@ -54,7 +56,6 @@ struct MyWindow : WindowGL{
 	
 	void freqs(float v1, float v2){ freq1=v1; freq2=v2; }
 
-	gfx::Graphics gl;
 	float freq1, freq2;
 };
 

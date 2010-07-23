@@ -18,6 +18,7 @@
 #include "math/al_Quat.hpp"
 #include "math/al_Vec.hpp"
 #include "protocol/al_Graphics.hpp"
+#include "protocol/al_GraphicsBackendOpenGL.hpp"
 #include "protocol/al_OSC.hpp"
 #include "protocol/al_OSCAPR.hpp"
 #include "protocol/al_Serialize.hpp"
@@ -52,5 +53,6 @@ int utSystem();
 int utTypes();
 int utTypesConversion();
 int utThreadAPR();
+int utFileAPR();
 
 #endif

@@ -212,6 +212,10 @@
 		3687E33C11FA4F9500EC6706 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
 		3687E33D11FA4F9500EC6706 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		3687E34311FA4FA100EC6706 /* exIsosurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3687E2BE11FA39F900EC6706 /* exIsosurface.cpp */; };
+		3687E35211FA501200EC6706 /* al_FileAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3687E35111FA501200EC6706 /* al_FileAPR.cpp */; };
+		3687E35311FA501200EC6706 /* al_FileAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3687E35111FA501200EC6706 /* al_FileAPR.cpp */; };
+		3687E35511FA503600EC6706 /* utFileAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3687E35411FA503600EC6706 /* utFileAPR.cpp */; };
+		3687E37E11FA51FC00EC6706 /* al_Surface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36D69A5211F9267800699158 /* al_Surface.cpp */; };
 		36AED02711D4638F000D98C9 /* al_MainLoopGLUT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36AED02511D4638F000D98C9 /* al_MainLoopGLUT.cpp */; };
 		36B4129910EFF864007B16D0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		36B412B010EFF916007B16D0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
@@ -657,6 +661,9 @@
 		3687E26611FA366E00EC6706 /* input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = input.cpp; sourceTree = "<group>"; };
 		3687E2BE11FA39F900EC6706 /* exIsosurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exIsosurface.cpp; sourceTree = "<group>"; };
 		3687E34111FA4F9500EC6706 /* exIsosurface */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exIsosurface; sourceTree = BUILT_PRODUCTS_DIR; };
+		3687E35011FA4FE500EC6706 /* al_FileAPR.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_FileAPR.hpp; sourceTree = "<group>"; };
+		3687E35111FA501200EC6706 /* al_FileAPR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_FileAPR.cpp; sourceTree = "<group>"; };
+		3687E35411FA503600EC6706 /* utFileAPR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utFileAPR.cpp; sourceTree = "<group>"; };
 		369EA3B0116D60CE00EB1934 /* liballoutil.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liballoutil.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		36A20CFC110ACA0E0075A21C /* al_OSCAPR.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OSCAPR.hpp; sourceTree = "<group>"; };
 		36AED02511D4638F000D98C9 /* al_MainLoopGLUT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_MainLoopGLUT.cpp; sourceTree = "<group>"; };
@@ -1102,6 +1109,7 @@
 				16AC52A611628D4D0076AA8B /* utTypes.cpp */,
 				166DD744117CDBFD00A8BA12 /* utTypesConversion.cpp */,
 				36E4158411E9A37400A8A63D /* utThreadAPR.cpp */,
+				3687E35411FA503600EC6706 /* utFileAPR.cpp */,
 			);
 			name = unitTests;
 			path = ../../unitTests;
@@ -1375,6 +1383,7 @@
 				3622BEE1116D527D00928703 /* al_WindowGL.cpp */,
 				3622BEE2116D527D00928703 /* al_WindowGLUT.cpp */,
 				3622BEE3116D527D00928703 /* Makefile.config */,
+				3687E35111FA501200EC6706 /* al_FileAPR.cpp */,
 			);
 			path = io;
 			sourceTree = "<group>";
@@ -1638,6 +1647,7 @@
 				36F46822110BE2E90082D21E /* al_File.hpp */,
 				36B4BF06110E55AF00F789A8 /* al_Socket.hpp */,
 				36F46823110BE2E90082D21E /* al_WindowGL.hpp */,
+				3687E35011FA4FE500EC6706 /* al_FileAPR.hpp */,
 			);
 			path = io;
 			sourceTree = "<group>";
@@ -2076,6 +2086,9 @@
 				36E4158511E9A37400A8A63D /* utThreadAPR.cpp in Sources */,
 				16B042EF11F80650002FDB85 /* al_ThreadAPR.cpp in Sources */,
 				160FD0E111FA1CF4001E8987 /* al_Isosurface.cpp in Sources */,
+				3687E35311FA501200EC6706 /* al_FileAPR.cpp in Sources */,
+				3687E35511FA503600EC6706 /* utFileAPR.cpp in Sources */,
+				3687E37E11FA51FC00EC6706 /* al_Surface.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2194,6 +2207,7 @@
 				36D69A4511F925FC00699158 /* al_GraphicsBackendOpenGL.cpp in Sources */,
 				36D69A5311F9267800699158 /* al_Surface.cpp in Sources */,
 				3687E2B511FA399A00EC6706 /* al_Isosurface.cpp in Sources */,
+				3687E35211FA501200EC6706 /* al_FileAPR.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
