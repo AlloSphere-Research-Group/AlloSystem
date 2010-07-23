@@ -63,8 +63,8 @@ public:
 	Texture(GraphicsBackend *backend);
 	virtual ~Texture();
 	
-	void bind(int unit);
-	void unbind(int unit);
+	void bind(int unit = 0);
+	void unbind(int unit = 0);
 	void setLatticeFormat(AlloLatticeHeader &header);
 	void fromLattice(al::Lattice *lattice);
 	

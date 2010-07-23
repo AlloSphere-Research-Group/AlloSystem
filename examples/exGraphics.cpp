@@ -171,7 +171,7 @@ static void drawScene(void * self) {
 	
 	gl.pushMatrix();
 	gl.scale(2, 2, 2);
-		surface_tex->bind(0);
+		surface_tex->bind();
 		gl.begin(gfx::QUADS);
 			gl.color(1, 1, 1, 1);
 			gl.texcoord(0, 0);
@@ -186,13 +186,13 @@ static void drawScene(void * self) {
 			gl.texcoord(0, 1);
 			gl.vertex(-1, 1);
 		gl.end();
-		surface_tex->unbind(0);
+		surface_tex->unbind();
 	gl.popMatrix();
 
 	
 	gl.pushMatrix();
 	gl.translate(1, 1, 0);
-		texture->bind(0);
+		texture->bind();
 		gl.draw();
 		/*
 		gl.begin(gfx::QUADS);
@@ -210,7 +210,7 @@ static void drawScene(void * self) {
 			gl.vertex(-1, 1);
 		gl.end();
 		*/
-		texture->unbind(0);
+		texture->unbind();
 	gl.popMatrix();
 	
 	gl.matrixMode(gfx::PROJECTION);
