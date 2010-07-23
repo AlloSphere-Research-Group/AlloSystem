@@ -2,34 +2,16 @@
 
 namespace al{
 
-void Nav :: toAED(const Vec3d& to, double& azimuth, double& elevation, double& distance) const {
-	
-	Vec3d rel = to - vec();
-	distance = rel.mag();
-	
-	if (distance > QUAT_EPSILON*2) 
-	{
-		rel.normalize();
-		
-		// dot product of A & B vectors is the similarity or cosine:
-		double xness = rel.dot(mUX); 
-		double yness = rel.dot(mUY);
-		double zness = rel.dot(mUZ);
-		
-		azimuth = -atan2(xness, zness);
-		elevation = asin(yness);
-	} else {
-		// near origin; might as well assume 0 to avoid denormals
-		// do not set az/el; they may already have more meaningful values
-		distance = 0.0;
-	}
-
+Nav :: Nav()
+:	Pose()
+{
+	updateUnitVectors();
 }
 
-void Nav :: updateUnitVectors() {
-	mQuat.toVectorX(mUX);
-	mQuat.toVectorY(mUY);
-	mQuat.toVectorZ(mUZ);
+Nav :: Nav(const Vec3d &v)
+:	Pose(v)
+{
+	updateUnitVectors();
 }
 
 void Nav :: step() {
@@ -57,5 +39,29 @@ void Nav :: step(double dt) {
 	}
 }
 
+
+void Nav :: toAED(const Vec3d& to, double& azimuth, double& elevation, double& distance) const {
+	
+	Vec3d rel = to - vec();
+	distance = rel.mag();
+	
+	if (distance > QUAT_EPSILON*2) 
+	{
+		rel.normalize();
+		
+		// dot product of A & B vectors is the similarity or cosine:
+		double xness = rel.dot(mUX); 
+		double yness = rel.dot(mUY);
+		double zness = rel.dot(mUZ);
+		
+		azimuth = -atan2(xness, zness);
+		elevation = asin(yness);
+	} else {
+		// near origin; might as well assume 0 to avoid denormals
+		// do not set az/el; they may already have more meaningful values
+		distance = 0.0;
+	}
+
+}
 
 } // al::

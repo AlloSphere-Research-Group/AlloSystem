@@ -6,7 +6,7 @@ ViewPort :: ViewPort(double eyeSep)
 :	mEyeSep(eyeSep), mCamera(Camera::defaultCamera())
 {
 	dimensions(1,1,0,0);
-	mUserProjectionTransform.set(Matrix4d::Identity());
+	mUserProjectionTransform.set(Matrix4d::identity());
 }
 
 ViewPort :: ~ViewPort() {

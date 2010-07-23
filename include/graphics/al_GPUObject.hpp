@@ -14,6 +14,7 @@ public:
 
 	/// Returns the assigned object id
 	const uint32_t id() const { return mID; }
+	void id(uint32_t v) {mID = v;}
 	
 	bool created(){ return id()!=0; }
 
@@ -24,8 +25,12 @@ public:
 	}
 	
 	/// Destroys object on GPU
-	void destroy(){ onDestroy(); mID=0; }
-
+	void destroy(){ 
+		if(! created()) {
+			onDestroy(); mID=0; 
+		}
+	}
+	
 protected:
 	uint32_t mID;
 	virtual void onCreate() = 0;

@@ -34,51 +34,111 @@
 */
 
 #include "math/al_Vec.hpp"
+#include "math/al_Matrix4.hpp"
 #include "types/al_Buffer.hpp"
 #include "types/al_Color.hpp"
+
+#include <stack>
+using std::stack;
 
 namespace al{
 namespace gfx{
 
-
-namespace Backend{
-	enum type{
-		None = 0,
-		AutoDetect,
-		OpenGL,
-		OpenGLES1,
-		OpenGLES2
-	};
-}
-
-
-
-template <int N, class T>
-struct ArrayN{
-	ArrayN(const T& v=T()){ for(int i=0; i<N; ++i) mElems[i]=v; }
-	ArrayN(const T& a, const T& b){ mElems[0]=a; mElems[1]=b; }
-	ArrayN(const T& a, const T& b, const T& c){ mElems[0]=a; mElems[1]=b; mElems[2]=c; }
-	ArrayN(const T& a, const T& b, const T& c, const T& d){ mElems[0]=a; mElems[1]=b; mElems[2]=c; mElems[3]=d; }
-	T& operator[](int i){ return mElems[i]; }
-	const T& operator[](int i) const { return mElems[i]; }
-	T mElems[N];
+enum BlendFunc {
+	SRC_ALPHA = 0,
+	SRC_COLOR,
+	DST_ALPHA,
+	DST_COLOR,
+	ZERO,
+	ONE
 };
 
+enum PolygonMode {
+	POINT = 0,
+	LINE,
+	FILL
+};
+
+enum MatrixMode {
+	MODELVIEW = 0,
+	PROJECTION
+};
+
+enum Primitive {
+	POINTS = 0,
+	LINES,
+	LINE_STRIP,
+	LINE_LOOP,
+	TRIANGLES,
+	QUADS,
+	POLYGON
+};
+
+struct StateDelta {
+	StateDelta()
+	:	blending(false),
+		lighting(false),
+		depth_testing(false),
+		polygon_mode(false),
+		antialiasing(false)
+	{}
+	
+	~StateDelta(){}
+
+	bool blending;
+	bool lighting;
+	bool depth_testing;
+	bool polygon_mode;
+	bool antialiasing;
+};
+
+
+struct State {
+	State()
+	:	blend_enable(false),
+		blend_src(SRC_COLOR),
+		blend_dst(DST_COLOR),
+		lighting_enable(false),
+		depth_enable(true),
+		polygon_mode(FILL)
+	{}
+	
+	~State() {}
+	
+
+	// Blending
+	bool blend_enable;
+	BlendFunc blend_src;
+	BlendFunc blend_dst;
+	
+	// Lighting
+	bool lighting_enable;
+	
+	// Depth Testing
+	bool depth_enable;
+	
+	// Polygon Mode
+	PolygonMode polygon_mode;
+	
+	// Anti-Aliasing
+	
+};
 
 class GraphicsData{
 public:
 
-	typedef Vec3<float>		Vertex;
-	typedef Vec3<float>		Normal;
-	typedef Vec4<float>		Color;
-	typedef Vec2<float>		TexCoord2;
-	typedef Vec3<float>		TexCoord3;
+	typedef Vec<3,float>	Vertex;
+	typedef Vec<3,float>	Normal;
+	typedef Vec<4,float>	Color;
+	typedef Vec<2,float>	TexCoord2;
+	typedef Vec<3,float>	TexCoord3;
 	typedef unsigned int	Index;
 
 	/// Reset all buffers
 	void resetBuffers();
+	void equalizeBuffers();
 
-	int primitive() const { return mPrimitive; } 
+	Primitive primitive() const { return mPrimitive; } 
 	const Buffer<Vertex>& vertices() const { return mVertices; }
 	const Buffer<Normal>& normals() const { return mNormals; }
 	const Buffer<Color>& colors() const { return mColors; }
@@ -92,7 +152,7 @@ public:
 	void addTexCoord(float u, float v){ texCoord2s().append(TexCoord2(u,v)); }
 	void addTexCoord(float u, float v, float w){ texCoord3s().append(TexCoord3(u,v,w)); }
 	void addVertex(float x, float y, float z=0){ vertices().append(Vertex(x,y,z)); }
-	void primitive(int prim){ mPrimitive=prim; }
+	void primitive(Primitive prim){ mPrimitive=prim; }
 
 	Buffer<Vertex>& vertices(){ return mVertices; }
 	Buffer<Normal>& normals(){ return mNormals; }
@@ -112,9 +172,13 @@ protected:
 	
 	Buffer<Index> mIndices;
 
-	int mPrimitive;
+	Primitive mPrimitive;
 };
 
+
+
+
+class GraphicsBackend;
 
 /*
 	Graphics knows how to draw GraphicsData
@@ -123,53 +187,69 @@ protected:
 class Graphics {
 public:
 
-	Graphics(gfx::Backend::type backend = gfx::Backend::AutoDetect);
+//	Graphics(gfx::Backend::type backend = gfx::Backend::AutoDetect);
+	Graphics(GraphicsBackend *backend);
 	~Graphics();
+	
+	// Rendering State
+	void pushState(State &state);
+	void popState();
 
-	void clear(int attribMask){ s_clear(attribMask); }
-	void clearColor(float r, float g, float b, float a){ s_clearColor(r,g,b,a); }
-	void loadIdentity(){ s_loadIdentity(); }
-	void draw(const GraphicsData& v){ s_draw(v); }
-	void draw(){ draw(mGraphicsData); }
-	void viewport(int x, int y, int width, int height){ s_viewport(x,y,width,height); }
-
-	void begin(int mode) { s_begin(this, mode); }
-	void end() { s_end(this); }
+	// Frame
+	void clear(int attribMask);
+	void clearColor(float r, float g, float b, float a);
 	
-	void vertex(double x, double y, double z=0.) { s_vertex(this, x, y, z); }
-	void normal(double x, double y, double z=0.) { s_normal(this, x, y, z); }
-	void color(double r, double g, double b, double a=1.) { s_color(this, r, g, b, a); }
+	// Coordinate Transforms
+	void viewport(int x, int y, int width, int height);
+	void matrixMode(MatrixMode mode);
+	MatrixMode matrixMode();
+	void pushMatrix();
+	void popMatrix();
+	void loadIdentity();
+	void loadMatrix(const Matrix4d &m);
+	void multMatrix(const Matrix4d &m);
+	void translate(double x, double y, double z);
+	void rotate(double angle, double x, double y, double z);
+	void scale(double x, double y, double z);
 	
-	bool setBackend(gfx::Backend::type backend);
+	// Immediate Mode
+	void begin(Primitive mode);
+	void end();
 	
-	gfx::Backend::type mBackend;
-	int POINTS, LINES, LINE_LOOP, LINE_STRIP, TRIANGLES, TRIANGLE_STRIP, TRIANGLE_FAN, QUADS, QUAD_STRIP, POLYGON;
-	int COLOR_BUFFER_BIT, DEPTH_BUFFER_BIT;
+	void vertex(double x, double y, double z=0.);
+	void texcoord(double u, double v);
+	void normal(double x, double y, double z=0.);
+	void color(double r, double g, double b, double a=1.);
 	
-	void (*s_draw)(const GraphicsData& v);
-	void (*s_clear)(int mask);
-	void (*s_clearColor)(float r, float g, float b, float a);
-	void (*s_loadIdentity)();
-	void (*s_viewport)(int x, int y, int w, int h);
 	
-	void (*s_begin)(Graphics * g, int mode);
-	void (*s_end)(Graphics * g);
-	void (*s_vertex)(Graphics * g, double x, double y, double z);
-	void (*s_normal)(Graphics * g, double x, double y, double z);
-	void (*s_color)(Graphics * g, double x, double y, double z, double a);
+	// Buffer drawing
+	void draw(const GraphicsData& v);
+	void draw();
 	
+	GraphicsBackend * backend() { return mBackend; }
 	GraphicsData& data() { return mGraphicsData; }
 	
+	
 protected:
-	GraphicsData mGraphicsData;	// used for immediate mode style rendering
+	void compareState(State &prev_state, State &state);
+	void enableState();
+	void drawBegin();
+	void drawEnd();
+	
+	stack<Matrix4d> & matrixStackForMode(MatrixMode mode);
+	
+	
+protected:
+	GraphicsBackend	*	mBackend;			// graphics API implementation
+	GraphicsData		mGraphicsData;		// used for immediate mode style rendering
+	bool				mInImmediateMode;	// flag for whether or not in immediate mode
+	MatrixMode			mMatrixMode;		// matrix stack to use
+	stack<Matrix4d>		mProjectionMatrix;	// projection matrix stack
+	stack<Matrix4d>		mModelViewMatrix;	// modelview matrix stack
+	StateDelta			mStateDelta;		// state difference to mark changes
+	stack<State>		mState;				// state stack
+	
 };
-
-extern bool setBackendNone(Graphics * g);
-extern bool setBackendOpenGL(Graphics * g);
-extern bool setBackendOpenGLES(Graphics * g);
-extern bool setBackendOpenGLES1(Graphics * g);
-extern bool setBackendOpenGLES2(Graphics * g);
-
 
 } // ::al::gfx
 } // ::al

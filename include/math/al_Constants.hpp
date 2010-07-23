@@ -69,6 +69,12 @@ namespace al {
 #ifndef M_SQRT1_2
 #define M_SQRT1_2	0.707106781186547524400844362104849039
 #endif
+#ifndef M_DEG2RAD
+#define M_DEG2RAD	0.017453292519943
+#endif
+#ifndef M_RAD2DEG
+#define M_RAD2DEG	57.295779513082
+#endif
 
 // Some other useful constants
 #ifndef M_2PI

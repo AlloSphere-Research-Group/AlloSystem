@@ -1,15 +1,13 @@
 #ifndef INCLUDE_AL_MATRIX4_HPP
 #define INCLUDE_AL_MATRIX4_HPP
 
+#include "math/al_Constants.hpp"
 #include "math/al_Quat.hpp"
 #include "math/al_Vec.hpp"
 
 namespace al {
 
 template<class T> class Matrix4;
-
-typedef Matrix4<double>	Matrix4d;	///< Double-precision quaternion
-typedef Matrix4<float>	Matrix4f;	///< Single-precision quaternion
 
 /// 4x4 Matrix (Homogenous Transform)
 template<typename T=double>
@@ -33,10 +31,24 @@ public:
 		const T& v14, const T& v24, const T& v34, const T& v44
 	)
 	:	Base(
-			v11, v12, v13, v14,
-			v21, v22, v23, v24,
-			v31, v32, v33, v34,
-			v41, v42, v43, v44
+			v11, v21, v31, v41,
+			v12, v22, v32, v42,
+			v13, v23, v33, v43,
+			v14, v24, v34, v44
+		)
+	{}
+	
+	Matrix4(
+		const Vec3<T>& xaxis,
+		const Vec3<T>& yaxis,
+		const Vec3<T>& zaxis,
+		const Vec3<T>& position
+	)
+	:	Base(
+			xaxis[0], xaxis[1], xaxis[2], 0,
+			yaxis[0], yaxis[1], yaxis[2], 0,
+			zaxis[0], zaxis[1], zaxis[2], 0,
+			position[0], position[1], position[2], 1
 		)
 	{}
 	
@@ -57,38 +69,34 @@ public:
 	}
 	void fromQuat(Quat<T>& q) { q.toMatrix(Base::elems); }
 		
-	static const Matrix4 Identity() {
-		Matrix4 m(
+	static const Matrix4 identity() {
+		return Matrix4(
 			1,	0,	0,	0, 
 			0,	1,	0,	0, 
 			0,	0,	1,	0, 
 			0,	0,	0,	1
 		);
-		return m;
 	}
 	
-	static const Matrix4 Translate(T x, T y, T z) {
-		Matrix4 m(
+	static const Matrix4 translate(T x, T y, T z) {
+		return Matrix4(
 			1, 0, 0, 0,
 			0, 1, 0, 0,
 			0, 0, 1, 0,
 			x, y, z, 1
 		);
-		return m;
 	}	
 	
-	static const Matrix4 Scale(T x, T y, T z) {
-		Matrix4 m;/*(
+	static const Matrix4 scale(T x, T y, T z) {
+		return Matrix4(
 			x,	0,	0,	0,
 			0,	y,	0,	0, 
 			0,	0,	z,	0, 
 			0,	0,	0,	1
-		);*/
-		
-		return m;
+		);
 	}
 	
-	static const Matrix4 RotateYZ(T theta) {
+	static const Matrix4 rotateYZ(T theta) {
 		const T C = cos(theta); 
 		const T S = sin(theta);
 		const T m[] = {	1,	0,	0,	0, 
@@ -97,7 +105,7 @@ public:
 						0,	0,	0,	1 };
 		return Matrix4(m);
 	}
-	static const Matrix4 RotateZX(T theta) {
+	static const Matrix4 rotateZX(T theta) {
 		const T C = cos(theta); 
 		const T S = sin(theta);
 		const T m[] = {	C,	0,	S,	0, 
@@ -106,7 +114,7 @@ public:
 						0,	0,	0,	1 };
 		return Matrix4(m);
 	}
-	static const Matrix4 RotateXY(T theta) {
+	static const Matrix4 rotateXY(T theta) {
 		const T C = cos(theta); 
 		const T S = sin(theta);
 		const T m[] = {	C,	-S,	0,	0, 
@@ -120,8 +128,8 @@ public:
 		Vec<3, T> axis(v);
 		axis.normalize();
 		
-		float c = cos(angle*QUAT_DEG2RAD);
-		float s = sin(angle*QUAT_DEG2RAD);
+		float c = cos(angle*M_DEG2RAD);
+		float s = sin(angle*M_DEG2RAD);
 			
 		Matrix4 m(
 			axis[0]*axis[0]*(1-c)+c,
@@ -145,21 +153,21 @@ public:
 		return m;
 	}
 	
-	static const Matrix4 ShearYZ(T y, T z) {
+	static const Matrix4 shearYZ(T y, T z) {
 		const T m[] = {	1,	0,	0,	0, 
 						y,	1,	0,	0, 
 						z,	0,	1,	0, 
 						0,	0,	0,	1 };
 		return Matrix4(m);
 	}
-	static const Matrix4 ShearZX(T z, T x) {
+	static const Matrix4 shearZX(T z, T x) {
 		const T m[] = {	1,	x,	0,	0, 
 						0,	1,	0,	0, 
 						0,	z,	1,	0, 
 						0,	0,	0,	1 };
 		return Matrix4(m);
 	}
-	static const Matrix4 ShearXY(T x, T y) {
+	static const Matrix4 shearXY(T x, T y) {
 		const T m[] = {	1,	0,	x,	0, 
 						0,	1,	y,	0, 
 						0,	0,	1,	0, 
@@ -167,7 +175,17 @@ public:
 		return Matrix4(m);
 	}
 	
-	static const Matrix4 Perspective(T l, T r, T b, T t, T n, T f) {
+	static const Matrix4 perspective(T fovy, T aspect, T near, T far) {
+		float f = 1/tan(fovy*M_DEG2RAD/2.);
+		return Matrix4(
+			f/aspect, 0, 0, 0,
+			0, f, 0, 0,
+			0, 0, (far+near)/(near-far), -1,
+			0, 0, (2*far*near)/(near-far), 0
+		);
+	}
+	
+	static const Matrix4 perspective(T l, T r, T b, T t, T n, T f) {
 		const T W = r-l;	const T W2 = r+l;
 		const T H = t-b;	const T H2 = t+b;
 		const T D = f-n;	const T D2 = f+n;
@@ -180,7 +198,7 @@ public:
 		return Matrix4(m);
 	}
 	
-	static const Matrix4 UnPerspective(T l, T r, T b, T t, T n, T f) {
+	static const Matrix4 unPerspective(T l, T r, T b, T t, T n, T f) {
 		const T W = r-l;	const T W2 = r+l;
 		const T H = t-b;	const T H2 = t+b;
 		const T D = f-n;	const T D2 = f+n;
@@ -193,7 +211,7 @@ public:
 		return Matrix4(m);
 	}
 	
-	static const Matrix4 Ortho(T l, T r, T b, T t, T n, T f) {
+	static const Matrix4 ortho(T l, T r, T b, T t, T n, T f) {
 		const T W = r-l;	const T W2 = r+l;
 		const T H = t-b;	const T H2 = t+b;
 		const T D = f-n;	const T D2 = f+n;
@@ -204,7 +222,7 @@ public:
 		return Matrix4(m);
 	}
 	
-	static const Matrix4 UnOrtho(T l, T r, T b, T t, T n, T f) {
+	static const Matrix4 unOrtho(T l, T r, T b, T t, T n, T f) {
 		const T W = r-l;	const T W2 = r+l;
 		const T H = t-b;	const T H2 = t+b;
 		const T D = f-n;	const T D2 = f+n;
@@ -217,14 +235,9 @@ public:
 		
 };
 
+typedef Matrix4<double>	Matrix4d;	///< Double-precision quaternion
+typedef Matrix4<float>	Matrix4f;	///< Single-precision quaternion
 
-
-
-
-
-/// Implementation
-
-
-} // namespace
+} // al::
 
 #endif /* include guard */

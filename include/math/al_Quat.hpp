@@ -352,9 +352,9 @@ inline void Quat<T> :: toEuler(T * e) const {
 	T sqx = x*x;
 	T sqy = y*y;
 	T sqz = z*z;
-	e[0] = QUAT_RAD2DEG * asin(-2.0 * (x*z - w*y));
-	e[1] = QUAT_RAD2DEG * atan2(2.0 * (y*z + w*x),(sqw - sqx - sqy + sqz));
-	e[2] = QUAT_RAD2DEG * atan2(2.0 * (x*y + w*z), (sqw + sqx - sqy - sqz));
+	e[0] = M_RAD2DEG * asin(-2.0 * (x*z - w*y));
+	e[1] = M_RAD2DEG * atan2(2.0 * (y*z + w*x),(sqw - sqx - sqy + sqz));
+	e[2] = M_RAD2DEG * atan2(2.0 * (x*y + w*z), (sqw + sqx - sqy - sqz));
 }
 
 template<typename T>
@@ -580,7 +580,7 @@ void Quat<T> :: towardPoint(Vec3<T> &pos, Quat<T> &q, Vec3<T> &v, float amt) {
 	}
 	
 	if(along < 0.9995 && axis_mag_sqr > 0.001) {
-		float theta = ABS(amt)*acos(along)*QUAT_RAD2DEG;
+		float theta = ABS(amt)*acos(along)*M_RAD2DEG;
 //			printf("theta: %f  amt: %f\n", theta, amt);
 		fromAxisAngle(theta, axis.x, axis.y, axis.z);
 	}

@@ -12,7 +12,11 @@ namespace al {
 class Pose {
 public:
 	Pose(): mVec(0){ mQuat.identity(); }
-
+	Pose(const Vec3d &v): mVec(v) { mQuat.identity(); }
+	
+	Vec3d& pos(){ return mVec; }
+	const Vec3d& pos() const { return mVec; }
+	
 	Vec3d& vec(){ return mVec; }
 	const Vec3d& vec() const { return mVec; }
 
@@ -31,6 +35,10 @@ protected:
 class Nav : public Pose {
 public:
 
+	Nav();
+	Nav(const Vec3d &v);
+	virtual ~Nav() {}
+
 	Pose& vel(){ return mVel; }
 	const Pose& vel() const { return mVel; }
 
@@ -47,14 +55,10 @@ public:
 	void step();
 	
 	/// scale the velocities by amt:
-	void decay(double amt) {
-		mVel.vec() *= amt;
-		mVel.quat() *= amt;
-		updateUnitVectors();
-	}
+	void decay(double amt);
 	
-	void	view(const Quatd & v) { quat().set(v); updateUnitVectors(); }
-	void	turn(const Quatd & v) { vel().quat().set(v); }
+	void	view(const Quatd & v);
+	void	turn(const Quatd & v);
 	
 	void	move(double x, double y, double z) { moveX(x); moveY(y); moveZ(z); }
 	void	moveX(double amount) { vel().vec()[0] = amount; }
@@ -66,8 +70,8 @@ public:
 	void	pushY(double amount) { vel().vec()[1] += amount; }
 	void	pushZ(double amount) { vel().vec()[2] += amount; }
 	
-	void	halt() { vel().quat().identity(); vel().vec().set(0); }
-	void	home() { quat().identity(); vec().set(0); updateUnitVectors(); }
+	void	halt();
+	void	home();
 	
 	// get the azimuth, elevation & distance from this to another point
 	void toAED(const Vec3d& to, double& azimuth, double& elevation, double& distance) const;
@@ -92,6 +96,41 @@ public:
 protected:
 	Nav * mParent;
 };
+
+
+// Implementation --------------------------------------------------------------
+
+inline void Nav :: updateUnitVectors() {
+	mQuat.toVectorX(mUX);
+	mQuat.toVectorY(mUY);
+	mQuat.toVectorZ(mUZ);
+}
+
+inline void Nav :: decay(double amt) {
+	mVel.vec() *= amt;
+	mVel.quat() *= amt;
+	updateUnitVectors();
+}
+
+inline void Nav :: view(const Quatd & v) { 
+	quat().set(v);
+	updateUnitVectors();
+}
+
+inline void Nav :: turn(const Quatd & v) {
+	vel().quat().set(v);
+}
+
+inline void Nav :: halt() {
+	vel().quat().identity();
+	vel().vec().set(0);
+}
+
+inline void Nav :: home() {
+	quat().identity();
+	vec().set(0);
+	updateUnitVectors();
+}
 
 
 } // al::

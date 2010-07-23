@@ -66,13 +66,116 @@ protected:
 	
 public:
 
+	Lattice() {
+		data.ptr = 0;
+		header.dimcount = 0;
+		
+		create1d(3, AlloPointer32Ty, 1, 0);
+		data_calloc();
+	}
+	
+
 	size_t size() { return allo_lattice_size(this); }
 	
 	void data_calloc() {
 		data.ptr = (char *)calloc(1, size());
 	}
 	void data_free() {
-		free(data.ptr);
+		if(data.ptr) {
+			free(data.ptr);
+		}
+	}
+	
+	bool equal(AlloLatticeHeader &h2) {
+		bool equiv =	header.components == h2.components && 
+						header.type == h2.type && 
+						header.dimcount == h2.dimcount;
+						
+		for(int i=0; i < header.dimcount; i++) {
+			equiv &= header.dim[i] == h2.dim[i];
+			equiv &= header.stride[i] == h2.stride[i];
+		}
+
+		return equiv;
+	}
+	
+	void create1d(int components, AlloTy type, int w, size_t align = 4) {
+		define1d(components, type, w, align);
+		data_calloc();
+	}
+	
+	void create2d(int components, AlloTy type, int w, int h, size_t align = 4) {
+		define2d(components, type, w, h, align);
+		data_calloc();
+	}
+	
+	void create3d(int components, AlloTy type, int w, int h, int d, size_t align = 4) {
+		define3d(components, type, w, h, d, align);
+		data_calloc();
+	}
+	
+	void create(AlloLatticeHeader &h) {
+		define(h);
+		data_calloc();
+	}
+
+	void adapt1d(int components, AlloTy type, int w, size_t align = 4) {
+		AlloLatticeHeader h;
+		h.type = type;
+		h.components = components;
+		h.dimcount = 1;
+		h.dim[0] = w;
+		allo_lattice_setstride(&h, align);
+		adapt(h);
+	}
+	
+	void adapt2d(int components, AlloTy type, int w, int h, size_t align = 4) {
+		AlloLatticeHeader hh;
+		hh.type = type;
+		hh.components = components;
+		hh.dimcount = 2;
+		hh.dim[0] = w;
+		hh.dim[1] = h;
+		allo_lattice_setstride(&hh, align);
+		adapt(hh);
+	}
+	
+	void adapt3d(int components, AlloTy type, int w, int h, int d, size_t align = 4) {
+		AlloLatticeHeader hh;
+		hh.type = type;
+		hh.components = components;
+		hh.dimcount = 3;
+		hh.dim[0] = w;
+		hh.dim[1] = h;
+		hh.dim[2] = d;
+		allo_lattice_setstride(&hh, align);
+		adapt(hh);
+	}
+	
+	void adapt(AlloLatticeHeader &h) {
+		if(! equal(h)) {
+			data_free();
+			define(h);
+			data_calloc();
+		}
+	}
+	
+	void adapt(AlloLattice *lattice) {
+		if(! equal(lattice->header)) {
+			data_free();
+			define(lattice->header);
+			data_calloc();
+		}
+	}
+	
+	void define(AlloLatticeHeader &h2) {
+		header.components = h2.components;
+		header.type = h2.type;
+		header.dimcount = h2.dimcount;
+		for(int i=0; i < header.dimcount; i++) {
+			header.dim[i] = h2.dim[i];
+			header.stride[i] = h2.stride[i];
+		}
 	}
 
 	void define1d(uint32_t components, AlloTy ty, uint32_t dimx, size_t align = 4) {

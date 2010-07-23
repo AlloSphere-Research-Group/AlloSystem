@@ -1,11 +1,10 @@
 #include "protocol/al_Graphics.hpp"
+#include "protocol/al_GraphicsBackend.hpp"
 
 namespace al {
 namespace gfx{
 
-
-
-void GraphicsData::resetBuffers(){
+void GraphicsData::resetBuffers() {
 	vertices().clear();
 	normals().clear();
 	colors().clear();
@@ -14,7 +13,303 @@ void GraphicsData::resetBuffers(){
 	indices().clear();	
 }
 
+void GraphicsData::equalizeBuffers() {
+	int VS = vertices().size();
+	int NS = normals().size();
+	int CS = colors().size();
+	int T2S = texCoord2s().size();
+	int T3S = texCoord3s().size();
+	
+	if(NS > 0) {
+		for(int i=NS; i < VS; i++) {
+			normals().append(normals()[NS-1]);
+		}
+	}
+	if(CS > 0) {
+		for(int i=CS; i < VS; i++) {
+			colors().append(colors()[CS-1]);
+		}
+	}
+	if(T2S > 0) {
+		for(int i=T2S; i < VS; i++) {
+			texCoord2s().append(texCoord2s()[T2S-1]);
+		}
+	}
+	if(T3S > 0) {
+		for(int i=T3S; i < VS; i++) {
+			texCoord3s().append(texCoord3s()[T3S-1]);
+		}
+	}
+}
 
+
+
+
+Graphics::Graphics(GraphicsBackend *backend)
+:	mBackend(backend),
+	mInImmediateMode(false),
+	mMatrixMode(MODELVIEW)
+{
+	mProjectionMatrix.push(Matrix4d::identity());
+	mModelViewMatrix.push(Matrix4d::identity());
+	mState.push(State());
+}
+
+Graphics::~Graphics() {
+}
+
+// Rendering State
+void Graphics::pushState(State &state) {
+	compareState(mState.top(), state);
+	mState.push(state);
+}
+
+void Graphics::popState() {
+	State &prev_state = mState.top();
+	mState.pop();
+	compareState(prev_state, mState.top());
+}
+
+void Graphics::compareState(State &prev_state, State &state) {
+	// blending
+	if(	prev_state.blend_enable != state.blend_enable || 
+		prev_state.blend_src != state.blend_src || 
+		prev_state.blend_dst != state.blend_dst)
+	{
+		mStateDelta.blending = true;
+	}
+	
+	// lighting
+	if(prev_state.lighting_enable != state.lighting_enable) {
+		mStateDelta.lighting = true;
+	}
+	
+	// depth testing
+	if(prev_state.depth_enable != state.depth_enable) {
+		mStateDelta.depth_testing = true;
+	}
+	
+	// polygon mode
+	if(prev_state.polygon_mode != state.polygon_mode) {
+		mStateDelta.polygon_mode = true;
+	}
+	
+	// anti-aliasing
+	/*
+	if() {
+		mStateDelta.antialiasing = true;
+	}
+	*/
+}
+
+
+// Frame
+void Graphics::clear(int attribMask) {
+	mBackend->clear(attribMask);
+}
+
+void Graphics::clearColor(float r, float g, float b, float a) {
+	mBackend->clearColor(r, g, b, a);
+}
+
+
+// Coordinate Transforms
+void Graphics::viewport(int x, int y, int width, int height) {
+	mBackend->viewport(x, y, width, height);
+}
+
+void Graphics::matrixMode(MatrixMode mode) {
+	mMatrixMode = mode;
+}
+
+MatrixMode Graphics::matrixMode() {
+	return mMatrixMode;
+}
+
+stack<Matrix4d> & Graphics::matrixStackForMode(MatrixMode mode) {
+	if(mode == PROJECTION) {
+		return mProjectionMatrix;
+	}
+	else {
+		return mModelViewMatrix;
+	}
+}
+
+void Graphics::pushMatrix() {
+	stack<Matrix4d> &matrix_stack = matrixStackForMode(mMatrixMode);
+	matrix_stack.push(matrix_stack.top());
+}
+
+void Graphics::popMatrix() {
+	stack<Matrix4d> &matrix_stack = matrixStackForMode(mMatrixMode);
+	matrix_stack.pop();
+}
+
+void Graphics::loadIdentity() {
+	stack<Matrix4d> &matrix_stack = matrixStackForMode(mMatrixMode);
+	matrix_stack.top() = Matrix4d::identity();
+}
+
+void Graphics::loadMatrix(const Matrix4d &m) {
+	stack<Matrix4d> &matrix_stack = matrixStackForMode(mMatrixMode);
+	matrix_stack.top() = m;
+}
+
+void Graphics::multMatrix(const Matrix4d &m) {
+	stack<Matrix4d> &matrix_stack = matrixStackForMode(mMatrixMode);
+	matrix_stack.top() *= m;
+}
+
+void Graphics::translate(double x, double y, double z) {
+	stack<Matrix4d> &matrix_stack = matrixStackForMode(mMatrixMode);
+	matrix_stack.top() *= Matrix4d::translate(x, y, z);
+}
+
+void Graphics::rotate(double angle, double x, double y, double z) {
+	stack<Matrix4d> &matrix_stack = matrixStackForMode(mMatrixMode);
+	matrix_stack.top() *= Matrix4d::rotate(angle, Vec3d(x, y, z));
+}
+
+void Graphics::scale(double x, double y, double z) {
+	stack<Matrix4d> &matrix_stack = matrixStackForMode(mMatrixMode);
+	matrix_stack.top() *= Matrix4d::scale(x, y, z);
+}
+
+// Immediate Mode
+void Graphics::begin(Primitive mode) {
+	// clear buffers
+	mGraphicsData.resetBuffers();
+
+	// start primitive drawing
+	mGraphicsData.primitive(mode);
+	mInImmediateMode = true;
+}
+
+void Graphics::end() {
+	draw(mGraphicsData);
+	mInImmediateMode = false;
+}
+
+void Graphics::vertex(double x, double y, double z) {
+	if(mInImmediateMode) {
+		// make sure all buffers are the same size if > 0
+		mGraphicsData.addVertex(x, y, z);
+		mGraphicsData.equalizeBuffers();
+	}
+}
+
+void Graphics::texcoord(double u, double v) {
+	if(mInImmediateMode) {
+		mGraphicsData.addTexCoord(u, v);
+	}
+}
+
+void Graphics::normal(double x, double y, double z) {
+	if(mInImmediateMode) {
+		mGraphicsData.addNormal(x, y, z);
+	}
+}
+
+void Graphics::color(double r, double g, double b, double a) {
+	if(mInImmediateMode) {
+		mGraphicsData.addColor(r, g, b, a);
+	}
+	else {
+		mBackend->color(Color(r, g, b, a));
+	}
+}
+
+void Graphics::enableState() {
+	State &state = mState.top();
+	
+	if(mStateDelta.blending) {
+		mBackend->enableBlending(
+			state.blend_enable,
+			state.blend_src,
+			state.blend_dst
+		);
+		mStateDelta.blending = false;
+	}
+	
+	if(mStateDelta.lighting) {
+		mBackend->enableLighting(
+			state.lighting_enable
+		);
+		mStateDelta.lighting = false;
+	}
+	
+	if(mStateDelta.depth_testing) {
+		mBackend->enableDepthTesting(
+			state.depth_enable
+		);
+		mStateDelta.depth_testing = false;
+	}
+	
+	if(mStateDelta.polygon_mode) {
+		mBackend->setPolygonMode(
+			state.polygon_mode
+		);
+		mStateDelta.polygon_mode = false;
+	}
+	
+	if(mStateDelta.antialiasing) {
+		//mBackend->set_antialiasing(
+		//	state.???
+		//);
+		mStateDelta.antialiasing = false;
+	}
+}
+
+void Graphics::drawBegin() {
+// Draw Begin (generic)
+//		update state?
+	enableState();
+	
+	mBackend->setProjectionMatrix(mProjectionMatrix.top());
+	mBackend->setModelviewMatrix(mModelViewMatrix.top());
+	
+	
+//		update matrices?
+//		update textures?
+/*
+	vector<Texture *>::iterator tex_it = mTextures.begin();
+	vector<Texture *>::iterator tex_ite = mTextures.end();
+	for(int i=0; tex_it != tex_ite; ++tex_it, ++i) {
+		(*tex_it)->bind(i);
+	}
+*/
+//		update material?
+}
+
+void Graphics::drawEnd() {
+	// Draw End (generic)
+//		unbind materials
+//		unbind used textures
+/*
+	vector<Texture *>::iterator tex_it = mTextures.begin();
+	vector<Texture *>::iterator tex_ite = mTextures.end();
+	for(int i=0; tex_it != tex_ite; ++tex_it, ++i) {
+		(*tex_it)->unbind(i);
+	}
+*/
+}
+
+// Buffer drawing
+void Graphics::draw(const GraphicsData& v) {
+	drawBegin();
+		mBackend->draw(v);
+	drawEnd();
+}
+
+void Graphics::draw() {
+	draw(mGraphicsData);
+}
+
+
+
+
+
+/*
 static void gl_draw(const GraphicsData& v){}
 
 static void gl_clear(int attribMask){}
@@ -63,6 +358,7 @@ Graphics :: Graphics(Backend::type backend) {
 	setBackend(backend);	
 }
 
+
 Graphics :: ~Graphics() {
 	
 }
@@ -97,6 +393,6 @@ bool Graphics :: setBackend(Backend::type backend) {
 	
 	return true;
 }
-
+*/
 } // ::al::gfx
 } // ::al

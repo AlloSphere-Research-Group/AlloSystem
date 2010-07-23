@@ -5,6 +5,7 @@
 #include "math/al_Plane.hpp"
 #include "math/al_Vec.hpp"
 #include "math/al_Quat.hpp"
+#include "math/al_Matrix4.hpp"
 #include "spatial/al_CoordinateFrame.hpp"
 
 namespace al {

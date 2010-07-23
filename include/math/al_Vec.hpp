@@ -69,6 +69,21 @@ public:
 
 	/// @param[in] v		value to initialize all elements to
 	Vec(const T& v=T()){ set(v); }
+	
+	/// @param[in] v1		value to initialize first element
+	/// @param[in] v2		value to initialize second element
+	Vec(const T& v1, const T& v2){ set(v1, v2); }
+	
+	/// @param[in] v1		value to initialize first element
+	/// @param[in] v2		value to initialize second element
+	/// @param[in] v3		value to initialize third element
+	Vec(const T& v1, const T& v2, const T& v3){ set(v1, v2, v3); }
+	
+	/// @param[in] v1		value to initialize first element
+	/// @param[in] v2		value to initialize second element
+	/// @param[in] v3		value to initialize third element
+	/// @param[in] v4		value to initialize fourth element
+	Vec(const T& v1, const T& v2, const T& v3, const T& v4){ set(v1, v2, v3, v4); }
 
 	/// @param[in] v		vector to initialize all elements to
 	template <class T2>
@@ -391,6 +406,12 @@ public:
 		IT(N){ r[i] = vRow.dot(m.col(i)); }
 		return r;
 	}
+	
+	/// Get read-only pointer to elements
+	const T* ptr() const { return elems; }
+	
+	/// Get read-write pointer to elements
+	T* ptr(){ return elems; }
 
 	/// Returns total number of elements
 	static int size(){ return N*N; }
