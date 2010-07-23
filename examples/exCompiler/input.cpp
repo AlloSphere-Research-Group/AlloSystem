@@ -123,7 +123,7 @@ struct MyWindow : WindowGL{
 };
 
 
-int main(){
+int main(int ac, char ** av){
 
 	MyWindow win;
 	MyWindow win2;

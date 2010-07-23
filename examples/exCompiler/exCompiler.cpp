@@ -5,6 +5,8 @@
 
 #define MAX_PATH 1024
 
+typedef int (*mainptr)(int ac, char ** av);
+
 int main(int argc, char * argv[]) {
 	
 	char allo_root_path[MAX_PATH];
@@ -46,6 +48,12 @@ int main(int argc, char * argv[]) {
 	
 	/* show IR */
 	cc.dump();
+	
+	al::JIT * jit = cc.jit();	
+	
+	mainptr mp = (mainptr)jit->getfunctionptr("main");
+	
+	mp(NULL, NULL);
 	
 	return 0;
 }
