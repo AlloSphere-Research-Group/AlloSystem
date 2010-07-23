@@ -20,7 +20,7 @@ struct MyWindow : WindowGL{
 	}
 
 	void onFrame(){
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 		gl.loadIdentity();
 		gl.viewport(0,0, dimensions().w, dimensions().h);
 
@@ -40,7 +40,7 @@ struct MyWindow : WindowGL{
 		}
 		}
 
-		iso.primitive(gl.TRIANGLES);
+		iso.primitive(gfx::TRIANGLES);
 		iso.level(0);
 		iso.resetBuffers();
 		iso.generate(volData, N, 1./N);

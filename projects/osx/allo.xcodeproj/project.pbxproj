@@ -1299,7 +1299,6 @@
 		3622BEDB116D526700928703 /* examples */ = {
 			isa = PBXGroup;
 			children = (
-				3687E2BE11FA39F900EC6706 /* exIsosurface.cpp */,
 				360C252411E65C9A000FF335 /* exCompiler */,
 				3622C06B116D56A500928703 /* exMainloopCocoa */,
 				36B4139610EFFD4C007B16D0 /* main.h */,
@@ -1311,6 +1310,7 @@
 				36C13EDB11D15D45006196FC /* exReverb.cpp */,
 				361BF1B411DEBA5200E60A9C /* exAudioScene.cpp */,
 				36D69A3E11F9242400699158 /* exGraphics.cpp */,
+				3687E2BE11FA39F900EC6706 /* exIsosurface.cpp */,
 			);
 			name = examples;
 			path = ../../examples;
