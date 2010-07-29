@@ -174,7 +174,7 @@ public:
 						0,	0,	0,	1 };
 		return Matrix4(m);
 	}
-	
+
 	static const Matrix4 perspective(T fovy, T aspect, T near, T far) {
 		float f = 1/tan(fovy*M_DEG2RAD/2.);
 		return Matrix4(

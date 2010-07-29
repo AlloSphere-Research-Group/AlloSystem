@@ -30,7 +30,7 @@ public:
 			onDestroy(); mID=0; 
 		}
 	}
-	
+
 protected:
 	uint32_t mID;
 	virtual void onCreate() = 0;

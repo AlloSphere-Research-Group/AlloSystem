@@ -11,8 +11,9 @@ namespace al {
 ///		Combines a Vec3d position with a Quat orientation
 class Pose {
 public:
-	Pose(): mVec(0){ mQuat.identity(); }
+	Pose(): mVec(0) { mQuat.identity(); }
 	Pose(const Vec3d &v): mVec(v) { mQuat.identity(); }
+	virtual ~Pose() {}
 	
 	Vec3d& pos(){ return mVec; }
 	const Vec3d& pos() const { return mVec; }
@@ -57,19 +58,23 @@ public:
 	/// scale the velocities by amt:
 	void decay(double amt);
 	
+
 	void	view(const Quatd & v);
 	void	turn(const Quatd & v);
+
 	
-	void	move(double x, double y, double z) { moveX(x); moveY(y); moveZ(z); }
-	void	moveX(double amount) { vel().vec()[0] = amount; }
-	void	moveY(double amount) { vel().vec()[1] = amount; }
-	void	moveZ(double amount) { vel().vec()[2] = amount; }
+	void move(double x, double y, double z) { moveX(x); moveY(y); moveZ(z); }
+	void moveX(double amount) { vel().vec()[0] = amount; }
+	void moveY(double amount) { vel().vec()[1] = amount; }
+	void moveZ(double amount) { vel().vec()[2] = amount; }
 	
-	void	push(double x, double y, double z) { pushX(x); pushY(y); pushZ(z); }
-	void	pushX(double amount) { vel().vec()[0] += amount; }
-	void	pushY(double amount) { vel().vec()[1] += amount; }
-	void	pushZ(double amount) { vel().vec()[2] += amount; }
+	void push(double x, double y, double z) { pushX(x); pushY(y); pushZ(z); }
+	void pushX(double amount) { vel().vec()[0] += amount; }
+	void pushY(double amount) { vel().vec()[1] += amount; }
+	void pushZ(double amount) { vel().vec()[2] += amount; }
 	
+
+
 	//void	rotateX(double amount) { vel().quat()
 	
 	void	halt();

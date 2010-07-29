@@ -11,7 +11,7 @@
 #define QUAT_ACCURACY_MAX (1.000001)
 #define QUAT_ACCURACY_MIN (0.999999)
 #define QUAT_EPSILON (0.000001)
-#define QUAT_DEG2RAD_BY2 (0.00872664626)
+#define QUAT_DEG2RAD_BY2 (M_DEG2RAD)
 #define QUAT_PIBY2 (1.57079632679)
 
 typedef struct al_quat al_quat;

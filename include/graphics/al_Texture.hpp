@@ -59,7 +59,6 @@ public:
 		LINEAR_MIPMAP_LINEAR
 	};
 
-	
 	Texture(GraphicsBackend *backend);
 	virtual ~Texture();
 	

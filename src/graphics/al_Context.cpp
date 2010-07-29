@@ -3,7 +3,7 @@
 namespace al{
 
 ViewPort :: ViewPort(double eyeSep) 
-:	mEyeSep(eyeSep), mCamera(Camera::defaultCamera())
+:	mEyeSep(eyeSep), mCamera(new Camera())
 {
 	dimensions(1,1,0,0);
 	mUserProjectionTransform.set(Matrix4d::identity());

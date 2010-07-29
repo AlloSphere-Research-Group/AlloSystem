@@ -9,11 +9,13 @@
 #include "math/al_Random.hpp"
 #include "system/al_Time.hpp"
 #include "graphics/al_Context.hpp"
+#include "protocol/al_GraphicsBackendOpenGL.hpp"
 
 using namespace al;
 
 Camera camera;
-gfx::Graphics gl;
+gfx::GraphicsBackendOpenGL backend;
+gfx::Graphics gl(&backend);
 double eyesep = 1;
 
 // synchronize window updates with a Clock. 
@@ -139,7 +141,7 @@ static void drawScene(void * self) {
 //		}}}
 //	gl.end();
 	
-	gl.begin(gl.LINES);
+	gl.begin(gfx::LINES);
 		for (int i=0; i<NUM_VERTICES; i++) {
 			vertex& v = vertices[i];
 			gl.color(v.r, v.g, v.b, 0.5);
@@ -264,14 +266,14 @@ class FrameClock : public ClockListener {
 		camera.step();
 			
 		win1.doFrame();
-		win2.doFrame();
-		win3.doFrame();
-		win4.doFrame();
+//		win2.doFrame();
+//		win3.doFrame();
+//		win4.doFrame();
 		
 		al_sec rt = al_time() - MainLoop::T0();		// actual time now
 		al_sec next_t = t+clock->period();	
 		al_sec overtime = rt - next_t;						
-		al_sec cpu = (overtime/clock->period())+1.;
+	//	al_sec cpu = (overtime/clock->period())+1.;
 		//printf("step/frame cpu: %6.2f%%, main cpu: %6.2f%%\n", cpu*100, MainLoop::cpu()*100);
 		
 	}
@@ -288,7 +290,7 @@ int main (int argc, char * argv[]) {
 	/// define the scene - a semi random walk
 	for (int i=0; i<NUM_VERTICES; i++) {
 	
-		double r, g, b, x, y, z;
+		double r, g, b, y, z;
 		
 		double p = i/(double)NUM_VERTICES;
 		r = p;
@@ -318,10 +320,11 @@ int main (int argc, char * argv[]) {
 	
 	// set fps == 0, and drive frame rendering manually instead
 	win1.create(WindowGL::Dim(320,240,0,40), "win1", fps);
-	win1.ctx.mode(Context::Dual);
-	win1.ctx.stereo(true);
+//	win1.ctx.mode(Context::Dual);
+//	win1.ctx.stereo(true);
 	win1.ctx.viewport().camera(&camera);
 	
+	/*
 	win2.create(WindowGL::Dim(320,240,0,320), "win2", fps);
 	win2.ctx.mode(Context::Anaglyph);
 	//win2.anaglyphMode(WindowGL::RedCyan);
@@ -344,7 +347,7 @@ int main (int argc, char * argv[]) {
 	win4.ctx.stereo(true);
 	win4.ctx.viewport().camera(&camera);
 
-	
+	*/
 	camera.turn(Quatd::fromEuler(0., 0., 0.1));
 	//MainLoop::queue().send(0., step);
 	MainLoop::interval(0.01);

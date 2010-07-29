@@ -74,6 +74,7 @@ enum Primitive {
 	POLYGON
 };
 
+
 enum AttributeBit {
 	COLOR_BUFFER_BIT = 1<<0,
 	DEPTH_BUFFER_BIT = 1<<1,
@@ -206,6 +207,8 @@ public:
 	void clear(int attribMask);
 	void clearColor(float r, float g, float b, float a);
 	
+
+
 	// Coordinate Transforms
 	void viewport(int x, int y, int width, int height);
 	void matrixMode(MatrixMode mode);
@@ -226,6 +229,7 @@ public:
 	void begin(Primitive mode);
 	void end();
 	
+
 	void vertex(double x, double y, double z=0.);
 	void vertex(const Vec3d& v) { vertex(v[0], v[1], v[2]); }
 	void texcoord(double u, double v);
@@ -233,7 +237,7 @@ public:
 	void normal(const Vec3d& v) { normal(v[0], v[1], v[2]); }
 	void color(double r, double g, double b, double a=1.);
 	void color(const Vec3d& v, double a=1.) { color(v[0], v[1], v[2], a); }
-	
+
 	// Other state
 	void pointSize(double v);
 	void lineWidth(double v);
@@ -264,7 +268,7 @@ protected:
 	stack<Matrix4d>		mModelViewMatrix;	// modelview matrix stack
 	StateChange			mStateChange;		// state difference to mark changes
 	stack<State>		mState;				// state stack
-	
+
 };
 
 } // ::al::gfx

@@ -8,121 +8,74 @@
 #include "math/al_Matrix4.hpp"
 #include "spatial/al_CoordinateFrame.hpp"
 
+
 namespace al {
 
-/*
-	Camera lives in World-space; it shouldn't know anything about rendering, just its own configuration
-*/
-
-/*
-Steve Baker's Golden Rule for OpenGL cameras:
-
-The only functions that should be called when the glMatrixMode is set to 
-GL_PROJECTION are:
-
-glLoadIdentity - to initialise the stack.
-gluPerspective/glFrustum/glOrtho/gluOrtho2 - to set the appropriate projection 
-onto the stack.
-You *could* use glLoadMatrix to set up your own projection matrix (if you 
-understand the restrictions and consequences) - but I'm told that this can cause 
-problems for some OpenGL implementations which rely on data passed to glFrustum, 
-etc to determine the near and far clip planes.
-*/
 ///<	Utility wrapper of Pose for use as a 3D camera
 ///		
 class Camera : public Nav {
 public:
 
-	enum StereoMode{
-		Anaglyph=0,	/**< Red (left eye) / cyan (right eye) stereo */
-		Active,		/**< Active quad-buffered stereo */
-		Dual,		/**< Dual side-by-side stereo */
-		LeftEye,	/**< Left eye only */
-		RightEye	/**< Right eye only */
-	};
-	
-	struct FrustumGL{
-		double left, right, bottom, top, near, far;
+	enum Eye{
+		MONO = 0,
+		LEFT,
+		RIGHT
 	};
 
-	Camera(double aper=30, double nearClip=0.01, double farClip=100, double focalLen=6, double eyeSep=0.02);
 
-	/// Set viewport dimensions in screen coordinates
-	Camera& dimensions(double w, double h);
+	Camera(
+		double fovy=30, 
+		double nearClip=0.01, 
+		double farClip=100, 
+		double focalLength=6, 
+		double eyeSep=0.02,
+		double aspectRatio=1.3333
+	);
 	
-	/// Set viewport dimensions in screen coordinates
-	Camera& dimensions(double w, double h, double x, double y);
-
-	Camera& focalLength(double v){ mFocalLength=v; return *this; } ///< Set focal length
-	Camera& aperture(double v);								///< Set vertical field of view, in degrees
-	Camera& eyeSep(double v){ mEyeSep=v; return *this; }	///< Set eye separation
+	virtual ~Camera() {}
+	
+	// setters
+	Camera& fovy(double v);									///< Set vertical field of view, in degrees
 	Camera& near(double v){ mNear=v; return *this; }		///< Set frustum near plane distance
 	Camera& far(double v){ mFar=v; return *this; }			///< Set frustum far plane distance
-	Camera& mode(StereoMode v){ mMode=v; return *this; }	///< Set stereographic mode
-	Camera& stereo(bool v){ mStereo=v; return *this; }		///< Set stereographic active
+	Camera& focalLength(double v){ mFocalLength=v; return *this; } ///< Set focal length
+	Camera& eyeSep(double v){ mEyeSep=v; return *this; }	///< Set eye separation
+	Camera& aspectRatio(double v){ mAspectRatio=v; return *this; }	///< Set the aspect ratio
+	Camera& autoEyeSep(bool v){ mAutoEyeSep=v; return *this; }		///< Set auto eye separation amount
 	Camera& zoom(double v){ mZoom=v; return *this; }		///< Set zoom amount
-
-	Frustumd& computeTestFrustum();
-	Frustumd& testFrustum(){ return mFrustum; }
-
-	const Vec3d& pos() const { return vec(); }				///< Get position
+		
+	// aliases for Nav
 	const Vec3d& vf() const { return uz(); }				///< Get forward vector
 	const Vec3d& vu() const { return uy(); }				///< Get up vector
 	const Vec3d& vr() const { return ux(); }				///< Get right vector
-	double focalLength() const { return mFocalLength; }		///< Get focal length
-	double fovy() const { return mFOVY; }				///< Get vertical field of view, in degrees
-	double aperture() const { return mFOVY; }			///< Get vertical field of view, in degrees
-	double eyeSep() const { return mEyeSep; }				///< Get eye separation
-	FrustumGL frustum(double eyePos=0) const;				///< Get frustum from an eye position
+	
+	
+	double fovy() const { return mFovy; }					///< Get frustum near plane distance
 	double near() const { return mNear; }					///< Get frustum near plane distance
-	double nearTop() const;									///< Get frustum near plane top
-	double nearRight() const;								///< Get frustum near plane right
 	double far() const { return mFar; }						///< Get frustum far plane distance
-	double farTop() const;									///< Get frustum far plane top
-	double farRight() const;								///< Get frustum far plane right
-	StereoMode mode() const { return mMode; }				///< Get stereographic mode
-	double ratio() const { return mRatio; }					///< Get aspect ratio (width/height)
-	bool stereo() const { return mStereo; }					///< Get stereographic active
+	double focalLength() const { return mFocalLength; }		///< Get focal length
+	double eyeSep() const { return mEyeSep; }				///< Get eye separation
+	double aspectRatio() const { return mAspectRatio; }		///< Get aspect ratio (width/height)
+	bool autoEyeSep() const { return mAutoEyeSep; }			///< Get auto eye separation
 	double zoom() const { return mZoom; }					///< Get zoom amount
 	
-	void setLookAt(double tx, double ty, double tz);
-
-	void begin(double w, double h, double x=0, double y=0);
-	void end();
-
-	int eyeEnd() const;
-	int eyeStart() const;
-	void setEye(int i);
+	Matrix4d modelViewMatrix(Eye e=MONO);
+	Matrix4d projectionMatrix(Eye e=MONO);
 	
-	static Camera * defaultCamera() {
-		static Camera def;
-		return &def;
-	}
+	double height(double distance);							///< Height of view at distance from camera
+
 
 protected:
-	double mFocalLength;		// Focal length along vd (determines zero parallax)
-	double mFOVY;				// Camera aperture (degrees)
-	double mTanFOV;
+	double mFovy;				// Camera aperture (degrees)
+	double mNear, mFar;			// Cutting plane distances
+	double mFocalLength;		// Focal length along vd
+	double mEyeSep;				// Eye separation
+	double mAspectRatio;		// frustum aspect ratio
+	bool mAutoEyeSep;			// auto calculate the eye separation
+	
 	double mZoom;
 
-	double mEyeSep;				// Eye separation
-	double mNear, mFar;			// Cutting plane distances
-	double mRatio;				// frustum aspect ratio 
-	double mNearTop;			// frustum near plane top
-	double mFarTop;				// frustum far plane top
-
-	double mNearOverFocalLength;
 	Vec3d mStereoOffset;					// eye offset vector (right eye; left eye is inverse), usually (1, 0, 0)
-	double mLeft, mBottom, mWidth, mHeight;
-	StereoMode mMode;
-	Frustumd mFrustum;
-	bool mStereo;
-
-	void calcFrustum();
-	void setFrustum(double sep);
-	void left();
-	void mid();
-	void right();
 };
 
 } // al::
