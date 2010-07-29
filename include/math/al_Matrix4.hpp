@@ -185,6 +185,26 @@ public:
 		);
 	}
 	
+	// for stereographics:
+	static const Matrix4 perspectiveLeft(T fovy, T aspect, T near, T far, T eyeSep, T focal) {
+		T D = 0.5*eyeSep*near/focal;				// stereo eye separation adjustment
+		T top = near * tan(fovy*M_DEG2RAD*0.5);	// height of view at distance = near
+		T bottom = -top;
+		T left = -aspect*top + D;
+		T right = aspect*top + D;
+		return perspective(left, right, bottom, top, near, far);
+	}
+
+	// for stereographics:
+	static const Matrix4 perspectiveRight(T fovy, T aspect, T near, T far, T eyeSep, T focal) {
+		T D = -0.5*eyeSep*near/focal;				// stereo eye separation adjustment
+		T top = near * tan(fovy*M_DEG2RAD*0.5);	// height of view at distance = near
+		T bottom = -top;
+		T left = -aspect*top + D;
+		T right = aspect*top + D;
+		return perspective(left, right, bottom, top, near, far);
+	}
+	
 	static const Matrix4 perspective(T l, T r, T b, T t, T n, T f) {
 		const T W = r-l;	const T W2 = r+l;
 		const T H = t-b;	const T H2 = t+b;
@@ -233,12 +253,34 @@ public:
 		return Matrix4(m);
 	}
 	
-	static const Matrix4 lookAt(const Vec3d& ux, const Vec3d& uz, const Vec3d& uy, const Vec3d& pos) {
+	static const Matrix4 lookAt(const Vec3<T>& ux, const Vec3<T>& uz, const Vec3<T>& uy, const Vec3<T>& pos) {
 		return Matrix4(
 			ux[0], uy[0], -uz[0], 0,
 			ux[1], uy[1], -uz[1], 0,
 			ux[2], uy[2], -uz[2], 0,
 			-(ux.dot(pos)), -(uy.dot(pos)), (uz.dot(pos)), 1
+		);
+	}
+	
+	// for stereographics:
+	static const Matrix4 lookAtLeft(const Vec3<T>& ux, const Vec3<T>& uz, const Vec3<T>& uy, const Vec3<T>& pos, double eyeSep) {
+		Vec3<T> eyePos = pos - (ux * eyeSep);
+	
+		return Matrix4(
+			ux[0], uy[0], -uz[0], 0,
+			ux[1], uy[1], -uz[1], 0,
+			ux[2], uy[2], -uz[2], 0,
+			-(ux.dot(eyePos)), -(uy.dot(eyePos)), (uz.dot(eyePos)), 1
+		);
+	}
+	static const Matrix4 lookAtRight(const Vec3<T>& ux, const Vec3<T>& uz, const Vec3<T>& uy, const Vec3<T>& pos, double eyeSep) {
+		Vec3<T> eyePos = pos + (ux * eyeSep);
+	
+		return Matrix4(
+			ux[0], uy[0], -uz[0], 0,
+			ux[1], uy[1], -uz[1], 0,
+			ux[2], uy[2], -uz[2], 0,
+			-(ux.dot(eyePos)), -(uy.dot(eyePos)), (uz.dot(eyePos)), 1
 		);
 	}
 		
