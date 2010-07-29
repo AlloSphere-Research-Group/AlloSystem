@@ -166,9 +166,9 @@ class WindowGL {
 public:
 
 	struct Dim{
-		Dim(int w_, int h_, int l_=0, int t_=0): l(l_), t(t_), w(w_), h(h_){}
-		Dim(int v=0): l(0), t(0), w(v), h(v){}
-		int l,t,w,h;
+		Dim(double w_, double h_, double l_=0, double t_=0): l(l_), t(t_), w(w_), h(h_){}
+		Dim(double v=0): l(0), t(0), w(v), h(v){}
+		double l,t,w,h;
 	};
 
 	WindowGL();

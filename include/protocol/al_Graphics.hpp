@@ -216,18 +216,27 @@ public:
 	void loadMatrix(const Matrix4d &m);
 	void multMatrix(const Matrix4d &m);
 	void translate(double x, double y, double z);
+	void translate(const Vec3d& v) { translate(v[0], v[1], v[2]); }
 	void rotate(double angle, double x, double y, double z);
+	void rotate(double angle, const Vec3d& v) { rotate(angle, v[0], v[1], v[2]); }
 	void scale(double x, double y, double z);
+	void scale(const Vec3d& v) { scale(v[0], v[1], v[2]); }
 	
 	// Immediate Mode
 	void begin(Primitive mode);
 	void end();
 	
 	void vertex(double x, double y, double z=0.);
+	void vertex(const Vec3d& v) { vertex(v[0], v[1], v[2]); }
 	void texcoord(double u, double v);
 	void normal(double x, double y, double z=0.);
+	void normal(const Vec3d& v) { normal(v[0], v[1], v[2]); }
 	void color(double r, double g, double b, double a=1.);
+	void color(const Vec3d& v, double a=1.) { color(v[0], v[1], v[2], a); }
 	
+	// Other state
+	void pointSize(double v);
+	void lineWidth(double v);
 	
 	// Buffer drawing
 	void draw(const GraphicsData& v);

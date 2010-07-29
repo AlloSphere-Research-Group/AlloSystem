@@ -109,6 +109,13 @@ void GraphicsBackendOpenGL::color(const Color &c) {
 	glColor4fv(c.to_ptr());
 }
 
+void GraphicsBackendOpenGL::pointSize(double v) {
+	glPointSize(v);
+}
+
+void GraphicsBackendOpenGL::lineWidth(double v) {
+	glLineWidth(v);
+}
 
 // Frame
 void GraphicsBackendOpenGL::clear(int attribMask) {

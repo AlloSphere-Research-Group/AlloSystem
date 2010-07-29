@@ -70,6 +70,8 @@ public:
 	void	pushY(double amount) { vel().vec()[1] += amount; }
 	void	pushZ(double amount) { vel().vec()[2] += amount; }
 	
+	//void	rotateX(double amount) { vel().quat()
+	
 	void	halt();
 	void	home();
 	
@@ -101,6 +103,7 @@ protected:
 // Implementation --------------------------------------------------------------
 
 inline void Nav :: updateUnitVectors() {
+	mQuat.normalize();
 	mQuat.toVectorX(mUX);
 	mQuat.toVectorY(mUY);
 	mQuat.toVectorZ(mUZ);

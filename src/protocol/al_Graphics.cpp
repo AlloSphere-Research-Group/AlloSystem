@@ -260,6 +260,14 @@ void Graphics::enableState() {
 	}
 }
 
+void Graphics::pointSize(double v) {
+	mBackend->pointSize(v);
+}
+
+void Graphics::lineWidth(double v) {
+	mBackend->lineWidth(v);
+}
+
 void Graphics::drawBegin() {
 // Draw Begin (generic)
 //		update state?

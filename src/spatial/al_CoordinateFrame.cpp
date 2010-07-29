@@ -16,7 +16,7 @@ Nav :: Nav(const Vec3d &v)
 
 void Nav :: step() {
 	// accumulate orientation:
-	mQuat *= vel().quat();
+	mQuat = mQuat * vel().quat();
 	updateUnitVectors();
 	
 	// accumulate position:

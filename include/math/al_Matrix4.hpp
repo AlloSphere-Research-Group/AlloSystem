@@ -232,6 +232,15 @@ public:
 						0,		0,		0,		1 };
 		return Matrix4(m);
 	}
+	
+	static const Matrix4 lookAt(const Vec3d& ux, const Vec3d& uz, const Vec3d& uy, const Vec3d& pos) {
+		return Matrix4(
+			ux[0], uy[0], -uz[0], 0,
+			ux[1], uy[1], -uz[1], 0,
+			ux[2], uy[2], -uz[2], 0,
+			-(ux.dot(pos)), -(uy.dot(pos)), (uz.dot(pos)), 1
+		);
+	}
 		
 };
 

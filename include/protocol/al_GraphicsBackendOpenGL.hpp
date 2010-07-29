@@ -54,6 +54,8 @@ public:
 	virtual void enableDepthTesting(bool enable);
 	virtual void setPolygonMode(PolygonMode mode);
 	virtual void color(const Color &c);
+	virtual void pointSize(double v);
+	virtual void lineWidth(double v);
 	
 	// Frame
 	virtual void clear(int attribMask);
