@@ -145,39 +145,13 @@ struct MyWindow : WindowGL{
 
 	static void render(void * ud) 
 	{	
-		const Vec3d& pos = cam.pos();
-		const Vec3d& ux  = cam.ux();
-		const Vec3d& uy  = cam.uy();
-		const Vec3d& uz  = cam.uz();
-		const Vec3d& eye = pos + ux * cam.IOD();
-		const Vec3d& at  = eye + uz * cam.focalLength();
-	
-		gl.pointSize(2);
-		gl.draw(grid);
-				
-		// draw axis
-		gl.lineWidth(1);
-		gl.pushMatrix();
-		gl.translate(at[0], at[1], at[2]);
-		gl.begin(gfx::LINES);
-			gl.color(1, 0, 0);
-			gl.vertex(0, 0, 0); gl.vertex(1, 0, 0);
-			gl.color(0, 1, 0);
-			gl.vertex(0, 0, 0); gl.vertex(0, 1, 0);
-			gl.color(0, 0, 1);
-			gl.vertex(0, 0, 0); gl.vertex(0, 0, 1);
-		gl.end();
+		gfx::State state;
+		state.depth_enable = true;
+		gl.pushState(state);
 		
-		gl.translate(1, 0, 0);
-		gl.begin(gfx::LINES);
-			gl.color(0, 1, 1);
-			gl.vertex(0, 0, 0); gl.vertex(ux);
-			gl.color(1, 0, 1);
-			gl.vertex(0, 0, 0); gl.vertex(uy);
-			gl.color(1, 1, 0);
-			gl.vertex(0, 0, 0); gl.vertex(uz);
-		gl.end();
-		gl.popMatrix();
+		gl.pointSize(2);
+		gl.draw(grid);		
+		gl.popState();
 		
 	}
 	
@@ -193,13 +167,14 @@ int main (int argc, char * const argv[]) {
 	
 	// set up grid:
 	grid.primitive(gfx::TRIANGLES);
-	double size = 0.1;
+	double size = 0.5;
 	for (int i=0; i<256; i++) {
 		double x = rng.uniformS(4.);
 		double y = rng.uniformS(4.);
 		double z = rng.uniformS(4.);
+		double c = rng.uniformS(M_PI);
 		for (int v=0; v<3; v++) {
-			grid.addColor((x+1.)*0.5+0.5, (y+1.)*0.5+0.5, (z+1.)*0.5+0.5);
+			grid.addColor(0.5+cos(c), 0.5, 0.5+sin(c));
 			grid.addVertex(x+rng.uniformS(size), y+rng.uniformS(size), z+rng.uniformS(size));
 		}
 	}
