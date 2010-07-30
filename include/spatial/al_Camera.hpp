@@ -58,6 +58,7 @@ public:
 	double aspectRatio() const { return mAspectRatio; }		///< Get aspect ratio (width/height)
 	bool autoEyeSep() const { return mAutoEyeSep; }			///< Get auto eye separation
 	double zoom() const { return mZoom; }					///< Get zoom amount
+	double IOD() const { return eyeSep() * focalLength()/30.0; }	///< Get automatic inter-ocular distance
 	
 	Matrix4d modelViewMatrix(Eye e=MONO);
 	Matrix4d projectionMatrix(Eye e=MONO);

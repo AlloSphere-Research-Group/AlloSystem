@@ -68,6 +68,10 @@ public:
 	template <class T>
 	T uniform(const T& hi, const T& lo){ return (hi-lo)*uniform() + lo;  }
 
+	/// Returns uniform random in [-lim, lim)
+	template <class T>
+	T uniformS(const T& lim){ return lim*uniformS(); }
+
 	/// Returns random Gaussian
 	float gaussian(){ float r; gaussian(r,r); return r; }
 

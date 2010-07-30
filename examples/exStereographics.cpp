@@ -4,14 +4,19 @@
 #include "graphics/al_Config.h"
 #include "protocol/al_GraphicsBackendOpenGL.hpp"
 #include "graphics/al_Stereographic.hpp"
+#include "math/al_Random.hpp"
 
 using namespace al;
 
 static gfx::GraphicsBackendOpenGL backend;
 static gfx::Graphics gl(&backend);
-static gfx::Stereographic stereo;
 
-static Nav cam;
+static gfx::GraphicsData grid;
+
+static gfx::Stereographic stereo;
+static Camera cam;
+
+static rnd::Random<> rng;
 
 struct MyWindow : WindowGL{
 
@@ -21,8 +26,8 @@ struct MyWindow : WindowGL{
 	void onVisibility(bool v){			printf("onVisibility %s\n", v?"true":"false"); }
 	
 	void onKeyDown(const Keyboard& k){	 	
-		const double a = 1;
-		const double v = 0.04;
+		const double a = 0.5;
+		const double v = 0.1;
 			
 		switch(k.key()){
 			case Key::Escape: fullScreenToggle(); break;
@@ -144,25 +149,14 @@ struct MyWindow : WindowGL{
 		const Vec3d& ux  = cam.ux();
 		const Vec3d& uy  = cam.uy();
 		const Vec3d& uz  = cam.uz();
-		const Vec3d& eye = pos + ux * stereo.IOD();
-		const Vec3d& at  = eye + uz * stereo.focal();
+		const Vec3d& eye = pos + ux * cam.IOD();
+		const Vec3d& at  = eye + uz * cam.focalLength();
 	
-		gl.pointSize(4);
-		
-		
-		// draw a reference grid:
-		gl.begin(gfx::POINTS);
-		double step = 0.125;
-		for (double x=-1; x<=1; x+= step) {
-		for (double y=-1; y<=1; y+= step) {
-		for (double z=-1; z<=1; z+= step) {
-			gl.color((x+1)*0.5+0.3, (y+1)*0.5+0.3, (z+1)*0.5+0.3);
-			gl.vertex(x, y, z);
-		}}}
-		gl.end();
-		
+		gl.pointSize(2);
+		gl.draw(grid);
+				
 		// draw axis
-		gl.lineWidth(2);
+		gl.lineWidth(1);
 		gl.pushMatrix();
 		gl.translate(at[0], at[1], at[2]);
 		gl.begin(gfx::LINES);
@@ -190,8 +184,26 @@ struct MyWindow : WindowGL{
 	al_sec n;
 };
 
+
+
 int main (int argc, char * const argv[]) {
 
+	// exaggerate stereo:
+	cam.eyeSep(1/20.);
+	
+	// set up grid:
+	grid.primitive(gfx::TRIANGLES);
+	double size = 0.1;
+	for (int i=0; i<256; i++) {
+		double x = rng.uniformS(4.);
+		double y = rng.uniformS(4.);
+		double z = rng.uniformS(4.);
+		for (int v=0; v<3; v++) {
+			grid.addColor((x+1.)*0.5+0.5, (y+1.)*0.5+0.5, (z+1.)*0.5+0.5);
+			grid.addVertex(x+rng.uniformS(size), y+rng.uniformS(size), z+rng.uniformS(size));
+		}
+	}
+		
     MyWindow win;
 	win.create(WindowGL::Dim(720,480), "Window 1", 40);
 	MainLoop::start();

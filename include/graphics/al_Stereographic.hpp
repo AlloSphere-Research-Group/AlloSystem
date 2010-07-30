@@ -28,9 +28,8 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#include "graphics/al_Common.hpp"
 #include "protocol/al_Graphics.hpp"
-#include "spatial/al_CoordinateFrame.hpp"
+#include "spatial/al_Camera.hpp"
 
 namespace al {
 namespace gfx{
@@ -57,19 +56,19 @@ public:
 		CyanRed
 	};
 	
-	Stereographic() : mFovy(60), mNear(0.01), mFar(100), mFocal(2), mEyeSep(0.1), mMode(Anaglyph), mAnaglyphMode(RedBlue), mStereo(false)
-	{}
+	Stereographic() 
+	: mMode(Anaglyph), mAnaglyphMode(RedBlue), mStereo(false) {}
 	~Stereographic() {}
 
-	void draw(Graphics& gl, Nav& cam, void (*draw)(void *), double width, double height, void * userdata);
+	void draw(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
 
 	/// So many different ways to draw :-)
-	void drawMono(Graphics& gl, Nav& cam, void (*draw)(void *), double width, double height, void * userdata);
-	void drawActive(Graphics& gl, Nav& cam, void (*draw)(void *), double width, double height, void * userdata);
-	void drawAnaglyph(Graphics& gl, Nav& cam, void (*draw)(void *), double width, double height, void * userdata);
-	void drawDual(Graphics& gl, Nav& cam, void (*draw)(void *), double width, double height, void * userdata);
-	void drawLeft(Graphics& gl, Nav& cam, void (*draw)(void *), double width, double height, void * userdata);
-	void drawRight(Graphics& gl, Nav& cam, void (*draw)(void *), double width, double height, void * userdata);
+	void drawMono(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
+	void drawActive(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
+	void drawAnaglyph(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
+	void drawDual(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
+	void drawLeft(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
+	void drawRight(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
 	
 	/// Blue line sync for active stereo (for those projectors that need it)
 	/// add this call at the end of rendering (just before the swap buffers call)
@@ -79,27 +78,11 @@ public:
 	Stereographic& stereo(bool v){ mStereo=v; return *this; }		///< Set stereographic active
 	Stereographic& anaglyphMode(AnaglyphMode v) { mAnaglyphMode=v; return *this; }	///< set glasses type
 	
-	Stereographic& fovy(double v){ mFovy=v; return *this; }	
-	Stereographic& near(double v){ mNear=v; return *this; }	
-	Stereographic& far(double v) { mFar=v; return *this; }	
-	Stereographic& focal(double v){ mFocal=v; return *this; }	
-	Stereographic& eyesep(double v){ mEyeSep=v; return *this; }	
-	
 	StereoMode mode() const { return mMode; }				///< Get stereographic mode
 	bool stereo() const { return mStereo; }					///< Get stereographic active
 	AnaglyphMode anaglyphMode() const { return mAnaglyphMode; }	///< get anaglyph glasses type
 	
-	double fovy() const { return mFovy; }
-	double near() const { return mNear; }
-	double far() const { return mFar; }
-	double focal() const { return mFocal; }
-	
-	double IOD() const { return mEyeSep * mFocal/30.0; }
-	
 protected:
-	double mFovy, mNear, mFar, mFocal;
-	double mEyeSep;
-	
 	StereoMode mMode;
 	AnaglyphMode mAnaglyphMode;
 	bool mStereo;
