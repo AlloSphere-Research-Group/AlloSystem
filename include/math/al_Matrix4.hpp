@@ -193,17 +193,13 @@ public:
 	
 	// for stereographics:
 	static const Matrix4 perspectiveLeft(T fovy, T aspect, T near, T far, T eyeSep, T focal) {
-		T shift = 0.5*eyeSep*near/focal;				// stereo eye separation adjustment
-		T top = near * tan(fovy*M_DEG2RAD*0.5);	// height of view at distance = near
-		T bottom = -top;
-		T left = -aspect*top + shift;
-		T right = aspect*top + shift;
-		return perspective(left, right, bottom, top, near, far);
+		return perspectiveOffAxis(fovy, aspect, near, far,-eyeSep, focal);
 	}
-
-	// for stereographics:
 	static const Matrix4 perspectiveRight(T fovy, T aspect, T near, T far, T eyeSep, T focal) {
-		T shift = -0.5*eyeSep*near/focal;				// stereo eye separation adjustment
+		return perspectiveOffAxis(fovy, aspect, near, far, eyeSep, focal);
+	}
+	static const Matrix4 perspectiveOffAxis(T fovy, T aspect, T near, T far, T eyeShift, T focal) {
+		T shift = -0.5*eyeShift*near/focal;
 		T top = near * tan(fovy*M_DEG2RAD*0.5);	// height of view at distance = near
 		T bottom = -top;
 		T left = -aspect*top + shift;
@@ -254,18 +250,14 @@ public:
 	
 	// for stereographics:
 	static const Matrix4 lookAtLeft(const Vec3<T>& ux, const Vec3<T>& uz, const Vec3<T>& uy, const Vec3<T>& pos, double eyeSep) {
-		Vec3<T> eyePos = pos - (ux * eyeSep);
-	
-		return Matrix4(
-			ux[0], uy[0], -uz[0], 0,
-			ux[1], uy[1], -uz[1], 0,
-			ux[2], uy[2], -uz[2], 0,
-			-(ux.dot(eyePos)), -(uy.dot(eyePos)), (uz.dot(eyePos)), 1
-		);
+		return lookAtOffAxis(ux,uz,uy, pos,-eyeSep);
 	}
 	static const Matrix4 lookAtRight(const Vec3<T>& ux, const Vec3<T>& uz, const Vec3<T>& uy, const Vec3<T>& pos, double eyeSep) {
-		Vec3<T> eyePos = pos + (ux * eyeSep);
-	
+		return lookAtOffAxis(ux,uz,uy, pos, eyeSep);
+	}
+	static const Matrix4 lookAtOffAxis(const Vec3<T>& ux, const Vec3<T>& uz, const Vec3<T>& uy, const Vec3<T>& pos, double eyeShift){
+		Vec3<T> eyePos = pos + (ux * eyeShift);
+
 		return Matrix4(
 			ux[0], uy[0], -uz[0], 0,
 			ux[1], uy[1], -uz[1], 0,
@@ -273,6 +265,11 @@ public:
 			-(ux.dot(eyePos)), -(uy.dot(eyePos)), (uz.dot(eyePos)), 1
 		);
 	}
+	
+	
+	
+
+	
 		
 };
 
