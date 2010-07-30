@@ -11,7 +11,7 @@ using namespace al;
 static gfx::GraphicsBackendOpenGL backend;
 static gfx::Graphics gl(&backend);
 
-static gfx::GraphicsData grid;
+static gfx::GraphicsData stuff;
 
 static gfx::Stereographic stereo;
 static Camera cam;
@@ -145,12 +145,14 @@ struct MyWindow : WindowGL{
 
 	static void render(void * ud) 
 	{	
+		glEnable(GL_DEPTH_TEST); //<< why is this glitchy?
+		
 		gfx::State state;
 		state.depth_enable = true;
 		gl.pushState(state);
 		
 		gl.pointSize(2);
-		gl.draw(grid);		
+		gl.draw(stuff);		
 		gl.popState();
 		
 	}
@@ -165,8 +167,8 @@ int main (int argc, char * const argv[]) {
 	// exaggerate stereo:
 	cam.eyeSep(1/20.);
 	
-	// set up grid:
-	grid.primitive(gfx::TRIANGLES);
+	// set up stuff:
+	stuff.primitive(gfx::TRIANGLES);
 	double size = 0.5;
 	for (int i=0; i<256; i++) {
 		double x = rng.uniformS(4.);
@@ -174,8 +176,8 @@ int main (int argc, char * const argv[]) {
 		double z = rng.uniformS(4.);
 		double c = rng.uniformS(M_PI);
 		for (int v=0; v<3; v++) {
-			grid.addColor(0.5+cos(c), 0.5, 0.5+sin(c));
-			grid.addVertex(x+rng.uniformS(size), y+rng.uniformS(size), z+rng.uniformS(size));
+			stuff.addColor(0.5+cos(c), 0.5, 0.5+sin(c));
+			stuff.addVertex(x+rng.uniformS(size), y+rng.uniformS(size), z+rng.uniformS(size));
 		}
 	}
 		

@@ -41,7 +41,8 @@ public:
 	:	mWindow(w), mID(-1), mIDGameMode(-1),
 		mWinDim(0), mFPS(0), mTitle(""),
 		mCursor(Cursor::Pointer),
-		mInGameMode(false), mVisible(true), mFullScreen(false), mCursorHide(false)
+		mInGameMode(false), mVisible(true), mFullScreen(false), mCursorHide(false),
+		mMode(DisplayMode::DefaultBuf)
 	{
 		//
 		MainLoop::get();
@@ -452,7 +453,7 @@ void WindowGL::create(
         (enabled(StencilBuf)	? GLUT_STENCIL		:0) |
         (enabled(StereoBuf )	? GLUT_STEREO		:0) |
 		(enabled(Multisample)	? GLUT_MULTISAMPLE	:0);
-
+		
 	glutInitDisplayMode(GLUT_RGBA | bits);
 
 //	int stat = glutGet(GLUT_DISPLAY_MODE_POSSIBLE);
@@ -538,6 +539,8 @@ void WindowGL::doFrame(){
 	const int current = glutGetWindow();
 	if(winID != current) glutSetWindow(winID);
 //	glutPostRedisplay();
+	//glEnable(GL_DEPTH_TEST);
+
 	onFrame();
 
 	glutSwapBuffers();
