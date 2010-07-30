@@ -23,20 +23,6 @@ struct MyWindow : WindowGL{
 	void onKeyDown(const Keyboard& k){	 	
 		const double a = 1;
 		const double v = 0.04;
-		/* 
-			key codes for my mac: 
-		*/
-		#define KEY_TAB 9
-		
-		#define KEY_APOSTROPHE 39
-		#define KEY_COMMA 44
-		#define KEY_PERIOD 46
-		#define KEY_SLASH 47
-		
-		#define KEY_ARROW_RIGHT 269
-		#define KEY_ARROW_UP 270
-		#define KEY_ARROW_LEFT 271
-		#define KEY_ARROW_DOWN 272
 			
 		switch(k.key()){
 			case Key::Escape: fullScreenToggle(); break;
@@ -62,31 +48,31 @@ struct MyWindow : WindowGL{
 				//cam.vel().quat().set(Quatd::fromAxisAngle(a, 0, 0, 1));
 				cam.vel().quat().set(Quatd::fromEuler(0, 0, -a));
 				break;
-			case KEY_ARROW_RIGHT:
-				//cam.vel().quat().set(Quatd::fromAxisAngle(a, 0, -1, 0));
-				cam.vel().quat().set(Quatd::fromEuler(-a, 0, 0));
-				break;
-			case KEY_ARROW_LEFT:
+			case Key::Right:
 				//cam.vel().quat().set(Quatd::fromAxisAngle(a, 0, 1, 0));
 				cam.vel().quat().set(Quatd::fromEuler(a, 0, 0));
 				break;
+			case Key::Left:
+				//cam.vel().quat().set(Quatd::fromAxisAngle(a, 0, -1, 0));
+				cam.vel().quat().set(Quatd::fromEuler(-a, 0, 0));
+				break;
 				
-			case KEY_ARROW_UP:
+			case Key::Up:
 				cam.moveZ(v);
 				break;
-			case KEY_ARROW_DOWN:
+			case Key::Down:
 				cam.moveZ(-v);
 				break;
-			case KEY_APOSTROPHE:
+			case '\'':
 				cam.moveY(v);
 				break;
-			case KEY_SLASH:
+			case '/':
 				cam.moveY(-v);
 				break;
-			case KEY_COMMA:
+			case ',':
 				cam.moveX(-v);
 				break;
-			case KEY_PERIOD:
+			case '.':
 				cam.moveX(v);
 				break;
 				
@@ -94,7 +80,7 @@ struct MyWindow : WindowGL{
 				cam.halt(); cam.home();
 				break;
 				
-			case KEY_TAB:
+			case Key::Tab:
 				stereo.stereo(!stereo.stereo());
 				break;
 				
@@ -120,9 +106,9 @@ struct MyWindow : WindowGL{
 				break;
 				
 			default:
-				printf("k:%3d, %d s:%d c:%d a:%d\n", k.key(), k.down(), k.shift(), k.ctrl(), k.alt());
-				break;
-		}
+								break;
+		}printf("k:%3d, %d s:%d c:%d a:%d\n", k.key(), k.down(), k.shift(), k.ctrl(), k.alt());
+
 	}
 	void onKeyUp(const Keyboard& k) {
 		cam.vel().quat().identity();
