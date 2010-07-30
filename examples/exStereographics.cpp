@@ -145,7 +145,7 @@ struct MyWindow : WindowGL{
 
 	static void render(void * ud) 
 	{	
-		glEnable(GL_DEPTH_TEST); //<< why is this glitchy?
+		//glEnable(GL_DEPTH_TEST); //<< why is this glitchy?
 		
 		gfx::State state;
 		state.depth_enable = true;
