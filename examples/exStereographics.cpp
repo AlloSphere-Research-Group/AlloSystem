@@ -106,9 +106,9 @@ struct MyWindow : WindowGL{
 				break;
 				
 			default:
-								break;
-		}printf("k:%3d, %d s:%d c:%d a:%d\n", k.key(), k.down(), k.shift(), k.ctrl(), k.alt());
-
+				printf("k:%3d, %d s:%d c:%d a:%d\n", k.key(), k.down(), k.shift(), k.ctrl(), k.alt());
+				break;
+		}
 	}
 	void onKeyUp(const Keyboard& k) {
 		cam.vel().quat().identity();
