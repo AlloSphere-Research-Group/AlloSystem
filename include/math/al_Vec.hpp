@@ -199,6 +199,12 @@ public:
 
 	/// Scales elements evenly so magnitude is one
 	Vec& normalize();
+	
+	/// linear interpolation
+	void lerp(const Vec& target, T amt) { set(lerp(*this, target, amt)); }
+	static Vec lerp(const Vec& input, const Vec& target, T amt) {
+		return input+amt*(target-input);
+	}
 
 	/// Set elements from another vector
 	template <class T2>

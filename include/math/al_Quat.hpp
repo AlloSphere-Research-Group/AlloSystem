@@ -114,6 +114,9 @@ public:
 	
 	/// Warning: Assumes that axes are normalized.
 	static Quat fromAxisAngle(T theta, T x1, T y1, T z1);
+	static Quat fromAxisX(T theta);
+	static Quat fromAxisY(T theta);
+	static Quat fromAxisZ(T theta);
 	static Quat fromEuler(T a, T e, T b);
 	static Quat fromMatrix(T * matrix);
 	
@@ -224,6 +227,42 @@ inline Quat<T> Quat<T> :: fromAxisAngle(T theta, T x1, T y1, T z1) {
 	q.x = x1 * sinft2;
 	q.y = y1 * sinft2;
 	q.z = z1 * sinft2;
+	return q.normalize();
+}
+
+template<typename T>
+inline Quat<T> Quat<T> :: fromAxisX(T theta) {
+	Quat q;
+	T t2 = theta * 0.00872664626; // * 0.5 * 180/PI
+	T sinft2 = sin(t2);
+	q.w = cos(t2);
+	q.x = sinft2;
+	q.y = 0;
+	q.z = 0;
+	return q.normalize();
+}
+
+template<typename T>
+inline Quat<T> Quat<T> :: fromAxisY(T theta) {
+	Quat q;
+	T t2 = theta * 0.00872664626; // * 0.5 * 180/PI
+	T sinft2 = sin(t2);
+	q.w = cos(t2);
+	q.x = 0;
+	q.y = sinft2;
+	q.z = 0;
+	return q.normalize();
+}
+
+template<typename T>
+inline Quat<T> Quat<T> :: fromAxisZ(T theta) {
+	Quat q;
+	T t2 = theta * 0.00872664626; // * 0.5 * 180/PI
+	T sinft2 = sin(t2);
+	q.w = cos(t2);
+	q.x = 0;
+	q.y = 0;
+	q.z = sinft2;
 	return q.normalize();
 }
 

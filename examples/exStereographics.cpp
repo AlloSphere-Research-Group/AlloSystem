@@ -18,6 +18,123 @@ static Camera cam;
 
 static rnd::Random<> rng;
 
+
+class NavControls {
+public:
+	NavControls(double moveSpeed = 0.5, double turnSpeed = 2, double slide = 0.9) 
+	: mMoveRate(moveSpeed), mTurnRate(turnSpeed), mSlide(slide) {}
+	
+	bool keyDown(Camera &cam, int k) {
+		switch (k) {
+			case 'w':
+				turn[0] = -1;
+				return true;
+			case 'x':
+				turn[0] = 1;
+				return true;
+			case 'a':
+				turn[2] = 1;
+				return true;
+			case 'd':
+				turn[2] = -1;
+				return true;
+			case Key::Right:
+				turn[1] = 1;
+				return true;
+			case Key::Left:
+				turn[1] = -1;
+				return true;
+			case Key::Up:
+				move[2] = mMoveRate;
+				return true;
+			case Key::Down:
+				move[2] = -mMoveRate;
+				return true;
+			case '\'':
+				move[1] = mMoveRate;
+				return true;
+			case '/':
+				move[1] = -mMoveRate;
+				return true;
+			case ',':
+				move[0] = -mMoveRate;
+				return true;
+			case '.':
+				move[0] = mMoveRate;
+				return true;
+				
+			case '`':
+				cam.halt(); cam.home();
+				return true;
+		}
+		return false;
+	}
+	
+	bool keyUp(Camera &cam, int k) {
+		switch (k) {
+			case 'w':
+				turn[0] = 0;
+				return true;
+			case 'x':
+				turn[0] = 0;
+				return true;
+			case 'a':
+				turn[2] = 0;
+				return true;
+			case 'd':
+				turn[2] = 0;
+				return true;
+			case Key::Right:
+				turn[1] = 0;
+				return true;
+			case Key::Left:
+				turn[1] = 0;
+				return true;
+			case Key::Up:
+				move[2] = 0;
+				return true;
+			case Key::Down:
+				move[2] = 0;
+				return true;
+			case '\'':
+				move[1] = 0;
+				return true;
+			case '/':
+				move[1] = 0;
+				return true;
+			case ',':
+				move[0] = 0;
+				return true;
+			case '.':
+				move[0] = 0;
+				return true;	
+			case '`':
+				turn.set(0); move.set(0);
+				return true;
+		}
+		return false;
+	}
+	
+	void update(double dt, Camera &cam) {
+		double amt = 1.-pow(mSlide,dt);
+		move1.lerp(move, amt);
+		turn1.lerp(turn, amt);
+		cam.vel().quat().set(Quatd::fromAxisAngle(mTurnRate, turn1[0], turn1[1], turn1[2]));
+		cam.vel().vec().set(move1);
+	}
+protected:
+	Vec3d move, move1;
+	Vec3d turn, turn1;
+	
+	double mMoveRate;
+	double mTurnRate;
+	
+	double mSlide;
+};
+
+static NavControls navcontrols;
+
+
 struct MyWindow : WindowGL{
 
 	void onCreate(){ 					printf("onCreate\n"); }
@@ -26,8 +143,8 @@ struct MyWindow : WindowGL{
 	void onVisibility(bool v){			printf("onVisibility %s\n", v?"true":"false"); }
 	
 	void onKeyDown(const Keyboard& k){	 	
-		const double a = 0.5;
-		const double v = 0.1;
+		
+		if (navcontrols.keyDown(cam, k.key())) return;
 			
 		switch(k.key()){
 			case Key::Escape: fullScreenToggle(); break;
@@ -36,50 +153,6 @@ struct MyWindow : WindowGL{
 			case 'h': if(k.ctrl()) hide(); break;
 			case 'm': if(k.ctrl()) iconify(); break;
 			case 'c': if(k.ctrl()) cursorHideToggle(); break;
-			
-			case 'w':
-				//cam.vel().quat().set(Quatd::fromAxisAngle(a, 1, 0, 0));
-				cam.vel().quat().set(Quatd::fromEuler(0, -a, 0));
-				break;
-			case 'x':
-				//cam.vel().quat().set(Quatd::fromAxisAngle(a, -1, 0, 0));
-				cam.vel().quat().set(Quatd::fromEuler(0, a, 0));
-				break;
-			case 'a':
-				//cam.vel().quat().set(Quatd::fromAxisAngle(a, 0, 0, -1));
-				cam.vel().quat().set(Quatd::fromEuler(0, 0, a));
-				break;
-			case 'd':
-				//cam.vel().quat().set(Quatd::fromAxisAngle(a, 0, 0, 1));
-				cam.vel().quat().set(Quatd::fromEuler(0, 0, -a));
-				break;
-			case Key::Right:
-				//cam.vel().quat().set(Quatd::fromAxisAngle(a, 0, 1, 0));
-				cam.vel().quat().set(Quatd::fromEuler(a, 0, 0));
-				break;
-			case Key::Left:
-				//cam.vel().quat().set(Quatd::fromAxisAngle(a, 0, -1, 0));
-				cam.vel().quat().set(Quatd::fromEuler(-a, 0, 0));
-				break;
-				
-			case Key::Up:
-				cam.moveZ(v);
-				break;
-			case Key::Down:
-				cam.moveZ(-v);
-				break;
-			case '\'':
-				cam.moveY(v);
-				break;
-			case '/':
-				cam.moveY(-v);
-				break;
-			case ',':
-				cam.moveX(-v);
-				break;
-			case '.':
-				cam.moveX(v);
-				break;
 				
 			case '`':
 				cam.halt(); cam.home();
@@ -116,8 +189,7 @@ struct MyWindow : WindowGL{
 		}
 	}
 	void onKeyUp(const Keyboard& k) {
-		cam.vel().quat().identity();
-		cam.move(0, 0, 0);
+		navcontrols.keyUp(cam, k.key());
 	}
 	
 	void onMouseDown(const Mouse& m){	printf("onMouseDown  "); printMouse(); }
@@ -127,7 +199,7 @@ struct MyWindow : WindowGL{
 	
 	void printMouse(){
 		const Mouse& m = mouse();
-		printf("x:%4d y:%4d b:%d,%d\n", m.x(), m.y(), m.button(), m.down());
+		//printf("x:%4d y:%4d b:%d,%d\n", m.x(), m.y(), m.button(), m.down());
 	}
 
 	void onFrame(){
@@ -135,10 +207,11 @@ struct MyWindow : WindowGL{
 		al_sec f = al_time();
 		al_sec dt = f-n;
 		n = f;
-		//printf("%f\n", 1./(f-n));
 		
-		//cam.decay(1.0 - dt*2);
-		cam.step(dt*30.);
+		al_sec frame_dt = dt*fps();
+		
+		navcontrols.update(frame_dt, cam);
+		cam.step(frame_dt);
 		
 		stereo.draw(gl, cam, render, dimensions().w, dimensions().h, NULL);
 	}
@@ -167,15 +240,16 @@ int main (int argc, char * const argv[]) {
 	
 	// set up stuff:
 	stuff.primitive(gfx::TRIANGLES);
-	double size = 0.5;
-	for (int i=0; i<256; i++) {
-		double x = rng.uniformS(4.);
-		double y = rng.uniformS(4.);
-		double z = rng.uniformS(4.);
+	double tri_size = 1;
+	double world_radius = 25;
+	for (int i=0; i<1024; i++) {
+		double x = rng.uniformS(world_radius);
+		double y = rng.uniformS(world_radius);
+		double z = rng.uniformS(world_radius);
 		double c = rng.uniform(0.5);
 		for (int v=0; v<3; v++) {
 			stuff.addColor(0.5+c, 0.5, 1-c);
-			stuff.addVertex(x+rng.uniformS(size), y+rng.uniformS(size), z+rng.uniformS(size));
+			stuff.addVertex(x+rng.uniformS(tri_size), y+rng.uniformS(tri_size), z+rng.uniformS(tri_size));
 		}
 	}
 		
