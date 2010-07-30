@@ -61,7 +61,7 @@ void Stereographic :: drawMono(Graphics& gl, Nav& cam, void (*draw)(void *), dou
 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::lookAt(ux, uz, uy, pos));
+	gl.loadMatrix(Matrix4d::lookAt(ux, uy, uz, pos));
 	
 	draw(userdata);
 	
@@ -133,7 +133,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, Nav& cam, void (*draw)(void *),
 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::lookAtLeft(ux, uz, uy, pos, iod));
+	gl.loadMatrix(Matrix4d::lookAtLeft(ux, uy, uz, pos, iod));
 	
 	draw(userdata);
 	
@@ -175,7 +175,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, Nav& cam, void (*draw)(void *),
 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::lookAtRight(ux, uz, uy, pos, iod));
+	gl.loadMatrix(Matrix4d::lookAtRight(ux, uy, uz, pos, iod));
 	
 	draw(userdata);
 	
@@ -224,7 +224,7 @@ void Stereographic :: drawActive(Graphics& gl, Nav& cam, void (*draw)(void *), d
 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::lookAtLeft(ux, uz, uy, pos, iod));
+	gl.loadMatrix(Matrix4d::lookAtLeft(ux, uy, uz, pos, iod));
 	
 	draw(userdata);
 	
@@ -251,7 +251,7 @@ void Stereographic :: drawActive(Graphics& gl, Nav& cam, void (*draw)(void *), d
 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::lookAtRight(ux, uz, uy, pos, iod));
+	gl.loadMatrix(Matrix4d::lookAtRight(ux, uy, uz, pos, iod));
 	
 	draw(userdata);
 	
@@ -297,7 +297,7 @@ void Stereographic :: drawDual(Graphics& gl, Nav& cam, void (*draw)(void *), dou
 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::lookAtLeft(ux, uz, uy, pos, iod));
+	gl.loadMatrix(Matrix4d::lookAtLeft(ux, uy, uz, pos, iod));
 	
 	draw(userdata);
 	
@@ -319,7 +319,7 @@ void Stereographic :: drawDual(Graphics& gl, Nav& cam, void (*draw)(void *), dou
 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::lookAtRight(ux, uz, uy, pos, iod));
+	gl.loadMatrix(Matrix4d::lookAtRight(ux, uy, uz, pos, iod));
 	
 	draw(userdata);
 	
@@ -364,7 +364,7 @@ void Stereographic :: drawLeft(Graphics& gl, Nav& cam, void (*draw)(void *), dou
 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::lookAtLeft(ux, uz, uy, pos, iod));
+	gl.loadMatrix(Matrix4d::lookAtLeft(ux, uy, uz, pos, iod));
 
 	draw(userdata);
 	
@@ -407,7 +407,7 @@ double aspect = width/height;
 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::lookAtRight(ux, uz, uy, pos, iod));
+	gl.loadMatrix(Matrix4d::lookAtRight(ux, uy, uz, pos, iod));
 
 	draw(userdata);
 	

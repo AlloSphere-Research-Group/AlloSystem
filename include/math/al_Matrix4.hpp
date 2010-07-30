@@ -239,7 +239,7 @@ public:
 						W2/2,	H2/2,	D2/2,	1	);
 	}
 	
-	static const Matrix4 lookAt(const Vec3<T>& ux, const Vec3<T>& uz, const Vec3<T>& uy, const Vec3<T>& pos) {
+	static const Matrix4 lookAt(const Vec3<T>& ux, const Vec3<T>& uy, const Vec3<T>& uz, const Vec3<T>& pos) {
 		return Matrix4(
 			ux[0], uy[0], -uz[0], 0,
 			ux[1], uy[1], -uz[1], 0,
@@ -249,28 +249,15 @@ public:
 	}
 	
 	// for stereographics:
-	static const Matrix4 lookAtLeft(const Vec3<T>& ux, const Vec3<T>& uz, const Vec3<T>& uy, const Vec3<T>& pos, double eyeSep) {
-		return lookAtOffAxis(ux,uz,uy, pos,-eyeSep);
+	static const Matrix4 lookAtLeft(const Vec3<T>& ux, const Vec3<T>& uy, const Vec3<T>& uz, const Vec3<T>& pos, double eyeSep) {
+		return lookAtOffAxis(ux,uy,uz, pos,-eyeSep);
 	}
-	static const Matrix4 lookAtRight(const Vec3<T>& ux, const Vec3<T>& uz, const Vec3<T>& uy, const Vec3<T>& pos, double eyeSep) {
-		return lookAtOffAxis(ux,uz,uy, pos, eyeSep);
+	static const Matrix4 lookAtRight(const Vec3<T>& ux, const Vec3<T>& uy, const Vec3<T>& uz, const Vec3<T>& pos, double eyeSep) {
+		return lookAtOffAxis(ux,uy,uz, pos, eyeSep);
 	}
-	static const Matrix4 lookAtOffAxis(const Vec3<T>& ux, const Vec3<T>& uz, const Vec3<T>& uy, const Vec3<T>& pos, double eyeShift){
-		Vec3<T> eyePos = pos + (ux * eyeShift);
-
-		return Matrix4(
-			ux[0], uy[0], -uz[0], 0,
-			ux[1], uy[1], -uz[1], 0,
-			ux[2], uy[2], -uz[2], 0,
-			-(ux.dot(eyePos)), -(uy.dot(eyePos)), (uz.dot(eyePos)), 1
-		);
+	static const Matrix4 lookAtOffAxis(const Vec3<T>& ux, const Vec3<T>& uy, const Vec3<T>& uz, const Vec3<T>& pos, double eyeShift){
+		return lookAt(ux, uy, uz, pos + (ux * eyeShift));
 	}
-	
-	
-	
-
-	
-		
 };
 
 typedef Matrix4<double>	Matrix4d;	///< Double-precision quaternion
