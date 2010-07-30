@@ -172,9 +172,9 @@ int main (int argc, char * const argv[]) {
 		double x = rng.uniformS(4.);
 		double y = rng.uniformS(4.);
 		double z = rng.uniformS(4.);
-		double c = rng.uniformS(M_PI);
+		double c = rng.uniform(0.5);
 		for (int v=0; v<3; v++) {
-			stuff.addColor(0.5+cos(c), 0.5, 0.5+sin(c));
+			stuff.addColor(0.5+c, 0.5, 1-c);
 			stuff.addVertex(x+rng.uniformS(size), y+rng.uniformS(size), z+rng.uniformS(size));
 		}
 	}
