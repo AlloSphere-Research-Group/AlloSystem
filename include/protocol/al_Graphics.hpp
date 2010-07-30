@@ -74,13 +74,16 @@ enum Primitive {
 	POLYGON
 };
 
-
-enum AttributeBit {
-	COLOR_BUFFER_BIT = 1<<0,
-	DEPTH_BUFFER_BIT = 1<<1,
-	ENABLE_BIT = 1<<2,
-	VIEWPORT_BIT = 1<<3
-};
+namespace AttributeBit {
+	enum t{
+		ColorBuffer	= 1<<0,		/**< Color-buffer bit */
+		DepthBuffer	= 1<<1,		/**< Depth-buffer bit */
+		Enable		= 1<<2,		/**< Enable bit */
+		Viewport	= 1<<3		/**< Viewport bit */
+	};
+	inline t operator| (const t& a, const t& b){ return t(int(a) | int(b)); }
+	inline t operator& (const t& a, const t& b){ return t(int(a) & int(b)); }
+}
 
 struct StateChange {
 	StateChange()

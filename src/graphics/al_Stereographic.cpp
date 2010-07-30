@@ -56,7 +56,7 @@ void Stereographic :: drawMono(Graphics& gl, Camera& cam, void (*draw)(void *), 
 //	glScissor(0, 0, width, height);
 	gl.viewport(0,0,width,height);
 	
-	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
+	gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
 	
 	// apply camera transform:
 	gl.matrixMode(gfx::PROJECTION);
@@ -106,7 +106,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, Camera& cam, void (*draw)(void 
 //	glScissor(0, 0, width, height);
 	gl.viewport(0,0,width,height);
 	
-	gl.clear(gfx::COLOR_BUFFER_BIT);
+	gl.clear(gfx::AttributeBit::ColorBuffer);
 	
 	switch (mAnaglyphMode) {
 		case RedBlue:
@@ -132,7 +132,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, Camera& cam, void (*draw)(void 
 			glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
 	} 
 	//clear(DepthBufferBit);
-	gl.clear(gfx::DEPTH_BUFFER_BIT);
+	gl.clear(gfx::AttributeBit::DepthBuffer);
 	
 	// apply camera transform:
 	gl.matrixMode(gfx::PROJECTION);
@@ -174,7 +174,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, Camera& cam, void (*draw)(void 
 			glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
 	} 
 	//clear(DepthBufferBit);
-	gl.clear(gfx::DEPTH_BUFFER_BIT);
+	gl.clear(gfx::AttributeBit::DepthBuffer);
 	
 	// apply camera transform:
 	gl.matrixMode(gfx::PROJECTION);
@@ -221,7 +221,7 @@ void Stereographic :: drawActive(Graphics& gl, Camera& cam, void (*draw)(void *)
 	//drawBuffer(BackLeft);
 	glDrawBuffer(GL_BACK_LEFT);
 	
-	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
+	gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
 	
 	// GraphicsBackedOpenGL should also apply matching glScissor() 
 //	//enable(ScissorTest);
@@ -248,7 +248,7 @@ void Stereographic :: drawActive(Graphics& gl, Camera& cam, void (*draw)(void *)
 	
 	//drawBuffer(BackRight);
 	glDrawBuffer(GL_BACK_RIGHT);
-	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
+	gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
 	
 	// GraphicsBackedOpenGL should also apply matching glScissor() 
 //	//enable(ScissorTest);
@@ -305,7 +305,7 @@ void Stereographic :: drawDual(Graphics& gl, Camera& cam, void (*draw)(void *), 
 //	glScissor(0, 0, width*0.5, height);
 	gl.viewport(0,0,width*0.5,height);
 	
-	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
+	gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
 	
 	// apply camera transform:
 	gl.matrixMode(gfx::PROJECTION);
@@ -327,7 +327,7 @@ void Stereographic :: drawDual(Graphics& gl, Camera& cam, void (*draw)(void *), 
 //	glScissor(width*0.5, 0, width*0.5, height);
 	gl.viewport(width*0.5,0,width*0.5,height);
 	
-	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
+	gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
 	
 	// apply camera transform:
 	gl.matrixMode(gfx::PROJECTION);
@@ -376,7 +376,7 @@ void Stereographic :: drawLeft(Graphics& gl, Camera& cam, void (*draw)(void *), 
 //	glScissor(0, 0, width, height);
 	gl.viewport(0,0,width,height);
 	
-	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
+	gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
 	
 	// apply camera transform:
 	gl.matrixMode(gfx::PROJECTION);
@@ -423,7 +423,7 @@ void Stereographic :: drawRight(Graphics& gl, Camera& cam, void (*draw)(void *),
 //	glScissor(0, 0, width, height);
 	gl.viewport(0,0,width,height);
 	
-	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
+	gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
 	
 	// apply camera transform:
 	gl.matrixMode(gfx::PROJECTION);

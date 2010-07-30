@@ -119,15 +119,12 @@ void GraphicsBackendOpenGL::lineWidth(double v) {
 
 // Frame
 void GraphicsBackendOpenGL::clear(int attribMask) {
-	if (attribMask & COLOR_BUFFER_BIT != 0) {
-		glClear(GL_COLOR_BUFFER_BIT);
-	} else if (attribMask & DEPTH_BUFFER_BIT != 0) {
-		glClear(GL_DEPTH_BUFFER_BIT);
-	} else if (attribMask & ENABLE_BIT != 0) {
-		glClear(GL_ENABLE_BIT);
-	} else if (attribMask & VIEWPORT_BIT != 0) {
-		glClear(GL_VIEWPORT_BIT);
-	}
+	int bits = 
+		(attribMask & AttributeBit::ColorBuffer ? GL_COLOR_BUFFER_BIT : 0) |
+		(attribMask & AttributeBit::DepthBuffer ? GL_DEPTH_BUFFER_BIT : 0) |
+		(attribMask & AttributeBit::Enable ? GL_ENABLE_BIT : 0) |
+		(attribMask & AttributeBit::Viewport ? GL_VIEWPORT_BIT : 0);
+	glClear(bits);
 }
 
 void GraphicsBackendOpenGL::clearColor(float r, float g, float b, float a) {

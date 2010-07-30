@@ -64,7 +64,7 @@ struct MyWindow : WindowGL{
 	void onMouseDrag(const Mouse& m){}
 
 	void onFrame(){
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
 		gl.loadIdentity();
 		gl.viewport(0,0, dimensions().w, dimensions().h);
 

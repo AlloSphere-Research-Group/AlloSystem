@@ -35,6 +35,7 @@ namespace Attribute{
 		ViewPortBit		= GL_VIEWPORT_BIT
 	};
 	inline t operator| (const t& a, const t& b){ return t(int(a) | int(b)); }
+	inline t operator& (const t& a, const t& b){ return t(int(a) & int(b)); }
 }
 
 namespace BufferType{

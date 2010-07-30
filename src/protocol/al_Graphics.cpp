@@ -52,7 +52,9 @@ Graphics::Graphics(GraphicsBackend *backend)
 {
 	mProjectionMatrix.push(Matrix4d::identity());
 	mModelViewMatrix.push(Matrix4d::identity());
-	mState.push(State());
+	State nullstate;
+	nullstate.depth_enable = false;
+	mState.push(nullstate);
 }
 
 Graphics::~Graphics() {
