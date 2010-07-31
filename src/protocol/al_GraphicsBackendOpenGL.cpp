@@ -12,7 +12,14 @@ GLenum format_from_texture_format(GraphicsBackendOpenGL *backend, Texture::Forma
 GLenum type_from_texture_type(GraphicsBackendOpenGL *backend, Texture::Type type);
 GLenum internal_format_from_format(GraphicsBackendOpenGL *backend, Texture::Format format, Texture::Type type);
 
-
+GLenum gl_antialias_mode(AntiAliasMode::t mode) {
+	switch (mode) {
+		case AntiAliasMode::Nicest:		return GL_NICEST;
+		case AntiAliasMode::Fastest:	return GL_FASTEST;
+		default:
+			return GL_DONT_CARE;
+	}
+}
 
 GLenum gl_blend_func(BlendFunc bf) {
 	switch (bf) {
@@ -103,6 +110,13 @@ void GraphicsBackendOpenGL::enableDepthTesting(bool enable) {
 
 void GraphicsBackendOpenGL::setPolygonMode(PolygonMode mode) {
 	glPolygonMode(GL_FRONT_AND_BACK, gl_polygon_mode(mode));
+}
+
+void GraphicsBackendOpenGL::setAntialiasing(AntiAliasMode::t mode) {
+	GLenum m = gl_antialias_mode(mode);
+	glHint(GL_POINT_SMOOTH_HINT, m);
+	glHint(GL_LINE_SMOOTH_HINT, m);
+	glHint(GL_POLYGON_SMOOTH_HINT, m);
 }
 
 void GraphicsBackendOpenGL::color(const Color &c) {

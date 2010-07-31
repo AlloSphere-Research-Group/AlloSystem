@@ -46,6 +46,7 @@ public:
 	virtual void enableLight(bool enable, int idx) = 0;
 	virtual void enableDepthTesting(bool enable) = 0;
 	virtual void setPolygonMode(PolygonMode mode) = 0;
+	virtual void setAntialiasing(AntiAliasMode::t mode) = 0;
 	virtual void color(const Color &c) = 0;
 	virtual void pointSize(double v) = 0;
 	virtual void lineWidth(double v) = 0;

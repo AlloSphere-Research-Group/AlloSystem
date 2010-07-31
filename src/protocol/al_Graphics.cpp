@@ -97,11 +97,10 @@ void Graphics::compareState(State &prev_state, State &state) {
 	}
 	
 	// anti-aliasing
-	/*
-	if() {
+	if(prev_state.antialias_mode != state.antialias_mode) {
 		mStateChange.antialiasing = true;
 	}
-	*/
+	
 }
 
 
@@ -255,9 +254,7 @@ void Graphics::enableState() {
 	}
 	
 	if(mStateChange.antialiasing) {
-		//mBackend->set_antialiasing(
-		//	state.???
-		//);
+		mBackend->setAntialiasing(state.antialias_mode);
 		mStateChange.antialiasing = false;
 	}
 }

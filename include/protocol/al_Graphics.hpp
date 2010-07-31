@@ -74,6 +74,16 @@ enum Primitive {
 	POLYGON
 };
 
+namespace AntiAliasMode {
+	enum t{
+		DontCare	= 1<<0,	
+		Fastest		= 1<<1,
+		Nicest		= 1<<2
+	};
+	inline t operator| (const t& a, const t& b){ return t(int(a) | int(b)); }
+	inline t operator& (const t& a, const t& b){ return t(int(a) & int(b)); }
+}
+
 namespace AttributeBit {
 	enum t{
 		ColorBuffer	= 1<<0,		/**< Color-buffer bit */
@@ -111,7 +121,8 @@ struct State {
 		blend_dst(DST_COLOR),
 		lighting_enable(false),
 		depth_enable(true),
-		polygon_mode(FILL)
+		polygon_mode(FILL),
+		antialias_mode(AntiAliasMode::DontCare)
 	{}
 	
 	~State() {}
@@ -132,6 +143,7 @@ struct State {
 	PolygonMode polygon_mode;
 	
 	// Anti-Aliasing
+	AntiAliasMode::t antialias_mode;
 	
 };
 
