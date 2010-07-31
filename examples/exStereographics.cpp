@@ -21,114 +21,27 @@ static rnd::Random<> rng;
 
 class NavControls {
 public:
-	NavControls(double moveSpeed = 0.5, double turnSpeed = 2, double slide = 0.9) 
-	: mMoveRate(moveSpeed), mTurnRate(turnSpeed), mSlide(slide) {}
+	NavControls(double turnRate = 2, double slide = 0.85) 
+	: mSlide(slide) {}
 	
-	bool keyDown(Camera &cam, int k) {
-		switch (k) {
-			case 'w':
-				turn[0] = -1;
-				return true;
-			case 'x':
-				turn[0] = 1;
-				return true;
-			case 'a':
-				turn[2] = 1;
-				return true;
-			case 'd':
-				turn[2] = -1;
-				return true;
-			case Key::Right:
-				turn[1] = 1;
-				return true;
-			case Key::Left:
-				turn[1] = -1;
-				return true;
-			case Key::Up:
-				move[2] = mMoveRate;
-				return true;
-			case Key::Down:
-				move[2] = -mMoveRate;
-				return true;
-			case '\'':
-				move[1] = mMoveRate;
-				return true;
-			case '/':
-				move[1] = -mMoveRate;
-				return true;
-			case ',':
-				move[0] = -mMoveRate;
-				return true;
-			case '.':
-				move[0] = mMoveRate;
-				return true;
-				
-			case '`':
-				cam.halt(); cam.home();
-				return true;
-		}
-		return false;
-	}
+	void moveX(double v) { mMove[0] = v; }
+	void moveY(double v) { mMove[1] = v; }
+	void moveZ(double v) { mMove[2] = v; }
+	void turnX(double v) { mTurn[0] = v; }
+	void turnY(double v) { mTurn[1] = v; }
+	void turnZ(double v) { mTurn[2] = v; }
+	void halt() { mMove.set(0); mTurn.set(0); }
 	
-	bool keyUp(Camera &cam, int k) {
-		switch (k) {
-			case 'w':
-				turn[0] = 0;
-				return true;
-			case 'x':
-				turn[0] = 0;
-				return true;
-			case 'a':
-				turn[2] = 0;
-				return true;
-			case 'd':
-				turn[2] = 0;
-				return true;
-			case Key::Right:
-				turn[1] = 0;
-				return true;
-			case Key::Left:
-				turn[1] = 0;
-				return true;
-			case Key::Up:
-				move[2] = 0;
-				return true;
-			case Key::Down:
-				move[2] = 0;
-				return true;
-			case '\'':
-				move[1] = 0;
-				return true;
-			case '/':
-				move[1] = 0;
-				return true;
-			case ',':
-				move[0] = 0;
-				return true;
-			case '.':
-				move[0] = 0;
-				return true;	
-			case '`':
-				turn.set(0); move.set(0);
-				return true;
-		}
-		return false;
-	}
-	
-	void update(double dt, Camera &cam) {
-		double amt = 1.-pow(mSlide,dt);
-		move1.lerp(move, amt);
-		turn1.lerp(turn, amt);
-		cam.vel().quat().set(Quatd::fromAxisAngle(mTurnRate, turn1[0], turn1[1], turn1[2]));
-		cam.vel().vec().set(move1);
+	void update(al_sec dt, Camera &cam) {
+		double amt = 1.-mSlide;	// TODO: adjust for dt
+		mMove1.lerp(mMove, amt);
+		mTurn1.lerp(mTurn, amt);
+		cam.vel().quat().set(Quatd::fromEuler(mTurn1[1], mTurn1[0], mTurn1[2]));
+		cam.vel().vec().set(mMove1);
 	}
 protected:
-	Vec3d move, move1;
-	Vec3d turn, turn1;
-	
-	double mMoveRate;
-	double mTurnRate;
-	
+	Vec3d mMove, mMove1;
+	Vec3d mTurn, mTurn1;
 	double mSlide;
 };
 
@@ -143,9 +56,10 @@ struct MyWindow : WindowGL{
 	void onVisibility(bool v){			printf("onVisibility %s\n", v?"true":"false"); }
 	
 	void onKeyDown(const Keyboard& k){	 	
+	
+		static double a = 1;		// rotational speed: degrees per update
+		static double v = 0.25;		// speed: units per update
 		
-		if (navcontrols.keyDown(cam, k.key())) return;
-			
 		switch(k.key()){
 			case Key::Escape: fullScreenToggle(); break;
 			case 'q': if(k.ctrl()) WindowGL::stopLoop(); break;
@@ -153,10 +67,6 @@ struct MyWindow : WindowGL{
 			case 'h': if(k.ctrl()) hide(); break;
 			case 'm': if(k.ctrl()) iconify(); break;
 			case 'c': if(k.ctrl()) cursorHideToggle(); break;
-				
-			case '`':
-				cam.halt(); cam.home();
-				break;
 				
 			case Key::Tab:
 				stereo.stereo(!stereo.stereo());
@@ -183,13 +93,82 @@ struct MyWindow : WindowGL{
 				printf("stereo mode %d\n", stereo.mode());
 				break;
 				
+			case '`':
+				navcontrols.halt();
+				cam.halt(); 
+				cam.home();
+				break;					
+			case 'w':
+				navcontrols.turnX(-a);
+				break;
+			case 'x':
+				navcontrols.turnX(a);
+				break;
+			case Key::Right:
+				navcontrols.turnY(a);
+				break;
+			case Key::Left:
+				navcontrols.turnY(-a);
+				break;
+			case 'a':
+				navcontrols.turnZ(a);
+				break;
+			case 'd':
+				navcontrols.turnZ(-a);
+				break;
+			case ',':
+				navcontrols.moveX(-v);
+				break;
+			case '.':
+				navcontrols.moveX(v);
+				break;
+			case '\'':
+				navcontrols.moveY(v);
+				break;
+			case '/':
+				navcontrols.moveY(-v);
+				break;
+			case Key::Up:
+				navcontrols.moveZ(v);
+				break;
+			case Key::Down:
+				navcontrols.moveZ(-v);
+				break;
+				
 			default:
 				printf("k:%3d, %d s:%d c:%d a:%d\n", k.key(), k.down(), k.shift(), k.ctrl(), k.alt());
 				break;
 		}
 	}
 	void onKeyUp(const Keyboard& k) {
-		navcontrols.keyUp(cam, k.key());
+		switch (k.key()) {
+			case 'w':
+			case 'x':
+				navcontrols.turnX(0);
+				break;
+			case Key::Right:
+			case Key::Left:
+				navcontrols.turnY(0);
+				break;
+			case 'a':
+			case 'd':
+				navcontrols.turnZ(0);
+				break;
+			case ',':
+			case '.':
+				navcontrols.moveX(0);
+				break;
+			case '\'':
+			case '/':
+				navcontrols.moveY(0);
+				break;
+			case Key::Up:
+			case Key::Down:
+				navcontrols.moveZ(0);
+				break;
+			default:
+				break;
+		}
 	}
 	
 	void onMouseDown(const Mouse& m){	printf("onMouseDown  "); printMouse(); }
@@ -206,11 +185,11 @@ struct MyWindow : WindowGL{
 	
 		al_sec f = al_time();
 		al_sec dt = f-n;
+		al_sec frame_dt = dt*fps();
+		//printf("dt %f\n", dt);
 		n = f;
 		
-		al_sec frame_dt = dt*fps();
-		
-		navcontrols.update(frame_dt, cam);
+		navcontrols.update(dt, cam);
 		cam.step(frame_dt);
 		
 		stereo.draw(gl, cam, render, dimensions().w, dimensions().h, NULL);
@@ -240,9 +219,9 @@ int main (int argc, char * const argv[]) {
 	
 	// set up stuff:
 	stuff.primitive(gfx::TRIANGLES);
-	double tri_size = 1;
-	double world_radius = 25;
-	for (int i=0; i<1024; i++) {
+	double tri_size = 2;
+	double world_radius = 50;
+	for (int i=0; i<4000; i++) {
 		double x = rng.uniformS(world_radius);
 		double y = rng.uniformS(world_radius);
 		double z = rng.uniformS(world_radius);
