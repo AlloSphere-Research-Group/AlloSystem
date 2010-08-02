@@ -46,3 +46,11 @@ Linux
 =====
 
 TODO: put apt-get command line here (for libapr, libportaudio, llvm/clang2.7 etc.
+
+allocore:
+	g++
+	glew-dev
+	libglut3-dev
+	portaudio19-dev
+alloclang:
+	clang

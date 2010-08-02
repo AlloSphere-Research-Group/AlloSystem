@@ -24,7 +24,7 @@ void Stereographic :: draw(Graphics& gl, Camera& cam, void (*draw)(void *), doub
 				drawRight(gl, cam, draw, width, height, userdata);
 				break;
 			default:
-				printf("unknown stereo mode\n");
+				drawMono(gl, cam, draw, width, height, userdata);
 				break;
 		}
 	} else {
