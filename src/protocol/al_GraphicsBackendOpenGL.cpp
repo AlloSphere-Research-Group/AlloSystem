@@ -118,6 +118,11 @@ void GraphicsBackendOpenGL::setAntialiasing(AntiAliasMode::t mode) {
 	glHint(GL_POINT_SMOOTH_HINT, m);
 	glHint(GL_LINE_SMOOTH_HINT, m);
 	glHint(GL_POLYGON_SMOOTH_HINT, m);
+	if (m!=AntiAliasMode::Fastest) {
+		glEnable(GL_POLYGON_SMOOTH);
+	} else {
+		glDisable(GL_POLYGON_SMOOTH);
+	}
 }
 
 void GraphicsBackendOpenGL::color(const Color &c) {

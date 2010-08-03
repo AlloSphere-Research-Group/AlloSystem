@@ -44,7 +44,7 @@ void Stereographic :: drawMono(Graphics& gl, Camera& cam, void (*draw)(void *), 
 	double far = cam.far();
 		
 	//pushAttrib(ColorBufferBit | DepthBufferBit | EnableBit | ViewPortBit);
-	//glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
+	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 	
 	//gl.drawBuffer(Back);
 	glDrawBuffer(GL_BACK);
@@ -77,7 +77,7 @@ void Stereographic :: drawMono(Graphics& gl, Camera& cam, void (*draw)(void *), 
 	//disable(ScissorTest);
 	//glDisable(GL_SCISSOR_TEST);
 	//popAttrib()
-	//glPopAttrib();
+	glPopAttrib();
 }
 
 void Stereographic :: drawAnaglyph(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata) 
@@ -94,7 +94,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, Camera& cam, void (*draw)(void 
 	double iod = cam.IOD();
 	
 	//pushAttrib(ColorBufferBit | DepthBufferBit | EnableBit | ViewPortBit);
-	//glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
+	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 
 	//drawBuffer(BackLeft);
 	glDrawBuffer(GL_BACK);
@@ -199,7 +199,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, Camera& cam, void (*draw)(void 
 //	glDisable(GL_SCISSOR_TEST);
 
 //	//popAttrib()
-//	glPopAttrib();
+	glPopAttrib();
 }
 
 void Stereographic :: drawActive(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata) 
@@ -216,7 +216,7 @@ void Stereographic :: drawActive(Graphics& gl, Camera& cam, void (*draw)(void *)
 	double iod = cam.IOD();
 	
 	//pushAttrib(ColorBufferBit | DepthBufferBit | EnableBit | ViewPortBit);
-	//glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
+	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 	
 	//drawBuffer(BackLeft);
 	glDrawBuffer(GL_BACK_LEFT);
@@ -276,7 +276,7 @@ void Stereographic :: drawActive(Graphics& gl, Camera& cam, void (*draw)(void *)
 	//disable(ScissorTest);
 	//glDisable(GL_SCISSOR_TEST);
 	//popAttrib()
-	//glPopAttrib();
+	glPopAttrib();
 }
 
 void Stereographic :: drawDual(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata) 
@@ -295,7 +295,7 @@ void Stereographic :: drawDual(Graphics& gl, Camera& cam, void (*draw)(void *), 
 	aspect *= 0.5;	// for split view
 	
 	//pushAttrib(ColorBufferBit | DepthBufferBit | EnableBit | ViewPortBit);
-	//glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
+	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 	
 	//drawBuffer(BackLeft);
 	glDrawBuffer(GL_BACK);
@@ -348,7 +348,7 @@ void Stereographic :: drawDual(Graphics& gl, Camera& cam, void (*draw)(void *), 
 	//disable(ScissorTest);
 	//glDisable(GL_SCISSOR_TEST);
 	//popAttrib()
-	//glPopAttrib();
+	glPopAttrib();
 }
 
 
@@ -367,7 +367,7 @@ void Stereographic :: drawLeft(Graphics& gl, Camera& cam, void (*draw)(void *), 
 	double iod = cam.IOD();
 	
 	//pushAttrib(ColorBufferBit | DepthBufferBit | EnableBit | ViewPortBit);
-	//glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
+	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 	
 	glDrawBuffer(GL_BACK);
 	
@@ -397,7 +397,7 @@ void Stereographic :: drawLeft(Graphics& gl, Camera& cam, void (*draw)(void *), 
 	//disable(ScissorTest);
 	//glDisable(GL_SCISSOR_TEST);
 	//popAttrib()
-	//glPopAttrib();
+	glPopAttrib();
 }
 
 void Stereographic :: drawRight(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata) 
@@ -414,7 +414,7 @@ void Stereographic :: drawRight(Graphics& gl, Camera& cam, void (*draw)(void *),
 	double iod = cam.IOD();
 	
 	//pushAttrib(ColorBufferBit | DepthBufferBit | EnableBit | ViewPortBit);
-	//glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
+	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 	
 	glDrawBuffer(GL_BACK);
 	
@@ -444,7 +444,7 @@ void Stereographic :: drawRight(Graphics& gl, Camera& cam, void (*draw)(void *),
 	//disable(ScissorTest);
 	//glDisable(GL_SCISSOR_TEST);
 	//popAttrib()
-	//glPopAttrib();
+	glPopAttrib();
 }
 
 /// blue line sync for active stereo

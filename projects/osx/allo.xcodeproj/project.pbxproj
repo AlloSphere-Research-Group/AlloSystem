@@ -1109,10 +1109,10 @@
 				16AA95EA118F6EEF00B98EC3 /* al_Light.hpp */,
 				16AA967E118F7D5700B98EC3 /* al_Shader.hpp */,
 				16AA960B118F775E00B98EC3 /* al_Texture.hpp */,
+				367F0B3812034EDB00FCC534 /* al_Stereographic.hpp */,
+				36D69A4A11F9264700699158 /* al_Surface.hpp */,
 				361BF03011DEAA9400E60A9C /* pending */,
 				16AA95ED118F6FB800B98EC3 /* OpenGLSupport.txt */,
-				36D69A4A11F9264700699158 /* al_Surface.hpp */,
-				367F0B3812034EDB00FCC534 /* al_Stereographic.hpp */,
 			);
 			path = graphics;
 			sourceTree = "<group>";
@@ -1126,8 +1126,8 @@
 				16AA95F2118F74FB00B98EC3 /* al_Light.cpp */,
 				16AA9609118F774800B98EC3 /* al_Texture.cpp */,
 				16AA967F118F7D6600B98EC3 /* al_Shader.cpp */,
-				36D69A5211F9267800699158 /* al_Surface.cpp */,
 				367F0B3A12034EED00FCC534 /* al_Stereographic.cpp */,
+				36D69A5211F9267800699158 /* al_Surface.cpp */,
 			);
 			path = graphics;
 			sourceTree = "<group>";

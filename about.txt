@@ -2,26 +2,7 @@
 AlloSphere Core C/C++ Libraries
 ===========================================================================
 
-The core is divided into the following modules:
-
-	delta:
-		- schedule events to and from the audio thread
-		- manage audio buffers
-
-	network:
-		- OSC receive and send objects
-
-	system:
-		- threads
-		- high-precision timing
-		- stopwatch
-		- main loop abstraction (attach, register, and enter)
-
-	types:
-		- lattice
-		- priority queue
-		- "tube"	
-
+The core is divided into modules.
 
 ___________________________________________________________________________
 Directory Structure
@@ -36,8 +17,11 @@ include/
 projects/
 	- project files for building libraries and examples
 
-Source files (.c, .cpp) are in */src, and unit tests are in */test where '*' is the module name.
+src/
+	- library source files (.c, .cpp)
 
+unitTests/
+	- unit tests for library
 
-
-
+examples/
+	- example projects using library
