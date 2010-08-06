@@ -42,7 +42,9 @@ public:
 		int depth_id;
 	};
 	
-	
+	static Graphics * makeGraphics() {
+		return new Graphics(new GraphicsBackendOpenGL());
+	}
 
 	GraphicsBackendOpenGL();
 	virtual ~GraphicsBackendOpenGL();

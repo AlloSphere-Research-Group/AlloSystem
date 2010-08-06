@@ -120,8 +120,15 @@ void GraphicsBackendOpenGL::setAntialiasing(AntiAliasMode::t mode) {
 	glHint(GL_POLYGON_SMOOTH_HINT, m);
 	if (m!=AntiAliasMode::Fastest) {
 		glEnable(GL_POLYGON_SMOOTH);
+		glEnable(GL_LINE_SMOOTH);
+		glEnable(GL_POINT_SMOOTH);
+		glEnable(GL_POINT_SMOOTH_HINT);
+		glEnable(GL_LINE_SMOOTH_HINT);
+		glEnable(GL_POLYGON_SMOOTH_HINT);
 	} else {
 		glDisable(GL_POLYGON_SMOOTH);
+		glDisable(GL_LINE_SMOOTH);
+		glDisable(GL_POINT_SMOOTH);
 	}
 }
 

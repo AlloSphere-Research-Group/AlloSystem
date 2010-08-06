@@ -199,6 +199,7 @@ struct MyWindow : WindowGL{
 	{	
 		gfx::State state;
 		state.depth_enable = true;
+		//state.blend_enable = true;
 		state.antialias_mode = gfx::AntiAliasMode::Nicest;
 		gl.pushState(state);
 		

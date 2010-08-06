@@ -355,6 +355,13 @@
 			remoteGlobalIDString = 36B4130E10EFFA8D007B16D0;
 			remoteInfo = allocore;
 		};
+		36573C8A120CA82500353D27 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 36B4130E10EFFA8D007B16D0;
+			remoteInfo = allocore;
+		};
 		367F0B4D12034F1E00FCC534 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
@@ -1831,6 +1838,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				36573C8B120CA82500353D27 /* PBXTargetDependency */,
 			);
 			name = alloclang;
 			productName = alloutil;
@@ -2348,6 +2356,11 @@
 			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
 			targetProxy = 3622BFD8116D55DD00928703 /* PBXContainerItemProxy */;
 		};
+		36573C8B120CA82500353D27 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
+			targetProxy = 36573C8A120CA82500353D27 /* PBXContainerItemProxy */;
+		};
 		367F0B4C12034F1E00FCC534 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
@@ -2519,6 +2532,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
+				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx10.5;
 				SYMROOT = ../../build;
 				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../include";
@@ -2569,6 +2583,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
+				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx10.5;
 				STRIP_STYLE = debugging;
 				SYMROOT = ../../build;
