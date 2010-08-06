@@ -198,10 +198,15 @@ struct MyWindow : WindowGL{
 	static void render(void * ud) 
 	{	
 		gfx::State state;
-		state.depth_enable = true;
-		//state.blend_enable = true;
+		state.depth_enable = false;
+		state.blend_enable = true;
+		
+		state.blend_src = gfx::SRC_ALPHA_SATURATE;
+		state.blend_dst = gfx::ONE;
 		state.antialias_mode = gfx::AntiAliasMode::Nicest;
 		gl.pushState(state);
+		
+		//glEnable(GL_POLYGON_SMOOTH);
 		
 		gl.pointSize(2);
 		gl.draw(stuff);		
@@ -229,7 +234,7 @@ int main (int argc, char * const argv[]) {
 		double z = rng.uniformS(world_radius);
 		double c = rng.uniform(0.5);
 		for (int v=0; v<3; v++) {
-			stuff.addColor(0.5+c, 0.5, 1-c);
+			stuff.addColor(0.5+c, 0.5, 1-c, 0.5);
 			stuff.addVertex(x+rng.uniformS(tri_size), y+rng.uniformS(tri_size), z+rng.uniformS(tri_size));
 		}
 	}

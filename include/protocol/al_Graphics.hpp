@@ -50,7 +50,8 @@ enum BlendFunc {
 	DST_ALPHA,
 	DST_COLOR,
 	ZERO,
-	ONE
+	ONE,
+	SRC_ALPHA_SATURATE
 };
 
 enum PolygonMode {

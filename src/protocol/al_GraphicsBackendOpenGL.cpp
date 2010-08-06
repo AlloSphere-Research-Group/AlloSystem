@@ -30,6 +30,7 @@ GLenum gl_blend_func(BlendFunc bf) {
 		case DST_ALPHA:	return GL_DST_ALPHA;
 		case ZERO:		return GL_ZERO;
 		case ONE:		return GL_ONE;
+		case SRC_ALPHA_SATURATE: return GL_SRC_ALPHA_SATURATE;
 		
 		default:
 			return GL_SRC_COLOR;
@@ -115,6 +116,9 @@ void GraphicsBackendOpenGL::setPolygonMode(PolygonMode mode) {
 
 void GraphicsBackendOpenGL::setAntialiasing(AntiAliasMode::t mode) {
 	GLenum m = gl_antialias_mode(mode);
+	glEnable(GL_POINT_SMOOTH_HINT);
+	glEnable(GL_LINE_SMOOTH_HINT);
+	glEnable(GL_POLYGON_SMOOTH_HINT);
 	glHint(GL_POINT_SMOOTH_HINT, m);
 	glHint(GL_LINE_SMOOTH_HINT, m);
 	glHint(GL_POLYGON_SMOOTH_HINT, m);
@@ -122,9 +126,6 @@ void GraphicsBackendOpenGL::setAntialiasing(AntiAliasMode::t mode) {
 		glEnable(GL_POLYGON_SMOOTH);
 		glEnable(GL_LINE_SMOOTH);
 		glEnable(GL_POINT_SMOOTH);
-		glEnable(GL_POINT_SMOOTH_HINT);
-		glEnable(GL_LINE_SMOOTH_HINT);
-		glEnable(GL_POLYGON_SMOOTH_HINT);
 	} else {
 		glDisable(GL_POLYGON_SMOOTH);
 		glDisable(GL_LINE_SMOOTH);
