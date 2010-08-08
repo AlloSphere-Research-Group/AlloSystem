@@ -119,6 +119,15 @@ public:
 	static Quat fromAxisZ(T theta);
 	static Quat fromEuler(T a, T e, T b);
 	static Quat fromMatrix(T * matrix);
+	static Quat& fromMatrix(Mat<4, T>& matrix) { return fromMatrix(matrix.ptr()); }
+	
+	Quat& setFromAxisAngle(T theta, T x1, T y1, T z1) { return set(fromAxisAngle(theta, x1, y1, z1)); }
+	Quat& setFromAxisX(T theta) { return set(fromAxisX(theta)); }
+	Quat& setFromAxisY(T theta) { return set(fromAxisY(theta)); }
+	Quat& setFromAxisZ(T theta) { return set(fromAxisZ(theta)); }
+	Quat& setFromEuler(T a, T e, T b) { return set(fromEuler(a, e, b)); }
+	Quat& setFromMatrix(T * matrix) { return set(fromMatrix(matrix)); }
+	Quat& setFromMatrix(Mat<4, T>& matrix) { return set(fromMatrix(matrix.ptr())); }
 	
 	/// Convert to 4x4 column-major matrix
 	void toMatrix(T * matrix) const;
@@ -138,9 +147,9 @@ public:
 	/// Rotate vector
 	void rotate(Vec3<T>& v) const;
 	void rotateVector(const T * src, T * dst) const;
-	void rotateVector(const Vec3<T>& src, Vec3<T>& dst) const;
+	Vec3<T> rotateVector(const Vec3<T>& src) const;
 	void rotateVectorTransposed(const T * src, T * dst) const;
-	void rotateVectorTransposed(const Vec3<T>& src, Vec3<T>& dst) const;
+	Vec3<T> rotateVectorTransposed(const Vec3<T>& src) const;
 	
 	/// Spherical interpolation
 	Quat& slerp(const Quat& target, T amt) { return set(slerp(*this, target, amt)); }
@@ -448,8 +457,10 @@ inline void Quat<T> :: rotateVector(const T * src, T * dst) const {
 }
 
 template<typename T>
-inline void Quat<T> :: rotateVector(const Vec3<T>& src, Vec3<T>& dst) const {
+inline Vec3<T> Quat<T> :: rotateVector(const Vec3<T>& src) const {
+	Vec3<T> dst;
 	rotateVector(&src[0], &dst[0]);
+	return dst;
 }
 
 template<typename T>
@@ -462,8 +473,10 @@ inline void Quat<T> :: rotateVectorTransposed(const T * src, T * dst) const {
 }
 
 template<typename T>
-inline void Quat<T> :: rotateVectorTransposed(const Vec3<T>& src, Vec3<T>& dst) const {
+inline Vec3<T> Quat<T> :: rotateVectorTransposed(const Vec3<T>& src) const {
+	Vec3<T> dst;
 	rotateVectorTransposed(&src[0], &dst[0]);
+	return dst;
 }
 
 

@@ -2529,7 +2529,7 @@
 					$PROJECT_DIR/../../dev/osx/lib,
 					$PROJECT_DIR/../../build/$CONFIGURATION,
 				);
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				RUN_CLANG_STATIC_ANALYZER = YES;
@@ -2546,7 +2546,8 @@
 					x86_64,
 					i386,
 				);
-				DEPLOYMENT_LOCATION = YES;
+				COPY_PHASE_STRIP = NO;
+				DEPLOYMENT_LOCATION = NO;
 				DEPLOYMENT_POSTPROCESSING = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_ENABLE_CPP_RTTI = YES;
@@ -2580,11 +2581,12 @@
 					$PROJECT_DIR/../../dev/osx/lib,
 					$PROJECT_DIR/../../build/$CONFIGURATION,
 				);
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = macosx10.5;
+				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = debugging;
 				SYMROOT = ../../build;
 				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../include";
@@ -3100,7 +3102,7 @@
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				INSTALL_PATH = /usr/local/lib;
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../../dev/osx/lib\"";
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "-DOSC_HOST_LITTLE_ENDIAN";
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -3125,7 +3127,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = YES;
+				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
@@ -3147,6 +3149,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				SDKROOT = $inherited;
+				SEPARATE_STRIP = NO;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
 				SYMROOT = $inherited;
 				USER_HEADER_SEARCH_PATHS = $inherited;

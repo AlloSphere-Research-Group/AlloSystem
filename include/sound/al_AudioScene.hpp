@@ -33,7 +33,6 @@ protected:
 		mAmbiDomainChannels.resize(mDecoder.channels() * numFrames);
 	}
 	
-	friend class AudioScene;
 	AmbiDecode mDecoder;
 	
 	std::vector<float> mAmbiDomainChannels;
