@@ -28,6 +28,7 @@
 #define INCLUDE_ALLO_TYPES_CPP_H 1
 
 #include "al_types.h"
+#include "math/al_Functions.hpp"	
 #include <stdlib.h>
 
 namespace al {
@@ -303,6 +304,8 @@ public:
 	// linear interpolated lookup (virtual lattice index x, y)
 	// writes the linearly interpolated plane values into val array
 	template<typename T> void interp1d(T* val, double x) {
+	
+		x = wrap<double>(x, (double)header.dim[0], 0.);
 		
 		#define DOUBLE_FLOOR(v) ( (long)(v) - ((v)<0.0 && (v)!=(long)(v)) )
 		#define DOUBLE_CEIL(v) ( (((v)>0.0)&&((v)!=(long)(v))) ? 1+(v) : (v) )
@@ -335,6 +338,8 @@ public:
 	// linear interpolated write (virtual lattice index x, y)
 	// writes the linearly interpolated plane values from val array into lattice
 	template<typename T> void writeInterp1d(T* val, double x) {
+	
+		x = wrap<double>(x, (double)header.dim[0], 0.);
 		
 		#define DOUBLE_FLOOR(v) ( (long)(v) - ((v)<0.0 && (v)!=(long)(v)) )
 		#define DOUBLE_CEIL(v) ( (((v)>0.0)&&((v)!=(long)(v))) ? 1+(v) : (v) )
@@ -368,6 +373,9 @@ public:
 	// bilinear interpolated lookup (virtual lattice index x, y)
 	// writes the linearly interpolated plane values into val array
 	template<typename T> void interp2d(T* val, double x, double y) {
+	
+		x = wrap<double>(x, (double)header.dim[0], 0.);
+		y = wrap<double>(y, (double)header.dim[1], 0.);
 		
 		#define DOUBLE_FLOOR(v) ( (long)(v) - ((v)<0.0 && (v)!=(long)(v)) )
 		#define DOUBLE_CEIL(v) ( (((v)>0.0)&&((v)!=(long)(v))) ? 1+(v) : (v) )
@@ -415,6 +423,9 @@ public:
 	// bilinear interpolated write (virtual lattice index x, y)
 	// writes the linearly interpolated plane values from val array into lattice
 	template<typename T> void writeInterp2d(T* val, double x, double y) {
+	
+		x = wrap<double>(x, (double)header.dim[0], 0.);
+		y = wrap<double>(y, (double)header.dim[1], 0.);
 		
 		#define DOUBLE_FLOOR(v) ( (long)(v) - ((v)<0.0 && (v)!=(long)(v)) )
 		#define DOUBLE_CEIL(v) ( (((v)>0.0)&&((v)!=(long)(v))) ? 1+(v) : (v) )
@@ -464,6 +475,10 @@ public:
 	// trilinear interpolated lookup (virtual lattice index x, y, z)
 	// writes the linearly interpolated plane values into val array
 	template<typename T> void interp3d(T* val, double x, double y, double z) {
+	
+		x = wrap<double>(x, (double)header.dim[0], 0.);
+		y = wrap<double>(y, (double)header.dim[1], 0.);
+		z = wrap<double>(z, (double)header.dim[2], 0.);
 		
 		#define DOUBLE_FLOOR(v) ( (long)(v) - ((v)<0.0 && (v)!=(long)(v)) )
 		#define DOUBLE_CEIL(v) ( (((v)>0.0)&&((v)!=(long)(v))) ? 1+(v) : (v) )
@@ -528,6 +543,10 @@ public:
 	// trilinear interpolated write (virtual lattice index x, y, z)
 	// writes the linearly interpolated plane values from val array into lattice
 	template<typename T> void writeInterp3d(T* val, double x, double y, double z) {
+	
+		x = wrap<double>(x, (double)header.dim[0], 0.);
+		y = wrap<double>(y, (double)header.dim[1], 0.);
+		z = wrap<double>(z, (double)header.dim[2], 0.);
 		
 		#define DOUBLE_FLOOR(v) ( (long)(v) - ((v)<0.0 && (v)!=(long)(v)) )
 		#define DOUBLE_CEIL(v) ( (((v)>0.0)&&((v)!=(long)(v))) ? 1+(v) : (v) )
