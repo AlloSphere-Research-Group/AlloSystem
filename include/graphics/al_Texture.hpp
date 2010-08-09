@@ -67,6 +67,12 @@ public:
 	void setLatticeFormat(AlloLatticeHeader &header);
 	void fromLattice(al::Lattice *lattice);
 	
+	// trigger textureSubmit:
+	void update() { mUpdate = true; }
+	
+	// retrieve internal lattice:
+	al::Lattice& lattice() { return mLattice; }
+	
 	bool rect();
 	void rect(bool v);
 	
@@ -109,6 +115,7 @@ public:
 	
 	
 	Color& borderColor() {return mBorderColor;}
+	
 	
 protected:
 	virtual void onCreate();

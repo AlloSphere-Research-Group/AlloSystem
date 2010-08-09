@@ -64,6 +64,9 @@ void Texture::setLatticeFormat(AlloLatticeHeader &header) {
 	mDepth = header.dim[2];
 	
 	mTarget = target_for_lattice_dimcount(header.dimcount);
+	
+	// allocate lattice data space
+	mLattice.adapt(header);
 }
 
 void Texture::fromLattice(al::Lattice *lattice) {
