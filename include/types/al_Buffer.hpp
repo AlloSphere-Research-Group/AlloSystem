@@ -121,6 +121,8 @@ public:
 		mPos=mSize;
 		++mSize;
 	}
+	/// synonym for append():
+	void push_back(const T &v, double growFactor=2) { append(v, growFactor); }	
 
 	/// Write new element to ring buffer
 	void write(const T& v){

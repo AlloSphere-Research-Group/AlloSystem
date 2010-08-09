@@ -39,14 +39,18 @@ template <int N, class T> class Mat;
 
 typedef Vec<2,float>	Vec2f;
 typedef Vec<2,double>	Vec2d;
+typedef Vec<2,int>		Vec2i;
 typedef Vec3<float>		Vec3f;
 typedef Vec3<double>	Vec3d;
+typedef Vec3<int>		Vec3i;
 typedef Vec4<float>		Vec4f;
 typedef Vec4<double>	Vec4d;
+typedef Vec4<int>		Vec4i;
 typedef Mat<3,float>	Mat3f;
 typedef Mat<3,double>	Mat3d;
 typedef Mat<4,float>	Mat4f;
 typedef Mat<4,double>	Mat4d;
+typedef Mat<4,int>		Mat4i;
 
 // Forward iterates from 0 to n-1. Current index is 'i'.
 #define IT(n) for(int i=0; i<n; ++i)
@@ -608,6 +612,8 @@ struct Vec3 : public Vec<3,T> {
 	Vec3(const T& x, const T& y, const T& z){ Base::set(x,y,z); }
 
 	Vec3& operator= (const Base& v){ Base::set(v); return *this; }
+	
+	
 };
 
 

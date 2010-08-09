@@ -12,7 +12,7 @@ namespace gfx{
 
 /// These should be set before rendering the vertices of the object they
 /// are to be applied to.
-class Material{
+class Material {
 public:
 
 	Material(Face::t f=Face::Front);
@@ -31,6 +31,12 @@ public:
 	Material& diffuse(const Color& v);
 	Material& emission(const Color& v);
 	Material& specular(const Color& v);
+	
+	float shininess() const { return mShine; }
+	const Color& ambient() const { return mAmbient; }
+	const Color& diffuse() const  { return mDiffuse; }
+	const Color& emission() const { return mEmission; }
+	const Color& specular() const { return mSpecular; }
 
 protected:
 	Color mAmbient;

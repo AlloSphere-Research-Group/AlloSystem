@@ -5,11 +5,14 @@ namespace al {
 namespace gfx{
 
 Material::Material(Face::t f)
-:	mAmbient(0), mDiffuse(1), mEmission(0), mSpecular(0),
-	mShine(0), mFace(f)
-{
-	
-}
+:	mAmbient(0.2), 
+	mDiffuse(0.8), 
+	mEmission(0.), 
+	mSpecular(0.),
+	mShine(0), 
+	mFace(f)
+{}
+
 void Material::operator()() const {
 	glMaterialfv(mFace, GL_AMBIENT, mAmbient.components);
 	glMaterialfv(mFace, GL_DIFFUSE, mDiffuse.components);

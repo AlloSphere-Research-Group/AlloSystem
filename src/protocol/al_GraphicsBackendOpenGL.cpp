@@ -761,6 +761,8 @@ void GraphicsBackendOpenGL::draw(const GraphicsData& v) {
 	if(Nc){
 		glEnableClientState(GL_COLOR_ARRAY);
 		glColorPointer(4, GL_FLOAT, 0, &v.colors()[0]);			
+	} else {
+		glColor4f(1, 1, 1, 1);
 	}
 	
 	if(Nt2 || Nt3){

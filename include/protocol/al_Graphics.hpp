@@ -148,7 +148,7 @@ struct State {
 	
 };
 
-class GraphicsData{
+class GraphicsData {
 public:
 
 	typedef Vec<3,float>	Vertex;
@@ -161,6 +161,14 @@ public:
 	/// Reset all buffers
 	void resetBuffers();
 	void equalizeBuffers();
+	void getBounds(Vertex& min, Vertex& max);
+	void unitize();	/// scale to -1..1
+	void center(); // center at 0,0,0
+	
+	// generates smoothed normals for a set of vertices
+	// will replace any normals currently in use
+	// angle - maximum angle (in degrees) to smooth across
+	void generateNormals(float angle);
 
 	Primitive primitive() const { return mPrimitive; } 
 	const Buffer<Vertex>& vertices() const { return mVertices; }
@@ -172,10 +180,15 @@ public:
 
 	void addIndex(unsigned int i){ indices().append(i); }
 	void addColor(float r, float g, float b, float a=1){ colors().append(Color(r,g,b,a)); }
+	void addColor(Color& v) { colors().append(v); }
 	void addNormal(float x, float y, float z=0){ normals().append(Normal(x,y,z)); }
+	void addNormal(Normal& v) { normals().append(v); }
 	void addTexCoord(float u, float v){ texCoord2s().append(TexCoord2(u,v)); }
 	void addTexCoord(float u, float v, float w){ texCoord3s().append(TexCoord3(u,v,w)); }
+	void addTexCoord(TexCoord2& v){ texCoord2s().append(v); }
+	void addTexCoord(TexCoord3& v){ texCoord3s().append(v); }
 	void addVertex(float x, float y, float z=0){ vertices().append(Vertex(x,y,z)); }
+	void addVertex(Vertex& v){ vertices().append(v); }
 	void primitive(Primitive prim){ mPrimitive=prim; }
 
 	Buffer<Vertex>& vertices(){ return mVertices; }

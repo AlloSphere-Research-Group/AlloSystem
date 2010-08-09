@@ -42,6 +42,45 @@ void GraphicsData::equalizeBuffers() {
 	}
 }
 
+void GraphicsData::generateNormals(float angle) {
+
+}
+
+void GraphicsData::getBounds(Vertex& min, Vertex& max) {
+	min.set(mVertices[0]);
+	max.set(mVertices[0]);
+	for (int v=1; v<mVertices.size(); v++) {
+		Vertex& vt = mVertices[v];
+		for (int i=0; i<3; i++) {
+			min[i] = MIN(min[i], vt[i]);
+			max[i] = MAX(max[i], vt[i]);
+		}
+	}
+}
+
+void GraphicsData::unitize() {
+	Vertex min, max;
+	getBounds(min, max);
+	Vertex avg = (max-min)*0.5;
+	for (int v=0; v<mVertices.size(); v++) {
+		Vertex& vt = mVertices[v];
+		for (int i=0; i<3; i++) {
+			vt[i] = -1. + (vt[i]-min[i])/avg[i];
+		}
+	}
+}
+
+void GraphicsData::center() {
+	Vertex min, max;
+	getBounds(min, max);
+	Vertex offset = min+(max-min)*0.5;
+	for (int v=0; v<mVertices.size(); v++) {
+		Vertex& vt = mVertices[v];
+		for (int i=0; i<3; i++) {
+			vt[i] = vt[i] - offset[i];
+		}
+	}
+}
 
 
 
@@ -168,12 +207,12 @@ void Graphics::translate(double x, double y, double z) {
 
 void Graphics::rotate(double angle, double x, double y, double z) {
 	stack<Matrix4d> &matrix_stack = matrixStackForMode(mMatrixMode);
-	matrix_stack.top() *= Matrix4d::rotate(angle, Vec3d(x, y, z));
+	matrix_stack.top() *= Matrix4d::rotate(angle, Vec3d(x, y, z)); // * matrix_stack.top();
 }
 
 void Graphics::scale(double x, double y, double z) {
 	stack<Matrix4d> &matrix_stack = matrixStackForMode(mMatrixMode);
-	matrix_stack.top() *= Matrix4d::scale(x, y, z);
+	matrix_stack.top() *= Matrix4d::scale(x, y, z); // * matrix_stack.top();
 }
 
 // Immediate Mode
