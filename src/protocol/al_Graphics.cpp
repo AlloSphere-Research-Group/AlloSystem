@@ -1,3 +1,7 @@
+#include <vector>
+#include <map>
+#include <string>
+
 #include "protocol/al_Graphics.hpp"
 #include "protocol/al_GraphicsBackend.hpp"
 
@@ -42,8 +46,66 @@ void GraphicsData::equalizeBuffers() {
 	}
 }
 
-void GraphicsData::generateNormals(float angle) {
+class TriFace {
+public:
+	GraphicsData::Vertex vertices[3];
+	Vec3f norm;
+	
+	TriFace(const TriFace& cpy) 
+	: norm(cpy.norm) {	
+		vertices[0] = cpy.vertices[0];
+		vertices[1] = cpy.vertices[1];
+		vertices[2] = cpy.vertices[2];
+	}
+	TriFace(GraphicsData::Vertex p0, GraphicsData::Vertex p1, GraphicsData::Vertex p2)
+	{
+		vertices[0] = p0;
+		vertices[1] = p1;
+		vertices[2] = p2;
+		// calculate norm for this face:
+		normal<float>(norm, p0, p1, p2);
+	}
+};
 
+void GraphicsData::generateNormals(float angle) {
+//	/*
+//		Multi-pass algorithm:
+//			generate a list of faces (assume triangles?)
+//				(vary according to whether mIndices is used)
+//			calculate normal per face (use normal<float>(dst, p0, p1, p2))
+//			vertices may be used in multiple faces; their norm should be an average of the uses
+//				easy enough if indices is being used; not so easy otherwise. 
+//					create a lookup table by hashing on vertex x,y,z
+//			
+//			
+//			write avg into corresponding normals for each vertex
+//				EXCEPT: if edge is sharper than @angle, just use the face normal directly
+//	*/
+//	std::vector<TriFace> faces;
+//	
+//	std::map<std::string, int> vertexHash;
+//	
+//	int Ni = indices().size();
+//	int Nv = vertices().size();
+//	if (Ni) {
+//		for (int i=0; i<Ni;) {
+//			TriFace face(
+//				mVertices[mIndices[i++]],
+//				mVertices[mIndices[i++]],
+//				mVertices[mIndices[i++]]
+//			);
+//			faces.push_back(face);
+//		}
+//	} else {
+//		for (int i=0; i<Nv;) {
+//			TriFace face(	
+//				mVertices[i++],
+//				mVertices[i++],
+//				mVertices[i++]
+//			);
+//			faces.push_back(face);
+//		}
+//	}
 }
 
 void GraphicsData::getBounds(Vertex& min, Vertex& max) {
