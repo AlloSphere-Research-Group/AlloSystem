@@ -52,7 +52,7 @@ static void freeID(int i){ lightPool()[i]=false; }
 
 
 Light::Light(float x, float y, float z)
-:	mID(nextID()), mAmbient(0.2), mDiffuse(0.7), mSpecular(1)
+:	mID(nextID()), mAmbient(0.), mDiffuse(1.), mSpecular(1.)
 {
 	mPos[3]=1;
 	pos(x,y,z);
@@ -66,7 +66,7 @@ Light::~Light(){
 void Light::operator()() const {
 	glEnable(GL_LIGHTING);
 	glEnable(GL_COLOR_MATERIAL);
-	//glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	int glID = lightID(mID);
 	glLightfv(glID, GL_AMBIENT,		mAmbient.components);
 	glLightfv(glID, GL_DIFFUSE,		mDiffuse.components);
@@ -77,7 +77,7 @@ void Light::operator()() const {
     glLightf(glID, GL_QUADRATIC_ATTENUATION,mAtten[2]);
 	
 	glEnable(glID); // MUST enable each light source after configuration
-//	glShadeModel(GL_FLAT);
+	glShadeModel(GL_SMOOTH);
 }
 
 Light& Light::attenuation(float c0, float c1, float c2){
