@@ -5,11 +5,11 @@ namespace al {
 namespace gfx{
 
 Material::Material(Face::t f)
-:	mAmbient(0.2), 
-	mDiffuse(0.8), 
+:	mAmbient(0.), 
+	mDiffuse(0.6), 
 	mEmission(0.), 
-	mSpecular(0.),
-	mShine(0), 
+	mSpecular(1.),
+	mShine(5.), 
 	mFace(f)
 {}
 
@@ -52,7 +52,7 @@ static void freeID(int i){ lightPool()[i]=false; }
 
 
 Light::Light(float x, float y, float z)
-:	mID(nextID()), mAmbient(0.), mDiffuse(1.), mSpecular(1.)
+:	mID(nextID()), mAmbient(0.), mDiffuse(0.9), mSpecular(0.9)
 {
 	mPos[3]=1;
 	pos(x,y,z);
