@@ -85,7 +85,7 @@ public:
 		while (iter != mGroups.end()) {	
 			Group& gr = iter->second;
 			// apply materials:
-			mMaterials[gr.material()]();
+			//mMaterials[gr.material()]();
 			// render data:
 			gl.draw(gr.data());
 			iter++;

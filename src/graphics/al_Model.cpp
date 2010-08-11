@@ -46,7 +46,7 @@ void Model :: readMTL(std::string name)
     }
 	
 	mMaterials.insert(std::make_pair("default", Material()));
-	Material& current = mMaterials["default"];
+	Material * current = &mMaterials["default"];
 	
 	Color color;
 	float shininess;
@@ -57,24 +57,24 @@ void Model :: readMTL(std::string name)
 	float optical_density;
 	
     while(fscanf(file, "%s", buf) != EOF) {
-		printf("mtl %s\n", buf);
 		switch(buf[0]) {
 			case 'n':               /* newmtl */
 				fgets(buf, MODEL_PARSER_BUF_LEN, file);
 				sscanf(buf, "%s %s", buf, buf);
 				mMaterials.insert(std::make_pair(buf, Material()));
-				current = mMaterials[buf];
+				printf(">>> mtl %s\n", buf);
+				current = &mMaterials[buf];
 				break;
 			case 'N':
 				switch(buf[1]) {
 					case 's':
 						fscanf(file, "%f", &shininess);
 						/* wavefront shininess is from [0, 1000], so scale for OpenGL */
-						current.shininess(shininess*128./1000.);
+						current->shininess(shininess*128./1000.);
 						break;
 					case 'i':
 						fscanf(file, "%f", &optical_density);
-						printf("optical_density %f\n", optical_density/1000.0);
+						current->opticalDensity(optical_density*128./1000.);
 						break;
 					default:
 						/* eat up rest of line */
@@ -91,21 +91,21 @@ void Model :: readMTL(std::string name)
 							&color.r,
 							&color.g,
 							&color.b);
-						current.diffuse(color);
+						current->diffuse(color);
 						break;
 					case 's':
 						fscanf(file, "%f %f %f",
 							&color.r,
 							&color.g,
 							&color.b);
-						current.specular(color);
+						current->specular(color);
 						break;
 					case 'a':
 						fscanf(file, "%f %f %f",
 							&color.r,
 							&color.g,
 							&color.b);
-						current.ambient(color);
+						current->ambient(color);
 						break;
 					default:
 						/* eat up rest of line */
@@ -119,15 +119,15 @@ void Model :: readMTL(std::string name)
 						switch(buf[5]) {
 							case 'a':
 								fscanf(file, "%s", buf);
-								printf("map_Ka: %s\n", buf);
+								current->ambientMap(buf);
 								break;
 							case 'd':
 								fscanf(file, "%s", buf);
-								printf("map_Kd: %s\n", buf);
+								current->diffuseMap(buf);
 								break;
 							case 's':
 								fscanf(file, "%s", buf);
-								printf("map_Ks: %s\n", buf);
+								current->specularMap(buf);
 								break;
 							default:
 								printf("unhandled: %s\n", buf);
@@ -138,15 +138,28 @@ void Model :: readMTL(std::string name)
 						break;
 					case 'd':
 						fscanf(file, "%s", buf);
-						printf("map_d: %s\n", buf);
+						printf("unhandled: map_d: %s\n", buf);
 						break;
 					case 'a':
 						fscanf(file, "%s", buf);
-						printf("map_aat: %s\n", buf);
+						printf("unhandled: map_aat: %s\n", buf);
 						break;
 					case 'N':
 						fscanf(file, "%s", buf);
-						printf("map_Ns: %s\n", buf);
+						printf("unhandled: map_Ns: %s\n", buf);
+						break;
+					default:
+						printf("unhandled: %s\n", buf);
+						/* eat up rest of line */
+						fgets(buf, MODEL_PARSER_BUF_LEN, file);
+						break;
+					}
+				break;
+			case 'b':
+				switch(buf[1]) {
+					case 'u':
+						fscanf(file, "%s", buf);
+						current->bumpMap(buf);
 						break;
 					default:
 						printf("unhandled: %s\n", buf);
@@ -175,24 +188,24 @@ void Model :: readMTL(std::string name)
 					10	 Casts shadows onto invisible surfaces 
 				*/
 				fscanf(file, "%d", &illum);
-				printf("illum: %d\n", illum);
+				current->illumination(illum);
 				break;
 			case 'T':
 				// transmission filter 
 				// (what colors are filtered by this object as light passes through)
 				// TODO: handle 'spectral' and 'xyz' flags
 				fscanf(file, "%f %f %f", &Tf[0], &Tf[1], &Tf[2]);
-				printf("Tf: %f %f %f\n", Tf[0], Tf[1], Tf[2]);
+				printf("unhandled: Tf: %f %f %f\n", Tf[0], Tf[1], Tf[2]);
 				break;
 			case 'd':
 				// todo: handle -halo flag
 				fscanf(file, "%f", &dissolve);
-				printf("d: %f\n", dissolve);
+				printf("unhandled: d: %f\n", dissolve);
 				break;
 			case 's':
 				// sharpness
 				fscanf(file, "%f", &sharpness);
-				printf("sharpness: %f\n", sharpness);
+				printf("unhandled: sharpness: %f\n", sharpness);
 				break;
 
 			default:
@@ -217,6 +230,7 @@ void Model :: readMTL(std::string name)
 		printf("d %f %f %f\n", m.diffuse().r, m.diffuse().g, m.diffuse().b);
 		printf("s %f %f %f\n", m.specular().r, m.specular().g, m.specular().b);
 		printf("a %f %f %f\n", m.ambient().r, m.ambient().g, m.ambient().b);
+		printf("map a: %s s: %s d: %s\n", m.ambientMap().data(), m.specularMap().data(), m.diffuseMap().data());
 		iter++;
 	}
 	

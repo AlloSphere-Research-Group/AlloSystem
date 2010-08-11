@@ -1,6 +1,8 @@
 #ifndef INCLUDE_AL_GRAPHICS_LIGHT_HPP
 #define INCLUDE_AL_GRAPHICS_LIGHT_HPP
 
+#include <string>
+
 #include "types/al_Color.hpp"
 #include "graphics/al_Common.hpp"
 
@@ -25,26 +27,41 @@ public:
 
 	/// Set specular exponent [0, 128]
 	Material& shininess(float v);
+	Material& opticalDensity(float v) { mOpticalDensity=v; return *this; }
+	Material& illumination(float v) { mIllumination=v; return *this; }
 
 	Material& ambientAndDiffuse(const Color& v);
 	Material& ambient(const Color& v);
 	Material& diffuse(const Color& v);
 	Material& emission(const Color& v);
 	Material& specular(const Color& v);
+	
+	Material& ambientMap(std::string map) { mMapKa = map; return *this; }
+	Material& specularMap(std::string map) { mMapKs = map; return *this; }
+	Material& diffuseMap(std::string map) { mMapKd = map; return *this; }
+	Material& bumpMap(std::string map) { mMapBump = map; return *this; }
 
 	float shininess() const { return mShine; }
+	float opticalDensity() const { return mOpticalDensity; }
+	float illumination() const { return mIllumination; }
 	const Color& ambient() const { return mAmbient; }
 	const Color& diffuse() const  { return mDiffuse; }
 	const Color& emission() const { return mEmission; }
 	const Color& specular() const { return mSpecular; }
+	
+	const std::string& ambientMap() const { return mMapKa; }
+	const std::string& specularMap() const { return mMapKs; }
+	const std::string& diffuseMap() const { return mMapKd; }
+	const std::string& bumpMap() const { return mMapBump; }
 
 protected:
 	Color mAmbient;
 	Color mDiffuse;
 	Color mEmission;
 	Color mSpecular;
-	float mShine;
+	float mShine, mOpticalDensity, mIllumination;
 	int mFace;
+	std::string mMapKa, mMapKs, mMapKd, mMapBump;
 };
 
 
