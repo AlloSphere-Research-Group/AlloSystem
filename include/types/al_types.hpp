@@ -119,7 +119,7 @@ public:
 		}
 	}
 	
-	bool equal(AlloLatticeHeader &h2) {
+	bool equal(const AlloLatticeHeader &h2) {
 		bool equiv =	header.components == h2.components && 
 						header.type == h2.type && 
 						header.dimcount == h2.dimcount;
@@ -185,7 +185,7 @@ public:
 		adapt(hh);
 	}
 	
-	void adapt(AlloLatticeHeader &h) {
+	void adapt(const AlloLatticeHeader &h) {
 		if(! equal(h)) {
 			data_free();
 			define(h);
@@ -193,7 +193,7 @@ public:
 		}
 	}
 	
-	void adapt(AlloLattice *lattice) {
+	void adapt(const AlloLattice *lattice) {
 		if(! equal(lattice->header)) {
 			data_free();
 			define(lattice->header);
@@ -201,7 +201,7 @@ public:
 		}
 	}
 	
-	void define(AlloLatticeHeader &h2) {
+	void define(const AlloLatticeHeader &h2) {
 		header.components = h2.components;
 		header.type = h2.type;
 		header.dimcount = h2.dimcount;

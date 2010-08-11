@@ -55,7 +55,7 @@ void Texture::unbind(int unit) {
 	mBackend->textureUnbind(this, unit);
 }
 
-void Texture::setLatticeFormat(AlloLatticeHeader &header) {
+void Texture::setLatticeFormat(const AlloLatticeHeader &header) {
 	mFormat = format_for_lattice_components(header.components);
 	mType = type_for_lattice_type(header.type);
 
@@ -69,7 +69,7 @@ void Texture::setLatticeFormat(AlloLatticeHeader &header) {
 	mLattice.adapt(header);
 }
 
-void Texture::fromLattice(al::Lattice *lattice) {
+void Texture::fromLattice(const al::Lattice *lattice) {
 	if(! mLattice.equal(lattice->header) || mMode != DATA) {
 		mMode = DATA;
 		setLatticeFormat(lattice->header);

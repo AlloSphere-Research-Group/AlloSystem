@@ -308,6 +308,12 @@
 		36F46824110BE2E90082D21E /* al_AudioIO.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36F46821110BE2E90082D21E /* al_AudioIO.hpp */; };
 		36F46825110BE2E90082D21E /* al_File.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36F46822110BE2E90082D21E /* al_File.hpp */; };
 		36F46826110BE2E90082D21E /* al_WindowGL.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36F46823110BE2E90082D21E /* al_WindowGL.hpp */; };
+		36F596511211D58B003B78B5 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
+		36F596521211D58B003B78B5 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
+		36F596751211D5F8003B78B5 /* al_Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F596741211D5F8003B78B5 /* al_Image.cpp */; };
+		36F596761211D5F8003B78B5 /* al_Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F596741211D5F8003B78B5 /* al_Image.cpp */; };
+		36F598FD12122628003B78B5 /* al_Model.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F598FC12122628003B78B5 /* al_Model.cpp */; };
+		36F598FE12122628003B78B5 /* al_Model.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F598FC12122628003B78B5 /* al_Model.cpp */; };
 		8DD76F650486A84900D96B5E /* exScheduling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* exScheduling.cpp */; settings = {ATTRIBUTES = (); }; };
 		8DD76F6A0486A84900D96B5E /* alscheduling.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* alscheduling.1 */; };
 /* End PBXBuildFile section */
@@ -761,6 +767,12 @@
 		36F46823110BE2E90082D21E /* al_WindowGL.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_WindowGL.hpp; sourceTree = "<group>"; };
 		36F46844110BE34D0082D21E /* libportaudio.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libportaudio.a; sourceTree = "<group>"; };
 		36F46847110BE3640082D21E /* portaudio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = portaudio.h; sourceTree = "<group>"; };
+		36F5964F1211D57E003B78B5 /* FreeImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FreeImage.h; sourceTree = "<group>"; };
+		36F596501211D58B003B78B5 /* libfreeimage.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libfreeimage.a; sourceTree = "<group>"; };
+		36F596691211D5AB003B78B5 /* al_Image.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Image.hpp; sourceTree = "<group>"; };
+		36F596741211D5F8003B78B5 /* al_Image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Image.cpp; sourceTree = "<group>"; };
+		36F598FB12122617003B78B5 /* al_Model.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Model.hpp; sourceTree = "<group>"; };
+		36F598FC12122628003B78B5 /* al_Model.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Model.cpp; sourceTree = "<group>"; };
 		8DD76F6C0486A84900D96B5E /* exScheduling */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exScheduling; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6859E8B029090EE04C91782 /* alscheduling.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = alscheduling.1; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -778,6 +790,7 @@
 				16AC52C911628EC50076AA8B /* Cocoa.framework in Frameworks */,
 				16AC5365116293100076AA8B /* GLUT.framework in Frameworks */,
 				16B5C1741189020B0090CE80 /* libapr-1.a in Frameworks */,
+				36F596521211D58B003B78B5 /* libfreeimage.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -966,6 +979,7 @@
 				16AC53091162907D0076AA8B /* CoreAudio.framework in Frameworks */,
 				16AC5313116290AA0076AA8B /* AudioUnit.framework in Frameworks */,
 				16AC531B116290BE0076AA8B /* AudioToolbox.framework in Frameworks */,
+				36F596511211D58B003B78B5 /* libfreeimage.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1112,8 +1126,10 @@
 				16AA95E8118F6EEF00B98EC3 /* al_Common.hpp */,
 				16AA95FE118F760C00B98EC3 /* al_Debug.hpp */,
 				16AA95E9118F6EEF00B98EC3 /* al_GPUObject.hpp */,
+				36F596691211D5AB003B78B5 /* al_Image.hpp */,
 				160FD0DF11FA1CE4001E8987 /* al_Isosurface.hpp */,
 				16AA95EA118F6EEF00B98EC3 /* al_Light.hpp */,
+				36F598FB12122617003B78B5 /* al_Model.hpp */,
 				16AA967E118F7D5700B98EC3 /* al_Shader.hpp */,
 				16AA960B118F775E00B98EC3 /* al_Texture.hpp */,
 				367F0B3812034EDB00FCC534 /* al_Stereographic.hpp */,
@@ -1129,8 +1145,10 @@
 			children = (
 				360C404511D32DDA002FE91F /* al_Context.cpp */,
 				16AA95FF118F76B800B98EC3 /* al_Debug.cpp */,
+				36F596741211D5F8003B78B5 /* al_Image.cpp */,
 				160FD0E011FA1CF4001E8987 /* al_Isosurface.cpp */,
 				16AA95F2118F74FB00B98EC3 /* al_Light.cpp */,
+				36F598FC12122628003B78B5 /* al_Model.cpp */,
 				16AA9609118F774800B98EC3 /* al_Texture.cpp */,
 				16AA967F118F7D6600B98EC3 /* al_Shader.cpp */,
 				367F0B3A12034EED00FCC534 /* al_Stereographic.cpp */,
@@ -1594,12 +1612,7 @@
 		36B4127010EFF864007B16D0 /* osx */ = {
 			isa = PBXGroup;
 			children = (
-				16AC531A116290BE0076AA8B /* AudioToolbox.framework */,
-				16AC5312116290AA0076AA8B /* AudioUnit.framework */,
-				16AC53081162907D0076AA8B /* CoreAudio.framework */,
-				16AC52D311628F860076AA8B /* GLUT.framework */,
-				16AC52D411628F860076AA8B /* OpenGL.framework */,
-				36B412AF10EFF916007B16D0 /* Cocoa.framework */,
+				36F5967B1211D645003B78B5 /* Frameworks */,
 				36B4127110EFF864007B16D0 /* include */,
 				36B4129710EFF864007B16D0 /* lib */,
 			);
@@ -1610,6 +1623,7 @@
 		36B4127110EFF864007B16D0 /* include */ = {
 			isa = PBXGroup;
 			children = (
+				36F5964F1211D57E003B78B5 /* FreeImage.h */,
 				36F46847110BE3640082D21E /* portaudio.h */,
 				36B4127210EFF864007B16D0 /* apr-1 */,
 			);
@@ -1665,6 +1679,7 @@
 				360C245E11E659D3000FF335 /* llvm */,
 				36F46844110BE34D0082D21E /* libportaudio.a */,
 				36B4129810EFF864007B16D0 /* libapr-1.a */,
+				36F596501211D58B003B78B5 /* libfreeimage.a */,
 			);
 			path = lib;
 			sourceTree = "<group>";
@@ -1699,6 +1714,19 @@
 				3687E35011FA4FE500EC6706 /* al_FileAPR.hpp */,
 			);
 			path = io;
+			sourceTree = "<group>";
+		};
+		36F5967B1211D645003B78B5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				16AC531A116290BE0076AA8B /* AudioToolbox.framework */,
+				16AC5312116290AA0076AA8B /* AudioUnit.framework */,
+				16AC53081162907D0076AA8B /* CoreAudio.framework */,
+				16AC52D311628F860076AA8B /* GLUT.framework */,
+				16AC52D411628F860076AA8B /* OpenGL.framework */,
+				36B412AF10EFF916007B16D0 /* Cocoa.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		C6859E8C029090F304C91782 /* Documentation */ = {
@@ -2160,6 +2188,8 @@
 				3687E35511FA503600EC6706 /* utFileAPR.cpp in Sources */,
 				3687E37E11FA51FC00EC6706 /* al_Surface.cpp in Sources */,
 				367F0B3C12034EED00FCC534 /* al_Stereographic.cpp in Sources */,
+				36F596761211D5F8003B78B5 /* al_Image.cpp in Sources */,
+				36F598FD12122628003B78B5 /* al_Model.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2288,6 +2318,8 @@
 				3687E2B511FA399A00EC6706 /* al_Isosurface.cpp in Sources */,
 				3687E35211FA501200EC6706 /* al_FileAPR.cpp in Sources */,
 				367F0B3B12034EED00FCC534 /* al_Stereographic.cpp in Sources */,
+				36F596751211D5F8003B78B5 /* al_Image.cpp in Sources */,
+				36F598FE12122628003B78B5 /* al_Model.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2424,7 +2456,10 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = "";
 				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../dev/osx/lib\"",
+				);
 				PREBINDING = NO;
 				PRODUCT_NAME = unitTests;
 				USER_HEADER_SEARCH_PATHS = "$(inherited)";
@@ -2441,7 +2476,10 @@
 				GCC_MODEL_TUNING = G5;
 				HEADER_SEARCH_PATHS = "";
 				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../dev/osx/lib\"",
+				);
 				PREBINDING = NO;
 				PRODUCT_NAME = unitTests;
 				USER_HEADER_SEARCH_PATHS = "$(inherited)";

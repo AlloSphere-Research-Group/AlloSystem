@@ -64,8 +64,8 @@ public:
 	
 	void bind(int unit = 0);
 	void unbind(int unit = 0);
-	void setLatticeFormat(AlloLatticeHeader &header);
-	void fromLattice(al::Lattice *lattice);
+	void setLatticeFormat(const AlloLatticeHeader &header);
+	void fromLattice(const al::Lattice *lattice);
 	
 	// trigger textureSubmit:
 	void update() { mUpdate = true; }
