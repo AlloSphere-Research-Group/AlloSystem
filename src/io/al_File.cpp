@@ -1,5 +1,6 @@
-#include <syslimits.h>
-#include <string>
+#include <cstring>
+
+#define AL_PATH_MAX (4096)
 
 #include "io/al_File.hpp"
 
@@ -7,7 +8,7 @@ namespace al{
 
 void path2dir(char* dst, const char* src) {
     char* s;
-	snprintf(dst, PATH_MAX, "%s", src);
+	snprintf(dst, AL_PATH_MAX, "%s", src);
     s = strrchr(dst, '/');
     if (s)
         s[1] = '\0';
