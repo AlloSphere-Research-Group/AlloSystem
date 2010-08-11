@@ -27,7 +27,7 @@
 	CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 	WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-#include "OscOutboundPacketStream.h"
+#include "protocol/oscpack/osc/OscOutboundPacketStream.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -37,7 +37,7 @@
 #include <malloc.h> // for alloca
 #endif
 
-#include "OscHostEndianness.h"
+#include "protocol/oscpack/osc/OscHostEndianness.h"
 
 
 namespace osc{
@@ -620,7 +620,7 @@ OutboundPacketStream& OutboundPacketStream::operator<<( const Blob& rhs )
     *(--typeTagsCurrent_) = BLOB_TYPE_TAG;
     FromUInt32( argumentCurrent_, rhs.size );
     argumentCurrent_ += 4;
-    
+
     memcpy( argumentCurrent_, rhs.data, rhs.size );
     argumentCurrent_ += rhs.size;
 

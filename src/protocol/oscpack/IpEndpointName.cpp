@@ -27,11 +27,11 @@
 	CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 	WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-#include "IpEndpointName.h"
+#include "protocol/oscpack/ip/IpEndpointName.h"
 
 #include <stdio.h>
 
-#include "NetworkingUtils.h"
+#include "protocol/oscpack/ip/NetworkingUtils.h"
 
 
 unsigned long IpEndpointName::GetHostByName( const char *s )
@@ -77,5 +77,5 @@ void IpEndpointName::AddressAndPortAsString( char *s ) const
 				(int)(address & 0xFF),
 				(int)port );
 		}
-	}	
+	}
 }

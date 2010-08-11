@@ -58,5 +58,7 @@ allocore:
 	glew-dev
 	libglut3-dev
 	portaudio19-dev
+	libjack-dev
+	freeimage-dev
 alloclang:
 	clang

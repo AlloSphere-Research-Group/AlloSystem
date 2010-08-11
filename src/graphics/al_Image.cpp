@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "graphics/al_Image.hpp"
 #include "system/al_Config.h"
 

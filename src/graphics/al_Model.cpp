@@ -1,5 +1,7 @@
-#include "al_Model.hpp"
 #include <stdio.h>
+#include <string.h>
+
+#include "graphics/al_Model.hpp"
 
 using namespace al;
 using namespace gfx;

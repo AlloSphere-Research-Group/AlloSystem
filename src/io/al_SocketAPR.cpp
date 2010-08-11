@@ -3,7 +3,11 @@
 #include "system/al_Config.h"
 
 #include "../private/al_ImplAPR.h"
+#ifdef AL_LINUX
+#include "apr-1.0/apr_network_io.h"
+#else
 #include "apr-1/apr_network_io.h"
+#endif
 
 #define PRINT_SOCKADDR(s)\
 	printf("%s %s\n", s->hostname, s->servname);
@@ -13,16 +17,16 @@ namespace al{
 struct Socket::Impl : public ImplAPR {
 
 	Impl(unsigned int port, const char * address, al_sec timeout, bool sender) : ImplAPR() {
-	
+
 		// TODO: check_apr results should jump to an err label and return an uninitialized socket!
-		
+
 		/* @see http://dev.ariel-networks.com/apr/apr-tutorial/html/apr-tutorial-13.html */
 		// create socket:
 		apr_sockaddr_t * sa;
 		apr_socket_t * sock;
 		check_apr(apr_sockaddr_info_get(&sa, address, APR_INET, port, 0, mPool));
 		check_apr(apr_socket_create(&sock, sa->family, SOCK_DGRAM, APR_PROTO_UDP, mPool));
-		
+
 		if (timeout == 0) {
 			// non-blocking:			APR_SO_NONBLOCK==1(on),  then timeout=0
 			check_apr(apr_socket_opt_set(sock, APR_SO_NONBLOCK, 1));
@@ -31,23 +35,23 @@ struct Socket::Impl : public ImplAPR {
 			// blocking-with-timeout:	APR_SO_NONBLOCK==0(off), then timeout>0
 			check_apr(apr_socket_opt_set(sock, APR_SO_NONBLOCK, 0));
 			check_apr(apr_socket_timeout_set(sock, (apr_interval_time_t)(timeout * 1.0e6)));
-		
+
 		} else {
 			// blocking-forever:		APR_SO_NONBLOCK==0(off), then timeout<0
 			check_apr(apr_socket_opt_set(sock, APR_SO_NONBLOCK, 0));
 			check_apr(apr_socket_timeout_set(sock, -1));
 		}
 
-		
+
 		if(sender)	check_apr(apr_socket_connect(sock, sa));
 		else		check_apr(apr_socket_bind(sock, sa));
-				
+
 		mAddress = sa;
 		mSock = sock;
 
-//		char * buf;		
+//		char * buf;
 ////		apr_sockaddr_ip_get(&buf, mAddress);
-//		apr_getnameinfo(&buf, sa, 0);	
+//		apr_getnameinfo(&buf, sa, 0);
 ////		char * scopeid;
 ////		apr_port_t p = port;
 ////		apr_parse_addr_port(&buf, &scopeid, &p, "localhost", defaultPool());
@@ -62,7 +66,7 @@ struct Socket::Impl : public ImplAPR {
 
 
 
-Socket::Socket(unsigned int port, const char * address, al_sec timeout, bool sender) 
+Socket::Socket(unsigned int port, const char * address, al_sec timeout, bool sender)
 : mImpl(new Impl(port, address, timeout, sender))
 {
 }
@@ -79,7 +83,7 @@ void Socket::close(){
 size_t Socket::recv(char * buffer, size_t maxlen) {
 	apr_size_t len = maxlen;
 	apr_status_t r = apr_socket_recv(mImpl->mSock, buffer, &len);
-	
+
 	// only error check if not error# 35: Resource temporarily unavailable
 	if(len){ check_apr(r); }
 	return len;
