@@ -5,6 +5,10 @@
 
 namespace al{
 
+// strips a qualified path to a file (src) into a path to the containing folder (dst)
+void path2dir(char* dst, const char* src);
+
+
 class File{
 public:
 
@@ -54,8 +58,6 @@ protected:
 	void allocContent(int n);
 	void getSize();
 };
-
-
 
 } // al::
 

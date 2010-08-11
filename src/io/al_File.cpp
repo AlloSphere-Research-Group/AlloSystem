@@ -1,6 +1,21 @@
+#include <syslimits.h>
+#include <string>
+
 #include "io/al_File.hpp"
 
 namespace al{
+
+void path2dir(char* dst, const char* src) {
+    char* s;
+	snprintf(dst, PATH_MAX, "%s", src);
+    s = strrchr(dst, '/');
+    if (s)
+        s[1] = '\0';
+    else
+        dst[0] = '\0';
+}
+
+
 
 File::File(const char * path, const char * mode, bool open_)
 :	mPath(path), mMode(mode), mContent(0), mSizeBytes(0), mFP(0)

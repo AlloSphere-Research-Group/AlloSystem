@@ -109,19 +109,21 @@ void GraphicsData::generateNormals(float angle) {
 }
 
 void GraphicsData::getBounds(Vertex& min, Vertex& max) {
-	min.set(mVertices[0]);
-	max.set(mVertices[0]);
-	for (int v=1; v<mVertices.size(); v++) {
-		Vertex& vt = mVertices[v];
-		for (int i=0; i<3; i++) {
-			min[i] = MIN(min[i], vt[i]);
-			max[i] = MAX(max[i], vt[i]);
+	if (mVertices.size() > 0) {
+		min.set(mVertices[0][0], mVertices[0][1], mVertices[0][2]);
+		min.set(mVertices[0][0], mVertices[0][1], mVertices[0][2]);
+		for (int v=1; v<mVertices.size(); v++) {
+			Vertex& vt = mVertices[v];
+			for (int i=0; i<3; i++) {
+				min[i] = MIN(min[i], vt[i]);
+				max[i] = MAX(max[i], vt[i]);
+			}
 		}
 	}
 }
 
 void GraphicsData::unitize() {
-	Vertex min, max;
+	Vertex min(0), max(0);
 	getBounds(min, max);
 	Vertex avg = (max-min)*0.5;
 	for (int v=0; v<mVertices.size(); v++) {
@@ -133,7 +135,7 @@ void GraphicsData::unitize() {
 }
 
 void GraphicsData::center() {
-	Vertex min, max;
+	Vertex min(0), max(0);
 	getBounds(min, max);
 	Vertex offset = min+(max-min)*0.5;
 	for (int v=0; v<mVertices.size(); v++) {

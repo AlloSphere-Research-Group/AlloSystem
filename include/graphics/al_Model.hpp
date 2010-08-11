@@ -69,7 +69,7 @@ public:
 	Model() {}
 	~Model() {}
 	
-	void readOBJ(const char * filename);
+	void readOBJ(std::string filename);
 	
 	void center() {
 		std::map<std::string, Group>::iterator iter = mGroups.begin();

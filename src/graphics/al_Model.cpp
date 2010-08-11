@@ -2,38 +2,23 @@
 #include <string.h>
 
 #include "graphics/al_Model.hpp"
+#include "io/al_File.hpp"
 
 using namespace al;
 using namespace gfx;
 
 #define MODEL_PARSER_BUF_LEN (256)
 
-
-static char* dirName(const char* path)
-{
-    char* dir;
-    char* s;
-    
-    dir = strdup(path);
-    
-    s = strrchr(dir, '/');
-    if (s)
-        s[1] = '\0';
-    else
-        dir[0] = '\0';
-    
-    return dir;
-}
-
 // @http://www.fileformat.info/format/material/
 void Model :: readMTL(std::string name)
 {
     FILE* file;
-    std::string dir;
     std::string filename;
+	char dir[PATH_MAX];
     char buf[MODEL_PARSER_BUF_LEN];
-    
-    dir = dirName(mPath.data());
+    path2dir(dir, mPath.data());
+	
+    printf("path %s\n", dir);
     filename = dir + name;
 	
 	printf("Reading material file: %s\n", filename.data());
@@ -547,7 +532,7 @@ struct Parser {
 	}
 };
 
-void Model :: readOBJ(const char * filename) {
+void Model :: readOBJ(std::string filename) {
 //	mModel = glmReadOBJ(filename);
 //	glmFacetNormals(mModel);
 //	glmVertexNormals(mModel, 10);
@@ -556,10 +541,10 @@ void Model :: readOBJ(const char * filename) {
 	std::string mtl = "default";
     
     /* open the file */
-    file = fopen(filename, "r");
+    file = fopen(filename.data(), "r");
     if (!file) {
         fprintf(stderr, "Model readOBJ failed: can't open data file \"%s\".\n",
-            filename);
+            filename.data());
 		return;
     }
 	mPath = filename;
@@ -640,10 +625,9 @@ void Model :: readOBJ(const char * filename) {
 		printf("%s name: %s (mt: %s)\n", iter->first.data(), gr.name().data(), gr.material().data());
 		printf("\tindices: %d / vertices: %d\n", gr.data().indices().size(), gr.data().vertices().size());
 		
-//		GraphicsData::Vertex min, max;
-//		printf("min %f %f %f max %f %f %f\n", min[0], min[1], min[2], max[0], max[1], max[2]);
-//		gr.data().getBounds(min, max);
-//		printf("min %f %f %f max %f %f %f\n", min[0], min[1], min[2], max[0], max[1], max[2]);
+		GraphicsData::Vertex min, max;
+		gr.data().getBounds(min, max);
+		printf("min %f %f %f max %f %f %f\n", min[0], min[1], min[2], max[0], max[1], max[2]);
 		
 		iter++;
 	}
