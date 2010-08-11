@@ -25,7 +25,7 @@ public:
 		TEXTURE_RECT,
 		TEXTURE_3D
 	};
-	
+
 	enum Format {
 		ALPHA = 0,
 		LUMINANCE,
@@ -35,97 +35,97 @@ public:
 		RGBA,
 		BGRA
 	};
-	
+
 	enum Type {
 		UCHAR = 0,
 		INT,
 		UINT,
 		FLOAT32
 	};
-	
+
 	enum Wrap {
 		CLAMP = 0,
 		CLAMP_TO_BORDER,
 		CLAMP_TO_EDGE,
 		REPEAT
 	};
-	
+
 	enum Filter {
-		NEAREST = 0, 
-		LINEAR, 
+		NEAREST = 0,
+		LINEAR,
 		NEAREST_MIPMAP_NEAREST,
-		LINEAR_MIPMAP_NEAREST, 
-		NEAREST_MIPMAP_LINEAR, 
+		LINEAR_MIPMAP_NEAREST,
+		NEAREST_MIPMAP_LINEAR,
 		LINEAR_MIPMAP_LINEAR
 	};
 
 	Texture(GraphicsBackend *backend);
 	virtual ~Texture();
-	
+
 	void bind(int unit = 0);
 	void unbind(int unit = 0);
 	void setLatticeFormat(const AlloLatticeHeader &header);
 	void fromLattice(const al::Lattice *lattice);
-	
+
 	// trigger textureSubmit:
 	void update() { mUpdate = true; }
-	
+
 	// retrieve internal lattice:
 	al::Lattice& lattice() { return mLattice; }
-	
+
 	bool rect();
 	void rect(bool v);
-	
+
 	char * getData();
 	int getRowStride();
-	
+
 	int width();
 	void width(int w);
 	int height();
 	void height(int h);
 	int depth();
 	void depth(int d);
-	
+
 	void getDimensions(int &w, int &h);
 	void getDimensions(int &w, int &h, int &d);
-	
+
 	void dimensions(int w, int h);
 	void dimensions(int w, int h, int d);
-	
+
 	Mode mode();
 	void mode(Mode v);
-	
+
 	Target target();
 	void target(Target v);
-	
+
 	Format format();
 	void format(Format v);
-	
+
 	Type type();
 	void type(Type v);
-	
+
 	Wrap wrap();
 	void wrap(Wrap v);
-	
+
 	Filter minFilter();
 	void minFilter(Filter v);
-	
+
 	Filter magFilter();
 	void magFilter(Filter v);
-	
-	
+
+
 	Color& borderColor() {return mBorderColor;}
-	
-	
-protected:
+
+
 	virtual void onCreate();
 	virtual void onDestroy();
-	
+protected:
+
 	Format format_for_lattice_components(int components);
 	Type type_for_lattice_type(AlloTy type);
 	Target target_for_lattice_dimcount(int dimcount);
-	
-	
+
+
 	GraphicsBackend	* mBackend;			///< Library backend
 	al::Lattice		mLattice;			///< Lattice of data
 	Mode			mMode;				///< Texture mode
@@ -142,7 +142,7 @@ protected:
 	Filter			mMinFilter;			///< Minification filter
 	Filter			mMagFilter;			///< Magnification filter (NEAREST or LINEAR)
 	Color			mBorderColor;		///< Border color
-	
+
 }; // Texture
 
 
@@ -163,7 +163,7 @@ protected:
 //
 ///// Base texture class
 //
-///// 
+/////
 /////
 //class TextureBase : public GPUObject{
 //public:
@@ -172,7 +172,7 @@ protected:
 //	virtual ~TextureBase();
 //
 //	void * buffer() const { return mBuffer; }
-//	
+//
 //	template <class T>
 //	T * buffer() const { return (T *)mBuffer; }
 //
@@ -183,7 +183,7 @@ protected:
 //	TextureBase& ipolMode(IpolMode::t v);					///< Set interpolation mode
 //	TextureBase& dataType(DataType::t v);					///< Set the color data type
 //	TextureBase& wrapMode(WrapMode::t v);					///< Set wrapping mode
-//	
+//
 //	const TextureBase& send() const;						///< Send pointed to pixels to GPU
 //
 //	ColorFormat::t format() const { return mFormat; }
@@ -195,13 +195,13 @@ protected:
 //	void * mPixels;		// pointer to the client-side pixel data (0 if none)
 //	void * mBuffer;		// internally allocated pixel buffer
 //	ColorFormat::t mFormat;	// format of the pixel data:
-//						//   GL_COLOR_INDEX, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, 
+//						//   GL_COLOR_INDEX, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA,
 //						//   GL_RGB, GL_BGR, GL_RGBA, GL_BGRA, GL_LUMINANCE, and GL_LUMINANCE_ALPHA
 //	IpolMode::t mIpol;	// interpolation mode
 //	WrapMode::t mWrap;
 //	DataType::t mType;			// type of the pixel data:
 //						//   GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_FLOAT
-//						
+//
 //	void freeMem();
 //	void allocMem();
 //	virtual int size() const = 0;	// total number of texels
@@ -209,7 +209,7 @@ protected:
 //	virtual void texImage() const = 0;
 //	virtual void texSubImage() const = 0;
 //	virtual void texWrap() const = 0;
-//	
+//
 //	virtual void onCreate();
 //	virtual void onDestroy();
 //};
@@ -220,8 +220,8 @@ protected:
 //public:
 //
 //	/// This constructor will allocate an internal pixel buffer
-//	Texture2(	int width, int height, 
-//				ColorFormat::t format=gfx::RGB, 
+//	Texture2(	int width, int height,
+//				ColorFormat::t format=gfx::RGB,
 //				DataType::t type=gfx::UByte,
 //				WrapMode::t wrap=gfx::Repeat);
 //
@@ -254,7 +254,7 @@ protected:
 //
 //	/// This constructor will allocate an internal pixel buffer
 //	Texture3(	int width, int height, int depth,
-//				ColorFormat::t format=gfx::RGB, 
+//				ColorFormat::t format=gfx::RGB,
 //				DataType::t type=gfx::UByte,
 //				WrapMode::t wrap=gfx::Repeat);
 //

@@ -31,7 +31,7 @@ public:
 	Material& diffuse(const Color& v);
 	Material& emission(const Color& v);
 	Material& specular(const Color& v);
-	
+
 	float shininess() const { return mShine; }
 	const Color& ambient() const { return mAmbient; }
 	const Color& diffuse() const  { return mDiffuse; }
@@ -50,7 +50,7 @@ protected:
 
 class Light{
 public:
-	Light(float x=5, float y=2, float z=5);
+	Light(float x=5, float y=2, float z=-5);
 	~Light();
 
 	/// Send current light settings to GPU
@@ -61,7 +61,7 @@ public:
 	Light& ambient(const Color& v);
 	Light& diffuse(const Color& v);
 	Light& specular(const Color& v);
-	
+
 	/// Set directional light direction
 	Light& dir(float x, float y, float z);
 
@@ -77,12 +77,12 @@ public:
 	Light& pos(const VEC3& v){ return pos(v[0],v[1],v[2]); }
 
 	/// Set spotlight parameters
-	
+
 	/// @param[in] xDir		x direction
 	/// @param[in] yDir		y direction
 	/// @param[in] zDir		z direction
 	/// @param[in] cutoff	angle of the cone light emitted by the spot; [0, 90], 180 (uniform)
-	/// @param[in] expo		the intensity distribution of the light; [0, 128]	
+	/// @param[in] expo		the intensity distribution of the light; [0, 128]
 	Light& spot(float xDir, float yDir, float zDir, float cutoff, float expo=15);
 
 	template <class VEC3>
@@ -94,7 +94,7 @@ public:
 
 	/// Determines how global specular reflection angles are computed
 	static void localViewer(bool v);
-	
+
 	/// Determines whether global lighting is two-sided
 	static void twoSided(bool v);
 
