@@ -146,7 +146,14 @@ void GraphicsData::center() {
 	}
 }
 
-
+void GraphicsData::scale(double x, double y, double z) {
+	for (int v=0; v<mVertices.size(); v++) {
+		Vertex& vt = mVertices[v];
+		vt[0] *= x;
+		vt[1] *= y;
+		vt[2] *= z;
+	}
+}
 
 Graphics::Graphics(GraphicsBackend *backend)
 :	mBackend(backend),

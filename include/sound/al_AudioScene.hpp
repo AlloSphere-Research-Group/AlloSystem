@@ -63,7 +63,7 @@ public:
 	}
 	
 	al_sec maxDelay(double samplerate) {
-		mSound.size() / samplerate;
+		return mSound.size() / samplerate;
 	}
 	double maxIndex() { return mSound.size(); }
 

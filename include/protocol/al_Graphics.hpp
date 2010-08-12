@@ -162,8 +162,12 @@ public:
 	void resetBuffers();
 	void equalizeBuffers();
 	void getBounds(Vertex& min, Vertex& max);
+	
+	// destructive edits to internal vertices:
 	void unitize();	/// scale to -1..1
 	void center(); // center at 0,0,0
+	void scale(double x, double y, double z);
+	void scale(double s) { scale(x, y, z); }
 	
 	// generates smoothed normals for a set of vertices
 	// will replace any normals currently in use
@@ -235,8 +239,7 @@ public:
 	// Frame
 	void clear(int attribMask);
 	void clearColor(float r, float g, float b, float a);
-	
-
+	void clearColor(const Color& color) { clearColor(color.r, color.g, color.b, color.a); }
 
 	// Coordinate Transforms
 	void viewport(int x, int y, int width, int height);
