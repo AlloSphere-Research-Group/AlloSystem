@@ -58,43 +58,45 @@ public:
 		
 		void name(std::string n) { mName = n; }
 		void material(std::string m) { mMaterial = m; }
+		Vec3f& center() { return mCenter; }
+		
+		void draw(Graphics& gl) {
+			gl.draw(data());
+		}
 		
 	protected:
+		friend class Model;
 		std::string     mName;           /* name of this group */
 		std::string     mMaterial;       /* index to material for group */
 		GraphicsData	mData;
+		Vec3f			mCenter;	
 		//std::vector<Triangle> mTriangles;
 	};
 	
 	Model() {}
+	Model(std::string name) { readOBJ(name); }
 	~Model() {}
 	
 	void readOBJ(std::string filename);
-	
-	void center() {
-		std::map<std::string, Group>::iterator iter = mGroups.begin();
-		while (iter != mGroups.end()) {	
-			Group& g = iter->second;
-			g.data().center();
-			iter++;
-		}
-	}
 	
 	void draw(Graphics& gl) {
 		std::map<std::string, Group>::iterator iter = mGroups.begin();
 		while (iter != mGroups.end()) {	
 			Group& gr = iter->second;
 			// apply materials:
-			//mMaterials[gr.material()]();
+			mMaterials[gr.material()]();
 			// render data:
 			gl.draw(gr.data());
 			iter++;
 		}
 	}
 	
-	
 	Material& material(std::string name);
 	Group& group(std::string name);
+	
+	typedef std::map<std::string, Group>::iterator groupIterator;
+	groupIterator groupsBegin() { return mGroups.begin(); }
+	groupIterator groupsEnd() { return mGroups.end(); }
 	
 protected:
 

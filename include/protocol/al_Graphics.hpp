@@ -151,23 +151,26 @@ struct State {
 class GraphicsData {
 public:
 
-	typedef Vec<3,float>	Vertex;
-	typedef Vec<3,float>	Normal;
-	typedef Vec<4,float>	Color;
-	typedef Vec<2,float>	TexCoord2;
-	typedef Vec<3,float>	TexCoord3;
+	typedef Vec3f	Vertex;
+	typedef Vec3f	Normal;
+	typedef Vec4f	Color;
+	typedef Vec2f	TexCoord2;
+	typedef Vec3f	TexCoord3;
 	typedef unsigned int	Index;
 
 	/// Reset all buffers
 	void resetBuffers();
 	void equalizeBuffers();
-	void getBounds(Vertex& min, Vertex& max);
+	void getBounds(Vec3f& min, Vec3f& max);
+	Vec3f getCenter(); // center at 0,0,0
 	
 	// destructive edits to internal vertices:
 	void unitize();	/// scale to -1..1
-	void center(); // center at 0,0,0
 	void scale(double x, double y, double z);
+	void scale(Vec3f v) { scale(v[0], v[1], v[2]); }
 	void scale(double s) { scale(s, s, s); }
+	void translate(double x, double y, double z);
+	void translate(Vec3f v) { translate(v[0], v[1], v[2]); }
 	
 	// generates smoothed normals for a set of vertices
 	// will replace any normals currently in use
@@ -252,10 +255,13 @@ public:
 	void multMatrix(const Matrix4d &m);
 	void translate(double x, double y, double z);
 	void translate(const Vec3d& v) { translate(v[0], v[1], v[2]); }
+	void translate(const Vec3f& v) { translate(v[0], v[1], v[2]); }
 	void rotate(double angle, double x, double y, double z);
 	void rotate(double angle, const Vec3d& v) { rotate(angle, v[0], v[1], v[2]); }
 	void scale(double x, double y, double z);
+	void scale(double s) { scale(s, s, s); }
 	void scale(const Vec3d& v) { scale(v[0], v[1], v[2]); }
+	void scale(const Vec3f& v) { scale(v[0], v[1], v[2]); }
 	
 	// Immediate Mode
 	void begin(Primitive mode);
@@ -264,11 +270,14 @@ public:
 
 	void vertex(double x, double y, double z=0.);
 	void vertex(const Vec3d& v) { vertex(v[0], v[1], v[2]); }
+	void vertex(const Vec3f& v) { vertex(v[0], v[1], v[2]); }
 	void texcoord(double u, double v);
 	void normal(double x, double y, double z=0.);
 	void normal(const Vec3d& v) { normal(v[0], v[1], v[2]); }
+	void normal(const Vec3f& v) { normal(v[0], v[1], v[2]); }
 	void color(double r, double g, double b, double a=1.);
 	void color(const Vec3d& v, double a=1.) { color(v[0], v[1], v[2], a); }
+	void color(const Vec3f& v, double a=1.) { color(v[0], v[1], v[2], a); }
 
 	// Other state
 	void pointSize(double v);

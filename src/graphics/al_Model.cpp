@@ -409,15 +409,9 @@ struct Parser {
 	}
 
 	std::string parseGroup() {
-		/* eat up rest of line */
 		readLine();
-	#if SINGLE_STRING_GROUP_NAMES
-		sscanf(buf, "%s", buf);
-	#else
-		buf[strlen(buf)-1] = '\0';  /* nuke '\n' */
-	#endif
+		sscanf(buf, "%s %s", buf, buf);
 		std::string grp = buf;
-		//printf(">> group %s\n", grp);
 		readToken();
 		return grp;
 	}
@@ -566,8 +560,7 @@ void Model :: readOBJ(std::string filename) {
 				readMTL(mMaterialLib);
 				break;
 
-			case 'g':               /* group */
-				/* eat up rest of line */
+			case 'g': 
 				g = addGroup(parser.parseGroup());
 	            g->material(mtl);
 				break;
@@ -621,13 +614,12 @@ void Model :: readOBJ(std::string filename) {
 
 		//gr.data().unitize();
 		gr.data().primitive(gfx::TRIANGLES);
+		gr.mCenter = gr.data().getCenter();
+		gr.data().translate(-gr.center());
 
 		printf("%s name: %s (mt: %s)\n", iter->first.data(), gr.name().data(), gr.material().data());
 		printf("\tindices: %d / vertices: %d\n", gr.data().indices().size(), gr.data().vertices().size());
-
-		GraphicsData::Vertex min, max;
-		gr.data().getBounds(min, max);
-		printf("min %f %f %f max %f %f %f\n", min[0], min[1], min[2], max[0], max[1], max[2]);
+		printf("%f %f %f\n", gr.mCenter[0], gr.mCenter[1], gr.mCenter[2]);
 
 		iter++;
 	}

@@ -134,15 +134,18 @@ void GraphicsData::unitize() {
 	}
 }
 
-void GraphicsData::center() {
+Vec3f GraphicsData::getCenter() {
 	Vertex min(0), max(0);
 	getBounds(min, max);
-	Vertex offset = min+(max-min)*0.5;
+	return min+(max-min)*0.5;
+}
+
+void GraphicsData::translate(double x, double y, double z) {
 	for (int v=0; v<mVertices.size(); v++) {
 		Vertex& vt = mVertices[v];
-		for (int i=0; i<3; i++) {
-			vt[i] = vt[i] - offset[i];
-		}
+		vt[0] += x;
+		vt[1] += y;
+		vt[2] += z;
 	}
 }
 
