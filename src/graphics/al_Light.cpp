@@ -14,6 +14,7 @@ Material::Material(Face::t f)
 {}
 
 void Material::operator()() const {
+	glColor3f(1, 1, 1);
 	glMaterialfv(mFace, GL_AMBIENT, mAmbient.components);
 	glMaterialfv(mFace, GL_DIFFUSE, mDiffuse.components);
 	glMaterialfv(mFace, GL_EMISSION, mEmission.components);
@@ -65,7 +66,8 @@ Light::~Light(){
 
 void Light::operator()() const {
 	glEnable(GL_LIGHTING);
-	glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_COLOR_MATERIAL);	// need to enable for glColor* to work
+	//glDisable(GL_COLOR_MATERIAL);	// need to disable for glMaterial* to work
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	int glID = lightID(mID);
 	glLightfv(glID, GL_AMBIENT,		mAmbient.components);
