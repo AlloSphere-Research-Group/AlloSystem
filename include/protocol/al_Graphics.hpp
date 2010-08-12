@@ -167,7 +167,7 @@ public:
 	void unitize();	/// scale to -1..1
 	void center(); // center at 0,0,0
 	void scale(double x, double y, double z);
-	void scale(double s) { scale(x, y, z); }
+	void scale(double s) { scale(s, s, s); }
 	
 	// generates smoothed normals for a set of vertices
 	// will replace any normals currently in use
