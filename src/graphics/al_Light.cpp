@@ -5,16 +5,22 @@ namespace al {
 namespace gfx{
 
 Material::Material(Face::t f)
-:	mAmbient(0.), 
-	mDiffuse(0.6), 
-	mEmission(0.), 
+:	mAmbient(0.),
+	mDiffuse(0.6),
+	mEmission(0.),
 	mSpecular(1.),
-	mShine(5.), 
-	mFace(f)
+	mShine(5.),
+	mFace(f),
+	mUseColorMaterial(true)
 {}
 
 void Material::operator()() const {
-	glColor3f(1, 1, 1);
+	if (useColorMaterial()) {
+		glEnable(GL_COLOR_MATERIAL);	// need to enable for glColor* to work
+		glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+	} else {
+		glDisable(GL_COLOR_MATERIAL);	// need to disable for glMaterial* to work
+	}
 	glMaterialfv(mFace, GL_AMBIENT, mAmbient.components);
 	glMaterialfv(mFace, GL_DIFFUSE, mDiffuse.components);
 	glMaterialfv(mFace, GL_EMISSION, mEmission.components);
@@ -53,7 +59,7 @@ static void freeID(int i){ lightPool()[i]=false; }
 
 
 Light::Light(float x, float y, float z)
-:	mID(nextID()), mAmbient(0.), mDiffuse(0.9), mSpecular(0.9)
+:	mID(nextID()), mAmbient(0.), mDiffuse(0.1), mSpecular(0.4)
 {
 	mPos[3]=1;
 	pos(x,y,z);
@@ -66,9 +72,6 @@ Light::~Light(){
 
 void Light::operator()() const {
 	glEnable(GL_LIGHTING);
-	glEnable(GL_COLOR_MATERIAL);	// need to enable for glColor* to work
-	//glDisable(GL_COLOR_MATERIAL);	// need to disable for glMaterial* to work
-	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	int glID = lightID(mID);
 	glLightfv(glID, GL_AMBIENT,		mAmbient.components);
 	glLightfv(glID, GL_DIFFUSE,		mDiffuse.components);
@@ -77,7 +80,7 @@ void Light::operator()() const {
     glLightf(glID, GL_CONSTANT_ATTENUATION,	mAtten[0]);
     glLightf(glID, GL_LINEAR_ATTENUATION,	mAtten[1]);
     glLightf(glID, GL_QUADRATIC_ATTENUATION,mAtten[2]);
-	
+
 	glEnable(glID); // MUST enable each light source after configuration
 	glShadeModel(GL_SMOOTH);
 }

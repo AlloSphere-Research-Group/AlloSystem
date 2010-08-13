@@ -35,11 +35,12 @@ public:
 	Material& diffuse(const Color& v);
 	Material& emission(const Color& v);
 	Material& specular(const Color& v);
-	
+
 	Material& ambientMap(std::string map) { mMapKa = map; return *this; }
 	Material& specularMap(std::string map) { mMapKs = map; return *this; }
 	Material& diffuseMap(std::string map) { mMapKd = map; return *this; }
 	Material& bumpMap(std::string map) { mMapBump = map; return *this; }
+	Material& useColorMaterial(bool v) { mUseColorMaterial = v; return *this; }
 
 	float shininess() const { return mShine; }
 	float opticalDensity() const { return mOpticalDensity; }
@@ -48,11 +49,12 @@ public:
 	const Color& diffuse() const  { return mDiffuse; }
 	const Color& emission() const { return mEmission; }
 	const Color& specular() const { return mSpecular; }
-	
+
 	const std::string& ambientMap() const { return mMapKa; }
 	const std::string& specularMap() const { return mMapKs; }
 	const std::string& diffuseMap() const { return mMapKd; }
 	const std::string& bumpMap() const { return mMapBump; }
+	const bool useColorMaterial() const { return mUseColorMaterial; }
 
 protected:
 	Color mAmbient;
@@ -60,6 +62,7 @@ protected:
 	Color mEmission;
 	Color mSpecular;
 	float mShine, mOpticalDensity, mIllumination;
+	bool mUseColorMaterial;
 	int mFace;
 	std::string mMapKa, mMapKs, mMapKd, mMapBump;
 };
