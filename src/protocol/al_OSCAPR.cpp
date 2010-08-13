@@ -28,7 +28,7 @@ public:
 	virtual ~OscRecvImplAPR() {
 		apr_socket_close(mSock);
 	}
-	
+
 	virtual size_t recv(char * buffer, size_t maxlen) {
 		apr_size_t len = maxlen;
 		apr_status_t res = apr_socket_recv(mSock, buffer, &len);
@@ -36,8 +36,8 @@ public:
 		if(len){ al::check_apr(res); }
 		return res == 0 ? len : 0;
 	}
-	
-	
+
+
 	static void * RecvThreadFunction(void * ptr) {
 		OscRecvImplAPR * self = (OscRecvImplAPR *)ptr;
 		Recv * recv = self->mRecv;
@@ -51,7 +51,7 @@ public:
 		}
 		return 0;
 	}
-	
+
 	virtual void start(Recv::MessageParser handler, void * userdata, size_t maxlen, al_sec period) {
 		mBackgroundHandler = handler;
 		mBackgroundMaxLen = maxlen;
@@ -59,7 +59,7 @@ public:
 		mBackgroundPtr = userdata;
 		mThread.start(RecvThreadFunction, this);
 	}
-	
+
 	virtual void stop() {
 		mThread.wait();
 	}
@@ -67,7 +67,7 @@ public:
 	apr_sockaddr_t * mAddress;
 	apr_socket_t * mSock;
 	al::Thread mThread;
-	
+
 	Recv * mRecv;
 	Recv::MessageParser mBackgroundHandler;
 	void * mBackgroundPtr;
@@ -78,7 +78,7 @@ public:
 class OscSendImplAPR : public Send::Impl, public al::ImplAPR {
 public:
 	OscSendImplAPR(const char * address, unsigned int port) :
-	Send::Impl(), ImplAPR() 
+	Send::Impl(), ImplAPR()
 	{
 		/* @see http://dev.ariel-networks.com/apr/apr-tutorial/html/apr-tutorial-13.html */
 		// create socket:
@@ -91,11 +91,11 @@ public:
 		mAddress = sa;
 		mSock = sock;
 	}
-	
+
 	virtual ~OscSendImplAPR() {
 		apr_socket_close(mSock);
 	}
-	
+
 	virtual size_t send(const char * buffer, size_t len) {
 		apr_size_t size = len;
 		//al::check_apr(apr_socket_send(mSock, buffer, &size));
@@ -105,7 +105,7 @@ public:
 
 	apr_sockaddr_t * mAddress;
 	apr_socket_t * mSock;
-};	
+};
 
 Recv::Recv(unsigned int port) : mPort(port), mBackground(false) {
 	mImpl = new OscRecvImplAPR(this, port);
@@ -138,24 +138,24 @@ static void parsebundle(const osc::ReceivedBundle & p, Recv::MessageParser handl
 	}
 }
 
-size_t Recv::recv(char * buffer, size_t maxlen) { 
+size_t Recv::recv(char * buffer, size_t maxlen) {
 	return mImpl->recv(buffer, maxlen);
 }
 
-size_t Recv::recv(MessageParser handler, void * userdata, size_t maxlen) {
+void Recv::recv(MessageParser handler, void * userdata, size_t maxlen) {
 	char buffer[maxlen];
 	size_t len = mImpl->recv(buffer, maxlen);
-	if (len) {
+	while (len) {
 		osc::ReceivedPacket p(buffer, len);
 		if(p.IsBundle()) {
 			parsebundle(osc::ReceivedBundle(p), handler, userdata);
 		} else {
 			(handler)(osc::ReceivedMessage(p), userdata);
 		}
+		len = mImpl->recv(buffer, maxlen);
 	}
-	return len;
 }
-	
+
 Send::Send(const char * address, unsigned int port, int maxPacketSizeBytes)
 : mPort(port), mBuffer(0), mStream(0) {
 	maxPacketSize(maxPacketSizeBytes);

@@ -74,7 +74,7 @@ namespace osc {
 class Recv {
 public:
 	typedef void (*MessageParser)(const osc::ReceivedMessage & p, void * userdata);
-	
+
 	class Impl {
 	public:
 		virtual ~Impl() {}
@@ -83,34 +83,34 @@ public:
 		virtual void stop() {};
 	};
 
-	
+
 	Recv(unsigned int port = 7007);
 	~Recv();
 
 	unsigned int port() const { return mPort; }
 
 	/*
-		Non-blocking explicit poll: 
+		Non-blocking explicit poll:
 			Using oscpack to call handler per osc::ReceivedMessage
-			returns the number of bytes received.
+			flushes socket
 	*/
-	size_t recv(MessageParser handler, void * userdata = 0, size_t maxlen = OSC_DEFAULT_MAX_MESSAGE_LEN);
-	
+	void recv(MessageParser handler, void * userdata = 0, size_t maxlen = OSC_DEFAULT_MAX_MESSAGE_LEN);
+
 	/*
-		Non-blocking explicit poll: 
+		Non-blocking explicit poll:
 			buffer should have at least maxlen bytes of space
 			returns the number of bytes received.
 			call it repeatedly until it returns zero.
 	*/
 	size_t recv(char * buffer, size_t maxlen = OSC_DEFAULT_MAX_MESSAGE_LEN);
-	
+
 	/*
 		Alternative: polling from a background thread
 			(make sure your handler only makes thread-safe calls!)
 	*/
 	void start(MessageParser handler, void * userdata = 0, size_t maxlen = OSC_DEFAULT_MAX_MESSAGE_LEN, al_sec period=0.001);
 	void stop();
-	
+
 	bool background() const { return mBackground; }
 
 protected:
@@ -128,8 +128,8 @@ public:
 		virtual ~Impl() {}
 		virtual size_t send(const char * buffer, size_t len) = 0;
 	};
-	
-	
+
+
 	Send(const char * address = "localhost", unsigned int port = 7007, int maxPacketSizeBytes=OSC_DEFAULT_MAX_MESSAGE_LEN);
 	~Send();
 
@@ -152,22 +152,22 @@ public:
 	/// Send address pattern along with 2 arguments immediately
 	template <class T1, class T2>
 	size_t send(const std::string& addressPattern, const T1& arg1, const T2& arg2);
-	
+
 	/// Send address pattern along with 3 arguments immediately
 	template <class T1, class T2, class T3>
 	size_t send(const std::string& addressPattern, const T1& arg1, const T2& arg2, const T3& arg3);
-	
+
 	/// Send address pattern along with 4 arguments immediately
 	template <class T1, class T2, class T3, class T4>
 	size_t send(const std::string& addressPattern, const T1& arg1, const T2& arg2, const T3& arg3, const T4& arg4);
-	
+
 	/// Send address pattern along with 5 arguments immediately
 	template <class T1, class T2, class T3, class T4, class T5>
 	size_t send(const std::string& addressPattern, const T1& arg1, const T2& arg2, const T3& arg3, const T4& arg4, const T5& arg5);
-	
+
 	/// Set maximum outbound packet size
 	void maxPacketSize(int bytes);
-	
+
 	unsigned int port() const { return mPort; }
 
 protected:
@@ -184,31 +184,31 @@ protected:
 
 template <class T1>
 size_t Send::send(const std::string& p, const T1& a1){
-	(*mStream) << osc::BeginMessage(p.c_str()) << a1 << osc::EndMessage; 
+	(*mStream) << osc::BeginMessage(p.c_str()) << a1 << osc::EndMessage;
 	return send((*mStream));
 }
 
 template <class T1, class T2>
 size_t Send::send(const std::string& p, const T1& a1, const T2& a2){
-	(*mStream) << osc::BeginMessage(p.c_str()) << a1<<a2 << osc::EndMessage; 
+	(*mStream) << osc::BeginMessage(p.c_str()) << a1<<a2 << osc::EndMessage;
 	return send((*mStream));
 }
 
 template <class T1, class T2, class T3>
 size_t Send::send(const std::string& p, const T1& a1, const T2& a2, const T3& a3){
-	(*mStream) << osc::BeginMessage(p.c_str()) << a1<<a2<<a3 << osc::EndMessage; 
+	(*mStream) << osc::BeginMessage(p.c_str()) << a1<<a2<<a3 << osc::EndMessage;
 	return send((*mStream));
 }
 
 template <class T1, class T2, class T3, class T4>
 size_t Send::send(const std::string& p, const T1& a1, const T2& a2, const T3& a3, const T4& a4){
-	(*mStream) << osc::BeginMessage(p.c_str()) << a1<<a2<<a3<<a4 << osc::EndMessage; 
+	(*mStream) << osc::BeginMessage(p.c_str()) << a1<<a2<<a3<<a4 << osc::EndMessage;
 	return send((*mStream));
 }
 
 template <class T1, class T2, class T3, class T4, class T5>
 size_t Send::send(const std::string& p, const T1& a1, const T2& a2, const T3& a3, const T4& a4, const T5& a5){
-	(*mStream) << osc::BeginMessage(p.c_str()) << a1<<a2<<a3<<a4<<a5 << osc::EndMessage; 
+	(*mStream) << osc::BeginMessage(p.c_str()) << a1<<a2<<a3<<a4<<a5 << osc::EndMessage;
 	return send((*mStream));
 }
 
