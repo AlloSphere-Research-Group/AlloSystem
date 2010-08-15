@@ -316,6 +316,26 @@
 		36F598FE12122628003B78B5 /* al_Model.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F598FC12122628003B78B5 /* al_Model.cpp */; };
 		8DD76F650486A84900D96B5E /* exScheduling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* exScheduling.cpp */; settings = {ATTRIBUTES = (); }; };
 		8DD76F6A0486A84900D96B5E /* alscheduling.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* alscheduling.1 */; };
+		B9C962A41218939E00091F80 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
+		B9C962A51218939E00091F80 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
+		B9C962A61218939E00091F80 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC53081162907D0076AA8B /* CoreAudio.framework */; };
+		B9C962A71218939E00091F80 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
+		B9C962A81218939E00091F80 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
+		B9C962A91218939E00091F80 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
+		B9C962AA1218939E00091F80 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
+		B9C962AB1218939E00091F80 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
+		B9C962C41218941800091F80 /* OpenCL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B9C962B1121893F100091F80 /* OpenCL.framework */; };
+		B9C962C91218943800091F80 /* exOpenCL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9C962C81218943800091F80 /* exOpenCL.cpp */; };
+		B9C962CA1218950800091F80 /* al_OpenCLProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9C9629D1218938C00091F80 /* al_OpenCLProgram.cpp */; };
+		B9C962CB1218950800091F80 /* al_OpenCLPlatform.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9C9629C1218938C00091F80 /* al_OpenCLPlatform.cpp */; };
+		B9C962CC1218950900091F80 /* al_OpenCLMemoryBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9C9629B1218938C00091F80 /* al_OpenCLMemoryBuffer.cpp */; };
+		B9C962CD1218950900091F80 /* al_OpenCLKernel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9C9629A1218938C00091F80 /* al_OpenCLKernel.cpp */; };
+		B9C962CE1218950A00091F80 /* al_OpenCLInternal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9C962991218938C00091F80 /* al_OpenCLInternal.cpp */; };
+		B9C962CF1218950B00091F80 /* al_OpenCLEngine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9C962971218938C00091F80 /* al_OpenCLEngine.cpp */; };
+		B9C962D01218950C00091F80 /* al_OpenCLDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9C962961218938C00091F80 /* al_OpenCLDevice.cpp */; };
+		B9C962D11218950D00091F80 /* al_OpenCLContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9C962951218938C00091F80 /* al_OpenCLContext.cpp */; };
+		B9C962D21218950E00091F80 /* al_OpenCLCommandQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9C962941218938C00091F80 /* al_OpenCLCommandQueue.cpp */; };
+		B9C962D31218950E00091F80 /* al_OpenCLEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9C962981218938C00091F80 /* al_OpenCLEvent.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -404,6 +424,13 @@
 			remoteInfo = allocore;
 		};
 		36D69A2A11F923FC00699158 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 36B4130E10EFFA8D007B16D0;
+			remoteInfo = libal;
+		};
+		B9C962A01218939E00091F80 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
@@ -774,6 +801,30 @@
 		36F598FB12122617003B78B5 /* al_Model.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Model.hpp; sourceTree = "<group>"; };
 		36F598FC12122628003B78B5 /* al_Model.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Model.cpp; sourceTree = "<group>"; };
 		8DD76F6C0486A84900D96B5E /* exScheduling */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exScheduling; sourceTree = BUILT_PRODUCTS_DIR; };
+		B9C962881218937700091F80 /* al_OpenCL.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OpenCL.hpp; sourceTree = "<group>"; };
+		B9C962891218937700091F80 /* al_OpenCLCommandQueue.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OpenCLCommandQueue.hpp; sourceTree = "<group>"; };
+		B9C9628A1218937700091F80 /* al_OpenCLContext.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OpenCLContext.hpp; sourceTree = "<group>"; };
+		B9C9628B1218937700091F80 /* al_OpenCLDevice.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OpenCLDevice.hpp; sourceTree = "<group>"; };
+		B9C9628C1218937700091F80 /* al_OpenCLEngine.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OpenCLEngine.hpp; sourceTree = "<group>"; };
+		B9C9628D1218937700091F80 /* al_OpenCLEvent.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OpenCLEvent.hpp; sourceTree = "<group>"; };
+		B9C9628E1218937700091F80 /* al_OpenCLInternal.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OpenCLInternal.hpp; sourceTree = "<group>"; };
+		B9C9628F1218937700091F80 /* al_OpenCLKernel.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OpenCLKernel.hpp; sourceTree = "<group>"; };
+		B9C962901218937700091F80 /* al_OpenCLMemoryBuffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OpenCLMemoryBuffer.hpp; sourceTree = "<group>"; };
+		B9C962911218937700091F80 /* al_OpenCLPlatform.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OpenCLPlatform.hpp; sourceTree = "<group>"; };
+		B9C962921218937700091F80 /* al_OpenCLProgram.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OpenCLProgram.hpp; sourceTree = "<group>"; };
+		B9C962941218938C00091F80 /* al_OpenCLCommandQueue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_OpenCLCommandQueue.cpp; sourceTree = "<group>"; };
+		B9C962951218938C00091F80 /* al_OpenCLContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_OpenCLContext.cpp; sourceTree = "<group>"; };
+		B9C962961218938C00091F80 /* al_OpenCLDevice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_OpenCLDevice.cpp; sourceTree = "<group>"; };
+		B9C962971218938C00091F80 /* al_OpenCLEngine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_OpenCLEngine.cpp; sourceTree = "<group>"; };
+		B9C962981218938C00091F80 /* al_OpenCLEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_OpenCLEvent.cpp; sourceTree = "<group>"; };
+		B9C962991218938C00091F80 /* al_OpenCLInternal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_OpenCLInternal.cpp; sourceTree = "<group>"; };
+		B9C9629A1218938C00091F80 /* al_OpenCLKernel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_OpenCLKernel.cpp; sourceTree = "<group>"; };
+		B9C9629B1218938C00091F80 /* al_OpenCLMemoryBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_OpenCLMemoryBuffer.cpp; sourceTree = "<group>"; };
+		B9C9629C1218938C00091F80 /* al_OpenCLPlatform.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_OpenCLPlatform.cpp; sourceTree = "<group>"; };
+		B9C9629D1218938C00091F80 /* al_OpenCLProgram.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_OpenCLProgram.cpp; sourceTree = "<group>"; };
+		B9C962AF1218939E00091F80 /* exOpenCL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exOpenCL; sourceTree = BUILT_PRODUCTS_DIR; };
+		B9C962B1121893F100091F80 /* OpenCL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenCL.framework; path = /System/Library/Frameworks/OpenCL.framework; sourceTree = "<absolute>"; };
+		B9C962C81218943800091F80 /* exOpenCL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exOpenCL.cpp; sourceTree = "<group>"; };
 		C6859E8B029090EE04C91782 /* alscheduling.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = alscheduling.1; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1044,6 +1095,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B9C962A31218939E00091F80 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B9C962A41218939E00091F80 /* AudioToolbox.framework in Frameworks */,
+				B9C962A51218939E00091F80 /* AudioUnit.framework in Frameworks */,
+				B9C962A61218939E00091F80 /* CoreAudio.framework in Frameworks */,
+				B9C962A71218939E00091F80 /* GLUT.framework in Frameworks */,
+				B9C962A81218939E00091F80 /* OpenGL.framework in Frameworks */,
+				B9C962A91218939E00091F80 /* Cocoa.framework in Frameworks */,
+				B9C962AA1218939E00091F80 /* liballocore.a in Frameworks */,
+				B9C962AB1218939E00091F80 /* libapr-1.a in Frameworks */,
+				B9C962C41218941800091F80 /* OpenCL.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -1207,6 +1274,7 @@
 				36D69A3B11F923FC00699158 /* exGraphics */,
 				3687E34111FA4F9500EC6706 /* exIsosurface */,
 				367F0B5C12034F1E00FCC534 /* exStereographics */,
+				B9C962AF1218939E00091F80 /* exOpenCL */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1221,6 +1289,7 @@
 				36A20CFC110ACA0E0075A21C /* al_OSCAPR.hpp */,
 				3602B53D110A6D3D005DC3D0 /* al_Serialize.h */,
 				3602B53E110A6D3D005DC3D0 /* al_Serialize.hpp */,
+				B9C962871218937700091F80 /* opencl */,
 				3602B53F110A6D3D005DC3D0 /* oscpack */,
 			);
 			path = protocol;
@@ -1419,6 +1488,7 @@
 				36D69A3E11F9242400699158 /* exGraphics.cpp */,
 				3687E2BE11FA39F900EC6706 /* exIsosurface.cpp */,
 				367F0B5E12034F3700FCC534 /* exStereographics.cpp */,
+				B9C962C81218943800091F80 /* exOpenCL.cpp */,
 			);
 			name = examples;
 			path = ../../examples;
@@ -1465,6 +1535,7 @@
 				3622BEE6116D527D00928703 /* al_OSCAPR.cpp */,
 				3622BEE7116D527D00928703 /* al_Serialize.cpp */,
 				3622BEE8116D527D00928703 /* Makefile.config */,
+				B9C962931218938C00091F80 /* opencl */,
 				3622BEE9116D527D00928703 /* oscpack */,
 			);
 			path = protocol;
@@ -1725,8 +1796,44 @@
 				16AC52D311628F860076AA8B /* GLUT.framework */,
 				16AC52D411628F860076AA8B /* OpenGL.framework */,
 				36B412AF10EFF916007B16D0 /* Cocoa.framework */,
+				B9C962B1121893F100091F80 /* OpenCL.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		B9C962871218937700091F80 /* opencl */ = {
+			isa = PBXGroup;
+			children = (
+				B9C962881218937700091F80 /* al_OpenCL.hpp */,
+				B9C962891218937700091F80 /* al_OpenCLCommandQueue.hpp */,
+				B9C9628A1218937700091F80 /* al_OpenCLContext.hpp */,
+				B9C9628B1218937700091F80 /* al_OpenCLDevice.hpp */,
+				B9C9628C1218937700091F80 /* al_OpenCLEngine.hpp */,
+				B9C9628D1218937700091F80 /* al_OpenCLEvent.hpp */,
+				B9C9628E1218937700091F80 /* al_OpenCLInternal.hpp */,
+				B9C9628F1218937700091F80 /* al_OpenCLKernel.hpp */,
+				B9C962901218937700091F80 /* al_OpenCLMemoryBuffer.hpp */,
+				B9C962911218937700091F80 /* al_OpenCLPlatform.hpp */,
+				B9C962921218937700091F80 /* al_OpenCLProgram.hpp */,
+			);
+			path = opencl;
+			sourceTree = "<group>";
+		};
+		B9C962931218938C00091F80 /* opencl */ = {
+			isa = PBXGroup;
+			children = (
+				B9C962991218938C00091F80 /* al_OpenCLInternal.cpp */,
+				B9C962971218938C00091F80 /* al_OpenCLEngine.cpp */,
+				B9C9629C1218938C00091F80 /* al_OpenCLPlatform.cpp */,
+				B9C962961218938C00091F80 /* al_OpenCLDevice.cpp */,
+				B9C962951218938C00091F80 /* al_OpenCLContext.cpp */,
+				B9C9629B1218938C00091F80 /* al_OpenCLMemoryBuffer.cpp */,
+				B9C9629D1218938C00091F80 /* al_OpenCLProgram.cpp */,
+				B9C9629A1218938C00091F80 /* al_OpenCLKernel.cpp */,
+				B9C962941218938C00091F80 /* al_OpenCLCommandQueue.cpp */,
+				B9C962981218938C00091F80 /* al_OpenCLEvent.cpp */,
+			);
+			path = opencl;
 			sourceTree = "<group>";
 		};
 		C6859E8C029090F304C91782 /* Documentation */ = {
@@ -2086,6 +2193,24 @@
 			productReference = 8DD76F6C0486A84900D96B5E /* exScheduling */;
 			productType = "com.apple.product-type.tool";
 		};
+		B9C9629E1218939E00091F80 /* exOpenCL */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B9C962AC1218939E00091F80 /* Build configuration list for PBXNativeTarget "exOpenCL" */;
+			buildPhases = (
+				B9C962A11218939E00091F80 /* Sources */,
+				B9C962A31218939E00091F80 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B9C9629F1218939E00091F80 /* PBXTargetDependency */,
+			);
+			name = exOpenCL;
+			productInstallPath = "$(HOME)/bin";
+			productName = alscheduling;
+			productReference = B9C962AF1218939E00091F80 /* exOpenCL */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -2114,6 +2239,7 @@
 				36D69A2811F923FC00699158 /* exGraphics */,
 				3687E33011FA4F9500EC6706 /* exIsosurface */,
 				367F0B4B12034F1E00FCC534 /* exStereographics */,
+				B9C9629E1218939E00091F80 /* exOpenCL */,
 			);
 		};
 /* End PBXProject section */
@@ -2355,6 +2481,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B9C962A11218939E00091F80 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B9C962C91218943800091F80 /* exOpenCL.cpp in Sources */,
+				B9C962CA1218950800091F80 /* al_OpenCLProgram.cpp in Sources */,
+				B9C962CB1218950800091F80 /* al_OpenCLPlatform.cpp in Sources */,
+				B9C962CC1218950900091F80 /* al_OpenCLMemoryBuffer.cpp in Sources */,
+				B9C962CD1218950900091F80 /* al_OpenCLKernel.cpp in Sources */,
+				B9C962CE1218950A00091F80 /* al_OpenCLInternal.cpp in Sources */,
+				B9C962CF1218950B00091F80 /* al_OpenCLEngine.cpp in Sources */,
+				B9C962D01218950C00091F80 /* al_OpenCLDevice.cpp in Sources */,
+				B9C962D11218950D00091F80 /* al_OpenCLContext.cpp in Sources */,
+				B9C962D21218950E00091F80 /* al_OpenCLCommandQueue.cpp in Sources */,
+				B9C962D31218950E00091F80 /* al_OpenCLEvent.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -2422,6 +2566,11 @@
 			isa = PBXTargetDependency;
 			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
 			targetProxy = 36D69A2A11F923FC00699158 /* PBXContainerItemProxy */;
+		};
+		B9C9629F1218939E00091F80 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
+			targetProxy = B9C962A01218939E00091F80 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -3319,6 +3468,51 @@
 			};
 			name = Release;
 		};
+		B9C962AD1218939E00091F80 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"_GLIBCXX_DEBUG=1",
+					"_GLIBCXX_DEBUG_PEDANTIC=1",
+				);
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_CFLAGS = (
+					"-DAPR_FAST_COMPAT",
+					"-DAPR_STRICT",
+				);
+				PRODUCT_NAME = $TARGET_NAME;
+				SDKROOT = macosx10.6;
+				SYMROOT = ../../build;
+				USER_HEADER_SEARCH_PATHS = $inherited;
+			};
+			name = Debug;
+		};
+		B9C962AE1218939E00091F80 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_CFLAGS = (
+					"-DAPR_FAST_COMPAT",
+					"-DAPR_STRICT",
+				);
+				PRODUCT_NAME = $TARGET_NAME;
+				SDKROOT = macosx10.6;
+				SYMROOT = ../../build;
+				USER_HEADER_SEARCH_PATHS = $inherited;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -3471,6 +3665,15 @@
 			buildConfigurations = (
 				36D69A3911F923FC00699158 /* Debug */,
 				36D69A3A11F923FC00699158 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B9C962AC1218939E00091F80 /* Build configuration list for PBXNativeTarget "exOpenCL" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B9C962AD1218939E00091F80 /* Debug */,
+				B9C962AE1218939E00091F80 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
