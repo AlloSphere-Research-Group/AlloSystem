@@ -164,6 +164,13 @@ bool OpenCLEngine :: create_context() {
 }
 
 OpenCLCommandQueue * OpenCLEngine :: queue_for_device(const OpenCLDevice &dev) {
+	if(! mContext.get_context()) {
+		if(! create_context()) {
+			return NULL;
+		}
+	}
+	
+
 	map<cl_device_id, OpenCLCommandQueue *>::iterator it =	mDeviceQueues.find(dev.get_device());
 	OpenCLCommandQueue *queue = NULL;
 	if(it == mDeviceQueues.end()) {
