@@ -72,6 +72,9 @@ void OpenCLEngine :: compile_source(const char *name, const char *source) {
 		program->build(mPlatforms.front().get_devices());
 		mPrograms.insert(std::pair<string, OpenCLProgram *>(string(name), program));
 	}
+	else {
+		delete program;
+	}
 }
 
 OpenCLKernel * OpenCLEngine :: get_kernel(const char *name, const char *kernel_name) {
@@ -89,7 +92,7 @@ OpenCLKernel * OpenCLEngine :: get_kernel(const char *name, const char *kernel_n
 		OpenCLKernel::create(*program, kers);
 		if(kers.size() > 0) {
 			OpenCLKernel *kernel = kers.front();
-			for(int i=1; i < kers.size(); i++) {
+			for(unsigned int i=1; i < kers.size(); i++) {
 				delete kers[i];
 			}
 			return kernel;
