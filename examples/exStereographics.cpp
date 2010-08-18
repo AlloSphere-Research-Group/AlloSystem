@@ -217,9 +217,9 @@ struct MyWindow : WindowGL{
 	al_sec n;
 };
 
-
-
 int main (int argc, char * const argv[]) {
+
+	printf("%d %d\n", sizeof(Foo), sizeof(Bar));
 
 	// exaggerate stereo:
 	cam.eyeSep(1/20.);
