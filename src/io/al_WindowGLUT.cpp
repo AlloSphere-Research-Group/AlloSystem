@@ -42,7 +42,9 @@ public:
 		mWinDim(0), mFPS(0), mTitle(""),
 		mCursor(Cursor::Pointer),
 		mInGameMode(false), mVisible(true), mFullScreen(false), mCursorHide(false),
-		mMode(DisplayMode::DefaultBuf)
+		mMode(DisplayMode::DefaultBuf),
+		mScheduled(false),
+		mAvg(0.)
 	{
 		//
 		MainLoop::get();
@@ -144,7 +146,10 @@ public:
 	int id(){ return mInGameMode ? mIDGameMode : mID; }
 
 	void scheduleDraw(){
-		scheduleDrawStatic(0, id());
+		if (!mScheduled) {
+			mScheduled = true;
+			MainLoop::queue().send(0, scheduleDrawStatic, id());
+		}
 	}
 	
 	void visible(bool v){ mVisible=v; }
@@ -381,19 +386,21 @@ private:
 			if(win){
 				win->doFrame();
 				if(win->fps() > 0) {
-					al_sec frameperiod = 1.0/win->fps();
-					al_sec rt = MainLoop::realtime();
+					al_sec projected = t+1.0/win->fps();	// what time next render should be
+					al_sec rt = MainLoop::realtime();	// what time it really is now (after render)
+					al_sec next = projected;
+					if (rt > projected) next = rt;	// next = MAX(rt,projected)
 					
-					MainLoop::queue().send(rt + frameperiod, scheduleDrawStatic, winID);
-					
-					// not clear if this version is better or worse...
-//					al_sec littlegap = 0.1 * frameperiod;	// 10% of frameperiod
-//					int nextframeid = (int)((rt + littlegap + frameperiod) / frameperiod);
-//					al_sec next_t = nextframeid * frameperiod;
-//					MainLoop::queue().send(next_t, scheduleDrawStatic, winID);
+					MainLoop::queue().send(next, scheduleDrawStatic, winID);
+					al_sec per = 1./(next - t);
+					impl->mAvg += 0.3 * (per - impl->mAvg);
+				} else {
+					impl->mScheduled = false;
 				}
+			} else {
+				impl->mScheduled = false;
 			}
-		}
+		} 
 	}
 
 	// Map of windows constructed on first use to avoid static intialization
@@ -415,6 +422,9 @@ private:
 	bool mVisible;
 	bool mFullScreen;
 	bool mCursorHide;
+	
+	bool mScheduled;
+	al_sec mAvg;
     
 	friend class WindowGL;
 };
@@ -499,6 +509,7 @@ WindowGL::Dim WindowGL::dimensions() const {
 
 bool WindowGL::enabled(DisplayMode::t v) const { return mImpl->mMode & v; }
 double WindowGL::fps() const { return mImpl->mFPS; }
+double WindowGL::avgFps() const { return mImpl->mAvg; }
 bool WindowGL::fullScreen() const { return mImpl->mFullScreen; }
 const std::string& WindowGL::title() const { return mImpl->mTitle; }
 bool WindowGL::visible() const { return mImpl->mVisible; }

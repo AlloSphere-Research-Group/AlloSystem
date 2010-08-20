@@ -201,7 +201,8 @@ public:
 	Dim dimensions() const;
 	bool enabled(DisplayMode::t v) const;				///<
 	bool fullScreen() const;
-	double fps() const;									///< Returns frames/second
+	double fps() const;									///< Returns frames/second (requested)
+	double avgFps() const;								///< Returns frames/second (running average)
 	double spf() const { return 1./fps(); }				///< Returns seconds/frame
 	const std::string& title() const;
 	bool visible() const;
