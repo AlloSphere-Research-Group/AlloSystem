@@ -27,10 +27,12 @@
 namespace al {
 
 /*
-	An arena is a block from which to allocate items that will share a lifetime.
+	An Arena is a block from which to allocate items that will share a lifetime.
 	When the lifetime is expired, there is no need to free the items allocated;
 	just deleting the Arena (or letting it go out of scope if stack allocated) 
 	will free all associated memory.
+	
+	AKA AutoReleasePool. 
 	
 	E.g.
 	
@@ -38,6 +40,7 @@ namespace al {
 		Arena arena;
 		double * x = (double *)arena.calloc(sizeof(double) * 10);
 		Foo * foo = arena.alloc<Foo>();
+		Foo * foo1 = arena.New<Foo>();
 		
 		... // instructions using x and foo
 		
@@ -55,6 +58,10 @@ public:
 	T * alloc() { return alloc(sizeof(T)); }
 	template<typename T>
 	T * calloc() { return calloc(sizeof(T)); }
+	
+	template<typename T>
+	T * New() { return new (alloc(sizeof(T))) T(); }
+	
 	
 	class Impl {
 	public:

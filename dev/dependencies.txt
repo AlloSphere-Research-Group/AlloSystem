@@ -32,6 +32,19 @@ version 3.12.0
 Found through macports (port install freeimage)
 
 
+
+Lua 5.1.4
+--------------
+
+patch src/makefile @line 101:
+macosx:
+-	$(MAKE) all MYCFLAGS=-DLUA_USE_LINUX MYLIBS="-lreadline"
++	$(MAKE) all MYCFLAGS="-DLUA_USE_LINUX -mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk -arch x86_64 -arch i386" MYLIBS="-lreadline"
+
+
+env MACOSX_DEPLOYMENT_TARGET=10.5 make macosx 
+
+
 LLVM/Clang 2.7
 --------------
 
