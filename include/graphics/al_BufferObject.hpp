@@ -161,7 +161,7 @@ protected:
 /// Element object buffer
 class EBO : public BufferObject {
 public:
-	EBO(Prim::t prim, BufferUsage::t usage=BufferUsage::StaticDraw)
+	EBO(Prim::t prim=Prim::Points, BufferUsage::t usage=BufferUsage::StaticDraw)
 	:	BufferObject(BufferType::ElementArray, usage), mPrim(prim), mStart(0), mEnd(0)
 	{}
 
@@ -178,6 +178,29 @@ protected:
 	}
 };
 
+/*
+class BufferObjects : public GPUObject, public Drawable {
+public:
+	
+	BufferObjects() {};
+
+	virtual ~BufferObjects() {};
+	virtual void draw(Graphics& gl);
+	
+	GraphicsData& data() { return *mData; }
+
+protected:	
+
+	virtual void onCreate() {};
+	virtual void onDestroy() {};
+	
+	GraphicsData mData;
+
+	VBO mVBO;
+	CBO mCBO;
+	EBO mEBO;
+};
+*/
 
 } // al::gfx
 } // al::

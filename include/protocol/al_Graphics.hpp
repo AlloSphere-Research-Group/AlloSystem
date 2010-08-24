@@ -157,6 +157,9 @@ public:
 	typedef Vec2f	TexCoord2;
 	typedef Vec3f	TexCoord3;
 	typedef unsigned int	Index;
+	
+	/// TODO!
+	GraphicsData() {}
 
 	/// Reset all buffers
 	void resetBuffers();
@@ -309,6 +312,15 @@ protected:
 	stack<Matrix4d>		mModelViewMatrix;	// modelview matrix stack
 	StateChange			mStateChange;		// state difference to mark changes
 	stack<State>		mState;				// state stack
+
+};
+
+/*
+	Abstract base class for any object that can be rendered via Graphics:
+*/	
+class Drawable {
+public:
+	virtual void draw(Graphics& gl) = 0;
 
 };
 
