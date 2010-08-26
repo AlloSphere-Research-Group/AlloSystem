@@ -1,4 +1,5 @@
 #include "al_OpenCLCommandQueue.hpp"
+#include "al_OpenCLMemoryBuffer.hpp"
 
 namespace al {
 namespace cl {
@@ -36,7 +37,7 @@ void OpenCLCommandQueue :: create(OpenCLContext &ctx, const OpenCLDevice &dev, b
 	ctx.attach_resource(this);
 }
 
-OpenCLEvent OpenCLCommandQueue :: enqueueKernel(const OpenCLKernel &ker, cl_uint ndim, size_t *global, size_t *local) {
+OpenCLEvent OpenCLCommandQueue :: enqueue_kernel(const OpenCLKernel &ker, cl_uint ndim, size_t *global, size_t *local) {
 	cl_event event = 0;
 	cl_int res = clEnqueueNDRangeKernel(
 		mCommandQueue,
@@ -56,25 +57,12 @@ OpenCLEvent OpenCLCommandQueue :: enqueueKernel(const OpenCLKernel &ker, cl_uint
 	return OpenCLEvent(event);
 }
 
-OpenCLEvent OpenCLCommandQueue :: enqueueRead(const OpenCLMemoryBuffer &mem, bool block, size_t offset, size_t size, void *ptr) {
-	cl_event event = 0;
-	cl_int res = clEnqueueReadBuffer(
-		mCommandQueue,
-		mem.get_memory(),
-		block ? CL_TRUE : CL_FALSE,
-		offset,
-		size,
-		ptr,
-		0,
-		NULL,
-		&event
-	);
-	
-	if(opencl_error(res, "clEnqueueReadBuffer error enqueuing read event")) {
-		return OpenCLEvent();
-	}
-	
-	return OpenCLEvent(event);
+OpenCLEvent OpenCLCommandQueue :: enqueue_read(OpenCLMemoryBuffer &mem, bool block, size_t offset, size_t size, void *ptr) {
+	return mem.enqueue_read(*this, block, offset, size, ptr);
+}
+
+OpenCLEvent OpenCLCommandQueue :: enqueue_read(OpenCLMemoryBuffer &mem, bool block, size_t offset, AlloLattice *lattice) {
+	return mem.enqueue_read(*this, block, offset, lattice);
 }
 
 void OpenCLCommandQueue :: destroy() {

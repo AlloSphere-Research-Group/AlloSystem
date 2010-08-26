@@ -4,16 +4,19 @@
 #include "al_OpenCLInternal.hpp"
 #include "al_OpenCLContext.hpp"
 #include "al_OpenCLKernel.hpp"
-#include "al_OpenCLMemoryBuffer.hpp"
 #include "al_OpenCLEvent.hpp"
+#include "types/al_types.h"
 #include <vector>
 #include <string>
+
 
 using std::vector;
 using std::string;
 
 namespace al {
 namespace cl {
+
+class OpenCLMemoryBuffer;
 
 class OpenCLCommandQueue : public OpenCLResource<OpenCLContext> {
 public:	
@@ -26,8 +29,9 @@ public:
 	
 	cl_command_queue get_command_queue() const {return mCommandQueue;}
 	void create(OpenCLContext &ctx, const OpenCLDevice &dev, bool ordered=true, bool profiling=false);
-	OpenCLEvent enqueueKernel(const OpenCLKernel &ker, cl_uint ndim, size_t *global, size_t *local);
-	OpenCLEvent enqueueRead(const OpenCLMemoryBuffer &mem, bool block, size_t offset, size_t size, void *ptr);
+	OpenCLEvent enqueue_kernel(const OpenCLKernel &ker, cl_uint ndim, size_t *global, size_t *local);
+	OpenCLEvent enqueue_read(OpenCLMemoryBuffer &mem, bool block, size_t offset, size_t size, void *ptr);
+	OpenCLEvent enqueue_read(OpenCLMemoryBuffer &mem, bool block, size_t offset, AlloLattice *lattice);
 	void destroy();
 
 protected:

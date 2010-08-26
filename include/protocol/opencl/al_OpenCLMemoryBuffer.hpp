@@ -3,6 +3,8 @@
 
 #include "al_OpenCLInternal.hpp"
 #include "al_OpenCLContext.hpp"
+#include "al_OpenCLEvent.hpp"
+#include "types/al_types.h"
 #include <vector>
 #include <string>
 
@@ -11,6 +13,8 @@ using std::string;
 
 namespace al {
 namespace cl {
+
+class OpenCLCommandQueue;
 
 class OpenCLMemoryBuffer : public OpenCLResource<OpenCLContext> {
 public:
@@ -22,7 +26,29 @@ public:
 	
 	cl_mem get_memory() const {return mMem;}
 	void create(OpenCLContext &ctx, cl_mem_flags usage, size_t size, void *ptr);
+	virtual void create(
+		OpenCLContext &ctx, 
+		cl_mem_flags usage, 
+		AlloLattice *lattice
+	);
 	void destroy();
+	
+	virtual OpenCLEvent enqueue_read(
+		OpenCLCommandQueue &queue, 
+		bool block, 
+		size_t offset, 
+		size_t size, 
+		void *ptr
+	);
+	
+	virtual OpenCLEvent enqueue_read(
+		OpenCLCommandQueue &queue, 
+		bool block, 
+		size_t offset, 
+		AlloLattice *lattice
+	);
+	
+	static cl_mem_flags check_memory_flags(cl_mem_flags usage, void *ptr);
 
 protected:
 	cl_mem mMem;

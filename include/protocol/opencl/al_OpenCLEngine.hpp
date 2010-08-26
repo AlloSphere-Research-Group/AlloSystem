@@ -44,7 +44,7 @@ public:
 	
 	OpenCLEvent enqueue_read(
 		const OpenCLDevice &dev, 
-		const OpenCLMemoryBuffer *mem, 
+		OpenCLMemoryBuffer *mem, 
 		bool block, 
 		size_t offset, 
 		size_t size, 

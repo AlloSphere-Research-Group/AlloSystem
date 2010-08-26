@@ -2,6 +2,7 @@
 #define AL_OPENCL_INTERNAL_H 1
 
 #include <OpenCL/OpenCL.h>
+#include <OpenCL/cl_gl.h>
 #include <string>
 
 #define GET_FLAG(flag, word) (flag & word)

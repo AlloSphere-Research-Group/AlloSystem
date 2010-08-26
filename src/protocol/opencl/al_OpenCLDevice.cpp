@@ -4,6 +4,10 @@
 namespace al {
 namespace cl {
 
+bool OpenCLDevice :: has_extension(const char *ext) {
+	return strstr(mExtensions.c_str(), ext) != NULL;
+}
+
 void OpenCLDevice :: get_devices(const OpenCLPlatform &plat, vector<OpenCLDevice> &devs) {
 	cl_device_id devices[MAX_DEVICES];
 	cl_uint num_devices = 0;

@@ -17,23 +17,42 @@ const char *kernel_source = "\n" \
 "}                                                                      \n" \
 "\n";
 
+void test(cl::OpenCLMemoryBuffer *mem1) {
+	cl_mem mem = mem1->get_memory();
+	char param_value[2048];
+	size_t sz=0;
+	for(int i=0; i < 1000000; i++) {
+		clGetMemObjectInfo(
+			mem,
+			CL_MEM_SIZE,
+			2048,
+			param_value,
+			&sz
+		);
+	}
+}
+
+#define SIZE (256)
 int main (int argc, char * argv[]) {
-	size_t sizes[] = {4, 4};
+	size_t sizes[] = {16, 16};
+	size_t sizes4[] = {4, 4};
 	size_t sizes1[] = {1, 1};
-	float data1[16];
-	float data2[16];
-	for(int i=0; i < 16; i++) data1[i] = (float)i;
+	float data1[SIZE];
+	float data2[SIZE];
+	for(int i=0; i < SIZE; i++) data1[i] = (float)i;
 
 	cl::OpenCLEngine engine;
 	engine.compile_source("square", kernel_source);
 
 	cl::OpenCLKernel *kernel = engine.get_kernel("square");
-	cl::OpenCLMemoryBuffer *mem1 = engine.create_memory_buffer(CL_MEM_READ_WRITE, sizeof(float)*16, data1);
-	cl::OpenCLMemoryBuffer *mem2 = engine.create_memory_buffer(CL_MEM_READ_WRITE, sizeof(float)*16, NULL);
+	cl::OpenCLMemoryBuffer *mem1 = engine.create_memory_buffer(CL_MEM_READ_WRITE, sizeof(float)*SIZE, data1);
+	cl::OpenCLMemoryBuffer *mem2 = engine.create_memory_buffer(CL_MEM_READ_WRITE, sizeof(float)*SIZE, data2);
 	
 	kernel->set_argument(0, *mem1);
 	kernel->set_argument(1, *mem2);
 	
+	
+//	test(mem1);
 	
 	
 	printf("\nUSING GPU DEVICE:\n");
@@ -45,13 +64,15 @@ int main (int argc, char * argv[]) {
 		(int)dev->get_max_compute_units(),
 		(int)dev->get_max_work_group_size()
 	);
-	engine.enqueue_kernel(*dev, kernel, 2, sizes, sizes);
-	engine.enqueue_read(*dev, mem2, true, 0, sizeof(float)*16, data2);
-	for(int i=0; i < 16; i++) printf("%d: %f\n", i, data2[i]);
+	
+	printf("GPU EXTENSIONS: %s\n", dev->get_extensions().c_str());
+	engine.enqueue_kernel(*dev, kernel, 2, sizes, sizes1);
+	engine.enqueue_read(*dev, mem2, true, 0, sizeof(float)*SIZE, data2);
+//	for(int i=0; i < SIZE; i++) printf("%d: %f\n", i, data2[i]);
 	
 	
 	// reset input data to something different
-	for(int i=0; i < 16; i++) data1[i] = ((float)i)*0.5;
+	for(int i=0; i < SIZE; i++) data1[i] = ((float)i)*0.5;
 	
 	printf("\nUSING CPU DEVICE:\n");
 	cl::OpenCLDevice *dev2 = engine.cpu_device();
@@ -63,8 +84,14 @@ int main (int argc, char * argv[]) {
 		(int)dev2->get_max_work_group_size()
 	);
 	engine.enqueue_kernel(*dev2, kernel, 2, sizes, sizes1);
-	engine.enqueue_read(*dev2, mem2, true, 0, sizeof(float)*16, data2);
-	for(int i=0; i < 16; i++) printf("%d: %f\n", i, data2[i]);
+	engine.enqueue_read(*dev2, mem2, true, 0, sizeof(float)*SIZE, data2);
+//	for(int i=0; i < SIZE; i++) printf("%d: %f\n", i, data2[i]);
+	
+	
+	printf("GL_SHARE gpu: %s cpu: %s\n", 
+		dev->has_extension("cl_APPLE_gl_sharing") ? "TRUE" : "FALSE", 
+		dev2->has_extension("cl_APPLE_gl_sharing") ? "TRUE" : "FALSE"
+	);
 	
 	return 0;
 }

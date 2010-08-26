@@ -54,6 +54,8 @@ protected:
 public:
 
 	~OpenCLDevice() {}
+	
+	bool has_extension(const char *ext);
 
 	static void get_devices(const OpenCLPlatform &plat, vector<OpenCLDevice> &devs);
 

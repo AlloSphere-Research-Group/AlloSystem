@@ -338,6 +338,9 @@
 		B9C962D11218950D00091F80 /* al_OpenCLContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9C962951218938C00091F80 /* al_OpenCLContext.cpp */; };
 		B9C962D21218950E00091F80 /* al_OpenCLCommandQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9C962941218938C00091F80 /* al_OpenCLCommandQueue.cpp */; };
 		B9C962D31218950E00091F80 /* al_OpenCLEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9C962981218938C00091F80 /* al_OpenCLEvent.cpp */; };
+		B9C970A112268D1400091F80 /* al_OpenCLImage2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9C970A012268D1400091F80 /* al_OpenCLImage2D.cpp */; };
+		B9C970EB1226918400091F80 /* al_OpenCLImage3D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9C970EA1226918400091F80 /* al_OpenCLImage3D.cpp */; };
+		B9C972691226CE2A00091F80 /* al_OpenCLExtensions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9C972681226CE2A00091F80 /* al_OpenCLExtensions.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -829,6 +832,13 @@
 		B9C962AF1218939E00091F80 /* exOpenCL */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exOpenCL; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9C962B1121893F100091F80 /* OpenCL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenCL.framework; path = /System/Library/Frameworks/OpenCL.framework; sourceTree = "<absolute>"; };
 		B9C962C81218943800091F80 /* exOpenCL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exOpenCL.cpp; sourceTree = "<group>"; };
+		B9C9709E12268D0300091F80 /* al_OpenCLImage2D.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OpenCLImage2D.hpp; sourceTree = "<group>"; };
+		B9C970A012268D1400091F80 /* al_OpenCLImage2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_OpenCLImage2D.cpp; sourceTree = "<group>"; };
+		B9C970E91226916000091F80 /* al_OpenCLImage3D.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OpenCLImage3D.hpp; sourceTree = "<group>"; };
+		B9C970EA1226918400091F80 /* al_OpenCLImage3D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_OpenCLImage3D.cpp; sourceTree = "<group>"; };
+		B9C970F9122692BC00091F80 /* al_OpenCLImageFormat.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OpenCLImageFormat.hpp; sourceTree = "<group>"; };
+		B9C972591226C9E400091F80 /* al_OpenCLExtensions.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OpenCLExtensions.hpp; sourceTree = "<group>"; };
+		B9C972681226CE2A00091F80 /* al_OpenCLExtensions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_OpenCLExtensions.cpp; sourceTree = "<group>"; };
 		C6859E8B029090EE04C91782 /* alscheduling.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = alscheduling.1; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1819,8 +1829,12 @@
 				B9C9628E1218937700091F80 /* al_OpenCLInternal.hpp */,
 				B9C9628F1218937700091F80 /* al_OpenCLKernel.hpp */,
 				B9C962901218937700091F80 /* al_OpenCLMemoryBuffer.hpp */,
+				B9C9709E12268D0300091F80 /* al_OpenCLImage2D.hpp */,
+				B9C970E91226916000091F80 /* al_OpenCLImage3D.hpp */,
+				B9C970F9122692BC00091F80 /* al_OpenCLImageFormat.hpp */,
 				B9C962911218937700091F80 /* al_OpenCLPlatform.hpp */,
 				B9C962921218937700091F80 /* al_OpenCLProgram.hpp */,
+				B9C972591226C9E400091F80 /* al_OpenCLExtensions.hpp */,
 			);
 			path = opencl;
 			sourceTree = "<group>";
@@ -1834,10 +1848,13 @@
 				B9C962961218938C00091F80 /* al_OpenCLDevice.cpp */,
 				B9C962951218938C00091F80 /* al_OpenCLContext.cpp */,
 				B9C9629B1218938C00091F80 /* al_OpenCLMemoryBuffer.cpp */,
+				B9C970A012268D1400091F80 /* al_OpenCLImage2D.cpp */,
+				B9C970EA1226918400091F80 /* al_OpenCLImage3D.cpp */,
 				B9C9629D1218938C00091F80 /* al_OpenCLProgram.cpp */,
 				B9C9629A1218938C00091F80 /* al_OpenCLKernel.cpp */,
 				B9C962941218938C00091F80 /* al_OpenCLCommandQueue.cpp */,
 				B9C962981218938C00091F80 /* al_OpenCLEvent.cpp */,
+				B9C972681226CE2A00091F80 /* al_OpenCLExtensions.cpp */,
 			);
 			path = opencl;
 			sourceTree = "<group>";
@@ -2504,6 +2521,9 @@
 				B9C962D11218950D00091F80 /* al_OpenCLContext.cpp in Sources */,
 				B9C962D21218950E00091F80 /* al_OpenCLCommandQueue.cpp in Sources */,
 				B9C962D31218950E00091F80 /* al_OpenCLEvent.cpp in Sources */,
+				B9C970A112268D1400091F80 /* al_OpenCLImage2D.cpp in Sources */,
+				B9C970EB1226918400091F80 /* al_OpenCLImage3D.cpp in Sources */,
+				B9C972691226CE2A00091F80 /* al_OpenCLExtensions.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

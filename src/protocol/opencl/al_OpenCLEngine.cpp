@@ -113,7 +113,7 @@ OpenCLEvent OpenCLEngine :: enqueue_kernel(
 {
 	OpenCLCommandQueue *queue = queue_for_device(dev);
 	if(queue) {
-		return queue->enqueueKernel(*ker, ndim, global, local);
+		return queue->enqueue_kernel(*ker, ndim, global, local);
 	}
 	else {
 		return OpenCLEvent();
@@ -122,7 +122,7 @@ OpenCLEvent OpenCLEngine :: enqueue_kernel(
 
 OpenCLEvent OpenCLEngine :: enqueue_read(
 	const OpenCLDevice &dev, 
-	const OpenCLMemoryBuffer *mem, 
+	OpenCLMemoryBuffer *mem, 
 	bool block, 
 	size_t offset, 
 	size_t size, 
@@ -131,7 +131,7 @@ OpenCLEvent OpenCLEngine :: enqueue_read(
 {
 	OpenCLCommandQueue *queue = queue_for_device(dev);
 	if(queue) {
-		return queue->enqueueRead(*mem, block, offset, size, ptr);
+		return queue->enqueue_read(*mem, block, offset, size, ptr);
 	}
 	else {
 		return OpenCLEvent();

@@ -2,6 +2,7 @@
 #define AL_OPENCL_PLATFORM_H 1
 
 #include "al_OpenCLInternal.hpp"
+#include "al_OpenCLExtensions.hpp"
 #include "al_OpenCLDevice.hpp"
 #include <vector>
 #include <string>
@@ -17,7 +18,9 @@ protected:
 	OpenCLPlatform(cl_platform_id platform=0)
 	:	mPlatform(platform),
 		mProfile(UNKNOWN_PROFILE)
-	{}
+	{
+		load_extension_functions();
+	}
 
 public:
 	~OpenCLPlatform() {}
