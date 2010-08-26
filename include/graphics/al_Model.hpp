@@ -36,8 +36,126 @@
 #include "graphics/al_Common.hpp"
 #include "graphics/al_Light.hpp"
 
+#define MODEL_PARSER_BUF_LEN (256)
+
 namespace al {
 namespace gfx{
+
+/// an object with internal GraphicsData and Material. 
+class MaterialObject : public Drawable {
+public:
+	MaterialObject() : Drawable() {}
+	virtual ~MaterialObject() {}
+	
+	virtual void draw(Graphics& gl) {}
+	
+	void name(std::string n) { mName = n; }
+
+protected:	
+	std::string     mName;
+	GraphicsData	mData;			/* vertex data */
+	Material *		mMaterial;		/* material used */
+};
+
+/// OBJ file reader. Parses .obj (and .mtl) files. A separate object will be created per group and/or usemtl command.
+/// it stores the OBJ data intenally, divided per object. 
+/// any of these objects can be instantiated (factory style) into GraphicsData and Materials
+/// the names of objects/materials are available for iteration. 
+/// Typically, after parsing the OBJ and instantiating the desired objects and materials, the OBJReader itself can be discarded. 
+class OBJReader {
+public:
+
+	OBJReader() {}
+	OBJReader(std::string path, std::string filename) { readOBJ(path, filename); }
+	~OBJReader() {}
+	
+	void readOBJ(std::string path, std::string filename);
+	
+	
+	
+	
+	struct Group {
+		std::vector<int> indices;
+		std::string material;
+	};
+	
+	typedef std::map<std::string, Group>::iterator GroupIterator;
+	GroupIterator groupsBegin() { return mGroups.begin(); }
+	GroupIterator groupsEnd() { return mGroups.end(); }
+	GroupIterator groupsFind(std::string name) { return mGroups.find(name); }
+	
+	// returns NULL if the group is not found, or has no vertices
+	GraphicsData * createGraphicsData(GroupIterator group);
+	
+	struct Mtl {
+		float shininess, optical_density;
+		Color diffuse, ambient, specular;
+		std::string diffuseMap, ambientMap, specularMap, bumpMap;
+	};
+	
+	typedef std::map<std::string, Mtl>::iterator MtlIterator;
+	MtlIterator materialsBegin() { return mMaterials.begin(); }
+	MtlIterator materialsEnd() { return mMaterials.end(); }
+	MtlIterator materialsFind(std::string name) { return mMaterials.find(name); }
+	
+	
+	// returns NULL if the group is not found, or has no vertices
+	Material * createMaterial(MtlIterator mtl);
+
+protected:
+	
+	std::string mPath;				/* path to this model */
+	std::string mFilename;				/* path to this model */
+	std::string mMaterialLib;       /* name of the material library */
+	
+	FILE * file;
+	char buf[MODEL_PARSER_BUF_LEN];
+	
+	struct FaceVertex {
+		int vertex, texcoord, normal;
+		
+		FaceVertex(unsigned int vertex, unsigned int texcoord, unsigned int normal) : vertex(vertex), texcoord(texcoord), normal(normal) {}
+		FaceVertex(const FaceVertex& cpy) : vertex(cpy.vertex), texcoord(cpy.texcoord), normal(cpy.normal) {}
+	};
+	
+	std::map<std::string, Group> mGroups;
+	std::map<std::string, Mtl> mMaterials;
+	
+	// parser:
+	void readToken();
+	bool hasToken();
+	void readLine();
+	void eatLine();
+	std::string parseMaterial();
+	std::string parseMaterialLib();
+	std::string parseGroup();
+	void parseVertex();
+	void parseTexcoord();
+	void parseNormal();
+	void parseColor(Color& c);
+	void parseFace(Group * g);
+	
+	void readMTL(std::string path, std::string name);
+	
+	int findFaceVertex(std::string s);
+	int addFaceVertex(std::string buf, int v, int t, int n);
+	void addTriangle(Group * g, unsigned int id0, unsigned int id1, unsigned int id2);
+	
+	std::vector<GraphicsData::Vertex> vertices;
+	std::vector<GraphicsData::TexCoord2> texcoords;
+	std::vector<GraphicsData::Normal> normals;
+	std::vector<FaceVertex> face_vertices;
+	
+	// maps face vertices (as string) to corresponding this->vertices index
+	// this way, avoid inserting the same vertex/tex/norm combo twice,
+	// and use index buffer instead.
+	std::map<std::string, int> vertexMap;
+	
+	
+
+};
+
+
 
 class Model {
 public:
