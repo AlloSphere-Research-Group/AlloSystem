@@ -849,9 +849,9 @@ struct Parser {
 		GraphicsData& data = g.data();
 
 		// store this triangle in the GraphicsData indices() buffer:
-		data.addIndex(id0);
-		data.addIndex(id1);
-		data.addIndex(id2);
+		data.addIndex(id0-1);
+		data.addIndex(id1-1);
+		data.addIndex(id2-1);
 	}
 
 	std::string parseMaterial() {

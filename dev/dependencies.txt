@@ -45,6 +45,22 @@ macosx:
 env MACOSX_DEPLOYMENT_TARGET=10.5 make macosx 
 
 
+LuaJIT-2.0.0
+--------------
+
+Modified src/Makefile to change MACOSX_DEPLOYMENT_TARGET to 10.5
+Built x64 bit, and then 32 bit
+
+make
+mv src/libluajit.a src/libluajit64.a
+make clean
+make CC="gcc -m32"
+mv src/libluajit.a src/libluajit32.a
+lipo -create src/libluajit32.a src/libluajit64.a -output src/libluajit.a
+ranlib src/libluajit.a
+
+
+
 LLVM/Clang 2.7
 --------------
 
