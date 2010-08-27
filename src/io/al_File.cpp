@@ -1,8 +1,13 @@
 #include <cstring>
 
-#define AL_PATH_MAX (4096)
-
 #include "io/al_File.hpp"
+
+#include "../private/al_ImplAPR.h"
+#ifdef AL_LINUX
+	#include "apr-1.0/apr_file_info.h"
+#else
+	#include "apr-1/apr_file_info.h"
+#endif
 
 namespace al{
 
@@ -14,6 +19,60 @@ void path2dir(char* dst, const char* src) {
         s[1] = '\0';
     else
         dst[0] = '\0';
+}
+
+
+
+
+class Path : public ImplAPR {
+public:
+	apr_dir_t * dir;
+	apr_finfo_t dirent;
+	std::string dirname;
+	
+	Path(std::string dirname) : ImplAPR(), dir(NULL), dirname(dirname) {
+		if (APR_SUCCESS != check_apr(apr_dir_open(&dir, dirname.data(), mPool))) {
+			dir=NULL;
+		}
+	}
+	
+	virtual ~Path() {
+		if (dir) check_apr(apr_dir_close(dir));
+	}
+	
+	bool find(std::string name, FilePath& result, bool recursive=true) {
+		bool found = false;
+		if (dir && APR_SUCCESS == check_apr(apr_dir_open(&dir, dirname.data(), mPool))) {
+			// iterate over directory:
+			while ((!found) && APR_SUCCESS == (apr_dir_read(&dirent, APR_FINFO_DIRENT, dir))) {
+				
+				if (dirent.filetype == APR_REG && dirent.name == name) {
+					result.file(dirent.name);
+					result.path(dirname);
+					found = true;
+					break;
+				} else if (recursive && dirent.filetype == APR_DIR && dirent.name[0] != '.') {
+					Path path(dirname + dirent.name + AL_FILE_DELIMITER);
+					found = path.find(name, result, true);
+				}
+			}
+		}
+		return found;
+	}
+};
+
+
+
+FilePath SearchPaths::find(std::string name) {
+	FilePath result;
+	bool found = false;
+	std::list<SearchPaths::searchpath>::iterator iter = mSearchPaths.begin();
+	while ((!found) && iter != mSearchPaths.end()) {
+		Path path(iter->first.data());
+		found = path.find(name, result, iter->second);
+		iter++;
+	}
+	return result;
 }
 
 

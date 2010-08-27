@@ -1,12 +1,87 @@
 #ifndef INCLUDE_AL_FILE_HPP
 #define INCLUDE_AL_FILE_HPP
 
+#include <unistd.h>
 #include <stdio.h>
+#include <string>
+#include <sys/stat.h>
+#include <list>
+
+#include "system/al_Config.h"
+
+#ifdef AL_WIN32 
+	#define AL_FILE_DELIMITER '\\'
+#else
+	#define AL_FILE_DELIMITER '/'
+#endif	
+
+#define AL_PATH_MAX (4096)
 
 namespace al{
 
 // strips a qualified path to a file (src) into a path to the containing folder (dst)
 void path2dir(char* dst, const char* src);
+
+/// a pair of path (folder/directory) and filename
+class FilePath {
+public:
+	FilePath() {};
+	FilePath(std::string file, std::string path = "/") : mFile(file), mPath(path) {}
+	
+	std::string file() const { return mFile; }
+	std::string path() const { return mPath; }
+	
+	std::string filepath() const { return mPath+mFile; }
+	
+	FilePath& file(std::string v) { mFile=v; return *this; }
+	FilePath& path(std::string v) { mPath=v; return *this; }
+	
+protected:
+	std::string mPath;
+	std::string mFile;
+};
+
+/// a handy way to manage several possible search paths
+class SearchPaths {
+public:
+	SearchPaths() {}
+	SearchPaths(int argc, char * const argv[], bool recursive=true) { addAppPaths(argc,argv,recursive); }
+	~SearchPaths() {}
+
+	/// find a file in the searchpaths
+	/// returns true if file found, and fills result with corresponding path & filename
+	/// returns false if file not found
+	FilePath find(std::string filename);
+	
+	/// add a path to search in; recursive searching is optional
+	void addSearchPath(std::string path, bool recursive = true);
+	
+	/// adds best estimate of application launch paths (cwd etc.)
+	/// can pass in argv from the main() function if desired.
+	void addAppPaths(int argc, char * const argv[], bool recursive = true);
+	void addAppPaths(bool recursive = true);
+	
+	std::string appPath() { return mAppPath; }
+	
+	/// todo?
+	//void addResourcePath();
+	
+	// strips trailing filename from a path; e.g. /usr/bin/man -> /usr/bin/
+	static std::string stripFileName(std::string src);
+	// ensure path ends with the proper delimiter
+	static std::string conformPath(std::string src);
+	// does a file at the given filepath exist?
+	static bool fileExists(std::string name, std::string path);
+	
+protected:
+
+	typedef std::pair<std::string, bool> searchpath;
+	std::list<searchpath> mSearchPaths;
+	
+	std::string mAppPath;
+
+};
+
 
 
 class File{
@@ -58,6 +133,66 @@ protected:
 	void allocContent(int n);
 	void getSize();
 };
+
+
+
+//// INLINE IMPLEMENTATION ////
+
+inline std::string SearchPaths::stripFileName(std::string src) {
+	std::string filepath(src);
+	size_t pos = filepath.find_last_of(AL_FILE_DELIMITER);
+	if (pos !=std::string::npos) {
+		filepath.erase(pos+1);
+	}
+	return filepath;
+}
+
+inline std::string SearchPaths::conformPath(std::string src) {
+	std::string path(src);
+	// paths should end with a delimiter:
+	if (path[path.size()-1] != AL_FILE_DELIMITER) {
+		path += AL_FILE_DELIMITER;
+	}
+	return path;
+}
+
+inline void SearchPaths::addAppPaths(int argc, char * const argv[], bool recursive) {
+	addAppPaths(recursive);
+	if (argc > 0) {
+		char path[4096];
+		std::string filepath = stripFileName(argv[0]);
+		mAppPath = filepath;
+		addSearchPath(filepath, recursive);
+	}
+}
+
+inline void SearchPaths::addAppPaths(bool recursive) {	
+	char cwd[4096];
+	getcwd(cwd, 4096);
+	addSearchPath(cwd, recursive);
+}
+
+inline void SearchPaths::addSearchPath(std::string src, bool recursive) {
+	std::string path=conformPath(src);
+	
+	// check for duplicates
+	std::list<searchpath>::iterator iter = mSearchPaths.begin();
+	while (iter != mSearchPaths.end()) {
+		//printf("path %s\n", iter->first.data());
+		if (path == iter->first.data()) {
+			return;
+		}
+		iter++;
+	}
+	printf("adding path %s\n", path.data());
+	mSearchPaths.push_front(searchpath(path, recursive));
+}
+
+inline bool SearchPaths::fileExists(std::string path, std::string name) {
+	struct stat stFileInfo; 
+	std::string filename(path+name);
+	return (stat((path + name).c_str(),&stFileInfo) == 0);
+}
 
 } // al::
 

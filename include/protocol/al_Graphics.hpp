@@ -321,7 +321,7 @@ protected:
 class Drawable {
 public:
 	virtual void draw(Graphics& gl) = 0;
-
+	virtual ~Drawable() {}
 };
 
 } // ::al::gfx
