@@ -301,6 +301,82 @@ public:
 	// check whether the internal lattice data is of type T:
 	template<typename T> bool checkType() { return al::checkType<T>(header.type); }
 	
+	// read the plane values from lattice into val array
+	template<typename T> void read1d(T* val, double x) {
+	
+		x = wrap<double>(x, (double)header.dim[0], 0.);
+		
+		#define DOUBLE_FLOOR(v) ( (long)(v) - ((v)<0.0 && (v)!=(long)(v)) )
+		
+		// convert 0..1 field indices to 0..(d-1) cell indices
+		uint32_t xa = (uint32_t)DOUBLE_FLOOR(x);	
+		
+		// get the cell addresses for each neighbor:
+		uint32_t fieldstride_x = header.stride[0];
+		T * paaa = (T *)(data.ptr + xa*fieldstride_x);
+
+		// for each plane of the field, do the 3D interp:
+		for (uint8_t p=0; p<header.components; p++) {		
+			val[p] = paaa[p];
+		}
+		
+		#undef DOUBLE_FLOOR
+	}
+	
+	// read the plane values from lattice into val array
+	template<typename T> void read2d(T* val, double x, double y) {
+	
+		x = wrap<double>(x, (double)header.dim[0], 0.);
+		y = wrap<double>(y, (double)header.dim[1], 0.);
+		
+		#define DOUBLE_FLOOR(v) ( (long)(v) - ((v)<0.0 && (v)!=(long)(v)) )
+		
+		// convert 0..1 field indices to 0..(d-1) cell indices
+		uint32_t xa = (uint32_t)DOUBLE_FLOOR(x);	
+		uint32_t ya = (uint32_t)DOUBLE_FLOOR(y);	
+		
+		// get the cell addresses for each neighbor:
+		uint32_t fieldstride_x = header.stride[0];
+		uint32_t fieldstride_y = header.stride[1];
+		T * paaa = (T *)(data.ptr + xa*fieldstride_x + ya*fieldstride_y);
+
+		// for each plane of the field, do the 3D interp:
+		for (uint8_t p=0; p<header.components; p++) {		
+			val[p] = paaa[p];
+		}
+		
+		#undef DOUBLE_FLOOR
+	}
+	
+	// read the plane values from lattice into val array
+	template<typename T> void read3d(T* val, double x, double y, double z) {
+	
+		x = wrap<double>(x, (double)header.dim[0], 0.);
+		y = wrap<double>(y, (double)header.dim[1], 0.);
+		z = wrap<double>(z, (double)header.dim[2], 0.);
+		
+		#define DOUBLE_FLOOR(v) ( (long)(v) - ((v)<0.0 && (v)!=(long)(v)) )
+		
+		// convert 0..1 field indices to 0..(d-1) cell indices
+		uint32_t xa = (uint32_t)DOUBLE_FLOOR(x);	
+		uint32_t ya = (uint32_t)DOUBLE_FLOOR(y);	
+		uint32_t za = (uint32_t)DOUBLE_FLOOR(z);	
+
+		// get the cell addresses for each neighbor:
+		uint32_t fieldstride_x = header.stride[0];
+		uint32_t fieldstride_y = header.stride[1];
+		uint32_t fieldstride_z = header.stride[2];
+		T * paaa = (T *)(data.ptr + xa*fieldstride_x + ya*fieldstride_y + za*fieldstride_z);
+
+		// for each plane of the field, do the 3D interp:
+		for (uint8_t p=0; p<header.components; p++) {		
+			val[p] = paaa[p];
+		}
+		
+		#undef DOUBLE_FLOOR
+	}
+
+	
 	// writes the plane values from val array into lattice
 	template<typename T> void write1d(T* val, double x) {
 	
