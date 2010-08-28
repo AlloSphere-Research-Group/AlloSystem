@@ -35,7 +35,7 @@ public:
 	virtual ~Camera() {}
 	
 	// setters
-	Camera& fovy(double v);									///< Set vertical field of view, in degrees
+	Camera& fovy(double v) { mFovy =v; }									///< Set vertical field of view, in degrees
 	Camera& near(double v){ mNear=v; return *this; }		///< Set frustum near plane distance
 	Camera& far(double v){ mFar=v; return *this; }			///< Set frustum far plane distance
 	Camera& focalLength(double v){ mFocalLength=v; return *this; } ///< Set focal length
