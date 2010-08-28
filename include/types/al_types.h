@@ -33,6 +33,7 @@
 
 #include "system/al_Config.h"
 #include <string.h>
+#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -151,6 +152,20 @@ typedef struct {
 		
 } AlloLattice;
 
+/*
+	An extended lattice (wrapper)
+*/
+typedef struct AlloLatticeWrapper {
+
+	AlloLattice lattice;
+	
+	/*
+		The reference count:
+	*/
+	int refs;
+	
+} AlloLatticeWrapper;
+
 #pragma mark AlloGraph
 /*
 	AlloGraph type.
@@ -251,6 +266,98 @@ static inline void allo_lattice_setstride(AlloLatticeHeader * h, unsigned alignS
 		unsigned i=2;
 		for(; i<numDims; ++i){ h->stride[i] = h->stride[i-1] * h->dim[i-1]; }
 	}
+}
+
+static inline int allo_lattice_equal_headers(AlloLatticeHeader *h1, AlloLatticeHeader *h2) {
+	int equiv =	h1->components == h2->components && 
+				h1->type == h2->type && 
+				h1->dimcount == h2->dimcount;
+					
+	for(int i=0; i < h1->dimcount; i++) {
+		equiv = equiv && h1->dim[i] == h2->dim[i];
+		equiv = equiv && h1->stride[i] == h2->stride[i];
+	}
+
+	return equiv;
+}
+
+
+static inline void allo_lattice_header_clear(AlloLatticeHeader *h) {
+	memset(h, '\0', sizeof(AlloLatticeHeader));
+}
+
+static inline void allo_lattice_clear(AlloLattice *lat) {
+	allo_lattice_header_clear( &(lat->header) );
+	lat->data.ptr = 0;
+}
+
+static inline void allo_lattice_destroy(AlloLattice *lat) {
+	if(lat->data.ptr) {
+		if(lat->data.ptr) {
+			free(lat->data.ptr);
+			allo_lattice_clear(lat);
+		}
+	}
+}
+
+static inline void allo_lattice_create(AlloLattice *lat, AlloLatticeHeader *h) {
+	allo_lattice_destroy(lat);
+	allo_lattice_setheader(lat, h);
+	lat->data.ptr = (char *)calloc(1, allo_lattice_size(lat));
+}
+
+static inline void allo_lattice_create2d(
+	AlloLattice *lat, 
+	uint8_t components, 
+	AlloTy type, 
+	uint32_t dimx, 
+	uint32_t dimy, 
+	size_t align
+) {
+	AlloLatticeHeader header;
+	header.type = type;
+	header.components = components;
+	header.dimcount = 2;
+	header.dim[0] = dimx;
+	header.dim[1] = dimy;
+	allo_lattice_setstride(&header, align);
+	allo_lattice_create(lat, &header);
+}
+
+
+/*
+	Adapt a latticle to another size
+*/
+static inline void allo_lattice_adapt(AlloLattice *lat, AlloLatticeHeader *h) {
+	if(! allo_lattice_equal_headers( &(lat->header), h)) {
+		allo_lattice_create(lat, h);
+	}
+}
+
+static inline void allo_lattice_adapt2d(
+	AlloLattice *lat, 
+	uint8_t components, 
+	AlloTy type, 
+	uint32_t dimx, 
+	uint32_t dimy, 
+	size_t align
+) {
+	AlloLatticeHeader header;
+	header.type = type;
+	header.components = components;
+	header.dimcount = 2;
+	header.dim[0] = dimx;
+	header.dim[1] = dimy;
+	allo_lattice_setstride(&header, align);
+	allo_lattice_adapt(lat, &header);
+}
+
+/*
+	Copy a lattice into another lattice
+*/
+static inline void allo_lattice_copy(AlloLattice *dst, AlloLattice *src){
+	allo_lattice_adapt(dst, &(src->header));
+	memcpy(dst->data.ptr, src->data.ptr, allo_lattice_size(src));
 }
 
 
