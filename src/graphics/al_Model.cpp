@@ -151,15 +151,14 @@ void OBJReader :: readMTL(std::string path, std::string name)
 	Mtl * m = &mMaterials["default"];
 
 	readToken();
-	printf("> %s\n", buf);
 	while(hasToken()) {
-		printf("> %s\n", buf);
+		//printf("> %s\n", buf);
 		switch(buf[0]) {
 
 			case 'n':               // newmtl
 				readLine();
 				sscanf(buf, "%s %s", buf, buf);
-				printf(">>> mtl %s\n", buf);
+				//printf(">>> mtl %s\n", buf);
 				m = &mMaterials[buf];
 				readToken();
 				break;
@@ -457,6 +456,7 @@ void OBJReader :: readMTL(std::string path, std::string name)
 	printf("%d materials\n", nummaterials);
 
 	// dump materials:
+	/*
 	MtlIterator iter = materialsBegin();
 	while (iter != materialsEnd()) {
 		printf("material %s\n", iter->first.data());
@@ -468,6 +468,7 @@ void OBJReader :: readMTL(std::string path, std::string name)
 		//printf("map a: %s s: %s d: %s\n", m.ambientMap.data(), m.specularMap.data(), m.diffuseMap.data());
 		iter++;
 	}
+	*/
 
     fclose(file);
 }
