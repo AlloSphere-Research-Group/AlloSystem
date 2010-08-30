@@ -37,7 +37,7 @@ namespace al{
 
 /// implementation of MainLoop for the GLUT target
 
-MainLoop :: MainLoop() 
+MainLoop :: MainLoop()
 :	mImpl(NULL),
 	mInterval(0.01), mActualInterval(0),
 	mT0(al_time()), mLastTickTime(mT0),
@@ -57,15 +57,22 @@ MainLoop :: ~MainLoop() {}
 
 static void timerFunc(int id) { MainLoop::get().tick(); }
 
+MainLoop& MainLoop :: get() {
+    static MainLoop * mainloop = new MainLoop;
+    return *mainloop;
+//	static MainLoop mainloop;
+//	return mainloop;
+}
+
 void MainLoop :: tick() {
-	al_sec realtime = al_time();	
+	al_sec realtime = al_time();
 	al_sec logicaltime = realtime - mT0;
-	
-	/* 
+
+	/*
 		CPU usage measurement
-		Measures relationship between ideal tick interval (mInterval), 
+		Measures relationship between ideal tick interval (mInterval),
 			and the actual duration between ticks.
-		Thus, it measures cost of both mQueue.update(), 
+		Thus, it measures cost of both mQueue.update(),
 			plus every other activity in this thread between successive ticks
 		When using GLUT and vsync, it will always be substatial.
 	*/
@@ -73,10 +80,10 @@ void MainLoop :: tick() {
 	double cpu = (mActualInterval - mInterval)/mInterval;
 	mCPU += 0.1 * (cpu - mCPU);		// running average
 	mLastTickTime = realtime;		// store realtime for use in next tick()
-	
+
 	// trigger any scheduled functions:
 	mQueue.update(logicaltime);
-	
+
 	// schedule another tick:
 	glutTimerFunc((unsigned int)(1000.0*mInterval), timerFunc, 0);
 }
@@ -89,7 +96,7 @@ void MainLoop :: start() {
 		M.mT0 = al_time();
 		M.mLastTickTime = M.mT0-M.mInterval;
 		glutTimerFunc((unsigned int)(1000.0*M.interval()), timerFunc, 0);
-		glutMainLoop(); 
+		glutMainLoop();
 	}
 }
 
@@ -97,13 +104,16 @@ void MainLoop :: stop() {
 	MainLoop& M = get();
 	if (M.mIsRunning) {
 		M.mIsRunning = 0;
+		#ifdef AL_LINUX
+		// glutLeaveMainLoop();
+        #endif
 		// GLUT can't be stopped; the only option is a hard exit. Yeah, it sucks that bad.
 		exit(0);
 	}
 }
 
-void MainLoop :: interval(al_sec interval) { 
-	get().mInterval = interval; 
+void MainLoop :: interval(al_sec interval) {
+	get().mInterval = interval;
 }
 
 } // al::

@@ -30,8 +30,6 @@ namespace al{
 //	glutTimerFunc((unsigned int)ms, timerFunc, (int)this);
 //}
 
-
-
 class WindowImpl{
 public:
 
@@ -46,27 +44,31 @@ public:
 		mInGameMode(false), mVisible(true), mFullScreen(false), mCursorHide(false),
 		mScheduled(false)
 	{
-		//
-		MainLoop::get();
+		// ensure that GLUT and mainloop exist:
+		//MainLoop::get();
+		printf("%f\n", MainLoop::get().T0());
 	}
-	
+
 	~WindowImpl(){
 		destroy();
 	}
-	
+
 	bool created(){ return mID >= 0; }
-	
-	void destroy(){
+
+	void destroy(){ //printf("destroy\n");
 		if(created()){
 			glutDestroyWindow(mID);
 			windows().erase(id());
 			mID = -1;
 			mIDGameMode = -1;
 			mInGameMode = false;
+			mScheduled = false;
 		}
 	}
 
 	void gameMode(bool v){
+
+        mScheduled = false;
 		// Go into game mode
 		if(v){
 
@@ -96,7 +98,7 @@ public:
 	//		num     Number  of  the  window  system depenedent display
 	//				mode configuration.
 	//		width   Width of the screen in pixels.
-	
+
 	//		compact mode [ width "x" height ][ ":" bitsPerPixel ][ "@" videoRate ]
 
 			// get current screen resolution
@@ -108,26 +110,26 @@ public:
 				char buf[32];
 				snprintf(buf, sizeof(buf), "%dx%d:24", sw, sh);
 				glutGameModeString(buf);
-			
+
 				//int refresh = glutGameModeGet(GLUT_GAME_MODE_REFRESH_RATE);
 				//printf("%d\n", refresh);
 			}
-		
+
 			// otherwise, use sensible defaults
 			else{
 				glutGameModeString("1024x768:24");
 			}
 
 			windows().erase(mID);	// erase ID to stop draw scheduling...
-			mIDGameMode = glutEnterGameMode();	
-			mInGameMode = true;			
+			mIDGameMode = glutEnterGameMode();
+			mInGameMode = true;
 			windows()[mIDGameMode] = this;
-			
+
 			glutSetWindow(mIDGameMode);
 			registerCBs();	// need to register callbacks since new window
 			scheduleDraw();
 		}
-	
+
 		// Exit game mode
 		// All previously created windows are restored...
 		else{
@@ -148,23 +150,24 @@ public:
 	void scheduleDraw(){
 		if (!mScheduled) {
 			mScheduled = true;
+			//printf("window id: %d\n", id());
 			MainLoop::queue().send(0, scheduleDrawStatic, id());
 		}
 	}
-	
+
 	void visible(bool v){ mVisible=v; }
-	
+
 	// Returns the implementation of the currently selected window
 	static WindowImpl * getWindowImpl(){ return getWindowImpl(glutGetWindow()); }
-	
-	
+
+
 	static WindowImpl * getWindowImpl(int id){
 		if(windows().count(id) > 0){
 			return windows()[id];
 		}
 		return 0;
 	}
-	
+
 	// Returns the currently selected window or 0 if invalid
 	static WindowGL * getWindow(){
 		WindowImpl * w = getWindowImpl();
@@ -193,7 +196,7 @@ public:
 				CS(LEFT, Left) CS(UP, Up) CS(RIGHT, Right) CS(DOWN, Down)
 				CS(PAGE_UP, PageUp) CS(PAGE_DOWN, PageDown)
 				CS(HOME, Home) CS(END, End) CS(INSERT, Insert)
-			
+
 				CS(F1, F1) CS(F2, F2) CS(F3, F3) CS(F4, F4)
 				CS(F5, F5) CS(F6, F6) CS(F7, F7) CS(F8, F8)
 				CS(F9, F9) CS(F10, F10)	CS(F11, F11) CS(F12, F12)
@@ -201,14 +204,14 @@ public:
 			#undef CS
 		}
 		else{
-		
+
 			//printf("GLUT i: %3d %c\n", key, key);
 
 			#define MAP(i,o) case i: key=o; break
 
 //			bool shft = glutGetModifiers() & GLUT_ACTIVE_SHIFT;
 //			if(shft && (key>32 && key<127)){
-//				const char * QWERTYunshifted = 
+//				const char * QWERTYunshifted =
 //					" 1\'3457\'908=,-./0123456789;;,=./"
 //					"2abcdefghijklmnopqrstuvwxyz[\\]6-"
 //					"`abcdefghijklmnopqrstuvwxyz[\\]`"
@@ -233,24 +236,24 @@ public:
 				//Tab		=9
 				//Return	=13
 				//Escape	=27glutPostRedisplay();
-				
+
 				if(key <= 26){ key += 96; }
-				
+
 				// only some non-alphabetic keys are wrong...
 				else{
-					
+
 					switch(key){
 						MAP(27, '[');
 						MAP(28, '\\');
 						MAP(29, ']');
 						MAP(31, '-');
 					};
-					
+
 				}
 			}
-			
+
 			//#endif
-			
+
 			#undef MAP
 
 			//printf("GLUT o: %3d %c\n", key, key);
@@ -299,7 +302,7 @@ public:
 			win->onKeyUp(win->mKeyboard);
 		}
 	}
-	
+
 
 	static void cbMouse(int btn, int state, int ax, int ay){
 		//printf("GLUT: mouse event x:%d y:%d bt:#%d,%d\n", ax,ay, btn, state==GLUT_DOWN);
@@ -324,7 +327,7 @@ public:
 		}
 	}
 
-	static void cbMotion(int ax, int ay){		
+	static void cbMotion(int ax, int ay){
 		WindowGL * win = getWindow();
 		if(win){
 			win->mMouse.position(ax,ay);
@@ -350,13 +353,13 @@ public:
 										// after exiting full screen
 		}
 	}
-	
+
 	static void cbVisibility(int v){
 		WindowGL * win = getWindow();
 		if(win){
 			win->mImpl->visible(v == GLUT_VISIBLE);
 			win->onVisibility(v == GLUT_VISIBLE);
-			
+
 		}
 	}
 
@@ -368,7 +371,7 @@ public:
 		glutMotionFunc(cbMotion);
 		glutPassiveMotionFunc(cbPassiveMotion);
 		glutReshapeFunc(cbReshape);
-		glutSpecialFunc(cbSpecial); 
+		glutSpecialFunc(cbSpecial);
 		glutSpecialUpFunc(cbSpecialUp);
 		glutVisibilityFunc(cbVisibility);
 	}
@@ -379,7 +382,7 @@ private:
 	// schedule draws of a specific window
 	static void scheduleDrawStatic(al_sec t, int winID) {
 		WindowImpl *impl = getWindowImpl(winID);
-		
+
 		// If there is a valid implementation, then draw and schedule next draw...
 		if(impl){
 			WindowGL * win = impl->mWindow;
@@ -390,7 +393,7 @@ private:
 					al_sec rt = MainLoop::realtime();	// what time it really is now (after render)
 					al_sec next = projected;
 					if (rt > projected) next = rt;	// next = MAX(rt,projected)
-					
+
 					MainLoop::queue().send(next, scheduleDrawStatic, winID);
 					al_sec per = 1./(next - t);
 					impl->mAvg += 0.3 * (per - impl->mAvg);
@@ -398,9 +401,12 @@ private:
 					impl->mScheduled = false;
 				}
 			} else {
+                printf("no window\n");
 				impl->mScheduled = false;
 			}
-		} 
+		} else {
+            printf("no window impl\n");
+		}
 	}
 
 	// Map of windows constructed on first use to avoid static intialization
@@ -423,9 +429,9 @@ private:
 	bool mInGameMode;
 	bool mVisible;
 	bool mFullScreen;
-	bool mCursorHide;	
+	bool mCursorHide;
 	bool mScheduled;
-    
+
 	friend class WindowGL;
 };
 
@@ -443,6 +449,8 @@ void WindowGL::create(
 	const Dim& dim, const std::string title, double fps, DisplayMode::t mode
 )
 {
+
+
 	if(mImpl->created()) return;
 
 	mImpl->mWinDim = dim;
@@ -454,7 +462,7 @@ void WindowGL::create(
 	glutInitWindowPosition(mImpl->mWinDim.l, mImpl->mWinDim.t);
 
 	using namespace DisplayMode;
-    int bits = 
+    int bits =
         (enabled(SingleBuf )	? GLUT_SINGLE		:0) |
         (enabled(DoubleBuf )	? GLUT_DOUBLE		:0) |
         (enabled(AccumBuf  )	? GLUT_ACCUM		:0) |
@@ -463,7 +471,7 @@ void WindowGL::create(
         (enabled(StencilBuf)	? GLUT_STENCIL		:0) |
         (enabled(StereoBuf )	? GLUT_STEREO		:0) |
 		(enabled(Multisample)	? GLUT_MULTISAMPLE	:0);
-		
+
 	glutInitDisplayMode(GLUT_RGBA | bits);
 
 //	int stat = glutGet(GLUT_DISPLAY_MODE_POSSIBLE);
@@ -477,7 +485,7 @@ void WindowGL::create(
 	WindowImpl::windows()[mImpl->mID] = mImpl;
 
 	AL_GRAPHICS_INIT_CONTEXT;
-	onCreate();	
+	onCreate();
 	mImpl->scheduleDraw();
 }
 
@@ -516,7 +524,7 @@ bool WindowGL::visible() const { return mImpl->mVisible; }
 
 WindowGL& WindowGL::cursor(Cursor::t v){
 	mImpl->mCursor = v;
-	
+
 	if(mImpl->created() && !mImpl->mCursorHide){
 		switch(v){
 			case Cursor::CrossHair:	makeActive(); glutSetCursor(GLUT_CURSOR_CROSSHAIR);
@@ -578,12 +586,12 @@ WindowGL& WindowGL::fullScreen(bool v){
 			dimensions(mImpl->mWinDim);	// glutReshapeWindow leaves full screen
 		#endif
 	}
-	
+
 	// enter full screen
 	else if(!mImpl->mFullScreen && v){
-	
+
 		mImpl->mWinDim = dimensions();
-	
+
 		#ifdef AL_LINUX
 			onDestroy();
 			mImpl->gameMode(true);
@@ -594,7 +602,7 @@ WindowGL& WindowGL::fullScreen(bool v){
 			glutFullScreen();
 		#endif
 	}
-	
+
 	mImpl->mFullScreen = v;
 	return *this;
 }
@@ -612,10 +620,10 @@ WindowGL& WindowGL::title(const std::string& v){
 	return *this;
 }
 
-void WindowGL::startLoop(){ 	
+void WindowGL::startLoop(){
 	MainLoop::get().start();
 //	glutIdleFunc(al_main_tick);
-//	glutMainLoop(); 
+//	glutMainLoop();
 }
 
 void WindowGL::stopLoop(){
