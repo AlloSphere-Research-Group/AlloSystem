@@ -13,7 +13,7 @@ void OBJReader :: readOBJ(std::string path, std::string filename) {
 	std::string groupname = "default:default";
 	std::string fullpath = path + filename;
 
-    // open the file 
+    // open the file
     file = fopen(fullpath.data(), "r");
     if (!file) {
         fprintf(stderr, "Model readOBJ failed: can't open data file \"%s\".\n",
@@ -22,26 +22,26 @@ void OBJReader :: readOBJ(std::string path, std::string filename) {
     }
 	mPath = path;
 	mFilename = filename;
-	
+
 	printf("reading OBJ: \"%s\".\n", filename.data());
 
 	// create a default group:
 	Group * g = &mGroups["default"];
-	
+
 	vertices.push_back(GraphicsData::Vertex());
 	texcoords.push_back(GraphicsData::TexCoord2());
 	normals.push_back(GraphicsData::Normal());
-	
+
 	readToken();
 	while(hasToken()) {
 		switch(buf[0]) {
 			case 'u':	// usemtl
-				printf("group %s has %d indices\n", groupname.data(), g->indices.size());
+				//printf("group %s has %d indices\n", groupname.data(), g->indices.size());
 				mtl = parseMaterial();
 				// if current group is not empty, create new group:
 				if (g->indices.size() > 0) {
 					groupname = group + ":" + mtl;
-					printf("group %s\n", groupname.data());
+					//printf("group %s\n", groupname.data());
 					g = &mGroups[groupname];
 				}
 				g->material = mtl;
@@ -51,25 +51,25 @@ void OBJReader :: readOBJ(std::string path, std::string filename) {
 				mMaterialLib = parseMaterialLib();
 				break;
 
-			case 'g': 
+			case 'g':
 				// new group:
-				printf("group %s has %d indices\n", groupname.data(), g->indices.size());
+				//printf("group %s has %d indices\n", groupname.data(), g->indices.size());
 				group = parseGroup();
 				groupname = group + ":" + mtl;
-				printf("group %s\n", groupname.data());
+				//printf("group %s\n", groupname.data());
 				g = &mGroups[groupname];
 				g->material = mtl;
 				break;
 
-			case 'v':               // v, vn, vt 
+			case 'v':               // v, vn, vt
 				switch(buf[1]) {
-					case '\0':          
+					case '\0':
 						parseVertex();
 						break;
-					case 'n':          
+					case 'n':
 						parseNormal();
 						break;
-					case 't':           
+					case 't':
 						parseTexcoord();
 						break;
 					default:
@@ -79,7 +79,7 @@ void OBJReader :: readOBJ(std::string path, std::string filename) {
 				}
 				break;	// end of case 'v'
 
-			case 'f':               
+			case 'f':
 				parseFace(g);
 				break;
 
@@ -88,126 +88,47 @@ void OBJReader :: readOBJ(std::string path, std::string filename) {
 				break;
         }
 	}
-	
+
 //	printf("parsed %d vertices %d texcoords %d normals %d face_vertices\n", vertices.size(), texcoords.size(), normals.size(), face_vertices.size());
-//	
+//
 //	for (int i=0; i<vertices.size(); i++) {
 //		printf("%d %f %f %f\n", i, vertices[i][0], vertices[i][1], vertices[i][2]);
 //	}
-//	
+//
 //	for (int i=0; i<face_vertices.size(); i++) {
 //		printf("%d %d %d %d\n", i, face_vertices[i].vertex, face_vertices[i].texcoord, face_vertices[i].normal);
 //	}
-	
-	
+
+
 	gfx::OBJReader::GroupIterator iter = groupsBegin();
 	while (iter != groupsEnd()) {
-	
+
 		Group& g = mGroups[iter->first];
-		
-		printf("group %s with %d indices\n", (iter->first).data(), g.indices.size());
+
+//		printf("group %s with %d indices\n", (iter->first).data(), g.indices.size());
 //		for (int i=0; i<g.indices.size(); i++) {
 //			int faceindex = g.indices[i];
 //			int vertexindex = face_vertices[faceindex].vertex;
 //			printf("\t%d group index %d face_vertex %d\n", i, faceindex, vertexindex);
-//			printf("\t\t%f %f %f\n", 
+//			printf("\t\t%f %f %f\n",
 //				vertices[vertexindex][0],
 //				vertices[vertexindex][1],
 //				vertices[vertexindex][2]
 //			);
 //		}
-	
-		
+
+
 		iter++;
 	}
-	
+
     fclose(file);
-	
-	readMTL(mPath, mMaterialLib);
+    readMTL(mPath, mMaterialLib);
 }
 
-
-GraphicsData * OBJReader::createGraphicsData(GroupIterator iter) {
-	if (iter == mGroups.end()) return NULL;
-	Group& g = iter->second;
-	
-	printf("create with %d indices\n", g.indices.size());
-	if (g.indices.size() <= 0) return NULL;
-	
-	GraphicsData * gd = new GraphicsData();
-	gd->primitive(gfx::TRIANGLES);
-	gd->resetBuffers();
-	
-	// memoize face_vertices index -> graphicsdata index
-	std::map<unsigned int, unsigned int> indexMap;
-	
-	for (int i=0; i<g.indices.size(); i++) {
-		int faceindex = g.indices[i];
-		
-		if (indexMap.find(faceindex) == indexMap.end()) {
-			indexMap[faceindex] = gd->indices().size();
-			
-			int vertexindex = face_vertices[faceindex].vertex;
-			int texindex = face_vertices[faceindex].texcoord;
-			int normalindex = face_vertices[faceindex].normal;
-			int newindex = gd->vertices().size();
-			
-			gd->addIndex(newindex);
-			gd->addVertex(vertices[vertexindex]);
-			gd->addTexCoord(texcoords[texindex]);
-			gd->addNormal(normals[normalindex]);
-		} else {
-			
-			// re-use existing index:
-			int newindex = gd->indices()[indexMap[faceindex]];
-			gd->addIndex(newindex);
-		}
-		
-	}
-	
-//	for (int i=0; i<gd->indices().size(); i++) {
-//		int vertexindex = gd->indices()[i];
-//		printf("\tindex %d vertex %d\n", i, vertexindex);
-//		printf("\t\t%f %f %f\n", 
-//			gd->vertices()[vertexindex][0],
-//			gd->vertices()[vertexindex][1],
-//			gd->vertices()[vertexindex][2]
-//		);
-//	}
-	
-	// don't create empty models
-	if (gd->indices().size() == 0) {
-		delete gd;
-		return NULL;
-	}
-	
-	printf("%d input indices, %d vertices, %d indices\n", g.indices.size(), gd->vertices().size(), gd->indices().size());
-	
-	return gd;
-}
-
-Material * OBJReader :: createMaterial(MtlIterator iter) {
-	if (iter == mMaterials.end()) return NULL;
-	Mtl& mtl = iter->second;
-	
-	Material * m = new Material();
-	m->ambient(mtl.ambient);
-	m->diffuse(mtl.diffuse);
-	m->specular(mtl.specular);
-	m->ambientMap(mtl.ambientMap);
-	m->diffuseMap(mtl.diffuseMap);
-	m->specularMap(mtl.specularMap);
-	m->bumpMap(mtl.bumpMap);
-	m->shininess(mtl.shininess);
-	m->opticalDensity(mtl.optical_density);
-	
-	return m;
-}
 
 // @http://www.fileformat.info/format/material/
 void OBJReader :: readMTL(std::string path, std::string name)
 {
-    FILE* file;
     std::string filename = path + name;
 
 	printf("Reading material file: %s\n", filename.data());
@@ -218,41 +139,44 @@ void OBJReader :: readMTL(std::string path, std::string name)
             filename.data());
         return;
     }
-	
+
 	Color color;
 	float shininess;
-	int illum;
-	float Tf[3];
-	float dissolve;
-	float sharpness;
+	//int illum;
+	//float Tf[3];
+	//float dissolve;
+	//float sharpness;
 	float optical_density;
-	
+
 	Mtl * m = &mMaterials["default"];
-	
+
 	readToken();
+	printf("> %s\n", buf);
 	while(hasToken()) {
+		printf("> %s\n", buf);
 		switch(buf[0]) {
-			case 'n':               // newmtl 
+
+			case 'n':               // newmtl
 				readLine();
 				sscanf(buf, "%s %s", buf, buf);
 				printf(">>> mtl %s\n", buf);
 				m = &mMaterials[buf];
 				readToken();
 				break;
-			
-			case 'N':				
+
+			case 'N':
 				switch(buf[1]) {
 					case 's':
 						readLine();
 						sscanf(buf, "%f", &shininess);
-						// wavefront shininess is from [0, 1000], so scale for OpenGL 
+						// wavefront shininess is from [0, 1000], so scale for OpenGL
 						m->shininess = shininess*128./1000.;
 						readToken();
 						break;
 					case 'i':
 						readLine();
 						sscanf(buf, "%f", &optical_density);
-						// wavefront shininess is from [0, 1000], so scale for OpenGL 
+						// wavefront shininess is from [0, 1000], so scale for OpenGL
 						m->shininess = (optical_density*128./1000.);
 						readToken();
 						break;
@@ -308,7 +232,7 @@ void OBJReader :: readMTL(std::string path, std::string name)
 						break;
 					}
 				break;
-				
+
 			case 'b':
 				switch(buf[1]) {
 					case 'u':
@@ -324,7 +248,7 @@ void OBJReader :: readMTL(std::string path, std::string name)
 				break;
 //			case 'i':
 //				// illumination model
-////				
+////
 ////					0	 Color on and Ambient off
 ////					1	 Color on and Ambient on
 ////					2	 Highlight on
@@ -340,7 +264,7 @@ void OBJReader :: readMTL(std::string path, std::string name)
 ////					9	 Transparency: Glass on
 ////					Reflection: Ray trace off
 ////					10	 Casts shadows onto invisible surfaces
-////				
+////
 //				fscanf(file, "%d", &illum);
 //				current->illumination(illum);
 //				break;
@@ -362,13 +286,14 @@ void OBJReader :: readMTL(std::string path, std::string name)
 //				printf("unhandled: sharpness: %f\n", sharpness);
 //				break;
 
+				/**/
 			default:
 				eatLine();
 				break;
         }
 	}
-	
-	
+
+
 /*
 	mMaterials.insert(std::make_pair("default", Material()));
 	Material * current = &mMaterials["default"];
@@ -376,7 +301,7 @@ void OBJReader :: readMTL(std::string path, std::string name)
 
     while(fscanf(file, "%s", buf) != EOF) {
 		switch(buf[0]) {
-			case 'n':               // newmtl 
+			case 'n':               // newmtl
 				fgets(buf, MODEL_PARSER_BUF_LEN, file);
 				sscanf(buf, "%s %s", buf, buf);
 				mMaterials.insert(std::make_pair(buf, Material()));
@@ -387,7 +312,7 @@ void OBJReader :: readMTL(std::string path, std::string name)
 				switch(buf[1]) {
 					case 's':
 						fscanf(file, "%f", &shininess);
-						// wavefront shininess is from [0, 1000], so scale for OpenGL 
+						// wavefront shininess is from [0, 1000], so scale for OpenGL
 						current->shininess(shininess*128./1000.);
 						break;
 					case 'i':
@@ -483,7 +408,7 @@ void OBJReader :: readMTL(std::string path, std::string name)
 				break;
 			case 'i':
 				// illumination model
-//				
+//
 //					0	 Color on and Ambient off
 //					1	 Color on and Ambient on
 //					2	 Highlight on
@@ -499,7 +424,7 @@ void OBJReader :: readMTL(std::string path, std::string name)
 //					9	 Transparency: Glass on
 //					Reflection: Ray trace off
 //					10	 Casts shadows onto invisible surfaces
-//				
+//
 				fscanf(file, "%d", &illum);
 				current->illumination(illum);
 				break;
@@ -527,24 +452,102 @@ void OBJReader :: readMTL(std::string path, std::string name)
 				break;
         }
     }
-
+*/
 	int nummaterials = mMaterials.size();
 	printf("%d materials\n", nummaterials);
 
 	// dump materials:
-	std::map<std::string, Material>::iterator iter = mMaterials.begin();
-	while (iter != mMaterials.end()) {
+	MtlIterator iter = materialsBegin();
+	while (iter != materialsEnd()) {
 		printf("material %s\n", iter->first.data());
-		Material& m = iter->second;
-		printf("N %f\n", m.shininess());
-		printf("d %f %f %f\n", m.diffuse().r, m.diffuse().g, m.diffuse().b);
-		printf("s %f %f %f\n", m.specular().r, m.specular().g, m.specular().b);
-		printf("a %f %f %f\n", m.ambient().r, m.ambient().g, m.ambient().b);
-		printf("map a: %s s: %s d: %s\n", m.ambientMap().data(), m.specularMap().data(), m.diffuseMap().data());
+		Mtl& m = iter->second;
+		//printf("N %f\n", m.shininess());
+		printf("d %f %f %f\n", m.diffuse.r, m.diffuse.g, m.diffuse.b);
+		printf("s %f %f %f\n", m.specular.r, m.specular.g, m.specular.b);
+		printf("a %f %f %f\n", m.ambient.r, m.ambient.g, m.ambient.b);
+		//printf("map a: %s s: %s d: %s\n", m.ambientMap.data(), m.specularMap.data(), m.diffuseMap.data());
 		iter++;
 	}
-*/
+
     fclose(file);
+}
+
+
+GraphicsData * OBJReader::createGraphicsData(GroupIterator iter) {
+	if (iter == mGroups.end()) return NULL;
+	Group& g = iter->second;
+
+	printf("create with %d indices\n", g.indices.size());
+	if (g.indices.size() <= 0) return NULL;
+
+	GraphicsData * gd = new GraphicsData();
+	gd->primitive(gfx::TRIANGLES);
+	gd->resetBuffers();
+
+	// memoize face_vertices index -> graphicsdata index
+	std::map<unsigned int, unsigned int> indexMap;
+
+	for (unsigned int i=0; i<g.indices.size(); i++) {
+		int faceindex = g.indices[i];
+
+		if (indexMap.find(faceindex) == indexMap.end()) {
+			indexMap[faceindex] = gd->indices().size();
+
+			int vertexindex = face_vertices[faceindex].vertex;
+			int texindex = face_vertices[faceindex].texcoord;
+			int normalindex = face_vertices[faceindex].normal;
+			int newindex = gd->vertices().size();
+
+			gd->addIndex(newindex);
+			gd->addVertex(vertices[vertexindex]);
+			gd->addTexCoord(texcoords[texindex]);
+			gd->addNormal(normals[normalindex]);
+		} else {
+
+			// re-use existing index:
+			int newindex = gd->indices()[indexMap[faceindex]];
+			gd->addIndex(newindex);
+		}
+
+	}
+
+//	for (int i=0; i<gd->indices().size(); i++) {
+//		int vertexindex = gd->indices()[i];
+//		printf("\tindex %d vertex %d\n", i, vertexindex);
+//		printf("\t\t%f %f %f\n",
+//			gd->vertices()[vertexindex][0],
+//			gd->vertices()[vertexindex][1],
+//			gd->vertices()[vertexindex][2]
+//		);
+//	}
+
+	// don't create empty models
+	if (gd->indices().size() == 0) {
+		delete gd;
+		return NULL;
+	}
+
+	printf("%d input indices, %d vertices, %d indices\n", g.indices.size(), gd->vertices().size(), gd->indices().size());
+
+	return gd;
+}
+
+Material * OBJReader :: createMaterial(MtlIterator iter) {
+	if (iter == mMaterials.end()) return NULL;
+	Mtl& mtl = iter->second;
+
+	Material * m = new Material();
+	m->ambient(mtl.ambient);
+	m->diffuse(mtl.diffuse);
+	m->specular(mtl.specular);
+	m->ambientMap(mtl.ambientMap);
+	m->diffuseMap(mtl.diffuseMap);
+	m->specularMap(mtl.specularMap);
+	m->bumpMap(mtl.bumpMap);
+	m->shininess(mtl.shininess);
+	m->opticalDensity(mtl.optical_density);
+
+	return m;
 }
 
 void OBJReader::readToken() {
@@ -562,12 +565,12 @@ void OBJReader::readLine() {
 }
 
 void OBJReader::eatLine() {
-	fgets(buf, MODEL_PARSER_BUF_LEN, file);
+	readLine();
 	readToken();
 }
 
 static std::string nastyHackCombineWords(const char * src) {
-		
+
 	char outbuf[MODEL_PARSER_BUF_LEN];
 	// nasty hack.
 	for (int i=0; i<MODEL_PARSER_BUF_LEN-1; i++) {
@@ -683,7 +686,7 @@ void OBJReader::parseFace(Group * g) {
 	} else if (sscanf(buf, "%d/%d", &v, &t) == 2) {
 		id0 = addFaceVertex(buf, v, t, 0);
 		sscanf(buf, "%d/%d", &v, &t);
-		id1 = addFaceVertex(buf, v, t, 0);		
+		id1 = addFaceVertex(buf, v, t, 0);
 		sscanf(buf, "%d/%d", &v, &t);
 		id2 = addFaceVertex(buf, v, t, 0);
 		addTriangle(g, id0, id1, id2);
@@ -774,7 +777,7 @@ struct Parser {
 	// and use index buffer instead.
 	std::map<std::string, int> vertexMap;
 
-	
+
 	int findVertex(std::string s) {
 		std::map<std::string, int>::iterator iter = vertexMap.find(s);
 		if (iter != vertexMap.end()) {
@@ -917,7 +920,7 @@ struct Parser {
 		std::map<std::string, int>::iterator iter;
 
 		readToken();
-		// can be one of %d, %d//%d, %d/%d, %d/%d/%d %d//%d 
+		// can be one of %d, %d//%d, %d/%d, %d/%d/%d %d//%d
 		if (strstr(buf, "//")) {
 			sscanf(buf, "%d//%d", &v, &n);
 			id0 = addVN(g, buf, v, n);
@@ -1025,7 +1028,7 @@ void Model :: readMTL(std::string name)
 
     while(fscanf(file, "%s", buf) != EOF) {
 		switch(buf[0]) {
-			case 'n':               // newmtl 
+			case 'n':               // newmtl
 				fgets(buf, MODEL_PARSER_BUF_LEN, file);
 				sscanf(buf, "%s %s", buf, buf);
 				mMaterials.insert(std::make_pair(buf, Material()));
@@ -1036,7 +1039,7 @@ void Model :: readMTL(std::string name)
 				switch(buf[1]) {
 					case 's':
 						fscanf(file, "%f", &shininess);
-						// wavefront shininess is from [0, 1000], so scale for OpenGL 
+						// wavefront shininess is from [0, 1000], so scale for OpenGL
 						current->shininess(shininess*128./1000.);
 						break;
 					case 'i':
@@ -1132,7 +1135,7 @@ void Model :: readMTL(std::string name)
 				break;
 			case 'i':
 				// illumination model
-//				
+//
 //					0	 Color on and Ambient off
 //					1	 Color on and Ambient on
 //					2	 Highlight on
@@ -1148,7 +1151,7 @@ void Model :: readMTL(std::string name)
 //					9	 Transparency: Glass on
 //					Reflection: Ray trace off
 //					10	 Casts shadows onto invisible surfaces
-//				
+//
 				fscanf(file, "%d", &illum);
 				current->illumination(illum);
 				break;
@@ -1244,7 +1247,7 @@ void Model :: readOBJ(std::string filename) {
 
 	Parser parser(file);
 
-	// create default group 
+	// create default group
 	Group * g = addGroup("default");
 
 	parser.readToken();
@@ -1259,20 +1262,20 @@ void Model :: readOBJ(std::string filename) {
 				readMTL(mMaterialLib);
 				break;
 
-			case 'g': 
+			case 'g':
 				g = addGroup(parser.parseGroup());
 	            g->material(mtl);
 				break;
 
-			case 'v':               // v, vn, vt 
+			case 'v':               // v, vn, vt
 				switch(parser.buf[1]) {
-					case '\0':          
+					case '\0':
 						parser.parseVertex(file);
 						break;
-					case 'n':          
+					case 'n':
 						parser.parseNormal(file);
 						break;
-					case 't':           
+					case 't':
 						parser.parseTexcoord(file);
 						break;
 					default:
@@ -1282,7 +1285,7 @@ void Model :: readOBJ(std::string filename) {
 				}
 				break;	// end of case 'v'
 
-			case 'f':               
+			case 'f':
 				parser.parseFace(file, *g);
 				break;
 
@@ -1321,7 +1324,7 @@ void Model :: readOBJ(std::string filename) {
 
 		iter++;
 	}
-	
+
     fclose(file);
 }
 
