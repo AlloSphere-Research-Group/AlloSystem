@@ -40,11 +40,11 @@ public:
 	WindowImpl(WindowGL * w)
 	:	mWindow(w), mID(-1), mIDGameMode(-1),
 		mWinDim(0), mFPS(0), mTitle(""),
-		mCursor(Cursor::Pointer),
-		mInGameMode(false), mVisible(true), mFullScreen(false), mCursorHide(false),
 		mMode(DisplayMode::DefaultBuf),
-		mScheduled(false),
-		mAvg(0.)
+		mCursor(Cursor::Pointer),
+		mAvg(0.),
+		mInGameMode(false), mVisible(true), mFullScreen(false), mCursorHide(false),
+		mScheduled(false)
 	{
 		//
 		MainLoop::get();
@@ -418,13 +418,13 @@ private:
 	std::string mTitle;
 	DisplayMode::t mMode;
 	Cursor::t mCursor;
+	al_sec mAvg;
+
 	bool mInGameMode;
 	bool mVisible;
 	bool mFullScreen;
-	bool mCursorHide;
-	
+	bool mCursorHide;	
 	bool mScheduled;
-	al_sec mAvg;
     
 	friend class WindowGL;
 };

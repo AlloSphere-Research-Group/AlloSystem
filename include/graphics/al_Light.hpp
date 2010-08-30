@@ -62,9 +62,9 @@ protected:
 	Color mEmission;
 	Color mSpecular;
 	float mShine, mOpticalDensity, mIllumination;
-	bool mUseColorMaterial;
 	int mFace;
 	std::string mMapKa, mMapKs, mMapKd, mMapBump;
+	bool mUseColorMaterial;
 };
 
 

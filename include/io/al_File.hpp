@@ -26,10 +26,10 @@ void path2dir(char* dst, const char* src);
 class FilePath {
 public:
 	FilePath() {};
-	FilePath(std::string file, std::string path = "/") : mFile(file), mPath(path) {}
+	FilePath(std::string file, std::string path = "/") : mPath(path), mFile(file) {}
 	
-	std::string file() const { return mFile; }
-	std::string path() const { return mPath; }
+	const std::string& file() const { return mFile; }
+	const std::string& path() const { return mPath; }
 	
 	std::string filepath() const { return mPath+mFile; }
 	
@@ -61,7 +61,7 @@ public:
 	void addAppPaths(int argc, char * const argv[], bool recursive = true);
 	void addAppPaths(bool recursive = true);
 	
-	std::string appPath() { return mAppPath; }
+	const std::string& appPath() const { return mAppPath; }
 	
 	/// todo?
 	//void addResourcePath();

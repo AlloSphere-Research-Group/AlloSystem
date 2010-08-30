@@ -104,7 +104,7 @@ public:
 			case Image::LUMINANCE: {
 				char *o_pix = (char *)(lat.data.ptr);
 				int rowstride = lat.header.stride[1];
-				for(int j = 0; j < lat.header.dim[1]; j++) {
+				for(unsigned j = 0; j < lat.header.dim[1]; ++j) {
 					char *pix = (char *)FreeImage_GetScanLine(mImage, j);
 					memcpy(o_pix, pix, rowstride);
 					o_pix += rowstride;
@@ -118,10 +118,10 @@ public:
 						char *bp = (char *)(lat.data.ptr);
 						int rowstride = lat.header.stride[1];
 
-						for(int j = 0; j < lat.header.dim[1]; j++) {
+						for(unsigned j = 0; j < lat.header.dim[1]; ++j) {
 							RGBTRIPLE * pix = (RGBTRIPLE *)FreeImage_GetScanLine(mImage, j);
 							Image::RGBPix<uint8_t> *o_pix = (Image::RGBPix<uint8_t> *)(bp + j*rowstride);
-							for(int i=0; i < lat.header.dim[0]; i++) {
+							for(unsigned i=0; i < lat.header.dim[0]; ++i) {
 								#if (defined(AL_LINUX) || defined(AL_OSX))
 								o_pix->r = pix->rgbtRed;
 								o_pix->g = pix->rgbtGreen;
@@ -142,7 +142,7 @@ public:
 						char *o_pix = (char *)(lat.data.ptr);
 						int rowstride = lat.header.stride[1];
 
-						for(int j = 0; j < lat.header.dim[1]; j++) {
+						for(unsigned j = 0; j < lat.header.dim[1]; ++j) {
 							char *pix = (char *)FreeImage_GetScanLine(mImage, j);
 							memcpy(o_pix, pix, rowstride);
 							o_pix += rowstride;
@@ -162,10 +162,10 @@ public:
 					case AlloUInt8Ty: {
 						char *bp = (char *)(lat.data.ptr);
 						int rowstride = lat.header.stride[1];
-						for(int j = 0; j < lat.header.dim[1]; j++) {
+						for(unsigned j = 0; j < lat.header.dim[1]; ++j) {
 							RGBQUAD *pix = (RGBQUAD *)FreeImage_GetScanLine(mImage, j);
 							Image::RGBAPix<uint8_t> *o_pix = (Image::RGBAPix<uint8_t> *)(bp + j*rowstride);
-							for(int i=0; i < lat.header.dim[0]; i++) {
+							for(unsigned i=0; i < lat.header.dim[0]; ++i) {
 								#if (defined(AL_LINUX) || defined(AL_OSX))
 								o_pix->r = pix->rgbRed;
 								o_pix->g = pix->rgbGreen;
@@ -188,7 +188,7 @@ public:
 					case AlloFloat32Ty: {
 						char *o_pix = (char *)(lat.data.ptr);
 						int rowstride = lat.header.stride[1];
-						for(int j = 0; j < lat.header.dim[1]; j++) {
+						for(unsigned j = 0; j < lat.header.dim[1]; ++j) {
 							char *pix = (char *)FreeImage_GetScanLine(mImage, j);
 							memcpy(o_pix, pix, rowstride);
 							o_pix += rowstride;
@@ -240,10 +240,10 @@ public:
 						char *bp = (char *)(lat.data.ptr);
 						int rowstride = header.stride[1]; 
 
-						for(int j = 0; j < header.dim[1]; j++) {
+						for(unsigned j = 0; j < header.dim[1]; ++j) {
 							RGBTRIPLE *pix = (RGBTRIPLE *)FreeImage_GetScanLine(mImage, j);
 							Image::RGBPix<uint8_t> *o_pix = (Image::RGBPix<uint8_t> *)(bp + j*rowstride);
-							for(int i=0; i < header.dim[0]; i++) {
+							for(unsigned i=0; i < header.dim[0]; ++i) {
 								pix->rgbtRed = o_pix->r;
 								pix->rgbtGreen = o_pix->g;
 								pix->rgbtBlue = o_pix->b;
@@ -271,10 +271,10 @@ public:
 						char *bp = (char *)(lat.data.ptr);
 						int rowstride = header.stride[1]; 
 
-						for(int j = 0; j < header.dim[1]; j++) {
+						for(unsigned j = 0; j < header.dim[1]; ++j) {
 							RGBQUAD *pix = (RGBQUAD *)FreeImage_GetScanLine(mImage, j);
 							Image::RGBAPix<uint8_t> *o_pix = (Image::RGBAPix<uint8_t> *)(bp + j*rowstride);
-							for(int i=0; i < header.dim[0]; i++) {
+							for(unsigned i=0; i < header.dim[0]; ++i) {
 								pix->rgbRed = o_pix->b;
 								pix->rgbGreen = o_pix->g;
 								pix->rgbBlue = o_pix->r;
