@@ -46,7 +46,7 @@ MainLoop :: MainLoop()
 {
 	static bool doInit=true;
 	if(doInit){
-        printf("initializing GLUT\n");
+        //printf("initializing GLUT\n");
 		doInit=false;
 		int argc = 0;
 		char * argv[] = {0};
