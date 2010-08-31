@@ -45,8 +45,8 @@ public:
 		mScheduled(false)
 	{
 		// ensure that GLUT and mainloop exist:
-		//MainLoop::get();
-		printf("%f\n", MainLoop::get().T0());
+		MainLoop::get();
+		//
 	}
 
 	~WindowImpl(){
@@ -449,8 +449,6 @@ void WindowGL::create(
 	const Dim& dim, const std::string title, double fps, DisplayMode::t mode
 )
 {
-
-
 	if(mImpl->created()) return;
 
 	mImpl->mWinDim = dim;

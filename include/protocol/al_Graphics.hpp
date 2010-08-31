@@ -2,13 +2,13 @@
 #define INCLUDE_AL_GRAPHICS_HPP
 
 /*
-	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
+	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS).
 	All Rights Reserved.
 
 	Permission to use, copy, modify, distribute, and distribute modified versions
 	of this software and its documentation without fee and without a signed
 	licensing agreement, is hereby granted, provided that the above copyright
-	notice, the list of contributors, this paragraph and the following two paragraphs 
+	notice, the list of contributors, this paragraph and the following two paragraphs
 	appear in all copies, modifications, and distributions.
 
 	IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
@@ -25,9 +25,9 @@
 
 /*
 	Example code:
-	
+
 	Graphics gl();
-	
+
 	gl.begin(gl.POINTS);
 	gl.vertex3d(0, 0, 0);
 	gl.end();
@@ -77,7 +77,7 @@ enum Primitive {
 
 namespace AntiAliasMode {
 	enum t{
-		DontCare	= 1<<0,	
+		DontCare	= 1<<0,
 		Fastest		= 1<<1,
 		Nicest		= 1<<2
 	};
@@ -98,13 +98,13 @@ namespace AttributeBit {
 
 struct StateChange {
 	StateChange()
-	:	blending(false),
-		lighting(false),
-		depth_testing(false),
-		polygon_mode(false),
-		antialiasing(false)
+	:	blending(true),
+		lighting(true),
+		depth_testing(true),
+		polygon_mode(true),
+		antialiasing(true)
 	{}
-	
+
 	~StateChange(){}
 
 	bool blending;
@@ -125,27 +125,27 @@ struct State {
 		polygon_mode(FILL),
 		antialias_mode(AntiAliasMode::DontCare)
 	{}
-	
+
 	~State() {}
-	
+
 
 	// Blending
 	bool blend_enable;
 	BlendFunc blend_src;
 	BlendFunc blend_dst;
-	
+
 	// Lighting
 	bool lighting_enable;
-	
+
 	// Depth Testing
 	bool depth_enable;
-	
+
 	// Polygon Mode
 	PolygonMode polygon_mode;
-	
+
 	// Anti-Aliasing
 	AntiAliasMode::t antialias_mode;
-	
+
 };
 
 class GraphicsData {
@@ -157,7 +157,7 @@ public:
 	typedef Vec2f	TexCoord2;
 	typedef Vec3f	TexCoord3;
 	typedef unsigned int	Index;
-	
+
 	/// TODO!
 	GraphicsData() {}
 
@@ -166,7 +166,7 @@ public:
 	void equalizeBuffers();
 	void getBounds(Vec3f& min, Vec3f& max);
 	Vec3f getCenter(); // center at 0,0,0
-	
+
 	// destructive edits to internal vertices:
 	void unitize();	/// scale to -1..1
 	void scale(double x, double y, double z);
@@ -174,13 +174,13 @@ public:
 	void scale(double s) { scale(s, s, s); }
 	void translate(double x, double y, double z);
 	void translate(Vec3f v) { translate(v[0], v[1], v[2]); }
-	
+
 	// generates smoothed normals for a set of vertices
 	// will replace any normals currently in use
 	// angle - maximum angle (in degrees) to smooth across
 	void generateNormals(float angle);
 
-	Primitive primitive() const { return mPrimitive; } 
+	Primitive primitive() const { return mPrimitive; }
 	const Buffer<Vertex>& vertices() const { return mVertices; }
 	const Buffer<Normal>& normals() const { return mNormals; }
 	const Buffer<Color>& colors() const { return mColors; }
@@ -216,7 +216,7 @@ protected:
 	Buffer<Color> mColors;
 	Buffer<TexCoord2> mTexCoord2s;
 	Buffer<TexCoord3> mTexCoord3s;
-	
+
 	Buffer<Index> mIndices;
 
 	Primitive mPrimitive;
@@ -230,14 +230,14 @@ class GraphicsBackend;
 /*
 	Graphics knows how to draw GraphicsData
 	It also owns a GraphicsData, to simulate immediate mode (where it draws its own data)
-*/	
+*/
 class Graphics {
 public:
 
 //	Graphics(gfx::Backend::type backend = gfx::Backend::AutoDetect);
 	Graphics(GraphicsBackend *backend);
 	~Graphics();
-	
+
 	// Rendering State
 	void pushState(State &state);
 	void popState();
@@ -265,11 +265,11 @@ public:
 	void scale(double s) { scale(s, s, s); }
 	void scale(const Vec3d& v) { scale(v[0], v[1], v[2]); }
 	void scale(const Vec3f& v) { scale(v[0], v[1], v[2]); }
-	
+
 	// Immediate Mode
 	void begin(Primitive mode);
 	void end();
-	
+
 
 	void vertex(double x, double y, double z=0.);
 	void vertex(const Vec3d& v) { vertex(v[0], v[1], v[2]); }
@@ -285,24 +285,24 @@ public:
 	// Other state
 	void pointSize(double v);
 	void lineWidth(double v);
-	
+
 	// Buffer drawing
 	void draw(const GraphicsData& v);
 	void draw();
-	
+
 	GraphicsBackend * backend() { return mBackend; }
 	GraphicsData& data() { return mGraphicsData; }
-	
-	
-protected:
-	void compareState(State &prev_state, State &state);
-	void enableState();
+
+
 	void drawBegin();
 	void drawEnd();
-	
+protected:
+	void compareState(const State &prev_state, const State &state);
+	void enableState();
+
 	stack<Matrix4d> & matrixStackForMode(MatrixMode mode);
-	
-	
+
+
 protected:
 	GraphicsBackend	*	mBackend;			// graphics API implementation
 	GraphicsData		mGraphicsData;		// used for immediate mode style rendering
@@ -317,7 +317,7 @@ protected:
 
 /*
 	Abstract base class for any object that can be rendered via Graphics:
-*/	
+*/
 class Drawable {
 public:
 	virtual void draw(Graphics& gl) = 0;
@@ -326,6 +326,6 @@ public:
 
 } // ::al::gfx
 } // ::al
-	
+
 #endif
-	
+

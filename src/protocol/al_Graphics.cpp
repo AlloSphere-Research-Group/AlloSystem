@@ -14,7 +14,7 @@ void GraphicsData::resetBuffers() {
 	colors().clear();
 	texCoord2s().clear();
 	texCoord3s().clear();
-	indices().clear();	
+	indices().clear();
 }
 
 void GraphicsData::equalizeBuffers() {
@@ -23,7 +23,7 @@ void GraphicsData::equalizeBuffers() {
 	int CS = colors().size();
 	int T2S = texCoord2s().size();
 	int T3S = texCoord3s().size();
-	
+
 	if(NS > 0) {
 		for(int i=NS; i < VS; i++) {
 			normals().append(normals()[NS-1]);
@@ -50,9 +50,9 @@ class TriFace {
 public:
 	GraphicsData::Vertex vertices[3];
 	Vec3f norm;
-	
-	TriFace(const TriFace& cpy) 
-	: norm(cpy.norm) {	
+
+	TriFace(const TriFace& cpy)
+	: norm(cpy.norm) {
 		vertices[0] = cpy.vertices[0];
 		vertices[1] = cpy.vertices[1];
 		vertices[2] = cpy.vertices[2];
@@ -74,17 +74,17 @@ void GraphicsData::generateNormals(float angle) {
 //				(vary according to whether mIndices is used)
 //			calculate normal per face (use normal<float>(dst, p0, p1, p2))
 //			vertices may be used in multiple faces; their norm should be an average of the uses
-//				easy enough if indices is being used; not so easy otherwise. 
+//				easy enough if indices is being used; not so easy otherwise.
 //					create a lookup table by hashing on vertex x,y,z
-//			
-//			
+//
+//
 //			write avg into corresponding normals for each vertex
 //				EXCEPT: if edge is sharper than @angle, just use the face normal directly
 //	*/
 //	std::vector<TriFace> faces;
-//	
+//
 //	std::map<std::string, int> vertexHash;
-//	
+//
 //	int Ni = indices().size();
 //	int Nv = vertices().size();
 //	if (Ni) {
@@ -98,7 +98,7 @@ void GraphicsData::generateNormals(float angle) {
 //		}
 //	} else {
 //		for (int i=0; i<Nv;) {
-//			TriFace face(	
+//			TriFace face(
 //				mVertices[i++],
 //				mVertices[i++],
 //				mVertices[i++]
@@ -185,35 +185,35 @@ void Graphics::popState() {
 	compareState(prev_state, mState.top());
 }
 
-void Graphics::compareState(State &prev_state, State &state) {
+void Graphics::compareState(const State &prev_state, const State &state) {
 	// blending
-	if(	prev_state.blend_enable != state.blend_enable || 
-		prev_state.blend_src != state.blend_src || 
-		prev_state.blend_dst != state.blend_dst)
+	if(	prev_state.blend_enable == state.blend_enable &&
+		prev_state.blend_src == state.blend_src &&
+		prev_state.blend_dst == state.blend_dst)
 	{
-		mStateChange.blending = true;
+		mStateChange.blending = false;
 	}
-	
+
 	// lighting
 	if(prev_state.lighting_enable != state.lighting_enable) {
 		mStateChange.lighting = true;
 	}
-	
+
 	// depth testing
 	if(prev_state.depth_enable != state.depth_enable) {
 		mStateChange.depth_testing = true;
 	}
-	
+
 	// polygon mode
 	if(prev_state.polygon_mode != state.polygon_mode) {
 		mStateChange.polygon_mode = true;
 	}
-	
+
 	// anti-aliasing
 	if(prev_state.antialias_mode != state.antialias_mode) {
 		mStateChange.antialiasing = true;
 	}
-	
+
 }
 
 
@@ -335,7 +335,7 @@ void Graphics::color(double r, double g, double b, double a) {
 
 void Graphics::enableState() {
 	State &state = mState.top();
-	
+
 	if(mStateChange.blending) {
 		mBackend->enableBlending(
 			state.blend_enable,
@@ -344,28 +344,28 @@ void Graphics::enableState() {
 		);
 		mStateChange.blending = false;
 	}
-	
+
 	if(mStateChange.lighting) {
 		mBackend->enableLighting(
 			state.lighting_enable
 		);
 		mStateChange.lighting = false;
 	}
-	
+
 	if(mStateChange.depth_testing) {
 		mBackend->enableDepthTesting(
 			state.depth_enable
 		);
 		mStateChange.depth_testing = false;
 	}
-	
+
 	if(mStateChange.polygon_mode) {
 		mBackend->setPolygonMode(
 			state.polygon_mode
 		);
 		mStateChange.polygon_mode = false;
 	}
-	
+
 	if(mStateChange.antialiasing) {
 		mBackend->setAntialiasing(state.antialias_mode);
 		mStateChange.antialiasing = false;
@@ -384,11 +384,11 @@ void Graphics::drawBegin() {
 // Draw Begin (generic)
 //		update state?
 	enableState();
-	
+
 	mBackend->setProjectionMatrix(mProjectionMatrix.top());
 	mBackend->setModelviewMatrix(mModelViewMatrix.top());
-	
-	
+
+
 //		update matrices?
 //		update textures?
 /*
@@ -459,7 +459,7 @@ bool setBackendNone(Graphics * g) {
 	g->s_color = gl_color;
 
 	g->mBackend = Backend::None;
-	
+
 	return true;
 }
 
@@ -475,12 +475,12 @@ bool setBackendOpenGLES(Graphics * g) {
 }
 
 Graphics :: Graphics(Backend::type backend) {
-	setBackend(backend);	
+	setBackend(backend);
 }
 
 
 Graphics :: ~Graphics() {
-	
+
 }
 
 bool Graphics :: setBackend(Backend::type backend) {
@@ -494,7 +494,7 @@ bool Graphics :: setBackend(Backend::type backend) {
 			return false;
 		}
 	}
-		
+
 	// set function pointers according to backend
 	switch (backend) {
 		case Backend::OpenGLES2:
@@ -510,7 +510,7 @@ bool Graphics :: setBackend(Backend::type backend) {
 			setBackendNone(this);
 			return false;
 	}
-	
+
 	return true;
 }
 */

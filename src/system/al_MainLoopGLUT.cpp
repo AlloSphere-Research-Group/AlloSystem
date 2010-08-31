@@ -46,6 +46,7 @@ MainLoop :: MainLoop()
 {
 	static bool doInit=true;
 	if(doInit){
+        printf("initializing GLUT\n");
 		doInit=false;
 		int argc = 0;
 		char * argv[] = {0};
@@ -84,8 +85,10 @@ void MainLoop :: tick() {
 	// trigger any scheduled functions:
 	mQueue.update(logicaltime);
 
-	// schedule another tick:
-	glutTimerFunc((unsigned int)(1000.0*mInterval), timerFunc, 0);
+    if (mIsRunning) {
+        // schedule another tick:
+        glutTimerFunc((unsigned int)(1000.0*mInterval), timerFunc, 0);
+    }
 }
 
 /// in the GLUT case, we better have created a Window before using this...

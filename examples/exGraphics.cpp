@@ -14,9 +14,11 @@
 
 using namespace al;
 
-Camera camera;
+/*
 gfx::GraphicsBackendOpenGL backend;
 gfx::Graphics gl(&backend);
+
+Camera camera;
 gfx::Texture *texture = backend.textureNew();
 gfx::Texture *surface_tex = backend.textureNew();
 gfx::Surface *surface = backend.surfaceNew();
@@ -37,12 +39,15 @@ void mprint(const Matrix4d &m) {
 	printf("%.5f %.5f %.5f %.5f\n", m[2], m[6], m[10], m[14]);
 	printf("%.5f %.5f %.5f %.5f\n", m[3], m[7], m[11], m[15]);
 }
-
+*/
 static void drawScene(void * self) {
 
 	glEnable(GL_BLEND);
 	glEnable(GL_LINE_SMOOTH);
+	glClearColor(1, 0, 0, 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+/*
 	gl.clearColor(1, 0, 0, 0);
     gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
 
@@ -70,7 +75,7 @@ static void drawScene(void * self) {
 		gl.vertex(1, 0, 0);
 	gl.end();
 	//surface->leave();
-
+*/
 /*
 	gl.pushMatrix();
 	gl.scale(2, 2, 2);
@@ -115,12 +120,12 @@ static void drawScene(void * self) {
 
 		texture->unbind();
 	gl.popMatrix();
-*/
+
 	gl.matrixMode(gfx::PROJECTION);
 	gl.popMatrix();
 
 	gl.matrixMode(gfx::MODELVIEW);
-	gl.popMatrix();
+	gl.popMatrix();*/
 }
 
 
@@ -165,13 +170,17 @@ struct MyWindow : WindowGL{
 	}
 };
 
-MyWindow win1;
 
 
 double fps =100;
 
 int main (int argc, char * argv[]) {
+        printf("main\n");
+        printf("%f\n", MainLoop::get().T0());
 
+MyWindow win1;
+
+/*
 	al::Lattice tex_data;
 	tex_data.create2d(3, AlloUInt8Ty, 256, 256);
 
@@ -223,13 +232,12 @@ int main (int argc, char * argv[]) {
 		vertices[i].b = b;
 
 	}
+	*/
 
-	// set fps == 0, and drive frame rendering manually instead
 	win1.create(WindowGL::Dim(320, 240, 0, 40), "win1", fps);
-	//win1.ctx.viewport().camera(&camera);
 
 //	camera.turn(Quatd::fromEuler(0., 0., 0.1));
-	MainLoop::interval(0.01);
+//	MainLoop::interval(0.01);
 
 
 
