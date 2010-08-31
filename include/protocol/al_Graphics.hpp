@@ -77,12 +77,10 @@ enum Primitive {
 
 namespace AntiAliasMode {
 	enum t{
-		DontCare	= 1<<0,
-		Fastest		= 1<<1,
-		Nicest		= 1<<2
+		DontCare,
+		Fastest,
+		Nicest
 	};
-	inline t operator| (const t& a, const t& b){ return t(int(a) | int(b)); }
-	inline t operator& (const t& a, const t& b){ return t(int(a) & int(b)); }
 }
 
 namespace AttributeBit {
@@ -159,7 +157,7 @@ public:
 	typedef unsigned int	Index;
 
 	/// TODO!
-	GraphicsData() {}
+	GraphicsData(): mPrimitive(gfx::POINTS){}
 
 	/// Reset all buffers
 	void resetBuffers();
@@ -216,7 +214,6 @@ protected:
 	Buffer<Color> mColors;
 	Buffer<TexCoord2> mTexCoord2s;
 	Buffer<TexCoord3> mTexCoord3s;
-
 	Buffer<Index> mIndices;
 
 	Primitive mPrimitive;
