@@ -4,11 +4,11 @@
 #include <vector>
 #include <list>
 #include "types/al_Buffer.hpp"
+#include "math/al_Interpolation.hpp"
 #include "math/al_Vec.hpp"
 #include "spatial/al_CoordinateFrame.hpp"
 #include "sound/al_Ambisonics.hpp"
 #include "sound/al_Reverb.hpp"
-#include "math/al_Interpolation.hpp"
 
 namespace al{
 

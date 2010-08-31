@@ -41,6 +41,7 @@
 namespace al{
 
 
+/// Base class for network socket
 class Socket{
 public:
 

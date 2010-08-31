@@ -73,12 +73,12 @@ public:
 	AudioIOData(void * user);
 	virtual ~AudioIOData();
 
-	void * user;							///< User specified data
+	void * user;						///< User specified data
 	
-	float *       aux(int channel);	///< Returns an aux channel buffer
-	const float * in (int channel);	///< Returns an in channel buffer
-	float *       out(int channel);	///< Returns an out channel buffer
-	float *		  temp();					///< Returns single channel temporary buffer
+	float *       aux(int channel);		///< Returns an aux channel buffer
+	const float * in (int channel);		///< Returns an in channel buffer
+	float *       out(int channel);		///< Returns an out channel buffer
+	float *		  temp();				///< Returns single channel temporary buffer
 	
 	int channelsIn () const;			///< Returns effective number of input channels
 	int channelsOut() const;			///< Returns effective number of output channels
@@ -87,12 +87,12 @@ public:
 	int channelsInDevice() const;		///< Returns number of channels opened on input device
 	int channelsOutDevice() const;		///< Returns number of channels opened on output device
 	int framesPerBuffer() const;		///< Returns frames/buffer of audio I/O stream
-	double framesPerSecond() const;			///< Returns frames/second of audio I/O streams
-	double secondsPerBuffer() const;		///< Returns seconds/buffer of audio I/O stream
-	double time() const;					///< Returns current stream time in seconds
+	double framesPerSecond() const;		///< Returns frames/second of audio I/O streams
+	double secondsPerBuffer() const;	///< Returns seconds/buffer of audio I/O stream
+	double time() const;				///< Returns current stream time in seconds
 	double time(int frame) const;		///< Returns current stream time in seconds of frame
-	void zeroAux();							///< Zeros all the aux buffers
-	void zeroOut();							///< Zeros all the internal output buffers
+	void zeroAux();						///< Zeros all the aux buffers
+	void zeroOut();						///< Zeros all the internal output buffers
 	
 protected:
 	PaStreamParameters mInParams, mOutParams;	// Input and output stream parameters.
@@ -100,36 +100,42 @@ protected:
 	int mFramesPerBuffer;
 	double mFramesPerSecond;
 	
-	float *mBufI, *mBufO, *mBufA;		// input, output, and aux buffers
-	float * mBufT;						// temporary one channel buffer
+	float *mBufI, *mBufO, *mBufA;	// input, output, and aux buffers
+	float * mBufT;					// temporary one channel buffer
 	int mNumI, mNumO, mNumA;		// input, output, and aux channels
 };
 
 
-
+/// Audio device abstraction
 class AudioDevice{
 public:
+
+	/// @param[in] deviceNum	Device enumeration number
 	AudioDevice(int deviceNum);
+	
+	/// @param[in] nameKeyword	Keyword to search for in device name
+	/// @param[in] input		Whether to search input devices
+	/// @param[in] ouput		Whether to search output devices
 	AudioDevice(const std::string& nameKeyword, bool input=true, bool output=true);
 
 	~AudioDevice();
 
-	bool valid() const { return 0 != mImpl; }
-	int id() const { return mID; }
-	const char * name() const;
-	int channelsInMax() const;
-	int channelsOutMax() const;
-	double defaultSampleRate() const;
+	bool valid() const { return 0!=mImpl; }	///< Returns whether device is valid
+	int id() const { return mID; }			///< Get device unique ID
+	const char * name() const;				///< Get device name
+	int channelsInMax() const;				///< Get maximum number of input channels supported
+	int channelsOutMax() const;				///< Get maximum number of output channels supported
+	double defaultSampleRate() const;		///< Get default sample rate
 	
-	bool hasInput() const;
-	bool hasOutput() const;
+	bool hasInput() const;					///< Returns whether device has input
+	bool hasOutput() const;					///< Returns whether device has output
 	
-	void print() const;	/// Prints info about specific i/o device to stdout.
+	void print() const;						///< Prints info about specific i/o device to stdout
 
-	static AudioDevice defaultInput();
-	static AudioDevice defaultOutput();
-	static int numDevices();			///< Returns number of audio i/o devices available.
-	static void printAll();				///< Prints info about all available i/o devices to stdout.
+	static AudioDevice defaultInput();		///< Get system's default input device
+	static AudioDevice defaultOutput();		///< Get system's default output device
+	static int numDevices();				///< Returns number of audio i/o devices available
+	static void printAll();					///< Prints info about all available i/o devices to stdout
 
 private:
 	void setImpl(int deviceNum);
@@ -145,7 +151,7 @@ typedef void (*audioCallback)(AudioIOData& io);
 
 /// Audio input/output streaming.
 
-/// This is a C++ wrapper around the PortAudio v1.9 library.
+/// This is a wrapper around the PortAudio v1.9 library.
 /// 
 class AudioIO : public AudioIOData {
 public:
@@ -156,12 +162,12 @@ public:
 
 	/// Creates AudioIO using default I/O devices.
 	///
-	/// @param[in]	framesPerBuf	Number of sample frames to process per callback
-	/// @param[in]	framesPerSec	Frame rate.  Unsupported values will use default rate of device.
-	/// @param[in]	callback		Audio processing callback
-	/// @param[in]	userData		Pointer to user data accessible within callback
-	/// @param[in]	outChans		Number of output channels to open
-	/// @param[in]	inChans			Number of input channels to open
+	/// @param[in] framesPerBuf		Number of sample frames to process per callback
+	/// @param[in] framesPerSec		Frame rate.  Unsupported values will use default rate of device.
+	/// @param[in] callback			Audio processing callback
+	/// @param[in] userData			Pointer to user data accessible within callback
+	/// @param[in] outChans			Number of output channels to open
+	/// @param[in] inChans			Number of input channels to open
 	/// If the number of input or output channels is greater than the device
 	/// supports, virtual buffers will be created.
 	AudioIO(
@@ -170,16 +176,15 @@ public:
 		int outChans = 2, int inChans = 0 );
 
 	virtual ~AudioIO();
-		
-	//static audioCallback callback;	///< User specified callback function.
-	audioCallback callback;	///< User specified callback function.
-	
-	void operator()();				///< Calls callback manually
 
-	bool open();					///< Opens audio device.
-	bool close();					///< Closes audio device. Will stop active IO.
-	bool start();					///< Starts the audio IO.  Will open audio device if necessary.
-	bool stop();					///< Stops the audio IO.
+	audioCallback callback;						///< User specified callback function.
+	
+	void operator()();							///< Calls callback manually
+	
+	bool open();								///< Opens audio device.
+	bool close();								///< Closes audio device. Will stop active IO.
+	bool start();								///< Starts the audio IO.  Will open audio device if necessary.
+	bool stop();								///< Stops the audio IO.
 
 	/// Sets number of effective channels on input or output device depending on 'forOutput' flag.
 	
@@ -187,16 +192,17 @@ public:
 	/// depending on how many channels the device supports. Passing in -1 for
 	/// the number of channels opens all available channels.
 	void channels(int num, bool forOutput);
-	void channelsIn(int n){ channels(n,false); }	///< Set number of input channels
-	void channelsOut(int n){ channels(n,true); }	///< Set number of output channels
-	void channelsAux(int num);				///< Set number of auxiliary channels
+
+	void channelsIn(int n){ channels(n,false); } ///< Set number of input channels
+	void channelsOut(int n){ channels(n,true); } ///< Set number of output channels
+	void channelsAux(int num);					///< Set number of auxiliary channels
 	void clipOut(bool v){ mClipOut=v; }			///< Set whether to clip output between -1 and 1
 	
 	void deviceIn(const AudioDevice& v);		///< Set input device
 	void deviceOut(const AudioDevice& v);		///< Set output device
 	
 	void framesPerSecond(double v);				///< Set number of frames per second
-	void framesPerBuffer(int n);			///< Set number of frames per processing buffer
+	void framesPerBuffer(int n);				///< Set number of frames per processing buffer
 	void zeroNANs(bool v){ mZeroNANs=v; }		///< Set whether to zero NANs in output buffer
 
 	int channels(bool forOutput) const;

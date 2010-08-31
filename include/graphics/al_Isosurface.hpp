@@ -51,6 +51,7 @@ struct PointID {
 };
 
 
+/// Isosurface using marching cubes
 template<class T=double>
 class Isosurface : public gfx::GraphicsData{
 public:

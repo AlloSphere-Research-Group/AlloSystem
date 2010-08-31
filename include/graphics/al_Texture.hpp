@@ -11,6 +11,7 @@ namespace gfx{
 
 class GraphicsBackend;
 
+/// Graphics texture
 class Texture : public GPUObject {
 public:
 

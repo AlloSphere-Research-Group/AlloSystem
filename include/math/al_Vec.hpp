@@ -57,7 +57,7 @@ typedef Mat<4,int>		Mat4i;
 
 
 
-///< N-vector
+/// N-vector
 
 /// This is a fixed size array to enable better loop unrolling optimizations
 /// by the compiler and to avoid an extra 'size' data member for small-sized
@@ -272,12 +272,12 @@ public:
 
 
 
-// N x N matrix
+/// N x N square matrix
 template <int N, class T>
 class Mat{
 public:
 
-	/// column-major array
+	/// Column-major array of elements
 	T elems[N*N];
 
 	Mat(){ set(T(0)); }

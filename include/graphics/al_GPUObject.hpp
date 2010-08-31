@@ -6,6 +6,7 @@
 namespace al {
 namespace gfx{
 
+/// Base class for allocated resources on the GPU
 class GPUObject{
 public:
 	GPUObject(): mID(0){}

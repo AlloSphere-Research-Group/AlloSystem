@@ -34,10 +34,8 @@
 namespace al {
 namespace gfx{
 
-/*
-	Stereographic
-	Higher-level utility class to manage various stereo rendering techniques
-*/
+
+///	Higher-level utility class to manage various stereo rendering techniques
 class Stereographic {
 public:
 	enum StereoMode{

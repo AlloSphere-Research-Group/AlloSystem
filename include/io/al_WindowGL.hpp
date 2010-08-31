@@ -39,10 +39,6 @@ namespace al{
 #endif
 
 
-
-
-
-
 /// Constants of keyboard keys.
 namespace Key{
 	enum t{
@@ -61,6 +57,7 @@ namespace Key{
 	};
 }
 
+/// Window display mode bit flags
 namespace DisplayMode{
 	enum t{
 		SingleBuf	= 1<<0,		/**< Single-buffered */
@@ -77,94 +74,98 @@ namespace DisplayMode{
 	inline t operator& (const t& a, const t& b){ return t(int(a) & int(b)); }
 }
 
+/// Cursor icon types
 namespace Cursor{
 	enum t{
-		None		= 0,
-		Pointer		= 1,
-		CrossHair,
+		None		= 0,		/**< */
+		Pointer		= 1,		/**< */
+		CrossHair,				/**< */
 	};
 }
 
 
 using namespace DisplayMode;
 
-
+/// Keyboard state
 class Keyboard{
 public:
 
 	/// Constructor.
 	Keyboard();
 	
-	int key() const;		///< Returns key code (non-shifted character) of last key event.
-	int keyAsNumber() const;///< Returns decimal number correlating to key code
-	bool alt() const;		///< Whether an alt key is down.
-	bool caps() const;		///< Whether capslock is down.
-	bool ctrl() const;		///< Whether a ctrl key is down.
-	bool meta() const;		///< Whether a meta (e.g. windows, apple) key is down.
-	bool shift() const;		///< Whether a shift key is down.
-	bool down() const;		///< Whether last event was button down.
-	bool isNumber() const;	///< Whether key is a number key
-	bool key(int k) const;	///< Whether the last key was 'k'.
+	int key() const;			///< Returns key code (non-shifted character) of last key event.
+	int keyAsNumber() const;	///< Returns decimal number correlating to key code
+	bool alt() const;			///< Whether an alt key is down.
+	bool caps() const;			///< Whether capslock is down.
+	bool ctrl() const;			///< Whether a ctrl key is down.
+	bool meta() const;			///< Whether a meta (e.g. windows, apple) key is down.
+	bool shift() const;			///< Whether a shift key is down.
+	bool down() const;			///< Whether last event was button down.
+	bool isNumber() const;		///< Whether key is a number key
+	bool key(int k) const;		///< Whether the last key was 'k'.
 
-	void alt  (bool state);	///< Set alt key state.
-	void caps (bool state);	///< Set alt key state.
-	void ctrl (bool state);	///< Set ctrl key state.
-	void meta (bool state);	///< Set meta key state.
-	void shift(bool state);	///< Set shift key state.
+	void alt  (bool state);		///< Set alt key state.
+	void caps (bool state);		///< Set alt key state.
+	void ctrl (bool state);		///< Set ctrl key state.
+	void meta (bool state);		///< Set meta key state.
+	void shift(bool state);		///< Set shift key state.
 
-	void print();			///< Print keyboard state to stdout.
+	void print();				///< Print keyboard state to stdout.
 
 private:
 	friend class WindowImpl;
 
-	int	mKeycode;			// last key event key number
-	bool mDown;				// last key event state (pressed or released)
-	bool mModifiers[5];		// Modifier key state array (shift, alt, ctrl, caps, meta)
+	int	mKeycode;		// last key event key number
+	bool mDown;			// last key event state (pressed or released)
+	bool mModifiers[5];	// Modifier key state array (shift, alt, ctrl, caps, meta)
 	
 	void setKey(int k, bool v);
 };
 
 
+/// Mouse state
 class Mouse{
 public:
 	enum{
-		Left	= 0,
-		Middle	= 1,
-		Right	= 2,
-		Extra	= 3
+		Left	= 0,				/**< Left button */
+		Middle	= 1,				/**< Middle button */
+		Right	= 2,				/**< Right button */
+		Extra	= 3					/**< Start of any extra buttons */
 	};
 	
 	Mouse();
 	
-	int x() const;
-	int y() const;
+	int x() const;					///< Get x coordinate in screen pixels
+	int y() const;					///< Get y coordinate in screen pixels
 	
-	int button() const;
-	bool down() const;
-	bool down(int button) const;
-	bool left() const;
-	bool middle() const;
-	bool right() const;
+	int button() const;				///< Get last clicked button
+	bool down() const;				///< Get state of last clicked button
+	bool down(int button) const;	///< Get state of a button
+	bool left() const;				///< Get whether left button is down
+	bool middle() const;			///< Get whether middle button is down
+	bool right() const;				///< Get whether right button is down
 	
 private:
 	friend class WindowImpl;
 
-	int mX, mY;							// x,y positions
-	int mButton;						// most recent button changed
-	int mBX[AL_MOUSE_MAX_BUTTONS];		// button down xs
-	int mBY[AL_MOUSE_MAX_BUTTONS];		// button down ys
-	bool mB[AL_MOUSE_MAX_BUTTONS];		// button states
+	int mX, mY;						// x,y positions
+	int mButton;					// most recent button changed
+	int mBX[AL_MOUSE_MAX_BUTTONS];	// button down xs
+	int mBY[AL_MOUSE_MAX_BUTTONS];	// button down ys
+	bool mB[AL_MOUSE_MAX_BUTTONS];	// button states
 	
 	void button(int b, bool v);
 	void position(int x, int y);
 };
 
-/// TODO: rename to Window
 
-/// OpenGL Window interface
+// TODO: rename to Window
+
+/// Window with OpenGL context
 class WindowGL {
 public:
 
+	/// Window pixel dimensions
 	struct Dim{
 		Dim(double w_, double h_, double l_=0, double t_=0): l(l_), t(t_), w(w_), h(h_){}
 		Dim(double v=0): l(0), t(0), w(v), h(v){}
@@ -174,6 +175,12 @@ public:
 	WindowGL();
 	virtual ~WindowGL();
 	
+	/// Create a new window
+	
+	/// @param[in] dim		Window dimensions in pixels
+	/// @param[in] title	Title of window
+	/// @param[in] fps		Desired frames/second
+	/// @param[in] mode		Display mode bit flags
 	void create(
 		const Dim& dim,
 		const std::string title,
@@ -181,53 +188,55 @@ public:
 		DisplayMode::t mode = DisplayMode::DefaultBuf
 	);
 	
+	/// Destroys current window and its associated OpenGL context
 	void destroy();
-	
-	virtual void onCreate(){}
-	virtual void onDestroy(){}
-	virtual void onFrame(){}
-	virtual void onResize(int w, int h){}
-	virtual void onVisibility(bool v){}
-	
-	virtual void onMouseDown(const Mouse& m){}
-	virtual void onMouseDrag(const Mouse& m){}
-	virtual void onMouseMove(const Mouse& m){}
-	virtual void onMouseUp(const Mouse& m){}
-	
-	virtual void onKeyDown(const Keyboard& k){}
-	virtual void onKeyUp(const Keyboard& k){}
-	
-	bool cursorHide() const;
-	Dim dimensions() const;
-	bool enabled(DisplayMode::t v) const;				///<
-	bool fullScreen() const;
-	double fps() const;									///< Returns frames/second (requested)
-	double avgFps() const;								///< Returns frames/second (running average)
-	double spf() const { return 1./fps(); }				///< Returns seconds/frame
-	const std::string& title() const;
-	bool visible() const;
-	const Keyboard& keyboard(){ return mKeyboard; }
-	const Mouse& mouse(){ return mMouse; }
 
-	void doFrame();										///< Calls onFrame() and swaps buffers
+	virtual void onCreate(){}					///< Called after window is created with valid OpenGL context
+	virtual void onDestroy(){}					///< Called before the window and its OpenGL context are destroyed
+	virtual void onFrame(){}					///< Called every frame
+	virtual void onResize(int w, int h){}		///< Called whenever window dimensions change
+	virtual void onVisibility(bool v){}			///< Called when window changes from hidden to shown and vice versa
+	
+	virtual void onMouseDown(const Mouse& m){}	///< Called when a mouse button is pressed
+	virtual void onMouseDrag(const Mouse& m){}	///< Called when the mouse moves while a button is down
+	virtual void onMouseMove(const Mouse& m){}	///< Called when the mouse moves
+	virtual void onMouseUp(const Mouse& m){}	///< Called when a mouse button is released
+	
+	virtual void onKeyDown(const Keyboard& k){}	///< Called when a keyboard key is pressed
+	virtual void onKeyUp(const Keyboard& k){}	///< Called when a keyboard key is released
+	
+	bool cursorHide() const;					///< Whether the cursor is hidden
+	Dim dimensions() const;						///< Get current dimensions of window
+	bool enabled(DisplayMode::t v) const;		///< Get whether display mode flag is set
+	bool fullScreen() const;					///< Get whether window is in fullscreen
+	double fps() const;							///< Returns frames/second (requested)
+	double avgFps() const;						///< Returns frames/second (running average)
+	double spf() const { return 1./fps(); }		///< Returns seconds/frame
+	const std::string& title() const;			///< Get title of window
+	bool visible() const;						///< Get whether window is visible
+	const Keyboard& keyboard(){ return mKeyboard; } ///< Get current keyboard state
+	const Mouse& mouse(){ return mMouse; }		///< Get current mouse state
 
-	WindowGL& cursor(Cursor::t v);						///< Set cursor type
-	WindowGL& cursorHide(bool v);						///< Set cursor hiding
-	WindowGL& cursorHideToggle();						///< Toggle cursor hiding
-	WindowGL& dimensions(const Dim& v);
-	WindowGL& fps(double v);							///< Set frames/second
+	void doFrame();								///< Calls onFrame() and swaps buffers
+
+	WindowGL& cursor(Cursor::t v);				///< Set cursor type
+	WindowGL& cursorHide(bool v);				///< Set cursor hiding
+	WindowGL& cursorHideToggle();				///< Toggle cursor hiding
+	WindowGL& dimensions(const Dim& v);			///< Set dimensions
+	WindowGL& fps(double v);					///< Set frames/second
 	
 	/// Set fullscreen mode
 	
 	/// This will make the window go fullscreen without borders and,
 	/// if posssible, without changing the display resolution.
 	WindowGL& fullScreen(bool on);
-	WindowGL& fullScreenToggle();
-	WindowGL& hide();
-	WindowGL& iconify();
-	WindowGL& makeActive();
-	WindowGL& show();
-	WindowGL& title(const std::string& v);
+
+	WindowGL& fullScreenToggle();				///< Toggle fullscreen
+	WindowGL& hide();							///< Hide window (if showing)
+	WindowGL& iconify();						///< Iconify window
+	WindowGL& makeActive();						///< Bring window to front
+	WindowGL& show();							///< Show window (if hidden)
+	WindowGL& title(const std::string& v);		///< Set title
 
 	/// Destroy all created windows
 	static void destroyAll();

@@ -19,7 +19,7 @@
 
 namespace al{
 
-// strips a qualified path to a file (src) into a path to the containing folder (dst)
+/// Strips a qualified path to a file (src) into a path to the containing folder (dst)
 void path2dir(char* dst, const char* src);
 
 /// a pair of path (folder/directory) and filename
@@ -41,7 +41,7 @@ protected:
 	std::string mFile;
 };
 
-/// a handy way to manage several possible search paths
+/// A handy way to manage several possible search paths
 class SearchPaths {
 public:
 	SearchPaths() {}
@@ -83,7 +83,7 @@ protected:
 };
 
 
-
+/// File
 class File{
 public:
 
