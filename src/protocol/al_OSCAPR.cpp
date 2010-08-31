@@ -170,8 +170,10 @@ size_t Send::send(const char * buffer, size_t len) {
 	return mImpl->send(buffer, len);
 }
 
-size_t Send::send(const osc::OutboundPacketStream & packet) {
-	return mImpl->send(packet.Data(), packet.Size());
+size_t Send::send(osc::OutboundPacketStream & packet) {
+	size_t r = mImpl->send(packet.Data(), packet.Size());
+	packet.Clear();
+	return r;
 }
 
 void Send::maxPacketSize(int bytes){

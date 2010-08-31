@@ -143,7 +143,7 @@ public:
 		Use oscpack's OutboundPacketStream interface to prepare messages and send
 			Returns bytes sent
 	*/
-	size_t send(const osc::OutboundPacketStream & packet);
+	size_t send(osc::OutboundPacketStream & packet);
 
 	/// Send address pattern along with 1 argument immediately
 	template <class T1>
