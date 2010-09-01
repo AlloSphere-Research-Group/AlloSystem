@@ -30,7 +30,7 @@ public:
 	apr_finfo_t dirent;
 	std::string dirname;
 	
-	Path(std::string dirname) : ImplAPR(), dir(NULL), dirname(dirname) {
+	Path(const std::string& dirname) : ImplAPR(), dir(NULL), dirname(dirname) {
 		if (APR_SUCCESS != check_apr(apr_dir_open(&dir, dirname.data(), mPool))) {
 			dir=NULL;
 		}
@@ -40,7 +40,7 @@ public:
 		if (dir) check_apr(apr_dir_close(dir));
 	}
 	
-	bool find(std::string name, FilePath& result, bool recursive=true) {
+	bool find(const std::string& name, FilePath& result, bool recursive=true) {
 		bool found = false;
 		if (dir && APR_SUCCESS == check_apr(apr_dir_open(&dir, dirname.data(), mPool))) {
 			// iterate over directory:
@@ -63,7 +63,7 @@ public:
 
 
 
-FilePath SearchPaths::find(std::string name) {
+FilePath SearchPaths::find(const std::string& name) {
 	FilePath result;
 	bool found = false;
 	std::list<SearchPaths::searchpath>::iterator iter = mSearchPaths.begin();

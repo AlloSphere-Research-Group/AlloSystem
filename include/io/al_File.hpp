@@ -31,10 +31,10 @@ public:
 	const std::string& file() const { return mFile; }
 	const std::string& path() const { return mPath; }
 	
-	std::string filepath() const { return mPath+mFile; }
+	std::string filepath() const { return path()+file(); }
 	
-	FilePath& file(std::string v) { mFile=v; return *this; }
-	FilePath& path(std::string v) { mPath=v; return *this; }
+	FilePath& file(const std::string& v) { mFile=v; return *this; }
+	FilePath& path(const std::string& v) { mPath=v; return *this; }
 	
 protected:
 	std::string mPath;
@@ -51,10 +51,10 @@ public:
 	/// find a file in the searchpaths
 	/// returns true if file found, and fills result with corresponding path & filename
 	/// returns false if file not found
-	FilePath find(std::string filename);
+	FilePath find(const std::string& filename);
 	
 	/// add a path to search in; recursive searching is optional
-	void addSearchPath(std::string path, bool recursive = true);
+	void addSearchPath(const std::string& path, bool recursive = true);
 	
 	/// adds best estimate of application launch paths (cwd etc.)
 	/// can pass in argv from the main() function if desired.
@@ -67,11 +67,11 @@ public:
 	//void addResourcePath();
 	
 	// strips trailing filename from a path; e.g. /usr/bin/man -> /usr/bin/
-	static std::string stripFileName(std::string src);
+	static std::string stripFileName(const std::string& src);
 	// ensure path ends with the proper delimiter
-	static std::string conformPath(std::string src);
+	static std::string conformPath(const std::string& src);
 	// does a file at the given filepath exist?
-	static bool fileExists(std::string name, std::string path);
+	static bool fileExists(const std::string& name, const std::string& path);
 	
 protected:
 
@@ -96,7 +96,8 @@ public:
 	void close();	///< Close file
 	bool open();	///< Open file with specified i/o mode
 
-	void mode(const char * v){ mMode=v; }
+	File& mode(const char * v){ mMode=v; return *this; }
+	File& path(const char * v){ mPath=v; return *this; }
 
 	/// Write memory elements to file
 	int write(const void * v, int size, int items=1){ return fwrite(v, size, items, mFP); }
@@ -138,7 +139,7 @@ protected:
 
 //// INLINE IMPLEMENTATION ////
 
-inline std::string SearchPaths::stripFileName(std::string src) {
+inline std::string SearchPaths::stripFileName(const std::string& src) {
 	std::string filepath(src);
 	size_t pos = filepath.find_last_of(AL_FILE_DELIMITER);
 	if (pos !=std::string::npos) {
@@ -147,7 +148,7 @@ inline std::string SearchPaths::stripFileName(std::string src) {
 	return filepath;
 }
 
-inline std::string SearchPaths::conformPath(std::string src) {
+inline std::string SearchPaths::conformPath(const std::string& src) {
 	std::string path(src);
 	// paths should end with a delimiter:
 	if (path[path.size()-1] != AL_FILE_DELIMITER) {
@@ -168,11 +169,11 @@ inline void SearchPaths::addAppPaths(int argc, char * const argv[], bool recursi
 
 inline void SearchPaths::addAppPaths(bool recursive) {	
 	char cwd[4096];
-	getcwd(cwd, 4096);
+	getcwd(cwd, sizeof(cwd));
 	addSearchPath(cwd, recursive);
 }
 
-inline void SearchPaths::addSearchPath(std::string src, bool recursive) {
+inline void SearchPaths::addSearchPath(const std::string& src, bool recursive) {
 	std::string path=conformPath(src);
 	
 	// check for duplicates
@@ -188,7 +189,7 @@ inline void SearchPaths::addSearchPath(std::string src, bool recursive) {
 	mSearchPaths.push_front(searchpath(path, recursive));
 }
 
-inline bool SearchPaths::fileExists(std::string path, std::string name) {
+inline bool SearchPaths::fileExists(const std::string& path, const std::string& name) {
 	struct stat stFileInfo; 
 	std::string filename(path+name);
 	return (stat((path + name).c_str(),&stFileInfo) == 0);
