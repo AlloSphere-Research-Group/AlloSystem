@@ -1530,11 +1530,11 @@
 			children = (
 				3622BEDE116D527D00928703 /* al_AudioIO.cpp */,
 				3622BEDF116D527D00928703 /* al_File.cpp */,
+				3687E35111FA501200EC6706 /* al_FileAPR.cpp */,
 				160DAE1211C1B1FE00C6905A /* al_SocketAPR.cpp */,
 				3622BEE1116D527D00928703 /* al_WindowGL.cpp */,
 				3622BEE2116D527D00928703 /* al_WindowGLUT.cpp */,
 				3622BEE3116D527D00928703 /* Makefile.config */,
-				3687E35111FA501200EC6706 /* al_FileAPR.cpp */,
 			);
 			path = io;
 			sourceTree = "<group>";

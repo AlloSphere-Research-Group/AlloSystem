@@ -258,6 +258,7 @@ GLenum wrap_from_texture_wrap(GraphicsBackendOpenGL *backend, Texture::Target ta
 			case Texture::CLAMP_TO_BORDER:	return GL_CLAMP_TO_BORDER;
 			case Texture::CLAMP:			return GL_CLAMP;
 			//case Texture::REPEAT:
+			default:;
 		}
 	}
 	

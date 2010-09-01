@@ -121,9 +121,8 @@ typedef struct {
 		LJP:
 					0			1			2			3			4
 		Specifier	row			column		pillar		file
-		Mathematic	element		array		matrix
-		Audio		sample		time		channel		pattern
-		Visual		pixel		line		rect		time
+		Tensor		scalar		vector		matrix		
+		Sound		sample		time		channel		pattern
 		Polytope	point		line		polygon		polyhedron	polychoron
 		n-Hypercube	point		line		square		cube		tesseract
 		Boundary	none		vertex		edge		face		cell

@@ -28,7 +28,6 @@
 */
 
 #include <cmath>
-#include "system/al_Config.h"
 
 namespace al {
 
@@ -46,13 +45,20 @@ typedef Complex<double>	Complexd;
 template <class T>
 class Polar{
 public:
+	/// @param[in] p	phase, in radians
 	Polar(const T& p): m(1.), p(p){}
+	
+	/// @param[in] m	magnitude
+	/// @param[in] p	phase, in radians
 	Polar(const T& m, const T& p): m(m), p(p){}
+	
+	/// @param[in] v	rectangular complex number to convert from
 	Polar(const Complex<T>& v){ *this = v; }
 
 	Polar& operator = (const Complex<T>& v){ m=v.norm(); p=v.arg(); return *this; }
 
-	T m, p;
+	T m;	///< Magnitude
+	T p;	///< Phase, in radians
 };
 
 

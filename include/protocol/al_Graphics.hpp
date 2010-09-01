@@ -146,6 +146,8 @@ struct State {
 
 };
 
+
+/// Stores buffers related to rendering graphical objects
 class GraphicsData {
 public:
 
@@ -221,13 +223,12 @@ protected:
 
 
 
-
 class GraphicsBackend;
 
-/*
-	Graphics knows how to draw GraphicsData
-	It also owns a GraphicsData, to simulate immediate mode (where it draws its own data)
-*/
+/// Interface for setting graphics state and rendering GraphicsData
+
+///	It also owns a GraphicsData, to simulate immediate mode (where it draws its own data)
+///
 class Graphics {
 public:
 

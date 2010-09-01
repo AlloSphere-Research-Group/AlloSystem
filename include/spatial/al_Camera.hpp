@@ -1,13 +1,13 @@
 #ifndef INCLUDE_AL_CAMERA_HPP
 #define INCLUDE_AL_CAMERA_HPP
 
-#include "math/al_Frustum.hpp"
-#include "math/al_Plane.hpp"
 #include "math/al_Vec.hpp"
-#include "math/al_Quat.hpp"
 #include "math/al_Matrix4.hpp"
 #include "spatial/al_CoordinateFrame.hpp"
 
+//#include "math/al_Frustum.hpp"
+//#include "math/al_Plane.hpp"
+//#include "math/al_Quat.hpp"
 
 namespace al {
 
@@ -35,7 +35,7 @@ public:
 	virtual ~Camera() {}
 
 	// setters
-	Camera& fovy(double v) { mFovy =v; return *this; }									///< Set vertical field of view, in degrees
+	Camera& fovy(double v) { mFovy =v; return *this; }		///< Set vertical field of view, in degrees
 	Camera& near(double v){ mNear=v; return *this; }		///< Set frustum near plane distance
 	Camera& far(double v){ mFar=v; return *this; }			///< Set frustum far plane distance
 	Camera& focalLength(double v){ mFocalLength=v; return *this; } ///< Set focal length
@@ -64,7 +64,6 @@ public:
 	Matrix4d projectionMatrix(Eye e=MONO);
 
 	double height(double distance);							///< Height of view at distance from camera
-
 
 protected:
 	double mFovy;				// Camera aperture (degrees)

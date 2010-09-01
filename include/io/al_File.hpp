@@ -159,7 +159,7 @@ inline std::string SearchPaths::conformPath(std::string src) {
 inline void SearchPaths::addAppPaths(int argc, char * const argv[], bool recursive) {
 	addAppPaths(recursive);
 	if (argc > 0) {
-		char path[4096];
+		//char path[4096];
 		std::string filepath = stripFileName(argv[0]);
 		mAppPath = filepath;
 		addSearchPath(filepath, recursive);

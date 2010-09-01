@@ -478,7 +478,7 @@ GraphicsData * OBJReader::createGraphicsData(GroupIterator iter) {
 	if (iter == mGroups.end()) return NULL;
 	Group& g = iter->second;
 
-	printf("create with %d indices\n", g.indices.size());
+	printf("create with %d indices\n", (int)g.indices.size());
 	if (g.indices.size() <= 0) return NULL;
 
 	GraphicsData * gd = new GraphicsData();
@@ -528,7 +528,7 @@ GraphicsData * OBJReader::createGraphicsData(GroupIterator iter) {
 		return NULL;
 	}
 
-	printf("%d input indices, %d vertices, %d indices\n", g.indices.size(), gd->vertices().size(), gd->indices().size());
+	printf("%d input indices, %d vertices, %d indices\n", (int)g.indices.size(), gd->vertices().size(), gd->indices().size());
 
 	return gd;
 }
