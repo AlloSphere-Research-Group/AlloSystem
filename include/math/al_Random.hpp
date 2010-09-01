@@ -49,7 +49,7 @@ inline static uint32_t seed(){
 }
 
 
-
+/// Random distribution generator
 template <class RNG=al::rnd::Tausworthe>
 class Random{
 public:
