@@ -63,16 +63,3 @@ protocol	OSC, lattice, serialize
 
 application	main loop, run loop
 
-
-===========================================================================
-To do
-===========================================================================
-APR C++ wrappers
-	directory
-	file (Lance- return APR file object)
-	thread (Graham)
-
-OSC poll receiving (Graham)
-
-Serialize.h- Separate C and C++ headers (Lance)
-
