@@ -13,7 +13,7 @@ void * threadfunc1(void * ud) {
 }
 
 
-int utThreadAPR() {
+int utThread() {
 	Thread thd(threadfunc1, 0);
 	al_sleep(0.2);
 	active = 0;

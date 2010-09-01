@@ -19,7 +19,7 @@ int main(){
 //	utIOAudioIO();
 //	utIOWindowGL();
 //	utIOSocket();
-	utThreadAPR();
+	utThread();
 	
 //	utProtocolGraphics();
 

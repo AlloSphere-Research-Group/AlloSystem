@@ -1,10 +1,10 @@
 #include "utAllocore.h"
-#include "io/al_FileAPR.hpp"
+#include "io/al_File.hpp"
 #include "graphics/al_Image.hpp"
 
 static al::gfx::Image img;
 
-int utFileAPR() {
+int utFile() {
 	
 	printf("thread done\n");
 	

@@ -52,7 +52,7 @@ int utSpatial();
 int utSystem();
 int utTypes();
 int utTypesConversion();
-int utThreadAPR();
-int utFileAPR();
+int utThread();
+int utFile();
 
 #endif
