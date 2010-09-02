@@ -151,14 +151,14 @@ struct State {
 class GraphicsData {
 public:
 
-	typedef Vec3f	Vertex;
-	typedef Vec3f	Normal;
-	typedef Vec4f	Color;
-	typedef Vec2f	TexCoord2;
-	typedef Vec3f	TexCoord3;
+	typedef Vec3f			Vertex;
+	typedef Vec3f			Normal;
+	typedef Vec4f			Color;
+	typedef Vec2f			TexCoord2;
+	typedef Vec3f			TexCoord3;
 	typedef unsigned int	Index;
 
-	/// TODO!
+
 	GraphicsData(): mPrimitive(gfx::POINTS){}
 
 	/// Reset all buffers
@@ -189,16 +189,23 @@ public:
 	const Buffer<Index>& indices() const { return mIndices; }
 
 	void addIndex(unsigned int i){ indices().append(i); }
-	void addColor(float r, float g, float b, float a=1){ colors().append(Color(r,g,b,a)); }
-	void addColor(Color& v) { colors().append(v); }
-	void addNormal(float x, float y, float z=0){ normals().append(Normal(x,y,z)); }
-	void addNormal(Normal& v) { normals().append(v); }
-	void addTexCoord(float u, float v){ texCoord2s().append(TexCoord2(u,v)); }
-	void addTexCoord(float u, float v, float w){ texCoord3s().append(TexCoord3(u,v,w)); }
-	void addTexCoord(TexCoord2& v){ texCoord2s().append(v); }
-	void addTexCoord(TexCoord3& v){ texCoord3s().append(v); }
-	void addVertex(float x, float y, float z=0){ vertices().append(Vertex(x,y,z)); }
-	void addVertex(Vertex& v){ vertices().append(v); }
+
+	void addColor(float r, float g, float b, float a=1){ addColor(Color(r,g,b,a)); }
+	void addColor(const Color& v) { colors().append(v); }
+	void addColor(const al::Color& v) { addColor(v.r, v.g, v.b, v.a); }
+
+	void addNormal(float x, float y, float z=0){ addNormal(Normal(x,y,z)); }
+	void addNormal(const Normal& v) { normals().append(v); }
+
+	void addTexCoord(float u, float v){ addTexCoord(TexCoord2(u,v)); }
+	void addTexCoord(const TexCoord2& v){ texCoord2s().append(v); }
+	
+	void addTexCoord(float u, float v, float w){ addTexCoord(TexCoord3(u,v,w)); }
+	void addTexCoord(const TexCoord3& v){ texCoord3s().append(v); }
+
+	void addVertex(float x, float y, float z=0){ addVertex(Vertex(x,y,z)); }
+	void addVertex(const Vertex& v){ vertices().append(v); }
+
 	void primitive(Primitive prim){ mPrimitive=prim; }
 
 	Buffer<Vertex>& vertices(){ return mVertices; }
