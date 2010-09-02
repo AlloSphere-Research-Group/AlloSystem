@@ -401,12 +401,13 @@ private:
 					impl->mScheduled = false;
 				}
 			} else {
-                printf("no window\n");
+				//printf("no window\n");
 				impl->mScheduled = false;
 			}
-		} else {
-            printf("no window impl\n");
 		}
+//		else {
+//			printf("no window impl\n");
+//		}
 	}
 
 	// Map of windows constructed on first use to avoid static intialization

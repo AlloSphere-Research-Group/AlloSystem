@@ -226,14 +226,6 @@ public:
 	virtual void onResize(int w, int h){}		///< Called whenever window dimensions change
 	virtual void onVisibility(bool v){}			///< Called when window changes from hidden to shown and vice versa
 	
-//	virtual void onMouseDown(const Mouse& m){}	///< Called when a mouse button is pressed
-//	virtual void onMouseDrag(const Mouse& m){}	///< Called when the mouse moves while a button is down
-//	virtual void onMouseMove(const Mouse& m){}	///< Called when the mouse moves
-//	virtual void onMouseUp(const Mouse& m){}	///< Called when a mouse button is released
-//	
-//	virtual void onKeyDown(const Keyboard& k){}	///< Called when a keyboard key is pressed
-//	virtual void onKeyUp(const Keyboard& k){}	///< Called when a keyboard key is released
-	
 	bool cursorHide() const;					///< Whether the cursor is hidden
 	Dim dimensions() const;						///< Get current dimensions of window
 	bool enabled(DisplayMode::t v) const;		///< Get whether display mode flag is set
