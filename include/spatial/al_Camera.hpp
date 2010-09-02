@@ -13,8 +13,8 @@ namespace al {
 
 ///<	Utility wrapper of Pose for use as a 3D camera
 ///
-class Camera : public NavSmooth {
-//class Camera : public Nav {
+//class Camera : public NavSmooth {
+class Camera : public Nav {
 public:
 
 	enum Eye{
