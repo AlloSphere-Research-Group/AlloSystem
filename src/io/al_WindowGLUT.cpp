@@ -269,7 +269,7 @@ public:
 			key = remapKey(key, false);
 			win->mKeyboard.setKey(key, true);
 			setModifiers(win->mKeyboard);
-			win->onKeyDown(win->mKeyboard);
+			win->doKeyDown(win->mKeyboard);
 		}
 	}
 
@@ -279,7 +279,7 @@ public:
 			key = remapKey(key, false);
 			win->mKeyboard.setKey(key, false);
 			setModifiers(win->mKeyboard);
-			win->onKeyUp(win->mKeyboard);
+			win->doKeyUp(win->mKeyboard);
 		}
 	}
 
@@ -289,7 +289,7 @@ public:
 			key = remapKey(key, true);
 			win->mKeyboard.setKey(key, true);
 			setModifiers(win->mKeyboard);
-			win->onKeyDown(win->mKeyboard);
+			win->doKeyDown(win->mKeyboard);
 		}
 	}
 
@@ -299,7 +299,7 @@ public:
 			key = remapKey(key, true);
 			win->mKeyboard.setKey(key, false);
 			setModifiers(win->mKeyboard);
-			win->onKeyUp(win->mKeyboard);
+			win->doKeyUp(win->mKeyboard);
 		}
 	}
 
@@ -318,11 +318,11 @@ public:
 			Mouse& m = win->mMouse;
 			if(GLUT_DOWN == state){
 				m.position(ax, ay); m.button(btn, true);
-				win->onMouseDown(m);
+				win->doMouseDown(m);
 			}
 			else if(GLUT_UP == state){
 				m.position(ax, ay);	m.button(btn, false);
-				win->onMouseUp(m);
+				win->doMouseUp(m);
 			}
 		}
 	}
@@ -331,7 +331,7 @@ public:
 		WindowGL * win = getWindow();
 		if(win){
 			win->mMouse.position(ax,ay);
-			win->onMouseDrag(win->mMouse);
+			win->doMouseDrag(win->mMouse);
 		}
 	}
 
@@ -339,7 +339,7 @@ public:
 		WindowGL * win = getWindow();
 		if(win){
 			win->mMouse.position(ax,ay);
-			win->onMouseMove(win->mMouse);
+			win->doMouseMove(win->mMouse);
 		}
 	}
 

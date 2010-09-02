@@ -33,6 +33,9 @@
 
 namespace al{
 
+class WindowGL;
+
+
 // can redefine, but should be at least 4
 #ifndef AL_MOUSE_MAX_BUTTONS
 #define AL_MOUSE_MAX_BUTTONS 4
@@ -135,9 +138,11 @@ public:
 	
 	Mouse();
 	
-	int x() const;					///< Get x coordinate in screen pixels
-	int y() const;					///< Get y coordinate in screen pixels
-	
+	int x() const;					///< Get x position in screen pixels
+	int y() const;					///< Get y position in screen pixels
+	int dx() const;					///< Get change in x position in screen pixels
+	int dy() const;					///< Get change in y position in screen pixels
+
 	int button() const;				///< Get last clicked button
 	bool down() const;				///< Get state of last clicked button
 	bool down(int button) const;	///< Get state of a button
@@ -149,6 +154,7 @@ private:
 	friend class WindowImpl;
 
 	int mX, mY;						// x,y positions
+	int mDX, mDY;					// change in x,y positions
 	int mButton;					// most recent button changed
 	int mBX[AL_MOUSE_MAX_BUTTONS];	// button down xs
 	int mBY[AL_MOUSE_MAX_BUTTONS];	// button down ys
@@ -159,10 +165,33 @@ private:
 };
 
 
+/// Controller for handling input events
+struct InputEventHandler{
+	virtual ~InputEventHandler(){}
+
+	virtual void onKeyDown(const Keyboard& k){}	///< Called when a keyboard key is pressed
+	virtual void onKeyUp(const Keyboard& k){}	///< Called when a keyboard key is released
+
+	virtual void onMouseDown(const Mouse& m){}	///< Called when a mouse button is pressed
+	virtual void onMouseDrag(const Mouse& m){}	///< Called when the mouse moves while a button is down
+	virtual void onMouseMove(const Mouse& m){}	///< Called when the mouse moves
+	virtual void onMouseUp(const Mouse& m){}	///< Called when a mouse button is released
+
+	WindowGL& window(){ return *mWindow; }
+	const WindowGL& window() const { return *mWindow; }
+
+private:
+	friend class WindowGL;
+	WindowGL * mWindow;
+	InputEventHandler& window(WindowGL * v){ mWindow=v; return *this; }
+};
+
+
+
 // TODO: rename to Window
 
 /// Window with OpenGL context
-class WindowGL {
+class WindowGL : public InputEventHandler {
 public:
 
 	/// Window pixel dimensions
@@ -197,13 +226,13 @@ public:
 	virtual void onResize(int w, int h){}		///< Called whenever window dimensions change
 	virtual void onVisibility(bool v){}			///< Called when window changes from hidden to shown and vice versa
 	
-	virtual void onMouseDown(const Mouse& m){}	///< Called when a mouse button is pressed
-	virtual void onMouseDrag(const Mouse& m){}	///< Called when the mouse moves while a button is down
-	virtual void onMouseMove(const Mouse& m){}	///< Called when the mouse moves
-	virtual void onMouseUp(const Mouse& m){}	///< Called when a mouse button is released
-	
-	virtual void onKeyDown(const Keyboard& k){}	///< Called when a keyboard key is pressed
-	virtual void onKeyUp(const Keyboard& k){}	///< Called when a keyboard key is released
+//	virtual void onMouseDown(const Mouse& m){}	///< Called when a mouse button is pressed
+//	virtual void onMouseDrag(const Mouse& m){}	///< Called when the mouse moves while a button is down
+//	virtual void onMouseMove(const Mouse& m){}	///< Called when the mouse moves
+//	virtual void onMouseUp(const Mouse& m){}	///< Called when a mouse button is released
+//	
+//	virtual void onKeyDown(const Keyboard& k){}	///< Called when a keyboard key is pressed
+//	virtual void onKeyUp(const Keyboard& k){}	///< Called when a keyboard key is released
 	
 	bool cursorHide() const;					///< Whether the cursor is hidden
 	Dim dimensions() const;						///< Get current dimensions of window
@@ -244,14 +273,45 @@ public:
 	static void startLoop();
 	static void stopLoop();
 
+	WindowGL& add(InputEventHandler * v){
+		mEventHandlers.push_back(&(v->window(this)));
+		return *this;
+	}
+
 private:
 	friend class WindowImpl;
 
 	class WindowImpl * mImpl;
 	Keyboard mKeyboard;
 	Mouse mMouse;
-	
+	std::vector<InputEventHandler *> mEventHandlers;
+
+	#define CALL(e)\
+	e; for(unsigned i=0; i<mEventHandlers.size(); ++i){ mEventHandlers[i]->e; }
+	void doMouseDown(const Mouse& m){ CALL(onMouseDown(m)); }
+	void doMouseDrag(const Mouse& m){ CALL(onMouseDrag(m)); }
+	void doMouseMove(const Mouse& m){ CALL(onMouseMove(m)); }
+	void doMouseUp(const Mouse& m){ CALL(onMouseUp(m)); }
+	void doKeyDown(const Keyboard& k){ CALL(onKeyDown(k)); }
+	void doKeyUp(const Keyboard& k){ CALL(onKeyUp(k)); }
+	#undef CALL
+
 	void init();
+};
+
+
+
+struct StandardWindowKeyControls : InputEventHandler {
+	void onKeyDown(const Keyboard& k){
+		switch(k.key()){
+			case Key::Escape: window().fullScreenToggle(); break;
+			case 'q': if(k.ctrl()) WindowGL::stopLoop(); break;
+			//case 'w': if(k.ctrl()) window().destroy(); break;
+			case 'h': if(k.ctrl()) window().hide(); break;
+			case 'm': if(k.ctrl()) window().iconify(); break;
+			case 'c': if(k.ctrl()) window().cursorHideToggle(); break;
+		}
+	}
 };
 
 

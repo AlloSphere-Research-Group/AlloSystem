@@ -33,6 +33,8 @@ Mouse::Mouse(): mX(0), mY(0), mButton(Left){
 
 int Mouse::x() const { return mX; }
 int Mouse::y() const { return mY; }
+int Mouse::dx() const { return mDX; }
+int Mouse::dy() const { return mDY; }
 
 int Mouse::button() const { return mButton; }
 bool Mouse::down() const { return down(mButton); }
@@ -43,7 +45,7 @@ bool Mouse::right() const { return mB[Right]; }
 
 
 void Mouse::button(int b, bool v){ mButton=b; mB[b]=v; if(v){ mBX[b]=mX; mBY[b]=mY; } }
-void Mouse::position(int x, int y){ mX=x; mY=y; }
+void Mouse::position(int x, int y){ mDX=x-mX; mDY=y-mY; mX=x; mY=y; }
 
 
 void WindowGL::init(){
