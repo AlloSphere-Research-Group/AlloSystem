@@ -2,12 +2,6 @@
 
 namespace al{
 
-Nav :: Nav()
-:	Pose()
-{
-	updateUnitVectors();
-}
-
 Nav :: Nav(const Vec3d &v)
 :	Pose(v)
 {
