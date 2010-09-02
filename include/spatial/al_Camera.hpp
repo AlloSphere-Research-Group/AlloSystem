@@ -3,6 +3,7 @@
 
 #include "math/al_Vec.hpp"
 #include "math/al_Matrix4.hpp"
+#include "math/al_Frustum.hpp"
 #include "spatial/al_CoordinateFrame.hpp"
 
 //#include "math/al_Frustum.hpp"
@@ -62,6 +63,8 @@ public:
 
 	Matrix4d modelViewMatrix(Eye e=MONO);
 	Matrix4d projectionMatrix(Eye e=MONO);
+	
+	Frustumd frustum(Eye e=MONO);
 
 	double height(double distance);							///< Height of view at distance from camera
 

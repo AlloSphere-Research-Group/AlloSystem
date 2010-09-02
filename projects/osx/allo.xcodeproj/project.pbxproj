@@ -76,7 +76,6 @@
 		16D46565118F57970039A84C /* al_Printing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16D46563118F57970039A84C /* al_Printing.cpp */; };
 		16FE4B2111DB05AF002D3847 /* al_MainLoopGLUT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36AED02511D4638F000D98C9 /* al_MainLoopGLUT.cpp */; };
 		16FE4B2311DB05C1002D3847 /* al_MsgQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 365599FB11D4013600BA01E8 /* al_MsgQueue.cpp */; };
-		16FE4B2511DB05EE002D3847 /* al_Context.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 360C404511D32DDA002FE91F /* al_Context.cpp */; };
 		16FE4B3F11DB0E62002D3847 /* al_Ambisonics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16FE4B3E11DB0E62002D3847 /* al_Ambisonics.cpp */; };
 		3602B4D0110A67C9005DC3D0 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
 		3602B4D1110A67C9005DC3D0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
@@ -150,8 +149,6 @@
 		360C253511E65DCA000FF335 /* liballoclang.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C241B11E65929000FF335 /* liballoclang.a */; };
 		360C253811E65DF3000FF335 /* clangversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 360C23FE11E6591C000FF335 /* clangversion.cpp */; };
 		360C274F11E67E2E000FF335 /* exCompiler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 360C274E11E67E2E000FF335 /* exCompiler.cpp */; };
-		360C404111D32D3E002FE91F /* al_Context.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 360C404011D32D3E002FE91F /* al_Context.hpp */; };
-		360C404711D32DDA002FE91F /* al_Context.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 360C404511D32DDA002FE91F /* al_Context.cpp */; };
 		360C404F11D32FED002FE91F /* al_Matrix4.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 360C404E11D32FED002FE91F /* al_Matrix4.hpp */; };
 		361BF1A511DEBA3A00E60A9C /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		361BF1A611DEBA3A00E60A9C /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
@@ -667,8 +664,6 @@
 		360C24AF11E659D3000FF335 /* libplugin_llvmc_Base.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libplugin_llvmc_Base.a; sourceTree = "<group>"; };
 		360C24B011E659D3000FF335 /* libplugin_llvmc_Clang.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libplugin_llvmc_Clang.a; sourceTree = "<group>"; };
 		360C274E11E67E2E000FF335 /* exCompiler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exCompiler.cpp; sourceTree = "<group>"; };
-		360C404011D32D3E002FE91F /* al_Context.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Context.hpp; sourceTree = "<group>"; };
-		360C404511D32DDA002FE91F /* al_Context.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Context.cpp; sourceTree = "<group>"; };
 		360C404E11D32FED002FE91F /* al_Matrix4.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Matrix4.hpp; sourceTree = "<group>"; };
 		361BF02F11DEA66600E60A9C /* al_BufferObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_BufferObject.hpp; sourceTree = "<group>"; };
 		361BF03111DEAA9400E60A9C /* al_FBO.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_FBO.hpp; sourceTree = "<group>"; };
@@ -1199,7 +1194,6 @@
 			children = (
 				361BF02F11DEA66600E60A9C /* al_BufferObject.hpp */,
 				16AA95E5118F6EEF00B98EC3 /* al_Config.h */,
-				360C404011D32D3E002FE91F /* al_Context.hpp */,
 				16AA95E8118F6EEF00B98EC3 /* al_Common.hpp */,
 				16AA95FE118F760C00B98EC3 /* al_Debug.hpp */,
 				16AA95E9118F6EEF00B98EC3 /* al_GPUObject.hpp */,
@@ -1220,7 +1214,6 @@
 		16AA95F0118F74FB00B98EC3 /* graphics */ = {
 			isa = PBXGroup;
 			children = (
-				360C404511D32DDA002FE91F /* al_Context.cpp */,
 				16AA95FF118F76B800B98EC3 /* al_Debug.cpp */,
 				36F596741211D5F8003B78B5 /* al_Image.cpp */,
 				160FD0E011FA1CF4001E8987 /* al_Isosurface.cpp */,
@@ -1913,7 +1906,6 @@
 				16BC66A5117770BF002A0C18 /* al_Functions.hpp in Headers */,
 				16BC66A6117770BF002A0C18 /* al_Interpolation.hpp in Headers */,
 				166DD742117CDB6000A8BA12 /* al_Conversion.hpp in Headers */,
-				360C404111D32D3E002FE91F /* al_Context.hpp in Headers */,
 				360C404F11D32FED002FE91F /* al_Matrix4.hpp in Headers */,
 				362FA88D11D3F5CC00AA2DC4 /* al_MainLoop.hpp in Headers */,
 				362FA89911D3FA6700AA2DC4 /* al_MsgQueue.hpp in Headers */,
@@ -2282,7 +2274,6 @@
 				36BAE1C411C2FAFF009A8BBD /* al_MainLoop.cpp in Sources */,
 				16FE4B2111DB05AF002D3847 /* al_MainLoopGLUT.cpp in Sources */,
 				16FE4B2311DB05C1002D3847 /* al_MsgQueue.cpp in Sources */,
-				16FE4B2511DB05EE002D3847 /* al_Context.cpp in Sources */,
 				36BAE1C511C2FAFF009A8BBD /* al_MainLoopOSX.mm in Sources */,
 				360BB6E611DB06E2000C2A42 /* al_Time.cpp in Sources */,
 				36BAE1C711C2FAFF009A8BBD /* al_OSC.cpp in Sources */,
@@ -2450,7 +2441,6 @@
 				16AA8EDF11C6F1D20053EFE1 /* al_Quat.cpp in Sources */,
 				16AA8EFD11C6FD200053EFE1 /* al_CoordinateFrame.cpp in Sources */,
 				16AA8F0311C6FE0B0053EFE1 /* al_Camera.cpp in Sources */,
-				360C404711D32DDA002FE91F /* al_Context.cpp in Sources */,
 				365599FC11D4013600BA01E8 /* al_MsgQueue.cpp in Sources */,
 				36C079A811D4964F00764E50 /* al_MainLoopOSX.mm in Sources */,
 				36AED02711D4638F000D98C9 /* al_MainLoopGLUT.cpp in Sources */,
