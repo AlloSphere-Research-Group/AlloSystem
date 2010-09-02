@@ -179,6 +179,8 @@ int utMath(){
 				4,5,6,
 				7,8,9
 		);
+		
+		a.transpose();	// data stored column-major
 
 		assert(a.col(0) == Vec3d(1,4,7));
 		assert(a.col(1) == Vec3d(2,5,8));
