@@ -5,7 +5,8 @@
 include ../Makefile.config
 include ../$(SRC_DIR)/$(IO_DIR)/Makefile.config
 
-SRCS =	utIOAudioIO.cpp \
+SRCS =	utFile.cpp \
+	utIOAudioIO.cpp \
 	utIOSocket.cpp \
 	utIOWindowGL.cpp \
 	utMath.cpp \

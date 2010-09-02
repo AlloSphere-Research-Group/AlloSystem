@@ -27,7 +27,7 @@ int utFile() {
 		
 		char * read = f.readAll();
 		
-		assert(f.size() == strlen(text));
+		assert(f.size() == (int)strlen(text));
 		
 		for(int i=0; i<f.size(); ++i){
 			assert(read[i] == text[i]);

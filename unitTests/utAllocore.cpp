@@ -9,13 +9,13 @@ int main(){
 	utSystem();
 //	utProtocolOSC();
 	utProtocolSerialize();
-//
+
 //	utIOAudioIO();
 //	utIOWindowGL();
 	utIOSocket();
 	utFile();
 //	utThread();
-	
+
 //	utProtocolGraphics();
 
 	return 0;
