@@ -48,7 +48,7 @@ public:
 	enum{ OUTSIDE, INTERSECT, INSIDE };
 
 	Plane<T> pl[6];
-	Vec3<T> ntl,ntr,nbl,nbr,ftl,ftr,fbl,fbr;	// frustrum vertices
+	Vec3<T> ntl,ntr,nbl,nbr,ftl,ftr,fbl,fbr;	// frustum vertices
 //	T mNear, mFar;			// clipping z distances
 //	T mRatio;				// aspect ratio
 //	T mAngle, mTanFOV;		// lens angle, tan(field of view)
