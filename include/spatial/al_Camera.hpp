@@ -6,7 +6,6 @@
 #include "math/al_Frustum.hpp"
 #include "spatial/al_CoordinateFrame.hpp"
 
-//#include "math/al_Frustum.hpp"
 //#include "math/al_Plane.hpp"
 //#include "math/al_Quat.hpp"
 
@@ -14,7 +13,8 @@ namespace al {
 
 ///<	Utility wrapper of Pose for use as a 3D camera
 ///
-class Camera : public Nav {
+class Camera : public NavSmooth {
+//class Camera : public Nav {
 public:
 
 	enum Eye{
@@ -26,7 +26,7 @@ public:
 
 	Camera(
 		double fovy=30,
-		double nearClip=0.01,
+		double nearClip=0.1,
 		double farClip=100,
 		double focalLength=6,
 		double eyeSep=0.02,

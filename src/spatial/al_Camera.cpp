@@ -11,7 +11,7 @@ Camera :: Camera(
 	double eyeSep,
 	double aspectRatio
 )
-:	Nav(Vec3d(0, 0, -4)),
+:	NavSmooth(Vec3d(0, 0, -4)),
 	mFovy(fovy),
 	mNear(nearClip),
 	mFar(farClip),
