@@ -31,6 +31,7 @@ protected:
 
 
 /// Shader object
+/// A shader object represents your source code. You are able to pass your source code to a shader object and compile the shader object. 
 class Shader : public ShaderBase{
 public:
 
@@ -59,6 +60,8 @@ private:
 
 
 /// Shader program object
+/// A program object represents a useable part of render pipeline. 
+/// Links shaders to one program object
 class ShaderProgram : public ShaderBase{
 public:
 	ShaderProgram(){}
