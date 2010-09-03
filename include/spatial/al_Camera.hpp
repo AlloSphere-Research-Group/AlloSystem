@@ -6,9 +6,6 @@
 #include "math/al_Frustum.hpp"
 #include "spatial/al_CoordinateFrame.hpp"
 
-//#include "math/al_Plane.hpp"
-//#include "math/al_Quat.hpp"
-
 namespace al {
 
 ///<	Utility wrapper of Pose for use as a 3D camera
