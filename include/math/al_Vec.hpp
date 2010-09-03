@@ -596,7 +596,7 @@ struct Vec2 : public Vec<2,T> {
 	typedef Vec<2,T> Base;
 
 	Vec2(const Base& v=Base()){ *this = v; }
-	Vec2(const T& x, const T& y){ set(x,y); }
+	Vec2(const T& x, const T& y){ Base::set(x,y); }
 
 	Vec2& operator= (const Base& v){ Base::set(v); return *this; }
 };
@@ -624,7 +624,7 @@ struct Vec4 : public Vec<4,T> {
 	typedef Vec<4,T> Base;
 	
 	Vec4(const Base& v=Base()){ *this = v; }
-	Vec4(const T& x, const T& y, const T& z, const T& w){ set(x,y,z,w); }
+	Vec4(const T& x, const T& y, const T& z, const T& w){ Base::set(x,y,z,w); }
 	
 	Vec4& operator= (const Base& v){ Base::set(v); return *this; }
 

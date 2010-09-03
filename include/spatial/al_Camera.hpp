@@ -63,7 +63,6 @@ public:
 
 	Matrix4d modelViewMatrix(Eye e=MONO);
 	Matrix4d projectionMatrix(Eye e=MONO);
-	
 	Frustumd frustum(Eye e=MONO);
 
 	double height(double distance);							///< Height of view at distance from camera

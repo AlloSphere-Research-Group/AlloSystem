@@ -327,7 +327,15 @@ template<> inline char abs(char v){ return labs(v); }
 template<> inline short abs(short v){ return labs(v); }
 template<> inline int abs(int v){ return labs(v); }
 template<> inline long abs(long v){ return labs(v); }
-template<> inline long long abs(long long v){ return llabs(v); }
+/*
+Call of overloaded 'llabs(long long int&)' is ambiguous in ../../include/math/al_Functions.hpp
+
+/Developer/SDKs/MacOSX10.5.sdk/usr/include/stdlib.h:166:0 /Developer/SDKs/MacOSX10.5.sdk/usr/include/stdlib.h:166: note: candidates are: long long int llabs(long long int)
+
+/Developer/SDKs/MacOSX10.5.sdk/usr/include/c++/4.2.1/cstdlib:172:0 /Developer/SDKs/MacOSX10.5.sdk/usr/include/c++/4.2.1/cstdlib:172: note:                 long long int __gnu_cxx::llabs(long long int)
+
+*/
+//template<> inline long long abs(long long v){ return llabs(v); }
 
 TEM inline T atLeast(T v, T e){	return (v >= T(0)) ? max(v, e) : min(v, -e); }
 

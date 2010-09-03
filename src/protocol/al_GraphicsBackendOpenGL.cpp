@@ -4,6 +4,47 @@
 namespace al{
 namespace gfx{
 
+void GraphicsBackendOpenGL::gl_error(const char *msg) {
+	GLenum err = glGetError();
+
+	switch(err) {
+		case GL_INVALID_ENUM:
+			printf("%s:\n %s\n", msg, "An unacceptable value is specified for an enumerated argument. The offending command is ignored and has no other side effect than to set the error flag.");
+			break;
+
+		case GL_INVALID_VALUE:
+			printf("%s:\n %s\n", msg, "A numeric argument is out of range. The offending command is ignored and has no other side effect than to set the error flag.");
+			break;
+
+		case GL_INVALID_OPERATION:
+			printf("%s:\n %s\n", msg, "The specified operation is not allowed in the current state. The offending command is ignored and has no other side effect than to set the error flag.");
+			break;
+
+		case GL_STACK_OVERFLOW:
+			printf("%s:\n %s\n", msg, "This command would cause a stack overflow. The offending command is ignored and has no other side effect than to set the error flag.");
+			break;
+
+		case GL_STACK_UNDERFLOW:
+			printf("%s:\n %s\n", msg, "This command would cause a stack underflow. The offending command is ignored and has no other side effect than to set the error flag.");
+			break;
+
+		case GL_OUT_OF_MEMORY:
+			printf("%s:\n %s\n", msg, "There is not enough memory left to execute the command.  The state of the GL is undefined, except for the state of the error flags, after this error is recorded.");
+			break;
+
+		case GL_TABLE_TOO_LARGE:
+			printf("%s:\n %s\n", msg, "The specified table exceeds the implementation's maximum supported table size.  The offending command is ignored and has no other side effect than to set the error flag.");
+			break;
+
+		case GL_NO_ERROR:
+			break;
+
+		default:
+			break;
+	}
+}
+
+
 Texture::Target check_target(GraphicsBackendOpenGL *backend, Texture::Target target);
 GLenum target_from_texture_target(GraphicsBackendOpenGL *backend, Texture::Target target);
 void clamp_texture_dimensions(GraphicsBackendOpenGL *backend, Texture::Target target, int &w, int &h, int &d);
@@ -174,6 +215,23 @@ void GraphicsBackendOpenGL::setProjectionMatrix(Matrix4d &m) {
 void GraphicsBackendOpenGL::setModelviewMatrix(Matrix4d &m) {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrixd(m.elems);
+}
+
+GLenum GraphicsBackendOpenGL::type_for_lattice_type(AlloTy type) {
+	switch(type) {
+		case AlloFloat32Ty: return GL_FLOAT;
+		case AlloFloat64Ty: return GL_DOUBLE;
+
+		case AlloSInt8Ty:	return GL_BYTE;
+		case AlloSInt16Ty:	return GL_SHORT;
+		case AlloSInt32Ty:	return GL_INT;
+		
+		case AlloUInt8Ty:	return GL_UNSIGNED_BYTE;
+		case AlloUInt16Ty:	return GL_UNSIGNED_SHORT;
+		case AlloUInt32Ty:	return GL_UNSIGNED_INT;
+	}
+	
+	return GL_BYTE;
 }
 
 Texture::Target check_target(GraphicsBackendOpenGL *backend, Texture::Target target) {

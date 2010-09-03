@@ -31,6 +31,8 @@ namespace gfx{
 
 class GraphicsBackendOpenGL : public GraphicsBackend {
 public:
+	static void gl_error(const char *msg);
+	static GLenum type_for_lattice_type(AlloTy type);
 
 	struct SurfaceData{
 		SurfaceData()

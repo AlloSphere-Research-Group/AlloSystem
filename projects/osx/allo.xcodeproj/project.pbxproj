@@ -300,6 +300,19 @@
 		36D69A4B11F9264700699158 /* al_Surface.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36D69A4A11F9264700699158 /* al_Surface.hpp */; };
 		36D69A5311F9267800699158 /* al_Surface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36D69A5211F9267800699158 /* al_Surface.cpp */; };
 		36E4155811E99BED00A8A63D /* al_ThreadAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36E4155711E99BED00A8A63D /* al_ThreadAPR.cpp */; };
+		36F0ABC012319586000A8EBF /* al_ShaderAttribute.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F0ABBA12319586000A8EBF /* al_ShaderAttribute.cpp */; };
+		36F0ABC112319586000A8EBF /* al_ShaderBackend.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F0ABBB12319586000A8EBF /* al_ShaderBackend.cpp */; };
+		36F0ABC212319586000A8EBF /* al_ShaderBackendGLSL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F0ABBC12319586000A8EBF /* al_ShaderBackendGLSL.cpp */; };
+		36F0ABC312319586000A8EBF /* al_ShaderParam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F0ABBD12319586000A8EBF /* al_ShaderParam.cpp */; };
+		36F0ABC412319586000A8EBF /* al_ShaderProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F0ABBE12319586000A8EBF /* al_ShaderProgram.cpp */; };
+		36F0ABC512319586000A8EBF /* al_ShaderAttribute.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F0ABBA12319586000A8EBF /* al_ShaderAttribute.cpp */; };
+		36F0ABC612319586000A8EBF /* al_ShaderBackend.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F0ABBB12319586000A8EBF /* al_ShaderBackend.cpp */; };
+		36F0ABC712319586000A8EBF /* al_ShaderBackendGLSL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F0ABBC12319586000A8EBF /* al_ShaderBackendGLSL.cpp */; };
+		36F0ABC812319586000A8EBF /* al_ShaderParam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F0ABBD12319586000A8EBF /* al_ShaderParam.cpp */; };
+		36F0ABC912319586000A8EBF /* al_ShaderProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F0ABBE12319586000A8EBF /* al_ShaderProgram.cpp */; };
+		36F0ABD1123195F2000A8EBF /* liblua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F0ABD0123195F2000A8EBF /* liblua.a */; };
+		36F0ABD2123195F2000A8EBF /* liblua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F0ABD0123195F2000A8EBF /* liblua.a */; };
+		36F0ABE612319709000A8EBF /* lua_utility.h in Headers */ = {isa = PBXBuildFile; fileRef = 36F0ABE512319709000A8EBF /* lua_utility.h */; };
 		36F2568C121FBF36008C4597 /* al_Memory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F2568B121FBF36008C4597 /* al_Memory.cpp */; };
 		36F2568D121FBF36008C4597 /* al_Memory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F2568B121FBF36008C4597 /* al_Memory.cpp */; };
 		36F46824110BE2E90082D21E /* al_AudioIO.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36F46821110BE2E90082D21E /* al_AudioIO.hpp */; };
@@ -785,6 +798,20 @@
 		36D69A4A11F9264700699158 /* al_Surface.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Surface.hpp; sourceTree = "<group>"; };
 		36D69A5211F9267800699158 /* al_Surface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Surface.cpp; sourceTree = "<group>"; };
 		36E4155711E99BED00A8A63D /* al_ThreadAPR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_ThreadAPR.cpp; sourceTree = "<group>"; };
+		36F0ABBA12319586000A8EBF /* al_ShaderAttribute.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_ShaderAttribute.cpp; sourceTree = "<group>"; };
+		36F0ABBB12319586000A8EBF /* al_ShaderBackend.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_ShaderBackend.cpp; sourceTree = "<group>"; };
+		36F0ABBC12319586000A8EBF /* al_ShaderBackendGLSL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_ShaderBackendGLSL.cpp; sourceTree = "<group>"; };
+		36F0ABBD12319586000A8EBF /* al_ShaderParam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_ShaderParam.cpp; sourceTree = "<group>"; };
+		36F0ABBE12319586000A8EBF /* al_ShaderProgram.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_ShaderProgram.cpp; sourceTree = "<group>"; };
+		36F0ABBF12319586000A8EBF /* Makefile.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.config; sourceTree = "<group>"; };
+		36F0ABCA123195D5000A8EBF /* al_ShaderAttribute.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_ShaderAttribute.hpp; sourceTree = "<group>"; };
+		36F0ABCB123195D5000A8EBF /* al_ShaderBackend.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_ShaderBackend.hpp; sourceTree = "<group>"; };
+		36F0ABCC123195D5000A8EBF /* al_ShaderBackendGLSL.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_ShaderBackendGLSL.hpp; sourceTree = "<group>"; };
+		36F0ABCD123195D5000A8EBF /* al_ShaderParam.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_ShaderParam.hpp; sourceTree = "<group>"; };
+		36F0ABCE123195D5000A8EBF /* al_ShaderProgram.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_ShaderProgram.hpp; sourceTree = "<group>"; };
+		36F0ABCF123195D5000A8EBF /* al_Slab.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Slab.hpp; sourceTree = "<group>"; };
+		36F0ABD0123195F2000A8EBF /* liblua.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = liblua.a; sourceTree = "<group>"; };
+		36F0ABE512319709000A8EBF /* lua_utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lua_utility.h; sourceTree = "<group>"; };
 		36F2568A121FBE8A008C4597 /* al_Memory.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Memory.hpp; sourceTree = "<group>"; };
 		36F2568B121FBF36008C4597 /* al_Memory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Memory.cpp; sourceTree = "<group>"; };
 		36F46821110BE2E90082D21E /* al_AudioIO.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_AudioIO.hpp; sourceTree = "<group>"; };
@@ -847,6 +874,7 @@
 				16AC5365116293100076AA8B /* GLUT.framework in Frameworks */,
 				16B5C1741189020B0090CE80 /* libapr-1.a in Frameworks */,
 				36F596521211D58B003B78B5 /* libfreeimage.a in Frameworks */,
+				36F0ABD2123195F2000A8EBF /* liblua.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1036,6 +1064,7 @@
 				16AC5313116290AA0076AA8B /* AudioUnit.framework in Frameworks */,
 				16AC531B116290BE0076AA8B /* AudioToolbox.framework in Frameworks */,
 				36F596511211D58B003B78B5 /* libfreeimage.a in Frameworks */,
+				36F0ABD1123195F2000A8EBF /* liblua.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1140,6 +1169,7 @@
 			isa = PBXGroup;
 			children = (
 				1685D3C111C2EDB5009F676C /* al_ImplAPR.h */,
+				36F0ABE512319709000A8EBF /* lua_utility.h */,
 			);
 			path = private;
 			sourceTree = "<group>";
@@ -1202,6 +1232,12 @@
 				16AA95EA118F6EEF00B98EC3 /* al_Light.hpp */,
 				36F598FB12122617003B78B5 /* al_Model.hpp */,
 				16AA967E118F7D5700B98EC3 /* al_Shader.hpp */,
+				36F0ABCA123195D5000A8EBF /* al_ShaderAttribute.hpp */,
+				36F0ABCB123195D5000A8EBF /* al_ShaderBackend.hpp */,
+				36F0ABCC123195D5000A8EBF /* al_ShaderBackendGLSL.hpp */,
+				36F0ABCD123195D5000A8EBF /* al_ShaderParam.hpp */,
+				36F0ABCE123195D5000A8EBF /* al_ShaderProgram.hpp */,
+				36F0ABCF123195D5000A8EBF /* al_Slab.hpp */,
 				16AA960B118F775E00B98EC3 /* al_Texture.hpp */,
 				367F0B3812034EDB00FCC534 /* al_Stereographic.hpp */,
 				36D69A4A11F9264700699158 /* al_Surface.hpp */,
@@ -1214,6 +1250,7 @@
 		16AA95F0118F74FB00B98EC3 /* graphics */ = {
 			isa = PBXGroup;
 			children = (
+				36F0ABBF12319586000A8EBF /* Makefile.config */,
 				16AA95FF118F76B800B98EC3 /* al_Debug.cpp */,
 				36F596741211D5F8003B78B5 /* al_Image.cpp */,
 				160FD0E011FA1CF4001E8987 /* al_Isosurface.cpp */,
@@ -1221,6 +1258,11 @@
 				36F598FC12122628003B78B5 /* al_Model.cpp */,
 				16AA9609118F774800B98EC3 /* al_Texture.cpp */,
 				16AA967F118F7D6600B98EC3 /* al_Shader.cpp */,
+				36F0ABBA12319586000A8EBF /* al_ShaderAttribute.cpp */,
+				36F0ABBB12319586000A8EBF /* al_ShaderBackend.cpp */,
+				36F0ABBC12319586000A8EBF /* al_ShaderBackendGLSL.cpp */,
+				36F0ABBD12319586000A8EBF /* al_ShaderParam.cpp */,
+				36F0ABBE12319586000A8EBF /* al_ShaderProgram.cpp */,
 				367F0B3A12034EED00FCC534 /* al_Stereographic.cpp */,
 				36D69A5211F9267800699158 /* al_Surface.cpp */,
 			);
@@ -1754,6 +1796,7 @@
 				360C245E11E659D3000FF335 /* llvm */,
 				36F46844110BE34D0082D21E /* libportaudio.a */,
 				36B4129810EFF864007B16D0 /* libapr-1.a */,
+				36F0ABD0123195F2000A8EBF /* liblua.a */,
 				36F596501211D58B003B78B5 /* libfreeimage.a */,
 			);
 			path = lib;
@@ -1911,6 +1954,7 @@
 				362FA89911D3FA6700AA2DC4 /* al_MsgQueue.hpp in Headers */,
 				36D69A4B11F9264700699158 /* al_Surface.hpp in Headers */,
 				367F0B3912034EDB00FCC534 /* al_Stereographic.hpp in Headers */,
+				36F0ABE612319709000A8EBF /* lua_utility.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2324,6 +2368,11 @@
 				16054DBB122E12010039003C /* al_FileAPR.cpp in Sources */,
 				16054DC2122E13360039003C /* utThread.cpp in Sources */,
 				16054DC3122E13360039003C /* utFile.cpp in Sources */,
+				36F0ABC512319586000A8EBF /* al_ShaderAttribute.cpp in Sources */,
+				36F0ABC612319586000A8EBF /* al_ShaderBackend.cpp in Sources */,
+				36F0ABC712319586000A8EBF /* al_ShaderBackendGLSL.cpp in Sources */,
+				36F0ABC812319586000A8EBF /* al_ShaderParam.cpp in Sources */,
+				36F0ABC912319586000A8EBF /* al_ShaderProgram.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2453,6 +2502,11 @@
 				36F598FE12122628003B78B5 /* al_Model.cpp in Sources */,
 				36F2568C121FBF36008C4597 /* al_Memory.cpp in Sources */,
 				16054DBC122E12010039003C /* al_FileAPR.cpp in Sources */,
+				36F0ABC012319586000A8EBF /* al_ShaderAttribute.cpp in Sources */,
+				36F0ABC112319586000A8EBF /* al_ShaderBackend.cpp in Sources */,
+				36F0ABC212319586000A8EBF /* al_ShaderBackendGLSL.cpp in Sources */,
+				36F0ABC312319586000A8EBF /* al_ShaderParam.cpp in Sources */,
+				36F0ABC412319586000A8EBF /* al_ShaderProgram.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

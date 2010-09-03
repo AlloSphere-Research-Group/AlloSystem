@@ -376,7 +376,6 @@ public:
 		#undef DOUBLE_FLOOR
 	}
 
-	
 	// writes the plane values from val array into lattice
 	template<typename T> void write1d(T* val, double x) {
 	
