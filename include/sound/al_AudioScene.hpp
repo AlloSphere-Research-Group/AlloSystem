@@ -14,7 +14,7 @@ namespace al{
 
 
 
-class Listener : public NavRef {
+class Listener : public Nav {
 public:
 
 	Listener& numSpeakers(int num){ mDecoder.numSpeakers(num); return *this; }
@@ -44,7 +44,7 @@ protected:
 
 
 
-class SoundSource : public NavRef {
+class SoundSource : public Nav {
 public:
 	SoundSource(int bufSize=1024): mSound(bufSize)
 	{}

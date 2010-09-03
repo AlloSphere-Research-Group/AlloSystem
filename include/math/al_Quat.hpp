@@ -137,6 +137,7 @@ public:
 
 	/// Convert to Euler angles as T[3]
 	void toEuler(T * e) const;
+	void toEuler(Vec3<T> & v) const;
 	void toVectorX(T * x, T * y, T * z) const;
 	void toVectorY(T * x, T * y, T * z) const;
 	void toVectorZ(T * x, T * y, T * z) const;
@@ -393,6 +394,7 @@ inline void Quat<T> :: toAxisAngle(T * aa, T * ax, T * ay, T * az) const {
   }
 }
 
+
 template<typename T>
 inline void Quat<T> :: toEuler(T * e) const {
 	// http://www.mathworks.com/access/helpdesk/help/toolbox/aeroblks/quaternionstoeulerangles.html
@@ -403,6 +405,18 @@ inline void Quat<T> :: toEuler(T * e) const {
 	e[0] = M_RAD2DEG * asin(-2.0 * (x*z - w*y));
 	e[1] = M_RAD2DEG * atan2(2.0 * (y*z + w*x),(sqw - sqx - sqy + sqz));
 	e[2] = M_RAD2DEG * atan2(2.0 * (x*y + w*z), (sqw + sqx - sqy - sqz));
+}
+
+template<typename T>
+inline void Quat<T> :: toEuler(Vec3<T> & v) const {
+	// http://www.mathworks.com/access/helpdesk/help/toolbox/aeroblks/quaternionstoeulerangles.html
+	T sqw = w*w;
+	T sqx = x*x;
+	T sqy = y*y;
+	T sqz = z*z;
+	v[1] = M_RAD2DEG * asin(-2.0 * (x*z - w*y));
+	v[0] = M_RAD2DEG * atan2(2.0 * (y*z + w*x),(sqw - sqx - sqy + sqz));
+	v[2] = M_RAD2DEG * atan2(2.0 * (x*y + w*z), (sqw + sqx - sqy - sqz));
 }
 
 template<typename T>

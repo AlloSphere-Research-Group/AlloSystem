@@ -33,6 +33,9 @@ public:
 		mQuat[0]=v[0]; mQuat[1]=v[1]; mQuat[2]=v[2]; mQuat[3]=v[3];
 		return *this;
 	}
+	
+	// get the azimuth, elevation & distance from this to another point
+	void toAED(const Vec3d& to, double& azimuth, double& elevation, double& distance) const;
 
 	// TODO: conversion operators for Pose->Vec3d, Pose->Quatd?	
 protected:
@@ -43,61 +46,11 @@ protected:
 
 ///<	A mobile coordinate frame
 ///		A Pose that knows how to accumulate velocities
+/// Smooth navigation with adjustable linear and angular velocity
 class Nav : public Pose {
 public:
 
-	Nav(const Vec3d &v = Vec3d(0));
-
-	const Vec3d& ux() const { return mUX; }
-	const Vec3d& uy() const { return mUY; }
-	const Vec3d& uz() const { return mUZ; }
-	Pose& vel(){ return mVel; }
-	const Pose& vel() const { return mVel; }
-	
-	/// Update coordinate frame basis vectors based on internal quaternion
-	void updateUnitVectors();
-	
-	/// accumulate pose based on velocity
-	void step(double dt);
-	/// accumulate pose based on velocity (faster path for dt == 1)
-	void step();
-	
-	/// scale the velocities by amt:
-	void decay(double amt);
-
-	void view(const Quatd & v);
-	void turn(const Quatd & v);
-
-	void move(double x, double y, double z) { moveX(x); moveY(y); moveZ(z); }
-	void moveX(double amount) { vel().vec()[0] = amount; }
-	void moveY(double amount) { vel().vec()[1] = amount; }
-	void moveZ(double amount) { vel().vec()[2] = amount; }
-	
-	void push(double x, double y, double z) { pushX(x); pushY(y); pushZ(z); }
-	void pushX(double amount) { vel().vec()[0] += amount; }
-	void pushY(double amount) { vel().vec()[1] += amount; }
-	void pushZ(double amount) { vel().vec()[2] += amount; }
-
-	//void	rotateX(double amount) { vel().quat()
-	
-	void halt();
-	void home();
-	
-	// get the azimuth, elevation & distance from this to another point
-	void toAED(const Vec3d& to, double& azimuth, double& elevation, double& distance) const;
-	
-protected:
-	Pose mVel;
-	Vec3d mUX, mUY, mUZ; // unit vectors for the current pose
-};
-
-
-
-/// Smooth navigation with adjustable linear and angular velocity
-class NavSmooth : public Pose {
-public:
-
-	NavSmooth(const Vec3d &position = Vec3d(0), double smooth=0.85, double turnRate=2)
+	Nav(const Vec3d &position = Vec3d(0), double smooth=0.85, double turnRate=2)
 	:	Pose(position), mSmooth(smooth)
 	{	updateUnitVectors(); }
 
@@ -117,7 +70,17 @@ public:
 	}
 
 	/// Set smoothing amount [0,1)
-	NavSmooth& smooth(double v){ mSmooth=v; return *this; }
+	Nav& smooth(double v){ mSmooth=v; return *this; }
+	
+	
+	void view(const Quatd & v) {
+		quat(v);
+		updateUnitVectors();
+	}
+	
+	void turn(const Quatd & v) {
+		v.toEuler(mSpin1);
+	}
 
 	/// Set linear velocity
 	void move(double x, double y, double z) { moveX(x); moveY(y); moveZ(z); }
@@ -142,10 +105,10 @@ public:
 	void turnZ(double v){ mTurn[2] = v; }
 
 	/// Stop moving and spinning
-	NavSmooth& halt(){ mMove0.set(0); mSpin0.set(0); return *this; }
+	Nav& halt(){ mMove0.set(0); mSpin0.set(0); return *this; }
 
 	/// Go to origin and reset orientation to identity
-	NavSmooth& home(){ 
+	Nav& home(){ 
 		quat().identity();
 		vec().set(0);
 		updateUnitVectors();
@@ -190,56 +153,24 @@ protected:
 
 
 
-
-class NavRef : public Nav {
-public:
-	NavRef()
-	: mParent(0)
-	{}
-
-	void parent(Nav * v){ mParent = v; }
-
-	Nav * parent(){ return mParent; }
-
-protected:
-	Nav * mParent;
-};
+//
+//class NavRef : public Nav {
+//public:
+//	NavRef()
+//	: mParent(0)
+//	{}
+//
+//	void parent(Nav * v){ mParent = v; }
+//
+//	Nav * parent(){ return mParent; }
+//
+//protected:
+//	Nav * mParent;
+//};
 
 
 // Implementation --------------------------------------------------------------
 
-inline void Nav :: updateUnitVectors() {
-	mQuat.normalize();
-	mQuat.toVectorX(mUX);
-	mQuat.toVectorY(mUY);
-	mQuat.toVectorZ(mUZ);
-}
-
-inline void Nav :: decay(double amt) {
-	mVel.vec() *= amt;
-	mVel.quat() *= amt;
-	updateUnitVectors();
-}
-
-inline void Nav :: view(const Quatd & v) { 
-	quat().set(v);
-	updateUnitVectors();
-}
-
-inline void Nav :: turn(const Quatd & v) {
-	vel().quat().set(v);
-}
-
-inline void Nav :: halt() {
-	vel().quat().identity();
-	vel().vec().set(0);
-}
-
-inline void Nav :: home() {
-	quat().identity();
-	vec().set(0);
-	updateUnitVectors();
-}
 
 
 } // al::

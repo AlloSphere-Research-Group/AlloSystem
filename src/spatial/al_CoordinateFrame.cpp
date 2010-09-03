@@ -2,39 +2,39 @@
 
 namespace al{
 
-Nav :: Nav(const Vec3d &v)
-:	Pose(v)
-{
-	updateUnitVectors();
-}
+//Nav :: Nav(const Vec3d &v)
+//:	Pose(v)
+//{
+//	updateUnitVectors();
+//}
+//
+//void Nav :: step() {
+//	// accumulate orientation:
+//	mQuat = mQuat * vel().quat();
+//	updateUnitVectors();
+//	
+//	// accumulate position:
+//	for (int i=0; i<3; i++) {
+//		vec()[i] += vel().vec().dot(Vec3d(ux()[i], uy()[i], uz()[i]));
+//	}
+//
+//}
+//
+//void Nav :: step(double dt) {
+//	// accumulate orientation:
+//	Quatd q2(quat());
+//	q2 *= vel().quat();
+//	mQuat.slerp(q2, dt);
+//	updateUnitVectors();
+//	
+//	// accumulate position:
+//	for (int i=0; i<3; i++) {
+//		vec()[i] += dt * vel().vec().dot(Vec3d(ux()[i], uy()[i], uz()[i]));
+//	}
+//}
 
-void Nav :: step() {
-	// accumulate orientation:
-	mQuat = mQuat * vel().quat();
-	updateUnitVectors();
-	
-	// accumulate position:
-	for (int i=0; i<3; i++) {
-		vec()[i] += vel().vec().dot(Vec3d(ux()[i], uy()[i], uz()[i]));
-	}
 
-}
-
-void Nav :: step(double dt) {
-	// accumulate orientation:
-	Quatd q2(quat());
-	q2 *= vel().quat();
-	mQuat.slerp(q2, dt);
-	updateUnitVectors();
-	
-	// accumulate position:
-	for (int i=0; i<3; i++) {
-		vec()[i] += dt * vel().vec().dot(Vec3d(ux()[i], uy()[i], uz()[i]));
-	}
-}
-
-
-void Nav :: toAED(const Vec3d& to, double& azimuth, double& elevation, double& distance) const {
+void Pose :: toAED(const Vec3d& to, double& azimuth, double& elevation, double& distance) const {
 	
 	Vec3d rel = to - vec();
 	distance = rel.mag();
@@ -43,10 +43,16 @@ void Nav :: toAED(const Vec3d& to, double& azimuth, double& elevation, double& d
 	{
 		rel.normalize();
 		
+		Vec3d ux, uy, uz;
+		
+		quat().toVectorX(ux);
+		quat().toVectorY(uy);
+		quat().toVectorZ(uz);	
+		
 		// dot product of A & B vectors is the similarity or cosine:
-		double xness = rel.dot(mUX); 
-		double yness = rel.dot(mUY);
-		double zness = rel.dot(mUZ);
+		double xness = rel.dot(ux); 
+		double yness = rel.dot(uy);
+		double zness = rel.dot(uz);
 		
 		azimuth = -atan2(xness, zness);
 		elevation = asin(yness);
