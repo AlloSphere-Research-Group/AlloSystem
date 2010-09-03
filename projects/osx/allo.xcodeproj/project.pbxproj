@@ -40,7 +40,6 @@
 		16AA95F6118F74FB00B98EC3 /* al_Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95F2118F74FB00B98EC3 /* al_Light.cpp */; };
 		16AA9600118F76B800B98EC3 /* al_Debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95FF118F76B800B98EC3 /* al_Debug.cpp */; };
 		16AA960A118F774800B98EC3 /* al_Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA9609118F774800B98EC3 /* al_Texture.cpp */; };
-		16AA9680118F7D6600B98EC3 /* al_Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA967F118F7D6600B98EC3 /* al_Shader.cpp */; };
 		16AC52C911628EC50076AA8B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		16AC52D511628F860076AA8B /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
 		16AC52D611628F870076AA8B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
@@ -262,7 +261,6 @@
 		36BAE1DF11C2FAFF009A8BBD /* al_Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95F2118F74FB00B98EC3 /* al_Light.cpp */; };
 		36BAE1E011C2FAFF009A8BBD /* al_Debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95FF118F76B800B98EC3 /* al_Debug.cpp */; };
 		36BAE1E111C2FAFF009A8BBD /* al_Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA9609118F774800B98EC3 /* al_Texture.cpp */; };
-		36BAE1E211C2FAFF009A8BBD /* al_Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA967F118F7D6600B98EC3 /* al_Shader.cpp */; };
 		36BAE1E411C2FAFF009A8BBD /* al_SocketAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160DAE1211C1B1FE00C6905A /* al_SocketAPR.cpp */; };
 		36C079A811D4964F00764E50 /* al_MainLoopOSX.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF9116D527D00928703 /* al_MainLoopOSX.mm */; };
 		36C079B211D4966500764E50 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
@@ -538,7 +536,6 @@
 		16AA9609118F774800B98EC3 /* al_Texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Texture.cpp; sourceTree = "<group>"; };
 		16AA960B118F775E00B98EC3 /* al_Texture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Texture.hpp; sourceTree = "<group>"; };
 		16AA967E118F7D5700B98EC3 /* al_Shader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Shader.hpp; sourceTree = "<group>"; };
-		16AA967F118F7D6600B98EC3 /* al_Shader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Shader.cpp; sourceTree = "<group>"; };
 		16AC529711628D0E0076AA8B /* unitTests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = unitTests; sourceTree = BUILT_PRODUCTS_DIR; };
 		16AC529F11628D4D0076AA8B /* utAllocore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utAllocore.cpp; path = ../../unitTests/utAllocore.cpp; sourceTree = SOURCE_ROOT; };
 		16AC52A011628D4D0076AA8B /* utIOAudioIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utIOAudioIO.cpp; path = ../../unitTests/utIOAudioIO.cpp; sourceTree = SOURCE_ROOT; };
@@ -1232,7 +1229,6 @@
 				16AA95F2118F74FB00B98EC3 /* al_Light.cpp */,
 				36F598FC12122628003B78B5 /* al_Model.cpp */,
 				16AA9609118F774800B98EC3 /* al_Texture.cpp */,
-				16AA967F118F7D6600B98EC3 /* al_Shader.cpp */,
 				367F0B3A12034EED00FCC534 /* al_Stereographic.cpp */,
 				36D69A5211F9267800699158 /* al_Surface.cpp */,
 			);
@@ -2310,7 +2306,6 @@
 				36BAE1DF11C2FAFF009A8BBD /* al_Light.cpp in Sources */,
 				36BAE1E011C2FAFF009A8BBD /* al_Debug.cpp in Sources */,
 				36BAE1E111C2FAFF009A8BBD /* al_Texture.cpp in Sources */,
-				36BAE1E211C2FAFF009A8BBD /* al_Shader.cpp in Sources */,
 				36BAE1E411C2FAFF009A8BBD /* al_SocketAPR.cpp in Sources */,
 				36BAE06011C2F00F009A8BBD /* utAllocore.cpp in Sources */,
 				36BAE06111C2F00F009A8BBD /* utIOAudioIO.cpp in Sources */,
@@ -2450,7 +2445,6 @@
 				16AA95F6118F74FB00B98EC3 /* al_Light.cpp in Sources */,
 				16AA9600118F76B800B98EC3 /* al_Debug.cpp in Sources */,
 				16AA960A118F774800B98EC3 /* al_Texture.cpp in Sources */,
-				16AA9680118F7D6600B98EC3 /* al_Shader.cpp in Sources */,
 				160DAE1411C1B1FE00C6905A /* al_SocketAPR.cpp in Sources */,
 				16AA8EDF11C6F1D20053EFE1 /* al_Quat.cpp in Sources */,
 				16AA8EFD11C6FD200053EFE1 /* al_CoordinateFrame.cpp in Sources */,
