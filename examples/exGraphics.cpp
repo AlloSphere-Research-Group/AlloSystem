@@ -8,7 +8,6 @@
 #include "protocol/al_Graphics.hpp"
 #include "math/al_Random.hpp"
 #include "system/al_Time.hpp"
-#include "graphics/al_Context.hpp"
 #include "spatial/al_Camera.hpp"
 #include "protocol/al_GraphicsBackendOpenGL.hpp"
 

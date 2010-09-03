@@ -1,5 +1,5 @@
 #include "graphics/al_Shader.hpp"
-#include "lua_utility.h"
+#include "../private/lua_utility.h"
 #include <fstream>
 
 namespace al {

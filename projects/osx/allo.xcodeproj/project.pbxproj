@@ -2341,6 +2341,11 @@
 				36BAE1E011C2FAFF009A8BBD /* al_Debug.cpp in Sources */,
 				36BAE1E111C2FAFF009A8BBD /* al_Texture.cpp in Sources */,
 				36BAE1E211C2FAFF009A8BBD /* al_Shader.cpp in Sources */,
+				36F0ABC512319586000A8EBF /* al_ShaderAttribute.cpp in Sources */,
+				36F0ABC612319586000A8EBF /* al_ShaderBackend.cpp in Sources */,
+				36F0ABC712319586000A8EBF /* al_ShaderBackendGLSL.cpp in Sources */,
+				36F0ABC812319586000A8EBF /* al_ShaderParam.cpp in Sources */,
+				36F0ABC912319586000A8EBF /* al_ShaderProgram.cpp in Sources */,
 				36BAE1E411C2FAFF009A8BBD /* al_SocketAPR.cpp in Sources */,
 				36BAE06011C2F00F009A8BBD /* utAllocore.cpp in Sources */,
 				36BAE06111C2F00F009A8BBD /* utIOAudioIO.cpp in Sources */,
@@ -2368,11 +2373,6 @@
 				16054DBB122E12010039003C /* al_FileAPR.cpp in Sources */,
 				16054DC2122E13360039003C /* utThread.cpp in Sources */,
 				16054DC3122E13360039003C /* utFile.cpp in Sources */,
-				36F0ABC512319586000A8EBF /* al_ShaderAttribute.cpp in Sources */,
-				36F0ABC612319586000A8EBF /* al_ShaderBackend.cpp in Sources */,
-				36F0ABC712319586000A8EBF /* al_ShaderBackendGLSL.cpp in Sources */,
-				36F0ABC812319586000A8EBF /* al_ShaderParam.cpp in Sources */,
-				36F0ABC912319586000A8EBF /* al_ShaderProgram.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
