@@ -7,7 +7,7 @@ int utIOSocket(){
 	const char dataSend[] = "Hello World!";
 	char dataRecv[128];
 
-	SocketSend s(port, "ljp.local"); //, "127.0.0.1");
+	SocketSend s(port, "127.0.0.1");
 	SocketRecv r(port);
 
 	s.send(dataSend, sizeof(dataSend));
