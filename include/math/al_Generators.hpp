@@ -48,7 +48,7 @@ namespace gen{
 // This is needed since templates are not always smart about inheriting super members.
 #define INHERIT\
 	using Val<T>::val; using Val<T>::operator=;\
-	T   operator[](uint32_t i) const { return (*this)(); }
+	T   operator[](int i) const { return (*this)(); }
 
 
 /// Single value generator

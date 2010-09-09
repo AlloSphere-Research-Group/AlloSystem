@@ -116,7 +116,7 @@ Tv linear(Tf frac, const Tv& x, const Tv& y);
 template <class Tf, class Tv>
 Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z);
 
-template <class T> void linear(T * dst, const T * xs, const T * xp1s, uint32_t len, T frac);
+template <class T> void linear(T * dst, const T * xs, const T * xp1s, int len, T frac);
 
 /// Nearest neighbor interpolation.
 template <class Tf, class Tv>
@@ -236,8 +236,8 @@ inline Tv cubic(Tf f, const Tv& w, const Tv& x, const Tv& y, const Tv& z){
 }
 
 template <class T>
-void cubic(T * dst, const T * xm1s, const T * xs, const T * xp1s, const T * xp2s, uint32_t len, T f){
-	for(uint32_t i=0; i<len; ++i) dst[i] = cubic(f, xm1s[i], xs[i], xp1s[i], xp2s[i]);
+void cubic(T * dst, const T * xm1s, const T * xs, const T * xp1s, const T * xp2s, int len, T f){
+	for(int i=0; i<len; ++i) dst[i] = cubic(f, xm1s[i], xs[i], xp1s[i], xp2s[i]);
 }
 
 
@@ -293,10 +293,10 @@ inline Tv hermite(Tp f,
 
 
 template <class T> void lagrange(T * a, T delay, int order){
-	for(uint32_t i=0; i<=order; i++){
+	for(int i=0; i<=order; ++i){
 		T coef = T(1);
 		T i_f = T(i); 
-		for(uint32_t j=0; j<=order; j++){
+		for(int j=0; j<=order; ++j){
 			if(j != i){
 				T j_f = (T)j;
 				coef *= (delay - j_f) / (i_f - j_f);
@@ -354,8 +354,8 @@ inline Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z){
 }
 
 template <class T>
-void linear(T * dst, const T * xs, const T * xp1s, uint32_t len, T f){
-	for(uint32_t i=0; i<len; ++i) dst[i] = linear(f, xs[i], xp1s[i]);
+void linear(T * dst, const T * xs, const T * xp1s, int len, T f){
+	for(int i=0; i<len; ++i) dst[i] = linear(f, xs[i], xp1s[i]);
 }
 
 

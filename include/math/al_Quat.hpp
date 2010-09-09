@@ -1,8 +1,8 @@
 #ifndef INCLUDE_AL_QUAT_HPP
 #define INCLUDE_AL_QUAT_HPP
 
-#include "al_Quat.h"
-#include "al_Vec.hpp"
+#include "math/al_Quat.h"
+#include "math/al_Vec.hpp"
 
 #ifndef ABS
 	#define ABS(x) ((x)<0?-(x):(x))

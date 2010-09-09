@@ -173,10 +173,25 @@ private:
 };
 
 
+/// Get global random number generator
+Random<>& globalRNG(){
+	static Random<> r; return r;
+}
+
+
+/// Returns uniform random in [0,1)
+inline float uniform(){ return globalRNG().uniform(); }
+
+/// Returns uniform random in [0, hi)
+template <class T>
+inline T uniform(const T& hi){ return globalRNG().uniform(hi); }
+
+/// Returns uniform random in [lo, hi)
+template <class T>
+inline T uniform(const T& hi, const T& lo){ return globalRNG().uniform(hi,lo); }
 
 
 // Implementation_______________________________________________________________
-
 
 //---- Tausworthe
 
@@ -243,7 +258,7 @@ void Random<RNG>::shuffle(T * arr, uint32_t len){
 
 
 
-} // ::al::rnd::
-} // ::al::
+} // al::rnd::
+} // al::
 
 #endif

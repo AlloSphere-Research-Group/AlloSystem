@@ -67,7 +67,7 @@ FORCE:
 # Compile and run source files in examples/ folder
 examples/%.cpp: $(SLIB_FILE) FORCE
 	@$(CC) $(CFLAGS) -o $(BIN_DIR)/$(*F) $@ $(LFLAGS) $(SLIB_FILE)
-	@./$(BIN_DIR)/$(*F) &
+	@./$(BIN_DIR)/$(*F)
 
 # Build unit tests
 .PHONY: test

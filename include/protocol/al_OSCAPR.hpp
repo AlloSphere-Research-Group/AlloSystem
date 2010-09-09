@@ -49,7 +49,12 @@ void handler(const osc::ReceivedMessage & p, void * userdata) {
 		args >> i >> d >> s;
 	}
 }
-recv.recv(handler, NULL);
+
+// put this in your draw loop maybe?:
+	recv.recv(handler, NULL);
+
+// or, launch an automatic background thread:
+recv.start(handler); 
 
 */
 
@@ -58,6 +63,7 @@ recv.recv(handler, NULL);
 /* allocore */
 #include "system/al_Config.h"
 #include "system/al_Time.h"
+#include "system/al_Thread.hpp"
 
 /* oscpack */
 #include "protocol/oscpack/osc/OscOutboundPacketStream.h"
@@ -117,6 +123,7 @@ protected:
 	Impl * mImpl;
 	unsigned int mPort;
 	bool mBackground;
+	al::Thread mThread;
 };
 
 
