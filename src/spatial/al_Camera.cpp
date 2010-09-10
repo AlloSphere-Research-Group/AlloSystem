@@ -20,7 +20,7 @@ Camera :: Camera(
 	mAspectRatio(aspectRatio),
 	mAutoEyeSep(true),
 	mZoom(0)
-{}
+{	smooth(0.85); }
 
 
 Matrix4d Camera::modelViewMatrix(Eye e) {
