@@ -174,7 +174,7 @@ private:
 
 
 /// Get global random number generator
-Random<>& globalRNG(){
+inline Random<>& globalRNG(){
 	static Random<> r; return r;
 }
 
