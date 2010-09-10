@@ -16,38 +16,11 @@ namespace al{
 
 struct Socket::Impl : public ImplAPR {
 
-	Impl(unsigned int port, const char * address, al_sec timeout, bool sender) : ImplAPR() {
-
-		// TODO: check_apr results should jump to an err label and return an uninitialized socket!
-
-		/* @see http://dev.ariel-networks.com/apr/apr-tutorial/html/apr-tutorial-13.html */
-		// create socket:
-		apr_sockaddr_t * sa;
-		apr_socket_t * sock;
-		check_apr(apr_sockaddr_info_get(&sa, address, APR_INET, port, 0, mPool));
-		check_apr(apr_socket_create(&sock, sa->family, SOCK_DGRAM, APR_PROTO_UDP, mPool));
-
-		if (timeout == 0) {
-			// non-blocking:			APR_SO_NONBLOCK==1(on),  then timeout=0
-			check_apr(apr_socket_opt_set(sock, APR_SO_NONBLOCK, 1));
-			check_apr(apr_socket_timeout_set(sock, 0));
-		} else if (timeout > 0) {
-			// blocking-with-timeout:	APR_SO_NONBLOCK==0(off), then timeout>0
-			check_apr(apr_socket_opt_set(sock, APR_SO_NONBLOCK, 0));
-			check_apr(apr_socket_timeout_set(sock, (apr_interval_time_t)(timeout * 1.0e6)));
-
-		} else {
-			// blocking-forever:		APR_SO_NONBLOCK==0(off), then timeout<0
-			check_apr(apr_socket_opt_set(sock, APR_SO_NONBLOCK, 0));
-			check_apr(apr_socket_timeout_set(sock, -1));
-		}
-
-
-		if(sender)	check_apr(apr_socket_connect(sock, sa));
-		else		check_apr(apr_socket_bind(sock, sa));
-
-		mAddress = sa;
-		mSock = sock;
+	Impl(unsigned int port, const char * address, al_sec timeout_, bool sender)
+	:	ImplAPR(), mPort(0), mAddress(0), mSock(0)
+	{
+		open(port, address, sender);
+		timeout(timeout_);
 
 //		char * buf;
 ////		apr_sockaddr_ip_get(&buf, mAddress);
@@ -56,11 +29,59 @@ struct Socket::Impl : public ImplAPR {
 ////		apr_port_t p = port;
 ////		apr_parse_addr_port(&buf, &scopeid, &p, "localhost", defaultPool());
 //		printf("%s\n", buf);
-
 	}
 
+	void close(){
+		if(opened()){
+			apr_socket_close(mSock);
+			mSock=0;
+		}
+	}
+
+	void open(unsigned int port, const char * address, bool sender){
+		close();
+
+		// TODO: check_apr results should jump to an err label and return an uninitialized socket!
+
+		/* @see http://dev.ariel-networks.com/apr/apr-tutorial/html/apr-tutorial-13.html */
+
+		mPort = port;
+		mSender = sender;
+		check_apr(apr_sockaddr_info_get(&mAddress, address, APR_INET, mPort, 0, mPool));
+		check_apr(apr_socket_create(&mSock, mAddress->family, SOCK_DGRAM, APR_PROTO_UDP, mPool));
+
+		if(mSock){
+			// Assign address to socket. If TCP, establish new connection.
+			if(mSender)	check_apr(apr_socket_connect(mSock, mAddress));
+			else		check_apr(apr_socket_bind(mSock, mAddress));
+		}
+	}
+	
+	void timeout(al_sec v){
+		if(v == 0){
+			// non-blocking:			APR_SO_NONBLOCK==1(on),  then timeout=0
+			check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 1));
+			check_apr(apr_socket_timeout_set(mSock, 0));
+		}
+		else if(v > 0){
+			// blocking-with-timeout:	APR_SO_NONBLOCK==0(off), then timeout>0
+			check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 0));
+			check_apr(apr_socket_timeout_set(mSock, (apr_interval_time_t)(v * 1.0e6)));
+
+		}
+		else{
+			// blocking-forever:		APR_SO_NONBLOCK==0(off), then timeout<0
+			check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 0));
+			check_apr(apr_socket_timeout_set(mSock, -1));
+		}
+	}
+	
+	bool opened(){ return 0!=mSock; }
+
+	unsigned int mPort;
 	apr_sockaddr_t * mAddress;
 	apr_socket_t * mSock;
+	bool mSender;
 };
 
 
@@ -76,9 +97,15 @@ Socket::~Socket(){
 	delete mImpl;
 }
 
-void Socket::close(){
-	apr_socket_close(mImpl->mSock);
+void Socket::close(){ mImpl->close(); }
+
+void Socket::open(unsigned int port, const char * address, bool sender){
+	mImpl->open(port, address, sender);
 }
+
+unsigned int Socket::port() const { return mImpl->mPort; }
+
+void Socket::timeout(al_sec v){ mImpl->timeout(v); }
 
 size_t Socket::recv(char * buffer, size_t maxlen) {
 	apr_size_t len = maxlen;

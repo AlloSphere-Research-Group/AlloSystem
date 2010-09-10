@@ -45,11 +45,14 @@ namespace al{
 class Socket{
 public:
 
+	/// Get port number
+	unsigned int port() const;
+
 	/// Close the socket
 	void close();
 
-	/// Get port number
-	unsigned int port() const { return mPort; }
+	/// Set timeout. < 0: block forever; = 0: no blocking; > 0 block with timeout
+	void timeout(al_sec v);
 
 	/// Get name of current host
 	static std::string hostName();
@@ -63,9 +66,7 @@ protected:
 	Socket(unsigned int port, const char * address, al_sec timeout, bool sender);
 	virtual ~Socket();
 
-protected:
-	unsigned int mPort;
-
+	void open(unsigned int port, const char * address, bool sender);
 	size_t recv(char * buffer, size_t maxlen);
 	size_t send(const char * buffer, size_t len);
 
