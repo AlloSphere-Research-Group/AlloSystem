@@ -50,7 +50,7 @@ protected:
 class Nav : public Pose {
 public:
 
-	Nav(const Vec3d &position = Vec3d(0), double smooth=1)
+	Nav(const Vec3d &position = Vec3d(0), double smooth=0)
 	:	Pose(position), mSmooth(smooth)
 	{	updateUnitVectors(); }
 
