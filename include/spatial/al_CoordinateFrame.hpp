@@ -50,7 +50,7 @@ protected:
 class Nav : public Pose {
 public:
 
-	Nav(const Vec3d &position = Vec3d(0), double smooth=0.85, double turnRate=2)
+	Nav(const Vec3d &position = Vec3d(0), double smooth=1)
 	:	Pose(position), mSmooth(smooth)
 	{	updateUnitVectors(); }
 
@@ -81,6 +81,9 @@ public:
 	void turn(const Quatd & v) {
 		v.toEuler(mSpin1);
 	}
+	
+	void position(double x, double y, double z) { mVec[0]=x; mVec[1]=y; mVec[2]=z; }
+	void position(const Vec3d& p) { mVec.set(p); }
 
 	/// Set linear velocity
 	void move(double x, double y, double z) { moveX(x); moveY(y); moveZ(z); }
@@ -98,18 +101,22 @@ public:
 	void spinX(double v){ mSpin0[0] = v; }
 	void spinY(double v){ mSpin0[1] = v; }
 	void spinZ(double v){ mSpin0[2] = v; }
+	void spin(double a, double e, double b){ spinX(e); spinY(a); spinZ(b); }
 
 	/// Turn by a single increment for one step
 	void turnX(double v){ mTurn[0] = v; }
 	void turnY(double v){ mTurn[1] = v; }
 	void turnZ(double v){ mTurn[2] = v; }
+	void turn(double a, double e, double b){ turnX(e); turnY(a); turnZ(b); }
 
 	/// Stop moving and spinning
-	Nav& halt(){ mMove0.set(0); mSpin0.set(0); return *this; }
+	Nav& halt(){ mMove0.set(0); mSpin0.set(0); quat().identity(); return *this; }
 
 	/// Go to origin and reset orientation to identity
 	Nav& home(){ 
 		quat().identity();
+		turn(0, 0, 0); 
+		spin(0, 0, 0);
 		vec().set(0);
 		updateUnitVectors();
 		return *this;
