@@ -36,7 +36,7 @@
 namespace al{
 
 /// Sleep for an interval of seconds
-void wait(al_sec dt){ al_sleep(dt); }
+inline void wait(al_sec dt){ al_sleep(dt); }
 
 
 /// Timer with stopwatch-like functionality for benchmarking, etc.
