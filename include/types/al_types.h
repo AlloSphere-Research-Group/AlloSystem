@@ -79,7 +79,7 @@ typedef uint16_t AlloTy;
 
 #pragma mark AlloLattice
 /*
-	AlloLattice is a general purpose descriptor of data in a regular dimensional layout
+	AlloLattice is a multidimensional array.
 	It is a pointer to data followed by meta-data to describe its type and layout.
 	
 	Separating the data from the header meta-data allows logic to performed on layouts without data 

@@ -785,7 +785,6 @@
 		36D69A4A11F9264700699158 /* al_Surface.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Surface.hpp; sourceTree = "<group>"; };
 		36D69A5211F9267800699158 /* al_Surface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Surface.cpp; sourceTree = "<group>"; };
 		36E4155711E99BED00A8A63D /* al_ThreadAPR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_ThreadAPR.cpp; sourceTree = "<group>"; };
-		36E7D9431231D0A500A717C9 /* al_Octree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Octree.h; sourceTree = "<group>"; };
 		36F0ABBF12319586000A8EBF /* Makefile.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.config; sourceTree = "<group>"; };
 		36F0ABCF123195D5000A8EBF /* al_Slab.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Slab.hpp; sourceTree = "<group>"; };
 		36F0ABD0123195F2000A8EBF /* liblua.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = liblua.a; sourceTree = "<group>"; };
@@ -1184,7 +1183,6 @@
 			children = (
 				16AA8F0011C6FDE10053EFE1 /* al_Camera.hpp */,
 				16AA8EEF11C6F9290053EFE1 /* al_CoordinateFrame.hpp */,
-				36E7D9431231D0A500A717C9 /* al_Octree.h */,
 			);
 			path = spatial;
 			sourceTree = "<group>";
