@@ -39,7 +39,7 @@
 		const float * in1 = io.in(0);
 		const float * in2 = io.in(1);
 		
-		MyStuff& stuff = *(MyStuff *)io.user;
+		MyStuff& stuff = *(MyStuff *)io.user();
 
 		for(unsigned i=0; i<io.framesPerBuffer(); ++i){
 
@@ -60,9 +60,6 @@
 */
 
 #include <string>
-#include <string.h>		/* memset() */
-#include "portaudio.h"
-
 
 namespace al{
 
@@ -72,34 +69,33 @@ class AudioIOData {
 public:
 	AudioIOData(void * user);
 	virtual ~AudioIOData();
-
-	void * user;						///< User specified data
 	
-	float *       aux(int channel);		///< Returns an aux channel buffer
-	const float * in (int channel);		///< Returns an in channel buffer
-	float *       out(int channel);		///< Returns an out channel buffer
-	float *		  temp();				///< Returns single channel temporary buffer
+	void * user() const { return mUser; }
 	
-	int channelsIn () const;			///< Returns effective number of input channels
-	int channelsOut() const;			///< Returns effective number of output channels
-	int channelsAux() const;			///< Returns number of aux channels
+	float *       aux(int channel);		///< Get an aux channel buffer
+	const float * in (int channel);		///< Get an in channel buffer
+	float *       out(int channel);		///< Get an out channel buffer
+	float *		  temp();				///< Get a single channel temporary buffer
+	
+	int channelsIn () const;			///< Get effective number of input channels
+	int channelsOut() const;			///< Get effective number of output channels
+	int channelsAux() const;			///< Get number of aux channels
 
-	int channelsInDevice() const;		///< Returns number of channels opened on input device
-	int channelsOutDevice() const;		///< Returns number of channels opened on output device
-	int framesPerBuffer() const;		///< Returns frames/buffer of audio I/O stream
-	double framesPerSecond() const;		///< Returns frames/second of audio I/O streams
-	double secondsPerBuffer() const;	///< Returns seconds/buffer of audio I/O stream
-	double time() const;				///< Returns current stream time in seconds
-	double time(int frame) const;		///< Returns current stream time in seconds of frame
+	int channelsInDevice() const;		///< Get number of channels opened on input device
+	int channelsOutDevice() const;		///< Get number of channels opened on output device
+	int framesPerBuffer() const;		///< Get frames/buffer of audio I/O stream
+	double framesPerSecond() const;		///< Get frames/second of audio I/O streams
+	double secondsPerBuffer() const;	///< Get seconds/buffer of audio I/O stream
+	double time() const;				///< Get current stream time in seconds
+	double time(int frame) const;		///< Get current stream time in seconds of frame
 	void zeroAux();						///< Zeros all the aux buffers
 	void zeroOut();						///< Zeros all the internal output buffers
 	
 protected:
-	PaStreamParameters mInParams, mOutParams;	// Input and output stream parameters.
-	PaStream * mStream;
+	class Impl; Impl * mImpl;
+	void * mUser;					// User specified data
 	int mFramesPerBuffer;
 	double mFramesPerSecond;
-	
 	float *mBufI, *mBufO, *mBufA;	// input, output, and aux buffers
 	float * mBufT;					// temporary one channel buffer
 	int mNumI, mNumO, mNumA;		// input, output, and aux channels
@@ -155,10 +151,6 @@ typedef void (*audioCallback)(AudioIOData& io);
 /// 
 class AudioIO : public AudioIOData {
 public:
-	using AudioIOData::channelsIn;
-	using AudioIOData::channelsOut;
-	using AudioIOData::framesPerBuffer;
-	using AudioIOData::framesPerSecond;
 
 	/// Creates AudioIO using default I/O devices.
 	///
@@ -176,6 +168,17 @@ public:
 		int outChans = 2, int inChans = 0 );
 
 	virtual ~AudioIO();
+
+	using AudioIOData::channelsIn;
+	using AudioIOData::channelsOut;
+	using AudioIOData::framesPerBuffer;
+	using AudioIOData::framesPerSecond;
+
+	int channels(bool forOutput) const;
+	bool clipOut() const { return mClipOut; }	///< Returns clipOut setting
+	double cpu() const;							///< Returns current CPU usage of audio thread
+	bool supportsFPS(double fps) const;			///< Return true if fps supported, otherwise false
+	bool zeroNANs() const;						///< Returns zeroNANs setting
 
 	audioCallback callback;						///< User specified callback function.
 	
@@ -205,52 +208,21 @@ public:
 	void framesPerBuffer(int n);				///< Set number of frames per processing buffer
 	void zeroNANs(bool v){ mZeroNANs=v; }		///< Set whether to zero NANs in output buffer
 
-	int channels(bool forOutput) const;
-	bool clipOut() const { return mClipOut; }	///< Returns clipOut setting
-	double cpu() const;							///< Returns current CPU usage of audio thread
-	bool supportsFPS(double fps);				///< Return true if fps supported, otherwise false
-	bool zeroNANs() const;						///< Returns zeroNANs setting
-
 	void print();								///< Prints info about current i/o devices to stdout.
-	void printError();							///< Prints info about current error status to stdout.
 
 	static const char * errorText(int errNum);		// Returns error string.
-	
+
 private:
-	PaError mErrNum;							// Most recent error number.
-	//PaDeviceIndex mInDevice, mOutDevice;		// Input and output device ids.
 	AudioDevice mInDevice, mOutDevice;
 
-	bool mIsOpen;			// An audio device is open
-	bool mIsRunning;		// An audio stream is running
 	bool mInResizeDeferred, mOutResizeDeferred;
 	bool mZeroNANs;			// whether to zero NANs
 	bool mClipOut;			// whether to clip output between -1 and 1
 
 	void init();		// Initializes PortAudio and member variables.
-	
-	static int paCallback(	const void *input,
-							void *output,
-							unsigned long frameCount,
-							const PaStreamCallbackTimeInfo* timeInfo,
-							PaStreamCallbackFlags statusFlags,
-							void *userData );
-
-	PaDeviceIndex defaultInDevice();
-	PaDeviceIndex defaultOutDevice();
-	
-	bool error() const;
-	void inDevice(PaDeviceIndex index);		// directly set input device
-	void outDevice(PaDeviceIndex index);	// directly set output device
-	void setInDeviceChans(int num);			// directly set # device input channels
-	void setOutDeviceChans(int num);			// directly set # device output channels
-	//void virtualChans(int num, bool forOutput);
-	
 	void deferBufferResize(bool forOutput);
-	void resizeBuffer(bool forOutput);
-
 	void reopen();		// reopen stream (restarts stream if needed)
-
+	void resizeBuffer(bool forOutput);
 };
 
 } // al::
