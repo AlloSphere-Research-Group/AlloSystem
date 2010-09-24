@@ -56,6 +56,11 @@ public:
 
 	/// Get smoothing amount
 	double smooth() const { return mSmooth; }
+	
+	/// friendly helpers
+	const double x() { return mVec[0]; }
+	const double y() { return mVec[1]; }
+	const double z() { return mVec[2]; }
 
 	const Vec3d& ux() const { return mUX; }
 	const Vec3d& uy() const { return mUY; }
@@ -73,6 +78,9 @@ public:
 	Nav& smooth(double v){ mSmooth=v; return *this; }
 	
 	
+	void view(double azimuth, double elevation, double bank) {
+		view(Quatd::fromEuler(azimuth, elevation, bank));
+	}
 	void view(const Quatd & v) {
 		quat(v);
 		updateUnitVectors();
