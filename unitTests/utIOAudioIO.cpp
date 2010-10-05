@@ -25,14 +25,14 @@ DelayLine<> delay;
 void audioCB(AudioIOData& io){
 
 	for(int i=0; i<io.framesPerBuffer(); ++i){
-		float s = io.in(0)[i];
+		float s = io.in(0,i);
 		s = delay(lpf(s, 0.2));
 		//s = float(i)/io.framesPerBuffer();
 		//s = 0;
 		s += sine()*0.1;
 
-		io.out(0)[i] = s;
-		io.out(1)[i] = s;
+		io.out(0,i) = s;
+		io.out(1,i) = s;
 	}
 }
 

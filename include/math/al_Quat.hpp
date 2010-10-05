@@ -33,6 +33,7 @@ public:
 		};
 		T components[4];
 	};
+	
 
 	Quat(T w = T(1), T x = T(0), T y = T(0), T z = T(0));
 	Quat(const Quat & src);
@@ -647,7 +648,7 @@ void Quat<T> :: slerp_buffer(const Quat& input, const Quat& target, Quat<T> * bu
 		RSin sinB(cos_angle*inv_frames, 0, inv_sine * bflip);
 
 		for (int i=0; i<numFrames; i++) {
-			T amt = i*inv_frames;
+			//T amt = i*inv_frames;
 			T a = sinA();
 			T b = sinB();
 

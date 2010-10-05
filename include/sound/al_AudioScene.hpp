@@ -13,14 +13,24 @@
 namespace al{
 
 
+/// Audio scene listener object
 
+/// 
+///
 class Listener : public Nav {
 public:
 
-	Listener& numSpeakers(int num){ mDecoder.numSpeakers(num); return *this; }
-	Listener& speakerPos(int speakerNum, int deviceChannel, double az, double el=0){ mDecoder.setSpeaker(speakerNum, deviceChannel, az, el); return *this; }
+	Listener& numSpeakers(int num){
+		mDecoder.numSpeakers(num); return *this;
+	}
+
+	Listener& speakerPos(int speakerNum, int deviceChannel, double az, double el=0){
+		mDecoder.setSpeaker(speakerNum, deviceChannel, az, el);
+		return *this;
+	}
 
 	int numSpeakers() const { return mDecoder.numSpeakers(); }
+
 	float * ambiChans() { return &mAmbiDomainChannels[0]; }
 	
 protected:
@@ -36,10 +46,9 @@ protected:
 	AmbiDecode mDecoder;
 	
 	std::vector<float> mAmbiDomainChannels;
-	std::vector<Quatd> mQuatHistory;				// buffer of slerped orientations
-	ShiftBuffer<4, Vec3d> mPosHistory;	// position in previous blocks
-	Quatd mQuatPrev;					// orientation in previous block
-	
+	std::vector<Quatd> mQuatHistory;		// buffer of interpolated orientations
+	ShiftBuffer<4, Vec3d> mPosHistory;		// position in previous blocks
+	Quatd mQuatPrev;						// orientation in previous block
 };
 
 
@@ -58,7 +67,7 @@ public:
 		return ipl::linear(frac, a, b);
 	}
 	
-	double delay2index(al_sec delay, double samplerate) {
+	double delayToIndex(al_sec delay, double samplerate) {
 		return delay * samplerate;
 	}
 	
@@ -105,7 +114,7 @@ public:
 	/// encode sources (per listener)
 	void encode(const int& numFrames, double samplerate) {
 	
-		const double invClipRange = mFarClip - mNearClip;
+		//const double invClipRange = mFarClip - mNearClip;
 	
 		// update source history data:
 		for(std::list<SoundSource *>::iterator it = mSources.begin(); it != mSources.end(); it++) {
@@ -113,7 +122,7 @@ public:
 			src.mPosHistory(src.vec());
 		}
 	
-		for(int il=0; il<mListeners.size(); ++il){
+		for(unsigned il=0; il<mListeners.size(); ++il){
 			Listener& l = *mListeners[il];
 			
 			// update listener history data:
@@ -122,12 +131,12 @@ public:
 			l.mQuatPrev = qnew;
 			l.mPosHistory(l.vec());
 			
-			float * ambiChans = l.ambiChans();
+			//float * ambiChans = l.ambiChans();
 			
 			for(std::list<SoundSource *>::iterator it = mSources.begin(); it != mSources.end(); it++) {
 				SoundSource& src = *(*it);
 				
-				for(unsigned int i=0; i<numFrames; ++i) {
+				for(int i=0; i<numFrames; ++i) {
 					
 					// interpolated source position relative to listener
 					float alpha = i/(float)numFrames;
@@ -144,7 +153,7 @@ public:
 					double x = distance - mFarClip;
 					if (x >= 0. || index < src.maxIndex()) {
 						
-						double amp = 1;
+						//double amp = 1;
 						// TODO: amplitude rolloff
 						if (distance > mNearClip) {
 							
@@ -180,7 +189,7 @@ public:
 
 	/// decode sources (per listener) to output channels
 	void render(float * outs, const int& numFrames) {
-		for(int il=0; il<mListeners.size(); ++il){
+		for(unsigned il=0; il<mListeners.size(); ++il){
 			Listener& l = *mListeners[il];
 			l.mDecoder.decode(outs, l.ambiChans(), numFrames);
 		}
@@ -221,41 +230,6 @@ protected:
 	// c = mFarFadeOut
 	// y *= 1-(cn)/(c+1+n)
 };
-
-
-//
-///// Referential interface to a multi-channel audio i/o frame
-//class AudioFrame {
-//public:
-//
-//	AudioFrame(int chansOut=0, int chansIn=0)
-//	:	mIndex(0)
-//	{	channels(chansOut, chansIn); }
-//
-//	/// Get sample from input channel
-//	float in(int channel){ return mIn[channel][mIndex]; }
-//
-//	/// Add sample to output channel
-//	void out(float v, int channel){ mOut[channel][mIndex] += v; }
-//	void out(float v, int ch1, int ch2){ out(v,ch1); out(v,ch2); }
-//	void out(float v, int ch1, int ch2, int ch3){ out(v,ch1,ch2); out(v,ch3); }
-//
-//	/// Get frame index in block
-//	int index() const { return mIndex; }
-//
-//private:
-////	friend class AudioContext;
-////	friend class AudioContextImpl;
-//	int mIndex;
-//	std::vector<const float *> mIn;
-//	std::vector<float *> mOut;
-//	
-//	AudioFrame& index(int v){ mIndex=v; return *this; }
-//	void channelsIn (int v){ if(v >  mIn.size())  mIn.resize(v); }
-//	void channelsOut(int v){ if(v > mOut.size()) mOut.resize(v); }
-//	void channels(int vo, int vi){ channelsIn(vi); channelsOut(vo); }
-//};
-
 
 
 

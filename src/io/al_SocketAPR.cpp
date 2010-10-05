@@ -39,6 +39,7 @@ struct Socket::Impl : public ImplAPR {
 	}
 
 	void open(unsigned int port, const char * address, bool sender){
+
 		close();
 
 		// TODO: check_apr results should jump to an err label and return an uninitialized socket!

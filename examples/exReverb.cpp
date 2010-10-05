@@ -1,66 +1,38 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include "io/al_AudioIO.hpp"
-#include "io/al_WindowGL.hpp"
-#include "protocol/al_Graphics.hpp"
-#include "sound/al_Reverb.hpp"
+/*
+Description:
+This demonstrates how to apply a reverberation effect to the audio line input.
 
-using namespace al;
+*/
+
+#include "al_Allocore.hpp"
 
 Reverb<float> reverb;
 
-
 void audioCB(AudioIOData& io){
-	for(int i=0; i<io.framesPerBuffer(); ++i){
-		float s = io.in(0)[i];
+	while(io()){
+		float s = io.in(0);
 
-		float sl, sr;
-		reverb(s, sl, sr);
-		sl = 0.2*sl;
-		sr = 0.2*sr;
+		// compute two wet channels of reverberation
+		float wet1, wet2;
+		reverb(s, wet1, wet2);
 
-		io.out(0)[i] = sl;
-		io.out(1)[i] = sr;
+		// output just the wet signals
+		io.out(0) = wet1*0.2;
+		io.out(1) = wet2*0.2;
 	}
 }
 
 
-struct MyWindow : WindowGL{
-	
-	void onKeyDown(const Keyboard& k){
-		switch(k.key()){
-			case Key::Escape: fullScreenToggle(); break;
-			case 'q': if(k.ctrl()) WindowGL::stopLoop(); break;
-			case 'w': if(k.ctrl()) destroy(); break;
-			case 'h': if(k.ctrl()) hide(); break;
-			case 'm': if(k.ctrl()) iconify(); break;
-			case 'c': if(k.ctrl()) cursorHideToggle(); break;
-		}
-	}
-
-	void onMouseDown(const Mouse& m){}
-	void onMouseUp(const Mouse& m){}
-	void onMouseDrag(const Mouse& m){}
-
-	void onFrame(){
-		gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
-		gl.loadIdentity();
-		gl.viewport(0,0, dimensions().w, dimensions().h);
-
-	}
-
-	gfx::Graphics gl;
-};
-
-
 int main (int argc, char * argv[]){
 
-	MyWindow win;
-	win.create(WindowGL::Dim(200,200,100), "Window 1", 40);
+	reverb.bandwidth(0.9);		// low-pass amount on input
+	reverb.damping(0.5);		// high-frequency damping
+	reverb.decay(0.8);			// tail decay factor
+	reverb.diffusion(0.76, 0.666, 0.707, 0.571); // diffusion amounts
 
 	AudioIO audioIO(256, 44100, audioCB, 0, 2, 1);
 	audioIO.start();
 
-	WindowGL::startLoop();
+	printf("\nPress 'enter' to quit...\n"); getchar();
 	return 0;
 }

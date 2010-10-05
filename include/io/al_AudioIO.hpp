@@ -32,22 +32,34 @@
 	and process input and output buffers.
 	
 	struct MyStuff{};
-	
-	void audioCB(AudioIOData& io){
-		float * out1 = io.out(0);
-		float * out2 = io.out(1);
-		const float * in1 = io.in(0);
-		const float * in2 = io.in(1);
+
+	// Simple: Using automatic indexing
+	void audioCBSimple(AudioIOData& io){
 		
-		MyStuff& stuff = *(MyStuff *)io.user();
+		MyStuff& stuff = io.user<MyStuff>();
+
+		while(io()){
+
+			float inSample1 = io.in(0);
+			float inSample2 = io.in(1);
+
+			io.out(0) = -inSample1;
+			io.out(1) = -inSample2;
+		}
+	}
+
+	// Advanced: Using manual indexing
+	void audioCB(AudioIOData& io){
+		
+		MyStuff& stuff = io.user<MyStuff>();
 
 		for(unsigned i=0; i<io.framesPerBuffer(); ++i){
 
-			float inSample1 = in1[i];
-			float inSample2 = in2[i];
+			float inSample1 = io.in(0,i);
+			float inSample2 = io.in(1,i);
 
-			out1[i] = -inSample1;
-			out2[i] = -inSample2;
+			io.out(0,i) = -inSample1;
+			io.out(1,i) = -inSample2;
 		}
 	}
 	
@@ -59,47 +71,15 @@
 	}
 */
 
+
 #include <string>
 
 namespace al{
+class AudioIOData;
 
 
-/// Audio data to be sent to callback
-class AudioIOData {
-public:
-	AudioIOData(void * user);
-	virtual ~AudioIOData();
-	
-	void * user() const { return mUser; }
-	
-	float *       aux(int channel);		///< Get an aux channel buffer
-	const float * in (int channel);		///< Get an in channel buffer
-	float *       out(int channel);		///< Get an out channel buffer
-	float *		  temp();				///< Get a single channel temporary buffer
-	
-	int channelsIn () const;			///< Get effective number of input channels
-	int channelsOut() const;			///< Get effective number of output channels
-	int channelsAux() const;			///< Get number of aux channels
-
-	int channelsInDevice() const;		///< Get number of channels opened on input device
-	int channelsOutDevice() const;		///< Get number of channels opened on output device
-	int framesPerBuffer() const;		///< Get frames/buffer of audio I/O stream
-	double framesPerSecond() const;		///< Get frames/second of audio I/O streams
-	double secondsPerBuffer() const;	///< Get seconds/buffer of audio I/O stream
-	double time() const;				///< Get current stream time in seconds
-	double time(int frame) const;		///< Get current stream time in seconds of frame
-	void zeroAux();						///< Zeros all the aux buffers
-	void zeroOut();						///< Zeros all the internal output buffers
-	
-protected:
-	class Impl; Impl * mImpl;
-	void * mUser;					// User specified data
-	int mFramesPerBuffer;
-	double mFramesPerSecond;
-	float *mBufI, *mBufO, *mBufA;	// input, output, and aux buffers
-	float * mBufT;					// temporary one channel buffer
-	int mNumI, mNumO, mNumA;		// input, output, and aux channels
-};
+/// Audio callback type
+typedef void (* audioCallback)(AudioIOData& io);
 
 
 /// Audio device abstraction
@@ -141,13 +121,88 @@ private:
 };
 
 
-/// Audio callback type
-typedef void (*audioCallback)(AudioIOData& io);
+
+/// Audio data to be sent to callback
+
+/// Audio buffers are guaranteed to be stored in a contiguous deinterleaved 
+/// format, i.e., frames are tightly packed per channel.
+class AudioIOData {
+public:
+	/// Constructor
+	AudioIOData(void * user);
+
+	virtual ~AudioIOData();
+
+
+	/// Iterate frame counter, returning true while more frames
+	bool operator()() const { return (++mFrame)<framesPerBuffer(); }
+		
+	/// Get current frame number
+	int frame() const { return mFrame; }
+
+	/// Get bus sample at current frame iteration on specified channel
+	float& bus(int chan) const { return bus(chan, frame()); }
+
+	/// Get bus sample at specified channel and frame
+	float& bus(int chan, int frame) const;
+
+	/// Get input sample at current frame iteration on specified channel
+	const float& in(int chan) const { return in (chan, frame()); }
+
+	/// Get input sample at specified channel and frame
+	const float& in (int chan, int frame) const;
+
+	/// Get output sample at current frame iteration on specified channel
+	float& out(int chan) const { return out(chan, frame()); }
+
+	/// Get output sample at specified channel and frame
+	float& out(int chan, int frame) const;
+	
+	/// Add value to current output sample on specified channel
+	void sum(float v, int chan) const { out(chan)+=v; }
+	
+	/// Add value to current output sample on specified channels
+	void sum(float v, int ch1, int ch2) const { sum(v, ch1); sum(v,ch2); }
+	
+	/// Get sample from temporary buffer at specified frame
+	float& temp(int frame) const;
+
+	void * user() const{ return mUser; } ///< Get pointer to user data
+
+	template<class UserDataType>
+	UserDataType& user() const { return *(static_cast<UserDataType *>(mUser)); }
+
+	int channelsIn () const;			///< Get effective number of input channels
+	int channelsOut() const;			///< Get effective number of output channels
+	int channelsBus() const;			///< Get number of allocated bus channels
+	int channelsInDevice() const;		///< Get number of channels opened on input device
+	int channelsOutDevice() const;		///< Get number of channels opened on output device
+	int framesPerBuffer() const;		///< Get frames/buffer of audio I/O stream
+	double framesPerSecond() const;		///< Get frames/second of audio I/O streams
+	double secondsPerBuffer() const;	///< Get seconds/buffer of audio I/O stream
+	double time() const;				///< Get current stream time in seconds
+	double time(int frame) const;		///< Get current stream time in seconds of frame
+
+
+	void frame(int v){ mFrame=v-1; }	///< Set frame count for next iteration
+	void zeroBus();						///< Zeros all the bus buffers
+	void zeroOut();						///< Zeros all the internal output buffers
+
+protected:
+	class Impl; Impl * mImpl;
+	void * mUser;					// User specified data
+	mutable int mFrame;
+	int mFramesPerBuffer;
+	double mFramesPerSecond;
+	float *mBufI, *mBufO, *mBufB;	// input, output, and aux buffers
+	float * mBufT;					// temporary one channel buffer
+	int mNumI, mNumO, mNumB;		// input, output, and aux channels
+};
 
 
 /// Audio input/output streaming.
 
-/// This is a wrapper around the PortAudio v1.9 library.
+///
 /// 
 class AudioIO : public AudioIOData {
 public:
@@ -174,6 +229,7 @@ public:
 	using AudioIOData::framesPerBuffer;
 	using AudioIOData::framesPerSecond;
 
+	bool autoZeroOut() const { return mAutoZeroOut; }
 	int channels(bool forOutput) const;
 	bool clipOut() const { return mClipOut; }	///< Returns clipOut setting
 	double cpu() const;							///< Returns current CPU usage of audio thread
@@ -183,6 +239,8 @@ public:
 	audioCallback callback;						///< User specified callback function.
 	
 	void operator()();							///< Calls callback manually
+
+	void autoZeroOut(bool v){ mAutoZeroOut=v; }
 	
 	bool open();								///< Opens audio device.
 	bool close();								///< Closes audio device. Will stop active IO.
@@ -196,9 +254,9 @@ public:
 	/// the number of channels opens all available channels.
 	void channels(int num, bool forOutput);
 
+	void channelsBus(int n);					///< Set number of bus channels
 	void channelsIn(int n){ channels(n,false); } ///< Set number of input channels
 	void channelsOut(int n){ channels(n,true); } ///< Set number of output channels
-	void channelsAux(int num);					///< Set number of auxiliary channels
 	void clipOut(bool v){ mClipOut=v; }			///< Set whether to clip output between -1 and 1
 	
 	void deviceIn(const AudioDevice& v);		///< Set input device
@@ -218,12 +276,20 @@ private:
 	bool mInResizeDeferred, mOutResizeDeferred;
 	bool mZeroNANs;			// whether to zero NANs
 	bool mClipOut;			// whether to clip output between -1 and 1
+	bool mAutoZeroOut;		// whether to automatically zero output buffers each block
 
 	void init();		// Initializes PortAudio and member variables.
 	void deferBufferResize(bool forOutput);
 	void reopen();		// reopen stream (restarts stream if needed)
 	void resizeBuffer(bool forOutput);
 };
+
+
+//==============================================================================
+inline float&       AudioIOData::bus(int c, int f) const { return mBufB[c*framesPerBuffer() + f]; }
+inline const float& AudioIOData::in (int c, int f) const { return mBufI[c*framesPerBuffer() + f]; }
+inline float&       AudioIOData::out(int c, int f) const { return mBufO[c*framesPerBuffer() + f]; }
+inline float&       AudioIOData::temp(int f) const { return mBufT[f]; }
 
 } // al::
 
