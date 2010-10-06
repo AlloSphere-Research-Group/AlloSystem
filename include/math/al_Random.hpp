@@ -178,6 +178,8 @@ inline Random<>& globalRNG(){
 	static Random<> r; return r;
 }
 
+/// Returns true with probability p
+inline bool prob(float p=0.5){ return globalRNG().prob(p); }
 
 /// Returns uniform random in [0,1)
 inline float uniform(){ return globalRNG().uniform(); }
