@@ -4,32 +4,37 @@
 namespace al {
 namespace gfx {
 
-void Stereographic :: draw(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata) 
+// This cruft is needed to call a Drawable using a static function pointer
+struct DrawableData{
+	Graphics& g;
+	Drawable& d;
+};
+
+static void cdraw(void * aDrawableData){
+	DrawableData* dd = static_cast<DrawableData*>(aDrawableData);
+	dd->d.draw(dd->g);
+}
+
+void Stereographic::draw(Graphics& gl, Camera& cam, Drawable& draw, double w, double h){
+	DrawableData dd = {gl, draw};
+	Stereographic::draw(gl,cam, cdraw, w,h, &dd);
+}
+
+
+void Stereographic :: draw(Graphics& gl, Camera& cam, void (*draw)(void *), double w, double h, void * user) 
 {
-	if (mStereo) {
-		switch (mMode) {
-			case Anaglyph:
-				drawAnaglyph(gl, cam, draw, width, height, userdata);
-				break;
-			case Active:
-				drawActive(gl, cam, draw, width, height, userdata);
-				break;
-			case Dual:
-				drawDual(gl, cam, draw, width, height, userdata);
-				break;
-			case LeftEye:
-				drawLeft(gl, cam, draw, width, height, userdata);
-				break;
-			case RightEye:
-				drawRight(gl, cam, draw, width, height, userdata);
-				break;
-			default:
-				drawMono(gl, cam, draw, width, height, userdata);
-				break;
+	if(mStereo){
+		switch(mMode){
+			case Anaglyph:	drawAnaglyph(gl, cam, draw, w, h, user); return;
+			case Active:	drawActive	(gl, cam, draw, w, h, user); return;
+			case Dual:		drawDual	(gl, cam, draw, w, h, user); return;
+			case LeftEye:	drawLeft	(gl, cam, draw, w, h, user); return;
+			case RightEye:	drawRight	(gl, cam, draw, w, h, user); return;
+			default:;
 		}
-	} else {
-		drawMono(gl, cam, draw, width, height, userdata);
 	}
+	
+	drawMono(gl, cam, draw, w, h, user);
 }
 
 void Stereographic :: drawMono(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata) 

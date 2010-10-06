@@ -60,6 +60,9 @@ public:
 
 	void draw(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
 
+	/// Draw stereographic scene
+	void draw(Graphics& gl, Camera& cam, Drawable& draw, double width, double height);
+
 	/// So many different ways to draw :-)
 	void drawMono(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
 	void drawActive(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
