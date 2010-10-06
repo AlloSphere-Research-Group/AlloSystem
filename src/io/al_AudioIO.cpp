@@ -417,11 +417,11 @@ int paCallback(
 	const float * paI = (const float *)input;
 	float * paO = (float *)output;
 
-	bool deinterleave = true;
+	bool bDeinterleave = true;
 
-	if(deinterleave){
-		al::deinterleave(const_cast<float *>(&io.in(0,0)),  paI, io.framesPerBuffer(), io.channelsInDevice() );
-		//al::deinterleave(&io.out(0,0), paO, io.framesPerBuffer(), io.channelsOutDevice());
+	if(bDeinterleave){
+		deinterleave(const_cast<float *>(&io.in(0,0)),  paI, io.framesPerBuffer(), io.channelsInDevice() );
+		//deinterleave(&io.out(0,0), paO, io.framesPerBuffer(), io.channelsOutDevice());
 	}
 	
 	if(io.autoZeroOut()) io.zeroOut();
@@ -444,7 +444,7 @@ int paCallback(
 		}		
 	}
 
-	if(deinterleave){
+	if(bDeinterleave){
 		interleave(paO, &io.out(0,0), io.framesPerBuffer(), io.channelsOutDevice());
 	}
 

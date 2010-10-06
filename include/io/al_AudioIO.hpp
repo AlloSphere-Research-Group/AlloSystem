@@ -75,6 +75,7 @@
 #include <string>
 
 namespace al{
+
 class AudioIOData;
 
 
@@ -229,23 +230,22 @@ public:
 	using AudioIOData::framesPerBuffer;
 	using AudioIOData::framesPerSecond;
 
+	audioCallback callback;						///< User specified callback function.
+
 	bool autoZeroOut() const { return mAutoZeroOut; }
 	int channels(bool forOutput) const;
 	bool clipOut() const { return mClipOut; }	///< Returns clipOut setting
 	double cpu() const;							///< Returns current CPU usage of audio thread
 	bool supportsFPS(double fps) const;			///< Return true if fps supported, otherwise false
-	bool zeroNANs() const;						///< Returns zeroNANs setting
-
-	audioCallback callback;						///< User specified callback function.
+	bool zeroNANs() const;						///< Returns whether to zero NANs in output buffer going to DAC
 	
-	void operator()();							///< Calls callback manually
-
-	void autoZeroOut(bool v){ mAutoZeroOut=v; }
-	
+	void operator()();							///< Call callback manually
 	bool open();								///< Opens audio device.
 	bool close();								///< Closes audio device. Will stop active IO.
 	bool start();								///< Starts the audio IO.  Will open audio device if necessary.
 	bool stop();								///< Stops the audio IO.
+
+	void autoZeroOut(bool v){ mAutoZeroOut=v; }
 
 	/// Sets number of effective channels on input or output device depending on 'forOutput' flag.
 	
@@ -254,17 +254,15 @@ public:
 	/// the number of channels opens all available channels.
 	void channels(int num, bool forOutput);
 
-	void channelsBus(int n);					///< Set number of bus channels
-	void channelsIn(int n){ channels(n,false); } ///< Set number of input channels
-	void channelsOut(int n){ channels(n,true); } ///< Set number of output channels
+	void channelsIn(int n){channels(n,false);}	///< Set number of input channels
+	void channelsOut(int n){channels(n,true);}	///< Set number of output channels
+	void channelsBus(int num);					///< Set number of bus channels
 	void clipOut(bool v){ mClipOut=v; }			///< Set whether to clip output between -1 and 1
-	
 	void deviceIn(const AudioDevice& v);		///< Set input device
 	void deviceOut(const AudioDevice& v);		///< Set output device
-	
 	void framesPerSecond(double v);				///< Set number of frames per second
 	void framesPerBuffer(int n);				///< Set number of frames per processing buffer
-	void zeroNANs(bool v){ mZeroNANs=v; }		///< Set whether to zero NANs in output buffer
+	void zeroNANs(bool v){ mZeroNANs=v; }		///< Set whether to zero NANs in output buffer going to DAC
 
 	void print();								///< Prints info about current i/o devices to stdout.
 
