@@ -7,11 +7,21 @@
 
 namespace al {
 
-///<	A coordinate frame
-///		Combines a Vec3d position with a Quat orientation
+///	A coordinate frame
+
+///	Combines a Vec3d position with a Quat orientation
+///
 class Pose {
 public:
 	Pose(const Vec3d &v=Vec3d(0)): mVec(v) { mQuat.identity(); }
+
+	Pose operator* (const Pose& v) const { return Pose(*this)*=v; }
+
+	Pose& operator*=(const Pose& v){
+		mVec += v.vec();
+		mQuat*= v.quat();
+		return *this;
+	}
 	
 	Vec3d& pos(){ return mVec; }
 	const Vec3d& pos() const { return mVec; }
@@ -33,6 +43,9 @@ public:
 		mQuat[0]=v[0]; mQuat[1]=v[1]; mQuat[2]=v[2]; mQuat[3]=v[3];
 		return *this;
 	}
+
+	/// Set state from another Pose
+	Pose& set(const Pose& v){ mVec=v.vec(); mQuat=v.quat(); return *this; }
 	
 	// get the azimuth, elevation & distance from this to another point
 	void toAED(const Vec3d& to, double& azimuth, double& elevation, double& distance) const;
@@ -44,8 +57,9 @@ protected:
 };
 
 
-///<	A mobile coordinate frame
-///		A Pose that knows how to accumulate velocities
+///	A mobile coordinate frame
+
+///	A Pose that knows how to accumulate velocities
 /// Smooth navigation with adjustable linear and angular velocity
 class Nav : public Pose {
 public:
@@ -58,9 +72,9 @@ public:
 	double smooth() const { return mSmooth; }
 	
 	/// friendly helpers
-	const double x() { return mVec[0]; }
-	const double y() { return mVec[1]; }
-	const double z() { return mVec[2]; }
+	double x() const { return mVec[0]; }
+	double y() const { return mVec[1]; }
+	double z() const { return mVec[2]; }
 
 	const Vec3d& ux() const { return mUX; }
 	const Vec3d& uy() const { return mUY; }
@@ -81,12 +95,12 @@ public:
 	void view(double azimuth, double elevation, double bank) {
 		view(Quatd::fromEuler(azimuth, elevation, bank));
 	}
-	void view(const Quatd & v) {
+	void view(const Quatd& v) {
 		quat(v);
 		updateUnitVectors();
 	}
 	
-	void turn(const Quatd & v) {
+	void turn(const Quatd& v) {
 		v.toEuler(mSpin1);
 	}
 	
@@ -111,7 +125,7 @@ public:
 	void spinZ(double v){ mSpin0[2] = v; }
 	void spin(double a, double e, double b){ spinX(e); spinY(a); spinZ(b); }
 
-	/// Turn by a single increment for one step
+	/// Turn by a single increment for one step, in degrees
 	void turnX(double v){ mTurn[0] = v; }
 	void turnY(double v){ mTurn[1] = v; }
 	void turnZ(double v){ mTurn[2] = v; }
@@ -136,6 +150,15 @@ public:
 		quat().toVectorX(mUX);
 		quat().toVectorY(mUY);
 		quat().toVectorZ(mUZ);	
+	}
+	
+	void set(const Nav& v){
+		Pose::set(v);
+		mMove0 = v.mMove0; mMove1 = v.mMove1;
+		mSpin0 = v.mSpin0; mSpin1 = v.mSpin1;
+		mTurn = v.mTurn;
+		mUX = v.mUX; mUY = v.mUY; mUZ = v.mUZ;
+		mSmooth = v.mSmooth;
 	}
 	
 	/// Accumulate pose based on velocity
