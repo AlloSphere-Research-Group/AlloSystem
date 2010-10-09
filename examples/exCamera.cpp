@@ -41,7 +41,7 @@ struct MyWindow : WindowGL{
 		
 		state.blend_src = gfx::SRC_ALPHA_SATURATE;
 		state.blend_dst = gfx::ONE;
-		state.antialias_mode = gfx::AntiAliasMode::Nicest;
+		state.antialias_mode = gfx::NICEST;
 		gl.pushState(state);
 		
 		//glEnable(GL_POLYGON_SMOOTH);

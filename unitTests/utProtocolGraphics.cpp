@@ -8,7 +8,7 @@ struct MyWindow2 : WindowGL{
 	void onFrame(){
 		using namespace al::gfx;
 		
-		gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
+		gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 		gl.viewport(0,0, dimensions().w, dimensions().h);
 		gl.loadIdentity();
 		

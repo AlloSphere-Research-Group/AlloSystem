@@ -339,12 +339,6 @@ public:
 	Mat operator * (const T& v) const { return Mat(*this) *= v; }
 	Mat operator / (const T& v) const { return Mat(*this) /= v; }
 
-
-	/// Set elements on diagonal to one and all others to zero
-	Mat& identity(){
-		IT(size()){ (*this)[i] = (i%(N+1)) ? T(0) : T(1); }
-		return *this;
-	}
 	
 	/// Set all elements to value
 	Mat& set(const T& v){ IT(size()){ (*this)[i]=v; } return *this; }
@@ -375,6 +369,9 @@ public:
 		elems[3] = v41; elems[7] = v42; elems[11] = v43; elems[15] = v44;
 		return *this;
 	}
+
+	/// Set elements on diagonal to one and all others to zero
+	Mat& setIdentity(){ return ((*this) = identity()); }
 	
 	Mat& transpose(){
 		for(int j=0; j<N-1; ++j){		// row and column
@@ -390,6 +387,13 @@ public:
 
 	/// Get trace (sum of diagonal elements)
 	T trace() const { return diagonal().sum(); }
+
+	/// Returns identity matrix
+	static Mat identity(){
+		Mat m;
+		IT(size()){ m[i] = (i%(N+1)) ? T(0) : T(1); }
+		return m;
+	}
 
 	/// Computes matrix product r = a * b
 	

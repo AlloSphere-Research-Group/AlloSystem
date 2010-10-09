@@ -103,7 +103,7 @@ void OBJReader :: readOBJ(std::string path, std::string filename) {
 	gfx::OBJReader::GroupIterator iter = groupsBegin();
 	while (iter != groupsEnd()) {
 
-		Group& g = mGroups[iter->first];
+//		Group& g = mGroups[iter->first];
 
 //		printf("group %s with %d indices\n", (iter->first).data(), g.indices.size());
 //		for (int i=0; i<g.indices.size(); i++) {

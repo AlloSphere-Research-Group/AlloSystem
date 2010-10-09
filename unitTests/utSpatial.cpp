@@ -9,9 +9,9 @@ int utSpatial(){
 	{
 		Nav a;
 		a.vec().set(0,0,0);
-		a.quat().identity();
+		a.quat().setIdentity();
 		a.vel().vec().set(1,0,0);
-		a.vel().quat().identity();
+		a.vel().quat().setIdentity();
 		
 		a.step();		assert(a.vec() == Vec3d(1.0,0,0));
 		a.step();		assert(a.vec() == Vec3d(2.0,0,0));

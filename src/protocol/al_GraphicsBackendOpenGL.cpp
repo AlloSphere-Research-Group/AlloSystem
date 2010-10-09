@@ -54,12 +54,11 @@ GLenum format_from_texture_format(GraphicsBackendOpenGL *backend, Texture::Forma
 GLenum type_from_texture_type(GraphicsBackendOpenGL *backend, Texture::Type type);
 GLenum internal_format_from_format(GraphicsBackendOpenGL *backend, Texture::Format format, Texture::Type type);
 
-GLenum gl_antialias_mode(AntiAliasMode::t mode) {
+GLenum gl_antialias_mode(AntiAliasMode mode) {
 	switch (mode) {
-		case AntiAliasMode::Nicest:		return GL_NICEST;
-		case AntiAliasMode::Fastest:	return GL_FASTEST;
-		default:
-			return GL_DONT_CARE;
+		case NICEST:	return GL_NICEST;
+		case FASTEST:	return GL_FASTEST;
+		default:		return GL_DONT_CARE;
 	}
 }
 
@@ -155,7 +154,7 @@ void GraphicsBackendOpenGL::setPolygonMode(PolygonMode mode) {
 	glPolygonMode(GL_FRONT_AND_BACK, gl_polygon_mode(mode));
 }
 
-void GraphicsBackendOpenGL::setAntialiasing(AntiAliasMode::t mode) {
+void GraphicsBackendOpenGL::setAntialiasing(AntiAliasMode mode) {
 	GLenum m = gl_antialias_mode(mode);
 	glEnable(GL_POINT_SMOOTH_HINT);
 	glEnable(GL_LINE_SMOOTH_HINT);
@@ -163,7 +162,7 @@ void GraphicsBackendOpenGL::setAntialiasing(AntiAliasMode::t mode) {
 	glHint(GL_POINT_SMOOTH_HINT, m);
 	glHint(GL_LINE_SMOOTH_HINT, m);
 	glHint(GL_POLYGON_SMOOTH_HINT, m);
-	if (m!=AntiAliasMode::Fastest) {
+	if (GL_FASTEST != m) {
 		glEnable(GL_POLYGON_SMOOTH);
 		glEnable(GL_LINE_SMOOTH);
 		glEnable(GL_POINT_SMOOTH);
@@ -189,10 +188,10 @@ void GraphicsBackendOpenGL::lineWidth(double v) {
 // Frame
 void GraphicsBackendOpenGL::clear(int attribMask) {
 	int bits = 
-		(attribMask & AttributeBit::ColorBuffer ? GL_COLOR_BUFFER_BIT : 0) |
-		(attribMask & AttributeBit::DepthBuffer ? GL_DEPTH_BUFFER_BIT : 0) |
-		(attribMask & AttributeBit::Enable ? GL_ENABLE_BIT : 0) |
-		(attribMask & AttributeBit::Viewport ? GL_VIEWPORT_BIT : 0);
+		(attribMask & COLOR_BUFFER_BIT ? GL_COLOR_BUFFER_BIT : 0) |
+		(attribMask & DEPTH_BUFFER_BIT ? GL_DEPTH_BUFFER_BIT : 0) |
+		(attribMask & ENABLE_BIT ? GL_ENABLE_BIT : 0) |
+		(attribMask & VIEWPORT_BIT ? GL_VIEWPORT_BIT : 0);
 	glClear(bits);
 }
 

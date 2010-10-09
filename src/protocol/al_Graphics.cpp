@@ -158,6 +158,9 @@ void GraphicsData::scale(double x, double y, double z) {
 	}
 }
 
+
+//==============================================================================
+
 Graphics::Graphics(GraphicsBackend *backend)
 :	mBackend(backend),
 	mInImmediateMode(false),
@@ -174,6 +177,13 @@ Graphics::~Graphics() {
 }
 
 // Rendering State
+
+void Graphics::blending(bool v, BlendFunc src, BlendFunc dst){ backend()->enableBlending(v, src,dst); }
+
+void Graphics::depthTesting(bool v){ backend()->enableDepthTesting(v); }
+
+void Graphics::lighting(bool v){ backend()->enableLighting(v); }
+
 void Graphics::pushState(State &state) {
 	compareState(mState.top(), state);
 	mState.push(state);
@@ -372,13 +382,18 @@ void Graphics::enableState() {
 	}
 }
 
-void Graphics::pointSize(double v) {
-	mBackend->pointSize(v);
+void Graphics::antialiasing(AntiAliasMode v){
+	backend()->setAntialiasing(v);
 }
 
 void Graphics::lineWidth(double v) {
 	mBackend->lineWidth(v);
 }
+
+void Graphics::pointSize(double v) {
+	mBackend->pointSize(v);
+}
+
 
 void Graphics::drawBegin() {
 // Draw Begin (generic)

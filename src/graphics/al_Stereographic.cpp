@@ -12,7 +12,7 @@ struct DrawableData{
 
 static void cdraw(void * aDrawableData){
 	DrawableData* dd = static_cast<DrawableData*>(aDrawableData);
-	dd->d.draw(dd->g);
+	dd->d.onDraw(dd->g);
 }
 
 void Stereographic::draw(Graphics& gl, Camera& cam, Drawable& draw, double w, double h){
@@ -41,9 +41,9 @@ void Stereographic :: drawMono(Graphics& gl, Camera& cam, void (*draw)(void *), 
 {
 	double aspect = width/height;
 	const Vec3d& pos = cam.pos();
-	const Vec3d& ux  = cam.ux();
-	const Vec3d& uy  = cam.uy();
-	const Vec3d& uz  = cam.uz();
+	const Vec3d& ur  = cam.ur();
+	const Vec3d& uu  = cam.uu();
+	const Vec3d& uf  = cam.uf();
 	double fovy = cam.fovy();
 	double near = cam.near();
 	double far = cam.far();
@@ -61,7 +61,7 @@ void Stereographic :: drawMono(Graphics& gl, Camera& cam, void (*draw)(void *), 
 //	glScissor(0, 0, width, height);
 	gl.viewport(0,0,width,height);
 	
-	gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
+	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
 	gl.matrixMode(gfx::PROJECTION);
@@ -70,7 +70,7 @@ void Stereographic :: drawMono(Graphics& gl, Camera& cam, void (*draw)(void *), 
 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::lookAt(ux, uy, uz, pos));
+	gl.loadMatrix(Matrix4d::lookAt(ur, uu, uf, pos));
 	
 	draw(userdata);
 	
@@ -89,9 +89,9 @@ void Stereographic :: drawAnaglyph(Graphics& gl, Camera& cam, void (*draw)(void 
 {
 	double aspect = width/height;
 	const Vec3d& pos = cam.pos();
-	const Vec3d& ux  = cam.ux();
-	const Vec3d& uy  = cam.uy();
-	const Vec3d& uz  = cam.uz();
+	const Vec3d& ur  = cam.ur();
+	const Vec3d& uu  = cam.uu();
+	const Vec3d& uf  = cam.uf();
 	double fovy = cam.fovy();
 	double near = cam.near();
 	double far = cam.far();
@@ -111,7 +111,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, Camera& cam, void (*draw)(void 
 //	glScissor(0, 0, width, height);
 	gl.viewport(0,0,width,height);
 	
-	gl.clear(gfx::AttributeBit::ColorBuffer);
+	gl.clear(gfx::COLOR_BUFFER_BIT);
 	
 	switch (mAnaglyphMode) {
 		case RedBlue:
@@ -137,7 +137,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, Camera& cam, void (*draw)(void 
 			glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
 	} 
 	//clear(DepthBufferBit);
-	gl.clear(gfx::AttributeBit::DepthBuffer);
+	gl.clear(gfx::DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
 	gl.matrixMode(gfx::PROJECTION);
@@ -146,7 +146,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, Camera& cam, void (*draw)(void 
 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::lookAtLeft(ux, uy, uz, pos, iod));
+	gl.loadMatrix(Matrix4d::lookAtLeft(ur, uu, uf, pos, iod));
 	
 	draw(userdata);
 	
@@ -179,7 +179,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, Camera& cam, void (*draw)(void 
 			glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
 	} 
 	//clear(DepthBufferBit);
-	gl.clear(gfx::AttributeBit::DepthBuffer);
+	gl.clear(gfx::DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
 	gl.matrixMode(gfx::PROJECTION);
@@ -188,7 +188,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, Camera& cam, void (*draw)(void 
 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::lookAtRight(ux, uy, uz, pos, iod));
+	gl.loadMatrix(Matrix4d::lookAtRight(ur, uu, uf, pos, iod));
 	
 	draw(userdata);
 	
@@ -211,9 +211,9 @@ void Stereographic :: drawActive(Graphics& gl, Camera& cam, void (*draw)(void *)
 {
 	double aspect = width/height;
 	const Vec3d& pos = cam.pos();
-	const Vec3d& ux  = cam.ux();
-	const Vec3d& uy  = cam.uy();
-	const Vec3d& uz  = cam.uz();
+	const Vec3d& ur  = cam.ur();
+	const Vec3d& uu  = cam.uu();
+	const Vec3d& uf  = cam.uf();
 	double fovy = cam.fovy();
 	double near = cam.near();
 	double far = cam.far();
@@ -226,7 +226,7 @@ void Stereographic :: drawActive(Graphics& gl, Camera& cam, void (*draw)(void *)
 	//drawBuffer(BackLeft);
 	glDrawBuffer(GL_BACK_LEFT);
 	
-	gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
+	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 	
 	// GraphicsBackedOpenGL should also apply matching glScissor() 
 //	//enable(ScissorTest);
@@ -242,7 +242,7 @@ void Stereographic :: drawActive(Graphics& gl, Camera& cam, void (*draw)(void *)
 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::lookAtLeft(ux, uy, uz, pos, iod));
+	gl.loadMatrix(Matrix4d::lookAtLeft(ur, uu, uf, pos, iod));
 	
 	draw(userdata);
 	
@@ -253,7 +253,7 @@ void Stereographic :: drawActive(Graphics& gl, Camera& cam, void (*draw)(void *)
 	
 	//drawBuffer(BackRight);
 	glDrawBuffer(GL_BACK_RIGHT);
-	gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
+	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 	
 	// GraphicsBackedOpenGL should also apply matching glScissor() 
 //	//enable(ScissorTest);
@@ -269,7 +269,7 @@ void Stereographic :: drawActive(Graphics& gl, Camera& cam, void (*draw)(void *)
 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::lookAtRight(ux, uy, uz, pos, iod));
+	gl.loadMatrix(Matrix4d::lookAtRight(ur, uu, uf, pos, iod));
 	
 	draw(userdata);
 	
@@ -288,9 +288,9 @@ void Stereographic :: drawDual(Graphics& gl, Camera& cam, void (*draw)(void *), 
 {
 	double aspect = width/height;
 	const Vec3d& pos = cam.pos();
-	const Vec3d& ux  = cam.ux();
-	const Vec3d& uy  = cam.uy();
-	const Vec3d& uz  = cam.uz();
+	const Vec3d& ur  = cam.ur();
+	const Vec3d& uu  = cam.uu();
+	const Vec3d& uf  = cam.uf();
 	double fovy = cam.fovy();
 	double near = cam.near();
 	double far = cam.far();
@@ -310,7 +310,7 @@ void Stereographic :: drawDual(Graphics& gl, Camera& cam, void (*draw)(void *), 
 //	glScissor(0, 0, width*0.5, height);
 	gl.viewport(0,0,width*0.5,height);
 	
-	gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
+	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
 	gl.matrixMode(gfx::PROJECTION);
@@ -319,7 +319,7 @@ void Stereographic :: drawDual(Graphics& gl, Camera& cam, void (*draw)(void *), 
 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::lookAtLeft(ux, uy, uz, pos, iod));
+	gl.loadMatrix(Matrix4d::lookAtLeft(ur, uu, uf, pos, iod));
 	
 	draw(userdata);
 	
@@ -332,7 +332,7 @@ void Stereographic :: drawDual(Graphics& gl, Camera& cam, void (*draw)(void *), 
 //	glScissor(width*0.5, 0, width*0.5, height);
 	gl.viewport(width*0.5,0,width*0.5,height);
 	
-	gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
+	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
 	gl.matrixMode(gfx::PROJECTION);
@@ -341,7 +341,7 @@ void Stereographic :: drawDual(Graphics& gl, Camera& cam, void (*draw)(void *), 
 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::lookAtRight(ux, uy, uz, pos, iod));
+	gl.loadMatrix(Matrix4d::lookAtRight(ur, uu, uf, pos, iod));
 	
 	draw(userdata);
 	
@@ -362,9 +362,9 @@ void Stereographic :: drawLeft(Graphics& gl, Camera& cam, void (*draw)(void *), 
 {
 	double aspect = width/height;
 	const Vec3d& pos = cam.pos();
-	const Vec3d& ux  = cam.ux();
-	const Vec3d& uy  = cam.uy();
-	const Vec3d& uz  = cam.uz();
+	const Vec3d& ur  = cam.ur();
+	const Vec3d& uu  = cam.uu();
+	const Vec3d& uf  = cam.uf();
 	double fovy = cam.fovy();
 	double near = cam.near();
 	double far = cam.far();
@@ -381,7 +381,7 @@ void Stereographic :: drawLeft(Graphics& gl, Camera& cam, void (*draw)(void *), 
 //	glScissor(0, 0, width, height);
 	gl.viewport(0,0,width,height);
 	
-	gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
+	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
 	gl.matrixMode(gfx::PROJECTION);
@@ -390,7 +390,7 @@ void Stereographic :: drawLeft(Graphics& gl, Camera& cam, void (*draw)(void *), 
 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::lookAtLeft(ux, uy, uz, pos, iod));
+	gl.loadMatrix(Matrix4d::lookAtLeft(ur, uu, uf, pos, iod));
 
 	draw(userdata);
 	
@@ -409,9 +409,9 @@ void Stereographic :: drawRight(Graphics& gl, Camera& cam, void (*draw)(void *),
 {
 	double aspect = width/height;
 	const Vec3d& pos = cam.pos();
-	const Vec3d& ux  = cam.ux();
-	const Vec3d& uy  = cam.uy();
-	const Vec3d& uz  = cam.uz();
+	const Vec3d& ur  = cam.ur();
+	const Vec3d& uu  = cam.uu();
+	const Vec3d& uf  = cam.uf();
 	double fovy = cam.fovy();
 	double near = cam.near();
 	double far = cam.far();
@@ -428,7 +428,7 @@ void Stereographic :: drawRight(Graphics& gl, Camera& cam, void (*draw)(void *),
 //	glScissor(0, 0, width, height);
 	gl.viewport(0,0,width,height);
 	
-	gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
+	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
 	gl.matrixMode(gfx::PROJECTION);
@@ -437,7 +437,7 @@ void Stereographic :: drawRight(Graphics& gl, Camera& cam, void (*draw)(void *),
 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::lookAtRight(ux, uy, uz, pos, iod));
+	gl.loadMatrix(Matrix4d::lookAtRight(ur, uu, uf, pos, iod));
 
 	draw(userdata);
 	

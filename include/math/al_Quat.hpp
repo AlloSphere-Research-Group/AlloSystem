@@ -98,9 +98,6 @@ public:
 	Quat multiply(const Quat & q2) const;
 	Quat reverseMultiply(const Quat & q2) const;
 
-	/// Set to identity (1,0,0,0)
-	Quat& identity(){ return set(1,0,0,0); }
-
 	/// Normalize magnitude to one
 	Quat& normalize();
 
@@ -112,6 +109,9 @@ public:
 
 	/// Set from other quaternion
 	Quat& set(const Quat& q){ return set(q.w, q.x, q.y, q.z); }
+
+	/// Set to identity
+	Quat& setIdentity(){ return (*this) = Quat::identity(); }
 
 	/// Warning: Assumes that axes are normalized.
 	static Quat fromAxisAngle(T theta, T x1, T y1, T z1);
@@ -173,6 +173,9 @@ public:
 	/// Get the quaternion from a given point and quaterion toward another point
 	void towardPoint(Vec3<T> &pos, Quat<T> &q, Vec3<T> &v, float amt);
 
+	/// Returns identity
+	static Quat identity(){ return Quat(1,0,0,0); }
+
 	// v1 and v2 must be normalized
 	// alternatively expressed as Q = (1+gp(v1, v2))/sqrt(2*(1+dot(b, a)))
 	static Quat<T> rotor(Vec3<T> &v1, Vec3<T> &v2);
@@ -205,7 +208,7 @@ inline Quat<T>& Quat<T> :: normalize() {
 	T unit = magSqr();
 	if(unit*unit < QUAT_EPSILON){
 		// unit too close to epsilon, set to default transform
-		identity();
+		setIdentity();
 	}
 	else if(unit > QUAT_ACCURACY_MAX || unit < QUAT_ACCURACY_MIN){
 		T invmag = 1.0/sqrt(unit);
@@ -711,7 +714,7 @@ void Quat<T> :: towardPoint(Vec3<T> &pos, Quat<T> &q, Vec3<T> &v, float amt) {
 		fromAxisAngle(theta, axis.x, axis.y, axis.z);
 	}
 	else {
-		identity();
+		setIdentity();
 	}
 }
 

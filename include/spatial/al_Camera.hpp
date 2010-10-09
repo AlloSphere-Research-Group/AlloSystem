@@ -41,12 +41,6 @@ public:
 	Camera& autoEyeSep(bool v){ mAutoEyeSep=v; return *this; }		///< Set auto eye separation amount
 	Camera& zoom(double v){ mZoom=v; return *this; }		///< Set zoom amount
 
-	// aliases for Nav
-	const Vec3d& vf() const { return uz(); }				///< Get forward vector
-	const Vec3d& vu() const { return uy(); }				///< Get up vector
-	const Vec3d& vr() const { return ux(); }				///< Get right vector
-
-
 	double fovy() const { return mFovy; }					///< Get frustum near plane distance
 	double near() const { return mNear; }					///< Get frustum near plane distance
 	double far() const { return mFar; }						///< Get frustum far plane distance

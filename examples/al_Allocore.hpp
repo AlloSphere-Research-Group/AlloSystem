@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "graphics/al_Config.h"
+#include "graphics/al_Image.hpp"
+#include "graphics/al_Isosurface.hpp"
+#include "graphics/al_Light.hpp"
 #include "graphics/al_Stereographic.hpp"
 #include "io/al_AudioIO.hpp"
 #include "io/al_File.hpp"

@@ -2,13 +2,13 @@
 What is our "Hello world!" app?
 
 A sphere orbits around the origin emiting the audio line input. The camera
-view can be switched between a freely navigable mode and a follow mode on
-the sphere.
+view can be switched between a freely navigable keyboard/mouse controlled mode 
+and a sphere follow mode.
 
-2 channel spatial sound
+Requirements:
+2 channels of spatial sound
 2 windows, one front view, one back view
-stereographic
-
+stereographic rendering
 */
 
 #include "al_Allocore.hpp"
@@ -26,7 +26,8 @@ struct Agent : public SoundSource{
 		while(io()){
 			float s = io.in(0);
 			
-			writeSample(s);
+			//writeSample(s);
+			writeSample(rnd::uniform()*0.2);
 
 //			float sl, sr;
 //			reverb(s, sl, sr);
@@ -39,7 +40,7 @@ struct Agent : public SoundSource{
 	virtual void onUpdateNav(){
 		smooth(0.9);
 		if((phase+=0.01) >= M_2PI) phase -= M_2PI;
-		pos().set(cos(phase), sin(phase), 0);
+		pos(cos(phase), sin(phase), 0);
 		step();
 	}
 	
@@ -51,7 +52,6 @@ struct Agent : public SoundSource{
 AudioScene scene(3, 1, AUDIO_BLOCK_SIZE);
 Reverb<float> reverb;
 Listener * listener;
-SoundSource src;
 Nav navMaster(Vec3d(0,0,-4), 0.9);
 
 std::vector<Agent> agents(1);
@@ -72,11 +72,11 @@ void audioCB(AudioIOData& io){
 
 	for(unsigned i=0; i<agents.size(); ++i){
 		io.frame(0);
-		agents[i].onProcess(io);
 		agents[i].onUpdateNav();
+		agents[i].onProcess(io);
 	}
 	
-	navMaster.step(0.2);
+	navMaster.step();
 	
 //	for(int i=0; i<numFrames; i++){
 //		src.writeSample(rnd::uniform(1.,-1.)*0.2);
@@ -89,16 +89,20 @@ void audioCB(AudioIOData& io){
 
 struct MyWindow : public WindowGL, public gfx::Drawable{
 	
-	MyWindow(): gl(new gfx::GraphicsBackendOpenGL)
-	{}
+	MyWindow(): gl(new gfx::GraphicsBackendOpenGL){}
 
 	void onFrame(){
+
+		nav.step();
 		cam.set(navMaster);
+		cam *= nav;
+		cam.updateUnitVectors();
+
 		stereo.draw(gl, cam, *this, dimensions().w, dimensions().h);
 	}
 	
-	void draw(gfx::Graphics& g){
-		
+	void onDraw(gfx::Graphics& g){
+		g.antialiasing(gfx::NICEST);
 		g.pointSize(10);
 		g.begin(gfx::POINTS);
 		for(unsigned i=0; i<agents.size(); ++i){
@@ -106,9 +110,30 @@ struct MyWindow : public WindowGL, public gfx::Drawable{
 			g.color(1,1,0);
 		}
 		g.end();
+		
+		g.depthTesting(1);
+		g.begin(gfx::TRIANGLES);
+		{
+		int N=3000;
+		double r = 2;
+		double f1 = 101;
+		double f2 = 166;
+		for(int i=0; i<N; i++){
+			double p = float(i)/N*M_2PI;
+			double x = r*cos(f1*p) * sin(f2*p);
+			double y = r*sin(f1*p) * sin(f2*p);
+			double z = r*cos(f2*p);
+			double c = cos(p)*0.25 + 0.25;
+
+			g.color(HSV(0.2+c, 0.5, i%3 ? 0.5 : 0));
+			g.vertex(x, y, z);
+		}
+		}
+		g.end();
 	}
 
 	gfx::Graphics gl;
+	Nav nav;
 	Camera cam;
 	gfx::Stereographic stereo;
 };
@@ -117,7 +142,6 @@ struct MyWindow : public WindowGL, public gfx::Drawable{
 int main (int argc, char * argv[]){
 
 	listener = &scene.createListener(2);
-	//scene.addSource(src);
 	
 	for(unsigned i=0; i<agents.size(); ++i) scene.addSource(agents[i]);
 
@@ -126,8 +150,8 @@ int main (int argc, char * argv[]){
 	for(int i=0; i<2; ++i){
 		windows[i].add(new StandardWindowKeyControls);
 		windows[i].add(new NavInputControl(&navMaster));
-		//windows[i].add(new NavInputControl(&windows[i].cam));
 		windows[i].create(WindowGL::Dim(600,480,i*650), "Hello Virtual World!");
+		windows[i].nav.turnU(i*90);
 	}
 
 	AudioIO audioIO(AUDIO_BLOCK_SIZE, 44100, audioCB, 0, 2, 1);

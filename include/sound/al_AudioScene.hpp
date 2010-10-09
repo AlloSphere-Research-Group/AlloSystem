@@ -122,6 +122,7 @@ public:
 			src.mPosHistory(src.vec());
 		}
 	
+		// iterate through all listeners adding contribution from all sources
 		for(unsigned il=0; il<mListeners.size(); ++il){
 			Listener& l = *mListeners[il];
 			
@@ -136,10 +137,10 @@ public:
 			for(std::list<SoundSource *>::iterator it = mSources.begin(); it != mSources.end(); it++) {
 				SoundSource& src = *(*it);
 				
-				for(int i=0; i<numFrames; ++i) {
+				for(int i=0; i<numFrames; ++i){
 					
 					// interpolated source position relative to listener
-					float alpha = i/(float)numFrames;
+					float alpha = float(i)/numFrames;
 					Vec3d relpos = ipl::cubic(
 						alpha, 
 						src.mPosHistory[3]-l.mPosHistory[3], 

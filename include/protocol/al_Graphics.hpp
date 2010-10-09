@@ -44,6 +44,19 @@ using std::stack;
 namespace al{
 namespace gfx{
 
+enum AntiAliasMode {
+	DONT_CARE,
+	FASTEST,
+	NICEST
+};
+
+enum AttributeBit {
+	COLOR_BUFFER_BIT	= 1<<0,		/**< Color-buffer bit */
+	DEPTH_BUFFER_BIT	= 1<<1,		/**< Depth-buffer bit */
+	ENABLE_BIT			= 1<<2,		/**< Enable bit */
+	VIEWPORT_BIT		= 1<<3		/**< Viewport bit */
+};
+
 enum BlendFunc {
 	SRC_ALPHA = 0,
 	SRC_COLOR,
@@ -54,15 +67,15 @@ enum BlendFunc {
 	SRC_ALPHA_SATURATE
 };
 
+enum MatrixMode {
+	MODELVIEW = 0,
+	PROJECTION
+};
+
 enum PolygonMode {
 	POINT = 0,
 	LINE,
 	FILL
-};
-
-enum MatrixMode {
-	MODELVIEW = 0,
-	PROJECTION
 };
 
 enum Primitive {
@@ -75,42 +88,6 @@ enum Primitive {
 	POLYGON
 };
 
-namespace AntiAliasMode {
-	enum t{
-		DontCare,
-		Fastest,
-		Nicest
-	};
-}
-
-namespace AttributeBit {
-	enum t{
-		ColorBuffer	= 1<<0,		/**< Color-buffer bit */
-		DepthBuffer	= 1<<1,		/**< Depth-buffer bit */
-		Enable		= 1<<2,		/**< Enable bit */
-		Viewport	= 1<<3		/**< Viewport bit */
-	};
-	inline t operator| (const t& a, const t& b){ return t(int(a) | int(b)); }
-	inline t operator& (const t& a, const t& b){ return t(int(a) & int(b)); }
-}
-
-struct StateChange {
-	StateChange()
-	:	blending(true),
-		lighting(true),
-		depth_testing(true),
-		polygon_mode(true),
-		antialiasing(true)
-	{}
-
-	~StateChange(){}
-
-	bool blending;
-	bool lighting;
-	bool depth_testing;
-	bool polygon_mode;
-	bool antialiasing;
-};
 
 
 struct State {
@@ -121,7 +98,7 @@ struct State {
 		lighting_enable(false),
 		depth_enable(true),
 		polygon_mode(FILL),
-		antialias_mode(AntiAliasMode::DontCare)
+		antialias_mode(DONT_CARE)
 	{}
 
 	~State() {}
@@ -142,8 +119,27 @@ struct State {
 	PolygonMode polygon_mode;
 
 	// Anti-Aliasing
-	AntiAliasMode::t antialias_mode;
+	AntiAliasMode antialias_mode;
 
+};
+
+
+struct StateChange {
+	StateChange()
+	:	blending(true),
+		lighting(true),
+		depth_testing(true),
+		polygon_mode(true),
+		antialiasing(true)
+	{}
+
+	~StateChange(){}
+
+	bool blending;
+	bool lighting;
+	bool depth_testing;
+	bool polygon_mode;
+	bool antialiasing;
 };
 
 
@@ -244,6 +240,9 @@ public:
 	~Graphics();
 
 	// Rendering State
+	void blending(bool enable, BlendFunc src, BlendFunc dst);
+	void depthTesting(bool enable);
+	void lighting(bool enable);
 	void pushState(State &state);
 	void popState();
 
@@ -272,9 +271,12 @@ public:
 	void scale(const Vec3f& v) { scale(v[0], v[1], v[2]); }
 
 	// Immediate Mode
-	void begin(Primitive mode);
-	void end();
 
+	/// Begin "immediate" mode drawing
+	void begin(Primitive mode);
+	
+	/// End "immediate" mode
+	void end();
 
 	void vertex(double x, double y, double z=0.);
 	void vertex(const Vec3d& v) { vertex(v[0], v[1], v[2]); }
@@ -284,29 +286,31 @@ public:
 	void normal(const Vec3d& v) { normal(v[0], v[1], v[2]); }
 	void normal(const Vec3f& v) { normal(v[0], v[1], v[2]); }
 	void color(double r, double g, double b, double a=1.);
+	void color(const Color& v){ color(v.r, v.g, v.b, v.a); }
 	void color(const Vec3d& v, double a=1.) { color(v[0], v[1], v[2], a); }
 	void color(const Vec3f& v, double a=1.) { color(v[0], v[1], v[2], a); }
 
 	// Other state
-	void pointSize(double v);
+	void antialiasing(AntiAliasMode v);
 	void lineWidth(double v);
+	void pointSize(double v);
 
 	// Buffer drawing
+
+	/// Render data in graphic buffers
 	void draw(const GraphicsData& v);
+
+	/// Render data in internal graphic buffers
 	void draw();
 
-	GraphicsBackend * backend() { return mBackend; }
-	GraphicsData& data() { return mGraphicsData; }
-
+	/// Get implementation backend
+	GraphicsBackend * backend(){ return mBackend; }
+	
+	/// Get internal graphic buffers
+	GraphicsData& data(){ return mGraphicsData; }
 
 	void drawBegin();
 	void drawEnd();
-protected:
-	void compareState(const State &prev_state, const State &state);
-	void enableState();
-
-	stack<Matrix4d> & matrixStackForMode(MatrixMode mode);
-
 
 protected:
 	GraphicsBackend	*	mBackend;			// graphics API implementation
@@ -318,6 +322,9 @@ protected:
 	StateChange			mStateChange;		// state difference to mark changes
 	stack<State>		mState;				// state stack
 
+	void compareState(const State &prev_state, const State &state);
+	void enableState();
+	stack<Matrix4d>& matrixStackForMode(MatrixMode mode);
 };
 
 /*
@@ -325,7 +332,7 @@ protected:
 */
 class Drawable {
 public:
-	virtual void draw(Graphics& gl) = 0;
+	virtual void onDraw(Graphics& gl) = 0;
 	virtual ~Drawable() {}
 };
 

@@ -13,35 +13,63 @@ namespace al {
 ///
 class Pose {
 public:
-	Pose(const Vec3d &v=Vec3d(0)): mVec(v) { mQuat.identity(); }
+	Pose(const Vec3d& v=Vec3d(0), const Quatd& q=Quatd::identity())
+	:	mVec(v), mQuat(q)
+	{}
 
 	Pose operator* (const Pose& v) const { return Pose(*this)*=v; }
 
+	/// Translate and rotate by argument
 	Pose& operator*=(const Pose& v){
 		mVec += v.vec();
 		mQuat*= v.quat();
 		return *this;
 	}
-	
-	Vec3d& pos(){ return mVec; }
+
+
+	/// Get "position" vector
 	const Vec3d& pos() const { return mVec; }
 	
+	/// Get vector component
+	const Vec3d& vec() const { return mVec; }
+
+	/// Get quaternion component
+	const Quatd& quat() const { return mQuat; }
+
+	double x() const { return mVec[0]; }
+	double y() const { return mVec[1]; }
+	double z() const { return mVec[2]; }
+
+	
+	/// Set position
 	template <class T>
 	Pose& pos(const Vec3<T>& v){ return vec(v); }
 	
-	Vec3d& vec(){ return mVec; }
-	const Vec3d& vec() const { return mVec; }
+	/// Set position from individual components
+	Pose& pos(double x, double y, double z) { return vec(Vec3d(x,y,z)); }
 
+	/// Set vector component
 	template <class T>
 	Pose& vec(const Vec3<T>& v){ mVec.set(v); return *this; }
 
-	Quatd& quat(){ return mQuat; }
-	const Quatd& quat() const { return mQuat; }
-
+	/// Set quaternion component
 	template <class T>
 	Pose& quat(const Quat<T>& v){
 		mQuat[0]=v[0]; mQuat[1]=v[1]; mQuat[2]=v[2]; mQuat[3]=v[3];
 		return *this;
+	}
+
+	Vec3d& pos(){ return mVec; }
+	Vec3d& vec(){ return mVec; }
+	Quatd& quat(){ return mQuat; }
+
+	/// Get right, up, and forward unit vectors
+	template <class T>
+	void unitVectors(Vec3<T>& ur, Vec3<T>& uu, Vec3<T>& uf){
+		quat().normalize();
+		quat().toVectorX(ur);
+		quat().toVectorY(uu);
+		quat().toVectorZ(uf);	
 	}
 
 	/// Set state from another Pose
@@ -70,27 +98,23 @@ public:
 
 	/// Get smoothing amount
 	double smooth() const { return mSmooth; }
-	
-	/// friendly helpers
-	double x() const { return mVec[0]; }
-	double y() const { return mVec[1]; }
-	double z() const { return mVec[2]; }
 
-	const Vec3d& ux() const { return mUX; }
-	const Vec3d& uy() const { return mUY; }
-	const Vec3d& uz() const { return mUZ; }
+	/// Get right unit vector
+	const Vec3d& ur() const { return mUR; }
+	
+	/// Get up unit vector
+	const Vec3d& uu() const { return mUU; }
+	
+	/// Get forward unit vector
+	const Vec3d& uf() const { return mUF; }
 	
 	/// Get linear and angular velocities as a Pose
 	Pose vel() const {
-		Pose p;
-		p.vec(mMove1);
-		p.quat(Quatd::fromEuler(mSpin1[1], mSpin1[0], mSpin1[2]));
-		return p;
+		return Pose(mMove1, Quatd::fromEuler(mSpin1[1], mSpin1[0], mSpin1[2]));
 	}
 
 	/// Set smoothing amount [0,1)
 	Nav& smooth(double v){ mSmooth=v; return *this; }
-	
 	
 	void view(double azimuth, double elevation, double bank) {
 		view(Quatd::fromEuler(azimuth, elevation, bank));
@@ -103,33 +127,36 @@ public:
 	void turn(const Quatd& v) {
 		v.toEuler(mSpin1);
 	}
-	
-	void position(double x, double y, double z) { mVec[0]=x; mVec[1]=y; mVec[2]=z; }
-	void position(const Vec3d& p) { mVec.set(p); }
 
 	/// Set linear velocity
-	void move(double x, double y, double z) { moveX(x); moveY(y); moveZ(z); }
-	void moveX(double v){ mMove0[0] = v; }
-	void moveY(double v){ mMove0[1] = v; }
-	void moveZ(double v){ mMove0[2] = v; }
+	void move(double dr, double du, double df) { moveR(dr); moveU(du); moveF(df); }
+	void moveR(double v){ mMove0[0] = v; }
+	void moveU(double v){ mMove0[1] = v; }
+	void moveF(double v){ mMove0[2] = v; }
 
 	/// Accelerate
-	void push(double x, double y, double z) { pushX(x); pushY(y); pushZ(z); }
-	void pushX(double amount) { mMove0[0] += amount; }
-	void pushY(double amount) { mMove0[1] += amount; }
-	void pushZ(double amount) { mMove0[2] += amount; }
+	void push(double ddr, double ddu, double ddf) { pushR(ddr); pushU(ddu); pushF(ddf); }
+	void pushR(double amount) { mMove0[0] += amount; }
+	void pushU(double amount) { mMove0[1] += amount; }
+	void pushF(double amount) { mMove0[2] += amount; }
 
-	/// Set angular velocity
-	void spinX(double v){ mSpin0[0] = v; }
-	void spinY(double v){ mSpin0[1] = v; }
-	void spinZ(double v){ mSpin0[2] = v; }
-	void spin(double a, double e, double b){ spinX(e); spinY(a); spinZ(b); }
+	/// Set all angular velocity values from azimuth, elevation, and bank differentials
+	void spin(double da, double de, double db){ spinR(de); spinU(da); spinF(db); }
+
+	/// Set angular velocity around right vector
+	void spinR(double v){ mSpin0[0] = v; }
+	
+	/// Set angular velocity around up vector
+	void spinU(double v){ mSpin0[1] = v; }
+	
+	/// Set angular velocity around forward vector
+	void spinF(double v){ mSpin0[2] = v; }
 
 	/// Turn by a single increment for one step, in degrees
-	void turnX(double v){ mTurn[0] = v; }
-	void turnY(double v){ mTurn[1] = v; }
-	void turnZ(double v){ mTurn[2] = v; }
-	void turn(double a, double e, double b){ turnX(e); turnY(a); turnZ(b); }
+	void turnR(double v){ mTurn[0] = v; }
+	void turnU(double v){ mTurn[1] = v; }
+	void turnF(double v){ mTurn[2] = v; }
+	void turn(double a, double e, double b){ turnR(e); turnU(a); turnF(b); }
 
 	/// Stop moving and spinning
 	Nav& halt(){ mMove0.set(0); mSpin0.set(0); quat().identity(); return *this; }
@@ -145,19 +172,14 @@ public:
 	}
 
 	/// Update coordinate frame basis vectors based on internal quaternion
-	void updateUnitVectors(){
-		quat().normalize();
-		quat().toVectorX(mUX);
-		quat().toVectorY(mUY);
-		quat().toVectorZ(mUZ);	
-	}
+	void updateUnitVectors(){ unitVectors(mUR, mUU, mUF); }
 	
 	void set(const Nav& v){
 		Pose::set(v);
 		mMove0 = v.mMove0; mMove1 = v.mMove1;
 		mSpin0 = v.mSpin0; mSpin1 = v.mSpin1;
 		mTurn = v.mTurn;
-		mUX = v.mUX; mUY = v.mUY; mUZ = v.mUZ;
+		mUR = v.mUR; mUU = v.mUU; mUF = v.mUF;
 		mSmooth = v.mSmooth;
 	}
 	
@@ -177,7 +199,7 @@ public:
 
 		// accumulate position:
 		for(int i=0; i<pos().size(); ++i){
-			pos()[i] += mMove1.dot(Vec3d(ux()[i], uy()[i], uz()[i]));
+			pos()[i] += mMove1.dot(Vec3d(ur()[i], uu()[i], uf()[i]));
 		}
 	}
 
@@ -185,7 +207,7 @@ protected:
 	Vec3d mMove0, mMove1;	// linear velocities (raw, smoothed)
 	Vec3d mSpin0, mSpin1;	// angular velocities (raw, smoothed)
 	Vec3d mTurn;			// 
-	Vec3d mUX, mUY, mUZ;	// basis vectors of coordinate frame
+	Vec3d mUR, mUU, mUF;	// basis vectors of coordinate frame
 	double mSmooth;
 };
 

@@ -42,7 +42,7 @@ void audioCB(AudioIOData& io){
 	}
 	
 	scene.encode(numFrames, io.framesPerSecond());
-	scene.render(io.out(0), numFrames);
+	scene.render(&io.out(0,0), numFrames);
 }
 
 
@@ -62,7 +62,7 @@ struct MyWindow : WindowGL{
 	void onMouseDrag(const Mouse& m){}
 
 	void onFrame(){
-		gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
+		gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 		gl.loadIdentity();
 		gl.viewport(0,0, dimensions().w, dimensions().h);
 	}

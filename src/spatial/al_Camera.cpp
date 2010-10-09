@@ -26,12 +26,12 @@ Camera :: Camera(
 Matrix4d Camera::modelViewMatrix(Eye e) {
 	switch(e) {
 		case RIGHT: 
-			return Matrix4d::lookAtOffAxis(ux(), uy(), uz(), pos(), mEyeSep);
+			return Matrix4d::lookAtOffAxis(ur(), uu(), uf(), pos(), mEyeSep);
 		case LEFT: 
-			return Matrix4d::lookAtOffAxis(ux(), uy(), uz(), pos(), -mEyeSep);
+			return Matrix4d::lookAtOffAxis(ur(), uu(), uf(), pos(), -mEyeSep);
 		case MONO:
 		default: 
-			return Matrix4d::lookAt(ux(), uy(), uz(), pos());
+			return Matrix4d::lookAt(ur(), uu(), uf(), pos());
 	}
 }
 
