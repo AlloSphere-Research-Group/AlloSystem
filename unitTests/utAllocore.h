@@ -13,6 +13,7 @@
 #include "math/al_Functions.hpp"
 #include "math/al_Generators.hpp"
 #include "math/al_Interpolation.hpp"
+#include "math/al_Interval.hpp"
 #include "math/al_Plane.hpp"
 #include "math/al_Random.hpp"
 #include "math/al_Quat.hpp"

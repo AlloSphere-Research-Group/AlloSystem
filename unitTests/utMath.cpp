@@ -5,9 +5,6 @@ inline bool eq(double x, double y, double eps=0.000001){ return abs(x-y) < eps; 
 
 int utMath(){
 
-	
-
-
 	// Vec
 	{
 		const int N = 4;
@@ -447,6 +444,51 @@ int utMath(){
 		assert(g() ==15);
 		assert(g() ==31);
 		}
+	}
+
+
+	// Interval
+	{
+		Interval<double> i(0,1);
+		
+		assert(i.min()==0 && i.max()==1);
+
+		i.min(2);
+		assert(i.min()==1 && i.max()==2);
+
+		i.max(0);
+		assert(i.min()==0 && i.max()==1);
+		
+		i.endpoints(-1,1);
+		assert(i.min()==-1 && i.max()==1);
+		
+		assert(i.center()	==0);
+		assert(i.diameter()	==2);
+		assert(i.radius()	==1);
+		
+		assert(i.proper());
+		
+		i.endpoints(0,0);
+		assert(i.degenerate());
+		
+		i.centerDiameter(1, 4);
+		assert(i.center()	==1);
+		assert(i.diameter()	==4);
+		assert(i.min()==-1 && i.max()==3);
+		
+		i.center(2);
+		assert(i.min()==0 && i.max()==4);
+		
+		i.diameter(6);
+		assert(i.min()==-1 && i.max()==5);
+		
+		i.endpoints(-1, 1);
+		assert(i.toUnit(0) == 0.5);
+
+		assert(Interval<int>(0,1) != Interval<int>(0,1));
+		assert(Interval<int>(0,2) != Interval<int>(0,1));
+		assert((Interval<int>(0,2) += Interval<int>(-1,2)) == Interval<int>(-1,4));
+		assert((Interval<int>(0,2) -= Interval<int>(-1,2)) == Interval<int>(-2,3));
 	}
 
 
