@@ -344,7 +344,19 @@ public:
 	Mat& set(const T& v){ IT(size()){ (*this)[i]=v; } return *this; }
 	
 	/// Set elements in column-major order from C array
-	Mat& set(const T * arr){ IT(size()){ (*this)[i]=arr[i]; } return *this; }
+	template <class U>
+	Mat& set(const U * arr){ IT(size()){ (*this)[i]=arr[i]; } return *this; }
+
+	/// Set elements in column-major order from C array
+	
+	/// @param[in] arr			1D array from which to copy (stride=1)
+	/// @param[in] numElements	number of elements to copy
+	/// @param[in] matOffset	index offset into matrix
+	/// @param[in] matStride	amount to stride through matrix
+	template <class U>
+	Mat& set(const U * arr, int numElements, int matOffset, int matStride=1){
+		IT(numElements){ (*this)[i*matStride+matOffset]=arr[i]; } return *this;
+	}
 	
 	Mat& set(
 		const T& v11, const T& v21, const T& v31,

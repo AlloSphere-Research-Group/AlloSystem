@@ -40,6 +40,14 @@ public:
 	double y() const { return mVec[1]; }
 	double z() const { return mVec[2]; }
 
+	/// Convert to homogenous coordinate 4x4 matrix
+	Mat4d matrix() const {
+		Mat4d m;
+		quat().toMatrix(&m[0]);
+		m.set(&vec()[0], 3, 12);
+		return m;
+	}
+
 	
 	/// Set position
 	template <class T>
