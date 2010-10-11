@@ -10,22 +10,13 @@ struct MyWindow : WindowGL{
 	void onResize(int w, int h){		printf("onResize     %d, %d\n", w, h); }
 	void onVisibility(bool v){			printf("onVisibility %s\n", v?"true":"false"); }
 	
-	void onKeyDown(const Keyboard& k){	printf("onKeyDown    "); printKey(); 
-		switch(k.key()){
-			case Key::Escape: fullScreenToggle(); break;
-			case 'q': if(k.ctrl()) WindowGL::stopLoop(); break;
-			case 'w': if(k.ctrl()) destroy(); break;
-			case 'h': if(k.ctrl()) hide(); break;
-			case 'm': if(k.ctrl()) iconify(); break;
-			case 'c': if(k.ctrl()) cursorHideToggle(); break;
-		}
-	}
-	void onKeyUp(const Keyboard& k){	printf("onKeyUp      "); printKey(); }
+	bool onKeyDown(const Keyboard& k){	printf("onKeyDown    "); printKey(); return true; }
+	bool onKeyUp(const Keyboard& k){	printf("onKeyUp      "); printKey(); return true; }
 	
-	void onMouseDown(const Mouse& m){	printf("onMouseDown  "); printMouse(); }
-	void onMouseUp(const Mouse& m){		printf("onMouseUp    "); printMouse(); }
-	void onMouseDrag(const Mouse& m){	printf("onMouseDrag  "); printMouse(); }
-	//void onMouseMove(const Mouse& m){	printf("onMouseMove  "); printMouse(); }
+	bool onMouseDown(const Mouse& m){	printf("onMouseDown  "); printMouse(); return true; }
+	bool onMouseUp(const Mouse& m){		printf("onMouseUp    "); printMouse(); return true; }
+	bool onMouseDrag(const Mouse& m){	printf("onMouseDrag  "); printMouse(); return true; }
+	//void onMouseMove(const Mouse& m){	printf("onMouseMove  "); printMouse(); return true; }
 	
 	void printMouse(){
 		const Mouse& m = mouse();
