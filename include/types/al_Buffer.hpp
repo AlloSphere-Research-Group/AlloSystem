@@ -113,7 +113,7 @@ public:
 	}
 
 	/// Appends element to end of buffer growing its size if necessary
-	void append(const T &v, double growFactor=2){
+	void append(const T& v, double growFactor=2){
 		if(size() >= capacity()){	// double array size if too small
 			mElems.resize((size() ? size() : 4)*growFactor);
 		}
@@ -122,7 +122,7 @@ public:
 		++mSize;
 	}
 	/// synonym for append():
-	void push_back(const T &v, double growFactor=2) { append(v, growFactor); }	
+	void push_back(const T& v, double growFactor=2) { append(v, growFactor); }	
 
 	/// Write new element to ring buffer
 	void write(const T& v){
