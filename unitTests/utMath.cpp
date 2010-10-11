@@ -485,7 +485,7 @@ int utMath(){
 		i.endpoints(-1, 1);
 		assert(i.toUnit(0) == 0.5);
 
-		assert(Interval<int>(0,1) != Interval<int>(0,1));
+		assert(Interval<int>(0,1) == Interval<int>(0,1));
 		assert(Interval<int>(0,2) != Interval<int>(0,1));
 		assert((Interval<int>(0,2) += Interval<int>(-1,2)) == Interval<int>(-1,4));
 		assert((Interval<int>(0,2) -= Interval<int>(-1,2)) == Interval<int>(-2,3));
