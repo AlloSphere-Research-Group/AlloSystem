@@ -130,7 +130,7 @@ public:
 
 	/// Encode a single time sample
 	
-	/// @param[out] ambiChans	flat array (non-interleaved) of Ambisonic domain channels
+	/// @param[out] ambiChans	Ambisonic domain channels (non-interleaved)
 	/// @param[in ] numFrames	number of frames in time buffer
 	/// @param[in ] timeIndex	index at which to encode time sample
 	/// @param[in ] timeSample	value of time sample

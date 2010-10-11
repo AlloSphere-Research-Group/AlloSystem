@@ -101,7 +101,7 @@ void AmbiBase::encodeWeightsFuMa(float * ws, int dim, int order, float az, float
 	float x = COS(az) * cosel;
 	float y = SIN(az) * cosel;
 	float z = dim>=3 ? SIN(el) : 0;
-	encodeWeightsFuMa(ws, dim, x,y,z);
+	encodeWeightsFuMa(ws, dim, order, x,y,z);
 }
 
 // [x, y, z] is the normalized direction vector
@@ -194,7 +194,7 @@ void AmbiDecode::decode(float * dec, const float * enc, int numDecFrames){
 		float * out = dec + mSpeakers[s].deviceChannel * numDecFrames;
 		
 		// iterate ambi channels
-		for(int c=0; c<channels(); c++){
+		for(int c=0; c<channels(); ++c){
 			const float * in = enc + c * numDecFrames;
 			float w = decodeWeight(s, c);
 			for(int i=0; i<numDecFrames; ++i) out[i] += in[i] * w;		
@@ -218,12 +218,10 @@ void AmbiDecode::numSpeakers(int num){
 
 void AmbiDecode::setSpeakerRadians(int index, int deviceChannel, float az, float el){
 	if(index < numSpeakers()){		// verify speaker index
-//		azimuths()  [index] = az;	// update speaker location	
-//		elevations()[index] = el;
 		mSpeakers[index].azimuth = az;
 		mSpeakers[index].elevation = el;
 		mSpeakers[index].deviceChannel = deviceChannel;
-		
+
 		// update encoding weights
 		//mDecodeMatrix[index][0] *= AmbiBase::c1_sqrt2;
 		encodeWeightsFuMa(mDecodeMatrix + index * channels(), mDim, mOrder, az, el);
@@ -231,7 +229,7 @@ void AmbiDecode::setSpeakerRadians(int index, int deviceChannel, float az, float
 }
 
 void AmbiDecode::setSpeaker(int index, int deviceChannel, float az, float el){
-	setSpeaker(index, deviceChannel, az * float(0.01745329252), el * float(0.01745329252));
+	setSpeakerRadians(index, deviceChannel, az * float(0.01745329252), el * float(0.01745329252));
 }
 
 void AmbiDecode::updateChanWeights(){
