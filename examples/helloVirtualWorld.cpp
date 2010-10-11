@@ -27,13 +27,8 @@ struct Agent : public SoundSource{
 			float s = io.in(0);
 			
 			//writeSample(s);
-			writeSample(rnd::uniform()*0.2);
+			writeSample(rnd::uniform()*0.2); // make noise, just to hear something
 
-//			float sl, sr;
-//			reverb(s, sl, sr);
-//
-//			io.sum(0) = sl*0.2;
-//			io.sum(1) = sr*0.2;
 		}
 	}
 	
@@ -50,9 +45,8 @@ struct Agent : public SoundSource{
 
 #define AUDIO_BLOCK_SIZE 256
 AudioScene scene(3, 1, AUDIO_BLOCK_SIZE);
-Reverb<float> reverb;
 Listener * listener;
-Nav navMaster(Vec3d(0,0,-4), 0.9);
+Nav navMaster(Vec3d(0,0,-4), 0.95);
 
 std::vector<Agent> agents(1);
 
@@ -115,7 +109,7 @@ struct MyWindow : public WindowGL, public gfx::Drawable{
 		g.begin(gfx::TRIANGLES);
 		{
 		int N=3000;
-		double r = 2;
+		double r = 4;
 		double f1 = 101;
 		double f2 = 166;
 		for(int i=0; i<N; i++){

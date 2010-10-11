@@ -165,17 +165,21 @@ private:
 };
 
 
+
 /// Controller for handling input events
+
+/// The return value of the event handlers determines whether or not
+/// the event should be propagated to other handlers.
 struct InputEventHandler{
 	virtual ~InputEventHandler(){}
 
-	virtual void onKeyDown(const Keyboard& k){}	///< Called when a keyboard key is pressed
-	virtual void onKeyUp(const Keyboard& k){}	///< Called when a keyboard key is released
+	virtual bool onKeyDown(const Keyboard& k){return true;}	///< Called when a keyboard key is pressed
+	virtual bool onKeyUp(const Keyboard& k){return true;}	///< Called when a keyboard key is released
 
-	virtual void onMouseDown(const Mouse& m){}	///< Called when a mouse button is pressed
-	virtual void onMouseDrag(const Mouse& m){}	///< Called when the mouse moves while a button is down
-	virtual void onMouseMove(const Mouse& m){}	///< Called when the mouse moves
-	virtual void onMouseUp(const Mouse& m){}	///< Called when a mouse button is released
+	virtual bool onMouseDown(const Mouse& m){return true;}	///< Called when a mouse button is pressed
+	virtual bool onMouseDrag(const Mouse& m){return true;}	///< Called when the mouse moves while a button is down
+	virtual bool onMouseMove(const Mouse& m){return true;}	///< Called when the mouse moves
+	virtual bool onMouseUp(const Mouse& m){return true;}	///< Called when a mouse button is released
 
 	WindowGL& window(){ return *mWindow; }
 	const WindowGL& window() const { return *mWindow; }
@@ -279,7 +283,11 @@ private:
 	std::vector<InputEventHandler *> mEventHandlers;
 
 	#define CALL(e)\
-	e; for(unsigned i=0; i<mEventHandlers.size(); ++i){ mEventHandlers[i]->e; }
+	if(e){\
+		for(unsigned i=0; i<mEventHandlers.size(); ++i){\
+			if(!mEventHandlers[i]->e) break;\
+		}\
+	}
 	void doMouseDown(const Mouse& m){ CALL(onMouseDown(m)); }
 	void doMouseDrag(const Mouse& m){ CALL(onMouseDrag(m)); }
 	void doMouseMove(const Mouse& m){ CALL(onMouseMove(m)); }
@@ -294,24 +302,27 @@ private:
 
 
 struct StandardWindowKeyControls : InputEventHandler {
-	void onKeyDown(const Keyboard& k){
-		switch(k.key()){
-			case Key::Escape: window().fullScreenToggle(); break;
-			case 'q': if(k.ctrl()) WindowGL::stopLoop(); break;
-			//case 'w': if(k.ctrl()) window().destroy(); break;
-			case 'h': if(k.ctrl()) window().hide(); break;
-			case 'm': if(k.ctrl()) window().iconify(); break;
-			case 'c': if(k.ctrl()) window().cursorHideToggle(); break;
+	bool onKeyDown(const Keyboard& k){
+		if(k.ctrl()){
+			switch(k.key()){
+				case 'q': WindowGL::stopLoop(); return false;
+				//case 'w': window().destroy(); return false;
+				case 'h': window().hide(); return false;
+				case 'm': window().iconify(); return false;
+				case 'c': window().cursorHideToggle(); return false;
+				default:;
+			}
 		}
+		else{
+			switch(k.key()){
+				case Key::Escape: window().fullScreenToggle(); return false;
+				default:;
+			}
+		}
+		return true;
 	}
 };
 
-
-//struct TimedFunction{
-//	virtual ~TimedFunction(){}
-//	void operator()(float ms);
-//	virtual void onExecute(){}
-//};
 
 
 } // al::
