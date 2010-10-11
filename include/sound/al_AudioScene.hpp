@@ -71,7 +71,7 @@ public:
 		return delay*sampleRate;
 	}
 
-	/// Returns maximum number of seconds (exclusive) of delay
+	/// Returns maximum number of seconds of delay
 	double maxDelay(double sampleRate) const {
 		return delaySize()/sampleRate;
 	}
@@ -92,7 +92,7 @@ public:
 	}
 
 
-	/// Write sample to delay-line
+	/// Write sample to internal delay-line
 	void writeSample(const float& v){ mSound.write(v); }
 
 protected:
@@ -117,15 +117,16 @@ public:
 	// TODO: setNumFrames
 
 	Listener& createListener(int numspeakers) {
-		mListeners.push_back(new Listener(dim(), order(), numspeakers, 1, mNumFrames));
-		return *mListeners.back();
+		Listener * l = new Listener(dim(), order(), numspeakers, 1, mNumFrames);
+		mListeners.push_back(l);
+		return *l;
 	}
 	
-	void addSource(SoundSource & src) {
+	void addSource(SoundSource& src) {
 		mSources.push_back(&src);
 	}
 	
-	void removeSource(SoundSource & src) {
+	void removeSource(SoundSource& src) {
 		mSources.remove(&src);
 	}
 
@@ -135,12 +136,15 @@ public:
 		//const double invClipRange = mFarClip - mNearClip;
 		
 		double distanceToSample = sampleRate / mSpeedOfSound;
+		distanceToSample = 16;
 	
 		// update source history data:
 		for(Sources::iterator it = mSources.begin(); it != mSources.end(); it++) {
 			SoundSource& src = *(*it);
 			src.mPosHistory(src.vec());
 		}
+	
+		//printf("%d, %d\n", (int)mListeners.size(), (int)mSources.size());
 	
 		// iterate through all listeners adding contribution from all sources
 		for(unsigned il=0; il<mListeners.size(); ++il){
@@ -152,17 +156,16 @@ public:
 			l.mQuatPrev = qnew;
 			l.mPosHistory(l.vec());
 			
-			l.zeroAmbi(); // zero out existing data
-			//float * ambiChans = l.ambiChans();
+			l.zeroAmbi(); // zero out existing ambi samples
 
 			// iterate through all sound sources
-			for(Sources::iterator it = mSources.begin(); it != mSources.end(); it++){
+			for(Sources::iterator it = mSources.begin(); it != mSources.end(); ++it){
 				SoundSource& src = *(*it);
 				
 				// iterate time samples
 				for(int i=0; i<numFrames; ++i){
 					
-					// interpolated source position relative to listener
+					// compute interpolated source position relative to listener
 					float alpha = float(i)/numFrames;
 					Vec3d relpos = ipl::cubic(
 						alpha, 
@@ -171,18 +174,19 @@ public:
 						src.mPosHistory[1]-l.mPosHistory[1], 
 						src.mPosHistory[0]-l.mPosHistory[0]
 					);
-					
+
 					double distance = relpos.mag();
 					double idx = distance * distanceToSample;
 
-					//int idx0 = idx;
+					int idx0 = idx;
 					
 					// are we within range?
-					if(idx <= src.maxIndex()){
+					if(idx0 <= src.maxIndex()){
 
 						double distAtten = 0.1;
 						double gain = distAtten * distance;	
 						gain = (gain>1.) ? 1./gain : 1.;
+						gain = 1;
 						
 						float s = src.readSample(idx) * gain;
 						
@@ -225,10 +229,13 @@ public:
 		}
 	}
 	
-	/// between encode & decode, can apply optional processing to ambi domain signals (e.g. reverb)
+	// between encode & decode, can apply optional processing to ambi domain signals (e.g. reverb)
 	
 
-	/// decode sources (per listener) to output channels
+	/// Decode sources (per listener) to output channels
+	
+	/// @param[out] outs		1D array of output (non-interleaved)
+	/// @param[in ] numFrames	number of frames per channel buffer
 	void render(float * outs, const int& numFrames){
 		for(unsigned il=0; il<mListeners.size(); ++il){
 			Listener& l = *mListeners[il];

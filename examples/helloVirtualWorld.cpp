@@ -14,7 +14,7 @@ stereographic rendering
 #include "al_Allocore.hpp"
 #include "al_NavControl.hpp"
 
-struct Agent : public SoundSource{
+struct Agent : public SoundSource, public gfx::Drawable{
 
 	Agent()
 	: phase(0)
@@ -25,7 +25,7 @@ struct Agent : public SoundSource{
 	virtual void onProcess(AudioIOData& io){
 		while(io()){
 			//float s = io.in(0);
-			float s = rnd::uniform()*0.2; // make noise, just to hear something
+			float s = rnd::uniform()*0.9; // make noise, just to hear something
 			writeSample(s);
 		}
 	}
@@ -33,8 +33,31 @@ struct Agent : public SoundSource{
 	virtual void onUpdateNav(){
 		smooth(0.9);
 		if((phase+=0.01) >= M_2PI) phase -= M_2PI;
-		pos(cos(phase), sin(phase), 0);
+		//pos(cos(phase), sin(phase), 0);
+		//pos(0,0,0);
+		
+		spin(0.3, 0.011, 0.417);
+		//moveF(0.01);
 		step();
+	}
+	
+	virtual void onDraw(gfx::Graphics& g){
+
+		g.pushMatrix();
+		g.multMatrix(matrix());
+	
+		g.begin(gfx::TRIANGLES);
+			float ds = 0.5;
+			g.vertex(    0, 0, ds*2);
+			g.vertex( ds/2, 0,-ds);
+			g.vertex(-ds/2, 0,-ds);
+			
+			g.color(1,1,1);
+			g.color(1,1,0);
+			g.color(1,0,1);
+		g.end();
+		
+		g.popMatrix();	
 	}
 	
 	double phase;
@@ -45,37 +68,24 @@ struct Agent : public SoundSource{
 AudioScene scene(3, 1, AUDIO_BLOCK_SIZE);
 Listener * listener;
 Nav navMaster(Vec3d(0,0,-4), 0.95);
-
 std::vector<Agent> agents(1);
 
 
 void audioCB(AudioIOData& io){
 	int numFrames = io.framesPerBuffer();
 
-//	for(int i=0; i<numFrames; ++i){
-//		float s = io.in(0,i);
-//
-//		float sl, sr;
-//		reverb(s, sl, sr);
-//
-//		io.out(0,i) = sl*0.2;
-//		io.out(1,i) = sr*0.2;
-//	}
-
 	for(unsigned i=0; i<agents.size(); ++i){
 		io.frame(0);
 		agents[i].onUpdateNav();
 		agents[i].onProcess(io);
 	}
-	
+
 	navMaster.step();
-	
-//	for(int i=0; i<numFrames; i++){
-//		src.writeSample(rnd::uniform(1.,-1.)*0.2);
-//	}
-	
+
 	scene.encode(numFrames, io.framesPerSecond());
 	scene.render(&io.out(0,0), numFrames);
+	
+	//printf("%g\n", io.out(0,0));
 }
 
 
@@ -93,35 +103,12 @@ struct MyWindow : public WindowGL, public gfx::Drawable{
 		stereo.draw(gl, cam, *this, dimensions().w, dimensions().h);
 	}
 	
-	void onDraw(gfx::Graphics& g){
+	virtual void onDraw(gfx::Graphics& g){
 		g.antialiasing(gfx::NICEST);
-		g.pointSize(10);
-		g.begin(gfx::POINTS);
+
 		for(unsigned i=0; i<agents.size(); ++i){
-			g.vertex(agents[i].pos());
-			g.color(1,1,0);
+			agents[i].onDraw(g);
 		}
-		g.end();
-		
-//		g.depthTesting(1);
-//		g.begin(gfx::TRIANGLES);
-//		{
-//		int N=3000;
-//		double r = 4;
-//		double f1 = 101;
-//		double f2 = 166;
-//		for(int i=0; i<N; i++){
-//			double p = float(i)/N*M_2PI;
-//			double x = r*cos(f1*p) * sin(f2*p);
-//			double y = r*sin(f1*p) * sin(f2*p);
-//			double z = r*cos(f2*p);
-//			double c = cos(p)*0.25 + 0.25;
-//
-//			g.color(HSV(0.2+c, 0.5, i%3 ? 0.5 : 0));
-//			g.vertex(x, y, z);
-//		}
-//		}
-//		g.end();
 	}
 
 	gfx::Graphics gl;
@@ -134,6 +121,9 @@ struct MyWindow : public WindowGL, public gfx::Drawable{
 int main (int argc, char * argv[]){
 
 	listener = &scene.createListener(2);
+	
+	listener->speakerPos(0,0,-90);
+	listener->speakerPos(1,1, 90);
 	
 	for(unsigned i=0; i<agents.size(); ++i) scene.addSource(agents[i]);
 

@@ -333,7 +333,7 @@ protected:
 class Drawable {
 public:
 	virtual void onDraw(Graphics& gl) = 0;
-	virtual ~Drawable() {}
+	virtual ~Drawable(){}
 };
 
 } // ::al::gfx
