@@ -8,16 +8,15 @@ Camera cam, cam2;
 
 struct MyWindow : WindowGL{
 	
-	void onKeyDown(const Keyboard& k){	 	
-
+	bool onKeyDown(const Keyboard& k){
 		switch(k.key()){
-			case Key::Tab: stereo.stereo(!stereo.stereo()); break;
-			case '1': stereo.mode(gfx::Stereographic::Anaglyph); break;
-			case '2': stereo.mode(gfx::Stereographic::Active); break;
-			case '3': stereo.mode(gfx::Stereographic::Dual); break;
-			case '4': stereo.mode(gfx::Stereographic::LeftEye); break;
-			case '5': stereo.mode(gfx::Stereographic::RightEye); break;
-			default:;
+			case Key::Tab: stereo.stereo(!stereo.stereo()); return false;
+			case '1': stereo.mode(gfx::Stereographic::Anaglyph); return false;
+			case '2': stereo.mode(gfx::Stereographic::Active); return false;
+			case '3': stereo.mode(gfx::Stereographic::Dual); return false;
+			case '4': stereo.mode(gfx::Stereographic::LeftEye); return false;
+			case '5': stereo.mode(gfx::Stereographic::RightEye); return false;
+			default: return true;
 		}
 	}
 

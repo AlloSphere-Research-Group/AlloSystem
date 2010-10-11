@@ -130,29 +130,6 @@ static void drawScene(void * self) {
 
 
 struct MyWindow : WindowGL{
-/*
-	void onCreate(){ 					printf("onCreate\n"); }
-	void onDestroy(){					printf("onDestroy\n"); }
-	void onResize(int w, int h){		printf("onResize     %d, %d\n", w, h); }
-	void onVisibility(bool v){			printf("onVisibility %s\n", v?"true":"false"); }
-	void onKeyUp(const Keyboard& k){	printf("onKeyUp      "); printKey(); }
-
-	void onMouseDown(const Mouse& m){	printf("onMouseDown  "); printMouse(); }
-	void onMouseUp(const Mouse& m){		printf("onMouseUp    "); printMouse(); }
-	void onMouseDrag(const Mouse& m){	printf("onMouseDrag  "); printMouse(); }
-	//void onMouseMove(const Mouse& m){	printf("onMouseMove  "); printMouse(); }
-*/
-
-	void onKeyDown(const Keyboard& k){	printf("onKeyDown    "); printKey();
-		switch(k.key()){
-			case Key::Escape: fullScreenToggle(); break;
-			case 'q': if(k.ctrl() || k.alt()) WindowGL::stopLoop(); break;
-			case 'w': if(k.ctrl()) destroy(); break;
-			case 'h': if(k.ctrl()) hide(); break;
-			case 'm': if(k.ctrl()) iconify(); break;
-			case 'c': if(k.ctrl()) cursorHideToggle(); break;
-		}
-	}
 
 	void printMouse(){
 		const Mouse& m = mouse();
@@ -174,10 +151,12 @@ struct MyWindow : WindowGL{
 double fps =100;
 
 int main (int argc, char * argv[]) {
-        printf("main\n");
-        printf("%f\n", MainLoop::get().T0());
+	printf("main\n");
+	printf("%f\n", MainLoop::get().T0());
 
-MyWindow win1;
+	MyWindow win1;
+
+	win1.add(new StandardWindowKeyControls);
 
 /*
 	al::Lattice tex_data;

@@ -51,15 +51,11 @@ struct MyWindow : WindowGL{
 	MyWindow(): gl(new gfx::GraphicsBackendOpenGL)
 	{}
 	
-	void onKeyDown(const Keyboard& k){
+	bool onKeyDown(const Keyboard& k){
 		switch(k.key()){
-			default:;
+			default: return true;
 		}
 	}
-
-	void onMouseDown(const Mouse& m){}
-	void onMouseUp(const Mouse& m){}
-	void onMouseDrag(const Mouse& m){}
 
 	void onFrame(){
 		gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
