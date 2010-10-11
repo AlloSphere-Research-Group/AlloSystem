@@ -299,7 +299,7 @@ void AmbiDecode::onChannelsChange(){
 	resizeArrays(channels(), mNumSpeakers);
 }
 
-void AmbiDecode::print(FILE * fp, const char * append){
+void AmbiDecode::print(FILE * fp, const char * append) const {
 //	AmbiBase::print(stdout, ", ");
 //	fprintf(fp, "s:%3d%s", mNumSpeakers, append);
 }

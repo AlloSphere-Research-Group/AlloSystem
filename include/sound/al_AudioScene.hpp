@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <list>
+#include <strings.h> // bzero
 #include "types/al_Buffer.hpp"
 #include "math/al_Interpolation.hpp"
 #include "math/al_Vec.hpp"
@@ -20,6 +21,8 @@ namespace al{
 class Listener : public Nav {
 public:
 
+	int numSpeakers() const { return mDecoder.numSpeakers(); }
+
 	Listener& numSpeakers(int num){
 		mDecoder.numSpeakers(num); return *this;
 	}
@@ -28,8 +31,6 @@ public:
 		mDecoder.setSpeaker(speakerNum, deviceChannel, az, el);
 		return *this;
 	}
-
-	int numSpeakers() const { return mDecoder.numSpeakers(); }
 
 	float * ambiChans() { return &mAmbiDomainChannels[0]; }
 	
@@ -49,6 +50,10 @@ protected:
 	std::vector<Quatd> mQuatHistory;		// buffer of interpolated orientations
 	ShiftBuffer<4, Vec3d> mPosHistory;		// position in previous blocks
 	Quatd mQuatPrev;						// orientation in previous block
+
+	void zeroAmbi(){
+		bzero(ambiChans(), mAmbiDomainChannels.size()*sizeof(ambiChans()[0]));
+	}
 };
 
 
@@ -58,30 +63,43 @@ public:
 	SoundSource(int bufSize=1024): mSound(bufSize)
 	{}
 
-	void writeSample(const float& v){ mSound.write(v); }
+	/// Get size of delay in samples
+	int delaySize() const { return mSound.size(); }
+
+	/// Convert delay, in seconds, to an index
+	double delayToIndex(double delay, double sampleRate) const {
+		return delay*sampleRate;
+	}
+
+	/// Returns maximum number of seconds (exclusive) of delay
+	double maxDelay(double sampleRate) const {
+		return delaySize()/sampleRate;
+	}
+
+	/// Returns maximum index that can be used for reading samples
+	int maxIndex() const { return delaySize()-2; }
+
+	/// Read sample from delay-line using linear interpolation
 	
-	float readSample(double index) {
-		float a = mSound.atRel(index);
-		float b = mSound.atRel(index+1);
-		float frac = index - (int)index;
+	/// The index specifies how many samples ago by which to read back from
+	/// the buffer. The index must be less than or equal to bufferSize()-2.
+	float readSample(double index) const {
+		int index0 = index;
+		float a = mSound.atRel(index0);
+		float b = mSound.atRel(index0+1);
+		float frac = index - index0;
 		return ipl::linear(frac, a, b);
 	}
-	
-	double delayToIndex(al_sec delay, double samplerate) {
-		return delay * samplerate;
-	}
-	
-	al_sec maxDelay(double samplerate) {
-		return mSound.size() / samplerate;
-	}
-	double maxIndex() { return mSound.size(); }
+
+
+	/// Write sample to delay-line
+	void writeSample(const float& v){ mSound.write(v); }
 
 protected:
 	friend class AudioScene;
 	
 	Buffer<float> mSound;	// spherical wave around position
 	ShiftBuffer<4, Vec3d> mPosHistory; // previous positions
-	
 };	
 
 
@@ -112,12 +130,14 @@ public:
 	}
 
 	/// encode sources (per listener)
-	void encode(const int& numFrames, double samplerate) {
+	void encode(const int& numFrames, double sampleRate) {
 	
 		//const double invClipRange = mFarClip - mNearClip;
+		
+		double distanceToSample = sampleRate / mSpeedOfSound;
 	
 		// update source history data:
-		for(std::list<SoundSource *>::iterator it = mSources.begin(); it != mSources.end(); it++) {
+		for(Sources::iterator it = mSources.begin(); it != mSources.end(); it++) {
 			SoundSource& src = *(*it);
 			src.mPosHistory(src.vec());
 		}
@@ -132,11 +152,14 @@ public:
 			l.mQuatPrev = qnew;
 			l.mPosHistory(l.vec());
 			
+			l.zeroAmbi(); // zero out existing data
 			//float * ambiChans = l.ambiChans();
-			
-			for(std::list<SoundSource *>::iterator it = mSources.begin(); it != mSources.end(); it++) {
+
+			// iterate through all sound sources
+			for(Sources::iterator it = mSources.begin(); it != mSources.end(); it++){
 				SoundSource& src = *(*it);
 				
+				// iterate time samples
 				for(int i=0; i<numFrames; ++i){
 					
 					// interpolated source position relative to listener
@@ -150,36 +173,53 @@ public:
 					);
 					
 					double distance = relpos.mag();
-					double index = samplerate * (distance / mSpeedOfSound);
-					double x = distance - mFarClip;
-					if (x >= 0. || index < src.maxIndex()) {
-						
-						//double amp = 1;
-						// TODO: amplitude rolloff
-						if (distance > mNearClip) {
-							
-//							// 
-//							amp = 
-//							
-//							const double c = 
-//							const double f = mFarClip;
-//							
-//							double denom = cf + f - x;
-//							
-//							// smooth to zero at farcilp:
-//							amp *= (1 - (cx) / (cf - f + x));
-						}
+					double idx = distance * distanceToSample;
+
+					//int idx0 = idx;
 					
-						// TODO: transform relpos by listener's perspective
-						// to derive x,y,z in listener's coordinate frame (or az/el/dist)
-						Quatd q = l.mQuatHistory[i];
-						//...
+					// are we within range?
+					if(idx <= src.maxIndex()){
+
+						double distAtten = 0.1;
+						double gain = distAtten * distance;	
+						gain = (gain>1.) ? 1./gain : 1.;
 						
-					
-					} // otherwise, it's too far away for the doppler.... (culled)
+						float s = src.readSample(idx) * gain;
+						
+						mEncoder.encode(l.ambiChans(), numFrames, i, s);
+					}
+
+//					double x = distance - mFarClip;
+
+//					if (x >= 0. || index < src.maxIndex()) {
+//						
+//						//double amp = 1;
+//						// TODO: amplitude rolloff
+//						if (distance > mNearClip) {
+//							
+////							// 
+////							amp = 
+////							
+////							const double c = 
+////							const double f = mFarClip;
+////							
+////							double denom = cf + f - x;
+////							
+////							// smooth to zero at farcilp:
+////							amp *= (1 - (cx) / (cf - f + x));
+//						}
+//					
+//						// TODO: transform relpos by listener's perspective
+//						// to derive x,y,z in listener's coordinate frame (or az/el/dist)
+//						Quatd q = l.mQuatHistory[i];
+//						//...
+//						
+//					
+//					} // otherwise, it's too far away for the doppler.... (culled)
 				}
 				
-				//mEncoder.encode<Vec3d>(ambiChans, mSource);void encode(float ** ambiChans, const XYZ * pos, const float * input, numFrames)
+				//void encode(float ** ambiChans, const XYZ * pos, const float * input, numFrames)
+				//mEncoder.encode<Vec3d>(ambiChans, mSource);
 			}
 			
 		}
@@ -189,7 +229,7 @@ public:
 	
 
 	/// decode sources (per listener) to output channels
-	void render(float * outs, const int& numFrames) {
+	void render(float * outs, const int& numFrames){
 		for(unsigned il=0; il<mListeners.size(); ++il){
 			Listener& l = *mListeners[il];
 			l.mDecoder.decode(outs, l.ambiChans(), numFrames);
@@ -197,8 +237,11 @@ public:
 	}
 
 protected:
-	std::vector<Listener *> mListeners;
-	std::list<SoundSource *> mSources;
+	typedef std::vector<Listener *> Listeners;
+	typedef std::list<SoundSource *> Sources;
+
+	Listeners mListeners;
+	Sources mSources;
 	AmbiEncode mEncoder;
 	int mNumFrames;			// audio frames per block
 	double mSpeedOfSound;	// distance per second

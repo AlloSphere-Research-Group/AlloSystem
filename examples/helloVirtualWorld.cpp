@@ -24,11 +24,9 @@ struct Agent : public SoundSource{
 
 	virtual void onProcess(AudioIOData& io){
 		while(io()){
-			float s = io.in(0);
-			
-			//writeSample(s);
-			writeSample(rnd::uniform()*0.2); // make noise, just to hear something
-
+			//float s = io.in(0);
+			float s = rnd::uniform()*0.2; // make noise, just to hear something
+			writeSample(s);
 		}
 	}
 	
@@ -105,25 +103,25 @@ struct MyWindow : public WindowGL, public gfx::Drawable{
 		}
 		g.end();
 		
-		g.depthTesting(1);
-		g.begin(gfx::TRIANGLES);
-		{
-		int N=3000;
-		double r = 4;
-		double f1 = 101;
-		double f2 = 166;
-		for(int i=0; i<N; i++){
-			double p = float(i)/N*M_2PI;
-			double x = r*cos(f1*p) * sin(f2*p);
-			double y = r*sin(f1*p) * sin(f2*p);
-			double z = r*cos(f2*p);
-			double c = cos(p)*0.25 + 0.25;
-
-			g.color(HSV(0.2+c, 0.5, i%3 ? 0.5 : 0));
-			g.vertex(x, y, z);
-		}
-		}
-		g.end();
+//		g.depthTesting(1);
+//		g.begin(gfx::TRIANGLES);
+//		{
+//		int N=3000;
+//		double r = 4;
+//		double f1 = 101;
+//		double f2 = 166;
+//		for(int i=0; i<N; i++){
+//			double p = float(i)/N*M_2PI;
+//			double x = r*cos(f1*p) * sin(f2*p);
+//			double y = r*sin(f1*p) * sin(f2*p);
+//			double z = r*cos(f2*p);
+//			double c = cos(p)*0.25 + 0.25;
+//
+//			g.color(HSV(0.2+c, 0.5, i%3 ? 0.5 : 0));
+//			g.vertex(x, y, z);
+//		}
+//		}
+//		g.end();
 	}
 
 	gfx::Graphics gl;
@@ -145,7 +143,7 @@ int main (int argc, char * argv[]){
 		windows[i].add(new StandardWindowKeyControls);
 		windows[i].add(new NavInputControl(&navMaster));
 		windows[i].create(WindowGL::Dim(600,480,i*650), "Hello Virtual World!");
-		windows[i].nav.turnU(i*90);
+		windows[i].nav.turnU(i*180);
 	}
 
 	AudioIO audioIO(AUDIO_BLOCK_SIZE, 44100, audioCB, 0, 2, 1);

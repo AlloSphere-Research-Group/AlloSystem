@@ -68,6 +68,17 @@ public:
 	AmbiDecode(int dim, int order, int numSpeakers, int flavor=1);
 	virtual ~AmbiDecode();
 
+	virtual void onChannelsChange();
+
+	float decodeWeight(int speaker, int channel) const { 
+		return mWeights[channel] * mDecodeMatrix[speaker * channels() + channel];
+	}
+
+	int flavor() const { return mFlavor; };				///< Returns decode flavor
+	int numSpeakers() const { return mNumSpeakers; };	///< Returns number of speakers
+
+	void print(FILE * fp = stdout, const char * append = "\n") const;
+
 	//float decode(int speakerNum);	///< Decode speaker's sample from stored ambisonic frame.
 	
 	// dec is a flat array (non-interleaved) of the device output channels (as indexed by deviceChannel)
@@ -83,17 +94,7 @@ public:
 //	float * azimuths();				///< Returns pointer to speaker azimuths.
 //	float * elevations();			///< Returns pointer to speaker elevations.
 //	float * frame() const;			///< Returns pointer to ambisonic channel frame used by decode(int)
-	Speaker & speaker(int num) { return mSpeakers[num]; }
-	int numSpeakers() const { return mNumSpeakers; };	///< Returns number of speakers.
-	int flavor() { return mFlavor; };					///< Returns decode flavor.
-
-	virtual void onChannelsChange();
-	
-	void print(FILE * fp = stdout, const char * append = "\n");
-	
-	float decodeWeight(int speaker, int channel){ 
-		return mWeights[channel] * mDecodeMatrix[speaker * channels() + channel];
-	}
+	Speaker& speaker(int num) { return mSpeakers[num]; }
 
 protected:
 	int mNumSpeakers;
@@ -127,10 +128,28 @@ public:
 //	/// Encode input sample and add to decoder frame.
 //	void encodeAdd(const AmbiDecode &dec, float input);
 
+	/// Encode a single time sample
 	
+	/// @param[out] ambiChans	flat array (non-interleaved) of Ambisonic domain channels
+	/// @param[in ] numFrames	number of frames in time buffer
+	/// @param[in ] timeIndex	index at which to encode time sample
+	/// @param[in ] timeSample	value of time sample
+	void encode(float * ambiChans, int numFrames, int timeIndex, float timeSample) const {
+			
+		// "Iterate" through spherical harmonics using Duff's device.
+		// This requires only a simple jump per time sample.
+		#define CS(c) case c: ambiChans[c*numFrames+timeIndex] += weights()[c] * timeSample;
+		int ch = channels()-1;
+		switch(ch){
+			CS(15) CS(14) CS(13) CS(12) CS(11) CS(10) CS( 9) CS( 8)
+			CS( 7) CS( 6) CS( 5) CS( 4) CS( 3) CS( 2) CS( 1) CS( 0)
+			default:;
+		}
+	}
+
 	/// (x,y,z unit vector in the listener's coordinate frame)
 	template <class XYZ>
-	void encode(float ** ambiChans, const XYZ * pos, const float * input, int numFrames){
+	void encode(float * ambiChans, const XYZ * pos, const float * input, int numFrames){
 	
 		// TODO: how can we efficiently encode a moving source?
 		
@@ -153,23 +172,11 @@ public:
 
 		// outer-time, inner-space
 		for(int i=0; i<numFrames; ++i){
-
 			position(pos[i][0], pos[i][1], pos[i][2]);
-			
-			// iterate spherical harmonics
+			encode(ambiChans, numFrames, i, input[i]);
 //			for(int c=0; c<channels(); ++c){
 //				ambiChans[c][i] += weights()[c] * input[i];
 //			}
-			
-			// Duff's device
-			// This requires only a simple jump per time sample.
-			#define CS(n) case n: ambiChans[n][i] += weights()[n] * input[i];
-			int ch = channels()-1;
-			switch(ch){
-				CS(15) CS(14) CS(13) CS(12) CS(11) CS(10) CS( 9) CS( 8)
-				CS( 7) CS( 6) CS( 5) CS( 4) CS( 3) CS( 2) CS( 1) CS( 0)
-			default:;
-			}
 		}
 	}
 	
