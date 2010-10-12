@@ -111,8 +111,8 @@ public:
 	:	mEncoder(dim, order), mNumFrames(numFrames), mSpeedOfSound(343), mNearClip(0.1), mFarClip(100)
 	{}
 	
-	int dim() { return mEncoder.dim(); }
-	int order() { return mEncoder.order(); }
+	int dim() const { return mEncoder.dim(); }
+	int order() const { return mEncoder.order(); }
 	
 	// TODO: setNumFrames
 
@@ -186,11 +186,14 @@ public:
 						double distAtten = 0.1;
 						double gain = distAtten * distance;	
 						gain = (gain>1.) ? 1./gain : 1.;
-						gain = 1;
+						//gain = 1;
 						
 						float s = src.readSample(idx) * gain;
-						
+						//printf("%g\n", s);
+
 						mEncoder.encode(l.ambiChans(), numFrames, i, s);
+						//printf("%g\n", l.ambiChans()[0]);
+						//printf("%g\n", mEncoder.weights()[1]);
 					}
 
 //					double x = distance - mFarClip;
@@ -225,18 +228,17 @@ public:
 				//void encode(float ** ambiChans, const XYZ * pos, const float * input, numFrames)
 				//mEncoder.encode<Vec3d>(ambiChans, mSource);
 			}
-			
 		}
+		//printf("%f\n", mListeners[0]->ambiChans()[0]);
 	}
 	
 	// between encode & decode, can apply optional processing to ambi domain signals (e.g. reverb)
-	
 
 	/// Decode sources (per listener) to output channels
 	
 	/// @param[out] outs		1D array of output (non-interleaved)
 	/// @param[in ] numFrames	number of frames per channel buffer
-	void render(float * outs, const int& numFrames){
+	void render(float * outs, const int& numFrames) const {
 		for(unsigned il=0; il<mListeners.size(); ++il){
 			Listener& l = *mListeners[il];
 			l.mDecoder.decode(outs, l.ambiChans(), numFrames);

@@ -70,6 +70,11 @@ public:
 
 	virtual void onChannelsChange();
 
+	/// @param[out] dec				output time domain buffers (non-interleaved)
+	/// @param[in ] enc				input Ambisonic domain buffers (non-interleaved)
+	/// @param[in ] numDecFrames	number of frames in time domain buffers
+	void decode(float * dec, const float * enc, int numDecFrames) const;
+
 	float decodeWeight(int speaker, int channel) const { 
 		return mWeights[channel] * mDecodeMatrix[speaker * channels() + channel];
 	}
@@ -78,12 +83,6 @@ public:
 	int numSpeakers() const { return mNumSpeakers; };	///< Returns number of speakers
 
 	void print(FILE * fp = stdout, const char * append = "\n") const;
-
-	//float decode(int speakerNum);	///< Decode speaker's sample from stored ambisonic frame.
-	
-	// dec is a flat array (non-interleaved) of the device output channels (as indexed by deviceChannel)
-	// enc is a flat array (non-interleaved) of the Ambisonic domain channels
-	void decode(float * dec, const float * enc, int numDecFrames);
 
 	void flavor(int type);
 	void numSpeakers(int num);		///< Set number of speakers.  Positions are zeroed upon resize.
@@ -135,7 +134,7 @@ public:
 	/// @param[in ] timeIndex	index at which to encode time sample
 	/// @param[in ] timeSample	value of time sample
 	void encode(float * ambiChans, int numFrames, int timeIndex, float timeSample) const {
-			
+
 		// "Iterate" through spherical harmonics using Duff's device.
 		// This requires only a simple jump per time sample.
 		#define CS(c) case c: ambiChans[c*numFrames+timeIndex] += weights()[c] * timeSample;

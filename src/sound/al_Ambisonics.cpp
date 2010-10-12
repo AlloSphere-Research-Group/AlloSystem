@@ -183,11 +183,10 @@ AmbiDecode::AmbiDecode(int dim, int order, int numSpeakers, int flavor)
 
 AmbiDecode::~AmbiDecode(){
 	delete[] mDecodeMatrix;
-	//delete[] mPositions;
 	delete[] mSpeakers;
 }
 
-void AmbiDecode::decode(float * dec, const float * enc, int numDecFrames){
+void AmbiDecode::decode(float * dec, const float * enc, int numDecFrames) const {
 		
 	// iterate speakers
 	for(int s=0; s<numSpeakers(); ++s){
@@ -287,7 +286,7 @@ void AmbiDecode::resizeArrays(int numChannels, int numSpeakers){
 //			setSpeaker(i, azimuths()[i], elevations()[i]);
 //		}
 //		
-//		updateChanWeights();
+		updateChanWeights();
 	}
 
 	mChannels = numChannels;

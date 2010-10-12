@@ -57,7 +57,7 @@ struct Agent : public SoundSource, public gfx::Drawable{
 			g.color(1,0,1);
 		g.end();
 		
-		g.popMatrix();	
+		g.popMatrix();
 	}
 	
 	double phase;
