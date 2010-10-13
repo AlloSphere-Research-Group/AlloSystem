@@ -426,7 +426,7 @@ int paCallback(
 	
 	if(io.autoZeroOut()) io.zeroOut();
 
-	io();	// call callback
+	io.processAudio();	// call callback
 
 	// kill pesky nans so we don't hurt anyone's ears
 	if(io.zeroNANs()){
@@ -531,7 +531,7 @@ void AudioIO::print(){
 }
 
 
-void AudioIO::operator()(){ frame(0); if(callback) callback(*this); }
+void AudioIO::processAudio(){ frame(0); if(callback) callback(*this); }
 
 int AudioIO::channels(bool forOutput) const { return forOutput ? channelsOut() : channelsIn(); }
 double AudioIO::cpu() const { return Pa_GetStreamCpuLoad(mImpl->mStream); }

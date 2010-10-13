@@ -239,7 +239,7 @@ public:
 	bool supportsFPS(double fps) const;			///< Return true if fps supported, otherwise false
 	bool zeroNANs() const;						///< Returns whether to zero NANs in output buffer going to DAC
 	
-	void operator()();							///< Call callback manually
+	void processAudio();						///< Call callback manually
 	bool open();								///< Opens audio device.
 	bool close();								///< Closes audio device. Will stop active IO.
 	bool start();								///< Starts the audio IO.  Will open audio device if necessary.
