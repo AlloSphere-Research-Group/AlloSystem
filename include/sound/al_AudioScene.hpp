@@ -136,7 +136,7 @@ public:
 		//const double invClipRange = mFarClip - mNearClip;
 		
 		double distanceToSample = sampleRate / mSpeedOfSound;
-		distanceToSample = 16;
+		//distanceToSample = 16;
 	
 		// update source history data:
 		for(Sources::iterator it = mSources.begin(); it != mSources.end(); it++) {
@@ -166,6 +166,7 @@ public:
 				for(int i=0; i<numFrames; ++i){
 					
 					// compute interpolated source position relative to listener
+					// TODO: make this sound good
 					float alpha = float(i)/numFrames;
 					Vec3d relpos = ipl::cubic(
 						alpha, 
@@ -175,25 +176,39 @@ public:
 						src.mPosHistory[0]-l.mPosHistory[0]
 					);
 
+//					Vec3d relpos = ipl::linear(
+//						alpha,
+//						src.mPosHistory[1]-l.mPosHistory[1], 
+//						src.mPosHistory[0]-l.mPosHistory[0]
+//					);
+
+					//Vec3d relpos = src.mPosHistory[0]-l.mPosHistory[0];
+
+					//printf("%g %g %g\n", l.pos()[0], l.pos()[1], l.pos()[2]);
+					//printf("%g %g %g\n", src.pos()[0], src.pos()[1], src.pos()[2]);
+
 					double distance = relpos.mag();
 					double idx = distance * distanceToSample;
+					//printf("%g\n", distance);
 
 					int idx0 = idx;
 					
 					// are we within range?
-					if(idx0 <= src.maxIndex()){
+					if(idx0 <= src.maxIndex()-numFrames){
 
-						double distAtten = 0.1;
-						double gain = distAtten * distance;	
+						idx += (numFrames-i);
+
+						double distAtten = 4;
+						double gain = distAtten * distance;
 						gain = (gain>1.) ? 1./gain : 1.;
-						//gain = 1;
 						
 						float s = src.readSample(idx) * gain;
 						//printf("%g\n", s);
+						//printf("%g\n", idx);
 
+						relpos.normalize();
+						mEncoder.direction(relpos[0], relpos[1], relpos[2]);
 						mEncoder.encode(l.ambiChans(), numFrames, i, s);
-						//printf("%g\n", l.ambiChans()[0]);
-						//printf("%g\n", mEncoder.weights()[1]);
 					}
 
 //					double x = distance - mFarClip;

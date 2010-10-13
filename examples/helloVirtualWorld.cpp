@@ -25,14 +25,16 @@ struct Agent : public SoundSource, public gfx::Drawable{
 	virtual void onProcess(AudioIOData& io){
 		while(io()){
 			//float s = io.in(0);
-			float s = rnd::uniform()*0.9; // make noise, just to hear something
+			//float s = rnd::uniform()*0.9; // make noise, just to hear something
+			float s = sin(phase);
+			phase += 1./44100 * 440 * M_2PI;
 			writeSample(s);
 		}
 	}
 	
 	virtual void onUpdateNav(){
 		smooth(0.9);
-		if((phase+=0.01) >= M_2PI) phase -= M_2PI;
+		//if((phase+=0.01) >= M_2PI) phase -= M_2PI;
 		//pos(cos(phase), sin(phase), 0);
 		//pos(0,0,0);
 		
@@ -99,6 +101,8 @@ struct MyWindow : public WindowGL, public gfx::Drawable{
 		cam.set(navMaster);
 		cam *= nav;
 		cam.updateUnitVectors();
+		
+		listener->pos(cam.pos());
 
 		stereo.draw(gl, cam, *this, dimensions().w, dimensions().h);
 	}
@@ -124,6 +128,8 @@ int main (int argc, char * argv[]){
 	
 	listener->speakerPos(0,0,-90);
 	listener->speakerPos(1,1, 90);
+//	listener->speakerPos(0,0,-45);
+//	listener->speakerPos(1,1, 45);
 	
 	for(unsigned i=0; i<agents.size(); ++i) scene.addSource(agents[i]);
 

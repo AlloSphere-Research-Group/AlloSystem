@@ -103,8 +103,8 @@ protected:
 								// cols are channels and rows are speakers								
 	float mWOrder[5];			// weights for each order
 	Speaker * mSpeakers;
-	//float * mPositions;			// speakers' azimuths + elevations
-	//float * mFrame;				// an ambisonic channel frame used for decode(int)
+	//float * mPositions;		// speakers' azimuths + elevations
+	//float * mFrame;			// an ambisonic channel frame used for decode(int)
 
 	void updateChanWeights();
 	void resizeArrays(int numChannels, int numSpeakers);
@@ -148,7 +148,7 @@ public:
 
 	/// (x,y,z unit vector in the listener's coordinate frame)
 	template <class XYZ>
-	void encode(float * ambiChans, const XYZ * pos, const float * input, int numFrames){
+	void encode(float * ambiChans, const XYZ * dir, const float * input, int numFrames){
 	
 		// TODO: how can we efficiently encode a moving source?
 		
@@ -171,7 +171,7 @@ public:
 
 		// outer-time, inner-space
 		for(int i=0; i<numFrames; ++i){
-			position(pos[i][0], pos[i][1], pos[i][2]);
+			direction(dir[i][0], dir[i][1], dir[i][2]);
 			encode(ambiChans, numFrames, i, input[i]);
 //			for(int c=0; c<channels(); ++c){
 //				ambiChans[c][i] += weights()[c] * input[i];
@@ -180,11 +180,11 @@ public:
 	}
 	
 	/// Set spherical direction of source to be encoded
-	void position(float az, float el);
+	void direction(float az, float el);
 	
 	/// Set Cartesian direction of source to be encoded
 	/// (x,y,z unit vector in the listener's coordinate frame)
-	void position(float x, float y, float z);
+	void direction(float x, float y, float z);
 };
 
 
@@ -213,11 +213,11 @@ inline int AmbiBase::orderToChannelsV(int orderV){ return orderV * orderV; }
 //	for(int c=0; c<dec.channels(); ++c) dec.frame()[c] += weights()[c] * input;
 //}
 
-inline void AmbiEncode::position(float az, float el){
+inline void AmbiEncode::direction(float az, float el){
 	AmbiBase::encodeWeightsFuMa(mWeights, mDim, mOrder, az, el);
 }
 
-inline void AmbiEncode::position(float x, float y, float z){
+inline void AmbiEncode::direction(float x, float y, float z){
 	AmbiBase::encodeWeightsFuMa(mWeights, mDim, mOrder, x,y,z);
 }
 

@@ -104,7 +104,7 @@ void AmbiBase::encodeWeightsFuMa(float * ws, int dim, int order, float az, float
 	encodeWeightsFuMa(ws, dim, order, x,y,z);
 }
 
-// [x, y, z] is the normalized direction vector
+// [x, y, z] is the direction unit vector
 void AmbiBase::encodeWeightsFuMa16(float * ws, float x, float y, float z){
 	float x2 = x * x;
 	float y2 = y * y;
@@ -126,7 +126,7 @@ void AmbiBase::encodeWeightsFuMa16(float * ws, float x, float y, float z){
 	ws[12] = x * y * z;					// O = sin(2A)sin(E)cos2(E) = XYZ
 	ws[13] = pre * x;					// L = 8cos(A)cos(E)(5sin2(E) - 1)/11 = 8X(5Z2-1)/11
 	ws[14] = pre * y;					// M = 8sin(A)cos(E)(5sin2(E) - 1)/11 = 8Y(5Z2-1)/11
-	ws[15] = z * (2.5f * z2 - 1.5f);	// K = sin(E)(5sin2(E) - 3)/2 = Z(5Z2-3)/2	
+	ws[15] = z * (2.5f * z2 - 1.5f);	// K = sin(E)(5sin2(E) - 3)/2 = Z(5Z2-3)/2
 }
 
 
@@ -173,12 +173,12 @@ float AmbiDecode::flavorWeights[4][5][5] = {
 	}
 };
 
-AmbiDecode::AmbiDecode(int dim, int order, int numSpeakers, int flavor)
+AmbiDecode::AmbiDecode(int dim, int order, int numSpeakers, int flav)
 	: AmbiBase(dim, order),
-	mNumSpeakers(0), mDecodeMatrix(0), mSpeakers(0) //mFrame(0)
+	mNumSpeakers(0), mDecodeMatrix(0), mSpeakers(0)
 {
 	resizeArrays(channels(), numSpeakers);
-	this->flavor(flavor);
+	flavor(flav);
 }
 
 AmbiDecode::~AmbiDecode(){
@@ -186,7 +186,7 @@ AmbiDecode::~AmbiDecode(){
 	delete[] mSpeakers;
 }
 
-void AmbiDecode::decode(float * dec, const float * enc, int numDecFrames) const {
+void AmbiDecode::decode(float * dec, const float * ambi, int numDecFrames) const {
 		
 	// iterate speakers
 	for(int s=0; s<numSpeakers(); ++s){
@@ -194,7 +194,7 @@ void AmbiDecode::decode(float * dec, const float * enc, int numDecFrames) const 
 		
 		// iterate ambi channels
 		for(int c=0; c<channels(); ++c){
-			const float * in = enc + c * numDecFrames;
+			const float * in = ambi + c * numDecFrames;
 			float w = decodeWeight(s, c);
 			for(int i=0; i<numDecFrames; ++i) out[i] += in[i] * w;		
 		}		
@@ -204,7 +204,8 @@ void AmbiDecode::decode(float * dec, const float * enc, int numDecFrames) const 
 void AmbiDecode::flavor(int type){
 	if(type < 4){
 		mFlavor = type;
-		for(int i=0; i<4 ; i++) mWOrder[i] = flavorWeights[type][i][mOrder];
+		const int No = sizeof(mWOrder)/sizeof(mWOrder[0]);
+		for(int i=0; i<No; ++i) mWOrder[i] = flavorWeights[flavor()][i][order()];
 		updateChanWeights();
 	} 
 }
@@ -235,7 +236,7 @@ void AmbiDecode::updateChanWeights(){
 	float * wc = mWeights;
 	*wc++ = mWOrder[0];	
 	
-	if (mOrder > 0) {
+	if(mOrder > 0){
 		*wc++ = mWOrder[1];				// X
 		*wc++ = mWOrder[1];				// Y
 		if (mOrder > 1) {
@@ -269,23 +270,23 @@ void AmbiDecode::resizeArrays(int numChannels, int numSpeakers){
 
 	int oldSize = channels() * mNumSpeakers;
 	int newSize = numChannels * numSpeakers;
-	
+
 	if(oldSize != newSize){
 
 		resize(mDecodeMatrix, newSize);
 		//resize(mFrame, newSize);
-		
+
 		// resize number of speakers (?)
 		if(numSpeakers != mNumSpeakers){
 			mNumSpeakers = numSpeakers;
 			resize(mSpeakers, numSpeakers);
 		}
-		
+
 //		// recompute decode matrix weights
 //		for(int i=0; i<numSpeakers; i++){
 //			setSpeaker(i, azimuths()[i], elevations()[i]);
 //		}
-//		
+
 		updateChanWeights();
 	}
 
