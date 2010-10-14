@@ -89,7 +89,7 @@ public:
 
 	/// @param[in] path		path of file
 	/// @param[in] mode		i/o mode w, r, wb, rb
-	File(const char * path, const char * mode, bool open=false);
+	File(const char * path, const char * mode="r", bool open=false);
 
 	~File();
 

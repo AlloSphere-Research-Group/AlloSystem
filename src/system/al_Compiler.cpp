@@ -85,6 +85,7 @@ static JITListener gJITEventListener;
 static void llvmErrorHandler(void * user_data, const std::string& reason) {
 	printf("llvm error %s\n", reason.data());
 }
+
 static void llvmInit() {
 	static bool initialized = false;
 	if (!initialized) {
@@ -252,6 +253,7 @@ bool Compiler :: compile(std::string code) {
 
 bool Compiler :: readbitcode(std::string path) {
 	//if (!mImpl) mImpl = new ModuleImpl; //etc.
+	printf("readbitcode: not yet implemented\n");
 	return true;
 }
 
@@ -296,17 +298,20 @@ JIT * Compiler :: jit() {
 JIT::JIT() {}
 
 JIT::~JIT() {
+	/* free any statics allocated in the code */
+	EE->runStaticConstructorsDestructors(mImpl->module, true);
+	
 	/*	Removing the functions one by one. */
 	llvm::Module::FunctionListType & flist = mImpl->module->getFunctionList();
 	for (llvm::Module::FunctionListType::iterator iter= flist.begin(); iter != flist.end(); iter++) {
-		//printf("function %s %d\n", iter->getName().data(), iter->isIntrinsic());
+		printf("function %s %d\n", iter->getName().data(), iter->isIntrinsic());
 		EE->freeMachineCodeForFunction(iter);
 	}
-	/* free any statics allocated in the code */
-	EE->runStaticConstructorsDestructors(mImpl->module, true);
 	EE->clearGlobalMappingsFromModule(mImpl->module);
+	
 	/* EE forgets about module */
 	EE->removeModule(mImpl->module);	
+	
 	/* should be safe */
 	delete mImpl->module;
 	delete mImpl;
@@ -333,6 +338,10 @@ void * JIT :: getglobalptr(std::string globalname) {
 
 bool Compiler :: writebitcode(std::string path) {
 	return true;
+}	
+
+void Compiler :: optimize(std::string opt) {
+	printf("Compiler optimizations not yet enabled\n");
 }	
 
 } // al::
