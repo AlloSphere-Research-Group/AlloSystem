@@ -304,7 +304,7 @@ JIT::~JIT() {
 	/*	Removing the functions one by one. */
 	llvm::Module::FunctionListType & flist = mImpl->module->getFunctionList();
 	for (llvm::Module::FunctionListType::iterator iter= flist.begin(); iter != flist.end(); iter++) {
-		printf("function %s %d\n", iter->getName().data(), iter->isIntrinsic());
+		//printf("function %s %d\n", iter->getName().data(), iter->isIntrinsic());
 		EE->freeMachineCodeForFunction(iter);
 	}
 	EE->clearGlobalMappingsFromModule(mImpl->module);

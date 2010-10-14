@@ -22,7 +22,17 @@ void path2dir(char* dst, const char* src) {
 }
 
 
+struct File::Impl : public ImplAPR {
+public:
+	apr_finfo_t finfo;
+	
+	Impl() : ImplAPR() {}
+	virtual ~Impl() {}
 
+	bool getInfo(const char * path, apr_int32_t wanted) {
+		return (APR_SUCCESS == check_apr(apr_stat(&finfo, path, wanted, mPool)));
+	}
+};
 
 class Path : public ImplAPR {
 public:
@@ -62,7 +72,6 @@ public:
 };
 
 
-
 FilePath SearchPaths::find(const std::string& name) {
 	FilePath result;
 	bool found = false;
@@ -78,10 +87,11 @@ FilePath SearchPaths::find(const std::string& name) {
 
 
 File::File(const char * path, const char * mode, bool open_)
-:	mPath(path), mMode(mode), mContent(0), mSizeBytes(0), mFP(0)
+:	mImpl(new Impl()), 
+	mPath(path), mMode(mode), mContent(0), mSizeBytes(0), mFP(0)
 {	if(open_) open(); }
 
-File::~File(){ close(); freeContent(); }
+File::~File(){ close(); freeContent(); delete mImpl; }
 
 void File::allocContent(int n){
 	if(mContent) freeContent();
@@ -135,6 +145,37 @@ int File::write(const char * path, const void * v, int size, int items){
 
 
 bool File::exists(const char * path){ File f(path, "r"); return f.open(); }
+
+
+al_sec File :: modificationTime() {
+	if (mImpl->getInfo(mPath, APR_FINFO_MTIME)) {
+		return 1.0e-6 * al_sec(mImpl->finfo.mtime);
+	}
+}
+
+al_sec File :: accessTime() {
+	if (mImpl->getInfo(mPath, APR_FINFO_ATIME)) {
+		return 1.0e-6 * al_sec(mImpl->finfo.atime);
+	}
+}
+
+al_sec File :: createdTime() {
+	if (mImpl->getInfo(mPath, APR_FINFO_CTIME)) {
+		return 1.0e-6 * al_sec(mImpl->finfo.ctime);
+	}
+}
+
+size_t File :: size() {
+	if (mImpl->getInfo(mPath, APR_FINFO_SIZE)) {
+		return mImpl->finfo.size;
+	}
+}
+
+size_t File :: storage() {
+	if (mImpl->getInfo(mPath, APR_FINFO_CSIZE)) {
+		return mImpl->finfo.csize;
+	}
+}
 
 
 } // al::

@@ -122,6 +122,18 @@ public:
 
 	/// Returns whether file exists
 	static bool exists(const char * path);
+	
+	/// Return modification time of file
+	al_sec modificationTime();
+	/// Return last access time of file
+	al_sec accessTime();
+	/// Return creation time of file
+	al_sec createdTime();
+	
+	/// Return size file
+	size_t size();
+	/// Return space used on disk of file
+	size_t storage();
 
 protected:
 	const char * mPath;
@@ -129,6 +141,8 @@ protected:
 	char * mContent;
 	int mSizeBytes;
 	FILE * mFP;
+	
+	class Impl; Impl * mImpl;
 	
 	void freeContent();
 	void allocContent(int n);
