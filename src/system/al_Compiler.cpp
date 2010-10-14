@@ -129,7 +129,8 @@ Compiler::~Compiler() {
 
 void Compiler :: clear() {
 	if (mImpl) {
-		delete mImpl->module;
+		if (mImpl->module)
+			delete mImpl->module;
 		delete mImpl;
 		mImpl = NULL;
 	}
@@ -149,8 +150,8 @@ bool Compiler :: compile(std::string code) {
 	CompilerInstance CI;
 	CI.createDiagnostics(0, NULL);
 	Diagnostic & Diags = CI.getDiagnostics();	
-	TextDiagnosticBuffer client;
-	Diags.setClient(&client);
+	TextDiagnosticBuffer * client = new TextDiagnosticBuffer();
+	Diags.setClient(client);
 	CompilerInvocation::CreateFromArgs(CI.getInvocation(), NULL, NULL, Diags);
 	
 //	// list standard invocation args:
@@ -232,8 +233,9 @@ bool Compiler :: compile(std::string code) {
 	printf("compile errors\n");
 	
 	int ecount = 0;
-	for(TextDiagnosticBuffer::const_iterator it = client.err_begin();
-		it != client.err_end();
+	
+	for(TextDiagnosticBuffer::const_iterator it = client->err_begin();
+		it != client->err_end();
 		++it)
 	{
 		FullSourceLoc SourceLoc = FullSourceLoc(it->first, CI.getSourceManager());

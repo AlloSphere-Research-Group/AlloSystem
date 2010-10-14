@@ -85,14 +85,18 @@ class ModuleImpl;
 class Compiler {
 public: 
 	struct Options {
-		unsigned CPlusPlus; 
+		bool CPlusPlus; 
 		std::vector<std::string> system_includes;
 		std::vector<std::string> user_includes;
 		
 		Options() 
-			: CPlusPlus(1) {}
+			: CPlusPlus(true) {}
 	};
 	Compiler::Options options;
+	
+	void cpp(bool v) { options.CPlusPlus = v; }
+	void include(std::string path) { options.user_includes.push_back(path); }
+	void system_include(std::string path) { options.system_includes.push_back(path); }
 	
 	Compiler();
 	~Compiler();
