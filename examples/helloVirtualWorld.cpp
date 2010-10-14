@@ -17,7 +17,7 @@ stereographic rendering
 struct Agent : public SoundSource, public gfx::Drawable{
 
 	Agent()
-	: phase(0)
+	: oscPhase(0)
 	{}
 
 	virtual ~Agent(){}
@@ -25,10 +25,12 @@ struct Agent : public SoundSource, public gfx::Drawable{
 	virtual void onProcess(AudioIOData& io){
 		while(io()){
 			//float s = io.in(0);
-			//float s = rnd::uniform()*0.9; // make noise, just to hear something
-			float s = sin(phase);
-			phase += 1./44100 * 440 * M_2PI;
-			writeSample(s);
+			//float s = rnd::uniform(); // make noise, just to hear something
+			float s = sin(oscPhase * M_2PI);
+			//float s = phase * 2 - 1;
+			oscPhase += 440./io.framesPerSecond();
+			if(oscPhase >= 1) oscPhase -= 1;
+			writeSample(s*0.2);
 		}
 	}
 	
@@ -62,7 +64,7 @@ struct Agent : public SoundSource, public gfx::Drawable{
 		g.popMatrix();
 	}
 	
-	double phase;
+	double oscPhase;
 };
 
 
@@ -108,7 +110,6 @@ struct MyWindow : public WindowGL, public gfx::Drawable{
 	}
 	
 	virtual void onDraw(gfx::Graphics& g){
-		g.antialiasing(gfx::NICEST);
 
 		for(unsigned i=0; i<agents.size(); ++i){
 			agents[i].onDraw(g);

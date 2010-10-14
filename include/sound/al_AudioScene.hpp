@@ -60,8 +60,32 @@ protected:
 
 class SoundSource : public Nav {
 public:
-	SoundSource(int bufSize=1024): mSound(bufSize)
+	SoundSource(double rollOff=1, double near=0.1, double far=100, int bufSize=1024)
+	:	mSound(bufSize), mRollOff(rollOff), mNearClip(near), mFarClip(far)
 	{}
+
+	/// Get far clipping distance
+	double farClip() const { return mFarClip; }
+
+	/// Get near clipping distance
+	double nearClip() const { return mNearClip; }
+
+	/// Get roll off factor
+	double rollOff() const { return mRollOff; }
+
+	/// Returns attentuation factor based on distance to listener
+	double attenuation(double distance) const {
+	
+		double d = distance;
+		if(d < nearClip()){ d=nearClip(); }
+		else if(d > farClip()){ d=farClip(); }
+
+		// inverse
+		return nearClip() / (nearClip() + rollOff() * (d - nearClip()));
+		
+//		// exponential
+//		return pow(d / nearClip(), -rollOff());
+	}
 
 	/// Get size of delay in samples
 	int delaySize() const { return mSound.size(); }
@@ -92,6 +116,15 @@ public:
 	}
 
 
+	/// Set far clipping distance
+	void farClip(double v){ mFarClip=v; }
+
+	/// Set near clipping distance	
+	void nearClip(double v){ mNearClip=v; }
+
+	/// Set roll off amount
+	void rollOff(double v){ mRollOff=v; }	
+
 	/// Write sample to internal delay-line
 	void writeSample(const float& v){ mSound.write(v); }
 
@@ -100,6 +133,9 @@ protected:
 	
 	Buffer<float> mSound;	// spherical wave around position
 	ShiftBuffer<4, Vec3d> mPosHistory; // previous positions
+	
+	double mRollOff;
+	double mNearClip, mFarClip;
 };	
 
 
@@ -108,7 +144,7 @@ class AudioScene {
 public:
 
 	AudioScene(int dim, int order, int numFrames) 
-	:	mEncoder(dim, order), mNumFrames(numFrames), mSpeedOfSound(343), mNearClip(0.1), mFarClip(100)
+	:	mEncoder(dim, order), mNumFrames(numFrames), mSpeedOfSound(343)
 	{}
 	
 	int dim() const { return mEncoder.dim(); }
@@ -136,7 +172,7 @@ public:
 		//const double invClipRange = mFarClip - mNearClip;
 		
 		double distanceToSample = sampleRate / mSpeedOfSound;
-		//distanceToSample = 16;
+		distanceToSample = 16;
 	
 		// update source history data:
 		for(Sources::iterator it = mSources.begin(); it != mSources.end(); it++) {
@@ -166,7 +202,7 @@ public:
 				for(int i=0; i<numFrames; ++i){
 					
 					// compute interpolated source position relative to listener
-					// TODO: make this sound good
+					// TODO: this tends to warble when moving fast
 					float alpha = float(i)/numFrames;
 					Vec3d relpos = ipl::cubic(
 						alpha, 
@@ -197,10 +233,8 @@ public:
 					if(idx0 <= src.maxIndex()-numFrames){
 
 						idx += (numFrames-i);
-
-						double distAtten = 4;
-						double gain = distAtten * distance;
-						gain = (gain>1.) ? 1./gain : 1.;
+						
+						double gain = src.attenuation(distance);
 						
 						float s = src.readSample(idx) * gain;
 						//printf("%g\n", s);
@@ -249,6 +283,7 @@ public:
 	
 	// between encode & decode, can apply optional processing to ambi domain signals (e.g. reverb)
 
+
 	/// Decode sources (per listener) to output channels
 	
 	/// @param[out] outs		1D array of output (non-interleaved)
@@ -269,12 +304,11 @@ protected:
 	AmbiEncode mEncoder;
 	int mNumFrames;			// audio frames per block
 	double mSpeedOfSound;	// distance per second
-	double mNearClip, mFarClip;
 	
 	// how slowly amplitude decays away from mNearClip. 
 	// 1-> 50% at farclip, 10 -> 10% at farclip, 100 -> 1% at farclip, 1000 -> 0.1%  
 	// (if mKneeSmoothness is near zero; as d increases, amplitude at farclip increases slightly
-	double mRollOff;	
+	//double mRollOff;	
 	
 	// how much the curve approximates 1/(1+x)
 	// 0 -> (1/1+x), 1 -> (1+1)/(x^2+x+1); typical might be 0.2 - 100 
