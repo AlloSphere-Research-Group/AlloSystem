@@ -123,16 +123,19 @@ public:
 	/// Returns whether file exists
 	static bool exists(const char * path);
 	
-	/// Return modification time of file
-	al_sec modificationTime();
-	/// Return last access time of file
-	al_sec accessTime();
-	/// Return creation time of file
-	al_sec createdTime();
+	/// Return modification time of file (or 0 on failure)
+	/// as number of seconds since 00:00:00 january 1, 1970 UTC
+	al_sec modified();
+	/// Return last access time of file (or 0 on failure)
+	/// as number of seconds since 00:00:00 january 1, 1970 UTC
+	al_sec accessed();
+	/// Return creation time of file (or 0 on failure)
+	/// as number of seconds since 00:00:00 january 1, 1970 UTC
+	al_sec created();
 	
-	/// Return size file
+	/// Return size file (or 0 on failure)
 	size_t size();
-	/// Return space used on disk of file
+	/// Return space used on disk of file (or 0 on failure)
 	size_t storage();
 
 protected:

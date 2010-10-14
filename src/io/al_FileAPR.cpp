@@ -147,34 +147,39 @@ int File::write(const char * path, const void * v, int size, int items){
 bool File::exists(const char * path){ File f(path, "r"); return f.open(); }
 
 
-al_sec File :: modificationTime() {
+al_sec File :: modified() {
 	if (mImpl->getInfo(mPath, APR_FINFO_MTIME)) {
 		return 1.0e-6 * al_sec(mImpl->finfo.mtime);
 	}
+	return 0;
 }
 
-al_sec File :: accessTime() {
+al_sec File :: accessed() {
 	if (mImpl->getInfo(mPath, APR_FINFO_ATIME)) {
 		return 1.0e-6 * al_sec(mImpl->finfo.atime);
 	}
+	return 0;
 }
 
-al_sec File :: createdTime() {
+al_sec File :: created() {
 	if (mImpl->getInfo(mPath, APR_FINFO_CTIME)) {
 		return 1.0e-6 * al_sec(mImpl->finfo.ctime);
 	}
+	return 0;
 }
 
 size_t File :: size() {
 	if (mImpl->getInfo(mPath, APR_FINFO_SIZE)) {
 		return mImpl->finfo.size;
 	}
+	return 0;
 }
 
 size_t File :: storage() {
 	if (mImpl->getInfo(mPath, APR_FINFO_CSIZE)) {
 		return mImpl->finfo.csize;
 	}
+	return 0;
 }
 
 

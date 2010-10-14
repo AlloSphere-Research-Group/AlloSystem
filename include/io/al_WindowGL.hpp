@@ -284,8 +284,9 @@ private:
 
 	#define CALL(e)\
 	if(e){\
-		for(unsigned i=0; i<mEventHandlers.size(); ++i){\
-			if(!mEventHandlers[i]->e) break;\
+		std::vector<InputEventHandler *>::iterator iter = mEventHandlers.begin(); \
+		while(iter != mEventHandlers.end()){\
+			if(!(*iter)->e) break;\
 		}\
 	}
 	void doMouseDown(const Mouse& m){ CALL(onMouseDown(m)); }

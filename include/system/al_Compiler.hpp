@@ -145,9 +145,24 @@ public:
 	// TODO: maybe also offer a per-function optimize here?
 	void * getfunctionptr(std::string funcname);
 	void * getglobalptr(std::string globalname);
+	
+	/*
+		print module to stdout
+	*/
+	void dump();
+	
+	/* 
+		JIT supports a reference-count mechanism
+	*/
+	void retain() { mRefs++; }
+	void release() { if (--mRefs == 0) { unload(); } }
+	
 private:
+	void unload();
+
 	friend class ModuleImpl;
 	class ModuleImpl * mImpl;
+	int mRefs;
 };
 
 

@@ -285,58 +285,88 @@ JIT * Compiler :: jit() {
 		} else {
 			EE->addModule(mImpl->module);
 		}
+		
+		// initialize the statics:
 		EE->runStaticConstructorsDestructors(mImpl->module, false);
+		
 		// create JIT and transfer ownership of module to it:
 		JIT * jit = new JIT;
 		jit->mImpl = mImpl;
+		jit->retain();
 		mImpl = NULL;
 		return jit;
 	}
 	return NULL;
 }
 
-JIT::JIT() {}
+JIT::JIT() : mRefs(0) {}
 
 JIT::~JIT() {
-	/* free any statics allocated in the code */
-	EE->runStaticConstructorsDestructors(mImpl->module, true);
-	
-	/*	Removing the functions one by one. */
-	llvm::Module::FunctionListType & flist = mImpl->module->getFunctionList();
-	for (llvm::Module::FunctionListType::iterator iter= flist.begin(); iter != flist.end(); iter++) {
-		//printf("function %s %d\n", iter->getName().data(), iter->isIntrinsic());
-		EE->freeMachineCodeForFunction(iter);
+	unload();
+}
+
+void JIT :: unload() {
+	if (mImpl) {
+		/* free any statics allocated in the code */
+		// TODO: why does this not work???
+		EE->runStaticConstructorsDestructors(mImpl->module, true);
+		
+		// apparently not necessary:
+//		/*	Removing the functions one by one. */
+//		llvm::Module::FunctionListType & flist = mImpl->module->getFunctionList();
+//		for (llvm::Module::FunctionListType::iterator iter= flist.begin(); iter != flist.end(); iter++) {
+//			//printf("function %s %d\n", iter->getName().data(), iter->isIntrinsic());
+//			EE->freeMachineCodeForFunction(iter);
+//		}	
+//		/* walk the globals */
+//		llvm::Module::GlobalListType & glist = mImpl->module->getGlobalList();
+//		for (llvm::Module::GlobalListType::iterator iter= glist.begin(); iter != glist.end(); iter++) {
+//			printf("global %s %d\n", iter->getName().data(), iter->isDeclaration());
+//			//EE->freeMachineCodeForFunction(iter);
+//			EE->updateGlobalMapping(iter, NULL);
+//		}
+		
+		
+		/* EE forgets about module */
+		EE->clearGlobalMappingsFromModule(mImpl->module);
+		EE->removeModule(mImpl->module);	
+		
+		/* should be safe */
+		delete mImpl->module;
+		delete mImpl;
+		mImpl = 0;
 	}
-	EE->clearGlobalMappingsFromModule(mImpl->module);
-	
-	/* EE forgets about module */
-	EE->removeModule(mImpl->module);	
-	
-	/* should be safe */
-	delete mImpl->module;
-	delete mImpl;
+}
+
+
+void JIT :: dump() {
+	if (mImpl) mImpl->module->dump();
 }
 
 void * JIT :: getfunctionptr(std::string funcname) {
-	llvm::StringRef fname = llvm::StringRef(funcname);
-	llvm::Function * f = mImpl->module->getFunction(fname);
-	if (f) {
-		return EE->getPointerToFunction(f);
+	if (mImpl) {
+		llvm::StringRef fname = llvm::StringRef(funcname);
+		llvm::Function * f = mImpl->module->getFunction(fname);
+		if (f) {
+			return EE->getPointerToFunction(f);
+		}
 	}
 	return NULL;
 }
 void * JIT :: getglobalptr(std::string globalname) {
+	if (mImpl) {
+		const llvm::GlobalVariable * GV = mImpl->module->getGlobalVariable(globalname);
+		if (GV) {
+			return EE->getOrEmitGlobalVariable(GV);
+		} else {
+			printf("global %s not found\n", globalname.data());
+		}
+	}
 	return NULL;
 }
 
-//std::vector<std::string> Compiler :: getfunctionnames() {
-//	mImpl->module();
-//}
-//std::vector<std::string> Compiler :: getglobalnames() {
-//	
-//}
-
 bool Compiler :: writebitcode(std::string path) {
+	printf("writebitcode not yet enabled\n");
 	return true;
 }	
 

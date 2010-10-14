@@ -71,7 +71,7 @@ public:
 		Data data = { f };
 		sched(at, &Data::call, (char *)(&data), sizeof(Data));
 	}
-	
+
 	template<typename A1>
 	void send(al_sec at, void (*f)(al_sec t, A1 a1), A1 a1) {
 		struct Data {
@@ -155,6 +155,114 @@ public:
 		Data data = { f, a1, a2, a3, a4, a5, a6 };
 		sched(at, &Data::call, (char *)(&data), sizeof(Data));
 	}
+	
+	/*
+		Equivalents for object->method calls:
+	*/
+	template<typename T>
+	void send(al_sec at, T * self, void (T::*f)(al_sec t)) {
+		struct Data {
+			T * self;
+			void (T::*f)(al_sec t);
+			static void call(al_sec t, char * args) {
+				const Data * d = (Data *)args;
+				((d->self)->*(d->f))(t);
+			}
+		};
+		Data data = { self, f };
+		sched(at, &Data::call, (char *)(&data), sizeof(Data));
+	}
+	
+	template<typename T, typename A1>
+	void send(al_sec at, T * self, void (T::*f)(al_sec t, A1 a1), A1 a1) {
+		struct Data {
+			T * self;
+			void (T::*f)(al_sec t, A1 a1);
+			A1 a1;
+			static void call(al_sec t, char * args) {
+				const Data * d = (Data *)args;
+				((d->self)->*(d->f))(t, d->a1);
+			}
+		};
+		Data data = { self, f, a1 };
+		sched(at, &Data::call, (char *)(&data), sizeof(Data));
+	}
+	
+	template<typename T, typename A1, typename A2>
+	void send(al_sec at, T * self, void (T::*f)(al_sec t, A1 a1, A2 a2), A1 a1, A2 a2) {
+		struct Data {
+			T * self;
+			void (T::*f)(al_sec t, A1 a1, A2 a2);
+			A1 a1; A2 a2;
+			static void call(al_sec t, char * args) {
+				const Data * d = (Data *)args;
+				((d->self)->*(d->f))(t, d->a1, d->a2);
+			}
+		};
+		Data data = { self, f, a1, a2 };
+		sched(at, &Data::call, (char *)(&data), sizeof(Data));
+	}
+	
+	template<typename T, typename A1, typename A2, typename A3>
+	void send(al_sec at, T * self, void (T::*f)(al_sec t, A1 a1, A2 a2, A3 a3), A1 a1, A2 a2, A3 a3) {
+		struct Data {
+			T * self;
+			void (T::*f)(al_sec t, A1 a1, A2 a2, A3 a3);
+			A1 a1; A2 a2; A3 a3; 
+			static void call(al_sec t, char * args) {
+				const Data * d = (Data *)args;
+				((d->self)->*(d->f))(t, d->a1, d->a2, d->a3);
+			}
+		};
+		Data data = { self, f, a1, a2, a3 };
+		sched(at, &Data::call, (char *)(&data), sizeof(Data));
+	}
+	
+	template<typename T, typename A1, typename A2, typename A3, typename A4>
+	void send(al_sec at, T * self, void (T::*f)(al_sec t, A1 a1, A2 a2, A3 a3, A4 a4 ), A1 a1, A2 a2, A3 a3, A4 a4 ) {
+		struct Data {
+			T * self;
+			void (T::*f)(al_sec t, A1 a1, A2 a2, A3 a3, A4 a4 );
+			A1 a1; A2 a2; A3 a3; A4 a4; 
+			static void call(al_sec t, char * args) {
+				const Data * d = (Data *)args;
+				((d->self)->*(d->f))(t, d->a1, d->a2, d->a3, d->a4 );
+			}
+		};
+		Data data = { self, f, a1, a2, a3, a4 };
+		sched(at, &Data::call, (char *)(&data), sizeof(Data));
+	}
+	
+	template<typename T, typename A1, typename A2, typename A3, typename A4, typename A5>
+	void send(al_sec at, T * self, void (T::*f)(al_sec t, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5), A1 a1, A2 a2, A3 a3, A4 a4, A5 a5) {
+		struct Data {
+			T * self;
+			void (T::*f)(al_sec t, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5);
+			A1 a1; A2 a2; A3 a3; A4 a4; A5 a5;
+			static void call(al_sec t, char * args) {
+				const Data * d = (Data *)args;
+				((d->self)->*(d->f))(t, d->a1, d->a2, d->a3, d->a4, d->a5);
+			}
+		};
+		Data data = { self, f, a1, a2, a3, a4, a5 };
+		sched(at, &Data::call, (char *)(&data), sizeof(Data));
+	}
+	
+	template<typename T, typename A1, typename A2, typename A3, typename A4, typename A5, typename A6>
+	void send(al_sec at, T * self, void (T::*f)(al_sec t, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6), A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6) {
+		struct Data {
+			T * self;
+			void (T::*f)(al_sec t, A1 a1, A2 a2, A3 a3, A4 a4, A5 a5, A6 a6);
+			A1 a1; A2 a2; A3 a3; A4 a4; A5 a5; A6 a6;
+			static void call(al_sec t, char * args) {
+				const Data * d = (Data *)args;
+				((d->self)->*(d->f))(t, d->a1, d->a2, d->a3, d->a4, d->a5, d->a6);
+			}
+		};
+		Data data = { self, f, a1, a2, a3, a4, a5, a6 };
+		sched(at, &Data::call, (char *)(&data), sizeof(Data));
+	}
+	
 
 	// generic method to schedule a callback
 	void sched(al_sec at, msg_func func, char * data, size_t size);
