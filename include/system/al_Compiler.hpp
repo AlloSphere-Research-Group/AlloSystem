@@ -32,6 +32,46 @@
 
 /*
 	A wrapper around the LLVM/Clang APIs
+	
+	
+	Usage:
+	
+	std::string code = ...	// source to compile
+	std::string path = ...  // additional include paths
+	std::string funcname = ... // function to JIT from code
+	
+	JIT * jit;
+	void (*fptr)();		
+	
+	// set up compiler:
+	Compiler cc;
+	cc.options.CPlusPlus = 1;
+	cc.options.user_includes.push_back(path);
+	
+	// compile code
+	if (cc.compile(code)) {
+		// optimize it
+		cc.optimize();
+		// print out LLVM IR
+		cc.dump();
+		// load into execution engine (returns a JIT object)
+		// the compiler is reset, and can be re-used
+		// the JIT can be used to instantiate functions
+		// these functions will be deleted when the JIT is deleted
+		jit = cc.jit();
+		if (jit) {
+			// grab a function from the JIT object
+			// this is where just-in-time machine code generation actually occurs
+			fptr = (void (*)())(jit->getfunctionptr(funcname));
+			if (fptr) {
+				// call the generated function
+				fptr();
+			}
+			// done with jitted code, delete it:
+			delete jit;
+			jit = NULL;
+		}
+	}
 */	
 
 namespace al {
