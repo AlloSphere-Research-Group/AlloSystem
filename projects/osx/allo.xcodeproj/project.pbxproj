@@ -199,6 +199,7 @@
 		362FA88D11D3F5CC00AA2DC4 /* al_MainLoop.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 362FA88C11D3F5CC00AA2DC4 /* al_MainLoop.hpp */; };
 		362FA89911D3FA6700AA2DC4 /* al_MsgQueue.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 362FA89811D3FA6700AA2DC4 /* al_MsgQueue.hpp */; };
 		362FA8F611D3FCC100AA2DC4 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
+		3649CDA512440A3F0077128E /* al_Nurbs.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3649CDA412440A3F0077128E /* al_Nurbs.hpp */; };
 		365599FC11D4013600BA01E8 /* al_MsgQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 365599FB11D4013600BA01E8 /* al_MsgQueue.cpp */; };
 		3659D756117B8AFA0065EBE4 /* ringbuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 3659D755117B8AFA0065EBE4 /* ringbuffer.c */; };
 		367F0B3912034EDB00FCC534 /* al_Stereographic.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 367F0B3812034EDB00FCC534 /* al_Stereographic.hpp */; };
@@ -712,6 +713,7 @@
 		3625B541116EEDEF00C685B7 /* Makefile.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.config; path = ../../Makefile.config; sourceTree = SOURCE_ROOT; };
 		362FA88C11D3F5CC00AA2DC4 /* al_MainLoop.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_MainLoop.hpp; sourceTree = "<group>"; };
 		362FA89811D3FA6700AA2DC4 /* al_MsgQueue.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_MsgQueue.hpp; sourceTree = "<group>"; };
+		3649CDA412440A3F0077128E /* al_Nurbs.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Nurbs.hpp; sourceTree = "<group>"; };
 		365599FB11D4013600BA01E8 /* al_MsgQueue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_MsgQueue.cpp; sourceTree = "<group>"; };
 		3659D750117B8A980065EBE4 /* al_MsgTube.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_MsgTube.hpp; sourceTree = "<group>"; };
 		3659D752117B8AC60065EBE4 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
@@ -1208,6 +1210,7 @@
 				160FD0DF11FA1CE4001E8987 /* al_Isosurface.hpp */,
 				16AA95EA118F6EEF00B98EC3 /* al_Light.hpp */,
 				36F598FB12122617003B78B5 /* al_Model.hpp */,
+				3649CDA412440A3F0077128E /* al_Nurbs.hpp */,
 				16AA967E118F7D5700B98EC3 /* al_Shader.hpp */,
 				36F0ABCF123195D5000A8EBF /* al_Slab.hpp */,
 				16AA960B118F775E00B98EC3 /* al_Texture.hpp */,
@@ -1921,6 +1924,7 @@
 				36D69A4B11F9264700699158 /* al_Surface.hpp in Headers */,
 				367F0B3912034EDB00FCC534 /* al_Stereographic.hpp in Headers */,
 				36F0ABE612319709000A8EBF /* lua_utility.h in Headers */,
+				3649CDA512440A3F0077128E /* al_Nurbs.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

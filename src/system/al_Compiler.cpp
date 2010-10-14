@@ -15,13 +15,13 @@
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/TextDiagnosticBuffer.h"
 #include "clang/Frontend/TextDiagnosticPrinter.h"
-//#include "clang/Frontend/FrontendOptions.h"
+#include "clang/Frontend/FrontendOptions.h"
 //#include "clang/Frontend/HeaderSearchOptions.h"
 //#include "clang/Frontend/PreprocessorOptions.h"
 #include "clang/Frontend/Utils.h"
 //#include "clang/Lex/HeaderSearch.h"
 #include "clang/Lex/Preprocessor.h"
-#include "clang/Sema/ParseAST.h"
+#include "clang/Parse/ParseAST.h"
 //#include "clang/Sema/CodeCompleteConsumer.h"
 
 //#include "llvm/ADT/OwningPtr.h"
@@ -90,7 +90,8 @@ static void llvmInit() {
 	if (!initialized) {
 		llvm::InitializeAllTargets();
 		llvm::InitializeAllAsmPrinters();
-		llvm::llvm_install_error_handler(llvmErrorHandler, NULL);
+		//llvm::InitializeAllAsmParsers();
+		llvm::install_fatal_error_handler(llvmErrorHandler, NULL);
 		initialized = true;
 	}
 }
@@ -138,7 +139,9 @@ bool Compiler :: compile(std::string code) {
 	if (!mImpl) mImpl = new ModuleImpl;
 	
 	const char * src = code.data();
-	llvm::MemoryBuffer *buffer = llvm::MemoryBuffer::getMemBufferCopy(src, src+strlen(src), "src");
+	llvm::StringRef input_data(src);
+	llvm::StringRef buffer_name("src");
+	llvm::MemoryBuffer *buffer = llvm::MemoryBuffer::getMemBufferCopy(input_data, buffer_name);
 	if(!buffer) {
 		printf("couldn't create buffer\n");
 	}
@@ -187,10 +190,10 @@ bool Compiler :: compile(std::string code) {
 	// Header paths:
 	HeaderSearchOptions& headeropts = CI.getHeaderSearchOpts();
 	for (unsigned int i=0; i<options.system_includes.size(); i++) {
-		headeropts.AddPath(options.system_includes[i], clang::frontend::Angled, true, false);
+		headeropts.AddPath(options.system_includes[i], clang::frontend::Angled, true, false, false/* true ? */);
 	}
 	for (unsigned int i=0; i<options.user_includes.size(); i++) {
-		headeropts.AddPath(options.user_includes[i], clang::frontend::Quoted, true, false);
+		headeropts.AddPath(options.user_includes[i], clang::frontend::Quoted, true, false, false/* true ? */);
 	}
 	ApplyHeaderSearchOptions(PP.getHeaderSearchInfo(), headeropts, lang, CI.getTarget().getTriple());
 	
@@ -251,7 +254,7 @@ bool Compiler :: readbitcode(std::string path) {
 }
 
 void Compiler :: dump() {
-	mImpl->module->dump();
+	if (mImpl) mImpl->module->dump();
 }
 
 JIT * Compiler :: jit() {
@@ -308,7 +311,8 @@ JIT::~JIT() {
 }
 
 void * JIT :: getfunctionptr(std::string funcname) {
-	llvm::Function * f = mImpl->module->getFunction(funcname);
+	llvm::StringRef fname = llvm::StringRef(funcname);
+	llvm::Function * f = mImpl->module->getFunction(fname);
 	if (f) {
 		return EE->getPointerToFunction(f);
 	}
