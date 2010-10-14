@@ -273,6 +273,13 @@ public:
 		mEventHandlers.push_back(&(v->window(this)));
 		return *this;
 	}
+	
+	// note: won't remove multiple references!
+	// note 2: maybe mEventHandlers should be a std::list instead?
+	WindowGL& remove(InputEventHandler * v){
+		mEventHandlers.erase(std::remove(mEventHandlers.begin(), mEventHandlers.end(), v), mEventHandlers.end());
+		return *this;
+	}
 
 private:
 	friend class WindowImpl;
@@ -287,6 +294,7 @@ private:
 		std::vector<InputEventHandler *>::iterator iter = mEventHandlers.begin(); \
 		while(iter != mEventHandlers.end()){\
 			if(!(*iter)->e) break;\
+			iter++; \
 		}\
 	}
 	void doMouseDown(const Mouse& m){ CALL(onMouseDown(m)); }
