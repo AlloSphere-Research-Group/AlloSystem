@@ -28,7 +28,7 @@
 //#include "llvm/ADT/SmallPtrSet.h"
 //#include "llvm/ADT/SmallString.h"
 //#include "llvm/ADT/StringExtras.h"
-//#include "llvm/Analysis/Verifier.h"
+#include "llvm/Analysis/Verifier.h"
 //#include "llvm/Bitcode/ReaderWriter.h"
 //#include "llvm/Analysis/Verifier.h"
 //#include "llvm/Config/config.h"
@@ -40,11 +40,7 @@
 #include "llvm/Linker.h"
 #include "llvm/LLVMContext.h"
 #include "llvm/Module.h"
-//#include "llvm/Target/TargetData.h"
-#include "llvm/Target/TargetSelect.h"
-//#include "llvm/Transforms/Scalar.h"
-#include "llvm/Type.h"
-//#include "llvm/PassManager.h"
+#include "llvm/PassManager.h"
 //#include "llvm/Support/Allocator.h"
 #include "llvm/Support/ErrorHandling.h"
 //#include "llvm/Support/IRBuilder.h"
@@ -57,8 +53,12 @@
 //#include "llvm/System/Host.h"
 //#include "llvm/System/Path.h"
 //#include "llvm/System/Signals.h"
-//#include "llvm/Transforms/IPO.h"
-//#include "llvm/Transforms/Scalar.h"
+#include "llvm/Target/TargetData.h"
+#include "llvm/Target/TargetSelect.h"
+#include "llvm/Transforms/Scalar.h"
+#include "llvm/Transforms/IPO.h"
+#include "llvm/Transforms/Scalar.h"
+#include "llvm/Type.h"
 //#include "llvm/ValueSymbolTable.h"
 
 using namespace clang;
@@ -306,7 +306,7 @@ JIT::~JIT() {
 }
 
 void JIT :: unload() {
-	if (mImpl) {
+	if (valid()) {
 		/* free any statics allocated in the code */
 		// TODO: why does this not work???
 		EE->runStaticConstructorsDestructors(mImpl->module, true);
@@ -326,7 +326,6 @@ void JIT :: unload() {
 //			EE->updateGlobalMapping(iter, NULL);
 //		}
 		
-		
 		/* EE forgets about module */
 		EE->clearGlobalMappingsFromModule(mImpl->module);
 		EE->removeModule(mImpl->module);	
@@ -340,11 +339,11 @@ void JIT :: unload() {
 
 
 void JIT :: dump() {
-	if (mImpl) mImpl->module->dump();
+	if (valid()) mImpl->module->dump();
 }
 
 void * JIT :: getfunctionptr(std::string funcname) {
-	if (mImpl) {
+	if (valid()) {
 		llvm::StringRef fname = llvm::StringRef(funcname);
 		llvm::Function * f = mImpl->module->getFunction(fname);
 		if (f) {
@@ -354,7 +353,7 @@ void * JIT :: getfunctionptr(std::string funcname) {
 	return NULL;
 }
 void * JIT :: getglobalptr(std::string globalname) {
-	if (mImpl) {
+	if (valid()) {
 		const llvm::GlobalVariable * GV = mImpl->module->getGlobalVariable(globalname);
 		if (GV) {
 			return EE->getOrEmitGlobalVariable(GV);
@@ -370,8 +369,84 @@ bool Compiler :: writebitcode(std::string path) {
 	return true;
 }	
 
-void Compiler :: optimize(std::string opt) {
-	printf("Compiler optimizations not yet enabled\n");
+void Compiler :: optimize(std::string olevel) {
+	if (mImpl == 0) return;
+	
+	llvm::TargetData * targetdata = new llvm::TargetData(mImpl->module);
+	llvm::PassManager pm;
+	pm.add(targetdata);
+	
+	if (olevel == std::string("O1")) {
+		pm.add(llvm::createPromoteMemoryToRegisterPass());
+		pm.add(llvm::createInstructionCombiningPass());
+		pm.add(llvm::createCFGSimplificationPass());
+		pm.add(llvm::createVerifierPass(llvm::PrintMessageAction));
+	} else if (olevel == std::string("O3")) {
+		pm.add(llvm::createCFGSimplificationPass());
+		pm.add(llvm::createScalarReplAggregatesPass());
+		pm.add(llvm::createInstructionCombiningPass());
+		//pm.add(llvm::createRaiseAllocationsPass());   // call %malloc -> malloc inst
+		pm.add(llvm::createCFGSimplificationPass());       // Clean up disgusting code
+		pm.add(llvm::createPromoteMemoryToRegisterPass()); // Kill useless allocas
+		pm.add(llvm::createGlobalOptimizerPass());       // OptLevel out global vars
+		pm.add(llvm::createGlobalDCEPass());          // Remove unused fns and globs
+		pm.add(llvm::createIPConstantPropagationPass()); // IP Constant Propagation
+		pm.add(llvm::createDeadArgEliminationPass());   // Dead argument elimination
+		pm.add(llvm::createInstructionCombiningPass());   // Clean up after IPCP & DAE
+		pm.add(llvm::createCFGSimplificationPass());      // Clean up after IPCP & DAE
+		pm.add(llvm::createPruneEHPass());               // Remove dead EH info
+		pm.add(llvm::createFunctionAttrsPass());         // Deduce function attrs
+		pm.add(llvm::createFunctionInliningPass());      // Inline small functions
+		pm.add(llvm::createArgumentPromotionPass());  // Scalarize uninlined fn args
+		pm.add(llvm::createSimplifyLibCallsPass());    // Library Call Optimizations
+		pm.add(llvm::createInstructionCombiningPass());  // Cleanup for scalarrepl.
+		pm.add(llvm::createJumpThreadingPass());         // Thread jumps.
+		pm.add(llvm::createCFGSimplificationPass());     // Merge & remove BBs
+		pm.add(llvm::createScalarReplAggregatesPass());  // Break up aggregate allocas
+		pm.add(llvm::createInstructionCombiningPass());  // Combine silly seq's
+		//pm.add(llvm::createCondPropagationPass());       // Propagate conditionals
+		pm.add(llvm::createTailCallEliminationPass());   // Eliminate tail calls
+		pm.add(llvm::createCFGSimplificationPass());     // Merge & remove BBs
+		pm.add(llvm::createReassociatePass());           // Reassociate expressions
+		pm.add(llvm::createLoopRotatePass());            // Rotate Loop
+		pm.add(llvm::createLICMPass());                  // Hoist loop invariants
+		pm.add(llvm::createLoopUnswitchPass());
+		pm.add(llvm::createLoopIndexSplitPass());        // Split loop index
+		pm.add(llvm::createInstructionCombiningPass());
+		pm.add(llvm::createIndVarSimplifyPass());        // Canonicalize indvars
+		pm.add(llvm::createLoopDeletionPass());          // Delete dead loops
+		pm.add(llvm::createLoopUnrollPass());          // Unroll small loops
+		pm.add(llvm::createInstructionCombiningPass()); // Clean up after the unroller
+		pm.add(llvm::createGVNPass());                   // Remove redundancies
+		pm.add(llvm::createMemCpyOptPass());            // Remove memcpy / form memset
+		pm.add(llvm::createSCCPPass());                  // Constant prop with SCCP
+		pm.add(llvm::createInstructionCombiningPass());
+		//pm.add(llvm::createCondPropagationPass());       // Propagate conditionals
+		pm.add(llvm::createDeadStoreEliminationPass());  // Delete dead stores
+		pm.add(llvm::createAggressiveDCEPass());   // Delete dead instructions
+		pm.add(llvm::createCFGSimplificationPass());     // Merge & remove BBs
+		pm.add(llvm::createStripDeadPrototypesPass()); // Get rid of dead prototypes
+		pm.add(llvm::createDeadTypeEliminationPass());   // Eliminate dead types
+		pm.add(llvm::createConstantMergePass());       // Merge dup global constants
+		pm.add(llvm::createVerifierPass(llvm::PrintMessageAction));
+	} else {
+		pm.add(llvm::createCFGSimplificationPass());
+		pm.add(llvm::createFunctionInliningPass());
+		pm.add(llvm::createJumpThreadingPass());
+		pm.add(llvm::createPromoteMemoryToRegisterPass());
+		pm.add(llvm::createInstructionCombiningPass());
+		pm.add(llvm::createCFGSimplificationPass());
+		pm.add(llvm::createScalarReplAggregatesPass());
+		pm.add(llvm::createLICMPass());
+		//pm.add(llvm::createCondPropagationPass());
+		pm.add(llvm::createGVNPass());
+		pm.add(llvm::createSCCPPass());
+		pm.add(llvm::createAggressiveDCEPass());
+		pm.add(llvm::createCFGSimplificationPass());
+		pm.add(llvm::createVerifierPass(llvm::PrintMessageAction));
+	}
+	
+	pm.run(*mImpl->module);
 }	
 
 } // al::

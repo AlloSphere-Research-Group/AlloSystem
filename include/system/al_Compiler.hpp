@@ -107,7 +107,9 @@ public:
 	bool compile(std::string code);	
 	bool readbitcode(std::string path);	
 	bool writebitcode(std::string path);	
-	void optimize(std::string flag = "02");
+	
+	/// valid olevels: O1, O2, O3
+	void optimize(std::string olevel = "O2");
 	
 	/*
 		discards any code compiled so far.
@@ -156,6 +158,11 @@ public:
 	*/
 	void retain() { mRefs++; }
 	void release() { if (--mRefs == 0) { unload(); } }
+	
+	/*
+		Returns false if the JIT has no module (cannot emit functions or globals)
+	*/
+	bool valid() { return mImpl != NULL; }
 	
 private:
 	void unload();
