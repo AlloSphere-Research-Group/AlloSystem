@@ -151,7 +151,7 @@ bool Compiler :: compile(std::string code) {
 	CompilerInstance CI;
 	CI.createDiagnostics(0, NULL);
 	Diagnostic & Diags = CI.getDiagnostics();	
-	TextDiagnosticBuffer * client = new TextDiagnosticBuffer();
+	TextDiagnosticBuffer * client = new TextDiagnosticBuffer;
 	Diags.setClient(client);
 	CompilerInvocation::CreateFromArgs(CI.getInvocation(), NULL, NULL, Diags);
 	
