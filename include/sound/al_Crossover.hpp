@@ -41,9 +41,9 @@ class Crossover {
 public:
 
 	/// set the cross-over middle frequency
-	void freq(T f);
+	void freq(T f, T fs);
 	
-	Crossover(T f=(T)600) { freq(f); clear(); }
+	Crossover(T f=(T)600, T fs=(T)44100.) { freq(f, fs); clear(); }
 	
 	/// process one sample and return hi/lo shelf
 	void next(const T in, T * lo, T * hi);
@@ -58,8 +58,8 @@ protected:
 
 
 template<>
-void Crossover<double> :: freq(double f) {
-	double rad = M_PI * 2. * f;
+void Crossover<double> :: freq(double f, double fs) {
+	double rad = M_PI * 2. * f / fs;
 	double cosine = cos(rad);
 	double sine = sin(rad);
 	if (abs(c) > 0.0001) {
@@ -92,8 +92,8 @@ inline void Crossover<double> :: next(const double in, double * lo, double * hi)
 }
 
 template<>
-void Crossover<float> :: freq(float f) {
-	float rad = M_PI * 2.f * f;
+void Crossover<float> :: freq(float f, float fs) {
+	float rad = M_PI * 2.f * f / fs;
 	float cosine = cosf(rad);
 	float sine = sinf(rad);
 	if (fabs(c) > 0.0001f) {
