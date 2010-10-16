@@ -67,7 +67,8 @@ public:
 		q.fromMatrix(Base::elems);
 		return q;
 	}
-	void fromQuat(Quat<T>& q) { q.toMatrix(Base::elems); }
+	Matrix4& fromQuat(Quat<T>& q) { q.toMatrix(Base::elems); return *this; }
+	Matrix4& fromQuatGL(Quat<T>& q) { q.toMatrixGL(Base::elems); return *this; }
 		
 	static const Matrix4 identity() {
 		return Matrix4(

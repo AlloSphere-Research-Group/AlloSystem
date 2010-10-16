@@ -119,7 +119,10 @@ public:
 	static Quat fromAxisY(T theta);
 	static Quat fromAxisZ(T theta);
 	static Quat fromEuler(T a, T e, T b);
+	// set from column-major matrix:
 	static Quat fromMatrix(T * matrix);
+	// set from row-major matrix:
+	static Quat fromMatrixGL(T * matrix);
 	static Quat& fromMatrix(Mat<4, T>& matrix) { return fromMatrix(matrix.ptr()); }
 
 	Quat& setFromAxisAngle(T theta, T x1, T y1, T z1) { return set(fromAxisAngle(theta, x1, y1, z1)); }
@@ -129,9 +132,13 @@ public:
 	Quat& setFromEuler(T a, T e, T b) { return set(fromEuler(a, e, b)); }
 	Quat& setFromMatrix(T * matrix) { return set(fromMatrix(matrix)); }
 	Quat& setFromMatrix(Mat<4, T>& matrix) { return set(fromMatrix(matrix.ptr())); }
+	Quat& setFromMatrixGL(T * matrix) { return set(fromMatrixGL(matrix)); }
+	Quat& setFromMatrixGL(Mat<4, T>& matrix) { return set(fromMatrixGL(matrix.ptr())); }
 
 	/// Convert to 4x4 column-major matrix
 	void toMatrix(T * matrix) const;
+	/// Convert to 4x4 row-major matrix
+	void toMatrixGL(T * matrix) const;
 
 	/// Convert to axis-angle form
 	void toAxisAngle(T * aa, T * ax, T * ay, T * az) const;
@@ -356,6 +363,43 @@ inline Quat<T> Quat<T> :: fromMatrix(T *m) {
 }
 
 template<typename T>
+inline Quat<T> Quat<T> :: fromMatrixGL(T *m) {
+	Quat q;
+	T trace = m[0]+m[5]+m[10];
+	q.w = sqrt(1. + trace)*0.5;
+
+	if(trace > 0.) {
+		q.x = (m[9] - m[6])/(4.*q.w);
+		q.y = (m[2] - m[8])/(4.*q.w);
+		q.z = (m[4] - m[1])/(4.*q.w);
+	}
+	else {
+		if(m[0] > m[5] && m[0] > m[10]) {
+			// m[0] is greatest
+			q.x = sqrt(1. + m[0]-m[5]-m[10])*0.5;
+			q.w = (m[9] - m[6])/(4.*q.x);
+			q.y = (m[4] + m[1])/(4.*q.x);
+			q.z = (m[8] + m[2])/(4.*q.x);
+		}
+		else if(m[5] > m[0] && m[5] > m[10]) {
+			// m[1] is greatest
+			q.y = sqrt(1. + m[5]-m[0]-m[10])*0.5;
+			q.w = (m[2] - m[8])/(4.*q.y);
+			q.x = (m[4] + m[1])/(4.*q.y);
+			q.z = (m[9] + m[6])/(4.*q.y);
+		}
+		else { //if(m[10] > m[0] && m[10] > m[5]) {
+			// m[2] is greatest
+			q.z = sqrt(1. + m[10]-m[0]-m[5])*0.5;
+			q.w = (m[4] - m[1])/(4.*q.z);
+			q.x = (m[8] + m[2])/(4.*q.z);
+			q.y = (m[9] + m[6])/(4.*q.z);
+		}
+	}
+	return q;
+}
+
+template<typename T>
 inline void Quat<T> :: toMatrix(T * m) const {
 
 	static const T _2 = T(2);
@@ -380,6 +424,34 @@ inline void Quat<T> :: toMatrix(T * m) const {
 	m[11] = 0;
 
 	m[12]=m[13]=m[14]=0;
+	m[15]=_1;
+}
+
+template<typename T>
+inline void Quat<T> :: toMatrixGL(T * m) const {
+
+	static const T _2 = T(2);
+	static const T _1 = T(1);
+	T	_2w=_2*w, _2x=_2*x, _2y=_2*y;
+	T	wx=_2w*x, wy=_2w*y, wz=_2w*z, xx=_2x*x, xy=_2x*y,
+		xz=_2x*z, yy=_2y*y, yz=_2y*z, zz=_2*z*z;
+
+	m[ 0] =-zz - yy + _1;
+	m[ 4] = xy - wz;
+	m[ 8] = wy + xz;
+	m[ 12] = 0;
+
+	m[ 1] = wz + xy;
+	m[ 5] =-zz - xx + _1;
+	m[ 9] = yz - wx;
+	m[ 13] = 0;
+
+	m[ 2] = xz - wy;
+	m[ 6] = wx + yz;
+	m[10] =-yy - xx + _1;
+	m[14] = 0;
+
+	m[ 3]=m[ 7]=m[ 11]=0;
 	m[15]=_1;
 }
 
