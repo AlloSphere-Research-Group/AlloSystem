@@ -31,6 +31,17 @@
 #include <stdio.h>
 //#define MAX_ORDER 3
 
+
+/*
+	TODO: near-field compensation
+	acknowledges that the speakers are at a finite distance from the listener.  This a simple Minimum Phase HP filter (on directional signals, not the W component) to deal with "proximity effect" because the speakers are 'near' the listener.
+	
+	f = c / (2 * PI * d) = 54.6 / d    Hz	c : speed of sound  343 m/s	
+											d : speaker distance      m
+											
+	If we pass speaker distance, then we might also want to attenuate/delay speakers for irregular layouts.
+*/
+
 namespace al{
 
 /// Ambisonic base class
