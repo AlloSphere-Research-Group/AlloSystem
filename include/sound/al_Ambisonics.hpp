@@ -39,6 +39,8 @@
 	f = c / (2 * PI * d) = 54.6 / d    Hz	c : speed of sound  343 m/s	
 											d : speaker distance      m
 											
+	Should be IIR, because it mostly affects LF.
+											
 	If we pass speaker distance, then we might also want to attenuate/delay speakers for irregular layouts.
 */
 
