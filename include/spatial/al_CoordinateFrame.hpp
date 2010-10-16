@@ -167,9 +167,17 @@ public:
 	void turn(double a, double e, double b){ turnR(e); turnU(a); turnF(b); }
 
 	/// Stop moving and spinning
-	Nav& halt(){ mMove0.set(0); mSpin0.set(0); quat().identity(); return *this; }
+	Nav& halt(){ 
+		mMove0.set(0); 
+		mMove1.set(0); 
+		mSpin0.set(0); 
+		mSpin1.set(0); 
+		mTurn.set(0);
+		updateUnitVectors();
+		return *this; 
+	}
 
-	/// Go to origin and reset orientation to identity
+	/// Go to origin, reset orientation
 	Nav& home(){ 
 		quat().identity();
 		turn(0, 0, 0); 

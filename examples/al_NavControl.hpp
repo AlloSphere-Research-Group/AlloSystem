@@ -4,7 +4,7 @@
 namespace al {
 
 /// Mapping from keyboard and mouse controls to a Nav object
-struct NavInputControl : InputEventHandler {
+struct NavInputControl : public InputEventHandler {
 
 	NavInputControl(Nav * nav): mNav(nav){}
 
@@ -72,13 +72,13 @@ protected:
 };
 
 
-struct NavInputControlCosm : NavInputControl {
+struct NavInputControlCosm : public NavInputControl {
 
 	NavInputControlCosm(Nav * nav): NavInputControl(nav){}
 
 	bool onKeyDown(const Keyboard& k){	 	
 	
-		static double a = 2;		// rotational speed: degrees per update
+		static double a = 1;		// rotational speed: degrees per update
 		static double v = 0.25;		// speed: units per update
 		
 		switch(k.key()){
