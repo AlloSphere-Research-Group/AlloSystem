@@ -89,21 +89,22 @@ public:
 
 	/// @param[in] path		path of file
 	/// @param[in] mode		i/o mode w, r, wb, rb
-	File(const char * path, const char * mode="r", bool open=false);
+	File(std::string path, std::string mode="r", bool open=false);
 
 	~File();
 
 	void close();	///< Close file
 	bool open();	///< Open file with specified i/o mode
 
-	File& mode(const char * v){ mMode=v; return *this; }
-	File& path(const char * v){ mPath=v; return *this; }
+	File& mode(std::string v){ mMode=v.data(); return *this; }
+	File& path(std::string v){ mPath=v.data(); return *this; }
 
 	/// Write memory elements to file
+	int write(std::string v){ return fwrite(v.data(), 1, v.length(), mFP); }
 	int write(const void * v, int size, int items=1){ return fwrite(v, size, items, mFP); }
 
 	/// Quick and dirty write memory to file
-	static int write(const char * path, const void * v, int size, int items=1);
+	static int write(std::string path, const void * v, int size, int items=1);
 
 	/// Returns character string of file contents (read mode only)
 	char * readAll();
@@ -121,7 +122,7 @@ public:
 	int size() const { return mSizeBytes; }
 
 	/// Returns whether file exists
-	static bool exists(const char * path);
+	static bool exists(std::string path);
 	
 	/// Return modification time of file (or 0 on failure)
 	/// as number of seconds since 00:00:00 january 1, 1970 UTC

@@ -86,9 +86,9 @@ FilePath SearchPaths::find(const std::string& name) {
 
 
 
-File::File(const char * path, const char * mode, bool open_)
+File::File(std::string path, std::string mode, bool open_)
 :	mImpl(new Impl()), 
-	mPath(path), mMode(mode), mContent(0), mSizeBytes(0), mFP(0)
+	mPath(path.data()), mMode(mode.data()), mContent(0), mSizeBytes(0), mFP(0)
 {	if(open_) open(); }
 
 File::~File(){ close(); freeContent(); delete mImpl; }
@@ -133,7 +133,7 @@ char * File::readAll(){
 	return mContent;
 }
 
-int File::write(const char * path, const void * v, int size, int items){
+int File::write(std::string path, const void * v, int size, int items){
 	File f(path, "w");
 	int r = 0;
 	if(f.open()){
@@ -144,7 +144,7 @@ int File::write(const char * path, const void * v, int size, int items){
 }
 
 
-bool File::exists(const char * path){ File f(path, "r"); return f.open(); }
+bool File::exists(std::string path){ File f(path.data(), "r"); return f.open(); }
 
 
 al_sec File :: modified() {
