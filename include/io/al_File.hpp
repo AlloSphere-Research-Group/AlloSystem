@@ -138,6 +138,8 @@ public:
 	size_t size();
 	/// Return space used on disk of file (or 0 on failure)
 	size_t storage();
+	
+	FILE * filePointer() { return mFP; }
 
 protected:
 	const char * mPath;
