@@ -142,13 +142,13 @@ public:
 	FILE * filePointer() { return mFP; }
 
 protected:
+	class Impl; Impl * mImpl;
+
 	const char * mPath;
 	const char * mMode;
 	char * mContent;
 	int mSizeBytes;
 	FILE * mFP;
-	
-	class Impl; Impl * mImpl;
 	
 	void freeContent();
 	void allocContent(int n);
