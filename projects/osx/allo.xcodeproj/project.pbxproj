@@ -553,6 +553,7 @@
 		16AC531A116290BE0076AA8B /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = /System/Library/Frameworks/AudioToolbox.framework; sourceTree = "<absolute>"; };
 		16B0425D11F78D56002FDB85 /* al_ThreadNative.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_ThreadNative.cpp; sourceTree = "<group>"; };
 		16B5BF8C1188D0E90090CE80 /* utProtocolGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utProtocolGraphics.cpp; sourceTree = "<group>"; };
+		16B74EFD1266B38900D66B0C /* al_Interval.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Interval.hpp; sourceTree = "<group>"; };
 		16BC66A1117770BF002A0C18 /* al_Constants.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Constants.hpp; sourceTree = "<group>"; };
 		16BC66A2117770BF002A0C18 /* al_Functions.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Functions.hpp; sourceTree = "<group>"; };
 		16BC66A3117770BF002A0C18 /* al_Interpolation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Interpolation.hpp; sourceTree = "<group>"; };
@@ -1163,6 +1164,7 @@
 				16BC66A2117770BF002A0C18 /* al_Functions.hpp */,
 				16FFCB53118BAA8300D4C1BD /* al_Generators.hpp */,
 				16BC66A3117770BF002A0C18 /* al_Interpolation.hpp */,
+				16B74EFD1266B38900D66B0C /* al_Interval.hpp */,
 				360C404E11D32FED002FE91F /* al_Matrix4.hpp */,
 				16D46542118F4ADA0039A84C /* al_Plane.hpp */,
 				16FFCB51118BA96500D4C1BD /* al_Random.hpp */,
