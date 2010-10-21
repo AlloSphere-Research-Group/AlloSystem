@@ -192,6 +192,7 @@ public:
 	int channelsOutDevice() const;		///< Get number of channels opened on output device
 	int framesPerBuffer() const;		///< Get frames/buffer of audio I/O stream
 	double framesPerSecond() const;		///< Get frames/second of audio I/O streams
+	double fps() const { return framesPerSecond(); }
 	double secondsPerBuffer() const;	///< Get seconds/buffer of audio I/O stream
 	double time() const;				///< Get current stream time in seconds
 	double time(int frame) const;		///< Get current stream time in seconds of frame
