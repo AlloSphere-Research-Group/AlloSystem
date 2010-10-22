@@ -155,12 +155,7 @@ bool Compiler :: compile(std::string code) {
 	Diags.setClient(client);
 	CompilerInvocation::CreateFromArgs(CI.getInvocation(), NULL, NULL, Diags);
 	
-//	// list standard invocation args:
-//	std::vector<std::string> Args;
-//	Compiler.getInvocation().toArgs(Args);
-//	for (int i=0; i<Args.size(); i++) {
-//		printf("%d %s\n", i, Args[i].data());
-//	}
+
 	
 
 	
@@ -189,6 +184,7 @@ bool Compiler :: compile(std::string code) {
 	CI.createPreprocessor();
 	Preprocessor &PP = CI.getPreprocessor();
 	
+
 	// Header paths:
 	HeaderSearchOptions& headeropts = CI.getHeaderSearchOpts();
 	for (unsigned int i=0; i<options.system_includes.size(); i++) {
@@ -199,8 +195,21 @@ bool Compiler :: compile(std::string code) {
 	}
 	ApplyHeaderSearchOptions(PP.getHeaderSearchInfo(), headeropts, lang, CI.getTarget().getTriple());
 	
-	PP.getBuiltinInfo().InitializeBuiltins(PP.getIdentifierTable(), PP.getLangOptions().NoBuiltin);
+		// add file remapping:
+  // (doesn't work)
+	llvm::StringRef remapped_name("/usr/include/remapped.h");
+	llvm::StringRef remapped_data("#include <stdio.h> \n void remapped() { printf(\"remapped!\\n\");");
+	llvm::MemoryBuffer * remapped_buffer = llvm::MemoryBuffer::getMemBufferCopy(remapped_data, remapped_name);
+	CI.getPreprocessorOpts().addRemappedFile(remapped_name, remapped_buffer);
+
+//	//	// list standard invocation args:
+//	std::vector<std::string> Args;
+//	CI.getInvocation().toArgs(Args);
+//	for (int i=0; i<Args.size(); i++) {
+//		printf("%d %s\n", i, Args[i].data());
+//	}
 	
+	PP.getBuiltinInfo().InitializeBuiltins(PP.getIdentifierTable(), PP.getLangOptions().NoBuiltin);
 			
 	
 	CI.createASTContext();
@@ -214,7 +223,13 @@ bool Compiler :: compile(std::string code) {
 			
 	CodeGenOptions CGO;
 	CodeGenerator * codegen = CreateLLVMCodeGen(Diags, "mymodule", CGO, mImpl->llvmContext );
+	
+	std::vector< std::pair
+< std::string, std::string > > rmp = CI.getPreprocessorOpts().RemappedFiles;
 
+	for (int i=0; i<rmp.size(); i++) {
+		printf("rmp %s\n", rmp[i].first.data());
+	}
 	
 	ParseAST(CI.getPreprocessor(),
 			codegen,
@@ -225,6 +240,7 @@ bool Compiler :: compile(std::string code) {
 	
 	llvm::Module* module = codegen->ReleaseModule();
 	delete codegen;
+	
 	
 	if (module) {
 		mImpl->link(module);
@@ -249,6 +265,9 @@ bool Compiler :: compile(std::string code) {
 	}
 	clear();
 	return false;
+	
+	
+	// delete buffer?
 }
 
 bool Compiler :: readbitcode(std::string path) {
@@ -278,7 +297,7 @@ JIT * Compiler :: jit() {
 			}
 			
 			// turn this off when not debugging:
-			EE->RegisterJITEventListener(&gJITEventListener);
+			//EE->RegisterJITEventListener(&gJITEventListener);
 			//EE->InstallLazyFunctionCreator(lazyfunctioncreator);
 			//EE->DisableGVCompilation();
 		

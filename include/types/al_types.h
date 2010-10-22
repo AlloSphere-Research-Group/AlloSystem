@@ -305,6 +305,22 @@ static inline void allo_lattice_create(AlloLattice *lat, AlloLatticeHeader *h) {
 	lat->data.ptr = (char *)calloc(1, allo_lattice_size(lat));
 }
 
+static inline void allo_lattice_create1d(
+	AlloLattice *lat, 
+	uint8_t components, 
+	AlloTy type, 
+	uint32_t dimx, 
+	size_t align
+) {
+	AlloLatticeHeader header;
+	header.type = type;
+	header.components = components;
+	header.dimcount = 1;
+	header.dim[0] = dimx;
+	allo_lattice_setstride(&header, align);
+	allo_lattice_create(lat, &header);
+}
+
 static inline void allo_lattice_create2d(
 	AlloLattice *lat, 
 	uint8_t components, 
