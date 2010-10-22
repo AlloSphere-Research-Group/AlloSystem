@@ -30,7 +30,7 @@
 #include <vector>
 #include <string>
 
-/*
+/*!
 	A wrapper around the LLVM/Clang APIs
 	
 	
@@ -45,8 +45,8 @@
 	
 	// set up compiler:
 	Compiler cc;
-	cc.options.CPlusPlus = 1;
-	cc.options.user_includes.push_back(path);
+	cc.cpp(true);
+	cc.include(path);
 	
 	// compile code
 	if (cc.compile(code)) {
@@ -79,53 +79,57 @@ namespace al {
 class JIT;
 class ModuleImpl;
 
-/*
-	Compiler is responsible for compiling, reading, and linking different sources
-*/	
+///! Compiler is responsible for compiling, reading, and linking different sources
 class Compiler {
 public: 
-	struct Options {
+	class Options {
+	public:
 		bool CPlusPlus; 
 		std::vector<std::string> system_includes;
 		std::vector<std::string> user_includes;
+		std::vector<std::pair<std::string, std::string> > headers;
 		
 		Options() 
 			: CPlusPlus(true) {}
 	};
-	Compiler::Options options;
-	
-	void cpp(bool v) { options.CPlusPlus = v; }
-	void include(std::string path) { options.user_includes.push_back(path); }
-	void system_include(std::string path) { options.system_includes.push_back(path); }
+	Options options;
 	
 	Compiler();
 	~Compiler();
-
-	/*
-		Note: successive compiles/bitcode reads are linked together.
-	*/
+	
+	///! enable/disable C++ mode
+	void cpp(bool v) { options.CPlusPlus = v; }
+	///! add user include path (quoted includes only)
+	void include(std::string path) { options.user_includes.push_back(path); }
+	///! add system include path (angled and quoted includes)
+	void system_include(std::string path) { options.system_includes.push_back(path); }
+	///! Add a 'virtual' header; reads from memory instead of from disk
+	/// The path should be in the set of user/system include paths
+	void header(std::string path, std::string code) {
+		options.headers.push_back(std::pair<std::string, std::string>(path, code));
+	}
+	
+	///! Compile a string of code
+	/// Note: successive compiles/bitcode reads are automaticaly linked together.
 	bool compile(std::string code);	
+	///! Load in precompiled LLVM bitcode
+	/// Note: successive compiles/bitcode reads are automaticaly linked together.
 	bool readbitcode(std::string path);	
+	///! Write out the currently compiled/linked bitcode to file
 	bool writebitcode(std::string path);	
 	
-	/// valid olevels: O1, O2, O3
+	///! Optimize (call after compile()); valid olevels: O1, O2, O3
 	void optimize(std::string olevel = "O2");
 	
-	/*
-		discards any code compiled so far.
-	*/
+	///! discards any code compiled/linked so far.
 	void clear();
 	
-	/*
-		transfers code compiled so far into the JIT engine 
-		runs any static constructors for this code at this point
-		calls clear() to reset this Compiler
-	*/
+	///! transfers code compiled so far into the JIT engine 
+	/// runs any static constructors for this code at this point
+	/// calls clear() to reset this Compiler
 	JIT * jit();	
 	
-	/*
-		print module to stdout
-	*/
+	///! print module bytecode to stdout
 	void dump();
 				
 private:
@@ -133,38 +137,35 @@ private:
 	class ModuleImpl * mImpl;
 };
 
-/*
-	JIT is responsible for retrieving pointers and functions 
-	from the code registered with the run-time execution engine
-*/	
+///! JIT is responsible for retrieving pointers and functions 
+/// from the code registered with the run-time execution engine
 class JIT {
 private:
 	friend class Compiler;
+	/// private constructor; use Compiler::jit() to create a JIT object
 	JIT();
 public:
-	~JIT();	// when a JIT is freed, the functions/pointers associated with it are freed to
-	
-	// TODO: maybe also offer a per-function optimize here?
+
+	///! frees memory for the functions/globals emitted by this JIT.
+	~JIT() { unload(); }
+
+	///! get/emit a function or global pointer from the JIT
 	void * getfunctionptr(std::string funcname);
 	void * getglobalptr(std::string globalname);
 	
-	/*
-		print module to stdout
-	*/
+	///! print module bytecode to stdout
 	void dump();
 	
-	/* 
-		JIT supports a reference-count mechanism
-	*/
+	///! reference counting
 	void retain() { mRefs++; }
 	void release() { if (--mRefs == 0) { unload(); } }
 	
-	/*
-		Returns false if the JIT has no module (cannot emit functions or globals)
-	*/
+	///! Returns false if the JIT has no module (cannot emit functions or globals)
 	bool valid() { return mImpl != NULL; }
 	
 private:
+	///! frees memory for the functions/globals emitted by this JIT.
+	/// the JIT will no longer be usable
 	void unload();
 
 	friend class ModuleImpl;

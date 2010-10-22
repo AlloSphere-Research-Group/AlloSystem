@@ -140,13 +140,7 @@ void Compiler :: clear() {
 bool Compiler :: compile(std::string code) {
 	if (!mImpl) mImpl = new ModuleImpl;
 	
-	const char * src = code.data();
-	llvm::StringRef input_data(src);
-	llvm::StringRef buffer_name("src");
-	llvm::MemoryBuffer *buffer = llvm::MemoryBuffer::getMemBufferCopy(input_data, buffer_name);
-	if(!buffer) {
-		printf("couldn't create buffer\n");
-	}
+	llvm::MemoryBuffer * buffer = llvm::MemoryBuffer::getMemBufferCopy(code, "src");
 	
 	CompilerInstance CI;
 	CI.createDiagnostics(0, NULL);
@@ -154,10 +148,6 @@ bool Compiler :: compile(std::string code) {
 	TextDiagnosticBuffer * client = new TextDiagnosticBuffer;
 	Diags.setClient(client);
 	CompilerInvocation::CreateFromArgs(CI.getInvocation(), NULL, NULL, Diags);
-	
-
-	
-
 	
 	LangOptions& lang = CI.getInvocation().getLangOpts();
 	// The fateful line
@@ -181,6 +171,14 @@ bool Compiler :: compile(std::string code) {
 //	for (int i=0; i<targetopts.Features.size(); i++)
 //		printf("Feature %s\n", targetopts.Features[i].data());
 	
+	// add header file remappings:
+	for (unsigned int i=0; i<options.headers.size(); i++) {
+		llvm::StringRef remapped_name(options.headers[i].first);
+		llvm::StringRef remapped_data(options.headers[i].second);
+		llvm::MemoryBuffer * remapped_buffer = llvm::MemoryBuffer::getMemBufferCopy(remapped_data, remapped_name);
+		CI.getPreprocessorOpts().addRemappedFile(remapped_name, remapped_buffer);
+	}
+	
 	CI.createPreprocessor();
 	Preprocessor &PP = CI.getPreprocessor();
 	
@@ -195,13 +193,6 @@ bool Compiler :: compile(std::string code) {
 	}
 	ApplyHeaderSearchOptions(PP.getHeaderSearchInfo(), headeropts, lang, CI.getTarget().getTriple());
 	
-		// add file remapping:
-  // (doesn't work)
-	llvm::StringRef remapped_name("/usr/include/remapped.h");
-	llvm::StringRef remapped_data("#include <stdio.h> \n void remapped() { printf(\"remapped!\\n\");");
-	llvm::MemoryBuffer * remapped_buffer = llvm::MemoryBuffer::getMemBufferCopy(remapped_data, remapped_name);
-	CI.getPreprocessorOpts().addRemappedFile(remapped_name, remapped_buffer);
-
 //	//	// list standard invocation args:
 //	std::vector<std::string> Args;
 //	CI.getInvocation().toArgs(Args);
@@ -263,11 +254,8 @@ bool Compiler :: compile(std::string code) {
 		ecount++;
 		if(ecount > 250) break;
 	}
-	clear();
+	
 	return false;
-	
-	
-	// delete buffer?
 }
 
 bool Compiler :: readbitcode(std::string path) {
@@ -319,10 +307,6 @@ JIT * Compiler :: jit() {
 }
 
 JIT::JIT() : mRefs(0) {}
-
-JIT::~JIT() {
-	unload();
-}
 
 void JIT :: unload() {
 	if (valid()) {
