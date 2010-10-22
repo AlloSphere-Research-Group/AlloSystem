@@ -81,6 +81,7 @@ public:
 	}
 };
 static JITListener gJITEventListener;
+static int verboseJIT = false;
 
 static void llvmErrorHandler(void * user_data, const std::string& reason) {
 	printf("llvm error %s\n", reason.data());
@@ -121,6 +122,20 @@ public:
 		return true;
 	}
 };
+
+///! Use this to implement garbage collection on JITs.
+//class JITGCList {
+//public:
+//	///! add a JIT to the list of garbage collected JITs
+//	void add(JIT * j) { if (j) { mList.push_front(j); } }
+//	///! trigger the unjit() of any unreferenced (collectible) JITs in the list
+//	/// call periodically!
+//	void sweep();
+//protected:
+//	std::list<JIT *> mList;
+//};
+
+std::list<JIT *> JITGCList;
 
 Compiler::Compiler() : mImpl(NULL) { llvmInit(); }
 
@@ -288,7 +303,7 @@ JIT * Compiler :: jit() {
 			}
 			
 			// turn this off when not debugging:
-			//EE->RegisterJITEventListener(&gJITEventListener);
+			if (verboseJIT) EE->RegisterJITEventListener(&gJITEventListener);
 			//EE->InstallLazyFunctionCreator(lazyfunctioncreator);
 			//EE->DisableGVCompilation();
 		
@@ -302,6 +317,9 @@ JIT * Compiler :: jit() {
 		// create JIT and transfer ownership of module to it:
 		JIT * jit = new JIT;
 		jit->mImpl = mImpl;
+		// for garbage collection:
+		JITGCList.push_front(jit);
+		
 		mImpl = NULL;
 		return jit;
 	}
@@ -369,18 +387,20 @@ void * JIT :: getglobalptr(std::string globalname) {
 	return NULL;
 }
 
-void JIT::GCList :: sweep() {
-	std::list<JIT *>::iterator it = mList.begin();
-	while (it != mList.end()) {
+void JIT :: sweep() {
+	std::list<JIT *>::iterator it = JITGCList.begin();
+	while (it != JITGCList.end()) {
 		JIT * j = *it;
-		if (j->gccheck()) {
-			it++;
-		} else {
-			it = mList.erase(it);
+		if (j->valid() && j->mRefs <= 0) {
+			it = JITGCList.erase(it);
 			delete j;
+		} else {
+			it++;
 		}
 	}
 }
+
+void JIT :: verbose(bool v) { verboseJIT = v; }
 
 bool Compiler :: writebitcode(std::string path) {
 	printf("writebitcode not yet enabled\n");

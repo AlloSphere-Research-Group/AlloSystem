@@ -140,15 +140,7 @@ private:
 ///! JIT is responsible for retrieving pointers and functions 
 /// from the code registered with the run-time execution engine
 class JIT {
-private:
-	friend class Compiler;
-	/// private constructor; use Compiler::jit() to create a JIT object
-	JIT();
 public:
-
-	///! frees memory for the functions/globals emitted by this JIT.
-	~JIT() { unjit(); }
-
 	///! get/emit a function or global pointer from the JIT
 	void * getfunctionptr(std::string funcname);
 	void * getglobalptr(std::string globalname);
@@ -156,39 +148,56 @@ public:
 	///! print module bytecode to stdout
 	void dump();
 	
-	///! reference counting
-	void retain() { mRefs++; }
-	void release() { mRefs--; }
-	///! used by GC list. @see unjit()
-	bool gccheck() { if (valid() && mRefs <= 0) { unjit(); } return valid(); }
-	
 	///! Returns false if the JIT has no module (cannot emit functions or globals)
 	bool valid() { return mImpl != NULL; }
 	
-	///! Use this to implement garbage collection on JITs.
-	class GCList {
-	public:
-		///! add a JIT to the list of garbage collected JITs
-		void add(JIT * j) { if (j) { mList.push_front(j); } }
-		///! trigger the unjit() of any unreferenced (collectible) JITs in the list
-		/// call periodically!
-		void sweep();
-	protected:
-		std::list<JIT *> mList;
-	};
+	///! reference counting; @see sweep
+	// TODO: make this thread-safe (use atomics)
+	JIT& retain() { mRefs++; return *this; }
+	JIT& release() { mRefs--; return *this; }
+	
+	///! trigger the unjit() of any unreferenced (collectible) JITs created so far
+	/// call periodically! @see retain, release
+	static void sweep();
+	
+	///! tell the JIT to print extra information (to stdout)
+	static void verbose(bool v=true);
 	
 private:
+	/// private constructor; use Compiler::jit() to create a JIT object
+	JIT();
+	/// private destructor; use sweep() to free memory associated JITs.
+	~JIT() { unjit(); }
 	///! frees memory for the functions/globals emitted by this JIT.
 	/// the JIT will no longer be usable
 	void unjit();
 
+	friend class Compiler;
 	friend class ModuleImpl;
 	class ModuleImpl * mImpl;
 	int mRefs;
 };
 
 
-
+/*!
+	An object that will keep a JIT alive while it exists
+	
+	Useful base-class for any objects that may outlive their calling context
+		(common in event-based or multi-threaded scenarios)
+*/
+class JitObject {
+public:
+	JitObject(JIT * jit) : mJIT(jit) { 
+		mJIT->retain(); 
+	}
+	~JitObject() { 
+		mJIT->release();
+		printf("released JitObject\n"); 
+	}
+	
+protected:	
+	JIT * mJIT;
+};
 
 
 } // al::
