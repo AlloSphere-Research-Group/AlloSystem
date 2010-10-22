@@ -140,6 +140,12 @@ public:
 	size_t storage();
 	
 	FILE * filePointer() { return mFP; }
+	
+	static al_sec modified(std::string path) { File f(path); return f.modified(); }
+	static al_sec accessed(std::string path) { File f(path); return f.accessed(); }
+	static al_sec created(std::string path) { File f(path); return f.created(); }
+	static size_t size(std::string path) { File f(path); return f.size(); }
+	static size_t storage(std::string path) { File f(path); return f.storage(); }
 
 protected:
 	class Impl; Impl * mImpl;

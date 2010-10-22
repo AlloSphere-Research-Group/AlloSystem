@@ -28,6 +28,7 @@
 */
 
 #include <vector>
+#include <list>
 #include <string>
 
 /*!
@@ -146,7 +147,7 @@ private:
 public:
 
 	///! frees memory for the functions/globals emitted by this JIT.
-	~JIT() { unload(); }
+	~JIT() { unjit(); }
 
 	///! get/emit a function or global pointer from the JIT
 	void * getfunctionptr(std::string funcname);
@@ -157,20 +158,35 @@ public:
 	
 	///! reference counting
 	void retain() { mRefs++; }
-	void release() { if (--mRefs == 0) { unload(); } }
+	void release() { mRefs--; }
+	///! used by GC list. @see unjit()
+	bool gccheck() { if (valid() && mRefs <= 0) { unjit(); } return valid(); }
 	
 	///! Returns false if the JIT has no module (cannot emit functions or globals)
 	bool valid() { return mImpl != NULL; }
 	
+	///! Use this to implement garbage collection on JITs.
+	class GCList {
+	public:
+		///! add a JIT to the list of garbage collected JITs
+		void add(JIT * j) { if (j) { mList.push_front(j); } }
+		///! trigger the unjit() of any unreferenced (collectible) JITs in the list
+		/// call periodically!
+		void sweep();
+	protected:
+		std::list<JIT *> mList;
+	};
+	
 private:
 	///! frees memory for the functions/globals emitted by this JIT.
 	/// the JIT will no longer be usable
-	void unload();
+	void unjit();
 
 	friend class ModuleImpl;
 	class ModuleImpl * mImpl;
 	int mRefs;
 };
+
 
 
 

@@ -302,7 +302,6 @@ JIT * Compiler :: jit() {
 		// create JIT and transfer ownership of module to it:
 		JIT * jit = new JIT;
 		jit->mImpl = mImpl;
-		jit->retain();
 		mImpl = NULL;
 		return jit;
 	}
@@ -311,7 +310,7 @@ JIT * Compiler :: jit() {
 
 JIT::JIT() : mRefs(0) {}
 
-void JIT :: unload() {
+void JIT :: unjit() {
 	if (valid()) {
 		/* free any statics allocated in the code */
 		// TODO: why does this not work???
@@ -368,6 +367,19 @@ void * JIT :: getglobalptr(std::string globalname) {
 		}
 	}
 	return NULL;
+}
+
+void JIT::GCList :: sweep() {
+	std::list<JIT *>::iterator it = mList.begin();
+	while (it != mList.end()) {
+		JIT * j = *it;
+		if (j->gccheck()) {
+			it++;
+		} else {
+			it = mList.erase(it);
+			delete j;
+		}
+	}
 }
 
 bool Compiler :: writebitcode(std::string path) {

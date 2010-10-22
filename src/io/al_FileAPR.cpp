@@ -99,7 +99,6 @@ void File::allocContent(int n){
 	mContent[n] = '\0';
 }
 
-void File::close(){ if(opened()){ fclose(mFP); mFP=0; } }
 
 void File::freeContent(){ delete[] mContent; }
 
@@ -122,6 +121,8 @@ bool File::open(){
 	}
 	return false;
 }
+
+void File::close(){ if(opened()){ fclose(mFP); } mFP=0; }
 
 char * File::readAll(){
 	if(opened() && mMode[0]=='r'){
