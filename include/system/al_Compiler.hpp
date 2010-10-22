@@ -104,9 +104,8 @@ public:
 	///! add system include path (angled and quoted includes)
 	void system_include(std::string path) { options.system_includes.push_back(path); }
 	///! Add a 'virtual' header; reads from memory instead of from disk
-	/// The path should be in the set of user/system include paths
-	void header(std::string path, std::string code) {
-		options.headers.push_back(std::pair<std::string, std::string>(path, code));
+	void header(std::string name, std::string code) {
+		options.headers.push_back(std::pair<std::string, std::string>(name, code));
 	}
 	
 	///! Compile a string of code

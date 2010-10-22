@@ -140,6 +140,8 @@ void Compiler :: clear() {
 bool Compiler :: compile(std::string code) {
 	if (!mImpl) mImpl = new ModuleImpl;
 	
+	static std::string virtual_include_path("/usr/local/include/");
+	
 	llvm::MemoryBuffer * buffer = llvm::MemoryBuffer::getMemBufferCopy(code, "src");
 	
 	CompilerInstance CI;
@@ -173,9 +175,9 @@ bool Compiler :: compile(std::string code) {
 	
 	// add header file remappings:
 	for (unsigned int i=0; i<options.headers.size(); i++) {
-		llvm::StringRef remapped_name(options.headers[i].first);
+		llvm::StringRef remapped_name(virtual_include_path + options.headers[i].first);
 		llvm::StringRef remapped_data(options.headers[i].second);
-		llvm::MemoryBuffer * remapped_buffer = llvm::MemoryBuffer::getMemBufferCopy(remapped_data, remapped_name);
+		llvm::MemoryBuffer * remapped_buffer = llvm::MemoryBuffer::getMemBufferCopy(remapped_data, llvm::StringRef(options.headers[i].first));
 		CI.getPreprocessorOpts().addRemappedFile(remapped_name, remapped_buffer);
 	}
 	
@@ -185,6 +187,7 @@ bool Compiler :: compile(std::string code) {
 
 	// Header paths:
 	HeaderSearchOptions& headeropts = CI.getHeaderSearchOpts();
+	headeropts.AddPath(virtual_include_path, clang::frontend::Quoted, true, false, false);
 	for (unsigned int i=0; i<options.system_includes.size(); i++) {
 		headeropts.AddPath(options.system_includes[i], clang::frontend::Angled, true, false, false/* true ? */);
 	}
