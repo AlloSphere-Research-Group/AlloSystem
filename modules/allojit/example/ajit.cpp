@@ -148,7 +148,7 @@ bool World::InputControl :: onKeyUp(const Keyboard& k) {
 	return true;
 }
 
-void World::WorldWindow :: onFrame() {
+bool World::WorldWindow :: onFrame() {
 	World * W = World::get();
 	W->cam.step();
 	if (doFrame) {
@@ -159,6 +159,8 @@ void World::WorldWindow :: onFrame() {
 	//printf("sweep\n");	
 	JIT::sweep();
 	//printf("end onFrame\n");
+	
+	return true;
 }
 
 

@@ -97,7 +97,7 @@ struct MyWindow : public WindowGL, public gfx::Drawable{
 	
 	MyWindow(): gl(new gfx::GraphicsBackendOpenGL){}
 
-	void onFrame(){
+	bool onFrame(){
 
 		nav.step();
 		cam.set(navMaster);
@@ -107,6 +107,8 @@ struct MyWindow : public WindowGL, public gfx::Drawable{
 		listener->pos(cam.pos());
 
 		stereo.draw(gl, cam, *this, dimensions().w, dimensions().h);
+		
+		return true;
 	}
 	
 	virtual void onDraw(gfx::Graphics& g){

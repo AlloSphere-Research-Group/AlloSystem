@@ -64,7 +64,7 @@ struct MyWindow : WindowGL{
 		}
 	}
 
-	void onFrame(){
+	bool onFrame(){
 	
 		al_sec f = al_time();
 		al_sec dt = f-n;
@@ -75,6 +75,7 @@ struct MyWindow : WindowGL{
 		cam.step(frame_dt);
 		
 		stereo.draw(gl, cam, render, dimensions().w, dimensions().h, NULL);
+		return true;
 	}
 
 	static void render(void * ud) 

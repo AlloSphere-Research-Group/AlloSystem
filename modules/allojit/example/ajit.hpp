@@ -37,7 +37,6 @@ public:
 
 	struct WorldWindow : public WindowGL{
 		WorldWindow() : doFrame(doFrameNothing) {}
-		void onFrame();
 		static void doFrameNothing(void *) {};
 		draw_fptr doFrame;
 	};

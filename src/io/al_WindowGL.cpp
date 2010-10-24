@@ -48,6 +48,15 @@ void Mouse::button(int b, bool v){ mButton=b; mB[b]=v; if(v){ mBX[b]=mX; mBY[b]=
 void Mouse::position(int x, int y){ mDX=x-mX; mDY=y-mY; mX=x; mY=y; }
 
 
+
+InputEventHandler :: ~InputEventHandler() {
+	if (mWindow) mWindow->remove(this);
+}
+
+WindowEventHandler :: ~WindowEventHandler() {
+	if (mWindow) mWindow->remove(this);
+}
+
 void WindowGL::init(){
 
 }
@@ -61,6 +70,8 @@ WindowGL& WindowGL::fullScreenToggle(){
 	fullScreen(!fullScreen());
 	return *this;
 }
+
+
 
 
 } // al::

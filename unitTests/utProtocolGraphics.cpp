@@ -5,7 +5,7 @@ static gfx::Graphics gl(&backend);
  
 struct MyWindow2 : WindowGL{
 
-	void onFrame(){
+	bool onFrame(){
 		using namespace al::gfx;
 		
 		gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
@@ -32,6 +32,7 @@ struct MyWindow2 : WindowGL{
 
 		gl.draw(data);
 
+		return true;
 	}
 	
 	gfx::GraphicsData data;

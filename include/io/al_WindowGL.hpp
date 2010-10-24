@@ -171,7 +171,8 @@ private:
 /// The return value of the event handlers determines whether or not
 /// the event should be propagated to other handlers.
 struct InputEventHandler{
-	virtual ~InputEventHandler(){}
+	InputEventHandler() : mWindow(NULL) {}
+	virtual ~InputEventHandler();
 
 	virtual bool onKeyDown(const Keyboard& k){return true;}	///< Called when a keyboard key is pressed
 	virtual bool onKeyUp(const Keyboard& k){return true;}	///< Called when a keyboard key is released
@@ -191,11 +192,35 @@ private:
 };
 
 
+/// Subscriber for general Window events
+
+/// The return value of the event handlers determines whether or not
+/// the event should be propagated to other handlers.
+struct WindowEventHandler {
+	WindowEventHandler() : mWindow(NULL) {}
+	virtual ~WindowEventHandler();
+
+	virtual bool onCreate(){ return true; }					///< Called after window is created with valid OpenGL context
+	virtual bool onDestroy(){ return true; }					///< Called before the window and its OpenGL context are destroyed
+	virtual bool onFrame(){ return true; }		///< Called every frame
+	virtual bool onResize(int w, int h){ return true; }		///< Called whenever window dimensions change
+	virtual bool onVisibility(bool v){ return true; }			///< Called when window changes from hidden to shown and vice versa
+	
+	WindowGL& window(){ return *mWindow; }
+	const WindowGL& window() const { return *mWindow; }
+
+private:
+	friend class WindowGL;
+	WindowGL * mWindow;
+	WindowEventHandler& window(WindowGL * v){ mWindow=v; return *this; }
+};
+
+
 
 // TODO: rename to Window
 
 /// Window with OpenGL context
-class WindowGL : public InputEventHandler {
+class WindowGL : public InputEventHandler, public WindowEventHandler {
 public:
 
 	/// Window pixel dimensions
@@ -223,13 +248,7 @@ public:
 	
 	/// Destroys current window and its associated OpenGL context
 	void destroy();
-
-	virtual void onCreate(){}					///< Called after window is created with valid OpenGL context
-	virtual void onDestroy(){}					///< Called before the window and its OpenGL context are destroyed
-	virtual void onFrame(){}					///< Called every frame
-	virtual void onResize(int w, int h){}		///< Called whenever window dimensions change
-	virtual void onVisibility(bool v){}			///< Called when window changes from hidden to shown and vice versa
-	
+		
 	bool cursorHide() const;					///< Whether the cursor is hidden
 	Dim dimensions() const;						///< Get current dimensions of window
 	bool enabled(DisplayMode::t v) const;		///< Get whether display mode flag is set
@@ -241,8 +260,6 @@ public:
 	bool visible() const;						///< Get whether window is visible
 	const Keyboard& keyboard(){ return mKeyboard; } ///< Get current keyboard state
 	const Mouse& mouse(){ return mMouse; }		///< Get current mouse state
-
-	void doFrame();								///< Calls onFrame() and swaps buffers
 
 	WindowGL& cursor(Cursor::t v);				///< Set cursor type
 	WindowGL& cursorHide(bool v);				///< Set cursor hiding
@@ -270,29 +287,46 @@ public:
 	static void stopLoop();
 
 	WindowGL& add(InputEventHandler * v){
-		mEventHandlers.push_back(&(v->window(this)));
+		mInputEventHandlers.push_back(&(v->window(this)));
 		return *this;
 	}
 	
 	// note: won't remove multiple references!
 	// note 2: maybe mEventHandlers should be a std::list instead?
 	WindowGL& remove(InputEventHandler * v){
-		mEventHandlers.erase(std::remove(mEventHandlers.begin(), mEventHandlers.end(), v), mEventHandlers.end());
+		mInputEventHandlers.erase(std::remove(mInputEventHandlers.begin(), mInputEventHandlers.end(), v), mInputEventHandlers.end());
+		v->mWindow = NULL;
+		return *this;
+	}
+	
+	WindowGL& add(WindowEventHandler * v){
+		mWindowEventHandlers.push_back(&(v->window(this)));
+		return *this;
+	}
+	
+	// note: won't remove multiple references!
+	// note 2: maybe mEventHandlers should be a std::list instead?
+	WindowGL& remove(WindowEventHandler * v){
+		mWindowEventHandlers.erase(std::remove(mWindowEventHandlers.begin(), mWindowEventHandlers.end(), v), mWindowEventHandlers.end());
+		v->mWindow = NULL;
 		return *this;
 	}
 
 private:
 	friend class WindowImpl;
 
+	void doFrameImpl();							///< Calls onFrame() and swaps buffers
+
 	class WindowImpl * mImpl;
 	Keyboard mKeyboard;
 	Mouse mMouse;
-	std::vector<InputEventHandler *> mEventHandlers;
+	std::vector<InputEventHandler *> mInputEventHandlers;
+	std::vector<WindowEventHandler *> mWindowEventHandlers;
 
 	#define CALL(e)\
 	if(e){\
-		std::vector<InputEventHandler *>::iterator iter = mEventHandlers.begin(); \
-		while(iter != mEventHandlers.end()){\
+		std::vector<InputEventHandler *>::iterator iter = mInputEventHandlers.begin(); \
+		while(iter != mInputEventHandlers.end()){\
 			if(!(*iter)->e) break;\
 			iter++; \
 		}\
@@ -303,6 +337,21 @@ private:
 	void doMouseUp(const Mouse& m){ CALL(onMouseUp(m)); }
 	void doKeyDown(const Keyboard& k){ CALL(onKeyDown(k)); }
 	void doKeyUp(const Keyboard& k){ CALL(onKeyUp(k)); }
+	#undef CALL
+	
+	#define CALL(e)\
+	if(e){\
+		std::vector<WindowEventHandler *>::iterator iter = mWindowEventHandlers.begin(); \
+		while(iter != mWindowEventHandlers.end()){\
+			if(!(*iter)->e) break;\
+			iter++; \
+		}\
+	}
+	void doFrame() { CALL(onFrame()); }
+	void doCreate(){ CALL(onCreate()); }				
+	void doDestroy(){ CALL(onDestroy()); }				
+	void doResize(int w, int h){ CALL(onResize(w, h)); }	
+	void doVisibility(bool v){ CALL(onVisibility(v)); }
 	#undef CALL
 
 	void init();
@@ -331,7 +380,6 @@ struct StandardWindowKeyControls : InputEventHandler {
 		return true;
 	}
 };
-
 
 
 } // al::

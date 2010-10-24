@@ -348,7 +348,7 @@ public:
 		WindowGL * win = getWindow();
 		if(win){
 			win->makeActive();
-			win->onResize(w, h);
+			win->doResize(w, h);
 			win->title(win->title());	// TODO: need this hack to get title back
 										// after exiting full screen
 		}
@@ -358,7 +358,7 @@ public:
 		WindowGL * win = getWindow();
 		if(win){
 			win->mImpl->visible(v == GLUT_VISIBLE);
-			win->onVisibility(v == GLUT_VISIBLE);
+			win->doVisibility(v == GLUT_VISIBLE);
 
 		}
 	}
@@ -387,7 +387,7 @@ private:
 		if(impl){
 			WindowGL * win = impl->mWindow;
 			if(win){
-				win->doFrame();
+				win->doFrameImpl();
 				if(win->fps() > 0) {
 					al_sec projected = t+1.0/win->fps();	// what time next render should be
 					al_sec rt = MainLoop::realtime();	// what time it really is now (after render)
@@ -484,12 +484,12 @@ void WindowGL::create(
 	WindowImpl::windows()[mImpl->mID] = mImpl;
 
 	AL_GRAPHICS_INIT_CONTEXT;
-	onCreate();
+	doCreate();
 	mImpl->scheduleDraw();
 }
 
 void WindowGL::destroy(){
-	onDestroy();
+	doDestroy();
 	mImpl->destroy();
 }
 
@@ -552,14 +552,14 @@ WindowGL& WindowGL::dimensions(const Dim& v){
 	return *this;
 }
 
-void WindowGL::doFrame(){
+void WindowGL::doFrameImpl(){
 	const int winID = mImpl->id();
 	const int current = glutGetWindow();
 	if(winID != current) glutSetWindow(winID);
 //	glutPostRedisplay();
 	//glEnable(GL_DEPTH_TEST);
 
-	onFrame();
+	doFrame();
 
 	glutSwapBuffers();
 //	if(current > 0 && current != winID) glutSetWindow(current);
@@ -576,10 +576,10 @@ WindowGL& WindowGL::fullScreen(bool v){
 	// exit full screen
 	if(mImpl->mFullScreen && !v){
 		#ifdef AL_LINUX
-			onDestroy();
+			doDestroy();
 			mImpl->gameMode(false);
-			onCreate();
-			onResize(mImpl->mWinDim.w, mImpl->mWinDim.h);
+			doCreate();
+			doResize(mImpl->mWinDim.w, mImpl->mWinDim.h);
 			hide(); show(); // need to force focus to get key callbacks to work
 		#else
 			dimensions(mImpl->mWinDim);	// glutReshapeWindow leaves full screen
@@ -592,9 +592,9 @@ WindowGL& WindowGL::fullScreen(bool v){
 		mImpl->mWinDim = dimensions();
 
 		#ifdef AL_LINUX
-			onDestroy();
+			doDestroy();
 			mImpl->gameMode(true);
-			onCreate();
+			doCreate();
 			cursorHide(cursorHide());
 		#else
 			glutSetWindow(mImpl->mID);

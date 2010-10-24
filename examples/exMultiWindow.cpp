@@ -154,10 +154,10 @@ static void drawScene(void * self) {
 
 struct MyWindow : WindowGL{
 
-	void onCreate(){ 					printf("onCreate\n"); }
-	void onDestroy(){					printf("onDestroy\n"); }
-	void onResize(int w, int h){		printf("onResize     %d, %d\n", w, h); }
-	void onVisibility(bool v){			printf("onVisibility %s\n", v?"true":"false"); }
+	bool onCreate(){ 					printf("onCreate\n"); return true; }
+	bool onDestroy(){					printf("onDestroy\n"); return true; }
+	bool onResize(int w, int h){		printf("onResize     %d, %d\n", w, h); return true; }
+	bool onVisibility(bool v){			printf("onVisibility %s\n", v?"true":"false"); return true; }
 	
 	void onKeyDown(const Keyboard& k){	printf("onKeyDown    "); printKey(); 
 		switch(k.key()){
@@ -186,9 +186,10 @@ struct MyWindow : WindowGL{
 		printf("k:%3d, %d s:%d c:%d a:%d\n", k.key(), k.down(), k.shift(), k.ctrl(), k.alt());
 	}
 
-	void onFrame(){
+	bool onFrame(){
 		//drawScene(this);
 		ctx.draw(drawScene, dimensions().w, dimensions().h, this);
+		return true;
 	}
 	
 	Context ctx;

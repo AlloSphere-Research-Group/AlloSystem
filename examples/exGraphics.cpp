@@ -141,8 +141,9 @@ struct MyWindow : WindowGL{
 		printf("k:%3d, %d s:%d c:%d a:%d\n", k.key(), k.down(), k.shift(), k.ctrl(), k.alt());
 	}
 
-	void onFrame(){
+	bool onFrame(){
 		drawScene(this);
+		return true;
 	}
 };
 

@@ -39,7 +39,7 @@ void drawbox() {
 
 struct MyWindow : WindowGL{
 
-	void onFrame(){
+	bool onFrame(){
 		double aspect = dimensions().w / dimensions().h;
 		
 		gl.viewport(0,0, dimensions().w, dimensions().h);
@@ -88,6 +88,7 @@ struct MyWindow : WindowGL{
 		gl.draw(iso);
 		
 		drawbox();
+		return true;
 	}
 };
 

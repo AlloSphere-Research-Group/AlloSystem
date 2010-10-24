@@ -7,6 +7,7 @@ namespace al {
 struct NavInputControl : public InputEventHandler {
 
 	NavInputControl(Nav * nav): mNav(nav){}
+	virtual ~NavInputControl() {}
 
 	void nav(Nav * v){ mNav=v; }
 
@@ -75,6 +76,7 @@ protected:
 struct NavInputControlCosm : public NavInputControl {
 
 	NavInputControlCosm(Nav * nav): NavInputControl(nav){}
+	virtual ~NavInputControlCosm() {}
 
 	bool onKeyDown(const Keyboard& k){	 	
 	

@@ -10,10 +10,10 @@ struct MyWindow : WindowGL {
 
 	static std::vector<MyWindow *> windows;
 
-	void onCreate(){ 					printf("onCreate\n"); }
-	void onDestroy(){					printf("onDestroy\n"); }
-	void onResize(int w, int h){		printf("onResize     %d, %d\n", w, h); }
-	void onVisibility(bool v){			printf("onVisibility %s\n", v?"true":"false"); }
+	bool onCreate(){ 					printf("onCreate\n"); return true; }
+	bool onDestroy(){					printf("onDestroy\n"); return true; }
+	bool onResize(int w, int h){		printf("onResize     %d, %d\n", w, h); return true; }
+	bool onVisibility(bool v){			printf("onVisibility %s\n", v?"true":"false"); return true; }
 	
 	void onKeyDown(const Keyboard& k){	printf("onKeyDown    "); printKey(); 
 		switch(k.key()){
@@ -46,7 +46,7 @@ struct MyWindow : WindowGL {
 		printf("k:%3d, %d s:%d c:%d a:%d\n", k.key(), k.down(), k.shift(), k.ctrl(), k.alt());
 	}
 
-	void onFrame(){
+	bool onFrame(){
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.loadIdentity();
 		gl.viewport(0,0, dimensions().w, dimensions().h);
@@ -61,6 +61,7 @@ struct MyWindow : WindowGL {
 			}
 		gl.end();
 //printf("%p: %d x %d\n", this, dimensions().w, dimensions().h);
+		return true;
 	}
 	
 	void freqs(float v1, float v2){ freq1=v1; freq2=v2; }
