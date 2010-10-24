@@ -267,10 +267,10 @@ printf("2 * ++x %d 2 * y++ %d\n", 2 * ++x, 2 * y++);
 	W->win.create(WindowGL::Dim(720,480), "Window 1", 40);
 
 	SearchPaths paths(argc, argv);
-	clang_headers_path = paths.appPath() + "../../../../dev/osx/lib/llvm/clang/2.8/include";
-	allo_headers_path = paths.appPath() + "../../../../include";
-	ajit_headers_path = paths.appPath() + "../../src";
-	example_headers_path = paths.appPath() + "../../example";
+	clang_headers_path = paths.appPath() + "../../dev/osx/lib/llvm/clang/2.8/include";
+	allo_headers_path = paths.appPath() + "../../include";
+	ajit_headers_path = paths.appPath() + "../../modules/allojit/src";
+	example_headers_path = paths.appPath() + "../../modules/allojit/example";
 	paths.addSearchPath(example_headers_path);
 	
 	FilePath jitcode_path = paths.find("jitcode.cpp");
