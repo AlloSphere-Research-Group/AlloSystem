@@ -11,7 +11,7 @@ struct NavInputControl : public InputEventHandler {
 
 	void nav(Nav * v){ mNav=v; }
 
-	bool onKeyDown(const Keyboard& k){	 	
+	virtual bool onKeyDown(const Keyboard& k){	 	
 	
 		static double a = 2;		// rotational speed: degrees per update
 		static double v = 0.125;	// speed: units per update
@@ -35,7 +35,7 @@ struct NavInputControl : public InputEventHandler {
 		}
 		return true;
 	}
-	bool onKeyUp(const Keyboard& k) {
+	virtual bool onKeyUp(const Keyboard& k) {
 		switch (k.key()) {
 			case Key::Up:
 			case Key::Down:		nav().spinR(0); return false;
@@ -54,7 +54,7 @@ struct NavInputControl : public InputEventHandler {
 		return true;
 	}
 
-	bool onMouseDrag(const Mouse& m){
+	virtual bool onMouseDrag(const Mouse& m){
 		if(m.left()){
 			nav().turnU( m.dx() * 0.2);
 			nav().turnR( m.dy() * 0.2);
@@ -78,7 +78,7 @@ struct NavInputControlCosm : public NavInputControl {
 	NavInputControlCosm(Nav * nav): NavInputControl(nav){}
 	virtual ~NavInputControlCosm() {}
 
-	bool onKeyDown(const Keyboard& k){	 	
+	virtual bool onKeyDown(const Keyboard& k){	 	
 	
 		static double a = 1;		// rotational speed: degrees per update
 		static double v = 0.25;		// speed: units per update
@@ -102,7 +102,7 @@ struct NavInputControlCosm : public NavInputControl {
 		return true;
 	}
 
-	bool onKeyUp(const Keyboard& k) {
+	virtual bool onKeyUp(const Keyboard& k) {
 		switch (k.key()) {
 			case 'w':
 			case 'x':			nav().spinR(0); return false;
@@ -121,7 +121,7 @@ struct NavInputControlCosm : public NavInputControl {
 		return true;
 	}
 	
-	bool onMouseDrag(const Mouse& m){ return true; }
+	virtual bool onMouseDrag(const Mouse& m){ return true; }
 };
 
 
