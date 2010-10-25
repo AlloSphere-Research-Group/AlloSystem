@@ -33,7 +33,7 @@
 
 namespace al{
 
-class WindowGL;
+class Window;
 
 
 // can redefine, but should be at least 4
@@ -182,13 +182,13 @@ struct InputEventHandler{
 	virtual bool onMouseMove(const Mouse& m){return true;}	///< Called when the mouse moves
 	virtual bool onMouseUp(const Mouse& m){return true;}	///< Called when a mouse button is released
 
-	WindowGL& window(){ return *mWindow; }
-	const WindowGL& window() const { return *mWindow; }
+	Window& window(){ return *mWindow; }
+	const Window& window() const { return *mWindow; }
 
 private:
-	friend class WindowGL;
-	WindowGL * mWindow;
-	InputEventHandler& window(WindowGL * v){ mWindow=v; return *this; }
+	friend class Window;
+	Window * mWindow;
+	InputEventHandler& window(Window * v){ mWindow=v; return *this; }
 };
 
 
@@ -201,26 +201,24 @@ struct WindowEventHandler {
 	virtual ~WindowEventHandler();
 
 	virtual bool onCreate(){ return true; }					///< Called after window is created with valid OpenGL context
-	virtual bool onDestroy(){ return true; }					///< Called before the window and its OpenGL context are destroyed
-	virtual bool onFrame(){ return true; }		///< Called every frame
+	virtual bool onDestroy(){ return true; }				///< Called before the window and its OpenGL context are destroyed
+	virtual bool onFrame(){ return true; }					///< Called every frame
 	virtual bool onResize(int w, int h){ return true; }		///< Called whenever window dimensions change
-	virtual bool onVisibility(bool v){ return true; }			///< Called when window changes from hidden to shown and vice versa
+	virtual bool onVisibility(bool v){ return true; }		///< Called when window changes from hidden to shown and vice versa
 	
-	WindowGL& window(){ return *mWindow; }
-	const WindowGL& window() const { return *mWindow; }
+	Window& window(){ return *mWindow; }
+	const Window& window() const { return *mWindow; }
 
 private:
-	friend class WindowGL;
-	WindowGL * mWindow;
-	WindowEventHandler& window(WindowGL * v){ mWindow=v; return *this; }
+	friend class Window;
+	Window * mWindow;
+	WindowEventHandler& window(Window * v){ mWindow=v; return *this; }
 };
 
 
 
-// TODO: rename to Window
-
 /// Window with OpenGL context
-class WindowGL : public InputEventHandler, public WindowEventHandler {
+class Window : public InputEventHandler, public WindowEventHandler {
 public:
 
 	/// Window pixel dimensions
@@ -230,8 +228,8 @@ public:
 		double l,t,w,h;
 	};
 
-	WindowGL();
-	virtual ~WindowGL();
+	Window();
+	virtual ~Window();
 	
 	/// Create a new window
 	
@@ -261,24 +259,24 @@ public:
 	const Keyboard& keyboard(){ return mKeyboard; } ///< Get current keyboard state
 	const Mouse& mouse(){ return mMouse; }		///< Get current mouse state
 
-	WindowGL& cursor(Cursor::t v);				///< Set cursor type
-	WindowGL& cursorHide(bool v);				///< Set cursor hiding
-	WindowGL& cursorHideToggle();				///< Toggle cursor hiding
-	WindowGL& dimensions(const Dim& v);			///< Set dimensions
-	WindowGL& fps(double v);					///< Set frames/second
+	Window& cursor(Cursor::t v);				///< Set cursor type
+	Window& cursorHide(bool v);					///< Set cursor hiding
+	Window& cursorHideToggle();					///< Toggle cursor hiding
+	Window& dimensions(const Dim& v);			///< Set dimensions
+	Window& fps(double v);						///< Set frames/second
 	
 	/// Set fullscreen mode
 	
 	/// This will make the window go fullscreen without borders and,
 	/// if posssible, without changing the display resolution.
-	WindowGL& fullScreen(bool on);
+	Window& fullScreen(bool on);
 
-	WindowGL& fullScreenToggle();				///< Toggle fullscreen
-	WindowGL& hide();							///< Hide window (if showing)
-	WindowGL& iconify();						///< Iconify window
-	WindowGL& makeActive();						///< Bring window to front
-	WindowGL& show();							///< Show window (if hidden)
-	WindowGL& title(const std::string& v);		///< Set title
+	Window& fullScreenToggle();					///< Toggle fullscreen
+	Window& hide();								///< Hide window (if showing)
+	Window& iconify();							///< Iconify window
+	Window& makeActive();						///< Bring window to front
+	Window& show();								///< Show window (if hidden)
+	Window& title(const std::string& v);		///< Set title
 
 	/// Destroy all created windows
 	static void destroyAll();
@@ -286,27 +284,27 @@ public:
 	static void startLoop();
 	static void stopLoop();
 
-	WindowGL& add(InputEventHandler * v){
+	Window& add(InputEventHandler * v){
 		mInputEventHandlers.push_back(&(v->window(this)));
 		return *this;
 	}
 	
 	// note: won't remove multiple references!
 	// note 2: maybe mEventHandlers should be a std::list instead?
-	WindowGL& remove(InputEventHandler * v){
+	Window& remove(InputEventHandler * v){
 		mInputEventHandlers.erase(std::remove(mInputEventHandlers.begin(), mInputEventHandlers.end(), v), mInputEventHandlers.end());
 		v->mWindow = NULL;
 		return *this;
 	}
 	
-	WindowGL& add(WindowEventHandler * v){
+	Window& add(WindowEventHandler * v){
 		mWindowEventHandlers.push_back(&(v->window(this)));
 		return *this;
 	}
 	
 	// note: won't remove multiple references!
 	// note 2: maybe mEventHandlers should be a std::list instead?
-	WindowGL& remove(WindowEventHandler * v){
+	Window& remove(WindowEventHandler * v){
 		mWindowEventHandlers.erase(std::remove(mWindowEventHandlers.begin(), mWindowEventHandlers.end(), v), mWindowEventHandlers.end());
 		v->mWindow = NULL;
 		return *this;
@@ -363,7 +361,7 @@ struct StandardWindowKeyControls : InputEventHandler {
 	bool onKeyDown(const Keyboard& k){
 		if(k.ctrl()){
 			switch(k.key()){
-				case 'q': WindowGL::stopLoop(); return false;
+				case 'q': Window::stopLoop(); return false;
 				//case 'w': window().destroy(); return false;
 				case 'h': window().hide(); return false;
 				case 'm': window().iconify(); return false;

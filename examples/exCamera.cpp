@@ -6,7 +6,7 @@ gfx::GraphicsData stuff;
 gfx::Stereographic stereo;
 Camera cam, cam2;
 
-struct MyWindow : WindowGL{
+struct MyWindow : Window{
 	
 	bool onKeyDown(const Keyboard& k){
 		switch(k.key()){
@@ -20,7 +20,7 @@ struct MyWindow : WindowGL{
 		}
 	}
 
-	void onFrame(){
+	bool onFrame(){
 	
 		al_sec f = al_time();
 		al_sec dt = f-n;
@@ -31,6 +31,7 @@ struct MyWindow : WindowGL{
 		cam.step(frame_dt);
 
 		stereo.draw(gl, cam, render, dimensions().w, dimensions().h, NULL);
+		return true;
 	}
 
 	static void render(void * ud){	
@@ -78,7 +79,7 @@ int main (int argc, char * const argv[]) {
 	//printf("%lu %lu\n", sizeof(Nav) + sizeof(NavControls), sizeof(NavSmooth));
 
     MyWindow win;
-	win.create(WindowGL::Dim(720,480), "Window 1", 40);
+	win.create(Window::Dim(720,480), "Window 1", 40);
 
 	win.add(new StandardWindowKeyControls).add(new NavInputControl(&cam));
 	MainLoop::start();

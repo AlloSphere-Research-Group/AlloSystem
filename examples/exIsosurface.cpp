@@ -37,7 +37,7 @@ void drawbox() {
 }
 
 
-struct MyWindow : WindowGL{
+struct MyWindow : Window{
 
 	bool onFrame(){
 		double aspect = dimensions().w / dimensions().h;
@@ -98,11 +98,11 @@ int main (int argc, char * argv[]){
 	iso.primitive(gfx::TRIANGLES);
 	
 	MyWindow win;
-	win.create(WindowGL::Dim(800,600), "Isosurface Example", 140);
+	win.create(Window::Dim(800,600), "Isosurface Example", 140);
 
 	win.add(new StandardWindowKeyControls);
 	win.add(new NavInputControl(&cam));
 
-	WindowGL::startLoop();
+	Window::startLoop();
 	return 0;
 }

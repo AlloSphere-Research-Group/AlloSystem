@@ -93,7 +93,7 @@ void audioCB(AudioIOData& io){
 }
 
 
-struct MyWindow : public WindowGL, public gfx::Drawable{
+struct MyWindow : public Window, public gfx::Drawable{
 	
 	MyWindow(): gl(new gfx::GraphicsBackendOpenGL){}
 
@@ -141,7 +141,7 @@ int main (int argc, char * argv[]){
 	for(int i=0; i<2; ++i){
 		windows[i].add(new StandardWindowKeyControls);
 		windows[i].add(new NavInputControl(&navMaster));
-		windows[i].create(WindowGL::Dim(600,480,i*650), "Hello Virtual World!");
+		windows[i].create(Window::Dim(600,480,i*650), "Hello Virtual World!");
 		windows[i].nav.turnU(i*180);
 	}
 

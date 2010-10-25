@@ -1,4 +1,4 @@
-#include "io/al_WindowGL.hpp"
+#include "io/al_Window.hpp"
 #include "spatial/al_CoordinateFrame.hpp"
 
 namespace al {

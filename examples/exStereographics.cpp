@@ -1,11 +1,5 @@
+#include "al_Allocore.hpp"
 #include "al_NavControl.hpp"
-
-#include "system/al_MainLoop.hpp"
-#include "io/al_WindowGL.hpp"
-#include "graphics/al_Config.h"
-#include "protocol/al_GraphicsBackendOpenGL.hpp"
-#include "graphics/al_Stereographic.hpp"
-#include "math/al_Random.hpp"
 
 using namespace al;
 
@@ -49,7 +43,7 @@ static rnd::Random<> rng;
 //static NavControls navcontrols;
 
 
-struct MyWindow : WindowGL{
+struct MyWindow : Window{
 	
 	bool onKeyDown(const Keyboard& k){	
 		
@@ -125,7 +119,7 @@ int main (int argc, char * const argv[]) {
 	win.add(new StandardWindowKeyControls);
 	win.add(new NavInputControl(&cam));
 	
-	win.create(WindowGL::Dim(720,480), "Window 1", 40);
+	win.create(Window::Dim(720,480), "Window 1", 40);
 	MainLoop::start();
     return 0;
 }

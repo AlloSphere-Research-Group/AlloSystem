@@ -8,7 +8,7 @@
 #include "io/al_AudioIO.hpp"
 #include "io/al_File.hpp"
 #include "io/al_Socket.hpp"
-#include "io/al_WindowGL.hpp"
+#include "io/al_Window.hpp"
 #include "math/al_Complex.hpp"
 #include "math/al_Constants.hpp"
 #include "math/al_Frustum.hpp"

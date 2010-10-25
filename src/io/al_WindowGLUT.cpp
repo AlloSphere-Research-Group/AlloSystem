@@ -2,7 +2,7 @@
 #include <stdlib.h>		// exit
 #include <map>
 
-#include "io/al_WindowGL.hpp"
+#include "io/al_Window.hpp"
 
 #include "system/al_Config.h"		// system defines
 #include "system/al_MainLoop.hpp"	// start/stop loop, rendering
@@ -35,7 +35,7 @@ public:
 
 	typedef std::map<int, WindowImpl *> WindowsMap;
 
-	WindowImpl(WindowGL * w)
+	WindowImpl(Window * w)
 	:	mWindow(w), mID(-1), mIDGameMode(-1),
 		mWinDim(0), mFPS(0), mTitle(""),
 		mMode(DisplayMode::DefaultBuf),
@@ -169,7 +169,7 @@ public:
 	}
 
 	// Returns the currently selected window or 0 if invalid
-	static WindowGL * getWindow(){
+	static Window * getWindow(){
 		WindowImpl * w = getWindowImpl();
 		return w ? w->mWindow : 0;
 	}
@@ -264,7 +264,7 @@ public:
 
 	static void cbKeyboard(unsigned char key, int x, int y){
 //printf("GLUT key down:\n");
-		WindowGL * win = getWindow();
+		Window * win = getWindow();
 		if(win){
 			key = remapKey(key, false);
 			win->mKeyboard.setKey(key, true);
@@ -274,7 +274,7 @@ public:
 	}
 
 	static void cbKeyboardUp(unsigned char key, int x, int y){
-		WindowGL * win = getWindow();
+		Window * win = getWindow();
 		if(win){
 			key = remapKey(key, false);
 			win->mKeyboard.setKey(key, false);
@@ -284,7 +284,7 @@ public:
 	}
 
 	static void cbSpecial(int key, int x, int y){
-		WindowGL * win = getWindow();
+		Window * win = getWindow();
 		if(win){
 			key = remapKey(key, true);
 			win->mKeyboard.setKey(key, true);
@@ -294,7 +294,7 @@ public:
 	}
 
 	static void cbSpecialUp(int key, int x, int y){
-		WindowGL * win = getWindow();
+		Window * win = getWindow();
 		if(win){
 			key = remapKey(key, true);
 			win->mKeyboard.setKey(key, false);
@@ -306,7 +306,7 @@ public:
 
 	static void cbMouse(int btn, int state, int ax, int ay){
 		//printf("GLUT: mouse event x:%d y:%d bt:#%d,%d\n", ax,ay, btn, state==GLUT_DOWN);
-		WindowGL * win = getWindow();
+		Window * win = getWindow();
 		if(win){
 			switch(btn){
 				case GLUT_LEFT_BUTTON:		btn = Mouse::Left; break;
@@ -328,7 +328,7 @@ public:
 	}
 
 	static void cbMotion(int ax, int ay){
-		WindowGL * win = getWindow();
+		Window * win = getWindow();
 		if(win){
 			win->mMouse.position(ax,ay);
 			win->doMouseDrag(win->mMouse);
@@ -336,7 +336,7 @@ public:
 	}
 
 	static void cbPassiveMotion(int ax, int ay){
-		WindowGL * win = getWindow();
+		Window * win = getWindow();
 		if(win){
 			win->mMouse.position(ax,ay);
 			win->doMouseMove(win->mMouse);
@@ -345,7 +345,7 @@ public:
 
 
 	static void cbReshape(int w, int h){
-		WindowGL * win = getWindow();
+		Window * win = getWindow();
 		if(win){
 			win->makeActive();
 			win->doResize(w, h);
@@ -355,7 +355,7 @@ public:
 	}
 
 	static void cbVisibility(int v){
-		WindowGL * win = getWindow();
+		Window * win = getWindow();
 		if(win){
 			win->mImpl->visible(v == GLUT_VISIBLE);
 			win->doVisibility(v == GLUT_VISIBLE);
@@ -385,7 +385,7 @@ private:
 
 		// If there is a valid implementation, then draw and schedule next draw...
 		if(impl){
-			WindowGL * win = impl->mWindow;
+			Window * win = impl->mWindow;
 			if(win){
 				win->doFrameImpl();
 				if(win->fps() > 0) {
@@ -417,10 +417,10 @@ private:
 		return *windowsmap;
 	}
 
-	WindowGL * mWindow;
+	Window * mWindow;
 	int mID;
 	int mIDGameMode;
-	WindowGL::Dim mWinDim;
+	Window::Dim mWinDim;
 	double mFPS;
 	std::string mTitle;
 	DisplayMode::t mMode;
@@ -433,20 +433,20 @@ private:
 	bool mCursorHide;
 	bool mScheduled;
 
-	friend class WindowGL;
+	friend class Window;
 };
 
 
 
-WindowGL::WindowGL(): mImpl(new WindowImpl(this)){}
+Window::Window(): mImpl(new WindowImpl(this)){}
 
-WindowGL::~WindowGL(){
+Window::~Window(){
 	destroy();
 	delete mImpl;
 }
 
 
-void WindowGL::create(
+void Window::create(
 	const Dim& dim, const std::string title, double fps, DisplayMode::t mode
 )
 {
@@ -488,12 +488,12 @@ void WindowGL::create(
 	mImpl->scheduleDraw();
 }
 
-void WindowGL::destroy(){
+void Window::destroy(){
 	doDestroy();
 	mImpl->destroy();
 }
 
-void WindowGL::destroyAll(){
+void Window::destroyAll(){
 	WindowImpl::WindowsMap::iterator it = WindowImpl::windows().begin();
 	for(; it != WindowImpl::windows().end(); it++){
 		if(it->second && it->second->mWindow){
@@ -502,9 +502,9 @@ void WindowGL::destroyAll(){
 	}
 }
 
-bool WindowGL::cursorHide() const { return mImpl->mCursorHide; }
+bool Window::cursorHide() const { return mImpl->mCursorHide; }
 
-WindowGL::Dim WindowGL::dimensions() const {
+Window::Dim Window::dimensions() const {
 	Dim d;
 	glutSetWindow(mImpl->id());
 	d.l = glutGet(GLUT_WINDOW_X);
@@ -514,14 +514,14 @@ WindowGL::Dim WindowGL::dimensions() const {
 	return d;
 }
 
-bool WindowGL::enabled(DisplayMode::t v) const { return mImpl->mMode & v; }
-double WindowGL::fps() const { return mImpl->mFPS; }
-double WindowGL::avgFps() const { return mImpl->mAvg; }
-bool WindowGL::fullScreen() const { return mImpl->mFullScreen; }
-const std::string& WindowGL::title() const { return mImpl->mTitle; }
-bool WindowGL::visible() const { return mImpl->mVisible; }
+bool Window::enabled(DisplayMode::t v) const { return mImpl->mMode & v; }
+double Window::fps() const { return mImpl->mFPS; }
+double Window::avgFps() const { return mImpl->mAvg; }
+bool Window::fullScreen() const { return mImpl->mFullScreen; }
+const std::string& Window::title() const { return mImpl->mTitle; }
+bool Window::visible() const { return mImpl->mVisible; }
 
-WindowGL& WindowGL::cursor(Cursor::t v){
+Window& Window::cursor(Cursor::t v){
 	mImpl->mCursor = v;
 
 	if(mImpl->created() && !mImpl->mCursorHide){
@@ -534,7 +534,7 @@ WindowGL& WindowGL::cursor(Cursor::t v){
 	return *this;
 }
 
-WindowGL& WindowGL::cursorHide(bool v){
+Window& Window::cursorHide(bool v){
 	mImpl->mCursorHide = v;
 	makeActive();
 	if(mImpl->created() && v)	glutSetCursor(GLUT_CURSOR_NONE);
@@ -542,7 +542,7 @@ WindowGL& WindowGL::cursorHide(bool v){
 	return *this;
 }
 
-WindowGL& WindowGL::dimensions(const Dim& v){
+Window& Window::dimensions(const Dim& v){
 	mImpl->mWinDim = v;
 	if(mImpl->created()){
 		glutSetWindow(mImpl->mID);
@@ -552,7 +552,7 @@ WindowGL& WindowGL::dimensions(const Dim& v){
 	return *this;
 }
 
-void WindowGL::doFrameImpl(){
+void Window::doFrameImpl(){
 	const int winID = mImpl->id();
 	const int current = glutGetWindow();
 	if(winID != current) glutSetWindow(winID);
@@ -565,13 +565,13 @@ void WindowGL::doFrameImpl(){
 //	if(current > 0 && current != winID) glutSetWindow(current);
 }
 
-WindowGL& WindowGL::fps(double v){
+Window& Window::fps(double v){
 	if(mImpl->mFPS <= 0 && v > 0) mImpl->scheduleDraw();
 	mImpl->mFPS = v;
 	return *this;
 }
 
-WindowGL& WindowGL::fullScreen(bool v){
+Window& Window::fullScreen(bool v){
 
 	// exit full screen
 	if(mImpl->mFullScreen && !v){
@@ -606,27 +606,27 @@ WindowGL& WindowGL::fullScreen(bool v){
 	return *this;
 }
 
-WindowGL& WindowGL::hide(){ makeActive(); glutHideWindow(); return *this; }
-WindowGL& WindowGL::iconify(){ makeActive(); glutIconifyWindow(); return *this; }
-WindowGL& WindowGL::makeActive(){ glutSetWindow(mImpl->id()); return *this; }
-WindowGL& WindowGL::show(){ makeActive(); glutShowWindow(); return *this; }
+Window& Window::hide(){ makeActive(); glutHideWindow(); return *this; }
+Window& Window::iconify(){ makeActive(); glutIconifyWindow(); return *this; }
+Window& Window::makeActive(){ glutSetWindow(mImpl->id()); return *this; }
+Window& Window::show(){ makeActive(); glutShowWindow(); return *this; }
 
-WindowGL& WindowGL::title(const std::string& v){
+Window& Window::title(const std::string& v){
 	mImpl->mTitle = v;
 	glutSetWindow(mImpl->mID);
 	glutSetWindowTitle(mImpl->mTitle.c_str());
-	//printf("WindowGL::title(%s)\n", mImpl->mTitle.c_str());
+	//printf("Window::title(%s)\n", mImpl->mTitle.c_str());
 	return *this;
 }
 
-void WindowGL::startLoop(){
+void Window::startLoop(){
 	MainLoop::get().start();
 //	glutIdleFunc(al_main_tick);
 //	glutMainLoop();
 }
 
-void WindowGL::stopLoop(){
-	WindowGL::destroyAll();
+void Window::stopLoop(){
+	Window::destroyAll();
 	MainLoop::get().stop();
 }
 

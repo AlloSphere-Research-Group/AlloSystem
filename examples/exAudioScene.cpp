@@ -46,7 +46,7 @@ void audioCB(AudioIOData& io){
 }
 
 
-struct MyWindow : WindowGL{
+struct MyWindow : Window{
 	
 	MyWindow(): gl(new gfx::GraphicsBackendOpenGL)
 	{}
@@ -75,7 +75,7 @@ int main (int argc, char * argv[]){
 
 	MyWindow win;
 	win.add(new StandardWindowKeyControls);
-	win.create(WindowGL::Dim(200,200,100), "Window 1", 40);
+	win.create(Window::Dim(200,200,100), "Window 1", 40);
 
 	AudioIO audioIO(NUM_FRAMES, 44100, audioCB, 0, 2, 1);
 	audioIO.start();

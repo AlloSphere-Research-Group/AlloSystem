@@ -4,7 +4,7 @@
 
 #include "types/al_MsgQueue.hpp"
 #include "system/al_MainLoop.hpp"
-#include "io/al_WindowGL.hpp"
+#include "io/al_Window.hpp"
 #include "protocol/al_Graphics.hpp"
 #include "math/al_Random.hpp"
 #include "system/al_Time.hpp"
@@ -129,7 +129,7 @@ static void drawScene(void * self) {
 
 
 
-struct MyWindow : WindowGL{
+struct MyWindow : Window{
 
 	void printMouse(){
 		const Mouse& m = mouse();
@@ -213,7 +213,7 @@ int main (int argc, char * argv[]) {
 	}
 	*/
 
-	win1.create(WindowGL::Dim(320, 240, 0, 40), "win1", fps);
+	win1.create(Window::Dim(320, 240, 0, 40), "win1", fps);
 
 //	camera.turn(Quatd::fromEuler(0., 0., 0.1));
 //	MainLoop::interval(0.01);

@@ -1,4 +1,4 @@
-#include "io/al_WindowGL.hpp"
+#include "io/al_Window.hpp"
 
 namespace al{
 
@@ -57,16 +57,16 @@ WindowEventHandler :: ~WindowEventHandler() {
 	if (mWindow) mWindow->remove(this);
 }
 
-void WindowGL::init(){
+void Window::init(){
 
 }
 
-WindowGL& WindowGL::cursorHideToggle(){
+Window& Window::cursorHideToggle(){
 	cursorHide(!cursorHide());
 	return *this;
 }
 
-WindowGL& WindowGL::fullScreenToggle(){
+Window& Window::fullScreenToggle(){
 	fullScreen(!fullScreen());
 	return *this;
 }
