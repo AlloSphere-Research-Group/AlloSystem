@@ -411,7 +411,7 @@
 		3685735B12668D2400981167 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		3685735D12668D2400981167 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 		3685735F12668D2400981167 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
-		368573D012668EDC00981167 /* liballocore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = liballocore.a; sourceTree = "<group>"; };
+		368573D012668EDC00981167 /* liballocore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liballocore.a; path = ../Release/liballocore.a; sourceTree = "<group>"; };
 		368573D212668EDC00981167 /* al_Ambisonics.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_Ambisonics.o; sourceTree = "<group>"; };
 		368573D312668EDC00981167 /* al_AudioIO.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_AudioIO.o; sourceTree = "<group>"; };
 		368573D412668EDC00981167 /* al_Camera.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_Camera.o; sourceTree = "<group>"; };
@@ -4816,10 +4816,12 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				INSTALL_PATH = /usr/local/lib;
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PREBINDING = NO;
 				PRODUCT_NAME = allojit;
+				SEPARATE_STRIP = NO;
 			};
 			name = Debug;
 		};
@@ -4827,14 +4829,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = YES;
+				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
+				GENERATE_MASTER_OBJECT_FILE = YES;
 				INSTALL_PATH = /usr/local/lib;
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PREBINDING = NO;
 				PRODUCT_NAME = allojit;
+				SEPARATE_STRIP = NO;
 				ZERO_LINK = NO;
 			};
 			name = Release;
