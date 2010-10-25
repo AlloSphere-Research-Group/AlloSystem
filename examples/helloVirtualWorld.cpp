@@ -1,7 +1,7 @@
 /*
 What is our "Hello world!" app?
 
-A sphere orbits around the origin emiting the audio line input. The camera
+An agent orbits around the origin emitting the audio line input. The camera
 view can be switched between a freely navigable keyboard/mouse controlled mode 
 and a sphere follow mode.
 
