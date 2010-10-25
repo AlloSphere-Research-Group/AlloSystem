@@ -4,7 +4,7 @@
 #include "protocol/al_Graphics.hpp"
 #include "protocol/al_GraphicsBackendOpenGL.hpp"
 #include "graphics/al_Stereographic.hpp"
-#include "io/al_WindowGL.hpp"
+#include "io/al_Window.hpp"
 #include "math/al_Random.hpp"
 
 #include "al_Compiler.hpp"
@@ -35,8 +35,9 @@ public:
 		bool onMouseDrag(const Mouse& m){ return true; }
 	};
 
-	struct WorldWindow : public WindowGL{
+	struct WorldWindow : public Window{
 		WorldWindow() : doFrame(doFrameNothing) {}
+		bool onFrame();
 		static void doFrameNothing(void *) {};
 		draw_fptr doFrame;
 	};

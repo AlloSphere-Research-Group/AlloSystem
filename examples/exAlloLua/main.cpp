@@ -1,12 +1,12 @@
 #include <iostream>
 #include <vector>
 
-#include "io/al_WindowGL.hpp"
+#include "io/al_Window.hpp"
 #include "protocol/al_Graphics.hpp"
 
 using namespace al;
 
-struct MyWindow : WindowGL {
+struct MyWindow : Window {
 
 	static std::vector<MyWindow *> windows;
 
@@ -18,14 +18,14 @@ struct MyWindow : WindowGL {
 	void onKeyDown(const Keyboard& k){	printf("onKeyDown    "); printKey(); 
 		switch(k.key()){
 			case Key::Escape: fullScreenToggle(); break;
-			case 'q': if(k.ctrl()) WindowGL::stopLoop(); break;
+			case 'q': if(k.ctrl()) Window::stopLoop(); break;
 			case 'w': if(k.ctrl()) destroy(); break;
 			case 'h': if(k.ctrl()) hide(); break;
 			case 'm': if(k.ctrl()) iconify(); break;
 			case 'c': if(k.ctrl()) cursorHideToggle(); break;
 			case 'n': 
 				windows.push_back(new MyWindow);
-				windows[windows.size()-1]->create(WindowGL::Dim(200,200,400), "Window X", 40);
+				windows[windows.size()-1]->create(Window::Dim(200,200,400), "Window X", 40);
 				break;
 		}
 	}
@@ -75,8 +75,8 @@ std::vector<MyWindow *> MyWindow::windows;
 int main (int argc, char * const argv[]) {
 
 	MyWindow win;
-	win.create(WindowGL::Dim(200,200,100), "Window 1", 40);
+	win.create(Window::Dim(200,200,100), "Window 1", 40);
 	
-	WindowGL::startLoop();	/* GLUT never returns. */
+	Window::startLoop();	/* GLUT never returns. */
     return 0;
 }

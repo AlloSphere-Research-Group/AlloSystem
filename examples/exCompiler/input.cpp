@@ -16,7 +16,7 @@
 #include "io/al_AudioIO.hpp"
 #include "io/al_File.hpp"
 #include "io/al_Socket.hpp"
-#include "io/al_WindowGL.hpp"
+#include "io/al_Window.hpp"
 
 #include "math/al_Complex.hpp"
 #include "math/al_Constants.hpp"
@@ -70,12 +70,12 @@ float volData[N*N*N];
 Isosurface<float> iso;
 double phase=0;
 
-struct MyWindow : WindowGL{
+struct MyWindow : Window{
 	
 	void onKeyDown(const Keyboard& k){
 		switch(k.key()){
 			case Key::Escape: fullScreenToggle(); break;
-			case 'q': if(k.ctrl()) WindowGL::stopLoop(); break;
+			case 'q': if(k.ctrl()) Window::stopLoop(); break;
 		}
 	}
 
@@ -112,8 +112,8 @@ struct MyWindow : WindowGL{
 int main (int argc, char * argv[]){
 
 	MyWindow win;
-	win.create(WindowGL::Dim(800,600), "Isosurface Example", 40);
+	win.create(Window::Dim(800,600), "Isosurface Example", 40);
 
-	WindowGL::startLoop();
+	Window::startLoop();
 	return 0;
 }

@@ -11,7 +11,7 @@
 
 using namespace al;
 
-static const int NUM_AGENTS = 3000;
+static const int NUM_AGENTS = 1000;
 static const double dim = 16;
 
 

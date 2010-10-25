@@ -71,7 +71,7 @@
 #include "io/al_AudioIO.hpp"
 #include "io/al_File.hpp"
 #include "io/al_Socket.hpp"
-#include "io/al_WindowGL.hpp"
+#include "io/al_Window.hpp"
 #include "spatial/al_Camera.hpp"
 #include "graphics/al_Config.h"
 #include "graphics/al_Common.hpp"

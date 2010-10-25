@@ -266,7 +266,7 @@ printf("2 * ++x %d 2 * y++ %d\n", 2 * ++x, 2 * y++);
 	
 	W->win.add(new StandardWindowKeyControls);
 	W->win.add(new World::InputControl(W));
-	W->win.create(WindowGL::Dim(720,480), "Window 1", 40);
+	W->win.create(Window::Dim(720,480), "Window 1", 40);
 
 	SearchPaths paths(argc, argv);
 	clang_headers_path = paths.appPath() + "../../dev/osx/lib/llvm/clang/2.8/include";
