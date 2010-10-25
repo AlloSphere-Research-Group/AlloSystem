@@ -230,7 +230,7 @@ protected:
 */
 #pragma mark Inline Implementation
 
-MsgTube :: MsgTube(int bits) {
+inline MsgTube :: MsgTube(int bits) {
 	now = 0;
 	memsize = 1<<bits;
 	rb = jack_ringbuffer_create(memsize);
@@ -238,13 +238,13 @@ MsgTube :: MsgTube(int bits) {
 	jack_ringbuffer_reset(rb);
 }
 
-MsgTube :: ~MsgTube() {
+inline MsgTube :: ~MsgTube() {
 	// TODO: empty the cache
 	// empty the ringbuffer
 	jack_ringbuffer_free(rb);
 }
 
-void MsgTube :: executeUntil(al_sec until) {
+inline void MsgTube :: executeUntil(al_sec until) {
 	Header header;
 	while (jack_ringbuffer_read_space(rb) > sizeof(header)) {
 		jack_ringbuffer_peek(rb, (char *)&header, sizeof(header));
@@ -260,7 +260,7 @@ void MsgTube :: executeUntil(al_sec until) {
 /*
 	Copies 'data', so you can safely free it after this call
 */
-void MsgTube :: send_data(void (*func)(al_sec t, char * data), char * data, size_t size) {
+inline void MsgTube :: send_data(void (*func)(al_sec t, char * data), char * data, size_t size) {
 	struct Data {
 		Header header;
 		void (*f)(al_sec t, char * args);
