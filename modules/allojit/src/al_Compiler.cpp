@@ -90,8 +90,11 @@ static void llvmErrorHandler(void * user_data, const std::string& reason) {
 static void llvmInit() {
 	static bool initialized = false;
 	if (!initialized) {
-		llvm::InitializeAllTargets();
-		llvm::InitializeAllAsmPrinters();
+		llvm::InitializeNativeTarget();
+		llvm::InitializeNativeTargetAsmPrinter();
+		
+		//llvm::InitializeAllTargets();
+		//llvm::InitializeAllAsmPrinters();
 		//llvm::InitializeAllAsmParsers();
 		llvm::install_fatal_error_handler(llvmErrorHandler, NULL);
 		initialized = true;

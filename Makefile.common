@@ -6,11 +6,16 @@
 # Makefile using 'include Makefile.standard'.
 ###########################################################################
 #==========================================================================
+
 # Command-line options
+
 # Modify for your system -or- use command-line argument OPTION=string
+
 #==========================================================================
 #--------------------------------------------------------------------------
+
 # Operating system variables
+
 #--------------------------------------------------------------------------
 # Operating system: 'macosx', 'linux', or 'windows'
 UNAME := $(shell uname)
@@ -37,7 +42,9 @@ OSX_VERSION	= 10_5
 USING_PUREDYNE	= 0
 
 #--------------------------------------------------------------------------
+
 # Build settings
+
 #--------------------------------------------------------------------------
 LIB_NAME	?=
 
@@ -47,15 +54,20 @@ BUILD_CONFIG	= Release
 STRICT_WARNINGS = 1
 AUTORUN		= 1
 SLIB_EXT	= a
+
 DLIB_EXT	= so
+
 DLIB_OPT	= shared
 
 # Flags required for including and linking against library
 EXT_CPPFLAGS	?=
+
 EXT_LDFLAGS	?=
 
 #--------------------------------------------------------------------------
+
 # Default paths
+
 #--------------------------------------------------------------------------
 PREFIX		= /usr/local/
 CONFPREFIX	= $(PREFIX)/etc/
@@ -70,7 +82,9 @@ OBJ_DIR		= $(BIN_DIR)obj/
 DESTDIR		= $(PREFIX)
 
 #--------------------------------------------------------------------------
+
 # Default tools/commands
+
 #--------------------------------------------------------------------------
 AR		= ar cr
 INSTALL		= install
@@ -80,6 +94,7 @@ RM		= rm -df
 # Linux:
 ifeq ($(PLATFORM), linux)
 	ifneq ($(USING_PUREDYNE), 0)
+
 		CXX = gcc
 	endif
 
@@ -111,6 +126,7 @@ else ifeq ($(PLATFORM), macosx)
 	endif
 
 	DLIB_EXT = dylib
+
 	DLIB_OPT = dynamiclib
 
 # Windows:
@@ -132,11 +148,14 @@ ifneq ($(STRICT_WARNINGS), 0)
 	CFLAGS += \
 		-Wreturn-type \
 		-Wformat -Wmissing-braces -Wparentheses -Wswitch \
-		-Wunused-variable -Wsign-compare -Wno-unknown-pragmas
+		-Wunused-variable -Wsign-compare -Wno-unknown-pragmas 
 	CXXFLAGS += -Wnon-virtual-dtor -Woverloaded-virtual
 endif
 
 SLIB_FILE = lib$(LIB_NAME).$(SLIB_EXT)
+
 DLIB_FILE = lib$(LIB_NAME).$(DLIB_EXT)
+
 DLIB_PATH = $(addprefix $(BIN_DIR), $(DLIB_FILE))
+
 SLIB_PATH = $(addprefix $(BIN_DIR), $(SLIB_FILE))

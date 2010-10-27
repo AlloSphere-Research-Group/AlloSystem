@@ -91,7 +91,6 @@
 		3602B73A110A9785005DC3D0 /* exOscSend.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3602B739110A9785005DC3D0 /* exOscSend.cpp */; };
 		360BB6E511DB06D4000C2A42 /* al_Time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFA116D527D00928703 /* al_Time.cpp */; };
 		360BB6E611DB06E2000C2A42 /* al_Time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFA116D527D00928703 /* al_Time.cpp */; };
-		360C241C11E65950000FF335 /* al_Compiler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 360C23FD11E6591C000FF335 /* al_Compiler.cpp */; };
 		360C243811E6599F000FF335 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		360C243911E6599F000FF335 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		360C243A11E6599F000FF335 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
@@ -101,55 +100,6 @@
 		360C243E11E6599F000FF335 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
 		360C243F11E6599F000FF335 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		360C244011E6599F000FF335 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
-		360C24CE11E659D3000FF335 /* libCIndex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C248211E659D3000FF335 /* libCIndex.a */; };
-		360C24CF11E659D3000FF335 /* libclangAnalysis.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C248311E659D3000FF335 /* libclangAnalysis.a */; };
-		360C24D011E659D3000FF335 /* libclangAST.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C248411E659D3000FF335 /* libclangAST.a */; };
-		360C24D111E659D3000FF335 /* libclangBasic.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C248511E659D3000FF335 /* libclangBasic.a */; };
-		360C24D211E659D3000FF335 /* libclangChecker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C248611E659D3000FF335 /* libclangChecker.a */; };
-		360C24D311E659D3000FF335 /* libclangCodeGen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C248711E659D3000FF335 /* libclangCodeGen.a */; };
-		360C24D411E659D3000FF335 /* libclangDriver.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C248811E659D3000FF335 /* libclangDriver.a */; };
-		360C24D511E659D3000FF335 /* libclangFrontend.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C248911E659D3000FF335 /* libclangFrontend.a */; };
-		360C24D611E659D3000FF335 /* libclangIndex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C248A11E659D3000FF335 /* libclangIndex.a */; };
-		360C24D711E659D3000FF335 /* libclangLex.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C248B11E659D3000FF335 /* libclangLex.a */; };
-		360C24D811E659D3000FF335 /* libclangParse.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C248C11E659D3000FF335 /* libclangParse.a */; };
-		360C24D911E659D3000FF335 /* libclangRewrite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C248D11E659D3000FF335 /* libclangRewrite.a */; };
-		360C24DA11E659D3000FF335 /* libclangSema.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C248E11E659D3000FF335 /* libclangSema.a */; };
-		360C24DB11E659D3000FF335 /* libCompilerDriver.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C248F11E659D3000FF335 /* libCompilerDriver.a */; };
-		360C24DC11E659D3000FF335 /* libEnhancedDisassembly.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C249011E659D3000FF335 /* libEnhancedDisassembly.a */; };
-		360C24DD11E659D3000FF335 /* libLLVMAnalysis.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C249111E659D3000FF335 /* libLLVMAnalysis.a */; };
-		360C24DE11E659D3000FF335 /* libLLVMArchive.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C249211E659D3000FF335 /* libLLVMArchive.a */; };
-		360C24DF11E659D3000FF335 /* libLLVMAsmParser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C249311E659D3000FF335 /* libLLVMAsmParser.a */; };
-		360C24E011E659D3000FF335 /* libLLVMAsmPrinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C249411E659D3000FF335 /* libLLVMAsmPrinter.a */; };
-		360C24E111E659D3000FF335 /* libLLVMBitReader.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C249511E659D3000FF335 /* libLLVMBitReader.a */; };
-		360C24E211E659D3000FF335 /* libLLVMBitWriter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C249611E659D3000FF335 /* libLLVMBitWriter.a */; };
-		360C24E311E659D3000FF335 /* libLLVMCodeGen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C249711E659D3000FF335 /* libLLVMCodeGen.a */; };
-		360C24E411E659D3000FF335 /* libLLVMCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C249811E659D3000FF335 /* libLLVMCore.a */; };
-		360C24E511E659D3000FF335 /* libLLVMExecutionEngine.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C249911E659D3000FF335 /* libLLVMExecutionEngine.a */; };
-		360C24E611E659D4000FF335 /* libLLVMInstCombine.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C249A11E659D3000FF335 /* libLLVMInstCombine.a */; };
-		360C24E711E659D4000FF335 /* libLLVMInstrumentation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C249B11E659D3000FF335 /* libLLVMInstrumentation.a */; };
-		360C24E811E659D4000FF335 /* libLLVMInterpreter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C249C11E659D3000FF335 /* libLLVMInterpreter.a */; };
-		360C24E911E659D4000FF335 /* libLLVMipa.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C249D11E659D3000FF335 /* libLLVMipa.a */; };
-		360C24EA11E659D4000FF335 /* libLLVMipo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C249E11E659D3000FF335 /* libLLVMipo.a */; };
-		360C24EB11E659D4000FF335 /* libLLVMJIT.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C249F11E659D3000FF335 /* libLLVMJIT.a */; };
-		360C24EC11E659D4000FF335 /* libLLVMLinker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C24A011E659D3000FF335 /* libLLVMLinker.a */; };
-		360C24ED11E659D4000FF335 /* libLLVMMC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C24A111E659D3000FF335 /* libLLVMMC.a */; };
-		360C24EE11E659D4000FF335 /* libLLVMMCParser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C24A211E659D3000FF335 /* libLLVMMCParser.a */; };
-		360C24EF11E659D4000FF335 /* libLLVMScalarOpts.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C24A311E659D3000FF335 /* libLLVMScalarOpts.a */; };
-		360C24F011E659D4000FF335 /* libLLVMSelectionDAG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C24A411E659D3000FF335 /* libLLVMSelectionDAG.a */; };
-		360C24F111E659D4000FF335 /* libLLVMSupport.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C24A511E659D3000FF335 /* libLLVMSupport.a */; };
-		360C24F211E659D4000FF335 /* libLLVMSystem.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C24A611E659D3000FF335 /* libLLVMSystem.a */; };
-		360C24F311E659D4000FF335 /* libLLVMTarget.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C24A711E659D3000FF335 /* libLLVMTarget.a */; };
-		360C24F411E659D4000FF335 /* libLLVMTransformUtils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C24A811E659D3000FF335 /* libLLVMTransformUtils.a */; };
-		360C24F511E659D4000FF335 /* libLLVMX86AsmParser.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C24A911E659D3000FF335 /* libLLVMX86AsmParser.a */; };
-		360C24F611E659D4000FF335 /* libLLVMX86AsmPrinter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C24AA11E659D3000FF335 /* libLLVMX86AsmPrinter.a */; };
-		360C24F711E659D4000FF335 /* libLLVMX86CodeGen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C24AB11E659D3000FF335 /* libLLVMX86CodeGen.a */; };
-		360C24F811E659D4000FF335 /* libLLVMX86Disassembler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C24AC11E659D3000FF335 /* libLLVMX86Disassembler.a */; };
-		360C24F911E659D4000FF335 /* libLLVMX86Info.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C24AD11E659D3000FF335 /* libLLVMX86Info.a */; };
-		360C24FA11E659D4000FF335 /* libLTO.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C24AE11E659D3000FF335 /* libLTO.a */; };
-		360C24FB11E659D4000FF335 /* libplugin_llvmc_Base.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C24AF11E659D3000FF335 /* libplugin_llvmc_Base.a */; };
-		360C24FC11E659D4000FF335 /* libplugin_llvmc_Clang.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C24B011E659D3000FF335 /* libplugin_llvmc_Clang.a */; };
-		360C253511E65DCA000FF335 /* liballoclang.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 360C241B11E65929000FF335 /* liballoclang.a */; };
-		360C253811E65DF3000FF335 /* clangversion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 360C23FE11E6591C000FF335 /* clangversion.cpp */; };
 		360C274F11E67E2E000FF335 /* exCompiler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 360C274E11E67E2E000FF335 /* exCompiler.cpp */; };
 		360C404F11D32FED002FE91F /* al_Matrix4.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 360C404E11D32FED002FE91F /* al_Matrix4.hpp */; };
 		361BF1A511DEBA3A00E60A9C /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
@@ -177,7 +127,6 @@
 		3622BF40116D530600928703 /* OscPrintReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEEC116D527D00928703 /* OscPrintReceivedElements.cpp */; };
 		3622BF41116D530600928703 /* OscReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEED116D527D00928703 /* OscReceivedElements.cpp */; };
 		3622BF42116D530600928703 /* OscTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEEE116D527D00928703 /* OscTypes.cpp */; };
-		3622BFA7116D558500928703 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		3622BFC1116D55B500928703 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		3622BFE0116D55DD00928703 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
 		3622BFE1116D55DD00928703 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
@@ -285,7 +234,6 @@
 		36C13EDC11D15D45006196FC /* exReverb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36C13EDB11D15D45006196FC /* exReverb.cpp */; };
 		36C13EE711D15D8A006196FC /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		36C13EFF11D15E1A006196FC /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
-		36C13F0211D15E33006196FC /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
 		36D69A2E11F923FC00699158 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		36D69A2F11F923FC00699158 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
 		36D69A3011F923FC00699158 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC53081162907D0076AA8B /* CoreAudio.framework */; };
@@ -307,7 +255,6 @@
 		36F2568D121FBF36008C4597 /* al_Memory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F2568B121FBF36008C4597 /* al_Memory.cpp */; };
 		36F46824110BE2E90082D21E /* al_AudioIO.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36F46821110BE2E90082D21E /* al_AudioIO.hpp */; };
 		36F46825110BE2E90082D21E /* al_File.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36F46822110BE2E90082D21E /* al_File.hpp */; };
-		36F596511211D58B003B78B5 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
 		36F596521211D58B003B78B5 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
 		36F596751211D5F8003B78B5 /* al_Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F596741211D5F8003B78B5 /* al_Image.cpp */; };
 		36F596761211D5F8003B78B5 /* al_Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F596741211D5F8003B78B5 /* al_Image.cpp */; };
@@ -362,13 +309,6 @@
 			remoteGlobalIDString = 36B4130E10EFFA8D007B16D0;
 			remoteInfo = allocore;
 		};
-		360C24FD11E659E5000FF335 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 360C240B11E65929000FF335;
-			remoteInfo = alloclang;
-		};
 		361BF1A111DEBA3A00E60A9C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
@@ -377,13 +317,6 @@
 			remoteInfo = allocore;
 		};
 		3622BFD8116D55DD00928703 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 36B4130E10EFFA8D007B16D0;
-			remoteInfo = allocore;
-		};
-		36573C8A120CA82500353D27 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
@@ -587,7 +520,6 @@
 		3602B739110A9785005DC3D0 /* exOscSend.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exOscSend.cpp; sourceTree = "<group>"; };
 		360C23FD11E6591C000FF335 /* al_Compiler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Compiler.cpp; sourceTree = "<group>"; };
 		360C23FE11E6591C000FF335 /* clangversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = clangversion.cpp; sourceTree = "<group>"; };
-		360C241B11E65929000FF335 /* liballoclang.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liballoclang.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		360C241D11E65967000FF335 /* al_Compiler.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Compiler.hpp; sourceTree = "<group>"; };
 		360C244411E6599F000FF335 /* exCompiler */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exCompiler; sourceTree = BUILT_PRODUCTS_DIR; };
 		360C246211E659D3000FF335 /* .dir */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .dir; sourceTree = "<group>"; };
@@ -881,60 +813,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		360C241711E65929000FF335 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				360C24CE11E659D3000FF335 /* libCIndex.a in Frameworks */,
-				360C24CF11E659D3000FF335 /* libclangAnalysis.a in Frameworks */,
-				360C24D011E659D3000FF335 /* libclangAST.a in Frameworks */,
-				360C24D111E659D3000FF335 /* libclangBasic.a in Frameworks */,
-				360C24D211E659D3000FF335 /* libclangChecker.a in Frameworks */,
-				360C24D311E659D3000FF335 /* libclangCodeGen.a in Frameworks */,
-				360C24D411E659D3000FF335 /* libclangDriver.a in Frameworks */,
-				360C24D511E659D3000FF335 /* libclangFrontend.a in Frameworks */,
-				360C24D611E659D3000FF335 /* libclangIndex.a in Frameworks */,
-				360C24D711E659D3000FF335 /* libclangLex.a in Frameworks */,
-				360C24D811E659D3000FF335 /* libclangParse.a in Frameworks */,
-				360C24D911E659D3000FF335 /* libclangRewrite.a in Frameworks */,
-				360C24DA11E659D3000FF335 /* libclangSema.a in Frameworks */,
-				360C24DB11E659D3000FF335 /* libCompilerDriver.a in Frameworks */,
-				360C24DC11E659D3000FF335 /* libEnhancedDisassembly.a in Frameworks */,
-				360C24DD11E659D3000FF335 /* libLLVMAnalysis.a in Frameworks */,
-				360C24DE11E659D3000FF335 /* libLLVMArchive.a in Frameworks */,
-				360C24DF11E659D3000FF335 /* libLLVMAsmParser.a in Frameworks */,
-				360C24E011E659D3000FF335 /* libLLVMAsmPrinter.a in Frameworks */,
-				360C24E111E659D3000FF335 /* libLLVMBitReader.a in Frameworks */,
-				360C24E211E659D3000FF335 /* libLLVMBitWriter.a in Frameworks */,
-				360C24E311E659D3000FF335 /* libLLVMCodeGen.a in Frameworks */,
-				360C24E411E659D3000FF335 /* libLLVMCore.a in Frameworks */,
-				360C24E511E659D3000FF335 /* libLLVMExecutionEngine.a in Frameworks */,
-				360C24E611E659D4000FF335 /* libLLVMInstCombine.a in Frameworks */,
-				360C24E711E659D4000FF335 /* libLLVMInstrumentation.a in Frameworks */,
-				360C24E811E659D4000FF335 /* libLLVMInterpreter.a in Frameworks */,
-				360C24E911E659D4000FF335 /* libLLVMipa.a in Frameworks */,
-				360C24EA11E659D4000FF335 /* libLLVMipo.a in Frameworks */,
-				360C24EB11E659D4000FF335 /* libLLVMJIT.a in Frameworks */,
-				360C24EC11E659D4000FF335 /* libLLVMLinker.a in Frameworks */,
-				360C24ED11E659D4000FF335 /* libLLVMMC.a in Frameworks */,
-				360C24EE11E659D4000FF335 /* libLLVMMCParser.a in Frameworks */,
-				360C24EF11E659D4000FF335 /* libLLVMScalarOpts.a in Frameworks */,
-				360C24F011E659D4000FF335 /* libLLVMSelectionDAG.a in Frameworks */,
-				360C24F111E659D4000FF335 /* libLLVMSupport.a in Frameworks */,
-				360C24F211E659D4000FF335 /* libLLVMSystem.a in Frameworks */,
-				360C24F311E659D4000FF335 /* libLLVMTarget.a in Frameworks */,
-				360C24F411E659D4000FF335 /* libLLVMTransformUtils.a in Frameworks */,
-				360C24F511E659D4000FF335 /* libLLVMX86AsmParser.a in Frameworks */,
-				360C24F611E659D4000FF335 /* libLLVMX86AsmPrinter.a in Frameworks */,
-				360C24F711E659D4000FF335 /* libLLVMX86CodeGen.a in Frameworks */,
-				360C24F811E659D4000FF335 /* libLLVMX86Disassembler.a in Frameworks */,
-				360C24F911E659D4000FF335 /* libLLVMX86Info.a in Frameworks */,
-				360C24FA11E659D4000FF335 /* libLTO.a in Frameworks */,
-				360C24FB11E659D4000FF335 /* libplugin_llvmc_Base.a in Frameworks */,
-				360C24FC11E659D4000FF335 /* libplugin_llvmc_Clang.a in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		360C243711E6599F000FF335 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -946,7 +824,6 @@
 				360C243C11E6599F000FF335 /* libapr-1.a in Frameworks */,
 				360C243D11E6599F000FF335 /* libportaudio.a in Frameworks */,
 				360C243E11E6599F000FF335 /* liballocore.a in Frameworks */,
-				360C253511E65DCA000FF335 /* liballoclang.a in Frameworks */,
 				360C243F11E6599F000FF335 /* Cocoa.framework in Frameworks */,
 				360C244011E6599F000FF335 /* GLUT.framework in Frameworks */,
 			);
@@ -1037,14 +914,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				36C13F0211D15E33006196FC /* libportaudio.a in Frameworks */,
-				3622BFA7116D558500928703 /* libapr-1.a in Frameworks */,
 				16AC52D511628F860076AA8B /* GLUT.framework in Frameworks */,
 				16AC52D611628F870076AA8B /* OpenGL.framework in Frameworks */,
 				16AC53091162907D0076AA8B /* CoreAudio.framework in Frameworks */,
 				16AC5313116290AA0076AA8B /* AudioUnit.framework in Frameworks */,
 				16AC531B116290BE0076AA8B /* AudioToolbox.framework in Frameworks */,
-				36F596511211D58B003B78B5 /* libfreeimage.a in Frameworks */,
 				36F0ABD1123195F2000A8EBF /* liblua.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1286,7 +1160,6 @@
 				36C13ED911D15D30006196FC /* exReverb */,
 				36C079BF11D4966500764E50 /* exMultiWindow */,
 				361BF1B111DEBA3A00E60A9C /* exAudioScene */,
-				360C241B11E65929000FF335 /* liballoclang.a */,
 				360C244411E6599F000FF335 /* exCompiler */,
 				36D69A3B11F923FC00699158 /* exGraphics */,
 				3687E34111FA4F9500EC6706 /* exIsosurface */,
@@ -1873,13 +1746,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		360C240C11E65929000FF335 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		369EA3AC116D60CE00EB1934 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -1989,24 +1855,6 @@
 			productReference = 3602B736110A9770005DC3D0 /* exOscSend */;
 			productType = "com.apple.product-type.tool";
 		};
-		360C240B11E65929000FF335 /* alloclang */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 360C241811E65929000FF335 /* Build configuration list for PBXNativeTarget "alloclang" */;
-			buildPhases = (
-				360C240C11E65929000FF335 /* Headers */,
-				360C241511E65929000FF335 /* Sources */,
-				360C241711E65929000FF335 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				36573C8B120CA82500353D27 /* PBXTargetDependency */,
-			);
-			name = alloclang;
-			productName = alloutil;
-			productReference = 360C241B11E65929000FF335 /* liballoclang.a */;
-			productType = "com.apple.product-type.library.static";
-		};
 		360C243211E6599F000FF335 /* exCompiler */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 360C244111E6599F000FF335 /* Build configuration list for PBXNativeTarget "exCompiler" */;
@@ -2018,7 +1866,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				360C24FE11E659E5000FF335 /* PBXTargetDependency */,
 				360C243311E6599F000FF335 /* PBXTargetDependency */,
 			);
 			name = exCompiler;
@@ -2252,7 +2099,6 @@
 			targets = (
 				36B4130E10EFFA8D007B16D0 /* allocore */,
 				369EA3AF116D60CE00EB1934 /* alloutil */,
-				360C240B11E65929000FF335 /* alloclang */,
 				16AC529611628D0E0076AA8B /* unitTests */,
 				8DD76F620486A84900D96B5E /* exScheduling */,
 				3602B4CA110A67C9005DC3D0 /* exOscRecv */,
@@ -2357,15 +2203,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3602B73A110A9785005DC3D0 /* exOscSend.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		360C241511E65929000FF335 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				360C241C11E65950000FF335 /* al_Compiler.cpp in Sources */,
-				360C253811E65DF3000FF335 /* clangversion.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2543,11 +2380,6 @@
 			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
 			targetProxy = 360C243411E6599F000FF335 /* PBXContainerItemProxy */;
 		};
-		360C24FE11E659E5000FF335 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 360C240B11E65929000FF335 /* alloclang */;
-			targetProxy = 360C24FD11E659E5000FF335 /* PBXContainerItemProxy */;
-		};
 		361BF1A011DEBA3A00E60A9C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
@@ -2557,11 +2389,6 @@
 			isa = PBXTargetDependency;
 			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
 			targetProxy = 3622BFD8116D55DD00928703 /* PBXContainerItemProxy */;
-		};
-		36573C8B120CA82500353D27 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
-			targetProxy = 36573C8A120CA82500353D27 /* PBXContainerItemProxy */;
 		};
 		367F0B4C12034F1E00FCC534 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2942,55 +2769,6 @@
 			};
 			name = Release;
 		};
-		360C241911E65929000FF335 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_CPP_RTTI = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREFIX_HEADER = "";
-				GENERATE_MASTER_OBJECT_FILE = YES;
-				INSTALL_PATH = /usr/local/lib;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Carbon,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = $TARGET_NAME;
-			};
-			name = Debug;
-		};
-		360C241A11E65929000FF335 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_CPP_RTTI = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREFIX_HEADER = "";
-				GENERATE_MASTER_OBJECT_FILE = YES;
-				INSTALL_PATH = /usr/local/lib;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Carbon,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = $TARGET_NAME;
-				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
-				ZERO_LINK = NO;
-			};
-			name = Release;
-		};
 		360C244211E6599F000FF335 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3341,13 +3119,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = NO;
+				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_CPP_RTTI = NO;
+				DEPLOYMENT_POSTPROCESSING = NO;
+				GCC_ENABLE_CPP_RTTI = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				INSTALL_PATH = /usr/local/lib;
+				LD_GENERATE_MAP_FILE = NO;
 				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../../dev/osx/lib\"";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DOSC_HOST_LITTLE_ENDIAN";
@@ -3363,8 +3143,9 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
+				RUN_CLANG_STATIC_ANALYZER = NO;
 				SDKROOT = $inherited;
-				SEPARATE_STRIP = NO;
+				SEPARATE_STRIP = YES;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = static;
 				SYMROOT = $inherited;
 				USER_HEADER_SEARCH_PATHS = $inherited;
@@ -3583,15 +3364,6 @@
 			buildConfigurations = (
 				3602B734110A9770005DC3D0 /* Debug */,
 				3602B735110A9770005DC3D0 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		360C241811E65929000FF335 /* Build configuration list for PBXNativeTarget "alloclang" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				360C241911E65929000FF335 /* Debug */,
-				360C241A11E65929000FF335 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

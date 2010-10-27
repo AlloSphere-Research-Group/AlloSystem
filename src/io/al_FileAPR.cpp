@@ -56,12 +56,12 @@ public:
 			// iterate over directory:
 			while ((!found) && APR_SUCCESS == (apr_dir_read(&dirent, APR_FINFO_DIRENT, dir))) {
 				
-				if (dirent.filetype == APR_REG && dirent.name == name) {
+				if (dirent.filetype == APR_REG && dirent.name && dirent.name == name) {
 					result.file(dirent.name);
 					result.path(dirname);
 					found = true;
 					break;
-				} else if (recursive && dirent.filetype == APR_DIR && dirent.name[0] != '.') {
+				} else if (recursive && dirent.filetype == APR_DIR && dirent.name && dirent.name[0] != '.') {
 					Path path(dirname + dirent.name + AL_FILE_DELIMITER);
 					found = path.find(name, result, true);
 				}
