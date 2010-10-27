@@ -252,13 +252,8 @@ public:
 
 
 int main (int argc, char * const argv[]) {
-int x,y;
-x = 1, y = 1;
-printf("x %d y %d\n", x, y);
-x = 1, y = 1;
-printf("++x %d y++ %d\n", ++x, y++);
-x = 1, y = 1;
-printf("2 * ++x %d 2 * y++ %d\n", 2 * ++x, 2 * y++);
+
+	//gfx::OBJReader hack;
 
 	World * W = World::get();
 	
