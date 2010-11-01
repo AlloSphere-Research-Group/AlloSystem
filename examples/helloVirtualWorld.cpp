@@ -84,7 +84,7 @@ void audioCB(AudioIOData& io){
 		agents[i].onProcess(io);
 	}
 
-	navMaster.step();
+	navMaster.step(0.5);
 
 	scene.encode(numFrames, io.framesPerSecond());
 	scene.render(&io.out(0,0), numFrames);

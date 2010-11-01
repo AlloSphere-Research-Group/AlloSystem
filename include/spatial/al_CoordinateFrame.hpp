@@ -101,7 +101,7 @@ class Nav : public Pose {
 public:
 
 	Nav(const Vec3d &position = Vec3d(0), double smooth=0)
-	:	Pose(position), mSmooth(smooth)
+	:	Pose(position), mSmooth(smooth), mVelScale(1)
 	{	updateUnitVectors(); }
 
 	/// Get smoothing amount
@@ -120,6 +120,8 @@ public:
 	Pose vel() const {
 		return Pose(mMove1, Quatd::fromEuler(mSpin1[1], mSpin1[0], mSpin1[2]));
 	}
+	
+	double velScale() const { return mVelScale; }
 
 	/// Set smoothing amount [0,1)
 	Nav& smooth(double v){ mSmooth=v; return *this; }
@@ -201,14 +203,17 @@ public:
 	
 	/// Accumulate pose based on velocity
 	void step(double dt=1){
+		mVelScale = dt;
+	
 		double amt = 1.-smooth();	// TODO: adjust for dt
 
 		Vec3d angVel = mSpin0 + mTurn;
-		mTurn.set(0); // turn is just a one-shot increment, so clear each frame
 
 		// low-pass filter velocities
 		mMove1.lerp(mMove0*dt, amt);
-		mSpin1.lerp(angVel*dt, amt);
+		mSpin1.lerp(mSpin0*dt + mTurn, amt);
+
+		mTurn.set(0); // turn is just a one-shot increment, so clear each frame
 
 		mQuat *= vel().quat();
 		updateUnitVectors();
@@ -225,6 +230,7 @@ protected:
 	Vec3d mTurn;			// 
 	Vec3d mUR, mUU, mUF;	// basis vectors of coordinate frame
 	double mSmooth;
+	double mVelScale;		// velocity scaling factor
 };
 
 

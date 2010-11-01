@@ -13,9 +13,10 @@ struct NavInputControl : public InputEventHandler {
 
 	virtual bool onKeyDown(const Keyboard& k){	 	
 	
-		static double a = 2;		// rotational speed: degrees per update
-		static double v = 0.125;	// speed: units per update
-		
+		double vs = nav().velScale();
+		double a = 2.000 * vs;	// rotational speed: degrees per update
+		double v = 0.125 * vs;	// speed: units per update
+
 		switch(k.key()){
 			case '`':			nav().halt().home(); return false;
 			case 's':			nav().halt(); return false;
@@ -56,8 +57,8 @@ struct NavInputControl : public InputEventHandler {
 
 	virtual bool onMouseDrag(const Mouse& m){
 		if(m.left()){
-			nav().turnU( m.dx() * 0.2);
-			nav().turnR( m.dy() * 0.2);
+			nav().turnU(m.dx() * 0.2);
+			nav().turnR(m.dy() * 0.2);
 		}
 		else if(m.right()){
 			nav().turnF(m.dx() * 0.2);
@@ -79,9 +80,10 @@ struct NavInputControlCosm : public NavInputControl {
 	virtual ~NavInputControlCosm() {}
 
 	virtual bool onKeyDown(const Keyboard& k){	 	
-	
-		static double a = 1;		// rotational speed: degrees per update
-		static double v = 0.25;		// speed: units per update
+
+		double vs = nav().velScale();
+		double a = 1.00 * vs;	// rotational speed: degrees per update
+		double v = 0.25 * vs;	// speed: units per update
 		
 		switch(k.key()){
 			case '`':			nav().halt().home(); return false;
