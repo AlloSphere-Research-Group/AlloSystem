@@ -518,9 +518,7 @@
 		3602B54E110A6D3D005DC3D0 /* OscTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OscTypes.h; sourceTree = "<group>"; };
 		3602B736110A9770005DC3D0 /* exOscSend */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exOscSend; sourceTree = BUILT_PRODUCTS_DIR; };
 		3602B739110A9785005DC3D0 /* exOscSend.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exOscSend.cpp; sourceTree = "<group>"; };
-		360C23FD11E6591C000FF335 /* al_Compiler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Compiler.cpp; sourceTree = "<group>"; };
 		360C23FE11E6591C000FF335 /* clangversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = clangversion.cpp; sourceTree = "<group>"; };
-		360C241D11E65967000FF335 /* al_Compiler.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Compiler.hpp; sourceTree = "<group>"; };
 		360C244411E6599F000FF335 /* exCompiler */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exCompiler; sourceTree = BUILT_PRODUCTS_DIR; };
 		360C246211E659D3000FF335 /* .dir */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .dir; sourceTree = "<group>"; };
 		360C246311E659D3000FF335 /* emmintrin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = emmintrin.h; sourceTree = "<group>"; };
@@ -1455,7 +1453,6 @@
 		3622BEF5116D527D00928703 /* system */ = {
 			isa = PBXGroup;
 			children = (
-				360C23FD11E6591C000FF335 /* al_Compiler.cpp */,
 				360C23FE11E6591C000FF335 /* clangversion.cpp */,
 				3622BEF7116D527D00928703 /* al_MainLoop.cpp */,
 				36AED02511D4638F000D98C9 /* al_MainLoopGLUT.cpp */,
@@ -1542,7 +1539,6 @@
 		36B4124710EFF7B8007B16D0 /* system */ = {
 			isa = PBXGroup;
 			children = (
-				360C241D11E65967000FF335 /* al_Compiler.hpp */,
 				168EC8ED1161CA2C00FCACC7 /* al_Config.h */,
 				168EC8EC1161CA2C00FCACC7 /* al_MainLoop.h */,
 				362FA88C11D3F5CC00AA2DC4 /* al_MainLoop.hpp */,
