@@ -57,6 +57,45 @@ Example send code:
 
 */
 
+/*
+The unit of transmission of OSC is an OSC Packet.
+
+An OSC Packet consists of
+	its contents
+	a contiguous block of binary data
+	its size, the number of 8-bit bytes that comprise the contents
+
+The contents of an OSC packet must be either an OSC Message or an OSC Bundle.
+The first byte of the packet's contents unambiguously distinguishes between 
+these two alternatives.
+The size of an OSC packet is always a multiple of 4.
+
+An OSC message consists of
+	1) an OSC Address Pattern
+	2) an OSC Type Tag String
+	3) zero or more OSC Arguments
+
+An OSC Address Pattern is an OSC-string beginning with the character '/'
+
+An OSC Type Tag String is an OSC-string beginning with the character ',' (comma)
+followed by a sequence of characters corresponding exactly to the sequence of 
+OSC Arguments in the given message.
+
+i	int32
+f	float32
+s	OSC-string
+b	OSC-blob
+
+OSC-string "#bundle"			8 bytes				How to know that this data is a bundle
+OSC-timetag						8 bytes				Time tag that applies to the entire bundle
+Size of first bundle element	int32 = 4 bytes		First bundle element
+First bundle element's contents	As many bytes as given by "size of first bundle element"
+Size of second bundle element	int32 = 4 bytes		Second bundle element
+Second bundle element's contents	As many bytes as given by "size of second bundle element"
+etc.												Addtional bundle elements
+
+*/
+
 
 #include <string>
 #include <vector>
