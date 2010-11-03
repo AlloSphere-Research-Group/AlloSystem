@@ -1,8 +1,8 @@
 #ifndef INCLUDE_AL_GRAPHICS_BUFFEROBJECT_HPP
 #define INCLUDE_AL_GRAPHICS_BUFFEROBJECT_HPP
 
-#include "graphics/al_Common.hpp"
-#include "graphics/al_GPUObject.hpp"
+#include "allocore/graphics/al_Common.hpp"
+#include "allocore/graphics/al_GPUObject.hpp"
 
 /*
 

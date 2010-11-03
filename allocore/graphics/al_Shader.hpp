@@ -2,8 +2,8 @@
 #define INCLUDE_AL_GRAPHICS_SHADER_HPP
 
 #include <string>
-#include "graphics/al_Common.hpp"
-#include "graphics/al_GPUObject.hpp"
+#include "allocore/graphics/al_Common.hpp"
+#include "allocore/graphics/al_GPUObject.hpp"
 
 namespace al {
 namespace gfx{

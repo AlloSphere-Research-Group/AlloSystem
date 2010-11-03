@@ -28,8 +28,8 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#include "types/jack/ringbuffer.h"
-#include "system/al_Time.h"
+#include "allocore/types/jack/ringbuffer.h"
+#include "allocore/system/al_Time.h"
 #include <string.h>
 #include <queue>
 #include <cstring>
