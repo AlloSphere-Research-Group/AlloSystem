@@ -1,5 +1,5 @@
-#include "protocol/al_OSCAPR.hpp"
-#include "system/al_Thread.hpp"
+#include "allocore/protocol/al_OSCAPR.hpp"
+#include "allocore/system/al_Thread.hpp"
 
 #include "../private/al_ImplAPR.h"
 

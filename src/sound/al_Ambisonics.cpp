@@ -1,5 +1,5 @@
 #include <string.h>
-#include "sound/al_Ambisonics.hpp"
+#include "allocore/sound/al_Ambisonics.hpp"
 
 #ifdef USE_GAMMA
 	#include "scl.h"

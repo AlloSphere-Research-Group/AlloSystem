@@ -1,5 +1,5 @@
-#include "system/al_MainLoop.h"
-#include "system/al_MainLoop.hpp"
+#include "allocore/system/al_MainLoop.h"
+#include "allocore/system/al_MainLoop.hpp"
 #include <stdlib.h>
 #include <assert.h>
 

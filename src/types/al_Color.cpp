@@ -1,4 +1,4 @@
-#include "types/al_Color.hpp"
+#include "allocore/types/al_Color.hpp"
 
 namespace al{
 

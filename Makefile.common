@@ -72,7 +72,7 @@ DESTDIR		= $(PREFIX)
 #--------------------------------------------------------------------------
 # Default tools/commands
 #--------------------------------------------------------------------------
-AR		= ar cr
+AR		= ar crs
 INSTALL		= install
 RANLIB		= ranlib
 RM		= rm -df

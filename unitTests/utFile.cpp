@@ -1,5 +1,4 @@
 #include "utAllocore.h"
-#include "io/al_File.hpp"
 
 int utFile() {
 	
@@ -11,25 +10,28 @@ int utFile() {
 		assert(!f.opened());
 
 		f.open();
+		printf("%s\n", f.path());
 		assert(f.opened());
+		printf("%s\n", f.path());
 		assert(File::exists(path));
-		
+		printf("%s\n", f.path());
+
 		assert(
 			f.write(text, strlen(text))
 		);
-		
+
 		f.close();
 		assert(!f.opened());
 		assert(File::exists(path));
-		
+
 		f.mode("r").open();
 		assert(f.opened());
 		
 		char * read = f.readAll();
 		
-		assert(f.size() == (int)strlen(text));
+		assert(f.size() == strlen(text));
 		
-		for(int i=0; i<f.size(); ++i){
+		for(unsigned i=0; i<f.size(); ++i){
 			assert(read[i] == text[i]);
 			//printf("%c", read[i]);
 		}

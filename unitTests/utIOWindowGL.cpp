@@ -3,7 +3,7 @@
 static gfx::GraphicsBackendOpenGL backend;
 static gfx::Graphics gl(&backend);
 
-struct MyWindow : WindowGL{
+struct MyWindow : Window{
 
 	bool onCreate(){ 					printf("onCreate\n"); return true; }
 	bool onDestroy(){					printf("onDestroy\n"); return true; }
@@ -68,15 +68,15 @@ int utIOWindowGL(){
 //	Func tf;
 //	tf(1000);
 
-	win.create(WindowGL::Dim(200,200,100), "Window 1", 40);
-	win2.create(WindowGL::Dim(200,200,300), "Window 2", 40);
-//	win2.create(WindowGL::Dim(200,200,300), "Window 2", 40, SingleBuf);
+	win.create(Window::Dim(200,200,100), "Window 1", 40);
+	win2.create(Window::Dim(200,200,300), "Window 2", 40);
+//	win2.create(Window::Dim(200,200,300), "Window 2", 40, SingleBuf);
 
 	win.freqs(1,2);
 	win2.freqs(3,4);
 
 //win.cursorHide(true);
 
-	WindowGL::startLoop();
+	Window::startLoop();
 	return 0;
 }

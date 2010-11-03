@@ -27,11 +27,11 @@
 	CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 	WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-#include "protocol/oscpack/ip/IpEndpointName.h"
+#include "allocore/protocol/oscpack/ip/IpEndpointName.h"
 
 #include <stdio.h>
 
-#include "protocol/oscpack/ip/NetworkingUtils.h"
+#include "allocore/protocol/oscpack/ip/NetworkingUtils.h"
 
 
 unsigned long IpEndpointName::GetHostByName( const char *s )

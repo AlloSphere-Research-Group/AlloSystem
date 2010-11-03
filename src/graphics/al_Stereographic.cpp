@@ -1,5 +1,5 @@
-#include "graphics/al_Stereographic.hpp"
-#include "graphics/al_Common.hpp"	/* << need the OpenGL headers */
+#include "allocore/graphics/al_Stereographic.hpp"
+#include "allocore/graphics/al_Common.hpp"	/* << need the OpenGL headers */
 
 namespace al {
 namespace gfx {

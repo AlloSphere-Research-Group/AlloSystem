@@ -27,7 +27,7 @@
 	CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 	WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-#include "protocol/oscpack/osc/OscPrintReceivedElements.h"
+#include "allocore/protocol/oscpack/osc/OscPrintReceivedElements.h"
 
 #include <iostream>
 #include <iomanip>

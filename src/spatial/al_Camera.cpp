@@ -1,4 +1,4 @@
-#include "spatial/al_Camera.hpp"
+#include "allocore/spatial/al_Camera.hpp"
 
 
 namespace al{

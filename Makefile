@@ -64,7 +64,7 @@ $(SLIB_PATH): createFolders $(addprefix $(OBJ_DIR), $(OBJS))
 	@echo AR $@
 	@$(RM) $@
 	@$(AR) $@ $(filter %.o, $^)
-	@$(RANLIB) $@
+#	@$(RANLIB) $@
 #	@libtool -static $(LDFLAGS) $(filter %.o, $^) -o $@
 #	@libtool -static $@ $(patsubst %, $(DEV_DIR)lib/lib%.a, $(STATIC_LIBS)) -o $@
 

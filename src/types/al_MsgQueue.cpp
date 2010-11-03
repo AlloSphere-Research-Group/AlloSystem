@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string>
 
-#include "types/al_MsgQueue.hpp"
+#include "allocore/types/al_MsgQueue.hpp"
 
 namespace al{
 

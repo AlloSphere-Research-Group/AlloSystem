@@ -1,6 +1,6 @@
 #include <cstring>
-#include "io/al_Socket.hpp"
-#include "system/al_Config.h"
+#include "allocore/io/al_Socket.hpp"
+#include "allocore/system/al_Config.h"
 
 #include "../private/al_ImplAPR.h"
 #ifdef AL_LINUX

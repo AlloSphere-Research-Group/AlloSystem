@@ -5,6 +5,7 @@ This demonstrates how to apply a reverberation effect to the audio line input.
 */
 
 #include "al_Allocore.hpp"
+using namespace al;
 
 Reverb<float> reverb;
 

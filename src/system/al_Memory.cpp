@@ -1,4 +1,4 @@
-#include "system/al_Memory.hpp"
+#include "allocore/system/al_Memory.hpp"
 #include "../private/al_ImplAPR.h"
 
 namespace al {

@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "graphics/al_Model.hpp"
-#include "io/al_File.hpp"
+#include "allocore/graphics/al_Model.hpp"
+#include "allocore/io/al_File.hpp"
 
 using namespace al;
 using namespace gfx;

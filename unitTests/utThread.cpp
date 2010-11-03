@@ -1,5 +1,4 @@
 #include "utAllocore.h"
-#include "system/al_Thread.hpp"
 
 int active = 1;
 

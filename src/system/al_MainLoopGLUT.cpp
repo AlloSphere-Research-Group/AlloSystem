@@ -1,9 +1,9 @@
-#include "system/al_MainLoop.hpp"
+#include "allocore/system/al_MainLoop.hpp"
 
 #include <stdio.h>		// snprintf
 #include <stdlib.h>		// exit
-#include "system/al_Config.h"
-#include "system/al_MainLoop.h"
+#include "allocore/system/al_Config.h"
+#include "allocore/system/al_MainLoop.h"
 
 #ifdef AL_OSX
 	#include <OpenGL/OpenGL.h>

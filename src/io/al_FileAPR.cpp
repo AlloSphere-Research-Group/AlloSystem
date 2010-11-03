@@ -1,6 +1,6 @@
 #include <cstring>
 
-#include "io/al_File.hpp"
+#include "allocore/io/al_File.hpp"
 
 #include "../private/al_ImplAPR.h"
 #ifdef AL_LINUX
@@ -41,7 +41,7 @@ public:
 	std::string dirname;
 	
 	Path(const std::string& dirname) : ImplAPR(), dir(NULL), dirname(dirname) {
-		if (APR_SUCCESS != check_apr(apr_dir_open(&dir, dirname.data(), mPool))) {
+		if (APR_SUCCESS != check_apr(apr_dir_open(&dir, dirname.c_str(), mPool))) {
 			dir=NULL;
 		}
 	}
@@ -52,7 +52,7 @@ public:
 	
 	bool find(const std::string& name, FilePath& result, bool recursive=true) {
 		bool found = false;
-		if (dir && APR_SUCCESS == check_apr(apr_dir_open(&dir, dirname.data(), mPool))) {
+		if (dir && APR_SUCCESS == check_apr(apr_dir_open(&dir, dirname.c_str(), mPool))) {
 			// iterate over directory:
 			while ((!found) && APR_SUCCESS == (apr_dir_read(&dirent, APR_FINFO_DIRENT, dir))) {
 				
@@ -77,7 +77,7 @@ FilePath SearchPaths::find(const std::string& name) {
 	bool found = false;
 	std::list<SearchPaths::searchpath>::iterator iter = mSearchPaths.begin();
 	while ((!found) && iter != mSearchPaths.end()) {
-		Path path(iter->first.data());
+		Path path(iter->first.c_str());
 		found = path.find(name, result, iter->second);
 		iter++;
 	}
@@ -88,7 +88,7 @@ FilePath SearchPaths::find(const std::string& name) {
 
 File::File(std::string path, std::string mode, bool open_)
 :	mImpl(new Impl()), 
-	mPath(path.data()), mMode(mode.data()), mContent(0), mSizeBytes(0), mFP(0)
+	mPath(path.c_str()), mMode(mode.c_str()), mContent(0), mSizeBytes(0), mFP(0)
 {	if(open_) open(); }
 
 File::~File(){ close(); freeContent(); delete mImpl; }
@@ -114,7 +114,8 @@ void File::getSize(){
 
 bool File::open(){
 	if(0 == mFP){
-		if((mFP = fopen(mPath, mMode))){
+		mFP = fopen(mPath, mMode);
+		if(mFP){
 			getSize();
 			return true;
 		}
@@ -145,7 +146,7 @@ int File::write(std::string path, const void * v, int size, int items){
 }
 
 
-bool File::exists(std::string path){ File f(path.data(), "r"); return f.open(); }
+bool File::exists(std::string path){ File f(path.c_str(), "r"); return f.open(); }
 
 
 al_sec File :: modified() {

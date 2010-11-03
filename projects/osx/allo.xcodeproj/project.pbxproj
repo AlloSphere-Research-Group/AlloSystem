@@ -440,6 +440,7 @@
 		16198FF31173E39B006FBADF /* al_Buffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Buffer.hpp; sourceTree = "<group>"; };
 		1619909B11743914006FBADF /* al_Color.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Color.hpp; sourceTree = "<group>"; };
 		1619909C11743990006FBADF /* al_Color.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Color.cpp; sourceTree = "<group>"; };
+		1663FD461280D608002B2979 /* al_Allocore.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Allocore.hpp; sourceTree = "<group>"; };
 		166DD741117CDB6000A8BA12 /* al_Conversion.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Conversion.hpp; sourceTree = "<group>"; };
 		166DD744117CDBFD00A8BA12 /* utTypesConversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utTypesConversion.cpp; path = ../../unitTests/utTypesConversion.cpp; sourceTree = SOURCE_ROOT; };
 		166DD78D117CDF1800A8BA12 /* pstdint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pstdint.h; sourceTree = "<group>"; };
@@ -1007,7 +1008,7 @@
 				36B5D3E611D81D2C004D228D /* TODO */,
 				3625B540116EEDEF00C685B7 /* Makefile */,
 				3625B541116EEDEF00C685B7 /* Makefile.config */,
-				36B4124410EFF7B8007B16D0 /* include */,
+				36B4124410EFF7B8007B16D0 /* allocore */,
 				3622BEDC116D527D00928703 /* src */,
 				3622BEDB116D526700928703 /* examples */,
 				16AC528F11628CD50076AA8B /* unitTests */,
@@ -1520,9 +1521,10 @@
 			path = jack;
 			sourceTree = "<group>";
 		};
-		36B4124410EFF7B8007B16D0 /* include */ = {
+		36B4124410EFF7B8007B16D0 /* allocore */ = {
 			isa = PBXGroup;
 			children = (
+				1663FD461280D608002B2979 /* al_Allocore.hpp */,
 				16AA95E3118F6EEF00B98EC3 /* graphics */,
 				36F46820110BE2E90082D21E /* io */,
 				1697336B11768ABD0025299C /* math */,
@@ -1532,8 +1534,8 @@
 				36B4124710EFF7B8007B16D0 /* system */,
 				36B4124D10EFF7B8007B16D0 /* types */,
 			);
-			name = include;
-			path = ../../include;
+			name = allocore;
+			path = ../../allocore;
 			sourceTree = SOURCE_ROOT;
 		};
 		36B4124710EFF7B8007B16D0 /* system */ = {
@@ -2537,7 +2539,7 @@
 				);
 				DEPLOYMENT_LOCATION = NO;
 				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_CPP_RTTI = YES;
 				GCC_INPUT_FILETYPE = automatic;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -2571,7 +2573,7 @@
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 				SYMROOT = ../../build;
-				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../include";
+				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../";
 			};
 			name = Debug;
 		};
@@ -2586,7 +2588,7 @@
 				DEPLOYMENT_LOCATION = NO;
 				DEPLOYMENT_POSTPROCESSING = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
-				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_CPP_RTTI = YES;
 				GCC_INPUT_FILETYPE = automatic;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -2625,7 +2627,7 @@
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = debugging;
 				SYMROOT = ../../build;
-				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../include";
+				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../";
 			};
 			name = Release;
 		};

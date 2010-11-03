@@ -27,7 +27,7 @@
 	CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 	WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
-#include "protocol/oscpack/osc/OscOutboundPacketStream.h"
+#include "allocore/protocol/oscpack/osc/OscOutboundPacketStream.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -37,7 +37,7 @@
 #include <malloc.h> // for alloca
 #endif
 
-#include "protocol/oscpack/osc/OscHostEndianness.h"
+#include "allocore/protocol/oscpack/osc/OscHostEndianness.h"
 
 
 namespace osc{

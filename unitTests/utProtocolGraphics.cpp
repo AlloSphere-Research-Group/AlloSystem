@@ -3,7 +3,7 @@
 static gfx::GraphicsBackendOpenGL backend;
 static gfx::Graphics gl(&backend);
  
-struct MyWindow2 : WindowGL{
+struct MyWindow2 : Window{
 
 	bool onFrame(){
 		using namespace al::gfx;
@@ -44,8 +44,8 @@ int utProtocolGraphics(){
 
 	MyWindow2 win;
 
-	win.create(WindowGL::Dim(400,400,000), "Window 1", 40);
+	win.create(Window::Dim(400,400,000), "Window 1", 40);
 
-	WindowGL::startLoop();
+	Window::startLoop();
 	return 0;
 }

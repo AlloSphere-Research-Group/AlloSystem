@@ -5,7 +5,7 @@
 #include <math.h>
 
 #include "portaudio.h"
-#include "io/al_AudioIO.hpp"
+#include "allocore/io/al_AudioIO.hpp"
 
 namespace al{
 

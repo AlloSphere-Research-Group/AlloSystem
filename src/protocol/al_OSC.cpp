@@ -1,4 +1,4 @@
-#include "protocol/al_OSC.hpp"
+#include "allocore/protocol/al_OSC.hpp"
 
 //namespace al{
 namespace osc{

@@ -1,4 +1,4 @@
-#include "system/al_Thread.hpp"
+#include "allocore/system/al_Thread.hpp"
 #include "../private/al_ImplAPR.h"
 #ifdef AL_LINUX
 #include "apr-1.0/apr_general.h"

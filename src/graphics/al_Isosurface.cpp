@@ -1,5 +1,5 @@
 #include <math.h>
-#include "graphics/al_Isosurface.hpp"
+#include "allocore/graphics/al_Isosurface.hpp"
 
 namespace al{
 

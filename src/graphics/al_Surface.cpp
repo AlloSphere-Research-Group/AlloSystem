@@ -1,7 +1,7 @@
 #include <stdlib.h>
-#include "protocol/al_GraphicsBackend.hpp"
-#include "graphics/al_Config.h"
-#include "graphics/al_Surface.hpp"
+#include "allocore/protocol/al_GraphicsBackend.hpp"
+#include "allocore/graphics/al_Config.h"
+#include "allocore/graphics/al_Surface.hpp"
 
 namespace al {
 namespace gfx{

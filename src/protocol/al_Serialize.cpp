@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include "protocol/al_Serialize.h"
+#include "allocore/protocol/al_Serialize.h"
 
 #ifdef __cplusplus
-#include "protocol/al_Serialize.hpp"
+#include "allocore/protocol/al_Serialize.hpp"
 
 namespace al{
 

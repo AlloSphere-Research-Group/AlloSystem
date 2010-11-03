@@ -2,11 +2,11 @@
 #include <stdlib.h>		// exit
 #include <map>
 
-#include "io/al_Window.hpp"
+#include "allocore/io/al_Window.hpp"
 
-#include "system/al_Config.h"		// system defines
-#include "system/al_MainLoop.hpp"	// start/stop loop, rendering
-#include "graphics/al_Config.h"		// OpenGL headers
+#include "allocore/system/al_Config.h"		// system defines
+#include "allocore/system/al_MainLoop.hpp"	// start/stop loop, rendering
+#include "allocore/graphics/al_Config.h"		// OpenGL headers
 
 #ifdef AL_OSX
 	#include <GLUT/glut.h>

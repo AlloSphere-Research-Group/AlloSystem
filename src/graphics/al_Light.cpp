@@ -1,5 +1,5 @@
-#include "graphics/al_Config.h"
-#include "graphics/al_Light.hpp"
+#include "allocore/graphics/al_Config.h"
+#include "allocore/graphics/al_Light.hpp"
 
 namespace al {
 namespace gfx{
