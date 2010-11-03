@@ -89,22 +89,23 @@ public:
 
 	/// @param[in] path		path of file
 	/// @param[in] mode		i/o mode w, r, wb, rb
-	File(std::string path, std::string mode="r", bool open=false);
+	/// @param[in] open		whether to open the file
+	File(const std::string& path, const std::string& mode="r", bool open=false);
 
 	~File();
 
 	void close();	///< Close file
 	bool open();	///< Open file with specified i/o mode
 
-	File& mode(std::string v){ mMode=v.c_str(); return *this; }
-	File& path(std::string v){ mPath=v.c_str(); return *this; }
+	File& mode(const std::string& v){ mMode=v; return *this; }
+	File& path(const std::string& v){ mPath=v; return *this; }
 
 	/// Write memory elements to file
-	int write(std::string v){ return fwrite(v.data(), 1, v.length(), mFP); }
+	int write(const std::string& v){ return fwrite(v.data(), 1, v.length(), mFP); }
 	int write(const void * v, int size, int items=1){ return fwrite(v, size, items, mFP); }
 
 	/// Quick and dirty write memory to file
-	static int write(std::string path, const void * v, int size, int items=1);
+	static int write(const std::string& path, const void * v, int size, int items=1);
 
 	/// Returns character string of file contents (read mode only)
 	char * readAll();
@@ -113,16 +114,16 @@ public:
 	bool opened() const { return 0 != mFP; }
 	
 	/// Returns file i/o mode string
-	const char * mode() const { return mMode; }
+	const std::string& mode() const { return mMode; }
 	
 	/// Returns path string
-	const char * path() const { return mPath; }
+	const std::string& path() const { return mPath; }
 	
 	/// Returns size (in bytes) of file contents
 	int size() const { return mSizeBytes; }
 
 	/// Returns whether file exists
-	static bool exists(std::string path);
+	static bool exists(const std::string& path);
 	
 	/// Return modification time of file (or 0 on failure)
 	/// as number of seconds since 00:00:00 january 1, 1970 UTC
@@ -150,8 +151,8 @@ public:
 protected:
 	class Impl; Impl * mImpl;
 
-	const char * mPath;
-	const char * mMode;
+	std::string mPath;
+	std::string mMode;
 	char * mContent;
 	int mSizeBytes;
 	FILE * mFP;

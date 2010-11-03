@@ -86,9 +86,9 @@ FilePath SearchPaths::find(const std::string& name) {
 
 
 
-File::File(std::string path, std::string mode, bool open_)
+File::File(const std::string& path, const std::string& mode, bool open_)
 :	mImpl(new Impl()), 
-	mPath(path.c_str()), mMode(mode.c_str()), mContent(0), mSizeBytes(0), mFP(0)
+	mPath(path), mMode(mode), mContent(0), mSizeBytes(0), mFP(0)
 {	if(open_) open(); }
 
 File::~File(){ close(); freeContent(); delete mImpl; }
@@ -114,7 +114,7 @@ void File::getSize(){
 
 bool File::open(){
 	if(0 == mFP){
-		mFP = fopen(mPath, mMode);
+		mFP = fopen(path().c_str(), mode().c_str());
 		if(mFP){
 			getSize();
 			return true;
@@ -135,7 +135,7 @@ char * File::readAll(){
 	return mContent;
 }
 
-int File::write(std::string path, const void * v, int size, int items){
+int File::write(const std::string& path, const void * v, int size, int items){
 	File f(path, "w");
 	int r = 0;
 	if(f.open()){
@@ -146,39 +146,39 @@ int File::write(std::string path, const void * v, int size, int items){
 }
 
 
-bool File::exists(std::string path){ File f(path.c_str(), "r"); return f.open(); }
+bool File::exists(const std::string& path){ File f(path, "r"); return f.open(); }
 
 
 al_sec File :: modified() {
-	if (mImpl->getInfo(mPath, APR_FINFO_MTIME)) {
+	if (mImpl->getInfo(path().c_str(), APR_FINFO_MTIME)) {
 		return 1.0e-6 * al_sec(mImpl->finfo.mtime);
 	}
 	return 0;
 }
 
 al_sec File :: accessed() {
-	if (mImpl->getInfo(mPath, APR_FINFO_ATIME)) {
+	if (mImpl->getInfo(path().c_str(), APR_FINFO_ATIME)) {
 		return 1.0e-6 * al_sec(mImpl->finfo.atime);
 	}
 	return 0;
 }
 
 al_sec File :: created() {
-	if (mImpl->getInfo(mPath, APR_FINFO_CTIME)) {
+	if (mImpl->getInfo(path().c_str(), APR_FINFO_CTIME)) {
 		return 1.0e-6 * al_sec(mImpl->finfo.ctime);
 	}
 	return 0;
 }
 
 size_t File :: size() {
-	if (mImpl->getInfo(mPath, APR_FINFO_SIZE)) {
+	if (mImpl->getInfo(path().c_str(), APR_FINFO_SIZE)) {
 		return mImpl->finfo.size;
 	}
 	return 0;
 }
 
 size_t File :: storage() {
-	if (mImpl->getInfo(mPath, APR_FINFO_CSIZE)) {
+	if (mImpl->getInfo(path().c_str(), APR_FINFO_CSIZE)) {
 		return mImpl->finfo.csize;
 	}
 	return 0;

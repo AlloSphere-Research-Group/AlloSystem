@@ -10,11 +10,8 @@ int utFile() {
 		assert(!f.opened());
 
 		f.open();
-		printf("%s\n", f.path());
 		assert(f.opened());
-		printf("%s\n", f.path());
 		assert(File::exists(path));
-		printf("%s\n", f.path());
 
 		assert(
 			f.write(text, strlen(text))
