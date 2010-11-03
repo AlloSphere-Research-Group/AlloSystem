@@ -277,12 +277,13 @@ public:
 	Window& makeActive();						///< Bring window to front
 	Window& show();								///< Show window (if hidden)
 	Window& title(const std::string& v);		///< Set title
-
-	/// Destroy all created windows
-	static void destroyAll();
-
-	static void startLoop();
-	static void stopLoop();
+	
+	virtual bool onKeyDown(const Keyboard& k){return true;}	///< Called when a keyboard key is pressed
+	virtual bool onKeyUp(const Keyboard& k){return true;}	///< Called when a keyboard key is released
+	virtual bool onMouseDown(const Mouse& m){return true;}	///< Called when a mouse button is pressed
+	virtual bool onMouseDrag(const Mouse& m){return true;}	///< Called when the mouse moves while a button is down
+	virtual bool onMouseMove(const Mouse& m){return true;}	///< Called when the mouse moves
+	virtual bool onMouseUp(const Mouse& m){return true;}	///< Called when a mouse button is released
 
 	Window& add(InputEventHandler * v){
 		mInputEventHandlers.push_back(&(v->window(this)));
@@ -297,6 +298,12 @@ public:
 		return *this;
 	}
 	
+	virtual bool onCreate(){ return true; }				///< Called after window is created with valid OpenGL context
+	virtual bool onDestroy(){ return true; }			///< Called before the window and its OpenGL context are destroyed
+	virtual bool onFrame(){ return true; }				///< Called every frame
+	virtual bool onResize(int w, int h){ return true; }	///< Called whenever window dimensions change
+	virtual bool onVisibility(bool v){ return true; }	///< Called when window changes from hidden to shown and vice 
+	
 	Window& add(WindowEventHandler * v){
 		mWindowEventHandlers.push_back(&(v->window(this)));
 		return *this;
@@ -309,6 +316,12 @@ public:
 		v->mWindow = NULL;
 		return *this;
 	}
+
+	/// Destroy all created windows
+	static void destroyAll();
+
+	static void startLoop();
+	static void stopLoop();
 
 private:
 	friend class WindowImpl;

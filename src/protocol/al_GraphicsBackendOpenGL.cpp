@@ -94,7 +94,10 @@ GLenum gl_primitive(Primitive prim) {
 		case LINE_STRIP:	return GL_LINE_STRIP;
 		case LINE_LOOP:		return GL_LINE_LOOP;
 		case TRIANGLES:		return GL_TRIANGLES;
+		case TRIANGLE_STRIP:return GL_TRIANGLE_STRIP;
+		case TRIANGLE_FAN:	return GL_TRIANGLE_FAN;
 		case QUADS:			return GL_QUADS;
+		case QUAD_STRIP:	return GL_QUAD_STRIP;
 		case POLYGON:		return GL_POLYGON;
 		
 		default: return GL_POINTS;

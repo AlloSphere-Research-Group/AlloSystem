@@ -33,40 +33,40 @@ namespace al {
 	
 
 
-/*
-	A zone forms a tree-like hierarchy
-		When a parent zone is destroyed, all child zones are destroyed (in reverse order of creation)
-*/
-class Zone {
-public:
-
-	Zone(Zone * parent) : mParentZone(parent) {}
-	
-	~Zone() {
-		while (!mChildZones.empty()) {
-			delete *mChildZones.rbegin();
-		}
-		if (mParentZone) mParentZone->remove(this);
-	}
-	
-	Zone * create() {
-		Zone * z = new Zone(this);
-		add(z);
-		return z;
-	}
-
-	void add(Zone * z) {
-		mChildZones.push_back(z);
-	}
-	
-	void remove(Zone * z) {
-		mChildZones.remove(z);
-	}
-
-	Zone * mParentZone;
-	std::list<Zone *> mChildZones;
-
-};
+///*
+//	A zone forms a tree-like hierarchy
+//		When a parent zone is destroyed, all child zones are destroyed (in reverse order of creation)
+//*/
+//class Zone {
+//public:
+//
+//	Zone(Zone * parent) : mParentZone(parent) {}
+//	
+//	~Zone() {
+//		while (!mChildZones.empty()) {
+//			delete *mChildZones.rbegin();
+//		}
+//		if (mParentZone) mParentZone->remove(this);
+//	}
+//	
+//	Zone * create() {
+//		Zone * z = new Zone(this);
+//		add(z);
+//		return z;
+//	}
+//
+//	void add(Zone * z) {
+//		mChildZones.push_back(z);
+//	}
+//	
+//	void remove(Zone * z) {
+//		mChildZones.remove(z);
+//	}
+//
+//	Zone * mParentZone;
+//	std::list<Zone *> mChildZones;
+//
+//};
 	
 	
 } // al::
