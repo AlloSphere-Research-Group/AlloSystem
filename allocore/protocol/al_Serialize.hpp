@@ -114,86 +114,9 @@ private:
 
 
 
-struct SyncedMemory{
-
-	SyncedMemory(void * data, uint8_t type, uint32_t numElems=1)
-	:	curr((char *)data), prev(0), type(type), numElems(numElems)
-	{
-		prev = new char[size()];
-		bzero(prev, size());
-	}
-
-	~SyncedMemory(){ delete[] prev; }
-	
-	bool changed(){ return 0 != memcmp(curr, prev, size()); }
-	void update(){ memcpy(prev, curr, size()); }
-	
-	/// Returns number of elements copied
-	int copyTo(const SyncedMemory& m){
-		if(numElems != m.numElems) return 0;
-
-		if(type == m.type){
-			memcpy(m.curr, curr, size());
-		}
-		
-		else{
-			#define CP(d,s)\
-				for(unsigned i=0; i<numElems; ++i){\
-					((d *)m.curr)[i] = ((s *)curr)[i];\
-				}
-			
-			switch(type){
-			case 'f':
-				switch(m.type){
-				case 'd': CP( double, float)
-				case 't': CP(uint8_t, float)
-				}
-				break;
-
-			case 'd':	
-				switch(m.type){
-				case 'f': CP(  float, double)
-				case 't': CP(uint8_t, double)
-				}
-				break;
-				
-			case 't':	
-				switch(m.type){
-				case 'f': CP(  float, uint8_t)
-				case 'd': CP( double, uint8_t)
-				}
-				break;
-			}
-			#undef CP
-		}
-		
-		return numElems;
-	}
-
-	char * curr;	// pointer to memory
-	char * prev;	// local copy
-	uint8_t type;
-	uint32_t numElems;	// number of elements
-	uint32_t size(){ return serTypeSize(type)*numElems; }
-};
-
-
-
-// Watches two memory locations for changes and synchronizes them accordingly.
-
-// If either memory location changes between calls to synchronize(), then
-// the memory that changed will be copied to the other memory.
-
-// If the two data types differ, then casting will be performed.
-struct MemorySynchronizer{
-
-
-
-	SyncedMemory data1;
-	SyncedMemory data2;
-};
-
-
+// =============================================================================
+// Implementation
+// =============================================================================
 
 
 template <class T> Serializer& Serializer::operator<< (T v){

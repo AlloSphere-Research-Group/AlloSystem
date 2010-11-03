@@ -88,27 +88,7 @@ int utProtocolSerialize(){
 			ASSERT(iTn, oTn);
 			ASSERT(iun, oun);
 			ASSERT(iUn, oUn);
-		}
-
-		{
-			float vf1=1, vf2=1;
-			SyncedMemory sm1(&vf1, 'f');
-			SyncedMemory sm2(&vf2, 'f');
-
-			assert(sm1.changed());
-			sm1.update();
-			assert(!sm1.changed());
-			
-			vf1 = 0;
-			assert(sm1.changed());
-
-			sm1.copyTo(sm2);
-			assert(vf2 == 0);
-			//assert(sm2.changed());
-			
-			//void * vv = &SyncedMemory::changed;
-		}
-	
+		}	
 	}
 
 	return 0;
