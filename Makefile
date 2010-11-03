@@ -85,7 +85,7 @@ test: $(SLIB_PATH)
 	@$(MAKE) -C $(TEST_DIR)
 
 loop:
-	@for v in `find $(INC_DIR) -type d ! -path '*.*'`; do \
+	@for v in `cd $(INC_DIR)$(LIB_NAME) && find * -type d ! -path '*.*'`; do \
 		echo $$v; \
 	done
 
@@ -94,17 +94,22 @@ loop:
 # library files are copied to DESTDIR/lib
 install: $(SLIB_PATH)
 #	@$(INSTALL) -d $(DESTDIR)/
-#	@$(INSTALL) -d $(DESTDIR)/lib
+	@$(INSTALL) -d $(DESTDIR)/lib
 
-	@for v in $(MODULE_DIRS); do \
+	@for v in `cd $(INC_DIR)$(LIB_NAME) && find * -type d ! -path '*.*'`; do \
 		$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)/$$v; \
-		$(INSTALL) -c -m 644 $(INC_DIR)/$$v/*.h* $(DESTDIR)/include/$(LIB_NAME)/$$v;\
+		$(INSTALL) -c -m 644 $(INC_DIR)$(LIB_NAME)/$$v/*.h* $(DESTDIR)/include/$(LIB_NAME)/$$v;\
 	done
 
+#	@for v in $(MODULE_DIRS); do \
+#		$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)/$$v; \
+#		$(INSTALL) -c -m 644 $(INC_DIR)/$$v/*.h* $(DESTDIR)/include/$(LIB_NAME)/$$v;\
+#	done
+
 #	@$(INSTALL) -d $(addprefix $(DESTDIR)/include/$(LIB_NAME)/, $(MODULE_DIRS))
-	@$(INSTALL) -cd -m 644 $(SLIB_PATH) $(DESTDIR)/lib
-	@$(INSTALL) -cd -m 644 $(DEV_DIR)lib/*.a $(DESTDIR)/lib
-#	@$(INSTALL) -cd -m 644 $(EXT_LIB_DIR)* $(DESTDIR)/lib
+	@$(INSTALL) -c -m 644 $(SLIB_PATH) $(DESTDIR)/lib
+	@$(INSTALL) -c -m 644 $(DEV_DIR)lib/*.a $(DESTDIR)/lib
+#	@$(INSTALL) -c -m 644 $(EXT_LIB_DIR)* $(DESTDIR)/lib
 	@$(RANLIB) $(DESTDIR)/lib/$(SLIB_FILE)
 
 # Remove active build configuration binary files
