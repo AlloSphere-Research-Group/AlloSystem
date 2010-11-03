@@ -1535,7 +1535,7 @@
 				36B4124D10EFF7B8007B16D0 /* types */,
 			);
 			name = allocore;
-			path = ../../allocore;
+			path = ../../include/allocore;
 			sourceTree = SOURCE_ROOT;
 		};
 		36B4124710EFF7B8007B16D0 /* system */ = {
@@ -2573,7 +2573,7 @@
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 				SYMROOT = ../../build;
-				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../";
+				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../include";
 			};
 			name = Debug;
 		};
@@ -2627,7 +2627,7 @@
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = debugging;
 				SYMROOT = ../../build;
-				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../";
+				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../include";
 			};
 			name = Release;
 		};

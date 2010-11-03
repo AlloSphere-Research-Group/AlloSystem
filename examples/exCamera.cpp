@@ -1,5 +1,6 @@
-#include "al_Allocore.hpp"
+#include "allocore/al_Allocore.hpp"
 #include "al_NavControl.hpp"
+using namespace al;
 
 gfx::Graphics gl(new gfx::GraphicsBackendOpenGL);
 gfx::GraphicsData stuff;

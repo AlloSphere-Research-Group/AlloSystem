@@ -1,6 +1,6 @@
-#include "system/al_mainloop.h"
-#include "protocol/al_OSCAPR.hpp"
-#include "stdlib.h"
+#include <stdio.h>
+#include "allocore/al_Allocore.hpp"
+using namespace al;
 
 int main (int argc, char * argv[]) {
 	

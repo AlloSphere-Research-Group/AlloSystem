@@ -1,16 +1,7 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "types/al_MsgQueue.hpp"
-#include "system/al_MainLoop.hpp"
-#include "io/al_Window.hpp"
-#include "protocol/al_Graphics.hpp"
-#include "math/al_Random.hpp"
-#include "system/al_Time.hpp"
-#include "spatial/al_Camera.hpp"
-#include "protocol/al_GraphicsBackendOpenGL.hpp"
-
+#include "allocore/al_Allocore.hpp"
 using namespace al;
 
 /*

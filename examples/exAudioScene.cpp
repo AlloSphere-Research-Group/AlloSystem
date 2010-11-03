@@ -5,7 +5,8 @@ own sound and graphics.
 
 */
 
-#include "al_Allocore.hpp"
+#include "allocore/al_Allocore.hpp"
+using namespace al;
 
 struct Agent : public Nav{
 

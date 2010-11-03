@@ -1,4 +1,4 @@
-#include "graphics/al_Shader.hpp"
+#include "allocore/graphics/al_Shader.hpp"
 
 namespace al {
 namespace gfx{

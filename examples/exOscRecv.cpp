@@ -1,6 +1,6 @@
-#include "system/al_mainloop.h"
-#include "protocol/al_OSCAPR.hpp"
-#include "stdlib.h"
+#include <stdio.h>
+#include "allocore/al_Allocore.hpp"
+using namespace al;
 
 void osc_parsemessage(const osc::ReceivedMessage & p, void * userdata) {
 	printf("address %s tags %s args %d\n", p.AddressPattern(), p.TypeTags(), (int)p.ArgumentCount());

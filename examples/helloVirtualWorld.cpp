@@ -11,8 +11,9 @@ Requirements:
 stereographic rendering
 */
 
-#include "al_Allocore.hpp"
+#include "allocore/al_Allocore.hpp"
 #include "al_NavControl.hpp"
+using namespace al;
 
 struct Agent : public SoundSource, public gfx::Drawable{
 
