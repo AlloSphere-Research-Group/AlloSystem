@@ -8,17 +8,15 @@
 
 namespace al {
 
-///<	Utility wrapper of Pose for use as a 3D camera
+///<	Camera stores optics settings important for rendering
 ///
 class Camera {
 public:
-
 	enum Eye{
 		MONO = 0,
 		LEFT,
 		RIGHT
 	};
-
 
 	Camera(
 		double fovy=30,
@@ -38,7 +36,6 @@ public:
 	Camera& focalLength(double v){ mFocalLength=v; return *this; } ///< Set focal length
 	Camera& eyeSep(double v){ mEyeSep=v; return *this; }	///< Set eye separation
 	Camera& aspectRatio(double v){ mAspectRatio=v; return *this; }	///< Set the aspect ratio
-	Camera& autoEyeSep(bool v){ mAutoEyeSep=v; return *this; }		///< Set auto eye separation amount
 	Camera& zoom(double v){ mZoom=v; return *this; }		///< Set zoom amount
 
 	double fovy() const { return mFovy; }					///< Get frustum near plane distance
@@ -47,7 +44,6 @@ public:
 	double focalLength() const { return mFocalLength; }		///< Get focal length
 	double eyeSep() const { return mEyeSep; }				///< Get eye separation
 	double aspectRatio() const { return mAspectRatio; }		///< Get aspect ratio (width/height)
-	bool autoEyeSep() const { return mAutoEyeSep; }			///< Get auto eye separation
 	double zoom() const { return mZoom; }					///< Get zoom amount
 	double IOD() const { return eyeSep() * focalLength()/30.0; }	///< Get automatic inter-ocular distance
 
@@ -63,8 +59,6 @@ protected:
 	double mFocalLength;		// Focal length along vd
 	double mEyeSep;				// Eye separation
 	double mAspectRatio;		// frustum aspect ratio
-	bool mAutoEyeSep;			// auto calculate the eye separation
-
 	double mZoom;
 
 	Vec3d mStereoOffset;					// eye offset vector (right eye; left eye is inverse), usually (1, 0, 0)
@@ -82,16 +76,13 @@ inline Camera :: Camera(
 	double eyeSep,
 	double aspectRatio
 )
-:	Nav(Vec3d(0, 0, -4)),
-	mFovy(fovy),
+:	mFovy(fovy),
 	mNear(nearClip),
 	mFar(farClip),
 	mFocalLength(focalLength),
 	mEyeSep(eyeSep),
 	mAspectRatio(aspectRatio),
-	mAutoEyeSep(true),
-	mZoom(0)
-{	smooth(0.8); }
+	mZoom(0) {}
 
 } // al::
 
