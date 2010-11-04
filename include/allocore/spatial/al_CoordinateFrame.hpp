@@ -44,6 +44,7 @@ public:
 	Mat4d matrix() const {
 		Mat4d m;
 		quat().toMatrix(&m[0]);
+		m.transpose();
 		m.set(&vec()[0], 3, 12);
 		return m;
 	}
@@ -163,10 +164,10 @@ public:
 	void spinF(double v){ mSpin0[2] = v; }
 
 	/// Turn by a single increment for one step, in degrees
+	void turn(double a, double e, double b){ turnR(e); turnU(a); turnF(b); }
 	void turnR(double v){ mTurn[0] = v; }
 	void turnU(double v){ mTurn[1] = v; }
 	void turnF(double v){ mTurn[2] = v; }
-	void turn(double a, double e, double b){ turnR(e); turnU(a); turnF(b); }
 
 	/// Stop moving and spinning
 	Nav& halt(){ 
