@@ -141,6 +141,7 @@ public:
 std::list<JIT *> JITGCList;
 
 Compiler::Compiler() : mImpl(NULL) { llvmInit(); }
+Compiler::Compiler(Compiler::Options opt) : options(opt), mImpl(NULL) { llvmInit(); }
 
 Compiler::~Compiler() {
 	clear();

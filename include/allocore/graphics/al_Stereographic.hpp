@@ -35,6 +35,14 @@ namespace al {
 namespace gfx{
 
 
+struct ViewPort {
+	int b, l, w, h;	///! bottom, left, width, height
+	
+	ViewPort(int b, int l, int w, int h) : b(b), l(l), w(w), h(h) {}
+	ViewPort(int w, int h) : b(0), l(0), w(w), h(h) {}
+};
+
+
 ///	Higher-level utility class to manage various stereo rendering techniques
 class Stereographic {
 public:
@@ -58,18 +66,21 @@ public:
 	: mMode(Anaglyph), mAnaglyphMode(RedBlue), mStereo(false) {}
 	~Stereographic() {}
 
-	void draw(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
+
+	void draw(Graphics& gl, Camera& cam, Pose& pose, ViewPort& viewport, Drawable& draw);
+
+	//void draw(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
 
 	/// Draw stereographic scene
 	void draw(Graphics& gl, Camera& cam, Drawable& draw, double width, double height);
 
 	/// So many different ways to draw :-)
-	void drawMono(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
-	void drawActive(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
-	void drawAnaglyph(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
-	void drawDual(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
-	void drawLeft(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
-	void drawRight(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
+//	void drawMono(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
+//	void drawActive(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
+//	void drawAnaglyph(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
+//	void drawDual(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
+//	void drawLeft(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
+//	void drawRight(Graphics& gl, Camera& cam, void (*draw)(void *), double width, double height, void * userdata);
 	
 	/// Blue line sync for active stereo (for those projectors that need it)
 	/// add this call at the end of rendering (just before the swap buffers call)

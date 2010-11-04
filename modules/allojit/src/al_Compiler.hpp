@@ -92,10 +92,25 @@ public:
 		
 		Options() 
 			: CPlusPlus(true) {}
+		
+//		Options(const Options& copy) 
+//			: CPlusPlus(copy.CPlusPlus) 
+//		{
+//			for (int i=0; i<copy.user_includes.size(); i++ ){
+//				user_includes.push_back(copy.user_includes[i]);
+//			}
+//			for (int i=0; i<copy.system_includes.size(); i++ ){
+//				system_includes.push_back(copy.system_includes[i]);
+//			}
+//			for (int i=0; i<copy.headers.size(); i++ ){
+//				headers.push_back(copy.headers[i]);
+//			}
+//		}
 	};
 	Options options;
 	
 	Compiler();
+	Compiler(Options opt);
 	~Compiler();
 	
 	///! enable/disable C++ mode

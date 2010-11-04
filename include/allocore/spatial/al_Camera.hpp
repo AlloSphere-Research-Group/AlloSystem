@@ -10,7 +10,7 @@ namespace al {
 
 ///<	Utility wrapper of Pose for use as a 3D camera
 ///
-class Camera : public Nav {
+class Camera {
 public:
 
 	enum Eye{
@@ -51,9 +51,9 @@ public:
 	double zoom() const { return mZoom; }					///< Get zoom amount
 	double IOD() const { return eyeSep() * focalLength()/30.0; }	///< Get automatic inter-ocular distance
 
-	Matrix4d modelViewMatrix(Eye e=MONO);
-	Matrix4d projectionMatrix(Eye e=MONO);
-	Frustumd frustum(Eye e=MONO);
+//	Matrix4d modelViewMatrix(Eye e=MONO);
+//	Matrix4d projectionMatrix(Eye e=MONO);
+//	Frustumd frustum(Eye e=MONO);
 
 	double height(double distance);							///< Height of view at distance from camera
 
@@ -69,6 +69,29 @@ protected:
 
 	Vec3d mStereoOffset;					// eye offset vector (right eye; left eye is inverse), usually (1, 0, 0)
 };
+
+inline double Camera::height(double distance) {
+	return 2*distance * tan(mFovy*M_DEG2RAD*0.5);
+}
+
+inline Camera :: Camera(
+	double fovy, 
+	double nearClip, 
+	double farClip, 
+	double focalLength, 
+	double eyeSep,
+	double aspectRatio
+)
+:	Nav(Vec3d(0, 0, -4)),
+	mFovy(fovy),
+	mNear(nearClip),
+	mFar(farClip),
+	mFocalLength(focalLength),
+	mEyeSep(eyeSep),
+	mAspectRatio(aspectRatio),
+	mAutoEyeSep(true),
+	mZoom(0)
+{	smooth(0.8); }
 
 } // al::
 
