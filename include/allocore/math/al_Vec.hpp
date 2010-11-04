@@ -282,23 +282,31 @@ public:
 
 	Mat(){ set(T(0)); }
 
+	/// param[in] arr	one dimensional array in column-major
 	Mat(const T * arr){ set(arr); }
 
 	Mat(
-		const T& v11, const T& v21, const T& v31,
-		const T& v12, const T& v22, const T& v32,
-		const T& v13, const T& v23, const T& v33
+		const T& r1c1, const T& r1c2, const T& r1c3,
+		const T& r2c1, const T& r2c2, const T& r2c3,
+		const T& r3c1, const T& r3c2, const T& r3c3
 	){
-		set(v11,v21,v31, v12,v22,v32, v13,v23,v33);
+		set(r1c1, r1c2, r1c3,
+			r2c1, r2c2, r2c3,
+			r3c1, r3c2, r3c3
+		);
 	}
 
 	Mat(
-		const T& v11, const T& v21, const T& v31, const T& v41,
-		const T& v12, const T& v22, const T& v32, const T& v42,
-		const T& v13, const T& v23, const T& v33, const T& v43,
-		const T& v14, const T& v24, const T& v34, const T& v44
+		const T& r1c1, const T& r1c2, const T& r1c3, const T& r1c4,
+		const T& r2c1, const T& r2c2, const T& r2c3, const T& r2c4,
+		const T& r3c1, const T& r3c2, const T& r3c3, const T& r3c4,
+		const T& r4c1, const T& r4c2, const T& r4c3, const T& r4c4
 	){
-		set(v11,v21,v31,v41, v12,v22,v32,v42, v13,v23,v33,v43, v14,v24,v34,v44);
+		set(r1c1, r1c2, r1c3, r1c4,
+			r2c1, r2c2, r2c3, r2c4,
+			r3c1, r3c2, r3c3, r3c4,
+			r4c1, r4c2, r4c3, r4c4
+		);
 	}
 
 	/// Set element at index with no bounds checking
@@ -359,26 +367,26 @@ public:
 	}
 	
 	Mat& set(
-		const T& v11, const T& v21, const T& v31,
-		const T& v12, const T& v22, const T& v32,
-		const T& v13, const T& v23, const T& v33
+		const T& r1c1, const T& r1c2, const T& r1c3,
+		const T& r2c1, const T& r2c2, const T& r2c3,
+		const T& r3c1, const T& r3c2, const T& r3c3
 	){
-		elems[0] = v11; elems[3] = v12; elems[6] = v13;
-		elems[1] = v21; elems[4] = v22; elems[7] = v23;
-		elems[2] = v31; elems[5] = v32; elems[8] = v33;
+		elems[0] = r1c1; elems[3] = r1c2; elems[6] = r1c3;
+		elems[1] = r2c1; elems[4] = r2c2; elems[7] = r2c3;
+		elems[2] = r3c1; elems[5] = r3c2; elems[8] = r3c3;
 		return *this;
 	}
 	
 	Mat& set(
-		const T& v11, const T& v21, const T& v31, const T& v41,
-		const T& v12, const T& v22, const T& v32, const T& v42,
-		const T& v13, const T& v23, const T& v33, const T& v43,
-		const T& v14, const T& v24, const T& v34, const T& v44
+		const T& r1c1, const T& r1c2, const T& r1c3, const T& r1c4,
+		const T& r2c1, const T& r2c2, const T& r2c3, const T& r2c4,
+		const T& r3c1, const T& r3c2, const T& r3c3, const T& r3c4,
+		const T& r4c1, const T& r4c2, const T& r4c3, const T& r4c4
 	){
-		elems[0] = v11; elems[4] = v12; elems[8] = v13; elems[12] = v14;
-		elems[1] = v21; elems[5] = v22; elems[9] = v23; elems[13] = v24;
-		elems[2] = v31; elems[6] = v32; elems[10] = v33; elems[14] = v34;
-		elems[3] = v41; elems[7] = v42; elems[11] = v43; elems[15] = v44;
+		elems[0] = r1c1; elems[4] = r1c2; elems[ 8] = r1c3; elems[12] = r1c4;
+		elems[1] = r2c1; elems[5] = r2c2; elems[ 9] = r2c3; elems[13] = r2c4;
+		elems[2] = r3c1; elems[6] = r3c2; elems[10] = r3c3; elems[14] = r3c4;
+		elems[3] = r4c1; elems[7] = r4c2; elems[11] = r4c3; elems[15] = r4c4;
 		return *this;
 	}
 

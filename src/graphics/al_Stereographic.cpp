@@ -4,7 +4,7 @@
 namespace al {
 namespace gfx {
 
-void Stereographic :: draw(Graphics& gl, Camera& cam, Pose& pose, ViewPort& viewport, Drawable& draw) {
+void Stereographic :: draw(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw) {
 	if(mStereo){
 		switch(mMode){
 			case Anaglyph:	drawAnaglyph(gl, cam, pose, viewport, draw); return;
@@ -19,7 +19,7 @@ void Stereographic :: draw(Graphics& gl, Camera& cam, Pose& pose, ViewPort& view
 	}
 }
 
-void Stereographic :: drawMono(Graphics& gl, Camera& cam, Pose& pose, ViewPort& viewport, Drawable& draw) 
+void Stereographic :: drawMono(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw) 
 {
 	double fovy = cam.fovy();
 	double near = cam.near();
@@ -66,7 +66,7 @@ void Stereographic :: drawMono(Graphics& gl, Camera& cam, Pose& pose, ViewPort& 
 	glPopAttrib();
 }
 
-void Stereographic :: drawAnaglyph(Graphics& gl, Camera& cam, Pose& pose, ViewPort& viewport, Drawable& draw) 
+void Stereographic :: drawAnaglyph(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw) 
 {
 	double fovy = cam.fovy();
 	double near = cam.near();
@@ -187,7 +187,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, Camera& cam, Pose& pose, ViewPo
 	glPopAttrib();
 }
 
-void Stereographic :: drawActive(Graphics& gl, Camera& cam, Pose& pose, ViewPort& viewport, Drawable& draw) 
+void Stereographic :: drawActive(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw) 
 {
 	double fovy = cam.fovy();
 	double near = cam.near();
@@ -258,7 +258,7 @@ void Stereographic :: drawActive(Graphics& gl, Camera& cam, Pose& pose, ViewPort
 	glPopAttrib();
 }
 
-void Stereographic :: drawDual(Graphics& gl, Camera& cam, Pose& pose, ViewPort& viewport, Drawable& draw) 
+void Stereographic :: drawDual(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw) 
 {
 	double fovy = cam.fovy();
 	double near = cam.near();
@@ -331,7 +331,7 @@ void Stereographic :: drawDual(Graphics& gl, Camera& cam, Pose& pose, ViewPort& 
 
 
 
-void Stereographic :: drawLeft(Graphics& gl, Camera& cam, Pose& pose, ViewPort& viewport, Drawable& draw) 
+void Stereographic :: drawLeft(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw) 
 {
 	double fovy = cam.fovy();
 	double near = cam.near();
@@ -379,7 +379,7 @@ void Stereographic :: drawLeft(Graphics& gl, Camera& cam, Pose& pose, ViewPort& 
 	glPopAttrib();
 }
 
-void Stereographic :: drawRight(Graphics& gl, Camera& cam, Pose& pose, ViewPort& viewport, Drawable& draw) 
+void Stereographic :: drawRight(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw) 
 {
 	double fovy = cam.fovy();
 	double near = cam.near();

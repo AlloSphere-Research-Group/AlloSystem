@@ -39,18 +39,18 @@ public:
 		0, 0, 0, 1
 	)
 	{}
-	
+
 	Matrix4(
-		const T& v11, const T& v21, const T& v31, const T& v41,
-		const T& v12, const T& v22, const T& v32, const T& v42,
-		const T& v13, const T& v23, const T& v33, const T& v43,
-		const T& v14, const T& v24, const T& v34, const T& v44
+		const T& r1c1, const T& r1c2, const T& r1c3, const T& r1c4,
+		const T& r2c1, const T& r2c2, const T& r2c3, const T& r2c4,
+		const T& r3c1, const T& r3c2, const T& r3c3, const T& r3c4,
+		const T& r4c1, const T& r4c2, const T& r4c3, const T& r4c4
 	)
 	:	Base(
-			v11, v21, v31, v41,
-			v12, v22, v32, v42,
-			v13, v23, v33, v43,
-			v14, v24, v34, v44
+			r1c1, r1c2, r1c3, r1c4,
+			r2c1, r2c2, r2c3, r2c4,
+			r3c1, r3c2, r3c3, r3c4,
+			r4c1, r4c2, r4c3, r4c4
 		)
 	{}
 	
@@ -61,10 +61,10 @@ public:
 		const Vec3<T>& position
 	)
 	:	Base(
-			xaxis[0], xaxis[1], xaxis[2], 0,
-			yaxis[0], yaxis[1], yaxis[2], 0,
-			zaxis[0], zaxis[1], zaxis[2], 0,
-			position[0], position[1], position[2], 1
+			xaxis[0], yaxis[0], zaxis[0], position[0],
+			xaxis[1], yaxis[1], zaxis[1], position[1],
+			xaxis[2], yaxis[2], zaxis[2], position[2],
+			0, 0, 0, 1
 		)
 	{}
 	
@@ -84,7 +84,7 @@ public:
 		return q;
 	}
 	Matrix4& fromQuat(Quat<T>& q) { q.toMatrix(Base::elems); return *this; }
-	Matrix4& fromQuatGL(Quat<T>& q) { q.toMatrixGL(Base::elems); return *this; }
+	Matrix4& fromQuatTransposed(Quat<T>& q) { q.toMatrixTransposed(Base::elems); return *this; }
 		
 	static const Matrix4 identity() {
 		return Matrix4(
@@ -97,10 +97,10 @@ public:
 	
 	static const Matrix4 translate(T x, T y, T z) {
 		return Matrix4(
-			1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			x, y, z, 1
+			1, 0, 0, x,
+			0, 1, 0, y,
+			0, 0, 1, z,
+			0, 0, 0, 1
 		);
 	}	
 	
@@ -116,26 +116,26 @@ public:
 	static const Matrix4 rotateYZ(T theta) {
 		const T C = cos(theta); 
 		const T S = sin(theta);
-		return Matrix4(	1,	0,	0,	0, 
-						0,	C,	S,	0, 
-						0,	-S,	C,	0, 
-						0,	0,	0,	1	);
+		return Matrix4(	1, 0, 0, 0, 
+						0, C,-S, 0, 
+						0, S, C, 0, 
+						0, 0, 0, 1);
 	}
 	static const Matrix4 rotateZX(T theta) {
 		const T C = cos(theta); 
 		const T S = sin(theta);
-		return Matrix4(	C,	0,	-S,	0, 
-						0,	1,	0,	0, 
-						S,	0,	C,	0, 
-						0,	0,	0,	1 );
+		return Matrix4(	C, 0, S, 0, 
+						0, 1, 0, 0, 
+						-S,0, C, 0, 
+						0, 0, 0, 1);
 	}
 	static const Matrix4 rotateXY(T theta) {
 		const T C = cos(theta); 
 		const T S = sin(theta);
-		return Matrix4(	C,	S,	0,	0, 
-						-S,	C,	0,	0, 
-						0,	0,	1,	0, 
-						0,	0,	0,	1	);
+		return Matrix4(	C,-S, 0, 0, 
+						S, C, 0, 0, 
+						0, 0, 1, 0, 
+						0, 0, 0, 1);
 	}
 
 	static const Matrix4 rotate(float angle, const Vec<3, T> &v) {
@@ -168,21 +168,21 @@ public:
 	}
 	
 	static const Matrix4 shearYZ(T y, T z) {
-		return Matrix4(	1,	y,	z,	0,
-						0,	1,	0,	0,
-						0,	0,	1,	0,
+		return Matrix4(	1,	0,	0,	0,
+						y,	1,	0,	0,
+						z,	0,	1,	0,
 						0,	0,	0,	1	);
 	}
 	static const Matrix4 shearZX(T z, T x) {
-		return Matrix4(	1,	0,	0,	0,
-						x,	1,	z,	0,
-						0,	0,	1,	0,
+		return Matrix4(	1,	x,	0,	0,
+						0,	1,	0,	0,
+						0,	z,	1,	0,
 						0,	0,	0,	1	);
 	}
 	static const Matrix4 shearXY(T x, T y) {
-		return Matrix4(	1,	0,	0,	0,
-						0,	1,	0,	0,
-						x,	y,	1,	0,
+		return Matrix4(	1,	0,	x,	0,
+						0,	1,	y,	0,
+						0,	0,	1,	0,
 						0,	0,	0,	1	);
 	}
 		
@@ -192,19 +192,19 @@ public:
 		const T D = f-n;	const T D2 = f+n;
 		const T n2 = n*2;
 		const T fn2 = f*n2;
-		return Matrix4(	n2/W,	0,		0,		0, 
-						0,		n2/H,	0,		0, 
-						W2/W,	H2/H,	-D2/D,	-1,
-						0,		0,		-fn2/D,	0 );
+		return Matrix4(	n2/W,	0,		W2/W,		0, 
+						0,		n2/H,	H2/H,		0, 
+						0,		0,		-D2/D,	-fn2/D,
+						0,		0,		-1,			0 );
 	}
 	
 	static const Matrix4 perspective(T fovy, T aspect, T near, T far) {
 		float f = 1/tan(fovy*M_DEG2RAD/2.);
 		return Matrix4(
-			f/aspect, 0, 0, 0,
-			0, f, 0, 0,
-			0, 0, (far+near)/(near-far), -1,
-			0, 0, (2*far*near)/(near-far), 0
+			f/aspect,	0, 0,						0,
+			0,			f, 0,						0,
+			0,			0, (far+near)/(near-far),	(2*far*near)/(near-far),
+			0,			0, -1,						0
 		);
 	}
 	
@@ -230,38 +230,38 @@ public:
 		const T D = f-n;	const T D2 = f+n;
 		const T n2 = n*2;
 		const T fn2 = f*n2;
-		return Matrix4(	W/n2,	0,		0,		0,
-						0,		H/n2,	0,		0,
-						0,		0,		0,		-D/fn2,
-						W2/n2,	H2/n2,	-1,		D2/fn2	);
+		return Matrix4(	W/n2,	0,		0,		W2/n2,
+						0,		H/n2,	0,		H2/n2,
+						0,		0,		0,		-1,
+						0,		0,		-D/fn2,	D2/fn2	);
 	}
 	
 	static const Matrix4 ortho(T l, T r, T b, T t, T n, T f) {
 		const T W = r-l;	const T W2 = r+l;
 		const T H = t-b;	const T H2 = t+b;
 		const T D = f-n;	const T D2 = f+n;
-		return Matrix4(	2/W,	0,		0,		0,
-						0,		2/H,	0,		0,
-						0,		0,		-2/D,	0,
-						-W2/W,	-H2/H,	-D2/D,	1	);
+		return Matrix4(	2/W,	0,		0,		-W2/W,
+						0,		2/H,	0,		-H2/H,
+						0,		0,		-2/D,	-D2/D,
+						0,		0,		0,		1	);
 	}
 	
 	static const Matrix4 unOrtho(T l, T r, T b, T t, T n, T f) {
 		const T W = r-l;	const T W2 = r+l;
 		const T H = t-b;	const T H2 = t+b;
 		const T D = f-n;	const T D2 = f+n;
-		return Matrix4(	W/2,	0,		0,		0,
-						0,		H/2,	0,		0,
-						0,		0,		D/-2,	0,
-						W2/2,	H2/2,	D2/2,	1	);
+		return Matrix4(	W/2,	0,		0,		W2/2,
+						0,		H/2,	0,		H2/2,
+						0,		0,		D/-2,	D2/2,
+						0,		0,		0,		1	);
 	}
 	
 	static const Matrix4 lookAt(const Vec3<T>& ux, const Vec3<T>& uy, const Vec3<T>& uz, const Vec3<T>& pos) {
 		return Matrix4(
-			ux[0], uy[0], -uz[0], 0,
-			ux[1], uy[1], -uz[1], 0,
-			ux[2], uy[2], -uz[2], 0,
-			-(ux.dot(pos)), -(uy.dot(pos)), (uz.dot(pos)), 1
+			 ux[0], ux[1], ux[2], -(ux.dot(pos)),
+			 uy[0], uy[1], uy[2], -(uy.dot(pos)),
+			-uz[0],-uz[1],-uz[2],  (uz.dot(pos)),
+			0, 0, 0, 1
 		);
 	}
 	

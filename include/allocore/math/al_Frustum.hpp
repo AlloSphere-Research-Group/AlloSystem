@@ -39,7 +39,10 @@ template <class T> class Frustum;
 typedef Frustum<double> Frustumd;
 
 
-/// Frustum geometry
+/// Rectangular frustum
+
+/// A frustum has the shape of a four-sided pyramid truncated at the top.
+/// For graphics, this specifies the viewing frustum of a camera.
 template <class T>
 class Frustum{
 public:
@@ -47,7 +50,6 @@ public:
 	enum{ TOP=0, BOTTOM, LEFT, RIGHT, NEARP, FARP };
 	enum{ OUTSIDE, INTERSECT, INSIDE };
 
-	Plane<T> pl[6];
 	Vec3<T> ntl,ntr,nbl,nbr,ftl,ftr,fbl,fbr;	// frustum vertices
 //	T mNear, mFar;			// clipping z distances
 //	T mRatio;				// aspect ratio
@@ -68,6 +70,9 @@ public:
 	
 	/// Test whether axis-aligned box is in frustum
 	int boxInFrustum(const Vec3<T>& xyz, const Vec3<T>& dim) const;
+
+protected:
+	Plane<T> pl[6];		// planes comprising the frustum, used for efficient testing	
 };
 
 

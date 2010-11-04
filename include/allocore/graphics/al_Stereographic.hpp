@@ -35,11 +35,11 @@ namespace al {
 namespace gfx{
 
 
-struct ViewPort {
+struct Viewport {
 	int b, l, w, h;	///! bottom, left, width, height
 	
-	ViewPort(int b, int l, int w, int h) : b(b), l(l), w(w), h(h) {}
-	ViewPort(int w, int h) : b(0), l(0), w(w), h(h) {}
+	Viewport(int b, int l, int w, int h) : b(b), l(l), w(w), h(h) {}
+	Viewport(int w, int h) : b(0), l(0), w(w), h(h) {}
 	
 	double aspect() { return w/(double)h; }
 };
@@ -69,15 +69,15 @@ public:
 	~Stereographic() {}
 
 	///< draw the scene according to the stored stereographic mode
-	void draw(Graphics& gl, Camera& cam, Pose& pose, ViewPort& viewport, Drawable& draw);
+	void draw(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw);
 	
 	/// So many different ways to draw :-)
-	void drawMono(Graphics& gl, Camera& cam, Pose& pose, ViewPort& viewport, Drawable& draw);
-	void drawActive(Graphics& gl, Camera& cam, Pose& pose, ViewPort& viewport, Drawable& draw);
-	void drawAnaglyph(Graphics& gl, Camera& cam, Pose& pose, ViewPort& viewport, Drawable& draw);
-	void drawDual(Graphics& gl, Camera& cam, Pose& pose, ViewPort& viewport, Drawable& draw);
-	void drawLeft(Graphics& gl, Camera& cam, Pose& pose, ViewPort& viewport, Drawable& draw);
-	void drawRight(Graphics& gl, Camera& cam, Pose& pose, ViewPort& viewport, Drawable& draw);
+	void drawMono(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw);
+	void drawActive(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw);
+	void drawAnaglyph(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw);
+	void drawDual(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw);
+	void drawLeft(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw);
+	void drawRight(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw);
 	
 	/// Blue line sync for active stereo (for those projectors that need it)
 	/// add this call at the end of rendering (just before the swap buffers call)

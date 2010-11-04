@@ -137,8 +137,9 @@ public:
 
 	/// Convert to 4x4 column-major matrix
 	void toMatrix(T * matrix) const;
+
 	/// Convert to 4x4 row-major matrix
-	void toMatrixGL(T * matrix) const;
+	void toMatrixTransposed(T * matrix) const;
 
 	/// Convert to axis-angle form
 	void toAxisAngle(T * aa, T * ax, T * ay, T * az) const;
@@ -400,7 +401,7 @@ inline Quat<T> Quat<T> :: fromMatrixGL(T *m) {
 }
 
 template<typename T>
-inline void Quat<T> :: toMatrix(T * m) const {
+inline void Quat<T> :: toMatrixTransposed(T * m) const {
 
 	static const T _2 = T(2);
 	static const T _1 = T(1);
@@ -428,7 +429,7 @@ inline void Quat<T> :: toMatrix(T * m) const {
 }
 
 template<typename T>
-inline void Quat<T> :: toMatrixGL(T * m) const {
+inline void Quat<T> :: toMatrix(T * m) const {
 
 	static const T _2 = T(2);
 	static const T _1 = T(1);

@@ -176,8 +176,6 @@ int utMath(){
 				4,5,6,
 				7,8,9
 		);
-		
-		a.transpose();	// data stored column-major
 
 		assert(a.col(0) == Vec3d(1,4,7));
 		assert(a.col(1) == Vec3d(2,5,8));
@@ -185,7 +183,16 @@ int utMath(){
 		assert(a.row(0) == Vec3d(1,2,3));
 		assert(a.row(1) == Vec3d(4,5,6));
 		assert(a.row(2) == Vec3d(7,8,9));
-		
+
+		a.transpose();
+
+		assert(a.col(0) == Vec3d(1,2,3));
+		assert(a.col(1) == Vec3d(4,5,6));
+		assert(a.col(2) == Vec3d(7,8,9));
+		assert(a.row(0) == Vec3d(1,4,7));
+		assert(a.row(1) == Vec3d(2,5,8));
+		assert(a.row(2) == Vec3d(3,6,9));
+
 		#undef CHECK
 	}
 
@@ -210,7 +217,10 @@ int utMath(){
 	}
 
 	// Quat
-	{	
+	{
+
+		
+
 //		Quatd q(0,0,0,0);
 //		#define T(x, y) assert(x == y);
 //		T(q, Quatd(0,0,0,0))
