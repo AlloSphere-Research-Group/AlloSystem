@@ -9,6 +9,22 @@ namespace al {
 
 template<class T> class Matrix4;
 
+/*
+	The constructor will map into memory locations as follows:
+
+	Matrix4(arg1, arg2, arg3, ...)
+		
+	arg1 ->m[0]	arg2 ->m[4]	arg3 ->m[8]		arg4 ->m[12]
+	arg5 ->m[1]	arg6 ->m[5]	arg7 ->m[9]		arg8 ->m[13]
+	arg9 ->m[2]	arg10->m[6]	arg11->m[10]	arg12->m[14]
+	arg13->m[3]	arg14->m[7]	arg15->m[11]	arg16->m[15]	
+	
+	Matrix4(r1c1, r1c2, r1c3, r1c4, 
+			r2c1, r2c2, r2c3, r2c4, 
+			r3c1, r3c2, r3c3, r3c4, 
+			r4c1, r4c2, r4c3, r4c4)
+*/
+
 /// 4x4 Matrix (Homogenous Transform)
 template<typename T=double>
 class Matrix4 : public Mat<4, T> {	

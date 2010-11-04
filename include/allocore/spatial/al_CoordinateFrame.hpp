@@ -43,7 +43,7 @@ public:
 	/// Convert to homogenous coordinate 4x4 matrix
 	Mat4d matrix() const {
 		Mat4d m;
-		quat().toMatrix(&m[0]);
+		quat().toMatrixGL(&m[0]);
 		m.transpose();
 		m.set(&vec()[0], 3, 12);
 		return m;
