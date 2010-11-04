@@ -28,7 +28,7 @@
 */
 
 /*
-	C++ helper wrapeprs for al_time
+	C++ helper wrappers for al_time
 */
 
 #include "allocore/system/al_Time.h"
@@ -38,6 +38,8 @@ namespace al{
 /// Sleep for an interval of seconds
 inline void wait(al_sec dt){ al_sleep(dt); }
 
+/// Get current wall time in seconds
+inline al_sec time(){ return al_time(); }
 
 /// Timer with stopwatch-like functionality for benchmarking, etc.
 class Timer {
