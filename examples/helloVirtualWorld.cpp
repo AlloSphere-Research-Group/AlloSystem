@@ -74,6 +74,7 @@ AudioScene scene(3, 1, AUDIO_BLOCK_SIZE);
 Listener * listener;
 Nav navMaster(Vec3d(0,0,-4), 0.95);
 std::vector<Agent> agents(1);
+gfx::Stereographic stereo;
 
 
 void audioCB(AudioIOData& io){
@@ -100,14 +101,12 @@ struct MyWindow : public Window, public gfx::Drawable{
 
 	bool onFrame(){
 
-		nav.step();
-		cam.set(navMaster);
-		cam *= nav;
-		cam.updateUnitVectors();
+		Pose pose(navMaster * transform);
 		
-		listener->pos(cam.pos());
+		listener->pos(pose.pos());
 
-		stereo.draw(gl, cam, *this, dimensions().w, dimensions().h);
+		gfx::Viewport vp(dimensions().w, dimensions().h);
+		stereo.draw(gl, cam, pose, vp, *this);
 		
 		return true;
 	}
@@ -120,9 +119,8 @@ struct MyWindow : public Window, public gfx::Drawable{
 	}
 
 	gfx::Graphics gl;
-	Nav nav;
+	Pose transform;
 	Camera cam;
-	gfx::Stereographic stereo;
 };
 
 
@@ -143,7 +141,7 @@ int main (int argc, char * argv[]){
 		windows[i].add(new StandardWindowKeyControls);
 		windows[i].add(new NavInputControl(&navMaster));
 		windows[i].create(Window::Dim(600,480,i*650), "Hello Virtual World!");
-		windows[i].nav.turnU(i*180);
+		windows[i].transform.quat(Quatd::fromAxisAngle(i*180, 0, 1, 0));
 	}
 
 	AudioIO audioIO(AUDIO_BLOCK_SIZE, 44100, audioCB, 0, 2, 1);
