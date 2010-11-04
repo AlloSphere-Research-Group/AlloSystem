@@ -138,8 +138,8 @@ int main (int argc, char * argv[]){
 
 	listener = &scene.createListener(2);
 	
-	listener->speakerPos(0,0,-90);
-	listener->speakerPos(1,1, 90);
+	listener->speakerPos(0,0,-60);
+	listener->speakerPos(1,1, 60);
 //	listener->speakerPos(0,0,-45);
 //	listener->speakerPos(1,1, 45);
 	
