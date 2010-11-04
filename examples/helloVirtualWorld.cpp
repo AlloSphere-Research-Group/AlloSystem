@@ -31,7 +31,7 @@ struct Agent : public SoundSource, public gfx::Drawable{
 			//float s = phase * 2 - 1;
 			oscPhase += 440./io.framesPerSecond();
 			if(oscPhase >= 1) oscPhase -= 1;
-			writeSample(s*0.2);
+			writeSample(s*1);
 		}
 	}
 	
@@ -87,6 +87,7 @@ void audioCB(AudioIOData& io){
 	}
 
 	navMaster.step(0.5);
+	listener->pos(navMaster.pos());
 
 	scene.encode(numFrames, io.framesPerSecond());
 	scene.render(&io.out(0,0), numFrames);
@@ -103,10 +104,19 @@ struct MyWindow : public Window, public gfx::Drawable{
 
 		Pose pose(navMaster * transform);
 		
-		listener->pos(pose.pos());
+		//listener->pos(pose.pos());
 
 		gfx::Viewport vp(dimensions().w, dimensions().h);
 		stereo.draw(gl, cam, pose, vp, *this);
+		
+		return true;
+	}
+	
+	bool onKeyDown(const Keyboard& k) {
+		
+		if (k.key() == Key::Tab) {
+			stereo.stereo(!stereo.stereo());
+		}
 		
 		return true;
 	}
