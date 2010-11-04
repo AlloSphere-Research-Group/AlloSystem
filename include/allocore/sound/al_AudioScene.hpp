@@ -37,11 +37,17 @@ public:
 protected:
 	friend class AudioScene;
 	
-	Listener(int dim, int order, int numspeakers, int flavor, int numFrames) 
+	Listener(int dim, int order, int numspeakers, int flavor, int numFrames_) 
 	:	mDecoder(dim, order, numspeakers, flavor) 
 	{
-		mQuatHistory.resize(numFrames);
-		mAmbiDomainChannels.resize(mDecoder.channels() * numFrames);
+		numFrames(numFrames_);
+	}
+	
+	void numFrames(unsigned v){
+		if(mQuatHistory.size() != v) mQuatHistory.resize(v);
+		if(mAmbiDomainChannels.size() != (mDecoder.channels() * v)){
+			mAmbiDomainChannels.resize(mDecoder.channels() * v);
+		}
 	}
 	
 	AmbiDecode mDecoder;
@@ -150,7 +156,16 @@ public:
 	int dim() const { return mEncoder.dim(); }
 	int order() const { return mEncoder.order(); }
 	
-	// TODO: setNumFrames
+	void numFrames(int v){
+		if(mNumFrames != v){
+			Listeners::iterator it = mListeners.begin();
+			while(it != mListeners.end()){
+				(*it)->numFrames(v);
+				++it;
+			}
+			mNumFrames = v;
+		}
+	}
 
 	Listener& createListener(int numspeakers) {
 		Listener * l = new Listener(dim(), order(), numspeakers, 1, mNumFrames);
