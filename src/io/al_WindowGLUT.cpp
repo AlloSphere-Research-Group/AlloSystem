@@ -613,9 +613,11 @@ Window& Window::show(){ makeActive(); glutShowWindow(); return *this; }
 
 Window& Window::title(const std::string& v){
 	mImpl->mTitle = v;
-	glutSetWindow(mImpl->mID);
-	glutSetWindowTitle(mImpl->mTitle.c_str());
-	//printf("Window::title(%s)\n", mImpl->mTitle.c_str());
+	if(mImpl->created()){
+		glutSetWindow(mImpl->mID);
+		glutSetWindowTitle(mImpl->mTitle.c_str());
+		//printf("Window::title(%s)\n", mImpl->mTitle.c_str());
+	}
 	return *this;
 }
 
