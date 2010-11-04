@@ -246,6 +246,7 @@ public:
 	void blending(bool enable, BlendFunc src, BlendFunc dst);
 	void depthTesting(bool enable);
 	void lighting(bool enable);
+	void scissor(bool enable);
 	void pushState(State &state);
 	void popState();
 

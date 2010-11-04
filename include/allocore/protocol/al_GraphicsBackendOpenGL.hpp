@@ -56,6 +56,7 @@ public:
 	virtual void enableLighting(bool enable);
 	virtual void enableLight(bool enable, int idx);
 	virtual void enableDepthTesting(bool enable);
+	virtual void enableScissor(bool enable);
 	virtual void setPolygonMode(PolygonMode mode);
 	virtual void setAntialiasing(AntiAliasMode mode);
 	virtual void color(const Color &c);

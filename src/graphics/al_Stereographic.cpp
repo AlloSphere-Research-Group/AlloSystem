@@ -40,11 +40,7 @@ void Stereographic :: drawMono(Graphics& gl, Camera& cam, Pose& pose, ViewPort& 
 	//gl.drawBuffer(Back);
 	glDrawBuffer(GL_BACK);
 	
-	// GraphicsBackedOpenGL should also apply matching glScissor() 
-//	//enable(ScissorTest);
-//	glEnable(GL_SCISSOR_TEST);
-//	//scissor(vp.left(),vp.bottom(), width * vp.width(), height * vp.height());
-//	glScissor(0, 0, width, height);
+	gl.scissor(true);
 	gl.viewport(viewport.l, viewport.b, viewport.w, viewport.h);
 	
 	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
@@ -65,8 +61,7 @@ void Stereographic :: drawMono(Graphics& gl, Camera& cam, Pose& pose, ViewPort& 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.popMatrix();
 	
-	//disable(ScissorTest);
-	//glDisable(GL_SCISSOR_TEST);
+	gl.scissor(false);
 	//popAttrib()
 	glPopAttrib();
 }
@@ -94,11 +89,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, Camera& cam, Pose& pose, ViewPo
 	//drawBuffer(BackLeft);
 	glDrawBuffer(GL_BACK);
 	
-	// GraphicsBackedOpenGL should also apply matching glScissor() 
-//	//enable(ScissorTest);
-//	glEnable(GL_SCISSOR_TEST);
-//	//scissor(vp.left(),vp.bottom(), width * vp.width(), height * vp.height());
-//	glScissor(0, 0, width, height);
+	gl.scissor(true);
 	gl.viewport(viewport.l, viewport.b, viewport.w, viewport.h);
 	
 	gl.clear(gfx::COLOR_BUFFER_BIT);
@@ -190,8 +181,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, Camera& cam, Pose& pose, ViewPo
 	//colorMask(1,1,1,1);
 	glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
 	
-//	//disable(ScissorTest);
-//	glDisable(GL_SCISSOR_TEST);
+	gl.scissor(false);
 
 //	//popAttrib()
 	glPopAttrib();
@@ -222,11 +212,7 @@ void Stereographic :: drawActive(Graphics& gl, Camera& cam, Pose& pose, ViewPort
 	
 	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 	
-	// GraphicsBackedOpenGL should also apply matching glScissor() 
-//	//enable(ScissorTest);
-//	glEnable(GL_SCISSOR_TEST);
-//	//scissor(vp.left(),vp.bottom(), width * vp.width(), height * vp.height());
-//	glScissor(0, 0, width, height);
+	gl.scissor(true);
 	gl.viewport(viewport.l, viewport.b, viewport.w, viewport.h);
 
 	// apply camera transform:
@@ -249,11 +235,6 @@ void Stereographic :: drawActive(Graphics& gl, Camera& cam, Pose& pose, ViewPort
 	glDrawBuffer(GL_BACK_RIGHT);
 	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 	
-	// GraphicsBackedOpenGL should also apply matching glScissor() 
-//	//enable(ScissorTest);
-//	glEnable(GL_SCISSOR_TEST);
-//	//scissor(vp.left(),vp.bottom(), width * vp.width(), height * vp.height());
-//	glScissor(0, 0, width, height);
 	gl.viewport(viewport.l, viewport.b, viewport.w, viewport.h);
 
 	// apply camera transform:
@@ -272,8 +253,7 @@ void Stereographic :: drawActive(Graphics& gl, Camera& cam, Pose& pose, ViewPort
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.popMatrix();
 	
-	//disable(ScissorTest);
-	//glDisable(GL_SCISSOR_TEST);
+	gl.scissor(false);
 	//popAttrib()
 	glPopAttrib();
 }
@@ -303,9 +283,7 @@ void Stereographic :: drawDual(Graphics& gl, Camera& cam, Pose& pose, ViewPort& 
 	//drawBuffer(BackLeft);
 	glDrawBuffer(GL_BACK);
 	
-	// GraphicsBackedOpenGL should also apply matching glScissor() 
-//	glEnable(GL_SCISSOR_TEST);
-//	glScissor(0, 0, width*0.5, height);
+	gl.scissor(false);
 	gl.viewport(viewport.l, viewport.b, viewport.w*0.5, viewport.h);
 	
 	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
@@ -326,8 +304,6 @@ void Stereographic :: drawDual(Graphics& gl, Camera& cam, Pose& pose, ViewPort& 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.popMatrix();
 	
-	// GraphicsBackedOpenGL should also apply matching glScissor() 
-//	glScissor(width*0.5, 0, width*0.5, height);
 	gl.viewport(viewport.l + viewport.w*0.5, viewport.b, viewport.w*0.5, viewport.h);
 	
 	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
@@ -348,8 +324,7 @@ void Stereographic :: drawDual(Graphics& gl, Camera& cam, Pose& pose, ViewPort& 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.popMatrix();
 	
-	//disable(ScissorTest);
-	//glDisable(GL_SCISSOR_TEST);
+	gl.scissor(false);
 	//popAttrib()
 	glPopAttrib();
 }
@@ -378,9 +353,7 @@ void Stereographic :: drawLeft(Graphics& gl, Camera& cam, Pose& pose, ViewPort& 
 	
 	glDrawBuffer(GL_BACK);
 	
-	// GraphicsBackedOpenGL should also apply matching glScissor() 
-//	glEnable(GL_SCISSOR_TEST);
-//	glScissor(0, 0, width, height);
+	gl.scissor(true);
 	gl.viewport(viewport.l, viewport.b, viewport.w, viewport.h);
 	
 	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
@@ -401,8 +374,7 @@ void Stereographic :: drawLeft(Graphics& gl, Camera& cam, Pose& pose, ViewPort& 
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.popMatrix();
 	
-	//disable(ScissorTest);
-	//glDisable(GL_SCISSOR_TEST);
+	gl.scissor(false);
 	//popAttrib()
 	glPopAttrib();
 }
@@ -429,9 +401,8 @@ void Stereographic :: drawRight(Graphics& gl, Camera& cam, Pose& pose, ViewPort&
 	
 	glDrawBuffer(GL_BACK);
 	
-	// GraphicsBackedOpenGL should also apply matching glScissor() 
-//	glEnable(GL_SCISSOR_TEST);
-//	glScissor(0, 0, width, height);
+	
+	gl.scissor(true);
 	gl.viewport(viewport.l, viewport.b, viewport.w, viewport.h);
 	
 	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
@@ -452,8 +423,7 @@ void Stereographic :: drawRight(Graphics& gl, Camera& cam, Pose& pose, ViewPort&
 	gl.matrixMode(gfx::MODELVIEW);
 	gl.popMatrix();
 	
-	//disable(ScissorTest);
-	//glDisable(GL_SCISSOR_TEST);
+	gl.scissor(false);
 	//popAttrib()
 	glPopAttrib();
 }

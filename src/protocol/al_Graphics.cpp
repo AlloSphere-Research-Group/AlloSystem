@@ -184,6 +184,8 @@ void Graphics::depthTesting(bool v){ backend()->enableDepthTesting(v); }
 
 void Graphics::lighting(bool v){ backend()->enableLighting(v); }
 
+void Graphics::scissor(bool v){ backend()->enableScissor(v); }
+
 void Graphics::pushState(State &state) {
 	compareState(mState.top(), state);
 	mState.push(state);

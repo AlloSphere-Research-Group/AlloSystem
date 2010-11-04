@@ -153,6 +153,15 @@ void GraphicsBackendOpenGL::enableDepthTesting(bool enable) {
 	}
 }
 
+void GraphicsBackendOpenGL::enableScissor(bool enable) {
+	if(enable) {
+		glEnable(GL_SCISSOR_TEST);
+	}
+	else {
+		glDisable(GL_SCISSOR_TEST);
+	}
+}
+
 void GraphicsBackendOpenGL::setPolygonMode(PolygonMode mode) {
 	glPolygonMode(GL_FRONT_AND_BACK, gl_polygon_mode(mode));
 }
