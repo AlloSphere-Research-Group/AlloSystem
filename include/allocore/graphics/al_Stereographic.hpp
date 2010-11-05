@@ -37,16 +37,16 @@ namespace gfx{
 
 /// A framed area on a display screen
 struct Viewport {
-	int l, b, w, h;	///< left, bottom, width, height
+	float l, b, w, h;	///< left, bottom, width, height
 
-	Viewport(int w=0, int h=1) : b(0), l(0), w(w), h(h) {}
-	Viewport(int l, int b, int w, int h) : l(l), b(b), w(w), h(h) {}
+	Viewport(float w=0, float h=1) : b(0), l(0), w(w), h(h) {}
+	Viewport(float l, float b, float w, float h) : l(l), b(b), w(w), h(h) {}
 
 	/// Get aspect ratio
-	double aspect() const { return w/(double)h; }
+	float aspect() const { return float(w)/h; }
 
 	/// Set dimensions
-	void set(int l_, int b_, int w_, int h_){ l=l_; b=b_; w=w_; h=h_; }
+	void set(float l_, float b_, float w_, float h_){ l=l_; b=b_; w=w_; h=h_; }
 };
 
 
