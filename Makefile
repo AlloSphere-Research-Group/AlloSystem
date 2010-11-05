@@ -84,20 +84,15 @@ endif
 test: $(SLIB_PATH)
 	@$(MAKE) -C $(TEST_DIR)
 
-loop:
-	@for v in `cd $(INC_DIR)$(LIB_NAME) && find * -type d ! -path '*.*'`; do \
-		echo $$v; \
-	done
-
 # Install library into path specified by DESTDIR
 # Include files are copied into DESTDIR/include/LIB_NAME and
 # library files are copied to DESTDIR/lib
 install: $(SLIB_PATH)
 	@$(INSTALL) -d $(DESTDIR)/lib
 
-	@for v in `cd $(INC_DIR)$(LIB_NAME) && find * -type d ! -path '*.*'`; do \
-		$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)/$$v; \
-		$(INSTALL) -c -m 644 $(INC_DIR)$(LIB_NAME)/$$v/*.h* $(DESTDIR)/include/$(LIB_NAME)/$$v;\
+	@for v in `cd $(INC_DIR) && find * -type d ! -path '*.*'`; do \
+		$(INSTALL) -d $(DESTDIR)/include/$$v; \
+		$(INSTALL) -c -m 644 $(INC_DIR)$$v/*.h* $(DESTDIR)/include/$$v;\
 	done
 
 #	@$(INSTALL) -d $(addprefix $(DESTDIR)/include/$(LIB_NAME)/, $(MODULE_DIRS))
