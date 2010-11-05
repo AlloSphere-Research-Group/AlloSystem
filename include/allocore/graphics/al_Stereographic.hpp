@@ -35,12 +35,13 @@ namespace al {
 namespace gfx{
 
 
+/// A framed area on a display screen
 struct Viewport {
-	int b, l, w, h;	///! bottom, left, width, height
-	
+	int l, b, w, h;	///< left, bottom, width, height
+
+	Viewport(int w=0, int h=1) : b(0), l(0), w(w), h(h) {}
 	Viewport(int l, int b, int w, int h) : l(l), b(b), w(w), h(h) {}
-	Viewport(int w, int h) : b(0), l(0), w(w), h(h) {}
-	
+
 	double aspect() { return w/(double)h; }
 };
 
