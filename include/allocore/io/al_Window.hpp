@@ -203,7 +203,7 @@ struct WindowEventHandler {
 	virtual bool onCreate(){ return true; }					///< Called after window is created with valid OpenGL context
 	virtual bool onDestroy(){ return true; }				///< Called before the window and its OpenGL context are destroyed
 	virtual bool onFrame(){ return true; }					///< Called every frame
-	virtual bool onResize(int w, int h){ return true; }		///< Called whenever window dimensions change
+	virtual bool onResize(int dw, int dh){ return true; }	///< Called whenever window dimensions change
 	virtual bool onVisibility(bool v){ return true; }		///< Called when window changes from hidden to shown and vice versa
 	
 	Window& window(){ return *mWindow; }
@@ -223,9 +223,11 @@ public:
 
 	/// Window pixel dimensions
 	struct Dim{
-		Dim(double w_, double h_, double l_=0, double t_=0): l(l_), t(t_), w(w_), h(h_){}
-		Dim(double v=0): l(0), t(0), w(v), h(v){}
-		double l,t,w,h;
+		int l,t,w,h;
+		Dim(int v=0): l(0), t(0), w(v), h(v){}
+		Dim(int w_, int h_): l(0), t(0), w(w_), h(h_){}
+		Dim(int l_, int t_, int w_, int h_): l(l_), t(t_), w(w_), h(h_){}
+		void set(int l_, int t_, int w_, int h_){l=l_;t=t_;w=w_;h=h_;}
 	};
 
 	Window();
@@ -246,7 +248,10 @@ public:
 	
 	/// Destroys current window and its associated OpenGL context
 	void destroy();
-		
+
+	const Keyboard& keyboard() const { return mKeyboard; }	///< Get current keyboard state
+	const Mouse& mouse() const { return mMouse; }			///< Get current mouse state
+
 	bool cursorHide() const;					///< Whether the cursor is hidden
 	Dim dimensions() const;						///< Get current dimensions of window
 	bool enabled(DisplayMode::t v) const;		///< Get whether display mode flag is set
@@ -256,8 +261,6 @@ public:
 	double spf() const { return 1./fps(); }		///< Returns seconds/frame
 	const std::string& title() const;			///< Get title of window
 	bool visible() const;						///< Get whether window is visible
-	const Keyboard& keyboard(){ return mKeyboard; } ///< Get current keyboard state
-	const Mouse& mouse(){ return mMouse; }		///< Get current mouse state
 
 	Window& cursor(Cursor::t v);				///< Set cursor type
 	Window& cursorHide(bool v);					///< Set cursor hiding
@@ -277,40 +280,29 @@ public:
 	Window& makeActive();						///< Bring window to front
 	Window& show();								///< Show window (if hidden)
 	Window& title(const std::string& v);		///< Set title
-	
-	virtual bool onKeyDown(const Keyboard& k){return true;}	///< Called when a keyboard key is pressed
-	virtual bool onKeyUp(const Keyboard& k){return true;}	///< Called when a keyboard key is released
-	virtual bool onMouseDown(const Mouse& m){return true;}	///< Called when a mouse button is pressed
-	virtual bool onMouseDrag(const Mouse& m){return true;}	///< Called when the mouse moves while a button is down
-	virtual bool onMouseMove(const Mouse& m){return true;}	///< Called when the mouse moves
-	virtual bool onMouseUp(const Mouse& m){return true;}	///< Called when a mouse button is released
 
+	/// Add input event handler
 	Window& add(InputEventHandler * v){
 		mInputEventHandlers.push_back(&(v->window(this)));
 		return *this;
 	}
-	
-	// note: won't remove multiple references!
-	// note 2: maybe mEventHandlers should be a std::list instead?
-	Window& remove(InputEventHandler * v){
-		mInputEventHandlers.erase(std::remove(mInputEventHandlers.begin(), mInputEventHandlers.end(), v), mInputEventHandlers.end());
-		v->mWindow = NULL;
-		return *this;
-	}
-	
-	virtual bool onCreate(){ return true; }				///< Called after window is created with valid OpenGL context
-	virtual bool onDestroy(){ return true; }			///< Called before the window and its OpenGL context are destroyed
-	virtual bool onFrame(){ return true; }				///< Called every frame
-	virtual bool onResize(int w, int h){ return true; }	///< Called whenever window dimensions change
-	virtual bool onVisibility(bool v){ return true; }	///< Called when window changes from hidden to shown and vice 
-	
+
+	/// Add window event handler
 	Window& add(WindowEventHandler * v){
 		mWindowEventHandlers.push_back(&(v->window(this)));
 		return *this;
 	}
 	
 	// note: won't remove multiple references!
-	// note 2: maybe mEventHandlers should be a std::list instead?
+	/// Remove input event handler
+	Window& remove(InputEventHandler * v){
+		mInputEventHandlers.erase(std::remove(mInputEventHandlers.begin(), mInputEventHandlers.end(), v), mInputEventHandlers.end());
+		v->mWindow = NULL;
+		return *this;
+	}
+
+	// note: won't remove multiple references!
+	/// Remove window event handler
 	Window& remove(WindowEventHandler * v){
 		mWindowEventHandlers.erase(std::remove(mWindowEventHandlers.begin(), mWindowEventHandlers.end(), v), mWindowEventHandlers.end());
 		v->mWindow = NULL;
@@ -324,6 +316,9 @@ public:
 	static void stopLoop();
 
 private:
+	// note: maybe mEventHandlers should be a std::list instead?
+	typedef std::vector<InputEventHandler *> InputEventHandlers;
+	typedef std::vector<WindowEventHandler *> WindowEventHandlers;
 	friend class WindowImpl;
 
 	void doFrameImpl();							///< Calls onFrame() and swaps buffers
@@ -331,12 +326,12 @@ private:
 	class WindowImpl * mImpl;
 	Keyboard mKeyboard;
 	Mouse mMouse;
-	std::vector<InputEventHandler *> mInputEventHandlers;
-	std::vector<WindowEventHandler *> mWindowEventHandlers;
+	InputEventHandlers mInputEventHandlers;
+	WindowEventHandlers mWindowEventHandlers;
 
 	#define CALL(e)\
 	if(e){\
-		std::vector<InputEventHandler *>::iterator iter = mInputEventHandlers.begin(); \
+		InputEventHandlers::iterator iter = mInputEventHandlers.begin(); \
 		while(iter != mInputEventHandlers.end()){\
 			if(!(*iter)->e) break;\
 			iter++; \
@@ -352,7 +347,7 @@ private:
 	
 	#define CALL(e)\
 	if(e){\
-		std::vector<WindowEventHandler *>::iterator iter = mWindowEventHandlers.begin(); \
+		WindowEventHandlers::iterator iter = mWindowEventHandlers.begin(); \
 		while(iter != mWindowEventHandlers.end()){\
 			if(!(*iter)->e) break;\
 			iter++; \
