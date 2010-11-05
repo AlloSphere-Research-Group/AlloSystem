@@ -42,7 +42,11 @@ struct Viewport {
 	Viewport(int w=0, int h=1) : b(0), l(0), w(w), h(h) {}
 	Viewport(int l, int b, int w, int h) : l(l), b(b), w(w), h(h) {}
 
-	double aspect() { return w/(double)h; }
+	/// Get aspect ratio
+	double aspect() const { return w/(double)h; }
+
+	/// Set dimensions
+	void set(int l_, int b_, int w_, int h_){ l=l_; b=b_; w=w_; h=h_; }
 };
 
 
