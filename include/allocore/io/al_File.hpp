@@ -196,8 +196,9 @@ inline void SearchPaths::addAppPaths(int argc, char * const argv[], bool recursi
 
 inline void SearchPaths::addAppPaths(bool recursive) {	
 	char cwd[4096];
-	getcwd(cwd, sizeof(cwd));
-	addSearchPath(cwd, recursive);
+	if(getcwd(cwd, sizeof(cwd))){
+		addSearchPath(cwd, recursive);
+	}
 }
 
 inline void SearchPaths::addSearchPath(const std::string& src, bool recursive) {

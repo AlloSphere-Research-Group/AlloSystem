@@ -28,6 +28,7 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
+#include <algorithm>
 #include <vector>
 #include <string>
 
