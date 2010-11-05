@@ -38,7 +38,7 @@ namespace gfx{
 struct Viewport {
 	int b, l, w, h;	///! bottom, left, width, height
 	
-	Viewport(int b, int l, int w, int h) : b(b), l(l), w(w), h(h) {}
+	Viewport(int l, int b, int w, int h) : l(l), b(b), w(w), h(h) {}
 	Viewport(int w, int h) : b(0), l(0), w(w), h(h) {}
 	
 	double aspect() { return w/(double)h; }
