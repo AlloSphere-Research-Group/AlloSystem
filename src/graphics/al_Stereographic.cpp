@@ -4,7 +4,7 @@
 namespace al {
 namespace gfx {
 
-void Stereographic :: draw(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw) {
+void Stereographic :: draw(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& viewport, Drawable& draw) {
 	if(mStereo){
 		switch(mMode){
 			case Anaglyph:	drawAnaglyph(gl, cam, pose, viewport, draw); return;
@@ -19,7 +19,7 @@ void Stereographic :: draw(Graphics& gl, Camera& cam, Pose& pose, Viewport& view
 	}
 }
 
-void Stereographic :: drawMono(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw) 
+void Stereographic :: drawMono(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& viewport, Drawable& draw) 
 {
 	double fovy = cam.fovy();
 	double near = cam.near();
@@ -29,7 +29,7 @@ void Stereographic :: drawMono(Graphics& gl, Camera& cam, Pose& pose, Viewport& 
 	Vec3d ur;
 	Vec3d uu;
 	Vec3d uf;
-	Quatd& q = pose.quat();
+	const Quatd& q = pose.quat();
 	q.toVectorX(ur);
 	q.toVectorY(uu);
 	q.toVectorZ(uf);
@@ -66,7 +66,7 @@ void Stereographic :: drawMono(Graphics& gl, Camera& cam, Pose& pose, Viewport& 
 	glPopAttrib();
 }
 
-void Stereographic :: drawAnaglyph(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw) 
+void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& viewport, Drawable& draw) 
 {
 	double fovy = cam.fovy();
 	double near = cam.near();
@@ -78,7 +78,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, Camera& cam, Pose& pose, Viewpo
 	Vec3d ur;
 	Vec3d uu;
 	Vec3d uf;
-	Quatd& q = pose.quat();
+	const Quatd& q = pose.quat();
 	q.toVectorX(ur);
 	q.toVectorY(uu);
 	q.toVectorZ(uf);
@@ -187,7 +187,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, Camera& cam, Pose& pose, Viewpo
 	glPopAttrib();
 }
 
-void Stereographic :: drawActive(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw) 
+void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& viewport, Drawable& draw) 
 {
 	double fovy = cam.fovy();
 	double near = cam.near();
@@ -199,7 +199,7 @@ void Stereographic :: drawActive(Graphics& gl, Camera& cam, Pose& pose, Viewport
 	Vec3d ur;
 	Vec3d uu;
 	Vec3d uf;
-	Quatd& q = pose.quat();
+	const Quatd& q = pose.quat();
 	q.toVectorX(ur);
 	q.toVectorY(uu);
 	q.toVectorZ(uf);
@@ -258,7 +258,7 @@ void Stereographic :: drawActive(Graphics& gl, Camera& cam, Pose& pose, Viewport
 	glPopAttrib();
 }
 
-void Stereographic :: drawDual(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw) 
+void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& viewport, Drawable& draw) 
 {
 	double fovy = cam.fovy();
 	double near = cam.near();
@@ -270,7 +270,7 @@ void Stereographic :: drawDual(Graphics& gl, Camera& cam, Pose& pose, Viewport& 
 	Vec3d ur;
 	Vec3d uu;
 	Vec3d uf;
-	Quatd& q = pose.quat();
+	const Quatd& q = pose.quat();
 	q.toVectorX(ur);
 	q.toVectorY(uu);
 	q.toVectorZ(uf);
@@ -331,7 +331,7 @@ void Stereographic :: drawDual(Graphics& gl, Camera& cam, Pose& pose, Viewport& 
 
 
 
-void Stereographic :: drawLeft(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw) 
+void Stereographic :: drawLeft(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& viewport, Drawable& draw) 
 {
 	double fovy = cam.fovy();
 	double near = cam.near();
@@ -343,7 +343,7 @@ void Stereographic :: drawLeft(Graphics& gl, Camera& cam, Pose& pose, Viewport& 
 	Vec3d ur;
 	Vec3d uu;
 	Vec3d uf;
-	Quatd& q = pose.quat();
+	const Quatd& q = pose.quat();
 	q.toVectorX(ur);
 	q.toVectorY(uu);
 	q.toVectorZ(uf);
@@ -379,7 +379,7 @@ void Stereographic :: drawLeft(Graphics& gl, Camera& cam, Pose& pose, Viewport& 
 	glPopAttrib();
 }
 
-void Stereographic :: drawRight(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw) 
+void Stereographic :: drawRight(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& viewport, Drawable& draw) 
 {
 	double fovy = cam.fovy();
 	double near = cam.near();
@@ -391,7 +391,7 @@ void Stereographic :: drawRight(Graphics& gl, Camera& cam, Pose& pose, Viewport&
 	Vec3d ur;
 	Vec3d uu;
 	Vec3d uf;
-	Quatd& q = pose.quat();
+	const Quatd& q = pose.quat();
 	q.toVectorX(ur);
 	q.toVectorY(uu);
 	q.toVectorZ(uf);

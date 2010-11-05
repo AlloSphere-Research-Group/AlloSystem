@@ -74,15 +74,15 @@ public:
 	~Stereographic() {}
 
 	///< draw the scene according to the stored stereographic mode
-	void draw(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw);
+	void draw(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& viewport, Drawable& draw);
 	
 	/// So many different ways to draw :-)
-	void drawMono(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw);
-	void drawActive(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw);
-	void drawAnaglyph(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw);
-	void drawDual(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw);
-	void drawLeft(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw);
-	void drawRight(Graphics& gl, Camera& cam, Pose& pose, Viewport& viewport, Drawable& draw);
+	void drawMono(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& viewport, Drawable& draw);
+	void drawActive(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& viewport, Drawable& draw);
+	void drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& viewport, Drawable& draw);
+	void drawDual(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& viewport, Drawable& draw);
+	void drawLeft(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& viewport, Drawable& draw);
+	void drawRight(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& viewport, Drawable& draw);
 	
 	/// Blue line sync for active stereo (for those projectors that need it)
 	/// add this call at the end of rendering (just before the swap buffers call)
