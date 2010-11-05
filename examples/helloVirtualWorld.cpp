@@ -150,7 +150,7 @@ int main (int argc, char * argv[]){
 	for(int i=0; i<2; ++i){
 		windows[i].add(new StandardWindowKeyControls);
 		windows[i].add(new NavInputControl(&navMaster));
-		windows[i].create(Window::Dim(600,480,i*650), "Hello Virtual World!");
+		windows[i].create(Window::Dim(i*650,0, 600,480), "Hello Virtual World!");
 		windows[i].transform.quat(Quatd::fromAxisAngle(i*180, 0, 1, 0));
 	}
 
