@@ -44,7 +44,7 @@ int utProtocolGraphics(){
 
 	MyWindow2 win;
 
-	win.create(Window::Dim(400,400,000), "Window 1", 40);
+	win.create(Window::Dim(400,400), "Window 1", 40);
 
 	Window::startLoop();
 	return 0;

@@ -68,8 +68,8 @@ int utIOWindowGL(){
 //	Func tf;
 //	tf(1000);
 
-	win.create(Window::Dim(200,200,100), "Window 1", 40);
-	win2.create(Window::Dim(200,200,300), "Window 2", 40);
+	win.create(Window::Dim(100,0, 200,200), "Window 1", 40);
+	win2.create(Window::Dim(300,0, 200,200), "Window 2", 40);
 //	win2.create(Window::Dim(200,200,300), "Window 2", 40, SingleBuf);
 
 	win.freqs(1,2);
