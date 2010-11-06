@@ -26,11 +26,7 @@ void Stereographic :: drawMono(Graphics& gl, const Camera& cam, const Pose& pose
 	double far = cam.far();
 	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	const Quatd& q = pose.quat();
-	Vec3d ur, uu, uf;
-	q.toVectorX(ur);
-	q.toVectorY(uu);
-	q.toVectorZ(uf);
+	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
 
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 	glDrawBuffer(GL_BACK);
@@ -65,11 +61,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 	double iod = cam.IOD();
 	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	const Quatd& q = pose.quat();
-	Vec3d ur, uu, uf;
-	q.toVectorX(ur);
-	q.toVectorY(uu);
-	q.toVectorZ(uf);
+	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
 
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 	glDrawBuffer(GL_BACK);
@@ -140,11 +132,7 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 	double iod = cam.IOD();
 	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	const Quatd& q = pose.quat();
-	Vec3d ur, uu, uf;
-	q.toVectorX(ur);
-	q.toVectorY(uu);
-	q.toVectorZ(uf);
+	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
 
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 	glDrawBuffer(GL_BACK_LEFT);
@@ -195,11 +183,7 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 	double iod = cam.IOD();
 	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	const Quatd& q = pose.quat();
-	Vec3d ur, uu, uf;
-	q.toVectorX(ur);
-	q.toVectorY(uu);
-	q.toVectorZ(uf);
+	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
 	
 	aspect *= 0.5;	// for split view
 	
@@ -256,11 +240,7 @@ void Stereographic :: drawLeft(Graphics& gl, const Camera& cam, const Pose& pose
 	double iod = cam.IOD();
 	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	const Quatd& q = pose.quat();
-	Vec3d ur, uu, uf;
-	q.toVectorX(ur);
-	q.toVectorY(uu);
-	q.toVectorZ(uf);
+	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
 	
 	//pushAttrib(ColorBufferBit | DepthBufferBit | EnableBit | ViewPortBit);
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
@@ -297,11 +277,7 @@ void Stereographic :: drawRight(Graphics& gl, const Camera& cam, const Pose& pos
 	double iod = cam.IOD();
 	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	const Quatd& q = pose.quat();
-	Vec3d ur, uu, uf;
-	q.toVectorX(ur);
-	q.toVectorY(uu);
-	q.toVectorZ(uf);
+	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
 
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 	glDrawBuffer(GL_BACK);
