@@ -38,7 +38,7 @@ public:
 	Camera& aspectRatio(double v){ mAspectRatio=v; return *this; }	///< Set the aspect ratio
 	Camera& zoom(double v){ mZoom=v; return *this; }		///< Set zoom amount
 
-	double fovy() const { return mFovy; }					///< Get frustum near plane distance
+	double fovy() const { return mFovy; }					///< Get vertical field of view, in degrees
 	double near() const { return mNear; }					///< Get frustum near plane distance
 	double far() const { return mFar; }						///< Get frustum far plane distance
 	double focalLength() const { return mFocalLength; }		///< Get focal length
@@ -51,6 +51,8 @@ public:
 //	Matrix4d projectionMatrix(Eye e=MONO);
 //	Frustumd frustum(Eye e=MONO);
 
+	void frustum(Frustumd& f, const Pose& p) const;			///< Get frustum
+
 	double height(double distance);							///< Height of view at distance from camera
 
 protected:
@@ -60,29 +62,9 @@ protected:
 	double mEyeSep;				// Eye separation
 	double mAspectRatio;		// frustum aspect ratio
 	double mZoom;
-
-	Vec3d mStereoOffset;					// eye offset vector (right eye; left eye is inverse), usually (1, 0, 0)
+	Vec3d mStereoOffset;		// eye offset vector (right eye; left eye is inverse), usually (1, 0, 0)
 };
 
-inline double Camera::height(double distance) {
-	return 2*distance * tan(mFovy*M_DEG2RAD*0.5);
-}
-
-inline Camera :: Camera(
-	double fovy, 
-	double nearClip, 
-	double farClip, 
-	double focalLength, 
-	double eyeSep,
-	double aspectRatio
-)
-:	mFovy(fovy),
-	mNear(nearClip),
-	mFar(farClip),
-	mFocalLength(focalLength),
-	mEyeSep(eyeSep),
-	mAspectRatio(aspectRatio),
-	mZoom(0) {}
 
 } // al::
 

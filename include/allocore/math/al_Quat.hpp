@@ -428,6 +428,28 @@ inline void Quat<T> :: toMatrixTransposed(T * m) const {
 	m[15]=_1;
 }
 
+// TODO: these are the same as the matrix conversions except with the sign on w flipped
+//template<typename T>
+//inline void Quat<T> :: toVectorX(T * vx, T * vy, T * vz) const {
+//	*vx = 1.0 - 2.0*y*y - 2.0*z*z;
+//	*vy = 2.0*x*y + 2.0*z*w;
+//	*vz = 2.0*x*z - 2.0*y*w;
+//}
+//
+//template<typename T>
+//inline void Quat<T> :: toVectorY(T * vx, T * vy, T * vz) const {
+//	*vx = 2.0*x*y - 2.0*z*w;
+//	*vy = 1.0 - 2.0*x*x - 2.0*z*z;
+//	*vz = 2.0*y*z + 2.0*x*w;
+//}
+//
+//template<typename T>
+//inline void Quat<T> :: toVectorZ(T * vx, T * vy, T * vz) const {
+//	*vx = 2.0*x*z + 2.0*y*w;
+//	*vy = 2.0*y*z - 2.0*x*w;
+//	*vz = 1.0 - 2.0*x*x - 2.0*y*y;
+//}
+
 template<typename T>
 inline void Quat<T> :: toMatrix(T * m) const {
 

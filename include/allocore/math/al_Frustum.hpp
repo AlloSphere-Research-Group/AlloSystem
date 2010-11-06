@@ -50,17 +50,8 @@ public:
 	enum{ TOP=0, BOTTOM, LEFT, RIGHT, NEARP, FARP };
 	enum{ OUTSIDE, INTERSECT, INSIDE };
 
-	Vec3<T> ntl,ntr,nbl,nbr,ftl,ftr,fbl,fbr;	// frustum vertices
-//	T mNear, mFar;			// clipping z distances
-//	T mRatio;				// aspect ratio
-//	T mAngle, mTanFOV;		// lens angle, tan(field of view)
-	T nw,nh,fw,fh;			// near and far plane dimensions
-
-//	/// Set from camera parameters
-//	void setCamInternals(T angle, T ratio, T nearDist, T farDist);
-//	
-//	/// Set from camera position, look, and up vectors
-//	void setCamDef(const Vec3<T>& pos, const Vec3<T>& look, const Vec3<T>& up);
+	Vec3<T> ntl, ntr, nbl, nbr, ftl, ftr, fbl, fbr;	// corners
+	Plane<T> pl[6];									// faces
 
 	/// Test whether point is in frustum
 	int pointInFrustum(const Vec3<T>& p) const;
@@ -71,10 +62,30 @@ public:
 	/// Test whether axis-aligned box is in frustum
 	int boxInFrustum(const Vec3<T>& xyz, const Vec3<T>& dim) const;
 
-protected:
-	Plane<T> pl[6];		// planes comprising the frustum, used for efficient testing	
+	void computePlanes();
+
+//	T mNear, mFar;			// clipping z distances
+//	T mRatio;				// aspect ratio
+//	T mAngle, mTanFOV;		// lens angle, tan(field of view)
+//	T nw, nh, fw, fh;		// near and far plane dimensions
+
+//	/// Set from camera parameters
+//	void setCamInternals(T angle, T ratio, T nearDist, T farDist);
+//	
+//	/// Set from camera position, look, and up vectors
+//	void setCamDef(const Vec3<T>& pos, const Vec3<T>& look, const Vec3<T>& up);
+		
 };
 
+template <class T>
+void Frustum<T>::computePlanes(){
+	pl[TOP].set3Points(ntr,ntl,ftl);
+	pl[BOTTOM].set3Points(nbl,nbr,fbr);
+	pl[LEFT].set3Points(ntl,nbl,fbl);
+	pl[RIGHT].set3Points(nbr,ntr,fbr);
+	pl[NEARP].set3Points(ntl,ntr,nbr);
+	pl[FARP].set3Points(ftr,ftl,fbl);
+}
 
 //
 //template <class T>
@@ -91,7 +102,6 @@ protected:
 //	fh = mFar  * mTanFOV;
 //	fw = fh * mRatio;
 //}
-//
 //
 //template <class T>
 //void Frustum<T>::setCamDef(const Vec3<T>& p, const Vec3<T>& l, const Vec3<T>& u){

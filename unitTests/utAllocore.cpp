@@ -23,6 +23,7 @@ int main(){
 //		printf("%d %d %d\n", z, (z & size), !!(z & size));
 //	}
 
+//	printf("%d\n", sizeof(Frustumd));
 	return 0;
 }
 

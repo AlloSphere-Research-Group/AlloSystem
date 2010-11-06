@@ -1,7 +1,62 @@
+#include <math.h>
 #include "allocore/spatial/al_Camera.hpp"
 
-
 namespace al{
+
+Camera :: Camera(
+	double fovy, 
+	double nearClip, 
+	double farClip, 
+	double focalLength, 
+	double eyeSep,
+	double aspectRatio
+)
+:	mFovy(fovy),
+	mNear(nearClip),
+	mFar(farClip),
+	mFocalLength(focalLength),
+	mEyeSep(eyeSep),
+	mAspectRatio(aspectRatio),
+	mZoom(0)
+{}
+
+void Camera::frustum(Frustumd& f, const Pose& p) const {
+
+	Vec3d ur, uu, uf;
+	p.quat().toVectorX(ur);
+	p.quat().toVectorY(uu);
+	p.quat().toVectorZ(uf);
+	const Vec3d& pos = p.pos();
+
+	static double const tanCoef = 0.01745329252*0.5;	// degree-to-radian over /2
+	double tanFOV = tan(fovy() * tanCoef);
+	double nh = near() * tanFOV;
+	double nw = nh * aspectRatio(); 
+	double fh = far()  * tanFOV;
+	double fw = fh * aspectRatio();
+//	Vec3d Z = (pos - l).normalize();
+//	Vec3d X = cross(uu, Z).normalize();
+//	Vec3d Y = cross(Z, X);
+
+	Vec3d nc = pos + uf * near();	// center point of near plane
+	Vec3d fc = pos + uf * far();	// center point of far plane
+
+	f.ntl = nc + uu * nh - ur * nw;
+	f.ntr = nc + uu * nh + ur * nw;
+	f.nbl = nc - uu * nh - ur * nw;
+	f.nbr = nc - uu * nh + ur * nw;
+
+	f.ftl = fc + uu * fh - ur * fw;
+	f.ftr = fc + uu * fh + ur * fw;
+	f.fbl = fc - uu * fh - ur * fw;
+	f.fbr = fc - uu * fh + ur * fw;
+
+	f.computePlanes();
+}
+
+double Camera::height(double distance) {
+	return 2*distance * tan(mFovy*M_DEG2RAD*0.5);
+}
 
 //Camera :: Camera(
 //	double fovy, 
