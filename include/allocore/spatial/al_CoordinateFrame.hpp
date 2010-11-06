@@ -73,8 +73,7 @@ public:
 
 	/// Get right, up, and forward unit vectors
 	template <class T>
-	void unitVectors(Vec3<T>& ur, Vec3<T>& uu, Vec3<T>& uf){
-		quat().normalize();
+	void unitVectors(Vec3<T>& ur, Vec3<T>& uu, Vec3<T>& uf) const {
 		quat().toVectorX(ur);
 		quat().toVectorY(uu);
 		quat().toVectorZ(uf);	
