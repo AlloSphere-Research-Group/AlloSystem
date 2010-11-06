@@ -4,273 +4,199 @@
 namespace al {
 namespace gfx {
 
-void Stereographic :: draw(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& viewport, Drawable& draw) {
+void Stereographic :: draw(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw) {
 	if(mStereo){
 		switch(mMode){
-			case Anaglyph:	drawAnaglyph(gl, cam, pose, viewport, draw); return;
-			case Active:	drawActive	(gl, cam, pose, viewport, draw); return;
-			case Dual:		drawDual	(gl, cam, pose, viewport, draw); return;
-			case LeftEye:	drawLeft	(gl, cam, pose, viewport, draw); return;
-			case RightEye:	drawRight	(gl, cam, pose, viewport, draw); return;
+			case Anaglyph:	drawAnaglyph(gl, cam, pose, vp, draw); return;
+			case Active:	drawActive	(gl, cam, pose, vp, draw); return;
+			case Dual:		drawDual	(gl, cam, pose, vp, draw); return;
+			case LeftEye:	drawLeft	(gl, cam, pose, vp, draw); return;
+			case RightEye:	drawRight	(gl, cam, pose, vp, draw); return;
 			default:;
 		}
 	} else {
-		drawMono(gl, cam, pose, viewport, draw);
+		drawMono(gl, cam, pose, vp, draw);
 	}
 }
 
-void Stereographic :: drawMono(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& viewport, Drawable& draw) 
+void Stereographic :: drawMono(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw) 
 {
 	double fovy = cam.fovy();
 	double near = cam.near();
 	double far = cam.far();
-	double aspect = viewport.aspect();
+	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	Vec3d ur;
-	Vec3d uu;
-	Vec3d uf;
 	const Quatd& q = pose.quat();
+	Vec3d ur, uu, uf;
 	q.toVectorX(ur);
 	q.toVectorY(uu);
 	q.toVectorZ(uf);
-		
-	//pushAttrib(ColorBufferBit | DepthBufferBit | EnableBit | ViewPortBit);
+
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
-	
-	//gl.drawBuffer(Back);
 	glDrawBuffer(GL_BACK);
 	
 	gl.scissor(true);
-	gl.viewport(viewport.l, viewport.b, viewport.w, viewport.h);
+	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 	
 	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
-	gl.matrixMode(gfx::PROJECTION);
-	gl.pushMatrix();
+	gl.pushMatrix(gfx::PROJECTION);
 	gl.loadMatrix(Matrix4d::perspective(fovy, aspect, near, far));
 
-	gl.matrixMode(gfx::MODELVIEW);
-	gl.pushMatrix();
+	gl.pushMatrix(gfx::MODELVIEW);
 	gl.loadMatrix(Matrix4d::lookAt(ur, uu, uf, pos));
 	
 	draw.onDraw(gl);
-	
-	gl.matrixMode(gfx::PROJECTION);
-	gl.popMatrix();
-	gl.matrixMode(gfx::MODELVIEW);
-	gl.popMatrix();
+
+	gl.popMatrix(gfx::PROJECTION);
+	gl.popMatrix(gfx::MODELVIEW);
 	
 	gl.scissor(false);
-	//popAttrib()
 	glPopAttrib();
 }
 
-void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& viewport, Drawable& draw) 
+void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw) 
 {
 	double fovy = cam.fovy();
 	double near = cam.near();
 	double far = cam.far();
 	double focal = cam.focalLength();
 	double iod = cam.IOD();
-	double aspect = viewport.aspect();
+	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	Vec3d ur;
-	Vec3d uu;
-	Vec3d uf;
 	const Quatd& q = pose.quat();
+	Vec3d ur, uu, uf;
 	q.toVectorX(ur);
 	q.toVectorY(uu);
 	q.toVectorZ(uf);
-	
-	//pushAttrib(ColorBufferBit | DepthBufferBit | EnableBit | ViewPortBit);
-	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 
-	//drawBuffer(BackLeft);
+	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 	glDrawBuffer(GL_BACK);
 	
 	gl.scissor(true);
-	gl.viewport(viewport.l, viewport.b, viewport.w, viewport.h);
+	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 	
 	gl.clear(gfx::COLOR_BUFFER_BIT);
 	
-	switch (mAnaglyphMode) {
+	switch(mAnaglyphMode){
 		case RedBlue:
 		case RedGreen:
-		case RedCyan:
-			//colorMask(1, 0, 0, 1);
-			glColorMask(GL_TRUE,GL_FALSE,GL_FALSE,GL_TRUE);
-		break;
-		case BlueRed:
-			//colorMask(0, 0, 1, 1);
-			glColorMask(GL_FALSE,GL_FALSE,GL_TRUE,GL_TRUE);
-		break;
-		case GreenRed:
-			//colorMask(0, 1, 0, 1);
-			glColorMask(GL_FALSE,GL_TRUE,GL_FALSE,GL_TRUE);
-		break;
-		case CyanRed:
-			//colorMask(0, 1, 1, 1);
-			glColorMask(GL_FALSE,GL_TRUE,GL_TRUE,GL_TRUE);
-		break;
-		default:
-			//colorMask(1, 1, 1, 1);
-			glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
+		case RedCyan:	glColorMask(GL_TRUE, GL_FALSE,GL_FALSE,GL_TRUE); break;
+		case BlueRed:	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE, GL_TRUE); break;
+		case GreenRed:	glColorMask(GL_FALSE,GL_TRUE, GL_FALSE,GL_TRUE); break;
+		case CyanRed:	glColorMask(GL_FALSE,GL_TRUE, GL_TRUE, GL_TRUE); break;
+		default:		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE ,GL_TRUE);
 	} 
-	//clear(DepthBufferBit);
+
 	gl.clear(gfx::DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
-	gl.matrixMode(gfx::PROJECTION);
-	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal)); //T fovy, T aspect, T near, T far, T eyeSep, T focal
+	gl.pushMatrix(gfx::PROJECTION);
+	gl.loadMatrix(Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal));
 
-	gl.matrixMode(gfx::MODELVIEW);
-	gl.pushMatrix();
+	gl.pushMatrix(gfx::MODELVIEW);
 	gl.loadMatrix(Matrix4d::lookAtLeft(ur, uu, uf, pos, iod));
 	
 	draw.onDraw(gl);
+
+	gl.popMatrix(gfx::PROJECTION);
+	gl.popMatrix(gfx::MODELVIEW);
 	
-	gl.matrixMode(gfx::PROJECTION);
-	gl.popMatrix();
-	gl.matrixMode(gfx::MODELVIEW);
-	gl.popMatrix();
-	
-	switch (mAnaglyphMode) {
-		case RedBlue:
-			//colorMask(0, 1, 0, 1);
-			glColorMask(GL_FALSE,GL_FALSE,GL_TRUE,GL_TRUE);
-		break;
-		case RedGreen:
-			//colorMask(0, 1, 0, 1);
-			glColorMask(GL_FALSE,GL_TRUE,GL_FALSE,GL_TRUE);
-		break;
-		case RedCyan:
-			//colorMask(0, 1, 1, 1);
-			glColorMask(GL_FALSE,GL_TRUE,GL_TRUE,GL_TRUE);
-		break;
+	switch(mAnaglyphMode){
+		case RedBlue:	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE, GL_TRUE); break;
+		case RedGreen:	glColorMask(GL_FALSE,GL_TRUE, GL_FALSE,GL_TRUE); break;
+		case RedCyan:	glColorMask(GL_FALSE,GL_TRUE, GL_TRUE, GL_TRUE); break;
 		case BlueRed:
 		case GreenRed:
-		case CyanRed:
-			//colorMask(1, 0, 0, 1);
-			glColorMask(GL_TRUE,GL_FALSE,GL_FALSE,GL_TRUE);
-		break;
-		default:
-			//colorMask(1, 1, 1, 1);
-			glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
+		case CyanRed:	glColorMask(GL_TRUE, GL_FALSE,GL_FALSE,GL_TRUE); break;
+		default:		glColorMask(GL_TRUE, GL_TRUE ,GL_TRUE, GL_TRUE);
 	} 
-	//clear(DepthBufferBit);
+
 	gl.clear(gfx::DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
-	gl.matrixMode(gfx::PROJECTION);
-	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal)); //T fovy, T aspect, T near, T far, T eyeSep, T focal
+	gl.pushMatrix(gfx::PROJECTION);
+	gl.loadMatrix(Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal));
 
-	gl.matrixMode(gfx::MODELVIEW);
-	gl.pushMatrix();
+	gl.pushMatrix(gfx::MODELVIEW);
 	gl.loadMatrix(Matrix4d::lookAtRight(ur, uu, uf, pos, iod));
 	
 	draw.onDraw(gl);
 	
-	gl.matrixMode(gfx::PROJECTION);
-	gl.popMatrix();
-	gl.matrixMode(gfx::MODELVIEW);
-	gl.popMatrix();
-	
-	//colorMask(1,1,1,1);
+	gl.popMatrix(gfx::PROJECTION);
+	gl.popMatrix(gfx::MODELVIEW);
 	glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
-	
 	gl.scissor(false);
-
-//	//popAttrib()
 	glPopAttrib();
 }
 
-void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& viewport, Drawable& draw) 
+void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw) 
 {
 	double fovy = cam.fovy();
 	double near = cam.near();
 	double far = cam.far();
 	double focal = cam.focalLength();
 	double iod = cam.IOD();
-	double aspect = viewport.aspect();
+	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	Vec3d ur;
-	Vec3d uu;
-	Vec3d uf;
 	const Quatd& q = pose.quat();
+	Vec3d ur, uu, uf;
 	q.toVectorX(ur);
 	q.toVectorY(uu);
 	q.toVectorZ(uf);
-	
-	//pushAttrib(ColorBufferBit | DepthBufferBit | EnableBit | ViewPortBit);
+
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
-	
-	//drawBuffer(BackLeft);
 	glDrawBuffer(GL_BACK_LEFT);
-	
 	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 	
 	gl.scissor(true);
-	gl.viewport(viewport.l, viewport.b, viewport.w, viewport.h);
+	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 
 	// apply camera transform:
-	gl.matrixMode(gfx::PROJECTION);
-	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal)); //T fovy, T aspect, T near, T far, T eyeSep, T focal
+	gl.pushMatrix(gfx::PROJECTION);
+	gl.loadMatrix(Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal));
 
-	gl.matrixMode(gfx::MODELVIEW);
-	gl.pushMatrix();
+	gl.pushMatrix(gfx::MODELVIEW);
 	gl.loadMatrix(Matrix4d::lookAtLeft(ur, uu, uf, pos, iod));
 	
 	draw.onDraw(gl);
 	
-	gl.matrixMode(gfx::PROJECTION);
-	gl.popMatrix();
-	gl.matrixMode(gfx::MODELVIEW);
-	gl.popMatrix();
+	gl.popMatrix(gfx::PROJECTION);
+	gl.popMatrix(gfx::MODELVIEW);
 	
 	//drawBuffer(BackRight);
 	glDrawBuffer(GL_BACK_RIGHT);
 	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 	
-	gl.viewport(viewport.l, viewport.b, viewport.w, viewport.h);
+	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 
 	// apply camera transform:
-	gl.matrixMode(gfx::PROJECTION);
-	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal)); //T fovy, T aspect, T near, T far, T eyeSep, T focal
+	gl.pushMatrix(gfx::PROJECTION);
+	gl.loadMatrix(Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal));
 
-	gl.matrixMode(gfx::MODELVIEW);
-	gl.pushMatrix();
+	gl.pushMatrix(gfx::MODELVIEW);
 	gl.loadMatrix(Matrix4d::lookAtRight(ur, uu, uf, pos, iod));
 	
 	draw.onDraw(gl);
 	
-	gl.matrixMode(gfx::PROJECTION);
-	gl.popMatrix();
-	gl.matrixMode(gfx::MODELVIEW);
-	gl.popMatrix();
-	
+	gl.popMatrix(gfx::PROJECTION);
+	gl.popMatrix(gfx::MODELVIEW);
 	gl.scissor(false);
-	//popAttrib()
 	glPopAttrib();
 }
 
-void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& viewport, Drawable& draw) 
+void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw) 
 {
 	double fovy = cam.fovy();
 	double near = cam.near();
 	double far = cam.far();
 	double focal = cam.focalLength();
 	double iod = cam.IOD();
-	double aspect = viewport.aspect();
+	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	Vec3d ur;
-	Vec3d uu;
-	Vec3d uf;
 	const Quatd& q = pose.quat();
+	Vec3d ur, uu, uf;
 	q.toVectorX(ur);
 	q.toVectorY(uu);
 	q.toVectorZ(uf);
@@ -284,66 +210,54 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 	glDrawBuffer(GL_BACK);
 	
 	gl.scissor(false);
-	gl.viewport(viewport.l, viewport.b, viewport.w*0.5, viewport.h);
+	gl.viewport(vp.l, vp.b, vp.w*0.5, vp.h);
 	
 	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
-	gl.matrixMode(gfx::PROJECTION);
-	gl.pushMatrix();
+	gl.pushMatrix(gfx::PROJECTION);
 	gl.loadMatrix(Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal)); //T fovy, T aspect, T near, T far, T eyeSep, T focal
 
-	gl.matrixMode(gfx::MODELVIEW);
-	gl.pushMatrix();
+	gl.pushMatrix(gfx::MODELVIEW);
 	gl.loadMatrix(Matrix4d::lookAtLeft(ur, uu, uf, pos, iod));
 	
 	draw.onDraw(gl);
 	
-	gl.matrixMode(gfx::PROJECTION);
-	gl.popMatrix();
-	gl.matrixMode(gfx::MODELVIEW);
-	gl.popMatrix();
+	gl.popMatrix(gfx::PROJECTION);
+	gl.popMatrix(gfx::MODELVIEW);
 	
-	gl.viewport(viewport.l + viewport.w*0.5, viewport.b, viewport.w*0.5, viewport.h);
+	gl.viewport(vp.l + vp.w*0.5, vp.b, vp.w*0.5, vp.h);
 	
 	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
-	gl.matrixMode(gfx::PROJECTION);
-	gl.pushMatrix();
+	gl.pushMatrix(gfx::PROJECTION);
 	gl.loadMatrix(Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal)); //T fovy, T aspect, T near, T far, T eyeSep, T focal
 
-	gl.matrixMode(gfx::MODELVIEW);
-	gl.pushMatrix();
+	gl.pushMatrix(gfx::MODELVIEW);
 	gl.loadMatrix(Matrix4d::lookAtRight(ur, uu, uf, pos, iod));
 	
 	draw.onDraw(gl);
 	
-	gl.matrixMode(gfx::PROJECTION);
-	gl.popMatrix();
-	gl.matrixMode(gfx::MODELVIEW);
-	gl.popMatrix();
-	
+	gl.popMatrix(gfx::PROJECTION);
+	gl.popMatrix(gfx::MODELVIEW);
 	gl.scissor(false);
-	//popAttrib()
 	glPopAttrib();
 }
 
 
 
-void Stereographic :: drawLeft(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& viewport, Drawable& draw) 
+void Stereographic :: drawLeft(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw) 
 {
 	double fovy = cam.fovy();
 	double near = cam.near();
 	double far = cam.far();
 	double focal = cam.focalLength();
 	double iod = cam.IOD();
-	double aspect = viewport.aspect();
+	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	Vec3d ur;
-	Vec3d uu;
-	Vec3d uf;
 	const Quatd& q = pose.quat();
+	Vec3d ur, uu, uf;
 	q.toVectorX(ur);
 	q.toVectorY(uu);
 	q.toVectorZ(uf);
@@ -354,77 +268,62 @@ void Stereographic :: drawLeft(Graphics& gl, const Camera& cam, const Pose& pose
 	glDrawBuffer(GL_BACK);
 	
 	gl.scissor(true);
-	gl.viewport(viewport.l, viewport.b, viewport.w, viewport.h);
+	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 	
 	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
-	gl.matrixMode(gfx::PROJECTION);
-	gl.pushMatrix();
+	gl.pushMatrix(gfx::PROJECTION);
 	gl.loadMatrix(Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal)); //T fovy, T aspect, T near, T far, T eyeSep, T focal
 
-	gl.matrixMode(gfx::MODELVIEW);
-	gl.pushMatrix();
+	gl.pushMatrix(gfx::MODELVIEW);
 	gl.loadMatrix(Matrix4d::lookAtLeft(ur, uu, uf, pos, iod));
 
 	draw.onDraw(gl);
 	
-	gl.matrixMode(gfx::PROJECTION);
-	gl.popMatrix();
-	gl.matrixMode(gfx::MODELVIEW);
-	gl.popMatrix();
+	gl.popMatrix(gfx::PROJECTION);
+	gl.popMatrix(gfx::MODELVIEW);
 	
 	gl.scissor(false);
-	//popAttrib()
 	glPopAttrib();
 }
 
-void Stereographic :: drawRight(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& viewport, Drawable& draw) 
+void Stereographic :: drawRight(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw) 
 {
 	double fovy = cam.fovy();
 	double near = cam.near();
 	double far = cam.far();
 	double focal = cam.focalLength();
 	double iod = cam.IOD();
-	double aspect = viewport.aspect();
+	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	Vec3d ur;
-	Vec3d uu;
-	Vec3d uf;
 	const Quatd& q = pose.quat();
+	Vec3d ur, uu, uf;
 	q.toVectorX(ur);
 	q.toVectorY(uu);
 	q.toVectorZ(uf);
-	
-	//pushAttrib(ColorBufferBit | DepthBufferBit | EnableBit | ViewPortBit);
+
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
-	
 	glDrawBuffer(GL_BACK);
 	
-	
 	gl.scissor(true);
-	gl.viewport(viewport.l, viewport.b, viewport.w, viewport.h);
+	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 	
 	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
-	gl.matrixMode(gfx::PROJECTION);
-	gl.pushMatrix();
-	gl.loadMatrix(Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal)); //T fovy, T aspect, T near, T far, T eyeSep, T focal
+	gl.pushMatrix(gfx::PROJECTION);
+	gl.loadMatrix(Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal));
 
-	gl.matrixMode(gfx::MODELVIEW);
-	gl.pushMatrix();
+	gl.pushMatrix(gfx::MODELVIEW);
 	gl.loadMatrix(Matrix4d::lookAtRight(ur, uu, uf, pos, iod));
 
 	draw.onDraw(gl);
 	
-	gl.matrixMode(gfx::PROJECTION);
-	gl.popMatrix();
-	gl.matrixMode(gfx::MODELVIEW);
-	gl.popMatrix();
+	gl.popMatrix(gfx::PROJECTION);
+	gl.popMatrix(gfx::MODELVIEW);
 	
 	gl.scissor(false);
-	//popAttrib()
 	glPopAttrib();
 }
 
@@ -501,7 +400,6 @@ void Stereographic :: drawBlueLine(double window_width, double window_height)
 		glViewport(vp[0], vp[1], vp[2], vp[3]);
 	}	
 	glPopAttrib();
-
 }
 
 } // gfx::
