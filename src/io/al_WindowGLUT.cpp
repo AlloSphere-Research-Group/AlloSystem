@@ -500,6 +500,7 @@ void Window::create(
 //	printf("%d\n", stat);
 
 	mImpl->mID = glutCreateWindow(mImpl->mTitle.c_str());
+	printf("%d\n",mImpl->mID);
 
 	glutSetWindow(mImpl->mID);
 	glutIgnoreKeyRepeat(1);
