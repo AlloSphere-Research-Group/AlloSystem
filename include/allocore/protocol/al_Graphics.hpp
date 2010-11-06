@@ -260,7 +260,9 @@ public:
 	void matrixMode(MatrixMode mode);
 	MatrixMode matrixMode();
 	void pushMatrix();
+	void pushMatrix(MatrixMode v){ matrixMode(v); pushMatrix(); }
 	void popMatrix();
+	void popMatrix(MatrixMode v){ matrixMode(v); popMatrix(); }
 	void loadIdentity();
 	void loadMatrix(const Matrix4d &m);
 	void multMatrix(const Matrix4d &m);
