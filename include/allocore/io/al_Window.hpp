@@ -283,29 +283,33 @@ public:
 	Window& title(const std::string& v);		///< Set title
 
 	/// Add input event handler
+	
+	/// The order by which handlers are added matches their calling order.
+	/// The window's event handlers are called before any attached handlers.
 	Window& add(InputEventHandler * v){
 		mInputEventHandlers.push_back(&(v->window(this)));
 		return *this;
 	}
 
 	/// Add window event handler
+	
+	/// The order by which handlers are added matches their calling order.
+	/// The window's event handlers are called before any attached handlers.
 	Window& add(WindowEventHandler * v){
 		mWindowEventHandlers.push_back(&(v->window(this)));
 		return *this;
 	}
-	
-	// note: won't remove multiple references!
-	/// Remove input event handler
+
+	/// Remove all input event handlers matching argument
 	Window& remove(InputEventHandler * v){
-		mInputEventHandlers.erase(std::remove(mInputEventHandlers.begin(), mInputEventHandlers.end(), v), mInputEventHandlers.end());
+		std::remove(mInputEventHandlers.begin(), mInputEventHandlers.end(), v);
 		v->mWindow = NULL;
 		return *this;
 	}
 
-	// note: won't remove multiple references!
-	/// Remove window event handler
+	/// Remove all window event handlers matching argument
 	Window& remove(WindowEventHandler * v){
-		mWindowEventHandlers.erase(std::remove(mWindowEventHandlers.begin(), mWindowEventHandlers.end(), v), mWindowEventHandlers.end());
+		std::remove(mWindowEventHandlers.begin(), mWindowEventHandlers.end(), v);
 		v->mWindow = NULL;
 		return *this;
 	}
@@ -318,6 +322,9 @@ public:
 
 private:
 	// note: maybe mEventHandlers should be a std::list instead?
+	// ljp: A list has faster insertion/removal but is slower to iterate through
+	// versus an array. We will probably be iterating more often than inserting
+	// removing, so probably best to leave as an array.
 	typedef std::vector<InputEventHandler *> InputEventHandlers;
 	typedef std::vector<WindowEventHandler *> WindowEventHandlers;
 	friend class WindowImpl;
