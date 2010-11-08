@@ -115,10 +115,16 @@ public:
 	/// Appends element to end of buffer growing its size if necessary
 	void append(const T& v, double growFactor=2){
 		if(size() >= capacity()){	// double array size if too small
+			// Copy argument since it may be an element in current memory range
+			// which may become invalid after the resize.
+			const T vsafecopy = v;
 			mElems.resize((size() ? size() : 4)*growFactor);
+			super::construct(elems()+size(), vsafecopy);
 		}
-		super::construct(elems()+size(), v);
-		mPos=mSize;
+		else{
+			super::construct(elems()+size(), v);
+		}
+		mPos=size();
 		++mSize;
 	}
 	/// synonym for append():
