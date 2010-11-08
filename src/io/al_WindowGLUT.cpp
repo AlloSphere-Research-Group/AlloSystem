@@ -469,7 +469,7 @@ Window::~Window(){
 
 
 void Window::create(
-	const Dim& dim, const std::string title, double fps, DisplayMode::t mode
+	const Dim& dim, const std::string& title, double fps, DisplayMode::t mode
 )
 {
 	if(mImpl->created()) return;
