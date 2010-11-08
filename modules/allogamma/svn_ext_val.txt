@@ -1,0 +1,1 @@
+ gamma svn+ssh://svn.mat.ucsb.edu/svn/gamma/trunk
