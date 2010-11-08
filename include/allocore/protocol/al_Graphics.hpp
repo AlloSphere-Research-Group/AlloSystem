@@ -285,6 +285,8 @@ public:
 	void end();
 
 	void vertex(double x, double y, double z=0.);
+	void vertex(const Vec2d& v) { vertex(v[0], v[1], 0); }
+	void vertex(const Vec2f& v) { vertex(v[0], v[1], 0); }
 	void vertex(const Vec3d& v) { vertex(v[0], v[1], v[2]); }
 	void vertex(const Vec3f& v) { vertex(v[0], v[1], v[2]); }
 	void texcoord(double u, double v);
