@@ -823,22 +823,26 @@ void GraphicsBackendOpenGL::draw(const GraphicsData& v) {
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, 0, &v.vertices()[0]);
 
-	if(Nn){
+	if(Nn >= Nv){
 		glEnableClientState(GL_NORMAL_ARRAY);
 		glNormalPointer(GL_FLOAT, 0, &v.normals()[0]);
 	}
 	
-	if(Nc){
+	if(Nc >= Nv){
 		glEnableClientState(GL_COLOR_ARRAY);
 		glColorPointer(4, GL_FLOAT, 0, &v.colors()[0]);			
-	} else {
+	}
+	else if(0 == Nc){
 		glColor4f(1, 1, 1, 1);
+	}
+	else{
+		glColor4f(v.colors()[0][0], v.colors()[0][1], v.colors()[0][2], v.colors()[0][3]);
 	}
 	
 	if(Nt2 || Nt3){
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		if(Nt2) glTexCoordPointer(2, GL_FLOAT, 0, &v.texCoord2s()[0]);
-		if(Nt3) glTexCoordPointer(3, GL_FLOAT, 0, &v.texCoord3s()[0]);
+		if(Nt2 >= Nv) glTexCoordPointer(2, GL_FLOAT, 0, &v.texCoord2s()[0]);
+		if(Nt3 >= Nv) glTexCoordPointer(3, GL_FLOAT, 0, &v.texCoord3s()[0]);
 	}
 	
 	
