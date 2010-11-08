@@ -242,7 +242,7 @@ public:
 	/// @param[in] mode		Display mode bit flags
 	void create(
 		const Dim& dim,
-		const std::string title,
+		const std::string& title="",
 		double fps=40,
 		DisplayMode::t mode = DisplayMode::DefaultBuf
 	);
