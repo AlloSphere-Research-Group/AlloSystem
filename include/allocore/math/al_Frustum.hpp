@@ -38,6 +38,15 @@ template <class T> class Frustum;
 
 typedef Frustum<double> Frustumd;
 
+/*
+The vertices of the far (back) plane can be simply calculated by the ratio of 
+similar triangles.
+
+ltf = ((f/n)l, (f/n)t, f)
+lbf = ((f/n)l, (f/n)b, f)
+rtf = ((f/n)r, (f/n)t, f)
+rbf = ((f/n)r, (f/n)b, f)
+*/
 
 /// Rectangular frustum
 
