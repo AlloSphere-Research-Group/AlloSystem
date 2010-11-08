@@ -263,6 +263,9 @@ public:
 	const std::string& title() const;			///< Get title of window
 	bool visible() const;						///< Get whether window is visible
 
+	int height() const { return dimensions().h; }
+	int width() const { return dimensions().w; }
+
 	Window& cursor(Cursor::t v);				///< Set cursor type
 	Window& cursorHide(bool v);					///< Set cursor hiding
 	Window& cursorHideToggle();					///< Toggle cursor hiding
