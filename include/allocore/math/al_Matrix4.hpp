@@ -265,6 +265,13 @@ public:
 		);
 	}
 	
+	static const Matrix4 lookat2(const Vec3<T>& eye, const Vec3<T>& at, const Vec3<T>& up) {
+		Vec3<T> z = (at - eye).normalize();
+		Vec3<T> x = cross(up, z);
+		Vec3<T> y = cross(z, x);
+		return lookAt(x, y, z, eye);
+	}
+	
 	// for stereographics:
 	static const Matrix4 lookAtLeft(const Vec3<T>& ux, const Vec3<T>& uy, const Vec3<T>& uz, const Vec3<T>& pos, double eyeSep) {
 		return lookAtOffAxis(ux,uy,uz, pos,-eyeSep);

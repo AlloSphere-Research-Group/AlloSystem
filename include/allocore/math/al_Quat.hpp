@@ -776,37 +776,41 @@ void Quat<T> :: slerp_buffer(const Quat& input, const Quat& target, Quat<T> * bu
 template<typename T>
 void Quat<T> :: towardPoint(Vec3<T> &pos, Quat<T> &q, Vec3<T> &v, float amt) {
 	Vec3<T> diff, axis;
-	Vec3<T>::sub(diff, v, pos);
-	Vec3<T>::normalize(diff);
-
+	diff = v-pos;
+	diff.normalize();
+	
 	if(amt < 0) {
 		diff = diff*-1.;
 	}
 
 	Vec3<T> zaxis;
 	q.toVectorZ(zaxis);
-	Vec3<T>::cross(axis, zaxis, diff);
-	Vec3<T>::normalize(axis);
+	//axis = zaxis.cross(diff);
+	cross(axis, zaxis, diff);
+	//Vec3<T>::cross(axis, zaxis, diff);
+	axis.normalize();
 
-	float axis_mag_sqr = Vec3<T>::dot(axis, axis);
-	float along = Vec3<T>::dot(zaxis, diff);
+	float axis_mag_sqr = axis.dot(axis);
+	float along = zaxis.dot(diff); //Vec3<T>::dot(zaxis, diff);
 
 	if(axis_mag_sqr < 0.001 && along < 0) {
-		Vec3<T>::cross(axis, zaxis, Vec3<T>(0., 0., 1.));
-		Vec3<T>::normalize(axis);
+		//Vec3<T>::cross(axis, zaxis, Vec3<T>(0., 0., 1.));
+		cross(axis, zaxis, Vec3<T>(0, 0, 1));
+		axis.normalize();
 
 		if(axis_mag_sqr < 0.001) {
-			Vec3<T>::cross(axis, zaxis, Vec3<T>(0., 1., 0.));
-			Vec3<T>::normalize(axis);
+			//Vec3<T>::cross(axis, zaxis, Vec3<T>(0., 1., 0.));
+			cross(axis, zaxis, Vec3<T>(0, 1, 0));
+			axis.normalize();
 		}
 
-		axis_mag_sqr = Vec3<T>::dot(axis, axis);
+		axis_mag_sqr = axis.dot(axis); //Vec3<T>::dot(axis, axis);
 	}
 
 	if(along < 0.9995 && axis_mag_sqr > 0.001) {
 		float theta = ABS(amt)*acos(along)*M_RAD2DEG;
 //			printf("theta: %f  amt: %f\n", theta, amt);
-		fromAxisAngle(theta, axis.x, axis.y, axis.z);
+		fromAxisAngle(theta, axis[0], axis[1], axis[2]);
 	}
 	else {
 		setIdentity();
@@ -819,16 +823,16 @@ template<typename T>
 Quat<T> Quat<T> :: rotor(Vec3<T> &v1, Vec3<T> &v2) {
 	// get the normal to the plane (i.e. the unit bivector containing the v1 and v2)
 	Vec3<T> n;
-	Vec3<T>::cross(n, v1, v2);
-	Vec3<T>::normalize(n);	// normalize because the cross product can get slightly denormalized
+	cross(n, v1, v2);
+	n.normalize();	// normalize because the cross product can get slightly denormalized
 
 	// calculate half the angle between v1 and v2
-	T dotmag = Vec3<T>::dot(v1, v2);
+	T dotmag = v1.dot(v2);
 	T theta = acos(dotmag)*0.5;
 
 	// calculate the scaled actual bivector generaed by v1 and v2
 	Vec3<T> bivec = n*sin(theta);
-	Quat<T> q(cos(theta), bivec.x, bivec.y, bivec.z);
+	Quat<T> q(cos(theta), bivec[0], bivec[1], bivec[2]);
 
 	return q;
 }
