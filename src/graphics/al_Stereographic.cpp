@@ -134,12 +134,14 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 	const Vec3d& pos = pose.pos();
 	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
 
+	gl.scissor(true);
+	gl.viewport(vp.l, vp.b, vp.w, vp.h);
+
+
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 	glDrawBuffer(GL_BACK_LEFT);
 	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 	
-	gl.scissor(true);
-	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 
 	// apply camera transform:
 	gl.pushMatrix(gfx::PROJECTION);
@@ -153,11 +155,11 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 	gl.popMatrix(gfx::PROJECTION);
 	gl.popMatrix(gfx::MODELVIEW);
 	
-	//drawBuffer(BackRight);
 	glDrawBuffer(GL_BACK_RIGHT);
+	gl.viewport(vp.l, vp.b, vp.w, vp.h);
+	//drawBuffer(BackRight);
 	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
 	
-	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 
 	// apply camera transform:
 	gl.pushMatrix(gfx::PROJECTION);
@@ -193,7 +195,7 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 	//drawBuffer(BackLeft);
 	glDrawBuffer(GL_BACK);
 	
-	gl.scissor(false);
+	gl.scissor(true);
 	gl.viewport(vp.l, vp.b, vp.w*0.5, vp.h);
 	
 	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
