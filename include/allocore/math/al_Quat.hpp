@@ -126,6 +126,7 @@ public:
 	static Quat& fromMatrix(Mat<4,T>& matrix) { return fromMatrix(matrix.ptr()); }
 
 	Quat& setFromAxisAngle(T theta, T x1, T y1, T z1) { return set(fromAxisAngle(theta, x1, y1, z1)); }
+	Quat& setFromAxisAngle(T theta, Vec<3, T> axis) { return set(fromAxisAngle(theta, axis[0], axis[1], axis[2])); }
 	Quat& setFromAxisX(T theta) { return set(fromAxisX(theta)); }
 	Quat& setFromAxisY(T theta) { return set(fromAxisY(theta)); }
 	Quat& setFromAxisZ(T theta) { return set(fromAxisZ(theta)); }
