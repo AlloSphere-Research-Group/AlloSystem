@@ -1,10 +1,9 @@
-#include "allocore/graphics/al_Config.h"
+#include "allocore/graphics/al_GraphicsOpenGL.h"
 #include "allocore/graphics/al_Light.hpp"
 
-namespace al {
-namespace gfx{
+namespace al{
 
-Material::Material(Face::t f)
+Material::Material(Graphics::Face f)
 :	mAmbient(0.),
 	mDiffuse(0.6),
 	mEmission(0.),
@@ -14,18 +13,29 @@ Material::Material(Face::t f)
 	mUseColorMaterial(true)
 {}
 
+GLenum gl_face(Graphics::Face f){
+	switch(f){
+	case Graphics::FRONT:	return GL_FRONT;
+	case Graphics::BACK:	return GL_BACK;
+	default:				return GL_FRONT_AND_BACK;
+	}
+}
+
 void Material::operator()() const {
+
+	GLenum glface = gl_face(face());
+
 	if (useColorMaterial()) {
 		glEnable(GL_COLOR_MATERIAL);	// need to enable for glColor* to work
 		glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	} else {
 		glDisable(GL_COLOR_MATERIAL);	// need to disable for glMaterial* to work
 	}
-	glMaterialfv(mFace, GL_AMBIENT, mAmbient.components);
-	glMaterialfv(mFace, GL_DIFFUSE, mDiffuse.components);
-	glMaterialfv(mFace, GL_EMISSION, mEmission.components);
-	glMaterialfv(mFace, GL_SPECULAR, mSpecular.components);
-	glMaterialf(mFace, GL_SHININESS, mShine);
+	glMaterialfv(glface, GL_AMBIENT,	mAmbient.components);
+	glMaterialfv(glface, GL_DIFFUSE,	mDiffuse.components);
+	glMaterialfv(glface, GL_EMISSION,	mEmission.components);
+	glMaterialfv(glface, GL_SPECULAR,	mSpecular.components);
+	glMaterialf (glface, GL_SHININESS,	mShine);
 }
 Material& Material::ambientAndDiffuse(const Color& v){ ambient(v); return diffuse(v); }
 Material& Material::ambient(const Color& v){ mAmbient=v; return *this; }
@@ -33,7 +43,7 @@ Material& Material::diffuse(const Color& v){ mDiffuse=v; return *this; }
 Material& Material::emission(const Color& v){ mEmission=v; return *this; }
 Material& Material::specular(const Color& v){ mSpecular=v; return *this; }
 Material& Material::shininess(float v){ mShine=v; return *this; }
-Material& Material::face(Face::t f){ mFace=f; return *this; }
+Material& Material::face(Graphics::Face f){ mFace=f; return *this; }
 
 static bool * lightPool(){
 	static bool x[8] = {0};
@@ -120,5 +130,4 @@ void Light::twoSided(bool v){
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, v ? GL_TRUE : GL_FALSE);
 }
 
-} // ::al::gfx
 } // ::al

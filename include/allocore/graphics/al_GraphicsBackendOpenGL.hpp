@@ -23,11 +23,10 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-
+#include "allocore/graphics/al_GraphicsOpenGL.h"
 #include "allocore/graphics/al_GraphicsBackend.hpp"
 
 namespace al{
-namespace gfx{
 
 class GraphicsBackendOpenGL : public GraphicsBackend {
 public:
@@ -52,13 +51,16 @@ public:
 	virtual ~GraphicsBackendOpenGL();
 	
 	// Render State
-	virtual void enableBlending(bool enable, BlendFunc src, BlendFunc dst);
+	virtual void enable(Graphics::Capability v);
+	virtual void disable(Graphics::Capability v);
+
+	virtual void enableBlending(bool enable, Graphics::BlendFunc src, Graphics::BlendFunc dst);
 	virtual void enableLighting(bool enable);
 	virtual void enableLight(bool enable, int idx);
 	virtual void enableDepthTesting(bool enable);
 	virtual void enableScissor(bool enable);
-	virtual void setPolygonMode(PolygonMode mode);
-	virtual void setAntialiasing(AntiAliasMode mode);
+	virtual void setPolygonMode(Graphics::PolygonMode mode);
+	virtual void setAntialiasing(Graphics::AntiAliasMode mode);
 	virtual void color(const Color &c);
 	virtual void pointSize(double v);
 	virtual void lineWidth(double v);
@@ -102,8 +104,6 @@ public:
 	
 };
 
-} // ::al::gfx
 } // ::al
 	
 #endif
-	

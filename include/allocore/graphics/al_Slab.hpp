@@ -7,10 +7,9 @@
 
 #define SLAB_MAX_RENDER_TARGETS	8
 
-using al::gfx::Shader;
+using al::Shader;
 
-namespace al {
-namespace gfx {
+namespace al{
 
 class Slab : public GPUObject {
 public:
@@ -51,7 +50,6 @@ protected:
 	int						mHeight;				///< Output height of Slab
 };
 
-} // gfx::
 } // al::
 
 #endif // AL_SLAB_H

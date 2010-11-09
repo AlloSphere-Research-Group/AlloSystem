@@ -1,13 +1,11 @@
 #ifndef INCLUDE_AL_GRAPHICS_TEXTURE_HPP
 #define INCLUDE_AL_GRAPHICS_TEXTURE_HPP
 
-#include "allocore/graphics/al_Common.hpp"
 #include "allocore/graphics/al_GPUObject.hpp"
 #include "allocore/types/al_types.hpp"
 #include "allocore/types/al_Color.hpp"
 
-namespace al {
-namespace gfx{
+namespace al{
 
 class GraphicsBackend;
 
@@ -146,8 +144,6 @@ protected:
 
 }; // Texture
 
-
-} // ::al::gfx
 } // ::al
 
 #endif
@@ -156,7 +152,6 @@ protected:
 //#ifndef INCLUDE_AL_GRAPHICS_TEXTURE_HPP
 //#define INCLUDE_AL_GRAPHICS_TEXTURE_HPP
 //
-//#include "graphics/al_Common.hpp"
 //#include "graphics/al_GPUObject.hpp"
 //
 //namespace al {

@@ -49,7 +49,7 @@ void audioCB(AudioIOData& io){
 
 struct MyWindow : Window{
 	
-	MyWindow(): gl(new gfx::GraphicsBackendOpenGL)
+	MyWindow(): gl(new GraphicsBackendOpenGL)
 	{}
 	
 	bool onKeyDown(const Keyboard& k){
@@ -59,13 +59,13 @@ struct MyWindow : Window{
 	}
 
 	bool onFrame(){
-		gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.loadIdentity();
 		gl.viewport(0,0, dimensions().w, dimensions().h);
 		return true;
 	}
 
-	gfx::Graphics gl;
+	Graphics gl;
 };
 
 

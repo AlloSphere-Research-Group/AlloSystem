@@ -15,7 +15,7 @@ stereographic rendering
 #include "al_NavControl.hpp"
 using namespace al;
 
-struct Agent : public SoundSource, public gfx::Drawable{
+struct Agent : public SoundSource, public Drawable{
 
 	Agent()
 	: oscPhase(0)
@@ -46,12 +46,12 @@ struct Agent : public SoundSource, public gfx::Drawable{
 		step();
 	}
 	
-	virtual void onDraw(gfx::Graphics& g){
+	virtual void onDraw(Graphics& g){
 
 		g.pushMatrix();
 		g.multMatrix(matrix());
 	
-		g.begin(gfx::TRIANGLES);
+		g.begin(g.TRIANGLES);
 			float ds = 0.5;
 			g.vertex(    0, 0, ds*2);
 			g.vertex( ds/2, 0,-ds);
@@ -74,7 +74,7 @@ AudioScene scene(3, 1, AUDIO_BLOCK_SIZE);
 Listener * listener;
 Nav navMaster(Vec3d(0,0,-4), 0.95);
 std::vector<Agent> agents(1);
-gfx::Stereographic stereo;
+Stereographic stereo;
 
 
 void audioCB(AudioIOData& io){
@@ -96,9 +96,9 @@ void audioCB(AudioIOData& io){
 }
 
 
-struct MyWindow : public Window, public gfx::Drawable{
+struct MyWindow : public Window, public Drawable{
 	
-	MyWindow(): gl(new gfx::GraphicsBackendOpenGL){}
+	MyWindow(): gl(new GraphicsBackendOpenGL){}
 
 	bool onFrame(){
 
@@ -106,7 +106,7 @@ struct MyWindow : public Window, public gfx::Drawable{
 		
 		//listener->pos(pose.pos());
 
-		gfx::Viewport vp(dimensions().w, dimensions().h);
+		Viewport vp(dimensions().w, dimensions().h);
 		stereo.draw(gl, cam, pose, vp, *this);
 		
 		return true;
@@ -121,14 +121,14 @@ struct MyWindow : public Window, public gfx::Drawable{
 		return true;
 	}
 	
-	virtual void onDraw(gfx::Graphics& g){
+	virtual void onDraw(Graphics& g){
 
 		for(unsigned i=0; i<agents.size(); ++i){
 			agents[i].onDraw(g);
 		}
 	}
 
-	gfx::Graphics gl;
+	Graphics gl;
 	Pose transform;
 	Camera cam;
 };

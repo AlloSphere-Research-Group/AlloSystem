@@ -32,7 +32,6 @@
 #include "allocore/graphics/al_Surface.hpp"
 
 namespace al{
-namespace gfx{
 
 class GraphicsBackend {
 public:
@@ -41,13 +40,16 @@ public:
 	virtual ~GraphicsBackend() {}
 	
 	// Render State
-	virtual void enableBlending(bool enable, BlendFunc src, BlendFunc dst) = 0;
+	virtual void enable(Graphics::Capability v) = 0;
+	virtual void disable(Graphics::Capability v) = 0;
+	
+	virtual void enableBlending(bool enable, Graphics::BlendFunc src, Graphics::BlendFunc dst) = 0;
 	virtual void enableLighting(bool enable) = 0;
 	virtual void enableLight(bool enable, int idx) = 0;
 	virtual void enableDepthTesting(bool enable) = 0;
 	virtual void enableScissor(bool enable) = 0;
-	virtual void setPolygonMode(PolygonMode mode) = 0;
-	virtual void setAntialiasing(AntiAliasMode mode) = 0;
+	virtual void setPolygonMode(Graphics::PolygonMode mode) = 0;
+	virtual void setAntialiasing(Graphics::AntiAliasMode mode) = 0;
 	virtual void color(const Color &c) = 0;
 	virtual void pointSize(double v) = 0;
 	virtual void lineWidth(double v) = 0;
@@ -82,12 +84,8 @@ public:
 	
 	// Buffer drawing
 	virtual void draw(const GraphicsData& v) = 0;
-	
-	
 };
 
-} // ::al::gfx
 } // ::al
 	
 #endif
-	

@@ -31,7 +31,6 @@
 #include "allocore/types/al_types.hpp"
 
 namespace al{
-namespace gfx {
 
 /*!
 	\class Image
@@ -95,7 +94,6 @@ protected:
 
 };
 
-} // gfx::
 } // al::
 
 #endif

@@ -3,8 +3,7 @@
 
 #include <list>
 
-namespace al {
-namespace gfx{
+namespace al{
 
 /// Base class for allocated resources on the GPU
 class GPUObject{
@@ -62,7 +61,6 @@ protected:
 	std::list<GPUObject *> mObjects;
 };
 
-} // ::al::gfx
 } // ::al
 
 #endif

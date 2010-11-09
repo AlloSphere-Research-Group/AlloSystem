@@ -5,13 +5,13 @@
 using namespace al;
 
 /*
-gfx::GraphicsBackendOpenGL backend;
-gfx::Graphics gl(&backend);
+GraphicsBackendOpenGL backend;
+Graphics gl(&backend);
 
 Camera camera;
-gfx::Texture *texture = backend.textureNew();
-gfx::Texture *surface_tex = backend.textureNew();
-gfx::Surface *surface = backend.surfaceNew();
+Texture *texture = backend.textureNew();
+Texture *surface_tex = backend.textureNew();
+Surface *surface = backend.surfaceNew();
 double eyesep = 1;
 
 
@@ -39,19 +39,19 @@ static void drawScene(void * self) {
 
 /*
 	gl.clearColor(1, 0, 0, 0);
-    gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-	gl.matrixMode(gfx::PROJECTION);
+	gl.matrixMode(gl.PROJECTION);
 	gl.pushMatrix();
 	//	gl.loadMatrix(camera.projectionMatrix());
 
-	gl.matrixMode(gfx::MODELVIEW);
+	gl.matrixMode(gl.MODELVIEW);
 	gl.pushMatrix();
 	//	gl.loadMatrix(camera.modelViewMatrix());
 
 
 	//surface->enter();
-	gl.begin(gfx::LINES);
+	gl.begin(gl.LINES);
 		for (int i=0; i< NUM_VERTICES; i++) {
 			vertex& v = vertices[i];
 			gl.color(v.r, v.g, v.b, 0.5);
@@ -70,7 +70,7 @@ static void drawScene(void * self) {
 	gl.pushMatrix();
 	gl.scale(2, 2, 2);
 		surface_tex->bind();
-		gl.begin(gfx::QUADS);
+		gl.begin(gl.QUADS);
 			gl.color(1, 1, 1, 1);
 			gl.texcoord(0, 0);
 			gl.vertex(-1, -1);
@@ -93,7 +93,7 @@ static void drawScene(void * self) {
 		texture->bind();
 		gl.draw();
 
-		gl.begin(gfx::QUADS);
+		gl.begin(gl.QUADS);
 			gl.color(1, 1, 1, 1);
 			gl.texcoord(0, 0);
 			gl.vertex(-1, -1);
@@ -111,10 +111,10 @@ static void drawScene(void * self) {
 		texture->unbind();
 	gl.popMatrix();
 
-	gl.matrixMode(gfx::PROJECTION);
+	gl.matrixMode(gl.PROJECTION);
 	gl.popMatrix();
 
-	gl.matrixMode(gfx::MODELVIEW);
+	gl.matrixMode(gl.MODELVIEW);
 	gl.popMatrix();*/
 }
 

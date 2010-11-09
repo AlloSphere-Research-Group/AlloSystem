@@ -33,13 +33,11 @@
 #include <map>
 
 #include "allocore/graphics/al_Graphics.hpp"
-#include "allocore/graphics/al_Common.hpp"
 #include "allocore/graphics/al_Light.hpp"
 
 #define MODEL_PARSER_BUF_LEN (256)
 
-namespace al {
-namespace gfx{
+namespace al{
 
 /// an object with internal GraphicsData and Material. 
 class MaterialObject : public Drawable {
@@ -228,7 +226,6 @@ protected:
 	std::string mMaterialLib;       /* name of the material library */
 };
 
-} // ::al::gfx
 } // ::al
 
 #endif

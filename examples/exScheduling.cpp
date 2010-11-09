@@ -42,7 +42,7 @@ struct MyWindow : WindowGL{
 		avg += 0.1*((t-last)-avg);
 		last = t;
 		
-		gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.loadIdentity();
 		gl.viewport(0,0, dimensions().w, dimensions().h);
 		
@@ -61,7 +61,7 @@ struct MyWindow : WindowGL{
 	
 	void freqs(float v1, float v2){ freq1=v1; freq2=v2; }
 
-	gfx::Graphics gl;
+	Graphics gl;
 	float freq1, freq2;
 	al_sec last;
 	al_sec avg;

@@ -2,10 +2,12 @@
 #include "al_NavControl.hpp"
 using namespace al;
 
-gfx::GraphicsBackendOpenGL backend;
-gfx::Light light;
-gfx::Graphics gl(&backend);
+GraphicsBackendOpenGL backend;
+Graphics gl(&backend);
+Light light;
 Camera cam;
+Nav nav;
+Stereographic stereo;
 
 const int N = 32;
 float volData[N*N*N];
@@ -13,7 +15,7 @@ Isosurface<float> iso;
 double phase=0;
 
 void drawbox() {
-	gl.begin(gfx::LINES);
+	gl.begin(gl.LINES);
 	gl.color(1,1,1);
 	for (int z=-1; z<=1; z+=2) {
 		for (int y=-1; y<=1; y+=2) {
@@ -36,32 +38,25 @@ void drawbox() {
 }
 
 
-struct MyWindow : Window{
+struct MyWindow : public Window, public Drawable{
+
+	void onDraw(Graphics& gl){
+		gl.depthTesting(1);
+		gl.lighting(1);
+		
+		light();
+		
+		iso.level(0);
+		iso.generate(volData, N, 1./N);
+		gl.draw(iso);
+		
+		drawbox();
+	}
 
 	bool onFrame(){
-		double aspect = dimensions().w / dimensions().h;
-		
-		gl.viewport(0,0, dimensions().w, dimensions().h);
-		gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
-
-		cam.step(1.);
-		
-		const Vec3d& pos = cam.pos();
-		const Vec3d& ur  = cam.ur();
-		const Vec3d& uu  = cam.uu();
-		const Vec3d& uf  = cam.uf();
-		double fovy = cam.fovy();
-		double near = cam.near();
-		double far  = cam.far();
-		
-		// apply camera transform:
-		gl.matrixMode(gfx::PROJECTION);
-		gl.pushMatrix();
-		gl.loadMatrix(Matrix4d::perspective(fovy, aspect, near, far));
-
-		gl.matrixMode(gfx::MODELVIEW);
-		gl.pushMatrix();
-		gl.loadMatrix(Matrix4d::lookAt(ur, uu, uf, pos));
+		nav.smooth(0.8);
+		nav.step(1.);
+		stereo.draw(gl, cam, nav, Viewport(width(), height()), *this);
 		
 		if((phase += 0.001) > 2*M_PI) phase -= 2*M_PI;
 
@@ -77,16 +72,6 @@ struct MyWindow : Window{
 				+ cos(z * cos(phase*9));
 		}}}
 
-		gl.depthTesting(1);
-		gl.lighting(1);
-		
-		light();
-		
-		iso.level(0);
-		iso.generate(volData, N, 1./N);
-		gl.draw(iso);
-		
-		drawbox();
 		return true;
 	}
 };
@@ -94,13 +79,17 @@ struct MyWindow : Window{
 
 int main (int argc, char * argv[]){
 
-	iso.primitive(gfx::TRIANGLES);
+	iso.primitive(Graphics::TRIANGLES);
 	
 	MyWindow win;
 	win.create(Window::Dim(800,600), "Isosurface Example", 140);
 
 	win.add(new StandardWindowKeyControls);
-	win.add(new NavInputControl(&cam));
+	win.add(new NavInputControl(&nav));
+
+	Pose p;
+	Vec3d v1, v2;
+	p.pos(v1 - v2);
 
 	Window::startLoop();
 	return 0;

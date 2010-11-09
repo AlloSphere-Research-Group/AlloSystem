@@ -31,9 +31,7 @@
 #include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/spatial/al_Camera.hpp"
 
-namespace al {
-namespace gfx{
-
+namespace al{
 
 /// A framed area on a display screen
 struct Viewport {
@@ -102,7 +100,6 @@ protected:
 	bool mStereo;
 };
 
-} // gfx::
 } // al::
 
-#endif /* include guard */
+#endif

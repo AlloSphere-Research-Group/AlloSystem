@@ -2,12 +2,9 @@
 #define INCLUDE_AL_GRAPHICS_SHADER_HPP
 
 #include <string>
-#include "allocore/graphics/al_Common.hpp"
 #include "allocore/graphics/al_GPUObject.hpp"
 
-namespace al {
-namespace gfx{
-
+namespace al{
 
 /// Shader abstract base class
 class ShaderBase : public GPUObject{
@@ -35,20 +32,25 @@ protected:
 class Shader : public ShaderBase{
 public:
 
-	Shader(const std::string& source="", ShaderType::t type=ShaderType::Fragment);
+	enum Type{
+		VERTEX,
+		FRAGMENT
+	};
+
+	Shader(const std::string& source="", Shader::Type type=FRAGMENT);
 	
 	/// This will automatically delete the shader object when it is no longer 
 	/// attached to any program object.
 	virtual ~Shader(){ destroy(); }
 
 	Shader& source(const std::string& v);
-	Shader& source(const std::string& v, ShaderType::t type);
+	Shader& source(const std::string& v, Shader::Type type);
 	Shader& compile();
 	bool compiled() const;
 
 private:
 	std::string mSource;
-	GLenum mType;
+	Shader::Type mType;
 	void sendSource();
 
 	virtual void get(int pname, void * params) const;
@@ -92,7 +94,6 @@ protected:
 	virtual void onDestroy();
 };
 
-} // ::al::gfx
 } // ::al
 
 #endif

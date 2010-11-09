@@ -5,8 +5,8 @@
 using namespace al;
 
 Camera camera;
-gfx::GraphicsBackendOpenGL backend;
-gfx::Graphics gl(&backend);
+GraphicsBackendOpenGL backend;
+Graphics gl(&backend);
 double eyesep = 1;
 
 // synchronize window updates with a Clock. 
@@ -132,7 +132,7 @@ static void drawScene(void * self) {
 //		}}}
 //	gl.end();
 	
-	gl.begin(gfx::LINES);
+	gl.begin(gl.LINES);
 		for (int i=0; i<NUM_VERTICES; i++) {
 			vertex& v = vertices[i];
 			gl.color(v.r, v.g, v.b, 0.5);

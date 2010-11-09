@@ -1,8 +1,7 @@
 #include "allocore/graphics/al_Stereographic.hpp"
-#include "allocore/graphics/al_Common.hpp"	/* << need the OpenGL headers */
+#include "allocore/graphics/al_GraphicsOpenGL.h"	/* << need the OpenGL headers */
 
-namespace al {
-namespace gfx {
+namespace al{
 
 void Stereographic :: draw(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw) {
 	if(mStereo){
@@ -34,19 +33,19 @@ void Stereographic :: drawMono(Graphics& gl, const Camera& cam, const Pose& pose
 	gl.scissor(true);
 	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 	
-	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
-	gl.pushMatrix(gfx::PROJECTION);
+	gl.pushMatrix(gl.PROJECTION);
 	gl.loadMatrix(Matrix4d::perspective(fovy, aspect, near, far));
 
-	gl.pushMatrix(gfx::MODELVIEW);
+	gl.pushMatrix(gl.MODELVIEW);
 	gl.loadMatrix(Matrix4d::lookAt(ur, uu, uf, pos));
 	
 	draw.onDraw(gl);
 
-	gl.popMatrix(gfx::PROJECTION);
-	gl.popMatrix(gfx::MODELVIEW);
+	gl.popMatrix(gl.PROJECTION);
+	gl.popMatrix(gl.MODELVIEW);
 	
 	gl.scissor(false);
 	glPopAttrib();
@@ -69,7 +68,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 	gl.scissor(true);
 	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 	
-	gl.clear(gfx::COLOR_BUFFER_BIT);
+	gl.clear(gl.COLOR_BUFFER_BIT);
 	
 	switch(mAnaglyphMode){
 		case RedBlue:
@@ -81,19 +80,19 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 		default:		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE ,GL_TRUE);
 	} 
 
-	gl.clear(gfx::DEPTH_BUFFER_BIT);
+	gl.clear(gl.DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
-	gl.pushMatrix(gfx::PROJECTION);
+	gl.pushMatrix(gl.PROJECTION);
 	gl.loadMatrix(Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal));
 
-	gl.pushMatrix(gfx::MODELVIEW);
+	gl.pushMatrix(gl.MODELVIEW);
 	gl.loadMatrix(Matrix4d::lookAtLeft(ur, uu, uf, pos, iod));
 	
 	draw.onDraw(gl);
 
-	gl.popMatrix(gfx::PROJECTION);
-	gl.popMatrix(gfx::MODELVIEW);
+	gl.popMatrix(gl.PROJECTION);
+	gl.popMatrix(gl.MODELVIEW);
 	
 	switch(mAnaglyphMode){
 		case RedBlue:	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE, GL_TRUE); break;
@@ -105,19 +104,19 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 		default:		glColorMask(GL_TRUE, GL_TRUE ,GL_TRUE, GL_TRUE);
 	} 
 
-	gl.clear(gfx::DEPTH_BUFFER_BIT);
+	gl.clear(gl.DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
-	gl.pushMatrix(gfx::PROJECTION);
+	gl.pushMatrix(gl.PROJECTION);
 	gl.loadMatrix(Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal));
 
-	gl.pushMatrix(gfx::MODELVIEW);
+	gl.pushMatrix(gl.MODELVIEW);
 	gl.loadMatrix(Matrix4d::lookAtRight(ur, uu, uf, pos, iod));
 	
 	draw.onDraw(gl);
 	
-	gl.popMatrix(gfx::PROJECTION);
-	gl.popMatrix(gfx::MODELVIEW);
+	gl.popMatrix(gl.PROJECTION);
+	gl.popMatrix(gl.MODELVIEW);
 	glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
 	gl.scissor(false);
 	glPopAttrib();
@@ -144,36 +143,36 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 	glDrawBuffer(GL_BACK_RIGHT);
 	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 	//drawBuffer(BackRight);
-	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
 
 	// apply camera transform:
-	gl.pushMatrix(gfx::PROJECTION);
+	gl.pushMatrix(gl.PROJECTION);
 	gl.loadMatrix(Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal));
 
-	gl.pushMatrix(gfx::MODELVIEW);
+	gl.pushMatrix(gl.MODELVIEW);
 	gl.loadMatrix(Matrix4d::lookAtRight(ur, uu, uf, pos, iod));
 	
 	draw.onDraw(gl);
 	
-	gl.popMatrix(gfx::PROJECTION);
-	gl.popMatrix(gfx::MODELVIEW);
+	gl.popMatrix(gl.PROJECTION);
+	gl.popMatrix(gl.MODELVIEW);
 
 	glDrawBuffer(GL_BACK_LEFT);
-	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
 
 	// apply camera transform:
-	gl.pushMatrix(gfx::PROJECTION);
+	gl.pushMatrix(gl.PROJECTION);
 	gl.loadMatrix(Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal));
 
-	gl.pushMatrix(gfx::MODELVIEW);
+	gl.pushMatrix(gl.MODELVIEW);
 	gl.loadMatrix(Matrix4d::lookAtLeft(ur, uu, uf, pos, iod));
 	
 	draw.onDraw(gl);
 	
-	gl.popMatrix(gfx::PROJECTION);
-	gl.popMatrix(gfx::MODELVIEW);
+	gl.popMatrix(gl.PROJECTION);
+	gl.popMatrix(gl.MODELVIEW);
 
 	gl.scissor(false);
 	glPopAttrib();
@@ -201,35 +200,35 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 	gl.scissor(true);
 	gl.viewport(vp.l, vp.b, vp.w*0.5, vp.h);
 	
-	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
-	gl.pushMatrix(gfx::PROJECTION);
+	gl.pushMatrix(gl.PROJECTION);
 	gl.loadMatrix(Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal)); //T fovy, T aspect, T near, T far, T eyeSep, T focal
 
-	gl.pushMatrix(gfx::MODELVIEW);
+	gl.pushMatrix(gl.MODELVIEW);
 	gl.loadMatrix(Matrix4d::lookAtLeft(ur, uu, uf, pos, iod));
 	
 	draw.onDraw(gl);
 	
-	gl.popMatrix(gfx::PROJECTION);
-	gl.popMatrix(gfx::MODELVIEW);
+	gl.popMatrix(gl.PROJECTION);
+	gl.popMatrix(gl.MODELVIEW);
 	
 	gl.viewport(vp.l + vp.w*0.5, vp.b, vp.w*0.5, vp.h);
 	
-	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
-	gl.pushMatrix(gfx::PROJECTION);
+	gl.pushMatrix(gl.PROJECTION);
 	gl.loadMatrix(Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal)); //T fovy, T aspect, T near, T far, T eyeSep, T focal
 
-	gl.pushMatrix(gfx::MODELVIEW);
+	gl.pushMatrix(gl.MODELVIEW);
 	gl.loadMatrix(Matrix4d::lookAtRight(ur, uu, uf, pos, iod));
 	
 	draw.onDraw(gl);
 	
-	gl.popMatrix(gfx::PROJECTION);
-	gl.popMatrix(gfx::MODELVIEW);
+	gl.popMatrix(gl.PROJECTION);
+	gl.popMatrix(gl.MODELVIEW);
 	gl.scissor(false);
 	glPopAttrib();
 }
@@ -255,19 +254,19 @@ void Stereographic :: drawLeft(Graphics& gl, const Camera& cam, const Pose& pose
 	gl.scissor(true);
 	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 	
-	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
-	gl.pushMatrix(gfx::PROJECTION);
+	gl.pushMatrix(gl.PROJECTION);
 	gl.loadMatrix(Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal)); //T fovy, T aspect, T near, T far, T eyeSep, T focal
 
-	gl.pushMatrix(gfx::MODELVIEW);
+	gl.pushMatrix(gl.MODELVIEW);
 	gl.loadMatrix(Matrix4d::lookAtLeft(ur, uu, uf, pos, iod));
 
 	draw.onDraw(gl);
 	
-	gl.popMatrix(gfx::PROJECTION);
-	gl.popMatrix(gfx::MODELVIEW);
+	gl.popMatrix(gl.PROJECTION);
+	gl.popMatrix(gl.MODELVIEW);
 	
 	gl.scissor(false);
 	glPopAttrib();
@@ -290,19 +289,19 @@ void Stereographic :: drawRight(Graphics& gl, const Camera& cam, const Pose& pos
 	gl.scissor(true);
 	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 	
-	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
-	gl.pushMatrix(gfx::PROJECTION);
+	gl.pushMatrix(gl.PROJECTION);
 	gl.loadMatrix(Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal));
 
-	gl.pushMatrix(gfx::MODELVIEW);
+	gl.pushMatrix(gl.MODELVIEW);
 	gl.loadMatrix(Matrix4d::lookAtRight(ur, uu, uf, pos, iod));
 
 	draw.onDraw(gl);
 	
-	gl.popMatrix(gfx::PROJECTION);
-	gl.popMatrix(gfx::MODELVIEW);
+	gl.popMatrix(gl.PROJECTION);
+	gl.popMatrix(gl.MODELVIEW);
 	
 	gl.scissor(false);
 	glPopAttrib();
@@ -383,5 +382,4 @@ void Stereographic :: drawBlueLine(double window_width, double window_height)
 	glPopAttrib();
 }
 
-} // gfx::
 } // al::

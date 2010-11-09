@@ -18,8 +18,7 @@
 	http://freeimage.sourceforge.net/freeimage-license.txt
 */
 
-namespace al {
-namespace gfx {
+namespace al{
 
 static int initializedFreeImage = 0;
 
@@ -394,7 +393,4 @@ Image::Format Image :: getFormat(int planes) {
 	}
 }
 
-	
-} // gfx::
 } // al::
-

@@ -42,108 +42,10 @@
 using std::stack;
 
 namespace al{
-namespace gfx{
 
-enum AntiAliasMode {
-	DONT_CARE,
-	FASTEST,
-	NICEST
-};
-
-enum AttributeBit {
-	COLOR_BUFFER_BIT	= 1<<0,		/**< Color-buffer bit */
-	DEPTH_BUFFER_BIT	= 1<<1,		/**< Depth-buffer bit */
-	ENABLE_BIT			= 1<<2,		/**< Enable bit */
-	VIEWPORT_BIT		= 1<<3		/**< Viewport bit */
-};
-
-enum BlendFunc {
-	SRC_ALPHA = 0,
-	SRC_COLOR,
-	DST_ALPHA,
-	DST_COLOR,
-	ZERO,
-	ONE,
-	SRC_ALPHA_SATURATE
-};
-
-enum MatrixMode {
-	MODELVIEW = 0,
-	PROJECTION
-};
-
-enum PolygonMode {
-	POINT = 0,
-	LINE,
-	FILL
-};
-
-enum Primitive {
-	POINTS = 0,
-	LINES,
-	LINE_STRIP,
-	LINE_LOOP,
-	TRIANGLES,
-	TRIANGLE_STRIP,
-	TRIANGLE_FAN,
-	QUADS,
-	QUAD_STRIP,
-	POLYGON
-};
-
-
-
-struct State {
-	State()
-	:	blend_enable(false),
-		blend_src(SRC_COLOR),
-		blend_dst(DST_COLOR),
-		lighting_enable(false),
-		depth_enable(true),
-		polygon_mode(FILL),
-		antialias_mode(DONT_CARE)
-	{}
-
-	~State() {}
-
-
-	// Blending
-	bool blend_enable;
-	BlendFunc blend_src;
-	BlendFunc blend_dst;
-
-	// Lighting
-	bool lighting_enable;
-
-	// Depth Testing
-	bool depth_enable;
-
-	// Polygon Mode
-	PolygonMode polygon_mode;
-
-	// Anti-Aliasing
-	AntiAliasMode antialias_mode;
-
-};
-
-
-struct StateChange {
-	StateChange()
-	:	blending(true),
-		lighting(true),
-		depth_testing(true),
-		polygon_mode(true),
-		antialiasing(true)
-	{}
-
-	~StateChange(){}
-
-	bool blending;
-	bool lighting;
-	bool depth_testing;
-	bool polygon_mode;
-	bool antialiasing;
-};
+class Graphics;
+class GraphicsBackend;
+class GraphicsData;
 
 
 /// Stores buffers related to rendering graphical objects
@@ -158,7 +60,7 @@ public:
 	typedef unsigned int	Index;
 
 
-	GraphicsData(): mPrimitive(gfx::POINTS){}
+	GraphicsData(): mPrimitive(0){}
 
 	/// Reset all buffers
 	void resetBuffers();
@@ -179,7 +81,7 @@ public:
 	// angle - maximum angle (in degrees) to smooth across
 	void generateNormals(float angle);
 
-	Primitive primitive() const { return mPrimitive; }
+	int primitive() const { return mPrimitive; }
 	const Buffer<Vertex>& vertices() const { return mVertices; }
 	const Buffer<Normal>& normals() const { return mNormals; }
 	const Buffer<Color>& colors() const { return mColors; }
@@ -205,7 +107,7 @@ public:
 	void addVertex(float x, float y, float z=0){ addVertex(Vertex(x,y,z)); }
 	void addVertex(const Vertex& v){ vertices().append(v); }
 
-	void primitive(Primitive prim){ mPrimitive=prim; }
+	void primitive(int prim){ mPrimitive=prim; }
 
 	Buffer<Vertex>& vertices(){ return mVertices; }
 	Buffer<Normal>& normals(){ return mNormals; }
@@ -224,12 +126,10 @@ protected:
 	Buffer<TexCoord3> mTexCoord3s;
 	Buffer<Index> mIndices;
 
-	Primitive mPrimitive;
+	int mPrimitive;
 };
 
 
-
-class GraphicsBackend;
 
 /// Interface for setting graphics state and rendering GraphicsData
 
@@ -238,8 +138,112 @@ class GraphicsBackend;
 class Graphics {
 public:
 
-//	Graphics(gfx::Backend::type backend = gfx::Backend::AutoDetect);
+	enum AntiAliasMode {
+		DONT_CARE,
+		FASTEST,
+		NICEST
+	};
+
+	enum AttributeBit {
+		COLOR_BUFFER_BIT	= 1<<0,		/**< Color-buffer bit */
+		DEPTH_BUFFER_BIT	= 1<<1,		/**< Depth-buffer bit */
+		ENABLE_BIT			= 1<<2,		/**< Enable bit */
+		VIEWPORT_BIT		= 1<<3		/**< Viewport bit */
+	};
+
+	enum BlendFunc {
+		SRC_ALPHA = 0,
+		SRC_COLOR,
+		DST_ALPHA,
+		DST_COLOR,
+		ZERO,
+		ONE,
+		SRC_ALPHA_SATURATE
+	};
+
+	enum Capability {
+		BLEND,
+		DEPTH_TEST,
+		LIGHTING,
+		SCISSOR_TEST
+	};
+
+	enum Face {
+		FRONT = 0,
+		BACK,
+		FRONT_AND_BACK
+	};
+
+	enum MatrixMode {
+		MODELVIEW = 0,
+		PROJECTION
+	};
+
+	enum PolygonMode {
+		POINT = 0,
+		LINE,
+		FILL
+	};
+
+	enum Primitive {
+		POINTS = 0,
+		LINES,
+		LINE_STRIP,
+		LINE_LOOP,
+		TRIANGLES,
+		TRIANGLE_STRIP,
+		TRIANGLE_FAN,
+		QUADS,
+		QUAD_STRIP,
+		POLYGON
+	};
+
+	struct State {
+		State()
+		:	blend_enable(false),
+			blend_src(SRC_COLOR),
+			blend_dst(DST_COLOR),
+			lighting_enable(false),
+			depth_enable(true),
+			polygon_mode(FILL),
+			antialias_mode(DONT_CARE)
+		{}
+
+		~State() {}
+
+		// Blending
+		bool blend_enable;
+		BlendFunc blend_src;
+		BlendFunc blend_dst;
+
+		bool lighting_enable;			// Lighting
+		bool depth_enable;				// Depth Testing
+		PolygonMode polygon_mode;		// Polygon Mode
+		AntiAliasMode antialias_mode;	// Anti-Aliasing
+	};
+
+
+	struct StateChange {
+		StateChange()
+		:	blending(true),
+			lighting(true),
+			depth_testing(true),
+			polygon_mode(true),
+			antialiasing(true)
+		{}
+
+		~StateChange(){}
+
+		bool blending;
+		bool lighting;
+		bool depth_testing;
+		bool polygon_mode;
+		bool antialiasing;
+	};
+
+	/// @param[in] backend	The rendering backend
 	Graphics(GraphicsBackend *backend);
+
 	~Graphics();
 
 	// Rendering State
@@ -335,16 +339,15 @@ protected:
 	stack<Matrix4d>& matrixStackForMode(MatrixMode mode);
 };
 
-/*
-	Abstract base class for any object that can be rendered via Graphics:
-*/
+
+
+///	Abstract base class for any object that can be rendered via Graphics
 class Drawable {
 public:
 	virtual void onDraw(Graphics& gl) = 0;
 	virtual ~Drawable(){}
 };
 
-} // ::al::gfx
 } // ::al
 
 #endif

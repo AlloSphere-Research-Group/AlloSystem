@@ -1,25 +1,30 @@
 #ifndef INCLUDE_AL_GRAPHICS_BUFFEROBJECT_HPP
 #define INCLUDE_AL_GRAPHICS_BUFFEROBJECT_HPP
 
-#include "allocore/graphics/al_Common.hpp"
 #include "allocore/graphics/al_GPUObject.hpp"
 
-/*
-
-Vertex Buffer Objects (VBOs) create buffer memory for vertex attributes in high-performance memory (in contrast, Vertex Arrays store buffer memory in the client CPU, incurring the overhead of data transfer). If the buffer object is used to store pixel data, it is called Pixel Buffer Object (PBO).
-
-VBOs provide an interface to access these buffers in a similar fashion to vertex arrays. Hints of 'target' and 'mode' help the implementation determine whether to use system, AGP or video memory. 
-
-Unlike display lists, the data in vertex buffer object can be read and updated by mapping the buffer into client's memory space.
-
-Another important advantage of VBO is sharing the buffer objects with many clients, like display lists and textures. Since VBO is on the server's side, multiple clients will be able to access the same buffer with the corresponding identifier.
-
-*/
-
 namespace al{
-namespace gfx{
 
 /// Generic buffer object
+
+/**
+Vertex Buffer Objects (VBOs) create buffer memory for vertex attributes in 
+high-performance memory (in contrast, Vertex Arrays store buffer memory in the 
+client CPU, incurring the overhead of data transfer). If the buffer object is 
+used to store pixel data, it is called Pixel Buffer Object (PBO).
+
+VBOs provide an interface to access these buffers in a similar fashion to vertex 
+arrays. Hints of 'target' and 'mode' help the implementation determine whether 
+to use system, AGP or video memory. 
+
+Unlike display lists, the data in vertex buffer object can be read and updated 
+by mapping the buffer into client's memory space.
+
+Another important advantage of VBO is sharing the buffer objects with many 
+clients, like display lists and textures. Since VBO is on the server's side, 
+multiple clients will be able to access the same buffer with the corresponding 
+identifier.
+*/
 class BufferObject : public GPUObject {
 public:
 	BufferObject(BufferType::t bufType, BufferUsage::t bufUsage)
@@ -202,6 +207,5 @@ protected:
 };
 */
 
-} // al::gfx
 } // al::
 #endif

@@ -17,6 +17,10 @@
 		160DAE1411C1B1FE00C6905A /* al_SocketAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160DAE1211C1B1FE00C6905A /* al_SocketAPR.cpp */; };
 		160FD0E111FA1CF4001E8987 /* al_Isosurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160FD0E011FA1CF4001E8987 /* al_Isosurface.cpp */; };
 		1619909E11743990006FBADF /* al_Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1619909C11743990006FBADF /* al_Color.cpp */; };
+		16586A1D128903C10068E01A /* al_Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16586A1C128903C10068E01A /* al_Shader.cpp */; };
+		16586A1E128903C10068E01A /* al_Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16586A1C128903C10068E01A /* al_Shader.cpp */; };
+		16586A58128918D40068E01A /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
+		16586A59128918D40068E01A /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
 		166DD742117CDB6000A8BA12 /* al_Conversion.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 166DD741117CDB6000A8BA12 /* al_Conversion.hpp */; };
 		168EC8F11161CA2C00FCACC7 /* al_Time.h in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8EB1161CA2C00FCACC7 /* al_Time.h */; };
 		168EC8F21161CA2C00FCACC7 /* al_MainLoop.h in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8EC1161CA2C00FCACC7 /* al_MainLoop.h */; };
@@ -35,7 +39,6 @@
 		16AA8F0311C6FE0B0053EFE1 /* al_Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA8F0111C6FE0B0053EFE1 /* al_Camera.cpp */; };
 		16AA8F0F11C6FE6C0053EFE1 /* utSpatial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA8F0E11C6FE6C0053EFE1 /* utSpatial.cpp */; };
 		16AA95F6118F74FB00B98EC3 /* al_Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95F2118F74FB00B98EC3 /* al_Light.cpp */; };
-		16AA9600118F76B800B98EC3 /* al_Debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95FF118F76B800B98EC3 /* al_Debug.cpp */; };
 		16AA960A118F774800B98EC3 /* al_Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA9609118F774800B98EC3 /* al_Texture.cpp */; };
 		16AC52C911628EC50076AA8B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		16AC52D511628F860076AA8B /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
@@ -201,7 +204,6 @@
 		36BAE1DD11C2FAFF009A8BBD /* ringbuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 3659D755117B8AFA0065EBE4 /* ringbuffer.c */; };
 		36BAE1DE11C2FAFF009A8BBD /* al_Printing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16D46563118F57970039A84C /* al_Printing.cpp */; };
 		36BAE1DF11C2FAFF009A8BBD /* al_Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95F2118F74FB00B98EC3 /* al_Light.cpp */; };
-		36BAE1E011C2FAFF009A8BBD /* al_Debug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95FF118F76B800B98EC3 /* al_Debug.cpp */; };
 		36BAE1E111C2FAFF009A8BBD /* al_Texture.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA9609118F774800B98EC3 /* al_Texture.cpp */; };
 		36BAE1E411C2FAFF009A8BBD /* al_SocketAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160DAE1211C1B1FE00C6905A /* al_SocketAPR.cpp */; };
 		36C079A811D4964F00764E50 /* al_MainLoopOSX.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF9116D527D00928703 /* al_MainLoopOSX.mm */; };
@@ -431,7 +433,8 @@
 		16198FF31173E39B006FBADF /* al_Buffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Buffer.hpp; sourceTree = "<group>"; };
 		1619909B11743914006FBADF /* al_Color.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Color.hpp; sourceTree = "<group>"; };
 		1619909C11743990006FBADF /* al_Color.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Color.cpp; sourceTree = "<group>"; };
-		165867591288A0880068E01A /* simpleGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = simpleGraphics.cpp; path = ../../examples/graphics/simpleGraphics.cpp; sourceTree = SOURCE_ROOT; };
+		165869491288E9380068E01A /* al_GraphicsOpenGL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_GraphicsOpenGL.h; sourceTree = "<group>"; };
+		16586A1C128903C10068E01A /* al_Shader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Shader.cpp; sourceTree = "<group>"; };
 		1663FD461280D608002B2979 /* al_Allocore.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Allocore.hpp; sourceTree = "<group>"; };
 		166DD741117CDB6000A8BA12 /* al_Conversion.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Conversion.hpp; sourceTree = "<group>"; };
 		166DD744117CDBFD00A8BA12 /* utTypesConversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utTypesConversion.cpp; path = ../../unitTests/utTypesConversion.cpp; sourceTree = SOURCE_ROOT; };
@@ -454,14 +457,11 @@
 		16AA8F0111C6FE0B0053EFE1 /* al_Camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Camera.cpp; sourceTree = "<group>"; };
 		16AA8F0E11C6FE6C0053EFE1 /* utSpatial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utSpatial.cpp; path = ../../unitTests/utSpatial.cpp; sourceTree = SOURCE_ROOT; };
 		16AA8FA211C713890053EFE1 /* al_Frustum.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Frustum.hpp; sourceTree = "<group>"; };
-		16AA95E5118F6EEF00B98EC3 /* al_Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Config.h; sourceTree = "<group>"; };
 		16AA95E8118F6EEF00B98EC3 /* al_Common.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Common.hpp; sourceTree = "<group>"; };
 		16AA95E9118F6EEF00B98EC3 /* al_GPUObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_GPUObject.hpp; sourceTree = "<group>"; };
 		16AA95EA118F6EEF00B98EC3 /* al_Light.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Light.hpp; sourceTree = "<group>"; };
 		16AA95ED118F6FB800B98EC3 /* OpenGLSupport.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = OpenGLSupport.txt; sourceTree = "<group>"; };
 		16AA95F2118F74FB00B98EC3 /* al_Light.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Light.cpp; sourceTree = "<group>"; };
-		16AA95FE118F760C00B98EC3 /* al_Debug.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Debug.hpp; sourceTree = "<group>"; };
-		16AA95FF118F76B800B98EC3 /* al_Debug.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Debug.cpp; sourceTree = "<group>"; };
 		16AA9609118F774800B98EC3 /* al_Texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Texture.cpp; sourceTree = "<group>"; };
 		16AA960B118F775E00B98EC3 /* al_Texture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Texture.hpp; sourceTree = "<group>"; };
 		16AA967E118F7D5700B98EC3 /* al_Shader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Shader.hpp; sourceTree = "<group>"; };
@@ -882,6 +882,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				16586A58128918D40068E01A /* libportaudio.a in Frameworks */,
+				16586A59128918D40068E01A /* libfreeimage.a in Frameworks */,
 				3687E33611FA4F9500EC6706 /* AudioToolbox.framework in Frameworks */,
 				3687E33711FA4F9500EC6706 /* AudioUnit.framework in Frameworks */,
 				3687E33811FA4F9500EC6706 /* CoreAudio.framework in Frameworks */,
@@ -989,7 +991,6 @@
 		08FB7794FE84155DC02AAC07 /* alscheduling */ = {
 			isa = PBXGroup;
 			children = (
-				165867591288A0880068E01A /* simpleGraphics.cpp */,
 				36B5D3E611D81D2C004D228D /* TODO */,
 				3625B540116EEDEF00C685B7 /* Makefile */,
 				3625B541116EEDEF00C685B7 /* Makefile.config */,
@@ -1063,13 +1064,12 @@
 			isa = PBXGroup;
 			children = (
 				361BF02F11DEA66600E60A9C /* al_BufferObject.hpp */,
-				16AA95E5118F6EEF00B98EC3 /* al_Config.h */,
 				16AA95E8118F6EEF00B98EC3 /* al_Common.hpp */,
-				16AA95FE118F760C00B98EC3 /* al_Debug.hpp */,
 				16AA95E9118F6EEF00B98EC3 /* al_GPUObject.hpp */,
 				362127C71173CD72009CB6FC /* al_Graphics.hpp */,
 				36D69A4211F924B500699158 /* al_GraphicsBackend.hpp */,
 				36D69A4311F924C900699158 /* al_GraphicsBackendOpenGL.hpp */,
+				165869491288E9380068E01A /* al_GraphicsOpenGL.h */,
 				36F596691211D5AB003B78B5 /* al_Image.hpp */,
 				160FD0DF11FA1CE4001E8987 /* al_Isosurface.hpp */,
 				16AA95EA118F6EEF00B98EC3 /* al_Light.hpp */,
@@ -1077,9 +1077,9 @@
 				3649CDA412440A3F0077128E /* al_Nurbs.hpp */,
 				16AA967E118F7D5700B98EC3 /* al_Shader.hpp */,
 				36F0ABCF123195D5000A8EBF /* al_Slab.hpp */,
-				16AA960B118F775E00B98EC3 /* al_Texture.hpp */,
 				367F0B3812034EDB00FCC534 /* al_Stereographic.hpp */,
 				36D69A4A11F9264700699158 /* al_Surface.hpp */,
+				16AA960B118F775E00B98EC3 /* al_Texture.hpp */,
 				361BF03011DEAA9400E60A9C /* pending */,
 				16AA95ED118F6FB800B98EC3 /* OpenGLSupport.txt */,
 			);
@@ -1090,13 +1090,13 @@
 			isa = PBXGroup;
 			children = (
 				36F0ABBF12319586000A8EBF /* Makefile.config */,
-				16AA95FF118F76B800B98EC3 /* al_Debug.cpp */,
 				362127C81173CDBB009CB6FC /* al_Graphics.cpp */,
 				36D69A4411F925FC00699158 /* al_GraphicsBackendOpenGL.cpp */,
 				36F596741211D5F8003B78B5 /* al_Image.cpp */,
 				160FD0E011FA1CF4001E8987 /* al_Isosurface.cpp */,
 				16AA95F2118F74FB00B98EC3 /* al_Light.cpp */,
 				36F598FC12122628003B78B5 /* al_Model.cpp */,
+				16586A1C128903C10068E01A /* al_Shader.cpp */,
 				16AA9609118F774800B98EC3 /* al_Texture.cpp */,
 				367F0B3A12034EED00FCC534 /* al_Stereographic.cpp */,
 				36D69A5211F9267800699158 /* al_Surface.cpp */,
@@ -2106,7 +2106,6 @@
 				36BAE1DD11C2FAFF009A8BBD /* ringbuffer.c in Sources */,
 				36BAE1DE11C2FAFF009A8BBD /* al_Printing.cpp in Sources */,
 				36BAE1DF11C2FAFF009A8BBD /* al_Light.cpp in Sources */,
-				36BAE1E011C2FAFF009A8BBD /* al_Debug.cpp in Sources */,
 				36BAE1E111C2FAFF009A8BBD /* al_Texture.cpp in Sources */,
 				36BAE1E411C2FAFF009A8BBD /* al_SocketAPR.cpp in Sources */,
 				36BAE06011C2F00F009A8BBD /* utAllocore.cpp in Sources */,
@@ -2136,6 +2135,7 @@
 				16054DC2122E13360039003C /* utThread.cpp in Sources */,
 				16054DC3122E13360039003C /* utFile.cpp in Sources */,
 				160C9A4D12763AF70060D732 /* al_Window.cpp in Sources */,
+				16586A1D128903C10068E01A /* al_Shader.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2228,7 +2228,6 @@
 				3659D756117B8AFA0065EBE4 /* ringbuffer.c in Sources */,
 				16D46565118F57970039A84C /* al_Printing.cpp in Sources */,
 				16AA95F6118F74FB00B98EC3 /* al_Light.cpp in Sources */,
-				16AA9600118F76B800B98EC3 /* al_Debug.cpp in Sources */,
 				16AA960A118F774800B98EC3 /* al_Texture.cpp in Sources */,
 				160DAE1411C1B1FE00C6905A /* al_SocketAPR.cpp in Sources */,
 				16AA8EDF11C6F1D20053EFE1 /* al_Quat.cpp in Sources */,
@@ -2247,6 +2246,7 @@
 				36F2568C121FBF36008C4597 /* al_Memory.cpp in Sources */,
 				16054DBC122E12010039003C /* al_FileAPR.cpp in Sources */,
 				160C9A4C12763AF70060D732 /* al_Window.cpp in Sources */,
+				16586A1E128903C10068E01A /* al_Shader.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2949,7 +2949,10 @@
 					"_GLIBCXX_DEBUG_PEDANTIC=1",
 				);
 				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../dev/osx/lib\"",
+				);
 				OTHER_CFLAGS = (
 					"-DAPR_FAST_COMPAT",
 					"-DAPR_STRICT",
@@ -2967,7 +2970,10 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../dev/osx/lib\"",
+				);
 				OTHER_CFLAGS = (
 					"-DAPR_FAST_COMPAT",
 					"-DAPR_STRICT",

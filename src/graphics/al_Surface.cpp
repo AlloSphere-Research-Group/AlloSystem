@@ -1,10 +1,9 @@
 #include <stdlib.h>
 #include "allocore/graphics/al_GraphicsBackend.hpp"
-#include "allocore/graphics/al_Config.h"
+//#include "allocore/graphics/al_Config.h"
 #include "allocore/graphics/al_Surface.hpp"
 
-namespace al {
-namespace gfx{
+namespace al{
 
 Surface::Surface(GraphicsBackend *backend, void *surface_data)
 :	GPUObject(),
@@ -85,5 +84,4 @@ void Surface::onDestroy() {
 	mBackend->surfaceDestroy(this);
 }
 
-} // ::al::gfx
 } // ::al

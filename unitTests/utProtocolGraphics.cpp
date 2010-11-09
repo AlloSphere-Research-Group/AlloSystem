@@ -1,14 +1,13 @@
 #include "utAllocore.h"
 
-static gfx::GraphicsBackendOpenGL backend;
-static gfx::Graphics gl(&backend);
+static GraphicsBackendOpenGL backend;
+static Graphics gl(&backend);
  
 struct MyWindow2 : Window{
 
 	bool onFrame(){
-		using namespace al::gfx;
 		
-		gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.viewport(0,0, dimensions().w, dimensions().h);
 		gl.loadIdentity();
 		
@@ -28,14 +27,14 @@ struct MyWindow2 : Window{
 		}
 
 		//gl.primitive(gl.TRIANGLE_STRIP);
-		data.primitive(gfx::LINE_STRIP);
+		data.primitive(gl.LINE_STRIP);
 
 		gl.draw(data);
 
 		return true;
 	}
 	
-	gfx::GraphicsData data;
+	GraphicsData data;
 };
 
 

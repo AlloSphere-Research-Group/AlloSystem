@@ -4,8 +4,7 @@
 #include "allocore/graphics/al_Model.hpp"
 #include "allocore/io/al_File.hpp"
 
-using namespace al;
-using namespace gfx;
+namespace al{
 
 void OBJReader :: readOBJ(std::string path, std::string filename) {
 	std::string mtl = "default";
@@ -100,7 +99,7 @@ void OBJReader :: readOBJ(std::string path, std::string filename) {
 //	}
 
 
-	gfx::OBJReader::GroupIterator iter = groupsBegin();
+	OBJReader::GroupIterator iter = groupsBegin();
 	while (iter != groupsEnd()) {
 
 //		Group& g = mGroups[iter->first];
@@ -482,7 +481,7 @@ GraphicsData * OBJReader::createGraphicsData(GroupIterator iter) {
 	if (g.indices.size() <= 0) return NULL;
 
 	GraphicsData * gd = new GraphicsData();
-	gd->primitive(gfx::TRIANGLES);
+	gd->primitive(Graphics::TRIANGLES);
 	gd->resetBuffers();
 
 	// memoize face_vertices index -> graphicsdata index
@@ -1330,3 +1329,4 @@ void Model :: readOBJ(std::string filename) {
 }
 
 */
+} // ::al

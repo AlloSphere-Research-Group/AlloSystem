@@ -1,11 +1,9 @@
 #include <stdlib.h>
 #include "allocore/graphics/al_GraphicsBackend.hpp"
-#include "allocore/graphics/al_Config.h"
+//#include "allocore/graphics/al_Config.h"
 #include "allocore/graphics/al_Texture.hpp"
 
-namespace al {
-namespace gfx{
-
+namespace al{
 
 Texture::Texture(GraphicsBackend *backend)
 :	GPUObject(),
@@ -278,7 +276,6 @@ Texture::Target Texture::target_for_lattice_dimcount(int dimcount) {
 	}
 }
 
-} // ::al::gfx
 } // ::al
 
 

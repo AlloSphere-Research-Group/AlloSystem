@@ -2,13 +2,11 @@
 #define INCLUDE_AL_GRAPHICS_SURFACE_HPP
 
 #include "allocore/graphics/al_Texture.hpp"
-#include "allocore/graphics/al_Common.hpp"
 #include "allocore/graphics/al_GPUObject.hpp"
 #include "allocore/types/al_types.hpp"
 #include "allocore/types/al_Color.hpp"
 
-namespace al {
-namespace gfx{
+namespace al{
 
 class GraphicsBackend;
 
@@ -52,7 +50,6 @@ protected:
 	bool			mAutoclear;
 };
 
-} // ::al::gfx
 } // ::al
 
 #endif

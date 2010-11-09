@@ -5,8 +5,7 @@
 #include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_GraphicsBackend.hpp"
 
-namespace al {
-namespace gfx{
+namespace al{
 
 void GraphicsData::resetBuffers() {
 	vertices().clear();
@@ -248,7 +247,7 @@ void Graphics::matrixMode(MatrixMode mode) {
 	mMatrixMode = mode;
 }
 
-MatrixMode Graphics::matrixMode() {
+Graphics::MatrixMode Graphics::matrixMode() {
 	return mMatrixMode;
 }
 
@@ -531,5 +530,4 @@ bool Graphics :: setBackend(Backend::type backend) {
 	return true;
 }
 */
-} // ::al::gfx
 } // ::al

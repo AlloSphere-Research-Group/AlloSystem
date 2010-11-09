@@ -2,46 +2,23 @@
 #include "allocore/graphics/al_GraphicsBackendOpenGL.hpp"
 
 namespace al{
-namespace gfx{
 
 void GraphicsBackendOpenGL::gl_error(const char *msg) {
 	GLenum err = glGetError();
 
+	#define POST "The offending command is ignored and has no other side effect than to set the error flag."
 	switch(err) {
-		case GL_INVALID_ENUM:
-			printf("%s:\n %s\n", msg, "An unacceptable value is specified for an enumerated argument. The offending command is ignored and has no other side effect than to set the error flag.");
-			break;
-
-		case GL_INVALID_VALUE:
-			printf("%s:\n %s\n", msg, "A numeric argument is out of range. The offending command is ignored and has no other side effect than to set the error flag.");
-			break;
-
-		case GL_INVALID_OPERATION:
-			printf("%s:\n %s\n", msg, "The specified operation is not allowed in the current state. The offending command is ignored and has no other side effect than to set the error flag.");
-			break;
-
-		case GL_STACK_OVERFLOW:
-			printf("%s:\n %s\n", msg, "This command would cause a stack overflow. The offending command is ignored and has no other side effect than to set the error flag.");
-			break;
-
-		case GL_STACK_UNDERFLOW:
-			printf("%s:\n %s\n", msg, "This command would cause a stack underflow. The offending command is ignored and has no other side effect than to set the error flag.");
-			break;
-
-		case GL_OUT_OF_MEMORY:
-			printf("%s:\n %s\n", msg, "There is not enough memory left to execute the command.  The state of the GL is undefined, except for the state of the error flags, after this error is recorded.");
-			break;
-
-		case GL_TABLE_TOO_LARGE:
-			printf("%s:\n %s\n", msg, "The specified table exceeds the implementation's maximum supported table size.  The offending command is ignored and has no other side effect than to set the error flag.");
-			break;
-
-		case GL_NO_ERROR:
-			break;
-
-		default:
-			break;
+		case GL_INVALID_ENUM:	printf("%s:\n %s\n", msg, "An unacceptable value is specified for an enumerated argument. "POST); break;
+		case GL_INVALID_VALUE:	printf("%s:\n %s\n", msg, "A numeric argument is out of range. "POST); break;
+		case GL_INVALID_OPERATION:printf("%s:\n %s\n", msg, "The specified operation is not allowed in the current state. "POST); break;
+		case GL_STACK_OVERFLOW:	printf("%s:\n %s\n", msg, "This command would cause a stack overflow. "POST); break;
+		case GL_STACK_UNDERFLOW:printf("%s:\n %s\n", msg, "This command would cause a stack underflow. "POST); break;
+		case GL_OUT_OF_MEMORY:	printf("%s:\n %s\n", msg, "There is not enough memory left to execute the command. The state of the GL is undefined, except for the state of the error flags, after this error is recorded."); break;
+		case GL_TABLE_TOO_LARGE:printf("%s:\n %s\n", msg, "The specified table exceeds the implementation's maximum supported table size. "POST); break;
+		case GL_NO_ERROR: break;
+		default: break;
 	}
+	#undef POST
 }
 
 
@@ -54,55 +31,46 @@ GLenum format_from_texture_format(GraphicsBackendOpenGL *backend, Texture::Forma
 GLenum type_from_texture_type(GraphicsBackendOpenGL *backend, Texture::Type type);
 GLenum internal_format_from_format(GraphicsBackendOpenGL *backend, Texture::Format format, Texture::Type type);
 
-GLenum gl_antialias_mode(AntiAliasMode mode) {
-	switch (mode) {
-		case NICEST:	return GL_NICEST;
-		case FASTEST:	return GL_FASTEST;
-		default:		return GL_DONT_CARE;
+#define CS(TYPE) case Graphics::TYPE: return GL_##TYPE;
+
+GLenum gl_antialias_mode(Graphics::AntiAliasMode v) {
+	switch(v){
+		CS(NICEST) CS(FASTEST)
+		default: return GL_DONT_CARE;
 	}
 }
 
-GLenum gl_blend_func(BlendFunc bf) {
-	switch (bf) {
-		case SRC_COLOR:	return GL_SRC_COLOR;
-		case DST_COLOR:	return GL_DST_COLOR;
-		case SRC_ALPHA:	return GL_SRC_ALPHA;
-		case DST_ALPHA:	return GL_DST_ALPHA;
-		case ZERO:		return GL_ZERO;
-		case ONE:		return GL_ONE;
-		case SRC_ALPHA_SATURATE: return GL_SRC_ALPHA_SATURATE;
-		
-		default:
-			return GL_SRC_COLOR;
+GLenum gl_blend_func(Graphics::BlendFunc v) {
+	switch(v){
+		CS(SRC_COLOR) CS(DST_COLOR) CS(SRC_ALPHA) CS(DST_ALPHA)
+		CS(ZERO) CS(ONE) CS(SRC_ALPHA_SATURATE)
+		default: return GL_SRC_COLOR;
 	}
 }
 
-GLenum gl_polygon_mode(PolygonMode mode) {
-	switch(mode) {
-		case POINT:	return GL_POINT;
-		case LINE:	return GL_LINE;
-		case FILL:
-		default:
-			return GL_FILL;
+GLenum gl_polygon_mode(Graphics::PolygonMode v) {
+	switch(v){
+		CS(POINT) CS(LINE)
+		default: return GL_FILL;
 	}
 }
 
-GLenum gl_primitive(Primitive prim) {
-	switch(prim) {
-		case POINTS:		return GL_POINTS;
-		case LINES:			return GL_LINES;
-		case LINE_STRIP:	return GL_LINE_STRIP;
-		case LINE_LOOP:		return GL_LINE_LOOP;
-		case TRIANGLES:		return GL_TRIANGLES;
-		case TRIANGLE_STRIP:return GL_TRIANGLE_STRIP;
-		case TRIANGLE_FAN:	return GL_TRIANGLE_FAN;
-		case QUADS:			return GL_QUADS;
-		case QUAD_STRIP:	return GL_QUAD_STRIP;
-		case POLYGON:		return GL_POLYGON;
-		
+GLenum gl_primitive(Graphics::Primitive v){
+	switch(v){
+		CS(POINTS) CS(LINES) CS(LINE_STRIP) CS(LINE_LOOP) CS(TRIANGLES)
+		CS(TRIANGLE_STRIP) CS(TRIANGLE_FAN) CS(QUADS) CS(QUAD_STRIP) CS(POLYGON)
 		default: return GL_POINTS;
 	}
 }
+
+GLenum gl_capability(Graphics::Capability v){
+	switch(v){
+		CS(BLEND) CS(DEPTH_TEST) CS(LIGHTING)
+		default: return 0;
+	}
+}
+
+#undef CS
 
 
 GraphicsBackendOpenGL::GraphicsBackendOpenGL()
@@ -113,7 +81,15 @@ GraphicsBackendOpenGL::~GraphicsBackendOpenGL(){
 }
 
 // Render State
-void GraphicsBackendOpenGL::enableBlending(bool enable, BlendFunc src, BlendFunc dst) {
+void GraphicsBackendOpenGL::enable(Graphics::Capability v){
+	return glEnable(gl_capability(v));
+}
+
+void GraphicsBackendOpenGL::disable(Graphics::Capability v){
+	return glDisable(gl_capability(v));
+}
+
+void GraphicsBackendOpenGL::enableBlending(bool enable, Graphics::BlendFunc src, Graphics::BlendFunc dst) {
 	if(enable) {
 		glEnable(GL_BLEND);
 		glBlendFunc(
@@ -162,11 +138,11 @@ void GraphicsBackendOpenGL::enableScissor(bool enable) {
 	}
 }
 
-void GraphicsBackendOpenGL::setPolygonMode(PolygonMode mode) {
+void GraphicsBackendOpenGL::setPolygonMode(Graphics::PolygonMode mode) {
 	glPolygonMode(GL_FRONT_AND_BACK, gl_polygon_mode(mode));
 }
 
-void GraphicsBackendOpenGL::setAntialiasing(AntiAliasMode mode) {
+void GraphicsBackendOpenGL::setAntialiasing(Graphics::AntiAliasMode mode) {
 	GLenum m = gl_antialias_mode(mode);
 	glEnable(GL_POINT_SMOOTH_HINT);
 	glEnable(GL_LINE_SMOOTH_HINT);
@@ -200,10 +176,10 @@ void GraphicsBackendOpenGL::lineWidth(double v) {
 // Frame
 void GraphicsBackendOpenGL::clear(int attribMask) {
 	int bits = 
-		(attribMask & COLOR_BUFFER_BIT ? GL_COLOR_BUFFER_BIT : 0) |
-		(attribMask & DEPTH_BUFFER_BIT ? GL_DEPTH_BUFFER_BIT : 0) |
-		(attribMask & ENABLE_BIT ? GL_ENABLE_BIT : 0) |
-		(attribMask & VIEWPORT_BIT ? GL_VIEWPORT_BIT : 0);
+		(attribMask & Graphics::COLOR_BUFFER_BIT ? GL_COLOR_BUFFER_BIT : 0) |
+		(attribMask & Graphics::DEPTH_BUFFER_BIT ? GL_DEPTH_BUFFER_BIT : 0) |
+		(attribMask & Graphics::ENABLE_BIT ? GL_ENABLE_BIT : 0) |
+		(attribMask & Graphics::VIEWPORT_BIT ? GL_VIEWPORT_BIT : 0);
 	glClear(bits);
 }
 
@@ -854,7 +830,7 @@ void GraphicsBackendOpenGL::draw(const GraphicsData& v) {
 
 //		glDrawRangeElements(v.primitive(), vs, ve, ie-is, GL_UNSIGNED_INT, &v.indices()[is]);
 		glDrawElements(
-			gl_primitive(v.primitive()), 
+			gl_primitive((Graphics::Primitive)v.primitive()), 
 			ie-is, 
 			GL_UNSIGNED_INT, 
 			&v.indices()[is]
@@ -862,7 +838,7 @@ void GraphicsBackendOpenGL::draw(const GraphicsData& v) {
 	}
 	else{
 		glDrawArrays(
-			gl_primitive(v.primitive()), 
+			gl_primitive((Graphics::Primitive)v.primitive()), 
 			0, 
 			v.vertices().size()
 		);
@@ -875,5 +851,4 @@ void GraphicsBackendOpenGL::draw(const GraphicsData& v) {
 
 }
 
-} // ::al::gfx
 } // ::al

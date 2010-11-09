@@ -3,12 +3,10 @@
 
 #include <string>
 
+#include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/types/al_Color.hpp"
-#include "allocore/graphics/al_Common.hpp"
 
-namespace al {
-namespace gfx{
-
+namespace al{
 
 /// Material properties
 
@@ -17,13 +15,13 @@ namespace gfx{
 class Material {
 public:
 
-	Material(Face::t f=Face::Front);
+	Material(Graphics::Face f=Graphics::FRONT);
 
 	/// Send current material settings to GPU
 	void operator()() const;
 
 	/// Set the polygon face that material will be applied to
-	Material& face(gfx::Face::t f);
+	Material& face(Graphics::Face f);
 
 	/// Set specular exponent [0, 128]
 	Material& shininess(float v);
@@ -36,11 +34,13 @@ public:
 	Material& emission(const Color& v);
 	Material& specular(const Color& v);
 
-	Material& ambientMap(std::string map) { mMapKa = map; return *this; }
-	Material& specularMap(std::string map) { mMapKs = map; return *this; }
-	Material& diffuseMap(std::string map) { mMapKd = map; return *this; }
-	Material& bumpMap(std::string map) { mMapBump = map; return *this; }
+	Material& ambientMap(const std::string& map) { mMapKa = map; return *this; }
+	Material& specularMap(const std::string& map) { mMapKs = map; return *this; }
+	Material& diffuseMap(const std::string& map) { mMapKd = map; return *this; }
+	Material& bumpMap(const std::string& map) { mMapBump = map; return *this; }
 	Material& useColorMaterial(bool v) { mUseColorMaterial = v; return *this; }
+
+	Graphics::Face face() const { return mFace; }
 
 	float shininess() const { return mShine; }
 	float opticalDensity() const { return mOpticalDensity; }
@@ -62,7 +62,7 @@ protected:
 	Color mEmission;
 	Color mSpecular;
 	float mShine, mOpticalDensity, mIllumination;
-	int mFace;
+	Graphics::Face mFace;
 	std::string mMapKa, mMapKs, mMapKd, mMapBump;
 	bool mUseColorMaterial;
 };
@@ -127,7 +127,6 @@ protected:
 	float mAtten[3];
 };
 
-} // ::al::gfx
 } // ::al
 
 #endif

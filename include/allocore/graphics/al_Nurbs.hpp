@@ -33,14 +33,10 @@
 #include <map>
 
 #include "graphics/al_Graphics.hpp"
-#include "graphics/al_Common.hpp"
 
 namespace al {
-namespace gfx{
 
 
-
-} // ::al::gfx
 } // ::al
 
 #endif /* include guard */

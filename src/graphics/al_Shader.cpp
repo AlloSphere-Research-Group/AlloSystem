@@ -1,7 +1,15 @@
+#include "allocore/graphics/al_GraphicsOpenGL.h"
 #include "allocore/graphics/al_Shader.hpp"
 
-namespace al {
-namespace gfx{
+namespace al{
+
+GLenum gl_shader_type(Shader::Type v) {
+	switch(v){
+		case Shader::FRAGMENT:	return GL_FRAGMENT_SHADER;
+		case Shader::VERTEX:	return GL_VERTEX_SHADER;
+		default: return 0;
+	}
+}
 
 const char * ShaderBase::log(){
 	GLint lsize; get(GL_INFO_LOG_LENGTH, &lsize);
@@ -19,7 +27,7 @@ void glDeleteProgram (GLuint program);
 void glDetachShader(GLuint program, GLuint shader);
 */
 
-Shader::Shader(const std::string& source, ShaderType::t type)
+Shader::Shader(const std::string& source, Shader::Type type)
 :	mSource(source), mType(type){}
 
 Shader& Shader::compile(){ glCompileShader(id()); return *this; }
@@ -34,7 +42,7 @@ bool Shader::compiled() const {
 void Shader::get(int pname, void * params) const { glGetShaderiv(id(), pname, (GLint *)params); }
 
 void Shader::onCreate(){
-	mID = glCreateShader(mType);
+	mID = glCreateShader(gl_shader_type(mType));
 	if(mSource[0]){
 		sendSource(); compile();
 	}
@@ -56,7 +64,7 @@ Shader& Shader::source(const std::string& v){
 	return *this;
 }
 
-Shader& Shader::source(const std::string& src, ShaderType::t type){
+Shader& Shader::source(const std::string& src, Shader::Type type){
 	mType=type; return source(src);
 }
 	
@@ -89,8 +97,6 @@ int ShaderProgram::uniformLocation(const char * name) const { return glGetUnifor
 
 void ShaderProgram::get(int pname, void * params) const { glGetProgramiv(id(), pname, (GLint *)params); }
 
-
-} // ::al::gfx
 } // ::al
 
 

@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_GRAPHICS_CONFIG_H
-#define INCLUDE_AL_GRAPHICS_CONFIG_H
+#ifndef INCLUDE_AL_GRAPHICS_OPENGL_H
+#define INCLUDE_AL_GRAPHICS_OPENGL_H
 
 #include "allocore/system/al_Config.h"
 

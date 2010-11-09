@@ -3,12 +3,12 @@
 
 using namespace al;
 
-static gfx::GraphicsBackendOpenGL backend;
-static gfx::Graphics gl(&backend);
+static GraphicsBackendOpenGL backend;
+static Graphics gl(&backend);
 
-static gfx::GraphicsData stuff;
+static GraphicsData stuff;
 
-static gfx::Stereographic stereo;
+static Stereographic stereo;
 static Camera cam;
 
 static rnd::Random<> rng;
@@ -49,11 +49,11 @@ struct MyWindow : Window{
 		
 		switch(k.key()){
 			case Key::Tab: stereo.stereo(!stereo.stereo()); return false;
-			case '1': stereo.mode(gfx::Stereographic::Anaglyph); return false;
-			case '2': stereo.mode(gfx::Stereographic::Active); return false;
-			case '3': stereo.mode(gfx::Stereographic::Dual); return false;
-			case '4': stereo.mode(gfx::Stereographic::LeftEye); return false;
-			case '5': stereo.mode(gfx::Stereographic::RightEye); return false;
+			case '1': stereo.mode(Stereographic::Anaglyph); return false;
+			case '2': stereo.mode(Stereographic::Active); return false;
+			case '3': stereo.mode(Stereographic::Dual); return false;
+			case '4': stereo.mode(Stereographic::LeftEye); return false;
+			case '5': stereo.mode(Stereographic::RightEye); return false;
 			default: return true;
 		}
 	}
@@ -74,13 +74,13 @@ struct MyWindow : Window{
 
 	static void render(void * ud) 
 	{	
-		gfx::State state;
+		Graphics::State state;
 		state.depth_enable = false;
 		state.blend_enable = true;
 		
-		state.blend_src = gfx::SRC_ALPHA_SATURATE;
-		state.blend_dst = gfx::ONE;
-		state.antialias_mode = gfx::NICEST;
+		state.blend_src = gl.SRC_ALPHA_SATURATE;
+		state.blend_dst = gl.ONE;
+		state.antialias_mode = gl.NICEST;
 		gl.pushState(state);
 		
 		//glEnable(GL_POLYGON_SMOOTH);
@@ -100,7 +100,7 @@ int main (int argc, char * const argv[]) {
 	cam.eyeSep(1/20.);
 	
 	// set up stuff:
-	stuff.primitive(gfx::TRIANGLES);
+	stuff.primitive(Graphics::TRIANGLES);
 	double tri_size = 2;
 	double world_radius = 50;
 	for (int i=0; i<4000; i++) {

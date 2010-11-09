@@ -3,11 +3,12 @@
 */
 
 #include "graphics/al_BufferObject.hpp"
-#include "graphics/al_Common.hpp"
 #include "graphics/al_Config.h"
 #include "graphics/al_Context.hpp"
 #include "graphics/al_Debug.hpp"
 #include "graphics/al_GPUObject.hpp"
+#include "protocol/al_Graphics.hpp"
+#include "protocol/al_GraphicsBackendOpenGL.hpp"
 #include "graphics/al_Isosurface.hpp"
 #include "graphics/al_Light.hpp"
 #include "graphics/al_Shader.hpp"
@@ -30,8 +31,6 @@
 #include "math/al_Random.hpp"
 #include "math/al_Vec.hpp"
 
-#include "protocol/al_Graphics.hpp"
-#include "protocol/al_GraphicsBackendOpenGL.hpp"
 #include "protocol/al_OSC.hpp"
 #include "protocol/al_OSCAPR.hpp"
 #include "protocol/al_Serialize.hpp"
@@ -62,8 +61,8 @@
 
 using namespace al;
 
-gfx::GraphicsBackendOpenGL backend;
-gfx::Graphics gl(&backend);
+GraphicsBackendOpenGL backend;
+Graphics gl(&backend);
 
 const int N = 32;
 float volData[N*N*N];
@@ -80,7 +79,7 @@ struct MyWindow : Window{
 	}
 
 	void onFrame(){
-		gl.clear(gfx::AttributeBit::ColorBuffer | gfx::AttributeBit::DepthBuffer);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.loadIdentity();
 		gl.viewport(0,0, dimensions().w, dimensions().h);
 
@@ -100,7 +99,7 @@ struct MyWindow : Window{
 		}
 		}
 
-		iso.primitive(gfx::TRIANGLES);
+		iso.primitive(gl.TRIANGLES);
 		iso.level(0);
 		iso.resetBuffers();
 		iso.generate(volData, N, 1./N);

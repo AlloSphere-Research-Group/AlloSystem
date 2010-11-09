@@ -1,7 +1,7 @@
 #include "utAllocore.h"
 
-static gfx::GraphicsBackendOpenGL backend;
-static gfx::Graphics gl(&backend);
+static GraphicsBackendOpenGL backend;
+static Graphics gl(&backend);
 
 struct MyWindow : Window{
 
@@ -29,11 +29,11 @@ struct MyWindow : Window{
 	}
 
 	bool onFrame(){
-		gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.loadIdentity();
 		gl.viewport(0,0, dimensions().w, dimensions().h);
 		
-		gl.begin(gfx::LINE_STRIP);
+		gl.begin(gl.LINE_STRIP);
 			static float limit = 120;
 			for (float i = 0; i<limit; i++) {
 				float p = i / limit;
