@@ -172,6 +172,10 @@ public:
 		for(int i=1; i<N; ++i){ r *= (*this)[i]; }
 		return r;
 	}
+	
+	Vec reflect(const Vec& normal) {
+		return this - (2 * dot(normal) * normal);
+	}
 
 	/// Returns closest vector on unit N-sphere
 	Vec sgn() const { return Vec(*this).normalize(); }

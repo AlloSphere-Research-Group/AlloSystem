@@ -136,6 +136,16 @@ public:
 	void turn(const Quatd& v) {
 		v.toEuler(mSpin1);
 	}
+	
+	/// turn to face a given world-coordinate point 
+	void faceToward(const Vec3d& p, double amt=1.) {
+		Vec3d rotEuler;
+		Vec3d target(p - pos());
+		target.normalize();
+		Quatd rot = Quatd::getRotationTo(uf(), target);
+		rot.toEuler(rotEuler);
+		mTurn.set(rotEuler * amt);
+	}
 
 	/// Set linear velocity
 	void move(double dr, double du, double df) { moveR(dr); moveU(du); moveF(df); }

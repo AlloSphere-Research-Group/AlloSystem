@@ -1,8 +1,14 @@
 #ifndef INCLUDE_AL_QUAT_HPP
 #define INCLUDE_AL_QUAT_HPP
 
-#include "allocore/math/al_Quat.h"
+
+#include "allocore/math/al_Constants.hpp"
 #include "allocore/math/al_Vec.hpp"
+
+#define QUAT_ACCURACY_MAX (1.000001)
+#define QUAT_ACCURACY_MIN (0.999999)
+#define QUAT_EPSILON (0.0000001)
+#define QUAT_DEG2RAD_BY2 (M_DEG2RAD/2)
 
 #ifndef ABS
 	#define ABS(x) ((x)<0?-(x):(x))
@@ -188,6 +194,19 @@ public:
 	// v1 and v2 must be normalized
 	// alternatively expressed as Q = (1+gp(v1, v2))/sqrt(2*(1+dot(b, a)))
 	static Quat<T> rotor(Vec<3,T> &v1, Vec<3,T> &v2);
+	
+	
+	///! calculate the rotation required to move from unit vector src to unit vector dst
+	/// rotation occurs around the axis created by the cross product of src and dst
+	/// if the vectors are nearly opposing, the Y axis is used instead 
+	/// if the Y axis isn't suitable, the Z axis is used instead
+	/// 
+	/// a typical use case: rotate object A to face object B:
+	/// Vec3d src = Vec3d(A.quat().toVectorZ()).normalize();
+	/// Vec3d dst = Vec3d(B.pos() - A.pos()).normalize();
+	/// Quatd rot = Quatd::getRotationTo(src, dst);
+	/// A.quat() = rot * A.quat();
+	static Quat<T> getRotationTo(const Vec<3, T>& src, const Vec<3, T>& dst);
 
 };
 
@@ -769,6 +788,40 @@ void Quat<T> :: slerp_buffer(const Quat& input, const Quat& target, Quat<T> * bu
 			buffer[i].normalize();
 		}
 	}
+}
+
+template<typename T> 
+Quat<T> Quat<T> :: getRotationTo(const Vec<3, T>& src, const Vec<3, T>& dst) {
+	Quat<T> q;
+	Vec<3, T> v0(src);
+	Vec<3, T> v1(dst);
+	
+	T d = v0.dot(v1);
+	if (d >= 1.) {
+		// vectors are the same
+		return q;
+	}
+	if (d < (1.0e-6 - 1.)) {
+		// vectors are nearly opposing
+		// pick an axis to rotate around
+		Vec<3, T> axis = cross(Vec<3, T>(0, 1, 0), src);
+		// if colinear, pick another:
+		if (axis.magSqr() < 1.0e-6) {
+			axis = cross(Vec<3, T>(0, 0, 1), src);
+		}
+		axis.normalize();
+		q.setFromAxisAngle(180, axis);
+	} else {
+		T s = sqrt((d+1.)*2);
+		T invs = 1./s;
+		Vec<3, T> c = cross(v0, v1);
+		q.x = c[0] * invs;
+		q.y = c[1] * invs;
+		q.z = c[2] * invs;
+		q.w = s * 0.5;
+		q.normalize();
+	}
+	return q;
 }
 
 /*!

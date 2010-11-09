@@ -118,6 +118,23 @@ template<class T> T fold(T value, T hi=T(1), T lo=T(0));
 /// Returns value folded into [lo, hi] one time.
 template<class T> T foldOnce(T value, T hi=T(1), T lo=T(0));
 
+template <class V3>
+void frenet(const V3& d1, const V3& d2, V3& t, V3& n, V3& b){	
+	b = cross(d2, d1);
+	n = cross(d1, b);
+	t = d1 * 1./sqrt((d1.magSqr()));
+	b *= 1./sqrt(b.magSqr());
+	n *= 1./sqrt(n.magSqr());
+}
+
+template <class V3>
+void frenet(const V3& p2, const V3& p1, const V3& p0, V3& t, V3& n, V3& b){
+	//const V3 d1 = p0 - p1, d2 = d1 - (p1 - p2);
+	const V3 d1 = (p0 - p2)*0.5;
+	const V3 d2 = (d1 - p1)*2.0; // p0 - 2*p1 + p2 = p0 - p2 - 2*p1 = 2*d1 - 2*p1
+	frenet(d1,d2, t,n,b);
+}
+
 /// Returns e^(-v*v)
 template<class T> T gaussian(T v);
 
