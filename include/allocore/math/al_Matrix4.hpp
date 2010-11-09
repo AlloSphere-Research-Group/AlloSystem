@@ -55,10 +55,10 @@ public:
 	{}
 	
 	Matrix4(
-		const Vec3<T>& xaxis,
-		const Vec3<T>& yaxis,
-		const Vec3<T>& zaxis,
-		const Vec3<T>& position
+		const Vec<3,T>& xaxis,
+		const Vec<3,T>& yaxis,
+		const Vec<3,T>& zaxis,
+		const Vec<3,T>& position
 	)
 	:	Base(
 			xaxis[0], yaxis[0], zaxis[0], position[0],
@@ -256,7 +256,7 @@ public:
 						0,		0,		0,		1	);
 	}
 	
-	static const Matrix4 lookAt(const Vec3<T>& ux, const Vec3<T>& uy, const Vec3<T>& uz, const Vec3<T>& pos) {
+	static const Matrix4 lookAt(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& pos) {
 		return Matrix4(
 			 ux[0], ux[1], ux[2], -(ux.dot(pos)),
 			 uy[0], uy[1], uy[2], -(uy.dot(pos)),
@@ -265,21 +265,21 @@ public:
 		);
 	}
 	
-	static const Matrix4 lookat2(const Vec3<T>& eye, const Vec3<T>& at, const Vec3<T>& up) {
-		Vec3<T> z = (at - eye).normalize();
-		Vec3<T> x = cross(up, z);
-		Vec3<T> y = cross(z, x);
+	static const Matrix4 lookat2(const Vec<3,T>& eye, const Vec<3,T>& at, const Vec<3,T>& up) {
+		Vec<3,T> z = (at - eye).normalize();
+		Vec<3,T> x = cross(up, z);
+		Vec<3,T> y = cross(z, x);
 		return lookAt(x, y, z, eye);
 	}
 	
 	// for stereographics:
-	static const Matrix4 lookAtLeft(const Vec3<T>& ux, const Vec3<T>& uy, const Vec3<T>& uz, const Vec3<T>& pos, double eyeSep) {
+	static const Matrix4 lookAtLeft(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& pos, double eyeSep) {
 		return lookAtOffAxis(ux,uy,uz, pos,-eyeSep);
 	}
-	static const Matrix4 lookAtRight(const Vec3<T>& ux, const Vec3<T>& uy, const Vec3<T>& uz, const Vec3<T>& pos, double eyeSep) {
+	static const Matrix4 lookAtRight(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& pos, double eyeSep) {
 		return lookAtOffAxis(ux,uy,uz, pos, eyeSep);
 	}
-	static const Matrix4 lookAtOffAxis(const Vec3<T>& ux, const Vec3<T>& uy, const Vec3<T>& uz, const Vec3<T>& pos, double eyeShift){
+	static const Matrix4 lookAtOffAxis(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& pos, double eyeShift){
 		return lookAt(ux, uy, uz, pos + (ux * eyeShift));
 	}
 };

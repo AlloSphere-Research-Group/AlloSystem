@@ -59,17 +59,17 @@ public:
 	enum{ TOP=0, BOTTOM, LEFT, RIGHT, NEARP, FARP };
 	enum{ OUTSIDE, INTERSECT, INSIDE };
 
-	Vec3<T> ntl, ntr, nbl, nbr, ftl, ftr, fbl, fbr;	// corners
+	Vec<3,T> ntl, ntr, nbl, nbr, ftl, ftr, fbl, fbr;	// corners
 	Plane<T> pl[6];									// faces
 
 	/// Test whether point is in frustum
-	int pointInFrustum(const Vec3<T>& p) const;
+	int pointInFrustum(const Vec<3,T>& p) const;
 	
 	/// Test whether sphere is in frustum
-	int sphereInFrustum(const Vec3<T>& p, float raio) const;
+	int sphereInFrustum(const Vec<3,T>& p, float raio) const;
 	
 	/// Test whether axis-aligned box is in frustum
-	int boxInFrustum(const Vec3<T>& xyz, const Vec3<T>& dim) const;
+	int boxInFrustum(const Vec<3,T>& xyz, const Vec<3,T>& dim) const;
 
 	void computePlanes();
 
@@ -82,7 +82,7 @@ public:
 //	void setCamInternals(T angle, T ratio, T nearDist, T farDist);
 //	
 //	/// Set from camera position, look, and up vectors
-//	void setCamDef(const Vec3<T>& pos, const Vec3<T>& look, const Vec3<T>& up);
+//	void setCamDef(const Vec<3,T>& pos, const Vec<3,T>& look, const Vec<3,T>& up);
 		
 };
 
@@ -113,14 +113,14 @@ void Frustum<T>::computePlanes(){
 //}
 //
 //template <class T>
-//void Frustum<T>::setCamDef(const Vec3<T>& p, const Vec3<T>& l, const Vec3<T>& u){
+//void Frustum<T>::setCamDef(const Vec<3,T>& p, const Vec<3,T>& l, const Vec<3,T>& u){
 //
-//	Vec3<T> Z = (p-l).normalize();
-//	Vec3<T> X = cross(u,Z).normalize();
-//	Vec3<T> Y = cross(Z,X);
+//	Vec<3,T> Z = (p-l).normalize();
+//	Vec<3,T> X = cross(u,Z).normalize();
+//	Vec<3,T> Y = cross(Z,X);
 //
-//	Vec3<T> nc = p - Z * mNear;
-//	Vec3<T> fc = p - Z * mFar;
+//	Vec<3,T> nc = p - Z * mNear;
+//	Vec<3,T> fc = p - Z * mFar;
 //
 //	ntl = nc + Y * nh - X * nw;
 //	ntr = nc + Y * nh + X * nw;
@@ -141,7 +141,7 @@ void Frustum<T>::computePlanes(){
 //}
 
 template <class T>
-int Frustum<T>::pointInFrustum(const Vec3<T>& p) const {
+int Frustum<T>::pointInFrustum(const Vec<3,T>& p) const {
 	int result = INSIDE;
 	for(int i=0; i<6; ++i){
 		if(pl[i].distance(p) < 0)
@@ -151,7 +151,7 @@ int Frustum<T>::pointInFrustum(const Vec3<T>& p) const {
 }
 
 template <class T>
-int Frustum<T>::sphereInFrustum(const Vec3<T>& p, float raio) const {
+int Frustum<T>::sphereInFrustum(const Vec<3,T>& p, float raio) const {
 	int result = INSIDE;
 	for(int i=0; i<6; ++i){
 		float distance = pl[i].distance(p);
@@ -164,18 +164,18 @@ int Frustum<T>::sphereInFrustum(const Vec3<T>& p, float raio) const {
 }
 
 template <class T>
-int Frustum<T>::boxInFrustum(const Vec3<T>& xyz, const Vec3<T>& dim) const {
+int Frustum<T>::boxInFrustum(const Vec<3,T>& xyz, const Vec<3,T>& dim) const {
 	int result = INSIDE;
 	for(int i=0; i<6; i++){
 		const Vec3d& plNrm = pl[i].normal();
-		Vec3<T> vp = xyz;
+		Vec<3,T> vp = xyz;
 		
 		if(plNrm[0] > 0) vp[0] += dim[0];
 		if(plNrm[1] > 0) vp[1] += dim[1];
 		if(plNrm[2] > 0) vp[2] += dim[2];
 		if(pl[i].distance(vp) < 0) return OUTSIDE;	
 
-		Vec3<T> vn = xyz;
+		Vec<3,T> vn = xyz;
 		if(plNrm[0] < 0) vn[0] += dim[0];
 		if(plNrm[1] < 0) vn[1] += dim[1];
 		if(plNrm[2] < 0) vn[2] += dim[2];

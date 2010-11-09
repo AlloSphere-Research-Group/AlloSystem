@@ -36,7 +36,7 @@ template <class T>
 class Plane{
 public:
 
-	typedef al::Vec3<T> Vec3;
+	typedef al::Vec<3,T> Vec3;
 
 	Plane(){}
 	Plane(const Vec3& v1, const Vec3& v2, const Vec3& v3);

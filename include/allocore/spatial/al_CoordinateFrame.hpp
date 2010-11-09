@@ -48,17 +48,17 @@ public:
 		return m;
 	}
 
-	
+
 	/// Set position
 	template <class T>
-	Pose& pos(const Vec3<T>& v){ return vec(v); }
+	Pose& pos(const Vec<3,T>& v){ return vec(v); }
 	
 	/// Set position from individual components
 	Pose& pos(double x, double y, double z) { return vec(Vec3d(x,y,z)); }
 
 	/// Set vector component
 	template <class T>
-	Pose& vec(const Vec3<T>& v){ mVec.set(v); return *this; }
+	Pose& vec(const Vec<3,T>& v){ mVec.set(v); return *this; }
 
 	/// Set quaternion component
 	template <class T>
@@ -73,7 +73,7 @@ public:
 
 	/// Get right, up, and forward unit vectors
 	template <class T>
-	void unitVectors(Vec3<T>& ur, Vec3<T>& uu, Vec3<T>& uf) const {
+	void unitVectors(Vec<3,T>& ur, Vec<3,T>& uu, Vec<3,T>& uf) const {
 		quat().toVectorX(ur);
 		quat().toVectorY(uu);
 		quat().toVectorZ(uf);	

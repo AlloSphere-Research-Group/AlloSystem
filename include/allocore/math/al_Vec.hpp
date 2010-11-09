@@ -33,19 +33,17 @@ namespace al {
 
 
 template <int N, class T> class Vec;
-template <class T> class Vec3;
-template <class T> class Vec4;
 template <int N, class T> class Mat;
 
 typedef Vec<2,float>	Vec2f;
 typedef Vec<2,double>	Vec2d;
 typedef Vec<2,int>		Vec2i;
-typedef Vec3<float>		Vec3f;
-typedef Vec3<double>	Vec3d;
-typedef Vec3<int>		Vec3i;
-typedef Vec4<float>		Vec4f;
-typedef Vec4<double>	Vec4d;
-typedef Vec4<int>		Vec4i;
+typedef Vec<3,float>	Vec3f;
+typedef Vec<3,double>	Vec3d;
+typedef Vec<3,int>		Vec3i;
+typedef Vec<4,float>	Vec4f;
+typedef Vec<4,double>	Vec4d;
+typedef Vec<4,int>		Vec4i;
 typedef Mat<3,float>	Mat3f;
 typedef Mat<3,double>	Mat3d;
 typedef Mat<4,float>	Mat4f;
@@ -611,52 +609,8 @@ inline Vec<N,T> vmax(const Vec<N,T>& a, const Vec<N,T>& b){
 }
 
 
-// Specialized vector classes
 
-/// 2-vector
-template <class T>
-struct Vec2 : public Vec<2,T> {
-
-	typedef Vec<2,T> Base;
-
-	Vec2(const Base& v=Base()){ *this = v; }
-	Vec2(const T& x, const T& y){ Base::set(x,y); }
-
-	Vec2& operator= (const Base& v){ Base::set(v); return *this; }
-};
-
-
-/// 3-vector
-template <class T>
-struct Vec3 : public Vec<3,T> {
-
-	typedef Vec<3,T> Base;
-
-	Vec3(const Base& v=Base()){ *this = v; }
-	Vec3(const T& x, const T& y, const T& z){ Base::set(x,y,z); }
-
-	Vec3& operator= (const Base& v){ Base::set(v); return *this; }
-	
-	
-};
-
-
-/// 4-vector
-template <class T>
-struct Vec4 : public Vec<4,T> {
-
-	typedef Vec<4,T> Base;
-	
-	Vec4(const Base& v=Base()){ *this = v; }
-	Vec4(const T& x, const T& y, const T& z, const T& w){ Base::set(x,y,z,w); }
-	
-	Vec4& operator= (const Base& v){ Base::set(v); return *this; }
-
-};
-
-
-
-// Implementation
+// Implementation --------------------------------------------------------------
 
 template <int N, class T>
 Vec<N,T>& Vec<N,T>::normalize(){
