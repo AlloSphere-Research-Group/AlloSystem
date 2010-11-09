@@ -32,7 +32,7 @@
 #include <vector>
 #include <map>
 
-#include "allocore/protocol/al_Graphics.hpp"
+#include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_Common.hpp"
 #include "allocore/graphics/al_Light.hpp"
 

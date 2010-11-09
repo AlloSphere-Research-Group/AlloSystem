@@ -18,6 +18,17 @@
 		160FD0E111FA1CF4001E8987 /* al_Isosurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160FD0E011FA1CF4001E8987 /* al_Isosurface.cpp */; };
 		1619909E11743990006FBADF /* al_Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1619909C11743990006FBADF /* al_Color.cpp */; };
 		1619909F11743990006FBADF /* al_Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1619909C11743990006FBADF /* al_Color.cpp */; };
+		165867371288A0460068E01A /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
+		165867381288A0460068E01A /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
+		165867391288A0460068E01A /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC53081162907D0076AA8B /* CoreAudio.framework */; };
+		1658673A1288A0460068E01A /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
+		1658673B1288A0460068E01A /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
+		1658673C1288A0460068E01A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
+		1658673D1288A0460068E01A /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
+		1658673E1288A0460068E01A /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
+		1658675A1288A0880068E01A /* simpleGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 165867591288A0880068E01A /* simpleGraphics.cpp */; };
+		165867741288A1850068E01A /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
+		165867781288A1940068E01A /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
 		166DD742117CDB6000A8BA12 /* al_Conversion.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 166DD741117CDB6000A8BA12 /* al_Conversion.hpp */; };
 		166DD743117CDB6000A8BA12 /* al_Conversion.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 166DD741117CDB6000A8BA12 /* al_Conversion.hpp */; };
 		168EC8F11161CA2C00FCACC7 /* al_Time.h in Headers */ = {isa = PBXBuildFile; fileRef = 168EC8EB1161CA2C00FCACC7 /* al_Time.h */; };
@@ -288,6 +299,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		165867331288A0460068E01A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 36B4130E10EFFA8D007B16D0;
+			remoteInfo = libal;
+		};
 		3602B4CC110A67C9005DC3D0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
@@ -440,6 +458,8 @@
 		16198FF31173E39B006FBADF /* al_Buffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Buffer.hpp; sourceTree = "<group>"; };
 		1619909B11743914006FBADF /* al_Color.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Color.hpp; sourceTree = "<group>"; };
 		1619909C11743990006FBADF /* al_Color.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Color.cpp; sourceTree = "<group>"; };
+		165867421288A0460068E01A /* exSimpleGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exSimpleGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
+		165867591288A0880068E01A /* simpleGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = simpleGraphics.cpp; path = ../../examples/graphics/simpleGraphics.cpp; sourceTree = SOURCE_ROOT; };
 		1663FD461280D608002B2979 /* al_Allocore.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Allocore.hpp; sourceTree = "<group>"; };
 		166DD741117CDB6000A8BA12 /* al_Conversion.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Conversion.hpp; sourceTree = "<group>"; };
 		166DD744117CDBFD00A8BA12 /* utTypesConversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utTypesConversion.cpp; path = ../../unitTests/utTypesConversion.cpp; sourceTree = SOURCE_ROOT; };
@@ -773,6 +793,23 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		165867361288A0460068E01A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				165867781288A1940068E01A /* libportaudio.a in Frameworks */,
+				165867741288A1850068E01A /* libfreeimage.a in Frameworks */,
+				165867371288A0460068E01A /* AudioToolbox.framework in Frameworks */,
+				165867381288A0460068E01A /* AudioUnit.framework in Frameworks */,
+				165867391288A0460068E01A /* CoreAudio.framework in Frameworks */,
+				1658673A1288A0460068E01A /* GLUT.framework in Frameworks */,
+				1658673B1288A0460068E01A /* OpenGL.framework in Frameworks */,
+				1658673C1288A0460068E01A /* Cocoa.framework in Frameworks */,
+				1658673D1288A0460068E01A /* liballocore.a in Frameworks */,
+				1658673E1288A0460068E01A /* libapr-1.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		16AC529511628D0E0076AA8B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1005,6 +1042,7 @@
 		08FB7794FE84155DC02AAC07 /* alscheduling */ = {
 			isa = PBXGroup;
 			children = (
+				165867591288A0880068E01A /* simpleGraphics.cpp */,
 				36B5D3E611D81D2C004D228D /* TODO */,
 				3625B540116EEDEF00C685B7 /* Makefile */,
 				3625B541116EEDEF00C685B7 /* Makefile.config */,
@@ -1082,6 +1120,9 @@
 				16AA95E8118F6EEF00B98EC3 /* al_Common.hpp */,
 				16AA95FE118F760C00B98EC3 /* al_Debug.hpp */,
 				16AA95E9118F6EEF00B98EC3 /* al_GPUObject.hpp */,
+				362127C71173CD72009CB6FC /* al_Graphics.hpp */,
+				36D69A4211F924B500699158 /* al_GraphicsBackend.hpp */,
+				36D69A4311F924C900699158 /* al_GraphicsBackendOpenGL.hpp */,
 				36F596691211D5AB003B78B5 /* al_Image.hpp */,
 				160FD0DF11FA1CE4001E8987 /* al_Isosurface.hpp */,
 				16AA95EA118F6EEF00B98EC3 /* al_Light.hpp */,
@@ -1103,6 +1144,8 @@
 			children = (
 				36F0ABBF12319586000A8EBF /* Makefile.config */,
 				16AA95FF118F76B800B98EC3 /* al_Debug.cpp */,
+				362127C81173CDBB009CB6FC /* al_Graphics.cpp */,
+				36D69A4411F925FC00699158 /* al_GraphicsBackendOpenGL.cpp */,
 				36F596741211D5F8003B78B5 /* al_Image.cpp */,
 				160FD0E011FA1CF4001E8987 /* al_Isosurface.cpp */,
 				16AA95F2118F74FB00B98EC3 /* al_Light.cpp */,
@@ -1164,6 +1207,7 @@
 				3687E34111FA4F9500EC6706 /* exIsosurface */,
 				367F0B5C12034F1E00FCC534 /* exStereographics */,
 				B9C962AF1218939E00091F80 /* exOpenCL */,
+				165867421288A0460068E01A /* exSimpleGraphics */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1171,9 +1215,6 @@
 		3602B53B110A6D3D005DC3D0 /* protocol */ = {
 			isa = PBXGroup;
 			children = (
-				362127C71173CD72009CB6FC /* al_Graphics.hpp */,
-				36D69A4211F924B500699158 /* al_GraphicsBackend.hpp */,
-				36D69A4311F924C900699158 /* al_GraphicsBackendOpenGL.hpp */,
 				3602B53C110A6D3D005DC3D0 /* al_OSC.hpp */,
 				36A20CFC110ACA0E0075A21C /* al_OSCAPR.hpp */,
 				3602B53D110A6D3D005DC3D0 /* al_Serialize.h */,
@@ -1417,8 +1458,6 @@
 			isa = PBXGroup;
 			children = (
 				36D69A4611F9260600699158 /* deprecated */,
-				362127C81173CDBB009CB6FC /* al_Graphics.cpp */,
-				36D69A4411F925FC00699158 /* al_GraphicsBackendOpenGL.cpp */,
 				3622BEE5116D527D00928703 /* al_OSC.cpp */,
 				3622BEE6116D527D00928703 /* al_OSCAPR.cpp */,
 				3622BEE7116D527D00928703 /* al_Serialize.cpp */,
@@ -1799,6 +1838,24 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		165867311288A0460068E01A /* exSimpleGraphics */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1658673F1288A0460068E01A /* Build configuration list for PBXNativeTarget "exSimpleGraphics" */;
+			buildPhases = (
+				165867341288A0460068E01A /* Sources */,
+				165867361288A0460068E01A /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				165867321288A0460068E01A /* PBXTargetDependency */,
+			);
+			name = exSimpleGraphics;
+			productInstallPath = "$(HOME)/bin";
+			productName = alscheduling;
+			productReference = 165867421288A0460068E01A /* exSimpleGraphics */;
+			productType = "com.apple.product-type.tool";
+		};
 		16AC529611628D0E0076AA8B /* unitTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 16AC529E11628D3A0076AA8B /* Build configuration list for PBXNativeTarget "unitTests" */;
@@ -2111,6 +2168,7 @@
 				3687E33011FA4F9500EC6706 /* exIsosurface */,
 				367F0B4B12034F1E00FCC534 /* exStereographics */,
 				B9C9629E1218939E00091F80 /* exOpenCL */,
+				165867311288A0460068E01A /* exSimpleGraphics */,
 			);
 		};
 /* End PBXProject section */
@@ -2128,6 +2186,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		165867341288A0460068E01A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1658675A1288A0880068E01A /* simpleGraphics.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		16AC529411628D0E0076AA8B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2363,6 +2429,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		165867321288A0460068E01A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
+			targetProxy = 165867331288A0460068E01A /* PBXContainerItemProxy */;
+		};
 		3602B4CB110A67C9005DC3D0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
@@ -2445,6 +2516,53 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		165867401288A0460068E01A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = "";
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../dev/osx/lib\"",
+				);
+				OTHER_CFLAGS = (
+					"-DAPR_FAST_COMPAT",
+					"-DAPR_STRICT",
+				);
+				PRODUCT_NAME = $TARGET_NAME;
+				SYMROOT = ../../build;
+				USER_HEADER_SEARCH_PATHS = $inherited;
+			};
+			name = Debug;
+		};
+		165867411288A0460068E01A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_MODEL_TUNING = G5;
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../dev/osx/lib\"",
+				);
+				OTHER_CFLAGS = (
+					"-DAPR_FAST_COMPAT",
+					"-DAPR_STRICT",
+				);
+				PRODUCT_NAME = $TARGET_NAME;
+				SYMROOT = ../../build;
+				USER_HEADER_SEARCH_PATHS = $inherited;
+			};
+			name = Release;
+		};
 		16AC529911628D0F0076AA8B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3087,7 +3205,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_CPP_RTTI = NO;
+				GCC_ENABLE_CPP_RTTI = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -3323,6 +3441,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		1658673F1288A0460068E01A /* Build configuration list for PBXNativeTarget "exSimpleGraphics" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				165867401288A0460068E01A /* Debug */,
+				165867411288A0460068E01A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		16AC529E11628D3A0076AA8B /* Build configuration list for PBXNativeTarget "unitTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

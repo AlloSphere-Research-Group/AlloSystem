@@ -1,5 +1,5 @@
 #include "stdio.h"
-#include "allocore/protocol/al_GraphicsBackendOpenGL.hpp"
+#include "allocore/graphics/al_GraphicsBackendOpenGL.hpp"
 
 namespace al{
 namespace gfx{

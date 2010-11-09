@@ -2,8 +2,8 @@
 #include <map>
 #include <string>
 
-#include "allocore/protocol/al_Graphics.hpp"
-#include "allocore/protocol/al_GraphicsBackend.hpp"
+#include "allocore/graphics/al_Graphics.hpp"
+#include "allocore/graphics/al_GraphicsBackend.hpp"
 
 namespace al {
 namespace gfx{

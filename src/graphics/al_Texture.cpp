@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "allocore/protocol/al_GraphicsBackend.hpp"
+#include "allocore/graphics/al_GraphicsBackend.hpp"
 #include "allocore/graphics/al_Config.h"
 #include "allocore/graphics/al_Texture.hpp"
 

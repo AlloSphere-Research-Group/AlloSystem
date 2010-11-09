@@ -35,7 +35,7 @@
 #include <tr1/unordered_map>
 #endif
 #include "allocore/types/al_Buffer.hpp"
-#include "allocore/protocol/al_Graphics.hpp"
+#include "allocore/graphics/al_Graphics.hpp"
 
 namespace al{
 

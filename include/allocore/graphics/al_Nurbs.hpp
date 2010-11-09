@@ -32,7 +32,7 @@
 #include <vector>
 #include <map>
 
-#include "protocol/al_Graphics.hpp"
+#include "graphics/al_Graphics.hpp"
 #include "graphics/al_Common.hpp"
 
 namespace al {

@@ -28,7 +28,7 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#include "allocore/protocol/al_Graphics.hpp"
+#include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/spatial/al_Camera.hpp"
 
 namespace al {

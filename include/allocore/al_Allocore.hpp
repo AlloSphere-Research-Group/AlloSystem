@@ -25,6 +25,8 @@
 */
 
 #include "allocore/graphics/al_Config.h"
+#include "allocore/graphics/al_Graphics.hpp"
+#include "allocore/graphics/al_GraphicsBackendOpenGL.hpp"
 #include "allocore/graphics/al_Image.hpp"
 #include "allocore/graphics/al_Isosurface.hpp"
 #include "allocore/graphics/al_Light.hpp"
@@ -44,8 +46,6 @@
 #include "allocore/math/al_Quat.hpp"
 #include "allocore/math/al_Random.hpp"
 #include "allocore/math/al_Vec.hpp"
-#include "allocore/protocol/al_Graphics.hpp"
-#include "allocore/protocol/al_GraphicsBackendOpenGL.hpp"
 #include "allocore/protocol/al_OSC.hpp"
 #include "allocore/protocol/al_Serialize.hpp"
 #include "allocore/sound/al_Reverb.hpp"
