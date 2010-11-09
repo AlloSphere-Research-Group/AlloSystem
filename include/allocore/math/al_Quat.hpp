@@ -123,7 +123,7 @@ public:
 	static Quat fromMatrix(T * matrix);
 	// set from row-major matrix:
 	static Quat fromMatrixGL(T * matrix);
-	static Quat& fromMatrix(Mat<4, T>& matrix) { return fromMatrix(matrix.ptr()); }
+	static Quat& fromMatrix(Mat<4,T>& matrix) { return fromMatrix(matrix.ptr()); }
 
 	Quat& setFromAxisAngle(T theta, T x1, T y1, T z1) { return set(fromAxisAngle(theta, x1, y1, z1)); }
 	Quat& setFromAxisX(T theta) { return set(fromAxisX(theta)); }
@@ -131,9 +131,9 @@ public:
 	Quat& setFromAxisZ(T theta) { return set(fromAxisZ(theta)); }
 	Quat& setFromEuler(T a, T e, T b) { return set(fromEuler(a, e, b)); }
 	Quat& setFromMatrix(T * matrix) { return set(fromMatrix(matrix)); }
-	Quat& setFromMatrix(Mat<4, T>& matrix) { return set(fromMatrix(matrix.ptr())); }
+	Quat& setFromMatrix(Mat<4,T>& matrix) { return set(fromMatrix(matrix.ptr())); }
 	Quat& setFromMatrixGL(T * matrix) { return set(fromMatrixGL(matrix)); }
-	Quat& setFromMatrixGL(Mat<4, T>& matrix) { return set(fromMatrixGL(matrix.ptr())); }
+	Quat& setFromMatrixGL(Mat<4,T>& matrix) { return set(fromMatrixGL(matrix.ptr())); }
 
 	/// Convert to 4x4 column-major matrix
 	void toMatrix(T * matrix) const;
@@ -146,22 +146,22 @@ public:
 
 	/// Convert to Euler angles as T[3] (azimuth, elevation, bank)
 	void toEuler(T * e) const;
-	void toEuler(Vec3<T> & v) const;
+	void toEuler(Vec<3,T> & v) const;
 	
 	/// return unit vectors:
 	void toVectorX(T * x, T * y, T * z) const;
 	void toVectorY(T * x, T * y, T * z) const;
 	void toVectorZ(T * x, T * y, T * z) const;
-	void toVectorX(Vec3<T> & v) const;
-	void toVectorY(Vec3<T> & v) const;
-	void toVectorZ(Vec3<T> & v) const;
+	void toVectorX(Vec<3,T> & v) const;
+	void toVectorY(Vec<3,T> & v) const;
+	void toVectorZ(Vec<3,T> & v) const;
 
 	/// Rotate vector
-	void rotate(Vec3<T>& v) const;
+	void rotate(Vec<3,T>& v) const;
 	void rotateVector(const T * src, T * dst) const;
-	Vec3<T> rotateVector(const Vec3<T>& src) const;
+	Vec<3,T> rotateVector(const Vec<3,T>& src) const;
 	void rotateVectorTransposed(const T * src, T * dst) const;
-	Vec3<T> rotateVectorTransposed(const Vec3<T>& src) const;
+	Vec<3,T> rotateVectorTransposed(const Vec<3,T>& src) const;
 
 	/// Spherical interpolation
 	Quat& slerp(const Quat& target, T amt) { return set(slerp(*this, target, amt)); }
@@ -179,14 +179,14 @@ public:
 	static Quat slerp(const Quat& input, const Quat& target, T amt);
 
 	/// Get the quaternion from a given point and quaterion toward another point
-	void towardPoint(Vec3<T> &pos, Quat<T> &q, Vec3<T> &v, float amt);
+	void towardPoint(Vec<3,T> &pos, Quat<T> &q, Vec<3,T> &v, float amt);
 
 	/// Returns identity
 	static Quat identity(){ return Quat(1,0,0,0); }
 
 	// v1 and v2 must be normalized
 	// alternatively expressed as Q = (1+gp(v1, v2))/sqrt(2*(1+dot(b, a)))
-	static Quat<T> rotor(Vec3<T> &v1, Vec3<T> &v2);
+	static Quat<T> rotor(Vec<3,T> &v1, Vec<3,T> &v2);
 
 };
 
@@ -509,7 +509,7 @@ inline void Quat<T> :: toEuler(T * e) const {
 }
 
 template<typename T>
-inline void Quat<T> :: toEuler(Vec3<T> & v) const {
+inline void Quat<T> :: toEuler(Vec<3,T> & v) const {
 	// http://www.mathworks.com/access/helpdesk/help/toolbox/aeroblks/quaternionstoeulerangles.html
 	T sqw = w*w;
 	T sqx = x*x;
@@ -542,22 +542,22 @@ inline void Quat<T> :: toVectorZ(T * vx, T * vy, T * vz) const {
 }
 
 template<typename T>
-inline void Quat<T> :: toVectorX(Vec3<T>& v) const {
+inline void Quat<T> :: toVectorX(Vec<3,T>& v) const {
 	toVectorX(&v[0], &v[1], &v[2]);
 }
 
 template<typename T>
-inline void Quat<T> :: toVectorY(Vec3<T>& v) const {
+inline void Quat<T> :: toVectorY(Vec<3,T>& v) const {
 	toVectorY(&v[0], &v[1], &v[2]);
 }
 
 template<typename T>
-inline void Quat<T> :: toVectorZ(Vec3<T>& v) const {
+inline void Quat<T> :: toVectorZ(Vec<3,T>& v) const {
 	toVectorZ(&v[0], &v[1], &v[2]);
 }
 
 template<typename T>
-inline void Quat<T>::rotate(Vec3<T>& v) const{
+inline void Quat<T>::rotate(Vec<3,T>& v) const{
 	rotateVector(v,v);
 }
 
@@ -600,8 +600,8 @@ inline void Quat<T> :: rotateVector(const T * src, T * dst) const {
 }
 
 template<typename T>
-inline Vec3<T> Quat<T> :: rotateVector(const Vec3<T>& src) const {
-	Vec3<T> dst;
+inline Vec<3,T> Quat<T> :: rotateVector(const Vec<3,T>& src) const {
+	Vec<3,T> dst;
 	rotateVector(&src[0], &dst[0]);
 	return dst;
 }
@@ -645,8 +645,8 @@ inline void Quat<T> :: rotateVectorTransposed(const T * src, T * dst) const {
 }
 
 template<typename T>
-inline Vec3<T> Quat<T> :: rotateVectorTransposed(const Vec3<T>& src) const {
-	Vec3<T> dst;
+inline Vec<3,T> Quat<T> :: rotateVectorTransposed(const Vec<3,T>& src) const {
+	Vec<3,T> dst;
 	rotateVectorTransposed(&src[0], &dst[0]);
 	return dst;
 }
@@ -774,8 +774,8 @@ void Quat<T> :: slerp_buffer(const Quat& input, const Quat& target, Quat<T> * bu
 	Get the quaternion from a given point and quaterion toward another point
 */
 template<typename T>
-void Quat<T> :: towardPoint(Vec3<T> &pos, Quat<T> &q, Vec3<T> &v, float amt) {
-	Vec3<T> diff, axis;
+void Quat<T> :: towardPoint(Vec<3,T> &pos, Quat<T> &q, Vec<3,T> &v, float amt) {
+	Vec<3,T> diff, axis;
 	diff = v-pos;
 	diff.normalize();
 	
@@ -783,28 +783,28 @@ void Quat<T> :: towardPoint(Vec3<T> &pos, Quat<T> &q, Vec3<T> &v, float amt) {
 		diff = diff*-1.;
 	}
 
-	Vec3<T> zaxis;
+	Vec<3,T> zaxis;
 	q.toVectorZ(zaxis);
 	//axis = zaxis.cross(diff);
 	cross(axis, zaxis, diff);
-	//Vec3<T>::cross(axis, zaxis, diff);
+	//Vec<3,T>::cross(axis, zaxis, diff);
 	axis.normalize();
 
 	float axis_mag_sqr = axis.dot(axis);
-	float along = zaxis.dot(diff); //Vec3<T>::dot(zaxis, diff);
+	float along = zaxis.dot(diff); //Vec<3,T>::dot(zaxis, diff);
 
 	if(axis_mag_sqr < 0.001 && along < 0) {
-		//Vec3<T>::cross(axis, zaxis, Vec3<T>(0., 0., 1.));
-		cross(axis, zaxis, Vec3<T>(0, 0, 1));
+		//Vec<3,T>::cross(axis, zaxis, Vec<3,T>(0., 0., 1.));
+		cross(axis, zaxis, Vec<3,T>(0, 0, 1));
 		axis.normalize();
 
 		if(axis_mag_sqr < 0.001) {
-			//Vec3<T>::cross(axis, zaxis, Vec3<T>(0., 1., 0.));
-			cross(axis, zaxis, Vec3<T>(0, 1, 0));
+			//Vec<3,T>::cross(axis, zaxis, Vec<3,T>(0., 1., 0.));
+			cross(axis, zaxis, Vec<3,T>(0, 1, 0));
 			axis.normalize();
 		}
 
-		axis_mag_sqr = axis.dot(axis); //Vec3<T>::dot(axis, axis);
+		axis_mag_sqr = axis.dot(axis); //Vec<3,T>::dot(axis, axis);
 	}
 
 	if(along < 0.9995 && axis_mag_sqr > 0.001) {
@@ -820,9 +820,9 @@ void Quat<T> :: towardPoint(Vec3<T> &pos, Quat<T> &q, Vec3<T> &v, float amt) {
 // v1 and v2 must be normalized
 // alternatively expressed as Q = (1+gp(v1, v2))/sqrt(2*(1+dot(b, a)))
 template<typename T>
-Quat<T> Quat<T> :: rotor(Vec3<T> &v1, Vec3<T> &v2) {
+Quat<T> Quat<T> :: rotor(Vec<3,T> &v1, Vec<3,T> &v2) {
 	// get the normal to the plane (i.e. the unit bivector containing the v1 and v2)
-	Vec3<T> n;
+	Vec<3,T> n;
 	cross(n, v1, v2);
 	n.normalize();	// normalize because the cross product can get slightly denormalized
 
@@ -831,7 +831,7 @@ Quat<T> Quat<T> :: rotor(Vec3<T> &v1, Vec3<T> &v2) {
 	T theta = acos(dotmag)*0.5;
 
 	// calculate the scaled actual bivector generaed by v1 and v2
-	Vec3<T> bivec = n*sin(theta);
+	Vec<3,T> bivec = n*sin(theta);
 	Quat<T> q(cos(theta), bivec[0], bivec[1], bivec[2]);
 
 	return q;
