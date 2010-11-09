@@ -597,7 +597,7 @@ inline void normal(Vec<3,T>& n, const Vec<3,T>& p1, const Vec<3,T>& p2, const Ve
 /*! Returns vector containing element-wise minimum between two vectors
 */
 template <int N, class T>
-inline Vec<N,T> vmin(const Vec<N,T>& a, const Vec<N,T>& b){
+inline Vec<N,T> min(const Vec<N,T>& a, const Vec<N,T>& b){
 	Vec<N,T> r;
 	IT(N){ r[i] = a[i] > b[i] ? b[i] : a[i]; }
 	return r;
@@ -606,7 +606,7 @@ inline Vec<N,T> vmin(const Vec<N,T>& a, const Vec<N,T>& b){
 /*! Returns vector containing element-wise maximum between two vectors
 */
 template <int N, class T>
-inline Vec<N,T> vmax(const Vec<N,T>& a, const Vec<N,T>& b){	
+inline Vec<N,T> max(const Vec<N,T>& a, const Vec<N,T>& b){	
 	Vec<N,T> r;
 	IT(N){ r[i] = a[i] < b[i] ? b[i] : a[i]; }
 	return r;

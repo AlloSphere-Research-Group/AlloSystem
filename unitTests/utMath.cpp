@@ -121,8 +121,8 @@ int utMath(){
 		
 		a = 0;
 		b = 1;
-		assert(vmin(a,b) == 0);
-		assert(vmax(a,b) == 1);
+		assert(min(a,b) == 0);
+		assert(max(a,b) == 1);
 		
 	}
 	
