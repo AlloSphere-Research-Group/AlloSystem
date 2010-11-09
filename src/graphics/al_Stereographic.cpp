@@ -139,21 +139,7 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 
 
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
-	glDrawBuffer(GL_BACK_LEFT);
-	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
-	
 
-	// apply camera transform:
-	gl.pushMatrix(gfx::PROJECTION);
-	gl.loadMatrix(Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal));
-
-	gl.pushMatrix(gfx::MODELVIEW);
-	gl.loadMatrix(Matrix4d::lookAtLeft(ur, uu, uf, pos, iod));
-	
-	draw.onDraw(gl);
-	
-	gl.popMatrix(gfx::PROJECTION);
-	gl.popMatrix(gfx::MODELVIEW);
 	
 	glDrawBuffer(GL_BACK_RIGHT);
 	gl.viewport(vp.l, vp.b, vp.w, vp.h);
@@ -172,6 +158,23 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 	
 	gl.popMatrix(gfx::PROJECTION);
 	gl.popMatrix(gfx::MODELVIEW);
+
+	glDrawBuffer(GL_BACK_LEFT);
+	gl.clear(gfx::COLOR_BUFFER_BIT | gfx::DEPTH_BUFFER_BIT);
+	
+
+	// apply camera transform:
+	gl.pushMatrix(gfx::PROJECTION);
+	gl.loadMatrix(Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal));
+
+	gl.pushMatrix(gfx::MODELVIEW);
+	gl.loadMatrix(Matrix4d::lookAtLeft(ur, uu, uf, pos, iod));
+	
+	draw.onDraw(gl);
+	
+	gl.popMatrix(gfx::PROJECTION);
+	gl.popMatrix(gfx::MODELVIEW);
+
 	gl.scissor(false);
 	glPopAttrib();
 }

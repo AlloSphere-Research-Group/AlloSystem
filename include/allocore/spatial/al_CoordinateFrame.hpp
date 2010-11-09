@@ -72,8 +72,9 @@ public:
 	Quatd& quat(){ return mQuat; }
 
 	/// Get right, up, and forward unit vectors
+	/// quat() should have been normalized before this call
 	template <class T>
-	void unitVectors(Vec<3,T>& ur, Vec<3,T>& uu, Vec<3,T>& uf) const {
+	void unitVectors(Vec<3,T>& ur, Vec<3,T>& uu, Vec<3,T>& uf) const {	
 		quat().toVectorX(ur);
 		quat().toVectorY(uu);
 		quat().toVectorZ(uf);	
@@ -199,7 +200,10 @@ public:
 	}
 
 	/// Update coordinate frame basis vectors based on internal quaternion
-	void updateUnitVectors(){ unitVectors(mUR, mUU, mUF); }
+	void updateUnitVectors(){ 
+		quat().normalize();
+		unitVectors(mUR, mUU, mUF); 
+	}
 	
 	void set(const Nav& v){
 		Pose::set(v);

@@ -8,7 +8,7 @@
 #define QUAT_ACCURACY_MAX (1.000001)
 #define QUAT_ACCURACY_MIN (0.999999)
 #define QUAT_EPSILON (0.0000001)
-#define QUAT_DEG2RAD_BY2 (M_DEG2RAD/2)
+#define QUAT_DEG2RAD_BY2 (M_DEG2RAD/2.)
 
 #ifndef ABS
 	#define ABS(x) ((x)<0?-(x):(x))
@@ -801,16 +801,16 @@ Quat<T> Quat<T> :: getRotationTo(const Vec<3, T>& src, const Vec<3, T>& dst) {
 		// vectors are the same
 		return q;
 	}
-	if (d < (1.0e-6 - 1.)) {
+	if (d < -0.999999999) {
 		// vectors are nearly opposing
 		// pick an axis to rotate around
 		Vec<3, T> axis = cross(Vec<3, T>(0, 1, 0), src);
 		// if colinear, pick another:
-		if (axis.magSqr() < 1.0e-6) {
+		if (axis.magSqr() < 0.00000000001) {
 			axis = cross(Vec<3, T>(0, 0, 1), src);
 		}
 		axis.normalize();
-		q.setFromAxisAngle(180, axis);
+		q.setFromAxisAngle(180., axis);
 	} else {
 		T s = sqrt((d+1.)*2);
 		T invs = 1./s;
@@ -819,9 +819,8 @@ Quat<T> Quat<T> :: getRotationTo(const Vec<3, T>& src, const Vec<3, T>& dst) {
 		q.y = c[1] * invs;
 		q.z = c[2] * invs;
 		q.w = s * 0.5;
-		q.normalize();
 	}
-	return q;
+	return q.normalize();
 }
 
 /*!
