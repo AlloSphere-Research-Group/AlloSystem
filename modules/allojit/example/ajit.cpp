@@ -1,57 +1,53 @@
 
-#include "graphics/al_BufferObject.hpp"
-#include "graphics/al_Common.hpp"
-#include "graphics/al_Config.h"
-#include "graphics/al_Debug.hpp"
-#include "graphics/al_GPUObject.hpp"
-#include "graphics/al_Image.hpp"
-#include "graphics/al_Isosurface.hpp"
-#include "graphics/al_Model.hpp"
-#include "graphics/al_Light.hpp"
-#include "graphics/al_Shader.hpp"
-#include "graphics/al_Texture.hpp"
+//#include "allocore/graphics/al_BufferObject.hpp"
+#include "allocore/graphics/al_GPUObject.hpp"
+#include "allocore/graphics/al_Image.hpp"
+#include "allocore/graphics/al_Isosurface.hpp"
+#include "allocore/graphics/al_Model.hpp"
+#include "allocore/graphics/al_Light.hpp"
+#include "allocore/graphics/al_Shader.hpp"
+#include "allocore/graphics/al_Texture.hpp"
 
-#include "io/al_AudioIO.hpp"
-#include "io/al_File.hpp"
-#include "io/al_Socket.hpp"
+#include "allocore/io/al_AudioIO.hpp"
+#include "allocore/io/al_File.hpp"
+#include "allocore/io/al_Socket.hpp"
 
-#include "math/al_Complex.hpp"
-#include "math/al_Constants.hpp"
-#include "math/al_Frustum.hpp"
-#include "math/al_Functions.hpp"
-#include "math/al_Generators.hpp"
-#include "math/al_Interpolation.hpp"
-#include "math/al_Matrix4.hpp"
-#include "math/al_Plane.hpp"
-#include "math/al_Quat.hpp"
-#include "math/al_Vec.hpp"
+#include "allocore/math/al_Complex.hpp"
+#include "allocore/math/al_Constants.hpp"
+#include "allocore/math/al_Frustum.hpp"
+#include "allocore/math/al_Functions.hpp"
+#include "allocore/math/al_Generators.hpp"
+#include "allocore/math/al_Interpolation.hpp"
+#include "allocore/math/al_Matrix4.hpp"
+#include "allocore/math/al_Plane.hpp"
+#include "allocore/math/al_Quat.hpp"
+#include "allocore/math/al_Vec.hpp"
 
-#include "protocol/al_OSC.hpp"
-#include "protocol/al_OSCAPR.hpp"
-#include "protocol/al_Serialize.hpp"
+#include "allocore/protocol/al_OSC.hpp"
+#include "allocore/protocol/al_OSCAPR.hpp"
+#include "allocore/protocol/al_Serialize.hpp"
 
-#include "sound/al_Ambisonics.hpp"
-#include "sound/al_AudioScene.hpp"
-#include "sound/al_Reverb.hpp"
+#include "allocore/sound/al_Ambisonics.hpp"
+#include "allocore/sound/al_AudioScene.hpp"
+#include "allocore/sound/al_Reverb.hpp"
 
-#include "spatial/al_Camera.hpp"
-#include "spatial/al_CoordinateFrame.hpp"
+#include "allocore/spatial/al_Camera.hpp"
+#include "allocore/spatial/al_CoordinateFrame.hpp"
 
-#include "system/al_Config.h"
-#include "system/al_MainLoop.h"
-#include "system/al_MainLoop.hpp"
-#include "system/al_Printing.hpp"
-#include "system/al_Thread.hpp"
-#include "system/al_Time.h"
-#include "system/al_Time.hpp"
+#include "allocore/system/al_Config.h"
+#include "allocore/system/al_MainLoop.h"
+#include "allocore/system/al_MainLoop.hpp"
+#include "allocore/system/al_Printing.hpp"
+#include "allocore/system/al_Thread.hpp"
+#include "allocore/system/al_Time.h"
+#include "allocore/system/al_Time.hpp"
 
-#include "types/al_Buffer.hpp"
-#include "types/al_Color.hpp"
-#include "types/al_Conversion.hpp"
-#include "types/al_MsgQueue.hpp"
-#include "types/al_MsgTube.hpp"
-#include "types/al_types.h"
-#include "types/al_types.hpp"
+#include "allocore/types/al_Buffer.hpp"
+#include "allocore/types/al_Color.hpp"
+#include "allocore/types/al_Conversion.hpp"
+#include "allocore/types/al_MsgQueue.hpp"
+#include "allocore/types/al_MsgTube.hpp"
+#include "allocore/types/al_Lattice.hpp"
 
 #include "ajit.hpp"
 
@@ -88,7 +84,7 @@ using namespace al;
 typedef int (*dumb_fptr)();
 typedef void (*onevent_fptr)(World * data, JIT * jit);
 
-typedef void (*doFrame_fptr)(gfx::Graphics &gl);
+typedef void (*doFrame_fptr)(Graphics &gl);
 
 std::string clang_headers_path;
 std::string allo_headers_path;
@@ -101,7 +97,7 @@ World * World::get() {
 	return W; 
 }
 
-World :: World() : gl(new gfx::GraphicsBackendOpenGL), rootZone(NULL) {}
+World :: World() : gl(new GraphicsBackendOpenGL) /*, rootZone(NULL) */ {}
 
 bool World::InputControl :: onKeyDown(const Keyboard& k){	 	
 	World * W = World::get();
@@ -252,8 +248,6 @@ public:
 
 
 int main (int argc, char * const argv[]) {
-
-	//gfx::OBJReader hack;
 
 	World * W = World::get();
 	

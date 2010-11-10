@@ -1,11 +1,11 @@
 #ifndef INCLUDE_AJIT_H
 #define INCLUDE_AJIT_H
 
-#include "protocol/al_Graphics.hpp"
-#include "protocol/al_GraphicsBackendOpenGL.hpp"
-#include "graphics/al_Stereographic.hpp"
-#include "io/al_Window.hpp"
-#include "math/al_Random.hpp"
+#include "allocore/graphics/al_Graphics.hpp"
+#include "allocore/graphics/al_GraphicsBackendOpenGL.hpp"
+#include "allocore/graphics/al_Stereographic.hpp"
+#include "allocore/io/al_Window.hpp"
+#include "allocore/math/al_Random.hpp"
 
 #include "al_Compiler.hpp"
 
@@ -29,7 +29,7 @@ public:
 	static World * get();
 	
 	struct InputControl : public NavInputControl {
-		InputControl(World * W) : NavInputControl(&W->cam) {}
+		InputControl(World * W) : NavInputControl(&W->nav) {}
 		bool onKeyDown(const Keyboard& k);
 		bool onKeyUp(const Keyboard& k);		
 		bool onMouseDrag(const Mouse& m){ return true; }
@@ -43,10 +43,11 @@ public:
 	};
 	
 	WorldWindow win;
-	gfx::Graphics gl;
-	gfx::Stereographic stereo;
+	Graphics gl;
+	Stereographic stereo;
 	Camera cam;
-	Zone rootZone;
+	Nav nav;
+	//Zone rootZone;
 	
 private:
 	World();
