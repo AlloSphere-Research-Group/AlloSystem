@@ -55,8 +55,7 @@
 #include "types/al_Conversion.hpp"
 #include "types/al_MsgQueue.hpp"
 #include "types/al_MsgTube.hpp"
-#include "types/al_types.h"
-#include "types/al_types.hpp"
+#include "allocore/types/al_Lattice.hpp"
 
 
 using namespace al;

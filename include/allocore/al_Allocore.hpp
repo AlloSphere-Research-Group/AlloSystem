@@ -59,4 +59,4 @@
 #include "allocore/system/al_Time.hpp"
 #include "allocore/types/al_Buffer.hpp"
 #include "allocore/types/al_Conversion.hpp"
-#include "allocore/types/al_types.hpp"
+#include "allocore/types/al_Lattice.hpp"

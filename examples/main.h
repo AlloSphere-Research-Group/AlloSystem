@@ -14,8 +14,7 @@
 #include "system/al_Time.hpp"
 #include "system/al_Thread.hpp"
 #include "system/al_MainLoop.h"
-#include "types/al_types.h"
-#include "types/al_types.hpp"
+#include "allocore/types/al_Lattice.hpp"
 #include "math/al_Vec.hpp"
 
 #ifdef AL_UT_NOPRINT	/* disable printing to stdout */

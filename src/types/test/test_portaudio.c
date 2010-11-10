@@ -1,5 +1,5 @@
 
-#include "al_types.h"
+#include "allocore/types/al_lattice.h"
 #include "portaudio.h"
 
 PaError err;

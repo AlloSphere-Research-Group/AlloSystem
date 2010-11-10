@@ -27,7 +27,7 @@
 #ifndef INCLUDE_ALLO_TYPES_CPP_H
 #define INCLUDE_ALLO_TYPES_CPP_H 1
 
-#include "al_types.h"
+#include "allocore/types/al_lattice.h"
 #include "allocore/math/al_Functions.hpp"	
 #include <stdlib.h>
 

@@ -28,7 +28,7 @@
 */
 
 #include <string>
-#include "allocore/types/al_types.hpp"
+#include "allocore/types/al_Lattice.hpp"
 
 namespace al{
 
