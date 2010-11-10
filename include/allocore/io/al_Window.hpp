@@ -253,6 +253,7 @@ public:
 	const Keyboard& keyboard() const { return mKeyboard; }	///< Get current keyboard state
 	const Mouse& mouse() const { return mMouse; }			///< Get current mouse state
 
+	double aspect() const;						///< Get aspect ratio (width divided by height)
 	bool cursorHide() const;					///< Whether the cursor is hidden
 	Dim dimensions() const;						///< Get current dimensions of window
 	bool enabled(DisplayMode::t v) const;		///< Get whether display mode flag is set
@@ -398,6 +399,11 @@ struct StandardWindowKeyControls : InputEventHandler {
 	}
 };
 
+
+inline double Window::aspect() const {
+	Dim d = dimensions();
+	return double(d.w) / d.h;
+}
 
 } // al::
 
