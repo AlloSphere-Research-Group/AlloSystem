@@ -30,6 +30,7 @@
 #include "allocore/graphics/al_Image.hpp"
 #include "allocore/graphics/al_Isosurface.hpp"
 #include "allocore/graphics/al_Light.hpp"
+#include "allocore/graphics/al_Model.hpp"
 #include "allocore/graphics/al_Stereographic.hpp"
 #include "allocore/io/al_AudioIO.hpp"
 #include "allocore/io/al_File.hpp"
