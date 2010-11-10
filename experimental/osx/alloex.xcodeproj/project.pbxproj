@@ -331,6 +331,55 @@
 			remoteGlobalIDString = 36B4130E10EFFA8D007B16D0;
 			remoteInfo = allocore;
 		};
+		361718EA128B22CF00D6ED65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 36171863128B22CE00D6ED65 /* alloplay.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D2AAC046055464E500DB518D /* liballocompiler.a */;
+			remoteInfo = allocompiler;
+		};
+		361718EC128B22CF00D6ED65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 36171863128B22CE00D6ED65 /* alloplay.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 36C9F1BF11C6A7B1004FEBE3 /* utCompiler */;
+			remoteInfo = utCompiler;
+		};
+		361718F3128B22CF00D6ED65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 36171869128B22CE00D6ED65 /* exAlloLua.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8DD76F6C0486A84900D96B5E /* exAlloLua */;
+			remoteInfo = exAlloLua;
+		};
+		361718FB128B22CF00D6ED65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 36171881128B22CF00D6ED65 /* allo.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 363E41A11176B42200AA74DF /* liballocore.a */;
+			remoteInfo = allocore;
+		};
+		361718FD128B22CF00D6ED65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 36171881128B22CF00D6ED65 /* allo.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1D6058910D05DD3D006BFB54 /* allo.app */;
+			remoteInfo = allotest;
+		};
+		36171903128B22CF00D6ED65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3617189B128B22CF00D6ED65 /* allo.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1D6058910D05DD3D006BFB54 /* iphone.app */;
+			remoteInfo = iphone;
+		};
+		3617190A128B22CF00D6ED65 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 361718E0128B22CF00D6ED65 /* threadedapp.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8D1107320486CEB800E47090 /* threadedapp.app */;
+			remoteInfo = threadedapp;
+		};
 		361BF1A111DEBA3A00E60A9C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
@@ -626,6 +675,100 @@
 		360C24AF11E659D3000FF335 /* libplugin_llvmc_Base.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libplugin_llvmc_Base.a; sourceTree = "<group>"; };
 		360C24B011E659D3000FF335 /* libplugin_llvmc_Clang.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libplugin_llvmc_Clang.a; sourceTree = "<group>"; };
 		360C404E11D32FED002FE91F /* al_Matrix4.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Matrix4.hpp; sourceTree = "<group>"; };
+		36171860128B22CE00D6ED65 /* exCompiler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exCompiler.cpp; sourceTree = "<group>"; };
+		36171861128B22CE00D6ED65 /* input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = input.cpp; sourceTree = "<group>"; };
+		36171863128B22CE00D6ED65 /* alloplay.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = alloplay.xcodeproj; sourceTree = "<group>"; };
+		36171866128B22CE00D6ED65 /* input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = input.cpp; sourceTree = "<group>"; };
+		36171868128B22CE00D6ED65 /* exAlloLua.1 */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.man; path = exAlloLua.1; sourceTree = "<group>"; };
+		36171869128B22CE00D6ED65 /* exAlloLua.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = exAlloLua.xcodeproj; sourceTree = "<group>"; };
+		3617186C128B22CE00D6ED65 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		3617186E128B22CE00D6ED65 /* CocoaExample_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CocoaExample_Prefix.pch; sourceTree = "<group>"; };
+		36171870128B22CE00D6ED65 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		36171872128B22CF00D6ED65 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		36171873128B22CF00D6ED65 /* exMainloopCocoa-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "exMainloopCocoa-Info.plist"; sourceTree = "<group>"; };
+		36171874128B22CF00D6ED65 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		36171875128B22CF00D6ED65 /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
+		36171876128B22CF00D6ED65 /* TestController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestController.h; sourceTree = "<group>"; };
+		36171877128B22CF00D6ED65 /* TestController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestController.m; sourceTree = "<group>"; };
+		36171879128B22CF00D6ED65 /* iphone-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "iphone-Info.plist"; sourceTree = "<group>"; };
+		3617187A128B22CF00D6ED65 /* iphone_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iphone_Prefix.pch; sourceTree = "<group>"; };
+		3617187B128B22CF00D6ED65 /* iphoneAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iphoneAppDelegate.h; sourceTree = "<group>"; };
+		3617187C128B22CF00D6ED65 /* iphoneAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iphoneAppDelegate.m; sourceTree = "<group>"; };
+		3617187D128B22CF00D6ED65 /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
+		3617187E128B22CF00D6ED65 /* MainWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainWindow.xib; sourceTree = "<group>"; };
+		36171880128B22CF00D6ED65 /* allo-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "allo-Info.plist"; sourceTree = "<group>"; };
+		36171881128B22CF00D6ED65 /* allo.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = allo.xcodeproj; sourceTree = "<group>"; };
+		36171884128B22CF00D6ED65 /* allo_iPrefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = allo_iPrefix.pch; sourceTree = "<group>"; };
+		36171885128B22CF00D6ED65 /* alloGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = alloGLView.h; sourceTree = "<group>"; };
+		36171886128B22CF00D6ED65 /* alloGLView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = alloGLView.mm; sourceTree = "<group>"; };
+		36171887128B22CF00D6ED65 /* alloGLViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = alloGLViewController.h; sourceTree = "<group>"; };
+		36171888128B22CF00D6ED65 /* alloGLViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = alloGLViewController.mm; sourceTree = "<group>"; };
+		36171889128B22CF00D6ED65 /* ES1Renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ES1Renderer.h; sourceTree = "<group>"; };
+		3617188A128B22CF00D6ED65 /* ES1Renderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ES1Renderer.m; sourceTree = "<group>"; };
+		3617188B128B22CF00D6ED65 /* ES2Renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ES2Renderer.h; sourceTree = "<group>"; };
+		3617188C128B22CF00D6ED65 /* ES2Renderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ES2Renderer.m; sourceTree = "<group>"; };
+		3617188D128B22CF00D6ED65 /* ESRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ESRenderer.h; sourceTree = "<group>"; };
+		3617188F128B22CF00D6ED65 /* AppDelegate_Pad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate_Pad.h; sourceTree = "<group>"; };
+		36171890128B22CF00D6ED65 /* AppDelegate_Pad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate_Pad.m; sourceTree = "<group>"; };
+		36171891128B22CF00D6ED65 /* MainWindow_Pad.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainWindow_Pad.xib; sourceTree = "<group>"; };
+		36171893128B22CF00D6ED65 /* AppDelegate_Phone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate_Phone.h; sourceTree = "<group>"; };
+		36171894128B22CF00D6ED65 /* AppDelegate_Phone.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate_Phone.m; sourceTree = "<group>"; };
+		36171895128B22CF00D6ED65 /* MainWindow_Phone.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainWindow_Phone.xib; sourceTree = "<group>"; };
+		36171896128B22CF00D6ED65 /* Shader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = Shader.fsh; sourceTree = "<group>"; };
+		36171897128B22CF00D6ED65 /* Shader.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = Shader.vsh; sourceTree = "<group>"; };
+		36171899128B22CF00D6ED65 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		3617189B128B22CF00D6ED65 /* allo.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = allo.xcodeproj; sourceTree = "<group>"; };
+		361718A1128B22CF00D6ED65 /* categories.pbxbtree */ = {isa = PBXFileReference; lastKnownFileType = file; path = categories.pbxbtree; sourceTree = "<group>"; };
+		361718A2128B22CF00D6ED65 /* cdecls.pbxbtree */ = {isa = PBXFileReference; lastKnownFileType = file; path = cdecls.pbxbtree; sourceTree = "<group>"; };
+		361718A3128B22CF00D6ED65 /* decls.pbxbtree */ = {isa = PBXFileReference; lastKnownFileType = file; path = decls.pbxbtree; sourceTree = "<group>"; };
+		361718A4128B22CF00D6ED65 /* files.pbxbtree */ = {isa = PBXFileReference; lastKnownFileType = file; path = files.pbxbtree; sourceTree = "<group>"; };
+		361718A5128B22CF00D6ED65 /* imports.pbxbtree */ = {isa = PBXFileReference; lastKnownFileType = file; path = imports.pbxbtree; sourceTree = "<group>"; };
+		361718A6128B22CF00D6ED65 /* pbxindex.header */ = {isa = PBXFileReference; lastKnownFileType = file; path = pbxindex.header; sourceTree = "<group>"; };
+		361718A7128B22CF00D6ED65 /* protocols.pbxbtree */ = {isa = PBXFileReference; lastKnownFileType = file; path = protocols.pbxbtree; sourceTree = "<group>"; };
+		361718A8128B22CF00D6ED65 /* refs.pbxbtree */ = {isa = PBXFileReference; lastKnownFileType = file; path = refs.pbxbtree; sourceTree = "<group>"; };
+		361718AA128B22CF00D6ED65 /* control */ = {isa = PBXFileReference; lastKnownFileType = file; path = control; sourceTree = "<group>"; };
+		361718AB128B22CF00D6ED65 /* strings */ = {isa = PBXFileReference; lastKnownFileType = file; path = strings; sourceTree = "<group>"; };
+		361718AC128B22CF00D6ED65 /* subclasses.pbxbtree */ = {isa = PBXFileReference; lastKnownFileType = file; path = subclasses.pbxbtree; sourceTree = "<group>"; };
+		361718AD128B22CF00D6ED65 /* symbols0.pbxsymbols */ = {isa = PBXFileReference; lastKnownFileType = file; path = symbols0.pbxsymbols; sourceTree = "<group>"; };
+		361718AF128B22CF00D6ED65 /* EAGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EAGLView.h; sourceTree = "<group>"; };
+		361718B0128B22CF00D6ED65 /* EAGLView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EAGLView.m; sourceTree = "<group>"; };
+		361718B1128B22CF00D6ED65 /* ES1Renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ES1Renderer.h; sourceTree = "<group>"; };
+		361718B2128B22CF00D6ED65 /* ES1Renderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ES1Renderer.m; sourceTree = "<group>"; };
+		361718B3128B22CF00D6ED65 /* ES2Renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ES2Renderer.h; sourceTree = "<group>"; };
+		361718B4128B22CF00D6ED65 /* ES2Renderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ES2Renderer.m; sourceTree = "<group>"; };
+		361718B5128B22CF00D6ED65 /* ESRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ESRenderer.h; sourceTree = "<group>"; };
+		361718B6128B22CF00D6ED65 /* iphoneAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iphoneAppDelegate.h; sourceTree = "<group>"; };
+		361718B7128B22CF00D6ED65 /* iphoneAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iphoneAppDelegate.m; sourceTree = "<group>"; };
+		361718B8128B22CF00D6ED65 /* iphone-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "iphone-Info.plist"; sourceTree = "<group>"; };
+		361718B9128B22CF00D6ED65 /* iphone_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iphone_Prefix.pch; sourceTree = "<group>"; };
+		361718BA128B22CF00D6ED65 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		361718BB128B22CF00D6ED65 /* MainWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainWindow.xib; sourceTree = "<group>"; };
+		361718BD128B22CF00D6ED65 /* Shader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = Shader.fsh; sourceTree = "<group>"; };
+		361718BE128B22CF00D6ED65 /* Shader.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = Shader.vsh; sourceTree = "<group>"; };
+		361718C1128B22CF00D6ED65 /* al_runloop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_runloop.h; sourceTree = "<group>"; };
+		361718C2128B22CF00D6ED65 /* al_runloop_osx.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = al_runloop_osx.m; sourceTree = "<group>"; };
+		361718C3128B22CF00D6ED65 /* AlOpenGLSurface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlOpenGLSurface.h; sourceTree = "<group>"; };
+		361718C4128B22CF00D6ED65 /* AlOpenGLSurface.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlOpenGLSurface.m; sourceTree = "<group>"; };
+		361718C5128B22CF00D6ED65 /* AlOpenGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlOpenGLView.h; sourceTree = "<group>"; };
+		361718C6128B22CF00D6ED65 /* AlOpenGLView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlOpenGLView.m; sourceTree = "<group>"; };
+		361718C7128B22CF00D6ED65 /* AlOpenGlWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlOpenGlWindow.h; sourceTree = "<group>"; };
+		361718C8128B22CF00D6ED65 /* AlOpenGlWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlOpenGlWindow.m; sourceTree = "<group>"; };
+		361718CD128B22CF00D6ED65 /* build-state.dat */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "build-state.dat"; sourceTree = "<group>"; };
+		361718CE128B22CF00D6ED65 /* build-state~.dat */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "build-state~.dat"; sourceTree = "<group>"; };
+		361718CF128B22CF00D6ED65 /* threadedapp.dep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = threadedapp.dep; sourceTree = "<group>"; };
+		361718D0128B22CF00D6ED65 /* threadedapp~.dep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "threadedapp~.dep"; sourceTree = "<group>"; };
+		361718D3128B22CF00D6ED65 /* build-state.dat */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "build-state.dat"; sourceTree = "<group>"; };
+		361718D4128B22CF00D6ED65 /* build-state~.dat */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "build-state~.dat"; sourceTree = "<group>"; };
+		361718D5128B22CF00D6ED65 /* threadedapp.dep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = threadedapp.dep; sourceTree = "<group>"; };
+		361718D6128B22CF00D6ED65 /* threadedapp~.dep */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "threadedapp~.dep"; sourceTree = "<group>"; };
+		361718D8128B22CF00D6ED65 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		361718DA128B22CF00D6ED65 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		361718DC128B22CF00D6ED65 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/OpenGLWindow.xib; sourceTree = "<group>"; };
+		361718DD128B22CF00D6ED65 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		361718DE128B22CF00D6ED65 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		361718DF128B22CF00D6ED65 /* notes */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = notes; sourceTree = "<group>"; };
+		361718E0128B22CF00D6ED65 /* threadedapp.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = threadedapp.xcodeproj; sourceTree = "<group>"; };
+		361718E3128B22CF00D6ED65 /* threadedapp_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = threadedapp_Prefix.pch; sourceTree = "<group>"; };
 		361BF02F11DEA66600E60A9C /* al_BufferObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_BufferObject.hpp; sourceTree = "<group>"; };
 		361BF03111DEAA9400E60A9C /* al_FBO.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_FBO.hpp; sourceTree = "<group>"; };
 		361BF1B111DEBA3A00E60A9C /* exAudioScene */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exAudioScene; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -720,7 +863,6 @@
 		36B4130F10EFFA8D007B16D0 /* liballocore.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liballocore.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		36B4139610EFFD4C007B16D0 /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
 		36B4BF06110E55AF00F789A8 /* al_Socket.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Socket.hpp; sourceTree = "<group>"; };
-		36B5D3E611D81D2C004D228D /* TODO */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO; sourceTree = "<group>"; };
 		36C079BF11D4966500764E50 /* exMultiWindow */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exMultiWindow; sourceTree = BUILT_PRODUCTS_DIR; };
 		36C079C111D4967B00764E50 /* exMultiWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exMultiWindow.cpp; sourceTree = "<group>"; };
 		36C13ED911D15D30006196FC /* exReverb */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exReverb; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1056,7 +1198,15 @@
 		08FB7794FE84155DC02AAC07 /* alscheduling */ = {
 			isa = PBXGroup;
 			children = (
-				36B5D3E611D81D2C004D228D /* TODO */,
+				3617185F128B22CE00D6ED65 /* alCompiler */,
+				36171862128B22CE00D6ED65 /* alloplay */,
+				36171867128B22CE00D6ED65 /* exAlloLua */,
+				3617186D128B22CE00D6ED65 /* exMainloopCocoa */,
+				36171878128B22CF00D6ED65 /* exMainloopIphone */,
+				3617187F128B22CF00D6ED65 /* iphone */,
+				3617189A128B22CF00D6ED65 /* iphone_gles */,
+				361718BF128B22CF00D6ED65 /* shadertest */,
+				361718C0128B22CF00D6ED65 /* threadedOpenGL */,
 				3625B540116EEDEF00C685B7 /* Makefile */,
 				3625B541116EEDEF00C685B7 /* Makefile.config */,
 				36B4124410EFF7B8007B16D0 /* allocore */,
@@ -1393,6 +1543,334 @@
 				360C248111E659D3000FF335 /* xmmintrin.h */,
 			);
 			path = include;
+			sourceTree = "<group>";
+		};
+		3617185F128B22CE00D6ED65 /* alCompiler */ = {
+			isa = PBXGroup;
+			children = (
+				36171860128B22CE00D6ED65 /* exCompiler.cpp */,
+				36171861128B22CE00D6ED65 /* input.cpp */,
+			);
+			name = alCompiler;
+			path = ../alCompiler;
+			sourceTree = SOURCE_ROOT;
+		};
+		36171862128B22CE00D6ED65 /* alloplay */ = {
+			isa = PBXGroup;
+			children = (
+				36171863128B22CE00D6ED65 /* alloplay.xcodeproj */,
+				36171866128B22CE00D6ED65 /* input.cpp */,
+			);
+			name = alloplay;
+			path = ../alloplay;
+			sourceTree = SOURCE_ROOT;
+		};
+		36171864128B22CE00D6ED65 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				361718EB128B22CF00D6ED65 /* liballocompiler.a */,
+				361718ED128B22CF00D6ED65 /* utCompiler */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		36171867128B22CE00D6ED65 /* exAlloLua */ = {
+			isa = PBXGroup;
+			children = (
+				36171868128B22CE00D6ED65 /* exAlloLua.1 */,
+				36171869128B22CE00D6ED65 /* exAlloLua.xcodeproj */,
+				3617186C128B22CE00D6ED65 /* main.cpp */,
+			);
+			name = exAlloLua;
+			path = ../exAlloLua;
+			sourceTree = SOURCE_ROOT;
+		};
+		3617186A128B22CE00D6ED65 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				361718F4128B22CF00D6ED65 /* exAlloLua */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3617186D128B22CE00D6ED65 /* exMainloopCocoa */ = {
+			isa = PBXGroup;
+			children = (
+				3617186E128B22CE00D6ED65 /* CocoaExample_Prefix.pch */,
+				3617186F128B22CE00D6ED65 /* InfoPlist.strings */,
+				36171871128B22CF00D6ED65 /* MainMenu.xib */,
+				36171873128B22CF00D6ED65 /* exMainloopCocoa-Info.plist */,
+				36171874128B22CF00D6ED65 /* Info.plist */,
+				36171875128B22CF00D6ED65 /* main.mm */,
+				36171876128B22CF00D6ED65 /* TestController.h */,
+				36171877128B22CF00D6ED65 /* TestController.m */,
+			);
+			name = exMainloopCocoa;
+			path = ../exMainloopCocoa;
+			sourceTree = SOURCE_ROOT;
+		};
+		36171878128B22CF00D6ED65 /* exMainloopIphone */ = {
+			isa = PBXGroup;
+			children = (
+				36171879128B22CF00D6ED65 /* iphone-Info.plist */,
+				3617187A128B22CF00D6ED65 /* iphone_Prefix.pch */,
+				3617187B128B22CF00D6ED65 /* iphoneAppDelegate.h */,
+				3617187C128B22CF00D6ED65 /* iphoneAppDelegate.m */,
+				3617187D128B22CF00D6ED65 /* main.mm */,
+				3617187E128B22CF00D6ED65 /* MainWindow.xib */,
+			);
+			name = exMainloopIphone;
+			path = ../exMainloopIphone;
+			sourceTree = SOURCE_ROOT;
+		};
+		3617187F128B22CF00D6ED65 /* iphone */ = {
+			isa = PBXGroup;
+			children = (
+				36171880128B22CF00D6ED65 /* allo-Info.plist */,
+				36171881128B22CF00D6ED65 /* allo.xcodeproj */,
+				36171884128B22CF00D6ED65 /* allo_iPrefix.pch */,
+				36171885128B22CF00D6ED65 /* alloGLView.h */,
+				36171886128B22CF00D6ED65 /* alloGLView.mm */,
+				36171887128B22CF00D6ED65 /* alloGLViewController.h */,
+				36171888128B22CF00D6ED65 /* alloGLViewController.mm */,
+				36171889128B22CF00D6ED65 /* ES1Renderer.h */,
+				3617188A128B22CF00D6ED65 /* ES1Renderer.m */,
+				3617188B128B22CF00D6ED65 /* ES2Renderer.h */,
+				3617188C128B22CF00D6ED65 /* ES2Renderer.m */,
+				3617188D128B22CF00D6ED65 /* ESRenderer.h */,
+				3617188E128B22CF00D6ED65 /* iPad */,
+				36171892128B22CF00D6ED65 /* iPhone */,
+				36171896128B22CF00D6ED65 /* Shader.fsh */,
+				36171897128B22CF00D6ED65 /* Shader.vsh */,
+				36171898128B22CF00D6ED65 /* Shared */,
+			);
+			name = iphone;
+			path = ../iphone;
+			sourceTree = SOURCE_ROOT;
+		};
+		36171882128B22CF00D6ED65 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				361718FC128B22CF00D6ED65 /* liballocore.a */,
+				361718FE128B22CF00D6ED65 /* allo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3617188E128B22CF00D6ED65 /* iPad */ = {
+			isa = PBXGroup;
+			children = (
+				3617188F128B22CF00D6ED65 /* AppDelegate_Pad.h */,
+				36171890128B22CF00D6ED65 /* AppDelegate_Pad.m */,
+				36171891128B22CF00D6ED65 /* MainWindow_Pad.xib */,
+			);
+			path = iPad;
+			sourceTree = "<group>";
+		};
+		36171892128B22CF00D6ED65 /* iPhone */ = {
+			isa = PBXGroup;
+			children = (
+				36171893128B22CF00D6ED65 /* AppDelegate_Phone.h */,
+				36171894128B22CF00D6ED65 /* AppDelegate_Phone.m */,
+				36171895128B22CF00D6ED65 /* MainWindow_Phone.xib */,
+			);
+			path = iPhone;
+			sourceTree = "<group>";
+		};
+		36171898128B22CF00D6ED65 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				36171899128B22CF00D6ED65 /* main.m */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		3617189A128B22CF00D6ED65 /* iphone_gles */ = {
+			isa = PBXGroup;
+			children = (
+				3617189B128B22CF00D6ED65 /* allo.xcodeproj */,
+				3617189E128B22CF00D6ED65 /* build */,
+				361718AE128B22CF00D6ED65 /* Classes */,
+				361718B8128B22CF00D6ED65 /* iphone-Info.plist */,
+				361718B9128B22CF00D6ED65 /* iphone_Prefix.pch */,
+				361718BA128B22CF00D6ED65 /* main.m */,
+				361718BB128B22CF00D6ED65 /* MainWindow.xib */,
+				361718BC128B22CF00D6ED65 /* Shaders */,
+			);
+			name = iphone_gles;
+			path = ../iphone_gles;
+			sourceTree = SOURCE_ROOT;
+		};
+		3617189C128B22CF00D6ED65 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				36171904128B22CF00D6ED65 /* iphone.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3617189E128B22CF00D6ED65 /* build */ = {
+			isa = PBXGroup;
+			children = (
+				3617189F128B22CF00D6ED65 /* allo.build */,
+			);
+			path = build;
+			sourceTree = "<group>";
+		};
+		3617189F128B22CF00D6ED65 /* allo.build */ = {
+			isa = PBXGroup;
+			children = (
+				361718A0128B22CF00D6ED65 /* allo.pbxindex */,
+			);
+			path = allo.build;
+			sourceTree = "<group>";
+		};
+		361718A0128B22CF00D6ED65 /* allo.pbxindex */ = {
+			isa = PBXGroup;
+			children = (
+				361718A1128B22CF00D6ED65 /* categories.pbxbtree */,
+				361718A2128B22CF00D6ED65 /* cdecls.pbxbtree */,
+				361718A3128B22CF00D6ED65 /* decls.pbxbtree */,
+				361718A4128B22CF00D6ED65 /* files.pbxbtree */,
+				361718A5128B22CF00D6ED65 /* imports.pbxbtree */,
+				361718A6128B22CF00D6ED65 /* pbxindex.header */,
+				361718A7128B22CF00D6ED65 /* protocols.pbxbtree */,
+				361718A8128B22CF00D6ED65 /* refs.pbxbtree */,
+				361718A9128B22CF00D6ED65 /* strings.pbxstrings */,
+				361718AC128B22CF00D6ED65 /* subclasses.pbxbtree */,
+				361718AD128B22CF00D6ED65 /* symbols0.pbxsymbols */,
+			);
+			path = allo.pbxindex;
+			sourceTree = "<group>";
+		};
+		361718A9128B22CF00D6ED65 /* strings.pbxstrings */ = {
+			isa = PBXGroup;
+			children = (
+				361718AA128B22CF00D6ED65 /* control */,
+				361718AB128B22CF00D6ED65 /* strings */,
+			);
+			path = strings.pbxstrings;
+			sourceTree = "<group>";
+		};
+		361718AE128B22CF00D6ED65 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				361718AF128B22CF00D6ED65 /* EAGLView.h */,
+				361718B0128B22CF00D6ED65 /* EAGLView.m */,
+				361718B1128B22CF00D6ED65 /* ES1Renderer.h */,
+				361718B2128B22CF00D6ED65 /* ES1Renderer.m */,
+				361718B3128B22CF00D6ED65 /* ES2Renderer.h */,
+				361718B4128B22CF00D6ED65 /* ES2Renderer.m */,
+				361718B5128B22CF00D6ED65 /* ESRenderer.h */,
+				361718B6128B22CF00D6ED65 /* iphoneAppDelegate.h */,
+				361718B7128B22CF00D6ED65 /* iphoneAppDelegate.m */,
+			);
+			path = Classes;
+			sourceTree = "<group>";
+		};
+		361718BC128B22CF00D6ED65 /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				361718BD128B22CF00D6ED65 /* Shader.fsh */,
+				361718BE128B22CF00D6ED65 /* Shader.vsh */,
+			);
+			path = Shaders;
+			sourceTree = "<group>";
+		};
+		361718BF128B22CF00D6ED65 /* shadertest */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = shadertest;
+			path = ../shadertest;
+			sourceTree = SOURCE_ROOT;
+		};
+		361718C0128B22CF00D6ED65 /* threadedOpenGL */ = {
+			isa = PBXGroup;
+			children = (
+				361718C1128B22CF00D6ED65 /* al_runloop.h */,
+				361718C2128B22CF00D6ED65 /* al_runloop_osx.m */,
+				361718C3128B22CF00D6ED65 /* AlOpenGLSurface.h */,
+				361718C4128B22CF00D6ED65 /* AlOpenGLSurface.m */,
+				361718C5128B22CF00D6ED65 /* AlOpenGLView.h */,
+				361718C6128B22CF00D6ED65 /* AlOpenGLView.m */,
+				361718C7128B22CF00D6ED65 /* AlOpenGlWindow.h */,
+				361718C8128B22CF00D6ED65 /* AlOpenGlWindow.m */,
+				361718C9128B22CF00D6ED65 /* build */,
+				361718D7128B22CF00D6ED65 /* InfoPlist.strings */,
+				361718D9128B22CF00D6ED65 /* MainMenu.xib */,
+				361718DB128B22CF00D6ED65 /* OpenGLWindow.xib */,
+				361718DD128B22CF00D6ED65 /* Info.plist */,
+				361718DE128B22CF00D6ED65 /* main.m */,
+				361718DF128B22CF00D6ED65 /* notes */,
+				361718E0128B22CF00D6ED65 /* threadedapp.xcodeproj */,
+				361718E3128B22CF00D6ED65 /* threadedapp_Prefix.pch */,
+			);
+			name = threadedOpenGL;
+			path = ../threadedOpenGL;
+			sourceTree = SOURCE_ROOT;
+		};
+		361718C9128B22CF00D6ED65 /* build */ = {
+			isa = PBXGroup;
+			children = (
+				361718CA128B22CF00D6ED65 /* threadedapp.build */,
+			);
+			path = build;
+			sourceTree = "<group>";
+		};
+		361718CA128B22CF00D6ED65 /* threadedapp.build */ = {
+			isa = PBXGroup;
+			children = (
+				361718CB128B22CF00D6ED65 /* Debug */,
+				361718D1128B22CF00D6ED65 /* Release */,
+			);
+			path = threadedapp.build;
+			sourceTree = "<group>";
+		};
+		361718CB128B22CF00D6ED65 /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				361718CC128B22CF00D6ED65 /* threadedapp.build */,
+			);
+			path = Debug;
+			sourceTree = "<group>";
+		};
+		361718CC128B22CF00D6ED65 /* threadedapp.build */ = {
+			isa = PBXGroup;
+			children = (
+				361718CD128B22CF00D6ED65 /* build-state.dat */,
+				361718CE128B22CF00D6ED65 /* build-state~.dat */,
+				361718CF128B22CF00D6ED65 /* threadedapp.dep */,
+				361718D0128B22CF00D6ED65 /* threadedapp~.dep */,
+			);
+			path = threadedapp.build;
+			sourceTree = "<group>";
+		};
+		361718D1128B22CF00D6ED65 /* Release */ = {
+			isa = PBXGroup;
+			children = (
+				361718D2128B22CF00D6ED65 /* threadedapp.build */,
+			);
+			path = Release;
+			sourceTree = "<group>";
+		};
+		361718D2128B22CF00D6ED65 /* threadedapp.build */ = {
+			isa = PBXGroup;
+			children = (
+				361718D3128B22CF00D6ED65 /* build-state.dat */,
+				361718D4128B22CF00D6ED65 /* build-state~.dat */,
+				361718D5128B22CF00D6ED65 /* threadedapp.dep */,
+				361718D6128B22CF00D6ED65 /* threadedapp~.dep */,
+			);
+			path = threadedapp.build;
+			sourceTree = "<group>";
+		};
+		361718E1128B22CF00D6ED65 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3617190B128B22CF00D6ED65 /* threadedapp.app */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		361BF03011DEAA9400E60A9C /* pending */ = {
@@ -2115,7 +2593,7 @@
 /* Begin PBXProject section */
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
-			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "allo" */;
+			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "alloex" */;
 			compatibilityVersion = "Xcode 3.0";
 			hasScannedForEncodings = 1;
 			knownRegions = (
@@ -2126,6 +2604,28 @@
 			);
 			mainGroup = 08FB7794FE84155DC02AAC07 /* alscheduling */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 36171882128B22CF00D6ED65 /* Products */;
+					ProjectRef = 36171881128B22CF00D6ED65 /* allo.xcodeproj */;
+				},
+				{
+					ProductGroup = 3617189C128B22CF00D6ED65 /* Products */;
+					ProjectRef = 3617189B128B22CF00D6ED65 /* allo.xcodeproj */;
+				},
+				{
+					ProductGroup = 36171864128B22CE00D6ED65 /* Products */;
+					ProjectRef = 36171863128B22CE00D6ED65 /* alloplay.xcodeproj */;
+				},
+				{
+					ProductGroup = 3617186A128B22CE00D6ED65 /* Products */;
+					ProjectRef = 36171869128B22CE00D6ED65 /* exAlloLua.xcodeproj */;
+				},
+				{
+					ProductGroup = 361718E1128B22CF00D6ED65 /* Products */;
+					ProjectRef = 361718E0128B22CF00D6ED65 /* threadedapp.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				36B4130E10EFFA8D007B16D0 /* allocore */,
@@ -2148,6 +2648,58 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		361718EB128B22CF00D6ED65 /* liballocompiler.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = liballocompiler.a;
+			remoteRef = 361718EA128B22CF00D6ED65 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		361718ED128B22CF00D6ED65 /* utCompiler */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = utCompiler;
+			remoteRef = 361718EC128B22CF00D6ED65 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		361718F4128B22CF00D6ED65 /* exAlloLua */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = exAlloLua;
+			remoteRef = 361718F3128B22CF00D6ED65 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		361718FC128B22CF00D6ED65 /* liballocore.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = liballocore.a;
+			remoteRef = 361718FB128B22CF00D6ED65 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		361718FE128B22CF00D6ED65 /* allo.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = allo.app;
+			remoteRef = 361718FD128B22CF00D6ED65 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		36171904128B22CF00D6ED65 /* iphone.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = iphone.app;
+			remoteRef = 36171903128B22CF00D6ED65 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3617190B128B22CF00D6ED65 /* threadedapp.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = threadedapp.app;
+			remoteRef = 3617190A128B22CF00D6ED65 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		3622C075116D575700928703 /* Resources */ = {
@@ -2471,6 +3023,49 @@
 			targetProxy = B9C962A01218939E00091F80 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		3617186F128B22CE00D6ED65 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				36171870128B22CE00D6ED65 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		36171871128B22CF00D6ED65 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				36171872128B22CF00D6ED65 /* English */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+		361718D7128B22CF00D6ED65 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				361718D8128B22CF00D6ED65 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		361718D9128B22CF00D6ED65 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				361718DA128B22CF00D6ED65 /* English */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+		361718DB128B22CF00D6ED65 /* OpenGLWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				361718DC128B22CF00D6ED65 /* English */,
+			);
+			name = OpenGLWindow.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		05C93815128A158B0068F87F /* Debug */ = {
@@ -3423,7 +4018,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "allo" */ = {
+		1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "alloex" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1DEB923608733DC60010E9CD /* Debug */,
