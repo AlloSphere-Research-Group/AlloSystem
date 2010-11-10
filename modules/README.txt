@@ -1,0 +1,1 @@
+This subfolder is for any projects that build upon and extend allocore, but have to large or difficult to support dependencies to belong in the core itself.
