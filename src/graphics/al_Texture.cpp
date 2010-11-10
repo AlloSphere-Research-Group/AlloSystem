@@ -259,7 +259,7 @@ Texture::Type Texture::type_for_lattice_type(AlloTy type) {
 		case AlloUInt8Ty:		return UCHAR;
 		case AlloSInt32Ty:		return INT;
 		case AlloUInt32Ty:		return UINT;
-		case AlloPointer32Ty:	return FLOAT32;
+		case AlloFloat32Ty:		return FLOAT32;
 		default:
 			return UCHAR;
 	}
