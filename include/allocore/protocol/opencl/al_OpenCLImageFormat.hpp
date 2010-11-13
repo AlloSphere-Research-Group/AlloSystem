@@ -22,20 +22,20 @@ typedef struct _cl_image_format {
 */
 class OpenCLImageFormat {
 public:
-	static cl_image_format format_from_lattice(AlloLattice *lattice, bool normalized = true) {
+	static cl_image_format format_from_array(AlloArray *array, bool normalized = true) {
 		cl_image_format format;
 		
-		switch(lattice->header.components) {
+		switch(array->header.components) {
 			case 1:	format.image_channel_order = CL_A; break;
 			case 2:	format.image_channel_order = CL_RA; break;
 			case 3:	format.image_channel_order = CL_RGB; break;
 			case 4:	format.image_channel_order = CL_RGBA; break;
 			default:
-				opencl_error(USER_OPENCL_ERROR, "format_from_lattice invalid number of components");
+				opencl_error(USER_OPENCL_ERROR, "format_from_array invalid number of components");
 				break;
 		}
 		
-		switch(lattice->header.type) {
+		switch(array->header.type) {
 			/* floating point numbers */
 			case AlloFloat32Ty:	format.image_channel_data_type = CL_FLOAT; break;
 
@@ -64,7 +64,7 @@ public:
 				format.image_channel_data_type = CL_UNSIGNED_INT32; break;
 			
 			default:
-				opencl_error(USER_OPENCL_ERROR, "format_from_lattice invalid type");
+				opencl_error(USER_OPENCL_ERROR, "format_from_array invalid type");
 				break;
 		}
 		

@@ -75,7 +75,7 @@ public:
 	bool save(std::string filename);
 	
 	bool loaded() const { return mLoaded; }
-	const Array& lattice() { return mArray; }
+	const Array& array() { return mArray; }
 	
 	static Format getFormat(int planes);
 

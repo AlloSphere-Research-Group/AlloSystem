@@ -1,8 +1,8 @@
 #include <stdio.h>
 
-#include "allocore/types/al_lattice.h"
+#include "allocore/types/al_array.h"
 
-extern void maincpp(AlloLattice * lat);
+extern void maincpp(AlloArray * lat);
 
 typedef struct { double x; double y; } cell_d2;
 
@@ -10,7 +10,7 @@ int main (int argc, char * const argv[]) {
     
 	void * data = malloc(sizeof(double) * 2 * 64);
 	
-	AlloLattice * lat = malloc(sizeof(AlloLattice));
+	AlloArray * lat = malloc(sizeof(AlloArray));
 	lat->data.ptr = data;
 	lat->header.type = AlloFloat64Ty;
 	lat->header.components = 2;
@@ -29,7 +29,7 @@ int main (int argc, char * const argv[]) {
 	printf("lat %p, data %p, *lat %p\n", lat, data, *lat);
 	printf("dimcount %i, components %i, dim %i %i sizeof %i\n", 
 		lat->header.dimcount, lat->header.components, 
-		lat->header.dim[0], lat->header.dim[1], allo_lattice_size(lat) + sizeof(AlloLattice));
+		lat->header.dim[0], lat->header.dim[1], allo_array_size(lat) + sizeof(AlloArray));
 		
 	int rowstride = lat->header.stride[1];
 	int width = lat->header.dim[0];

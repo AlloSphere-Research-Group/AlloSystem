@@ -28,18 +28,18 @@ void OpenCLMemoryBuffer :: create(OpenCLContext &ctx, cl_mem_flags usage, size_t
 	ctx.attach_resource(this);
 }
 
-void OpenCLMemoryBuffer :: create(OpenCLContext &ctx, cl_mem_flags usage, AlloLattice *lattice) {
+void OpenCLMemoryBuffer :: create(OpenCLContext &ctx, cl_mem_flags usage, AlloArray *array) {
 	destroy();
 	detach();
 	
-	usage = check_memory_flags(usage, lattice->data.ptr);
+	usage = check_memory_flags(usage, array->data.ptr);
 	
 	cl_int res = CL_SUCCESS;
 	cl_mem mem = clCreateBuffer(
 		ctx.get_context(),
 		usage,
-		allo_lattice_size(lattice),
-		lattice->data.ptr,
+		allo_array_size(array),
+		array->data.ptr,
 		&res
 	);
 	
@@ -91,7 +91,7 @@ OpenCLEvent OpenCLMemoryBuffer :: enqueue_read(
 	OpenCLCommandQueue &queue, 
 	bool block, 
 	size_t offset, 
-	AlloLattice *lattice
+	AlloArray *array
 ) {
 	cl_event event = 0;
 	cl_int res = clEnqueueReadBuffer(
@@ -99,8 +99,8 @@ OpenCLEvent OpenCLMemoryBuffer :: enqueue_read(
 		mMem,
 		block ? CL_TRUE : CL_FALSE,
 		offset,
-		allo_lattice_size(lattice),
-		lattice->data.ptr,
+		allo_array_size(array),
+		array->data.ptr,
 		0,
 		NULL,
 		&event

@@ -1,27 +1,27 @@
 
-#include "allocore/types/al_lattice.h"
+#include "allocore/types/al_array.h"
 #include "portaudio.h"
 
 PaError err;
 
-AlloLatticeHeader latticetype;
-AlloLattice inputlattice, outputlattice;
+AlloArrayHeader arraytype;
+AlloArray inputarray, outputarray;
 
 int phase = 0;
 double pincr = 0.06;
 
 int callback(const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void *userData ) 
 {
-	/* convert stream data to AlloLatticeTy */
-	inputlattice.data.ptr = (void *)input;
-	outputlattice.data.ptr = output;
+	/* convert stream data to AlloArrayTy */
+	inputarray.data.ptr = (void *)input;
+	outputarray.data.ptr = output;
 	
 	/* do any processing here: */
-	assert(frameCount == outputlattice.header.dim[1]);
+	assert(frameCount == outputarray.header.dim[1]);
 	
-	char * outp = outputlattice.data.ptr;
-	int frame_stride = outputlattice.header.stride[1];
-	for (int i=0; i<outputlattice.header.dim[1]; i++) {
+	char * outp = outputarray.data.ptr;
+	int frame_stride = outputarray.header.stride[1];
+	for (int i=0; i<outputarray.header.dim[1]; i++) {
 		float * out = (float *)(outp + frame_stride * i);
 		out[1] = sin(pincr * (phase+i));
 		phase += 0.01;
@@ -48,18 +48,18 @@ int main(int argc, char * argv) {
                               NULL );
 	if (err != paNoError) goto out;
 	
-	/* configure lattice type for audio IO */
-	latticetype.type = AlloFloat32Ty;
+	/* configure array type for audio IO */
+	arraytype.type = AlloFloat32Ty;
 	/* note that portaudio by default gives us interleaved data */
-	latticetype.components = 1; /* single sample units */
-	latticetype.dimcount = 2; /* 1 dim */
-	latticetype.dim[0] = 2; /* 2 channels */
-	latticetype.dim[1] = 64; /* block size */
-	latticetype.stride[0] = latticetype.components * allo_type_size(latticetype.type); 
-	latticetype.stride[1] = latticetype.stride[0] * latticetype.dim[0]; 
+	arraytype.components = 1; /* single sample units */
+	arraytype.dimcount = 2; /* 1 dim */
+	arraytype.dim[0] = 2; /* 2 channels */
+	arraytype.dim[1] = 64; /* block size */
+	arraytype.stride[0] = arraytype.components * allo_type_size(arraytype.type); 
+	arraytype.stride[1] = arraytype.stride[0] * arraytype.dim[0]; 
 	
-	allo_lattice_setheader(&inputlattice, &latticetype);
-	allo_lattice_setheader(&outputlattice, &latticetype);
+	allo_array_setheader(&inputarray, &arraytype);
+	allo_array_setheader(&outputarray, &arraytype);
 	
 	err = Pa_StartStream(stream);
 	if (err != paNoError) goto out;

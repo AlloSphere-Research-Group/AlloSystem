@@ -204,7 +204,7 @@ void GraphicsBackendOpenGL::setModelviewMatrix(Matrix4d &m) {
 	glLoadMatrixd(m.elems);
 }
 
-GLenum GraphicsBackendOpenGL::type_for_lattice_type(AlloTy type) {
+GLenum GraphicsBackendOpenGL::type_for_array_type(AlloTy type) {
 	switch(type) {
 		case AlloFloat32Ty: return GL_FLOAT;
 		case AlloFloat64Ty: return GL_DOUBLE;

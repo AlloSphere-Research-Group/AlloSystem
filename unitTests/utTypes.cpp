@@ -70,7 +70,7 @@ int utTypes(){
 
 		data_t data[comps*size0*size1];
 	
-		AlloLatticeHeader hdr;
+		AlloArrayHeader hdr;
 		hdr.type = AlloFloat64Ty;
 		hdr.components = comps;
 		hdr.dimcount = dims;
@@ -79,17 +79,17 @@ int utTypes(){
 		hdr.stride[0] = stride0;
 		hdr.stride[1] = stride1;
 		
-		AlloLattice lat;
+		AlloArray lat;
 		lat.data.ptr = (char *)&data;
 		
-		allo_lattice_setheader(&lat, &hdr);
+		allo_array_setheader(&lat, &hdr);
 
-		assert(allo_lattice_elements(&lat) == size0*size1);
-		assert(allo_lattice_size(&lat) == sizeof(data));
+		assert(allo_array_elements(&lat) == size0*size1);
+		assert(allo_array_size(&lat) == sizeof(data));
 	}
 	
 	{
-		AlloLatticeHeader hdr;
+		AlloArrayHeader hdr;
 		hdr.type = AlloSInt8Ty;
 		hdr.components = 1;
 		hdr.dim[0] = 7;
@@ -98,25 +98,25 @@ int utTypes(){
 		// 2D test
 		hdr.dimcount = 2;
 		
-		allo_lattice_setstride(&hdr, 1);
+		allo_array_setstride(&hdr, 1);
 		assert(hdr.stride[0] == 1);
 		assert(hdr.stride[1] == 7);
 
-		allo_lattice_setstride(&hdr, 4);
+		allo_array_setstride(&hdr, 4);
 		assert(hdr.stride[1] == 8);
 		
-		allo_lattice_setstride(&hdr, 8);
+		allo_array_setstride(&hdr, 8);
 		assert(hdr.stride[1] == 8);
 		
 		// 3D test
 		hdr.dimcount = 3;
-		allo_lattice_setstride(&hdr, 4);
+		allo_array_setstride(&hdr, 4);
 		assert(hdr.stride[2] == 8*7);
 	}
 	
 	// not implemented...
 //	{
-//		al::Lattice lat;
+//		al::Array lat;
 //		lat.setpacked3d<double>(2, 8, 8, 8);
 //		lat.data.ptr = (char *)calloc(1, lat.size());
 //

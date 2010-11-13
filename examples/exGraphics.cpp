@@ -151,7 +151,7 @@ int main (int argc, char * argv[]) {
 	win1.add(new StandardWindowKeyControls);
 
 /*
-	al::Lattice tex_data;
+	al::Array tex_data;
 	tex_data.create2d(3, AlloUInt8Ty, 256, 256);
 
 	for(int j=0; j < 256; j++) {
@@ -164,7 +164,7 @@ int main (int argc, char * argv[]) {
 		}
 	}
 
-	texture->fromLattice(&tex_data);
+	texture->fromArray(&tex_data);
 
 	surface_tex->dimensions(512, 512);
 	surface->attach(surface_tex);

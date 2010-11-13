@@ -31,7 +31,7 @@ public:
 	void create(OpenCLContext &ctx, const OpenCLDevice &dev, bool ordered=true, bool profiling=false);
 	OpenCLEvent enqueue_kernel(const OpenCLKernel &ker, cl_uint ndim, size_t *global, size_t *local);
 	OpenCLEvent enqueue_read(OpenCLMemoryBuffer &mem, bool block, size_t offset, size_t size, void *ptr);
-	OpenCLEvent enqueue_read(OpenCLMemoryBuffer &mem, bool block, size_t offset, AlloLattice *lattice);
+	OpenCLEvent enqueue_read(OpenCLMemoryBuffer &mem, bool block, size_t offset, AlloArray *array);
 	void destroy();
 
 protected:

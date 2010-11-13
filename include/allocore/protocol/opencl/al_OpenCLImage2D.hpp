@@ -35,7 +35,7 @@ public:
 	virtual void create(
 		OpenCLContext &ctx, 
 		cl_mem_flags usage, 
-		AlloLattice *lattice
+		AlloArray *array
 	);
 	
 	virtual OpenCLEvent enqueue_read(
@@ -50,7 +50,7 @@ public:
 		OpenCLCommandQueue &queue, 
 		bool block, 
 		size_t offset, 
-		AlloLattice *lattice
+		AlloArray *array
 	);
 	
 	OpenCLEvent enqueue_read(

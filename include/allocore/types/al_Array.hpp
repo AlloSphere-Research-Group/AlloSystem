@@ -87,7 +87,7 @@ public:
 		this->components = components;
 		dimcount = 1;
 		dim[0] = dimx;
-		allo_lattice_setstride(this, align);
+		allo_array_setstride(this, align);
 	}
 	
 	void define2d(int components, AlloTy ty, int dimx, int dimy, size_t align = 4) {
@@ -96,7 +96,7 @@ public:
 		dimcount = 2;
 		dim[0] = dimx;
 		dim[1] = dimy;
-		allo_lattice_setstride(this, align);
+		allo_array_setstride(this, align);
 	}
 	
 	void define3d(int components, AlloTy ty, int dimx, int dimy, int dimz, size_t align = 4) {
@@ -106,7 +106,7 @@ public:
 		dim[0] = dimx;
 		dim[1] = dimy;
 		dim[2] = dimz;
-		allo_lattice_setstride(this, align);
+		allo_array_setstride(this, align);
 	}
 };
 
@@ -137,10 +137,10 @@ public:
 		create3d(components, ty, dimx, dimy, dimz);
 	}
 
-	size_t size() { return allo_lattice_size(this); }
+	size_t size() { return allo_array_size(this); }
 	
 	
-	// check whether the internal lattice data is of type T:
+	// check whether the internal array data is of type T:
 	template<typename T> bool checkType() { return al::checkType<T>(header.type); }
 	
 	void data_calloc() {
@@ -191,7 +191,7 @@ public:
 		h.components = components;
 		h.dimcount = 1;
 		h.dim[0] = w;
-		allo_lattice_setstride(&h, align);
+		allo_array_setstride(&h, align);
 		adapt(h);
 	}
 	
@@ -202,7 +202,7 @@ public:
 		hh.dimcount = 2;
 		hh.dim[0] = w;
 		hh.dim[1] = h;
-		allo_lattice_setstride(&hh, align);
+		allo_array_setstride(&hh, align);
 		adapt(hh);
 	}
 	
@@ -214,7 +214,7 @@ public:
 		hh.dim[0] = w;
 		hh.dim[1] = h;
 		hh.dim[2] = d;
-		allo_lattice_setstride(&hh, align);
+		allo_array_setstride(&hh, align);
 		adapt(hh);
 	}
 	
@@ -226,10 +226,10 @@ public:
 		}
 	}
 	
-	void adapt(const AlloArray *lattice) {
-		if(! equal(lattice->header)) {
+	void adapt(const AlloArray *array) {
+		if(! equal(array->header)) {
 			data_free();
-			define(lattice->header);
+			define(array->header);
 			data_calloc();
 		}
 	}
@@ -249,7 +249,7 @@ public:
 		header.components = components;
 		header.dimcount = 1;
 		header.dim[0] = dimx;
-		allo_lattice_setstride(&header, align);
+		allo_array_setstride(&header, align);
 	}
 	
 	void define2d(int components, AlloTy ty, int dimx, int dimy, size_t align = 4) {
@@ -258,7 +258,7 @@ public:
 		header.dimcount = 2;
 		header.dim[0] = dimx;
 		header.dim[1] = dimy;
-		allo_lattice_setstride(&header, align);
+		allo_array_setstride(&header, align);
 	}
 	
 	void define3d(int components, AlloTy ty, int dimx, int dimy, int dimz, size_t align = 4) {
@@ -268,11 +268,11 @@ public:
 		header.dim[0] = dimx;
 		header.dim[1] = dimy;
 		header.dim[2] = dimz;
-		allo_lattice_setstride(&header, align);
+		allo_array_setstride(&header, align);
 	}
 	
 	/*
-		Use a function to fill a lattice with data:
+		Use a function to fill a array with data:
 	*/
 	template<typename T> void fill1d(void (*func)(T * values, double normx)) {
 		int d0 = header.dim[0];
@@ -325,7 +325,7 @@ public:
 		}
 	}
 	
-	// get the components at a given index in the lattice (no bounds checking)
+	// get the components at a given index in the array (no bounds checking)
 	template<typename T> T * cell(int x) {
 		int fieldstride_x = header.stride[0];
 		return (T *)(data.ptr + x*fieldstride_x);
@@ -343,7 +343,7 @@ public:
 	}
 	
 	
-	// read the plane values from lattice into val array (no bounds checking)
+	// read the plane values from array into val array (no bounds checking)
 	template<typename T> void read(T* val, int x) {
 		T * paaa = cell<T>(x);
 		for (uint8_t p=0; p<header.components; p++) {		
@@ -363,7 +363,7 @@ public:
 		}
 	}
 	
-	// read the plane values from lattice into val array (wraps periodically at bounds)
+	// read the plane values from array into val array (wraps periodically at bounds)
 	template<typename T> void read_wrap(T* val, int x) {
 		read(val, wrap<int>(x, header.dim[0], 0));
 	}
@@ -374,7 +374,7 @@ public:
 		read(val, wrap<int>(x, header.dim[0], 0), wrap<int>(y, header.dim[1], 0), wrap<int>(z, header.dim[2], 0));
 	}
 	
-	// linear interpolated lookup (virtual lattice index)
+	// linear interpolated lookup (virtual array index)
 	// reads the linearly interpolated plane values into val array
 	template<typename T> void read_interp(T * val, double x) {
 		x = wrap<double>(x, (double)header.dim[0], 0.);
@@ -474,7 +474,7 @@ public:
 		}
 	}
 	
-	// write plane values from val array into lattice (no bounds checking)
+	// write plane values from val array into array (no bounds checking)
 	template<typename T> void write(T* val, double x) {
 		T * paaa = cell<T>(x);
 		for (uint8_t p=0; p<header.components; p++) {		
@@ -494,7 +494,7 @@ public:
 		}
 	}
 	
-	// write plane values from val array into lattice (wraps periodically at bounds)
+	// write plane values from val array into array (wraps periodically at bounds)
 	template<typename T> void write_wrap(T* val, int x) {
 		write(val, wrap<int>(x, header.dim[0], 0));
 	}
@@ -505,8 +505,8 @@ public:
 		write(val, wrap<int>(x, header.dim[0], 0), wrap<int>(y, header.dim[1], 0), wrap<int>(z, header.dim[2], 0));
 	}
 	
-	// linear interpolated write (virtual lattice index)
-	// writes the linearly interpolated plane values from val array into lattice
+	// linear interpolated write (virtual array index)
+	// writes the linearly interpolated plane values from val array into array
 	template<typename T> void write_interp(T* val, double x) {
 		x = wrap<double>(x, (double)header.dim[0], 0.);
 		// convert 0..1 field indices to 0..(d-1) cell indices

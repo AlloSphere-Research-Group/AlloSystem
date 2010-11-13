@@ -31,7 +31,7 @@ namespace al{
 class GraphicsBackendOpenGL : public GraphicsBackend {
 public:
 	static void gl_error(const char *msg);
-	static GLenum type_for_lattice_type(AlloTy type);
+	static GLenum type_for_array_type(AlloTy type);
 
 	struct SurfaceData{
 		SurfaceData()

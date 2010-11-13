@@ -29,7 +29,7 @@ public:
 	virtual void create(
 		OpenCLContext &ctx, 
 		cl_mem_flags usage, 
-		AlloLattice *lattice
+		AlloArray *array
 	);
 	void destroy();
 	
@@ -45,7 +45,7 @@ public:
 		OpenCLCommandQueue &queue, 
 		bool block, 
 		size_t offset, 
-		AlloLattice *lattice
+		AlloArray *array
 	);
 	
 	static cl_mem_flags check_memory_flags(cl_mem_flags usage, void *ptr);

@@ -54,25 +54,25 @@ void Texture::unbind(int unit) {
 }
 
 void Texture::setArrayFormat(const AlloArrayHeader &header) {
-	mFormat = format_for_lattice_components(header.components);
-	mType = type_for_lattice_type(header.type);
+	mFormat = format_for_array_components(header.components);
+	mType = type_for_array_type(header.type);
 
 	mWidth = header.dim[0];
 	mHeight = header.dim[1];
 	mDepth = header.dim[2];
 	
-	mTarget = target_for_lattice_dimcount(header.dimcount);
+	mTarget = target_for_array_dimcount(header.dimcount);
 	
-	// allocate lattice data space
+	// allocate array data space
 	mArray.adapt(header);
 }
 
-void Texture::fromArray(const al::Array *lattice) {
-	if(! mArray.equal(lattice->header) || mMode != DATA) {
+void Texture::fromArray(const al::Array *array) {
+	if(! mArray.equal(array->header) || mMode != DATA) {
 		mMode = DATA;
-		setArrayFormat(lattice->header);
-		mArray.adapt(lattice);
-		memcpy(mArray.data.ptr, lattice->data.ptr, mArray.size());
+		setArrayFormat(array->header);
+		mArray.adapt(array);
+		memcpy(mArray.data.ptr, array->data.ptr, mArray.size());
 		mRebuild = true;
 	}
 	
@@ -243,7 +243,7 @@ void Texture::onDestroy() {
 	mBackend->textureDestroy(this);
 }
 
-Texture::Format Texture::format_for_lattice_components(int components) {
+Texture::Format Texture::format_for_array_components(int components) {
 	switch(components) {
 		case 1:	return LUMINANCE;
 		case 2:	return LUMALPHA;
@@ -254,7 +254,7 @@ Texture::Format Texture::format_for_lattice_components(int components) {
 	}
 }
 
-Texture::Type Texture::type_for_lattice_type(AlloTy type) {
+Texture::Type Texture::type_for_array_type(AlloTy type) {
 	switch(type) {
 		case AlloUInt8Ty:		return UCHAR;
 		case AlloSInt32Ty:		return INT;
@@ -265,7 +265,7 @@ Texture::Type Texture::type_for_lattice_type(AlloTy type) {
 	}
 }
 
-Texture::Target Texture::target_for_lattice_dimcount(int dimcount) {
+Texture::Target Texture::target_for_array_dimcount(int dimcount) {
 	switch(dimcount) {
 		case 1:	return TEXTURE_1D;
 		case 3:	return TEXTURE_3D;

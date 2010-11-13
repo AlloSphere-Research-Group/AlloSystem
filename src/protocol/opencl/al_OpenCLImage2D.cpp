@@ -42,18 +42,18 @@ void OpenCLImage2D :: create(
 void OpenCLImage2D :: create(
 	OpenCLContext &ctx, 
 	cl_mem_flags usage, 
-	AlloLattice *lattice
+	AlloArray *array
 ) {
 	destroy();
 	detach();
 
-	usage = OpenCLMemoryBuffer::check_memory_flags(usage, lattice->data.ptr);
+	usage = OpenCLMemoryBuffer::check_memory_flags(usage, array->data.ptr);
 	
-	bool at_least_2d = lattice->header.dimcount >= 2;
-	size_t width = lattice->header.dim[0];
-	size_t height = at_least_2d ? lattice->header.dim[1] : 1;
-	size_t rowstride = at_least_2d ? lattice->header.stride[1] : allo_lattice_size(lattice);
-	cl_image_format format = OpenCLImageFormat::format_from_lattice(lattice);
+	bool at_least_2d = array->header.dimcount >= 2;
+	size_t width = array->header.dim[0];
+	size_t height = at_least_2d ? array->header.dim[1] : 1;
+	size_t rowstride = at_least_2d ? array->header.stride[1] : allo_array_size(array);
+	cl_image_format format = OpenCLImageFormat::format_from_array(array);
 	
 	cl_int res = CL_SUCCESS;
 	cl_mem mem = clCreateImage2D(
@@ -63,7 +63,7 @@ void OpenCLImage2D :: create(
 		width,
 		height,
 		rowstride,
-		lattice->data.ptr,
+		array->data.ptr,
 		&res
 	);
 	
@@ -79,16 +79,16 @@ OpenCLEvent OpenCLImage2D :: enqueue_read(
 	OpenCLCommandQueue &queue, 
 	bool block, 
 	size_t offset, 
-	AlloLattice *lattice
+	AlloArray *array
 ) {
-	bool at_least_2d = lattice->header.dimcount >= 2;
-	size_t rowstride = at_least_2d ? lattice->header.stride[1] : allo_lattice_size(lattice);
+	bool at_least_2d = array->header.dimcount >= 2;
+	size_t rowstride = at_least_2d ? array->header.stride[1] : allo_array_size(array);
 	
-	size_t width = lattice->header.dim[0];
-	size_t height = at_least_2d ? lattice->header.dim[1] : 1;
+	size_t width = array->header.dim[0];
+	size_t height = at_least_2d ? array->header.dim[1] : 1;
 	
 	size_t ycells = offset/rowstride;
-	size_t xcells = (offset - (ycells*rowstride))/(lattice->header.stride[0]);
+	size_t xcells = (offset - (ycells*rowstride))/(array->header.stride[0]);
 
 	size_t origin[] = {
 		xcells, 
@@ -101,7 +101,7 @@ OpenCLEvent OpenCLImage2D :: enqueue_read(
 		0
 	};
 	
-	return enqueue_read(queue, block, origin, region, rowstride, lattice->data.ptr);
+	return enqueue_read(queue, block, origin, region, rowstride, array->data.ptr);
 }
 
 OpenCLEvent OpenCLImage2D :: enqueue_read(

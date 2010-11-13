@@ -87,8 +87,8 @@ typedef uint16_t AlloTy;
 	
 */
 /*
-	Maximum number of dimensions a lattice may represent
-	To model higher dimensional spaces, use a nested lattice descriptor
+	Maximum number of dimensions a array may represent
+	To model higher dimensional spaces, use a nested array descriptor
 */
 #define ALLO_LATTICE_MAX_DIMS (4)
 typedef struct {
@@ -137,7 +137,7 @@ typedef struct {
 		First member of the struct to permit easy dereferencing without pointer adjustment.
 		Anonymous union with 64-bit padding for portability
 		Serialized data should be little-endian, but in-memory data should match to the native endianness
-		Stride is necessary for lattices that are 4 or 8 byte aligned
+		Stride is necessary for arrays that are 4 or 8 byte aligned
 	*/
 	union{
 		char * ptr;
@@ -152,11 +152,11 @@ typedef struct {
 } AlloArray;
 
 /*
-	An extended lattice (wrapper)
+	An extended array (wrapper)
 */
 typedef struct AlloArrayWrapper {
 
-	AlloArray lattice;
+	AlloArray array;
 	
 	/*
 		The reference count:
@@ -225,9 +225,9 @@ static inline size_t allo_type_size(const AlloTy ty) {
 }
 
 /*
-	Return the number of elements (cells) in a lattice
+	Return the number of elements (cells) in a array
 */
-static inline uint32_t allo_lattice_elements(const AlloArray * lat) {
+static inline uint32_t allo_array_elements(const AlloArray * lat) {
 	uint32_t i, elements = 1;
 	for (i=0; i<lat->header.dimcount; i++) 
 		elements *= lat->header.dim[i];
@@ -235,24 +235,24 @@ static inline uint32_t allo_lattice_elements(const AlloArray * lat) {
 }
 
 /*
-	Return the memory footprint of a lattice
+	Return the memory footprint of a array
 */
-static inline size_t allo_lattice_size(const AlloArray * lat) {
+static inline size_t allo_array_size(const AlloArray * lat) {
 	int idx = lat->header.dimcount-1;
 	return lat->header.stride[idx] * lat->header.dim[idx];
 }
 
 /*
-	Set a lattice header, e.g. just after allocating
+	Set a array header, e.g. just after allocating
 */
-static inline void allo_lattice_setheader(AlloArray * lat, const AlloArrayHeader * header) {
+static inline void allo_array_setheader(AlloArray * lat, const AlloArrayHeader * header) {
 	memcpy(&lat->header, header, sizeof(AlloArrayHeader));
 }
 
 /*
 	Set stride factors based on a specific byte alignment
 */
-static inline void allo_lattice_setstride(AlloArrayHeader * h, unsigned alignSize){
+static inline void allo_array_setstride(AlloArrayHeader * h, unsigned alignSize){
 	unsigned typeSize = allo_type_size(h->type);
 	unsigned numDims = h->dimcount;
 	h->stride[0] = h->components * typeSize;
@@ -267,7 +267,7 @@ static inline void allo_lattice_setstride(AlloArrayHeader * h, unsigned alignSiz
 	}
 }
 
-static inline int allo_lattice_equal_headers(AlloArrayHeader *h1, AlloArrayHeader *h2) {
+static inline int allo_array_equal_headers(AlloArrayHeader *h1, AlloArrayHeader *h2) {
 	int equiv =	h1->components == h2->components && 
 				h1->type == h2->type && 
 				h1->dimcount == h2->dimcount;
@@ -281,31 +281,31 @@ static inline int allo_lattice_equal_headers(AlloArrayHeader *h1, AlloArrayHeade
 }
 
 
-static inline void allo_lattice_header_clear(AlloArrayHeader *h) {
+static inline void allo_array_header_clear(AlloArrayHeader *h) {
 	memset(h, '\0', sizeof(AlloArrayHeader));
 }
 
-static inline void allo_lattice_clear(AlloArray *lat) {
-	allo_lattice_header_clear( &(lat->header) );
+static inline void allo_array_clear(AlloArray *lat) {
+	allo_array_header_clear( &(lat->header) );
 	lat->data.ptr = 0;
 }
 
-static inline void allo_lattice_destroy(AlloArray *lat) {
+static inline void allo_array_destroy(AlloArray *lat) {
 	if(lat->data.ptr) {
 		if(lat->data.ptr) {
 			free(lat->data.ptr);
-			allo_lattice_clear(lat);
+			allo_array_clear(lat);
 		}
 	}
 }
 
-static inline void allo_lattice_create(AlloArray *lat, AlloArrayHeader *h) {
-	allo_lattice_destroy(lat);
-	allo_lattice_setheader(lat, h);
-	lat->data.ptr = (char *)calloc(1, allo_lattice_size(lat));
+static inline void allo_array_create(AlloArray *lat, AlloArrayHeader *h) {
+	allo_array_destroy(lat);
+	allo_array_setheader(lat, h);
+	lat->data.ptr = (char *)calloc(1, allo_array_size(lat));
 }
 
-static inline void allo_lattice_create1d(
+static inline void allo_array_create1d(
 	AlloArray *lat, 
 	uint8_t components, 
 	AlloTy type, 
@@ -317,11 +317,11 @@ static inline void allo_lattice_create1d(
 	header.components = components;
 	header.dimcount = 1;
 	header.dim[0] = dimx;
-	allo_lattice_setstride(&header, align);
-	allo_lattice_create(lat, &header);
+	allo_array_setstride(&header, align);
+	allo_array_create(lat, &header);
 }
 
-static inline void allo_lattice_create2d(
+static inline void allo_array_create2d(
 	AlloArray *lat, 
 	uint8_t components, 
 	AlloTy type, 
@@ -335,21 +335,21 @@ static inline void allo_lattice_create2d(
 	header.dimcount = 2;
 	header.dim[0] = dimx;
 	header.dim[1] = dimy;
-	allo_lattice_setstride(&header, align);
-	allo_lattice_create(lat, &header);
+	allo_array_setstride(&header, align);
+	allo_array_create(lat, &header);
 }
 
 
 /*
 	Adapt a latticle to another size
 */
-static inline void allo_lattice_adapt(AlloArray *lat, AlloArrayHeader *h) {
-	if(! allo_lattice_equal_headers( &(lat->header), h)) {
-		allo_lattice_create(lat, h);
+static inline void allo_array_adapt(AlloArray *lat, AlloArrayHeader *h) {
+	if(! allo_array_equal_headers( &(lat->header), h)) {
+		allo_array_create(lat, h);
 	}
 }
 
-static inline void allo_lattice_adapt2d(
+static inline void allo_array_adapt2d(
 	AlloArray *lat, 
 	uint8_t components, 
 	AlloTy type, 
@@ -363,16 +363,16 @@ static inline void allo_lattice_adapt2d(
 	header.dimcount = 2;
 	header.dim[0] = dimx;
 	header.dim[1] = dimy;
-	allo_lattice_setstride(&header, align);
-	allo_lattice_adapt(lat, &header);
+	allo_array_setstride(&header, align);
+	allo_array_adapt(lat, &header);
 }
 
 /*
-	Copy a lattice into another lattice
+	Copy a array into another array
 */
-static inline void allo_lattice_copy(AlloArray *dst, AlloArray *src){
-	allo_lattice_adapt(dst, &(src->header));
-	memcpy(dst->data.ptr, src->data.ptr, allo_lattice_size(src));
+static inline void allo_array_copy(AlloArray *dst, AlloArray *src){
+	allo_array_adapt(dst, &(src->header));
+	memcpy(dst->data.ptr, src->data.ptr, allo_array_size(src));
 }
 
 

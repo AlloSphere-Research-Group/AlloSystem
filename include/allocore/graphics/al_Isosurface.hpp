@@ -70,7 +70,7 @@ public:
 	/// valid.
 	int volumeLengths(double& volLengthX, double& volLengthY, double& volLengthZ) const;
 
-	/// Sets the dimensions of the lattice
+	/// Sets the dimensions of the array
 	Isosurface& cellDims(int nx, int ny, int nz);
 
 	/// Set lengths of cell

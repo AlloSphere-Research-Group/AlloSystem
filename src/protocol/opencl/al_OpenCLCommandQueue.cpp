@@ -61,8 +61,8 @@ OpenCLEvent OpenCLCommandQueue :: enqueue_read(OpenCLMemoryBuffer &mem, bool blo
 	return mem.enqueue_read(*this, block, offset, size, ptr);
 }
 
-OpenCLEvent OpenCLCommandQueue :: enqueue_read(OpenCLMemoryBuffer &mem, bool block, size_t offset, AlloLattice *lattice) {
-	return mem.enqueue_read(*this, block, offset, lattice);
+OpenCLEvent OpenCLCommandQueue :: enqueue_read(OpenCLMemoryBuffer &mem, bool block, size_t offset, AlloArray *array) {
+	return mem.enqueue_read(*this, block, offset, array);
 }
 
 void OpenCLCommandQueue :: destroy() {

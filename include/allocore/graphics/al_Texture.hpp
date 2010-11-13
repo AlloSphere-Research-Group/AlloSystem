@@ -64,13 +64,13 @@ public:
 	void bind(int unit = 0);
 	void unbind(int unit = 0);
 	void setArrayFormat(const AlloArrayHeader &header);
-	void fromArray(const al::Array *lattice);
+	void fromArray(const al::Array *array);
 
 	// trigger textureSubmit:
 	void update() { mUpdate = true; }
 
-	// retrieve internal lattice:
-	al::Array& lattice() { return mArray; }
+	// retrieve internal array:
+	al::Array& array() { return mArray; }
 
 	bool rect();
 	void rect(bool v);
@@ -120,9 +120,9 @@ public:
 	virtual void onDestroy();
 protected:
 
-	Format format_for_lattice_components(int components);
-	Type type_for_lattice_type(AlloTy type);
-	Target target_for_lattice_dimcount(int dimcount);
+	Format format_for_array_components(int components);
+	Type type_for_array_type(AlloTy type);
+	Target target_for_array_dimcount(int dimcount);
 
 
 	GraphicsBackend	* mBackend;			///< Library backend

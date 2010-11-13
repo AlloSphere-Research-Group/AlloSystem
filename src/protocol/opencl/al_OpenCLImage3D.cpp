@@ -46,22 +46,22 @@ void OpenCLImage3D :: create(
 void OpenCLImage3D :: create(
 	OpenCLContext &ctx, 
 	cl_mem_flags usage, 
-	AlloLattice *lattice
+	AlloArray *array
 ) {
 	destroy();
 	detach();
 
-	usage = OpenCLMemoryBuffer::check_memory_flags(usage, lattice->data.ptr);
+	usage = OpenCLMemoryBuffer::check_memory_flags(usage, array->data.ptr);
 	
-	bool at_least_2d = lattice->header.dimcount >= 2;
-	bool at_least_3d = lattice->header.dimcount >= 3;
-	size_t width = lattice->header.dim[0];
-	size_t height = at_least_2d ? lattice->header.dim[1] : 1;
-	size_t rowstride = at_least_2d ? lattice->header.stride[1] : allo_lattice_size(lattice);
-	size_t depth = at_least_3d ? lattice->header.dim[2] : 1;
-	size_t planestride = at_least_3d ? lattice->header.stride[2] : allo_lattice_size(lattice);
+	bool at_least_2d = array->header.dimcount >= 2;
+	bool at_least_3d = array->header.dimcount >= 3;
+	size_t width = array->header.dim[0];
+	size_t height = at_least_2d ? array->header.dim[1] : 1;
+	size_t rowstride = at_least_2d ? array->header.stride[1] : allo_array_size(array);
+	size_t depth = at_least_3d ? array->header.dim[2] : 1;
+	size_t planestride = at_least_3d ? array->header.stride[2] : allo_array_size(array);
 	
-	cl_image_format format = OpenCLImageFormat::format_from_lattice(lattice);
+	cl_image_format format = OpenCLImageFormat::format_from_array(array);
 	
 	cl_int res = CL_SUCCESS;
 	cl_mem mem = clCreateImage3D(
@@ -73,7 +73,7 @@ void OpenCLImage3D :: create(
 		depth,
 		rowstride,
 		planestride,
-		lattice->data.ptr,
+		array->data.ptr,
 		&res
 	);
 	
@@ -89,20 +89,20 @@ OpenCLEvent OpenCLImage3D :: enqueue_read(
 	OpenCLCommandQueue &queue, 
 	bool block, 
 	size_t offset, 
-	AlloLattice *lattice
+	AlloArray *array
 ) {
-	bool at_least_2d = lattice->header.dimcount >= 2;
-	bool at_least_3d = lattice->header.dimcount >= 3;
-	size_t rowstride = at_least_2d ? lattice->header.stride[1] : allo_lattice_size(lattice);
-	size_t planestride = at_least_3d ? lattice->header.stride[2] : allo_lattice_size(lattice);
+	bool at_least_2d = array->header.dimcount >= 2;
+	bool at_least_3d = array->header.dimcount >= 3;
+	size_t rowstride = at_least_2d ? array->header.stride[1] : allo_array_size(array);
+	size_t planestride = at_least_3d ? array->header.stride[2] : allo_array_size(array);
 	
-	size_t width = lattice->header.dim[0];
-	size_t height = at_least_2d ? lattice->header.dim[1] : 1;
-	size_t depth = at_least_3d ? lattice->header.dim[2] : 1;
+	size_t width = array->header.dim[0];
+	size_t height = at_least_2d ? array->header.dim[1] : 1;
+	size_t depth = at_least_3d ? array->header.dim[2] : 1;
 	
 	size_t zcells = offset/planestride;
 	size_t ycells = (offset - (planestride*zcells))/rowstride;
-	size_t xcells = (offset - (planestride*zcells) - (ycells*rowstride))/(lattice->header.stride[0]);
+	size_t xcells = (offset - (planestride*zcells) - (ycells*rowstride))/(array->header.stride[0]);
 	
 	size_t origin[] = {
 		xcells, 
@@ -115,7 +115,7 @@ OpenCLEvent OpenCLImage3D :: enqueue_read(
 		depth
 	};
 	
-	return enqueue_read(queue, block, origin, region,  rowstride, planestride, lattice->data.ptr);
+	return enqueue_read(queue, block, origin, region,  rowstride, planestride, array->data.ptr);
 }
 
 OpenCLEvent OpenCLImage3D :: enqueue_read(

@@ -8,16 +8,16 @@ static std::complex<double> foo;
 
 void test (uint32_t * x) {}
 
-extern "C" void maincpp(AlloLattice * lat) {
+extern "C" void maincpp(AlloArray * lat) {
     
 	// coerce the C struct into a C++ class:
-	al::Lattice * lattice = (al::Lattice *)lat;
+	al::Array * array = (al::Array *)lat;
 	
-	printf("lat is double? %i\n", lattice->checkType<double>());
-	printf("lat is float? %i\n", lattice->checkType<float>());
+	printf("lat is double? %i\n", array->checkType<double>());
+	printf("lat is float? %i\n", array->checkType<float>());
 	
 	double vals[2];
-	lattice->interp(vals, 1, 2, 3);
+	array->interp(vals, 1, 2, 3);
 	printf("value at 1, 2, 3: %f %f\n", vals[0], vals[1]);
 		
 	// create a new header:
