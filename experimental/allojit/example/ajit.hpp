@@ -1,8 +1,6 @@
 #ifndef INCLUDE_AJIT_H
 #define INCLUDE_AJIT_H
 
-#include "allocore/graphics/al_Graphics.hpp"
-#include "allocore/graphics/al_GraphicsBackendOpenGL.hpp"
 #include "allocore/graphics/al_Stereographic.hpp"
 #include "allocore/io/al_Window.hpp"
 #include "allocore/math/al_Random.hpp"
@@ -20,10 +18,36 @@ static rnd::Random<> rng;
 
 class World;
 
+template<typename T>
+class BasicList {
+public:
+	typedef typename std::list<T *> List;
+	typedef typename List::iterator Iter;
+	
+	void attach(T * o) { mObjects.push_back(o); }
+	void detach(T * o) { mObjects.remove(o); }
+	
+	Iter begin() { return mObjects.begin(); }
+	Iter end() { return mObjects.end(); }
+	
+	List mObjects;
+};
+
+class Drawables : public BasicList<Drawable> {
+public:
+	void onDraw(Graphics& gl) {
+		Iter it = mObjects.begin();
+		while (it != mObjects.end()) {
+			Drawable& o = *(*it++);
+			o.onDraw(gl);
+		}
+	}
+};
+
 /*
 	Container for all AOT installed elements
 */
-class World {
+class World : public Drawable {
 public:
 	/// get the world singleton
 	static World * get();
@@ -36,10 +60,13 @@ public:
 	};
 
 	struct WorldWindow : public Window{
-		WorldWindow() : doFrame(doFrameNothing) {}
+		WorldWindow() {}
 		bool onFrame();
 		static void doFrameNothing(void *) {};
-		draw_fptr doFrame;
+	};
+		
+	virtual void onDraw(Graphics& gl) {
+		drawables.onDraw(gl);
 	};
 	
 	WorldWindow win;
@@ -47,7 +74,7 @@ public:
 	Stereographic stereo;
 	Camera cam;
 	Nav nav;
-	//Zone rootZone;
+	Drawables drawables;
 	
 private:
 	World();

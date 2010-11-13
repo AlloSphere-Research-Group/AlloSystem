@@ -47,7 +47,7 @@
 #include "allocore/types/al_Conversion.hpp"
 #include "allocore/types/al_MsgQueue.hpp"
 #include "allocore/types/al_MsgTube.hpp"
-#include "allocore/types/al_Lattice.hpp"
+#include "allocore/types/al_Array.hpp"
 
 #include "ajit.hpp"
 
@@ -146,12 +146,11 @@ bool World::InputControl :: onKeyUp(const Keyboard& k) {
 
 bool World::WorldWindow :: onFrame() {
 	World * W = World::get();
-	W->cam.step();
-	if (doFrame) {
-		W->stereo.draw(W->gl, W->cam, doFrame, dimensions().w, dimensions().h, W);
-	} else {
-		//printf("doFrame NULL\n");
-	}
+	W->nav.step();
+	
+	Viewport vp(width(), height());
+	W->stereo.draw(W->gl, W->cam, W->nav, vp, *W);
+
 	//printf("sweep\n");	
 	JIT::sweep();
 	//printf("end onFrame\n");
@@ -260,8 +259,9 @@ int main (int argc, char * const argv[]) {
 	SearchPaths paths(argc, argv);
 	clang_headers_path = paths.appPath() + "../../dev/osx/lib/llvm/clang/2.8/include";
 	allo_headers_path = paths.appPath() + "../../include";
-	ajit_headers_path = paths.appPath() + "../../modules/allojit/src";
-	example_headers_path = paths.appPath() + "../../modules/allojit/example";
+	ajit_headers_path = paths.appPath() + "../../experimental/allojit/src";
+	example_headers_path = paths.appPath() + "../../experimental/allojit/example";
+	
 	paths.addSearchPath(example_headers_path);
 	
 	FilePath jitcode_path = paths.find("jitcode.cpp");

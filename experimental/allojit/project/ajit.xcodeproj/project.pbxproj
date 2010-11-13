@@ -1957,6 +1957,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36857CA512668F1300981167 /* liballocore.a in Frameworks */,
+				36857CA312668F0A00981167 /* libapr-1.a in Frameworks */,
+				36857CA412668F0A00981167 /* libportaudio.a in Frameworks */,
 				36857CAF12668F8300981167 /* libclang.a in Frameworks */,
 				36857CB012668F8300981167 /* libclangAnalysis.a in Frameworks */,
 				36857CB112668F8300981167 /* libclangAST.a in Frameworks */,
@@ -2048,9 +2051,6 @@
 				36857D0712668F8300981167 /* libLLVMXCoreAsmPrinter.a in Frameworks */,
 				36857D0812668F8300981167 /* libLLVMXCoreCodeGen.a in Frameworks */,
 				36857D0912668F8300981167 /* libLLVMXCoreInfo.a in Frameworks */,
-				36857CA512668F1300981167 /* liballocore.a in Frameworks */,
-				36857CA312668F0A00981167 /* libapr-1.a in Frameworks */,
-				36857CA412668F0A00981167 /* libportaudio.a in Frameworks */,
 				3685735612668D2400981167 /* AudioToolbox.framework in Frameworks */,
 				3685735812668D2400981167 /* AudioUnit.framework in Frameworks */,
 				3685735A12668D2400981167 /* Cocoa.framework in Frameworks */,
@@ -4665,7 +4665,11 @@
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				INSTALL_PATH = /usr/local/bin;
 				KEEP_PRIVATE_EXTERNS = YES;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../build/Release\"",
+					"\"$(SRCROOT)/../../../dev/osx/lib\"",
+				);
 				OTHER_LDFLAGS = "";
 				PRESERVE_DEAD_CODE_INITS_AND_TERMS = YES;
 				PRODUCT_NAME = $inherited;
@@ -4683,7 +4687,11 @@
 				GENERATE_MASTER_OBJECT_FILE = YES;
 				INSTALL_PATH = /usr/local/bin;
 				KEEP_PRIVATE_EXTERNS = YES;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../../build/Release\"",
+					"\"$(SRCROOT)/../../../dev/osx/lib\"",
+				);
 				OTHER_LDFLAGS = "";
 				PRESERVE_DEAD_CODE_INITS_AND_TERMS = YES;
 				PRODUCT_NAME = $inherited;

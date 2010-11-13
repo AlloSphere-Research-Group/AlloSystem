@@ -1,5 +1,5 @@
-#include "io/al_Window.hpp"
-#include "spatial/al_CoordinateFrame.hpp"
+#include "allocore/io/al_Window.hpp"
+#include "allocore/spatial/al_CoordinateFrame.hpp"
 
 namespace al {
 
