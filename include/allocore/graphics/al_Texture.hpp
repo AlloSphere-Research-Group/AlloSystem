@@ -2,7 +2,7 @@
 #define INCLUDE_AL_GRAPHICS_TEXTURE_HPP
 
 #include "allocore/graphics/al_GPUObject.hpp"
-#include "allocore/types/al_Lattice.hpp"
+#include "allocore/types/al_Array.hpp"
 #include "allocore/types/al_Color.hpp"
 
 namespace al{
@@ -63,14 +63,14 @@ public:
 
 	void bind(int unit = 0);
 	void unbind(int unit = 0);
-	void setLatticeFormat(const AlloLatticeHeader &header);
-	void fromLattice(const al::Lattice *lattice);
+	void setArrayFormat(const AlloArrayHeader &header);
+	void fromArray(const al::Array *lattice);
 
 	// trigger textureSubmit:
 	void update() { mUpdate = true; }
 
 	// retrieve internal lattice:
-	al::Lattice& lattice() { return mLattice; }
+	al::Array& lattice() { return mArray; }
 
 	bool rect();
 	void rect(bool v);
@@ -126,7 +126,7 @@ protected:
 
 
 	GraphicsBackend	* mBackend;			///< Library backend
-	al::Lattice		mLattice;			///< Lattice of data
+	al::Array		mArray;			///< Array of data
 	Mode			mMode;				///< Texture mode
 	bool			mRebuild;			///< Rebuild flag
 	bool			mUpdate;			///< Update flag

@@ -1,5 +1,5 @@
 
-#include "allocore/types/al_Lattice.hpp"
+#include "allocore/types/al_Array.hpp"
 
 #include <stdio.h>
 #include <complex>

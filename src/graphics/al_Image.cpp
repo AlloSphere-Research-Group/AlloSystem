@@ -33,7 +33,7 @@ public:
 	virtual ~FreeImageImpl() {
 	}
 	
-	virtual bool load(std::string filename, Lattice &lat) {
+	virtual bool load(std::string filename, Array &lat) {
 		FREE_IMAGE_FORMAT type = FreeImage_GetFIFFromFilename(filename.data());
 		if(type == FIF_UNKNOWN) {
 			printf("image format not recognized: %s\n", filename.data());
@@ -208,7 +208,7 @@ public:
 		return true;
 	}
 	
-	virtual bool save(std::string filename, Lattice &lat) {
+	virtual bool save(std::string filename, Array &lat) {
 	
 		// check existing image type
 		FREE_IMAGE_FORMAT type = FreeImage_GetFIFFromFilename(filename.data());
@@ -224,7 +224,7 @@ public:
 		
 		destroy();
 		
-		AlloLatticeHeader& header = lat.header;
+		AlloArrayHeader& header = lat.header;
 		int w = header.dim[0];
 		int h = (header.dimcount > 1) ? header.dim[1] : 1;
 		Image::Format format = Image::getFormat(header.components);
@@ -366,7 +366,7 @@ bool Image :: load(std::string filename) {
 //	// detect by file extension & redirect to appropriate implementation here:
 //	if (mImpl) delete mImpl;
 //	mImpl = new FreeImageImpl();
-	mLoaded = mImpl->load(filename, mLattice);
+	mLoaded = mImpl->load(filename, mArray);
 	if (mLoaded) mFilename = filename;
 	return mLoaded;
 }
@@ -377,7 +377,7 @@ bool Image :: save(std::string filename) {
 //	// detect by file extension & redirect to appropriate implementation here:
 //	if (mImpl) delete mImpl;
 //	mImpl = new FreeImageImpl();
-	mLoaded = mImpl->save(filename, mLattice);
+	mLoaded = mImpl->save(filename, mArray);
 	if (mLoaded) mFilename = filename;
 	return mLoaded;
 }

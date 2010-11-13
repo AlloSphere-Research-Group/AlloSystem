@@ -5,7 +5,7 @@
 #include "al_OpenCLContext.hpp"
 #include "al_OpenCLKernel.hpp"
 #include "al_OpenCLEvent.hpp"
-#include "allocore/types/al_Lattice.hpp"
+#include "allocore/types/al_Array.hpp"
 #include <vector>
 #include <string>
 

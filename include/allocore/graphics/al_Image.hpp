@@ -28,7 +28,7 @@
 */
 
 #include <string>
-#include "allocore/types/al_Lattice.hpp"
+#include "allocore/types/al_Array.hpp"
 
 namespace al{
 
@@ -75,19 +75,19 @@ public:
 	bool save(std::string filename);
 	
 	bool loaded() const { return mLoaded; }
-	const Lattice& lattice() { return mLattice; }
+	const Array& lattice() { return mArray; }
 	
 	static Format getFormat(int planes);
 
 	class Impl {
 	public:
 		virtual ~Impl() {};
-		virtual bool load(std::string filename, Lattice &lat) = 0;
-		virtual bool save(std::string filename, Lattice &lat) = 0;
+		virtual bool load(std::string filename, Array &lat) = 0;
+		virtual bool save(std::string filename, Array &lat) = 0;
 	};
 
 protected: 
-	Lattice mLattice;			// pixel data
+	Array mArray;			// pixel data
 	Impl * mImpl;				// library implementation
 	std::string mFilename;
 	bool mLoaded;				// true after image data is loaded

@@ -1916,7 +1916,7 @@
 			productReference = 36D69A3B11F923FC00699158 /* exGraphics */;
 			productType = "com.apple.product-type.tool";
 		};
-		8DD76F620486A84900D96B5E /* exAlloLua */ = {
+		8DD76F620486A84900D96B5E /* exScheduling */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "exScheduling" */;
 			buildPhases = (
@@ -1991,7 +1991,7 @@
 			);
 			projectRoot = "";
 			targets = (
-				8DD76F620486A84900D96B5E /* exAlloLua */,
+				8DD76F620486A84900D96B5E /* exScheduling */,
 				3602B4CA110A67C9005DC3D0 /* exOscRecv */,
 				3602B728110A9770005DC3D0 /* exOscSend */,
 				3622BFD6116D55DD00928703 /* exMainloopTool */,

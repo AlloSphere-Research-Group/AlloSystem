@@ -4,7 +4,7 @@
 #include "al_OpenCLInternal.hpp"
 #include "al_OpenCLContext.hpp"
 #include "al_OpenCLEvent.hpp"
-#include "allocore/types/al_Lattice.hpp"
+#include "allocore/types/al_Array.hpp"
 #include <vector>
 #include <string>
 

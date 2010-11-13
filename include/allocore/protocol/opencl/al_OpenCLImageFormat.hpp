@@ -2,7 +2,7 @@
 #define AL_OPENCL_IMAGE_FORMAT_H 1
 
 #include "al_OpenCLInternal.hpp"
-#include "allocore/types/al_Lattice.hpp"
+#include "allocore/types/al_Array.hpp"
 #include <vector>
 #include <string>
 

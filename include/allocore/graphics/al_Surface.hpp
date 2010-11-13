@@ -3,7 +3,7 @@
 
 #include "allocore/graphics/al_Texture.hpp"
 #include "allocore/graphics/al_GPUObject.hpp"
-#include "allocore/types/al_Lattice.hpp"
+#include "allocore/types/al_Array.hpp"
 #include "allocore/types/al_Color.hpp"
 
 namespace al{

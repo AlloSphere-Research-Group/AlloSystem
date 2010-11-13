@@ -36,9 +36,17 @@ namespace al{
 
 /*
 	Conceptually, a Behavior t is a value of type t that varies over synchronous time.
+	
+	
+	
 */
 template <typename T>
 struct BehaviorBase {
+
+	T value;
+	
+	T get(){ return value; }
+	
 	
 	/// todo: operator overloads:
 };

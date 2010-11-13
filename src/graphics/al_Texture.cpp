@@ -53,7 +53,7 @@ void Texture::unbind(int unit) {
 	mBackend->textureUnbind(this, unit);
 }
 
-void Texture::setLatticeFormat(const AlloLatticeHeader &header) {
+void Texture::setArrayFormat(const AlloArrayHeader &header) {
 	mFormat = format_for_lattice_components(header.components);
 	mType = type_for_lattice_type(header.type);
 
@@ -64,15 +64,15 @@ void Texture::setLatticeFormat(const AlloLatticeHeader &header) {
 	mTarget = target_for_lattice_dimcount(header.dimcount);
 	
 	// allocate lattice data space
-	mLattice.adapt(header);
+	mArray.adapt(header);
 }
 
-void Texture::fromLattice(const al::Lattice *lattice) {
-	if(! mLattice.equal(lattice->header) || mMode != DATA) {
+void Texture::fromArray(const al::Array *lattice) {
+	if(! mArray.equal(lattice->header) || mMode != DATA) {
 		mMode = DATA;
-		setLatticeFormat(lattice->header);
-		mLattice.adapt(lattice);
-		memcpy(mLattice.data.ptr, lattice->data.ptr, mLattice.size());
+		setArrayFormat(lattice->header);
+		mArray.adapt(lattice);
+		memcpy(mArray.data.ptr, lattice->data.ptr, mArray.size());
 		mRebuild = true;
 	}
 	
@@ -88,11 +88,11 @@ void Texture::rect(bool v) {
 }
 	
 char * Texture::getData() {
-	return mLattice.data.ptr;
+	return mArray.data.ptr;
 }
 
 int Texture::getRowStride() {
-	return mLattice.header.stride[1];
+	return mArray.header.stride[1];
 }
 
 int Texture::width() {
