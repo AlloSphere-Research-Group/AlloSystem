@@ -27,7 +27,7 @@
 #ifndef INCLUDE_ALLO_TYPES_CPP_H
 #define INCLUDE_ALLO_TYPES_CPP_H 1
 
-#include "allocore/types/al_Lattice.h"
+#include "allocore/types/al_Array.h"
 #include "allocore/math/al_Functions.hpp"	
 #include <stdlib.h>
 
@@ -52,7 +52,7 @@ template<> inline AlloTy getType<int32_t>() { return AlloSInt32Ty; }
 template<> inline AlloTy getType<int64_t>() { return AlloSInt64Ty; }
 template<> inline AlloTy getType<float>() { return AlloFloat32Ty; }
 template<> inline AlloTy getType<double>() { return AlloFloat64Ty; }
-template<> inline AlloTy getType<AlloLattice>() { return AlloLatticeTy; }
+template<> inline AlloTy getType<AlloArray>() { return AlloArrayTy; }
 // TODO: #define for platform ptrsize
 //template<> AlloTy getType<void *>() { return AlloPointer32Ty; }
 //template<> AlloTy getType<void *>() { return AlloPointer32Ty; }
@@ -67,18 +67,18 @@ template<typename T> inline bool checkType(AlloTy ty) { return getType<T>() && t
 	Derived type
 		N.B. methods and static members only... no additional instance member data!
 */
-class LatticeHeader : public AlloLatticeHeader {
+class ArrayHeader : public AlloArrayHeader {
 public:
 	
-	LatticeHeader(int components, AlloTy ty, int dimx) {
+	ArrayHeader(int components, AlloTy ty, int dimx) {
 		define1d(components, ty, dimx);
 	}
 	
-	LatticeHeader(int components, AlloTy ty, int dimx, int dimy) {
+	ArrayHeader(int components, AlloTy ty, int dimx, int dimy) {
 		define2d(components, ty, dimx, dimy);
 	}
 	
-	LatticeHeader(int components, AlloTy ty, int dimx, int dimy, int dimz) {
+	ArrayHeader(int components, AlloTy ty, int dimx, int dimy, int dimz) {
 		define3d(components, ty, dimx, dimy, dimz);
 	}
 	
@@ -114,10 +114,10 @@ public:
 	Derived type
 		N.B. methods and static members only... no additional instance member data!
 */
-class Lattice : public AlloLattice {
+class Array : public AlloArray {
 public:
 
-	Lattice() {
+	Array() {
 		data.ptr = 0;
 		header.dimcount = 0;
 		
@@ -125,15 +125,15 @@ public:
 		data_calloc();
 	}
 	
-	Lattice(int components, AlloTy ty, int dimx) {
+	Array(int components, AlloTy ty, int dimx) {
 		create1d(components, ty, dimx);
 	}
 	
-	Lattice(int components, AlloTy ty, int dimx, int dimy) {
+	Array(int components, AlloTy ty, int dimx, int dimy) {
 		create2d(components, ty, dimx, dimy);
 	}
 	
-	Lattice(int components, AlloTy ty, int dimx, int dimy, int dimz) {
+	Array(int components, AlloTy ty, int dimx, int dimy, int dimz) {
 		create3d(components, ty, dimx, dimy, dimz);
 	}
 
@@ -152,7 +152,7 @@ public:
 		}
 	}
 	
-	bool equal(const AlloLatticeHeader &h2) {
+	bool equal(const AlloArrayHeader &h2) {
 		bool equiv =	header.components == h2.components && 
 						header.type == h2.type && 
 						header.dimcount == h2.dimcount;
@@ -180,13 +180,13 @@ public:
 		data_calloc();
 	}
 	
-	void create(AlloLatticeHeader &h) {
+	void create(AlloArrayHeader &h) {
 		define(h);
 		data_calloc();
 	}
 
 	void adapt1d(int components, AlloTy type, int w, size_t align = 4) {
-		AlloLatticeHeader h;
+		AlloArrayHeader h;
 		h.type = type;
 		h.components = components;
 		h.dimcount = 1;
@@ -196,7 +196,7 @@ public:
 	}
 	
 	void adapt2d(int components, AlloTy type, int w, int h, size_t align = 4) {
-		AlloLatticeHeader hh;
+		AlloArrayHeader hh;
 		hh.type = type;
 		hh.components = components;
 		hh.dimcount = 2;
@@ -207,7 +207,7 @@ public:
 	}
 	
 	void adapt3d(int components, AlloTy type, int w, int h, int d, size_t align = 4) {
-		AlloLatticeHeader hh;
+		AlloArrayHeader hh;
 		hh.type = type;
 		hh.components = components;
 		hh.dimcount = 3;
@@ -218,7 +218,7 @@ public:
 		adapt(hh);
 	}
 	
-	void adapt(const AlloLatticeHeader &h) {
+	void adapt(const AlloArrayHeader &h) {
 		if(! equal(h)) {
 			data_free();
 			define(h);
@@ -226,7 +226,7 @@ public:
 		}
 	}
 	
-	void adapt(const AlloLattice *lattice) {
+	void adapt(const AlloArray *lattice) {
 		if(! equal(lattice->header)) {
 			data_free();
 			define(lattice->header);
@@ -234,7 +234,7 @@ public:
 		}
 	}
 	
-	void define(const AlloLatticeHeader &h2) {
+	void define(const AlloArrayHeader &h2) {
 		header.components = h2.components;
 		header.type = h2.type;
 		header.dimcount = h2.dimcount;
