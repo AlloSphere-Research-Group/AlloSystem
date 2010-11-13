@@ -71,7 +71,7 @@ void Texture::fromArray(const al::Array *array) {
 	if(! mArray.equal(array->header) || mMode != DATA) {
 		mMode = DATA;
 		setArrayFormat(array->header);
-		mArray.adapt(array);
+		mArray.adapt(*array);
 		memcpy(mArray.data.ptr, array->data.ptr, mArray.size());
 		mRebuild = true;
 	}

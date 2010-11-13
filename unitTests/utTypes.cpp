@@ -3,6 +3,27 @@
 typedef double data_t;
 
 int utTypes(){
+	
+	
+	{
+		// Basic Array usage
+		
+		// a 1D array of float-pairs (e.g. interleaved audio buffer)
+		Array buf(2, AlloFloat32Ty, 64);
+		
+		
+		// a 2D array of char[4] data (e.g. ARGB image matrix with color values as 0-255) 
+		Array img(4, AlloUInt8Ty, 720, 480);
+		
+		// a 3D array of float triplets (e.g. vector field)
+		Array field(3, Array::type<float>(), 16, 16, 16);
+		
+		// check the type of 
+		assert(buf.isType<float>());
+		assert(buf.isType(AlloFloat32Ty));
+		
+		
+	}
 
 	{
 		Buffer<int> a(0,2);

@@ -76,6 +76,8 @@ enum {
 };
 
 typedef uint16_t AlloTy;
+	
+static size_t allo_type_size(const AlloTy ty);
 
 #pragma mark AlloArray
 /*

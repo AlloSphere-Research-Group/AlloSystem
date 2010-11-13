@@ -95,8 +95,7 @@ public:
 		AlloTy ty = getDataType();
 		int w, h;
 		getDim(w, h);
-		lat.define2d(planes, ty, w, h);
-		lat.data_calloc();
+		lat.create(planes, ty, w, h);
 		
 		Image::Format format = Image::getFormat(planes);
 		switch(format) {
