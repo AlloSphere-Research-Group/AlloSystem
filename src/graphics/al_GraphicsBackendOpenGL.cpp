@@ -809,7 +809,8 @@ void GraphicsBackendOpenGL::draw(const GraphicsData& v) {
 		glColorPointer(4, GL_FLOAT, 0, &v.colors()[0]);			
 	}
 	else if(0 == Nc){
-		glColor4f(1, 1, 1, 1);
+		// no; just use whatever the last glColor() call used!
+		//glColor4f(1, 1, 1, 1);
 	}
 	else{
 		glColor4f(v.colors()[0][0], v.colors()[0][1], v.colors()[0][2], v.colors()[0][3]);

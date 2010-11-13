@@ -28,7 +28,7 @@
 #include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_GraphicsBackendOpenGL.hpp"
 #include "allocore/graphics/al_Image.hpp"
-#include "allocore/graphics/al_Isosurface.hpp"
+//#include "allocore/graphics/al_Isosurface.hpp"
 #include "allocore/graphics/al_Light.hpp"
 #include "allocore/graphics/al_Model.hpp"
 #include "allocore/graphics/al_Stereographic.hpp"

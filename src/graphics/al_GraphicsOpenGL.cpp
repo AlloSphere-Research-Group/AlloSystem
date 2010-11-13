@@ -46,8 +46,8 @@ static void gl_end(Graphics * g) {
 	g->data().resetBuffers();
 }
 
-static void gl_color(Graphics * G, double r, double g, double b, double a) {
-	G->data().addColor(r,g,b,a);
+static void gl_color(Graphics * g, double r, double g, double b, double a) {
+	g->data().addColor(r,g,b,a);
 }
 static void gl_normal(Graphics * g, double x, double y, double z) {
 	g->data().addNormal(x,y,z);

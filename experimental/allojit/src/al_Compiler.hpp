@@ -207,13 +207,49 @@ public:
 	}
 	~JitObject() { 
 		mJIT->release();
-		printf("released JitObject\n"); 
+		//printf("released JitObject\n"); 
 	}
+	
+	JIT * jit() const { return mJIT; }
 	
 protected:	
 	JIT * mJIT;
 };
 
+/*
+	JitZone can be used to form a tree-like hierarchy of JitObjects/JitZones
+		When a parent zone is destroyed, all child JitObjects are destroyed (in reverse order of creation)
+*/
+class JitZone : public JitObject {
+public:
+
+	JitZone(JIT * jit, JitZone * parent) : JitObject(jit), mParentZone(parent) {}
+	
+	virtual ~JitZone() {
+		while (!mChildJits.empty()) {
+			delete *mChildJits.rbegin();
+		}
+		if (mParentZone) mParentZone->remove(this);
+	}
+	
+	JitZone * create(JIT * jit) {
+		JitZone * z = new JitZone(jit, this);
+		add(z);
+		return z;
+	}
+
+	void add(JitObject * z) {
+		mChildJits.push_back(z);
+	}
+	
+	void remove(JitObject * z) {
+		mChildJits.remove(z);
+	}
+
+	JitZone * mParentZone;
+	std::list<JitObject *> mChildJits;
+
+};
 
 } // al::
 
