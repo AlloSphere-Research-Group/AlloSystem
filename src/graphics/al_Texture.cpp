@@ -64,14 +64,14 @@ void Texture::setArrayFormat(const AlloArrayHeader &header) {
 	mTarget = target_for_array_dimcount(header.dimcount);
 	
 	// allocate array data space
-	mArray.adapt(header);
+	mArray.format(header);
 }
 
 void Texture::fromArray(const al::Array *array) {
-	if(! mArray.equal(array->header) || mMode != DATA) {
+	if(! mArray.hasFormat(array->header) || mMode != DATA) {
 		mMode = DATA;
 		setArrayFormat(array->header);
-		mArray.adapt(*array);
+		mArray.format(*array);
 		memcpy(mArray.data.ptr, array->data.ptr, mArray.size());
 		mRebuild = true;
 	}

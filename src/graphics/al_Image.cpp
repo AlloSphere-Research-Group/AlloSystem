@@ -95,7 +95,7 @@ public:
 		AlloTy ty = getDataType();
 		int w, h;
 		getDim(w, h);
-		lat.create(planes, ty, w, h);
+		lat.format(planes, ty, w, h);
 		
 		Image::Format format = Image::getFormat(planes);
 		switch(format) {
