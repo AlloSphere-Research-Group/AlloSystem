@@ -59,70 +59,22 @@ public:
 	static void deriveStride(AlloArrayHeader& h, size_t alignSize);
 	
 	/*!
-		Empty constructor defines a 0-D, 1-plane array of void type; unallocated data
+	 Standard constructors; will allocate memory accordingly
 	 */
-	Array() : AlloArray() {
-		data.ptr = 0;
-		header.type= 0;
-		header.components = 1;
-		header.dimcount = 0;
-	}
+	Array(int components, AlloTy ty, int dimx);
+	Array(int components, AlloTy ty, int dimx, int dimy);
+	Array(int components, AlloTy ty, int dimx, int dimy, int dimz);
 	
 	/*! 
 		Copy constructor; copies both the layout and data from cpy
 	*/
-	Array(const AlloArray& cpy) {
-		format(cpy.header);
-		if (cpy.data.ptr) {
-			memcpy(data.ptr, cpy.data.ptr, size());
-		}
-	}
+	Array(const AlloArray& cpy);
+	Array(const AlloArrayHeader& h2);
 	
 	/*!
-		Standard constructors; will allocate memory accordingly
+	 Empty constructor defines a 0-D, 1-plane array of void type; unallocated data
 	 */
-	Array(int components, AlloTy ty, int dimx) {
-		data.ptr = NULL;
-		format(components, ty, dimx);
-	}
-	
-	Array(int components, AlloTy ty, int dimx, int dimy) {
-		data.ptr = NULL;
-		format(components, ty, dimx, dimy);
-	}
-	
-	Array(int components, AlloTy ty, int dimx, int dimy, int dimz) {
-		data.ptr = NULL;
-		format(components, ty, dimx, dimy, dimz);
-	}
-	Array(const AlloArrayHeader& h2) {
-		data.ptr = NULL;
-		format(h2);
-	}
-	
-	///! verify a type:
-	bool isType(AlloTy ty) const { return header.type == ty; }
-	template<typename T> bool isType() { return isType(type<T>()); }
-	
-	///! verify that Array contains data
-	bool hasData() const { return data.ptr != NULL; }
-
-	///! Return the memory footprint of a array
-	size_t size() const { return allo_array_size(this); }
-	
-	///! Check if this Array conforms to an ArrayHeader format
-	bool hasFormat(const AlloArrayHeader &h2) const {
-		bool equiv =	header.components == h2.components && 
-						header.type == h2.type && 
-						header.dimcount == h2.dimcount;
-						
-		for(int i=0; i < header.dimcount; i++) {
-			equiv &= header.dim[i] == h2.dim[i];
-			equiv &= header.stride[i] == h2.stride[i];
-		}
-
-		return equiv;
-	}
+	Array();
 	
 	/*!
 		Change the format (header/layout) of the Array
@@ -138,15 +90,23 @@ public:
 	void formatAligned(int components, AlloTy ty, int dimx, int dimy, size_t align);
 	void formatAligned(int components, AlloTy ty, int dimx, int dimy, int dimz, size_t align);
 	
+	///! Check if this Array conforms to an ArrayHeader format
+	bool hasFormat(const AlloArrayHeader &h2) const;
+	
+	///! verify a type:
+	bool isType(AlloTy ty) const { return header.type == ty; }
+	template<typename T> bool isType() { return isType(type<T>()); }
+	
+	///! Return the memory footprint of a array
+	size_t size() const { return allo_array_size(this); }
+	
+	///! verify that Array contains data
+	bool hasData() const { return data.ptr != NULL; }
+	
 	///! Allocate memory for the given header 
 	/// (warning, does not check if data.ptr was not NULL!)
-	void dataCalloc() {
-		data.ptr = (char *)calloc(1, size());
-	}
-	
-	void dataFree() {
-		if(hasData()) free(data.ptr);
-	}
+	void dataCalloc() { data.ptr = (char *)calloc(1, size()); }
+	void dataFree() { if(hasData()) free(data.ptr); }
 	
 	///! Use a pure C function to fill an array with data:
 	template<typename T> void fill(void (*func)(T * values, double normx));
@@ -192,14 +152,73 @@ public:
 };
 	
 	
-#pragma mark --------------------------------------
+	
+	
+	
+	
+	
+	
+	
+	
 /*
- 
+ *
  ********* INLINE IMPLEMENTATION BELOW ***********
- 
-*/
+ *
+ */
+#pragma mark --------------------------------------
 	
 
+/*
+	Type traits by partial specialization:
+ */
+template<> inline AlloTy Array::type<uint8_t>() { return AlloUInt8Ty; }
+template<> inline AlloTy Array::type<uint16_t>() { return AlloUInt16Ty; }
+template<> inline AlloTy Array::type<uint32_t>() { return AlloUInt32Ty; }
+template<> inline AlloTy Array::type<uint64_t>() { return AlloUInt64Ty; }
+template<> inline AlloTy Array::type<int8_t>() { return AlloSInt8Ty; }
+template<> inline AlloTy Array::type<int16_t>() { return AlloSInt16Ty; }
+template<> inline AlloTy Array::type<int32_t>() { return AlloSInt32Ty; }
+template<> inline AlloTy Array::type<int64_t>() { return AlloSInt64Ty; }
+template<> inline AlloTy Array::type<float>() { return AlloFloat32Ty; }
+template<> inline AlloTy Array::type<double>() { return AlloFloat64Ty; }
+template<> inline AlloTy Array::type<AlloArray>() { return AlloArrayTy; }
+
+	
+	
+inline Array::Array() : AlloArray() {
+	data.ptr = 0;
+	header.type= 0;
+	header.components = 1;
+	header.dimcount = 0;
+}
+
+inline Array::Array(const AlloArray& cpy) : AlloArray() {
+	format(cpy.header);
+	if (cpy.data.ptr) {
+		memcpy(data.ptr, cpy.data.ptr, size());
+	}
+}
+inline Array::Array(const AlloArrayHeader& h2) : AlloArray() {
+	data.ptr = NULL;
+	format(h2);
+}
+
+inline Array::Array(int components, AlloTy ty, int dimx) : AlloArray() {
+	data.ptr = NULL;
+	format(components, ty, dimx);
+}
+
+inline Array::Array(int components, AlloTy ty, int dimx, int dimy) : AlloArray() {
+	data.ptr = NULL;
+	format(components, ty, dimx, dimy);
+}
+
+inline Array::Array(int components, AlloTy ty, int dimx, int dimy, int dimz) : AlloArray() {
+	data.ptr = NULL;
+	format(components, ty, dimx, dimy, dimz);
+}
+	
+	
 /*
 	Set stride factors based on a specific byte alignment
  */
@@ -216,6 +235,20 @@ inline void Array::deriveStride(AlloArrayHeader& h, size_t alignSize) {
 		unsigned i=2;
 		for(; i<numDims; ++i){ h.stride[i] = h.stride[i-1] * h.dim[i-1]; }
 	}
+}
+	
+///! Check if this Array conforms to an ArrayHeader format
+inline bool Array::hasFormat(const AlloArrayHeader &h2) const {
+	bool equiv =	header.components == h2.components && 
+	header.type == h2.type && 
+	header.dimcount == h2.dimcount;
+	
+	for(int i=0; i < header.dimcount; i++) {
+		equiv &= header.dim[i] == h2.dim[i];
+		equiv &= header.stride[i] == h2.stride[i];
+	}
+	
+	return equiv;
 }
 	
 inline void Array::format(const AlloArrayHeader &h2) {
@@ -272,21 +305,6 @@ inline void Array::formatAligned(int components, AlloTy ty, int dimx, int dimy, 
 	deriveStride(hh, align);
 	format(hh);
 }
-	
-/*
-	Type traits by partial specialization:
- */
-template<> inline AlloTy Array::type<uint8_t>() { return AlloUInt8Ty; }
-template<> inline AlloTy Array::type<uint16_t>() { return AlloUInt16Ty; }
-template<> inline AlloTy Array::type<uint32_t>() { return AlloUInt32Ty; }
-template<> inline AlloTy Array::type<uint64_t>() { return AlloUInt64Ty; }
-template<> inline AlloTy Array::type<int8_t>() { return AlloSInt8Ty; }
-template<> inline AlloTy Array::type<int16_t>() { return AlloSInt16Ty; }
-template<> inline AlloTy Array::type<int32_t>() { return AlloSInt32Ty; }
-template<> inline AlloTy Array::type<int64_t>() { return AlloSInt64Ty; }
-template<> inline AlloTy Array::type<float>() { return AlloFloat32Ty; }
-template<> inline AlloTy Array::type<double>() { return AlloFloat64Ty; }
-template<> inline AlloTy Array::type<AlloArray>() { return AlloArrayTy; }
 	
 template<typename T> inline T * Array::cell(int x) const {
 	int fieldstride_x = header.stride[0];
