@@ -31,9 +31,34 @@
 #ifndef INCLUDE_ALLO_TYPES_H
 #define INCLUDE_ALLO_TYPES_H 1
 
+/*
+ AlloArray is a multidimensional array.
+ It is a pointer to data followed by meta-data to describe its type and layout.
+ 
+ Separating the data from the header meta-data allows logic to performed on layouts without data 
+ - a specific layout can be defined and checked against
+ 
+ 
+	 0			1			2			3			4
+	 Specifier	row			column		pillar		file
+	 Tensor		scalar		vector		matrix		
+	 Sound		sample		time		channel		pattern
+	 Polytope	point		line		polygon		polyhedron	polychoron
+	 n-Hypercube	point		line		square		cube		tesseract
+	 Boundary	none		vertex		edge		face		cell
+	 Movement	position	velocity	accel.		jerk		snap
+ */
+
 #include "allocore/system/al_Config.h"
 #include <string.h>
 #include <stdlib.h>
+
+
+/*
+ Maximum number of dimensions a array may represent
+ To model higher dimensional spaces, use a nested array descriptor
+ */
+#define ALLO_LATTICE_MAX_DIMS (4)
 
 #ifdef __cplusplus
 extern "C" {
@@ -67,8 +92,7 @@ enum {
 	AlloUInt64Ty		= 0x0208,
 	
 	/* structural types */
-	AlloArrayTy		= 0x1A2C,	/* 2C == 44 bytes, sizeof AlloArray */
-	/* AlloGraphTy		= 0x1B00, */
+	AlloArrayTy			= 0x1A2C,	/* 2C == 44 bytes, sizeof AlloArray */
 	
 	/* pointer types */
 	AlloPointer32Ty		= 0x2F04,
@@ -77,22 +101,8 @@ enum {
 
 typedef uint16_t AlloTy;
 	
+	
 static size_t allo_type_size(const AlloTy ty);
-
-#pragma mark AlloArray
-/*
-	AlloArray is a multidimensional array.
-	It is a pointer to data followed by meta-data to describe its type and layout.
-	
-	Separating the data from the header meta-data allows logic to performed on layouts without data 
-		- a specific layout can be defined and checked against
-	
-*/
-/*
-	Maximum number of dimensions a array may represent
-	To model higher dimensional spaces, use a nested array descriptor
-*/
-#define ALLO_LATTICE_MAX_DIMS (4)
 typedef struct {
 	
 	/* The type of data stored (see enums above) */
@@ -115,23 +125,9 @@ typedef struct {
 	*/
 	uint32_t stride[ALLO_LATTICE_MAX_DIMS];
 	
-	/* 
-		TODO:	should we store whether this is row, column major etc? 
-				or should we enforce row-major and offer transpose operators?
-				(row, column, pillar, file)
-	
-		LJP:
-					0			1			2			3			4
-		Specifier	row			column		pillar		file
-		Tensor		scalar		vector		matrix		
-		Sound		sample		time		channel		pattern
-		Polytope	point		line		polygon		polyhedron	polychoron
-		n-Hypercube	point		line		square		cube		tesseract
-		Boundary	none		vertex		edge		face		cell
-		Movement	position	velocity	accel.		jerk		snap
-	*/
-	
 } AlloArrayHeader;
+	
+	
 
 typedef struct {
 	/*
@@ -166,42 +162,19 @@ typedef struct AlloArrayWrapper {
 	int refs;
 	
 } AlloArrayWrapper;
-
-#pragma mark AlloGraph
-/*
-	AlloGraph type.
-	Stores a set of nodes (vertices) and a set of arcs (edges) as node pairs.
-	Graphs may be directed or undirected. 
-	Graphs can be translated into 2D adjacency matrices, of dimensions NxN (where N = no. of nodes)
-*/
-typedef struct {
-	uint16_t type;
-	union{
-		void * ptr;
-		uint64_t pad;
-	} data;
-} AlloGraphNode;
-
-typedef struct {
-	uint16_t a, b;
-} AlloGraphEdge;
-
-typedef struct {
-	/* the number of nodes */
-	uint16_t nodecount;
 	
-	/* the number of edges */
-	uint16_t edgecount; 
 	
-	AlloGraphNode * nodes;
-	AlloGraphEdge * edges;
 
-} AlloGraph;
-
-#pragma mark -
+	
 /*
-********** INLINE IMPLEMENTATION BELOW ***********
-*/
+ *
+ ********* INLINE IMPLEMENTATION BELOW ***********
+ *
+ */
+#pragma mark -------------------------------------
+	
+	
+	
 
 /*
 	Return the size for a given type
@@ -219,7 +192,6 @@ static inline size_t allo_type_size(const AlloTy ty) {
 		case AlloFloat32Ty:		return sizeof(float);
 		case AlloFloat64Ty:		return sizeof(double);
 		case AlloArrayTy:		return sizeof(AlloArray);
-		//case AlloGraphTy:		return sizeof(AlloGraph);
 		case AlloPointer32Ty:	return sizeof(int32_t);
 		case AlloPointer64Ty:	return sizeof(int64_t);
 		default:				return 0;
