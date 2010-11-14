@@ -153,9 +153,13 @@ public:
 
 	enum BlendFunc {
 		SRC_ALPHA = 0,
+		ONE_MINUS_SRC_ALPHA,
 		SRC_COLOR,
+		ONE_MINUS_SRC_COLOR,
 		DST_ALPHA,
+		ONE_MINUS_DST_ALPHA,
 		DST_COLOR,
+		ONE_MINUS_DST_COLOR,
 		ZERO,
 		ONE,
 		SRC_ALPHA_SATURATE
@@ -249,6 +253,7 @@ public:
 	// Rendering State
 	void blending(bool enable, BlendFunc src, BlendFunc dst);
 	void depthTesting(bool enable);
+	void depthMask(bool enable);
 	void lighting(bool enable);
 	void scissor(bool enable);
 	void pushState(State &state);

@@ -179,6 +179,8 @@ Graphics::~Graphics() {
 
 void Graphics::blending(bool v, BlendFunc src, BlendFunc dst){ backend()->enableBlending(v, src,dst); }
 
+void Graphics::depthMask(bool v) { backend()->enableDepthMask(v); }
+
 void Graphics::depthTesting(bool v){ backend()->enableDepthTesting(v); }
 
 void Graphics::lighting(bool v){ backend()->enableLighting(v); }

@@ -192,6 +192,7 @@ public:
 	/// Go to origin, reset orientation
 	Nav& home(){ 
 		quat().identity();
+		view(0, 0, 0);
 		turn(0, 0, 0); 
 		spin(0, 0, 0);
 		vec().set(0);

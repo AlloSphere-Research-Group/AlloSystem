@@ -58,6 +58,7 @@ public:
 	virtual void enableLighting(bool enable);
 	virtual void enableLight(bool enable, int idx);
 	virtual void enableDepthTesting(bool enable);
+	virtual void enableDepthMask(bool enable);
 	virtual void enableScissor(bool enable);
 	virtual void setPolygonMode(Graphics::PolygonMode mode);
 	virtual void setAntialiasing(Graphics::AntiAliasMode mode);

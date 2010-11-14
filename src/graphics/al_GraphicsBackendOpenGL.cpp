@@ -41,10 +41,19 @@ GLenum gl_antialias_mode(Graphics::AntiAliasMode v) {
 }
 
 GLenum gl_blend_func(Graphics::BlendFunc v) {
-	switch(v){
-		CS(SRC_COLOR) CS(DST_COLOR) CS(SRC_ALPHA) CS(DST_ALPHA)
-		CS(ZERO) CS(ONE) CS(SRC_ALPHA_SATURATE)
-		default: return GL_SRC_COLOR;
+	switch(v){	
+		CS(SRC_COLOR) 
+		CS(ONE_MINUS_SRC_COLOR)
+		CS(DST_COLOR) 
+		CS(ONE_MINUS_DST_COLOR)
+		CS(SRC_ALPHA) 
+		CS(ONE_MINUS_SRC_ALPHA)
+		CS(DST_ALPHA)
+		CS(ONE_MINUS_DST_ALPHA)	
+		CS(ZERO) 
+		CS(ONE) 
+		CS(SRC_ALPHA_SATURATE)		
+		default: return GL_SRC_ALPHA;
 	}
 }
 
@@ -127,6 +136,10 @@ void GraphicsBackendOpenGL::enableDepthTesting(bool enable) {
 	else {
 		glDisable(GL_DEPTH_TEST);
 	}
+}
+
+void GraphicsBackendOpenGL::enableDepthMask(bool enable) {
+	glDepthMask(enable ? GL_TRUE : GL_FALSE);
 }
 
 void GraphicsBackendOpenGL::enableScissor(bool enable) {
