@@ -24,8 +24,8 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#ifndef INCLUDE_ALLO_TYPES_CPP_H
-#define INCLUDE_ALLO_TYPES_CPP_H 1
+#ifndef INCLUDE_ALLO_ARRAY_HPP
+#define INCLUDE_ALLO_ARRAY_HPP 1
 
 #include "allocore/types/al_Array.h"
 #include "allocore/math/al_Functions.hpp"	

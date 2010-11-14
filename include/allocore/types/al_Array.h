@@ -28,8 +28,8 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#ifndef INCLUDE_ALLO_TYPES_H
-#define INCLUDE_ALLO_TYPES_H 1
+#ifndef INCLUDE_ALLO_ARRAY_H
+#define INCLUDE_ALLO_ARRAY_H 1
 
 /*
  AlloArray is a multidimensional array.
@@ -58,7 +58,7 @@
  Maximum number of dimensions a array may represent
  To model higher dimensional spaces, use a nested array descriptor
  */
-#define ALLO_LATTICE_MAX_DIMS (4)
+#define ALLO_ARRAY_MAX_DIMS (4)
 
 #ifdef __cplusplus
 extern "C" {
@@ -114,16 +114,16 @@ typedef struct {
 	*/
 	uint8_t components;
 	
-	/* The number of dimensions (actually should not be > ALLO_LATTICE_MAX_DIMS!) */
+	/* The number of dimensions (actually should not be > ALLO_ARRAY_MAX_DIMS!) */
 	uint8_t dimcount;
 	
 	/* The size of each dimension */
-	uint32_t dim[ALLO_LATTICE_MAX_DIMS];
+	uint32_t dim[ALLO_ARRAY_MAX_DIMS];
 	
 	/* 
 		# of bytes between elements of that dimension
 	*/
-	uint32_t stride[ALLO_LATTICE_MAX_DIMS];
+	uint32_t stride[ALLO_ARRAY_MAX_DIMS];
 	
 } AlloArrayHeader;
 	
@@ -241,7 +241,7 @@ static inline void allo_array_setstride(AlloArrayHeader * h, unsigned alignSize)
 	}
 }
 
-static inline int allo_array_equal_headers(AlloArrayHeader *h1, AlloArrayHeader *h2) {
+static inline int allo_array_equal_headers(AlloArrayHeader *h1, const AlloArrayHeader *h2) {
 	int equiv =	h1->components == h2->components && 
 				h1->type == h2->type && 
 				h1->dimcount == h2->dimcount;
@@ -273,7 +273,7 @@ static inline void allo_array_destroy(AlloArray *lat) {
 	}
 }
 
-static inline void allo_array_create(AlloArray *lat, AlloArrayHeader *h) {
+static inline void allo_array_create(AlloArray *lat, const AlloArrayHeader *h) {
 	allo_array_destroy(lat);
 	allo_array_setheader(lat, h);
 	lat->data.ptr = (char *)calloc(1, allo_array_size(lat));
@@ -317,7 +317,7 @@ static inline void allo_array_create2d(
 /*
 	Adapt a latticle to another size
 */
-static inline void allo_array_adapt(AlloArray *lat, AlloArrayHeader *h) {
+static inline void allo_array_adapt(AlloArray *lat, const AlloArrayHeader *h) {
 	if(! allo_array_equal_headers( &(lat->header), h)) {
 		allo_array_create(lat, h);
 	}
@@ -347,6 +347,32 @@ static inline void allo_array_adapt2d(
 static inline void allo_array_copy(AlloArray *dst, AlloArray *src){
 	allo_array_adapt(dst, &(src->header));
 	memcpy(dst->data.ptr, src->data.ptr, allo_array_size(src));
+}
+
+static inline AlloArrayWrapper * allo_array_wrapper_new() {
+	return (AlloArrayWrapper *)malloc(sizeof(AlloArrayWrapper));
+}
+
+static inline void allo_array_wrapper_free(AlloArrayWrapper *w) {
+	free(w);
+}
+
+static inline void allo_array_wrapper_setup(AlloArrayWrapper *wrap) {
+	allo_array_clear( &(wrap->array) );
+	wrap->refs = 0;
+}
+
+static inline void allo_array_wrapper_retain(AlloArrayWrapper *wrap) {
+	wrap->refs++;
+}
+
+static inline void allo_array_wrapper_release(AlloArrayWrapper *wrap) {
+	wrap->refs--;
+	if(wrap->refs <= 0) {
+		allo_array_destroy(&(wrap->array));
+		wrap->refs = 0;
+		allo_array_wrapper_free(wrap);
+	}
 }
 
 
