@@ -84,10 +84,10 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 	
 	// apply camera transform:
 	gl.pushMatrix(gl.PROJECTION);
-	gl.loadMatrix(Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal));
+	gl.loadMatrix(Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal));
 
 	gl.pushMatrix(gl.MODELVIEW);
-	gl.loadMatrix(Matrix4d::lookAtLeft(ur, uu, uf, pos, iod));
+	gl.loadMatrix(Matrix4d::lookAtRight(ur, uu, uf, pos, iod));
 	
 	draw.onDraw(gl);
 
@@ -108,10 +108,10 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 	
 	// apply camera transform:
 	gl.pushMatrix(gl.PROJECTION);
-	gl.loadMatrix(Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal));
+	gl.loadMatrix(Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal));
 
 	gl.pushMatrix(gl.MODELVIEW);
-	gl.loadMatrix(Matrix4d::lookAtRight(ur, uu, uf, pos, iod));
+	gl.loadMatrix(Matrix4d::lookAtLeft(ur, uu, uf, pos, iod));
 	
 	draw.onDraw(gl);
 	
