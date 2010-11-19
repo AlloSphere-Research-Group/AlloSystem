@@ -271,6 +271,7 @@ public:
 };
 
 
+/// Socket for sending OSC packets
 class Send : public SocketSend, public Packet{
 public:
 
@@ -314,6 +315,7 @@ public:
 };
 
 
+/// Socket for receiving OSC packets
 class Recv : public SocketRecv{
 public:
 
