@@ -149,10 +149,11 @@ public:
     bool isMessage() const;			///< Whether packet is a message
     bool isBundle() const;			///< Whether packet is a bundle
 	
+	/// Pretty-print raw packet bytes
+	void printRaw() const;
+	
 	/// Get number of bytes of current packet data
 	int size() const;
-
-	void printRaw() const;
 
 	/// Begin a new bundle
 	Packet& beginBundle(TimeTag timeTag=1);
@@ -217,6 +218,9 @@ protected:
 class Message{
 public:
 
+	/// @param[in] message		raw OSC message bytes
+	/// @param[in] size			number of bytes in message
+	/// @param[in] timeTag		time tag of message (inherited from bundle)
 	Message(const char * message, int size, const TimeTag& timeTag=1);
 
 	/// Pretty-print message information
@@ -234,15 +238,16 @@ public:
 	/// Get type tags
 	const std::string& typeTags() const { return mTypeTags; }
 
+	/// Reset stream for converting from raw message bytes to types
 	Message& resetStream();
 
-	Message& operator>> (int& v);			///< Extract integer
-	Message& operator>> (float& v);			///< Extract float
-	Message& operator>> (double& v);		///< Extract double
-	Message& operator>> (char& v);			///< Extract char
-	Message& operator>> (const char*& v);	///< Extract C-string
-	Message& operator>> (std::string& v);	///< Extract string
-	Message& operator>> (Blob& v);			///< Extract Blob
+	Message& operator>> (int& v);			///< Extract next stream element as integer
+	Message& operator>> (float& v);			///< Extract next stream element as float
+	Message& operator>> (double& v);		///< Extract next stream element as double
+	Message& operator>> (char& v);			///< Extract next stream element as char
+	Message& operator>> (const char*& v);	///< Extract next stream element as C-string
+	Message& operator>> (std::string& v);	///< Extract next stream element as string
+	Message& operator>> (Blob& v);			///< Extract next stream element as Blob
 
 protected:
 	class Impl; Impl * mImpl;
