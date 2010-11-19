@@ -111,7 +111,6 @@ void Message::print() const {
 }
 
 Message& Message::resetStream(){ mImpl->args = mImpl->ArgumentStream(); return *this; }
-
 Message& Message::operator>> (int& v){ ::osc::int32 r; (*mImpl)>>r; v=r; return *this; }
 Message& Message::operator>> (float& v){ (*mImpl)>>v; return *this; }
 Message& Message::operator>> (double& v){ (*mImpl)>>v; return *this; }
@@ -142,6 +141,53 @@ void PacketHandler::parse(const char *packet, int size, TimeTag timeTag){
 		Message m(packet, size, timeTag);
 		onMessage(m);
 	}
+}
+
+
+
+Send::Send(unsigned int port, const char * address, al_sec timeout)
+:	SocketSend(port, address, timeout)
+{}
+
+int Send::send(){
+	int r = SocketSend::send(Packet::data(), Packet::size());
+	Packet::clear();
+	return r;
+}
+
+
+
+static void * recvThreadFunc(void * user){
+	Recv * r = static_cast<Recv *>(user);
+	while(r->background()){
+		r->recv();
+	}
+	return NULL;
+}
+
+Recv::Recv(unsigned int port, const char * address, al_sec timeout)
+:	SocketRecv(port, address, timeout), mHandler(0), mBuffer(1024), mBackground(false)
+{}
+
+int Recv::recv(){
+	int r = SocketRecv::recv(&mBuffer[0], mBuffer.size());;
+	if(r && mHandler){
+		mHandler->parse(&mBuffer[0], r);
+	}
+	return r;
+}
+
+bool Recv::start(){
+	mBackground = true;
+	return mThread.start(recvThreadFunc, this);
+}
+
+/// Stop the background polling
+void Recv::stop(){
+	//if(mBackground){
+		mBackground = false;
+	//	mThread.wait();
+	//}
 }
 
 

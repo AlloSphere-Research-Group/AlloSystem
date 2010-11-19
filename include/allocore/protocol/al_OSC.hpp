@@ -277,16 +277,10 @@ public:
 	/// @param[in] port		Port number
 	/// @param[in] address	IP address
 	/// @param[in] timeout	< 0: block forever; = 0: no blocking; > 0 block with timeout
-	Send(unsigned int port, const char * address = "localhost", al_sec timeout=0)
-	:	SocketSend(port, address, timeout)
-	{}
+	Send(unsigned int port, const char * address = "localhost", al_sec timeout=0);
 
 	/// Send and clear current packet contents
-	int send(){
-		int r = SocketSend::send(Packet::data(), Packet::size());
-		Packet::clear();
-		return r;
-	}
+	int send();
 
 	/// Send one argument message immediately
 	template <class A>
@@ -317,7 +311,6 @@ public:
 	int send(const std::string& addr, const A& a, const B& b, const C& c, const D& d, const E& e){
 		addMessage(addr, a,b,c,d,e); return send();
 	}
-
 };
 
 
@@ -327,51 +320,37 @@ public:
 	/// @param[in] port		Port number
 	/// @param[in] address	IP address. If 0, will bind all network interfaces to socket.
 	/// @param[in] timeout	< 0: block forever; = 0: no blocking; > 0 block with timeout
-	Recv(unsigned int port, const char * address = 0, al_sec timeout=0)
-	:	SocketRecv(port, address, timeout), mHandler(0), mBuffer(1024), mBackground(false)
-	{}
+	Recv(unsigned int port, const char * address = 0, al_sec timeout=0);
 
+	/// Whether background polling is activated
 	bool background() const { return mBackground; }
+	
+	/// Get current received packet data
+	const char * data() const { return &mBuffer[0]; }
 
 	/// Set size of internal buffer
 	void bufferSize(int n){ mBuffer.resize(n); }
 
+	/// Set packet handling routine
 	Recv& handler(PacketHandler& v){ mHandler = &v; return *this; }
 
 	/// Check for OSC packet and call handler
-	int recv(){
-		int r = SocketRecv::recv(&mBuffer[0], mBuffer.size());;
-		if(r && mHandler){
-			mHandler->parse(&mBuffer[0], r);
-		}
-		return r;
-	}
+	int recv();
 	
-	void start(){
-		mBackground = true;
-		mThread.start(sThreadFunc, this);
-	}
+	/// Begin a background thread to poll the socket. 
 	
-	void stop(){
-		//if(mBackground){
-			mBackground = false;
-		//	mThread.wait();
-		//}
-	}
+	/// The socket timeout controls the polling period.
+	/// Returns whether the thread was started successfully.
+	bool start();
+	
+	/// Stop the background polling
+	void stop();
 
 protected:
 	PacketHandler * mHandler;
 	std::vector<char> mBuffer;
 	al::Thread mThread;
 	bool mBackground;
-
-	static void * sThreadFunc(void * user){
-		Recv * r = static_cast<Recv *>(user);
-		while(r->background()){
-			r->recv();
-		}
-		return NULL;
-	}
 };
 
 
