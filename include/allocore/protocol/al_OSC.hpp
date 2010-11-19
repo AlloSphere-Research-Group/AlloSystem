@@ -307,7 +307,7 @@ public:
 		addMessage(addr, a,b,c,d); return send();
 	}
 
-	/// Send four argument message immediately
+	/// Send five argument message immediately
 	template <class A, class B, class C, class D, class E>
 	int send(const std::string& addr, const A& a, const B& b, const C& c, const D& d, const E& e){
 		addMessage(addr, a,b,c,d,e); return send();
