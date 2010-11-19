@@ -1,5 +1,6 @@
 #include "utAllocore.h"
 
+/*
 // Data structure containing the possible OSC data types
 struct Data{
 	Data(){ clear(); }
@@ -164,4 +165,6 @@ int utProtocolOSC(){
 	
 #endif
 	return 0;
+
 }
+*/

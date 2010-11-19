@@ -14,7 +14,7 @@ int main(){
 //	utIOWindowGL();
 	utIOSocket();
 	utFile();
-//	utThread();
+	utThread();
 
 //	utProtocolGraphics();
 	

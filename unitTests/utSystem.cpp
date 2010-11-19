@@ -1,21 +1,9 @@
 #include "utAllocore.h"
 
-void * threadFunc(void * user){
-	*(int *)user = 1; return NULL;
-}
-
 template <class T>
 bool aboutEqual(T v, T to, T r){ return v<(to+r) && v>(to-r); }
 
 int utSystem(){
-
-	// Thread
-	UT_PRINTF("system: thread\n");
-	{	int x=0;
-		Thread t(threadFunc, &x);
-		t.wait();
-		assert(x == 1);
-	}
 	
 	// Timing
 	UT_PRINTF("system: timing\n");

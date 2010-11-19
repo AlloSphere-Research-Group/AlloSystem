@@ -105,7 +105,237 @@ etc.												Addtional bundle elements
 #include "allocore/protocol/oscpack/osc/OscPacketListener.h"
 #include "allocore/protocol/oscpack/osc/OscReceivedElements.h"
 #include "allocore/protocol/oscpack/osc/OscTypes.h"
+#include "allocore/io/al_Socket.hpp"
 #include "allocore/system/al_Thread.hpp"
+
+namespace al{
+namespace osc{
+
+
+/// User-defined data
+struct Blob{
+    Blob(){}
+    explicit Blob(const void* data_, unsigned long size_)
+		: data( data_ ), size( size_ ){}
+    const void* data;
+    unsigned long size;
+};
+
+/// Time tag
+
+/// Time tags are represented by a 64 bit fixed point number. The first 
+/// 32 bits specify the number of seconds since midnight on January 1, 1900,
+/// and the last 32 bits specify fractional parts of a second to a precision 
+/// of about 200 picoseconds. This is the representation used by Internet 
+/// NTP timestamps.The time tag value consisting of 63 zero bits followed by
+/// a one in the least signifigant bit is a special case meaning "immediately."
+typedef unsigned long long TimeTag;
+
+
+/// Outbound OSC packet
+class Packet{
+public:
+
+	/// @param[in] size			size, in bytes, of the packet buffer
+	Packet(int size=1024);
+
+	/// @param[in] contents		buffer to copy packet data from
+	/// @param[in] size			size, in bytes, of the packet buffer	
+	Packet(const char * contents, int size);
+
+	~Packet();
+
+	const char * data() const;		///< Get raw packet data
+    bool isMessage() const;			///< Whether packet is a message
+    bool isBundle() const;			///< Whether packet is a bundle
+	
+	/// Get number of bytes of current packet data
+	int size() const;
+
+	void printRaw() const;
+
+	/// Begin a new bundle
+	Packet& beginBundle(TimeTag timeTag=1);
+	
+	/// End bundle
+	Packet& endBundle();
+
+	/// Start a new message
+	Packet& beginMessage(const std::string& addressPattern);
+	
+	/// End message
+	Packet& endMessage();
+
+	/// Add one argument message
+	template <class A>
+	Packet& addMessage(const std::string& addr, const A& a){
+		beginMessage(addr); (*this)<<a; return endMessage();
+	}
+
+	/// Add two argument message
+	template <class A, class B>
+	Packet& addMessage(const std::string& addr, const A& a, const B& b){
+		beginMessage(addr); (*this)<<a<<b; return endMessage();
+	}
+
+	/// Add three argument message
+	template <class A, class B, class C>
+	Packet& addMessage(const std::string& addr, const A& a, const B& b, const C& c){
+		beginMessage(addr); (*this)<<a<<b<<c; return endMessage();
+	}
+
+	/// Add four argument message
+	template <class A, class B, class C, class D>
+	Packet& addMessage(const std::string& addr, const A& a, const B& b, const C& c, const D& d){
+		beginMessage(addr); (*this)<<a<<b<<c<<d; return endMessage();
+	}
+
+	Packet& operator<< (int v);					///< Add integer to message
+	Packet& operator<< (float v);				///< Add float to message
+	Packet& operator<< (double v);				///< Add double to message
+	Packet& operator<< (char v);				///< Add char to message
+	Packet& operator<< (const char* v);			///< Add C-string to message
+	Packet& operator<< (const std::string& v);	///< Add string to message
+	Packet& operator<< (const Blob& v);			///< Add Blob to message
+
+	/// Clear current packet contents
+	Packet& clear();
+
+protected:
+	class Impl; Impl * mImpl;
+	std::vector<char> mData;
+};
+
+
+/// Inbound OSC message
+class Message{
+public:
+
+	Message(const char * message, int size, const TimeTag& timeTag=1);
+
+	/// Pretty-print message information
+	void print() const;
+
+	/// Get time tag
+	
+	/// If the message is contained within a bundle, it will inherit the
+	/// time tag of the bundle, otherwise the time tag will be 1 (immediate).
+	const TimeTag& timeTag() const { return mTimeTag; }
+
+	/// Get address pattern
+	const std::string& addressPattern() const { return mAddressPattern; }
+
+	/// Get type tags
+	const std::string& typeTags() const { return mTypeTags; }
+
+	Message& resetStream();
+
+	Message& operator>> (int& v);			///< Extract integer
+	Message& operator>> (float& v);			///< Extract float
+	Message& operator>> (double& v);		///< Extract double
+	Message& operator>> (char& v);			///< Extract char
+	Message& operator>> (const char*& v);	///< Extract C-string
+	Message& operator>> (std::string& v);	///< Extract string
+	Message& operator>> (Blob& v);			///< Extract Blob
+
+protected:
+	class Impl; Impl * mImpl;
+	std::string mAddressPattern;
+	std::string mTypeTags;
+	TimeTag mTimeTag;
+};
+
+
+
+/// Iterates through all messages contained within an OSC packet
+class PacketHandler{
+public:
+
+	virtual ~PacketHandler(){}
+
+	/// Called for each message contained in packet
+	virtual void onMessage(Message& m) = 0;
+
+	void parse(const char *packet, int size, TimeTag timeTag=1);
+};
+
+
+class Send : public SocketSend, public Packet{
+public:
+
+	/// @param[in] port		Port number
+	/// @param[in] address	IP address
+	/// @param[in] timeout	< 0: block forever; = 0: no blocking; > 0 block with timeout
+	Send(unsigned int port, const char * address = "localhost", al_sec timeout=0)
+	:	SocketSend(port, address, timeout)
+	{}
+
+	/// Send and clear current packet contents
+	int send(){
+		int r = SocketSend::send(Packet::data(), Packet::size());
+		Packet::clear();
+		return r;
+	}
+
+};
+
+
+class Recv : public SocketRecv{
+public:
+
+	/// @param[in] port		Port number
+	/// @param[in] address	IP address. If 0, will bind all network interfaces to socket.
+	/// @param[in] timeout	< 0: block forever; = 0: no blocking; > 0 block with timeout
+	Recv(unsigned int port, const char * address = 0, al_sec timeout=0)
+	:	SocketRecv(port, address, timeout), mHandler(0), mBuffer(1024), mBackground(false)
+	{}
+
+	bool background() const { return mBackground; }
+
+	/// Set size of internal buffer
+	void bufferSize(int n){ mBuffer.resize(n); }
+
+	Recv& handler(PacketHandler& v){ mHandler = &v; return *this; }
+
+	/// Check for OSC packet and call handler
+	int recv(){
+		int r = SocketRecv::recv(&mBuffer[0], mBuffer.size());;
+		if(r && mHandler){
+			mHandler->parse(&mBuffer[0], r);
+		}
+		return r;
+	}
+	
+	void start(){
+		mBackground = true;
+		mThread.start(sThreadFunc, this);
+	}
+	
+	void stop(){
+		//if(mBackground){
+			mBackground = false;
+		//	mThread.wait();
+		//}
+	}
+
+protected:
+	PacketHandler * mHandler;
+	std::vector<char> mBuffer;
+	al::Thread mThread;
+	bool mBackground;
+
+	static void * sThreadFunc(void * user){
+		Recv * r = static_cast<Recv *>(user);
+		while(r->background()){
+			r->recv();
+		}
+		return NULL;
+	}
+};
+
+
+}
+}
 
 
 //namespace al{

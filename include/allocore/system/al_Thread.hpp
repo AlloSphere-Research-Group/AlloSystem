@@ -33,6 +33,11 @@ namespace al{
 
 typedef void * (*ThreadFunction)(void * userData);
 
+//class ThreadRoutine{
+//	virtual ~ThreadRoutine(){}
+//	virtual void run() = 0;
+//};
+
 class Thread{
 public:
 	Thread();
@@ -61,6 +66,7 @@ public:
 protected:
 	class Impl;
 	Impl * mImpl;
+//	ThreadRoutine * mRoutine;
 };
 
 
