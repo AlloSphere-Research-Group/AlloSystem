@@ -190,6 +190,12 @@ public:
 		beginMessage(addr); (*this)<<a<<b<<c<<d; return endMessage();
 	}
 
+	/// Add five argument message
+	template <class A, class B, class C, class D, class E>
+	Packet& addMessage(const std::string& addr, const A& a, const B& b, const C& c, const D& d, const E& e){
+		beginMessage(addr); (*this)<<a<<b<<c<<d<<e; return endMessage();
+	}
+
 	Packet& operator<< (int v);					///< Add integer to message
 	Packet& operator<< (float v);				///< Add float to message
 	Packet& operator<< (double v);				///< Add double to message
@@ -275,6 +281,36 @@ public:
 		int r = SocketSend::send(Packet::data(), Packet::size());
 		Packet::clear();
 		return r;
+	}
+
+	/// Send one argument message immediately
+	template <class A>
+	int send(const std::string& addr, const A& a){
+		addMessage(addr, a); return send();
+	}
+	
+	/// Send two argument message immediately
+	template <class A, class B>
+	int send(const std::string& addr, const A& a, const B& b){
+		addMessage(addr, a,b); return send();
+	}
+
+	/// Send three argument message immediately
+	template <class A, class B, class C>
+	int send(const std::string& addr, const A& a, const B& b, const C& c){
+		addMessage(addr, a,b,c); return send();
+	}
+
+	/// Send four argument message immediately
+	template <class A, class B, class C, class D>
+	int send(const std::string& addr, const A& a, const B& b, const C& c, const D& d){
+		addMessage(addr, a,b,c,d); return send();
+	}
+
+	/// Send four argument message immediately
+	template <class A, class B, class C, class D, class E>
+	int send(const std::string& addr, const A& a, const B& b, const C& c, const D& d, const E& e){
+		addMessage(addr, a,b,c,d,e); return send();
 	}
 
 };
