@@ -39,29 +39,29 @@ namespace al{
 	
 	
 	
-*/
-template <typename T>
-struct BehaviorBase {
-
-	T value;
-	
-	T get(){ return value; }
-	
-	
-	/// todo: operator overloads:
-};
-
-/// simplest behaviors are constants:
-Behavior<T> Constant(T value);
-
-
-
-
-
-template<typename T>
-struct Event {
-
-};
+//*/
+//template <typename T>
+//struct BehaviorBase {
+//
+//	T value;
+//	
+//	T get(){ return value; }
+//	
+//	
+//	/// todo: operator overloads:
+//};
+//
+///// simplest behaviors are constants:
+//Behavior<T> Constant(T value);
+//
+//
+//
+//
+//
+//template<typename T>
+//struct Event {
+//
+//};
 
 } // al::
 

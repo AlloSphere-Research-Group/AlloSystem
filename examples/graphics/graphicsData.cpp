@@ -1,4 +1,5 @@
 #include "allocore/al_Allocore.hpp"
+
 using namespace al;
 
 Graphics gl(new GraphicsBackendOpenGL);
@@ -11,7 +12,7 @@ struct MyWindow : Window{
 		gl.viewport(0,0, width(), height());
 		
 		gl.data().resetBuffers();
-		gl.begin(gl.TRIANGLES);
+		gl.begin(gl.LINES);
 		
 		//printf("%d\n", gl.DEPTH_BUFFER_BIT);
 		

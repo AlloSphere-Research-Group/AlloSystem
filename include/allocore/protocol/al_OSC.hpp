@@ -39,7 +39,7 @@ Example receive code:
 	}
 	
 	OSCRecv r(12000, onRecv);
-	r.start();
+	r.start();	// or, call r.recv() periodically in another loop
 
 	
 Example send code:
@@ -54,6 +54,7 @@ Example send code:
         << osc::EndBundle;
 		
 	s.send();
+	s.send("/test1", true, 23, 3.1415f, "hello");
 
 */
 

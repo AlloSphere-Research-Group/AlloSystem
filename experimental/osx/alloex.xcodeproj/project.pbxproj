@@ -26,7 +26,6 @@
 		05C9388A128A166B0068F87F /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
 		05C9388B128A166B0068F87F /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
 		05C9388C128A166B0068F87F /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
-		05C93893128A168F0068F87F /* graphicsData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 05C93892128A168F0068F87F /* graphicsData.cpp */; };
 		16586A58128918D40068E01A /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
 		16586A59128918D40068E01A /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
 		16AC52F011628FAF0076AA8B /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
@@ -85,6 +84,9 @@
 		363204BC128B27E900A742CC /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
 		363204BD128B27E900A742CC /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		363204BF128B281F00A742CC /* frp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 363204BE128B281000A742CC /* frp.cpp */; };
+		3633CE4E129DE080006269CE /* modelShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3633CE4D129DE080006269CE /* modelShader.cpp */; };
+		3633CEC7129DE5E7006269CE /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3633CE9F129DE5E7006269CE /* liballocore.a */; };
+		3633CF32129DE747006269CE /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3633CF31129DE747006269CE /* libassimp.a */; };
 		367F0B5112034F1E00FCC534 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		367F0B5212034F1E00FCC534 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
 		367F0B5312034F1E00FCC534 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC53081162907D0076AA8B /* CoreAudio.framework */; };
@@ -501,6 +503,51 @@
 		36320467128B27DB00A742CC /* liballocore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liballocore.a; path = ../../build/Release/liballocore.a; sourceTree = SOURCE_ROOT; };
 		363204BE128B281000A742CC /* frp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = frp.cpp; sourceTree = "<group>"; };
 		363204EE128B28E900A742CC /* al_frp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_frp.hpp; sourceTree = "<group>"; };
+		3633CE4D129DE080006269CE /* modelShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = modelShader.cpp; sourceTree = "<group>"; };
+		3633CE9B129DE5E7006269CE /* ajit */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = ajit; sourceTree = "<group>"; };
+		3633CE9C129DE5E7006269CE /* ajit.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = ajit.dSYM; sourceTree = "<group>"; };
+		3633CE9D129DE5E7006269CE /* exSimpleGraphics */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = exSimpleGraphics; sourceTree = "<group>"; };
+		3633CE9E129DE5E7006269CE /* exSimpleGraphics.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; path = exSimpleGraphics.dSYM; sourceTree = "<group>"; };
+		3633CE9F129DE5E7006269CE /* liballocore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = liballocore.a; sourceTree = "<group>"; };
+		3633CEA1129DE5E7006269CE /* al_Ambisonics.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_Ambisonics.o; sourceTree = "<group>"; };
+		3633CEA2129DE5E7006269CE /* al_AudioIO.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_AudioIO.o; sourceTree = "<group>"; };
+		3633CEA3129DE5E7006269CE /* al_Camera.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_Camera.o; sourceTree = "<group>"; };
+		3633CEA4129DE5E7006269CE /* al_Color.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_Color.o; sourceTree = "<group>"; };
+		3633CEA5129DE5E7006269CE /* al_CoordinateFrame.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_CoordinateFrame.o; sourceTree = "<group>"; };
+		3633CEA6129DE5E7006269CE /* al_Debug.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_Debug.o; sourceTree = "<group>"; };
+		3633CEA7129DE5E7006269CE /* al_FileAPR.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_FileAPR.o; sourceTree = "<group>"; };
+		3633CEA8129DE5E7006269CE /* al_Graphics.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_Graphics.o; sourceTree = "<group>"; };
+		3633CEA9129DE5E7006269CE /* al_GraphicsBackendOpenGL.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_GraphicsBackendOpenGL.o; sourceTree = "<group>"; };
+		3633CEAA129DE5E7006269CE /* al_Image.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_Image.o; sourceTree = "<group>"; };
+		3633CEAB129DE5E7006269CE /* al_Isosurface.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_Isosurface.o; sourceTree = "<group>"; };
+		3633CEAC129DE5E7006269CE /* al_Light.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_Light.o; sourceTree = "<group>"; };
+		3633CEAD129DE5E7006269CE /* al_MainLoop.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_MainLoop.o; sourceTree = "<group>"; };
+		3633CEAE129DE5E7006269CE /* al_MainLoopGLUT.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_MainLoopGLUT.o; sourceTree = "<group>"; };
+		3633CEAF129DE5E7006269CE /* al_Model.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_Model.o; sourceTree = "<group>"; };
+		3633CEB0129DE5E7006269CE /* al_MsgQueue.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_MsgQueue.o; sourceTree = "<group>"; };
+		3633CEB1129DE5E7006269CE /* al_OSC.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_OSC.o; sourceTree = "<group>"; };
+		3633CEB2129DE5E7006269CE /* al_OSCAPR.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_OSCAPR.o; sourceTree = "<group>"; };
+		3633CEB3129DE5E7006269CE /* al_Printing.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_Printing.o; sourceTree = "<group>"; };
+		3633CEB4129DE5E7006269CE /* al_Quat.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_Quat.o; sourceTree = "<group>"; };
+		3633CEB5129DE5E7006269CE /* al_Serialize.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_Serialize.o; sourceTree = "<group>"; };
+		3633CEB6129DE5E7006269CE /* al_Shader.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_Shader.o; sourceTree = "<group>"; };
+		3633CEB7129DE5E7006269CE /* al_SocketAPR.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_SocketAPR.o; sourceTree = "<group>"; };
+		3633CEB8129DE5E7006269CE /* al_Stereographic.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_Stereographic.o; sourceTree = "<group>"; };
+		3633CEB9129DE5E7006269CE /* al_Surface.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_Surface.o; sourceTree = "<group>"; };
+		3633CEBA129DE5E7006269CE /* al_Texture.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_Texture.o; sourceTree = "<group>"; };
+		3633CEBB129DE5E7006269CE /* al_ThreadAPR.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_ThreadAPR.o; sourceTree = "<group>"; };
+		3633CEBC129DE5E7006269CE /* al_Time.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_Time.o; sourceTree = "<group>"; };
+		3633CEBD129DE5E7006269CE /* al_Window.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_Window.o; sourceTree = "<group>"; };
+		3633CEBE129DE5E7006269CE /* al_WindowGLUT.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = al_WindowGLUT.o; sourceTree = "<group>"; };
+		3633CEBF129DE5E7006269CE /* IpEndpointName.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = IpEndpointName.o; sourceTree = "<group>"; };
+		3633CEC0129DE5E7006269CE /* NetworkingUtils.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = NetworkingUtils.o; sourceTree = "<group>"; };
+		3633CEC1129DE5E7006269CE /* OscOutboundPacketStream.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = OscOutboundPacketStream.o; sourceTree = "<group>"; };
+		3633CEC2129DE5E7006269CE /* OscPrintReceivedElements.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = OscPrintReceivedElements.o; sourceTree = "<group>"; };
+		3633CEC3129DE5E7006269CE /* OscReceivedElements.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = OscReceivedElements.o; sourceTree = "<group>"; };
+		3633CEC4129DE5E7006269CE /* OscTypes.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = OscTypes.o; sourceTree = "<group>"; };
+		3633CEC5129DE5E7006269CE /* ringbuffer.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = ringbuffer.o; sourceTree = "<group>"; };
+		3633CEC6129DE5E7006269CE /* UdpSocket.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = UdpSocket.o; sourceTree = "<group>"; };
+		3633CF31129DE747006269CE /* libassimp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libassimp.a; sourceTree = "<group>"; };
 		3638758D126A18C700FCFD67 /* al_Crossover.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Crossover.hpp; sourceTree = "<group>"; };
 		3649CDA412440A3F0077128E /* al_Nurbs.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Nurbs.hpp; sourceTree = "<group>"; };
 		3659D750117B8A980065EBE4 /* al_MsgTube.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_MsgTube.hpp; sourceTree = "<group>"; };
@@ -627,6 +674,8 @@
 				05C9388A128A166B0068F87F /* libportaudio.a in Frameworks */,
 				05C9388B128A166B0068F87F /* libfreeimage.a in Frameworks */,
 				05C9388C128A166B0068F87F /* libapr-1.a in Frameworks */,
+				3633CEC7129DE5E7006269CE /* liballocore.a in Frameworks */,
+				3633CF32129DE747006269CE /* libassimp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -840,6 +889,7 @@
 		08FB7794FE84155DC02AAC07 /* alscheduling */ = {
 			isa = PBXGroup;
 			children = (
+				3633CE9A129DE5E7006269CE /* Release */,
 				36B4124410EFF7B8007B16D0 /* allocore */,
 				3617185F128B22CE00D6ED65 /* alCompiler */,
 				36171862128B22CE00D6ED65 /* alloplay */,
@@ -1343,6 +1393,7 @@
 		361718BF128B22CF00D6ED65 /* shadertest */ = {
 			isa = PBXGroup;
 			children = (
+				3633CE4D129DE080006269CE /* modelShader.cpp */,
 			);
 			name = shadertest;
 			path = ../shadertest;
@@ -1479,6 +1530,65 @@
 			path = ../frp;
 			sourceTree = SOURCE_ROOT;
 		};
+		3633CE9A129DE5E7006269CE /* Release */ = {
+			isa = PBXGroup;
+			children = (
+				3633CE9B129DE5E7006269CE /* ajit */,
+				3633CE9C129DE5E7006269CE /* ajit.dSYM */,
+				3633CE9D129DE5E7006269CE /* exSimpleGraphics */,
+				3633CE9E129DE5E7006269CE /* exSimpleGraphics.dSYM */,
+				3633CE9F129DE5E7006269CE /* liballocore.a */,
+				3633CEA0129DE5E7006269CE /* obj */,
+			);
+			name = Release;
+			path = ../../build/Release;
+			sourceTree = SOURCE_ROOT;
+		};
+		3633CEA0129DE5E7006269CE /* obj */ = {
+			isa = PBXGroup;
+			children = (
+				3633CEA1129DE5E7006269CE /* al_Ambisonics.o */,
+				3633CEA2129DE5E7006269CE /* al_AudioIO.o */,
+				3633CEA3129DE5E7006269CE /* al_Camera.o */,
+				3633CEA4129DE5E7006269CE /* al_Color.o */,
+				3633CEA5129DE5E7006269CE /* al_CoordinateFrame.o */,
+				3633CEA6129DE5E7006269CE /* al_Debug.o */,
+				3633CEA7129DE5E7006269CE /* al_FileAPR.o */,
+				3633CEA8129DE5E7006269CE /* al_Graphics.o */,
+				3633CEA9129DE5E7006269CE /* al_GraphicsBackendOpenGL.o */,
+				3633CEAA129DE5E7006269CE /* al_Image.o */,
+				3633CEAB129DE5E7006269CE /* al_Isosurface.o */,
+				3633CEAC129DE5E7006269CE /* al_Light.o */,
+				3633CEAD129DE5E7006269CE /* al_MainLoop.o */,
+				3633CEAE129DE5E7006269CE /* al_MainLoopGLUT.o */,
+				3633CEAF129DE5E7006269CE /* al_Model.o */,
+				3633CEB0129DE5E7006269CE /* al_MsgQueue.o */,
+				3633CEB1129DE5E7006269CE /* al_OSC.o */,
+				3633CEB2129DE5E7006269CE /* al_OSCAPR.o */,
+				3633CEB3129DE5E7006269CE /* al_Printing.o */,
+				3633CEB4129DE5E7006269CE /* al_Quat.o */,
+				3633CEB5129DE5E7006269CE /* al_Serialize.o */,
+				3633CEB6129DE5E7006269CE /* al_Shader.o */,
+				3633CEB7129DE5E7006269CE /* al_SocketAPR.o */,
+				3633CEB8129DE5E7006269CE /* al_Stereographic.o */,
+				3633CEB9129DE5E7006269CE /* al_Surface.o */,
+				3633CEBA129DE5E7006269CE /* al_Texture.o */,
+				3633CEBB129DE5E7006269CE /* al_ThreadAPR.o */,
+				3633CEBC129DE5E7006269CE /* al_Time.o */,
+				3633CEBD129DE5E7006269CE /* al_Window.o */,
+				3633CEBE129DE5E7006269CE /* al_WindowGLUT.o */,
+				3633CEBF129DE5E7006269CE /* IpEndpointName.o */,
+				3633CEC0129DE5E7006269CE /* NetworkingUtils.o */,
+				3633CEC1129DE5E7006269CE /* OscOutboundPacketStream.o */,
+				3633CEC2129DE5E7006269CE /* OscPrintReceivedElements.o */,
+				3633CEC3129DE5E7006269CE /* OscReceivedElements.o */,
+				3633CEC4129DE5E7006269CE /* OscTypes.o */,
+				3633CEC5129DE5E7006269CE /* ringbuffer.o */,
+				3633CEC6129DE5E7006269CE /* UdpSocket.o */,
+			);
+			path = obj;
+			sourceTree = "<group>";
+		};
 		3659D751117B8AC60065EBE4 /* jack */ = {
 			isa = PBXGroup;
 			children = (
@@ -1602,6 +1712,7 @@
 		36B4129710EFF864007B16D0 /* lib */ = {
 			isa = PBXGroup;
 			children = (
+				3633CF31129DE747006269CE /* libassimp.a */,
 				36320467128B27DB00A742CC /* liballocore.a */,
 				360C245E11E659D3000FF335 /* llvm */,
 				36F46844110BE34D0082D21E /* libportaudio.a */,
@@ -1958,6 +2069,7 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "alloex" */;
 			compatibilityVersion = "Xcode 3.0";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -2086,7 +2198,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				05C93893128A168F0068F87F /* graphicsData.cpp in Sources */,
+				3633CE4E129DE080006269CE /* modelShader.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2297,6 +2409,8 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\\\"$(SRCROOT)/../../dev/osx/lib\\\"",
+					"\"$(SRCROOT)/../../build/Release\"",
+					"\"$(SRCROOT)/../../dev/osx/lib\"",
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = exSimpleGraphics;
@@ -2315,6 +2429,8 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\\\"$(SRCROOT)/../../dev/osx/lib\\\"",
+					"\"$(SRCROOT)/../../build/Release\"",
+					"\"$(SRCROOT)/../../dev/osx/lib\"",
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = exSimpleGraphics;
@@ -2406,7 +2522,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				RUN_CLANG_STATIC_ANALYZER = YES;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
 				SYMROOT = ../../build;
 				USER_HEADER_SEARCH_PATHS = "../../dev/osx/include ../../include";
 			};
