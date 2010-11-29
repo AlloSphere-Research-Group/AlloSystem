@@ -32,19 +32,19 @@ namespace al{
 struct Color;
 struct HSV;
 
-/// An RGBA color.
+
+/// Color represented by red, green, blue, and alpha components
 struct Color{
 
 	union{
 		struct{
-			float r;	///< Red component in [0, 1]
-			float g;	///< Green component in [0, 1]
-			float b;	///< Blue component in [0, 1]
-			float a;	///< Alpha component in [0, 1]
+			float r;			///< Red component in [0, 1]
+			float g;			///< Green component in [0, 1]
+			float b;			///< Blue component in [0, 1]
+			float a;			///< Alpha component in [0, 1]
 		};
-		float components[4];
+		float components[4];	///< RGBA component vector
 	};
-
 
 	/// @param[in] r			red component
 	/// @param[in] g			green component
@@ -143,21 +143,43 @@ inline Color operator * (float s, const Color& c){ return  c*s; }
 inline Color operator / (float s, const Color& c){ return Color(s/c.r, s/c.g, s/c.b, s/c.a); }
 
 
+
+/// Color represented by hue, saturation, and value
 struct HSV{
 
-	float h, s, v;
+	union{
+		struct{
+			float h;			///< Hue component in [0, 1]
+			float s;			///< Saturation component in [0, 1]
+			float v;			///< Value component in [0, 1]
+		};
+		float components[3];	///< HSV component vector
+	};
 
+	/// @param[in] h	hue
+	/// @param[in] s	saturation
+	/// @param[in] v	value
+	HSV(float h=0, float s=1, float v=1): h(h), s(s), v(v){}
+	
+	/// @param[in] c	RGB color to convert from
+	HSV(const Color& c){ *this = c; }
+
+	/// @param[in] hsv		3-vector of hsv components
 	template<class T>
 	HSV(T * hsv): h(hsv[0]), s(hsv[1]), v(hsv[2]){}
 
-	HSV(float h=0, float s=1, float v=1): h(h), s(s), v(v){}	
-	HSV(const Color& c){ *this = c; }
-
-	HSV& operator()(float hue, float sat, float val){ h=hue; s=sat; v=val; return *this; }
-
+	/// Set from RGB color
 	HSV& operator=(const Color& c);
+	
+	/// Rotate hue in interval [0, 1)
+	HSV& rotateHue(float v){ h += v; wrapHue(); return *this; }
+	
+	/// Wrap hue value into valid interval [0, 1)
+	void wrapHue(){
+		if(h>1){ h -= int(h); }
+		else if(h<0){ h -= int(h)-1; }
+	}
 };
-
 
 } // al::
 
