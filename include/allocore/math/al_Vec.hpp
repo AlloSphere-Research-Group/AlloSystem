@@ -406,10 +406,7 @@ public:
 	}
 
 	/// Set elements on diagonal to one and all others to zero
-	Mat& identity(){
-		IT(size()){ (*this)[i] = (i%(N+1)) ? T(0) : T(1); }
-		return *this;
-	}
+	Mat& setIdentity(){ return (*this) = identity(); }
 	
 	/// Transpose elements
 	Mat& transpose(){
@@ -423,6 +420,13 @@ public:
 		}} return *this;
 	}
 
+
+	/// Get identity matrix
+	static Mat identity(){
+		Mat m;
+		IT(size()){ m[i] = (i%(N+1)) ? T(0) : T(1); }
+		return m;
+	}
 
 	/// Get trace (sum of diagonal elements)
 	T trace() const { return diagonal().sum(); }
