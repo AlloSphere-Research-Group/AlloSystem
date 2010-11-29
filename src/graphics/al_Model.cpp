@@ -459,7 +459,7 @@ void OBJReader :: readMTL(std::string path, std::string name)
 	MtlIterator iter = materialsBegin();
 	while (iter != materialsEnd()) {
 		//printf("material %s\n", iter->first.data());
-		Mtl& m = iter->second;
+//		Mtl& m = iter->second;
 		//printf("N %f\n", m.shininess());
 		//printf("d %f %f %f\n", m.diffuse.r, m.diffuse.g, m.diffuse.b);
 		//printf("s %f %f %f\n", m.specular.r, m.specular.g, m.specular.b);
