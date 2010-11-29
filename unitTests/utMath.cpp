@@ -144,7 +144,7 @@ int utMath(){
 	
 	// Mat
 	{
-		Mat<3,double> a;//, b;
+		Mat3d a;//, b;
 		
 		//a(0,1) = a(1,0);
 		#define CHECK(m, a,b,c, d,e,f, g,h,i)\
@@ -152,7 +152,8 @@ int utMath(){
 		assert(m(1,0)==d); assert(m(1,1)==e); assert(m(1,2)==f);\
 		assert(m(2,0)==g); assert(m(2,1)==h); assert(m(2,2)==i)
 		
-		a.setIdentity();	CHECK(a, 1,0,0, 0,1,0, 0,0,1);
+		a.identity();	CHECK(a, 1,0,0, 0,1,0, 0,0,1);
+		a = Mat3d().identity(); CHECK(a, 1,0,0, 0,1,0, 0,0,1);
 		
 		assert(a.trace() == 3);
 		
@@ -161,13 +162,13 @@ int utMath(){
 		a *= 2;		CHECK(a, 4,2,2, 2,4,2, 2,2,4);
 		a /= 2;		CHECK(a, 2,1,1, 1,2,1, 1,1,2);
 		
-		a.setIdentity();
+		a.identity();
 		a = a+2;	CHECK(a, 3,2,2, 2,3,2, 2,2,3);
 		a = a-1;	CHECK(a, 2,1,1, 1,2,1, 1,1,2);
 		a = a*2;	CHECK(a, 4,2,2, 2,4,2, 2,2,4);
 		a = a/2;	CHECK(a, 2,1,1, 1,2,1, 1,1,2);
 
-		a.setIdentity();
+		a.identity();
 		a = 2.+a;	CHECK(a, 3,2,2, 2,3,2, 2,2,3);
 		a = 4.-a;	CHECK(a, 1,2,2, 2,1,2, 2,2,1);
 		a = 2.*a;	CHECK(a, 2,4,4, 4,2,4, 4,4,2);

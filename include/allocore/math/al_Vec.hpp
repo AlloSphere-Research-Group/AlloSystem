@@ -35,20 +35,21 @@ namespace al {
 template <int N, class T> class Vec;
 template <int N, class T> class Mat;
 
-typedef Vec<2,float>	Vec2f;
-typedef Vec<2,double>	Vec2d;
-typedef Vec<2,int>		Vec2i;
-typedef Vec<3,float>	Vec3f;
-typedef Vec<3,double>	Vec3d;
-typedef Vec<3,int>		Vec3i;
-typedef Vec<4,float>	Vec4f;
-typedef Vec<4,double>	Vec4d;
-typedef Vec<4,int>		Vec4i;
-typedef Mat<3,float>	Mat3f;
-typedef Mat<3,double>	Mat3d;
-typedef Mat<4,float>	Mat4f;
-typedef Mat<4,double>	Mat4d;
-typedef Mat<4,int>		Mat4i;
+typedef Vec<2,float>	Vec2f;	///< float 2-vector
+typedef Vec<2,double>	Vec2d;	///< double 2-vector
+typedef Vec<2,int>		Vec2i;	///< integer 2-vector
+typedef Vec<3,float>	Vec3f;	///< float 3-vector
+typedef Vec<3,double>	Vec3d;	///< double 3-vector
+typedef Vec<3,int>		Vec3i;	///< integer 3-vector
+typedef Vec<4,float>	Vec4f;	///< float 4-vector
+typedef Vec<4,double>	Vec4d;	///< double 4-vector
+typedef Vec<4,int>		Vec4i;	///< integer 4-vector
+typedef Mat<3,float>	Mat3f;	///< float 3x3 matrix
+typedef Mat<3,double>	Mat3d;	///< double 3x3 matrix
+typedef Mat<3,int>		Mat3i;	///< integer 3x3 matrix
+typedef Mat<4,float>	Mat4f;	///< float 4x4 matrix
+typedef Mat<4,double>	Mat4d;	///< double 4x4 matrix
+typedef Mat<4,int>		Mat4i;	///< integer 4x4 matrix
 
 // Forward iterates from 0 to n-1. Current index is 'i'.
 #define IT(n) for(int i=0; i<n; ++i)
@@ -233,18 +234,23 @@ public:
 		return *this;
 	}
 
+	/// Set first 2 elements
 	Vec& set(const T& v1, const T& v2){
 		return set(v1,v2,v1,v1,v1,v1); }
 
+	/// Set first 3 elements
 	Vec& set(const T& v1, const T& v2, const T& v3){
 		return set(v1,v2,v3,v1,v1,v1); }
 
+	/// Set first 4 elements
 	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4){
 		return set(v1,v2,v3,v4,v1,v1); }
 
+	/// Set first 5 elements
 	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5){
 		return set(v1,v2,v3,v4,v5,v1); }
 
+	/// Set first 6 elements
 	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6){		
 		switch(N){
 		default:(*this)[5] = v6;
@@ -275,6 +281,9 @@ public:
 
 
 /// N x N square matrix
+
+/// Elements are stored in column-major format.
+///
 template <int N, class T>
 class Mat{
 public:
@@ -287,6 +296,7 @@ public:
 	/// param[in] arr	one dimensional array in column-major
 	Mat(const T * arr){ set(arr); }
 
+	///
 	Mat(
 		const T& r1c1, const T& r1c2, const T& r1c3,
 		const T& r2c1, const T& r2c2, const T& r2c3,
@@ -298,6 +308,7 @@ public:
 		);
 	}
 
+	///
 	Mat(
 		const T& r1c1, const T& r1c2, const T& r1c3, const T& r1c4,
 		const T& r2c1, const T& r2c2, const T& r2c3, const T& r2c4,
@@ -367,7 +378,8 @@ public:
 	Mat& set(const U * arr, int numElements, int matOffset, int matStride=1){
 		IT(numElements){ (*this)[i*matStride+matOffset]=arr[i]; } return *this;
 	}
-	
+
+	/// Set 3x3 matrix from arguments	
 	Mat& set(
 		const T& r1c1, const T& r1c2, const T& r1c3,
 		const T& r2c1, const T& r2c2, const T& r2c3,
@@ -379,6 +391,7 @@ public:
 		return *this;
 	}
 	
+	/// Set 4x4 matrix from arguments
 	Mat& set(
 		const T& r1c1, const T& r1c2, const T& r1c3, const T& r1c4,
 		const T& r2c1, const T& r2c2, const T& r2c3, const T& r2c4,
@@ -393,10 +406,14 @@ public:
 	}
 
 	/// Set elements on diagonal to one and all others to zero
-	Mat& setIdentity(){ return ((*this) = identity()); }
+	Mat& identity(){
+		IT(size()){ (*this)[i] = (i%(N+1)) ? T(0) : T(1); }
+		return *this;
+	}
 	
+	/// Transpose elements
 	Mat& transpose(){
-		for(int j=0; j<N-1; ++j){		// row and column
+		for(int j=0; j<N-1; ++j){	// row and column
 		for(int i=j+1; i<N; ++i){	// offset into row or column
 			int i1 = j*N + i;
 			int i2 = j + i*N;
@@ -409,13 +426,6 @@ public:
 
 	/// Get trace (sum of diagonal elements)
 	T trace() const { return diagonal().sum(); }
-
-	/// Returns identity matrix
-	static Mat identity(){
-		Mat m;
-		IT(size()){ m[i] = (i%(N+1)) ? T(0) : T(1); }
-		return m;
-	}
 
 	/// Computes matrix product r = a * b
 	
