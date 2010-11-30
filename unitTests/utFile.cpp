@@ -24,7 +24,7 @@ int utFile() {
 		f.mode("r").open();
 		assert(f.opened());
 		
-		char * read = f.readAll();
+		const char * read = f.readAll();
 		
 		assert(f.size() == strlen(text));
 		
