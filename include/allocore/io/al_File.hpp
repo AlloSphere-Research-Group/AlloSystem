@@ -91,6 +91,7 @@ public:
 	/// @param[in] mode		i/o mode w, r, wb, rb
 	/// @param[in] open		whether to open the file
 	File(const std::string& path, const std::string& mode="r", bool open=false);
+	File(const FilePath& path, const std::string& mode="r", bool open=false);
 
 	~File();
 
@@ -108,7 +109,7 @@ public:
 	static int write(const std::string& path, const void * v, int size, int items=1);
 
 	/// Returns character string of file contents (read mode only)
-	char * readAll();
+	const char * readAll();
 
 	/// Returns whether file is open
 	bool opened() const { return 0 != mFP; }
