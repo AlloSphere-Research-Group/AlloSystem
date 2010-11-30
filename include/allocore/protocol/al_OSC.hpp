@@ -156,6 +156,11 @@ public:
 	
 	/// End message
 	Packet& endMessage();
+	
+	/// Add zero argument message
+	Packet& addMessage(const std::string& addr){
+		beginMessage(addr); return endMessage();
+	}
 
 	/// Add one argument message
 	template <class A>
@@ -185,6 +190,18 @@ public:
 	template <class A, class B, class C, class D, class E>
 	Packet& addMessage(const std::string& addr, const A& a, const B& b, const C& c, const D& d, const E& e){
 		beginMessage(addr); (*this)<<a<<b<<c<<d<<e; return endMessage();
+	}
+
+	/// Add six argument message
+	template <class A, class B, class C, class D, class E, class F>
+	Packet& addMessage(const std::string& addr, const A& a, const B& b, const C& c, const D& d, const E& e, const F& f){
+		beginMessage(addr); (*this)<<a<<b<<c<<d<<e<<f; return endMessage();
+	}
+
+	/// Add seven argument message
+	template <class A, class B, class C, class D, class E, class F, class G>
+	Packet& addMessage(const std::string& addr, const A& a, const B& b, const C& c, const D& d, const E& e, const F& f, const G& g){
+		beginMessage(addr); (*this)<<a<<b<<c<<d<<e<<f<<g; return endMessage();
 	}
 
 	Packet& operator<< (int v);					///< Add integer to message
@@ -273,6 +290,11 @@ public:
 
 	/// Send and clear current packet contents
 	int send();
+	
+	/// Send zero argument message immediately
+	int send(const std::string& addr){
+		addMessage(addr); return send();
+	}
 
 	/// Send one argument message immediately
 	template <class A>
@@ -303,6 +325,18 @@ public:
 	int send(const std::string& addr, const A& a, const B& b, const C& c, const D& d, const E& e){
 		addMessage(addr, a,b,c,d,e); return send();
 	}
+
+	/// Send six argument message immediately
+	template <class A, class B, class C, class D, class E, class F>
+	int send(const std::string& addr, const A& a, const B& b, const C& c, const D& d, const E& e, const F& f){
+		addMessage(addr, a,b,c,d,e,f); return send();
+	}
+
+	/// Send seven argument message immediately
+	template <class A, class B, class C, class D, class E, class F, class G>
+	int send(const std::string& addr, const A& a, const B& b, const C& c, const D& d, const E& e, const F& f, const G& g){
+		addMessage(addr, a,b,c,d,e,f,g); return send();
+	}
 };
 
 
@@ -318,6 +352,8 @@ public:
 	/// @param[in] address	IP address. If 0, will bind all network interfaces to socket.
 	/// @param[in] timeout	< 0: block forever; = 0: no blocking; > 0 block with timeout
 	Recv(unsigned int port, const char * address = 0, al_sec timeout=0);
+	
+	virtual ~Recv() { stop(); }
 
 	/// Whether background polling is activated
 	bool background() const { return mBackground; }

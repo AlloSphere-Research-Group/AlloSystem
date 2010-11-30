@@ -17,28 +17,20 @@ namespace al{
 struct Socket::Impl : public ImplAPR {
 
 	Impl(unsigned int port, const char * address, al_sec timeout_, bool sender)
-	:	ImplAPR(), mPort(0), mAddress(0), mSock(0)
+	:	ImplAPR(), mPort(port), mAddressString(address ? address : ""), mAddress(0), mSock(0), mSender(sender)
 	{
-		open(port, address, sender);
+		// opens the socket also:
 		timeout(timeout_);
-
-//		char * buf;
-////		apr_sockaddr_ip_get(&buf, mAddress);
-//		apr_getnameinfo(&buf, sa, 0);
-////		char * scopeid;
-////		apr_port_t p = port;
-////		apr_parse_addr_port(&buf, &scopeid, &p, "localhost", defaultPool());
-//		printf("%s\n", buf);
 	}
 
 	void close(){
 		if(opened()){
-			apr_socket_close(mSock);
+			check_apr(apr_socket_close(mSock));
 			mSock=0;
 		}
 	}
 
-	void open(unsigned int port, const char * address, bool sender){
+	void open(unsigned int port, std::string address, bool sender){
 
 		close();
 
@@ -48,7 +40,8 @@ struct Socket::Impl : public ImplAPR {
 
 		mPort = port;
 		mSender = sender;
-		check_apr(apr_sockaddr_info_get(&mAddress, address, APR_INET, mPort, 0, mPool));
+		mAddressString = address;
+		check_apr(apr_sockaddr_info_get(&mAddress, (mAddressString[0]) ? mAddressString.c_str() : 0, APR_INET, mPort, 0, mPool));
 		check_apr(apr_socket_create(&mSock, mAddress->family, SOCK_DGRAM, APR_PROTO_UDP, mPool));
 
 		if(mSock){
@@ -58,7 +51,10 @@ struct Socket::Impl : public ImplAPR {
 		}
 	}
 	
+	// note that setting timeout will close and re-open the socket:
 	void timeout(al_sec v){
+		open(mPort, mAddressString, mSender);
+		
 		if(v == 0){
 			// non-blocking:			APR_SO_NONBLOCK==1(on),  then timeout=0
 			check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 1));
@@ -75,13 +71,16 @@ struct Socket::Impl : public ImplAPR {
 			check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 0));
 			check_apr(apr_socket_timeout_set(mSock, -1));
 		}
+		mTimeout = v;
 	}
 	
 	bool opened(){ return 0!=mSock; }
 
 	unsigned int mPort;
+	std::string mAddressString;
 	apr_sockaddr_t * mAddress;
 	apr_socket_t * mSock;
+	al_sec mTimeout;
 	bool mSender;
 };
 
@@ -89,8 +88,9 @@ struct Socket::Impl : public ImplAPR {
 
 
 Socket::Socket(unsigned int port, const char * address, al_sec timeout, bool sender)
-: mImpl(new Impl(port, address, timeout, sender))
+: mImpl(0)
 {
+	mImpl = new Impl(port, address, timeout, sender);
 }
 
 Socket::~Socket(){
@@ -108,10 +108,14 @@ unsigned int Socket::port() const { return mImpl->mPort; }
 
 void Socket::timeout(al_sec v){ mImpl->timeout(v); }
 
+al_sec Socket::timeout() const {
+	return mImpl->mTimeout;
+}
+
 size_t Socket::recv(char * buffer, size_t maxlen) {
 	apr_size_t len = maxlen;
 	apr_status_t r = apr_socket_recv(mImpl->mSock, buffer, &len);
-
+	
 	// only error check if not error# 35: Resource temporarily unavailable
 	if(len){ check_apr(r); }
 	return len;

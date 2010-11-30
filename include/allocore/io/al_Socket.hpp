@@ -96,7 +96,11 @@ public:
 	void close();
 
 	/// Set timeout. < 0: block forever; = 0: no blocking; > 0 block with timeout
+	/// note that setting timeout will close and re-open the socket:
 	void timeout(al_sec v);
+	
+	/// get current timeout
+	al_sec timeout() const;
 
 	/// Get name of current host
 	static std::string hostName();

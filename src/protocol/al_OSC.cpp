@@ -203,6 +203,7 @@ static void * recvThreadFunc(void * user){
 	while(r->background()){
 		r->recv();
 	}
+	printf("thread done\n");
 	return NULL;
 }
 
@@ -220,15 +221,18 @@ int Recv::recv(){
 
 bool Recv::start(){
 	mBackground = true;
+	if (timeout() <= 0) {
+		printf("warning (osc::Recv): timeout <= 0 and background polling may eat up your CPU! Set timeout(seconds) to avoid this.\n");
+	}
 	return mThread.start(recvThreadFunc, this);
 }
 
 /// Stop the background polling
 void Recv::stop(){
-	//if(mBackground){
+	if(mBackground){
 		mBackground = false;
-	//	mThread.wait();
-	//}
+		mThread.wait();
+	}
 }
 
 
