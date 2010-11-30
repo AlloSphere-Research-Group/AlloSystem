@@ -1,14 +1,13 @@
 #ifndef INCLUDE_AL_QUAT_HPP
 #define INCLUDE_AL_QUAT_HPP
 
-
 #include "allocore/math/al_Constants.hpp"
 #include "allocore/math/al_Vec.hpp"
 
 #define QUAT_ACCURACY_MAX (1.000001)
 #define QUAT_ACCURACY_MIN (0.999999)
 #define QUAT_EPSILON (0.0000001)
-#define QUAT_DEG2RAD_BY2 (M_DEG2RAD/2.)
+//#define QUAT_DEG2RAD_BY2 (M_DEG2RAD/2.)
 
 #ifndef ABS
 	#define ABS(x) ((x)<0?-(x):(x))
@@ -16,14 +15,11 @@
 
 namespace al {
 
-/*
-	Quat<double> is equivalent to struct al_quat
-*/
 
 template<class T> class Quat;
 
-typedef Quat<double>	Quatd;	///< Double-precision quaternion
 typedef Quat<float>		Quatf;	///< Single-precision quaternion
+typedef Quat<double>	Quatd;	///< Double-precision quaternion
 
 
 /// Quaternion
@@ -32,17 +28,19 @@ class Quat {
 public:
 	union{
 		struct{
-			T w;
-			T x;
-			T y;
-			T z;
+			T w;			///< w component
+			T x;			///< x component
+			T y;			///< y component
+			T z;			///< z component
 		};
-		T components[4];
+		T components[4];	///< component vector
 	};
 	
+	///
+	Quat(const T& w = T(1), const T& x = T(0), const T& y = T(0), const T& z = T(0));
 
-	Quat(T w = T(1), T x = T(0), T y = T(0), T z = T(0));
-	Quat(const Quat & src);
+	/// @param[in] src		quaternion to set values from
+	Quat(const Quat& src);
 
 	/// Set component with index
 	T& operator[](int i){ return components[i];}
@@ -79,15 +77,17 @@ public:
 	Quat& operator /=(const    T& v){ w/=v; x/=v; y/=v; z/=v; return *this; }
 
 
-
 	/// Returns the conjugate
-	Quat conjugate() const { return Quat(w, -x, -y, -z); }
+	Quat conj() const { return Quat(w, -x, -y, -z); }
 
 	/// Returns dot product with another quaternion
 	T dot(const Quat& v) const { return w*v.w + x*v.x + y*v.y + z*v.z; }
 
+	/// Returns identity
+	static Quat identity(){ return Quat(1,0,0,0); }
+
 	/// Returns inverse (same as conjugate if normalized as q^-1 = q_conj/q_mag^2)
-	Quat inverse() const { return sgn().conjugate(); }
+	Quat inverse() const { return sgn().conj(); }
 
 	/// Get magnitude
 	T mag() const { return (T)sqrt(magSqr()); }
@@ -96,7 +96,7 @@ public:
 	T magSqr() const { return dot(*this); }
 
 	/// Returns multiplicative inverse
-	Quat recip() const { return conjugate()/magSqr(); }
+	Quat recip() const { return conj()/magSqr(); }
 
 	/// Returns signum, q/|q|, the closest point on unit 3-sphere
 	Quat sgn() const { return Quat(*this).normalize(); }
@@ -108,7 +108,7 @@ public:
 	Quat& normalize();
 
 	/// Set components
-	Quat& set(T w, T x, T y, T z){
+	Quat& set(const T& w, const T& x, const T& y, const T& z){
 		this->w = w; this->x = x; this->y = y; this->z = z;
 		return *this;
 	}
@@ -119,49 +119,75 @@ public:
 	/// Set to identity
 	Quat& setIdentity(){ return (*this) = Quat::identity(); }
 
-	/// Warning: Assumes that axes are normalized.
-	static Quat fromAxisAngle(T theta, T x1, T y1, T z1);
-	static Quat fromAxisX(T theta);
-	static Quat fromAxisY(T theta);
-	static Quat fromAxisZ(T theta);
-	static Quat fromEuler(T a, T e, T b);
-	// set from column-major matrix:
-	static Quat fromMatrix(T * matrix);
-	// set from row-major matrix:
-	static Quat fromMatrixGL(T * matrix);
-	static Quat& fromMatrix(Mat<4,T>& matrix) { return fromMatrix(matrix.ptr()); }
+	/// Set as versor rotated by angle around unit vector
+	Quat& fromAxisAngle(T angle, T x1, T y1, T z1);
 
-	Quat& setFromAxisAngle(T theta, T x1, T y1, T z1) { return set(fromAxisAngle(theta, x1, y1, z1)); }
-	Quat& setFromAxisAngle(T theta, Vec<3, T> axis) { return set(fromAxisAngle(theta, axis[0], axis[1], axis[2])); }
-	Quat& setFromAxisX(T theta) { return set(fromAxisX(theta)); }
-	Quat& setFromAxisY(T theta) { return set(fromAxisY(theta)); }
-	Quat& setFromAxisZ(T theta) { return set(fromAxisZ(theta)); }
-	Quat& setFromEuler(T a, T e, T b) { return set(fromEuler(a, e, b)); }
-	Quat& setFromMatrix(T * matrix) { return set(fromMatrix(matrix)); }
-	Quat& setFromMatrix(Mat<4,T>& matrix) { return set(fromMatrix(matrix.ptr())); }
-	Quat& setFromMatrixGL(T * matrix) { return set(fromMatrixGL(matrix)); }
-	Quat& setFromMatrixGL(Mat<4,T>& matrix) { return set(fromMatrixGL(matrix.ptr())); }
+	/// Set as versor rotated by angle around unit vector
+	Quat& fromAxisAngle(T angle, const Vec<3,T>& axis) { return fromAxisAngle(angle, axis[0], axis[1], axis[2]); }
 
-	/// Convert to 4x4 column-major matrix
+	/// Set as versor rotated by angle around x-axis
+	Quat& fromAxisX(T angle){ return fromAxisAngle(angle, 1,0,0); }
+
+	/// Set as versor rotated by angle around y-axis
+	Quat& fromAxisY(T angle){ return fromAxisAngle(angle, 0,1,0); }
+
+	/// Set as versor rotated by angle around z-axis
+	Quat& fromAxisZ(T angle){ return fromAxisAngle(angle, 0,0,1); }
+
+	/// Set as versor rotated by Euler angles, in degrees
+	Quat& fromEuler(T az, T el, T ba);
+	
+	/// Set as versor from column-major 4-by-4 projective space transformation matrix
+	Quat& fromMatrix(const T * matrix);
+
+	/// Set as versor from column-major 4-by-4 projective space transformation matrix
+	Quat& fromMatrix(const Mat<4,T>& v){ return fromMatrix(v.ptr()); }
+
+	/// Set as versor from row-major 4-by-4 projective space transformation matrix
+	Quat& fromMatrixTransposed(const T * matrix);
+
+	/// Set as versor from row-major 4-by-4 projective space transformation matrix
+	Quat& fromMatrixTransposed(const Mat<4,T>& v){ return fromMatrixTransposed(v.ptr()); }
+
+
+	/// Convert to coordinate frame unit vectors
+	void toCoordinateFrame(Vec<3,T>& ux, Vec<3,T>& uy, Vec<3,T>& uz) const;
+
+	/// Convert to column-major 4-by-4 projective space transformation matrix
 	void toMatrix(T * matrix) const;
 
-	/// Convert to 4x4 row-major matrix
+	/// Convert to row-major 4-by-4 projective space transformation matrix
 	void toMatrixTransposed(T * matrix) const;
 
 	/// Convert to axis-angle form
-	void toAxisAngle(T * aa, T * ax, T * ay, T * az) const;
+	void toAxisAngle(T& angle, T& ax, T& ay, T& az) const;
 
-	/// Convert to Euler angles as T[3] (azimuth, elevation, bank)
-	void toEuler(T * e) const;
-	void toEuler(Vec<3,T> & v) const;
+	/// Convert to Euler angles (azimuth, elevation, bank), in degrees
+	void toEuler(T& az, T& el, T& ba) const;
+
+	/// Convert to Euler angle vector (azimuth, elevation, bank), in degrees
+	void toEuler(T * e) const { toEuler(e[0],e[1],e[2]); }
+
+	/// Convert to Euler angle vector (azimuth, elevation, bank), in degrees
+	void toEuler(Vec<3,T> & v) const { toEuler(v[0],v[1],v[2]); }
+
+	/// Get local x unit vector (1,0,0) in absolute coordinates
+	void toVectorX(T& ax, T& ay, T& az) const;
+
+	/// Get local y unit vector (0,1,0) in absolute coordinates
+	void toVectorY(T& ax, T& ay, T& az) const;
+
+	/// Get local z unit vector (0,0,1) in absolute coordinates
+	void toVectorZ(T& ax, T& ay, T& az) const;
+
+	/// Get local x unit vector (1,0,0) in absolute coordinates
+	void toVectorX(Vec<3,T>& v) const { toVectorX(v[0],v[1],v[2]); }
 	
-	/// return unit vectors:
-	void toVectorX(T * x, T * y, T * z) const;
-	void toVectorY(T * x, T * y, T * z) const;
-	void toVectorZ(T * x, T * y, T * z) const;
-	void toVectorX(Vec<3,T> & v) const;
-	void toVectorY(Vec<3,T> & v) const;
-	void toVectorZ(Vec<3,T> & v) const;
+	/// Get local y unit vector (0,1,0) in absolute coordinates
+	void toVectorY(Vec<3,T>& v) const { toVectorY(v[0],v[1],v[2]); }
+	
+	/// Get local z unit vector (0,0,1) in absolute coordinates
+	void toVectorZ(Vec<3,T>& v) const { toVectorZ(v[0],v[1],v[2]); }
 
 	/// Rotate vector
 	void rotate(Vec<3,T>& v) const;
@@ -176,23 +202,21 @@ public:
 	/// Fill an array of Quats with a full spherical interpolation:
 	static void slerp_buffer(const Quat& input, const Quat& target, Quat<T> * buffer, int numFrames);
 
-	/*!
-		Spherical linear interpolation of a quaternion
+	///	Spherical linear interpolation of a quaternion
 
-		@param result	Resulting interpolated quaternion
-		@param target	The quaternion to interpolate toward
-		@param amt		The amount to interpolate, range [0, 1]
-	*/
+	///	@param[in] result	Resulting interpolated quaternion
+	///	@param[in] target	The quaternion to interpolate toward
+	///	@param[in] amt		The amount to interpolate, range [0, 1]
 	static Quat slerp(const Quat& input, const Quat& target, T amt);
 
 	/// Get the quaternion from a given point and quaterion toward another point
 	void towardPoint(Vec<3,T> &pos, Quat<T> &q, Vec<3,T> &v, float amt);
 
-	/// Returns identity
-	static Quat identity(){ return Quat(1,0,0,0); }
 
-	// v1 and v2 must be normalized
-	// alternatively expressed as Q = (1+gp(v1, v2))/sqrt(2*(1+dot(b, a)))
+	/// Get rotor from two unit vectors
+	
+	/// Alternatively expressed as Q = (1+gp(v1, v2))/sqrt(2*(1+dot(b, a))).
+	///
 	static Quat<T> rotor(Vec<3,T> &v1, Vec<3,T> &v2);
 	
 	
@@ -208,6 +232,9 @@ public:
 	/// A.quat() = rot * A.quat();
 	static Quat<T> getRotationTo(const Vec<3, T>& src, const Vec<3, T>& dst);
 
+protected:
+	static const double degToHalfRad(){ return 0.5*M_DEG2RAD; }
+	static const double halfRadToDeg(){ return 2.0*M_RAD2DEG; }
 };
 
 template<class T> Quat<T> operator + (T r, const Quat<T>& q){ return  q+r; }
@@ -222,13 +249,13 @@ template<class T> Quat<T> operator / (T r, const Quat<T>& q){ return  q.conjugat
 /// Implementation
 
 template<typename T>
-inline Quat<T> :: Quat(T w, T x, T y, T z)
+inline Quat<T> :: Quat(const T& w, const T& x, const T& y, const T& z)
 : w(w), x(x), y(y), z(z)
 {}
 
 template<typename T>
-inline Quat<T> :: Quat(const Quat & src) {
-	w = src.w; x = src.x; y = src.y; z = src.z;
+inline Quat<T> :: Quat(const Quat& q) {
+	w = q.w; x = q.x; y = q.y; z = q.z;
 }
 
 template<typename T>
@@ -239,79 +266,41 @@ inline Quat<T>& Quat<T> :: normalize() {
 		setIdentity();
 	}
 	else if(unit > QUAT_ACCURACY_MAX || unit < QUAT_ACCURACY_MIN){
-		T invmag = 1.0/sqrt(unit);
-		(*this) *= invmag;
+		(*this) *= 1./sqrt(unit);
 	}
 	return *this;
 }
 
 // assumes both are already normalized!
 template<typename T>
-inline Quat<T> Quat<T> :: multiply(const Quat<T> & q2) const {
+inline Quat<T> Quat<T> :: multiply(const Quat<T>& q) const {
 	return Quat(
-		w*q2.w - x*q2.x - y*q2.y - z*q2.z,
-		w*q2.x + x*q2.w + y*q2.z - z*q2.y,
-		w*q2.y + y*q2.w + z*q2.x - x*q2.z,
-		w*q2.z + z*q2.w + x*q2.y - y*q2.x
+		w*q.w - x*q.x - y*q.y - z*q.z,
+		w*q.x + x*q.w + y*q.z - z*q.y,
+		w*q.y + y*q.w + z*q.x - x*q.z,
+		w*q.z + z*q.w + x*q.y - y*q.x
 	);
 }
 
 // assumes both are already normalized!
 template<typename T>
-inline Quat<T> Quat<T> :: reverseMultiply(const Quat<T> & q2) const {
-	return q2 * (*this);
+inline Quat<T> Quat<T> :: reverseMultiply(const Quat<T> & q) const {
+	return q * (*this);
 }
 
 template<typename T>
-inline Quat<T> Quat<T> :: fromAxisAngle(T theta, T x1, T y1, T z1) {
-	Quat q;
-	T t2 = theta * 0.00872664626; // * 0.5 * 180/PI
+inline Quat<T>& Quat<T> :: fromAxisAngle(T angle, T x1, T y1, T z1) {
+	T t2 = angle * degToHalfRad();
 	T sinft2 = sin(t2);
-	q.w = cos(t2);
-	q.x = x1 * sinft2;
-	q.y = y1 * sinft2;
-	q.z = z1 * sinft2;
-	return q.normalize();
+	w = cos(t2);
+	x = x1 * sinft2;
+	y = y1 * sinft2;
+	z = z1 * sinft2;
+	return normalize();
 }
 
 template<typename T>
-inline Quat<T> Quat<T> :: fromAxisX(T theta) {
-	Quat q;
-	T t2 = theta * 0.00872664626; // * 0.5 * 180/PI
-	T sinft2 = sin(t2);
-	q.w = cos(t2);
-	q.x = sinft2;
-	q.y = 0;
-	q.z = 0;
-	return q.normalize();
-}
-
-template<typename T>
-inline Quat<T> Quat<T> :: fromAxisY(T theta) {
-	Quat q;
-	T t2 = theta * 0.00872664626; // * 0.5 * 180/PI
-	T sinft2 = sin(t2);
-	q.w = cos(t2);
-	q.x = 0;
-	q.y = sinft2;
-	q.z = 0;
-	return q.normalize();
-}
-
-template<typename T>
-inline Quat<T> Quat<T> :: fromAxisZ(T theta) {
-	Quat q;
-	T t2 = theta * 0.00872664626; // * 0.5 * 180/PI
-	T sinft2 = sin(t2);
-	q.w = cos(t2);
-	q.x = 0;
-	q.y = 0;
-	q.z = sinft2;
-	return q.normalize();
-}
-
-template<typename T>
-inline Quat<T> Quat<T> :: fromEuler(T az, T el, T ba) {
+inline Quat<T>& Quat<T>::fromEuler(T az, T el, T ba){
 	//http://vered.rose.utoronto.ca/people/david_dir/GEMS/GEMS.html
 	//Converting from Euler angles to a quaternion is slightly more tricky, as the order of operations
 	//must be correct. Since you can convert the Euler angles to three independent quaternions by
@@ -324,262 +313,196 @@ inline Quat<T> Quat<T> :: fromEuler(T az, T el, T ba) {
     //Qz = [ cos(c/2), (0, 0, sin(c/2))]
 	//And the final quaternion is obtained by Qx * Qy * Qz.
 
-	T c1 = cos(az * QUAT_DEG2RAD_BY2);
-	T c2 = cos(el * QUAT_DEG2RAD_BY2);
-	T c3 = cos(ba * QUAT_DEG2RAD_BY2);
-	T s1 = sin(az * QUAT_DEG2RAD_BY2);
-	T s2 = sin(el * QUAT_DEG2RAD_BY2);
-	T s3 = sin(ba * QUAT_DEG2RAD_BY2);
+	T c1 = cos(az * degToHalfRad());
+	T c2 = cos(el * degToHalfRad());
+	T c3 = cos(ba * degToHalfRad());
+	T s1 = sin(az * degToHalfRad());
+	T s2 = sin(el * degToHalfRad());
+	T s3 = sin(ba * degToHalfRad());
 
-	// equiv quat_multiply(&Qy, &Qx, &Q1); // since many terms are zero
+	// equiv Q1 = Qy * Qx; // since many terms are zero
 	T tw = c1*c2;
 	T tx = c1*s2;
 	T ty = s1*c2;
-	T tz = - s1*s2;
+	T tz =-s1*s2;
 
-	// equiv quat_multiply(&Q1, &Qz, &Q2); // since many terms are zero
-	Quat q;
-	q.w = tw*c3 - tz*s3;
-	q.x = tx*c3 + ty*s3;
-	q.y = ty*c3 - tx*s3;
-	q.z = tw*s3 + tz*c3;
-	return q.normalize();
+	// equiv Q2 = Q1 * Qz; // since many terms are zero
+	w = tw*c3 - tz*s3;
+	x = tx*c3 + ty*s3;
+	y = ty*c3 - tx*s3;
+	z = tw*s3 + tz*c3;
+	return normalize();
 }
 
 template<typename T>
-inline Quat<T> Quat<T> :: fromMatrix(T *m) {
-	Quat q;
+inline Quat<T>& Quat<T> :: fromMatrix(const T * m) {
 	T trace = m[0]+m[5]+m[10];
-	q.w = sqrt(1. + trace)*0.5;
+	w = sqrt(1. + trace)*0.5;
 
 	if(trace > 0.) {
-		q.x = (m[6] - m[9])/(4.*q.w);
-		q.y = (m[8] - m[2])/(4.*q.w);
-		q.z = (m[1] - m[4])/(4.*q.w);
+		x = (m[9] - m[6])/(4.*w);
+		y = (m[2] - m[8])/(4.*w);
+		z = (m[4] - m[1])/(4.*w);
 	}
 	else {
 		if(m[0] > m[5] && m[0] > m[10]) {
 			// m[0] is greatest
-			q.x = sqrt(1. + m[0]-m[5]-m[10])*0.5;
-			q.w = (m[6] - m[9])/(4.*q.x);
-			q.y = (m[1] + m[4])/(4.*q.x);
-			q.z = (m[2] + m[8])/(4.*q.x);
+			x = sqrt(1. + m[0]-m[5]-m[10])*0.5;
+			w = (m[9] - m[6])/(4.*x);
+			y = (m[4] + m[1])/(4.*x);
+			z = (m[8] + m[2])/(4.*x);
 		}
 		else if(m[5] > m[0] && m[5] > m[10]) {
 			// m[1] is greatest
-			q.y = sqrt(1. + m[5]-m[0]-m[10])*0.5;
-			q.w = (m[8] - m[2])/(4.*q.y);
-			q.x = (m[1] + m[4])/(4.*q.y);
-			q.z = (m[6] + m[9])/(4.*q.y);
+			y = sqrt(1. + m[5]-m[0]-m[10])*0.5;
+			w = (m[2] - m[8])/(4.*y);
+			x = (m[4] + m[1])/(4.*y);
+			z = (m[9] + m[6])/(4.*y);
 		}
 		else { //if(m[10] > m[0] && m[10] > m[5]) {
 			// m[2] is greatest
-			q.z = sqrt(1. + m[10]-m[0]-m[5])*0.5;
-			q.w = (m[1] - m[4])/(4.*q.z);
-			q.x = (m[2] + m[8])/(4.*q.z);
-			q.y = (m[6] + m[9])/(4.*q.z);
+			z = sqrt(1. + m[10]-m[0]-m[5])*0.5;
+			w = (m[4] - m[1])/(4.*z);
+			x = (m[8] + m[2])/(4.*z);
+			y = (m[9] + m[6])/(4.*z);
 		}
 	}
-	return q;
+	return *this;
 }
 
 template<typename T>
-inline Quat<T> Quat<T> :: fromMatrixGL(T *m) {
-	Quat q;
+inline Quat<T>& Quat<T> :: fromMatrixTransposed(const T * m) {
 	T trace = m[0]+m[5]+m[10];
-	q.w = sqrt(1. + trace)*0.5;
+	w = sqrt(1. + trace)*0.5;
 
 	if(trace > 0.) {
-		q.x = (m[9] - m[6])/(4.*q.w);
-		q.y = (m[2] - m[8])/(4.*q.w);
-		q.z = (m[4] - m[1])/(4.*q.w);
+		x = (m[6] - m[9])/(4.*w);
+		y = (m[8] - m[2])/(4.*w);
+		z = (m[1] - m[4])/(4.*w);
 	}
 	else {
 		if(m[0] > m[5] && m[0] > m[10]) {
 			// m[0] is greatest
-			q.x = sqrt(1. + m[0]-m[5]-m[10])*0.5;
-			q.w = (m[9] - m[6])/(4.*q.x);
-			q.y = (m[4] + m[1])/(4.*q.x);
-			q.z = (m[8] + m[2])/(4.*q.x);
+			x = sqrt(1. + m[0]-m[5]-m[10])*0.5;
+			w = (m[6] - m[9])/(4.*x);
+			y = (m[1] + m[4])/(4.*x);
+			z = (m[2] + m[8])/(4.*x);
 		}
 		else if(m[5] > m[0] && m[5] > m[10]) {
 			// m[1] is greatest
-			q.y = sqrt(1. + m[5]-m[0]-m[10])*0.5;
-			q.w = (m[2] - m[8])/(4.*q.y);
-			q.x = (m[4] + m[1])/(4.*q.y);
-			q.z = (m[9] + m[6])/(4.*q.y);
+			y = sqrt(1. + m[5]-m[0]-m[10])*0.5;
+			w = (m[8] - m[2])/(4.*y);
+			x = (m[1] + m[4])/(4.*y);
+			z = (m[6] + m[9])/(4.*y);
 		}
 		else { //if(m[10] > m[0] && m[10] > m[5]) {
 			// m[2] is greatest
-			q.z = sqrt(1. + m[10]-m[0]-m[5])*0.5;
-			q.w = (m[4] - m[1])/(4.*q.z);
-			q.x = (m[8] + m[2])/(4.*q.z);
-			q.y = (m[9] + m[6])/(4.*q.z);
+			z = sqrt(1. + m[10]-m[0]-m[5])*0.5;
+			w = (m[1] - m[4])/(4.*z);
+			x = (m[2] + m[8])/(4.*z);
+			y = (m[6] + m[9])/(4.*z);
 		}
 	}
-	return q;
+	return *this;
+}
+
+
+template<typename T>
+inline void Quat<T> :: toAxisAngle(T& aa, T& ax, T& ay, T& az) const {
+	T unit = w*w;
+	if(unit > QUAT_ACCURACY_MAX || unit < QUAT_ACCURACY_MIN){
+		T invSinAngle = 1.f/sqrt(1.f - unit);
+		aa = acosf(w) * halfRadToDeg();
+		ax = x * invSinAngle;
+		ay = y * invSinAngle;
+		az = z * invSinAngle;
+	} else {
+		aa = 0.f;
+		ax = x;
+		ay = y;
+		az = z;
+	}
 }
 
 template<typename T>
-inline void Quat<T> :: toMatrixTransposed(T * m) const {
+inline void Quat<T> :: toEuler(T& az, T& el, T& ba) const {
+	// http://www.mathworks.com/access/helpdesk/help/toolbox/aeroblks/quaternionstoeulerangles.html
+	T sqw = w*w;
+	T sqx = x*x;
+	T sqy = y*y;
+	T sqz = z*z;
+	az = M_RAD2DEG * asin (-2.0 * (x*z - w*y));
+	el = M_RAD2DEG * atan2( 2.0 * (y*z + w*x), (sqw - sqx - sqy + sqz));
+	ba = M_RAD2DEG * atan2( 2.0 * (x*y + w*z), (sqw + sqx - sqy - sqz));
+}
 
+template<typename T>
+inline void Quat<T>::toCoordinateFrame(Vec<3,T>& ux, Vec<3,T>& uy, Vec<3,T>& uz) const {
 	static const T _2 = T(2);
 	static const T _1 = T(1);
 	T	_2w=_2*w, _2x=_2*x, _2y=_2*y;
 	T	wx=_2w*x, wy=_2w*y, wz=_2w*z, xx=_2x*x, xy=_2x*y,
 		xz=_2x*z, yy=_2y*y, yz=_2y*z, zz=_2*z*z;
 
-	m[ 0] =-zz - yy + _1;
-	m[ 1] = xy - wz;
-	m[ 2] = wy + xz;
-	m[ 3] = 0;
+	ux[0] =-zz - yy + _1;
+	ux[1] = wz + xy;
+	ux[2] = xz - wy;
 
-	m[ 4] = wz + xy;
-	m[ 5] =-zz - xx + _1;
-	m[ 6] = yz - wx;
-	m[ 7] = 0;
+	uy[0] = xy - wz;
+	uy[1] =-zz - xx + _1;
+	uy[2] = wx + yz;
 
-	m[ 8] = xz - wy;
-	m[ 9] = wx + yz;
-	m[10] =-yy - xx + _1;
-	m[11] = 0;
-
-	m[12]=m[13]=m[14]=0;
-	m[15]=_1;
+	uz[0] = wy + xz;
+	uz[1] = yz - wx;
+	uz[2] =-yy - xx + _1;
 }
-
-// TODO: these are the same as the matrix conversions except with the sign on w flipped
-//template<typename T>
-//inline void Quat<T> :: toVectorX(T * vx, T * vy, T * vz) const {
-//	*vx = 1.0 - 2.0*y*y - 2.0*z*z;
-//	*vy = 2.0*x*y + 2.0*z*w;
-//	*vz = 2.0*x*z - 2.0*y*w;
-//}
-//
-//template<typename T>
-//inline void Quat<T> :: toVectorY(T * vx, T * vy, T * vz) const {
-//	*vx = 2.0*x*y - 2.0*z*w;
-//	*vy = 1.0 - 2.0*x*x - 2.0*z*z;
-//	*vz = 2.0*y*z + 2.0*x*w;
-//}
-//
-//template<typename T>
-//inline void Quat<T> :: toVectorZ(T * vx, T * vy, T * vz) const {
-//	*vx = 2.0*x*z + 2.0*y*w;
-//	*vy = 2.0*y*z - 2.0*x*w;
-//	*vz = 1.0 - 2.0*x*x - 2.0*y*y;
-//}
 
 template<typename T>
 inline void Quat<T> :: toMatrix(T * m) const {
+	Vec<3,T> ux,uy,uz;
+	toCoordinateFrame(ux,uy,uz);
 
-	static const T _2 = T(2);
-	static const T _1 = T(1);
-	T	_2w=_2*w, _2x=_2*x, _2y=_2*y;
-	T	wx=_2w*x, wy=_2w*y, wz=_2w*z, xx=_2x*x, xy=_2x*y,
-		xz=_2x*z, yy=_2y*y, yz=_2y*z, zz=_2*z*z;
+	m[ 0] = ux[0];	m[ 4] = uy[0];	m[ 8] = uz[0];	m[12] = 0;
+	m[ 1] = ux[1];	m[ 5] = uy[1];	m[ 9] = uz[1];	m[13] = 0;
+	m[ 2] = ux[2];	m[ 6] = uy[2];	m[10] = uz[2];	m[14] = 0;
+	m[ 3] = 0;		m[ 7] = 0;		m[11] = 0;		m[15] = 1;
+}
 
-	m[ 0] =-zz - yy + _1;
-	m[ 4] = xy - wz;
-	m[ 8] = wy + xz;
-	m[ 12] = 0;
+// Note: same as toMatrix, but with matrix indices transposed
+template<typename T>
+inline void Quat<T> :: toMatrixTransposed(T * m) const {
+	Vec<3,T> ux,uy,uz;
+	toCoordinateFrame(ux,uy,uz);
 
-	m[ 1] = wz + xy;
-	m[ 5] =-zz - xx + _1;
-	m[ 9] = yz - wx;
-	m[ 13] = 0;
-
-	m[ 2] = xz - wy;
-	m[ 6] = wx + yz;
-	m[10] =-yy - xx + _1;
-	m[14] = 0;
-
-	m[ 3]=m[ 7]=m[ 11]=0;
-	m[15]=_1;
+	m[ 0] = ux[0];	m[ 1] = uy[0];	m[ 2] = uz[0];	m[ 3] = 0;
+	m[ 4] = ux[1];	m[ 5] = uy[1];	m[ 6] = uz[1];	m[ 7] = 0;
+	m[ 8] = ux[2];	m[ 9] = uy[2];	m[10] = uz[2];	m[11] = 0;
+	m[12] = 0;		m[13] = 0;		m[14] = 0;		m[15] = 1;
 }
 
 template<typename T>
-inline void Quat<T> :: toAxisAngle(T * aa, T * ax, T * ay, T * az) const {
-  T unit = w*w;
-  if (unit > QUAT_ACCURACY_MAX || unit < QUAT_ACCURACY_MIN) {
-	T invSinAngle = 1.f/sqrt(1.f - unit);
-	*aa = acosf(w) * 114.59155902616; // * 2 * 180 / pi
-	*ax = x * invSinAngle;
-	*ay = y * invSinAngle;
-	*az = z * invSinAngle;
-  } else {
-	*aa = 0.f;
-	*ax = x;
-	*ay = y;
-	*az = z;
-  }
-}
-
-
-template<typename T>
-inline void Quat<T> :: toEuler(T * e) const {
-	// http://www.mathworks.com/access/helpdesk/help/toolbox/aeroblks/quaternionstoeulerangles.html
-	T sqw = w*w;
-	T sqx = x*x;
-	T sqy = y*y;
-	T sqz = z*z;
-	e[0] = M_RAD2DEG * asin(-2.0 * (x*z - w*y));
-	e[1] = M_RAD2DEG * atan2(2.0 * (y*z + w*x),(sqw - sqx - sqy + sqz));
-	e[2] = M_RAD2DEG * atan2(2.0 * (x*y + w*z), (sqw + sqx - sqy - sqz));
+inline void Quat<T> :: toVectorX(T& ax, T& ay, T& az) const {
+	ax = 1.0 - 2.0*y*y - 2.0*z*z;
+	ay = 2.0*x*y + 2.0*z*w;
+	az = 2.0*x*z - 2.0*y*w;
 }
 
 template<typename T>
-inline void Quat<T> :: toEuler(Vec<3,T> & v) const {
-	// http://www.mathworks.com/access/helpdesk/help/toolbox/aeroblks/quaternionstoeulerangles.html
-	T sqw = w*w;
-	T sqx = x*x;
-	T sqy = y*y;
-	T sqz = z*z;
-	v[0] = M_RAD2DEG * asin(-2.0 * (x*z - w*y));
-	v[1] = M_RAD2DEG * atan2(2.0 * (y*z + w*x),(sqw - sqx - sqy + sqz));
-	v[2] = M_RAD2DEG * atan2(2.0 * (x*y + w*z), (sqw + sqx - sqy - sqz));
+inline void Quat<T> :: toVectorY(T& ax, T& ay, T& az) const {
+	ax = 2.0*x*y - 2.0*z*w;
+	ay = 1.0 - 2.0*x*x - 2.0*z*z;
+	az = 2.0*y*z + 2.0*x*w;
 }
 
 template<typename T>
-inline void Quat<T> :: toVectorX(T * vx, T * vy, T * vz) const {
-	*vx = 1.0 - 2.0*y*y - 2.0*z*z;
-	*vy = 2.0*x*y + 2.0*z*w;
-	*vz = 2.0*x*z - 2.0*y*w;
+inline void Quat<T> :: toVectorZ(T& ax, T& ay, T& az) const {
+	ax = 2.0*x*z + 2.0*y*w;
+	ay = 2.0*y*z - 2.0*x*w;
+	az = 1.0 - 2.0*x*x - 2.0*y*y;
 }
 
 template<typename T>
-inline void Quat<T> :: toVectorY(T * vx, T * vy, T * vz) const {
-	*vx = 2.0*x*y - 2.0*z*w;
-	*vy = 1.0 - 2.0*x*x - 2.0*z*z;
-	*vz = 2.0*y*z + 2.0*x*w;
-}
-
-template<typename T>
-inline void Quat<T> :: toVectorZ(T * vx, T * vy, T * vz) const {
-	*vx = 2.0*x*z + 2.0*y*w;
-	*vy = 2.0*y*z - 2.0*x*w;
-	*vz = 1.0 - 2.0*x*x - 2.0*y*y;
-}
-
-template<typename T>
-inline void Quat<T> :: toVectorX(Vec<3,T>& v) const {
-	toVectorX(&v[0], &v[1], &v[2]);
-}
-
-template<typename T>
-inline void Quat<T> :: toVectorY(Vec<3,T>& v) const {
-	toVectorY(&v[0], &v[1], &v[2]);
-}
-
-template<typename T>
-inline void Quat<T> :: toVectorZ(Vec<3,T>& v) const {
-	toVectorZ(&v[0], &v[1], &v[2]);
-}
-
-template<typename T>
-inline void Quat<T>::rotate(Vec<3,T>& v) const{
-	rotateVector(v,v);
-}
+inline void Quat<T>::rotate(Vec<3,T>& v) const{ rotateVector(v,v); }
 
 template<typename T>
 inline void Quat<T> :: rotateVector(const T * src, T * dst) const {
@@ -810,7 +733,7 @@ Quat<T> Quat<T> :: getRotationTo(const Vec<3, T>& src, const Vec<3, T>& dst) {
 			axis = cross(Vec<3, T>(0, 0, 1), src);
 		}
 		axis.normalize();
-		q.setFromAxisAngle(180., axis);
+		q.fromAxisAngle(180., axis);
 	} else {
 		T s = sqrt((d+1.)*2);
 		T invs = 1./s;

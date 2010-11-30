@@ -118,7 +118,7 @@ public:
 	
 	/// Get linear and angular velocities as a Pose
 	Pose vel() const {
-		return Pose(mMove1, Quatd::fromEuler(mSpin1[1], mSpin1[0], mSpin1[2]));
+		return Pose(mMove1, Quatd().fromEuler(mSpin1[1], mSpin1[0], mSpin1[2]));
 	}
 	
 	double velScale() const { return mVelScale; }
@@ -127,7 +127,7 @@ public:
 	Nav& smooth(double v){ mSmooth=v; return *this; }
 	
 	void view(double azimuth, double elevation, double bank) {
-		view(Quatd::fromEuler(azimuth, elevation, bank));
+		view(Quatd().fromEuler(azimuth, elevation, bank));
 	}
 	void view(const Quatd& v) {
 		quat(v);

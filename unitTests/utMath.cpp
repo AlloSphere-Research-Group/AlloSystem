@@ -1,7 +1,16 @@
 #include <math.h>
 #include "utAllocore.h"
 
-inline bool eq(double x, double y, double eps=0.000001){ return abs(x-y) < eps; }
+template <class T>
+inline bool eq(T x, T y, T eps=0.000001){ return abs(x-y) < eps; }
+
+template <class T>
+inline bool eq(const T* x, const T* y, int n, T eps=0.0000001){
+	for(int i=0; i<n; ++i){
+		if(!eq(x[0], y[0], eps)) return false;
+	}
+	return true; 
+}
 
 int utMath(){
 
@@ -219,6 +228,10 @@ int utMath(){
 
 	// Quat
 	{
+		struct printQuat{
+			void operator()(const Quatd& v){ printf("%g %g %g %g\n", v[0], v[1], v[2], v[3]); }
+		};
+	
 		Quatd q(0,0,0,0);
 
 		assert(q == Quatd(0,0,0,0));
@@ -226,9 +239,58 @@ int utMath(){
 		q.setIdentity();
 		
 		assert(q == Quatd(1,0,0,0));
+		assert(q != Quatd(1,0,0,1));
+		
+		q.set(1,2,4,10);
 		
 		assert(q.conj()	== Quatd(q.w, -q.x, -q.y, -q.z));
-		//assert(q.in
+		assert(q.dot(q) == 121);
+		assert(q.identity() == Quatd(1,0,0,0));
+		assert(q.mag() == 11);
+		assert(q.magSqr() == 121);
+		assert(eq(&q.sgn()[0], &Quatd(1./11, 2./11, 4./11, 10./11)[0], 4));
+		
+		q.fromAxisAngle(90, 1,0,0);
+		assert(eq(&q[0], &Quatd(sqrt(2)/2, sqrt(2)/2,0,0)[0], 4));
+
+		q.fromAxisAngle(90, 0,1,0);
+		assert(eq(&q[0], &Quatd(sqrt(2)/2, 0,sqrt(2)/2,0)[0], 4));
+		
+		assert(q.fromAxisAngle(45, 1,0,0) == Quatd().fromAxisX(45));
+		assert(q.fromAxisAngle(45, 0,1,0) == Quatd().fromAxisY(45));
+		assert(q.fromAxisAngle(45, 0,0,1) == Quatd().fromAxisZ(45));
+
+		{
+			q.fromEuler(10,20,30);		// set to something non-trival...
+			double angle, ax,ay,az;
+			q.toAxisAngle(angle, ax,ay,az);
+			Quatd b = q.fromAxisAngle(angle, ax,ay,az);
+			assert(q == b || q == b.conj());
+		}
+
+		assert(q.fromEuler(45,45,45) == ((Quatd().fromAxisY(45) * Quatd().fromAxisX(45)) * Quatd().fromAxisZ(45)) );
+
+		{
+			q.fromEuler(10,20,30);		// set to something non-trival...
+			double az, el, ba;
+			q.toEuler(az, el, ba);
+			Quatd b = q.fromEuler(az, el, ba);
+			assert(q == b || q == b.conj());
+		}
+
+		{
+			double mat4[16];
+			Quatd b;
+			q.toMatrix(mat4);
+			b = q.fromMatrix(mat4);
+			assert(q == b || q == b.conj());
+
+			q.toMatrixTransposed(mat4);
+			b = q.fromMatrixTransposed(mat4);
+			assert(q == b || q == b.conj());
+		}
+		
+		
 
 //		int smps = 100;
 //		Quatd q1 = Quatd::fromAxisAngle(10, .707, .707, 0);
@@ -366,7 +428,7 @@ int utMath(){
 	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
 	#undef T
 
-	#define T(x) assert(eq(al::pow64(x), x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x, 10));
+	#define T(x) assert(eq(al::pow64(x), x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x*x));
 	T(0.) T(1.) T(1.01) T(1.02) T(-1.) T(-1.01) T(-1.02)
 	#undef T
 

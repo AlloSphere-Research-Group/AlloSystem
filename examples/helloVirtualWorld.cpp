@@ -151,7 +151,7 @@ int main (int argc, char * argv[]){
 		windows[i].add(new StandardWindowKeyControls);
 		windows[i].add(new NavInputControl(&navMaster));
 		windows[i].create(Window::Dim(i*650,0, 600,480), "Hello Virtual World!");
-		windows[i].transform.quat(Quatd::fromAxisAngle(i*180, 0, 1, 0));
+		windows[i].transform.quat().fromAxisAngle(i*180, 0, 1, 0);
 	}
 
 	AudioIO audioIO(AUDIO_BLOCK_SIZE, 44100, audioCB, 0, 2, 1);
