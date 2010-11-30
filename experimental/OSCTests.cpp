@@ -19,7 +19,9 @@ struct PacketData{
 
 int main(){
 
-	al::osc::Packet p;
+	osc::Send(1000).send("/foo", 1, 2.3, "four");
+
+	osc::Packet p;
 	PacketData data;
 	
 	// Create a complicated OSC bundle packet
@@ -42,8 +44,8 @@ int main(){
 //	p.printRaw();
 
 
-	struct MyPacketHandler : public	al::osc::PacketHandler {
-		void onMessage(al::osc::Message& m){ m.print(); }
+	struct MyPacketHandler : public	osc::PacketHandler {
+		void onMessage(osc::Message& m){ m.print(); }
 	} ph;
 	ph.parse(p.data(), p.size());
 
@@ -52,7 +54,7 @@ int main(){
 	p.clear();
 	p.beginMessage("/test");
 		p << "a string" << data.i << data.f << data.d << data.c;
-		p << al::osc::Blob(&data, sizeof(data));
+		p << osc::Blob(&data, sizeof(data));
 	p.endMessage();
 
 	assert(!p.isBundle());
@@ -63,13 +65,13 @@ int main(){
 	
 	// Read data from message
 	{
-		al::osc::Message m(p.data(), p.size(), 1);
+		osc::Message m(p.data(), p.size(), 1);
 
 		printf("%s %s\n", m.addressPattern().c_str(), m.typeTags().c_str());
 
 		const char * s;
 		PacketData d;
-		al::osc::Blob b;
+		osc::Blob b;
 
 		m >> s >> d.i >> d.f >> d.d >> d.c >> b;
 
@@ -78,8 +80,8 @@ int main(){
 	}
 
 	{
-		struct OSCHandler : public al::osc::PacketHandler{
-			void onMessage(al::osc::Message& m){
+		struct OSCHandler : public osc::PacketHandler{
+			void onMessage(osc::Message& m){
 			
 				m.print();
 			
@@ -88,7 +90,7 @@ int main(){
 
 				std::string s;
 				PacketData d;
-				al::osc::Blob b;
+				osc::Blob b;
 
 				d.clear();
 				m >> s >> d.i >> d.f >> d.d >> d.c >> b;
@@ -101,8 +103,8 @@ int main(){
 
 		int numTrials = 40;
 		unsigned port = 4110;
-		al::osc::Send s(port, "127.0.0.1");
-		al::osc::Recv r(port);
+		osc::Send s(port, "127.0.0.1");
+		osc::Recv r(port);
 
 		r.timeout(1);
 		r.handler(handler);
@@ -113,7 +115,7 @@ int main(){
 			s.beginBundle(i);
 			s.beginMessage("/test");
 				s << "a string" << data.i << data.f << data.d << data.c;
-				s << al::osc::Blob(&data, sizeof(data));
+				s << osc::Blob(&data, sizeof(data));
 			s.endMessage();
 			s.endBundle();
 			s.send();

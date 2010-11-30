@@ -29,57 +29,72 @@
 */
 
 /*
-Summary of OSC 1.0 spec from http://opensoundcontrol.org
 
-The unit of transmission of OSC is an OSC Packet.
+Example usage (sending):
 
-An OSC Packet consists of
-	its contents
-	a contiguous block of binary data
-	its size, the number of 8-bit bytes that comprise the contents
+	osc::Send s(1000, "localhost");
+	
+	// A simple way to send a message
+	s.send("/foo", 1, 2.3, "four");
+	
+	// Or, use a temp object
+	osc::Send(1000, "192.168.0.1").send("/foo", 1, 2.3, "four");
 
-The contents of an OSC packet must be either an OSC Message or an OSC Bundle.
-The first byte of the packet's contents unambiguously distinguishes between 
-these two alternatives.
-The size of an OSC packet is always a multiple of 4.
+	// Sending a fairly complex time-tagged bundle
+	osc::TimeTag timeNow = ...;
+	osc::TimeTag dt = ...;
 
-An OSC message consists of
-	1) an OSC Address Pattern
-	2) an OSC Type Tag String
-	3) zero or more OSC Arguments
+	s.beginBundle(timeNow);		
+		s.addMessage("/message11", 12345678, 1.f, 1., "hello world!");
+		s.addMessage("/message12", 23456789);
+		s.beginBundle(timeNow + dt);
+			s.addMessage("/message21", 3456789);
+			s.beginBundle(timeNow + dt*2);
+				s.addMessage("/message31", 456789);
+			s.endBundle();
+		s.endBundle();
+		s.addMessage("/message13", 56789);
+	s.endBundle();
+	
+	s.send();
 
-An OSC Address Pattern is an OSC-string beginning with the character '/'
 
-An OSC Type Tag String is an OSC-string beginning with the character ',' (comma)
-followed by a sequence of characters corresponding exactly to the sequence of 
-OSC Arguments in the given message.
+Example usage (receiving):
 
-i	int32
-f	float32
-s	OSC-string
-b	OSC-blob
+	osc::Recv r(1000);
 
-Anatomy of a bundle:
+	struct OSCHandler : public osc::PacketHandler{
+		void onMessage(osc::Message& m){
+			std::string tags = m.typeTags();
+			std::string addr = m.addressPattern();
+			osc::TimeTag ttag= m.timeTag();
 
-OSC-string "#bundle"			8 bytes				How to know that this data is a bundle
-OSC-timetag						8 bytes	(int64)		Time tag that applies to the entire bundle
-Size of first bundle element	4 bytes (int32)		First bundle element
-1st bundle element's contents	size of 1st bundle
-Size of second bundle element	4 bytes (int32)		Second bundle element
-2nd bundle element's contents	size of 2nd bundle
-etc.												Addtional bundle elements
+			int i;
+			double d;
+			std::string s;
+			if(addr == "/example" && tags == "ids" ){
+				m >> i >> d >> s;
+			}
+		}
+	};
+	
+	OSCHandler myOSCHandler;
+	r.handler(myOSCHandler);
+
+	// Poll socket manually at periodic intervals ...
+	r.timeout(0);	// set to be non-blocking
+	void myThreadFunc(){
+		r.recv();
+	}
+
+	// or, launch an automatic background thread
+	r.timeout(1);	// ensure waiting period is greater than 0
+	r.start(); 
 
 */
 
-
 #include <string>
 #include <vector>
-#include <stdio.h>
-//#include "allocore/protocol/oscpack/ip/UdpSocket.h"
-//#include "allocore/protocol/oscpack/osc/OscOutboundPacketStream.h"
-//#include "allocore/protocol/oscpack/osc/OscPacketListener.h"
-//#include "allocore/protocol/oscpack/osc/OscReceivedElements.h"
-//#include "allocore/protocol/oscpack/osc/OscTypes.h"
 #include "allocore/io/al_Socket.hpp"
 #include "allocore/system/al_Thread.hpp"
 
@@ -246,6 +261,7 @@ public:
 };
 
 
+
 /// Socket for sending OSC packets
 class Send : public SocketSend, public Packet{
 public:
@@ -290,7 +306,11 @@ public:
 };
 
 
+
 /// Socket for receiving OSC packets
+
+/// Supports explicit polling or implicit background thread polling
+///
 class Recv : public SocketRecv{
 public:
 
@@ -331,199 +351,8 @@ protected:
 };
 
 
-}
-}
-
-
-/*
-Example receive code:
-
-	void onRecv(const osc::RecvPacket& p, void * user){
-		printf("sender:    %s %d\n", p.remoteIP().c_str(), p.remotePort());
-		printf("time:      %d\n", p.time);
-		printf("arguments: %d\n", p.argc());
-		printf("message:   %s %s\n", p.addr().c_str(), p.tags().c_str());
-	}
-	
-	OSCRecv r(12000, onRecv);
-	r.start();	// or, call r.recv() periodically in another loop
-
-	
-Example send code:
-
-	OSCSend s("127.0.0.1", 12000);
-
-    s << osc::BeginBundleImmediate
-        << osc::BeginMessage( "/test1" ) 
-            << true << 23 << (float)3.1415 << "hello" << osc::EndMessage
-        << osc::BeginMessage( "/test2" ) 
-            << true << 24 << (float)10.8 << "world" << osc::EndMessage
-        << osc::EndBundle;
-		
-	s.send();
-	s.send("/test1", true, 23, 3.1415f, "hello");
-
-*/
-
-//
-////namespace al{
-//namespace osc{
-//
-//// Simplified names
-//typedef ReceivedBundle		OSCBundle;
-//typedef ReceivedMessage		OSCMsg;
-//typedef IpEndpointName		NetAddr;
-//
-//
-///// Received packet (for callbacks)
-//struct RecvPacket{
-//	RecvPacket(const osc::OSCMsg& m, const osc::NetAddr& r, osc::uint64 t)
-//	:	msg(m), remote(r), time(t){}
-//	
-//	unsigned long argc() const { return msg.ArgumentCount(); }
-//	std::string addr() const { return msg.AddressPattern() ? msg.AddressPattern() : ""; }
-//	std::string tags() const { return msg.TypeTags() ? msg.TypeTags() : ""; }
-//	osc::ReceivedMessageArgumentStream args() const { return msg.ArgumentStream(); }
-//	osc::ReceivedMessage::const_iterator argi() const { return msg.ArgumentsBegin(); }
-//
-//	void print(FILE * f=stdout) const;
-//	void printVerbose(FILE * f=stdout) const;
-//	
-//	std::string remoteIP() const { char b[32]; remote.AddressAsString(b); return b; }
-//	int remotePort() const { return remote.port; }
-//
-//	const osc::OSCMsg& msg;
-//	const osc::NetAddr& remote;
-//	osc::uint64 time;
-//};
-//
-//
-///// Open Sound Control Receiver
-//
-///// Start its own listening thread and calls callback in its own thread.
-/////
-//class OSCRecv : public osc::OscPacketListener {
-//public:
-//	typedef void (* networkRecvCB)(const RecvPacket& p, void * user);
-//
-//	OSCRecv(networkRecvCB cb=0, void * userData=0);
-//	OSCRecv(unsigned int port, networkRecvCB cb, void * userData=0);
-//
-//	~OSCRecv();
-//
-//	networkRecvCB callback;	///< Receive callback
-//	void * user;			///< User data passed into callback
-//	
-//	/// Change port number to receive messages on.
-//	
-//	/// If the receiver has already been started, it will be stopped and
-//	/// restarted using the new port number.
-//	OSCRecv& port(unsigned int p);
-//	
-//	/// Start the OSC receive thread
-//	void start();
-//	
-//	/// Stop the OSC receive thread.
-//	void stop();
-//	
-//	/// Get the receiving port number
-//	unsigned int port() const { return mPort; }
-//	
-//	/// Get whether the receiving thread has been started
-//	bool started() const { return mStarted; }
-//	
-//protected:
-//	al::Thread mThread;
-//	unsigned int mPort;
-//	osc::uint64 mTime;
-//	UdpListeningReceiveSocket * mSocket;
-//	bool mStarted;
-//	
-//	//static THREAD_FUNCTION(threadFunc);
-//	static void * threadFunc(void * user);
-//	virtual void ProcessMessage(const OSCMsg& m, const NetAddr& remote);
-//	virtual void ProcessBundle(const OSCBundle& b, const NetAddr& remote);
-//};
-//
-//
-//
-///// Open Sound Control Sender
-//class OSCSend{
-//public:
-//
-//	OSCSend(int maxPacketSizeBytes=4096);
-//	OSCSend(const char * remoteIP, int port, int maxPacketSizeBytes=4096);
-//	~OSCSend();
-//
-//	/// Add data to current packet
-//	template <class T>
-//	OSCSend& operator << (T data){ (*mStream) << data; return *this; }
-//
-//	/// Add string to current packet
-//	OSCSend& operator << (const std::string& v){ (*mStream) << v.c_str(); return *this; }
-//
-//	/// Add unsigned integer to current packet
-//	OSCSend& operator << (unsigned int v){ (*mStream) << osc::int32(v); return *this; }
-//	
-//	/// Adds a remote endpoint to receive messages
-//	OSCSend& add(const char * remoteIP, int port);
-//	
-//	/// Removes all endpoints
-//	void clearEndpoints() { mEndpoints.clear(); }
-//
-//	/// Removes an existing endpoint
-//	OSCSend& remove(const char * remoteIP, int port);
-//	
-//	/// Get endpoints
-//	std::vector<NetAddr>& endpoints(){ return mEndpoints; }
-//	const std::vector<NetAddr>& endpoints() const { return mEndpoints; }
-//
-//
-//	/// Set maximum outbound packet size
-//	void maxPacketSize(int bytes);
-//	
-//	/// Sends the current outbound packet and then clears it.
-//	void send();
-//
-//	/// Send address pattern along with 1 argument immediately
-//	template <class T1>
-//	void send(const std::string& addressPattern, const T1& arg1);
-//
-//	/// Send address pattern along with 2 arguments immediately
-//	template <class T1, class T2>
-//	void send(const std::string& addressPattern, const T1& arg1, const T2& arg2);
-//	
-//	/// Send address pattern along with 3 arguments immediately
-//	template <class T1, class T2, class T3>
-//	void send(const std::string& addressPattern, const T1& arg1, const T2& arg2, const T3& arg3);
-//
-//private:	
-//	char * mBuffer;
-//	std::vector<NetAddr> mEndpoints;
-//	OutboundPacketStream * mStream;
-//	UdpSocket mSocket;
-//};
-//
-//
-//
-//template <class T1>
-//void OSCSend::send(const std::string& p, const T1& a1){
-//	((*this) << osc::BeginMessage(p.c_str()) << a1 << osc::EndMessage); send();
-//}
-//
-//template <class T1, class T2>
-//void OSCSend::send(const std::string& p, const T1& a1, const T2& a2){
-//	((*this) << osc::BeginMessage(p.c_str()) << a1<<a2 << osc::EndMessage); send();
-//}
-//
-//template <class T1, class T2, class T3>
-//void OSCSend::send(const std::string& p, const T1& a1, const T2& a2, const T3& a3){
-//	((*this) << osc::BeginMessage(p.c_str()) << a1<<a2<<a3 << osc::EndMessage); send();
-//}
-//
-//
-//} // osc::
-////} // al::
+} // osc::
+} // al::
 	
 #endif
 	
