@@ -60,7 +60,6 @@
 		1697336D11768ABD0025299C /* al_Vec.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1697336C11768ABD0025299C /* al_Vec.hpp */; };
 		1697337611768B040025299C /* al_Quat.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1697337411768B040025299C /* al_Quat.hpp */; };
 		1697338711768B6E0025299C /* al_Complex.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1697338611768B6E0025299C /* al_Complex.hpp */; };
-		16AA8EDF11C6F1D20053EFE1 /* al_Quat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA8EDD11C6F1D20053EFE1 /* al_Quat.cpp */; };
 		16AA8EFD11C6FD200053EFE1 /* al_CoordinateFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA8EFB11C6FD200053EFE1 /* al_CoordinateFrame.cpp */; };
 		16AA8F0311C6FE0B0053EFE1 /* al_Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA8F0111C6FE0B0053EFE1 /* al_Camera.cpp */; };
 		16AA95F6118F74FB00B98EC3 /* al_Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95F2118F74FB00B98EC3 /* al_Light.cpp */; };
@@ -455,7 +454,6 @@
 		1697337411768B040025299C /* al_Quat.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Quat.hpp; sourceTree = "<group>"; };
 		1697338611768B6E0025299C /* al_Complex.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Complex.hpp; sourceTree = "<group>"; };
 		1697339A11768CDF0025299C /* utMath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = utMath.cpp; path = ../../unitTests/utMath.cpp; sourceTree = SOURCE_ROOT; };
-		16AA8EDD11C6F1D20053EFE1 /* al_Quat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Quat.cpp; sourceTree = "<group>"; };
 		16AA8EEF11C6F9290053EFE1 /* al_CoordinateFrame.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_CoordinateFrame.hpp; sourceTree = "<group>"; };
 		16AA8EFB11C6FD200053EFE1 /* al_CoordinateFrame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_CoordinateFrame.cpp; sourceTree = "<group>"; };
 		16AA8F0011C6FDE10053EFE1 /* al_Camera.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Camera.hpp; sourceTree = "<group>"; };
@@ -1073,7 +1071,6 @@
 		16AA8ED811C6F1BB0053EFE1 /* math */ = {
 			isa = PBXGroup;
 			children = (
-				16AA8EDD11C6F1D20053EFE1 /* al_Quat.cpp */,
 			);
 			path = math;
 			sourceTree = "<group>";
@@ -2258,7 +2255,6 @@
 				16AA95F6118F74FB00B98EC3 /* al_Light.cpp in Sources */,
 				16AA960A118F774800B98EC3 /* al_Texture.cpp in Sources */,
 				160DAE1411C1B1FE00C6905A /* al_SocketAPR.cpp in Sources */,
-				16AA8EDF11C6F1D20053EFE1 /* al_Quat.cpp in Sources */,
 				16AA8EFD11C6FD200053EFE1 /* al_CoordinateFrame.cpp in Sources */,
 				16AA8F0311C6FE0B0053EFE1 /* al_Camera.cpp in Sources */,
 				365599FC11D4013600BA01E8 /* al_MsgQueue.cpp in Sources */,
