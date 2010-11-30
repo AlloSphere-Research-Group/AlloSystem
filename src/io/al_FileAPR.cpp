@@ -91,6 +91,11 @@ File::File(const std::string& path, const std::string& mode, bool open_)
 	mPath(path), mMode(mode), mContent(0), mSizeBytes(0), mFP(0)
 {	if(open_) open(); }
 
+File::File(const FilePath& path, const std::string& mode, bool open_)
+:	mImpl(new Impl()), 
+	mPath(path.filepath()), mMode(mode), mContent(0), mSizeBytes(0), mFP(0)
+{	if(open_) open(); }
+
 File::~File(){ close(); freeContent(); delete mImpl; }
 
 void File::allocContent(int n){
@@ -125,7 +130,7 @@ bool File::open(){
 
 void File::close(){ if(opened()){ fclose(mFP); } mFP=0; }
 
-char * File::readAll(){
+const char * File::readAll(){
 	if(opened() && mMode[0]=='r'){
 		int n = size();
 		allocContent(n);
