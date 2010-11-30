@@ -5,10 +5,17 @@
 #include "assimp/aiPostProcess.h"
 #include "assimp/aiScene.h"
 
+#include "allocore/graphics/al_Shader.hpp"
+
+
+
 using namespace al;
 
 Graphics gl(new GraphicsBackendOpenGL);
 SearchPaths searchpaths;
+
+Shader vert, frag;
+ShaderProgram shaderprogram;
 
 
 // the global Assimp scene object
@@ -21,7 +28,7 @@ struct aiVector3D scene_min, scene_max, scene_center;
 static float a = 0.f;
 
 // ----------------------------------------------------------------------------
-void get_bounding_box_for_node (const struct aiNode* nd, 
+void get_bounding_box_for_node(const struct aiNode* nd, 
 		struct aiVector3D* min, struct aiVector3D* max, struct aiMatrix4x4* trafo){
 	struct aiMatrix4x4 prev;
 	unsigned int n = 0, t;
@@ -46,7 +53,7 @@ void get_bounding_box_for_node (const struct aiNode* nd,
 	*trafo = prev;
 }
 
-void get_bounding_box (struct aiVector3D* min, struct aiVector3D* max)
+void get_bounding_box(struct aiVector3D* min, struct aiVector3D* max)
 {
 	struct aiMatrix4x4 trafo;
 	aiIdentityMatrix4(&trafo);
@@ -221,12 +228,50 @@ void recursive_render (const struct aiScene *sc, const struct aiNode* nd)
 	glPopMatrix();
 }
 
+int initialized = 0;
+
 struct MyWindow : Window{
 
 	bool onFrame(){
+	
+		if (!initialized) {
+			frag.create();
+			vert.create();
+			shaderprogram.create();
+		
+			frag.compile();	
+			vert.compile();
+			
+			shaderprogram.attach(vert);
+			shaderprogram.attach(frag);
+			shaderprogram.link();
+			
+			initialized = 1;
+			
+			printf("compiled shaders\n");
+		}
+	
 		gl.clearColor(0.1, 0.1, 0.1, 1);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.viewport(0,0, width(), height());
+		
+		gl.matrixMode(gl.PROJECTION);
+		gl.loadMatrix(Matrix4d::perspective(45, aspect(), 0.1, 100));
+		
+		gl.matrixMode(gl.MODELVIEW);
+		gl.loadMatrix(Matrix4d::lookAt(Vec3d(0,0,-4), Vec3d(0,0,0), Vec3d(0,1,0)));
+
+
+//		gl.begin(gl.QUADS);
+//			gl.color(1,0,0);
+//			gl.vertex(-1,-1);
+//			gl.color(0,1,0);
+//			gl.vertex( 1,-1);
+//			gl.color(0,0,1);
+//			gl.vertex( 1, 1);
+//			gl.color(1,1,1);
+//			gl.vertex(-1, 1);		
+//		gl.end();	
 		
 		glEnable(GL_LIGHTING);
 		glEnable(GL_LIGHT0);    // Uses default lighting parameters
@@ -234,6 +279,9 @@ struct MyWindow : Window{
 		glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 		glEnable(GL_NORMALIZE);
 		glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
+		
+		const GLfloat pos[]={ 0.f, 1.f, 0.f, 0.f };
+		glLightfv(GL_LIGHT0, GL_POSITION, pos);
 		
 		glPushMatrix();
 		
@@ -263,7 +311,11 @@ struct MyWindow : Window{
 			recursive_render(scene, scene->mRootNode);
 			glEndList();
 		}
+		
+		shaderprogram.begin();
 		glCallList(scene_list);
+		shaderprogram.end();
+		
 		glPopMatrix();
 		
 		return true;
@@ -272,7 +324,7 @@ struct MyWindow : Window{
 
 int main (int argc, char * const argv[]) {
 	searchpaths.addAppPaths(argc, argv);
-	searchpaths.addSearchPath(searchpaths.appPath() + "../../resources/models");
+	searchpaths.addSearchPath(searchpaths.appPath() + "../../resources");
 	
 	
 	// get a handle to the predefined STDOUT log stream and attach
@@ -288,6 +340,14 @@ int main (int argc, char * const argv[]) {
 		printf("error reading %s\n", path.filepath().c_str());
 		return -1;
 	}
+	File frag_file(searchpaths.find("shaderTestF.glsl"), "r", true);
+	File vert_file(searchpaths.find("shaderTestV.glsl"), "r", true);
+	
+	printf("frag_file %s %s\n", frag_file.path().c_str(), frag_file.readAll());
+	printf("vert_file %s %s\n", vert_file.path().c_str(), vert_file.readAll());
+	
+	frag.source(frag_file.readAll(), Shader::FRAGMENT);	
+	vert.source(vert_file.readAll(), Shader::VERTEX);
 	
 	MyWindow win1;
 	win1.add(new StandardWindowKeyControls);
