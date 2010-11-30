@@ -280,7 +280,7 @@ public:
 
 
 
-/// N x N square matrix
+/// N-by-N square matrix
 
 /// Elements are stored in column-major format.
 ///
@@ -379,7 +379,7 @@ public:
 		IT(numElements){ (*this)[i*matStride+matOffset]=arr[i]; } return *this;
 	}
 
-	/// Set 3x3 matrix from arguments	
+	/// Set 3-by-3 matrix from arguments	
 	Mat& set(
 		const T& r1c1, const T& r1c2, const T& r1c3,
 		const T& r2c1, const T& r2c2, const T& r2c3,
@@ -391,7 +391,7 @@ public:
 		return *this;
 	}
 	
-	/// Set 4x4 matrix from arguments
+	/// Set 4-by-4 matrix from arguments
 	Mat& set(
 		const T& r1c1, const T& r1c2, const T& r1c3, const T& r1c4,
 		const T& r2c1, const T& r2c2, const T& r2c3, const T& r2c4,
