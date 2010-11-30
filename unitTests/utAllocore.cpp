@@ -7,7 +7,7 @@ int main(){
 	utTypesConversion();
 //	utSpatial();
 //	utSystem();
-//	utProtocolOSC();
+	utProtocolOSC();
 	utProtocolSerialize();
 
 //	utIOAudioIO();

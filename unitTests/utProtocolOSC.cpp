@@ -1,5 +1,22 @@
 #include "utAllocore.h"
 
+struct PacketData{
+	PacketData(): i(0x12345678), f(1), d(1), c(1){}
+	int i;
+	float f;
+	double d;
+	char c;
+	
+	void clear(){ i=0; f=0; d=0; c=0; }
+	bool valid() const { return 0x12345678==i && 1==f && 1==d && 1==c; }
+	void print() const { printf("%x %g %g %d\n", i, f, d, c); }
+};
+
+int utProtocolOSC(){
+
+	return 0;
+}
+
 /*
 // Data structure containing the possible OSC data types
 struct Data{
