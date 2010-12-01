@@ -255,8 +255,13 @@ public:
 						//printf("%g\n", s);
 						//printf("%g\n", idx);
 
-						relpos.normalize();
-						mEncoder.direction(relpos[0], relpos[1], relpos[2]);
+						//Vec3d dir = relpos;
+						Vec3d dir;
+						Quatd qdir(l.quat());
+						qdir.towardPoint(l.vec(), src.quat(), src.vec(), 1);
+						qdir.toVectorZ(dir);
+
+						mEncoder.direction(dir[0], dir[1], dir[2]);
 						mEncoder.encode(l.ambiChans(), numFrames, i, s);
 					}
 

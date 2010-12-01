@@ -18,7 +18,7 @@ using namespace al;
 struct Agent : public SoundSource, public Drawable{
 
 	Agent()
-	: oscPhase(0)
+	: oscPhase(0), oscEnv(1)
 	{}
 
 	virtual ~Agent(){}
@@ -28,6 +28,11 @@ struct Agent : public SoundSource, public Drawable{
 			//float s = io.in(0);
 			//float s = rnd::uniform(); // make noise, just to hear something
 			float s = sin(oscPhase * M_2PI);
+			
+			s *= (oscEnv*=0.9995);
+			
+			if(oscEnv < 0.001){ oscEnv=1; oscPhase=0; }
+			
 			//float s = phase * 2 - 1;
 			oscPhase += 440./io.framesPerSecond();
 			if(oscPhase >= 1) oscPhase -= 1;
@@ -65,7 +70,7 @@ struct Agent : public SoundSource, public Drawable{
 		g.popMatrix();
 	}
 	
-	double oscPhase;
+	double oscPhase, oscEnv;
 };
 
 
