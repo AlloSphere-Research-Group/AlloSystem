@@ -210,14 +210,14 @@ public:
 	static Quat slerp(const Quat& input, const Quat& target, T amt);
 
 	/// Get the quaternion from a given point and quaterion toward another point
-	void towardPoint(Vec<3,T> &pos, Quat<T> &q, Vec<3,T> &v, float amt);
+	void towardPoint(const Vec<3,T>& pos, const Quat<T>& q, const Vec<3,T>& v, float amt);
 
 
 	/// Get rotor from two unit vectors
 	
 	/// Alternatively expressed as Q = (1+gp(v1, v2))/sqrt(2*(1+dot(b, a))).
 	///
-	static Quat<T> rotor(Vec<3,T> &v1, Vec<3,T> &v2);
+	static Quat<T> rotor(const Vec<3,T>& v1, const Vec<3,T>& v2);
 	
 	
 	///! calculate the rotation required to move from unit vector src to unit vector dst
@@ -750,7 +750,7 @@ Quat<T> Quat<T> :: getRotationTo(const Vec<3, T>& src, const Vec<3, T>& dst) {
 	Get the quaternion from a given point and quaterion toward another point
 */
 template<typename T>
-void Quat<T> :: towardPoint(Vec<3,T> &pos, Quat<T> &q, Vec<3,T> &v, float amt) {
+void Quat<T> :: towardPoint(const Vec<3,T>& pos, const Quat<T>& q, const Vec<3,T>& v, float amt) {
 	Vec<3,T> diff, axis;
 	diff = v-pos;
 	diff.normalize();
@@ -796,7 +796,7 @@ void Quat<T> :: towardPoint(Vec<3,T> &pos, Quat<T> &q, Vec<3,T> &v, float amt) {
 // v1 and v2 must be normalized
 // alternatively expressed as Q = (1+gp(v1, v2))/sqrt(2*(1+dot(b, a)))
 template<typename T>
-Quat<T> Quat<T> :: rotor(Vec<3,T> &v1, Vec<3,T> &v2) {
+Quat<T> Quat<T> :: rotor(const Vec<3,T>& v1, const Vec<3,T>& v2) {
 	// get the normal to the plane (i.e. the unit bivector containing the v1 and v2)
 	Vec<3,T> n;
 	cross(n, v1, v2);
