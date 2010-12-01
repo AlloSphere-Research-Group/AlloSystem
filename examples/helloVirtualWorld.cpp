@@ -19,7 +19,9 @@ struct Agent : public SoundSource, public Drawable{
 
 	Agent()
 	: oscPhase(0), oscEnv(1)
-	{}
+	{
+		pos(-4, 0, -4);
+	}
 
 	virtual ~Agent(){}
 
@@ -46,25 +48,62 @@ struct Agent : public SoundSource, public Drawable{
 		//pos(cos(phase), sin(phase), 0);
 		//pos(0,0,0);
 		
-		spin(0.3, 0.011, 0.417);
-		//moveF(0.01);
+		spin(0.3, 0, 0);
+		moveF(0.04);
 		step();
 	}
 	
 	virtual void onDraw(Graphics& g){
+	
+		g.pushMatrix();
+		g.scale(10);
+		g.begin(g.LINES);
+			g.color(1, 1, 1);
+			for (int x=-1; x<=1; x+=2) {
+			for (int y=-1; y<=1; y+=2) {
+			for (int z=-1; z<=1; z+=2) {
+				g.vertex(x,y,z);
+			}}} 
+			for (int z=-1; z<=1; z+=2) {
+			for (int x=-1; x<=1; x+=2) {
+			for (int y=-1; y<=1; y+=2) {
+				g.vertex(x,y,z);
+			}}}
+			for (int z=-1; z<=1; z+=2) {
+			for (int y=-1; y<=1; y+=2) {
+			for (int x=-1; x<=1; x+=2) {
+				g.vertex(x,y,z);
+			}}}
+		g.end();
+		g.popMatrix();
 
 		g.pushMatrix();
 		g.multMatrix(matrix());
 	
 		g.begin(g.TRIANGLES);
 			float ds = 0.5;
+			
+			g.color(1,1,1);
 			g.vertex(    0, 0, ds*2);
+			g.color(1,1,0);
 			g.vertex( ds/2, 0,-ds);
+			g.color(1,0,1);
 			g.vertex(-ds/2, 0,-ds);
 			
 			g.color(1,1,1);
-			g.color(1,1,0);
+			g.vertex(    0, 0, ds*2);
+			g.color(0,1,1);
+			g.vertex( 0, ds/2,-ds);
 			g.color(1,0,1);
+			g.vertex(-ds/2, 0,-ds);
+			
+			g.color(1,1,1);
+			g.vertex(    0, 0, ds*2);
+			g.color(1,1,0);
+			g.vertex( ds/2, 0,-ds);
+			g.color(0,1,1);
+			g.vertex( 0, ds/2, -ds);
+			
 		g.end();
 		
 		g.popMatrix();
@@ -93,6 +132,7 @@ void audioCB(AudioIOData& io){
 
 	navMaster.step(0.5);
 	listener->pos(navMaster.pos());
+	listener->quat(navMaster.quat());
 
 	scene.encode(numFrames, io.framesPerSecond());
 	scene.render(&io.out(0,0), numFrames);
@@ -150,13 +190,26 @@ int main (int argc, char * argv[]){
 	
 	for(unsigned i=0; i<agents.size(); ++i) scene.addSource(agents[i]);
 
-	MyWindow windows[2];
+	MyWindow windows[6];
+	
+	windows[5].create(Window::Dim(200, 500, 200,200), "Bottom");
+	windows[0].create(Window::Dim(  0, 300, 200,200), "Left");
+	windows[1].create(Window::Dim(200, 300, 200,200), "Center");
+	windows[2].create(Window::Dim(400, 300, 200,200), "Right");
+	windows[3].create(Window::Dim(600, 300, 200,200), "Back");
+	windows[4].create(Window::Dim(200, 100, 200,200), "Top");
 
-	for(int i=0; i<2; ++i){
+	for(int i=0; i<4; ++i){
 		windows[i].add(new StandardWindowKeyControls);
 		windows[i].add(new NavInputControl(&navMaster));
-		windows[i].create(Window::Dim(i*650,0, 600,480), "Hello Virtual World!");
-		windows[i].transform.quat().fromAxisAngle(i*180, 0, 1, 0);
+		windows[i].transform.quat().fromAxisAngle(-90 + i*90, 0, 1, 0);
+		windows[i].cam.fovy(90);
+	}
+	for(int i=4; i<6; ++i){
+		windows[i].add(new StandardWindowKeyControls);
+		windows[i].add(new NavInputControl(&navMaster));
+		windows[i].transform.quat().fromAxisAngle(-90 + i*180, 1, 0, 0);
+		windows[i].cam.fovy(90);
 	}
 
 	AudioIO audioIO(AUDIO_BLOCK_SIZE, 44100, audioCB, 0, 2, 1);

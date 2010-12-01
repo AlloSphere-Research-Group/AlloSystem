@@ -254,14 +254,24 @@ public:
 						float s = src.readSample(idx) * gain;
 						//printf("%g\n", s);
 						//printf("%g\n", idx);
+						
+						// compute azimuth & elevation of relative position in
+						//  current listener's coordinate frame:
+						Vec3d urel(relpos);
+						urel.normalize();	// unit vector in axis listener->source
+						// project into listener's coordinate frame:
+						Vec3d axis;			
+						l.mQuatHistory[i].toVectorX(axis);
+						double rr = urel.dot(axis);	
+						l.mQuatHistory[i].toVectorY(axis);
+						double ru = urel.dot(axis);
+						l.mQuatHistory[i].toVectorZ(axis);
+						double rf = urel.dot(axis);
+						// derive polar coordinates:
+						double azimuth = atan2(rr, rf);
+						double elevation = asin(ru);
 
-						//Vec3d dir = relpos;
-						Vec3d dir;
-						Quatd qdir(l.quat());
-						qdir.towardPoint(l.vec(), src.quat(), src.vec(), 1);
-						qdir.toVectorZ(dir);
-
-						mEncoder.direction(dir[0], dir[1], dir[2]);
+						mEncoder.direction(azimuth, elevation);
 						mEncoder.encode(l.ambiChans(), numFrames, i, s);
 					}
 
