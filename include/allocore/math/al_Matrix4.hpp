@@ -284,8 +284,8 @@ public:
 	}
 };
 
-typedef Matrix4<double>	Matrix4d;	///< Double-precision quaternion
-typedef Matrix4<float>	Matrix4f;	///< Single-precision quaternion
+typedef Matrix4<double>	Matrix4d;	///< Double-precision 4-by-4 matrix
+typedef Matrix4<float>	Matrix4f;	///< Single-precision 4-by-4 matrix
 
 } // al::
 
