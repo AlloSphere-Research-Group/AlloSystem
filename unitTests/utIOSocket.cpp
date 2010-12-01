@@ -1,13 +1,6 @@
 #include "utAllocore.h"
 
-#include "apr-1/apr_general.h"
-#include "apr-1/apr_file_io.h"
-#include "apr-1/apr_strings.h"
-#include "apr-1/apr_network_io.h"
-#include "apr-1/apr_poll.h"
-
 int utIOSocket(){
-
 
 	int numTrials = 20000;
 	unsigned port = 4110;
@@ -20,7 +13,6 @@ int utIOSocket(){
 	SocketRecv r(port, NULL, 0.1);
 
 
-	
 	assert(s.port() == port);
 
 	// Make receiver block forever until a packet is received. 
@@ -66,7 +58,7 @@ int utIOSocket(){
 
 	// make sure timeout works:
 	for(int i=0; i<20; ++i){
-		int nr = r.recv(dataRecv, sizeof dataRecv);
+		r.recv(dataRecv, sizeof dataRecv);
 	}
 
 	// Empirical tests

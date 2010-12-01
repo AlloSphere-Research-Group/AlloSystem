@@ -203,7 +203,7 @@ static void * recvThreadFunc(void * user){
 	while(r->background()){
 		r->recv();
 	}
-	printf("thread done\n");
+//	printf("thread done\n");
 	return NULL;
 }
 
