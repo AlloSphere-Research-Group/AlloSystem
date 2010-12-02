@@ -1,0 +1,63 @@
+#=========================================================================
+# Common rules
+#=========================================================================
+
+CPPFLAGS	+= $(EXT_CPPFLAGS)
+LDFLAGS		+= $(EXT_LDFLAGS)
+
+CFLAGS		:= $(CPPFLAGS) $(CFLAGS)
+CXXFLAGS	:= $(CFLAGS) $(CXXFLAGS)
+
+#--------------------------------------------------------------------------
+# Rules
+#--------------------------------------------------------------------------
+.PHONY: clean cleanall
+
+# Build object file from C++ source
+$(OBJ_DIR)%.o: %.cpp
+	@echo CXX $< $@
+	@$(CXX) -c $(CXXFLAGS) $< -o $@
+
+# Build object file from C source
+$(OBJ_DIR)%.o: %.c
+	@echo CC $< $@
+	@$(CC) -c $(CFLAGS) $< -o $@
+
+all: $(SLIB_PATH)
+
+# Build static library
+$(SLIB_PATH): createFolders $(addprefix $(OBJ_DIR), $(OBJS))
+	@echo AR $@
+	@$(RM) $@
+	@$(AR) $@ $(filter %.o, $^)
+#	@$(RANLIB) $@
+#	@libtool -static $(LDFLAGS) $(filter %.o, $^) -o $@
+#	@libtool -static $@ $(patsubst %, $(DEV_DIR)lib/lib%.a, $(STATIC_LIBS)) -o $@
+
+
+# Dummy target to force rebuilds
+FORCE:
+
+
+# Remove active build configuration binary files
+clean: createFolders
+	@$(RM) -r $(BIN_DIR)*
+
+
+# Remove all build configuration binary files
+cleanall:
+	@$(RM) -r $(BUILD_DIR)*
+
+
+createFolders:
+	@mkdir -p $(OBJ_DIR)
+	@mkdir -p $(BIN_DIR)include
+	@mkdir -p $(BIN_DIR)lib
+
+
+# Create file with settings for linking to external libraries
+external:
+	@echo '\
+CPPFLAGS += $(EXT_CPPFLAGS) \r\n\
+LDFLAGS  += $(EXT_LDFLAGS) \
+'> Makefile.external

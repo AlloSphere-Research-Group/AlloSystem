@@ -4,7 +4,10 @@
 
 include Makefile.config
 
-# Include configuration files of modules
+# These are the folder names of the extra modules located within modules/
+EXTRA_MODULES := allogamma alloglv alloutil
+
+# Include configuration files of AlloCore modules
 # TODO: Permit selective inclusive of modules for building a library
 # and doing unit tests.
 
@@ -33,56 +36,36 @@ SYS_SRC		:= $(addprefix $(SRC_DIR)$(SYS_DIR), $(SYS_SRC))
 SRCS		= $(GFX_SRC) $(IO_SRC) $(PRO_SRC) $(MATH_SRC) $(SND_SRC) $(SPA_SRC) $(SYS_SRC) $(TYP_SRC)
 OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
-CPPFLAGS	+= $(EXT_CPPFLAGS)
-LDFLAGS		+= $(EXT_LDFLAGS)
-
-CPPFLAGS	+= $(addprefix -I, $(INC_DIRS) $(RINC_DIRS))
+CPPFLAGS	+= $(addprefix -I, $(INC_DIRS) $(RINC_DIRS) $(BIN_DIR)/include)
 LDFLAGS		:= $(addprefix -L, $(LIB_DIRS)) $(LDFLAGS)
-
-CFLAGS		:= $(CPPFLAGS) $(CFLAGS)
-CXXFLAGS	:= $(CFLAGS) $(CXXFLAGS)
 
 #--------------------------------------------------------------------------
 # Rules
 #--------------------------------------------------------------------------
-.PHONY: clean cleanall test
 
-# Build object file from C++ source
-$(OBJ_DIR)%.o: %.cpp
-	@echo CXX $< $@
-	@$(CXX) -c $(CXXFLAGS) $< -o $@
+include Makefile.rules
 
-# Build object file from C source
-$(OBJ_DIR)%.o: %.c
-	@echo CC $< $@
-	@$(CC) -c $(CFLAGS) $< -o $@
+#.PHONY: clean cleanall test
 
-all: $(SLIB_PATH)
-
-# Build static library
-$(SLIB_PATH): createFolders $(addprefix $(OBJ_DIR), $(OBJS))
-	@echo AR $@
-	@$(RM) $@
-	@$(AR) $@ $(filter %.o, $^)
-#	@$(RANLIB) $@
-#	@libtool -static $(LDFLAGS) $(filter %.o, $^) -o $@
-#	@libtool -static $@ $(patsubst %, $(DEV_DIR)lib/lib%.a, $(STATIC_LIBS)) -o $@
-
-# Dummy target to force rebuilds
-FORCE:
 
 # Compile and run source files in examples/ folder
 examples/%.cpp experimental/%.cpp: $(SLIB_PATH) FORCE
 #	@$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LDFLAGS) -whole-archive $(SLIB_PATH)
 	@$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LDFLAGS) $(SLIB_PATH)
-#	@$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(SLIB_PATH)
+#	@$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(SLIB_PATH) `ls $(BIN_DIR)lib/*.a`
 ifneq ($(AUTORUN), 0)
 	@$(BIN_DIR)$(*F)
 endif
 
-# Build unit tests
-test: $(SLIB_PATH)
-	@$(MAKE) -C $(TEST_DIR)
+
+$(EXTRA_MODULES):
+#	@$(MAKE) -C modules/$@ external
+	@$(MAKE) -C modules/$@ install DESTDIR=`pwd`/$(BIN_DIR)
+
+gamma:
+	@$(MAKE) -C modules/allogamma/gamma external
+	@$(MAKE) -C modules/allogamma/gamma install DESTDIR=`pwd`/$(BIN_DIR)
+
 
 # Install library into path specified by DESTDIR
 # Include files are copied into DESTDIR/include/LIB_NAME and
@@ -101,20 +84,7 @@ install: $(SLIB_PATH)
 #	@$(INSTALL) -c -m 644 $(EXT_LIB_DIR)* $(DESTDIR)/lib
 	@$(RANLIB) $(DESTDIR)/lib/$(SLIB_FILE)
 
-# Remove active build configuration binary files
-clean: createFolders
-	@$(RM) -r $(BIN_DIR)*
 
-# Remove all build configuration binary files
-cleanall:
-	@$(RM) -r $(BUILD_DIR)*
-
-createFolders:
-	@mkdir -p $(OBJ_DIR)
-
-# Create file with settings for linking to external libraries
-external:
-	@echo '\
-CPPFLAGS += $(EXT_CPPFLAGS) \r\n\
-LDFLAGS  += $(EXT_LDFLAGS) \
-'> Makefile.external
+# Build unit tests
+test: $(SLIB_PATH)
+	@$(MAKE) -C $(TEST_DIR)

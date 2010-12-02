@@ -1,1 +1,3 @@
-This subfolder is for any projects that build upon and extend allocore, but have to large or difficult to support dependencies to belong in the core itself.
+This subfolder is for any projects that build upon and extend allocore, but have too large or difficult to support dependencies to belong in the core itself.
+
+In order for the AlloCore Make build system to automatically build and utilize the modules, each module folder should contain an Makefile with an 'install' build rule. This install rule should install the module library into the path specified by the DESTDIR variable. Specifically, header files should be copied into DESTDIR/include/LIB_NAME/ and library files should be copied into DESTDIR/lib/.

@@ -267,6 +267,9 @@ public:
 						double ru = urel.dot(axis);
 						l.mQuatHistory[i].toVectorZ(axis);
 						double rf = urel.dot(axis);
+						
+						//if(i==0) printf("%g\n", rr*rr + ru*ru + rf*rf);
+						
 						// derive polar coordinates:
 						double azimuth = atan2(rr, rf);
 						double elevation = asin(ru);
