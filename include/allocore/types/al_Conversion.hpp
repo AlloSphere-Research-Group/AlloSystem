@@ -34,6 +34,14 @@
 #include <sstream>		/* string conversion */
 #include "allocore/system/al_Config.h"
 
+#ifndef UINT32_C
+#define UINT32_C(v) v ## UL
+#endif 
+
+#ifndef UINT64_C
+#define UINT64_C(v) v ## ULL
+#endif 
+
 #define CONST(N, vf, vd)\
 	template <class T> struct N;\
 	template<> struct N< float>{ operator uint32_t() const { return UINT32_C(vf); } };\
