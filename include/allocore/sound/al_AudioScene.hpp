@@ -14,6 +14,30 @@
 namespace al{
 
 
+/*!
+	A note on coordinate conventions
+	
+	The cartesian coordinate system used for Ambisonics is:
+		+x is forward
+		+y is left
+		+z is up
+		
+	The polar coordinate system is as follows:
+		Azimuth is the angle between the xz-plane and the source. From the listener's perspective, a positive azimuth is leftward (towards +y) and negative is rightwards (towards -y).
+		Elevation is the angle between the xy-plane and the source. From the listener's perspective, a positive elevation is upward (towards +z) and negative is downward (towards -z).
+
+	The cartesian coordinate system used in Allocore's OpenGL is:
+		+x is right
+		+y is up
+		+z is backward
+
+	The correct OpenGL to Ambisonics conversion is thus:
+		 ambi_x = -gl_z;
+		 ambi_y = -gl_x;
+		 ambi_z =  gl_y;
+*/
+
+
 /// Audio scene listener object
 
 /// 
@@ -27,6 +51,7 @@ public:
 		mDecoder.numSpeakers(num); return *this;
 	}
 
+	/// azimuth is anti-clockwise; both azimuth and elevation are in degrees
 	Listener& speakerPos(int speakerNum, int deviceChannel, double az, double el=0){
 		mDecoder.setSpeaker(speakerNum, deviceChannel, az, el);
 		return *this;
@@ -275,7 +300,7 @@ public:
 						double elevation = asin(ru);
 
 						//mEncoder.direction(azimuth, elevation);
-						mEncoder.direction(rf, rr, ru);
+						mEncoder.direction(-rf, -rr, ru);
 						mEncoder.encode(l.ambiChans(), numFrames, i, s);
 					}
 

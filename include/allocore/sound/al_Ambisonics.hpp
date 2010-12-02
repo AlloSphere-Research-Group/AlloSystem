@@ -44,6 +44,31 @@
 	If we pass speaker distance, then we might also want to attenuate/delay speakers for irregular layouts.
 */
 
+
+/*!
+	A note on coordinate conventions
+	
+	The cartesian coordinate system used for Ambisonics is:
+		+x is forward
+		+y is left
+		+z is up
+		
+	The polar coordinate system is as follows:
+		Azimuth is the angle between the xz-plane and the source. From the listener's perspective, a positive azimuth is leftward (towards +y) and negative is rightwards (towards -y).
+		Elevation is the angle between the xy-plane and the source. From the listener's perspective, a positive elevation is upward (towards +z) and negative is downward (towards -z).
+
+	The cartesian coordinate system used in Allocore's OpenGL is:
+		+x is right
+		+y is up
+		+z is backward
+
+	The correct OpenGL to Ambisonics conversion is thus:
+		 ambi_x = -gl_z;
+		 ambi_y = -gl_x;
+		 ambi_z =  gl_y;
+*/
+
+
 namespace al{
 
 /// Ambisonic base class
@@ -70,6 +95,7 @@ public:
 	static int channelsToUniformOrder(int channels);
 	
 	/// Compute spherical harmonic weights based on azimuth and elevation
+	/// azimuth is anti-clockwise; both azimuth and elevation are in degrees
 	static void encodeWeightsFuMa(float * weights, int dim, int order, float azimuth, float elevation);
 	
 	/// Compute spherical harmonic weights based on unit direction vector (in the listener's coordinate frame)
