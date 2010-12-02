@@ -38,7 +38,7 @@ struct Agent : public SoundSource, public Drawable{
 			//float s = phase * 2 - 1;
 			oscPhase += 440./io.framesPerSecond();
 			if(oscPhase >= 1) oscPhase -= 1;
-			writeSample(s*1);
+			writeSample(s*10.);
 		}
 	}
 	
@@ -48,8 +48,8 @@ struct Agent : public SoundSource, public Drawable{
 		//pos(cos(phase), sin(phase), 0);
 		//pos(0,0,0);
 		
-		spin(0.3, 0, 0);
-		moveF(0.04);
+		//spin(0.3, 0, 0);
+		//moveF(0.04);
 		step();
 	}
 	

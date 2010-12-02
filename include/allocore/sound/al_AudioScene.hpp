@@ -274,7 +274,8 @@ public:
 						double azimuth = atan2(rr, rf);
 						double elevation = asin(ru);
 
-						mEncoder.direction(azimuth, elevation);
+						//mEncoder.direction(azimuth, elevation);
+						mEncoder.direction(rf, rr, ru);
 						mEncoder.encode(l.ambiChans(), numFrames, i, s);
 					}
 
