@@ -110,12 +110,6 @@ struct RSin : public Val<T>{ INHERIT;
 		val2 = val;
 		return val = v0;
 	}
-
-	void next3(T& o2, T& o1, T& o0) const {
-		T v0 = o0 = mul * val  - val2;
-		o2 = val2 = mul * v0   - val;
-		o1 = val  = mul * val2 - v0;
-	}
 	
 	T freq() const { return acos(mul*0.5) * M_1_2PI; }
 	
@@ -129,7 +123,7 @@ struct RSin : public Val<T>{ INHERIT;
 	}
 
 	mutable T val2;
-	T mul;			///< Multiplication factor. [-2, 2] range gives stable sinusoids.
+	T mul;			///< Multiplication factor
 };
 
 
