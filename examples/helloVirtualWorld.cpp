@@ -29,16 +29,17 @@ struct Agent : public SoundSource, public Drawable{
 		while(io()){
 			//float s = io.in(0);
 			//float s = rnd::uniform(); // make noise, just to hear something
-			float s = sin(oscPhase * M_2PI);
+			//float s = sin(oscPhase * M_2PI);
+			float s = al::rnd::uniformS();
 			
-			s *= (oscEnv*=0.9995);
+			s *= (oscEnv*=0.999);
 			
-			if(oscEnv < 0.001){ oscEnv=1; oscPhase=0; }
+			if(oscEnv < 0.00001){ oscEnv=1; oscPhase=0; }
 			
 			//float s = phase * 2 - 1;
 			oscPhase += 440./io.framesPerSecond();
 			if(oscPhase >= 1) oscPhase -= 1;
-			writeSample(s*10.);
+			writeSample(s*4.);
 		}
 	}
 	
@@ -54,7 +55,6 @@ struct Agent : public SoundSource, public Drawable{
 	}
 	
 	virtual void onDraw(Graphics& g){
-	
 		g.pushMatrix();
 		g.scale(10);
 		g.begin(g.LINES);
@@ -114,7 +114,7 @@ struct Agent : public SoundSource, public Drawable{
 
 
 #define AUDIO_BLOCK_SIZE 256
-AudioScene scene(3, 1, AUDIO_BLOCK_SIZE);
+AudioScene scene(3, 3, AUDIO_BLOCK_SIZE);
 Listener * listener;
 Nav navMaster(Vec3d(0,0,-4), 0.95);
 std::vector<Agent> agents(1);
@@ -148,11 +148,15 @@ struct MyWindow : public Window, public Drawable{
 	bool onFrame(){
 
 		Pose pose(navMaster * transform);
-		
-		//listener->pos(pose.pos());
+
 
 		Viewport vp(dimensions().w, dimensions().h);
 		stereo.draw(gl, cam, pose, vp, *this);
+		
+		
+		
+		printf("pos %f %f %f\n", navMaster.pos()[0], navMaster.pos()[1], navMaster.pos()[2]);
+		
 		
 		return true;
 	}
@@ -183,10 +187,50 @@ int main (int argc, char * argv[]){
 
 	listener = &scene.createListener(2);
 	
-	listener->speakerPos(0,0,-60);
-	listener->speakerPos(1,1, 60);
-//	listener->speakerPos(0,0,-45);
-//	listener->speakerPos(1,1, 45);
+//	listener->speakerPos(0,0,-60);
+//	listener->speakerPos(1,1, 60);
+////	listener->speakerPos(0,0,-45);
+////	listener->speakerPos(1,1, 45);
+//
+	
+	const int numSpeakers = 16;
+	const double topAz = 90;
+	const double topEl = 45;
+	const double midAz = (360./8);
+	const double midEl = 0;
+	const double botAz = 90;
+	const double botEl =-45;
+
+	AmbiDecode::Speaker speakers[numSpeakers] = {
+		{ 0.5*topAz, topEl,  7-1},
+		{ 1.5*topAz, topEl,  9-1},
+		{-0.5*topAz, topEl,  8-1},
+		{-1.5*topAz, topEl, 21-1},
+		
+		{ 0.5*midAz, midEl,  3-1},
+		{ 1.5*midAz, midEl,  6-1},
+		{ 2.5*midAz, midEl, 17-1},
+		{ 3.5*midAz, midEl, 18-1},
+		{-0.5*midAz, midEl,  4-1},
+		{-1.5*midAz, midEl,  5-1},
+		{-2.5*midAz, midEl, 20-1},
+		{-3.5*midAz, midEl, 19-1},
+
+		{ 0.5*botAz, botEl, 24-1},
+		{ 1.5*botAz, botEl, 23-1},
+		{-0.5*botAz, botEl, 10-1},
+		{-1.5*botAz, botEl, 22-1},
+	};
+	
+	listener->numSpeakers(numSpeakers);
+	for(int i=0; i<numSpeakers; ++i){
+		listener->speakerPos(
+			i,
+			speakers[i].deviceChannel,
+			speakers[i].azimuth,
+			speakers[i].elevation
+		);
+	}
 	
 	for(unsigned i=0; i<agents.size(); ++i) scene.addSource(agents[i]);
 
@@ -212,7 +256,7 @@ int main (int argc, char * argv[]){
 		windows[i].cam.fovy(90);
 	}
 
-	AudioIO audioIO(AUDIO_BLOCK_SIZE, 44100, audioCB, 0, 2, 1);
+	AudioIO audioIO(AUDIO_BLOCK_SIZE, 44100, audioCB, 0, -1, 1);
 	audioIO.start();
 
 	MainLoop::start();

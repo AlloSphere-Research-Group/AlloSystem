@@ -296,8 +296,8 @@ public:
 						//if(i==0) printf("%g\n", rr*rr + ru*ru + rf*rf);
 						
 						// derive polar coordinates:
-						double azimuth = atan2(rr, rf);
-						double elevation = asin(ru);
+//						double azimuth = atan2(rr, rf);
+//						double elevation = asin(ru);
 
 						//mEncoder.direction(azimuth, elevation);
 						mEncoder.direction(-rf, -rr, ru);
