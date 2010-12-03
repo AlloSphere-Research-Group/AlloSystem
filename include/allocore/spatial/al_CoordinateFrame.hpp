@@ -40,7 +40,7 @@ public:
 	double y() const { return mVec[1]; }
 	double z() const { return mVec[2]; }
 
-	/// Convert to homogenous coordinate 4x4 matrix
+	/// Convert to 4-by-4 projection space matrix
 	Mat4d matrix() const {
 		Mat4d m;
 		quat().toMatrix(&m[0]);
