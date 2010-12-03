@@ -152,11 +152,8 @@ struct MyWindow : public Window, public Drawable{
 
 		Viewport vp(dimensions().w, dimensions().h);
 		stereo.draw(gl, cam, pose, vp, *this);
-		
-		
-		
-		printf("pos %f %f %f\n", navMaster.pos()[0], navMaster.pos()[1], navMaster.pos()[2]);
-		
+
+//		printf("pos %f %f %f\n", navMaster.pos()[0], navMaster.pos()[1], navMaster.pos()[2]);		
 		
 		return true;
 	}
