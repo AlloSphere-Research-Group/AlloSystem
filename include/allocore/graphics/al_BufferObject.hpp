@@ -192,14 +192,14 @@ public:
 	virtual ~BufferObjects() {};
 	virtual void draw(Graphics& gl);
 	
-	GraphicsData& data() { return *mData; }
+	Mesh& data() { return *mData; }
 
 protected:	
 
 	virtual void onCreate() {};
 	virtual void onDestroy() {};
 	
-	GraphicsData mData;
+	Mesh mData;
 
 	VBO mVBO;
 	CBO mCBO;

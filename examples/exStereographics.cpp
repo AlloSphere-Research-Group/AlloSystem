@@ -3,10 +3,9 @@
 
 using namespace al;
 
-static GraphicsBackendOpenGL backend;
-static Graphics gl(&backend);
+static GraphicsGL gl;
 
-static GraphicsData stuff;
+static Mesh stuff;
 
 static Stereographic stereo;
 static Camera cam;

@@ -5,8 +5,7 @@
 using namespace al;
 
 /*
-GraphicsBackendOpenGL backend;
-Graphics gl(&backend);
+Graphics gl;
 
 Camera camera;
 Texture *texture = backend.textureNew();

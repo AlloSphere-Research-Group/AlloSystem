@@ -13,7 +13,7 @@ namespace al{
 
 class Slab : public GPUObject {
 public:
-	Slab(GraphicsBackend *backend);
+	Slab(Graphics *backend);
 	virtual ~Slab();
 	
 	void draw(int argc, Texture **argv);
@@ -41,7 +41,7 @@ protected:
 	}
 
 protected:
-	GraphicsBackend *		mBackend;				///< The backend
+	Graphics *				mBackend;				///< The backend
 	Shader *				mShader;				///< The shader	
 	int						mNumActiveTextures;		///< number of active render target textures
 	Texture					*mTex[SLAB_MAX_RENDER_TARGETS];		///< Output texture

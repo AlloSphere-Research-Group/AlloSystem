@@ -1,11 +1,10 @@
 #include <stdlib.h>
-#include "allocore/graphics/al_GraphicsBackend.hpp"
-//#include "allocore/graphics/al_Config.h"
+#include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_Surface.hpp"
 
 namespace al{
 
-Surface::Surface(GraphicsBackend *backend, void *surface_data)
+Surface::Surface(Graphics *backend, void *surface_data)
 :	GPUObject(),
 	mBackend(backend),
 	mSurfaceData(surface_data),

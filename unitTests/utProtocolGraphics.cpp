@@ -1,7 +1,6 @@
 #include "utAllocore.h"
 
-static GraphicsBackendOpenGL backend;
-static Graphics gl(&backend);
+static GraphicsGL gl;
  
 struct MyWindow2 : Window{
 
@@ -34,7 +33,7 @@ struct MyWindow2 : Window{
 		return true;
 	}
 	
-	GraphicsData data;
+	Mesh data;
 };
 
 

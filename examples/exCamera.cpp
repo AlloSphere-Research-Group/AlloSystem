@@ -2,8 +2,8 @@
 #include "al_NavControl.hpp"
 using namespace al;
 
-gfx::Graphics gl(new gfx::GraphicsBackendOpenGL);
-gfx::GraphicsData stuff;
+gfx::GraphicsGL gl;
+gfx::Mesh stuff;
 gfx::Stereographic stereo;
 Camera cam, cam2;
 

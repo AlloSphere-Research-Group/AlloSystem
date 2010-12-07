@@ -449,9 +449,9 @@ void Isosurface<T>::calcNormals(){
 		int i2 = mIndices[i+2];
 		
 		// Compute normal of triangle
-		GraphicsData::Vertex v1 = mVertices[i1] - mVertices[i0];
-		GraphicsData::Vertex v2 = mVertices[i2] - mVertices[i0];
-		GraphicsData::Vertex nd = v1 ^ v2;
+		Mesh::Vertex v1 = mVertices[i1] - mVertices[i0];
+		Mesh::Vertex v2 = mVertices[i2] - mVertices[i0];
+		Mesh::Vertex nd = v1 ^ v2;
 
 		mNormals[i0] += nd;
 		mNormals[i1] += nd;

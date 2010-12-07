@@ -16,7 +16,7 @@ int main(){
 	utFile();
 	utThread();
 
-//	utProtocolGraphics();
+	utProtocolGraphics();
 	
 //	int size = 14;
 //	for (int z=-64; z<64; z++) {

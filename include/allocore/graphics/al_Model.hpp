@@ -39,7 +39,7 @@
 
 namespace al{
 
-/// an object with internal GraphicsData and Material. 
+/// an object with internal Mesh and Material. 
 class MaterialObject : public Drawable {
 public:
 	MaterialObject() : Drawable() {}
@@ -51,13 +51,13 @@ public:
 
 protected:	
 	std::string     mName;
-	GraphicsData	mData;			/* vertex data */
+	Mesh			mData;			/* vertex data */
 	Material *		mMaterial;		/* material used */
 };
 
 /// OBJ file reader. Parses .obj (and .mtl) files. A separate object will be created per group and/or usemtl command.
 /// it stores the OBJ data intenally, divided per object. 
-/// any of these objects can be instantiated (factory style) into GraphicsData and Materials
+/// any of these objects can be instantiated (factory style) into Mesh and Materials
 /// the names of objects/materials are available for iteration. 
 /// Typically, after parsing the OBJ and instantiating the desired objects and materials, the OBJReader itself can be discarded. 
 class OBJReader {
@@ -83,7 +83,7 @@ public:
 	GroupIterator groupsFind(std::string name) { return mGroups.find(name); }
 	
 	// returns NULL if the group is not found, or has no vertices
-	GraphicsData * createGraphicsData(GroupIterator group);
+	Mesh * createMesh(GroupIterator group);
 	
 	struct Mtl {
 		float shininess, optical_density;
@@ -139,9 +139,9 @@ protected:
 	int addFaceVertex(std::string buf, int v, int t, int n);
 	void addTriangle(Group * g, unsigned int id0, unsigned int id1, unsigned int id2);
 	
-	std::vector<GraphicsData::Vertex> vertices;
-	std::vector<GraphicsData::TexCoord2> texcoords;
-	std::vector<GraphicsData::Normal> normals;
+	std::vector<Mesh::Vertex> vertices;
+	std::vector<Mesh::TexCoord2> texcoords;
+	std::vector<Mesh::Normal> normals;
 	std::vector<FaceVertex> face_vertices;
 	
 	// maps face vertices (as string) to corresponding this->vertices index
@@ -160,7 +160,7 @@ public:
 
 //	struct Triangle {
 //		unsigned int indices[3];
-//		GraphicsData::Normal normal;
+//		Mesh::Normal normal;
 //	};
 
 	struct Group {
@@ -170,7 +170,7 @@ public:
 		
 		std::string name() { return mName; }
 		std::string material() { return mMaterial; }
-		GraphicsData& data() { return mData; }
+		Mesh& data() { return mData; }
 		
 		void name(std::string n) { mName = n; }
 		void material(std::string m) { mMaterial = m; }
@@ -184,7 +184,7 @@ public:
 		friend class Model;
 		std::string     mName;           /* name of this group */
 		std::string     mMaterial;       /* index to material for group */
-		GraphicsData	mData;
+		Mesh	mData;
 		Vec3f			mCenter;	
 		//std::vector<Triangle> mTriangles;
 	};

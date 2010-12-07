@@ -23,7 +23,7 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#include "allocore/graphics/al_GraphicsOpenGL.h"
+#include "allocore/graphics/al_GraphicsOpenGL.hpp"
 #include "allocore/graphics/al_GraphicsBackend.hpp"
 
 namespace al{

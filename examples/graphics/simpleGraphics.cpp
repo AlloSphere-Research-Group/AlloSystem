@@ -1,7 +1,7 @@
 #include "allocore/al_Allocore.hpp"
 using namespace al;
 
-Graphics gl(new GraphicsBackendOpenGL);
+GraphicsGL gl;
 
 struct MyWindow : Window{
 

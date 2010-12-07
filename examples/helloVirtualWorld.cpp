@@ -143,7 +143,7 @@ void audioCB(AudioIOData& io){
 
 struct MyWindow : public Window, public Drawable{
 	
-	MyWindow(): gl(new GraphicsBackendOpenGL){}
+	MyWindow() {}
 
 	bool onFrame(){
 
@@ -174,7 +174,7 @@ struct MyWindow : public Window, public Drawable{
 		}
 	}
 
-	Graphics gl;
+	GraphicsGL gl;
 	Pose transform;
 	Camera cam;
 };

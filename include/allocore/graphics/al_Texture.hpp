@@ -7,7 +7,7 @@
 
 namespace al{
 
-class GraphicsBackend;
+class Graphics;
 
 /// Graphics texture
 class Texture : public GPUObject {
@@ -58,7 +58,7 @@ public:
 		LINEAR_MIPMAP_LINEAR
 	};
 
-	Texture(GraphicsBackend *backend);
+	Texture(Graphics * backend);
 	virtual ~Texture();
 
 	void bind(int unit = 0);
@@ -125,7 +125,7 @@ protected:
 	Target target_for_array_dimcount(int dimcount);
 
 
-	GraphicsBackend	* mBackend;			///< Library backend
+	Graphics *		mBackend;			///< Library backend
 	al::Array		mArray;			///< Array of data
 	Mode			mMode;				///< Texture mode
 	bool			mRebuild;			///< Rebuild flag

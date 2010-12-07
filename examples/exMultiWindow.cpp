@@ -5,8 +5,7 @@
 using namespace al;
 
 Camera camera;
-GraphicsBackendOpenGL backend;
-Graphics gl(&backend);
+GraphicsGL gl;
 double eyesep = 1;
 
 // synchronize window updates with a Clock. 

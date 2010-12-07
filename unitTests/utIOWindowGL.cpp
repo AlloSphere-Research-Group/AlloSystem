@@ -1,7 +1,6 @@
 #include "utAllocore.h"
 
-static GraphicsBackendOpenGL backend;
-static Graphics gl(&backend);
+static GraphicsGL gl;
 
 struct MyWindow : Window{
 
@@ -57,10 +56,7 @@ int utIOWindowGL(){
 	MyWindow win;
 	MyWindow win2;
 	
-//	gl.setBackend(GraphicsBackend::None);
 	
-//	printf("setBackendOpenGL %d\n", setBackendOpenGL(&gl));
-
 //	struct Func:TimedFunction{
 //		void onExecute(){ printf("hello\n"); }
 //	};

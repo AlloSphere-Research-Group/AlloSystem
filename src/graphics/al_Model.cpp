@@ -27,9 +27,9 @@ void OBJReader :: readOBJ(std::string path, std::string filename) {
 	// create a default group:
 	Group * g = &mGroups["default"];
 
-	vertices.push_back(GraphicsData::Vertex());
-	texcoords.push_back(GraphicsData::TexCoord2());
-	normals.push_back(GraphicsData::Normal());
+	vertices.push_back(Mesh::Vertex());
+	texcoords.push_back(Mesh::TexCoord2());
+	normals.push_back(Mesh::Normal());
 
 	readToken();
 	while(hasToken()) {
@@ -473,14 +473,14 @@ void OBJReader :: readMTL(std::string path, std::string name)
 }
 
 
-GraphicsData * OBJReader::createGraphicsData(GroupIterator iter) {
+Mesh * OBJReader::createMesh(GroupIterator iter) {
 	if (iter == mGroups.end()) return NULL;
 	Group& g = iter->second;
 
 	printf("create with %d indices\n", (int)g.indices.size());
 	if (g.indices.size() <= 0) return NULL;
 
-	GraphicsData * gd = new GraphicsData();
+	Mesh * gd = new Mesh();
 	gd->primitive(Graphics::TRIANGLES);
 	gd->resetBuffers();
 
@@ -610,7 +610,7 @@ std::string OBJReader::parseGroup() {
 }
 
 void OBJReader::parseVertex() {
-	GraphicsData::Vertex vertex;
+	Mesh::Vertex vertex;
 	fscanf(file, "%f %f %f",
 		&vertex[0],
 		&vertex[1],
@@ -628,7 +628,7 @@ void OBJReader::parseColor(Color& color) {
 }
 
 void OBJReader::parseTexcoord() {
-	GraphicsData::TexCoord2 texcoord;
+	Mesh::TexCoord2 texcoord;
 	fscanf(file, "%f %f",
 		&texcoord[0],
 		&texcoord[1]);
@@ -637,7 +637,7 @@ void OBJReader::parseTexcoord() {
 }
 
 void OBJReader::parseNormal() {
-	GraphicsData::Normal normal;
+	Mesh::Normal normal;
 	fscanf(file, "%f %f %f",
 		&normal[0],
 		&normal[1],
@@ -758,21 +758,21 @@ struct FaceVertex {
 };
 
 struct Parser {
-	std::vector<GraphicsData::Vertex> vertices;
-	std::vector<GraphicsData::TexCoord2> texcoords;
-	std::vector<GraphicsData::Normal> normals;
+	std::vector<Mesh::Vertex> vertices;
+	std::vector<Mesh::TexCoord2> texcoords;
+	std::vector<Mesh::Normal> normals;
 
 	FILE * file;
 	char buf[MODEL_PARSER_BUF_LEN];
 
 	Parser(FILE * file) : file(file)
 	{
-		vertices.push_back(GraphicsData::Vertex());
-		texcoords.push_back(GraphicsData::TexCoord2());
-		normals.push_back(GraphicsData::Normal());
+		vertices.push_back(Mesh::Vertex());
+		texcoords.push_back(Mesh::TexCoord2());
+		normals.push_back(Mesh::Normal());
 	}
 
-	// maps face vertices (as string) to corresponding GraphicsData indices
+	// maps face vertices (as string) to corresponding Mesh indices
 	// this way, avoid inserting the same vertex/tex/norm combo twice,
 	// and use index buffer instead.
 	std::map<std::string, int> vertexMap;
@@ -849,9 +849,9 @@ struct Parser {
 	}
 
 	void addTriangle(Model::Group& g, unsigned int id0, unsigned int id1, unsigned int id2) {
-		GraphicsData& data = g.data();
+		Mesh& data = g.data();
 
-		// store this triangle in the GraphicsData indices() buffer:
+		// store this triangle in the Mesh indices() buffer:
 		data.addIndex(id0-1);
 		data.addIndex(id1-1);
 		data.addIndex(id2-1);
@@ -882,7 +882,7 @@ struct Parser {
 	}
 
 	void parseVertex(FILE * file) {
-		GraphicsData::Vertex vertex;
+		Mesh::Vertex vertex;
 		fscanf(file, "%f %f %f",
 			&vertex[0],
 			&vertex[1],
@@ -892,7 +892,7 @@ struct Parser {
 	}
 
 	void parseTexcoord(FILE * file) {
-		GraphicsData::TexCoord2 texcoord;
+		Mesh::TexCoord2 texcoord;
 		fscanf(file, "%f %f",
 			&texcoord[0],
 			&texcoord[1]);
@@ -901,7 +901,7 @@ struct Parser {
 	}
 
 	void parseNormal(FILE * file) {
-		GraphicsData::Normal normal;
+		Mesh::Normal normal;
 		fscanf(file, "%f %f %f",
 			&normal[0],
 			&normal[1],
@@ -1307,9 +1307,9 @@ void Model :: readOBJ(std::string filename) {
 //			Triangle& tri = gr.mTriangles[i];
 //
 //			// the three points of the triangle:
-//			GraphicsData::Vertex p0 = gr.data().vertices()[tri.indices[0]];
-//			GraphicsData::Vertex p1 = gr.data().vertices()[tri.indices[1]];
-//			GraphicsData::Vertex p2 = gr.data().vertices()[tri.indices[2]];
+//			Mesh::Vertex p0 = gr.data().vertices()[tri.indices[0]];
+//			Mesh::Vertex p1 = gr.data().vertices()[tri.indices[1]];
+//			Mesh::Vertex p2 = gr.data().vertices()[tri.indices[2]];
 //			normal<float>(tri.normal, p0, p1, p2);
 //		}
 

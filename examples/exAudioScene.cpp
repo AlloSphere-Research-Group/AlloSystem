@@ -49,8 +49,7 @@ void audioCB(AudioIOData& io){
 
 struct MyWindow : Window{
 	
-	MyWindow(): gl(new GraphicsBackendOpenGL)
-	{}
+	MyWindow() {}
 	
 	bool onKeyDown(const Keyboard& k){
 		switch(k.key()){
@@ -65,7 +64,7 @@ struct MyWindow : Window{
 		return true;
 	}
 
-	Graphics gl;
+	GraphicsGL gl;
 };
 
 

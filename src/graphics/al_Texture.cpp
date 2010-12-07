@@ -1,11 +1,10 @@
 #include <stdlib.h>
-#include "allocore/graphics/al_GraphicsBackend.hpp"
-//#include "allocore/graphics/al_Config.h"
+#include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_Texture.hpp"
 
 namespace al{
 
-Texture::Texture(GraphicsBackend *backend)
+Texture::Texture(Graphics *backend)
 :	GPUObject(),
 	mBackend(backend),
 	mMode(DATA),

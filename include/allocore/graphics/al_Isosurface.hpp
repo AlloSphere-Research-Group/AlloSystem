@@ -53,7 +53,7 @@ struct PointID {
 
 /// Isosurface using marching cubes
 template<class T=double>
-class Isosurface : public GraphicsData{
+class Isosurface : public Mesh {
 public:
 
 	Isosurface(const T& level=T(0));

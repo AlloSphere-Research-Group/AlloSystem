@@ -24,9 +24,8 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-//#include "allocore/graphics/al_Config.h"
 #include "allocore/graphics/al_Graphics.hpp"
-#include "allocore/graphics/al_GraphicsBackendOpenGL.hpp"
+#include "allocore/graphics/al_GraphicsOpenGL.hpp"
 #include "allocore/graphics/al_Image.hpp"
 //#include "allocore/graphics/al_Isosurface.hpp"
 #include "allocore/graphics/al_Light.hpp"

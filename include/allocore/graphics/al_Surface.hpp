@@ -8,13 +8,13 @@
 
 namespace al{
 
-class GraphicsBackend;
+class Graphics;
 
 ///
 class Surface : public GPUObject {
 public:
 
-	Surface(GraphicsBackend *backend, void *surface_data);
+	Surface(Graphics *backend, void *surface_data);
 	virtual ~Surface();
 	
 	void * surfaceData();
@@ -42,7 +42,7 @@ protected:
 	virtual void onDestroy();
 	
 	
-	GraphicsBackend	* mBackend;
+	Graphics *		mBackend;
 	void *			mSurfaceData;
 	Texture *		mTexture;
 	Color			mClearColor;

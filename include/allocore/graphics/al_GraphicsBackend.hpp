@@ -23,15 +23,11 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-
-#include "allocore/math/al_Vec.hpp"
-#include "allocore/types/al_Buffer.hpp"
-#include "allocore/types/al_Color.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_Texture.hpp"
 #include "allocore/graphics/al_Surface.hpp"
 
-namespace al{
+namespace al {
 
 class GraphicsBackend {
 public:

@@ -1,4 +1,4 @@
-#include "allocore/graphics/al_GraphicsOpenGL.h"
+#include "allocore/graphics/al_GraphicsOpenGL.hpp"
 #include "allocore/graphics/al_Light.hpp"
 
 namespace al{

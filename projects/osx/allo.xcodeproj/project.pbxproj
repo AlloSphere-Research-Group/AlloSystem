@@ -128,6 +128,8 @@
 		360C243F11E6599F000FF335 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		360C244011E6599F000FF335 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
 		360C404F11D32FED002FE91F /* al_Matrix4.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 360C404E11D32FED002FE91F /* al_Matrix4.hpp */; };
+		361AA71C12AECB0A002E9DFD /* al_GraphicsGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 361AA71B12AECB0A002E9DFD /* al_GraphicsGL.cpp */; };
+		361AA7A512AEE1AC002E9DFD /* al_Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 361AA7A412AEE1AC002E9DFD /* al_Mesh.cpp */; };
 		361BF1A511DEBA3A00E60A9C /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		361BF1A611DEBA3A00E60A9C /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		361BF1A711DEBA3A00E60A9C /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
@@ -233,7 +235,6 @@
 		36D69A3411F923FC00699158 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
 		36D69A3511F923FC00699158 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		36D69A3F11F9242400699158 /* exGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36D69A3E11F9242400699158 /* exGraphics.cpp */; };
-		36D69A4511F925FC00699158 /* al_GraphicsBackendOpenGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36D69A4411F925FC00699158 /* al_GraphicsBackendOpenGL.cpp */; };
 		36D69A4B11F9264700699158 /* al_Surface.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 36D69A4A11F9264700699158 /* al_Surface.hpp */; };
 		36D69A5311F9267800699158 /* al_Surface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36D69A5211F9267800699158 /* al_Surface.cpp */; };
 		36E4155811E99BED00A8A63D /* al_ThreadAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36E4155711E99BED00A8A63D /* al_ThreadAPR.cpp */; };
@@ -461,7 +462,7 @@
 		16198FF31173E39B006FBADF /* al_Buffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Buffer.hpp; sourceTree = "<group>"; };
 		1619909B11743914006FBADF /* al_Color.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Color.hpp; sourceTree = "<group>"; };
 		1619909C11743990006FBADF /* al_Color.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Color.cpp; sourceTree = "<group>"; };
-		165869491288E9380068E01A /* al_GraphicsOpenGL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_GraphicsOpenGL.h; sourceTree = "<group>"; };
+		165869491288E9380068E01A /* al_GraphicsOpenGL.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_GraphicsOpenGL.hpp; sourceTree = "<group>"; };
 		16586A1C128903C10068E01A /* al_Shader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Shader.cpp; sourceTree = "<group>"; };
 		1663FD461280D608002B2979 /* al_Allocore.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Allocore.hpp; sourceTree = "<group>"; };
 		166DD741117CDB6000A8BA12 /* al_Conversion.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Conversion.hpp; sourceTree = "<group>"; };
@@ -621,6 +622,11 @@
 		360C24AF11E659D3000FF335 /* libplugin_llvmc_Base.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libplugin_llvmc_Base.a; sourceTree = "<group>"; };
 		360C24B011E659D3000FF335 /* libplugin_llvmc_Clang.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libplugin_llvmc_Clang.a; sourceTree = "<group>"; };
 		360C404E11D32FED002FE91F /* al_Matrix4.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Matrix4.hpp; sourceTree = "<group>"; };
+		361AA6F112AEC2B8002E9DFD /* al_Graphics_Old.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Graphics_Old.hpp; sourceTree = "<group>"; };
+		361AA6F412AEC305002E9DFD /* al_Graphics_Old.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Graphics_Old.cpp; sourceTree = "<group>"; };
+		361AA71B12AECB0A002E9DFD /* al_GraphicsGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GraphicsGL.cpp; sourceTree = "<group>"; };
+		361AA7A312AEE173002E9DFD /* al_Mesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Mesh.hpp; sourceTree = "<group>"; };
+		361AA7A412AEE1AC002E9DFD /* al_Mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Mesh.cpp; sourceTree = "<group>"; };
 		361BF02F11DEA66600E60A9C /* al_BufferObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_BufferObject.hpp; sourceTree = "<group>"; };
 		361BF03111DEAA9400E60A9C /* al_FBO.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_FBO.hpp; sourceTree = "<group>"; };
 		361BF1B111DEBA3A00E60A9C /* exAudioScene */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exAudioScene; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1185,12 +1191,14 @@
 				361BF02F11DEA66600E60A9C /* al_BufferObject.hpp */,
 				16AA95E9118F6EEF00B98EC3 /* al_GPUObject.hpp */,
 				362127C71173CD72009CB6FC /* al_Graphics.hpp */,
+				165869491288E9380068E01A /* al_GraphicsOpenGL.hpp */,
+				361AA6F112AEC2B8002E9DFD /* al_Graphics_Old.hpp */,
 				36D69A4211F924B500699158 /* al_GraphicsBackend.hpp */,
 				36D69A4311F924C900699158 /* al_GraphicsBackendOpenGL.hpp */,
-				165869491288E9380068E01A /* al_GraphicsOpenGL.h */,
 				36F596691211D5AB003B78B5 /* al_Image.hpp */,
 				160FD0DF11FA1CE4001E8987 /* al_Isosurface.hpp */,
 				16AA95EA118F6EEF00B98EC3 /* al_Light.hpp */,
+				361AA7A312AEE173002E9DFD /* al_Mesh.hpp */,
 				36F598FB12122617003B78B5 /* al_Model.hpp */,
 				3649CDA412440A3F0077128E /* al_Nurbs.hpp */,
 				16AA967E118F7D5700B98EC3 /* al_Shader.hpp */,
@@ -1209,10 +1217,13 @@
 			children = (
 				36F0ABBF12319586000A8EBF /* Makefile.config */,
 				362127C81173CDBB009CB6FC /* al_Graphics.cpp */,
+				361AA71B12AECB0A002E9DFD /* al_GraphicsGL.cpp */,
+				361AA6F412AEC305002E9DFD /* al_Graphics_Old.cpp */,
 				36D69A4411F925FC00699158 /* al_GraphicsBackendOpenGL.cpp */,
 				36F596741211D5F8003B78B5 /* al_Image.cpp */,
 				160FD0E011FA1CF4001E8987 /* al_Isosurface.cpp */,
 				16AA95F2118F74FB00B98EC3 /* al_Light.cpp */,
+				361AA7A412AEE1AC002E9DFD /* al_Mesh.cpp */,
 				36F598FC12122628003B78B5 /* al_Model.cpp */,
 				16586A1C128903C10068E01A /* al_Shader.cpp */,
 				16AA9609118F774800B98EC3 /* al_Texture.cpp */,
@@ -2132,6 +2143,7 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "allo" */;
 			compatibilityVersion = "Xcode 3.0";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -2304,7 +2316,6 @@
 				36C079A811D4964F00764E50 /* al_MainLoopOSX.mm in Sources */,
 				36AED02711D4638F000D98C9 /* al_MainLoopGLUT.cpp in Sources */,
 				36E4155811E99BED00A8A63D /* al_ThreadAPR.cpp in Sources */,
-				36D69A4511F925FC00699158 /* al_GraphicsBackendOpenGL.cpp in Sources */,
 				36D69A5311F9267800699158 /* al_Surface.cpp in Sources */,
 				3687E2B511FA399A00EC6706 /* al_Isosurface.cpp in Sources */,
 				367F0B3B12034EED00FCC534 /* al_Stereographic.cpp in Sources */,
@@ -2318,6 +2329,8 @@
 				1686189912A58918002AD8AB /* OscPrintReceivedElements.cpp in Sources */,
 				1686189B12A58918002AD8AB /* OscReceivedElements.cpp in Sources */,
 				1686189D12A58918002AD8AB /* OscTypes.cpp in Sources */,
+				361AA71C12AECB0A002E9DFD /* al_GraphicsGL.cpp in Sources */,
+				361AA7A512AEE1AC002E9DFD /* al_Mesh.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

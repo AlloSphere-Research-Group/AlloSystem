@@ -2,8 +2,7 @@
 #include "al_NavControl.hpp"
 using namespace al;
 
-GraphicsBackendOpenGL backend;
-Graphics gl(&backend);
+Graphics gl;
 Light light;
 Camera cam;
 Nav nav;
