@@ -24,7 +24,7 @@ endif
 
 # Architecture: '32', '64', or '32_64' (macosx only)
 UNAMEM := $(shell uname -m)
-ifeq ($(UNAMEM), x86_64)
+ifeq ($(UNAMEM), $(findstring $(UNAMEM), x86_64 ia86 amd64))
 	ARCH = 32_64
 else
 	ARCH = 32
