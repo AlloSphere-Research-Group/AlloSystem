@@ -622,8 +622,6 @@
 		360C24AF11E659D3000FF335 /* libplugin_llvmc_Base.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libplugin_llvmc_Base.a; sourceTree = "<group>"; };
 		360C24B011E659D3000FF335 /* libplugin_llvmc_Clang.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libplugin_llvmc_Clang.a; sourceTree = "<group>"; };
 		360C404E11D32FED002FE91F /* al_Matrix4.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Matrix4.hpp; sourceTree = "<group>"; };
-		361AA6F112AEC2B8002E9DFD /* al_Graphics_Old.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Graphics_Old.hpp; sourceTree = "<group>"; };
-		361AA6F412AEC305002E9DFD /* al_Graphics_Old.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Graphics_Old.cpp; sourceTree = "<group>"; };
 		361AA71B12AECB0A002E9DFD /* al_GraphicsGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GraphicsGL.cpp; sourceTree = "<group>"; };
 		361AA7A312AEE173002E9DFD /* al_Mesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Mesh.hpp; sourceTree = "<group>"; };
 		361AA7A412AEE1AC002E9DFD /* al_Mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Mesh.cpp; sourceTree = "<group>"; };
@@ -722,9 +720,6 @@
 		36C13F0E11D15FA9006196FC /* al_Reverb.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Reverb.hpp; sourceTree = "<group>"; };
 		36D69A3B11F923FC00699158 /* exGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
 		36D69A3E11F9242400699158 /* exGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exGraphics.cpp; sourceTree = "<group>"; };
-		36D69A4211F924B500699158 /* al_GraphicsBackend.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_GraphicsBackend.hpp; sourceTree = "<group>"; };
-		36D69A4311F924C900699158 /* al_GraphicsBackendOpenGL.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_GraphicsBackendOpenGL.hpp; sourceTree = "<group>"; };
-		36D69A4411F925FC00699158 /* al_GraphicsBackendOpenGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GraphicsBackendOpenGL.cpp; sourceTree = "<group>"; };
 		36D69A4A11F9264700699158 /* al_Surface.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Surface.hpp; sourceTree = "<group>"; };
 		36D69A5211F9267800699158 /* al_Surface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Surface.cpp; sourceTree = "<group>"; };
 		36E4155711E99BED00A8A63D /* al_ThreadAPR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_ThreadAPR.cpp; sourceTree = "<group>"; };
@@ -1192,9 +1187,6 @@
 				16AA95E9118F6EEF00B98EC3 /* al_GPUObject.hpp */,
 				362127C71173CD72009CB6FC /* al_Graphics.hpp */,
 				165869491288E9380068E01A /* al_GraphicsOpenGL.hpp */,
-				361AA6F112AEC2B8002E9DFD /* al_Graphics_Old.hpp */,
-				36D69A4211F924B500699158 /* al_GraphicsBackend.hpp */,
-				36D69A4311F924C900699158 /* al_GraphicsBackendOpenGL.hpp */,
 				36F596691211D5AB003B78B5 /* al_Image.hpp */,
 				160FD0DF11FA1CE4001E8987 /* al_Isosurface.hpp */,
 				16AA95EA118F6EEF00B98EC3 /* al_Light.hpp */,
@@ -1218,8 +1210,6 @@
 				36F0ABBF12319586000A8EBF /* Makefile.config */,
 				362127C81173CDBB009CB6FC /* al_Graphics.cpp */,
 				361AA71B12AECB0A002E9DFD /* al_GraphicsGL.cpp */,
-				361AA6F412AEC305002E9DFD /* al_Graphics_Old.cpp */,
-				36D69A4411F925FC00699158 /* al_GraphicsBackendOpenGL.cpp */,
 				36F596741211D5F8003B78B5 /* al_Image.cpp */,
 				160FD0E011FA1CF4001E8987 /* al_Isosurface.cpp */,
 				16AA95F2118F74FB00B98EC3 /* al_Light.cpp */,
