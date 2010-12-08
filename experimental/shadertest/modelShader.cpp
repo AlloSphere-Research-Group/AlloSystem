@@ -7,11 +7,9 @@
 
 #include "allocore/graphics/al_Shader.hpp"
 
-
-
 using namespace al;
 
-Graphics gl(new GraphicsBackendOpenGL);
+GraphicsGL gl;
 SearchPaths searchpaths;
 
 Shader vert, frag;
@@ -67,7 +65,7 @@ int loadasset(std::string path)
 	printf("loading model %s\n", path.c_str());
 	// we are taking one of the postprocessing presets to avoid
 	// writing 20 single postprocessing flags here.
-	scene = aiImportFile(path.c_str(), aiProcessPreset_TargetRealtime_Quality);
+	scene = aiImportFile(path.c_str(), aiProcessPreset_TargetRealtime_Quality | aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_GenUVCoords | aiProcess_TransformUVCoords);
 	if (scene) {
 		get_bounding_box(&scene_min,&scene_max);
 		scene_center.x = (scene_min.x + scene_max.x) / 2.0f;
@@ -228,26 +226,17 @@ void recursive_render (const struct aiScene *sc, const struct aiNode* nd)
 	glPopMatrix();
 }
 
-int initialized = 0;
-
 struct MyWindow : Window{
 
 	bool onFrame(){
 	
-		if (!initialized) {
-			frag.create();
-			vert.create();
-			shaderprogram.create();
-		
+		if (!shaderprogram.linked()) {
 			frag.compile();	
 			vert.compile();
-			
 			shaderprogram.attach(vert);
 			shaderprogram.attach(frag);
 			shaderprogram.link();
-			
-			initialized = 1;
-			
+		
 			printf("compiled shaders\n");
 		}
 	
@@ -280,20 +269,20 @@ struct MyWindow : Window{
 		glEnable(GL_NORMALIZE);
 		glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
 		
-		const GLfloat pos[]={ 0.f, 1.f, 0.f, 0.f };
+		const GLfloat pos[]={ 0.f, 1.f, 2.f, 0.f };
 		glLightfv(GL_LIGHT0, GL_POSITION, pos);
 		
 		glPushMatrix();
 		
 		// rotate it around the y axis
 		glRotatef(a, 1.f,1.f,0.f);
-		a += 0.1;
+		a += 0.5;
 		
 		// scale the whole asset to fit into our view frustum 
 		float tmp = scene_max.x-scene_min.x;
 		tmp = MAX(scene_max.y - scene_min.y,tmp);
 		tmp = MAX(scene_max.z - scene_min.z,tmp);
-		tmp = 1.f / tmp;
+		tmp = 2.f / tmp;
 		glScalef(tmp, tmp, tmp);
 		
 		// center the model
@@ -340,8 +329,8 @@ int main (int argc, char * const argv[]) {
 		printf("error reading %s\n", path.filepath().c_str());
 		return -1;
 	}
-	File frag_file(searchpaths.find("shaderTestF.glsl"), "r", true);
-	File vert_file(searchpaths.find("shaderTestV.glsl"), "r", true);
+	File frag_file(searchpaths.find("basicFragment.glsl"), "r", true);
+	File vert_file(searchpaths.find("basicVertex.glsl"), "r", true);
 	
 	printf("frag_file %s %s\n", frag_file.path().c_str(), frag_file.readAll());
 	printf("vert_file %s %s\n", vert_file.path().c_str(), vert_file.readAll());

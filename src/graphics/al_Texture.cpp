@@ -31,14 +31,13 @@ void Texture::bind(int unit) {
 		destroy();
 	}
 
-	if(! created()) {
+	if(!created()) {
 		create();
 		mRebuild = false;
 	}
 
 	mBackend->textureBind(this, unit);
 	
-
 	if(mUpdate) {
 		mBackend->textureSubmit(this);
 		mUpdate = false;

@@ -440,17 +440,14 @@ GLenum internal_format_from_format(Texture::Format format, Texture::Type type) {
 }
 
 void GraphicsGL :: textureCreate(Texture *tex) {
-//	MuroError err = MURO_ERROR_NONE;
 	GLuint texid = 0;
 	
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glGenTextures(1, &texid);
 	
-//	if(texid <= 0) return err;
 	if(texid <= 0) return;
 	
 	tex->id((int)texid);
-	
 
 	// get the OpenGL texture target
 	tex->target(check_target(tex->target()));

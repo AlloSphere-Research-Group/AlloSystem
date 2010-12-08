@@ -43,7 +43,7 @@ public:
 	}
 	void send() { (*this)(); }
 	
-	void bind() const { glBindBuffer(mType, id()); }
+	void bind() const { validate(); glBindBuffer(mType, id()); }
 	void unbind() const { glBindBuffer(mType, 0); }
 
 #ifdef AL_GRAPHICS_USE_OPENGL

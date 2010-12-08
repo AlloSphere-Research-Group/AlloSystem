@@ -30,7 +30,7 @@ void glDetachShader(GLuint program, GLuint shader);
 Shader::Shader(const std::string& source, Shader::Type type)
 :	mSource(source), mType(type){}
 
-Shader& Shader::compile(){ glCompileShader(id()); return *this; }
+Shader& Shader::compile(){ validate(); glCompileShader(id()); return *this; }
 
 bool Shader::compiled() const {
 	GLint v;
@@ -72,8 +72,16 @@ Shader& Shader::source(const std::string& src, Shader::Type type){
 
 
 
-const ShaderProgram& ShaderProgram::attach(const Shader& s) const { glAttachShader(id(), s.id()); return *this; }
-const ShaderProgram& ShaderProgram::detach(const Shader& s) const { glDetachShader(id(), s.id()); return *this; }
+const ShaderProgram& ShaderProgram::attach(Shader& s) { 
+	validate();
+	if (!s.compiled()) s.compile();
+	glAttachShader(id(), s.id()); 
+	return *this; 
+}
+const ShaderProgram& ShaderProgram::detach(const Shader& s) const { 
+	glDetachShader(id(), s.id()); 
+	return *this; 
+}
 const ShaderProgram& ShaderProgram::link() const { glLinkProgram(id()); return *this; }
 
 void ShaderProgram::onCreate(){ mID = glCreateProgram(); }

@@ -103,10 +103,6 @@
 		3687E33B11FA4F9500EC6706 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		3687E33D11FA4F9500EC6706 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		3687E34311FA4FA100EC6706 /* exIsosurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3687E2BE11FA39F900EC6706 /* exIsosurface.cpp */; };
-		369837E212A485C200D8CCEA /* shaderTestV.glsl in Sources */ = {isa = PBXBuildFile; fileRef = 369837E112A485C200D8CCEA /* shaderTestV.glsl */; };
-		369837E412A485CF00D8CCEA /* shaderTestF.glsl in Sources */ = {isa = PBXBuildFile; fileRef = 369837E312A485CF00D8CCEA /* shaderTestF.glsl */; };
-		369837EE12A4862F00D8CCEA /* shaderTestV.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 369837E112A485C200D8CCEA /* shaderTestV.glsl */; };
-		369837EF12A4862F00D8CCEA /* shaderTestF.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = 369837E312A485CF00D8CCEA /* shaderTestF.glsl */; };
 		36B4129910EFF864007B16D0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		36B412B010EFF916007B16D0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		36C079B211D4966500764E50 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
@@ -236,8 +232,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
-				369837EE12A4862F00D8CCEA /* shaderTestV.glsl in CopyFiles */,
-				369837EF12A4862F00D8CCEA /* shaderTestF.glsl in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -266,7 +260,7 @@
 /* Begin PBXFileReference section */
 		05C93813128A158B0068F87F /* exSimpleGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exSimpleGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
 		05C93876128A16060068F87F /* simpleGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = simpleGraphics.cpp; sourceTree = "<group>"; };
-		05C93890128A166B0068F87F /* exShader */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exShader; sourceTree = BUILT_PRODUCTS_DIR; };
+		05C93890128A166B0068F87F /* exSimpleGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exSimpleGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
 		05C93892128A168F0068F87F /* graphicsData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = graphicsData.cpp; sourceTree = "<group>"; };
 		05C938B8128A17190068F87F /* al_NavControl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_NavControl.hpp; sourceTree = "<group>"; };
 		05C938B9128A17190068F87F /* exCamera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exCamera.cpp; sourceTree = "<group>"; };
@@ -277,7 +271,6 @@
 		160FD0DF11FA1CE4001E8987 /* al_Isosurface.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Isosurface.hpp; sourceTree = "<group>"; };
 		16198FF31173E39B006FBADF /* al_Buffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Buffer.hpp; sourceTree = "<group>"; };
 		1619909B11743914006FBADF /* al_Color.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Color.hpp; sourceTree = "<group>"; };
-		165869491288E9380068E01A /* al_GraphicsOpenGL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_GraphicsOpenGL.h; sourceTree = "<group>"; };
 		1663FD461280D608002B2979 /* al_Allocore.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Allocore.hpp; sourceTree = "<group>"; };
 		166DD741117CDB6000A8BA12 /* al_Conversion.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Conversion.hpp; sourceTree = "<group>"; };
 		166DD78D117CDF1800A8BA12 /* pstdint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pstdint.h; sourceTree = "<group>"; };
@@ -503,6 +496,8 @@
 		361718DF128B22CF00D6ED65 /* notes */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = notes; sourceTree = "<group>"; };
 		361718E0128B22CF00D6ED65 /* threadedapp.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = threadedapp.xcodeproj; sourceTree = "<group>"; };
 		361718E3128B22CF00D6ED65 /* threadedapp_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = threadedapp_Prefix.pch; sourceTree = "<group>"; };
+		361AA90A12AF0B9D002E9DFD /* basicFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = basicFragment.glsl; path = ../../resources/shaders/basicFragment.glsl; sourceTree = SOURCE_ROOT; };
+		361AA90B12AF0BB1002E9DFD /* basicVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = basicVertex.glsl; path = ../../resources/shaders/basicVertex.glsl; sourceTree = SOURCE_ROOT; };
 		361BF02F11DEA66600E60A9C /* al_BufferObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_BufferObject.hpp; sourceTree = "<group>"; };
 		361BF03111DEAA9400E60A9C /* al_FBO.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_FBO.hpp; sourceTree = "<group>"; };
 		361BF1B111DEBA3A00E60A9C /* exAudioScene */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exAudioScene; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -573,10 +568,6 @@
 		3687E2BE11FA39F900EC6706 /* exIsosurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exIsosurface.cpp; sourceTree = "<group>"; };
 		3687E34111FA4F9500EC6706 /* exIsosurface */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exIsosurface; sourceTree = BUILT_PRODUCTS_DIR; };
 		3698371A12A47EB700D8CCEA /* al_Graphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Graphics.cpp; sourceTree = "<group>"; };
-		3698371B12A47EB700D8CCEA /* al_GraphicsBackendOpenGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GraphicsBackendOpenGL.cpp; sourceTree = "<group>"; };
-		3698371C12A47EB700D8CCEA /* al_GraphicsOpenGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GraphicsOpenGL.cpp; sourceTree = "<group>"; };
-		3698371D12A47EB700D8CCEA /* al_GraphicsOpenGLES1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GraphicsOpenGLES1.cpp; sourceTree = "<group>"; };
-		3698371E12A47EB700D8CCEA /* al_GraphicsOpenGLES2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GraphicsOpenGLES2.cpp; sourceTree = "<group>"; };
 		3698371F12A47EB700D8CCEA /* al_Image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Image.cpp; sourceTree = "<group>"; };
 		3698372012A47EB700D8CCEA /* al_Isosurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Isosurface.cpp; sourceTree = "<group>"; };
 		3698372112A47EB700D8CCEA /* al_Light.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Light.cpp; sourceTree = "<group>"; };
@@ -598,7 +589,6 @@
 		3698373512A47EB700D8CCEA /* al_ImplAPR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_ImplAPR.h; sourceTree = "<group>"; };
 		3698373612A47EB700D8CCEA /* lua_utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lua_utility.h; sourceTree = "<group>"; };
 		3698373812A47EB700D8CCEA /* al_OSC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_OSC.cpp; sourceTree = "<group>"; };
-		3698373912A47EB700D8CCEA /* al_OSCAPR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_OSCAPR.cpp; sourceTree = "<group>"; };
 		3698373A12A47EB700D8CCEA /* al_Serialize.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Serialize.cpp; sourceTree = "<group>"; };
 		3698373B12A47EB700D8CCEA /* Makefile.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.config; sourceTree = "<group>"; };
 		3698373D12A47EB700D8CCEA /* al_OpenCLCommandQueue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_OpenCLCommandQueue.cpp; sourceTree = "<group>"; };
@@ -638,8 +628,6 @@
 		3698377112A47EB700D8CCEA /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
 		3698377212A47EB700D8CCEA /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
 		3698377312A47EB700D8CCEA /* test_portaudio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_portaudio.c; sourceTree = "<group>"; };
-		369837E112A485C200D8CCEA /* shaderTestV.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = shaderTestV.glsl; sourceTree = "<group>"; };
-		369837E312A485CF00D8CCEA /* shaderTestF.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = shaderTestF.glsl; sourceTree = "<group>"; };
 		36A20CFC110ACA0E0075A21C /* al_OSCAPR.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OSCAPR.hpp; sourceTree = "<group>"; };
 		36B4125210EFF7B8007B16D0 /* al_Lattice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Lattice.h; sourceTree = "<group>"; };
 		36B4125310EFF7B8007B16D0 /* al_Lattice.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Lattice.hpp; sourceTree = "<group>"; };
@@ -691,8 +679,6 @@
 		36C13F0E11D15FA9006196FC /* al_Reverb.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Reverb.hpp; sourceTree = "<group>"; };
 		36D69A3B11F923FC00699158 /* exGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
 		36D69A3E11F9242400699158 /* exGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exGraphics.cpp; sourceTree = "<group>"; };
-		36D69A4211F924B500699158 /* al_GraphicsBackend.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_GraphicsBackend.hpp; sourceTree = "<group>"; };
-		36D69A4311F924C900699158 /* al_GraphicsBackendOpenGL.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_GraphicsBackendOpenGL.hpp; sourceTree = "<group>"; };
 		36D69A4A11F9264700699158 /* al_Surface.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Surface.hpp; sourceTree = "<group>"; };
 		36F0ABCF123195D5000A8EBF /* al_Slab.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Slab.hpp; sourceTree = "<group>"; };
 		36F0ABD0123195F2000A8EBF /* liblua.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = liblua.a; sourceTree = "<group>"; };
@@ -1027,9 +1013,6 @@
 				361BF02F11DEA66600E60A9C /* al_BufferObject.hpp */,
 				16AA95E9118F6EEF00B98EC3 /* al_GPUObject.hpp */,
 				362127C71173CD72009CB6FC /* al_Graphics.hpp */,
-				36D69A4211F924B500699158 /* al_GraphicsBackend.hpp */,
-				36D69A4311F924C900699158 /* al_GraphicsBackendOpenGL.hpp */,
-				165869491288E9380068E01A /* al_GraphicsOpenGL.h */,
 				36F596691211D5AB003B78B5 /* al_Image.hpp */,
 				160FD0DF11FA1CE4001E8987 /* al_Isosurface.hpp */,
 				16AA95EA118F6EEF00B98EC3 /* al_Light.hpp */,
@@ -1063,7 +1046,7 @@
 				367F0B5C12034F1E00FCC534 /* exStereographics */,
 				B9C962AF1218939E00091F80 /* exOpenCL */,
 				05C93813128A158B0068F87F /* exSimpleGraphics */,
-				05C93890128A166B0068F87F /* exShader */,
+				05C93890128A166B0068F87F /* exSimpleGraphics */,
 				36320458128B278600A742CC /* frp */,
 			);
 			name = Products;
@@ -1478,8 +1461,8 @@
 			isa = PBXGroup;
 			children = (
 				3633CE4D129DE080006269CE /* modelShader.cpp */,
-				369837E112A485C200D8CCEA /* shaderTestV.glsl */,
-				369837E312A485CF00D8CCEA /* shaderTestF.glsl */,
+				361AA90A12AF0B9D002E9DFD /* basicFragment.glsl */,
+				361AA90B12AF0BB1002E9DFD /* basicVertex.glsl */,
 			);
 			name = shadertest;
 			path = ../shadertest;
@@ -1704,10 +1687,6 @@
 			isa = PBXGroup;
 			children = (
 				3698371A12A47EB700D8CCEA /* al_Graphics.cpp */,
-				3698371B12A47EB700D8CCEA /* al_GraphicsBackendOpenGL.cpp */,
-				3698371C12A47EB700D8CCEA /* al_GraphicsOpenGL.cpp */,
-				3698371D12A47EB700D8CCEA /* al_GraphicsOpenGLES1.cpp */,
-				3698371E12A47EB700D8CCEA /* al_GraphicsOpenGLES2.cpp */,
 				3698371F12A47EB700D8CCEA /* al_Image.cpp */,
 				3698372012A47EB700D8CCEA /* al_Isosurface.cpp */,
 				3698372112A47EB700D8CCEA /* al_Light.cpp */,
@@ -1765,7 +1744,6 @@
 			isa = PBXGroup;
 			children = (
 				3698373812A47EB700D8CCEA /* al_OSC.cpp */,
-				3698373912A47EB700D8CCEA /* al_OSCAPR.cpp */,
 				3698373A12A47EB700D8CCEA /* al_Serialize.cpp */,
 				3698373B12A47EB700D8CCEA /* Makefile.config */,
 				3698373C12A47EB700D8CCEA /* opencl */,
@@ -2086,7 +2064,7 @@
 			);
 			name = exShader;
 			productName = exSimpleGraphics;
-			productReference = 05C93890128A166B0068F87F /* exShader */;
+			productReference = 05C93890128A166B0068F87F /* exSimpleGraphics */;
 			productType = "com.apple.product-type.tool";
 		};
 		3602B4CA110A67C9005DC3D0 /* exOscRecv */ = {
@@ -2292,7 +2270,7 @@
 			productReference = 36D69A3B11F923FC00699158 /* exGraphics */;
 			productType = "com.apple.product-type.tool";
 		};
-		8DD76F620486A84900D96B5E /* exAlloLua */ = {
+		8DD76F620486A84900D96B5E /* exScheduling */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "exScheduling" */;
 			buildPhases = (
@@ -2368,7 +2346,7 @@
 			);
 			projectRoot = "";
 			targets = (
-				8DD76F620486A84900D96B5E /* exAlloLua */,
+				8DD76F620486A84900D96B5E /* exScheduling */,
 				3602B4CA110A67C9005DC3D0 /* exOscRecv */,
 				3602B728110A9770005DC3D0 /* exOscSend */,
 				3622BFD6116D55DD00928703 /* exMainloopTool */,
@@ -2464,8 +2442,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3633CE4E129DE080006269CE /* modelShader.cpp in Sources */,
-				369837E212A485C200D8CCEA /* shaderTestV.glsl in Sources */,
-				369837E412A485CF00D8CCEA /* shaderTestF.glsl in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2681,6 +2657,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
 			};
 			name = Debug;
 		};
@@ -2701,6 +2678,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = exSimpleGraphics;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -2837,7 +2815,7 @@
 					$PROJECT_DIR/../../dev/osx/lib,
 					$PROJECT_DIR/../../build/$CONFIGURATION,
 				);
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				RUN_CLANG_STATIC_ANALYZER = YES;

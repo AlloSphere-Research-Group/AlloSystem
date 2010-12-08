@@ -130,6 +130,7 @@
 		360C404F11D32FED002FE91F /* al_Matrix4.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 360C404E11D32FED002FE91F /* al_Matrix4.hpp */; };
 		361AA71C12AECB0A002E9DFD /* al_GraphicsGL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 361AA71B12AECB0A002E9DFD /* al_GraphicsGL.cpp */; };
 		361AA7A512AEE1AC002E9DFD /* al_Mesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 361AA7A412AEE1AC002E9DFD /* al_Mesh.cpp */; };
+		361AA8AE12AEFDF3002E9DFD /* al_GPUObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 361AA8AD12AEFDF3002E9DFD /* al_GPUObject.cpp */; };
 		361BF1A511DEBA3A00E60A9C /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		361BF1A611DEBA3A00E60A9C /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		361BF1A711DEBA3A00E60A9C /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
@@ -625,6 +626,7 @@
 		361AA71B12AECB0A002E9DFD /* al_GraphicsGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GraphicsGL.cpp; sourceTree = "<group>"; };
 		361AA7A312AEE173002E9DFD /* al_Mesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Mesh.hpp; sourceTree = "<group>"; };
 		361AA7A412AEE1AC002E9DFD /* al_Mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Mesh.cpp; sourceTree = "<group>"; };
+		361AA8AD12AEFDF3002E9DFD /* al_GPUObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GPUObject.cpp; sourceTree = "<group>"; };
 		361BF02F11DEA66600E60A9C /* al_BufferObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_BufferObject.hpp; sourceTree = "<group>"; };
 		361BF03111DEAA9400E60A9C /* al_FBO.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_FBO.hpp; sourceTree = "<group>"; };
 		361BF1B111DEBA3A00E60A9C /* exAudioScene */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exAudioScene; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1208,6 +1210,7 @@
 			isa = PBXGroup;
 			children = (
 				36F0ABBF12319586000A8EBF /* Makefile.config */,
+				361AA8AD12AEFDF3002E9DFD /* al_GPUObject.cpp */,
 				362127C81173CDBB009CB6FC /* al_Graphics.cpp */,
 				361AA71B12AECB0A002E9DFD /* al_GraphicsGL.cpp */,
 				36F596741211D5F8003B78B5 /* al_Image.cpp */,
@@ -2321,6 +2324,7 @@
 				1686189D12A58918002AD8AB /* OscTypes.cpp in Sources */,
 				361AA71C12AECB0A002E9DFD /* al_GraphicsGL.cpp in Sources */,
 				361AA7A512AEE1AC002E9DFD /* al_Mesh.cpp in Sources */,
+				361AA8AE12AEFDF3002E9DFD /* al_GPUObject.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

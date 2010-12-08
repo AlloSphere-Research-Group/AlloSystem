@@ -183,7 +183,6 @@ struct MyWindow : WindowGL{
 	}
 	
 	Context ctx;
-	//GPUObjectList objects;
 };
 
 MyWindow win1;

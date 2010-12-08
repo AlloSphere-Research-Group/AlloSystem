@@ -20,7 +20,7 @@ public:
 	static void bind(GLuint id);
 	static void storage(GLenum internalformat, GLsizei width, GLsizei height);
 
-	void bind() const { bind(id()); }
+	void bind() const { validate(); bind(id()); }
 	void begin() const { bind(); }
 	static void end() { bind(0); }
 	GLenum format() const { return mFormat; }
@@ -54,7 +54,7 @@ public:
 	FBO& detachTexture2D(int attach=0, int level=0);
 
 	/// Start rendering to attached objects
-	void begin() const { bind(id()); }
+	void begin() const { validate(); bind(id()); }
 
 	/// Stop rendering to attached objects
 	static void end(){ bind(0); }

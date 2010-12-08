@@ -71,7 +71,8 @@ public:
 	/// Any attached shaders will automatically be detached, but not deleted.
 	virtual ~ShaderProgram(){ destroy(); }
 	
-	const ShaderProgram& attach(const Shader& s) const;
+	/// input Shader s will be compiled if necessary:
+	const ShaderProgram& attach(Shader& s);
 	const ShaderProgram& detach(const Shader& s) const;
 	
 	const ShaderProgram& link() const;
