@@ -252,6 +252,7 @@ struct MyWindow : Window{
 			shaderprogram.attach(vert);
 			shaderprogram.attach(frag);
 			shaderprogram.link();
+			shaderprogram.listParams();
 			
 			printf("frag %s\n", frag.log());
 			printf("vert %s\n", vert.log());

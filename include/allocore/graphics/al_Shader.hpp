@@ -66,6 +66,43 @@ private:
 /// Links shaders to one program object
 class ShaderProgram : public ShaderBase{
 public:
+
+	/*!
+		The basic parameter types
+	*/
+	enum Type {
+		NONE = 0,	//uninitialized type
+
+		FLOAT,		///< A single float value
+		VEC2,		///< Two float values
+		VEC3,		///< Three float values
+		VEC4,		///< Four float values
+
+		INT,		///< A single int value
+		INT2,		///< Two int values
+		INT3,		///< Three int values
+		INT4,		///< Four int values
+
+		BOOL,		///< A single bool value
+		BOOL2,		///< Two bool values
+		BOOL3,		///< Three bool values
+		BOOL4,		///< Four bool values
+
+		MAT22,		///< A 2x2 matrix
+		MAT33,		///< A 3x3 matrix
+		MAT44,		///< A 4x4 matrix
+
+		SAMPLER_1D,			///< A 1D texture
+		SAMPLER_2D,			///< A 2D texture
+		SAMPLER_RECT,		///< A rectangular texture
+		SAMPLER_3D,			///< A 3D texture
+		SAMPLER_CUBE,		///< A cubemap texture
+		SAMPLER_1D_SHADOW,	///< A 1D depth texture
+		SAMPLER_2D_SHADOW	///< A 2D depth texture
+
+		//textures? non square matrices? attributes?
+	};
+
 	ShaderProgram(){}
 	
 	/// Any attached shaders will automatically be detached, but not deleted.
@@ -84,8 +121,11 @@ public:
 	/// Returns whether program linked successfully.
 	bool linked() const;
 
+	void listParams() const;
 	const ShaderProgram& uniform(const char * name, int v0);
 	const ShaderProgram& uniform(const char * name, float v0);
+	
+	static Type param_type_from_gltype(GLenum gltype);
 
 protected:
 	int uniformLocation(const char * name) const;

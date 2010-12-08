@@ -1,6 +1,12 @@
 #include "allocore/graphics/al_GraphicsOpenGL.hpp"
 #include "allocore/graphics/al_Shader.hpp"
 
+#include <map>
+#include <string>
+
+using std::map;
+using std::string;
+
 namespace al{
 
 GLenum gl_shader_type(Shader::Type v) {
@@ -120,20 +126,142 @@ bool ShaderProgram::linked() const {
 
 const ShaderProgram& ShaderProgram::uniform(const char * name, int v0){
 	glUniform1i(uniformLocation(name), v0); 
+	//glUniform1iARB(uniformLocation(name), v0);
 	return *this;
 }
 
 const ShaderProgram& ShaderProgram::uniform(const char * name, float v0){
 	glUniform1f(uniformLocation(name), v0); 
+	//glUniform1fARB(uniformLocation(name), v0);
 	return *this;
 }
 
 int ShaderProgram::uniformLocation(const char * name) const { 
 	return glGetUniformLocation(id(), name); 
+	//return glGetUniformLocationARB(id(), name);
 }
 
 void ShaderProgram::get(int pname, void * params) const { 
 	glGetProgramiv(id(), pname, (GLint *)params); 
+}
+
+void ShaderProgram::listParams() const {
+	GLuint program = id();
+	GLint numActiveUniforms = 0;
+	GLint numActiveAttributes = 0;
+
+	glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numActiveUniforms);
+	glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &numActiveAttributes);
+
+	for(int j=0; j < numActiveUniforms; j++)
+	{
+		GLsizei length;
+		GLint size;
+		GLenum gltype;
+		char name[256];
+
+		glGetActiveUniform(program,
+							j,
+							256,
+							&length,
+							&size,
+							&gltype,
+							name);
+
+		// check for array names
+		if(name[ strlen(name)-3 ] == '[' && name[ strlen(name)-1 ] == ']') {
+			name[ strlen(name)-3 ] = '\0';
+		}
+		
+		printf("uniform %d(%s): type %d size %d length %d\n",
+			j, name, param_type_from_gltype(gltype), size, length);
+
+//		//could already have a param if the user set some values before compiling
+//		map<string, ShaderProgram *>::iterator it = mParameters.find(name);
+//		if(it != mParameters.end()) {
+//			ShaderProgram::Type type = param_type_from_gltype(gltype);
+//			ShaderProgram &p = *(it->second);
+//			p.set_active(true);
+//			p.set_location(j);
+//			p.set_type(type);
+//			p.set_count(size);
+//		}
+		/*
+		Only use params defined in shader file
+		else
+		{
+			ShaderProgram *p = new ShaderProgram(name, j, type, size);
+			mParameters[ name ] = p;
+		}*/
+	}
+
+	for(int j=0; j < numActiveAttributes; j++) {
+		GLsizei length;
+		GLint size;
+		GLenum gltype;
+		char name[256];	// could query for max char length
+
+		glGetActiveAttrib(program,
+							j,
+							256,
+							&length,
+							&size,
+							&gltype,
+							name);
+							
+		printf("attribute %d(%s): type %d size %d length %d\n",
+			j, name, param_type_from_gltype(gltype), size, length);
+
+		//map<string, ShaderAttribute *>::iterator it = mAttributes.find(name);
+//		if(it != mAttributes.end()) {
+//			// TODO: FIX THIS HACK
+//			#if defined(MURO_LINUX_VERSION)
+//			int loc = (j < 0) ? 1 : j+1;
+//			#else
+//			int loc = (j <= 0) ? 1 : j;
+//			#endif
+//			ShaderProgram::Type type = param_type_from_gltype(gltype);
+//			ShaderAttribute &a = *(it->second);
+//			a.realize_location(loc);
+//			a.set_type(type);
+//			//a.setCount(size);
+//		}
+	}
+}
+
+ShaderProgram::Type ShaderProgram :: param_type_from_gltype(GLenum gltype) {
+	ShaderProgram::Type type = ShaderProgram::NONE;
+
+	switch(gltype) {
+		case GL_FLOAT:			type = ShaderProgram::FLOAT;	break;
+		case GL_FLOAT_VEC2:		type = ShaderProgram::VEC2;	break;
+		case GL_FLOAT_VEC3:		type = ShaderProgram::VEC3;	break;
+		case GL_FLOAT_VEC4:		type = ShaderProgram::VEC4;	break;
+
+		case GL_INT:			type = ShaderProgram::INT;	break;
+		case GL_INT_VEC2:		type = ShaderProgram::INT2;	break;
+		case GL_INT_VEC3:		type = ShaderProgram::INT3;	break;
+		case GL_INT_VEC4:		type = ShaderProgram::INT4;	break;
+
+		case GL_BOOL:			type = ShaderProgram::BOOL;	break;
+		case GL_BOOL_VEC2:		type = ShaderProgram::BOOL2;	break;
+		case GL_BOOL_VEC3:		type = ShaderProgram::BOOL3;	break;
+		case GL_BOOL_VEC4:		type = ShaderProgram::BOOL4;	break;
+
+		case GL_FLOAT_MAT2:		type = ShaderProgram::MAT22;	break;
+		case GL_FLOAT_MAT3:		type = ShaderProgram::MAT33;	break;
+		case GL_FLOAT_MAT4:		type = ShaderProgram::MAT44;	break;
+
+		case GL_SAMPLER_1D:		type = ShaderProgram::SAMPLER_1D;	break;
+		case GL_SAMPLER_2D:		type = ShaderProgram::SAMPLER_2D;	break;
+		case GL_SAMPLER_2D_RECT_ARB: type = ShaderProgram::SAMPLER_RECT; break;
+		case GL_SAMPLER_3D:		type = ShaderProgram::SAMPLER_3D;	break;
+		case GL_SAMPLER_CUBE:	type = ShaderProgram::SAMPLER_CUBE; break;
+		case GL_SAMPLER_1D_SHADOW: type = ShaderProgram::SAMPLER_1D_SHADOW; break;
+		case GL_SAMPLER_2D_SHADOW: type = ShaderProgram::SAMPLER_2D_SHADOW; break;
+	}
+
+	return type;
 }
 
 } // ::al
