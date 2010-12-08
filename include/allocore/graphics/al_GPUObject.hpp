@@ -26,6 +26,7 @@ public:
 	
 	// register with a context (note: should only register with one context!)
 	void contextRegister(std::string ctx);
+	void contextRegister(GPUContext& ctx) { contextRegister(ctx.contextName()); }
 	
 	// remove from the context:
 	void contextUnregister();

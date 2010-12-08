@@ -86,9 +86,10 @@ public:
 
 	const ShaderProgram& uniform(const char * name, int v0);
 	const ShaderProgram& uniform(const char * name, float v0);
-	int uniformLocation(const char * name) const;
 
 protected:
+	int uniformLocation(const char * name) const;
+	
 	virtual void get(int pname, void * params) const;
 
 	virtual void onCreate();

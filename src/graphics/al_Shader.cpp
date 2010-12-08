@@ -82,28 +82,59 @@ const ShaderProgram& ShaderProgram::detach(const Shader& s) const {
 	glDetachShader(id(), s.id()); 
 	return *this; 
 }
-const ShaderProgram& ShaderProgram::link() const { glLinkProgram(id()); return *this; }
+const ShaderProgram& ShaderProgram::link() const { 
+	glLinkProgram(id()); 
+	
+	int isValid;
+	glValidateProgram(id());
+	glGetProgramiv(id(), GL_VALIDATE_STATUS, &isValid);
+	if (!isValid) {
+		GraphicsGL::gl_error("ShaderProgram::link");
+	}
+	return *this; 
+}
 
-void ShaderProgram::onCreate(){ mID = glCreateProgram(); }
-void ShaderProgram::onDestroy(){ glDeleteProgram(id()); }
+void ShaderProgram::onCreate(){ 
+	mID = glCreateProgram(); 
+}
+void ShaderProgram::onDestroy(){ 
+	glDeleteProgram(id()); 
+}
 
-const ShaderProgram& ShaderProgram::use() const { glUseProgram(id()); return *this; }
-void ShaderProgram::begin() const { use(); }
-void ShaderProgram::end() const { glUseProgram(0); }
-bool ShaderProgram::linked() const { GLint v; get(GL_LINK_STATUS, &v); return v; }
+const ShaderProgram& ShaderProgram::use() const { 
+	glUseProgram(id()); 
+	return *this; 
+}
+void ShaderProgram::begin() const { 
+	use(); 
+}
+void ShaderProgram::end() const { 
+	glUseProgram(0); 
+}
+bool ShaderProgram::linked() const { 
+	GLint v; 
+	get(GL_LINK_STATUS, &v); 
+	return v; 
+}
 // GLint v; glGetProgramiv(id(), GL_LINK_STATUS, &v); return v; }
 
 const ShaderProgram& ShaderProgram::uniform(const char * name, int v0){
-	glUniform1i(uniformLocation(name), v0); return *this;
+	glUniform1i(uniformLocation(name), v0); 
+	return *this;
 }
 
 const ShaderProgram& ShaderProgram::uniform(const char * name, float v0){
-	glUniform1f(uniformLocation(name), v0); return *this;
+	glUniform1f(uniformLocation(name), v0); 
+	return *this;
 }
 
-int ShaderProgram::uniformLocation(const char * name) const { return glGetUniformLocation(id(), name); }
+int ShaderProgram::uniformLocation(const char * name) const { 
+	return glGetUniformLocation(id(), name); 
+}
 
-void ShaderProgram::get(int pname, void * params) const { glGetProgramiv(id(), pname, (GLint *)params); }
+void ShaderProgram::get(int pname, void * params) const { 
+	glGetProgramiv(id(), pname, (GLint *)params); 
+}
 
 } // ::al
 

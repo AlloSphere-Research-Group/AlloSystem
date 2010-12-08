@@ -232,7 +232,7 @@ public:
 		void set(int l_, int t_, int w_, int h_){l=l_;t=t_;w=w_;h=h_;}
 	};
 
-	Window(std::string contextName);
+	Window();
 	virtual ~Window();
 	
 	/// Create a new window

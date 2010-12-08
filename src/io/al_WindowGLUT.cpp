@@ -459,8 +459,8 @@ private:
 
 
 
-Window::Window(std::string contextName)
-: mImpl(new WindowImpl(this)), mContextName(contextName) {}
+Window::Window()
+: mImpl(new WindowImpl(this)) {}
 
 Window::~Window(){
 	destroy();
@@ -473,6 +473,8 @@ void Window::create(
 )
 {
 	if(mImpl->created()) return;
+	
+	mContextName = title;
 
 	mImpl->mDimPrev.set(0,0,0,0);
 	mImpl->mDimCurr.set(dim.l,dim.t,0,0);

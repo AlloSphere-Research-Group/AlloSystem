@@ -498,6 +498,9 @@
 		361718E3128B22CF00D6ED65 /* threadedapp_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = threadedapp_Prefix.pch; sourceTree = "<group>"; };
 		361AA90A12AF0B9D002E9DFD /* basicFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = basicFragment.glsl; path = ../../resources/shaders/basicFragment.glsl; sourceTree = SOURCE_ROOT; };
 		361AA90B12AF0BB1002E9DFD /* basicVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = basicVertex.glsl; path = ../../resources/shaders/basicVertex.glsl; sourceTree = SOURCE_ROOT; };
+		361AAD3E12AF2DE7002E9DFD /* al_GPUObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GPUObject.cpp; sourceTree = "<group>"; };
+		361AAD3F12AF2DE7002E9DFD /* al_GraphicsGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GraphicsGL.cpp; sourceTree = "<group>"; };
+		361AAD4012AF2DE7002E9DFD /* al_Mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Mesh.cpp; sourceTree = "<group>"; };
 		361BF02F11DEA66600E60A9C /* al_BufferObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_BufferObject.hpp; sourceTree = "<group>"; };
 		361BF03111DEAA9400E60A9C /* al_FBO.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_FBO.hpp; sourceTree = "<group>"; };
 		361BF1B111DEBA3A00E60A9C /* exAudioScene */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exAudioScene; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1686,10 +1689,13 @@
 		3698371912A47EB700D8CCEA /* graphics */ = {
 			isa = PBXGroup;
 			children = (
+				361AAD3E12AF2DE7002E9DFD /* al_GPUObject.cpp */,
 				3698371A12A47EB700D8CCEA /* al_Graphics.cpp */,
+				361AAD3F12AF2DE7002E9DFD /* al_GraphicsGL.cpp */,
 				3698371F12A47EB700D8CCEA /* al_Image.cpp */,
 				3698372012A47EB700D8CCEA /* al_Isosurface.cpp */,
 				3698372112A47EB700D8CCEA /* al_Light.cpp */,
+				361AAD4012AF2DE7002E9DFD /* al_Mesh.cpp */,
 				3698372212A47EB700D8CCEA /* al_Model.cpp */,
 				3698372312A47EB700D8CCEA /* al_Shader.cpp */,
 				3698372412A47EB700D8CCEA /* al_Stereographic.cpp */,
