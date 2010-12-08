@@ -28,6 +28,7 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
+#include "allocore/graphics/al_GPUObject.hpp"
 #include <algorithm>
 #include <vector>
 #include <string>
@@ -219,7 +220,7 @@ private:
 
 
 /// Window with OpenGL context
-class Window : public InputEventHandler, public WindowEventHandler {
+class Window : public InputEventHandler, public WindowEventHandler, public GPUContext {
 public:
 
 	/// Window pixel dimensions
@@ -231,7 +232,7 @@ public:
 		void set(int l_, int t_, int w_, int h_){l=l_;t=t_;w=w_;h=h_;}
 	};
 
-	Window();
+	Window(std::string contextName);
 	virtual ~Window();
 	
 	/// Create a new window
@@ -249,6 +250,8 @@ public:
 	
 	/// Destroys current window and its associated OpenGL context
 	void destroy();
+	
+	std::string contextName() { return mContextName; }
 
 	const Keyboard& keyboard() const { return mKeyboard; }	///< Get current keyboard state
 	const Mouse& mouse() const { return mMouse; }			///< Get current mouse state
@@ -340,6 +343,7 @@ private:
 	Mouse mMouse;
 	InputEventHandlers mInputEventHandlers;
 	WindowEventHandlers mWindowEventHandlers;
+	std::string mContextName;
 
 	#define CALL(e)\
 	if(e){\
@@ -367,7 +371,10 @@ private:
 	}
 	void doFrame() { CALL(onFrame()); }
 	void doCreate(){ CALL(onCreate()); }				
-	void doDestroy(){ CALL(onDestroy()); }				
+	void doDestroy(){ 
+		CALL(onDestroy()); 
+		contextDestroy(); 
+	}				
 	void doResize(int w, int h){ CALL(onResize(w, h)); }	
 	void doVisibility(bool v){ CALL(onVisibility(v)); }
 	#undef CALL

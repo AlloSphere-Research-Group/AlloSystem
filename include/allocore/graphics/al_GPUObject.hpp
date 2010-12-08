@@ -1,18 +1,26 @@
 #ifndef INCLUDE_AL_GRAPHICS_GPUOBJECT_H
 #define INCLUDE_AL_GRAPHICS_GPUOBJECT_H
 
+#include <string>
 #include <list>
 
 namespace al{
+
+class GPUContext {
+public:	
+	virtual ~GPUContext() {};
+	
+	// returns the context name
+	virtual std::string contextName() = 0;
+	
+	// triggers destroy handler for each GPUObject registered in a given context
+	void contextDestroy();
+};
 
 /// Base class for allocated resources on the GPU
 class GPUObject{
 public:
 	
-	// triggers destroy handler for each GPUObject registered in a given context
-	static void contextRefresh(std::string ctx);
-
-
 	GPUObject(): mID(0){}
 	virtual ~GPUObject(){ contextUnregister(); }
 	

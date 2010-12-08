@@ -15,6 +15,20 @@ ContextMap g_context_resources;
 ResourceMap g_resources;
 
 
+
+void GPUContext :: contextDestroy() {
+	std::string ctx(contextName());
+	ContextMap::iterator it = g_context_resources.find(ctx);
+	if(it != g_context_resources.end()) {
+		ResourceSet &ctx_set = it->second;
+		ResourceSet::iterator sit = ctx_set.begin();
+		ResourceSet::iterator site = ctx_set.end();
+		for(; sit != site; ++sit) {
+			(*sit)->destroy();
+		}
+	}
+}
+
 void GPUObject :: contextRegister(std::string ctx) {
 	ContextMap::iterator it = g_context_resources.find(ctx);
 	if(it == g_context_resources.end()) {
@@ -39,18 +53,6 @@ void GPUObject :: contextUnregister() {
 		}
 		
 		g_resources.erase(rit);
-	}
-}
-
-void GPUObject :: contextRefresh(std::string ctx) {
-	ContextMap::iterator it = g_context_resources.find(ctx);
-	if(it != g_context_resources.end()) {
-		ResourceSet &ctx_set = it->second;
-		ResourceSet::iterator sit = ctx_set.begin();
-		ResourceSet::iterator site = ctx_set.end();
-		for(; sit != site; ++sit) {
-			(*sit)->destroy();
-		}
 	}
 }
 

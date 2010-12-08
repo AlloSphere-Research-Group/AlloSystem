@@ -48,7 +48,6 @@ public:
 	{
 		// ensure that GLUT and mainloop exist:
 		MainLoop::get();
-		//
 	}
 
 	~WindowImpl(){
@@ -460,7 +459,8 @@ private:
 
 
 
-Window::Window(): mImpl(new WindowImpl(this)){}
+Window::Window(std::string contextName)
+: mImpl(new WindowImpl(this)), mContextName(contextName) {}
 
 Window::~Window(){
 	destroy();
