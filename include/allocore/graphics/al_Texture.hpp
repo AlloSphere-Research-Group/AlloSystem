@@ -8,6 +8,7 @@
 namespace al{
 
 class Graphics;
+class Surface;
 
 /// Graphics texture
 class Texture : public GPUObject {
@@ -19,9 +20,9 @@ public:
 	};
 
 	enum Target {
-		TEXTURE_1D = 0,
+		TEXTURE_RECT = 0,
+		TEXTURE_1D,
 		TEXTURE_2D,
-		TEXTURE_RECT,
 		TEXTURE_3D
 	};
 
@@ -46,6 +47,7 @@ public:
 		CLAMP = 0,
 		CLAMP_TO_BORDER,
 		CLAMP_TO_EDGE,
+		MIRRORED_REPEAT,
 		REPEAT
 	};
 
@@ -60,11 +62,17 @@ public:
 
 	Texture(Graphics * backend);
 	virtual ~Texture();
+	
+	void attach(Surface *s);
+	void clear(int unit=0, bool do_bind=true, bool clear_data=false);
 
 	void bind(int unit = 0);
 	void unbind(int unit = 0);
 	void setArrayFormat(const AlloArrayHeader &header);
 	void fromArray(const al::Array *array);
+	void toArray();
+	
+	void allocate(AlloArrayHeader &header);
 
 	// trigger textureSubmit:
 	void update() { mUpdate = true; }
@@ -102,7 +110,10 @@ public:
 
 	Type type();
 	void type(Type v);
-
+	
+	Texture::Format singleChannel();
+	void singleChannel(Format v);
+	
 	Wrap wrap();
 	void wrap(Wrap v);
 
@@ -113,20 +124,26 @@ public:
 	void magFilter(Filter v);
 
 
+	void borderColor(const Color& c);
 	Color& borderColor() {return mBorderColor;}
 
+	Graphics * backend() {return mBackend;}
+	Surface * surface() {return mSurface;}
 
 	virtual void onCreate();
 	virtual void onDestroy();
 protected:
 
 	Format format_for_array_components(int components);
+	int components_for_format(Format format);
 	Type type_for_array_type(AlloTy type);
+	AlloTy array_type_for_type(Type type);
 	Target target_for_array_dimcount(int dimcount);
-
+	int dimcount_for_target(Target target);
 
 	Graphics *		mBackend;			///< Library backend
-	al::Array		mArray;			///< Array of data
+	Surface *		mSurface;			///< Surface object
+	al::Array		mArray;				///< Array of data
 	Mode			mMode;				///< Texture mode
 	bool			mRebuild;			///< Rebuild flag
 	bool			mUpdate;			///< Update flag
@@ -136,6 +153,7 @@ protected:
 	int				mDepth;				///< Depth of texture in pixels
 	Target			mTarget;			///< Texture target (2D, RECT, 3D, etc.)
 	Format			mFormat;			///< Texture format (RGB, RGBA, etc.)
+	Format			mSingleChannel;		///< Preferred single channel texture format (ALPHA or LUMINANCE)
 	Type			mType;				///< Texture type (UCHAR, FLOAT, etc.)
 	Wrap			mWrap;				///< Wrap mode
 	Filter			mMinFilter;			///< Minification filter

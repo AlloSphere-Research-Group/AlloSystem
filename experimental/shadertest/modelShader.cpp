@@ -244,6 +244,8 @@ struct MyWindow : Window{
 //			vert.validate();
 //			shaderprogram.validate();
 //			tex.validate();
+
+			printf("texture %dx%dx%d mode %d format %d type %d target %d\n", tex.width(), tex.height(), tex.depth(), tex.mode(), tex.format(), tex.type(), tex.target());
 			
 			frag.compile();	
 			vert.compile();
@@ -272,10 +274,11 @@ struct MyWindow : Window{
 		
 		gl.disable(gl.LIGHTING);
 		
-		tex.bind(0);
+		
 		//shaderprogram.begin();
 		//shaderprogram.uniform("tex", 0);
 		GraphicsGL::gl_error("tex");
+		tex.bind(0);
 		gl.begin(gl.QUADS);
 		gl.color(1, 1, 1);
 		gl.texcoord(0, 0);
@@ -287,22 +290,8 @@ struct MyWindow : Window{
 		gl.texcoord(1, 0);
 		gl.vertex(1, 0, 0);
 		gl.end();
-		//shaderprogram.end();
 		tex.unbind(0);
-		
-//		tex.bind();
-//		gl.begin(gl.QUADS);
-//		gl.color(1, 1, 1);
-//		gl.texcoord(0, 0);
-//		gl.vertex(0, 0, 0);
-//		gl.texcoord(0, 1);
-//		gl.vertex(0, 1, 0);
-//		gl.texcoord(1, 1);
-//		gl.vertex(1, 1, 0);
-//		gl.texcoord(1, 0);
-//		gl.vertex(1, 0, 0);
-//		gl.end();
-//		tex.unbind();
+		//shaderprogram.end();
 		
 		
 		glEnable(GL_LIGHTING);
@@ -347,20 +336,15 @@ struct MyWindow : Window{
 //			glEndList();
 //		}
 		
-		tex.bind(0);
 		shaderprogram.begin();
 		shaderprogram.uniform("tex", 0);
 		GraphicsGL::gl_error("tex");
-		shaderprogram.end();
+		tex.bind(0);
+		//glCallList(scene_list);
+		gl.color(1, 1, 1);
+		recursive_render(scene, scene->mRootNode);
 		tex.unbind(0);
-		
-		//shaderprogram.begin();
-//		tex.bind(0);
-//		//glCallList(scene_list);
-//		gl.color(1, 1, 1);
-//		recursive_render(scene, scene->mRootNode);
-//		tex.unbind(0);
-//		shaderprogram.end();
+		shaderprogram.end();
 		
 		glPopMatrix();
 		

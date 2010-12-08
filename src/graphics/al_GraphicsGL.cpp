@@ -577,6 +577,23 @@ void GraphicsGL :: textureLeave(Texture *tex, int unit) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
+void GraphicsGL :: textureToArray(Texture *tex) {
+	if(tex->mode() == Texture::SURFACE) {
+		Surface *surface = tex->surface();
+		if(surface) {
+			SurfaceData *surface_data = (SurfaceData *)surface->surfaceData();
+			//PBO *pbo = surface_data->pbo;
+//			pbo->bind();
+//			pbo->fromTexture(tex, format_from_texture_format(tex->format()));
+//			pbo->unbind();
+//			pbo->toArray(tex->array());
+		}
+	}
+	else {
+		// glTexImage
+	}
+}
+
 void GraphicsGL :: textureSubmit(Texture *tex){
 	GLvoid *data = (GLvoid *)tex->getData();
 	if(data) {
@@ -818,3 +835,60 @@ void GraphicsGL :: surfaceLeave(Surface *surface) {
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 }
+
+
+void GraphicsGL::surfaceClear(Surface *surface) {
+	surfaceBind(surface);
+	surfaceEnter(surface);
+	surfaceLeave(surface);
+	surfaceUnbind(surface);
+	
+	gl_error("clearing surface");
+}
+
+void GraphicsGL::surfaceCopy(Surface *surface, Texture *texture) {
+	glPushAttrib(GL_COLOR_BUFFER_BIT);	// to save blending state
+	glDisable(GL_BLEND);
+
+	surface->enter();
+	texture->bind(0);
+
+	glMatrixMode(GL_PROJECTION);
+		glPushMatrix();
+			glLoadIdentity();
+			glOrtho(-1.0, 1.0, -1.0, 1.0, -100, 100);
+
+			glMatrixMode(GL_MODELVIEW);
+			glPushMatrix();
+
+				glLoadIdentity();
+				glBegin(GL_QUADS);
+					glColor4f(1., 1., 1., 1.);
+					glTexCoord2f(0., 1.);
+					glVertex3f(-1., 1., 0.);
+
+					glTexCoord2f(1., 1.);
+					glVertex3f(1., 1., 0.);
+
+					glTexCoord2f(1., 0.);
+					glVertex3f(1., -1., 0.);
+
+					glTexCoord2f(0., 0.);
+					glVertex3f(-1., -1., 0.);
+
+				glEnd();
+
+			glPopMatrix();
+		glMatrixMode(GL_PROJECTION);
+		glPopMatrix();
+
+	glMatrixMode(GL_MODELVIEW);
+
+	texture->unbind(0);
+	surface->leave();
+
+	glPopAttrib();	// to restore blending state
+	
+	gl_error("copying surface");
+}
+

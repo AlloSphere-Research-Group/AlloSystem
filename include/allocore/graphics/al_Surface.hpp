@@ -19,12 +19,15 @@ public:
 	
 	void * surfaceData();
 	
+	void copy(Texture * tex);
+	
 	void attach(Texture *tex);
 	Texture * texture();
 	
 	void enter();
 	void leave();
 	
+	void clearColor(Color &c);
 	Color& clearColor();
 	
 	float clearDepth();
@@ -35,6 +38,10 @@ public:
 	
 	int width();
 	int height();
+	
+	void clear();
+	
+	bool creating() {return mCreating;}
 	
 protected:
 
@@ -48,6 +55,7 @@ protected:
 	Color			mClearColor;
 	float			mClearDepth;
 	bool			mAutoclear;
+	bool			mCreating;
 };
 
 } // ::al

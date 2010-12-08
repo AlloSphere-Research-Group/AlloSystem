@@ -149,6 +149,7 @@ public:
 	virtual void textureEnter(Texture *tex, int unit);
 	virtual void textureLeave(Texture *tex, int unit);
 	virtual void textureSubmit(Texture *tex);
+	virtual void textureToArray(Texture *tex);
 	
 	// surfaces
 	virtual Surface * surfaceNew();
@@ -158,6 +159,8 @@ public:
 	virtual void surfaceUnbind(Surface *surface);
 	virtual void surfaceEnter(Surface *surface);
 	virtual void surfaceLeave(Surface *surface);
+	virtual void surfaceClear(Surface *surface);
+	virtual void surfaceCopy(Surface *surface, Texture *texture);
 	
 	// OpenGL specific:
 	void enableLight(bool enable, int idx);

@@ -201,6 +201,7 @@ public:
 	virtual void textureEnter(Texture *tex, int unit) = 0;
 	virtual void textureLeave(Texture *tex, int unit) = 0;
 	virtual void textureSubmit(Texture *tex) = 0;
+	virtual void textureToArray(Texture *tex) = 0;
 	
 	// surfaces
 	virtual Surface * surfaceNew() = 0;
@@ -210,6 +211,8 @@ public:
 	virtual void surfaceUnbind(Surface *surface) = 0;
 	virtual void surfaceEnter(Surface *surface) = 0;
 	virtual void surfaceLeave(Surface *surface) = 0;
+	virtual void surfaceClear(Surface *surface) = 0;
+	virtual void surfaceCopy(Surface *surface, Texture *texture) = 0;
 	
 protected:
 	Mesh				mMesh;				// used for immediate mode style rendering

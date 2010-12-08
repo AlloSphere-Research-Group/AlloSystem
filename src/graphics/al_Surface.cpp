@@ -11,7 +11,8 @@ Surface::Surface(Graphics *backend, void *surface_data)
 	mTexture(0),
 	mClearColor(0., 0., 0., 1.),
 	mClearDepth(1.),
-	mAutoclear(true)
+	mAutoclear(true),
+	mCreating(false)
 {}
 
 Surface::~Surface() {
@@ -23,7 +24,7 @@ void * Surface::surfaceData() {
 
 void Surface::attach(Texture *tex) {
 	mTexture = tex;
-	mTexture->mode(Texture::SURFACE);
+	mTexture->attach(this);
 }
 
 Texture * Surface::texture() {
@@ -44,6 +45,14 @@ void Surface::enter() {
 void Surface::leave() {
 	mBackend->surfaceLeave(this);
 	mBackend->surfaceUnbind(this);
+}
+
+void Surface::copy(Texture *tex) {
+	mBackend->surfaceCopy(this, tex);
+}
+
+void Surface::clearColor(Color &c) {
+	mClearColor = c;
 }
 
 Color& Surface::clearColor() {
@@ -74,9 +83,17 @@ int Surface::height() {
 	return mTexture ? mTexture->height() : 0;
 }
 
+void Surface::clear() {
+	mBackend->surfaceClear(this);
+}
 
 void Surface::onCreate() {
-	mBackend->surfaceCreate(this);
+	if(! mCreating) {
+		mCreating = true;
+		mBackend->surfaceCreate(this);
+		mCreating = false;
+	}
+
 }
 
 void Surface::onDestroy() {
