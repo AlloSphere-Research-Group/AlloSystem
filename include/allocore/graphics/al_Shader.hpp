@@ -28,7 +28,9 @@ protected:
 
 
 /// Shader object
-/// A shader object represents your source code. You are able to pass your source code to a shader object and compile the shader object. 
+
+/// A shader object represents your source code. You are able to pass your 
+/// source code to a shader object and compile the shader object. 
 class Shader : public ShaderBase{
 public:
 
