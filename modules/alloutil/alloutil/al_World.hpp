@@ -145,10 +145,11 @@ protected:
 class World {
 public:
 	
-	World()
+	World(const std::string& name="")
 	:	mGraphics(new GraphicsBackendOpenGL),
 		mAudioIO(128, 44100, sAudioCB, this, 2, 1),
-		mAudioScene(3,2, 128)
+		mAudioScene(3,2, 128),
+		mName(name)
 	{
 		mListeners.push_back(&mAudioScene.createListener(2));
 	}

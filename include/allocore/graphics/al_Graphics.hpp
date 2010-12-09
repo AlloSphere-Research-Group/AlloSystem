@@ -123,6 +123,7 @@ public:
 	virtual void blending(bool enable, BlendFunc src, BlendFunc dst) = 0;
 	virtual void enable(Capability cap) = 0;
 	virtual void disable(Capability cap) = 0;
+	virtual void capability(Capability cap, bool value) = 0;
 	
 	void depthTesting(bool b);
 	void blending(bool b);
@@ -165,11 +166,10 @@ public:
 	/// End "immediate" mode
 	void end();
 
-	virtual void raw_vertex(double x, double y, double z=0.) = 0;
-	virtual void raw_color(double r, double g, double b, double a=1.) = 0;
-	virtual void raw_normal(double x, double y, double z=0.) = 0;
-	virtual void raw_texcoord(double u, double v) = 0;
-	
+
+	const Mesh& mesh() const { return mMesh; }
+	Mesh& mesh(){ return mMesh; }
+
 	void vertex(double x, double y, double z=0.);
 	void vertex(const Vec2d& v) { vertex(v[0], v[1], 0); }
 	void vertex(const Vec2f& v) { vertex(v[0], v[1], 0); }
@@ -183,7 +183,7 @@ public:
 	void color(const Color& v){ color(v.r, v.g, v.b, v.a); }
 	void color(const Vec3d& v, double a=1.) { color(v[0], v[1], v[2], a); }
 	void color(const Vec3f& v, double a=1.) { color(v[0], v[1], v[2], a); }
-	
+
 	virtual void draw(const Mesh& v) = 0;
 	void draw() { draw(mMesh); }
 
@@ -215,6 +215,8 @@ public:
 	virtual void surfaceCopy(Surface *surface, Texture *texture) = 0;
 	
 protected:
+	virtual void raw_color(double r, double g, double b, double a=1.) = 0;
+
 	Mesh				mMesh;				// used for immediate mode style rendering
 	bool				mInImmediateMode;	// flag for whether or not in immediate mode
 };

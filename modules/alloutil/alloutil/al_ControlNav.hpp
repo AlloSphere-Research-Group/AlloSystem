@@ -1,3 +1,6 @@
+#ifndef INC_AL_CONTROL_NAV_HPP
+#define INC_AL_CONTROL_NAV_HPP
+
 #include "allocore/io/al_Window.hpp"
 #include "allocore/spatial/al_CoordinateFrame.hpp"
 
@@ -126,6 +129,6 @@ struct NavInputControlCosm : public NavInputControl {
 	virtual bool onMouseDrag(const Mouse& m){ return true; }
 };
 
-
-
 } // al::
+
+#endif

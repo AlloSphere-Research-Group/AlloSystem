@@ -474,7 +474,7 @@ void Isosurface<T>::begin(){
 
 template <class T>
 void Isosurface<T>::end(){
-	resetBuffers();
+	reset();
 	renameVerticesAndTriangles();
 	calcNormals();
 	mValidSurface = true;
@@ -564,7 +564,7 @@ void Isosurface<T>::renameVerticesAndTriangles(){
 			++nextID;
 			
 			// add vertex to vertex buffer
-			addVertex(it->second.x, it->second.y, it->second.z);
+			vertex(it->second.x, it->second.y, it->second.z);
 		}
 	}
 
@@ -576,7 +576,7 @@ void Isosurface<T>::renameVerticesAndTriangles(){
 			int newID = mID2PointID[t.indices[j]].newID;
 			
 			// Add index to vertex indices buffer
-			addIndex(newID);
+			index(newID);
 		}		
 	}
 

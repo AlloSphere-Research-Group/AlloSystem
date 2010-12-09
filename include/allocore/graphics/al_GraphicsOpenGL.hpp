@@ -129,11 +129,6 @@ public:
 	virtual void rotate(double angle, double x, double y, double z);
 	virtual void scale(double x, double y, double z);
 	
-	virtual void raw_vertex(double x, double y, double z=0.);
-	virtual void raw_color(double r, double g, double b, double a=1.);
-	virtual void raw_normal(double x, double y, double z=0.);
-	virtual void raw_texcoord(double u, double v);
-	
 	virtual void draw(const Mesh& v);
 
 	// Other state
@@ -167,6 +162,7 @@ public:
 	void setPolygonMode(Graphics::PolygonMode mode);
 	
 protected:
+	virtual void raw_color(double r, double g, double b, double a=1.);
 };
 
 } // al::

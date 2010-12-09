@@ -7,7 +7,7 @@
 
 namespace al{
 
-void Mesh::resetBuffers() {
+void Mesh::reset() {
 	vertices().clear();
 	normals().clear();
 	colors().clear();

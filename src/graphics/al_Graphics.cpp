@@ -13,7 +13,7 @@ Graphics::~Graphics() {}
 // Immediate Mode
 void Graphics::begin(Primitive mode) {
 	// clear buffers
-	mMesh.resetBuffers();
+	mMesh.reset();
 
 	// start primitive drawing
 	mMesh.primitive(mode);
@@ -28,32 +28,26 @@ void Graphics::end() {
 void Graphics::vertex(double x, double y, double z) {
 	if(mInImmediateMode) {
 		// make sure all buffers are the same size if > 0
-		mMesh.addVertex(x, y, z);
+		mMesh.vertex(x, y, z);
 		mMesh.equalizeBuffers();
-	} else {
-		raw_vertex(x, y, z);
 	}	
 }
 
 void Graphics::texcoord(double u, double v) {
 	if(mInImmediateMode) {
-		mMesh.addTexCoord(u, v);
-	} else {
-		raw_texcoord(u, v);
+		mMesh.texCoord(u, v);
 	}
 }
 
 void Graphics::normal(double x, double y, double z) {
 	if(mInImmediateMode) {
-		mMesh.addNormal(x, y, z);
-	} else {
-		raw_normal(x, y, z);
+		mMesh.normal(x, y, z);
 	}
 }
 
 void Graphics::color(double r, double g, double b, double a) {
 	if(mInImmediateMode) {
-		mMesh.addColor(r, g, b, a);
+		mMesh.color(r, g, b, a);
 	} else {
 		raw_color(r, g, b, a);
 	}

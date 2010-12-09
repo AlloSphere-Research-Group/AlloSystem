@@ -18,7 +18,7 @@ struct MyWindow : Window{
 		gl.loadMatrix(Matrix4d::lookAt(Vec3d(0,0,-4), Vec3d(0,0,0), Vec3d(0,1,0)));
 
 		
-		gl.data().resetBuffers();
+		gl.mesh().resetBuffers();
 		gl.begin(gl.LINES);
 		
 		//printf("%d\n", gl.DEPTH_BUFFER_BIT);

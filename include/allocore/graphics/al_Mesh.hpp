@@ -45,7 +45,7 @@ public:
 	Mesh(): mPrimitive(0){}
 
 	/// Reset all buffers
-	void resetBuffers();
+	void reset();
 	void equalizeBuffers();
 	void getBounds(Vec3f& min, Vec3f& max);
 	Vec3f getCenter(); // center at 0,0,0
@@ -71,23 +71,23 @@ public:
 	const Buffer<TexCoord3>& texCoord3s() const { return mTexCoord3s; }
 	const Buffer<Index>& indices() const { return mIndices; }
 
-	void addIndex(unsigned int i){ indices().append(i); }
+	void index(unsigned int i){ indices().append(i); }
 
-	void addColor(float r, float g, float b, float a=1){ addColor(Color(r,g,b,a)); }
-	void addColor(const Color& v) { colors().append(v); }
-	void addColor(const al::Color& v) { addColor(v.r, v.g, v.b, v.a); }
+	void color(float r, float g, float b, float a=1){ color(Color(r,g,b,a)); }
+	void color(const Color& v) { colors().append(v); }
+	void color(const al::Color& v) { color(v.r, v.g, v.b, v.a); }
 
-	void addNormal(float x, float y, float z=0){ addNormal(Normal(x,y,z)); }
-	void addNormal(const Normal& v) { normals().append(v); }
+	void normal(float x, float y, float z=0){ normal(Normal(x,y,z)); }
+	void normal(const Normal& v) { normals().append(v); }
 
-	void addTexCoord(float u, float v){ addTexCoord(TexCoord2(u,v)); }
-	void addTexCoord(const TexCoord2& v){ texCoord2s().append(v); }
+	void texCoord(float u, float v){ texCoord(TexCoord2(u,v)); }
+	void texCoord(const TexCoord2& v){ texCoord2s().append(v); }
 	
-	void addTexCoord(float u, float v, float w){ addTexCoord(TexCoord3(u,v,w)); }
-	void addTexCoord(const TexCoord3& v){ texCoord3s().append(v); }
+	void texCoord(float u, float v, float w){ texCoord(TexCoord3(u,v,w)); }
+	void texCoord(const TexCoord3& v){ texCoord3s().append(v); }
 
-	void addVertex(float x, float y, float z=0){ addVertex(Vertex(x,y,z)); }
-	void addVertex(const Vertex& v){ vertices().append(v); }
+	void vertex(float x, float y, float z=0){ vertex(Vertex(x,y,z)); }
+	void vertex(const Vertex& v){ vertices().append(v); }
 
 	void primitive(int prim){ mPrimitive=prim; }
 

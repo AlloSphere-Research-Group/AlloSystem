@@ -482,7 +482,7 @@ Mesh * OBJReader::createMesh(GroupIterator iter) {
 
 	Mesh * gd = new Mesh();
 	gd->primitive(Graphics::TRIANGLES);
-	gd->resetBuffers();
+	gd->reset();
 
 	// memoize face_vertices index -> graphicsdata index
 	std::map<unsigned int, unsigned int> indexMap;
@@ -498,15 +498,15 @@ Mesh * OBJReader::createMesh(GroupIterator iter) {
 			int normalindex = face_vertices[faceindex].normal;
 			int newindex = gd->vertices().size();
 
-			gd->addIndex(newindex);
-			gd->addVertex(vertices[vertexindex]);
-			gd->addTexCoord(texcoords[texindex]);
-			gd->addNormal(normals[normalindex]);
+			gd->index(newindex);
+			gd->vertex(vertices[vertexindex]);
+			gd->texCoord(texcoords[texindex]);
+			gd->normal(normals[normalindex]);
 		} else {
 
 			// re-use existing index:
 			int newindex = gd->indices()[indexMap[faceindex]];
-			gd->addIndex(newindex);
+			gd->index(newindex);
 		}
 
 	}

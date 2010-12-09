@@ -175,17 +175,9 @@ void GraphicsGL :: antialiasing(AntiAliasMode mode) {
 void GraphicsGL :: lineWidth(double v) { glLineWidth(v); }
 void GraphicsGL :: pointSize(double v) { glPointSize(v); }
 
-void GraphicsGL :: raw_vertex(double x, double y, double z) {
-	glVertex3d(x, y, z);
-}
+
 void GraphicsGL :: raw_color(double r, double g, double b, double a) {
 	glColor4f(r, g, b, a);
-}
-void GraphicsGL :: raw_normal(double x, double y, double z) {
-	glNormal3d(x, y, z);
-}
-void GraphicsGL :: raw_texcoord(double u, double v) {
-	glTexCoord2d(u, v);
 }
 
 
@@ -581,7 +573,7 @@ void GraphicsGL :: textureToArray(Texture *tex) {
 	if(tex->mode() == Texture::SURFACE) {
 		Surface *surface = tex->surface();
 		if(surface) {
-			SurfaceData *surface_data = (SurfaceData *)surface->surfaceData();
+//			SurfaceData *surface_data = (SurfaceData *)surface->surfaceData();
 			//PBO *pbo = surface_data->pbo;
 //			pbo->bind();
 //			pbo->fromTexture(tex, format_from_texture_format(tex->format()));
