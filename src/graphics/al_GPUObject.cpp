@@ -32,6 +32,8 @@ void GPUContext :: contextDestroy() {
 }
 
 void GPUObject :: contextRegister(int ctx) {
+	contextUnregister();
+	
 	ContextMap::iterator it = g_context_resources.find(ctx);
 	if(it == g_context_resources.end()) {
 		g_context_resources.insert(std::pair<int, ResourceSet>(ctx, ResourceSet()));
