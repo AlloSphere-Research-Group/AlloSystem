@@ -1,24 +1,26 @@
 #include "allocore/graphics/al_GPUObject.hpp"
 
-#include <string>
 #include <map>
 #include <set>
 
 using namespace al;
 
 typedef std::set<al::GPUObject *> ResourceSet;
-typedef std::map<std::string, ResourceSet> ContextMap;
-typedef std::map<al::GPUObject *, std::string> ResourceMap;
+typedef std::map<int, ResourceSet> ContextMap;
+typedef std::map<al::GPUObject *, int> ResourceMap;
 
 // Global data structures for managing context resources
-ContextMap g_context_resources;
-ResourceMap g_resources;
+static ContextMap g_context_resources;
+static ResourceMap g_resources;
+static int g_next_context_id = 0;
 
-
+GPUContext :: GPUContext() {
+	mContextID = g_next_context_id;
+	g_next_context_id++;
+}
 
 void GPUContext :: contextDestroy() {
-	std::string ctx(contextName());
-	ContextMap::iterator it = g_context_resources.find(ctx);
+	ContextMap::iterator it = g_context_resources.find(mContextID);
 	if(it != g_context_resources.end()) {
 		ResourceSet &ctx_set = it->second;
 		ResourceSet::iterator sit = ctx_set.begin();
@@ -29,14 +31,14 @@ void GPUContext :: contextDestroy() {
 	}
 }
 
-void GPUObject :: contextRegister(std::string ctx) {
+void GPUObject :: contextRegister(int ctx) {
 	ContextMap::iterator it = g_context_resources.find(ctx);
 	if(it == g_context_resources.end()) {
-		g_context_resources.insert(std::pair<std::string, ResourceSet>(ctx, ResourceSet()));
+		g_context_resources.insert(std::pair<int, ResourceSet>(ctx, ResourceSet()));
 		it = g_context_resources.find(ctx);
 	}
 	it->second.insert(this);
-	g_resources.insert(std::pair<al::GPUObject *, std::string>(this, ctx));
+	g_resources.insert(std::pair<al::GPUObject *, int>(this, ctx));
 }
 
 void GPUObject :: contextUnregister() {

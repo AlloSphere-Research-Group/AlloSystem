@@ -250,8 +250,6 @@ public:
 	
 	/// Destroys current window and its associated OpenGL context
 	void destroy();
-	
-	std::string contextName() { return mContextName; }
 
 	const Keyboard& keyboard() const { return mKeyboard; }	///< Get current keyboard state
 	const Mouse& mouse() const { return mMouse; }			///< Get current mouse state
@@ -343,7 +341,6 @@ private:
 	Mouse mMouse;
 	InputEventHandlers mInputEventHandlers;
 	WindowEventHandlers mWindowEventHandlers;
-	std::string mContextName;
 
 	#define CALL(e)\
 	if(e){\

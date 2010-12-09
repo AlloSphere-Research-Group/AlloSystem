@@ -473,8 +473,6 @@ void Window::create(
 )
 {
 	if(mImpl->created()) return;
-	
-	mContextName = title;
 
 	mImpl->mDimPrev.set(0,0,0,0);
 	mImpl->mDimCurr.set(dim.l,dim.t,0,0);
