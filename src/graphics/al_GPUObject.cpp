@@ -9,19 +9,32 @@ typedef std::set<al::GPUObject *> ResourceSet;
 typedef std::map<int, ResourceSet> ContextMap;
 typedef std::map<al::GPUObject *, int> ResourceMap;
 
-// Global data structures for managing context resources
-static ContextMap g_context_resources;
-static ResourceMap g_resources;
-static int g_next_context_id = 0;
+
+ContextMap * getContextMap() {
+	static ContextMap * instance = new ContextMap;
+	return instance;
+}
+
+ResourceMap * getResourceMap() {
+	static ResourceMap * instance = new ResourceMap;
+	return instance;
+}
+
+int getNextContextID() {
+	static int g_next_context_id = 0;
+	int result = g_next_context_id;
+	g_next_context_id++;
+	return result;
+}
 
 GPUContext :: GPUContext() {
-	mContextID = g_next_context_id;
-	g_next_context_id++;
+	mContextID = getNextContextID();
 }
 
 void GPUContext :: contextDestroy() {
-	ContextMap::iterator it = g_context_resources.find(mContextID);
-	if(it != g_context_resources.end()) {
+	ContextMap& contexts = *getContextMap();
+	ContextMap::iterator it = contexts.find(mContextID);
+	if(it != contexts.end()) {
 		ResourceSet &ctx_set = it->second;
 		ResourceSet::iterator sit = ctx_set.begin();
 		ResourceSet::iterator site = ctx_set.end();
@@ -33,30 +46,27 @@ void GPUContext :: contextDestroy() {
 
 void GPUObject :: contextRegister(int ctx) {
 	contextUnregister();
-	
-	ContextMap::iterator it = g_context_resources.find(ctx);
-	if(it == g_context_resources.end()) {
-		g_context_resources.insert(std::pair<int, ResourceSet>(ctx, ResourceSet()));
-		it = g_context_resources.find(ctx);
-	}
-	it->second.insert(this);
-	g_resources.insert(std::pair<al::GPUObject *, int>(this, ctx));
+	ContextMap& contexts = *getContextMap();
+	ResourceMap& resources = *getResourceMap();
+	contexts[ctx].insert(this);
+	resources[this] = ctx;
 }
 
 void GPUObject :: contextUnregister() {
-	ResourceMap::iterator rit = g_resources.find(this);
-	if(rit != g_resources.end()) {
-		
-		ContextMap::iterator it = g_context_resources.find( rit->second );
-		if(it != g_context_resources.end()) {
+	ContextMap& contexts = *getContextMap();
+	ResourceMap& resources = *getResourceMap();
+	
+	ResourceMap::iterator rit = resources.find(this);
+	if(rit != resources.end()) {
+		ContextMap::iterator it = contexts.find( rit->second );
+		if(it != contexts.end()) {
 			ResourceSet &ctx_set = it->second;
 			ResourceSet::iterator sit = ctx_set.find(this);
 			if(sit != ctx_set.end()) {
 				ctx_set.erase(sit);
 			}
 		}
-		
-		g_resources.erase(rit);
+		resources.erase(rit);
 	}
 }
 

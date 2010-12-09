@@ -275,11 +275,10 @@ struct MyWindow : Window{
 		
 		gl.disable(gl.LIGHTING);
 		
-		
-		tex.bind(0);
 		shaderprogram.begin();
 		shaderprogram.uniform("tex0", 0);
 		GraphicsGL::gl_error("shader");
+		tex.bind(0);
 		gl.begin(gl.QUADS);
 		gl.color(1, 1, 1);
 		gl.texcoord(0, 0);
@@ -291,8 +290,8 @@ struct MyWindow : Window{
 		gl.texcoord(1, 0);
 		gl.vertex(1, 0, 0);
 		gl.end();
-		shaderprogram.end();
 		tex.unbind(0);
+		shaderprogram.end();
 		
 		
 		glEnable(GL_LIGHTING);

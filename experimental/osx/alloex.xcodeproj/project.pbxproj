@@ -6,6 +6,20 @@
 	objectVersion = 44;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		36DC8C8012B0A5A500AEC644 /* liballocore */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 36DC8C8A12B0A5BD00AEC644 /* Build configuration list for PBXAggregateTarget "liballocore" */;
+			buildPhases = (
+				36DC8C7F12B0A5A500AEC644 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = liballocore;
+			productName = liballocore;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		05C93863128A15AB0068F87F /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		05C93864128A15AB0068F87F /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
@@ -194,6 +208,13 @@
 			remoteGlobalIDString = 8D1107320486CEB800E47090;
 			remoteInfo = threadedapp;
 		};
+		36DC8C8312B0A5AD00AEC644 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 36DC8C8012B0A5A500AEC644 /* liballocore */;
+			remoteInfo = liballocore;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -260,7 +281,7 @@
 /* Begin PBXFileReference section */
 		05C93813128A158B0068F87F /* exSimpleGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exSimpleGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
 		05C93876128A16060068F87F /* simpleGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = simpleGraphics.cpp; sourceTree = "<group>"; };
-		05C93890128A166B0068F87F /* exSimpleGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exSimpleGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
+		05C93890128A166B0068F87F /* exShader */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exShader; sourceTree = BUILT_PRODUCTS_DIR; };
 		05C93892128A168F0068F87F /* graphicsData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = graphicsData.cpp; sourceTree = "<group>"; };
 		05C938B8128A17190068F87F /* al_NavControl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_NavControl.hpp; sourceTree = "<group>"; };
 		05C938B9128A17190068F87F /* exCamera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exCamera.cpp; sourceTree = "<group>"; };
@@ -1049,7 +1070,7 @@
 				367F0B5C12034F1E00FCC534 /* exStereographics */,
 				B9C962AF1218939E00091F80 /* exOpenCL */,
 				05C93813128A158B0068F87F /* exSimpleGraphics */,
-				05C93890128A166B0068F87F /* exSimpleGraphics */,
+				05C93890128A166B0068F87F /* exShader */,
 				36320458128B278600A742CC /* frp */,
 			);
 			name = Products;
@@ -2067,10 +2088,11 @@
 			buildRules = (
 			);
 			dependencies = (
+				36DC8C8412B0A5AD00AEC644 /* PBXTargetDependency */,
 			);
 			name = exShader;
 			productName = exSimpleGraphics;
-			productReference = 05C93890128A166B0068F87F /* exSimpleGraphics */;
+			productReference = 05C93890128A166B0068F87F /* exShader */;
 			productType = "com.apple.product-type.tool";
 		};
 		3602B4CA110A67C9005DC3D0 /* exOscRecv */ = {
@@ -2352,6 +2374,7 @@
 			);
 			projectRoot = "";
 			targets = (
+				36DC8C8012B0A5A500AEC644 /* liballocore */,
 				8DD76F620486A84900D96B5E /* exScheduling */,
 				3602B4CA110A67C9005DC3D0 /* exOscRecv */,
 				3602B728110A9770005DC3D0 /* exOscSend */,
@@ -2433,6 +2456,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		36DC8C7F12B0A5A500AEC644 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# shell script goes here\ncd ../../projects/osx\nxcodebuild -project allo.xcodeproj -target allocore -configuration $CONFIGURATION\nexit 0";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		05C93810128A158B0068F87F /* Sources */ = {
@@ -2563,6 +2602,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		36DC8C8412B0A5AD00AEC644 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 36DC8C8012B0A5A500AEC644 /* liballocore */;
+			targetProxy = 36DC8C8312B0A5AD00AEC644 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		3617186F128B22CE00D6ED65 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
@@ -2662,7 +2709,7 @@
 					"\"$(SRCROOT)/../../dev/osx/lib\"",
 				);
 				PREBINDING = NO;
-				PRODUCT_NAME = $TARGET_NAME;
+				PRODUCT_NAME = $inherited;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
 			};
 			name = Debug;
@@ -2683,7 +2730,7 @@
 					"\"$(SRCROOT)/../../dev/osx/lib\"",
 				);
 				PREBINDING = NO;
-				PRODUCT_NAME = exSimpleGraphics;
+				PRODUCT_NAME = $inherited;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
 				ZERO_LINK = NO;
 			};
@@ -3403,6 +3450,27 @@
 			};
 			name = Release;
 		};
+		36DC8C8112B0A5A600AEC644 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = liballocore;
+			};
+			name = Debug;
+		};
+		36DC8C8212B0A5A600AEC644 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = liballocore;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		B9C962AD1218939E00091F80 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3591,6 +3659,15 @@
 			buildConfigurations = (
 				36D69A3911F923FC00699158 /* Debug */,
 				36D69A3A11F923FC00699158 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		36DC8C8A12B0A5BD00AEC644 /* Build configuration list for PBXAggregateTarget "liballocore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				36DC8C8112B0A5A600AEC644 /* Debug */,
+				36DC8C8212B0A5A600AEC644 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
