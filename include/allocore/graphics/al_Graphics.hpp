@@ -123,11 +123,12 @@ public:
 	virtual void blending(bool enable, BlendFunc src, BlendFunc dst) = 0;
 	virtual void enable(Capability cap) = 0;
 	virtual void disable(Capability cap) = 0;
-	virtual void capability(Capability cap, bool value) = 0;
 	
-	void depthTesting(bool b);
-	void blending(bool b);
+	void capability(Capability cap, bool value);
+
+	void blending(bool b);	
 	void depthMask(bool b);
+	void depthTesting(bool b);
 	void lighting(bool b);
 	void scissor(bool b);
 	
@@ -222,6 +223,7 @@ protected:
 };
 
 
+
 ///	Abstract base class for any object that can be rendered via Graphics
 class Drawable {
 public:
@@ -229,28 +231,19 @@ public:
 	virtual ~Drawable(){}
 };
 
-/// ============== INLINE ============== 
 
-inline void Graphics::depthTesting(bool b) { 
-	if (b) { enable(DEPTH_TEST); } else { disable(DEPTH_TEST); }
+
+// ============== INLINE ============== 
+
+inline void Graphics::capability(Graphics::Capability cap, bool v){
+	v ? enable(cap) : disable(cap);
 }
 
-inline void Graphics::blending(bool b) { 
-	if (b) { enable(BLEND); } else { disable(BLEND); }
-}
-
-inline void Graphics::depthMask(bool b) { 
-	if (b) { enable(DEPTH_MASK); } else { disable(DEPTH_MASK); }
-}
-
-inline void Graphics::lighting(bool b) { 
-	if (b) { enable(LIGHTING); } else { disable(LIGHTING); }
-}
-
-inline void Graphics::scissor(bool b) { 
-	if (b) { enable(SCISSOR_TEST); } else { disable(SCISSOR_TEST); }
-}
-
+inline void Graphics::blending(bool b) { capability(BLEND, b); }
+inline void Graphics::depthMask(bool b) { capability(DEPTH_MASK, b); }
+inline void Graphics::depthTesting(bool b){ capability(DEPTH_TEST, b); }
+inline void Graphics::lighting(bool b) { capability(LIGHTING, b); }
+inline void Graphics::scissor(bool b) { capability(SCISSOR_TEST, b); }
 
 } // ::al
 
