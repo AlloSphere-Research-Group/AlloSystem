@@ -2,7 +2,7 @@ varying vec4 diffuse,ambient;
 varying vec3 normal,lightDir,halfVector;
 varying vec4 texcoord0;
 
-uniform sampler2D tex;
+uniform sampler2D tex0;
 
 void main()
 {
@@ -13,7 +13,7 @@ void main()
 	color = vec4(0.2, 0.2, 0, 1);
 	color = ambient;
 	color = vec4(0.5, texcoord0.st, 1); 
-	color = texture2D(tex, texcoord0.st);
+	color = texture2D(tex0, texcoord0.st);
 	
 	
 //	/* a fragment shader can't write a verying variable, hence we need

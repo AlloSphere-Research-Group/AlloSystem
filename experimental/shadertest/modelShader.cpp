@@ -276,10 +276,10 @@ struct MyWindow : Window{
 		gl.disable(gl.LIGHTING);
 		
 		
-		//shaderprogram.begin();
-		//shaderprogram.uniform("tex", 0);
-		GraphicsGL::gl_error("tex");
 		tex.bind(0);
+		shaderprogram.begin();
+		shaderprogram.uniform("tex0", 0);
+		GraphicsGL::gl_error("shader");
 		gl.begin(gl.QUADS);
 		gl.color(1, 1, 1);
 		gl.texcoord(0, 0);
@@ -291,8 +291,8 @@ struct MyWindow : Window{
 		gl.texcoord(1, 0);
 		gl.vertex(1, 0, 0);
 		gl.end();
+		shaderprogram.end();
 		tex.unbind(0);
-		//shaderprogram.end();
 		
 		
 		glEnable(GL_LIGHTING);
@@ -389,10 +389,6 @@ int main (int argc, char * const argv[]) {
 	MyWindow win1;
 	win1.add(new StandardWindowKeyControls);
 	win1.create(Window::Dim(800, 600));
-	
-	frag.contextRegister(win1);
-	vert.contextRegister(win1);
-	shaderprogram.contextRegister(win1);
 	
 	MainLoop::start();
 	

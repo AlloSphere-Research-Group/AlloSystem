@@ -34,7 +34,7 @@ protected:
 class Shader : public ShaderBase{
 public:
 
-	enum Type{
+	enum Type {
 		VERTEX,
 		FRAGMENT
 	};

@@ -113,12 +113,49 @@ struct Agent : public SoundSource, public Drawable{
 };
 
 
-#define AUDIO_BLOCK_SIZE 256
-AudioScene scene(3, 3, AUDIO_BLOCK_SIZE);
 Listener * listener;
 Nav navMaster(Vec3d(0,0,-4), 0.95);
 std::vector<Agent> agents(1);
 Stereographic stereo;
+#define AUDIO_BLOCK_SIZE 256
+
+#ifdef ALLOSPHERE
+AudioScene scene(3, 3, AUDIO_BLOCK_SIZE);
+const int numSpeakers = 16;
+const double topAz = 90;
+const double topEl = 45;
+const double midAz = (360./8);
+const double midEl = 0;
+const double botAz = 90;
+const double botEl =-45;
+AmbiDecode::Speaker speakers[numSpeakers] = {
+	{ 0.5*midAz, midEl,  3-1},
+	{ 1.5*midAz, midEl,  6-1},
+	{ 2.5*midAz, midEl, 17-1},
+	{ 3.5*midAz, midEl, 18-1},
+	{-0.5*midAz, midEl,  4-1},
+	{-1.5*midAz, midEl,  5-1},
+	{-2.5*midAz, midEl, 20-1},
+	{-3.5*midAz, midEl, 19-1},
+	
+	{ 0.5*topAz, topEl,  7-1},
+	{ 1.5*topAz, topEl,  9-1},
+	{-0.5*topAz, topEl,  8-1},
+	{-1.5*topAz, topEl, 21-1},
+
+	{ 0.5*botAz, botEl, 24-1},
+	{ 1.5*botAz, botEl, 23-1},
+	{-0.5*botAz, botEl, 10-1},
+	{-1.5*botAz, botEl, 22-1},
+};
+#else
+AudioScene scene(2, 1, AUDIO_BLOCK_SIZE);
+const int numSpeakers = 2;
+AmbiDecode::Speaker speakers[] = {
+	{  45, 0,  0},
+	{ -45, 0,  1},
+};
+#endif
 
 
 void audioCB(AudioIOData& io){
@@ -190,34 +227,8 @@ int main (int argc, char * argv[]){
 ////	listener->speakerPos(1,1, 45);
 //
 	
-	const int numSpeakers = 16;
-	const double topAz = 90;
-	const double topEl = 45;
-	const double midAz = (360./8);
-	const double midEl = 0;
-	const double botAz = 90;
-	const double botEl =-45;
 
-	AmbiDecode::Speaker speakers[numSpeakers] = {
-		{ 0.5*topAz, topEl,  7-1},
-		{ 1.5*topAz, topEl,  9-1},
-		{-0.5*topAz, topEl,  8-1},
-		{-1.5*topAz, topEl, 21-1},
-		
-		{ 0.5*midAz, midEl,  3-1},
-		{ 1.5*midAz, midEl,  6-1},
-		{ 2.5*midAz, midEl, 17-1},
-		{ 3.5*midAz, midEl, 18-1},
-		{-0.5*midAz, midEl,  4-1},
-		{-1.5*midAz, midEl,  5-1},
-		{-2.5*midAz, midEl, 20-1},
-		{-3.5*midAz, midEl, 19-1},
 
-		{ 0.5*botAz, botEl, 24-1},
-		{ 1.5*botAz, botEl, 23-1},
-		{-0.5*botAz, botEl, 10-1},
-		{-1.5*botAz, botEl, 22-1},
-	};
 	
 	listener->numSpeakers(numSpeakers);
 	for(int i=0; i<numSpeakers; ++i){
@@ -253,7 +264,7 @@ int main (int argc, char * argv[]){
 		windows[i].cam.fovy(90);
 	}
 
-	AudioIO audioIO(AUDIO_BLOCK_SIZE, 44100, audioCB, 0, -1, 1);
+	AudioIO audioIO(AUDIO_BLOCK_SIZE, 44100, audioCB, NULL, numSpeakers, 2);
 	audioIO.start();
 
 	MainLoop::start();
