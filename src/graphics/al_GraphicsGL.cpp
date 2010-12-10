@@ -70,7 +70,8 @@ GLenum gl_primitive(Graphics::Primitive v){
 
 GLenum gl_capability(Graphics::Capability v){
 	switch(v){
-		CS(BLEND) CS(DEPTH_TEST) CS(LIGHTING)
+		CS(BLEND) CS(COLOR_MATERIAL) CS(DEPTH_TEST) CS(LIGHTING)
+		CS(SCISSOR_TEST)
 		default: return 0;
 	}
 }
@@ -82,7 +83,7 @@ GraphicsGL :: GraphicsGL() : Graphics() {}
 GraphicsGL :: ~GraphicsGL() {}
 	
 	// Rendering State
-void GraphicsGL :: blending(bool enable, BlendFunc src, BlendFunc dst) {
+void GraphicsGL :: p_blending(bool enable, BlendFunc src, BlendFunc dst) {
 	if(enable) {
 		glEnable(GL_BLEND);
 		glBlendFunc(
@@ -94,14 +95,14 @@ void GraphicsGL :: blending(bool enable, BlendFunc src, BlendFunc dst) {
 		glDisable(GL_BLEND);
 	}
 }
-void GraphicsGL :: enable(Capability v) {
+void GraphicsGL :: p_enable(Capability v) {
 	if (v == DEPTH_MASK) {
 		glDepthMask(GL_TRUE);
 	} else {
 		glEnable(gl_capability(v));
 	}
 }
-void GraphicsGL :: disable(Capability v) {
+void GraphicsGL :: p_disable(Capability v) {
 	if (v == DEPTH_MASK) {
 		glDepthMask(GL_FALSE);
 	} else {
@@ -119,7 +120,7 @@ void GraphicsGL::enableLight(bool enable, int idx) {
 }
 
 
-void GraphicsGL::clear(int attribMask) {
+void GraphicsGL::p_clear(int attribMask) {
 	int bits = 
 		(attribMask & Graphics::COLOR_BUFFER_BIT ? GL_COLOR_BUFFER_BIT : 0) |
 		(attribMask & Graphics::DEPTH_BUFFER_BIT ? GL_DEPTH_BUFFER_BIT : 0) |
@@ -128,32 +129,32 @@ void GraphicsGL::clear(int attribMask) {
 	glClear(bits);
 }
 
-void GraphicsGL::clearColor(float r, float g, float b, float a) {
+void GraphicsGL::p_clearColor(float r, float g, float b, float a) {
 	glClearColor(r, g, b, a);
 }
 	
 	// Coordinate Transforms
-void GraphicsGL :: viewport(int x, int y, int width, int height) {
+void GraphicsGL :: p_viewport(int x, int y, int width, int height) {
 	glEnable(GL_SCISSOR_TEST);
 	glScissor(x, y, width, height);
 	glViewport(x, y, width, height);
 }
 
-void GraphicsGL :: matrixMode(MatrixMode mode) {
+void GraphicsGL :: p_matrixMode(MatrixMode mode) {
 	glMatrixMode(gl_matrix_mode(mode));
 }	
 
-void GraphicsGL :: pushMatrix() { glPushMatrix(); }
-void GraphicsGL :: popMatrix() { glPopMatrix(); }
-void GraphicsGL :: loadIdentity() { glLoadIdentity(); }
-void GraphicsGL :: loadMatrix(const Matrix4d &m) { glLoadMatrixd(m.elems); }
-void GraphicsGL :: multMatrix(const Matrix4d &m) { glMultMatrixd(m.elems); }
-void GraphicsGL :: translate(double x, double y, double z) { glTranslated(x, y, z); }
-void GraphicsGL :: rotate(double angle, double x, double y, double z) { glRotated(angle, x, y, z); }
-void GraphicsGL :: scale(double x, double y, double z) { glScaled(x, y, z); }
+void GraphicsGL :: p_pushMatrix() { glPushMatrix(); }
+void GraphicsGL :: p_popMatrix() { glPopMatrix(); }
+void GraphicsGL :: p_loadIdentity() { glLoadIdentity(); }
+void GraphicsGL :: p_loadMatrix(const Matrix4d &m) { glLoadMatrixd(m.elems); }
+void GraphicsGL :: p_multMatrix(const Matrix4d &m) { glMultMatrixd(m.elems); }
+void GraphicsGL :: p_translate(double x, double y, double z) { glTranslated(x, y, z); }
+void GraphicsGL :: p_rotate(double angle, double x, double y, double z) { glRotated(angle, x, y, z); }
+void GraphicsGL :: p_scale(double x, double y, double z) { glScaled(x, y, z); }
 
 	// Other state
-void GraphicsGL :: antialiasing(AntiAliasMode mode) {
+void GraphicsGL :: p_antialiasing(AntiAliasMode mode) {
 	GLenum m = gl_antialias_mode(mode);
 	glEnable(GL_POINT_SMOOTH_HINT);
 	glEnable(GL_LINE_SMOOTH_HINT);
@@ -172,11 +173,11 @@ void GraphicsGL :: antialiasing(AntiAliasMode mode) {
 	}
 }
 
-void GraphicsGL :: lineWidth(double v) { glLineWidth(v); }
-void GraphicsGL :: pointSize(double v) { glPointSize(v); }
+void GraphicsGL :: p_lineWidth(double v) { glLineWidth(v); }
+void GraphicsGL :: p_pointSize(double v) { glPointSize(v); }
 
 
-void GraphicsGL :: raw_color(double r, double g, double b, double a) {
+void GraphicsGL :: p_currentColor(double r, double g, double b, double a) {
 	glColor4f(r, g, b, a);
 }
 
@@ -188,7 +189,7 @@ void GraphicsGL :: setPolygonMode(Graphics::PolygonMode mode) {
 
 
 // Buffer drawing
-void GraphicsGL :: draw(const Mesh& v) {
+void GraphicsGL :: p_draw(const Mesh& v) {
 
 	int Nv = v.vertices().size();
 	if(0 == Nv) return;

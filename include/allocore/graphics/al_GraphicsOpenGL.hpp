@@ -106,36 +106,11 @@ public:
 	
 	GraphicsGL();
 	virtual ~GraphicsGL();
-	
-	// Rendering State
-	virtual void blending(bool enable, BlendFunc src, BlendFunc dst);
-	virtual void enable(Capability cap);
-	virtual void disable(Capability cap);
 
-	// Frame
-	virtual void clear(int attribMask);
-	virtual void clearColor(float r, float g, float b, float a);
-	
-	// Coordinate Transforms
-	virtual void viewport(int x, int y, int width, int height);
-	virtual void matrixMode(MatrixMode mode);
-	MatrixMode matrixMode();
-	virtual void pushMatrix();
-	virtual void popMatrix();
-	virtual void loadIdentity();
-	virtual void loadMatrix(const Matrix4d &m);
-	virtual void multMatrix(const Matrix4d &m);
-	virtual void translate(double x, double y, double z);
-	virtual void rotate(double angle, double x, double y, double z);
-	virtual void scale(double x, double y, double z);
-	
-	virtual void draw(const Mesh& v);
+	// OpenGL specific:
+	void enableLight(bool enable, int idx);
+	void setPolygonMode(Graphics::PolygonMode mode);
 
-	// Other state
-	virtual void antialiasing(AntiAliasMode v);
-	virtual void lineWidth(double v);
-	virtual void pointSize(double v);
-	
 	// Textures
 	virtual void textureCreate(Texture *tex);
 	virtual void textureDestroy(Texture *tex);
@@ -156,13 +131,37 @@ public:
 	virtual void surfaceLeave(Surface *surface);
 	virtual void surfaceClear(Surface *surface);
 	virtual void surfaceCopy(Surface *surface, Texture *texture);
+
+private:
+	virtual void p_currentColor(double r, double g, double b, double a=1.);
+
+	// Rendering State
+	virtual void p_blending(bool enable, BlendFunc src, BlendFunc dst);
+	virtual void p_enable(Capability cap);
+	virtual void p_disable(Capability cap);
+
+	// Frame
+	virtual void p_clear(int attribMask);
+	virtual void p_clearColor(float r, float g, float b, float a);
 	
-	// OpenGL specific:
-	void enableLight(bool enable, int idx);
-	void setPolygonMode(Graphics::PolygonMode mode);
+	// Coordinate Transforms
+	virtual void p_viewport(int x, int y, int width, int height);
+	virtual void p_matrixMode(MatrixMode mode);
+
+	virtual void p_pushMatrix();
+	virtual void p_popMatrix();
+	virtual void p_loadIdentity();
+	virtual void p_loadMatrix(const Matrix4d &m);
+	virtual void p_multMatrix(const Matrix4d &m);
+	virtual void p_translate(double x, double y, double z);
+	virtual void p_rotate(double angle, double x, double y, double z);
+	virtual void p_scale(double x, double y, double z);
 	
-protected:
-	virtual void raw_color(double r, double g, double b, double a=1.);
+	virtual void p_draw(const Mesh& v);
+
+	virtual void p_antialiasing(AntiAliasMode v);
+	virtual void p_lineWidth(double v);
+	virtual void p_pointSize(double v);
 };
 
 } // al::

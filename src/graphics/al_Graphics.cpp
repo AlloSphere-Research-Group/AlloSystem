@@ -49,7 +49,7 @@ void Graphics::color(double r, double g, double b, double a) {
 	if(mInImmediateMode) {
 		mMesh.color(r, g, b, a);
 	} else {
-		raw_color(r, g, b, a);
+		p_currentColor(r, g, b, a);
 	}
 }
 

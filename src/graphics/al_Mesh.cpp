@@ -105,6 +105,57 @@ void Mesh::generateNormals(float angle) {
 //			faces.push_back(face);
 //		}
 //	}
+
+	int Nv = vertices().size();
+
+	// same number of normals as vertices
+	normals().size(Nv);
+
+	for(int i=0; i<Nv; ++i) normals()[i].set(0,0,0);
+
+	// compute per face normals
+	if(indices().size()){
+		int Ni = indices().size();
+
+//		if(primitive() == TRIANGLES){
+			Ni = Ni - (Ni%3); // must be multiple of 3
+
+			for(int i=0; i<Ni; i+=3){
+				Index i1 = indices()[i+0];
+				Index i2 = indices()[i+1];
+				Index i3 = indices()[i+2];
+				const Vertex& v1 = vertices()[i1];
+				const Vertex& v2 = vertices()[i2];
+				const Vertex& v3 = vertices()[i3];
+				
+				Vertex vn = cross(v2-v1, v3-v1);
+				
+				normals()[i1] += vn;
+				normals()[i2] += vn;
+				normals()[i3] += vn;
+			}
+//		}
+//		else if(primitive() == TRIANGLE_STRIP){
+//			for(int i=2; i<Ni; ++i){
+//				Index i1 = indices()[i-2];
+//				Index i2 = indices()[i-1];
+//				Index i3 = indices()[i-0];
+//				const Vertex& v1 = vertices()[i1];
+//				const Vertex& v2 = vertices()[i2];
+//				const Vertex& v3 = vertices()[i3];
+//				
+//				Vertex vn = cross(v2-v1, v3-v1);
+//				
+//				normals()[i1] += vn;
+//				normals()[i2] += vn;
+//				normals()[i3] += vn;
+//			}
+//		}
+
+	}
+
+	// normalize the normals
+	for(int i=0; i<Nv; ++i) normals()[i].normalize();
 }
 
 void Mesh::getBounds(Vertex& min, Vertex& max) {

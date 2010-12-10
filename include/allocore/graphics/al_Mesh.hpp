@@ -61,7 +61,7 @@ public:
 	// generates smoothed normals for a set of vertices
 	// will replace any normals currently in use
 	// angle - maximum angle (in degrees) to smooth across
-	void generateNormals(float angle);
+	void generateNormals(float angle=360);
 
 	int primitive() const { return mPrimitive; }
 	const Buffer<Vertex>& vertices() const { return mVertices; }
@@ -72,6 +72,9 @@ public:
 	const Buffer<Index>& indices() const { return mIndices; }
 
 	void index(unsigned int i){ indices().append(i); }
+	
+	template <class Tindex>
+	void index(const Tindex * buf, int size){ for(int i=0; i<size; ++i) index(buf[i]); }
 
 	void color(float r, float g, float b, float a=1){ color(Color(r,g,b,a)); }
 	void color(const Color& v) { colors().append(v); }
@@ -82,12 +85,22 @@ public:
 
 	void texCoord(float u, float v){ texCoord(TexCoord2(u,v)); }
 	void texCoord(const TexCoord2& v){ texCoord2s().append(v); }
-	
+
 	void texCoord(float u, float v, float w){ texCoord(TexCoord3(u,v,w)); }
 	void texCoord(const TexCoord3& v){ texCoord3s().append(v); }
 
 	void vertex(float x, float y, float z=0){ vertex(Vertex(x,y,z)); }
 	void vertex(const Vertex& v){ vertices().append(v); }
+
+	template <class T>
+	void vertex(const T * buf, int size){
+		for(int i=0; i<size; ++i) vertex(buf[3*i+0], buf[3*i+1], buf[3*i+2]);
+	}
+
+	template <class T>
+	void vertex(const Vec<3,T> * buf, int size){
+		for(int i=0; i<size; ++i) vertex(buf[i][0], buf[i][1], buf[i][2]);
+	}
 
 	void primitive(int prim){ mPrimitive=prim; }
 

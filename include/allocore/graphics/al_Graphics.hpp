@@ -80,6 +80,7 @@ public:
 
 	enum Capability {
 		BLEND,
+		COLOR_MATERIAL,
 		DEPTH_TEST,
 		DEPTH_MASK,
 		LIGHTING,
@@ -120,9 +121,9 @@ public:
 	virtual ~Graphics();
 	
 	// Rendering State
-	virtual void blending(bool enable, BlendFunc src, BlendFunc dst) = 0;
-	virtual void enable(Capability cap) = 0;
-	virtual void disable(Capability cap) = 0;
+	void blending(bool enable, BlendFunc src, BlendFunc dst){ p_blending(enable, src, dst); }
+	void enable(Capability cap){ p_enable(cap); }
+	void disable(Capability cap){ p_disable(cap); }
 	
 	void capability(Capability cap, bool value);
 
@@ -133,22 +134,21 @@ public:
 	void scissor(bool b);
 	
 	// Frame
-	virtual void clear(int attribMask) = 0;
-	virtual void clearColor(float r, float g, float b, float a) = 0;
-	
+	void clear(int attribMask){ p_clear(attribMask); }
+	void clearColor(float r, float g, float b, float a){ p_clearColor(r,g,b,a); }
 	void clearColor(const Color& color) { clearColor(color.r, color.g, color.b, color.a); }
 
 	// Coordinate Transforms
-	virtual void viewport(int x, int y, int width, int height) = 0;
-	virtual void matrixMode(MatrixMode mode) = 0;
-	virtual void pushMatrix() = 0;
-	virtual void popMatrix() = 0;
-	virtual void loadIdentity() = 0;
-	virtual void loadMatrix(const Matrix4d &m) = 0;
-	virtual void multMatrix(const Matrix4d &m) = 0;
-	virtual void translate(double x, double y, double z) = 0;
-	virtual void rotate(double angle, double x, double y, double z) = 0;
-	virtual void scale(double x, double y, double z) = 0;
+	void viewport(int x, int y, int width, int height){ p_viewport(x,y,width,height); }
+	void matrixMode(MatrixMode mode){ p_matrixMode(mode); }
+	void pushMatrix(){ p_pushMatrix(); }
+	void popMatrix(){ p_popMatrix(); }
+	void loadIdentity(){ p_loadIdentity(); }
+	void loadMatrix(const Matrix4d &m){ p_loadMatrix(m); }
+	void multMatrix(const Matrix4d &m){ p_multMatrix(m); }
+	void translate(double x, double y, double z){ p_translate(x,y,z); }
+	void rotate(double angle, double x, double y, double z){ p_rotate(angle, x,y,z); }
+	void scale(double x, double y, double z){ p_scale(x,y,z); }
 	
 	void pushMatrix(MatrixMode v){ matrixMode(v); pushMatrix(); }
 	void popMatrix(MatrixMode v){ matrixMode(v); popMatrix(); }
@@ -185,13 +185,13 @@ public:
 	void color(const Vec3d& v, double a=1.) { color(v[0], v[1], v[2], a); }
 	void color(const Vec3f& v, double a=1.) { color(v[0], v[1], v[2], a); }
 
-	virtual void draw(const Mesh& v) = 0;
-	void draw() { draw(mMesh); }
+	void draw(const Mesh& v){ p_draw(v); }
+	void draw(){ draw(mMesh); }
 
 	// Other state
-	virtual void antialiasing(AntiAliasMode v) = 0;
-	virtual void lineWidth(double v) = 0;
-	virtual void pointSize(double v) = 0;
+	void antialiasing(AntiAliasMode v){ p_antialiasing(v); }
+	void lineWidth(double v){ p_lineWidth(v); }
+	void pointSize(double v){ p_pointSize(v); }
 	
 	// Textures
 	Texture * textureNew() { return new Texture(this); }
@@ -216,10 +216,35 @@ public:
 	virtual void surfaceCopy(Surface *surface, Texture *texture) = 0;
 	
 protected:
-	virtual void raw_color(double r, double g, double b, double a=1.) = 0;
+	Mesh mMesh;				// used for immediate mode style rendering
+	bool mInImmediateMode;	// flag for whether or not in immediate mode
 
-	Mesh				mMesh;				// used for immediate mode style rendering
-	bool				mInImmediateMode;	// flag for whether or not in immediate mode
+private:
+	virtual void p_blending(bool enable, BlendFunc src, BlendFunc dst) = 0;
+	virtual void p_enable(Capability cap) = 0;
+	virtual void p_disable(Capability cap) = 0;
+
+	virtual void p_clear(int attribMask) = 0;
+	virtual void p_clearColor(float r, float g, float b, float a) = 0;
+
+	virtual void p_currentColor(double r, double g, double b, double a) = 0;
+
+	virtual void p_draw(const Mesh& v) = 0;
+
+	virtual void p_viewport(int x, int y, int width, int height) = 0;
+	virtual void p_matrixMode(MatrixMode mode) = 0;
+	virtual void p_pushMatrix() = 0;
+	virtual void p_popMatrix() = 0;
+	virtual void p_loadIdentity() = 0;
+	virtual void p_loadMatrix(const Matrix4d &m) = 0;
+	virtual void p_multMatrix(const Matrix4d &m) = 0;
+	virtual void p_translate(double x, double y, double z) = 0;
+	virtual void p_rotate(double angle, double x, double y, double z) = 0;
+	virtual void p_scale(double x, double y, double z) = 0;
+
+	virtual void p_antialiasing(AntiAliasMode v) = 0;
+	virtual void p_lineWidth(double v) = 0;
+	virtual void p_pointSize(double v) = 0;
 };
 
 
