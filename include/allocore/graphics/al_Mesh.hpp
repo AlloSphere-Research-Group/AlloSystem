@@ -44,14 +44,25 @@ public:
 
 	Mesh(): mPrimitive(0){}
 
-	/// Reset all buffers
-	void reset();
-	void equalizeBuffers();
-	void getBounds(Vec3f& min, Vec3f& max);
-	Vec3f getCenter(); // center at 0,0,0
+	void getBounds(Vec3f& min, Vec3f& max) const;
+
+	/// Get center of vertices
+	Vec3f getCenter() const;
 
 	// destructive edits to internal vertices:
-	void unitize();	/// scale to -1..1
+
+	/// Convert indices (if any) to flat vertex buffers
+	void decompress();
+
+	/// Extend buffers to match number of vertices
+	void equalizeBuffers();
+
+	/// Reset all buffers
+	void reset();
+
+	/// Scale all vertices to lie in [-1,1]
+	void unitize();
+
 	void scale(double x, double y, double z);
 	void scale(Vec3f v) { scale(v[0], v[1], v[2]); }
 	void scale(double s) { scale(s, s, s); }

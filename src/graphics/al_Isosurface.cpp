@@ -581,7 +581,7 @@ void Isosurface<T>::renameVerticesAndTriangles(){
 	}
 
 	mID2PointID.clear();
-	mTriangles.clear();
+	mTriangles.reset();
 }
 
 

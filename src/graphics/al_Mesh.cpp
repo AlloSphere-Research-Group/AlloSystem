@@ -1,6 +1,7 @@
-#include <vector>
+#include <algorithm>
 #include <map>
 #include <string>
+#include <vector>
 
 #include "allocore/system/al_Config.h"
 #include "allocore/graphics/al_Mesh.hpp"
@@ -8,12 +9,36 @@
 namespace al{
 
 void Mesh::reset() {
-	vertices().clear();
-	normals().clear();
-	colors().clear();
-	texCoord2s().clear();
-	texCoord3s().clear();
-	indices().clear();
+	vertices().reset();
+	normals().reset();
+	colors().reset();
+	texCoord2s().reset();
+	texCoord3s().reset();
+	indices().reset();
+}
+
+void Mesh::decompress(){
+	int Ni = indices().size();
+	if(Ni){
+		#define DECOMPRESS(buf, Type)\
+		{\
+			int N = buf.size();\
+			if(N){\
+				std::vector<Type> old(N);\
+				std::copy(&buf[0], (&buf[0]) + N, old.begin());\
+				buf.size(Ni);\
+				for(int i=0; i<Ni; ++i)	buf[i] = old[indices()[i]];\
+			}\
+		}
+		DECOMPRESS(vertices(), Vertex)
+		DECOMPRESS(colors(), Color)
+		DECOMPRESS(normals(), Normal)
+		DECOMPRESS(texCoord2s(), TexCoord2)
+		DECOMPRESS(texCoord3s(), TexCoord3)
+		#undef DECOMPRESS
+		
+		indices().reset();
+	}
 }
 
 void Mesh::equalizeBuffers() {
@@ -113,7 +138,7 @@ void Mesh::generateNormals(float angle) {
 
 	for(int i=0; i<Nv; ++i) normals()[i].set(0,0,0);
 
-	// compute per face normals
+	// compute vertex based normals
 	if(indices().size()){
 		int Ni = indices().size();
 
@@ -152,24 +177,54 @@ void Mesh::generateNormals(float angle) {
 //			}
 //		}
 
+		// normalize the normals
+		for(int i=0; i<Nv; ++i) normals()[i].normalize();
+	}
+	
+	// compute face based normals
+	else{
+//		if(primitive() == TRIANGLES){
+			int N = Nv - (Nv % 3);
+
+			for(int i=0; i<N; i+=3){
+				int i1 = i+0;
+				int i2 = i+1;
+				int i3 = i+2;
+				const Vertex& v1 = vertices()[i1];
+				const Vertex& v2 = vertices()[i2];
+				const Vertex& v3 = vertices()[i3];
+				
+				Vertex vn = cross(v2-v1, v3-v1).normalize();
+				
+				normals()[i1] = vn;
+				normals()[i2] = vn;
+				normals()[i3] = vn;
+			}			
+			
+//		}
 	}
 
-	// normalize the normals
-	for(int i=0; i<Nv; ++i) normals()[i].normalize();
+
 }
 
-void Mesh::getBounds(Vertex& min, Vertex& max) {
-	if (mVertices.size() > 0) {
-		min.set(mVertices[0][0], mVertices[0][1], mVertices[0][2]);
-		min.set(mVertices[0][0], mVertices[0][1], mVertices[0][2]);
-		for (int v=1; v<mVertices.size(); v++) {
-			Vertex& vt = mVertices[v];
-			for (int i=0; i<3; i++) {
+void Mesh::getBounds(Vertex& min, Vertex& max) const {
+	if(vertices().size()){
+		min.set(vertices()[0]);
+		max.set(min);
+		for(int v=1; v<vertices().size(); ++v){
+			const Vertex& vt = vertices()[v];
+			for(int i=0; i<3; ++i){
 				min[i] = MIN(min[i], vt[i]);
 				max[i] = MAX(max[i], vt[i]);
 			}
 		}
 	}
+}
+
+Vec3f Mesh::getCenter() const {
+	Vertex min(0), max(0);
+	getBounds(min, max);
+	return min+(max-min)*0.5;
 }
 
 void Mesh::unitize() {
@@ -182,12 +237,6 @@ void Mesh::unitize() {
 			vt[i] = -1. + (vt[i]-min[i])/avg[i];
 		}
 	}
-}
-
-Vec3f Mesh::getCenter() {
-	Vertex min(0), max(0);
-	getBounds(min, max);
-	return min+(max-min)*0.5;
 }
 
 void Mesh::translate(double x, double y, double z) {

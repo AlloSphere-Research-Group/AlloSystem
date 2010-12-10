@@ -89,8 +89,8 @@ public:
 	/// Get last element
 	const T& last() const { return mElems[mPos-1]; }
 
-	/// Clear
-	void clear(){ mSize=mFill=0; mPos=-1; }
+	/// Resets size to zero without deallocating allocated memory
+	void reset(){ mSize=mFill=0; mPos=-1; }
 
 	/// Resize buffer
 	

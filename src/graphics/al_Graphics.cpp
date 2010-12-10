@@ -33,7 +33,7 @@ void Graphics::vertex(double x, double y, double z) {
 	}	
 }
 
-void Graphics::texcoord(double u, double v) {
+void Graphics::texCoord(double u, double v) {
 	if(mInImmediateMode) {
 		mMesh.texCoord(u, v);
 	}
