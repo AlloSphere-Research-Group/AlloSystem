@@ -210,6 +210,7 @@ public:
 			CS( 7) CS( 6) CS( 5) CS( 4) CS( 3) CS( 2) CS( 1) CS( 0)
 			default:;
 		}
+		#undef CS
 	}
 
 	/// (x,y,z unit vector in the listener's coordinate frame)

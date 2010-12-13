@@ -36,6 +36,7 @@ public:
 
 	enum Type {
 		VERTEX,
+		GEOMETRY,
 		FRAGMENT
 	};
 
