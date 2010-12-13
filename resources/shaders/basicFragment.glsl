@@ -17,19 +17,19 @@ void main()
 	color = texture2D(tex0, texcoord0);
 	
 	
-//	/* a fragment shader can't write a verying variable, hence we need
-//	a new variable to store the normalized interpolated normal */
-//	n = normalize(normal);
-//	
-//	/* compute the dot product between normal and ldir */
-//	NdotL = max(dot(n,lightDir),0.0);
-//
-//	if (NdotL > 0.0) {
-//		halfV = normalize(halfVector);
-//		NdotHV = max(dot(n,halfV),0.0);
-//		color += gl_FrontMaterial.specular * gl_LightSource[0].specular * pow(NdotHV,gl_FrontMaterial.shininess);
-//		color += diffuse * NdotL;
-//	}
+	/* a fragment shader can't write a verying variable, hence we need
+	a new variable to store the normalized interpolated normal */
+	n = normalize(normal);
+	
+	/* compute the dot product between normal and ldir */
+	NdotL = max(dot(n,lightDir),0.0);
+
+	if (NdotL > 0.0) {
+		halfV = normalize(halfVector);
+		NdotHV = max(dot(n,halfV),0.0);
+		color += gl_FrontMaterial.specular * gl_LightSource[0].specular * pow(NdotHV,gl_FrontMaterial.shininess);
+		color += diffuse * NdotL;
+	}
 
 	gl_FragColor = color;
 }
