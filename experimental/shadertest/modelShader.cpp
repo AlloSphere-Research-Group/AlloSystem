@@ -236,106 +236,17 @@ void recursive_render (const struct aiScene *sc, const struct aiNode* nd)
 struct MyWindow : Window{
 
 	bool onFrame(){
-//		if (!shaderprogram.created()) {
-//			frag.validate();
-//			vert.validate();
-//			shaderprogram.validate();
-//			tex.validate();
-//
-//			printf("texture %dx%dx%d mode %d format %d type %d target %d\n", tex.width(), tex.height(), tex.depth(), tex.mode(), tex.format(), tex.type(), tex.target());
-//			
-//			frag.compile();	
-//			vert.compile();
-//			shaderprogram.attach(vert);
-//			shaderprogram.attach(frag);
-//			shaderprogram.link();
-//			shaderprogram.listParams();
-//			
-//			printf("frag %s\n", frag.log());
-//			printf("vert %s\n", vert.log());
-//			printf("shaderprogram %s\n", shaderprogram.log());
-//		
-//			printf("compiled shaders\n");
-//			
-//		}
-//		GraphicsGL::gl_error("onframe");
-//		
-//		gl.clearColor(0.1, 0.1, 0.1, 1);
-//		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-//		gl.viewport(0,0, width(), height());
-//		
-//		gl.matrixMode(gl.PROJECTION);
-//		gl.loadMatrix(Matrix4d::perspective(45, aspect(), 0.1, 100));
-//		
-//		gl.matrixMode(gl.MODELVIEW);
-//		gl.loadMatrix(Matrix4d::lookAt(Vec3d(0,0,4), Vec3d(0,0,0), Vec3d(0,1,0)));
-//		
-//		shaderprogram.begin();
-//		
-//		GLint loc = glGetUniformLocationARB(shaderprogram.handle(), "tex0");
-//		printf("%d\n", loc);
-//		
-//		tex.validate();
-//		gl.textureBind(&tex, 0);
-////		glActiveTextureARB( GL_TEXTURE0_ARB+0 );
-////		//GLenum gltarget = target_from_texture_target(tex->target());
-////		glEnable(GL_TEXTURE_RECTANGLE_ARB);
-////		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex.id());
-////		//gl_error("binding texture");
-////		
-////		gl.textureSubmit(&tex);	// first pass only?
-////		gl.textureEnter(&tex, 0);
-//		
-//		tex.bind(0);
-////		glActiveTextureARB( GL_TEXTURE0_ARB+0 );
-////		
-////		//GLenum gltarget = target_from_texture_target(tex->target());
-////		printf("%d\n", tex.target());
-////		
-////		glBindTexture(GL_TEXTURE_RECTANGLE_ARB, tex.id());
-//
-//		glUniform1iARB(loc, 0);
-//		
-//		gl.begin(gl.QUADS);
-//		gl.color(1, 1, 1);
-//		gl.texCoord(0, 0);
-//		gl.vertex(0, 0, 0);
-//		gl.texCoord(0, 1);
-//		gl.vertex(0, 1, 0);
-//		gl.texCoord(1, 1);
-//		gl.vertex(1, 1, 0);
-//		gl.texCoord(1, 0);
-//		gl.vertex(1, 0, 0);
-//		gl.end();
-//		//tex.unbind(0);
-//		gl.textureLeave(&tex, 0);
-//		gl.textureUnbind(&tex, 0);
-//		
-//		
-//		shaderprogram.end();
 		
 		// this is annoying:
 		if (!shaderprogram.created()) {
-//			frag.validate();
-//			vert.validate();
-//			shaderprogram.validate();
-//			tex.validate();
-
-			printf("texture %dx%dx%d mode %d format %d type %d target %d\n", tex.width(), tex.height(), tex.depth(), tex.mode(), tex.format(), tex.type(), tex.target());
-			
 			frag.compile();	
 			vert.compile();
 			shaderprogram.attach(vert);
 			shaderprogram.attach(frag);
 			shaderprogram.link();
-			shaderprogram.listParams();
-			
+			//shaderprogram.listParams();
 			printf("frag %s\n", frag.log());
 			printf("vert %s\n", vert.log());
-//			printf("shaderprogram %s\n", shaderprogram.log());
-		
-			printf("compiled shaders\n");
-			
 		}
 	
 		gl.clearColor(0.1, 0.1, 0.1, 1);
@@ -397,28 +308,20 @@ struct MyWindow : Window{
 		glTranslatef( -scene_center.x, -scene_center.y, -scene_center.z );
 		
 		
-//		// if the display list has not been made yet, create a new one and
-//		// fill it with scene contents
-//		if(scene_list == 0) {
-//			scene_list = glGenLists(1);
-//			glNewList(scene_list, GL_COMPILE);
-//			// now begin at the root node of the imported data and traverse
-//			// the scenegraph by multiplying subsequent local transforms
-//			// together on GL's matrix stack.
-//			
-//			tex.bind();
-//			recursive_render(scene, scene->mRootNode);
-//			tex.unbind();
-//			glEndList();
-//		}
+		// if the display list has not been made yet, create a new one and
+		// fill it with scene contents
+		if(scene_list == 0) {
+			scene_list = glGenLists(1);
+			glNewList(scene_list, GL_COMPILE);
+			recursive_render(scene, scene->mRootNode);
+			glEndList();
+		}
 		
 		shaderprogram.begin();
 		shaderprogram.uniform("tex", 0);
 		GraphicsGL::gl_error("tex");
 		tex.bind(0);
-		//glCallList(scene_list);
-		gl.color(1, 1, 1);
-		recursive_render(scene, scene->mRootNode);
+		glCallList(scene_list);
 		tex.unbind(0);
 		shaderprogram.end();
 		

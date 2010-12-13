@@ -22,9 +22,6 @@ void main()
 	ambient = gl_FrontMaterial.ambient * gl_LightSource[0].ambient;
 	ambient += gl_LightModel.ambient * gl_FrontMaterial.ambient;
 
-	// test visualize texture coords:
-	ambient = vec4(gl_MultiTexCoord0.rgb, 1);
-	
 	texcoord0 = vec2(gl_MultiTexCoord0);
 	gl_Position = ftransform();
 } 
