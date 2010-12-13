@@ -1,7 +1,7 @@
 
 varying vec4 diffuse,ambient;
 varying vec3 normal,lightDir,halfVector;
-varying vec4 texcoord0;
+varying vec2 texcoord0;
 
 void main()
 {	
@@ -25,6 +25,6 @@ void main()
 	// test visualize texture coords:
 //	ambient = vec4(gl_MultiTexCoord0.rgb, 1);
 	
-	texcoord0 = gl_MultiTexCoord0;
+	texcoord0 = vec2(gl_MultiTexCoord0);
 	gl_Position = ftransform();
 } 

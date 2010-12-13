@@ -91,15 +91,15 @@ public:
 	}
 	
 	/// Returns the assigned object id
-	const int id() const { return mID; }
-	void id(int v) {mID = v;}
+	const long id() const { return mID; }
+	void id(long v) {mID = v;}
 
 protected:
 
 	// remove from the context:
 	void contextUnregister();
 	
-	int mID;
+	long mID;
 	virtual void onCreate() = 0;
 	virtual void onDestroy() = 0;
 };

@@ -212,7 +212,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 36DC8C8012B0A5A500AEC644 /* liballocore */;
+			remoteGlobalIDString = 36DC8C8012B0A5A500AEC644;
 			remoteInfo = liballocore;
 		};
 /* End PBXContainerItemProxy section */

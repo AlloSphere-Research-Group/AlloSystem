@@ -11,7 +11,7 @@ Texture::Texture(Graphics *backend)
 	mMode(DATA),
 	mRebuild(true),
 	mUpdate(false),
-	mRect(true),
+	mRect(false),
 	mWidth(512),
 	mHeight(512),
 	mDepth(0),

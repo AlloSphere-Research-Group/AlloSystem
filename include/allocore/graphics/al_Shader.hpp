@@ -15,6 +15,8 @@ public:
 
 	/// Returns info log or 0 if none.
 	const char * log();
+	
+	void * handle() const { return mHandle; }
 
 protected:
 	char * mLog;
@@ -23,6 +25,9 @@ protected:
 
 	//virtual void get(int pname, GLint * params) = 0;
 	virtual void get(int pname, void * params) const = 0;
+	
+	
+	void * mHandle;
 };
 
 
@@ -50,6 +55,7 @@ public:
 	Shader& source(const std::string& v, Shader::Type type);
 	Shader& compile();
 	bool compiled() const;
+	
 
 private:
 	std::string mSource;
@@ -60,6 +66,7 @@ private:
 	
 	virtual void onCreate();
 	virtual void onDestroy();
+	
 };
 
 
@@ -127,11 +134,13 @@ public:
 	void listParams() const;
 	const ShaderProgram& uniform(const char * name, int v0);
 	const ShaderProgram& uniform(const char * name, float v0);
+	const ShaderProgram& attribute(const char * name, float v0);
 	
 	static Type param_type_from_gltype(GLenum gltype);
 
 protected:
 	int uniformLocation(const char * name) const;
+	int attributeLocation(const char * name) const;
 	
 	virtual void get(int pname, void * params) const;
 

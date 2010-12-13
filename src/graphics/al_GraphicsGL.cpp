@@ -534,16 +534,11 @@ void GraphicsGL :: textureBind(Texture *tex, int unit) {
 	// multitexturing
 	glActiveTextureARB( GL_TEXTURE0_ARB+unit );
 
-
 	GLenum gltarget = target_from_texture_target(tex->target());
 	glEnable(gltarget);
 	glBindTexture(gltarget, tex->id());
-}
-
-void GraphicsGL :: textureUnbind(Texture *tex, int unit) {
-	GLenum gltarget = target_from_texture_target(tex->target());
-	glBindTexture(gltarget, 0);
-	glDisable(gltarget);
+	
+	gl_error("binding texture");
 }
 
 void GraphicsGL :: textureEnter(Texture *tex, int unit) {
@@ -558,6 +553,8 @@ void GraphicsGL :: textureEnter(Texture *tex, int unit) {
 
 	// set texture environment
 //	glTexEnvi(GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, mCoordReplace);
+
+	gl_error("entering texture");
 }
 
 void GraphicsGL :: textureLeave(Texture *tex, int unit) {
@@ -568,6 +565,16 @@ void GraphicsGL :: textureLeave(Texture *tex, int unit) {
 	glPopMatrix();
 
 	glMatrixMode(GL_MODELVIEW);
+	
+	gl_error("leaving texture");
+}
+
+void GraphicsGL :: textureUnbind(Texture *tex, int unit) {
+	GLenum gltarget = target_from_texture_target(tex->target());
+	glBindTexture(gltarget, 0);
+	glDisable(gltarget);
+	
+	gl_error("unbinding texture");
 }
 
 void GraphicsGL :: textureToArray(Texture *tex) {
