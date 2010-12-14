@@ -23,7 +23,7 @@
 \*===----------------------------------------------------------------------===*/
 
 #ifndef __CLANG_STDINT_H
-#define __CLANG_STDINT_H
+#define __CLANG_STDINT_H 
 
 /* If we're hosted, fall back to the system's stdint.h, which might have
  * additional definitions.
