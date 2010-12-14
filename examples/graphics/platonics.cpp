@@ -3,7 +3,7 @@
 using namespace al;
 
 GraphicsGL gl;
-Mesh plato1, plato2, plato3, plato4, plato5;
+Mesh solids[5];
 Light light;
 Material material;
 
@@ -36,40 +36,14 @@ struct MyWindow : Window{
 		float angPos = 2*M_PI/5;
 		float R = 3;
 		
-		gl.pushMatrix(gl.MODELVIEW);
-			gl.translate(R*cos(0*angPos), R*sin(0*angPos), 0);
-			gl.rotate(angle1, 0,1,0);
-			gl.rotate(angle2, 1,0,0);
-			gl.draw(plato1);
-		gl.popMatrix();
-
-		gl.pushMatrix(gl.MODELVIEW);
-			gl.translate(R*cos(1*angPos), R*sin(1*angPos), 0);
-			gl.rotate(angle1, 0,1,0);
-			gl.rotate(angle2, 1,0,0);
-			gl.draw(plato2);
-		gl.popMatrix();
-
-		gl.pushMatrix(gl.MODELVIEW);
-			gl.translate(R*cos(2*angPos), R*sin(2*angPos), 0);
-			gl.rotate(angle1, 0,1,0);
-			gl.rotate(angle2, 1,0,0);
-			gl.draw(plato3);
-		gl.popMatrix();
-
-		gl.pushMatrix(gl.MODELVIEW);
-			gl.translate(R*cos(3*angPos), R*sin(3*angPos), 0);
-			gl.rotate(angle1, 0,1,0);
-			gl.rotate(angle2, 1,0,0);
-			gl.draw(plato4);
-		gl.popMatrix();
-
-		gl.pushMatrix(gl.MODELVIEW);
-			gl.translate(R*cos(4*angPos), R*sin(4*angPos), 0);
-			gl.rotate(angle1, 0,1,0);
-			gl.rotate(angle2, 1,0,0);
-			gl.draw(plato5);
-		gl.popMatrix();
+		for(int i=0; i<5; ++i){
+			gl.pushMatrix(gl.MODELVIEW);
+				gl.translate(R*cos(i*angPos), R*sin(i*angPos), 0);
+				gl.rotate(angle1, 0,1,0);
+				gl.rotate(angle2, 1,0,0);
+				gl.draw(solids[i]);
+			gl.popMatrix();
+		}
 
 		return true;
 	}
@@ -96,17 +70,17 @@ int main(){
 
 		int Nv = sizeof(vertices)/sizeof(*vertices)/3;
 
-		plato1.vertex(vertices, Nv);
-		plato1.index(indices, sizeof(indices)/sizeof(*indices));
-		plato1.primitive(Graphics::TRIANGLES);
+		solids[0].vertex(vertices, Nv);
+		solids[0].index(indices, sizeof(indices)/sizeof(*indices));
+		solids[0].primitive(Graphics::TRIANGLES);
 
 		for(int i=0; i<Nv; ++i){
 			float f = float(i)/Nv;
-			plato1.color(HSV(f*0.2+0.4,1,1));
+			solids[0].color(HSV(f*0.2+0.4,1,1));
 		}
 
-		plato1.decompress();
-		plato1.generateNormals();
+		solids[0].decompress();
+		solids[0].generateNormals();
 	}
 
 	{
@@ -125,17 +99,17 @@ int main(){
 		
 		int Nv = sizeof(vertices)/sizeof(*vertices)/3;
 
-		plato2.vertex(vertices, Nv);
-		plato2.index(indices, sizeof(indices)/sizeof(*indices));
-		plato2.primitive(Graphics::TRIANGLES);
+		solids[1].vertex(vertices, Nv);
+		solids[1].index(indices, sizeof(indices)/sizeof(*indices));
+		solids[1].primitive(Graphics::TRIANGLES);
 
 		for(int i=0; i<Nv; ++i){
 			float f = float(i)/Nv;
-			plato2.color(HSV(f*0.1+0.2,1,1));
+			solids[1].color(HSV(f*0.1+0.2,1,1));
 		}
 
-		plato2.decompress();
-		plato2.generateNormals();
+		solids[1].decompress();
+		solids[1].generateNormals();
 	}
 
 	{
@@ -151,17 +125,17 @@ int main(){
 		
 		int Nv = sizeof(vertices)/sizeof(*vertices)/3;
 
-		plato3.vertex(vertices, Nv);
-		plato3.index(indices, sizeof(indices)/sizeof(*indices));
-		plato3.primitive(Graphics::TRIANGLES);
+		solids[2].vertex(vertices, Nv);
+		solids[2].index(indices, sizeof(indices)/sizeof(*indices));
+		solids[2].primitive(Graphics::TRIANGLES);
 
 		for(int i=0; i<Nv; ++i){
 			float f = float(i)/Nv;
-			plato3.color(HSV(f*0.1+0.1,1,1));
+			solids[2].color(HSV(f*0.1+0.1,1,1));
 		}
 
-		plato3.decompress();
-		plato3.generateNormals();
+		solids[2].decompress();
+		solids[2].generateNormals();
 	}
 
 	{
@@ -184,17 +158,17 @@ int main(){
 		
 		int Nv = sizeof(vertices)/sizeof(*vertices)/3;
 
-		plato4.vertex(vertices, Nv);
-		plato4.index(indices, sizeof(indices)/sizeof(*indices));
-		plato4.primitive(Graphics::TRIANGLES);
+		solids[3].vertex(vertices, Nv);
+		solids[3].index(indices, sizeof(indices)/sizeof(*indices));
+		solids[3].primitive(Graphics::TRIANGLES);
 
 		for(int i=0; i<Nv; ++i){
 			float f = float(i)/Nv;
-			plato4.color(HSV(f*0.1,1,1));
+			solids[3].color(HSV(f*0.1,1,1));
 		}
 
-		plato4.decompress();
-		plato4.generateNormals();
+		solids[3].decompress();
+		solids[3].generateNormals();
 	}
 
 	{
@@ -263,17 +237,17 @@ int main(){
 
 		int Nv = sizeof(vertices)/sizeof(*vertices)/3;
 
-		plato5.vertex(vertices, Nv);
-		plato5.index(indices, sizeof(indices)/sizeof(*indices));
-		plato5.primitive(Graphics::TRIANGLES);
+		solids[4].vertex(vertices, Nv);
+		solids[4].index(indices, sizeof(indices)/sizeof(*indices));
+		solids[4].primitive(Graphics::TRIANGLES);
 
 		for(int i=0; i<Nv; ++i){
 			float f = float(i)/Nv;
-			plato5.color(HSV(f*0.1 + 0.7,1,1));
+			solids[4].color(HSV(f*0.1 + 0.7,1,1));
 		}
 
-		plato5.decompress();
-		plato5.generateNormals();
+		solids[4].decompress();
+		solids[4].generateNormals();
 	}
 
 	MyWindow win1;

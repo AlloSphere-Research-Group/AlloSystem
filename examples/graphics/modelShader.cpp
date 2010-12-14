@@ -13,6 +13,8 @@ Shader vert, frag;
 ShaderProgram shaderprogram;
 Texture tex(&gl);
 Image img;
+Light light;
+Material material;
 
 Scene * ascene = 0;
 Vec3f scene_min, scene_max, scene_center;
@@ -23,19 +25,44 @@ float a = 0.f; // current rotation angle
 
 struct MyWindow : Window{
 
-	bool onFrame(){
-		
+	bool onCreate(){
+	
 		// this is annoying:
-		if (!shaderprogram.created()) {
-			frag.compile();	
-			vert.compile();
-			shaderprogram.attach(vert);
-			shaderprogram.attach(frag);
-			shaderprogram.link();
-			//shaderprogram.listParams();
-			printf("frag %s\n", frag.log());
-			printf("vert %s\n", vert.log());
-		}
+		frag.compile();	
+		vert.compile();
+		shaderprogram.attach(vert);
+		shaderprogram.attach(frag);
+		shaderprogram.link();
+		//shaderprogram.listParams();
+		printf("frag %s\n", frag.log());
+		printf("vert %s\n", vert.log());
+
+
+		// if the display list has not been made yet, create a new one and
+		// fill it with scene contents
+		scene_list = glGenLists(1);
+		glNewList(scene_list, GL_COMPILE);
+		
+		Mesh mesh;
+		for (int i=0; i<ascene->meshes(); i++) {
+			ascene->mesh(i, mesh);
+			gl.draw(mesh);
+		}	
+		
+		//recursive_render(scene, scene->mRootNode);
+		glEndList();
+
+		return true;
+	}
+	
+	bool onDestroy(){
+	
+		glDeleteLists(scene_list, 1);
+	
+		return true;
+	}
+
+	bool onFrame(){
 	
 		gl.clearColor(0.1, 0.1, 0.1, 1);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -78,11 +105,20 @@ struct MyWindow : Window{
 		
 		const GLfloat pos[]={ 1.f, 1.f, 2.f, 0.f };
 		glLightfv(GL_LIGHT0, GL_POSITION, pos);
+
+//		gl.enable(gl.DEPTH_TEST);
+////		gl.enable(gl.NORMALIZE);
+//		light.twoSided(true);
+//		light.dir(1.f, 1.f, 2.f);
+//
+//		light();
+//		material();
+//		glColorMaterial(GL_FRONT_AND_BACK, GL_DIFFUSE);
 		
-		glPushMatrix();
+		gl.pushMatrix();
 		
 		// rotate it around the y axis
-		glRotatef(a, 0.f,1.f,0.f);
+		gl.rotate(a, 0.f,1.f,0.f);
 		a += 0.5;
 		
 		// scale the whole asset to fit into our view frustum 
@@ -90,27 +126,11 @@ struct MyWindow : Window{
 		tmp = MAX(scene_max[1] - scene_min[1],tmp);
 		tmp = MAX(scene_max[2] - scene_min[2],tmp);
 		tmp = 2.f / tmp;
-		glScalef(tmp, tmp, tmp);
+		gl.scale(tmp);
 	
 		// center the model
 		gl.translate( -scene_center );
-		
-		
-		// if the display list has not been made yet, create a new one and
-		// fill it with scene contents
-		if(scene_list == 0) {
-			scene_list = glGenLists(1);
-			glNewList(scene_list, GL_COMPILE);
-			
-			Mesh mesh;
-			for (int i=0; i<ascene->meshes(); i++) {
-				ascene->mesh(i, mesh);
-				gl.draw(mesh);
-			}	
-			
-			//recursive_render(scene, scene->mRootNode);
-			glEndList();
-		}
+
 		
 		shaderprogram.begin();
 		shaderprogram.uniform("tex", 0);
@@ -120,7 +140,7 @@ struct MyWindow : Window{
 		tex.unbind(0);
 		shaderprogram.end();
 		
-		glPopMatrix();
+		gl.popMatrix();
 		
 		return true;
 	}
