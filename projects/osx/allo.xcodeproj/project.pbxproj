@@ -134,6 +134,8 @@
 		362FA8F611D3FCC100AA2DC4 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		365599FC11D4013600BA01E8 /* al_MsgQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 365599FB11D4013600BA01E8 /* al_MsgQueue.cpp */; };
 		3659D756117B8AFA0065EBE4 /* ringbuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 3659D755117B8AFA0065EBE4 /* ringbuffer.c */; };
+		366EF1E512B6FC1C0000EF65 /* modelShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 366EF1E412B6FC1C0000EF65 /* modelShader.cpp */; };
+		366EF1F612B6FC4E0000EF65 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DDF6512B6C8C000F75D2A /* libassimp.a */; };
 		367F0B3B12034EED00FCC534 /* al_Stereographic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 367F0B3A12034EED00FCC534 /* al_Stereographic.cpp */; };
 		367F0B5112034F1E00FCC534 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		367F0B5212034F1E00FCC534 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
@@ -624,6 +626,7 @@
 		3659D752117B8AC60065EBE4 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		3659D753117B8AC60065EBE4 /* ringbuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ringbuffer.h; sourceTree = "<group>"; };
 		3659D755117B8AFA0065EBE4 /* ringbuffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ringbuffer.c; sourceTree = "<group>"; };
+		366EF1E412B6FC1C0000EF65 /* modelShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = modelShader.cpp; sourceTree = "<group>"; };
 		367F0B3812034EDB00FCC534 /* al_Stereographic.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Stereographic.hpp; sourceTree = "<group>"; };
 		367F0B3A12034EED00FCC534 /* al_Stereographic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Stereographic.cpp; sourceTree = "<group>"; };
 		367F0B5C12034F1E00FCC534 /* exStereographics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exStereographics; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -776,6 +779,7 @@
 				05C9388A128A166B0068F87F /* libportaudio.a in Frameworks */,
 				05C9388B128A166B0068F87F /* libfreeimage.a in Frameworks */,
 				05C9388C128A166B0068F87F /* libapr-1.a in Frameworks */,
+				366EF1F612B6FC4E0000EF65 /* libassimp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1026,6 +1030,7 @@
 			children = (
 				05C93876128A16060068F87F /* simpleGraphics.cpp */,
 				05C93892128A168F0068F87F /* graphicsData.cpp */,
+				366EF1E412B6FC1C0000EF65 /* modelShader.cpp */,
 			);
 			path = graphics;
 			sourceTree = "<group>";
@@ -2133,6 +2138,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				366EF1E512B6FC1C0000EF65 /* modelShader.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2460,6 +2466,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\\\"$(SRCROOT)/../../dev/osx/lib\\\"",
+					"\"$(SRCROOT)/../../dev/osx/lib\"",
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = exSimpleGraphics;
@@ -2478,6 +2485,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\\\"$(SRCROOT)/../../dev/osx/lib\\\"",
+					"\"$(SRCROOT)/../../dev/osx/lib\"",
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = exSimpleGraphics;

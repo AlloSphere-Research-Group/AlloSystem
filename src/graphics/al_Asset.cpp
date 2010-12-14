@@ -1,4 +1,4 @@
-#include "al_Asset.hpp"
+#include "allocore/graphics/al_Asset.hpp"
 
 #include "allocore/graphics/al_GraphicsOpenGL.hpp"
 
