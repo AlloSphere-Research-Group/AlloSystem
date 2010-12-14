@@ -6,7 +6,7 @@ SearchPaths& getSearchPaths() { return searchpaths; }
 
 int main (int argc, char * const argv[]) {
 	searchpaths.addAppPaths(argc, argv);
-	searchpaths.addSearchPath(searchpaths.appPath() + "../../resources");
+	searchpaths.addSearchPath(searchpaths.appPath() + "../share");
 
 	utAsset();
 	
