@@ -27,7 +27,6 @@ struct MyWindow : Window{
 
 	bool onCreate(){
 	
-		// this is annoying:
 		frag.compile();	
 		vert.compile();
 		shaderprogram.attach(vert);

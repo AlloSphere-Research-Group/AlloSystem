@@ -21,6 +21,17 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		36340D1212B742B20025B04D /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DE3B312B6F77200F75D2A /* libapr-1.a */; };
+		36340D1312B742B20025B04D /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DE3B412B6F77200F75D2A /* libassimp.a */; };
+		36340D1412B742B20025B04D /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DE3B512B6F77200F75D2A /* libfreeimage.a */; };
+		36340D1512B742B20025B04D /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DE3B812B6F77200F75D2A /* libportaudio.a */; };
+		36340EB512B743560025B04D /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DE43612B6F7A300F75D2A /* Carbon.framework */; };
+		36340EB612B743560025B04D /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DE43812B6F7A300F75D2A /* CoreAudio.framework */; };
+		36340EB712B743560025B04D /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DE43A12B6F7A300F75D2A /* GLUT.framework */; };
+		36340EB812B743560025B04D /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DE43C12B6F7A300F75D2A /* OpenGL.framework */; };
+		36340EB912B743560025B04D /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DE44A12B6F7D000F75D2A /* AudioToolbox.framework */; };
+		36340EBA12B743560025B04D /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DE44C12B6F7D000F75D2A /* Cocoa.framework */; };
+		36340EBB12B743560025B04D /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DE45012B6F7E000F75D2A /* AudioUnit.framework */; };
 		369DE0B412B6E6F700F75D2A /* al_Compiler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 369DE09612B6E62800F75D2A /* al_Compiler.cpp */; };
 		369DE0B512B6E6FD00F75D2A /* liballojit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DE0A212B6E68700F75D2A /* liballojit.a */; };
 		369DE29D12B6EC6800F75D2A /* libclang.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DE22A12B6EC6800F75D2A /* libclang.a */; };
@@ -100,7 +111,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 36402DA312B71DFD00D94D38 /* make dependencies */;
+			remoteGlobalIDString = 36402DA312B71DFD00D94D38;
 			remoteInfo = "make dependencies";
 		};
 		369DE0A512B6E68D00F75D2A /* PBXContainerItemProxy */ = {
@@ -444,6 +455,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36340EB512B743560025B04D /* Carbon.framework in Frameworks */,
+				36340EB612B743560025B04D /* CoreAudio.framework in Frameworks */,
+				36340EB712B743560025B04D /* GLUT.framework in Frameworks */,
+				36340EB812B743560025B04D /* OpenGL.framework in Frameworks */,
+				36340EB912B743560025B04D /* AudioToolbox.framework in Frameworks */,
+				36340EBA12B743560025B04D /* Cocoa.framework in Frameworks */,
+				36340EBB12B743560025B04D /* AudioUnit.framework in Frameworks */,
+				36340D1212B742B20025B04D /* libapr-1.a in Frameworks */,
+				36340D1312B742B20025B04D /* libassimp.a in Frameworks */,
+				36340D1412B742B20025B04D /* libfreeimage.a in Frameworks */,
+				36340D1512B742B20025B04D /* libportaudio.a in Frameworks */,
 				369DE0B512B6E6FD00F75D2A /* liballojit.a in Frameworks */,
 				369DE30012B6ECEC00F75D2A /* liballocore.a in Frameworks */,
 			);
@@ -961,7 +983,10 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/lib\"",
+				);
 				PRODUCT_NAME = $inherited;
 				VALID_ARCHS = $inherited;
 			};
@@ -974,7 +999,10 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/lib\"",
+				);
 				PRODUCT_NAME = $inherited;
 				VALID_ARCHS = $inherited;
 			};
