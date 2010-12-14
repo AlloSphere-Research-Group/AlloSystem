@@ -342,13 +342,14 @@ private:
 	InputEventHandlers mInputEventHandlers;
 	WindowEventHandlers mWindowEventHandlers;
 
-	#define CALL(e)\
-	if(e){\
+	#define CALL(e)	{\
 		InputEventHandlers::iterator iter = mInputEventHandlers.begin(); \
-		while(iter != mInputEventHandlers.end()){\
-			if(!(*iter)->e) break;\
+		bool active = true; \
+		while(active && iter != mInputEventHandlers.end()){\
+			active = (*iter)->e; \
 			iter++; \
 		}\
+		if (active) e; \
 	}
 	void doMouseDown(const Mouse& m){ CALL(onMouseDown(m)); }
 	void doMouseDrag(const Mouse& m){ CALL(onMouseDrag(m)); }
@@ -358,13 +359,14 @@ private:
 	void doKeyUp(const Keyboard& k){ CALL(onKeyUp(k)); }
 	#undef CALL
 	
-	#define CALL(e)\
-	if(e){\
+	#define CALL(e)	{\
 		WindowEventHandlers::iterator iter = mWindowEventHandlers.begin(); \
-		while(iter != mWindowEventHandlers.end()){\
-			if(!(*iter)->e) break;\
+		bool active = true; \
+		while(active && iter != mWindowEventHandlers.end()){\
+			active = (*iter)->e; \
 			iter++; \
 		}\
+		if (active) e; \
 	}
 	void doFrame() { CALL(onFrame()); }
 	void doCreate(){ CALL(onCreate()); }				

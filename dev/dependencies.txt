@@ -75,6 +75,11 @@ sudo make install
 
 
 
+AssImp 2.0.863
+--------------
+
+make static NOBOOST=1 CPPFLAGS="-O3 -mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk -arch x86_64 -arch i386"
+
 
 Linux
 =====

@@ -1,11 +1,5 @@
 #include "allocore/al_Allocore.hpp"
-#include "al_Asset.hpp"
-
-// @see http://assimp.svn.sourceforge.net/viewvc/assimp/trunk/samples/SimpleOpenGL/Sample_SimpleOpenGL.c?revision=827&view=markup
-#include "assimp/assimp.h"
-#include "assimp/aiPostProcess.h"
-#include "assimp/aiScene.h"
-
+#include "allocore/graphics/al_Asset.hpp"
 #include "allocore/graphics/al_Shader.hpp"
 #include "allocore/graphics/al_Texture.hpp"
 #include "allocore/graphics/al_Image.hpp"

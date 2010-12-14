@@ -41,7 +41,7 @@ int utTypes(){
 		assert(a.size() == 3);
 		assert(a.capacity() == 4);
 		
-		a.clear();
+		a.reset();
 		assert(a.size() == 0);
 		assert(a.capacity() == 4);
 

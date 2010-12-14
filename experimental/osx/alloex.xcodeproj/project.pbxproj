@@ -117,7 +117,6 @@
 		3687E33B11FA4F9500EC6706 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		3687E33D11FA4F9500EC6706 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		3687E34311FA4FA100EC6706 /* exIsosurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3687E2BE11FA39F900EC6706 /* exIsosurface.cpp */; };
-		369DDC5412B5BBDA00F75D2A /* al_Asset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 369DDC5312B5BBDA00F75D2A /* al_Asset.cpp */; };
 		36B4129910EFF864007B16D0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		36B412B010EFF916007B16D0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		36C079B211D4966500764E50 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
@@ -642,8 +641,6 @@
 		3698377112A47EB700D8CCEA /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
 		3698377212A47EB700D8CCEA /* test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test.cpp; sourceTree = "<group>"; };
 		3698377312A47EB700D8CCEA /* test_portaudio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test_portaudio.c; sourceTree = "<group>"; };
-		369DDC5212B5BBDA00F75D2A /* al_Asset.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Asset.hpp; sourceTree = "<group>"; };
-		369DDC5312B5BBDA00F75D2A /* al_Asset.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Asset.cpp; sourceTree = "<group>"; };
 		369DDC7212B5C2CC00F75D2A /* al_BufferObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_BufferObject.hpp; sourceTree = "<group>"; };
 		369DDC7312B5C2CC00F75D2A /* al_GPUObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_GPUObject.hpp; sourceTree = "<group>"; };
 		369DDC7412B5C2CC00F75D2A /* al_Graphics.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Graphics.hpp; sourceTree = "<group>"; };
@@ -1470,8 +1467,6 @@
 		361718BF128B22CF00D6ED65 /* shadertest */ = {
 			isa = PBXGroup;
 			children = (
-				369DDC5212B5BBDA00F75D2A /* al_Asset.hpp */,
-				369DDC5312B5BBDA00F75D2A /* al_Asset.cpp */,
 				3633CE4D129DE080006269CE /* modelShader.cpp */,
 				361AA90A12AF0B9D002E9DFD /* basicFragment.glsl */,
 				361AA90B12AF0BB1002E9DFD /* basicVertex.glsl */,
@@ -2510,7 +2505,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3633CE4E129DE080006269CE /* modelShader.cpp in Sources */,
-				369DDC5412B5BBDA00F75D2A /* al_Asset.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

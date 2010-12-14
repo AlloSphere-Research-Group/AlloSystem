@@ -29,5 +29,8 @@ int utTypes();
 int utTypesConversion();
 int utThread();
 int utFile();
+int utAsset();
+
+SearchPaths& getSearchPaths();
 
 #endif

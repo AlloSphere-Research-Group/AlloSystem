@@ -369,7 +369,7 @@ void Scene :: dump() const {
 		printf("\t%d: %d properties\n", i, x->mNumProperties);
 		for (unsigned int j=0; j<x->mNumProperties; j++) {
 			aiMaterialProperty * p = x->mProperties[j];
-			size_t dim;
+			int dim;
 			std::string str;
 			printf("\t\t%d: %s = { texture: %d, semantic: %d } ", j, p->mKey.data, p->mIndex, p->mSemantic);
 			switch (p->mType) {
