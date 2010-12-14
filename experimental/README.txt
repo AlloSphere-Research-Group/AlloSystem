@@ -1,1 +1,0 @@
-This subfolder is for any projects that are work-in-progress and are not yet ready to move into allo core source or module projects.
