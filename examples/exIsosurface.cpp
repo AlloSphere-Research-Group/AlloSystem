@@ -1,9 +1,12 @@
 #include "allocore/al_Allocore.hpp"
-#include "al_NavControl.hpp"
+#include "allocore/graphics/al_Isosurface.hpp"
+#include "alloutil/al_ControlNav.hpp"
+//#include "al_NavControl.hpp"
 using namespace al;
 
-Graphics gl;
+GraphicsGL gl;
 Light light;
+Material material;
 Camera cam;
 Nav nav;
 Stereographic stereo;
@@ -41,13 +44,20 @@ struct MyWindow : public Window, public Drawable{
 
 	void onDraw(Graphics& gl){
 		gl.depthTesting(1);
-		gl.lighting(1);
-		
+
+		material.shininess(10)();
 		light();
-		
+
 		iso.level(0);
 		iso.generate(volData, N, 1./N);
-		gl.draw(iso);
+		
+		gl.pushMatrix(gl.MODELVIEW);
+			glEnable(GL_RESCALE_NORMAL);
+			gl.translate(-1,-1,-1);
+			gl.scale(2);
+			iso.color(0.6,0.6,0.6);
+			gl.draw(iso);
+		gl.popMatrix();
 		
 		drawbox();
 	}
@@ -57,7 +67,7 @@ struct MyWindow : public Window, public Drawable{
 		nav.step(1.);
 		stereo.draw(gl, cam, nav, Viewport(width(), height()), *this);
 		
-		if((phase += 0.001) > 2*M_PI) phase -= 2*M_PI;
+		if((phase += 0.0005) > 2*M_PI) phase -= 2*M_PI;
 
 		for(int k=0; k<N; ++k){
 		for(int j=0; j<N; ++j){
@@ -80,15 +90,13 @@ int main (int argc, char * argv[]){
 
 	iso.primitive(Graphics::TRIANGLES);
 	
+	nav.pos(0,0,-5);
+	
 	MyWindow win;
 	win.create(Window::Dim(800,600), "Isosurface Example", 140);
 
 	win.add(new StandardWindowKeyControls);
 	win.add(new NavInputControl(&nav));
-
-	Pose p;
-	Vec3d v1, v2;
-	p.pos(v1 - v2);
 
 	Window::startLoop();
 	return 0;

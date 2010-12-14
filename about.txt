@@ -25,3 +25,29 @@ unitTests/
 
 examples/
 	- example projects using library
+
+
+
+allosuite
+	allocore
+	allojit
+	glv
+	gamma
+	(smaller projects)
+
+	build/
+
+projects
+	nanomed
+	allosuite -rX
+
+
+
+build/
+	bin/		# executables
+	include/	
+	lib/
+	share/		# architecture independent data
+
+	home/		# contains the home directories for the users
+	etc/		# contains configuration files
