@@ -28,8 +28,6 @@
 namespace al{
 
 // Platonic solids
-// Platonic solid data taken from "Platonic Solids (Regular Polytopes In 3D)"
-// http://local.wasp.uwa.edu.au/~pbourke/geometry/platonic/
 
 /// Add tetrahedron as triangle vertices and indices
 int addTetrahedron(Mesh& m);

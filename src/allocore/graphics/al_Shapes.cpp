@@ -65,6 +65,8 @@ int addOctahedron(Mesh& m){
 	return Nv;
 }
 
+// Data taken from "Platonic Solids (Regular Polytopes In 3D)"
+// http://local.wasp.uwa.edu.au/~pbourke/geometry/platonic/
 int addDodecahedron(Mesh& m){
 	static const float a = 1.6 * 0.5;
 	static const float b = 1.6 / (2 * phi);
