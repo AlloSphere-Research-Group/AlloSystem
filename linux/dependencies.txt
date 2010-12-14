@@ -1,0 +1,16 @@
+=======================
+DEPENDENCY BUILD NOTES
+=======================
+
+TODO: put apt-get command line here (for libapr, libportaudio, llvm/clang2.7 etc.
+
+allocore:
+	g++
+	libapr1-dev
+	glew-dev
+	libglut3-dev
+	portaudio19-dev
+	libjack-dev
+	freeimage-dev
+alloclang:
+	clang
