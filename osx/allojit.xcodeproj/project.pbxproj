@@ -103,7 +103,6 @@
 		369DE09312B6E62800F75D2A /* al_Compiler.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Compiler.hpp; sourceTree = "<group>"; };
 		369DE09612B6E62800F75D2A /* al_Compiler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Compiler.cpp; sourceTree = "<group>"; };
 		369DE0A212B6E68700F75D2A /* liballojit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liballojit.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		369DE10E12B6EAD400F75D2A /* include */ = {isa = PBXFileReference; lastKnownFileType = folder; name = include; path = ../../../build/include; sourceTree = SOURCE_ROOT; };
 		369DE22A12B6EC6800F75D2A /* libclang.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libclang.a; sourceTree = "<group>"; };
 		369DE22B12B6EC6800F75D2A /* libclangAnalysis.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libclangAnalysis.a; sourceTree = "<group>"; };
 		369DE22C12B6EC6800F75D2A /* libclangAST.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libclangAST.a; sourceTree = "<group>"; };
@@ -435,10 +434,9 @@
 		08FB7794FE84155DC02AAC07 /* osx */ = {
 			isa = PBXGroup;
 			children = (
-				369DE10E12B6EAD400F75D2A /* include */,
 				369DE09212B6E62800F75D2A /* allojit */,
-				369DE09512B6E62800F75D2A /* src */,
-				08FB7795FE84155DC02AAC07 /* example */,
+				369DE09512B6E62800F75D2A /* allojit */,
+				08FB7795FE84155DC02AAC07 /* allojit */,
 				369DE2FB12B6ECDA00F75D2A /* lib */,
 				369DE3B212B6F77200F75D2A /* lib */,
 				C6859E8C029090F304C91782 /* Documentation */,
@@ -447,7 +445,7 @@
 			name = osx;
 			sourceTree = "<group>";
 		};
-		08FB7795FE84155DC02AAC07 /* example */ = {
+		08FB7795FE84155DC02AAC07 /* allojit */ = {
 			isa = PBXGroup;
 			children = (
 				08FB7796FE84155DC02AAC07 /* example.cpp */,
@@ -455,8 +453,8 @@
 				369DE39612B6F4B700F75D2A /* example_using_jitfile.hpp */,
 				369DE39712B6F4B700F75D2A /* example_using_jitfile.cpp */,
 			);
-			name = example;
-			path = ../example;
+			name = allojit;
+			path = ../examples/allojit;
 			sourceTree = "<group>";
 		};
 		1AB674ADFE9D54B511CA2CBB /* Products */ = {
@@ -476,16 +474,16 @@
 				369DE3A712B6F6EE00F75D2A /* al_JitFile.hpp */,
 			);
 			name = allojit;
-			path = ../allojit;
+			path = ../include/allojit;
 			sourceTree = SOURCE_ROOT;
 		};
-		369DE09512B6E62800F75D2A /* src */ = {
+		369DE09512B6E62800F75D2A /* allojit */ = {
 			isa = PBXGroup;
 			children = (
 				369DE09612B6E62800F75D2A /* al_Compiler.cpp */,
 			);
-			name = src;
-			path = ../src;
+			name = allojit;
+			path = ../src/allojit;
 			sourceTree = SOURCE_ROOT;
 		};
 		369DE20D12B6EC6800F75D2A /* llvm */ = {
@@ -594,7 +592,7 @@
 				369DE2FD12B6ECDA00F75D2A /* liballojit.a */,
 			);
 			name = lib;
-			path = ../../../build/lib;
+			path = ../build/lib;
 			sourceTree = SOURCE_ROOT;
 		};
 		369DE3B212B6F77200F75D2A /* lib */ = {
@@ -617,9 +615,8 @@
 				369DE44C12B6F7D000F75D2A /* Cocoa.framework */,
 				369DE45012B6F7E000F75D2A /* AudioUnit.framework */,
 			);
-			name = lib;
-			path = ../../../dev/osx/lib;
-			sourceTree = SOURCE_ROOT;
+			path = lib;
+			sourceTree = "<group>";
 		};
 		369DE3BA12B6F77200F75D2A /* llvm */ = {
 			isa = PBXGroup;
@@ -797,7 +794,6 @@
 				369DE09E12B6E68700F75D2A /* Headers */,
 				369DE09F12B6E68700F75D2A /* Sources */,
 				369DE0A012B6E68700F75D2A /* Frameworks */,
-				369DE18012B6EB1E00F75D2A /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -869,22 +865,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		369DE18012B6EB1E00F75D2A /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cd ../\nsvn export --force allojit ../../build/include/allojit";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		369DE09F12B6E68700F75D2A /* Sources */ = {
@@ -966,10 +946,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				LIBRARY_SEARCH_PATHS = (
-					"\"$(SRCROOT)/../../../build/lib\"",
-					"\"$(SRCROOT)/../../../dev/osx/lib/llvm\"",
-				);
+				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../build/lib\"";
 				OBJROOT = build;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
@@ -981,8 +958,8 @@
 				PRODUCT_NAME = $TARGET_NAME;
 				SDKROOT = macosx10.5;
 				SHARED_PRECOMPS_DIR = "";
-				SYMROOT = ../../../build;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../../dev/osx/include\"";
+				SYMROOT = ../build;
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../build/include\" \"$(SRCROOT)/include\" ";
 				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
@@ -996,10 +973,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				LIBRARY_SEARCH_PATHS = (
-					"\"$(SRCROOT)/../../../build/lib\"",
-					"\"$(SRCROOT)/../../../dev/osx/lib/llvm\"",
-				);
+				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../build/lib\"";
 				OBJROOT = build;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
@@ -1011,8 +985,8 @@
 				PRODUCT_NAME = $TARGET_NAME;
 				SDKROOT = macosx10.5;
 				SHARED_PRECOMPS_DIR = "";
-				SYMROOT = ../../../build;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../../dev/osx/include\"";
+				SYMROOT = ../build;
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../build/include\" \"$(SRCROOT)/include\" ";
 				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Release;
@@ -1027,12 +1001,16 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				HEADER_SEARCH_PATHS = ../../../dev/osx/include;
+				HEADER_SEARCH_PATHS = $inherited;
 				INSTALL_PATH = /usr/local/lib;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					lib/llvm,
+				);
 				PREBINDING = NO;
 				PRODUCT_NAME = allojit;
 				SYMROOT = $inherited/lib;
+				USER_HEADER_SEARCH_PATHS = $inherited;
 				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
@@ -1046,12 +1024,16 @@
 				GCC_ENABLE_CPP_RTTI = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
-				HEADER_SEARCH_PATHS = ../../../dev/osx/include;
+				HEADER_SEARCH_PATHS = $inherited;
 				INSTALL_PATH = /usr/local/lib;
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					lib/llvm,
+				);
 				PREBINDING = NO;
 				PRODUCT_NAME = allojit;
 				SYMROOT = $inherited/lib;
+				USER_HEADER_SEARCH_PATHS = $inherited;
 				VALID_ARCHS = "i386 x86_64";
 				ZERO_LINK = NO;
 			};

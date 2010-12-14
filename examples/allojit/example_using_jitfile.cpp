@@ -16,7 +16,7 @@ int main (int argc, char * const argv[]) {
 	Stereographic& stereo = W->stereo;
 	
 	searchpaths.addAppPaths(argc, argv);
-	std::string sourcepath = searchpaths.appPath() + "../modules/allojit/example";
+	std::string sourcepath = searchpaths.appPath() + "../examples/allojit";
 	searchpaths.addSearchPath(sourcepath);
 
 	//JIT::verbose(true);
@@ -33,8 +33,8 @@ int main (int argc, char * const argv[]) {
 	JitFile<World> jitfile(jitcode_path.filepath(), World::get());
 	
 	Compiler& cc = jitfile.compiler();
-	cc.system_include(searchpaths.appPath() + "../dev/osx/lib/llvm/clang/2.8/include");
-	cc.include(searchpaths.appPath() + "/include");
+	cc.system_include(searchpaths.appPath() + "lib/llvm/clang/2.8/include");
+	cc.include(searchpaths.appPath() + "include");
 	cc.include(sourcepath);
 
 	MainLoop::start();
