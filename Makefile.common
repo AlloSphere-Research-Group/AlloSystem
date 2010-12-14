@@ -128,6 +128,9 @@ ifeq ($(BUILD_CONFIG), Release)
 else
 endif
 
+#LDFLAGS += -fvisibility=default
+#LDFLAGS += -fvisibility-inlines-hidden -fvisibility=hidden
+
 ifneq ($(STRICT_WARNINGS), 0)
 	CFLAGS += \
 		-Wreturn-type \
