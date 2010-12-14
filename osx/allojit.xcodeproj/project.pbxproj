@@ -6,6 +6,20 @@
 	objectVersion = 45;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		36402DA312B71DFD00D94D38 /* make dependencies */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 36402DAB12B71E0C00D94D38 /* Build configuration list for PBXAggregateTarget "make dependencies" */;
+			buildPhases = (
+				36402DA212B71DFD00D94D38 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = "make dependencies";
+			productName = "make dependencies";
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		369DE0B412B6E6F700F75D2A /* al_Compiler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 369DE09612B6E62800F75D2A /* al_Compiler.cpp */; };
 		369DE0B512B6E6FD00F75D2A /* liballojit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DE0A212B6E68700F75D2A /* liballojit.a */; };
@@ -82,6 +96,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		36402DB012B71E4100D94D38 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 36402DA312B71DFD00D94D38 /* make dependencies */;
+			remoteInfo = "make dependencies";
+		};
 		369DE0A512B6E68D00F75D2A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
@@ -798,6 +819,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				36402DB112B71E4100D94D38 /* PBXTargetDependency */,
 			);
 			name = allojit;
 			productName = allojit;
@@ -862,9 +884,26 @@
 				369DE0A112B6E68700F75D2A /* allojit */,
 				8DD76F620486A84900D96B5E /* allojit_example */,
 				369DE38712B6F45500F75D2A /* allojitfile_example */,
+				36402DA312B71DFD00D94D38 /* make dependencies */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		36402DA212B71DFD00D94D38 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "xcodebuild -project allo.xcodeproj -target allocore -configuration $CONFIGURATION";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		369DE09F12B6E68700F75D2A /* Sources */ = {
@@ -894,6 +933,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		36402DB112B71E4100D94D38 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 36402DA312B71DFD00D94D38 /* make dependencies */;
+			targetProxy = 36402DB012B71E4100D94D38 /* PBXContainerItemProxy */;
+		};
 		369DE0A612B6E68D00F75D2A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 369DE0A112B6E68700F75D2A /* allojit */;
@@ -988,6 +1032,27 @@
 				SYMROOT = ../build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../build/include\" \"$(SRCROOT)/include\" ";
 				VALID_ARCHS = "i386 x86_64";
+			};
+			name = Release;
+		};
+		36402DA412B71DFD00D94D38 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = "make dependencies";
+			};
+			name = Debug;
+		};
+		36402DA512B71DFD00D94D38 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = "make dependencies";
+				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -1091,6 +1156,15 @@
 			buildConfigurations = (
 				1DEB923608733DC60010E9CD /* Debug */,
 				1DEB923708733DC60010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		36402DAB12B71E0C00D94D38 /* Build configuration list for PBXAggregateTarget "make dependencies" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				36402DA412B71DFD00D94D38 /* Debug */,
+				36402DA512B71DFD00D94D38 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
