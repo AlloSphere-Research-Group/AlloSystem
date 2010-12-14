@@ -1,0 +1,40 @@
+.fig{ text-align: center; font-size: 10pt; font-weight: bold; }
+.sub{ margin-left: 24px }
+
+#footer{ font-size: 8pt; font-style: italic; text-align: center; }
+#name{ margin-bottom: 0px; color:#000; font-size: 20pt; font-weight: bold; }
+#sect{ margin-top: 40px; }
+
+a{ text-decoration: none; color: #840; }
+a:hover{ text-decoration: none; color: #ccc; }
+
+body{
+	background: transparent;
+	color: #444;
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 10pt;
+	margin: 0px;
+	padding: 0px;
+}
+
+div#main{
+	position: absolute;
+	left: 50%;
+	width: 600px;
+	margin-top: 40px;
+	margin-left: -316px;
+	padding: 15px;
+	background-color: #fff;
+}
+
+h1, h2, h3{ color:#000; }
+h1{ font-size: 16pt; }
+h2{ font-size: 14pt; }
+h3{ font-size: 10pt; }
+
+
+pre{ font-size: 8pt; }
+
+table{ border-style: none; }
+td{ vertical-align: top; }
+
