@@ -1004,7 +1004,7 @@
 				SHARED_PRECOMPS_DIR = "";
 				SYMROOT = ../build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../build/include\" \"$(SRCROOT)/include\" ";
-				VALID_ARCHS = "i386 x86_64";
+				VALID_ARCHS = i386;
 			};
 			name = Debug;
 		};
@@ -1031,7 +1031,7 @@
 				SHARED_PRECOMPS_DIR = "";
 				SYMROOT = ../build;
 				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../build/include\" \"$(SRCROOT)/include\" ";
-				VALID_ARCHS = "i386 x86_64";
+				VALID_ARCHS = i386;
 			};
 			name = Release;
 		};
