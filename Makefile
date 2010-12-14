@@ -36,8 +36,8 @@ SRCS		= \
 
 OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
-CPPFLAGS	+= $(addprefix -I, $(INC_DIRS) $(RINC_DIRS) $(BIN_DIR)/include)
-LDFLAGS		:= $(addprefix -L, $(LIB_DIRS)) $(LDFLAGS)
+CPPFLAGS	+= $(addprefix -I, $(INC_DIRS) $(RINC_DIRS) $(BUILD_DIR)/include)
+LDFLAGS		:= $(addprefix -L, $(LIB_DIRS) $(BUILD_DIR)/lib) $(LDFLAGS)
 
 #--------------------------------------------------------------------------
 # Rules
@@ -89,8 +89,8 @@ install: $(SLIB_PATH)
 	done
 
 #	@$(INSTALL) -d $(addprefix $(DESTDIR)/include/$(LIB_NAME)/, $(MODULE_DIRS))
-	@$(INSTALL) -c -m 644 $(SLIB_PATH) $(DESTDIR)/lib
-	@$(INSTALL) -c -m 644 $(DEV_DIR)lib/*.a $(DESTDIR)/lib
+	@$(INSTALL) -C -m 644 $(SLIB_PATH) $(DESTDIR)/lib
+	@$(INSTALL) -C -m 644 $(DEV_DIR)lib/*.a $(DESTDIR)/lib
 #	@$(INSTALL) -c -m 644 $(EXT_LIB_DIR)* $(DESTDIR)/lib
 	@$(RANLIB) $(DESTDIR)/lib/$(SLIB_FILE)
 
