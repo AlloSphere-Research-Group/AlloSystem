@@ -1,10 +1,24 @@
+#include "example_using_jitfile.hpp"
+
+using namespace al;
+
+class TestZone : public JitZone {
+public:
+	TestZone(JIT * jit, World * W) : JitZone(jit, NULL), W(W) {
+		printf("created TestZone\n");
+	}
+	
+	virtual ~TestZone() {
+		printf("~TestZone()\n");
+	}
+	
+	World * W;
+};
+
 /*
- *  jitfile_example.cpp
- *  allojit
- *
- *  Created by Graham Wakefield on 12/13/10.
- *  Copyright 2010 UCSB. All rights reserved.
- *
- */
-
-
+	Entry point from JIT engine:
+*/
+extern "C" JitZone * onload(JIT * jit, World * W) {
+	
+	return new TestZone(jit, W);
+}

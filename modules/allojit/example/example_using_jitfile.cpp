@@ -16,6 +16,8 @@ int main (int argc, char * const argv[]) {
 	Stereographic& stereo = W->stereo;
 	
 	searchpaths.addAppPaths(argc, argv);
+	std::string sourcepath = searchpaths.appPath() + "../modules/allojit/example";
+	searchpaths.addSearchPath(sourcepath);
 
 	//JIT::verbose(true);
 
@@ -23,7 +25,7 @@ int main (int argc, char * const argv[]) {
 	nav.pos().set(0, 0, -2);
 	nav.smooth(0.8);
 
-    win.create(Window::Dim(720,960), "Window 1", 100, DisplayMode::DefaultBuf);
+    win.create(Window::Dim(320,240), "Window 1", 100, DisplayMode::DefaultBuf);
 
 	FilePath jitcode_path = searchpaths.find("jitfile.cpp");
 	printf("loading %s\n", jitcode_path.filepath().data());
@@ -33,6 +35,7 @@ int main (int argc, char * const argv[]) {
 	Compiler& cc = jitfile.compiler();
 	cc.system_include(searchpaths.appPath() + "../dev/osx/lib/llvm/clang/2.8/include");
 	cc.include(searchpaths.appPath() + "/include");
+	cc.include(sourcepath);
 
 	MainLoop::start();
     return 0;
