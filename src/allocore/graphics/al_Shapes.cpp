@@ -7,14 +7,14 @@ const double phi = (1 + sqrt(5))/2; // the golden ratio
 
 int addTetrahedron(Mesh& m){
 	static const float l = sqrt(1./3);
-	static float vertices[] = {
+	static const float vertices[] = {
 		 l, l, l,
 		-l, l,-l,
 		 l,-l,-l,
 		-l,-l, l
 	};
 
-	static int indices[] = {0,2,1, 0,1,3, 1,2,3, 2,0,3};
+	static const int indices[] = {0,2,1, 0,1,3, 1,2,3, 2,0,3};
 
 	int Nv = sizeof(vertices)/sizeof(*vertices)/3;
 
@@ -25,15 +25,15 @@ int addTetrahedron(Mesh& m){
 }
 
 int addCube(Mesh& m){
-	static const  float l = sqrt(1./3);
-	static float vertices[] = {
+	static const float l = sqrt(1./3);
+	static const float vertices[] = {
 		-l, l,-l,	 l, l,-l,	// 0  1
 		-l,-l,-l,	 l,-l,-l,	// 2  3
 			-l, l, l,	 l, l, l,	// 4  5
 			-l,-l, l,	 l,-l, l,	// 6  7
 	};
 
-	static int indices[] = {
+	static const int indices[] = {
 		6,5,4, 6,7,5, 7,1,5, 7,3,1, 3,0,1, 3,2,0, 2,4,0, 2,6,4,
 		4,1,0, 4,5,1, 2,3,6, 3,7,6
 	};
@@ -47,12 +47,12 @@ int addCube(Mesh& m){
 }
 
 int addOctahedron(Mesh& m){
-	static float vertices[] = {
+	static const float vertices[] = {
 		 1,0,0, 0, 1,0, 0,0, 1,	// 0 1 2
 		-1,0,0, 0,-1,0, 0,0,-1	// 3 4 5
 	};
 
-	static int indices[] = {
+	static const int indices[] = {
 		0,1,2, 1,3,2, 3,4,2, 4,0,2,
 		1,0,5, 3,1,5, 4,3,5, 0,4,5
 	};
