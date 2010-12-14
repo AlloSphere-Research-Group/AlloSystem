@@ -64,11 +64,21 @@
 		369DE2F312B6EC6900F75D2A /* libLLVMX86Disassembler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DE28012B6EC6800F75D2A /* libLLVMX86Disassembler.a */; };
 		369DE2F412B6EC6900F75D2A /* libLLVMX86Info.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DE28112B6EC6800F75D2A /* libLLVMX86Info.a */; };
 		369DE30012B6ECEC00F75D2A /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DE2FC12B6ECDA00F75D2A /* liballocore.a */; };
+		369DE38D12B6F45500F75D2A /* liballojit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DE0A212B6E68700F75D2A /* liballojit.a */; };
+		369DE38E12B6F45500F75D2A /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DE2FC12B6ECDA00F75D2A /* liballocore.a */; };
+		369DE39812B6F4B700F75D2A /* example_using_jitfile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 369DE39712B6F4B700F75D2A /* example_using_jitfile.cpp */; };
 		8DD76F650486A84900D96B5E /* example.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* example.cpp */; settings = {ATTRIBUTES = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		369DE0A512B6E68D00F75D2A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 369DE0A112B6E68700F75D2A;
+			remoteInfo = allojit;
+		};
+		369DE38912B6F45500F75D2A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
@@ -177,7 +187,12 @@
 		369DE28512B6EC6800F75D2A /* libLTO.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libLTO.a; sourceTree = "<group>"; };
 		369DE2FC12B6ECDA00F75D2A /* liballocore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = liballocore.a; sourceTree = "<group>"; };
 		369DE2FD12B6ECDA00F75D2A /* liballojit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = liballojit.a; sourceTree = "<group>"; };
-		8DD76F6C0486A84900D96B5E /* osx */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = osx; sourceTree = BUILT_PRODUCTS_DIR; };
+		369DE39212B6F45500F75D2A /* allojitfile_example */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = allojitfile_example; sourceTree = BUILT_PRODUCTS_DIR; };
+		369DE39412B6F49600F75D2A /* jitfile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jitfile.cpp; sourceTree = "<group>"; };
+		369DE39612B6F4B700F75D2A /* example_using_jitfile.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = example_using_jitfile.hpp; sourceTree = "<group>"; };
+		369DE39712B6F4B700F75D2A /* example_using_jitfile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = example_using_jitfile.cpp; sourceTree = "<group>"; };
+		369DE3A712B6F6EE00F75D2A /* al_JitFile.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_JitFile.hpp; sourceTree = "<group>"; };
+		8DD76F6C0486A84900D96B5E /* allojit_example */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = allojit_example; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6859E8B029090EE04C91782 /* osx.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = osx.1; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -243,6 +258,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		369DE38C12B6F45500F75D2A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				369DE38D12B6F45500F75D2A /* liballojit.a in Frameworks */,
+				369DE38E12B6F45500F75D2A /* liballocore.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DD76F660486A84900D96B5E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -274,6 +298,9 @@
 			isa = PBXGroup;
 			children = (
 				08FB7796FE84155DC02AAC07 /* example.cpp */,
+				369DE39412B6F49600F75D2A /* jitfile.cpp */,
+				369DE39612B6F4B700F75D2A /* example_using_jitfile.hpp */,
+				369DE39712B6F4B700F75D2A /* example_using_jitfile.cpp */,
 			);
 			name = example;
 			path = ../example;
@@ -282,8 +309,9 @@
 		1AB674ADFE9D54B511CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8DD76F6C0486A84900D96B5E /* osx */,
+				8DD76F6C0486A84900D96B5E /* allojit_example */,
 				369DE0A212B6E68700F75D2A /* liballojit.a */,
+				369DE39212B6F45500F75D2A /* allojitfile_example */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -292,6 +320,7 @@
 			isa = PBXGroup;
 			children = (
 				369DE09312B6E62800F75D2A /* al_Compiler.hpp */,
+				369DE3A712B6F6EE00F75D2A /* al_JitFile.hpp */,
 			);
 			name = allojit;
 			path = ../allojit;
@@ -455,6 +484,24 @@
 			productReference = 369DE0A212B6E68700F75D2A /* liballojit.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		369DE38712B6F45500F75D2A /* allojitfile_example */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 369DE38F12B6F45500F75D2A /* Build configuration list for PBXNativeTarget "allojitfile_example" */;
+			buildPhases = (
+				369DE38A12B6F45500F75D2A /* Sources */,
+				369DE38C12B6F45500F75D2A /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				369DE38812B6F45500F75D2A /* PBXTargetDependency */,
+			);
+			name = allojitfile_example;
+			productInstallPath = "$(HOME)/bin";
+			productName = osx;
+			productReference = 369DE39212B6F45500F75D2A /* allojitfile_example */;
+			productType = "com.apple.product-type.tool";
+		};
 		8DD76F620486A84900D96B5E /* allojit_example */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "allojit_example" */;
@@ -470,7 +517,7 @@
 			name = allojit_example;
 			productInstallPath = "$(HOME)/bin";
 			productName = osx;
-			productReference = 8DD76F6C0486A84900D96B5E /* osx */;
+			productReference = 8DD76F6C0486A84900D96B5E /* allojit_example */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -494,6 +541,7 @@
 			targets = (
 				369DE0A112B6E68700F75D2A /* allojit */,
 				8DD76F620486A84900D96B5E /* allojit_example */,
+				369DE38712B6F45500F75D2A /* allojitfile_example */,
 			);
 		};
 /* End PBXProject section */
@@ -523,6 +571,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		369DE38A12B6F45500F75D2A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				369DE39812B6F4B700F75D2A /* example_using_jitfile.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8DD76F640486A84900D96B5E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -539,6 +595,11 @@
 			target = 369DE0A112B6E68700F75D2A /* allojit */;
 			targetProxy = 369DE0A512B6E68D00F75D2A /* PBXContainerItemProxy */;
 		};
+		369DE38812B6F45500F75D2A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 369DE0A112B6E68700F75D2A /* allojit */;
+			targetProxy = 369DE38912B6F45500F75D2A /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -553,7 +614,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				PRODUCT_NAME = osx;
+				PRODUCT_NAME = $inherited;
 				VALID_ARCHS = $inherited;
 			};
 			name = Debug;
@@ -566,7 +627,7 @@
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				PRODUCT_NAME = osx;
+				PRODUCT_NAME = $inherited;
 				VALID_ARCHS = $inherited;
 			};
 			name = Release;
@@ -672,6 +733,35 @@
 			};
 			name = Release;
 		};
+		369DE39012B6F45500F75D2A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				PRODUCT_NAME = $inherited;
+				VALID_ARCHS = $inherited;
+			};
+			name = Debug;
+		};
+		369DE39112B6F45500F75D2A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				PRODUCT_NAME = $inherited;
+				VALID_ARCHS = $inherited;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -698,6 +788,15 @@
 			buildConfigurations = (
 				369DE0A312B6E68800F75D2A /* Debug */,
 				369DE0A412B6E68800F75D2A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		369DE38F12B6F45500F75D2A /* Build configuration list for PBXNativeTarget "allojitfile_example" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				369DE39012B6F45500F75D2A /* Debug */,
+				369DE39112B6F45500F75D2A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
