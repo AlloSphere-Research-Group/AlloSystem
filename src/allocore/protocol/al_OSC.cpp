@@ -1,5 +1,6 @@
 #include <ctype.h> // isgraph
 #include <stdio.h> // printf
+#include <string.h>
 #include "allocore/protocol/al_OSC.hpp"
 
 #include "oscpack/osc/OscOutboundPacketStream.h"

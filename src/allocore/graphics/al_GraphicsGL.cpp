@@ -1,4 +1,5 @@
 #include "allocore/graphics/al_GraphicsOpenGL.hpp"
+#include <stdio.h>
 
 using namespace al;
 

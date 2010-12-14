@@ -6,6 +6,7 @@
 #include "assimp/aiPostProcess.h"
 #include "assimp/aiScene.h"
 
+#include <stdio.h>
 #include <map>
 
 using namespace al;
