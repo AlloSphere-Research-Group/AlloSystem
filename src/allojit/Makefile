@@ -1,8 +1,8 @@
 #=========================================================================
-# AlloUtil main makefile
+# AlloJIT main makefile
 #=========================================================================
 
-LIB_NAME	= alloutil
+LIB_NAME	= allojit
 INC_DIR		= ../../include/$(LIB_NAME)/
 SRC_DIR		= ./
 VPATH		= $(SRC_DIR)
@@ -10,7 +10,10 @@ VPATH		= $(SRC_DIR)
 SRCS		:= $(wildcard $(SRC_DIR)/*.c*)
 OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
-CPPFLAGS	+= -I../../include
+JITLIBS		:= `ls $(PLATFORM_DIR)/lib32/llvm`
+
+CPPFLAGS	+= -I../../include -I../../$(PLATFORM_DIR)/include
+LDFLAGS		+= $(addprefix ../../$(PLATFORM_DIR)/lib/, $(JITLIBS))
 
 include ../../Makefile.common
 include ../../Makefile.rules

@@ -69,6 +69,9 @@ OBJ_DIR		= $(BUILD_DIR)obj/
 # Location of library installation
 DESTDIR		= $(PREFIX)
 
+# Platform-dependent directory
+PLATFORM_DIR ?=
+
 #--------------------------------------------------------------------------
 # Default tools/commands
 #--------------------------------------------------------------------------
@@ -79,6 +82,9 @@ RM		= rm -df
 
 # Linux:
 ifeq ($(PLATFORM), linux)
+
+	PLATFORM_DIR = linux/
+
 	ifneq ($(USING_PUREDYNE), 0)
 		CXX = gcc
 	endif
@@ -94,6 +100,9 @@ ifeq ($(PLATFORM), linux)
 
 # Mac OSX:
 else ifeq ($(PLATFORM), macosx)
+
+	PLATFORM_DIR = osx/
+
 	ifeq ($(ARCH), 32)
 		CFLAGS += -arch i386
 	else ifeq ($(ARCH), 64)
@@ -115,6 +124,9 @@ else ifeq ($(PLATFORM), macosx)
 
 # Windows:
 else ifeq ($(PLATFORM), windows)
+
+	PLATFORM_DIR = windows/
+
 	SLIB_EXT = lib
 	DLIB_EXT = dll
 endif

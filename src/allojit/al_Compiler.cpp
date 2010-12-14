@@ -1,4 +1,5 @@
-#include "al_Compiler.hpp"
+#include <stdio.h>
+#include "allojit/al_Compiler.hpp"
 
 //#include "clang/Checker/BugReporter/PathDiagnostic.h"
 #include "clang/AST/ASTContext.h"
