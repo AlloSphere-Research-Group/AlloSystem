@@ -14,3 +14,16 @@ allocore:
 	freeimage-dev
 alloclang:
 	clang
+
+
+
+
+
+AssImp 2.0.863
+--------------
+
+cd code
+make static NOBOOST=1 CPPFLAGS="-O3"
+
+
+
