@@ -4,9 +4,6 @@
 
 include Makefile.config
 
-# These are the folder names of the extra modules located within modules/
-EXTRA_MODULES := allogamma alloglv alloutil
-
 # Include configuration files of AlloCore modules
 # TODO: Permit selective inclusive of modules for building a library
 # and doing unit tests.
@@ -33,7 +30,10 @@ SPA_SRC		:= $(addprefix $(SRC_DIR)$(SPA_DIR), $(SPA_SRC))
 SYS_SRC		:= $(addprefix $(SRC_DIR)$(SYS_DIR), $(SYS_SRC))
 
 # These are all the source files
-SRCS		= $(GFX_SRC) $(IO_SRC) $(PRO_SRC) $(MATH_SRC) $(SND_SRC) $(SPA_SRC) $(SYS_SRC) $(TYP_SRC)
+SRCS		= \
+		$(GFX_SRC) $(IO_SRC) $(PRO_SRC) $(MATH_SRC) \
+		$(SND_SRC) $(SPA_SRC) $(SYS_SRC) $(TYP_SRC)
+
 OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
 CPPFLAGS	+= $(addprefix -I, $(INC_DIRS) $(RINC_DIRS) $(BIN_DIR)/include)
@@ -58,13 +58,23 @@ ifneq ($(AUTORUN), 0)
 endif
 
 
-$(EXTRA_MODULES):
-#	@$(MAKE) -C modules/$@ external
-	@$(MAKE) -C modules/$@ install DESTDIR=`pwd`/$(BIN_DIR)
+# AlloCore extensions
+extensions: allojit alloutil
 
-gamma:
-	@$(MAKE) -C modules/allogamma/gamma external
-	@$(MAKE) -C modules/allogamma/gamma install DESTDIR=`pwd`/$(BIN_DIR)
+allojit alloutil:
+	@$(MAKE) -C src/$@ install BUILD_DIR=../../$(BUILD_DIR) DESTDIR=../../$(BUILD_DIR)
+
+
+# AlloCore externals
+externals: gamma glv
+
+gamma glv:
+	@$(MAKE) -C externals/$@ install DESTDIR=../../$(BUILD_DIR)
+
+
+#$(EXTRA_MODULES):
+#	@$(MAKE) -C modules/$@ external
+#	@$(MAKE) -C modules/$@ install DESTDIR=`pwd`/$(BUILD_DIR)
 
 
 # Install library into path specified by DESTDIR

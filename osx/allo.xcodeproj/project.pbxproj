@@ -54,6 +54,7 @@
 		1686189912A58918002AD8AB /* OscPrintReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1686187A12A58918002AD8AB /* OscPrintReceivedElements.cpp */; };
 		1686189B12A58918002AD8AB /* OscReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1686187C12A58918002AD8AB /* OscReceivedElements.cpp */; };
 		1686189D12A58918002AD8AB /* OscTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1686187E12A58918002AD8AB /* OscTypes.cpp */; };
+		168F105812B80DD100B1E07C /* al_Shapes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168F105712B80DD100B1E07C /* al_Shapes.cpp */; };
 		16AA8EFD11C6FD200053EFE1 /* al_CoordinateFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA8EFB11C6FD200053EFE1 /* al_CoordinateFrame.cpp */; };
 		16AA8F0311C6FE0B0053EFE1 /* al_Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA8F0111C6FE0B0053EFE1 /* al_Camera.cpp */; };
 		16AA95F6118F74FB00B98EC3 /* al_Light.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA95F2118F74FB00B98EC3 /* al_Light.cpp */; };
@@ -459,6 +460,8 @@
 		168EC8ED1161CA2C00FCACC7 /* al_Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Config.h; sourceTree = "<group>"; };
 		168EC8EE1161CA2C00FCACC7 /* al_Time.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Time.hpp; sourceTree = "<group>"; };
 		168EC8EF1161CA2C00FCACC7 /* al_Thread.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Thread.hpp; sourceTree = "<group>"; };
+		168F105612B808EF00B1E07C /* al_Shapes.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Shapes.hpp; sourceTree = "<group>"; };
+		168F105712B80DD100B1E07C /* al_Shapes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Shapes.cpp; sourceTree = "<group>"; };
 		1697336C11768ABD0025299C /* al_Vec.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Vec.hpp; sourceTree = "<group>"; };
 		1697337411768B040025299C /* al_Quat.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Quat.hpp; sourceTree = "<group>"; };
 		1697338611768B6E0025299C /* al_Complex.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Complex.hpp; sourceTree = "<group>"; };
@@ -1171,6 +1174,7 @@
 				36F598FB12122617003B78B5 /* al_Model.hpp */,
 				3649CDA412440A3F0077128E /* al_Nurbs.hpp */,
 				16AA967E118F7D5700B98EC3 /* al_Shader.hpp */,
+				168F105612B808EF00B1E07C /* al_Shapes.hpp */,
 				36F0ABCF123195D5000A8EBF /* al_Slab.hpp */,
 				367F0B3812034EDB00FCC534 /* al_Stereographic.hpp */,
 				36D69A4A11F9264700699158 /* al_Surface.hpp */,
@@ -1196,6 +1200,7 @@
 				36F598FC12122628003B78B5 /* al_Model.cpp */,
 				16586A1C128903C10068E01A /* al_Shader.cpp */,
 				16AA9609118F774800B98EC3 /* al_Texture.cpp */,
+				168F105712B80DD100B1E07C /* al_Shapes.cpp */,
 				367F0B3A12034EED00FCC534 /* al_Stereographic.cpp */,
 				36D69A5211F9267800699158 /* al_Surface.cpp */,
 			);
@@ -2272,6 +2277,7 @@
 				361AA7A512AEE1AC002E9DFD /* al_Mesh.cpp in Sources */,
 				361AA8AE12AEFDF3002E9DFD /* al_GPUObject.cpp in Sources */,
 				369DDF5212B6C87200F75D2A /* al_Asset.cpp in Sources */,
+				168F105812B80DD100B1E07C /* al_Shapes.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -39,20 +39,16 @@ $(SLIB_PATH): createFolders $(addprefix $(OBJ_DIR), $(OBJS))
 FORCE:
 
 
-# Remove active build configuration binary files
+# Remove build files
 clean: createFolders
-	@$(RM) -r $(BIN_DIR)*
-
-
-# Remove all build configuration binary files
-cleanall:
 	@$(RM) -r $(BUILD_DIR)*
 
 
 createFolders:
+	@mkdir -p $(BIN_DIR)
 	@mkdir -p $(OBJ_DIR)
-	@mkdir -p $(BIN_DIR)include
-	@mkdir -p $(BIN_DIR)lib
+	@mkdir -p $(BUILD_DIR)include
+	@mkdir -p $(BUILD_DIR)lib
 
 
 # Create file with settings for linking to external libraries

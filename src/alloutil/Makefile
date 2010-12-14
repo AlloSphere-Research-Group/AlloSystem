@@ -1,16 +1,16 @@
 #=========================================================================
-# AlloCore main makefile
+# AlloUtil main makefile
 #=========================================================================
 
 LIB_NAME	= alloutil
-INC_DIR		= $(LIB_NAME)/
-SRC_DIR		= src/
+INC_DIR		= ../../include/$(LIB_NAME)/
+SRC_DIR		= ./
 VPATH		= $(SRC_DIR)
 
 SRCS		:= $(wildcard $(SRC_DIR)/*.c*)
 OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
-CPPFLAGS	+= -I./ -I../../include/
+CPPFLAGS	+= -I../../include
 
 include ../../Makefile.common
 include ../../Makefile.rules
@@ -22,8 +22,6 @@ include ../../Makefile.rules
 install: $(SLIB_PATH)
 	@$(INSTALL) -d $(DESTDIR)/lib
 	@$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)
-
 	@$(INSTALL) -c -m 644 $(INC_DIR)$/*.h* $(DESTDIR)/include/$(LIB_NAME)
-
 	@$(INSTALL) -c -m 644 $(SLIB_PATH) $(DESTDIR)/lib
 #	@$(RANLIB) $(DESTDIR)/lib/$(SLIB_FILE)
