@@ -20,7 +20,6 @@ int addTetrahedron(Mesh& m){
 
 	m.vertex(vertices, Nv);
 	m.index(indices, sizeof(indices)/sizeof(*indices));
-	m.primitive(Graphics::TRIANGLES);
 
 	return Nv;
 }

@@ -23,7 +23,6 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-#include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
 
 namespace al{
