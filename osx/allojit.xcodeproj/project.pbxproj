@@ -1076,7 +1076,7 @@
 				PRODUCT_NAME = allojit;
 				SYMROOT = $inherited/lib;
 				USER_HEADER_SEARCH_PATHS = $inherited;
-				VALID_ARCHS = "i386 x86_64";
+				VALID_ARCHS = $inherited;
 			};
 			name = Debug;
 		};
@@ -1099,7 +1099,7 @@
 				PRODUCT_NAME = allojit;
 				SYMROOT = $inherited/lib;
 				USER_HEADER_SEARCH_PATHS = $inherited;
-				VALID_ARCHS = "i386 x86_64";
+				VALID_ARCHS = $inherited;
 				ZERO_LINK = NO;
 			};
 			name = Release;
