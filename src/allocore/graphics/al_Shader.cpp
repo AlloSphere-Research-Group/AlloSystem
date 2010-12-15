@@ -44,7 +44,7 @@ bool Shader::compiled() const {
 	GLint v;
 	//GLhandleARB h = (GLhandleARB)mID;
 	//glGetObjectParameterivARB((GLhandleARB)handle(), GL_COMPILE_STATUS, &v);
-	glGetProgramiv((GLhandleARB)id(), GL_COMPILE_STATUS, &v);
+	glGetProgramiv(id(), GL_COMPILE_STATUS, &v);
 	return v;
 }
 
