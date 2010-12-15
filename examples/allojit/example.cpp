@@ -21,11 +21,13 @@ int main (int argc, char * const argv[]) {
 	searchpaths.addAppPaths(argc, argv);
 	
 	JIT * jit;
+
+	printf("%s\n", searchpaths.appPath().c_str());
 	
 	Compiler cc;
 	cc.cpp(true);
-	cc.system_include(searchpaths.appPath() + "lib/llvm/clang/2.8/include");
-	cc.include(searchpaths.appPath() + "include");
+	cc.system_include(searchpaths.appPath() + "/../lib/llvm/clang/2.8/include");
+	cc.include(searchpaths.appPath() + "/../include");
 	
 	// compile code
 	if (cc.compile(code)) {

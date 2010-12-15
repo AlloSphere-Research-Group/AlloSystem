@@ -77,7 +77,7 @@ PLATFORM_DIR ?=
 #--------------------------------------------------------------------------
 # Default tools/commands
 #--------------------------------------------------------------------------
-AR		= ar crs
+AR		= ar crsT
 INSTALL		= install
 RANLIB		= ranlib
 RM		= rm -df

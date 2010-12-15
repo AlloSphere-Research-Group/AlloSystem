@@ -46,4 +46,8 @@ install: $(SLIB_PATH)
 	@$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)
 	@$(INSTALL) -C -m 644 $(INC_DIR)$/*.h* $(DESTDIR)/include/$(LIB_NAME)
 	@$(INSTALL) -C -m 644 $(SLIB_PATH) $(DESTDIR)/lib
+	for v in `cd ../../$(PLATFORM_DIR)/lib32/llvm/clang/2.8 && find * -type d ! -path '*.*'`; do \
+		$(INSTALL) -d $(DESTDIR)/lib/llvm/clang/2.8/$$v; \
+		$(INSTALL) -C -m 644 ../../$(PLATFORM_DIR)/lib32/llvm/clang/2.8/$$v/* $(DESTDIR)/lib/llvm/clang/2.8/$$v;\
+	done	
 #	@$(RANLIB) $(DESTDIR)/lib/$(SLIB_FILE)
