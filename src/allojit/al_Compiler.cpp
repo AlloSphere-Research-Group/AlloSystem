@@ -241,7 +241,7 @@ bool Compiler :: compile(std::string code) {
 	std::vector< std::pair
 < std::string, std::string > > rmp = CI.getPreprocessorOpts().RemappedFiles;
 
-	for (int i=0; i<rmp.size(); i++) {
+	for (unsigned int i=0; i<rmp.size(); i++) {
 		printf("rmp %s\n", rmp[i].first.data());
 	}
 	

@@ -5,6 +5,7 @@
 #include "assimp/assimp.h"
 #include "assimp/aiPostProcess.h"
 #include "assimp/aiScene.h"
+#include "assimp/aiMaterial.h"
 
 #include <stdio.h>
 #include <map>

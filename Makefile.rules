@@ -15,13 +15,13 @@ CXXFLAGS	:= $(CFLAGS) $(CXXFLAGS)
 
 # Build object file from C++ source
 $(OBJ_DIR)%.o: %.cpp
-	@echo CXX $< $@
-	@$(CXX) -c $(CXXFLAGS) $< -o $@
+	echo CXX $< $@
+	$(CXX) -c $(CXXFLAGS) $< -o $@
 
 # Build object file from C source
 $(OBJ_DIR)%.o: %.c
-	@echo CC $< $@
-	@$(CC) -c $(CFLAGS) $< -o $@
+	echo CC $< $@
+	$(CC) -c $(CFLAGS) $< -o $@
 
 all: $(SLIB_PATH)
 
@@ -29,9 +29,9 @@ all: $(SLIB_PATH)
 $(SLIB_PATH): createFolders $(addprefix $(OBJ_DIR), $(OBJS))
 	@echo AR $@
 	@$(RM) $@
-	@$(AR) $@ $(filter %.o, $^)
+#	$(AR) $@ $(filter %.o, $^) $(STATIC_LIB_FLAGS)
 #	@$(RANLIB) $@
-#	@libtool -static $(LDFLAGS) $(filter %.o, $^) -o $@
+	libtool --mode=link -static $(LDFLAGS) $(filter %.o, $^) $(STATIC_LIB_FLAGS) -o $@
 #	@libtool -static $@ $(patsubst %, $(DEV_DIR)lib/lib%.a, $(STATIC_LIBS)) -o $@
 
 
