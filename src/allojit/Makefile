@@ -10,8 +10,8 @@ VPATH		= $(SRC_DIR)
 SRCS		:= $(wildcard $(SRC_DIR)/*.c*)
 OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
-#JITLIBS		= `ls ../../$(PLATFORM_DIR)/lib32/llvm/*.a`
-#JITLIBS		= $(wildcard ../../$(PLATFORM_DIR)/lib32/llvm/*.a)
+#JITLIBS		= `ls ../../$(PLATFORM_DIR)/lib$(ARCH)/llvm/*.a`
+#JITLIBS		= $(wildcard ../../$(PLATFORM_DIR)/lib$(ARCH)/llvm/*.a)
 
 LLVMLIBNAMES	:= LLVMJIT EnhancedDisassembly clang LLVMX86AsmParser \
 		LLVMInstrumentation LLVMX86Disassembler clangFrontendTool \
@@ -27,7 +27,9 @@ LLVMLIBNAMES	:= LLVMJIT EnhancedDisassembly clang LLVMX86AsmParser \
 		LLVMTransformUtils LLVMipa LLVMAnalysis LLVMTarget \
 		LLVMCore LLVMMC LLVMSupport LLVMSystem
 
-LLVMLIBS	= $(addprefix ../../$(PLATFORM_DIR)/lib32/llvm/lib, $(addsuffix .a, $(LLVMLIBNAMES)))
+LLVMLIBDIR	= ../../$(PLATFORM_DIR)/lib$(ARCH)/llvm
+
+LLVMLIBS	= $(addprefix $(LLVMLIBDIR)/lib, $(addsuffix .a, $(LLVMLIBNAMES)))
 
 CPPFLAGS	+= -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti
 CPPFLAGS	+= -I../../include -I../../$(PLATFORM_DIR)/include
@@ -46,8 +48,8 @@ install: $(SLIB_PATH)
 	@$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)
 	@$(INSTALL) -C -m 644 $(INC_DIR)$/*.h* $(DESTDIR)/include/$(LIB_NAME)
 	@$(INSTALL) -C -m 644 $(SLIB_PATH) $(DESTDIR)/lib
-	for v in `cd ../../$(PLATFORM_DIR)/lib32/llvm/clang/2.8 && find * -type d ! -path '*.*'`; do \
+	@for v in `cd $(LLVMLIBDIR)/clang/2.8 && find * -type d ! -path '*.*'`; do \
 		$(INSTALL) -d $(DESTDIR)/lib/llvm/clang/2.8/$$v; \
-		$(INSTALL) -C -m 644 ../../$(PLATFORM_DIR)/lib32/llvm/clang/2.8/$$v/* $(DESTDIR)/lib/llvm/clang/2.8/$$v;\
+		$(INSTALL) -C -m 644 $(LLVMLIBDIR)/clang/2.8/$$v/* $(DESTDIR)/lib/llvm/clang/2.8/$$v;\
 	done	
 #	@$(RANLIB) $(DESTDIR)/lib/$(SLIB_FILE)
