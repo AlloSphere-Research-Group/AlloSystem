@@ -8,11 +8,11 @@ using namespace al;
 SearchPaths searchpaths;
 
 std::string code = ""
-	"#include \"allocore/system/al_Time.h\" \n"
+	"#include \"allocore/system/al_MainLoop.hpp\" \n"
 	"#include <stdio.h> \n"
 	"extern \"C\" int test(double x) { \n"
 	"	printf(\"test %f\\n\", x); \n"
-	"	printf(\"at time: %f\\n\", al_time()); \n"
+	"	printf(\"at time: %f\\n\", al::MainLoop::now()); \n"
 	"	return x*2; \n"
 	"}";
 	
