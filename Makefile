@@ -43,6 +43,15 @@ LDFLAGS		:= $(addprefix -L, $(LIB_DIRS) $(BUILD_DIR)/lib) $(LDFLAGS)
 # Rules
 #--------------------------------------------------------------------------
 
+help:
+	@echo No rule specified.
+	@echo The possible rules are:
+	@echo     allocore .... build allocore
+	@echo     allojit ..... build allocore JIT extension
+	@echo     alloutil .... build allocore utilities extension
+	@echo     gamma ....... build Gamma external
+	@echo     glv ......... build GLV external
+
 include Makefile.rules
 
 #.PHONY: clean cleanall test
@@ -51,8 +60,8 @@ include Makefile.rules
 # Compile and run source files in examples/ folder
 examples/%.cpp experimental/%.cpp: $(SLIB_PATH) FORCE
 #	@$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LDFLAGS) -whole-archive $(SLIB_PATH)
-#	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(SLIB_PATH) $(LDFLAGS)
-	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(SLIB_PATH) $(LDFLAGS) `ls $(BUILD_DIR)lib/*.a`
+#	@$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(SLIB_PATH) $(LDFLAGS)
+	@$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(SLIB_PATH) $(LDFLAGS) `ls $(BUILD_DIR)lib/*.a`
 ifneq ($(AUTORUN), 0)
 	@$(BIN_DIR)$(*F)
 endif
@@ -61,11 +70,19 @@ endif
 # AlloCore extensions
 extensions: allojit alloutil allocore
 
-allocore:
-	$(MAKE) install DESTDIR=$(BUILD_DIR)
+allocore: $(SLIB_PATH)
+# 	copy header files
+	@$(INSTALL) -d $(BUILD_DIR)/include/$@
+	@$(INSTALL) -c -m 644 $(INC_DIR)/$@/*.h* $(BUILD_DIR)/include/$@
+	@for v in `cd $(INC_DIR)/$@ && find * -type d ! -path '*.*'`; do \
+		$(INSTALL) -d $(BUILD_DIR)/include/$@/$$v; \
+		$(INSTALL) -c -m 644 $(INC_DIR)/$@/$$v/*.h* $(BUILD_DIR)/include/$@/$$v;\
+	done
+	@$(INSTALL) -C -m 644 $(DEV_DIR)lib/*.a $(BUILD_DIR)/lib
+#	@$(MAKE) install DESTDIR=$(BUILD_DIR)
 
 allojit alloutil:
-	$(MAKE) -C src/$@ install BUILD_DIR=../../$(BUILD_DIR) DESTDIR=../../$(BUILD_DIR)
+	@$(MAKE) -C src/$@ install BUILD_DIR=../../$(BUILD_DIR) DESTDIR=../../$(BUILD_DIR)
 
 
 # AlloCore externals
@@ -86,16 +103,29 @@ gamma glv:
 install: $(SLIB_PATH)
 	@$(INSTALL) -d $(DESTDIR)/lib
 
-	@for v in `cd $(INC_DIR) && find * -type d ! -path '*.*'`; do \
+	# copy all header files from local build directory to destination
+	@for v in `cd $(BUILD_DIR)/include && find * -type d ! -path '*.*'`; do \
 		$(INSTALL) -d $(DESTDIR)/include/$$v; \
-		$(INSTALL) -c -m 644 $(INC_DIR)$$v/*.h* $(DESTDIR)/include/$$v;\
+		$(INSTALL) -c -m 644 $(BUILD_DIR)/include/$$v/*.h* $(DESTDIR)/include/$$v;\
 	done
 
+	# copy all library files from local build directory to destination
+	@for v in `cd $(BUILD_DIR)/lib && find * -type d ! -path '*.*'`; do \
+		$(INSTALL) -d $(DESTDIR)/lib/$$v; \
+		$(INSTALL) -c -m 644 $(BUILD_DIR)/lib/$$v/*.* $(DESTDIR)/lib/$$v;\
+	done
+
+#	# copy header from local include directory
+#	@for v in `cd $(INC_DIR) && find * -type d ! -path '*.*'`; do \
+#		$(INSTALL) -d $(DESTDIR)/include/$$v; \
+#		$(INSTALL) -c -m 644 $(INC_DIR)$$v/*.h* $(DESTDIR)/include/$$v;\
+#	done
+
 #	@$(INSTALL) -d $(addprefix $(DESTDIR)/include/$(LIB_NAME)/, $(MODULE_DIRS))
-	@$(INSTALL) -C -m 644 $(SLIB_PATH) $(DESTDIR)/lib
-	@$(INSTALL) -C -m 644 $(DEV_DIR)lib/*.a $(DESTDIR)/lib
+#	@$(INSTALL) -C -m 644 $(SLIB_PATH) $(DESTDIR)/lib
+#	@$(INSTALL) -C -m 644 $(DEV_DIR)lib/*.a $(DESTDIR)/lib
 #	@$(INSTALL) -c -m 644 $(EXT_LIB_DIR)* $(DESTDIR)/lib
-	@$(RANLIB) $(DESTDIR)/lib/$(SLIB_FILE)
+#	@$(RANLIB) $(DESTDIR)/lib/$(SLIB_FILE)
 
 
 # Build unit tests
