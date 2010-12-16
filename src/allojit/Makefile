@@ -2,6 +2,9 @@
 # AlloJIT main makefile
 #=========================================================================
 
+
+include ../../Makefile.common
+
 LIB_NAME	= allojit
 INC_DIR		= ../../include/$(LIB_NAME)/
 SRC_DIR		= ./
@@ -10,35 +13,58 @@ VPATH		= $(SRC_DIR)
 SRCS		:= $(wildcard $(SRC_DIR)/*.c*)
 OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
-#JITLIBS		= `ls ../../$(PLATFORM_DIR)/lib$(ARCH)/llvm/*.a`
-#JITLIBS		= $(wildcard ../../$(PLATFORM_DIR)/lib$(ARCH)/llvm/*.a)
-
-LLVMLIBNAMES	:= LLVMJIT EnhancedDisassembly clang LLVMX86AsmParser \
-		LLVMInstrumentation LLVMX86Disassembler clangFrontendTool \
-		clangCodeGen CompilerDriver clangChecker clangRewrite \
-		clangFrontend clangDriver clangParse clangSerialization \
-		clangFrontend clangSema clangIndex clangLex clangAnalysis \
-		clangAST clangBasic LLVMpic16passes LLVMAsmParser LTO \
-		LLVMLinker LLVMCBackend LLVMCBackendInfo LLVMX86CodeGen \
-		LLVMX86AsmPrinter LLVMX86Info LLVMAsmPrinter LLVMMCParser \
-		LLVMBitWriter LLVMipo LLVMArchive LLVMBitReader \
-		LLVMSelectionDAG LLVMInterpreter LLVMExecutionEngine \
-		LLVMCodeGen LLVMScalarOpts LLVMInstCombine \
-		LLVMTransformUtils LLVMipa LLVMAnalysis LLVMTarget \
-		LLVMCore LLVMMC LLVMSupport LLVMSystem
-
-LLVMLIBDIR	= ../../$(PLATFORM_DIR)/lib$(ARCH)/llvm
-
-LLVMLIBS	= $(addprefix $(LLVMLIBDIR)/lib, $(addsuffix .a, $(LLVMLIBNAMES)))
-
 CPPFLAGS	+= -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti
 CPPFLAGS	+= -I../../include -I../../$(PLATFORM_DIR)/include
 
-include ../../Makefile.common
-include ../../Makefile.rules
+ifeq ($(PLATFORM), macosx)
+	# OSX:
+	
+	# this works from xcode:
+	# libtool -static 
+	# OSX stuff:
+	# -arch_only i386 -syslibroot /Developer/SDKs/MacOSX10.5.sdk 
+	# the library search paths:
+	# -L/Users/grahamwakefield/Source/allosphere/allocore/trunk/osx/../build/lib -L/Users/grahamwakefield/Source/allosphere/allocore/trunk/osx/../build/lib -Llib32/llvm 
+	# this is just al_Compiler.o:
+	# -filelist /Users/grahamwakefield/Source/allosphere/allocore/trunk/osx/build/allojit.build/Release/allojit.build/Objects-normal/i386/allojit.LinkFileList 
+	# this is the library list; apparently the order is not important
+	# -lclang -lclangAnalysis -lclangAST -lclangBasic -lclangChecker -lclangCodeGen -lclangDriver -lclangFrontend -lclangIndex -lclangLex -lclangParse -lclangRewrite -lclangSema -lclangSerialization -lCompilerDriver -lEnhancedDisassembly -lLLVMAnalysis -lLLVMArchive -lLLVMAsmParser -lLLVMAsmPrinter -lLLVMBitReader -lLLVMBitWriter -lLLVMCBackend -lLLVMCBackendInfo -lLLVMCodeGen -lLLVMCore -lLLVMCppBackend -lLLVMCppBackendInfo -lLLVMExecutionEngine -lLLVMInstCombine -lLLVMInstrumentation -lLLVMInterpreter -lLLVMipa -lLLVMipo -lLLVMJIT -lLLVMLinker -lLLVMMC -lLLVMMCDisassembler -lLLVMMCParser -lLLVMpic16passes -lLLVMScalarOpts -lLLVMSelectionDAG -lLLVMSupport -lLLVMSystem -lLLVMTarget -lLLVMTransformUtils -lLLVMX86AsmParser -lLLVMX86AsmPrinter -lLLVMX86CodeGen -lLLVMX86Disassembler -lLLVMX86Info 
+	# the output file
+	#-o /Users/grahamwakefield/Source/allosphere/allocore/trunk/osx/../build/lib/liballojit.a
+
+	LLVMLIBDIR	= ../../$(PLATFORM_DIR)/lib32/llvm
+	
+	LLVMLIBNAMES	:= clang clangAnalysis clangAST clangBasic clangChecker clangCodeGen clangDriver clangFrontend clangIndex clangLex clangParse clangRewrite clangSema clangSerialization CompilerDriver EnhancedDisassembly LLVMAnalysis LLVMArchive LLVMAsmParser LLVMAsmPrinter LLVMBitReader LLVMBitWriter LLVMCBackend LLVMCBackendInfo LLVMCodeGen LLVMCore LLVMCppBackend LLVMCppBackendInfo LLVMExecutionEngine LLVMInstCombine LLVMInstrumentation LLVMInterpreter LLVMipa LLVMipo LLVMJIT LLVMLinker LLVMMC LLVMMCDisassembler LLVMMCParser LLVMpic16passes LLVMScalarOpts LLVMSelectionDAG LLVMSupport LLVMSystem LLVMTarget LLVMTransformUtils LLVMX86AsmParser LLVMX86AsmPrinter LLVMX86CodeGen LLVMX86Disassembler LLVMX86Info	
+	
+	LLVMLIBS = $(addprefix -l, $(LLVMLIBNAMES))
+	
+	AR := libtool -static -arch_only i386 -syslibroot /Developer/SDKs/MacOSX10.5.sdk -L$(LLVMLIBDIR) -o 
+	
+else	
+	# LINUX:
+	LLVMLIBDIR	= ../../$(PLATFORM_DIR)/lib$(ARCH)/llvm
+	
+	LLVMLIBNAMES	:= LLVMJIT EnhancedDisassembly clang LLVMX86AsmParser \
+			LLVMInstrumentation LLVMX86Disassembler clangFrontendTool \
+			clangCodeGen CompilerDriver clangChecker clangRewrite \
+			clangFrontend clangDriver clangParse clangSerialization \
+			clangFrontend clangSema clangIndex clangLex clangAnalysis \
+			clangAST clangBasic LLVMpic16passes LLVMAsmParser LTO \
+			LLVMLinker LLVMCBackend LLVMCBackendInfo LLVMX86CodeGen \
+			LLVMX86AsmPrinter LLVMX86Info LLVMAsmPrinter LLVMMCParser \
+			LLVMBitWriter LLVMipo LLVMArchive LLVMBitReader \
+			LLVMSelectionDAG LLVMInterpreter LLVMExecutionEngine \
+			LLVMCodeGen LLVMScalarOpts LLVMInstCombine \
+			LLVMTransformUtils LLVMipa LLVMAnalysis LLVMTarget \
+			LLVMCore LLVMMC LLVMSupport LLVMSystem
+	LLVMLIBS = $(addprefix $(LLVMLIBDIR)/lib, $(addsuffix .a, $(LLVMLIBNAMES)))
+endif
+
+
 
 STATIC_LIB_FLAGS += $(LLVMLIBS)
-#$(addprefix ../../$(PLATFORM_DIR)/lib/, $(JITLIBS))
+
+include ../../Makefile.rules
 
 # Install library into path specified by DESTDIR
 # Include files are copied into DESTDIR/include/ and
@@ -48,6 +74,7 @@ install: $(SLIB_PATH)
 	@$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)
 	@$(INSTALL) -C -m 644 $(INC_DIR)$/*.h* $(DESTDIR)/include/$(LIB_NAME)
 	@$(INSTALL) -C -m 644 $(SLIB_PATH) $(DESTDIR)/lib
+	echo $(PLATFORM)
 	@for v in `cd $(LLVMLIBDIR)/clang/2.8 && find * -type d ! -path '*.*'`; do \
 		$(INSTALL) -d $(DESTDIR)/lib/llvm/clang/2.8/$$v; \
 		$(INSTALL) -C -m 644 $(LLVMLIBDIR)/clang/2.8/$$v/* $(DESTDIR)/lib/llvm/clang/2.8/$$v;\

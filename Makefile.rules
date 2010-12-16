@@ -29,7 +29,7 @@ all: $(SLIB_PATH)
 $(SLIB_PATH): createFolders $(addprefix $(OBJ_DIR), $(OBJS))
 	@echo AR $@
 	@$(RM) $@
-	@$(AR) $@ $(filter %.o, $^) $(STATIC_LIB_FLAGS)
+	$(AR) $@ $(filter %.o, $^) $(STATIC_LIB_FLAGS)
 #	@$(RANLIB) $@
 #	libtool --mode=link --tag=CXX $(filter %.o, $^) $(STATIC_LIB_FLAGS) -o $@
 #	@libtool -static $@ $(patsubst %, $(DEV_DIR)lib/lib%.a, $(STATIC_LIBS)) -o $@
