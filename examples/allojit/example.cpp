@@ -8,9 +8,11 @@ using namespace al;
 SearchPaths searchpaths;
 
 std::string code = ""
-	"#include \"allocore/al_Allocore.hpp\" \n"
-	"int test(double x) { \n"
-	"	printf(\"test %f\", x); \n"
+	"#include \"allocore/system/al_Time.h\" \n"
+	"#include <stdio.h> \n"
+	"extern \"C\" int test(double x) { \n"
+	"	printf(\"test %f\\n\", x); \n"
+	"	printf(\"at time: %f\\n\", al_time()); \n"
 	"	return x*2; \n"
 	"}";
 	
@@ -48,10 +50,14 @@ int main (int argc, char * const argv[]) {
 			if (fptr) {
 				// call the generated function
 				fptr(3.141);
+			} else {
+				printf("failed to retrieve function pointer\n");
 			}
 			// done with jitted code, delete it:
 			jit->release();
 			JIT::sweep();
+		} else {
+			printf("failed to create JIT\n");
 		}
 	}
 	

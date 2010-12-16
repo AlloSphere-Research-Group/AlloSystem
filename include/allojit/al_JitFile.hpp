@@ -91,6 +91,9 @@ public:
 	///! utility to retrieve the Compiler object (e.g. to set search paths)
 	Compiler& compiler() { return mCC; }
 
+	std::string path() const { return mFilePath; }
+	void path(std::string v) { mFilePath = v; }
+
 protected:
 
 	// file-watching background task:
