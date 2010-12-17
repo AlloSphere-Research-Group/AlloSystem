@@ -81,7 +81,11 @@ PLATFORM_DIR ?=
 #--------------------------------------------------------------------------
 # Default tools/commands
 #--------------------------------------------------------------------------
-AR		= ar crsv
+ifeq ($(PLATFORM), linux)
+	AR		= ar crsT
+else
+	AR		= ar crs
+endif
 INSTALL		= install
 RANLIB		= ranlib
 RM		= rm -df
