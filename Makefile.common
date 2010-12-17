@@ -81,10 +81,10 @@ PLATFORM_DIR ?=
 #--------------------------------------------------------------------------
 # Default tools/commands
 #--------------------------------------------------------------------------
-AR			= ar crsT
+AR		= ar crs
 INSTALL		= install
 RANLIB		= ranlib
-RM			= rm -df
+RM		= rm -df
 
 # Linux:
 ifeq ($(PLATFORM), linux)

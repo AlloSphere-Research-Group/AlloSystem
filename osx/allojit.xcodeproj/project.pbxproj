@@ -108,7 +108,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 369DE0A112B6E68700F75D2A /* allojit */;
+			remoteGlobalIDString = 369DE0A112B6E68700F75D2A;
 			remoteInfo = allojit;
 		};
 		369DE38912B6F45500F75D2A /* PBXContainerItemProxy */ = {
@@ -831,6 +831,7 @@
 					"\"$(SRCROOT)/lib\"",
 				);
 				PRODUCT_NAME = $inherited;
+				SYMROOT = ../build/bin;
 				VALID_ARCHS = $inherited;
 			};
 			name = Debug;
@@ -847,6 +848,7 @@
 					"\"$(SRCROOT)/lib\"",
 				);
 				PRODUCT_NAME = $inherited;
+				SYMROOT = ../build/bin;
 				VALID_ARCHS = $inherited;
 			};
 			name = Release;

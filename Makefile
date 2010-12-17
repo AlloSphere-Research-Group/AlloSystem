@@ -61,7 +61,7 @@ include Makefile.rules
 examples/%.cpp experimental/%.cpp: $(SLIB_PATH) FORCE
 #	@$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LDFLAGS) -whole-archive $(SLIB_PATH)
 #	@$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(SLIB_PATH) $(LDFLAGS)
-	@$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(SLIB_PATH) $(LDFLAGS) `ls $(BUILD_DIR)lib/*.a`
+	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(SLIB_PATH) $(LDFLAGS) `ls $(BUILD_DIR)lib/*.a`
 ifneq ($(AUTORUN), 0)
 	@$(BIN_DIR)$(*F)
 endif

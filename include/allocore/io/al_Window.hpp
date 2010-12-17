@@ -174,7 +174,7 @@ private:
 /// the event should be propagated to other handlers.
 struct InputEventHandler{
 	InputEventHandler() : mWindow(NULL) {}
-	virtual ~InputEventHandler() {}
+	virtual ~InputEventHandler();
 
 	virtual bool onKeyDown(const Keyboard& k){return true;}	///< Called when a keyboard key is pressed
 	virtual bool onKeyUp(const Keyboard& k){return true;}	///< Called when a keyboard key is released
@@ -200,7 +200,7 @@ private:
 /// the event should be propagated to other handlers.
 struct WindowEventHandler {
 	WindowEventHandler() : mWindow(NULL) {}
-	virtual ~WindowEventHandler() {}
+	virtual ~WindowEventHandler();
 
 	virtual bool onCreate(){ return true; }					///< Called after window is created with valid OpenGL context
 	virtual bool onDestroy(){ return true; }				///< Called before the window and its OpenGL context are destroyed
