@@ -17,6 +17,7 @@ CPPFLAGS	+= -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti
 CPPFLAGS	+= -I../../include -I../../$(PLATFORM_DIR)/include
 
 ifeq ($(PLATFORM), macosx)
+
 	# OSX:
 	LLVMLIBDIR	= ../../$(PLATFORM_DIR)/lib32/llvm
 	
@@ -55,7 +56,8 @@ include ../../Makefile.rules
 # Install library into path specified by DESTDIR
 # Include files are copied into DESTDIR/include/ and
 # library files are copied to DESTDIR/lib/
-install: $(SLIB_PATH)
+install: $(SLIB_PATH)	
+	@echo built for $(PLATFORM) $(ARCH)
 	@$(INSTALL) -d $(DESTDIR)/lib
 	@$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)
 	@$(INSTALL) -C -m 644 $(INC_DIR)$/*.h* $(DESTDIR)/include/$(LIB_NAME)
