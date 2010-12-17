@@ -638,8 +638,6 @@
 				369DE39412B6F49600F75D2A /* jitfile.cpp */,
 				369DE39612B6F4B700F75D2A /* example_using_jitfile.hpp */,
 				369DE39712B6F4B700F75D2A /* example_using_jitfile.cpp */,
-				36F4253512BB189900B81C98 /* ajit.hpp */,
-				36F4253612BB189900B81C98 /* ajit.cpp */,
 				36F4288F12BB449D00B81C98 /* ajit_test.cpp */,
 			);
 			name = allojit;
@@ -660,6 +658,7 @@
 		369DE09212B6E62800F75D2A /* allojit */ = {
 			isa = PBXGroup;
 			children = (
+				36F4253512BB189900B81C98 /* ajit.hpp */,
 				369DE09312B6E62800F75D2A /* al_Compiler.hpp */,
 				369DE3A712B6F6EE00F75D2A /* al_JitFile.hpp */,
 			);
@@ -671,6 +670,7 @@
 			isa = PBXGroup;
 			children = (
 				369DE09612B6E62800F75D2A /* al_Compiler.cpp */,
+				36F4253612BB189900B81C98 /* ajit.cpp */,
 			);
 			name = allojit;
 			path = ../src/allojit;
@@ -1163,6 +1163,7 @@
 			buildPhases = (
 				36F424FB12BB185F00B81C98 /* Sources */,
 				36F424FC12BB185F00B81C98 /* Frameworks */,
+				36F42A9412BBF2FA00B81C98 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1232,6 +1233,19 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "#xcodebuild -project allo.xcodeproj -target allocore -configuration $CONFIGURATION\ncd ..\nmake allocore";
+		};
+		36F42A9412BBF2FA00B81C98 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "svn export --force ../include/allojit ../build/include/allojit";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1349,7 +1363,7 @@
 				SDKROOT = macosx10.5;
 				SHARED_PRECOMPS_DIR = "";
 				SYMROOT = ../build;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../build/include\" \"$(SRCROOT)/../include\" ";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../include\" \"$(SRCROOT)/../build/include\" ";
 				VALID_ARCHS = i386;
 			};
 			name = Debug;
@@ -1379,7 +1393,7 @@
 				SDKROOT = macosx10.5;
 				SHARED_PRECOMPS_DIR = "";
 				SYMROOT = ../build;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../build/include\" \"$(SRCROOT)/../include\" ";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../include\" \"$(SRCROOT)/../build/include\" ";
 				VALID_ARCHS = i386;
 			};
 			name = Release;
@@ -1514,7 +1528,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = "$(inherited)";
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../build/include\" \"$(SRCROOT)/../include\" \"$(SRCROOT)/include\" ";
+				USER_HEADER_SEARCH_PATHS = "$(inherited) \"$(SRCROOT)/include\" ";
 			};
 			name = Debug;
 		};
@@ -1537,7 +1551,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = "$(inherited)";
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../build/include\" \"$(SRCROOT)/../include\" \"$(SRCROOT)/include\" ";
+				USER_HEADER_SEARCH_PATHS = "$(inherited) \"$(SRCROOT)/include\" ";
 				ZERO_LINK = NO;
 			};
 			name = Release;

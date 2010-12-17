@@ -20,6 +20,7 @@ public:
 	rnd::Random<> rng;
 	osc::Recv oscRecv;
 	osc::Send oscSend;
+	std::string path;
 	SearchPaths searchpaths;
 	JitFile<App> jitfile;
 

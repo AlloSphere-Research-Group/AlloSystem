@@ -22,6 +22,11 @@ $(OBJ_DIR)%.o: %.cpp
 $(OBJ_DIR)%.o: %.c
 	@echo CC $< $@
 	@$(CC) -c $(CFLAGS) $< -o $@
+	
+# Build object file from Obj-C++ source
+$(OBJ_DIR)%.o: %.mm
+	@echo CC $< $@
+	@$(CXX) -c $(CFLAGS) $< -o $@
 
 all: $(SLIB_PATH)
 

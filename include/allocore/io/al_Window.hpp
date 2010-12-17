@@ -307,14 +307,16 @@ public:
 
 	/// Remove all input event handlers matching argument
 	Window& remove(InputEventHandler * v){
-		std::remove(mInputEventHandlers.begin(), mInputEventHandlers.end(), v);
+		// the proper way to do it:
+		mInputEventHandlers.erase(std::remove(mInputEventHandlers.begin(), mInputEventHandlers.end(), v), mInputEventHandlers.end());
 		v->mWindow = NULL;
 		return *this;
 	}
 
 	/// Remove all window event handlers matching argument
 	Window& remove(WindowEventHandler * v){
-		std::remove(mWindowEventHandlers.begin(), mWindowEventHandlers.end(), v);
+		// the proper way to do it:
+		mWindowEventHandlers.erase(std::remove(mWindowEventHandlers.begin(), mWindowEventHandlers.end(), v), mWindowEventHandlers.end());
 		v->mWindow = NULL;
 		return *this;
 	}

@@ -178,7 +178,7 @@ void JitFile<GlobalState>::tick(al_sec t) {
 		printf("JitFile(%s): file not found\n", mFilePath.c_str());
 	}
 	// wash and repeat
-	MainLoop::queue().send(t+0.1, this, &JitFile::tick);
+	MainLoop::queue().send(t+0.01, this, &JitFile::tick);
 }
 
 

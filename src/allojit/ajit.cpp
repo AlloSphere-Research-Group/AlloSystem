@@ -1,4 +1,4 @@
-#include "ajit.hpp"
+#include "allojit/ajit.hpp"
 
 using namespace al;
 
@@ -25,6 +25,7 @@ App :: App(int argc, char * argv[])
 		printf("%s, %s\n", source.path().c_str(), source.file().c_str());
 		
 		searchpaths.addSearchPath(source.path());
+		path = source.path();
 		
 		Compiler& cc = jitfile.compiler();
 		cc.system_include(searchpaths.appPath() + "../lib/llvm/clang/2.8/include");
@@ -33,7 +34,7 @@ App :: App(int argc, char * argv[])
 		jitfile.path(source.filepath());
 		
 	} else {
-		printf("No input file specified.");
+		printf("No input file specified.\n");
 		exit(0);
 	}
 
@@ -47,6 +48,9 @@ App :: App(int argc, char * argv[])
 #endif
 }
 
+// just a hack
+//int al_main_platform_enter(double) {}
+//void al_main_platform_attach(double) {}
 
 int main(int argc, char * argv[])
 {
