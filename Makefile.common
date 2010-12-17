@@ -48,8 +48,15 @@ LIB_NAME	?=
 # Build configuration: 'Release' or 'Debug'
 BUILD_CONFIG	= Release
 
+# Whether to show verbose output
+VERBOSE		= 0
+
+# Whether to enable strict warnings
 STRICT_WARNINGS = 1
+
+# Whether to automatically run executables after building
 AUTORUN		= 1
+
 SLIB_EXT	= a
 DLIB_EXT	= so
 DLIB_OPT	= shared
@@ -82,9 +89,9 @@ PLATFORM_DIR ?=
 # Default tools/commands
 #--------------------------------------------------------------------------
 ifeq ($(PLATFORM), linux)
-	AR		= ar crsT
+	AR = ar crsT
 else
-	AR		= ar crs
+	AR = ar crs
 endif
 INSTALL		= install
 RANLIB		= ranlib
@@ -152,6 +159,12 @@ endif
 
 #LDFLAGS += -fvisibility=default
 #LDFLAGS += -fvisibility-inlines-hidden -fvisibility=hidden
+
+ifeq ($(VERBOSE), 0)
+	AR  := @$(AR)
+	CC  := @$(CC)
+	CXX := @$(CXX)
+endif
 
 ifneq ($(STRICT_WARNINGS), 0)
 	CFLAGS += \
