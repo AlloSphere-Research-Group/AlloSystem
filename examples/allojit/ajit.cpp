@@ -15,13 +15,26 @@ App :: App(int argc, char * argv[])
 	{
 	searchpaths.addAppPaths(argc, argv);
 	
-	if (argc>=1) {
+	for (int i=0; i<argc; i++) {
+		printf("argv[%d]: %s\n", i, argv[i]);
+	}
+	printf("using app path: %s\n", searchpaths.appPath().c_str());
+	
+	if (argc>1) {
 		FilePath source(argv[1]);
 		printf("%s, %s\n", source.path().c_str(), source.file().c_str());
-	}
-	
-	for (int i=0; i<argc; i++) {
-		printf("%d %s\n", i, argv[i]);
+		
+		searchpaths.addSearchPath(source.path());
+		
+		Compiler& cc = jitfile.compiler();
+		cc.system_include(searchpaths.appPath() + "../lib/llvm/clang/2.8/include");
+		cc.include(searchpaths.appPath() + "../include");
+		cc.include(source.path());
+		jitfile.path(source.filepath());
+		
+	} else {
+		printf("No input file specified.");
+		exit(0);
 	}
 
 	//win.add(new NavInputControlCosm(&nav));
@@ -32,13 +45,6 @@ App :: App(int argc, char * argv[])
 #else
     win.create(Window::Dim(360,480), "ajit", 100, DisplayMode::DefaultBuf);
 #endif
-
-	//FilePath jitcode_path = searchpaths.find("cnm.cpp");
-//	Compiler& cc = jitfile.compiler();
-//	cc.system_include(searchpaths.appPath() + "../allocore/build/lib/llvm/clang/2.8/include");
-//	cc.include(searchpaths.appPath() + "../allocore/build/include");
-//	cc.include(searchpaths.appPath() + "../cnm");
-//	jitfile.path(jitcode_path.filepath());
 }
 
 

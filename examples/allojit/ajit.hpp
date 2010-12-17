@@ -26,7 +26,6 @@ public:
 	App(int argc, char * argv[]);
 };
 
-	
 } // al::
 
 #endif /* include guard */

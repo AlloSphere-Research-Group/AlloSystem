@@ -165,6 +165,7 @@
 		36F4269F12BB19C900B81C98 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DE3B512B6F77200F75D2A /* libfreeimage.a */; };
 		36F426A012BB19C900B81C98 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DE3B812B6F77200F75D2A /* libportaudio.a */; };
 		36F426A312BB19EA00B81C98 /* al_Compiler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 369DE09612B6E62800F75D2A /* al_Compiler.cpp */; };
+		36F4289012BB449D00B81C98 /* ajit_test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F4288F12BB449D00B81C98 /* ajit_test.cpp */; };
 		8DD76F650486A84900D96B5E /* example.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* example.cpp */; settings = {ATTRIBUTES = (); }; };
 /* End PBXBuildFile section */
 
@@ -438,6 +439,7 @@
 		36F427B912BB22AF00B81C98 /* al_ControlGLV.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_ControlGLV.hpp; sourceTree = "<group>"; };
 		36F427BA12BB22AF00B81C98 /* al_ControlNav.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_ControlNav.hpp; sourceTree = "<group>"; };
 		36F427BB12BB22AF00B81C98 /* al_World.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_World.hpp; sourceTree = "<group>"; };
+		36F4288F12BB449D00B81C98 /* ajit_test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ajit_test.cpp; sourceTree = "<group>"; };
 		8DD76F6C0486A84900D96B5E /* allojit_example */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = allojit_example; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6859E8B029090EE04C91782 /* osx.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = osx.1; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -638,6 +640,7 @@
 				369DE39712B6F4B700F75D2A /* example_using_jitfile.cpp */,
 				36F4253512BB189900B81C98 /* ajit.hpp */,
 				36F4253612BB189900B81C98 /* ajit.cpp */,
+				36F4288F12BB449D00B81C98 /* ajit_test.cpp */,
 			);
 			name = allojit;
 			path = ../examples/allojit;
@@ -745,7 +748,7 @@
 				369DE2FD12B6ECDA00F75D2A /* liballojit.a */,
 			);
 			name = lib;
-			path = ../../../nanomed/trunk/allocore/build/lib;
+			path = ../build/lib;
 			sourceTree = SOURCE_ROOT;
 		};
 		369DE3B212B6F77200F75D2A /* lib */ = {
@@ -893,7 +896,7 @@
 				36F427B812BB22AF00B81C98 /* alloutil */,
 			);
 			name = include;
-			path = ../../../nanomed/trunk/allocore/include;
+			path = ../include;
 			sourceTree = SOURCE_ROOT;
 		};
 		36F4275812BB22AF00B81C98 /* allocore */ = {
@@ -1255,6 +1258,7 @@
 			files = (
 				36F426A312BB19EA00B81C98 /* al_Compiler.cpp in Sources */,
 				36F4253712BB189900B81C98 /* ajit.cpp in Sources */,
+				36F4289012BB449D00B81C98 /* ajit_test.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1329,7 +1333,10 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../build/lib\"";
+				LIBRARY_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../build/lib\"",
+					"\"$(SRCROOT)/lib\"",
+				);
 				OBJROOT = build;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
@@ -1342,7 +1349,7 @@
 				SDKROOT = macosx10.5;
 				SHARED_PRECOMPS_DIR = "";
 				SYMROOT = ../build;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../build/include\" \"$(SRCROOT)/include\" ";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../build/include\" \"$(SRCROOT)/../include\" ";
 				VALID_ARCHS = i386;
 			};
 			name = Debug;
@@ -1356,7 +1363,10 @@
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../build/lib\"";
+				LIBRARY_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../build/lib\"",
+					"\"$(SRCROOT)/lib\"",
+				);
 				OBJROOT = build;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
@@ -1369,7 +1379,7 @@
 				SDKROOT = macosx10.5;
 				SHARED_PRECOMPS_DIR = "";
 				SYMROOT = ../build;
-				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../build/include\" \"$(SRCROOT)/include\" ";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../build/include\" \"$(SRCROOT)/../include\" ";
 				VALID_ARCHS = i386;
 			};
 			name = Release;
@@ -1504,6 +1514,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = "$(inherited)";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../build/include\" \"$(SRCROOT)/../include\" \"$(SRCROOT)/include\" ";
 			};
 			name = Debug;
 		};
@@ -1526,6 +1537,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = "$(inherited)";
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../build/include\" \"$(SRCROOT)/../include\" \"$(SRCROOT)/include\" ";
 				ZERO_LINK = NO;
 			};
 			name = Release;

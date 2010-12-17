@@ -1,4 +1,6 @@
+#include "ajit.hpp"
 #include "example_using_jitfile.hpp"
+
 
 using namespace al;
 

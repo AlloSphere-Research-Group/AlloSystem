@@ -26,7 +26,7 @@ namespace al{
 class FilePath {
 public:
 	FilePath() {};
-	FilePath(std::string file, std::string path = "/") : mPath(path), mFile(file) {}
+	FilePath(std::string file, std::string path) : mPath(path), mFile(file) {}
 	///! this constructor takes a path to a file:
 	FilePath(std::string fullpath);
 	

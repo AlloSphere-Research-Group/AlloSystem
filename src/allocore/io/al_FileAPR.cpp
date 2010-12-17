@@ -84,11 +84,10 @@ FilePath SearchPaths::find(const std::string& name) {
 }
 
 FilePath::FilePath(std::string fullpath) {
-	size_t found = fullpath.rfind("/");
-	printf("rfind / %d %s\n", found, fullpath.c_str());
+	size_t found = fullpath.rfind(AL_FILE_DELIMITER);
 	if (found!=std::string::npos) {
-		mPath = fullpath.substr(0, found);
-		mFile = fullpath.substr(found);
+		mPath = fullpath.substr(0, found+1);
+		mFile = fullpath.substr(found+1);
 	} else {
 		mPath = "/";
 		mFile = fullpath;
