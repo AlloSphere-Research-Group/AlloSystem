@@ -20,13 +20,15 @@
 namespace al{
 
 /// Strips a qualified path to a file (src) into a path to the containing folder (dst)
-void path2dir(char* dst, const char* src);
+//void path2dir(char* dst, const char* src);
 
 /// a pair of path (folder/directory) and filename
 class FilePath {
 public:
 	FilePath() {};
 	FilePath(std::string file, std::string path = "/") : mPath(path), mFile(file) {}
+	///! this constructor takes a path to a file:
+	FilePath(std::string fullpath);
 	
 	const std::string& file() const { return mFile; }
 	const std::string& path() const { return mPath; }

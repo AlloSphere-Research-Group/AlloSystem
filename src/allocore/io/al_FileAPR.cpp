@@ -11,16 +11,15 @@
 
 namespace al{
 
-void path2dir(char* dst, const char* src) {
-    char* s;
-	snprintf(dst, AL_PATH_MAX, "%s", src);
-    s = strrchr(dst, '/');
-    if (s)
-        s[1] = '\0';
-    else
-        dst[0] = '\0';
-}
-
+//void path2dir(char* dst, const char* src) {
+//    char* s;
+//	snprintf(dst, AL_PATH_MAX, "%s", src);
+//    s = strrchr(dst, '/');
+//    if (s)
+//        s[1] = '\0';
+//    else
+//        dst[0] = '\0';
+//}
 
 struct File::Impl : public ImplAPR {
 public:
@@ -84,7 +83,18 @@ FilePath SearchPaths::find(const std::string& name) {
 	return result;
 }
 
+FilePath::FilePath(std::string fullpath) {
+	size_t found = fullpath.rfind("/");
+	printf("rfind / %d %s\n", found, fullpath.c_str());
+	if (found!=std::string::npos) {
+		mPath = fullpath.substr(0, found);
+		mFile = fullpath.substr(found);
+	} else {
+		mPath = "/";
+		mFile = fullpath;
+	}
 
+}
 
 File::File(const std::string& path, const std::string& mode, bool open_)
 :	mImpl(new Impl()), 
