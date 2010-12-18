@@ -194,7 +194,7 @@ public:
 	void pointSize(double v){ p_pointSize(v); }
 	
 	// Textures
-	Texture * textureNew() { return new Texture(this); }
+	Texture * textureNew() { return new Texture(*this); }
 	virtual void textureCreate(Texture *tex) = 0;
 	virtual void textureDestroy(Texture *tex) = 0;
 	virtual void textureBind(Texture *tex, int unit) = 0;

@@ -4,21 +4,21 @@
 
 namespace al{
 
-Texture::Texture(Graphics *backend)
+Texture::Texture(Graphics& backend, int width, int height, Format format, Type type, Wrap wrap)
 :	GPUObject(),
-	mBackend(backend),
+	mBackend(&backend),
 	mSurface(0),
 	mMode(DATA),
 	mRebuild(true),
 	mUpdate(false),
 	mRect(false),
-	mWidth(512),
-	mHeight(512),
+	mWidth(width),
+	mHeight(height),
 	mDepth(0),
 	mTarget(TEXTURE_2D),
-	mFormat(RGBA),
-	mType(UCHAR),
-	mWrap(REPEAT),
+	mFormat(format),
+	mType(type),
+	mWrap(wrap),
 	mMinFilter(LINEAR),
 	mMagFilter(LINEAR),
 	mBorderColor(0, 0, 0, 1)
@@ -166,6 +166,18 @@ void Texture::toArray() {
 	mBackend->textureToArray(this);
 }
 
+void Texture::allocate(){
+	AlloArrayHeader h = {
+		array_type_for_type(type()),
+		components_for_format(format()),
+		dimcount_for_target(target()),
+		{ width(), height(), depth(), 0 },
+		{ 0,0,0,0 }
+	};
+	allo_array_setstride(&h, 4);
+	allocate(h);
+}
+
 void Texture::allocate(AlloArrayHeader &header) {
 	if(! 
 		allo_array_equal_headers(
@@ -193,7 +205,7 @@ void Texture::rect(bool v) {
 	mRect = v;
 }
 	
-char * Texture::getData() {
+char * Texture::data() {
 	return mArray.data.ptr;
 }
 

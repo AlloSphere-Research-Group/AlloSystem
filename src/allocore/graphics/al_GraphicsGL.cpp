@@ -596,7 +596,7 @@ void GraphicsGL :: textureToArray(Texture *tex) {
 }
 
 void GraphicsGL :: textureSubmit(Texture *tex){
-	GLvoid *data = (GLvoid *)tex->getData();
+	GLvoid *data = (GLvoid *)tex->data();
 	if(data) {
 		GLenum gltarget = target_from_texture_target(tex->target());
 		GLenum glformat = format_from_texture_format(tex->format());

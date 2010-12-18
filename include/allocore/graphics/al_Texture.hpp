@@ -60,7 +60,7 @@ public:
 		LINEAR_MIPMAP_LINEAR
 	};
 
-	Texture(Graphics * backend);
+	Texture(Graphics& backend, int width=512, int height=512, Format format=RGBA, Type type=UCHAR, Wrap wrap=REPEAT);
 	virtual ~Texture();
 	
 	void attach(Surface *s);
@@ -72,6 +72,9 @@ public:
 	void fromArray(const al::Array *array);
 	void toArray();
 	
+	/// Allocate internal memory based on current settings
+	void allocate();
+
 	void allocate(AlloArrayHeader &header);
 
 	// trigger textureSubmit:
@@ -83,7 +86,9 @@ public:
 	bool rect();
 	void rect(bool v);
 
-	char * getData();
+	char * data();
+	template<class T> T * data(){ return (T*)(data()); }
+	
 	int getRowStride();
 
 	int width();
@@ -143,7 +148,7 @@ protected:
 
 	Graphics *		mBackend;			///< Library backend
 	Surface *		mSurface;			///< Surface object
-	al::Array		mArray;				///< Array of data
+	al::Array		mArray;				///< Array of data allocated internally
 	Mode			mMode;				///< Texture mode
 	bool			mRebuild;			///< Rebuild flag
 	bool			mUpdate;			///< Update flag
