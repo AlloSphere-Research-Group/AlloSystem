@@ -28,15 +28,25 @@
 */
 
 /**
-	Ensures that GPU resources are valid even when a rendering context is rebuilt.
+	Ensures that GPU resources are valid even when a rendering context is
+	rebuilt.
 	
 	GPUContext represents an object with a corollary rendering context on a GPU.
-	GPUObject is a shared base class for all objects that have a corrollary object on the GPU, and which must be re-submitted when the rendering context is rebuilt.
-	An object that inherits GPUContext must call contextDestroy() when the context has been invalidated. For example, the al::Window object does this automatically when the window is closed or enters/leaves fullscreen. Doing so will mark all associated GPUObjects as invalidated (calling their onDestroy() handlers).
-	Each GPUObject should call validate() before attempting to render; this will re-submit the resources (by calling its onCreate() handler).
+	GPUObject is a shared base class for all objects that have a corrollary 
+	object on the GPU, and which must be re-submitted when the rendering context
+	is rebuilt.
+	An object that inherits GPUContext must call contextDestroy() when the
+	context has been invalidated. For example, the al::Window object does this
+	automatically when the window is closed or enters/leaves fullscreen. Doing
+	so will mark all associated GPUObjects as invalidated (calling their
+	onDestroy() handlers).
+	Each GPUObject should call validate() before attempting to render; this will
+	re-submit the resources (by calling its onCreate() handler).
 	
-	GPUContexts are identified by an integer ID, which increments for each context created. 
-	The first created context has ID=0. GPUObjects will register with this context by default.
+	GPUContexts are identified by an integer ID, which increments for each
+	context created. 
+	The first created context has ID=0. GPUObjects will register with this
+	context by default.
 */
 
 
@@ -45,7 +55,6 @@ namespace al{
 class GPUContext {
 public:	
 	GPUContext();
-	virtual ~GPUContext() {};
 	
 	// triggers destroy handler for each GPUObject registered in a given context
 	void contextDestroy();
