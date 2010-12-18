@@ -197,7 +197,7 @@ void Texture::allocate(AlloArrayHeader &header) {
 	mUpdate = true;
 }
 	
-bool Texture::rect() {
+bool Texture::rect() const {
 	return mRect;
 }
 
@@ -209,11 +209,11 @@ char * Texture::data() {
 	return mArray.data.ptr;
 }
 
-int Texture::getRowStride() {
+int Texture::getRowStride() const {
 	return mArray.header.stride[1];
 }
 
-int Texture::width() {
+int Texture::width() const {
 	return mWidth;
 }
 
@@ -224,7 +224,7 @@ void Texture::width(int w) {
 	}
 }
 
-int Texture::height() {
+int Texture::height() const {
 	return mHeight;
 }
 
@@ -235,7 +235,7 @@ void Texture::height(int h) {
 	}
 }
 
-int Texture::depth() {
+int Texture::depth() const {
 	return mDepth;
 }
 
@@ -246,11 +246,11 @@ void Texture::depth(int d) {
 	}
 }
 
-void Texture::getDimensions(int &w, int &h) {
+void Texture::getDimensions(int &w, int &h) const {
 	w = mWidth; h = mHeight;;
 }
 
-void Texture::getDimensions(int &w, int &h, int &d) {
+void Texture::getDimensions(int &w, int &h, int &d) const {
 	w = mWidth; h = mHeight; d = mDepth;
 }
 
@@ -271,7 +271,7 @@ void Texture::dimensions(int w, int h, int d) {
 	}
 }
 
-Texture::Mode Texture::mode() {
+Texture::Mode Texture::mode() const {
 	return mMode;
 }
 
@@ -286,7 +286,7 @@ void Texture::mode(Mode v) {
 	}
 }
 
-Texture::Target Texture::target() {
+Texture::Target Texture::target() const {
 	return mTarget;
 }
 
@@ -297,7 +297,7 @@ void Texture::target(Target v) {
 	}
 }
 
-Texture::Format Texture::format() {
+Texture::Format Texture::format() const {
 	return mFormat;
 }
 
@@ -308,7 +308,7 @@ void Texture::format(Format v) {
 	}
 }
 
-Texture::Format Texture::singleChannel() {
+Texture::Format Texture::singleChannel() const {
 	return mSingleChannel;
 }
 
@@ -322,7 +322,7 @@ void Texture::singleChannel(Format v) {
 }
 
 
-Texture::Type Texture::type() {
+Texture::Type Texture::type() const {
 	return mType;
 }
 
@@ -333,7 +333,7 @@ void Texture::type(Type v) {
 	}
 }
 
-Texture::Wrap Texture::wrap() {
+Texture::Wrap Texture::wrap() const {
 	return mWrap;
 }
 
@@ -344,7 +344,7 @@ void Texture::wrap(Wrap v) {
 	}
 }
 
-Texture::Filter Texture::minFilter() {
+Texture::Filter Texture::minFilter() const {
 	return mMinFilter;
 }
 
@@ -355,7 +355,7 @@ void Texture::minFilter(Filter v) {
 	}
 }
 
-Texture::Filter Texture::magFilter() {
+Texture::Filter Texture::magFilter() const {
 	return mMagFilter;
 }
 
@@ -371,6 +371,7 @@ void Texture::borderColor(const Color& c) {
 }
 
 void Texture::onCreate() {
+//	printf("Texture::onCreate()\n");
 	mBackend->textureCreate(this);
 }
 

@@ -83,60 +83,59 @@ public:
 	// retrieve internal array:
 	al::Array& array() { return mArray; }
 
-	bool rect();
+	bool rect() const;
 	void rect(bool v);
 
 	char * data();
 	template<class T> T * data(){ return (T*)(data()); }
 	
-	int getRowStride();
+	int getRowStride() const;
 
-	int width();
+	int width() const;
 	void width(int w);
-	int height();
+	int height() const;
 	void height(int h);
-	int depth();
+	int depth() const;
 	void depth(int d);
 
-	void getDimensions(int &w, int &h);
-	void getDimensions(int &w, int &h, int &d);
+	void getDimensions(int &w, int &h) const;
+	void getDimensions(int &w, int &h, int &d) const;
 
 	void dimensions(int w, int h);
 	void dimensions(int w, int h, int d);
 
-	Mode mode();
+	Mode mode() const;
 	void mode(Mode v);
 
-	Target target();
+	Target target() const;
 	void target(Target v);
 
-	Format format();
+	Format format() const;
 	void format(Format v);
 
-	Type type();
+	Type type() const;
 	void type(Type v);
 	
-	Texture::Format singleChannel();
+	Texture::Format singleChannel() const;
 	void singleChannel(Format v);
 	
-	Wrap wrap();
+	Wrap wrap() const;
 	void wrap(Wrap v);
 
-	Filter minFilter();
+	Filter minFilter() const;
 	void minFilter(Filter v);
 
-	Filter magFilter();
+	Filter magFilter() const;
 	void magFilter(Filter v);
 
+	void filter(Filter v){ minFilter(v); magFilter(v); }
 
 	void borderColor(const Color& c);
-	Color& borderColor() {return mBorderColor;}
+	const Color& borderColor() const {return mBorderColor;}
 
 	Graphics * backend() {return mBackend;}
 	Surface * surface() {return mSurface;}
 
-	virtual void onCreate();
-	virtual void onDestroy();
 protected:
 
 	Format format_for_array_components(int components);
@@ -164,6 +163,9 @@ protected:
 	Filter			mMinFilter;			///< Minification filter
 	Filter			mMagFilter;			///< Magnification filter (NEAREST or LINEAR)
 	Color			mBorderColor;		///< Border color
+
+	virtual void onCreate();
+	virtual void onDestroy();
 
 }; // Texture
 
