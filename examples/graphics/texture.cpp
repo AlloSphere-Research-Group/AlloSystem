@@ -3,23 +3,11 @@
 using namespace al;
 
 GraphicsGL gl;
-Texture tex(gl, 128,128, Texture::RGBA, Texture::FLOAT32);
+Texture tex(gl, 64,64, Texture::RGBA, Texture::FLOAT32);
 
 struct MyWindow : Window{
 
 	bool onCreate(){
-	
-		const int N = 12;
-	
-		data.primitive(gl.POINTS);
-	
-		for(int k=0; k<N; ++k){ float z = float(k)/(N-1)*2-1;
-		for(int j=0; j<N; ++j){ float y = float(j)/(N-1)*2-1;
-		for(int i=0; i<N; ++i){ float x = float(i)/(N-1)*2-1;
-			data.vertex(x,y,z);
-		}}}
-
-		//tex.wrap(Texture::CLAMP);
 		tex.filter(Texture::NEAREST);
 		tex.allocate();
 		int Nx = tex.width();
@@ -28,17 +16,17 @@ struct MyWindow : Window{
 		
 		for(int j=0; j<Ny; ++j){ float y = float(j)/(Ny-1)*2-1;
 		for(int i=0; i<Nx; ++i){ float x = float(i)/(Nx-1)*2-1;
-			
+
 			float m = 1 - al::clip(hypot(x,y));
 			float a = al::wrap(atan2(y,x)/M_2PI);
-
-			Color col = HSV(a,1,1);
+			
+			Color col = HSV(a,1,m);
 			
 			int idx = j*Nx + i;
 			texBuf[idx*4 + 0] = col.r;
 			texBuf[idx*4 + 1] = col.g;
 			texBuf[idx*4 + 2] = col.b;
-			texBuf[idx*4 + 3] = m;
+			texBuf[idx*4 + 3] = col.a;
 		}}
 
 		return true;
@@ -53,34 +41,25 @@ struct MyWindow : Window{
 		gl.loadMatrix(Matrix4d::perspective(45, aspect(), 0.1, 100));
 
 		gl.matrixMode(gl.MODELVIEW);
-		gl.loadMatrix(Matrix4d::lookAt(Vec3d(0,0,-4), Vec3d(0,0,0), Vec3d(0,1,0)));
+		gl.loadMatrix(Matrix4d::lookAt(Vec3d(0,0,-3), Vec3d(0,0,0), Vec3d(0,1,0)));
 
-		gl.depthTesting(0);
-		gl.blending(1, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+		tex.bind();
 
-		++angleY;
+			gl.begin(gl.QUADS);
+			gl.vertex(-1, -1);
+			gl.vertex( 1, -1);
+			gl.vertex( 1,  1);
+			gl.vertex(-1,  1);
+			gl.texCoord(0,0);
+			gl.texCoord(1,0);
+			gl.texCoord(1,1);
+			gl.texCoord(0,1);
+			gl.end();
 
-		gl.pushMatrix();
-		
-			glEnable(GL_POINT_SPRITE);
-			glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-			glPointSize(50);
-
-			tex.bind();
-		
-			gl.rotate(angleY, 0,1,0);
-			gl.draw(data);
-			
-			tex.unbind();
-			
-			glDisable(GL_POINT_SPRITE);
-		gl.popMatrix();
+		tex.unbind();
 
 		return true;
 	}
-	
-	float angleY;
-	Mesh data;
 };
 
 int main(){
