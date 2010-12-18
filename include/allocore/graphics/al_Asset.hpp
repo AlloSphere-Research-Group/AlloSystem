@@ -118,6 +118,8 @@ public:
 	
 	/// return number of materials in scene
 	unsigned int materials() const;
+	/// read a material from the scene
+	void material(unsigned int i, Material& mat) const;
 	
 	/// return number of materials in scene
 	unsigned int textures() const;

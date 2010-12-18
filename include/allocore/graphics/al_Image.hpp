@@ -74,6 +74,8 @@ public:
 	bool load(std::string filename);
 	bool save(std::string filename);
 	
+	std::string filepath() const { return mFilename; }
+	
 	bool loaded() const { return mLoaded; }
 	const Array& array() { return mArray; }
 	

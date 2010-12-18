@@ -33,6 +33,9 @@ App :: App(int argc, char * argv[])
 		cc.include(source.path());
 		jitfile.path(source.filepath());
 		
+		/// start polling this jitfile automatically:
+		jitfile.start();
+		
 	} else {
 		printf("No input file specified.\n");
 		exit(0);

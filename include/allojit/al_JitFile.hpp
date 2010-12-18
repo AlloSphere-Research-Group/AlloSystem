@@ -88,11 +88,22 @@ public:
 	///! constructor requires a full path and optional GlobalState object
 	JitFile(std::string path, GlobalState * state=NULL);
 	
+	~JitFile();
+	
 	///! utility to retrieve the Compiler object (e.g. to set search paths)
 	Compiler& compiler() { return mCC; }
 
 	std::string path() const { return mFilePath; }
 	void path(std::string v) { mFilePath = v; }
+	
+	///! load the file / reload (if modified):
+	void poll();
+	
+	///! start polling automatically as a MainLoop task:
+	void start(al_sec period = 0.1);
+	
+	///! close any active JitZone:
+	void close();
 
 protected:
 
@@ -104,6 +115,7 @@ protected:
 	
 	std::string mFilePath;	// path to file watched
 	al_sec mMtime;			// last modification date of file
+	al_sec mPeriod;			// polling interval
 	Compiler mCC;			// compiler used to compile the file's contents
 	JitZone * mJitZone;		// manage garbage collection of JITted code
 	GlobalState * mState;	// global state passed to each JITted instance
@@ -119,15 +131,36 @@ protected:
 
 template <typename GlobalState>
 JitFile<GlobalState>::JitFile(std::string path, GlobalState * state) 
-: mFilePath(path.data()), mMtime(0), mJitZone(NULL), mState(state)
+: mFilePath(path.data()), mMtime(0), mPeriod(0.1), mJitZone(NULL), mState(state)
+{}
+
+template <typename GlobalState>
+JitFile<GlobalState>::~JitFile() 
 {
-	// launch the background process to monitor the file
-	MainLoop::queue().send(MainLoop::now()+0.1, this, &JitFile::tick);
+	close();
+}
+
+template <typename GlobalState>
+void JitFile<GlobalState>::close() 
+{
+	// dispose of the previous JITted instance of the file:
+	if (mJitZone) {
+		//printf("JitFile(%s): freeing JitZone %p\n", mFilePath.c_str(), mJitZone);
+		delete mJitZone;
+		mJitZone = NULL;
+	}
+}
+
+
+template <typename GlobalState>
+void JitFile<GlobalState>::start(al_sec period) {
+	mPeriod = period;
+	MainLoop::queue().send(MainLoop::now()+mPeriod, this, &JitFile::tick);
 }
 
 // background process monitoring and JITting the file
 template <typename GlobalState>
-void JitFile<GlobalState>::tick(al_sec t) {
+void JitFile<GlobalState>::poll() {
 	// if file exists
 	if (File::exists(mFilePath.c_str())) {
 		al_sec mtime = File::modified(mFilePath.c_str());
@@ -152,14 +185,9 @@ void JitFile<GlobalState>::tick(al_sec t) {
 						// get the entry point into the file:
 						jitEntryFptr f = (jitEntryFptr)(jit->getfunctionptr("onload"));
 						if (f) {
-						
 							// dispose of the previous JITted instance of the file:
-							if (mJitZone) {
-								//printf("JitFile(%s): freeing JitZone %p\n", mFilePath.c_str(), mJitZone);
-								delete mJitZone;
-								mJitZone = NULL;
-							}
-							
+							close();
+														
 							// initialized and acquire the new JITted instance of the file:
 							mJitZone = f(jit, mState);
 							//printf("JitFile(%s): captured JitZone %p\n", mFilePath.c_str(), mJitZone);
@@ -177,8 +205,13 @@ void JitFile<GlobalState>::tick(al_sec t) {
 	} else {
 		printf("JitFile(%s): file not found\n", mFilePath.c_str());
 	}
-	// wash and repeat
-	MainLoop::queue().send(t+0.01, this, &JitFile::tick);
+}
+
+// background process monitoring and JITting the file
+template <typename GlobalState>
+void JitFile<GlobalState>::tick(al_sec t) {
+	poll();
+	MainLoop::queue().send(t+mPeriod, this, &JitFile::tick);
 }
 
 
