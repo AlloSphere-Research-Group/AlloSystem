@@ -58,7 +58,9 @@ include Makefile.rules
 
 
 # Compile and run source files in examples/ folder
-examples/%.cpp experimental/%.cpp: $(SLIB_PATH) FORCE
+EXEC_TARGETS = examples/%.cpp experimental/%.cpp
+.PRECIOUS: $(EXEC_TARGETS)
+$(EXEC_TARGETS): $(SLIB_PATH) FORCE
 #	@$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LDFLAGS) -whole-archive $(SLIB_PATH)
 #	@$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(SLIB_PATH) $(LDFLAGS)
 	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(SLIB_PATH) $(LDFLAGS) `ls $(BUILD_DIR)lib/*.a`
