@@ -11,7 +11,7 @@ SearchPaths searchpaths;
 
 Shader vert, frag;
 ShaderProgram shaderprogram;
-Texture tex(&gl);
+Texture tex(gl);
 Image img;
 Light light;
 Material material;
@@ -32,7 +32,7 @@ struct MyWindow : Window{
 		shaderprogram.attach(vert);
 		shaderprogram.attach(frag);
 		shaderprogram.link();
-		//shaderprogram.listParams();
+		shaderprogram.listParams();
 		printf("frag %s\n", frag.log());
 		printf("vert %s\n", vert.log());
 
@@ -131,12 +131,13 @@ struct MyWindow : Window{
 		gl.translate( -scene_center );
 
 		
+		
 		shaderprogram.begin();
-		shaderprogram.uniform("tex", 0);
-		GraphicsGL::gl_error("tex");
-		tex.bind(0);
+		shaderprogram.uniform("tex0", 1);
+		GraphicsGL::gl_error("tex0");
+		tex.bind(1);
 		glCallList(scene_list);
-		tex.unbind(0);
+		tex.unbind(1);
 		shaderprogram.end();
 		
 		gl.popMatrix();
@@ -147,10 +148,11 @@ struct MyWindow : Window{
 
 int main (int argc, char * const argv[]) {
 	searchpaths.addAppPaths(argc, argv);
-	searchpaths.addSearchPath(searchpaths.appPath() + "../resources");
+	searchpaths.addSearchPath(searchpaths.appPath() + "../share");
 	
 	// load in a "scene"
 	FilePath path = searchpaths.find("ducky.obj");
+	printf("reading %s\n", path.filepath().c_str());
 	
 	ascene = Scene::import(path.filepath());
 	if (ascene==0) {
@@ -182,156 +184,3 @@ int main (int argc, char * const argv[]) {
 	
 	return 0;
 }
-
-
-
-// ----------------------------------------------------------------------------
-//void color4_to_float4(const struct aiColor4D *c, float f[4])
-//{
-//	f[0] = c->r;
-//	f[1] = c->g;
-//	f[2] = c->b;
-//	f[3] = c->a;
-//}
-//
-// ----------------------------------------------------------------------------
-//
-//void set_float4(float f[4], float a, float b, float c, float d)
-//{
-//	f[0] = a;
-//	f[1] = b;
-//	f[2] = c;
-//	f[3] = d;
-//}
-// ----------------------------------------------------------------------------
-//void apply_material(const struct aiMaterial *mtl)
-//{
-//	float c[4];
-//
-//	GLenum fill_mode;
-//	unsigned int ret1, ret2;
-//	struct aiColor4D diffuse;
-//	struct aiColor4D specular;
-//	struct aiColor4D ambient;
-//	struct aiColor4D emission;
-//	float shininess, strength;
-//	int two_sided;
-//	int wireframe;
-//	unsigned int max;
-//
-//	set_float4(c, 0.8f, 0.8f, 0.8f, 1.0f);
-//	if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_DIFFUSE, &diffuse))
-//		color4_to_float4(&diffuse, c);
-//	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, c);
-//
-//	set_float4(c, 0.0f, 0.0f, 0.0f, 1.0f);
-//	if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_SPECULAR, &specular))
-//		color4_to_float4(&specular, c);
-//	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, c);
-//
-//	set_float4(c, 0.2f, 0.2f, 0.2f, 1.0f);
-//	if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_AMBIENT, &ambient))
-//		color4_to_float4(&ambient, c);
-//	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, c);
-//
-//	set_float4(c, 0.0f, 0.0f, 0.0f, 1.0f);
-//	if(AI_SUCCESS == aiGetMaterialColor(mtl, AI_MATKEY_COLOR_EMISSIVE, &emission))
-//		color4_to_float4(&emission, c);
-//	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, c);
-//
-//	max = 1;
-//	ret1 = aiGetMaterialFloatArray(mtl, AI_MATKEY_SHININESS, &shininess, &max);
-//	max = 1;
-//	ret2 = aiGetMaterialFloatArray(mtl, AI_MATKEY_SHININESS_STRENGTH, &strength, &max);
-//	if((ret1 == AI_SUCCESS) && (ret2 == AI_SUCCESS))
-//		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess * strength);
-//	else {
-//		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 0.0f);
-//		set_float4(c, 0.0f, 0.0f, 0.0f, 0.0f);
-//		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, c);
-//	}
-//
-//	max = 1;
-//	if(AI_SUCCESS == aiGetMaterialIntegerArray(mtl, AI_MATKEY_ENABLE_WIREFRAME, &wireframe, &max))
-//		fill_mode = wireframe ? GL_LINE : GL_FILL;
-//	else
-//		fill_mode = GL_FILL;
-//	glPolygonMode(GL_FRONT_AND_BACK, fill_mode);
-//
-//	max = 1;
-//	if((AI_SUCCESS == aiGetMaterialIntegerArray(mtl, AI_MATKEY_TWOSIDED, &two_sided, &max)) && two_sided)
-//		glEnable(GL_CULL_FACE);
-//	else 
-//		glDisable(GL_CULL_FACE);
-//}
-//
-// Can't send color down as a pointer to aiColor4D because AI colors are ABGR.
-//void Color4f(const struct aiColor4D *color)
-//{
-//	glColor4f(color->r, color->g, color->b, color->a);
-//}
-//void recursive_render (const struct aiScene *sc, const struct aiNode* nd)
-//{
-//	int i;
-//	unsigned int n = 0, t;
-//	struct aiMatrix4x4 m = nd->mTransformation;
-//
-//	// update transform
-//	aiTransposeMatrix4(&m);
-//	glPushMatrix();
-//	glMultMatrixf((float*)&m);
-//
-//	// draw all meshes assigned to this node
-//	for (; n < nd->mNumMeshes; ++n) {
-//		const struct aiMesh* mesh = scene->mMeshes[nd->mMeshes[n]];
-//
-//		//apply_material(sc->mMaterials[mesh->mMaterialIndex]);
-//
-//		if(mesh->mNormals == NULL) {
-//			glDisable(GL_LIGHTING);
-//		} else {
-//			glEnable(GL_LIGHTING);
-//		}
-//
-//		if(mesh->mColors[0] != NULL) {
-//			glEnable(GL_COLOR_MATERIAL);
-//		} else {
-//			glDisable(GL_COLOR_MATERIAL);
-//		}
-//
-//		for (t = 0; t < mesh->mNumFaces; ++t) {
-//			const struct aiFace* face = &mesh->mFaces[t];
-//			GLenum face_mode;
-//
-//			switch(face->mNumIndices) {
-//				case 1: face_mode = GL_POINTS; break;
-//				case 2: face_mode = GL_LINES; break;
-//				case 3: face_mode = GL_TRIANGLES; break;
-//				default: face_mode = GL_POLYGON; break;
-//			}
-//
-//			glBegin(face_mode);
-//
-//			for(i = 0; i < face->mNumIndices; i++) {
-//				int index = face->mIndices[i];
-//				if(mesh->mColors[0] != NULL)
-//					Color4f(&mesh->mColors[0][index]);
-//				if(mesh->mNormals != NULL) 
-//					glNormal3fv(&mesh->mNormals[index].x);
-//				if(mesh->mTextureCoords[0] != NULL) 
-//					glTexCoord3fv(&mesh->mTextureCoords[0][index].x);
-//				glVertex3fv(&mesh->mVertices[index].x);
-//			}
-//
-//			glEnd();
-//		}
-//
-//	}
-//
-//	// draw all children
-//	for (n = 0; n < nd->mNumChildren; ++n) {
-//		recursive_render(sc, nd->mChildren[n]);
-//	}
-//
-//	glPopMatrix();
-//}

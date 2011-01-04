@@ -1199,10 +1199,10 @@
 				361AA7A412AEE1AC002E9DFD /* al_Mesh.cpp */,
 				36F598FC12122628003B78B5 /* al_Model.cpp */,
 				16586A1C128903C10068E01A /* al_Shader.cpp */,
-				16AA9609118F774800B98EC3 /* al_Texture.cpp */,
 				168F105712B80DD100B1E07C /* al_Shapes.cpp */,
 				367F0B3A12034EED00FCC534 /* al_Stereographic.cpp */,
 				36D69A5211F9267800699158 /* al_Surface.cpp */,
+				16AA9609118F774800B98EC3 /* al_Texture.cpp */,
 			);
 			path = graphics;
 			sourceTree = "<group>";

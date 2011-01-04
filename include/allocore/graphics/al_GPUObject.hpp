@@ -108,7 +108,7 @@ protected:
 	// remove from the context:
 	void contextUnregister();
 	
-	long mID;
+	unsigned long mID;
 	virtual void onCreate() = 0;
 	virtual void onDestroy() = 0;
 };

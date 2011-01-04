@@ -161,14 +161,18 @@ const ShaderProgram& ShaderProgram::attribute(const char * name, float v0){
 }
 
 int ShaderProgram::uniformLocation(const char * name) const { 
-	//GLint loc = glGetAttribLocationARB((GLhandleARB)handle(), name);
-	GLint loc = glGetAttribLocation(id(), name);
+	//GLint loc = glGetUniformLocationARB((GLhandleARB)handle(), name);
+	GLint loc = glGetUniformLocation(id(), name);
+	if (loc == -1)
+        printf("No such uniform named \"%s\"\n", name);
 	return loc; 
 }
 
 int ShaderProgram::attributeLocation(const char * name) const { 
-	//GLint loc = glGetUniformLocationARB((GLhandleARB)handle(), name);
-	GLint loc = glGetUniformLocation(id(), name);
+	//GLint loc = glGetAttribLocationARB((GLhandleARB)handle(), name);
+	GLint loc = glGetAttribLocation(id(), name);
+	if (loc == -1)
+        printf("No such attribute named \"%s\"\n", name);
 	return loc; // glGetUniformLocation(id(), name); 
 }
 

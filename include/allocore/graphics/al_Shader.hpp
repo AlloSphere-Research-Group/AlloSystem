@@ -15,8 +15,6 @@ public:
 
 	/// Returns info log or 0 if none.
 	const char * log();
-	
-	void * handle() const { return mHandle; }
 
 protected:
 	char * mLog;
@@ -26,8 +24,6 @@ protected:
 	//virtual void get(int pname, GLint * params) = 0;
 	virtual void get(int pname, void * params) const = 0;
 	
-	
-	void * mHandle;
 };
 
 
