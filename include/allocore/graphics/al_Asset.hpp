@@ -97,11 +97,14 @@ public:
 		
 		Material();
 		
+		std::string name;
+		
 		int shading_model, two_sided, wireframe, blend_func;
 		float shininess, shininess_strength, opacity, reflectivity, refracti, bump_scaling;
 		Color diffuse, ambient, specular, emissive, transparent, reflective;
 		TextureProperty diffusemap, ambientmap, specularmap, opacitymap, emissivemap, shininessmap, lightmap, normalmap, heightmap, displacementmap, reflectionmap; 
 		std::string background;	
+		
 	};
 	
 	static Scene * import(std::string path, ImportPreset preset = MAX_QUALITY);
@@ -119,7 +122,7 @@ public:
 	/// return number of materials in scene
 	unsigned int materials() const;
 	/// read a material from the scene
-	void material(unsigned int i, Material& mat) const;
+	const Material& material(unsigned int i) const;
 	
 	/// return number of materials in scene
 	unsigned int textures() const;

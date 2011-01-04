@@ -173,6 +173,9 @@ Scene :: Scene(Impl * impl) : mImpl(impl) {
 		aiGetMaterialInteger(mat, AI_MATKEY_ENABLE_WIREFRAME, &m.wireframe);
 		aiGetMaterialInteger(mat, AI_MATKEY_BLEND_FUNC, &m.blend_func);
 		
+		aiGetMaterialString(mat, AI_MATKEY_NAME, &szPath);
+		m.name = std::string(szPath.data);
+		
 		aiGetMaterialString(mat, AI_MATKEY_GLOBAL_BACKGROUND_IMAGE, &szPath);
 		m.background = std::string(szPath.data);
 		
@@ -274,53 +277,8 @@ void Scene :: mesh(unsigned int i, Mesh& mesh) const {
 	}
 }
 
-void Scene :: material(unsigned int i, Material& mat) const {
-	if (i < materials()) {
-		aiMaterial * x = mImpl->scene->mMaterials[i];
-		if (x) {
-			printf("\t%d: %d properties\n", i, x->mNumProperties);
-			
-			
-			aiGetMaterialInteger(x, AI_MATKEY_SHADING_MODEL, &mat.shading_model);
-			aiGetMaterialInteger(x, AI_MATKEY_TWOSIDED, &mat.two_sided);
-			aiGetMaterialInteger(x, AI_MATKEY_ENABLE_WIREFRAME, &mat.wireframe);
-			aiGetMaterialInteger(x, AI_MATKEY_BLEND_FUNC, &mat.blend_func);
-			
-			aiGetMaterialFloat(x, AI_MATKEY_SHININESS, &mat.shininess);
-			aiGetMaterialFloat(x, AI_MATKEY_SHININESS_STRENGTH, &mat.shininess_strength);
-			aiGetMaterialFloat(x, AI_MATKEY_OPACITY, &mat.opacity);
-			aiGetMaterialFloat(x, AI_MATKEY_REFLECTIVITY, &mat.reflectivity);
-			aiGetMaterialFloat(x, AI_MATKEY_REFRACTI, &mat.refracti);
-			aiGetMaterialFloat(x, AI_MATKEY_BUMPSCALING, &mat.bump_scaling);
-			
-			int pMax = 4;
-			aiGetMaterialFloatArray(x, AI_MATKEY_COLOR_DIFFUSE, mat.diffuse.components, &pMax);
-			aiGetMaterialFloatArray(x, AI_MATKEY_COLOR_AMBIENT, mat.ambient.components, &pMax);
-			aiGetMaterialFloatArray(x, AI_MATKEY_COLOR_SPECULAR, mat.specular.components, &pMax);
-			aiGetMaterialFloatArray(x, AI_MATKEY_COLOR_EMISSIVE, mat.emissive.components, &pMax);
-			aiGetMaterialFloatArray(x, AI_MATKEY_COLOR_TRANSPARENT, mat.transparent.components, &pMax);
-			aiGetMaterialFloatArray(x, AI_MATKEY_COLOR_REFLECTIVE, mat.reflective.components, &pMax);
-			
-			//aiGetMaterialFloatArray(x, AI_MATKEY_GLOBAL_BACKGROUND_IMAGE, mat.diffuse.components, &pMax);
-			
-			/*
-			#define AI_MATKEY_NAME "?mat.name",0,0
-#define AI_MATKEY_COLOR_DIFFUSE "$clr.diffuse",0,0
-#define AI_MATKEY_COLOR_AMBIENT "$clr.ambient",0,0
-#define AI_MATKEY_COLOR_SPECULAR "$clr.specular",0,0
-#define AI_MATKEY_COLOR_EMISSIVE "$clr.emissive",0,0
-#define AI_MATKEY_COLOR_TRANSPARENT "$clr.transparent",0,0
-#define AI_MATKEY_COLOR_REFLECTIVE "$clr.reflective",0,0
-#define AI_MATKEY_GLOBAL_BACKGROUND_IMAGE "?bg.global",0,0
-				
-				int shading_model, two_sided, wireframe, blend_func;
-		float shininess, shininess_strength, opacity, reflectivity, refracti, bump_scaling;
-		Color diffuse, ambient, specular, emissive, transparent, reflective;
-		TextureProperty diffusemap, ambientmap, specularmap, opacitymap, emissivemap, shininessmap, lightmap, normalmap, heightmap, displacementmap, reflectionmap; 
-		std::string background;	*/
-				
-		}
-	}
+const Scene::Material& Scene :: material(unsigned int i) const {
+	return mMaterials[i];
 }
 
 unsigned int Scene :: meshMaterial(unsigned int i) const {
