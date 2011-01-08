@@ -63,7 +63,7 @@ EXEC_TARGETS = examples/%.cpp experimental/%.cpp
 $(EXEC_TARGETS): $(SLIB_PATH) FORCE
 #	@$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LDFLAGS) -whole-archive $(SLIB_PATH)
 #	@$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(SLIB_PATH) $(LDFLAGS)
-	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(SLIB_PATH) $(LDFLAGS) `ls $(BUILD_DIR)lib/*.a`
+	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(SLIB_PATH) $(LDFLAGS) `ls $(BUILD_DIR)lib$(ARCH)/*.a`
 ifneq ($(AUTORUN), 0)
 	@$(BIN_DIR)$(*F)
 endif
@@ -80,7 +80,7 @@ allocore: $(SLIB_PATH)
 		$(INSTALL) -d $(BUILD_DIR)/include/$@/$$v; \
 		$(INSTALL) -c -m 644 $(INC_DIR)/$@/$$v/*.h* $(BUILD_DIR)/include/$@/$$v;\
 	done
-	@$(INSTALL) -C -m 644 $(DEV_DIR)lib/*.a $(BUILD_DIR)/lib
+	@$(INSTALL) -C -m 644 $(DEV_DIR)lib$(ARCH)/*.a $(BUILD_DIR)/lib
 #	@$(MAKE) install DESTDIR=$(BUILD_DIR)
 
 allojit alloutil:
