@@ -23,21 +23,21 @@ void GraphicsGL::gl_error(const char *msg) {
 
 #define CS(TYPE) case Graphics::TYPE: return GL_##TYPE;
 
-GLenum gl_antialias_mode(Graphics::AntiAliasMode v) {
+GLenum GraphicsGL :: gl_antialias_mode(Graphics::AntiAliasMode v) {
 	switch(v){
 		CS(NICEST) CS(FASTEST)
 		default: return GL_DONT_CARE;
 	}
 }
 
-GLenum gl_matrix_mode(Graphics::MatrixMode v) {
+GLenum GraphicsGL :: gl_matrix_mode(Graphics::MatrixMode v) {
 	switch(v){
 		CS(MODELVIEW) CS(PROJECTION)
 		default: return GL_MODELVIEW;
 	}
 }
 
-GLenum gl_blend_func(Graphics::BlendFunc v) {
+GLenum GraphicsGL :: gl_blend_func(Graphics::BlendFunc v) {
 	switch(v){	
 		CS(SRC_COLOR) 
 		CS(ONE_MINUS_SRC_COLOR)
@@ -54,14 +54,14 @@ GLenum gl_blend_func(Graphics::BlendFunc v) {
 	}
 }
 
-GLenum gl_polygon_mode(Graphics::PolygonMode v) {
+GLenum GraphicsGL :: gl_polygon_mode(Graphics::PolygonMode v) {
 	switch(v){
 		CS(POINT) CS(LINE)
 		default: return GL_FILL;
 	}
 }
 
-GLenum gl_primitive(Graphics::Primitive v){
+GLenum GraphicsGL :: gl_primitive(Graphics::Primitive v){
 	switch(v){
 		CS(POINTS) CS(LINES) CS(LINE_STRIP) CS(LINE_LOOP) CS(TRIANGLES)
 		CS(TRIANGLE_STRIP) CS(TRIANGLE_FAN) CS(QUADS) CS(QUAD_STRIP) CS(POLYGON)
@@ -69,7 +69,7 @@ GLenum gl_primitive(Graphics::Primitive v){
 	}
 }
 
-GLenum gl_capability(Graphics::Capability v){
+GLenum GraphicsGL :: gl_capability(Graphics::Capability v){
 	switch(v){
 		CS(BLEND) CS(COLOR_MATERIAL) CS(DEPTH_TEST) CS(LIGHTING)
 		CS(SCISSOR_TEST)

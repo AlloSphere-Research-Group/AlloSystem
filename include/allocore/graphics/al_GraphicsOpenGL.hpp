@@ -101,6 +101,13 @@ public:
 	};
 	
 	static void gl_error(const char *msg = "");
+	
+	static GLenum gl_primitive(Graphics::Primitive v);
+	static GLenum gl_antialias_mode(Graphics::AntiAliasMode v);
+	static GLenum gl_matrix_mode(Graphics::MatrixMode v);
+	static GLenum gl_blend_func(Graphics::BlendFunc v);
+	static GLenum gl_polygon_mode(Graphics::PolygonMode v);
+	static GLenum gl_capability(Graphics::Capability v);
 	static GLenum type_for_array_type(AlloTy type);
 	static GLenum target_from_texture_target(Texture::Target target);
 	

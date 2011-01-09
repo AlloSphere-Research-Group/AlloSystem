@@ -52,6 +52,7 @@ public:
 	Shader& compile();
 	bool compiled() const;
 	
+	Shader::Type type() const { return mType; }
 
 private:
 	std::string mSource;
@@ -109,7 +110,7 @@ public:
 		//textures? non square matrices? attributes?
 	};
 
-	ShaderProgram(){}
+	ShaderProgram() : inPrim(Graphics::TRIANGLES), outPrim(Graphics::TRIANGLES), outVertices(3) {}
 	
 	/// Any attached shaders will automatically be detached, but not deleted.
 	virtual ~ShaderProgram(){ destroy(); }
@@ -117,6 +118,11 @@ public:
 	/// input Shader s will be compiled if necessary:
 	const ShaderProgram& attach(Shader& s);
 	const ShaderProgram& detach(const Shader& s) const;
+	
+	// these parameters must be set on Geometry shaders before being linked.
+	void setGeometryInputPrimitive(Graphics::Primitive prim) { inPrim = prim; }
+	void setGeometryOutputPrimitive(Graphics::Primitive prim) { outPrim = prim; }
+	void setGeometryOutputVertices(unsigned int i) { outVertices = i; }
 	
 	const ShaderProgram& link() const;
 	const ShaderProgram& use() const;
@@ -130,11 +136,15 @@ public:
 	void listParams() const;
 	const ShaderProgram& uniform(const char * name, int v0);
 	const ShaderProgram& uniform(const char * name, float v0);
+	const ShaderProgram& uniform(const char * name, double v0) { uniform(name, (float)v0); }
 	const ShaderProgram& attribute(const char * name, float v0);
 	
 	static Type param_type_from_gltype(GLenum gltype);
 
 protected:
+	Graphics::Primitive inPrim, outPrim;	// IO primitives for geometry shaders
+	unsigned int outVertices;
+	
 	int uniformLocation(const char * name) const;
 	int attributeLocation(const char * name) const;
 	

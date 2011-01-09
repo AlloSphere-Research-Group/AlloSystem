@@ -14,6 +14,7 @@ GLenum gl_shader_type(Shader::Type v) {
 	switch(v){
 		case Shader::FRAGMENT:	return GL_FRAGMENT_SHADER;
 		case Shader::VERTEX:	return GL_VERTEX_SHADER;
+		case Shader::GEOMETRY:	return GL_GEOMETRY_SHADER_EXT;
 		default: return 0;
 	}
 }
@@ -92,6 +93,13 @@ const ShaderProgram& ShaderProgram::attach(Shader& s) {
 	if (!s.compiled()) s.compile();
 	//glAttachObjectARB((GLhandleARB)handle(), (GLhandleARB)s.handle());
 	glAttachShader(id(), s.id()); 
+	
+	if (s.type() == Shader::GEOMETRY) {
+		glProgramParameteriEXT(id(),GL_GEOMETRY_INPUT_TYPE_EXT,GraphicsGL::gl_primitive(inPrim));
+		glProgramParameteriEXT(id(),GL_GEOMETRY_OUTPUT_TYPE_EXT,GraphicsGL::gl_primitive(outPrim));
+		glProgramParameteriEXT(id(),GL_GEOMETRY_VERTICES_OUT_EXT,outVertices);
+	}
+	
 	return *this; 
 }
 const ShaderProgram& ShaderProgram::detach(const Shader& s) const { 
@@ -110,6 +118,7 @@ const ShaderProgram& ShaderProgram::link() const {
 	if (!isValid) {
 		GraphicsGL::gl_error("ShaderProgram::link");
 	}
+		
 	return *this; 
 }
 
