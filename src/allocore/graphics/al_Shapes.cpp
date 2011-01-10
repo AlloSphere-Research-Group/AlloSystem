@@ -19,7 +19,7 @@ int addTetrahedron(Mesh& m){
 	int Nv = sizeof(vertices)/sizeof(*vertices)/3;
 
 	m.vertex(vertices, Nv);
-	m.index(indices, sizeof(indices)/sizeof(*indices));
+	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
 
 	return Nv;
 }
@@ -41,7 +41,7 @@ int addCube(Mesh& m){
 	int Nv = sizeof(vertices)/sizeof(*vertices)/3;
 
 	m.vertex(vertices, Nv);
-	m.index(indices, sizeof(indices)/sizeof(*indices));
+	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
 	
 	return Nv;
 }
@@ -60,7 +60,7 @@ int addOctahedron(Mesh& m){
 	int Nv = sizeof(vertices)/sizeof(*vertices)/3;
 
 	m.vertex(vertices, Nv);
-	m.index(indices, sizeof(indices)/sizeof(*indices));
+	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
 
 	return Nv;
 }
@@ -88,7 +88,7 @@ int addDodecahedron(Mesh& m){
 	int Nv = sizeof(vertices)/sizeof(*vertices)/3;
 
 	m.vertex(vertices, Nv);
-	m.index(indices, sizeof(indices)/sizeof(*indices));
+	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
 
 	return Nv;
 }
@@ -160,7 +160,7 @@ int addIcosahedron(Mesh& m){
 	int Nv = sizeof(vertices)/sizeof(*vertices)/3;
 
 	m.vertex(vertices, Nv);
-	m.index(indices, sizeof(indices)/sizeof(*indices));
+	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
 	
 	return Nv;
 }
