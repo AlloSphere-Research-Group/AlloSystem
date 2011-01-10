@@ -136,7 +136,7 @@ public:
 	void listParams() const;
 	const ShaderProgram& uniform(const char * name, int v0);
 	const ShaderProgram& uniform(const char * name, float v0);
-	const ShaderProgram& uniform(const char * name, double v0) { uniform(name, (float)v0); }
+	const ShaderProgram& uniform(const char * name, double v0) { return uniform(name, (float)v0); }
 	const ShaderProgram& attribute(const char * name, float v0);
 	
 	static Type param_type_from_gltype(GLenum gltype);
