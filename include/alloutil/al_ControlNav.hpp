@@ -9,7 +9,8 @@ namespace al {
 /// Mapping from keyboard and mouse controls to a Nav object
 struct NavInputControl : public InputEventHandler {
 
-	NavInputControl(Nav * nav): mNav(nav){}
+	NavInputControl(Nav * nav, double vscale = 0.125, double tscale = 2.)
+	: mNav(nav), mVScale(vscale), mTScale(tscale) {}
 	virtual ~NavInputControl() {}
 
 	void nav(Nav * v){ mNav=v; }
@@ -17,8 +18,8 @@ struct NavInputControl : public InputEventHandler {
 	virtual bool onKeyDown(const Keyboard& k){	 	
 	
 		double vs = nav().velScale();
-		double a = 2.000 * vs;	// rotational speed: degrees per update
-		double v = 0.125 * vs;	// speed: units per update
+		double a = mTScale * vs;	// rotational speed: degrees per update
+		double v = mVScale * vs;	// speed: units per update
 
 		switch(k.key()){
 			case '`':			nav().halt().home(); return false;
@@ -74,19 +75,20 @@ struct NavInputControl : public InputEventHandler {
 
 protected:
 	Nav * mNav;
+	double mVScale, mTScale;
 };
 
 
 struct NavInputControlCosm : public NavInputControl {
 
-	NavInputControlCosm(Nav * nav): NavInputControl(nav){}
+	NavInputControlCosm(Nav * nav, double vscale = 0.125, double tscale = 2.): NavInputControl(nav, vscale, tscale){}
 	virtual ~NavInputControlCosm() {}
 
 	virtual bool onKeyDown(const Keyboard& k){	 	
 
 		double vs = nav().velScale();
-		double a = 1.00 * vs;	// rotational speed: degrees per update
-		double v = 0.25 * vs;	// speed: units per update
+		double a = mTScale * vs;	// rotational speed: degrees per update
+		double v = mVScale * vs;	// speed: units per update
 		
 		switch(k.key()){
 			case '`':			nav().halt().home(); return false;
