@@ -68,6 +68,14 @@ public:
 	void scale(double s) { scale(s, s, s); }
 	void translate(double x, double y, double z);
 	void translate(Vec3f v) { translate(v[0], v[1], v[2]); }
+	
+	/// Transform vertices by projective transform matrix
+	
+	/// @param[in] m		projective transform matrix
+	/// @param[in] begin	beginning index of vertices
+	/// @param[in] end		ending index of vertices, negative amount specify distance from one past last element
+	template <class T>
+	void transform(const Mat<4,T>& m, int begin=0, int end=-1);
 
 	// generates smoothed normals for a set of vertices
 	// will replace any normals currently in use
@@ -85,7 +93,8 @@ public:
 	void index(unsigned int i){ indices().append(i); }
 	
 	template <class Tindex>
-	void index(const Tindex * buf, int size){ for(int i=0; i<size; ++i) index(buf[i]); }
+	void index(const Tindex * buf, int size, int indexOffset=0){
+		for(int i=0; i<size; ++i) index(buf[i] + indexOffset); }
 
 	void color(float r, float g, float b, float a=1){ color(Color(r,g,b,a)); }
 	void color(const Color& v) { colors().append(v); }
@@ -134,6 +143,18 @@ protected:
 
 	int mPrimitive;
 };
+
+
+
+template <class T>
+void Mesh::transform(const Mat<4,T>& m, int begin, int end){
+	if(end<0) end += vertices().size()+1; // negative index wraps to end of array
+	for(int i=begin; i<end; ++i){
+		Vertex& ver = vertices()[i];
+		Vec<4,T> vec(ver[0], ver[1], ver[2], 1);
+		ver.set(m*vec);
+	}
+}
 
 } // ::al
 
