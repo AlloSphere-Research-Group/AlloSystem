@@ -192,7 +192,7 @@ inline T uniform(const T& hi){ return globalRNG().uniform(hi); }
 template <class T>
 inline T uniform(const T& hi, const T& lo){ return globalRNG().uniform(hi,lo); }
 
-/// Returns signed uniform random in [0,1)
+/// Returns signed uniform random in [-1,1)
 inline float uniformS(){ return globalRNG().uniformS(); }
 
 /// Returns signed uniform random in [-lim, lim)
