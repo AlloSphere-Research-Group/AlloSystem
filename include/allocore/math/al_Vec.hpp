@@ -52,7 +52,7 @@ typedef Mat<4,double>	Mat4d;	///< double 4x4 matrix
 typedef Mat<4,int>		Mat4i;	///< integer 4x4 matrix
 
 // Forward iterates from 0 to n-1. Current index is 'i'.
-#define IT(n) for(int i=0; i<n; ++i)
+#define IT(n) for(int i=0; i<(n); ++i)
 
 
 
@@ -183,7 +183,7 @@ public:
 
 	/// Get a subvector
 	template <int M>
-	Vec<M,T> sub(int begin=0){
+	Vec<M,T> sub(int begin=0) const {
 		return Vec<M,T>(ptr()+begin);
 	}
 
@@ -216,6 +216,10 @@ public:
 	/// Set elements from another vector
 	template <class T2>
 	Vec& set(const Vec<N, T2> &v){ IT(N){ (*this)[i] = T(v[i]); } return *this; }
+
+	/// Set elements from another vector
+	template <int N2, class T2>
+	Vec& set(const Vec<N2, T2> &v){ IT(N<N2?N:N2){ (*this)[i] = T(v[i]); } return *this; }
 	
 	/// Set all elements to the same value
 	Vec& set(const T& v){ IT(N){ (*this)[i] = v; } return *this; }
