@@ -108,6 +108,9 @@ public:
 	void dataCalloc() { data.ptr = (char *)calloc(1, size()); }
 	void dataFree() { if(hasData()) free(data.ptr); }
 	
+	///! set all data to zero.
+	void zero() { if(hasData()) memset(data.ptr, 0, size()); }
+	
 	///! Use a pure C function to fill an array with data:
 	template<typename T> void fill(void (*func)(T * values, double normx));
 	template<typename T> void fill(void (*func)(T * values, double normx, double normy));
