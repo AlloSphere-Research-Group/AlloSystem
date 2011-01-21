@@ -84,7 +84,7 @@ Example usage (receiving):
 	// Poll socket manually at periodic intervals ...
 	r.timeout(0);	// set to be non-blocking
 	void myThreadFunc(){
-		r.recv();
+		while (r.recv()) {}	// use while loop to empty queue
 	}
 
 	// or, launch an automatic background thread
@@ -367,7 +367,9 @@ public:
 	/// Set packet handling routine
 	Recv& handler(PacketHandler& v){ mHandler = &v; return *this; }
 
-	/// Check for OSC packet and call handler
+	/// Check for an OSC packet and call handler
+	/// returns bytes read
+	/// note: use while(recv()){} to ensure queue is fully flushed.
 	int recv();
 	
 	/// Begin a background thread to poll the socket. 

@@ -213,7 +213,7 @@ Recv::Recv(unsigned int port, const char * address, al_sec timeout)
 {}
 
 int Recv::recv(){
-	int r = SocketRecv::recv(&mBuffer[0], mBuffer.size());;
+	int r = SocketRecv::recv(&mBuffer[0], mBuffer.size());
 	if(r && mHandler){
 		mHandler->parse(&mBuffer[0], r);
 	}

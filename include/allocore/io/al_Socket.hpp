@@ -156,7 +156,11 @@ public:
 	{}
 	
 	/// Read data from a network
-
+	/// returns bytes read.
+	
+	/// note: to ensure receipt of all messages in the queue, use 
+	/// while(recv()){}
+	
 	/// @param[in] buffer	A buffer to copy the received data into
 	/// @param[in] maxlen	The maximum length, in bytes, of data to copy
 	size_t recv(char * buffer, size_t maxlen){ return Socket::recv(buffer, maxlen); }
