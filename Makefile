@@ -105,13 +105,13 @@ gamma glv:
 install: $(SLIB_PATH)
 	@$(INSTALL) -d $(DESTDIR)/lib
 
-	# copy all header files from local build directory to destination
+#	copy all header files from local build directory to destination
 	@for v in `cd $(BUILD_DIR)/include && find * -type d ! -path '*.*'`; do \
 		$(INSTALL) -d $(DESTDIR)/include/$$v; \
 		$(INSTALL) -c -m 644 $(BUILD_DIR)/include/$$v/*.h* $(DESTDIR)/include/$$v;\
 	done
 
-	# copy all library files from local build directory to destination
+# 	copy all library files from local build directory to destination
 	@for v in `cd $(BUILD_DIR)/lib && find * -type d ! -path '*.*'`; do \
 		$(INSTALL) -d $(DESTDIR)/lib/$$v; \
 		$(INSTALL) -c -m 644 $(BUILD_DIR)/lib/$$v/*.* $(DESTDIR)/lib/$$v;\
