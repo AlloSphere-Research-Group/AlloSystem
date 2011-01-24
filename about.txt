@@ -1,53 +1,69 @@
-===========================================================================
 AlloSphere Core C/C++ Libraries
-===========================================================================
 
-The core is divided into modules.
-
-___________________________________________________________________________
-Directory Structure
-___________________________________________________________________________
-
-build/
-	- location of built libraries
-
-include/
-	- contains all header files organized by module name
-
-projects/
-	- project files for building libraries and examples
-
-src/
-	- library source files (.c, .cpp)
-
-unitTests/
-	- unit tests for library
-
-examples/
-	- example projects using library
+AlloSphere Research Group
+University of California, Santa Barbara
 
 
+========================================
+1. About
+========================================
+The AlloCore is a cross-platform suite of C++ components for building interactive multimedia tools and applications.
 
-allosuite
-	allocore
-	allojit
-	glv
-	gamma
-	(smaller projects)
+________________________________________
+1.1 Directory Structure
+________________________________________
+The project root is organized into the following main directories:
 
-	build/
+	include/	- AlloCore header files organized by module name
+	src/		- AlloCore source files (.c, .cpp)
 
-projects
-	nanomed
-	allosuite -rX
+	external/	- optional external libraries included for convenience
+
+	linux/		- Linux specific project files and dependent libraries
+	osx/		- Mac OSX specific project files and dependent libraries
+	share/		- resource files for testing and demonstration purposes
+
+	examples/	- example projects using library
+	unitTests/	- unit tests for library
+
+	build/		- default build folder, constructed on first use
+
+The build folder (typically ./build/) is organized using a Unix-style hierarchy as follows:
+
+	bin/		- binary executables
+	include/	- library header files
+	lib/		- libraries
+	obj/		- built object files
 
 
+========================================
+2. Compilation Instructions
+========================================
+----------------------------------------
+2.1 Building a Library
+----------------------------------------
+........................................
+Make (Linux, OS X)
+........................................
 
-build/
-	bin/		# executables
-	include/	
-	lib/
-	share/		# architecture independent data
+The following variables can be modified to customize where built files are placed:
 
-	home/		# contains the home directories for the users
-	etc/		# contains configuration files
+	BUILD_DIR		- location to build files into (default = ./build)
+	DESTDIR			- location to install built files into (default = /usr/local/)
+
+The following rules are available:
+
+	make allocore		- build allocore library
+	make allojit		- build allocore JIT extension
+	make alloutil		- build allocore utilities extension
+	make gamma		- build Gamma external library
+	make glv		- build GLV external library
+
+	make install		- installs built components
+	make clean		- removes binaries from build folder
+
+	make examples/x.cpp	- builds and runs example source file x.cpp
+
+
+The rules that build examples and tests will automatically run the executable by default. To turn this off, pass AUTORUN=0 to make. The examples and tests rules follow standard Unix conventions so that, for instance, all the tests can be built and run by typing the command 'make tests/test*.cpp'.
+
