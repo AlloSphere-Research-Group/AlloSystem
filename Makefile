@@ -112,9 +112,9 @@ install: $(SLIB_PATH)
 	done
 
 # 	copy all library files from local build directory to destination
-	@for v in `cd $(BUILD_DIR)/lib && find * -type d ! -path '*.*'`; do \
+	@for v in `cd $(BUILD_DIR)/lib && find * -type d ! -path '*.*'` .; do \
 		$(INSTALL) -d $(DESTDIR)/lib/$$v; \
-		$(INSTALL) -c -m 644 $(BUILD_DIR)/lib/$$v/*.* $(DESTDIR)/lib/$$v;\
+		$(INSTALL) -c -m 644 $(BUILD_DIR)/lib/$$v/*.a $(DESTDIR)/lib/$$v; \
 	done
 
 #	# copy header from local include directory
