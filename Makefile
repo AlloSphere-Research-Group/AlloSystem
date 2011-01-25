@@ -103,7 +103,6 @@ gamma glv:
 # Include files are copied into DESTDIR/include/LIB_NAME and
 # library files are copied to DESTDIR/lib
 install: $(SLIB_PATH)
-	@$(INSTALL) -d $(DESTDIR)/lib
 
 #	copy all header files from local build directory to destination
 	@for v in `cd $(BUILD_DIR)/include && find * -type d ! -path '*.*'`; do \
