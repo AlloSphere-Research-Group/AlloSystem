@@ -8,8 +8,7 @@
 
 namespace al {
 
-///<	Camera stores optics settings important for rendering
-///
+/// Camera stores optics settings important for rendering
 class Camera {
 public:
 	enum Eye{
@@ -47,11 +46,7 @@ public:
 	double zoom() const { return mZoom; }					///< Get zoom amount
 	double IOD() const { return eyeSep() * focalLength()/30.0; }	///< Get automatic inter-ocular distance
 
-//	Matrix4d modelViewMatrix(Eye e=MONO);
-//	Matrix4d projectionMatrix(Eye e=MONO);
-//	Frustumd frustum(Eye e=MONO);
-
-	void frustum(Frustumd& f, const Pose& p) const;			///< Get frustum
+	void frustum(Frustumd& f, const Pose& p, double aspectRatio) const;		///< Get frustum, TODO: off-axis
 
 	double height(double distance);							///< Height of view at distance from camera
 
@@ -60,7 +55,7 @@ protected:
 	double mNear, mFar;			// Cutting plane distances
 	double mFocalLength;		// Focal length along vd
 	double mEyeSep;				// Eye separation
-	double mAspectRatio;		// frustum aspect ratio
+	double mAspectRatio;		// frustum aspect ratio, TODO: extraneous? always derived from viewport...
 	double mZoom;
 	Vec3d mStereoOffset;		// eye offset vector (right eye; left eye is inverse), usually (1, 0, 0)
 };

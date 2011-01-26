@@ -20,20 +20,19 @@ Camera :: Camera(
 	mZoom(0)
 {}
 
-void Camera::frustum(Frustumd& f, const Pose& p) const {
+
+void Camera::frustum(Frustumd& f, const Pose& p, double aspect) const {
 
 	Vec3d ur, uu, uf;
-	p.quat().toVectorX(ur);
-	p.quat().toVectorY(uu);
-	p.quat().toVectorZ(uf);
+	p.unitVectors(ur, uu, uf);
 	const Vec3d& pos = p.pos();
 
-	static double const tanCoef = 0.01745329252*0.5;	// degree-to-radian over /2
+	static double const tanCoef = 0.01745329252*0.5;	// degree-to-radian over 2
 	double tanFOV = tan(fovy() * tanCoef);
 	double nh = near() * tanFOV;
-	double nw = nh * aspectRatio(); 
+	double nw = nh * aspect; 
 	double fh = far()  * tanFOV;
-	double fw = fh * aspectRatio();
+	double fw = fh * aspect;
 //	Vec3d Z = (pos - l).normalize();
 //	Vec3d X = cross(uu, Z).normalize();
 //	Vec3d Y = cross(Z, X);
