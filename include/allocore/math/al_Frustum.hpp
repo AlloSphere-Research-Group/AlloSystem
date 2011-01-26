@@ -60,7 +60,7 @@ public:
 	enum{ OUTSIDE, INTERSECT, INSIDE };
 
 	Vec<3,T> ntl, ntr, nbl, nbr, ftl, ftr, fbl, fbr;	// corners
-	Plane<T> pl[6];									// faces
+	Plane<T> pl[6];										// faces
 
 	/// Test whether point is in frustum
 	int pointInFrustum(const Vec<3,T>& p) const;
