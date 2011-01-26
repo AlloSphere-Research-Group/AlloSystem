@@ -160,6 +160,7 @@ public:
 	Camera& camera(){ return mCamera; }
 
 	const Nav& nav() const { return mNav; }
+	Nav& nav(){ return mNav; }
 
 	World& name(const std::string& v){ mName=v; return *this; }
 
