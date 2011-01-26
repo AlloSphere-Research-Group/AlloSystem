@@ -73,7 +73,7 @@ public:
 	/// Animation (model update) callback
 	virtual void onAnimate(double dt){}
 
-	/// Drawing callback
+	/// Drawing callback (in world coordinates)
 	
 	/// This will be called from the main graphics renderer. Since it may be 
 	/// called multiple times, no state updates should be made in it.
@@ -83,25 +83,25 @@ protected:
 };
 
 
-class Spectator : public Listener {
-public:
-	typedef std::vector<Viewpoint *> Viewpoints;
+//class Spectator : public Listener {
+//public:
+//	typedef std::vector<Viewpoint *> Viewpoints;
+//
+//protected:
+//};
 
-protected:
-};
 
-
-class AlloView : public Window {
+class ViewpointWindow : public Window {
 public:
 	using Window::add;
 	typedef std::vector<Viewpoint *> Viewpoints;
 
-	AlloView(){
+	ViewpointWindow(){
 		add(new StandardWindowKeyControls);
 		add(new ResizeHandler(*this));
 	}
 	
-	AlloView(
+	ViewpointWindow(
 		int l, int t, int w, int h,
 		const std::string title,
 		double fps=40,
@@ -120,11 +120,11 @@ protected:
 	Viewpoints mViewpoints;
 	
 	struct ResizeHandler : public WindowEventHandler{
-		ResizeHandler(AlloView& v_): v(v_){}
+		ResizeHandler(ViewpointWindow& w_): w(w_){}
 		bool onResize(int dw, int dh){
-			Viewpoints::iterator iv = v.mViewpoints.begin();
+			Viewpoints::iterator iv = w.mViewpoints.begin();
 			
-			while(iv != v.mViewpoints.end()){
+			while(iv != w.mViewpoints.end()){
 				Viewpoint& vp = **iv;
 
 				vp.viewport().l += dw * vp.anchorX();
@@ -136,7 +136,7 @@ protected:
 			}
 			return true;
 		}
-		AlloView& v;
+		ViewpointWindow& w;
 	};
 };
 
@@ -167,7 +167,7 @@ public:
 		mActors.push_back(&v);
 	}
 	
-	void add(AlloView& v, bool animates=false);
+	void add(ViewpointWindow& win, bool animates=false);
 	
 	void start(){
 		mAudioIO.start();
@@ -180,11 +180,11 @@ protected:
 
 	typedef std::vector<Actor *> Actors;
 	typedef std::vector<Listener *> Listeners;
-	typedef std::vector<AlloView *> Viewports;
+	typedef std::vector<ViewpointWindow *> Windows;
 	
 	Actors mActors;
 	Listeners mListeners;
-	Viewports mViewports;
+	Windows mWindows;
 	Nav mNav;
 	Camera mCamera;
 
@@ -219,7 +219,7 @@ protected:
 
 	// This is called by each window to render all actors in each of its view regions
 	struct DrawActors : public WindowEventHandler{
-		DrawActors(AlloView& v_, World& w_): v(v_), w(w_){}
+		DrawActors(ViewpointWindow& win_, World& w_): win(win_), w(w_){}
 
 		virtual bool onFrame(){
 
@@ -229,8 +229,8 @@ protected:
 			
 			g.depthTesting(true);
 			
-			//printf("%f %f %f\n", navMaster.x(), navMaster.y(), navMaster.z());
-			//printf("%p: %f %f %f\n", &v.camera(), cam.x(), cam.y(), cam.z());
+//			printf("%f %f %f\n", w.nav().x(), w.nav().y(), w.nav().z());
+//			printf("%p: %f %f %f\n", &v.camera(), cam.x(), cam.y(), cam.z());
 
 			struct DrawAllActors : public Drawable {
 				DrawAllActors(Actors& as_, World& w_, Viewpoint& v_)
@@ -239,12 +239,10 @@ protected:
 					Actors::iterator ia = as.begin();
 					while(ia != as.end()){
 						Actor& a = *(*ia);
-						g.matrixMode(g.MODELVIEW);
-						g.pushMatrix();
-						g.multMatrix(a.matrix());
+						g.pushMatrix(g.MODELVIEW);
+						//g.multMatrix(a.matrix()); // draw in relative coords
 						a.onDraw(g,v);
-						g.matrixMode(g.MODELVIEW);
-						g.popMatrix();
+						g.popMatrix(g.MODELVIEW);
 						++ia;
 					}
 				}
@@ -253,24 +251,29 @@ protected:
 				Viewpoint& v;
 			};
 
-			AlloView::Viewpoints::const_iterator iv = v.viewpoints().begin();
+			ViewpointWindow::Viewpoints::const_iterator iv = win.viewpoints().begin();
 			
-			while(iv != v.viewpoints().end()){
+			while(iv != win.viewpoints().end()){
 				Viewpoint& vp = *(*iv);
 				
 				// if no camera, set to default scene camera
 				if(!vp.hasCamera()) vp.camera(w.camera());
 
 				const Camera& cam = vp.camera();
-				DrawAllActors drawFunc(w.mActors, w, vp);
-				w.mStereo.draw(g, cam, w.nav() * vp.transform(), vp.viewport(), drawFunc);
+
+				// get viewpoint in world coords
+				Viewpoint vpWorld = vp;
+				vpWorld.transform() = w.nav() * vpWorld.transform();
+
+				DrawAllActors drawFunc(w.mActors, w, vpWorld);
+				w.mStereo.draw(g, cam, vpWorld.transform(), vpWorld.viewport(), drawFunc);
 				++iv;
 			}
 
 			return true;
 		}
 
-		AlloView& v;
+		ViewpointWindow& win;
 		World& w;
 	};
 	

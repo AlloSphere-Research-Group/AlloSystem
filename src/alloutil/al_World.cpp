@@ -2,12 +2,12 @@
 
 namespace al{
 
-void World::add(AlloView& v, bool animates){
-	v.add(new NavInputControl(&mNav));
-	v.add(new DrawActors(v, *this));
-	v.add(new SceneInputControl(*this));
-	if(animates) v.add(new AnimateActors(*this));
-	mViewports.push_back(&v);
+void World::add(ViewpointWindow& win, bool animates){
+	win.add(new NavInputControl(&mNav));
+	win.add(new DrawActors(win, *this));
+	win.add(new SceneInputControl(*this));
+	if(animates) win.add(new AnimateActors(*this));
+	mWindows.push_back(&win);
 }
 
 } // al::
