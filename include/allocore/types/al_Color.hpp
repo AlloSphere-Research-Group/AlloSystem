@@ -172,12 +172,13 @@ struct HSV{
 	HSV& operator=(const Color& c);
 	
 	/// Rotate hue in interval [0, 1)
-	HSV& rotateHue(float v){ h += v; wrapHue(); return *this; }
+	HSV& rotateHue(float v){ h += v; return wrapHue(); }
 	
 	/// Wrap hue value into valid interval [0, 1)
-	void wrapHue(){
+	HSV& wrapHue(){
 		if(h>1){ h -= int(h); }
 		else if(h<0){ h -= int(h)-1; }
+		return *this;
 	}
 };
 
