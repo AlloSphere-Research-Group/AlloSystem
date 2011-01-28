@@ -291,35 +291,22 @@ public:
 	
 	/// The order by which handlers are added matches their calling order.
 	/// The window's event handlers are called before any attached handlers.
-	Window& add(InputEventHandler * v){
-		mInputEventHandlers.push_back(&(v->window(this)));
-		return *this;
-	}
+	Window& add(InputEventHandler * v);
 
 	/// Add window event handler
 	
 	/// The order by which handlers are added matches their calling order.
 	/// The window's event handlers are called before any attached handlers.
-	Window& add(WindowEventHandler * v){
-		mWindowEventHandlers.push_back(&(v->window(this)));
-		return *this;
-	}
+	Window& add(WindowEventHandler * v);
+
+	Window& prepend(InputEventHandler * v);
+	Window& prepend(WindowEventHandler * v);
 
 	/// Remove all input event handlers matching argument
-	Window& remove(InputEventHandler * v){
-		// the proper way to do it:
-		mInputEventHandlers.erase(std::remove(mInputEventHandlers.begin(), mInputEventHandlers.end(), v), mInputEventHandlers.end());
-		v->mWindow = NULL;
-		return *this;
-	}
+	Window& remove(InputEventHandler * v);
 
 	/// Remove all window event handlers matching argument
-	Window& remove(WindowEventHandler * v){
-		// the proper way to do it:
-		mWindowEventHandlers.erase(std::remove(mWindowEventHandlers.begin(), mWindowEventHandlers.end(), v), mWindowEventHandlers.end());
-		v->mWindow = NULL;
-		return *this;
-	}
+	Window& remove(WindowEventHandler * v);
 
 	/// Destroy all created windows
 	static void destroyAll();

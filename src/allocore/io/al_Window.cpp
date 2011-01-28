@@ -25,6 +25,8 @@ void Keyboard::meta (bool state){mModifiers[4] = state;}
 void Keyboard::shift(bool state){mModifiers[0] = state;}
 void Keyboard::setKey(int k, bool v){ mKeycode=k; mDown=v; }
 
+
+
 Mouse::Mouse(): mX(0), mY(0), mButton(Left){
 	for(int i=0; i<AL_MOUSE_MAX_BUTTONS; ++i){
 		mBX[i] = mBY[i] = 0; mB[i] = false;
@@ -43,7 +45,6 @@ bool Mouse::left() const { return mB[Left]; }
 bool Mouse::middle() const { return mB[Middle]; }
 bool Mouse::right() const { return mB[Right]; }
 
-
 void Mouse::button(int b, bool v){ mButton=b; mB[b]=v; if(v){ mBX[b]=mX; mBY[b]=mY; } }
 void Mouse::position(int x, int y){ mDX=x-mX; mDY=y-mY; mX=x; mY=y; }
 
@@ -56,6 +57,8 @@ InputEventHandler :: ~InputEventHandler() {
 WindowEventHandler :: ~WindowEventHandler() {
 	if (mWindow) mWindow->remove(this);
 }
+
+
 
 void Window::init(){
 
@@ -71,7 +74,39 @@ Window& Window::fullScreenToggle(){
 	return *this;
 }
 
+Window& Window::add(InputEventHandler * v){
+	mInputEventHandlers.push_back(&(v->window(this)));
+	return *this;
+}
 
+Window& Window::add(WindowEventHandler * v){
+	mWindowEventHandlers.push_back(&(v->window(this)));
+	return *this;
+}
+
+Window& Window::prepend(InputEventHandler * v){
+	mInputEventHandlers.insert(mInputEventHandlers.begin(), &(v->window(this)));
+	return *this;
+}
+
+Window& Window::prepend(WindowEventHandler * v){
+	mWindowEventHandlers.insert(mWindowEventHandlers.begin(), &(v->window(this)));
+	return *this;
+}
+
+Window& Window::remove(InputEventHandler * v){
+	// the proper way to do it:
+	mInputEventHandlers.erase(std::remove(mInputEventHandlers.begin(), mInputEventHandlers.end(), v), mInputEventHandlers.end());
+	v->mWindow = NULL;
+	return *this;
+}
+
+Window& Window::remove(WindowEventHandler * v){
+	// the proper way to do it:
+	mWindowEventHandlers.erase(std::remove(mWindowEventHandlers.begin(), mWindowEventHandlers.end(), v), mWindowEventHandlers.end());
+	v->mWindow = NULL;
+	return *this;
+}
 
 
 } // al::
