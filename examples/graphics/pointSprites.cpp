@@ -56,12 +56,13 @@ struct MyWindow : Window{
 		gl.loadMatrix(Matrix4d::lookAt(Vec3d(0,0,-4), Vec3d(0,0,0), Vec3d(0,1,0)));
 
 		gl.depthTesting(0);
-		gl.blending(1, gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+		gl.blending(1, gl.SRC_ALPHA, gl.ONE);
 
 		++angleY;
 
 		gl.pushMatrix();
 		
+			glColor4f(1,1,1,0.3);
 			glEnable(GL_POINT_SPRITE);
 			glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 			glPointSize(50);
