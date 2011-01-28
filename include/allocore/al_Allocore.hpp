@@ -24,6 +24,14 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
+/*! \mainpage AlloCore
+
+	\section intro_sec About
+
+	The AlloCore is a cross-platform suite of C++ components for building 
+	interactive multimedia tools and applications.
+*/
+
 #include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_GraphicsOpenGL.hpp"
 #include "allocore/graphics/al_Image.hpp"
