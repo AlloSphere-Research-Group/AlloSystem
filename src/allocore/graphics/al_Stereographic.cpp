@@ -133,7 +133,6 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 	const Vec3d& pos = pose.pos();
 	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
 
-	gl.scissor(true);
 	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 
 
@@ -197,7 +196,6 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 	//drawBuffer(BackLeft);
 	glDrawBuffer(GL_BACK);
 	
-	gl.scissor(true);
 	gl.viewport(vp.l, vp.b, vp.w*0.5, vp.h);
 	
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);

@@ -136,9 +136,9 @@ void GraphicsGL::p_clearColor(float r, float g, float b, float a) {
 	
 	// Coordinate Transforms
 void GraphicsGL :: p_viewport(int x, int y, int width, int height) {
+	glViewport(x, y, width, height);
 	glEnable(GL_SCISSOR_TEST);
 	glScissor(x, y, width, height);
-	glViewport(x, y, width, height);
 }
 
 void GraphicsGL :: p_matrixMode(MatrixMode mode) {
