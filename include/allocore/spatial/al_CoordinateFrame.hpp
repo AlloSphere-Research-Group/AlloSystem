@@ -156,7 +156,7 @@ public:
 		// rotate target into local frame:
 		quat().rotate(target);
 		// push ourselves in that particular direction:
-		push(target * amt);
+		nudge(target * amt);
 	}
 
 	/// Set linear velocity
@@ -254,7 +254,7 @@ public:
 	}
 
 protected:
-	Vec3d mVel0, mMove1;	// linear velocities (raw, smoothed)
+	Vec3d mMove0, mMove1;	// linear velocities (raw, smoothed)
 	Vec3d mSpin0, mSpin1;	// angular velocities (raw, smoothed)
 	Vec3d mTurn;
 	Vec3d mNudge;			//  

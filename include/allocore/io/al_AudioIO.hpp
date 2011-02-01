@@ -73,6 +73,7 @@
 
 
 #include <string>
+#include <vector>
 
 namespace al{
 
@@ -214,6 +215,16 @@ protected:
 };
 
 
+
+/// Interface for objects which can be registered with an audio IO stream
+
+class AudioCallback {
+public:
+	virtual ~AudioCallback() {}
+	virtual void onAudioCB(AudioIOData& io) = 0;
+};
+
+
 /// Audio input/output streaming.
 
 ///
@@ -225,8 +236,8 @@ public:
 	///
 	/// @param[in] framesPerBuf		Number of sample frames to process per callback
 	/// @param[in] framesPerSec		Frame rate.  Unsupported values will use default rate of device.
-	/// @param[in] callback			Audio processing callback
-	/// @param[in] userData			Pointer to user data accessible within callback
+	/// @param[in] callback			Audio processing callback (optional)
+	/// @param[in] userData			Pointer to user data accessible within callback (optional)
 	/// @param[in] outChans			Number of output channels to open
 	/// @param[in] inChans			Number of input channels to open
 	/// If the number of input or output channels is greater than the device
@@ -244,6 +255,12 @@ public:
 	using AudioIOData::framesPerSecond;
 
 	audioCallback callback;						///< User specified callback function.
+	
+	/// Add an AudioCallback handler (internal callback is always called first):
+	AudioIO& append(AudioCallback * v);		
+	AudioIO& prepend(AudioCallback * v);
+	/// Remove all input event handlers matching argument:
+	AudioIO& remove(AudioCallback * v);
 
 	bool autoZeroOut() const { return mAutoZeroOut; }
 	int channels(bool forOutput) const;
@@ -288,12 +305,17 @@ private:
 	bool mZeroNANs;			// whether to zero NANs
 	bool mClipOut;			// whether to clip output between -1 and 1
 	bool mAutoZeroOut;		// whether to automatically zero output buffers each block
+	
+	std::vector<AudioCallback *> mAudioCallbacks;
 
 	void init();		// Initializes PortAudio and member variables.
 	void deferBufferResize(bool forOutput);
 	void reopen();		// reopen stream (restarts stream if needed)
 	void resizeBuffer(bool forOutput);
 };
+
+
+
 
 
 //==============================================================================

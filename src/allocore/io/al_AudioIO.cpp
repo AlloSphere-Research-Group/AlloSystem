@@ -283,6 +283,22 @@ void AudioIO::init(){
 	mImpl->setOutDeviceChans(0);
 }
 
+AudioIO& AudioIO::append(AudioCallback * v){
+	mAudioCallbacks.push_back(v);
+	return *this;
+}
+
+AudioIO& AudioIO::prepend(AudioCallback * v){
+	mAudioCallbacks.insert(mAudioCallbacks.begin(), v);
+	return *this;
+}
+
+AudioIO& AudioIO::remove(AudioCallback * v){
+	// the proper way to do it:
+	mAudioCallbacks.erase(std::remove(mAudioCallbacks.begin(), mAudioCallbacks.end(), v), mAudioCallbacks.end());
+	return *this;
+}
+
 void AudioIO::deviceIn(const AudioDevice& v){
 
 	if(v.valid() && v.hasInput()){
@@ -531,7 +547,17 @@ void AudioIO::print(){
 }
 
 
-void AudioIO::processAudio(){ frame(0); if(callback) callback(*this); }
+//void AudioIO::processAudio(){ frame(0); if(callback) callback(*this); }
+void AudioIO::processAudio(){ 
+	frame(0); 
+	if(callback) callback(*this); 
+	
+	std::vector<AudioCallback *>::iterator iter = mAudioCallbacks.begin(); 
+	while(iter != mAudioCallbacks.end()){
+		frame(0); 
+		(*iter++)->onAudioCB(*this); 
+	}
+}
 
 int AudioIO::channels(bool forOutput) const { return forOutput ? channelsOut() : channelsIn(); }
 double AudioIO::cpu() const { return Pa_GetStreamCpuLoad(mImpl->mStream); }
