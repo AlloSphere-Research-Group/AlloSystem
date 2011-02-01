@@ -84,7 +84,12 @@ public:
 	T dot(const Quat& v) const { return w*v.w + x*v.x + y*v.y + z*v.z; }
 
 	/// Returns identity
-	static Quat identity(){ return Quat(1,0,0,0); }
+	void identity() { set(1,0,0,0); }
+	
+	/// these are 180 degree rotations around the various axes:
+	void flipX() { return set(T(0), T(1), T(0), T(0)); } 
+	void flipY() { return set(T(0), T(0), T(1), T(0)); } 
+	void flipZ() { return set(T(0), T(0), T(0), T(1)); } 
 
 	/// Returns inverse (same as conjugate if normalized as q^-1 = q_conj/q_mag^2)
 	Quat inverse() const { return sgn().conj(); }
@@ -231,7 +236,8 @@ public:
 	/// Quatd rot = Quatd::getRotationTo(src, dst);
 	/// A.quat() = rot * A.quat();
 	static Quat<T> getRotationTo(const Vec<3, T>& src, const Vec<3, T>& dst);
-
+	
+	
 protected:
 	static const double degToHalfRad(){ return 0.5*M_DEG2RAD; }
 	static const double halfRadToDeg(){ return 2.0*M_RAD2DEG; }
