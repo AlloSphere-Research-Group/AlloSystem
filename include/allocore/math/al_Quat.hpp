@@ -126,13 +126,22 @@ public:
 	Quat& fromAxisAngle(T angle, const Vec<3,T>& axis) { return fromAxisAngle(angle, axis[0], axis[1], axis[2]); }
 
 	/// Set as versor rotated by angle around x-axis
-	Quat& fromAxisX(T angle){ return fromAxisAngle(angle, 1,0,0); }
+	Quat& fromAxisX(T angle) {
+		T t2 = angle * degToHalfRad();
+		return set(cos(t2), sin(t2), T(0), T(0));
+	}
 
 	/// Set as versor rotated by angle around y-axis
-	Quat& fromAxisY(T angle){ return fromAxisAngle(angle, 0,1,0); }
+	Quat& fromAxisY(T angle){
+		T t2 = angle * degToHalfRad();
+		return set(cos(t2), T(0), sin(t2), T(0));
+	}
 
 	/// Set as versor rotated by angle around z-axis
-	Quat& fromAxisZ(T angle){ return fromAxisAngle(angle, 0,0,1); }
+	Quat& fromAxisZ(T angle){
+		T t2 = angle * degToHalfRad();
+		return set(cos(t2), T(0), T(0), sin(t2));
+	}
 
 	/// Set as versor rotated by Euler angles, in degrees
 	Quat& fromEuler(T az, T el, T ba);
