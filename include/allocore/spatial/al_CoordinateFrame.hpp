@@ -16,6 +16,8 @@ public:
 	Pose(const Vec3d& v=Vec3d(0), const Quatd& q=Quatd::identity())
 	:	mVec(v), mQuat(q)
 	{}
+	
+	Pose(const Pose& p) { set(p); }
 
 	Pose operator* (const Pose& v) const { return Pose(*this)*=v; }
 
@@ -92,6 +94,30 @@ protected:
 	Quatd mQuat;	// orientation of reference frame as a quaternion (relative to global axes)
 };
 
+/// A smoothed Pose:
+/// It approaches the stored target Pose exponentially
+/// with a curvature determined by psmooth and qsmooth
+class SmoothPose : public Pose {
+public:
+	SmoothPose(const Pose& init, double psmooth=0.9, double qsmooth=0.9) 
+	:	Pose(init), mTarget(init), mPF(psmooth), mQF(qsmooth) {}
+	
+	// different ways to set the target:
+	Pose& target() { return mTarget; }
+	void target(const Pose& p) { mTarget.set(p); }
+	void target(const Vec3d& p) { mTarget.pos().set(p); }
+	void target(const Quatd& p) { mTarget.quat().set(p); } 
+	
+	// step toward the target:
+	void step() {
+		pos().lerp(mTarget.pos(), mPF);
+		quat().slerp(mTarget.quat(), mQF);
+	}
+
+protected:
+	Pose mTarget;
+	double mPF, mQF;
+};
 
 ///	A mobile coordinate frame
 
