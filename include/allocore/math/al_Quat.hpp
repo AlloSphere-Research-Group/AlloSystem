@@ -191,7 +191,7 @@ public:
 
 	/// Rotate vector
 	void rotate(Vec<3,T>& v) const;
-	void rotateVector(const T * src, T * dst) const;
+	void rotateVector(const Vec<3,T>& src, Vec<3,T>& dst) const;
 	Vec<3,T> rotateVector(const Vec<3,T>& src) const;
 	void rotateVectorTransposed(const T * src, T * dst) const;
 	Vec<3,T> rotateVectorTransposed(const Vec<3,T>& src) const;
@@ -505,7 +505,7 @@ template<typename T>
 inline void Quat<T>::rotate(Vec<3,T>& v) const{ rotateVector(v,v); }
 
 template<typename T>
-inline void Quat<T> :: rotateVector(const T * src, T * dst) const {
+inline void Quat<T> :: rotateVector(const Vec<3,T>& src, Vec<3,T>& dst) const {
 	static const T c1 = T(1);
 	static const T c2 = T(2);
 	const T x = src[0];

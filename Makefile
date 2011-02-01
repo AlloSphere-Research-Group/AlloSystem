@@ -68,6 +68,7 @@ ifneq ($(AUTORUN), 0)
 	@$(BIN_DIR)$(*F)
 endif
 
+all: alloutil allocore gamma glv
 
 # AlloCore extensions
 extensions: allojit alloutil allocore

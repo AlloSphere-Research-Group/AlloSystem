@@ -147,18 +147,31 @@ public:
 		rot.toEuler(rotEuler);
 		mTurn.set(rotEuler * amt);
 	}
+	
+	/// move toward a given world-coordinate point 
+	void nudgeToward(const Vec3d& p, double amt=1.) {
+		Vec3d rotEuler;
+		Vec3d target(p - pos());
+		target.normalize();	// unit vector of direction to move (in world frame)
+		// rotate target into local frame:
+		quat().rotate(target);
+		// push ourselves in that particular direction:
+		push(target * amt);
+	}
 
 	/// Set linear velocity
 	void move(double dr, double du, double df) { moveR(dr); moveU(du); moveF(df); }
+	void move(Vec3d dp) { moveR(dp[0]); moveU(dp[1]); moveF(dp[2]); }
 	void moveR(double v){ mMove0[0] = v; }
 	void moveU(double v){ mMove0[1] = v; }
 	void moveF(double v){ mMove0[2] = v; }
 
 	/// Accelerate
-	void push(double ddr, double ddu, double ddf) { pushR(ddr); pushU(ddu); pushF(ddf); }
-	void pushR(double amount) { mMove0[0] += amount; }
-	void pushU(double amount) { mMove0[1] += amount; }
-	void pushF(double amount) { mMove0[2] += amount; }
+	void nudge(double ddr, double ddu, double ddf) { nudgeR(ddr); nudgeU(ddu); nudgeF(ddf); }
+	void nudge(Vec3d dp) { nudgeR(dp[0]); nudgeU(dp[1]); nudgeF(dp[2]); }
+	void nudgeR(double amount) { mNudge[0] += amount; }
+	void nudgeU(double amount) { mNudge[1] += amount; }
+	void nudgeF(double amount) { mNudge[2] += amount; }
 
 	/// Set all angular velocity values from azimuth, elevation, and bank differentials
 	void spin(double da, double de, double db){ spinR(de); spinU(da); spinF(db); }
@@ -185,6 +198,7 @@ public:
 		mSpin0.set(0); 
 		mSpin1.set(0); 
 		mTurn.set(0);
+		mNudge.set(0);
 		updateUnitVectors();
 		return *this; 
 	}
@@ -224,10 +238,11 @@ public:
 		Vec3d angVel = mSpin0 + mTurn;
 
 		// low-pass filter velocities
-		mMove1.lerp(mMove0*dt, amt);
+		mMove1.lerp(mMove0*dt + mNudge, amt);
 		mSpin1.lerp(mSpin0*dt + mTurn, amt);
 
 		mTurn.set(0); // turn is just a one-shot increment, so clear each frame
+		mNudge.set(0);
 
 		mQuat *= vel().quat();
 		updateUnitVectors();
@@ -239,9 +254,10 @@ public:
 	}
 
 protected:
-	Vec3d mMove0, mMove1;	// linear velocities (raw, smoothed)
+	Vec3d mVel0, mMove1;	// linear velocities (raw, smoothed)
 	Vec3d mSpin0, mSpin1;	// angular velocities (raw, smoothed)
-	Vec3d mTurn;			// 
+	Vec3d mTurn;
+	Vec3d mNudge;			//  
 	Vec3d mUR, mUU, mUF;	// basis vectors of coordinate frame
 	double mSmooth;
 	double mVelScale;		// velocity scaling factor
