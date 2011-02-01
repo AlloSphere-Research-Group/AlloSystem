@@ -62,10 +62,11 @@ public:
 	Quat operator + (const    T& v) const { return Quat(*this)+=v; }
 	Quat operator - (const Quat& v) const { return Quat(*this)-=v; }
 	Quat operator - (const    T& v) const { return Quat(*this)-=v; }
-	Quat operator * (const Quat& v) const { return Quat(*this)*=v; }
-	Quat operator * (const    T& v) const { return Quat(*this)*=v; }
 	Quat operator / (const Quat& v) const { return Quat(*this)/=v; }
 	Quat operator / (const    T& v) const { return Quat(*this)/=v; }
+	Quat operator * (const Quat& v) const { return Quat(*this)*=v; }
+	Vec3<3,T> operator * (const Vec3<3,T>& v) const { return rotateVectorTransposed(v); }
+	Quat operator * (const    T& v) const { return Quat(*this)*=v; }
 
 
 	Quat& operator  =(const Quat& v){ return set(v); }
