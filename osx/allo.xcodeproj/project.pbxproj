@@ -303,13 +303,6 @@
 			remoteGlobalIDString = 36B4130E10EFFA8D007B16D0;
 			remoteInfo = libal;
 		};
-		367FE54E12A5F4FD002D8350 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 36B4130E10EFFA8D007B16D0;
-			remoteInfo = allocore;
-		};
 		3687E33211FA4F9500EC6706 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
@@ -1929,7 +1922,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				367FE54D12A5F4FD002D8350 /* PBXTargetDependency */,
 			);
 			name = exHelloVirtualWorld;
 			productName = exSimpleGraphics;
@@ -2069,6 +2061,7 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "allo" */;
 			compatibilityVersion = "Xcode 3.0";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -2380,11 +2373,6 @@
 			isa = PBXTargetDependency;
 			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
 			targetProxy = 367F0B4D12034F1E00FCC534 /* PBXContainerItemProxy */;
-		};
-		367FE54D12A5F4FD002D8350 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
-			targetProxy = 367FE54E12A5F4FD002D8350 /* PBXContainerItemProxy */;
 		};
 		3687E33111FA4F9500EC6706 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

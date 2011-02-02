@@ -29,10 +29,10 @@ struct Agent : public SoundSource, public Drawable{
 		while(io()){
 			//float s = io.in(0);
 			//float s = rnd::uniform(); // make noise, just to hear something
-			//float s = sin(oscPhase * M_2PI);
-			float s = al::rnd::uniformS();
+			float s = sin(oscPhase * M_2PI);
+			//float s = al::rnd::uniformS();
 			
-			s *= (oscEnv*=0.999);
+			//s *= (oscEnv*=0.999);
 			
 			if(oscEnv < 0.00001){ oscEnv=1; oscPhase=0; }
 			
@@ -49,8 +49,8 @@ struct Agent : public SoundSource, public Drawable{
 		//pos(cos(phase), sin(phase), 0);
 		//pos(0,0,0);
 		
-		//spin(0.3, 0, 0);
-		//moveF(0.04);
+		spin(3., 0, 0);
+		moveF(0.4);
 		step();
 	}
 	

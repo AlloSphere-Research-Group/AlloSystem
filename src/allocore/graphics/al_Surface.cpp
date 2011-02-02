@@ -76,11 +76,13 @@ void Surface::autoClear(bool v) {
 }
 
 int Surface::width() {
-	return mTexture ? mTexture->width() : 0;
+	//return mTexture ? mTexture->width() : 0;
+	return 0;
 }
 
 int Surface::height() {
-	return mTexture ? mTexture->height() : 0;
+	//return mTexture ? mTexture->height() : 0;
+	return 0;
 }
 
 void Surface::clear() {

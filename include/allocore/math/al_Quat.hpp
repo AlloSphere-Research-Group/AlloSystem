@@ -206,7 +206,7 @@ public:
 	void rotate(Vec<3,T>& v) const;
 	void rotateVector(const Vec<3,T>& src, Vec<3,T>& dst) const;
 	Vec<3,T> rotateVector(const Vec<3,T>& src) const;
-	void rotateVectorTransposed(const T * src, T * dst) const;
+	void rotateVectorTransposed(const Vec<3,T>& src, Vec<3,T>& dst) const;
 	Vec<3,T> rotateVectorTransposed(const Vec<3,T>& src) const;
 
 	/// Spherical interpolation
