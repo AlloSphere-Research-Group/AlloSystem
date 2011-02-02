@@ -43,7 +43,7 @@ public:
 	Quat(const Quat& src);
 	
 	/// constructor of 'pure' quaternion
-	Quat(const Vec3<T>& v) { w=0; x=v[0]; y=v[1]; z=v[2]; }
+	Quat(const Vec<3,T>& v) { w=0; x=v[0]; y=v[1]; z=v[2]; }
 
 	/// Set component with index
 	T& operator[](int i){ return components[i];}
@@ -65,7 +65,7 @@ public:
 	Quat operator / (const Quat& v) const { return Quat(*this)/=v; }
 	Quat operator / (const    T& v) const { return Quat(*this)/=v; }
 	Quat operator * (const Quat& v) const { return Quat(*this)*=v; }
-	Vec3<3,T> operator * (const Vec3<3,T>& v) const { return rotateVectorTransposed(v); }
+	Vec<3,T> operator * (const Vec<3,T>& v) const { return rotateVectorTransposed(v); }
 	Quat operator * (const    T& v) const { return Quat(*this)*=v; }
 
 
@@ -79,7 +79,6 @@ public:
 	Quat& operator *=(const    T& v){ w*=  v; x*=  v; y*=  v; z*=  v; return *this; }
 	Quat& operator /=(const Quat& v){ return (*this) *= v.recip(); }
 	Quat& operator /=(const    T& v){ w/=v; x/=v; y/=v; z/=v; return *this; }
-
 
 	/// Returns the conjugate
 	Quat conj() const { return Quat(w, -x, -y, -z); }
@@ -105,6 +104,7 @@ public:
 	/// Returns signum, q/|q|, the closest point on unit 3-sphere
 	Quat sgn() const { return Quat(*this).normalize(); }
 
+	// assumes both are already normalized!
 	Quat multiply(const Quat & q2) const;
 	Quat reverseMultiply(const Quat & q2) const;
 
@@ -124,10 +124,12 @@ public:
 	Quat& setIdentity(){ return (*this) = Quat::identity(); }
 
 	/// Set as versor rotated by angle around unit vector
+	/// (x1,y1,z1) MUST BE A UNIT VECTOR
 	Quat& fromAxisAngle(T angle, T x1, T y1, T z1);
 
 	/// Set as versor rotated by angle around unit vector
-	Quat& fromAxisAngle(T angle, const Vec<3,T>& axis) { return fromAxisAngle(angle, axis[0], axis[1], axis[2]); }
+	/// axis MUST BE A UNIT VECTOR
+	Quat& fromAxisAngle(T angle, const Vec<3,T>& axis);
 
 	/// Set as versor rotated by angle around x-axis
 	Quat& fromAxisX(T angle) {
@@ -161,7 +163,6 @@ public:
 
 	/// Set as versor from row-major 4-by-4 projective space transformation matrix
 	Quat& fromMatrixTransposed(const Mat<4,T>& v){ return fromMatrixTransposed(v.ptr()); }
-
 
 	/// Convert to coordinate frame unit vectors
 	void toCoordinateFrame(Vec<3,T>& ux, Vec<3,T>& uy, Vec<3,T>& uz) const;
@@ -203,11 +204,10 @@ public:
 	void toVectorZ(Vec<3,T>& v) const { toVectorZ(v[0],v[1],v[2]); }
 
 	/// Rotate vector
-	void rotate(Vec<3,T>& v) const;
-	void rotateVector(const Vec<3,T>& src, Vec<3,T>& dst) const;
-	Vec<3,T> rotateVector(const Vec<3,T>& src) const;
-	void rotateVectorTransposed(const Vec<3,T>& src, Vec<3,T>& dst) const;
-	Vec<3,T> rotateVectorTransposed(const Vec<3,T>& src) const;
+	/// NOTE: quaternion should be normalized for accurate results.
+	Vec<3,T> rotateVector(const Vec<3,T>& v) const;
+	/// This is rotation by the quaternion's conjugate
+	Vec<3,T> rotateVectorTransposed(const Vec<3,T>& v) const;
 
 	/// Spherical interpolation
 	Quat& slerp(const Quat& target, T amt) { return set(slerp(*this, target, amt)); }
@@ -300,21 +300,25 @@ inline Quat<T> Quat<T> :: multiply(const Quat<T>& q) const {
 	);
 }
 
-// assumes both are already normalized!
 template<typename T>
 inline Quat<T> Quat<T> :: reverseMultiply(const Quat<T> & q) const {
 	return q * (*this);
 }
 
 template<typename T>
-inline Quat<T>& Quat<T> :: fromAxisAngle(T angle, T x1, T y1, T z1) {
+inline Quat<T>& Quat<T> :: fromAxisAngle(T angle, const Vec<3,T>& axis) {
 	T t2 = angle * degToHalfRad();
-	T sinft2 = sin(t2);
+	T sinft2 = sin(t2);	
 	w = cos(t2);
-	x = x1 * sinft2;
-	y = y1 * sinft2;
-	z = z1 * sinft2;
-	return normalize();
+	x = axis[0] * sinft2;
+	y = axis[1] * sinft2;
+	z = axis[2] * sinft2;
+	return *this;
+}
+
+template<typename T>
+inline Quat<T>& Quat<T> :: fromAxisAngle(T angle, T x1, T y1, T z1) {
+	return fromAxisAngle(Vec<3,T>(x1, y1, z1));
 }
 
 template<typename T>
@@ -349,7 +353,8 @@ inline Quat<T>& Quat<T>::fromEuler(T az, T el, T ba){
 	x = tx*c3 + ty*s3;
 	y = ty*c3 - tx*s3;
 	z = tw*s3 + tz*c3;
-	return normalize();
+	//return normalize();
+	return *this;
 }
 
 template<typename T>
@@ -519,124 +524,33 @@ inline void Quat<T> :: toVectorZ(T& ax, T& ay, T& az) const {
 	az = 1.0 - 2.0*x*x - 2.0*y*y;
 }
 
-template<typename T>
-inline void Quat<T>::rotate(Vec<3,T>& v) const{ rotateVector(v,v); }
-
 /*
-	Rotating a vector should be simpler:
+	Rotating a vector is simple:
 	
 	v1 = q * qv * q^-1
 	
 	Where v is a 'pure quaternion' derived from the vector, i.e. w = 0. 	
 */
 template<typename T>
-inline void Quat<T> :: rotateVector(const Vec<3,T>& src, Vec<3,T>& dst) const {
-	Quat q(*this);
-	q.normalize();
-	Quat qi = q.conj();
-	Quat qv(src);	// pure quat
-	Quat qr = q * qv * qi;
-	dst.set(qr.x, qr.y, qr.z);
-}
-//template<typename T>
-//inline void Quat<T> :: rotateVector(const Vec<3,T>& src, Vec<3,T>& dst) const {
-//	static const T c1 = T(1);
-//	static const T c2 = T(2);
-//	const T x = src[0];
-//	const T y = src[1];
-//	const T z = src[2];
-//	const T x2 = x*x;
-//	const T y2 = y*y;
-//	const T z2 = z*z;
-//	const T xy = x*y;
-//	const T xz = x*z;
-//	const T yz = y*z;
-//	const T xw = x*w;
-//	const T yw = y*w;
-//	const T zw = z*w;
-//	// unit vectors of quaternion:
-//	const T ux[3] = {
-//		c1 - c2*y2 - c2*z2,
-//		c2*xy + c2*zw,
-//		c2*xz - c2*yw
-//	};
-//	const T uy[3] = {
-//		c2*xy - c2*zw,
-//		c1 - c2*x2 - c2*z2,
-//		c2*yz + c2*xw
-//	};
-//	const T uz[3] = {
-//		c2*xz + c2*yw,
-//		c2*yz - c2*xw,
-//		c1 - c2*x2 - c2*y2
-//	};
-//	// matrix multiply:
-//	dst[0] = src[0] * ux[0] + src[1] * ux[1] + src[2] * ux[2];
-//	dst[1] = src[0] * uy[0] + src[1] * uy[1] + src[2] * uy[2];
-//	dst[2] = src[0] * uz[0] + src[1] * uz[1] + src[2] * uz[2];
-//}
-
-template<typename T>
-inline Vec<3,T> Quat<T> :: rotateVector(const Vec<3,T>& src) const {
-	Vec<3,T> dst;
-	rotateVector(&src[0], &dst[0]);
-	return dst;
+inline Vec<3,T> Quat<T> :: rotateVector(const Vec<3,T>& v) const {
+	// dst = (q * v * q^-1)
+	// simplified p = (q * v):
+	Quat p(
+		-x*v[0] - y*v[1] - z*v[2],
+		 w*v[0] + y*v[2] - z*v[1],
+		 w*v[1] - x*v[2] + z*v[0],
+		 w*v[2] + x*v[1] - y*v[0]
+	);
+	p *= conj();	// p * q^-1
+	return Vec<3,T>(p.x, p.y, p.z);
 }
 
 template<typename T>
-inline void Quat<T> :: rotateVectorTransposed(const Vec<3,T>& src, Vec<3,T>& dst) const {
-	Quat q(*this);
-	q.normalize();
-	Quat qi = q.conj();
-	Quat qv(src);	// pure quat
-	Quat qr = qi * qv * q;
-	dst.set(qr.x, qr.y, qr.z);
+inline Vec<3,T> Quat<T> :: rotateVectorTransposed(const Vec<3,T>& v) const {
+	Quat qi(*this);
+	qi.conj();
+	return qi.conj().rotateVector(v);
 }
-//template<typename T>
-//inline void Quat<T> :: rotateVectorTransposed(const T * src, T * dst) const {
-//	static const T c1 = T(1);
-//	static const T c2 = T(2);
-//	const T x = src[0];
-//	const T y = src[1];
-//	const T z = src[2];
-//	const T x2 = x*x;
-//	const T y2 = y*y;
-//	const T z2 = z*z;
-//	const T xy = x*y;
-//	const T xz = x*z;
-//	const T yz = y*z;
-//	const T xw = x*w;
-//	const T yw = y*w;
-//	const T zw = z*w;
-//	// unit vectors of quaternion:
-//	const T ux[3] = {
-//		c1 - c2*y2 - c2*z2,
-//		c2*xy + c2*zw,
-//		c2*xz - c2*yw
-//	};
-//	const T uy[3] = {
-//		c2*xy - c2*zw,
-//		c1 - c2*x2 - c2*z2,
-//		c2*yz + c2*xw
-//	};
-//	const T uz[3] = {
-//		c2*xz + c2*yw,
-//		c2*yz - c2*xw,
-//		c1 - c2*x2 - c2*y2
-//	};
-//	// matrix multiply:
-//	dst[0] = src[0] * ux[0] + src[1] * uy[0] + src[2] * uz[0];
-//	dst[1] = src[0] * ux[1] + src[1] * uy[1] + src[2] * uz[1];
-//	dst[2] = src[0] * ux[2] + src[1] * uy[2] + src[2] * uz[2];
-//}
-
-template<typename T>
-inline Vec<3,T> Quat<T> :: rotateVectorTransposed(const Vec<3,T>& src) const {
-	Vec<3,T> dst;
-	rotateVectorTransposed(&src[0], &dst[0]);
-	return dst;
-}
-
 
 template<typename T>
 Quat<T> Quat<T> :: slerp(const Quat& input, const Quat& target, T amt){

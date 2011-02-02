@@ -180,7 +180,7 @@ public:
 		Vec3d target(p - pos());
 		target.normalize();	// unit vector of direction to move (in world frame)
 		// rotate target into local frame:
-		quat().rotate(target);
+		target = quat().rotateVector(target);
 		// push ourselves in that particular direction:
 		nudge(target * amt);
 	}
