@@ -32,6 +32,9 @@
 namespace al{
 
 /// Stores buffers related to rendering graphical objects
+
+/// A mesh is a collection of buffers storing vertices, colors, indices, etc.
+/// that define the geometry and coloring/shading of a graphical object.
 class Mesh {
 public:
 
