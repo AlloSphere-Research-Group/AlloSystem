@@ -42,7 +42,10 @@ public:
 	typedef Vec3f			TexCoord3;
 	typedef unsigned int	Index;
 
-	Mesh(): mPrimitive(0){}
+
+	/// @param[in] primitive	renderer-dependent primitive number
+	Mesh(int primitive=0): mPrimitive(primitive){}
+
 
 	void getBounds(Vec3f& min, Vec3f& max) const;
 
@@ -156,7 +159,7 @@ void Mesh::transform(const Mat<4,T>& m, int begin, int end){
 	}
 }
 
-} // ::al
+} // al::
 
 
 #endif	/* include guard */
