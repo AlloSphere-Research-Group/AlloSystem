@@ -68,7 +68,7 @@ public:
 	};
 	
 	Stereographic() 
-	: mMode(Anaglyph), mAnaglyphMode(RedBlue), mStereo(false) {}
+	: mMode(Anaglyph), mAnaglyphMode(RedCyan), mStereo(false) {}
 	~Stereographic() {}
 
 	/// Draw the scene according to the stored stereographic mode
