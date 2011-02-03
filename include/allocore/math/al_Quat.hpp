@@ -318,7 +318,7 @@ inline Quat<T>& Quat<T> :: fromAxisAngle(T angle, const Vec<3,T>& axis) {
 
 template<typename T>
 inline Quat<T>& Quat<T> :: fromAxisAngle(T angle, T x1, T y1, T z1) {
-	return fromAxisAngle(Vec<3,T>(x1, y1, z1));
+	return fromAxisAngle(angle, Vec<3,T>(x1, y1, z1));
 }
 
 template<typename T>
