@@ -703,6 +703,12 @@
 		36F3A43312FCCF7A004BC82F /* al_World.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_World.hpp; sourceTree = "<group>"; };
 		36F3A43512FCCF88004BC82F /* al_World.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_World.cpp; sourceTree = "<group>"; };
 		36F3A43612FCCF88004BC82F /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		36F3A64112FCF069004BC82F /* ajit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ajit.cpp; sourceTree = "<group>"; };
+		36F3A64212FCF069004BC82F /* al_Compiler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Compiler.cpp; sourceTree = "<group>"; };
+		36F3A64312FCF069004BC82F /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		36F3A64512FCF076004BC82F /* ajit.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ajit.hpp; sourceTree = "<group>"; };
+		36F3A64612FCF076004BC82F /* al_Compiler.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Compiler.hpp; sourceTree = "<group>"; };
+		36F3A64712FCF076004BC82F /* al_JitFile.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_JitFile.hpp; sourceTree = "<group>"; };
 		36F46821110BE2E90082D21E /* al_AudioIO.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_AudioIO.hpp; sourceTree = "<group>"; };
 		36F46822110BE2E90082D21E /* al_File.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_File.hpp; sourceTree = "<group>"; };
 		36F46844110BE34D0082D21E /* libportaudio.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libportaudio.a; sourceTree = "<group>"; };
@@ -1039,6 +1045,8 @@
 		08FB7794FE84155DC02AAC07 /* alscheduling */ = {
 			isa = PBXGroup;
 			children = (
+				36F3A64412FCF076004BC82F /* allojit */,
+				36F3A64012FCF069004BC82F /* allojit */,
 				36F3A43012FCCF7A004BC82F /* alloutil */,
 				36F3A43412FCCF88004BC82F /* alloutil */,
 				36B5D3E611D81D2C004D228D /* TODO */,
@@ -1684,6 +1692,28 @@
 			);
 			name = alloutil;
 			path = ../src/alloutil;
+			sourceTree = SOURCE_ROOT;
+		};
+		36F3A64012FCF069004BC82F /* allojit */ = {
+			isa = PBXGroup;
+			children = (
+				36F3A64112FCF069004BC82F /* ajit.cpp */,
+				36F3A64212FCF069004BC82F /* al_Compiler.cpp */,
+				36F3A64312FCF069004BC82F /* Makefile */,
+			);
+			name = allojit;
+			path = ../src/allojit;
+			sourceTree = SOURCE_ROOT;
+		};
+		36F3A64412FCF076004BC82F /* allojit */ = {
+			isa = PBXGroup;
+			children = (
+				36F3A64512FCF076004BC82F /* ajit.hpp */,
+				36F3A64612FCF076004BC82F /* al_Compiler.hpp */,
+				36F3A64712FCF076004BC82F /* al_JitFile.hpp */,
+			);
+			name = allojit;
+			path = ../include/allojit;
 			sourceTree = SOURCE_ROOT;
 		};
 		36F46820110BE2E90082D21E /* io */ = {

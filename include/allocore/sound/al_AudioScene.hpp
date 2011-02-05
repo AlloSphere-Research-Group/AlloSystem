@@ -38,6 +38,15 @@ namespace al{
 */
 
 
+/*
+	So, for large numbers of sources it quickly gets too expensive.
+	Having one delayline per soundsource (for doppler) is itself quite taxing.
+	e.g., at 44100kHz sampling rate, a speed of sound of 343m/s and an audible distance of 50m implies a delay of at least 6428 samples (need to add blocksize to that too). 
+	The actual buffersize sets the effective doppler far-clip; beyond this it always uses max-delay size (no doppler)
+	The head-size sets the effective doppler near-clip.
+	
+*/
+
 /// Audio scene listener object
 
 /// 
@@ -111,7 +120,13 @@ class SoundSource {
 public:
 	SoundSource(double rollOff=1, double near=1, double range=32, double ampFar=0.0, int bufSize=5000)
 	:	mSound(bufSize), mRollOff(rollOff), mNearClip(near), mClipRange(range), mAmpFar(ampFar)
-	{}
+	{
+		// initialize the position history to be VERY FAR AWAY so that we don't deafen ourselves... 
+		mPosHistory(Vec3d(1000, 1000, 1000));
+		mPosHistory(Vec3d(1000, 1000, 1000));
+		mPosHistory(Vec3d(1000, 1000, 1000));
+		mPosHistory(Vec3d(1000, 1000, 1000));
+	}
 	
 	// calculate the buffersize needed for given samplerate, speed of sound & distance traveled (e.g. nearClip+clipRange).
 	// probably want to add io.samplesPerBuffer() to this for safety.
@@ -191,6 +206,9 @@ public:
 		return ipl::linear(frac, a, b);
 	}
 
+	double maxindex() const {
+		return mSound.size() - 2;
+	}
 
 	/// Set far clipping distance
 	void farClip(double v){ mClipRange=(v-mNearClip); }
@@ -261,11 +279,12 @@ public:
 	void encode(const int& numFrames, double sampleRate) {
 		//printf("__________________\n");
 	
-		//const double invClipRange = mFarClip - mNearClip;
-		
 		double distanceToSample = sampleRate / mSpeedOfSound;
 		//distanceToSample = 16;
 	
+		
+		//const double invClipRange = mFarClip - mNearClip;
+		
 		// update source history data:
 		for(Sources::iterator it = mSources.begin(); it != mSources.end(); it++) {
 			SoundSource& src = *(*it);
@@ -290,25 +309,49 @@ public:
 			for(Sources::iterator it = mSources.begin(); it != mSources.end(); ++it){
 				SoundSource& src = *(*it);
 				
+				// scalar factor to convert distances into delayline indices
+				// varies per source, 
+				// since each source has its own buffersize and far clip
+				// (not physically accurate of course)
+				distanceToSample = (src.maxindex()-numFrames)/src.farClip();
+				
 				// iterate time samples
 				for(int i=0; i<numFrames; ++i){
 					
 					// compute interpolated source position relative to listener
 					// TODO: this tends to warble when moving fast
 					double alpha = double(i)/numFrames;
-					Vec3d relpos = ipl::cubic(
-						alpha, 
-						src.mPosHistory[3]-l.mPosHistory[3], 
-						src.mPosHistory[2]-l.mPosHistory[2], 
-						src.mPosHistory[1]-l.mPosHistory[1], 
-						src.mPosHistory[0]-l.mPosHistory[0]
-					);
-
-//					Vec3d relpos = ipl::linear(
-//						alpha,
+					
+//					Vec3d relpos = ipl::cubic(
+//						alpha, 
+//						src.mPosHistory[3]-l.mPosHistory[3], 
+//						src.mPosHistory[2]-l.mPosHistory[2], 
 //						src.mPosHistory[1]-l.mPosHistory[1], 
 //						src.mPosHistory[0]-l.mPosHistory[0]
 //					);
+
+					Vec3d srcpos = ipl::cubic(
+						alpha, 
+						src.mPosHistory[3], 
+						src.mPosHistory[2], 
+						src.mPosHistory[1], 
+						src.mPosHistory[0]
+					);
+					Vec3d lpos = ipl::cubic(
+						alpha, 
+						l.mPosHistory[3], 
+						l.mPosHistory[2], 
+						l.mPosHistory[1], 
+						l.mPosHistory[0]
+					);
+					Vec3d relpos = srcpos-lpos;
+					
+//					Vec3d relpos = ipl::linear(
+//						alpha, 
+//						src.mPosHistory[1]-l.mPosHistory[1], 
+//						src.mPosHistory[0]-l.mPosHistory[0]
+//					);
+
 
 					//Vec3d relpos = src.mPosHistory[0]-l.mPosHistory[0];
 
@@ -316,16 +359,17 @@ public:
 					//printf("%g %g %g\n", src.pos()[0], src.pos()[1], src.pos()[2]);
 
 					double distance = relpos.mag();
+					
 					double idx = distance * distanceToSample;
 					//if (i==0) printf("%g\n", distance);
 					
 					
 
-					//int idx0 = idx;
+					int idx0 = idx;
 					
 					// are we within range?
-					//if(idx0 <= src.maxIndex()-numFrames){
-					if (distance < src.farClip()) {
+					if(idx0 <= src.maxIndex()-numFrames){
+					//if (distance < src.farClip()) {
 
 						idx += (numFrames-i);
 						
@@ -343,22 +387,20 @@ public:
 						Vec3d urel(relpos);
 						urel.normalize();	// unit vector in axis listener->source
 						// project into listener's coordinate frame:
-						Vec3d axis;			
-						l.mQuatHistory[i].toVectorX(axis);
-						double rr = urel.dot(axis);	
-						l.mQuatHistory[i].toVectorY(axis);
-						double ru = urel.dot(axis);
-						l.mQuatHistory[i].toVectorZ(axis);
-						double rf = urel.dot(axis);
+//						Vec3d axis;			
+//						l.mQuatHistory[i].toVectorX(axis);
+//						double rr = urel.dot(axis);	
+//						l.mQuatHistory[i].toVectorY(axis);
+//						double ru = urel.dot(axis);
+//						l.mQuatHistory[i].toVectorZ(axis);
+//						double rf = urel.dot(axis);
 						
-						//if(i==0) printf("%g\n", rr*rr + ru*ru + rf*rf);
-						
-						// derive polar coordinates:
-//						double azimuth = atan2(rr, rf);
-//						double elevation = asin(ru);
+						// cheaper:
+						Vec3d direction = l.mQuatHistory[i].rotateVectorTransposed(urel);
 
 						//mEncoder.direction(azimuth, elevation);
-						mEncoder.direction(-rf, -rr, ru);
+						//mEncoder.direction(-rf, -rr, ru);
+						mEncoder.direction(-direction[2], -direction[0], direction[1]);
 						mEncoder.encode(l.ambiChans(), numFrames, i, s);
 					}
 
