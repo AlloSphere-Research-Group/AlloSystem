@@ -321,7 +321,7 @@ public:
 					
 					
 
-					int idx0 = idx;
+					//int idx0 = idx;
 					
 					// are we within range?
 					//if(idx0 <= src.maxIndex()-numFrames){

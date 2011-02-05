@@ -151,7 +151,7 @@ public:
 		mAudioScene(3,2, 128),
 		mName(name)
 	{
-		mListeners.push_back(&mAudioScene.createListener(2));
+		mListeners.push_back(mAudioScene.createListener(2));
 	}
 
 	const std::string& name() const { return mName; }
