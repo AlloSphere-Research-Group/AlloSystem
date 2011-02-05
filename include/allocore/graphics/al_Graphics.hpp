@@ -35,6 +35,7 @@
 
 #include "allocore/math/al_Vec.hpp"
 #include "allocore/math/al_Matrix4.hpp"
+#include "allocore/math/al_Quat.hpp"
 #include "allocore/types/al_Buffer.hpp"
 #include "allocore/types/al_Color.hpp"
 
@@ -148,6 +149,7 @@ public:
 	void multMatrix(const Matrix4d &m){ p_multMatrix(m); }
 	void translate(double x, double y, double z){ p_translate(x,y,z); }
 	void rotate(double angle, double x, double y, double z){ p_rotate(angle, x,y,z); }
+	void rotate(const Quatd& q);
 	void scale(double x, double y, double z){ p_scale(x,y,z); }
 	
 	void pushMatrix(MatrixMode v){ matrixMode(v); pushMatrix(); }
@@ -269,6 +271,12 @@ inline void Graphics::depthMask(bool b) { capability(DEPTH_MASK, b); }
 inline void Graphics::depthTesting(bool b){ capability(DEPTH_TEST, b); }
 inline void Graphics::lighting(bool b) { capability(LIGHTING, b); }
 inline void Graphics::scissor(bool b) { capability(SCISSOR_TEST, b); }
+
+inline void Graphics::rotate(const Quatd& q) {
+	Matrix4d m;
+	q.toMatrix(m.elems);
+	multMatrix(m);
+}
 
 } // ::al
 

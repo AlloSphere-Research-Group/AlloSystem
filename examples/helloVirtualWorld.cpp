@@ -15,7 +15,7 @@ stereographic rendering
 #include "alloutil/al_ControlNav.hpp"
 using namespace al;
 
-struct Agent : public SoundSource, public Drawable{
+struct Agent : public SoundSource, public Nav, public Drawable{
 
 	Agent()
 	: oscPhase(0), oscEnv(1)
@@ -52,6 +52,8 @@ struct Agent : public SoundSource, public Drawable{
 		spin(3., 0, 0);
 		moveF(0.4);
 		step();
+		
+		SoundSource::pose(*this);
 	}
 	
 	virtual void onDraw(Graphics& g){
@@ -168,8 +170,7 @@ void audioCB(AudioIOData& io){
 	}
 
 	navMaster.step(0.5);
-	listener->pos(navMaster.pos());
-	listener->quat(navMaster.quat());
+	listener->pose(navMaster);
 
 	scene.encode(numFrames, io.framesPerSecond());
 	scene.render(&io.out(0,0), numFrames);
@@ -219,7 +220,7 @@ struct MyWindow : public Window, public Drawable{
 
 int main (int argc, char * argv[]){
 
-	listener = &scene.createListener(2);
+	listener = scene.createListener(2);
 	
 //	listener->speakerPos(0,0,-60);
 //	listener->speakerPos(1,1, 60);
@@ -260,7 +261,7 @@ int main (int argc, char * argv[]){
 	for(int i=4; i<6; ++i){
 		windows[i].add(new StandardWindowKeyControls);
 		windows[i].add(new NavInputControl(&navMaster));
-		windows[i].transform.quat().fromAxisAngle(-90 + i*180, Vec3d(0, 1, 0));
+		windows[i].transform.quat().fromAxisAngle(-90 + i*180, Vec3d(1, 0, 0));
 		windows[i].cam.fovy(90);
 	}
 

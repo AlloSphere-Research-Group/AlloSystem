@@ -698,6 +698,11 @@
 		36F0ABE512319709000A8EBF /* lua_utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lua_utility.h; sourceTree = "<group>"; };
 		36F2568A121FBE8A008C4597 /* al_Memory.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Memory.hpp; sourceTree = "<group>"; };
 		36F2568B121FBF36008C4597 /* al_Memory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Memory.cpp; sourceTree = "<group>"; };
+		36F3A43112FCCF7A004BC82F /* al_ControlGLV.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_ControlGLV.hpp; sourceTree = "<group>"; };
+		36F3A43212FCCF7A004BC82F /* al_ControlNav.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_ControlNav.hpp; sourceTree = "<group>"; };
+		36F3A43312FCCF7A004BC82F /* al_World.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_World.hpp; sourceTree = "<group>"; };
+		36F3A43512FCCF88004BC82F /* al_World.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_World.cpp; sourceTree = "<group>"; };
+		36F3A43612FCCF88004BC82F /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		36F46821110BE2E90082D21E /* al_AudioIO.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_AudioIO.hpp; sourceTree = "<group>"; };
 		36F46822110BE2E90082D21E /* al_File.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_File.hpp; sourceTree = "<group>"; };
 		36F46844110BE34D0082D21E /* libportaudio.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libportaudio.a; sourceTree = "<group>"; };
@@ -1034,6 +1039,8 @@
 		08FB7794FE84155DC02AAC07 /* alscheduling */ = {
 			isa = PBXGroup;
 			children = (
+				36F3A43012FCCF7A004BC82F /* alloutil */,
+				36F3A43412FCCF88004BC82F /* alloutil */,
 				36B5D3E611D81D2C004D228D /* TODO */,
 				3625B540116EEDEF00C685B7 /* Makefile */,
 				3625B541116EEDEF00C685B7 /* Makefile.config */,
@@ -1657,6 +1664,27 @@
 			);
 			path = sound;
 			sourceTree = "<group>";
+		};
+		36F3A43012FCCF7A004BC82F /* alloutil */ = {
+			isa = PBXGroup;
+			children = (
+				36F3A43112FCCF7A004BC82F /* al_ControlGLV.hpp */,
+				36F3A43212FCCF7A004BC82F /* al_ControlNav.hpp */,
+				36F3A43312FCCF7A004BC82F /* al_World.hpp */,
+			);
+			name = alloutil;
+			path = ../include/alloutil;
+			sourceTree = SOURCE_ROOT;
+		};
+		36F3A43412FCCF88004BC82F /* alloutil */ = {
+			isa = PBXGroup;
+			children = (
+				36F3A43512FCCF88004BC82F /* al_World.cpp */,
+				36F3A43612FCCF88004BC82F /* Makefile */,
+			);
+			name = alloutil;
+			path = ../src/alloutil;
+			sourceTree = SOURCE_ROOT;
 		};
 		36F46820110BE2E90082D21E /* io */ = {
 			isa = PBXGroup;

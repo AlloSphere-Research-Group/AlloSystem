@@ -58,7 +58,7 @@ protected:
 
 
 
-class Actor : public SoundSource {//, public gfx::Drawable {
+class Actor : public SoundSource, public Nav {//, public gfx::Drawable {
 public:
 
 	virtual ~Actor(){}

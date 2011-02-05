@@ -150,6 +150,7 @@ public:
 	}
 
 	/// Set as versor rotated by Euler angles, in degrees
+	Quat& fromEuler(const Vec<3,T>& aed) { return fromEuler(aed[0], aed[1], aed[2]); }
 	Quat& fromEuler(T az, T el, T ba);
 	
 	/// Set as versor from column-major 4-by-4 projective space transformation matrix
@@ -175,6 +176,9 @@ public:
 
 	/// Convert to axis-angle form
 	void toAxisAngle(T& angle, T& ax, T& ay, T& az) const;
+	void toAxisAngle(T& angle, Vec<3,T> axis) const {
+		toAxisAngle(angle, axis[0], axis[1], axis[2]);
+	}
 
 	/// Convert to Euler angles (azimuth, elevation, bank), in degrees
 	void toEuler(T& az, T& el, T& ba) const;
@@ -234,6 +238,7 @@ public:
 	
 	
 	///! calculate the rotation required to move from unit vector src to unit vector dst
+	/// NOTE: both arguments must be UNIT VECTORS (normalized)
 	/// rotation occurs around the axis created by the cross product of src and dst
 	/// if the vectors are nearly opposing, the Y axis is used instead 
 	/// if the Y axis isn't suitable, the Z axis is used instead
@@ -243,7 +248,7 @@ public:
 	/// Vec3d dst = Vec3d(B.pos() - A.pos()).normalize();
 	/// Quatd rot = Quatd::getRotationTo(src, dst);
 	/// A.quat() = rot * A.quat();
-	static Quat<T> getRotationTo(const Vec<3, T>& src, const Vec<3, T>& dst);
+	static Quat<T> getRotationTo(const Vec<3, T>& usrc, const Vec<3, T>& udst);
 	
 	/// these are 180 degree rotations around the various axes:
 	void flipX() { return set(T(0), T(1), T(0), T(0)); } 
@@ -555,6 +560,13 @@ inline Vec<3,T> Quat<T> :: rotateVectorTransposed(const Vec<3,T>& v) const {
 template<typename T>
 Quat<T> Quat<T> :: slerp(const Quat& input, const Quat& target, T amt){
 	Quat<T> result;
+	
+	if (amt==T(0)) {
+		return input;
+	} else if (amt==T(1)) {
+		return target;
+	}
+	
 	int bflip = 0;
 	T dot_prod = input.dot(target);
 	T a, b;
@@ -689,7 +701,7 @@ Quat<T> Quat<T> :: getRotationTo(const Vec<3, T>& src, const Vec<3, T>& dst) {
 		if (axis.magSqr() < 0.00000000001) {
 			axis = cross(Vec<3, T>(0, 0, 1), src);
 		}
-		axis.normalize();
+		//axis.normalize();
 		q.fromAxisAngle(180., axis);
 	} else {
 		T s = sqrt((d+1.)*2);

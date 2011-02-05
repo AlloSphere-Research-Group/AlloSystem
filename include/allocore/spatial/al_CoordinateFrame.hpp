@@ -4,6 +4,8 @@
 #include "allocore/math/al_Vec.hpp"
 #include "allocore/math/al_Quat.hpp"
 
+#include <stdio.h>
+
 
 namespace al {
 
@@ -87,6 +89,10 @@ public:
 	
 	// get the azimuth, elevation & distance from this to another point
 	void toAED(const Vec3d& to, double& azimuth, double& elevation, double& distance) const;
+	
+	// print
+	void print() const { printf("Vec3d(%f, %f, %f);\nQuatd(%f, %f, %f, %f);\n",
+		mVec[0], mVec[1], mVec[2], mQuat[0], mQuat[1], mQuat[2], mQuat[3]); }
 
 	// TODO: conversion operators for Pose->Vec3d, Pose->Quatd?	
 protected:
@@ -99,19 +105,40 @@ protected:
 /// with a curvature determined by psmooth and qsmooth
 class SmoothPose : public Pose {
 public:
-	SmoothPose(const Pose& init, double psmooth=0.9, double qsmooth=0.9) 
+	SmoothPose(const Pose& init=Pose(), double psmooth=0.9, double qsmooth=0.9) 
 	:	Pose(init), mTarget(init), mPF(psmooth), mQF(qsmooth) {}
 	
-	// different ways to set the target:
+	// step toward the target:
+	SmoothPose& operator()() {
+		pos().lerp(mTarget.pos(), 1.-mPF);
+		quat().slerp(mTarget.quat(), 1.-mQF);
+		return *this;
+	}
+	
+	// set and update:
+	SmoothPose& operator()(const Pose& p) {
+		target(p);
+		return (*this)();
+	}
+	
+	// set the target to smoothly interpolate to:
 	Pose& target() { return mTarget; }
 	void target(const Pose& p) { mTarget.set(p); }
 	void target(const Vec3d& p) { mTarget.pos().set(p); }
 	void target(const Quatd& p) { mTarget.quat().set(p); } 
 	
-	// step toward the target:
-	void step() {
-		pos().lerp(mTarget.pos(), mPF);
-		quat().slerp(mTarget.quat(), mQF);
+	// set immediately (without smoothing):
+	void jump(Pose& p) {
+		target(p);
+		set(p);
+	}
+	void jump(Vec3d& v) {
+		target(v);
+		pos().set(v);
+	}
+	void jump(Quatd& q) {
+		target(q);
+		quat().set(q);
 	}
 
 protected:
