@@ -322,6 +322,8 @@ public:
 					// TODO: this tends to warble when moving fast
 					double alpha = double(i)/numFrames;
 					
+					// note: cubic(src-listener) 
+					// is equivalent to cubic(src) - cubic(listener)
 //					Vec3d relpos = ipl::cubic(
 //						alpha, 
 //						src.mPosHistory[3]-l.mPosHistory[3], 
@@ -329,28 +331,23 @@ public:
 //						src.mPosHistory[1]-l.mPosHistory[1], 
 //						src.mPosHistory[0]-l.mPosHistory[0]
 //					);
-
-					Vec3d srcpos = ipl::cubic(
-						alpha, 
-						src.mPosHistory[3], 
-						src.mPosHistory[2], 
-						src.mPosHistory[1], 
-						src.mPosHistory[0]
-					);
-					Vec3d lpos = ipl::cubic(
-						alpha, 
-						l.mPosHistory[3], 
-						l.mPosHistory[2], 
-						l.mPosHistory[1], 
-						l.mPosHistory[0]
-					);
-					Vec3d relpos = srcpos-lpos;
 					
+					// sounds rough!
 //					Vec3d relpos = ipl::linear(
 //						alpha, 
 //						src.mPosHistory[1]-l.mPosHistory[1], 
 //						src.mPosHistory[0]-l.mPosHistory[0]
 //					);
+
+					// moving average:
+					// cheaper & slightly less warbly than cubic, 
+					// less glitchy than linear
+					Vec3d relpos = (
+						(src.mPosHistory[3]-l.mPosHistory[3])*(1.-alpha) + 
+						(src.mPosHistory[2]-l.mPosHistory[2]) + 
+						(src.mPosHistory[1]-l.mPosHistory[1]) + 
+						(src.mPosHistory[0]-l.mPosHistory[0])*(alpha)
+					)/3.0;
 
 
 					//Vec3d relpos = src.mPosHistory[0]-l.mPosHistory[0];
