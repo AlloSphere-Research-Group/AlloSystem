@@ -363,7 +363,7 @@ template<typename T> inline void Array::read_interp(T * val, double x) const {
 	x = wrap<double>(x, (double)header.dim[0], 0.);
 	// convert 0..1 field indices to 0..(d-1) cell indices
 	int xa = (int)DOUBLE_FLOOR(x);	
-	int xb = (int)DOUBLE_CEIL (x);				
+	int xb = xa+1;	if (xb == header.dim[0]) xb = 0;
 	// get the normalized 0..1 interp factors, of x,y,z:
 	double faaa = DOUBLE_FRAC(x);
 	double fbaa = 1.f - faaa;
@@ -381,9 +381,9 @@ template<typename T> inline void Array::read_interp(T * val, double x, double y)
 	y = wrap<double>(y, (double)header.dim[1], 0.);
 	// convert 0..1 field indices to 0..(d-1) cell indices
 	int xa = (int)DOUBLE_FLOOR(x);	
-	int xb = (int)DOUBLE_CEIL (x);
 	int ya = (int)DOUBLE_FLOOR(y);	
-	int yb = (int)DOUBLE_CEIL (y);				
+	int xb = xa+1;	if (xb == header.dim[0]) xb = 0;
+	int yb = ya+1;	if (yb == header.dim[1]) yb = 0;
 	// get the normalized 0..1 interp factors, of x,y,z:
 	double xbf = DOUBLE_FRAC(x);
 	double xaf = 1.f - xbf;
@@ -414,11 +414,11 @@ template<typename T> inline void Array::read_interp(T * val, double x, double y,
 	z = wrap<double>(z, (double)header.dim[2], 0.);
 	// convert 0..1 field indices to 0..(d-1) cell indices
 	int xa = (int)DOUBLE_FLOOR(x);	
-	int xb = (int)DOUBLE_CEIL (x);
 	int ya = (int)DOUBLE_FLOOR(y);	
-	int yb = (int)DOUBLE_CEIL (y);
 	int za = (int)DOUBLE_FLOOR(z);	
-	int zb = (int)DOUBLE_CEIL (z);				
+	int xb = xa+1;	if (xb == header.dim[0]) xb = 0;
+	int yb = ya+1;	if (yb == header.dim[1]) yb = 0;
+	int zb = za+1;	if (zb == header.dim[2]) zb = 0;				
 	// get the normalized 0..1 interp factors, of x,y,z:
 	double xbf = DOUBLE_FRAC(x);
 	double xaf = 1.f - xbf;
@@ -494,7 +494,7 @@ template<typename T> inline void Array::write_interp(T* val, double x) {
 	x = wrap<double>(x, (double)header.dim[0], 0.);
 	// convert 0..1 field indices to 0..(d-1) cell indices
 	int xa = (int)DOUBLE_FLOOR(x);	
-	int xb = (int)DOUBLE_CEIL (x);				
+	int xb = xa+1;	if (xb == header.dim[0]) xb = 0;
 	// get the normalized 0..1 interp factors, of x,y,z:
 	double xbf = DOUBLE_FRAC(x);
 	double xaf = 1.f - xbf;
@@ -515,9 +515,9 @@ template<typename T> inline void Array::write_interp(T* val, double x, double y)
 	y = wrap<double>(y, (double)header.dim[1], 0.);
 	// convert 0..1 field indices to 0..(d-1) cell indices
 	int xa = (int)DOUBLE_FLOOR(x);	
-	int xb = (int)DOUBLE_CEIL (x);
 	int ya = (int)DOUBLE_FLOOR(y);	
-	int yb = (int)DOUBLE_CEIL (y);				
+	int xb = xa+1;	if (xb == header.dim[0]) xb = 0;
+	int yb = ya+1;	if (yb == header.dim[1]) yb = 0;
 	// get the normalized 0..1 interp factors, of x,y,z:
 	double xbf = DOUBLE_FRAC(x);
 	double xaf = 1.f - xbf;
@@ -541,17 +541,17 @@ template<typename T> inline void Array::write_interp(T* val, double x, double y)
 		pbba[p] += tmp * fbba;
 	}
 }	
-template<typename T> inline void Array::write_interp(T* val, double x, double y, double z) {
-	x = wrap<double>(x, (double)header.dim[0], 0.);
-	y = wrap<double>(y, (double)header.dim[1], 0.);
-	z = wrap<double>(z, (double)header.dim[2], 0.);
+template<typename T> inline void Array::write_interp(T* val, double x0, double y0, double z0) {
+	double x = wrap<double>(x0, (double)header.dim[0], 0.);
+	double y = wrap<double>(y0, (double)header.dim[1], 0.);
+	double z = wrap<double>(z0, (double)header.dim[2], 0.);
 	// convert 0..1 field indices to 0..(d-1) cell indices
 	int xa = (int)DOUBLE_FLOOR(x);	
-	int xb = (int)DOUBLE_CEIL (x);
 	int ya = (int)DOUBLE_FLOOR(y);	
-	int yb = (int)DOUBLE_CEIL (y);
 	int za = (int)DOUBLE_FLOOR(z);	
-	int zb = (int)DOUBLE_CEIL (z);				
+	int xb = xa+1;	if (xb == header.dim[0]) xb = 0;
+	int yb = ya+1;	if (yb == header.dim[1]) yb = 0;
+	int zb = za+1;	if (zb == header.dim[2]) zb = 0;			
 	// get the normalized 0..1 interp factors, of x,y,z:
 	double xbf = DOUBLE_FRAC(x);
 	double xaf = 1.f - xbf;
