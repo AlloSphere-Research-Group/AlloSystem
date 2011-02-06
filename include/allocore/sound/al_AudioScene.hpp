@@ -339,9 +339,9 @@ public:
 //						src.mPosHistory[0]-l.mPosHistory[0]
 //					);
 
-					// moving average:
-					// cheaper & slightly less warbly than cubic, 
-					// less glitchy than linear
+//					// moving average:
+//					// cheaper & slightly less warbly than cubic, 
+//					// less glitchy than linear
 					Vec3d relpos = (
 						(src.mPosHistory[3]-l.mPosHistory[3])*(1.-alpha) + 
 						(src.mPosHistory[2]-l.mPosHistory[2]) + 
