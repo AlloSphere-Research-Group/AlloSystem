@@ -49,6 +49,17 @@ public:
 	void frustum(Frustumd& f, const Pose& p, double aspectRatio) const;		///< Get frustum, TODO: off-axis
 
 	double height(double distance);							///< Height of view at distance from camera
+	
+	
+	// find the X or Y borders at a given Z depth:
+	double heightAtDepth(double depth) { return depth*tan(M_DEG2RAD*mFovy*0.5); }
+	double widthAtDepth(double depth) { return mAspectRatio*heightAtDepth(depth); }	
+	
+	// calculate desired fovy, given the Y height of the border at a specified Z depth:
+	static double getFovyForHeight(double height, double depth) {
+		return 2.*M_RAD2DEG*atan(height/depth);
+	}
+ 
 
 protected:
 	double mFovy;				// Camera aperture (degrees)
