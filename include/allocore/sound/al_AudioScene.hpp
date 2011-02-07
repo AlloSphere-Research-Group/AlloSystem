@@ -66,7 +66,7 @@ public:
 		return *this;
 	}
 
-	float * ambiChans() { return &mAmbiDomainChannels[0]; }
+	float * ambiChans(unsigned channel=0) { return &mAmbiDomainChannels[channel * mNumFrames]; }
 	
 	/// Set current pose:
 	void pose(const Pose& p) { mPose.set(p); }
@@ -82,6 +82,7 @@ protected:
 	}
 	
 	void numFrames(unsigned v){
+		mNumFrames = v;
 		if(mQuatHistory.size() != v) mQuatHistory.resize(v);
 		if(mAmbiDomainChannels.size() != (mDecoder.channels() * v)){
 			mAmbiDomainChannels.resize(mDecoder.channels() * v);
@@ -95,6 +96,7 @@ protected:
 	ShiftBuffer<4, Vec3d> mPosHistory;		// position in previous blocks
 	Quatd mQuatPrev;						// orientation in previous block
 	Pose mPose;								// current position
+	unsigned mNumFrames;
 
 	void zeroAmbi(){
 		bzero(ambiChans(), mAmbiDomainChannels.size()*sizeof(ambiChans()[0]));
