@@ -91,7 +91,7 @@ public:
 	void formatAligned(int components, AlloTy ty, int dimx, int dimy, int dimz, size_t align);
 	
 	///! Check if this Array conforms to an ArrayHeader format
-	bool hasFormat(const AlloArrayHeader &h2) const;
+	bool isFormat(const AlloArrayHeader &h2) const;
 	
 	///! verify a type:
 	bool isType(AlloTy ty) const { return header.type == ty; }
@@ -241,7 +241,7 @@ inline void Array::deriveStride(AlloArrayHeader& h, size_t alignSize) {
 }
 	
 ///! Check if this Array conforms to an ArrayHeader format
-inline bool Array::hasFormat(const AlloArrayHeader &h2) const {
+inline bool Array::isFormat(const AlloArrayHeader &h2) const {
 	bool equiv =	header.components == h2.components && 
 	header.type == h2.type && 
 	header.dimcount == h2.dimcount;
@@ -255,7 +255,7 @@ inline bool Array::hasFormat(const AlloArrayHeader &h2) const {
 }
 	
 inline void Array::format(const AlloArrayHeader &h2) {
-	if(!hasFormat(h2)) {
+	if(!isFormat(h2)) {
 		dataFree();
 		header.type = h2.type;
 		header.components = h2.components;

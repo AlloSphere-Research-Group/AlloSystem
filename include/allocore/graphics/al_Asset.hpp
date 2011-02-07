@@ -99,9 +99,15 @@ public:
 		
 		std::string name;
 		
-		int shading_model, two_sided, wireframe, blend_func;
-		float shininess, shininess_strength, opacity, reflectivity, refracti, bump_scaling;
-		Color diffuse, ambient, specular, emissive, transparent, reflective;
+		// standard OpenGL properties:
+		int two_sided, wireframe;
+		Color diffuse, ambient, specular, emissive;
+		float shininess;
+		
+		// other properites:
+		int shading_model, blend_func;
+		float shininess_strength, opacity, reflectivity, refracti, bump_scaling;
+		Color transparent, reflective;
 		TextureProperty diffusemap, ambientmap, specularmap, opacitymap, emissivemap, shininessmap, lightmap, normalmap, heightmap, displacementmap, reflectionmap; 
 		std::string background;	
 		
