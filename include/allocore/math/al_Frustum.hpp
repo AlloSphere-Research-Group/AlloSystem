@@ -57,20 +57,22 @@ class Frustum{
 public:
 
 	enum{ TOP=0, BOTTOM, LEFT, RIGHT, NEARP, FARP };
-	enum{ OUTSIDE, INTERSECT, INSIDE };
+	enum{ OUTSIDE=0, INTERSECT, INSIDE };
 
-	Vec<3,T> ntl, ntr, nbl, nbr, ftl, ftr, fbl, fbr;	// corners
-	Plane<T> pl[6];										// faces
+	Vec<3,T> ntl, ntr, nbl, nbr, ftl, ftr, fbl, fbr;	///< Corners
+	Plane<T> pl[6];										///< Faces
+
 
 	/// Test whether point is in frustum
-	int pointInFrustum(const Vec<3,T>& p) const;
+	int testPoint(const Vec<3,T>& p) const;
 	
 	/// Test whether sphere is in frustum
-	int sphereInFrustum(const Vec<3,T>& p, float raio) const;
+	int testSphere(const Vec<3,T>& center, float radius) const;
 	
 	/// Test whether axis-aligned box is in frustum
-	int boxInFrustum(const Vec<3,T>& xyz, const Vec<3,T>& dim) const;
+	int testBox(const Vec<3,T>& xyz, const Vec<3,T>& dim) const;
 
+	/// Compute planes based on frustum corners (planes face to inside)
 	void computePlanes();
 
 //	T mNear, mFar;			// clipping z distances
@@ -88,12 +90,55 @@ public:
 
 template <class T>
 void Frustum<T>::computePlanes(){
-	pl[TOP].set3Points(ntr,ntl,ftl);
-	pl[BOTTOM].set3Points(nbl,nbr,fbr);
-	pl[LEFT].set3Points(ntl,nbl,fbl);
-	pl[RIGHT].set3Points(nbr,ntr,fbr);
-	pl[NEARP].set3Points(ntl,ntr,nbr);
-	pl[FARP].set3Points(ftr,ftl,fbl);
+	pl[TOP   ].from3Points(ntr,ntl,ftl);
+	pl[BOTTOM].from3Points(nbl,nbr,fbr);
+	pl[LEFT  ].from3Points(ntl,nbl,fbl);
+	pl[RIGHT ].from3Points(nbr,ntr,fbr);
+	pl[NEARP ].from3Points(ntl,ntr,nbr);
+	pl[FARP  ].from3Points(ftr,ftl,fbl);
+}
+
+template <class T>
+int Frustum<T>::testPoint(const Vec<3,T>& p) const {
+	for(int i=0; i<6; ++i){
+		if(pl[i].distance(p) < 0)
+			return OUTSIDE;
+	}
+	return INSIDE;
+}
+
+template <class T>
+int Frustum<T>::testSphere(const Vec<3,T>& c, float r) const {
+	int result = INSIDE;
+	for(int i=0; i<6; ++i){
+		float distance = pl[i].distance(c);
+		if(distance < -r)
+			return OUTSIDE;
+		else if(distance < r)
+			result = INTERSECT;
+	}
+	return result;
+}
+
+template <class T>
+int Frustum<T>::testBox(const Vec<3,T>& xyz, const Vec<3,T>& dim) const {
+	int result = INSIDE;
+	for(int i=0; i<6; i++){
+		const Vec3d& plNrm = pl[i].normal();
+		Vec<3,T> vp = xyz;
+		
+		if(plNrm[0] > 0) vp[0] += dim[0];
+		if(plNrm[1] > 0) vp[1] += dim[1];
+		if(plNrm[2] > 0) vp[2] += dim[2];
+		if(pl[i].distance(vp) < 0) return OUTSIDE;	
+
+		Vec<3,T> vn = xyz;
+		if(plNrm[0] < 0) vn[0] += dim[0];
+		if(plNrm[1] < 0) vn[1] += dim[1];
+		if(plNrm[2] < 0) vn[2] += dim[2];
+		if(pl[i].distance(vn) < 0) result = INTERSECT;
+	}
+	return result;
 }
 
 //
@@ -140,54 +185,6 @@ void Frustum<T>::computePlanes(){
 //	pl[FARP].set3Points(ftr,ftl,fbl);
 //}
 
-template <class T>
-int Frustum<T>::pointInFrustum(const Vec<3,T>& p) const {
-	int result = INSIDE;
-	for(int i=0; i<6; ++i){
-		if(pl[i].distance(p) < 0)
-			return OUTSIDE;
-	}
-	return result;
-}
-
-template <class T>
-int Frustum<T>::sphereInFrustum(const Vec<3,T>& p, float raio) const {
-	int result = INSIDE;
-	for(int i=0; i<6; ++i){
-		float distance = pl[i].distance(p);
-		if(distance < -raio)
-			return OUTSIDE;
-		else if(distance < raio)
-			result = INTERSECT;
-	}
-	return result;
-}
-
-template <class T>
-int Frustum<T>::boxInFrustum(const Vec<3,T>& xyz, const Vec<3,T>& dim) const {
-	int result = INSIDE;
-	for(int i=0; i<6; i++){
-		const Vec3d& plNrm = pl[i].normal();
-		Vec<3,T> vp = xyz;
-		
-		if(plNrm[0] > 0) vp[0] += dim[0];
-		if(plNrm[1] > 0) vp[1] += dim[1];
-		if(plNrm[2] > 0) vp[2] += dim[2];
-		if(pl[i].distance(vp) < 0) return OUTSIDE;	
-
-		Vec<3,T> vn = xyz;
-		if(plNrm[0] < 0) vn[0] += dim[0];
-		if(plNrm[1] < 0) vn[1] += dim[1];
-		if(plNrm[2] < 0) vn[2] += dim[2];
-		if(pl[i].distance(vn) < 0) result = INTERSECT;
-	}
-	return result;
-}
-
-
-
-
-
-} // ::al::
+} // al::
 
 #endif

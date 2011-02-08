@@ -31,73 +31,68 @@
 
 namespace al {
 
-/// Representation of a Euclidean plane
+/// A plane in Euclidean space
 template <class T>
 class Plane{
 public:
 
 	typedef al::Vec<3,T> Vec3;
 
-	Plane(){}
+	Plane(): mNormal(1,0,0), mD(0){}
 	Plane(const Vec3& v1, const Vec3& v2, const Vec3& v3);
 
-	/// Set plane from three points
-	void set3Points(const Vec3& v1, const Vec3& v2, const Vec3& v3);
+	/// Set from three points lying on the plane 
+	Plane& from3Points(const Vec3& v1, const Vec3& v2, const Vec3& v3);
 	
-	/// Set plane from a normal and point
-	void setNormalAndPoint(const Vec3& normal, const Vec3& point);
+	/// Set plane from a unit length normal and point lying on the plane
+	Plane& fromNormalAndPoint(const Vec3& normal, const Vec3& point);
 
 	/// Set plane from coefficients
-	void setCoefficients(T a, T b, T c, T d);
+	Plane& fromCoefficients(T a, T b, T c, T d);
 
-	/// Returns distance from plane to point
+	/// Returns distance from plane to point (measured relative to plane normal)
 	T distance(const Vec3& p) const;
 
+	/// Get normal perpendicular to plane
 	const Vec3& normal() const { return mNormal; }
 
 protected:
-	Vec3 mNormal, mPoint;
-	T mD;
+	Vec3 mNormal;	// plane orientation as perp. unit vector
+	T mD;			// plane position as translation factor along normal
 };
 
 
 template <class T>
 Plane<T>::Plane(const Vec3& v1, const Vec3& v2, const Vec3& v3){
-	set3Points(v1,v2,v3);
+	from3Points(v1,v2,v3);
 }
 
 template <class T>
-void Plane<T>::set3Points(const Vec3& v1, const Vec3& v2, const Vec3& v3){
-
-	Vec3 aux1 = v1 - v2;
-	Vec3 aux2 = v3 - v2;
-
-	cross(mNormal, aux2, aux1);
-
-	mNormal.normalize();
-	mPoint = v2;
-	mD = -(mNormal.dot(mPoint));
+Plane<T>& Plane<T>::from3Points(const Vec3& v1, const Vec3& v2, const Vec3& v3){
+	return fromNormalAndPoint(cross(v1-v2, v3-v2).normalize(), v2); // left-handed
+//	return fromNormalAndPoint(cross(v3-v2, v1-v2).normalize(), v2); // right-handed
 }
 
 template <class T>
-void Plane<T>::setNormalAndPoint(const Vec3& nrm, const Vec3& point){
-	mNormal = nrm.sgn();
-	mD = -(mNormal.dot(mPoint));
+Plane<T>& Plane<T>::fromNormalAndPoint(const Vec3& nrm, const Vec3& point){
+	mNormal = nrm;
+	mD = -(mNormal.dot(point));
+	return *this;
 }
 
 template <class T>
-void Plane<T>::setCoefficients(T a, T b, T c, T d){
+Plane<T>& Plane<T>::fromCoefficients(T a, T b, T c, T d){
 	mNormal(a,b,c);
 	T l = mNormal.mag();
 	mNormal(a/l,b/l,c/l);
 	mD = d/l;
+	return *this;
 }
 
 template <class T>
 T Plane<T>::distance(const Vec3& p) const{
 	return (mD + mNormal.dot(p));
 }
-
 
 } // ::al::
 
