@@ -216,7 +216,7 @@ inline void SearchPaths::addSearchPath(const std::string& src, bool recursive) {
 		}
 		iter++;
 	}
-	printf("adding path %s\n", path.data());
+//	printf("adding path %s\n", path.data());
 	mSearchPaths.push_front(searchpath(path, recursive));
 }
 
