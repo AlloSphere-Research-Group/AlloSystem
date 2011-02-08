@@ -41,7 +41,10 @@ public:
 	Plane(): mNormal(1,0,0), mD(0){}
 	Plane(const Vec3& v1, const Vec3& v2, const Vec3& v3);
 
-	/// Set from three points lying on the plane 
+	/// Set from three points lying on the plane
+	
+	/// The normal is computed according to a right-handed coordinate system.
+	/// For left-handed, swap the first and last vertices.
 	Plane& from3Points(const Vec3& v1, const Vec3& v2, const Vec3& v3);
 	
 	/// Set plane from a unit length normal and point lying on the plane
@@ -69,8 +72,8 @@ Plane<T>::Plane(const Vec3& v1, const Vec3& v2, const Vec3& v3){
 
 template <class T>
 Plane<T>& Plane<T>::from3Points(const Vec3& v1, const Vec3& v2, const Vec3& v3){
-	return fromNormalAndPoint(cross(v1-v2, v3-v2).normalize(), v2); // left-handed
-//	return fromNormalAndPoint(cross(v3-v2, v1-v2).normalize(), v2); // right-handed
+//	return fromNormalAndPoint(cross(v1-v2, v3-v2).normalize(), v2); // left-handed
+	return fromNormalAndPoint(cross(v3-v2, v1-v2).normalize(), v2); // right-handed
 }
 
 template <class T>

@@ -240,13 +240,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		0509834C128E17BA007C1805 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 36B4130E10EFFA8D007B16D0;
-			remoteInfo = allocore;
-		};
 		05C9386B128A15B00068F87F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
@@ -1838,7 +1831,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				0509834D128E17BA007C1805 /* PBXTargetDependency */,
 			);
 			name = unitTests;
 			productName = unitTests;
@@ -2119,7 +2111,6 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "allo" */;
 			compatibilityVersion = "Xcode 3.0";
-			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -2387,11 +2378,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		0509834D128E17BA007C1805 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
-			targetProxy = 0509834C128E17BA007C1805 /* PBXContainerItemProxy */;
-		};
 		05C9386C128A15B00068F87F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 36B4130E10EFFA8D007B16D0 /* allocore */;

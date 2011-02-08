@@ -211,7 +211,7 @@ int utMath(){
 		#define T(x, y) assert(x == y);
 		T(c, Complexd(0,0))
 		c.fromPolar(1, 0.2);	T(c, Polard(0.2))
-		c.fromPhase(2.3);		T(c, Polard(2.3))
+		c.fromPolar(2.3);		T(c, Polard(2.3))
 		assert(c != Complexd(0,0));
 		T(c.conj(), Complexd(c.r, -c.i))
 		#undef T
@@ -608,7 +608,41 @@ int utMath(){
 	
 	
 	{
-		al::Plane<double> p(Vec3d(), Vec3d(), Vec3d());
+		al::Plane<double> p;
+		p.fromNormalAndPoint(Vec3d(1,0,0), Vec3d(1,1,1));
+		assert(p.distance(Vec3d(1,0,0)) ==  0);
+		assert(p.distance(Vec3d(0,1,0)) == -1);
+		assert(p.distance(Vec3d(0,0,1)) == -1);
+		assert(p.distance(Vec3d(2,0,0)) ==  1);
+	}
+	
+	{
+		Frustumd f;
+		f.fbl = Vec3d(-1,-1,-1);
+		f.fbr = Vec3d( 1,-1,-1);
+		f.ftl = Vec3d(-1, 1,-1);
+		f.ftr = Vec3d( 1, 1,-1);
+		f.nbl = Vec3d(-1,-1, 1);
+		f.nbr = Vec3d( 1,-1, 1);
+		f.ntl = Vec3d(-1, 1, 1);
+		f.ntr = Vec3d( 1, 1, 1);
+		f.computePlanesRH();
+
+//		Plane<double>& p = f.pl[Frustumd::LEFT];
+//		printf("%g %g %g\n", p.normal()[0], p.normal()[1], p.normal()[2]);
+//		
+//		Vec3d nrm = cross(f.fbl-f.nbl, f.ntl-f.nbl);
+//		printf("%g %g %g\n", nrm[0], nrm[1], nrm[2]);
+//		
+//		printf("%g %g %g\n", (f.fbl-f.nbl)[0], (f.fbl-f.nbl)[1], (f.fbl-f.nbl)[2]);
+//		printf("%g %g %g\n", (f.ntl-f.nbl)[0], (f.ntl-f.nbl)[1], (f.ntl-f.nbl)[2]);
+
+		assert(f.testPoint(Vec3d(0,0,0)) == Frustumd::INSIDE);
+		assert(f.testPoint(Vec3d(2,1,1)) == Frustumd::OUTSIDE);
+		
+		assert(f.testSphere(Vec3d(0,0,0), 0.9) == Frustumd::INSIDE);
+		assert(f.testSphere(Vec3d(0,0,0), 1.1) == Frustumd::INTERSECT);
+		assert(f.testSphere(Vec3d(2,2,2), 0.5) == Frustumd::OUTSIDE);
 	}
 
 	return 0;

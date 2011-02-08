@@ -73,7 +73,10 @@ public:
 	int testBox(const Vec<3,T>& xyz, const Vec<3,T>& dim) const;
 
 	/// Compute planes based on frustum corners (planes face to inside)
-	void computePlanes();
+	void computePlanesLH();
+
+	/// Compute planes based on frustum corners (planes face to inside)
+	void computePlanesRH();
 
 //	T mNear, mFar;			// clipping z distances
 //	T mRatio;				// aspect ratio
@@ -88,8 +91,19 @@ public:
 		
 };
 
+
 template <class T>
-void Frustum<T>::computePlanes(){
+void Frustum<T>::computePlanesLH(){
+	pl[TOP   ].from3Points(ftl,ntl,ntr);
+	pl[BOTTOM].from3Points(fbr,nbr,nbl);
+	pl[LEFT  ].from3Points(fbl,nbl,ntl);
+	pl[RIGHT ].from3Points(fbr,ntr,nbr);
+	pl[NEARP ].from3Points(nbr,ntr,ntl);
+	pl[FARP  ].from3Points(fbl,ftl,ftr);
+}
+
+template <class T>
+void Frustum<T>::computePlanesRH(){
 	pl[TOP   ].from3Points(ntr,ntl,ftl);
 	pl[BOTTOM].from3Points(nbl,nbr,fbr);
 	pl[LEFT  ].from3Points(ntl,nbl,fbl);

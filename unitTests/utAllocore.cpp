@@ -8,23 +8,23 @@ int main (int argc, char * const argv[]) {
 	searchpaths.addAppPaths(argc, argv);
 	searchpaths.addSearchPath(searchpaths.appPath() + "../share");
 
-	utAsset();
+//	utAsset();
 	
 	utMath();
-	utTypes();
-	utTypesConversion();
+//	utTypes();
+//	utTypesConversion();
 //	utSpatial();
 //	utSystem();
-	utProtocolOSC();
-	utProtocolSerialize();
+//	utProtocolOSC();
+//	utProtocolSerialize();
 
 //	utIOAudioIO();
 //	utIOWindowGL();
-	utIOSocket();
-	utFile();
-	utThread();
+//	utIOSocket();
+//	utFile();
+//	utThread();
 
-	utProtocolGraphics();
+//	utProtocolGraphics();
 	
 //	int size = 14;
 //	for (int z=-64; z<64; z++) {

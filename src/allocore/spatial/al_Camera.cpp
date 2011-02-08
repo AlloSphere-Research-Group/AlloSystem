@@ -50,7 +50,7 @@ void Camera::frustum(Frustumd& f, const Pose& p, double aspect) const {
 	f.fbl = fc - uu * fh - ur * fw;
 	f.fbr = fc - uu * fh + ur * fw;
 
-	f.computePlanes();
+	f.computePlanesLH();
 }
 
 double Camera::height(double distance) {
