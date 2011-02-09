@@ -539,8 +539,7 @@ void GraphicsGL :: textureBind(Texture *tex, int unit) {
 	glEnable(gltarget);
 	glBindTexture(gltarget, tex->id());
 	
-	printf("(unit %i, target %i, id %ld)\n",
-		unit, tex->target(), tex->id());
+	//printf("(unit %i, target %i, id %ld)\n", unit, tex->target(), tex->id());
 	gl_error("binding texture");
 }
 
