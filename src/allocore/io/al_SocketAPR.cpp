@@ -58,21 +58,23 @@ struct Socket::Impl : public ImplAPR {
 	void timeout(al_sec v){
 		open(mPort, mAddressString, mSender);
 		
-		if(v == 0){
-			// non-blocking:			APR_SO_NONBLOCK==1(on),  then timeout=0
-			check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 1));
-			check_apr(apr_socket_timeout_set(mSock, 0));
-		}
-		else if(v > 0){
-			// blocking-with-timeout:	APR_SO_NONBLOCK==0(off), then timeout>0
-			check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 0));
-			check_apr(apr_socket_timeout_set(mSock, (apr_interval_time_t)(v * 1.0e6)));
+		if (opened()) {
+			if(v == 0){
+				// non-blocking:			APR_SO_NONBLOCK==1(on),  then timeout=0
+				check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 1));
+				check_apr(apr_socket_timeout_set(mSock, 0));
+			}
+			else if(v > 0){
+				// blocking-with-timeout:	APR_SO_NONBLOCK==0(off), then timeout>0
+				check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 0));
+				check_apr(apr_socket_timeout_set(mSock, (apr_interval_time_t)(v * 1.0e6)));
 
-		}
-		else{
-			// blocking-forever:		APR_SO_NONBLOCK==0(off), then timeout<0
-			check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 0));
-			check_apr(apr_socket_timeout_set(mSock, -1));
+			}
+			else{
+				// blocking-forever:		APR_SO_NONBLOCK==0(off), then timeout<0
+				check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 0));
+				check_apr(apr_socket_timeout_set(mSock, -1));
+			}
 		}
 		mTimeout = v;
 	}
@@ -126,8 +128,12 @@ size_t Socket::recv(char * buffer, size_t maxlen) {
 
 size_t Socket::send(const char * buffer, size_t len) {
 	apr_size_t size = len;
-	//check_apr(apr_socket_send(mSock, buffer, &size));
-	apr_socket_send(mImpl->mSock, buffer, &size);
+	if (mImpl->opened()) {
+		//check_apr(apr_socket_send(mSock, buffer, &size));
+		apr_socket_send(mImpl->mSock, buffer, &size);
+	} else {
+		size = 0;
+	}
 	return size;
 }
 
