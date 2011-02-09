@@ -1,4 +1,4 @@
-#include "protocol/opencl/al_OpenCL.hpp"
+#include "allocore/protocol/opencl/al_OpenCL.hpp"
 #include <stdio.h>
 
 using namespace al;

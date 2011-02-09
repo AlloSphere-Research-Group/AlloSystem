@@ -52,6 +52,10 @@ namespace al {
 /// Returns absolute value
 template<class T> T abs(T v);
 
+/// Convert amplitude to decibels
+template <class T>
+inline T ampTodB(const T& amp){ return 20*::log(amp); }
+
 /// Returns value clipped ouside of range [-eps, eps]
 template<class T> T atLeast(T v, T eps);
 
@@ -90,6 +94,10 @@ template<class T> T clip(T v, int& clipFlag, T hi, T lo);
 
 /// Returns value clipped to [-hi, hi].
 template<class T> T clipS(T value, T hi=T(1));
+
+/// Convert decibels to amplitude
+template <class T>
+inline T dBToAmp(const T& db){ return ::pow(10, db/20.); }
 
 /// Returns whether or not an integer value is even.
 template<class T> bool even(T v);
