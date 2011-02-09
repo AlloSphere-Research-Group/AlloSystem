@@ -4,21 +4,27 @@
 namespace al{
 
 Camera :: Camera(
-	double fovy, 
+	double fovy_, 
 	double nearClip, 
 	double farClip, 
 	double focalLength, 
-	double eyeSep,
-	double aspectRatio
+	double eyeSep
 )
-:	mFovy(fovy),
-	mNear(nearClip),
+:	mNear(nearClip),
 	mFar(farClip),
 	mFocalLength(focalLength),
 	mEyeSep(eyeSep),
-	mAspectRatio(aspectRatio),
 	mZoom(0)
-{}
+{
+	fovy(fovy_);
+}
+
+Camera& Camera::fovy(double v){
+	static const double cDeg2Rad = M_PI / 180.;
+	mFovy = v;
+	mTanFOV = tan(fovy() * cDeg2Rad*0.5);
+	return *this;
+}
 
 
 void Camera::frustum(Frustumd& f, const Pose& p, double aspect) const {
@@ -27,11 +33,9 @@ void Camera::frustum(Frustumd& f, const Pose& p, double aspect) const {
 	p.unitVectors(ur, uu, uf);
 	const Vec3d& pos = p.pos();
 
-	static double const tanCoef = 0.01745329252*0.5;	// degree-to-radian over 2
-	double tanFOV = tan(fovy() * tanCoef);
-	double nh = near() * tanFOV;
+	double nh = heightAtDepth(near());
 	double nw = nh * aspect; 
-	double fh = far()  * tanFOV;
+	double fh = heightAtDepth(far());
 	double fw = fh * aspect;
 //	Vec3d Z = (pos - l).normalize();
 //	Vec3d X = cross(uu, Z).normalize();
@@ -53,9 +57,9 @@ void Camera::frustum(Frustumd& f, const Pose& p, double aspect) const {
 	f.computePlanesLH();
 }
 
-double Camera::height(double distance) {
-	return 2*distance * tan(mFovy*M_DEG2RAD*0.5);
-}
+//double Camera::height(double distance) {
+//	return 2*distance * tan(mFovy*M_DEG2RAD*0.5);
+//}
 
 //Camera :: Camera(
 //	double fovy, 
