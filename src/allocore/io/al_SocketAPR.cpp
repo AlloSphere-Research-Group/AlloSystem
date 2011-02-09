@@ -41,13 +41,16 @@ struct Socket::Impl : public ImplAPR {
 		mPort = port;
 		mSender = sender;
 		mAddressString = address;
-		check_apr(apr_sockaddr_info_get(&mAddress, (mAddressString[0]) ? mAddressString.c_str() : 0, APR_INET, mPort, 0, mPool));
-		check_apr(apr_socket_create(&mSock, mAddress->family, SOCK_DGRAM, APR_PROTO_UDP, mPool));
+		if (APR_SUCCESS == check_apr(apr_sockaddr_info_get(&mAddress, (mAddressString[0]) ? mAddressString.c_str() : 0, APR_INET, mPort, 0, mPool))) {
+			check_apr(apr_socket_create(&mSock, mAddress->family, SOCK_DGRAM, APR_PROTO_UDP, mPool));
 
-		if(mSock){
-			// Assign address to socket. If TCP, establish new connection.
-			if(mSender)	check_apr(apr_socket_connect(mSock, mAddress));
-			else		check_apr(apr_socket_bind(mSock, mAddress));
+			if(mSock){
+				// Assign address to socket. If TCP, establish new connection.
+				if(mSender)	check_apr(apr_socket_connect(mSock, mAddress));
+				else		check_apr(apr_socket_bind(mSock, mAddress));
+			}
+		} else {
+			printf("failed to create socket at %s:%i\n", address.c_str(), port);
 		}
 	}
 	

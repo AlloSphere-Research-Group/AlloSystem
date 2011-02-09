@@ -17,6 +17,7 @@ Texture::Texture(Graphics& backend, int width, int height, Format format, Type t
 	mDepth(0),
 	mTarget(TEXTURE_2D),
 	mFormat(format),
+	mSingleChannel(LUMINANCE),
 	mType(type),
 	mWrap(wrap),
 	mMinFilter(LINEAR),
@@ -115,13 +116,16 @@ void Texture::unbind(int unit) {
 }
 
 void Texture::setArrayFormat(const AlloArrayHeader &header) {
+	
 	mFormat = format_for_array_components(header.components);
+	
 	mType = type_for_array_type(header.type);
 
 	mWidth = header.dim[0];
 	mHeight = header.dim[1];
 	mDepth = header.dim[2];
 	
+	mRect = header.dim[0] == header.dim[1];
 	mTarget = target_for_array_dimcount(header.dimcount);
 	
 	// allocate array data space
