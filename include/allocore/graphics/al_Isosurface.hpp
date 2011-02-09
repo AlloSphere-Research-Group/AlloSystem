@@ -70,11 +70,17 @@ public:
 	/// valid.
 	int volumeLengths(double& volLengthX, double& volLengthY, double& volLengthZ) const;
 
-	/// Sets the dimensions of the array
+	/// Set individual dimensions of the array
 	Isosurface& cellDims(int nx, int ny, int nz);
 
-	/// Set lengths of cell
+	/// Set all dimensions of the array
+	Isosurface& cellDims(int n){ return cellDims(n,n,n); }
+
+	/// Set individual lengths of cell
 	Isosurface& cellLengths(double dx, double dy, double dz);
+
+	/// Set all lengths of cell
+	Isosurface& cellLengths(double v){ return cellLengths(v,v,v); }
 
 	/// Set isolevel
 	Isosurface& level(T v){ mIsolevel=v; return *this; }
