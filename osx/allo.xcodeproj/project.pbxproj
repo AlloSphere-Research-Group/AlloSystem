@@ -6,6 +6,20 @@
 	objectVersion = 44;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		36035DB813037E8D001E9BA9 /* make allocore */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 36035DC713037EB7001E9BA9 /* Build configuration list for PBXAggregateTarget "make allocore" */;
+			buildPhases = (
+				36035DB713037E8D001E9BA9 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = "make allocore";
+			productName = "make allocore";
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		0509834E128E17C0007C1805 /* utAllocore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AC529F11628D4D0076AA8B /* utAllocore.cpp */; };
 		0509834F128E17C0007C1805 /* utFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16054DC1122E13360039003C /* utFile.cpp */; };
@@ -2354,6 +2368,7 @@
 			projectRoot = "";
 			targets = (
 				36B4130E10EFFA8D007B16D0 /* allocore */,
+				36035DB813037E8D001E9BA9 /* make allocore */,
 				16AC529611628D0E0076AA8B /* unitTests */,
 				8DD76F620486A84900D96B5E /* exScheduling */,
 				3602B4CA110A67C9005DC3D0 /* exOscRecv */,
@@ -2386,6 +2401,19 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		36035DB713037E8D001E9BA9 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd ../\nmake allocore\n";
+		};
 		369DE0E412B6E86500F75D2A /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -3088,6 +3116,27 @@
 			};
 			name = Release;
 		};
+		36035DB913037E8E001E9BA9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = "make allocore";
+			};
+			name = Debug;
+		};
+		36035DBA13037E8E001E9BA9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = "make allocore";
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		360C244211E6599F000FF335 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3709,6 +3758,15 @@
 			buildConfigurations = (
 				3602B734110A9770005DC3D0 /* Debug */,
 				3602B735110A9770005DC3D0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		36035DC713037EB7001E9BA9 /* Build configuration list for PBXAggregateTarget "make allocore" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				36035DB913037E8E001E9BA9 /* Debug */,
+				36035DBA13037E8E001E9BA9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

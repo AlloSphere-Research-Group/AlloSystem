@@ -40,34 +40,32 @@ Shader::Shader(const std::string& source, Shader::Type type)
 :	mSource(source), mType(type){}
 
 Shader& Shader::compile(){ 
-GraphicsGL::gl_error("compile0");
+	GraphicsGL::gl_error("glerror compile0");
 	validate(); 
-GraphicsGL::gl_error("compile1");
-	glCompileShader(id()); 
-GraphicsGL::gl_error("compile2");
+	GraphicsGL::gl_error("glerror compile1");
 	return *this; 
 }
 
 bool Shader::compiled() const {
 	GLint v;
-	//GLhandleARB h = (GLhandleARB)mID;
-	//glGetObjectParameterivARB((GLhandleARB)handle(), GL_COMPILE_STATUS, &v);
-	glGetProgramiv(id(), GL_COMPILE_STATUS, &v);
+	GLhandleARB h = (GLhandleARB)id();
+	glGetObjectParameterivARB(h, GL_COMPILE_STATUS, &v);
+	//glGetProgramiv(id(), GL_COMPILE_STATUS, &v);
+	GraphicsGL::gl_error("Shader::compiled()");
 	return v;
 }
 
 void Shader::get(int pname, void * params) const { glGetShaderiv(id(), pname, (GLint *)params); }
 
 void Shader::onCreate(){
-	printf("Shader::onCreate\n");
 	mID = glCreateShader(gl_shader_type(mType));
-GraphicsGL::gl_error("Shader::onCreate0");
+	GraphicsGL::gl_error("Shader::onCreate0");
 	//mHandle = glCreateShaderObjectARB(gl_shader_type(mType));
 	//mID = (long)handle();
 	if(mSource[0]){
 		sendSource(); 
 		GraphicsGL::gl_error("Shader::onCreate1");
-		compile();
+		glCompileShader(id());
 		GraphicsGL::gl_error("Shader::onCreate2");
 	}
 }
@@ -102,9 +100,9 @@ Shader& Shader::source(const std::string& src, Shader::Type type){
 
 const ShaderProgram& ShaderProgram::attach(Shader& s) { 
 	validate();
-	if (!s.compiled()) s.compile();
-	//glAttachObjectARB((GLhandleARB)handle(), (GLhandleARB)s.handle());
-	glAttachShader(id(), s.id()); 
+	s.compile();
+	glAttachObjectARB((GLhandleARB)id(), (GLhandleARB)s.id());
+	//glAttachShader(id(), s.id()); 
 	
 	if (s.type() == Shader::GEOMETRY) {
 		glProgramParameteriEXT(id(),GL_GEOMETRY_INPUT_TYPE_EXT,GraphicsGL::gl_primitive(inPrim));
@@ -208,6 +206,8 @@ void ShaderProgram::listParams() const {
 
 	glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numActiveUniforms);
 	glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &numActiveAttributes);
+	
+	printf("ShaderProgram::listParams()\n");
 
 	for(int j=0; j < numActiveUniforms; j++)
 	{
