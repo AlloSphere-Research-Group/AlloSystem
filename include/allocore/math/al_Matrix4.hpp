@@ -185,7 +185,13 @@ public:
 						0,	0,	1,	0,
 						0,	0,	0,	1	);
 	}
-		
+
+	/// @param[in] l	distance from center of near plane to left edge
+	/// @param[in] r	distance from center of near plane to right edge
+	/// @param[in] b	distance from center of near plane to bottom edge
+	/// @param[in] t	distance from center of near plane to top edge
+	/// @param[in] n	distance from eye to near plane
+	/// @param[in] f	distance from eye to far plane
 	static const Matrix4 perspective(T l, T r, T b, T t, T n, T f) {
 		const T W = r-l;	const T W2 = r+l;
 		const T H = t-b;	const T H2 = t+b;
