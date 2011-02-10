@@ -12,6 +12,7 @@ namespace al {
 class Camera {
 public:
 
+	///
 	Camera(
 		double fovy=30,
 		double nearClip=0.1,
@@ -36,7 +37,13 @@ public:
 	double zoom() const { return mZoom; }					///< Get zoom amount
 	double IOD() const { return eyeSep() * focalLength()/30.0; }	///< Get automatic inter-ocular distance
 
-	void frustum(Frustumd& f, const Pose& p, double aspectRatio) const;		///< Get frustum, TODO: off-axis
+	/// Get test frustum
+	
+	/// @param[in] f			The resulting test frustum
+	/// @param[in] p			A position and orientation in world coordinates
+	/// @param[in] aspect		Aspect ratio (width/height) of viewport
+	/// @param[in] isStereo		Whether scene is in stereo (widens near/far planes to fit both eyes)
+	void frustum(Frustumd& f, const Pose& p, double aspect, bool isStereo=false) const;
 	
 	/// Returns half the height of the frustum at a given depth
 	
@@ -56,7 +63,7 @@ protected:
 	double mFocalLength;		// Focal length along vd
 	double mEyeSep;				// Eye separation
 	double mZoom;
-	Vec3d mStereoOffset;		// eye offset vector (right eye; left eye is inverse), usually (1, 0, 0)
+//	Vec3d mStereoOffset;		// eye offset vector (right eye; left eye is inverse), usually (1, 0, 0)
 };
 
 

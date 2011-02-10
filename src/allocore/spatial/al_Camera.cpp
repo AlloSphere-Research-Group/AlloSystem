@@ -27,19 +27,25 @@ Camera& Camera::fovy(double v){
 }
 
 
-void Camera::frustum(Frustumd& f, const Pose& p, double aspect) const {
+void Camera::frustum(Frustumd& f, const Pose& p, double aspect, bool isStereo) const {
 
 	Vec3d ur, uu, uf;
 	p.unitVectors(ur, uu, uf);
 	const Vec3d& pos = p.pos();
 
 	double nh = heightAtDepth(near());
-	double nw = nh * aspect; 
 	double fh = heightAtDepth(far());
+
+	double nw = nh * aspect;
 	double fw = fh * aspect;
-//	Vec3d Z = (pos - l).normalize();
-//	Vec3d X = cross(uu, Z).normalize();
-//	Vec3d Y = cross(Z, X);
+	
+	// This effectively creates a union between the near/far planes of the 
+	// left and right eyes. The offsets are computed by using the law
+	// of similar triangles.
+	if(isStereo){
+		nw += fabs(0.5*eyeSep()*(focalLength()-near())/focalLength());
+		fw += fabs(0.5*eyeSep()*(focalLength()- far())/focalLength());
+	}
 
 	Vec3d nc = pos + uf * near();	// center point of near plane
 	Vec3d fc = pos + uf * far();	// center point of far plane
