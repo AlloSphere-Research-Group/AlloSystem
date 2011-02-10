@@ -39,7 +39,14 @@ void glDetachShader(GLuint program, GLuint shader);
 Shader::Shader(const std::string& source, Shader::Type type)
 :	mSource(source), mType(type){}
 
-Shader& Shader::compile(){ validate(); glCompileShader(id()); return *this; }
+Shader& Shader::compile(){ 
+GraphicsGL::gl_error("compile0");
+	validate(); 
+GraphicsGL::gl_error("compile1");
+	glCompileShader(id()); 
+GraphicsGL::gl_error("compile2");
+	return *this; 
+}
 
 bool Shader::compiled() const {
 	GLint v;
@@ -52,11 +59,16 @@ bool Shader::compiled() const {
 void Shader::get(int pname, void * params) const { glGetShaderiv(id(), pname, (GLint *)params); }
 
 void Shader::onCreate(){
+	printf("Shader::onCreate\n");
 	mID = glCreateShader(gl_shader_type(mType));
+GraphicsGL::gl_error("Shader::onCreate0");
 	//mHandle = glCreateShaderObjectARB(gl_shader_type(mType));
 	//mID = (long)handle();
 	if(mSource[0]){
-		sendSource(); compile();
+		sendSource(); 
+		GraphicsGL::gl_error("Shader::onCreate1");
+		compile();
+		GraphicsGL::gl_error("Shader::onCreate2");
 	}
 }
 
