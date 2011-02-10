@@ -170,7 +170,7 @@ void Texture::toArray() {
 	mBackend->textureToArray(this);
 }
 
-void Texture::allocate(){
+void Texture::allocate(unsigned align){
 	AlloArrayHeader h = {
 		array_type_for_type(type()),
 		components_for_format(format()),
@@ -178,7 +178,7 @@ void Texture::allocate(){
 		{ width(), height(), depth(), 0 },
 		{ 0,0,0,0 }
 	};
-	allo_array_setstride(&h, 4);
+	allo_array_setstride(&h, align);
 	allocate(h);
 }
 

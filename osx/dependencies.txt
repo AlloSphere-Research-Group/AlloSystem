@@ -19,8 +19,9 @@ To:
 
 3) make
 
-To create a multi-architecture ("fat" file) use lip:
+To create a multi-architecture ("fat" file) use lipo:
 lipo -create -arch i386 arch_i386_libapr-1.a -arch x86_64 arch_x86_64_libapr-1.a -output libapr-1.a
+
 
 libfreeimage
 --------------

@@ -73,7 +73,7 @@ public:
 	void toArray();
 	
 	/// Allocate internal memory based on current settings
-	void allocate();
+	void allocate(unsigned align=4);
 
 	void allocate(AlloArrayHeader &header);
 

@@ -86,6 +86,7 @@
 		3602B72F110A9770005DC3D0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		3602B730110A9770005DC3D0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		3602B732110A9770005DC3D0 /* alscheduling.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* alscheduling.1 */; };
+		36035C3313037130001E9BA9 /* al_Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36035C3213037130001E9BA9 /* al_Font.cpp */; };
 		360BB6E511DB06D4000C2A42 /* al_Time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFA116D527D00928703 /* al_Time.cpp */; };
 		360C243811E6599F000FF335 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		360C243911E6599F000FF335 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
@@ -502,6 +503,8 @@
 		3602B53D110A6D3D005DC3D0 /* al_Serialize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Serialize.h; sourceTree = "<group>"; };
 		3602B53E110A6D3D005DC3D0 /* al_Serialize.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Serialize.hpp; sourceTree = "<group>"; };
 		3602B736110A9770005DC3D0 /* exOscSend */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exOscSend; sourceTree = BUILT_PRODUCTS_DIR; };
+		36035C3113037120001E9BA9 /* al_Font.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Font.hpp; sourceTree = "<group>"; };
+		36035C3213037130001E9BA9 /* al_Font.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Font.cpp; sourceTree = "<group>"; };
 		360C23FE11E6591C000FF335 /* clangversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = clangversion.cpp; sourceTree = "<group>"; };
 		360C244411E6599F000FF335 /* exCompiler */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exCompiler; sourceTree = BUILT_PRODUCTS_DIR; };
 		360C246211E659D3000FF335 /* .dir */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .dir; sourceTree = "<group>"; };
@@ -1178,6 +1181,7 @@
 			children = (
 				369DDF5012B6C86600F75D2A /* al_Asset.hpp */,
 				361BF02F11DEA66600E60A9C /* al_BufferObject.hpp */,
+				36035C3113037120001E9BA9 /* al_Font.hpp */,
 				16AA95E9118F6EEF00B98EC3 /* al_GPUObject.hpp */,
 				362127C71173CD72009CB6FC /* al_Graphics.hpp */,
 				165869491288E9380068E01A /* al_GraphicsOpenGL.hpp */,
@@ -1204,6 +1208,7 @@
 			children = (
 				36F0ABBF12319586000A8EBF /* Makefile.config */,
 				369DDF5112B6C87200F75D2A /* al_Asset.cpp */,
+				36035C3213037130001E9BA9 /* al_Font.cpp */,
 				361AA8AD12AEFDF3002E9DFD /* al_GPUObject.cpp */,
 				362127C81173CDBB009CB6FC /* al_Graphics.cpp */,
 				361AA71B12AECB0A002E9DFD /* al_GraphicsGL.cpp */,
@@ -2122,6 +2127,7 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "allo" */;
 			compatibilityVersion = "Xcode 3.0";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -2327,6 +2333,7 @@
 				361AA8AE12AEFDF3002E9DFD /* al_GPUObject.cpp in Sources */,
 				369DDF5212B6C87200F75D2A /* al_Asset.cpp in Sources */,
 				168F105812B80DD100B1E07C /* al_Shapes.cpp in Sources */,
+				36035C3313037130001E9BA9 /* al_Font.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
