@@ -37,7 +37,7 @@ public:
 	const Pose& transform() const { return mTransform; }
 	Pose& transform(){ return mTransform; }
 	
-	Pose worldTransform() const { mParentTransform ? (*mParentTransform) * transform() : transform(); }
+	Pose worldTransform() const { return mParentTransform ? (*mParentTransform) * transform() : transform(); }
 	
 	const Viewport& viewport() const { return mViewport; }
 	Viewport& viewport(){ return mViewport; }
