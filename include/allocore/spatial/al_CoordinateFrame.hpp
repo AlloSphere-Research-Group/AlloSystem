@@ -11,7 +11,7 @@ namespace al {
 
 ///	A coordinate frame
 
-///	Combines a Vec3d position with a Quat orientation
+///	Combines a 3-vector position with a quaternion orientation
 ///
 class Pose {
 public:
@@ -36,6 +36,8 @@ public:
 
 
 	// Getters
+
+	static Pose identity(){ return Pose().setIdentity(); }
 
 	/// Get "position" vector
 	const Vec3d& pos() const { return mVec; }

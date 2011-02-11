@@ -15,7 +15,7 @@ namespace al{
 class Viewpoint{
 public:
 
-	Viewpoint()
+	Viewpoint(const Pose& transform = Pose::identity())
 	:	mViewport(0,0,0,0),
 		mAnchorX(0), mAnchorY(0), mStretchX(1), mStretchY(1),
 		mCamera(0)
