@@ -11,7 +11,7 @@ public:
 
 	virtual void onDraw(Graphics& g, const Viewpoint& v){		
 		Frustumd fr;
-		v.camera().frustum(fr, v.transform(), v.viewport().aspect());
+		v.camera().frustum(fr, v.worldTransform(), v.viewport().aspect());
 
 //		printf("ntl: %g %g %g\n", fr.ntl[0], fr.ntl[1], fr.ntl[2]);
 //		printf("ftl: %g %g %g\n", fr.ftl[0], fr.ftl[1], fr.ftl[2]);
@@ -96,6 +96,7 @@ int main(){
 
 	ViewpointWindow win(0,0, 600,400, w.name());
 	Viewpoint vp;
+	vp.parentTransform(w.nav());
 	MyActor myActor;
 
 	win.add(vp);
