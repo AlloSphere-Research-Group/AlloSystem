@@ -68,8 +68,8 @@ public:
 	Vec<3,T> operator * (const Vec<3,T>& v) const { return rotateVectorTransposed(v); }
 	Quat operator * (const    T& v) const { return Quat(*this)*=v; }
 
-
-	Quat& operator  =(const Quat& v){ return set(v); }
+	template <class U>
+	Quat& operator  =(const Quat<U>& v){ return set(v); }
 	Quat& operator  =(const    T& v){ return set(v); }
 	Quat& operator +=(const Quat& v){ w+=v.w; x+=v.x; y+=v.y; z+=v.z; return *this; }
 	Quat& operator +=(const    T& v){ w+=  v; x+=  v; y+=  v; z+=  v; return *this; }
@@ -118,7 +118,8 @@ public:
 	}
 
 	/// Set from other quaternion
-	Quat& set(const Quat& q){ return set(q.w, q.x, q.y, q.z); }
+	template <class U>
+	Quat& set(const Quat<U>& q){ return set(q.w, q.x, q.y, q.z); }
 
 	/// Set to identity
 	Quat& setIdentity(){ return (*this) = Quat::identity(); }

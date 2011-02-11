@@ -21,15 +21,21 @@ public:
 	
 	Pose(const Pose& p) { set(p); }
 
+
+	// Arithmetic operations
+
+	/// Get pose transformed by another pose
 	Pose operator* (const Pose& v) const { return Pose(*this)*=v; }
 
 	/// Translate and rotate by argument
-	Pose& operator*=(const Pose& v){
+	Pose& operator*= (const Pose& v){
 		mVec += v.vec();
 		mQuat*= v.quat();
 		return *this;
 	}
 
+
+	// Getters
 
 	/// Get "position" vector
 	const Vec3d& pos() const { return mVec; }
@@ -52,6 +58,24 @@ public:
 		return m;
 	}
 
+	/// Get the azimuth, elevation & distance from this to another point
+	void toAED(const Vec3d& to, double& azimuth, double& elevation, double& distance) const;
+
+	/// Get right, up, and forward unit vectors
+	/// quat() should have been normalized before this call
+	template <class T>
+	void unitVectors(Vec<3,T>& ur, Vec<3,T>& uu, Vec<3,T>& uf) const {	
+		quat().toVectorX(ur);
+		quat().toVectorY(uu);
+		quat().toVectorZ(uf);	
+	}
+	
+	
+	// Setters
+
+	Vec3d& pos(){ return mVec; }
+	Vec3d& vec(){ return mVec; }
+	Quatd& quat(){ return mQuat; }
 
 	/// Set position
 	template <class T>
@@ -66,31 +90,15 @@ public:
 
 	/// Set quaternion component
 	template <class T>
-	Pose& quat(const Quat<T>& v){
-		mQuat[0]=v[0]; mQuat[1]=v[1]; mQuat[2]=v[2]; mQuat[3]=v[3];
-		return *this;
-	}
-
-	Vec3d& pos(){ return mVec; }
-	Vec3d& vec(){ return mVec; }
-	Quatd& quat(){ return mQuat; }
-
-	/// Get right, up, and forward unit vectors
-	/// quat() should have been normalized before this call
-	template <class T>
-	void unitVectors(Vec<3,T>& ur, Vec<3,T>& uu, Vec<3,T>& uf) const {	
-		quat().toVectorX(ur);
-		quat().toVectorY(uu);
-		quat().toVectorZ(uf);	
-	}
+	Pose& quat(const Quat<T>& v){ quat() = v; return *this; }
 
 	/// Set state from another Pose
 	Pose& set(const Pose& v){ mVec=v.vec(); mQuat=v.quat(); return *this; }
+
+	/// Set to identity transform
+	Pose& setIdentity(){ quat().setIdentity(); vec().set(0); return *this; }
 	
-	// get the azimuth, elevation & distance from this to another point
-	void toAED(const Vec3d& to, double& azimuth, double& elevation, double& distance) const;
-	
-	// print
+	/// Print to standard output
 	void print() const { printf("Vec3d(%f, %f, %f);\nQuatd(%f, %f, %f, %f);\n",
 		mVec[0], mVec[1], mVec[2], mQuat[0], mQuat[1], mQuat[2], mQuat[3]); }
 
