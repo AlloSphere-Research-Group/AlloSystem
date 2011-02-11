@@ -72,6 +72,12 @@ struct NavInputControl : public InputEventHandler {
 	}
 
 	Nav& nav(){ return *mNav; }
+	
+	double vscale() { return mVScale; }
+	NavInputControl& vscale(double v) { mVScale=v; return *this; }
+	
+	double tscale() { return mTScale; }
+	NavInputControl& tscale(double v) { mTScale=v; return *this; }
 
 protected:
 	Nav * mNav;
