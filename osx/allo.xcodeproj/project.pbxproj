@@ -95,11 +95,9 @@
 		3602B4D0110A67C9005DC3D0 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
 		3602B4D1110A67C9005DC3D0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		3602B4D2110A67C9005DC3D0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
-		3602B4D4110A67C9005DC3D0 /* alscheduling.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* alscheduling.1 */; };
 		3602B72E110A9770005DC3D0 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
 		3602B72F110A9770005DC3D0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		3602B730110A9770005DC3D0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
-		3602B732110A9770005DC3D0 /* alscheduling.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* alscheduling.1 */; };
 		36035C3313037130001E9BA9 /* al_Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36035C3213037130001E9BA9 /* al_Font.cpp */; };
 		36035C611303728F001E9BA9 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36035C5E13037289001E9BA9 /* libfreetype.a */; };
 		36035C621303728F001E9BA9 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DDF6512B6C8C000F75D2A /* libassimp.a */; };
@@ -203,7 +201,6 @@
 		36C079B711D4966500764E50 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		36C079B811D4966500764E50 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4130F10EFFA8D007B16D0 /* liballocore.a */; };
 		36C079B911D4966500764E50 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
-		36C079BB11D4966500764E50 /* alscheduling.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* alscheduling.1 */; };
 		36C079C211D4967B00764E50 /* exMultiWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36C079C111D4967B00764E50 /* exMultiWindow.cpp */; };
 		36C13ECF11D15D30006196FC /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		36C13ED011D15D30006196FC /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
@@ -232,7 +229,6 @@
 		36F596751211D5F8003B78B5 /* al_Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F596741211D5F8003B78B5 /* al_Image.cpp */; };
 		36F598FE12122628003B78B5 /* al_Model.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36F598FC12122628003B78B5 /* al_Model.cpp */; };
 		8DD76F650486A84900D96B5E /* exScheduling.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08FB7796FE84155DC02AAC07 /* exScheduling.cpp */; settings = {ATTRIBUTES = (); }; };
-		8DD76F6A0486A84900D96B5E /* alscheduling.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* alscheduling.1 */; };
 		B9C962A41218939E00091F80 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		B9C962A51218939E00091F80 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
 		B9C962A61218939E00091F80 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC53081162907D0076AA8B /* CoreAudio.framework */; };
@@ -366,7 +362,6 @@
 			dstPath = /usr/share/man/man1/;
 			dstSubfolderSpec = 0;
 			files = (
-				3602B4D4110A67C9005DC3D0 /* alscheduling.1 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
@@ -376,7 +371,6 @@
 			dstPath = /usr/share/man/man1/;
 			dstSubfolderSpec = 0;
 			files = (
-				3602B732110A9770005DC3D0 /* alscheduling.1 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
@@ -395,7 +389,6 @@
 			dstPath = /usr/share/man/man1/;
 			dstSubfolderSpec = 0;
 			files = (
-				36C079BB11D4966500764E50 /* alscheduling.1 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
@@ -405,7 +398,6 @@
 			dstPath = /usr/share/man/man1/;
 			dstSubfolderSpec = 0;
 			files = (
-				8DD76F6A0486A84900D96B5E /* alscheduling.1 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
@@ -856,7 +848,6 @@
 		B9C970F9122692BC00091F80 /* al_OpenCLImageFormat.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OpenCLImageFormat.hpp; sourceTree = "<group>"; };
 		B9C972591226C9E400091F80 /* al_OpenCLExtensions.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OpenCLExtensions.hpp; sourceTree = "<group>"; };
 		B9C972681226CE2A00091F80 /* al_OpenCLExtensions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_OpenCLExtensions.cpp; sourceTree = "<group>"; };
-		C6859E8B029090EE04C91782 /* alscheduling.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = alscheduling.1; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1165,19 +1156,12 @@
 		08FB7794FE84155DC02AAC07 /* alscheduling */ = {
 			isa = PBXGroup;
 			children = (
-				36F3A64412FCF076004BC82F /* allojit */,
-				36F3A64012FCF069004BC82F /* allojit */,
-				36F3A43012FCCF7A004BC82F /* alloutil */,
-				36F3A43412FCCF88004BC82F /* alloutil */,
-				36B5D3E611D81D2C004D228D /* TODO */,
-				3625B540116EEDEF00C685B7 /* Makefile */,
-				3625B541116EEDEF00C685B7 /* Makefile.config */,
-				36B4124410EFF7B8007B16D0 /* allocore */,
-				3622BEDC116D527D00928703 /* allocore */,
+				16B94F901305D78900CE396B /* allocore */,
+				16B94F8F1305D76F00CE396B /* alloutil */,
+				16B94F911305D7A900CE396B /* allojit */,
 				3622BEDB116D526700928703 /* examples */,
 				16AC528F11628CD50076AA8B /* unitTests */,
 				36B4127010EFF864007B16D0 /* osx */,
-				C6859E8C029090F304C91782 /* Documentation */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
 			);
 			name = alscheduling;
@@ -1359,6 +1343,36 @@
 			);
 			name = unitTests;
 			path = ../unitTests;
+			sourceTree = "<group>";
+		};
+		16B94F8F1305D76F00CE396B /* alloutil */ = {
+			isa = PBXGroup;
+			children = (
+				36F3A43012FCCF7A004BC82F /* include */,
+				36F3A43412FCCF88004BC82F /* src */,
+			);
+			name = alloutil;
+			sourceTree = "<group>";
+		};
+		16B94F901305D78900CE396B /* allocore */ = {
+			isa = PBXGroup;
+			children = (
+				36B5D3E611D81D2C004D228D /* TODO */,
+				3625B540116EEDEF00C685B7 /* Makefile */,
+				3625B541116EEDEF00C685B7 /* Makefile.config */,
+				36B4124410EFF7B8007B16D0 /* include */,
+				3622BEDC116D527D00928703 /* src */,
+			);
+			name = allocore;
+			sourceTree = "<group>";
+		};
+		16B94F911305D7A900CE396B /* allojit */ = {
+			isa = PBXGroup;
+			children = (
+				36F3A64412FCF076004BC82F /* include */,
+				36F3A64012FCF069004BC82F /* src */,
+			);
+			name = allojit;
 			sourceTree = "<group>";
 		};
 		16FE4B3D11DB0E47002D3847 /* sound */ = {
@@ -1672,7 +1686,7 @@
 			path = ../examples;
 			sourceTree = SOURCE_ROOT;
 		};
-		3622BEDC116D527D00928703 /* allocore */ = {
+		3622BEDC116D527D00928703 /* src */ = {
 			isa = PBXGroup;
 			children = (
 				1685D3C011C2EDB5009F676C /* private */,
@@ -1685,7 +1699,7 @@
 				3622BEF5116D527D00928703 /* system */,
 				3622BEFD116D527D00928703 /* types */,
 			);
-			name = allocore;
+			name = src;
 			path = ../src/allocore;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -1770,7 +1784,7 @@
 			path = jack;
 			sourceTree = "<group>";
 		};
-		36B4124410EFF7B8007B16D0 /* allocore */ = {
+		36B4124410EFF7B8007B16D0 /* include */ = {
 			isa = PBXGroup;
 			children = (
 				1663FD461280D608002B2979 /* al_Allocore.hpp */,
@@ -1783,7 +1797,7 @@
 				36B4124710EFF7B8007B16D0 /* system */,
 				36B4124D10EFF7B8007B16D0 /* types */,
 			);
-			name = allocore;
+			name = include;
 			path = ../include/allocore;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -1910,46 +1924,46 @@
 			path = sound;
 			sourceTree = "<group>";
 		};
-		36F3A43012FCCF7A004BC82F /* alloutil */ = {
+		36F3A43012FCCF7A004BC82F /* include */ = {
 			isa = PBXGroup;
 			children = (
 				36F3A43112FCCF7A004BC82F /* al_ControlGLV.hpp */,
 				36F3A43212FCCF7A004BC82F /* al_ControlNav.hpp */,
 				36F3A43312FCCF7A004BC82F /* al_World.hpp */,
 			);
-			name = alloutil;
+			name = include;
 			path = ../include/alloutil;
 			sourceTree = SOURCE_ROOT;
 		};
-		36F3A43412FCCF88004BC82F /* alloutil */ = {
+		36F3A43412FCCF88004BC82F /* src */ = {
 			isa = PBXGroup;
 			children = (
 				36F3A43512FCCF88004BC82F /* al_World.cpp */,
 				36F3A43612FCCF88004BC82F /* Makefile */,
 			);
-			name = alloutil;
+			name = src;
 			path = ../src/alloutil;
 			sourceTree = SOURCE_ROOT;
 		};
-		36F3A64012FCF069004BC82F /* allojit */ = {
+		36F3A64012FCF069004BC82F /* src */ = {
 			isa = PBXGroup;
 			children = (
 				36F3A64112FCF069004BC82F /* ajit.cpp */,
 				36F3A64212FCF069004BC82F /* al_Compiler.cpp */,
 				36F3A64312FCF069004BC82F /* Makefile */,
 			);
-			name = allojit;
+			name = src;
 			path = ../src/allojit;
 			sourceTree = SOURCE_ROOT;
 		};
-		36F3A64412FCF076004BC82F /* allojit */ = {
+		36F3A64412FCF076004BC82F /* include */ = {
 			isa = PBXGroup;
 			children = (
 				36F3A64512FCF076004BC82F /* ajit.hpp */,
 				36F3A64612FCF076004BC82F /* al_Compiler.hpp */,
 				36F3A64712FCF076004BC82F /* al_JitFile.hpp */,
 			);
-			name = allojit;
+			name = include;
 			path = ../include/allojit;
 			sourceTree = SOURCE_ROOT;
 		};
@@ -2018,14 +2032,6 @@
 				B9C972681226CE2A00091F80 /* al_OpenCLExtensions.cpp */,
 			);
 			path = opencl;
-			sourceTree = "<group>";
-		};
-		C6859E8C029090F304C91782 /* Documentation */ = {
-			isa = PBXGroup;
-			children = (
-				C6859E8B029090EE04C91782 /* alscheduling.1 */,
-			);
-			name = Documentation;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -2355,7 +2361,6 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "allo" */;
 			compatibilityVersion = "Xcode 3.0";
-			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
