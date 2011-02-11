@@ -17,6 +17,7 @@ public:
 
 	Viewpoint(const Pose& transform = Pose::identity())
 	:	mViewport(0,0,0,0),
+		mParentTransform(0),
 		mAnchorX(0), mAnchorY(0), mStretchX(1), mStretchY(1),
 		mCamera(0)
 	{}
@@ -30,8 +31,13 @@ public:
 
 	const Camera& camera() const { return *mCamera; }
 
+	const Pose* parentTransform() const { return mParentTransform; }
+
+
 	const Pose& transform() const { return mTransform; }
 	Pose& transform(){ return mTransform; }
+	
+	Pose worldTransform() const { mParentTransform ? (*mParentTransform) * transform() : transform(); }
 	
 	const Viewport& viewport() const { return mViewport; }
 	Viewport& viewport(){ return mViewport; }
@@ -44,16 +50,17 @@ public:
 		mStretchX=sx; mStretchY=sy; return *this;
 	}
 
-	Viewpoint& camera(Camera& v){
-		mCamera=&v; return *this;
-	}
+	Viewpoint& camera(Camera& v){ mCamera=&v; return *this; }
+
+	Viewpoint& parentTransform(Pose& v){ mParentTransform = &v; return *this; }
 
 protected:
-	Viewport mViewport;
-	Pose mTransform;
-	float mAnchorX, mAnchorY;
-	float mStretchX, mStretchY;
-	Camera * mCamera;
+	Viewport mViewport;				// screen display region
+	Pose * mParentTransform;		// parent transform, 0 if none
+	Pose mTransform;				// local transform
+	float mAnchorX, mAnchorY;		// viewport anchor factors relative to parent window
+	float mStretchX, mStretchY;		// viewport stretch factors relative to parent window
+	Camera * mCamera;				// camera; if not set, will be set to scene's default camera
 };
 
 
@@ -263,11 +270,14 @@ protected:
 				const Camera& cam = vp.camera();
 
 				// get viewpoint in world coords
-				Viewpoint vpWorld = vp;
-				vpWorld.transform() = w.nav() * vpWorld.transform();
+//				Viewpoint vpWorld = vp;
+//				vpWorld.transform() = w.nav() * vpWorld.transform();
+//
+//				DrawAllActors drawFunc(w.mActors, w, vpWorld);
+//				w.mStereo.draw(g, cam, vpWorld.transform(), vpWorld.viewport(), drawFunc);
 
-				DrawAllActors drawFunc(w.mActors, w, vpWorld);
-				w.mStereo.draw(g, cam, vpWorld.transform(), vpWorld.viewport(), drawFunc);
+				DrawAllActors drawFunc(w.mActors, w, vp);
+				w.mStereo.draw(g, cam, vp.worldTransform(), vp.viewport(), drawFunc);
 				++iv;
 			}
 
