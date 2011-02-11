@@ -16,10 +16,12 @@ struct NavInputControl : public InputEventHandler {
 	void nav(Nav * v){ mNav=v; }
 
 	virtual bool onKeyDown(const Keyboard& k){	 	
-	
+
 		double vs = nav().velScale();
 		double a = mTScale * vs;	// rotational speed: degrees per update
 		double v = mVScale * vs;	// speed: units per update
+
+		if(k.alt()) v *= 10;
 
 		switch(k.key()){
 			case '`':			nav().halt().home(); return false;
