@@ -222,7 +222,7 @@ public:
 		return perspectiveOffAxis(fovy, aspect, near, far, eyeSep, focal);
 	}
 	static const Matrix4 perspectiveOffAxis(T fovy, T aspect, T near, T far, T eyeShift, T focal) {
-		T shift = -0.5*eyeShift*near/focal;
+		T shift = -0.5*eyeShift*(focal-near)/focal;
 		T top = near * tan(fovy*M_DEG2RAD*0.5);	// height of view at distance = near
 		T bottom = -top;
 		T left = -aspect*top + shift;
