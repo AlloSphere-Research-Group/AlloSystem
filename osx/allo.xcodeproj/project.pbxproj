@@ -269,6 +269,13 @@
 			remoteGlobalIDString = 36B4130E10EFFA8D007B16D0;
 			remoteInfo = allocore;
 		};
+		163CE4F9130B64340034308D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 36B4130E10EFFA8D007B16D0 /* allocore */;
+			remoteInfo = allocore;
+		};
 		3602B4CC110A67C9005DC3D0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
@@ -305,13 +312,6 @@
 			remoteInfo = allocore;
 		};
 		367F0B4D12034F1E00FCC534 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 36B4130E10EFFA8D007B16D0;
-			remoteInfo = libal;
-		};
-		3687E33211FA4F9500EC6706 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
@@ -2238,7 +2238,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				3687E33111FA4F9500EC6706 /* PBXTargetDependency */,
+				163CE4FA130B64340034308D /* PBXTargetDependency */,
 			);
 			name = exIsosurface;
 			productInstallPath = "$(HOME)/bin";
@@ -2650,6 +2650,11 @@
 			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
 			targetProxy = 05C9387F128A166B0068F87F /* PBXContainerItemProxy */;
 		};
+		163CE4FA130B64340034308D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
+			targetProxy = 163CE4F9130B64340034308D /* PBXContainerItemProxy */;
+		};
 		3602B4CB110A67C9005DC3D0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
@@ -2679,11 +2684,6 @@
 			isa = PBXTargetDependency;
 			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
 			targetProxy = 367F0B4D12034F1E00FCC534 /* PBXContainerItemProxy */;
-		};
-		3687E33111FA4F9500EC6706 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 36B4130E10EFFA8D007B16D0 /* allocore */;
-			targetProxy = 3687E33211FA4F9500EC6706 /* PBXContainerItemProxy */;
 		};
 		36B4131810EFFAA5007B16D0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
