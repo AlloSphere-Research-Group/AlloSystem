@@ -37,6 +37,12 @@ namespace al{
 
 /// implementation of MainLoop for the GLUT target
 
+// function to be called after returning from main OR when exit() is called
+static void exitFunc(){
+//	printf("exited\n");
+	al_main_exit();
+}
+
 MainLoop :: MainLoop()
 :	mImpl(NULL),
 	mInterval(0.01), mActualInterval(0),
@@ -51,6 +57,8 @@ MainLoop :: MainLoop()
 		int argc = 0;
 		char * argv[] = {0};
 		glutInit(&argc,argv);
+		
+		atexit(exitFunc);
 	}
 }
 
@@ -111,7 +119,7 @@ void MainLoop :: stop() {
 		// glutLeaveMainLoop();
         #endif
 		// GLUT can't be stopped; the only option is a hard exit. Yeah, it sucks that bad.
-		exit(0);
+		exit(0); // Note: this will call our function registered with atexit()
 	}
 }
 

@@ -59,6 +59,7 @@ int al_main_enter(al_sec interval, main_tick_handler tickhandler, void * userdat
 }
 
 void al_main_exit() {
+	al_main_get();
 	if (g_main->isRunning) {
 		g_main->isRunning = 0;
 		if (g_main->quithandler)
