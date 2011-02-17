@@ -57,7 +57,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 	double near = cam.near();
 	double far = cam.far();
 	double focal = cam.focalLength();
-	double iod = cam.IOD();
+	double iod = cam.eyeSep();
 	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
 	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
@@ -128,7 +128,7 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 	double near = cam.near();
 	double far = cam.far();
 	double focal = cam.focalLength();
-	double iod = cam.IOD();
+	double iod = cam.eyeSep();
 	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
 	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
@@ -183,7 +183,7 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 	double near = cam.near();
 	double far = cam.far();
 	double focal = cam.focalLength();
-	double iod = cam.IOD();
+	double iod = cam.eyeSep();
 	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
 	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
@@ -239,7 +239,7 @@ void Stereographic :: drawLeft(Graphics& gl, const Camera& cam, const Pose& pose
 	double near = cam.near();
 	double far = cam.far();
 	double focal = cam.focalLength();
-	double iod = cam.IOD();
+	double iod = cam.eyeSep();
 	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
 	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
@@ -276,7 +276,7 @@ void Stereographic :: drawRight(Graphics& gl, const Camera& cam, const Pose& pos
 	double near = cam.near();
 	double far = cam.far();
 	double focal = cam.focalLength();
-	double iod = cam.IOD();
+	double iod = cam.eyeSep();
 	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
 	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
