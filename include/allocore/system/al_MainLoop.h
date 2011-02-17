@@ -117,6 +117,9 @@ typedef struct {
 
 extern al_main_t * al_main_get();
 
+extern void al_main_platform_attach(al_sec interval);
+extern int al_main_platform_enter(al_sec interval);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

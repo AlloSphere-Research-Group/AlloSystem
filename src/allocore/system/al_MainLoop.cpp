@@ -8,8 +8,7 @@
 	Platform specific implementations
 		(implemented in separate file)
 */
-void al_main_platform_attach(al_sec interval);
-int al_main_platform_enter(al_sec interval);
+
 
 /*
 	If there is anything that is a singleton, it's the main loop!

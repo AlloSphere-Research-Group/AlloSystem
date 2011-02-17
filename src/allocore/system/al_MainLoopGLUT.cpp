@@ -33,6 +33,9 @@
 	#define AL_GRAPHICS_INIT_CONTEXT
 #endif
 
+void al_main_platform_attach(al_sec interval) {}
+int al_main_platform_enter(al_sec interval) { return 0; }
+
 namespace al{
 
 /// implementation of MainLoop for the GLUT target
@@ -42,6 +45,7 @@ static void exitFunc(){
 //	printf("exited\n");
 	al_main_exit();
 }
+
 
 MainLoop :: MainLoop()
 :	mImpl(NULL),
