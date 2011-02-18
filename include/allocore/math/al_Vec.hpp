@@ -97,6 +97,8 @@ public:
 	template <class T2>
 	Vec(const T2 * v, int stride=1){ set(v,stride); }
 
+	/// Cast to pointer
+	operator T* (){ return elems; }
 	
 	/// Set element at index with no bounds checking
 	T& operator[](int i){ return elems[i];}
