@@ -169,6 +169,8 @@ private:
 	virtual void p_antialiasing(AntiAliasMode v);
 	virtual void p_lineWidth(double v);
 	virtual void p_pointSize(double v);
+	
+	virtual void p_fog(float end, float start, const Color& c);
 };
 
 } // al::

@@ -194,6 +194,7 @@ public:
 	void antialiasing(AntiAliasMode v){ p_antialiasing(v); }
 	void lineWidth(double v){ p_lineWidth(v); }
 	void pointSize(double v){ p_pointSize(v); }
+	void fog(float end, float start, const Color& c){ p_fog(end, start, c); }
 	
 	// Textures
 	Texture * textureNew() { return new Texture(*this); }
@@ -247,6 +248,8 @@ private:
 	virtual void p_antialiasing(AntiAliasMode v) = 0;
 	virtual void p_lineWidth(double v) = 0;
 	virtual void p_pointSize(double v) = 0;
+	
+	virtual void p_fog(float end, float start, const Color& c) = 0;
 };
 
 

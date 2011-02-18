@@ -133,6 +133,14 @@ void GraphicsGL::p_clear(int attribMask) {
 void GraphicsGL::p_clearColor(float r, float g, float b, float a) {
 	glClearColor(r, g, b, a);
 }
+
+void GraphicsGL::p_fog(float end, float start, const Color& c){
+	glEnable(GL_FOG);
+	glFogi(GL_FOG_MODE, GL_LINEAR); 
+	glFogf(GL_FOG_START, start); glFogf(GL_FOG_END, end);
+	float fogColor[4] = {c.r, c.g, c.b, c.a};
+	glFogfv(GL_FOG_COLOR, fogColor);
+}
 	
 	// Coordinate Transforms
 void GraphicsGL :: p_viewport(int x, int y, int width, int height) {

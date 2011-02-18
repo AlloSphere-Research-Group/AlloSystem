@@ -182,6 +182,7 @@
 		163E49B8130E0255007B30A0 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4931130E0254007B30A0 /* libportaudio.a */; };
 		163E49B9130E0255007B30A0 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4932130E0254007B30A0 /* libsndfile.a */; };
 		163E49C6130E0439007B30A0 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
+		163E4A26130E0A10007B30A0 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
 		16A603DA13033BA50077B460 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DDF6512B6C8C000F75D2A /* libassimp.a */; };
 		16AC52C911628EC50076AA8B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		16AC52F011628FAF0076AA8B /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
@@ -860,6 +861,7 @@
 				16AC5368116293270076AA8B /* CoreAudio.framework in Frameworks */,
 				16AC52C911628EC50076AA8B /* Cocoa.framework in Frameworks */,
 				16AC5365116293100076AA8B /* GLUT.framework in Frameworks */,
+				163E4A26130E0A10007B30A0 /* liballocore.a in Frameworks */,
 				16B5C1731189020B0090CE80 /* libportaudio.a in Frameworks */,
 				369DDF6B12B6C8F300F75D2A /* libassimp.a in Frameworks */,
 				16B5C1741189020B0090CE80 /* libapr-1.a in Frameworks */,
@@ -2699,6 +2701,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../../dev/osx/lib\"",
 					"\"$(SRCROOT)/lib\"",
+					"\"$(SRCROOT)/../build/lib\"",
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = unitTests;
@@ -2721,6 +2724,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/../../dev/osx/lib\"",
 					"\"$(SRCROOT)/lib\"",
+					"\"$(SRCROOT)/../build/lib\"",
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = unitTests;
