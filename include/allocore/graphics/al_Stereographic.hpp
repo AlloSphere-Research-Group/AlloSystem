@@ -68,7 +68,8 @@ public:
 	};
 	
 	Stereographic() 
-	: mMode(Anaglyph), mAnaglyphMode(RedCyan), mStereo(false) {}
+	: mMode(Anaglyph), mAnaglyphMode(RedCyan), mClearColor(Color(0)), mStereo(false) {}
+
 	~Stereographic() {}
 
 	/// Draw the scene according to the stored stereographic mode
@@ -86,17 +87,20 @@ public:
 	/// add this call at the end of rendering (just before the swap buffers call)
 	void drawBlueLine(double window_width, double window_height);
 	
-	Stereographic& mode(StereoMode v){ mMode=v; return *this; }	///< Set stereographic mode
-	Stereographic& stereo(bool v){ mStereo=v; return *this; }		///< Set stereographic active
+	Stereographic& clearColor(const Color& v){ mClearColor=v; return *this; }	///< Set background clear color
+	Stereographic& mode(StereoMode v){ mMode=v; return *this; }					///< Set stereographic mode
+	Stereographic& stereo(bool v){ mStereo=v; return *this; }					///< Set stereographic active
 	Stereographic& anaglyphMode(AnaglyphMode v) { mAnaglyphMode=v; return *this; }	///< set glasses type
 	
-	StereoMode mode() const { return mMode; }				///< Get stereographic mode
-	bool stereo() const { return mStereo; }					///< Get stereographic active
+	const Color& clearColor() const { return mClearColor; }		///< Get background clear color
+	StereoMode mode() const { return mMode; }					///< Get stereographic mode
+	bool stereo() const { return mStereo; }						///< Get stereographic active
 	AnaglyphMode anaglyphMode() const { return mAnaglyphMode; }	///< get anaglyph glasses type
 	
 protected:
 	StereoMode mMode;
 	AnaglyphMode mAnaglyphMode;
+	Color mClearColor;
 	bool mStereo;
 };
 

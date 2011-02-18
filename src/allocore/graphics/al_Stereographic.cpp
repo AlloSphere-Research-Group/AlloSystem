@@ -28,9 +28,10 @@ void Stereographic :: drawMono(Graphics& gl, const Camera& cam, const Pose& pose
 	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
 
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
+	gl.clearColor(mClearColor);
+
 	glDrawBuffer(GL_BACK);
-	
-	gl.scissor(true);
+
 	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 	
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -63,9 +64,10 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
 
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
+	gl.clearColor(mClearColor);
+
 	glDrawBuffer(GL_BACK);
-	
-	gl.scissor(true);
+
 	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 	
 	gl.clear(gl.COLOR_BUFFER_BIT);
@@ -137,7 +139,7 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 
 
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
-
+	gl.clearColor(mClearColor);
 	
 	glDrawBuffer(GL_BACK_RIGHT);
 	gl.viewport(vp.l, vp.b, vp.w, vp.h);
@@ -192,6 +194,7 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 	
 	//pushAttrib(ColorBufferBit | DepthBufferBit | EnableBit | ViewPortBit);
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
+	gl.clearColor(mClearColor);
 	
 	//drawBuffer(BackLeft);
 	glDrawBuffer(GL_BACK);
@@ -246,6 +249,7 @@ void Stereographic :: drawLeft(Graphics& gl, const Camera& cam, const Pose& pose
 	
 	//pushAttrib(ColorBufferBit | DepthBufferBit | EnableBit | ViewPortBit);
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
+	gl.clearColor(mClearColor);
 	
 	glDrawBuffer(GL_BACK);
 	
@@ -282,6 +286,8 @@ void Stereographic :: drawRight(Graphics& gl, const Camera& cam, const Pose& pos
 	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
 
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
+	gl.clearColor(mClearColor);
+
 	glDrawBuffer(GL_BACK);
 	
 	gl.scissor(true);
