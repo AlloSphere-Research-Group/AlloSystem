@@ -306,6 +306,19 @@ template<class T> T wrapPhase(T radians);
 template<class T> T wrapPhaseOnce(T radians);
 
 
+/// Convert spherical to Cartesian coordinates in-place
+template<class T> void sphericalToCart(T& r2x, T& t2y, T& p2z);
+
+/// Convert spherical to Cartesian coordinates in-place
+template<class T> void sphericalToCart(T * vec3);
+
+/// Convert Cartesian to spherical coordinates in-place
+template<class T> void cartToSpherical(T& x2r, T& y2t, T& z2p);
+
+/// Convert Cartesian to spherical coordinates in-place
+template<class T> void cartToSpherical(T * vec3);
+
+
 
 
 // Implementation
@@ -669,6 +682,27 @@ TEM inline T wrapPhaseOnce(T r){
 	else if(r < T(-M_PI))	return r + T(M_2PI);
 	return r;
 }
+
+
+TEM inline void sphericalToCart(T& r, T& t, T& p){
+	T rsint = r * sin(t);
+	T rcost = r * cos(t);
+	r = rsint * cos(p);
+	t = rsint * sin(p);
+	p = rcost;
+}
+
+TEM inline void sphericalToCart(T * vec3){ sphericalToCart(vec3[0], vec3[1], vec3[2]); }
+
+TEM inline void cartToSpherical(T& x, T& y, T& z){
+	T r = sqrt(x*x + y*y + z*z);
+	T t = acos(z/r);
+	z = atan2(y, x);
+	y = t;	
+	x = r;
+}
+
+TEM inline void cartToSpherical(T * vec3){ cartToSpherical(vec3[0], vec3[1], vec3[2]); }
 
 
 #undef TEM
