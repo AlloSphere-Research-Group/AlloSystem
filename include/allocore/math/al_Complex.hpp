@@ -118,7 +118,7 @@ public:
 	C operator / (const T& v) const { return C(*this) /= v; }
 	
 	T arg() const { return atan2(i, r); }					///< Returns argument (angle)
-	T argUnit() const { T r=arg()/M_PI; return r>0 ? r : r+1; }	///< Return argument in unit interval [0, 1)
+	T argUnit() const { T r=arg()/M_2PI; return r>0 ? r : r+1; }	///< Return argument in unit interval [0, 1)
 	C conj() const { return C(r,-i); }						///< Returns conjugate, z*
 	T dot(const C& v) const { return r*v.r + i*v.i; }		///< Returns vector dot product
 	C exp() const { return Polar<T>(::exp(r), i); }			///< Returns e^z
