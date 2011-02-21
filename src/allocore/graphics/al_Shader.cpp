@@ -161,19 +161,35 @@ bool ShaderProgram::linked() const {
 }
 // GLint v; glGetProgramiv(id(), GL_LINK_STATUS, &v); return v; }
 
-const ShaderProgram& ShaderProgram::uniform(const char * name, int v0){
-	glUniform1i(uniformLocation(name), v0); 
-	//glUniform1iARB(uniformLocation(name), v0);
-	return *this;
+const ShaderProgram& ShaderProgram::uniform(const char * name, int v0) const{
+	glUniform1i(uniformLocation(name), v0);	return *this;
+}
+const ShaderProgram& ShaderProgram::uniform(const char * name, float v0) const{
+	glUniform1f(uniformLocation(name), v0);	return *this;
+}
+const ShaderProgram& ShaderProgram::uniform(const char * name, float v0, float v1) const{
+	glUniform2f(uniformLocation(name), v0,v1); return *this;	
+}
+const ShaderProgram& ShaderProgram::uniform(const char * name, float v0, float v1, float v2) const{
+	glUniform3f(uniformLocation(name), v0,v1,v2); return *this;	
+}
+const ShaderProgram& ShaderProgram::uniform(const char * name, float v0, float v1, float v2, float v3) const{
+	glUniform4f(uniformLocation(name), v0,v1,v2,v3); return *this;	
+}
+const ShaderProgram& ShaderProgram::uniform1(const char * name, const float * v, int count) const{
+	glUniform1fv(uniformLocation(name), count, v); return *this;
+}
+const ShaderProgram& ShaderProgram::uniform2(const char * name, const float * v, int count) const{
+	glUniform2fv(uniformLocation(name), count, v); return *this;
+}
+const ShaderProgram& ShaderProgram::uniform3(const char * name, const float * v, int count) const{
+	glUniform3fv(uniformLocation(name), count, v); return *this;
+}
+const ShaderProgram& ShaderProgram::uniform4(const char * name, const float * v, int count) const{
+	glUniform4fv(uniformLocation(name), count, v); return *this;
 }
 
-const ShaderProgram& ShaderProgram::uniform(const char * name, float v0){
-	glUniform1f(uniformLocation(name), v0); 
-	//glUniform1fARB(uniformLocation(name), v0);
-	return *this;
-}
-
-const ShaderProgram& ShaderProgram::attribute(const char * name, float v0){
+const ShaderProgram& ShaderProgram::attribute(const char * name, float v0) const{
 	//glVertexAttrib1fARB(uniformLocation(name), v0);
 	glVertexAttrib1f(uniformLocation(name), v0);
 	return *this;

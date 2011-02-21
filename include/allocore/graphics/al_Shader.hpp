@@ -134,10 +134,19 @@ public:
 	bool linked() const;
 
 	void listParams() const;
-	const ShaderProgram& uniform(const char * name, int v0);
-	const ShaderProgram& uniform(const char * name, float v0);
-	const ShaderProgram& uniform(const char * name, double v0) { return uniform(name, (float)v0); }
-	const ShaderProgram& attribute(const char * name, float v0);
+	const ShaderProgram& uniform(const char * name, int v0) const;
+	const ShaderProgram& uniform(const char * name, float v0) const;
+	const ShaderProgram& uniform(const char * name, double v0) const { return uniform(name, (float)v0); }
+	const ShaderProgram& uniform(const char * name, float v0, float v1) const;
+	const ShaderProgram& uniform(const char * name, float v0, float v1, float v2) const;
+	const ShaderProgram& uniform(const char * name, float v0, float v1, float v2, float v3) const;
+
+	const ShaderProgram& uniform1(const char * name, const float * v, int count=1) const;
+	const ShaderProgram& uniform2(const char * name, const float * v, int count=1) const;
+	const ShaderProgram& uniform3(const char * name, const float * v, int count=1) const;
+	const ShaderProgram& uniform4(const char * name, const float * v, int count=1) const;
+
+	const ShaderProgram& attribute(const char * name, float v0) const;
 	
 	static Type param_type_from_gltype(GLenum gltype);
 
