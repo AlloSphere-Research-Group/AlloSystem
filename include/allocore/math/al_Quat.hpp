@@ -486,6 +486,23 @@ inline void Quat<T>::toCoordinateFrame(Vec<3,T>& ux, Vec<3,T>& uy, Vec<3,T>& uz)
 	uz[2] =-yy - xx + _1;
 }
 
+/*
+Quat to matrix:
+RHCS
+	[ 1 - 2y - 2z    2xy + 2wz      2xz - 2wy	] 
+	[											] 
+	[ 2xy - 2wz      1 - 2x - 2z    2yz + 2wx	] 
+	[											] 
+	[ 2xz + 2wy      2yz - 2wx      1 - 2x - 2y	]
+
+LHCS              
+	[ 1 - 2y - 2z    2xy - 2wz      2xz + 2wy	] 
+	[											] 
+	[ 2xy + 2wz      1 - 2x - 2z    2yz - 2wx	] 
+	[											] 
+	[ 2xz - 2wy      2yz + 2wx      1 - 2x - 2y	]
+*/
+
 template<typename T>
 inline void Quat<T> :: toMatrix(T * m) const {
 	Vec<3,T> ux,uy,uz;
