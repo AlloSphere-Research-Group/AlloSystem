@@ -60,10 +60,11 @@ include Makefile.rules
 # Compile and run source files in examples/ folder
 EXEC_TARGETS = examples/%.cpp experimental/%.cpp
 .PRECIOUS: $(EXEC_TARGETS)
-$(EXEC_TARGETS): allocore FORCE
+$(EXEC_TARGETS): allocore alloutil FORCE
+#	@echo `ls $(BUILD_DIR)lib/*.a`
 #	@$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LDFLAGS) -whole-archive $(SLIB_PATH)
 #	@$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(SLIB_PATH) $(LDFLAGS)
-	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(SLIB_PATH) $(LDFLAGS) `ls $(BUILD_DIR)lib/*.a`
+	@$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LDFLAGS) `ls $(BUILD_DIR)lib/*.a`
 ifneq ($(AUTORUN), 0)
 	@$(BIN_DIR)$(*F)
 endif
