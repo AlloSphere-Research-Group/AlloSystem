@@ -254,13 +254,13 @@ int main (int argc, char * argv[]){
 
 	for(int i=0; i<4; ++i){
 		windows[i].add(new StandardWindowKeyControls);
-		windows[i].add(new NavInputControl(&navMaster));
+		windows[i].add(new NavInputControl(navMaster));
 		windows[i].transform.quat().fromAxisAngle(-90 + i*90, Vec3d(0, 1, 0));
 		windows[i].cam.fovy(90);
 	}
 	for(int i=4; i<6; ++i){
 		windows[i].add(new StandardWindowKeyControls);
-		windows[i].add(new NavInputControl(&navMaster));
+		windows[i].add(new NavInputControl(navMaster));
 		windows[i].transform.quat().fromAxisAngle(-90 + i*180, Vec3d(1, 0, 0));
 		windows[i].cam.fovy(90);
 	}
