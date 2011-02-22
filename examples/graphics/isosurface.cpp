@@ -96,7 +96,7 @@ int main (int argc, char * argv[]){
 	win.create(Window::Dim(800,600), "Isosurface Example", 140);
 
 	win.add(new StandardWindowKeyControls);
-	win.add(new NavInputControl(&nav));
+	win.add(new NavInputControl(nav));
 
 	Window::startLoop();
 	return 0;

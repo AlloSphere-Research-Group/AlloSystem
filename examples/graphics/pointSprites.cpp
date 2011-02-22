@@ -8,9 +8,9 @@ Texture tex(gl, 128,128, Texture::RGBA, Texture::FLOAT32);
 struct MyWindow : Window{
 
 	bool onCreate(){
-	
 		const int N = 12;
 	
+		data.color(Color(1));
 		data.primitive(gl.POINTS);
 	
 		for(int k=0; k<N; ++k){ float z = float(k)/(N-1)*2-1;
