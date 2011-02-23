@@ -255,8 +255,11 @@ public:
 	const Mouse& mouse() const { return mMouse; }			///< Get current mouse state
 
 	double aspect() const;						///< Get aspect ratio (width divided by height)
+	bool created() const;						///< Whether window has been created (is active)	
+	Cursor::t cursor() const;					///< Get current cursor type	
 	bool cursorHide() const;					///< Whether the cursor is hidden
 	Dim dimensions() const;						///< Get current dimensions of window
+	DisplayMode::t displayMode() const;			///< Get current display mode	
 	bool enabled(DisplayMode::t v) const;		///< Get whether display mode flag is set
 	bool fullScreen() const;					///< Get whether window is in fullscreen
 	double fps() const;							///< Returns frames/second (requested)
@@ -272,6 +275,7 @@ public:
 	Window& cursorHide(bool v);					///< Set cursor hiding
 	Window& cursorHideToggle();					///< Toggle cursor hiding
 	Window& dimensions(const Dim& v);			///< Set dimensions
+	Window& displayMode(DisplayMode::t v);		///< Set display mode; will recreate window if different from current
 	Window& fps(double v);						///< Set frames/second
 	
 	/// Set fullscreen mode
@@ -323,13 +327,14 @@ private:
 	typedef std::vector<WindowEventHandler *> WindowEventHandlers;
 	friend class WindowImpl;
 
-	void doFrameImpl();							///< Calls onFrame() and swaps buffers
-
 	class WindowImpl * mImpl;
 	Keyboard mKeyboard;
 	Mouse mMouse;
 	InputEventHandlers mInputEventHandlers;
 	WindowEventHandlers mWindowEventHandlers;
+	DisplayMode::t mDisplayMode;
+
+	void doFrameImpl();							// Calls onFrame() and swaps buffers
 
 	#define CALL(e)	{\
 		InputEventHandlers::iterator iter = mInputEventHandlers.begin(); \

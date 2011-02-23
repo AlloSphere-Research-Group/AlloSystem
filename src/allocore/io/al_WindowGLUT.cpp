@@ -36,16 +36,12 @@ public:
 	typedef std::map<int, WindowImpl *> WindowsMap;
 
 	WindowImpl(Window * w)
-	:	mWindow(w), mID(-1), mIDGameMode(-1),
-		//mWinDim(0),
+	:	mWindow(w),
 		mDimPrev(0), mDimCurr(0),
 		mFPS(0), mTitle(""),
-		mMode(DisplayMode::DefaultBuf),
-		mCursor(Cursor::Pointer),
-		mAvg(0.),
-		mInGameMode(false), mVisible(true), mFullScreen(false), mCursorHide(false),
-		mScheduled(false)
+		mAvg(0.)
 	{
+		resetState();
 		// ensure that GLUT and mainloop exist:
 		MainLoop::get();
 	}
@@ -54,16 +50,25 @@ public:
 		destroy();
 	}
 
+	void resetState(){
+		mID = -1;
+		mIDGameMode = -1;
+		mInGameMode = false;
+		mScheduled = false;
+		mCursor = Cursor::Pointer;
+		mVisible = true;
+		mFullScreen = false;
+		mCursorHide = false;
+		mScheduled = false;		
+	}
+
 	bool created(){ return mID >= 0; }
 
 	void destroy(){ //printf("destroy\n");
 		if(created()){
 			glutDestroyWindow(mID);
 			windows().erase(id());
-			mID = -1;
-			mIDGameMode = -1;
-			mInGameMode = false;
-			mScheduled = false;
+			resetState();
 		}
 	}
 
@@ -444,7 +449,6 @@ private:
 	Window::Dim mDimPrev, mDimCurr;
 	double mFPS;
 	std::string mTitle;
-	DisplayMode::t mMode;
 	Cursor::t mCursor;
 	al_sec mAvg;
 
@@ -460,7 +464,9 @@ private:
 
 
 Window::Window()
-: mImpl(new WindowImpl(this)) {}
+:	mImpl(new WindowImpl(this)),
+	mDisplayMode(DisplayMode::DefaultBuf)
+{}
 
 Window::~Window(){
 	destroy();
@@ -472,13 +478,13 @@ void Window::create(
 	const Dim& dim, const std::string& title, double fps, DisplayMode::t mode
 )
 {
-	if(mImpl->created()) return;
+	if(created()) return;
 
 	mImpl->mDimPrev.set(0,0,0,0);
 	mImpl->mDimCurr.set(dim.l,dim.t,0,0);
 	mImpl->mTitle = title;
 	mImpl->mFPS = fps;
-	mImpl->mMode = mode;
+	mDisplayMode = mode;
 
 	glutInitWindowSize(dim.w, dim.h);
 	glutInitWindowPosition(dim.l, dim.t);
@@ -526,10 +532,11 @@ void Window::destroyAll(){
 	}
 }
 
+bool Window::created() const { return mImpl->created(); }
+Cursor::t Window::cursor() const { return mImpl->mCursor; }
 bool Window::cursorHide() const { return mImpl->mCursorHide; }
 
 Window::Dim Window::dimensions() const { return mImpl->dimensions(); }
-bool Window::enabled(DisplayMode::t v) const { return mImpl->mMode & v; }
 double Window::fps() const { return mImpl->mFPS; }
 double Window::avgFps() const { return mImpl->mAvg; }
 bool Window::fullScreen() const { return mImpl->mFullScreen; }
@@ -539,7 +546,7 @@ bool Window::visible() const { return mImpl->mVisible; }
 Window& Window::cursor(Cursor::t v){
 	mImpl->mCursor = v;
 
-	if(mImpl->created() && !mImpl->mCursorHide){
+	if(created() && !mImpl->mCursorHide){
 		switch(v){
 			case Cursor::CrossHair:	makeActive(); glutSetCursor(GLUT_CURSOR_CROSSHAIR);
 			case Cursor::Pointer:	makeActive(); glutSetCursor(GLUT_CURSOR_INHERIT);
@@ -552,14 +559,14 @@ Window& Window::cursor(Cursor::t v){
 Window& Window::cursorHide(bool v){
 	mImpl->mCursorHide = v;
 	makeActive();
-	if(mImpl->created() && v)	glutSetCursor(GLUT_CURSOR_NONE);
-	else						cursor(mImpl->mCursor);
+	if(created() && v)	glutSetCursor(GLUT_CURSOR_NONE);
+	else				cursor(mImpl->mCursor);
 	return *this;
 }
 
 Window& Window::dimensions(const Dim& v){
 
-	if(mImpl->created()){
+	if(created()){
 		glutSetWindow(mImpl->mID);
 		glutPositionWindow(v.l, v.t);
 		mImpl->mDimPrev.l = mImpl->mDimCurr.l;
@@ -643,7 +650,7 @@ Window& Window::show(){ makeActive(); glutShowWindow(); return *this; }
 
 Window& Window::title(const std::string& v){
 	mImpl->mTitle = v;
-	if(mImpl->created()){
+	if(created()){
 		glutSetWindow(mImpl->mID);
 		glutSetWindowTitle(mImpl->mTitle.c_str());
 		//printf("Window::title(%s)\n", mImpl->mTitle.c_str());

@@ -69,6 +69,28 @@ Window& Window::cursorHideToggle(){
 	return *this;
 }
 
+DisplayMode::t Window::displayMode() const { return mDisplayMode; }
+
+Window& Window::displayMode(DisplayMode::t v){
+	if(created()){
+		const Cursor::t cursor_ = cursor();
+		const bool cursorHide_ = cursorHide();
+		const Dim dim_ = dimensions();
+		const bool fullScreen_ = fullScreen();
+		const double fps_ = fps();
+		const std::string& title_ = title();
+		
+		destroy();
+		create(dim_, title_, fps_, v);
+		cursor(cursor_);
+		cursorHide(cursorHide_);
+		fullScreen(fullScreen_);
+	}
+	return *this;
+}
+
+bool Window::enabled(DisplayMode::t v) const { return mDisplayMode & v; }
+
 Window& Window::fullScreenToggle(){
 	fullScreen(!fullScreen());
 	return *this;
