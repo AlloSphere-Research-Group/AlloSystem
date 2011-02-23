@@ -82,10 +82,15 @@ allocore: $(SLIB_PATH)
 		$(INSTALL) -d $(BUILD_DIR)/include/$@/$$v; \
 		$(INSTALL) -c -m 644 $(INC_DIR)/$@/$$v/*.h* $(BUILD_DIR)/include/$@/$$v;\
 	done
-	@$(INSTALL) -C -m 644 $(DEV_LIB_DIR)/*.a $(BUILD_DIR)/lib	
+	@$(INSTALL) -C -m 644 $(DEV_LIB_DIR)/*.a $(BUILD_DIR)/lib
+# 	I don't know how to do this:
+#	ifeq ($(PLATFORM), macosx)
+#		@$(INSTALL) -C -m 644 $(DEV_LIB_DIR)/*.dylib $(BUILD_DIR)/lib
+#	endif
+	
 #	@$(MAKE) install DESTDIR=$(BUILD_DIR)
 
-allojit alloutil:
+allojit alloutil alloni:
 	@$(MAKE) -C src/$@ install BUILD_DIR=../../$(BUILD_DIR) DESTDIR=../../$(BUILD_DIR)
 
 

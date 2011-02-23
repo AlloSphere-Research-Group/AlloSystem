@@ -1,0 +1,7 @@
+
+…being a wrapping of the OpenNI natural interaction libraries to allocore (and thus, the use of Kinect and similar devices therein)…
+
+
+
+
+
