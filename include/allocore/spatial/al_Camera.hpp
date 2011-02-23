@@ -34,8 +34,8 @@ public:
 	double far() const { return mFar; }						///< Get frustum far plane distance
 	double focalLength() const { return mFocalLength; }		///< Get focal length
 	double eyeSep() const { return mEyeSep; }				///< Get eye separation
+	double eyeSepAuto() const { return focalLength()/30.0; }///< Get automatic inter-ocular distance
 	double zoom() const { return mZoom; }					///< Get zoom amount
-	double IOD() const { return eyeSep() * focalLength()/30.0; }	///< Get automatic inter-ocular distance
 
 	/// Get test frustum
 	
