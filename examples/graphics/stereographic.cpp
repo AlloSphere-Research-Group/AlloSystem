@@ -25,7 +25,6 @@ struct MyWindow : Window, public Drawable{
 	}
 
 	bool onFrame(){
-		nav.smooth(0.9);
 		nav.step();
 		stereo.draw(gl, cam, nav, Viewport(width(), height()), *this);
 		return true;
@@ -40,9 +39,13 @@ struct MyWindow : Window, public Drawable{
 
 int main(){
 
+	nav.smooth(0.9);
+	nav.pos(0, 0, -20);
+
 	// exaggerate stereo:
 	cam.eyeSep(1/20.);
 	stereo.stereo(true);
+
 	
 	// set up mesh:
 	mesh.primitive(Graphics::TRIANGLES);

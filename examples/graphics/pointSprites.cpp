@@ -10,7 +10,7 @@ struct MyWindow : Window{
 	bool onCreate(){
 		const int N = 12;
 	
-		data.color(Color(1));
+		data.color(Color(1, 0.3));
 		data.primitive(gl.POINTS);
 	
 		for(int k=0; k<N; ++k){ float z = float(k)/(N-1)*2-1;
@@ -61,11 +61,10 @@ struct MyWindow : Window{
 		++angleY;
 
 		gl.pushMatrix();
-		
-			glColor4f(1,1,1,0.3);
+
 			glEnable(GL_POINT_SPRITE);
 			glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-			glPointSize(50);
+			gl.pointSize(50);
 
 			tex.bind();
 		
