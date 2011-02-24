@@ -154,7 +154,7 @@ protected:
 			font.mChars[i].width = mFace->glyph->advance.x/PIX_TO_EM;
 			font.mChars[i].y_offset = mFace->glyph->bitmap_top;
 			
-			printf("char %i %c %i %i\n", i, i, font.mChars[i].width, font.mChars[i].y_offset);
+			//printf("char %i %c %i %i\n", i, i, font.mChars[i].width, font.mChars[i].y_offset);
 			
 			// calculate texture pointer offset:
 			int xidx = i % GLYPHS_PER_ROW;

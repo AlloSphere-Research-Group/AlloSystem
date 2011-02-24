@@ -110,17 +110,20 @@ struct Kinect :: Impl {
 	xn::DepthMetaData mDepthMD;
 };
 
-Kinect :: Kinect(int deviceID) 
-:	mDepthArray(1, AlloFloat32Ty, 640, 480),
+Kinect :: Kinect(unsigned deviceID) 
+:	mImpl(NULL),
+	mDepthArray(1, AlloFloat32Ty, 640, 480),
 	mTime(0),
 	mDepthNormalize(true),
 	mFPS(0)
 {
 	// find the info for this device:
 	Ni::get();
-	xn::NodeInfo info = depth_nodes[deviceID % depth_nodes.size()];
+	if (deviceID < depth_nodes.size()) {
+		xn::NodeInfo info = depth_nodes[deviceID % depth_nodes.size()];
 	
-	mImpl = new Impl(info);
+		mImpl = new Impl(info);
+	}
 }
 
 Kinect :: ~Kinect() {
@@ -128,11 +131,13 @@ Kinect :: ~Kinect() {
 }
 
 bool Kinect :: start() {
+	if (mImpl == 0) return false;
 	mActive = true;
 	return mThread.start(threadFunction, this);
 }
 
 bool Kinect :: stop() {
+	if (mImpl == 0) return false;
 	mActive = false;
 	return mThread.wait();
 }

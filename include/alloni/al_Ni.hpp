@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_GRAPHICS_ASSET_HPP
-#define INCLUDE_AL_GRAPHICS_ASSET_HPP
+#ifndef INCLUDE_AL_NI_HPP
+#define INCLUDE_AL_NI_HPP
 
 /*
 	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
@@ -44,7 +44,7 @@ protected:
 
 class Kinect {
 public:
-	Kinect(int deviceID);
+	Kinect(unsigned deviceID);
 	~Kinect();
 	
 	bool start();
