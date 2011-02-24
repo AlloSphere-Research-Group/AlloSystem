@@ -2,6 +2,8 @@
 # AlloUtil main makefile
 #=========================================================================
 
+include ../../Makefile.common
+
 LIB_NAME	= alloni
 INC_DIR		= ../../include/$(LIB_NAME)/
 SRC_DIR		= ./
@@ -11,12 +13,13 @@ SRCS		:= $(wildcard $(SRC_DIR)/*.c*)
 OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
 CPPFLAGS	+= -I../../include
-#CPPFLAGS	+= -I/usr/include/ni -I/usr/include/ni
-CPPFLAGS	+= -I../../$(PLATFORM_DIR)/include/ni -I../../$(PLATFORM_DIR)/include/nite
+ifeq ($(PLATFORM), linux)
+	CPPFLAGS	+= -I/usr/include/ni -I/usr/include/ni
+else
+	CPPFLAGS	+= -I../../$(PLATFORM_DIR)/include/ni -I../../$(PLATFORM_DIR)/include/nite
+endif
 
-include ../../Makefile.common
 include ../../Makefile.rules
-
 
 #INC_DIRS	+= DEV_DIR/include/ni
 

@@ -16,17 +16,20 @@ CXXFLAGS	:= $(CFLAGS) $(CXXFLAGS)
 # Build object file from C++ source
 $(OBJ_DIR)%.o: %.cpp
 	@echo CXX $< $@
+#	@echo @$(CXX) -c $(CXXFLAGS) $< -o $@
 	@$(CXX) -c $(CXXFLAGS) $< -o $@
 
 # Build object file from C source
 $(OBJ_DIR)%.o: %.c
 	@echo CC $< $@
+#	@echo @$(CC) -c $(CFLAGS) $< -o $@
 	@$(CC) -c $(CFLAGS) $< -o $@
 	
 # Build object file from Obj-C++ source
 $(OBJ_DIR)%.o: %.mm
 	@echo CC $< $@
-	$(CXX) -c $(CFLAGS) $< -o $@
+#	@echo $(CXX) -c $(CFLAGS) $< -o 
+	$(CXX) -c $(CFLAGS) $< -o $@$@
 
 all: $(SLIB_PATH)
 
