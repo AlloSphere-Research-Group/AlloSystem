@@ -69,6 +69,8 @@ ifneq ($(AUTORUN), 0)
 	@$(BIN_DIR)$(*F)
 endif
 
+extended: all alloni
+
 all: extensions externals
 
 # AlloCore extensions
