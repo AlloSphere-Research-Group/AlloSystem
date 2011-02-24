@@ -239,7 +239,7 @@ void Scene :: mesh(unsigned int i, Mesh& mesh) const {
 	if (i < meshes()) {
 		aiMesh * amesh = mImpl->scene->mMeshes[i];
 		if (amesh) {
-			mesh.reset();
+			//mesh.reset();
 			
 			bool hasnormals = amesh->mNormals != NULL;
 			bool hascolors = amesh->mColors[0] != NULL;

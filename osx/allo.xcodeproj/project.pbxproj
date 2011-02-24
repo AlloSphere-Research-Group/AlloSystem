@@ -252,6 +252,8 @@
 		3687E33911FA4F9500EC6706 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
 		3687E33A11FA4F9500EC6706 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		3687E33B11FA4F9500EC6706 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
+		368D9DEA1315DCFB00A4ECBD /* modelShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16A6041F130345BB0077B460 /* modelShader.cpp */; };
+		368D9E211315DD7400A4ECBD /* simpleGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16A60423130345BB0077B460 /* simpleGraphics.cpp */; };
 		369DDF6B12B6C8F300F75D2A /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DDF6512B6C8C000F75D2A /* libassimp.a */; };
 		369DDF6E12B6C90E00F75D2A /* utAsset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 369DDF6D12B6C90E00F75D2A /* utAsset.cpp */; };
 		36B412B010EFF916007B16D0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
@@ -2448,6 +2450,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				368D9E211315DD7400A4ECBD /* simpleGraphics.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2455,6 +2458,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				368D9DEA1315DCFB00A4ECBD /* modelShader.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

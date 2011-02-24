@@ -16,6 +16,7 @@ Image img;
 Light light;
 Material material;
 
+
 Scene * ascene = 0;
 Vec3f scene_min, scene_max, scene_center;
 GLuint scene_list = 0;
@@ -175,6 +176,7 @@ int main (int argc, char * const argv[]) {
 	path = searchpaths.find("hubble.jpg");
 	img.load(path.filepath());
 	tex.fromArray(&img.array());
+	tex.target(Texture::TEXTURE_2D);
 	
 	MyWindow win1;
 	win1.add(new StandardWindowKeyControls);
