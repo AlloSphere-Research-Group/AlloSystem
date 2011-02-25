@@ -483,6 +483,10 @@ int utMath(){
 	T(0,0,1, true) T(1,0,1, true)
 	#undef T
 
+//	printf("%.20g\n", wrap<double>(-32.0, 32.0, 0.));  // should be 0.0
+//	printf("%.20g\n", wrap<double>(-64.0, 32.0, 0.));  // should be 0.0
+//	printf("%.20g\n", wrap<double>(-1e-16, 32., 0.));  // should be 31.999999999999996447
+
 	#define T(x, y) assert(eq(al::wrap(x, 1., -1.), y));
 	T(0., 0.)	T( 0.5, 0.5) T( 1.,-1.) T( 1.2,-0.8) T( 2.2, 0.2)
 				T(-0.5,-0.5) T(-1.,-1.) T(-1.2, 0.8) T(-2.2,-0.2)

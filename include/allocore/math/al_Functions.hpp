@@ -619,9 +619,14 @@ TEM inline T wrap(T v, T hi, T lo){
 	}
 	else if(v < lo){
 		T diff = hi - lo;
-		v += diff;	// this might give diff if range is too large, so check at end of block...
-		if(v < lo) v += diff * (T)(uint32_t)(((lo - v)/diff) + 1);
+		v += diff;
+
+		// If value is very slightly less than 'lo', then less significant 
+		// digits might get truncated by adding a larger number.
 		if(v==diff) return al::nextAfter(v, lo);
+		
+		if(v < lo) v += diff * (T)(uint32_t)(((lo - v)/diff) + 1);
+		if(v==diff) return lo;
 	}
 	return v;
 }
