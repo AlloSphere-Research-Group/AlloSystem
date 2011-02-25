@@ -46,6 +46,26 @@ namespace al {
 */
 class Array : public AlloArray {
 public:
+
+	// temporary hack because the one in al_Function gave a bad result
+	// for e.g. wrap<double>(-64.0, -32.0);
+	template<typename T> 
+	static inline T wrap(T v, const T hi, const T lo){
+		if(lo == hi) return lo;
+		//if(v >= hi){
+		if(!(v < hi)){
+			T diff = hi - lo;
+			v -= diff;
+			if(!(v < hi)) v -= diff * (T)(uint32_t)((v - lo)/diff);
+		}
+		else if(v < lo){
+			T diff = hi - lo;
+			v += diff;	
+			if(v < lo) v += diff * (T)(uint32_t)(((lo - v)/diff) + 1);
+			if(v==diff) return lo;
+		}
+		return v;
+	}
 	
 	/*!
 		Returns the type enumeration ID (AlloTy) for a given type (given as template argument)
