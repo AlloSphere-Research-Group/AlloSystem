@@ -23,7 +23,7 @@ static bool ok(XnStatus status) {
 	if (status != XN_STATUS_OK) {
 		printf("OpenNI error: %s\n", xnGetStatusString(status));
 		return false;
-	}	
+	}
 	return true;
 }
 
@@ -38,7 +38,7 @@ xn::NodeInfoList device_node_info_list, depth_node_info_list;
 
 Ni :: Ni() {
 	int i;
-	
+
 	// enumerate devices:
 	if (!ok(context.Init())) return;
 
@@ -48,7 +48,7 @@ Ni :: Ni() {
 	// enumerate all devices
 	printf("Searching for OpenNI compliant USB devices:\n");
 	if (!ok(context.EnumerateProductionTrees(XN_NODE_TYPE_DEVICE, NULL, device_node_info_list))) return;
-	
+
 	i=0;
 	for (xn::NodeInfoList::Iterator nodeIt = device_node_info_list.Begin (); nodeIt != device_node_info_list.End (); ++nodeIt, ++i) {
 		const xn::NodeInfo& info = *nodeIt;
@@ -60,10 +60,10 @@ Ni :: Ni() {
 		sscanf(info.GetCreationInfo(), "%hx/%hx@%hhu/%hhu", &vendor_id, &product_id, &bus, &address);
 		std::string connection_string = info.GetCreationInfo();
 		std::transform (connection_string.begin (), connection_string.end (), connection_string.begin (), std::towlower);
-		printf(">%2d (USB bus %2i address %2i): vendor %s (vendor_id %i) name %s (product_id %i), connection string %s\n", 
-			i, bus, address, 
-			description.strVendor, vendor_id, 
-			description.strName, product_id, 
+		printf(">%2d (USB bus %2i address %2i): vendor %s (vendor_id %i) name %s (product_id %i), connection string %s\n",
+			i, bus, address,
+			description.strVendor, vendor_id,
+			description.strName, product_id,
 			connection_string.c_str());
 
 		if (connection_string.substr (0,4) == "045e") {
@@ -73,7 +73,7 @@ Ni :: Ni() {
 		device_nodes.push_back(info);
 		bus_map[bus][address] = device_nodes.size();
 	}
-	
+
 	depth_nodes.clear();
 	if (!ok(context.EnumerateProductionTrees(XN_NODE_TYPE_DEPTH, NULL, depth_node_info_list))) return;
 	i=0;
@@ -92,7 +92,7 @@ struct Kinect :: Impl {
 		hasData = false;
 		if (!ok(context.CreateProductionTree(info))) return;
 		if (!ok(info.GetInstance(mDepthGenerator))) return;
-			
+
 		XnMapOutputMode mode;
 		mode.nXRes = 640;
 		mode.nYRes = 480;
@@ -101,18 +101,18 @@ struct Kinect :: Impl {
 		mDepthGenerator.SetIntProperty ("RegistrationType", 2);	// 2 for kinect, 1 for primesense
 
 		mDepthGenerator.RegisterToNewDataAvailable(NewDepthDataAvailable, this, mDepthCallbackHandle);
- 
+
 	}
 
 	static void NewDepthDataAvailable (xn::ProductionNode& node, void* cookie) {
-		Impl * self = (Impl *)cookie;	
-		//printf("%p\n", cookie);	
+		Impl * self = (Impl *)cookie;
+		//printf("%p\n", cookie);
 
-		printf("new depth data %p\n", cookie);
+		//printf("new depth data %p\n", cookie);
 		// trigger condition:
 		self->hasData = true;
 	}
-	
+
 	bool getMetaData() {
 		XnUInt64 timestamp;
 		hasData = false;
@@ -135,7 +135,7 @@ struct Kinect :: Impl {
 	bool hasData;
 };
 
-Kinect :: Kinect(unsigned deviceID) 
+Kinect :: Kinect(unsigned deviceID)
 :	mImpl(NULL),
 	mDepthArray(1, AlloFloat32Ty, 640, 480),
 	mTime(0),
@@ -146,7 +146,7 @@ Kinect :: Kinect(unsigned deviceID)
 	Ni::get();
 	if (deviceID < depth_nodes.size()) {
 		xn::NodeInfo info = depth_nodes[deviceID % depth_nodes.size()];
-	
+
 		mImpl = new Impl(info);
 	}
 }
@@ -176,7 +176,7 @@ bool Kinect :: tick() {
 		const XnUInt yres = mImpl->mDepthMD.YRes();
 		const XnDepthPixel zres = mImpl->mDepthMD.ZRes();
 		const XnDepthPixel* pDepth = mImpl->mDepthMD.Data();
-		
+
 		const float zscale = mDepthNormalize ? 1.f/zres : 1.f;
 		const float zoffset = 0.f;
 
@@ -188,31 +188,31 @@ bool Kinect :: tick() {
 			*optr++ = (*pDepth++) * zscale + zoffset;
 
 		}
-		
+
 		// update FPS:
 		al_sec when = al_time();
 		al_sec dt = when - mTime;
 		mTime = when;
 		mFPS = 1./dt;
 	}
-	
+
 	return true;
 }
 
 void * Kinect :: threadFunction(void * userData) {
 	Kinect& self = *(Kinect *)userData;
-	
+
 	printf("start generating kinect... %p\n", userData);
 	XnStatus s = self.mImpl->mDepthGenerator.StartGenerating();
 	if (!ok(s)) return 0;
-	
+
 	self.mTime = al_time();
 
 	printf("while kinect %p\n", userData);
-	while (self.mActive && self.tick()) {}
+	while (self.mActive && self.tick()) { al_sleep(0.01); }
 
 	printf("kinect done %p\n", userData);
-	
+
 	ok(self.mImpl->mDepthGenerator.StopGenerating());
 	return 0;
 }
