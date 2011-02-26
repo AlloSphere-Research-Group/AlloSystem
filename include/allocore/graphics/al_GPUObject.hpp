@@ -84,7 +84,7 @@ public:
 		if (!created()) create();
 	}
 	
-	bool created(){ return id()!=0; }
+	bool created() const { return id()!=0; }
 
 	/// Creates object on GPU
 	void create(){
@@ -100,7 +100,7 @@ public:
 	}
 	
 	/// Returns the assigned object id
-	const long id() const { return mID; }
+	long id() const { return mID; }
 	void id(long v) {mID = v;}
 
 protected:
