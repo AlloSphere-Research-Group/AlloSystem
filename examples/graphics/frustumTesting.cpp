@@ -38,51 +38,15 @@ public:
 //			printf("%d\n", r);
 		}
 
-//		// draw frustum
-//		m.reset();
-//		m.vertex(fr.nbl);
-//		m.vertex(fr.nbr);
-//		m.vertex(fr.ntr);
-//		m.vertex(fr.ntl);
-//		m.vertex(fr.fbl);
-//		m.vertex(fr.fbr);
-//		m.vertex(fr.ftr);
-//		m.vertex(fr.ftl);
-//		m.color(Color(0.5,0.5,0.5));
-//		m.color(Color(1,0,0));
-//		m.color(Color(1,1,0));
-//		m.color(Color(0,1,0));
-//		m.color(Color(0,0,1));
-//		m.color(Color(1,0,1));
-//		m.color(Color(1,1,1));
-//		m.color(Color(0,1,1));
-//
-//		{
-//			int edges[] = {
-//				0,1, 3,2, 7,6, 4,5,
-//				5,2,
-//				2,6, 1,5, 0,4, 3,7,
-//			};
-//			for(unsigned e=0; e<sizeof(edges)/sizeof(edges[0]); ++e){
-//				m.index(edges[e]);
-//			}
-//		}
-//		m.primitive(g.LINE_STRIP);
-//		g.draw();
-//
-//		m.indices().reset();
-//		{
-//			int edges[] = {
-//				3, 2, 0, 1, 7, 6, 4, 5
-//			};
-//			for(unsigned e=0; e<sizeof(edges)/sizeof(edges[0]); ++e){
-//				m.index(edges[e]);
-//			}
-//		}
-//
-//		g.pointSize(20);
-//		m.primitive(g.POINTS);		
-//		g.draw();
+		// draw rectangle across frustum diagonal
+		m.reset();
+		m.color(Color(0.5));
+		m.vertex(fr.nbl);
+		m.vertex(fr.fbr);
+		m.vertex(fr.ntr);
+		m.vertex(fr.ftl);
+		m.primitive(g.LINE_LOOP);
+		g.draw();
 	}
 
 };
