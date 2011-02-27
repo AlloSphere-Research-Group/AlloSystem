@@ -104,8 +104,7 @@ public:
 	typedef std::vector<Viewpoint *> Viewpoints;
 
 	ViewpointWindow(){
-		add(new StandardWindowKeyControls);
-		add(new ResizeHandler(*this));
+		init();
 	}
 	
 	ViewpointWindow(
@@ -114,8 +113,7 @@ public:
 		double fps=40,
 		DisplayMode::t mode = DisplayMode::DefaultBuf
 	){
-		add(new StandardWindowKeyControls);
-		add(new ResizeHandler(*this));
+		init();
 		create(Dim(l,t,w,h), title, fps, mode);
 	}
 
@@ -145,6 +143,12 @@ protected:
 		}
 		ViewpointWindow& w;
 	};
+
+private:
+	void init(){
+		add(new StandardWindowKeyControls);
+		add(new ResizeHandler(*this));
+	}
 };
 
 
