@@ -88,8 +88,13 @@ PLATFORM_DIR ?=
 #--------------------------------------------------------------------------
 # Default tools/commands
 #--------------------------------------------------------------------------
+
+# NOTE: ar -s is completely equivalent to running ranlib
 ifeq ($(PLATFORM), linux)
-	AR = ar crsT
+# NOTE: -T is 'thin' archive under some Linux distros which 
+# may not be what we want here...
+#	AR = ar crsT
+	AR = ar crs
 else
 	AR = ar crs
 endif
