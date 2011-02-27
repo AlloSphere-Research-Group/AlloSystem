@@ -84,6 +84,12 @@ public:
 
 	void gameMode(bool v){
 
+		/* GLUT reshape behavior:
+			When entering game mode, the GLUT reshape callback gets called
+			with the dimensions of the fullscreen window.
+			When exiting game mode, the GLUT reshape callback is NOT called.
+		*/
+
         mScheduled = false;
 		// Go into game mode
 		if(v){
@@ -117,24 +123,30 @@ public:
 
 	//		compact mode [ width "x" height ][ ":" bitsPerPixel ][ "@" videoRate ]
 
-			// get current screen resolution
+			// use screen resolution for fullscreen dimensions
 			int sw = glutGet(GLUT_SCREEN_WIDTH);
 			int sh = glutGet(GLUT_SCREEN_HEIGHT);
 
-			// use current resolution and refresh rate
-			if(sw && sh){
+			// if invalid screen resolution, use sensible defaults
+			if(!sw || !sh){
+				sw = 1024;
+				sh = 768;
+			}
+
+			// set full screen settings
+			{
 				char buf[32];
 				snprintf(buf, sizeof(buf), "%dx%d:24", sw, sh);
 				glutGameModeString(buf);
-
 				//int refresh = glutGameModeGet(GLUT_GAME_MODE_REFRESH_RATE);
 				//printf("%d\n", refresh);
 			}
 
-			// otherwise, use sensible defaults
-			else{
-				glutGameModeString("1024x768:24");
-			}
+			// ensure that current dims are set
+			// GLUT will call the reshape CB upon entering game mode with fullscreen dims
+			mDimCurr = dimensions();
+
+//			printf("l=%d, t=%d, w=%d, h=%d\n", mDimCurr.l, mDimCurr.t, mDimCurr.w, mDimCurr.h);
 
 			windows().erase(mID);	// erase ID to stop draw scheduling...
 			mIDGameMode = glutEnterGameMode();
@@ -361,6 +373,7 @@ public:
 
 
 	static void cbReshape(int w, int h){
+//		printf("GLUT reshape: w = %4d, h = %4d\n", w,h);
 		Window * win = getWindow();
 		if(win){
 			win->makeActive();
@@ -438,8 +451,8 @@ private:
 	// Map of windows constructed on first use to avoid static intialization
 	// order problems.
 	static WindowsMap& windows(){
-		static WindowsMap* windowsmap = new WindowsMap;
-		return *windowsmap;
+		static WindowsMap* v = new WindowsMap;
+		return *v;
 	}
 
 	Window * mWindow;
@@ -607,6 +620,8 @@ Window& Window::fullScreen(bool v){
 	if(mImpl->mFullScreen && !v){
 		#ifdef AL_LINUX
 			doDestroy();
+			// Must manually set dims since exiting game mode does NOT 
+			// automatically call GLUT reshape callback.
 			mImpl->mDimPrev = dimensions();
 			mImpl->gameMode(false);
 			mImpl->mDimCurr = dimensions();
@@ -627,9 +642,14 @@ Window& Window::fullScreen(bool v){
 
 		#ifdef AL_LINUX
 			doDestroy();
-			mImpl->mDimPrev = dimensions();
+			// TODO: current dims now set in gameMode().
+			// GLUT automatically calls reshape CB upon entering game mode...
+//			mImpl->mDimPrev = dimensions();		// dims of windowed window
 			mImpl->gameMode(true);
-			mImpl->mDimCurr = dimensions();
+//			mImpl->mDimCurr = dimensions();		// dims of fullscreen window
+
+//			printf("l=%d, t=%d, w=%d, h=%d\n", mImpl->mDimPrev.l, mImpl->mDimPrev.t, mImpl->mDimPrev.w, mImpl->mDimPrev.h);
+//			printf("l=%d, t=%d, w=%d, h=%d\n", mImpl->mDimCurr.l, mImpl->mDimCurr.t, mImpl->mDimCurr.w, mImpl->mDimCurr.h);
 			doCreate();
 			cursorHide(cursorHide());
 		#else
