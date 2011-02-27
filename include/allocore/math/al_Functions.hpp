@@ -103,7 +103,10 @@ inline T dBToAmp(const T& db){ return ::pow(10, db/20.); }
 template<class T> bool even(T v);
 
 /// Returns factorial. Argument must be less than or equal to 12.
-uint32_t factorial(uint32_t v);
+uint32_t factorial(uint32_t n0to12);
+
+/// Returns square root of factorial
+double factorialSqrt(int v);
 
 /// Returns floor of floating point value.
 template<class T> T floor(T val);
@@ -433,6 +436,13 @@ TEM inline T clipS(T v, T hi){ return al::clip(v, hi, -hi); }
 TEM inline bool even(T v){ return 0 == al::odd(v); }
 
 inline uint32_t factorial(uint32_t v){ return mFactorial12u[v]; }
+
+inline double factorialSqrt(int v){
+	if(v<=1) return 1;
+	double r=1;
+	for(int i=2; i<=v; ++i) r *= ::sqrt(i);
+	return r;
+}
 
 TEM inline T floor(T v){ return al::round(v - roundEps<T>()); }
 TEM inline T floor(T v, T s){ return al::floor(v/s)*s; }
