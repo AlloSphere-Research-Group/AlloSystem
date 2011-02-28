@@ -163,6 +163,8 @@ public:
 		mName(name)
 	{
 		mListeners.push_back(mAudioScene.createListener(2));
+		mListeners[0]->speakerPos(0,0, -45);
+		mListeners[0]->speakerPos(1,1,  45);
 	}
 
 	const std::string& name() const { return mName; }
@@ -187,6 +189,8 @@ public:
 	}
 	
 	Stereographic& stereo(){ return mStereo; }
+	AudioIO& audioIO(){ return mAudioIO; }
+	AudioScene& audioScene(){ return mAudioScene; }
 
 protected:
 
@@ -215,6 +219,7 @@ protected:
 		//w.mNavMaster.step(io.secondsPerBuffer());
 		w.mNav.smooth(0.95);
 		w.mNav.step(1./4);
+		w.mListeners[0]->pose(w.mNav);
 
 		Actors::iterator it = w.mActors.begin();
 
