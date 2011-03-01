@@ -281,8 +281,15 @@ public:
 			}
 
 			//#endif
-
 			#undef MAP
+
+			#ifdef AL_OSX
+
+			// swap backspace and delete
+			if(8 == key){ key = 127; }
+			else if(127 == key){ key = 8; }
+
+			#endif
 
 			//printf("GLUT o: %3d %c\n", key, key);
 		}

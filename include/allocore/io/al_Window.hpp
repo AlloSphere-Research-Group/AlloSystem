@@ -50,7 +50,7 @@ namespace Key{
 		
 		// Standard ASCII non-printable characters
 		Enter		=3,		/**< */
-		BackSpace	=8,		/**< */
+		Backspace	=8,		/**< */
 		Tab			=9,		/**< */
 		Return		=13,	/**< */
 		Escape		=27,	/**< */
