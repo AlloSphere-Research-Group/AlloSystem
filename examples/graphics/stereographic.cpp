@@ -31,6 +31,7 @@ struct MyWindow : Window, public Drawable{
 	}
 
 	void onDraw(Graphics& gl){
+		gl.fog(cam.far(), cam.far()/2, stereo.clearColor());
 		gl.depthTesting(1);
 		gl.draw(mesh);	
 	}
@@ -39,12 +40,13 @@ struct MyWindow : Window, public Drawable{
 
 int main(){
 
-	nav.smooth(0.9);
+	nav.smooth(0.8);
 	nav.pos(0, 0, -20);
 
-	// exaggerate stereo:
-	cam.eyeSep(1/20.);
+	cam.near(1).far(100).focalLength(1).fovy(45);
+	cam.eyeSep(cam.eyeSepAuto());
 	stereo.stereo(true);
+	stereo.mode(Stereographic::Active);
 
 	
 	// set up mesh:
@@ -63,7 +65,7 @@ int main(){
 	}
 
 	MyWindow win;
-	win.create(Window::Dim(100, 0, 640, 480), "Stereographic Example");
+	win.create(Window::Dim(100, 0, 640, 480), "Stereographic Example", 60);
 	
 	win.displayMode(win.displayMode() | DisplayMode::StereoBuf);
 
