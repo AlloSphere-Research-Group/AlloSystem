@@ -58,7 +58,7 @@ include Makefile.rules
 
 
 # Compile and run source files in examples/ folder
-EXEC_TARGETS = examples/%.cpp experimental/%.cpp
+EXEC_TARGETS = examples/%.cpp
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS): allocore alloutil FORCE
 #	@echo $(wildcard $(BUILD_DIR)lib/*.a)
