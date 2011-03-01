@@ -39,7 +39,7 @@ OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 CPPFLAGS	+= $(addprefix -I, $(INC_DIRS) $(RINC_DIRS) $(BUILD_DIR)/include)
 LDFLAGS		:= $(addprefix -L, $(LIB_DIRS) $(BUILD_DIR)/lib) $(LDFLAGS)
 LINK_LIBS_PATH	:= $(wildcard $(BUILD_DIR)lib/*.a)
-LINK_LIBS_FLAGS	:= $(addprefix -l :, $(notdir $(LINK_LIBS_PATH)))
+LINK_LIBS_FLAGS	:=
 
 #--------------------------------------------------------------------------
 # Rules
@@ -61,8 +61,12 @@ include Makefile.rules
 
 # Compile and run source files in examples/ folder
 EXEC_TARGETS = examples/%.cpp
+ifeq ($(PLATFORM), linux)
+	LINK_LIBS_FLAGS += $(addprefix -l, $(notdir $(LINK_LIBS_PATH)))
+endif
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS): allocore alloutil FORCE
+	@echo $(LINK_LIBS_FLAGS)
 	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LDFLAGS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH)
 ifneq ($(AUTORUN), 0)
 	@$(BIN_DIR)$(*F)
