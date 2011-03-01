@@ -38,6 +38,8 @@ OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
 CPPFLAGS	+= $(addprefix -I, $(INC_DIRS) $(RINC_DIRS) $(BUILD_DIR)/include)
 LDFLAGS		:= $(addprefix -L, $(LIB_DIRS) $(BUILD_DIR)/lib) $(LDFLAGS)
+LINK_LIBS_PATH	:= $(wildcard $(BUILD_DIR)lib/*.a)
+LINK_LIBS_FLAGS	:= $(addprefix -l :, $(notdir $(LINK_LIBS_PATH)))
 
 #--------------------------------------------------------------------------
 # Rules
@@ -61,12 +63,7 @@ include Makefile.rules
 EXEC_TARGETS = examples/%.cpp
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS): allocore alloutil FORCE
-#	@echo $(wildcard $(BUILD_DIR)lib/*.a)
-#	@echo `ls $(BUILD_DIR)lib/*.a`
-#	@$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LDFLAGS) -whole-archive $(SLIB_PATH)
-#	@$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(SLIB_PATH) $(LDFLAGS)
-	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LDFLAGS) $(wildcard $(BUILD_DIR)lib/*.a)
-#	-lallocore -lalloutil `ls $(BUILD_DIR)lib/*.a`
+	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LDFLAGS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH)
 ifneq ($(AUTORUN), 0)
 	@$(BIN_DIR)$(*F)
 endif
