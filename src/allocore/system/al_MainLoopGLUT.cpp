@@ -58,8 +58,9 @@ MainLoop :: MainLoop()
 	if(doInit){
         //printf("initializing GLUT\n");
 		doInit=false;
-		int argc = 0;
-		char * argv[] = {0};
+		int   argc   = 1;
+		char name[] = {'a','l','l','o'};
+		char *argv[] = {name, NULL};
 		glutInit(&argc,argv);
 		
 		atexit(exitFunc);
