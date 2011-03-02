@@ -208,10 +208,6 @@ public:
 		return ipl::linear(frac, a, b);
 	}
 
-	double maxindex() const {
-		return mSound.size() - 2;
-	}
-
 	/// Set far clipping distance
 	void farClip(double v){ mClipRange=(v-mNearClip); }
 	void ampFar(double v){ mAmpFar=v; }
@@ -315,7 +311,7 @@ public:
 				// varies per source, 
 				// since each source has its own buffersize and far clip
 				// (not physically accurate of course)
-				distanceToSample = (src.maxindex()-numFrames)/src.farClip();
+				distanceToSample = (src.maxIndex()-numFrames)/src.farClip();
 				
 				// iterate time samples
 				for(int i=0; i<numFrames; ++i){
