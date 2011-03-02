@@ -58,7 +58,7 @@ namespace Key{
 			
 		// Non-standard, but common keys.
 		F1=256, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, 
-		Insert, Left, Up, Right, Down, PageDown, PageUp, End, Home,
+		Insert, Left, Up, Right, Down, PageDown, PageUp, End, Home
 	};
 }
 
@@ -84,7 +84,7 @@ namespace Cursor{
 	enum t{
 		None		= 0,		/**< */
 		Pointer		= 1,		/**< */
-		CrossHair,				/**< */
+		CrossHair				/**< */
 	};
 }
 
