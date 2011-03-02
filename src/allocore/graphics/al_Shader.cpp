@@ -189,9 +189,9 @@ const ShaderProgram& ShaderProgram::uniform4(const char * name, const float * v,
 	glUniform4fv(uniformLocation(name), count, v); return *this;
 }
 
-const ShaderProgram& ShaderProgram::attribute(const char * name, float v0) const{
+const ShaderProgram& ShaderProgram::attribute(const char * name, float v0) const {
 	//glVertexAttrib1fARB(uniformLocation(name), v0);
-	glVertexAttrib1f(uniformLocation(name), v0);
+	glVertexAttrib1f(attributeLocation(name), v0);
 	return *this;
 }
 
@@ -208,7 +208,7 @@ int ShaderProgram::attributeLocation(const char * name) const {
 	GLint loc = glGetAttribLocation(id(), name);
 	if (loc == -1)
         printf("No such attribute named \"%s\"\n", name);
-	return loc; // glGetUniformLocation(id(), name); 
+	return loc;  
 }
 
 void ShaderProgram::get(int pname, void * params) const { 

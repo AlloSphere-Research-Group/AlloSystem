@@ -148,17 +148,16 @@ public:
 
 	const ShaderProgram& attribute(const char * name, float v0) const;
 	
+	int uniformLocation(const char * name) const;
+	int attributeLocation(const char * name) const;
+	
 	static Type param_type_from_gltype(GLenum gltype);
 
 protected:
 	Graphics::Primitive inPrim, outPrim;	// IO primitives for geometry shaders
 	unsigned int outVertices;
 	
-	int uniformLocation(const char * name) const;
-	int attributeLocation(const char * name) const;
-	
 	virtual void get(int pname, void * params) const;
-
 	virtual void onCreate();
 	virtual void onDestroy();
 };
