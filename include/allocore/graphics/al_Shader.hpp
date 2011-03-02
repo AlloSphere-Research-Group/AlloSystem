@@ -147,6 +147,14 @@ public:
 	const ShaderProgram& uniform4(const char * name, const float * v, int count=1) const;
 
 	const ShaderProgram& attribute(const char * name, float v0) const;
+	const ShaderProgram& attribute(const char * name, float v0, float v1) const;
+	const ShaderProgram& attribute(const char * name, float v0, float v1, float v2) const;
+	const ShaderProgram& attribute(const char * name, float v0, float v1, float v2, float v3) const;
+
+	const ShaderProgram& attribute1(const char * name, const float * v) const;
+	const ShaderProgram& attribute2(const char * name, const float * v) const;
+	const ShaderProgram& attribute3(const char * name, const float * v) const;
+	const ShaderProgram& attribute4(const char * name, const float * v) const;
 	
 	int uniformLocation(const char * name) const;
 	int attributeLocation(const char * name) const;

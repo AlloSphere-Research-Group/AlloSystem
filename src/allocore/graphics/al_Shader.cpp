@@ -189,10 +189,29 @@ const ShaderProgram& ShaderProgram::uniform4(const char * name, const float * v,
 	glUniform4fv(uniformLocation(name), count, v); return *this;
 }
 
-const ShaderProgram& ShaderProgram::attribute(const char * name, float v0) const {
-	//glVertexAttrib1fARB(uniformLocation(name), v0);
-	glVertexAttrib1f(attributeLocation(name), v0);
-	return *this;
+const ShaderProgram& ShaderProgram::attribute(const char * name, float v0) const{
+	glVertexAttrib1f(attributeLocation(name), v0);	return *this;
+}
+const ShaderProgram& ShaderProgram::attribute(const char * name, float v0, float v1) const{
+	glVertexAttrib2f(attributeLocation(name), v0,v1); return *this;	
+}
+const ShaderProgram& ShaderProgram::attribute(const char * name, float v0, float v1, float v2) const{
+	glVertexAttrib3f(attributeLocation(name), v0,v1,v2); return *this;	
+}
+const ShaderProgram& ShaderProgram::attribute(const char * name, float v0, float v1, float v2, float v3) const{
+	glVertexAttrib4f(attributeLocation(name), v0,v1,v2,v3); return *this;	
+}
+const ShaderProgram& ShaderProgram::attribute1(const char * name, const float * v) const{
+	glVertexAttrib1fv(attributeLocation(name), v); return *this;
+}
+const ShaderProgram& ShaderProgram::attribute2(const char * name, const float * v) const{
+	glVertexAttrib2fv(attributeLocation(name), v); return *this;
+}
+const ShaderProgram& ShaderProgram::attribute3(const char * name, const float * v) const{
+	glVertexAttrib3fv(attributeLocation(name), v); return *this;
+}
+const ShaderProgram& ShaderProgram::attribute4(const char * name, const float * v) const{
+	glVertexAttrib4fv(attributeLocation(name), v); return *this;
 }
 
 int ShaderProgram::uniformLocation(const char * name) const { 
