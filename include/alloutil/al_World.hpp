@@ -166,6 +166,10 @@ public:
 		mListeners[0]->speakerPos(0,0, -45);
 		mListeners[0]->speakerPos(1,1,  45);
 	}
+	
+	virtual ~World(){
+		mAudioIO.close();
+	}
 
 	const std::string& name() const { return mName; }
 
