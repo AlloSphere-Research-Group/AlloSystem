@@ -315,37 +315,31 @@ template <class T> Isosurface<T>::~Isosurface(){
 	clear();
 }
 
-
 template <class T>
-void Isosurface<T>::addCell(
-	const T& xyz, const T& Xyz,
-	const T& xYz, const T& XYz,
-	const T& xyZ, const T& XyZ,
-	const T& xYZ, const T& XYZ,
-	int ix, int iy, int iz
-){
-	// Store values in local struct to be passed into functions
-	T cellVals[8] = { xyz, Xyz, xYz, XYz, xyZ, XyZ, xYZ, XYZ };
+void Isosurface<T>::addCell(const T * cellVals, const int * cellIdx3){
+	const int &ix = cellIdx3[0];
+	const int &iy = cellIdx3[1];
+	const int &iz = cellIdx3[2];
 
 	// Get isosurface cell index depending on field values at corners of cell
-	int ind = 0;
-	if(xyz < level()) ind |=   1;
-	if(xYz < level()) ind |=   2;
-	if(XYz < level()) ind |=   4;
-	if(Xyz < level()) ind |=   8;
-	if(xyZ < level()) ind |=  16;
-	if(xYZ < level()) ind |=  32;
-	if(XYZ < level()) ind |=  64;
-	if(XyZ < level()) ind |= 128;
+	int idx = 0;
+	if(cellVals[0] < level()) idx |=   1;
+	if(cellVals[2] < level()) idx |=   2;
+	if(cellVals[3] < level()) idx |=   4;
+	if(cellVals[1] < level()) idx |=   8;
+	if(cellVals[4] < level()) idx |=  16;
+	if(cellVals[6] < level()) idx |=  32;
+	if(cellVals[7] < level()) idx |=  64;
+	if(cellVals[5] < level()) idx |= 128;
 
 	// Create a triangulation of the isosurface in this cell.
-	int edgeCode = sEdgeTable[ind];
+	int edgeCode = sEdgeTable[idx];
 	if(edgeCode){
 	
 		int vID = vertexID(ix,iy,iz);
 
 		// Compute interpolated vertices on edges of box
-		//		(int EdgeID, PointID vertex) pair is created in mID2PointID
+		//		(int EdgeID, PointID vertex) pair is created in mEdgeToVertex
 		//		EdgeID is a unique integer ID of box edge
 		//		vertex.newID is not set to anything
 		if(edgeCode &    1) addEdgeVertex(ix,iy,iz,vID, 0, cellVals);
@@ -362,46 +356,47 @@ void Isosurface<T>::addCell(
 		if(edgeCode & 2048) addEdgeVertex(ix,iy,iz,vID,11, cellVals);
 
 		// Add up to 5 triangles (15 vertices) representing surface through cell
-		// Each triangle consists of 3 vertex indices stored in mID2PointID
-		for(int i=0; sTriTable[ind][i] != -1; i+=3){
+		// Each triangle consists of 3 vertex indices stored in mEdgeToVertex
+		for(int i=0; sTriTable[idx][i] != -1; i+=3){
 			
 			// Add 3 indices of triangle
-			TRIANGLE triangle;
-			triangle.indices[0] = edgeID(vID, sTriTable[ind][i  ]);
-			triangle.indices[1] = edgeID(vID, sTriTable[ind][i+1]);
-			triangle.indices[2] = edgeID(vID, sTriTable[ind][i+2]);
-			mTriangles.append(triangle, 1.5);
+			EdgeTriangle triangle;
+			triangle.edgeIDs[0] = edgeID(vID, sTriTable[idx][i  ]);
+			triangle.edgeIDs[1] = edgeID(vID, sTriTable[idx][i+1]);
+			triangle.edgeIDs[2] = edgeID(vID, sTriTable[idx][i+2]);
+			mEdgeTriangles.append(triangle, 1.5);
 		}
 	}
 }
 
 
 template <class T>
-void Isosurface<T>::addEdgeVertex(int x, int y, int z, int vertID, int edge, const T * cellVals){
+void Isosurface<T>::addEdgeVertex(int ix, int iy, int iz, int vertID, int edgeNo, const T * cellVals){
 
-	int id = edgeID(vertID, edge);
+	int id = edgeID(vertID, edgeNo);
 
-	ID2PointID::iterator it = mID2PointID.find(id);
+	typename EdgeToVertex::iterator it = mEdgeToVertex.find(id);
 	
 	// If this edge vertex has not been computed yet, then compute it
-	if(it == mID2PointID.end()){
-		PointID pt = calcIntersection(x,y,z, edge, cellVals);
-		mID2PointID[id] = pt;
+	if(it == mEdgeToVertex.end()){
+		PointID pt = calcIntersection(ix,iy,iz, edgeNo, cellVals);
+		mEdgeToVertex[id] = pt;
 	}
 };
 
 
 template <class T>
-PointID Isosurface<T>::calcIntersection(int ix, int iy, int iz, int edgeNo, const T * cellVals) const{
+typename Isosurface<T>::PointID 
+Isosurface<T>::calcIntersection(int ix, int iy, int iz, int edgeNo, const T * cellVals) const{
 
 	// Positions of cube vertices
-	static const double cubeVertices[8][3] = {
+	static const int cubeVertices[8][3] = {
 	/*	0        1        2        3        4        5        6        7 */
 		{0,0,0}, {1,0,0}, {0,1,0}, {1,1,0}, {0,0,1}, {1,0,1}, {0,1,1}, {1,1,1}
 	};
 
 	// Store differences between cube vertices for faster interpolation
-	static const double edgeDirections[12][3] = {
+	static const float edgeDirections[12][3] = {
 		{0,1,0}, {1,0,0}, {0,-1,0}, {-1,0,0},
 		{0,1,0}, {1,0,0}, {0,-1,0}, {-1,0,0},
 		{0,0,1}, {0,0,1}, {0, 0,1}, { 0,0,1}
@@ -414,56 +409,26 @@ PointID Isosurface<T>::calcIntersection(int ix, int iy, int iz, int edgeNo, cons
 		{0,4}, {2,6}, {3,7}, {1,5}
 	};
 
-	int i0 = cellEdgeIndices[edgeNo][0];
-	int i1 = cellEdgeIndices[edgeNo][1];
+	const char& i0 = cellEdgeIndices[edgeNo][0];
+	const char& i1 = cellEdgeIndices[edgeNo][1];
 	const T& val1 = cellVals[i0];
 	const T& val2 = cellVals[i1];
-	const double * e1 = cubeVertices[i0];
-	const double * ed = edgeDirections[edgeNo];
+	const int * e1 = cubeVertices[i0];
+	const float * ed = edgeDirections[edgeNo];
 
 	// Interpolate between two grid points to produce the point at which
-	// the isosurface intersects an edge.	
-	double mu = double((level() - val1))/(val2 - val1);
+	// the isosurface intersects an edge.
+	
+	// 'mu' is the fraction along the edge where the vertex lies
+	float mu = float((level() - val1)/(val2 - val1));
 
 	PointID r;
-	r.x = (e1[0] + mu*ed[0] + ix) * mL1;
-	r.y = (e1[1] + mu*ed[1] + iy) * mL2;
-	r.z = (e1[2] + mu*ed[2] + iz) * mL3;
+	r.x = (ix + e1[0] + mu*ed[0]) * mL1;
+	r.y = (iy + e1[1] + mu*ed[1]) * mL2;
+	r.z = (iz + e1[2] + mu*ed[2]) * mL3;
 
 	return r;
 }
-
-
-template <class T>
-void Isosurface<T>::calcNormals(){
-	mNormals.size(mVertices.size());
-	mNormals.assign(mNormals.size(), Vec3f(0,0,0));
-
-	// Calculate normals
-	// The vertex normals are a sum of all neighboring triangles normals
-	for(int i=0; i<mIndices.size(); i+=3){
-
-		// Get indices of triangle vertices
-		int i0 = mIndices[i  ];
-		int i1 = mIndices[i+1];
-		int i2 = mIndices[i+2];
-		
-		// Compute normal of triangle
-		Mesh::Vertex v1 = mVertices[i1] - mVertices[i0];
-		Mesh::Vertex v2 = mVertices[i2] - mVertices[i0];
-		Mesh::Vertex nd = v1 ^ v2;
-
-		mNormals[i0] += nd;
-		mNormals[i1] += nd;
-		mNormals[i2] += nd;
-	}
-
-	// Normalize normals
-	for(int i=0; i < mNormals.size(); i++){
-		mNormals[i].normalize();
-	}
-}
-
 
 
 template <class T>
@@ -475,8 +440,9 @@ void Isosurface<T>::begin(){
 template <class T>
 void Isosurface<T>::end(){
 	reset();
-	renameVerticesAndTriangles();
-	calcNormals();
+	compressTriangles();
+	generateNormals();
+//	calcNormals();
 	mValidSurface = true;
 }
 
@@ -545,44 +511,76 @@ int Isosurface<T>::volumeLengths(double& volLengthX, double& volLengthY, double&
 }
 
 
-// Renames vertices and triangles so that they can be accessed more efficiently.
+// Compress vertices and triangles so that they can be accessed more efficiently
 template <class T>
-void Isosurface<T>::renameVerticesAndTriangles(){
+void Isosurface<T>::compressTriangles(){
 
 	// We have:
-	// mID2PointID-	a map of (index, vertex) pairs making up surface
-	//				vertices lie on edges of cells
-	// mTriangles-	a vector of indices specifying triangles
-	//				every 3 indices is a triangle
+	// mEdgeToVertex-	map of (edge id, vertex) pairs making up surface
+	//					vertices lie on edges of cells
+	// mEdgeTriangles-		array of indices specifying triangles
+	//					every 3 indices is a triangle
+
+//	struct PointID { int newID; double x, y, z; };
+//	struct EdgeTriangle{ int edgeIDs[3]; };
 
 	// Assign edge vertices to sequential vertex buffer locations
 	{
-		int nextID = 0;
-		ID2PointID::iterator it = mID2PointID.begin();
-		for(; it != mID2PointID.end(); ++it){
-			it->second.newID = nextID;
-			++nextID;
-			
-			// add vertex to vertex buffer
-			vertex(it->second.x, it->second.y, it->second.z);
+		int nextID = -1;
+		typename EdgeToVertex::iterator it = mEdgeToVertex.begin();
+		for(; it != mEdgeToVertex.end(); ++it){
+			PointID& pt = it->second;
+			pt.newID = ++nextID;		// store vertex index
+			vertex(pt.x, pt.y, pt.z);	// add vertex to vertex buffer
 		}
 	}
 
 	// Reassign triangles to vertex buffer locations
-	for(int i=0; i<mTriangles.size(); ++i){
-		TRIANGLE& t = mTriangles[i];
+	for(int i=0; i<mEdgeTriangles.size(); ++i){
+		const EdgeTriangle& tri = mEdgeTriangles[i];
 
 		for(int j=0; j<3; ++j){
-			int newID = mID2PointID[t.indices[j]].newID;
+			int newID = mEdgeToVertex[tri.edgeIDs[j]].newID;
 			
 			// Add index to vertex indices buffer
 			index(newID);
 		}		
 	}
 
-	mID2PointID.clear();
-	mTriangles.reset();
+	mEdgeToVertex.clear();
+	mEdgeTriangles.reset();
 }
+
+
+//template <class T>
+//void Isosurface<T>::calcNormals(){
+//	mNormals.size(mVertices.size());
+//	mNormals.assign(mNormals.size(), Vec3f(0,0,0));
+//
+//	// Calculate normals
+//	// The vertex normals are a sum of all neighboring triangles normals
+//	for(int i=0; i<mIndices.size(); i+=3){
+//
+//		// Get indices of triangle vertices
+//		int i0 = mIndices[i  ];
+//		int i1 = mIndices[i+1];
+//		int i2 = mIndices[i+2];
+//		
+//		// Compute normal of triangle
+//		Mesh::Vertex v1 = mVertices[i1] - mVertices[i0];
+//		Mesh::Vertex v2 = mVertices[i2] - mVertices[i0];
+//		Mesh::Vertex nd = v1 ^ v2;
+//
+//		mNormals[i0] += nd;
+//		mNormals[i1] += nd;
+//		mNormals[i2] += nd;
+//	}
+//
+//	// Normalize normals
+//	for(int i=0; i < mNormals.size(); i++){
+//		mNormals[i].normalize();
+//	}
+//}
 
 
 
@@ -620,7 +618,6 @@ Isosurface<T>& Isosurface<T>::cellLengths(double dx, double dy, double dz){
 template <class T>
 void Isosurface<T>::clear(){
 	mL1 = mL2 = mL3 = mN1 = mN2 = mN3 = mN1p = mN2p = 0;
-//	mField = NULL;
 	mValidSurface = false;
 }
 
@@ -634,3 +631,32 @@ template class Isosurface<double>;
 
 } // al::
 
+/*
+
+Biggest hit is lookup into the edge-to-vertex map.
+Can we just use a counter for edge IDs?
+
+12.9%	12.9%	isosurface	al::Isosurface<float>::addCell(float const*, int const*)
+12.7%	12.7%	isosurface	std::tr1::hashtable<int, std::pair<int const, al::Isosurface<float>::PointID>, std::allocator<std::pair<int const, al::Isosurface<float>::PointID> >, Internal::extract1st<std::pair<int const, al::Isosurface<float>::PointID> >, std::equal_to<int>, al::Isosurface<float>::IsosurfaceHashInt, Internal::mod_range_hashing, Internal::default_ranged_hash, Internal::prime_rehash_policy, false, true, true>::insert(std::pair<int const, al::Isosurface<float>::PointID> const&, std::tr1::integral_constant<bool, true>)
+0.0%	9.9%	isosurface		al::Isosurface<float>::compressTriangles()
+0.0%	2.6%	isosurface		al::Isosurface<float>::addEdgeVertex(int, int, int, int, int, float const*)
+0.0%	0.1%	isosurface		al::Isosurface<float>::generate(float const*, int, int, int, float, float, float)
+9.0%	9.0%	isosurface	al::Isosurface<float>::compressTriangles()
+7.8%	7.8%	libSystem.B.dylib	szone_free
+7.5%	7.5%	isosurface	al::Mesh::generateNormals(float)
+7.1%	7.1%	isosurface	al::Isosurface<float>::generate(float const*, int, int, int, float, float, float)
+6.4%	6.4%	isosurface	std::tr1::hashtable<int, std::pair<int const, al::Isosurface<float>::PointID>, std::allocator<std::pair<int const, al::Isosurface<float>::PointID> >, Internal::extract1st<std::pair<int const, al::Isosurface<float>::PointID> >, std::equal_to<int>, al::Isosurface<float>::IsosurfaceHashInt, Internal::mod_range_hashing, Internal::default_ranged_hash, Internal::prime_rehash_policy, false, true, true>::find(int const&)
+0.0%	6.3%	isosurface		al::Isosurface<float>::addEdgeVertex(int, int, int, int, int, float const*)
+0.0%	0.2%	isosurface		al::Isosurface<float>::addCell(float const*, int const*)
+3.7%	3.7%	libSystem.B.dylib	tiny_malloc_from_free_list
+3.2%	3.2%	isosurface	al::Isosurface<float>::calcIntersection(int, int, int, int, float const*) const
+3.2%	3.2%	isosurface	al::Isosurface<float>::addEdgeVertex(int, int, int, int, int, float const*)
+
+
+struct CellVertex{
+	float value;
+	Color color;
+	Index index;
+};
+
+*/

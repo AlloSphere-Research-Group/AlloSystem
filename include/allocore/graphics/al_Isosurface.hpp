@@ -40,17 +40,6 @@
 namespace al{
 
 
-struct IsosurfaceHashInt{ 
-	size_t operator()(int v) const { return v; }
-//	size_t operator()(int v) const { return v*2654435761UL; }
-};
-
-struct PointID {
-	int newID;
-	double x, y, z;
-};
-
-
 /// Isosurface using marching cubes
 template<class T=double>
 class Isosurface : public Mesh {
@@ -91,6 +80,7 @@ public:
 	/// End cell-at-a-time mode
 	void end();
 
+
 	/// Add a cell from a scalar field
 	
 	/// This should be called in between calls to begin() and end().
@@ -101,12 +91,13 @@ public:
 		const T& xyZ, const T& XyZ,
 		const T& xYZ, const T& XYZ,
 		int ix, int iy, int iz
-	);
-
-	template <class Ti>
-	void addCell(const T * v, const Ti * i){
-		addCell(v[0],v[1],v[2],v[3],v[4],v[5],v[6],v[7],i[0],i[1],i[2]);
+	){
+		const T vals[8] = { xyz, Xyz, xYz, XYz, xyZ, XyZ, xYZ, XYZ };
+		int inds[3] = { ix, iy, iz };
+		addCell(vals, inds);
 	}
+
+	void addCell(const T * cellVals8, const int * indices3);
 
 	/// Clear the isosurface
 	void clear();
@@ -121,15 +112,21 @@ public:
 		generate(scalarField, n,n,n, cellLength,cellLength,cellLength);
 	}
 
+protected:
+	struct PointID { int newID; double x, y, z; };
+	struct EdgeTriangle { int edgeIDs[3]; };
 
-protected:	
-	struct TRIANGLE{ int indices[3]; };
-	typedef std::tr1::unordered_map<int, PointID, IsosurfaceHashInt> ID2PointID;
-//	typedef std::hash_map<int, PointID, IsosurfaceHashInt> ID2PointID;
-//	typedef std::map<int, PointID> ID2PointID;
+	struct IsosurfaceHashInt{ 
+		size_t operator()(int v) const { return v; }
+	//	size_t operator()(int v) const { return v*2654435761UL; }
+	};
 
-	ID2PointID mID2PointID;				// Map of POINT3Ds which form the isosurface
-	al::Buffer<TRIANGLE> mTriangles;	// Array of TRIANGLES indices which form the triangulation of the isosurface
+	typedef std::tr1::unordered_map<int, PointID, IsosurfaceHashInt> EdgeToVertex;
+//	typedef std::hash_map<int, PointID, IsosurfaceHashInt> EdgeToVertex;
+//	typedef std::map<int, PointID> EdgeToVertex;
+
+	EdgeToVertex mEdgeToVertex;					// map from edge ID to vertex
+	al::Buffer<EdgeTriangle> mEdgeTriangles;	// surface triangles in terms of edge IDs
 
 	int mN1, mN2, mN3;				// No. of cells in x, y, and z directions
 	int mN1p, mN2p;
@@ -141,8 +138,8 @@ protected:
 	int edgeID(int vertID, int edgeNo) const;
 	int vertexID(int ix, int iy, int iz) const;
 	PointID calcIntersection(int nX, int nY, int nZ, int nEdgeNo, const T * cellVals) const;
-	void renameVerticesAndTriangles();
-	void calcNormals();
+	void compressTriangles();
+//	void calcNormals();
 	void addEdgeVertex(int x, int y, int z, int vertID, int edge, const T * cellVals);
 };
 
