@@ -17,6 +17,8 @@ struct NavInputControl : public InputEventHandler {
 
 	virtual bool onKeyDown(const Keyboard& k){	 	
 
+		if(k.ctrl()) return true;
+
 		double vs = nav().velScale();
 		double a = mTScale * vs;	// rotational speed: degrees per update
 		double v = mVScale * vs;	// speed: units per update
