@@ -117,21 +117,6 @@ int Frustum<T>::testSphere(const Vec<3,T>& c, float r) const {
 	return result;
 }
 
-//int AABBvsFrustum(AABB *b, FRUSTUM *f)
-//{
-// float m, n; int i, result = INSIDE;
-//
-// for (i = 0; i < 6; i++) { PLANE *p = f->plane + i;
-//
-//     m = (p->a * b->v[p->nx].x) + (p->b * b->v[p->ny].y) + (p->c * b->v[p->nz].z);
-//     if (m > -p->d) return OUTSIDE;
-//
-//     n = (p->a * b->v[p->px].x) + (p->b * b->v[p->py].y) + (p->c * b->v[p->pz].z);
-//     if (n > -p->d) result = INTERSECT;
-//
-//     } return result;
-//}
-
 template <class T>
 int Frustum<T>::testBox(const Vec<3,T>& xyz, const Vec<3,T>& dim) const {
 	int result = INSIDE;
@@ -148,19 +133,6 @@ int Frustum<T>::testBox(const Vec<3,T>& xyz, const Vec<3,T>& dim) const {
 		testing the whereabouts of the n-vertex tells if the box is totally on 
 		the right side of the plane, or if the box intersects the plane.
 */
-
-//		Vec<3,T> vn = xyz;
-//		if(plNrm[0] < 0) vn[0] += dim[0];
-//		if(plNrm[1] < 0) vn[1] += dim[1];
-//		if(plNrm[2] < 0) vn[2] += dim[2];
-//		if(plNrm.dot(vn) > pl[i].offset()) return OUTSIDE;
-//
-//		Vec<3,T> vp = xyz;		
-//		if(plNrm[0] > 0) vp[0] += dim[0];
-//		if(plNrm[1] > 0) vp[1] += dim[1];
-//		if(plNrm[2] > 0) vp[2] += dim[2];
-//		if(plNrm.dot(vp) > pl[i].offset()) result = INTERSECT;
-
 		// Is positive vertex outside?
 		Vec<3,T> vp = xyz;		
 		if(plNrm[0] > 0) vp[0] += dim[0];
