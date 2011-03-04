@@ -54,6 +54,10 @@ template <class RNG=al::rnd::Tausworthe>
 class Random{
 public:
 
+	Random(){}
+
+	Random(uint32_t seed): mRNG(seed){}
+
 	/// Returns uniform random in [0,1)
 	float uniform(){ return al::uintToUnit<float>(mRNG()); }
 	
