@@ -33,20 +33,9 @@
 
 namespace al {
 
-
 template <class T> class Frustum;
+typedef Frustum<double> Frustumd;	///< Double precision frustrum
 
-typedef Frustum<double> Frustumd;
-
-/*
-The vertices of the far (back) plane can be simply calculated by the ratio of 
-similar triangles.
-
-ltf = ((f/n)l, (f/n)t, f)
-lbf = ((f/n)l, (f/n)b, f)
-rtf = ((f/n)r, (f/n)t, f)
-rbf = ((f/n)r, (f/n)b, f)
-*/
 
 /// Rectangular frustum
 
@@ -76,20 +65,10 @@ public:
 	void computePlanesLH();
 
 	/// Compute planes based on frustum corners (planes face to inside)
-	void computePlanesRH();
-
-//	T mNear, mFar;			// clipping z distances
-//	T mRatio;				// aspect ratio
-//	T mAngle, mTanFOV;		// lens angle, tan(field of view)
-//	T nw, nh, fw, fh;		// near and far plane dimensions
-
-//	/// Set from camera parameters
-//	void setCamInternals(T angle, T ratio, T nearDist, T farDist);
-//	
-//	/// Set from camera position, look, and up vectors
-//	void setCamDef(const Vec<3,T>& pos, const Vec<3,T>& look, const Vec<3,T>& up);
-		
+	void computePlanesRH();		
 };
+
+
 
 
 template <class T>
@@ -137,7 +116,7 @@ int Frustum<T>::testSphere(const Vec<3,T>& c, float r) const {
 template <class T>
 int Frustum<T>::testBox(const Vec<3,T>& xyz, const Vec<3,T>& dim) const {
 	int result = INSIDE;
-	for(int i=0; i<6; i++){
+	for(int i=0; i<6; ++i){
 		const Vec3d& plNrm = pl[i].normal();
 		Vec<3,T> vp = xyz;
 		
@@ -154,50 +133,6 @@ int Frustum<T>::testBox(const Vec<3,T>& xyz, const Vec<3,T>& dim) const {
 	}
 	return result;
 }
-
-//
-//template <class T>
-//void Frustum<T>::setCamInternals(T angle, T ratio, T nearD, T farD){
-//	mRatio = ratio;
-//	mAngle = angle;
-//	mNear = nearD;
-//	mFar = farD;
-//
-//	static double const tanCoef = 0.01745329252*0.5;	// degree-to-radian over /2
-//	mTanFOV = (T)tan(mAngle * tanCoef);
-//	nh = mNear * mTanFOV;
-//	nw = nh * mRatio; 
-//	fh = mFar  * mTanFOV;
-//	fw = fh * mRatio;
-//}
-//
-//template <class T>
-//void Frustum<T>::setCamDef(const Vec<3,T>& p, const Vec<3,T>& l, const Vec<3,T>& u){
-//
-//	Vec<3,T> Z = (p-l).normalize();
-//	Vec<3,T> X = cross(u,Z).normalize();
-//	Vec<3,T> Y = cross(Z,X);
-//
-//	Vec<3,T> nc = p - Z * mNear;
-//	Vec<3,T> fc = p - Z * mFar;
-//
-//	ntl = nc + Y * nh - X * nw;
-//	ntr = nc + Y * nh + X * nw;
-//	nbl = nc - Y * nh - X * nw;
-//	nbr = nc - Y * nh + X * nw;
-//
-//	ftl = fc + Y * fh - X * fw;
-//	ftr = fc + Y * fh + X * fw;
-//	fbl = fc - Y * fh - X * fw;
-//	fbr = fc - Y * fh + X * fw;
-//
-//	pl[TOP].set3Points(ntr,ntl,ftl);
-//	pl[BOTTOM].set3Points(nbl,nbr,fbr);
-//	pl[LEFT].set3Points(ntl,nbl,fbl);
-//	pl[RIGHT].set3Points(nbr,ntr,fbr);
-//	pl[NEARP].set3Points(ntl,ntr,nbr);
-//	pl[FARP].set3Points(ftr,ftl,fbl);
-//}
 
 } // al::
 
