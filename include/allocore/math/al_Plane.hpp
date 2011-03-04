@@ -41,6 +41,19 @@ public:
 	Plane(): mNormal(1,0,0), mD(0){}
 	Plane(const Vec3& v1, const Vec3& v2, const Vec3& v3);
 
+	/// Get normal perpendicular to plane (a, b, and c components)
+	const Vec3& normal() const { return mNormal; }
+
+	/// Get scalar component of plane equation
+	T d() const { return mD; }
+
+	/// Returns distance from plane to point (measured relative to plane normal)
+	T distance(const Vec3& p) const { return (mD + mNormal.dot(p)); }
+
+	/// Returns whether a point is in the negative half-space of the plane
+	bool inNegativeSpace(const Vec3& p) const { return mNormal.dot(p) < -d(); }
+
+
 	/// Set from three points lying on the plane
 	
 	/// The normal is computed according to a right-handed coordinate system.
@@ -52,15 +65,6 @@ public:
 
 	/// Set plane from coefficients
 	Plane& fromCoefficients(T a, T b, T c, T d);
-
-	/// Returns distance from plane to point (measured relative to plane normal)
-	T distance(const Vec3& p) const;
-
-	/// Get normal perpendicular to plane (a, b, and c components)
-	const Vec3& normal() const { return mNormal; }
-
-	/// Get scalar component of plane equation
-	T d() const { return mD; }
 
 protected:
 	Vec3 mNormal;	// plane orientation as perp. unit vector
@@ -93,11 +97,6 @@ Plane<T>& Plane<T>::fromCoefficients(T a, T b, T c, T d){
 	mNormal(a/l,b/l,c/l);
 	mD = d/l;
 	return *this;
-}
-
-template <class T>
-T Plane<T>::distance(const Vec3& p) const{
-	return (mD + mNormal.dot(p));
 }
 
 } // ::al::

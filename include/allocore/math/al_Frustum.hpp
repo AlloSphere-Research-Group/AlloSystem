@@ -98,8 +98,7 @@ void Frustum<T>::computePlanesRH(){
 template <class T>
 int Frustum<T>::testPoint(const Vec<3,T>& p) const {
 	for(int i=0; i<6; ++i){
-		if(pl[i].distance(p) < 0)
-			return OUTSIDE;
+		if(pl[i].inNegativeSpace(p)) return OUTSIDE;
 	}
 	return INSIDE;
 }
@@ -109,10 +108,8 @@ int Frustum<T>::testSphere(const Vec<3,T>& c, float r) const {
 	int result = INSIDE;
 	for(int i=0; i<6; ++i){
 		float distance = pl[i].distance(c);
-		if(distance < -r)
-			return OUTSIDE;
-		else if(distance < r)
-			result = INTERSECT;
+		if(distance < -r)		return OUTSIDE;
+		else if(distance < r)	result = INTERSECT;
 	}
 	return result;
 }
@@ -132,20 +129,20 @@ int Frustum<T>::testBox(const Vec<3,T>& xyz, const Vec<3,T>& dim) const {
 		other hand, if the p-vertex is on the right side of the plane, then 
 		testing the whereabouts of the n-vertex tells if the box is totally on 
 		the right side of the plane, or if the box intersects the plane.
-*/
+*/		
 		// Is positive vertex outside?
 		Vec<3,T> vp = xyz;		
 		if(plNrm[0] > 0) vp[0] += dim[0];
 		if(plNrm[1] > 0) vp[1] += dim[1];
 		if(plNrm[2] > 0) vp[2] += dim[2];
-		if(plNrm.dot(vp) < -pl[i].d()) return OUTSIDE;
+		if(pl[i].inNegativeSpace(vp)) return OUTSIDE;
 
 		// Is negative vertex outside?
 		Vec<3,T> vn = xyz;
 		if(plNrm[0] < 0) vn[0] += dim[0];
 		if(plNrm[1] < 0) vn[1] += dim[1];
 		if(plNrm[2] < 0) vn[2] += dim[2];
-		if(plNrm.dot(vn) < -pl[i].d()) result = INTERSECT;
+		if(pl[i].inNegativeSpace(vn)) result = INTERSECT;
 	}
 	return result;
 }
