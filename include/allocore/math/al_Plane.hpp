@@ -56,11 +56,11 @@ public:
 	/// Returns distance from plane to point (measured relative to plane normal)
 	T distance(const Vec3& p) const;
 
-	/// Get normal perpendicular to plane
+	/// Get normal perpendicular to plane (a, b, and c components)
 	const Vec3& normal() const { return mNormal; }
 
-	/// Get distance from origin to plane along normal
-	T offset() const { return mD; }
+	/// Get scalar component of plane equation
+	T d() const { return mD; }
 
 protected:
 	Vec3 mNormal;	// plane orientation as perp. unit vector
