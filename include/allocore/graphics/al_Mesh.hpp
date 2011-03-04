@@ -116,7 +116,7 @@ public:
 	void texCoord(const TexCoord3& v){ texCoord3s().append(v); }
 
 	void vertex(float x, float y, float z=0){ vertex(Vertex(x,y,z)); }
-	void vertex(const Vertex& v){ vertices().append(v); equalizeBuffers(); }
+	void vertex(const Vertex& v){ vertices().append(v); }
 
 	template <class T>
 	void vertex(const T * buf, int size){
