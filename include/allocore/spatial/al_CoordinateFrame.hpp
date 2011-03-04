@@ -72,9 +72,14 @@ public:
 		quat().toVectorZ(uf);	
 	}
 
-	/// Get forward unit vector
-	Vec3d uf() const { Vec3d r; quat().toVectorZ(r); return r; }	
+	/// Get right unit vector
+	Vec3d ur() const { Vec3d r; quat().toVectorX(r); return r; }
 
+	/// Get up unit vector
+	Vec3d uu() const { Vec3d r; quat().toVectorY(r); return r; }
+
+	/// Get forward unit vector
+	Vec3d uf() const { Vec3d r; quat().toVectorZ(r); return r; }
 
 
 	// Setters
