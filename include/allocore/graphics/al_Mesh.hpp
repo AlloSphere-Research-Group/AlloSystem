@@ -96,38 +96,60 @@ public:
 	const Buffer<TexCoord3>& texCoord3s() const { return mTexCoord3s; }
 	const Buffer<Index>& indices() const { return mIndices; }
 
+	/// Append index to index buffer
 	void index(unsigned int i){ indices().append(i); }
-	
+
+	/// Append indices to index buffer	
 	template <class Tindex>
 	void index(const Tindex * buf, int size, int indexOffset=0){
 		for(int i=0; i<size; ++i) index(buf[i] + indexOffset); }
 
+	/// Append color to color buffer
 	void color(float r, float g, float b, float a=1){ color(Color(r,g,b,a)); }
+	
+	/// Append color to color buffer
 	void color(const Color& v) { colors().append(v); }
+	
+	/// Append color to color buffer
 	void color(const al::Color& v) { color(v.r, v.g, v.b, v.a); }
 
+	/// Append normal to normal buffer
 	void normal(float x, float y, float z=0){ normal(Normal(x,y,z)); }
+	
+	/// Append normal to normal buffer
 	void normal(const Normal& v) { normals().append(v); }
 
+	/// Append texture coordinate to 2D texture coordinate buffer
 	void texCoord(float u, float v){ texCoord(TexCoord2(u,v)); }
+	
+	/// Append texture coordinate to 2D texture coordinate buffer
 	void texCoord(const TexCoord2& v){ texCoord2s().append(v); }
 
+	/// Append texture coordinate to 3D texture coordinate buffer
 	void texCoord(float u, float v, float w){ texCoord(TexCoord3(u,v,w)); }
+	
+	/// Append texture coordinate to 3D texture coordinate buffer
 	void texCoord(const TexCoord3& v){ texCoord3s().append(v); }
 
+	/// Append vertex to vertex buffer
 	void vertex(float x, float y, float z=0){ vertex(Vertex(x,y,z)); }
+
+	/// Append vertex to vertex buffer
 	void vertex(const Vertex& v){ vertices().append(v); }
 
+	/// Append vertices to vertex buffer
 	template <class T>
 	void vertex(const T * buf, int size){
 		for(int i=0; i<size; ++i) vertex(buf[3*i+0], buf[3*i+1], buf[3*i+2]);
 	}
 
+	/// Append vertices to vertex buffer
 	template <class T>
 	void vertex(const Vec<3,T> * buf, int size){
 		for(int i=0; i<size; ++i) vertices().append(buf[i][0], buf[i][1], buf[i][2]);
 	}
 
+	/// Set geometric primitive
 	void primitive(int prim){ mPrimitive=prim; }
 
 	Buffer<Vertex>& vertices(){ return mVertices; }
