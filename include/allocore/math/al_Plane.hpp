@@ -59,6 +59,9 @@ public:
 	/// Get normal perpendicular to plane
 	const Vec3& normal() const { return mNormal; }
 
+	/// Get distance from origin to plane along normal
+	T offset() const { return mD; }
+
 protected:
 	Vec3 mNormal;	// plane orientation as perp. unit vector
 	T mD;			// plane position as translation factor along normal
