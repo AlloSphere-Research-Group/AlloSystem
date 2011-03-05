@@ -12,6 +12,19 @@ int utGraphicsMesh(){
 		{
 			Mesh m;
 			for(int i=0; i<N; ++i){
+				m.color(colors[i]);
+				m.vertex(verts[i]);
+			}
+			
+			for(int i=0; i<N; ++i){
+				assert(m.vertices()[i] == verts[i]);
+				assert(m.colors()[i] == colors[i]);
+			}
+		}
+
+		{
+			Mesh m;
+			for(int i=0; i<N; ++i){
 				m.vertex(verts[i]);
 				m.color(colors[i]);
 			}
@@ -26,8 +39,8 @@ int utGraphicsMesh(){
 				assert(m.vertices()[i] == verts[i]);
 				assert(m.colors()[i] == colors[i]);
 			}
-
 		}
+
 	}
 
 	return 0;
