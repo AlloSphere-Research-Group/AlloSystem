@@ -106,31 +106,15 @@ int Frustum<T>::testPoint(const Vec<3,T>& p) const {
 	return INSIDE;
 }
 
-//int SphereInFrustum( float x, float y, float z, float radius    )
-//{
-//  int p;
-//  int c = 0;
-//  float d;
-//  for( p = 0; p < 6; p++ )
-//  {
-//    d = frustum[p][0] * x + frustum[p][1] * y + frustum[p][2] * z + frustum[p][3];
-//    if( d <= -radius )
-//      return 0;
-//    if( d > radius )
-//      c++;
-//  }
-//  return (c == 6) ? 2 : 1;
-//}
-
 template <class T>
 int Frustum<T>::testSphere(const Vec<3,T>& c, float r) const {
-	int cnt = 0;
+	int result = INSIDE;
 	for(int i=0; i<6; ++i){
 		float distance = pl[i].distance(c);
 		if(distance < -r)		return OUTSIDE;
-		else if(distance > r)	++cnt; // sphere on positive side of plane
+		else if(distance < r)	result = INTERSECT;
 	}
-	return (6 == cnt) ? INSIDE : INTERSECT;
+	return result;
 }
 
 template <class T>
