@@ -97,6 +97,12 @@ struct Color{
 	/// Set RGB components from HSV
 	Color& operator= (const HSV& v);
 
+	/// Return true if all components are equal, false otherwise
+	bool operator ==(const Color& v) const { return v.r==r && v.g==g && v.b==b && v.a==a; }
+
+	/// Return true if components are not equal, false otherwise
+	bool operator !=(const Color& v) const { return !(*this == v); }
+
 	Color& operator+= (const Color& v){ return set(r+v.r, g+v.g, b+v.b, a+v.a); }
 	Color& operator-= (const Color& v){ return set(r-v.r, g-v.g, b-v.b, a-v.a); }
 	Color& operator*= (const Color& v){ return set(r*v.r, g*v.g, b*v.b, a*v.a); }
