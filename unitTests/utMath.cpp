@@ -614,6 +614,7 @@ int utMath(){
 	{
 		al::Plane<double> p;
 		p.fromNormalAndPoint(Vec3d(1,0,0), Vec3d(1,1,1));
+
 		assert(p.distance(Vec3d(1,0,0)) ==  0);
 		assert(p.distance(Vec3d(0,1,0)) == -1);
 		assert(p.distance(Vec3d(0,0,1)) == -1);

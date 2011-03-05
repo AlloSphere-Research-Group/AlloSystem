@@ -8,6 +8,7 @@ int utSpatial(){
 
 	{
 		Nav a;
+		a.smooth(0);
 		a.vec().set(0,0,0);
 		a.quat().setIdentity();
 		a.vel().vec().set(1,0,0);

@@ -11,11 +11,11 @@ int main (int argc, char * const argv[]) {
 //	utAsset();
 	
 	utMath();
-//	utTypes();
-//	utTypesConversion();
+	utTypes();
+	utTypesConversion();
 //	utSpatial();
 //	utSystem();
-//	utProtocolOSC();
+	utProtocolOSC();
 //	utProtocolSerialize();
 
 //	utIOAudioIO();
@@ -24,8 +24,9 @@ int main (int argc, char * const argv[]) {
 //	utFile();
 //	utThread();
 
-//	utProtocolGraphics();
-	
+//	utGraphicsDraw();
+	utGraphicsMesh();
+
 //	int size = 14;
 //	for (int z=-64; z<64; z++) {
 //		printf("%d %d %d\n", z, (z & size), !!(z & size));
