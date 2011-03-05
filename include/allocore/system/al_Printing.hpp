@@ -35,6 +35,14 @@ namespace al{
 /// Returns an ASCII character most closely matching an intensity value in [0,1].
 char intensityToASCII(float v);
 
+/// Print an array of numbers
+template <class T>
+void print(T * arr, int size, const char * append="");
+
+/// Print an array of number with newline
+template <class T>
+void println(T * arr, int size){ print(arr, size, "\n"); }
+
 /// Prints 2D pixel array
 template<class T> void print2D(T* pix, int nx, int ny, FILE * fp=stdout);
 
@@ -67,6 +75,22 @@ inline char intensityToASCII(float v){
 	v = v<0 ? 0 : (v>0.9999999f ? 0.9999999f : v);
 	return map[int(N*v)];
 }
+
+
+#define DEF_PRINT(T, code)\
+template<>\
+inline void print<T>(T * arr, int size, const char * append){\
+	for(int i=0; i<size; ++i){ printf(code" ", arr[i]); } if(append[0]) printf(append);\
+}
+
+DEF_PRINT(float, "%g")
+DEF_PRINT(double, "%g")
+DEF_PRINT(char, "%d")
+DEF_PRINT(unsigned char, "%d")
+DEF_PRINT(int, "%d")
+DEF_PRINT(unsigned int, "%d")
+
+#undef DEF_PRINT
 
 template<class T> void print2D(T* pix, int nx, int ny, FILE * fp){
 	for(int j=0; j<nx; ++j){
