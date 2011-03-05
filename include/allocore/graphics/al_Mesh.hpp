@@ -40,7 +40,7 @@ public:
 
 	typedef Vec3f			Vertex;
 	typedef Vec3f			Normal;
-	typedef Vec4f			Color;
+	//typedef Vec4f			Color;
 	typedef Vec2f			TexCoord2;
 	typedef Vec3f			TexCoord3;
 	typedef unsigned int	Index;
@@ -96,6 +96,7 @@ public:
 	const Buffer<TexCoord3>& texCoord3s() const { return mTexCoord3s; }
 	const Buffer<Index>& indices() const { return mIndices; }
 
+
 	/// Append index to index buffer
 	void index(unsigned int i){ indices().append(i); }
 
@@ -104,20 +105,24 @@ public:
 	void index(const Tindex * buf, int size, int indexOffset=0){
 		for(int i=0; i<size; ++i) index(buf[i] + indexOffset); }
 
+
+	/// Append color to color buffer
+	void color(const Color& v) { colors().append(v); }
+
 	/// Append color to color buffer
 	void color(float r, float g, float b, float a=1){ color(Color(r,g,b,a)); }
 	
 	/// Append color to color buffer
-	void color(const Color& v) { colors().append(v); }
-	
-	/// Append color to color buffer
-	void color(const al::Color& v) { color(v.r, v.g, v.b, v.a); }
+	template <class T>
+	void color(const Vec<4,T>& v) { color(v[0], v[1], v[2], v[3]); }
+
 
 	/// Append normal to normal buffer
 	void normal(float x, float y, float z=0){ normal(Normal(x,y,z)); }
 	
 	/// Append normal to normal buffer
 	void normal(const Normal& v) { normals().append(v); }
+
 
 	/// Append texture coordinate to 2D texture coordinate buffer
 	void texCoord(float u, float v){ texCoord(TexCoord2(u,v)); }
@@ -130,6 +135,7 @@ public:
 	
 	/// Append texture coordinate to 3D texture coordinate buffer
 	void texCoord(const TexCoord3& v){ texCoord3s().append(v); }
+
 
 	/// Append vertex to vertex buffer
 	void vertex(float x, float y, float z=0){ vertex(Vertex(x,y,z)); }
