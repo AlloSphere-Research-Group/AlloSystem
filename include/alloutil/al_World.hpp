@@ -12,6 +12,9 @@ namespace al{
 
 
 /// Viewpoint within a scene
+
+/// A viewpoint is an aggregation of a viewport (screen region), a pose
+/// (3D position and orientation), and a camera.
 class Viewpoint{
 public:
 
@@ -288,6 +291,7 @@ protected:
 //
 //				DrawAllActors drawFunc(w.mActors, w, vpWorld);
 //				w.mStereo.draw(g, cam, vpWorld.transform(), vpWorld.viewport(), drawFunc);
+				//vpWorld.transform().pos() -= Vec3d(w.nav().uf()*4);
 
 				DrawAllActors drawFunc(w.mActors, w, vp);
 				w.mStereo.draw(g, cam, vp.worldTransform(), vp.viewport(), drawFunc);
