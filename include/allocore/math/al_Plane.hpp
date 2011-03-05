@@ -53,6 +53,8 @@ public:
 	/// Returns whether a point is in the negative half-space of the plane
 	bool inNegativeSpace(const Vec3& p) const { return mNormal.dot(p) < -d(); }
 
+	/// Returns whether a point is in the positive half-space of the plane
+	bool inPositiveSpace(const Vec3& p) const { return mNormal.dot(p) >=-d(); }
 
 	/// Set from three points lying on the plane
 	
