@@ -473,7 +473,7 @@ TEM inline T foldOnce(T v, T hi, T lo){
 TEM inline T gaussian(T v){ return ::exp(-v*v); }
 
 TEM T gcd(const T& x, const T& y){
-	if(y==T(0)) return x;
+	if(y==T(0)) return al::abs(x);
 	return al::gcd(y, al::remainder(x,y));
 }
 
