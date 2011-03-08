@@ -37,11 +37,19 @@ char intensityToASCII(float v);
 
 /// Print an array of numbers
 template <class T>
-void print(T * arr, int size, const char * append="");
+void print(const T * arr, int size, const char * append="");
 
-/// Print an array of number with newline
+/// Print an array of number with new line
 template <class T>
-void println(T * arr, int size){ print(arr, size, "\n"); }
+void println(const T * arr, int size){ print(arr, size, "\n"); }
+
+/// Print value
+template <class T>
+void print(const T& v, const char * append=""){ print(&v, 1, append); }
+
+/// Print value with new line
+template <class T>
+void println(const T& v){ print(v, "\n"); }
 
 /// Prints 2D pixel array
 template<class T> void print2D(T* pix, int nx, int ny, FILE * fp=stdout);
@@ -79,7 +87,7 @@ inline char intensityToASCII(float v){
 
 #define DEF_PRINT(T, code)\
 template<>\
-inline void print<T>(T * arr, int size, const char * append){\
+inline void print<T>(const T * arr, int size, const char * append){\
 	for(int i=0; i<size; ++i){ printf(code" ", arr[i]); } if(append[0]) printf(append);\
 }
 
