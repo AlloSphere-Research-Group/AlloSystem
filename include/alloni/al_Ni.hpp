@@ -50,7 +50,7 @@ public:
 	bool start();
 	bool stop();
 	
-	
+	// 640x480, float32, 1 component
 	Array& depthArray() { return mDepthArray; }
 	double fps() const { return mFPS; }
 

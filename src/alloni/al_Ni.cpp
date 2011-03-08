@@ -49,6 +49,7 @@ Ni :: Ni() {
 	printf("Searching for OpenNI compliant USB devices:\n");
 	if (!ok(context.EnumerateProductionTrees(XN_NODE_TYPE_DEVICE, NULL, device_node_info_list))) return;
 
+	printf("listing devices\n");
 	i=0;
 	for (xn::NodeInfoList::Iterator nodeIt = device_node_info_list.Begin (); nodeIt != device_node_info_list.End (); ++nodeIt, ++i) {
 		const xn::NodeInfo& info = *nodeIt;

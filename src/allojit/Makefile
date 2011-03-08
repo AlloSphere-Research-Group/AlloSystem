@@ -10,7 +10,7 @@ INC_DIR		= ../../include/$(LIB_NAME)/
 SRC_DIR		= ./
 VPATH		= $(SRC_DIR)
 
-SRCS		:= $(wildcard $(SRC_DIR)/*.c*)
+SRCS		:= $(SRC_DIR)/al_Compiler.cpp
 OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
 CPPFLAGS	+= -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti

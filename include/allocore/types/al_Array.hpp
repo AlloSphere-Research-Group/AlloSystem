@@ -96,6 +96,13 @@ public:
 	 */
 	Array();
 	
+	/**
+		Assignment operator copies format and data (allocates memory if necessary)
+	*/
+	Array& operator= (const AlloArray& cpy);
+	
+	uint32_t dim(int i=0) const { return header.dim[i]; }
+	
 	/*!
 		Change the format (header/layout) of the Array
 		Will reallocate if necessary
@@ -215,11 +222,16 @@ inline Array::Array() : AlloArray() {
 	header.dimcount = 0;
 }
 
-inline Array::Array(const AlloArray& cpy) : AlloArray() {
+inline Array& Array::operator= (const AlloArray& cpy) {
 	format(cpy.header);
 	if (cpy.data.ptr) {
 		memcpy(data.ptr, cpy.data.ptr, size());
 	}
+	return *this;
+}
+
+inline Array::Array(const AlloArray& cpy) : AlloArray() {
+	(*this) = cpy;
 }
 inline Array::Array(const AlloArrayHeader& h2) : AlloArray() {
 	data.ptr = NULL;

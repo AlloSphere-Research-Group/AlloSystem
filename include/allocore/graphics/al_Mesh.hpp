@@ -139,7 +139,7 @@ public:
 
 	/// Append vertex to vertex buffer
 	void vertex(float x, float y, float z=0){ vertex(Vertex(x,y,z)); }
-
+	
 	/// Append vertex to vertex buffer
 	void vertex(const Vertex& v){ vertices().append(v); }
 
