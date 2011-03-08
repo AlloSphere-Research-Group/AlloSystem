@@ -87,7 +87,8 @@ public:
 	const T& atRel(int i) const { return mElems[wrapOnce(pos()-i, size())]; }
 
 	/// Get last element
-	const T& last() const { return mElems[mPos-1]; }
+	const T& last() const { return mElems[pos()]; }
+	T& last(){ return mElems[pos()]; }
 
 	/// Resets size to zero without deallocating allocated memory
 	void reset(){ mSize=mFill=0; mPos=-1; }
@@ -140,7 +141,7 @@ public:
 private:
 	int mSize;		// number of elements in array
 	int	mFill;		// number of elements written to buffer (up to size())
-	int mPos;		// circular buffer write position
+	int mPos;		// index of most recently written element
 	std::vector<T, Alloc> mElems;
 	
 	void setSize(int n){
