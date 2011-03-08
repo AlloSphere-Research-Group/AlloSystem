@@ -36,19 +36,19 @@ namespace al{
 char intensityToASCII(float v);
 
 /// Print an array of numbers
-template <class T>
+template <typename T>
 void print(const T * arr, int size, const char * append="");
 
 /// Print an array of number with new line
-template <class T>
+template <typename T>
 void println(const T * arr, int size){ print(arr, size, "\n"); }
 
 /// Print value
-template <class T>
+template <typename T>
 void print(const T& v, const char * append=""){ print(&v, 1, append); }
 
 /// Print value with new line
-template <class T>
+template <typename T>
 void println(const T& v){ print(v, "\n"); }
 
 /// Prints 2D pixel array
@@ -95,8 +95,14 @@ DEF_PRINT(float, "%g")
 DEF_PRINT(double, "%g")
 DEF_PRINT(char, "%d")
 DEF_PRINT(unsigned char, "%d")
+DEF_PRINT(short, "%d")
+DEF_PRINT(unsigned short, "%d")
 DEF_PRINT(int, "%d")
 DEF_PRINT(unsigned int, "%d")
+DEF_PRINT(long, "%ld")
+DEF_PRINT(unsigned long, "%ld")
+DEF_PRINT(long long, "%lld")
+DEF_PRINT(unsigned long long, "%lld")
 
 #undef DEF_PRINT
 
