@@ -129,6 +129,7 @@ public:
 		float azimuth;
 		float elevation;
 		int deviceChannel;	// index in the output device channels array
+		float amp;
 	};
 
 	AmbiDecode(int dim, int order, int numSpeakers, int flavor=1);
@@ -152,8 +153,8 @@ public:
 
 	void flavor(int type);
 	void numSpeakers(int num);		///< Set number of speakers.  Positions are zeroed upon resize.
-	void setSpeakerRadians(int index, int deviceChannel, float azimuth, float elevation);
-	void setSpeaker(int index, int deviceChannel, float azimuth, float elevation=0);
+	void setSpeakerRadians(int index, int deviceChannel, float azimuth, float elevation, float amp=1.f);
+	void setSpeaker(int index, int deviceChannel, float azimuth, float elevation=0, float amp=1.f);
 	void zero();					///< Zeroes out internal ambisonic frame.
 
 //	float * azimuths();				///< Returns pointer to speaker azimuths.
@@ -297,7 +298,7 @@ inline float AmbiDecode::decode(float * encFrame, int encNumChannels, int speake
 	float * dec = mDecodeMatrix + speakerNum * channels();
 	float * wc = mWeights;
 	for(int i=0; i<encNumChannels; ++i) smp += *dec++ * *wc++ * *encFrame++;
-	return smp;
+	return smp * mSpeakers[speakerNum].amp;
 }
 
 //inline float AmbiDecode::decode(int speakerNum){

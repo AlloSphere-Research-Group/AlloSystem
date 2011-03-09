@@ -191,11 +191,12 @@ void AmbiDecode::decode(float * dec, const float * ambi, int numDecFrames) const
 	// iterate speakers
 	for(int s=0; s<numSpeakers(); ++s){
 		float * out = dec + mSpeakers[s].deviceChannel * numDecFrames;
+		float amp = mSpeakers[s].amp;
 		
 		// iterate ambi channels
 		for(int c=0; c<channels(); ++c){
 			const float * in = ambi + c * numDecFrames;
-			float w = decodeWeight(s, c);
+			float w = amp * decodeWeight(s, c);
 			for(int i=0; i<numDecFrames; ++i) out[i] += in[i] * w;		
 		}		
 	}
@@ -216,20 +217,24 @@ void AmbiDecode::numSpeakers(int num){
 
 //void AmbiDecode::zero(){ memset(mFrame, 0, channels()*sizeof(float)); }
 
-void AmbiDecode::setSpeakerRadians(int index, int deviceChannel, float az, float el){
+void AmbiDecode::setSpeakerRadians(int index, int deviceChannel, float az, float el, float amp){
 	if(index < numSpeakers()){		// verify speaker index
 		mSpeakers[index].azimuth = az;
 		mSpeakers[index].elevation = el;
 		mSpeakers[index].deviceChannel = deviceChannel;
+		mSpeakers[index].amp = amp;
+		
+		printf("channel	%i amp %f\n", index, amp);
 
 		// update encoding weights
 		//mDecodeMatrix[index][0] *= AmbiBase::c1_sqrt2;
 		encodeWeightsFuMa(mDecodeMatrix + index * channels(), mDim, mOrder, az, el);
+		mDecodeMatrix[index * channels()] *= amp;
 	}	
 }
 
-void AmbiDecode::setSpeaker(int index, int deviceChannel, float az, float el){
-	setSpeakerRadians(index, deviceChannel, az * float(0.01745329252), el * float(0.01745329252));
+void AmbiDecode::setSpeaker(int index, int deviceChannel, float az, float el, float amp){
+	setSpeakerRadians(index, deviceChannel, az * float(0.01745329252), el * float(0.01745329252), amp);
 }
 
 void AmbiDecode::updateChanWeights(){

@@ -61,8 +61,8 @@ public:
 	}
 
 	/// azimuth is anti-clockwise; both azimuth and elevation are in degrees
-	Listener& speakerPos(int speakerNum, int deviceChannel, double az, double el=0){
-		mDecoder.setSpeaker(speakerNum, deviceChannel, az, el);
+	Listener& speakerPos(int speakerNum, int deviceChannel, double az, double el=0, double amp=1.){
+		mDecoder.setSpeaker(speakerNum, deviceChannel, az, el, amp);
 		return *this;
 	}
 
