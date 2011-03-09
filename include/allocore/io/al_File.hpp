@@ -106,6 +106,9 @@ public:
 	/// Write memory elements to file
 	int write(const std::string& v){ return fwrite(v.data(), 1, v.length(), mFP); }
 	int write(const void * v, int size, int items=1){ return fwrite(v, size, items, mFP); }
+	
+	/// Read memory elements from file
+	int read(void * v, int size, int items=1){ return fread(v, size, items, mFP); }
 
 	/// Quick and dirty write memory to file
 	static int write(const std::string& path, const void * v, int size, int items=1);

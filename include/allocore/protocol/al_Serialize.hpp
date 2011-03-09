@@ -38,21 +38,35 @@ namespace ser{
 
 template<class T> inline uint32_t encode(char * b, const T * v, uint32_t n){ return 0; }
 
-#define DEF(t,T,c)\
-template<> inline uint32_t encode(char * b, const t * v, uint32_t n){ return serEncode##T(b, c v,n); }
-DEF(float,   Float32,)
-DEF(double,  Float64,)
-DEF(char,    Int8, (const int8_t *))
-DEF(int8_t,  Int8,)
-DEF(int16_t, Int16,)
-DEF(int32_t, Int32,)
-DEF(int64_t, Int64,)
-DEF(uint8_t, UInt8,)
-DEF(bool,    UInt8, (const uint8_t *))
-DEF(uint16_t,UInt16,)
-DEF(uint32_t,UInt32,)
-DEF(uint64_t,UInt64,)
-#undef DEF
+//#define DEF(t,T,c)\
+//template<> inline uint32_t encode(char * b, const t * v, uint32_t n){ return serEncode##T(b, c v,n); }
+//DEF(float,   Float32,)
+//DEF(double,  Float64,)
+//DEF(char,    Int8, (const int8_t *))
+//DEF(int8_t,  Int8,)
+//DEF(int16_t, Int16,)
+//DEF(int32_t, Int32,)
+//DEF(int64_t, Int64,)
+//DEF(uint8_t, UInt8,)
+//DEF(bool,    UInt8, (const uint8_t *))
+//DEF(uint16_t,UInt16,)
+//DEF(uint32_t,UInt32,)
+//DEF(uint64_t,UInt64,)
+//#undef DEF
+
+template<> inline uint32_t encode(char * b, const float * v, uint32_t n){ return serEncodeFloat32(b, v, n); }
+template<> inline uint32_t encode(char * b, const double * v, uint32_t n){ return serEncodeFloat64(b, v, n); }
+template<> inline uint32_t encode(char * b, const char * v, uint32_t n){ return serEncodeInt8(b, (const int8_t *)v, n); }
+template<> inline uint32_t encode(char * b, const int8_t * v, uint32_t n){ return serEncodeInt8(b, v, n); }
+template<> inline uint32_t encode(char * b, const int16_t * v, uint32_t n){ return serEncodeInt16(b, v, n); }
+template<> inline uint32_t encode(char * b, const int32_t * v, uint32_t n){ return serEncodeInt32(b, v, n); }
+template<> inline uint32_t encode(char * b, const int64_t * v, uint32_t n){ return serEncodeInt64(b, v, n); }
+template<> inline uint32_t encode(char * b, const bool * v, uint32_t n){ return serEncodeUInt8(b, (const uint8_t *)v, n); }
+template<> inline uint32_t encode(char * b, const uint8_t * v, uint32_t n){ return serEncodeUInt8(b, v, n); }
+template<> inline uint32_t encode(char * b, const uint16_t * v, uint32_t n){ return serEncodeUInt16(b, v, n); }
+template<> inline uint32_t encode(char * b, const uint32_t * v, uint32_t n){ return serEncodeUInt32(b, v, n); }
+template<> inline uint32_t encode(char * b, const uint64_t * v, uint32_t n){ return serEncodeUInt64(b, v, n); }
+
 
 template<class T> uint8_t getType();
 template<> inline uint8_t getType<float   >(){ return 'f'; }
