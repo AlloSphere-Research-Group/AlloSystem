@@ -147,6 +147,8 @@ public:
 	void loadIdentity(){ p_loadIdentity(); }
 	void loadMatrix(const Matrix4d &m){ p_loadMatrix(m); }
 	void multMatrix(const Matrix4d &m){ p_multMatrix(m); }
+	void modelView(const Matrix4d& m){ matrixMode(MODELVIEW); loadMatrix(m); }
+	void projection(const Matrix4d& m){ matrixMode(PROJECTION); loadMatrix(m); }
 	void translate(double x, double y, double z){ p_translate(x,y,z); }
 	void rotate(double angle, double x, double y, double z){ p_rotate(angle, x,y,z); }
 	void rotate(const Quatd& q);

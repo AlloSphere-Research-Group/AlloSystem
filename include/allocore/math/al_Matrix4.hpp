@@ -289,6 +289,19 @@ public:
 		return lookAt(ux, uy, uz, pos + (ux * -eyeShift));
 	}
 	
+	/// Computes product of matrix multiplied by column vector, r = m * vCol
+	// This is typically what is required to project a vertex through a transform
+	Vec<4,T> transform(const Vec<3,T>& vCol) const {
+		Vec<4,T> r, v(vCol[0], vCol[1], vCol[2], 1.);
+		Mat<4,T>::multiply(r, *this, v);
+		return r;
+	}
+	Vec<4,T> transform(const Vec<4,T>& v) const {
+		Vec<4,T> r;
+		Mat<4,T>::multiply(r, *this, v);
+		return r;
+	}
+	
 	static const Matrix4 inverse(const Base& m) {
 		double determinant =
 			m[12]*m[9]*m[6]*m[3] - m[8]*m[13]*m[6]*m[3] - m[12]*m[5]*m[10]*m[3] + m[4]*m[13]*m[10]*m[3]+

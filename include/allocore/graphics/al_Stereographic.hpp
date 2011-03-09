@@ -98,11 +98,23 @@ public:
 	bool stereo() const { return mStereo; }						///< Get stereographic active
 	AnaglyphMode anaglyphMode() const { return mAnaglyphMode; }	///< get anaglyph glasses type
 	
+	// These accessors will be valid only during the Drawable's onDraw() event
+	// they can be useful to simulate the OpenGL pipeline transforms
+	//	e.g. Matrix4d::multiply(Vec4d eyespace, stereo.modelView(), Vec4d objectspace); 
+	//	e.g. Matrix4d::multiply(Vec4d clipspace, stereo.projection(), Vec4d eyespace);
+	//	e.g. Matrix4d::multiply(Vec4d clipspace, stereo.modelViewProjection(), Vec4d objectspace);
+	// to convert in the opposite direction, use Matrix4::inverse(). 
+	const Matrix4d& modelView() const { return mModelView; }
+	const Matrix4d& projection() const { return mProjection; }
+	Matrix4d modelViewProjection() const { return mProjection * mModelView; }
+	
 protected:
 	StereoMode mMode;
 	AnaglyphMode mAnaglyphMode;
 	Color mClearColor;
 	bool mStereo;
+	
+	Matrix4d mProjection, mModelView;
 };
 
 } // al::

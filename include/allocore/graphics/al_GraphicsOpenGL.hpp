@@ -100,7 +100,7 @@ public:
 		int depth_id;
 	};
 	
-	static void gl_error(const char *msg = "");
+	static bool gl_error(const char *msg = "");
 	
 	static GLenum gl_primitive(Graphics::Primitive v);
 	static GLenum gl_antialias_mode(Graphics::AntiAliasMode v);

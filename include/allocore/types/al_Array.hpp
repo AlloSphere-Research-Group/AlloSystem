@@ -143,6 +143,8 @@ public:
 	template<typename T> void fill(void (*func)(T * values, double normx, double normy));
 	template<typename T> void fill(void (*func)(T * values, double normx, double normy, double normz));
 	
+	/// TODO: iterators!
+	
 	///! get the components at a given index in the array (no bounds checking)
 	template<typename T> T * cell(int x) const;
 	template<typename T> T * cell(int x, int y) const;
@@ -175,6 +177,7 @@ public:
 	template<typename T> void write_wrap(T* val, int x, int y, int z);
 	
 	///! linear interpolated write (virtual array index)
+	/// AKA trilinear splat
 	/// writes the linearly interpolated plane values from val array into array
 	template<typename T> void write_interp(T* val, double x);
 	template<typename T> void write_interp(T* val, double x, double y);
