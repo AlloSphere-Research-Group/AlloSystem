@@ -2,39 +2,32 @@
 # AlloCore unit tests makefile
 #=========================================================================
 
-include ../Makefile.config
-include ../$(SRC_DIR)/$(IO_DIR)/Makefile.config
+LIB_NAME	= allounittests
+INC_DIR		= ./
+SRC_DIR		= ./
+VPATH		= $(SRC_DIR)
 
-SRCS =	utFile.cpp \
-	utIOAudioIO.cpp \
-	utIOSocket.cpp \
-	utIOWindowGL.cpp \
-	utMath.cpp \
-	utProtocolGraphics.cpp \
-	utProtocolOSC.cpp \
-	utProtocolSerialize.cpp \
-	utSystem.cpp \
-	utTypes.cpp \
-	utTypesConversion.cpp \
-	utAllocore.cpp
+SRCS		= $(wildcard $(SRC_DIR)/ut*.cpp)
+OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
-OBJS = $(addsuffix .o, $(basename $(notdir $(SRCS))))
+include ../Makefile.common
+include ../Makefile.rules
 
-CFLAGS += $(addprefix -I../, $(INC_DIRS))
-LFLAGS += -L../$(BIN_DIR) -L../$(DEV_DIR)/lib -lallocore
+CXXFLAGS	+= -I../include
+LDFLAGS		+= -L$(BUILD_DIR)lib -l$(LIB_NAME)
 
-../$(OBJ_DIR)/%.o: %.cpp
-	@echo CC $< $@
-	@$(CC) -c $(CFLAGS) $< -o $@
+LINK_LIBS_PATH	= $(wildcard ../$(BUILD_DIR)lib/*.a)
+LINK_LIBS_FLAGS	=
+ifeq ($(PLATFORM), linux)
+	LINK_LIBS_FLAGS += $(addprefix -l :, $(notdir $(LINK_LIBS_PATH)))
+endif
 
-../$(BIN_DIR)/utAllocore: $(addprefix ../$(OBJ_DIR)/, $(OBJS))
-#	@echo $(LFLAGS)
-	@echo $(@F)
-	@$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
+#-------------------------------------------------------------------------
+# Rules
+#-------------------------------------------------------------------------
 
-
-#$(BIN_DIR)/%: $(OBJ_DIR)/%.o
-#	@echo $@
-#	@$(CC) $(CFLAGS) $@ -o $@ $^ $(LFLAGS)
-#	@$(CC) $(CFLAGS) $@ -o $(TEST_EXEC) $(filter %.o, $^) $(LFLAGS)
-#	@$(RUN_TEST)
+test: unitTests.cpp $(SLIB_PATH)
+	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) -o $(BIN_DIR)unitTests
+ifneq ($(AUTORUN), 0)
+	@cd $(BIN_DIR) && ./unitTests
+endif

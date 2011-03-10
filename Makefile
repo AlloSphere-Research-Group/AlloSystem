@@ -142,5 +142,5 @@ install: allocore
 
 
 # Build unit tests
-test: $(SLIB_PATH)
-	@$(MAKE) -C $(TEST_DIR)
+test: allocore
+	@$(MAKE) -C $(TEST_DIR) test
