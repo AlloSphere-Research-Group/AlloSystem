@@ -35,11 +35,13 @@ int utTypes(){
 		assert(a[0] == 1);
 		assert(a.atAbs(0) == 1);
 		assert(a.size() == 1);
+		assert(a.last() == 1);
 		
 		a.append(2);
 		a.append(3);
 		assert(a.size() == 3);
 		assert(a.capacity() == 4);
+		assert(a.last() == 3);
 		
 		a.reset();
 		assert(a.size() == 0);
