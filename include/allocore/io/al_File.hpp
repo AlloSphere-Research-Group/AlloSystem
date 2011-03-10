@@ -104,8 +104,12 @@ public:
 	File& path(const std::string& v){ mPath=v; return *this; }
 
 	/// Write memory elements to file
-	int write(const std::string& v){ return fwrite(v.data(), 1, v.length(), mFP); }
-	int write(const void * v, int size, int items=1){ return fwrite(v, size, items, mFP); }
+	int write(const std::string& v){ return write(v.data(), 1, v.length()); }
+	int write(const void * v, int itemSizeInBytes, int items=1){
+		int itemsWritten = fwrite(v, itemSizeInBytes, items, mFP);
+		mSizeBytes += itemsWritten * itemSizeInBytes;
+		return itemsWritten;
+	}
 	
 	/// Read memory elements from file
 	int read(void * v, int size, int items=1){ return fread(v, size, items, mFP); }
@@ -125,33 +129,36 @@ public:
 	/// Returns path string
 	const std::string& path() const { return mPath; }
 	
-	/// Returns size (in bytes) of file contents
+	/// Returns size, in bytes, of file contents
 	int size() const { return mSizeBytes; }
 
 	/// Returns whether file exists
 	static bool exists(const std::string& path);
 	
-	/// Return modification time of file (or 0 on failure)
-	/// as number of seconds since 00:00:00 january 1, 1970 UTC
-	al_sec modified();
-	/// Return last access time of file (or 0 on failure)
-	/// as number of seconds since 00:00:00 january 1, 1970 UTC
-	al_sec accessed();
-	/// Return creation time of file (or 0 on failure)
-	/// as number of seconds since 00:00:00 january 1, 1970 UTC
-	al_sec created();
+	/// Return modification time of file (or 0 on failure) \
+		as number of seconds since 00:00:00 january 1, 1970 UTC
+	al_sec modified() const;
+
+	/// Return last access time of file (or 0 on failure) \
+		as number of seconds since 00:00:00 january 1, 1970 UTC
+	al_sec accessed() const;
+
+	/// Return creation time of file (or 0 on failure) \
+		as number of seconds since 00:00:00 january 1, 1970 UTC
+	al_sec created() const;
 	
 	/// Return size file (or 0 on failure)
-	size_t size();
+	size_t sizeFile() const;
+
 	/// Return space used on disk of file (or 0 on failure)
-	size_t storage();
+	size_t storage() const;
 	
 	FILE * filePointer() { return mFP; }
 	
 	static al_sec modified(std::string path) { File f(path); return f.modified(); }
 	static al_sec accessed(std::string path) { File f(path); return f.accessed(); }
 	static al_sec created(std::string path) { File f(path); return f.created(); }
-	static size_t size(std::string path) { File f(path); return f.size(); }
+	static size_t sizeFile(std::string path) { File f(path); return f.sizeFile(); }
 	static size_t storage(std::string path) { File f(path); return f.storage(); }
 
 protected:

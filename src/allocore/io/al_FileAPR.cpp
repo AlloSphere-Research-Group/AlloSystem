@@ -23,12 +23,12 @@ namespace al{
 
 struct File::Impl : public ImplAPR {
 public:
-	apr_finfo_t finfo;
+	mutable apr_finfo_t finfo;
 	
 	Impl() : ImplAPR() {}
 	virtual ~Impl() {}
 
-	bool getInfo(const char * path, apr_int32_t wanted) {
+	bool getInfo(const char * path, apr_int32_t wanted) const {
 		return (APR_SUCCESS == check_apr(apr_stat(&finfo, path, wanted, mPool)));
 	}
 };
@@ -122,6 +122,7 @@ void File::getSize(){
 		fseek(mFP, 0, SEEK_END);
 		r = ftell(mFP);
 		rewind(mFP);
+//		printf("File::getSize %d (%s)\n", r, mode().c_str());
 	}
 	mSizeBytes = r;
 }
@@ -137,7 +138,7 @@ bool File::open(){
 	return false;
 }
 
-void File::close(){ if(opened()){ fclose(mFP); } mFP=0; }
+void File::close(){ if(opened()){ fclose(mFP); } mFP=0; mSizeBytes=0; }
 
 const char * File::readAll(){
 	if(opened() && mMode[0]=='r'){
@@ -163,35 +164,35 @@ int File::write(const std::string& path, const void * v, int size, int items){
 bool File::exists(const std::string& path){ File f(path, "r"); return f.open(); }
 
 
-al_sec File :: modified() {
+al_sec File :: modified() const {
 	if (mImpl->getInfo(path().c_str(), APR_FINFO_MTIME)) {
 		return 1.0e-6 * al_sec(mImpl->finfo.mtime);
 	}
 	return 0;
 }
 
-al_sec File :: accessed() {
+al_sec File :: accessed() const {
 	if (mImpl->getInfo(path().c_str(), APR_FINFO_ATIME)) {
 		return 1.0e-6 * al_sec(mImpl->finfo.atime);
 	}
 	return 0;
 }
 
-al_sec File :: created() {
+al_sec File :: created() const {
 	if (mImpl->getInfo(path().c_str(), APR_FINFO_CTIME)) {
 		return 1.0e-6 * al_sec(mImpl->finfo.ctime);
 	}
 	return 0;
 }
 
-size_t File :: size() {
+size_t File :: sizeFile() const {
 	if (mImpl->getInfo(path().c_str(), APR_FINFO_SIZE)) {
 		return mImpl->finfo.size;
 	}
 	return 0;
 }
 
-size_t File :: storage() {
+size_t File :: storage() const {
 	if (mImpl->getInfo(path().c_str(), APR_FINFO_CSIZE)) {
 		return mImpl->finfo.csize;
 	}
