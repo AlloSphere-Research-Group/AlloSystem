@@ -228,7 +228,8 @@ void AmbiDecode::setSpeakerRadians(int index, int deviceChannel, float az, float
 		// update encoding weights
 		//mDecodeMatrix[index][0] *= AmbiBase::c1_sqrt2;
 		encodeWeightsFuMa(mDecodeMatrix + index * channels(), mDim, mOrder, az, el);
-		mDecodeMatrix[index * channels()] *= amp;
+		for (int i=0; i<channels(); i++)
+			mDecodeMatrix[index * channels() + i] *= amp;
 	}	
 }
 
