@@ -18,7 +18,7 @@ int main (int argc, char * const argv[]) {
 	utMath();
 	utTypes();
 	utTypesConversion();
-	utSpatial();	// TODO: fails
+	utSpatial();
 	utSystem();
 	utProtocolOSC();
 	utProtocolSerialize();
