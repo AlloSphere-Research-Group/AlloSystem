@@ -232,7 +232,7 @@ bool Recv::start(){
 void Recv::stop(){
 	if(mBackground){
 		mBackground = false;
-		mThread.wait();
+		mThread.join();
 	}
 }
 

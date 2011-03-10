@@ -10,6 +10,7 @@
 
 namespace al {
 
+/*
 struct Thread::Impl : public ImplAPR {
 	Impl(void * ud = NULL)
 	:	 ImplAPR(), mThread(0), mThreadAttr(0), mRoutine(0), mUserData(0)
@@ -50,27 +51,98 @@ struct Thread::Impl : public ImplAPR {
 		return result;
 	}
 };
+*/
 
 
+struct Thread::Impl : public ImplAPR {
+	Impl()
+	:	 ImplAPR(), mThread(0), mThreadAttr(0), mFunc(0)
+	{
+		check_apr(apr_threadattr_create(&mThreadAttr, mPool));
+	}
+
+	bool start(ThreadFunction& func){
+		if(mThread) return false;	// can't start already started!
+		mFunc = &func;
+		apr_status_t rv = apr_thread_create(&mThread, mThreadAttr, cThreadFunc, this, mPool);
+		check_apr(rv);
+		return rv == APR_SUCCESS;
+	}
+
+	bool join(){
+		apr_status_t rv = APR_SUCCESS;
+		rv = check_apr(apr_thread_join(&rv, mThread));
+		mThread = 0;
+		return rv == APR_SUCCESS;
+	}
+
+	apr_thread_t * mThread;
+    apr_threadattr_t * mThreadAttr;
+	ThreadFunction * mFunc;
+	//void * mUserData;
+
+	static void * APR_THREAD_FUNC cThreadFunc(apr_thread_t *thread, void *data){
+		//printf(".\n");
+		Impl * impl = (Impl *)data;
+		(*impl->mFunc)();
+		apr_thread_exit(thread, APR_SUCCESS);
+		return NULL;
+	}
+};
 
 Thread::Thread()
-:	mImpl(new Impl())
+:	mImpl(new Impl()), mJoinOnDestroy(false)
 {}
 
-Thread::Thread(ThreadFunction routine, void * userData)
-:	mImpl(new Impl())
+Thread::Thread(ThreadFunction& func)
+:	mImpl(new Impl()), mJoinOnDestroy(false)
 {
-	start(routine, userData);
+	start(func);
 }
 
-Thread::~Thread(){ delete mImpl; }
-
-bool Thread::start(ThreadFunction routine, void * userData){
-	return mImpl->start(routine, userData);
+Thread::Thread(void * (*cThreadFunc)(void * userData), void * userData)
+:	mImpl(new Impl()), mJoinOnDestroy(false)
+{
+	start(cThreadFunc, userData);
 }
 
-bool Thread::wait(){
-	return mImpl->wait();
+Thread::~Thread(){
+	if(mJoinOnDestroy) join();
+	delete mImpl;
 }
+
+bool Thread::start(ThreadFunction& func){
+	return mImpl->start(func);
+}
+
+bool Thread::start(void * (*threadFunc)(void * userData), void * userData){
+	mCFunc.func = threadFunc;
+	mCFunc.user = userData;
+	return start(mCFunc);
+}
+
+bool Thread::join(){
+	return mImpl->join();
+}
+
+//Thread::Thread()
+//:	mImpl(new Impl())
+//{}
+//
+//Thread::Thread(ThreadFunction routine, void * userData)
+//:	mImpl(new Impl())
+//{
+//	start(routine, userData);
+//}
+//
+//Thread::~Thread(){ delete mImpl; }
+//
+//bool Thread::start(ThreadFunction routine, void * userData){
+//	return mImpl->start(routine, userData);
+//}
+//
+//bool Thread::wait(){
+//	return mImpl->wait();
+//}
 
 } // al::

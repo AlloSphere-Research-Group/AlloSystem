@@ -22,7 +22,7 @@ int main (int argc, char * const argv[]) {
 //	utIOWindowGL();
 //	utIOSocket();
 //	utFile();
-//	utThread();
+	utThread();
 
 //	utGraphicsDraw();
 	utGraphicsMesh();

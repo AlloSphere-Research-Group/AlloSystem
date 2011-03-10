@@ -31,44 +31,67 @@
 
 namespace al{
 
-typedef void * (*ThreadFunction)(void * userData);
 
-//class ThreadRoutine{
-//	virtual ~ThreadRoutine(){}
-//	virtual void run() = 0;
-//};
+/// Function object used by thread
+struct ThreadFunction{
+	virtual ~ThreadFunction(){}
+	virtual void operator()() = 0;
+};
 
+
+/// C-style thread function with user data
+struct CThreadFunction : public ThreadFunction{
+	typedef void * (*CFunc)(void * userData);
+	
+	CThreadFunction(CFunc func_=0, void * user_=0): func(func_), user(user_){}
+	
+	void operator()(){ func(user); }
+	
+	CFunc func;
+	void * user;
+};
+
+
+/// Thread
 class Thread{
 public:
-	Thread();
-	Thread(ThreadFunction routine, void * userData = 0);
 
-	//! The class destructor does not attempt to cancel or join a thread.
+	/// Create thread without starting
+	Thread();
+
+	/// @param[in] func			thread function object
+	Thread(ThreadFunction& func);
+	
+	/// @param[in] cFunc		thread C function
+	/// @param[in] userData		user data passed to C function
+	Thread(void * (*cFunc)(void * userData), void * userData);
+
 	~Thread();
 
-	//! Begin execution of the thread \e routine.  Upon success, true is returned.
-	/*!
-	A data pointer can be supplied to the thread routine via the
-	optional \e ptr argument.  If the thread cannot be created, the
-	return value is false.
-	*/
-	bool start(ThreadFunction routine, void * userData = 0);
+	
+	/// Set whether thread will automatically join upon destruction
+	Thread& joinOnDestroy(bool v){ mJoinOnDestroy=v; return *this; }
 
-	//! Block the calling routine indefinitely until the thread terminates.
-	/*!
-	This function suspends execution of the calling routine until the thread has 
-	terminated.  It will return immediately if the thread was already 
-	terminated.  A \e true return value signifies successful termination. 
-	A \e false return value indicates a problem with the wait call.
-	*/
-	bool wait();
+	/// Start executing thread function
+	bool start(ThreadFunction& func);	
+
+	/// Start executing thread C function with user data
+	bool start(void * (*threadFunc)(void * userData), void * userData);
+
+	/// Block the calling routine indefinitely until the thread terminates
+
+	///	This function suspends execution of the calling routine until the thread has 
+	///	terminated.  It will return immediately if the thread was already 
+	///	terminated.  A \e true return value signifies successful termination. 
+	///	A \e false return value indicates a problem with the wait call.
+	bool join();
 
 protected:
 	class Impl;
 	Impl * mImpl;
-//	ThreadRoutine * mRoutine;
+	CThreadFunction mCFunc;
+	bool mJoinOnDestroy;
 };
-
 
 } // al::
 

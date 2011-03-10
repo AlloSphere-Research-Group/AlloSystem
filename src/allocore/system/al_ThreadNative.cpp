@@ -31,6 +31,8 @@ namespace al {
 #if USE_PTHREAD
 #include <pthread.h>
 
+#error "ThreadNative not re-implemented using new Thread interface. May be better to use std::thread ..." 
+
 //typedef pthread_t ThreadHandle;
 //typedef void * (*ThreadFunction)(void *);
 //#define THREAD_FUNCTION(name) void * name(void * user)
