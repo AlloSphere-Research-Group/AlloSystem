@@ -6,31 +6,36 @@ int utFile() {
 		const char * path = "utFile.txt";
 		const char * text = "This is a test of AlloCore file i/o functionality.\nYou can safely delete this file.";
 
+		// write data
 		File f(path, "w");
 		assert(!f.opened());
 
-		f.open();
+		assert(f.open());
 		assert(f.opened());
 		assert(File::exists(path));
 
 		assert(
 			f.write(text, strlen(text))
 		);
+		
+		assert(f.size() == (int)strlen(text));
 
 		f.close();
 		assert(!f.opened());
 		assert(File::exists(path));
 
+
+		// read data
 		f.mode("r").open();
 		assert(f.opened());
 		
 		const char * read = f.readAll();
+
+		assert(f.size() == (int)strlen(text));
 		
-		assert(f.size() == strlen(text));
-		
-		for(unsigned i=0; i<f.size(); ++i){
+		for(int i=0; i<f.size(); ++i){
 			assert(read[i] == text[i]);
-			//printf("%c", read[i]);
+//			printf("%c", read[i]);
 		}
 		
 		f.close();
