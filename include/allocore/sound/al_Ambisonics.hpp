@@ -298,7 +298,7 @@ inline float AmbiDecode::decode(float * encFrame, int encNumChannels, int speake
 	float * dec = mDecodeMatrix + speakerNum * channels();
 	float * wc = mWeights;
 	for(int i=0; i<encNumChannels; ++i) smp += *dec++ * *wc++ * *encFrame++;
-	return smp * mSpeakers[speakerNum].amp;
+	return smp;
 }
 
 //inline float AmbiDecode::decode(int speakerNum){

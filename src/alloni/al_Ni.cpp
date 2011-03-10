@@ -115,7 +115,7 @@ struct Kinect :: Impl {
 	}
 
 	bool getMetaData() {
-		XnUInt64 timestamp;
+		//XnUInt64 timestamp;
 		hasData = false;
 		//printf("!");
 		//if (mDepthGenerator.IsNewDataAvailable(&timestamp)) {
@@ -166,7 +166,7 @@ bool Kinect :: start() {
 bool Kinect :: stop() {
 	if (mImpl == 0) return false;
 	mActive = false;
-	return mThread.wait();
+	return mThread.join();
 }
 
 bool Kinect :: tick() {

@@ -191,12 +191,11 @@ void AmbiDecode::decode(float * dec, const float * ambi, int numDecFrames) const
 	// iterate speakers
 	for(int s=0; s<numSpeakers(); ++s){
 		float * out = dec + mSpeakers[s].deviceChannel * numDecFrames;
-		float amp = mSpeakers[s].amp;
 		
 		// iterate ambi channels
 		for(int c=0; c<channels(); ++c){
 			const float * in = ambi + c * numDecFrames;
-			float w = amp * decodeWeight(s, c);
+			float w = decodeWeight(s, c);
 			for(int i=0; i<numDecFrames; ++i) out[i] += in[i] * w;		
 		}		
 	}
