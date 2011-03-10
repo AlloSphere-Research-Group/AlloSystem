@@ -596,9 +596,9 @@ int utMath(){
 
 		Random<> r;
 		int N = 100000;
-		for(int i=0; i<N; ++i){ int v=r.uniform(20, 0); assert(v < 20 && v >= 0); }
-		for(int i=0; i<N; ++i){ int v=r.uniform(20,10); assert(v < 20 && v >=10); }
-		for(int i=0; i<N; ++i){ int v=r.uniform(20,-10); assert(v < 20 && v >=-10); }
+		for(int i=0; i<N; ++i){ int v=r.uniform(20,  0); assert(  0 <= v && v < 20); }
+		for(int i=0; i<N; ++i){ int v=r.uniform(20, 10); assert( 10 <= v && v < 20); }
+		for(int i=0; i<N; ++i){ int v=r.uniform(20,-10); assert(-10 <= v && v < 20); }
 
 		//for(int i=0; i<32; ++i) printf("% g ", r.uniformS());
 		//for(int i=0; i<32; ++i) printf("%d ", r.prob(0.1));
