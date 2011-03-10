@@ -8,31 +8,34 @@ int main (int argc, char * const argv[]) {
 	searchpaths.addAppPaths(argc, argv);
 	searchpaths.addSearchPath(searchpaths.appPath() + "../share");
 
-//	utAsset();
+	// Logical tests; leave uncommented
+	// These tests are purely logical, they should not print anything out to
+	// the console (as it interferes with assertion error messages) or start any
+	// processes that require user intervention to proceed or validate the test.
+	
+	utAsset();
 	
 	utMath();
 	utTypes();
 	utTypesConversion();
-//	utSpatial();
-//	utSystem();
+	utSpatial();	// TODO: fails
+	utSystem();
 	utProtocolOSC();
-//	utProtocolSerialize();
+	utProtocolSerialize();
 
-//	utIOAudioIO();
-//	utIOWindowGL();
-//	utIOSocket();
-//	utFile();
+	utIOSocket();
+	utFile();
 	utThread();
 
-//	utGraphicsDraw();
 	utGraphicsMesh();
 
-//	int size = 14;
-//	for (int z=-64; z<64; z++) {
-//		printf("%d %d %d\n", z, (z & size), !!(z & size));
-//	}
+	// Empirical tests; leave commented
+	// These are tests that require some kind of observation to validate.
 
-//	printf("%d\n", sizeof(Frustumd));
+//	utGraphicsDraw();
+//	utIOAudioIO();
+//	utIOWindowGL();
+
 	return 0;
 }
 
