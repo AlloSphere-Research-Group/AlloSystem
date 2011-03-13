@@ -223,7 +223,7 @@ void AmbiDecode::setSpeakerRadians(int index, int deviceChannel, float az, float
 		mSpeakers[index].deviceChannel = deviceChannel;
 		mSpeakers[index].amp = amp;
 		
-		printf("channel	%i amp %f\n", index, amp);
+//		printf("channel	%i amp %f\n", index, amp);
 
 		// update encoding weights
 		//mDecodeMatrix[index][0] *= AmbiBase::c1_sqrt2;
