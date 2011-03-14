@@ -121,6 +121,7 @@ void MsgQueue :: update(al_sec until, bool defer) {
 
 		mNow = MAX(mNow, m->t); 
 		(m->func)(mNow, m->args());
+		//(m->func)(m->t, m->args());
 		
 		recycle(m);
 		m = mHead;

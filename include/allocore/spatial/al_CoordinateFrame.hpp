@@ -71,7 +71,16 @@ public:
 		quat().toVectorY(uu);
 		quat().toVectorZ(uf);	
 	}
-
+	
+	/// Get a linear-interpolated Pose between this and another
+	// (useful ingredient for smooth animations, estimations, etc.)
+	Pose lerp(Pose& target, double amt) const {
+		Pose r(*this);
+		r.pos().lerp(target.pos(), amt);
+		r.quat().slerp(target.quat(), amt);
+		return r;
+	}
+	
 	/// Get right unit vector
 	Vec3d ur() const { Vec3d r; quat().toVectorX(r); return r; }
 
