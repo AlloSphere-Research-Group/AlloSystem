@@ -135,16 +135,13 @@ public:
 	/// Returns whether file exists
 	static bool exists(const std::string& path);
 	
-	/// Return modification time of file (or 0 on failure) \
-		as number of seconds since 00:00:00 january 1, 1970 UTC
+	/// Return modification time of file (or 0 on failure) as number of seconds since 00:00:00 january 1, 1970 UTC
 	al_sec modified() const;
 
-	/// Return last access time of file (or 0 on failure) \
-		as number of seconds since 00:00:00 january 1, 1970 UTC
+	/// Return last access time of file (or 0 on failure) as number of seconds since 00:00:00 january 1, 1970 UTC
 	al_sec accessed() const;
 
-	/// Return creation time of file (or 0 on failure) \
-		as number of seconds since 00:00:00 january 1, 1970 UTC
+	/// Return creation time of file (or 0 on failure) as number of seconds since 00:00:00 january 1, 1970 UTC
 	al_sec created() const;
 	
 	/// Return size file (or 0 on failure)
