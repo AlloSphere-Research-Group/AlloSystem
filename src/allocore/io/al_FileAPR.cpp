@@ -53,9 +53,8 @@ public:
 		bool found = false;
 		if (dir && APR_SUCCESS == check_apr(apr_dir_open(&dir, dirname.c_str(), mPool))) {
 			// iterate over directory:
-			while ((!found) && APR_SUCCESS == (apr_dir_read(&dirent, APR_FINFO_DIRENT, dir))) {
-				
-				if (dirent.filetype == APR_REG && dirent.name && dirent.name == name) {
+			while ((!found) && APR_SUCCESS == (apr_dir_read(&dirent, APR_FINFO_TYPE|APR_FINFO_NAME, dir))) {
+				if (dirent.filetype == APR_REG && dirent.name && std::string(dirent.name) == name) {
 					result.file(dirent.name);
 					result.path(dirname);
 					found = true;
@@ -65,6 +64,8 @@ public:
 					found = path.find(name, result, true);
 				}
 			}
+		} else {
+			printf("couldn't open directory %s\n", dirname.c_str());
 		}
 		return found;
 	}
