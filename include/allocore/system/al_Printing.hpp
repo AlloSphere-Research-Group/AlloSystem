@@ -88,7 +88,7 @@ inline char intensityToASCII(float v){
 #define DEF_PRINT(T, code)\
 template<>\
 inline void print<T>(const T * arr, int size, const char * append){\
-	for(int i=0; i<size; ++i){ printf(code" ", arr[i]); } if(append[0]) printf(append);\
+	for(int i=0; i<size; ++i){ printf(code" ", arr[i]); } if(append[0]) printf("%s", append);\
 }
 
 DEF_PRINT(float, "%g")
