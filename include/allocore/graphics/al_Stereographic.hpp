@@ -38,7 +38,7 @@ namespace al{
 struct Viewport {
 	float l, b, w, h;	///< left, bottom, width, height
 
-	Viewport(float w=800, float h=600) : b(0), l(0), w(w), h(h) {}
+	Viewport(float w=800, float h=600) : l(0), b(0), w(w), h(h) {}
 	Viewport(float l, float b, float w, float h) : l(l), b(b), w(w), h(h) {}
 
 	/// Get aspect ratio
