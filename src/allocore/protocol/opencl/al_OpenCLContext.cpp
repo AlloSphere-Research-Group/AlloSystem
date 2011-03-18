@@ -1,7 +1,7 @@
 #include "al_OpenCLContext.hpp"
 
-#ifndef MIN
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#ifndef AL_MIN
+#define AL_MIN(a, b) (((a) < (b)) ? (a) : (b))
 #endif
 
 namespace al {
@@ -27,7 +27,7 @@ void OpenCLContext :: create(const vector<OpenCLDevice> &devs) {
 	
 	cl_device_id devices[MAX_DEVICES];
 	cl_int res = CL_SUCCESS;
-	for(int i=0; i < MIN(MAX_DEVICES, ndevices); i++) {
+	for(int i=0; i < AL_MIN(MAX_DEVICES, ndevices); i++) {
 		devices[i] = devs[i].get_device();
 		
 		if(!devs[i].get_available()) {

@@ -62,12 +62,12 @@ typedef long long int al_nsec;				/**< nanoseconds type (accurate to +/- 292.5 y
 typedef double al_sec;						/**< seconds type */
 
 
-#if !defined(MIN)
-	#define MIN(A,B)	({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __a : __b; })
+#if !defined(AL_MIN)
+	#define AL_MIN(A,B)	({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __a : __b; })
 #endif
 
-#if !defined(MAX)
-	#define MAX(A,B)	({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __b : __a; })
+#if !defined(AL_MAX)
+	#define AL_MAX(A,B)	({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __b : __a; })
 #endif
 
 #endif /* INCLUDE_AL_SYSTEM_CONFIG_H */
