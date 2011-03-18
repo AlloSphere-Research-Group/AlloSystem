@@ -327,12 +327,12 @@ void get_bounding_box_for_node(const aiScene * scene, const struct aiNode* nd, V
 			for (t = 0; t < mesh->mNumVertices; ++t) {
 			struct aiVector3D tmp = mesh->mVertices[t];
 			aiTransformVecByMatrix4(&tmp,trafo);
-			min[0] = MIN(min[0],tmp.x);
-			min[1] = MIN(min[1],tmp.y);
-			min[2] = MIN(min[2],tmp.z);
-			max[0] = MAX(max[0],tmp.x);
-			max[1] = MAX(max[1],tmp.y);
-			max[2] = MAX(max[2],tmp.z);
+			min[0] = AL_MIN(min[0],tmp.x);
+			min[1] = AL_MIN(min[1],tmp.y);
+			min[2] = AL_MIN(min[2],tmp.z);
+			max[0] = AL_MAX(max[0],tmp.x);
+			max[1] = AL_MAX(max[1],tmp.y);
+			max[2] = AL_MAX(max[2],tmp.z);
 		}
 	}
 	for (n = 0; n < nd->mNumChildren; ++n) {

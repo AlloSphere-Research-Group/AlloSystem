@@ -119,7 +119,7 @@ void MsgQueue :: update(al_sec until, bool defer) {
 //			al_pq_sched_msg(x, m);
 //		} else {	
 
-		mNow = MAX(mNow, m->t); 
+		mNow = AL_MAX(mNow, m->t); 
 		(m->func)(mNow, m->args());
 		//(m->func)(m->t, m->args());
 		
