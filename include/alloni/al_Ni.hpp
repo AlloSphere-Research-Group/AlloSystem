@@ -29,6 +29,8 @@
 #include "allocore/system/al_Thread.hpp"
 #include "allocore/types/al_Array.hpp"
 
+#include <list>
+
 namespace al{
 
 class Ni {
@@ -53,6 +55,16 @@ public:
 	// 640x480, float32, 1 component
 	Array& depthArray() { return mDepthArray; }
 	double fps() const { return mFPS; }
+	
+	class Callback {
+	public:
+		virtual ~Callback() {}
+		virtual void onKinectData(Kinect& k) = 0;
+	};
+	
+	void add(Callback * cb) {
+		mCallbacks.push_back(cb);
+	}
 
 protected:
 	class Impl;
@@ -63,9 +75,11 @@ protected:
 	bool mDepthNormalize;
 	bool mActive;
 	Thread mThread;
+	std::list<Callback *> mCallbacks;
 	
 	static void * threadFunction(void * userData);
 	bool tick();
+	
 	
 };
 

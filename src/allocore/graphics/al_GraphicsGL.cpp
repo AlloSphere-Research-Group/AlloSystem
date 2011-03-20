@@ -196,8 +196,6 @@ void GraphicsGL :: setPolygonMode(Graphics::PolygonMode mode) {
 	glPolygonMode(GL_FRONT_AND_BACK, gl_polygon_mode(mode));
 }
 
-
-
 // Buffer drawing
 void GraphicsGL :: p_draw(const Mesh& v) {
 

@@ -84,7 +84,7 @@ Ni :: Ni() {
 		printf("depth %2d: vendor %s name %s, connection %s\n", i, description.strVendor, description.strName, info.GetCreationInfo());
 		depth_nodes.push_back(info);
 	}
-	printf("created Ni\n");
+	printf("Initialized OpenNI\n");
 }
 
 struct Kinect :: Impl {
@@ -159,7 +159,7 @@ Kinect :: ~Kinect() {
 bool Kinect :: start() {
 	if (mImpl == 0) return false;
 	mActive = true;
-	printf("starting kinect\n");
+	//printf("starting kinect\n");
 	return mThread.start(threadFunction, this);
 }
 
@@ -195,6 +195,11 @@ bool Kinect :: tick() {
 		al_sec dt = when - mTime;
 		mTime = when;
 		mFPS = 1./dt;
+		
+		// callbacks:
+		for (std::list<Callback *>::iterator it = mCallbacks.begin(); it != mCallbacks.end(); it++) {
+			(*it)->onKinectData(*this);
+		}
 	}
 
 	return true;
@@ -209,10 +214,7 @@ void * Kinect :: threadFunction(void * userData) {
 
 	self.mTime = al_time();
 
-	printf("while kinect %p\n", userData);
 	while (self.mActive && self.tick()) { al_sleep(0.01); }
-
-	printf("kinect done %p\n", userData);
 
 	ok(self.mImpl->mDepthGenerator.StopGenerating());
 	return 0;
