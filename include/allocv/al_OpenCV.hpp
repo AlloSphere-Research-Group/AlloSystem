@@ -36,7 +36,7 @@ inline CvMat toCV(const Array& arr) {
 //	);
 
 	int type = toCV(arr.header.type, arr.header.components);
-	return cvMat(arr.dim(0), arr.dim(1), type, (uchar *)arr.data.ptr);
+	return cvMat(arr.dim(1), arr.dim(0), type, (uchar *)arr.data.ptr);
 }
 
 

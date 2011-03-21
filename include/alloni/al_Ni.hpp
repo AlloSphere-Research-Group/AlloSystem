@@ -46,6 +46,13 @@ protected:
 
 class Kinect {
 public:
+	
+	class Callback {
+	public:
+		virtual ~Callback() {}
+		virtual void onKinectData(Kinect& k) = 0;
+	};
+	
 	Kinect(unsigned deviceID);
 	~Kinect();
 	
@@ -55,12 +62,6 @@ public:
 	// 640x480, float32, 1 component
 	Array& depthArray() { return mDepthArray; }
 	double fps() const { return mFPS; }
-	
-	class Callback {
-	public:
-		virtual ~Callback() {}
-		virtual void onKinectData(Kinect& k) = 0;
-	};
 	
 	void add(Callback * cb) {
 		mCallbacks.push_back(cb);
@@ -76,6 +77,7 @@ protected:
 	bool mActive;
 	Thread mThread;
 	std::list<Callback *> mCallbacks;
+	unsigned mDeviceID;
 	
 	static void * threadFunction(void * userData);
 	bool tick();

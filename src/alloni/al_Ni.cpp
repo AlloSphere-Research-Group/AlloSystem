@@ -104,11 +104,14 @@ struct Kinect :: Impl {
 		mDepthGenerator.RegisterToNewDataAvailable(NewDepthDataAvailable, this, mDepthCallbackHandle);
 
 	}
+	
+	~Impl() {
+		mDepthGenerator.UnregisterFromNewDataAvailable(mDepthCallbackHandle);
+	}
 
 	static void NewDepthDataAvailable (xn::ProductionNode& node, void* cookie) {
 		Impl * self = (Impl *)cookie;
 		//printf("%p\n", cookie);
-
 		//printf("new depth data %p\n", cookie);
 		// trigger condition:
 		self->hasData = true;
@@ -141,25 +144,15 @@ Kinect :: Kinect(unsigned deviceID)
 	mDepthArray(1, AlloFloat32Ty, 640, 480),
 	mTime(0),
 	mDepthNormalize(true),
-	mFPS(0)
-{
-	// find the info for this device:
-	Ni::get();
-	if (deviceID < depth_nodes.size()) {
-		xn::NodeInfo info = depth_nodes[deviceID % depth_nodes.size()];
-
-		mImpl = new Impl(info);
-	}
-}
+	mFPS(0),
+	mDeviceID(deviceID)
+{}
 
 Kinect :: ~Kinect() {
-	delete mImpl;
+	if (mImpl) delete mImpl;
 }
 
 bool Kinect :: start() {
-	if (mImpl == 0) return false;
-	mActive = true;
-	//printf("starting kinect\n");
 	return mThread.start(threadFunction, this);
 }
 
@@ -170,9 +163,7 @@ bool Kinect :: stop() {
 }
 
 bool Kinect :: tick() {
-	while(!mImpl->hasData) { al_sleep(0.01); }
-
-	if (mImpl->getMetaData()) {
+	if(mImpl->hasData && mImpl->getMetaData()) {
 		const XnUInt xres = mImpl->mDepthMD.XRes();
 		const XnUInt yres = mImpl->mDepthMD.YRes();
 		const XnDepthPixel zres = mImpl->mDepthMD.ZRes();
@@ -201,21 +192,31 @@ bool Kinect :: tick() {
 			(*it)->onKinectData(*this);
 		}
 	}
-
 	return true;
 }
 
 void * Kinect :: threadFunction(void * userData) {
 	Kinect& self = *(Kinect *)userData;
+	
+	// find the info for this device:
+	printf("started Kinect thread\n");
+	Ni::get();
+	if (self.mDeviceID < depth_nodes.size()) {
+		xn::NodeInfo info = depth_nodes[self.mDeviceID % depth_nodes.size()];
+		self.mImpl = new Impl(info);
 
-	printf("start generating kinect... %p\n", userData);
-	XnStatus s = self.mImpl->mDepthGenerator.StartGenerating();
-	if (!ok(s)) return 0;
+		if (self.mImpl) {
+			printf("start generating kinect... %p\n", userData);
+			XnStatus s = self.mImpl->mDepthGenerator.StartGenerating();
+			if (!ok(s)) return 0;
 
-	self.mTime = al_time();
+			self.mTime = al_time();
+			self.mActive = true;
 
-	while (self.mActive && self.tick()) { al_sleep(0.01); }
+			while (self.mActive && self.tick()) { al_sleep(0.010); }
 
-	ok(self.mImpl->mDepthGenerator.StopGenerating());
+			ok(self.mImpl->mDepthGenerator.StopGenerating());
+		}
+	}
 	return 0;
 }
