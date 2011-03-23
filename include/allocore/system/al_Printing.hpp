@@ -32,18 +32,28 @@
 
 namespace al{
 
-/// Returns an ASCII character most closely matching an intensity value in [0,1].
+/// Returns an ASCII character with intensity most closely matching a value in [0,1)
 char intensityToASCII(float v);
 
 /// Print an array of numbers
+
+/// @param[in] arr		input array
+/// @param[in] size		size of input array
+/// @param[in] append	an extra string to append at end
 template <typename T>
 void print(const T * arr, int size, const char * append="");
 
-/// Print an array of number with new line
+/// Print an array of numbers with new line
+
+/// @param[in] arr		input array
+/// @param[in] size		size of input array
 template <typename T>
 void println(const T * arr, int size){ print(arr, size, "\n"); }
 
 /// Print value
+
+/// @param[in] v		value to print
+/// @param[in] append	an extra string to append at end
 template <typename T>
 void print(const T& v, const char * append=""){ print(&v, 1, append); }
 
@@ -51,8 +61,13 @@ void print(const T& v, const char * append=""){ print(&v, 1, append); }
 template <typename T>
 void println(const T& v){ print(v, "\n"); }
 
-/// Prints 2D pixel array
-template<class T> void print2D(T* pix, int nx, int ny, FILE * fp=stdout);
+/// Prints 2D array of intensity values
+
+/// @param[in] arr		flat 2D array of values in [0, 1) where x moves fastest
+/// @param[in] nx		number of elements along x
+/// @param[in] ny		number of elements along y
+/// @param[in] fp		file to write output to
+template<class T> void print2D(const T* arr, int nx, int ny, FILE * fp=stdout);
 
 /// Print signed unit value on a horizontal plot.
 
@@ -62,17 +77,17 @@ template<class T> void print2D(T* pix, int nx, int ny, FILE * fp=stdout);
 /// @param[in]	point	The print character for points
 void printPlot(float value, uint32_t width=50, bool spaces=true, const char * point="o");
 
-/// Prints error messge to stderr and optionally calls exit()
+/// Prints error message to stderr and optionally calls exit()
 void err(const char * msg, const char * src="", bool exits=true);
 
-/// Prints warning messge to stderr
+/// Prints warning message to stderr
 void warn(const char * msg, const char * src="");
 
 
 
 
 
-// StateChange --------------------------------------------------------------
+// Implementation --------------------------------------------------------------
 
 inline char intensityToASCII(float v){
 	static const char map[] =
@@ -106,7 +121,7 @@ DEF_PRINT(unsigned long long, "%lld")
 
 #undef DEF_PRINT
 
-template<class T> void print2D(T* pix, int nx, int ny, FILE * fp){
+template<class T> void print2D(const T* pix, int nx, int ny, FILE * fp){
 	for(int j=0; j<nx; ++j){
 	for(int i=0; i<ny; ++i){
 		float v = pix[j*nx + i];
@@ -114,6 +129,7 @@ template<class T> void print2D(T* pix, int nx, int ny, FILE * fp){
 	} printf("\n"); }
 }
 
-} // ::al::
+} // al::
 
 #endif
+
