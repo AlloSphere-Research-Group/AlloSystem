@@ -486,7 +486,12 @@ private:
 Window::Window()
 :	mImpl(new WindowImpl(this)),
 	mDisplayMode(DisplayMode::DefaultBuf)
-{}
+{
+	// Window has its own built-in handlers (which may be overridden in subclasses)
+	// they are added explicitly here so that the order of handlers can be user controled
+	add((InputEventHandler *)this);
+	add((WindowEventHandler *)this);
+}
 
 Window::~Window(){
 	destroy();

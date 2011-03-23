@@ -343,8 +343,20 @@ private:
 			active = (*iter)->e; \
 			iter++; \
 		}\
+	}
+	
+	/*
+	#define CALL(e)	{\
+		InputEventHandlers::iterator iter = mInputEventHandlers.begin(); \
+		bool active = true; \
+		while(active && iter != mInputEventHandlers.end()){\
+			active = (*iter)->e; \
+			iter++; \
+		}\
 		if (active) e; \
 	}
+	*/
+	
 	void doMouseDown(const Mouse& m){ CALL(onMouseDown(m)); }
 	void doMouseDrag(const Mouse& m){ CALL(onMouseDrag(m)); }
 	void doMouseMove(const Mouse& m){ CALL(onMouseMove(m)); }
@@ -360,8 +372,20 @@ private:
 			active = (*iter)->e; \
 			iter++; \
 		}\
+	}
+
+	/*
+	#define CALL(e)	{\
+		WindowEventHandlers::iterator iter = mWindowEventHandlers.begin(); \
+		bool active = true; \
+		while(active && iter != mWindowEventHandlers.end()){\
+			active = (*iter)->e; \
+			iter++; \
+		}\
 		if (active) e; \
 	}
+	*/
+	
 	void doFrame() { CALL(onFrame()); }
 	void doCreate(){ CALL(onCreate()); }				
 	void doDestroy(){ 

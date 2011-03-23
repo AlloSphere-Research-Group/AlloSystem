@@ -66,6 +66,8 @@ public:
 	void add(Callback * cb) {
 		mCallbacks.push_back(cb);
 	}
+	
+	static void * getContext();
 
 protected:
 	class Impl;

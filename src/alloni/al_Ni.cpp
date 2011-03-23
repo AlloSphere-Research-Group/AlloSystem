@@ -152,6 +152,11 @@ Kinect :: ~Kinect() {
 	if (mImpl) delete mImpl;
 }
 
+void * Kinect :: getContext() {
+	Ni::get();
+	return (void *)&context;
+}	
+
 bool Kinect :: start() {
 	return mThread.start(threadFunction, this);
 }

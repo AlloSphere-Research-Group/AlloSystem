@@ -29,6 +29,7 @@
 
 #include "allocore/types/al_Array.h"
 #include "allocore/math/al_Functions.hpp"	
+#include "allocore/math/al_Vec.hpp"
 #include <stdlib.h>
 
 #define AL_ARRAY_DEFAULT_ALIGNMENT (4)
@@ -150,15 +151,24 @@ public:
 	template<typename T> T * cell(const int x, const int y) const;
 	template<typename T> T * cell(const int x, const int y, const int z) const;
 	
+	template<typename T, typename TP> T * cell(const T* val, const Vec<2,TP> p) const { return cell(val, p[0], p[1]); }
+	template<typename T, typename TP> T * cell(const T* val, const Vec<3,TP> p) const { return cell(val, p[0], p[1], p[2]); }
+	
 	///! read the plane values from array into val array (no bounds checking)
 	template<typename T> void read(T* val, const int x) const;
 	template<typename T> void read(T* val, const int x, const int y) const;
 	template<typename T> void read(T* val, const int x, const int y, const int z) const;
 	
+	template<typename T, typename TP> void read(const T* val, const Vec<2,TP> p) const { read(val, p[0], p[1]); }
+	template<typename T, typename TP> void read(const T* val, const Vec<3,TP> p) const { read(val, p[0], p[1], p[2]); }
+	
 	///! read the plane values from array into val array (wraps periodically at bounds)
 	template<typename T> void read_wrap(T* val, const int x) const;
 	template<typename T> void read_wrap(T* val, const int x, const int y) const;
 	template<typename T> void read_wrap(T* val, const int x, const int y, const int z) const;
+	
+	template<typename T, typename TP> void read_wrap(const T* val, const Vec<2,TP> p) const { read_wrap(val, p[0], p[1]); }
+	template<typename T, typename TP> void read_wrap(const T* val, const Vec<3,TP> p) const { read_wrap(val, p[0], p[1], p[2]); }
 	
 	///! linear interpolated lookup (virtual array index)
 	/// reads the linearly interpolated plane values into val array
@@ -166,15 +176,25 @@ public:
 	template<typename T> void read_interp(T * val, double x, double y) const;
 	template<typename T> void read_interp(T * val, double x, double y, double z) const;
 	
+	template<typename T, typename TP> void read_interp(const T* val, const Vec<2,TP> p) const { read_interp(val, p[0], p[1]); }
+	template<typename T, typename TP> void read_interp(const T* val, const Vec<3,TP> p) const { read_interp(val, p[0], p[1], p[2]); }
+	
 	///! write plane values from val array into array (no bounds checking)
 	template<typename T> void write(const T* val, const double x);
 	template<typename T> void write(const T* val, const double x, const double y);
 	template<typename T> void write(const T* val, const double x, const double y, const double z);
 	
+	template<typename T, typename TP> void write(const T* val, const Vec<2,TP> p) { write(val, p[0], p[1]); }
+	template<typename T, typename TP> void write(const T* val, const Vec<3,TP> p) { write(val, p[0], p[1], p[2]); }
+	
+	
 	///! write plane values from val array into array (wraps periodically at bounds)
 	template<typename T> void write_wrap(const T* val, const int x);
 	template<typename T> void write_wrap(const T* val, const int x, const int y);
 	template<typename T> void write_wrap(const T* val, const int x, const int y, const int z);
+	
+	template<typename T, typename TP> void write_wrap(const T* val, const Vec<2,TP> p) { write_wrap(val, p[0], p[1]); }
+	template<typename T, typename TP> void write_wrap(const T* val, const Vec<3,TP> p) { write_wrap(val, p[0], p[1], p[2]); }
 	
 	///! linear interpolated write (virtual array index)
 	/// AKA trilinear splat
@@ -182,6 +202,9 @@ public:
 	template<typename T> void write_interp(const T* val, const double x);
 	template<typename T> void write_interp(const T* val, const double x, const double y);
 	template<typename T> void write_interp(const T* val, const double x, const double y, const double z);
+	
+	template<typename T, typename TP> void write_interp(const T* val, const Vec<2,TP> p) { write_interp(val, p[0], p[1]); }
+	template<typename T, typename TP> void write_interp(const T* val, const Vec<3,TP> p) { write_interp(val, p[0], p[1], p[2]); }
 };
 	
 	
