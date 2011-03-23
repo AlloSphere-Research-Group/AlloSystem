@@ -79,15 +79,18 @@ char base10To36(int dec10);
 int base36To10(char ascii36);
 
 /// Convert a string of 1s and 0s to an integer.
-uint32_t bitsToUInt(const char * string);
 
-/// Sets argument to zero if subnormal
+/// @param[in] strBin	binary string where the first character is the most-significant digit
+///
+uint32_t bitsToUInt(const char * strBin);
+
+/// Returns zero if argument is subnormal, otherwise returns argument
 float blockSubnormal(float v);
 
-/// Sets argument to zero if subnormal
+/// Returns zero if argument is subnormal, otherwise returns argument
 double blockSubnormal(double v);
 
-/// Returns 1 if little endian
+/// Returns 1 if little endian, 0 if big endian
 int endian();
 
 /// Returns biased decimal value of 32-bit float exponent field.
@@ -120,11 +123,20 @@ inline float punUF(uint32_t v){ Twiddle<float> u(v); return u.f; }
 /// This function uses a union to avoid problems with direct pointer casting
 /// when the fstrict-aliasing compiler flag is on.
 inline uint32_t punFU( float v){ Twiddle< float> u(v); return u.u; }
+
+/// Type-pun 32-bit float to 32-bit signed int
 inline  int32_t punFI( float v){ Twiddle< float> u(v); return u.i; }
 
-inline  int64_t punFI(  double v){ Twiddle<double> u(v); return u.i; }
+/// Type-pun 64-bit float to 64-bit unsigned int
 inline uint64_t punFU(  double v){ Twiddle<double> u(v); return u.u; }
+
+/// Type-pun 64-bit float to 64-bit signed int
+inline  int64_t punFI(  double v){ Twiddle<double> u(v); return u.i; }
+
+/// Type-pun 64-bit unsigned int to 64-bit float
 inline   double punUF(uint64_t v){ Twiddle<double> u(v); return u.f; }
+
+/// Type-pun 64-bit signed int to 64-bit float
 inline   double punIF( int64_t v){ Twiddle<double> u(v); return u.f; }
 
 /// Convert numerical type to a string
