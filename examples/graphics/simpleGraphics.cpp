@@ -18,7 +18,7 @@ struct MyWindow : Window{
 		gl.matrixMode(gl.MODELVIEW);
 		gl.loadMatrix(Matrix4d::lookAt(Vec3d(0,0,-4), Vec3d(0,0,0), Vec3d(0,1,0)));
 
-		gl.rotate(sin(al_time()) * 90., 0, 1, 0);
+		//gl.rotate(sin(al_time()) * 90., 0, 1, 0);
 		gl.begin(gl.QUADS);
 			gl.color(1,0,0);
 			gl.vertex(-1,-1);
