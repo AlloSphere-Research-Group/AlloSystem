@@ -41,12 +41,14 @@ public:
 	Interval()
 	:	mMin(0), mMax(1){}
 
+	/// @param[in] min	minimum endpoint
+	/// @param[in] max	maximum endpoint
 	Interval(const T& min, const T& max)
 	{ endpoints(min,max); }
 
 	T center() const { return (max()+min())/T(2); }	///< Returns center point
 
-	/// Test is point is contained exclusively within interval
+	/// Returns true if value is in interval
 	bool contains(const T& v) const { return v>=min() && v<=max(); }
 
 	bool degenerate() const { return min()==max(); }///< Returns true if diameter is zero
@@ -126,3 +128,4 @@ private:
 } // ::al::
 
 #endif
+
