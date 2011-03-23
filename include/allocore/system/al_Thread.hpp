@@ -35,20 +35,26 @@ namespace al{
 /// Function object used by thread
 struct ThreadFunction{
 	virtual ~ThreadFunction(){}
+
+	/// Routine called on thread execution start
 	virtual void operator()() = 0;
 };
 
 
 /// C-style thread function with user data
 struct CThreadFunction : public ThreadFunction{
+
+	/// Prototype of thread execution function
 	typedef void * (*CFunc)(void * userData);
 	
+	/// @param[in] func		thread execution function
+	/// @param[in] user		user data passed into thread execution function
 	CThreadFunction(CFunc func_=0, void * user_=0): func(func_), user(user_){}
 	
 	void operator()(){ func(user); }
-	
-	CFunc func;
-	void * user;
+
+	CFunc func;		///< Thread execution function
+	void * user;	///< User data passed into thread execution function
 };
 
 
@@ -95,4 +101,5 @@ protected:
 
 } // al::
 
-#endif /* include guard */
+#endif
+
