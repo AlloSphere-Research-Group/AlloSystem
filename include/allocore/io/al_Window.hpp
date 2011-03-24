@@ -220,6 +220,9 @@ private:
 
 
 /// Window with OpenGL context
+
+/// Upon construction, the Window will add itself to its list of input event
+/// handlers and its list of window event handlers.
 class Window : public InputEventHandler, public WindowEventHandler, public GPUContext {
 public:
 
@@ -291,19 +294,28 @@ public:
 	Window& show();								///< Show window (if hidden)
 	Window& title(const std::string& v);		///< Set title
 
-	/// Add input event handler
+	/// Append handler to input event handler list
 	
-	/// The order by which handlers are added matches their calling order.
-	/// The window's event handlers are called before any attached handlers.
+	/// The order of handlers in the list matches their calling order.
+	///
 	Window& add(InputEventHandler * v);
 
-	/// Add window event handler
+	/// Append handler to window event handler list
 	
-	/// The order by which handlers are added matches their calling order.
-	/// The window's event handlers are called before any attached handlers.
+	/// The order of handlers in the list matches their calling order.
+	///
 	Window& add(WindowEventHandler * v);
 
+	/// Prepend handler to input event handler list
+
+	/// The order of handlers in the list matches their calling order.
+	///
 	Window& prepend(InputEventHandler * v);
+
+	/// Prepend handler to window event handler list
+
+	/// The order of handlers in the list matches their calling order.
+	///
 	Window& prepend(WindowEventHandler * v);
 
 	/// Remove all input event handlers matching argument
@@ -319,10 +331,6 @@ public:
 	static void stopLoop();
 
 private:
-	// note: maybe mEventHandlers should be a std::list instead?
-	// ljp: A list has faster insertion/removal but is slower to iterate through
-	// versus an array. We will probably be iterating more often than inserting
-	// removing, so probably best to leave as an array.
 	typedef std::vector<InputEventHandler *> InputEventHandlers;
 	typedef std::vector<WindowEventHandler *> WindowEventHandlers;
 	friend class WindowImpl;
@@ -334,7 +342,8 @@ private:
 	WindowEventHandlers mWindowEventHandlers;
 	DisplayMode::t mDisplayMode;
 
-	void doFrameImpl();							// Calls onFrame() and swaps buffers
+	void init();					// IMPORTANT: this must be called from the constructor
+	void doFrameImpl();				// Calls onFrame() and swaps buffers
 
 	#define CALL(e)	{\
 		InputEventHandlers::iterator iter = mInputEventHandlers.begin(); \
@@ -395,8 +404,6 @@ private:
 	void doResize(int w, int h){ CALL(onResize(w, h)); }	
 	void doVisibility(bool v){ CALL(onVisibility(v)); }
 	#undef CALL
-
-	void init();
 };
 
 
