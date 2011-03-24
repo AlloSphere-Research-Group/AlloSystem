@@ -6,7 +6,7 @@ bool aboutEqual(T v, T to, T r){ return v<(to+r) && v>(to-r); }
 int utSystem(){
 	
 	// Timing
-	UT_PRINTF("system: timing\n");
+//	UT_PRINTF("system: timing\n");
 	{
 		al_nsec slop = 1e7;
 		al_nsec sleepns = 1e8;
@@ -19,25 +19,25 @@ int utSystem(){
 		al_nsec t, dt;
 		al_sec now, dts;
 
-	UT_PRINTF("\tSleeping %ld nsec... ", (long int)sleepns);
+//	UT_PRINTF("\tSleeping %ld nsec... ", (long int)sleepns);
 		t = al_time_nsec();
 		al_sleep_nsec(sleepns);
 		dt = al_time_nsec() - t;
-	UT_PRINTF("done.\n");
+//	UT_PRINTF("done.\n");
 		assert(aboutEqual(dt, sleepns, slop));
 
-	UT_PRINTF("\tSleeping %g sec... ", al_time_ns2s * sleepns);
+//	UT_PRINTF("\tSleeping %g sec... ", al_time_ns2s * sleepns);
 		t = al_time_nsec();
 		al_sleep(al_time_ns2s * sleepns);
 		dt = al_time_nsec() - t;
-	UT_PRINTF("done.\n");
+//	UT_PRINTF("done.\n");
 		assert(aboutEqual(dt, sleepns, slop));
 
-	UT_PRINTF("\tSleeping from %.12g to %.12g sec... ", al_time(), al_time()+sleeps);
+//	UT_PRINTF("\tSleeping from %.12g to %.12g sec... ", al_time(), al_time()+sleeps);
 		now = al_time();
 		al_sleep_until(now + sleeps);
 		dts = al_time() - now;
-	UT_PRINTF("done.\n");
+//	UT_PRINTF("done.\n");
 		assert(aboutEqual(dts, sleeps, slops));
 
 		Timer tm;

@@ -63,8 +63,8 @@ int utIOSocket(){
 
 	// Empirical tests
 	{
-		printf("%s\n", Socket::hostName().c_str());
-		printf("%s\n", Socket::hostIP().c_str());
+//		printf("%s\n", Socket::hostName().c_str());
+//		printf("%s\n", Socket::hostIP().c_str());
 	}
 	
 	return 0;

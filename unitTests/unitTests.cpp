@@ -13,24 +13,32 @@ int main (int argc, char * const argv[]) {
 	// the console (as it interferes with assertion error messages) or start any
 	// processes that require user intervention to proceed or validate the test.
 
-	utMath();
-	utTypes();
-	utTypesConversion();
-	utSpatial();
-	utSystem();
-	utProtocolOSC();
-	utProtocolSerialize();
+	// This macro runs the unit test and prints out status info
+	// 'Name' should match the name of the unit test, utName.
+	#define RUNTEST(Name)\
+		printf("%s ", #Name);\
+		ut##Name();\
+		for(size_t i=0; i<32-strlen(#Name); ++i) printf(".");\
+		printf(" pass\n")
 
-	utIOSocket();
-	utFile();
-	utThread();
+	RUNTEST(Math);
+	RUNTEST(Types);
+	RUNTEST(TypesConversion);
+	RUNTEST(Spatial);
+	RUNTEST(System);
+	RUNTEST(ProtocolOSC);
+	RUNTEST(ProtocolSerialize);
 
-	//utAsset();
-	utGraphicsMesh();
+	RUNTEST(IOSocket);
+	RUNTEST(File);
+	RUNTEST(Thread);
+
+	RUNTEST(GraphicsMesh);
 
 	// Empirical tests; leave commented
 	// These are tests that require some kind of observation to validate.
 
+//	utAsset();
 //	utGraphicsDraw();
 //	utIOAudioIO();
 //	utIOWindowGL();
