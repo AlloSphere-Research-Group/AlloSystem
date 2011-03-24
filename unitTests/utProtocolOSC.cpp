@@ -34,6 +34,8 @@ int utProtocolOSC(){
 		assert(!p.isMessage());
 		assert(p.isBundle());
 
+	p.clear();
+
 	// Test message
 	{
 		const char * str = "Hello World!";
