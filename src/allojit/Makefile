@@ -45,6 +45,10 @@ else
 			LLVMTransformUtils LLVMipa LLVMAnalysis LLVMTarget \
 			LLVMCore LLVMMC LLVMSupport LLVMSystem
 	LLVMLIBS = $(addprefix $(LLVMLIBDIR)/lib, $(addsuffix .a, $(LLVMLIBNAMES)))
+	
+	# currently not working. Not sure why.
+	#AR := libtool --tag=CXX --mode=link g++ -export-dynamic -static -o 
+	
 endif
 
 

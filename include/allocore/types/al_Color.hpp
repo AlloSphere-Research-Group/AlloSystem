@@ -6,13 +6,13 @@
  */
 
 /*
-	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
+	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS).
 	All Rights Reserved.
 
 	Permission to use, copy, modify, distribute, and distribute modified versions
 	of this software and its documentation without fee and without a signed
 	licensing agreement, is hereby granted, provided that the above copyright
-	notice, the list of contributors, this paragraph and the following two paragraphs 
+	notice, the list of contributors, this paragraph and the following two paragraphs
 	appear in all copies, modifications, and distributions.
 
 	IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
@@ -51,14 +51,12 @@ struct Color{
 	/// @param[in] b			blue component
 	/// @param[in] a			alpha component
 	Color(float r, float g, float b, float a=1.f)
-	//:	r(r), g(g), b(b), a(a)	<< Clang can't handle it
-	{ this->r=r;  this->g=g; this->b=b; this->a=a; }
+	:	r(r), g(g), b(b), a(a) {}
 
 	/// @param[in] gray			red/green/blue components
 	/// @param[in] a			alpha component
 	Color(float gray=1.f, float a=1.f)
-	//:	r(gray), g(gray), b(gray), a(a)	<< Clang can't handle it
-	{ this->r=gray;  this->g=gray; this->b=gray; this->a=a; }
+	:	r(gray), g(gray), b(gray), a(a)	{}
 
 	/// @param[in] hsv			HSV value
 	/// @param[in] a			alpha component
@@ -69,7 +67,7 @@ struct Color{
 
 	/// Set color component at index with no bounds checking
 	float& operator[](int i){ return components[i]; }
-	
+
 	/// Get color component at index with no bounds checking
 	const float& operator[](int i) const { return components[i]; }
 
@@ -135,10 +133,10 @@ struct Color{
 
 	/// Returns inverted color
 	Color inverse() const { return Color(1.f-r, 1.f-g, 1.f-b, a); }
-	
+
 	/// Invert RGB components
 	Color& invert(){ return set(1.f-r, 1.f-g, 1.f-b); }
-	
+
 	/// Returns luminance value
 	float luminance() const { return r*0.3f+g*0.59f+b*0.11f; }
 };
@@ -166,7 +164,7 @@ struct HSV{
 	/// @param[in] s	saturation
 	/// @param[in] v	value
 	HSV(float h=0, float s=1, float v=1): h(h), s(s), v(v){}
-	
+
 	/// @param[in] c	RGB color to convert from
 	HSV(const Color& c){ *this = c; }
 
@@ -176,10 +174,10 @@ struct HSV{
 
 	/// Set from RGB color
 	HSV& operator=(const Color& c);
-	
+
 	/// Rotate hue in interval [0, 1)
 	HSV& rotateHue(float v){ h += v; return wrapHue(); }
-	
+
 	/// Wrap hue value into valid interval [0, 1)
 	HSV& wrapHue(){
 		if(h>1){ h -= int(h); }

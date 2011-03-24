@@ -9,11 +9,11 @@
 
 #include "allocore/system/al_Config.h"
 
-#ifdef AL_WIN32 
+#ifdef AL_WIN32
 	#define AL_FILE_DELIMITER '\\'
 #else
 	#define AL_FILE_DELIMITER '/'
-#endif	
+#endif
 
 #define AL_PATH_MAX (4096)
 
@@ -29,15 +29,15 @@ public:
 	FilePath(std::string file, std::string path) : mPath(path), mFile(file) {}
 	///! this constructor takes a path to a file:
 	FilePath(std::string fullpath);
-	
+
 	const std::string& file() const { return mFile; }
 	const std::string& path() const { return mPath; }
-	
+
 	std::string filepath() const { return path()+file(); }
-	
+
 	FilePath& file(const std::string& v) { mFile=v; return *this; }
 	FilePath& path(const std::string& v) { mPath=v; return *this; }
-	
+
 protected:
 	std::string mPath;
 	std::string mFile;
@@ -54,32 +54,33 @@ public:
 	/// returns true if file found, and fills result with corresponding path & filename
 	/// returns false if file not found
 	FilePath find(const std::string& filename);
-	
+
 	/// add a path to search in; recursive searching is optional
 	void addSearchPath(const std::string& path, bool recursive = true);
-	
+
 	/// adds best estimate of application launch paths (cwd etc.)
 	/// can pass in argv from the main() function if desired.
 	void addAppPaths(int argc, char * const argv[], bool recursive = true);
+	void addAppPaths(int argc, const char ** argv, bool recursive = true);
 	void addAppPaths(bool recursive = true);
-	
+
 	const std::string& appPath() const { return mAppPath; }
-	
+
 	/// todo?
 	//void addResourcePath();
-	
+
 	// strips trailing filename from a path; e.g. /usr/bin/man -> /usr/bin/
 	static std::string stripFileName(const std::string& src);
 	// ensure path ends with the proper delimiter
 	static std::string conformPath(const std::string& src);
 	// does a file at the given filepath exist?
 	static bool fileExists(const std::string& name, const std::string& path);
-	
+
 protected:
 
 	typedef std::pair<std::string, bool> searchpath;
 	std::list<searchpath> mSearchPaths;
-	
+
 	std::string mAppPath;
 
 };
@@ -110,7 +111,7 @@ public:
 		mSizeBytes += itemsWritten * itemSizeInBytes;
 		return itemsWritten;
 	}
-	
+
 	/// Read memory elements from file
 	int read(void * v, int size, int items=1){ return fread(v, size, items, mFP); }
 
@@ -122,19 +123,19 @@ public:
 
 	/// Returns whether file is open
 	bool opened() const { return 0 != mFP; }
-	
+
 	/// Returns file i/o mode string
 	const std::string& mode() const { return mMode; }
-	
+
 	/// Returns path string
 	const std::string& path() const { return mPath; }
-	
+
 	/// Returns size, in bytes, of file contents
 	int size() const { return mSizeBytes; }
 
 	/// Returns whether file exists
 	static bool exists(const std::string& path);
-	
+
 	/// Return modification time of file (or 0 on failure) as number of seconds since 00:00:00 january 1, 1970 UTC
 	al_sec modified() const;
 
@@ -143,15 +144,15 @@ public:
 
 	/// Return creation time of file (or 0 on failure) as number of seconds since 00:00:00 january 1, 1970 UTC
 	al_sec created() const;
-	
+
 	/// Return size file (or 0 on failure)
 	size_t sizeFile() const;
 
 	/// Return space used on disk of file (or 0 on failure)
 	size_t storage() const;
-	
+
 	FILE * filePointer() { return mFP; }
-	
+
 	static al_sec modified(std::string path) { File f(path); return f.modified(); }
 	static al_sec accessed(std::string path) { File f(path); return f.accessed(); }
 	static al_sec created(std::string path) { File f(path); return f.created(); }
@@ -166,7 +167,7 @@ protected:
 	char * mContent;
 	int mSizeBytes;
 	FILE * mFP;
-	
+
 	void freeContent();
 	void allocContent(int n);
 	void getSize();
@@ -204,7 +205,7 @@ inline void SearchPaths::addAppPaths(int argc, char * const argv[], bool recursi
 	}
 }
 
-inline void SearchPaths::addAppPaths(bool recursive) {	
+inline void SearchPaths::addAppPaths(bool recursive) {
 	char cwd[4096];
 	if(getcwd(cwd, sizeof(cwd))){
 		mAppPath = std::string(cwd) + "/";
@@ -214,7 +215,7 @@ inline void SearchPaths::addAppPaths(bool recursive) {
 
 inline void SearchPaths::addSearchPath(const std::string& src, bool recursive) {
 	std::string path=conformPath(src);
-	
+
 	// check for duplicates
 	std::list<searchpath>::iterator iter = mSearchPaths.begin();
 	while (iter != mSearchPaths.end()) {
@@ -229,7 +230,7 @@ inline void SearchPaths::addSearchPath(const std::string& src, bool recursive) {
 }
 
 inline bool SearchPaths::fileExists(const std::string& path, const std::string& name) {
-	struct stat stFileInfo; 
+	struct stat stFileInfo;
 	std::string filename(path+name);
 	return (stat((path + name).c_str(),&stFileInfo) == 0);
 }

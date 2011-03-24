@@ -115,6 +115,8 @@ ifeq ($(PLATFORM), linux)
 	ifneq ($(USING_PUREDYNE), 0)
 		CXX = gcc
 	endif
+	
+	#CXX = clang++
 
 	ifeq ($(ARCH), 32)
 		CFLAGS += -m32
