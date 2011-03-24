@@ -85,8 +85,9 @@ Packet& Packet::operator<< (const char * v){ (*mImpl) << v; return *this; }
 Packet& Packet::operator<< (const std::string& v){ (*mImpl) << v.c_str(); return *this; }
 Packet& Packet::operator<< (const Blob& v){ (*mImpl) << ::osc::Blob(v.data, v.size); return *this; }
 
-Packet& Packet::beginMessage(const std::string& addressPattern){
-	(*mImpl) << ::osc::BeginMessage(addressPattern.c_str()); return *this;
+Packet& Packet::beginMessage(const std::string& addr){
+	(*mImpl) << ::osc::BeginMessage(addr.c_str());
+	return *this;
 }
 
 Packet& Packet::endMessage(){
