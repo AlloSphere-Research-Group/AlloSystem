@@ -104,7 +104,7 @@ struct Kinect :: Impl {
 		mDepthGenerator.RegisterToNewDataAvailable(NewDepthDataAvailable, this, mDepthCallbackHandle);
 
 	}
-	
+
 	~Impl() {
 		mDepthGenerator.UnregisterFromNewDataAvailable(mDepthCallbackHandle);
 	}
@@ -142,10 +142,14 @@ struct Kinect :: Impl {
 Kinect :: Kinect(unsigned deviceID)
 :	mImpl(NULL),
 	mDepthArray(1, AlloFloat32Ty, 640, 480),
+	mRawDepthArray(1, AlloFloat32Ty, 640, 480),
+	mRealWorldArray(3, AlloFloat32Ty, 640, 480),
 	mTime(0),
 	mDepthNormalize(true),
 	mFPS(0),
-	mDeviceID(deviceID)
+	mDeviceID(deviceID),
+	mZPD(120),
+	mZPPS(0.104200)
 {}
 
 Kinect :: ~Kinect() {
@@ -155,7 +159,7 @@ Kinect :: ~Kinect() {
 void * Kinect :: getContext() {
 	Ni::get();
 	return (void *)&context;
-}	
+}
 
 bool Kinect :: start() {
 	return mThread.start(threadFunction, this);
@@ -167,6 +171,15 @@ bool Kinect :: stop() {
 	return mThread.join();
 }
 
+
+//void Kinect :: toRealWorld(unsigned count, Vec3f pos[], Vec3f res[]) const {
+//	if (mImpl) mImpl->mDepthGenerator.ConvertProjectiveToRealWorld(count, (const XnPoint3D *)pos, (XnPoint3D *)res);
+//}
+
+//void Kinect :: toProjective(unsigned count, Vec3f pos[], Vec3f res[]) const {
+//	if (mImpl) mImpl->mDepthGenerator.ConvertRealWorldToProjective(count, (const XnPoint3D *)pos, (XnPoint3D *)res);
+//}
+
 bool Kinect :: tick() {
 	if(mImpl->hasData && mImpl->getMetaData()) {
 		const XnUInt xres = mImpl->mDepthMD.XRes();
@@ -177,13 +190,21 @@ bool Kinect :: tick() {
 		const float zscale = mDepthNormalize ? 1.f/zres : 1.f;
 		const float zoffset = 0.f;
 
-		//printf("%p: %ix%ix%i, %f fps\n", this, xres, yres, (int)zres, mFPS);
+		printf("%p: %ix%ix%i, %f fps\n", this, xres, yres, (int)zres, mFPS);
 
 		// copy into Array:
 		float * optr = (float *)mDepthArray.data.ptr;
-		for (unsigned i=0; i<xres*yres; i++) {
-			*optr++ = (*pDepth++) * zscale + zoffset;
+		float * rptr = (float *)mRawDepthArray.data.ptr;
+		//for (unsigned i=0; i<xres*yres; i++) {
 
+		for (unsigned y=0; y<yres; y++) {
+			for (unsigned x=0; x<xres; x++) {
+				XnDepthPixel D = (*pDepth++);
+				*rptr++ = D;
+				*optr++ = D * zscale + zoffset;
+				//Vec3d p(toRealWorld(x, y, D));
+				//mRealWorldArray.write(p.elems, x, y);
+			}
 		}
 
 		// update FPS:
@@ -191,18 +212,19 @@ bool Kinect :: tick() {
 		al_sec dt = when - mTime;
 		mTime = when;
 		mFPS = 1./dt;
-		
+
 		// callbacks:
 		for (std::list<Callback *>::iterator it = mCallbacks.begin(); it != mCallbacks.end(); it++) {
 			(*it)->onKinectData(*this);
 		}
 	}
+
 	return true;
 }
 
 void * Kinect :: threadFunction(void * userData) {
 	Kinect& self = *(Kinect *)userData;
-	
+
 	// find the info for this device:
 	printf("started Kinect thread\n");
 	Ni::get();
@@ -215,13 +237,22 @@ void * Kinect :: threadFunction(void * userData) {
 			XnStatus s = self.mImpl->mDepthGenerator.StartGenerating();
 			if (!ok(s)) return 0;
 
+
+			//self.mImpl->mDepthGenerator.GetIntProperty("ZPD", (XnUInt64&)self.mZPD);
+			//self.mImpl->mDepthGenerator.GetRealProperty("ZPPS", self.mZPPS);
+
 			self.mTime = al_time();
 			self.mActive = true;
+
+			self.mImpl->hasData = false;
 
 			while (self.mActive && self.tick()) { al_sleep(0.010); }
 
 			ok(self.mImpl->mDepthGenerator.StopGenerating());
 		}
+
+		delete self.mImpl;
+		self.mImpl = NULL;
 	}
 	return 0;
 }

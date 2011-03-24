@@ -2,13 +2,13 @@
 #define INCLUDE_AL_NI_HPP
 
 /*
-	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
+	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS).
 	All Rights Reserved.
 
 	Permission to use, copy, modify, distribute, and distribute modified versions
 	of this software and its documentation without fee and without a signed
 	licensing agreement, is hereby granted, provided that the above copyright
-	notice, the list of contributors, this paragraph and the following two paragraphs 
+	notice, the list of contributors, this paragraph and the following two paragraphs
 	appear in all copies, modifications, and distributions.
 
 	IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
@@ -36,7 +36,7 @@ namespace al{
 class Ni {
 public:
 	static Ni& get();
-	
+
 	void listDevices();
 
 protected:
@@ -46,33 +46,54 @@ protected:
 
 class Kinect {
 public:
-	
+
 	class Callback {
 	public:
 		virtual ~Callback() {}
 		virtual void onKinectData(Kinect& k) = 0;
 	};
-	
+
 	Kinect(unsigned deviceID);
 	~Kinect();
-	
+
 	bool start();
 	bool stop();
-	
+
 	// 640x480, float32, 1 component
 	Array& depthArray() { return mDepthArray; }
+	Array& rawDepthArray() { return mRawDepthArray; }
+	Array& realWorldArray() { return mRealWorldArray; }
 	double fps() const { return mFPS; }
-	
+
 	void add(Callback * cb) {
 		mCallbacks.push_back(cb);
 	}
-	
+
 	static void * getContext();
+
+	// these values are populated when the camera is initialized:
+	// focal length in mm (Zero Plane Distance)
+	uint64_t zpd() const { return mZPD; }
+	// pixel size in mm (at Zero Plane)
+	double zpps() const { return mZPPS; }
+
+	// from raw depth in mm:
+	Vec3d toRealWorld(int u, int v, int depth) {
+		const double meters = depth * 0.001;
+		const double metersPerPixel = meters * 2. * mZPPS / mZPD;
+		return Vec3d(
+			(u-320) * metersPerPixel,
+			(v-240) * metersPerPixel,
+			meters
+		);
+	}
 
 protected:
 	class Impl;
 	Impl * mImpl;
 	Array mDepthArray;
+	Array mRawDepthArray;
+	Array mRealWorldArray;
 	al_sec mTime;
 	double mFPS;
 	bool mDepthNormalize;
@@ -80,11 +101,14 @@ protected:
 	Thread mThread;
 	std::list<Callback *> mCallbacks;
 	unsigned mDeviceID;
-	
+
+	uint64_t mZPD;
+	double mZPPS;
+
 	static void * threadFunction(void * userData);
 	bool tick();
-	
-	
+
+
 };
 
 } // al::

@@ -16,7 +16,7 @@ inline int toCV(AlloTy type, uint8_t components);
 // sets the AlloTy and components fields in an AlloArrayHeader
 inline void fromCV(AlloArrayHeader hdr, int CV_TYPE);
 
-/// creates a cv::Mat which directly uses an Array's data (no copying) 
+/// creates a cv::Mat which directly uses an Array's data (no copying)
 /// This implies that no memory management will be performed by OpenCV.
 /// To copy the data (to persist beyond the Array), call clone() on the result.
 inline CvMat toCV(const Array& arr) {
@@ -28,10 +28,10 @@ inline CvMat toCV(const Array& arr) {
 //		sizes[i] = arr.header.dim[i];
 //	}
 //	return CvMat(
-//		arr.header.dimcount, 
-//		sizes, 
-//		toCV(arr.header.type, arr.header.components), 
-//		arr.data.ptr, 
+//		arr.header.dimcount,
+//		sizes,
+//		toCV(arr.header.type, arr.header.components),
+//		arr.data.ptr,
 //		steps
 //	);
 
@@ -45,9 +45,9 @@ inline CvMat toCV(const Array& arr) {
 //inline void fromCV(Array& arr, const cv::Mat& mat, bool copyData=true) {
 //	AlloArrayHeader hdr;
 //	cv::Size size = mat.size();
-//	
+//
 //	fromCV(hdr, mat.type());
-//	
+//
 //	arr.format(hdr); // allocates.
 //	arr.data.ptr = (char *)mat.ptr();
 //}
@@ -116,37 +116,37 @@ inline void fromCV(AlloArrayHeader hdr, int CV_TYPE) {
 		case CV_8UC2: hdr.type = AlloUInt8Ty;	hdr.components = 2;	break;
 		case CV_8UC3: hdr.type = AlloUInt8Ty;	hdr.components = 3;	break;
 		case CV_8UC4: hdr.type = AlloUInt8Ty;	hdr.components = 4;	break;
-		
+
 		case CV_16UC1: hdr.type = AlloUInt16Ty;	hdr.components = 1;	break;
 		case CV_16UC2: hdr.type = AlloUInt16Ty;	hdr.components = 2;	break;
 		case CV_16UC3: hdr.type = AlloUInt16Ty;	hdr.components = 3;	break;
 		case CV_16UC4: hdr.type = AlloUInt16Ty;	hdr.components = 4;	break;
-		
+
 		case CV_8SC1: hdr.type = AlloSInt8Ty;	hdr.components = 1;	break;
 		case CV_8SC2: hdr.type = AlloSInt8Ty;	hdr.components = 2;	break;
 		case CV_8SC3: hdr.type = AlloSInt8Ty;	hdr.components = 3;	break;
 		case CV_8SC4: hdr.type = AlloSInt8Ty;	hdr.components = 4;	break;
-		
+
 		case CV_16SC1: hdr.type = AlloSInt16Ty;	hdr.components = 1;	break;
 		case CV_16SC2: hdr.type = AlloSInt16Ty;	hdr.components = 2;	break;
 		case CV_16SC3: hdr.type = AlloSInt16Ty;	hdr.components = 3;	break;
 		case CV_16SC4: hdr.type = AlloSInt16Ty;	hdr.components = 4;	break;
-		
+
 		case CV_32SC1: hdr.type = AlloSInt32Ty;	hdr.components = 1;	break;
 		case CV_32SC2: hdr.type = AlloSInt32Ty;	hdr.components = 2;	break;
 		case CV_32SC3: hdr.type = AlloSInt32Ty;	hdr.components = 3;	break;
 		case CV_32SC4: hdr.type = AlloSInt32Ty;	hdr.components = 4;	break;
-		
+
 		case CV_32FC1: hdr.type = AlloFloat32Ty;	hdr.components = 1;	break;
 		case CV_32FC2: hdr.type = AlloFloat32Ty;	hdr.components = 2;	break;
 		case CV_32FC3: hdr.type = AlloFloat32Ty;	hdr.components = 3;	break;
 		case CV_32FC4: hdr.type = AlloFloat32Ty;	hdr.components = 4;	break;
-		
+
 		case CV_64FC1: hdr.type = AlloFloat64Ty;	hdr.components = 1;	break;
 		case CV_64FC2: hdr.type = AlloFloat64Ty;	hdr.components = 2;	break;
 		case CV_64FC3: hdr.type = AlloFloat64Ty;	hdr.components = 3;	break;
 		case CV_64FC4: hdr.type = AlloFloat64Ty;	hdr.components = 4;	break;
-		
+
 		default:
 			break;
 	}
