@@ -1,13 +1,10 @@
 =======================
 DEPENDENCY BUILD NOTES
 =======================
-
-TODO: put apt-get command line here (for libapr, libportaudio, llvm/clang2.7 etc.
-
 allocore:
 	g++
 	libapr1-dev
-	glew-dev
+	libglew-dev
 	libglut3-dev
 	portaudio19-dev
 	libjack-dev
@@ -16,6 +13,19 @@ alloclang:
 	clang
 
 
+Installation Using apt-get
+--------------------------
+First resynchronize the package index files from their sources by running
+
+	sudo apt-get update
+
+Then for each package listed run
+
+	sudo apt-get install <library_name>
+
+or install all packages at once with
+
+	sudo apt-get install libapr1-dev libglew-dev libglut3-dev portaudio19-dev libjack-dev freeimage-dev
 
 
 
