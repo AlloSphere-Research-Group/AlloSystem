@@ -31,7 +31,7 @@ endif
 
 test: unitTests.cpp $(SLIB_PATH)
 #	@echo $(LINK_LIBS_FLAGS)
-	@echo LDFLAGS: $(LDFLAGS)
+#	@echo LDFLAGS: $(LDFLAGS)
 	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) -o $(BIN_DIR)unitTests
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./unitTests
