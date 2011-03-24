@@ -142,5 +142,5 @@ install: allocore
 
 
 # Build unit tests
-test: allocore
+test: allocore external
 	@$(MAKE) -C $(TEST_DIR) test
