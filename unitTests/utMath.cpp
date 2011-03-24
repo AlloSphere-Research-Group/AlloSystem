@@ -203,6 +203,28 @@ int utMath(){
 		assert(a.row(1) == Vec3d(2,5,8));
 		assert(a.row(2) == Vec3d(3,6,9));
 
+		// test special operations
+		{
+			Mat<2,int> m(
+				2,4,
+				0,3
+			);
+
+			assert(determinant(m) == 6);
+			assert(invert(m));
+		}
+
+		{
+			Mat<3,int> m(
+				2,5,7,
+				0,3,6,
+				0,0,4
+			);
+
+			assert(determinant(m) == 24);
+			assert(invert(m));
+		}
+
 		#undef CHECK
 	}
 

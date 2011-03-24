@@ -176,6 +176,7 @@ public:
 		return r;
 	}
 	
+	/// Reflect vector around line
 	Vec reflect(const Vec& normal) {
 		return this - (2 * dot(normal) * normal);
 	}
@@ -304,6 +305,16 @@ public:
 
 	///
 	Mat(
+		const T& r1c1, const T& r1c2,
+		const T& r2c1, const T& r2c2
+	){
+		set(r1c1, r1c2,
+			r2c1, r2c2
+		);
+	}
+
+	///
+	Mat(
 		const T& r1c1, const T& r1c2, const T& r1c3,
 		const T& r2c1, const T& r2c2, const T& r2c3,
 		const T& r3c1, const T& r3c2, const T& r3c3
@@ -385,6 +396,16 @@ public:
 		IT(numElements){ (*this)[i*matStride+matOffset]=arr[i]; } return *this;
 	}
 
+	/// Set 2-by-2 matrix from arguments	
+	Mat& set(
+		const T& r1c1, const T& r1c2,
+		const T& r2c1, const T& r2c2
+	){
+		elems[0] = r1c1; elems[2] = r1c2;
+		elems[1] = r2c1; elems[3] = r2c2;
+		return *this;
+	}
+
 	/// Set 3-by-3 matrix from arguments	
 	Mat& set(
 		const T& r1c1, const T& r1c2, const T& r1c3,
@@ -413,7 +434,8 @@ public:
 
 	/// Set elements on diagonal to one and all others to zero
 	Mat& setIdentity(){ return (*this) = identity(); }
-	
+
+
 	/// Transpose elements
 	Mat& transpose(){
 		for(int j=0; j<N-1; ++j){	// row and column
@@ -549,7 +571,6 @@ inline Vec<N1+N2, T1> concat(const Vec<N1,T1>& a, const Vec<N2,T2>& b){
 	return r;
 }
 
-
 /// Sets r to cross product, a x b
 template <class T>
 inline void cross(Vec<3,T>& r, const Vec<3,T>& a, const Vec<3,T>& b){
@@ -558,13 +579,11 @@ inline void cross(Vec<3,T>& r, const Vec<3,T>& a, const Vec<3,T>& b){
 	r[2] = a[0]*b[1] - a[1]*b[0];
 }
 
-
 /// Returns cross product, a x b
 template <class T>
 inline Vec<3,T> cross(const Vec<3,T>& a, const Vec<3,T>& b){
 	Vec<3,T> r;	cross(r,a,b); return r;
 }
-
 
 /// Returns wedge product a ^ b
 
@@ -574,13 +593,11 @@ inline Vec<3,T> cross(const Vec<3,T>& a, const Vec<3,T>& b){
 template <int N, class T>
 Vec<N,T> operator^ (const Vec<N,T>& a, const Vec<N,T>& b);
 
-
 /// Returns wedge (cross) product of two 3-vectors
 template <class T>
 inline Vec<3,T> operator^ (const Vec<3,T>& a, const Vec<3,T>& b){
 	return cross(a,b);
 }
-
 
 /// Returns angle, in radians, between two vectors
 template <int N, class T>
@@ -588,7 +605,6 @@ static T angle(const Vec<N,T>& a, const Vec<N,T>& b){
 	using namespace std;
 	return acos(a.sgn().dot(b.sgn()));
 }
-
 
 /*! Centroid of a triangle defined by three points
 	@param p1	Point1
@@ -614,8 +630,7 @@ inline void normal(Vec<3,T>& n, const Vec<3,T>& p1, const Vec<3,T>& p2, const Ve
 	n.normalize();
 }
 
-/*! Returns vector containing element-wise minimum between two vectors
-*/
+/// Returns vector containing element-wise minimum between two vectors
 template <int N, class T>
 inline Vec<N,T> min(const Vec<N,T>& a, const Vec<N,T>& b){
 	Vec<N,T> r;
@@ -623,8 +638,7 @@ inline Vec<N,T> min(const Vec<N,T>& a, const Vec<N,T>& b){
 	return r;
 }
 
-/*! Returns vector containing element-wise maximum between two vectors
-*/
+/// Returns vector containing element-wise maximum between two vectors
 template <int N, class T>
 inline Vec<N,T> max(const Vec<N,T>& a, const Vec<N,T>& b){	
 	Vec<N,T> r;
@@ -632,6 +646,53 @@ inline Vec<N,T> max(const Vec<N,T>& a, const Vec<N,T>& b){
 	return r;
 }
 
+
+// Specialized MatN functions
+
+/// Get determinant of 2-by-2 matrix
+template <class T>
+T determinant(const Mat<2,T>& m){
+	return m(0,0)*m(1,1) - m(0,1)*m(1,0);
+}
+
+/// Get determinant of 3-by-3 matrix
+template <class T>
+T determinant(const Mat<3,T>& m){
+	return
+		m(0,0)*(m(1,1)*m(2,2) - m(1,2)*m(2,1)) +
+		m(0,1)*(m(1,2)*m(2,0) - m(1,0)*m(2,2)) +
+		m(0,2)*(m(1,0)*m(2,1) - m(1,1)*m(2,0));
+}
+
+// TODO: Determinants of higher order matrices:	
+//			Find using Gaussian elimination
+//			(product of diagonal terms in row echelon form)
+
+
+/// Invert 2-by-2 matrix, returns whether matrix was able to be inverted
+template <class T>
+bool invert(Mat<2,T>& m){
+	T det = determinant(m);
+	if(det != 0){
+		m.set(
+			 m(1,1),-m(0,1),
+			-m(1,0), m(0,0)
+		) /= det;
+		return true;
+	}
+	return false;
+}
+
+/// Invert 3-by-3 matrix, returns whether matrix was able to be inverted
+template <class T>
+bool invert(Mat<3,T>& m){
+	T det = determinant(m);
+	if(det != 0){
+		m.transpose() /= det;
+		return true;
+	}
+	return false;
+}
 
 
 // Implementation --------------------------------------------------------------
