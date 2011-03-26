@@ -190,7 +190,7 @@ bool Kinect :: tick() {
 		const float zscale = mDepthNormalize ? 1.f/zres : 1.f;
 		const float zoffset = 0.f;
 
-		printf("%p: %ix%ix%i, %f fps\n", this, xres, yres, (int)zres, mFPS);
+		//printf("%p: %ix%ix%i, %f fps\n", this, xres, yres, (int)zres, mFPS);
 
 		// copy into Array:
 		float * optr = (float *)mDepthArray.data.ptr;
@@ -202,8 +202,8 @@ bool Kinect :: tick() {
 				XnDepthPixel D = (*pDepth++);
 				*rptr++ = D;
 				*optr++ = D * zscale + zoffset;
-				//Vec3d p(toRealWorld(x, y, D));
-				//mRealWorldArray.write(p.elems, x, y);
+				Vec3d p(toRealWorld(x, y, D));
+				mRealWorldArray.write(p.elems, x, y);
 			}
 		}
 
