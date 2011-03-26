@@ -240,8 +240,8 @@ void * Kinect :: threadFunction(void * userData) {
 			if (!ok(s)) return 0;
 
 
-			//self.mImpl->mDepthGenerator.GetIntProperty("ZPD", (XnUInt64&)self.mZPD);
-			//self.mImpl->mDepthGenerator.GetRealProperty("ZPPS", self.mZPPS);
+			self.mImpl->mDepthGenerator.GetIntProperty("ZPD", (XnUInt64&)self.mZPD);
+			self.mImpl->mDepthGenerator.GetRealProperty("ZPPS", self.mZPPS);
 
 			self.mTime = al_time();
 			self.mActive = true;
