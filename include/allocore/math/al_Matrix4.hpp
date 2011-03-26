@@ -291,6 +291,7 @@ public:
 	
 	/// Computes product of matrix multiplied by column vector, r = m * vCol
 	// This is typically what is required to project a vertex through a transform
+	// For a better explanation, @see http://xkcd.com/184/ -g
 	Vec<4,T> transform(const Vec<3,T>& vCol) const {
 		Vec<4,T> r, v(vCol[0], vCol[1], vCol[2], 1.);
 		Mat<4,T>::multiply(r, *this, v);

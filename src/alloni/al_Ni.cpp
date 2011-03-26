@@ -150,7 +150,9 @@ Kinect :: Kinect(unsigned deviceID)
 	mDeviceID(deviceID),
 	mZPD(120),
 	mZPPS(0.104200)
-{}
+{
+	printf("created Kinect\n");
+}
 
 Kinect :: ~Kinect() {
 	if (mImpl) delete mImpl;
