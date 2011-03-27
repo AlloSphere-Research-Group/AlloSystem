@@ -649,6 +649,12 @@ inline Vec<N,T> max(const Vec<N,T>& a, const Vec<N,T>& b){
 
 // Specialized MatN functions
 
+// TODO: Determinants of higher order matrices:
+//			For small N, find recursively using determinants of minors
+//			For large N, find using Gaussian elimination
+//				(product of diagonal terms in row echelon form)
+//				We need a rowEchelon() method for Mat (should indicate what rows were swapped, if any)
+
 /// Get determinant of 2-by-2 matrix
 template <class T>
 T determinant(const Mat<2,T>& m){
@@ -664,10 +670,8 @@ T determinant(const Mat<3,T>& m){
 		m(0,2)*(m(1,0)*m(2,1) - m(1,1)*m(2,0));
 }
 
-// TODO: Determinants of higher order matrices:	
-//			Find using Gaussian elimination
-//			(product of diagonal terms in row echelon form)
 
+/// TODO: general Mat inversion, need general determinant first
 
 /// Invert 2-by-2 matrix, returns whether matrix was able to be inverted
 template <class T>
