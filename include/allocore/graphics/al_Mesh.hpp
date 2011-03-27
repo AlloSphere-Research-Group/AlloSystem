@@ -83,10 +83,15 @@ public:
 	template <class T>
 	void transform(const Mat<4,T>& m, int begin=0, int end=-1);
 
-	// generates smoothed normals for a set of vertices
-	// will replace any normals currently in use
-	// angle - maximum angle (in degrees) to smooth across
-	void generateNormals(float angle=360);
+	/// Generates normals for a set of vertices
+	
+	/// This method will generate a normal for each vertex in the buffer
+	/// assuming the drawing primitive is a triangle. Face normals are generated
+	/// if no indices are present, and average vertex normals are generated
+	/// if indices are present. This will replace any normals currently in use.
+	///
+	/// @param[in] normalize	whether to normalize normals
+	void generateNormals(bool normalize=true);
 
 	int primitive() const { return mPrimitive; }
 	const Buffer<Vertex>& vertices() const { return mVertices; }

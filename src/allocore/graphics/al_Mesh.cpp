@@ -91,7 +91,14 @@ public:
 	}
 };
 
-void Mesh::generateNormals(float angle) {
+
+// Old non-functional prototype...
+//	// generates smoothed normals for a set of vertices
+//	// will replace any normals currently in use
+//	// angle - maximum angle (in degrees) to smooth across
+//	void generateNormals(float angle=360);
+
+void Mesh::generateNormals(bool normalize) {
 //	/*
 //		Multi-pass algorithm:
 //			generate a list of faces (assume triangles?)
@@ -136,10 +143,12 @@ void Mesh::generateNormals(float angle) {
 	// same number of normals as vertices
 	normals().size(Nv);
 
-	for(int i=0; i<Nv; ++i) normals()[i].set(0,0,0);
 
 	// compute vertex based normals
 	if(indices().size()){
+
+		for(int i=0; i<Nv; ++i) normals()[i].set(0,0,0);
+
 		int Ni = indices().size();
 
 //		if(primitive() == TRIANGLES){
@@ -178,7 +187,7 @@ void Mesh::generateNormals(float angle) {
 //		}
 
 		// normalize the normals
-		for(int i=0; i<Nv; ++i) normals()[i].normalize();
+		if(normalize) for(int i=0; i<Nv; ++i) normals()[i].normalize();
 	}
 	
 	// compute face based normals
@@ -194,7 +203,8 @@ void Mesh::generateNormals(float angle) {
 				const Vertex& v2 = vertices()[i2];
 				const Vertex& v3 = vertices()[i3];
 				
-				Vertex vn = cross(v2-v1, v3-v1).normalize();
+				Vertex vn = cross(v2-v1, v3-v1);
+				if(normalize) vn.normalize();
 				
 				normals()[i1] = vn;
 				normals()[i2] = vn;
