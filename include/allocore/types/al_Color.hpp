@@ -91,6 +91,7 @@ struct Color{
 
 	/// Set from gray value
 	Color& operator= (float v){ return set(v); }
+	Color& operator= (double v){ return set(v); }
 
 	/// Set RGB components from HSV
 	Color& operator= (const HSV& v);
