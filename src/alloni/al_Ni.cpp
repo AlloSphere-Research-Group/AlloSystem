@@ -204,7 +204,12 @@ bool Kinect :: tick() {
 				XnDepthPixel D = (*pDepth++);
 				*rptr++ = D;
 				*optr++ = D * zscale + zoffset;
-				Vec3d p(toRealWorld(x, y, D));
+				Vec3f p(toRealWorld(x, y, D));
+				
+				if (p[0] > 10.) {
+					printf("depth %f at pixel %i,%i leads to x=%f\n", D, x, y, p[0]);
+				}
+				
 				mRealWorldArray.write(p.elems, x, y);
 			}
 		}

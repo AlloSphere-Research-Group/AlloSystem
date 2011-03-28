@@ -48,25 +48,25 @@ namespace al {
 class Array : public AlloArray {
 public:
 
-	// temporary hack because the one in al_Function gave a bad result
-	// for e.g. wrap<double>(-64.0, -32.0);
-	template<typename T>
-	static inline T wrap(T v, const T hi, const T lo){
-		if(lo == hi) return lo;
-		//if(v >= hi){
-		if(!(v < hi)){
-			T diff = hi - lo;
-			v -= diff;
-			if(!(v < hi)) v -= diff * (T)(uint32_t)((v - lo)/diff);
-		}
-		else if(v < lo){
-			T diff = hi - lo;
-			v += diff;
-			if(v < lo) v += diff * (T)(uint32_t)(((lo - v)/diff) + 1);
-			if(v==diff) return lo;
-		}
-		return v;
-	}
+//	// temporary hack because the one in al_Function gave a bad result
+//	// for e.g. wrap<double>(-64.0, -32.0);
+//	template<typename T>
+//	static inline T wrap(T v, const T hi, const T lo){
+//		if(lo == hi) return lo;
+//		//if(v >= hi){
+//		if(!(v < hi)){
+//			T diff = hi - lo;
+//			v -= diff;
+//			if(!(v < hi)) v -= diff * (T)(uint32_t)((v - lo)/diff);
+//		}
+//		else if(v < lo){
+//			T diff = hi - lo;
+//			v += diff;
+//			if(v < lo) v += diff * (T)(uint32_t)(((lo - v)/diff) + 1);
+//			if(v==diff) return lo;
+//		}
+//		return v;
+//	}
 
 	/*!
 		Returns the type enumeration ID (AlloTy) for a given type (given as template argument)
@@ -176,8 +176,8 @@ public:
 	template<typename T> void read_interp(T * val, double x, double y) const;
 	template<typename T> void read_interp(T * val, double x, double y, double z) const;
 
-	template<typename T, typename TP> void read_interp(const T* val, const Vec<2,TP> p) const { read_interp(val, p[0], p[1]); }
-	template<typename T, typename TP> void read_interp(const T* val, const Vec<3,TP> p) const { read_interp(val, p[0], p[1], p[2]); }
+	template<typename T, typename TP> void read_interp(T* val, const Vec<2,TP> p) const { read_interp(val, p[0], p[1]); }
+	template<typename T, typename TP> void read_interp(T* val, const Vec<3,TP> p) const { read_interp(val, p[0], p[1], p[2]); }
 
 	///! write plane values from val array into array (no bounds checking)
 	template<typename T> void write(const T* val, double x);
@@ -505,13 +505,13 @@ template<typename T> inline void Array::read_interp(T * val, double x, double y,
 	// for each plane of the field, do the 3D interp:
 	for (uint8_t p=0; p<header.components; p++) {
 		val[p] =	(paaa[p] * faaa) +
-		(pbaa[p] * fbaa) +
-		(paba[p] * faba) +
-		(paab[p] * faab) +
-		(pbab[p] * fbab) +
-		(pabb[p] * fabb) +
-		(pbba[p] * fbba) +
-		(pbbb[p] * fbbb);
+					(pbaa[p] * fbaa) +
+					(paba[p] * faba) +
+					(paab[p] * faab) +
+					(pbab[p] * fbab) +
+					(pabb[p] * fabb) +
+					(pbba[p] * fbba) +
+					(pbbb[p] * fbbb);
 	}
 }
 

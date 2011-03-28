@@ -107,6 +107,7 @@ inline int toCV(AlloTy type, uint8_t components) {
 			// unhandled type:
 			return 0;
 	}
+	return 0;
 }
 
 // sets the AlloTy and components fields in an AlloArrayHeader
