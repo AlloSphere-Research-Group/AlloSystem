@@ -22,6 +22,9 @@
 	<File name="../externals/gamma/src/FFT_fftpack.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="351" topLine="0" />
 	</File>
+	<File name="../include/allocv/al_OpenCV.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="1043" topLine="21" />
+	</File>
 	<File name="../include/alloni/al_Ni.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="1901" topLine="42" />
 	</File>

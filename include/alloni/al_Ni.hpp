@@ -77,11 +77,12 @@ public:
 	// pixel size in mm (at Zero Plane)
 	double zpps() const { return mZPPS; }
 
-	// from raw depth in mm:
-	Vec3d toRealWorld(int u, int v, int depth) {
+	// from pixel location & raw depth in mm
+	// returns location in meters:
+	Vec3f toRealWorld(int u, int v, int depth) {
 		const double meters = depth * 0.001;
 		const double metersPerPixel = meters * 2. * mZPPS / mZPD;
-		return Vec3d(
+		return Vec3f(
 			(u-320) * metersPerPixel,
 			(v-240) * metersPerPixel,
 			meters

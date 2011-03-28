@@ -511,6 +511,7 @@
 		<Unit filename="../include/allocore/types/al_MsgQueue.hpp" />
 		<Unit filename="../include/allocore/types/al_MsgTube.hpp" />
 		<Unit filename="../include/allocore/types/jack/ringbuffer.h" />
+		<Unit filename="../include/allocv/al_OpenCV.hpp" />
 		<Unit filename="../include/allojit/ajit.hpp" />
 		<Unit filename="../include/allojit/al_Compiler.hpp" />
 		<Unit filename="../include/allojit/al_JitFile.hpp" />
