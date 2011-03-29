@@ -13,7 +13,7 @@ Stereographic stereo;
 
 const int N = 32;
 float volData[N*N*N];
-Isosurface<float> iso;
+Isosurface iso;
 double phase=0;
 
 void drawbox() {
