@@ -394,9 +394,11 @@ public:
 			int dw = w - dimPrev.w;
 			int dh = h - dimPrev.h;
 
-			win->doResize(dw, dh);
-			win->title(win->title());	// TODO: need this hack to get title back
-										// after exiting full screen
+			if(dw || dh){
+				win->doResize(dw, dh);
+				win->title(win->title());	// TODO: need this hack to get title back
+											// after exiting full screen
+			}
 		}
 	}
 
