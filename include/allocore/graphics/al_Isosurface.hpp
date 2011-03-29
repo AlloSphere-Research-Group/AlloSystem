@@ -46,8 +46,6 @@ public:
 
 	struct EdgeVertex {
 		Vec3i pos;			// cell coordinates
-		//int idx;			// cell flattened array index
-		//int corners[2];		// edge corners as offsets from cell position
 		Vec3i corners[2];	// edge corners as offsets from cell coordinates
 		float x, y, z;		// vertex position
 		float mu;			// fraction along edge of vertex
