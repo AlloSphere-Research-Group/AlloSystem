@@ -389,16 +389,16 @@ public:
 			Window::Dim& dimCurr = win->mImpl->mDimCurr;
 
 			dimPrev = dimCurr;
-			dimCurr = win->dimensions();
+			//dimCurr = win->dimensions(); // BUG: not always new dimensions
+			dimCurr.w = w;
+			dimCurr.h = h;
 
 			int dw = w - dimPrev.w;
 			int dh = h - dimPrev.h;
 
-			if(dw || dh){
-				win->doResize(dw, dh);
-				win->title(win->title());	// TODO: need this hack to get title back
-											// after exiting full screen
-			}
+			win->doResize(dw, dh);
+			win->title(win->title());	// TODO: need this hack to get title back
+										// after exiting full screen
 		}
 	}
 
