@@ -537,7 +537,7 @@ void Isosurface::compressTriangles(){
 	// start? 
 	// For 64x64x64, this means an array of 786,432 edge indices ~= 3 MB.
 	// For 32x32x32, this means an array of  98,304 edge indices ~= 393 kB.
-	if(1){
+	if(0){
 		if(mEdgeToVertex.size() == 0) return;
 
 		// get the min/max corners of bounding box
