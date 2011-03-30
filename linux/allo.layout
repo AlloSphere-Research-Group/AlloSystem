@@ -7,11 +7,14 @@
 	<File name="../build/include/allocore/sound/al_Ambisonics.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="5660" topLine="143" />
 	</File>
-	<File name="../build/include/allocore/types/al_Array.h" open="0" top="0" tabpos="0">
-		<Cursor position="4293" topLine="111" />
+	<File name="../build/include/allocore/types/al_Array.h" open="1" top="0" tabpos="2">
+		<Cursor position="4293" topLine="160" />
 	</File>
 	<File name="../build/include/allocore/types/al_Array.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="22450" topLine="598" />
+	</File>
+	<File name="../build/include/allocore/types/al_MsgQueue.hpp" open="1" top="1" tabpos="4">
+		<Cursor position="9179" topLine="219" />
 	</File>
 	<File name="../examples/exAlloNI.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="1440" topLine="22" />
@@ -21,6 +24,9 @@
 	</File>
 	<File name="../externals/gamma/src/FFT_fftpack.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="351" topLine="0" />
+	</File>
+	<File name="../include/allocore/types/al_Array.hpp" open="1" top="0" tabpos="1">
+		<Cursor position="5048" topLine="118" />
 	</File>
 	<File name="../include/allocv/al_OpenCV.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="1043" topLine="21" />

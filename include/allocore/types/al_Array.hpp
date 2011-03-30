@@ -599,6 +599,7 @@ template<typename T> inline void Array::write_interp(const T* val, double x, dou
 		pbba[p] += tmp * fbba;
 	}
 }
+
 template<typename T> inline void Array::write_interp(const T* val, double x0, double y0, double z0) {
 	double x = wrap<double>(x0, (double)header.dim[0], 0.);
 	double y = wrap<double>(y0, (double)header.dim[1], 0.);
@@ -647,6 +648,7 @@ template<typename T> inline void Array::write_interp(const T* val, double x0, do
 		pbbb[p] += tmp * fbbb;
 	}
 }
+
 
 template<typename T> inline void Array::fill(void (*func)(T * values, double normx)) {
 	int d0 = header.dim[0];
