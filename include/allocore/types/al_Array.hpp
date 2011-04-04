@@ -151,24 +151,24 @@ public:
 	template<typename T> T * cell(int x, int y) const;
 	template<typename T> T * cell(int x, int y, int z) const;
 
-	template<typename T, typename TP> T * cell(const T* val, const Vec<2,TP> p) const { return cell(val, p[0], p[1]); }
-	template<typename T, typename TP> T * cell(const T* val, const Vec<3,TP> p) const { return cell(val, p[0], p[1], p[2]); }
+	template<typename T, typename TP> T * cell(T* val, const Vec<2,TP> p) const { return cell(val, p[0], p[1]); }
+	template<typename T, typename TP> T * cell(T* val, const Vec<3,TP> p) const { return cell(val, p[0], p[1], p[2]); }
 
 	///! read the plane values from array into val array (no bounds checking)
 	template<typename T> void read(T* val, int x) const;
 	template<typename T> void read(T* val, int x, int y) const;
 	template<typename T> void read(T* val, int x, int y, int z) const;
 
-	template<typename T, typename TP> void read(const T* val, const Vec<2,TP> p) const { read(val, p[0], p[1]); }
-	template<typename T, typename TP> void read(const T* val, const Vec<3,TP> p) const { read(val, p[0], p[1], p[2]); }
+	template<typename T, typename TP> void read(T* val, const Vec<2,TP> p) const { read(val, p[0], p[1]); }
+	template<typename T, typename TP> void read(T* val, const Vec<3,TP> p) const { read(val, p[0], p[1], p[2]); }
 
 	///! read the plane values from array into val array (wraps periodically at bounds)
 	template<typename T> void read_wrap(T* val, int x) const;
 	template<typename T> void read_wrap(T* val, int x, int y) const;
 	template<typename T> void read_wrap(T* val, int x, int y, int z) const;
 
-	template<typename T, typename TP> void read_wrap(const T* val, const Vec<2,TP> p) const { read_wrap(val, p[0], p[1]); }
-	template<typename T, typename TP> void read_wrap(const T* val, const Vec<3,TP> p) const { read_wrap(val, p[0], p[1], p[2]); }
+	template<typename T, typename TP> void read_wrap(T* val, const Vec<2,TP> p) const { read_wrap(val, p[0], p[1]); }
+	template<typename T, typename TP> void read_wrap(T* val, const Vec<3,TP> p) const { read_wrap(val, p[0], p[1], p[2]); }
 
 	///! linear interpolated lookup (virtual array index)
 	/// reads the linearly interpolated plane values into val array
