@@ -143,13 +143,14 @@ Kinect :: Kinect(unsigned deviceID)
 :	mImpl(NULL),
 	mDepthArray(1, AlloFloat32Ty, 640, 480),
 	mRawDepthArray(1, AlloFloat32Ty, 640, 480),
-	mRealWorldArray(3, AlloFloat32Ty, 640, 480),
+//	mRealWorldArray(3, AlloFloat32Ty, 640, 480),
 	mTime(0),
 	mDepthNormalize(true),
 	mFPS(0),
 	mDeviceID(deviceID),
 	mZPD(120),
-	mZPPS(0.104200)
+	mZPPS(0.104200),
+	mZRes(10001)
 {
 	printf("created Kinect\n");
 }
@@ -186,10 +187,10 @@ bool Kinect :: tick() {
 	if(mImpl->hasData && mImpl->getMetaData()) {
 		const XnUInt xres = mImpl->mDepthMD.XRes();
 		const XnUInt yres = mImpl->mDepthMD.YRes();
-		const XnDepthPixel zres = mImpl->mDepthMD.ZRes();
+		mZRes = mImpl->mDepthMD.ZRes();
 		const XnDepthPixel* pDepth = mImpl->mDepthMD.Data();
 
-		const float zscale = mDepthNormalize ? 1.f/zres : 1.f;
+		const float zscale = 1.f/mZRes;
 		const float zoffset = 0.f;
 
 		//printf("%p: %ix%ix%i, %f fps\n", this, xres, yres, (int)zres, mFPS);
@@ -204,8 +205,8 @@ bool Kinect :: tick() {
 				XnDepthPixel D = (*pDepth++);
 				*rptr++ = D;
 				*optr++ = D * zscale + zoffset;
-				Vec3f p(toRealWorld(x, y, D));
-				mRealWorldArray.write(p.elems, x, y);
+//				Vec3f p(toRealWorld(x, y, D));
+//				mRealWorldArray.write(p.elems, x, y);
 			}
 		}
 

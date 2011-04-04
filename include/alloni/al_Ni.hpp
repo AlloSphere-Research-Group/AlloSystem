@@ -62,7 +62,7 @@ public:
 	// 640x480, float32, 1 component
 	Array& depthArray() { return mDepthArray; }
 	Array& rawDepthArray() { return mRawDepthArray; }
-	Array& realWorldArray() { return mRealWorldArray; }
+//	Array& realWorldArray() { return mRealWorldArray; }
 	double fps() const { return mFPS; }
 
 	void add(Callback * cb) {
@@ -76,6 +76,8 @@ public:
 	uint64_t zpd() const { return mZPD; }
 	// pixel size in mm (at Zero Plane)
 	double zpps() const { return mZPPS; }
+	
+	uint16_t zres() const { return mZRes; }
 
 	// from pixel location & raw depth in mm
 	// returns location in meters:
@@ -94,7 +96,7 @@ protected:
 	Impl * mImpl;
 	Array mDepthArray;
 	Array mRawDepthArray;
-	Array mRealWorldArray;
+//	Array mRealWorldArray;
 	al_sec mTime;
 	double mFPS;
 	bool mDepthNormalize;
@@ -105,6 +107,7 @@ protected:
 
 	uint64_t mZPD;
 	double mZPPS;
+	uint16_t mZRes;
 
 	static void * threadFunction(void * userData);
 	bool tick();

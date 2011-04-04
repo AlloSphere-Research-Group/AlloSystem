@@ -21,7 +21,7 @@ GLenum gl_shader_type(Shader::Type v) {
 
 const char * ShaderBase::log(){
 	GLint lsize; get(GL_INFO_LOG_LENGTH, &lsize);
-	if(0==lsize) return "\0";
+	if(0==lsize) return NULL;
 	newLog(lsize);
 	glGetShaderInfoLog(id(), 4096, NULL, mLog);
 	//glGetInfoLogARB((GLhandleARB)handle(), 4096, NULL, mLog);
