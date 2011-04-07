@@ -69,7 +69,7 @@ $(EXEC_TARGETS): allocore alloutil FORCE
 #	@echo $(LINK_LIBS_FLAGS)
 	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LDFLAGS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH)
 ifneq ($(AUTORUN), 0)
-	@$(BIN_DIR)$(*F)
+	@cd $(BIN_DIR) && ./$(*F)
 endif
 
 extended: all alloni
