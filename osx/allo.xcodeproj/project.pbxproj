@@ -305,6 +305,16 @@
 		B9C972691226CE2A00091F80 /* al_OpenCLExtensions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9C972681226CE2A00091F80 /* al_OpenCLExtensions.cpp */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		168B4F0D133180520076257A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 36035DB813037E8D001E9BA9;
+			remoteInfo = "make allocore";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		3602B4D3110A67C9005DC3D0 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -427,6 +437,8 @@
 		1697337411768B040025299C /* al_Quat.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Quat.hpp; sourceTree = "<group>"; };
 		1697338611768B6E0025299C /* al_Complex.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Complex.hpp; sourceTree = "<group>"; };
 		1697339A11768CDF0025299C /* utMath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utMath.cpp; sourceTree = "<group>"; };
+		169CD07D134E4FA000D0037B /* al_Info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Info.cpp; sourceTree = "<group>"; };
+		169CD07E134E4FF500D0037B /* al_Info.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Info.hpp; sourceTree = "<group>"; };
 		16A6041B130345BB0077B460 /* frustumTesting.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = frustumTesting.cpp; sourceTree = "<group>"; };
 		16A6041C130345BB0077B460 /* isosurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = isosurface.cpp; sourceTree = "<group>"; };
 		16A6041D130345BB0077B460 /* lines.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lines.cpp; sourceTree = "<group>"; };
@@ -1809,6 +1821,7 @@
 			isa = PBXGroup;
 			children = (
 				360C23FE11E6591C000FF335 /* clangversion.cpp */,
+				169CD07D134E4FA000D0037B /* al_Info.cpp */,
 				3622BEF7116D527D00928703 /* al_MainLoop.cpp */,
 				36AED02511D4638F000D98C9 /* al_MainLoopGLUT.cpp */,
 				3622BEF9116D527D00928703 /* al_MainLoopOSX.mm */,
@@ -1882,6 +1895,7 @@
 			isa = PBXGroup;
 			children = (
 				168EC8ED1161CA2C00FCACC7 /* al_Config.h */,
+				169CD07E134E4FF500D0037B /* al_Info.hpp */,
 				168EC8EC1161CA2C00FCACC7 /* al_MainLoop.h */,
 				362FA88C11D3F5CC00AA2DC4 /* al_MainLoop.hpp */,
 				36F2568A121FBE8A008C4597 /* al_Memory.hpp */,
@@ -2307,6 +2321,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				168B4F0E133180520076257A /* PBXTargetDependency */,
 			);
 			name = exIsosurface;
 			productInstallPath = "$(HOME)/bin";
@@ -2627,6 +2642,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		168B4F0E133180520076257A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 36035DB813037E8D001E9BA9 /* make allocore */;
+			targetProxy = 168B4F0D133180520076257A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		05C93815128A158B0068F87F /* Debug */ = {
