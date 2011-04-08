@@ -205,6 +205,7 @@ public:
 	}
 
 	Packet& operator<< (int v);					///< Add integer to message
+	Packet& operator<< (unsigned v);			///< Add integer to message
 	Packet& operator<< (float v);				///< Add float to message
 	Packet& operator<< (double v);				///< Add double to message
 	Packet& operator<< (char v);				///< Add char to message
@@ -282,6 +283,7 @@ public:
 /// Socket for sending OSC packets
 class Send : public SocketSend, public Packet{
 public:
+	Send(){}
 
 	/// @param[in] port		Port number
 	/// @param[in] address	IP address
@@ -347,6 +349,7 @@ public:
 ///
 class Recv : public SocketRecv{
 public:
+	Recv(){}
 
 	/// @param[in] port		Port number
 	/// @param[in] address	IP address. If 0, will bind all network interfaces to socket.

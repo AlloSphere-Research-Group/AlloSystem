@@ -78,6 +78,7 @@ Packet::Packet(const char * contents, int size)
 Packet::~Packet(){ delete mImpl; }
 
 Packet& Packet::operator<< (int v){ (*mImpl) << (::osc::int32)v; return *this; }
+Packet& Packet::operator<< (unsigned v){ (*mImpl) << (::osc::int32)v; return *this; }
 Packet& Packet::operator<< (float v){ (*mImpl) << v; return *this; }
 Packet& Packet::operator<< (double v){ (*mImpl) << v; return *this; }
 Packet& Packet::operator<< (char v){ (*mImpl) << v; return *this; }
