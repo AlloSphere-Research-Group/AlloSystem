@@ -1,6 +1,4 @@
 #include "alloutil/al_World.hpp"
-#include "allocore/graphics/al_Isosurface.hpp"
-
 
 using namespace al;
 
