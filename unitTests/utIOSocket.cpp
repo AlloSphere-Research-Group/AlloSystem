@@ -2,6 +2,11 @@
 
 int utIOSocket(){
 
+	{
+		SocketSend s;
+		SocketRecv r;
+	}
+
 	int numTrials = 20000;
 	unsigned port = 4110;
 	int dropped = 0;
@@ -10,8 +15,7 @@ int utIOSocket(){
 	char dataRecv[sizeof dataSend];
 
 	SocketSend s(port, "localhost");
-	SocketRecv r(port, NULL, 0.1);
-
+	SocketRecv r(port, "", 0.1);
 
 	assert(s.port() == port);
 
@@ -66,6 +70,6 @@ int utIOSocket(){
 //		printf("%s\n", Socket::hostName().c_str());
 //		printf("%s\n", Socket::hostIP().c_str());
 	}
-	
+
 	return 0;
 }

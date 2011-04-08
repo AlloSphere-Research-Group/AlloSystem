@@ -89,18 +89,28 @@ namespace al{
 class Socket{
 public:
 
+	/// Returns whether socket is open
+	bool opened() const;
+
+	/// Get IP address string
+	const std::string& address() const;
+
 	/// Get port number
 	unsigned int port() const;
+
+	/// Get timeout duration, in seconds
+	al_sec timeout() const;
+
 
 	/// Close the socket
 	void close();
 
 	/// Set timeout. < 0: block forever; = 0: no blocking; > 0 block with timeout
-	/// note that setting timeout will close and re-open the socket:
+
+	/// Note that setting timeout will close and re-open the socket.
+	///
 	void timeout(al_sec v);
-	
-	/// get current timeout
-	al_sec timeout() const;
+
 
 	/// Get name of current host
 	static std::string hostName();
@@ -109,12 +119,14 @@ public:
 	static std::string hostIP();
 
 protected:
-	
+	Socket();
+
 	/// @sender: true if Socket will send
 	Socket(unsigned int port, const char * address, al_sec timeout, bool sender);
+
 	virtual ~Socket();
 
-	void open(unsigned int port, const char * address, bool sender);
+	bool open(unsigned int port, const char * address, al_sec timeout, bool sender);
 	size_t recv(char * buffer, size_t maxlen);
 	size_t send(const char * buffer, size_t len);
 
@@ -127,6 +139,7 @@ private:
 /// Socket for sending data over a network
 class SocketSend : public Socket {
 public:
+	SocketSend(){}
 
 	/// @param[in] port		Port number
 	/// @param[in] address	IP address
@@ -134,7 +147,12 @@ public:
 	SocketSend(unsigned int port, const char * address = "localhost", al_sec timeout=0)
 	:	Socket(port, address, timeout, true)
 	{}
-	
+
+	/// Open socket closing and reopening if currently open
+	bool open(unsigned int port, const char * address, al_sec timeout=0){
+		return Socket::open(port, address, timeout, true);
+	}
+
 	/// Send data over a network
 	
 	/// @param[in] buffer	The buffer of data to send
@@ -147,6 +165,7 @@ public:
 /// Socket for receiving data over a network
 class SocketRecv : public Socket {
 public:
+	SocketRecv(){}
 
 	/// @param[in] port		Port number
 	/// @param[in] address	IP address. If 0, will bind all network interfaces to socket.
@@ -154,15 +173,20 @@ public:
 	SocketRecv(unsigned int port, const char * address = 0, al_sec timeout=0)
 	:	Socket(port, address, timeout, false)
 	{}
-	
+
+	/// Open socket closing and reopening if currently open
+	bool open(unsigned int port, const char * address, al_sec timeout=0){
+		return Socket::open(port, address, timeout, false);
+	}
+
 	/// Read data from a network
-	/// returns bytes read.
-	
-	/// note: to ensure receipt of all messages in the queue, use 
-	/// while(recv()){}
-	
+
 	/// @param[in] buffer	A buffer to copy the received data into
 	/// @param[in] maxlen	The maximum length, in bytes, of data to copy
+	/// \returns bytes read
+	//
+	/// Note: to ensure receipt of all messages in the queue, use 
+	/// while(recv()){}
 	size_t recv(char * buffer, size_t maxlen){ return Socket::recv(buffer, maxlen); }
 };
 

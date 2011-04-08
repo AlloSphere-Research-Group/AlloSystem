@@ -16,11 +16,16 @@ namespace al{
 
 struct Socket::Impl : public ImplAPR {
 
+	Impl()
+	:	ImplAPR(), mPort(0), mAddress(""), mSockAddr(0), mSock(0), mSender(false)
+	{}
+
 	Impl(unsigned int port, const char * address, al_sec timeout_, bool sender)
-	:	ImplAPR(), mPort(port), mAddressString(address ? address : ""), mAddress(0), mSock(0), mSender(sender)
+	:	ImplAPR(), mPort(port), mAddress(address ? address : ""), mSockAddr(0), mSock(0), mSender(sender)
 	{
-		// opens the socket also:
-		timeout(timeout_);
+//		// opens the socket also:
+//		timeout(timeout_);
+		open(port, address, timeout_, sender);
 	}
 
 	void close(){
@@ -30,60 +35,118 @@ struct Socket::Impl : public ImplAPR {
 		}
 	}
 
-	void open(unsigned int port, std::string address, bool sender){
+	#define BAILONFAIL(func)\
+		if(APR_SUCCESS != check_apr(func)){\
+			printf("failed to create socket at %s:%i\n", address.c_str(), port);\
+			close();\
+			return false;\
+		}
 
+	bool open(unsigned int port, std::string address, al_sec timeout, bool sender){
 		close();
-
-		// TODO: check_apr results should jump to an err label and return an uninitialized socket!
 
 		/* @see http://dev.ariel-networks.com/apr/apr-tutorial/html/apr-tutorial-13.html */
 
 		mPort = port;
 		mSender = sender;
-		mAddressString = address;
-		if (APR_SUCCESS == check_apr(apr_sockaddr_info_get(&mAddress, (mAddressString[0]) ? mAddressString.c_str() : 0, APR_INET, mPort, 0, mPool))) {
-			check_apr(apr_socket_create(&mSock, mAddress->family, SOCK_DGRAM, APR_PROTO_UDP, mPool));
+		mAddress = address;
 
-			if(mSock){
-				// Assign address to socket. If TCP, establish new connection.
-				if(mSender)	check_apr(apr_socket_connect(mSock, mAddress));
-				else		check_apr(apr_socket_bind(mSock, mAddress));
-			}
-		} else {
-			printf("failed to create socket at %s:%i\n", address.c_str(), port);
-		}
-	}
-	
-	// note that setting timeout will close and re-open the socket:
-	void timeout(al_sec v){
-		open(mPort, mAddressString, mSender);
-		
-		if (opened()) {
-			if(v == 0){
+		BAILONFAIL(
+			apr_sockaddr_info_get(&mSockAddr, mAddress[0] ? mAddress.c_str() : 0, APR_INET, mPort, 0, mPool)
+		);
+
+		BAILONFAIL(apr_socket_create(&mSock, mSockAddr->family, SOCK_DGRAM, APR_PROTO_UDP, mPool));
+
+		if(mSock){
+			// Assign address to socket. If TCP, establish new connection.
+			if(mSender){	BAILONFAIL(apr_socket_connect(mSock, mSockAddr)); }
+			else{			BAILONFAIL(apr_socket_bind(mSock, mSockAddr)); }
+
+			// Set timeout behavior
+			if(timeout == 0){
 				// non-blocking:			APR_SO_NONBLOCK==1(on),  then timeout=0
-				check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 1));
-				check_apr(apr_socket_timeout_set(mSock, 0));
+				BAILONFAIL(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 1));
+				BAILONFAIL(apr_socket_timeout_set(mSock, 0));
 			}
-			else if(v > 0){
+			else if(timeout > 0){
 				// blocking-with-timeout:	APR_SO_NONBLOCK==0(off), then timeout>0
-				check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 0));
-				check_apr(apr_socket_timeout_set(mSock, (apr_interval_time_t)(v * 1.0e6)));
+				BAILONFAIL(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 0));
+				BAILONFAIL(apr_socket_timeout_set(mSock, (apr_interval_time_t)(timeout * 1.0e6)));
 
 			}
 			else{
 				// blocking-forever:		APR_SO_NONBLOCK==0(off), then timeout<0
-				check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 0));
-				check_apr(apr_socket_timeout_set(mSock, -1));
+				BAILONFAIL(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 0));
+				BAILONFAIL(apr_socket_timeout_set(mSock, -1));
 			}
+			
+			mTimeout = timeout;
 		}
-		mTimeout = v;
+
+		return true;
 	}
+
+	// note that setting timeout will close and re-open the socket:
+	void timeout(al_sec v){
+		open(mPort, mAddress, v, mSender);
+	}
+
+//	bool open(unsigned int port, std::string address, bool sender){
+//
+//		close();
+//
+//		// TODO: check_apr results should jump to an err label and return an uninitialized socket!
+//
+//		/* @see http://dev.ariel-networks.com/apr/apr-tutorial/html/apr-tutorial-13.html */
+//
+//		mPort = port;
+//		mSender = sender;
+//		mAddress = address;
+//		if (APR_SUCCESS == check_apr(apr_sockaddr_info_get(&mSockAddr, mAddress[0] ? mAddress.c_str() : 0, APR_INET, mPort, 0, mPool))) {
+//			check_apr(apr_socket_create(&mSock, mSockAddr->family, SOCK_DGRAM, APR_PROTO_UDP, mPool));
+//
+//			if(mSock){
+//				// Assign address to socket. If TCP, establish new connection.
+//				if(mSender)	check_apr(apr_socket_connect(mSock, mSockAddr));
+//				else		check_apr(apr_socket_bind(mSock, mSockAddr));
+//				return true;
+//			}
+//		} else {
+//			printf("failed to create socket at %s:%i\n", address.c_str(), port);
+//		}
+//		return false;
+//	}
+//	
+//	// note that setting timeout will close and re-open the socket:
+//	void timeout(al_sec v){
+//		open(mPort, mAddress, mSender);
+//		
+//		if (opened()) {
+//			if(v == 0){
+//				// non-blocking:			APR_SO_NONBLOCK==1(on),  then timeout=0
+//				check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 1));
+//				check_apr(apr_socket_timeout_set(mSock, 0));
+//			}
+//			else if(v > 0){
+//				// blocking-with-timeout:	APR_SO_NONBLOCK==0(off), then timeout>0
+//				check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 0));
+//				check_apr(apr_socket_timeout_set(mSock, (apr_interval_time_t)(v * 1.0e6)));
+//
+//			}
+//			else{
+//				// blocking-forever:		APR_SO_NONBLOCK==0(off), then timeout<0
+//				check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 0));
+//				check_apr(apr_socket_timeout_set(mSock, -1));
+//			}
+//		}
+//		mTimeout = v;
+//	}
 	
-	bool opened(){ return 0!=mSock; }
+	bool opened() const { return 0!=mSock; }
 
 	unsigned int mPort;
-	std::string mAddressString;
-	apr_sockaddr_t * mAddress;
+	std::string mAddress;
+	apr_sockaddr_t * mSockAddr;
 	apr_socket_t * mSock;
 	al_sec mTimeout;
 	bool mSender;
@@ -91,6 +154,11 @@ struct Socket::Impl : public ImplAPR {
 
 
 
+Socket::Socket()
+:	mImpl(0)
+{
+	mImpl = new Impl;
+}
 
 Socket::Socket(unsigned int port, const char * address, al_sec timeout, bool sender)
 : mImpl(0)
@@ -103,19 +171,24 @@ Socket::~Socket(){
 	delete mImpl;
 }
 
-void Socket::close(){ mImpl->close(); }
+const std::string& Socket::address() const { return mImpl->mAddress; }
 
-void Socket::open(unsigned int port, const char * address, bool sender){
-	mImpl->open(port, address, sender);
-}
+bool Socket::opened() const { return mImpl->opened(); }
 
 unsigned int Socket::port() const { return mImpl->mPort; }
 
-void Socket::timeout(al_sec v){ mImpl->timeout(v); }
+al_sec Socket::timeout() const { return mImpl->mTimeout; }
 
-al_sec Socket::timeout() const {
-	return mImpl->mTimeout;
+
+void Socket::close(){ mImpl->close(); }
+
+bool Socket::open(unsigned int port, const char * address, al_sec timeout, bool sender){
+	return mImpl->open(port, address, timeout, sender);
 }
+
+
+
+void Socket::timeout(al_sec v){ mImpl->timeout(v); }
 
 size_t Socket::recv(char * buffer, size_t maxlen) {
 	apr_size_t len = maxlen;
