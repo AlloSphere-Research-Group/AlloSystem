@@ -106,6 +106,31 @@ struct GLVWindowControl : public GLVControl, public WindowEventHandler {
 	//virtual bool onVisibility(bool v){ return true; }
 };
 
+
+/// Pose GLV model
+struct PoseModel : public glv::Model{
+	PoseModel(Pose& p): pose(p){}
+
+	virtual const glv::Data& getData(glv::Data& d) const {
+		d.resize(glv::Data::FLOAT, 7);
+		d.assignFromArray(pose.pos().elems, 3);
+		d.assignFromArray(&pose.quat()[0], 4, 1, 3);
+//		double a[4];
+//		pose.quat().toAxisAngle(a[0], a[1],a[2],a[3]);
+//		d.assignFromArray(a, 4, 1, 3);
+		return d;
+	}
+
+	virtual void setData(const glv::Data& d){
+		pose.pos(d.at<float>(0), d.at<float>(1), d.at<float>(2));
+		pose.quat().set(d.at<float>(3), d.at<float>(4), d.at<float>(5), d.at<float>(6));
+//		pose.quat().fromAxisAngle(d.at<float>(3), d.at<float>(4), d.at<float>(5), d.at<float>(6));
+	}
+
+	Pose& pose;
+};
+
+
 } // al::
 
 #endif
