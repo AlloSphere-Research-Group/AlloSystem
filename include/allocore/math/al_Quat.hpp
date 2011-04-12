@@ -129,7 +129,6 @@ public:
 	Quat& fromAxisAngle(T angle, T x1, T y1, T z1);
 
 	/// Set as versor rotated by angle around unit vector
-	/// axis MUST BE A UNIT VECTOR
 	Quat& fromAxisAngle(T angle, const Vec<3,T>& axis);
 
 	/// Set as versor rotated by angle around x-axis
@@ -177,7 +176,7 @@ public:
 
 	/// Convert to axis-angle form
 	void toAxisAngle(T& angle, T& ax, T& ay, T& az) const;
-	void toAxisAngle(T& angle, Vec<3,T> axis) const {
+	void toAxisAngle(T& angle, Vec<3,T>& axis) const {
 		toAxisAngle(angle, axis[0], axis[1], axis[2]);
 	}
 
