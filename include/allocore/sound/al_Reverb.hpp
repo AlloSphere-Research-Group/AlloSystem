@@ -1,81 +1,9 @@
 #ifndef INCLUDE_AL_REVERB_HPP
 #define INCLUDE_AL_REVERB_HPP
 
-#include <vector>
+#include <stdlib.h>
 
 namespace al{
-
-namespace{
-
-//template <class T, class Alloc=std::allocator<T> >
-//class DelayLine : public std::vector<T, Alloc>{
-//public:
-//	DelayLine(int size): Base(size), mPos(0){}
-//	
-//	/// Write value to delay
-//	void write(const T& v){
-//		(*this)[pos()] = v;
-//		++mPos; if(mPos >= size()) mPos=0;
-//	}
-//
-//	/// Read value at delay i
-//	const T& read(int i) const {
-//		int ind = pos()-i;
-//		if(ind < 0) ind += size();
-//		//else if(ind >= size()) ind -= size();
-//		return (*this)[ind];
-//	}
-//	
-//	/// Write new value and return oldest value
-//	T operator()(const T& v){
-//		T r = (*this)[pos()];
-//		write(v);
-//		return r;
-//	}
-//	
-//	const T& back() const { return (*this)[indexBack()]; }
-//	
-//	T comb(const T& v, const T& ffd, const T& fbk){
-//		T d = (*this)[pos()];
-//		T r = v + d*fbk;
-//		write(r);
-//		return d + r*ffd;
-//	}
-//	
-//	/// Get absolute index of write tap
-//	int pos() const { return mPos; }
-//	
-//	int size() const { return Base::size(); }
-//
-//	int indexBack() const {
-//		int i = pos()+1;
-//		return (i < size()) ? i : 0;
-//	}
-//
-//	void resize(int n){
-//		Base::resize(n);
-//		if(mPos >= n) mPos = mPos % n;
-//	}
-//
-//protected:
-//	typedef std::vector<T, Alloc> Base;
-//	int mPos;
-//};
-//
-//
-//template <class T>
-//class OnePole{
-//public:
-//	OnePole(): mO1(0), mA0(1), mB1(0){}
-//	void damping(const T& v){ mB1=v; mA0=T(1)-v; }
-//	T operator()(const T& i0){ return mO1 = mO1*mB1 + i0*mA0; }
-//protected:
-//	T mO1;
-//	T mA0, mB1;
-//};
-}
-
-
 
 /// Plate reverberator
 
@@ -83,7 +11,7 @@ namespace{
 /// Dattorro, J. (1997). Effect design: Part 1: Reverberator and other filters. 
 /// Journal of the Audio Engineering Society, 45(9):660–684.
 /// https://ccrma.stanford.edu/~dattorro/EffectDesignPart1.pdf
-template <class T, class A=std::allocator<T> >
+template <class T>
 class Reverb{
 public:
 
@@ -178,70 +106,81 @@ public:
 
 protected:
 
-class DelayLine : public std::vector<T, A>{
-public:
-	DelayLine(int size): Base(size), mPos(0){}
-	
-	/// Write value to delay
-	void write(const T& v){
-		(*this)[pos()] = v;
-		++mPos; if(mPos >= size()) mPos=0;
-	}
+	class DelayLine {
+	public:
+		DelayLine(int size): mPos(0){ resize(size); }
 
-	/// Read value at delay i
-	const T& read(int i) const {
-		int ind = pos()-i;
-		if(ind < 0) ind += size();
-		//else if(ind >= size()) ind -= size();
-		return (*this)[ind];
-	}
-	
-	/// Write new value and return oldest value
-	T operator()(const T& v){
-		T r = (*this)[pos()];
-		write(v);
-		return r;
-	}
-	
-	const T& back() const { return (*this)[indexBack()]; }
-	
-	T comb(const T& v, const T& ffd, const T& fbk){
-		T d = (*this)[pos()];
-		T r = v + d*fbk;
-		write(r);
-		return d + r*ffd;
-	}
-	
-	/// Get absolute index of write tap
-	int pos() const { return mPos; }
-	
-	int size() const { return Base::size(); }
+		~DelayLine(){ deleteBuf(); }
 
-	int indexBack() const {
-		int i = pos()+1;
-		return (i < size()) ? i : 0;
-	}
+		/// Read value at delay i
+		const T& read(int i) const {
+			int ind = pos()-i;
+			if(ind < 0) ind += size();
+			//else if(ind >= size()) ind -= size();
+			return mBuf[ind];
+		}
+		
+		/// Write value to delay
+		void write(const T& v){
+			mBuf[pos()] = v;
+			++mPos; if(mPos >= size()) mPos=0;
+		}
 
-	void resize(int n){
-		Base::resize(n);
-		if(mPos >= n) mPos = mPos % n;
-	}
 
-protected:
-	typedef std::vector<T, A> Base;
-	int mPos;
-};
+		const T& back() const { return mBuf[indexBack()]; }
 
-class OnePole{
-public:
-	OnePole(): mO1(0), mA0(1), mB1(0){}
-	void damping(const T& v){ mB1=v; mA0=T(1)-v; }
-	T operator()(const T& i0){ return mO1 = mO1*mB1 + i0*mA0; }
-protected:
-	T mO1;
-	T mA0, mB1;
-};
+		int indexBack() const {
+			int i = pos()+1;
+			return (i < size()) ? i : 0;
+		}
 
+		/// Get absolute index of write tap
+		int pos() const { return mPos; }
+		
+		int size() const { return mSize; }
+
+
+		
+		/// Write new value and return oldest value
+		T operator()(const T& v){
+			T r = mBuf[pos()];
+			write(v);
+			return r;
+		}
+		
+		T comb(const T& v, const T& ffd, const T& fbk){
+			T d = mBuf[pos()];
+			T r = v + d*fbk;
+			write(r);
+			return d + r*ffd;
+		}
+
+		void resize(int n){
+			if(n != mSize){
+				deleteBuf();
+				mBuf = (T*)::calloc(n, sizeof(T));
+				mSize = n;
+				if(mPos >= n) mPos = mPos % n;
+			}
+		}
+
+	protected:
+		void deleteBuf(){ if(mBuf) ::free(mBuf); mBuf=0; }
+
+		int mPos;
+		int mSize;
+		T * mBuf;
+	};
+
+	class OnePole{
+	public:
+		OnePole(): mO1(0), mA0(1), mB1(0){}
+		void damping(const T& v){ mB1=v; mA0=T(1)-v; }
+		T operator()(const T& i0){ return mO1 = mO1*mB1 + i0*mA0; }
+	protected:
+		T mO1;
+		T mA0, mB1;
+	};
 
 	T mDfIn1, mDfIn2, mDfDcy1, mDfDcy2, mDecay;
 	DelayLine mPreDelay;
