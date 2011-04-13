@@ -62,9 +62,15 @@ public:
 		virtual ~VertexAction(){}
 		virtual void operator()(const Isosurface::EdgeVertex& v, Isosurface& s) = 0;
 	};
+	
+	struct NoVertexAction : public VertexAction{
+		virtual void operator()(const EdgeVertex& v, Isosurface& s){}
+	};
+	
+	static NoVertexAction noVertexAction;
 
 
-	Isosurface(float level=0, VertexAction * a=0);
+	Isosurface(float level=0, VertexAction& a = noVertexAction);
 
 	virtual ~Isosurface();
 

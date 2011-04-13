@@ -326,8 +326,10 @@ static const char sTriTable[256][16] = {
 //	}
 
 
-Isosurface::Isosurface(float lev, VertexAction * va)
-:	mIsolevel(lev), mVertexAction(va), mComputeNormals(true), mNormalize(true)
+Isosurface::NoVertexAction Isosurface::noVertexAction;
+
+Isosurface::Isosurface(float lev, VertexAction& va)
+:	mIsolevel(lev), mVertexAction(&va), mComputeNormals(true), mNormalize(true)
 {
 	clear();
 }
@@ -437,7 +439,7 @@ void Isosurface::addEdgeVertex(int ix, int iy, int iz, int cellID, int edgeNo, c
 
 		Mesh::vertex(ev.x, ev.y, ev.z);
 
-		if(mVertexAction) (*mVertexAction)(ev, *this);
+		(*mVertexAction)(ev, *this);
 
 //		if(cols) Mesh::color(cols[ev.i0] + ev.mu * (cols[ev.i1] - cols[ev.i0]));
 
