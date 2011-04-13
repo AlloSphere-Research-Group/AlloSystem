@@ -1,6 +1,9 @@
 #include "utAllocore.h"
 
 int utFile() {
+
+	// static functions
+	assert(fileExists("./"));
 	
 	{
 		const char * path = "utFile.txt";
@@ -12,7 +15,7 @@ int utFile() {
 
 		assert(f.open());
 		assert(f.opened());
-		assert(File::exists(path));
+		assert(fileExists(path));
 
 		assert(
 			f.write(text, strlen(text))
@@ -22,7 +25,7 @@ int utFile() {
 
 		f.close();
 		assert(!f.opened());
-		assert(File::exists(path));
+		assert(fileExists(path));
 
 
 		// read data

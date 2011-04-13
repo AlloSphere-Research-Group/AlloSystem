@@ -162,9 +162,6 @@ int File::write(const std::string& path, const void * v, int size, int items){
 }
 
 
-bool File::exists(const std::string& path){ File f(path, "r"); return f.open(); }
-
-
 al_sec File :: modified() const {
 	if (mImpl->getInfo(path().c_str(), APR_FINFO_MTIME)) {
 		return 1.0e-6 * al_sec(mImpl->finfo.mtime);

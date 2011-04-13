@@ -22,6 +22,11 @@ namespace al{
 /// Strips a qualified path to a file (src) into a path to the containing folder (dst)
 //void path2dir(char* dst, const char* src);
 
+
+/// Returns whether a file or directory exists
+bool fileExists(const std::string& path);
+
+
 /// a pair of path (folder/directory) and filename
 class FilePath {
 public:
@@ -133,9 +138,6 @@ public:
 	/// Returns size, in bytes, of file contents
 	int size() const { return mSizeBytes; }
 
-	/// Returns whether file exists
-	static bool exists(const std::string& path);
-
 	/// Return modification time of file (or 0 on failure) as number of seconds since 00:00:00 january 1, 1970 UTC
 	al_sec modified() const;
 
@@ -176,6 +178,11 @@ protected:
 
 
 //// INLINE IMPLEMENTATION ////
+
+inline bool fileExists(const std::string& path){
+	struct stat s;
+	return ::stat(path.c_str(), &s) == 0;
+}
 
 inline std::string SearchPaths::stripFileName(const std::string& src) {
 	std::string filepath(src);
@@ -230,9 +237,7 @@ inline void SearchPaths::addSearchPath(const std::string& src, bool recursive) {
 }
 
 inline bool SearchPaths::fileExists(const std::string& path, const std::string& name) {
-	struct stat stFileInfo;
-	std::string filename(path+name);
-	return (stat((path + name).c_str(),&stFileInfo) == 0);
+	return al::fileExists(path+name);
 }
 
 } // al::
