@@ -68,6 +68,9 @@ public:
 	///
 	int testBox(const Vec<3,T>& xyz, const Vec<3,T>& dim) const;
 
+	/// Returns center of frustum
+	Vec<3,T> center() const { return (ntl+ntr+nbl+nbr+ftl+ftr+fbl+fbr)*0.125; }
+
 	/// Compute planes based on frustum corners (planes face to inside)
 	void computePlanesLH();
 
