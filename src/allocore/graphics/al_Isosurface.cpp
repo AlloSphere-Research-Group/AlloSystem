@@ -514,14 +514,14 @@ void Isosurface::end(){
 }
 
 
-int Isosurface::volumeLengths(double& volLengthX, double& volLengthY, double& volLengthZ) const {
+bool Isosurface::volumeLengths(double& volLengthX, double& volLengthY, double& volLengthZ) const {
 	if(validSurface()){
 		volLengthX = mL[0]*(mNF[0]-1);
 		volLengthY = mL[1]*(mNF[1]-1);
 		volLengthZ = mL[2]*(mNF[2]-1);
-		return 1;
+		return true;
 	}
-	return -1;
+	return false;
 }
 
 

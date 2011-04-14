@@ -70,22 +70,26 @@ public:
 	static NoVertexAction noVertexAction;
 
 
-	Isosurface(float level=0, VertexAction& a = noVertexAction);
+	/// @param[in] level	value to construct surface on
+	/// @param[in] action	user defined functor called upon adding a new edge vertex
+	Isosurface(float level=0, VertexAction& action = noVertexAction);
 
 	virtual ~Isosurface();
 
-	int fieldDim(int i){ return mNF[i]; }
+	/// Get a field dimension
+	int fieldDim(int i) const { return mNF[i]; }
 
 	/// Get isolevel
 	float level() const { return mIsolevel; }
 
-	/// Returns true if a valid surface has been generated.
+	/// Returns true if a valid surface has been generated
 	bool validSurface() const { return mValidSurface; }
 
-	/// Returns the length, width, and height of the volume in which the
-	/// isosurface in enclosed in.  Returns -1 if the surface is not
-	/// valid.
-	int volumeLengths(double& volLengthX, double& volLengthY, double& volLengthZ) const;
+	/// Gets the length, width, and height of the isosurface volume
+	
+	/// \returns true upon success and false if the surface is not valid
+	///
+	bool volumeLengths(double& volLengthX, double& volLengthY, double& volLengthZ) const;
 
 	// Get unique identifier of 3d position indices
 	int posID(int ix, int iy, int iz) const { return ix + mNF[0] * (iy + mNF[1] * iz); }
