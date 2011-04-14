@@ -434,21 +434,33 @@ inline Quat<T>& Quat<T> :: fromMatrixTransposed(const T * m) {
 	return *this;
 }
 
-
 template<typename T>
 inline void Quat<T> :: toAxisAngle(T& aa, T& ax, T& ay, T& az) const {
 	T unit = w*w;
-	if(unit > QUAT_ACCURACY_MAX || unit < QUAT_ACCURACY_MIN){
-		T invSinAngle = 1.f/sqrt(1.f - unit);
-		aa = acosf(w) * halfRadToDeg();
+	if(unit < QUAT_ACCURACY_MIN){ // |cos x| must always be less than or equal to 1!
+		T invSinAngle = 1./sqrt(1. - unit); // = 1/sqrt(1 - cos^2(theta/2))
+
+		aa = ::acos(w) * halfRadToDeg();
 		ax = x * invSinAngle;
 		ay = y * invSinAngle;
 		az = z * invSinAngle;
 	} else {
-		aa = 0.f;
-		ax = x;
-		ay = y;
-		az = z;
+		aa = 0;
+		if(x == T(0) && y == T(0) && z == T(0)){
+			// axes are 0,0,0, change to a default:
+			ax = T(1);
+			ay = T(0);
+			az = T(0);
+		}
+		else{
+			// for small angles, axis is roughly equal to i,j,k components
+			// axes are close to zero, should be normalized:
+			Vec<3,T> v(x, y, z);
+			v.normalize();
+			ax = v[0];
+			ay = v[1];
+			az = v[2];
+		}
 	}
 }
 
