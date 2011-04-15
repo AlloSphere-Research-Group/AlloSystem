@@ -52,6 +52,7 @@
 
 namespace al{
 
+/// Context for signaling resource changes to GPU objects
 class GPUContext {
 public:	
 	GPUContext();
@@ -65,6 +66,7 @@ public:
 protected:
 	int mContextID;
 };
+
 
 /// Base class for allocated resources on the GPU
 class GPUObject{
