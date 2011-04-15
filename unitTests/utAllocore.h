@@ -1,6 +1,15 @@
 #ifndef INCLUDE_UT_ALLOCORE_H
 #define INCLUDE_UT_ALLOCORE_H
 
+/*
+AlloCore unit tests
+
+TODO:
+Window
+	- opening and closing (check that onCreate, onDestroy called properly)
+	- fullscreen (check correctness of arguments passed to onResize)
+*/
+
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>

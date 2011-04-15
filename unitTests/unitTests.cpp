@@ -1,7 +1,6 @@
 #include "utAllocore.h"
 
 SearchPaths searchpaths;
-
 SearchPaths& getSearchPaths() { return searchpaths; }
 
 int main (int argc, char * const argv[]) {
