@@ -2876,7 +2876,7 @@
 				PRODUCT_NAME = $TARGET_NAME;
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
-				SYMROOT = ../build;
+				SYMROOT = ../build/bin;
 				USER_HEADER_SEARCH_PATHS = ../include;
 			};
 			name = Debug;
@@ -2933,7 +2933,7 @@
 				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = debugging;
-				SYMROOT = ../build;
+				SYMROOT = ../build/bin;
 				USER_HEADER_SEARCH_PATHS = ../include;
 			};
 			name = Release;
@@ -3416,7 +3416,7 @@
 					"-DAPR_STRICT",
 				);
 				PRODUCT_NAME = $TARGET_NAME;
-				SYMROOT = ../../build;
+				SYMROOT = ../build/bin;
 				USER_HEADER_SEARCH_PATHS = $inherited;
 			};
 			name = Debug;
@@ -3438,7 +3438,7 @@
 					"-DAPR_STRICT",
 				);
 				PRODUCT_NAME = $TARGET_NAME;
-				SYMROOT = ../../build;
+				SYMROOT = ../build/bin;
 				USER_HEADER_SEARCH_PATHS = $inherited;
 			};
 			name = Release;
