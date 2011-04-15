@@ -101,6 +101,7 @@ protected:
 //};
 
 
+/// A window with one or more Viewpoints
 class ViewpointWindow : public Window {
 public:
 	using Window::add;
@@ -158,11 +159,19 @@ private:
 
 class World {
 public:
-	
-	World(const std::string& name="")
+
+	typedef std::vector<Actor *> Actors;
+	typedef std::vector<Listener *> Listeners;
+	typedef std::vector<ViewpointWindow *> Windows;
+
+	World(
+		const std::string& name="",
+		double audioRate=44100, int audioBlockSize=128,
+		int audioOutputs=-1, int audioInputs=-1
+	)
 	:	//mGraphics(new GraphicsBackendOpenGL),
-		mAudioIO(128, 44100, sAudioCB, this, 2, 1),
-		mAudioScene(3,2, 128),
+		mAudioIO(audioBlockSize, audioRate, sAudioCB, this, audioOutputs, audioInputs),
+		mAudioScene(3,2, audioBlockSize),
 		mName(name)
 	{
 		mListeners.push_back(mAudioScene.createListener(2));
@@ -172,38 +181,65 @@ public:
 	
 	virtual ~World(){
 		mAudioIO.close();
+		if(name()!="" && oscSend().opened()) sendDisconnect();
 	}
 
-	const std::string& name() const { return mName; }
+	const AudioIO&		audioIO() const { return mAudioIO; }
+	AudioIO&			audioIO(){ return mAudioIO; }
 
-	const Camera& camera() const { return mCamera; }
-	Camera& camera(){ return mCamera; }
+	const AudioScene&	audioScene() const { return mAudioScene; }
+	AudioScene&			audioScene(){ return mAudioScene; }
 
-	const Nav& nav() const { return mNav; }
-	Nav& nav(){ return mNav; }
+	const Actors&		actors() const { return mActors; }
+	Actors&				actors(){ return mActors; }
 
-	World& name(const std::string& v){ mName=v; return *this; }
+	const Camera&		camera() const { return mCamera; }
+	Camera&				camera(){ return mCamera; }
 
+	const std::string&	name() const { return mName; }
+	World&				name(const std::string& v){ mName=v; return *this; }
+
+	const Nav&			nav() const { return mNav; }
+	Nav&				nav(){ return mNav; }
+
+	osc::Recv&			oscRecv(){ return mOSCRecv; }
+	osc::Send&			oscSend(){ return mOSCSend; }
+
+	const Stereographic& stereo() const { return mStereo; }
+	Stereographic&		stereo(){ return mStereo; }
+
+	const Windows&		windows() const { return mWindows; }
+	Windows&			windows(){ return mWindows; }
+
+	/// Add an actor to the world
 	void add(Actor& v){
 		mActors.push_back(&v);
 	}
 	
-	void add(ViewpointWindow& win, bool animates=false);
+	/// Add a window to the world
 	
+	/// @param[in] win			The window to add
+	/// @param[in] animates		Whether actors are animated based on frame rate
+	///							of this window. There should only be one window
+	///							in the world that animates.
+	void add(ViewpointWindow& win, bool animates=false);
+
+
+	void sendHandshake(){
+		oscSend().send("/handshake", name(), oscRecv().port());
+	}
+	
+	void sendDisconnect(){
+		oscSend().send("/disconnectApplication", name());
+	}
+
 	void start(){
+		if(name()!="" && oscSend().opened()) sendHandshake();
 		mAudioIO.start();
 		MainLoop::start();
 	}
-	
-	Stereographic& stereo(){ return mStereo; }
-	AudioIO& audioIO(){ return mAudioIO; }
-	AudioScene& audioScene(){ return mAudioScene; }
 
 protected:
-
-	typedef std::vector<Actor *> Actors;
-	typedef std::vector<Listener *> Listeners;
-	typedef std::vector<ViewpointWindow *> Windows;
 	
 	Actors mActors;
 	Listeners mListeners;
@@ -217,6 +253,9 @@ protected:
 	AudioScene mAudioScene;
 
 	std::string mName;
+	
+	osc::Recv mOSCRecv;
+	osc::Send mOSCSend;
 
 	static void sAudioCB(AudioIOData& io){
 		World& w = io.user<World>();
