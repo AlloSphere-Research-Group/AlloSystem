@@ -2,7 +2,6 @@
 #define INCLUDE_AL_GRAPHICS_ASSET_HPP
 
 /*
- *  A collection of functions and classes related to application mainloops
  *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
  */
 
