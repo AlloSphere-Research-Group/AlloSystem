@@ -33,7 +33,7 @@ public:
 	virtual ~FreeImageImpl() {
 	}
 	
-	virtual bool load(std::string filename, Array &lat) {
+	virtual bool load(const std::string& filename, Array &lat) {
 		FREE_IMAGE_FORMAT type = FreeImage_GetFIFFromFilename(filename.data());
 		if(type == FIF_UNKNOWN) {
 			printf("image format not recognized: %s\n", filename.data());
@@ -207,7 +207,7 @@ public:
 		return true;
 	}
 	
-	virtual bool save(std::string filename, Array &lat) {
+	virtual bool save(const std::string& filename, const Array& lat) {
 	
 		// check existing image type
 		FREE_IMAGE_FORMAT type = FreeImage_GetFIFFromFilename(filename.data());
@@ -223,7 +223,7 @@ public:
 		
 		destroy();
 		
-		AlloArrayHeader& header = lat.header;
+		const AlloArrayHeader& header = lat.header;
 		int w = header.dim[0];
 		int h = (header.dimcount > 1) ? header.dim[1] : 1;
 		Image::Format format = Image::getFormat(header.components);
@@ -316,13 +316,13 @@ public:
 		}
 	}
 	
-	int getPlanes() {
+	int getPlanes() const {
 		AlloTy type = getDataType();
 		BITMAPINFOHEADER * hdr = FreeImage_GetInfoHeader(mImage);
 		return (hdr->biBitCount)/(8*allo_type_size(type));
 	}
 	
-	AlloTy getDataType() {
+	AlloTy getDataType() const {
 		FREE_IMAGE_TYPE type = FreeImage_GetImageType(mImage);
 		switch(type) {
 			case FIT_UINT32: return AlloUInt32Ty;
@@ -350,7 +350,7 @@ Image :: Image()
 : mImpl(0), mLoaded(false)
 {}
 
-Image :: Image(std::string filename) 
+Image :: Image(const std::string& filename) 
 : mImpl(0), mFilename(filename), mLoaded(false) {
 	load(filename);
 }
@@ -359,7 +359,7 @@ Image :: ~Image() {
 	if (mImpl) delete mImpl;
 }
 	
-bool Image :: load(std::string filename) {
+bool Image :: load(const std::string& filename) {
 	if (!mImpl) mImpl = new FreeImageImpl();
 //	// TODO: if we add other image formats/libraries, 
 //	// detect by file extension & redirect to appropriate implementation here:
@@ -370,7 +370,7 @@ bool Image :: load(std::string filename) {
 	return mLoaded;
 }
 
-bool Image :: save(std::string filename) {
+bool Image :: save(const std::string& filename) {
 	if (!mImpl) mImpl = new FreeImageImpl();
 //	// TODO: if we add other image formats/libraries, 
 //	// detect by file extension & redirect to appropriate implementation here:

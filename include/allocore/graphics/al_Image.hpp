@@ -68,24 +68,24 @@ public:
 	~Image();
 	
 	// shorthand for Image().load(filename)
-	Image(std::string filename);
+	Image(const std::string& filename);
 	
 	// Image attempts to determine image type by file extension:
-	bool load(std::string filename);
-	bool save(std::string filename);
+	bool load(const std::string& filename);
+	bool save(const std::string& filename);
 	
-	std::string filepath() const { return mFilename; }
+	const std::string& filepath() const { return mFilename; }
 	
 	bool loaded() const { return mLoaded; }
-	const Array& array() { return mArray; }
+	const Array& array() const { return mArray; }
 	
 	static Format getFormat(int planes);
 
 	class Impl {
 	public:
 		virtual ~Impl() {};
-		virtual bool load(std::string filename, Array &lat) = 0;
-		virtual bool save(std::string filename, Array &lat) = 0;
+		virtual bool load(const std::string& filename, Array& lat) = 0;
+		virtual bool save(const std::string& filename, const Array& lat) = 0;
 	};
 
 protected: 
