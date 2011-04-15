@@ -56,10 +56,11 @@ class GPUContext {
 public:	
 	GPUContext();
 	
-	// triggers destroy handler for each GPUObject registered in a given context
+	/// Triggers destroy handler for each GPUObject registered in a given context
 	void contextDestroy();
 	
-	int contextID() { return mContextID; }
+	/// Get context ID
+	int contextID() const { return mContextID; }
 	
 protected:
 	int mContextID;
@@ -100,8 +101,8 @@ public:
 	}
 	
 	/// Returns the assigned object id
-	long id() const { return mID; }
-	void id(long v) {mID = v;}
+	unsigned long id() const { return mID; }
+	void id(unsigned long v) {mID = v;}
 
 protected:
 
