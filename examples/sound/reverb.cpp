@@ -20,6 +20,9 @@ void audioCB(AudioIOData& io){
 		// output just the wet signals
 		io.out(0) = wet1*0.2;
 		io.out(1) = wet2*0.2;
+
+//		io.out(0) = s + wet1*0.2;
+//		io.out(1) = s + wet2*0.2;
 	}
 }
 
