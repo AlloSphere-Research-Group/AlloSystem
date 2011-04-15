@@ -1,5 +1,6 @@
 .fig{ text-align: center; font-size: 10pt; font-weight: bold; }
 .sub{ margin-left: 24px }
+.small{ font-size: 8pt; }
 
 #footer{ font-size: 8pt; font-style: italic; text-align: center; }
 #name{ margin-bottom: 0px; color:#000; font-size: 20pt; font-weight: bold; }
