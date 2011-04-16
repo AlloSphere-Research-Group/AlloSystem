@@ -7,6 +7,10 @@ ________________________________________________________________________________
 graphics/
 - move FBO out of pending/
 - Slab and Surface, document or die!
+- add nurbs abstraction
+
+io/
+- TCP/IP support
 
 protocol/
 - move OpenCL into its own module
@@ -86,7 +90,7 @@ sound/
 
 ________________________________________________________________________________
 
-Examples
+Examples and Project Ideas
 ________________________________________________________________________________
 
 gui/
@@ -94,11 +98,16 @@ gui/
 
 guiAudio/
 	- drum machine with step sequencer
-	- 303-like monosynth with step sequencer
+	- bass-line synth with step sequencer
 		- extra credit: save and load preset patterns
+	- pulsar generator a la Roads
 
 guiVisual/
 	- Lumia synth a la Wilfred's Clavilux
+	- supershape synth
+	- shader designer
+	- GUI designer
+	- generalized 3D volume renderer
 
 guiAudiovisual/
 	- oscillograph synth a la Laposky's Oscillons
@@ -112,18 +121,5 @@ Shader
 		- simple vertex transforms
 		- simple geometry shader demo
 		- more curvey shape for Phong lighting demo
-
-
-
-________________________________________________________________________________
-
-Future Plans and Project Ideas
-________________________________________________________________________________
-graphics/
-	- nurbs
-	- shader designer
-	- GUI designer
-	- generalized 3D volume renderer
-
 
 
