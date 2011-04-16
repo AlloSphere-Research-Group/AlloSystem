@@ -786,8 +786,6 @@
 		36F596501211D58B003B78B5 /* libfreeimage.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreeimage.a; path = ../../build/lib/libfreeimage.a; sourceTree = "<group>"; };
 		36F596691211D5AB003B78B5 /* al_Image.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Image.hpp; sourceTree = "<group>"; };
 		36F596741211D5F8003B78B5 /* al_Image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Image.cpp; sourceTree = "<group>"; };
-		36F598FB12122617003B78B5 /* al_Model.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Model.hpp; sourceTree = "<group>"; };
-		36F598FC12122628003B78B5 /* al_Model.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Model.cpp; sourceTree = "<group>"; };
 		8DD76F6C0486A84900D96B5E /* exScheduling */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exScheduling; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9C962881218937700091F80 /* al_OpenCL.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OpenCL.hpp; sourceTree = "<group>"; };
 		B9C962891218937700091F80 /* al_OpenCLCommandQueue.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OpenCLCommandQueue.hpp; sourceTree = "<group>"; };
@@ -1372,7 +1370,6 @@
 				160FD0DF11FA1CE4001E8987 /* al_Isosurface.hpp */,
 				16AA95EA118F6EEF00B98EC3 /* al_Light.hpp */,
 				361AA7A312AEE173002E9DFD /* al_Mesh.hpp */,
-				36F598FB12122617003B78B5 /* al_Model.hpp */,
 				16AA967E118F7D5700B98EC3 /* al_Shader.hpp */,
 				168F105612B808EF00B1E07C /* al_Shapes.hpp */,
 				36F0ABCF123195D5000A8EBF /* al_Slab.hpp */,
@@ -1398,7 +1395,6 @@
 				160FD0E011FA1CF4001E8987 /* al_Isosurface.cpp */,
 				16AA95F2118F74FB00B98EC3 /* al_Light.cpp */,
 				361AA7A412AEE1AC002E9DFD /* al_Mesh.cpp */,
-				36F598FC12122628003B78B5 /* al_Model.cpp */,
 				16586A1C128903C10068E01A /* al_Shader.cpp */,
 				168F105712B80DD100B1E07C /* al_Shapes.cpp */,
 				367F0B3A12034EED00FCC534 /* al_Stereographic.cpp */,
