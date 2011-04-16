@@ -88,6 +88,9 @@ ________________________________________________________________________________
 
 Examples
 ________________________________________________________________________________
+gui/
+	- modify GLV presets.cpp example to load presets
+
 graphics/
 Shader
 	- this could turn into a GLSL tutorial of sorts
@@ -95,6 +98,7 @@ Shader
 		- simple vertex transforms
 		- simple geometry shader demo
 		- more curvey shape for Phong lighting demo
+
 
 
 ________________________________________________________________________________
