@@ -88,8 +88,20 @@ ________________________________________________________________________________
 
 Examples
 ________________________________________________________________________________
+
 gui/
 	- modify GLV presets.cpp example to load presets
+
+guiAudio/
+	- drum machine with step sequencer
+	- 303-like monosynth with step sequencer
+		- extra credit: save and load preset patterns
+
+guiVisual/
+	- Lumia synth a la Wilfred's Clavilux
+
+guiAudiovisual/
+	- oscillograph synth a la Laposky's Oscillons
 
 graphics/
 Shader
