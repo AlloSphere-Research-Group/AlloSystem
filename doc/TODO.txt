@@ -102,6 +102,8 @@ guiVisual/
 
 guiAudiovisual/
 	- oscillograph synth a la Laposky's Oscillons
+	- time/frequency scopes of line-input
+		- extra credit: monitor n channels simultaneously
 
 graphics/
 Shader
@@ -115,10 +117,13 @@ Shader
 
 ________________________________________________________________________________
 
-Future Plans
+Future Plans and Project Ideas
 ________________________________________________________________________________
 graphics/
-	- Nurbs
+	- nurbs
+	- shader designer
+	- GUI designer
+	- generalized 3D volume renderer
 
 
 
