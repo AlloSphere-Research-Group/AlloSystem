@@ -18,6 +18,9 @@ protocol/
 math/
 - move Matrix4 to spatial/? Most operations are related to space...
 
+sound/
+- switch to jack for audio i/o
+
 ________________________________________________________________________________
 
 Unit Testing
