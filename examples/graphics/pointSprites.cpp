@@ -56,12 +56,11 @@ struct MyWindow : Window{
 		gl.loadMatrix(Matrix4d::lookAt(Vec3d(0,0,-4), Vec3d(0,0,0), Vec3d(0,1,0)));
 
 		gl.depthTesting(0);
-		gl.blending(1, gl.SRC_ALPHA, gl.ONE);
+		gl.blending(true, gl.SRC_ALPHA, gl.ONE);
 
 		++angleY;
 
 		gl.pushMatrix();
-
 			glEnable(GL_POINT_SPRITE);
 			glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 			gl.pointSize(50);
@@ -84,10 +83,10 @@ struct MyWindow : Window{
 };
 
 int main(){
-	MyWindow win1;
+	MyWindow win;
 
-	win1.add(new StandardWindowKeyControls);
-	win1.create(Window::Dim(800, 600));
+	win.add(new StandardWindowKeyControls);
+	win.create(Window::Dim(800, 600));
 
 	MainLoop::start();
 	return 0;

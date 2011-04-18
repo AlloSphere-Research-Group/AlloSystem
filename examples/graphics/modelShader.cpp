@@ -123,8 +123,8 @@ struct MyWindow : Window{
 		
 		// scale the whole asset to fit into our view frustum 
 		float tmp = scene_max[0]-scene_min[0];
-		tmp = MAX(scene_max[1] - scene_min[1],tmp);
-		tmp = MAX(scene_max[2] - scene_min[2],tmp);
+		tmp = al::max(scene_max[1] - scene_min[1],tmp);
+		tmp = al::max(scene_max[2] - scene_min[2],tmp);
 		tmp = 2.f / tmp;
 		gl.scale(tmp);
 	

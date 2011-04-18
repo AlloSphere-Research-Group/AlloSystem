@@ -63,10 +63,10 @@ struct MyWindow : Window{
 };
 
 int main(){
-	MyWindow win1;
+	MyWindow win;
 
-	win1.add(new StandardWindowKeyControls);
-	win1.create(Window::Dim(800, 600));
+	win.add(new StandardWindowKeyControls);
+	win.create(Window::Dim(800, 600));
 
 	MainLoop::start();
 	return 0;
