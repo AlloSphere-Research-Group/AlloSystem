@@ -7,7 +7,7 @@ inline bool eq(T x, T y, T eps=0.000001){ return abs(x-y) < eps; }
 template <class T>
 inline bool eq(const T* x, const T* y, int n, T eps=0.0000001){
 	for(int i=0; i<n; ++i){
-		if(!eq(x[0], y[0], eps)) return false;
+		if(!eq(x[i], y[i], eps)) return false;
 	}
 	return true; 
 }
