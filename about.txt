@@ -51,7 +51,7 @@ The following variables can be modified to customize where built files are place
 	BUILD_DIR		- location to build files into (default = ./build)
 	DESTDIR			- location to install built files into (default = /usr/local/)
 
-The following rules are available:
+The following rules are available (to be run from the root directory):
 
 	make allocore		- build allocore library
 	make allojit		- build allocore JIT extension
@@ -64,6 +64,7 @@ The following rules are available:
 
 	make examples/x.cpp	- builds and runs example source file x.cpp
 
+	make test		- build and run unit tests
 
 The rules that build examples and tests will automatically run the executable by default. To turn this off, pass AUTORUN=0 to make. The examples and tests rules follow standard Unix conventions so that, for instance, all the tests can be built and run by typing the command 'make tests/test*.cpp'.
 
