@@ -39,7 +39,7 @@ struct Agent : public SoundSource, public Nav, public Drawable{
 			//float s = phase * 2 - 1;
 			oscPhase += 440./io.framesPerSecond();
 			if(oscPhase >= 1) oscPhase -= 1;
-			writeSample(s*4.);
+			writeSample(s*0.2);
 		}
 	}
 	
