@@ -141,6 +141,18 @@ install: allocore
 #	@$(RANLIB) $(DESTDIR)/lib/$(SLIB_FILE)
 
 
+# Archive repository
+archive:
+	$(eval $@_TMP := $(shell mktemp -d tmp.XXXXXXXXXX))
+	@echo Creating archive, this may take some time...
+	@echo Creating temporary export...
+	@svn export --force . $($@_TMP)
+	@echo Compressing...
+	@cd $($@_TMP) && tar -czf ../allocore.tar.gz .
+	@echo Compression complete.
+	@rm -R $($@_TMP)
+
+
 # Build unit tests
 test: allocore external
 	@$(MAKE) -C $(TEST_DIR) test
