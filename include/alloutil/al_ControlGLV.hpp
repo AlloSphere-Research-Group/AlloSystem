@@ -111,6 +111,8 @@ struct GLVWindowControl : public GLVControl, public WindowEventHandler {
 struct PoseModel : public glv::Model{
 	PoseModel(Pose& p): pose(p){}
 
+	virtual ~PoseModel(){}
+
 	virtual const glv::Data& getData(glv::Data& d) const {
 		d.resize(glv::Data::FLOAT, 7);
 		d.assignFromArray(pose.pos().elems, 3);
