@@ -111,18 +111,26 @@ guiVisual/
 	- shader designer
 	- GUI designer
 	- generalized 3D volume renderer
+	- simple stereographic testing tool
 
 guiAudiovisual/
 	- oscillograph synth a la Laposky's Oscillons
 	- time/frequency scopes of line-input
 		- extra credit: monitor n channels simultaneously
 
+audio/
+	- basic synthesis (sine, modulated sine); check Gamma examples/
+	- Note list parser (Csound-style)
+
 graphics/
-Shader
-	- this could turn into a GLSL tutorial of sorts
+	- Shaders: this could turn into a GLSL tutorial of sorts
 		- combined fog and lighting
 		- simple vertex transforms
 		- simple geometry shader demo
 		- more curvey shape for Phong lighting demo
+	- Texture mapping
+	- Simple particle system
 
+world/
+	- OSC-navigable static 3D scene
 
