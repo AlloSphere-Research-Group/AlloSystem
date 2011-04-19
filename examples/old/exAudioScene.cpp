@@ -70,12 +70,12 @@ struct MyWindow : Window{
 
 int main (int argc, char * argv[]){
 
-	listener = &scene.createListener(2);
+	listener = scene.createListener(2);
 	scene.addSource(src);
 
 	MyWindow win;
 	win.add(new StandardWindowKeyControls);
-	win.create(Window::Dim(200,200,100), "Window 1", 40);
+	win.create(Window::Dim(100,100,200,200), "Window 1", 40);
 
 	AudioIO audioIO(NUM_FRAMES, 44100, audioCB, 0, 2, 1);
 	audioIO.start();
