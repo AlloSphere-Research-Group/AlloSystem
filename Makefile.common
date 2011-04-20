@@ -25,7 +25,7 @@ endif
 # Architecture: '32', '64', or '32_64' (macosx only)
 UNAMEM := $(shell uname -m)
 ifeq ($(UNAMEM), $(findstring $(UNAMEM), x86_64 ia86 amd64))
-	ifeq ( $(PLATFORM), macosx)
+	ifeq ($(PLATFORM), macosx)
 		ARCH = 32_64
 	else
 		ARCH = 64
@@ -36,7 +36,7 @@ endif
 
 # Mac OS X version: '10_6' or '10_5'
 UNAME := $(shell uname -r)
-ifeq ($(UNAME), 10.6.0)
+ifeq ($(UNAME), $(findstring $(UNAME), 10.6.0 10.7.0))
     OSX_VERSION = 10_6
 else
     OSX_VERSION = 10_5
@@ -134,11 +134,17 @@ else ifeq ($(PLATFORM), macosx)
 
 	ifeq ($(ARCH), 32)
 		CFLAGS += -arch i386
-	else ifeq ($(ARCH), 64)
+	else
 		CFLAGS += -arch x86_64
-	else ifeq ($(ARCH), 32_64)
-		CFLAGS += -arch i386 -arch x86_64
 	endif
+
+#	FIXME: 	Universal builds not compatible with dependency generation. :(
+#		Disabling for now...
+#	else ifeq ($(ARCH), 64)
+#		CFLAGS += -arch x86_64
+#	else ifeq ($(ARCH), 32_64)
+#		CFLAGS += -arch i386 -arch x86_64
+#	endif
 
 	CFLAGS += -isysroot
 
