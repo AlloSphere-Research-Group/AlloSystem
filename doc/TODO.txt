@@ -32,6 +32,11 @@ General
 errors. This will also be handy for "touching" all templated code to check for 
 compilation errors.
 
+FIXME
+--------------------------------------------------------------------------------
+protocol/OSC
+- on 64-bit platforms, ending a bundle with a message results in a seg fault
+
 
 Specific
 --------------------------------------------------------------------------------
