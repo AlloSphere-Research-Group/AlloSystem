@@ -60,9 +60,10 @@ int utProtocolOSC(){
 			assert('1'== c);
 			assert(strcmp(cs, str) == 0);
 			assert(ss == str);
-			assert(strlen(str) == b.size && !strcmp((char *)b.data, str));
+			assert(int(strlen(str)) == int(b.size));
+			assert(!strcmp((char *)b.data, str));
 	}
-	
+
 	
 
 	// Create a complicated OSC bundle packet
