@@ -4,7 +4,26 @@ int utFile() {
 
 	// static functions
 	assert(fileExists("./"));
-	
+
+	// simple file/directory searching
+	{
+		std::string dir;
+		
+		// Search for file (that exists and probably will not be moved...)
+		std::string find = "Makefile";
+		
+		bool r = searchBackForFile(dir, find);
+		assert(r);
+		assert(fileExists(dir + find));
+		
+		find = "../" + find;	// check for a file with path
+		r = searchBackForFile(dir, find);
+		assert(r);
+		assert(fileExists(dir + find));
+
+		assert(!searchBackForFile(dir, "thisdirectorydoesnotexist"AL_FILE_DELIMITER_STR"thisfiledoesnotexist.ext"));
+	}
+
 	{
 		const char * path = "utFile.txt";
 		const char * text = "This is a test of AlloCore file i/o functionality.\nYou can safely delete this file.";
@@ -43,17 +62,19 @@ int utFile() {
 		
 		f.close();
 		
-		f.path("thisdirectroydoesnotexist//neitherdoesthisone//notafile.txt");
+		f.path("thisdirectroydoesnotexist"AL_FILE_DELIMITER_STR"neitherdoesthisone"AL_FILE_DELIMITER_STR"notafile.txt");
 		assert(!f.open());
 	}
 	
 	
 	{
+		// TODO:
 		SearchPaths sp;
 		//printf("%s\n", sp.appPath().c_str());
 	}
 	
 	{
+		// TODO:
 		FilePath fp("file.txt", "path");
 
 		//printf("%s\n", fp.filepath().c_str());

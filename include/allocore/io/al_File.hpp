@@ -10,9 +10,11 @@
 #include "allocore/system/al_Config.h"
 
 #ifdef AL_WIN32
-	#define AL_FILE_DELIMITER '\\'
+	#define AL_FILE_DELIMITER		'\\'
+	#define AL_FILE_DELIMITER_STR	"\\"
 #else
-	#define AL_FILE_DELIMITER '/'
+	#define AL_FILE_DELIMITER		'/'
+	#define AL_FILE_DELIMITER_STR	"/"
 #endif
 
 #define AL_PATH_MAX (4096)
@@ -25,6 +27,17 @@ namespace al{
 
 /// Returns whether a file or directory exists
 bool fileExists(const std::string& path);
+
+
+/// Search for file or directory back from current directory
+
+/// @param[out] prefixPath	If the file is found, this contains a series of
+///							"../" that can be prefixed to 'matchPath' to get
+///							its actual location.
+/// @param[in]  matchPath	File or directory to search for
+/// @param[in]  maxDepth	Maximum number of directories to search back
+/// \returns whether the file or directory was found
+bool searchBackForFile(std::string& prefixPath, const std::string& matchPath, int maxDepth=6);
 
 
 /// a pair of path (folder/directory) and filename
@@ -182,6 +195,17 @@ protected:
 inline bool fileExists(const std::string& path){
 	struct stat s;
 	return ::stat(path.c_str(), &s) == 0;
+}
+
+inline bool searchBackForFile(std::string& prefixPath, const std::string& matchPath, int maxDepth){
+	int i=0;
+	prefixPath="";
+
+	for(; i<maxDepth; ++i){
+		if(al::fileExists(prefixPath + matchPath)) break;
+		prefixPath = ".."AL_FILE_DELIMITER_STR + prefixPath;
+	}
+	return i<maxDepth;
 }
 
 inline std::string SearchPaths::stripFileName(const std::string& src) {
