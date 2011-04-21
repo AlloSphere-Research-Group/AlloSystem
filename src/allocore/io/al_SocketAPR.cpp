@@ -21,7 +21,7 @@ struct Socket::Impl : public ImplAPR {
 	{}
 
 	Impl(unsigned int port, const char * address, al_sec timeout_, bool sender)
-	:	ImplAPR(), mPort(port), mAddress(address ? address : ""), mSockAddr(0), mSock(0), mSender(sender)
+	:	ImplAPR(), mPort(port), mAddress(address), mSockAddr(0), mSock(0), mSender(sender)
 	{
 //		// opens the socket also:
 //		timeout(timeout_);
