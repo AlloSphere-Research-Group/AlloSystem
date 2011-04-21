@@ -16,7 +16,7 @@ int utFile() {
 		assert(r);
 		assert(fileExists(dir + find));
 		
-		find = "../" + find;	// check for a file with path
+		find = ".."AL_FILE_DELIMITER_STR + find;	// check for a file with path
 		r = searchBackForFile(dir, find);
 		assert(r);
 		assert(fileExists(dir + find));
