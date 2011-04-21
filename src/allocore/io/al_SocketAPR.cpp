@@ -90,57 +90,6 @@ struct Socket::Impl : public ImplAPR {
 	void timeout(al_sec v){
 		open(mPort, mAddress, v, mSender);
 	}
-
-//	bool open(unsigned int port, std::string address, bool sender){
-//
-//		close();
-//
-//		// TODO: check_apr results should jump to an err label and return an uninitialized socket!
-//
-//		/* @see http://dev.ariel-networks.com/apr/apr-tutorial/html/apr-tutorial-13.html */
-//
-//		mPort = port;
-//		mSender = sender;
-//		mAddress = address;
-//		if (APR_SUCCESS == check_apr(apr_sockaddr_info_get(&mSockAddr, mAddress[0] ? mAddress.c_str() : 0, APR_INET, mPort, 0, mPool))) {
-//			check_apr(apr_socket_create(&mSock, mSockAddr->family, SOCK_DGRAM, APR_PROTO_UDP, mPool));
-//
-//			if(mSock){
-//				// Assign address to socket. If TCP, establish new connection.
-//				if(mSender)	check_apr(apr_socket_connect(mSock, mSockAddr));
-//				else		check_apr(apr_socket_bind(mSock, mSockAddr));
-//				return true;
-//			}
-//		} else {
-//			printf("failed to create socket at %s:%i\n", address.c_str(), port);
-//		}
-//		return false;
-//	}
-//	
-//	// note that setting timeout will close and re-open the socket:
-//	void timeout(al_sec v){
-//		open(mPort, mAddress, mSender);
-//		
-//		if (opened()) {
-//			if(v == 0){
-//				// non-blocking:			APR_SO_NONBLOCK==1(on),  then timeout=0
-//				check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 1));
-//				check_apr(apr_socket_timeout_set(mSock, 0));
-//			}
-//			else if(v > 0){
-//				// blocking-with-timeout:	APR_SO_NONBLOCK==0(off), then timeout>0
-//				check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 0));
-//				check_apr(apr_socket_timeout_set(mSock, (apr_interval_time_t)(v * 1.0e6)));
-//
-//			}
-//			else{
-//				// blocking-forever:		APR_SO_NONBLOCK==0(off), then timeout<0
-//				check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 0));
-//				check_apr(apr_socket_timeout_set(mSock, -1));
-//			}
-//		}
-//		mTimeout = v;
-//	}
 	
 	bool opened() const { return 0!=mSock; }
 
