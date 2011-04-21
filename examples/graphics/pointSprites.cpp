@@ -55,12 +55,16 @@ struct MyWindow : Window{
 		gl.matrixMode(gl.MODELVIEW);
 		gl.loadMatrix(Matrix4d::lookAt(Vec3d(0,0,-4), Vec3d(0,0,0), Vec3d(0,1,0)));
 
-		gl.depthTesting(0);
-		gl.blending(true, gl.SRC_ALPHA, gl.ONE);
+		//gl.depthTesting(0);
+		//gl.blending(true, gl.SRC_ALPHA, gl.ONE);
 
+		glDisable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+tex.update();
 		++angleY;
 
-		gl.pushMatrix();
+		//gl.pushMatrix();
 			glEnable(GL_POINT_SPRITE);
 			glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
 			gl.pointSize(50);
@@ -73,7 +77,7 @@ struct MyWindow : Window{
 			tex.unbind();
 			
 			glDisable(GL_POINT_SPRITE);
-		gl.popMatrix();
+		//gl.popMatrix();
 
 		return true;
 	}

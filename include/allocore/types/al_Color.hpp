@@ -140,6 +140,11 @@ struct Color{
 
 	/// Returns luminance value
 	float luminance() const { return r*0.3f+g*0.59f+b*0.11f; }
+
+	/// Returns self linearly mixed with another color (0 = none)
+	Color mix(const Color& c, float amt=0.5f) const {
+		return (c-*this)*amt + *this;
+	}
 };
 
 inline Color operator + (float s, const Color& c){ return  c+s; }
