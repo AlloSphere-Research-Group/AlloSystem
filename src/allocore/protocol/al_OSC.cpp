@@ -146,12 +146,26 @@ Message::Message(const char * message, int size, const TimeTag& timeTag)
 
 void Message::print() const {
 	printf("%s, %s %lld\n", addressPattern().c_str(), typeTags().c_str(), timeTag());
-//	for(int i=0; typeTags().size(); ++i){
-//		char c = 
-//		switch(){
-//		case 'f': printf("");
-//		}
-//	}
+	
+	::osc::ReceivedMessageArgumentIterator it = mImpl->ArgumentsBegin();
+	
+	printf("\targs = (");
+	for(unsigned i=0; i<typeTags().size(); ++i){
+		char tag = typeTags()[i];
+		switch(tag){
+			case 'f': {float v = it->AsFloat(); printf("%g", v);} break;
+			case 'i': {long v = it->AsInt32(); printf("%ld", v);} break;
+			case 'h': {long long v = it->AsInt64(); printf("%lld", v);} break;
+			case 'c': {char v = it->AsChar(); printf("'%c' (=%3d)", isprint(v) ? v : ' ', v);} break;
+			case 'd': {double v = it->AsDouble(); printf("%g", v);} break;
+			case 's': {const char * v = it->AsString(); printf("%s", v);} break;
+			case 'b': printf("blob"); break;
+			default:  printf("?");
+		}
+		if(i < (typeTags().size() - 1)) printf(", ");
+		++it;
+	}
+	printf(")\n");
 }
 
 Message& Message::resetStream(){ mImpl->args = mImpl->ArgumentStream(); return *this; }
