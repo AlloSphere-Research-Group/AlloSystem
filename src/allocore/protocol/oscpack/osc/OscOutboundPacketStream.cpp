@@ -185,16 +185,11 @@ void OutboundPacketStream::EndElement( char *endPtr )
         elementSizePtr_ = 0;
 
     }else{
-
         // while building an element, an offset to the containing element's
         // size slot is stored in the elements size slot (or a ptr to data_
         // if there is no containing element). We retrieve that here
-
-		// This operation results in seg fault on 64-bit platforms
-//        uint32 *previousElementSizePtr =
-//                (uint32*)(data_ + *reinterpret_cast<uint32*>(elementSizePtr_));
         uint32 *previousElementSizePtr =
-				(uint32*)(data_ + ((*reinterpret_cast<uint32*>(elementSizePtr_)) & 0xFFFFFFFF));
+                (uint32*)(data_ + *reinterpret_cast<uint32*>(elementSizePtr_));
 
         // then we store the element size in the slot, note that the element
         // size does not include the size slot, hence the - 4 below.
