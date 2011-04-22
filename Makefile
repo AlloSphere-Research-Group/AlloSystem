@@ -56,8 +56,6 @@ help:
 
 include Makefile.rules
 
-#.PHONY: clean cleanall test
-
 
 # Compile and run source files in examples/ folder
 EXEC_TARGETS = examples/%.cpp
@@ -151,6 +149,13 @@ archive:
 	@cd $($@_TMP) && tar -czf ../allocore.tar.gz .
 	@echo Compression complete.
 	@rm -R $($@_TMP)
+
+
+# Remove build files
+.PHONY: clean
+clean: createFolders
+	@$(RM) -rf $(BUILD_DIR)*
+	@$(RM) -rf $(TEST_DIR)/$(BUILD_DIR)*
 
 
 # Build unit tests

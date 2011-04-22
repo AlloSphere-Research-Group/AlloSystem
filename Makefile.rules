@@ -11,7 +11,6 @@ CXXFLAGS	:= $(CFLAGS) $(CXXFLAGS)
 #--------------------------------------------------------------------------
 # Rules
 #--------------------------------------------------------------------------
-.PHONY: clean cleanall
 
 # Build object file from C++ source
 $(OBJ_DIR)%.o: %.cpp
@@ -44,12 +43,6 @@ $(SLIB_PATH): createFolders $(addprefix $(OBJ_DIR), $(OBJS))
 
 # Dummy target to force rebuilds
 FORCE:
-
-
-# Remove build files
-clean: createFolders
-	@$(RM) -r $(BUILD_DIR)*
-
 
 createFolders:
 	@mkdir -p $(BIN_DIR)
