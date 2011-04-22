@@ -140,7 +140,7 @@ Message::Message(const char * message, int size, const TimeTag& timeTag)
 :	mImpl(new Impl(message, size)), mTimeTag(timeTag)
 {
 	mAddressPattern = mImpl->AddressPattern();
-	mTypeTags = mImpl->TypeTags();
+	mTypeTags = mImpl->ArgumentCount() ? mImpl->TypeTags() : "";
 	resetStream();
 }
 
@@ -179,6 +179,9 @@ Message& Message::operator>> (Blob& v){ ::osc::Blob b; (*mImpl)>>b; v.data=b.dat
 
 
 void PacketHandler::parse(const char *packet, int size, TimeTag timeTag){
+//printf("PacketHandler::parse: %d\n", size);
+
+//for(int i=0; i<size; ++i) printf("%c", packet[i]); printf("\n");
 
 	// this is the only generic entry point for parsing packets
 	::osc::ReceivedPacket p(packet, size);
@@ -196,7 +199,9 @@ void PacketHandler::parse(const char *packet, int size, TimeTag timeTag){
 		
 	}
 	else if(p.IsMessage()){
+printf("okay ismessage\n");
 		Message m(packet, size, timeTag);
+
 		onMessage(m);
 	}
 }

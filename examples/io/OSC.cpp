@@ -122,6 +122,8 @@ int main(){
 			//r.recv();
 			al_sleep(0.02);
 		}
+
+		//s.send("/test"); al_sleep(0.2);
 		
 		//al_sleep(1);
 		r.stop();
