@@ -352,9 +352,9 @@ public:
 	Recv(){}
 
 	/// @param[in] port		Port number
-	/// @param[in] address	IP address. If 0, will bind all network interfaces to socket.
+	/// @param[in] address	IP address. If empty, will bind all network interfaces to socket.
 	/// @param[in] timeout	< 0: block forever; = 0: no blocking; > 0 block with timeout
-	Recv(unsigned int port, const char * address = 0, al_sec timeout=0);
+	Recv(unsigned int port, const char * address = "", al_sec timeout=0);
 	
 	virtual ~Recv() { stop(); }
 
