@@ -138,6 +138,21 @@ public:
 		if(fill() < size()) ++mFill; 
 	}
 
+
+	/// Add new elements after each existing element
+	
+	/// @param[in] n	Number of elements to add after each existing element
+	/// @param[in] dup	If true, new elements are duplicates of existing elements.
+	///					If false, new elements are default constructed.
+	void expand(int n, bool dup=false){
+		size(size()*n);
+		int Nd = dup ? n : 1;
+		for(int i=size()/n-1; i>=0; --i){
+			const T& v = (*this)[i];
+			for(int j=0; j<Nd; ++j) Alloc::construct(elems()+n*i+j, v);
+		}
+	}
+
 private:
 	int mSize;		// number of elements in array
 	int	mFill;		// number of elements written to buffer (up to size())
