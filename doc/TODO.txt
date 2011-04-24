@@ -139,3 +139,7 @@ graphics/
 world/
 	- OSC-navigable static 3D scene
 
+
+cinematic pose:
+	like SmoothPose but with inertia, limited acceleration
+	dolly, track, extreme close up!, etc.
