@@ -1,16 +1,26 @@
+/*
+Allocore Example: Many Shape Mesh
+
+Description:
+This demonstrates how a single mesh can be used to draw many different shapes.
+
+Author:
+Lance Putnam, 4/25/2011
+*/
+
 #include "allocore/al_Allocore.hpp"
 
 using namespace al;
 
 GraphicsGL gl;
-Mesh mesh;
+Mesh shapes;
 Light light;
 Material material;
 
 struct MyWindow : Window{
 
 	bool onCreate(){
-		angle1 = angle2 = 0;
+		angle = 0;
 		return true;
 	}
 
@@ -31,75 +41,46 @@ struct MyWindow : Window{
 		material();
 		light();
 
-		angle1 += 1./71;
-		angle2 += M_PI/71;
-//		float angPos = 2*M_PI/5;
-//		float R = 3;
+		angle += 1./8000;
 
 		gl.pushMatrix(gl.MODELVIEW);
 			//gl.translate(R*cos(i*angPos), R*sin(i*angPos), 0);
-			gl.rotate(angle1, 0,1,0);
-			gl.rotate(angle2, 1,0,0);
-			gl.draw(mesh);
+			gl.rotate(angle*113, 0,1,0);
+			gl.rotate(angle* 79, 1,0,0);
+			gl.draw(shapes);
 		gl.popMatrix();
 
 		return true;
 	}
 	
-	double angle1, angle2;
+	double angle;
 };
-
-/*
-0  4  8 12
-1  5  9 13
-2  6 10 14
-3  7 11 15
-*/
-template<class T, class Vx, class Vy, class Vz>
-void scale(Mat<4,T>& m, Vx vx, Vy vy, Vz vz){
-	m[ 0] *= vx;
-	m[ 1] *= vx;
-	m[ 2] *= vx;
-	m[ 4] *= vy;
-	m[ 5] *= vy;
-	m[ 6] *= vy;
-	m[ 8] *= vz;
-	m[ 9] *= vz;
-	m[10] *= vz;
-}
-
-template<class T, class Vx, class Vy, class Vz>
-void translate(Mat<4,T>& m, Vx vx, Vy vy, Vz vz){
-	m[12] += vx;
-	m[13] += vy;
-	m[14] += vz;
-}
 
 
 int main(){
 
 	for(int i=0; i<800; ++i){
-		int Nv = addCube(mesh);
+		int Nv = rnd::prob(0.5)
+					? (rnd::prob(0.5) ? addCube(shapes) : addDodecahedron(shapes))
+					: addIcosahedron(shapes);
 		
 		Mat4f xfm;
 		xfm.setIdentity();
-		scale(xfm, rnd::uniform(1.,0.1), rnd::uniform(1.,0.1), rnd::uniform(1.,0.1));
-		translate(xfm, rnd::uniformS(6.), rnd::uniformS(6.), rnd::uniformS(6.));
+		scale(xfm, Vec3f(rnd::uniform(1.,0.1), rnd::uniform(1.,0.1), rnd::uniform(1.,0.1)));
+		translate(xfm, Vec3f(rnd::uniformS(8.), rnd::uniformS(8.), rnd::uniformS(8.)));
 		//rotate(xfm, rnd::uniform(), rnd::uniform(), rnd::uniform());
-		//scale(xfm, 1, 2, 1);
-		//translate(xfm, 1,0,0);
 		
-		mesh.transform(xfm, mesh.vertices().size()-Nv);
+		shapes.transform(xfm, shapes.vertices().size()-Nv);
 
 		for(int i=0; i<Nv; ++i){
 			float f = float(i)/Nv;
-			mesh.color(HSV(f*0.1+0.2,1,1));
+			shapes.color(HSV(f*0.1+0.2,1,1));
 		}
 	}
 
-	mesh.primitive(Graphics::TRIANGLES);
-	mesh.decompress();
-	mesh.generateNormals();
+	shapes.primitive(Graphics::TRIANGLES);
+	shapes.decompress();
+	shapes.generateNormals();
 
 	MyWindow win1;
 
