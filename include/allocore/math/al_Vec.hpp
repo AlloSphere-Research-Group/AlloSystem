@@ -546,7 +546,7 @@ template <int N, class T>
 inline Mat<N,T> operator * (T s, const Mat<N,T>& v){ return  v*s; }
 
 
-// Vec/Mat
+// Basic Vec/Mat Arithmetic
 template <int N, class T>
 inline Vec<N,T> operator* (const Mat<N,T>& m, const Vec<N,T>& vCol){
 	Vec<N,T> r; return Mat<N,T>::multiply(r, m,vCol);
@@ -557,6 +557,35 @@ inline Vec<N,T> operator* (const Vec<N,T>& vRow, const Mat<N,T>& m){
 	Vec<N,T> r; return Mat<N,T>::multiply(r, vRow,m);
 }
 
+
+// Affine transformations
+
+/// Scale existing transformation matrix
+template<int N, class T>
+static inline void scale(Mat<N+1,T>& m, const Vec<N,T>& scale){
+	for(int C=0; C<N; ++C){
+		for(int R=0; R<N; ++R){
+			m(R, C) *= scale[R];
+		}
+	}
+}
+
+template<int N, class T>
+static inline void scale(Mat<N+1,T>& m, const T& scale){
+	for(int C=0; C<N; ++C){
+		for(int R=0; R<N; ++R){
+			m(R, C) *= scale;
+		}
+	}
+}
+
+/// Translate existing transformation matrix
+template<int N, class T>
+static inline void translate(Mat<N+1,T>& m, const Vec<N,T>& trans){
+	for(int R=0; R<N; ++R){
+		m(R, N) += trans[R];
+	}
+}
 
 
 
