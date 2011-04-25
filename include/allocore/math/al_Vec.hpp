@@ -561,8 +561,8 @@ inline Vec<N,T> operator* (const Vec<N,T>& vRow, const Mat<N,T>& m){
 // Affine transformations
 
 /// Scale existing transformation matrix
-template<int N, class T>
-static inline void scale(Mat<N+1,T>& m, const Vec<N,T>& scale){
+template<int N, class T, class V>
+static inline void scale(Mat<N+1,T>& m, const Vec<N,V>& scale){
 	for(int C=0; C<N; ++C){
 		for(int R=0; R<N; ++R){
 			m(R, C) *= scale[R];
@@ -570,18 +570,18 @@ static inline void scale(Mat<N+1,T>& m, const Vec<N,T>& scale){
 	}
 }
 
-template<int N, class T>
-static inline void scale(Mat<N+1,T>& m, const T& scale){
-	for(int C=0; C<N; ++C){
-		for(int R=0; R<N; ++R){
+template<int N, class T, class V>
+static inline void scale(Mat<N,T>& m, const V& scale){
+	for(int C=0; C<N-1; ++C){
+		for(int R=0; R<N-1; ++R){
 			m(R, C) *= scale;
 		}
 	}
 }
 
 /// Translate existing transformation matrix
-template<int N, class T>
-static inline void translate(Mat<N+1,T>& m, const Vec<N,T>& trans){
+template<int N, class T, class V>
+static inline void translate(Mat<N+1,T>& m, const Vec<N,V>& trans){
 	for(int R=0; R<N; ++R){
 		m(R, N) += trans[R];
 	}
