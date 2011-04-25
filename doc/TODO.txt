@@ -34,8 +34,7 @@ compilation errors.
 
 FIXME
 --------------------------------------------------------------------------------
-protocol/OSC
-- on 64-bit platforms, ending a bundle with a message results in a seg fault
+
 
 
 Specific
