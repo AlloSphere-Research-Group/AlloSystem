@@ -565,7 +565,7 @@ template<int N, class T, class V>
 static inline void scale(Mat<N+1,T>& m, const Vec<N,V>& scale){
 	for(int C=0; C<N; ++C){
 		for(int R=0; R<N; ++R){
-			m(R, C) *= scale[R];
+			m(R, C) *= scale[C];
 		}
 	}
 }
