@@ -66,11 +66,11 @@ public:
 
 	/// Returns uniform random in [0, hi)
 	template <class T>
-	T uniform(const T& hi){ return hi*uniform();  }
+	T uniform(const T& hi){ return hi*uniform(); }
 	
 	/// Returns uniform random in [lo, hi)
 	template <class T>
-	T uniform(const T& hi, const T& lo){ return (hi-lo)*uniform() + lo;  }
+	T uniform(const T& hi, const T& lo){ return (hi-lo)*uniform() + lo; }
 
 	/// Returns uniform random in [-lim, lim)
 	template <class T>
@@ -111,6 +111,9 @@ public:
 	/// @param[in] seed	Initial seed value
 	LinCon(uint32_t seed): gen::RMulAdd<uint32_t>(1,0,seed){ type(0); }
 
+	/// Set seed
+	void seed(uint32_t v){ (*this)=v; }
+
 	/// Change the type of equation used.
 	
 	/// 0 - Knuth, Numerical Recipes in C\n
@@ -136,7 +139,10 @@ public:
 	
 	/// @param[in] seed	Initial seed value
 	MulLinCon(uint32_t seed): gen::RMul<uint32_t>(1,seed){ type(0); }
-	
+
+	/// Set seed
+	void seed(uint32_t v){ (*this)=v; }
+
 	/// Change the type of equation used.
 
 	/// 0 - Marsaglia, Super-Duper\n
@@ -167,9 +173,9 @@ public:
 	Tausworthe(uint32_t seed);
 	
 	uint32_t operator()();				///< Generates uniform random unsigned integer in [0, 2^32).
-	void operator = (uint32_t seed);	///< Set seed
-	void seed(uint32_t s);				///< Set seed
-	void seed(uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4); ///< Set seed
+//	void operator = (uint32_t seed);	///< Set seed
+	void seed(uint32_t v);				///< Set seed
+	void seed(uint32_t v1, uint32_t v2, uint32_t v3, uint32_t v4); ///< Set seed
 
 private:
 	uint32_t s1, s2, s3, s4;
@@ -216,10 +222,8 @@ inline uint32_t Tausworthe::operator()(){
 	return s1 ^ s2 ^ s3 ^ s4;
 }
 
-inline void Tausworthe::operator=(uint32_t s){ seed(s); }
-
-inline void Tausworthe::seed(uint32_t s){
-	al::rnd::LinCon g(s);
+inline void Tausworthe::seed(uint32_t v){
+	al::rnd::LinCon g(v);
 	g();
 	seed(g(), g(), g(), g());
 }
@@ -240,17 +244,24 @@ inline void Tausworthe::iterate(){
 }
 
 
-
+// Box-Muller transform
+//		Box, G. and Muller, M. A note on the generation of normal deviates. 
+//		Ann. Math. Slat. 28, (1958). 
+//
+// http://en.wikipedia.org/wiki/Box–Muller_transform
 template <class RNG>
 template <class T> void Random<RNG>::gaussian(T& y1, T& y2){
 	float x1, x2, w;
 
+	// Search for point within unit circle using sample-reject.
+	// This will pass with probability π/4 = ~0.785.
 	do{
 		x1 = uniformS();
 		x2 = uniformS();
 		w = x1 * x1 + x2 * x2;
 	} while(w >= 1.f);
 
+	// perform inverse Gaussian function mapping
 	w = std::sqrt((-2.f * std::log(w)) / w);
 	y1 = T(x1 * w);
 	y2 = T(x2 * w);
@@ -268,8 +279,6 @@ void Random<RNG>::shuffle(T * arr, uint32_t len){
 		arr[j] = t;
 	}
 }
-
-
 
 } // al::rnd::
 } // al::
