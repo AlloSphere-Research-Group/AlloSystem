@@ -165,4 +165,71 @@ int addIcosahedron(Mesh& m){
 	return Nv;
 }
 
+
+int addSphere(Mesh& m, double radius, int slices, int stacks){
+
+	struct CSin{
+		CSin(double frq, double radius=1.)
+		:	r(radius), i(0.), dr(cos(frq)), di(sin(frq)){}
+		void operator()(){
+			double r_ = r*dr - i*di;
+			i = r*di + i*dr;
+			r = r_;
+		}
+		double r,i,dr,di;
+	};
+
+	int Nv = m.vertices().size();
+
+	CSin P( M_PI/stacks); P.r = P.dr; P.i = P.di;
+	CSin T(M_2PI/slices, radius);
+
+	// add top cap
+	m.vertex(0,0,1);
+	for(int i=0; i<slices; ++i){
+		m.index(Nv+1 + i);
+		m.index(Nv+1 + ((i+1)%slices));
+		m.index(Nv);		
+	}
+
+	// add rings
+	for(int j=0; j<stacks-2; ++j){
+		int jp1 = j+1;
+	
+		for(int i=0; i<slices; ++i){
+			int ip1 = (i+1)%slices;
+
+			int i00 = Nv+1 + j  *slices + i;
+			int i10 = Nv+1 + j  *slices + ip1;
+			int i01 = Nv+1 + jp1*slices + i;
+			int i11 = Nv+1 + jp1*slices + ip1;
+
+			m.vertex(T.r*P.i, T.i*P.i, P.r);
+			m.index(i00);
+			m.index(i10);
+			m.index(i01);
+			m.index(i01);
+			m.index(i10);
+			m.index(i11);
+			T();
+		}
+		P();
+	}
+	
+	// add bottom ring and cap
+	int icap = m.vertices().size() + slices;
+	for(int i=0; i<slices; ++i){
+		m.vertex(T.r*P.i, T.i*P.i, P.r);
+		m.index(icap - slices + i);
+		m.index(icap - slices + ((i+1)%slices));
+		m.index(icap);
+		T();
+	}
+	m.vertex(0,0,-1);
+
+	return m.vertices().size()-Nv;
+}
+
+
+
 }

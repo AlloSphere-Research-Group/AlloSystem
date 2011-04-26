@@ -44,6 +44,9 @@ int addDodecahedron(Mesh& m);
 /// Add icosahedron as triangle vertices and indices
 int addIcosahedron(Mesh& m);
 
+/// Add sphere as triangle vertices and indices
+int addSphere(Mesh& m, double radius=1, int slices=8, int stacks=8);
+
 } // al::
 
 #endif
