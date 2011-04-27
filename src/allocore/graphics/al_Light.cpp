@@ -68,8 +68,9 @@ static int nextID(){
 static void freeID(int i){ lightPool()[i]=false; }
 
 
+// NOTE: all defaults match the OpenGL defaults for LIGHT0
 Light::Light(float x, float y, float z)
-:	mID(nextID()), mAmbient(0.), mDiffuse(0.1), mSpecular(0.4)
+:	mID(nextID()), mAmbient(0), mDiffuse(1), mSpecular(1)
 {
 	mPos[3]=1;
 	pos(x,y,z);
@@ -92,7 +93,7 @@ void Light::operator()() const {
     glLightf(glID, GL_QUADRATIC_ATTENUATION,mAtten[2]);
 
 	glEnable(glID); // MUST enable each light source after configuration
-	glShadeModel(GL_SMOOTH);
+//	glShadeModel(GL_SMOOTH); // enabled by default and don't want to force...
 }
 
 Light& Light::attenuation(float c0, float c1, float c2){
