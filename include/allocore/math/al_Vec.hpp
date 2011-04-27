@@ -587,6 +587,25 @@ static inline void translate(Mat<N+1,T>& m, const Vec<N,V>& trans){
 	}
 }
 
+/// Rotate existing transformation matrix along a plane
+
+/// @param[in] m		transformation matrix
+/// @param[in] angle	angle of rotation, in radians
+/// @param[in] dim1		local coordinate frame axis to rotate away from
+/// @param[in] dim2		local coordinate frame axis to rotate towards
+template<int N, class T>
+static inline void rotate(Mat<N,T>& m, double angle, int dim1, int dim2){
+	double cs = cos(angle);
+	double sn = sin(angle);
+	for(int R=0; R<N-1; ++R){
+		const T& v1 = m(R, dim1);
+		const T& v2 = m(R, dim2);
+		T t = v1*cs + v2*sn;
+		m(R, dim2) = v2*cs - v1*sn;
+		m(R, dim1) = t;
+	}
+}
+
 
 
 // Specialized vector functions
