@@ -66,9 +66,9 @@ int main(){
 		
 		Mat4f xfm;
 		xfm.setIdentity();
-		scale(xfm, Vec3f(rnd::uniform(1.,0.1), rnd::uniform(1.,0.1), rnd::uniform(1.,0.1)));
-		translate(xfm, Vec3f(rnd::uniformS(8.), rnd::uniformS(8.), rnd::uniformS(8.)));
-		//rotate(xfm, rnd::uniform(), rnd::uniform(), rnd::uniform());
+		xfm.scale(Vec3f(rnd::uniform(1.,0.1), rnd::uniform(1.,0.1), rnd::uniform(1.,0.1)));
+		xfm.translate(Vec3f(rnd::uniformS(8.), rnd::uniformS(8.), rnd::uniformS(8.)));
+		//xfm.rotate(rnd::uniform(), rnd::uniform(), rnd::uniform());
 		
 		shapes.transform(xfm, shapes.vertices().size()-Nv);
 

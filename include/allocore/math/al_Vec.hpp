@@ -459,6 +459,59 @@ public:
 	/// Get trace (sum of diagonal elements)
 	T trace() const { return diagonal().sum(); }
 
+
+	// Affine transformations
+
+	/// Scale transformation matrix
+	template<class V>
+	Mat& scale(const Vec<N-1,V>& amount){
+		for(int C=0; C<N-1; ++C){
+			for(int R=0; R<N-1; ++R){
+				(*this)(R, C) *= amount[C];
+			}
+		}
+		return *this;
+	}
+
+	/// Scale transformation matrix by uniform amount
+	template<class V>
+	Mat& scale(const V& amount){
+		for(int C=0; C<N-1; ++C){
+			for(int R=0; R<N-1; ++R){
+				(*this)(R, C) *= amount;
+			}
+		}
+		return *this;
+	}
+
+	/// Translate transformation matrix
+	template<class V>
+	Mat& translate(const Vec<N-1,V>& amount){
+		for(int R=0; R<N-1; ++R){
+			(*this)(R, N-1) += amount[R];
+		}
+		return *this;
+	}
+
+	/// Rotate transformation matrix along a plane
+
+	/// @param[in] angle	angle of rotation, in radians
+	/// @param[in] dim1		local coordinate frame axis to rotate away from
+	/// @param[in] dim2		local coordinate frame axis to rotate towards
+	Mat& rotate(double angle, int dim1, int dim2){
+		double cs = cos(angle);
+		double sn = sin(angle);
+		for(int R=0; R<N-1; ++R){
+			const T& v1 = (*this)(R, dim1);
+			const T& v2 = (*this)(R, dim2);
+			T t = v1*cs + v2*sn;
+			(*this)(R, dim2) = v2*cs - v1*sn;
+			(*this)(R, dim1) = t;
+		}
+		return *this;
+	}
+
+
 	/// Computes matrix product r = a * b
 	
 	/// Returns reference to result
@@ -498,6 +551,9 @@ public:
 
 
 
+// -----------------------------------------------------------------------------
+// The following are functions that either cannot be defined as class methods
+// (due to syntax rules or specialization) or simply are not object oriented.
 
 // Non-member binary arithmetic operations
 
@@ -556,56 +612,6 @@ template <int N, class T>
 inline Vec<N,T> operator* (const Vec<N,T>& vRow, const Mat<N,T>& m){
 	Vec<N,T> r; return Mat<N,T>::multiply(r, vRow,m);
 }
-
-
-// Affine transformations
-
-/// Scale existing transformation matrix
-template<int N, class T, class V>
-static inline void scale(Mat<N+1,T>& m, const Vec<N,V>& scale){
-	for(int C=0; C<N; ++C){
-		for(int R=0; R<N; ++R){
-			m(R, C) *= scale[C];
-		}
-	}
-}
-
-template<int N, class T, class V>
-static inline void scale(Mat<N,T>& m, const V& scale){
-	for(int C=0; C<N-1; ++C){
-		for(int R=0; R<N-1; ++R){
-			m(R, C) *= scale;
-		}
-	}
-}
-
-/// Translate existing transformation matrix
-template<int N, class T, class V>
-static inline void translate(Mat<N+1,T>& m, const Vec<N,V>& trans){
-	for(int R=0; R<N; ++R){
-		m(R, N) += trans[R];
-	}
-}
-
-/// Rotate existing transformation matrix along a plane
-
-/// @param[in] m		transformation matrix
-/// @param[in] angle	angle of rotation, in radians
-/// @param[in] dim1		local coordinate frame axis to rotate away from
-/// @param[in] dim2		local coordinate frame axis to rotate towards
-template<int N, class T>
-static inline void rotate(Mat<N,T>& m, double angle, int dim1, int dim2){
-	double cs = cos(angle);
-	double sn = sin(angle);
-	for(int R=0; R<N-1; ++R){
-		const T& v1 = m(R, dim1);
-		const T& v2 = m(R, dim2);
-		T t = v1*cs + v2*sn;
-		m(R, dim2) = v2*cs - v1*sn;
-		m(R, dim1) = t;
-	}
-}
-
 
 
 // Specialized vector functions

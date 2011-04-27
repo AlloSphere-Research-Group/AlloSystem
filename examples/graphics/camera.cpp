@@ -32,8 +32,8 @@ struct MyWindow : public Window, public Drawable {
 
 			Mat4f xfm;
 			xfm.setIdentity();
-			scale(xfm, rnd::uniform(2.,0.2));
-			translate(xfm, Vec3f(rnd::uniformS(20.), rnd::uniformS(20.), rnd::uniformS(20.)));
+			xfm.scale(rnd::uniform(2.,0.2));
+			xfm.translate(Vec3f(rnd::uniformS(20.), rnd::uniformS(20.), rnd::uniformS(20.)));
 			shapes.transform(xfm, shapes.vertices().size()-Nv);
 
 			for(int i=0; i<Nv; ++i){
