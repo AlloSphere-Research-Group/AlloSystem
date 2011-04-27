@@ -264,12 +264,12 @@ std::string toString(const T& v){
 }
 
 template<> inline float uintToUnit<float>(uint32_t v){
-	v = v >> 9 | Expo1<float>(); 
+	v = v >> 9 | Expo1<float>();	// float in [1, 2)
 	return punUF(v) - 1.f;
 }
 
 template<> inline float uintToUnitS<float>(uint32_t v){
-	v = v >> 9 | 0x40000000;
+	v = v >> 9 | 0x40000000;		// float in [2, 4)
 	return punUF(v) - 3.f;
 }
 
