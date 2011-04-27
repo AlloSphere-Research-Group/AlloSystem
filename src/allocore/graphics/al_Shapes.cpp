@@ -181,11 +181,11 @@ int addSphere(Mesh& m, double radius, int slices, int stacks){
 
 	int Nv = m.vertices().size();
 
-	CSin P( M_PI/stacks); P.r = P.dr; P.i = P.di;
-	CSin T(M_2PI/slices, radius);
+	CSin P( M_PI/stacks); P.r = P.dr*radius; P.i = P.di*radius;
+	CSin T(M_2PI/slices);
 
 	// add top cap
-	m.vertex(0,0,1);
+	m.vertex(0,0,radius);
 	for(int i=0; i<slices; ++i){
 		m.index(Nv+1 + i);
 		m.index(Nv+1 + ((i+1)%slices));
@@ -206,10 +206,10 @@ int addSphere(Mesh& m, double radius, int slices, int stacks){
 
 			m.vertex(T.r*P.i, T.i*P.i, P.r);
 			m.index(i00);
-			m.index(i10);
-			m.index(i01);
 			m.index(i01);
 			m.index(i10);
+			m.index(i10);
+			m.index(i01);
 			m.index(i11);
 			T();
 		}
@@ -220,12 +220,12 @@ int addSphere(Mesh& m, double radius, int slices, int stacks){
 	int icap = m.vertices().size() + slices;
 	for(int i=0; i<slices; ++i){
 		m.vertex(T.r*P.i, T.i*P.i, P.r);
-		m.index(icap - slices + i);
 		m.index(icap - slices + ((i+1)%slices));
+		m.index(icap - slices + i);
 		m.index(icap);
 		T();
 	}
-	m.vertex(0,0,-1);
+	m.vertex(0,0,-radius);
 
 	return m.vertices().size()-Nv;
 }
