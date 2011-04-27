@@ -2,8 +2,7 @@
 Allocore Example: Camera
 
 Description:
-A very simple app that shows how the camera can be used (with Drawable and Nav 
-classes).
+A very simple app that shows how to build a navigable camera.
 
 Author:
 Ritesh Lala, 4/20/2011
@@ -15,7 +14,7 @@ Modified by Lance Putnam, 4/25/2011
 
 using namespace al;
 
-struct MyWindow : public Window, public Drawable, public Nav{
+struct MyWindow : public Window, public Drawable {
     
     MyWindow()
 	:	nav(Vec3d(0,0,-2), 0.8)
