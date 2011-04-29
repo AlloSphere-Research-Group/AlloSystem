@@ -351,6 +351,11 @@ int utMath(){
 				T(-1.,-1.) T(-1.2,-1.) T(-1.8,-1.) T(-1000.1,-1000.)
 	#undef T
 
+	#define T(x, y) assert(al::ceilPow2(x) == y);
+	T(0, 0) T(1, 1) T(2, 2) T(3, 4)
+	T(500, 512) T(999, 1024)
+	#undef T
+
 	#define T(x, y) assert(al::clip(x) == y);
 	T(0., 0.) T(0.5, 0.5) T(1., 1.) T(1.2, 1.) T(-0.5, 0.) T(pinf, 1.) T(ninf, 0.)
 	#undef T
@@ -373,6 +378,11 @@ int utMath(){
 	#define T(x, y) assert(al::floor(x) == y);
 	T(0., 0.)	T( 1., 1.) T( 1.2, 1.) T( 1.8, 1.) T( 1000.1, 1000.)
 				T(-1.,-1.) T(-1.2,-2.) T(-1.8,-2.) T(-1000.1,-1001.)
+	#undef T
+
+	#define T(x, y) assert(al::floorPow2(x) == y);
+	T(0, 1) T(1, 1) T(2, 2) T(3, 2)
+	T(513, 512) T(1090, 1024)
 	#undef T
 
 	#define T(x, y) assert(eq(al::fold(x), y));
@@ -597,30 +607,40 @@ int utMath(){
 	{
 		using namespace al::rnd;
 		//for(int i=0; i<8; ++i) printf("%u\n", al::rnd::seed());
+		{
+			rnd::LinCon r;
+	//		printf("%u\n", r());
+	//		printf("%u\n", r());
+	//		r.seed(137);
+	//		for(int i=0; i<4; ++i) printf("%u\n", r());
+			
+			//for(int i=0; i<400; ++i) printf("% d ", rnd::uniform(2));
+		}
+
 		assert(seed() != seed());
 		
-		{
-		LinCon r;
-		assert(r() != r());
+		// ensure results are unique
+		{	LinCon r;
+			assert(r() != r());
 		}
 
-		{
-		MulLinCon r;
-		assert(r() != r());
+		{	MulLinCon r;
+			assert(r() != r());
 		}
 
-		{
-		Tausworthe r;
-		assert(r() != r());
+		{	Tausworthe r;
+			assert(r() != r());
 		}
-		
-		//assert(uniform() != uniform() != uniform());
 
 		Random<> r;
 		int N = 100000;
+		for(int i=0; i<N; ++i){ float v=r.uniform(); assert(  0 <= v && v < 1); }
 		for(int i=0; i<N; ++i){ int v=r.uniform(20,  0); assert(  0 <= v && v < 20); }
 		for(int i=0; i<N; ++i){ int v=r.uniform(20, 10); assert( 10 <= v && v < 20); }
 		for(int i=0; i<N; ++i){ int v=r.uniform(20,-10); assert(-10 <= v && v < 20); }
+
+		for(int i=0; i<N; ++i){ float v=r.uniformS(); assert(  -1 < v && v < 1); }
+		for(int i=0; i<N; ++i){ int v=r.uniformS(20); assert( -20 < v && v < 20); }
 
 		//for(int i=0; i<32; ++i) printf("% g ", r.uniformS());
 		//for(int i=0; i<32; ++i) printf("%d ", r.prob(0.1));
