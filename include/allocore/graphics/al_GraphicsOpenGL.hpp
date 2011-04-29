@@ -116,7 +116,6 @@ public:
 
 	// OpenGL specific:
 	void enableLight(bool enable, int idx);
-	void setPolygonMode(Graphics::PolygonMode mode);
 
 	// Textures
 	virtual void textureCreate(Texture *tex);
@@ -169,6 +168,7 @@ private:
 	virtual void p_antialiasing(AntiAliasMode v);
 	virtual void p_lineWidth(double v);
 	virtual void p_pointSize(double v);
+	virtual void p_polygonMode(PolygonMode m, Face f);
 	
 	virtual void p_fog(float end, float start, const Color& c);
 };

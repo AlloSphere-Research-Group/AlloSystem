@@ -31,13 +31,6 @@ GLenum GraphicsGL :: gl_antialias_mode(Graphics::AntiAliasMode v) {
 	}
 }
 
-GLenum GraphicsGL :: gl_matrix_mode(Graphics::MatrixMode v) {
-	switch(v){
-		CS(MODELVIEW) CS(PROJECTION)
-		default: return GL_MODELVIEW;
-	}
-}
-
 GLenum GraphicsGL :: gl_blend_func(Graphics::BlendFunc v) {
 	switch(v){	
 		CS(SRC_COLOR) 
@@ -55,6 +48,28 @@ GLenum GraphicsGL :: gl_blend_func(Graphics::BlendFunc v) {
 	}
 }
 
+GLenum GraphicsGL :: gl_capability(Graphics::Capability v){
+	switch(v){
+		CS(BLEND) CS(COLOR_MATERIAL) CS(DEPTH_TEST) CS(LIGHTING)
+		CS(SCISSOR_TEST)
+		default: return 0;
+	}
+}
+
+static inline GLenum gl_face(Graphics::Face v){
+	switch(v){
+		CS(FRONT) CS(BACK) CS(FRONT_AND_BACK)
+		default: return 0;
+	}
+}
+
+GLenum GraphicsGL :: gl_matrix_mode(Graphics::MatrixMode v) {
+	switch(v){
+		CS(MODELVIEW) CS(PROJECTION)
+		default: return GL_MODELVIEW;
+	}
+}
+
 GLenum GraphicsGL :: gl_polygon_mode(Graphics::PolygonMode v) {
 	switch(v){
 		CS(POINT) CS(LINE)
@@ -67,14 +82,6 @@ GLenum GraphicsGL :: gl_primitive(Graphics::Primitive v){
 		CS(POINTS) CS(LINES) CS(LINE_STRIP) CS(LINE_LOOP) CS(TRIANGLES)
 		CS(TRIANGLE_STRIP) CS(TRIANGLE_FAN) CS(QUADS) CS(QUAD_STRIP) CS(POLYGON)
 		default: return GL_POINTS;
-	}
-}
-
-GLenum GraphicsGL :: gl_capability(Graphics::Capability v){
-	switch(v){
-		CS(BLEND) CS(COLOR_MATERIAL) CS(DEPTH_TEST) CS(LIGHTING)
-		CS(SCISSOR_TEST)
-		default: return 0;
 	}
 }
 
@@ -185,15 +192,10 @@ void GraphicsGL :: p_antialiasing(AntiAliasMode mode) {
 
 void GraphicsGL :: p_lineWidth(double v) { glLineWidth(v); }
 void GraphicsGL :: p_pointSize(double v) { glPointSize(v); }
-
+void GraphicsGL :: p_polygonMode(PolygonMode m, Face f) { glPolygonMode(gl_face(f), gl_polygon_mode(m)); }
 
 void GraphicsGL :: p_currentColor(double r, double g, double b, double a) {
 	glColor4f(r, g, b, a);
-}
-
-
-void GraphicsGL :: setPolygonMode(Graphics::PolygonMode mode) {
-	glPolygonMode(GL_FRONT_AND_BACK, gl_polygon_mode(mode));
 }
 
 // Buffer drawing
