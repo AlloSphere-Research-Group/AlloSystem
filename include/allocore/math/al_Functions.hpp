@@ -409,13 +409,13 @@ TEM inline T ceil(T v, T s){ return ceil(v/s)*s; }
 TEM inline T ceil(T v, T s, T r){ return ceil(v*r)*s; }
 
 inline uint32_t ceilPow2(uint32_t v){
-	v--;
+	--v;
 	v |= v >> 1;
 	v |= v >> 2;
 	v |= v >> 4;
 	v |= v >> 8;
 	v |= v >> 16;
-	return ++v;
+	return v+1;
 }
 
 TEM inline T clip(T v, T hi, T lo){
