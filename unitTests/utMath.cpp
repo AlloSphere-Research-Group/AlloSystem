@@ -40,6 +40,10 @@ int utMath(){
 		
 		char c2[] = {1,0,1,0,1,0,1,0};
 		a.set(c2,2);			assert(a == 1);
+		
+		a.zero();
+		a.set(Vec<N-1,int>(1,2,3), 4);
+								assert(a[0] == 1 && a[1] == 2 && a[2] == 3 && a[3] == 4);
 		}
 		
 		a.zero();				assert(a == 0);

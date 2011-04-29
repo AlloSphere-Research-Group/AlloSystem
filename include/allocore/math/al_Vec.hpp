@@ -92,6 +92,11 @@ public:
 	template <class T2>
 	Vec(const Vec<N, T2>& v){ set(v); }
 
+	/// @param[in] v		vector to initialize all elements to
+	/// @param[in] s		value of last element
+	template <class Tv, class Ts>
+	Vec(const Vec<N-1, Tv>& v, const Ts& s){ set(v,s); }
+
 	/// @param[in] v		pointer to array to initialize all elements to
 	/// @param[in] stride	stride factor through array
 	template <class T2>
@@ -223,7 +228,11 @@ public:
 	/// Set elements from another vector
 	template <int N2, class T2>
 	Vec& set(const Vec<N2, T2> &v){ IT(N<N2?N:N2){ (*this)[i] = T(v[i]); } return *this; }
-	
+
+	/// Set elements from another vector and scalar
+	template <class Tv, class Ts>
+	Vec& set(const Vec<N-1, Tv> &v, const Ts& s){ (*this)[N-1]=s; return set(v); }
+
 	/// Set all elements to the same value
 	Vec& set(const T& v){ IT(N){ (*this)[i] = v; } return *this; }
 
