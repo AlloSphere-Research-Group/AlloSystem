@@ -443,6 +443,7 @@ GLenum internal_format_from_format(Texture::Format format, Texture::Type type) {
 }
 
 void GraphicsGL :: textureCreate(Texture *tex) {
+//printf("GraphicsGL::textureCreate\n");
 	GLuint texid = 0;
 	
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -455,7 +456,6 @@ void GraphicsGL :: textureCreate(Texture *tex) {
 	// get the OpenGL texture target
 	tex->target(check_target(tex->target()));
 	GLenum gltarget = target_from_texture_target(tex->target());
-	
 
 	glBindTexture(gltarget, texid);
 	
@@ -494,7 +494,6 @@ void GraphicsGL :: textureCreate(Texture *tex) {
 	glTexParameteri(gltarget, GL_TEXTURE_MIN_FILTER, glminfilter);
 	glTexParameterfv(gltarget, GL_TEXTURE_BORDER_COLOR, tex->borderColor().to_ptr());
 
-
 	GLenum glformat = format_from_texture_format(tex->format());
 	GLenum gltype = type_from_texture_type(tex->type());
 	GLenum iformat = internal_format_from_format(tex->format(), tex->type());
@@ -505,6 +504,7 @@ void GraphicsGL :: textureCreate(Texture *tex) {
 			break;
 			
 		case GL_TEXTURE_2D:
+//printf("GraphicsGL::textureCreate glTexImage2D\n");
 		case GL_TEXTURE_RECTANGLE_ARB:
 			glTexImage2D(gltarget, 0, iformat, w, h, 0, glformat, gltype, NULL);
 			break;
@@ -515,6 +515,7 @@ void GraphicsGL :: textureCreate(Texture *tex) {
 			break;
 	}
 
+//	printf("%x, %x, (%d, %d), %x %x %p\n", gltarget, iformat, w,h, glformat, gltype, tex->data());
 
 	glBindTexture(gltarget, 0);
 	glDisable(gltarget);
@@ -631,12 +632,13 @@ void GraphicsGL :: textureSubmit(Texture *tex){
 				break;
 			case GL_TEXTURE_2D:
 			case GL_TEXTURE_RECTANGLE_ARB:
+//printf("GraphicsGL::textureSubmit glTexSubImage2D %p\n", tex->data());
 				glTexSubImage2D(
 					gltarget, 
 					0, 0, 0, 
 					tex->width(), tex->height(), 
-					glformat, 
-					gltype, 
+					glformat,
+					gltype,
 					data
 				);
 				break;

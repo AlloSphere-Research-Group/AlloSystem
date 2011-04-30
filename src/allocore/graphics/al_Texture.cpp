@@ -83,8 +83,8 @@ void Texture::bind(int unit) {
 		destroy();
 	}
 
-	bool did_create = false;
 	if(!created()) {
+//printf("Texture::bind !created()\n");
 		create();
 		mRebuild = false;
 		
@@ -95,8 +95,7 @@ void Texture::bind(int unit) {
 				clear(unit);
 			}
 		}
-		
-		did_create = true;
+
 		mUpdate = true;
 	}
 
@@ -124,10 +123,14 @@ void Texture::setArrayFormat(const AlloArrayHeader &header) {
 	mWidth = header.dim[0];
 	mHeight = header.dim[1];
 	mDepth = header.dim[2];
-	
-	mRect = header.dim[0] == header.dim[1];
+
+	// Select use of rectangular texture based on dimensions.
+	// This will effect setting target type below!
+	mRect = (mWidth != mHeight);			// shouldn't it be this...
+//	mRect = header.dim[0] == header.dim[1];	// and not this?
+
 	mTarget = target_for_array_dimcount(header.dimcount);
-	
+
 	// allocate array data space
 	mArray.format(header);
 }
