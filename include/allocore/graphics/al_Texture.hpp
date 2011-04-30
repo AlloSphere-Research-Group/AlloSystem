@@ -66,8 +66,18 @@ public:
 	void attach(Surface *s);
 	void clear(int unit=0, bool do_bind=true, bool clear_data=false);
 
+	/// Bind texture
+
+	/// @param[in] unit		bind location (e.g. as used in a shader)
+	///
 	void bind(int unit = 0);
+
+	/// Unbind texture
+
+	/// @param[in] unit		bind location (e.g. as used in a shader)
+	///
 	void unbind(int unit = 0);
+
 	void setArrayFormat(const AlloArrayHeader &header);
 	void fromArray(const al::Array *array);
 	void toArray();
