@@ -4,26 +4,25 @@
 #include <string>
 #include "allocore/graphics/al_GPUObject.hpp"
 
+#define AL_SHADER_MAX_LOG_SIZE	4096
+
 namespace al{
 
 /// Shader abstract base class
 class ShaderBase : public GPUObject{
 public:
-	ShaderBase(): mLog(0){}
-	
-	virtual ~ShaderBase(){ deleteLog(); }
 
-	/// Returns info log or 0 if none.
-	const char * log();
+	virtual ~ShaderBase(){}
+
+	/// Returns info log or 0 if none
+	const char * log() const;
+
+	/// Prints info log, if any
+	void printLog() const;
 
 protected:
-	char * mLog;
-	void deleteLog(){ delete[] mLog; }
-	void newLog(int size){ deleteLog(); mLog=new char[size]; }
-
-	//virtual void get(int pname, GLint * params) = 0;
 	virtual void get(int pname, void * params) const = 0;
-	
+	virtual void getLog(char * buf) const = 0;
 };
 
 
@@ -60,15 +59,16 @@ private:
 	void sendSource();
 
 	virtual void get(int pname, void * params) const;
-	
+	virtual void getLog(char * buf) const;
+
 	virtual void onCreate();
-	virtual void onDestroy();
-	
+	virtual void onDestroy();	
 };
 
 
 
 /// Shader program object
+
 /// A program object represents a useable part of render pipeline. 
 /// Links shaders to one program object
 class ShaderProgram : public ShaderBase{
@@ -116,14 +116,14 @@ public:
 	virtual ~ShaderProgram(){ destroy(); }
 	
 	/// input Shader s will be compiled if necessary:
-	const ShaderProgram& attach(Shader& s);
+	ShaderProgram& attach(Shader& s);
 	const ShaderProgram& detach(const Shader& s) const;
 	
-	// these parameters must be set on Geometry shaders before being linked.
+	// These parameters must be set before attaching geometry shaders
 	void setGeometryInputPrimitive(Graphics::Primitive prim) { inPrim = prim; }
 	void setGeometryOutputPrimitive(Graphics::Primitive prim) { outPrim = prim; }
 	void setGeometryOutputVertices(unsigned int i) { outVertices = i; }
-	
+
 	const ShaderProgram& link() const;
 	const ShaderProgram& use() const;
 	
@@ -166,6 +166,8 @@ protected:
 	unsigned int outVertices;
 	
 	virtual void get(int pname, void * params) const;
+	virtual void getLog(char * buf) const;
+
 	virtual void onCreate();
 	virtual void onDestroy();
 };

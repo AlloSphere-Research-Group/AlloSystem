@@ -19,13 +19,32 @@ GLenum gl_shader_type(Shader::Type v) {
 	}
 }
 
-const char * ShaderBase::log(){
+const char * ShaderBase::log() const {
+//	GLint lsize; get(GL_INFO_LOG_LENGTH, &lsize);
+//	if(0==lsize) return NULL;
+//	newLog(lsize);
+//	glGetShaderInfoLog(id(), 4096, NULL, mLog);
+//	//glGetInfoLogARB((GLhandleARB)handle(), 4096, NULL, mLog);
+//	return mLog;
+
 	GLint lsize; get(GL_INFO_LOG_LENGTH, &lsize);
 	if(0==lsize) return NULL;
-	newLog(lsize);
-	glGetShaderInfoLog(id(), 4096, NULL, mLog);
-	//glGetInfoLogARB((GLhandleARB)handle(), 4096, NULL, mLog);
-	return mLog;
+
+	static char buf[AL_SHADER_MAX_LOG_SIZE];
+	getLog(buf);
+	return buf;
+}
+
+void ShaderBase::printLog() const {
+	const char * s = log();
+	if(s) printf("%s\n", s);
+}
+
+void Shader::getLog(char * buf) const {
+	glGetShaderInfoLog(id(), AL_SHADER_MAX_LOG_SIZE, NULL, buf);
+}
+void ShaderProgram::getLog(char * buf) const {
+	glGetProgramInfoLog(id(), AL_SHADER_MAX_LOG_SIZE, NULL, buf);
 }
 
 /*
@@ -98,7 +117,7 @@ Shader& Shader::source(const std::string& src, Shader::Type type){
 
 
 
-const ShaderProgram& ShaderProgram::attach(Shader& s) { 
+ShaderProgram& ShaderProgram::attach(Shader& s){
 	validate();
 	s.compile();
 	glAttachObjectARB((GLhandleARB)id(), (GLhandleARB)s.id());
