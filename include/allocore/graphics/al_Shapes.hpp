@@ -44,8 +44,19 @@ int addDodecahedron(Mesh& m);
 /// Add icosahedron as triangle vertices and indices
 int addIcosahedron(Mesh& m);
 
+
 /// Add sphere as triangle vertices and indices
+
+/// @param[in,out]	m		mesh to add vertices and indices to
+/// @param[in]		radius	radius of sphere
+/// @param[in]		slices	number of slices around z axis
+/// @param[in]		stacks	number of stacks on xy plane
 int addSphere(Mesh& m, double radius=1, int slices=8, int stacks=8);
+
+
+/// Add wireframe box as line vertices and indices
+int addWireBox(Mesh& m, float width, float height, float depth);
+inline int addWireBox(Mesh& m, float size=1){ return addWireBox(m,size,size,size); }
 
 } // al::
 
