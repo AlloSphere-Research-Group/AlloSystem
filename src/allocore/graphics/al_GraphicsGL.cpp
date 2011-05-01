@@ -173,9 +173,9 @@ void GraphicsGL :: p_scale(double x, double y, double z) { glScaled(x, y, z); }
 	// Other state
 void GraphicsGL :: p_antialiasing(AntiAliasMode mode) {
 	GLenum m = gl_antialias_mode(mode);
-	glEnable(GL_POINT_SMOOTH_HINT);
-	glEnable(GL_LINE_SMOOTH_HINT);
-	glEnable(GL_POLYGON_SMOOTH_HINT);
+//	glEnable(GL_POINT_SMOOTH_HINT);
+//	glEnable(GL_LINE_SMOOTH_HINT);
+//	glEnable(GL_POLYGON_SMOOTH_HINT);
 	glHint(GL_POINT_SMOOTH_HINT, m);
 	glHint(GL_LINE_SMOOTH_HINT, m);
 	glHint(GL_POLYGON_SMOOTH_HINT, m);
