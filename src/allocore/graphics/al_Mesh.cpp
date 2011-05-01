@@ -231,7 +231,7 @@ void Mesh::getBounds(Vertex& min, Vertex& max) const {
 	}
 }
 
-Vec3f Mesh::getCenter() const {
+Mesh::Vertex Mesh::getCenter() const {
 	Vertex min(0), max(0);
 	getBounds(min, max);
 	return min+(max-min)*0.5;
@@ -249,22 +249,16 @@ void Mesh::unitize() {
 	}
 }
 
-void Mesh::translate(double x, double y, double z) {
-	for (int v=0; v<mVertices.size(); v++) {
-		Vertex& vt = mVertices[v];
-		vt[0] += x;
-		vt[1] += y;
-		vt[2] += z;
-	}
+void Mesh::translate(double x, double y, double z){
+	const Vertex xfm(x,y,z);
+	for(int i=0; i<vertices().size(); ++i)
+		mVertices[i] += xfm;
 }
 
-void Mesh::scale(double x, double y, double z) {
-	for (int v=0; v<mVertices.size(); v++) {
-		Vertex& vt = mVertices[v];
-		vt[0] *= x;
-		vt[1] *= y;
-		vt[2] *= z;
-	}
+void Mesh::scale(double x, double y, double z){
+	const Vertex xfm(x,y,z);
+	for(int i=0; i<vertices().size(); ++i)
+		mVertices[i] *= xfm;
 }
 
 } // ::al

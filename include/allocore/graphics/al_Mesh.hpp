@@ -49,11 +49,15 @@ public:
 	/// @param[in] primitive	renderer-dependent primitive number
 	Mesh(int primitive=0): mPrimitive(primitive){}
 
-
+	/// Get corners of bounding box of vertices
+	
+	/// @param[out] min		minimum corner of bounding box
+	/// @param[out] max		maximum corner of bounding box
 	void getBounds(Vec3f& min, Vec3f& max) const;
 
 	/// Get center of vertices
-	Vec3f getCenter() const;
+	Vertex getCenter() const;
+
 
 	// destructive edits to internal vertices:
 
@@ -61,6 +65,9 @@ public:
 	void decompress();
 
 	/// Extend buffers to match number of vertices
+	
+	/// This will resize all populated buffers to match the size of the vertex
+	/// buffer. Buffers are extended by copying their last element.
 	void equalizeBuffers();
 
 	/// Reset all buffers
@@ -87,7 +94,7 @@ public:
 	
 	/// This method will generate a normal for each vertex in the buffer
 	/// assuming the drawing primitive is a triangle. Face normals are generated
-	/// if no indices are present, and average vertex normals are generated
+	/// if no indices are present, and averaged vertex normals are generated
 	/// if indices are present. This will replace any normals currently in use.
 	///
 	/// @param[in] normalize	whether to normalize normals
@@ -188,15 +195,17 @@ protected:
 template <class T>
 void Mesh::transform(const Mat<4,T>& m, int begin, int end){
 	if(end<0) end += vertices().size()+1; // negative index wraps to end of array
+//	for(int i=begin; i<end; ++i){
+//		Vertex& ver = vertices()[i];
+//		Vec<4,T> vec(ver[0], ver[1], ver[2], 1);
+//		ver.set(m*vec);
+//	}
 	for(int i=begin; i<end; ++i){
 		Vertex& ver = vertices()[i];
-		Vec<4,T> vec(ver[0], ver[1], ver[2], 1);
-		ver.set(m*vec);
+		ver.set(m * Vec<4,T>(ver, 1));
 	}
 }
 
 } // al::
 
-
-#endif	/* include guard */
-
+#endif
