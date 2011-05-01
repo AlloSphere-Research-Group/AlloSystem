@@ -15,7 +15,7 @@ using namespace al;
 struct MyWindow : public Window, public Drawable {
     
     MyWindow()
-	:	angle(0), wireframe(false)
+	:	angle(0), wireframe(false), vertexLight(true)
 	{		
 		add(new StandardWindowKeyControls);
 		cam.fovy(45);
@@ -48,7 +48,7 @@ struct MyWindow : public Window, public Drawable {
 			}
 		}}
 
-		shapes.decompress();
+		if(!vertexLight) shapes.decompress();
 		shapes.generateNormals();
 
 		gl.depthTesting(true);
@@ -67,10 +67,8 @@ struct MyWindow : public Window, public Drawable {
 	}
 	
 	virtual bool onKeyDown(const Keyboard& k){
-		switch(k.key()){
-			case 'f': wireframe^=true; break;
-			default:;
-		}
+				if(k.key('f')) wireframe  ^=true;
+		else	if(k.key('l')) vertexLight^=true;
 		return true;
 	}
     
@@ -81,6 +79,7 @@ struct MyWindow : public Window, public Drawable {
 	Light light;
 	double angle;
 	bool wireframe;
+	bool vertexLight;
 };
 
 int main(){
