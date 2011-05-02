@@ -277,6 +277,55 @@ void Scene :: mesh(unsigned int i, Mesh& mesh) const {
 	}
 }
 
+void Scene :: meshAlt(unsigned int i, Mesh& mesh) const {
+	if (i < meshes()) {
+		aiMesh * amesh = mImpl->scene->mMeshes[i];
+		if (amesh) {
+			//mesh.reset();
+						
+			bool hasnormals = amesh->mNormals != NULL;
+			bool hascolors = amesh->mColors[0] != NULL;
+			bool hastexcoords = amesh->mTextureCoords[0] != NULL;
+			
+			const struct aiFace* face = &amesh->mFaces[0];
+			Graphics::Primitive prim;
+			switch(face->mNumIndices) {
+				case 1: prim = Graphics::POINTS; break;
+				case 2: prim = Graphics::LINES; break;
+				case 3: prim = Graphics::TRIANGLES; break;
+				default: prim = Graphics::POLYGON; break;
+			}
+			mesh.primitive(prim);
+	
+			//read vertices, normals, colors, texcoord
+			for (unsigned int index = 0; index < amesh->mNumVertices; ++index){
+				if(hascolors) {
+					mesh.color(vec4FromAIColor4D(amesh->mColors[0][index]));
+				}
+				if(hasnormals) {
+					mesh.normal(vec3FromAIVector3D(amesh->mNormals[index]));
+				}
+				if(hastexcoords) {
+					mesh.texCoord(vec2FromAIVector3D(amesh->mTextureCoords[0][index]));
+				}
+				mesh.vertex(vec3FromAIVector3D(amesh->mVertices[index]));			
+			}
+
+			//read faces as indices
+			for (unsigned int t = 0; t < amesh->mNumFaces; ++t) {
+				const struct aiFace* tface = &amesh->mFaces[t];
+				for(i = 0; i < tface->mNumIndices; i++) {
+					
+					mesh.index( tface -> mIndices[i] );
+					//printf("face idx %d\n", tface -> mIndices[i] ); 
+				}
+			}
+			
+			// mesh.compress();
+		}
+	}
+}
+
 const Scene::Material& Scene :: material(unsigned int i) const {
 	return mMaterials[i];
 }

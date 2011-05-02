@@ -115,8 +115,6 @@ Shader& Shader::source(const std::string& src, Shader::Type type){
 	
 
 
-
-
 ShaderProgram& ShaderProgram::attach(Shader& s){
 	validate();
 	s.compile();

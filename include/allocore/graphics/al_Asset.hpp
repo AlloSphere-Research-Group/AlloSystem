@@ -119,6 +119,8 @@ public:
 	unsigned int meshes() const;
 	/// read a mesh from the Scene:
 	void mesh(unsigned int i, Mesh& mesh) const;
+	/// alternative read a mesh from the Scene:
+	void meshAlt(unsigned int i, Mesh& mesh) const;	
 	/// get the material index for a given mesh:
 	unsigned int meshMaterial(unsigned int i) const;
 	/// get the name of a given mesh
@@ -136,7 +138,6 @@ public:
 	unsigned int nodes() const;
 	/// read a node in the scene:
 	Node& node(unsigned int i) const;
-	
 	
 	/// get scene extents
 	void getBounds(Vec3f& min, Vec3f& max) const;

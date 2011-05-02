@@ -23,7 +23,6 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
-
 #include "allocore/math/al_Vec.hpp"
 #include "allocore/math/al_Matrix4.hpp"
 #include "allocore/types/al_Buffer.hpp"
@@ -44,7 +43,8 @@ public:
 	typedef Vec2f			TexCoord2;
 	typedef Vec3f			TexCoord3;
 	typedef unsigned int	Index;
-
+	typedef Vec3i			TriFace;
+	typedef Vec4i			QuadFace;
 
 	/// @param[in] primitive	renderer-dependent primitive number
 	Mesh(int primitive=0): mPrimitive(primitive){}
@@ -169,6 +169,12 @@ public:
 
 	/// Set geometric primitive
 	void primitive(int prim){ mPrimitive=prim; }
+	/// Get number of faces (assumes triangles or quads)
+//	int numFaces() const { return mIndices.size() / ( ( mPrimitive == Graphics::TRIANGLES ) ? 3 : 4 ); }
+	/// Get indices as triangles
+//	TriFace& indexAsTri(){ return (TriFace*) indices(); }
+	/// Get indices as quads
+//	QuadFace& indexAsQuad(){ return (QuadFace*) indices(); }
 
 	Buffer<Vertex>& vertices(){ return mVertices; }
 	Buffer<Normal>& normals(){ return mNormals; }
@@ -176,7 +182,7 @@ public:
 	Buffer<TexCoord2>& texCoord2s(){ return mTexCoord2s; }
 	Buffer<TexCoord3>& texCoord3s(){ return mTexCoord3s; }
 	Buffer<Index>& indices(){ return mIndices; }
-
+	
 protected:
 
 	// Only populated (size>0) buffers will be used
@@ -186,7 +192,7 @@ protected:
 	Buffer<TexCoord2> mTexCoord2s;
 	Buffer<TexCoord3> mTexCoord3s;
 	Buffer<Index> mIndices;
-
+	
 	int mPrimitive;
 };
 
