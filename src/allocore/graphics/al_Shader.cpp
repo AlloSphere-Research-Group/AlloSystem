@@ -122,9 +122,9 @@ ShaderProgram& ShaderProgram::attach(Shader& s){
 	//glAttachShader(id(), s.id()); 
 	
 	if (s.type() == Shader::GEOMETRY) {
-		glProgramParameteriEXT(id(),GL_GEOMETRY_INPUT_TYPE_EXT,GraphicsGL::gl_primitive(inPrim));
-		glProgramParameteriEXT(id(),GL_GEOMETRY_OUTPUT_TYPE_EXT,GraphicsGL::gl_primitive(outPrim));
-		glProgramParameteriEXT(id(),GL_GEOMETRY_VERTICES_OUT_EXT,outVertices);
+		glProgramParameteriEXT(id(),GL_GEOMETRY_INPUT_TYPE_EXT,GraphicsGL::gl_primitive(mInPrim));
+		glProgramParameteriEXT(id(),GL_GEOMETRY_OUTPUT_TYPE_EXT,GraphicsGL::gl_primitive(mOutPrim));
+		glProgramParameteriEXT(id(),GL_GEOMETRY_VERTICES_OUT_EXT,mOutVertices);
 	}
 	
 	return *this; 
@@ -160,7 +160,7 @@ void ShaderProgram::onDestroy(){
 }
 
 const ShaderProgram& ShaderProgram::use() const { 
-	glUseProgram(id()); 
+	if(active()) glUseProgram(id()); 
 	//glUseProgramObjectARB((GLhandleARB)handle());
 	return *this; 
 }
@@ -168,7 +168,7 @@ void ShaderProgram::begin() const {
 	use(); 
 }
 void ShaderProgram::end() const { 
-	glUseProgram(0); 
+	if(active()) glUseProgram(0); 
 	//glUseProgramObjectARB(0);
 }
 bool ShaderProgram::linked() const { 

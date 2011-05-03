@@ -110,7 +110,10 @@ public:
 		//textures? non square matrices? attributes?
 	};
 
-	ShaderProgram() : inPrim(Graphics::TRIANGLES), outPrim(Graphics::TRIANGLES), outVertices(3) {}
+	ShaderProgram()
+	:	mInPrim(Graphics::TRIANGLES), mOutPrim(Graphics::TRIANGLES), mOutVertices(3),
+		mActive(true)
+	{}
 	
 	/// Any attached shaders will automatically be detached, but not deleted.
 	virtual ~ShaderProgram(){ destroy(); }
@@ -120,13 +123,22 @@ public:
 	const ShaderProgram& detach(const Shader& s) const;
 	
 	// These parameters must be set before attaching geometry shaders
-	void setGeometryInputPrimitive(Graphics::Primitive prim) { inPrim = prim; }
-	void setGeometryOutputPrimitive(Graphics::Primitive prim) { outPrim = prim; }
-	void setGeometryOutputVertices(unsigned int i) { outVertices = i; }
+	void setGeometryInputPrimitive(Graphics::Primitive prim) { mInPrim = prim; }
+	void setGeometryOutputPrimitive(Graphics::Primitive prim) { mOutPrim = prim; }
+	void setGeometryOutputVertices(unsigned int i) { mOutVertices = i; }
 
 	const ShaderProgram& link() const;
 	const ShaderProgram& use() const;
-	
+
+	/// Get whether program is active
+	bool active() const { return mActive; }
+
+	/// Set whether program is active
+	ShaderProgram& active(bool v){ mActive=v; return *this; }	
+
+	/// Toggle active state
+	ShaderProgram& toggleActive(){ mActive^=true; return *this; }
+
 	void begin() const;
 	void end() const;
 
@@ -162,8 +174,9 @@ public:
 	static Type param_type_from_gltype(GLenum gltype);
 
 protected:
-	Graphics::Primitive inPrim, outPrim;	// IO primitives for geometry shaders
-	unsigned int outVertices;
+	Graphics::Primitive mInPrim, mOutPrim;	// IO primitives for geometry shaders
+	unsigned int mOutVertices;
+	bool mActive;
 	
 	virtual void get(int pname, void * params) const;
 	virtual void getLog(char * buf) const;
