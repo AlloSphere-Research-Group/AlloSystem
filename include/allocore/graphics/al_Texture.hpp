@@ -143,6 +143,8 @@ public:
 	void borderColor(const Color& c);
 	const Color& borderColor() const {return mBorderColor;}
 
+	Texture& backend(Graphics& v){ mBackend=&v; return *this; }
+
 	Graphics * backend() {return mBackend;}
 	Surface * surface() {return mSurface;}
 
