@@ -55,6 +55,9 @@ public:
 	Vec<3,T> ntl, ntr, nbl, nbr, ftl, ftr, fbl, fbr;	///< Corners
 	Plane<T> pl[6];										///< Faces
 
+	const Vec<3,T>& corner(int i0, int i1, int i2) const {
+		return (&ntl)[i2<<2 | i1<<1 | i0];
+	}
 
 	/// Test whether point is in frustum
 	int testPoint(const Vec<3,T>& p) const;
