@@ -201,14 +201,9 @@ protected:
 template <class T>
 void Mesh::transform(const Mat<4,T>& m, int begin, int end){
 	if(end<0) end += vertices().size()+1; // negative index wraps to end of array
-//	for(int i=begin; i<end; ++i){
-//		Vertex& ver = vertices()[i];
-//		Vec<4,T> vec(ver[0], ver[1], ver[2], 1);
-//		ver.set(m*vec);
-//	}
 	for(int i=begin; i<end; ++i){
-		Vertex& ver = vertices()[i];
-		ver.set(m * Vec<4,T>(ver, 1));
+		Vertex& v = vertices()[i];
+		v.set(m * Vec<4,T>(v, 1));
 	}
 }
 
