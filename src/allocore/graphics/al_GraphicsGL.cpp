@@ -359,7 +359,7 @@ GLenum wrap_from_texture_wrap(Texture::Target target, Texture::Wrap wrap) {
 			case Texture::CLAMP_TO_EDGE:	return GL_CLAMP_TO_EDGE;
 			case Texture::CLAMP_TO_BORDER:	return GL_CLAMP_TO_BORDER;
 			case Texture::CLAMP:			return GL_CLAMP;
-			//case Texture::REPEAT:
+			case Texture::REPEAT:			return GL_REPEAT;
 			default:
 				return GL_CLAMP_TO_BORDER;
 		}
@@ -369,7 +369,7 @@ GLenum wrap_from_texture_wrap(Texture::Target target, Texture::Wrap wrap) {
 			case Texture::CLAMP_TO_EDGE:	return GL_CLAMP_TO_EDGE;
 			case Texture::CLAMP_TO_BORDER:	return GL_CLAMP_TO_BORDER;
 			case Texture::CLAMP:			return GL_CLAMP;
-			//case Texture::REPEAT:
+			case Texture::REPEAT:			return GL_REPEAT;
 			default:;
 		}
 	}
