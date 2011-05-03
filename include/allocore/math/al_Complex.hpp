@@ -151,6 +151,7 @@ public:
 };
 
 #define TEM template <class T>
+TEM T abs(const Complex<T>& c){ return c.mag(); }
 TEM Complex<T> exp(const Complex<T>& c){ return c.exp(); }
 TEM Complex<T> log(const Complex<T>& c){ return c.log(); }
 TEM Complex<T> pow(const Complex<T>& b, const Complex<T>& e){ return b.pow(e); }
