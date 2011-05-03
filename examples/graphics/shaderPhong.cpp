@@ -59,8 +59,7 @@ struct MyWindow : Window{
 	double angle;
 	bool useShader;
 
-	MyWindow(): angle(0), useShader(true)
-	{}
+	MyWindow(): angle(0){}
 
 	bool onCreate(){
 		shaderV.source(vLight, Shader::VERTEX).compile();
@@ -105,7 +104,7 @@ struct MyWindow : Window{
 		mesh.generateNormals();
 
 		// Render
-		if(useShader) shaderP.begin();
+		shaderP.begin();
 
 			material.shininess(2);
 
@@ -123,7 +122,7 @@ struct MyWindow : Window{
 	}
 
 	virtual bool onKeyDown(const Keyboard& k){
-		if(k.key('s')) useShader^=true;
+		if(k.key('s')) shaderP.toggleActive();
 		return true;
 	}
 
