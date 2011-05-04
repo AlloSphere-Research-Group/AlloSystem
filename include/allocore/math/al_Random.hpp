@@ -58,11 +58,8 @@ public:
 
 	Random(uint32_t seed): mRNG(seed){}
 
-	/// Returns uniform random in [0,1)
+	/// Returns uniform random in [0, 1)
 	float uniform(){ return al::uintToUnit<float>(mRNG()); }
-	
-	/// Returns uniform random in [-1,1)
-	float uniformS(){ return al::uintToUnitS<float>(mRNG()); }
 
 	/// Returns uniform random in [0, hi)
 	template <class T>
@@ -72,7 +69,10 @@ public:
 	template <class T>
 	T uniform(const T& hi, const T& lo){ return (hi-lo)*uniform() + lo; }
 
-	/// Returns uniform random in [-lim, lim)
+	/// Returns uniform random in (-1, 1)
+	float uniformS(){ return al::uintToUnitS<float>(mRNG()); }
+
+	/// Returns uniform random in (-lim, lim)
 	template <class T>
 	T uniformS(const T& lim){ return lim*uniformS(); }
 
@@ -173,7 +173,7 @@ public:
 	Tausworthe(uint32_t seed);
 	
 	uint32_t operator()();				///< Generates uniform random unsigned integer in [0, 2^32).
-//	void operator = (uint32_t seed);	///< Set seed
+
 	void seed(uint32_t v);				///< Set seed
 	void seed(uint32_t v1, uint32_t v2, uint32_t v3, uint32_t v4); ///< Set seed
 
@@ -184,30 +184,28 @@ private:
 
 
 /// Get global random number generator
-inline Random<>& globalRNG(){
-	static Random<> r; return r;
-}
+inline Random<>& global(){ static Random<> r; return r; }
 
 /// Returns true with probability p
-inline bool prob(float p=0.5){ return globalRNG().prob(p); }
+inline bool prob(float p=0.5){ return global().prob(p); }
 
-/// Returns uniform random in [0,1)
-inline float uniform(){ return globalRNG().uniform(); }
+/// Returns uniform random in [0, 1)
+inline float uniform(){ return global().uniform(); }
 
 /// Returns uniform random in [0, hi)
 template <class T>
-inline T uniform(const T& hi){ return globalRNG().uniform(hi); }
+inline T uniform(const T& hi){ return global().uniform(hi); }
 
 /// Returns uniform random in [lo, hi)
 template <class T>
-inline T uniform(const T& hi, const T& lo){ return globalRNG().uniform(hi,lo); }
+inline T uniform(const T& hi, const T& lo){ return global().uniform(hi,lo); }
 
-/// Returns signed uniform random in [-1,1)
-inline float uniformS(){ return globalRNG().uniformS(); }
+/// Returns signed uniform random in (-1, 1)
+inline float uniformS(){ return global().uniformS(); }
 
-/// Returns signed uniform random in [-lim, lim)
+/// Returns signed uniform random in (-lim, lim)
 template <class T>
-inline T uniformS(const T& lim){ return globalRNG().uniformS(lim); }
+inline T uniformS(const T& lim){ return global().uniformS(lim); }
 
 
 // Implementation_______________________________________________________________
