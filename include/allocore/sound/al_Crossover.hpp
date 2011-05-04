@@ -96,7 +96,7 @@ void Crossover<float> :: freq(float f, float fs) {
 	float rad = M_PI * 2.f * f / fs;
 	float cosine = cosf(rad);
 	float sine = sinf(rad);
-	if (fabs(c) > 0.0001f) {
+	if (fabs(cosine) > 0.0001f) {
 		mC0 = (sine - 1.f)/cosine;
 	} else {
 		mC0 = cosine * 0.5f;

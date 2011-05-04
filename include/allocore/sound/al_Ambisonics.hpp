@@ -42,6 +42,9 @@
 	Should be IIR, because it mostly affects LF.
 											
 	If we pass speaker distance, then we might also want to attenuate/delay speakers for irregular layouts.
+	
+	@see "Near Field filters for Higher Order Ambisonics" Fons ADRIAENSEN
+	http://kokkinizita.linuxaudio.org/papers/index.html
 */
 
 

@@ -209,6 +209,8 @@ void GraphicsGL :: p_draw(const Mesh& v) {
 	int Nt2= v.texCoord2s().size();
 	int Nt3= v.texCoord3s().size();
 	int Ni = v.indices().size();
+	
+	//printf("Nv %i Nc %i Nn %i Nt2 %i Nt3 %i Ni %i\n", Nv, Nc, Nn, Nt2, Nt3, Ni);
 
 	// Enable arrays and set pointers...
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -224,8 +226,7 @@ void GraphicsGL :: p_draw(const Mesh& v) {
 		glColorPointer(4, GL_FLOAT, 0, &v.colors()[0]);			
 	}
 	else if(0 == Nc){
-		// no; just use whatever the last glColor() call used!
-		//glColor4f(1, 1, 1, 1);
+		// just use whatever the last glColor() call used!
 	}
 	else{
 		glColor4f(v.colors()[0][0], v.colors()[0][1], v.colors()[0][2], v.colors()[0][3]);
