@@ -1,26 +1,36 @@
+/*
+Allocore Example: Point Sprites
+
+Description:
+This demonstrates OpenGL's built-in point sprite capability. A point sprite
+is simply a screen-aligned textured square.
+
+Author:
+Lance Putnam, 2/25/2011 (putnam.lance at gmail dot com)
+*/
+
 #include "allocore/al_Allocore.hpp"
 
 using namespace al;
 
 GraphicsGL gl;
-Texture tex(gl, 128,128, Texture::RGBA, Texture::FLOAT32);
+Texture tex(gl, 16,16, Texture::LUMINANCE, Texture::FLOAT32);
 
 struct MyWindow : Window{
 
 	bool onCreate(){
+
+		// Generate a grid of points
 		const int N = 12;
-	
-		data.color(Color(1, 0.3));
 		data.primitive(gl.POINTS);
 	
 		for(int k=0; k<N; ++k){ float z = float(k)/(N-1)*2-1;
 		for(int j=0; j<N; ++j){ float y = float(j)/(N-1)*2-1;
 		for(int i=0; i<N; ++i){ float x = float(i)/(N-1)*2-1;
 			data.vertex(x,y,z);
+			data.color(x*0.1+0.1, y*0.1+0.1, z*0.1+0.1, 1);
 		}}}
 
-		//tex.wrap(Texture::CLAMP);
-		tex.filter(Texture::NEAREST);
 		tex.allocate();
 		int Nx = tex.width();
 		int Ny = tex.height();
@@ -28,17 +38,8 @@ struct MyWindow : Window{
 		
 		for(int j=0; j<Ny; ++j){ float y = float(j)/(Ny-1)*2-1;
 		for(int i=0; i<Nx; ++i){ float x = float(i)/(Nx-1)*2-1;
-			
 			float m = 1 - al::clip(hypot(x,y));
-			float a = al::wrap(atan2(y,x)/M_2PI);
-
-			Color col = HSV(a,1,1);
-			
-			int idx = j*Nx + i;
-			texBuf[idx*4 + 0] = col.r;
-			texBuf[idx*4 + 1] = col.g;
-			texBuf[idx*4 + 2] = col.b;
-			texBuf[idx*4 + 3] = m;
+			texBuf[j*Nx + i] = m;
 		}}
 
 		return true;
@@ -48,50 +49,39 @@ struct MyWindow : Window{
 		gl.clearColor(0,0,0,0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.viewport(0,0, width(), height());
-		
 		gl.matrixMode(gl.PROJECTION);
 		gl.loadMatrix(Matrix4d::perspective(45, aspect(), 0.1, 100));
-
 		gl.matrixMode(gl.MODELVIEW);
 		gl.loadMatrix(Matrix4d::lookAt(Vec3d(0,0,-4), Vec3d(0,0,0), Vec3d(0,1,0)));
 
-		//gl.depthTesting(0);
-		//gl.blending(true, gl.SRC_ALPHA, gl.ONE);
+		gl.depthTesting(0);
+		gl.blending(true, gl.SRC_ALPHA, gl.ONE);
 
-		glDisable(GL_DEPTH_TEST);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-tex.update();
-		++angleY;
+		angle += 0.1; if(angle>360) angle -= 360;
 
-		//gl.pushMatrix();
-			glEnable(GL_POINT_SPRITE);
-			glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-			gl.pointSize(50);
+		glEnable(GL_POINT_SPRITE);
+		glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+		gl.pointSize(40);
 
-			tex.bind();
-		
-			gl.rotate(angleY, 0,1,0);
+		tex.bind();
+			gl.rotate(angle*7, 0,1,0);
+			gl.rotate(angle*3, 0,0,1);
 			gl.draw(data);
-			
-			tex.unbind();
-			
-			glDisable(GL_POINT_SPRITE);
-		//gl.popMatrix();
+		tex.unbind();
+		
+		glDisable(GL_POINT_SPRITE);
 
 		return true;
 	}
 	
-	float angleY;
+	float angle;
 	Mesh data;
 };
 
 int main(){
 	MyWindow win;
-
 	win.add(new StandardWindowKeyControls);
-	win.create(Window::Dim(800, 600));
-
+	win.create();
 	MainLoop::start();
 	return 0;
 }
