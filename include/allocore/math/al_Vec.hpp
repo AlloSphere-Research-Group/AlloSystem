@@ -28,6 +28,7 @@
 */
 
 #include <cmath>
+#include <stdio.h>
 
 namespace al {
 
@@ -838,6 +839,16 @@ bool invert(Mat<3,T>& m){
 		return true;
 	}
 	return false;
+}
+
+/// Print
+template <int N, class T> 
+static inline void print(const Mat<N,T>& m){
+	for(int R=0; R<N; ++R){
+		for(int C=0; C<N; ++C){
+			printf("% 6.3g ", double(m(R,C)));
+		}	printf("\n");
+	}	printf("\n");
 }
 
 
