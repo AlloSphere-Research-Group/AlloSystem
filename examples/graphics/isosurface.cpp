@@ -6,9 +6,8 @@ using namespace al;
 
 GraphicsGL gl;
 Light light;
-Material material;
 Camera cam;
-Nav nav;
+Nav nav(Vec3d(0,0,-5));
 Stereographic stereo;
 
 const int N = 32;
@@ -16,36 +15,13 @@ float volData[N*N*N];
 Isosurface iso;
 double phase=0;
 
-void drawbox() {
-	gl.begin(gl.LINES);
-	gl.color(1,1,1);
-	for (int z=-1; z<=1; z+=2) {
-		for (int y=-1; y<=1; y+=2) {
-			for (int x=-1; x<=1; x+=2) {
-				gl.vertex(x, y, z);
-			}
-		}
-		for (int y=-1; y<=1; y+=2) {
-			for (int x=-1; x<=1; x+=2) {
-				gl.vertex(y, x, z);
-			}
-		}
-		for (int y=-1; y<=1; y+=2) {
-			for (int x=-1; x<=1; x+=2) {
-				gl.vertex(y, z, x);
-			}
-		}
-	}
-	gl.end();
-}
-
 
 struct MyWindow : public Window, public Drawable{
 
 	void onDraw(Graphics& gl){
 		gl.depthTesting(1);
 
-		material.shininess(10)();
+		gl.enable(gl.COLOR_MATERIAL);
 		light();
 
 		iso.level(0);
@@ -59,7 +35,9 @@ struct MyWindow : public Window, public Drawable{
 			gl.draw(iso);
 		gl.popMatrix();
 		
-		drawbox();
+		gl.mesh().primitive(gl.LINES).reset();
+		addWireBox(gl.mesh());
+		gl.draw();
 	}
 
 	bool onFrame(){
@@ -71,7 +49,7 @@ struct MyWindow : public Window, public Drawable{
 
 		static bool once = false;
 
-		if(!once){ once = true;
+		if(!once){ //once = true;
 		for(int k=0; k<N; ++k){ double z = double(k)/N * 4*M_PI;
 		for(int j=0; j<N; ++j){ double y = double(j)/N * 4*M_PI;
 		for(int i=0; i<N; ++i){ double x = double(i)/N * 4*M_PI;
@@ -88,12 +66,9 @@ struct MyWindow : public Window, public Drawable{
 };
 
 
-int main (int argc, char * argv[]){
-
+int main(){
 	iso.primitive(Graphics::TRIANGLES);
-	
-	nav.pos(0,0,-5);
-	
+
 	MyWindow win;
 	win.create(Window::Dim(800,600), "Isosurface Example", 140);
 
