@@ -8,13 +8,14 @@
 
 namespace al{
 
-void Mesh::reset() {
+Mesh& Mesh::reset() {
 	vertices().reset();
 	normals().reset();
 	colors().reset();
 	texCoord2s().reset();
 	texCoord3s().reset();
 	indices().reset();
+	return *this;
 }
 
 void Mesh::decompress(){
