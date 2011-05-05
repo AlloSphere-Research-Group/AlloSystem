@@ -70,6 +70,8 @@ public:
 	/// Element values
 	T elems[N];
 
+
+
 	/// @param[in] v		value to initialize all elements to
 	Vec(const T& v=T()){ set(v); }
 	
@@ -102,9 +104,23 @@ public:
 	template <class T2>
 	Vec(const T2 * v, int stride=1){ set(v,stride); }
 
+
+
+	//--------------------------------------------------------------------------
+	// Memory Operations
+
+	/// Returns number of elements
+	static int size(){ return N; }
+
 	/// Cast to pointer
 	operator T* (){ return elems; }
+
+	/// Get read-only pointer to elements
+	const T* ptr() const { return elems; }
 	
+	/// Get read-write pointer to elements
+	T* ptr(){ return elems; }
+
 	/// Set element at index with no bounds checking
 	T& operator[](int i){ return elems[i];}
 	
@@ -122,6 +138,29 @@ public:
 	
 	/// Return true if all elements are not equal to value, false otherwise
 	bool operator !=(const T& v) const { return !(*this == v); }
+
+	/// Get a vector comprised of indexed elements
+	Vec<2,T> get(int i0, int i1) const {
+		return Vec<2,T>((*this)[i0], (*this)[i1]); }
+
+	/// Get a vector comprised of indexed elements
+	Vec<3,T> get(int i0, int i1, int i2) const {
+		return Vec<3,T>((*this)[i0], (*this)[i1], (*this)[i2]); }
+
+	/// Get a vector comprised of indexed elements
+	Vec<4,T> get(int i0, int i1, int i2, int i3) const {
+		return Vec<4,T>((*this)[i0], (*this)[i1], (*this)[i2], (*this)[i3]); }
+
+	/// Get a subvector
+	template <int M>
+	Vec<M,T> sub(int begin=0) const {
+		return Vec<M,T>(ptr()+begin);
+	}
+
+
+
+	//--------------------------------------------------------------------------
+	// Basic Arithmetic Operations
 	
 	Vec& operator  =(const Vec& v){ return set(v); }
 	Vec& operator  =(const   T& v){ return set(v); }
@@ -143,83 +182,6 @@ public:
 	Vec operator / (const Vec& v) const { return Vec(*this) /= v; }
 	Vec operator / (const   T& v) const { return Vec(*this) /= v; }
 	Vec operator - () const { return Vec(*this).negate(); }
-
-	/// Returns dot (inner) product between vectors
-	T dot(const Vec& v) const {
-		T r = (*this)[0] * v[0];
-		for(int i=1; i<N; ++i){ r += (*this)[i] * v[i]; }
-		return r;
-	}
-	
-	/// Returns magnitude
-	T mag() const { return std::sqrt(magSqr()); }
-	
-	/// Returns magnitude squared
-	T magSqr() const { return dot(*this); }
-	
-	/// Returns p-norm of elements
-	
-	/// The p-norm is pth root of the sum of the absolute value of the elements 
-	/// raised to the pth, (sum |x_n|^p) ^ (1/p).
-	T norm(const T& p) const {
-		using namespace std;
-		T r = pow(abs((*this)[0]), p);
-		for(int i=1; i<N; ++i){ r += pow(abs((*this)[i]), p); }
-		return pow(r, T(1)/p);		
-	}
-
-	/// Return 1-norm (sum) of elements
-	T norm1() const { return sumAbs(); }
-	
-	/// Return 2-norm of elements
-	T norm2() const { return mag(); }
-
-	/// Returns product of elements
-	T product() const {
-		T r = (*this)[0];
-		for(int i=1; i<N; ++i){ r *= (*this)[i]; }
-		return r;
-	}
-	
-	/// Reflect vector around line
-	Vec reflect(const Vec& normal) {
-		return this - (2 * dot(normal) * normal);
-	}
-
-	/// Returns closest vector on unit N-sphere
-	Vec sgn() const { return Vec(*this).normalize(); }
-
-	/// Get a subvector
-	template <int M>
-	Vec<M,T> sub(int begin=0) const {
-		return Vec<M,T>(ptr()+begin);
-	}
-
-	/// Returns sum of elements
-	T sum() const {
-		T r = (*this)[0];
-		for(int i=1; i<N; ++i){ r += (*this)[i]; }
-		return r;
-	}
-
-	/// Returns sum of absolute value (1-norm) of elements
-	T sumAbs() const {
-		T r = abs((*this)[0]);
-		for(int i=1; i<N; ++i){ r += abs((*this)[i]); }
-		return r;
-	}
-
-	/// Negates all elements
-	Vec& negate(){ IT(N){ (*this)[i] = -(*this)[i]; } return *this; }
-
-	/// Scales elements evenly so magnitude is one
-	Vec& normalize();
-	
-	/// linear interpolation
-	void lerp(const Vec& target, T amt) { set(lerp(*this, target, amt)); }
-	static Vec lerp(const Vec& input, const Vec& target, T amt) {
-		return input+amt*(target-input);
-	}
 
 	/// Set elements from another vector
 	template <class T2>
@@ -282,15 +244,81 @@ public:
 	/// Set all elements to zero
 	Vec& zero(){ return set(T(0)); }
 
-	/// Get read-only pointer to elements
-	const T* ptr() const { return elems; }
-	
-	/// Get read-write pointer to elements
-	T* ptr(){ return elems; }
-	
 
-	/// Returns number of elements
-	static int size(){ return N; }
+
+	//--------------------------------------------------------------------------
+	// Linear Operations
+
+	/// Returns dot (inner) product between vectors
+	T dot(const Vec& v) const {
+		T r = (*this)[0] * v[0];
+		for(int i=1; i<N; ++i){ r += (*this)[i] * v[i]; }
+		return r;
+	}
+	
+	/// Returns magnitude
+	T mag() const { return std::sqrt(magSqr()); }
+	
+	/// Returns magnitude squared
+	T magSqr() const { return dot(*this); }
+	
+	/// Returns p-norm of elements
+	
+	/// The p-norm is pth root of the sum of the absolute value of the elements 
+	/// raised to the pth, (sum |x_n|^p) ^ (1/p).
+	T norm(const T& p) const {
+		using namespace std;
+		T r = pow(abs((*this)[0]), p);
+		for(int i=1; i<N; ++i){ r += pow(abs((*this)[i]), p); }
+		return pow(r, T(1)/p);		
+	}
+
+	/// Return 1-norm (sum) of elements
+	T norm1() const { return sumAbs(); }
+	
+	/// Return 2-norm of elements
+	T norm2() const { return mag(); }
+
+	/// Returns product of elements
+	T product() const {
+		T r = (*this)[0];
+		for(int i=1; i<N; ++i){ r *= (*this)[i]; }
+		return r;
+	}
+	
+	/// Reflect vector around line
+	Vec reflect(const Vec& normal) {
+		return this - (2 * dot(normal) * normal);
+	}
+
+	/// Returns closest vector on unit N-sphere
+	Vec sgn() const { return Vec(*this).normalize(); }
+
+	/// Returns sum of elements
+	T sum() const {
+		T r = (*this)[0];
+		for(int i=1; i<N; ++i){ r += (*this)[i]; }
+		return r;
+	}
+
+	/// Returns sum of absolute value (1-norm) of elements
+	T sumAbs() const {
+		T r = abs((*this)[0]);
+		for(int i=1; i<N; ++i){ r += abs((*this)[i]); }
+		return r;
+	}
+
+	/// Negates all elements
+	Vec& negate(){ IT(N){ (*this)[i] = -(*this)[i]; } return *this; }
+
+	/// Scales elements evenly so magnitude is one
+	Vec& normalize();
+	
+	/// linear interpolation
+	void lerp(const Vec& target, T amt) { set(lerp(*this, target, amt)); }
+	static Vec lerp(const Vec& input, const Vec& target, T amt) {
+		return input+amt*(target-input);
+	}
 	
 };
 
@@ -348,6 +376,57 @@ public:
 		);
 	}
 
+
+
+	//--------------------------------------------------------------------------
+	// Factory Methods
+
+	/// Get identity matrix
+	static Mat identity(){
+		Mat m;
+		IT(size()){ m[i] = (i%(N+1)) ? T(0) : T(1); }
+		return m;
+	}
+
+	/// Get a rotation transform matrix
+	static Mat rotation(double angle, int dim1, int dim2){
+		double cs = cos(angle);
+		double sn = sin(angle);
+
+		Mat m;
+		m.setIdentity();
+		m(dim1,dim1) = cs;
+		m(dim1,dim2) =-sn;
+		m(dim2,dim1) = sn;
+		m(dim2,dim2) = cs;
+		return m;
+	}
+
+	/// Get a scaling transform matrix
+	template <class V>
+	static Mat scaling(const Vec<N-1,V>& v){
+		Mat m;
+		for(int r=0; r<N-1; ++r) m(r,r) = v[r];
+		m(N-1,N-1) = T(1);
+		return m;
+	}
+	
+	/// Get a translation transform matrix
+	template <class V>
+	static Mat translation(const Vec<N-1,V>& v){
+		Mat m = identity();
+		for(int r=0; r<N-1; ++r) m(r,N-1) = v[r];
+		return m;
+	}
+
+
+
+	//--------------------------------------------------------------------------
+	// Memory Operations
+
+	/// Returns total number of elements
+	static int size(){ return N*N; }
+
 	/// Set element at index with no bounds checking
 	T& operator[](int i){ return elems[i];}
 	
@@ -369,6 +448,29 @@ public:
 	/// Return diagonal
 	Vec<N,T> diagonal() const { return Vec<N,T>(elems, N+1); }
 
+	/// Transpose elements
+	Mat& transpose(){
+		for(int j=0; j<N-1; ++j){	// row and column
+		for(int i=j+1; i<N; ++i){	// offset into row or column
+			int i1 = j*N + i;
+			int i2 = j + i*N;
+			T t = elems[i1];
+			elems[i1] = elems[i2];
+			elems[i2] = t;
+		}} return *this;
+	}
+
+	/// Get read-only pointer to elements
+	const T* ptr() const { return elems; }
+	
+	/// Get read-write pointer to elements
+	T* ptr(){ return elems; }
+
+
+
+	//--------------------------------------------------------------------------
+	// Basic Arithmetic Operations
+
 	Mat& operator *= (const Mat& v){ return multiply(*this, Mat(*this),v); }
 	Mat& operator += (const Mat& v){ IT(size()){ (*this)[i] += v[i]; } return *this; }
 	Mat& operator -= (const Mat& v){ IT(size()){ (*this)[i] -= v[i]; } return *this; }
@@ -386,7 +488,32 @@ public:
 	Mat operator * (const T& v) const { return Mat(*this) *= v; }
 	Mat operator / (const T& v) const { return Mat(*this) /= v; }
 
+	/// Computes matrix product r = a * b
 	
+	/// Returns reference to result
+	///
+	static Mat& multiply(Mat& r, const Mat& a, const Mat& b){
+		for(int j=0; j<N; ++j){
+			const Vec<N,T>& bcol = b.col(j);
+			for(int i=0; i<N; ++i){
+				r(i,j) = a.row(i).dot(bcol);
+			}
+		}
+		return r;
+	}
+	
+	/// Computes product of matrix multiplied by column vector, r = m * vCol
+	static Vec<N,T>& multiply(Vec<N,T>& r, const Mat& m, const Vec<N,T>& vCol){
+		IT(N){ r[i] = m.row(i).dot(vCol); }
+		return r;
+	}
+
+	/// Computes product of row vector multiplied by matrix, r = vRow * m
+	static Vec<N,T>& multiply(Vec<N,T>& r, const Vec<N,T>& vRow, const Mat& m){
+		IT(N){ r[i] = vRow.dot(m.col(i)); }
+		return r;
+	}
+
 	/// Set all elements to value
 	Mat& set(const T& v){ IT(size()){ (*this)[i]=v; } return *this; }
 	
@@ -445,31 +572,33 @@ public:
 	Mat& setIdentity(){ return (*this) = identity(); }
 
 
-	/// Transpose elements
-	Mat& transpose(){
-		for(int j=0; j<N-1; ++j){	// row and column
-		for(int i=j+1; i<N; ++i){	// offset into row or column
-			int i1 = j*N + i;
-			int i2 = j + i*N;
-			T t = elems[i1];
-			elems[i1] = elems[i2];
-			elems[i2] = t;
-		}} return *this;
-	}
 
 
-	/// Get identity matrix
-	static Mat identity(){
-		Mat m;
-		IT(size()){ m[i] = (i%(N+1)) ? T(0) : T(1); }
-		return m;
-	}
+	//--------------------------------------------------------------------------
+	// Linear Operations
 
 	/// Get trace (sum of diagonal elements)
 	T trace() const { return diagonal().sum(); }
 
-
 	// Affine transformations
+
+	/// Rotate transformation matrix along a plane
+
+	/// @param[in] angle	angle of rotation, in radians
+	/// @param[in] dim1		local coordinate frame axis to rotate away from
+	/// @param[in] dim2		local coordinate frame axis to rotate towards
+	Mat& rotate(double angle, int dim1, int dim2){
+		double cs = cos(angle);
+		double sn = sin(angle);
+		for(int R=0; R<N-1; ++R){
+			const T& v1 = (*this)(R, dim1);
+			const T& v2 = (*this)(R, dim2);
+			T t = v1*cs + v2*sn;
+			(*this)(R, dim2) = v2*cs - v1*sn;
+			(*this)(R, dim1) = t;
+		}
+		return *this;
+	}
 
 	/// Scale transformation matrix
 	template<class V>
@@ -502,60 +631,6 @@ public:
 		return *this;
 	}
 
-	/// Rotate transformation matrix along a plane
-
-	/// @param[in] angle	angle of rotation, in radians
-	/// @param[in] dim1		local coordinate frame axis to rotate away from
-	/// @param[in] dim2		local coordinate frame axis to rotate towards
-	Mat& rotate(double angle, int dim1, int dim2){
-		double cs = cos(angle);
-		double sn = sin(angle);
-		for(int R=0; R<N-1; ++R){
-			const T& v1 = (*this)(R, dim1);
-			const T& v2 = (*this)(R, dim2);
-			T t = v1*cs + v2*sn;
-			(*this)(R, dim2) = v2*cs - v1*sn;
-			(*this)(R, dim1) = t;
-		}
-		return *this;
-	}
-
-
-	/// Computes matrix product r = a * b
-	
-	/// Returns reference to result
-	///
-	static Mat& multiply(Mat& r, const Mat& a, const Mat& b){
-		for(int j=0; j<N; ++j){
-			const Vec<N,T>& bcol = b.col(j);
-			for(int i=0; i<N; ++i){
-				r(i,j) = a.row(i).dot(bcol);
-			}
-		}
-		return r;
-	}
-	
-	/// Computes product of matrix multiplied by column vector, r = m * vCol
-	static Vec<N,T>& multiply(Vec<N,T>& r, const Mat& m, const Vec<N,T>& vCol){
-		IT(N){ r[i] = m.row(i).dot(vCol); }
-		return r;
-	}
-
-	/// Computes product of row vector multiplied by matrix, r = vRow * m
-	static Vec<N,T>& multiply(Vec<N,T>& r, const Vec<N,T>& vRow, const Mat& m){
-		IT(N){ r[i] = vRow.dot(m.col(i)); }
-		return r;
-	}
-	
-	/// Get read-only pointer to elements
-	const T* ptr() const { return elems; }
-	
-	/// Get read-write pointer to elements
-	T* ptr(){ return elems; }
-
-	/// Returns total number of elements
-	static int size(){ return N*N; }
-
 };
 
 
@@ -580,6 +655,10 @@ template <int N, class T>
 inline Vec<N,T> operator / (T s, const Vec<N,T>& v){
 	Vec<N,T> r; IT(N){ r[i] = s/v[i]; } return r;
 }
+
+/// Get absolute value (magnitude) of vector
+template <int N, class T>
+inline T abs(const Vec<N,T>& v){ return v.mag(); }
 
 //template <int N, class T, class F>
 //inline Vec<N,T> binaryOp(const Vec<N,T>& a, const Vec<N,T>& b, const F& func){
