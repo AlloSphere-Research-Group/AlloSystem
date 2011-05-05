@@ -245,7 +245,7 @@ public:
 	/// @param[in] fps		Desired frames/second
 	/// @param[in] mode		Display mode bit flags
 	void create(
-		const Dim& dim,
+		const Dim& dim = Dim(800,600),
 		const std::string& title="",
 		double fps=40,
 		DisplayMode::t mode = DisplayMode::DefaultBuf
