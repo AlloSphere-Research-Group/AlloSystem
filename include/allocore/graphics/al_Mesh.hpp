@@ -71,7 +71,7 @@ public:
 	void equalizeBuffers();
 
 	/// Reset all buffers
-	void reset();
+	Mesh& reset();
 
 	/// Scale all vertices to lie in [-1,1]
 	void unitize();
@@ -168,7 +168,7 @@ public:
 	}
 
 	/// Set geometric primitive
-	void primitive(int prim){ mPrimitive=prim; }
+	Mesh& primitive(int prim){ mPrimitive=prim; return *this; }
 	/// Get number of faces (assumes triangles or quads)
 //	int numFaces() const { return mIndices.size() / ( ( mPrimitive == Graphics::TRIANGLES ) ? 3 : 4 ); }
 	/// Get indices as triangles
