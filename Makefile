@@ -70,6 +70,19 @@ ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./$(*F)
 endif
 
+
+# Build (and run) from one or more source files in a directory
+EXEC_DIR_TARGETS = examples/%
+.PRECIOUS: $(EXEC_DIR_TARGETS)
+$(EXEC_DIR_TARGETS): LSRC = $(wildcard $@/*.cpp) $(wildcard $@/*.c)
+$(EXEC_DIR_TARGETS): EXEC_NAME = $(subst /,_,$(*D))
+$(EXEC_DIR_TARGETS): allocore alloutil FORCE
+	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(EXEC_NAME) $(LSRC) $(LDFLAGS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH)
+ifneq ($(AUTORUN), 0)
+	@cd $(BIN_DIR) && ./$(EXEC_NAME)
+endif
+
+
 extended: all alloni
 
 all: extensions externals
