@@ -1,3 +1,13 @@
+/*
+Allocore Example: Platonics
+
+Description:
+The five Platonic solids.
+
+Author:
+Lance Putnam, 12/8/2010 (putnam.lance at gmail dot com)
+*/
+
 #include "allocore/al_Allocore.hpp"
 
 using namespace al;
@@ -122,11 +132,8 @@ int main(){
 	}
 
 	MyWindow win1;
-
 	win1.add(new StandardWindowKeyControls);
-
-	win1.create(Window::Dim(800, 600));
-
+	win1.create();
 	MainLoop::start();
 	return 0;
 }
