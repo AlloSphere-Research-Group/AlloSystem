@@ -88,7 +88,7 @@ extended: all alloni
 all: extensions externals
 
 # AlloCore extensions
-extensions: allojit alloutil allocore
+extensions: alloutil allocore
 
 allocore: $(SLIB_PATH)
 # 	copy header files

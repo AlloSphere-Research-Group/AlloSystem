@@ -9,7 +9,7 @@
 #include "clang/Basic/TargetInfo.h"
 //#include "clang/Basic/TargetOptions.h"
 #include "clang/Basic/SourceManager.h"
-//#include "clang/Basic/FileManager.h"
+#include "clang/Basic/FileManager.h"
 //#include "clang/CodeGen/CodeGenOptions.h"
 #include "clang/CodeGen/ModuleBuilder.h"
 //#include "clang/Driver/Driver.h"
@@ -179,8 +179,9 @@ bool Compiler :: compile(std::string code) {
 	lang.RTTI = 0;
 	lang.PICLevel = 1;
 	
-
-	CI.createSourceManager();
+	FileSystemOptions fileSysOpts;
+	FileManager fileMgr(fileSysOpts);
+	CI.createSourceManager(fileMgr);
 	CI.getSourceManager().createMainFileIDForMemBuffer(buffer);
 	CI.createFileManager();
 	
@@ -223,7 +224,7 @@ bool Compiler :: compile(std::string code) {
 //		printf("%d %s\n", i, Args[i].data());
 //	}
 	
-	PP.getBuiltinInfo().InitializeBuiltins(PP.getIdentifierTable(), PP.getLangOptions().NoBuiltin);
+	PP.getBuiltinInfo().InitializeBuiltins(PP.getIdentifierTable(), PP.getLangOptions());
 			
 	
 	CI.createASTContext();
@@ -454,7 +455,7 @@ void Compiler :: optimize(std::string olevel) {
 		pm.add(llvm::createLoopRotatePass());            // Rotate Loop
 		pm.add(llvm::createLICMPass());                  // Hoist loop invariants
 		pm.add(llvm::createLoopUnswitchPass());
-		pm.add(llvm::createLoopIndexSplitPass());        // Split loop index
+//		pm.add(llvm::createLoopIndexSplitPass());        // Split loop index
 		pm.add(llvm::createInstructionCombiningPass());
 		pm.add(llvm::createIndVarSimplifyPass());        // Canonicalize indvars
 		pm.add(llvm::createLoopDeletionPass());          // Delete dead loops

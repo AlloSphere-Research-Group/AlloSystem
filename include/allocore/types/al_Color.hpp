@@ -52,6 +52,12 @@ struct Color{
 	/// @param[in] a			alpha component
 	Color(float r, float g, float b, float a=1.f)
 	:	r(r), g(g), b(b), a(a) {}
+//	{
+//		this->r = r;
+//		this->g = g;
+//		this->b = b;
+//		this->a = a;
+//	}
 
 	/// @param[in] gray			red/green/blue components
 	/// @param[in] a			alpha component

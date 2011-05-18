@@ -26,13 +26,15 @@ endif
 UNAMEM := $(shell uname -m)
 ifeq ($(UNAMEM), $(findstring $(UNAMEM), x86_64 ia86 amd64))
 	ifeq ($(PLATFORM), macosx)
-#		ARCH = 32_64
-		ARCH = 64
+		ARCH = 32_64
+#		ARCH = 64
 	else
-		ARCH = 64
+		ARCH = 32_64
+#		ARCH = 64
 	endif
 else
-	ARCH = 32
+	ARCH = 32_64
+#	ARCH = 32
 endif
 
 # Mac OS X version: '10_6' or '10_5'
@@ -123,6 +125,8 @@ ifeq ($(PLATFORM), linux)
 		CFLAGS += -m32
 	else ifeq ($(ARCH), 64)
 		CFLAGS += -m64
+	else ifeq ($(ARCH), 32_64)
+		CFLAGS += -m32 -m64
 	endif
 
 	CPPFLAGS += -D__LINUX__ -DLINUX
@@ -135,9 +139,14 @@ else ifeq ($(PLATFORM), macosx)
 
 	ifeq ($(ARCH), 32)
 		CFLAGS += -arch i386
-	else
+	else 
+	#ifeq ($(ARCH), 64)
 		CFLAGS += -arch x86_64
+	#else ifeq ($(ARCH), 32_64)
+	#	CFLAGS += -arch i386 -arch x86_64
 	endif
+
+	#CXX = @clang++
 
 #	FIXME: 	Universal builds not compatible with dependency generation. :(
 #		Disabling for now...

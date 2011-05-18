@@ -21,6 +21,23 @@ static const double c8_11		= 8./11.;
 static const double c40_11		= 40./11.;
 
 
+//// @see http://www.ai.sri.com/ajh/ambisonics/
+//
+//// the three decode types:
+//double k_velocity  = 1.;
+//double k_energy_2d = sqrt(1/2.);
+//double k_energy_3d = sqrt(1/3.);
+//double k_cardioid = 1/2.;
+//
+//// compute speaker decode matrix
+//// k is decode type (velocity, energy, cardioid)
+//// dim is 2 (2D) or 3 (3D)
+//// pos is direction cosines (unit vector) of speaker
+//// @see http://www.ai.sri.com/ajh/ambisonics/speaker_matrix.m
+//void speaker_matrix(double k, int dim, Vec3d pos, double * weights) {
+//	
+//}
+
 // AmbiBase
 
 AmbiBase::AmbiBase(int dim, int order)
@@ -226,7 +243,6 @@ void AmbiDecode::setSpeakerRadians(int index, int deviceChannel, float az, float
 //		printf("channel	%i amp %f\n", index, amp);
 
 		// update encoding weights
-		//mDecodeMatrix[index][0] *= AmbiBase::c1_sqrt2;
 		encodeWeightsFuMa(mDecodeMatrix + index * channels(), mDim, mOrder, az, el);
 		for (int i=0; i<channels(); i++)
 			mDecodeMatrix[index * channels() + i] *= amp;
