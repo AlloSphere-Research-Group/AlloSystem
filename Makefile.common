@@ -25,15 +25,8 @@ endif
 # Architecture: '32' or '64'
 UNAMEM := $(shell uname -m)
 ifeq ($(UNAMEM), $(findstring $(UNAMEM), x86_64 ia86 amd64))
-#	ifeq ($(PLATFORM), macosx)
-#		ARCH = 32_64
-		ARCH = 64
-#	else
-#		ARCH = 32_64
-#		ARCH = 64
-#	endif
+	ARCH = 64
 else
-#	ARCH = 32_64
 	ARCH = 32
 endif
 
@@ -59,10 +52,12 @@ BUILD_CONFIG	= Release
 # Whether to show verbose output
 VERBOSE		= 0
 
-# Whether Make should determine the dependencies of each C or C++ file as it
-# compiles it. This will be automatically disabled for universal builds on
-# Mac OSX.
+# Whether Make should determine the dependencies of each C or C++ file as
+# it compiles it. This will be automatically disabled for universal builds # on Mac OSX.
 DEPENDENCY_TRACKING = 1
+ifeq ($(ARCH), 32_64)
+	DEPENDENCY_TRACKING = 0
+endif
 
 # Whether to enable strict warnings
 STRICT_WARNINGS = 1
@@ -144,22 +139,13 @@ else ifeq ($(PLATFORM), macosx)
 
 	ifeq ($(ARCH), 32)
 		CFLAGS += -arch i386
-	else 
-	#ifeq ($(ARCH), 64)
+	else ifeq ($(ARCH), 64)
 		CFLAGS += -arch x86_64
-	#else ifeq ($(ARCH), 32_64)
-	#	CFLAGS += -arch i386 -arch x86_64
+	else ifeq ($(ARCH), 32_64)
+		CFLAGS += -arch i386 -arch x86_64
 	endif
 
 	#CXX = @clang++
-
-#	FIXME: 	Universal builds not compatible with dependency generation. :(
-#		Disabling for now...
-#	else ifeq ($(ARCH), 64)
-#		CFLAGS += -arch x86_64
-#	else ifeq ($(ARCH), 32_64)
-#		CFLAGS += -arch i386 -arch x86_64
-#	endif
 
 	CFLAGS += -isysroot
 
