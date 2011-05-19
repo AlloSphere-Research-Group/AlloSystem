@@ -59,6 +59,11 @@ BUILD_CONFIG	= Release
 # Whether to show verbose output
 VERBOSE		= 0
 
+# Whether Make should determine the dependencies of each C or C++ file as it
+# compiles it. This will be automatically disabled for universal builds on
+# Mac OSX.
+DEPENDENCY_TRACKING = 1
+
 # Whether to enable strict warnings
 STRICT_WARNINGS = 1
 

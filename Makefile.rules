@@ -8,6 +8,11 @@ LDFLAGS		+= $(EXT_LDFLAGS)
 CFLAGS		:= $(CPPFLAGS) $(CFLAGS)
 CXXFLAGS	:= $(CFLAGS) $(CXXFLAGS)
 
+DEPFLAGS	=
+ifneq ($(DEPENDENCY_TRACKING), 0)
+	DEPFLAGS = -MMD -MF $(basename $@).dep
+endif
+
 #--------------------------------------------------------------------------
 # Rules
 #--------------------------------------------------------------------------
@@ -15,14 +20,14 @@ CXXFLAGS	:= $(CFLAGS) $(CXXFLAGS)
 # Build object file from C++ source
 $(OBJ_DIR)%.o: %.cpp
 	@echo CXX $< $@
-	$(CXX) -c $(CXXFLAGS) $< -o $@ -MMD -MF $(basename $@).dep
+	$(CXX) -c $(CXXFLAGS) $< -o $@ $(DEPFLAGS)
 
 # Build object file from C source
 $(OBJ_DIR)%.o: %.c
 	@echo CC $< $@
-	$(CC) -c $(CFLAGS) $< -o $@ -MMD -MF $(basename $@).dep
+	$(CC) -c $(CFLAGS) $< -o $@ $(DEPFLAGS)
 
-include $(wildcard $(OBJ_DIR)*.dep)
+-include $(wildcard $(OBJ_DIR)*.dep)
 	
 # Build object file from Obj-C++ source
 $(OBJ_DIR)%.o: %.mm
