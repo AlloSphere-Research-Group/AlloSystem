@@ -88,6 +88,7 @@ public:
 		bool CPlusPlus; 
 		std::vector<std::string> system_includes;
 		std::vector<std::string> user_includes;
+		std::vector<std::string> defines;
 		std::vector<std::pair<std::string, std::string> > headers;
 		
 		Options() 
@@ -119,6 +120,8 @@ public:
 	void include(std::string path) { options.user_includes.push_back(path); }
 	///! add system include path (angled and quoted includes)
 	void system_include(std::string path) { options.system_includes.push_back(path); }
+	///! add #define directives
+	void define(std::string def) { options.defines.push_back(def); }
 	///! Add a 'virtual' header; reads from memory instead of from disk
 	void header(std::string name, std::string code) {
 		options.headers.push_back(std::pair<std::string, std::string>(name, code));

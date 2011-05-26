@@ -217,6 +217,13 @@ bool Compiler :: compile(std::string code) {
 	}
 	ApplyHeaderSearchOptions(PP.getHeaderSearchInfo(), headeropts, lang, CI.getTarget().getTriple());
 	
+	// Defines:
+	std::string defines;
+	for (unsigned int i=0; i<options.defines.size(); i++) {
+		defines += options.defines[i];
+	}
+	PP.setPredefines(defines);
+	
 //	//	// list standard invocation args:
 //	std::vector<std::string> Args;
 //	CI.getInvocation().toArgs(Args);
@@ -292,17 +299,109 @@ void Compiler :: dump() {
 	if (mImpl) mImpl->module->dump();
 }
 
+
+/// GetX86CpuIDAndInfo - Execute the specified cpuid and return the 4 values in the
+/// specified arguments.  If we can't run cpuid on the host, return false.
+static bool GetX86CpuIDAndInfo(unsigned value, unsigned *rEAX,
+                               unsigned *rEBX, unsigned *rECX, unsigned *rEDX) {
+#if defined(__x86_64__) || defined(_M_AMD64) || defined (_M_X64)
+#if defined(__GNUC__)
+    // gcc doesn't know cpuid would clobber ebx/rbx. Preseve it manually.
+    asm ("movq\t%%rbx, %%rsi\n\t"
+         "cpuid\n\t"
+         "xchgq\t%%rbx, %%rsi\n\t"
+         : "=a" (*rEAX),
+         "=S" (*rEBX),
+         "=c" (*rECX),
+         "=d" (*rEDX)
+         :  "a" (value));
+    return true;
+#elif defined(_MSC_VER)
+    int registers[4];
+    __cpuid(registers, value);
+    *rEAX = registers[0];
+    *rEBX = registers[1];
+    *rECX = registers[2];
+    *rEDX = registers[3];
+    return true;
+#endif
+#elif defined(i386) || defined(__i386__) || defined(__x86__) || defined(_M_IX86)
+#if defined(__GNUC__)
+    asm ("movl\t%%ebx, %%esi\n\t"
+         "cpuid\n\t"
+         "xchgl\t%%ebx, %%esi\n\t"
+         : "=a" (*rEAX),
+         "=S" (*rEBX),
+         "=c" (*rECX),
+         "=d" (*rEDX)
+         :  "a" (value));
+    return true;
+#elif defined(_MSC_VER)
+    __asm {
+        mov   eax,value
+        cpuid
+        mov   esi,rEAX
+        mov   dword ptr [esi],eax
+        mov   esi,rEBX
+        mov   dword ptr [esi],ebx
+        mov   esi,rECX
+        mov   dword ptr [esi],ecx
+        mov   esi,rEDX
+        mov   dword ptr [esi],edx
+    }
+    return true;
+#endif
+#endif
+    return false;
+}
+
+static void DetectX86FamilyModel(unsigned EAX, unsigned *o_Family, unsigned *o_Model) {
+    unsigned Family = (EAX >> 8) & 0xf; // Bits 8 - 11
+    unsigned Model  = (EAX >> 4) & 0xf; // Bits 4 - 7
+    if (Family == 6 || Family == 0xf) {
+        if (Family == 0xf)
+            // Examine extended family ID if family ID is F.
+            Family += (EAX >> 20) & 0xff;    // Bits 20 - 27
+        // Examine extended model ID if family ID is 6 or F.
+        Model += ((EAX >> 16) & 0xf) << 4; // Bits 16 - 19
+    }
+    
+    *o_Family = Family;
+    *o_Model = Model;
+}
+
+bool is_sandy_bridge() {
+    unsigned EAX = 0, EBX = 0, ECX = 0, EDX = 0;
+    if(!GetX86CpuIDAndInfo(0x1, &EAX, &EBX, &ECX, &EDX)) return false;
+    
+    unsigned Family = 0;
+    unsigned Model  = 0;
+    DetectX86FamilyModel(EAX, &Family, &Model);
+    
+    return Family == 6 && Model == 42;
+}
+
 JIT * Compiler :: jit() {
 	std::string err;
 	if (mImpl) {
 		if (EE==0) {
-			EE = llvm::ExecutionEngine::createJIT(
-				mImpl->module,	
-				&err,		// error string
-				0,			// JITMemoryManager
-				llvm::CodeGenOpt::Default,	// JIT slowly (None, Default, Aggressive)
-				false		// allocate GlobalVariables separately from code
-			);
+			if (is_sandy_bridge()) {
+				EE = llvm::EngineBuilder(mImpl->module)
+				.setEngineKind(llvm::EngineKind::JIT)
+				.setErrorStr(&err)
+				.setOptLevel(llvm::CodeGenOpt::Default)
+				//.setMAttrs("-avx")
+				.setMCPU("core2")
+				.create();
+			} else {
+				EE = llvm::ExecutionEngine::createJIT(
+					mImpl->module,	
+					&err,		// error string
+					0,			// JITMemoryManager
+					llvm::CodeGenOpt::Default,	// JIT slowly (None, Less, Default, Aggressive)
+					false		// allocate GlobalVariables separately from code
+				);
+			}
 			if (EE == 0) {
 				printf("Failed to create Execution Engine: %s", err.data());
 				return 0;
