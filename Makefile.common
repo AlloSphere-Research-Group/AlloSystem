@@ -53,10 +53,11 @@ BUILD_CONFIG	= Release
 VERBOSE		= 0
 
 # Whether Make should determine the dependencies of each C or C++ file as
-# it compiles it. This will be automatically disabled for universal builds # on Mac OSX.
-DEPENDENCY_TRACKING = 1
+# it compiles it. This will be automatically disabled for universal builds
+# on Mac OSX.
+DEP_TRACK = 1
 ifeq ($(ARCH), 32_64)
-	DEPENDENCY_TRACKING = 0
+	DEP_TRACK = 0
 endif
 
 # Whether to enable strict warnings
