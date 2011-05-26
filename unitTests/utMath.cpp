@@ -85,6 +85,7 @@ int utMath(){
 		assert(a.sumAbs() == N);
 		assert(a.mag() == sqrt(N));
 		assert(b.mag() == sqrt(N));
+		assert(a.mag() == abs(a));
 		assert(a.magSqr() == N);
 		assert(b.magSqr() == N);
 		assert(a.norm1() == N);
@@ -103,10 +104,15 @@ int utMath(){
 		Vec<N+1, double> t = concat(a, Vec<1,char>(1));
 		assert(t.size() == a.size()+1);
 		}
+
+		for(int i=0; i<a.size(); ++i) a[i]=i;
+		assert(a.get(0,1) == Vec2d(0,1));
+		assert(a.get(2,2) == Vec2d(2,2));
+		assert(a.get(2,1,0) == Vec3d(2,1,0));
 		
 		{
 		for(int i=0; i<a.size(); ++i) a[i]=i;
-		
+
 		Vec<2, double> t;
 		t = a.sub<2>();			assert(t[0] == 0 && t[1] == 1);
 		t = a.sub<2>(2);		assert(t[0] == 2 && t[1] == 3);
@@ -166,6 +172,7 @@ int utMath(){
 		assert(m(2,0)==g); assert(m(2,1)==h); assert(m(2,2)==i)
 		
 		a.setIdentity();	CHECK(a, 1,0,0, 0,1,0, 0,0,1);
+		a.set(0);
 		a = a.identity();	CHECK(a, 1,0,0, 0,1,0, 0,0,1);
 		
 		assert(a.trace() == 3);

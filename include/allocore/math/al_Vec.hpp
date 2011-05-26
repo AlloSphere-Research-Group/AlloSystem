@@ -384,9 +384,11 @@ public:
 
 	/// Get identity matrix
 	static Mat identity(){
-		Mat m;
-		IT(size()){ m[i] = (i%(N+1)) ? T(0) : T(1); }
-		return m;
+//		Mat m;
+//		IT(size()){ m[i] = (i%(N+1)) ? T(0) : T(1); }
+//		return m;
+		
+		return Mat().setIdentity();
 	}
 
 	/// Get a rotation transform matrix
@@ -570,8 +572,15 @@ public:
 	}
 
 	/// Set elements on diagonal to one and all others to zero
-	Mat& setIdentity(){ return (*this) = identity(); }
+	Mat& setIdentity(){
+		for(int i=0; i<N; ++i)
+			(*this)[i*(N+1)] = T(1);
 
+		for(int i=0;   i< N-1; ++i){
+		for(int j=i+1; j<=N  ; ++j){
+			(*this)[i*N + j] = T(0);
+		}}
+	}
 
 
 
