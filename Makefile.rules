@@ -9,7 +9,7 @@ CFLAGS		:= $(CPPFLAGS) $(CFLAGS)
 CXXFLAGS	:= $(CFLAGS) $(CXXFLAGS)
 
 DEPFLAGS	=
-ifneq ($(DEPENDENCY_TRACKING), 0)
+ifneq ($(DEP_TRACK), 0)
 	DEPFLAGS = -MMD -MF $(basename $@).dep
 endif
 
