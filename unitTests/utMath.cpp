@@ -174,6 +174,8 @@ int utMath(){
 		a.setIdentity();	CHECK(a, 1,0,0, 0,1,0, 0,0,1);
 		a.set(0);
 		a = a.identity();	CHECK(a, 1,0,0, 0,1,0, 0,0,1);
+
+
 		
 		assert(a.trace() == 3);
 		

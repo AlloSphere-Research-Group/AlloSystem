@@ -341,6 +341,9 @@ public:
 	/// param[in] arr	one dimensional array in column-major
 	Mat(const T * arr){ set(arr); }
 
+	static struct NoInit{} NOINIT;
+	Mat(const NoInit& v){}
+
 	///
 	Mat(
 		const T& r1c1, const T& r1c2,
@@ -384,11 +387,7 @@ public:
 
 	/// Get identity matrix
 	static Mat identity(){
-//		Mat m;
-//		IT(size()){ m[i] = (i%(N+1)) ? T(0) : T(1); }
-//		return m;
-		
-		return Mat().setIdentity();
+		return Mat(NOINIT).setIdentity();
 	}
 
 	/// Get a rotation transform matrix
@@ -396,7 +395,7 @@ public:
 		double cs = cos(angle);
 		double sn = sin(angle);
 
-		Mat m;
+		Mat m(NOINIT);
 		m.setIdentity();
 		m(dim1,dim1) = cs;
 		m(dim1,dim2) =-sn;
@@ -417,7 +416,8 @@ public:
 	/// Get a translation transform matrix
 	template <class V>
 	static Mat translation(const Vec<N-1,V>& v){
-		Mat m = identity();
+		Mat m(NOINIT);
+		m.setIdentity();
 		for(int r=0; r<N-1; ++r) m(r,N-1) = v[r];
 		return m;
 	}
@@ -576,10 +576,11 @@ public:
 		for(int i=0; i<N; ++i)
 			(*this)[i*(N+1)] = T(1);
 
-		for(int i=0;   i< N-1; ++i){
-		for(int j=i+1; j<=N  ; ++j){
+		for(int i=0;   i<N-1  ; ++i){
+		for(int j=i+1; j<N+i+1; ++j){
 			(*this)[i*N + j] = T(0);
 		}}
+		return *this;
 	}
 
 
