@@ -217,12 +217,12 @@ bool Compiler :: compile(std::string code) {
 	}
 	ApplyHeaderSearchOptions(PP.getHeaderSearchInfo(), headeropts, lang, CI.getTarget().getTriple());
 	
-	// Defines:
-	std::string defines;
-	for (unsigned int i=0; i<options.defines.size(); i++) {
-		defines += options.defines[i];
-	}
-	PP.setPredefines(defines);
+//	// Defines:
+//	std::string defines;
+//	for (unsigned int i=0; i<options.defines.size(); i++) {
+//		defines += options.defines[i];
+//	}
+//	PP.setPredefines(defines);
 	
 //	//	// list standard invocation args:
 //	std::vector<std::string> Args;

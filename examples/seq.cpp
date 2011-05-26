@@ -113,7 +113,7 @@ public:
 	}
 	
 	virtual void onAudioCB(AudioIOData& io) {
-		if (recording) {
+		if (mRecording) {
 			// cached, because it may be being used in a different thread
 			sampletime r = mReadIndex;
 			sampletime w = mWriteIndex;
