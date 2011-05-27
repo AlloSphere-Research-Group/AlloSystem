@@ -67,29 +67,30 @@ int utProtocolOSC(){
 	
 
 	// Create a complicated OSC bundle packet
-//	p.beginBundle(12345);
-//p.addMessage("/test");
-//		p.addMessage("/message11", (int)0x12345678, 1.f, 1., "hello world!");
-//		p.addMessage("/message12", (int)0x23456789);
-//		p.beginBundle(12346);
-//			p.addMessage("/message21", (int)0x3456789a);
-//			p.beginBundle(12347);
-//				p.addMessage("/message31", (int)0x456789ab);
-//			p.endBundle();
-//		p.endBundle();
-//		p.addMessage("/message13", (int)0x56789abc);
-//	p.endBundle();
+	p.clear();
+	p.beginBundle(12345);
+		p.addMessage("/test");
+		p.addMessage("/message11", (int)0x12345678, 1.f, 1., "hello world!");
+		p.addMessage("/message12", (int)0x23456789);
+		p.beginBundle(12346);
+			p.addMessage("/message21", (int)0x3456789a);
+			p.beginBundle(12347);
+				p.addMessage("/message31", (int)0x456789ab);
+			p.endBundle();
+		p.endBundle();
+		p.addMessage("/message13", (int)0x56789abc);
+	p.endBundle();
 	
-//	assert(p.isBundle());
-//	assert(!p.isMessage());
+	assert(p.isBundle());
+	assert(!p.isMessage());
 
-/*	
+	
 	PacketData data;
 	{
 		struct OSCHandler : public osc::PacketHandler{
 			void onMessage(osc::Message& m){
 			
-				//m.print();
+				m.print();
 			
 				assert(m.typeTags() == "sifdcb");
 				assert(m.addressPattern() == "/test");
@@ -129,6 +130,6 @@ int utProtocolOSC(){
 			al_sleep(0.01);
 		}
 	}
-*/
+
 	return 0;
 }
