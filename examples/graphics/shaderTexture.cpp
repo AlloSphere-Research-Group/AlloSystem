@@ -1,3 +1,13 @@
+/*
+Allocore Example: Texture Shader
+
+Description:
+This demonstrates the simplest way to display a texture using a shader.
+
+Author(s):
+Lance Putnam, 5/27/2011
+*/
+
 #include "allocore/al_Allocore.hpp"
 #include "allocore/graphics/al_Shader.hpp"
 using namespace al;

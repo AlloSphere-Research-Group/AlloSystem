@@ -1,3 +1,13 @@
+/*
+Allocore Example: Point Sprite Shader
+
+Description:
+This demonstrates how to create point sprites using a geometry shader.
+
+Author(s):
+Lance Putnam, 5/27/2011
+*/
+
 #include "allocore/al_Allocore.hpp"
 #include "allocore/graphics/al_Shader.hpp"
 using namespace al;
