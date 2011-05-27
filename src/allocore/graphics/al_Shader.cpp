@@ -120,7 +120,15 @@ ShaderProgram& ShaderProgram::attach(Shader& s){
 	s.compile();
 	glAttachObjectARB((GLhandleARB)id(), (GLhandleARB)s.id());
 	//glAttachShader(id(), s.id()); 
-	
+
+	// TODO: check for geometry shader extensions
+//#ifdef GL_EXT_geometry_shader4
+//	printf("GL_EXT_geometry_shader4 defined\n");
+//#endif
+//#ifdef GL_ARB_geometry_shader4
+//	printf("GL_ARB_geometry_shader4 defined\n");
+//#endif
+
 	if (s.type() == Shader::GEOMETRY) {
 		glProgramParameteriEXT(id(),GL_GEOMETRY_INPUT_TYPE_EXT,GraphicsGL::gl_primitive(mInPrim));
 		glProgramParameteriEXT(id(),GL_GEOMETRY_OUTPUT_TYPE_EXT,GraphicsGL::gl_primitive(mOutPrim));
@@ -174,7 +182,7 @@ void ShaderProgram::end() const {
 bool ShaderProgram::linked() const { 
 	GLint v; 
 	get(GL_LINK_STATUS, &v); 
-	return v; 
+	return (v == GL_TRUE); 
 }
 // GLint v; glGetProgramiv(id(), GL_LINK_STATUS, &v); return v; }
 
