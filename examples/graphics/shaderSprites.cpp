@@ -20,8 +20,8 @@ const char * fPointSprite =
 
 // point sprite geometry shader
 const char * gPointSprite =
-//"#version 120"
-//"#extension GL_EXT_geometry_shader4 : enable"
+"#version 120\n"
+"#extension GL_EXT_geometry_shader4 : enable\n"
 "uniform float spriteRadius;"
 "void main(){"
 	//screen-aligned axes
@@ -164,7 +164,7 @@ struct MyWindow : Window{
 		tex.unbind();
 		shaderP.end();
 
-		printf("fps: %g\n", avgFps());
+//		printf("fps: %g\n", avgFps());
 
 		return true;
 	}
