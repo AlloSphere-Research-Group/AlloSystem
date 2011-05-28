@@ -12,87 +12,90 @@ Lance Putnam, 5/27/2011
 #include "allocore/graphics/al_Shader.hpp"
 using namespace al;
 
-
 // point sprite vertex shader
-const char * vPointSprite =
-"uniform float spriteRadius;"
-"void main(){"
-"	gl_FrontColor = gl_Color;"
-"	gl_Position = gl_Vertex;"
-"}";
+const char * vPointSprite = AL_STRINGIFY(
+uniform float spriteRadius;
+void main(){
+	gl_FrontColor = gl_Color;
+	gl_Position = gl_Vertex;
+}
+);
 
 // point sprite fragment shader
-const char * fPointSprite =
-"uniform sampler2D texSampler0;"
-"void main(){"
-"	gl_FragColor = texture2D(texSampler0, gl_TexCoord[0].xy) * gl_Color;"
-"}";
+const char * fPointSprite = AL_STRINGIFY(
+uniform sampler2D texSampler0;
+void main(){
+	gl_FragColor = texture2D(texSampler0, gl_TexCoord[0].xy) * gl_Color;
+}
+);
 
 // point sprite geometry shader
-const char * gPointSprite =
+const char * gPointSprite = 
 "#version 120\n"
 "#extension GL_EXT_geometry_shader4 : enable\n"
-"uniform float spriteRadius;"
-"void main(){"
+AL_STRINGIFY(
+uniform float spriteRadius;
+void main(){
 	//screen-aligned axes
-"	vec3 axis1 = vec3(	gl_ModelViewMatrix[0][0],"
-"						gl_ModelViewMatrix[1][0],"
-"						gl_ModelViewMatrix[2][0]) * spriteRadius;"
+	vec3 axis1 = vec3(	gl_ModelViewMatrix[0][0],
+						gl_ModelViewMatrix[1][0],
+						gl_ModelViewMatrix[2][0]) * spriteRadius;
 						
-"	vec3 axis2 = vec3(	gl_ModelViewMatrix[0][1],"
-"						gl_ModelViewMatrix[1][1],"
-"						gl_ModelViewMatrix[2][1]) * spriteRadius;"
+	vec3 axis2 = vec3(	gl_ModelViewMatrix[0][1],
+						gl_ModelViewMatrix[1][1],
+						gl_ModelViewMatrix[2][1]) * spriteRadius;
 
-"	vec4 pxy = gl_ModelViewProjectionMatrix * vec4(-axis1 - axis2, 0.5);"
-"	vec4 pXy = gl_ModelViewProjectionMatrix * vec4( axis1 - axis2, 0.5);"
-"	vec4 pxY = gl_ModelViewProjectionMatrix * vec4(-axis1 + axis2, 0.5);"
-"	vec4 pXY = gl_ModelViewProjectionMatrix * vec4( axis1 + axis2, 0.5);"
+	vec4 pxy = gl_ModelViewProjectionMatrix * vec4(-axis1 - axis2, 0.5);
+	vec4 pXy = gl_ModelViewProjectionMatrix * vec4( axis1 - axis2, 0.5);
+	vec4 pxY = gl_ModelViewProjectionMatrix * vec4(-axis1 + axis2, 0.5);
+	vec4 pXY = gl_ModelViewProjectionMatrix * vec4( axis1 + axis2, 0.5);
 
-"	for(int i = 0; i < gl_VerticesIn; ++i){"
+	for(int i = 0; i < gl_VerticesIn; ++i){
 		// copy color
-"		gl_FrontColor = gl_FrontColorIn[i];"
+		gl_FrontColor = gl_FrontColorIn[i];
 
-//"		vec3 p = gl_PositionIn[i].xyz;"
-//"		gl_TexCoord[0] = vec4(1, 1, 0, 1);"
-//"		gl_Position = gl_ModelViewProjectionMatrix * vec4(p + axis1 + axis2, 1.);"
-//"		EmitVertex();"
+//		vec3 p = gl_PositionIn[i].xyz;
+//		gl_TexCoord[0] = vec4(1, 1, 0, 1);
+//		gl_Position = gl_ModelViewProjectionMatrix * vec4(p + axis1 + axis2, 1.);
+//		EmitVertex();
 //
-//"		gl_TexCoord[0] = vec4(1, 0, 0, 1);"
-//"		gl_Position = gl_ModelViewProjectionMatrix * vec4(p + axis1 - axis2, 1.);"
-//"		EmitVertex();"
+//		gl_TexCoord[0] = vec4(1, 0, 0, 1);
+//		gl_Position = gl_ModelViewProjectionMatrix * vec4(p + axis1 - axis2, 1.);
+//		EmitVertex();
 //
-//"		gl_TexCoord[0] = vec4(0, 1, 0, 1);"
-//"		gl_Position = gl_ModelViewProjectionMatrix * vec4(p - axis1 + axis2, 1.);"
-//"		EmitVertex();"
+//		gl_TexCoord[0] = vec4(0, 1, 0, 1);
+//		gl_Position = gl_ModelViewProjectionMatrix * vec4(p - axis1 + axis2, 1.);
+//		EmitVertex();
 //
-//"		gl_TexCoord[0] = vec4(0, 0, 0, 1);"
-//"		gl_Position = gl_ModelViewProjectionMatrix * vec4(p - axis1 - axis2, 1.);"
-//"		EmitVertex();"
+//		gl_TexCoord[0] = vec4(0, 0, 0, 1);
+//		gl_Position = gl_ModelViewProjectionMatrix * vec4(p - axis1 - axis2, 1.);
+//		EmitVertex();
 
-"		vec4 p = gl_ModelViewProjectionMatrix * vec4(gl_PositionIn[i].xyz, 0.5);"
+		vec4 p = gl_ModelViewProjectionMatrix * vec4(gl_PositionIn[i].xyz, 0.5);
 
-"		gl_TexCoord[0] = vec4(0, 0, 0, 1);"
-"		gl_Position =  p + pxy;"
-"		EmitVertex();"
+		gl_TexCoord[0] = vec4(0, 0, 0, 1);
+		gl_Position =  p + pxy;
+		EmitVertex();
 
-"		gl_TexCoord[0] = vec4(1, 0, 0, 1);"
-"		gl_Position =  p + pXy;"
-"		EmitVertex();"
+		gl_TexCoord[0] = vec4(1, 0, 0, 1);
+		gl_Position =  p + pXy;
+		EmitVertex();
 
-"		gl_TexCoord[0] = vec4(0, 1, 0, 1);"
-"		gl_Position =  p + pxY;"
-"		EmitVertex();"
+		gl_TexCoord[0] = vec4(0, 1, 0, 1);
+		gl_Position =  p + pxY;
+		EmitVertex();
 
-"		gl_TexCoord[0] = vec4(1, 1, 0, 1);"
-"		gl_Position =  p + pXY;"
-"		EmitVertex();"
+		gl_TexCoord[0] = vec4(1, 1, 0, 1);
+		gl_Position =  p + pXY;
+		EmitVertex();
 
-"		EndPrimitive();"
-"	}"
+		EndPrimitive();
+	}
 
-//"	EndPrimitive();"	
-"	gl_Position = gl_PositionIn[0];"
-"}";
+//	EndPrimitive();	
+	gl_Position = gl_PositionIn[0];
+}
+);
 
 
 struct MyWindow : Window{

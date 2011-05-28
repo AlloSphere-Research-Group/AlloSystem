@@ -13,38 +13,40 @@ Lance Putnam, 5/1/2011
 
 using namespace al;
 
-static const char * vLight =
-"varying vec3 normal, lightDir, eyeVec;"
-"void main(){"
-"	normal = gl_NormalMatrix * gl_Normal;"
-"	vec3 V = vec3(gl_ModelViewMatrix * gl_Vertex);"
-"	eyeVec = normalize(-V);"
-"	lightDir = normalize(vec3(gl_LightSource[0].position.xyz - V));"
-"	gl_Position = ftransform();"
-"}";
+static const char * vLight = AL_STRINGIFY(
+varying vec3 normal, lightDir, eyeVec;
+void main(){
+	normal = gl_NormalMatrix * gl_Normal;
+	vec3 V = vec3(gl_ModelViewMatrix * gl_Vertex);
+	eyeVec = normalize(-V);
+	lightDir = normalize(vec3(gl_LightSource[0].position.xyz - V));
+	gl_Position = ftransform();
+}
+);
 
-static const char * fLight =
-"varying vec3 normal, lightDir, eyeVec;"
-"void main(){"
-"	vec4 final_color = gl_FrontMaterial.ambient"
-"		* (gl_FrontLightModelProduct.sceneColor + gl_LightSource[0].ambient);"
-"	vec3 N = normalize(normal);"
-"	vec3 L = lightDir;"
-"	float lambertTerm = dot(N,L);"
-"	if(lambertTerm > 0.){"
-"		final_color += gl_LightSource[0].diffuse"
-"		               * gl_FrontMaterial.diffuse"
-"					   * lambertTerm;"
-"		vec3 E = eyeVec;"
-"		vec3 R = reflect(-L, N);"
-"		float spec = pow( max(dot(R, E), 0.),"
-"		                 gl_FrontMaterial.shininess + 1e-20);"
-"		final_color += gl_LightSource[0].specular"
-"		               * gl_FrontMaterial.specular"
-"					   * spec;"
-"	}"
-"	gl_FragColor = final_color;"
-"}";
+static const char * fLight = AL_STRINGIFY(
+varying vec3 normal, lightDir, eyeVec;
+void main(){
+	vec4 final_color = gl_FrontMaterial.ambient
+		* (gl_FrontLightModelProduct.sceneColor + gl_LightSource[0].ambient);
+	vec3 N = normalize(normal);
+	vec3 L = lightDir;
+	float lambertTerm = dot(N,L);
+	if(lambertTerm > 0.){
+		final_color += gl_LightSource[0].diffuse
+		               * gl_FrontMaterial.diffuse
+					   * lambertTerm;
+		vec3 E = eyeVec;
+		vec3 R = reflect(-L, N);
+		float spec = pow( max(dot(R, E), 0.),
+		                 gl_FrontMaterial.shininess + 1e-20);
+		final_color += gl_LightSource[0].specular
+		               * gl_FrontMaterial.specular
+					   * spec;
+	}
+	gl_FragColor = final_color;
+}
+);
 
 
 
