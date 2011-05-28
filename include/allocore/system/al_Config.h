@@ -61,7 +61,6 @@
 typedef long long int al_nsec;				/**< nanoseconds type (accurate to +/- 292.5 years) */
 typedef double al_sec;						/**< seconds type */
 
-//#define AL_STRINGIFY(x) #x
 #define AL_STRINGIFY(...) #__VA_ARGS__
 
 #if !defined(AL_MIN)
