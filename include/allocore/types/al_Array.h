@@ -266,10 +266,8 @@ static inline void allo_array_clear(AlloArray *lat) {
 
 static inline void allo_array_destroy(AlloArray *lat) {
 	if(lat->data.ptr) {
-		if(lat->data.ptr) {
-			free(lat->data.ptr);
-			allo_array_clear(lat);
-		}
+		free(lat->data.ptr);
+		allo_array_clear(lat);
 	}
 }
 
