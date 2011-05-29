@@ -66,18 +66,54 @@ public:
 
 	Image();
 	~Image();
-	
-	// shorthand for Image().load(filename)
+
+	/// @param[in] filename		file name of image; loaded automatically
 	Image(const std::string& filename);
-	
-	// Image attempts to determine image type by file extension:
+
+
+	/// Load image with file name. Image type determined by file extension.
 	bool load(const std::string& filename);
+	
+	/// Save image with file name. Image type determined by file extension.
 	bool save(const std::string& filename);
 	
+	/// File path to image
 	const std::string& filepath() const { return mFilename; }
 	
+	/// Whether an image was loaded from file
 	bool loaded() const { return mLoaded; }
+
+
+	/// Get pixels as an Array
+	Array& array(){ return mArray; }
+	
+	/// Get pixels as an Array (read-only)
 	const Array& array() const { return mArray; }
+	
+	/// Get pointer to pixels
+	template <typename T>
+	T * pixels(){ return (T*)(mArray.data.ptr); }
+
+	/// Get pointer to pixels (read-only)
+	template <typename T>
+	const T * pixels() const { return (const T*)(mArray.data.ptr); }
+
+
+	/// Resize internal pixel buffer. Erases any existing data.
+	
+	/// @param[in] dimX		number of pixels in x direction
+	/// @param[in] dimY		number of pixels in y direction
+	/// @param[in] format	pixel color format
+	/// \returns True on success; false otherwise.
+	template <typename T>
+	bool resize(int dimX, int dimY, Format format){
+		mArray.formatAligned(components(format), Array::type<T>(), dimX, dimY, 0);
+		return true;
+	}
+
+
+	/// Get number of components per pixel element
+	static int components(Format v);
 	
 	static Format getFormat(int planes);
 
@@ -90,11 +126,24 @@ public:
 
 protected: 
 	Array mArray;			// pixel data
-	Impl * mImpl;				// library implementation
+	Impl * mImpl;			// library implementation
 	std::string mFilename;
-	bool mLoaded;				// true after image data is loaded
-
+	bool mLoaded;			// true after image data is loaded
 };
+
+
+
+inline int Image::components(Format v){
+	switch(v){
+	case LUMINANCE:	return 1;
+	case LUMALPHA:	return 2;
+	case RGB:		return 3;
+	case RGBA:		return 4;
+	default:;
+	}
+	return 0;
+}
+
 
 } // al::
 
