@@ -96,6 +96,8 @@ public:
 	 Empty constructor defines a 0-D, 1-plane array of void type; unallocated data
 	 */
 	Array();
+	
+	~Array(){ allo_array_destroy(this); }
 
 	/**
 		Assignment operator copies format and data (allocates memory if necessary)
