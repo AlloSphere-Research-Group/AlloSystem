@@ -102,7 +102,12 @@ public:
 	
 	void invertNormals();
 	
-	// creates a mesh filled with lines for each normal of the source:
+	/// Creates a mesh filled with lines for each normal of the source
+	
+	/// @param[out] mesh		normal lines
+	/// @param[in]  length		length of normals
+	/// @param[in]  perFace		whether normals line should be generated per 
+	///							face rather than per vertex
 	void createNormalsMesh(Mesh& mesh, float length=0.1, bool perFace=false);
 
 	int primitive() const { return mPrimitive; }

@@ -128,31 +128,18 @@ void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace) {
 	} else {
 		mesh.reset();
 		mesh.primitive(Graphics::LINES);
-		int Ni = indices().size();
-		if (Ni) {
-			for(int i=0; i<Ni; i+=3){
-				Index idx = indices()[i];
-				const Vertex& v1 = vertices()[idx];
-				const Normal& n1 = normals()[idx];
-				mesh.vertex(v1);
-				mesh.vertex(v1+n1);
-			}
-		} else {
-			Ni = al::min(vertices().size(), normals().size());
-			for(int i=0; i<Ni; i+=3){
-				const Vertex& v1 = vertices()[i];
-				const Normal& n1 = normals()[i];
-				mesh.vertex(v1);
-				mesh.vertex(v1+n1);
-			}
+		int Ni = al::min(vertices().size(), normals().size());
+		for(int i=0; i<Ni; i+=3){
+			const Vertex& v = vertices()[i];
+			mesh.vertex(v);
+			mesh.vertex(v + normals()[i]*length);
 		}
-
 	}
 }
 
 void Mesh::invertNormals() {
 	int Nv = normals().size();
-	for(int i=0; i<Nv; ++i) normals()[i] *= -1.f;
+	for(int i=0; i<Nv; ++i) normals()[i] = -normals()[i];
 }
 
 // Old non-functional prototype...
@@ -225,8 +212,19 @@ void Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 				const Vertex& v2 = vertices()[i2];
 				const Vertex& v3 = vertices()[i3];
 				
+				// MWAAT (mean weighted by areas of adjacent triangles)
 				Vertex vn = cross(v2-v1, v3-v1);
+
+				// MWE (mean weighted equally)
 				if (equalWeightPerFace) vn.normalize();
+
+				// MWA (mean weighted by angle)
+				// This doesn't work well with dynamic marching cubes- normals
+				// pop in and out for small triangles.
+//				Vertex v12= v2-v1;
+//				Vertex v13= v3-v1;
+//				Vertex vn = cross(v12, v13).normalize();
+//				vn *= angle(v12, v13) / M_PI;
 				
 				normals()[i1] += vn;
 				normals()[i2] += vn;
