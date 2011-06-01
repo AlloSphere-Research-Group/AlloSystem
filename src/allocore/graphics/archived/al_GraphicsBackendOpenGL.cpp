@@ -74,7 +74,7 @@ GLenum gl_primitive(Graphics::Primitive v){
 
 GLenum gl_capability(Graphics::Capability v){
 	switch(v){
-		CS(BLEND) CS(DEPTH_TEST) CS(LIGHTING)
+		CS(BLEND) CS(COLOR_MATERIAL) CS(DEPTH_TEST) CS(LIGHTING) CS(SCISSOR_TEST) CS(CULL_FACE)
 		default: return 0;
 	}
 }

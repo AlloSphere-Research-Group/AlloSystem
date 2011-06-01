@@ -85,7 +85,8 @@ public:
 		DEPTH_TEST,
 		DEPTH_MASK,
 		LIGHTING,
-		SCISSOR_TEST
+		SCISSOR_TEST,
+		CULL_FACE
 	};
 
 	enum Face {
@@ -138,6 +139,7 @@ public:
 	void depthTesting(bool b);
 	void lighting(bool b);
 	void scissor(bool b);
+	void cullFace(bool b);
 	
 	// Frame
 	void clear(int attribMask){ p_clear(attribMask); }
@@ -285,6 +287,7 @@ inline void Graphics::depthMask(bool b) { capability(DEPTH_MASK, b); }
 inline void Graphics::depthTesting(bool b){ capability(DEPTH_TEST, b); }
 inline void Graphics::lighting(bool b) { capability(LIGHTING, b); }
 inline void Graphics::scissor(bool b) { capability(SCISSOR_TEST, b); }
+inline void Graphics::cullFace(bool b) { capability(CULL_FACE, b); }
 
 inline void Graphics::rotate(const Quatd& q) {
 	Matrix4d m;

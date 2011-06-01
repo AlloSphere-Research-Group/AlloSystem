@@ -162,7 +162,7 @@ void JitFile<GlobalState>::start(al_sec period) {
 template <typename GlobalState>
 void JitFile<GlobalState>::poll() {
 	// if file exists
-	if (File::exists(mFilePath.c_str())) {
+	if (al::fileExists(mFilePath.c_str())) {
 		al_sec mtime = File::modified(mFilePath.c_str());
 		// and current modification date differs form the stored modification date
 		if (mMtime != mtime) {
