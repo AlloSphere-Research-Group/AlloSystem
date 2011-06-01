@@ -14,6 +14,8 @@ const int N = 32;
 float volData[N*N*N];
 Isosurface iso;
 double phase=0;
+bool evolve = true;
+bool wireframe = false;
 
 
 struct MyWindow : public Window, public Drawable{
@@ -26,7 +28,10 @@ struct MyWindow : public Window, public Drawable{
 
 		iso.level(0);
 		iso.generate(volData, N, 1./N);
-		
+
+		if(wireframe)	gl.polygonMode(gl.LINE);
+		else			gl.polygonMode(gl.FILL);
+
 		gl.pushMatrix(gl.MODELVIEW);
 			glEnable(GL_RESCALE_NORMAL);
 			gl.translate(-1,-1,-1);
@@ -35,32 +40,37 @@ struct MyWindow : public Window, public Drawable{
 			gl.draw(iso);
 		gl.popMatrix();
 		
-		gl.mesh().primitive(gl.LINES).reset();
-		addWireBox(gl.mesh());
-		gl.draw();
+//		gl.mesh().primitive(gl.LINES).reset();
+//		addWireBox(gl.mesh());
+//		gl.draw();
 	}
 
 	bool onFrame(){
 		nav.smooth(0.8);
 		nav.step(1.);
 		stereo.draw(gl, cam, nav, Viewport(width(), height()), *this);
-		
-		if((phase += 0.0005) > 2*M_PI) phase -= 2*M_PI;
 
-		static bool once = false;
-
-		if(!once){ //once = true;
-		for(int k=0; k<N; ++k){ double z = double(k)/N * 4*M_PI;
-		for(int j=0; j<N; ++j){ double y = double(j)/N * 4*M_PI;
-		for(int i=0; i<N; ++i){ double x = double(i)/N * 4*M_PI;
-			
-			volData[k*N*N + j*N + i] 
-				= cos(x * cos(phase*7)) 
-				+ cos(y * cos(phase*8)) 
-				+ cos(z * cos(phase*9));
-		}}}
+		if(evolve){
+			if((phase += 0.0002) > 2*M_PI) phase -= 2*M_PI;
+			for(int k=0; k<N; ++k){ double z = double(k)/N * 4*M_PI;
+			for(int j=0; j<N; ++j){ double y = double(j)/N * 4*M_PI;
+			for(int i=0; i<N; ++i){ double x = double(i)/N * 4*M_PI;
+				
+				volData[k*N*N + j*N + i] 
+					= cos(x * cos(phase*7)) 
+					+ cos(y * cos(phase*8)) 
+					+ cos(z * cos(phase*9));
+			}}}
 		}
 
+		return true;
+	}
+
+	virtual bool onKeyDown(const Keyboard& k){
+		switch(k.key()){
+		case 'f': wireframe^=1; return false;
+		case ' ': evolve^=1; return false;
+		}
 		return true;
 	}
 };
