@@ -56,6 +56,16 @@ public:
 		return 2.*M_RAD2DEG*atan(height/depth);
 	}
 
+	// calculate required fovy to produce a specific fovx, 
+	// given the width & height of the viewport:
+	static double getFovyForFovX(double fovx, double width, double height) {
+		// at depth=1, what is the position of the panel edges
+		double farW = tan(0.5*fovx*M_DEG2RAD);
+		double farH = height*farW/width;
+		// use this to derive the appropriate panel fovy:
+		return 2.*M_RAD2DEG*atan(farH);
+	}
+
 protected:
 	double mFovy;				// Camera aperture (degrees)
 	double mTanFOV;				// Cached factor for computing frustum dimensions
