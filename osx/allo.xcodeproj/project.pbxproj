@@ -3094,7 +3094,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ../\nmake allocore\n";
+			shellScript = "cd ../\nmake allocore";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -3287,8 +3287,10 @@
 					"\"$(SRCROOT)/../../dev/osx/lib\"",
 					"\"$(SRCROOT)/../build/lib\"",
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				PRODUCT_NAME = exSimpleGraphics;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 			};
 			name = Debug;
 		};
@@ -3307,6 +3309,7 @@
 					"\"$(SRCROOT)/../../dev/osx/lib\"",
 					"\"$(SRCROOT)/../build/lib\"",
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				PRODUCT_NAME = exSimpleGraphics;
 				ZERO_LINK = NO;
