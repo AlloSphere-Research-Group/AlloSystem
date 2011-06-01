@@ -193,7 +193,9 @@ void GraphicsGL :: p_antialiasing(AntiAliasMode mode) {
 void GraphicsGL :: p_lineWidth(double v) { glLineWidth(v); }
 void GraphicsGL :: p_pointSize(double v) { glPointSize(v); }
 void GraphicsGL :: p_polygonMode(PolygonMode m, Face f) { glPolygonMode(gl_face(f), gl_polygon_mode(m)); }
-
+void GraphicsGL :: p_shadeModel(ShadeModel m) {
+	glShadeModel(m ? GL_SMOOTH : GL_FLAT);
+}
 void GraphicsGL :: p_currentColor(double r, double g, double b, double a) {
 	glColor4f(r, g, b, a);
 }

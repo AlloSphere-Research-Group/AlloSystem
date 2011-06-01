@@ -104,6 +104,11 @@ public:
 		LINE,
 		FILL
 	};
+	
+	enum ShadeModel {
+		FLAT = 0,
+		SMOOTH
+	};
 
 	enum Primitive {
 		POINTS = 0,
@@ -197,6 +202,7 @@ public:
 	void lineWidth(double v){ p_lineWidth(v); }
 	void pointSize(double v){ p_pointSize(v); }
 	void polygonMode(PolygonMode m, Face f=FRONT_AND_BACK){ p_polygonMode(m,f); }
+	void shadeModel(ShadeModel m) { p_shadeModel(m); }
 	void fog(float end, float start, const Color& c){ p_fog(end, start, c); }
 	
 	// Textures
@@ -252,6 +258,7 @@ private:
 	virtual void p_lineWidth(double v) = 0;
 	virtual void p_pointSize(double v) = 0;
 	virtual void p_polygonMode(PolygonMode m, Face f) = 0;
+	virtual void p_shadeModel(ShadeModel m) = 0;
 	
 	virtual void p_fog(float end, float start, const Color& c) = 0;
 };

@@ -169,6 +169,7 @@ private:
 	virtual void p_lineWidth(double v);
 	virtual void p_pointSize(double v);
 	virtual void p_polygonMode(PolygonMode m, Face f);
+	virtual void p_shadeModel(ShadeModel m);
 	
 	virtual void p_fog(float end, float start, const Color& c);
 };
