@@ -26,6 +26,10 @@ Camera& Camera::fovy(double v){
 	return *this;
 }
 
+Camera& Camera::fovx(double v, double aspect) {
+	fovy(Camera::getFovyForFovX(v, aspect));
+	return *this;
+}
 
 void Camera::frustum(Frustumd& f, const Pose& p, double aspect, bool isStereo) const {
 

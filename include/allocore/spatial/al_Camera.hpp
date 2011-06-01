@@ -23,6 +23,7 @@ public:
 
 	// setters
 	Camera& fovy(double v);									///< Set vertical field of view, in degrees
+	Camera& fovx(double v, double aspect);					///< Set horizontal field of view, in degrees
 	Camera& near(double v){ mNear=v; return *this; }		///< Set frustum near plane distance
 	Camera& far(double v){ mFar=v; return *this; }			///< Set frustum far plane distance
 	Camera& focalLength(double v){ mFocalLength=v; return *this; } ///< Set focal length
@@ -56,14 +57,13 @@ public:
 		return 2.*M_RAD2DEG*atan(height/depth);
 	}
 
-	// calculate required fovy to produce a specific fovx, 
-	// given the width & height of the viewport:
-	static double getFovyForFovX(double fovx, double width, double height) {
-		// at depth=1, what is the position of the panel edges
+	/// Calculate required fovy to produce a specific fovx
+	/// @param[fovx] field-of-view in X axis to recreate
+	/// @param[aspect] aspect ratio of viewport
+	/// @return field-of-view in Y axis, usable by Camera.fovy() 
+	static double getFovyForFovX(double fovx, double aspect) {
 		double farW = tan(0.5*fovx*M_DEG2RAD);
-		double farH = height*farW/width;
-		// use this to derive the appropriate panel fovy:
-		return 2.*M_RAD2DEG*atan(farH);
+		return 2.*M_RAD2DEG*atan(farW/aspect);
 	}
 
 protected:
@@ -75,6 +75,7 @@ protected:
 	double mZoom;
 //	Vec3d mStereoOffset;		// eye offset vector (right eye; left eye is inverse), usually (1, 0, 0)
 };
+
 
 
 } // al::
