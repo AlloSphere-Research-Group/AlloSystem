@@ -7,7 +7,7 @@
 #include "allocore/types/al_Buffer.hpp"
 #include "allocore/math/al_Interpolation.hpp"
 #include "allocore/math/al_Vec.hpp"
-#include "allocore/spatial/al_CoordinateFrame.hpp"
+#include "allocore/spatial/al_Pose.hpp"
 #include "allocore/sound/al_Ambisonics.hpp"
 #include "allocore/sound/al_Reverb.hpp"
 

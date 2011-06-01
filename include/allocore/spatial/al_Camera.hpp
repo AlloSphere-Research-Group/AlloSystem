@@ -4,7 +4,7 @@
 #include "allocore/math/al_Vec.hpp"
 #include "allocore/math/al_Matrix4.hpp"
 #include "allocore/math/al_Frustum.hpp"
-#include "allocore/spatial/al_CoordinateFrame.hpp"
+#include "allocore/spatial/al_Pose.hpp"
 
 namespace al {
 

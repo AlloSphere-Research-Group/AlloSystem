@@ -2,7 +2,7 @@
 #define INC_AL_CONTROL_NAV_HPP
 
 #include "allocore/io/al_Window.hpp"
-#include "allocore/spatial/al_CoordinateFrame.hpp"
+#include "allocore/spatial/al_Pose.hpp"
 
 namespace al {
 

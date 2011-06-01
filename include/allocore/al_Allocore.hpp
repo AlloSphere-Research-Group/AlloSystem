@@ -59,7 +59,7 @@
 #include "allocore/sound/al_Reverb.hpp"
 #include "allocore/sound/al_AudioScene.hpp"
 #include "allocore/spatial/al_Camera.hpp"
-#include "allocore/spatial/al_CoordinateFrame.hpp"
+#include "allocore/spatial/al_Pose.hpp"
 #include "allocore/system/al_Info.hpp"
 #include "allocore/system/al_MainLoop.hpp"
 #include "allocore/system/al_Printing.hpp"
