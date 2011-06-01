@@ -5,6 +5,7 @@
 
 #include "allocore/system/al_Config.h"
 #include "allocore/graphics/al_Mesh.hpp"
+#include "allocore/graphics/al_Graphics.hpp"
 
 namespace al{
 
@@ -92,6 +93,67 @@ public:
 	}
 };
 
+void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace) {	
+	if (perFace) {	
+		// compute vertex based normals
+		if(indices().size()){
+			mesh.reset();
+			mesh.primitive(Graphics::LINES);
+			
+			int Ni = indices().size();
+			Ni = Ni - (Ni%3); // must be multiple of 3
+
+			for(int i=0; i<Ni; i+=3){
+				Index i1 = indices()[i+0];
+				Index i2 = indices()[i+1];
+				Index i3 = indices()[i+2];
+				const Vertex& v1 = vertices()[i1];
+				const Vertex& v2 = vertices()[i2];
+				const Vertex& v3 = vertices()[i3];
+				
+				// get mean:
+				const Vertex& mean = (v1 + v2 + v3)/3.f;
+				
+				// get face normal:
+				Vertex facenormal = cross(v2-v1, v3-v1);
+				facenormal.normalize();
+				
+				mesh.vertex(mean);
+				mesh.vertex(mean + (facenormal*length));
+				
+			}
+		} else {
+			printf("createNormalsMesh only valid for indexed meshes\n");
+		}
+	} else {
+		mesh.reset();
+		mesh.primitive(Graphics::LINES);
+		int Ni = indices().size();
+		if (Ni) {
+			for(int i=0; i<Ni; i+=3){
+				Index idx = indices()[i];
+				const Vertex& v1 = vertices()[idx];
+				const Normal& n1 = normals()[idx];
+				mesh.vertex(v1);
+				mesh.vertex(v1+n1);
+			}
+		} else {
+			Ni = al::min(vertices().size(), normals().size());
+			for(int i=0; i<Ni; i+=3){
+				const Vertex& v1 = vertices()[i];
+				const Normal& n1 = normals()[i];
+				mesh.vertex(v1);
+				mesh.vertex(v1+n1);
+			}
+		}
+
+	}
+}
+
+void Mesh::invertNormals() {
+	int Nv = normals().size();
+	for(int i=0; i<Nv; ++i) normals()[i] *= -1.f;
+}
 
 // Old non-functional prototype...
 //	// generates smoothed normals for a set of vertices
@@ -99,7 +161,7 @@ public:
 //	// angle - maximum angle (in degrees) to smooth across
 //	void generateNormals(float angle=360);
 
-void Mesh::generateNormals(bool normalize) {
+void Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 //	/*
 //		Multi-pass algorithm:
 //			generate a list of faces (assume triangles?)
@@ -164,6 +226,7 @@ void Mesh::generateNormals(bool normalize) {
 				const Vertex& v3 = vertices()[i3];
 				
 				Vertex vn = cross(v2-v1, v3-v1);
+				if (equalWeightPerFace) vn.normalize();
 				
 				normals()[i1] += vn;
 				normals()[i2] += vn;

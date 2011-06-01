@@ -98,7 +98,12 @@ public:
 	/// if indices are present. This will replace any normals currently in use.
 	///
 	/// @param[in] normalize	whether to normalize normals
-	void generateNormals(bool normalize=true);
+	void generateNormals(bool normalize=true, bool equalWeightPerFace=false);
+	
+	void invertNormals();
+	
+	// creates a mesh filled with lines for each normal of the source:
+	void createNormalsMesh(Mesh& mesh, float length=0.1, bool perFace=false);
 
 	int primitive() const { return mPrimitive; }
 	const Buffer<Vertex>& vertices() const { return mVertices; }
