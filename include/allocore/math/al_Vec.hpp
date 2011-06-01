@@ -752,11 +752,10 @@ inline Vec<3,T> operator^ (const Vec<3,T>& a, const Vec<3,T>& b){
 	return cross(a,b);
 }
 
-/// Returns angle, in radians, between two vectors
+/// Returns angle, in interval [0, pi], between two vectors
 template <int N, class T>
 static T angle(const Vec<N,T>& a, const Vec<N,T>& b){
-	using namespace std;
-	return acos(a.sgn().dot(b.sgn()));
+	return std::acos(a.sgn().dot(b.sgn()));
 }
 
 /*! Centroid of a triangle defined by three points
