@@ -47,6 +47,7 @@ protected:
 class Kinect {
 public:
 
+	// Warning: triggered in the Kinect's own thread
 	class Callback {
 	public:
 		virtual ~Callback() {}
