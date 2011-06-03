@@ -8,7 +8,7 @@ int utSystem(){
 	// Timing
 //	UT_PRINTF("system: timing\n");
 	{
-		al_nsec slop = 1e6;
+		al_nsec slop = 1e7;
 		al_nsec sleepns = 1e8;
 		al_sec sleeps = 0.5;
 		al_sec slops = 0.005;
