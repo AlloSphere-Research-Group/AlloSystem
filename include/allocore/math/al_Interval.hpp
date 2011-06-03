@@ -53,6 +53,7 @@ public:
 
 	bool degenerate() const { return min()==max(); }///< Returns true if diameter is zero
 	T diameter() const { return max()-min(); }		///< Returns absolute difference of endpoints
+	T size() const { return diameter(); }			///< Returns absolute difference of endpoints
 	const T& max() const { return mMax; }			///< Get maximum endpoint
 	const T& min() const { return mMin; }			///< Get minimum endpoint
 	bool proper() const { return min()!=max(); }	///< Returns true if diameter is non-zero
