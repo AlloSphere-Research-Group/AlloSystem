@@ -37,6 +37,7 @@ Ni& Ni :: get() {
 xn::NodeInfoList device_node_info_list, depth_node_info_list;
 
 Ni :: Ni() {
+	mNumDevices = 0;
 	int i;
 
 	// enumerate devices:
@@ -84,6 +85,9 @@ Ni :: Ni() {
 		printf("depth %2d: vendor %s name %s, connection %s\n", i, description.strVendor, description.strName, info.GetCreationInfo());
 		depth_nodes.push_back(info);
 	}
+	
+	mNumDevices = depth_nodes.size();
+	
 	printf("Initialized OpenNI\n");
 }
 
@@ -152,7 +156,7 @@ Kinect :: Kinect(unsigned deviceID)
 	mZPPS(0.104200),
 	mZRes(10001)
 {
-	printf("created Kinect\n");
+	printf("created Kinect %u\n", id());
 }
 
 Kinect :: ~Kinect() {
@@ -229,14 +233,14 @@ void * Kinect :: threadFunction(void * userData) {
 	Kinect& self = *(Kinect *)userData;
 
 	// find the info for this device:
-	printf("started Kinect thread\n");
+	printf("started Kinect thread %u\n", self.id());
 	Ni::get();
 	if (self.mDeviceID < depth_nodes.size()) {
 		xn::NodeInfo info = depth_nodes[self.mDeviceID % depth_nodes.size()];
 		self.mImpl = new Impl(info);
 
 		if (self.mImpl) {
-			printf("start generating kinect... %p\n", userData);
+			printf("start generating kinect %u... %p\n", self.id(), userData);
 			XnStatus s = self.mImpl->mDepthGenerator.StartGenerating();
 			if (!ok(s)) return 0;
 

@@ -38,9 +38,12 @@ public:
 	static Ni& get();
 
 	void listDevices();
+	
+	unsigned numDevices() { return mNumDevices; }
 
 protected:
 	Ni();	// singleton pattern.
+	unsigned mNumDevices;
 };
 
 
@@ -69,6 +72,8 @@ public:
 	void add(Callback * cb) {
 		mCallbacks.push_back(cb);
 	}
+	
+	unsigned id() { return mDeviceID; }
 
 	static void * getContext();
 
