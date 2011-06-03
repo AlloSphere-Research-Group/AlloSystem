@@ -130,14 +130,13 @@ public:
 	}
 	/// synonym for append():
 	void push_back(const T& v, double growFactor=2) { append(v, growFactor); }	
-
+	
 	/// Write new element to ring buffer
 	void write(const T& v){
 		++mPos; if(pos() == size()){ mPos=0; }
 		Alloc::construct(elems()+pos(), v);
 		if(fill() < size()) ++mFill; 
 	}
-
 
 	/// Add new elements after each existing element
 	
@@ -151,6 +150,13 @@ public:
 			const T& v = (*this)[i];
 			for(int j=0; j<Nd; ++j) Alloc::construct(elems()+n*i+j, v);
 		}
+	}
+	
+	/// Append elements of another Buffer
+	
+	/// Note: not safe to apply this to itself
+	void append(Buffer<T>& src) {
+		mElems.insert(mElems.end(), src.mElems.begin(), src.mElems.end());
 	}
 
 private:
