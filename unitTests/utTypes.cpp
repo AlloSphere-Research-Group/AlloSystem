@@ -47,6 +47,37 @@ int utTypes(){
 		assert(a.size() == 0);
 		assert(a.capacity() == 4);
 
+		// Appending another Buffer
+		{
+			Buffer<int> b(4);
+			for(int i=0; i<b.size(); ++i) b[i] = i+4;
+			
+			a.size(4);
+			for(int i=0; i<a.size(); ++i) a[i] = i;
+
+			// Append non-zero sized to non-zero sized
+			{
+			int N = a.size() + b.size();
+			a.append(b);
+				assert(a.size() == N);
+				for(int i=0; i<N; ++i) assert(a[i] == i);
+			}
+
+			// Append non-zero sized to zero sized
+			a.size(0);
+			a.append(b);
+				assert(a.size() == b.size());
+				for(int i=0; i<a.size(); ++i) assert(a[i] == b[i]);
+
+			// Append zero sized to non-zero sized
+			{
+			int N = a.size();
+			b.size(0);
+			a.append(b);
+				assert(a.size() == N);
+			}
+		}
+
 
 		// Test ring buffering
 		a.resize(4);

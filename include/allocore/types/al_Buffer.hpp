@@ -54,11 +54,12 @@ public:
 	~Buffer(){}
 
 
-	int capacity() const { return mElems.capacity(); }	///< Returns total capacity
+	int capacity() const { return mElems.size(); }		///< Returns total capacity
 	int fill() const { return mFill; }					///< Returns buffer fill amount
 	int pos() const { return mPos; }					///< Returns write position
 	int size() const { return mSize; }					///< Returns size
-	T * elems(){ return &mElems[0]; }					///< Returns C-style pointer to elements
+	const T * elems() const { return &mElems[0]; }		///< Returns C pointer to elements
+	T * elems(){ return &mElems[0]; }					///< Returns C pointer to elements
 
 
 	/// Set element at absolute index
@@ -155,8 +156,11 @@ public:
 	/// Append elements of another Buffer
 	
 	/// Note: not safe to apply this to itself
-	void append(Buffer<T>& src) {
-		mElems.insert(mElems.end(), src.mElems.begin(), src.mElems.end());
+	///
+	void append(const Buffer<T>& src) {
+		int oldsize = size();
+		size(size() + src.size());
+		std::copy(src.elems(), src.elems() + src.size(), mElems.begin() + oldsize);
 	}
 
 private:
@@ -167,8 +171,8 @@ private:
 	
 	void setSize(int n){
 		mSize=n;
-		if(mFill>=n) mFill = n-1;
-		if(mPos >=n) mPos  = n-1;	
+		if(mFill> n) mFill = n;
+		if(mPos >=n) mPos  = n-1;
 	}
 	
 	// Moves value one period closer to interval [0, max)
