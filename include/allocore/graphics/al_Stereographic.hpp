@@ -30,6 +30,7 @@
 
 #include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/spatial/al_Camera.hpp"
+#include "allocore/spatial/al_Pose.hpp"
 #include "allocore/types/al_Color.hpp"
 
 namespace al{
