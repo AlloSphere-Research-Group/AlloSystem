@@ -90,7 +90,7 @@ int utProtocolOSC(){
 		struct OSCHandler : public osc::PacketHandler{
 			void onMessage(osc::Message& m){
 			
-				m.print();
+//				m.print();
 			
 				assert(m.typeTags() == "sifdcb");
 				assert(m.addressPattern() == "/test");
