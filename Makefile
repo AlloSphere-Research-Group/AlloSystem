@@ -169,7 +169,8 @@ archive:
 clean: createFolders
 	@$(RM) -rf $(BUILD_DIR)*
 	@$(RM) -rf $(TEST_DIR)/$(BUILD_DIR)*
-
+	@$(MAKE) -C externals/gamma clean
+	@$(MAKE) -C externals/glv clean
 
 # Build unit tests
 test: allocore external
