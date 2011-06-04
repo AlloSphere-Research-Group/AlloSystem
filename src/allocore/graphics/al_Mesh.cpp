@@ -279,6 +279,51 @@ void Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 
 }
 
+
+void Mesh::merge(const Mesh& src){
+//	if (indices().size() || src.indices().size()) {
+//		printf("error: Mesh merging with indexed meshes not yet supported\n");
+//		return;
+//	}
+
+	// TODO: only do merge if source and dest are well-formed
+
+	// TODO: indices are more complex, since the offsets may have changed.
+	// we'd have to add indices.size() to all of the src.indices before adding.
+	// also, both src & dst should either use or not use indices
+	// tricky if src is empty...
+	//indices().append(src.indices());
+
+	// Source has indices, and I either do or don't.
+	// After this block, I will have indices.
+	if(src.indices().size()){
+		int Nv = vertices().size();
+		int Ni = indices().size();
+		// If no indices, must create
+		if(0 == Ni){
+			for(int i=0; i<Nv; ++i) index(i);
+		}
+		// Add source indices offset by my number of vertices
+		index(src.indices().elems(), src.indices().size(), Nv);
+	}
+	
+	// Source doesn't have indices, but I do
+	else if(indices().size()){
+		int Nv = vertices().size();
+		for(int i=Nv; i<Nv+src.vertices().size(); ++i) index(i);
+	}
+	
+	// From here, the game is indice invariant
+
+	//equalizeBuffers(); << TODO: must do this if we are using indices.
+	vertices().append(src.vertices());
+	normals().append(src.normals());
+	colors().append(src.colors());
+	texCoord2s().append(src.texCoord2s());
+	texCoord3s().append(src.texCoord3s());
+}
+
+
 void Mesh::getBounds(Vertex& min, Vertex& max) const {
 	if(vertices().size()){
 		min.set(vertices()[0]);

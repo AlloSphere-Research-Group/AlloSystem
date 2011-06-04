@@ -71,23 +71,7 @@ public:
 	void equalizeBuffers();
 	
 	/// Append buffers from another mesh:
-	void merge(Mesh& src) {
-		if (indices().size() || src.indices().size()) {
-			printf("error: Mesh merging with indexed meshes not yet supported\n");
-			return;
-		}
-		//equalizeBuffers(); << TODO: must do this if we are using indices.
-		vertices().append(src.vertices());
-		normals().append(src.normals());
-		colors().append(src.colors());
-		texCoord2s().append(src.texCoord2s());
-		texCoord3s().append(src.texCoord3s());
-		// TODO: indices are more complex, since the offsets may have changed.
-		// we'd have to add indices.size() to all of the src.indices before adding.
-		// also, both src & dst should either use or not use indices
-		// tricky if src is empty...
-		//indices().append(src.indices());
-	}
+	void merge(const Mesh& src);
 
 	/// Reset all buffers
 	Mesh& reset();
