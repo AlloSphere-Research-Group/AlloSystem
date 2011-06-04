@@ -132,6 +132,22 @@ public:
 	}
 	/// synonym for append():
 	void push_back(const T& v, double growFactor=2) { append(v, growFactor); }	
+
+	/// Append elements of another Buffer
+	
+	/// Note: not safe to apply this to itself
+	///
+	void append(const Buffer<T>& src){
+		append(src.elems(), src.size());
+	}
+
+	/// Append elements of an array
+	void append(const T * src, int len){
+		int oldsize = size();
+		size(size() + len);
+		std::copy(src, src + len, mElems.begin() + oldsize);
+	}
+
 	
 	/// Write new element to ring buffer
 	void write(const T& v){
@@ -152,16 +168,6 @@ public:
 			const T& v = (*this)[i];
 			for(int j=0; j<Nd; ++j) Alloc::construct(elems()+n*i+j, v);
 		}
-	}
-	
-	/// Append elements of another Buffer
-	
-	/// Note: not safe to apply this to itself
-	///
-	void append(const Buffer<T>& src) {
-		int oldsize = size();
-		size(size() + src.size());
-		std::copy(src.elems(), src.elems() + src.size(), mElems.begin() + oldsize);
 	}
 
 private:
