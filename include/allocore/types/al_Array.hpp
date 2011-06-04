@@ -82,9 +82,9 @@ public:
 	/*!
 	 Standard constructors; will allocate memory accordingly
 	 */
-	Array(int components, AlloTy ty, int dimx);
-	Array(int components, AlloTy ty, int dimx, int dimy);
-	Array(int components, AlloTy ty, int dimx, int dimy, int dimz);
+	Array(int components, AlloTy ty, uint32_t dimx);
+	Array(int components, AlloTy ty, uint32_t dimx, uint32_t dimy);
+	Array(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz);
 
 	/*!
 		Copy constructor; copies both the layout and data from cpy
@@ -113,12 +113,12 @@ public:
 	void format(const AlloArrayHeader &h2);
 	void format(const AlloArray& array) { format(array.header); }
 
-	void format(int components, AlloTy ty, int dimx);
-	void format(int components, AlloTy ty, int dimx, int dimy);
-	void format(int components, AlloTy ty, int dimx, int dimy, int dimz);
-	void formatAligned(int components, AlloTy ty, int dimx, size_t align);
-	void formatAligned(int components, AlloTy ty, int dimx, int dimy, size_t align);
-	void formatAligned(int components, AlloTy ty, int dimx, int dimy, int dimz, size_t align);
+	void format(int components, AlloTy ty, uint32_t dimx);
+	void format(int components, AlloTy ty, uint32_t dimx, uint32_t dimy);
+	void format(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz);
+	void formatAligned(int components, AlloTy ty, uint32_t dimx, size_t align);
+	void formatAligned(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, size_t align);
+	void formatAligned(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, size_t align);
 
 	///! Check if this Array conforms to an ArrayHeader format
 	bool isFormat(const AlloArrayHeader &h2) const;
@@ -132,6 +132,11 @@ public:
 
 	///! verify that Array contains data
 	bool hasData() const { return data.ptr != NULL; }
+	
+	uint8_t dimcount() const { return header.dimcount; }
+	uint32_t width() const { return header.dim[0]; }
+	uint32_t height() const { return header.dim[1]; }
+	uint32_t depth() const { return header.dim[2]; }
 
 	///! Allocate memory for the given header
 	/// (warning, does not check if data.ptr was not NULL!)
@@ -266,17 +271,17 @@ inline Array::Array(const AlloArrayHeader& h2) : AlloArray() {
 	format(h2);
 }
 
-inline Array::Array(int components, AlloTy ty, int dimx) : AlloArray() {
+inline Array::Array(int components, AlloTy ty, uint32_t dimx) : AlloArray() {
 	data.ptr = NULL;
 	format(components, ty, dimx);
 }
 
-inline Array::Array(int components, AlloTy ty, int dimx, int dimy) : AlloArray() {
+inline Array::Array(int components, AlloTy ty, uint32_t dimx, uint32_t dimy) : AlloArray() {
 	data.ptr = NULL;
 	format(components, ty, dimx, dimy);
 }
 
-inline Array::Array(int components, AlloTy ty, int dimx, int dimy, int dimz) : AlloArray() {
+inline Array::Array(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz) : AlloArray() {
 	data.ptr = NULL;
 	format(components, ty, dimx, dimy, dimz);
 }
@@ -328,17 +333,17 @@ inline void Array::format(const AlloArrayHeader &h2) {
 	}
 }
 
-inline void Array::format(int components, AlloTy ty, int dimx) {
+inline void Array::format(int components, AlloTy ty, uint32_t dimx) {
 	formatAligned(components, ty, dimx, AL_ARRAY_DEFAULT_ALIGNMENT);
 }
-inline void Array::format(int components, AlloTy ty, int dimx, int dimy) {
+inline void Array::format(int components, AlloTy ty, uint32_t dimx, uint32_t dimy) {
 	formatAligned(components, ty, dimx, dimy, AL_ARRAY_DEFAULT_ALIGNMENT);
 }
-inline void Array::format(int components, AlloTy ty, int dimx, int dimy, int dimz) {
+inline void Array::format(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz) {
 	formatAligned(components, ty, dimx, dimy, dimz, AL_ARRAY_DEFAULT_ALIGNMENT);
 }
 
-inline void Array::formatAligned(int components, AlloTy ty, int dimx, size_t align) {
+inline void Array::formatAligned(int components, AlloTy ty, uint32_t dimx, size_t align) {
 	AlloArrayHeader hh;
 	hh.type = ty;
 	hh.components = components;
@@ -347,7 +352,7 @@ inline void Array::formatAligned(int components, AlloTy ty, int dimx, size_t ali
 	deriveStride(hh, align);
 	format(hh);
 }
-inline void Array::formatAligned(int components, AlloTy ty, int dimx, int dimy, size_t align) {
+inline void Array::formatAligned(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, size_t align) {
 	AlloArrayHeader hh;
 	hh.type = ty;
 	hh.components = components;
@@ -357,7 +362,7 @@ inline void Array::formatAligned(int components, AlloTy ty, int dimx, int dimy, 
 	deriveStride(hh, align);
 	format(hh);
 }
-inline void Array::formatAligned(int components, AlloTy ty, int dimx, int dimy, int dimz, size_t align) {
+inline void Array::formatAligned(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, size_t align) {
 	AlloArrayHeader hh;
 	hh.type = ty;
 	hh.components = components;
