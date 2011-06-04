@@ -114,6 +114,37 @@ Shader& Shader::source(const std::string& src, Shader::Type type){
 }
 	
 
+static ShaderProgram::Type param_type_from_gltype(GLenum gltype) {
+	switch(gltype) {
+		case GL_FLOAT:				return ShaderProgram::FLOAT;
+		case GL_FLOAT_VEC2:			return ShaderProgram::VEC2;
+		case GL_FLOAT_VEC3:			return ShaderProgram::VEC3;
+		case GL_FLOAT_VEC4:			return ShaderProgram::VEC4;
+
+		case GL_INT:				return ShaderProgram::INT;
+		case GL_INT_VEC2:			return ShaderProgram::INT2;
+		case GL_INT_VEC3:			return ShaderProgram::INT3;
+		case GL_INT_VEC4:			return ShaderProgram::INT4;
+
+		case GL_BOOL:				return ShaderProgram::BOOL;
+		case GL_BOOL_VEC2:			return ShaderProgram::BOOL2;
+		case GL_BOOL_VEC3:			return ShaderProgram::BOOL3;
+		case GL_BOOL_VEC4:			return ShaderProgram::BOOL4;
+
+		case GL_FLOAT_MAT2:			return ShaderProgram::MAT22;
+		case GL_FLOAT_MAT3:			return ShaderProgram::MAT33;
+		case GL_FLOAT_MAT4:			return ShaderProgram::MAT44;
+
+		case GL_SAMPLER_1D:			return ShaderProgram::SAMPLER_1D;
+		case GL_SAMPLER_2D:			return ShaderProgram::SAMPLER_2D;
+		case GL_SAMPLER_2D_RECT_ARB:return ShaderProgram::SAMPLER_RECT;
+		case GL_SAMPLER_3D:			return ShaderProgram::SAMPLER_3D;
+		case GL_SAMPLER_CUBE:		return ShaderProgram::SAMPLER_CUBE;
+		case GL_SAMPLER_1D_SHADOW:	return ShaderProgram::SAMPLER_1D_SHADOW;
+		case GL_SAMPLER_2D_SHADOW:	return ShaderProgram::SAMPLER_2D_SHADOW;
+		default:					return ShaderProgram::NONE;
+	}
+}
 
 ShaderProgram& ShaderProgram::attach(Shader& s){
 	validate();
@@ -345,40 +376,7 @@ void ShaderProgram::listParams() const {
 	}
 }
 
-ShaderProgram::Type ShaderProgram :: param_type_from_gltype(GLenum gltype) {
-	ShaderProgram::Type type = ShaderProgram::NONE;
 
-	switch(gltype) {
-		case GL_FLOAT:			type = ShaderProgram::FLOAT;	break;
-		case GL_FLOAT_VEC2:		type = ShaderProgram::VEC2;	break;
-		case GL_FLOAT_VEC3:		type = ShaderProgram::VEC3;	break;
-		case GL_FLOAT_VEC4:		type = ShaderProgram::VEC4;	break;
-
-		case GL_INT:			type = ShaderProgram::INT;	break;
-		case GL_INT_VEC2:		type = ShaderProgram::INT2;	break;
-		case GL_INT_VEC3:		type = ShaderProgram::INT3;	break;
-		case GL_INT_VEC4:		type = ShaderProgram::INT4;	break;
-
-		case GL_BOOL:			type = ShaderProgram::BOOL;	break;
-		case GL_BOOL_VEC2:		type = ShaderProgram::BOOL2;	break;
-		case GL_BOOL_VEC3:		type = ShaderProgram::BOOL3;	break;
-		case GL_BOOL_VEC4:		type = ShaderProgram::BOOL4;	break;
-
-		case GL_FLOAT_MAT2:		type = ShaderProgram::MAT22;	break;
-		case GL_FLOAT_MAT3:		type = ShaderProgram::MAT33;	break;
-		case GL_FLOAT_MAT4:		type = ShaderProgram::MAT44;	break;
-
-		case GL_SAMPLER_1D:		type = ShaderProgram::SAMPLER_1D;	break;
-		case GL_SAMPLER_2D:		type = ShaderProgram::SAMPLER_2D;	break;
-		case GL_SAMPLER_2D_RECT_ARB: type = ShaderProgram::SAMPLER_RECT; break;
-		case GL_SAMPLER_3D:		type = ShaderProgram::SAMPLER_3D;	break;
-		case GL_SAMPLER_CUBE:	type = ShaderProgram::SAMPLER_CUBE; break;
-		case GL_SAMPLER_1D_SHADOW: type = ShaderProgram::SAMPLER_1D_SHADOW; break;
-		case GL_SAMPLER_2D_SHADOW: type = ShaderProgram::SAMPLER_2D_SHADOW; break;
-	}
-
-	return type;
-}
 
 } // ::al
 

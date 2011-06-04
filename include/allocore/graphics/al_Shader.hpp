@@ -3,6 +3,7 @@
 
 #include <string>
 #include "allocore/graphics/al_GPUObject.hpp"
+#include "allocore/graphics/al_Graphics.hpp"
 
 #define AL_SHADER_MAX_LOG_SIZE	4096
 
@@ -170,8 +171,6 @@ public:
 	
 	int uniformLocation(const char * name) const;
 	int attributeLocation(const char * name) const;
-	
-	static Type param_type_from_gltype(GLenum gltype);
 
 protected:
 	Graphics::Primitive mInPrim, mOutPrim;	// IO primitives for geometry shaders
