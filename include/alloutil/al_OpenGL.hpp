@@ -28,7 +28,10 @@ public:
 		mFormat(GL_RGBA),
 		mType(GL_UNSIGNED_BYTE),
 		mLevel(0),
-		mAlignment(4)
+		mBorder(0),
+		mAlignment(4),
+		mRebuild(true),
+		mSubmit(true)
 	{
 	}
 	
@@ -36,9 +39,6 @@ public:
 
 	void onCreate() {
 		glGenTextures(1, &mID);
-		
-		printf("texture create %i\n", id());
-		
 		glBindTexture(mTarget, id());
 		
 		// todo: which options?
@@ -47,38 +47,42 @@ public:
 		glTexParameterf(mTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameterf(mTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(mTarget, GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
-		
 		submit();
+		glBindTexture(mTarget, 0);
 		
-		unbind();
+		mRebuild = false;
+		
+		GraphicsGL::gl_error("creating texture");
 	}
 	
 	void onDestroy() {
 		if (mID) {
-			printf("texture destroy %i\n", id());
 			glDeleteTextures(1, &mID);
 			mID = 0;
 		}
 	}
 
 	void bind(int unit = 0) {
-		// rebuild?
 		if (mRebuild) {
-			printf("texture rebuild %i\n", id());
 			onDestroy();
-			onCreate();
-			mRebuild = false;
-			mUpdate = false;	// submitted in onCreate()
 		}
 		
-		// multitexturing
-		//glActiveTextureARB( GL_TEXTURE0_ARB+unit );
+		// ensure it is created:
+		if (id() == 0) onCreate();
+		
+		// multitexturing:
+		glActiveTextureARB( GL_TEXTURE0_ARB+unit );
+		
+		// bind:
 		glEnable(mTarget);
 		glBindTexture(mTarget, id());
 		
-		//printf("texture bound %i\n", id());
+		GraphicsGL::gl_error("binding texture");
 		
-		if(mUpdate) submit();
+		// re-submit if necessary:
+		if(mSubmit) submit();
+		
+		
 	}
 	
 	void unbind(int unit = 0) {
@@ -120,8 +124,16 @@ public:
 //		}}
 		
 		// trigger resubmit
-		mUpdate = true;
+		mSubmit = true;
 	}
+	
+	// manually trigger format/size change:
+	void rebuild() { 
+		configureFromArray(mArray);
+		mRebuild = true; 
+	}
+	// manually trigger data change:
+	void resubmit() { mSubmit = true; }
 	
 protected:
 
@@ -146,7 +158,6 @@ protected:
 			case AlloSInt32Ty:		return GL_INT;
 			case AlloUInt32Ty:		return GL_UNSIGNED_INT;
 			case AlloFloat32Ty:		return GL_FLOAT;
-			case AlloFloat64Ty:		return GL_DOUBLE;
 			default:
 				printf("warning: unknown type\n");
 				return GL_UNSIGNED_BYTE;
@@ -179,42 +190,33 @@ protected:
 	}
 	
 	void submit() {
-		printf("texture submit %i %ix%i\n", id(), width(), height());
 		GLvoid * ptr = (GLvoid *)data();
 		glPixelStorei(GL_UNPACK_ALIGNMENT, mAlignment);
+		
+		//printf("texture submit id %i target %X level %i components %i dim %ix%i format %X type %X ptr %p alignment %i\n", id(), mTarget, mLevel, mArray.header.components, width(), height(), mFormat, mType, ptr, mAlignment);
+//		printf("glTexImage2D target %X level %i components %i dim %ix%i format %X type %X ptr %p alignment %i\n", GL_TEXTURE_2D, 0, 3, 600, 600, GL_RGB, GL_UNSIGNED_BYTE, ptr, 4);
+
 		switch(mTarget) {
 			case GL_TEXTURE_1D:
-				glTexSubImage1D(
-					mTarget, 
-					mLevel, 
-					0, 
-					width(), 
-					mFormat, 
-					mTarget, 
-					ptr
+				glTexImage1D(
+					mTarget, mLevel, mArray.header.components, 
+					width(), mBorder, 
+					mFormat, mType, ptr
 				);
 				break;
 			case GL_TEXTURE_2D:
-			case GL_TEXTURE_RECTANGLE_ARB:
-				glTexSubImage2D(
-					mTarget, 
-					mLevel, 
-					0, 0, 
-					width(), height(), 
-					mFormat,
-					mType,
-					ptr
+			//case GL_TEXTURE_RECTANGLE_ARB:
+				glTexImage2D(
+					mTarget, mLevel, mArray.header.components, 
+					width(), height(), mBorder, 
+					mFormat, mType, ptr
 				);
 				break;
 			case GL_TEXTURE_3D:
-				glTexSubImage3D(
-					mTarget, 
-					mLevel, 
-					0, 0, 0, 
-					width(), height(), depth(), 
-					mFormat, 
-					mType, 
-					ptr
+				glTexImage3D(
+					mTarget, mLevel, mArray.header.components, 
+					width(), height(), depth(), mBorder, 
+					mFormat, mType, ptr
 				);
 				break;
 
@@ -222,7 +224,9 @@ protected:
 				printf("target not yet handled\n");
 				break;
 		}
+		mSubmit = false;	
 		
+		GraphicsGL::gl_error("submitting texture");
 	}
 
 	GLuint mID;
@@ -230,11 +234,12 @@ protected:
 	GLenum mFormat;	
 	GLenum mType;
 	GLint mLevel;
+	GLint mBorder;
 	GLint mAlignment;
 	
 	Array mArray;
 	
-	bool mRebuild, mUpdate;
+	bool mRebuild, mSubmit;
 };
 
 
