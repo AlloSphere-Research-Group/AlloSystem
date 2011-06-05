@@ -135,13 +135,15 @@ public:
 	bool hasData() const { return data.ptr != NULL; }
 	
 	uint8_t dimcount() const { return header.dimcount; }
-	uint32_t width() const { return header.dim[0]; }
-	uint32_t height() const { return header.dim[1]; }
-	uint32_t depth() const { return header.dim[2]; }
+	unsigned width() const { return header.dim[0]; }
+	unsigned height() const { return header.dim[1]; }
+	unsigned depth() const { return header.dim[2]; }
+	unsigned dim(unsigned i=0) const { return header.dim[i]; }
+	size_t stride(unsigned i=0) const { return header.stride[i]; }
 
 	///! Allocate memory for the given header
 	/// (warning, does not check if data.ptr was not NULL!)
-	void dataCalloc() { data.ptr = (char *)calloc(1, size()); }
+	void dataCalloc() { data.ptr = (char *)calloc(1, size()); printf("calloc %i\n", size()); }
 	void dataFree() { if(hasData()) free(data.ptr); }
 
 	///! set all data to zero.
@@ -321,6 +323,7 @@ inline bool Array::isFormat(const AlloArrayHeader &h2) const {
 }
 
 inline void Array::format(const AlloArrayHeader &h2) {
+	printf("formatting array\n");
 	if(!isFormat(h2)) {
 		dataFree();
 		header.type = h2.type;

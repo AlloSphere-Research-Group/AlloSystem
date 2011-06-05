@@ -32,7 +32,7 @@ public:
 	unsigned length() const { return components()*mDim3; }
 	unsigned components() const { return mArrays[0].header.components; }
 	unsigned dim() const { return mDim; }
-	unsigned stride(int dim=0) const { return mArrays[0].header.stride[dim]; }
+	size_t stride(int dim=0) const { return mArrays[0].header.stride[dim]; }
 	
 	// front is what is currently interacted with
 	// back is used for intermediate processing
@@ -42,7 +42,7 @@ public:
 	// raw access to internal pointer
 	T * ptr() { return (T *)front().data.ptr; }
 	// pointer index of a particular cell:
-	unsigned index(int x, int y, int z) const;
+	size_t index(int x, int y, int z) const;
 	// access a particular element:
 	T& cell(int x, int y, int z, int k=0);
 	
@@ -83,14 +83,13 @@ public:
 			To calculate this gradient field and then subtract it, we use this function:
 	*/
 	// grabs the gradient from the field:
-	void calculateGradient(Array& gradient, double factor);
-	// subtracts this gradient
+	void calculateGradient(Array& gradient);
 	void subtractGradient(const Array& gradient);
 	
 	void relax(double a, int iterations);
 	
 protected:
-	unsigned mDim, mDim3, mDimWrap;
+	size_t mDim, mDim3, mDimWrap;
 	Array mArrays[2];	// double-buffering
 	int mFront;			// which one is the front buffer?
 };
@@ -110,6 +109,20 @@ public:
 	
 	~Fluid() {}
 	
+	template<typename T1>
+	void addForce(const Vec<3,T1> pos, const Vec<3,T> vel) {
+		velocities.front().write_interp(vel.elems, pos);
+	}
+	
+	template<typename T1>
+	void addDensities(const Vec<3,T1> pos, const T * elems) {
+		densities.front().write_interp(elems, pos);
+	}
+	
+	template<typename T1>
+	void readVelocity(const Vec<3,T1> pos, Vec<3,T>& vel) {
+		velocities.front().read_interp(vel.elems, pos);
+	}
 	/*
 		a full fluid simulation:
 	*/
@@ -120,25 +133,25 @@ public:
 		velocities.diffuse(viscocity, passes);
 		// (diffused data now in velocities.front())
 		// stabilize: 
-		project(gradient);
-		// (projected data now in velocities.front())
-		// advect velocities:
-		velocities.advect(velocities.back());
-		// (advected data now in velocities.front())
-		// stabilize again:
-		project(gradient);
-		// (projected data now in velocities.front())
-
-		// DENSITIES:
-		// assume new data is in front();
-		// smoothen the new data:
-		densities.diffuse(diffusion, passes);
-		//(diffused data now in densities.front())
-		// and advect:
-		densities.advect(velocities.front());
-		//(advected data now in densities.front())
-		// fade, etc.
-		densities.scale(decay);
+//		project();
+//		// (projected data now in velocities.front())
+//		// advect velocities:
+//		velocities.advect(velocities.back());
+//		// (advected data now in velocities.front())
+//		// stabilize again:
+//		project();
+//		// (projected data now in velocities.front())
+//
+//		// DENSITIES:
+//		// assume new data is in front();
+//		// smoothen the new data:
+//		densities.diffuse(diffusion, passes);
+//		//(diffused data now in densities.front())
+//		// and advect:
+//		densities.advect(velocities.front());
+//		//(advected data now in densities.front())
+//		// fade, etc.
+//		densities.scale(decay);
 	}
 	
 	void project() {
@@ -156,8 +169,14 @@ public:
 	T viscocity, diffusion, decay;
 };
 
+
+
+// INLINE IMPLEMENTATION //
+
+
+
 template<typename T>
-unsigned Field3D<T>::index(int x, int y, int z) const {
+size_t Field3D<T>::index(int x, int y, int z) const {
 	return	((x&mDimWrap) * stride(0)) +
 			((y&mDimWrap) * stride(1)) +
 			((z&mDimWrap) * stride(2));
@@ -204,9 +223,9 @@ inline void Field3D<T>::scale(T v) {
 template<typename T>
 inline void Field3D<T>::scale(const Array& arr) {
 	if (arr.isFormat(front().header)) {
-		const uint32_t stride0 = stride(0);
-		const uint32_t stride1 = stride(1);
-		const uint32_t stride2 = stride(2);
+		const size_t stride0 = stride(0);
+		const size_t stride1 = stride(1);
+		const size_t stride2 = stride(2);
 		#define INDEX(p, x, y, z) ((T *)((p) + (((x)&mDimWrap)*stride0) +  (((y)&mDimWrap)*stride1) +  (((z)&mDimWrap)*stride2)))
 
 		// zero the boundary fields
@@ -235,9 +254,9 @@ inline void Field3D<T>::scale(const Array& arr) {
 template<typename T>
 inline void Field3D<T>::damp(const Array& arr) {
 	if (arr.isFormat(front().header)) {
-		const uint32_t stride0 = stride(0);
-		const uint32_t stride1 = stride(1);
-		const uint32_t stride2 = stride(2);
+		const size_t stride0 = stride(0);
+		const size_t stride1 = stride(1);
+		const size_t stride2 = stride(2);
 		#define INDEX(p, x, y, z) ((T *)((p) + (((x)&mDimWrap)*stride0) +  (((y)&mDimWrap)*stride1) +  (((z)&mDimWrap)*stride2)))
 
 		// zero the boundary fields
@@ -283,6 +302,59 @@ inline void Field3D<T> :: diffuse(T diffusion, int passes) {
 	diffuse(front(), back(), diffusion, passes);
 }
 
+// Gauss-Seidel relaxation scheme:
+template<typename T>
+inline void Field3D<T> :: diffuse(Array& out, const Array& in, T diffusion, int passes) {
+	const size_t stride0 = out.header.stride[0];
+	const size_t stride1 = out.header.stride[1];
+	const size_t stride2 = out.header.stride[2];
+	const size_t components = out.header.components;
+	const size_t dim = out.header.dim[0];
+	const size_t dimwrap = dim-1;
+	const T * iptr = (T *)in.data.ptr;
+	const T * optr = (T *)out.data.ptr;
+	double div = 1.0/((1.+6.*diffusion));
+	#define INDEX(p, x, y, z) ((T *)(p + ((((x)&dimwrap)*stride0) + (((y)&dimwrap)*stride1) + (((z)&dimwrap)*stride2))))
+
+
+	printf("%i,%i,%i %i %i,%i %p,%p, %u\n",
+		stride0, stride1, stride2, components, dim, dimwrap,
+		iptr, optr, out.size());
+	printf("%i,%i,%i %i %i,%i %p,%p %u\n",
+		out.header.stride[0], out.header.stride[1], out.header.stride[2], out.header.components, out.header.dim[2], dimwrap,
+		iptr, optr, in.size());
+	printf("%lu\n", (((((-1)&dimwrap)*stride0) + (((-1)&dimwrap)*stride1) + (((-1)&dimwrap)*stride2))));
+	printf("%lu\n", (((((dim)&dimwrap)*stride0) + (((dim)&dimwrap)*stride1) + (((dim)&dimwrap)*stride2))));
+	
+	for (unsigned n=0 ; n<passes ; n++) {
+		for (unsigned z=0;z<dim;z++) {
+			for (unsigned y=0;y<dim;y++) {
+				for (unsigned x=0;x<dim;x++) {
+					const T * prev =	INDEX(iptr, x,	y,	z);
+					T *		  next =	INDEX(optr, x,	y,	z);
+					const T * va00 =	INDEX(optr, x-1,y,	z);
+					const T * vb00 =	INDEX(optr, x+1,y,	z);
+					const T * v0a0 =	INDEX(optr, x,	y-1,z);
+					const T * v0b0 =	INDEX(optr, x,	y+1,z);
+					const T * v00a =	INDEX(optr, x,	y,	z-1);
+					const T * v00b =	INDEX(optr, x,	y,	z+1);
+					for (size_t k=0;k<components;k++) {
+						next[k] = div*(
+							prev[k] +
+							diffusion * (
+								va00[k] + vb00[k] +
+								v0a0[k] + v0b0[k] +
+								v00a[k] + v00b[k]
+							)
+						);
+					}
+				}
+			}
+		}
+	}
+	#undef INDEX
+}
+
 template<typename T>
 inline void Field3D<T> :: relax( double a, int iterations) {
 	char * old = front().data.ptr;
@@ -293,13 +365,13 @@ inline void Field3D<T> :: relax( double a, int iterations) {
 		for (int z=0;z<mDim;z++) {
 			for (int y=0;y<mDim;y++) {
 				for (int x=0;x<mDim;x++) {
-					const unsigned idx = index(x, y, z);
-					const unsigned x0 = index(x-1, y, z);
-					const unsigned x1 = index(x+1, y, z);
-					const unsigned y0 = index(x, y-1, z);
-					const unsigned y1 = index(x, y+1, z);
-					const unsigned z0 = index(x, y, z-1);
-					const unsigned z1 = index(x, y, z+1);
+					const size_t idx = index(x, y, z);
+					const size_t x0 = index(x-1, y, z);
+					const size_t x1 = index(x+1, y, z);
+					const size_t y0 = index(x, y-1, z);
+					const size_t y1 = index(x, y+1, z);
+					const size_t z0 = index(x, y, z-1);
+					const size_t z1 = index(x, y, z+1);
 					for (unsigned k=0; k<comps; k++) {
 						out[idx+k] = c * (
 										old[idx+k] +
@@ -319,52 +391,12 @@ inline void Field3D<T> :: relax( double a, int iterations) {
 }
 
 template<typename T>
-inline void Field3D<T> :: diffuse(Array& out, const Array& in, T diffusion, int passes) {
-	const uint32_t stride0 = in.header.stride[0];
-	const uint32_t stride1 = in.header.stride[1];
-	const uint32_t stride2 = in.header.stride[2];
-	const uint32_t components = in.header.components;
-	const uint32_t dim = in.header.dim[0];
-	char * iptr = in.data.ptr;
-	char * optr = out.data.ptr;
-	double div = 1.0/((1.+6.*diffusion));
-
-	// relaxation scheme:
-	for (int n=0 ; n<passes ; n++) {
-		for (int z=0;z<dim;z++) {
-			for (int y=0;y<dim;y++) {
-				for (int x=0;x<dim;x++) {
-					T * next =	optr + index(x,	y,	z);
-					T * prev =	iptr + index(x,	y,	z);
-					T * va00 =	optr + index(x-1,y,	z);
-					T * vb00 =	optr + index(x+1,y,	z);
-					T * v0a0 =	optr + index(x,	y-1,z);
-					T * v0b0 =	optr + index(x,	y+1,z);
-					T * v00a =	optr + index(x,	y,	z-1);
-					T * v00b =	optr + index(x,	y,	z+1);
-					for (int k=0;k<components;k++) {
-						next[k] = div*(
-							prev[k] +
-							diffusion * (
-								va00[k] + vb00[k] +
-								v0a0[k] + v0b0[k] +
-								v00a[k] + v00b[k]
-							)
-						);
-					}
-				}
-			}
-		}
-	}
-}
-
-template<typename T>
 inline void Field3D<T> :: advect(Array& dst, const Array& src, const Array& velocities, T rate) {
-	const uint32_t stride0 = src.stride(0);
-	const uint32_t stride1 = src.stride(1);
-	const uint32_t stride2 = src.stride(2);
-	const uint32_t dim = src.dim(0);
-	const uint32_t dimwrap = dim-1;
+	const size_t stride0 = src.stride(0);
+	const size_t stride1 = src.stride(1);
+	const size_t stride2 = src.stride(2);
+	const size_t dim = src.dim(0);
+	const size_t dimwrap = dim-1;
 	
 	if (velocities.header.type != src.header.type ||
 		velocities.header.components < 3 ||
@@ -405,11 +437,11 @@ inline void Field3D<T> :: advect(const Array& velocities, T rate) {
 }
 
 template<typename T>
-inline void Field3D<T> :: calculateGradient(Array& gradient, double factor) {
+inline void Field3D<T> :: calculateGradient(Array& gradient) {
 	gradient.format(1, Array::type<T>(), mDim, mDim, mDim);
-	const uint32_t stride0 = stride(0);
-	const uint32_t stride1 = stride(1);
-	const uint32_t stride2 = stride(2);
+	const size_t stride0 = stride(0);
+	const size_t stride1 = stride(1);
+	const size_t stride2 = stride(2);
 	
 	#define CELL(p, x, y, z, k) (((T *)((p) + (((x)&mDimWrap)*stride0) +  (((y)&mDimWrap)*stride1) +  (((z)&mDimWrap)*stride2)))[(k)])
 
@@ -448,9 +480,9 @@ inline void Field3D<T> :: subtractGradient(const Array& gradient) {
 		printf("Array format mismatch\n");
 		return;
 	}
-	const uint32_t stride0 = stride(0);
-	const uint32_t stride1 = stride(1);
-	const uint32_t stride2 = stride(2);
+	const size_t stride0 = stride(0);
+	const size_t stride1 = stride(1);
+	const size_t stride2 = stride(2);
 	#define CELL(p, x, y, z, k) (((T *)((p) + (((x)&mDimWrap)*stride0) +  (((y)&mDimWrap)*stride1) +  (((z)&mDimWrap)*stride2)))[(k)])
 	
 	// now subtract gradient from current field:
