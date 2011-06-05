@@ -214,6 +214,54 @@ public:
 		);
 	}
 	
+	/// Calculate perspective projection for near plane and eye coordinates
+	
+	/// (nearBL, nearBR, nearTL, eye) all share the same coordinate system
+	/// (nearBR,nearBL) and (nearTL,nearBL) should form a right angle
+	/// (eye) can be set freely, allowing diverse off-axis projections
+	/// @see Generalized Perspective Projection, Robert Kooima, 2009, EVL
+	/// @param[in] nearBL	bottom-left near-plane coordinate (world-space)
+	/// @param[in] nearBR	bottom-right near-plane coordinate (world-space)
+	/// @param[in] nearTL	top-left near-plane coordinate (world-space)
+	/// @param[in] eye		eye coordinate (world-space)
+	/// @param[in] near		near plane distance from eye
+	/// @param[in] far		far plane distance from eye
+	static const Matrix4 perspective(
+								const Vec<3,T>& nearBL,	
+								const Vec<3,T>& nearBR,	
+								const Vec<3,T>& nearTL,	
+								const Vec<3,T>& eye,	
+								T near,	T far)			
+	{
+		Vec<3,T> va, vb, vc;
+		Vec<3,T> vr, vu, vn;
+		T l, r, b, t, d;
+
+		// compute orthonormal basis for the screen
+		vr = (nearBR-nearBL).normalize();	// right vector
+		vu = (nearTL-nearBL).normalize();	// upvector
+		cross(vn, vr, vu);	// normal(forward) vector (out from screen)
+		vn.normalize();
+
+		// compute vectors from eye to screen corners:
+		va = nearBL-eye;	va.normalize();
+		vb = nearBR-eye;	vb.normalize();
+		vc = nearTL-eye;	vc.normalize();
+
+		// distance from eye to screen-plane
+		// = component of va along vector vn (normal to screen)
+		d = -va.dot(vn);
+
+		// find extent of perpendicular projection
+		T nbyd = near/d;
+		l = vr.dot(va) * nbyd;
+		r = vr.dot(vb) * nbyd;
+		b = vu.dot(va) * nbyd;	// not vd?
+		t = vu.dot(vc) * nbyd;
+		
+		return perspective(l, r, b, t, near, far);
+	}
+	
 	// for stereographics:
 	static const Matrix4 perspectiveLeft(T fovy, T aspect, T near, T far, T eyeSep, T focal) {
 		return perspectiveOffAxis(fovy, aspect, near, far,-0.5*eyeSep, focal);
