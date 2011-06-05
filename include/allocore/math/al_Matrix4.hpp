@@ -244,9 +244,9 @@ public:
 		vn.normalize();
 
 		// compute vectors from eye to screen corners:
-		va = nearBL-eye;	va.normalize();
-		vb = nearBR-eye;	vb.normalize();
-		vc = nearTL-eye;	vc.normalize();
+		va = nearBL-eye;	
+		vb = nearBR-eye;	
+		vc = nearTL-eye;	
 
 		// distance from eye to screen-plane
 		// = component of va along vector vn (normal to screen)

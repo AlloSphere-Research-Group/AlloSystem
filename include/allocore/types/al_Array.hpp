@@ -105,6 +105,7 @@ public:
 	Array& operator= (const AlloArray& cpy);
 
 	uint32_t dim(int i=0) const { return header.dim[i]; }
+	uint32_t stride(int i=0) const { return header.stride[i]; }
 
 	/*!
 		Change the format (header/layout) of the Array
