@@ -349,7 +349,7 @@ public:
 ///
 class Recv : public SocketRecv{
 public:
-	Recv(){}
+	Recv();
 
 	/// @param[in] port		Port number
 	/// @param[in] address	IP address. If empty, will bind all network interfaces to socket.

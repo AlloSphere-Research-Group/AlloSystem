@@ -226,6 +226,11 @@ static void * recvThreadFunc(void * user){
 	return NULL;
 }
 
+Recv::Recv()
+:	SocketRecv(), mHandler(0), mBuffer(1024), mBackground(false)
+{}
+
+
 Recv::Recv(unsigned int port, const char * address, al_sec timeout)
 :	SocketRecv(port, address, timeout), mHandler(0), mBuffer(1024), mBackground(false)
 {}

@@ -160,8 +160,6 @@ public:
 	size_t send(const char * buffer, size_t len){ return Socket::send(buffer, len); }
 };
 
-
-
 /// Socket for receiving data over a network
 class SocketRecv : public Socket {
 public:
@@ -175,7 +173,7 @@ public:
 	{}
 
 	/// Open socket closing and reopening if currently open
-	bool open(unsigned int port, const char * address, al_sec timeout=0){
+	bool open(unsigned int port, const char * address = "", al_sec timeout=0){
 		return Socket::open(port, address, timeout, false);
 	}
 
