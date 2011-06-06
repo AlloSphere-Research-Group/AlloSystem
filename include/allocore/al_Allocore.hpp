@@ -43,6 +43,7 @@
 #include "allocore/io/al_File.hpp"
 #include "allocore/io/al_Socket.hpp"
 #include "allocore/io/al_Window.hpp"
+#include "allocore/math/al_Analysis.hpp"
 #include "allocore/math/al_Complex.hpp"
 #include "allocore/math/al_Constants.hpp"
 #include "allocore/math/al_Frustum.hpp"
