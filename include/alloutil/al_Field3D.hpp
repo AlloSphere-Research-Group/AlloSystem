@@ -21,23 +21,26 @@ public:
 	:	mDim(ceilPow2(dim)),
 		mDim3(mDim*mDim*mDim),
 		mDimWrap(mDim-1),
-		mFront(0) 
+		mFront(1) 
 	{
-		mArrays[0].format(components, Array::type<T>(), mDim, mDim, mDim);
-		mArrays[1].format(components, Array::type<T>(), mDim, mDim, mDim);
-		mArrays[0].zero();
-		mArrays[1].zero();
+		mArray0.format(components, Array::type<T>(), mDim, mDim, mDim);
+		mArray1.format(components, Array::type<T>(), mDim, mDim, mDim);
+	}
+	
+	~Field3D() {
+		mArray0.dataFree();
+		mArray1.dataFree();
 	}
 	
 	unsigned length() const { return components()*mDim3; }
-	unsigned components() const { return mArrays[0].header.components; }
+	unsigned components() const { return mArray0.header.components; }
 	unsigned dim() const { return mDim; }
-	size_t stride(int dim=0) const { return mArrays[0].header.stride[dim]; }
+	size_t stride(int dim=0) const { return mArray0.header.stride[dim]; }
 	
 	// front is what is currently interacted with
 	// back is used for intermediate processing
-	Array& front() { return mArrays[mFront]; }
-	Array& back() { return mArrays[!mFront]; }
+	Array& front() { return mFront ? mArray0 : mArray1; }
+	Array& back() { return mFront ? mArray1 : mArray0; }
 	
 	// raw access to internal pointer
 	T * ptr() { return (T *)front().data.ptr; }
@@ -82,16 +85,16 @@ public:
 				we can subtract a gradient field from our bad velocity field to get an incompressible one
 			To calculate this gradient field and then subtract it, we use this function:
 	*/
-	// grabs the gradient from the field:
-	void calculateGradient(Array& gradient);
-	void subtractGradient(const Array& gradient);
+	// grabs the previous instantaneous magnitude of velocity gradient
+	void calculateGradientMagnitude(Array& gradient);
+	void subtractGradientMagnitude(const Array& gradient);
 	
 	void relax(double a, int iterations);
 	
 protected:
 	size_t mDim, mDim3, mDimWrap;
-	Array mArrays[2];	// double-buffering
 	int mFront;			// which one is the front buffer?
+	Array mArray0, mArray1; //mArrays[2];	// double-buffering
 };
 
 template<typename T=double>
@@ -104,8 +107,14 @@ public:
 		passes(10),
 		viscocity(0.0001),
 		diffusion(0.01),
-		decay(0.999)
-	{}
+		decay(0.99)
+	{
+		printf("gradient %x %x\n", gradient.front().data.ptr, gradient.back().data.ptr);	
+		printf("velocities %x %x\n", velocities.front().data.ptr, velocities.back().data.ptr);
+		//test writing data into gradient:
+		char * optr = gradient.front().data.ptr;
+		
+	}
 	
 	~Fluid() {}
 	
@@ -133,35 +142,36 @@ public:
 		velocities.diffuse(viscocity, passes);
 		// (diffused data now in velocities.front())
 		// stabilize: 
-//		project();
-//		// (projected data now in velocities.front())
-//		// advect velocities:
-//		velocities.advect(velocities.back());
-//		// (advected data now in velocities.front())
-//		// stabilize again:
-//		project();
-//		// (projected data now in velocities.front())
-//
-//		// DENSITIES:
-//		// assume new data is in front();
-//		// smoothen the new data:
-//		densities.diffuse(diffusion, passes);
-//		//(diffused data now in densities.front())
-//		// and advect:
-//		densities.advect(velocities.front());
-//		//(advected data now in densities.front())
-//		// fade, etc.
-//		densities.scale(decay);
+		project();
+		// (projected data now in velocities.front())
+		// advect velocities:
+		velocities.advect(velocities.back());
+		// (advected data now in velocities.front())
+		// stabilize again:
+		project();
+		// (projected data now in velocities.front())
+		velocities.scale(decay);
+
+		// DENSITIES:
+		// assume new data is in front();
+		// smoothen the new data:
+		densities.diffuse(diffusion, passes);
+		//(diffused data now in densities.front())
+		// and advect:
+		densities.advect(velocities.front());
+		//(advected data now in densities.front())
+		// fade, etc.
+		densities.scale(decay);
 	}
 	
 	void project() {
 		// prepare new gradient data:
 		gradient.back().zero();
-		velocities.calculateGradient(gradient.front());
+		velocities.calculateGradientMagnitude(gradient.front());
 		// diffuse it:
 		gradient.diffuse(1., passes);
 		// subtract from current velocities:
-		velocities.subtractGradient(gradient.front());
+		velocities.subtractGradientMagnitude(gradient.front());
 	}
 	
 	Field3D<T> densities, velocities, gradient;
@@ -311,20 +321,10 @@ inline void Field3D<T> :: diffuse(Array& out, const Array& in, T diffusion, int 
 	const size_t components = out.header.components;
 	const size_t dim = out.header.dim[0];
 	const size_t dimwrap = dim-1;
-	const T * iptr = (T *)in.data.ptr;
-	const T * optr = (T *)out.data.ptr;
+	const char * iptr = in.data.ptr;
+	const char * optr = out.data.ptr;
 	double div = 1.0/((1.+6.*diffusion));
 	#define INDEX(p, x, y, z) ((T *)(p + ((((x)&dimwrap)*stride0) + (((y)&dimwrap)*stride1) + (((z)&dimwrap)*stride2))))
-
-
-	printf("%i,%i,%i %i %i,%i %p,%p, %u\n",
-		stride0, stride1, stride2, components, dim, dimwrap,
-		iptr, optr, out.size());
-	printf("%i,%i,%i %i %i,%i %p,%p %u\n",
-		out.header.stride[0], out.header.stride[1], out.header.stride[2], out.header.components, out.header.dim[2], dimwrap,
-		iptr, optr, in.size());
-	printf("%lu\n", (((((-1)&dimwrap)*stride0) + (((-1)&dimwrap)*stride1) + (((-1)&dimwrap)*stride2))));
-	printf("%lu\n", (((((dim)&dimwrap)*stride0) + (((dim)&dimwrap)*stride1) + (((dim)&dimwrap)*stride2))));
 	
 	for (unsigned n=0 ; n<passes ; n++) {
 		for (unsigned z=0;z<dim;z++) {
@@ -437,20 +437,25 @@ inline void Field3D<T> :: advect(const Array& velocities, T rate) {
 }
 
 template<typename T>
-inline void Field3D<T> :: calculateGradient(Array& gradient) {
+inline void Field3D<T> :: calculateGradientMagnitude(Array& gradient) {
 	gradient.format(1, Array::type<T>(), mDim, mDim, mDim);
 	const size_t stride0 = stride(0);
 	const size_t stride1 = stride(1);
 	const size_t stride2 = stride(2);
+	const size_t gstride0 = gradient.stride(0);
+	const size_t gstride1 = gradient.stride(1);
+	const size_t gstride2 = gradient.stride(2);
 	
 	#define CELL(p, x, y, z, k) (((T *)((p) + (((x)&mDimWrap)*stride0) +  (((y)&mDimWrap)*stride1) +  (((z)&mDimWrap)*stride2)))[(k)])
-
+	#define CELLG(p, x, y, z, k) (((T *)((p) + (((x)&mDimWrap)*gstride0) +  (((y)&mDimWrap)*gstride1) +  (((z)&mDimWrap)*gstride2)))[(k)])
+	
 	// calculate gradient.
 	// previous instantaneous magnitude of velocity gradient
 	//		= average of velocity gradients per axis:
 	const double h = 1./3.; //0.5/mDim;
 	char * iptr = front().data.ptr;
 	char * optr = gradient.data.ptr;
+	
 	for (int z=0;z<mDim;z++) {
 		for (int y=0;y<mDim;y++) {
 			for (int x=0;x<mDim;x++) {
@@ -461,17 +466,18 @@ inline void Field3D<T> :: calculateGradient(Array& gradient) {
 				// gradient at current cell:
 				T grad = h * (xgrad+ygrad+zgrad);
 				// store in a 1-plane field
-				CELL(optr, x, y, z, 0) = grad;
+				CELLG(optr, x, y, z, 0) = grad;
 			}
 		}
 	}
 	#undef CELL
+	#undef CELLG
 }
 
 
 
 template<typename T>
-inline void Field3D<T> :: subtractGradient(const Array& gradient) {
+inline void Field3D<T> :: subtractGradientMagnitude(const Array& gradient) {
 	if (gradient.header.type != Array::type<T>() ||
 		gradient.header.dim[0] != mDim ||
 		gradient.header.dim[1] != mDim ||
@@ -480,11 +486,16 @@ inline void Field3D<T> :: subtractGradient(const Array& gradient) {
 		printf("Array format mismatch\n");
 		return;
 	}
-	const size_t stride0 = stride(0);
+		const size_t stride0 = stride(0);
 	const size_t stride1 = stride(1);
 	const size_t stride2 = stride(2);
-	#define CELL(p, x, y, z, k) (((T *)((p) + (((x)&mDimWrap)*stride0) +  (((y)&mDimWrap)*stride1) +  (((z)&mDimWrap)*stride2)))[(k)])
+	const size_t gstride0 = gradient.stride(0);
+	const size_t gstride1 = gradient.stride(1);
+	const size_t gstride2 = gradient.stride(2);
 	
+	#define CELL(p, x, y, z, k) (((T *)((p) + (((x)&mDimWrap)*stride0) +  (((y)&mDimWrap)*stride1) +  (((z)&mDimWrap)*stride2)))[(k)])
+	#define CELLG(p, x, y, z, k) (((T *)((p) + (((x)&mDimWrap)*gstride0) +  (((y)&mDimWrap)*gstride1) +  (((z)&mDimWrap)*gstride2)))[(k)])
+
 	// now subtract gradient from current field:
 	char * gptr = gradient.data.ptr;
 	char * optr = front().data.ptr;
@@ -495,14 +506,15 @@ inline void Field3D<T> :: subtractGradient(const Array& gradient) {
 				// cell to update:
 				T * vel = &CELL(optr, x, y, z, 0);
 				// gradients per axis:
-				vel[0] -= h * ( CELL(gptr, x-1,y,	z,	0)-CELL(gptr, x+1,y,	z,	0) );
-				vel[1] -= h * ( CELL(gptr, x,	y-1,z,	0)-CELL(gptr, x,	y+1,z,	0) );
-				vel[2] -= h * ( CELL(gptr, x,	y,	z-1,0)-CELL(gptr, x,	y,	z+1,0) );
+				vel[0] -= h * ( CELLG(gptr, x-1,y,	z,	0)-CELLG(gptr, x+1,y,	z,	0) );
+				vel[1] -= h * ( CELLG(gptr, x,	y-1,z,	0)-CELLG(gptr, x,	y+1,z,	0) );
+				vel[2] -= h * ( CELLG(gptr, x,	y,	z-1,0)-CELLG(gptr, x,	y,	z+1,0) );
 			}
 		}
 	}
 
 	#undef CELL
+	#undef CELLG
 }
 
 template<typename T>

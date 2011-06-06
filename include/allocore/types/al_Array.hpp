@@ -143,7 +143,7 @@ public:
 
 	///! Allocate memory for the given header
 	/// (warning, does not check if data.ptr was not NULL!)
-	void dataCalloc() { data.ptr = (char *)calloc(1, size()); printf("calloc %i\n", size()); }
+	void dataCalloc() { data.ptr = (char *)calloc(1, size()); }
 	void dataFree() { if(hasData()) free(data.ptr); }
 
 	///! set all data to zero.
@@ -323,7 +323,6 @@ inline bool Array::isFormat(const AlloArrayHeader &h2) const {
 }
 
 inline void Array::format(const AlloArrayHeader &h2) {
-	printf("formatting array\n");
 	if(!isFormat(h2)) {
 		dataFree();
 		header.type = h2.type;
