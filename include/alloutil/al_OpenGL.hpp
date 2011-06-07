@@ -9,13 +9,23 @@
 
 namespace al {
 
-/*!
-	A lot of OpenGL features follow a common pattern:
-		gen/delete (usually tied to window/context creation/deletion)
-		bind/unbind (around any process that utilizes the resource)
-*/
+class DisplayList {
+public:
+	DisplayList() : mID(0) {}
+	~DisplayList() { clear(); }
 
+	void begin() {
+		if (mID)
+			glDeleteLists(mID, 1);
+		mID = glGenLists(1);
+		glNewList(mID, GL_COMPILE);
+	}
+	void end() { glEndList(); }
+	void draw() { glCallList(mID); }
+	void clear() { glDeleteLists(mID, 1);}
 
+	unsigned long mID;
+};
 
 /*!
 	A simple wrapper around OpenGL Textures.

@@ -234,19 +234,20 @@ void AmbiDecode::numSpeakers(int num){
 //void AmbiDecode::zero(){ memset(mFrame, 0, channels()*sizeof(float)); }
 
 void AmbiDecode::setSpeakerRadians(int index, int deviceChannel, float az, float el, float amp){
-	if(index < numSpeakers()){		// verify speaker index
-		mSpeakers[index].azimuth = az;
-		mSpeakers[index].elevation = el;
-		mSpeakers[index].deviceChannel = deviceChannel;
-		mSpeakers[index].amp = amp;
-		
-//		printf("channel	%i amp %f\n", index, amp);
+	if(index >= numSpeakers()){		
+		numSpeakers(index);	// grow adaptively
+	}
+	
+	mSpeakers[index].azimuth = az;
+	mSpeakers[index].elevation = el;
+	mSpeakers[index].deviceChannel = deviceChannel;
+	mSpeakers[index].amp = amp;
 
-		// update encoding weights
-		encodeWeightsFuMa(mDecodeMatrix + index * channels(), mDim, mOrder, az, el);
-		for (int i=0; i<channels(); i++)
-			mDecodeMatrix[index * channels() + i] *= amp;
-	}	
+	// update encoding weights
+	encodeWeightsFuMa(mDecodeMatrix + index * channels(), mDim, mOrder, az, el);
+	for (int i=0; i<channels(); i++) {
+		mDecodeMatrix[index * channels() + i] *= amp;
+	} 
 }
 
 void AmbiDecode::setSpeaker(int index, int deviceChannel, float az, float el, float amp){

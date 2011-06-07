@@ -39,7 +39,7 @@ void Stereographic :: drawMono(Graphics& gl, const Camera& cam, const Pose& pose
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
 	// apply camera transform:
-	gl.projection(gl.PROJECTION);
+	gl.pushMatrix(gl.PROJECTION);
 	gl.loadMatrix(mProjection);
 	gl.pushMatrix(gl.MODELVIEW);
 	gl.loadMatrix(mModelView);
