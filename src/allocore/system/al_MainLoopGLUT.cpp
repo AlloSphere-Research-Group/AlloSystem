@@ -49,7 +49,7 @@ static void exitFunc(){
 
 MainLoop :: MainLoop()
 :	mImpl(NULL),
-	mInterval(0.01), mActualInterval(0),
+	mInterval(0.005), mActualInterval(0),
 	mT0(al_time()), mLastTickTime(mT0),
 	mCPU(0),
 	mIsRunning(false)
@@ -81,7 +81,7 @@ MainLoop& MainLoop :: get() {
 void MainLoop :: tick() {
 	al_sec realtime = al_time();
 	al_sec logicaltime = realtime - mT0;
-
+	
 	/*
 		CPU usage measurement
 		Measures relationship between ideal tick interval (mInterval),

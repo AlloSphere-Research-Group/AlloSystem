@@ -429,7 +429,6 @@ private:
 	// schedule draws of a specific window
 	static void scheduleDrawStatic(al_sec t, int winID) {
 		WindowImpl *impl = getWindowImpl(winID);
-
 		// If there is a valid implementation, then draw and schedule next draw...
 		if(impl){
 			Window * win = impl->mWindow;
@@ -452,9 +451,6 @@ private:
 				impl->mScheduled = false;
 			}
 		}
-//		else {
-//			printf("no window impl\n");
-//		}
 	}
 
 	// Map of windows constructed on first use to avoid static intialization
