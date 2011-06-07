@@ -8,7 +8,10 @@
 #include <vector>
 
 /*!
-	Utilities for receiving notifications when files are updated
+	Utility for receiving notifications when files are updated
+	
+	Sub-class FileWatcher and implement the onFileWatch() method.
+	Register for notifications of files using the watch() method(s)
 */
 
 namespace al {
