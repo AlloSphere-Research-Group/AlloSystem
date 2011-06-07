@@ -21,9 +21,8 @@ public:
 	/// begin filewatching:
 	/// param[in] filepath: the file to watch
 	/// param[in] immediate: triggers the handler immediately (if the file exists)
-	FileWatcher(std::string f, bool immediate=true) { watch( f, immediate); }
-	FileWatcher(FilePath f, bool immediate=true) { watch(f.filepath(), immediate); }
-	FileWatcher(File f, bool immediate=true) { watch( f.path(), immediate); }
+	template<typename T>
+	FileWatcher(T f, bool immediate=true) { watch( f, immediate); }
 	
 	virtual ~FileWatcher();
 	
@@ -31,6 +30,8 @@ public:
 	/// param[in] filepath: the file to watch
 	/// param[in] immediate: triggers the handler immediately (if the file exists)
 	void watch(std::string filepath, bool immediate=true);
+	void watch(FilePath f, bool immediate=true) { watch(f.filepath(), immediate); }
+	void watch(File f, bool immediate=true) { watch( f.path(), immediate); }
 	
 	/// callback when the file is modified:
 	virtual void onFileWatch(File& file) = 0;

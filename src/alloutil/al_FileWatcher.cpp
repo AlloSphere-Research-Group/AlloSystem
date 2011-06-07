@@ -8,17 +8,23 @@ using namespace al;
 class FileWatcherManager {
 public:
 	struct WatchedFile {
-		WatchedFile(std::string path, FileWatcher * handler, bool immediate)
-		: mPath(path), mHandler(handler) { 
-			if (immediate) {
-				mModified = 0;
-			} else {
-				mModified = File::modified(path);
-			}
-
-		}
+		WatchedFile(std::string path, FileWatcher * handler)
+		: mPath(path), mHandler(handler), mModified(0) {}
 		WatchedFile(const WatchedFile& cpy)
 		: mPath(cpy.mPath), mHandler(cpy.mHandler), mModified(cpy.mModified) {}
+		
+		void operator()() {
+			File f(mPath, "r", false);
+			if (al::fileExists(mPath)) {
+				al_sec mod = f.modified();
+				if(mod > mModified) {
+					f.open();
+					mHandler->onFileWatch(f);
+					f.close();
+					mModified = f.modified();
+				}
+			}
+		}
 		
 		std::string mPath;
 		al_sec mModified;
@@ -48,7 +54,13 @@ public:
 	FileWatcherManager& watch(std::string path, FileWatcher * handler, bool immediate) {
 		if (al::fileExists(path)) {
 			// note this may overwrite an existing handler.
-			mHandlers.push_back(WatchedFile(path, handler, immediate));
+			WatchedFile wf(path, handler);
+			if (immediate) {
+				wf();
+			} else {
+				wf.mModified = File::modified(path);
+			}
+			mHandlers.push_back(wf);
 		} else {
 			printf("warning: attempt to watch non-existent file %s\n", path.c_str());
 		}
@@ -80,16 +92,7 @@ public:
 		WatcherMap::iterator iter = mHandlers.begin();
 		while (iter != mHandlers.end()) {
 			WatchedFile& wf = *iter++;
-			File f(wf.mPath, "r", false);
-			if (al::fileExists(wf.mPath)) {
-				al_sec mod = f.modified();
-				if(mod > wf.mModified) {
-					f.open();
-					wf.mHandler->onFileWatch(f);
-					f.close();
-					wf.mModified = f.modified();
-				}
-			}
+			wf();
 		}
 		MainLoop::queue().send(t+mPeriod, this, &FileWatcherManager::poll);
 	}
