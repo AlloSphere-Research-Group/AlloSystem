@@ -35,11 +35,14 @@ namespace al {
 template<typename T=double>
 class MinMeanMax {
 public:
-	MinMeanMax() 
-	:	minimum(std::numeric_limits<T>::infinity()), 
-		maximum(-std::numeric_limits<T>::infinity()), 
-		sum(0), count(0)
-	{}
+	MinMeanMax() { clear(); }
+	
+	void clear() {
+		minimum = std::numeric_limits<T>::infinity();
+		maximum = -std::numeric_limits<T>::infinity();
+		sum = T(0);
+		count = 0;
+	}
 	
 	// add another analysis point:
 	void operator()(T val) {
