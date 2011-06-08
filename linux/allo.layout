@@ -25,7 +25,7 @@
 	<File name="../externals/gamma/src/FFT_fftpack.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="351" topLine="0" />
 	</File>
-	<File name="../include/allocore/types/al_Array.h" open="1" top="0" tabpos="9">
+	<File name="../include/allocore/types/al_Array.h" open="1" top="0" tabpos="5">
 		<Cursor position="4293" topLine="150" />
 	</File>
 	<File name="../include/allocore/types/al_Array.hpp" open="1" top="0" tabpos="1">
