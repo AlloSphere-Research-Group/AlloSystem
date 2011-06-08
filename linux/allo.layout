@@ -10,11 +10,11 @@
 	<File name="../build/include/allocore/types/al_Array.h" open="1" top="0" tabpos="2">
 		<Cursor position="4293" topLine="161" />
 	</File>
-	<File name="../build/include/allocore/types/al_Array.hpp" open="1" top="0" tabpos="5">
+	<File name="../build/include/allocore/types/al_Array.hpp" open="1" top="0" tabpos="4">
 		<Cursor position="9192" topLine="218" />
 	</File>
 	<File name="../build/include/allocore/types/al_MsgQueue.hpp" open="1" top="0" tabpos="3">
-		<Cursor position="9179" topLine="267" />
+		<Cursor position="9179" topLine="255" />
 	</File>
 	<File name="../examples/exAlloNI.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="1440" topLine="22" />
@@ -25,8 +25,11 @@
 	<File name="../externals/gamma/src/FFT_fftpack.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="351" topLine="0" />
 	</File>
+	<File name="../include/allocore/types/al_Array.h" open="1" top="0" tabpos="9">
+		<Cursor position="4293" topLine="150" />
+	</File>
 	<File name="../include/allocore/types/al_Array.hpp" open="1" top="0" tabpos="1">
-		<Cursor position="5048" topLine="118" />
+		<Cursor position="9192" topLine="206" />
 	</File>
 	<File name="../include/allocv/al_OpenCV.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="1043" topLine="21" />
