@@ -46,6 +46,7 @@ void MsgQueue :: recycle(Msg * m) {
 		char * args = *(char **)(m->mArgs);
 		mFree(args);
 	}
+	mLen--;
 }
 
 /* schedule a new message */

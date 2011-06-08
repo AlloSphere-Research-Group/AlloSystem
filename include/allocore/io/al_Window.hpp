@@ -270,6 +270,7 @@ public:
 	double spf() const { return 1./fps(); }		///< Returns seconds/frame
 	const std::string& title() const;			///< Get title of window
 	bool visible() const;						///< Get whether window is visible
+	bool asap() const { return mASAP; }			///< Get whether window is rendering as fast as possible
 
 	int height() const { return dimensions().h; }
 	int width() const { return dimensions().w; }
@@ -293,6 +294,7 @@ public:
 	Window& makeActive();						///< Bring window to front
 	Window& show();								///< Show window (if hidden)
 	Window& title(const std::string& v);		///< Set title
+	Window& asap(bool v) { mASAP=v; return *this; }	///< Set whether window renders as fast as possible
 
 	/// Append handler to input event handler list
 	
@@ -341,6 +343,7 @@ private:
 	InputEventHandlers mInputEventHandlers;
 	WindowEventHandlers mWindowEventHandlers;
 	DisplayMode::t mDisplayMode;
+	bool mASAP;
 
 	void init();					// IMPORTANT: this must be called from the constructor
 	void doFrameImpl();				// Calls onFrame() and swaps buffers
