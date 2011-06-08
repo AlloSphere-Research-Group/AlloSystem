@@ -230,6 +230,7 @@ public:
 	/// @param[in] size			number of bytes in message
 	/// @param[in] timeTag		time tag of message (inherited from bundle)
 	Message(const char * message, int size, const TimeTag& timeTag=1);
+	~Message();
 
 	/// Pretty-print message information
 	void print() const;

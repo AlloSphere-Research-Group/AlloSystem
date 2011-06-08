@@ -437,10 +437,13 @@ private:
 				if(win->fps() > 0) {
 					al_sec projected = t+1.0/win->fps();	// what time next render should be
 					al_sec rt = MainLoop::realtime();	// what time it really is now (after render)
+					// calculate time of next frame; if it has already passed, do it immediately:
 					al_sec next = projected;
 					if (rt > projected) next = rt;	// next = MAX(rt,projected)
 
 					MainLoop::queue().send(next, scheduleDrawStatic, winID);
+					
+					// frame-rate calculation:
 					al_sec per = 1./(next - t);
 					impl->mAvg += 0.3 * (per - impl->mAvg);
 				} else {

@@ -143,6 +143,10 @@ Message::Message(const char * message, int size, const TimeTag& timeTag)
 	mTypeTags = mImpl->ArgumentCount() ? mImpl->TypeTags() : "";
 	resetStream();
 }
+	
+Message::~Message() {
+	delete mImpl;
+}
 
 void Message::print() const {
 	printf("%s, %s %lld\n", addressPattern().c_str(), typeTags().c_str(), timeTag());
