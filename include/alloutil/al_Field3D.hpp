@@ -61,8 +61,8 @@ public:
 	void add(Array& src);
 	
 	// fill with noise:
-	void adduniform(rnd::Random<>& rng, T scalar);
-	void adduniformS(rnd::Random<>& rng, T scalar);
+	void adduniform(rnd::Random<>& rng, T scalar = T(1));
+	void adduniformS(rnd::Random<>& rng, T scalar = T(1));
 	// fill with sines:
 	void setHarmonic(T px=T(1), T py=T(1), T pz=T(1));
 	// 3-component fields only: set velocities to zero at boundaries
