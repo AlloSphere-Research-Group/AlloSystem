@@ -118,10 +118,14 @@ public:
 	// set texture data from array.
 	void fromArray(const al::Array& src) {
 		int sz = src.size();
-		if(sz <= 0) return;	// ignore empty arrays
+		if(sz <= 0) {
+			printf("ignoring attempt to store empty array to texture\n");
+			return;	// ignore empty arrays
+		}
 		
 		// format change?
 		if (!mArray.isFormat(src.header)) {
+			printf("texture format change\n");
 			configureFromArray(src);
 			// trigger re-create:
 			mRebuild = true;
@@ -129,13 +133,6 @@ public:
 		
 		// copy data & change format:
 		mArray = src;
-		
-//		// double-check:
-//		for (int x=0; x<width(); x++) {
-//		for (int y=0; y<height(); y++) {
-//			uint8_t * cell = mArray.cell<uint8_t>(x, y);
-//			printf("%i %i %u %u %u\n", x, y, cell[0], cell[1], cell[2]);
-//		}}
 		
 		// trigger resubmit
 		mSubmit = true;
@@ -207,8 +204,8 @@ protected:
 		GLvoid * ptr = (GLvoid *)data();
 		glPixelStorei(GL_UNPACK_ALIGNMENT, mAlignment);
 		
-		//printf("texture submit id %i target %X level %i components %i dim %ix%i format %X type %X ptr %p alignment %i\n", id(), mTarget, mLevel, mArray.header.components, width(), height(), mFormat, mType, ptr, mAlignment);
-//		printf("glTexImage2D target %X level %i components %i dim %ix%i format %X type %X ptr %p alignment %i\n", GL_TEXTURE_2D, 0, 3, 600, 600, GL_RGB, GL_UNSIGNED_BYTE, ptr, 4);
+		printf("texture submit id %i target %X level %i components %i dim %ix%i format %X type %X ptr %p alignment %i\n", id(), mTarget, mLevel, mArray.header.components, width(), height(), mFormat, mType, ptr, mAlignment);
+		printf("glTexImage2D target %X level %i components %i dim %ix%i format %X type %X ptr %p alignment %i\n", GL_TEXTURE_2D, 0, 3, 600, 600, GL_RGB, GL_UNSIGNED_BYTE, ptr, 4);
 
 		switch(mTarget) {
 			case GL_TEXTURE_1D:
@@ -220,6 +217,10 @@ protected:
 				break;
 			case GL_TEXTURE_2D:
 			//case GL_TEXTURE_RECTANGLE_ARB:
+//				glTexSubImage2D (
+//					mTarget, mLevel, 
+//					0, 0, width(), height(), 
+//					mFormat, mType, ptr);
 				glTexImage2D(
 					mTarget, mLevel, mArray.header.components, 
 					width(), height(), mBorder, 

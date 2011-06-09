@@ -12,7 +12,6 @@ SearchPaths searchpaths;
 Shader vert, frag;
 ShaderProgram shaderprogram;
 Texture tex(gl);
-Image img;
 Light light;
 Material material;
 
