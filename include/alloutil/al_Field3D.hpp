@@ -110,7 +110,7 @@ public:
 		selfadvection(0.1),
 		selfdecay(0.99),
 		selfbackgroundnoise(0.001),
-		decay(0.99)
+		decay(0.98)
 	{}
 	~Fluid() {}
 	
