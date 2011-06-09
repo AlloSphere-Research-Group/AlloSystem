@@ -48,25 +48,25 @@ namespace al {
 class Array : public AlloArray {
 public:
 
-//	// temporary hack because the one in al_Function gave a bad result
-//	// for e.g. wrap<double>(-64.0, -32.0);
-//	template<typename T>
-//	static inline T wrap(T v, const T hi, const T lo){
-//		if(lo == hi) return lo;
-//		//if(v >= hi){
-//		if(!(v < hi)){
-//			T diff = hi - lo;
-//			v -= diff;
-//			if(!(v < hi)) v -= diff * (T)(uint32_t)((v - lo)/diff);
-//		}
-//		else if(v < lo){
-//			T diff = hi - lo;
-//			v += diff;
-//			if(v < lo) v += diff * (T)(uint32_t)(((lo - v)/diff) + 1);
-//			if(v==diff) return lo;
-//		}
-//		return v;
-//	}
+	// temporary hack because the one in al_Function gave a bad result
+	// for e.g. wrap<double>(-64.0, -32.0);
+	template<typename T>
+	static inline T wrap(T v, const T hi, const T lo){
+		if(lo == hi) return lo;
+		//if(v >= hi){
+		if(!(v < hi)){
+			T diff = hi - lo;
+			v -= diff;
+			if(!(v < hi)) v -= diff * (T)(uint32_t)((v - lo)/diff);
+		}
+		else if(v < lo){
+			T diff = hi - lo;
+			v += diff;
+			if(v < lo) v += diff * (T)(uint32_t)(((lo - v)/diff) + 1);
+			if(v==diff) return lo;
+		}
+		return v;
+	}
 
 	/*!
 		Returns the type enumeration ID (AlloTy) for a given type (given as template argument)
@@ -157,9 +157,9 @@ public:
 	/// TODO: iterators!
 
 	///! get the components at a given index in the array (no bounds checking)
-	template<typename T> T * cell(int x) const;
-	template<typename T> T * cell(int x, int y) const;
-	template<typename T> T * cell(int x, int y, int z) const;
+	template<typename T> T * cell(size_t x) const;
+	template<typename T> T * cell(size_t x, size_t y) const;
+	template<typename T> T * cell(size_t x, size_t y, size_t z) const;
 
 	template<typename T, typename TP> T * cell(T* val, const Vec<2,TP> p) const { return cell(val, p[0], p[1]); }
 	template<typename T, typename TP> T * cell(T* val, const Vec<3,TP> p) const { return cell(val, p[0], p[1], p[2]); }
@@ -377,19 +377,19 @@ inline void Array::formatAligned(int components, AlloTy ty, uint32_t dimx, uint3
 	format(hh);
 }
 
-template<typename T> inline T * Array::cell(int x) const {
-	int fieldstride_x = header.stride[0];
+template<typename T> inline T * Array::cell(size_t x) const {
+	size_t fieldstride_x = header.stride[0];
 	return (T *)(data.ptr + x*fieldstride_x);
 }
-template<typename T> inline T * Array::cell(int x, int y) const {
-	int fieldstride_x = header.stride[0];
-	int fieldstride_y = header.stride[1];
+template<typename T> inline T * Array::cell(size_t x, size_t y) const {
+	size_t fieldstride_x = header.stride[0];
+	size_t fieldstride_y = header.stride[1];
 	return (T *)(data.ptr + x*fieldstride_x + y*fieldstride_y);
 }
-template<typename T> inline T * Array::cell(int x, int y, int z) const {
-	int fieldstride_x = header.stride[0];
-	int fieldstride_y = header.stride[1];
-	int fieldstride_z = header.stride[2];
+template<typename T> inline T * Array::cell(size_t x, size_t y, size_t z) const {
+	size_t fieldstride_x = header.stride[0];
+	size_t fieldstride_y = header.stride[1];
+	size_t fieldstride_z = header.stride[2];
 	return (T *)(data.ptr + x*fieldstride_x + y*fieldstride_y + z*fieldstride_z);
 }
 
@@ -513,7 +513,7 @@ template<typename T> inline void Array::read_interp(T * val, double x, double y,
 	T * pbba = cell<T>(xb, yb, za);
 	T * pbbb = cell<T>(xb, yb, zb);
 	// for each plane of the field, do the 3D interp:
-	for (uint8_t p=0; p<header.components; p++) {
+	for (size_t p=0; p<header.components; p++) {
 		val[p] =	(paaa[p] * faaa) +
 					(pbaa[p] * fbaa) +
 					(paba[p] * faba) +

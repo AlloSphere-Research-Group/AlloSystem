@@ -81,7 +81,7 @@ namespace al {
 			glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, width, height);
 			//glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT, width, height);
 			glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
-			
+			glEnable(GL_DEPTH_TEST);
 			
 			// attach a texture to FBO color attachement point
 			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, textureId, 0);
@@ -95,7 +95,10 @@ namespace al {
 			GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 			if(status != GL_FRAMEBUFFER_COMPLETE_EXT) {
 				printf("error creating FBO (%d)\n", status);
+			} else {
+				printf("created FBO\n");
 			}
+
 			
 			// switch back to window-system-provided framebuffer
 			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
@@ -122,11 +125,11 @@ namespace al {
 			
 			if (GraphicsGL::gl_error("SimpleFBO onEnter (pre)")) exit(0);
 			
-			glPushAttrib(GL_VIEWPORT_BIT);
-			glViewport(0, 0, width, height);
-			
 			// set rendering destination to FBO
 			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
+			
+//			glPushAttrib(GL_VIEWPORT_BIT);
+//			glViewport(0, 0, width, height);
 			
 			//glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 			//glPushAttrib(GL_VIEWPORT_BIT);
@@ -144,11 +147,11 @@ namespace al {
 			//glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			//glBindRenderbuffer(GL_RENDERBUFFER, 0);
 			
+//			// GL_VIEWPORT_BIT
+//			glPopAttrib();
+			
 			// unbind FBO
 			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-			
-			// GL_VIEWPORT_BIT
-			glPopAttrib();
 			
 			// trigger mipmaps generation explicitly
 			// NOTE: If GL_GENERATE_MIPMAP is set to GL_TRUE, then glCopyTexSubImage2D()
