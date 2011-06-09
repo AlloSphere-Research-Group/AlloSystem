@@ -96,6 +96,10 @@ public:
 	}
 	
 	void unbind(int unit = 0) {
+		
+		// multitexturing:
+		glActiveTextureARB( GL_TEXTURE0_ARB+unit );
+		
 		glBindTexture(mTarget, 0);
 		glDisable(mTarget);
 	}
