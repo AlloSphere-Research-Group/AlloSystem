@@ -65,7 +65,7 @@ int utProtocolOSC(){
 	}
 
 	
-
+p.clear();
 	// Create a complicated OSC bundle packet
 	p.clear();
 	p.beginBundle(12345);
