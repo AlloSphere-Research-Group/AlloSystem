@@ -214,7 +214,8 @@ public:
 	Vec<3,T> rotateVectorTransposed(const Vec<3,T>& v) const;
 
 	/// Spherical interpolation
-	Quat& slerp(const Quat& target, T amt) { return set(slerp(*this, target, amt)); }
+	Quat& slerp(const Quat& target, T amt) { return slerp(*this, target, amt); }
+	Quat& slerpto(const Quat& target, T amt) { return set(slerp(*this, target, amt)); }
 
 	/// Fill an array of Quats with a full spherical interpolation:
 	static void slerp_buffer(const Quat& input, const Quat& target, Quat<T> * buffer, int numFrames);

@@ -24,6 +24,7 @@ struct NavInputControl : public InputEventHandler {
 		double v = mVScale * vs;	// speed: units per update
 
 		if(k.alt()) v *= 10;
+		if(k.shift()) v *= 0.1;
 
 		switch(k.key()){
 			case '`':			nav().halt().home(); return false;
@@ -99,6 +100,9 @@ struct NavInputControlCosm : public NavInputControl {
 		double vs = nav().velScale();
 		double a = mTScale * vs;	// rotational speed: degrees per update
 		double v = mVScale * vs;	// speed: units per update
+		
+		if(k.ctrl()) v *= 0.1;
+		if(k.alt()) v *= 10;
 		
 		switch(k.key()){
 			case '`':			nav().halt().home(); return false;
