@@ -2,6 +2,7 @@
 #define INC_AL_UTIL_FRAMEBUFFERGL_HPP
 
 #include "allocore/graphics/al_GraphicsOpenGL.hpp"
+#include "alloutil/al_OpenGL.hpp"
 
 /*
  Dealing with Framebuffers in OpenGL can be tricky. This object tries to make it easier.
@@ -15,6 +16,9 @@
  Framebuffer-attachable layered image: Any layered image that can be attached to a framebuffer object.
  Attachment point: A named location within a framebuffer object that a framebuffer-attachable image or layered image can be attached to. Attachment points can have limitations on the format of the images attached there.
  Attach: To connect one object to another. This is not limited to FBOs, but attaching is a big part of them. Attachment is different from binding. Objects are bound to the context; they are attached to each other.
+ 
+ MULTISAMPLING
+ See http://stackoverflow.com/questions/765434/glreadpixels-from-fbo-fails-with-multisampling
  */
 
 namespace al {
@@ -29,21 +33,34 @@ namespace al {
 			//tex.target(Texture::TEXTURE_2D);
 			
 			textureId = rboId = fboId = 0;
+			
+			mArray.format(4, AlloUInt8Ty, width, height);
 		}
 		
 		GLuint textureId;
+		//TextureGL texture;
 		GLuint rboId;
 		GLuint fboId;
 		unsigned width, height;
 		Color bg;
 		
+		// array into which texture will be copied:
+		Array mArray;	
+		
 		void reset(int w, int h) {
 			onDestroy();
 			width = w; height = h;
+			mArray.format(4, AlloUInt8Ty, width, height);
 			onCreate();
 		}
 		
+		// retrieve internal array:
+		al::Array& array() { return mArray; }
+		// raw access:
+		char * data() { return mArray.data.ptr; }
+		
 		void onCreate() {
+			
 			
 //			glInfo glInfo;
 //			glInfo.getInfo();
@@ -149,7 +166,7 @@ namespace al {
 			
 //			// GL_VIEWPORT_BIT
 //			glPopAttrib();
-			
+
 			// unbind FBO
 			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 			
@@ -165,6 +182,14 @@ namespace al {
 			
 			if (GraphicsGL::gl_error("SimpleFBO onLeave")) exit(0);
 			
+		}
+		
+		// Note: this will reformat the array:
+		void readPixels(Array& dst) {
+			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
+			dst.format(3, AlloUInt8Ty, width, height);
+			glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, dst.data.ptr);
+			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 		}
 		
 		void draw(Graphics& gl) {
