@@ -319,6 +319,7 @@ public:
 		);
 	}
 	
+
 	static const Matrix4 lookAt(const Vec<3,T>& eye, const Vec<3,T>& at, const Vec<3,T>& up) {
 		Vec<3,T> z = (at - eye).normalize();
 		Vec<3,T> x = cross(up, z);
