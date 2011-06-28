@@ -121,20 +121,29 @@ public:
 
 	/// Constructor that defaults to realtime mode
 	Clock(bool useRT = true) 
-	: mNow(0), mReferenceTime(al_time()), mDT(0.33), bUseRT(useRT) 
+	: mNow(0), mReferenceTime(al_time()), mDT(0.33), mFPS(1./mDT), mFrame(0), bUseRT(useRT) 
 	{}
 
 	/// Constructor that defaults to a fixed 'frame rate'
 	Clock(al_sec dt) 
-	: mNow(0), mReferenceTime(al_time()), mDT(dt), bUseRT(false) 
+	: mNow(0), mReferenceTime(al_time()), mDT(dt), mFPS(1./mDT), mFrame(0), bUseRT(false) 
 	{}
 	
 	/// get current clock time
-	al_sec now() { return mNow; }
-	al_sec operator()() { return mNow; }
+	al_sec now() const { return mNow; }
+	al_sec operator()() const { return mNow; }
 	
 	/// get current delta time
-	al_sec dt() { return mDT; }
+	al_sec dt() const { return mDT; }
+	
+	/// get current FPS:
+	double fps() const { return mFPS; }
+	
+	/// get current frame:
+	unsigned frame() const { return mFrame; }
+	
+	/// get current mode:
+	bool rt() const { return bUseRT; }
 	
 	/// update the internal clock. 
 	al_sec update() { 
@@ -142,8 +151,12 @@ public:
 			al_sec t2 = al_time() - mReferenceTime;
 			mDT = t2 - mNow;
 			mNow = t2;
+			mFrame++;
+			mFPS = mFPS + 0.1 * ((1./mDT) - mFPS);
 		} else {
 			mNow += mDT;
+			mFrame++;
+			mFPS = 1./mDT;
 		}
 		return now();
 	}
@@ -160,23 +173,15 @@ public:
 		}
 		bUseRT = b;
 	}
-	
-//	void useRT(al_sec ) {
-//		if (!bUseRT && b) {
-//			// need to reset reference time:
-//			mReferenceTime = al_time() - mNow;
-//		}
-//		bUseRT = b;
-//	}
+	void useRT(al_sec dt) {
+		mDT = dt;
+		useRT(true);
+	}
 
 protected:
-	al_sec mNow;
-	al_sec mReferenceTime;
-	al_sec mDT;
-	
-	unsigned frame;
-	double fps_measured;
-	
+	al_sec mNow, mReferenceTime, mDT;
+	double mFPS;
+	unsigned mFrame;
 	bool bUseRT;
 };
 
