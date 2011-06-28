@@ -133,12 +133,18 @@ public:
 	al_sec now() { return mNow; }
 	al_sec operator()() { return mNow; }
 	
+	/// get current delta time
+	al_sec dt() { return mDT; }
+	
 	/// update the internal clock. 
 	al_sec update() { 
-		if (bUseRT) 
-			mNow = al_time() - mReferenceTime;
-		else 
+		if (bUseRT) {
+			al_sec t2 = al_time() - mReferenceTime;
+			mDT = t2 - mNow;
+			mNow = t2;
+		} else {
 			mNow += mDT;
+		}
 		return now();
 	}
 	al_sec update(al_sec dt) { 
@@ -146,6 +152,7 @@ public:
 		return update();
 	}
 	
+	/// switch between RT and NRT modes:
 	void useRT(bool b) {
 		if (!bUseRT && b) {
 			// need to reset reference time:
@@ -153,11 +160,22 @@ public:
 		}
 		bUseRT = b;
 	}
+	
+//	void useRT(al_sec ) {
+//		if (!bUseRT && b) {
+//			// need to reset reference time:
+//			mReferenceTime = al_time() - mNow;
+//		}
+//		bUseRT = b;
+//	}
 
 protected:
 	al_sec mNow;
 	al_sec mReferenceTime;
 	al_sec mDT;
+	
+	unsigned frame;
+	double fps_measured;
 	
 	bool bUseRT;
 };
