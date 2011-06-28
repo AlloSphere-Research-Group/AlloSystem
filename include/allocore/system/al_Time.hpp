@@ -84,6 +84,7 @@ public:
 	/// @param[in] realtime		source time that we are trying to smoothly follow
 	///
 	void step(al_sec realtime);
+	void operator()(al_sec realtime) { step(realtime); }
 	
 	/// Get the current period estimation (smoothed)
 	al_sec period_smoothed() const { return t2; }
@@ -112,6 +113,55 @@ protected:
 	double mB, mC;	// 1st & 2nd order weights	
 	bool mReset;
 };
+
+/// A timing source that can be locked to realtime or driven manually
+/// 
+class Clock {
+public:
+
+	/// Constructor that defaults to realtime mode
+	Clock(bool useRT = true) 
+	: mNow(0), mReferenceTime(al_time()), mDT(0.33), bUseRT(useRT) 
+	{}
+
+	/// Constructor that defaults to a fixed 'frame rate'
+	Clock(al_sec dt) 
+	: mNow(0), mReferenceTime(al_time()), mDT(dt), bUseRT(false) 
+	{}
+	
+	/// get current clock time
+	al_sec now() { return mNow; }
+	al_sec operator()() { return mNow; }
+	
+	/// update the internal clock. 
+	al_sec update() { 
+		if (bUseRT) 
+			mNow = al_time() - mReferenceTime;
+		else 
+			mNow += mDT;
+		return now();
+	}
+	al_sec update(al_sec dt) { 
+		mDT = dt;
+		return update();
+	}
+	
+	void useRT(bool b) {
+		if (!bUseRT && b) {
+			// need to reset reference time:
+			mReferenceTime = al_time() - mNow;
+		}
+		bUseRT = b;
+	}
+
+protected:
+	al_sec mNow;
+	al_sec mReferenceTime;
+	al_sec mDT;
+	
+	bool bUseRT;
+};
+
 
 
 } // al::
