@@ -314,7 +314,7 @@ public:
 		return Matrix4(
 			 ux[0], ux[1], ux[2], -(ux.dot(pos)),
 			 uy[0], uy[1], uy[2], -(uy.dot(pos)),
-			-uz[0],-uz[1],-uz[2],  (uz.dot(pos)),
+			 uz[0], uz[1], uz[2], -(uz.dot(pos)),
 			0, 0, 0, 1
 		);
 	}
@@ -325,6 +325,22 @@ public:
 		Vec<3,T> y = cross(z, x);
 		return lookAt(x, y, z, eye);
 	}
+
+//	static const Matrix4 lookAtRH(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& pos) {
+//		return Matrix4(
+//					   ux[0], ux[1], ux[2], -(ux.dot(pos)),
+//					   uy[0], uy[1], uy[2], -(uy.dot(pos)),
+//					   uz[0],uz[1],uz[2],  -(uz.dot(pos)),
+//					   0, 0, 0, 1
+//					   );
+//	}
+//	
+//	static const Matrix4 lookAtRH(const Vec<3,T>& eye, const Vec<3,T>& at, const Vec<3,T>& up) {
+//		Vec<3,T> z = (at - eye).normalize();
+//		Vec<3,T> x = cross(up, z);
+//		Vec<3,T> y = cross(z, x);
+//		return lookAt(x, y, z, eye);
+//	}	
 	
 	// for stereographics:
 	static const Matrix4 lookAtLeft(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& pos, double eyeSep) {

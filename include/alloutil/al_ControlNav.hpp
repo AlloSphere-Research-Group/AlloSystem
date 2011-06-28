@@ -31,8 +31,10 @@ struct NavInputControl : public InputEventHandler {
 			case 's':			nav().halt(); return false;
 			case Key::Up:		nav().spinR(-a); return false;
 			case Key::Down:		nav().spinR( a); return false;
-			case Key::Right:	nav().spinU( a); return false;
-			case Key::Left:		nav().spinU(-a); return false;
+//			case Key::Right:	nav().spinU( a); return false;
+//			case Key::Left:		nav().spinU(-a); return false;
+			case Key::Right:	nav().spinU(-a); return false;
+			case Key::Left:		nav().spinU( a); return false;
 			case 'q':			nav().spinF( a); return false;
 			case 'z':			nav().spinF(-a); return false;
 			case 'a':			nav().moveR(-v); return false;
@@ -41,6 +43,9 @@ struct NavInputControl : public InputEventHandler {
 			case 'c':			nav().moveU(-v); return false;
 			case 'x':			nav().moveF(-v); return false;
 			case 'w':			nav().moveF( v); return false;
+//			case 'x':			nav().moveF(v); return false;
+//			case 'w':			nav().moveF(-v); return false;
+
 			default:;
 		}
 		return true;
@@ -108,8 +113,10 @@ struct NavInputControlCosm : public NavInputControl {
 			case '`':			nav().halt().home(); return false;
 			case 'w':			nav().spinR(-a); return false;
 			case 'x':			nav().spinR( a); return false;
-			case Key::Right:	nav().spinU( a); return false;
-			case Key::Left:		nav().spinU(-a); return false;
+//			case Key::Right:	nav().spinU( a); return false;
+//			case Key::Left:		nav().spinU(-a); return false;
+			case Key::Right:	nav().spinU( -a); return false;
+			case Key::Left:		nav().spinU( a); return false;
 			case 'a':			nav().spinF( a); return false;
 			case 'd':			nav().spinF(-a); return false;
 			case ',':			nav().moveR(-v); return false;

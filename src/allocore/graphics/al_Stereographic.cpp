@@ -28,6 +28,7 @@ void Stereographic :: drawMono(Graphics& gl, const Camera& cam, const Pose& pose
 	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
 	mProjection = Matrix4d::perspective(fovy, aspect, near, far);
 	mModelView = Matrix4d::lookAt(ur, uu, uf, pos);
+//	mModelView = Matrix4d::lookAtRH(ur, uu, uf, pos);
 
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 	gl.clearColor(mClearColor);
