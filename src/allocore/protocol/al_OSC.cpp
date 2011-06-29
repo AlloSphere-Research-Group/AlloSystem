@@ -209,7 +209,7 @@ void PacketHandler::parse(const char *packet, int size, TimeTag timeTag){
 
 
 
-Send::Send(unsigned int port, const char * address, al_sec timeout)
+Send::Send(uint16_t port, const char * address, al_sec timeout)
 :	SocketSend(port, address, timeout)
 {}
 
@@ -235,7 +235,7 @@ Recv::Recv()
 {}
 
 
-Recv::Recv(unsigned int port, const char * address, al_sec timeout)
+Recv::Recv(uint16_t port, const char * address, al_sec timeout)
 :	SocketRecv(port, address, timeout), mHandler(0), mBuffer(1024), mBackground(false)
 {}
 
@@ -344,7 +344,7 @@ Example send code:
 //	typedef void (* networkRecvCB)(const RecvPacket& p, void * user);
 //
 //	OSCRecv(networkRecvCB cb=0, void * userData=0);
-//	OSCRecv(unsigned int port, networkRecvCB cb, void * userData=0);
+//	OSCRecv(uint16_t port, networkRecvCB cb, void * userData=0);
 //
 //	~OSCRecv();
 //
@@ -355,7 +355,7 @@ Example send code:
 //	
 //	/// If the receiver has already been started, it will be stopped and
 //	/// restarted using the new port number.
-//	OSCRecv& port(unsigned int p);
+//	OSCRecv& port(uint16_t p);
 //	
 //	/// Start the OSC receive thread
 //	void start();
@@ -364,14 +364,14 @@ Example send code:
 //	void stop();
 //	
 //	/// Get the receiving port number
-//	unsigned int port() const { return mPort; }
+//	uint16_t port() const { return mPort; }
 //	
 //	/// Get whether the receiving thread has been started
 //	bool started() const { return mStarted; }
 //	
 //protected:
 //	al::Thread mThread;
-//	unsigned int mPort;
+//	uint16_t mPort;
 //	osc::uint64 mTime;
 //	UdpListeningReceiveSocket * mSocket;
 //	bool mStarted;
@@ -485,13 +485,13 @@ Example send code:
 //:	callback(cb), user(userData), mPort(0), mTime(1), mStarted(false)
 //{}
 //
-//OSCRecv::OSCRecv(unsigned int port, networkRecvCB cb, void * userData)
+//OSCRecv::OSCRecv(uint16_t port, networkRecvCB cb, void * userData)
 //:	callback(cb), user(userData), mPort(port), mTime(1), mStarted(false)
 //{}
 //
 //OSCRecv::~OSCRecv(){ stop(); }
 //
-//OSCRecv& OSCRecv::port(unsigned int p){
+//OSCRecv& OSCRecv::port(uint16_t p){
 //	mPort = p;
 //	if(started()){ stop(); start(); }
 //	return *this;

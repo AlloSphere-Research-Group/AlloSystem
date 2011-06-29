@@ -286,10 +286,10 @@ class Send : public SocketSend, public Packet{
 public:
 	Send(){}
 
-	/// @param[in] port		Port number
+	/// @param[in] port		Port number (valid range is 0-65535)
 	/// @param[in] address	IP address
 	/// @param[in] timeout	< 0: block forever; = 0: no blocking; > 0 block with timeout
-	Send(unsigned int port, const char * address = "localhost", al_sec timeout=0);
+	Send(uint16_t port, const char * address = "localhost", al_sec timeout=0);
 
 	/// Send and clear current packet contents
 	int send();
@@ -352,10 +352,10 @@ class Recv : public SocketRecv{
 public:
 	Recv();
 
-	/// @param[in] port		Port number
+	/// @param[in] port		Port number (valid range is 0-65535)
 	/// @param[in] address	IP address. If empty, will bind all network interfaces to socket.
 	/// @param[in] timeout	< 0: block forever; = 0: no blocking; > 0 block with timeout
-	Recv(unsigned int port, const char * address = "", al_sec timeout=0);
+	Recv(uint16_t port, const char * address = "", al_sec timeout=0);
 	
 	virtual ~Recv() { stop(); }
 

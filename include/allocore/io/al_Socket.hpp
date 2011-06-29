@@ -96,7 +96,7 @@ public:
 	const std::string& address() const;
 
 	/// Get port number
-	unsigned int port() const;
+	uint16_t port() const;
 
 	/// Get timeout duration, in seconds
 	al_sec timeout() const;
@@ -122,11 +122,11 @@ protected:
 	Socket();
 
 	/// @sender: true if Socket will send
-	Socket(unsigned int port, const char * address, al_sec timeout, bool sender);
+	Socket(uint16_t port, const char * address, al_sec timeout, bool sender);
 
 	virtual ~Socket();
 
-	bool open(unsigned int port, const char * address, al_sec timeout, bool sender);
+	bool open(uint16_t port, const char * address, al_sec timeout, bool sender);
 	size_t recv(char * buffer, size_t maxlen);
 	size_t send(const char * buffer, size_t len);
 
@@ -141,15 +141,15 @@ class SocketSend : public Socket {
 public:
 	SocketSend(){}
 
-	/// @param[in] port		Port number
+	/// @param[in] port		Port number (valid range is 0-65535)
 	/// @param[in] address	IP address
 	/// @param[in] timeout	< 0: block forever; = 0: no blocking; > 0 block with timeout
-	SocketSend(unsigned int port, const char * address = "localhost", al_sec timeout=0)
+	SocketSend(uint16_t port, const char * address = "localhost", al_sec timeout=0)
 	:	Socket(port, address, timeout, true)
 	{}
 
 	/// Open socket closing and reopening if currently open
-	bool open(unsigned int port, const char * address, al_sec timeout=0){
+	bool open(uint16_t port, const char * address, al_sec timeout=0){
 		return Socket::open(port, address, timeout, true);
 	}
 
@@ -165,15 +165,15 @@ class SocketRecv : public Socket {
 public:
 	SocketRecv(){}
 
-	/// @param[in] port		Port number
+	/// @param[in] port		Port number (valid range is 0-65535)
 	/// @param[in] address	IP address. If empty, will bind all network interfaces to socket.
 	/// @param[in] timeout	< 0: block forever; = 0: no blocking; > 0 block with timeout
-	SocketRecv(unsigned int port, const char * address = "", al_sec timeout=0)
+	SocketRecv(uint16_t port, const char * address = "", al_sec timeout=0)
 	:	Socket(port, address, timeout, false)
 	{}
 
 	/// Open socket closing and reopening if currently open
-	bool open(unsigned int port, const char * address = "", al_sec timeout=0){
+	bool open(uint16_t port, const char * address = "", al_sec timeout=0){
 		return Socket::open(port, address, timeout, false);
 	}
 

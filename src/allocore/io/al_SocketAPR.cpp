@@ -20,7 +20,7 @@ struct Socket::Impl : public ImplAPR {
 	:	ImplAPR(), mPort(0), mAddress(""), mSockAddr(0), mSock(0), mSender(false)
 	{}
 
-	Impl(unsigned int port, const char * address, al_sec timeout_, bool sender)
+	Impl(uint16_t port, const char * address, al_sec timeout_, bool sender)
 	:	ImplAPR(), mPort(port), mAddress(address), mSockAddr(0), mSock(0), mSender(sender)
 	{
 //		// opens the socket also:
@@ -42,7 +42,7 @@ struct Socket::Impl : public ImplAPR {
 			return false;\
 		}
 
-	bool open(unsigned int port, std::string address, al_sec timeout, bool sender){
+	bool open(uint16_t port, std::string address, al_sec timeout, bool sender){
 		close();
 
 		/* @see http://dev.ariel-networks.com/apr/apr-tutorial/html/apr-tutorial-13.html */
@@ -93,7 +93,7 @@ struct Socket::Impl : public ImplAPR {
 	
 	bool opened() const { return 0!=mSock; }
 
-	unsigned int mPort;
+	uint16_t mPort;
 	std::string mAddress;
 	apr_sockaddr_t * mSockAddr;
 	apr_socket_t * mSock;
@@ -109,7 +109,7 @@ Socket::Socket()
 	mImpl = new Impl;
 }
 
-Socket::Socket(unsigned int port, const char * address, al_sec timeout, bool sender)
+Socket::Socket(uint16_t port, const char * address, al_sec timeout, bool sender)
 : mImpl(0)
 {
 	mImpl = new Impl(port, address, timeout, sender);
@@ -124,14 +124,14 @@ const std::string& Socket::address() const { return mImpl->mAddress; }
 
 bool Socket::opened() const { return mImpl->opened(); }
 
-unsigned int Socket::port() const { return mImpl->mPort; }
+uint16_t Socket::port() const { return mImpl->mPort; }
 
 al_sec Socket::timeout() const { return mImpl->mTimeout; }
 
 
 void Socket::close(){ mImpl->close(); }
 
-bool Socket::open(unsigned int port, const char * address, al_sec timeout, bool sender){
+bool Socket::open(uint16_t port, const char * address, al_sec timeout, bool sender){
 	return mImpl->open(port, address, timeout, sender);
 }
 

@@ -64,8 +64,7 @@ int utProtocolOSC(){
 			assert(!strcmp((char *)b.data, str));
 	}
 
-	
-p.clear();
+
 	// Create a complicated OSC bundle packet
 	p.clear();
 	p.beginBundle(12345);
