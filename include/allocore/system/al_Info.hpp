@@ -33,8 +33,8 @@
 
 namespace al{
 
-/// Returns the number of cores available
-int numCores();
+/// Returns the number of processors available
+int numProcessors();
 
 } // al::
 

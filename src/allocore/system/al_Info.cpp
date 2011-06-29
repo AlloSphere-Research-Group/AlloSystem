@@ -12,7 +12,7 @@
 
 namespace al{
 
-int numCores(){
+int numProcessors(){
 #ifdef AL_WIN32
     SYSTEM_INFO sysinfo;
     GetSystemInfo(&sysinfo);
