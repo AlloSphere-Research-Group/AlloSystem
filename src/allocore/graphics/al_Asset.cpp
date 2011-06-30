@@ -113,7 +113,9 @@ std::string Scene::Node :: name() const {
 	return std::string(mImpl->node->mName.data);
 }
 
-
+void Scene::verbose(bool b) {
+	aiEnableVerboseLogging(b);
+}
 
 
 Scene * Scene :: import(std::string path, ImportPreset preset) {

@@ -145,6 +145,9 @@ public:
 	/// print out information about the Scene
 	void dump() const;
 	
+	/// toggle verbose mode
+	static void verbose(bool b);
+	
 protected:
 
 	std::vector<Material> mMaterials;
