@@ -96,6 +96,8 @@ public:
 	Vec3d& pos(){ return mVec; }
 	Vec3d& vec(){ return mVec; }
 	Quatd& quat(){ return mQuat; }
+	
+	void set(Pose& src) { mVec = src.pos(); mQuat = src.quat(); }
 
 	/// Set position
 	template <class T>
