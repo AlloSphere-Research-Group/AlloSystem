@@ -165,17 +165,18 @@ public:
 		return update();
 	}
 	
-	/// switch between RT and NRT modes:
-	void useRT(bool b) {
-		if (!bUseRT && b) {
+	/// set RT mode:
+	void useRT() {
+		if (!bUseRT) {
 			// need to reset reference time:
 			mReferenceTime = al_time() - mNow;
 		}
-		bUseRT = b;
+		bUseRT = true;
 	}
-	void useRT(al_sec dt) {
+	/// set NRT mode with specific frame rate:
+	void useNRT(al_sec dt) {
 		mDT = dt;
-		useRT(true);
+		bUseRT = false;
 	}
 
 protected:
