@@ -31,6 +31,7 @@ public:
 		}
 	}
 	virtual ~FreeImageImpl() {
+		destroy();
 	}
 	
 	virtual bool load(const std::string& filename, Array &lat) {
