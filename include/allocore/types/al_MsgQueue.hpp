@@ -55,6 +55,8 @@ public:
 	void update(al_sec until, bool defer = false);
 	void advance(al_sec period, bool defer = false) { update(mNow + period, defer); }
 	
+	void clear();
+	
 	// how many messages are scheduled?
 	int len() { return mLen; }
 	

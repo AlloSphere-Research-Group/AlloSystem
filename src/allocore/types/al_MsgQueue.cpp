@@ -130,4 +130,18 @@ void MsgQueue :: update(al_sec until, bool defer) {
 	mNow = until;
 }
 
+void MsgQueue :: clear() {
+	// recycle everything:
+	Msg * m = mHead;
+	while (m) {
+		mHead = m->next;
+		recycle(m);
+		m = mHead;
+	}
+	// reset clock:
+	mNow = 0;
+	mHead = NULL;
+	mTail = NULL;
+}
+
 } // al::
