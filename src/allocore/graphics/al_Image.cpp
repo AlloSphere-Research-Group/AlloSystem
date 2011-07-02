@@ -357,6 +357,7 @@ Image :: Image(const std::string& filename)
 
 Image :: ~Image() {
 	if (mImpl) delete mImpl;
+	mArray.dataFree();
 }
 	
 bool Image :: load(const std::string& filename) {
