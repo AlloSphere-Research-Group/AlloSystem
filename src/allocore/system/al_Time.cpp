@@ -52,37 +52,57 @@
 	/* Windows */
 	#include <windows.h>
 
+/*
+From msdn:
+DWORD timeGetTime(void);
+
+	The timeGetTime function retrieves the system time, in milliseconds. 
+	The system time is the time elapsed since Windows was started.
+
+	(A DWORD is a 32-bit unsigned integer)
+
+	The default precision of the timeGetTime function can be five milliseconds or 
+	more, depending on the machine. You can use the timeBeginPeriod and 
+	timeEndPeriod functions to increase the precision of timeGetTime. If you do so, 
+	the minimum difference between successive values returned by timeGetTime can be 
+	as large as the minimum period value set using timeBeginPeriod and 
+	timeEndPeriod. Use the QueryPerformanceCounter and QueryPerformanceFrequency 
+	functions to measure short time intervals at a high resolution,
+	
+VOID WINAPI Sleep(
+  __in  DWORD dwMilliseconds
+);
+
+*/
+
 	/* singleton object to force init/quit of timing */
-	namespace al{
-		namespace{
-			struct TimeSingleton{
-				TimeSingleton(){ timeBeginPeriod(1); }
-				~TimeSingleton(){ timeEndPeriod(1); }
-			};
-			static TimeSingleton timeSingleton;
-		}
-	}
+	static struct TimeSingleton{
+		TimeSingleton(){ timeBeginPeriod(1); }
+		~TimeSingleton(){ timeEndPeriod(1); }
+	} timeSingleton;
 
-	al_sec al_time() {
-		return timeGetTime();
-	}
+	// interface to Windows API
+	static DWORD time_ms(){ return timeGetTime(); }
+	static void sleep_ms(unsigned int ms){ Sleep((DWORD)ms); }
 
-	al_nsec al_time_nsec() {
-		return al_sec2nsec(timeGetTime());
-	}
-
-	void al_sleep(al_sec v) {
-		Sleep((DWORD)(v * 1.0e3));
-	}
-
-	void al_sleep_nsec(al_nsec v) {
-		Sleep((DWORD)(v / (al_nsec)1e6));
-	}
+	// allocore definitions
+	al_sec al_time(){				return time_ms() * 1.0e-3; }
+	al_nsec al_time_nsec(){			return (al_nsec)time_ms()) * 1e6; }
+	void al_sleep(al_sec v){		sleep_ms(v * 1.0e3); }
+	void al_sleep_nsec(al_nsec v){	sleep_ms(v / (al_nsec)1e6); }
 
 #else
 	/* Posix (Mac, Linux) */
 	#include <sys/time.h>
 	#include <time.h>
+
+//struct timeval{
+//	long int tv_sec;	/*	number of whole seconds of elapsed time. */
+//	long int tv_usec;	/*	This is the rest of the elapsed time 
+//							(a fraction of a second), represented as the number 
+//							of microseconds. It is always less than one million.
+//						*/
+//}
 
 	al_sec al_time() {
 		timeval t;
@@ -93,7 +113,7 @@
 	al_nsec al_time_nsec() {
 		timeval t;
 		gettimeofday(&t, NULL);
-		return al_sec2nsec(t.tv_sec) + (al_nsec)(t.tv_usec * 1000);
+		return ((al_nsec)t.tv_sec * 1e9) + ((al_nsec)t.tv_usec * 1e3);
 	}
 
 	void al_sleep(al_sec v) {
