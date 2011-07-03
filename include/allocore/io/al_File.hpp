@@ -25,21 +25,6 @@ namespace al{
 //void path2dir(char* dst, const char* src);
 
 
-/// Returns whether a file or directory exists
-bool fileExists(const std::string& path);
-
-
-/// Search for file or directory back from current directory
-
-/// @param[out] prefixPath	If the file is found, this contains a series of
-///							"../" that can be prefixed to 'matchPath' to get
-///							its actual location.
-/// @param[in]  matchPath	File or directory to search for
-/// @param[in]  maxDepth	Maximum number of directories to search back
-/// \returns whether the file or directory was found
-bool searchBackForFile(std::string& prefixPath, const std::string& matchPath, int maxDepth=6);
-
-
 /// a pair of path (folder/directory) and filename
 class FilePath {
 public:
@@ -86,14 +71,6 @@ public:
 
 	/// todo?
 	//void addResourcePath();
-
-	// strips trailing filename from a path; e.g. /usr/bin/man -> /usr/bin/
-	static std::string stripFileName(const std::string& src);
-	// ensure path ends with the proper delimiter
-	static std::string conformPath(const std::string& src);
-	// does a file at the given filepath exist?
-	static bool fileExists(const std::string& name, const std::string& path);
-
 protected:
 
 	typedef std::pair<std::string, bool> searchpath;
@@ -168,6 +145,35 @@ public:
 
 	FILE * filePointer() { return mFP; }
 
+
+	/// Ensure path ends with the proper delimiter
+	static std::string conformPath(const std::string& src);
+
+	/// Extracts the directory-part of file name.
+	
+	/// The directory-part of the file name is everything up through (and 
+	/// including) the last slash in it. If the file name contains no slash, 
+	/// the directory part is the string ‘./’. E.g., /usr/bin/man -> /usr/bin/.
+	static std::string directory(const std::string& src);
+
+	/// Returns whether a file or directory exists
+	static bool exists(const std::string& path);
+
+	/// Returns whether a file in a directory exists
+	static bool exists(const std::string& name, const std::string& path){
+		return exists(path+name);
+	}
+
+	/// Search for file or directory back from current directory
+
+	/// @param[out] prefixPath	If the file is found, this contains a series of
+	///							"../" that can be prefixed to 'matchPath' to get
+	///							its actual location.
+	/// @param[in]  matchPath	File or directory to search for
+	/// @param[in]  maxDepth	Maximum number of directories to search back
+	/// \returns whether the file or directory was found
+	static bool searchBack(std::string& prefixPath, const std::string& matchPath, int maxDepth=6);
+
 	static al_sec modified(std::string path) { File f(path); return f.modified(); }
 	static al_sec accessed(std::string path) { File f(path); return f.accessed(); }
 	static al_sec created(std::string path) { File f(path); return f.created(); }
@@ -192,32 +198,7 @@ protected:
 
 //// INLINE IMPLEMENTATION ////
 
-inline bool fileExists(const std::string& path){
-	struct stat s;
-	return ::stat(path.c_str(), &s) == 0;
-}
-
-inline bool searchBackForFile(std::string& prefixPath, const std::string& matchPath, int maxDepth){
-	int i=0;
-	prefixPath="";
-
-	for(; i<maxDepth; ++i){
-		if(al::fileExists(prefixPath + matchPath)) break;
-		prefixPath = ".."AL_FILE_DELIMITER_STR + prefixPath;
-	}
-	return i<maxDepth;
-}
-
-inline std::string SearchPaths::stripFileName(const std::string& src) {
-	std::string filepath(src);
-	size_t pos = filepath.find_last_of(AL_FILE_DELIMITER);
-	if (pos !=std::string::npos) {
-		filepath.erase(pos+1);
-	}
-	return filepath;
-}
-
-inline std::string SearchPaths::conformPath(const std::string& src) {
+inline std::string File::conformPath(const std::string& src) {
 	std::string path(src);
 	// paths should end with a delimiter:
 	if (path[path.size()-1] != AL_FILE_DELIMITER) {
@@ -225,6 +206,34 @@ inline std::string SearchPaths::conformPath(const std::string& src) {
 	}
 	return path;
 }
+
+inline std::string File::directory(const std::string& src){
+	size_t pos = src.find_last_of(AL_FILE_DELIMITER);
+	if(std::string::npos != pos){
+		return src.substr(0, pos+1);
+	}
+	return "."AL_FILE_DELIMITER_STR;
+}
+
+inline bool File::exists(const std::string& path){
+	struct stat s;
+	return ::stat(path.c_str(), &s) == 0;
+}
+
+inline bool File::searchBack(std::string& prefixPath, const std::string& matchPath, int maxDepth){
+	int i=0;
+	prefixPath="";
+
+	for(; i<maxDepth; ++i){
+		if(File::exists(prefixPath + matchPath)) break;
+		prefixPath = ".."AL_FILE_DELIMITER_STR + prefixPath;
+	}
+	return i<maxDepth;
+}
+
+
+
+
 
 inline void SearchPaths::addAppPaths(int argc, char * const argv[], bool recursive) {
 	addAppPaths(recursive);
@@ -258,10 +267,6 @@ inline void SearchPaths::addSearchPath(const std::string& src, bool recursive) {
 	}
 //	printf("adding path %s\n", path.data());
 	mSearchPaths.push_front(searchpath(path, recursive));
-}
-
-inline bool SearchPaths::fileExists(const std::string& path, const std::string& name) {
-	return al::fileExists(path+name);
 }
 
 } // al::

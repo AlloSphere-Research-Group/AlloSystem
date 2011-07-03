@@ -3,7 +3,7 @@
 int utFile() {
 
 	// static functions
-	assert(fileExists("./"));
+	assert(File::exists("./"));
 
 	// simple file/directory searching
 	{
@@ -12,16 +12,16 @@ int utFile() {
 		// Search for file (that exists and probably will not be moved...)
 		std::string find = "Makefile";
 		
-		bool r = searchBackForFile(dir, find);
+		bool r = File::searchBack(dir, find);
 		assert(r);
-		assert(fileExists(dir + find));
+		assert(File::exists(dir + find));
 		
 		find = ".."AL_FILE_DELIMITER_STR + find;	// check for a file with path
-		r = searchBackForFile(dir, find);
+		r = File::searchBack(dir, find);
 		assert(r);
-		assert(fileExists(dir + find));
+		assert(File::exists(dir + find));
 
-		assert(!searchBackForFile(dir, "thisdirectorydoesnotexist"AL_FILE_DELIMITER_STR"thisfiledoesnotexist.ext"));
+		assert(!File::searchBack(dir, "thisdirectorydoesnotexist"AL_FILE_DELIMITER_STR"thisfiledoesnotexist.ext"));
 	}
 
 	{
@@ -34,7 +34,7 @@ int utFile() {
 
 		assert(f.open());
 		assert(f.opened());
-		assert(fileExists(path));
+		assert(File::exists(path));
 
 		assert(
 			f.write(text, strlen(text))
@@ -44,7 +44,7 @@ int utFile() {
 
 		f.close();
 		assert(!f.opened());
-		assert(fileExists(path));
+		assert(File::exists(path));
 
 
 		// read data
