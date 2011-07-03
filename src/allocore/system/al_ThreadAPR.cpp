@@ -115,12 +115,6 @@ bool Thread::start(ThreadFunction& func){
 	return mImpl->start(func);
 }
 
-bool Thread::start(void * (*threadFunc)(void * userData), void * userData){
-	mCFunc.func = threadFunc;
-	mCFunc.user = userData;
-	return start(mCFunc);
-}
-
 bool Thread::join(){
 	return mImpl->join();
 }

@@ -99,6 +99,17 @@ protected:
 	bool mJoinOnDestroy;
 };
 
+
+
+// -----------------------------------------------------------------------------
+// Inline implementation
+
+inline bool Thread::start(void * (*threadFunc)(void * userData), void * userData){
+	mCFunc.func = threadFunc;
+	mCFunc.user = userData;
+	return start(mCFunc);
+}
+
 } // al::
 
 #endif
