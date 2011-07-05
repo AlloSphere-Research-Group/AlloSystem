@@ -239,7 +239,7 @@ inline void SearchPaths::addAppPaths(int argc, char * const argv[], bool recursi
 	addAppPaths(recursive);
 	if (argc > 0) {
 		//char path[4096];
-		std::string filepath = stripFileName(argv[0]);
+		std::string filepath = File::directory(argv[0]);
 		mAppPath = filepath;
 		addSearchPath(filepath, recursive);
 	}
@@ -254,7 +254,7 @@ inline void SearchPaths::addAppPaths(bool recursive) {
 }
 
 inline void SearchPaths::addSearchPath(const std::string& src, bool recursive) {
-	std::string path=conformPath(src);
+	std::string path=File::conformPath(src);
 
 	// check for duplicates
 	std::list<searchpath>::iterator iter = mSearchPaths.begin();

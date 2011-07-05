@@ -15,7 +15,7 @@ public:
 		
 		void operator()() {
 			File f(mPath, "r", false);
-			if (al::fileExists(mPath)) {
+			if (File::exists(mPath)) {
 				al_sec mod = f.modified();
 				if(mod > mModified) {
 					f.open();
@@ -52,7 +52,7 @@ public:
 	/// this may overwrite an existing handler.
 	/// param[in] immediate: triggers the handler immediately if the file exists
 	FileWatcherManager& watch(std::string path, FileWatcher * handler, bool immediate) {
-		if (al::fileExists(path)) {
+		if (File::exists(path)) {
 			// note this may overwrite an existing handler.
 			WatchedFile wf(path, handler);
 			if (immediate) {
