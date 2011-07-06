@@ -29,10 +29,8 @@ struct NavInputControl : public InputEventHandler {
 		switch(k.key()){
 			case '`':			nav().halt().home(); return false;
 			case 's':			nav().halt(); return false;
-			case Key::Up:		nav().spinR(-a); return false;
-			case Key::Down:		nav().spinR( a); return false;
-//			case Key::Right:	nav().spinU( a); return false;
-//			case Key::Left:		nav().spinU(-a); return false;
+			case Key::Up:		nav().spinR( a); return false;
+			case Key::Down:		nav().spinR(-a); return false;
 			case Key::Right:	nav().spinU(-a); return false;
 			case Key::Left:		nav().spinU( a); return false;
 			case 'q':			nav().spinF( a); return false;
@@ -43,9 +41,6 @@ struct NavInputControl : public InputEventHandler {
 			case 'c':			nav().moveU(-v); return false;
 			case 'x':			nav().moveF(-v); return false;
 			case 'w':			nav().moveF( v); return false;
-//			case 'x':			nav().moveF(v); return false;
-//			case 'w':			nav().moveF(-v); return false;
-
 			default:;
 		}
 		return true;
@@ -71,8 +66,8 @@ struct NavInputControl : public InputEventHandler {
 
 	virtual bool onMouseDrag(const Mouse& m){
 		if(m.left()){
-			nav().turnU(m.dx() * 0.2);
-			nav().turnR(m.dy() * 0.2);
+			nav().turnU(-m.dx() * 0.2);
+			nav().turnR(-m.dy() * 0.2);
 		}
 		else if(m.right()){
 			nav().turnF(m.dx() * 0.2);
