@@ -309,6 +309,13 @@ public:
 						0,		0,		D/-2,	D2/2,
 						0,		0,		0,		1	);
 	}
+
+
+	/*
+	How does lookAt work?
+	http://pyopengl.sourceforge.net/documentation/manual/gluLookAt.3G.html
+	http://www.opengl.org/wiki/GluLookAt_code
+	*/
 	
 	static const Matrix4 lookAt(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& pos) {
 		return Matrix4(
@@ -319,7 +326,6 @@ public:
 		);
 	}
 	
-
 	static const Matrix4 lookAt(const Vec<3,T>& eye, const Vec<3,T>& at, const Vec<3,T>& up) {
 		Vec<3,T> z = (at - eye).normalize();
 		Vec<3,T> x = cross(up, z);
