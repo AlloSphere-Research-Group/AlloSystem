@@ -476,7 +476,6 @@
 		169CD07E134E4FF500D0037B /* al_Info.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Info.hpp; sourceTree = "<group>"; };
 		16A6041B130345BB0077B460 /* frustumTesting.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = frustumTesting.cpp; sourceTree = "<group>"; };
 		16A6041C130345BB0077B460 /* isosurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = isosurface.cpp; sourceTree = "<group>"; };
-		16A6041D130345BB0077B460 /* lines.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = lines.cpp; sourceTree = "<group>"; };
 		16A6041E130345BB0077B460 /* manyShapeMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = manyShapeMesh.cpp; sourceTree = "<group>"; };
 		16A6041F130345BB0077B460 /* modelShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = modelShader.cpp; sourceTree = "<group>"; };
 		16A60421130345BB0077B460 /* platonics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = platonics.cpp; sourceTree = "<group>"; };
@@ -3471,7 +3470,6 @@
 			children = (
 				16A6041B130345BB0077B460 /* frustumTesting.cpp */,
 				16A6041C130345BB0077B460 /* isosurface.cpp */,
-				16A6041D130345BB0077B460 /* lines.cpp */,
 				16A6041E130345BB0077B460 /* manyShapeMesh.cpp */,
 				16A6041F130345BB0077B460 /* modelShader.cpp */,
 				16A60421130345BB0077B460 /* platonics.cpp */,
@@ -8239,7 +8237,6 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "allo" */;
 			compatibilityVersion = "Xcode 3.0";
-			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
