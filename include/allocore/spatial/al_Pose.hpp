@@ -94,7 +94,7 @@ public:
 	Vec3d uu() const { Vec3d r; quat().toVectorY(r); return r; }
 
 	/// Get forward unit vector
-	Vec3d uf() const { Vec3d r; quat().toVectorZ(r); return r; }
+	Vec3d uf() const { Vec3d r; quat().toVectorZ(r); return -r; }
 
 
 	// Setters
