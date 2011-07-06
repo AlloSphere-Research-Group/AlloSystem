@@ -1,3 +1,22 @@
+/*
+Allocore Example: Simple 3D graphics test
+
+Description:
+This renders a colored square
+
+	(-1, 1, 0)		( 1, 1, 0)
+	Red				Blue
+
+
+	(-1,-1, 0)		( 1,-1, 0)
+	Green			White
+
+that can be helpful for understanding viewing transformations.
+
+Author:
+Lance Putnam, 7/6/2011
+*/
+
 #include "allocore/al_Allocore.hpp"
 using namespace al;
 
@@ -16,19 +35,24 @@ struct MyWindow : Window{
 		gl.loadMatrix(Matrix4d::perspective(45, aspect(), 0.1, 100));
 
 		gl.matrixMode(gl.MODELVIEW);
-		gl.loadMatrix(Matrix4d::lookAt(Vec3d(0,0,-4), Vec3d(0,0,0), Vec3d(0,1,0)));
+		gl.loadMatrix(Matrix4d::lookAt(Vec3d(0,0,4), Vec3d(0,0,0), Vec3d(0,1,0)));
 
-		//gl.rotate(sin(al_time()) * 90., 0, 1, 0);
-		gl.begin(gl.QUADS);
-			gl.color(1,0,0);
-			gl.vertex(-1,-1);
-			gl.color(0,1,0);
-			gl.vertex( 1,-1);
-			gl.color(0,0,1);
-			gl.vertex( 1, 1);
-			gl.color(1,1,1);
-			gl.vertex(-1, 1);		
+//		gl.loadIdentity();
+//		gluLookAt(0,0,4, 0,0,0, 0,1,0);
+
+//		gl.rotate(sin(al_time()) * 90., 0, 1, 0);
+		gl.begin(gl.TRIANGLE_STRIP);
+			gl.color(1,0,0);	gl.vertex(-1, 1);
+			gl.color(0,1,0);	gl.vertex(-1,-1);
+			gl.color(0,0,1);	gl.vertex( 1, 1);			
+			gl.color(1,1,1);	gl.vertex( 1,-1);
 		gl.end();
+
+/*		gl.begin(gl.TRIANGLE_STRIP);
+			gl.color(1,0,0);	gl.vertex(1,0,0);
+			gl.color(0,1,0);	gl.vertex(0,1,0);
+			gl.color(0,0,1);	gl.vertex(0,0,1);
+		gl.end();*/
 		return true;
 	}
 };
