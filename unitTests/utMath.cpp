@@ -285,12 +285,32 @@ int utMath(){
 		assert(q.magSqr() == 121);
 		assert(eq(&q.sgn()[0], &Quatd(1./11, 2./11, 4./11, 10./11)[0], 4));
 		
+		// test rotation of vectors by quaternion
 		q.fromAxisAngle(90, 1,0,0);
 		assert(eq(&q[0], &Quatd(sqrt(2)/2, sqrt(2)/2,0,0)[0], 4));
+		{
+			Vec3d v(0,0,1);
+			v = q.rotateVector(v);
+			assert(eq(&v[0], &Vec3d(0,-1,0)[0], 3));
+		}
 
 		q.fromAxisAngle(90, 0,1,0);
 		assert(eq(&q[0], &Quatd(sqrt(2)/2, 0,sqrt(2)/2,0)[0], 4));
-		
+		{
+			Vec3d v(0,0,1);
+			v = q.rotateVector(v);			
+			//printf("%g %g %g\n", v[0], v[1], v[2]);
+			assert(eq(&v[0], &Vec3d(1,0,0)[0], 3));
+		}
+
+		q.fromAxisAngle(90, 0,0,1);
+		{
+			Vec3d v(1,0,0);
+			v = q.rotateVector(v);			
+			//printf("%g %g %g\n", v[0], v[1], v[2]);
+			assert(eq(&v[0], &Vec3d(0,1,0)[0], 3));
+		}
+
 		assert(q.fromAxisAngle(45, 1,0,0) == Quatd().fromAxisX(45));
 		assert(q.fromAxisAngle(45, 0,1,0) == Quatd().fromAxisY(45));
 		assert(q.fromAxisAngle(45, 0,0,1) == Quatd().fromAxisZ(45));
@@ -323,6 +343,46 @@ int utMath(){
 			q.toMatrixTransposed(mat4);
 			b = q.fromMatrixTransposed(mat4);
 			assert(q == b || q == b.conj());
+		}
+		
+		
+		// test quaternion to component coordinate frame
+		{
+			Quatd q;
+			
+			Vec3d vx, vy, vz;
+
+			q.fromAxisAngle(90, 1,0,0);			
+			q.toVectorX(vx);
+			q.toVectorY(vy);
+			q.toVectorZ(vz);
+			assert(eq(&vx[0], &Vec3d(1,0,0)[0], 3));
+			assert(eq(&vy[0], &Vec3d(0,0,1)[0], 3));
+			assert(eq(&vz[0], &Vec3d(0,-1,0)[0], 3));
+
+			q.fromAxisAngle(90, 0,1,0);			
+			q.toVectorX(vx);
+			q.toVectorY(vy);
+			q.toVectorZ(vz);
+			assert(eq(&vx[0], &Vec3d(0,0,-1)[0], 3));
+			assert(eq(&vy[0], &Vec3d(0,1,0)[0], 3));
+			assert(eq(&vz[0], &Vec3d(1,0,0)[0], 3));
+
+			q.fromAxisAngle(90, 0,0,1);			
+			q.toVectorX(vx);
+			q.toVectorY(vy);
+			q.toVectorZ(vz);
+			assert(eq(&vx[0], &Vec3d(0,1,0)[0], 3));
+			assert(eq(&vy[0], &Vec3d(-1,0,0)[0], 3));
+			assert(eq(&vz[0], &Vec3d(0,0,1)[0], 3));
+
+//			q.fromAxisAngle(0, 0,1,0);			
+//			q.toVectorY(v);
+//			assert(v == Vec3d(0,1,0));
+//
+//			q.fromAxisAngle(0, 0,0,1);			
+//			q.toVectorZ(v);
+//			assert(v == Vec3d(0,0,1));
 		}
 		
 		
