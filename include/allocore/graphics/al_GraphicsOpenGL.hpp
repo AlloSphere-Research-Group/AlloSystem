@@ -111,6 +111,7 @@ public:
 	static GLenum type_for_array_type(AlloTy type);
 	static GLenum target_from_texture_target(Texture::Target target);
 	
+	
 	GraphicsGL();
 	virtual ~GraphicsGL();
 
