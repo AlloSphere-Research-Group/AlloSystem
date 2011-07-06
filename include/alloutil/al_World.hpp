@@ -22,28 +22,13 @@ public:
 	:	mViewport(0,0,0,0),
 		mParentTransform(0),
 		mAnchorX(0), mAnchorY(0), mStretchX(1), mStretchY(1),
-		mCamera(0)
+		mCamera(0), mClearColor(0)
 	{}
 
 	float anchorX() const { return mAnchorX; }
 	float anchorY() const { return mAnchorY; }
 	float stretchX() const { return mStretchX; }
 	float stretchY() const { return mStretchY; }
-
-	bool hasCamera() const { return 0 != mCamera; }
-
-	const Camera& camera() const { return *mCamera; }
-
-	const Pose* parentTransform() const { return mParentTransform; }
-
-
-	const Pose& transform() const { return mTransform; }
-	Pose& transform(){ return mTransform; }
-	
-	Pose worldTransform() const { return mParentTransform ? (*mParentTransform) * transform() : transform(); }
-	
-	const Viewport& viewport() const { return mViewport; }
-	Viewport& viewport(){ return mViewport; }
 
 	Viewpoint& anchor(float ax, float ay){
 		mAnchorX=ax; mAnchorY=ay; return *this;
@@ -53,9 +38,25 @@ public:
 		mStretchX=sx; mStretchY=sy; return *this;
 	}
 
-	Viewpoint& camera(Camera& v){ mCamera=&v; return *this; }
+	bool hasCamera() const { return 0 != mCamera; }
+	bool hasClearColor() const { return 0 != mClearColor; }
 
+	const Camera& camera() const { return *mCamera; }
+	Viewpoint& camera(Camera& v){ mCamera=&v; return *this; }
+	
+	const Color& clearColor() const { return *mClearColor; }
+	Viewpoint& clearColor(Color& v){ mClearColor=&v; return *this; }
+
+	const Pose* parentTransform() const { return mParentTransform; }
 	Viewpoint& parentTransform(Pose& v){ mParentTransform = &v; return *this; }
+
+	const Pose& transform() const { return mTransform; }
+	Pose& transform(){ return mTransform; }
+	
+	Pose worldTransform() const { return mParentTransform ? (*mParentTransform) * transform() : transform(); }
+	
+	const Viewport& viewport() const { return mViewport; }
+	Viewport& viewport(){ return mViewport; }
 
 protected:
 	Viewport mViewport;				// screen display region
@@ -64,6 +65,7 @@ protected:
 	float mAnchorX, mAnchorY;		// viewport anchor factors relative to parent window
 	float mStretchX, mStretchY;		// viewport stretch factors relative to parent window
 	Camera * mCamera;				// camera; if not set, will be set to scene's default camera
+	Color * mClearColor;
 };
 
 
@@ -195,6 +197,9 @@ public:
 
 	const Camera&		camera() const { return mCamera; }
 	Camera&				camera(){ return mCamera; }
+
+	const Graphics&		graphics() const { return mGraphics; }
+	Graphics&			graphics(){ return mGraphics; }
 
 	const std::string&	name() const { return mName; }
 	World&				name(const std::string& v){ mName=v; return *this; }
@@ -332,8 +337,19 @@ protected:
 //				w.mStereo.draw(g, cam, vpWorld.transform(), vpWorld.viewport(), drawFunc);
 				//vpWorld.transform().pos() -= Vec3d(w.nav().uf()*4);
 
+				Color defaultClearColor = w.mStereo.clearColor();
+				if(!vp.hasClearColor()){
+					vp.clearColor(const_cast<Color&>(w.mStereo.clearColor()));
+				}
+				else{
+					w.mStereo.clearColor(vp.clearColor());
+				}
+
 				DrawAllActors drawFunc(w.mActors, w, vp);
 				w.mStereo.draw(g, cam, vp.worldTransform(), vp.viewport(), drawFunc);
+				
+				w.mStereo.clearColor(defaultClearColor);
+				
 				++iv;
 			}
 
