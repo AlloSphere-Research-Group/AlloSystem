@@ -417,6 +417,7 @@
 		16198FF31173E39B006FBADF /* al_Buffer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Buffer.hpp; sourceTree = "<group>"; };
 		1619909B11743914006FBADF /* al_Color.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Color.hpp; sourceTree = "<group>"; };
 		1619909C11743990006FBADF /* al_Color.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Color.cpp; sourceTree = "<group>"; };
+		162B49B313C522A000254153 /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera.cpp; sourceTree = "<group>"; };
 		163E492A130E0254007B30A0 /* liballocore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = liballocore.a; sourceTree = "<group>"; };
 		163E492B130E0254007B30A0 /* libapr-1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libapr-1.a"; sourceTree = "<group>"; };
 		163E492C130E0254007B30A0 /* libassimp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libassimp.a; sourceTree = "<group>"; };
@@ -3470,6 +3471,7 @@
 		05C93875128A16060068F87F /* graphics */ = {
 			isa = PBXGroup;
 			children = (
+				162B49B313C522A000254153 /* camera.cpp */,
 				16A6041B130345BB0077B460 /* frustumTesting.cpp */,
 				16A6041C130345BB0077B460 /* isosurface.cpp */,
 				16A6041E130345BB0077B460 /* manyShapeMesh.cpp */,
