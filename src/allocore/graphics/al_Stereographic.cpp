@@ -25,9 +25,9 @@ void Stereographic :: drawMono(Graphics& gl, const Camera& cam, const Pose& pose
 	double far = cam.far();
 	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
+	Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
 	mProjection = Matrix4d::perspective(fovy, aspect, near, far);
-	mModelView = Matrix4d::lookAt(ur, uu, uf, pos);
+	mModelView = Matrix4d::lookAt(ux, uy, uz, pos);
 
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 	gl.clearColor(mClearColor);
@@ -62,7 +62,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 	double iod = cam.eyeSep();
 	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
+	Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
 
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 	gl.clearColor(mClearColor);
@@ -87,7 +87,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 	
 	// apply camera transform:
 	mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
-	mModelView = Matrix4d::lookAtRight(ur, uu, uf, pos, iod);
+	mModelView = Matrix4d::lookAtRight(ux, uy, uz, pos, iod);
 	gl.pushMatrix(gl.PROJECTION);
 	gl.loadMatrix(mProjection);
 	gl.pushMatrix(gl.MODELVIEW);
@@ -112,7 +112,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 	
 	// apply camera transform:
 	mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
-	mModelView = Matrix4d::lookAtLeft(ur, uu, uf, pos, iod);
+	mModelView = Matrix4d::lookAtLeft(ux, uy, uz, pos, iod);
 	gl.pushMatrix(gl.PROJECTION);
 	gl.loadMatrix(mProjection);
 	gl.pushMatrix(gl.MODELVIEW);
@@ -136,7 +136,7 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 	double iod = cam.eyeSep();
 	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
+	Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
 
 	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 
@@ -152,7 +152,7 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 
 	// apply camera transform:
 	mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
-	mModelView = Matrix4d::lookAtRight(ur, uu, uf, pos, iod);
+	mModelView = Matrix4d::lookAtRight(ux, uy, uz, pos, iod);
 	gl.pushMatrix(gl.PROJECTION);
 	gl.loadMatrix(mProjection);
 	gl.pushMatrix(gl.MODELVIEW);
@@ -168,7 +168,7 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 	
 	// apply camera transform:
 	mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
-	mModelView = Matrix4d::lookAtLeft(ur, uu, uf, pos, iod);
+	mModelView = Matrix4d::lookAtLeft(ux, uy, uz, pos, iod);
 	gl.pushMatrix(gl.PROJECTION);
 	gl.loadMatrix(mProjection);
 	gl.pushMatrix(gl.MODELVIEW);
@@ -192,7 +192,7 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 	double iod = cam.eyeSep();
 	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
+	Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
 	
 	aspect *= 0.5;	// for split view
 	
@@ -209,7 +209,7 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 	
 	// apply camera transform:
 	mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
-	mModelView = Matrix4d::lookAtLeft(ur, uu, uf, pos, iod);
+	mModelView = Matrix4d::lookAtLeft(ux, uy, uz, pos, iod);
 	gl.pushMatrix(gl.PROJECTION);
 	gl.loadMatrix(mProjection);
 	gl.pushMatrix(gl.MODELVIEW);
@@ -226,7 +226,7 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 	
 	// apply camera transform:
 	mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
-	mModelView = Matrix4d::lookAtRight(ur, uu, uf, pos, iod);
+	mModelView = Matrix4d::lookAtRight(ux, uy, uz, pos, iod);
 	gl.pushMatrix(gl.PROJECTION);
 	gl.loadMatrix(mProjection);
 	gl.pushMatrix(gl.MODELVIEW);
@@ -251,7 +251,7 @@ void Stereographic :: drawLeft(Graphics& gl, const Camera& cam, const Pose& pose
 	double iod = cam.eyeSep();
 	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
+	Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
 	
 	//pushAttrib(ColorBufferBit | DepthBufferBit | EnableBit | ViewPortBit);
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
@@ -266,7 +266,7 @@ void Stereographic :: drawLeft(Graphics& gl, const Camera& cam, const Pose& pose
 	
 	// apply camera transform:
 	mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
-	mModelView = Matrix4d::lookAtLeft(ur, uu, uf, pos, iod);
+	mModelView = Matrix4d::lookAtLeft(ux, uy, uz, pos, iod);
 	gl.pushMatrix(gl.PROJECTION);
 	gl.loadMatrix(mProjection);
 	gl.pushMatrix(gl.MODELVIEW);
@@ -290,7 +290,7 @@ void Stereographic :: drawRight(Graphics& gl, const Camera& cam, const Pose& pos
 	double iod = cam.eyeSep();
 	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	Vec3d ur, uu, uf; pose.unitVectors(ur, uu, uf);
+	Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
 
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 	gl.clearColor(mClearColor);
@@ -304,7 +304,7 @@ void Stereographic :: drawRight(Graphics& gl, const Camera& cam, const Pose& pos
 	
 	// apply camera transform:
 	mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
-	mModelView = Matrix4d::lookAtRight(ur, uu, uf, pos, iod);
+	mModelView = Matrix4d::lookAtRight(ux, uy, uz, pos, iod);
 	gl.pushMatrix(gl.PROJECTION);
 	gl.loadMatrix(mProjection);
 	gl.pushMatrix(gl.MODELVIEW);
