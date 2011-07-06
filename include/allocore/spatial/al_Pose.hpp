@@ -341,7 +341,7 @@ protected:
 	Vec3d mSpin0, mSpin1;	// angular velocities (raw, smoothed)
 	Vec3d mTurn;
 	Vec3d mNudge;			//  
-	Vec3d mUR, mUU, mUF;	// basis vectors of coordinate frame
+	Vec3d mUR, mUU, mUF;	// basis vectors of local coordinate frame
 	double mSmooth;
 	double mVelScale;		// velocity scaling factor
 };
