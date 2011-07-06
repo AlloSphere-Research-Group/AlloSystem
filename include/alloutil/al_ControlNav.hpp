@@ -106,8 +106,8 @@ struct NavInputControlCosm : public NavInputControl {
 		
 		switch(k.key()){
 			case '`':			nav().halt().home(); return false;
-			case 'w':			nav().spinR(-a); return false;
-			case 'x':			nav().spinR( a); return false;
+			case 'w':			nav().spinR( a); return false;
+			case 'x':			nav().spinR(-a); return false;
 //			case Key::Right:	nav().spinU( a); return false;
 //			case Key::Left:		nav().spinU(-a); return false;
 			case Key::Right:	nav().spinU( -a); return false;

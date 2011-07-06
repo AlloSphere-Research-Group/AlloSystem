@@ -191,25 +191,24 @@ public:
 
 	/// Get local x unit vector (1,0,0) in absolute coordinates
 	void toVectorX(T& ax, T& ay, T& az) const;
+	void toVectorX(Vec<3,T>& v) const { toVectorX(v[0],v[1],v[2]); }
+	Vec<3,T> toVectorX() const { Vec<3,T> v; toVectorX(v); return v; }
 
 	/// Get local y unit vector (0,1,0) in absolute coordinates
 	void toVectorY(T& ax, T& ay, T& az) const;
+	void toVectorY(Vec<3,T>& v) const { toVectorY(v[0],v[1],v[2]); }
+	Vec<3,T> toVectorY() const { Vec<3,T> v; toVectorY(v); return v; }
 
 	/// Get local z unit vector (0,0,1) in absolute coordinates
 	void toVectorZ(T& ax, T& ay, T& az) const;
-
-	/// Get local x unit vector (1,0,0) in absolute coordinates
-	void toVectorX(Vec<3,T>& v) const { toVectorX(v[0],v[1],v[2]); }
-	
-	/// Get local y unit vector (0,1,0) in absolute coordinates
-	void toVectorY(Vec<3,T>& v) const { toVectorY(v[0],v[1],v[2]); }
-	
-	/// Get local z unit vector (0,0,1) in absolute coordinates
 	void toVectorZ(Vec<3,T>& v) const { toVectorZ(v[0],v[1],v[2]); }
+	Vec<3,T> toVectorZ() const { Vec<3,T> v; toVectorZ(v); return v; }
 
 	/// Rotate vector
 	/// NOTE: quaternion should be normalized for accurate results.
 	Vec<3,T> rotateVector(const Vec<3,T>& v) const;
+	Vec<3,T> rotate(const Vec<3,T>& v) const { return rotateVector(v); }
+	
 	/// This is rotation by the quaternion's conjugate
 	Vec<3,T> rotateVectorTransposed(const Vec<3,T>& v) const;
 
