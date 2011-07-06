@@ -93,8 +93,17 @@ public:
 	/// Get up unit vector
 	Vec3d uu() const { Vec3d r; quat().toVectorY(r); return r; }
 
-	/// Get forward unit vector
+	/// Get forward unit vector (negative of Z)
 	Vec3d uf() const { Vec3d r; quat().toVectorZ(r); return -r; }
+	
+	/// Get X unit vector
+	Vec3d ux() const { Vec3d r; quat().toVectorX(r); return r; }
+
+	/// Get Y unit vector
+	Vec3d uy() const { Vec3d r; quat().toVectorY(r); return r; }
+
+	/// Get Z unit vector
+	Vec3d uz() const { Vec3d r; quat().toVectorZ(r); return r; }
 
 
 	// Setters
