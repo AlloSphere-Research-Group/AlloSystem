@@ -7,7 +7,7 @@ using namespace al;
 GraphicsGL gl;
 Light light;
 Camera cam;
-Nav nav(Vec3d(0,0,-5));
+Nav nav(Vec3d(0,0,5));
 Stereographic stereo;
 
 const int N = 32;

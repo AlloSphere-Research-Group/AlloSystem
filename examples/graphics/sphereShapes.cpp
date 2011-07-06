@@ -55,14 +55,14 @@ struct MyWindow : public Window, public Drawable {
 		if(wireframe)	gl.polygonMode(gl.LINE);
 		else			gl.polygonMode(gl.FILL);
 
-		stereo.draw(gl, cam, Pose(Vec3d(0,0,-2.8)), Viewport(width(), height()), *this);
+		stereo.draw(gl, cam, Pose(Vec3d(0,0,2.8)), Viewport(width(), height()), *this);
 
 		return true;
 	}
     
 	virtual void onDraw(Graphics& gl){
 		gl.enable(gl.COLOR_MATERIAL);
-		light.pos(4,4,-1)();
+		light.pos(4,4,1)();
 		gl.draw(shapes);
 	}
 	

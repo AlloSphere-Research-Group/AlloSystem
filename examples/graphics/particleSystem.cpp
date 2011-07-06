@@ -90,7 +90,7 @@ struct MyWindow : Window{
 		gl.loadMatrix(Matrix4d::perspective(45, aspect(), 0.1, 100));
 
 		gl.matrixMode(gl.MODELVIEW);
-		gl.loadMatrix(Matrix4d::lookAt(Vec3d(0,0,-10), Vec3d(0,0,0), Vec3d(0,1,0)));
+		gl.loadMatrix(Matrix4d::lookAt(Vec3d(0,0,10), Vec3d(0,0,0), Vec3d(0,1,0)));
 
 		gl.depthTesting(0);
 		gl.blending(true, gl.SRC_ALPHA, gl.ONE);
