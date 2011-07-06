@@ -66,10 +66,16 @@ public:
 	/// Get right, up, and forward unit vectors
 	/// quat() should have been normalized before this call
 	template <class T>
-	void unitVectors(Vec<3,T>& ur, Vec<3,T>& uu, Vec<3,T>& uf) const {	
-		quat().toVectorX(ur);
-		quat().toVectorY(uu);
-		quat().toVectorZ(uf);	
+	void unitVectors(Vec<3,T>& ux, Vec<3,T>& uy, Vec<3,T>& uz) const {	
+		quat().toVectorX(ux);
+		quat().toVectorY(uy);
+		quat().toVectorZ(uz);	
+	}
+
+	template <class T>
+	void directionVectors(Vec<3,T>& ur, Vec<3,T>& uu, Vec<3,T>& uf) const {
+		unitVectors(ur, uu, uf);
+		uf = -uf;
 	}
 	
 	/// Get a linear-interpolated Pose between this and another
@@ -185,7 +191,7 @@ public:
 
 	Nav(const Vec3d &position = Vec3d(0), double smooth=0)
 	:	Pose(position), mSmooth(smooth), mVelScale(1)
-	{	updateUnitVectors(); }
+	{	updateDirectionVectors(); }
 
 	/// Get smoothing amount
 	double smooth() const { return mSmooth; }
@@ -214,7 +220,7 @@ public:
 	}
 	void view(const Quatd& v) {
 		quat(v);
-		updateUnitVectors();
+		updateDirectionVectors();
 	}
 	
 	void turn(const Quatd& v) {
@@ -282,7 +288,7 @@ public:
 		mSpin1.set(0); 
 		mTurn.set(0);
 		mNudge.set(0);
-		updateUnitVectors();
+		updateDirectionVectors();
 		return *this; 
 	}
 
@@ -293,14 +299,14 @@ public:
 		turn(0, 0, 0); 
 		spin(0, 0, 0);
 		vec().set(0);
-		updateUnitVectors();
+		updateDirectionVectors();
 		return *this;
 	}
 
 	/// Update coordinate frame basis vectors based on internal quaternion
-	void updateUnitVectors(){ 
+	void updateDirectionVectors(){ 
 		quat().normalize();
-		unitVectors(mUR, mUU, mUF); 
+		directionVectors(mUR, mUU, mUF); 
 	}
 	
 	void set(const Nav& v){
@@ -328,7 +334,7 @@ public:
 		mNudge.set(0);
 
 		mQuat *= vel().quat();
-		updateUnitVectors();
+		updateDirectionVectors();
 
 		// accumulate position:
 		for(int i=0; i<pos().size(); ++i){
