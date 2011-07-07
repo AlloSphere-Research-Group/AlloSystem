@@ -290,7 +290,7 @@ int utMath(){
 		assert(eq(&q[0], &Quatd(sqrt(2)/2, sqrt(2)/2,0,0)[0], 4));
 		{
 			Vec3d v(0,0,1);
-			v = q.rotateVector(v);
+			v = q.rotate(v);
 			assert(eq(&v[0], &Vec3d(0,-1,0)[0], 3));
 		}
 
@@ -298,7 +298,7 @@ int utMath(){
 		assert(eq(&q[0], &Quatd(sqrt(2)/2, 0,sqrt(2)/2,0)[0], 4));
 		{
 			Vec3d v(0,0,1);
-			v = q.rotateVector(v);			
+			v = q.rotate(v);			
 			//printf("%g %g %g\n", v[0], v[1], v[2]);
 			assert(eq(&v[0], &Vec3d(1,0,0)[0], 3));
 		}
@@ -306,7 +306,7 @@ int utMath(){
 		q.fromAxisAngle(90, 0,0,1);
 		{
 			Vec3d v(1,0,0);
-			v = q.rotateVector(v);			
+			v = q.rotate(v);			
 			//printf("%g %g %g\n", v[0], v[1], v[2]);
 			assert(eq(&v[0], &Vec3d(0,1,0)[0], 3));
 		}

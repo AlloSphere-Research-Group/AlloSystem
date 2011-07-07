@@ -65,7 +65,7 @@ public:
 	Quat operator / (const Quat& v) const { return Quat(*this)/=v; }
 	Quat operator / (const    T& v) const { return Quat(*this)/=v; }
 	Quat operator * (const Quat& v) const { return Quat(*this)*=v; }
-	Vec<3,T> operator * (const Vec<3,T>& v) const { return rotateVectorTransposed(v); }
+	//Vec<3,T> operator * (const Vec<3,T>& v) const { return rotateVectorTransposed(v); }
 	Quat operator * (const    T& v) const { return Quat(*this)*=v; }
 
 	template <class U>
@@ -206,11 +206,10 @@ public:
 
 	/// Rotate vector
 	/// NOTE: quaternion should be normalized for accurate results.
-	Vec<3,T> rotateVector(const Vec<3,T>& v) const;
-	Vec<3,T> rotate(const Vec<3,T>& v) const { return rotateVector(v); }
+	Vec<3,T> rotate(const Vec<3,T>& v) const;
 	
 	/// This is rotation by the quaternion's conjugate
-	Vec<3,T> rotateVectorTransposed(const Vec<3,T>& v) const;
+	Vec<3,T> rotateTransposed(const Vec<3,T>& v) const;
 
 	/// Spherical interpolation
 	Quat slerp(const Quat& target, T amt) const { return slerp(*this, target, amt); }
@@ -567,7 +566,7 @@ inline void Quat<T> :: toVectorZ(T& ax, T& ay, T& az) const {
 	Where v is a 'pure quaternion' derived from the vector, i.e. w = 0. 	
 */
 template<typename T>
-inline Vec<3,T> Quat<T> :: rotateVector(const Vec<3,T>& v) const {
+inline Vec<3,T> Quat<T> :: rotate(const Vec<3,T>& v) const {
 	// dst = (q * v * q^-1)
 	// simplified p = (q * v):
 	Quat p(
@@ -581,10 +580,10 @@ inline Vec<3,T> Quat<T> :: rotateVector(const Vec<3,T>& v) const {
 }
 
 template<typename T>
-inline Vec<3,T> Quat<T> :: rotateVectorTransposed(const Vec<3,T>& v) const {
+inline Vec<3,T> Quat<T> :: rotateTransposed(const Vec<3,T>& v) const {
 	Quat qi(*this);
 	qi.conj();
-	return qi.conj().rotateVector(v);
+	return qi.conj().rotate(v);
 }
 
 template<typename T>

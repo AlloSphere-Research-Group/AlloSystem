@@ -391,7 +391,7 @@ public:
 //						double rf = urel.dot(axis);
 						
 						// cheaper:
-						Vec3d direction = l.mQuatHistory[i].rotateVectorTransposed(urel);
+						Vec3d direction = l.mQuatHistory[i].rotateTransposed(urel);
 
 						//mEncoder.direction(azimuth, elevation);
 						//mEncoder.direction(-rf, -rr, ru);
