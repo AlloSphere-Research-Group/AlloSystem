@@ -75,27 +75,17 @@ public:
 	Vec<3,T> center() const { return (ntl+ntr+nbl+nbr+ftl+ftr+fbl+fbr)*0.125; }
 
 	/// Compute planes based on frustum corners (planes face to inside)
-	void computePlanesLH();
-
-	/// Compute planes based on frustum corners (planes face to inside)
-	void computePlanesRH();		
+	
+	///	The plane normals are computed assuming a right-hand coordinate system.
+	///
+	void computePlanes();		
 };
 
 
 
 
 template <class T>
-void Frustum<T>::computePlanesLH(){
-	pl[TOP   ].from3Points(ftl,ntl,ntr);
-	pl[BOTTOM].from3Points(fbr,nbr,nbl);
-	pl[LEFT  ].from3Points(fbl,nbl,ntl);
-	pl[RIGHT ].from3Points(fbr,ntr,nbr);
-	pl[NEARP ].from3Points(nbr,ntr,ntl);
-	pl[FARP  ].from3Points(fbl,ftl,ftr);
-}
-
-template <class T>
-void Frustum<T>::computePlanesRH(){
+void Frustum<T>::computePlanes(){
 	pl[TOP   ].from3Points(ntr,ntl,ftl);
 	pl[BOTTOM].from3Points(nbl,nbr,fbr);
 	pl[LEFT  ].from3Points(ntl,nbl,fbl);

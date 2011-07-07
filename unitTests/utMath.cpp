@@ -746,7 +746,7 @@ int utMath(){
 		f.nbr = Vec3d( 1,-1, 1);
 		f.ntl = Vec3d(-1, 1, 1);
 		f.ntr = Vec3d( 1, 1, 1);
-		f.computePlanesRH();
+		f.computePlanes();
 
 //		Plane<double>& p = f.pl[Frustumd::LEFT];
 //		printf("%g %g %g\n", p.normal()[0], p.normal()[1], p.normal()[2]);

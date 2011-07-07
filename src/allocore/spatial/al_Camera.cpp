@@ -34,7 +34,7 @@ Camera& Camera::fovx(double v, double aspect) {
 void Camera::frustum(Frustumd& f, const Pose& p, double aspect, bool isStereo) const {
 
 	Vec3d ur, uu, uf;
-	p.unitVectors(ur, uu, uf);
+	p.directionVectors(ur, uu, uf);
 	const Vec3d& pos = p.pos();
 
 	double nh = heightAtDepth(near());
@@ -64,7 +64,7 @@ void Camera::frustum(Frustumd& f, const Pose& p, double aspect, bool isStereo) c
 	f.fbl = fc - uu * fh - ur * fw;
 	f.fbr = fc - uu * fh + ur * fw;
 
-	f.computePlanesLH();
+	f.computePlanes();
 }
 
 //double Camera::height(double distance) {
