@@ -3,14 +3,6 @@
 
 namespace al{
 
-// File Name: Isosurface.cpp
-// Last Modified: 5/8/2000
-// Author: Raghavendra Chandrashekara (based on source code provided
-// by Paul Bourke and Cory Gene Bloyd)
-// Email: rc99@doc.ic.ac.uk, rchandrashekara@hotmail.com
-//
-// Description: This is the implementation file for the Isosurface class.
-
 /*
 	 6 --------  7 
 	 /|       /|
@@ -31,6 +23,13 @@ namespace al{
 
 // This table maps an 8-bit mask of the box vertices inside the isosurface
 // to a 12-bit mask of edges intersected by the surface.
+
+// For any edge, if one vertex is inside of the surface and the other is outside of the surface
+//  then the edge intersects the surface
+// For each of the 8 vertices of the cube can be two possible states : either inside or outside of the surface
+// For any cube the are 2^8=256 possible sets of vertex states
+// This table lists the edges intersected by the surface for all 256 possible vertex states
+// There are 12 edges.  For each entry in the table, if edge #n is intersected, then bit #n is set to 1
 static const short sEdgeTable[256] = {
 0x0  ,0x109,0x203,0x30a,0x406,0x50f,0x605,0x70c,0x80c,0x905,0xa0f,0xb06,0xc0a,0xd03,0xe09,0xf00,
 0x190,0x99 ,0x393,0x29a,0x596,0x49f,0x795,0x69c,0x99c,0x895,0xb9f,0xa96,0xd9a,0xc93,0xf99,0xe90,
@@ -53,7 +52,7 @@ static const short sEdgeTable[256] = {
 // The first index is an 8-bit mask of box vertices inside isosurface.
 // The second index is an array of triangle indices making up the isosurface 
 // according to the first index. The first element of the array is its size and
-// the following elements are the triangle indices.
+// the following elements are the indices of the triangle in term of edge ID.
 static const char sTriTable[256][16] = {
 { 0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 { 3,0,8,3,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
@@ -329,7 +328,8 @@ static const char sTriTable[256][16] = {
 Isosurface::NoVertexAction Isosurface::noVertexAction;
 
 Isosurface::Isosurface(float lev, VertexAction& va)
-:	mIsolevel(lev), mVertexAction(&va), mComputeNormals(true), mNormalize(true)
+:	mIsolevel(lev), mVertexAction(&va),
+	mComputeNormals(true), mNormalize(true), mInBox(false)
 {
 	clear();
 }
@@ -423,27 +423,45 @@ void Isosurface::addEdgeVertex(int ix, int iy, int iz, int cellID, int edgeNo, c
 
 	int eIdx = edgeID(cellID, edgeNo);
 
-	EdgeToVertex::iterator it = mEdgeToVertex.find(eIdx);
-	
-	// If this edge vertex has not been computed yet, then compute it
-	if(mEdgeToVertex.end() == it){
-		EdgeVertex ev = calcIntersection(ix,iy,iz, edgeNo, vals);
+	if(inBox()){
+		if(mEdgeToVertexArray[eIdx] < 0){
+			EdgeVertex ev = calcIntersection(ix,iy,iz, edgeNo, vals);
 
-		ev.pos[0] = ix;
-		ev.pos[1] = iy;
-		ev.pos[2] = iz;
-//		ev.idx = cellID/3;
+			ev.pos[0] = ix;
+			ev.pos[1] = iy;
+			ev.pos[2] = iz;
 
-		int vIdx = Mesh::vertices().size();
-		mEdgeToVertex[eIdx] = vIdx;
+			int vIdx = Mesh::vertices().size();
+			mEdgeToVertexArray[eIdx] = vIdx;
 
-		Mesh::vertex(ev.x, ev.y, ev.z);
+			Mesh::vertex(ev.x, ev.y, ev.z);
 
-		(*mVertexAction)(ev, *this);
+			(*mVertexAction)(ev, *this);
+		}
+	}
+	else{	
+		EdgeToVertex::iterator it = mEdgeToVertex.find(eIdx);
+		
+		// If this edge vertex has not been computed yet, then compute it
+		if(mEdgeToVertex.end() == it){
+			EdgeVertex ev = calcIntersection(ix,iy,iz, edgeNo, vals);
 
-//		if(cols) Mesh::color(cols[ev.i0] + ev.mu * (cols[ev.i1] - cols[ev.i0]));
+			ev.pos[0] = ix;
+			ev.pos[1] = iy;
+			ev.pos[2] = iz;
+	//		ev.idx = cellID/3;
 
-//		if(1) Mesh::color(HSV((vIdx % 100)/100., 1,1));
+			int vIdx = Mesh::vertices().size();
+			mEdgeToVertex[eIdx] = vIdx;
+
+			Mesh::vertex(ev.x, ev.y, ev.z);
+
+			(*mVertexAction)(ev, *this);
+
+	//		if(cols) Mesh::color(cols[ev.i0] + ev.mu * (cols[ev.i1] - cols[ev.i0]));
+
+	//		if(1) Mesh::color(HSV((vIdx % 100)/100., 1,1));
+		}
 	}
 };
 
@@ -514,83 +532,18 @@ void Isosurface::end(){
 }
 
 
-bool Isosurface::volumeLengths(double& volLengthX, double& volLengthY, double& volLengthZ) const {
-	if(validSurface()){
-		volLengthX = mL[0]*(mNF[0]-1);
-		volLengthY = mL[1]*(mNF[1]-1);
-		volLengthZ = mL[2]*(mNF[2]-1);
-		return true;
-	}
-	return false;
-}
-
-
 // Compress vertices and triangles so that they can be accessed more efficiently
 void Isosurface::compressTriangles(){
 
 	// Convert edge indices into vertex buffer indices
 
-	// This copies the vertex buffer indices in the map into an array, then 
-	// does lookups into the array.
-	// For this to work efficiently, we must find the bounding box of the cubes
-	// and then translate the minimum corner to the origin.
-
-	// Hold on... if we are going to do this, why not just use an array from the
-	// start? 
-	// For 64x64x64, this means an array of 786,432 edge indices ~= 3 MB.
-	// For 32x32x32, this means an array of  98,304 edge indices ~= 393 kB.
-	if(0){
-		if(mEdgeToVertex.size() == 0) return;
-
-		// get the min/max corners of bounding box
-		int pmin[3] = {mNF[0], mNF[1], mNF[2]};
-		int pmax[3] = {0,0,0};
-
-		EdgeToVertex::iterator it = mEdgeToVertex.begin();
-		for(; it != mEdgeToVertex.end(); ++it){
-			unsigned ei = it->first;
-			unsigned vi = ei / 3;
-			int p[3] = { vi % mNF[0], (vi / mNF[0]) % mNF[1], (vi / (mNF[0]*mNF[1])) % mNF[2] };
-//s			int p[3] = { vi & 31, (vi>>5) & 31, (vi>>10) & 31 };
-			
-			for(int i=0; i<3; ++i){
-				if(p[i] < pmin[i]) pmin[i] = p[i];
-				else if(p[i] > pmax[i]) pmax[i] = p[i];
-			}
-		}
-		
-		int pdia[3] = {pmax[0]-pmin[0], pmax[1]-pmin[1], pmax[2]-pmin[2]};
-
-//		printf("edges=%d, vertices=%d\n", mEdgeToVertex.size(), indices().size());
-//		printf("min, max edges: %d, %d (dia = %d)\n", eimin, eimax, eimax-eimin);
-
-		mTempEdges.size(3 * (pdia[0]+1) * (pdia[1]+1) * (pdia[2]+1));
-		
-		// amount to subtract from edge index to range reduce
-		int isub = cellID(pmin[0], pmin[1], pmin[2]);
-		
-//		printf("min: %2d %2d %2d\n", pmin[0], pmin[1], pmin[2]);
-//		printf("max: %2d %2d %2d\n", pmax[0], pmax[1], pmax[2]);
-//		printf("dia: %2d %2d %2d\n", pdia[0], pdia[1], pdia[2]);
-//		printf("sub: %d\n", isub);
-//		printf("tmp: %d edges\n", mTempEdges.size());
-
-		// Copy edge-to-vertex map to the range reduced temp buffer
-		{
-			EdgeToVertex::iterator it = mEdgeToVertex.begin();
-			for(; it != mEdgeToVertex.end(); ++it){
-				int ei = it->first;
-				int vi = it->second;
-				mTempEdges[ei - isub] = vi;
-			}
-		}
-
-		// Convert edge indices to vertex indices
+	if(inBox()){
 		for(int i=0; i<indices().size(); ++i){
 			int ei = indices()[i];
-			indices()[i] = mTempEdges[ei - isub];
+			int vi = mEdgeToVertexArray[ei];
+			indices()[i] = vi;
 		}
-
+		mEdgeToVertexArray.assign(mEdgeToVertexArray.size(), -1);
 	}
 
 	// Lookup vertex buffer indices in map
@@ -613,6 +566,12 @@ void Isosurface::compressTriangles(){
 Isosurface& Isosurface::cellLengths(double dx, double dy, double dz){
 	mL[0]=dx; mL[1]=dy; mL[2]=dz;
 	return *this;
+}
+
+
+void Isosurface::clear(){
+	mL[0] = mL[1] = mL[2] = mNF[0] = mNF[1] = mNF[2] = 0;
+	mValidSurface = false;
 }
 
 
@@ -647,9 +606,27 @@ Isosurface& Isosurface::fieldDims(int nx, int ny, int nz){
 }
 
 
-void Isosurface::clear(){
-	mL[0] = mL[1] = mL[2] = mNF[0] = mNF[1] = mNF[2] = 0;
-	mValidSurface = false;
+Isosurface& Isosurface::inBox(bool v){
+	mInBox=v;
+	if(inBox()){
+		unsigned numEdges = 3 * (mNF[0]+1) * (mNF[1]+1) * (mNF[2]+1);
+		if(numEdges != mEdgeToVertexArray.size()){
+			mEdgeToVertexArray.resize(numEdges);
+			mEdgeToVertexArray.assign(numEdges, -1);
+		}
+	}
+	return *this;
+}
+
+
+bool Isosurface::volumeLengths(double& volLengthX, double& volLengthY, double& volLengthZ) const {
+	if(validSurface()){
+		volLengthX = mL[0]*(mNF[0]-1);
+		volLengthY = mL[1]*(mNF[1]-1);
+		volLengthZ = mL[2]*(mNF[2]-1);
+		return true;
+	}
+	return false;
 }
 
 
@@ -679,7 +656,6 @@ int vertexID(int ix, int iy, int iz) const{ return 3*(ix + mNF[0] * (iy + mNF[1]
 
 TODO:
 - optimize for multiple isolevels
-- vertex coloring according to secondary scalar field
 
 Biggest hit is lookup into the edge-to-vertex map.
 

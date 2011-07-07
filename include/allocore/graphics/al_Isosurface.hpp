@@ -25,6 +25,29 @@
 	PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
 	HEREUNDER IS PROVIDED "AS IS". REGENTS HAS  NO OBLIGATION TO PROVIDE
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+
+	This file incorporates work covered by the following copyright(s) and  
+	permission notice(s):  
+
+		Author: Raghavendra Chandrashekara
+		Email: rc99@doc.ic.ac.uk, rchandrashekara@hotmail.com
+		Last Modified: 5/8/2000
+
+		This work incorporates work covered by the following copyright and  
+		permission notice:
+
+			Marching Cubes Example Program 
+			by Cory Bloyd (corysama@yahoo.com)
+			
+			A simple, portable and complete implementation of the Marching Cubes
+			and Marching Tetrahedrons algorithms in a single source file.
+			There are many ways that this code could be made faster, but the 
+			intent is for the code to be easy to understand.
+			
+			For a description of the algorithm go to
+			http://astronomy.swin.edu.au/pbourke/modelling/polygonise/
+			
+			This code is public domain.
 */
 
 #include <map>
@@ -182,6 +205,16 @@ public:
 
 	void vertexAction(VertexAction& a){ mVertexAction = &a; }
 
+	const bool inBox() const { return mInBox; }
+
+	/// Set whether isosurface is assumed to fit snugly within a box
+
+	/// Setting this to true will speed up extraction when the isosurface
+	/// is mostly dense and box shaped, i.e., a rectangular cuboid. If the 
+	/// isosurface is to be computed on sparse or irregularly shaped grid, then
+	/// it is recommended to set this to false to save memory.
+	Isosurface& inBox(bool v);
+
 protected:
 
 	struct IsosurfaceHashInt{ 
@@ -197,7 +230,8 @@ protected:
 	EdgeToVertex mEdgeToVertex;					// map from edge ID to vertex
 	al::Buffer<EdgeTriangle> mEdgeTriangles;	// surface triangles in terms of edge IDs
 	
-	al::Buffer<int> mTempEdges;
+	std::vector<int> mEdgeToVertexArray;
+//	al::Buffer<int> mTempEdges;
 
 	double mL[3];				// cell length in x, y, and z directions
 	int mNF[3];					// number of field points in x, y, and z directions
@@ -207,7 +241,7 @@ protected:
 	bool mValidSurface;			// indicates whether a valid surface is present
 	bool mComputeNormals;		// whether to compute normals
 	bool mNormalize;			// whether to normalize normals
-
+	bool mInBox;
 	
 	EdgeVertex calcIntersection(int nX, int nY, int nZ, int nEdgeNo, const float * vals) const;
 	void addEdgeVertex(int x, int y, int z, int cellID, int edge, const float * vals);
@@ -223,13 +257,15 @@ protected:
 
 template <class T>
 void Isosurface::generate(const T * vals){
+	inBox(true);
 	begin();
 
 	int Nx = mNF[0];
 	int Nxy = Nx*mNF[1];
 
 	// iterate through cubes (not field points)
-	for(int z=0; z < mNF[2]-1; ++z){
+//	for(int z=0; z < mNF[2]-1; ++z){
+	for(int z=mNF[2]-2; z>=0; --z){	// support transparency (assumes higher indices are farther away)
 		int z0 = z   *Nxy;
 		int z1 =(z+1)*Nxy;
 	for(int y=0; y < mNF[1]-1; ++y){
