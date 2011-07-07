@@ -18,8 +18,8 @@ public:
 		
 		m.reset();
 		m.primitive(g.LINES);
-		m.vertex(-1,-1,11);
-		m.vertex( 1, 1,12);
+		m.vertex(-1,-1, -11);
+		m.vertex( 1, 1, -12);
 
 		for(int i=0; i<m.vertices().size(); ++i){
 			int r = fr.testPoint(m.vertices()[i]);
@@ -54,7 +54,6 @@ int main(){
 	World w;
 	w.name("Frustum Testing");
 	w.camera().near(10).far(25);
-	w.nav().quat().fromAxisAngle(0, 0,0,1);
 
 	ViewpointWindow win(0,0, 600,400, w.name());
 	Viewpoint vp;
