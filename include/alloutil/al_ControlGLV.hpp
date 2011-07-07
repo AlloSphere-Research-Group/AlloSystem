@@ -2,7 +2,7 @@
 #define INC_AL_CONTROL_GLV_HPP
 
 #include "allocore/io/al_Window.hpp"
-#include "GLV/glv_core.h"
+#include "glv_core.h"
 
 namespace al {
 
@@ -22,14 +22,14 @@ struct GLVInputControl : public GLVControl, public InputEventHandler {
 
 	GLVInputControl(glv::GLV * v): GLVControl(v){}
 	virtual ~GLVInputControl(){}
-	
+
 	virtual bool onMouseDown(const Mouse& m){
 		glv::space_t xrel=m.x(), yrel=m.y();
 		glv().setMouseDown(xrel,yrel, m.button(), 0);
 		glv().setMousePos(m.x(), m.y(), xrel, yrel);
 		return !glv().propagateEvent();
 	}
-	
+
 	virtual bool onMouseDrag(const Mouse& m){
 		return !motionToGLV(m, glv::Event::MouseDrag);
 	}
@@ -44,11 +44,11 @@ struct GLVInputControl : public GLVControl, public InputEventHandler {
 		glv().setMousePos(m.x(), m.y(), xrel, yrel);
 		return !glv().propagateEvent();
 	}
-	
+
 	virtual bool onKeyDown(const Keyboard& k){
 		return !keyToGLV(k, true);
 	}
-	
+
 	virtual bool onKeyUp(const al::Keyboard& k){
 		return !keyToGLV(k, false);
 	}
@@ -63,7 +63,7 @@ protected:
 		const_cast<glv::Keyboard*>(&glv().keyboard())->shift(k.shift());
 		return glv().propagateEvent();
 	}
-	
+
 	bool motionToGLV(const al::Mouse& m, glv::Event::t e){
 		glv::space_t x = m.x(), y = m.y(), relx = x, rely = y;
 		glv().setMouseMotion(relx, rely, e);
@@ -83,7 +83,7 @@ struct GLVWindowControl : public GLVControl, public WindowEventHandler {
 		glv().broadcastEvent(glv::Event::WindowCreate);
 		return true;
 	}
-	
+
 	virtual bool onDestroy(){
 		glv().broadcastEvent(glv::Event::WindowDestroy);
 		return true;
@@ -102,7 +102,7 @@ struct GLVWindowControl : public GLVControl, public WindowEventHandler {
 		glv().broadcastEvent(glv::Event::WindowResize);
 		return true;
 	}
-	
+
 	//virtual bool onVisibility(bool v){ return true; }
 };
 
