@@ -321,6 +321,9 @@ public:
 		return input+amt*(target-input);
 	}
 	
+	/// debug printing
+	void print(FILE * out=stdout);
+	
 };
 
 
@@ -862,6 +865,14 @@ static inline void print(const Mat<N,T>& m){
 
 
 // Implementation --------------------------------------------------------------
+
+template<int N, class T>
+inline void Vec<N,T>::print(FILE * out) {
+	fprintf(out, "Vec%i(%f", N,  (double)((*this)[0]));
+	for (int C=1; C<N; C++) 
+		fprintf(out, ", %f", (double)((*this)[C]));
+	fprintf(out, ")\n");
+}
 
 template <int N, class T>
 Vec<N,T>& Vec<N,T>::normalize(){

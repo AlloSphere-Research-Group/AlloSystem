@@ -255,6 +255,9 @@ public:
 	void flipY() { return set(T(0), T(0), T(1), T(0)); } 
 	void flipZ() { return set(T(0), T(0), T(0), T(1)); } 
 	
+	/// utility for debug printing:
+	void print(FILE * out = stdout) { fprintf(out, "Quat(%f, %f, %f, %f\n", w, x, y, z); }
+	
 protected:
 	static const double degToHalfRad(){ return 0.5*M_DEG2RAD; }
 	static const double halfRadToDeg(){ return 2.0*M_RAD2DEG; }
