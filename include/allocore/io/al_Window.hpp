@@ -117,7 +117,7 @@ public:
 
 	void print();				///< Print keyboard state to stdout.
 
-private:
+protected:
 	friend class WindowImpl;
 
 	int	mKeycode;		// last key event key number
@@ -152,7 +152,7 @@ public:
 	bool middle() const;			///< Get whether middle button is down
 	bool right() const;				///< Get whether right button is down
 	
-private:
+protected:
 	friend class WindowImpl;
 
 	int mX, mY;						// x,y positions
@@ -187,7 +187,7 @@ struct InputEventHandler{
 	Window& window(){ return *mWindow; }
 	const Window& window() const { return *mWindow; }
 
-private:
+protected:
 	friend class Window;
 	Window * mWindow;
 	InputEventHandler& window(Window * v){ mWindow=v; return *this; }
@@ -211,7 +211,7 @@ struct WindowEventHandler {
 	Window& window(){ return *mWindow; }
 	const Window& window() const { return *mWindow; }
 
-private:
+protected:
 	friend class Window;
 	Window * mWindow;
 	WindowEventHandler& window(Window * v){ mWindow=v; return *this; }
@@ -332,7 +332,7 @@ public:
 	static void startLoop();
 	static void stopLoop();
 
-private:
+protected:
 	typedef std::vector<InputEventHandler *> InputEventHandlers;
 	typedef std::vector<WindowEventHandler *> WindowEventHandlers;
 	friend class WindowImpl;
