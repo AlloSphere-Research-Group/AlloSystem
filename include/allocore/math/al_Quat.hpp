@@ -620,19 +620,12 @@ Quat<T> Quat<T> :: slerp(const Quat& input, const Quat& target, T amt){
 		a = sin(cos_angle*(1.-amt)) * inv_sine;
 		b = sin(cos_angle*amt) * inv_sine;
 
-		if (bflip) {
-			b = -b;
-		}
+		if (bflip) { b = -b; }
 	} else {
 		// nearly the same;
 		// approximate without trigonometry
 		a = amt;
 		b = 1.-amt;
-		
-		// TODO: is this required?
-		if (bflip) {
-			b = -b;
-		}
 	}
 
 	result.w = a*input.w + b*target.w;
