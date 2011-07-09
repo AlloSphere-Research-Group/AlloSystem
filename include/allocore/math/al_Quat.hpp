@@ -623,10 +623,16 @@ Quat<T> Quat<T> :: slerp(const Quat& input, const Quat& target, T amt){
 		if (bflip) {
 			b = -b;
 		}
-	}
-	else {
+	} else {
+		// nearly the same;
+		// approximate without trigonometry
 		a = amt;
 		b = 1.-amt;
+		
+		// TODO: is this required?
+		if (bflip) {
+			b = -b;
+		}
 	}
 
 	result.w = a*input.w + b*target.w;
