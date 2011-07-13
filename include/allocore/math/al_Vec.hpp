@@ -322,7 +322,7 @@ public:
 	}
 	
 	/// debug printing
-	void print(FILE * out=stdout);
+	void print(FILE * out=stdout) const;
 	
 };
 
@@ -855,7 +855,7 @@ bool invert(Mat<3,T>& m){
 
 /// Print
 template <int N, class T> 
-static inline void print(const Mat<N,T>& m){
+static inline void print(const Mat<N,T>& m) {
 	for(int R=0; R<N; ++R){
 		for(int C=0; C<N; ++C){
 			printf("% 6.3g ", double(m(R,C)));
@@ -867,7 +867,7 @@ static inline void print(const Mat<N,T>& m){
 // Implementation --------------------------------------------------------------
 
 template<int N, class T>
-inline void Vec<N,T>::print(FILE * out) {
+inline void Vec<N,T>::print(FILE * out) const {
 	fprintf(out, "Vec%i(%f", N,  (double)((*this)[0]));
 	for (int C=1; C<N; C++) 
 		fprintf(out, ", %f", (double)((*this)[C]));

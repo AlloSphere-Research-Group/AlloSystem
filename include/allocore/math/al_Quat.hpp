@@ -256,7 +256,7 @@ public:
 	void flipZ() { return set(T(0), T(0), T(0), T(1)); } 
 	
 	/// utility for debug printing:
-	void print(FILE * out = stdout) { fprintf(out, "Quat(%f, %f, %f, %f)\n", w, x, y, z); }
+	void print(FILE * out = stdout) const { fprintf(out, "Quat(%f, %f, %f, %f)\n", w, x, y, z); }
 	
 protected:
 	static const double degToHalfRad(){ return 0.5*M_DEG2RAD; }

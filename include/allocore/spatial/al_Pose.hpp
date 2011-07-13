@@ -201,6 +201,13 @@ public:
 	Nav(const Vec3d &position = Vec3d(0), double smooth=0)
 	:	Pose(position), mSmooth(smooth), mVelScale(1)
 	{	updateDirectionVectors(); }
+	
+	Nav(const Nav& nav) : Pose(nav.pos(), nav.quat() ), 
+	mMove0(nav.mMove0), mMove1(nav.mMove1),	// linear velocities (raw, smoothed)
+	mSpin0(nav.mSpin0), mSpin1(nav.mSpin1),	// angular velocities (raw, smoothed)
+	mTurn(nav.mTurn), mNudge(nav.mNudge),			//  
+	mSmooth(nav.smooth()), mVelScale(nav.mVelScale)
+	{ updateDirectionVectors(); }
 
 	/// Get smoothing amount
 	double smooth() const { return mSmooth; }
@@ -318,6 +325,11 @@ public:
 		directionVectors(mUR, mUU, mUF); 
 	}
 	
+	void set(const Pose& v){
+		Pose::set(v);
+		updateDirectionVectors();
+	}
+	
 	void set(const Nav& v){
 		Pose::set(v);
 		mMove0 = v.mMove0; mMove1 = v.mMove1;
@@ -325,6 +337,7 @@ public:
 		mTurn = v.mTurn;
 		mUR = v.mUR; mUU = v.mUU; mUF = v.mUF;
 		mSmooth = v.mSmooth;
+		updateDirectionVectors();
 	}
 	
 	/// Accumulate pose based on velocity
