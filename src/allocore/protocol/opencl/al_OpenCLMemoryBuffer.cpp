@@ -1,5 +1,5 @@
-#include "al_OpenCLMemoryBuffer.hpp"
-#include "al_OpenCLCommandQueue.hpp"
+#include "allocore/protocol/opencl/al_OpenCLMemoryBuffer.hpp"
+#include "allocore/protocol/opencl/al_OpenCLCommandQueue.hpp"
 
 
 namespace al {

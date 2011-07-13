@@ -1,4 +1,4 @@
-#include "system/al_Thread.hpp"
+#include "allocore/system/al_Thread.hpp"
 
 /***************************************************/
 /*! \class Thread

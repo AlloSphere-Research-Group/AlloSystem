@@ -3,7 +3,7 @@
 #include <string>
 
 #include "allocore/graphics/al_Graphics.hpp"
-#include "allocore/graphics/al_GraphicsBackend.hpp"
+#include "allocore/graphics/al_GraphicsOpenGL.hpp"
 
 namespace al{
 

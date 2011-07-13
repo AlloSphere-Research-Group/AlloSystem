@@ -39,9 +39,13 @@ public:
 	/// callback when the file is modified:
 	virtual void onFileWatch(File& file) = 0;
 	
-	/// set/get polling period (global, shared by all FileWatchers)
-	static void period(al_sec p);
-	static al_sec period();
+	/// trigger notifications from modified files:
+	/// (global, affecting all FileWatchers)
+	static void poll();
+	
+	/// start/stop automatic background polling (using MainLoop):
+	/// use period <= 0 to stop polling
+	static void autoPoll(al_sec period);
 };
 
 }; // al

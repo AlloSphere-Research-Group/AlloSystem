@@ -1,4 +1,4 @@
-#include "al_OpenCLContext.hpp"
+#include "allocore/protocol/opencl/al_OpenCLContext.hpp"
 
 #ifndef AL_MIN
 #define AL_MIN(a, b) (((a) < (b)) ? (a) : (b))

@@ -1,6 +1,6 @@
-#include "al_OpenCLImage2D.hpp"
-#include "al_OpenCLCommandQueue.hpp"
-#include "al_OpenCLImageFormat.hpp"
+#include "allocore/protocol/opencl/al_OpenCLImage2D.hpp"
+#include "allocore/protocol/opencl/al_OpenCLCommandQueue.hpp"
+#include "allocore/protocol/opencl/al_OpenCLImageFormat.hpp"
 
 namespace al {
 namespace cl {

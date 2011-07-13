@@ -1,4 +1,4 @@
-#include "al_OpenCLEngine.hpp"
+#include "allocore/protocol/opencl/al_OpenCLEngine.hpp"
 
 
 namespace al {

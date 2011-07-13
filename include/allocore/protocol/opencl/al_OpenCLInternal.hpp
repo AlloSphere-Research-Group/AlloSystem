@@ -1,7 +1,7 @@
 #ifndef AL_OPENCL_INTERNAL_H
 #define AL_OPENCL_INTERNAL_H 1
 
-#include <OpenCL/OpenCL.h>
+#include <OpenCL/opencl.h>
 #include <OpenCL/cl_gl.h>
 #include <string>
 

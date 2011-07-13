@@ -1,4 +1,4 @@
-#include "al_OpenCLEvent.hpp"
+#include "allocore/protocol/opencl/al_OpenCLEvent.hpp"
 
 
 namespace al {

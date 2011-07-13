@@ -1,4 +1,4 @@
-#include "al_OpenCLInternal.hpp"
+#include "allocore/protocol/opencl/al_OpenCLInternal.hpp"
 #include <stdio.h>
 
 

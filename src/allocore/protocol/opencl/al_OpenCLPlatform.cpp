@@ -1,4 +1,4 @@
-#include "al_OpenCLPlatform.hpp"
+#include "allocore/protocol/opencl/al_OpenCLPlatform.hpp"
 
 namespace al {
 namespace cl {

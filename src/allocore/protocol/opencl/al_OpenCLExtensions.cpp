@@ -1,4 +1,4 @@
-#include "al_OpenCLExtensions.hpp"
+#include "allocore/protocol/opencl/al_OpenCLExtensions.hpp"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,4 +1,4 @@
-#include "al_OpenCLKernel.hpp"
+#include "allocore/protocol/opencl/al_OpenCLKernel.hpp"
 
 namespace al {
 namespace cl {
