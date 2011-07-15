@@ -34,6 +34,8 @@
 #include <sstream>		/* string conversion */
 #include "allocore/system/al_Config.h"
 
+namespace al{
+
 #ifndef UINT32_C
 #define UINT32_C(v) v ## UL
 #endif 
@@ -53,7 +55,6 @@
 	CONST(Expo1   , 0x3F800000, 0x3FF0000000000000) // IEEE-754 floating-point [1-2) exponent interval
 #undef CONST
 
-namespace al{
 
 /// Union for twiddling bits of floats
 template<class T> struct Twiddle;
