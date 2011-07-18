@@ -495,7 +495,7 @@ void GraphicsGL :: textureCreate(Texture *tex) {
 	GLenum glminfilter = filter_from_texture_filter(tex->minFilter());
 	glTexParameteri(gltarget, GL_TEXTURE_MAG_FILTER, glmagfilter);
 	glTexParameteri(gltarget, GL_TEXTURE_MIN_FILTER, glminfilter);
-	glTexParameterfv(gltarget, GL_TEXTURE_BORDER_COLOR, tex->borderColor().to_ptr());
+	glTexParameterfv(gltarget, GL_TEXTURE_BORDER_COLOR, tex->borderColor().components);
 
 	GLenum glformat = format_from_texture_format(tex->format());
 	GLenum gltype = type_from_texture_type(tex->type());
