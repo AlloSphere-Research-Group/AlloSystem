@@ -51,18 +51,12 @@ struct Color{
 	/// @param[in] b			blue component
 	/// @param[in] a			alpha component
 	Color(float r, float g, float b, float a=1.f)
-	:	r(r), g(g), b(b), a(a) {}
-//	{
-//		this->r = r;
-//		this->g = g;
-//		this->b = b;
-//		this->a = a;
-//	}
+	:	r(r), g(g), b(b), a(a){}
 
 	/// @param[in] gray			red/green/blue components
 	/// @param[in] a			alpha component
 	Color(float gray=1.f, float a=1.f)
-	:	r(gray), g(gray), b(gray), a(a)	{}
+	:	r(gray), g(gray), b(gray), a(a){}
 
 	/// @param[in] hsv			HSV value
 	/// @param[in] a			alpha component
@@ -77,8 +71,6 @@ struct Color{
 	/// Get color component at index with no bounds checking
 	const float& operator[](int i) const { return components[i]; }
 
-	const float * to_ptr() const {return components;}
-
 	/// Set RGBA components
 	Color& set(float re, float gr, float bl, float al){ a=al; return set(re,gr,bl); }
 
@@ -90,6 +82,10 @@ struct Color{
 
 	/// Set from gray value and alpha
 	Color& set(float v, float al){ return set(v,al); }
+
+	/// Set from an array of RGBA components
+	template <class T>
+	Color& set(const T* rgba){ return set(rgba[0],rgba[1],rgba[2],rgba[3]); }
 
 	/// Set components from tightly packed RGBA array
 	template <class Array4>
