@@ -1,4 +1,5 @@
 #include "allocore/io/al_Window.hpp"
+#include "allocore/system/al_MainLoop.hpp"
 
 namespace al{
 
@@ -98,6 +99,8 @@ Window& Window::fullScreenToggle(){
 	fullScreen(!fullScreen());
 	return *this;
 }
+
+double Window::spfActual() const { return MainLoop::intervalActual(); }
 
 Window& Window::add(InputEventHandler * v){
 	mInputEventHandlers.push_back(&(v->window(this)));

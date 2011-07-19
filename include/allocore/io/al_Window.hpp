@@ -267,7 +267,8 @@ public:
 	bool fullScreen() const;					///< Get whether window is in fullscreen
 	double fps() const;							///< Returns frames/second (requested)
 	double avgFps() const;						///< Returns frames/second (running average)
-	double spf() const { return 1./fps(); }		///< Returns seconds/frame
+	double spf() const { return 1./fps(); }		///< Returns seconds/frame (requested)
+	double spfActual() const;					///< Returns seconds/frame (actual)
 	const std::string& title() const;			///< Get title of window
 	bool visible() const;						///< Get whether window is visible
 	bool asap() const { return mASAP; }			///< Get whether window is rendering as fast as possible
