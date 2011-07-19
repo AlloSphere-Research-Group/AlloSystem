@@ -60,6 +60,9 @@ public:
 	static void interval(al_sec interval);
 	static al_sec interval() { return get().mInterval; }
 
+	/// Get actual interval between ticks
+	static al_sec intervalActual() { return get().mActualInterval; }
+
 	/// performance monitoring:
 	/*
 		Measures relationship between ideal tick interval (mInterval),
