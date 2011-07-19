@@ -614,7 +614,6 @@
 		36035CBE130372AD001E9BA9 /* tttags.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tttags.h; sourceTree = "<group>"; };
 		36035CBF130372AD001E9BA9 /* ttunpat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ttunpat.h; sourceTree = "<group>"; };
 		36035CC0130372AD001E9BA9 /* ft2build.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ft2build.h; sourceTree = "<group>"; };
-		360C23FE11E6591C000FF335 /* clangversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = clangversion.cpp; sourceTree = "<group>"; };
 		360C244411E6599F000FF335 /* exCompiler */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exCompiler; sourceTree = BUILT_PRODUCTS_DIR; };
 		360C246211E659D3000FF335 /* .dir */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .dir; sourceTree = "<group>"; };
 		360C246311E659D3000FF335 /* emmintrin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = emmintrin.h; sourceTree = "<group>"; };
@@ -4105,7 +4104,6 @@
 		3622BEF5116D527D00928703 /* system */ = {
 			isa = PBXGroup;
 			children = (
-				360C23FE11E6591C000FF335 /* clangversion.cpp */,
 				169CD07D134E4FA000D0037B /* al_Info.cpp */,
 				3622BEF7116D527D00928703 /* al_MainLoop.cpp */,
 				36AED02511D4638F000D98C9 /* al_MainLoopGLUT.cpp */,
