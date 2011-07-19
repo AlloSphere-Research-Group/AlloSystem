@@ -28,7 +28,6 @@ public:
 	Camera& far(double v){ mFar=v; return *this; }			///< Set frustum far plane distance
 	Camera& focalLength(double v){ mFocalLength=v; return *this; } ///< Set focal length
 	Camera& eyeSep(double v){ mEyeSep=v; return *this; }	///< Set eye separation
-	Camera& zoom(double v){ mZoom=v; return *this; }		///< Set zoom amount
 
 	double fovy() const { return mFovy; }					///< Get vertical field of view, in degrees
 	double near() const { return mNear; }					///< Get frustum near plane distance
@@ -36,7 +35,6 @@ public:
 	double focalLength() const { return mFocalLength; }		///< Get focal length
 	double eyeSep() const { return mEyeSep; }				///< Get eye separation
 	double eyeSepAuto() const { return focalLength()/30.0; }///< Get automatic inter-ocular distance
-	double zoom() const { return mZoom; }					///< Get zoom amount
 
 	/// Get test frustum
 	
@@ -72,7 +70,6 @@ protected:
 	double mNear, mFar;			// Cutting plane distances
 	double mFocalLength;		// Focal length along vd
 	double mEyeSep;				// Eye separation
-	double mZoom;
 //	Vec3d mStereoOffset;		// eye offset vector (right eye; left eye is inverse), usually (1, 0, 0)
 };
 

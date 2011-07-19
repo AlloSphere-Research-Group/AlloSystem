@@ -13,8 +13,7 @@ Camera :: Camera(
 :	mNear(nearClip),
 	mFar(farClip),
 	mFocalLength(focalLength),
-	mEyeSep(eyeSep),
-	mZoom(0)
+	mEyeSep(eyeSep)
 {
 	fovy(fovy_);
 }
