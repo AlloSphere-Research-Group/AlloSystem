@@ -170,21 +170,9 @@ public:
 		const std::string& name="",
 		double audioRate=44100, int audioBlockSize=128,
 		int audioOutputs=-1, int audioInputs=-1
-	)
-	:	//mGraphics(new GraphicsBackendOpenGL),
-		mAudioIO(audioBlockSize, audioRate, sAudioCB, this, audioOutputs, audioInputs),
-		mAudioScene(3,2, audioBlockSize),
-		mName(name)
-	{
-		mListeners.push_back(mAudioScene.createListener(2));
-		mListeners[0]->speakerPos(0,0, -45);
-		mListeners[0]->speakerPos(1,1,  45);
-	}
+	);
 	
-	virtual ~World(){
-		mAudioIO.close();
-		if(name()!="" && oscSend().opened()) sendDisconnect();
-	}
+	virtual ~World();
 
 	const AudioIO&		audioIO() const { return mAudioIO; }
 	AudioIO&			audioIO(){ return mAudioIO; }
@@ -206,6 +194,9 @@ public:
 
 	const Nav&			nav() const { return mNav; }
 	Nav&				nav(){ return mNav; }
+
+	const NavInputControl& navControl() const { return mNavControl; }
+	NavInputControl&	navControl(){ return mNavControl; }
 
 	osc::Recv&			oscRecv(){ return mOSCRecv; }
 	osc::Send&			oscSend(){ return mOSCSend; }
@@ -256,6 +247,8 @@ protected:
 	GraphicsGL mGraphics;
 	AudioIO mAudioIO;
 	AudioScene mAudioScene;
+	
+	NavInputControl mNavControl;
 
 	std::string mName;
 	
