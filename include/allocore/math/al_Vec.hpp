@@ -430,6 +430,9 @@ public:
 	//--------------------------------------------------------------------------
 	// Memory Operations
 
+	/// Returns C array type punned into a matrix
+	static Mat& pun(T * src){ return *(Mat*)(src); }
+
 	/// Returns total number of elements
 	static int size(){ return N*N; }
 
@@ -596,7 +599,7 @@ public:
 
 	// Affine transformations
 
-	/// Rotate transformation matrix along a plane
+	/// Rotate transformation matrix on a local plane (A' = AR)
 
 	/// @param[in] angle	angle of rotation, in radians
 	/// @param[in] dim1		local coordinate frame axis to rotate away from
@@ -614,12 +617,31 @@ public:
 		return *this;
 	}
 
+	/// Rotate submatrix on a global plane (A' = RA)
+	template <int M>
+	Mat& rotateGlobal(double angle, int dim1, int dim2){
+		double cs = cos(angle);
+		double sn = sin(angle);
+		for(int C=0; C<M; ++C){
+			const T& v1 = (*this)(dim1, C);
+			const T& v2 = (*this)(dim2, C);
+			T t = v1*cs - v2*sn;
+			(*this)(dim2, C) = v2*cs + v1*sn;
+			(*this)(dim1, C) = t;
+		}
+		return *this;
+	}
+	
+	/// Rotate transformation matrix on a global plane (A' = RA)
+	Mat& rotateGlobal(double angle, int dim1, int dim2){
+		return rotateGlobal<N-1>(angle,dim1,dim2); }
+
 	/// Scale transformation matrix
 	template<class V>
 	Mat& scale(const Vec<N-1,V>& amount){
 		for(int C=0; C<N-1; ++C){
 			for(int R=0; R<N-1; ++R){
-				(*this)(R, C) *= amount[C];
+				(*this)(R,C) *= amount[C];
 			}
 		}
 		return *this;
@@ -630,7 +652,18 @@ public:
 	Mat& scale(const V& amount){
 		for(int C=0; C<N-1; ++C){
 			for(int R=0; R<N-1; ++R){
-				(*this)(R, C) *= amount;
+				(*this)(R,C) *= amount;
+			}
+		}
+		return *this;
+	}
+
+	/// Scale transformation matrix global coordinates
+	template<class V>
+	Mat& scaleGlobal(const Vec<N-1,V>& amount){
+		for(int R=0; R<N-1; ++R){
+			for(int C=0; C<N-1; ++C){
+				(*this)(R,C) *= amount[R];
 			}
 		}
 		return *this;
