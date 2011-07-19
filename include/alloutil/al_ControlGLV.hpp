@@ -90,7 +90,7 @@ struct GLVWindowControl : public GLVControl, public WindowEventHandler {
 	}
 
 	virtual bool onFrame(){
-		glv().drawGLV(glv().w, glv().h, window().spf());
+		glv().drawGLV(glv().w, glv().h, window().spfActual());
 		//glv().preamble(glv().w, glv().h);
 		//glv().drawWidgets(glv().w, glv().h, window().spf());
 		return true;
