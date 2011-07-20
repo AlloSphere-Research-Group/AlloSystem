@@ -137,11 +137,12 @@ struct Color{
 	Color blackAndWhite() const { return Color(luminance()>0.5f?1.f:0.f); }
 
 	/// Clamp all components into [0,1] range
-	void clamp(){
+	Color& clamp(){
 		r<0.f ? r=0.f : (r>1.f ? r=1.f : 0);
 		g<0.f ? g=0.f : (g>1.f ? g=1.f : 0);
 		b<0.f ? b=0.f : (b>1.f ? b=1.f : 0);
 		a<0.f ? a=0.f : (a>1.f ? a=1.f : 0);
+		return *this;
 	}
 
 	/// Returns inverted color
