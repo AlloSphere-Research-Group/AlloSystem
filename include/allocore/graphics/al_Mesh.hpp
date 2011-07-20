@@ -117,6 +117,7 @@ public:
 	const Buffer<Vertex>& vertices() const { return mVertices; }
 	const Buffer<Normal>& normals() const { return mNormals; }
 	const Buffer<Color>& colors() const { return mColors; }
+	const Buffer<Colori>& coloris() const { return mColoris; }
 	const Buffer<TexCoord2>& texCoord2s() const { return mTexCoord2s; }
 	const Buffer<TexCoord3>& texCoord3s() const { return mTexCoord3s; }
 	const Buffer<Index>& indices() const { return mIndices; }
@@ -135,11 +136,17 @@ public:
 	void color(const Color& v) { colors().append(v); }
 
 	/// Append color to color buffer
+	void color(const Colori& v) { coloris().append(v); }
+
+	/// Append color to color buffer
 	void color(float r, float g, float b, float a=1){ color(Color(r,g,b,a)); }
 	
 	/// Append color to color buffer
 	template <class T>
 	void color(const Vec<4,T>& v) { color(v[0], v[1], v[2], v[3]); }
+
+	/// Append floating-point color to integer color buffer
+	void colori(const Color& v) { coloris().append(Colori(v)); }
 
 
 	/// Append normal to normal buffer
@@ -192,6 +199,7 @@ public:
 	Buffer<Vertex>& vertices(){ return mVertices; }
 	Buffer<Normal>& normals(){ return mNormals; }
 	Buffer<Color>& colors(){ return mColors; }
+	Buffer<Colori>& coloris(){ return mColoris; }
 	Buffer<TexCoord2>& texCoord2s(){ return mTexCoord2s; }
 	Buffer<TexCoord3>& texCoord3s(){ return mTexCoord3s; }
 	Buffer<Index>& indices(){ return mIndices; }
@@ -202,6 +210,7 @@ protected:
 	Buffer<Vertex> mVertices;
 	Buffer<Normal> mNormals;
 	Buffer<Color> mColors;
+	Buffer<Colori> mColoris;
 	Buffer<TexCoord2> mTexCoord2s;
 	Buffer<TexCoord3> mTexCoord3s;
 	Buffer<Index> mIndices;

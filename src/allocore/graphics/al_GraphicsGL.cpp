@@ -203,14 +203,15 @@ void GraphicsGL :: p_currentColor(double r, double g, double b, double a) {
 // Buffer drawing
 void GraphicsGL :: p_draw(const Mesh& v) {
 
-	int Nv = v.vertices().size();
+	const int Nv = v.vertices().size();
 	if(0 == Nv) return;
 	
-	int Nc = v.colors().size();
-	int Nn = v.normals().size();
-	int Nt2= v.texCoord2s().size();
-	int Nt3= v.texCoord3s().size();
-	int Ni = v.indices().size();
+	const int Nc = v.colors().size();
+	const int Nci= v.coloris().size();
+	const int Nn = v.normals().size();
+	const int Nt2= v.texCoord2s().size();
+	const int Nt3= v.texCoord3s().size();
+	const int Ni = v.indices().size();
 	
 	//printf("Nv %i Nc %i Nn %i Nt2 %i Nt3 %i Ni %i\n", Nv, Nc, Nn, Nt2, Nt3, Ni);
 
@@ -225,13 +226,22 @@ void GraphicsGL :: p_draw(const Mesh& v) {
 	
 	if(Nc >= Nv){
 		glEnableClientState(GL_COLOR_ARRAY);
-		glColorPointer(4, GL_FLOAT, 0, &v.colors()[0]);			
+		glColorPointer(4, GL_FLOAT, 0, &v.colors()[0]);
 	}
-	else if(0 == Nc){
+	else if(Nci >= Nv){
+		glEnableClientState(GL_COLOR_ARRAY);
+		glColorPointer(4, GL_UNSIGNED_BYTE, 0, &v.coloris()[0]);
+//		printf("using integer colors\n");	
+	}
+	else if(0 == Nc && 0 == Nci){
 		// just use whatever the last glColor() call used!
 	}
 	else{
-		glColor4f(v.colors()[0][0], v.colors()[0][1], v.colors()[0][2], v.colors()[0][3]);
+		if(Nc)
+			//glColor4f(v.colors()[0][0], v.colors()[0][1], v.colors()[0][2], v.colors()[0][3]);
+			glColor4fv(v.colors()[0].components);
+		else
+			glColor3ubv(v.coloris()[0].components);
 	}
 	
 	if(Nt2 || Nt3){
@@ -263,10 +273,10 @@ void GraphicsGL :: p_draw(const Mesh& v) {
 		);
 	}
 
-	glDisableClientState(GL_VERTEX_ARRAY);
-	if(Nn) glDisableClientState(GL_NORMAL_ARRAY);
-	if(Nc) glDisableClientState(GL_COLOR_ARRAY);
-	if(Nt2 || Nt3) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+					glDisableClientState(GL_VERTEX_ARRAY);
+	if(Nn)			glDisableClientState(GL_NORMAL_ARRAY);
+	if(Nc || Nci)	glDisableClientState(GL_COLOR_ARRAY);
+	if(Nt2 || Nt3)	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 }
 

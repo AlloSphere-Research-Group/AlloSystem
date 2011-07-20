@@ -13,6 +13,7 @@ Mesh& Mesh::reset() {
 	vertices().reset();
 	normals().reset();
 	colors().reset();
+	coloris().reset();
 	texCoord2s().reset();
 	texCoord3s().reset();
 	indices().reset();
@@ -34,6 +35,7 @@ void Mesh::decompress(){
 		}
 		DECOMPRESS(vertices(), Vertex)
 		DECOMPRESS(colors(), Color)
+		DECOMPRESS(coloris(), Color)
 		DECOMPRESS(normals(), Normal)
 		DECOMPRESS(texCoord2s(), TexCoord2)
 		DECOMPRESS(texCoord3s(), TexCoord3)
@@ -44,30 +46,36 @@ void Mesh::decompress(){
 }
 
 void Mesh::equalizeBuffers() {
-	int VS = vertices().size();
-	int NS = normals().size();
-	int CS = colors().size();
-	int T2S = texCoord2s().size();
-	int T3S = texCoord3s().size();
+	const int Nv = vertices().size();
+	const int Nn = normals().size();
+	const int Nc = colors().size();
+	const int Nci= coloris().size();
+	const int Nt2= texCoord2s().size();
+	const int Nt3= texCoord3s().size();
 
-	if(NS > 0) {
-		for(int i=NS; i < VS; i++) {
-			normals().append(normals()[NS-1]);
+	if(Nn){
+		for(int i=Nn; i<Nv; ++i){
+			normals().append(normals()[Nn-1]);
 		}
 	}
-	if(CS > 0) {
-		for(int i=CS; i < VS; i++) {
-			colors().append(colors()[CS-1]);
+	if(Nc){
+		for(int i=Nc; i<Nv; ++i){
+			colors().append(colors()[Nc-1]);
 		}
 	}
-	if(T2S > 0) {
-		for(int i=T2S; i < VS; i++) {
-			texCoord2s().append(texCoord2s()[T2S-1]);
+	else if(Nci){
+		for(int i=Nci; i<Nv; ++i){
+			coloris().append(coloris()[Nci-1]);
 		}
 	}
-	if(T3S > 0) {
-		for(int i=T3S; i < VS; i++) {
-			texCoord3s().append(texCoord3s()[T3S-1]);
+	if(Nt2){
+		for(int i=Nt2; i<Nv; ++i){
+			texCoord2s().append(texCoord2s()[Nt2-1]);
+		}
+	}
+	if(Nt3){
+		for(int i=Nt3; i<Nv; ++i){
+			texCoord3s().append(texCoord3s()[Nt3-1]);
 		}
 	}
 }
@@ -287,6 +295,7 @@ void Mesh::merge(const Mesh& src){
 //	}
 
 	// TODO: only do merge if source and dest are well-formed
+	// TODO: what to do when mixing float and integer colors? promote or demote?
 
 	// TODO: indices are more complex, since the offsets may have changed.
 	// we'd have to add indices.size() to all of the src.indices before adding.
