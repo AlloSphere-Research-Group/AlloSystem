@@ -27,9 +27,12 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
+#include "allocore/system/pstdint.h"
+
 namespace al{
 
 struct Color;
+struct Colori;
 struct HSV;
 
 
@@ -46,6 +49,7 @@ struct Color{
 		float components[4];	///< RGBA component vector
 	};
 
+
 	/// @param[in] r			red component
 	/// @param[in] g			green component
 	/// @param[in] b			blue component
@@ -57,6 +61,9 @@ struct Color{
 	/// @param[in] a			alpha component
 	Color(float gray=1.f, float a=1.f)
 	:	r(gray), g(gray), b(gray), a(a){}
+
+	/// @param[in] c	RGBA color to convert from
+	Color(const Colori& c){ *this = c; }
 
 	/// @param[in] hsv			HSV value
 	/// @param[in] a			alpha component
@@ -89,11 +96,14 @@ struct Color{
 
 	/// Set components from tightly packed RGBA array
 	template <class Array4>
-	Color& operator=(const Array4& v){ return set(v[0], v[1], v[2], v[3]); }
+	Color& operator= (const Array4& v){ return set(v[0], v[1], v[2], v[3]); }
 
 	/// Set from gray value
 	Color& operator= (float v){ return set(v); }
 	Color& operator= (double v){ return set(v); }
+
+	/// Set components from integer color
+	Color& operator= (const Colori& v);
 
 	/// Set RGB components from HSV
 	Color& operator= (const HSV& v);
@@ -147,12 +157,85 @@ struct Color{
 	Color mix(const Color& c, float amt=0.5f) const {
 		return (c-*this)*amt + *this;
 	}
+
+private:
+	float tof(uint8_t v){ return float(v)/255.f; }
 };
 
-inline Color operator + (float s, const Color& c){ return  c+s; }
-inline Color operator - (float s, const Color& c){ return -c+s; }
-inline Color operator * (float s, const Color& c){ return  c*s; }
-inline Color operator / (float s, const Color& c){ return Color(s/c.r, s/c.g, s/c.b, s/c.a); }
+
+
+/// Color represented by red, green, blue, and alpha components packed into 32-bit integer
+
+/// The component accessor methods operate exclusively with integer types. To
+/// convert to and from floating point values in the interval [0, 1], use the
+/// overloaded assignment (=) operators.
+struct Colori {
+	
+	union{
+		struct{
+			uint8_t r;			///< Red component in [0, 255]
+			uint8_t g;			///< Green component in [0, 255]
+			uint8_t b;			///< Blue component in [0, 255]
+			uint8_t a;			///< Alpha component in [0, 255]
+		};
+		uint8_t components[4];	///< RGBA component vector
+		uint32_t rgba;			///< RGBA components packed into 32-bit integer
+	};
+
+
+	/// @param[in] r			red component
+	/// @param[in] g			green component
+	/// @param[in] b			blue component
+	/// @param[in] a			alpha component
+	Colori(uint8_t r, uint8_t g, uint8_t b, uint8_t a=255)
+	:	r(r), g(g), b(b), a(a){}
+
+	/// @param[in] gray			red/green/blue components
+	/// @param[in] a			alpha component
+	Colori(uint8_t gray=255, uint8_t a=255)
+	:	r(gray), g(gray), b(gray), a(a){}
+
+	/// @param[in] c			RGBA color to convert from
+	Colori(const Color& c){ *this = c; }
+
+	/// @param[in] hsv			HSV value
+	/// @param[in] a			alpha component
+	Colori(const HSV& hsv, float a=1.f)
+	:	a(toi(a))
+	{	*this = hsv; }
+
+
+
+	/// Set color component at index with no bounds checking
+	uint8_t& operator[](int i){ return components[i]; }
+
+	/// Get color component at index with no bounds checking
+	const uint8_t& operator[](int i) const { return components[i]; }
+
+	/// Set from floating-point color
+	Colori& operator= (const Color& c){
+		r=toi(c.r); g=toi(c.g); b=toi(c.b); a=toi(c.a); return *this; }
+
+	/// Set RGB components from HSV
+	Colori& operator= (const HSV& v){ *this = Color(v); return *this; }
+
+	/// Set RGB components
+	Colori& set(uint8_t re, uint8_t gr, uint8_t bl){
+		r=re; g=gr; b=bl; return *this; }
+
+	/// Set RGBA components
+	Colori& set(uint8_t re, uint8_t gr, uint8_t bl, uint8_t al){
+		a=al; return set(re,gr,bl); }
+
+	/// Set from gray value
+	Colori& set(uint8_t v){ return set(v,v,v); }
+
+	/// Set from gray value and alpha
+	Colori& set(uint8_t v, uint8_t al){ return set(v,al); }
+
+private:
+	uint8_t toi(float v){ return uint8_t(v*255.f); }
+};
 
 
 
@@ -168,6 +251,7 @@ struct HSV{
 		float components[3];	///< HSV component vector
 	};
 
+
 	/// @param[in] h	hue
 	/// @param[in] s	saturation
 	/// @param[in] v	value
@@ -176,15 +260,22 @@ struct HSV{
 	/// @param[in] c	RGB color to convert from
 	HSV(const Color& c){ *this = c; }
 
+	/// @param[in] c	RGB color to convert from
+	HSV(const Colori& c){ *this = c; }
+
 	/// @param[in] hsv		3-vector of hsv components
 	template<class T>
 	HSV(T * hsv): h(hsv[0]), s(hsv[1]), v(hsv[2]){}
 
+
 	/// Set from RGB color
-	HSV& operator=(const Color& c);
+	HSV& operator= (const Color& c);
+
+	/// Set from RGB color
+	HSV& operator= (const Colori& c){ return *this = Color(c); }
 
 	/// Rotate hue in interval [0, 1)
-	HSV& rotateHue(float v){ h += v; return wrapHue(); }
+	HSV& rotateHue(float dh){ h += dh; return wrapHue(); }
 
 	/// Wrap hue value into valid interval [0, 1)
 	HSV& wrapHue(){
@@ -193,6 +284,20 @@ struct HSV{
 		return *this;
 	}
 };
+
+
+
+
+// Implementation --------------------------------------------------------------
+
+inline Color operator + (float s, const Color& c){ return  c+s; }
+inline Color operator - (float s, const Color& c){ return -c+s; }
+inline Color operator * (float s, const Color& c){ return  c*s; }
+inline Color operator / (float s, const Color& c){ return Color(s/c.r, s/c.g, s/c.b, s/c.a); }
+
+inline Color& Color::operator= (const Colori& v){
+		r=tof(v.r); g=tof(v.g); b=tof(v.b); a=tof(v.a); return *this; }
+
 
 } // al::
 
