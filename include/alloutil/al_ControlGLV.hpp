@@ -2,7 +2,7 @@
 #define INC_AL_CONTROL_GLV_HPP
 
 #include "allocore/io/al_Window.hpp"
-#include "GLV/glv_core.h"
+#include "glv_core.h"
 
 namespace al {
 
