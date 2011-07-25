@@ -33,7 +33,7 @@ namespace al {
 
 namespace ipl{
 
-/// First order allpass interpolation.
+/// First order allpass interpolation
 
 /// Best for delay lines, not good for random access.
 ///
@@ -44,13 +44,13 @@ Tv allpass(Tf frac, const Tv& x, const Tv& y, Tv& o1);
 template <class Tf, class Tv>
 Tv allpassFixed(Tf frac, const Tv& x, const Tv& y, Tv& o1);
 
-/// Bezier curve, 3-point quadratic.
+/// Bezier curve, 3-point quadratic
 
 /// 'frac' [0, 1) is the value on the curve btw x2 and x0
 ///
 template <class T> T bezier(T frac, T x2, T x1, T x0);
 
-/// Bezier curve, 4-point cubic.
+/// Bezier curve, 4-point cubic
 
 /// 'frac' [0, 1) is the value on the curve btw x3 and x0
 ///
@@ -71,7 +71,7 @@ template <class Tp, class Tv>
 Tv hermite(Tp f, const Tv& w, const Tv& x, const Tv& y, const Tv& z, Tp tension, Tp bias);
 
 
-/// Computes FIR coefficients for Waring-Lagrange interpolation.
+/// Computes FIR coefficients for Waring-Lagrange interpolation
 
 ///		'h' are the FIR coefficients and should be of size ('order' + 1). \n
 ///		'delay' is a fractional delay in samples. \n
@@ -81,13 +81,13 @@ template <class T> void lagrange(T * h, T delay, int order);
 /// Optimized lagrange() for first order.
 template <class T> void lagrange1(T * h, T delay);
 
-/// Optimized lagrange() for second order.
+/// Optimized lagrange() for second order
 template <class T> void lagrange2(T * h, T delay);
 
-/// Optimized lagrange() for third order.
+/// Optimized lagrange() for third order
 template <class T> void lagrange3(T * h, T delay);
 
-/// Simplified parabolic interpolation of 3 points.
+/// Simplified parabolic interpolation of 3 points
 
 /// This assumes the points are spaced evenly on the x axis from [-1, 1].
 /// The output is an offset from 0.
@@ -112,13 +112,13 @@ Tv cubic2(Tf d, const Tv& w, const Tv& x, const Tv& y, const Tv& z);
 template <class Tf, class Tv>
 Tv linear(Tf frac, const Tv& x, const Tv& y);
 
-/// Linear interpolation between three elements.
+/// Linear interpolation between three elements
 template <class Tf, class Tv>
 Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z);
 
 template <class T> void linear(T * dst, const T * xs, const T * xp1s, int len, T frac);
 
-/// Nearest neighbor interpolation.
+/// Nearest neighbor interpolation
 template <class Tf, class Tv>
 Tv nearest(Tf frac, const Tv& x, const Tv& y);
 
@@ -127,22 +127,64 @@ template <class Tf, class Tv>
 Tv quadratic(Tf frac, const Tv& x, const Tv& y, const Tv& z); 
 
 
-/// Trilinear interpolation between eight corners of a cube.
+/// Bilinear interpolation between values on corners of quadrilateral
+template <class Tf, class Tv>
+inline Tv bilinear(
+	const Tf& fracX, const Tf& fracY,
+	const Tv& xy, const Tv& Xy,
+	const Tv& xY, const Tv& XY
+){
+	return linear(fracY,
+		linear(fracX, xy,Xy),
+		linear(fracX, xY,XY)
+	);
+}
 
-/// Input arguments are all array-indexable 3-vectors.
+/// Bilinear interpolation between values on corners of quadrilateral
+template <class Tf2, class Tv>
+inline Tv bilinear(
+	const Tf2& f,
+	const Tv& xy, const Tv& Xy,
+	const Tv& xY, const Tv& XY
+){
+	return bilinear(f[0],f[1],xy,Xy,xY,XY);
+}
+
+/// Trilinear interpolation between values on corners of a hexahedron
+template <class Tf, class Tv>
+inline Tv trilinear(
+	const Tf& fracX, const Tf& fracY, const Tv& fracZ,
+	const Tv& xyz, const Tv& Xyz,
+	const Tv& xYz, const Tv& XYz,
+	const Tv& xyZ, const Tv& XyZ,
+	const Tv& xYZ, const Tv& XYZ
+){
+	return linear(fracZ,
+		bilinear(fracX,fracY, xyz,Xyz,xYz,XYz),
+		bilinear(fracX,fracY, xyZ,XyZ,xYZ,XYZ)
+	);
+}
+
+/// Trilinear interpolation between values on corners of a hexahedron
+
+/// @param[in] frac		array-indexable 3-vector of fractions along x, y, and z
 ///
-template <class Tf3, class V3>
-inline V3 trilinear(
-	const Tf3& frac,
-	const V3& xyz, const V3& Xyz,
-	const V3& xYz, const V3& XYz,
-	const V3& xyZ, const V3& XyZ,
-	const V3& xYZ, const V3& XYZ
-);
+template <class Tf3, class Tv>
+inline Tv trilinear(
+	const Tf3& f, 
+	const Tv& xyz, const Tv& Xyz,
+	const Tv& xYz, const Tv& XYz,
+	const Tv& xyZ, const Tv& XyZ,
+	const Tv& xYZ, const Tv& XYZ
+){
+	return trilinear(f[0],f[1],f[2],xyz,Xyz,xYz,XYz,xyZ,XyZ,xYZ,XYZ);
+}
 
 
 
 
+
+//------------------------------------------------------------------------------
 // Implementation
 //------------------------------------------------------------------------------
 
@@ -380,30 +422,7 @@ inline Tv quadratic(Tf f, const Tv& x, const Tv& y, const Tv& z){
 	return (c2 * f + c1) * f + x;
 }
 
-
-template <class F3, class V3>
-inline V3 trilinear(
-	const F3& f, 
-	const V3& xyz, const V3& Xyz,
-	const V3& xYz, const V3& XYz,
-	const V3& xyZ, const V3& XyZ,
-	const V3& xYZ, const V3& XYZ
-){
-	return
-	linear(f[2],
-		linear(f[1],
-			linear(f[0], xyz, Xyz),
-			linear(f[0], xYz, XYz)
-		),
-		linear(f[1],
-			linear(f[0], xyZ, XyZ),
-			linear(f[0], xYZ, XYZ)			
-		)
-	);
-}
-
-} // ::al::ipl
-
-} // ::al::
+} // al::ipl
+} // al::
 
 #endif
