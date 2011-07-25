@@ -45,20 +45,26 @@ typedef Complex<double>	Complexd;
 template <class T>
 class Polar{
 public:
-	/// @param[in] p	phase, in radians
-	Polar(const T& p): m(1.), p(p){}
+
+	union{
+		struct{
+			T m;		///< Magnitude
+			T p;		///< Phase, in radians
+		};
+		T elems[2];
+	};
+
+	/// @param[in] phs		phase, in radians
+	Polar(const T& phs): m(1.), p(phs){}
 	
-	/// @param[in] m	magnitude
-	/// @param[in] p	phase, in radians
-	Polar(const T& m, const T& p): m(m), p(p){}
+	/// @param[in] mag		magnitude
+	/// @param[in] phs		phase, in radians
+	Polar(const T& mag, const T& phs): m(mag), p(phs){}
 	
-	/// @param[in] v	rectangular complex number to convert from
+	/// @param[in] v		rectangular complex number to convert from
 	Polar(const Complex<T>& v){ *this = v; }
 
 	Polar& operator = (const Complex<T>& v){ m=v.norm(); p=v.arg(); return *this; }
-
-	T m;	///< Magnitude
-	T p;	///< Phase, in radians
 };
 
 
@@ -69,7 +75,10 @@ public:
 	typedef Complex<T> C;
 
 	union{
-		struct{ T r, i; };
+		struct{
+			T r;		///< Real component
+			T i;		///< Imaginary component
+		};
 		T elems[2];
 	};
 	
@@ -88,6 +97,12 @@ public:
 	C& operator()(const Polar<T>& p){ return *this = p; }
 	T& operator[](uint32_t i){ return elems[i];}
 	const T& operator[](uint32_t i) const { return elems[i]; }
+
+	// Accessors compatible with std::complex
+	T& real(){return r;}
+	const T& real() const {return r;}
+	T& imag(){return i;}
+	const T& imag() const {return i;}
 
 	bool operator ==(const C& v) const { return (r==v.r) && (i==v.i); }		///< Returns true if all components are equal
 	bool operator ==(const T& v) const { return (r==v  ) && (i==T(0));}		///< Returns true if real and equals value
