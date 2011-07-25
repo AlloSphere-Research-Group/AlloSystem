@@ -51,12 +51,23 @@ void Mouse::position(int x, int y){ mDX=x-mX; mDY=y-mY; mX=x; mY=y; }
 
 
 
-InputEventHandler :: ~InputEventHandler() {
-	if (mWindow) mWindow->remove(this);
+InputEventHandler::~InputEventHandler(){
+	removeFromWindow();
 }
 
-WindowEventHandler :: ~WindowEventHandler() {
-	if (mWindow) mWindow->remove(this);
+void InputEventHandler::removeFromWindow(){
+	if(attached()) window().remove(this);
+}
+
+WindowEventHandler::~WindowEventHandler(){
+	removeFromWindow();
+}
+
+void WindowEventHandler::removeFromWindow(){
+	if(attached()){
+//		onResize(-window().width(), -window().height());
+		window().remove(this);
+	}
 }
 
 
@@ -103,22 +114,34 @@ Window& Window::fullScreenToggle(){
 double Window::spfActual() const { return MainLoop::intervalActual(); }
 
 Window& Window::add(InputEventHandler * v){
+	v->removeFromWindow();
 	mInputEventHandlers.push_back(&(v->window(this)));
 	return *this;
 }
 
 Window& Window::add(WindowEventHandler * v){
+	v->removeFromWindow();
 	mWindowEventHandlers.push_back(&(v->window(this)));
+	if(created()){		// notify new handler of changes
+		v->onCreate();
+//		v->onResize(width(), height());
+	}
 	return *this;
 }
 
 Window& Window::prepend(InputEventHandler * v){
+	v->removeFromWindow();
 	mInputEventHandlers.insert(mInputEventHandlers.begin(), &(v->window(this)));
 	return *this;
 }
 
 Window& Window::prepend(WindowEventHandler * v){
+	v->removeFromWindow();
 	mWindowEventHandlers.insert(mWindowEventHandlers.begin(), &(v->window(this)));
+	if(created()){		// notify new handler of changes
+		v->onCreate();
+//		v->onResize(width(), height());
+	}
 	return *this;
 }
 
@@ -132,6 +155,7 @@ Window& Window::remove(InputEventHandler * v){
 Window& Window::remove(WindowEventHandler * v){
 	// the proper way to do it:
 	mWindowEventHandlers.erase(std::remove(mWindowEventHandlers.begin(), mWindowEventHandlers.end(), v), mWindowEventHandlers.end());
+	v->onDestroy();
 	v->mWindow = NULL;
 	return *this;
 }

@@ -211,6 +211,7 @@ public:
 	}
 
 	static void cbDisplay(){
+//		printf("GLUT display\n");
 		// this is empty because we are using a periodic timer for drawing
 	}
 
@@ -298,7 +299,7 @@ public:
 	}
 
 	static void cbKeyboard(unsigned char key, int x, int y){
-//printf("GLUT key down:\n");
+//		printf("GLUT key down:\n");
 		Window * win = getWindow();
 		if(win){
 			key = remapKey(key, false);
@@ -340,7 +341,7 @@ public:
 
 
 	static void cbMouse(int btn, int state, int ax, int ay){
-		//printf("GLUT: mouse event x:%d y:%d bt:#%d,%d\n", ax,ay, btn, state==GLUT_DOWN);
+//		printf("GLUT: mouse click x:%d y:%d bt:#%d,%d\n", ax,ay, btn, state==GLUT_DOWN);
 		Window * win = getWindow();
 		if(win){
 			switch(btn){
@@ -363,6 +364,7 @@ public:
 	}
 
 	static void cbMotion(int ax, int ay){
+//		printf("GLUT: mouse drag x:%d y:%d\n", ax,ay);
 		Window * win = getWindow();
 		if(win){
 			win->mMouse.position(ax,ay);
@@ -411,16 +413,16 @@ public:
 	}
 
 	static void registerCBs(){
-		glutDisplayFunc(cbDisplay);
 		glutKeyboardFunc(cbKeyboard);
 		glutKeyboardUpFunc(cbKeyboardUp);
 		glutMouseFunc(cbMouse);
 		glutMotionFunc(cbMotion);
 		glutPassiveMotionFunc(cbPassiveMotion);
-		glutReshapeFunc(cbReshape);
 		glutSpecialFunc(cbSpecial);
 		glutSpecialUpFunc(cbSpecialUp);
+		glutReshapeFunc(cbReshape);
 		glutVisibilityFunc(cbVisibility);
+		glutDisplayFunc(cbDisplay);
 	}
 
 private:

@@ -184,13 +184,15 @@ struct InputEventHandler{
 	virtual bool onMouseMove(const Mouse& m){return true;}	///< Called when the mouse moves
 	virtual bool onMouseUp(const Mouse& m){return true;}	///< Called when a mouse button is released
 
+	bool attached() const { return NULL != mWindow; }
 	Window& window(){ return *mWindow; }
 	const Window& window() const { return *mWindow; }
 
-protected:
+private:
 	friend class Window;
 	Window * mWindow;
 	InputEventHandler& window(Window * v){ mWindow=v; return *this; }
+	void removeFromWindow();
 };
 
 
@@ -207,14 +209,16 @@ struct WindowEventHandler {
 	virtual bool onFrame(){ return true; }					///< Called every frame
 	virtual bool onResize(int dw, int dh){ return true; }	///< Called whenever window dimensions change
 	virtual bool onVisibility(bool v){ return true; }		///< Called when window changes from hidden to shown and vice versa
-	
+
+	bool attached() const { return NULL != mWindow; }
 	Window& window(){ return *mWindow; }
 	const Window& window() const { return *mWindow; }
 
-protected:
+private:
 	friend class Window;
 	Window * mWindow;
 	WindowEventHandler& window(Window * v){ mWindow=v; return *this; }
+	void removeFromWindow();
 };
 
 
