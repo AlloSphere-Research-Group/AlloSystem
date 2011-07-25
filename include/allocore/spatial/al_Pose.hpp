@@ -88,22 +88,22 @@ public:
 	}
 	
 	/// Get right unit vector
-	Vec3d ur() const { Vec3d r; quat().toVectorX(r); return r; }
+	Vec3d ur() const { return ux(); }
 
 	/// Get up unit vector
-	Vec3d uu() const { Vec3d r; quat().toVectorY(r); return r; }
+	Vec3d uu() const { return uy(); }
 
 	/// Get forward unit vector (negative of Z)
-	Vec3d uf() const { Vec3d r; quat().toVectorZ(r); return -r; }
+	Vec3d uf() const { return -uz(); }
 	
 	/// Get X unit vector
-	Vec3d ux() const { Vec3d r; quat().toVectorX(r); return r; }
+	Vec3d ux() const { return quat().toVectorX(); }
 
 	/// Get Y unit vector
-	Vec3d uy() const { Vec3d r; quat().toVectorY(r); return r; }
+	Vec3d uy() const { return quat().toVectorY(); }
 
 	/// Get Z unit vector
-	Vec3d uz() const { Vec3d r; quat().toVectorZ(r); return r; }
+	Vec3d uz() const { return quat().toVectorZ(); }
 
 
 	// Setters
