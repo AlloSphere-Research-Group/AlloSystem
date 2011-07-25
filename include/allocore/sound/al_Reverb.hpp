@@ -118,7 +118,9 @@ protected:
 
 	class DelayLine {
 	public:
-		DelayLine(int size): mPos(0){ resize(size); }
+		DelayLine(int size)
+		:	mPos(0), mSize(0), mBuf(0)
+		{	resize(size); }
 
 		~DelayLine(){ deleteBuf(); }
 
