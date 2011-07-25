@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <map>
+#include <limits>
 
 using namespace al;
 
