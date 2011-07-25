@@ -300,8 +300,11 @@ inline void Array::deriveStride(AlloArrayHeader& h, size_t alignSize) {
 
 	if(numDims>1){
 		h.stride[1] = h.stride[0] * h.dim[0];		// compute ideal row stride amount
-		unsigned remain = h.stride[1] % alignSize;		// compute pad bytes
-		if(remain){ h.stride[1] += alignSize - remain;}// add pad bytes (if any)
+		
+		if(alignSize){	// protection against x % 0, can throw exception...
+			unsigned remain = h.stride[1] % alignSize;		// compute pad bytes
+			if(remain){ h.stride[1] += alignSize - remain;}	// add pad bytes (if any)
+		}
 
 		unsigned i=2;
 		for(; i<numDims; ++i){ h.stride[i] = h.stride[i-1] * h.dim[i-1]; }
