@@ -184,7 +184,7 @@ public:
 	/// Append vertices to vertex buffer
 	template <class T>
 	void vertex(const Vec<3,T> * buf, int size){
-		for(int i=0; i<size; ++i) vertices().append(buf[i][0], buf[i][1], buf[i][2]);
+		for(int i=0; i<size; ++i) vertex(buf[i][0], buf[i][1], buf[i][2]);
 	}
 
 	/// Set geometric primitive
