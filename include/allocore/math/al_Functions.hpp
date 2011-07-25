@@ -310,12 +310,20 @@ template<class T> T wrapPhaseOnce(T radians);
 
 
 /// Convert spherical to Cartesian coordinates in-place
+
+/// @param[in,out] r2x		radius to x coordinate
+/// @param[in,out] t2y		theta (angle from z axis), in [0, pi], to y coordinate
+/// @param[in,out] p2z		phi (angle on xy plane), in [-pi, pi], to z coordinate
 template<class T> void sphericalToCart(T& r2x, T& t2y, T& p2z);
 
 /// Convert spherical to Cartesian coordinates in-place
 template<class T> void sphericalToCart(T * vec3);
 
 /// Convert Cartesian to spherical coordinates in-place
+
+/// @param[in,out] x2r		x coordinate to radius
+/// @param[in,out] y2t		y coordinate to theta (angle from z axis), in [0, pi]
+/// @param[in,out] z2p		z coordinate to phi (angle on xy plane), in [-pi, pi]
 template<class T> void cartToSpherical(T& x2r, T& y2t, T& z2p);
 
 /// Convert Cartesian to spherical coordinates in-place
