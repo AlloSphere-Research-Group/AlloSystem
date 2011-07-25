@@ -203,8 +203,9 @@ const ShaderProgram& ShaderProgram::use() const {
 	//glUseProgramObjectARB((GLhandleARB)handle());
 	return *this; 
 }
-void ShaderProgram::begin() const { 
-	use(); 
+bool ShaderProgram::begin() const { 
+	use();
+	return active();
 }
 void ShaderProgram::end() const { 
 	if(active()) glUseProgram(0); 

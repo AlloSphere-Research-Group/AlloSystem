@@ -140,7 +140,7 @@ public:
 	/// Toggle active state
 	ShaderProgram& toggleActive(){ mActive^=true; return *this; }
 
-	void begin() const;
+	bool begin() const;
 	void end() const;
 
 	/// Returns whether program linked successfully.
