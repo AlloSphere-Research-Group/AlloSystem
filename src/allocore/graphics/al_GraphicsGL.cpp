@@ -50,8 +50,8 @@ GLenum GraphicsGL :: gl_blend_func(Graphics::BlendFunc v) {
 
 GLenum GraphicsGL :: gl_capability(Graphics::Capability v){
 	switch(v){
-		CS(BLEND) CS(COLOR_MATERIAL) CS(DEPTH_TEST) CS(LIGHTING)
-		CS(SCISSOR_TEST)
+		CS(BLEND) CS(COLOR_MATERIAL) CS(DEPTH_TEST) CS(FOG)
+		CS(LIGHTING) CS(SCISSOR_TEST)
 		default: return 0;
 	}
 }
