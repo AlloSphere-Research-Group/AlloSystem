@@ -42,7 +42,7 @@ struct Viewport {
 	Viewport(float w=800, float h=600) : l(0), b(0), w(w), h(h) {}
 	Viewport(float l, float b, float w, float h) : l(l), b(b), w(w), h(h) {}
 
-	/// Get aspect ratio
+	/// Get aspect ratio (width divided by height)
 	float aspect() const { return (h!=0 && w!=0) ? float(w)/h : 1; }
 
 	/// Set dimensions
