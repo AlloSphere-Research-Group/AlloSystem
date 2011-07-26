@@ -151,10 +151,10 @@ HashSpace :: HashSpace(int resolution)
 	}
 	// create lookup tables:
 	mD.reserve(A.size());	
-	for(int i=0; i < A.size(); i++) {
+	for(unsigned i=0; i < A.size(); i++) {
 		vector<int> &ilist = A[i];
 		if(ilist.size() > 0) {
-			for(int j=0; j < ilist.size(); j++) {
+			for(unsigned j=0; j < ilist.size(); j++) {
 				mG.push_back(ilist[j]);
 			}
 			mD[i] = mG.size();
@@ -256,7 +256,7 @@ void HashSpace :: hash(int id, float x, float y, float z) {
 	Object * ob = &mObjects[id];
 	ob->pos.set(x,y,z);
 	int upos = unpackPos(x, y, z);
-	if(upos == InvalidPos) {
+	if(upos == (int)InvalidPos) {
 		if(ob->cellidx != InvalidCell) {
 			removeObject(ob);	
 					
@@ -307,7 +307,7 @@ void HashSpace :: hash(Array *points) {
 int HashSpace :: query(float x, float y, float z, float radius, int nobjs, Object **res) {
 	int nres = 0;
 	int upos = unpackPos(x, y, z);
-	if(upos != InvalidPos) {
+	if(upos != (int)InvalidPos) {
 		float d2 = radius*radius;
 		int n = (int)d2;
 		
@@ -344,7 +344,7 @@ int HashSpace :: query(float x, float y, float z, float radius, int nobjs, Objec
 int HashSpace :: query(float x, float y, float z, float radius, Object *exclude, int nobjs, Object **res) {
 	int nres = 0;
 	int upos = unpackPos(x, y, z);
-	if(upos != InvalidPos) {
+	if(upos != (int)InvalidPos) {
 		float d2 = radius*radius;
 		int n = (int)d2;
 		
@@ -382,7 +382,7 @@ int HashSpace :: query(float x, float y, float z, float radius, Object *exclude,
 int HashSpace :: queryRange(float x, float y, float z, float r1, float r2, int nobjs, Object **res) {
 	int nres = 0;
 	int upos = unpackPos(x, y, z);
-	if(upos != InvalidPos) {
+	if(upos != (int)InvalidPos) {
 		float d12 = r1*r1;
 		int n1 = (int)d12;
 		
