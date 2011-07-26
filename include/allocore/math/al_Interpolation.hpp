@@ -153,7 +153,7 @@ inline Tv bilinear(
 /// Trilinear interpolation between values on corners of a hexahedron
 template <class Tf, class Tv>
 inline Tv trilinear(
-	const Tf& fracX, const Tf& fracY, const Tv& fracZ,
+	const Tf& fracX, const Tf& fracY, const Tf& fracZ,
 	const Tv& xyz, const Tv& Xyz,
 	const Tv& xYz, const Tv& XYz,
 	const Tv& xyZ, const Tv& XyZ,
