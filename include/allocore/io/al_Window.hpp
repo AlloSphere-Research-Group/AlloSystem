@@ -184,6 +184,8 @@ struct InputEventHandler{
 	virtual bool onMouseMove(const Mouse& m){return true;}	///< Called when the mouse moves
 	virtual bool onMouseUp(const Mouse& m){return true;}	///< Called when a mouse button is released
 
+	InputEventHandler* inputEventHandler(){ return this; }	///< Return self
+
 	bool attached() const { return NULL != mWindow; }
 	Window& window(){ return *mWindow; }
 	const Window& window() const { return *mWindow; }
@@ -209,6 +211,8 @@ struct WindowEventHandler {
 	virtual bool onFrame(){ return true; }					///< Called every frame
 	virtual bool onResize(int dw, int dh){ return true; }	///< Called whenever window dimensions change
 	virtual bool onVisibility(bool v){ return true; }		///< Called when window changes from hidden to shown and vice versa
+
+	WindowEventHandler* windowEventHandler(){ return this; }///< Return self
 
 	bool attached() const { return NULL != mWindow; }
 	Window& window(){ return *mWindow; }
