@@ -202,11 +202,11 @@ public:
 
 	// Other state
 	void antialiasing(AntiAliasMode v){ p_antialiasing(v); }
-	void lineWidth(double v){ p_lineWidth(v); }
+	void lineWidth(float v){ p_lineWidth(v); }
 
 	/// Set distance attenuation of points. The scaling formula is clamp(size * sqrt(1/(c0 + c1*d + c2*d^2)))
 	void pointAtten(float c2=0, float c1=0, float c0=1){ p_pointAtten(c2,c1,c0); }
-	void pointSize(double v){ p_pointSize(v); }
+	void pointSize(float v){ p_pointSize(v); }
 	void polygonMode(PolygonMode m, Face f=FRONT_AND_BACK){ p_polygonMode(m,f); }
 	void shadeModel(ShadeModel m) { p_shadeModel(m); }
 	void fog(float end, float start, const Color& c){ p_fog(end, start, c); }
@@ -245,7 +245,7 @@ private:
 	virtual void p_clear(int attribMask) = 0;
 	virtual void p_clearColor(float r, float g, float b, float a) = 0;
 
-	virtual void p_currentColor(double r, double g, double b, double a) = 0;
+	virtual void p_currentColor(float r, float g, float b, float a) = 0;
 
 	virtual void p_draw(const Mesh& v) = 0;
 
@@ -261,8 +261,8 @@ private:
 	virtual void p_scale(double x, double y, double z) = 0;
 
 	virtual void p_antialiasing(AntiAliasMode v) = 0;
-	virtual void p_lineWidth(double v) = 0;
-	virtual void p_pointSize(double v) = 0;
+	virtual void p_lineWidth(float v) = 0;
+	virtual void p_pointSize(float v) = 0;
 	virtual void p_pointAtten(float c2, float c1, float c0) = 0;
 	virtual void p_polygonMode(PolygonMode m, Face f) = 0;
 	virtual void p_shadeModel(ShadeModel m) = 0;

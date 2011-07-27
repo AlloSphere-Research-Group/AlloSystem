@@ -140,7 +140,7 @@ public:
 	virtual void surfaceCopy(Surface *surface, Texture *texture);
 
 private:
-	virtual void p_currentColor(double r, double g, double b, double a=1.);
+	virtual void p_currentColor(float r, float g, float b, float a=1.);
 
 	// Rendering State
 	virtual void p_blending(bool enable, BlendFunc src, BlendFunc dst);
@@ -167,8 +167,8 @@ private:
 	virtual void p_draw(const Mesh& v);
 
 	virtual void p_antialiasing(AntiAliasMode v);
-	virtual void p_lineWidth(double v);
-	virtual void p_pointSize(double v);
+	virtual void p_lineWidth(float v);
+	virtual void p_pointSize(float v);
 	virtual void p_pointAtten(float c2, float c1, float c0);
 	virtual void p_polygonMode(PolygonMode m, Face f);
 	virtual void p_shadeModel(ShadeModel m);

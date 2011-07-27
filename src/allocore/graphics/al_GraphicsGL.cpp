@@ -190,8 +190,8 @@ void GraphicsGL :: p_antialiasing(AntiAliasMode mode) {
 	}
 }
 
-void GraphicsGL :: p_lineWidth(double v) { glLineWidth(v); }
-void GraphicsGL :: p_pointSize(double v) { glPointSize(v); }
+void GraphicsGL :: p_lineWidth(float v) { glLineWidth(v); }
+void GraphicsGL :: p_pointSize(float v) { glPointSize(v); }
 void GraphicsGL :: p_pointAtten(float c2, float c1, float c0){
 	GLfloat att[3] = {c0, c1, c2};
 	glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, att);
@@ -200,7 +200,7 @@ void GraphicsGL :: p_polygonMode(PolygonMode m, Face f) { glPolygonMode(gl_face(
 void GraphicsGL :: p_shadeModel(ShadeModel m) {
 	glShadeModel(m ? GL_SMOOTH : GL_FLAT);
 }
-void GraphicsGL :: p_currentColor(double r, double g, double b, double a) {
+void GraphicsGL :: p_currentColor(float r, float g, float b, float a) {
 	glColor4f(r, g, b, a);
 }
 
