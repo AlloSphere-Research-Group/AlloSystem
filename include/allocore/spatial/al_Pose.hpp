@@ -83,7 +83,7 @@ public:
 	Pose lerp(Pose& target, double amt) const {
 		Pose r(*this);
 		r.pos().lerp(target.pos(), amt);
-		r.quat().slerpto(target.quat(), amt);
+		r.quat().slerpTo(target.quat(), amt);
 		return r;
 	}
 	
@@ -156,7 +156,7 @@ public:
 	// step toward the target:
 	SmoothPose& operator()() {
 		pos().lerp(mTarget.pos(), 1.-mPF);
-		quat().slerpto(mTarget.quat(), 1.-mQF);
+		quat().slerpTo(mTarget.quat(), 1.-mQF);
 		return *this;
 	}
 	

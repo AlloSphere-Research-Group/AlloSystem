@@ -297,7 +297,7 @@ public:
 			
 			// update listener history data:
 			Quatd qnew = l.pose().quat();
-			Quatd::slerp_buffer(l.mQuatPrev, qnew, &l.mQuatHistory[0], numFrames);
+			Quatd::slerpBuffer(l.mQuatPrev, qnew, &l.mQuatHistory[0], numFrames);
 			l.mQuatPrev = qnew;
 			l.mPosHistory(l.pose().vec());
 			

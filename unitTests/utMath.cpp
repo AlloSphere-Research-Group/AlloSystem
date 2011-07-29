@@ -286,7 +286,7 @@ int utMath(){
 		assert(eq(&q.sgn()[0], &Quatd(1./11, 2./11, 4./11, 10./11)[0], 4));
 		
 		// test rotation of vectors by quaternion
-		q.fromAxisAngle(90, 1,0,0);
+		q.fromAxisAngle(M_2PI/4, 1,0,0);
 		assert(eq(&q[0], &Quatd(sqrt(2)/2, sqrt(2)/2,0,0)[0], 4));
 		{
 			Vec3d v(0,0,1);
@@ -294,7 +294,7 @@ int utMath(){
 			assert(eq(&v[0], &Vec3d(0,-1,0)[0], 3));
 		}
 
-		q.fromAxisAngle(90, 0,1,0);
+		q.fromAxisAngle(M_2PI/4, 0,1,0);
 		assert(eq(&q[0], &Quatd(sqrt(2)/2, 0,sqrt(2)/2,0)[0], 4));
 		{
 			Vec3d v(0,0,1);
@@ -303,7 +303,7 @@ int utMath(){
 			assert(eq(&v[0], &Vec3d(1,0,0)[0], 3));
 		}
 
-		q.fromAxisAngle(90, 0,0,1);
+		q.fromAxisAngle(M_2PI/4, 0,0,1);
 		{
 			Vec3d v(1,0,0);
 			v = q.rotate(v);			
@@ -311,22 +311,25 @@ int utMath(){
 			assert(eq(&v[0], &Vec3d(0,1,0)[0], 3));
 		}
 
-		assert(q.fromAxisAngle(45, 1,0,0) == Quatd().fromAxisX(45));
-		assert(q.fromAxisAngle(45, 0,1,0) == Quatd().fromAxisY(45));
-		assert(q.fromAxisAngle(45, 0,0,1) == Quatd().fromAxisZ(45));
+		assert(q.fromAxisAngle(M_2PI/8, 1,0,0) == Quatd().fromAxisX(M_2PI/8));
+		assert(q.fromAxisAngle(M_2PI/8, 0,1,0) == Quatd().fromAxisY(M_2PI/8));
+		assert(q.fromAxisAngle(M_2PI/8, 0,0,1) == Quatd().fromAxisZ(M_2PI/8));
 
 		{
-			q.fromEuler(10,20,30);		// set to something non-trival...
+			q.fromEuler(M_2PI/7, M_2PI/8, M_2PI/9);		// set to something non-trival...
 			double angle, ax,ay,az;
 			q.toAxisAngle(angle, ax,ay,az);
 			Quatd b = q.fromAxisAngle(angle, ax,ay,az);
 			assert(q == b || q == b.conj());
 		}
 
-		assert(q.fromEuler(45,45,45) == ((Quatd().fromAxisY(45) * Quatd().fromAxisX(45)) * Quatd().fromAxisZ(45)) );
+		assert(
+			q.fromEuler(M_2PI/8,M_2PI/8,M_2PI/8) 
+			== ((Quatd().fromAxisY(M_2PI/8) * Quatd().fromAxisX(M_2PI/8)) * Quatd().fromAxisZ(M_2PI/8))
+		);
 
 		{
-			q.fromEuler(10,20,30);		// set to something non-trival...
+			q.fromEuler(M_2PI/7, M_2PI/8, M_2PI/9);		// set to something non-trival...
 			double az, el, ba;
 			q.toEuler(az, el, ba);
 			Quatd b = q.fromEuler(az, el, ba);
@@ -352,7 +355,7 @@ int utMath(){
 			
 			Vec3d vx, vy, vz;
 
-			q.fromAxisAngle(90, 1,0,0);			
+			q.fromAxisAngle(M_2PI/4, 1,0,0);			
 			q.toVectorX(vx);
 			q.toVectorY(vy);
 			q.toVectorZ(vz);
@@ -360,7 +363,7 @@ int utMath(){
 			assert(eq(&vy[0], &Vec3d(0,0,1)[0], 3));
 			assert(eq(&vz[0], &Vec3d(0,-1,0)[0], 3));
 
-			q.fromAxisAngle(90, 0,1,0);			
+			q.fromAxisAngle(M_2PI/4, 0,1,0);			
 			q.toVectorX(vx);
 			q.toVectorY(vy);
 			q.toVectorZ(vz);
@@ -368,7 +371,7 @@ int utMath(){
 			assert(eq(&vy[0], &Vec3d(0,1,0)[0], 3));
 			assert(eq(&vz[0], &Vec3d(1,0,0)[0], 3));
 
-			q.fromAxisAngle(90, 0,0,1);			
+			q.fromAxisAngle(M_2PI/4, 0,0,1);			
 			q.toVectorX(vx);
 			q.toVectorY(vy);
 			q.toVectorZ(vz);
