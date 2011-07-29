@@ -145,6 +145,8 @@ protected:
 	Quatd mQuat;	// orientation of reference frame as a quaternion (relative to global axes)
 };
 
+
+
 /// A smoothed Pose:
 /// It approaches the stored target Pose exponentially
 /// with a curvature determined by psmooth and qsmooth
@@ -191,6 +193,8 @@ protected:
 	double mPF, mQF;
 };
 
+
+
 ///	A mobile coordinate frame
 
 ///	A Pose that knows how to accumulate velocities
@@ -202,12 +206,13 @@ public:
 	:	Pose(position), mSmooth(smooth), mVelScale(1)
 	{	updateDirectionVectors(); }
 	
-	Nav(const Nav& nav) : Pose(nav.pos(), nav.quat() ), 
-	mMove0(nav.mMove0), mMove1(nav.mMove1),	// linear velocities (raw, smoothed)
-	mSpin0(nav.mSpin0), mSpin1(nav.mSpin1),	// angular velocities (raw, smoothed)
-	mTurn(nav.mTurn), mNudge(nav.mNudge),			//  
-	mSmooth(nav.smooth()), mVelScale(nav.mVelScale)
-	{ updateDirectionVectors(); }
+	Nav(const Nav& nav)
+	:	Pose(nav.pos(), nav.quat() ), 
+		mMove0(nav.mMove0), mMove1(nav.mMove1),	// linear velocities (raw, smoothed)
+		mSpin0(nav.mSpin0), mSpin1(nav.mSpin1),	// angular velocities (raw, smoothed)
+		mTurn(nav.mTurn), mNudge(nav.mNudge),			//  
+		mSmooth(nav.smooth()), mVelScale(nav.mVelScale)
+	{	updateDirectionVectors(); }
 
 	/// Get smoothing amount
 	double smooth() const { return mSmooth; }
@@ -278,19 +283,19 @@ public:
 	void nudgeU(double amount) { mNudge[1] += amount; }
 	void nudgeF(double amount) { mNudge[2] += amount; }
 
-	/// Set all angular velocity values from azimuth, elevation, and bank differentials
+	/// Set all angular velocity values from azimuth, elevation, and bank differentials, in radians
 	void spin(double da, double de, double db){ spinR(de); spinU(da); spinF(db); }
 
-	/// Set angular velocity around right vector
+	/// Set angular velocity around right vector, in radians
 	void spinR(double v){ mSpin0[0] = v; }
 	
-	/// Set angular velocity around up vector
+	/// Set angular velocity around up vector, in radians
 	void spinU(double v){ mSpin0[1] = v; }
 	
-	/// Set angular velocity around forward vector
+	/// Set angular velocity around forward vector, in radians
 	void spinF(double v){ mSpin0[2] = v; }
 
-	/// Turn by a single increment for one step, in degrees
+	/// Turn by a single increment for one step, in radians
 	void turn(double a, double e, double b){ turnR(e); turnU(a); turnF(b); }
 	void turnR(double v){ mTurn[0] = v; }
 	void turnU(double v){ mTurn[1] = v; }
