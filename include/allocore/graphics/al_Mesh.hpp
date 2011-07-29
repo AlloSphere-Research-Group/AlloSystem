@@ -139,6 +139,9 @@ public:
 	void color(const Colori& v) { coloris().append(v); }
 
 	/// Append color to color buffer
+	void color(const HSV& v) { colors().append(v); }
+
+	/// Append color to color buffer
 	void color(float r, float g, float b, float a=1){ color(Color(r,g,b,a)); }
 	
 	/// Append color to color buffer
