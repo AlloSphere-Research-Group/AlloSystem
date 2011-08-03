@@ -146,31 +146,10 @@ public:
 
 protected:
 	Viewpoints mViewpoints;
-	
-//	struct ResizeHandler : public WindowEventHandler{
-//		ResizeHandler(ViewpointWindow& w_): w(w_){}
-//		bool onResize(int dw, int dh){
-//			Viewpoints::iterator iv = w.mViewpoints.begin();
-//			
-//			while(iv != w.mViewpoints.end()){
-//				Viewpoint& vp = **iv;
-//
-//				vp.viewport().l += dw * vp.anchorX();
-//				vp.viewport().b += dh * vp.anchorY();
-//				vp.viewport().w += dw * vp.stretchX();
-//				vp.viewport().h += dh * vp.stretchY();
-//
-//				++iv;
-//			}
-//			return true;
-//		}
-//		ViewpointWindow& w;
-//	};
 
 private:
 	void init(){
 		add(new StandardWindowKeyControls);
-//		add(new ResizeHandler(*this));
 	}
 };
 
