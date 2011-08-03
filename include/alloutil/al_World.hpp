@@ -127,33 +127,50 @@ public:
 	
 	void add(Viewpoint& v){ mViewpoints.push_back(&v); }
 
+
+	virtual bool onResize(int dw, int dh){
+		Viewpoints::iterator iv = mViewpoints.begin();
+		
+		while(iv != mViewpoints.end()){
+			Viewpoint& vp = **iv;
+
+			vp.viewport().l += dw * vp.anchorX();
+			vp.viewport().b += dh * vp.anchorY();
+			vp.viewport().w += dw * vp.stretchX();
+			vp.viewport().h += dh * vp.stretchY();
+
+			++iv;
+		}
+		return true;
+	}
+
 protected:
 	Viewpoints mViewpoints;
 	
-	struct ResizeHandler : public WindowEventHandler{
-		ResizeHandler(ViewpointWindow& w_): w(w_){}
-		bool onResize(int dw, int dh){
-			Viewpoints::iterator iv = w.mViewpoints.begin();
-			
-			while(iv != w.mViewpoints.end()){
-				Viewpoint& vp = **iv;
-
-				vp.viewport().l += dw * vp.anchorX();
-				vp.viewport().b += dh * vp.anchorY();
-				vp.viewport().w += dw * vp.stretchX();
-				vp.viewport().h += dh * vp.stretchY();
-
-				++iv;
-			}
-			return true;
-		}
-		ViewpointWindow& w;
-	};
+//	struct ResizeHandler : public WindowEventHandler{
+//		ResizeHandler(ViewpointWindow& w_): w(w_){}
+//		bool onResize(int dw, int dh){
+//			Viewpoints::iterator iv = w.mViewpoints.begin();
+//			
+//			while(iv != w.mViewpoints.end()){
+//				Viewpoint& vp = **iv;
+//
+//				vp.viewport().l += dw * vp.anchorX();
+//				vp.viewport().b += dh * vp.anchorY();
+//				vp.viewport().w += dw * vp.stretchX();
+//				vp.viewport().h += dh * vp.stretchY();
+//
+//				++iv;
+//			}
+//			return true;
+//		}
+//		ViewpointWindow& w;
+//	};
 
 private:
 	void init(){
 		add(new StandardWindowKeyControls);
-		add(new ResizeHandler(*this));
+//		add(new ResizeHandler(*this));
 	}
 };
 
@@ -194,6 +211,9 @@ public:
 
 	const Nav&			nav() const { return mNav; }
 	Nav&				nav(){ return mNav; }
+
+	const Nav&			navDraw() const { return mNavDraw; }
+	Nav&				navDraw(){ return mNavDraw; }
 
 	const NavInputControl& navControl() const { return mNavControl; }
 	NavInputControl&	navControl(){ return mNavControl; }
@@ -241,6 +261,7 @@ protected:
 	Listeners mListeners;
 	Windows mWindows;
 	Nav mNav;
+	Nav mNavDraw;	// this version remains invariant throughout all drawing
 	Camera mCamera;
 
 	Stereographic mStereo;
@@ -287,6 +308,8 @@ protected:
 			Graphics& g = w.mGraphics;
 			//int w = v.dimensions().w;
 			//int h = v.dimensions().h;
+			
+			w.navDraw() = w.nav();
 			
 			g.depthTesting(true);
 			
