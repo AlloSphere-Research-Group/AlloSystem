@@ -307,6 +307,7 @@ void HashSpace :: hash(Array *points) {
 int HashSpace :: query(float x, float y, float z, float radius, int nobjs, Object **res) {
 	int nres = 0;
 	int upos = unpackPos(x, y, z);
+
 	if(upos != (int)InvalidPos) {
 		float d2 = radius*radius;
 		int n = (int)d2;
@@ -316,20 +317,25 @@ int HashSpace :: query(float x, float y, float z, float radius, int nobjs, Objec
 			int offset = mG[i];
 			int cellpos = offset+upos;
 			int cidx = cellIdx(cellpos);
-			Cell &cell = mCells[cidx];
-			if(cell.objects) {
+			
+			printf("cellpos %d cidx %d cells %d\n", cellpos, cidx, mCells.size());
+			
+			if (cidx < mCells.size()) {
+				Cell &cell = mCells[cidx];
 				Object *o = cell.objects;
-				do {
-					float dx = x - o->pos[0];
-					float dy = y - o->pos[1];
-					float dz = z - o->pos[2];
-					float od2 = dx*dx+dy*dy+dz*dz;
-					if(od2 <= d2) {
-						res[nres] = o;
-						nres++;
-					}
-					o = o->next;
-				} while(o != cell.objects && nres < nobjs);
+				if(o) {
+					do {
+						float dx = x - o->pos[0];
+						float dy = y - o->pos[1];
+						float dz = z - o->pos[2];
+						float od2 = dx*dx+dy*dy+dz*dz;
+						if(od2 <= d2) {
+							res[nres] = o;
+							nres++;
+						}
+						o = o->next;
+					} while(o && o != cell.objects && nres < nobjs);
+				}
 			}
 			
 			if(nres == nobjs) {

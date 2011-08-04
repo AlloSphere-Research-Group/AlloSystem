@@ -20,58 +20,95 @@ void Stereographic :: draw(Graphics& gl, const Camera& cam, const Pose& pose, co
 
 void Stereographic :: drawMono(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw) 
 {
-	double fovy = cam.fovy();
 	double near = cam.near();
 	double far = cam.far();
-	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
-	mProjection = Matrix4d::perspective(fovy, aspect, near, far);
-	mModelView = Matrix4d::lookAt(ux, uy, uz, pos);
-
+	
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 	gl.clearColor(mClearColor);
-
-	glDrawBuffer(GL_BACK);
-
-	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 	
+	glDrawBuffer(GL_BACK);
+	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
-	// apply camera transform:
-	gl.pushMatrix(gl.PROJECTION);
-	gl.loadMatrix(mProjection);
-	gl.pushMatrix(gl.MODELVIEW);
-	gl.loadMatrix(mModelView);
+	if (omni()) {
 	
-	draw.onDraw(gl);
+		int wx = vp.l;
+		double fovx = mOmniFov;
+		for (unsigned i=0; i<mSlices; i++) {
+			double phase = i/(double)mSlices;
+			// pan from - fovx/2 to + fovx/2 over mSlices steps
+			double angle = (0.5-phase) * fovx; //2. * M_PI;
+			
+			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
+			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
+			double aspect = vp1.aspect(); 
+			double fovy = Camera::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect); 
+			
+			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
+			Vec3d ux = q.toVectorX();
+			Vec3d uy = q.toVectorY();
+			Vec3d uz = q.toVectorZ();
+			
+			mProjection = Matrix4d::perspective(fovy, aspect, near, far);
+			mModelView = Matrix4d::lookAt(ux, uy, uz, pos);
+			
+			gl.viewport(vp1.l, vp1.b, vp1.w, vp1.h);
+			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			
+			// apply camera transform:
+			gl.pushMatrix(gl.PROJECTION);
+			gl.loadMatrix(mProjection);
+			gl.pushMatrix(gl.MODELVIEW);
+			gl.loadMatrix(mModelView);
+			
+			draw.onDraw(gl);
 
-	gl.popMatrix(gl.PROJECTION);
-	gl.popMatrix(gl.MODELVIEW);
+			gl.popMatrix(gl.PROJECTION);
+			gl.popMatrix(gl.MODELVIEW);
+			
+			wx = wx1;
+		}
+		
+	} else {
+		
+		double fovy = cam.fovy();
+		double aspect = vp.aspect();
+		Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
+		mProjection = Matrix4d::perspective(fovy, aspect, near, far);
+		mModelView = Matrix4d::lookAt(ux, uy, uz, pos);
+
+		// apply camera transform:
+		gl.pushMatrix(gl.PROJECTION);
+		gl.loadMatrix(mProjection);
+		gl.pushMatrix(gl.MODELVIEW);
+		gl.loadMatrix(mModelView);
+		
+		draw.onDraw(gl);
+
+		gl.popMatrix(gl.PROJECTION);
+		gl.popMatrix(gl.MODELVIEW);
+
+	}
 	
 	gl.scissor(false);
 	glPopAttrib();
 }
 
 void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw) 
-{
-	double fovy = cam.fovy();
+{	
 	double near = cam.near();
 	double far = cam.far();
 	double focal = cam.focalLength();
 	double iod = cam.eyeSep();
-	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
 
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 	gl.clearColor(mClearColor);
-
-	glDrawBuffer(GL_BACK);
-
-	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 	
-	gl.clear(gl.COLOR_BUFFER_BIT);
+	glDrawBuffer(GL_BACK);
+	gl.viewport(vp.l, vp.b, vp.w, vp.h);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
 	switch(mAnaglyphMode){
 		case RedBlue:
@@ -83,20 +120,65 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 		default:		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE ,GL_TRUE);
 	} 
 
-	gl.clear(gl.DEPTH_BUFFER_BIT);
-	
-	// apply camera transform:
-	mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
-	mModelView = Matrix4d::lookAtRight(ux, uy, uz, pos, iod);
-	gl.pushMatrix(gl.PROJECTION);
-	gl.loadMatrix(mProjection);
-	gl.pushMatrix(gl.MODELVIEW);
-	gl.loadMatrix(mModelView);
-	
-	draw.onDraw(gl);
+	if (omni()) {
+		int wx = vp.l;
+		double fovx = mOmniFov;
+		for (unsigned i=0; i<mSlices; i++) {
+			double phase = i/(double)mSlices;
+			// pan from - fovx/2 to + fovx/2 over mSlices steps
+			double angle = (0.5-phase) * fovx; //2. * M_PI;
+			
+			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
+			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
+			double aspect = vp1.aspect(); 
+			double fovy = Camera::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect); 
+			
+			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
+			Vec3d ux = q.toVectorX();
+			Vec3d uy = q.toVectorY();
+			Vec3d uz = q.toVectorZ();
+			
+			mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
+			mModelView = Matrix4d::lookAtRight(ux, uy, uz, pos, iod);
+		
+			gl.viewport(vp1.l, vp1.b, vp1.w, vp1.h);
+			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			
+			// apply camera transform:
+			gl.pushMatrix(gl.PROJECTION);
+			gl.loadMatrix(mProjection);
+			gl.pushMatrix(gl.MODELVIEW);
+			gl.loadMatrix(mModelView);
+			
+			draw.onDraw(gl);
 
-	gl.popMatrix(gl.PROJECTION);
-	gl.popMatrix(gl.MODELVIEW);
+			gl.popMatrix(gl.PROJECTION);
+			gl.popMatrix(gl.MODELVIEW);
+			
+			wx = wx1;
+		}
+	} else {
+		double fovy = cam.fovy();
+		double aspect = vp.aspect();		
+		Vec3d ux, uy, uz; 
+		pose.unitVectors(ux, uy, uz);
+
+		gl.clear(gl.DEPTH_BUFFER_BIT);
+		
+		// apply camera transform:
+		mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
+		mModelView = Matrix4d::lookAtRight(ux, uy, uz, pos, iod);
+		gl.pushMatrix(gl.PROJECTION);
+		gl.loadMatrix(mProjection);
+		gl.pushMatrix(gl.MODELVIEW);
+		gl.loadMatrix(mModelView);
+		
+		draw.onDraw(gl);
+
+		gl.popMatrix(gl.PROJECTION);
+		gl.popMatrix(gl.MODELVIEW);
+		
+	}
 	
 	switch(mAnaglyphMode){
 		case RedBlue:	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE, GL_TRUE); break;
@@ -107,21 +189,67 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 		case CyanRed:	glColorMask(GL_TRUE, GL_FALSE,GL_FALSE,GL_TRUE); break;
 		default:		glColorMask(GL_TRUE, GL_TRUE ,GL_TRUE, GL_TRUE);
 	} 
+	
+	if (omni()) {
+		int wx = vp.l;
+		double fovx = mOmniFov;
+		for (unsigned i=0; i<mSlices; i++) {
+			double phase = i/(double)mSlices;
+			// pan from - fovx/2 to + fovx/2 over mSlices steps
+			double angle = (0.5-phase) * fovx; //2. * M_PI;
+			
+			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
+			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
+			double aspect = vp1.aspect(); 
+			double fovy = Camera::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect); 
+			
+			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
+			Vec3d ux = q.toVectorX();
+			Vec3d uy = q.toVectorY();
+			Vec3d uz = q.toVectorZ();
+			
+			mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
+			mModelView = Matrix4d::lookAtLeft(ux, uy, uz, pos, iod);
+		
+			gl.viewport(vp1.l, vp1.b, vp1.w, vp1.h);
+			gl.clear(gl.DEPTH_BUFFER_BIT);				// Note: depth only this pass
+			
+			// apply camera transform:
+			gl.pushMatrix(gl.PROJECTION);
+			gl.loadMatrix(mProjection);
+			gl.pushMatrix(gl.MODELVIEW);
+			gl.loadMatrix(mModelView);
+			
+			draw.onDraw(gl);
 
-	gl.clear(gl.DEPTH_BUFFER_BIT);
+			gl.popMatrix(gl.PROJECTION);
+			gl.popMatrix(gl.MODELVIEW);
+			
+			wx = wx1;
+		}
+	} else {
+		double fovy = cam.fovy();
+		double aspect = vp.aspect();		
+		Vec3d ux, uy, uz; 
+		pose.unitVectors(ux, uy, uz);
+		
+		gl.clear(gl.DEPTH_BUFFER_BIT);
+		
+		// apply camera transform:
+		mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
+		mModelView = Matrix4d::lookAtLeft(ux, uy, uz, pos, iod);
+		gl.pushMatrix(gl.PROJECTION);
+		gl.loadMatrix(mProjection);
+		gl.pushMatrix(gl.MODELVIEW);
+		gl.loadMatrix(mModelView);
+		
+		draw.onDraw(gl);
+		
+		gl.popMatrix(gl.PROJECTION);
+		gl.popMatrix(gl.MODELVIEW);
+		
+	}
 	
-	// apply camera transform:
-	mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
-	mModelView = Matrix4d::lookAtLeft(ux, uy, uz, pos, iod);
-	gl.pushMatrix(gl.PROJECTION);
-	gl.loadMatrix(mProjection);
-	gl.pushMatrix(gl.MODELVIEW);
-	gl.loadMatrix(mModelView);
-	
-	draw.onDraw(gl);
-	
-	gl.popMatrix(gl.PROJECTION);
-	gl.popMatrix(gl.MODELVIEW);
 	glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
 	gl.scissor(false);
 	glPopAttrib();
@@ -129,56 +257,171 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 
 void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw) 
 {
-	double fovy = cam.fovy();
 	double near = cam.near();
 	double far = cam.far();
 	double focal = cam.focalLength();
 	double iod = cam.eyeSep();
-	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
-
-	gl.viewport(vp.l, vp.b, vp.w, vp.h);
-
 
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 	gl.clearColor(mClearColor);
+	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 	
 	glDrawBuffer(GL_BACK_RIGHT);
 	gl.viewport(vp.l, vp.b, vp.w, vp.h);
-	//drawBuffer(BackRight);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
-
-	// apply camera transform:
-	mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
-	mModelView = Matrix4d::lookAtRight(ux, uy, uz, pos, iod);
-	gl.pushMatrix(gl.PROJECTION);
-	gl.loadMatrix(mProjection);
-	gl.pushMatrix(gl.MODELVIEW);
-	gl.loadMatrix(mModelView);
+	if (omni()) {
 	
-	draw.onDraw(gl);
-	
-	gl.popMatrix(gl.PROJECTION);
-	gl.popMatrix(gl.MODELVIEW);
+		int wx = vp.l;
+		double fovx = mOmniFov;
+		for (unsigned i=0; i<mSlices; i++) {
+			double phase = i/(double)mSlices;
+			// pan from - fovx/2 to + fovx/2 over mSlices steps
+			double angle = (0.5-phase) * fovx; //2. * M_PI;
+			
+			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
+			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
+			double aspect = vp1.aspect(); 
+			double fovy = Camera::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect); 
+			
+			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
+			Vec3d ux = q.toVectorX();
+			Vec3d uy = q.toVectorY();
+			Vec3d uz = q.toVectorZ();
+			
+			mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
+			mModelView = Matrix4d::lookAtRight(ux, uy, uz, pos, iod);
+			
+			gl.viewport(vp1.l, vp1.b, vp1.w, vp1.h);
+			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			
+			// apply camera transform:
+			gl.pushMatrix(gl.PROJECTION);
+			gl.loadMatrix(mProjection);
+			gl.pushMatrix(gl.MODELVIEW);
+			gl.loadMatrix(mModelView);
+			
+			draw.onDraw(gl);
 
+			gl.popMatrix(gl.PROJECTION);
+			gl.popMatrix(gl.MODELVIEW);
+			
+			wx = wx1;
+		}
+		
+	} else {
+		
+		double fovy = cam.fovy();
+		double aspect = vp.aspect();
+		Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
+		mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
+		mModelView = Matrix4d::lookAtRight(ux, uy, uz, pos, iod);
+
+		// apply camera transform:
+		gl.pushMatrix(gl.PROJECTION);
+		gl.loadMatrix(mProjection);
+		gl.pushMatrix(gl.MODELVIEW);
+		gl.loadMatrix(mModelView);
+		
+		draw.onDraw(gl);
+
+		gl.popMatrix(gl.PROJECTION);
+		gl.popMatrix(gl.MODELVIEW);
+
+	}
+	
+//	// apply camera transform:
+//	mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
+//	mModelView = Matrix4d::lookAtRight(ux, uy, uz, pos, iod);
+//	gl.pushMatrix(gl.PROJECTION);
+//	gl.loadMatrix(mProjection);
+//	gl.pushMatrix(gl.MODELVIEW);
+//	gl.loadMatrix(mModelView);
+//	
+//	draw.onDraw(gl);
+//	
+//	gl.popMatrix(gl.PROJECTION);
+//	gl.popMatrix(gl.MODELVIEW);
+
+	
 	glDrawBuffer(GL_BACK_LEFT);
+	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
-	// apply camera transform:
-	mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
-	mModelView = Matrix4d::lookAtLeft(ux, uy, uz, pos, iod);
-	gl.pushMatrix(gl.PROJECTION);
-	gl.loadMatrix(mProjection);
-	gl.pushMatrix(gl.MODELVIEW);
-	gl.loadMatrix(mModelView);
+	if (omni()) {
 	
-	draw.onDraw(gl);
+		int wx = vp.l;
+		double fovx = mOmniFov;
+		for (unsigned i=0; i<mSlices; i++) {
+			double phase = i/(double)mSlices;
+			// pan from - fovx/2 to + fovx/2 over mSlices steps
+			double angle = (0.5-phase) * fovx; //2. * M_PI;
+			
+			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
+			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
+			double aspect = vp1.aspect(); 
+			double fovy = Camera::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect); 
+			
+			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
+			Vec3d ux = q.toVectorX();
+			Vec3d uy = q.toVectorY();
+			Vec3d uz = q.toVectorZ();
+			
+			mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
+			mModelView = Matrix4d::lookAtLeft(ux, uy, uz, pos, iod);
 	
-	gl.popMatrix(gl.PROJECTION);
-	gl.popMatrix(gl.MODELVIEW);
+			gl.viewport(vp1.l, vp1.b, vp1.w, vp1.h);
+			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			
+			// apply camera transform:
+			gl.pushMatrix(gl.PROJECTION);
+			gl.loadMatrix(mProjection);
+			gl.pushMatrix(gl.MODELVIEW);
+			gl.loadMatrix(mModelView);
+			
+			draw.onDraw(gl);
 
+			gl.popMatrix(gl.PROJECTION);
+			gl.popMatrix(gl.MODELVIEW);
+			
+			wx = wx1;
+		}
+		
+	} else {
+		
+		double fovy = cam.fovy();
+		double aspect = vp.aspect();
+		Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
+		mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
+		mModelView = Matrix4d::lookAtLeft(ux, uy, uz, pos, iod);
+	
+		// apply camera transform:
+		gl.pushMatrix(gl.PROJECTION);
+		gl.loadMatrix(mProjection);
+		gl.pushMatrix(gl.MODELVIEW);
+		gl.loadMatrix(mModelView);
+		
+		draw.onDraw(gl);
+
+		gl.popMatrix(gl.PROJECTION);
+		gl.popMatrix(gl.MODELVIEW);
+
+	}
+	
+//	// apply camera transform:
+//	mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
+//	mModelView = Matrix4d::lookAtLeft(ux, uy, uz, pos, iod);
+//	gl.pushMatrix(gl.PROJECTION);
+//	gl.loadMatrix(mProjection);
+//	gl.pushMatrix(gl.MODELVIEW);
+//	gl.loadMatrix(mModelView);
+//	
+//	draw.onDraw(gl);
+//	
+//	gl.popMatrix(gl.PROJECTION);
+//	gl.popMatrix(gl.MODELVIEW);
+	
 	gl.scissor(false);
 	glPopAttrib();
 }
@@ -200,42 +443,118 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 	gl.clearColor(mClearColor);
 	
-	//drawBuffer(BackLeft);
 	glDrawBuffer(GL_BACK);
-	
-	gl.viewport(vp.l, vp.b, vp.w*0.5, vp.h);
-	
+	gl.viewport(vp.l, vp.b, vp.w, vp.h);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
-	// apply camera transform:
-	mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
-	mModelView = Matrix4d::lookAtLeft(ux, uy, uz, pos, iod);
-	gl.pushMatrix(gl.PROJECTION);
-	gl.loadMatrix(mProjection);
-	gl.pushMatrix(gl.MODELVIEW);
-	gl.loadMatrix(mModelView);
+	Viewport vpleft(vp.l, vp.b, vp.w*0.5, vp.h);
+	Viewport vpright(vp.l + vp.w*0.5, vp.b, vp.w*0.5, vp.h);
 	
-	draw.onDraw(gl);
+	if (omni()) {
+		int wx = vpleft.l;
+		double fovx = mOmniFov;
+		for (unsigned i=0; i<mSlices; i++) {
+			double phase = i/(double)mSlices;
+			// pan from - fovx/2 to + fovx/2 over mSlices steps
+			double angle = (0.5-phase) * fovx; //2. * M_PI;
+			
+			int wx1 = vpleft.l + vpleft.w * (i+1)/(double)mSlices;
+			Viewport vp1(wx, vpleft.b, wx1-wx, vpleft.h);
+			double aspect = vp1.aspect(); 
+			double fovy = Camera::getFovyForFovX(fovx * (vp1.w)/(double)vpleft.w, aspect); 
+			
+			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
+			Vec3d ux = q.toVectorX();
+			Vec3d uy = q.toVectorY();
+			Vec3d uz = q.toVectorZ();
+			
+			mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
+			mModelView = Matrix4d::lookAtLeft(ux, uy, uz, pos, iod);
+			
+			gl.viewport(vp1.l, vp1.b, vp1.w, vp1.h);
+			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			
+			// apply camera transform:
+			gl.pushMatrix(gl.PROJECTION);
+			gl.loadMatrix(mProjection);
+			gl.pushMatrix(gl.MODELVIEW);
+			gl.loadMatrix(mModelView);
+			
+			draw.onDraw(gl);
+
+			gl.popMatrix(gl.PROJECTION);
+			gl.popMatrix(gl.MODELVIEW);
+			
+			wx = wx1;
+		}
+		
+		wx = vpright.l;
+		for (unsigned i=0; i<mSlices; i++) {
+			double phase = i/(double)mSlices;
+			// pan from - fovx/2 to + fovx/2 over mSlices steps
+			double angle = (0.5-phase) * fovx; //2. * M_PI;
+			
+			int wx1 = vpright.l + vpright.w * (i+1)/(double)mSlices;
+			Viewport vp1(wx, vpright.b, wx1-wx, vpright.h);
+			double aspect = vp1.aspect(); 
+			double fovy = Camera::getFovyForFovX(fovx * (vp1.w)/(double)vpright.w, aspect); 
+			
+			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
+			Vec3d ux = q.toVectorX();
+			Vec3d uy = q.toVectorY();
+			Vec3d uz = q.toVectorZ();
+			
+			mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
+			mModelView = Matrix4d::lookAtRight(ux, uy, uz, pos, iod);
+			
+			gl.viewport(vp1.l, vp1.b, vp1.w, vp1.h);
+			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			
+			// apply camera transform:
+			gl.pushMatrix(gl.PROJECTION);
+			gl.loadMatrix(mProjection);
+			gl.pushMatrix(gl.MODELVIEW);
+			gl.loadMatrix(mModelView);
+			
+			draw.onDraw(gl);
+
+			gl.popMatrix(gl.PROJECTION);
+			gl.popMatrix(gl.MODELVIEW);
+			
+			wx = wx1;
+		}
+	} else {
+		gl.viewport(vpleft.l, vpleft.b, vpleft.w, vpleft.h);
+		
+		// apply camera transform:
+		mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
+		mModelView = Matrix4d::lookAtLeft(ux, uy, uz, pos, iod);
+		gl.pushMatrix(gl.PROJECTION);
+		gl.loadMatrix(mProjection);
+		gl.pushMatrix(gl.MODELVIEW);
+		gl.loadMatrix(mModelView);
+		
+		draw.onDraw(gl);
+		
+		gl.popMatrix(gl.PROJECTION);
+		gl.popMatrix(gl.MODELVIEW);
+		
+		gl.viewport(vpright.l, vpright.b, vpright.w, vpright.h);
+		
+		// apply camera transform:
+		mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
+		mModelView = Matrix4d::lookAtRight(ux, uy, uz, pos, iod);
+		gl.pushMatrix(gl.PROJECTION);
+		gl.loadMatrix(mProjection);
+		gl.pushMatrix(gl.MODELVIEW);
+		gl.loadMatrix(mModelView);
+		
+		draw.onDraw(gl);
+		
+		gl.popMatrix(gl.PROJECTION);
+		gl.popMatrix(gl.MODELVIEW);
+	}	
 	
-	gl.popMatrix(gl.PROJECTION);
-	gl.popMatrix(gl.MODELVIEW);
-	
-	gl.viewport(vp.l + vp.w*0.5, vp.b, vp.w*0.5, vp.h);
-	
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	
-	// apply camera transform:
-	mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
-	mModelView = Matrix4d::lookAtRight(ux, uy, uz, pos, iod);
-	gl.pushMatrix(gl.PROJECTION);
-	gl.loadMatrix(mProjection);
-	gl.pushMatrix(gl.MODELVIEW);
-	gl.loadMatrix(mModelView);
-	
-	draw.onDraw(gl);
-	
-	gl.popMatrix(gl.PROJECTION);
-	gl.popMatrix(gl.MODELVIEW);
 	gl.scissor(false);
 	glPopAttrib();
 }
@@ -244,38 +563,92 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 
 void Stereographic :: drawLeft(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw) 
 {
-	double fovy = cam.fovy();
 	double near = cam.near();
 	double far = cam.far();
 	double focal = cam.focalLength();
 	double iod = cam.eyeSep();
-	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
 	
 	//pushAttrib(ColorBufferBit | DepthBufferBit | EnableBit | ViewPortBit);
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 	gl.clearColor(mClearColor);
 	
 	glDrawBuffer(GL_BACK);
-	
-	gl.scissor(true);
 	gl.viewport(vp.l, vp.b, vp.w, vp.h);
-	
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
-	// apply camera transform:
-	mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
-	mModelView = Matrix4d::lookAtLeft(ux, uy, uz, pos, iod);
-	gl.pushMatrix(gl.PROJECTION);
-	gl.loadMatrix(mProjection);
-	gl.pushMatrix(gl.MODELVIEW);
-	gl.loadMatrix(mModelView);
-
-	draw.onDraw(gl);
+	if (omni()) {
 	
-	gl.popMatrix(gl.PROJECTION);
-	gl.popMatrix(gl.MODELVIEW);
+		int wx = vp.l;
+		double fovx = mOmniFov;
+		for (unsigned i=0; i<mSlices; i++) {
+			double phase = i/(double)mSlices;
+			// pan from - fovx/2 to + fovx/2 over mSlices steps
+			double angle = (0.5-phase) * fovx; //2. * M_PI;
+			
+			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
+			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
+			double aspect = vp1.aspect(); 
+			double fovy = Camera::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect); 
+			
+			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
+			Vec3d ux = q.toVectorX();
+			Vec3d uy = q.toVectorY();
+			Vec3d uz = q.toVectorZ();
+			
+			mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
+			mModelView = Matrix4d::lookAtLeft(ux, uy, uz, pos, iod);
+	
+			gl.viewport(vp1.l, vp1.b, vp1.w, vp1.h);
+			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			
+			// apply camera transform:
+			gl.pushMatrix(gl.PROJECTION);
+			gl.loadMatrix(mProjection);
+			gl.pushMatrix(gl.MODELVIEW);
+			gl.loadMatrix(mModelView);
+			
+			draw.onDraw(gl);
+
+			gl.popMatrix(gl.PROJECTION);
+			gl.popMatrix(gl.MODELVIEW);
+			
+			wx = wx1;
+		}
+		
+	} else {
+		
+		double fovy = cam.fovy();
+		double aspect = vp.aspect();
+		Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
+		mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
+		mModelView = Matrix4d::lookAtLeft(ux, uy, uz, pos, iod);
+	
+		// apply camera transform:
+		gl.pushMatrix(gl.PROJECTION);
+		gl.loadMatrix(mProjection);
+		gl.pushMatrix(gl.MODELVIEW);
+		gl.loadMatrix(mModelView);
+		
+		draw.onDraw(gl);
+
+		gl.popMatrix(gl.PROJECTION);
+		gl.popMatrix(gl.MODELVIEW);
+
+	}
+	
+//	// apply camera transform:
+//	mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
+//	mModelView = Matrix4d::lookAtLeft(ux, uy, uz, pos, iod);
+//	gl.pushMatrix(gl.PROJECTION);
+//	gl.loadMatrix(mProjection);
+//	gl.pushMatrix(gl.MODELVIEW);
+//	gl.loadMatrix(mModelView);
+//
+//	draw.onDraw(gl);
+//	
+//	gl.popMatrix(gl.PROJECTION);
+//	gl.popMatrix(gl.MODELVIEW);
 	
 	gl.scissor(false);
 	glPopAttrib();
@@ -283,37 +656,89 @@ void Stereographic :: drawLeft(Graphics& gl, const Camera& cam, const Pose& pose
 
 void Stereographic :: drawRight(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw) 
 {
-	double fovy = cam.fovy();
 	double near = cam.near();
 	double far = cam.far();
 	double focal = cam.focalLength();
 	double iod = cam.eyeSep();
-	double aspect = vp.aspect();
 	const Vec3d& pos = pose.pos();
-	Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
-
+	
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 	gl.clearColor(mClearColor);
 
 	glDrawBuffer(GL_BACK);
-	
-	gl.scissor(true);
 	gl.viewport(vp.l, vp.b, vp.w, vp.h);
-	
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
-	// apply camera transform:
-	mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
-	mModelView = Matrix4d::lookAtRight(ux, uy, uz, pos, iod);
-	gl.pushMatrix(gl.PROJECTION);
-	gl.loadMatrix(mProjection);
-	gl.pushMatrix(gl.MODELVIEW);
-	gl.loadMatrix(mModelView);
+	if (omni()) {
+		int wx = vp.l;
+		double fovx = mOmniFov;
+		for (unsigned i=0; i<mSlices; i++) {
+			double phase = i/(double)mSlices;
+			// pan from - fovx/2 to + fovx/2 over mSlices steps
+			double angle = (0.5-phase) * fovx; //2. * M_PI;
+			
+			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
+			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
+			double aspect = vp1.aspect(); 
+			double fovy = Camera::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect); 
+			
+			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
+			Vec3d ux = q.toVectorX();
+			Vec3d uy = q.toVectorY();
+			Vec3d uz = q.toVectorZ();
+			
+			mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
+			mModelView = Matrix4d::lookAtRight(ux, uy, uz, pos, iod);
+		
+			gl.viewport(vp1.l, vp1.b, vp1.w, vp1.h);
+			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			
+			// apply camera transform:
+			gl.pushMatrix(gl.PROJECTION);
+			gl.loadMatrix(mProjection);
+			gl.pushMatrix(gl.MODELVIEW);
+			gl.loadMatrix(mModelView);
+			
+			draw.onDraw(gl);
 
-	draw.onDraw(gl);
-	
-	gl.popMatrix(gl.PROJECTION);
-	gl.popMatrix(gl.MODELVIEW);
+			gl.popMatrix(gl.PROJECTION);
+			gl.popMatrix(gl.MODELVIEW);
+			
+			wx = wx1;
+		}
+	} else {
+		double fovy = cam.fovy();
+		double aspect = vp.aspect();		
+		Vec3d ux, uy, uz; 
+		pose.unitVectors(ux, uy, uz);
+		
+		// apply camera transform:
+		mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
+		mModelView = Matrix4d::lookAtRight(ux, uy, uz, pos, iod);
+		gl.pushMatrix(gl.PROJECTION);
+		gl.loadMatrix(mProjection);
+		gl.pushMatrix(gl.MODELVIEW);
+		gl.loadMatrix(mModelView);
+		
+		draw.onDraw(gl);
+
+		gl.popMatrix(gl.PROJECTION);
+		gl.popMatrix(gl.MODELVIEW);
+		
+	}
+
+//	// apply camera transform:
+//	mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
+//	mModelView = Matrix4d::lookAtRight(ux, uy, uz, pos, iod);
+//	gl.pushMatrix(gl.PROJECTION);
+//	gl.loadMatrix(mProjection);
+//	gl.pushMatrix(gl.MODELVIEW);
+//	gl.loadMatrix(mModelView);
+//
+//	draw.onDraw(gl);
+//	
+//	gl.popMatrix(gl.PROJECTION);
+//	gl.popMatrix(gl.MODELVIEW);
 	
 	gl.scissor(false);
 	glPopAttrib();

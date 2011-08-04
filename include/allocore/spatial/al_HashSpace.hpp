@@ -9,6 +9,9 @@
 /*!
 	HashSpace is a way to detect object collisions using a voxel grid
 	The grid has a given resolution (no. voxel cells per side)
+	
+	
+	
 */
 
 namespace al {
@@ -40,6 +43,16 @@ public:
 			dfree(0)
 		{}
 		
+		Object(const Object& cpy)
+		:	oidx(0),
+			idx(0),
+			cellidx(HashSpace::invalidCell()),
+			next(0), 
+			prev(0),
+			data(0),
+			dfree(0)
+		{}
+		
 		~Object() {
 			if(dfree && data) dfree(data);
 		}
@@ -48,6 +61,9 @@ public:
 	// The voxel is a list of objects 
 	struct Cell {
 		Cell() 
+		: objects(0) {}
+		
+		Cell(const Cell& cpy) 
 		: objects(0) {}
 		
 		void addObject(Object * ob);
@@ -81,6 +97,9 @@ public:
 	// get number of objects:
 	int numObjects() const { return mObjects.size(); }
 	
+	// id is not bounds checked; it must be 0 <= id < numObjects()
+	Object& object(int id) { return mObjects[id]; }
+	
 	// query a location/radius to capture set of objects 
 	// nobjs is the max number of objects to return
 	// returns number of objects found
@@ -95,7 +114,11 @@ public:
 	
 	// id is not bounds checked; it must be 0 <= id < numObjects()
 	void hash(int id, float x, float y, float z);
+	template <typename T>
+	void hash(int id, Vec<3,T> pos) { hash(id, pos[0], pos[1], pos[2]); }
+	// hash a whole array of locations
 	// assumes 3-components, FloatTy, 2D Array
+	// index into Array corresponds to id
 	void hash(Array *points);
 	
 	// internal use:

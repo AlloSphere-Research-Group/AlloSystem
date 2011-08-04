@@ -70,7 +70,7 @@ public:
 	};
 	
 	Stereographic() 
-	: mMode(Anaglyph), mAnaglyphMode(RedCyan), mClearColor(Color(0)), mStereo(false) {}
+	: mMode(Anaglyph), mAnaglyphMode(RedCyan), mClearColor(Color(0)), mStereo(false), mOmni(0), mSlices(24), mOmniFov(360) {}
 
 	~Stereographic() {}
 
@@ -84,7 +84,7 @@ public:
 	void drawDual		(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw);
 	void drawLeft		(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw);
 	void drawRight		(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw);
-
+	
 	/// Blue line sync for active stereo (for those projectors that need it)
 	/// add this call at the end of rendering (just before the swap buffers call)
 	void drawBlueLine(double window_width, double window_height);
@@ -93,11 +93,18 @@ public:
 	Stereographic& mode(StereoMode v){ mMode=v; return *this; }					///< Set stereographic mode
 	Stereographic& stereo(bool v){ mStereo=v; return *this; }					///< Set stereographic active
 	Stereographic& anaglyphMode(AnaglyphMode v) { mAnaglyphMode=v; return *this; }	///< set glasses type
+	/// Set omnigraphic mode
+	/// slices: sets number of sub-viewport slices to render
+	/// fov (degrees) sets field of view (horizontal)
+	/// NOTE: cam.fovy will be ignored in omni mode
+	Stereographic& omni(bool enable) { mOmni = enable; return *this; }
+	Stereographic& omni(bool enable, unsigned slices, double fov=360) { mOmni = enable; mSlices = slices; return *this; }
 	
 	const Color& clearColor() const { return mClearColor; }		///< Get background clear color
 	StereoMode mode() const { return mMode; }					///< Get stereographic mode
 	bool stereo() const { return mStereo; }						///< Get stereographic active
 	AnaglyphMode anaglyphMode() const { return mAnaglyphMode; }	///< get anaglyph glasses type
+	bool omni() { return mOmni; }
 	
 	// These accessors will be valid only during the Drawable's onDraw() event
 	// they can be useful to simulate the OpenGL pipeline transforms
@@ -114,6 +121,9 @@ protected:
 	AnaglyphMode mAnaglyphMode;
 	Color mClearColor;
 	bool mStereo;
+	bool mOmni;
+	unsigned mSlices;	// number of omni slices
+	double mOmniFov;	// field of view of omnigraphics
 	
 	Matrix4d mProjection, mModelView;
 };
