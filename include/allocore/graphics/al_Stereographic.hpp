@@ -98,7 +98,7 @@ public:
 	/// fov (degrees) sets field of view (horizontal)
 	/// NOTE: cam.fovy will be ignored in omni mode
 	Stereographic& omni(bool enable) { mOmni = enable; return *this; }
-	Stereographic& omni(bool enable, unsigned slices, double fov=360) { mOmni = enable; mSlices = slices; return *this; }
+	Stereographic& omni(bool enable, unsigned slices, double fov=360) { mOmni = enable; mSlices = slices; mOmniFov = fov; return *this; }
 	
 	const Color& clearColor() const { return mClearColor; }		///< Get background clear color
 	StereoMode mode() const { return mMode; }					///< Get stereographic mode
