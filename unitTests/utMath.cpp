@@ -450,6 +450,12 @@ int utMath(){
 	T(9, 9*8*7*6*5*4*3*2*1) T(10, 10*9*8*7*6*5*4*3*2*1) T(11, 11*10*9*8*7*6*5*4*3*2*1)
 	T(12, 12*11*10*9*8*7*6*5*4*3*2*1)
 	#undef T
+	
+	for(int i=0; i<=12; ++i){
+		assert(
+			eq(al::factorialSqrt(i), sqrt(al::factorial(i)))
+		);
+	}
 
 	#define T(x, y) assert(al::floor(x) == y);
 	T(0., 0.)	T( 1., 1.) T( 1.2, 1.) T( 1.8, 1.) T( 1000.1, 1000.)
