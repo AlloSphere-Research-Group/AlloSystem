@@ -52,6 +52,17 @@ namespace al {
 /// Returns absolute value
 template<class T> T abs(T v);
 
+/// Return whether two floats are almost equal
+
+/// @param[in] a		first operand
+/// @param[in] b		second operand
+/// @param[in] maxULP	maximum "units in the last place"
+///
+/// Algorithm from Dawson, B. "Comparing floating point numbers",
+/// http://www.cygnus-software.com/papers/comparingfloats/comparingfloats.htm
+bool aeq(float a, float b, int maxULP=10);
+bool aeq(double a, double b, int maxULP=10);
+
 /// Convert amplitude to decibels
 template <class T>
 inline T ampTodB(const T& amp){ return 20*::log(amp); }
@@ -369,22 +380,40 @@ namespace{
 
 
 /// Returns absolute value
-//TEM inline T abs(T v){ return std::fabs(v); }
-template<> inline float abs(float v){ return fabsf(v); }
-template<> inline double abs(double v){ return fabs(v); }
-template<> inline char abs(char v){ return labs(v); }
-template<> inline short abs(short v){ return labs(v); }
-template<> inline int abs(int v){ return labs(v); }
-template<> inline long abs(long v){ return labs(v); }
-/*
-Call of overloaded 'llabs(long long int&)' is ambiguous in ../../include/math/al_Functions.hpp
+template<> inline float abs(float v){ return ::fabsf(v); }
+template<> inline double abs(double v){ return ::fabs(v); }
+template<> inline char abs(char v){ return ::labs(v); }
+template<> inline short abs(short v){ return ::labs(v); }
+template<> inline int abs(int v){ return ::labs(v); }
+template<> inline long abs(long v){ return ::labs(v); }
+template<> inline long long abs(long long v){ return ::llabs(v); }
 
-/Developer/SDKs/MacOSX10.5.sdk/usr/include/stdlib.h:166:0 /Developer/SDKs/MacOSX10.5.sdk/usr/include/stdlib.h:166: note: candidates are: long long int llabs(long long int)
 
-/Developer/SDKs/MacOSX10.5.sdk/usr/include/c++/4.2.1/cstdlib:172:0 /Developer/SDKs/MacOSX10.5.sdk/usr/include/c++/4.2.1/cstdlib:172: note:                 long long int __gnu_cxx::llabs(long long int)
+inline bool aeq(float a, float b, int maxULP){
+	// Make sure maxULP is non-negative and small enough that the
+	// default NAN won't compare as equal to anything.
+	//assert(maxULP > 0 && maxULP < 4 * 1024 * 1024);
+	union{ float f; int32_t i; } u;
+	u.f=a; int32_t ai = u.i;
+	u.f=b; int32_t bi = u.i;
+	// Make ai and bi lexicographically ordered as a twos-complement int
+	if(ai < 0) ai = 0x80000000 - ai;
+	if(bi < 0) bi = 0x80000000 - bi;
+	return abs(ai - bi) <= maxULP;
+}
 
-*/
-//template<> inline long long abs(long long v){ return llabs(v); }
+inline bool aeq(double a, double b, int maxULP){
+	// Make sure maxULP is non-negative and small enough that the
+	// default NAN won't compare as equal to anything.
+	//assert(maxULP > 0 && maxULP < 4 * 1024 * 1024);
+	union{ double f; int64_t i; } u;
+	u.f=a; int64_t ai = u.i;
+	u.f=b; int64_t bi = u.i;
+	// Make ai and bi lexicographically ordered as a twos-complement int
+	if(ai < 0) ai = 0x8000000000000000ULL - ai;
+	if(bi < 0) bi = 0x8000000000000000ULL - bi;
+	return abs(ai - bi) <= maxULP;
+}
 
 TEM inline T atLeast(T v, T e){	return (v >= T(0)) ? max(v, e) : min(v, -e); }
 
