@@ -12,6 +12,25 @@ inline bool eq(const T* x, const T* y, int n, T eps=0.0000001){
 	return true; 
 }
 
+// Almost equal functions
+//template <class T>
+//inline bool eq(T x, T y){ return aeq(x,y,32); }
+//
+//template <class T>
+//inline bool eq(const T* x, const T* y, int n){
+//	for(int i=0; i<n; ++i){
+//		if(!eq(x[i], y[i])) return false;
+//	}
+//	return true; 
+//}
+
+template <class T>
+inline bool eq(const Quat<T>& a, const Quat<T>& b){ return eq(&a[0], &b[0], 4); }
+
+template <int N, class T>
+inline bool eq(const Vec<N,T>& a, const Vec<N,T>& b){ return eq(&a[0], &b[0], N); }
+
+
 int utMath(){
 
 	// Vec
@@ -283,24 +302,25 @@ int utMath(){
 		assert(q.identity() == Quatd(1,0,0,0));
 		assert(q.mag() == 11);
 		assert(q.magSqr() == 121);
-		assert(eq(&q.sgn()[0], &Quatd(1./11, 2./11, 4./11, 10./11)[0], 4));
+		assert(eq(q.sgn(), Quatd(1./11, 2./11, 4./11, 10./11)));
 		
 		// test rotation of vectors by quaternion
 		q.fromAxisAngle(M_2PI/4, 1,0,0);
-		assert(eq(&q[0], &Quatd(sqrt(2)/2, sqrt(2)/2,0,0)[0], 4));
+		assert(eq(q, Quatd(sqrt(2)/2, sqrt(2)/2,0,0)));
 		{
-			Vec3d v(0,0,1);
+			Vec3d v(0,1,0);
 			v = q.rotate(v);
-			assert(eq(&v[0], &Vec3d(0,-1,0)[0], 3));
+			//printf("%g %g %g\n", v[0], v[1], v[2]);
+			assert(eq(v, Vec3d(0,0,1)));
 		}
 
 		q.fromAxisAngle(M_2PI/4, 0,1,0);
-		assert(eq(&q[0], &Quatd(sqrt(2)/2, 0,sqrt(2)/2,0)[0], 4));
+		assert(eq(q, Quatd(sqrt(2)/2, 0,sqrt(2)/2,0)));
 		{
 			Vec3d v(0,0,1);
 			v = q.rotate(v);			
 			//printf("%g %g %g\n", v[0], v[1], v[2]);
-			assert(eq(&v[0], &Vec3d(1,0,0)[0], 3));
+			assert(eq(v, Vec3d(1,0,0)));
 		}
 
 		q.fromAxisAngle(M_2PI/4, 0,0,1);
@@ -308,7 +328,7 @@ int utMath(){
 			Vec3d v(1,0,0);
 			v = q.rotate(v);			
 			//printf("%g %g %g\n", v[0], v[1], v[2]);
-			assert(eq(&v[0], &Vec3d(0,1,0)[0], 3));
+			assert(eq(v, Vec3d(0,1,0)));
 		}
 
 		assert(q.fromAxisAngle(M_2PI/8, 1,0,0) == Quatd().fromAxisX(M_2PI/8));
@@ -359,33 +379,25 @@ int utMath(){
 			q.toVectorX(vx);
 			q.toVectorY(vy);
 			q.toVectorZ(vz);
-			assert(eq(&vx[0], &Vec3d(1,0,0)[0], 3));
-			assert(eq(&vy[0], &Vec3d(0,0,1)[0], 3));
-			assert(eq(&vz[0], &Vec3d(0,-1,0)[0], 3));
+			assert(eq(vx, Vec3d(1, 0,0)));
+			assert(eq(vy, Vec3d(0, 0,1)));
+			assert(eq(vz, Vec3d(0,-1,0)));
 
 			q.fromAxisAngle(M_2PI/4, 0,1,0);			
 			q.toVectorX(vx);
 			q.toVectorY(vy);
 			q.toVectorZ(vz);
-			assert(eq(&vx[0], &Vec3d(0,0,-1)[0], 3));
-			assert(eq(&vy[0], &Vec3d(0,1,0)[0], 3));
-			assert(eq(&vz[0], &Vec3d(1,0,0)[0], 3));
+			assert(eq(vx, Vec3d(0,0,-1)));
+			assert(eq(vy, Vec3d(0,1, 0)));
+			assert(eq(vz, Vec3d(1,0, 0)));
 
 			q.fromAxisAngle(M_2PI/4, 0,0,1);			
 			q.toVectorX(vx);
 			q.toVectorY(vy);
 			q.toVectorZ(vz);
-			assert(eq(&vx[0], &Vec3d(0,1,0)[0], 3));
-			assert(eq(&vy[0], &Vec3d(-1,0,0)[0], 3));
-			assert(eq(&vz[0], &Vec3d(0,0,1)[0], 3));
-
-//			q.fromAxisAngle(0, 0,1,0);			
-//			q.toVectorY(v);
-//			assert(v == Vec3d(0,1,0));
-//
-//			q.fromAxisAngle(0, 0,0,1);			
-//			q.toVectorZ(v);
-//			assert(v == Vec3d(0,0,1));
+			assert(eq(vx, Vec3d(0,1,0)));
+			assert(eq(vy, Vec3d(-1,0,0)));
+			assert(eq(vz, Vec3d(0,0,1)));
 		}
 		
 		
@@ -453,7 +465,7 @@ int utMath(){
 	
 	for(int i=0; i<=12; ++i){
 		assert(
-			eq(al::factorialSqrt(i), sqrt(al::factorial(i)))
+			al::aeq(al::factorialSqrt(i), sqrt(al::factorial(i)))
 		);
 	}
 
