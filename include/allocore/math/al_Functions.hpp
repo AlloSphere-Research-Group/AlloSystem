@@ -175,13 +175,13 @@ template<class T> T lcm(const T& x, const T& y);
 ///
 /// P_l^m(cos(t)) = (-1)^{l+m} / (2^l l!) sin^m(t) (d/d cos(t))^{l+m} sin^{2l}(t)
 ///
-/// @param[in]	l	degree s.t. l>=0
-/// @param[in]	m	order s.t. -l<=m <=l
-/// @param[in]	t	variable
+/// @param[in]	l	degree where  l >= 0
+/// @param[in]	m	order  where -l <= m <=l
+/// @param[in]	t	angle in [0, pi]
 ///
 /// http://comp.cs.ehime-u.ac.jp/~ogata/nac/index.html
-template<class T> T legendre(int l, int m, T t);
-template<class T> T legendre(int l, int m, T ct, T st);
+template<class T> T legendreP(int l, int m, T t);
+template<class T> T legendreP(int l, int m, T ct, T st);
 
 /// Returns whether the absolute value is less than an epsilon.
 template<class T> bool lessAbs(T v, T eps=T(0.000001));
@@ -526,10 +526,12 @@ TEM T laguerre(int n, int k, T x) {
 
 TEM inline T lcm(const T& x, const T& y){ return (x*y)/al::gcd(x,y); }
 
-TEM T legendre(int l, int m, T ct, T st){
+TEM T legendreP(int l, int m, T ct, T st){
 
 	if(l<0){ /*printf("l=%d. l must be non-negative.\n");*/ return 0; }
 	if(m<-l || m>l){ /*printf("m=%d. m must be -l <= m <= l.\n");*/ return 0; }
+
+	// First compute answer for |m|
 
 	// compute P_l^m(x) by the recurrence relation
 	//		(l-m)P_l^m(x) = x(2l-1)P_{l-1}^m(x) - (l+m-1)P_{l-2}^m(x)
@@ -537,25 +539,25 @@ TEM T legendre(int l, int m, T ct, T st){
 	//		P_m^m(x) = (-1)^m (2m-1)!! (1-x)^{m/2}, 
 	//		P_{m+1}^m(x) = x(2m+1) P_m^m(x).
 
-	T P = 0;
-	int mm = al::abs(m);			/*   mm = |m|   */
-	T y1 = 1.;
-	
-	for(int i=1; i<=mm; ++i)
+	T P = 0;				// the result
+	int M = al::abs(m);		// M = |m|
+	T y1 = 1.;				// recursion state variable
+
+	for(int i=1; i<=M; ++i)
 		y1 *= -((i<<1) - 1) * st;
 	
-	if(l==mm) P = y1;
+	if(l==M) P = y1;
 
 	else{
-		T y = ((mm<<1) + 1) * ct * y1;
-		if(l==(mm+1)) P = y;
+		T y = ((M<<1) + 1) * ct * y1;
+		if(l==(M+1)) P = y;
 
 		else{
-			T c = (mm<<1) - 1;
-			for(int k=mm+2; k<=l; ++k){
+			T c = (M<<1) - 1;
+			for(int k=M+2; k<=l; ++k){
 				T y2 = y1;
 				y1 = y;
-				T d = c / (k - mm);
+				T d = c / (k - M);
 				y = (2. + d) * ct * y1 - (1. + d) * y2;
 			}
 			P = y;
@@ -564,18 +566,18 @@ TEM T legendre(int l, int m, T ct, T st){
 
 	// In the case that m<0, 
 	// compute P_n^{-|m|}(x) by the formula 
-	//		P_l^{-|m|}(x) = (-1)^{|m|}((l-|m|)!/(l+|m|)!)^{1/2} P_l^{|m|}(x). 
+	//		P_l^{-|m|}(x) = (-1)^{|m|}((l-|m|)!/(l+|m|)!)^{1/2} P_l^{|m|}(x).
+	// NOTE: when l and |m| are large, we risk numerical underflow...
 	if(m<0){
-		for(int i=l-mm+1; i<=l+mm; ++i) P *= 1. / i;
-		if(al::odd(mm)) P = -P;
+		for(int i=l-M+1; i<=l+M; ++i) P *= 1. / i;
+		if(al::odd(M)) P = -P;
 	}
 
 	return P;
 }
 
-
-TEM T legendre(int l, int m, T t){
-	return al::legendre(l,m, std::cos(t), std::sin(t));
+TEM T legendreP(int l, int m, T t){
+	return al::legendreP(l,m, std::cos(t), std::sin(t));
 }
 
 TEM inline bool lessAbs(T v, T eps){ return al::abs(v) < eps; }
