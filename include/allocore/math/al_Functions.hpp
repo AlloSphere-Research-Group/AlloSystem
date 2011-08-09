@@ -166,7 +166,7 @@ template<class T> T gcd(const T& x, const T& y);
 /// Generalized Laguerre polynomial L{n,k}
 ///
 /// http://en.wikipedia.org/wiki/Laguerre_polynomials
-template<class T> T laguerre(int n, int k, T x);
+template<class T> T laguerreL(int n, int k, T x);
 
 /// Returns least common multiple
 template<class T> T lcm(const T& x, const T& y);
@@ -514,15 +514,24 @@ TEM T gcd(const T& x, const T& y){
 	return al::gcd(y, al::remainder(x,y));
 }
 
-TEM T laguerre(int n, int k, T x) {
-	T res = 1, bin = 1;
+TEM T laguerreL(int n, int k, T x) {
+//	T res = 1, bin = 1;
+//	
+//	for(int i=n; i>=1; --i){
+//		bin = bin * (k+i) / (n + 1 - i);
+//		res = bin - x * res / i;
+//	}
+//	return res;
 	
-	for(int i=n; i>=1; --i){
-		bin = bin * (k+i) / (n + 1 - i);
-		res = bin - x * res / i;
+	T L1= 0, R = 1;
+	for(int i=1; i<=n; ++i){
+		T L0 = L1;
+		L1 = R;
+		R = ((2*i + k-1 - x)*L1 - (i + k-1)*L0)/i;
 	}
-	return res;
+	return R;
 }
+
 
 TEM inline T lcm(const T& x, const T& y){ return (x*y)/al::gcd(x,y); }
 
