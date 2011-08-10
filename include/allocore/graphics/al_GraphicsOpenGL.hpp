@@ -144,6 +144,7 @@ private:
 
 	// Rendering State
 	virtual void p_blending(bool enable, BlendFunc src, BlendFunc dst);
+	virtual void p_blending(BlendFunc src, BlendFunc dst, BlendEquation eq);
 	virtual void p_enable(Capability cap);
 	virtual void p_disable(Capability cap);
 

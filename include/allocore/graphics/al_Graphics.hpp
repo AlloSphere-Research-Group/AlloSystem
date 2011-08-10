@@ -78,6 +78,14 @@ public:
 		ONE,
 		SRC_ALPHA_SATURATE
 	};
+	
+	enum BlendEquation {
+		FUNC_ADD = 0,
+		FUNC_SUBTRACT,
+		FUNC_REVERSE_SUBTRACT, 
+		MIN,
+		MAX
+	};
 
 	enum Capability {
 		BLEND,
@@ -130,6 +138,7 @@ public:
 	
 	// Rendering State
 	void blending(bool enable, BlendFunc src, BlendFunc dst){ p_blending(enable, src, dst); }
+	void blending(BlendFunc src, BlendFunc dst, BlendEquation eq){ p_blending(src, dst, eq); }
 	void enable(Capability cap){ p_enable(cap); }
 	void disable(Capability cap){ p_disable(cap); }
 	
@@ -239,6 +248,7 @@ protected:
 
 private:
 	virtual void p_blending(bool enable, BlendFunc src, BlendFunc dst) = 0;
+	virtual void p_blending(BlendFunc src, BlendFunc dst, BlendEquation eq) = 0;
 	virtual void p_enable(Capability cap) = 0;
 	virtual void p_disable(Capability cap) = 0;
 

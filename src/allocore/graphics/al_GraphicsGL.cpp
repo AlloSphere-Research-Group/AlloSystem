@@ -48,6 +48,13 @@ GLenum GraphicsGL :: gl_blend_func(Graphics::BlendFunc v) {
 	}
 }
 
+static inline GLenum gl_blend_equation(Graphics::BlendEquation v){
+	switch(v){
+		CS(FUNC_ADD) CS(FUNC_SUBTRACT) CS(FUNC_REVERSE_SUBTRACT) CS(MIN) CS(MAX)
+		default: return 0;
+	}
+}
+
 GLenum GraphicsGL :: gl_capability(Graphics::Capability v){
 	switch(v){
 		CS(BLEND) CS(COLOR_MATERIAL) CS(DEPTH_TEST) CS(FOG)
@@ -103,6 +110,13 @@ void GraphicsGL :: p_blending(bool enable, BlendFunc src, BlendFunc dst) {
 	else {
 		glDisable(GL_BLEND);
 	}
+}
+void GraphicsGL :: p_blending(BlendFunc src, BlendFunc dst, BlendEquation eq){
+	glBlendEquation(gl_blend_equation(eq));
+	glBlendFunc(
+		gl_blend_func(src),
+		gl_blend_func(dst)
+	);
 }
 void GraphicsGL :: p_enable(Capability v) {
 	if (v == DEPTH_MASK) {
