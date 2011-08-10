@@ -99,12 +99,13 @@ public:
 	/// NOTE: cam.fovy will be ignored in omni mode
 	Stereographic& omni(bool enable) { mOmni = enable; return *this; }
 	Stereographic& omni(bool enable, unsigned slices, double fov=360) { mOmni = enable; mSlices = slices; mOmniFov = fov; return *this; }
+	Stereographic& omniFov( double fov ) { mOmniFov = fov; return *this; }
 	
 	const Color& clearColor() const { return mClearColor; }		///< Get background clear color
 	StereoMode mode() const { return mMode; }					///< Get stereographic mode
 	bool stereo() const { return mStereo; }						///< Get stereographic active
 	AnaglyphMode anaglyphMode() const { return mAnaglyphMode; }	///< get anaglyph glasses type
-	bool omni() { return mOmni; }
+	bool omni() const { return mOmni; }
 	
 	// These accessors will be valid only during the Drawable's onDraw() event
 	// they can be useful to simulate the OpenGL pipeline transforms
