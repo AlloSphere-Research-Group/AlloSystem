@@ -77,6 +77,8 @@ void Window::init(){
 	// they are added explicitly here so that the order of handlers can be user controled
 	add((InputEventHandler *)this);
 	add((WindowEventHandler *)this);
+	mDisplayMode = DisplayMode::DefaultBuf;
+	mASAP = false;
 }
 
 Window& Window::cursorHideToggle(){

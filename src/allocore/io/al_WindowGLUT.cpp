@@ -494,8 +494,7 @@ private:
 
 
 Window::Window()
-:	mImpl(new WindowImpl(this)),
-	mDisplayMode(DisplayMode::DefaultBuf)
+:	mImpl(new WindowImpl(this))
 {
 	init();
 }
