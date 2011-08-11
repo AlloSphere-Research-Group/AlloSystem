@@ -100,7 +100,8 @@ public:
 	Stereographic& omni(bool enable) { mOmni = enable; return *this; }
 	Stereographic& omni(bool enable, unsigned slices, double fov=360) { mOmni = enable; mSlices = slices; mOmniFov = fov; return *this; }
 	Stereographic& omniFov( double fov ) { mOmniFov = fov; return *this; }
-	
+	Stereographic& omniSlices( int slices ) { mSlices = slices; return *this; }
+
 	const Color& clearColor() const { return mClearColor; }		///< Get background clear color
 	StereoMode mode() const { return mMode; }					///< Get stereographic mode
 	bool stereo() const { return mStereo; }						///< Get stereographic active
