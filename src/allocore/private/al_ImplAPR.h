@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// need this to pick up AL_LINUX etc:
 #include "allocore/system/al_Config.h"
 
 #ifdef AL_LINUX
