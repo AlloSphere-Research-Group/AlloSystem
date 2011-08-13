@@ -1,5 +1,6 @@
 #include "allocore/protocol/al_XML.hpp"
 #include "../private/al_ImplAPR.h"
+
 #ifdef AL_LINUX
 #include "apr-1.0/apr_general.h"
 #include "apr-1.0/apr_xml.h"

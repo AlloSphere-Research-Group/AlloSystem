@@ -30,6 +30,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "allocore/system/al_Config.h"
+
 #ifdef AL_LINUX
 	#include "apr-1.0/apr_general.h"
 	#include "apr-1.0/apr_errno.h"
