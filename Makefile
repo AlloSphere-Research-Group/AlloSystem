@@ -77,7 +77,7 @@ EXEC_DIR_TARGETS = examples/%
 $(EXEC_DIR_TARGETS): LSRC = $(wildcard $@/*.cpp) $(wildcard $@/*.c)
 $(EXEC_DIR_TARGETS): EXEC_NAME = $(subst /,_,$(*D))
 $(EXEC_DIR_TARGETS): allocore alloutil FORCE
-	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(EXEC_NAME) $(LSRC) $(LDFLAGS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH)
+	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(EXEC_NAME) $(LSRC) $(LDFLAGS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) -I$@
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./$(EXEC_NAME)
 endif
