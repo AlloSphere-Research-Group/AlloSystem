@@ -9,11 +9,15 @@ namespace al {
 /// Mapping from keyboard and mouse controls to a Nav object
 struct NavInputControl : public InputEventHandler {
 
-	NavInputControl(Nav& nav, double vscale = 0.125, double tscale = 2.)
-	: mNav(&nav), mVScale(vscale), mTScale(tscale) {}
-	virtual ~NavInputControl() {}
+	NavInputControl(const NavInputControl& v)
+	:	mNav(v.mNav), mVScale(v.vscale()), mTScale(v.tscale())
+	{}
 
-	void nav(Nav * v){ mNav=v; }
+	NavInputControl(Nav& nav, double vscale = 0.125, double tscale = 2.)
+	:	mNav(&nav), mVScale(vscale), mTScale(tscale)
+	{}
+
+	virtual ~NavInputControl(){}
 
 	virtual bool onKeyDown(const Keyboard& k){	 	
 
@@ -77,11 +81,13 @@ struct NavInputControl : public InputEventHandler {
 	}
 
 	Nav& nav(){ return *mNav; }
+	const Nav& nav() const { return *mNav; }
+	NavInputControl& nav(Nav& v){ mNav=&v; return *this; }
 	
-	double vscale() { return mVScale; }
+	double vscale() const { return mVScale; }
 	NavInputControl& vscale(double v) { mVScale=v; return *this; }
 	
-	double tscale() { return mTScale; }
+	double tscale() const { return mTScale; }
 	NavInputControl& tscale(double v) { mTScale=v; return *this; }
 
 protected:
