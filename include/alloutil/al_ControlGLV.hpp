@@ -98,7 +98,7 @@ struct GLVWindowControl : public GLVControl, public WindowEventHandler {
 
 	virtual bool onResize(int dw, int dh){
 		glv().extent(glv().width() + dw, glv().height() + dh);
-		//printf("%d %d %f %f\n", dw, dh, glv().width(), glv().height());
+		//printf("GLVWindowControl onResize: %d %d %f %f\n", dw, dh, glv().width(), glv().height());
 		glv().broadcastEvent(glv::Event::WindowResize);
 		return true;
 	}
