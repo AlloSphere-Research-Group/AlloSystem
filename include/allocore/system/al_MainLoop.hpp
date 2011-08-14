@@ -74,8 +74,11 @@ public:
 	*/
 	static double cpu() { return get().mCPU; }
 
-	///< al_time() when mainloop was created
+	/// Returns time when main loop was created
 	static al_sec T0() { return get().mT0; }
+
+	/// Returns whether main loop has been started
+	static bool isRunning(){ return get().mIsRunning; }
 
 	/// trigger a mainloop step (typically for implementation use only)
 	void tick();
