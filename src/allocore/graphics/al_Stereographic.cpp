@@ -36,9 +36,8 @@ void Stereographic :: drawMono(Graphics& gl, const Camera& cam, const Pose& pose
 		int wx = vp.l;
 		double fovx = mOmniFov;
 		for (unsigned i=0; i<mSlices; i++) {
-			double phase = i/(double)mSlices;
-			// pan from - fovx/2 to + fovx/2 over mSlices steps
-			double angle = (0.5-phase) * fovx; //2. * M_PI;
+			// angle at center of slice:
+			double angle = fovx * (0.5-((i+0.5)/(double)(mSlices)));
 			
 			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
@@ -124,9 +123,8 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 		int wx = vp.l;
 		double fovx = mOmniFov;
 		for (unsigned i=0; i<mSlices; i++) {
-			double phase = i/(double)mSlices;
-			// pan from - fovx/2 to + fovx/2 over mSlices steps
-			double angle = (0.5-phase) * fovx; //2. * M_PI;
+			// angle at center of slice:
+			double angle = fovx * (0.5-((i+0.5)/(double)(mSlices)));
 			
 			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
@@ -194,9 +192,8 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 		int wx = vp.l;
 		double fovx = mOmniFov;
 		for (unsigned i=0; i<mSlices; i++) {
-			double phase = i/(double)mSlices;
-			// pan from - fovx/2 to + fovx/2 over mSlices steps
-			double angle = (0.5-phase) * fovx; //2. * M_PI;
+			// angle at center of slice:
+			double angle = fovx * (0.5-((i+0.5)/(double)(mSlices)));
 			
 			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
@@ -276,9 +273,8 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 		int wx = vp.l;
 		double fovx = mOmniFov;
 		for (unsigned i=0; i<mSlices; i++) {
-			double phase = i/(double)mSlices;
-			// pan from - fovx/2 to + fovx/2 over mSlices steps
-			double angle = (0.5-phase) * fovx; //2. * M_PI;
+			// angle at center of slice:
+			double angle = fovx * (0.5-((i+0.5)/(double)(mSlices)));
 			
 			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
@@ -354,9 +350,8 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 		int wx = vp.l;
 		double fovx = mOmniFov;
 		for (unsigned i=0; i<mSlices; i++) {
-			double phase = i/(double)mSlices;
-			// pan from - fovx/2 to + fovx/2 over mSlices steps
-			double angle = (0.5-phase) * fovx; //2. * M_PI;
+			// angle at center of slice:
+			double angle = fovx * (0.5-((i+0.5)/(double)(mSlices)));
 			
 			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
@@ -454,9 +449,8 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 		int wx = vpleft.l;
 		double fovx = mOmniFov;
 		for (unsigned i=0; i<mSlices; i++) {
-			double phase = i/(double)mSlices;
-			// pan from - fovx/2 to + fovx/2 over mSlices steps
-			double angle = (0.5-phase) * fovx; //2. * M_PI;
+			// angle at center of slice:
+			double angle = fovx * (0.5-((i+0.5)/(double)(mSlices)));
 			
 			int wx1 = vpleft.l + vpleft.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vpleft.b, wx1-wx, vpleft.h);
@@ -490,9 +484,8 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 		
 		wx = vpright.l;
 		for (unsigned i=0; i<mSlices; i++) {
-			double phase = i/(double)mSlices;
-			// pan from - fovx/2 to + fovx/2 over mSlices steps
-			double angle = (0.5-phase) * fovx; //2. * M_PI;
+			// angle at center of slice:
+			double angle = fovx * (0.5-((i+0.5)/(double)(mSlices)));
 			
 			int wx1 = vpright.l + vpright.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vpright.b, wx1-wx, vpright.h);
@@ -582,9 +575,8 @@ void Stereographic :: drawLeft(Graphics& gl, const Camera& cam, const Pose& pose
 		int wx = vp.l;
 		double fovx = mOmniFov;
 		for (unsigned i=0; i<mSlices; i++) {
-			double phase = i/(double)mSlices;
-			// pan from - fovx/2 to + fovx/2 over mSlices steps
-			double angle = (0.5-phase) * fovx; //2. * M_PI;
+			// angle at center of slice:
+			double angle = fovx * (0.5-((i+0.5)/(double)(mSlices)));
 			
 			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
@@ -673,9 +665,8 @@ void Stereographic :: drawRight(Graphics& gl, const Camera& cam, const Pose& pos
 		int wx = vp.l;
 		double fovx = mOmniFov;
 		for (unsigned i=0; i<mSlices; i++) {
-			double phase = i/(double)mSlices;
-			// pan from - fovx/2 to + fovx/2 over mSlices steps
-			double angle = (0.5-phase) * fovx; //2. * M_PI;
+			// angle at center of slice:
+			double angle = fovx * (0.5-((i+0.5)/(double)(mSlices)));
 			
 			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
