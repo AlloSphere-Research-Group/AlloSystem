@@ -59,10 +59,31 @@ public:
 		mVisible = true;
 		mFullScreen = false;
 		mCursorHide = false;
-		mScheduled = false;		
+		mScheduled = false;
 	}
 
-	bool created(){ return mID >= 0; }
+
+	// Getters
+	bool created() const { return mID >= 0; }
+
+	int id() const { return mInGameMode ? mIDGameMode : mID; }
+
+	Window::Dim dimensions() const {
+		Window::Dim d(0,0,0,0);
+		if(created()){
+			glutSetWindow(id());
+			d.l = glutGet(GLUT_WINDOW_X);
+			d.t = glutGet(GLUT_WINDOW_Y);
+			d.w = glutGet(GLUT_WINDOW_WIDTH);
+			d.h = glutGet(GLUT_WINDOW_HEIGHT);
+		}
+		return d;
+	}
+
+
+
+	// Setters
+	void visible(bool v){ mVisible=v; }
 
 	void destroy(){ //printf("destroy\n");
 		if(created()){
@@ -70,16 +91,6 @@ public:
 			windows().erase(id());
 			resetState();
 		}
-	}
-
-	Window::Dim dimensions() const {
-		Window::Dim d;
-		glutSetWindow(id());
-		d.l = glutGet(GLUT_WINDOW_X);
-		d.t = glutGet(GLUT_WINDOW_Y);
-		d.w = glutGet(GLUT_WINDOW_WIDTH);
-		d.h = glutGet(GLUT_WINDOW_HEIGHT);
-		return d;
 	}
 
 	void gameMode(bool v){
@@ -173,8 +184,6 @@ public:
 		}
 	}
 
-	int id() const { return mInGameMode ? mIDGameMode : mID; }
-
 	void scheduleDraw(){
 		if (!mScheduled) {
 			mScheduled = true;
@@ -183,11 +192,8 @@ public:
 		}
 	}
 
-	void visible(bool v){ mVisible=v; }
-
 	// Returns the implementation of the currently selected window
 	static WindowImpl * getWindowImpl(){ return getWindowImpl(glutGetWindow()); }
-
 
 	static WindowImpl * getWindowImpl(int id){
 		if(windows().count(id) > 0){
@@ -341,7 +347,7 @@ public:
 
 
 	static void cbMouse(int btn, int state, int ax, int ay){
-//		printf("GLUT: mouse click x:%d y:%d bt:#%d,%d\n", ax,ay, btn, state==GLUT_DOWN);
+		//printf("GLUT: mouse click x:%d y:%d bt:#%d,%d\n", ax,ay, btn, state==GLUT_DOWN);
 		Window * win = getWindow();
 		if(win){
 			switch(btn){
@@ -364,7 +370,7 @@ public:
 	}
 
 	static void cbMotion(int ax, int ay){
-//		printf("GLUT: mouse drag x:%d y:%d\n", ax,ay);
+		//printf("GLUT: mouse drag x:%d y:%d\n", ax,ay);
 		Window * win = getWindow();
 		if(win){
 			win->mMouse.position(ax,ay);
@@ -381,8 +387,9 @@ public:
 	}
 
 
+	// NOTE: This only gets called if glutMainLoop() has been called.
 	static void cbReshape(int w, int h){
-//		printf("GLUT reshape: w = %4d, h = %4d\n", w,h);
+		//printf("GLUT reshape: w = %4d, h = %4d\n", w,h);
 		Window * win = getWindow();
 		if(win){
 			win->makeActive();
@@ -398,6 +405,7 @@ public:
 			int dw = w - dimPrev.w;
 			int dh = h - dimPrev.h;
 
+			//printf("Window: onResize(%d, %d)\n", dw, dh);
 			win->doResize(dw, dh);
 			win->title(win->title());	// TODO: need this hack to get title back
 										// after exiting full screen
@@ -537,7 +545,7 @@ void Window::create(
 //	printf("%d\n", stat);
 
 	mImpl->mID = glutCreateWindow(mImpl->mTitle.c_str());
-	//printf("%d\n",mImpl->mID);
+	//printf("GLUT created window %d\n",mImpl->mID);
 
 	glutSetWindow(mImpl->mID);
 	glutIgnoreKeyRepeat(1);
@@ -696,16 +704,12 @@ Window& Window::title(const std::string& v){
 	return *this;
 }
 
-void Window::startLoop(){
-	MainLoop::get().start();
-//	glutIdleFunc(al_main_tick);
-//	glutMainLoop();
-}
-
-void Window::stopLoop(){
-	Window::destroyAll();
-	MainLoop::get().stop();
-}
+// moved to al_Window.cpp ...
+//void Window::startLoop(){
+//	MainLoop::get().start();
+////	glutIdleFunc(al_main_tick);
+////	glutMainLoop();
+//}
 
 } // al::
 

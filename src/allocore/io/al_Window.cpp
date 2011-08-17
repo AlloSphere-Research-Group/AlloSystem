@@ -65,8 +65,7 @@ WindowEventHandler::~WindowEventHandler(){
 
 void WindowEventHandler::removeFromWindow(){
 	if(attached()){
-//		onResize(-window().width(), -window().height());
-		window().remove(this);
+		window().remove(this); // Window::remove calls onResize
 	}
 }
 
@@ -75,8 +74,8 @@ void WindowEventHandler::removeFromWindow(){
 void Window::init(){
 	// Window has its own built-in handlers (which may be overridden in subclasses)
 	// they are added explicitly here so that the order of handlers can be user controled
-	add((InputEventHandler *)this);
-	add((WindowEventHandler *)this);
+	add(inputEventHandler());
+	add(windowEventHandler());
 	mDisplayMode = DisplayMode::DefaultBuf;
 	mASAP = false;
 }
@@ -115,51 +114,93 @@ Window& Window::fullScreenToggle(){
 
 double Window::spfActual() const { return MainLoop::intervalActual(); }
 
-Window& Window::add(InputEventHandler * v){
-	v->removeFromWindow();
-	mInputEventHandlers.push_back(&(v->window(this)));
-	return *this;
-}
 
-Window& Window::add(WindowEventHandler * v){
-	v->removeFromWindow();
-	mWindowEventHandlers.push_back(&(v->window(this)));
-	if(created()){		// notify new handler of changes
-		v->onCreate();
-//		v->onResize(width(), height());
+Window& Window::insert(InputEventHandler& v, int i){
+	InputEventHandlers& H = mInputEventHandlers;
+	if(std::find(H.begin(), H.end(), &v) == H.end()){
+		v.removeFromWindow();
+		H.insert(H.begin()+i, &(v.window(this)));
 	}
 	return *this;
 }
 
-Window& Window::prepend(InputEventHandler * v){
-	v->removeFromWindow();
-	mInputEventHandlers.insert(mInputEventHandlers.begin(), &(v->window(this)));
-	return *this;
-}
-
-Window& Window::prepend(WindowEventHandler * v){
-	v->removeFromWindow();
-	mWindowEventHandlers.insert(mWindowEventHandlers.begin(), &(v->window(this)));
-	if(created()){		// notify new handler of changes
-		v->onCreate();
-//		v->onResize(width(), height());
+Window& Window::insert(WindowEventHandler& v, int i){
+	WindowEventHandlers& H = mWindowEventHandlers;
+	if(std::find(H.begin(), H.end(), &v) == H.end()){
+		v.removeFromWindow();
+		H.insert(H.begin()+i, &(v.window(this)));
+		
+		// notify new handler of changes if the window already is created
+		// otherwise, the window will call the proper handlers when created
+		if(created()){
+			v.onCreate();
+		}
+		if(started()){
+			v.onResize(width(), height());
+			//printf("WindowEventHandler %p onResize(%d, %d)\n", &v, width(), height());
+		}
 	}
 	return *this;
 }
 
-Window& Window::remove(InputEventHandler * v){
-	// the proper way to do it:
-	mInputEventHandlers.erase(std::remove(mInputEventHandlers.begin(), mInputEventHandlers.end(), v), mInputEventHandlers.end());
-	v->mWindow = NULL;
+Window& Window::add(InputEventHandler& v){ return insert(v, mInputEventHandlers.size()); }
+Window& Window::add(WindowEventHandler& v){ return insert(v, mWindowEventHandlers.size()); }
+Window& Window::prepend(InputEventHandler& v){ return insert(v,0); }
+Window& Window::prepend(WindowEventHandler& v){ return insert(v,0); }
+
+
+Window& Window::remove(InputEventHandler& v){
+	InputEventHandlers& H = mInputEventHandlers;
+	InputEventHandlers::iterator it = std::find(H.begin(), H.end(), &v);
+
+	if(it != H.end()){
+		H.erase(it);
+
+		// the proper way to do it:
+		//H.erase(std::remove(H.begin(), H.end(), &v), H.end());
+		v.mWindow = NULL;
+	}
 	return *this;
 }
 
-Window& Window::remove(WindowEventHandler * v){
-	// the proper way to do it:
-	mWindowEventHandlers.erase(std::remove(mWindowEventHandlers.begin(), mWindowEventHandlers.end(), v), mWindowEventHandlers.end());
-	v->onDestroy();
-	v->mWindow = NULL;
+Window& Window::remove(WindowEventHandler& v){
+	WindowEventHandlers& H = mWindowEventHandlers;
+	WindowEventHandlers::iterator it = std::find(H.begin(), H.end(), &v);
+
+	if(it != H.end()){
+
+		H.erase(it);
+
+		// the proper way to do it:
+		//H.erase(std::remove(H.begin(), H.end(), &v), H.end());
+
+		//printf("removed window event handler (%p) from window (%p)\n", &v, this);
+		//assert(std::find(H.begin(), H.end(), &v) == H.end());
+		
+		if(started()){
+			v.onResize(-width(), -height());
+			//printf("WindowEventHandler %p onResize(%d, %d)\n", &v, width(), height());
+		}
+		if(created()){
+			v.onDestroy();
+		}
+		v.mWindow = NULL;
+	}
 	return *this;
+}
+
+
+bool Window::started(){
+	return MainLoop::get().isRunning();
+}
+
+void Window::startLoop(){
+	MainLoop::get().start();
+}
+
+void Window::stopLoop(){
+	Window::destroyAll();
+	MainLoop::get().stop();
 }
 
 

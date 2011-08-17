@@ -184,7 +184,7 @@ struct InputEventHandler{
 	virtual bool onMouseMove(const Mouse& m){return true;}	///< Called when the mouse moves
 	virtual bool onMouseUp(const Mouse& m){return true;}	///< Called when a mouse button is released
 
-	InputEventHandler* inputEventHandler(){ return this; }	///< Return self
+	InputEventHandler& inputEventHandler(){ return *this; }	///< Return self
 
 	bool attached() const { return NULL != mWindow; }
 	Window& window(){ return *mWindow; }
@@ -212,7 +212,7 @@ struct WindowEventHandler {
 	virtual bool onResize(int dw, int dh){ return true; }	///< Called whenever window dimensions change
 	virtual bool onVisibility(bool v){ return true; }		///< Called when window changes from hidden to shown and vice versa
 
-	WindowEventHandler* windowEventHandler(){ return this; }///< Return self
+	WindowEventHandler& windowEventHandler(){ return *this; }///< Return self
 
 	bool attached() const { return NULL != mWindow; }
 	Window& window(){ return *mWindow; }
@@ -241,6 +241,8 @@ public:
 		Dim(int w_, int h_): l(0), t(0), w(w_), h(h_){}
 		Dim(int l_, int t_, int w_, int h_): l(l_), t(t_), w(w_), h(h_){}
 		void set(int l_, int t_, int w_, int h_){l=l_;t=t_;w=w_;h=h_;}
+		
+		float aspect() const { return (w!=0 && h!=0) ? double(w)/h : 1; }
 	};
 
 	Window();
@@ -265,8 +267,8 @@ public:
 	const Keyboard& keyboard() const { return mKeyboard; }	///< Get current keyboard state
 	const Mouse& mouse() const { return mMouse; }			///< Get current mouse state
 
-	double aspect() const;						///< Get aspect ratio (width divided by height)
-	bool created() const;						///< Whether window has been created (is active)	
+	double aspect() const { return dimensions().aspect(); }	///< Get aspect ratio (width divided by height)
+	bool created() const;						///< Whether window has been created providing a valid graphics context
 	Cursor::t cursor() const;					///< Get current cursor type	
 	bool cursorHide() const;					///< Whether the cursor is hidden
 	Dim dimensions() const;						///< Get current dimensions of window
@@ -309,37 +311,46 @@ public:
 	
 	/// The order of handlers in the list matches their calling order.
 	///
-	Window& add(InputEventHandler * v);
+	Window& add(InputEventHandler& v);
 
 	/// Append handler to window event handler list
 	
 	/// The order of handlers in the list matches their calling order.
 	///
-	Window& add(WindowEventHandler * v);
+	Window& add(WindowEventHandler& v);
 
 	/// Prepend handler to input event handler list
 
 	/// The order of handlers in the list matches their calling order.
 	///
-	Window& prepend(InputEventHandler * v);
+	Window& prepend(InputEventHandler& v);
 
 	/// Prepend handler to window event handler list
 
 	/// The order of handlers in the list matches their calling order.
 	///
-	Window& prepend(WindowEventHandler * v);
+	Window& prepend(WindowEventHandler& v);
 
 	/// Remove all input event handlers matching argument
-	Window& remove(InputEventHandler * v);
+	Window& remove(InputEventHandler& v);
 
 	/// Remove all window event handlers matching argument
-	Window& remove(WindowEventHandler * v);
+	Window& remove(WindowEventHandler& v);
+
+	/// DEPRECATED, do not use!
+	Window& add(InputEventHandler * v){ return add(*v); }
+	Window& add(WindowEventHandler * v){ return add(*v); }
+	Window& prepend(InputEventHandler * v){ return prepend(*v); }
+	Window& prepend(WindowEventHandler * v){ return prepend(*v); }
+	Window& remove(InputEventHandler * v){ return remove(*v); }
+	Window& remove(WindowEventHandler * v){ return remove(*v); }
 
 	/// Destroy all created windows
 	static void destroyAll();
 
 	static void startLoop();
 	static void stopLoop();
+	static bool started();
 
 protected:
 	typedef std::vector<InputEventHandler *> InputEventHandlers;
@@ -354,29 +365,20 @@ protected:
 	DisplayMode::t mDisplayMode;
 	bool mASAP;
 
+	Window& insert(InputEventHandler& v, int i);
+	Window& insert(WindowEventHandler& v, int i);
+
 	void init();					// IMPORTANT: this must be called from the constructor
 	void doFrameImpl();				// Calls onFrame() and swaps buffers
 
 	#define CALL(e)	{\
-		InputEventHandlers::iterator iter = mInputEventHandlers.begin(); \
+		InputEventHandlers::iterator it = mInputEventHandlers.begin(); \
 		bool active = true; \
-		while(active && iter != mInputEventHandlers.end()){\
-			active = (*iter)->e; \
-			iter++; \
+		while(active && it != mInputEventHandlers.end()){\
+			active = (*it)->e; \
+			++it; \
 		}\
 	}
-	
-	/*
-	#define CALL(e)	{\
-		InputEventHandlers::iterator iter = mInputEventHandlers.begin(); \
-		bool active = true; \
-		while(active && iter != mInputEventHandlers.end()){\
-			active = (*iter)->e; \
-			iter++; \
-		}\
-		if (active) e; \
-	}
-	*/
 	
 	void doMouseDown(const Mouse& m){ CALL(onMouseDown(m)); }
 	void doMouseDrag(const Mouse& m){ CALL(onMouseDrag(m)); }
@@ -387,29 +389,17 @@ protected:
 	#undef CALL
 	
 	#define CALL(e)	{\
-		WindowEventHandlers::iterator iter = mWindowEventHandlers.begin(); \
+		WindowEventHandlers::iterator it = mWindowEventHandlers.begin(); \
 		bool active = true; \
-		while(active && iter != mWindowEventHandlers.end()){\
-			active = (*iter)->e; \
-			iter++; \
+		while(active && it != mWindowEventHandlers.end()){\
+			active = (*it)->e; \
+			++it; \
 		}\
 	}
-
-	/*
-	#define CALL(e)	{\
-		WindowEventHandlers::iterator iter = mWindowEventHandlers.begin(); \
-		bool active = true; \
-		while(active && iter != mWindowEventHandlers.end()){\
-			active = (*iter)->e; \
-			iter++; \
-		}\
-		if (active) e; \
-	}
-	*/
 	
 	void doFrame() { CALL(onFrame()); }
 	void doCreate(){ CALL(onCreate()); }				
-	void doDestroy(){ 
+	void doDestroy(){
 		CALL(onDestroy()); 
 		contextDestroy(); 
 	}				
@@ -419,7 +409,7 @@ protected:
 };
 
 
-
+/// Standard key controls for window
 struct StandardWindowKeyControls : InputEventHandler {
 	bool onKeyDown(const Keyboard& k){
 		if(k.ctrl()){
@@ -441,12 +431,6 @@ struct StandardWindowKeyControls : InputEventHandler {
 		return true;
 	}
 };
-
-
-inline double Window::aspect() const {
-	Dim d = dimensions();
-	return double(d.w) / d.h;
-}
 
 } // al::
 
