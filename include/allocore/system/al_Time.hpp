@@ -40,6 +40,7 @@ inline void wait(al_sec dt){ al_sleep(dt); }
 
 /// Get current wall time in seconds
 inline al_sec walltime(){ return al_time(); }
+inline al_sec timeNow(){ return al_time(); }
 
 /// Timer with stopwatch-like functionality for benchmarking, etc.
 class Timer {
