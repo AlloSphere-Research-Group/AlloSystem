@@ -46,8 +46,8 @@ int main(){
 	nav.pos(0, 0, -20);
 
 	cam.near(1).far(100).focalLength(1).fovy(45);
-	cam.eyeSep(cam.eyeSepAuto());
-	stereo.omni(true, 24, 360);
+	cam.eyeSep(-cam.eyeSepAuto());
+	stereo.omni(true, 24, 120);
 	stereo.stereo(false);
 	stereo.mode(Stereographic::Anaglyph);
 	
