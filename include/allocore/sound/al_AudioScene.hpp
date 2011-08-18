@@ -1,14 +1,42 @@
 #ifndef INCLUDE_AL_AUDIOSCENE_HPP
 #define INCLUDE_AL_AUDIOSCENE_HPP
 
+/*
+ *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
+ */
+
+/*
+	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
+	All Rights Reserved.
+
+	Permission to use, copy, modify, distribute, and distribute modified versions
+	of this software and its documentation without fee and without a signed
+	licensing agreement, is hereby granted, provided that the above copyright
+	notice, the list of contributors, this paragraph and the following two paragraphs 
+	appear in all copies, modifications, and distributions.
+
+	IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+	SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
+	OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF REGENTS HAS
+	BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+	REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+	THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+	PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
+	HEREUNDER IS PROVIDED "AS IS". REGENTS HAS  NO OBLIGATION TO PROVIDE
+	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+*/
+
+#include <math.h>
+#include <strings.h> // bzero
 #include <vector>
 #include <list>
-#include <strings.h> // bzero
 #include "allocore/types/al_Buffer.hpp"
 #include "allocore/math/al_Interpolation.hpp"
 #include "allocore/math/al_Vec.hpp"
 #include "allocore/spatial/al_Pose.hpp"
 #include "allocore/sound/al_Ambisonics.hpp"
+#include "allocore/sound/al_Speaker.hpp"
 #include "allocore/sound/al_Reverb.hpp"
 
 namespace al{
@@ -47,12 +75,21 @@ namespace al{
 	
 */
 
+
 /// Audio scene listener object
 
 /// 
 ///
 class Listener {
 public:
+
+	/// Set current pose
+	void pose(const Pose& p) { mPose.set(p); }
+	Pose& pose(){ return mPose; }
+
+	/// Get current pose
+	const Pose& pose() const { return mPose; }
+
 
 	int numSpeakers() const { return mDecoder.numSpeakers(); }
 
@@ -68,9 +105,7 @@ public:
 
 	float * ambiChans(unsigned channel=0) { return &mAmbiDomainChannels[channel * mNumFrames]; }
 	
-	/// Set current pose:
-	void pose(const Pose& p) { mPose.set(p); }
-	const Pose& pose() const { return mPose; }
+
 	
 protected:
 	friend class AudioScene;
@@ -88,10 +123,11 @@ protected:
 			mAmbiDomainChannels.resize(mDecoder.channels() * v);
 		}
 	}
-	
-	AmbiDecode mDecoder;
-	
+
+	// move to specialized ambi panner...
+	AmbiDecode mDecoder;	
 	std::vector<float> mAmbiDomainChannels;
+
 	std::vector<Quatd> mQuatHistory;		// buffer of interpolated orientations
 	ShiftBuffer<4, Vec3d> mPosHistory;		// position in previous blocks
 	Quatd mQuatPrev;						// orientation in previous block
@@ -135,6 +171,14 @@ public:
 	static int bufferSize(double samplerate, double speedOfSound, double distance) {
 		return (int)ceil(samplerate * distance / speedOfSound);
 	}
+
+	/// Set current pose
+	void pose(const Pose& p) { mPose.set(p); }
+	Pose& pose(){ return mPose; }
+
+	/// Get current pose
+	const Pose& pose() const { return mPose; }
+
 
 	/// Get far clipping distance
 	double farClip() const { return mNearClip+mClipRange; }
@@ -220,10 +264,6 @@ public:
 
 	/// Write sample to internal delay-line
 	void writeSample(const double& v){ mSound.write(v); }
-	
-	/// Set current pose:
-	void pose(const Pose& p) { mPose.set(p); }
-	const Pose& pose() const { return mPose; }
 
 protected:
 	friend class AudioScene;
