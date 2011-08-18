@@ -9,6 +9,27 @@ static Stereographic stereo;
 static Camera cam;
 Nav nav;
 
+/*
+	Omnigraphic mode splits up the window into vertical slices (viewports)
+	Each viewport has a slightly rotated view of the scene, such that the 
+	borders match up and create a seamless panoramic view.
+	In effect, it presents a cylindrical map.
+	With stereographics, it creates omnistereo (where stereoscopy is continuous
+	around the cylinder)
+	
+	However it can be expensive, as each slice is a full scene render.
+	
+	Perhaps a similar effect can be achieved with a shader?:
+	
+		According to the polar angle of a vertex, displace it with a modified 
+		version of the ModelViewProjection matrix (instead of e.g. fttransform())
+	
+		The modelview/projection matrices can be calculated in the same way as 
+		the Stereographic class (perspectiveLeft/Right, lookatLeft/Right)
+	
+	The advantage would be full spherical omnistereo, and hopefully cheaper.
+*/
+
 struct MyWindow : Window, public Drawable{
 	
 	bool onKeyDown(const Keyboard& k){	
