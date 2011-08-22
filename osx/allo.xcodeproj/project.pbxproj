@@ -460,6 +460,7 @@
 		168B4E851331385E0076257A /* shaderPhong.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = shaderPhong.cpp; sourceTree = "<group>"; };
 		168C163D1322C656006D79CC /* utGraphicsMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utGraphicsMesh.cpp; sourceTree = "<group>"; };
 		168C16401322C755006D79CC /* utGraphicsDraw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utGraphicsDraw.cpp; sourceTree = "<group>"; };
+		168C46A713FC92C50085BCAD /* al_Speaker.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Speaker.hpp; sourceTree = "<group>"; };
 		168E74291329999D003115DD /* unitTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = unitTests.cpp; sourceTree = "<group>"; };
 		168EC8EB1161CA2C00FCACC7 /* al_Time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Time.h; sourceTree = "<group>"; };
 		168EC8EC1161CA2C00FCACC7 /* al_MainLoop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_MainLoop.h; sourceTree = "<group>"; };
@@ -518,6 +519,7 @@
 		16C70698135D13DF00FEE5B3 /* simpleWorld.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = simpleWorld.cpp; sourceTree = "<group>"; };
 		16C706B4135D14E400FEE5B3 /* OSC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OSC.cpp; sourceTree = "<group>"; };
 		16C706B5135D14E400FEE5B3 /* window.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = window.cpp; sourceTree = "<group>"; };
+		16D0504A1402F27D009A5BEB /* al_HashSpace.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_HashSpace.hpp; sourceTree = "<group>"; };
 		16D46542118F4ADA0039A84C /* al_Plane.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Plane.hpp; sourceTree = "<group>"; };
 		16D46562118F55790039A84C /* al_Printing.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Printing.hpp; sourceTree = "<group>"; };
 		16D46563118F57970039A84C /* al_Printing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Printing.cpp; sourceTree = "<group>"; };
@@ -3629,6 +3631,7 @@
 			isa = PBXGroup;
 			children = (
 				16AA8F0011C6FDE10053EFE1 /* al_Camera.hpp */,
+				16D0504A1402F27D009A5BEB /* al_HashSpace.hpp */,
 				16AFFDFD13996032007B3FE6 /* al_Pose.hpp */,
 			);
 			path = spatial;
@@ -4313,6 +4316,7 @@
 				36C13F0D11D15FA9006196FC /* al_Ambisonics.hpp */,
 				3638758D126A18C700FCFD67 /* al_Crossover.hpp */,
 				36C13F0E11D15FA9006196FC /* al_Reverb.hpp */,
+				168C46A713FC92C50085BCAD /* al_Speaker.hpp */,
 			);
 			path = sound;
 			sourceTree = "<group>";
