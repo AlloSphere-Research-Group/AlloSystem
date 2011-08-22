@@ -520,6 +520,7 @@
 		16C706B4135D14E400FEE5B3 /* OSC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OSC.cpp; sourceTree = "<group>"; };
 		16C706B5135D14E400FEE5B3 /* window.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = window.cpp; sourceTree = "<group>"; };
 		16D0504A1402F27D009A5BEB /* al_HashSpace.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_HashSpace.hpp; sourceTree = "<group>"; };
+		16D050581403125C009A5BEB /* al_DistAtten.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_DistAtten.hpp; sourceTree = "<group>"; };
 		16D46542118F4ADA0039A84C /* al_Plane.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Plane.hpp; sourceTree = "<group>"; };
 		16D46562118F55790039A84C /* al_Printing.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Printing.hpp; sourceTree = "<group>"; };
 		16D46563118F57970039A84C /* al_Printing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Printing.cpp; sourceTree = "<group>"; };
@@ -3631,6 +3632,7 @@
 			isa = PBXGroup;
 			children = (
 				16AA8F0011C6FDE10053EFE1 /* al_Camera.hpp */,
+				16D050581403125C009A5BEB /* al_DistAtten.hpp */,
 				16D0504A1402F27D009A5BEB /* al_HashSpace.hpp */,
 				16AFFDFD13996032007B3FE6 /* al_Pose.hpp */,
 			);
