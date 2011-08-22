@@ -241,7 +241,7 @@ void AmbiDecode::setSpeakerRadians(int index, int deviceChannel, float az, float
 	mSpeakers[index].azimuth = az;
 	mSpeakers[index].elevation = el;
 	mSpeakers[index].deviceChannel = deviceChannel;
-	mSpeakers[index].amp = amp;
+	mSpeakers[index].gain = amp;
 
 	// update encoding weights
 	encodeWeightsFuMa(mDecodeMatrix + index * channels(), mDim, mOrder, az, el);
