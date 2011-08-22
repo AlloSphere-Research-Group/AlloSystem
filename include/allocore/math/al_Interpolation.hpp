@@ -48,13 +48,15 @@ Tv allpassFixed(Tf frac, const Tv& x, const Tv& y, Tv& o1);
 
 /// 'frac' [0, 1) is the value on the curve btw x2 and x0
 ///
-template <class T> T bezier(T frac, T x2, T x1, T x0);
+template <class Tf, class Tv>
+Tv bezier(Tf frac, const Tv& x2, const Tv& x1, const Tv& x0);
 
 /// Bezier curve, 4-point cubic
 
 /// 'frac' [0, 1) is the value on the curve btw x3 and x0
 ///
-template <class T> T bezier(T frac, T x3, T x2, T x1, T x0);
+template <class Tf, class Tv>
+Tv bezier(Tf frac, const Tv& x3, const Tv& x2, const Tv& x1, const Tv& x0);
 
 ///	de Casteljau algorithm for four point interpolation
 
@@ -91,7 +93,7 @@ template <class T> void lagrange3(T * h, T delay);
 
 /// This assumes the points are spaced evenly on the x axis from [-1, 1].
 /// The output is an offset from 0.
-template <class T> T parabolic(T xm1, T x, T xp1);
+template <class T> T parabolic(const T& xm1, const T& x, const T& xp1);
 
 // Various functions to perform Waring-Lagrange interpolation.
 //		These are much faster than using a general purpose FIR filter since
@@ -100,13 +102,17 @@ template <class T> T parabolic(T xm1, T x, T xp1);
 
 /// Cubic interpolation
 
-///	This is also known as a Catmull-Rom spline or Cardinal spline with a=-0.5.
+///	This is a Cardinal spline with a tension of 0 (AKA a Catmull-Rom spline).
 ///
 template <class Tf, class Tv>
 Tv cubic(Tf frac, const Tv& w, const Tv& x, const Tv& y, const Tv& z);
 
+/// Cubic interpolation
+
+///	This is a Cardinal spline with a tension of -1.
+///
 template <class Tf, class Tv>
-Tv cubic2(Tf d, const Tv& w, const Tv& x, const Tv& y, const Tv& z);
+Tv cubic2(Tf frac, const Tv& w, const Tv& x, const Tv& y, const Tv& z);
 
 /// Linear interpolation.  Identical to first order Lagrange.
 template <class Tf, class Tv>
@@ -120,7 +126,9 @@ Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z);
 template <class Tf, class Tv>
 Tv linearCyclic(Tf frac, const Tv& x, const Tv& y, const Tv& z);
 
-template <class T> void linear(T * dst, const T * xs, const T * xp1s, int len, T frac);
+/// Element-wise linear interpolation between two arrays of values
+template <class Tf, class Tv>
+void linear(Tv * dst, const Tv * xs, const Tv * xp1s, int len, const Tf& frac);
 
 /// Nearest neighbor interpolation
 template <class Tf, class Tv>
@@ -198,7 +206,6 @@ inline Tv allpass(Tf f, const Tv& x, const Tv& y, Tv& o1){
 	return o1 = (y - o1) * f + x;
 }
 
-
 template <class Tf, class Tv>
 inline Tv allpassFixed(Tf f, const Tv& x, const Tv& y, Tv& o1){
 //	f = 1.f-f;
@@ -216,11 +223,12 @@ inline Tv allpassFixed(Tf f, const Tv& x, const Tv& y, Tv& o1){
 //	return (1.f - f) / (1.f + f) + offset;
 //}
 
-template <class T> inline T bezier(T d, T x2, T x1, T x0){
-	T d2 = d * d;
-	T dm1 = T(1) - d;
-	T dm12 = dm1 * dm1;
-	return x2 * dm12 + T(2) * x1 * dm1 * d + x0 * d2;
+template <class Tf, class Tv>
+inline Tv bezier(Tf d, const Tv& x2, const Tv& x1, const Tv& x0){
+	Tf d2 = d * d;
+	Tf dm1 = Tf(1) - d;
+	Tf dm12 = dm1 * dm1;
+	return dm12 * x2 + Tf(2)*dm1*d * x1 + d2 * x0;
 
 //	x2 (1-d)(1-d) + 2 x1 (1-d) d + x0 d d
 //	x2 - d 2 x2 + d d x2 + d 2 x1 - d d 2 x1 + d d x0
@@ -232,14 +240,13 @@ template <class T> inline T bezier(T d, T x2, T x1, T x0){
 //	return x2 - (d * c2 + c1) * d;
 }
 
-
-template <class T> inline T bezier(T d, T x3, T x2, T x1, T x0){
-	T c1 = T(3) * (x2 - x3);
-	T c2 = T(3) * (x1 - x2) - c1;
-	T c3 = x0 - x3 - c1 - c2;
+template <class Tf, class Tv>
+inline Tv bezier(Tf d, const Tv& x3, const Tv& x2, const Tv& x1, const Tv& x0){
+	Tv c1 = Tf(3) * (x2 - x3);
+	Tv c2 = Tf(3) * (x1 - x2) - c1;
+	Tv c3 = x0 - x3 - c1 - c2;
 	return ((c3 * d + c2) * d + c1) * d + x3;
 }
-
 
 template <class Tf, class Tv>
 Tv casteljau(const Tf& f, const Tv& a, const Tv& b, const Tv& c, const Tv& d){
@@ -252,7 +259,6 @@ Tv casteljau(const Tf& f, const Tv& a, const Tv& b, const Tv& c, const Tv& d){
 		linear(f, bc, cd)
 	);
 }
-
 
 template <class Tf, class Tv>
 inline Tv cubic(Tf f, const Tv& w, const Tv& x, const Tv& y, const Tv& z){	
@@ -285,7 +291,6 @@ template <class T>
 void cubic(T * dst, const T * xm1s, const T * xs, const T * xp1s, const T * xp2s, int len, T f){
 	for(int i=0; i<len; ++i) dst[i] = cubic(f, xm1s[i], xs[i], xp1s[i], xp2s[i]);
 }
-
 
 // From http://astronomy.swin.edu.au/~pbourke/other/interpolation/ (Paul Bourke)
 template <class Tf, class Tv>
@@ -337,7 +342,6 @@ inline Tv hermite(Tp f,
 	return x*a0 + m0*a1 + m1*a2 + y*a3;
 }
 
-
 template <class T> void lagrange(T * a, T delay, int order){
 	for(int i=0; i<=order; ++i){
 		T coef = T(1);
@@ -352,19 +356,16 @@ template <class T> void lagrange(T * a, T delay, int order){
 	}
 }
 
-
 template <class T> inline void lagrange1(T * h, T d){
 	h[0] = T(1) - d;
 	h[1] = d;
 }
-
 
 template <class T> inline void lagrange2(T * h, T d){
 	h[0] =      (d - T(1)) * (d - T(2)) * T(0.5);
 	h[1] = -d              * (d - T(2))         ;
 	h[2] =  d * (d - T(1))              * T(0.5);
 }
-
 
 template <class T> inline void lagrange3(T * h, T d){
 	T d1 = d - T(1);
@@ -399,8 +400,8 @@ inline Tv linear(Tf frac, const Tv& x, const Tv& y, const Tv& z){
 	return ipl::linear(frac-Tf(1), y,z);
 }
 
-template <class T>
-void linear(T * dst, const T * xs, const T * xp1s, int len, T f){
+template <class Tf, class Tv>
+void linear(Tv * dst, const Tv * xs, const Tv * xp1s, int len, const Tf& f){
 	for(int i=0; i<len; ++i) dst[i] = linear(f, xs[i], xp1s[i]);
 }
 
@@ -417,13 +418,9 @@ inline Tv nearest(Tf f, const Tv& x, const Tv& y){
 	return (f < Tf(0.5)) ? x : y;
 }
 
-
-template <class T> inline T parabolic(T xm1, T x, T xp1){
-	T numer = xm1 - xp1;
-	T denom = x - xp1 + x - xm1;
-	return T(-0.5) * numer / denom;
+template <class T> inline T parabolic(const T& xm1, const T& x, const T& xp1){
+	return T(-0.5) * (xm1 - xp1) / (x - xp1 + x - xm1);
 }
-
 
 template <class Tf, class Tv>
 inline Tv quadratic(Tf f, const Tv& x, const Tv& y, const Tv& z){
