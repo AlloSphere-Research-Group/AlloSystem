@@ -14,9 +14,9 @@ int main(){
 	topView << btn;
 
 	Window win;
-	win.add(new StandardWindowKeyControls);
-	win.add(new GLVInputControl(&topView));
-	win.add(new GLVWindowControl(&topView));
+	win.add(*new StandardWindowKeyControls);
+	win.add(*new GLVInputControl(topView));
+	win.add(*new GLVWindowControl(topView));
 
 	win.create(Window::Dim(600,400), "Simple GUI");
 

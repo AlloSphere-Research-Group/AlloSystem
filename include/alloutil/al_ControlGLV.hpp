@@ -8,9 +8,9 @@ namespace al {
 
 struct GLVControl {
 
-	GLVControl(glv::GLV * v): mGLV(v){}
+	GLVControl(glv::GLV& v): mGLV(&v){}
 
-	void glv(glv::GLV * v){ mGLV=v; }
+	void glv(glv::GLV& v){ mGLV=&v; }
 	glv::GLV& glv(){ return *mGLV; }
 
 protected:
@@ -20,7 +20,7 @@ protected:
 /// Mapping from keyboard and mouse controls to a GLV object
 struct GLVInputControl : public GLVControl, public InputEventHandler {
 
-	GLVInputControl(glv::GLV * v): GLVControl(v){}
+	GLVInputControl(glv::GLV& v): GLVControl(v){}
 	virtual ~GLVInputControl(){}
 
 	virtual bool onMouseDown(const Mouse& m){
@@ -76,7 +76,7 @@ protected:
 /// Mapping from window events to a GLV object
 struct GLVWindowControl : public GLVControl, public WindowEventHandler {
 
-	GLVWindowControl(glv::GLV * v): GLVControl(v){}
+	GLVWindowControl(glv::GLV& v): GLVControl(v){}
 	virtual ~GLVWindowControl(){}
 
 	virtual bool onCreate(){
