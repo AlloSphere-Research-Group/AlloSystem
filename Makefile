@@ -167,8 +167,11 @@ archive:
 # Remove build files
 .PHONY: clean
 clean: createFolders
-	@$(RM) -rf $(BUILD_DIR)*
-	@$(RM) -rf $(TEST_DIR)/$(BUILD_DIR)*
+# Clean only removes object files for now; avoids unintentional removal of user files
+#	@$(RM) -rf $(BUILD_DIR)*
+#	@$(RM) -rf $(TEST_DIR)/$(BUILD_DIR)*
+	@$(RM) -f $(OBJ_DIR)*
+	@$(RM) -f $(TEST_DIR)/$(OBJ_DIR)*
 	@$(MAKE) -C externals/gamma clean
 	@$(MAKE) -C externals/glv clean
 
