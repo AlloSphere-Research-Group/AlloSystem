@@ -29,6 +29,8 @@
 */
 
 #include <stdio.h>
+#include "allocore/sound/al_Speaker.hpp"
+
 //#define MAX_ORDER 3
 
 
@@ -127,13 +129,6 @@ protected:
 /// Higher Order Ambisonic Decoding class
 class AmbiDecode : public AmbiBase{
 public:
-
-	struct Speaker {
-		float azimuth;
-		float elevation;
-		int deviceChannel;	// index in the output device channels array
-		float amp;
-	};
 
 	AmbiDecode(int dim, int order, int numSpeakers, int flavor=1);
 	virtual ~AmbiDecode();
