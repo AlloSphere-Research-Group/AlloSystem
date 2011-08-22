@@ -57,8 +57,8 @@ public:
 	DistAtten& rollOff(const T& v){ mRollOff=v; return *this; }
 
 	/// Compile-time generic function mapping
-	template<enum Func>
-	T map(const T& dist){ return (*this)(Func, dist); }
+	template<Func func>
+	T map(const T& dist){ return (*this)(func, dist); }
 
 	/// Run-time variable function mapping
 	T map(Func func, const T& dist){
@@ -106,7 +106,7 @@ public:
 	T none(const T& dist) const { return 1; }
 
 	T sigmoid(const T& dist) const {
-		return 1. - tanh(M_PI * rolloff() * dist*dist);
+		return 1. - tanh(M_PI * rollOff() * dist*dist);
 	}
 
 
