@@ -95,10 +95,20 @@ template <class T> void lagrange3(T * h, T delay);
 /// The output is an offset from 0.
 template <class T> T parabolic(const T& xm1, const T& x, const T& xp1);
 
+
 // Various functions to perform Waring-Lagrange interpolation.
 //		These are much faster than using a general purpose FIR filter since
 //		the coefs are computed directly and nested multiplication is used
 //		rather than directly evaluating the polynomial (FIR).
+
+/// Compute weights for cubic cardinal spline
+
+/// @param[out] w	output weights
+/// @param[ in] x	input domain values; spline in [x[1], x[2]]
+/// @param[ in] f	fraction in [0,1]
+/// @param[ in] b	smoothness parameter in [-1,1]; 1 = Catmull-Rom
+template <class Tf, class Tv>
+void cardinalSpline(Tv * w, const Tv * x, const Tf& f, double b);
 
 /// Cubic interpolation
 
@@ -258,6 +268,35 @@ Tv casteljau(const Tf& f, const Tv& a, const Tv& b, const Tv& c, const Tv& d){
 		linear(f, ab, bc),
 		linear(f, bc, cd)
 	);
+}
+
+template <class Tf, class Tv>
+inline void cardinalSpline(Tv * w, const Tv * x, const Tf& f, double b){
+	
+	//c = (1-b);		// tension
+	b *= (x[2]-x[1]);	// make domain [t[1], t[2]]
+	
+	// evaluate the Hermite basis functions
+	Tf h00 = (1 + 2*f)*(f-1)*(f-1);
+	Tf h10 = f*(f-1)*(f-1);
+	Tf h01 = f*f*(3-2*f);
+	Tf h11 = f*f*(f-1);
+	
+	/*
+	The general cubic Hermite spline is
+		p(f) = h00 * p0 + h10 * m0 + h01 * p1 + h11 * m1
+
+	For a cardinal spline, the tangent at point k is
+		m[k] = (1-c) * (p[k+1] - p[k-1]) / (x[k+1] - x[k-1])
+		
+	To get the weights for each point, we plug the tangents into the general
+	spline equation and factor out the p[k].
+	*/
+	
+	w[0] = (    - b*h10/(x[2]-x[0]));
+	w[1] = (h00 - b*h11/(x[3]-x[1]));
+	w[2] = (h01 + b*h10/(x[2]-x[0]));
+	w[3] = (    + b*h11/(x[3]-x[1]));
 }
 
 template <class Tf, class Tv>
