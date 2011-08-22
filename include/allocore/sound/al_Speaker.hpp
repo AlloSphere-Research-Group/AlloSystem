@@ -46,7 +46,7 @@ struct Speaker {
 	/// @param[in] el				elevation of speaker
 	/// @param[in] radius			radius of speaker
 	/// @param[in] gain				gain of speaker
-	Speaker(int deviceChan, float az=0.f, float el=0.f, float radius=1.f, float gain=1.f)
+	Speaker(int deviceChan=0, float az=0.f, float el=0.f, float radius=1.f, float gain=1.f)
 	:	deviceChannel(deviceChan), gain(gain), azimuth(az), elevation(el), radius(radius)
 	{}
 
