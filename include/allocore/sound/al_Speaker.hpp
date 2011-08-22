@@ -27,6 +27,9 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 */
 
+#include <cmath>
+#include <vector>
+
 namespace al{
 
 /// Spatial definition of a speaker in a listening space
@@ -47,14 +50,16 @@ struct Speaker {
 	:	deviceChannel(deviceChan), gain(gain), azimuth(az), elevation(el), radius(radius)
 	{}
 
-	Vec3d vec(){
-		double elr = toRad(elevation);
-		double azr = toRad(azimuth);
-		double cosel = cos(elr);
-		double x = sin(azr) * cosel * radius;
-		double y = cos(azr) * cosel * radius;
-		double z =         sin(elr) * radius;
-		return Vec3d(x,y,z);
+	template <class T>
+	Speaker& posCart(T * xyz){
+		using namespace std;
+		float elr = toRad(elevation);
+		float azr = toRad(azimuth);
+		float cosel = cos(elr);
+		xyz[0] = sin(azr) * cosel * radius;
+		xyz[1] = cos(azr) * cosel * radius;
+		xyz[2] =         sin(elr) * radius;
+		return *this;
 	}
 	
 	static double toRad(double d){ return d*2.*M_PI/180.; }
@@ -65,7 +70,14 @@ struct Speaker {
 /// Base class for a configuration of multiple speakers
 class SpeakerLayout{
 public:
+	typedef std::vector<Speaker> Speakers;
+
 	SpeakerLayout(){}
+
+	int numSpeakers() const { return speakers().size(); }
+
+	const Speakers& speakers() const { return mSpeakers; }
+	Speakers& speakers(){ return mSpeakers; }
 
 //	Speaker addSpeaker(float azimuth, float elevation, float distance, int deviceChannel){
 //		Speaker s;
@@ -80,11 +92,13 @@ public:
 	SpeakerLayout& addSpeaker(const Speaker& spkr){
 		mSpeakers.push_back(spkr);
 		return *this;
-	}		
+	}
+
+	
 
 protected:
 	friend class Listener;
-	std::vector<Speaker> mSpeakers;
+	Speakers mSpeakers;
 };
 
 
