@@ -56,12 +56,16 @@ namespace al{
 class GPUContext {
 public:	
 	GPUContext();
+	virtual ~GPUContext();
 	
 	/// Triggers destroy handler for each GPUObject registered in a given context
 	void contextDestroy();
 	
 	/// Get context ID
 	int contextID() const { return mContextID; }
+	
+	void makeDefaultContext();
+	static int defaultContextID();
 	
 protected:
 	int mContextID;
@@ -72,7 +76,7 @@ protected:
 class GPUObject{
 public:
 	
-	GPUObject(int ctx=0): mID(0) { contextRegister(ctx); }
+	GPUObject(int ctx = GPUContext::defaultContextID()): mID(0) { contextRegister(ctx); }
 	GPUObject(GPUContext& ctx): mID(0) { contextRegister(ctx.contextID()); }
 	virtual ~GPUObject(){ contextUnregister(); }
 	
