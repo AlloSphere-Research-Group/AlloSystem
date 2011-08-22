@@ -1,28 +1,5 @@
 #include "allocore/system/al_Thread.hpp"
 
-/***************************************************/
-/*! \class Thread
-    \brief STK thread class.
-
-    This class provides a uniform interface for cross-platform
-    threads.  On unix systems, the pthread library is used.  Under
-    Windows, the C runtime threadex functions are used.
-
-    Each instance of the Thread class can be used to control a single
-    thread process.  Routines are provided to signal cancelation
-    and/or joining with a thread, though it is not possible for this
-    class to know the running status of a thread once it is started.
-
-    For cross-platform compatability, thread functions should be
-    declared as follows:
-
-    THREAD_FUNCTION(thread_function_name)
-
-    by Perry R. Cook and Gary P. Scavone, 1995 - 2005.
-*/
-/***************************************************/
-
-
 #define USE_PTHREAD		(defined (__APPLE__) || defined (OSX) || defined (__LINUX__) || defined (__UNIX__))
 #define USE_THREADEX	(defined(WIN32))
 
@@ -31,29 +8,19 @@ namespace al {
 #if USE_PTHREAD
 #include <pthread.h>
 
-#error "ThreadNative not re-implemented using new Thread interface. May be better to use std::thread ..." 
-
 //typedef pthread_t ThreadHandle;
 //typedef void * (*ThreadFunction)(void *);
 //#define THREAD_FUNCTION(name) void * name(void * user)
 
 struct Thread::Impl{
 	Impl(): mHandle(0){}
-	
-	bool start(ThreadFunction routine, void * userData){
+
+	bool start(ThreadFunction& func){
 		if(mHandle) return false;
-		return 0 == pthread_create(&mHandle, NULL, *routine, userData);
+		return 0 == pthread_create(&mHandle, NULL, cThreadFunc, &func);
 	}
 
-	bool cancel(){
-		return 0 == pthread_cancel(mHandle);
-	}
-
-	void testCancel(){
-		pthread_testcancel();
-	}
-
-	bool wait(){
+	bool join(){
 		if(pthread_join(mHandle, NULL) == 0){
 			mHandle = 0;
 			return true;
@@ -61,7 +28,21 @@ struct Thread::Impl{
 		return false;
 	}
 
+//	bool cancel(){
+//		return 0 == pthread_cancel(mHandle);
+//	}
+//
+//	void testCancel(){
+//		pthread_testcancel();
+//	}
+
 	pthread_t mHandle;
+
+	static void * cThreadFunc(void * user){
+		ThreadFunction& tfunc = *((ThreadFunction*)user);
+		tfunc();
+		return NULL;
+	}
 };
 
 #elif USE_THREADEX
@@ -75,24 +56,16 @@ struct Thread::Impl{
 
 struct Thread::Impl{
 	Impl(): mHandle(0){}
-	
-	bool start(ThreadFunction routine, void * userData){
+
+	bool start(ThreadFunction& func){
 		if(mHandle) return false;
 		unsigned thread_id;
-		mHandle = _beginthreadex(NULL, 0, cThreadFunc, this, 0, &thread_id);
+		mHandle = _beginthreadex(NULL, 0, cThreadFunc, &func, 0, &thread_id);
 		if(mHandle) return true;
 		return false;
 	}
 
-	bool cancel(){
-		TerminateThread((HANDLE)mHandle, 0);
-		return true;
-	}
-
-	void testCancel(){
-	}
-
-	bool wait(){
+	bool join(){
 		long retval = WaitForSingleObject((HANDLE)mHandle, INFINITE);
 		if(retval == WAIT_OBJECT_0){
 			CloseHandle((HANDLE)mHandle);
@@ -102,38 +75,55 @@ struct Thread::Impl{
 		return false;
 	}
 
+//	bool cancel(){
+//		TerminateThread((HANDLE)mHandle, 0);
+//		return true;
+//	}
+//
+//	void testCancel(){
+//	}
+
 	unsigned long mHandle;
-	ThreadFunction mRoutine;
-	
-	static unsigned _stdcall * cThreadFunc(void * userData){
-		Impl * impl = (Impl *)user;
-		return (unsigned _stdcall *)user->mRoutine(userData);
+//	ThreadFunction mRoutine;
+
+	static unsigned _stdcall * cThreadFunc(void * user){
+		ThreadFunction& tfunc = *((ThreadFunction*)user);
+		tfunc();
+		return NULL;
 	}
 };
 
 #endif
 
 
-// typedef void * (*ThreadFunction)(void *);
 
-Thread::Thread(): mImpl(new Impl()){}
+Thread::Thread()
+:	mImpl(new Impl()), mJoinOnDestroy(false)
+{}
 
-Thread::Thread(ThreadFunction routine, void * userData)
-:	mImpl(new Impl())
+Thread::Thread(ThreadFunction& func)
+:	mImpl(new Impl()), mJoinOnDestroy(false)
 {
-	start(routine, userData);
+	start(func);
+}
+
+Thread::Thread(void * (*cThreadFunc)(void * userData), void * userData)
+:	mImpl(new Impl()), mJoinOnDestroy(false)
+{
+	start(cThreadFunc, userData);
 }
 
 Thread::~Thread(){
+	if(mJoinOnDestroy) join();
 	delete mImpl;
 }
 
-bool Thread::start(ThreadFunction routine, void * userData){
-	return mImpl->start(routine, userData);
+bool Thread::start(ThreadFunction& func){
+	return mImpl->start(func);
 }
 
-bool Thread::wait(){
-	return mImpl->wait();
+bool Thread::join(){
+	return mImpl->join();
 }
 
 } // al::
