@@ -99,14 +99,8 @@ PLATFORM_DIR ?=
 #--------------------------------------------------------------------------
 
 # NOTE: ar -s is completely equivalent to running ranlib
-ifeq ($(PLATFORM), linux)
-# NOTE: -T is 'thin' archive under some Linux distros which 
-# may not be what we want here...
-#	AR = ar crsT
-	AR = ar crs
-else
-	AR = ar crs
-endif
+
+AR 		= ar crs
 INSTALL		= install
 RANLIB		= ranlib
 RM		= rm -df
