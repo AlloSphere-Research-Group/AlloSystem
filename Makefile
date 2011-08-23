@@ -91,18 +91,20 @@ all: extensions externals
 extensions: alloutil allocore
 
 allocore: $(SLIB_PATH)
-# 	copy header files
-	@$(INSTALL) -d $(BUILD_DIR)/include/$@
-	@$(INSTALL) -c -m 644 $(INC_DIR)/$@/*.h* $(BUILD_DIR)/include/$@
-	@for v in `cd $(INC_DIR)/$@ && find * -type d ! -path '*.*'`; do \
-		$(INSTALL) -d $(BUILD_DIR)/include/$@/$$v; \
-		$(INSTALL) -c -m 644 $(INC_DIR)/$@/$$v/*.h* $(BUILD_DIR)/include/$@/$$v;\
+#	Copy main header files into build directory
+	@for v in `cd $(INC_DIR)/$@ && find * -type d ! -path '*.*'` .; do\
+		$(INSTALL) -d $(BUILD_DIR)/include/$@/$$v;\
+		$(INSTALL) -C -m 644 $(INC_DIR)/$@/$$v/*.h* $(BUILD_DIR)/include/$@/$$v;\
 	done
-	@$(INSTALL) -C -m 644 $(DEV_LIB_DIR)/*.a $(BUILD_DIR)/lib
-# 	I don't know how to do this:
-#	ifeq ($(PLATFORM), macosx)
-#		@$(INSTALL) -C -m 644 $(DEV_LIB_DIR)/*.dylib $(BUILD_DIR)/lib
-#	endif
+
+#	Copy library dependencies
+#	Copying only occurs if the destination file doesn't exist or the source file is newer
+	@for v in `cd $(DEV_LIB_DIR) && find *.$(SLIB_EXT) *.$(DLIB_EXT)` .; do\
+		if test $(DEV_LIB_DIR)/$$v -nt $(BUILD_DIR)/lib/$$v; then\
+			echo Copying $(DEV_LIB_DIR)/$$v to $(BUILD_DIR)/lib;\
+			$(INSTALL) -C -m 644 $(DEV_LIB_DIR)/$$v $(BUILD_DIR)/lib;\
+		fi;\
+	done
 	
 #	@$(MAKE) install DESTDIR=$(BUILD_DIR)
 
@@ -123,33 +125,21 @@ gamma glv:
 
 
 # Install library into path specified by DESTDIR
-# Include files are copied into DESTDIR/include/LIB_NAME and
-# library files are copied to DESTDIR/lib
+# Include files are copied into DESTDIR/include/LIB_NAME
+# Library files are copied into DESTDIR/lib
 install: allocore
 
 #	copy all header files from local build directory to destination
 	@for v in `cd $(BUILD_DIR)/include && find * -type d ! -path '*.*'`; do \
 		$(INSTALL) -d $(DESTDIR)/include/$$v; \
-		$(INSTALL) -c -m 644 $(BUILD_DIR)/include/$$v/*.h* $(DESTDIR)/include/$$v;\
+		$(INSTALL) -C -m 644 $(BUILD_DIR)/include/$$v/*.h* $(DESTDIR)/include/$$v;\
 	done
 
 # 	copy all library files from local build directory to destination
 	@for v in `cd $(BUILD_DIR)/lib && find * -type d ! -path '*.*'` .; do \
 		$(INSTALL) -d $(DESTDIR)/lib/$$v; \
-		$(INSTALL) -c -m 644 $(BUILD_DIR)/lib/$$v/*.a $(DESTDIR)/lib/$$v; \
+		$(INSTALL) -C -m 644 $(BUILD_DIR)/lib/$$v/*.a $(DESTDIR)/lib/$$v; \
 	done
-
-#	# copy header from local include directory
-#	@for v in `cd $(INC_DIR) && find * -type d ! -path '*.*'`; do \
-#		$(INSTALL) -d $(DESTDIR)/include/$$v; \
-#		$(INSTALL) -c -m 644 $(INC_DIR)$$v/*.h* $(DESTDIR)/include/$$v;\
-#	done
-
-#	@$(INSTALL) -d $(addprefix $(DESTDIR)/include/$(LIB_NAME)/, $(MODULE_DIRS))
-#	@$(INSTALL) -C -m 644 $(SLIB_PATH) $(DESTDIR)/lib
-#	@$(INSTALL) -C -m 644 $(DEV_DIR)lib/*.a $(DESTDIR)/lib
-#	@$(INSTALL) -c -m 644 $(EXT_LIB_DIR)* $(DESTDIR)/lib
-#	@$(RANLIB) $(DESTDIR)/lib/$(SLIB_FILE)
 
 
 # Archive repository
