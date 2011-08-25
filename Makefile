@@ -99,8 +99,15 @@ allocore: $(SLIB_PATH)
 
 #	Copy library dependencies
 #	Copying only occurs if the destination file doesn't exist or the source file is newer
-	@for v in `cd $(DEV_LIB_DIR) && find *.$(SLIB_EXT) *.$(DLIB_EXT)` .; do\
-		if test $(DEV_LIB_DIR)/$$v -nt $(BUILD_DIR)/lib/$$v; then\
+#	@echo DEV_LIB_DIR = $(DEV_LIB_DIR)
+#	@echo SLIB_EXT = $(SLIB_EXT)
+#	@echo DLIB_EXT = $(DLIB_EXT)
+#	@for v in `cd $(DEV_LIB_DIR) && find . \(-name \*.$(SLIB_EXT) -o -name \*.$(DLIB_EXT) \)`; do\
+#	@SLIBEXT = $(SLIB_EXT); DLIBEXT=$(DLIB_EXT);\
+#	for v in `cd $(DEV_LIB_DIR) && find . \(-name \*.a -o -name \*.so \)`; do\
+#	@for v in `cd $(DEV_LIB_DIR) && find . -type f | egrep "\.($(SLIB_EXT)|$(DLIB_EXT)$"`; do\
+	@for v in `cd $(DEV_LIB_DIR) && find *.$(SLIB_EXT) *.$(DLIB_EXT)`; do\
+		if [ $(DEV_LIB_DIR)/$$v -nt $(BUILD_DIR)/lib/$$v ] || [ ! -e $(BUILD_DIR)/lib/$$v ]; then\
 			echo Copying $(DEV_LIB_DIR)/$$v to $(BUILD_DIR)/lib;\
 			$(INSTALL) -C -m 644 $(DEV_LIB_DIR)/$$v $(BUILD_DIR)/lib;\
 		fi;\
