@@ -1,3 +1,9 @@
+
+// http://www.opengl.org/wiki/Vertex_Transformation
+// http://3dengine.org/Right-up-back_from_modelview
+// http://paulbourke.net/miscellaneous/domemirror/
+// http://en.wikibooks.org/wiki/GLSL_Programming/Applying_Matrix_Transformations
+
 uniform float osc;
 
 // NOTE: mat4 ctor is transposed to allocore ctor:

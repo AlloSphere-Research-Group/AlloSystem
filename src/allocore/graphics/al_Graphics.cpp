@@ -39,6 +39,12 @@ void Graphics::texCoord(double u, double v) {
 	}
 }
 
+void Graphics::texCoord(double s, double t, double r) {
+	if(mInImmediateMode) {
+		mMesh.texCoord(s, t, r);
+	}
+}
+
 void Graphics::normal(double x, double y, double z) {
 	if(mInImmediateMode) {
 		mMesh.normal(x, y, z);

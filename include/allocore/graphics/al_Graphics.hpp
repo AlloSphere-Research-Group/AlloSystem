@@ -197,14 +197,24 @@ public:
 	void vertex(const Vec2f& v) { vertex(v[0], v[1], 0); }
 	void vertex(const Vec3d& v) { vertex(v[0], v[1], v[2]); }
 	void vertex(const Vec3f& v) { vertex(v[0], v[1], v[2]); }
+	
 	void texCoord(double u, double v);
+	void texCoord(const Vec2d& v) { texCoord(v[0], v[1]); }
+	void texCoord(const Vec2f& v) { texCoord(v[0], v[1]); }
+	void texCoord(double u, double v, double w);
+	void texCoord(const Vec3d& v) { texCoord(v[0], v[1], v[2]); }
+	void texCoord(const Vec3f& v) { texCoord(v[0], v[1], v[2]); }
+	
 	void normal(double x, double y, double z=0.);
 	void normal(const Vec3d& v) { normal(v[0], v[1], v[2]); }
 	void normal(const Vec3f& v) { normal(v[0], v[1], v[2]); }
+	
 	void color(double r, double g, double b, double a=1.);
 	void color(const Color& v){ color(v.r, v.g, v.b, v.a); }
 	void color(const Vec3d& v, double a=1.) { color(v[0], v[1], v[2], a); }
 	void color(const Vec3f& v, double a=1.) { color(v[0], v[1], v[2], a); }
+	void color(const Vec4d& v) { color(v[0], v[1], v[2], v[3]); }
+	void color(const Vec4f& v) { color(v[0], v[1], v[2], v[3]); }
 
 	void draw(const Mesh& v){ p_draw(v); }
 	void draw(){ draw(mMesh); }

@@ -160,6 +160,7 @@
 		3622C08A116D57B300928703 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC53081162907D0076AA8B /* CoreAudio.framework */; };
 		3622C08D116D57B300928703 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		3622C08E116D57B300928703 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
+		366E78051405C6B70010B21A /* cubemap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 366E78041405C6B70010B21A /* cubemap.cpp */; };
 		366EF1F612B6FC4E0000EF65 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DDF6512B6C8C000F75D2A /* libassimp.a */; };
 		367F0B5112034F1E00FCC534 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		367F0B5212034F1E00FCC534 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
@@ -733,6 +734,13 @@
 		3659D752117B8AC60065EBE4 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		3659D753117B8AC60065EBE4 /* ringbuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ringbuffer.h; sourceTree = "<group>"; };
 		3659D755117B8AFA0065EBE4 /* ringbuffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ringbuffer.c; sourceTree = "<group>"; };
+		366E78041405C6B70010B21A /* cubemap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cubemap.cpp; sourceTree = "<group>"; };
+		366E78061405C75B0010B21A /* al_Field3D.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Field3D.hpp; sourceTree = "<group>"; };
+		366E78071405C75B0010B21A /* al_FileWatcher.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_FileWatcher.hpp; sourceTree = "<group>"; };
+		366E78081405C75B0010B21A /* al_FPS.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_FPS.hpp; sourceTree = "<group>"; };
+		366E78091405C75B0010B21A /* al_Navigator.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Navigator.hpp; sourceTree = "<group>"; };
+		366E780A1405C75B0010B21A /* al_OverlayTextGL.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OverlayTextGL.hpp; sourceTree = "<group>"; };
+		366E780B1405C75B0010B21A /* al_ShotList.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_ShotList.hpp; sourceTree = "<group>"; };
 		367F0B3812034EDB00FCC534 /* al_Stereographic.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Stereographic.hpp; sourceTree = "<group>"; };
 		367F0B3A12034EED00FCC534 /* al_Stereographic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Stereographic.cpp; sourceTree = "<group>"; };
 		367F0B5C12034F1E00FCC534 /* exStereographics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exStereographics; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -3487,6 +3495,7 @@
 				16A60424130345BB0077B460 /* texture.cpp */,
 				16A60425130345BB0077B460 /* triangleNoise.cpp */,
 				36462C0313EAA5C500F33CA7 /* omnigraphic.cpp */,
+				366E78041405C6B70010B21A /* cubemap.cpp */,
 			);
 			path = graphics;
 			sourceTree = "<group>";
@@ -7497,9 +7506,15 @@
 			children = (
 				36F3A43112FCCF7A004BC82F /* al_ControlGLV.hpp */,
 				36F3A43212FCCF7A004BC82F /* al_ControlNav.hpp */,
-				36F3A43312FCCF7A004BC82F /* al_World.hpp */,
-				36CE482F1394378000DF6E6F /* al_OpenGL.hpp */,
+				366E78061405C75B0010B21A /* al_Field3D.hpp */,
+				366E78071405C75B0010B21A /* al_FileWatcher.hpp */,
 				36CE482E1394374C00DF6E6F /* al_FrameBufferGL.hpp */,
+				366E78081405C75B0010B21A /* al_FPS.hpp */,
+				366E78091405C75B0010B21A /* al_Navigator.hpp */,
+				36CE482F1394378000DF6E6F /* al_OpenGL.hpp */,
+				366E780A1405C75B0010B21A /* al_OverlayTextGL.hpp */,
+				366E780B1405C75B0010B21A /* al_ShotList.hpp */,
+				36F3A43312FCCF7A004BC82F /* al_World.hpp */,
 			);
 			name = include;
 			path = ../include/alloutil;
@@ -8550,6 +8565,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				36FE0C6413844E5C003AE7BE /* seq.cpp in Sources */,
+				366E78051405C6B70010B21A /* cubemap.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

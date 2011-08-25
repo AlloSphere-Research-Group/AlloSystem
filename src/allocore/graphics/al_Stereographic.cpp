@@ -32,7 +32,6 @@ void Stereographic :: drawMono(Graphics& gl, const Camera& cam, const Pose& pose
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
 	if (omni()) {
-	
 		int wx = vp.l;
 		double fovx = mOmniFov;
 		for (unsigned i=0; i<mSlices; i++) {
