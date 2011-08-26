@@ -769,6 +769,7 @@
 		366E780A1405C75B0010B21A /* al_OverlayTextGL.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OverlayTextGL.hpp; sourceTree = "<group>"; };
 		366E780B1405C75B0010B21A /* al_ShotList.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_ShotList.hpp; sourceTree = "<group>"; };
 		366E78F81407F2D60010B21A /* exSimpleGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exSimpleGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
+		366E7A6D14080A180010B21A /* al_AlloSphere.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_AlloSphere.hpp; sourceTree = "<group>"; };
 		367F0B3812034EDB00FCC534 /* al_Stereographic.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Stereographic.hpp; sourceTree = "<group>"; };
 		367F0B3A12034EED00FCC534 /* al_Stereographic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Stereographic.cpp; sourceTree = "<group>"; };
 		367F0B5C12034F1E00FCC534 /* exStereographics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exStereographics; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -7560,6 +7561,7 @@
 		36F3A43012FCCF7A004BC82F /* include */ = {
 			isa = PBXGroup;
 			children = (
+				366E7A6D14080A180010B21A /* al_AlloSphere.hpp */,
 				36F3A43112FCCF7A004BC82F /* al_ControlGLV.hpp */,
 				36F3A43212FCCF7A004BC82F /* al_ControlNav.hpp */,
 				366E78061405C75B0010B21A /* al_Field3D.hpp */,

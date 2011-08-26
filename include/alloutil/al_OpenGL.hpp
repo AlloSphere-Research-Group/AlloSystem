@@ -261,6 +261,13 @@ protected:
 
 class CubeMapTexture : public GPUObject {
 public:
+	// same order as OpenGL
+	enum Faces { 
+		POSITIVE_X, NEGATIVE_X, 
+		POSITIVE_Y, NEGATIVE_Y, 
+		POSITIVE_Z, NEGATIVE_Z 
+	};
+
 	CubeMapTexture(int resolution=1024) 
 	:	GPUObject(),
 		mResolution(resolution),
@@ -300,6 +307,17 @@ public:
 			//glTexParameteri(mTarget, GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
 			//glTexParameterf(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 			
+			// Domagoj also has:
+			glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
+			glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
+			glTexGeni( GL_R, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
+			float X[4] = { 1,0,0,0 };
+			float Y[4] = { 0,1,0,0 };
+			float Z[4] = { 0,0,1,0 };
+			glTexGenfv( GL_S, GL_OBJECT_PLANE, X );
+			glTexGenfv( GL_T, GL_OBJECT_PLANE, Y );
+			glTexGenfv( GL_R, GL_OBJECT_PLANE, Z );
+		
 			submit();
 			
 			// clean up:
@@ -394,7 +412,7 @@ public:
 	virtual void onCreate() {
 		CubeMapTexture::onCreate();
 		
-		//-------------------------
+		// one FBO to rule them all...
 		glGenFramebuffersEXT(1, &mFboId);
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFboId);
 		//Attach one of the faces of the Cubemap texture to this FBO
@@ -404,11 +422,14 @@ public:
 		glGenRenderbuffersEXT(1, &mRboId);
 		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, mRboId);
 		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, mResolution, mResolution);
-		//-------------------------
-		//Attach depth buffer to FBO
+		// Attach depth buffer to FBO
 		glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, mRboId);
 		
-		//-------------------------
+		// ...and in the darkness bind them:
+		for (unsigned face=0; face<6; face++) {
+			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT+face, GL_TEXTURE_CUBE_MAP_POSITIVE_X+face, id(), 0);
+		}
+		
 		//Does the GPU support current FBO configuration?
 		GLenum status;
 		status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
@@ -433,21 +454,22 @@ public:
 	void capture(Graphics& gl, const Camera& cam, const Pose& pose, Drawable& draw) {
 		validate();
 		
+		glPushAttrib(GL_ALL_ATTRIB_BITS);
+		
 		Vec3d pos = pose.pos();
 		Vec3d ux, uy, uz; 
 		pose.unitVectors(ux, uy, uz);
-		
 		mProjection = Matrix4d::perspective(90, 1, cam.near(), cam.far());
 		
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFboId);
-		for (int i=0; i<6; i++) {
-			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_CUBE_MAP_POSITIVE_X+i, id(), 0);
+		for (int face=0; face<6; face++) {
+			glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT+face);
 			
 			gl.viewport(0, 0, resolution(), resolution());
 			gl.clearColor(clearColor());
 			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 			
-			switch (i) {
+			switch (face) {
 				case 0:
 					// GL_TEXTURE_CUBE_MAP_POSITIVE_X   
 					mModelView = Matrix4d::lookAt(uz, uy, -ux, pos);
@@ -486,6 +508,8 @@ public:
 			gl.popMatrix(gl.MODELVIEW);
 		}
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+		
+		glPopAttrib();
 	}
 	
 	Color clearColor() const { return mClearColor; }

@@ -51,16 +51,16 @@ struct MyWindow : Window, public Drawable{
 
 
 int main(){
-
+	double world_radius = 50;
+	
 	nav.smooth(0.8);
 	nav.pos(0, 0, -20);
 
-	cam.near(1).far(64);
+	cam.near(1).far(world_radius);
 	
 	// set up mesh:
 	mesh.primitive(Graphics::TRIANGLES);
 	double tri_size = 2;
-	double world_radius = 50;
 	int count = 4000;
 	for (int i=0; i<count; i++) {
 		double x = rnd::uniformS(world_radius);
