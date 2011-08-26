@@ -28,12 +28,16 @@ public:
 };
 
 /*!
-	A simple wrapper around OpenGL Textures.
+	A simple wrapper around OpenGL Textures, 
+	using al::Array as a CPU-side interface for configuring & submitting
+	
+	TODO: lift out common features of TextureGL and CubeMapTexture into a 
+	generic superclass ?
 */
-class TextureGL {
+class TextureGL : public GPUObject {
 public:
 	TextureGL()
-	:	mID(0),
+	:	GPUObject(),
 		mTarget(GL_TEXTURE_2D),
 		mFormat(GL_RGBA),
 		mType(GL_UNSIGNED_BYTE),
@@ -42,32 +46,31 @@ public:
 		mAlignment(4),
 		mRebuild(true),
 		mSubmit(true)
-	{
-	}
+	{}
 	
-	~TextureGL() {}
+	virtual ~TextureGL() {}
 
-	void onCreate() {
-		glGenTextures(1, &mID);
-		glBindTexture(mTarget, id());
-		
-		// todo: which options?
-		glTexParameterf(mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameterf(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameterf(mTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameterf(mTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(mTarget, GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
-		submit();
-		glBindTexture(mTarget, 0);
-		
+	virtual void onCreate() {
+		if (mID == 0) {
+			glGenTextures(1, (GLuint *)&mID);
+			glBindTexture(mTarget, id());
+			
+			// TODO: which options?
+			glTexParameterf(mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameterf(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameterf(mTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameterf(mTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(mTarget, GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
+			submit();
+			glBindTexture(mTarget, 0);
+			GraphicsGL::gl_error("creating texture");
+		}
 		mRebuild = false;
-		
-		GraphicsGL::gl_error("creating texture");
 	}
 	
-	void onDestroy() {
+	virtual void onDestroy() {
 		if (mID) {
-			glDeleteTextures(1, &mID);
+			glDeleteTextures(1, (GLuint *)&mID);
 			mID = 0;
 		}
 	}
@@ -78,7 +81,7 @@ public:
 		}
 		
 		// ensure it is created:
-		if (id() == 0) onCreate();
+		validate();
 		
 		// multitexturing:
 		glActiveTextureARB( GL_TEXTURE0_ARB+unit );
@@ -244,7 +247,6 @@ protected:
 		GraphicsGL::gl_error("submitting texture");
 	}
 
-	GLuint mID;
 	GLenum mTarget;	// GL_TEXTURE_1D, GL_TEXTURE_2D, etc.
 	GLenum mFormat;	
 	GLenum mType;
@@ -256,6 +258,251 @@ protected:
 	
 	bool mRebuild, mSubmit;
 };
+
+class CubeMapTexture : public GPUObject {
+public:
+	CubeMapTexture(int resolution=1024) 
+	:	GPUObject(),
+		mResolution(resolution),
+		mTarget(GL_TEXTURE_CUBE_MAP)
+	{
+		// create mesh for drawing map:
+		mMapMesh.primitive(Graphics::QUADS);
+		mMapMesh.color(1,1,1,1);
+		int mapSteps =100;
+		double step = 1./mapSteps;
+		for (double x=0; x<=1.; x+=step) {
+			for (double y=0; y<=1.; y+=step) {
+				drawMapVertex(x,		y);
+				drawMapVertex(x,		y+step);
+				drawMapVertex(x+step,	y+step);
+				drawMapVertex(x+step,	y);
+			}
+		}
+	}
+	
+	virtual ~CubeMapTexture() {}
+	
+	virtual void onCreate() {
+		if (mID == 0) {
+		
+			// create cubemap texture:
+			glGenTextures(1, (GLuint *)&mID);
+			glBindTexture(mTarget, mID);
+			// each cube face should clamp at texture edges:
+			glTexParameteri(mTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(mTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(mTarget, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+			// normal filtering
+			glTexParameteri(mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			// no mipmapping:
+			//glTexParameteri(mTarget, GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
+			//glTexParameterf(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			
+			submit();
+			
+			// clean up:
+			glBindTexture(mTarget, 0);
+			GraphicsGL::gl_error("creating cubemap texture");
+		}
+		//printf("created CubeMapTexture %dx%d\n", mResolution, mResolution);
+	}
+	
+	virtual void onDestroy() {
+		if (mID) {
+			glDeleteTextures(1, (GLuint *)&mID);
+			mID=0;
+		}
+	}
+	
+	void bind(int unit = 0) {
+		// ensure it is created:
+		validate();
+		
+		// multitexturing:
+		glActiveTextureARB( GL_TEXTURE0_ARB+unit );
+		
+		glEnable(mTarget);
+		glBindTexture(mTarget, id());
+	}
+	
+	void unbind(int unit = 0) {
+		// multitexturing:
+		glActiveTextureARB( GL_TEXTURE0_ARB+unit );
+		
+		glBindTexture(mTarget, 0);
+		glDisable(mTarget);
+	}	
+	
+	unsigned resolution() const { return mResolution; }
+	
+	// useful for debugging
+	// draws full cubemap in a cylindrical projection
+	void drawMap(Graphics& gl, double x0=0., double y0=0., double x1=1., double y1=1.) {
+		bind();
+		gl.color(1, 1, 1, 1);
+		gl.pushMatrix();
+		gl.translate(x0, y0, 0);
+		gl.scale((x1-x0), (y1-y0), 1.);
+		gl.draw(mMapMesh);
+		gl.popMatrix();
+		unbind();
+	}
+
+protected:
+	inline void drawMapVertex(double x, double y) {
+		// x runs 0..1, convert to angle -PI..PI:
+		double az = M_PI * (x*2.-1.);
+		// y runs 0..1, convert to angle -PI_2..PI_2:
+		double el = M_PI * 0.5 * (y*2.-1.);
+		// convert polar to normal:
+		double x1 = sin(az);
+		double y1 = sin(el);
+		double z1 = cos(az);
+		Vec3d v(x1, y1, z1);
+		v.normalize();
+		mMapMesh.texCoord	( v );
+		mMapMesh.vertex	( x, y, 0);
+	}
+	
+	void submit() {
+		// RGBA8 Cubemap texture, 24 bit depth texture, mResolution x mResolution
+		// NULL means reserve texture memory, but texels are undefined
+		for (int i=0; i<6; i++) {
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+i, 0, GL_RGBA8, mResolution, mResolution, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+		}
+	}
+	
+	unsigned mResolution;
+	Mesh mMapMesh;
+	
+	GLenum mTarget;
+};
+
+class CubeMapFBO : public CubeMapTexture {
+public:
+	CubeMapFBO(int resolution=1024) 
+	:	CubeMapTexture(resolution),
+		mFboId(0),
+		mRboId(0),
+		mClearColor(0)
+	{}
+	
+	virtual ~CubeMapFBO() {}
+	
+	virtual void onCreate() {
+		CubeMapTexture::onCreate();
+		
+		//-------------------------
+		glGenFramebuffersEXT(1, &mFboId);
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFboId);
+		//Attach one of the faces of the Cubemap texture to this FBO
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_CUBE_MAP_POSITIVE_X, id(), 0);
+
+		
+		glGenRenderbuffersEXT(1, &mRboId);
+		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, mRboId);
+		glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, mResolution, mResolution);
+		//-------------------------
+		//Attach depth buffer to FBO
+		glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, mRboId);
+		
+		//-------------------------
+		//Does the GPU support current FBO configuration?
+		GLenum status;
+		status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+		if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
+			printf("GPU does not support required FBO configuration\n");
+			exit(0);
+		}
+		
+		// cleanup:
+		glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	}
+	
+	virtual void onDestroy() {
+		glDeleteRenderbuffersEXT(1, &mRboId);
+		glDeleteFramebuffersEXT(1, &mFboId);
+		mRboId = mFboId = 0;
+		
+		CubeMapTexture::onDestroy();
+	}
+	
+	void capture(Graphics& gl, const Camera& cam, const Pose& pose, Drawable& draw) {
+		validate();
+		
+		Vec3d pos = pose.pos();
+		Vec3d ux, uy, uz; 
+		pose.unitVectors(ux, uy, uz);
+		
+		mProjection = Matrix4d::perspective(90, 1, cam.near(), cam.far());
+		
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFboId);
+		for (int i=0; i<6; i++) {
+			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_CUBE_MAP_POSITIVE_X+i, id(), 0);
+			
+			gl.viewport(0, 0, resolution(), resolution());
+			gl.clearColor(clearColor());
+			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			
+			switch (i) {
+				case 0:
+					// GL_TEXTURE_CUBE_MAP_POSITIVE_X   
+					mModelView = Matrix4d::lookAt(uz, uy, -ux, pos);
+					break;
+				case 1:
+					// GL_TEXTURE_CUBE_MAP_NEGATIVE_X   
+					mModelView = Matrix4d::lookAt(-uz, uy, ux, pos);
+					break;
+				case 2:
+					// GL_TEXTURE_CUBE_MAP_POSITIVE_Y   
+					mModelView = Matrix4d::lookAt(ux, -uz, uy, pos);
+					break;
+				case 3:
+					// GL_TEXTURE_CUBE_MAP_NEGATIVE_Y   
+					mModelView = Matrix4d::lookAt(ux, uz, -uy, pos);
+					break;
+				case 4:
+					// GL_TEXTURE_CUBE_MAP_POSITIVE_Z   
+					mModelView = Matrix4d::lookAt(ux, uy, uz, pos);
+					break;
+				default:
+					// GL_TEXTURE_CUBE_MAP_NEGATIVE_Z   
+					mModelView = Matrix4d::lookAt(-ux, uy, -uz, pos);
+					break;
+			}
+			
+			// apply camera transform:
+			gl.pushMatrix(gl.PROJECTION);
+			gl.loadMatrix(mProjection);
+			gl.pushMatrix(gl.MODELVIEW);
+			gl.loadMatrix(mModelView);
+			
+			draw.onDraw(gl);
+			
+			gl.popMatrix(gl.PROJECTION);
+			gl.popMatrix(gl.MODELVIEW);
+		}
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+	}
+	
+	Color clearColor() const { return mClearColor; }
+	Matrix4d projection() const { return mProjection; }
+	Matrix4d modelView() const { return mModelView; }
+	GLuint fbo() { return mFboId; }
+	GLuint rbo() { return mRboId; }
+
+	CubeMapFBO& clearColor(const Color& c) { mClearColor = c; return *this; }
+	
+protected:
+	GLuint mFboId, mRboId;
+	Color mClearColor;
+	Matrix4d mProjection;
+	Matrix4d mModelView;
+};
+
 
 class Lighting {
 public:
