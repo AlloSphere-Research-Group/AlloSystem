@@ -269,13 +269,29 @@ public:
 	static const Matrix4 perspectiveRight(T fovy, T aspect, T near, T far, T eyeSep, T focal) {
 		return perspectiveOffAxis(fovy, aspect, near, far, 0.5*eyeSep, focal);
 	}
-	static const Matrix4 perspectiveOffAxis(T fovy, T aspect, T near, T far, T eyeShift, T focal) {
-		T shift = -eyeShift*near/focal;
+	static const Matrix4 perspectiveOffAxis(T fovy, T aspect, T near, T far, T xShift, T focal) {
 		T top = near * tan(fovy*M_DEG2RAD*0.5);	// height of view at distance = near
 		T bottom = -top;
+		T shift = -xShift*near/focal;
 		T left = -aspect*top + shift;
 		T right = aspect*top + shift;
 		return perspective(left, right, bottom, top, near, far);
+	}
+	static const Matrix4 perspectiveOffAxis(T fovy, T aspect, T near, T far, T xShift, T yShift, T focal) {
+		float tanfovy = tan(fovy*M_DEG2RAD/2.);
+		T t = near * tanfovy;	// height of view at distance = near
+		T b = -t;
+		T l = -aspect*t;
+		T r = aspect*t;
+		
+		T shift = -xShift*near/focal;
+		l += shift;
+		r += shift;
+		shift = -yShift*near/focal;
+		t += shift;
+		b += shift;
+		
+		return perspective(l, r, b, t, near, far);
 	}
 	
 	static const Matrix4 unPerspective(T l, T r, T b, T t, T n, T f) {

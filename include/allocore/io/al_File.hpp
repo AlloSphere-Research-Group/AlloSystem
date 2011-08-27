@@ -51,6 +51,10 @@ class SearchPaths {
 public:
 	SearchPaths() {}
 	SearchPaths(int argc, char * const argv[], bool recursive=true) { addAppPaths(argc,argv,recursive); }
+	SearchPaths(const SearchPaths& cpy) 
+	:	mSearchPaths(cpy.mSearchPaths),
+		mAppPath(cpy.mAppPath)
+	{}
 	~SearchPaths() {}
 
 	/// find a file in the searchpaths

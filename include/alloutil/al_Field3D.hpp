@@ -17,6 +17,7 @@ namespace al {
 template<typename T=double>
 class Field3D {
 public:
+	
 	Field3D(int components, int dim) 
 	:	mDim(ceilPow2(dim)),
 		mDim3(mDim*mDim*mDim),
@@ -54,7 +55,10 @@ public:
 
 	// multiply the front array:
 	void scale(T v);
-	void scale(const Array& src);	// src must have matching layout
+	// src must have matching layout
+	void scale(const Array& src);	
+	// src must have matching layout, except for components (which may be 1)
+	void scale1(const Array& src);	
 	// multiply by 1./(src+1.), as a 'damping' factor:
 	void damp(const Array& src);	// src must have matching layout
 	// add to front array. src must have matching layout
@@ -65,7 +69,7 @@ public:
 	void adduniformS(rnd::Random<>& rng, T scalar = T(1));
 	// fill with sines:
 	void setHarmonic(T px=T(1), T py=T(1), T pz=T(1));
-	// 3-component fields only: set velocities to zero at boundaries
+	// 3-component fields only: scale velocities at boundaries
 	void boundary();
 	
 	// diffusion
@@ -100,18 +104,30 @@ protected:
 template<typename T=double>
 class Fluid {
 public:
+	enum BoundaryMode {
+		NONE = 0,
+		CLAMP = 1,
+		FIELD = 2
+	};
+
 	Fluid(int components, int dim) 
 	:	densities(components, dim),
 		velocities(3, dim),
 		gradient(1, dim),
+		boundaries(1, Array::type<T>(), dim, dim, dim),
 		passes(10),
 		viscocity(0.001),
 		diffusion(0.01),
 		selfadvection(0.1),
 		selfdecay(0.99),
 		selfbackgroundnoise(0.001),
-		decay(0.98)
-	{}
+		decay(0.98),
+		mBoundaryMode(CLAMP)
+	{
+		// set all values to T(1):
+		T one = 1;
+		boundaries.set3d(&one);
+	}
 	~Fluid() {}
 	
 	template<typename T1>
@@ -149,7 +165,7 @@ public:
 		// smoothen the new data:
 		velocities.diffuse(viscocity, passes);
 		// zero velocities at boundaries:
-		velocities.boundary();
+		boundary();
 		// (diffused data now in velocities.front())
 		// stabilize: 
 		project();
@@ -157,14 +173,14 @@ public:
 		// advect velocities:
 		velocities.advect(velocities.back(), selfadvection);
 		// zero velocities at boundaries:
-		velocities.boundary();
+		boundary();
 		// (advected data now in velocities.front())
 		// stabilize again:
 		project();
 		// (projected data now in velocities.front())
 		velocities.scale(selfdecay);
 		// zero velocities at boundaries:
-		velocities.boundary();
+		boundary();
 
 		// DENSITIES:
 		// assume new data is in front();
@@ -178,6 +194,19 @@ public:
 		densities.scale(decay);
 	}
 	
+	void boundary() {
+		switch (mBoundaryMode) {
+			case CLAMP:
+				velocities.boundary();
+				break;
+			case FIELD:
+				velocities.scale1(boundaries);
+				break;
+			default:
+				break;
+		}
+	}
+	
 	void project() {
 		// prepare new gradient data:
 		gradient.back().zero();
@@ -188,10 +217,14 @@ public:
 		velocities.subtractGradientMagnitude(gradient.front());
 	}
 	
+	void boundary(BoundaryMode b) { mBoundaryMode = b; }
+	
 	Field3D<T> densities, velocities, gradient;
+	Array boundaries;
 	unsigned passes;
 	T viscocity, diffusion, selfadvection, selfdecay, selfbackgroundnoise, decay;
 	rnd::Random<> rng;
+	BoundaryMode mBoundaryMode;
 };
 
 
@@ -261,8 +294,55 @@ inline void Field3D<T>::scale(const Array& arr) {
 				for (int x=0;x<mDim;x++) {
 					// cell to update:
 					T * cell = INDEX(optr, x, y, z);
-					T v = INDEX(vptr, x, y, z)[0];
+					T * src = INDEX(vptr, x, y, z);
 
+					for (int k=0; k<components(); k++) {
+						cell[k] *= src[k];
+					}
+				}
+			}
+		}
+
+		#undef INDEX
+	} else {
+		printf("Field3D::scale() Array format mismatch\n");
+	}
+}
+
+template<typename T>
+inline void Field3D<T>::scale1(const Array& arr) {
+
+	AlloArrayHeader h1 = front().header;
+	AlloArrayHeader h2 = arr.header;
+	
+	bool ok =	
+		h1.type == h2.type &&
+		h1.dimcount == h2.dimcount;
+	for(int i=0; i < h1.dimcount; i++) {
+		ok &= h1.dim[i] <= h2.dim[i];
+	}
+	
+	if (ok) {
+		const size_t stride0 = stride(0);
+		const size_t stride1 = stride(1);
+		const size_t stride2 = stride(2);
+		
+		const size_t astride0 = arr.stride(0);
+		const size_t astride1 = arr.stride(1);
+		const size_t astride2 = arr.stride(2);
+		#define INDEX(p, x, y, z) ((T *)((p) + (((x)&mDimWrap)*stride0) +  (((y)&mDimWrap)*stride1) +  (((z)&mDimWrap)*stride2)))
+		
+		#define AINDEX(p, x, y, z) ((T *)((p) + (((x)&mDimWrap)*astride0) +  (((y)&mDimWrap)*astride1) +  (((z)&mDimWrap)*astride2)))
+
+		// scale the boundary fields
+		char * optr = front().data.ptr;
+		char * aptr = arr.data.ptr;
+		for (int z=0;z<mDim;z++) {
+			for (int y=0;y<mDim;y++) {
+				for (int x=0;x<mDim;x++) {
+					// cell to update:
+					T * cell = INDEX(optr, x, y, z);
+					T v = AINDEX(aptr, x, y, z)[0];
 					for (int k=0; k<components(); k++) {
 						cell[k] *= v;
 					}
@@ -271,8 +351,9 @@ inline void Field3D<T>::scale(const Array& arr) {
 		}
 
 		#undef INDEX
+		#undef AINDEX
 	} else {
-		printf("Array format mismatch\n");
+		printf("Field3D::scale1() Array format mismatch\n");
 	}
 }
 
@@ -310,9 +391,10 @@ inline void Field3D<T>::damp(const Array& arr) {
 template<typename T>
 inline void Field3D<T>::add(Array& src) {
 	if (src.isFormat(front().header)) {
+		int count = mDim3 * front().header.components;
 		T * in  = (T *)src.data.ptr;
 		T * out = (T *)front().data.ptr;
-		for (int i=0; i<mDim3; i++) {
+		for (int i=0; i<count; i++) {
 			out[i] += in[i];
 			in[i] = T(0);
 		}
@@ -539,11 +621,13 @@ inline void Field3D<T> :: boundary() {
 		printf("only valid for 3-component fields\n");
 		return;
 	}
+	
+
 	const size_t stride0 = stride(0);
 	const size_t stride1 = stride(1);
 	const size_t stride2 = stride(2);
 	char * optr = front().data.ptr;
-	
+
 	#define CELL(p, x, y, z, k) (((T *)((p) + (((x)&mDimWrap)*stride0) +  (((y)&mDimWrap)*stride1) +  (((z)&mDimWrap)*stride2)))[(k)])
 	
 	// x planes
@@ -569,6 +653,7 @@ inline void Field3D<T> :: boundary() {
 	}
 	
 	#undef CELL
+	
 }
 
 

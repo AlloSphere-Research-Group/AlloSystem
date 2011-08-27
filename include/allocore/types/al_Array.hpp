@@ -148,6 +148,11 @@ public:
 
 	///! set all data to zero.
 	void zero() { if(hasData()) memset(data.ptr, 0, size()); }
+	
+	///! Fill with the same cell value throughout:
+	template<typename T> void set1d(T * cell);
+	template<typename T> void set2d(T * cell);
+	template<typename T> void set3d(T * cell);
 
 	///! Use a pure C function to fill an array with data:
 	template<typename T> void fill(void (*func)(T * values, double normx));
@@ -563,7 +568,6 @@ template<typename T> inline void Array::write_wrap(const T* val, int x, int y, i
 // writes the linearly interpolated plane values from val array into array
 template<typename T> inline void Array::write_interp(const T* val, double x) {
 	x = wrap<double>(x, (double)header.dim[0], 0.);
-	// convert 0..1 field indices to 0..(d-1) cell indices
 	const unsigned xa = (const unsigned)DOUBLE_FLOOR(x);
 	unsigned xb = xa+1;	if (xb == header.dim[0]) xb = 0;
 	// get the normalized 0..1 interp factors, of x,y,z:
@@ -584,7 +588,6 @@ template<typename T> inline void Array::write_interp(const T* val, double x) {
 template<typename T> inline void Array::write_interp(const T* val, double x, double y) {
 	x = wrap<double>(x, (double)header.dim[0], 0.);
 	y = wrap<double>(y, (double)header.dim[1], 0.);
-	// convert 0..1 field indices to 0..(d-1) cell indices
 	const unsigned xa = (const unsigned)DOUBLE_FLOOR(x);
 	const unsigned ya = (const unsigned)DOUBLE_FLOOR(y);
 	unsigned xb = xa+1;	if (xb == header.dim[0]) xb = 0;
@@ -617,7 +620,6 @@ template<typename T> inline void Array::write_interp(const T* val, double x0, do
 	double x = wrap<double>(x0, (double)header.dim[0], 0.);
 	double y = wrap<double>(y0, (double)header.dim[1], 0.);
 	double z = wrap<double>(z0, (double)header.dim[2], 0.);
-	// convert 0..1 field indices to 0..(d-1) cell indices
 	const unsigned xa = (const unsigned)DOUBLE_FLOOR(x);
 	const unsigned ya = (const unsigned)DOUBLE_FLOOR(y);
 	const unsigned za = (const unsigned)DOUBLE_FLOOR(z);
@@ -709,6 +711,58 @@ template<typename T> inline void Array::fill(void (*func)(T * values, double nor
 			for(int x=0; x < d0; x++) {
 				func(vals, inv_d0 * x, inv_d1 * y, inv_d2 * z);
 				vals += components;
+			}
+		}
+	}
+}
+
+template<typename T> inline void Array::set1d(T * cell) {
+	int d0 = header.dim[0];
+	int s0 = header.stride[0];
+	int components = header.components;
+
+	for(int x=0; x < d0; x++) {
+		T *vals = (T *)(data.ptr + s0*x);
+		for (int i=0; i<components; i++) {
+			vals[i] = cell[i];
+		}
+	}
+}
+
+
+template<typename T> inline void Array::set2d(T * cell) {
+	int d0 = header.dim[0];
+	int d1 = header.dim[1];
+	int s0 = header.stride[0];
+	int s1 = header.stride[1];
+	int components = header.components;
+
+	for(int y=0; y < d1; y++) {
+		for(int x=0; x < d0; x++) {
+			T *vals = (T *)(data.ptr + s0*x + s1*y);
+			for (int i=0; i<components; i++) {
+				vals[i] = cell[i];
+			}
+		}
+	}
+}
+
+template<typename T> inline void Array::set3d(T * cell) {
+	int d0 = header.dim[0];
+	int d1 = header.dim[1];
+	int d2 = header.dim[2];
+	int s0 = header.stride[0];
+	int s1 = header.stride[1];
+	int s2 = header.stride[2];
+	int components = header.components;
+
+	for(int z=0; z < d1; z++) {
+		for(int y=0; y < d1; y++) {
+			for(int x=0; x < d0; x++) {
+				T *vals = (T *)(data.ptr + s0*x + s1*y + s2*z);
+				for (int i=0; i<components; i++) {
+					vals[i] = cell[i];
+				}
 			}
 		}
 	}
