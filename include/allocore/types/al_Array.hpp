@@ -51,7 +51,7 @@ public:
 	// temporary hack because the one in al_Function gave a bad result
 	// for e.g. wrap<double>(-64.0, -32.0);
 	template<typename T>
-	static inline T wrap(T v, const T hi, const T lo){
+	static inline T wrap(T v, const T hi=T(1.), const T lo=T(0.)){
 		if(lo == hi) return lo;
 		//if(v >= hi){
 		if(!(v < hi)){
@@ -106,6 +106,17 @@ public:
 
 	uint32_t dim(int i=0) const { return header.dim[i]; }
 	uint32_t stride(int i=0) const { return header.stride[i]; }
+	AlloTy type() const { return header.type; }
+	uint8_t components() const { return header.components; }
+	
+	/// return the packing alignment (1, 2, 4 or 8 byte)
+	uint32_t alignment() const {
+		uint32_t i = stride(0);
+		if (i % 2 > 0) return 1;
+		if (i % 4 > 0) return 2;
+		if (i % 8 > 0) return 4;
+		return 8;
+	}
 
 	/*!
 		Change the format (header/layout) of the Array
@@ -756,7 +767,7 @@ template<typename T> inline void Array::set3d(T * cell) {
 	int s2 = header.stride[2];
 	int components = header.components;
 
-	for(int z=0; z < d1; z++) {
+	for(int z=0; z < d2; z++) {
 		for(int y=0; y < d1; y++) {
 			for(int x=0; x < d0; x++) {
 				T *vals = (T *)(data.ptr + s0*x + s1*y + s2*z);

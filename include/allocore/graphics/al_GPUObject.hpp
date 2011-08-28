@@ -77,7 +77,7 @@ class GPUObject{
 public:
 	
 	GPUObject(int ctx = GPUContext::defaultContextID()): mID(0) { contextRegister(ctx); }
-	GPUObject(GPUContext& ctx): mID(0) { contextRegister(ctx.contextID()); }
+	GPUObject(GPUContext& ctx): mID(0), bResubmit(false) { contextRegister(ctx.contextID()); }
 	virtual ~GPUObject(){ contextUnregister(); }
 	
 	
@@ -88,7 +88,13 @@ public:
 	/// ensure that the GPUObject is ready to use
 	/// typically placed before any rendering implementation
 	void validate() {
+		if (bResubmit) { destroy(); bResubmit=false; }
 		if (!created()) create();
+	}
+	
+	/// Triggers re-creation of object safely
+	void invalidate() {
+		bResubmit = true;
 	}
 	
 	bool created() const { return id()!=0; }
@@ -101,9 +107,8 @@ public:
 	
 	/// Destroys object on GPU
 	void destroy(){ 
-		if(created()) {
-			onDestroy(); mID=0; 
-		}
+		if(created()) onDestroy(); 
+		mID=0;
 	}
 	
 	/// Returns the assigned object id
@@ -116,6 +121,9 @@ protected:
 	void contextUnregister();
 	
 	unsigned long mID;
+	bool bResubmit;
+	
+	/// subclasses must implement:
 	virtual void onCreate() = 0;
 	virtual void onDestroy() = 0;
 };

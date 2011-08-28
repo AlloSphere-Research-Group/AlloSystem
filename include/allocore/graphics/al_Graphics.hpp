@@ -138,7 +138,7 @@ public:
 	
 	// Rendering State
 	void blending(bool enable, BlendFunc src, BlendFunc dst){ p_blending(enable, src, dst); }
-	void blending(BlendFunc src, BlendFunc dst, BlendEquation eq){ p_blending(src, dst, eq); }
+	void blending(BlendFunc src, BlendFunc dst, BlendEquation eq=FUNC_ADD){ p_blending(src, dst, eq); }
 	void enable(Capability cap){ p_enable(cap); }
 	void disable(Capability cap){ p_disable(cap); }
 	
@@ -210,6 +210,7 @@ public:
 	void normal(const Vec3f& v) { normal(v[0], v[1], v[2]); }
 	
 	void color(double r, double g, double b, double a=1.);
+	void color(double gray, double a=1.) { color(gray, gray, gray, a); }
 	void color(const Color& v){ color(v.r, v.g, v.b, v.a); }
 	void color(const Vec3d& v, double a=1.) { color(v[0], v[1], v[2], a); }
 	void color(const Vec3f& v, double a=1.) { color(v[0], v[1], v[2], a); }
