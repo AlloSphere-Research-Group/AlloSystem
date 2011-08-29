@@ -63,6 +63,8 @@ public:
 	void damp(const Array& src);	// src must have matching layout
 	// add to front array. src must have matching layout
 	void add(Array& src);
+	// add uniform vector to front array. force must have as many components as the field
+	void add(T * force);
 	
 	// fill with noise:
 	void adduniform(rnd::Random<>& rng, T scalar = T(1));
@@ -654,6 +656,35 @@ inline void Field3D<T> :: boundary() {
 	
 	#undef CELL
 	
+}
+
+template<typename T>
+inline void Field3D<T> :: add(T * force) {
+	const uint32_t stride0 = front().stride(0);
+	const uint32_t stride1 = front().stride(1);
+	const uint32_t stride2 = front().stride(2);
+	const uint32_t dim0 = front().dim(0);
+	const uint32_t dim1 = front().dim(1);
+	const uint32_t dim2 = front().dim(2);
+	const uint8_t components = front().components();
+	#define INDEX(p, x, y, z) ((T *)((p) + (((x)&mDimWrap)*stride0) +  (((y)&mDimWrap)*stride1) +  (((z)&mDimWrap)*stride2)))
+
+	// zero the boundary fields
+	char * optr = front().data.ptr;
+	for (int z=0;z<dim2;z++) {
+		for (int y=0;y<dim1;y++) {
+			for (int x=0;x<dim0;x++) {
+				// cell to update:
+				T * vel = INDEX(optr, x, y, z);
+				for (int i=0; i<components; i++ ){
+					vel[i] += force[i];
+				}
+			}
+		}
+	}
+
+	#undef INDEX
+	#undef CELLG
 }
 
 

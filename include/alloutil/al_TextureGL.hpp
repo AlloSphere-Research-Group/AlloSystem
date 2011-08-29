@@ -26,6 +26,9 @@ public:
 	:	GPUObject(),
 		mTarget(GL_TEXTURE_2D),
 		mInternalFormat(GL_RGBA),
+		mWrapS(GL_CLAMP_TO_EDGE),
+		mWrapT(GL_CLAMP_TO_EDGE),
+		mWrapR(GL_CLAMP_TO_EDGE),
 //		mType(GL_UNSIGNED_BYTE),
 //		mLevel(0),
 //		mBorder(0),
@@ -56,8 +59,26 @@ public:
 	TextureGL& height(uint32_t v) { mHeight = v; determineTarget(); return *this; }
 	TextureGL& depth(uint32_t v) { mDepth = v; determineTarget(); return *this; }
 	
+	// e.g. GL_CLAMP, GL_CLAMP_TO_EDGE, GL_REPEAT
+	TextureGL& wrap(GLint mode) {
+		mWrapS = mWrapT = mWrapR = mode;
+		invalidate();
+		return *this;
+	}
+	TextureGL& wrap(GLint S, GLint T) {
+		mWrapS = S;
+		mWrapT = T;
+		invalidate();
+		return *this;
+	}
+	TextureGL& wrap(GLint S, GLint T, GLint R) {
+		mWrapS = S;
+		mWrapT = T;
+		mWrapR = R;
+		invalidate();
+		return *this;
+	}
 	
-
 	virtual void onCreate() {
 		if (mID == 0) {
 			printf("TextureGL onCreate\n");
@@ -68,12 +89,12 @@ public:
 			// TODO: which options?
 			glTexParameterf(mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexParameterf(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			glTexParameterf(mTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameterf(mTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameterf(mTarget, GL_TEXTURE_WRAP_S, mWrapS);
+			glTexParameterf(mTarget, GL_TEXTURE_WRAP_T, mWrapT);
+			glTexParameterf(mTarget, GL_TEXTURE_WRAP_R, mWrapR);
 			glTexParameteri(mTarget, GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
 			glBindTexture(mTarget, 0);
-			
-			submit(NULL);
+			submit();
 			GraphicsGL::gl_error("creating texture");
 		}
 	}
@@ -233,7 +254,7 @@ public:
 	
 	// submit manually
 	// supports the modes valid in GLES 1.0
-	void submit(void * pixels=NULL, uint32_t align=4) {
+	virtual void submit(void * pixels=NULL, uint32_t align=4) {
 		
 		validate();
 		
@@ -417,6 +438,7 @@ protected:
 	
 	GLint mTarget;			// GL_TEXTURE_1D, GL_TEXTURE_2D, etc.
 	GLint mInternalFormat;	// GL_RGBA, GL_ALPHA etc.
+	GLint mWrapS, mWrapT, mWrapR;
 	
 //	GLint mType;
 //	GLint mLevel;

@@ -153,6 +153,14 @@ public:
 	const ShaderProgram& uniform(const char * name, float v0, float v1) const;
 	const ShaderProgram& uniform(const char * name, float v0, float v1, float v2) const;
 	const ShaderProgram& uniform(const char * name, float v0, float v1, float v2, float v3) const;
+	
+	
+	const ShaderProgram& uniform(int location, int v0) const;
+	const ShaderProgram& uniform(int location, float v0) const;
+	const ShaderProgram& uniform(int location, double v0) const { return uniform(location, (float)v0); }
+	const ShaderProgram& uniform(int location, float v0, float v1) const;
+	const ShaderProgram& uniform(int location, float v0, float v1, float v2) const;
+	const ShaderProgram& uniform(int location, float v0, float v1, float v2, float v3) const;
 
 	const ShaderProgram& uniform1(const char * name, const float * v, int count=1) const;
 	const ShaderProgram& uniform2(const char * name, const float * v, int count=1) const;
@@ -164,13 +172,18 @@ public:
 	const ShaderProgram& attribute(const char * name, float v0, float v1, float v2) const;
 	const ShaderProgram& attribute(const char * name, float v0, float v1, float v2, float v3) const;
 
+	const ShaderProgram& attribute(int location, float v0) const;
+	const ShaderProgram& attribute(int location, float v0, float v1) const;
+	const ShaderProgram& attribute(int location, float v0, float v1, float v2) const;
+	const ShaderProgram& attribute(int location, float v0, float v1, float v2, float v3) const;
+
 	const ShaderProgram& attribute1(const char * name, const float * v) const;
 	const ShaderProgram& attribute2(const char * name, const float * v) const;
 	const ShaderProgram& attribute3(const char * name, const float * v) const;
 	const ShaderProgram& attribute4(const char * name, const float * v) const;
 	
-	int uniformLocation(const char * name) const;
-	int attributeLocation(const char * name) const;
+	int uniform(const char * name) const;
+	int attribute(const char * name) const;
 
 protected:
 	Graphics::Primitive mInPrim, mOutPrim;	// IO primitives for geometry shaders

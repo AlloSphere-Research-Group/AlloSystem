@@ -264,7 +264,13 @@ template<> inline AlloTy Array::type<int64_t>() { return AlloSInt64Ty; }
 template<> inline AlloTy Array::type<float>() { return AlloFloat32Ty; }
 template<> inline AlloTy Array::type<double>() { return AlloFloat64Ty; }
 template<> inline AlloTy Array::type<AlloArray>() { return AlloArrayTy; }
-
+template<> inline AlloTy Array::type<void *>() { 
+	switch(sizeof(void *)) {
+		case 4: return AlloPointer32Ty; 
+		case 8: return AlloPointer64Ty; 
+	}
+	return 0;
+}
 
 
 inline Array::Array() : AlloArray() {

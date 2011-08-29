@@ -49,6 +49,8 @@ protected:
 /// A handy way to manage several possible search paths
 class SearchPaths {
 public:
+	typedef std::pair<std::string, bool> searchpath;
+	
 	SearchPaths() {}
 	SearchPaths(int argc, char * const argv[], bool recursive=true) { addAppPaths(argc,argv,recursive); }
 	SearchPaths(const SearchPaths& cpy) 
@@ -75,13 +77,10 @@ public:
 
 	/// todo?
 	//void addResourcePath();
-protected:
 
-	typedef std::pair<std::string, bool> searchpath;
+protected:	
 	std::list<searchpath> mSearchPaths;
-
 	std::string mAppPath;
-
 };
 
 
