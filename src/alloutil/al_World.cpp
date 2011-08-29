@@ -11,7 +11,8 @@ World::World(
 	mAudioIO(audioBlockSize, audioRate, sAudioCB, this, audioOutputs, audioInputs),
 	mAudioScene(3,2, audioBlockSize),
 	mName(name),
-	mNavControl(mNav)
+	mNavControl(mNav),
+	mAutoStepNav(true)
 {
 	mListeners.push_back(mAudioScene.createListener(2));
 	mListeners[0]->speakerPos(0,0, -45);
@@ -23,13 +24,14 @@ World::~World(){
 	if(name()!="" && oscSend().opened()) sendDisconnect();
 }
 
-void World::add(ViewpointWindow& win, bool animates){
+World& World::add(ViewpointWindow& win, bool animates){
 //	win.add(new NavInputControl(mNav));
-	win.add(&mNavControl);
-	win.add(new DrawActors(win, *this));
-	win.add(new SceneInputControl(*this));
-	if(animates) win.add(new AnimateActors(*this));
+	win.add(mNavControl);
+	win.add(*new DrawActors(win, *this));
+	win.add(*new SceneInputControl(*this));
+	if(animates) win.add(*new AnimateActors(*this));
 	mWindows.push_back(&win);
+	return *this;
 }
 
 } // al::

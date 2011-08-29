@@ -30,10 +30,18 @@ public:
 	float stretchX() const { return mStretchX; }
 	float stretchY() const { return mStretchY; }
 
+	/// Set anchoring factors relative to bottom-left corner of window
+	
+	/// @param[in] ax	anchor factor relative to left edge of window, in [0,1]
+	/// @param[in] ay	anchor factor relative to bottom edge of window, in [0,1]
 	Viewpoint& anchor(float ax, float ay){
 		mAnchorX=ax; mAnchorY=ay; return *this;
 	}
 
+	/// Set stretch factors relative to bottom-left corner of window
+	
+	/// @param[in] sx	stretch factor relative to left edge of window, in [0,1]
+	/// @param[in] sy	stretch factor relative to bottom edge of window, in [0,1]
 	Viewpoint& stretch(float sx, float sy){
 		mStretchX=sx; mStretchY=sy; return *this;
 	}
@@ -125,10 +133,11 @@ public:
 
 	const Viewpoints& viewpoints() const { return mViewpoints; }
 	
-	void add(Viewpoint& v){ mViewpoints.push_back(&v); }
+	ViewpointWindow& add(Viewpoint& v){ mViewpoints.push_back(&v); return *this; }
 
 
 	virtual bool onResize(int dw, int dh){
+		//printf("ViewpointWindow onResize: %d %d\n", dw, dh);
 		Viewpoints::iterator iv = mViewpoints.begin();
 		
 		while(iv != mViewpoints.end()){
@@ -207,8 +216,9 @@ public:
 	Windows&			windows(){ return mWindows; }
 
 	/// Add an actor to the world
-	void add(Actor& v){
+	World& add(Actor& v){
 		mActors.push_back(&v);
+		return *this;
 	}
 	
 	/// Add a window to the world
@@ -217,7 +227,7 @@ public:
 	/// @param[in] animates		Whether actors are animated based on frame rate
 	///							of this window. There should only be one window
 	///							in the world that animates.
-	void add(ViewpointWindow& win, bool animates=false);
+	World& add(ViewpointWindow& win, bool animates=false);
 
 
 	void sendHandshake(){
@@ -233,6 +243,8 @@ public:
 		mAudioIO.start();
 		MainLoop::start();
 	}
+
+	World& autoStepNav(bool v){ mAutoStepNav=v; return *this;}
 
 protected:
 	
@@ -255,14 +267,19 @@ protected:
 	osc::Recv mOSCRecv;
 	osc::Send mOSCSend;
 
+	bool mAutoStepNav;	// whether to step Nav automatically (currently from audio thread)	
+
+
 	static void sAudioCB(AudioIOData& io){
 		World& w = io.user<World>();
 		int numFrames = io.framesPerBuffer();
 		
 		//w.mNavMaster.velScale(4);
 		//w.mNavMaster.step(io.secondsPerBuffer());
-		w.mNav.smooth(0.95);
-		w.mNav.step(1./4);
+		if(w.mAutoStepNav){
+			w.mNav.smooth(0.95);
+			w.mNav.step(1./4);
+		}
 		w.mListeners[0]->pose(w.mNav);
 
 		Actors::iterator it = w.mActors.begin();
@@ -289,6 +306,7 @@ protected:
 			//int h = v.dimensions().h;
 			
 			w.navDraw() = w.nav();
+			w.navDraw().quat().normalize();
 			
 			g.depthTesting(true);
 			
