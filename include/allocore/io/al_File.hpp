@@ -177,6 +177,20 @@ public:
 	/// \returns whether the file or directory was found
 	static bool searchBack(std::string& prefixPath, const std::string& matchPath, int maxDepth=6);
 
+	/// Search for file or directory back from current directory
+
+	/// @param[in,out] path		Input is a file or directory to search for.
+	///							If the file is found, the output contains a series of
+	///							"../" that can be prefixed to the input
+	/// @param[in]  maxDepth	Maximum number of directories to search back
+	/// \returns whether the file or directory was found
+	static bool searchBack(std::string& path, int maxDepth=6){
+		std::string prefix = "";
+		bool r = searchBack(prefix, path);
+		if(r) path = prefix + path;
+		return r;
+	}
+
 	static al_sec modified(std::string path) { File f(path); return f.modified(); }
 	static al_sec accessed(std::string path) { File f(path); return f.accessed(); }
 	static al_sec created(std::string path) { File f(path); return f.created(); }
