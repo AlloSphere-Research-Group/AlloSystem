@@ -95,6 +95,9 @@ public:
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFboId);
 	}
 	
+	Color clearColor() const { return mClearColor; }
+	Color& clearColor() { return mClearColor; }
+	
 	void clear() {
 		glViewport(0, 0, width(), height());
 		glClearColor(mClearColor.r, mClearColor.g, mClearColor.b, 1.);

@@ -33,7 +33,7 @@ namespace al{
 int addTetrahedron(Mesh& m);
 
 /// Add cube as triangle vertices and indices
-int addCube(Mesh& m);
+int addCube(Mesh& m, bool withNormalsAndTexcoords = false);
 
 /// Add octahedron as triangle vertices and indices
 int addOctahedron(Mesh& m);
