@@ -1,3 +1,14 @@
+/*
+Allocore Example: Front and back views 
+
+Description:
+This example demonstrates how to render both front and back views from
+a single navigation point.
+
+Author:
+Lance Putnam, 8/29/2011
+*/
+
 #include "alloutil/al_World.hpp"
 
 using namespace al;
@@ -5,72 +16,43 @@ using namespace al;
 class MyActor : public Actor{
 public:
 
-	MyActor(){}
-
-	virtual void onDraw(Graphics& g, const Viewpoint& v){		
-		Frustumd fr;
-		v.camera().frustum(fr, v.worldTransform(), v.viewport().aspect());
-
-//		printf("ntl: %g %g %g\n", fr.ntl[0], fr.ntl[1], fr.ntl[2]);
-//		printf("ftl: %g %g %g\n", fr.ftl[0], fr.ftl[1], fr.ftl[2]);
-
+	virtual void onDraw(Graphics& g, const Viewpoint& v){
 		Mesh& m = g.mesh();
 		
 		m.reset();
 		m.primitive(g.LINES);
-		m.vertex(-1,-1, -11);
-		m.vertex( 1, 1, -12);
-
-		for(int i=0; i<m.vertices().size(); ++i){
-			int r = fr.testPoint(m.vertices()[i]);
-			
-			m.color(HSV(r ? 0.3 : 0));
+		
+		for(int j=0; j<4; ++j){
+			int Nv = addSphere(m, (j+1)*2, 20, 20);
+			for(int i=0; i<Nv; ++i){
+				float v = float(i)/Nv;
+				m.color(HSV(0.2*v, 1-v*0.5, 1));
+			}
 		}
-
-		g.lineWidth(10);
-		g.antialiasing(g.NICEST);
-		g.draw();
-
-		{
-//			int r = fr.testPoint(Vec3d(0,0,15));
-//			printf("%d\n", r);
-		}
-
-		// draw rectangle across frustum diagonal
-		m.reset();
-		m.color(Color(0.5));
-		m.vertex(fr.nbl);
-		m.vertex(fr.fbr);
-		m.vertex(fr.ntr);
-		m.vertex(fr.ftl);
-		m.primitive(g.LINE_LOOP);
-		g.draw();
+		g.draw(m);
 	}
-
 };
 
 
 int main(){
-	World w;
-	w.name("Frustum Testing");
-	w.camera().near(10).far(25);
+	World w("Front and Back Views");
 
-	ViewpointWindow win(0,0, 600,400, w.name());
-	Viewpoint vp1, vp2;
-	vp1.parentTransform(w.nav());
-	vp2.parentTransform(w.nav());
-	
+	// Configure the front and back viewpoints
+	Viewpoint vpF, vpB;
+	vpF.parentTransform(w.nav());
+	vpB.parentTransform(w.nav());
 
-	// top
-	vp1.stretch(1, 0.5).anchor(0, 0.5);
-	vp2.stretch(1, 0.5).anchor(0, 0.0);
-	vp2.transform().quat().fromAxisAngle(M_PI, 0,1,0);
+	vpF.stretch(1, 0.5).anchor(0, 0.5);
+	vpB.stretch(1, 0.5).anchor(0, 0.0);
+	vpB.transform().quat().fromAxisAngle(M_PI, 0,1,0);
 	
 	MyActor myActor;
+	ViewpointWindow win(0,0, 800,600, w.name());
 
-	win.add(vp1);
-	win.add(vp2);
+	win.add(vpF).add(vpB);
 	w.add(win, true);
+	
+	// Note: this will call our drawing routine for each viewpoint
 	w.add(myActor);
 
 	w.start();
