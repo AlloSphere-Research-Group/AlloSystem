@@ -1,25 +1,10 @@
 #ifndef INCLUDE_AL_SERIALIZE_H
 #define INCLUDE_AL_SERIALIZE_H
 
-/*
-	General serialization and deserialization for file and network i/o.
+/*	Allocore --
+	Multimedia / virtual environment application class library
 
-	Either single elements or arrays of elements can be read or written to a
-	buffer. Each group of elements is preceeded by a header that tells the type of
-	elements and the size of the array.
-
-	A string is a C-style null-terminated array of characters.
-	A boolean is a single byte where a value of 0 is false and non-zero value is true.
-
-	Byte ordering is little endian. If the target architecture is big endian,
-	then pass in the preprocessor flag -DSER_IS_BIG_ENDIAN.
-*/
-
-/*
- *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
- */
-
-/*
+	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
 	All Rights Reserved.
 
@@ -39,6 +24,23 @@
 	PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
 	HEREUNDER IS PROVIDED "AS IS". REGENTS HAS  NO OBLIGATION TO PROVIDE
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+
+
+	File description:
+	General serialization and deserialization for file and network i/o.
+
+	Either single elements or arrays of elements can be read or written to a
+	buffer. Each group of elements is preceeded by a header that tells the type of
+	elements and the size of the array.
+
+	A string is a C-style null-terminated array of characters.
+	A boolean is a single byte where a value of 0 is false and non-zero value is true.
+
+	Byte ordering is little endian. If the target architecture is big endian,
+	then pass in the preprocessor flag -DSER_IS_BIG_ENDIAN.
+
+	File author(s):
+	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
 
