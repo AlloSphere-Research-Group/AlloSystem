@@ -63,13 +63,13 @@ int addCube(Mesh& m, bool withNormalsAndTexcoords){
 		m.equalizeBuffers();
 		m.normal	( 0,-1, 0);
 		m.texCoord	( 0, 0);
-		m.vertex	(-l, l,-l);
+		m.vertex	(-l,-l,-l);
 		m.texCoord	( 1, 0);
-		m.vertex	( l, l,-l);
+		m.vertex	( l,-l,-l);
 		m.texCoord	( 1, 1);
-		m.vertex	( l, l, l);
+		m.vertex	( l,-l, l);
 		m.texCoord	( 0, 1);
-		m.vertex	(-l, l, l);
+		m.vertex	(-l,-l, l);
 		
 		m.equalizeBuffers();
 		m.normal	( 0, 0, 1);

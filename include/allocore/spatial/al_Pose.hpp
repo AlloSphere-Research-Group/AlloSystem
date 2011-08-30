@@ -46,6 +46,8 @@ public:
 	{}
 	
 	Pose(const Pose& p) { set(p); }
+	
+	operator Vec3d () { return pos(); }
 
 
 	// Arithmetic operations
