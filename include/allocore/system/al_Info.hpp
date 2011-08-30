@@ -3,7 +3,7 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-
+	
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
 	All Rights Reserved.
@@ -25,12 +25,11 @@
 	HEREUNDER IS PROVIDED "AS IS". REGENTS HAS  NO OBLIGATION TO PROVIDE
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
-
 	File description:
 	Various functions for retrieving information about the system
-
+	
 	File author(s):
-	Lance Putnam, 2011, putnam.lance@gmail.com
+	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
 namespace al{

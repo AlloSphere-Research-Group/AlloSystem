@@ -1,11 +1,10 @@
 #ifndef INCLUDE_AL_POSE_HPP
 #define INCLUDE_AL_POSE_HPP
 
-/*
- *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
- */
-
-/*
+/*	Allocore --
+	Multimedia / virtual environment application class library
+	
+	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
 	All Rights Reserved.
 
@@ -25,6 +24,16 @@
 	PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
 	HEREUNDER IS PROVIDED "AS IS". REGENTS HAS  NO OBLIGATION TO PROVIDE
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+
+
+	File description:
+	Representing an oriented point by vector and quaternion
+
+	File author(s):
+	Wesley Smith, 2010, wesley.hoke@gmail.com
+	Lance Putnam, 2010, putnam.lance@gmail.com
+	Graham Wakefield, 2010, grrrwaaa@gmail.com
+	Pablo Colapinto, 2010, wolftype@gmail.com
 */
 
 #include "allocore/math/al_Vec.hpp"
