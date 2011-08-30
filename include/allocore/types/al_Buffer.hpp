@@ -1,11 +1,10 @@
 #ifndef INCLUDE_AL_BUFFER_HPP
 #define INCLUDE_AL_BUFFER_HPP
 
-/*
- *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
- */
-
-/*
+/*	Allocore --
+	Multimedia / virtual environment application class library
+	
+	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
 	All Rights Reserved.
 
@@ -25,6 +24,13 @@
 	PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
 	HEREUNDER IS PROVIDED "AS IS". REGENTS HAS  NO OBLIGATION TO PROVIDE
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+
+
+	File description:
+	Variably sized one-dimensional array
+
+	File author(s):
+	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
 #include <algorithm>

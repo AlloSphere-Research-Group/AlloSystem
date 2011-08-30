@@ -1,11 +1,10 @@
 #ifndef INCLUDE_AL_TIME_HPP
 #define INCLUDE_AL_TIME_HPP
 
-/*
- *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
- */
-
-/*
+/*	Allocore --
+	Multimedia / virtual environment application class library
+	
+	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
 	All Rights Reserved.
 
@@ -25,10 +24,18 @@
 	PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
 	HEREUNDER IS PROVIDED "AS IS". REGENTS HAS  NO OBLIGATION TO PROVIDE
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+
+
+	File description:
+	C++ helper wrappers for al_time
+
+	File author(s):
+	Graham Wakefield, 2010, grrrwaaa@gmail.com
+	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
 /*
-	C++ helper wrappers for al_time
+	
 */
 
 #include "allocore/system/al_Time.h"

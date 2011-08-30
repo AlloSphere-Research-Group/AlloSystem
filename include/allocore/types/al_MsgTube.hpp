@@ -6,7 +6,10 @@
  *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
  */
 
-/*
+/*	Allocore --
+	Multimedia / virtual environment application class library
+	
+	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
 	All Rights Reserved.
 
@@ -26,6 +29,13 @@
 	PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
 	HEREUNDER IS PROVIDED "AS IS". REGENTS HAS  NO OBLIGATION TO PROVIDE
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+
+
+	File description:
+	Passing functors between a pair of threads
+
+	File author(s):
+	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
 #include "allocore/types/jack/ringbuffer.h"

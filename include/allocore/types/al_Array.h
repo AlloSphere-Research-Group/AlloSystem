@@ -1,12 +1,7 @@
-/*
- *  allo.h
- *  A set of definitions for data interchange amenable to a C ABI.
- *
- *  AlloSphere, Media Arts & Technology, UCSB
- *
- */
- 
-/*
+/*	Allocore --
+	Multimedia / virtual environment application class library
+	
+	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
 	All Rights Reserved.
 
@@ -24,16 +19,25 @@
 	REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
 	THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
 	PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
-	HEREUNDER IS PROVIDED "AS IS". REGENTS HAS NO OBLIGATION TO PROVIDE
+	HEREUNDER IS PROVIDED "AS IS". REGENTS HAS  NO OBLIGATION TO PROVIDE
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+
+
+	File description:
+	AlloArray is a multidimensional array.
+	It is a pointer to data followed by meta-data to describe its type and layout.
+	
+	File author(s):
+	Wesley Smith, 2010, wesley.hoke@gmail.com
+	Graham Wakefield, 2010, grrrwaaa@gmail.com
+	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
 #ifndef INCLUDE_ALLO_ARRAY_H
 #define INCLUDE_ALLO_ARRAY_H 1
 
 /*
- AlloArray is a multidimensional array.
- It is a pointer to data followed by meta-data to describe its type and layout.
+ 
  
  Separating the data from the header meta-data allows logic to performed on layouts without data 
  - a specific layout can be defined and checked against
