@@ -3,9 +3,8 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
-	AlloSphere Research Group, Media Arts & Technology, UCSB, 2009
 
+	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
 	All Rights Reserved.
 
@@ -27,12 +26,15 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 
+	File description:
+	Various flavors of pseudo-random number generators nad distributions
+
 	File author(s):
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
 
-#include <time.h>					/* req'd for time() */
+#include <time.h>							/* req'd for time() */
 #include <cmath>
 #include "allocore/types/al_Conversion.hpp"	/* req'd for int to float conversion */
 #include "allocore/math/al_Constants.hpp"

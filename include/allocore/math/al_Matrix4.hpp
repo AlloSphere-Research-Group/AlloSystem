@@ -3,9 +3,8 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
-	AlloSphere Research Group, Media Arts & Technology, UCSB, 2009
 
+	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
 	All Rights Reserved.
 
@@ -26,6 +25,10 @@
 	HEREUNDER IS PROVIDED "AS IS". REGENTS HAS  NO OBLIGATION TO PROVIDE
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
+
+	File description:
+	This is a more specialized 4x4 matrix including transformations commonly 
+	used in computer graphics.
 
 	File author(s):
 	Graham Wakefield, 2010

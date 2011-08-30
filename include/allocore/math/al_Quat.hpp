@@ -4,8 +4,7 @@
 /*	Allocore --
 	Multimedia / virtual environment application class library
 	
-	AlloSphere Research Group, Media Arts & Technology, UCSB, 2009
-
+	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
 	All Rights Reserved.
 
@@ -26,6 +25,9 @@
 	HEREUNDER IS PROVIDED "AS IS". REGENTS HAS  NO OBLIGATION TO PROVIDE
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
+
+	File description:
+	A quaternion including many different conversion routines to matrices, etc.
 
 	File author(s):
 	Lance Putnam, 2010, putnam.lance@gmail.com

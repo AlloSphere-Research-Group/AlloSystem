@@ -3,9 +3,8 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
-	AlloSphere Research Group, Media Arts & Technology, UCSB, 2009
 
+	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
 	All Rights Reserved.
 
@@ -27,9 +26,6 @@
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 
-	File author(s):
-	Lance Putnam, 2010, putnam.lance@gmail.com
-	
 	File description:
 	Generator function objects
 
@@ -43,6 +39,9 @@
 	and return its previously stored value. The reason the previous value is 
 	returned is so that its value can be set directly and on its next iteration
 	it will return that value.
+
+	File author(s):
+	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
 namespace al {

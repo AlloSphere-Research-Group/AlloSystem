@@ -1,11 +1,10 @@
 #ifndef INCLUDE_AL_MATH_CONSTANTS_HPP
 #define INCLUDE_AL_MATH_CONSTANTS_HPP
 
-/*
- *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
- */
+/*	Allocore --
+	Multimedia / virtual environment application class library
 
-/*
+	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
 	All Rights Reserved.
 
@@ -25,11 +24,18 @@
 	PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
 	HEREUNDER IS PROVIDED "AS IS". REGENTS HAS  NO OBLIGATION TO PROVIDE
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+
+
+	File description:
+	This includes various macro constants that may not already be defined in the
+	standard C/C++ math headers.
+
+	File author(s):
+	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
 namespace al {
 
-// math.h sometimes does not include these ANSI C macros.
 #ifndef M_E
 #define M_E			2.71828182845904523536028747135266250
 #endif
