@@ -27,73 +27,83 @@ int addTetrahedron(Mesh& m){
 int addCube(Mesh& m, bool withNormalsAndTexcoords){
 	static const float l = sqrt(1./3);
 	if (withNormalsAndTexcoords) {
-		m.equalizeBuffers();
 		m.normal	( 1, 0, 0);
 		m.texCoord	( 0, 0);
 		m.vertex	( l,-l, l);
+		m.normal	( 1, 0, 0);
 		m.texCoord	( 1, 0);
 		m.vertex	( l,-l,-l);
+		m.normal	( 1, 0, 0);
 		m.texCoord	( 1, 1);
 		m.vertex	( l, l,-l);
+		m.normal	( 1, 0, 0);
 		m.texCoord	( 0, 1);
 		m.vertex	( l, l, l);
 		
-		m.equalizeBuffers();
 		m.normal	(-1, 0, 0);
 		m.texCoord	( 0, 0);
 		m.vertex	(-l, l, l);
+		m.normal	(-1, 0, 0);
 		m.texCoord	( 1, 0);
 		m.vertex	(-l, l,-l);
+		m.normal	(-1, 0, 0);
 		m.texCoord	( 1, 1);
 		m.vertex	(-l,-l,-l);
+		m.normal	(-1, 0, 0);
 		m.texCoord	( 0, 1);
 		m.vertex	(-l,-l, l);
 		
-		m.equalizeBuffers();
 		m.normal	( 0, 1, 0);
 		m.texCoord	( 0, 0);
 		m.vertex	(-l, l, l);
+		m.normal	( 0, 1, 0);
 		m.texCoord	( 1, 0);
 		m.vertex	( l, l, l);
+		m.normal	( 0, 1, 0);
 		m.texCoord	( 1, 1);
 		m.vertex	( l, l,-l);
+		m.normal	( 0, 1, 0);
 		m.texCoord	( 0, 1);
 		m.vertex	(-l, l,-l);
 		
-		m.equalizeBuffers();
 		m.normal	( 0,-1, 0);
 		m.texCoord	( 0, 0);
 		m.vertex	(-l,-l,-l);
+		m.normal	( 0,-1, 0);
 		m.texCoord	( 1, 0);
 		m.vertex	( l,-l,-l);
+		m.normal	( 0,-1, 0);
 		m.texCoord	( 1, 1);
 		m.vertex	( l,-l, l);
+		m.normal	( 0,-1, 0);
 		m.texCoord	( 0, 1);
 		m.vertex	(-l,-l, l);
 		
-		m.equalizeBuffers();
 		m.normal	( 0, 0, 1);
 		m.texCoord	( 0, 0);
 		m.vertex	(-l,-l, l);
+		m.normal	( 0, 0, 1);
 		m.texCoord	( 1, 0);
 		m.vertex	( l,-l, l);
+		m.normal	( 0, 0, 1);
 		m.texCoord	( 1, 1);
 		m.vertex	( l, l, l);
+		m.normal	( 0, 0, 1);
 		m.texCoord	( 0, 1);
 		m.vertex	(-l, l, l);
 		
-		m.equalizeBuffers();
 		m.normal	( 0, 0,-1);
 		m.texCoord	( 0, 0);
-		m.vertex	( l, l,-l);
-		m.texCoord	( 1, 0);
 		m.vertex	(-l, l,-l);
+		m.normal	( 0, 0,-1);
+		m.texCoord	( 1, 0);
+		m.vertex	( l, l,-l);
+		m.normal	( 0, 0,-1);
 		m.texCoord	( 1, 1);
-		m.vertex	(-l,-l,-l);
-		m.texCoord	( 0, 1);
 		m.vertex	( l,-l,-l);
-		
-		m.equalizeBuffers();
+		m.normal	( 0, 0,-1);
+		m.texCoord	( 0, 1);
+		m.vertex	(-l,-l,-l);
 		
 		return 6*4;
 	} else {
