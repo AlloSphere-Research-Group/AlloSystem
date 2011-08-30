@@ -4,10 +4,10 @@
 namespace al{
 
 Material::Material(Graphics::Face f)
-:	mAmbient(0.),
-	mDiffuse(0.6),
-	mEmission(0.),
-	mSpecular(1.),
+:	mAmbient(0.2),		// Do not change these initial values. (Yes, that means
+	mDiffuse(0.8),		// you!) They are the default OpenGL values.
+	mEmission(0),		// See http://www.opengl.org/sdk/docs/man/xhtml/glMaterial.xml
+	mSpecular(0),		// Specular is 0 to ensure linear lighting (no popping).
 	mShine(5.),
 	mFace(f),
 	mUseColorMaterial(true)
