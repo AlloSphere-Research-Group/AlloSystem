@@ -30,7 +30,7 @@
 	Various flavors of pseudo-random number generators nad distributions
 
 	File author(s):
-	Lance Putnam, 2010, putnam.lance@gmail.com
+	Lance Putnam, 2006, putnam.lance@gmail.com
 */
 
 

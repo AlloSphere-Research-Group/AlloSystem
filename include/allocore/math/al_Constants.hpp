@@ -31,7 +31,7 @@
 	standard C/C++ math headers.
 
 	File author(s):
-	Lance Putnam, 2010, putnam.lance@gmail.com
+	Lance Putnam, 2006, putnam.lance@gmail.com
 */
 
 namespace al {

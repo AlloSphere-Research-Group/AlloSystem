@@ -30,7 +30,7 @@
 	This is a rectangular frustum useful for computer graphics
 
 	File author(s):
-	Lance Putnam, 2010, putnam.lance@gmail.com
+	Lance Putnam, 2011, putnam.lance@gmail.com
 */
 
 #include "allocore/math/al_Plane.hpp"

@@ -30,7 +30,7 @@
 	A collection of classes related to spherical geometry
 
 	File author(s):
-	Lance Putnam, 2010, putnam.lance@gmail.com
+	Lance Putnam, 2011, putnam.lance@gmail.com
 */
 
 
