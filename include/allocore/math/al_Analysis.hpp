@@ -25,6 +25,12 @@
 	PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
 	HEREUNDER IS PROVIDED "AS IS". REGENTS HAS  NO OBLIGATION TO PROVIDE
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+	
+	File description:
+	Math analysis utilities
+
+	File author(s):
+	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
 #include "allocore/math/al_Functions.hpp"

@@ -31,8 +31,8 @@
 
 	File author(s):
 	Lance Putnam, 2010, putnam.lance@gmail.com
-	Wesley Smith
-	Graham Wakefield
+	Wesley Smith, 2010, wesley.hoke@gmail.com
+	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
 #include "allocore/math/al_Constants.hpp"

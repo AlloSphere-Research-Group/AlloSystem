@@ -31,7 +31,7 @@
 	used in computer graphics.
 
 	File author(s):
-	Graham Wakefield, 2010
+	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
 #include "allocore/math/al_Constants.hpp"

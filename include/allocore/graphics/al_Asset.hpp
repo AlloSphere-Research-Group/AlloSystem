@@ -5,7 +5,10 @@
  *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
  */
 
-/*
+/*	Allocore --
+	Multimedia / virtual environment application class library
+	
+	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
 	All Rights Reserved.
 
@@ -25,11 +28,19 @@
 	PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
 	HEREUNDER IS PROVIDED "AS IS". REGENTS HAS  NO OBLIGATION TO PROVIDE
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+
+
+	File description:
+	Asset manages the loading and parsing of 3D asset files (models and scenes)
+
+	File author(s):
+	Graham Wakefield, 2010, grrrwaaa@gmail.com
+	Pablo Colapinto, 2010, wolftype@gmail.com
 */
 
 /*!
 	Asset manages the loading and parsing of 3D asset files
-	It wraps the AssImp library.
+	Asset wraps the AssImp library.
 	
 	A scene contains
 		- array of meshes

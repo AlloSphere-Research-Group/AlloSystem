@@ -2,7 +2,10 @@
  *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
  */
 
-/*
+/*	Allocore --
+	Multimedia / virtual environment application class library
+	
+	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
 	All Rights Reserved.
 

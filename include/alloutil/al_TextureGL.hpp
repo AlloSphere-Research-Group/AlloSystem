@@ -261,7 +261,7 @@ public:
 		glBindTexture(mTarget, id());
 		
 		// set glPixelStore according to the array layout:
-		glPixelStorei(GL_UNPACK_ALIGNMENT, align);
+		//glPixelStorei(GL_UNPACK_ALIGNMENT, align);
 		
 		switch (mTarget) {
 			case GL_TEXTURE_1D:				
@@ -303,7 +303,7 @@ public:
 		}
 		
 		// set alignment back to default
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+		//glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 		
 		GraphicsGL::gl_error("submitting texture");
 		

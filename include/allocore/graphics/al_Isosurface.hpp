@@ -5,7 +5,10 @@
  *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
  */
 
-/*
+/*	Allocore --
+	Multimedia / virtual environment application class library
+	
+	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
 	All Rights Reserved.
 
@@ -25,6 +28,9 @@
 	PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
 	HEREUNDER IS PROVIDED "AS IS". REGENTS HAS  NO OBLIGATION TO PROVIDE
 	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+
+	File author(s):
+	Lance Putnam, 2010, putnam.lance@gmail.com
 
 	This file incorporates work covered by the following copyright(s) and  
 	permission notice(s):  
