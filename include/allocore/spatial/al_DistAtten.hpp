@@ -31,7 +31,7 @@
 	levels, fog density, etc. within a space.
 
 	File author(s):
-	Lance Putnam, 2010, putnam.lance@gmail.com
+	Lance Putnam, 2011, putnam.lance@gmail.com
 */
 
 #include <math.h>
