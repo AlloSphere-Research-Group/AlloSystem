@@ -1,11 +1,6 @@
 #ifndef INCLUDE_AL_MSG_TUBE_HPP
 #define INCLUDE_AL_MSG_TUBE_HPP
 
-/*
- *	Priority queue (C++ wrappers)
- *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
- */
-
 /*	Allocore --
 	Multimedia / virtual environment application class library
 	
