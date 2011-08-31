@@ -120,6 +120,10 @@ inline T dBToAmp(const T& db){ return ::pow(10, db/20.); }
 /// Returns whether or not an integer value is even.
 template<class T> bool even(T v);
 
+/// The Gauss error function or probability integral
+/// @see http://en.wikipedia.org/wiki/Error_function
+template<class T> T erf(T v);
+
 /// Returns factorial. Argument must be less than or equal to 12.
 uint32_t factorial(uint32_t n0to12);
 
@@ -169,6 +173,11 @@ template<class T> T gaussian(T v);
 
 /// Return greatest common divisor of two arguments
 template<class T> T gcd(const T& x, const T& y);
+
+/// The Gudermannian function 
+/// relates circular and hyperbolic functions without using complex numbers.
+/// @see http://en.wikipedia.org/wiki/Gudermannian_function
+template<class T> T gudermannian(const T x);
 
 /// Generalized Laguerre polynomial L{n,k}
 ///
@@ -479,6 +488,14 @@ TEM inline T clipS(T v, T hi){ return al::clip(v, hi, -hi); }
 
 TEM inline bool even(T v){ return 0 == al::odd(v); }
 
+/// @see http://en.wikipedia.org/wiki/Error_function
+TEM inline T erf(T x) {
+	static a = 0.147;
+	const T x2 = x*x;
+	const T ax2 = a * x2;
+	return sign(x)*sqrt(T(1) - exp(-x2*(T(4./M_PI) + ax2)/(T(1)+ax2)));
+}	
+
 inline uint32_t factorial(uint32_t v){ return mFactorial12u[v]; }
 
 inline double factorialSqrt(int v){
@@ -519,6 +536,11 @@ TEM inline T gaussian(T v){ return ::exp(-v*v); }
 TEM T gcd(const T& x, const T& y){
 	if(y==T(0)) return al::abs(x);
 	return al::gcd(y, al::remainder(x,y));
+}
+
+/// @see http://en.wikipedia.org/wiki/Gudermannian_function
+TEM T gudermannian(const T x) {
+	return T(2) * atan(exp(x)) - T(M_PI_2);
 }
 
 TEM T laguerreL(int n, int k, T x) {
