@@ -1,11 +1,6 @@
 #ifndef INCLUDE_AL_AUDIO_IO_HPP
 #define INCLUDE_AL_AUDIO_IO_HPP
 
-/*
- *	Audio device and input/output streaming
- *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
- */
-
 /*	Allocore --
 	Multimedia / virtual environment application class library
 	

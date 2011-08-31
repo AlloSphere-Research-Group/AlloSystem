@@ -1,11 +1,6 @@
 #ifndef INCLUDE_AL_IO_SOCKET_HPP
 #define INCLUDE_AL_IO_SOCKET_HPP 1
 
-/*
- *	Network I/O
- *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
- */
-
 /*	Allocore --
 	Multimedia / virtual environment application class library
 	
