@@ -490,7 +490,7 @@ TEM inline bool even(T v){ return 0 == al::odd(v); }
 
 /// @see http://en.wikipedia.org/wiki/Error_function
 TEM inline T erf(T x) {
-	static a = 0.147;
+	static T a = 0.147;
 	const T x2 = x*x;
 	const T ax2 = a * x2;
 	return sign(x)*sqrt(T(1) - exp(-x2*(T(4./M_PI) + ax2)/(T(1)+ax2)));
