@@ -1,8 +1,6 @@
 #ifndef INCLUDE_AL_THREAD_HPP
 #define INCLUDE_AL_THREAD_HPP
 
-
-
 /*	Allocore --
 	Multimedia / virtual environment application class library
 
