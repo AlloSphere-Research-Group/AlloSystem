@@ -1,11 +1,6 @@
 #ifndef INCLUDE_AL_HASHSPACE_HPP
 #define INCLUDE_AL_HASHSPACE_HPP
 
-#include "allocore/math/al_Vec.hpp"
-#include "allocore/types/al_Array.hpp"
-
-#include <vector>
-
 /*	Allocore --
 	Multimedia / virtual environment application class library
 	
@@ -34,11 +29,15 @@
 	File description:
 	HashSpace is a way to detect object collisions using a voxel grid
 	The grid has a given resolution (no. voxel cells per side)
-	File author(s):
-	
+
+	File author(s):	
 	Wesley Smith, 2010, wesley.hoke@gmail.com
 	Ported to AlloCore by Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
+
+#include <vector>
+#include "allocore/math/al_Vec.hpp"
+#include "allocore/types/al_Array.hpp"
 
 namespace al {
 
