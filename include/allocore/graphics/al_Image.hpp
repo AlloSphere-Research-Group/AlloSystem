@@ -1,10 +1,6 @@
 #ifndef INCLUDE_AL_IMAGE_HPP
 #define INCLUDE_AL_IMAGE_HPP
 
-/*
- *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
- */
-
 /*	Allocore --
 	Multimedia / virtual environment application class library
 	

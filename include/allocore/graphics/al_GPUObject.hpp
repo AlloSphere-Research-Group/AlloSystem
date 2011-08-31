@@ -1,10 +1,6 @@
 #ifndef INCLUDE_AL_GRAPHICS_GPUOBJECT_H
 #define INCLUDE_AL_GRAPHICS_GPUOBJECT_H
 
-/*
- *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
- */
-
 /*	Allocore --
 	Multimedia / virtual environment application class library
 	

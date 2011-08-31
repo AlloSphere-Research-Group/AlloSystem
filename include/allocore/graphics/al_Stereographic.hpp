@@ -1,11 +1,6 @@
 #ifndef INCLUDE_AL_GRAPHICS_STEREOGRAPHIC_HPP
 #define INCLUDE_AL_GRAPHICS_STEREOGRAPHIC_HPP
 
-/*
- *  A collection of functions and classes related to application mainloops
- *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
- */
-
 /*	Allocore --
 	Multimedia / virtual environment application class library
 	

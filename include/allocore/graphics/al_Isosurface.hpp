@@ -1,10 +1,6 @@
 #ifndef INCLUDE_AL_ISOSURFACE_HPP
 #define INCLUDE_AL_ISOSURFACE_HPP
 
-/*
- *  AlloSphere Research Group / Media Arts & Technology, UCSB, 2009
- */
-
 /*	Allocore --
 	Multimedia / virtual environment application class library
 	
