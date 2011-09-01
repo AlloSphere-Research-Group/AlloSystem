@@ -43,7 +43,7 @@ struct MyWindow : Window{
 		glNewList(scene_list, GL_COMPILE);
 		
 		Mesh mesh;
-		for (int i=0; i<ascene->meshes(); i++) {
+		for (unsigned i=0; i<ascene->meshes(); i++) {
 			ascene->mesh(i, mesh);
 			gl.draw(mesh);
 		}	
@@ -148,7 +148,7 @@ struct MyWindow : Window{
 
 int main (int argc, char * const argv[]) {
 	searchpaths.addAppPaths(argc, argv);
-	searchpaths.addSearchPath(searchpaths.appPath() + "../share");
+	searchpaths.addSearchPath(searchpaths.appPath() + "../../share");
 	
 	// load in a "scene"
 	FilePath path = searchpaths.find("ducky.obj");
@@ -173,6 +173,7 @@ int main (int argc, char * const argv[]) {
 	vert.source(vert_file.readAll(), Shader::VERTEX);
 	
 	path = searchpaths.find("hubble.jpg");
+	Image img;
 	img.load(path.filepath());
 	tex.fromArray(&img.array());
 	tex.target(Texture::TEXTURE_2D);
