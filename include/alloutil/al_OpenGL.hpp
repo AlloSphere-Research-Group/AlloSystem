@@ -317,7 +317,7 @@ public:
 			glLightf (id, GL_SPOT_CUTOFF, spotCutoff);
 			glLightf (id, GL_SPOT_EXPONENT, spotExponent);
 			if (spotCutoff != 180.f) {
-				glLightfv(id, GL_SPOT_DIRECTION, spotDirection.elems);
+				glLightfv(id, GL_SPOT_DIRECTION, spotDirection.elems());
 			}
 			
 			if (positionMode != 0.f) {

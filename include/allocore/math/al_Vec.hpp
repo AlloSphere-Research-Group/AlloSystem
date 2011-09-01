@@ -66,6 +66,14 @@ typedef Mat<4,int>		Mat4i;	///< integer 4x4 matrix
 #define IT(n) for(int i=0; i<(n); ++i)
 
 
+template <int N, class T>
+struct VecElems{ T x,y,z,w; private: T data[N-4]; };
+template<class T> struct VecElems<0,T>{};
+template<class T> struct VecElems<1,T>{ T x; };
+template<class T> struct VecElems<2,T>{ T x,y; };
+template<class T> struct VecElems<3,T>{ T x,y,z; };
+template<class T> struct VecElems<4,T>{ T x,y,z,w; };
+
 
 /// N-vector
 
@@ -73,14 +81,11 @@ typedef Mat<4,int>		Mat4i;	///< integer 4x4 matrix
 /// by the compiler and to avoid an extra 'size' data member for small-sized
 /// arrays.
 template <int N, class T>
-class Vec{
+class Vec : public VecElems<N,T>{
 public:
+	using VecElems<N,T>::x;
 
 	typedef T value_type; 
-
-	/// Element values
-	T elems[N];
-
 
 
 	/// @param[in] v		value to initialize all elements to
@@ -123,20 +128,26 @@ public:
 	/// Returns number of elements
 	static int size(){ return N; }
 
-	/// Cast to pointer
-	operator T* (){ return elems; }
-
 	/// Get read-only pointer to elements
-	const T* ptr() const { return elems; }
-	
+	const T * elems() const { return &x; }
+
 	/// Get read-write pointer to elements
-	T* ptr(){ return elems; }
+	T * elems(){ return &x; }
+
+	/// Cast to pointer
+	operator T* (){ return elems(); }
+
+//	/// Get read-only pointer to elements
+//	const T* ptr() const { return elems; }
+//	
+//	/// Get read-write pointer to elements
+//	T* ptr(){ return elems; }
 
 	/// Set element at index with no bounds checking
-	T& operator[](int i){ return elems[i];}
+	T& operator[](int i){ return elems()[i];}
 	
 	/// Get element at index with no bounds checking
-	const T& operator[](int i) const { return elems[i]; }
+	const T& operator[](int i) const { return elems()[i]; }
 
 	/// Return true if objects are element-wise equal, false otherwise
 	bool operator ==(const Vec& v) const { IT(N){ if((*this)[i] != v[i]) return false; } return true; }
@@ -165,7 +176,7 @@ public:
 	/// Get a subvector
 	template <int M>
 	Vec<M,T> sub(int begin=0) const {
-		return Vec<M,T>(ptr()+begin);
+		return Vec<M,T>(elems()+begin);
 	}
 
 
@@ -797,7 +808,7 @@ inline Vec<N,T> operator* (const Vec<N,T>& vRow, const Mat<N,T>& m){
 template <int N1, class T1, int N2, class T2>
 inline Vec<N1+N2, T1> concat(const Vec<N1,T1>& a, const Vec<N2,T2>& b){
 	Vec<N1+N2, T1> r;
-	r.set(a.ptr());
+	r.set(a.elems());
 	for(int i=0; i<N2; ++i) r[i+N1] = T1(b[i]);
 	return r;
 }
@@ -957,7 +968,7 @@ Vec<N,T>& Vec<N,T>::normalize(){
 	}
 	else{
 		set(T(0));
-		elems[0] = T(1);
+		(*this)[0] = T(1);
 	}
 	return *this;
 }

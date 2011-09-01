@@ -37,13 +37,20 @@ int utMath(){
 	{
 		const int N = 4;
 
-		// Should be able to hold generic objects not having overloaded operators
+		// Should be able to hold objects with constructors
 		{ Vec<1, Vec<1, int> > t; }
+		{ Vec<4, Complex<float> > t; }
+		{ Vec<5, char> t; }
 
 		Vec<N,double> a, b, c;	assert(a.size() == N);
 
 		a[0] = 0;				assert(a[0] == 0);
-								assert(a.elems[0] == 0);
+								assert(a.elems()[0] == 0);
+
+		a.x = 1;				assert(a[0] == 1);
+		a.y = 2;				assert(a[1] == 2);
+		a.z = 3;				assert(a[2] == 3);
+		a.w = 4;				assert(a[3] == 4);
 
 		a.set(1);				assert(a == 1);
 		b.set(a);				assert(b == 1);
@@ -51,7 +58,7 @@ int utMath(){
 		{
 		a.set(1);
 		b.set(0);
-		double * p = a.ptr();	assert(p[0] == a[0]);
+		double * p = a.elems();	assert(p[0] == a[0]);
 		b.set(p);				assert(a == b);
 
 		char c1[] = {4,4,4,4};
