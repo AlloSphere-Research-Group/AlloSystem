@@ -65,13 +65,25 @@ typedef Mat<4,int>		Mat4i;	///< integer 4x4 matrix
 // Forward iterates from 0 to n-1. Current index is 'i'.
 #define IT(n) for(int i=0; i<(n); ++i)
 
-
 template <int N, class T>
 struct VecElems{ T x,y,z,w; private: T data[N-4]; };
 template<class T> struct VecElems<0,T>{};
 template<class T> struct VecElems<1,T>{ T x; };
 template<class T> struct VecElems<2,T>{ T x,y; };
-template<class T> struct VecElems<3,T>{ T x,y,z; };
+template<class T> struct VecElems<3,T>{ 
+	T x,y,z; 
+	
+	/// methods that only make sense for Vec<3,T>:
+	
+	/// returns cross product of this x b
+	inline Vec<3,T> cross(const Vec<3,T>& b){
+		return Vec<3,T>(
+			y*b.z - z*b.y,
+			z*b.x - x*b.z,
+			x*b.y - y*b.x
+		);
+	}
+};
 template<class T> struct VecElems<4,T>{ T x,y,z,w; };
 
 
