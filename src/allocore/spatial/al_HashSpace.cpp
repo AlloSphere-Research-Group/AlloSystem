@@ -51,11 +51,11 @@ HashSpace :: HashSpace(uint32_t resolution, uint32_t numObjects)
 	
 	// now pack the shell indices into a sorted list
 	// and store in a secondary list the offsets per distance
-	for (int d=0; d<mMaxHalfD2; d++) {
+	for (unsigned d=0; d<mMaxHalfD2; d++) {
 		std::vector<uint32_t>& shell = shells[d];
 		if (!shell.empty()) {
 			mDistanceToVoxelIndices[d] = mVoxelIndices.size();
-			for (int j=0; j<shell.size(); j++) {
+			for (unsigned j=0; j<shell.size(); j++) {
 				mVoxelIndices.push_back(shell[j]);
 			}
 		} else {
