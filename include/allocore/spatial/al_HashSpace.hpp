@@ -222,7 +222,7 @@ inline int HashSpace::Query :: query(const HashSpace& space, Vec3d center, doubl
 	uint32_t offset = space.hash(center);
 	double minr2 = minRadius*minRadius;
 	double maxr2 = maxRadius*maxRadius;
-	uint32_t iminr2 = al::max(0., minr2-1.);
+	uint32_t iminr2 = al::max(uint32_t(0), uint32_t((minRadius-1)*(minRadius-1)));
 	uint32_t imaxr2 = al::min(space.mMaxHalfD2, uint32_t((maxRadius+1)*(maxRadius+1)));
 	if (iminr2 < imaxr2) { 
 		uint32_t cellstart = space.mDistanceToVoxelIndices[iminr2];

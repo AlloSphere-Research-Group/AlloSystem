@@ -13,7 +13,7 @@ Window win;
 class World : public WindowEventHandler, public Drawable {
 public:
 	World() 
-	:	space(5, 1000), query(1000)
+	:	space(6, 10000), query(10000)
 	{
 		WindowEventHandler& h = *this;
 		win.add(h);
@@ -23,7 +23,7 @@ public:
 			space.move(i, 
 				space.dim()*rng.uniform(),
 				space.dim()*rng.uniform(),
-				0//hashspace.dim()*rng.uniform()
+				0 //space.dim()*rng.uniform()
 			);
 		}
 	}
@@ -43,14 +43,15 @@ public:
 		gl.begin(gl.POINTS);
 		for (unsigned i=0; i<space.numObjects(); i++) {
 			HashSpace::Object& o =  space.object(i);
-			gl.color(1, 0, 0);
-			gl.vertex(o.pos);
 			
 			Vec3d newpos = o.pos;
 			for (int j=0; j<2; j++) {
-				newpos[j] = al::clip(o.pos[j] + 0.01 * rng.uniformS(), (double)space.dim(), 0.);
+				newpos[j] = al::clip(o.pos[j] + 0.1 * rng.uniformS(), (double)space.dim(), 0.);
 			}
 			space.move(i, newpos);
+			
+			gl.color(1, 0, 0);
+			gl.vertex(o.pos);
 		}
 		gl.color(1, 1, 0);
 		gl.vertex(center);
