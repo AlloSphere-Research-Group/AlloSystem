@@ -70,17 +70,17 @@ HashSpace :: HashSpace(uint32_t resolution, uint32_t numObjects)
 	mDistanceToVoxelIndices[mMaxHalfD2] = mVoxelIndices.size();
 	
 //	// dump the lists:
-//	uint32_t offset = hash(-2, -4, -11);
+//	uint32_t offset = hash(0, 0, 0);
 //	printf("offset %d\n", offset);
 //	Vec3i p = unhash(offset); p.print();
 //	for (unsigned d=1; d<mDistanceToVoxelIndices.size(); d++) {
-//		printf("=== shell (squared distance) %d .. %d ===\n", d-1, d);
 //		uint32_t cellstart = mDistanceToVoxelIndices[d-1];
 //		uint32_t cellend = mDistanceToVoxelIndices[d];
+//		printf("=== shell (squared distance) %d .. %d (%d .. %d) ===\n", d-1, d, cellstart, cellend);
 //		for (uint32_t j=cellstart; j<cellend; j++) {
 //			uint32_t voxel = (offset + mVoxelIndices[j]) & mWrap3;
 //			Vec3i p = unhash(voxel);
-//			p.print();
+//			//p.print();
 //		}
 //	}
 }

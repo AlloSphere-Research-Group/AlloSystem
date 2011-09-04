@@ -35,6 +35,8 @@
 	File description:
 	HashSpace is a way to detect object collisions using a voxel grid
 	The grid has a given resolution (no. voxel cells per side)
+	
+	TODO: non-toroidal version.
 
 	File author(s):
 	Graham Wakefield, 2011, grrrwaaa@gmail.com
@@ -49,12 +51,15 @@ public:
 	static uint32_t invalidHash() { return UINT_MAX; }
 	
 	struct Object {
-		Object() : hash(invalidHash()), next(NULL), prev(NULL) {}
-		
-		Vec3d pos;
-		uint32_t hash;
-		Object * next;
-		Object * prev;
+		Object() : hash(invalidHash()), next(NULL), prev(NULL), userdata(0) {}
+			
+		Vec3d pos;		
+		uint32_t hash;	///< which voxel ID it belongs to (or invalidHash())
+		Object * next, * prev;	///< neighbors in the same voxel
+		union {			// a way to attach user-defined payloads:
+			uint32_t id;
+			void * userdata;
+		};
 	};
 
 	struct Voxel {
@@ -76,18 +81,20 @@ public:
 		typedef std::vector<HashSpace::Object *> Vector;
 		typedef Vector::iterator Iterator;
 	
-		Query(uint32_t maxResults=0) 
+		Query(uint32_t maxResults=128) 
 		:	mMaxResults(maxResults),
 			mMinR2(0), mMaxR2(0),
 			mCellStart(0), mCellEnd(1)
 		{
-			if (maxResults) mObjects.reserve(maxResults);
+			mObjects.reserve(maxResults);
 		}
 	
+		/// get the neighbors within maxRadius (and further than minRadius if given)
 		// the maximum permissible value of radius is space.mDimHalf
 		// if int(inner^2) == int(outer^2), only 1 shell will be queried.
-		// TODO: non-toroidal version.
-		int query(const HashSpace& space, const Vec3d center, double maxRadius, double minRadius=0.);
+		int operator()(const HashSpace& space, const Vec3d center, double maxRadius, double minRadius=0.);
+		/// just get the nearest N neighbors (where N==maxResults)
+		int operator()(const HashSpace& space, Vec3d center);
 		
 		void clear() { mObjects.clear(); }
 		
@@ -112,8 +119,6 @@ public:
 	
 	int query(Vec3d center, double innerRadius, double outerRadius, std::vector<Object *>& results, int& maxresults);
 	
-	void rebuild(int numObjects);
-	
 	inline void move(uint32_t objectId, double x, double y, double z) { move(objectId, Vec3d(x,y,z)); }
 	inline void move(uint32_t objectId, Vec3d pos);
 	
@@ -131,6 +136,8 @@ public:
 	inline Vec3i unhash(uint32_t h) const { return Vec3i(unhashx(h), unhashy(h), unhashz(h)); }	
 	
 	Object& object(uint32_t i) { return mObjects[i]; }
+	
+	void numObjects(int numObjects);
 	uint32_t numObjects() const { return mObjects.size(); }
 	
 	uint32_t dim() const { return mDim; }
@@ -212,13 +219,16 @@ inline void HashSpace::Voxel :: remove(Object * o) {
 	// leave the object clean:
 	o->prev = o->next = NULL;
 }
+
+inline int HashSpace::Query :: operator()(const HashSpace& space, Vec3d center) {
+	return (*this)(space, center, space.maxRadius());
+}
 	
 // the maximum permissible value of radius is mDimHalf
 // if int(inner^2) == int(outer^2), only 1 shell will be queried.
 // TODO: non-toroidal version.
-inline int HashSpace::Query :: query(const HashSpace& space, Vec3d center, double maxRadius, double minRadius) {
+inline int HashSpace::Query :: operator()(const HashSpace& space, Vec3d center, double maxRadius, double minRadius) {
 	unsigned nres = 0;
-	uint32_t dim = space.dim();
 	uint32_t offset = space.hash(center);
 	double minr2 = minRadius*minRadius;
 	double maxr2 = maxRadius*maxRadius;
@@ -253,7 +263,7 @@ inline int HashSpace::Query :: query(const HashSpace& space, Vec3d center, doubl
 	return nres;
 }
 	
-inline void HashSpace :: rebuild(int numObjects) {
+inline void HashSpace :: numObjects(int numObjects) {
 	mObjects.clear();
 	mObjects.resize(numObjects);
 	// clear all voxels:
