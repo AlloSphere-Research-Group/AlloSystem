@@ -13,22 +13,16 @@ Window win;
 class World : public WindowEventHandler, public Drawable {
 public:
 	World() 
-	:	hashspace(5, 100)
+	:	space(5, 1000), query(1000)
 	{
-		printf("hi view\n");
-		
 		WindowEventHandler& h = *this;
-		
 		win.add(h);
 		
-		// create objects:
-		hashspace.rebuild(1000);
-		
 		// initialize each with random position
-		for (unsigned i=0; i<hashspace.numObjects(); i++) {
-			hashspace.hash(i, 
-				hashspace.dim()*rng.uniform(),
-				hashspace.dim()*rng.uniform(),
+		for (unsigned i=0; i<space.numObjects(); i++) {
+			space.move(i, 
+				space.dim()*rng.uniform(),
+				space.dim()*rng.uniform(),
 				0//hashspace.dim()*rng.uniform()
 			);
 		}
@@ -36,43 +30,55 @@ public:
 
 	virtual void onDraw(Graphics& gl) {
 		
+		// range of query:
+		double range = fmod(MainLoop::now() * 2., space.maxRadius());
+		double range2 = range/2;
+		
+		// center of query:
+		double p = fmod(MainLoop::now(), space.dim());
+		Vec3d center(p, p, 0);
+		
+		// draw points:
 		gl.pointSize(1);
 		gl.begin(gl.POINTS);
-		gl.color(1, 1, 1);
-		for (unsigned i=0; i<hashspace.numObjects(); i++) {
-			HashSpace::Object& o =  hashspace.object(i);
+		for (unsigned i=0; i<space.numObjects(); i++) {
+			HashSpace::Object& o =  space.object(i);
+			gl.color(1, 0, 0);
 			gl.vertex(o.pos);
+			
 			Vec3d newpos = o.pos;
 			for (int j=0; j<2; j++) {
-				newpos[j] = al::clip(o.pos[j] + 0.01 * rng.uniformS(), (double)hashspace.dim(), 0.);
+				newpos[j] = al::clip(o.pos[j] + 0.01 * rng.uniformS(), (double)space.dim(), 0.);
 			}
-			hashspace.hash(i, newpos);
+			space.move(i, newpos);
 		}
-		
-		double p = fmod(MainLoop::now(), hashspace.dim());
-		double range = 5;
-		Vec3d center(p, p, 0);
-		gl.color(1, 0, 0);
+		gl.color(1, 1, 0);
 		gl.vertex(center);
-		
 		gl.end();
 		
+		// draw region of interest:
 		gl.begin(gl.LINE_LOOP);
 		gl.color(1, 0, 0);
 		for (double a=0; a<M_2PI; a+=0.1) {
 			gl.vertex(center + Vec3d(range*cos(a), range*sin(a), 0));
 		}
 		gl.end();
-			
-		int MAXRESULTS = 100;
-		std::vector<HashSpace::Object *> results;
-		results.reserve(MAXRESULTS);
-		int numresults = hashspace.query(center, 0, range, results, MAXRESULTS);		
-		gl.begin(gl.LINES);
-		gl.color(0, 1, 0);
-		for (int i=0; i<numresults; i++) {
-			gl.vertex(center);
-			gl.vertex(results[i]->pos);
+		gl.begin(gl.LINE_LOOP);
+		gl.color(1, 0, 0);
+		for (double a=0; a<M_2PI; a+=0.1) {
+			gl.vertex(center + Vec3d(range2*cos(a), range2*sin(a), 0));
+		}
+		gl.end();
+		
+		// get neighbors:
+		query.clear();
+		int results = query.query(space, center, range, range2);
+
+		gl.begin(gl.POINTS);
+		gl.pointSize(2.);
+		for (unsigned i=0; i<results; i++) {
+			gl.color(0, 0.5, 0);
+			gl.vertex(query[i]->pos);
 		}
 		gl.end();
 	}
@@ -82,7 +88,7 @@ public:
 	
 		Camera cam;
 		cam.far(200);
-		Pose pose(Vec3d(16, 16, 100));
+		Pose pose(Vec3d(space.maxRadius(), space.maxRadius(), space.dim()*3));
 		Viewport vp(win.width(), win.height());
 		
 		stereo.draw(gl, cam, pose, vp, *(Drawable *)this);
@@ -100,7 +106,8 @@ public:
 	rnd::Random<> rng;
  	Stereographic stereo;
 	
-	HashSpace hashspace;
+	HashSpace space;
+	HashSpace::Query query;
 };
 
 int main(){
