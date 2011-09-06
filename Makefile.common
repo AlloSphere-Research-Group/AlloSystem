@@ -149,27 +149,15 @@ else ifeq ($(PLATFORM), macosx)
 
 	CFLAGS += -isysroot
 
-	ifeq ($(OSX_VERSION), 10_6)
-# commented out, because our support libs are built against 10.5.
-#		CFLAGS += /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6
-		CFLAGS += /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5
+	ifeq ($(OSX_VERSION), 10_7)
+		CFLAGS += /Developer/SDKs/MacOSX10.7.sdk -mmacosx-version-min=10.7
+	else ifeq ($(OSX_VERSION), 10_6)
+		CFLAGS += /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6
 	else ifeq ($(OSX_VERSION), 10_5)
 		CFLAGS += /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5
-#		LDFLAGS += -syslibroot /Developer/SDKs/MacOSX10.5.sdk
 	else ifeq ($(OSX_VERSION), 10_4)
 		CFLAGS += /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
-#		LDFLAGS += -syslibroot /Developer/SDKs/MacOSX10.4u.sdk
 	endif
-
-#	ifeq ($(OSX_VERSION), 10_7)
-#		CFLAGS += /Developer/SDKs/MacOSX10.7.sdk -mmacosx-version-min=10.7
-#	else ifeq ($(OSX_VERSION), 10_6)
-#		CFLAGS += /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6
-#	else ifeq ($(OSX_VERSION), 10_5)
-#		CFLAGS += /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5
-#	else ifeq ($(OSX_VERSION), 10_4)
-#		CFLAGS += /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
-#	endif
 
 	LDFLAGS	+= -lm -lstdc++
 	DLIB_EXT = dylib
