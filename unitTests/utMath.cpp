@@ -182,6 +182,8 @@ int utMath(){
 			assert(c == cross(a,b));
 			assert(c == (a^b));
 
+			assert(c == a.cross(b));
+
 		a = b;
 			assert(a == b);
 	}
