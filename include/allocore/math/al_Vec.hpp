@@ -76,7 +76,7 @@ template<class T> struct VecElems<3,T>{
 	/// methods that only make sense for Vec<3,T>:
 	
 	/// returns cross product of this x b
-	inline Vec<3,T> cross(const Vec<3,T>& b){
+	inline Vec<3,T> cross(const Vec<3,T>& b) const {
 		return Vec<3,T>( y*b.z - z*b.y, z*b.x - x*b.z, x*b.y - y*b.x );
 	}
 };
@@ -824,9 +824,10 @@ inline Vec<N1+N2, T1> concat(const Vec<N1,T1>& a, const Vec<N2,T2>& b){
 /// Sets r to cross product, a x b
 template <class T>
 inline void cross(Vec<3,T>& r, const Vec<3,T>& a, const Vec<3,T>& b){
-	r[0] = a[1]*b[2] - a[2]*b[1];
-	r[1] = a[2]*b[0] - a[0]*b[2];
-	r[2] = a[0]*b[1] - a[1]*b[0];
+//	r[0] = a[1]*b[2] - a[2]*b[1];
+//	r[1] = a[2]*b[0] - a[0]*b[2];
+//	r[2] = a[0]*b[1] - a[1]*b[0];
+	r = a.cross(b);
 }
 
 /// Returns cross product, a x b
