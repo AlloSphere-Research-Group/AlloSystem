@@ -110,7 +110,7 @@ PLATFORM_DIR ?=
 AR 		= ar crs
 INSTALL		= install
 RANLIB		= ranlib
-RM		= rm -df
+RM		= rm -f
 
 # Linux:
 ifeq ($(PLATFORM), linux)

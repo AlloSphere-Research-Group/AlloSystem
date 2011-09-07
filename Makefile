@@ -151,17 +151,17 @@ archive:
 	@echo Compressing...
 	@cd $($@_TMP) && tar -czf ../allocore.tar.gz .
 	@echo Compression complete.
-	@rm -R $($@_TMP)
+	@$(RM) -R $($@_TMP)
 
 
 # Remove build files
 .PHONY: clean
 clean: createFolders
 # Clean only removes object files for now; avoids unintentional removal of user files
-#	@$(RM) -rf $(BUILD_DIR)*
-#	@$(RM) -rf $(TEST_DIR)/$(BUILD_DIR)*
-	@$(RM) -f $(OBJ_DIR)*
-	@$(RM) -f $(TEST_DIR)/$(OBJ_DIR)*
+#	@$(RM) -r $(BUILD_DIR)*
+#	@$(RM) -r $(TEST_DIR)/$(BUILD_DIR)*
+	@$(RM) $(OBJ_DIR)*
+	@$(RM) $(TEST_DIR)/$(OBJ_DIR)*
 	@$(MAKE) -C externals/gamma clean
 	@$(MAKE) -C externals/glv clean
 
