@@ -51,7 +51,7 @@ public:
 	public:
 		virtual ~Handler();
 		virtual void onTick() {}
-		virtual void onQuit() {}
+		virtual void onExit() {}
 	};
 
 	enum Driver {
@@ -114,6 +114,7 @@ public:
 	/// trigger a mainloop step (typically for implementation use only)
 	void tick();
 	
+	/// calls any registerd Handlers' onExit() methods
 	void exit();
 	
 	// used to switch the driver
