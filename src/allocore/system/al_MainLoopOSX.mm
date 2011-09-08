@@ -90,6 +90,4 @@ extern "C" void al_main_native_enter(al_sec interval) {
 	[gClock dealloc];
 }
 
-extern "C" void al_main_native_init() {
-	// nothing to do
-}
+extern "C" void al_main_native_init() {}

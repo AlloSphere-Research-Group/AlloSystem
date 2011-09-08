@@ -41,6 +41,16 @@ extern "C" void al_main_native_init();
 extern "C" void al_main_native_attach(al_sec interval);
 extern "C" void al_main_native_enter(al_sec interval);
 
+#ifdef AL_LINUX
+	extern "C" void al_main_native_attach(al_sec interval) {
+		printf("Linux native loop not yet implemented\n");
+	}
+	extern "C" void al_main_native_enter(al_sec interval) {
+		printf("Linux native loop not yet implemented\n");
+	}
+	extern "C" void al_main_native_init() {}
+#endif
+
 namespace al {
 
 static bool gInitialized = false;
@@ -155,6 +165,8 @@ void Main::start() {
 			}
 		}
 	}
+	// trigger exit handlers:
+	Main::exit();
 }
 
 void Main::stop() {
