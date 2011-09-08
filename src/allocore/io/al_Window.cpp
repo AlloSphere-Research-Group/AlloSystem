@@ -112,7 +112,7 @@ Window& Window::fullScreenToggle(){
 	return *this;
 }
 
-double Window::spfActual() const { return MainLoop::intervalActual(); }
+double Window::spfActual() const { return Main::get().intervalActual(); }
 
 
 Window& Window::insert(InputEventHandler& v, int i){
@@ -191,16 +191,16 @@ Window& Window::remove(WindowEventHandler& v){
 
 
 bool Window::started(){
-	return MainLoop::get().isRunning();
+	return Main::get().isRunning();
 }
 
 void Window::startLoop(){
-	MainLoop::get().start();
+	Main::get().start();
 }
 
 void Window::stopLoop(){
 	Window::destroyAll();
-	MainLoop::get().stop();
+	Main::get().stop();
 }
 
 

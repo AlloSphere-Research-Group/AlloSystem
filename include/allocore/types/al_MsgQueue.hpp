@@ -54,7 +54,7 @@ public:
 	~MsgQueue();
 	
 	// for truly accurate scheduling, always use this as logical time:
-	al_sec now() { return mNow; }
+	al_sec now() const { return mNow; }
 	
 	// trigger registered callbacks
 	void update(al_sec until, bool defer = false);
@@ -63,7 +63,7 @@ public:
 	void clear();
 	
 	// how many messages are scheduled?
-	int len() { return mLen; }
+	int len() const { return mLen; }
 	
 	// template wrappers for multi-argument functions
 	// be sure to cast the send arguments to exactly match the function argument types!

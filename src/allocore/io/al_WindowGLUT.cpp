@@ -43,7 +43,7 @@ public:
 	{
 		resetState();
 		// ensure that GLUT and mainloop exist:
-		MainLoop::get();
+		Main::get();
 	}
 
 	~WindowImpl(){
@@ -188,7 +188,7 @@ public:
 		if (!mScheduled) {
 			mScheduled = true;
 			//printf("window id: %d\n", id());
-			MainLoop::queue().send(0, scheduleDrawStatic, id());
+			Main::get().queue().send(0, scheduleDrawStatic, id());
 		}
 	}
 
@@ -434,10 +434,11 @@ public:
 	}
 
 private:
-	friend class MainLoop;
+	friend class Main;
 
 	// schedule draws of a specific window
 	static void scheduleDrawStatic(al_sec t, int winID) {
+		Main& M = Main::get();
 		WindowImpl *impl = getWindowImpl(winID);
 		// If there is a valid implementation, then draw and schedule next draw...
 		if(impl){
@@ -447,7 +448,7 @@ private:
 				win->doFrameImpl();
 				if(win->fps() > 0) {
 					al_sec next;
-					al_sec rt = MainLoop::realtime();	// what time it really is now (after render)
+					al_sec rt = M.realtime();	// what time it really is now (after render)
 					if (win->asap()) {
 						next = rt;
 					} else {
@@ -457,7 +458,7 @@ private:
 						next = projected;
 						if (rt > projected) next = rt;	// next = MAX(rt,projected)
 					}
-					MainLoop::queue().send(next, scheduleDrawStatic, winID);
+					M.queue().send(next, scheduleDrawStatic, winID);
 					
 					// frame-rate calculation:
 					al_sec per = 1./(next - t);
@@ -518,6 +519,9 @@ void Window::create(
 )
 {
 	if(created()) return;
+	
+	// switch mainloop to GLUT mode:
+	Main::get().driver(Main::GLUT);
 
 	mImpl->mDimPrev.set(0,0,0,0);
 	mImpl->mDimCurr.set(dim.l,dim.t,0,0);
@@ -703,13 +707,6 @@ Window& Window::title(const std::string& v){
 	}
 	return *this;
 }
-
-// moved to al_Window.cpp ...
-//void Window::startLoop(){
-//	MainLoop::get().start();
-////	glutIdleFunc(al_main_tick);
-////	glutMainLoop();
-//}
 
 } // al::
 

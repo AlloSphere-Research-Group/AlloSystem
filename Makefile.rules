@@ -26,13 +26,13 @@ $(OBJ_DIR)%.o: %.cpp
 $(OBJ_DIR)%.o: %.c
 	@echo CC $< $@
 	$(CC) -c $(CFLAGS) $< -o $@ $(DEPFLAGS)
-
--include $(wildcard $(OBJ_DIR)*.dep)
 	
 # Build object file from Obj-C++ source
 $(OBJ_DIR)%.o: %.mm
 	@echo CC $< $@
-	$(CXX) -c $(CFLAGS) $< -o $@$@
+	$(CXX) -c $(CFLAGS) $< -o $@ $(DEPFLAGS)
+
+-include $(wildcard $(OBJ_DIR)*.dep)
 
 all: $(SLIB_PATH)
 

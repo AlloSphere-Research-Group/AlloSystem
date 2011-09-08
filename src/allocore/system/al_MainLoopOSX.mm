@@ -4,7 +4,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include "allocore/system/al_mainloop.h"
+#include "allocore/system/al_mainloop.hpp"
 
 
 /*
@@ -12,7 +12,7 @@
 */
 @interface OSClock : NSObject {
 	NSTimer * timer;
-	al_main_t * main;
+	al::Main * main;
 }
 
 - (id)initWithInterval:(al_sec)ti;
@@ -25,7 +25,7 @@
 
 -(void)tick
 {
-	al_main_tick();
+	main->tick();
 }
 
 - (id)initWithInterval:(al_sec)interval;
@@ -34,18 +34,20 @@
 	
 	if ((self = [super init]))
 	{
-		main = al_main_get();
+		main = &al::Main::get();
 		timer = [NSTimer timerWithTimeInterval:(NSTimeInterval)interval
 									target:self 
 									selector:@selector(tick) 
 									userInfo:nil 
-									repeats:YES];		
+									repeats:YES];	
+									
+		NSRunLoop * runloop = [NSRunLoop currentRunLoop];
 		
 		// attach to the runloop it was created from
 		// keep on going even during modal dialogs, window scrolling etc.
-		[[NSRunLoop currentRunLoop] addTimer:timer forMode:NSEventTrackingRunLoopMode]; 
-		[[NSRunLoop currentRunLoop] addTimer:timer forMode:NSModalPanelRunLoopMode]; 
-		[[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode]; 
+		[runloop addTimer:timer forMode:NSEventTrackingRunLoopMode]; 
+		[runloop addTimer:timer forMode:NSModalPanelRunLoopMode]; 
+		[runloop addTimer:timer forMode:NSDefaultRunLoopMode]; 
 	}
 	[pool release];
 	return self;
@@ -64,33 +66,30 @@
 
 static OSClock * gClock;
 
-/*
-	Main impl
-*/
-#pragma mark Main impl
 
-void al_main_platform_attach(al_sec interval) {
+
+extern "C" void al_main_native_attach(al_sec interval) {
 	if (!gClock) {
 		gClock = [[OSClock alloc] initWithInterval:interval];	
-	} else {
-		// what to do if loop already exists?
 	}
 }
 
-int al_main_platform_enter(al_sec interval) {
+extern "C" void al_main_native_enter(al_sec interval) {
 	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 	// create a new runloop if it doesn't exist:
-	NSRunLoop * rl = [NSRunLoop currentRunLoop];
+	NSRunLoop * runloop = [NSRunLoop currentRunLoop];
 	
-	al_main_t * main = al_main_get();
-	al_main_platform_attach(interval);
+	al::Main& main = al::Main::get();
+	al_main_native_attach(interval);
 	
 	// main loop:
-    while (main->isRunning && [rl runMode: NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:main->interval]]) { /*printf(".");*/ }
+    while (main.isRunning() && [runloop runMode: NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:main.interval()]]) { /*printf(".");*/ }
 	
 	// done
 	[pool release];
 	[gClock dealloc];
-	return 0;
 }
 
+extern "C" void al_main_native_init() {
+	// nothing to do
+}

@@ -1,101 +1,198 @@
-#include "allocore/system/al_MainLoop.h"
 #include "allocore/system/al_MainLoop.hpp"
 #include <stdlib.h>
 #include <assert.h>
+#include <stdio.h>		// snprintf
+#include <stdlib.h>		// exit
 
 
-/*
-	Platform specific implementations
-		(implemented in separate file)
-*/
+// GLUT includes:
+#ifdef AL_OSX
+	#include <OpenGL/OpenGL.h>
+	#include <GLUT/glut.h>
+	#define AL_GRAPHICS_INIT_CONTEXT\
+		/* prevents tearing */ \
+		{	GLint MacHackVBL = 1;\
+			CGLContextObj ctx = CGLGetCurrentContext();\
+			CGLSetParameter(ctx,  kCGLCPSwapInterval, &MacHackVBL); }
+#endif
+#ifdef AL_LINUX
+	#include <GL/glew.h>
+	#include <GL/glut.h>
+
+	#define AL_GRAPHICS_INIT_CONTEXT\
+		{	GLenum err = glewInit();\
+			if (GLEW_OK != err){\
+  				/* Problem: glewInit failed, something is seriously wrong. */\
+  				fprintf(stderr, "GLEW Init Error: %s\n", glewGetErrorString(err));\
+			}\
+		}
+#endif
+#ifdef AL_WIN32
+	#include <windows.h>
+	#include <GL/glut.h>
+
+	#define AL_GRAPHICS_INIT_CONTEXT
+#endif
 
 
-/*
-	If there is anything that is a singleton, it's the main loop!
-*/	
-static al_main_t * g_main;
+// native bindings:
 
-/*!
-	Main initialization and termination
-*/
-static int al_main_quit();
+extern "C" void al_main_native_init();
+extern "C" void al_main_native_attach(al_sec interval);
+extern "C" void al_main_native_enter(al_sec interval);
 
-#pragma mark C API
+namespace al {
 
-al_main_t * al_main_get() {
-	if (g_main == 0) {
-		g_main = (al_main_t *)malloc(sizeof(al_main_t));
-		assert(g_main != 0); /* if this fails, then your OS is probably going down */
-		g_main->t0 = al_time_nsec();
-		g_main->isRunning = 0;
-		g_main->userdata = NULL;
-		g_main->interval = 1;
-		g_main->tickhandler = NULL;
-		g_main->quithandler = NULL;
-	}
-	return g_main;
+static bool gInitialized = false;
+
+////////////////////////////////////////////////////////////////
+// GLUT impl:
+static void mainGLUTTimerFunc(int id);
+static void mainGLUTExitFunc();
+
+static void mainGLUTInit() {
+	int   argc   = 1;
+	char name[] = {'a','l','l','o'};
+	char *argv[] = {name, NULL};
+	glutInit(&argc,argv);
+	
+	atexit(mainGLUTExitFunc);
 }
 
-int al_main_quit() {
-	if (g_main != 0) {
-		free(g_main);
-		g_main = 0;
-	}
-	return 0;
+static void mainGLUTExitFunc(){
+	// call any exit handlers:
+	Main::get().exit();
 }
 
-int al_main_enter(al_sec interval, main_tick_handler tickhandler, void * userdata, main_quit_handler quithandler) {
-	al_main_get();	
-	if (!g_main->isRunning) {
-		g_main->interval = interval;
-		g_main->isRunning = 1;
-		g_main->tickhandler = tickhandler;
-		g_main->quithandler = quithandler;
-		g_main->userdata = userdata;
-		return al_main_platform_enter(interval);
-	}
-	return 0;
+static void mainGLUTTimerFunc(int id) { 
+	Main& M = Main::get();
+	M.tick();
+	if (M.isRunning()) {
+        // schedule another tick:
+        glutTimerFunc((unsigned int)(1000.0*M.interval()), mainGLUTTimerFunc, 0);
+    }
 }
 
-void al_main_exit() {
-	al_main_get();
-	if (g_main->isRunning) {
-		g_main->isRunning = 0;
-		if (g_main->quithandler)
-			g_main->quithandler(g_main->userdata);
-	}
+////////////////////////////////////////////////////////////////
+
+Main::Handler :: ~Handler() {
+	Main::get().remove(*this);
 }
 
-void al_main_attach(al_sec interval, main_tick_handler tickhandler, void * userdata, main_quit_handler quithandler) {
-	al_main_get();	
-	if (!g_main->isRunning) {
-		g_main->interval = interval;
-		g_main->isRunning = 1;
-		g_main->tickhandler = tickhandler;
-		g_main->quithandler = quithandler;
-		g_main->userdata = userdata;
-		al_main_platform_attach(interval);
-	}
-}
+////////////////////////////////////////////////////////////////
 
-void al_main_register(main_tick_handler tickhandler, void * userdata, main_quit_handler quithandler) {
-	al_main_get();
-	if (!g_main->isRunning) {
-		g_main->isRunning = 1;
-		g_main->tickhandler = tickhandler;
+Main::Main() 
+:	mT0(al_time()), mT1(0), 
+	mInterval(0.01), 
+	mIntervalActual(0.01),
+	mLogicalTime(0), 
+	mCPU(0),
+	mDriver(Main::SLEEP),
+	mActive(false)
+{
+	if (!gInitialized) {
 		
-		g_main->quithandler = quithandler;
-		g_main->userdata = userdata;
+		mainGLUTInit();
+	
+		al_main_native_init();
+	
+		gInitialized = true;
 	}
 }
 
-void al_main_tick() {
-	g_main->logicaltime = al_time_nsec() - g_main->t0;
-	// pass control to user-specified mainloop:
-	(g_main->tickhandler)(g_main->logicaltime, g_main->userdata);
+void Main::tick() {
+	al_sec t1 = al_time();
+	mLogicalTime = t1 - mT0;
+	
+	mIntervalActual = t1 - mT1;
+	mT1 = t1;
+	
+	// trigger any scheduled functions:
+	mQueue.update(mLogicalTime);
+	
+	// call tick handlers... 
+	std::vector<Handler *>::iterator it = mHandlers.begin(); 
+	bool active = true; 
+	while(it != mHandlers.end()){
+		(*it)->onQuit(); 
+		++it; 
+	}
+	
+	// measure CPU usage:
+	al_sec t2 = al_time();
+	al_sec used = (t2-t1)/interval();
+	// running average:
+	mCPU += 0.1 * (used - mCPU);
 }
 
-al_nsec al_main_time_nsec() {
-	return g_main->logicaltime;
+Main& Main::get() {
+	static Main main;
+	return main;
 }
+
+void Main::start() {
+	if (!mActive) {
+		mActive = true;
+		
+		while (mActive) {
+			// check inside sleep loop, so that we can smoothly migrate
+			// from a sleep-loop to a GLUT or NATIVE loop:
+			switch (mDriver) {
+				case Main::GLUT:
+					// start the GLUT mainloop
+					glutTimerFunc((unsigned int)(1000.0*interval()), mainGLUTTimerFunc, 0);
+					glutMainLoop();
+					break;
+				case Main::NATIVE:
+					al_main_native_enter(interval());
+					break;
+
+				default:
+					// sleep version for non-GLUT:
+					tick();				
+					al_sleep(interval());
+					break;
+			}
+		}
+	}
+}
+
+void Main::stop() {
+	if (mActive) {
+		mActive = false;
+		
+		// GLUT can't be stopped; the only option is a hard exit. Yeah, it sucks that bad.
+		::exit(0); // Note: this will call our function registered with atexit()
+	}
+}
+
+void Main::exit() {
+	// call exit handlers... 
+	std::vector<Handler *>::iterator it = mHandlers.begin(); 
+	bool active = true; 
+	while(it != mHandlers.end()){
+		(*it)->onQuit(); 
+		++it; 
+	}
+}
+
+
+Main& Main::add(Main::Handler& v) {
+	if (std::find(mHandlers.begin(), mHandlers.end(), &v) != mHandlers.end()) {
+		mHandlers.push_back(&v);
+	}
+	return *this;
+}
+
+Main& Main::remove(Main::Handler& v) {
+	std::vector<Handler *>::iterator it = std::find(mHandlers.begin(), mHandlers.end(), &v);
+	if (it != mHandlers.end()) {
+		mHandlers.erase(it);
+	}
+	return *this;
+}
+
+
+} //al::
+
 
