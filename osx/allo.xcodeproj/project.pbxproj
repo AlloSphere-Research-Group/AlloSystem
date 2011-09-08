@@ -760,6 +760,7 @@
 		369DDF6612B6C8C000F75D2A /* libluajit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libluajit.a; sourceTree = "<group>"; };
 		369DDF6712B6C8C000F75D2A /* libsndfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsndfile.a; sourceTree = "<group>"; };
 		369DDF6D12B6C90E00F75D2A /* utAsset.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utAsset.cpp; sourceTree = "<group>"; };
+		36A2AE4F141850A800479687 /* al_TextureGL.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_TextureGL.hpp; sourceTree = "<group>"; };
 		36B4125210EFF7B8007B16D0 /* al_Array.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Array.h; sourceTree = "<group>"; };
 		36B4125310EFF7B8007B16D0 /* al_Array.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Array.hpp; sourceTree = "<group>"; };
 		36B4127310EFF864007B16D0 /* apr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = apr.h; sourceTree = "<group>"; };
@@ -2891,6 +2892,7 @@
 				36CE482F1394378000DF6E6F /* al_OpenGL.hpp */,
 				366E780A1405C75B0010B21A /* al_OverlayTextGL.hpp */,
 				366E780B1405C75B0010B21A /* al_ShotList.hpp */,
+				36A2AE4F141850A800479687 /* al_TextureGL.hpp */,
 				36F3A43312FCCF7A004BC82F /* al_World.hpp */,
 			);
 			name = include;

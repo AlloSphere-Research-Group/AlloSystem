@@ -128,7 +128,6 @@ void Main::tick() {
 	
 	// call tick handlers... 
 	std::vector<Handler *>::iterator it = mHandlers.begin(); 
-	bool active = true; 
 	while(it != mHandlers.end()){
 		(*it)->onTick(); 
 		++it; 
@@ -189,7 +188,6 @@ void Main::stop() {
 void Main::exit() {
 	// call exit handlers... 
 	std::vector<Handler *>::iterator it = mHandlers.begin(); 
-	bool active = true; 
 	while(it != mHandlers.end()){
 		(*it)->onExit(); 
 		++it; 

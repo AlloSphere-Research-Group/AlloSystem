@@ -44,6 +44,9 @@
 	File author(s):
 	Graham Wakefield, 2011, grrrwaaa@gmail.com
 	Wesley Smith, 2010, wesley.hoke@gmail.com
+	
+	Inspired by this paper:
+	http://nicolas.brodu.numerimoire.net/common/recherche/publications/QuerySphereIndexing.pdf
 */
 
 namespace al {
