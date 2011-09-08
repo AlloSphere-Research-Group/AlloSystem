@@ -70,6 +70,7 @@ static void mainGLUTInit() {
 }
 
 static void mainGLUTExitFunc(){
+
 	// call any exit handlers:
 	Main::get().exit();
 }
@@ -87,6 +88,7 @@ static void mainGLUTTimerFunc(int id) {
 
 Main::Handler :: ~Handler() {
 	Main::get().remove(*this);
+	onExit();
 }
 
 ////////////////////////////////////////////////////////////////
@@ -109,6 +111,10 @@ Main::Main()
 		gInitialized = true;
 	}
 }
+
+Main::~Main() {
+	Main::exit();
+}	
 
 void Main::tick() {
 	al_sec t1 = al_time();
@@ -173,8 +179,10 @@ void Main::stop() {
 	if (mActive) {
 		mActive = false;
 		
-		// GLUT can't be stopped; the only option is a hard exit. Yeah, it sucks that bad.
-		::exit(0); // Note: this will call our function registered with atexit()
+		if (mDriver == GLUT) {
+			// GLUT can't be stopped; the only option is a hard exit. Yeah, it sucks that bad.
+			::exit(0); // Note: this will call our function registered with atexit()
+		}
 	}
 }
 
@@ -190,7 +198,7 @@ void Main::exit() {
 
 
 Main& Main::add(Main::Handler& v) {
-	if (std::find(mHandlers.begin(), mHandlers.end(), &v) != mHandlers.end()) {
+	if (std::find(mHandlers.begin(), mHandlers.end(), &v) == mHandlers.end()) {
 		mHandlers.push_back(&v);
 	}
 	return *this;

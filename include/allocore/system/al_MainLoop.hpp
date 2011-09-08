@@ -129,6 +129,7 @@ public:
 private:
 	// private constructor for singleton pattern
 	Main();
+	~Main();
 	
 	al_sec mT0, mT1;
 	al_sec mInterval, mIntervalActual;
