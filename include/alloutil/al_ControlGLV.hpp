@@ -148,7 +148,7 @@ struct PoseModel : public glv::Model{
 
 	virtual const glv::Data& getData(glv::Data& d) const {
 		d.resize(glv::Data::FLOAT, 7);
-		d.assignFromArray(pose.pos().elems, 3);
+		d.assignFromArray(pose.pos().elems(), 3);
 		d.assignFromArray(&pose.quat()[0], 4, 1, 3);
 //		double a[4];
 //		pose.quat().toAxisAngle(a[0], a[1],a[2],a[3]);
