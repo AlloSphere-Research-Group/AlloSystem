@@ -169,9 +169,11 @@ void Main::start() {
 					break;
 			}
 		}
+		
+		// if we got here, then the mainloop was started, and then stopped:
+		// trigger exit handlers:
+		Main::exit();
 	}
-	// trigger exit handlers:
-	Main::exit();
 }
 
 void Main::stop() {
