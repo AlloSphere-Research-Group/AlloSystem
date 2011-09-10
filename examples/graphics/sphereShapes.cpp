@@ -82,8 +82,9 @@ struct MyWindow : public Window, public Drawable {
 	bool vertexLight;
 };
 
+MyWindow win;
+
 int main(){
-	MyWindow win;
     win.create(Window::Dim(800, 600), "Allocore Example: Sphere Shapes");
 	MainLoop::start();
 	return 0;

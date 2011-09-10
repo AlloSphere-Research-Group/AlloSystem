@@ -78,8 +78,9 @@ struct MyWindow : Window{
 	Mesh data;
 };
 
+MyWindow win;
+
 int main(){
-	MyWindow win;
 	win.add(new StandardWindowKeyControls);
 	win.create();
 	MainLoop::start();

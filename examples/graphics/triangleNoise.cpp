@@ -41,9 +41,10 @@ struct MyWindow : Window{
 	}
 };
 
+MyWindow win1;
+
 int main(){
 
-	MyWindow win1;
 
 	win1.add(new StandardWindowKeyControls);
 

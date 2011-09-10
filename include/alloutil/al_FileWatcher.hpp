@@ -72,8 +72,12 @@ public:
 	virtual void onFileWatch(File& file) = 0;
 	
 	/// trigger notifications from modified files:
+	/// (affects only this FileWatcher):
+	void poll();
+	
+	/// trigger notifications from modified files:
 	/// (global, affecting all FileWatchers)
-	static void poll();
+	static void pollAll();
 	
 	/// start/stop automatic background polling (using MainLoop):
 	/// use period <= 0 to stop polling

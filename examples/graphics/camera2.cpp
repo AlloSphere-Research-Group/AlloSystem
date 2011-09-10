@@ -81,8 +81,9 @@ struct MyWindow : public Window, public Drawable {
 	Mesh shapes;
 };
 
+MyWindow win1;
+	
 int main(){
-	MyWindow win1;
     
     win1.create(Window::Dim(800, 600), "Allocore Example: Camera");
 

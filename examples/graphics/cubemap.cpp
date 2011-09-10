@@ -11,7 +11,6 @@ static Mesh mesh, grid, cube;
 static Camera cam;
 static Nav nav;
 static CubeMapFBO cubeFBO;
-
 unsigned drawMode = 1;
 
 struct MyWindow : Window, public Drawable{
@@ -87,8 +86,10 @@ struct MyWindow : Window, public Drawable{
 	}
 };
 
+MyWindow win;
 
 int main(){
+
 	double world_radius = 50;
 	
 	nav.smooth(0.8);
@@ -134,12 +135,12 @@ int main(){
 	addCube(cube);
 	cube.generateNormals();
 	
-	MyWindow win;
 	win.create(Window::Dim(100, 0, 640, 480), "Cube Map FBO Example", 60);
 	win.displayMode(win.displayMode() | DisplayMode::StereoBuf);
 	win.add(new StandardWindowKeyControls);
 	win.add(new NavInputControl(nav));
 
 	MainLoop::start();
+	
     return 0;
 }

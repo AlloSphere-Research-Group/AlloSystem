@@ -62,8 +62,9 @@ struct MyWindow : Window{
 	}
 };
 
+MyWindow win;
+
 int main(){
-	MyWindow win;
 
 	win.add(new StandardWindowKeyControls);
 	win.create(Window::Dim(800, 600));

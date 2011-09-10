@@ -56,6 +56,7 @@ struct MyWindow : Window{
 	double angle;
 };
 
+MyWindow win1;
 
 int main(){
 
@@ -82,7 +83,6 @@ int main(){
 	shapes.decompress();
 	shapes.generateNormals();
 
-	MyWindow win1;
 
 	win1.add(new StandardWindowKeyControls);
 

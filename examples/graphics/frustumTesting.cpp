@@ -49,17 +49,15 @@ public:
 
 };
 
+World w("Frustum Testing");
+ViewpointWindow win(0,0, 600,400, w.name());
+Viewpoint vp;		
+MyActor myActor;
 
 int main(){
-	World w;
-	w.name("Frustum Testing");
 	w.camera().near(10).far(25);
 
-	ViewpointWindow win(0,0, 600,400, w.name());
-	Viewpoint vp;
 	vp.parentTransform(w.nav());
-	MyActor myActor;
-
 	win.add(vp);
 	w.add(win, true);
 	w.add(myActor);
@@ -67,4 +65,5 @@ int main(){
 	w.start();
 	return 0;
 }
+
 

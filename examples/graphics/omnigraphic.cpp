@@ -60,6 +60,7 @@ struct MyWindow : Window, public Drawable{
 	}
 };
 
+MyWindow win;
 
 int main(){
 
@@ -106,7 +107,6 @@ int main(){
 	}}
 	grid.scale(world_radius);
 	
-	MyWindow win;
 	win.create(Window::Dim(100, 0, 640, 480), "Omnigraphic Example", 60);
 	
 	win.displayMode(win.displayMode() | DisplayMode::StereoBuf);

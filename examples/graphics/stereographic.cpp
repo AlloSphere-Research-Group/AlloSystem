@@ -37,6 +37,7 @@ struct MyWindow : Window, public Drawable{
 	}
 };
 
+MyWindow win;
 
 int main(){
 
@@ -64,7 +65,6 @@ int main(){
 		}
 	}
 
-	MyWindow win;
 	win.create(Window::Dim(100, 0, 640, 480), "Stereographic Example", 60);
 	
 	win.displayMode(win.displayMode() | DisplayMode::StereoBuf);

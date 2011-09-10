@@ -86,6 +86,10 @@ public:
 	typedef std::pair<std::string, bool> searchpath;
 	
 	SearchPaths() {}
+	SearchPaths(std::string file) {
+		FilePath fp(file);
+		addAppPaths(fp.path());
+	}
 	SearchPaths(int argc, char * const argv[], bool recursive=true) { addAppPaths(argc,argv,recursive); }
 	SearchPaths(const SearchPaths& cpy) 
 	:	mSearchPaths(cpy.mSearchPaths),
@@ -105,12 +109,12 @@ public:
 	/// can pass in argv from the main() function if desired.
 	void addAppPaths(int argc, char * const argv[], bool recursive = true);
 	void addAppPaths(int argc, const char ** argv, bool recursive = true);
+	void addAppPaths(std::string path, bool recursive = true);
 	void addAppPaths(bool recursive = true);
 
 	const std::string& appPath() const { return mAppPath; }
-
-	/// todo?
-	//void addResourcePath();
+	
+	void print();
 
 protected:	
 	std::list<searchpath> mSearchPaths;
@@ -185,6 +189,9 @@ public:
 
 	/// Ensure path ends with the proper delimiter
 	static std::string conformPath(const std::string& src);
+	
+	/// Convert relative paths to absolute paths
+	static std::string absolutePath(const std::string& src);
 
 	/// Extracts the directory-part of file name.
 	
@@ -258,6 +265,12 @@ inline std::string File::conformPath(const std::string& src) {
 	return path;
 }
 
+inline std::string File::absolutePath(const std::string& src) {
+	char temp[PATH_MAX];
+	char * result = realpath(src.c_str(), temp);
+	return result ? result : "";
+}
+
 inline std::string File::directory(const std::string& src){
 	size_t pos = src.find_last_of(AL_FILE_DELIMITER);
 	if(std::string::npos != pos){
@@ -283,16 +296,17 @@ inline bool File::searchBack(std::string& prefixPath, const std::string& matchPa
 }
 
 
-
+inline void SearchPaths::addAppPaths(std::string path, bool recursive) {
+	std::string filepath = File::directory(path);
+	mAppPath = filepath;
+	addSearchPath(filepath, recursive);
+}
 
 
 inline void SearchPaths::addAppPaths(int argc, char * const argv[], bool recursive) {
 	addAppPaths(recursive);
 	if (argc > 0) {
-		//char path[4096];
-		std::string filepath = File::directory(argv[0]);
-		mAppPath = filepath;
-		addSearchPath(filepath, recursive);
+		addAppPaths(File::directory(argv[0]), recursive);
 	}
 }
 
@@ -318,6 +332,15 @@ inline void SearchPaths::addSearchPath(const std::string& src, bool recursive) {
 	}
 //	printf("adding path %s\n", path.data());
 	mSearchPaths.push_front(searchpath(path, recursive));
+}
+
+inline void SearchPaths::print() {
+	printf("SearchPath %p appPath: %s\n", this, appPath().c_str());
+	std::list<searchpath>::iterator it = mSearchPaths.begin();
+	while (it != mSearchPaths.end()) {
+		SearchPaths::searchpath sp = (*it++);
+		printf("SearchPath %p path: %s (recursive: %d)\n", this, sp.first.c_str(), sp.second);
+	}
 }
 
 } // al::

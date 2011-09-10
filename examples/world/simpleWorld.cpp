@@ -17,18 +17,17 @@ public:
 
 };
 
+World w("Simple World");
+ViewpointWindow win(0,0, 600,400, w.name());
+Viewpoint vp;
+MyActor myActor;
 
 int main(){
-	World w;
-	w.name("Simple World");
 	w.camera().near(10).far(25);
 	w.nav().quat().fromAxisAngle(0, 0,0,1);
 
-	ViewpointWindow win(0,0, 600,400, w.name());
-	Viewpoint vp;
 	vp.parentTransform(w.nav());
-	MyActor myActor;
-
+	
 	win.add(vp);
 	w.add(win, true);
 	w.add(myActor);
@@ -36,4 +35,3 @@ int main(){
 	w.start();
 	return 0;
 }
-

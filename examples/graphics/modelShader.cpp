@@ -146,6 +146,8 @@ struct MyWindow : Window{
 	}
 };
 
+MyWindow win1;
+
 int main (int argc, char * const argv[]) {
 	searchpaths.addAppPaths(argc, argv);
 	searchpaths.addSearchPath(searchpaths.appPath() + "../../share");
@@ -178,7 +180,6 @@ int main (int argc, char * const argv[]) {
 	tex.fromArray(&img.array());
 	tex.target(Texture::TEXTURE_2D);
 	
-	MyWindow win1;
 	win1.add(new StandardWindowKeyControls);
 	win1.create(Window::Dim(640, 480));
 	

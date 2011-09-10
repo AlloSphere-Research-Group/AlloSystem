@@ -6,6 +6,7 @@
 #else
 #include "apr-1/apr_general.h"
 #include "apr-1/apr_thread_proc.h"
+#include "apr-1/apr_portable.h"
 #endif
 
 namespace al {
@@ -53,6 +54,7 @@ struct Thread::Impl : public ImplAPR {
 };
 */
 
+#pragma mark Thread::Impl
 
 struct Thread::Impl : public ImplAPR {
 	Impl()
@@ -75,7 +77,7 @@ struct Thread::Impl : public ImplAPR {
 		mThread = 0;
 		return rv == APR_SUCCESS;
 	}
-
+	
 	apr_thread_t * mThread;
     apr_threadattr_t * mThreadAttr;
 	ThreadFunction * mFunc;
@@ -117,6 +119,10 @@ bool Thread::start(ThreadFunction& func){
 
 bool Thread::join(){
 	return mImpl->join();
+}
+
+void * Thread::current() {
+	return apr_os_thread_current();
 }
 
 //Thread::Thread()

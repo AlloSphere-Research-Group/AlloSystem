@@ -27,6 +27,24 @@ struct WatchedFile {
 		}
 	}
 	
+	void test(FileWatcher * w) {	
+		if (File::exists(mPath)) {
+			File f(mPath, "r", false);
+			al_sec mod = f.modified();
+			if(mod > mModified) {
+				f.open();
+				WatcherList::iterator iter = mWatchers.begin();
+				while (iter != mWatchers.end()) {
+					FileWatcher * fw = *iter++;
+					if (w == fw) 
+						w->onFileWatch(f);
+				}
+				f.close();
+				mModified = f.modified();
+			}
+		}
+	}
+	
 	void test() {	
 		if (File::exists(mPath)) {
 			File f(mPath, "r", false);
@@ -57,8 +75,16 @@ typedef std::map<std::string, WatchedFile > WatcherMap;
 WatcherMap gWatchedFiles;
 al_sec gPollPeriod;
 
-
 void FileWatcher::poll() {
+	// check each file:
+	WatcherMap::iterator it = gWatchedFiles.begin();
+	while (it != gWatchedFiles.end()) {
+		it->second.test(this);
+		it++;
+	}
+}
+
+void FileWatcher::pollAll() {
 	// check each file:
 	WatcherMap::iterator it = gWatchedFiles.begin();
 	while (it != gWatchedFiles.end()) {
@@ -68,7 +94,7 @@ void FileWatcher::poll() {
 }
 
 static void autopoll(al_sec t) {
-	FileWatcher::poll();
+	FileWatcher::pollAll();
 	if (gPollPeriod > 0.) MainLoop::queue().send(t+gPollPeriod, autopoll);
 }
 

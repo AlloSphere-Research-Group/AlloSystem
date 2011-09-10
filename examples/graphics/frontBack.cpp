@@ -33,12 +33,14 @@ public:
 	}
 };
 
+World w("Front and Back Views");
+Viewpoint vpF, vpB;
+MyActor myActor;
+ViewpointWindow win(0,0, 800,600, w.name());
 
 int main(){
-	World w("Front and Back Views");
 
 	// Configure the front and back viewpoints
-	Viewpoint vpF, vpB;
 	vpF.parentTransform(w.nav());
 	vpB.parentTransform(w.nav());
 
@@ -46,9 +48,6 @@ int main(){
 	vpB.stretch(1, 0.5).anchor(0, 0.0);
 	vpB.transform().quat().fromAxisAngle(M_PI, 0,1,0);
 	
-	MyActor myActor;
-	ViewpointWindow win(0,0, 800,600, w.name());
-
 	win.add(vpF).add(vpB);
 	w.add(win, true);
 	

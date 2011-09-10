@@ -38,7 +38,7 @@
 namespace al{
 
 
-/// Function object used by thread
+/// Function object interface used by thread
 struct ThreadFunction{
 	virtual ~ThreadFunction(){}
 
@@ -97,6 +97,10 @@ public:
 	///	terminated.  A \e true return value signifies successful termination. 
 	///	A \e false return value indicates a problem with the wait call.
 	bool join();
+	
+	/// return pointer to current OS thread object
+	/// e.g. if using pthreads internally, will return the pthread_t
+	static void * current();
 
 protected:
 	class Impl;

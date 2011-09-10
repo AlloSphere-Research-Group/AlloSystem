@@ -1,9 +1,10 @@
 #include "allocore/system/al_MainLoop.hpp"
+#include "allocore/system/al_Thread.hpp"
 #include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>		// snprintf
 #include <stdlib.h>		// exit
-
+#include <map>
 
 // GLUT includes:
 #ifdef AL_OSX
@@ -140,12 +141,21 @@ void Main::tick() {
 	mCPU += 0.1 * (used - mCPU);
 }
 
-Main& Main::get() {
-	static Main main;
-	return main;
+Main& Main::get() {	
+	static Main gMain;
+	return gMain;
 }
 
+struct ForceMainThreadMain {
+	ForceMainThreadMain() {
+		Main::get();
+	}
+};
+
+ForceMainThreadMain fmtm;
+
 void Main::start() {
+
 	if (!mActive) {
 		mActive = true;
 		

@@ -26,6 +26,7 @@ void audioCB(AudioIOData& io){
 	}
 }
 
+AudioIO audioIO(256, 44100, audioCB, 0, 2, 1);
 
 int main (int argc, char * argv[]){
 
@@ -34,9 +35,8 @@ int main (int argc, char * argv[]){
 	reverb.decay(0.8);			// tail decay factor
 	reverb.diffusion(0.76, 0.666, 0.707, 0.571); // diffusion amounts
 
-	AudioIO audioIO(256, 44100, audioCB, 0, 2, 1);
 	audioIO.start();
-
+	
 	printf("\nPress 'enter' to quit...\n"); getchar();
 	return 0;
 }

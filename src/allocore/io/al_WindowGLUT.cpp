@@ -531,9 +531,6 @@ void Window::create(
 )
 {
 	if(created()) return;
-	
-	// switch mainloop to GLUT mode:
-	Main::get().driver(Main::GLUT);
 
 	mImpl->mDimPrev.set(0,0,0,0);
 	mImpl->mDimCurr.set(dim.l,dim.t,0,0);
@@ -571,6 +568,9 @@ void Window::create(
 	AL_GRAPHICS_INIT_CONTEXT;
 	doCreate();
 	mImpl->scheduleDraw();
+	
+	// switch mainloop to GLUT mode:
+	Main::get().driver(Main::GLUT);
 }
 
 void Window::destroy(){
