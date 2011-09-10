@@ -60,6 +60,8 @@ public:
 		mFullScreen = false;
 		mCursorHide = false;
 		mScheduled = false;
+		mFrameTime = Main::get().realtime();
+		mSPFActual = 0;
 	}
 
 
@@ -445,6 +447,13 @@ private:
 			Window * win = impl->mWindow;
 			if(win){
 				//al_sec prert = MainLoop::realtime();	// what time it really is now (before render)
+
+				{	// compute actual frame interval
+					al_sec timeNow = M.realtime();
+					impl->mSPFActual = timeNow - impl->mFrameTime;
+					impl->mFrameTime = timeNow;
+				}
+				
 				win->doFrameImpl();
 				if(win->fps() > 0) {
 					al_sec next;
@@ -486,10 +495,12 @@ private:
 	int mIDGameMode;
 	//Window::Dim mWinDim;
 	Window::Dim mDimPrev, mDimCurr;
-	double mFPS;
+	double mFPS; // requested FPS
+	al_sec mAvg;
+	al_sec mFrameTime, mSPFActual;
 	std::string mTitle;
 	Cursor::t mCursor;
-	al_sec mAvg;
+
 
 	bool mInGameMode;
 	bool mVisible;
@@ -583,6 +594,7 @@ bool Window::cursorHide() const { return mImpl->mCursorHide; }
 Window::Dim Window::dimensions() const { return mImpl->dimensions(); }
 double Window::fps() const { return mImpl->mFPS; }
 double Window::avgFps() const { return mImpl->mAvg; }
+double Window::spfActual() const { return mImpl->mSPFActual; }
 bool Window::fullScreen() const { return mImpl->mFullScreen; }
 const std::string& Window::title() const { return mImpl->mTitle; }
 bool Window::visible() const { return mImpl->mVisible; }

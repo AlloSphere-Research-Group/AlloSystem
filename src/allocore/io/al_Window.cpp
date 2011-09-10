@@ -112,7 +112,7 @@ Window& Window::fullScreenToggle(){
 	return *this;
 }
 
-double Window::spfActual() const { return Main::get().intervalActual(); }
+//double Window::spfActual() const { return Main::get().intervalActual(); }
 
 
 Window& Window::insert(InputEventHandler& v, int i){
