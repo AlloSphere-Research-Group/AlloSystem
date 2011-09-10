@@ -30,12 +30,22 @@
 	
 	File author(s):
 	Lance Putnam, 2010, putnam.lance@gmail.com
+	Graham Wakefield, 2011, grrrwaaa@gmail.com
 */
+
+#include <string>
 
 namespace al{
 
 /// Returns the number of processors available
 int numProcessors();
+
+/// Returns true if the processor is the Sandy Bridge architecture
+bool is_sandy_bridge();
+
+/// Valid only for OSX, when built as a .framework
+/// Returns path to framework/Resources
+std::string frameworkResourcePath();
 
 } // al::
 
