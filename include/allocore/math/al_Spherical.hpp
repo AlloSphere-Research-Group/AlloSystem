@@ -36,6 +36,7 @@
 
 #include "allocore/math/al_Complex.hpp"
 #include "allocore/math/al_Functions.hpp"
+#include "allocore/math/al_Vec.hpp"
 
 namespace al{
 
@@ -83,7 +84,7 @@ struct SphereCoord {
 		t(v[0], v[1]);
 		T tmag = t.mag();
 		p(v[2], tmag);
-		tmag != 0 ? t*=1./tmag : t(1,0);
+		tmag != 0 ? t*=(1./tmag) : t(1,0);
 		return *this;
 	}
 };
@@ -114,9 +115,8 @@ public:
 
 	/// @param[in] l		number of nodal lines
 	/// @param[in] m		number of longitudinal nodal lines, |m| <= l
-	/// @param[in] ctheta	longitudinal complex angle in [0,pi] (in upper half-plane)
-	/// @param[in] cphi		latitudinal complex angle
-	#error Discrepency in terms with SphereCoord!
+	/// @param[in] ctheta	latitudinal complex angle
+	/// @param[in] cphi		longitudinal complex angle in [0,pi] (in upper half-plane)
 	template <class T>
 	Complex<T> operator()(int l, int m, const Complex<T>& ctheta, const Complex<T>& cphi) const {
 		
@@ -125,17 +125,17 @@ public:
 		// compute e^im recursively
 		// TODO: this could be turned into a table lookup
 		for(int i=0; i<al::abs(m); ++i){
-			res *= cphi;
+			res *= ctheta;
 		}
 		
-		//T arg = cphi.arg();
+		//T arg = ctheta.arg();
 		//Complex<T> res;
 		//res.fromPolar(arg*m);
 		
 		if(m < 0) res.i = -res.i;
 
 		T c = l<=L_MAX ? coefTab(l,m) : coefCalc(l,m);
-		c *= al::legendreP(l,m, ctheta.r, ctheta.i);
+		c *= al::legendreP(l,m, cphi.r, cphi.i);
 
 		return res*c;
 	}
