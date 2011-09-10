@@ -414,7 +414,7 @@ protected:
 			while(ia != w.mActors.end()){
 				Actor& a = *(*ia);
 				a.step();
-				a.onAnimate(window().spf());
+				a.onAnimate(window().spfActual());
 				++ia;
 			}
 			return true;			
