@@ -4298,6 +4298,7 @@
 				STRIP_STYLE = debugging;
 				SYMROOT = ../build/bin;
 				USER_HEADER_SEARCH_PATHS = "$PROJECT_DIR/../include $PROJECT_DIR/../osx/include";
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Release;
 		};
