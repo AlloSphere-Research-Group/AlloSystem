@@ -111,11 +111,22 @@ public:
 	*/
 	Array& operator= (const AlloArray& cpy);
 
-	uint32_t dim(int i=0) const { return header.dim[i]; }
-	uint32_t stride(int i=0) const { return header.stride[i]; }
+
 	AlloTy type() const { return header.type; }
+	///! verify a type:
+	bool isType(AlloTy ty) const { return header.type == ty; }
+	template<typename T> bool isType() { return isType(type<T>()); }
+	
 	uint8_t components() const { return header.components; }
 	
+	uint8_t dimcount() const { return header.dimcount; }
+	
+	uint32_t dim(int i=0) const { return header.dim[i]; }
+	unsigned width() const { return header.dim[0]; }
+	unsigned height() const { return header.dim[1]; }
+	unsigned depth() const { return header.dim[2]; }
+	
+	uint32_t stride(int i=0) const { return header.stride[i]; }
 	/// return the packing alignment (1, 2, 4 or 8 byte)
 	uint32_t alignment() const {
 		uint32_t i = stride(0);
@@ -124,6 +135,9 @@ public:
 		if (i % 8 > 0) return 4;
 		return 8;
 	}
+
+	///! Return the memory footprint of a array
+	size_t size() const { return allo_array_size(this); }
 
 	/*!
 		Change the format (header/layout) of the Array
@@ -142,22 +156,8 @@ public:
 	///! Check if this Array conforms to an ArrayHeader format
 	bool isFormat(const AlloArrayHeader &h2) const;
 
-	///! verify a type:
-	bool isType(AlloTy ty) const { return header.type == ty; }
-	template<typename T> bool isType() { return isType(type<T>()); }
-
-	///! Return the memory footprint of a array
-	size_t size() const { return allo_array_size(this); }
-
 	///! verify that Array contains data
 	bool hasData() const { return data.ptr != NULL; }
-	
-	uint8_t dimcount() const { return header.dimcount; }
-	unsigned width() const { return header.dim[0]; }
-	unsigned height() const { return header.dim[1]; }
-	unsigned depth() const { return header.dim[2]; }
-	unsigned dim(unsigned i=0) const { return header.dim[i]; }
-	size_t stride(unsigned i=0) const { return header.stride[i]; }
 
 	///! Allocate memory for the given header
 	/// (warning, does not check if data.ptr was not NULL!)
@@ -238,6 +238,9 @@ public:
 
 	template<typename T, typename TP> void write_interp(const T* val, const Vec<2,TP> p) { write_interp(val, p[0], p[1]); }
 	template<typename T, typename TP> void write_interp(const T* val, const Vec<3,TP> p) { write_interp(val, p[0], p[1], p[2]); }
+	
+	/// for debugging:
+	void print() const;
 };
 
 
@@ -278,7 +281,6 @@ template<> inline AlloTy Array::type<void *>() {
 	}
 	return 0;
 }
-
 
 inline Array::Array() : AlloArray() {
 	data.ptr = 0;
@@ -360,10 +362,16 @@ inline void Array::format(const AlloArrayHeader &h2) {
 		header.type = h2.type;
 		header.components = h2.components;
 		header.dimcount = h2.dimcount;
-		for(int i=0; i < header.dimcount; i++) {
-			header.dim[i] = h2.dim[i];
-			header.stride[i] = h2.stride[i];
+		for(int i=0; i < ALLO_ARRAY_MAX_DIMS; i++) {
+			if (i < header.dimcount) {
+				header.dim[i] = h2.dim[i];
+				header.stride[i] = h2.stride[i];
+			} else {
+				header.dim[i] = 1;
+				header.stride[i] = h2.stride[i-1];
+			}
 		}
+		//printf("reformatted array "); print();
 		dataCalloc();
 	}
 }
@@ -790,6 +798,12 @@ template<typename T> inline void Array::set3d(T * cell) {
 			}
 		}
 	}
+}
+
+inline void Array::print() const {
+	printf("Array type %s components %d %d-D: ( ", allo_type_name(type()), components(), dimcount());
+	for (int i=0; i<dimcount(); i++) printf("%d(stride %d) ", dim(i), stride(i));
+	printf(") %d bytes\n", size());
 }
 
 #undef DOUBLE_FLOOR

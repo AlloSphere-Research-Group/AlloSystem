@@ -107,6 +107,9 @@ typedef uint16_t AlloTy;
 	
 	
 static size_t allo_type_size(const AlloTy ty);
+
+static const char * allo_type_name(const AlloTy ty);
+
 typedef struct {
 	
 	/* The type of data stored (see enums above) */
@@ -199,6 +202,62 @@ static inline size_t allo_type_size(const AlloTy ty) {
 		case AlloPointer32Ty:	return sizeof(int32_t);
 		case AlloPointer64Ty:	return sizeof(int64_t);
 		default:				return 0;
+	}
+}
+
+static inline const char * allo_type_name(const AlloTy ty) {
+	switch(ty) {
+		case AlloUInt8Ty:		return "uint8_t";	
+		case AlloUInt16Ty:		return "uint16_t";
+		case AlloUInt32Ty:		return "uint32_t";
+		case AlloUInt64Ty:		return "uint64_t";
+		case AlloSInt8Ty:		return "int8_t";
+		case AlloSInt16Ty:		return "int16_t";
+		case AlloSInt32Ty:		return "int32_t";
+		case AlloSInt64Ty:		return "int64_t";
+		case AlloFloat32Ty:		return "float";
+		case AlloFloat64Ty:		return "double";
+		case AlloArrayTy:		return "AlloArray";
+		case AlloPointer32Ty:	return "int32_t";
+		case AlloPointer64Ty:	return "int64_t";
+		default:				return 0;
+	}
+}
+
+// useful for converting numeric formats
+// converts any format value into a double from 0..1
+static inline double allo_type_tonumber(const AlloTy ty, const char * ptr) {
+	switch(ty) {
+		case AlloUInt8Ty:		return double(((uint8_t *)(ptr))[0])/255.;	// UCHAR_MAX
+		case AlloUInt16Ty:		return double(((uint8_t *)(ptr))[0])/65535.;	
+		case AlloUInt32Ty:		return double(((uint8_t *)(ptr))[0])/double(0xffffffff);	
+		case AlloUInt64Ty:		return double(((uint8_t *)(ptr))[0])/double(ULONG_MAX);
+		case AlloSInt8Ty:		return 0.5+double(((uint8_t *)(ptr))[0])/255.;	// UCHAR_MAX
+		case AlloSInt16Ty:		return 0.5+double(((uint8_t *)(ptr))[0])/65535.;	
+		case AlloSInt32Ty:		return 0.5+double(((uint8_t *)(ptr))[0])/double(0xffffffff);	
+		case AlloSInt64Ty:		return 0.5+double(((uint8_t *)(ptr))[0])/double(ULONG_MAX);
+		case AlloFloat32Ty:		return double(((float *)(ptr))[0]);
+		case AlloFloat64Ty:		return double(((double *)(ptr))[0]);
+		default:				return 0;
+	}
+}
+
+// useful for converting numeric formats
+// converts any format value into a double from 0..1
+static inline void allo_type_fromnumber(const AlloTy ty, double number, char * dst) {
+	switch(ty) {
+		case AlloUInt8Ty:		*(uint8_t *)(dst) = (uint8_t)(number * 255.); break;
+		case AlloUInt16Ty:		*(uint16_t *)(dst) = (uint16_t)(number * 65535.); break;
+		case AlloUInt32Ty:		*(uint32_t *)(dst) = (uint32_t)(number * double(0xffffffff)); break;
+		case AlloUInt64Ty:		*(uint64_t *)(dst) = (uint64_t)(number * double(ULONG_MAX)); break;
+		
+		case AlloSInt8Ty:		*(int8_t *)(dst) = (int8_t)((number-0.5) * 255.); break;
+		case AlloSInt16Ty:		*(int16_t *)(dst) = (int16_t)((number-0.5) * 65535.); break;
+		case AlloSInt32Ty:		*(int32_t *)(dst) = (int32_t)((number-0.5) * double(0xffffffff)); break;
+		case AlloSInt64Ty:		*(int64_t *)(dst) = (int64_t)((number-0.5) * double(ULONG_MAX)); break;
+		case AlloFloat32Ty:		*(float *)(dst) = (float)number; break;
+		case AlloFloat64Ty:		*(double *)(dst) = number; break;
+		default:				*dst = 0;
 	}
 }
 
