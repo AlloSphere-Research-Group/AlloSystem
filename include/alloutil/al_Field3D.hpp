@@ -172,7 +172,7 @@ public:
 	
 	template<typename T1>
 	void readVelocity(const Vec<3,T1> pos, Vec<3,T>& vel) {
-		velocities.front().read_interp(vel.elems, pos);
+		velocities.front().read_interp(vel.elems(), pos);
 	}
 	
 	template<typename T1>
