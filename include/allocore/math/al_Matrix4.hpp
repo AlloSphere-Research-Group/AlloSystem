@@ -171,6 +171,10 @@ public:
 						0, 0, 0, 1);
 	}
 
+	static const Matrix4 rotate(float angle, float x, float y, float z) {
+		return Matrix4::rotate(angle, Vec3d(x, y, z));
+	}
+	
 	static const Matrix4 rotate(float angle, const Vec<3, T> &v) {
 		Vec<3, T> axis(v);
 		axis.normalize();
