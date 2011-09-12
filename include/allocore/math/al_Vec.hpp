@@ -142,15 +142,6 @@ public:
 	/// Get read-write pointer to elements
 	T * elems(){ return &x; }
 
-	/// Cast to pointer
-	operator T* (){ return elems(); }
-
-//	/// Get read-only pointer to elements
-//	const T* ptr() const { return elems; }
-//	
-//	/// Get read-write pointer to elements
-//	T* ptr(){ return elems; }
-
 	/// Set element at index with no bounds checking
 	T& operator[](int i){ return elems()[i];}
 	
@@ -273,6 +264,7 @@ public:
 
 	/// Set all elements to zero
 	Vec& zero(){ return set(T(0)); }
+
 	
 	/// Clip to range:
 	/// NOTE argument order (max,min)
