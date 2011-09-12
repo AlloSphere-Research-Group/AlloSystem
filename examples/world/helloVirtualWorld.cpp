@@ -131,31 +131,31 @@ const double midEl = 0;
 const double botAz = 90;
 const double botEl =-45;
 AmbiDecode::Speaker speakers[numSpeakers] = {
-	{ 0.5*midAz, midEl,  3-1},
-	{ 1.5*midAz, midEl,  6-1},
-	{ 2.5*midAz, midEl, 17-1},
-	{ 3.5*midAz, midEl, 18-1},
-	{-0.5*midAz, midEl,  4-1},
-	{-1.5*midAz, midEl,  5-1},
-	{-2.5*midAz, midEl, 20-1},
-	{-3.5*midAz, midEl, 19-1},
+	Speaker( 3-1, 0.5*midAz, midEl),
+	Speaker( 6-1, 1.5*midAz, midEl),
+	Speaker(17-1, 2.5*midAz, midEl),
+	Speaker(18-1, 3.5*midAz, midEl),
+	Speaker( 4-1,-0.5*midAz, midEl),
+	Speaker( 5-1,-1.5*midAz, midEl),
+	Speaker(20-1,-2.5*midAz, midEl),
+	Speaker(19-1,-3.5*midAz, midEl),
 	
-	{ 0.5*topAz, topEl,  7-1},
-	{ 1.5*topAz, topEl,  9-1},
-	{-0.5*topAz, topEl,  8-1},
-	{-1.5*topAz, topEl, 21-1},
+	Speaker( 7-1, 0.5*topAz, topEl),
+	Speaker( 9-1, 1.5*topAz, topEl),
+	Speaker( 8-1,-0.5*topAz, topEl),
+	Speaker(21-1,-1.5*topAz, topEl),
 
-	{ 0.5*botAz, botEl, 24-1},
-	{ 1.5*botAz, botEl, 23-1},
-	{-0.5*botAz, botEl, 10-1},
-	{-1.5*botAz, botEl, 22-1},
+	Speaker(24-1, 0.5*botAz, botEl),
+	Speaker(23-1, 1.5*botAz, botEl),
+	Speaker(10-1,-0.5*botAz, botEl),
+	Speaker(22-1,-1.5*botAz, botEl),
 };
 #else
 AudioScene scene(2, 1, AUDIO_BLOCK_SIZE);
 const int numSpeakers = 2;
-AmbiDecode::Speaker speakers[] = {
-	{  45, 0,  0},
-	{ -45, 0,  1},
+Speaker speakers[] = {
+	Speaker(0,  45,0),
+	Speaker(1, -45,0),
 };
 #endif
 
@@ -186,7 +186,6 @@ struct MyWindow : public Window, public Drawable{
 	bool onFrame(){
 
 		Pose pose(navMaster * transform);
-
 
 		Viewport vp(dimensions().w, dimensions().h);
 		stereo.draw(gl, cam, pose, vp, *this);
@@ -221,16 +220,7 @@ struct MyWindow : public Window, public Drawable{
 int main (int argc, char * argv[]){
 
 	listener = scene.createListener(2);
-	
-//	listener->speakerPos(0,0,-60);
-//	listener->speakerPos(1,1, 60);
-////	listener->speakerPos(0,0,-45);
-////	listener->speakerPos(1,1, 45);
-//
-	
 
-
-	
 	listener->numSpeakers(numSpeakers);
 	for(int i=0; i<numSpeakers; ++i){
 		listener->speakerPos(
@@ -253,15 +243,15 @@ int main (int argc, char * argv[]){
 	windows[4].create(Window::Dim(200, 100, 200,200), "Top");
 
 	for(int i=0; i<4; ++i){
-		windows[i].add(new StandardWindowKeyControls);
-		windows[i].add(new NavInputControl(navMaster));
-		windows[i].transform.quat().fromAxisAngle(-90 + i*90, Vec3d(0, 1, 0));
+		windows[i].add(*new StandardWindowKeyControls);
+		windows[i].add(*new NavInputControl(navMaster));
+		windows[i].transform.quat().fromAxisAngle(-M_PI/2 + i*M_PI/2, Vec3d(0, 1, 0));
 		windows[i].cam.fovy(90);
 	}
 	for(int i=4; i<6; ++i){
-		windows[i].add(new StandardWindowKeyControls);
-		windows[i].add(new NavInputControl(navMaster));
-		windows[i].transform.quat().fromAxisAngle(-90 + i*180, Vec3d(1, 0, 0));
+		windows[i].add(*new StandardWindowKeyControls);
+		windows[i].add(*new NavInputControl(navMaster));
+		windows[i].transform.quat().fromAxisAngle(-M_PI/2 + i*M_PI, Vec3d(1, 0, 0));
 		windows[i].cam.fovy(90);
 	}
 
