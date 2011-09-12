@@ -985,7 +985,9 @@ std::ostream & operator << (std::ostream & out, const Vec<N,T> &v) {
 	return out;
   }
 
-  out << "Vec of size " << N << ": [";
+	
+
+  out << "Vec of size " << N << " and type " << typeid(T).name() << ": [";
 
   int numToPrint;
   char *printAfter = (char *)"";
