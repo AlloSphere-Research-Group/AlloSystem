@@ -216,13 +216,13 @@ public:
 	}
 
 	/// Set as versor rotated by angle, in radians, around y-axis
-	Quat& fromAxisY(T angle){
+	Quat& fromAxisY(const T& angle){
 		T t2 = angle * 0.5;
 		return set(cos(t2), T(0), sin(t2), T(0));
 	}
 
 	/// Set as versor rotated by angle, in radians, around z-axis
-	Quat& fromAxisZ(T angle){
+	Quat& fromAxisZ(const T& angle){
 		T t2 = angle * 0.5;
 		return set(cos(t2), T(0), T(0), sin(t2));
 	}
