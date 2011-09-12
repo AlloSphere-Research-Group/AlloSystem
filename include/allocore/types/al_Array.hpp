@@ -803,7 +803,7 @@ template<typename T> inline void Array::set3d(T * cell) {
 inline void Array::print() const {
 	printf("Array type %s components %d %d-D: ( ", allo_type_name(type()), components(), dimcount());
 	for (int i=0; i<dimcount(); i++) printf("%d(stride %d) ", dim(i), stride(i));
-	printf(") %d bytes\n", size());
+	printf(") %d bytes\n", int(size()));
 }
 
 #undef DOUBLE_FLOOR
