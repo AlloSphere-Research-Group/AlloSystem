@@ -234,20 +234,23 @@ int main (int argc, char * argv[]){
 	for(unsigned i=0; i<agents.size(); ++i) scene.addSource(agents[i]);
 
 	MyWindow windows[6];
-	
-	windows[5].create(Window::Dim(200, 500, 200,200), "Bottom");
+
 	windows[0].create(Window::Dim(  0, 300, 200,200), "Left");
 	windows[1].create(Window::Dim(200, 300, 200,200), "Center");
 	windows[2].create(Window::Dim(400, 300, 200,200), "Right");
 	windows[3].create(Window::Dim(600, 300, 200,200), "Back");
 	windows[4].create(Window::Dim(200, 100, 200,200), "Top");
+	windows[5].create(Window::Dim(200, 500, 200,200), "Bottom");
 
+	// side windows
 	for(int i=0; i<4; ++i){
 		windows[i].add(*new StandardWindowKeyControls);
 		windows[i].add(*new NavInputControl(navMaster));
-		windows[i].transform.quat().fromAxisAngle(-M_PI/2 + i*M_PI/2, Vec3d(0, 1, 0));
+		windows[i].transform.quat().fromAxisAngle(-M_PI/1 + i*M_PI/2, Vec3d(0, 1, 0));
 		windows[i].cam.fovy(90);
 	}
+	
+	// top/bottom windows
 	for(int i=4; i<6; ++i){
 		windows[i].add(*new StandardWindowKeyControls);
 		windows[i].add(*new NavInputControl(navMaster));
