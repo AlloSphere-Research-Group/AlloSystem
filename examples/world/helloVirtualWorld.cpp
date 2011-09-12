@@ -45,12 +45,9 @@ struct Agent : public SoundSource, public Nav, public Drawable{
 	
 	virtual void onUpdateNav(){
 		smooth(0.9);
-		//if((phase+=0.01) >= M_2PI) phase -= M_2PI;
-		//pos(cos(phase), sin(phase), 0);
-		//pos(0,0,0);
 		
-		spin(3., 0, 0);
-		moveF(0.4);
+		spin(M_2PI/360, M_2PI/397, 0);
+		moveF(0.04);
 		step();
 		
 		SoundSource::pose(*this);
@@ -58,56 +55,38 @@ struct Agent : public SoundSource, public Nav, public Drawable{
 	
 	virtual void onDraw(Graphics& g){
 		g.pushMatrix();
-		g.scale(10);
-		g.begin(g.LINES);
-			g.color(1, 1, 1);
-			for (int x=-1; x<=1; x+=2) {
-			for (int y=-1; y<=1; y+=2) {
-			for (int z=-1; z<=1; z+=2) {
-				g.vertex(x,y,z);
-			}}} 
-			for (int z=-1; z<=1; z+=2) {
-			for (int x=-1; x<=1; x+=2) {
-			for (int y=-1; y<=1; y+=2) {
-				g.vertex(x,y,z);
-			}}}
-			for (int z=-1; z<=1; z+=2) {
-			for (int y=-1; y<=1; y+=2) {
-			for (int x=-1; x<=1; x+=2) {
-				g.vertex(x,y,z);
-			}}}
-		g.end();
+			g.scale(10);
+			g.mesh().primitive(g.LINES);
+			addWireBox(g.mesh());
+			g.draw();
 		g.popMatrix();
 
 		g.pushMatrix();
-		g.multMatrix(matrix());
-	
-		g.begin(g.TRIANGLES);
-			float ds = 0.5;
-			
-			g.color(1,1,1);
-			g.vertex(    0, 0, ds*2);
-			g.color(1,1,0);
-			g.vertex( ds/2, 0,-ds);
-			g.color(1,0,1);
-			g.vertex(-ds/2, 0,-ds);
-			
-			g.color(1,1,1);
-			g.vertex(    0, 0, ds*2);
-			g.color(0,1,1);
-			g.vertex( 0, ds/2,-ds);
-			g.color(1,0,1);
-			g.vertex(-ds/2, 0,-ds);
-			
-			g.color(1,1,1);
-			g.vertex(    0, 0, ds*2);
-			g.color(1,1,0);
-			g.vertex( ds/2, 0,-ds);
-			g.color(0,1,1);
-			g.vertex( 0, ds/2, -ds);
-			
-		g.end();
-		
+			g.multMatrix(directionMatrix());
+			g.begin(g.TRIANGLES);
+				float ds = 0.5;
+				
+				g.color(1,1,1);
+				g.vertex(    0, 0, ds*2);
+				g.color(1,1,0);
+				g.vertex( ds/2, 0,-ds);
+				g.color(1,0,1);
+				g.vertex(-ds/2, 0,-ds);
+				
+				g.color(1,1,1);
+				g.vertex(    0, 0, ds*2);
+				g.color(0,1,1);
+				g.vertex( 0, ds/2,-ds);
+				g.color(1,0,1);
+				g.vertex(-ds/2, 0,-ds);
+				
+				g.color(1,1,1);
+				g.vertex(    0, 0, ds*2);
+				g.color(1,1,0);
+				g.vertex( ds/2, 0,-ds);
+				g.color(0,1,1);
+				g.vertex( 0, ds/2, -ds);
+			g.end();		
 		g.popMatrix();
 	}
 	
@@ -246,7 +225,7 @@ int main (int argc, char * argv[]){
 	for(int i=0; i<4; ++i){
 		windows[i].add(*new StandardWindowKeyControls);
 		windows[i].add(*new NavInputControl(navMaster));
-		windows[i].transform.quat().fromAxisAngle(-M_PI/1 + i*M_PI/2, Vec3d(0, 1, 0));
+		windows[i].transform.quat().fromAxisAngle(M_PI/2 - i*M_PI/2, Vec3d(0, 1, 0));
 		windows[i].cam.fovy(90);
 	}
 	
@@ -254,7 +233,7 @@ int main (int argc, char * argv[]){
 	for(int i=4; i<6; ++i){
 		windows[i].add(*new StandardWindowKeyControls);
 		windows[i].add(*new NavInputControl(navMaster));
-		windows[i].transform.quat().fromAxisAngle(-M_PI/2 + i*M_PI, Vec3d(1, 0, 0));
+		windows[i].transform.quat().fromAxisAngle(M_PI/2 - i*M_PI, Vec3d(1, 0, 0));
 		windows[i].cam.fovy(90);
 	}
 
