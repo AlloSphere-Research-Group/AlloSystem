@@ -37,6 +37,7 @@
 
 #include <cmath>
 #include <stdio.h>
+#include <ostream>
 
 #include "allocore/math/al_Functions.hpp"
 
@@ -974,6 +975,36 @@ Vec<N,T>& Vec<N,T>::normalize(){
 	return *this;
 }
 
+
+// Pretty-printing by Matt:
+#define MAX_TO_PRINT 10
+template <int N, class T>
+std::ostream & operator << (std::ostream & out, const Vec<N,T> &v) {
+  if (N == 0) {
+	out << "Vec of size 0 (empty)" << std::endl;
+	return out;
+  }
+
+  out << "Vec of size " << N << ": [";
+
+  int numToPrint;
+  char *printAfter = (char *)"";
+  if (N <= MAX_TO_PRINT) {
+	numToPrint = N;
+  } else {
+	numToPrint = MAX_TO_PRINT;
+	printAfter = (char *)", ...";
+  }
+
+  out << v[0];
+
+  for (int i = 1; i<numToPrint; ++i) {
+	out << ", " << v[i];
+  }
+  out <<  printAfter << "]" << std::endl;
+
+  return out;
+}
 
 #undef IT
 
