@@ -95,6 +95,7 @@ void Shader::onDestroy(){
 }
 
 void Shader::sendSource(){
+	validate();
 	const char * s = mSource.c_str();
 	glShaderSource(id(), 1, &s, NULL);
 	//glShaderSourceARB((GLhandleARB)handle(), 1, &s, NULL);
@@ -102,10 +103,7 @@ void Shader::sendSource(){
 
 Shader& Shader::source(const std::string& v){
 	mSource = v;
-	if(created()){
-		sendSource();
-		compile();
-	}
+	invalidate();
 	return *this;
 }
 
