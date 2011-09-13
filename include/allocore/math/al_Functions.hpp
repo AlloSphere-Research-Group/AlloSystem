@@ -57,7 +57,7 @@
 namespace al {
 
 /// Returns absolute value
-template<class T> T abs(T v);
+template<class T> T abs(const T& v);
 
 /// Return whether two floats are almost equal
 
@@ -169,7 +169,7 @@ void frenet(const V3& p2, const V3& p1, const V3& p0, V3& t, V3& n, V3& b){
 }
 
 /// Returns e^(-v*v)
-template<class T> T gaussian(T v);
+template<class T> T gaussian(const T& v);
 
 /// Return greatest common divisor of two arguments
 template<class T> T gcd(const T& x, const T& y);
@@ -396,13 +396,13 @@ namespace{
 
 
 /// Returns absolute value
-template<> inline float abs(float v){ return ::fabsf(v); }
-template<> inline double abs(double v){ return ::fabs(v); }
-template<> inline char abs(char v){ return ::labs(v); }
-template<> inline short abs(short v){ return ::labs(v); }
-template<> inline int abs(int v){ return ::labs(v); }
-template<> inline long abs(long v){ return ::labs(v); }
-template<> inline long long abs(long long v){ return ::llabs(v); }
+template<> inline float abs(const float& v){ return ::fabsf(v); }
+template<> inline double abs(const double& v){ return ::fabs(v); }
+template<> inline char abs(const char& v){ return ::labs(v); }
+template<> inline short abs(const short& v){ return ::labs(v); }
+template<> inline int abs(const int& v){ return ::labs(v); }
+template<> inline long abs(const long& v){ return ::labs(v); }
+template<> inline long long abs(const long long& v){ return ::llabs(v); }
 
 
 inline bool aeq(float a, float b, int maxULP){
@@ -531,7 +531,7 @@ TEM inline T foldOnce(T v, T hi, T lo){
 	return v;
 }
 
-TEM inline T gaussian(T v){ return ::exp(-v*v); }
+TEM inline T gaussian(const T& v){ return ::exp(-v*v); }
 
 TEM T gcd(const T& x, const T& y){
 	if(y==T(0)) return al::abs(x);
