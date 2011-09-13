@@ -266,12 +266,67 @@ public:
 	/// Set all elements to zero
 	Vec& zero(){ return set(T(0)); }
 
+//	/// Apply nullary function to each element in-place
+//	template <T (* Func)(const T&)>
+//	Vec& apply(){
+//		IT(N) (*this)[i] = Func((*this)[i]); return *this; }
+//
+//	/// Apply unary function to each element in-place
+//	template <T (* Func)(const T&, const T&)>
+//	Vec& apply(const T& arg){
+//		IT(N) (*this)[i] = Func((*this)[i], arg); return *this; }
+//
+//	/// Apply binary function to each element in-place
+//	template <T (* Func)(const T&, const T&, const T&)>
+//	Vec& apply(const T& arg1, const T& arg2){
+//		IT(N) (*this)[i] = Func((*this)[i], arg1,arg2); return *this; }
+//
+//	/// Apply unary function to each element in-place; args are vectors
+//	template <T (* Func)(const T&, const T&), class A>
+//	Vec& apply(const Vec<N,A>& args){
+//		IT(N) (*this)[i] = Func((*this)[i], args[i]); return *this; }
+//
+//	/// Apply binary function to each element in-place; args are vectors
+//	template <T (* Func)(const T&, const T&, const T&), class A, class B>
+//	Vec& apply(const Vec<N,A>& args1, const Vec<N,B>& args2){
+//		IT(N) (*this)[i] = Func((*this)[i], args1[i],args2[i]); return *this; }
+
+	// NOTE: this version doesn't like overloaded functions
+//	template <class Func, class A1, class A2>
+//	Vec& apply(const Func& func, const A1& a1, const A2& a2){
+//		IT(N){ (*this)[i] = func((*this)[i], a1,a2); }
+//		return *this;
+//	}
+
+	/// Apply function to each element in-place
+	Vec& apply(T (* const func)(const T&)){
+		IT(N) (*this)[i] = func((*this)[i]); return *this; }
+
+	/// Apply function to each element in-place
+	Vec& apply(T (* const func)(const T&, const T&), const T& arg){
+		IT(N) (*this)[i] = func((*this)[i], arg); return *this; }
+
+	/// Apply function to each element in-place
+	Vec& apply(T (* const func)(const T&, const T&, const T&), const T& arg1, const T& arg2){
+		IT(N) (*this)[i] = func((*this)[i], arg1,arg2); return *this; }
+
+	/// Apply function to each element in-place; arguments are vectors
+	template <class A>
+	Vec& apply(T (* Func)(const T&, const T&), const Vec<N,A>& args){
+		IT(N) (*this)[i] = Func((*this)[i], args[i]); return *this; }
+
+	/// Apply function to each element in-place; arguments are vectors
+	template <class A, class B>
+	Vec& apply(T (* Func)(const T&, const T&, const T&), const Vec<N,A>& args1, const Vec<N,B>& args2){
+		IT(N) (*this)[i] = Func((*this)[i], args1[i],args2[i]); return *this; }
+
 	
 	/// Clip to range:
 	/// NOTE argument order (max,min)
 	Vec& clip(T max=T(1), T min=T(0)) {
 		IT(N) (*this)[i] = al::clip((*this)[i], max, min);
 		return *this;
+		//return apply<al::clip>(max,min);
 	}
 	Vec& clip(Vec max, Vec min) {
 		IT(N) (*this)[i] = al::clip((*this)[i], max[i], min[i]);
@@ -356,7 +411,7 @@ public:
 		return r;
 	}
 
-	/// Returns sum of absolute value (1-norm) of elements
+	/// Returns sum of absolute value of elements
 	T sumAbs() const {
 		T r = abs((*this)[0]);
 		for(int i=1; i<N; ++i){ r += abs((*this)[i]); }
@@ -484,11 +539,11 @@ public:
 	//--------------------------------------------------------------------------
 	// Memory Operations
 
-	/// Returns C array type punned into a matrix
-	static Mat& pun(T * src){ return *(Mat*)(src); }
-
 	/// Returns total number of elements
 	static int size(){ return N*N; }
+
+	/// Returns C array type punned into a matrix
+	static Mat& pun(T * src){ return *(Mat*)(src); }
 
 	/// Set element at index with no bounds checking
 	T& operator[](int i){ return elems[i];}
@@ -528,6 +583,10 @@ public:
 	
 	/// Get read-write pointer to elements
 	T* ptr(){ return elems; }
+
+	/// Return matrix punned as a vector
+	Vec<N*N,T>& vec(){ return *(Vec<N*N,T>*)(this); }
+
 
 
 
@@ -827,20 +886,6 @@ inline void cross(Vec<3,T>& r, const Vec<3,T>& a, const Vec<3,T>& b){
 template <class T>
 inline Vec<3,T> cross(const Vec<3,T>& a, const Vec<3,T>& b){
 	Vec<3,T> r;	cross(r,a,b); return r;
-}
-
-/// Returns wedge product a ^ b
-
-/// Since the ^ operator has lower precedence than other arithmetic operators
-/// (-, +, *, /, ==) being a bitwise XOR, use parenthesis around this operation 
-/// to ensure correct results.
-template <int N, class T>
-Vec<N,T> operator^ (const Vec<N,T>& a, const Vec<N,T>& b);
-
-/// Returns wedge (cross) product of two 3-vectors
-template <class T>
-inline Vec<3,T> operator^ (const Vec<3,T>& a, const Vec<3,T>& b){
-	return cross(a,b);
 }
 
 /// Returns angle, in interval [0, pi], between two vectors
