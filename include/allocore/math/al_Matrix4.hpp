@@ -109,15 +109,15 @@ public:
 	:	Base(src)
 	{}
 	
-	Matrix4& set(const Base & src) { Base::set(src.elems); return *this; }
+	Matrix4& set(const Base & src) { Base::set(src.elems()); return *this; }
 	
 	Quat<T>& toQuat() {
 		Quat<T> q;
 		q.fromMatrix(Base::elems);
 		return q;
 	}
-	Matrix4& fromQuat(Quat<T>& q) { q.toMatrix(Base::elems); return *this; }
-	Matrix4& fromQuatTransposed(Quat<T>& q) { q.toMatrixTransposed(Base::elems); return *this; }
+	Matrix4& fromQuat(Quat<T>& q) { q.toMatrix(Base::elems()); return *this; }
+	Matrix4& fromQuatTransposed(Quat<T>& q) { q.toMatrixTransposed(Base::elems()); return *this; }
 		
 	static const Matrix4 identity() {
 		return Matrix4(

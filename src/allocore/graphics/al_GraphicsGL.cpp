@@ -178,8 +178,8 @@ void GraphicsGL :: p_matrixMode(MatrixMode mode) {
 void GraphicsGL :: p_pushMatrix() { glPushMatrix(); }
 void GraphicsGL :: p_popMatrix() { glPopMatrix(); }
 void GraphicsGL :: p_loadIdentity() { glLoadIdentity(); }
-void GraphicsGL :: p_loadMatrix(const Matrix4d &m) { glLoadMatrixd(m.elems); }
-void GraphicsGL :: p_multMatrix(const Matrix4d &m) { glMultMatrixd(m.elems); }
+void GraphicsGL :: p_loadMatrix(const Matrix4d &m) { glLoadMatrixd(m.elems()); }
+void GraphicsGL :: p_multMatrix(const Matrix4d &m) { glMultMatrixd(m.elems()); }
 void GraphicsGL :: p_translate(double x, double y, double z) { glTranslated(x, y, z); }
 void GraphicsGL :: p_rotate(double angle, double x, double y, double z) { glRotated(angle, x, y, z); }
 void GraphicsGL :: p_scale(double x, double y, double z) { glScaled(x, y, z); }

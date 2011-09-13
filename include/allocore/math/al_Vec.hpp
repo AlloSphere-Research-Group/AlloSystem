@@ -356,7 +356,7 @@ public:
 		return r;
 	}
 
-	/// Returns sum of absolute value (1-norm) of elements
+	/// Returns sum of absolute value of elements
 	T sumAbs() const {
 		T r = abs((*this)[0]);
 		for(int i=1; i<N; ++i){ r += abs((*this)[i]); }
@@ -391,7 +391,7 @@ class Mat{
 public:
 
 	/// Column-major array of elements
-	T elems[N*N];
+	T mElems[N*N];
 
 	Mat(){ set(T(0)); }
 
@@ -490,45 +490,45 @@ public:
 	/// Returns total number of elements
 	static int size(){ return N*N; }
 
+	/// Get read-only pointer to elements
+	const T* elems() const { return mElems; }
+	
+	/// Get read-write pointer to elements
+	T* elems(){ return mElems; }
+
 	/// Set element at index with no bounds checking
-	T& operator[](int i){ return elems[i];}
+	T& operator[](int i){ return elems()[i];}
 	
 	/// Get element at index with no bounds checking
-	const T& operator[](int i) const { return elems[i]; }
+	const T& operator[](int i) const { return elems()[i]; }
 
 	/// Set element at row i, column j
-	T& operator()(int i, int j){ return elems[j*N+i]; }
+	T& operator()(int i, int j){ return (*this)[j*N+i]; }
 	
 	/// Get element at row i, column j
-	const T& operator()(int i, int j) const { return elems[j*N+i]; }
+	const T& operator()(int i, int j) const { return (*this)[j*N+i]; }
 
 	/// Return column i as vector
-	Vec<N,T> col(int i) const { return Vec<N,T>(elems + i*N); }
+	Vec<N,T> col(int i) const { return Vec<N,T>(elems() + i*N); }
 
 	/// Return row i as vector
-	Vec<N,T> row(int i) const { return Vec<N,T>(elems+i, N); }
+	Vec<N,T> row(int i) const { return Vec<N,T>(elems()+i, N); }
 	
 	/// Return diagonal
-	Vec<N,T> diagonal() const { return Vec<N,T>(elems, N+1); }
+	Vec<N,T> diagonal() const { return Vec<N,T>(elems(), N+1); }
 
 	/// Transpose elements
 	Mat& transpose(){
 		for(int j=0; j<N-1; ++j){	// row and column
 		for(int i=j+1; i<N; ++i){	// offset into row or column
-			int i1 = j*N + i;
-			int i2 = j + i*N;
-			T t = elems[i1];
-			elems[i1] = elems[i2];
-			elems[i2] = t;
+			T& a = (*this)(i,j);
+			T& b = (*this)(j,i);
+			T c = a; a = b;	b = c;	// swap elements
 		}} return *this;
 	}
 
-	/// Get read-only pointer to elements
-	const T* ptr() const { return elems; }
-	
-	/// Get read-write pointer to elements
-	T* ptr(){ return elems; }
-
+	/// Return matrix punned as a vector
+	Vec<N*N,T>& vec(){ return *(Vec<N*N,T>*)(this); }
 
 
 	//--------------------------------------------------------------------------
@@ -595,40 +595,61 @@ public:
 		IT(numElements){ (*this)[i*matStride+matOffset]=arr[i]; } return *this;
 	}
 
-	/// Set 2-by-2 matrix from arguments	
+	/// Set 2-by-2 (sub)matrix from arguments	
 	Mat& set(
 		const T& r1c1, const T& r1c2,
-		const T& r2c1, const T& r2c2
+		const T& r2c1, const T& r2c2,
+		int row=0, int col=0
 	){
-		elems[0] = r1c1; elems[2] = r1c2;
-		elems[1] = r2c1; elems[3] = r2c2;
-		return *this;
+		setCol2(r1c1, r2c1, col  ,row);
+		setCol2(r1c2, r2c2, col+1,row); return *this;
 	}
 
-	/// Set 3-by-3 matrix from arguments	
+	/// Set 3-by-3 (sub)matrix from arguments	
 	Mat& set(
 		const T& r1c1, const T& r1c2, const T& r1c3,
 		const T& r2c1, const T& r2c2, const T& r2c3,
-		const T& r3c1, const T& r3c2, const T& r3c3
+		const T& r3c1, const T& r3c2, const T& r3c3,
+		int row=0, int col=0
 	){
-		elems[0] = r1c1; elems[3] = r1c2; elems[6] = r1c3;
-		elems[1] = r2c1; elems[4] = r2c2; elems[7] = r2c3;
-		elems[2] = r3c1; elems[5] = r3c2; elems[8] = r3c3;
-		return *this;
+		setCol3(r1c1, r2c1, r3c1, col  ,row);
+		setCol3(r1c2, r2c2, r3c2, col+1,row);
+		setCol3(r1c3, r2c3, r3c3, col+2,row); return *this;
 	}
 	
-	/// Set 4-by-4 matrix from arguments
+	/// Set 4-by-4 (sub)matrix from arguments
 	Mat& set(
 		const T& r1c1, const T& r1c2, const T& r1c3, const T& r1c4,
 		const T& r2c1, const T& r2c2, const T& r2c3, const T& r2c4,
 		const T& r3c1, const T& r3c2, const T& r3c3, const T& r3c4,
-		const T& r4c1, const T& r4c2, const T& r4c3, const T& r4c4
-	){
-		elems[0] = r1c1; elems[4] = r1c2; elems[ 8] = r1c3; elems[12] = r1c4;
-		elems[1] = r2c1; elems[5] = r2c2; elems[ 9] = r2c3; elems[13] = r2c4;
-		elems[2] = r3c1; elems[6] = r3c2; elems[10] = r3c3; elems[14] = r3c4;
-		elems[3] = r4c1; elems[7] = r4c2; elems[11] = r4c3; elems[15] = r4c4;
-		return *this;
+		const T& r4c1, const T& r4c2, const T& r4c3, const T& r4c4,
+		int row=0, int col=0
+	){		
+		setCol4(r1c1, r2c1, r3c1, r4c1, col  ,row);
+		setCol4(r1c2, r2c2, r3c2, r4c2, col+1,row);
+		setCol4(r1c3, r2c3, r3c3, r4c3, col+2,row);
+		setCol4(r1c4, r2c4, r3c4, r4c4, col+3,row); return *this;
+	}
+
+	/// Set a (sub)column
+	Mat& setCol2(const T& v1, const T& v2, int col=0, int row=0){
+		(*this)(row  , col) = v1;
+		(*this)(row+1, col) = v2; return *this;
+	}
+
+	/// Set a (sub)column
+	Mat& setCol3(const T& v1, const T& v2, const T& v3, int col=0, int row=0){
+		(*this)(row  , col) = v1;
+		(*this)(row+1, col) = v2;
+		(*this)(row+2, col) = v3; return *this;
+	}
+
+	/// Set a (sub)column	
+	Mat& setCol4(const T& v1, const T& v2, const T& v3, const T& v4, int col=0, int row=0){
+		(*this)(row,   col) = v1;
+		(*this)(row+1, col) = v2;
+		(*this)(row+2, col) = v3;
+		(*this)(row+3, col) = v4; return *this;
 	}
 
 	/// Set elements on diagonal to one and all others to zero
@@ -761,24 +782,6 @@ inline Vec<N,T> operator / (T s, const Vec<N,T>& v){
 template <int N, class T>
 inline T abs(const Vec<N,T>& v){ return v.mag(); }
 
-//template <int N, class T, class F>
-//inline Vec<N,T> binaryOp(const Vec<N,T>& a, const Vec<N,T>& b, const F& func){
-//	Vec<N,T> r;
-//	IT(N){ r[i] = func(a[0], b[0]); }
-//	return r;
-//}
-
-//template <int N, class T>
-//inline Vec<N,T> binaryOp(const Vec<N,T>& a, const Vec<N,T>& b, T (* const func)(const T&, const T&)){
-//	Vec<N,T> r;
-//	IT(N){ r[i] = func(a[0], b[0]); }
-//	return r;
-//}
-
-//template <int N, class T>
-//inline Mat<N,T> operator* (const Mat<N,T>& a, const Mat<N,T>& b){
-//	Mat<N,T> r; return Mat<N,T>::multiply(r, a,b);
-//}
 
 // Mat
 template <int N, class T>

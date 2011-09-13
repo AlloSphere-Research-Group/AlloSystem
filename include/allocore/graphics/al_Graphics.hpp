@@ -329,7 +329,7 @@ inline void Graphics::cullFace(bool b) { capability(CULL_FACE, b); }
 
 inline void Graphics::rotate(const Quatd& q) {
 	Matrix4d m;
-	q.toMatrix(m.elems);
+	q.toMatrix(m.elems());
 	multMatrix(m);
 }
 
