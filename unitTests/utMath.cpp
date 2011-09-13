@@ -12,18 +12,6 @@ inline bool eq(const T* x, const T* y, int n, T eps=0.0000001){
 	return true; 
 }
 
-// Almost equal functions
-//template <class T>
-//inline bool eq(T x, T y){ return aeq(x,y,32); }
-//
-//template <class T>
-//inline bool eq(const T* x, const T* y, int n){
-//	for(int i=0; i<n; ++i){
-//		if(!eq(x[i], y[i])) return false;
-//	}
-//	return true; 
-//}
-
 template <class T>
 inline bool eq(const Quat<T>& a, const Quat<T>& b){ return eq(&a[0], &b[0], 4); }
 
@@ -180,8 +168,6 @@ int utMath(){
 		b.set(0,1,0);
 		c.set(0,0,1);
 			assert(c == cross(a,b));
-			assert(c == (a^b));
-
 			assert(c == a.cross(b));
 
 		a = b;
