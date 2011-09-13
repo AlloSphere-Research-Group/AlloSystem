@@ -829,20 +829,6 @@ inline Vec<3,T> cross(const Vec<3,T>& a, const Vec<3,T>& b){
 	Vec<3,T> r;	cross(r,a,b); return r;
 }
 
-/// Returns wedge product a ^ b
-
-/// Since the ^ operator has lower precedence than other arithmetic operators
-/// (-, +, *, /, ==) being a bitwise XOR, use parenthesis around this operation 
-/// to ensure correct results.
-template <int N, class T>
-Vec<N,T> operator^ (const Vec<N,T>& a, const Vec<N,T>& b);
-
-/// Returns wedge (cross) product of two 3-vectors
-template <class T>
-inline Vec<3,T> operator^ (const Vec<3,T>& a, const Vec<3,T>& b){
-	return cross(a,b);
-}
-
 /// Returns angle, in interval [0, pi], between two vectors
 template <int N, class T>
 static T angle(const Vec<N,T>& a, const Vec<N,T>& b){
