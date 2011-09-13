@@ -520,7 +520,7 @@ Window::Window()
 }
 
 Window::~Window(){
-	printf("destroying Window\n");
+	//printf("destroying Window\n");
 	destroy();
 	delete mImpl;
 }
