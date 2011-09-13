@@ -73,9 +73,9 @@ public:
 	}
 
 
-	// Getters
-
+	/// Returns the identity
 	static Pose identity(){ return Pose().setIdentity(); }
+
 
 	/// Get "position" vector
 	const Vec3d& pos() const { return mVec; }
@@ -98,11 +98,18 @@ public:
 		return m;
 	}
 
+	Mat4d directionMatrix() const {
+		Mat4d m = matrix();
+		m(0,2) = -m(0,2);
+		m(1,2) = -m(1,2);
+		m(2,2) = -m(2,2);
+		return m;
+	}
+
 	/// Get the azimuth, elevation & distance from this to another point
 	void toAED(const Vec3d& to, double& azimuth, double& elevation, double& distance) const;
 
-	/// Get right, up, and forward unit vectors
-	/// quat() should have been normalized before this call
+	/// Get world space unit vectors
 	template <class T>
 	void unitVectors(Vec<3,T>& ux, Vec<3,T>& uy, Vec<3,T>& uz) const {	
 		quat().toVectorX(ux);
@@ -110,6 +117,7 @@ public:
 		quat().toVectorZ(uz);	
 	}
 
+	/// Get local right, up, and forward unit vectors
 	template <class T>
 	void directionVectors(Vec<3,T>& ur, Vec<3,T>& uu, Vec<3,T>& uf) const {
 		unitVectors(ur, uu, uf);
@@ -418,21 +426,6 @@ protected:
 };
 
 
-
-//
-//class NavRef : public Nav {
-//public:
-//	NavRef()
-//	: mParent(0)
-//	{}
-//
-//	void parent(Nav * v){ mParent = v; }
-//
-//	Nav * parent(){ return mParent; }
-//
-//protected:
-//	Nav * mParent;
-//};
 
 
 // Implementation --------------------------------------------------------------
