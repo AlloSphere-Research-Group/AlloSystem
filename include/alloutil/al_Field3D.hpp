@@ -162,7 +162,7 @@ public:
 	
 	template<typename T1>
 	void addForce(const Vec<3,T1> pos, const Vec<3,T> vel) {
-		velocities.front().write_interp(vel.elems, pos);
+		velocities.front().write_interp(vel.elems(), pos);
 	}
 	
 	template<typename T1>

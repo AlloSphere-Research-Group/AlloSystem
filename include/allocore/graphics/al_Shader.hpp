@@ -163,7 +163,7 @@ public:
 	void setGeometryOutputVertices(unsigned int i) { mOutVertices = i; }
 
 	const ShaderProgram& link() const;
-	const ShaderProgram& use() const;
+	const ShaderProgram& use();
 
 	/// Get whether program is active
 	bool active() const { return mActive; }
@@ -174,7 +174,7 @@ public:
 	/// Toggle active state
 	ShaderProgram& toggleActive(){ mActive^=true; return *this; }
 
-	bool begin() const;
+	bool begin();
 	void end() const;
 
 	/// Returns whether program linked successfully.

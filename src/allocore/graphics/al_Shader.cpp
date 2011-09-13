@@ -198,12 +198,15 @@ void ShaderProgram::onDestroy(){
 	//glDeleteObjectARB((GLhandleARB)handle()); 
 }
 
-const ShaderProgram& ShaderProgram::use() const { 
-	if(active()) glUseProgram(id()); 
+const ShaderProgram& ShaderProgram::use() { 
+	if(active()) {
+		validate();
+		glUseProgram(id()); 
+	}
 	//glUseProgramObjectARB((GLhandleARB)handle());
 	return *this; 
 }
-bool ShaderProgram::begin() const { 
+bool ShaderProgram::begin() { 
 	use();
 	return active();
 }
