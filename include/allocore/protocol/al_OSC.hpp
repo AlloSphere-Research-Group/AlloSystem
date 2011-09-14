@@ -36,36 +36,6 @@
 */
 
 /*
-
-Example usage (sending):
-
-	osc::Send s(1000, "localhost");
-	
-	// A simple way to send a message
-	s.send("/foo", 1, 2.3, "four");
-	
-	// Or, use a temp object
-	osc::Send(1000, "192.168.0.1").send("/foo", 1, 2.3, "four");
-
-	// Sending a fairly complex time-tagged bundle
-	osc::TimeTag timeNow = ...;
-	osc::TimeTag dt = ...;
-
-	s.beginBundle(timeNow);		
-		s.addMessage("/message11", 12345678, 1.f, 1., "hello world!");
-		s.addMessage("/message12", 23456789);
-		s.beginBundle(timeNow + dt);
-			s.addMessage("/message21", 3456789);
-			s.beginBundle(timeNow + dt*2);
-				s.addMessage("/message31", 456789);
-			s.endBundle();
-		s.endBundle();
-		s.addMessage("/message13", 56789);
-	s.endBundle();
-	
-	s.send();
-
-
 Example usage (receiving):
 
 	osc::Recv r(1000);
@@ -300,6 +270,9 @@ public:
 
 	/// Send and clear current packet contents
 	int send();
+
+	/// Send a packet
+	int send(const Packet& p);
 	
 	/// Send zero argument message immediately
 	int send(const std::string& addr){

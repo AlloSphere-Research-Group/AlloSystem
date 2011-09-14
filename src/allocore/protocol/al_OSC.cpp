@@ -214,9 +214,14 @@ Send::Send(uint16_t port, const char * address, al_sec timeout)
 {}
 
 int Send::send(){
-	int r = SocketSend::send(Packet::data(), Packet::size());
+	//int r = SocketSend::send(Packet::data(), Packet::size());
+	int r = send(*this);
 	Packet::clear();
 	return r;
+}
+
+int Send::send(const Packet& p){
+	return SocketSend::send(p.data(), p.size());
 }
 
 
