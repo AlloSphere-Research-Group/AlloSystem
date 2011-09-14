@@ -125,6 +125,8 @@ public:
 	void enter() {
 		validate();
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFboId);
+		glMatrixMode(GL_PROJECTION); glLoadIdentity();
+		glMatrixMode(GL_MODELVIEW); glLoadIdentity();
 	}
 	
 	Color clearColor() const { return mClearColor; }
@@ -132,11 +134,15 @@ public:
 	
 	void clear() {
 		glViewport(0, 0, width(), height());
-		glClearColor(mClearColor.r, mClearColor.g, mClearColor.b, 1.);
+		glEnable(GL_SCISSOR_TEST);
+		glScissor(0, 0, width(), height());
+		
+		glClearColor(mClearColor.r, mClearColor.g, mClearColor.b, 1.);				glClearDepth(1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 	
 	void leave() {
+		glDisable(GL_SCISSOR_TEST);
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 		
 		// trigger mipmap generation explicitly

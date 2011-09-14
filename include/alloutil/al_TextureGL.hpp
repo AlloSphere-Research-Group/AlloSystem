@@ -164,7 +164,6 @@ public:
 	
 	void quad(Graphics& gl, double w=1, double h=1, double x0=0, double y0=0) {
 		bind();
-		gl.color(1, 1, 1, 1);
 		gl.pushMatrix();
 		gl.translate(x0, y0, 0);
 		gl.scale(w, h, 1);

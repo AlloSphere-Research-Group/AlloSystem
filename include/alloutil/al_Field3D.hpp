@@ -50,11 +50,10 @@ public:
 	:	mDim(ceilPow2(dim)),
 		mDim3(mDim*mDim*mDim),
 		mDimWrap(mDim-1),
-		mFront(1) 
-	{
-		mArray0.format(components, Array::type<T>(), mDim, mDim, mDim);
-		mArray1.format(components, Array::type<T>(), mDim, mDim, mDim);
-	}
+		mFront(1),
+		mArray0(components, Array::type<T>(), mDim, mDim, mDim),
+		mArray1(components, Array::type<T>(), mDim, mDim, mDim)
+	{}
 	
 	~Field3D() {
 		mArray0.dataFree();
