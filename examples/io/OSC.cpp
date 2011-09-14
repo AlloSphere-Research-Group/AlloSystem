@@ -181,3 +181,18 @@ int main(){
 
 	return 0;
 }
+
+/*
+TODO: example code previous in header file
+
+	// Poll socket manually at periodic intervals ...
+	r.timeout(0);	// set to be non-blocking
+	void myThreadFunc(){
+		while (r.recv()) {}	// use while loop to empty queue
+	}
+
+	// or, launch an automatic background thread
+	r.timeout(1);	// ensure waiting period is greater than 0
+	r.start(); 
+
+*/

@@ -35,41 +35,6 @@
 
 */
 
-/*
-Example usage (receiving):
-
-	osc::Recv r(1000);
-
-	struct OSCHandler : public osc::PacketHandler{
-		void onMessage(osc::Message& m){
-			std::string tags = m.typeTags();
-			std::string addr = m.addressPattern();
-			osc::TimeTag ttag= m.timeTag();
-
-			int i;
-			double d;
-			std::string s;
-			if(addr == "/example" && tags == "ids" ){
-				m >> i >> d >> s;
-			}
-		}
-	};
-	
-	OSCHandler myOSCHandler;
-	r.handler(myOSCHandler);
-
-	// Poll socket manually at periodic intervals ...
-	r.timeout(0);	// set to be non-blocking
-	void myThreadFunc(){
-		while (r.recv()) {}	// use while loop to empty queue
-	}
-
-	// or, launch an automatic background thread
-	r.timeout(1);	// ensure waiting period is greater than 0
-	r.start(); 
-
-*/
-
 #include <string>
 #include <vector>
 #include "allocore/io/al_Socket.hpp"
@@ -77,7 +42,6 @@ Example usage (receiving):
 
 namespace al{
 namespace osc{
-
 
 /// User-defined data
 struct Blob{
@@ -87,6 +51,7 @@ struct Blob{
     const void* data;
     unsigned long size;
 };
+
 
 /// Time tag
 
