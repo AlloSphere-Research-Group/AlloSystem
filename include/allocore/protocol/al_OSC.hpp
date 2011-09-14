@@ -27,7 +27,7 @@
 
 	File description:
 	Objects for reading, writing, sending, and receiving 
-	OSC (Open Sound Control) packeets.
+	OSC (Open Sound Control) packets.
 
 	File author(s):
 	Lance Putnam, 2010, putnam.lance@gmail.com
