@@ -1,3 +1,15 @@
+/*
+Allocore Example: Audio Device
+
+Description:
+The example demonstrates how to start an audio stream and process input and
+output.
+
+Author:
+Lance Putnam, 4/25/2011
+*/
+
+
 #include "allocore/al_Allocore.hpp"
 using namespace al;
 
@@ -7,7 +19,7 @@ struct UserData{
 };
 
 
-// create a callback for generating a block of samples
+// Our main audio callback
 void audioCB(AudioIOData& io){
 
 	UserData& user = *(UserData *)io.user();
@@ -27,7 +39,7 @@ void audioCB(AudioIOData& io){
 
 int main(){
 
-	// set parameters of audio stream
+	// Set parameters of audio stream
 	int blockSize = 64;				// how many samples per block?
 	float sampleRate = 44100;		// sampling rate (samples/second)
 	int outputChannels = 2;			// how many output channels to open
@@ -38,15 +50,13 @@ int main(){
 	AudioDevice::printAll();
 	printf("\n");
 
-	// create an audio i/o object using default input and output devices
+	// Create an audio i/o object using default input and output devices
 	AudioIO io(blockSize, sampleRate, audioCB, &user, outputChannels, inputChannels);
 	
-//	io.deviceIn(AudioDevice(1));
-	
-	// start the audio stream
+	// Start the audio stream; this launches a new thread
 	io.start();
 	
-	// print some information about the i/o streams
+	// Print some information about the i/o streams
 	printf("Audio stream info:\n");
 	io.print();
 	
