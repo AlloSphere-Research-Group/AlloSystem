@@ -1,7 +1,11 @@
 /*
+Allocore Example: Reverberation
+
 Description:
 This demonstrates how to apply a reverberation effect to the audio line input.
 
+Author:
+Lance Putnam, 4/25/2011, putnam.lance@gmail.com
 */
 
 #include "allocore/al_Allocore.hpp"
@@ -26,7 +30,6 @@ void audioCB(AudioIOData& io){
 	}
 }
 
-AudioIO audioIO(256, 44100, audioCB, 0, 2, 1);
 
 int main (int argc, char * argv[]){
 
@@ -35,6 +38,7 @@ int main (int argc, char * argv[]){
 	reverb.decay(0.8);			// tail decay factor
 	reverb.diffusion(0.76, 0.666, 0.707, 0.571); // diffusion amounts
 
+	AudioIO audioIO(256, 44100, audioCB, 0, 2, 1);
 	audioIO.start();
 	
 	printf("\nPress 'enter' to quit...\n"); getchar();
