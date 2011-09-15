@@ -55,10 +55,7 @@ public:
 		mArray1(components, Array::type<T>(), mDim, mDim, mDim)
 	{}
 	
-	~Field3D() {
-		mArray0.dataFree();
-		mArray1.dataFree();
-	}
+	~Field3D() {}
 	
 	unsigned length() const { return components()*mDim3; }
 	unsigned components() const { return mArray0.header.components; }
