@@ -1,11 +1,14 @@
 /*
+Allocore Example: Sine wave
+
 Description:
+This demonstrates how to play a sine wave using Gamma.
 
-Calls Gamma TableSine from AlloCore
-
-Matt Wright
-
+Author:
+Matt Wright, 4/2011, matt@create.ucsb.edu
 */
+
+
 
 #include "allocore/al_Allocore.hpp"
 #include "Gamma/Oscillator.h"
@@ -23,7 +26,7 @@ void audioCB(AudioIOData& io){
 }
 
 
-int main (int argc, char * argv[]){
+int main(){
 	AudioIO audioIO(256, 44100, audioCB, 0, 2, 1);
 
 	// This call is necessary to synchronize the sample rate with all sound objects
