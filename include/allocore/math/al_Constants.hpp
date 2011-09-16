@@ -101,6 +101,9 @@ namespace al {
 #ifndef M_LN001		
 #define M_LN001		-6.90775527898								// ln(0.001)
 #endif
+#ifndef M_SQRT_1_3	
+#define	M_SQRT_1_3	0.577350269189626							// sqrt(1./3);
+#endif
 
 } // ::al::
 

@@ -24,8 +24,7 @@ int addTetrahedron(Mesh& m){
 	return Nv;
 }
 
-int addCube(Mesh& m, bool withNormalsAndTexcoords){
-	static const float l = sqrt(1./3);
+int addCube(Mesh& m, bool withNormalsAndTexcoords, float l){
 	if (withNormalsAndTexcoords) {
 		m.normal	( 1, 0, 0);
 		m.texCoord	( 0, 0);
