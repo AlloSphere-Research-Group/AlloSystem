@@ -9,11 +9,11 @@ Author:
 Lance Putnam, 8/29/2011
 */
 
-#include "alloutil/al_World.hpp"
+#include "alloutil/al_App.hpp"
 
 using namespace al;
 
-class MyActor : public Actor{
+class MyApp : public App{
 public:
 
 	virtual void onDraw(Graphics& g, const Viewpoint& v){
@@ -33,28 +33,24 @@ public:
 	}
 };
 
-World w("Front and Back Views");
+MyApp app;
 Viewpoint vpF, vpB;
-MyActor myActor;
-ViewpointWindow win(0,0, 800,600, w.name());
+ViewpointWindow win(Window::Dim(800,600));
 
 int main(){
 
 	// Configure the front and back viewpoints
-	vpF.parentTransform(w.nav());
-	vpB.parentTransform(w.nav());
+	vpF.parentTransform(app.nav());
+	vpB.parentTransform(app.nav());
 
 	vpF.stretch(1, 0.5).anchor(0, 0.5);
 	vpB.stretch(1, 0.5).anchor(0, 0.0);
 	vpB.transform().quat().fromAxisAngle(M_PI, 0,1,0);
 	
 	win.add(vpF).add(vpB);
-	w.add(win, true);
-	
-	// Note: this will call our drawing routine for each viewpoint
-	w.add(myActor);
+	app.add(win);
 
-	w.start();
+	app.start();
 	return 0;
 }
 
