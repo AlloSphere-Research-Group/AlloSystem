@@ -65,6 +65,9 @@ public:
 
 	Random(uint32_t seed): mRNG(seed){}
 
+	/// Set seed
+	Random& seed(uint32_t v){ mRNG.seed(v); return *this; }
+
 	/// Returns uniform random in [0, 1)
 	float uniform(){ return al::uintToUnit<float>(mRNG()); }
 
