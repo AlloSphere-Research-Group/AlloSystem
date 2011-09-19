@@ -1,11 +1,9 @@
-#include "alloutil/al_World.hpp"
+#include "alloutil/al_App.hpp"
 
 using namespace al;
 
-class MyActor : public Actor{
+class MyApp : public App{
 public:
-
-	MyActor(){}
 
 	virtual void onDraw(Graphics& g, const Viewpoint& v){		
 		Frustumd fr;
@@ -49,20 +47,12 @@ public:
 
 };
 
-World w("Frustum Testing");
-ViewpointWindow win(0,0, 600,400, w.name());
-Viewpoint vp;		
-MyActor myActor;
+MyApp app;
 
 int main(){
-	w.camera().near(10).far(25);
-
-	vp.parentTransform(w.nav());
-	win.add(vp);
-	w.add(win, true);
-	w.add(myActor);
-
-	w.start();
+	app.initWindow();
+	app.camera().near(10).far(25);
+	app.start();
 	return 0;
 }
 

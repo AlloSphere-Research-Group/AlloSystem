@@ -1,11 +1,9 @@
-#include "alloutil/al_World.hpp"
+#include "alloutil/al_App.hpp"
 
 using namespace al;
 
-class MyActor : public Actor{
+class MyApp : public App{
 public:
-
-	MyActor(){}
 
 	virtual void onSound(AudioIOData& io){}
 	
@@ -17,21 +15,14 @@ public:
 
 };
 
-World w("Simple World");
-ViewpointWindow win(0,0, 600,400, w.name());
-Viewpoint vp;
-MyActor myActor;
+MyApp app;
 
 int main(){
-	w.camera().near(10).far(25);
-	w.nav().quat().fromAxisAngle(0, 0,0,1);
+	app.camera().near(10).far(25);
+	app.nav().quat().fromAxisAngle(0, 0,0,1);
 
-	vp.parentTransform(w.nav());
-	
-	win.add(vp);
-	w.add(win, true);
-	w.add(myActor);
+	app.initWindow(Window::Dim(600,400));
 
-	w.start();
+	app.start();
 	return 0;
 }
