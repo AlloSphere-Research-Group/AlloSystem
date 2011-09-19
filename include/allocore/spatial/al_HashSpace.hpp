@@ -42,8 +42,8 @@
 	TODO: non-toroidal version.
 
 	File author(s):
-	Graham Wakefield, 2011, grrrwaaa@gmail.com
 	Wesley Smith, 2010, wesley.hoke@gmail.com
+	Graham Wakefield, 2011, grrrwaaa@gmail.com
 	
 	Inspired by this paper:
 	http://nicolas.brodu.numerimoire.net/common/recherche/publications/QuerySphereIndexing.pdf
@@ -51,61 +51,93 @@
 
 namespace al {
 
+/**
+	HashSpace is a way to detect object collisions using a voxel grid
+	The grid has a given resolution (no. voxel cells per side)
+	
+	It is optimized for densely packed points and querying for nearest neighbors
+	within given radii (results will be roughly sorted by distance). 
+*/
 class HashSpace {
 public:
 	
-	// container for registered spatial elements
+	/// container for registered spatial elements
 	struct Object {
 		Object() : hash(invalidHash()), next(NULL), prev(NULL), userdata(0) {}
 			
 		Vec3d pos;		
 		uint32_t hash;	///< which voxel ID it belongs to (or invalidHash())
 		Object * next, * prev;	///< neighbors in the same voxel
-		union {			// a way to attach user-defined payloads:
+		union {			///< a way to attach user-defined payloads:
 			uint32_t id;
 			void * userdata;
 		};
 	};
 
+	/// each Voxel contains a linked list of Objects
 	struct Voxel {
 		Voxel() : mObjects(NULL) {}
 		Voxel(const Voxel& cpy) : mObjects(NULL) {}
 		
-		// this is definitely not thread-safe.
+		/// definitely not thread-safe.
 		inline void add(Object * o);
 		
-		// this is definitely not thread-safe.
+		/// definitely not thread-safe.
 		inline void remove(Object * o);
 		
+		/// the linked list of objects in this voxel
 		Object * mObjects;
 	};
 	
-	// create and re-use a query object to find neighbors:
+	/** 
+		Query functor 
+		create and re-use a query functor to find neighbors
+		
+		Query query;
+		
+		query.clear(); // do this if you want to re-use the query object
+		query(space, Vec3d(0, 0, 0), 10);
+		for (int i=0; i<query.size(); i++) {
+			Object * o = query[i];
+			...
+		}
+	*/
 	struct Query {
-	
+		
 		typedef std::vector<HashSpace::Object *> Vector;
 		typedef Vector::iterator Iterator;
 	
+		/** 
+			Constructor
+			@param maxResults the maximum number of results to find
+		*/
 		Query(uint32_t maxResults=128) 
 		:	mMaxResults(maxResults)
 		{
 			mObjects.reserve(maxResults);
 		}
 		
-		/// clear is separated from the main query operation, 
-		/// to support aggregating queries in series
-		/// typically however you would want to clear() and then query.
-		Query& clear() { mObjects.clear(); return *this; }
-		
-		/// set/get the maximum number of desired results
-		Query& maxResults(uint32_t i) { mMaxResults = i; return *this; }
-		uint32_t maxResults() const { return mMaxResults; }
-		
-		/// get the neighbors within maxRadius (and beyond minRadius if given)
-		// the maximum permissible value of radius is space.maxRadius()
+		/** 
+			The main method of the query object
+			finds the neighbors of a given point, within given distances
+			the matches will be roughly (not exactly) sorted by distance
+			
+			@param space the HashSpace object to search in
+			@param center finds objects near to this point
+			@param maxRadius finds objects if they are nearer this distance
+				the maximum permissible value of radius is space.maxRadius()
+			@param minRadius finds objects if they are beyond this distance
+			@return the number of results found
+		*/ 
 		int operator()(const HashSpace& space, const Vec3d center, double maxRadius, double minRadius=0.);
 		
-		/// just get the nearest neighbors
+		/**
+			finds all the neighbors of the given point, up to maxResults()
+			the matches will be roughly (not exactly) sorted by distance
+			
+			@param space the HashSpace object to search in
+			@param center finds objects near to this point
+		*/
 		int operator()(const HashSpace& space, Vec3d center);
 		
 		/// get number of results:
@@ -113,7 +145,19 @@ public:
 		/// get each result:
 		Object * operator[](unsigned i) const { return mObjects[i]; }
 		
-		// std::vector interface:
+		/** 
+			clear is separated from the main query operation, 
+			to support aggregating queries in series
+			typically however you would want to clear() and then call the query.
+		*/
+		Query& clear() { mObjects.clear(); return *this; }
+		
+		/// set the maximum number of desired results
+		Query& maxResults(uint32_t i) { mMaxResults = i; return *this; }
+		/// get the maximum number of desired results
+		uint32_t maxResults() const { return mMaxResults; }
+		
+		/// std::vector interface:
 		Iterator begin() { return mObjects.begin(); }
 		Iterator end() { return mObjects.end(); }
 		Vector& vector() { return mObjects; }
@@ -123,16 +167,21 @@ public:
 		std::vector<Object *> mObjects;
 	};
 	
-	/// resolution defines the size of the space (2^resolution per axis)
-	/// locations will range from [0..2^resolution)
+	/** 
+		Construct a HashSpace
+		locations will range from [0..2^resolution)
+		
+		@param resolution determines the number of voxels as 2^resolution per axis 
+		@param numObjects set how many Object slots to initally allocate
+	*/
 	HashSpace(uint32_t resolution=5, uint32_t numObjects=0);
+	
 	~HashSpace();
 	
 	/// the dimension of the space per axis:
 	uint32_t dim() const { return mDim; }
 	/// the maximum valid radius to query (half the dimension):
 	uint32_t maxRadius() const { return mDimHalf; }
-	
 	
 	/// get/set the number of objects:
 	void numObjects(int numObjects);
@@ -148,7 +197,6 @@ public:
 	/// this removes the object from voxels/queries, but does not destroy it
 	/// the objectId can be reused later via move()
 	HashSpace& remove(uint32_t objectId);
-	
 	
 	/// wrap an absolute position within the space:
 	double wrap(double x) const { return wrap(x, dim()); }
