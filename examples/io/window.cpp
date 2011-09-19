@@ -1,8 +1,24 @@
+/*
+Allocore Example: Window
+
+Description:
+The example demonstrates how to create a window with custom event callbacks.
+
+Author:
+Lance Putnam, 4/25/2011
+*/
+
 #include <stdio.h>
 #include "allocore/al_Allocore.hpp"
 using namespace al;
 
 struct MyWindow : Window {
+
+	bool onFrame(){
+		// This is where your drawing code goes ...
+
+		return true;
+	}
 
 	bool onCreate(){ 					printTitle(); printf("onCreate\n"); return 1; }
 	bool onDestroy(){					printTitle(); printf("onDestroy\n"); return 1; }
@@ -27,24 +43,26 @@ struct MyWindow : Window {
 		printf("k:%3d, %d s:%d c:%d a:%d\n", k.key(), k.down(), k.shift(), k.ctrl(), k.alt());
 	}
 
-	bool onFrame(){
-		return true;
-	}
-	
 	void printTitle(){ printf("%s: ", &title()[0]); }
 };
 
 
 int main(){
 
-	MyWindow win1, win2;
-
-	win1.add(new StandardWindowKeyControls);
-	win2.add(new StandardWindowKeyControls);
-
-	win1.create(Window::Dim(100, 0, 400,300), "Window 1");
-	//win2.create(Window::Dim(500, 0, 400,300), "Window 2");
+	// Construct window; note this does not actually create it
+	MyWindow win;
 	
+	// Add some standard key controls for fullscreen, quitting, etc.
+	win.add(new StandardWindowKeyControls);
+	
+	// This creates the window
+	win.create(
+		Window::Dim(100, 0, 400,300),	// dimensions, in pixels
+		"Window",						// title
+		40,								// ideal frames/second; actual rate will vary
+		DisplayMode::DefaultBuf			// display mode
+	);
+
 	MainLoop::start();
 	return 0;
 }
