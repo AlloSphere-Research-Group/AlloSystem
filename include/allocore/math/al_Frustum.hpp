@@ -65,6 +65,28 @@ public:
 		return (&ntl)[i2<<2 | i1<<1 | i0];
 	}
 
+	/// Get point in frustum corresponding to fraction along edges
+	template <class U>
+	Vec<3,T> getPoint(const Vec<3,U>& frac) const {
+		return 
+		lerp(frac[2],
+			lerp(frac[1], 
+				lerp(frac[0], corner(0,0,0), corner(1,0,0)),
+				lerp(frac[0], corner(0,1,0), corner(1,1,0))
+			),
+			lerp(frac[1],
+				lerp(frac[0], corner(0,0,1), corner(1,0,1)),
+				lerp(frac[0], corner(0,1,1), corner(1,1,1))
+			)
+		);
+	}
+
+	/// Get point in frustum corresponding to fraction along edges
+	template <class U>
+	Vec<3,T> getPoint(const U& fracx, const U& fracy, const U& fracz) const {
+		return getPoint(Vec<3,U>(fracx,fracy,fracz));
+	}
+
 	/// Test whether point is in frustum
 	int testPoint(const Vec<3,T>& p) const;
 	
@@ -84,7 +106,13 @@ public:
 	
 	///	The plane normals are computed assuming a right-hand coordinate system.
 	///
-	void computePlanes();		
+	void computePlanes();
+
+private:
+	template <class Tf, class Tv>
+	static Tv lerp(Tf f, const Tv& x, const Tv& y){
+		return (y - x) * f + x;
+	}
 };
 
 
