@@ -203,7 +203,7 @@ public:
 	double time() const;				///< Get current stream time in seconds
 	double time(int frame) const;		///< Get current stream time in seconds of frame
 
-
+	void user(void * v){ mUser=v; }		///< Set user data
 	void frame(int v){ mFrame=v-1; }	///< Set frame count for next iteration
 	void zeroBus();						///< Zeros all the bus buffers
 	void zeroOut();						///< Zeros all the internal output buffers
