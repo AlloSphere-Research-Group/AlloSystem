@@ -48,7 +48,7 @@ public:
 		
 		// draw points:
 		gl.pointSize(1);
-		gl.color(1, 0, 0);
+		gl.color(1, 0.3, 0);
 		gl.begin(gl.POINTS);
 			for (unsigned id=0; id<space.numObjects(); id++) {
 				HashSpace::Object& o =  space.object(id);
@@ -60,13 +60,13 @@ public:
 		
 		// draw region of interest:
 		gl.begin(gl.LINE_LOOP);
-			gl.color(1, 0, 0);
+			gl.color(1, 0.3, 0);
 			for (double a=0; a<M_2PI; a+=0.1) {
 				gl.vertex(center + Vec3d(range*cos(a), range*sin(a), 0));
 			}
 		gl.end();
 		gl.begin(gl.LINE_LOOP);
-			gl.color(1, 0, 0);
+			gl.color(1, 0.3, 0);
 			for (double a=0; a<M_2PI; a+=0.1) {
 				gl.vertex(center + Vec3d(range2*cos(a), range2*sin(a), 0));
 			}
@@ -77,7 +77,7 @@ public:
 		query(space, center, range, range2);
 
 		// draw neighbors:
-		gl.color(0, 0.5, 0);
+		gl.color(0, 0.5, 1.);
 		gl.begin(gl.POINTS);
 			gl.pointSize(2.);
 			for (unsigned i=0; i<query.size(); i++) {
