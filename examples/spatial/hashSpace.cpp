@@ -13,7 +13,7 @@ Graphics gl;
 rnd::Random<> rng;
 Stereographic stereo;
 
-// the space has 2^6 voxels per size and 10000 objects:
+// the space has 2^6 voxels per side (i.e., for each of the 3 sides) and 10000 objects:
 HashSpace space(6, 10000);
 
 // a query object to be re-used for finding neighbors:
