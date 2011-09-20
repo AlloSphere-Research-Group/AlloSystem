@@ -35,7 +35,7 @@
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
-#include "allocore/graphics/al_GraphicsOpenGL.hpp"
+#include "allocore/graphics/al_Graphics.hpp"
 #include <stdio.h>
 
 /*!
@@ -129,7 +129,7 @@ public:
 			glTexParameteri(mTarget, GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
 			glBindTexture(mTarget, 0);
 			submit();
-			GraphicsGL::gl_error("creating texture");
+			Graphics::error("creating texture");
 		}
 	}
 	
@@ -151,7 +151,7 @@ public:
 		glEnable(mTarget);
 		glBindTexture(mTarget, id());
 		
-		GraphicsGL::gl_error("binding texture");
+		Graphics::error("binding texture");
 	}
 	
 	void unbind(int unit = 0) {		
@@ -338,7 +338,7 @@ public:
 		// set alignment back to default
 		//glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 		
-		GraphicsGL::gl_error("submitting texture");
+		Graphics::error("submitting texture");
 		
 //		// OpenGL may have changed the internal format to one it supports:
 //		GLint format;
@@ -546,7 +546,7 @@ public:
 			
 			// clean up:
 			glBindTexture(mTarget, 0);
-			GraphicsGL::gl_error("creating cubemap texture");
+			Graphics::error("creating cubemap texture");
 		}
 		//printf("created CubeMapTexture %dx%d\n", mResolution, mResolution);
 	}

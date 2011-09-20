@@ -9,7 +9,7 @@
 using namespace al;
 
 Window win;
-GraphicsGL gl;
+Graphics gl;
 rnd::Random<> rng;
 Stereographic stereo;
 

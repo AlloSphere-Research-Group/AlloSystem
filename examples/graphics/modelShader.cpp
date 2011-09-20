@@ -41,15 +41,17 @@ struct MyWindow : Window{
 		// fill it with scene contents
 		scene_list = glGenLists(1);
 		glNewList(scene_list, GL_COMPILE);
-		
 		Mesh mesh;
 		for (unsigned i=0; i<ascene->meshes(); i++) {
 			ascene->mesh(i, mesh);
 			gl.draw(mesh);
 		}	
-		
-		//recursive_render(scene, scene->mRootNode);
 		glEndList();
+		
+		FilePath path = searchpaths.find("hubble.jpg");
+		Image img;
+		img.load(path.filepath());
+		tex.submit(img.array(), true);
 
 		return true;
 	}
@@ -173,12 +175,6 @@ int main (int argc, char * const argv[]) {
 	
 	frag.source(frag_file.readAll(), Shader::FRAGMENT);	
 	vert.source(vert_file.readAll(), Shader::VERTEX);
-	
-	path = searchpaths.find("hubble.jpg");
-	Image img;
-	img.load(path.filepath());
-	tex.fromArray(&img.array());
-	tex.target(Texture::TEXTURE_2D);
 	
 	win1.add(new StandardWindowKeyControls);
 	win1.create(Window::Dim(640, 480));

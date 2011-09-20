@@ -33,7 +33,7 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
-#include "allocore/graphics/al_GraphicsOpenGL.hpp"
+#include "allocore/graphics/al_Graphics.hpp"
 #include "alloutil/al_TextureGL.hpp"
 
 #include <stdio.h>
