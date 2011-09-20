@@ -16,12 +16,16 @@ using namespace al;
 class MyApp : public App{
 public:
 
+	double phase;
+
+	MyApp(): phase(0){}
+
 	virtual void onSound(AudioIOData& io){
 		while(io()){
 			float in = io.in(0);
 			
-			float out1 =-in*in*in;
-			float out2 = out1;
+			float out1 = 0;
+			float out2 = 0;
 			
 			io.out(0) = out1;
 			io.out(1) = out2;
@@ -29,7 +33,9 @@ public:
 	}
 	
 	virtual void onAnimate(double dt){
-	
+		// The phase will ramp from 0 to 1 over 1 second
+		phase += dt;
+		if(phase >= 1.) phase -= 1.;
 	}
 
 	virtual void onDraw(Graphics& g, const Viewpoint& v){
@@ -42,13 +48,17 @@ public:
 		
 		m.reset();
 		m.primitive(g.TRIANGLES);
-		m.color(1,0,0);
-		addSphere(m);
+
+		int N = addSphere(m, 1, 32, 32);
+
+		for(int i=0; i<N; ++i){
+			m.color(HSV(0.1, 0.5, al::fold(phase + i*0.5/N, 0.5)+0.5));
+		}
 
 		g.draw(m);
 	}
-
 };
+
 
 MyApp app;
 
