@@ -190,7 +190,7 @@ struct MyWindow : public Window, public Drawable{
 		}
 	}
 
-	GraphicsGL gl;
+	Graphics gl;
 	Pose transform;
 	Camera cam;
 };

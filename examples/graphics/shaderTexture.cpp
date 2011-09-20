@@ -30,21 +30,18 @@ void main(){
 struct MyWindow : Window{
 
 	MyWindow()
-	:	 tex(gl, 64,64, Texture::RGBA, Texture::FLOAT32)
+	:	 tex(64,64, Graphics::RGBA, Graphics::FLOAT)
 	{}
 
-	GraphicsGL gl;
+	Graphics gl;
 	ShaderProgram shaderP;
 	Shader shaderV, shaderF;
 	Texture tex;
 
 	bool onCreate(){
-
-//		tex.filter(Texture::NEAREST);
-		tex.allocate();
 		int Nx = tex.width();
 		int Ny = tex.height();
-		float * texBuf = tex.data<float>();
+		float * texBuf = new float[tex.numElems()];
 		
 		for(int j=0; j<Ny; ++j){ float y = float(j)/(Ny-1)*2-1;
 		for(int i=0; i<Nx; ++i){ float x = float(i)/(Nx-1)*2-1;
@@ -60,6 +57,9 @@ struct MyWindow : Window{
 			texBuf[idx*4 + 2] = col.b;
 			texBuf[idx*4 + 3] = col.a;
 		}}
+		
+		tex.submit(texBuf);
+		delete[] texBuf;
 
 		shaderV.source(vTexture, Shader::VERTEX).compile().printLog();
 		shaderP.attach(shaderV);

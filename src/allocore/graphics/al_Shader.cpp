@@ -1,4 +1,4 @@
-#include "allocore/graphics/al_GraphicsOpenGL.hpp"
+#include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_Shader.hpp"
 
 #include <stdio.h>
@@ -59,9 +59,9 @@ Shader::Shader(const std::string& source, Shader::Type type)
 :	mSource(source), mType(type){}
 
 Shader& Shader::compile(){ 
-	GraphicsGL::gl_error("glerror compile0");
+	Graphics::error("glerror compile0");
 	validate(); 
-	GraphicsGL::gl_error("glerror compile1");
+	Graphics::error("glerror compile1");
 	return *this; 
 }
 
@@ -70,7 +70,7 @@ bool Shader::compiled() const {
 	GLhandleARB h = (GLhandleARB)id();
 	glGetObjectParameterivARB(h, GL_COMPILE_STATUS, &v);
 	//glGetProgramiv(id(), GL_COMPILE_STATUS, &v);
-	GraphicsGL::gl_error("Shader::compiled()");
+	Graphics::error("Shader::compiled()");
 	return v;
 }
 
@@ -78,14 +78,14 @@ void Shader::get(int pname, void * params) const { glGetShaderiv(id(), pname, (G
 
 void Shader::onCreate(){
 	mID = glCreateShader(gl_shader_type(mType));
-	GraphicsGL::gl_error("Shader::onCreate0");
+	Graphics::error("Shader::onCreate0");
 	//mHandle = glCreateShaderObjectARB(gl_shader_type(mType));
 	//mID = (long)handle();
 	if(mSource[0]){
 		sendSource(); 
-		GraphicsGL::gl_error("Shader::onCreate1");
+		Graphics::error("Shader::onCreate1");
 		glCompileShader(id());
-		GraphicsGL::gl_error("Shader::onCreate2");
+		Graphics::error("Shader::onCreate2");
 	}
 }
 
@@ -159,8 +159,8 @@ ShaderProgram& ShaderProgram::attach(Shader& s){
 //#endif
 
 	if (s.type() == Shader::GEOMETRY) {
-		glProgramParameteriEXT(id(),GL_GEOMETRY_INPUT_TYPE_EXT,GraphicsGL::gl_primitive(mInPrim));
-		glProgramParameteriEXT(id(),GL_GEOMETRY_OUTPUT_TYPE_EXT,GraphicsGL::gl_primitive(mOutPrim));
+		glProgramParameteriEXT(id(),GL_GEOMETRY_INPUT_TYPE_EXT, mInPrim);
+		glProgramParameteriEXT(id(),GL_GEOMETRY_OUTPUT_TYPE_EXT, mOutPrim);
 		glProgramParameteriEXT(id(),GL_GEOMETRY_VERTICES_OUT_EXT,mOutVertices);
 	}
 	
@@ -180,7 +180,7 @@ const ShaderProgram& ShaderProgram::link() const {
 	//glValidateProgramARB((GLhandleARB)handle());
 	glGetProgramiv(id(), GL_VALIDATE_STATUS, &isValid);
 	if (!isValid) {
-		GraphicsGL::gl_error("ShaderProgram::link");
+		Graphics::error("ShaderProgram::link");
 	}
 		
 	return *this; 

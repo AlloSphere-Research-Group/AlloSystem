@@ -74,7 +74,7 @@ struct MyWindow : Window{
 		return true;
 	}
 
-	GraphicsGL gl;
+	Graphics gl;
 	Light light;
 	Material material;
 	Mesh surface;

@@ -12,7 +12,7 @@ Lance Putnam, 4/25/2011
 #include "allocore/al_Allocore.hpp"
 using namespace al;
 
-GraphicsGL gl;
+Graphics gl;
 
 struct Particle{
 
@@ -92,8 +92,10 @@ struct MyWindow : Window{
 		gl.matrixMode(gl.MODELVIEW);
 		gl.loadMatrix(Matrix4d::lookAt(Vec3d(0,0,10), Vec3d(0,0,0), Vec3d(0,1,0)));
 
-		gl.depthTesting(0);
-		gl.blending(true, gl.SRC_ALPHA, gl.ONE);
+		gl.depthTesting(false);
+		gl.blending(true);
+		gl.blendModeAdd();
+		
 		gl.antialiasing(gl.NICEST);
 		gl.pointSize(6);
 

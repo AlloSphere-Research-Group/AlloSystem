@@ -262,7 +262,7 @@ private:
 	Windows mWindows;
 	Camera mCamera;
 	Stereographic mStereo;
-	GraphicsGL mGraphics;
+	Graphics mGraphics;
 	
 	// sound
 	AudioIO mAudioIO;

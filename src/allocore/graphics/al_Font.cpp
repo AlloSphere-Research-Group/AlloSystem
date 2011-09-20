@@ -187,8 +187,10 @@ protected:
 Font :: Font(Graphics& g, std::string filename, int font_size, bool anti_aliased)
 :	mFontSize(font_size),
 	mAntiAliased(anti_aliased),
-	mTex(g, 192, 192, Texture::LUMINANCE, Texture::UCHAR)
+//	mTex(g, 192, 192, Graphics::LUMINANCE, Graphics::UCHAR)
+	mTex(192, 192)
 {
+	mTex.format(Graphics::LUMINANCE).type(Graphics::UBYTE);
 	// TODO: if this fails (mImpl == NULL), fall back to native options (e.g. Cocoa)?
 	mImpl = Impl::create(*this, filename);
 }

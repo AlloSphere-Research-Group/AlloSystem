@@ -12,7 +12,7 @@ Lance Putnam, 12/8/2010 (putnam.lance at gmail dot com)
 
 using namespace al;
 
-GraphicsGL gl;
+Graphics gl;
 Mesh solids[5];
 Light light;
 Material material;

@@ -2,7 +2,7 @@
 
 using namespace al;
 
-GraphicsGL gl;
+Graphics gl;
 
 struct MyWindow : Window{
 

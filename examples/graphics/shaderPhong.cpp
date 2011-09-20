@@ -55,7 +55,7 @@ struct MyWindow : Window{
 	ShaderProgram shaderP;
 	Shader shaderV, shaderF;
 	Mesh mesh;
-	GraphicsGL gl;
+	Graphics gl;
 	Light light;
 	Material material;
 	double angle;

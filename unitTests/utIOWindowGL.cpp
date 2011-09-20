@@ -1,6 +1,6 @@
 #include "utAllocore.h"
 
-static GraphicsGL gl;
+static Graphics gl;
 
 struct MyWindow : Window{
 

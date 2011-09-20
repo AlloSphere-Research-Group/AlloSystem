@@ -101,10 +101,10 @@ void main(){
 struct MyWindow : Window{
 
 	MyWindow()
-	:	 tex(gl, 16,16, Texture::LUMINANCE, Texture::FLOAT32)
+	:	 tex(16,16, Graphics::LUMINANCE, Graphics::FLOAT)
 	{}
 
-	GraphicsGL gl;
+	Graphics gl;
 	ShaderProgram shaderP;
 	Shader shaderV, shaderF, shaderG;
 	Texture tex;
@@ -113,16 +113,20 @@ struct MyWindow : Window{
 
 	bool onCreate(){
 
-		tex.allocate();
+		//tex.allocate();
 		int Nx = tex.width();
 		int Ny = tex.height();
-		float * texBuf = tex.data<float>();
+		//float * texBuf = tex.data<float>();
+		float * texBuf = new float[tex.numElems()];
 		
 		for(int j=0; j<Ny; ++j){ float y = float(j)/(Ny-1)*2-1;
 		for(int i=0; i<Nx; ++i){ float x = float(i)/(Nx-1)*2-1;
 			float m = 1-al::clip(x*x + y*y);
 			texBuf[j*Nx + i] = m*=m*=m;
 		}}
+		
+		tex.submit(texBuf);
+		delete[] texBuf;
 
 		// create sprite positions
 		int N = 32;
@@ -165,7 +169,8 @@ struct MyWindow : Window{
 		gl.loadMatrix(mvmat);
 
 		gl.depthTesting(0);
-		gl.blending(true, gl.SRC_ALPHA, gl.ONE);
+		gl.blending(true);
+		gl.blendModeAdd();
 
 		shaderP.begin();
 		tex.bind();

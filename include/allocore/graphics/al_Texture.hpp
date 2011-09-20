@@ -35,314 +35,393 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
-#include "allocore/graphics/al_GPUObject.hpp"
 #include "allocore/types/al_Array.hpp"
 #include "allocore/types/al_Color.hpp"
 
+#include "allocore/graphics/al_Graphics.hpp"
+#include "allocore/graphics/al_GPUObject.hpp"
+
 namespace al{
 
-class Graphics;
-class Surface;
-
-/// Graphics texture
+/*!
+	A simple wrapper around OpenGL Textures, 
+	using al::Array as a CPU-side interface for configuring & submitting
+	
+	TODO: lift out common features of Texture and CubeMapTexture into a 
+	generic superclass ?
+*/
 class Texture : public GPUObject {
 public:
 
-	enum Mode {
-		DATA = 0,
-		SURFACE
-	};
+	typedef Graphics::Format Format;
+	typedef Graphics::DataType DataType;
 
 	enum Target {
-		TEXTURE_RECT = 0,
-		TEXTURE_1D,
-		TEXTURE_2D,
-		TEXTURE_3D
-	};
-
-	enum Format {
-		ALPHA = 0,
-		LUMINANCE,
-		LUMALPHA,
-		RGB,
-		BGR,
-		RGBA,
-		BGRA
-	};
-
-	enum Type {
-		UCHAR = 0,
-		INT,
-		UINT,
-		FLOAT32
+		TEXTURE_1D				= GL_TEXTURE_1D,
+		TEXTURE_2D				= GL_TEXTURE_2D,
+		TEXTURE_3D				= GL_TEXTURE_3D
 	};
 
 	enum Wrap {
-		CLAMP = 0,
-		CLAMP_TO_BORDER,
-		CLAMP_TO_EDGE,
-		MIRRORED_REPEAT,
-		REPEAT
+		CLAMP					= GL_CLAMP,
+		CLAMP_TO_BORDER			= GL_CLAMP_TO_BORDER,
+		CLAMP_TO_EDGE			= GL_CLAMP_TO_EDGE,
+		MIRRORED_REPEAT			= GL_MIRRORED_REPEAT,
+		REPEAT					= GL_REPEAT
 	};
 
 	enum Filter {
-		NEAREST = 0,
-		LINEAR,
-		NEAREST_MIPMAP_NEAREST,
-		LINEAR_MIPMAP_NEAREST,
-		NEAREST_MIPMAP_LINEAR,
-		LINEAR_MIPMAP_LINEAR
+		NEAREST					= GL_NEAREST,
+		LINEAR					= GL_LINEAR,
+		NEAREST_MIPMAP_NEAREST	= GL_NEAREST_MIPMAP_NEAREST,
+		LINEAR_MIPMAP_NEAREST	= GL_LINEAR_MIPMAP_NEAREST,
+		NEAREST_MIPMAP_LINEAR	= GL_NEAREST_MIPMAP_LINEAR,
+		LINEAR_MIPMAP_LINEAR	= GL_LINEAR_MIPMAP_LINEAR,
 	};
 
-	Texture(Graphics& backend, int width=512, int height=512, Format format=RGBA, Type type=UCHAR, Wrap wrap=REPEAT);
-	virtual ~Texture();
+
+	Texture(unsigned width=512, unsigned height=512, unsigned depth=0)
+	:	GPUObject(),
+		mTarget(TEXTURE_2D),
+		mFormat(Graphics::RGBA),
+		mType(Graphics::UBYTE),
+		mWrapS(CLAMP_TO_EDGE),
+		mWrapT(CLAMP_TO_EDGE),
+		mWrapR(CLAMP_TO_EDGE),
+		mFilter(LINEAR),
+//		mLevel(0),
+//		mBorder(0),
+//		mAlignment(4),
+		mWidth(width),
+		mHeight(height),
+		mDepth(depth),
+		mPixels(0), mBuffer(0),
+		mParamsUpdated(true),
+		mPixelsUpdated(true)
+	{
+		determineTarget();
+	}
 	
-	void attach(Surface *s);
-	void clear(int unit=0, bool do_bind=true, bool clear_data=false);
-
-	/// Bind texture
-
-	/// @param[in] unit		bind location (e.g. as used in a shader)
-	///
-	void bind(int unit = 0);
-
-	/// Unbind texture
-
-	/// @param[in] unit		bind location (e.g. as used in a shader)
-	///
-	void unbind(int unit = 0);
-
-	void setArrayFormat(const AlloArrayHeader &header);
-	void fromArray(const al::Array *array);
-	void toArray();
+	Texture(unsigned width, unsigned height, Graphics::Format format, Graphics::DataType type)
+	:	mTarget(TEXTURE_2D),
+		mFormat(format),
+		mType(type),
+		mWrapS(CLAMP_TO_EDGE),
+		mWrapT(CLAMP_TO_EDGE),
+		mWrapR(CLAMP_TO_EDGE),
+		mFilter(LINEAR),
+		mWidth(width),
+		mHeight(height),
+		mDepth(0),
+		mPixels(0), mBuffer(0),
+		mParamsUpdated(true),
+		mPixelsUpdated(true)
+	{}	
 	
-	/// Allocate internal memory based on current settings
-	void allocate(unsigned align=4);
+	virtual ~Texture(){}
 
-	void allocate(AlloArrayHeader &header);
 
-	// trigger textureSubmit:
-	void update() { mUpdate = true; }
+	Filter filter() const { return mFilter; }
+	Format format() const { return mFormat; }
+	Target target() const { return mTarget; }
+	DataType type() const { return mType; }	
 
-	// retrieve internal array:
-	al::Array& array() { return mArray; }
+	unsigned width() const { return mWidth; }
+	unsigned height() const { return mHeight; }
+	unsigned depth() const { return mDepth; }
 
-	bool rect() const;
-	void rect(bool v);
+	/// Return number of components per pixel
+	unsigned numComps() const { return Graphics::numComponents(format()); }
 
-	char * data();
-	template<class T> T * data(){ return (T*)(data()); }
+	/// Return total number of elements (components x width x height x depth)
+	unsigned numElems() const {
+		return numPixels() * numComps();
+	}
 	
-	int getRowStride() const;
+	unsigned numPixels() const {
+		return width() * (height()?height():1) * (depth()?depth():1);
+	}
 
-	int width() const;
-	void width(int w);
-	int height() const;
-	void height(int h);
-	int depth() const;
-	void depth(int d);
+	Texture& filter(Filter v){ return update(v, mFilter, mParamsUpdated); }
+	Texture& format(Format v){ return update(v, mFormat, mPixelsUpdated); }
+	Texture& type(DataType v){ return update(v, mType  , mPixelsUpdated); }
 
-	void getDimensions(int &w, int &h) const;
-	void getDimensions(int &w, int &h, int &d) const;
+	Texture& width (unsigned v){ return update(v, mWidth, mPixelsUpdated); }
+	Texture& height(unsigned v){ return update(v, mHeight,mPixelsUpdated); }
+	Texture& depth (unsigned v){ return update(v, mDepth ,mPixelsUpdated); }
 
-	void dimensions(int w, int h);
-	void dimensions(int w, int h, int d);
+	Texture& wrap(Wrap v){ return wrap(v,v,v); }
+	Texture& wrap(Wrap S, Wrap T){ return wrap(S,T,mWrapR); }
+	Texture& wrap(Wrap S, Wrap T, Wrap R){
+		if(S!=mWrapS || T!=mWrapT || R!=mWrapR){
+			mWrapS = S; mWrapT = T; mWrapR = R;
+			mParamsUpdated = true;
+		}
+		return *this;
+	}
 
-	Mode mode() const;
-	void mode(Mode v);
 
-	Target target() const;
-	void target(Target v);
-
-	Format format() const;
-	void format(Format v);
-
-	Type type() const;
-	void type(Type v);
+	void bind(int unit = 0) {
+		// ensure it is created:
+		//validate(); // FIXME: needed?
+		sendParams(false);
+		sendPixels(false);
+		
+		// multitexturing:
+		glActiveTextureARB(GL_TEXTURE0_ARB + unit);
+		
+		// bind:
+		glEnable(target());
+		glBindTexture(target(), id());
+		
+		Graphics::error("binding texture");
+	}
 	
-	Texture::Format singleChannel() const;
-	void singleChannel(Format v);
+	void unbind(int unit = 0) {		
+		// multitexturing:
+		glActiveTextureARB(GL_TEXTURE0_ARB + unit);
+		
+		glBindTexture(target(), 0);
+		glDisable(target());
+	}
 	
-	Wrap wrap() const;
-	void wrap(Wrap v);
+	void quad(Graphics& gl, double w=1, double h=1, double x0=0, double y0=0);
+	
+	// submit manually
+	// only safe while OpenGL context exists
+	void submit(const Array& src, bool reconfigure=false) {	
+		if (src.type() != AlloUInt8Ty) {
+			printf("submit failed: only uint8_t arrays are supported\n");
+			return;
+		} 
+		
+		if (reconfigure) {
+			// reconfigure texture from array
+			switch (src.dimcount()) {
+				case 1: mTarget = TEXTURE_1D; break;
+				case 2: mTarget = TEXTURE_2D; break;
+				case 3: mTarget = TEXTURE_3D; break;
+				default:
+					printf("invalid array dimensions for texture\n");
+					return;
+			}
+			
+			switch (src.dimcount()) {
+				case 3:	mDepth = src.depth();
+				case 2:	mHeight = src.height();
+				case 1:	mWidth = src.width(); break;
+			}
 
-	Filter minFilter() const;
-	void minFilter(Filter v);
+			switch (src.components()) {
+				case 1:	mFormat = Graphics::LUMINANCE; break; // alpha or luminance?
+				case 2:	mFormat = Graphics::LUMINANCE_ALPHA; break;
+				case 3:	mFormat = Graphics::RGB; break;
+				case 4:	mFormat = Graphics::RGBA; break;
+				default:
+					printf("invalid array component count for texture\n");
+					return;
+			}
+			
+			printf("configured to %dD=%X, format %X, align %d\n", src.dimcount(), mTarget, mFormat, src.alignment());
+		} 
+		else {
+			if (src.width() != width()) {
+				printf("submit failed: source array width does not match\n");
+				return;
+			}
+			if (height() && src.height() != height()) {
+				printf("submit failed: source array height does not match\n");
+				return;
+			}
+			if (depth() && src.depth() != depth()) {
+				printf("submit failed: source array depth does not match\n");
+				return;
+			}
+		
+			switch (format()) {
+				case Graphics::ALPHA:
+				case Graphics::LUMINANCE:
+					if (src.dimcount() != 1) {
+						printf("submit failed: source array dimcount does not match\n");
+						return;
+					}
+					break;
+				case Graphics::LUMINANCE_ALPHA:
+					if (src.dimcount() != 2) {
+						printf("submit failed: source array dimcount does not match\n");
+						return;
+					}
+					break;
+				case Graphics::RGB:
+					if (src.dimcount() != 3) {
+						printf("submit failed: source array dimcount does not match\n");
+						return;
+					}
+					break;
+				case Graphics::RGBA:
+					if (src.dimcount() != 4) {
+						printf("submit failed: source array dimcount does not match\n");
+						return;
+					}
+					break;
+				default:
+					break;
+			}
+		}
+		
+		submit(src.data.ptr, src.alignment());
+	}
+	
+	
+	/// Resize texture data on GPU and copy over pixels
+	
+	/// If pixels is NULL, then the only effect is to resize the texture
+	/// remotely.
+	virtual void submit(const void * pixels=NULL, uint32_t align=4) {
+		
+		validate();
+		
+		determineTarget();
+		glBindTexture(target(), id());
+		
+		// set glPixelStore according to the array layout:
+		//glPixelStorei(GL_UNPACK_ALIGNMENT, align);
+		
+		int comps = numComps();
+		
+		// void glTexImage3D(
+		//		GLenum target, GLint level, GLenum internalformat,
+		//		GLsizei width, GLsizei height, GLsizei depth, 
+		//		GLint border, GLenum format, GLenum type, const GLvoid *pixels
+		// );
+		switch(mTarget){
+		case GL_TEXTURE_1D:	glTexImage1D(mTarget, 0, comps, width(), 0, format(), type(), pixels); break;
+		case GL_TEXTURE_2D: glTexImage2D(mTarget, 0, comps, width(), height(), 0, format(), type(), pixels); break;
+		case GL_TEXTURE_3D: glTexImage3D(mTarget, 0, comps, width(), height(), depth(), 0, format(), type(), pixels); break;
+		default:;
+		}
+		
+		// set alignment back to default
+		//glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+		
+		Graphics::error("submitting texture");
+		
+//		// OpenGL may have changed the internal format to one it supports:
+//		GLint format;
+//		glGetTexLevelParameteriv(mTarget, 0, GL_TEXTURE_INTERNAL_FORMAT, &format);
+//		if (format != mInternalFormat) {
+//			printf("converted from %X to %X format\n", mInternalFormat, format);
+//			mInternalFormat = format;
+//		}
 
-	Filter magFilter() const;
-	void magFilter(Filter v);
+		//printf("submitted texture data %p\n", pixels);
+		
+		glBindTexture(target(), 0);
+	}
 
-	void filter(Filter v){ minFilter(v); magFilter(v); }
 
-	void borderColor(const Color& c);
-	const Color& borderColor() const {return mBorderColor;}
+	void allocate(){
+		deallocate();
+		mBuffer = malloc(numElems() * Graphics::numBytes(type()));
+		mPixels = mBuffer;
+	}
 
-	Texture& backend(Graphics& v){ mBackend=&v; return *this; }
-
-	Graphics * backend() {return mBackend;}
-	Surface * surface() {return mSurface;}
+	void deallocate(){
+		if(mBuffer){
+			free(mBuffer);
+			mBuffer=0;
+			mPixels=0;
+		}
+	}
 
 protected:
+//	GLint mLevel;	// TODO: on a rainy day...
+//	GLint mBorder;
+//	GLint mAlignment;
+	Target mTarget;				// TEXTURE_1D, TEXTURE_2D, etc.
+	Format mFormat;				// RGBA, ALPHA, etc.
+	DataType mType;				// UBYTE, FLOAT, etc.
+	Wrap mWrapS, mWrapT, mWrapR;	
+	Filter mFilter;
+	unsigned mWidth, mHeight, mDepth;
+	void * mPixels;				// pointer to client-side pixel data (0 if none)
+	void * mBuffer;				// internally allocated pixel buffer
+	bool mParamsUpdated;
+	bool mPixelsUpdated;
 
-	Format format_for_array_components(int components);
-	int components_for_format(Format format);
-	Type type_for_array_type(AlloTy type);
-	AlloTy array_type_for_type(Type type);
-	Target target_for_array_dimcount(int dimcount);
-	int dimcount_for_target(Target target);
+	virtual void onCreate(){
+		//printf("Texture onCreate\n");
+		glGenTextures(1, (GLuint *)&mID);
+		sendParams();
+		sendPixels();
+		Graphics::error("creating texture");
+	}
+	
+	virtual void onDestroy(){
+		glDeleteTextures(1, (GLuint *)&mID);
+	}
 
-	Graphics *		mBackend;			///< Library backend
-	Surface *		mSurface;			///< Surface object
-	al::Array		mArray;				///< Array of data allocated internally
-	Mode			mMode;				///< Texture mode
-	bool			mRebuild;			///< Rebuild flag
-	bool			mUpdate;			///< Update flag
-	bool			mRect;				///< Use rectangular textures flags
-	int				mWidth;				///< Width of texture in pixels
-	int				mHeight;			///< Height of texture in pixels
-	int				mDepth;				///< Depth of texture in pixels
-	Target			mTarget;			///< Texture target (2D, RECT, 3D, etc.)
-	Format			mFormat;			///< Texture format (RGB, RGBA, etc.)
-	Format			mSingleChannel;		///< Preferred single channel texture format (ALPHA or LUMINANCE)
-	Type			mType;				///< Texture type (UCHAR, FLOAT, etc.)
-	Wrap			mWrap;				///< Wrap mode
-	Filter			mMinFilter;			///< Minification filter
-	Filter			mMagFilter;			///< Magnification filter (NEAREST or LINEAR)
-	Color			mBorderColor;		///< Border color
+	void sendParams(bool force=true){
+		if(mParamsUpdated || force){
+			glBindTexture(target(), id());
+			glTexParameterf(target(), GL_TEXTURE_MAG_FILTER, filter());
+			glTexParameterf(target(), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameterf(target(), GL_TEXTURE_WRAP_S, mWrapS);
+			glTexParameterf(target(), GL_TEXTURE_WRAP_T, mWrapT);
+			glTexParameterf(target(), GL_TEXTURE_WRAP_R, mWrapR);
+			glTexParameteri(target(), GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
+			glBindTexture(target(), 0);
+			mParamsUpdated = false;
+		}
+	}
+	
+	void sendPixels(bool force=true){
+		if(mPixelsUpdated || force){
+			//determineTarget(); // moved to submit()
+			submit();
+			mPixelsUpdated = false;
+		}
+	}
 
-	virtual void onCreate();
-	virtual void onDestroy();
+	void determineTarget(){
+		if(0 == mHeight)		mTarget = TEXTURE_1D;
+		else if(0 == mDepth)	mTarget = TEXTURE_2D;
+		else					mTarget = TEXTURE_3D;
+		//invalidate(); // FIXME: mPixelsUpdated flag now triggers update
+	}
 
-}; // Texture
+	// Pattern for setting a variable that when changed sets a notification flag
+	template<class T>
+	Texture& update(const T& v, T& var, bool& flag){
+		if(v!=var){ var=v; flag=true; } return *this; }
 
-} // ::al
+//	Format toFormat(const Array& src) {
+//		switch(src.header.components) {
+//			case 1:	return Graphics::LUMINANCE;
+//			case 2:	return Graphics::LUMINANCE_ALPHA;
+//			case 3:	return Graphics::RGB;
+//			case 4:	return Graphics::RGBA;
+//			default:
+//				printf("warning: unknown type\n");
+//				return Graphics::RGBA;
+//		}
+//	}
+//	
+//	DataType toDataType(const Array& src){
+//		return Graphics::toDataType(src.header.type); }
+//	
+//	Target toTarget(const Array& src) {
+//		switch(src.header.dimcount) {
+//			case 1:		return TEXTURE_1D;
+//			case 2:		return TEXTURE_2D;
+//			case 3:		return TEXTURE_3D;
+//			default:
+//				printf("warning: unknown dimcount\n");
+//				return TEXTURE_2D;
+//		}
+//	}
+};
+
+} // al::
 
 #endif
-
-
-//#ifndef INCLUDE_AL_GRAPHICS_TEXTURE_HPP
-//#define INCLUDE_AL_GRAPHICS_TEXTURE_HPP
-//
-//#include "graphics/al_GPUObject.hpp"
-//
-//namespace al {
-//namespace gfx{
-//
-///// Base texture class
-//
-/////
-/////
-//class TextureBase : public GPUObject{
-//public:
-//	TextureBase(ColorFormat::t format, DataType::t type, WrapMode::t wrap);
-//
-//	virtual ~TextureBase();
-//
-//	void * buffer() const { return mBuffer; }
-//
-//	template <class T>
-//	T * buffer() const { return (T *)mBuffer; }
-//
-//	const TextureBase& begin() const;						///< Bind self to current context
-//	const TextureBase& bind() const;						///< Bind self to current context (alias of begin())
-//	void end() const;										///< Binds default texture
-//	TextureBase& format(ColorFormat::t v);					///< Set the color format
-//	TextureBase& ipolMode(IpolMode::t v);					///< Set interpolation mode
-//	TextureBase& dataType(DataType::t v);					///< Set the color data type
-//	TextureBase& wrapMode(WrapMode::t v);					///< Set wrapping mode
-//
-//	const TextureBase& send() const;						///< Send pointed to pixels to GPU
-//
-//	ColorFormat::t format() const { return mFormat; }
-//	IpolMode::t ipolMode() const { return mIpol; }
-//	DataType::t dataType() const { return mType; }
-//	WrapMode::t wrapMode() const { return mWrap; }
-//
-//protected:
-//	void * mPixels;		// pointer to the client-side pixel data (0 if none)
-//	void * mBuffer;		// internally allocated pixel buffer
-//	ColorFormat::t mFormat;	// format of the pixel data:
-//						//   GL_COLOR_INDEX, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA,
-//						//   GL_RGB, GL_BGR, GL_RGBA, GL_BGRA, GL_LUMINANCE, and GL_LUMINANCE_ALPHA
-//	IpolMode::t mIpol;	// interpolation mode
-//	WrapMode::t mWrap;
-//	DataType::t mType;			// type of the pixel data:
-//						//   GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_FLOAT
-//
-//	void freeMem();
-//	void allocMem();
-//	virtual int size() const = 0;	// total number of texels
-//	virtual int target() const = 0;
-//	virtual void texImage() const = 0;
-//	virtual void texSubImage() const = 0;
-//	virtual void texWrap() const = 0;
-//
-//	virtual void onCreate();
-//	virtual void onDestroy();
-//};
-//
-//
-///// 2-D texture
-//class Texture2 : public TextureBase{
-//public:
-//
-//	/// This constructor will allocate an internal pixel buffer
-//	Texture2(	int width, int height,
-//				ColorFormat::t format=gfx::RGB,
-//				DataType::t type=gfx::UByte,
-//				WrapMode::t wrap=gfx::Repeat);
-//
-//	int width() const { return w; }		///< Get width
-//	int height() const { return h; }	///< Get height
-//
-//	Texture2& draw(											///< Draw texture to rectangular quad
-//		float ql, float qt, float qr, float qb,
-//		float tl=0, float tt=1, float tr=1, float tb=0
-//	);
-//
-//	Texture2& load(int w, int h, void * pixels=0);	///< Resizes texture on graphics card
-//
-//	int index1D(int i, int j){ return j*width()+i; }
-//
-//private:
-//	int w, h;
-//	virtual int size() const { return w*h; }
-//	virtual int target() const;
-//	virtual void texImage() const;
-//	virtual void texSubImage() const;
-//	virtual void texWrap() const;
-//};
-//
-//
-//
-///// 3-D texture
-//class Texture3 : public TextureBase{
-//public:
-//
-//	/// This constructor will allocate an internal pixel buffer
-//	Texture3(	int width, int height, int depth,
-//				ColorFormat::t format=gfx::RGB,
-//				DataType::t type=gfx::UByte,
-//				WrapMode::t wrap=gfx::Repeat);
-//
-//	int width() const { return w; }		///< Get width
-//	int height() const { return h; }	///< Get height
-//	int depth() const { return d; }		///< Get depth
-//
-//	Texture3& load(int w, int h, int d, void * pixels=0);	///< Resizes texture on graphics card
-//
-//	int index1D(int i, int j, int k){ return width()*(k*height() + j) + i; }
-//
-//private:
-//	int w, h, d;
-//	virtual int size() const { return w*h*d; }
-//	virtual int target() const;
-//	virtual void texImage() const;
-//	virtual void texSubImage() const;
-//	virtual void texWrap() const;
-//};
-//
-//} // ::al::gfx
-//} // ::al
-//
-//#endif

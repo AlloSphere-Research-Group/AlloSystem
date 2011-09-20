@@ -131,8 +131,10 @@ protected:
 	unsigned long mID;
 	bool bResubmit;
 	
-	/// subclasses must implement:
+	/// Called when currently assigned context is created
 	virtual void onCreate() = 0;
+	
+	/// Called when currently assigned context is destroyed
 	virtual void onDestroy() = 0;
 };
 

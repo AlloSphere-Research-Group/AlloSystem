@@ -20,7 +20,7 @@ Lance Putnam, 7/6/2011
 #include "allocore/al_Allocore.hpp"
 using namespace al;
 
-GraphicsGL gl;
+Graphics gl;
 
 struct MyWindow : Window{
 

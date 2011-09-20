@@ -4,454 +4,476 @@
 
 namespace al{
 
-Texture::Texture(Graphics& backend, int width, int height, Format format, Type type, Wrap wrap)
-:	GPUObject(),
-	mBackend(&backend),
-	mSurface(0),
-	mMode(DATA),
-	mRebuild(true),
-	mUpdate(false),
-	mRect(false),
-	mWidth(width),
-	mHeight(height),
-	mDepth(0),
-	mTarget(TEXTURE_2D),
-	mFormat(format),
-	mSingleChannel(LUMINANCE),
-	mType(type),
-	mWrap(wrap),
-	mMinFilter(LINEAR),
-	mMagFilter(LINEAR),
-	mBorderColor(0, 0, 0, 1)
-{}
 
-Texture::~Texture() {
+void Texture::quad(Graphics& gl, double w, double h, double x0, double y0){
+	bind();
+	gl.color(1, 1, 1, 1);
+	gl.pushMatrix();
+	gl.translate(x0, y0, 0);
+	gl.scale(w, h, 1);
+	gl.begin(gl.QUADS);
+		gl.texCoord	( 0, 0);
+		gl.vertex	( 0, 0, 0);
+		gl.texCoord	( 0, 1);
+		gl.vertex	( 0, 1, 0);
+		gl.texCoord	( 1, 1);
+		gl.vertex	( 1, 1, 0);
+		gl.texCoord	( 1, 0);
+		gl.vertex	( 1, 0, 0);
+	gl.end();
+	gl.popMatrix();
+	unbind();
 }
 
-void Texture::attach(Surface *s) {
-	mode(Texture::SURFACE);
-	mSurface = s;
-}
 
-void Texture::clear(int unit, bool do_bind, bool clear_data) {
-	if(do_bind) {
-		bind(unit);
-	}
-	
-	if(mMode == Texture::SURFACE) {
-		if(mSurface) {
-			mSurface->enter();
-			mSurface->leave();
-		}
-	}
-	else {
-		// clear lattice, upload data
-		AlloArrayHeader header;
-		header.components = components_for_format(mFormat);
-		header.type = array_type_for_type(mType);
-		header.dimcount = dimcount_for_target(mTarget);
-		header.dim[0] = mWidth;
-		header.dim[1] = mHeight;
-		header.dim[2] = mDepth;
-		
-		// alignment
-		allo_array_setstride(&header, 1);
-		if(! allo_array_equal_headers(
-				&(mArray.header),
-				&(header)
-			)
-		) {
-			allo_array_adapt(&mArray, &header);
-			memset(mArray.data.ptr, '\0', allo_array_size(&mArray));
-		}
-		else if(clear_data) {
-			memset(mArray.data.ptr, '\0', allo_array_size(&mArray));
-		}
-		
-		if(do_bind) {
-			mBackend->textureSubmit(this);
-		}
-	}
-	
-	if(do_bind) {
-		unbind(unit);
-	}
-}
-	
-void Texture::bind(int unit) {
-	if(mRebuild) {
-		destroy();
-	}
-
-	if(!created()) {
-//printf("Texture::bind !created()\n");
-		create();
-		mRebuild = false;
-		
-		if(mMode == SURFACE && mSurface && !mSurface->creating()) {
-			mSurface->destroy();
-			mSurface->create();
-			if(!mSurface->creating()) {
-				clear(unit);
-			}
-		}
-
-		mUpdate = true;
-	}
-
-	mBackend->textureBind(this, unit);
-	
-	if(mUpdate) {
-		mBackend->textureSubmit(this);
-		mUpdate = false;
-	}
-	
-	mBackend->textureEnter(this, unit);
-}
-
-void Texture::unbind(int unit) {
-	mBackend->textureLeave(this, unit);
-	mBackend->textureUnbind(this, unit);
-}
-
-void Texture::setArrayFormat(const AlloArrayHeader &header) {
-	
-	mFormat = format_for_array_components(header.components);
-	
-	mType = type_for_array_type(header.type);
-
-	mWidth = header.dim[0];
-	mHeight = header.dim[1];
-	mDepth = header.dim[2];
-
-	// Select use of rectangular texture based on dimensions.
-	// This will effect setting target type below!
-	mRect = (mWidth != mHeight);			// shouldn't it be this...
-//	mRect = header.dim[0] == header.dim[1];	// and not this?
-
-	mTarget = target_for_array_dimcount(header.dimcount);
-
-	// allocate array data space
-	mArray.format(header);
-}
-
-void Texture::fromArray(const al::Array *array) {
-	int sz = allo_array_size(array);
-	if(sz <= 0) {
-		return;
-	}
-
-	if(! 
-		allo_array_equal_headers(
-			&(mArray.header), //&(mData->array.header), 
-			&(array->header)
-		) || 
-		mMode != DATA)
-	{
-		mMode = DATA;
-		setArrayFormat(array->header);
-		mRebuild = true;
-	}
-	
-	memcpy(mArray.data.ptr, array->data.ptr, sz);
-	//memcpy(mData->array.data.ptr, array->data.ptr, allo_array_size(array));
-	mUpdate = true;
-	
-	
-//	if(! mArray.hasFormat(array->header) || mMode != DATA) {
+//Texture::Texture(Graphics& backend, int width, int height, Format format, Type type, Wrap wrap)
+//:	GPUObject(),
+//	mBackend(&backend),
+//	mSurface(0),
+//	mMode(DATA),
+//	mRebuild(true),
+//	mUpdate(false),
+//	mRect(false),
+//	mWidth(width),
+//	mHeight(height),
+//	mDepth(0),
+//	mTarget(TEXTURE_2D),
+//	mFormat(format),
+//	mSingleChannel(LUMINANCE),
+//	mType(type),
+//	mWrap(wrap),
+//	mMinFilter(LINEAR),
+//	mMagFilter(LINEAR),
+//	mBorderColor(0, 0, 0, 1)
+//{}
+//
+//Texture::~Texture() {
+//}
+//
+//void Texture::attach(Surface *s) {
+//	mode(Texture::SURFACE);
+//	mSurface = s;
+//}
+//
+//void Texture::clear(int unit, bool do_bind, bool clear_data) {
+//	if(do_bind) {
+//		bind(unit);
+//	}
+//	
+//	if(mMode == Texture::SURFACE) {
+//		if(mSurface) {
+//			mSurface->enter();
+//			mSurface->leave();
+//		}
+//	}
+//	else {
+//		// clear lattice, upload data
+//		AlloArrayHeader header;
+//		header.components = components_for_format(mFormat);
+//		header.type = array_type_for_type(mType);
+//		header.dimcount = dimcount_for_target(mTarget);
+//		header.dim[0] = mWidth;
+//		header.dim[1] = mHeight;
+//		header.dim[2] = mDepth;
+//		
+//		// alignment
+//		allo_array_setstride(&header, 1);
+//		if(! allo_array_equal_headers(
+//				&(mArray.header),
+//				&(header)
+//			)
+//		) {
+//			allo_array_adapt(&mArray, &header);
+//			memset(mArray.data.ptr, '\0', allo_array_size(&mArray));
+//		}
+//		else if(clear_data) {
+//			memset(mArray.data.ptr, '\0', allo_array_size(&mArray));
+//		}
+//		
+//		if(do_bind) {
+//			mBackend->textureSubmit(this);
+//		}
+//	}
+//	
+//	if(do_bind) {
+//		unbind(unit);
+//	}
+//}
+//	
+//void Texture::bind(int unit) {
+//	if(mRebuild) {
+//		destroy();
+//	}
+//
+//	if(!created()) {
+////printf("Texture::bind !created()\n");
+//		create();
+//		mRebuild = false;
+//		
+//		if(mMode == SURFACE && mSurface && !mSurface->creating()) {
+//			mSurface->destroy();
+//			mSurface->create();
+//			if(!mSurface->creating()) {
+//				clear(unit);
+//			}
+//		}
+//
+//		mUpdate = true;
+//	}
+//
+//	mBackend->textureBind(this, unit);
+//	
+//	if(mUpdate) {
+//		mBackend->textureSubmit(this);
+//		mUpdate = false;
+//	}
+//	
+//	mBackend->textureEnter(this, unit);
+//}
+//
+//void Texture::unbind(int unit) {
+//	mBackend->textureLeave(this, unit);
+//	mBackend->textureUnbind(this, unit);
+//}
+//
+//void Texture::setArrayFormat(const AlloArrayHeader &header) {
+//	
+//	mFormat = format_for_array_components(header.components);
+//	
+//	mType = type_for_array_type(header.type);
+//
+//	mWidth = header.dim[0];
+//	mHeight = header.dim[1];
+//	mDepth = header.dim[2];
+//
+//	// Select use of rectangular texture based on dimensions.
+//	// This will effect setting target type below!
+//	mRect = (mWidth != mHeight);			// shouldn't it be this...
+////	mRect = header.dim[0] == header.dim[1];	// and not this?
+//
+//	mTarget = target_for_array_dimcount(header.dimcount);
+//
+//	// allocate array data space
+//	mArray.format(header);
+//}
+//
+//void Texture::fromArray(const al::Array *array) {
+//	int sz = allo_array_size(array);
+//	if(sz <= 0) {
+//		return;
+//	}
+//
+//	if(! 
+//		allo_array_equal_headers(
+//			&(mArray.header), //&(mData->array.header), 
+//			&(array->header)
+//		) || 
+//		mMode != DATA)
+//	{
 //		mMode = DATA;
 //		setArrayFormat(array->header);
-//		mArray.format(*array);
-//		memcpy(mArray.data.ptr, array->data.ptr, mArray.size());
+//		mRebuild = true;
+//	}
+//	
+//	memcpy(mArray.data.ptr, array->data.ptr, sz);
+//	//memcpy(mData->array.data.ptr, array->data.ptr, allo_array_size(array));
+//	mUpdate = true;
+//	
+//	
+////	if(! mArray.hasFormat(array->header) || mMode != DATA) {
+////		mMode = DATA;
+////		setArrayFormat(array->header);
+////		mArray.format(*array);
+////		memcpy(mArray.data.ptr, array->data.ptr, mArray.size());
+////		mRebuild = true;
+////	}
+////	
+////	mUpdate = true;
+//}
+//
+//void Texture::toArray() {
+//	mBackend->textureToArray(this);
+//}
+//
+//void Texture::allocate(unsigned align){
+//	AlloArrayHeader h = {
+//		array_type_for_type(type()),
+//		components_for_format(format()),
+//		dimcount_for_target(target()),
+//		{ width(), height(), depth(), 0 },
+//		{ 0,0,0,0 }
+//	};
+//	allo_array_setstride(&h, align);
+//	allocate(h);
+//}
+//
+//void Texture::allocate(AlloArrayHeader &header) {
+//	if(! 
+//		allo_array_equal_headers(
+//			//&(mData->array.header), 
+//			&(mArray.header), 
+//			&(header)
+//		) || 
+//		mMode != DATA)
+//	{
+//		mMode = DATA;
+//		setArrayFormat(header);
+//		//memset(mData->array.data.ptr, '\0', allo_array_size(&(mData->array)));
+//		memset(mArray.data.ptr, '\0', allo_array_size(&mArray));
 //		mRebuild = true;
 //	}
 //	
 //	mUpdate = true;
-}
-
-void Texture::toArray() {
-	mBackend->textureToArray(this);
-}
-
-void Texture::allocate(unsigned align){
-	AlloArrayHeader h = {
-		array_type_for_type(type()),
-		components_for_format(format()),
-		dimcount_for_target(target()),
-		{ width(), height(), depth(), 0 },
-		{ 0,0,0,0 }
-	};
-	allo_array_setstride(&h, align);
-	allocate(h);
-}
-
-void Texture::allocate(AlloArrayHeader &header) {
-	if(! 
-		allo_array_equal_headers(
-			//&(mData->array.header), 
-			&(mArray.header), 
-			&(header)
-		) || 
-		mMode != DATA)
-	{
-		mMode = DATA;
-		setArrayFormat(header);
-		//memset(mData->array.data.ptr, '\0', allo_array_size(&(mData->array)));
-		memset(mArray.data.ptr, '\0', allo_array_size(&mArray));
-		mRebuild = true;
-	}
-	
-	mUpdate = true;
-}
-	
-bool Texture::rect() const {
-	return mRect;
-}
-
-void Texture::rect(bool v) {
-	mRect = v;
-}
-	
-char * Texture::data() {
-	return mArray.data.ptr;
-}
-
-int Texture::getRowStride() const {
-	return mArray.header.stride[1];
-}
-
-int Texture::width() const {
-	return mWidth;
-}
-
-void Texture::width(int w) {
-	if(mWidth != w) {
-		mWidth = w;
-		mRebuild = true;
-	}
-}
-
-int Texture::height() const {
-	return mHeight;
-}
-
-void Texture::height(int h) {
-	if(mHeight != h) {
-		mHeight = h;
-		mRebuild = true;
-	}
-}
-
-int Texture::depth() const {
-	return mDepth;
-}
-
-void Texture::depth(int d) {
-	if(mDepth != d) {
-		mDepth = d;
-		mRebuild = true;
-	}
-}
-
-void Texture::getDimensions(int &w, int &h) const {
-	w = mWidth; h = mHeight;;
-}
-
-void Texture::getDimensions(int &w, int &h, int &d) const {
-	w = mWidth; h = mHeight; d = mDepth;
-}
-
-void Texture::dimensions(int w, int h) {
-	if(mWidth != w || mHeight != h) {
-		mWidth = w;
-		mHeight = h;
-		mRebuild = true;
-	}
-}
-
-void Texture::dimensions(int w, int h, int d) {
-	if(mWidth != w || mHeight != h || mDepth != d) {
-		mWidth = w;
-		mHeight = h;
-		mDepth = d;
-		mRebuild = true;
-	}
-}
-
-Texture::Mode Texture::mode() const {
-	return mMode;
-}
-
-void Texture::mode(Mode v) {
-	if(mMode != v) {
-		mMode = v;
-		mRebuild = true;
-		
-		if(mMode == SURFACE) {
-			mUpdate = false;
-		}
-	}
-}
-
-Texture::Target Texture::target() const {
-	return mTarget;
-}
-
-void Texture::target(Target v) {
-	if(mTarget != v) {
-		mTarget = v;
-		mRebuild = true;
-	}
-}
-
-Texture::Format Texture::format() const {
-	return mFormat;
-}
-
-void Texture::format(Format v) {
-	if(mFormat != v) {
-		mFormat = v;
-		mRebuild = true;
-	}
-}
-
-Texture::Format Texture::singleChannel() const {
-	return mSingleChannel;
-}
-
-void Texture::singleChannel(Format v) {
-	if(v == ALPHA || v == LUMINANCE) {
-		mSingleChannel = v;
-	}
-	else {
-		mSingleChannel = ALPHA;
-	}
-}
-
-
-Texture::Type Texture::type() const {
-	return mType;
-}
-
-void Texture::type(Type v) {
-	if(mType != v) {
-		mType = v;
-		mRebuild = true;
-	}
-}
-
-Texture::Wrap Texture::wrap() const {
-	return mWrap;
-}
-
-void Texture::wrap(Wrap v) {
-	if(mWrap != v) {
-		mWrap = v;
-		mRebuild = true;
-	}
-}
-
-Texture::Filter Texture::minFilter() const {
-	return mMinFilter;
-}
-
-void Texture::minFilter(Filter v) {
-	if(mMinFilter != v) {
-		mMinFilter = v;
-		mRebuild = true;
-	}
-}
-
-Texture::Filter Texture::magFilter() const {
-	return mMagFilter;
-}
-
-void Texture::magFilter(Filter v) {
-	if(mMagFilter != v) {
-		mMagFilter = v;
-		mRebuild = true;
-	}
-}
-
-void Texture::borderColor(const Color& c) {
-	mBorderColor = c;
-}
-
-void Texture::onCreate() {
-//	printf("Texture::onCreate()\n");
-	mBackend->textureCreate(this);
-}
-
-void Texture::onDestroy() {
-	mBackend->textureDestroy(this);
-}
-
-Texture::Format Texture::format_for_array_components(int components) {
-	switch(components) {
-		case 1:	return mSingleChannel;
-		case 2:	return LUMALPHA;
-		case 3:	return RGB;
-		case 4:	
-		default:
-			return RGBA;
-	}
-}
-
-int Texture::components_for_format(Format format) {
-	switch(format) {
-		case ALPHA: return 1;
-		case LUMINANCE: return 1;
-		case LUMALPHA: return 2;
-		case RGB: return 3;
-		case RGBA:
-		default:
-			return 4;
-	}
-}
-
-Texture::Type Texture::type_for_array_type(AlloTy type) {
-	switch(type) {
-		case AlloUInt8Ty:		return UCHAR;
-		case AlloSInt32Ty:		return INT;
-		case AlloUInt32Ty:		return UINT;
-		case AlloFloat32Ty:		return FLOAT32;
-		default:
-			return UCHAR;
-	}
-}
-
-AlloTy Texture::array_type_for_type(Type type) {
-	switch(type) {
-		case UCHAR:		return AlloUInt8Ty;
-		case INT:		return AlloSInt32Ty;
-		case UINT:		return AlloUInt32Ty;
-		case FLOAT32:	return AlloFloat32Ty;
-		default:
-			return AlloUInt8Ty;
-	}
-}
-
-Texture::Target Texture::target_for_array_dimcount(int dimcount) {
-	switch(dimcount) {
-		case 1:	return TEXTURE_1D;
-		case 3:	return TEXTURE_3D;
-		
-		case 2:
-		default:
-			return mRect ? TEXTURE_RECT : TEXTURE_2D;
-	}
-}
-
-int Texture::dimcount_for_target(Target target) {
-	switch(target) {
-		case TEXTURE_1D:	return 1;
-		case TEXTURE_3D:	return 3;
-		case TEXTURE_2D:
-		case TEXTURE_RECT:
-		default:
-			return 2;
-	}
-}
+//}
+//	
+//bool Texture::rect() const {
+//	return mRect;
+//}
+//
+//void Texture::rect(bool v) {
+//	mRect = v;
+//}
+//	
+//char * Texture::data() {
+//	return mArray.data.ptr;
+//}
+//
+//int Texture::getRowStride() const {
+//	return mArray.header.stride[1];
+//}
+//
+//int Texture::width() const {
+//	return mWidth;
+//}
+//
+//void Texture::width(int w) {
+//	if(mWidth != w) {
+//		mWidth = w;
+//		mRebuild = true;
+//	}
+//}
+//
+//int Texture::height() const {
+//	return mHeight;
+//}
+//
+//void Texture::height(int h) {
+//	if(mHeight != h) {
+//		mHeight = h;
+//		mRebuild = true;
+//	}
+//}
+//
+//int Texture::depth() const {
+//	return mDepth;
+//}
+//
+//void Texture::depth(int d) {
+//	if(mDepth != d) {
+//		mDepth = d;
+//		mRebuild = true;
+//	}
+//}
+//
+//void Texture::getDimensions(int &w, int &h) const {
+//	w = mWidth; h = mHeight;;
+//}
+//
+//void Texture::getDimensions(int &w, int &h, int &d) const {
+//	w = mWidth; h = mHeight; d = mDepth;
+//}
+//
+//void Texture::dimensions(int w, int h) {
+//	if(mWidth != w || mHeight != h) {
+//		mWidth = w;
+//		mHeight = h;
+//		mRebuild = true;
+//	}
+//}
+//
+//void Texture::dimensions(int w, int h, int d) {
+//	if(mWidth != w || mHeight != h || mDepth != d) {
+//		mWidth = w;
+//		mHeight = h;
+//		mDepth = d;
+//		mRebuild = true;
+//	}
+//}
+//
+//Texture::Mode Texture::mode() const {
+//	return mMode;
+//}
+//
+//void Texture::mode(Mode v) {
+//	if(mMode != v) {
+//		mMode = v;
+//		mRebuild = true;
+//		
+//		if(mMode == SURFACE) {
+//			mUpdate = false;
+//		}
+//	}
+//}
+//
+//Texture::Target Texture::target() const {
+//	return mTarget;
+//}
+//
+//void Texture::target(Target v) {
+//	if(mTarget != v) {
+//		mTarget = v;
+//		mRebuild = true;
+//	}
+//}
+//
+//Texture::Format Texture::format() const {
+//	return mFormat;
+//}
+//
+//void Texture::format(Format v) {
+//	if(mFormat != v) {
+//		mFormat = v;
+//		mRebuild = true;
+//	}
+//}
+//
+//Texture::Format Texture::singleChannel() const {
+//	return mSingleChannel;
+//}
+//
+//void Texture::singleChannel(Format v) {
+//	if(v == ALPHA || v == LUMINANCE) {
+//		mSingleChannel = v;
+//	}
+//	else {
+//		mSingleChannel = ALPHA;
+//	}
+//}
+//
+//
+//Texture::Type Texture::type() const {
+//	return mType;
+//}
+//
+//void Texture::type(Type v) {
+//	if(mType != v) {
+//		mType = v;
+//		mRebuild = true;
+//	}
+//}
+//
+//Texture::Wrap Texture::wrap() const {
+//	return mWrap;
+//}
+//
+//void Texture::wrap(Wrap v) {
+//	if(mWrap != v) {
+//		mWrap = v;
+//		mRebuild = true;
+//	}
+//}
+//
+//Texture::Filter Texture::minFilter() const {
+//	return mMinFilter;
+//}
+//
+//void Texture::minFilter(Filter v) {
+//	if(mMinFilter != v) {
+//		mMinFilter = v;
+//		mRebuild = true;
+//	}
+//}
+//
+//Texture::Filter Texture::magFilter() const {
+//	return mMagFilter;
+//}
+//
+//void Texture::magFilter(Filter v) {
+//	if(mMagFilter != v) {
+//		mMagFilter = v;
+//		mRebuild = true;
+//	}
+//}
+//
+//void Texture::borderColor(const Color& c) {
+//	mBorderColor = c;
+//}
+//
+//void Texture::onCreate() {
+////	printf("Texture::onCreate()\n");
+//	mBackend->textureCreate(this);
+//}
+//
+//void Texture::onDestroy() {
+//	mBackend->textureDestroy(this);
+//}
+//
+//Texture::Format Texture::format_for_array_components(int components) {
+//	switch(components) {
+//		case 1:	return mSingleChannel;
+//		case 2:	return LUMALPHA;
+//		case 3:	return RGB;
+//		case 4:	
+//		default:
+//			return RGBA;
+//	}
+//}
+//
+//int Texture::components_for_format(Format format) {
+//	switch(format) {
+//		case ALPHA: return 1;
+//		case LUMINANCE: return 1;
+//		case LUMALPHA: return 2;
+//		case RGB: return 3;
+//		case RGBA:
+//		default:
+//			return 4;
+//	}
+//}
+//
+//Texture::Type Texture::type_for_array_type(AlloTy type) {
+//	switch(type) {
+//		case AlloUInt8Ty:		return UCHAR;
+//		case AlloSInt32Ty:		return INT;
+//		case AlloUInt32Ty:		return UINT;
+//		case AlloFloat32Ty:		return FLOAT32;
+//		default:
+//			return UCHAR;
+//	}
+//}
+//
+//AlloTy Texture::array_type_for_type(Type type) {
+//	switch(type) {
+//		case UCHAR:		return AlloUInt8Ty;
+//		case INT:		return AlloSInt32Ty;
+//		case UINT:		return AlloUInt32Ty;
+//		case FLOAT32:	return AlloFloat32Ty;
+//		default:
+//			return AlloUInt8Ty;
+//	}
+//}
+//
+//Texture::Target Texture::target_for_array_dimcount(int dimcount) {
+//	switch(dimcount) {
+//		case 1:	return TEXTURE_1D;
+//		case 3:	return TEXTURE_3D;
+//		
+//		case 2:
+//		default:
+//			return mRect ? TEXTURE_RECT : TEXTURE_2D;
+//	}
+//}
+//
+//int Texture::dimcount_for_target(Target target) {
+//	switch(target) {
+//		case TEXTURE_1D:	return 1;
+//		case TEXTURE_3D:	return 3;
+//		case TEXTURE_2D:
+//		case TEXTURE_RECT:
+//		default:
+//			return 2;
+//	}
+//}
 
 } // ::al
 

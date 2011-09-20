@@ -510,7 +510,6 @@
 		163E4930130E0254007B30A0 /* libluajit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libluajit.a; sourceTree = "<group>"; };
 		163E4931130E0254007B30A0 /* libportaudio.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libportaudio.a; sourceTree = "<group>"; };
 		163E4932130E0254007B30A0 /* libsndfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsndfile.a; sourceTree = "<group>"; };
-		165869491288E9380068E01A /* al_GraphicsOpenGL.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_GraphicsOpenGL.hpp; sourceTree = "<group>"; };
 		16586A1C128903C10068E01A /* al_Shader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Shader.cpp; sourceTree = "<group>"; };
 		1663FD461280D608002B2979 /* al_Allocore.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Allocore.hpp; sourceTree = "<group>"; };
 		166DD741117CDB6000A8BA12 /* al_Conversion.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Conversion.hpp; sourceTree = "<group>"; };
@@ -596,6 +595,7 @@
 		16B0425D11F78D56002FDB85 /* al_ThreadNative.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_ThreadNative.cpp; sourceTree = "<group>"; };
 		16B4CE021427EBB900626C03 /* al_App.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_App.hpp; sourceTree = "<group>"; };
 		16B4CE031427EBE000626C03 /* al_App.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_App.cpp; sourceTree = "<group>"; };
+		16B4CE071428127700626C03 /* al_OpenGL.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OpenGL.hpp; sourceTree = "<group>"; };
 		16B74EFD1266B38900D66B0C /* al_Interval.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Interval.hpp; sourceTree = "<group>"; };
 		16BC66A1117770BF002A0C18 /* al_Constants.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Constants.hpp; sourceTree = "<group>"; };
 		16BC66A2117770BF002A0C18 /* al_Functions.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Functions.hpp; sourceTree = "<group>"; };
@@ -705,7 +705,6 @@
 		36035CC0130372AD001E9BA9 /* ft2build.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ft2build.h; sourceTree = "<group>"; };
 		360C244411E6599F000FF335 /* exCompiler */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exCompiler; sourceTree = BUILT_PRODUCTS_DIR; };
 		360C404E11D32FED002FE91F /* al_Matrix4.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Matrix4.hpp; sourceTree = "<group>"; };
-		361AA71B12AECB0A002E9DFD /* al_GraphicsGL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GraphicsGL.cpp; sourceTree = "<group>"; };
 		361AA7A312AEE173002E9DFD /* al_Mesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Mesh.hpp; sourceTree = "<group>"; };
 		361AA7A412AEE1AC002E9DFD /* al_Mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Mesh.cpp; sourceTree = "<group>"; };
 		361AA8AD12AEFDF3002E9DFD /* al_GPUObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GPUObject.cpp; sourceTree = "<group>"; };
@@ -881,8 +880,6 @@
 		36CF98E0141306DB00B00A30 /* apu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = apu.h; sourceTree = "<group>"; };
 		36CF98E1141306DB00B00A30 /* apu_version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = apu_version.h; sourceTree = "<group>"; };
 		36CF98E2141306DB00B00A30 /* apu_want.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = apu_want.h; sourceTree = "<group>"; };
-		36D69A4A11F9264700699158 /* al_Surface.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Surface.hpp; sourceTree = "<group>"; };
-		36D69A5211F9267800699158 /* al_Surface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Surface.cpp; sourceTree = "<group>"; };
 		36E4155711E99BED00A8A63D /* al_ThreadAPR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_ThreadAPR.cpp; sourceTree = "<group>"; };
 		36E4ACC113BCC2400088E632 /* aiAnim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aiAnim.h; sourceTree = "<group>"; };
 		36E4ACC213BCC2400088E632 /* aiAssert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aiAssert.h; sourceTree = "<group>"; };
@@ -1910,8 +1907,8 @@
 				361BF02F11DEA66600E60A9C /* al_BufferObject.hpp */,
 				36035C3113037120001E9BA9 /* al_Font.hpp */,
 				16AA95E9118F6EEF00B98EC3 /* al_GPUObject.hpp */,
+				16B4CE071428127700626C03 /* al_OpenGL.hpp */,
 				362127C71173CD72009CB6FC /* al_Graphics.hpp */,
-				165869491288E9380068E01A /* al_GraphicsOpenGL.hpp */,
 				36F596691211D5AB003B78B5 /* al_Image.hpp */,
 				160FD0DF11FA1CE4001E8987 /* al_Isosurface.hpp */,
 				16AA95EA118F6EEF00B98EC3 /* al_Light.hpp */,
@@ -1920,7 +1917,6 @@
 				168F105612B808EF00B1E07C /* al_Shapes.hpp */,
 				36F0ABCF123195D5000A8EBF /* al_Slab.hpp */,
 				367F0B3812034EDB00FCC534 /* al_Stereographic.hpp */,
-				36D69A4A11F9264700699158 /* al_Surface.hpp */,
 				16AA960B118F775E00B98EC3 /* al_Texture.hpp */,
 				361BF03011DEAA9400E60A9C /* pending */,
 				16AA95ED118F6FB800B98EC3 /* OpenGLSupport.txt */,
@@ -1936,7 +1932,6 @@
 				36035C3213037130001E9BA9 /* al_Font.cpp */,
 				361AA8AD12AEFDF3002E9DFD /* al_GPUObject.cpp */,
 				362127C81173CDBB009CB6FC /* al_Graphics.cpp */,
-				361AA71B12AECB0A002E9DFD /* al_GraphicsGL.cpp */,
 				36F596741211D5F8003B78B5 /* al_Image.cpp */,
 				160FD0E011FA1CF4001E8987 /* al_Isosurface.cpp */,
 				16AA95F2118F74FB00B98EC3 /* al_Light.cpp */,
@@ -1944,7 +1939,6 @@
 				16586A1C128903C10068E01A /* al_Shader.cpp */,
 				168F105712B80DD100B1E07C /* al_Shapes.cpp */,
 				367F0B3A12034EED00FCC534 /* al_Stereographic.cpp */,
-				36D69A5211F9267800699158 /* al_Surface.cpp */,
 				16AA9609118F774800B98EC3 /* al_Texture.cpp */,
 			);
 			path = graphics;

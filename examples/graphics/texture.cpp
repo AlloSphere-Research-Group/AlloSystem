@@ -1,18 +1,31 @@
+/*
+Allocore Example: Texture
+
+Description:
+This demonstrates how to create and display a texture.
+
+Author:
+Lance Putnam, 9/13/2011
+*/
+
 #include "allocore/al_Allocore.hpp"
 
 using namespace al;
 
-GraphicsGL gl;
-Texture tex(gl, 64,64, Texture::RGBA, Texture::FLOAT32);
+Graphics gl;
+Texture tex(64,64, Graphics::RGBA, Graphics::FLOAT);
 
 struct MyWindow : Window{
 
 	bool onCreate(){
 		tex.filter(Texture::NEAREST);
-		tex.allocate();
+		
 		int Nx = tex.width();
 		int Ny = tex.height();
-		float * texBuf = tex.data<float>();
+
+		//tex.allocate();
+		//float * texBuf = tex.data<float>();
+		float * texBuf = new float[Nx*Ny*4];
 		
 		for(int j=0; j<Ny; ++j){ float y = float(j)/(Ny-1)*2-1;
 		for(int i=0; i<Nx; ++i){ float x = float(i)/(Nx-1)*2-1;
@@ -29,6 +42,8 @@ struct MyWindow : Window{
 			texBuf[idx*4 + 3] = col.a;
 		}}
 
+		tex.submit(texBuf);
+
 		return true;
 	}
 
@@ -42,6 +57,8 @@ struct MyWindow : Window{
 
 		gl.matrixMode(gl.MODELVIEW);
 		gl.loadMatrix(Matrix4d::lookAt(Vec3d(0,0,3), Vec3d(0,0,0), Vec3d(0,1,0)));
+
+		tex.filter(Texture::LINEAR);
 
 		tex.bind();
 
@@ -66,7 +83,7 @@ MyWindow win;
 
 int main(){
 
-	win.add(new StandardWindowKeyControls);
+	win.add(*new StandardWindowKeyControls);
 	win.create(Window::Dim(800, 600));
 
 	MainLoop::start();

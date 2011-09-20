@@ -6,7 +6,7 @@
 
 using namespace al;
 
-static GraphicsGL gl;
+static Graphics gl;
 static Mesh mesh, grid, cube;
 static Camera cam;
 static Nav nav;

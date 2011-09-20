@@ -1,4 +1,4 @@
-#include "allocore/graphics/al_GraphicsOpenGL.hpp"
+#include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_Light.hpp"
 
 namespace al{
@@ -13,17 +13,9 @@ Material::Material(Graphics::Face f)
 	mUseColorMaterial(true)
 {}
 
-GLenum gl_face(Graphics::Face f){
-	switch(f){
-	case Graphics::FRONT:	return GL_FRONT;
-	case Graphics::BACK:	return GL_BACK;
-	default:				return GL_FRONT_AND_BACK;
-	}
-}
-
 void Material::operator()() const {
 
-	GLenum glface = gl_face(face());
+	GLenum glface = face();
 
 	if (useColorMaterial()) {
 		glEnable(GL_COLOR_MATERIAL);	// need to enable for glColor* to work

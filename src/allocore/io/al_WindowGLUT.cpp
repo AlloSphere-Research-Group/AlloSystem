@@ -6,7 +6,7 @@
 
 #include "allocore/system/al_Config.h"		// system defines
 #include "allocore/system/al_MainLoop.hpp"	// start/stop loop, rendering
-#include "allocore/graphics/al_GraphicsOpenGL.hpp"		// OpenGL headers
+#include "allocore/graphics/al_OpenGL.hpp"	// OpenGL headers
 
 #ifdef AL_OSX
 	#include <GLUT/glut.h>

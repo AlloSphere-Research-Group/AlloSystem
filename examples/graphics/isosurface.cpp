@@ -4,7 +4,7 @@
 
 using namespace al;
 
-GraphicsGL gl;
+Graphics gl;
 Light light;
 Camera cam;
 Nav nav(Vec3d(0,0,5));

@@ -6,12 +6,12 @@
 
 using namespace al;
 
-GraphicsGL gl;
+Graphics gl;
 SearchPaths searchpaths;
 
 Shader vert, frag;
 ShaderProgram shaderprogram;
-Texture tex(gl);
+Texture tex;
 Light light;
 Material material;
 
@@ -134,7 +134,7 @@ struct MyWindow : Window{
 		
 		shaderprogram.begin();
 		shaderprogram.uniform("tex0", 1);
-		GraphicsGL::gl_error("tex0");
+		Graphics::error("tex0");
 		tex.bind(1);
 		glCallList(scene_list);
 		tex.unbind(1);

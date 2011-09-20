@@ -32,12 +32,12 @@
 */
 
 #include "allocore/graphics/al_Graphics.hpp"
-#include "allocore/graphics/al_GraphicsOpenGL.hpp"
 #include "allocore/graphics/al_Image.hpp"
 //#include "allocore/graphics/al_Isosurface.hpp"
 #include "allocore/graphics/al_Light.hpp"
 #include "allocore/graphics/al_Shapes.hpp"
 #include "allocore/graphics/al_Stereographic.hpp"
+#include "allocore/graphics/al_Texture.hpp"
 #include "allocore/io/al_AudioIO.hpp"
 #include "allocore/io/al_File.hpp"
 #include "allocore/io/al_Socket.hpp"

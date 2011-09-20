@@ -67,7 +67,7 @@ struct MyWindow : public Window, public Drawable {
 		return true;
 	}
     
-    GraphicsGL gl;
+    Graphics gl;
 	Camera cam;
 	Nav nav;
 	Stereographic stereo;

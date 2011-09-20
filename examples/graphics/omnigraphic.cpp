@@ -3,7 +3,7 @@
 
 using namespace al;
 
-static GraphicsGL gl;
+static Graphics gl;
 static Mesh mesh, grid;
 static Stereographic stereo;
 static Camera cam;
