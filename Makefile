@@ -63,7 +63,7 @@ ifeq ($(PLATFORM), linux)
 	LINK_LIBS_FLAGS += $(addprefix -l :, $(notdir $(LINK_LIBS_PATH)))
 endif
 .PRECIOUS: $(EXEC_TARGETS)
-$(EXEC_TARGETS): allocore alloutil FORCE
+$(EXEC_TARGETS): allocore alloutil
 #	@echo $(LINK_LIBS_FLAGS)
 	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LDFLAGS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH)
 ifneq ($(AUTORUN), 0)
@@ -76,12 +76,18 @@ EXEC_DIR_TARGETS = examples/%
 .PRECIOUS: $(EXEC_DIR_TARGETS)
 $(EXEC_DIR_TARGETS): LSRC = $(wildcard $@/*.cpp) $(wildcard $@/*.c)
 $(EXEC_DIR_TARGETS): EXEC_NAME = $(subst /,_,$(*D))
-$(EXEC_DIR_TARGETS): allocore alloutil FORCE
+$(EXEC_DIR_TARGETS): allocore alloutil
+	@echo ($@)
+	@echo $(@D)
+	@echo $(*D)
+ifneq ($(*D), .)
+#	@echo $(EXEC_NAME)
+#	@echo $(LSRC)
 	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(EXEC_NAME) $(LSRC) $(LDFLAGS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) -I$@
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./$(EXEC_NAME)
 endif
-
+endif
 
 extended: all alloni
 
@@ -156,12 +162,10 @@ archive:
 
 # Remove build files
 .PHONY: clean
-clean: createFolders
+clean:
 # Clean only removes object files for now; avoids unintentional removal of user files
-#	@$(RM) -r $(BUILD_DIR)*
-#	@$(RM) -r $(TEST_DIR)/$(BUILD_DIR)*
-	@$(RM) $(OBJ_DIR)*
-	@$(RM) $(TEST_DIR)/$(OBJ_DIR)*
+	$(call RemoveDir, $(OBJ_DIR))
+	$(call RemoveDir, $(TEST_DIR)/$(OBJ_DIR))
 	@$(MAKE) -C externals/gamma clean
 	@$(MAKE) -C externals/glv clean
 

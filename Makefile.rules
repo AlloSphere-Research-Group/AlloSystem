@@ -13,6 +13,8 @@ ifneq ($(DEP_TRACK), 0)
 	DEPFLAGS = -MMD -MF $(basename $@).dep
 endif
 
+ALL_BUILD_DIRS = $(BIN_DIR) $(OBJ_DIR) $(BUILD_DIR)include $(BUILD_DIR)lib
+
 #--------------------------------------------------------------------------
 # Rules
 #--------------------------------------------------------------------------
@@ -37,7 +39,8 @@ $(OBJ_DIR)%.o: %.mm
 all: $(SLIB_PATH)
 
 # Build static library
-$(SLIB_PATH): createFolders $(addprefix $(OBJ_DIR), $(OBJS))
+#$(SLIB_PATH): createFolders $(addprefix $(OBJ_DIR), $(OBJS))
+$(SLIB_PATH): $(addprefix $(OBJ_DIR), $(OBJS))
 	@echo AR $@
 	@$(RM) $@
 	$(AR) $@ $(filter %.o, $^) $(STATIC_LIB_FLAGS)
@@ -49,12 +52,12 @@ $(SLIB_PATH): createFolders $(addprefix $(OBJ_DIR), $(OBJS))
 # Dummy target to force rebuilds
 FORCE:
 
-createFolders:
-	@mkdir -p $(BIN_DIR)
-	@mkdir -p $(OBJ_DIR)
-	@mkdir -p $(BUILD_DIR)include
-	@mkdir -p $(BUILD_DIR)lib
+# This creates a particular build folder
+$(ALL_BUILD_DIRS):
+	@mkdir -p $@
 
+# This rule creates all the build directories ONCE when the first object is built
+$(addprefix $(OBJ_DIR), $(OBJS)): | $(ALL_BUILD_DIRS)
 
 # Create file with settings for linking to external libraries
 external:
