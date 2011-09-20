@@ -515,47 +515,43 @@ public:
 	virtual ~CubeMapTexture() {}
 	
 	virtual void onCreate() {
-		if (mID == 0) {
 		
-			// create cubemap texture:
-			glGenTextures(1, (GLuint *)&mID);
-			glBindTexture(mTarget, mID);
-			// each cube face should clamp at texture edges:
-			glTexParameteri(mTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(mTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glTexParameteri(mTarget, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-			// normal filtering
-			glTexParameteri(mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			// no mipmapping:
-			//glTexParameteri(mTarget, GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
-			//glTexParameterf(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			
-			// Domagoj also has:
-			glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
-			glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
-			glTexGeni( GL_R, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
-			float X[4] = { 1,0,0,0 };
-			float Y[4] = { 0,1,0,0 };
-			float Z[4] = { 0,0,1,0 };
-			glTexGenfv( GL_S, GL_OBJECT_PLANE, X );
-			glTexGenfv( GL_T, GL_OBJECT_PLANE, Y );
-			glTexGenfv( GL_R, GL_OBJECT_PLANE, Z );
+		// create cubemap texture:
+		glGenTextures(1, (GLuint *)&mID);
+		glBindTexture(mTarget, mID);
+		// each cube face should clamp at texture edges:
+		glTexParameteri(mTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(mTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(mTarget, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		// normal filtering
+		glTexParameteri(mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		// no mipmapping:
+		//glTexParameteri(mTarget, GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
+		//glTexParameterf(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		
-			submit();
-			
-			// clean up:
-			glBindTexture(mTarget, 0);
-			Graphics::error("creating cubemap texture");
-		}
+		// Domagoj also has:
+		glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
+		glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
+		glTexGeni( GL_R, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
+		float X[4] = { 1,0,0,0 };
+		float Y[4] = { 0,1,0,0 };
+		float Z[4] = { 0,0,1,0 };
+		glTexGenfv( GL_S, GL_OBJECT_PLANE, X );
+		glTexGenfv( GL_T, GL_OBJECT_PLANE, Y );
+		glTexGenfv( GL_R, GL_OBJECT_PLANE, Z );
+	
+		submit();
+		
+		// clean up:
+		glBindTexture(mTarget, 0);
+		Graphics::error("creating cubemap texture");
+	
 		//printf("created CubeMapTexture %dx%d\n", mResolution, mResolution);
 	}
 	
 	virtual void onDestroy() {
-		if (mID) {
-			glDeleteTextures(1, (GLuint *)&mID);
-			mID=0;
-		}
+		glDeleteTextures(1, (GLuint *)&mID);
 	}
 	
 	void bind(int unit = 0) {

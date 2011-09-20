@@ -43,12 +43,8 @@
 
 namespace al{
 
-/*!
-	A simple wrapper around OpenGL Textures, 
-	using al::Array as a CPU-side interface for configuring & submitting
-	
-	TODO: lift out common features of Texture and CubeMapTexture into a 
-	generic superclass ?
+/**
+	A simple wrapper around OpenGL Texture
 */
 class Texture : public GPUObject {
 public:
@@ -152,193 +148,35 @@ public:
 
 	Texture& wrap(Wrap v){ return wrap(v,v,v); }
 	Texture& wrap(Wrap S, Wrap T){ return wrap(S,T,mWrapR); }
-	Texture& wrap(Wrap S, Wrap T, Wrap R){
-		if(S!=mWrapS || T!=mWrapT || R!=mWrapR){
-			mWrapS = S; mWrapT = T; mWrapR = R;
-			mParamsUpdated = true;
-		}
-		return *this;
-	}
+	Texture& wrap(Wrap S, Wrap T, Wrap R);
 
-
-	void bind(int unit = 0) {
-		// ensure it is created:
-		//validate(); // FIXME: needed?
-		sendParams(false);
-		sendPixels(false);
-		
-		// multitexturing:
-		glActiveTextureARB(GL_TEXTURE0_ARB + unit);
-		
-		// bind:
-		glEnable(target());
-		glBindTexture(target(), id());
-		
-		Graphics::error("binding texture");
-	}
+	/// bind the texture (to a multitexture unit)
+	void bind(int unit = 0);
+	/// unbind the texture (from a multitexture unit)
+	void unbind(int unit = 0);
 	
-	void unbind(int unit = 0) {		
-		// multitexturing:
-		glActiveTextureARB(GL_TEXTURE0_ARB + unit);
+	/// render the texture onto a quad on the XY plane
+	void quad(Graphics& gl, double w=1, double h=1, double x=0, double y=0);
 		
-		glBindTexture(target(), 0);
-		glDisable(target());
-	}
-	
-	void quad(Graphics& gl, double w=1, double h=1, double x0=0, double y0=0);
-	
-	// submit manually
-	// only safe while OpenGL context exists
-	void submit(const Array& src, bool reconfigure=false) {	
-		if (src.type() != AlloUInt8Ty) {
-			printf("submit failed: only uint8_t arrays are supported\n");
-			return;
-		} 
-		
-		if (reconfigure) {
-			// reconfigure texture from array
-			switch (src.dimcount()) {
-				case 1: mTarget = TEXTURE_1D; break;
-				case 2: mTarget = TEXTURE_2D; break;
-				case 3: mTarget = TEXTURE_3D; break;
-				default:
-					printf("invalid array dimensions for texture\n");
-					return;
-			}
-			
-			switch (src.dimcount()) {
-				case 3:	mDepth = src.depth();
-				case 2:	mHeight = src.height();
-				case 1:	mWidth = src.width(); break;
-			}
-
-			switch (src.components()) {
-				case 1:	mFormat = Graphics::LUMINANCE; break; // alpha or luminance?
-				case 2:	mFormat = Graphics::LUMINANCE_ALPHA; break;
-				case 3:	mFormat = Graphics::RGB; break;
-				case 4:	mFormat = Graphics::RGBA; break;
-				default:
-					printf("invalid array component count for texture\n");
-					return;
-			}
-			
-			printf("configured to %dD=%X, format %X, align %d\n", src.dimcount(), mTarget, mFormat, src.alignment());
-		} 
-		else {
-			if (src.width() != width()) {
-				printf("submit failed: source array width does not match\n");
-				return;
-			}
-			if (height() && src.height() != height()) {
-				printf("submit failed: source array height does not match\n");
-				return;
-			}
-			if (depth() && src.depth() != depth()) {
-				printf("submit failed: source array depth does not match\n");
-				return;
-			}
-		
-			switch (format()) {
-				case Graphics::ALPHA:
-				case Graphics::LUMINANCE:
-					if (src.dimcount() != 1) {
-						printf("submit failed: source array dimcount does not match\n");
-						return;
-					}
-					break;
-				case Graphics::LUMINANCE_ALPHA:
-					if (src.dimcount() != 2) {
-						printf("submit failed: source array dimcount does not match\n");
-						return;
-					}
-					break;
-				case Graphics::RGB:
-					if (src.dimcount() != 3) {
-						printf("submit failed: source array dimcount does not match\n");
-						return;
-					}
-					break;
-				case Graphics::RGBA:
-					if (src.dimcount() != 4) {
-						printf("submit failed: source array dimcount does not match\n");
-						return;
-					}
-					break;
-				default:
-					break;
-			}
-		}
-		
-		submit(src.data.ptr, src.alignment());
-	}
-	
-	
 	/// Resize texture data on GPU and copy over pixels
-	
 	/// If pixels is NULL, then the only effect is to resize the texture
 	/// remotely.
-	virtual void submit(const void * pixels=NULL, uint32_t align=4) {
-		
-		validate();
-		
-		determineTarget();
-		glBindTexture(target(), id());
-		
-		// set glPixelStore according to the array layout:
-		//glPixelStorei(GL_UNPACK_ALIGNMENT, align);
-		
-		int comps = numComps();
-		
-		// void glTexImage3D(
-		//		GLenum target, GLint level, GLenum internalformat,
-		//		GLsizei width, GLsizei height, GLsizei depth, 
-		//		GLint border, GLenum format, GLenum type, const GLvoid *pixels
-		// );
-		switch(mTarget){
-			case GL_TEXTURE_1D:	glTexImage1D(mTarget, 0, comps, width(), 0, format(), type(), pixels); break;
-			case GL_TEXTURE_2D: glTexImage2D(mTarget, 0, comps, width(), height(), 0, format(), type(), pixels); break;
-			case GL_TEXTURE_3D: glTexImage3D(mTarget, 0, comps, width(), height(), depth(), 0, format(), type(), pixels); break;
-			default:;
-		}
-		
-		// set alignment back to default
-		//glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-		
-		Graphics::error("submitting texture");
-		
-//		// OpenGL may have changed the internal format to one it supports:
-//		GLint format;
-//		glGetTexLevelParameteriv(mTarget, 0, GL_TEXTURE_INTERNAL_FORMAT, &format);
-//		if (format != mInternalFormat) {
-//			printf("converted from %X to %X format\n", mInternalFormat, format);
-//			mInternalFormat = format;
-//		}
+	virtual void submit(const void * pixels=NULL, uint32_t align=4);
+	
+	/// Submit the texture using an Array as source 
+	/// if reconfigure is true, 
+	/// it will attempt to derive size & layout from the array
+	void submit(const Array& src, bool reconfigure=false);
 
-		//printf("submitted texture data %p\n", pixels);
-		
-		glBindTexture(target(), 0);
-	}
-
-
-	void allocate(){
-		deallocate();
-		mBuffer = malloc(numElems() * Graphics::numBytes(type()));
-		mPixels = mBuffer;
-	}
-
-	void deallocate(){
-		if(mBuffer){
-			free(mBuffer);
-			mBuffer=0;
-			mPixels=0;
-		}
-	}
+	/// allocate memory for a CPU copy
+	void allocate();
+	void deallocate();
 
 protected:
 //	GLint mLevel;	// TODO: on a rainy day...
 //	GLint mBorder;
 //	GLint mAlignment;
-	Target mTarget;				// TEXTURE_1D, TEXTURE_2D, etc.
+	Target mTarget;				// TEXTURE_1D, TEXTURE_2D, etc. 
 	Format mFormat;				// RGBA, ALPHA, etc.
 	DataType mType;				// UBYTE, FLOAT, etc.
 	Wrap mWrapS, mWrapT, mWrapR;	
@@ -377,7 +215,6 @@ protected:
 	
 	void sendPixels(bool force=true){
 		if(mPixelsUpdated || force){
-			//determineTarget(); // moved to submit()
 			submit();
 			mPixelsUpdated = false;
 		}
@@ -393,7 +230,9 @@ protected:
 	// Pattern for setting a variable that when changed sets a notification flag
 	template<class T>
 	Texture& update(const T& v, T& var, bool& flag){
-		if(v!=var){ var=v; flag=true; } return *this; }
+		if(v!=var){ var=v; flag=true; } 
+		return *this; 
+	}
 
 //	Format toFormat(const Array& src) {
 //		switch(src.header.components) {
@@ -421,6 +260,54 @@ protected:
 //		}
 //	}
 };
+
+
+
+
+inline void Texture :: bind(int unit) {
+	// ensure it is created:
+	validate(); 
+	sendParams(false);
+	sendPixels(false);
+	
+	// multitexturing:
+	glActiveTextureARB(GL_TEXTURE0_ARB + unit);
+	
+	// bind:
+	glEnable(target());
+	glBindTexture(target(), id());
+	
+	Graphics::error("binding texture");
+}
+
+inline void Texture :: unbind(int unit) {		
+	// multitexturing:
+	glActiveTextureARB(GL_TEXTURE0_ARB + unit);
+	glBindTexture(target(), 0);
+	glDisable(target());
+}
+
+inline void Texture :: allocate() {
+	deallocate();
+	mBuffer = malloc(numElems() * Graphics::numBytes(type()));
+	mPixels = mBuffer;
+}
+
+inline void Texture :: deallocate() {
+	if(mBuffer){
+		free(mBuffer);
+		mBuffer=0;
+		mPixels=0;
+	}
+}
+
+inline Texture& Texture :: wrap(Wrap S, Wrap T, Wrap R){
+		if(S!=mWrapS || T!=mWrapT || R!=mWrapR){
+			mWrapS = S; mWrapT = T; mWrapR = R;
+			mParamsUpdated = true;
+		}
+		return *this;
+	}
 
 } // al::
 

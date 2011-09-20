@@ -33,7 +33,7 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
-#include "allocore/graphics/al_GraphicsOpenGL.hpp"
+#include "allocore/graphics/al_Graphics.hpp"
 #include "alloutil/al_OpenGL.hpp"
 
 /*
@@ -104,7 +104,7 @@ public:
 			// switch back to window-system-provided framebuffer
 			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 			
-			if (GraphicsGL::gl_error("SimpleFBO onCreate")) exit(0);
+			if (Graphics::error("SimpleFBO onCreate")) exit(0);
 		}
 	}
 	
@@ -153,7 +153,7 @@ public:
 		glGenerateMipmapEXT(GL_TEXTURE_2D);
 		unbind();
 		
-		if (GraphicsGL::gl_error("SimpleFBO onLeave")) exit(0);
+		if (Graphics::error("SimpleFBO onLeave")) exit(0);
 	}
 	
 	// Note: this will reformat the dst array:

@@ -25,6 +25,130 @@ void Texture::quad(Graphics& gl, double w, double h, double x0, double y0){
 	unbind();
 }
 
+void Texture :: submit(const Array& src, bool reconfigure) {	
+	if (src.type() != AlloUInt8Ty) {
+		printf("submit failed: only uint8_t arrays are supported\n");
+		return;
+	} 
+	
+	if (reconfigure) {
+		// reconfigure texture from array
+		switch (src.dimcount()) {
+			case 1: mTarget = TEXTURE_1D; break;
+			case 2: mTarget = TEXTURE_2D; break;
+			case 3: mTarget = TEXTURE_3D; break;
+			default:
+				printf("invalid array dimensions for texture\n");
+				return;
+		}
+		
+		switch (src.dimcount()) {
+			case 3:	mDepth = src.depth();
+			case 2:	mHeight = src.height();
+			case 1:	mWidth = src.width(); break;
+		}
+
+		switch (src.components()) {
+			case 1:	mFormat = Graphics::LUMINANCE; break; // alpha or luminance?
+			case 2:	mFormat = Graphics::LUMINANCE_ALPHA; break;
+			case 3:	mFormat = Graphics::RGB; break;
+			case 4:	mFormat = Graphics::RGBA; break;
+			default:
+				printf("invalid array component count for texture\n");
+				return;
+		}
+		
+		printf("configured to %dD=%X, format %X, align %d\n", src.dimcount(), mTarget, mFormat, src.alignment());
+	} 
+	else {
+		if (src.width() != width()) {
+			printf("submit failed: source array width does not match\n");
+			return;
+		}
+		if (height() && src.height() != height()) {
+			printf("submit failed: source array height does not match\n");
+			return;
+		}
+		if (depth() && src.depth() != depth()) {
+			printf("submit failed: source array depth does not match\n");
+			return;
+		}
+	
+		switch (format()) {
+			case Graphics::ALPHA:
+			case Graphics::LUMINANCE:
+				if (src.dimcount() != 1) {
+					printf("submit failed: source array dimcount does not match\n");
+					return;
+				}
+				break;
+			case Graphics::LUMINANCE_ALPHA:
+				if (src.dimcount() != 2) {
+					printf("submit failed: source array dimcount does not match\n");
+					return;
+				}
+				break;
+			case Graphics::RGB:
+				if (src.dimcount() != 3) {
+					printf("submit failed: source array dimcount does not match\n");
+					return;
+				}
+				break;
+			case Graphics::RGBA:
+				if (src.dimcount() != 4) {
+					printf("submit failed: source array dimcount does not match\n");
+					return;
+				}
+				break;
+			default:
+				break;
+		}
+	}
+	
+	submit(src.data.ptr, src.alignment());
+}
+
+void Texture :: submit(const void * pixels, uint32_t align) {
+		
+	validate();
+	
+	determineTarget();
+	glBindTexture(target(), id());
+	
+	// set glPixelStore according to the array layout:
+	//glPixelStorei(GL_UNPACK_ALIGNMENT, align);
+	
+	int comps = numComps();
+	
+	// void glTexImage3D(
+	//		GLenum target, GLint level, GLenum internalformat,
+	//		GLsizei width, GLsizei height, GLsizei depth, 
+	//		GLint border, GLenum format, GLenum type, const GLvoid *pixels
+	// );
+	switch(mTarget){
+		case GL_TEXTURE_1D:	glTexImage1D(mTarget, 0, comps, width(), 0, format(), type(), pixels); break;
+		case GL_TEXTURE_2D: glTexImage2D(mTarget, 0, comps, width(), height(), 0, format(), type(), pixels); break;
+		case GL_TEXTURE_3D: glTexImage3D(mTarget, 0, comps, width(), height(), depth(), 0, format(), type(), pixels); break;
+		default:;
+	}
+	
+	// set alignment back to default
+	//glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+	
+	Graphics::error("submitting texture");
+	
+//		// OpenGL may have changed the internal format to one it supports:
+//		GLint format;
+//		glGetTexLevelParameteriv(mTarget, 0, GL_TEXTURE_INTERNAL_FORMAT, &format);
+//		if (format != mInternalFormat) {
+//			printf("converted from %X to %X format\n", mInternalFormat, format);
+//			mInternalFormat = format;
+//		}
+
+	//printf("submitted texture data %p\n", pixels);
+	
+	glBindTexture(target(), 0);
+}
 
 //Texture::Texture(Graphics& backend, int width, int height, Format format, Type type, Wrap wrap)
 //:	GPUObject(),
