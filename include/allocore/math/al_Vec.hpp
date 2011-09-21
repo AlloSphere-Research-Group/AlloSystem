@@ -968,11 +968,15 @@ Vec<N,T>& Vec<N,T>::normalize(){
 // Pretty-printing by Matt:
 //
 template <typename T> const char* typeString();
-#define TypeString(A) template <> const char* typeString<A>() { return #A; }
+#define TypeString(A) template <> inline const char* typeString<A>() { return #A; }
 TypeString(char)
+TypeString(unsigned char)
 TypeString(int)
+TypeString(unsigned int)
 TypeString(float)
 TypeString(double)
+TypeString(long double)
+#undef TypeString
 
 template <int N, class T>
 std::ostream & operator << (std::ostream & out, const Vec<N,T> &v) {
