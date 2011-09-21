@@ -976,7 +976,11 @@ std::ostream & operator << (std::ostream & out, const Vec<N,T> &v) {
 
 	
 
-  out << "Vec of size " << N << " and type " << typeid(T).name() << ": [";
+  //out << "Vec of size " << N << " and type " << typeid(T).name() << ": [";
+
+	// FIXME: removed typeid since it needs RTTI
+	// and #include <typeinfo>
+	out << "Vec of size " << N << ": [";
 
   int numToPrint;
   char *printAfter = (char *)"";

@@ -3,6 +3,7 @@
 #ifdef AL_LINUX
 #include "apr-1.0/apr_general.h"
 #include "apr-1.0/apr_thread_proc.h"
+#include "apr-1.0/apr_portable.h"
 #else
 #include "apr-1/apr_general.h"
 #include "apr-1/apr_thread_proc.h"
@@ -122,7 +123,11 @@ bool Thread::join(){
 }
 
 void * Thread::current() {
-	return apr_os_thread_current();
+	// FIXME: this doesn't work on Linux
+	//return apr_os_thread_current();
+
+	// FIXME: what are we suppose to return here?
+	return (void *)(apr_os_thread_current());
 }
 
 //Thread::Thread()
