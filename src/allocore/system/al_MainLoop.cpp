@@ -71,7 +71,6 @@ static void mainGLUTInit() {
 }
 
 static void mainGLUTExitFunc(){
-
 	// call any exit handlers:
 	Main::get().exit();
 }
@@ -141,9 +140,11 @@ void Main::tick() {
 	mCPU += 0.1 * (used - mCPU);
 }
 
-Main& Main::get() {	
-	static Main gMain;
-	return gMain;
+Main& Main::get() {
+	// This has to be dynamically allocated,
+	// otherwise it can get destroyed at some random time
+	static Main * gMain = new Main;
+	return *gMain;
 }
 
 struct ForceMainThreadMain {

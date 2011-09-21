@@ -87,7 +87,7 @@ public:
 	// Setters
 	void visible(bool v){ mVisible=v; }
 
-	void destroy(){ //printf("destroy\n");
+	void destroy(){ //printf("destroy: %p\n", this);
 		if(created()){
 			glutDestroyWindow(mID);
 			windows().erase(id());
