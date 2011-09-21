@@ -1,0 +1,39 @@
+On Sep 6, 2011, at 4:56 PM, GrrrWaaa wrote:
+OSX:
+
+Until recently, our philosophy on OSX was to build 32/64 universal binary static libraries, against the 10.5 SDK, and include them in the distribution.
+I think now it may be more appropriate to target the 10.6 SDK, and possibly even gradually migrate to pure 64-bit.
+The theory was that we avoid dealing with users building libraries with different variants (managing each one's different approach to 'make', 'cmake', 'scons' or whatever system they use), by just providing ones that work.
+
+If we want to avoid distributing pre-built libs, then we have to deal with the fact that there is no official package management system for OSX, and either align ourselves with macports, fink, homebrew etc (hoping that they provide the libs we need with the right build properties) or write a mega shell script to download & build them one by one.
+
+Linux:
+
+On linux it is supposed to be easier, just using the package manager for the OS, but unfortunately the library names are not the same on all distributions / distribution versions. Furthermore, some of the libraries are not yet in the official package management repositories (e.g. AssImp), so we either a) fall back to distributing pre-built libs, b) make our own repository.
+
+X-platform:
+
+A third option, given that we are possibly moving to github, is to directly include third party sources (licenses permitting). That will make the build process much slower and the download much larger. Having dealt with building things like freetype over the last few years, I really don't recommend this route.
+
+Static/dynamic:
+
+Before I was an advocate of static, as the simple route of an easily distributable app, but nowadays I'm more inclined to dynamic, since that's what most OS's are designed around (plus it makes my life easier for JIT compilation purposes). 
+
+
+
+
+
+
+
+On Sep 6, 2011, at 2:31 PM, Lance Putnam wrote:
+1) Use the same (stable release) versions across all platforms.
+2) Have a single platform-independent command to
+download/build/install all dependencies. E.g., make install-dep.
+3) Use [dynamic or static?] linking by default.
+
+
+
+
+
+On Tue, Sep 6, 2011 at 2:00 PM, Matt Wright <matt@create.ucsb.edu> wrote:
+Is there any coherent "philosophy" or set of principles determining which versions of which libraries get linked in what way(s) to allocore projects?  From my somewhat outsider perspective it seems like a lot of case-by-case details with no discernible intellectual structure --- the kind of thing that I find hard to keep in my mind and hard to explain...  E.g., the whole linux install-dependencies.sh thing where sometimes you have to change it to a more specific version name and sometimes you have to change it to a less specific version name; it's maddening!
