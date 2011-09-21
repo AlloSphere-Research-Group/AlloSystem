@@ -68,7 +68,7 @@ typedef Mat<4,int>		Mat4i;	///< integer 4x4 matrix
 
 template <int N, class T>
 struct VecElems{ T x,y,z,w; private: T data[N-4]; };
-template<class T> struct VecElems<0,T>{};
+template<class T> struct VecElems<0,T>{ static T x; };
 template<class T> struct VecElems<1,T>{ T x; };
 template<class T> struct VecElems<2,T>{ T x,y; };
 template<class T> struct VecElems<3,T>{ 

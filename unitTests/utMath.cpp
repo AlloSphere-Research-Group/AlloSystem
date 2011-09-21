@@ -29,6 +29,7 @@ int utMath(){
 		{ Vec<1, Vec<1, int> > t; }
 		{ Vec<4, Complex<float> > t; }
 		{ Vec<5, char> t; }
+		{ Vec<0,int> t; }
 
 		Vec<N,double> a, b, c;	assert(a.size() == N);
 
