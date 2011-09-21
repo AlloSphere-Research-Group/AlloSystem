@@ -67,7 +67,8 @@ $(EXEC_TARGETS): allocore alloutil
 #	@echo $(LINK_LIBS_FLAGS)
 	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LDFLAGS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH)
 ifneq ($(AUTORUN), 0)
-	@cd $(BIN_DIR) && ./$(*F)
+	
+	cd $(BIN_DIR) && ./$(*F)
 endif
 
 
