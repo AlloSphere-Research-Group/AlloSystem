@@ -966,38 +966,20 @@ Vec<N,T>& Vec<N,T>::normalize(){
 
 
 // Pretty-printing by Matt:
-#define MAX_TO_PRINT 10
+//
+template <typename T> const char* typeString();
+#define TypeString(A) template <> const char* typeString<A>() { return #A; }
+TypeString(char)
+TypeString(int)
+TypeString(float)
+TypeString(double)
+
 template <int N, class T>
 std::ostream & operator << (std::ostream & out, const Vec<N,T> &v) {
-  if (N == 0) {
-	out << "Vec of size 0 (empty)" << std::endl;
-	return out;
-  }
-
-	
-
-  //out << "Vec of size " << N << " and type " << typeid(T).name() << ": [";
-
-	// FIXME: removed typeid since it needs RTTI
-	// and #include <typeinfo>
-	out << "Vec of size " << N << ": [";
-
-  int numToPrint;
-  char *printAfter = (char *)"";
-  if (N <= MAX_TO_PRINT) {
-	numToPrint = N;
-  } else {
-	numToPrint = MAX_TO_PRINT;
-	printAfter = (char *)", ...";
-  }
-
-  out << v[0];
-
-  for (int i = 1; i<numToPrint; ++i) {
-	out << ", " << v[i];
-  }
-  out <<  printAfter << "]" << std::endl;
-
+  out << "Vec<" << N << "," << typeString<T>() << "> = {" << v.elems()[0];
+  for (int i = 1; i < N; ++i)
+    out << ", " << v.elems()[i];
+  out << "}" << std::endl;
   return out;
 }
 
