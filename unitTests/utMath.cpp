@@ -31,6 +31,11 @@ int utMath(){
 		{ Vec<5, char> t; }
 		{ Vec<0,int> t; }
 
+		//Vec<0,int>().print();
+		//Vec<1,int>(1).print();
+		//Vec<2,int>(1,2).print();
+		//std::cout << Vec<0,int>();
+
 		Vec<N,double> a, b, c;	assert(a.size() == N);
 
 		a[0] = 0;				assert(a[0] == 0);

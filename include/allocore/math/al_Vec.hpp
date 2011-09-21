@@ -943,14 +943,6 @@ static inline void print(const Mat<N,T>& m) {
 
 // Implementation --------------------------------------------------------------
 
-template<int N, class T>
-inline void Vec<N,T>::print(FILE * out) const {
-	fprintf(out, "Vec%i(%f", N,  (double)((*this)[0]));
-	for (int C=1; C<N; C++) 
-		fprintf(out, ", %f", (double)((*this)[C]));
-	fprintf(out, ")\n");
-}
-
 template <int N, class T>
 Vec<N,T>& Vec<N,T>::normalize(){
 	float m = mag();
@@ -965,8 +957,6 @@ Vec<N,T>& Vec<N,T>::normalize(){
 }
 
 
-// Pretty-printing by Matt:
-//
 template <typename T> const char* typeString();
 #define TypeString(A) template <> inline const char* typeString<A>() { return #A; }
 TypeString(char)
@@ -978,13 +968,29 @@ TypeString(double)
 TypeString(long double)
 #undef TypeString
 
+template<int N, class T>
+inline void Vec<N,T>::print(FILE * out) const {
+	fprintf(out, "Vec<%i,%s> = {", N, typeString<T>());
+	if(size()){
+		fprintf(out, "%g", (double)((*this)[0]));
+		for (int i=1; i<N; ++i) 
+			fprintf(out, ", %g", (double)((*this)[i]));
+	}
+	fprintf(out, "}\n");
+}
+
+// Pretty-printing by Matt:
+//
 template <int N, class T>
 std::ostream & operator << (std::ostream & out, const Vec<N,T> &v) {
-  out << "Vec<" << N << "," << typeString<T>() << "> = {" << v.elems()[0];
-  for (int i = 1; i < N; ++i)
-    out << ", " << v.elems()[i];
-  out << "}" << std::endl;
-  return out;
+	out << "Vec<" << N << "," << typeString<T>() << "> = {";
+	if(v.size()){
+		out << v[0];
+		for (int i = 1; i < N; ++i)
+			out << ", " << v[i];
+	}
+	out << "}" << std::endl;
+	return out;
 }
 
 #undef IT
