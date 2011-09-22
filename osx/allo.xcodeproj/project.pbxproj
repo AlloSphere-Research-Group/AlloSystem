@@ -317,6 +317,13 @@
 			remoteGlobalIDString = 36035DB813037E8D001E9BA9;
 			remoteInfo = "make allocore";
 		};
+		367921F8142BC09D00E4738E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 36035DB813037E8D001E9BA9;
+			remoteInfo = "make allocore";
+		};
 		36CA80491418244B00B7CE6B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
@@ -3468,6 +3475,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				367921F9142BC09D00E4738E /* PBXTargetDependency */,
 			);
 			name = unitTests;
 			productName = unitTests;
@@ -4046,6 +4054,11 @@
 			target = 36035DB813037E8D001E9BA9 /* make allocore */;
 			targetProxy = 366E78FE1407F2E90010B21A /* PBXContainerItemProxy */;
 		};
+		367921F9142BC09D00E4738E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 36035DB813037E8D001E9BA9 /* make allocore */;
+			targetProxy = 367921F8142BC09D00E4738E /* PBXContainerItemProxy */;
+		};
 		36CA80481418244B00B7CE6B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 36035DB813037E8D001E9BA9 /* make allocore */;
@@ -4148,7 +4161,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = i386;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -4172,7 +4184,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = i386;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -4230,13 +4241,14 @@
 					$PROJECT_DIR/../osx/lib,
 				);
 				OBJROOT = /build;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				RUN_CLANG_STATIC_ANALYZER = YES;
-				SDKROOT = "";
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
 				SYMROOT = ../build/bin;
 				USER_HEADER_SEARCH_PATHS = "$PROJECT_DIR/../include $PROJECT_DIR/../osx/include";
+				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
 		};
@@ -4287,7 +4299,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				RUN_CLANG_STATIC_ANALYZER = YES;
-				SDKROOT = "";
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = debugging;
 				SYMROOT = ../build/bin;

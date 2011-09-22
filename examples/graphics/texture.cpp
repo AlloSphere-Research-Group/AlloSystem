@@ -13,7 +13,7 @@ Lance Putnam, 9/13/2011
 using namespace al;
 
 Graphics gl;
-Texture tex(64,64, Graphics::RGBA, Graphics::FLOAT);
+Texture tex(63,63, Graphics::RGB, Graphics::UBYTE);
 
 struct MyWindow : Window{
 
@@ -25,7 +25,7 @@ struct MyWindow : Window{
 
 		//tex.allocate();
 		//float * texBuf = tex.data<float>();
-		float * texBuf = new float[Nx*Ny*4];
+		unsigned char * texBuf = new unsigned char[Nx*Ny*4];
 		
 		for(int j=0; j<Ny; ++j){ float y = float(j)/(Ny-1)*2-1;
 		for(int i=0; i<Nx; ++i){ float x = float(i)/(Nx-1)*2-1;
@@ -36,10 +36,11 @@ struct MyWindow : Window{
 			Color col = HSV(a,1,m);
 			
 			int idx = j*Nx + i;
-			texBuf[idx*4 + 0] = col.r;
-			texBuf[idx*4 + 1] = col.g;
-			texBuf[idx*4 + 2] = col.b;
-			texBuf[idx*4 + 3] = col.a;
+			int stride = tex.numComponents();
+			texBuf[idx*stride + 0] = col.r * 255.;
+			texBuf[idx*stride + 1] = col.g * 255.;
+			texBuf[idx*stride + 2] = col.b * 255.;
+			//texBuf[idx*4 + 3] = col.a;
 		}}
 
 		tex.submit(texBuf);

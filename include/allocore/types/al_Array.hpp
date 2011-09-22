@@ -127,9 +127,10 @@ public:
 	unsigned depth() const { return header.dim[2]; }
 	
 	uint32_t stride(int i=0) const { return header.stride[i]; }
+	
 	/// return the packing alignment (1, 2, 4 or 8 byte)
 	uint32_t alignment() const {
-		uint32_t i = stride(0);
+		uint32_t i = stride(1);	// row stride
 		if (i % 2 > 0) return 1;
 		if (i % 4 > 0) return 2;
 		if (i % 8 > 0) return 4;
@@ -162,7 +163,7 @@ public:
 	///! Allocate memory for the given header
 	/// (warning, does not check if data.ptr was not NULL!)
 	void dataCalloc() { data.ptr = (char *)calloc(1, size()); }
-	void dataFree() { if(hasData()) free(data.ptr); }
+	void dataFree() { if(hasData()) free(data.ptr); data.ptr = NULL; }
 
 	///! set all data to zero.
 	void zero() { if(hasData()) memset(data.ptr, 0, size()); }

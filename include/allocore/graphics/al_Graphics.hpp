@@ -286,7 +286,11 @@ public:
 
 	/// Print current error state to file
 	static bool error(const char *msg="", FILE * fp=stdout);
+	
+	/// Returns AlloTy type for a given GL data type:
+	static AlloTy toAlloTy(DataType v);
 
+	/// Returns DataType for a given AlloTy
 	static DataType toDataType(AlloTy type);
 	
 protected:

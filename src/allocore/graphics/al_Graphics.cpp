@@ -74,6 +74,31 @@ Graphics::DataType Graphics::toDataType(AlloTy v){
 	}
 }
 
+enum DataType {
+		BYTE					= GL_BYTE,
+		UBYTE					= GL_UNSIGNED_BYTE,
+		SHORT					= GL_SHORT,
+		USHORT					= GL_UNSIGNED_SHORT,
+		INT						= GL_INT,
+		UINT					= GL_UNSIGNED_INT,
+		FLOAT					= GL_FLOAT,
+		DOUBLE					= GL_DOUBLE
+	};
+
+
+AlloTy Graphics :: toAlloTy(Graphics::DataType v) {
+	switch (v) {
+		case BYTE:		return AlloSInt8Ty;
+		case UBYTE:		return AlloUInt8Ty;
+		case SHORT:		return AlloSInt16Ty;
+		case USHORT:	return AlloUInt16Ty;
+		case INT:		return AlloSInt32Ty;
+		case UINT:		return AlloUInt32Ty;
+		case FLOAT:		return AlloFloat32Ty;
+		case DOUBLE:	return AlloFloat64Ty;
+		default:		return AlloVoidTy;
+	}
+}
 
 
 

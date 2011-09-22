@@ -15,7 +15,6 @@ Texture tex;
 Light light;
 Material material;
 
-
 Scene * ascene = 0;
 Vec3f scene_min, scene_max, scene_center;
 GLuint scene_list = 0;
@@ -47,12 +46,9 @@ struct MyWindow : Window{
 			gl.draw(mesh);
 		}	
 		glEndList();
-		
-		FilePath path = searchpaths.find("hubble.jpg");
-		Image img;
-		img.load(path.filepath());
-		tex.submit(img.array(), true);
 
+		//tex.submit();
+		
 		return true;
 	}
 	
@@ -178,6 +174,9 @@ int main (int argc, char * const argv[]) {
 	
 	win1.add(new StandardWindowKeyControls);
 	win1.create(Window::Dim(640, 480));
+	
+	Image img(searchpaths.find("hubble.jpg").filepath());
+	tex.allocate(img.array());
 	
 	MainLoop::start();
 	

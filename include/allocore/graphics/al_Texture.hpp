@@ -74,48 +74,18 @@ public:
 		NEAREST_MIPMAP_LINEAR	= GL_NEAREST_MIPMAP_LINEAR,
 		LINEAR_MIPMAP_LINEAR	= GL_LINEAR_MIPMAP_LINEAR,
 	};
-
-
-	Texture(unsigned width=512, unsigned height=512, unsigned depth=0)
-	:	GPUObject(),
-		mTarget(TEXTURE_2D),
-		mFormat(Graphics::RGBA),
-		mType(Graphics::UBYTE),
-		mWrapS(CLAMP_TO_EDGE),
-		mWrapT(CLAMP_TO_EDGE),
-		mWrapR(CLAMP_TO_EDGE),
-		mFilter(LINEAR),
-//		mLevel(0),
-//		mBorder(0),
-//		mAlignment(4),
-		mWidth(width),
-		mHeight(height),
-		mDepth(depth),
-		mPixels(0), mBuffer(0),
-		mParamsUpdated(true),
-		mPixelsUpdated(true)
-	{
-		determineTarget();
-	}
 	
-	Texture(unsigned width, unsigned height, Graphics::Format format, Graphics::DataType type)
-	:	mTarget(TEXTURE_2D),
-		mFormat(format),
-		mType(type),
-		mWrapS(CLAMP_TO_EDGE),
-		mWrapT(CLAMP_TO_EDGE),
-		mWrapR(CLAMP_TO_EDGE),
-		mFilter(LINEAR),
-		mWidth(width),
-		mHeight(height),
-		mDepth(0),
-		mPixels(0), mBuffer(0),
-		mParamsUpdated(true),
-		mPixelsUpdated(true)
-	{}	
+	/**
+		Construct a 2D Texture object.
+	*/
+	Texture(unsigned width=512, unsigned height=512, Graphics::Format format=Graphics::RGBA, Graphics::DataType type=Graphics::UBYTE);
+	
+	/**
+		Construct a 3D Texture object.
+	*/
+	Texture(unsigned width, unsigned height, unsigned depth, Graphics::Format format=Graphics::RGBA, Graphics::DataType type=Graphics::UBYTE);
 	
 	virtual ~Texture(){}
-
 
 	Filter filter() const { return mFilter; }
 	Format format() const { return mFormat; }
@@ -127,11 +97,11 @@ public:
 	unsigned depth() const { return mDepth; }
 
 	/// Return number of components per pixel
-	unsigned numComps() const { return Graphics::numComponents(format()); }
+	unsigned numComponents() const { return Graphics::numComponents(format()); }
 
 	/// Return total number of elements (components x width x height x depth)
 	unsigned numElems() const {
-		return numPixels() * numComps();
+		return numPixels() * numComponents();
 	}
 	
 	unsigned numPixels() const {
@@ -140,6 +110,7 @@ public:
 
 	Texture& filter(Filter v){ return update(v, mFilter, mParamsUpdated); }
 	Texture& format(Format v){ return update(v, mFormat, mPixelsUpdated); }
+	Texture& target(Target v){ return update(v, mTarget, mPixelsUpdated); }
 	Texture& type(DataType v){ return update(v, mType  , mPixelsUpdated); }
 
 	Texture& width (unsigned v){ return update(v, mWidth, mPixelsUpdated); }
@@ -157,36 +128,49 @@ public:
 	
 	/// render the texture onto a quad on the XY plane
 	void quad(Graphics& gl, double w=1, double h=1, double x=0, double y=0);
-		
-	/// Resize texture data on GPU and copy over pixels
-	/// If pixels is NULL, then the only effect is to resize the texture
-	/// remotely.
-	virtual void submit(const void * pixels=NULL, uint32_t align=4);
+	
+	/// return reference to the internal CPU-side cache
+	/// DO NOT MODIFY THE LAYOUT OR DIMENSIONS OF THIS ARRAY
+	Array& array() { return mArray; }
 	
 	/// Submit the texture using an Array as source 
+	/// NOTE: the graphics context (e.g. Window) must have been created
 	/// if reconfigure is true, 
 	/// it will attempt to derive size & layout from the array
 	void submit(const Array& src, bool reconfigure=false);
+		
+	/// Resize texture data on GPU and copy over pixels
+	/// NOTE: the graphics context (e.g. Window) must have been created
+	/// If pixels is NULL, then the only effect is to resize the texture
+	/// remotely.
+	virtual void submit(const void * pixels=NULL, uint32_t align=4);
 
+	/// allocate the internal Array for a CPU-side cache, copying from src
+	void allocate(const Array& src, bool reconfigure=true);
 	/// allocate memory for a CPU copy
-	void allocate();
+	/// reconfigures the internal array 
+	void allocate(unsigned align=1);
+	
 	void deallocate();
 
 protected:
 //	GLint mLevel;	// TODO: on a rainy day...
 //	GLint mBorder;
-//	GLint mAlignment;
 	Target mTarget;				// TEXTURE_1D, TEXTURE_2D, etc. 
 	Format mFormat;				// RGBA, ALPHA, etc.
 	DataType mType;				// UBYTE, FLOAT, etc.
 	Wrap mWrapS, mWrapT, mWrapR;	
 	Filter mFilter;
 	unsigned mWidth, mHeight, mDepth;
+	GLint mUnpack;
+	
 	void * mPixels;				// pointer to client-side pixel data (0 if none)
-	void * mBuffer;				// internally allocated pixel buffer
+	Array mArray;				// Array representation of client-side pixel data
+//	void * mBuffer;				// internally allocated pixel buffer
 	bool mParamsUpdated;
 	bool mPixelsUpdated;
-
+	
+	
 	virtual void onCreate(){
 		//printf("Texture onCreate\n");
 		glGenTextures(1, (GLuint *)&mID);
@@ -198,6 +182,9 @@ protected:
 	virtual void onDestroy(){
 		glDeleteTextures(1, (GLuint *)&mID);
 	}
+	
+	/// ensures that the internal Array format matches the texture format
+	void resetArray(unsigned align);
 
 	void sendParams(bool force=true){
 		if(mParamsUpdated || force){
@@ -215,17 +202,13 @@ protected:
 	
 	void sendPixels(bool force=true){
 		if(mPixelsUpdated || force){
-			submit();
+			submit(mPixels);
 			mPixelsUpdated = false;
 		}
 	}
 
-	void determineTarget(){
-		if(0 == mHeight)		mTarget = TEXTURE_1D;
-		else if(0 == mDepth)	mTarget = TEXTURE_2D;
-		else					mTarget = TEXTURE_3D;
-		//invalidate(); // FIXME: mPixelsUpdated flag now triggers update
-	}
+	/// determines target (e.g. GL_TEXTURE_2D) from the dimensions
+	void determineTarget();
 
 	// Pattern for setting a variable that when changed sets a notification flag
 	template<class T>
@@ -287,18 +270,128 @@ inline void Texture :: unbind(int unit) {
 	glDisable(target());
 }
 
-inline void Texture :: allocate() {
+inline void Texture :: resetArray(unsigned align) {
+	mArray.dataFree();
+	
+	// reconfigure the internal array according to the current settings:
+	switch (mTarget) {
+		case TEXTURE_1D:
+			mArray.header.type = Graphics::toAlloTy(mType);
+			mArray.header.components = Graphics::numComponents(mFormat);
+			mArray.header.dimcount = 1;
+			mArray.header.dim[0] = mWidth;
+			mArray.deriveStride(mArray.header, align);
+			break;
+			
+		case TEXTURE_3D:
+			mArray.header.type = Graphics::toAlloTy(mType);
+			mArray.header.components = Graphics::numComponents(mFormat);
+			mArray.header.dimcount = 3;
+			mArray.header.dim[0] = mWidth;
+			mArray.header.dim[1] = mHeight;
+			mArray.header.dim[3] = mDepth;
+			mArray.deriveStride(mArray.header, align);
+			break;
+			
+		case TEXTURE_2D:
+		default:
+			mArray.header.type = Graphics::toAlloTy(mType);
+			mArray.header.components = Graphics::numComponents(mFormat);
+			mArray.header.dimcount = 2;
+			mArray.header.dim[0] = mWidth;
+			mArray.header.dim[1] = mHeight;
+			mArray.deriveStride(mArray.header, align);
+			break;
+	}
+	
+	// if using array:
+	uint32_t rowsize = (mArray.stride(1) * Graphics::numBytes(type()) * numComponents());
+	mUnpack = (rowsize % 4 == 0) ? 4 : 1;
+	
+}
+
+inline void Texture :: allocate(unsigned align) {
 	deallocate();
-	mBuffer = malloc(numElems() * Graphics::numBytes(type()));
-	mPixels = mBuffer;
+	resetArray(align);
+	mArray.dataCalloc();
+	mPixels = mArray.data.ptr;
+	mPixelsUpdated = true;
+	
+	//mBuffer = malloc(numElems() * Graphics::numBytes(type()));
+	//mPixels = mBuffer;
+}
+
+inline void Texture :: allocate(const Array& src, bool reconfigure) {
+	
+	if (reconfigure) {
+		// reconfigure texture from array:
+		switch (src.dimcount()) {
+			case 1: target(TEXTURE_1D); break;
+			case 2: target(TEXTURE_2D); break;
+			case 3: target(TEXTURE_3D); break;
+			default:
+				printf("invalid array dimensions for texture\n");
+				return;
+		}
+		
+		// reconfigure size:
+		switch (src.dimcount()) {
+			case 3:	depth(src.depth());
+			case 2:	height(src.height());
+			case 1:	width(src.width()); break;
+		}
+		
+		// reconfigure components 
+		// (only if necessary - no need to lose e.g. 
+		// mFormat = DEPTH_COMPONENT if we are only changing size)
+		if (Graphics::numComponents(mFormat) != src.components()) {
+			switch (src.components()) {
+				case 1:	
+					format(Graphics::LUMINANCE); break; // alpha or luminance?
+				case 2:	
+					format(Graphics::LUMINANCE_ALPHA); break;
+				case 3:	
+					format(Graphics::RGB); break;
+				case 4:	
+					format(Graphics::RGBA); break;
+				default:
+					printf("invalid array component count for texture\n");
+					return;
+			}
+		}
+		
+		// re-allocate array:
+		allocate(src.alignment());
+		
+	} else {
+		
+		// TODO: read the source into the dst without changing dst layout
+		
+		// ensure that array matches texture:
+		if (!src.isFormat(mArray.header)) {
+			printf("couldn't allocate array, mismatch format\n");
+			mArray.print();
+			src.print();
+			return;
+		}
+		
+		// re-allocate array:
+		allocate();
+	}
+	
+	// copy data:
+	memcpy(mArray.data.ptr, src.data.ptr, src.size());
+	mPixels = mArray.data.ptr;
 }
 
 inline void Texture :: deallocate() {
-	if(mBuffer){
-		free(mBuffer);
-		mBuffer=0;
-		mPixels=0;
-	}
+//	if(mBuffer){
+//		free(mBuffer);
+//		mBuffer=0;
+//		mPixels=0;
+//	} 
+	mArray.dataFree();
+	mPixels=0;
 }
 
 inline Texture& Texture :: wrap(Wrap S, Wrap T, Wrap R){

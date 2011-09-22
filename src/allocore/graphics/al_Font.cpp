@@ -126,7 +126,7 @@ protected:
 	{
 		font.mTex.width(textureWidth(font.mFontSize));
 		font.mTex.height(textureHeight(font.mFontSize));
-		font.mTex.allocate(1);
+		font.mTex.allocate();
 		
 		Array& arr = font.mTex.array();
 		

@@ -4,6 +4,54 @@
 
 namespace al{
 
+Texture :: Texture(unsigned width, unsigned height, Graphics::Format format, Graphics::DataType type)
+:	GPUObject(),
+	mTarget(TEXTURE_2D),
+	mFormat(format),
+	mType(type),
+	mWrapS(CLAMP_TO_EDGE),
+	mWrapT(CLAMP_TO_EDGE),
+	mWrapR(CLAMP_TO_EDGE),
+	mFilter(LINEAR),
+	mWidth(width),
+	mHeight(height),
+	mDepth(0),
+	mUnpack(1),
+	mPixels(0), 
+	//mBuffer(0),
+	mParamsUpdated(true),
+	mPixelsUpdated(true)
+{
+	resetArray(mUnpack);
+}
+
+Texture :: Texture(unsigned width, unsigned height, unsigned depth, Graphics::Format format, Graphics::DataType type)
+:	GPUObject(),
+	mTarget(TEXTURE_3D),
+	mFormat(format),
+	mType(type),
+	mWrapS(CLAMP_TO_EDGE),
+	mWrapT(CLAMP_TO_EDGE),
+	mWrapR(CLAMP_TO_EDGE),
+	mFilter(LINEAR),
+	mWidth(width),
+	mHeight(height),
+	mDepth(depth),
+	mUnpack(1),
+	mPixels(0), 
+	//mBuffer(0),
+	mParamsUpdated(true),
+	mPixelsUpdated(true)
+{
+	resetArray(mUnpack);
+}
+
+void Texture :: determineTarget(){
+	if(0 == mHeight)		mTarget = TEXTURE_1D;
+	else if(0 == mDepth)	mTarget = TEXTURE_2D;
+	else					mTarget = TEXTURE_3D;
+	//invalidate(); // FIXME: mPixelsUpdated flag now triggers update
+}
 
 void Texture::quad(Graphics& gl, double w, double h, double x0, double y0){
 	bind();
@@ -34,25 +82,25 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 	if (reconfigure) {
 		// reconfigure texture from array
 		switch (src.dimcount()) {
-			case 1: mTarget = TEXTURE_1D; break;
-			case 2: mTarget = TEXTURE_2D; break;
-			case 3: mTarget = TEXTURE_3D; break;
+			case 1: target(TEXTURE_1D); break;
+			case 2: target(TEXTURE_2D); break;
+			case 3: target(TEXTURE_3D); break;
 			default:
 				printf("invalid array dimensions for texture\n");
 				return;
 		}
 		
 		switch (src.dimcount()) {
-			case 3:	mDepth = src.depth();
-			case 2:	mHeight = src.height();
-			case 1:	mWidth = src.width(); break;
+			case 3:	depth(src.depth());
+			case 2:	height(src.height());
+			case 1:	width(src.width()); break;
 		}
 
 		switch (src.components()) {
-			case 1:	mFormat = Graphics::LUMINANCE; break; // alpha or luminance?
-			case 2:	mFormat = Graphics::LUMINANCE_ALPHA; break;
-			case 3:	mFormat = Graphics::RGB; break;
-			case 4:	mFormat = Graphics::RGBA; break;
+			case 1:	format(Graphics::LUMINANCE); break; // alpha or luminance?
+			case 2:	format(Graphics::LUMINANCE_ALPHA); break;
+			case 3:	format(Graphics::RGB); break;
+			case 4:	format(Graphics::RGBA); break;
 			default:
 				printf("invalid array component count for texture\n");
 				return;
@@ -115,10 +163,11 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 	determineTarget();
 	glBindTexture(target(), id());
 	
-	// set glPixelStore according to the array layout:
-	//glPixelStorei(GL_UNPACK_ALIGNMENT, align);
+	// set glPixelStore according to layout:
+	glPixelStorei(GL_UNPACK_ALIGNMENT, mUnpack);
 	
-	int comps = numComps();
+	
+	int comps = numComponents();
 	
 	// void glTexImage3D(
 	//		GLenum target, GLint level, GLenum internalformat,
@@ -133,7 +182,7 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 	}
 	
 	// set alignment back to default
-	//glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 	
 	Graphics::error("submitting texture");
 	
