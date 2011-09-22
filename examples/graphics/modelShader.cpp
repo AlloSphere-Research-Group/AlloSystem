@@ -3,6 +3,7 @@
 #include "allocore/graphics/al_Texture.hpp"
 #include "allocore/graphics/al_Image.hpp"
 #include "allocore/graphics/al_Asset.hpp"
+#include "allocore/graphics/al_DisplayList.hpp"
 
 using namespace al;
 
@@ -17,7 +18,7 @@ Material material;
 
 Scene * ascene = 0;
 Vec3f scene_min, scene_max, scene_center;
-GLuint scene_list = 0;
+DisplayList scene_list;
 
 float a = 0.f; // current rotation angle
 
@@ -26,6 +27,7 @@ struct MyWindow : Window{
 
 	bool onCreate(){
 	
+		// initialize the shaders:
 		frag.compile();	
 		vert.compile();
 		shaderprogram.attach(vert);
@@ -36,26 +38,19 @@ struct MyWindow : Window{
 		printf("vert %s\n", vert.log());
 
 
-		// if the display list has not been made yet, create a new one and
-		// fill it with scene contents
-		scene_list = glGenLists(1);
-		glNewList(scene_list, GL_COMPILE);
+		// draw the models into a display list:
+		scene_list.begin();
 		Mesh mesh;
-		for (unsigned i=0; i<ascene->meshes(); i++) {
-			ascene->mesh(i, mesh);
-			gl.draw(mesh);
-		}	
-		glEndList();
-
-		//tex.submit();
+			for (unsigned i=0; i<ascene->meshes(); i++) {
+				ascene->mesh(i, mesh);
+				gl.draw(mesh);
+			}	
+		scene_list.end();
 		
 		return true;
 	}
 	
 	bool onDestroy(){
-	
-		glDeleteLists(scene_list, 1);
-	
 		return true;
 	}
 
@@ -133,9 +128,9 @@ struct MyWindow : Window{
 		shaderprogram.begin();
 		shaderprogram.uniform("tex0", 1);
 		Graphics::error("tex0");
-		tex.bind(1);
-		glCallList(scene_list);
-		tex.unbind(1);
+			tex.bind(1);
+				scene_list.draw();
+			tex.unbind(1);
 		shaderprogram.end();
 		
 		gl.popMatrix();

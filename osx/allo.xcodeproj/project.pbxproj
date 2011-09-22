@@ -757,6 +757,7 @@
 		366E780B1405C75B0010B21A /* al_ShotList.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_ShotList.hpp; sourceTree = "<group>"; };
 		366E78F81407F2D60010B21A /* exSimpleGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exSimpleGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
 		366E7A6D14080A180010B21A /* al_AlloSphere.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_AlloSphere.hpp; sourceTree = "<group>"; };
+		36792440142BE0A000E4738E /* al_DisplayList.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_DisplayList.hpp; sourceTree = "<group>"; };
 		367F0B3812034EDB00FCC534 /* al_Stereographic.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Stereographic.hpp; sourceTree = "<group>"; };
 		367F0B3A12034EED00FCC534 /* al_Stereographic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Stereographic.cpp; sourceTree = "<group>"; };
 		367F0B5C12034F1E00FCC534 /* exStereographics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exStereographics; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1912,6 +1913,7 @@
 			children = (
 				369DDF5012B6C86600F75D2A /* al_Asset.hpp */,
 				361BF02F11DEA66600E60A9C /* al_BufferObject.hpp */,
+				36792440142BE0A000E4738E /* al_DisplayList.hpp */,
 				36035C3113037120001E9BA9 /* al_Font.hpp */,
 				16AA95E9118F6EEF00B98EC3 /* al_GPUObject.hpp */,
 				16B4CE071428127700626C03 /* al_OpenGL.hpp */,

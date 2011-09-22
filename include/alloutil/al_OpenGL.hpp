@@ -34,6 +34,7 @@
 */
 
 #include "allocore/graphics/al_Graphics.hpp"
+#include "allocore/graphics/al_DisplayList.hpp"
 #include "alloutil/al_TextureGL.hpp"
 
 #include <stdio.h>
@@ -43,25 +44,6 @@
 */
 
 namespace al {
-
-class DisplayList {
-public:
-	DisplayList() : mID(0) {}
-	~DisplayList() { clear(); }
-
-	void begin() {
-		if (mID)
-			glDeleteLists(mID, 1);
-		mID = glGenLists(1);
-		glNewList(mID, GL_COMPILE);
-	}
-	void end() { glEndList(); }
-	void draw() { glCallList(mID); }
-	void clear() { glDeleteLists(mID, 1);}
-
-	unsigned long mID;
-};
-
 
 class CubeMapFBO : public CubeMapTexture {
 public:
