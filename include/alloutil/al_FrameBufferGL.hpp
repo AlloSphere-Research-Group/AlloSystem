@@ -51,17 +51,20 @@
  
  MULTISAMPLING
  See http://stackoverflow.com/questions/765434/glreadpixels-from-fbo-fails-with-multisampling
+ 
+ Looks like a multi-sampling FBO has to have a color renderbuffer rather than a texture... 'sophisticated'
  */
 
 namespace al {
 	
 class SimpleFBO : public TextureGL {
 public:
-	SimpleFBO(unsigned width=512, unsigned height=512)
+	SimpleFBO(unsigned width=512, unsigned height=512, unsigned multisampling=0)
 	:	TextureGL(width, height),
 		mFboId(0),
 		mRboId(0),
-		mClearColor(0)
+		mClearColor(0),
+		mMultiSamples(multisampling)
 	{}
 	
 	virtual ~SimpleFBO() {}
@@ -84,7 +87,12 @@ public:
 			glGenRenderbuffersEXT(1, &mRboId);
 			glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, mRboId);
 			// or GL_DEPTH_COMPONENT24
-			glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, width(), height());
+			
+			if (mMultiSamples) {
+				glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, mMultiSamples, GL_DEPTH_COMPONENT24, width(), height());
+			} else {
+				glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, width(), height());
+			}
 			//glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT, width, height);
 			glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
 			glEnable(GL_DEPTH_TEST);
@@ -99,7 +107,20 @@ public:
 			GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
 			if(status != GL_FRAMEBUFFER_COMPLETE_EXT) {
 				printf("error creating FBO (%d)\n", status);
-			} 
+	
+				switch (status) {
+					#define CASE(enum) case enum: printf("error creating FBO (%d = %s)\n", status, #enum); break;
+					CASE( GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT )
+					CASE( GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT )
+					CASE( GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT )
+					CASE( GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT )
+					CASE( GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT )
+					CASE( GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT )
+					CASE( GL_FRAMEBUFFER_UNSUPPORTED_EXT )
+					#undef CASE
+				}
+				destroy();
+			}
 			
 			// switch back to window-system-provided framebuffer
 			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
@@ -167,6 +188,7 @@ public:
 protected:	
 	GLuint mFboId, mRboId;
 	Color mClearColor;
+	unsigned mMultiSamples;
 	
 };
 	
