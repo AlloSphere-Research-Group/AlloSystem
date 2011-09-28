@@ -23,7 +23,7 @@ class World : public WindowEventHandler, public Drawable {
 public:
 	World() {
 		WindowEventHandler& h = *this;
-		win.add(h);
+		win.append(h);
 		
 		// initialize objects with random position
 		// just 2D for this demo

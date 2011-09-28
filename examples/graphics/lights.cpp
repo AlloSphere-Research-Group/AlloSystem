@@ -1,10 +1,11 @@
 /*
-Allocore Example: 
+Allocore Example: Lighting
 
 Description:
+This example demonstrates how to use lighting within a scene.
 
 Author:
-Lance Putnam, 12/8/2010 (putnam.lance at gmail dot com)
+Lance Putnam, 12/2010 (putnam.lance at gmail dot com)
 */
 
 #include "allocore/al_Allocore.hpp"
@@ -81,11 +82,11 @@ struct MyWindow : Window{
 	double phase;
 };
 
-MyWindow win1;
+MyWindow win;
 
 int main(){
-	win1.add(*new StandardWindowKeyControls);
-	win1.create();
+	win.append(*new StandardWindowKeyControls);
+	win.create();
 	MainLoop::start();
 	return 0;
 }

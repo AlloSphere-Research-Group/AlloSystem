@@ -74,8 +74,8 @@ void WindowEventHandler::removeFromWindow(){
 void Window::init(){
 	// Window has its own built-in handlers (which may be overridden in subclasses)
 	// they are added explicitly here so that the order of handlers can be user controled
-	add(inputEventHandler());
-	add(windowEventHandler());
+	append(inputEventHandler());
+	append(windowEventHandler());
 	mDisplayMode = DisplayMode::DefaultBuf;
 	mASAP = false;
 }
@@ -143,8 +143,8 @@ Window& Window::insert(WindowEventHandler& v, int i){
 	return *this;
 }
 
-Window& Window::add(InputEventHandler& v){ return insert(v, mInputEventHandlers.size()); }
-Window& Window::add(WindowEventHandler& v){ return insert(v, mWindowEventHandlers.size()); }
+Window& Window::append(InputEventHandler& v){ return insert(v, mInputEventHandlers.size()); }
+Window& Window::append(WindowEventHandler& v){ return insert(v, mWindowEventHandlers.size()); }
 Window& Window::prepend(InputEventHandler& v){ return insert(v,0); }
 Window& Window::prepend(WindowEventHandler& v){ return insert(v,0); }
 

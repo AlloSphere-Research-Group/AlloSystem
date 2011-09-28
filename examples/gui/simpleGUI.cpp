@@ -35,9 +35,9 @@ int main(){
 	win.prepend(*new GLVInputControl(topView));
 	
 	// Append GUI window control so the GUI is drawn last
-	win.add(*new GLVWindowControl(topView));
+	win.append(*new GLVWindowControl(topView));
 
-	win.add(*new StandardWindowKeyControls);
+	win.append(*new StandardWindowKeyControls);
 
 	win.create(Window::Dim(600,400), "Simple GUI");
 

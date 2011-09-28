@@ -84,7 +84,7 @@ MyWindow win;
 
 int main(){
 
-	win.add(*new StandardWindowKeyControls);
+	win.append(*new StandardWindowKeyControls);
 	win.create(Window::Dim(800, 600));
 
 	MainLoop::start();

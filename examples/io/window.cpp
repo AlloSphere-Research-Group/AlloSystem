@@ -53,7 +53,7 @@ int main(){
 	MyWindow win;
 	
 	// Add some standard key controls for fullscreen, quitting, etc.
-	win.add(new StandardWindowKeyControls);
+	win.append(*new StandardWindowKeyControls);
 	
 	// This creates the window
 	win.create(

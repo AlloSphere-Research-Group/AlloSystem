@@ -115,9 +115,9 @@ void App::start(){
 
 
 App& App::add(ViewpointWindow& win){
-	win.add(mNavControl);
-	win.add(*new SceneWindowHandler(win, *this));
-	win.add(*new SceneInputHandler(*this));
+	win.append(mNavControl);
+	win.append(*new SceneWindowHandler(win, *this));
+	win.append(*new SceneInputHandler(*this));
 	mWindows.push_back(&win);
 
 	// TODO: for now, first window will clock master Nav

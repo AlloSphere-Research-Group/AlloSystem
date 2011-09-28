@@ -223,16 +223,16 @@ int main (int argc, char * argv[]){
 
 	// side windows
 	for(int i=0; i<4; ++i){
-		windows[i].add(*new StandardWindowKeyControls);
-		windows[i].add(*new NavInputControl(navMaster));
+		windows[i].append(*new StandardWindowKeyControls);
+		windows[i].append(*new NavInputControl(navMaster));
 		windows[i].transform.quat().fromAxisAngle(M_PI/2 - i*M_PI/2, Vec3d(0, 1, 0));
 		windows[i].cam.fovy(90);
 	}
 	
 	// top/bottom windows
 	for(int i=4; i<6; ++i){
-		windows[i].add(*new StandardWindowKeyControls);
-		windows[i].add(*new NavInputControl(navMaster));
+		windows[i].append(*new StandardWindowKeyControls);
+		windows[i].append(*new NavInputControl(navMaster));
 		windows[i].transform.quat().fromAxisAngle(M_PI/2 - i*M_PI, Vec3d(1, 0, 0));
 		windows[i].cam.fovy(90);
 	}

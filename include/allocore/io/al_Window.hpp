@@ -318,13 +318,13 @@ public:
 	
 	/// The order of handlers in the list matches their calling order.
 	///
-	Window& add(InputEventHandler& v);
+	Window& append(InputEventHandler& v);
 
 	/// Append handler to window event handler list
 	
 	/// The order of handlers in the list matches their calling order.
 	///
-	Window& add(WindowEventHandler& v);
+	Window& append(WindowEventHandler& v);
 
 	/// Prepend handler to input event handler list
 
@@ -345,8 +345,8 @@ public:
 	Window& remove(WindowEventHandler& v);
 
 	/// DEPRECATED, do not use!
-	Window& add(InputEventHandler * v){ return add(*v); }
-	Window& add(WindowEventHandler * v){ return add(*v); }
+	Window& add(InputEventHandler * v){ return append(*v); }
+	Window& add(WindowEventHandler * v){ return append(*v); }
 	Window& prepend(InputEventHandler * v){ return prepend(*v); }
 	Window& prepend(WindowEventHandler * v){ return prepend(*v); }
 	Window& remove(InputEventHandler * v){ return remove(*v); }
