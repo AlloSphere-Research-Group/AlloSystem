@@ -1,3 +1,54 @@
+/*
+	What would a basic socket class need?
+	
+	binding methods for UDP and TCP are very different
+	receive-only or send-only or duplex?
+*/
+/*
+Nomenclature:
+Server side:
+bind		Assigns a socket an address, i.e. a specified local port number and IP 
+			address.
+	
+listen		After a socket has been associated with an address, listen 
+			prepares it for incoming connections.
+
+accept		Accepts a received incoming attempt to create a new TCP connection 
+			from the remote client, and creates a new socket associated with the
+			socket address pair of this connection.
+
+Client side:
+connect		Assigns a free local port number to a socket. In case of a TCP 
+			socket, it causes an attempt to establish a new TCP connection.
+
+Domain:
+PF_INET			network protocol IPv4
+PF_INET6		IPv6
+PF_UNIX			local socket (using a file)
+
+Type:
+SOCK_STREAM		(reliable stream-oriented service or Stream Sockets)
+SOCK_DGRAM		(datagram service or Datagram Sockets)
+SOCK_SEQPACKET	(reliable sequenced packet service)
+SOCK_RAW		(raw protocols atop the network layer)
+
+Protocol:
+IPPROTO_TCP
+IPPROTO_SCTP
+IPPROTO_UDP
+IPPROTO_DCCP
+
+TCP:
+(PF_INET, PF_INET6), (SOCK_STREAM), (IPPROTO_TCP)
+TCP Server:
+1) Create a TCP socket
+2) Bind socket to the listen port, with a call to bind()
+3) Prepare socket to listen for connections with a call to listen()
+4) Accepting incoming connections, via a call to accept()
+5) Communicate with remote host, which can be done through, e.g., send()
+6) Close each socket that was opened, once it is no longer needed, using close()
+*/
+
 #include <cstring>
 #include "allocore/io/al_Socket.hpp"
 #include "allocore/system/al_Config.h"
