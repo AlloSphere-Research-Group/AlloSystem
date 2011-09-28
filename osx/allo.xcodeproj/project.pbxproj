@@ -338,20 +338,6 @@
 			remoteGlobalIDString = 36035DB813037E8D001E9BA9;
 			remoteInfo = "make allocore";
 		};
-		36FE0D7B13844FA4003AE7BE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 36FE0D1513844FA4003AE7BE /* gamma.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 16F76AFE0D11E23D001C3DCA;
-			remoteInfo = testAnalysis;
-		};
-		36FE0D7D13844FA4003AE7BE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 36FE0D1513844FA4003AE7BE /* gamma.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 16D4286C0DC8030500BF3144;
-			remoteInfo = testAudioSine;
-		};
 		36FE0D7F13844FA4003AE7BE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 36FE0D1513844FA4003AE7BE /* gamma.xcodeproj */;
@@ -387,47 +373,12 @@
 			remoteGlobalIDString = 1681B95613392AF200056E42;
 			remoteInfo = testFilter;
 		};
-		36FE0D8913844FA4003AE7BE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 36FE0D1513844FA4003AE7BE /* gamma.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 16E2B28C0D3AD1F8003E39D1;
-			remoteInfo = testIpol;
-		};
-		36FE0D8B13844FA4003AE7BE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 36FE0D1513844FA4003AE7BE /* gamma.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 16C8729A0EFA14EA00449449;
-			remoteInfo = testNode;
-		};
-		36FE0D8D13844FA4003AE7BE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 36FE0D1513844FA4003AE7BE /* gamma.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 16C872A70EFA151600449449;
-			remoteInfo = testNoise;
-		};
 		36FE0D8F13844FA4003AE7BE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 36FE0D1513844FA4003AE7BE /* gamma.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 16AEEFBE0D3C41AA00AFD3A4;
 			remoteInfo = testOscillator;
-		};
-		36FE0D9113844FA4003AE7BE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 36FE0D1513844FA4003AE7BE /* gamma.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 165906A40D0F9F3E00EA3DB0;
-			remoteInfo = testRandom;
-		};
-		36FE0D9313844FA4003AE7BE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 36FE0D1513844FA4003AE7BE /* gamma.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 16F76B140D11E34A001C3DCA;
-			remoteInfo = testRecurrenceMap;
 		};
 		36FE0D9513844FA4003AE7BE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -449,13 +400,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = 16EACAA90D15BE960044B3CB;
 			remoteInfo = testTimer;
-		};
-		36FE0D9B13844FA4003AE7BE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 36FE0D1513844FA4003AE7BE /* gamma.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 169387860FBC7EF400274B2A;
-			remoteInfo = testTypes;
 		};
 		36FE0D9D13844FA4003AE7BE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -3285,23 +3229,15 @@
 		36FE0D1613844FA4003AE7BE /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				36FE0D7C13844FA4003AE7BE /* testAnalysis */,
-				36FE0D7E13844FA4003AE7BE /* testAudioSine */,
 				36FE0D8013844FA4003AE7BE /* testContainers */,
 				36FE0D8213844FA4003AE7BE /* testConversion */,
 				36FE0D8413844FA4003AE7BE /* testDFT */,
 				36FE0D8613844FA4003AE7BE /* testEnvelope */,
 				36FE0D8813844FA4003AE7BE /* testFilter */,
-				36FE0D8A13844FA4003AE7BE /* testIpol */,
-				36FE0D8C13844FA4003AE7BE /* testNode */,
-				36FE0D8E13844FA4003AE7BE /* testNoise */,
 				36FE0D9013844FA4003AE7BE /* testOscillator */,
-				36FE0D9213844FA4003AE7BE /* testRandom */,
-				36FE0D9413844FA4003AE7BE /* testRecurrenceMap */,
 				36FE0D9613844FA4003AE7BE /* testScalar */,
 				36FE0D9813844FA4003AE7BE /* testTable */,
 				36FE0D9A13844FA4003AE7BE /* testTimer */,
-				36FE0D9C13844FA4003AE7BE /* testTypes */,
 				36FE0D9E13844FA4003AE7BE /* unitTests */,
 				36FE0DA013844FA4003AE7BE /* libgamma.dylib */,
 				36FE0DA213844FA4003AE7BE /* libgamma.a */,
@@ -3730,20 +3666,6 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		36FE0D7C13844FA4003AE7BE /* testAnalysis */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = testAnalysis;
-			remoteRef = 36FE0D7B13844FA4003AE7BE /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		36FE0D7E13844FA4003AE7BE /* testAudioSine */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = testAudioSine;
-			remoteRef = 36FE0D7D13844FA4003AE7BE /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		36FE0D8013844FA4003AE7BE /* testContainers */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
@@ -3779,46 +3701,11 @@
 			remoteRef = 36FE0D8713844FA4003AE7BE /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		36FE0D8A13844FA4003AE7BE /* testIpol */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = testIpol;
-			remoteRef = 36FE0D8913844FA4003AE7BE /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		36FE0D8C13844FA4003AE7BE /* testNode */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = testNode;
-			remoteRef = 36FE0D8B13844FA4003AE7BE /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		36FE0D8E13844FA4003AE7BE /* testNoise */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = testNoise;
-			remoteRef = 36FE0D8D13844FA4003AE7BE /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		36FE0D9013844FA4003AE7BE /* testOscillator */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
 			path = testOscillator;
 			remoteRef = 36FE0D8F13844FA4003AE7BE /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		36FE0D9213844FA4003AE7BE /* testRandom */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = testRandom;
-			remoteRef = 36FE0D9113844FA4003AE7BE /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		36FE0D9413844FA4003AE7BE /* testRecurrenceMap */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = testRecurrenceMap;
-			remoteRef = 36FE0D9313844FA4003AE7BE /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		36FE0D9613844FA4003AE7BE /* testScalar */ = {
@@ -3840,13 +3727,6 @@
 			fileType = "compiled.mach-o.executable";
 			path = testTimer;
 			remoteRef = 36FE0D9913844FA4003AE7BE /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		36FE0D9C13844FA4003AE7BE /* testTypes */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = testTypes;
-			remoteRef = 36FE0D9B13844FA4003AE7BE /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		36FE0D9E13844FA4003AE7BE /* unitTests */ = {
