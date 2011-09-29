@@ -85,7 +85,7 @@ ViewpointWindow * App::initWindow(
 	const Window::Dim& dims,
 	const std::string title,
 	double fps,
-	DisplayMode::t mode,
+	Window::DisplayMode mode,
 	int flags
 ){
 	ViewpointWindow * win = new ViewpointWindow(dims, title, fps, mode);

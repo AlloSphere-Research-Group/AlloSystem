@@ -51,56 +51,25 @@ class Window;
 #endif
 
 
-/// Constants of keyboard keys.
-namespace Key{
-	enum t{
-		
-		// Standard ASCII non-printable characters
-		Enter		=3,		/**< */
-		Backspace	=8,		/**< */
-		Tab			=9,		/**< */
-		Return		=13,	/**< */
-		Escape		=27,	/**< */
-		Delete		=127,	/**< */
-			
-		// Non-standard, but common keys.
-		F1=256, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, 
-		Insert, Left, Up, Right, Down, PageDown, PageUp, End, Home
-	};
-}
-
-/// Window display mode bit flags
-namespace DisplayMode{
-	enum t{
-		SingleBuf	= 1<<0,		/**< Single-buffered */
-		DoubleBuf	= 1<<1,		/**< Double-buffered */
-		StereoBuf	= 1<<2,		/**< Do left-right stereo buffering */
-		AccumBuf	= 1<<3,		/**< Use accumulation buffer */
-		AlphaBuf	= 1<<4,		/**< Use alpha buffer */
-		DepthBuf	= 1<<5,		/**< Use depth buffer */
-		StencilBuf	= 1<<6,		/**< Use stencil buffer */
-		Multisample = 1<<7,		/**< Multisampling support */
-		DefaultBuf	= DoubleBuf|AlphaBuf|DepthBuf /**< Default display mode */
-	};
-	inline t operator| (const t& a, const t& b){ return t(int(a) | int(b)); }
-	inline t operator& (const t& a, const t& b){ return t(int(a) & int(b)); }
-}
-
-/// Cursor icon types
-namespace Cursor{
-	enum t{
-		None		= 0,		/**< */
-		Pointer		= 1,		/**< */
-		CrossHair				/**< */
-	};
-}
-
-
-using namespace DisplayMode;
-
 /// Keyboard state
 class Keyboard{
 public:
+
+	/// Non-printable keys
+	enum Key{
+		
+		// Standard ASCII non-printable characters
+		ENTER		=3,		/**< */
+		BACKSPACE	=8,		/**< */
+		TAB			=9,		/**< */
+		RETURN		=13,	/**< */
+		ESCAPE		=27,	/**< */
+		DELETE		=127,	/**< */
+			
+		// Non-standard, but common keys
+		F1=256, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, 
+		INSERT, LEFT, UP, RIGHT, DOWN, PAGE_DOWN, PAGE_UP, END, HOME
+	};
 
 	/// Constructor.
 	Keyboard();
@@ -139,10 +108,10 @@ protected:
 class Mouse{
 public:
 	enum{
-		Left	= 0,				/**< Left button */
-		Middle	= 1,				/**< Middle button */
-		Right	= 2,				/**< Right button */
-		Extra	= 3					/**< Start of any extra buttons */
+		LEFT	= 0,				/**< Left button */
+		MIDDLE	= 1,				/**< Middle button */
+		RIGHT	= 2,				/**< Right button */
+		EXTRA	= 3					/**< Start of any extra buttons */
 	};
 	
 	Mouse();
@@ -241,6 +210,27 @@ private:
 class Window : public InputEventHandler, public WindowEventHandler, public GPUContext {
 public:
 
+	/// Window display mode bit flags
+	enum DisplayMode{
+		SINGLE_BUF	= 1<<0,		/**< Do single-buffering */
+		DOUBLE_BUF	= 1<<1,		/**< Do double-buffering */
+		STEREO_BUF	= 1<<2,		/**< Do left-right stereo buffering */
+		ACCUM_BUF	= 1<<3,		/**< Use accumulation buffer */
+		ALPHA_BUF	= 1<<4,		/**< Use alpha buffer */
+		DEPTH_BUF	= 1<<5,		/**< Use depth buffer */
+		STENCIL_BUF	= 1<<6,		/**< Use stencil buffer */
+		MULTISAMPLE = 1<<7,		/**< Multisampling support */
+		DEFAULT_BUF	= DOUBLE_BUF|ALPHA_BUF|DEPTH_BUF /**< Default display mode */
+	};
+
+	/// Cursor icon types
+	enum Cursor{
+		NONE		= 0,		/**< */
+		POINTER		= 1,		/**< */
+		CROSSHAIR				/**< */
+	};
+
+
 	/// Window pixel dimensions
 	struct Dim{
 		int l,t,w,h;
@@ -252,9 +242,11 @@ public:
 		float aspect() const { return (w!=0 && h!=0) ? double(w)/h : 1; }
 	};
 
+
 	Window();
 	virtual ~Window();
-	
+
+
 	/// Create a new window
 	
 	/// @param[in] dim		Window dimensions in pixels
@@ -265,7 +257,7 @@ public:
 		const Dim& dim = Dim(800,600),
 		const std::string& title="",
 		double fps=40,
-		DisplayMode::t mode = DisplayMode::DefaultBuf
+		DisplayMode mode = DEFAULT_BUF
 	);
 	
 	/// Destroys current window and its associated OpenGL context
@@ -276,11 +268,11 @@ public:
 
 	double aspect() const { return dimensions().aspect(); }	///< Get aspect ratio (width divided by height)
 	bool created() const;						///< Whether window has been created providing a valid graphics context
-	Cursor::t cursor() const;					///< Get current cursor type	
+	Cursor cursor() const;						///< Get current cursor type	
 	bool cursorHide() const;					///< Whether the cursor is hidden
 	Dim dimensions() const;						///< Get current dimensions of window
-	DisplayMode::t displayMode() const;			///< Get current display mode	
-	bool enabled(DisplayMode::t v) const;		///< Get whether display mode flag is set
+	DisplayMode displayMode() const;			///< Get current display mode	
+	bool enabled(DisplayMode v) const;			///< Get whether display mode flag is set
 	bool fullScreen() const;					///< Get whether window is in fullscreen
 	double fps() const;							///< Returns frames/second (requested)
 	double avgFps() const;						///< Returns frames/second (running average)
@@ -293,11 +285,11 @@ public:
 	int height() const { return dimensions().h; }
 	int width() const { return dimensions().w; }
 
-	Window& cursor(Cursor::t v);				///< Set cursor type
+	Window& cursor(Cursor v);					///< Set cursor type
 	Window& cursorHide(bool v);					///< Set cursor hiding
 	Window& cursorHideToggle();					///< Toggle cursor hiding
 	Window& dimensions(const Dim& v);			///< Set dimensions
-	Window& displayMode(DisplayMode::t v);		///< Set display mode; will recreate window if different from current
+	Window& displayMode(DisplayMode v);			///< Set display mode; will recreate window if different from current
 	Window& fps(double v);						///< Set frames/second
 	
 	/// Set fullscreen mode
@@ -369,7 +361,7 @@ protected:
 	Mouse mMouse;
 	InputEventHandlers mInputEventHandlers;
 	WindowEventHandlers mWindowEventHandlers;
-	DisplayMode::t mDisplayMode;
+	DisplayMode mDisplayMode;
 	bool mASAP;
 
 	Window& insert(InputEventHandler& v, int i);
@@ -415,6 +407,12 @@ protected:
 	#undef CALL
 };
 
+inline Window::DisplayMode
+operator| (const Window::DisplayMode& a, const Window::DisplayMode& b){ return Window::DisplayMode(+a | +b); }
+
+inline Window::DisplayMode
+operator& (const Window::DisplayMode& a, const Window::DisplayMode& b){ return Window::DisplayMode(+a & +b); }
+
 
 /// Standard key controls for window
 struct StandardWindowKeyControls : InputEventHandler {
@@ -431,7 +429,7 @@ struct StandardWindowKeyControls : InputEventHandler {
 		}
 		else{
 			switch(k.key()){
-				case Key::Escape: window().fullScreenToggle(); return false;
+				case Keyboard::ESCAPE: window().fullScreenToggle(); return false;
 				default:;
 			}
 		}

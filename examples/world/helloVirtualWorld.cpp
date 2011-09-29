@@ -176,7 +176,7 @@ struct MyWindow : public Window, public Drawable{
 	
 	bool onKeyDown(const Keyboard& k) {
 		
-		if (k.key() == Key::Tab) {
+		if (k.key() == Keyboard::TAB) {
 			stereo.stereo(!stereo.stereo());
 		}
 		

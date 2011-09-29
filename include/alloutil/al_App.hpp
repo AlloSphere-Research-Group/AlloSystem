@@ -124,7 +124,7 @@ public:
 		const Dim& dims,
 		const std::string title="",
 		double fps=40,
-		DisplayMode::t mode = DisplayMode::DefaultBuf
+		DisplayMode mode = DEFAULT_BUF
 	){
 		init();
 		create(dims, title, fps, mode);
@@ -169,7 +169,7 @@ public:
 		const Window::Dim& dims = Window::Dim(800,600),
 		const std::string title="",
 		double fps=40,
-		DisplayMode::t mode = DisplayMode::DefaultBuf,
+		Window::DisplayMode mode = Window::DEFAULT_BUF,
 		int flags=0
 	);
 
@@ -310,7 +310,7 @@ private:
 		
 		virtual bool onKeyDown(const Keyboard& k){
 			switch(k.key()){
-				case Key::Tab: app.stereo().stereo(!app.stereo().stereo()); return false;
+				case Keyboard::TAB: app.stereo().stereo(!app.stereo().stereo()); return false;
 				default:;
 			}
 			return true;

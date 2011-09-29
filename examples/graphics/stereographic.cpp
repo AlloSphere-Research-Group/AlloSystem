@@ -14,12 +14,12 @@ struct MyWindow : Window, public Drawable{
 	bool onKeyDown(const Keyboard& k){	
 		
 		switch(k.key()){
-			case Key::Tab: stereo.stereo(!stereo.stereo()); return false;
-			case '1': stereo.mode(Stereographic::Anaglyph); return false;
-			case '2': stereo.mode(Stereographic::Active); return false;
-			case '3': stereo.mode(Stereographic::Dual); return false;
-			case '4': stereo.mode(Stereographic::LeftEye); return false;
-			case '5': stereo.mode(Stereographic::RightEye); return false;
+			case Keyboard::TAB: stereo.stereo(!stereo.stereo()); return false;
+			case '1': stereo.mode(Stereographic::ANAGLYPH); return false;
+			case '2': stereo.mode(Stereographic::ACTIVE); return false;
+			case '3': stereo.mode(Stereographic::DUAL); return false;
+			case '4': stereo.mode(Stereographic::LEFT_EYE); return false;
+			case '5': stereo.mode(Stereographic::RIGHT_EYE); return false;
 			default: return true;
 		}
 	}
@@ -47,7 +47,7 @@ int main(){
 	cam.near(1).far(100).focalLength(1).fovy(45);
 	cam.eyeSep(cam.eyeSepAuto());
 	stereo.stereo(true);
-	stereo.mode(Stereographic::Active);
+	stereo.mode(Stereographic::ACTIVE);
 
 	
 	// set up mesh:
@@ -67,10 +67,10 @@ int main(){
 
 	win.create(Window::Dim(100, 0, 640, 480), "Stereographic Example", 60);
 	
-	win.displayMode(win.displayMode() | DisplayMode::StereoBuf);
+	win.displayMode(win.displayMode() | Window::STEREO_BUF);
 
-	win.add(new StandardWindowKeyControls);
-	win.add(new NavInputControl(nav));
+	win.append(*new StandardWindowKeyControls);
+	win.append(*new NavInputControl(nav));
 
 	MainLoop::start();
     return 0;

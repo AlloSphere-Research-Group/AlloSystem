@@ -136,7 +136,7 @@ int main(){
 	cube.generateNormals();
 	
 	win.create(Window::Dim(100, 0, 640, 480), "Cube Map FBO Example", 60);
-	win.displayMode(win.displayMode() | DisplayMode::StereoBuf);
+	win.displayMode(win.displayMode() | Window::STEREO_BUF);
 	win.add(new StandardWindowKeyControls);
 	win.add(new NavInputControl(nav));
 

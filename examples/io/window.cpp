@@ -60,7 +60,7 @@ int main(){
 		Window::Dim(100, 0, 400,300),	// dimensions, in pixels
 		"Window",						// title
 		40,								// ideal frames/second; actual rate will vary
-		DisplayMode::DefaultBuf			// display mode
+		Window::DEFAULT_BUF				// display mode
 	);
 
 	MainLoop::start();

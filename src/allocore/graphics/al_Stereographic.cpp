@@ -6,11 +6,11 @@ namespace al{
 void Stereographic :: draw(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw) {
 	if(mStereo){
 		switch(mMode){
-			case Anaglyph:	drawAnaglyph(gl, cam, pose, vp, draw); return;
-			case Active:	drawActive	(gl, cam, pose, vp, draw); return;
-			case Dual:		drawDual	(gl, cam, pose, vp, draw); return;
-			case LeftEye:	drawLeft	(gl, cam, pose, vp, draw); return;
-			case RightEye:	drawRight	(gl, cam, pose, vp, draw); return;
+			case ANAGLYPH:	drawAnaglyph(gl, cam, pose, vp, draw); return;
+			case ACTIVE:	drawActive	(gl, cam, pose, vp, draw); return;
+			case DUAL:		drawDual	(gl, cam, pose, vp, draw); return;
+			case LEFT_EYE:	drawLeft	(gl, cam, pose, vp, draw); return;
+			case RIGHT_EYE:	drawRight	(gl, cam, pose, vp, draw); return;
 			default:;
 		}
 	} else {
@@ -109,12 +109,12 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
 	switch(mAnaglyphMode){
-		case RedBlue:
-		case RedGreen:
-		case RedCyan:	glColorMask(GL_TRUE, GL_FALSE,GL_FALSE,GL_TRUE); break;
-		case BlueRed:	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE, GL_TRUE); break;
-		case GreenRed:	glColorMask(GL_FALSE,GL_TRUE, GL_FALSE,GL_TRUE); break;
-		case CyanRed:	glColorMask(GL_FALSE,GL_TRUE, GL_TRUE, GL_TRUE); break;
+		case RED_BLUE:
+		case RED_GREEN:
+		case RED_CYAN:	glColorMask(GL_TRUE, GL_FALSE,GL_FALSE,GL_TRUE); break;
+		case BLUE_RED:	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE, GL_TRUE); break;
+		case GREEN_RED:	glColorMask(GL_FALSE,GL_TRUE, GL_FALSE,GL_TRUE); break;
+		case CYAN_RED:	glColorMask(GL_FALSE,GL_TRUE, GL_TRUE, GL_TRUE); break;
 		default:		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE ,GL_TRUE);
 	} 
 
@@ -178,12 +178,12 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 	}
 	
 	switch(mAnaglyphMode){
-		case RedBlue:	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE, GL_TRUE); break;
-		case RedGreen:	glColorMask(GL_FALSE,GL_TRUE, GL_FALSE,GL_TRUE); break;
-		case RedCyan:	glColorMask(GL_FALSE,GL_TRUE, GL_TRUE, GL_TRUE); break;
-		case BlueRed:
-		case GreenRed:
-		case CyanRed:	glColorMask(GL_TRUE, GL_FALSE,GL_FALSE,GL_TRUE); break;
+		case RED_BLUE:	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE, GL_TRUE); break;
+		case RED_GREEN:	glColorMask(GL_FALSE,GL_TRUE, GL_FALSE,GL_TRUE); break;
+		case RED_CYAN:	glColorMask(GL_FALSE,GL_TRUE, GL_TRUE, GL_TRUE); break;
+		case BLUE_RED:
+		case GREEN_RED:
+		case CYAN_RED:	glColorMask(GL_TRUE, GL_FALSE,GL_FALSE,GL_TRUE); break;
 		default:		glColorMask(GL_TRUE, GL_TRUE ,GL_TRUE, GL_TRUE);
 	} 
 	

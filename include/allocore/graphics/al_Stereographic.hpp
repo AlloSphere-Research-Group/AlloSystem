@@ -59,24 +59,28 @@ struct Viewport {
 ///	Higher-level utility class to manage various stereo rendering techniques
 class Stereographic {
 public:
+
+	/// Stereographic mode
 	enum StereoMode{
-		Anaglyph=0,	/**< Red (left eye) / cyan (right eye) stereo */
-		Active,		/**< Active quad-buffered stereo */
-		Dual,		/**< Dual side-by-side stereo */
-		LeftEye,	/**< Left eye only */
-		RightEye	/**< Right eye only */
+		ANAGLYPH=0,		/**< Red (left eye) / cyan (right eye) stereo */
+		ACTIVE,			/**< Active quad-buffered stereo */
+		DUAL,			/**< Dual side-by-side stereo */
+		LEFT_EYE,		/**< Left eye only */
+		RIGHT_EYE		/**< Right eye only */
 	};
+	
+	/// Anaglyph mode
 	enum AnaglyphMode {
-		RedBlue = 0,
-		RedGreen,
-		RedCyan,
-		BlueRed,
-		GreenRed,
-		CyanRed
+		RED_BLUE = 0,	/**< */
+		RED_GREEN,		/**< */
+		RED_CYAN,		/**< */
+		BLUE_RED,		/**< */
+		GREEN_RED,		/**< */
+		CYAN_RED		/**< */
 	};
 	
 	Stereographic() 
-	: mMode(Anaglyph), mAnaglyphMode(RedCyan), mClearColor(Color(0)), mStereo(false), mOmni(0), mSlices(24), mOmniFov(360) {}
+	: mMode(ANAGLYPH), mAnaglyphMode(RED_CYAN), mClearColor(Color(0)), mStereo(false), mOmni(0), mSlices(24), mOmniFov(360) {}
 
 	~Stereographic() {}
 
@@ -104,7 +108,8 @@ public:
 	/// fov (degrees) sets field of view (horizontal)
 	/// NOTE: cam.fovy will be ignored in omni mode
 	Stereographic& omni(bool enable) { mOmni = enable; return *this; }
-	Stereographic& omni(bool enable, unsigned slices, double fov=360) { mOmni = enable; mSlices = slices; mOmniFov = fov; return *this; }
+	Stereographic& omni(bool enable, unsigned slices, double fov=360){
+		mOmni = enable; mSlices = slices; mOmniFov = fov; return *this; }
 	Stereographic& omniFov( double fov ) { mOmniFov = fov; return *this; }
 	Stereographic& omniSlices( int slices ) { mSlices = slices; return *this; }
 

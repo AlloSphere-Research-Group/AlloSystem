@@ -28,7 +28,7 @@ void Keyboard::setKey(int k, bool v){ mKeycode=k; mDown=v; }
 
 
 
-Mouse::Mouse(): mX(0), mY(0), mButton(Left){
+Mouse::Mouse(): mX(0), mY(0), mButton(LEFT){
 	for(int i=0; i<AL_MOUSE_MAX_BUTTONS; ++i){
 		mBX[i] = mBY[i] = 0; mB[i] = false;
 	}
@@ -42,9 +42,9 @@ int Mouse::dy() const { return mDY; }
 int Mouse::button() const { return mButton; }
 bool Mouse::down() const { return down(mButton); }
 bool Mouse::down(int button) const { return mB[button]; }
-bool Mouse::left() const { return mB[Left]; }
-bool Mouse::middle() const { return mB[Middle]; }
-bool Mouse::right() const { return mB[Right]; }
+bool Mouse::left() const { return mB[LEFT]; }
+bool Mouse::middle() const { return mB[MIDDLE]; }
+bool Mouse::right() const { return mB[RIGHT]; }
 
 void Mouse::button(int b, bool v){ mButton=b; mB[b]=v; if(v){ mBX[b]=mX; mBY[b]=mY; } }
 void Mouse::position(int x, int y){ mDX=x-mX; mDY=y-mY; mX=x; mY=y; }
@@ -76,7 +76,7 @@ void Window::init(){
 	// they are added explicitly here so that the order of handlers can be user controled
 	append(inputEventHandler());
 	append(windowEventHandler());
-	mDisplayMode = DisplayMode::DefaultBuf;
+	mDisplayMode = DEFAULT_BUF;
 	mASAP = false;
 }
 
@@ -85,11 +85,11 @@ Window& Window::cursorHideToggle(){
 	return *this;
 }
 
-DisplayMode::t Window::displayMode() const { return mDisplayMode; }
+Window::DisplayMode Window::displayMode() const { return mDisplayMode; }
 
-Window& Window::displayMode(DisplayMode::t v){
+Window& Window::displayMode(DisplayMode v){
 	if(created()){
-		const Cursor::t cursor_ = cursor();
+		const Cursor cursor_ = cursor();
 		const bool cursorHide_ = cursorHide();
 		const Dim dim_ = dimensions();
 		const bool fullScreen_ = fullScreen();
@@ -105,7 +105,7 @@ Window& Window::displayMode(DisplayMode::t v){
 	return *this;
 }
 
-bool Window::enabled(DisplayMode::t v) const { return mDisplayMode & v; }
+bool Window::enabled(DisplayMode v) const { return mDisplayMode & v; }
 
 Window& Window::fullScreenToggle(){
 	fullScreen(!fullScreen());

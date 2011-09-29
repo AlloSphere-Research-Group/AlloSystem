@@ -55,7 +55,7 @@ public:
 		mIDGameMode = -1;
 		mInGameMode = false;
 		mScheduled = false;
-		mCursor = Cursor::Pointer;
+		mCursor = Window::POINTER;
 		mVisible = true;
 		mFullScreen = false;
 		mCursorHide = false;
@@ -228,15 +228,15 @@ public:
 
 		if(special){
 
-			#define CS(glut, io) case GLUT_KEY_##glut: key = Key::io; break;
+			#define CS(k) case GLUT_KEY_##k: key = Keyboard::k; break;
 			switch(key){
-				CS(LEFT, Left) CS(UP, Up) CS(RIGHT, Right) CS(DOWN, Down)
-				CS(PAGE_UP, PageUp) CS(PAGE_DOWN, PageDown)
-				CS(HOME, Home) CS(END, End) CS(INSERT, Insert)
+				CS(LEFT) CS(UP) CS(RIGHT) CS(DOWN)
+				CS(PAGE_UP) CS(PAGE_DOWN)
+				CS(HOME) CS(END) CS(INSERT)
 
-				CS(F1, F1) CS(F2, F2) CS(F3, F3) CS(F4, F4)
-				CS(F5, F5) CS(F6, F6) CS(F7, F7) CS(F8, F8)
-				CS(F9, F9) CS(F10, F10)	CS(F11, F11) CS(F12, F12)
+				CS(F1) CS(F2) CS(F3) CS(F4)
+				CS(F5) CS(F6) CS(F7) CS(F8)
+				CS(F9) CS(F10)	CS(F11) CS(F12)
 			}
 			#undef CS
 		}
@@ -353,10 +353,10 @@ public:
 		Window * win = getWindow();
 		if(win){
 			switch(btn){
-				case GLUT_LEFT_BUTTON:		btn = Mouse::Left; break;
-				case GLUT_MIDDLE_BUTTON:	btn = Mouse::Middle; break;
-				case GLUT_RIGHT_BUTTON:		btn = Mouse::Right; break;
-				default:					btn = Mouse::Extra;		// unrecognized button
+				case GLUT_LEFT_BUTTON:		btn = Mouse::LEFT; break;
+				case GLUT_MIDDLE_BUTTON:	btn = Mouse::MIDDLE; break;
+				case GLUT_RIGHT_BUTTON:		btn = Mouse::RIGHT; break;
+				default:					btn = Mouse::EXTRA;		// unrecognized button
 			}
 
 			Mouse& m = win->mMouse;
@@ -499,7 +499,7 @@ private:
 	al_sec mAvg;
 	al_sec mFrameTime, mSPFActual;
 	std::string mTitle;
-	Cursor::t mCursor;
+	Window::Cursor mCursor;
 
 
 	bool mInGameMode;
@@ -527,7 +527,7 @@ Window::~Window(){
 
 
 void Window::create(
-	const Dim& dim, const std::string& title, double fps, DisplayMode::t mode
+	const Dim& dim, const std::string& title, double fps, DisplayMode mode
 )
 {
 	if(created()) return;
@@ -541,16 +541,15 @@ void Window::create(
 	glutInitWindowSize(dim.w, dim.h);
 	glutInitWindowPosition(dim.l, dim.t);
 
-	using namespace DisplayMode;
     int bits =
-        (enabled(SingleBuf )	? GLUT_SINGLE		:0) |
-        (enabled(DoubleBuf )	? GLUT_DOUBLE		:0) |
-        (enabled(AccumBuf  )	? GLUT_ACCUM		:0) |
-        (enabled(AlphaBuf  )	? GLUT_ALPHA		:0) |
-        (enabled(DepthBuf  )	? GLUT_DEPTH		:0) |
-        (enabled(StencilBuf)	? GLUT_STENCIL		:0) |
-        (enabled(StereoBuf )	? GLUT_STEREO		:0) |
-		(enabled(Multisample)	? GLUT_MULTISAMPLE	:0);
+        (enabled(SINGLE_BUF )	? GLUT_SINGLE		:0) |
+        (enabled(DOUBLE_BUF )	? GLUT_DOUBLE		:0) |
+        (enabled(ACCUM_BUF  )	? GLUT_ACCUM		:0) |
+        (enabled(ALPHA_BUF  )	? GLUT_ALPHA		:0) |
+        (enabled(DEPTH_BUF  )	? GLUT_DEPTH		:0) |
+        (enabled(STENCIL_BUF)	? GLUT_STENCIL		:0) |
+        (enabled(STEREO_BUF )	? GLUT_STEREO		:0) |
+		(enabled(MULTISAMPLE)	? GLUT_MULTISAMPLE	:0);
 
 	glutInitDisplayMode(GLUT_RGBA | bits);
 
@@ -588,7 +587,7 @@ void Window::destroyAll(){
 }
 
 bool Window::created() const { return mImpl->created(); }
-Cursor::t Window::cursor() const { return mImpl->mCursor; }
+Window::Cursor Window::cursor() const { return mImpl->mCursor; }
 bool Window::cursorHide() const { return mImpl->mCursorHide; }
 
 Window::Dim Window::dimensions() const { return mImpl->dimensions(); }
@@ -599,13 +598,13 @@ bool Window::fullScreen() const { return mImpl->mFullScreen; }
 const std::string& Window::title() const { return mImpl->mTitle; }
 bool Window::visible() const { return mImpl->mVisible; }
 
-Window& Window::cursor(Cursor::t v){
+Window& Window::cursor(Cursor v){
 	mImpl->mCursor = v;
 
 	if(created() && !mImpl->mCursorHide){
 		switch(v){
-			case Cursor::CrossHair:	makeActive(); glutSetCursor(GLUT_CURSOR_CROSSHAIR);
-			case Cursor::Pointer:	makeActive(); glutSetCursor(GLUT_CURSOR_INHERIT);
+			case CROSSHAIR:	makeActive(); glutSetCursor(GLUT_CURSOR_CROSSHAIR);
+			case POINTER:	makeActive(); glutSetCursor(GLUT_CURSOR_INHERIT);
 			default:;
 		}
 	}
