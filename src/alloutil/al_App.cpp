@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "alloutil/al_App.hpp"
 
 namespace al{
@@ -110,7 +111,13 @@ void App::start(){
 	}
 	if(usingAudio()) mAudioIO.start();
 	if(name()!="" && oscSend().opened()) sendHandshake();
-	MainLoop::start();
+	
+	if(windows().size()){
+		MainLoop::start();
+	}
+	else{
+		printf("\nPress 'enter' to quit...\n"); getchar();
+	}
 }
 
 
