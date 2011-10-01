@@ -123,7 +123,7 @@ public:
 	
 protected:
 	size_t mDim, mDim3, mDimWrap;
-	int mFront;			// which one is the front buffer?
+	volatile int mFront;	// which one is the front buffer?
 	Array mArray0, mArray1; //mArrays[2];	// double-buffering
 };
 
@@ -421,8 +421,10 @@ inline void Field3D<T>::add(Array& src) {
 		T * in  = (T *)src.data.ptr;
 		T * out = (T *)front().data.ptr;
 		for (int i=0; i<count; i++) {
+			T v = in[i];
+//			if (v > 4. || v < -4.) 
+//				printf("oob %f %i\n", v, i);
 			out[i] += in[i];
-			in[i] = T(0);
 		}
 	} else {
 		printf("Array format mismatch\n");
@@ -532,15 +534,22 @@ inline void Field3D<T> :: advect(Array& dst, const Array& src, const Array& velo
 	}
 	char * outptr = dst.data.ptr;
 	char * velptr = velocities.data.ptr;
+	
+	const size_t vstride0 = velocities.stride(0);
+	const size_t vstride1 = velocities.stride(1);
+	const size_t vstride2 = velocities.stride(2);
+	const size_t vdim = velocities.dim(0);
+	const size_t vdimwrap = vdim-1;
 
 	#define CELL(p, x, y, z, k) (((T *)((p) + (((x)&dimwrap)*stride0) +  (((y)&dimwrap)*stride1) +  (((z)&dimwrap)*stride2)))[(k)])
-
+	#define VCELL(p, x, y, z, k) (((T *)((p) + (((x)&vdimwrap)*vstride0) +  (((y)&vdimwrap)*vstride1) +  (((z)&vdimwrap)*vstride2)))[(k)]) 
+	
 	for (int z=0;z<dim;z++) {
 		for (int y=0;y<dim;y++) {
 			for (int x=0;x<dim;x++) {
 				// back trace: (current cell offset by vector at cell)
 				T * bp  = &(CELL(outptr, x, y, z, 0));
-				T * vp	= &(CELL(velptr, x, y, z, 0));
+				T * vp	= &(VCELL(velptr, x, y, z, 0));
 				T vx = x - rate * vp[0];
 				T vy = y - rate * vp[1];
 				T vz = z - rate * vp[2];
@@ -551,6 +560,7 @@ inline void Field3D<T> :: advect(Array& dst, const Array& src, const Array& velo
 		}
 	}
 	#undef CELL
+	#undef VCELL
 }
 
 template<typename T>

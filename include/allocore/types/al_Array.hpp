@@ -162,8 +162,17 @@ public:
 
 	///! Allocate memory for the given header
 	/// (warning, does not check if data.ptr was not NULL!)
-	void dataCalloc() { data.ptr = (char *)calloc(1, size()); }
-	void dataFree() { if(hasData()) free(data.ptr); data.ptr = NULL; }
+	void dataCalloc() { 
+		//void * p = malloc(size());
+		data.ptr = new char[size()]; //(char *)p; //(char *)calloc(1, size()); 
+		zero();
+	}
+	void dataFree() { 
+		if(hasData()) 
+			//free(data.ptr); 
+			delete[] data.ptr;
+		data.ptr = NULL; 
+	}
 
 	///! set all data to zero.
 	void zero() { if(hasData()) memset(data.ptr, 0, size()); }
@@ -802,9 +811,9 @@ template<typename T> inline void Array::set3d(T * cell) {
 }
 
 inline void Array::print() const {
-	printf("Array type %s components %d %d-D: ( ", allo_type_name(type()), components(), dimcount());
+	printf("Array %p type %s components %d %d-D: ( ", this, allo_type_name(type()), components(), dimcount());
 	for (int i=0; i<dimcount(); i++) printf("%d(stride %d) ", dim(i), stride(i));
-	printf(") %d bytes\n", int(size()));
+	printf(") %d bytes, data: %p)\n", int(size()), data.ptr);
 }
 
 #undef DOUBLE_FLOOR
