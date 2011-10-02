@@ -74,10 +74,10 @@ void Texture::quad(Graphics& gl, double w, double h, double x0, double y0){
 }
 
 void Texture :: submit(const Array& src, bool reconfigure) {	
-	if (src.type() != AlloUInt8Ty) {
-		printf("submit failed: only uint8_t arrays are supported\n");
-		return;
-	} 
+//	if (src.type() != AlloUInt8Ty) {
+//		printf("submit failed: only uint8_t arrays are supported\n");
+//		return;
+//	} 
 	
 	if (reconfigure) {
 		// reconfigure texture from array
@@ -106,7 +106,20 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 				return;
 		}
 		
-		printf("configured to %dD=%X, format %X, align %d\n", src.dimcount(), mTarget, mFormat, src.alignment());
+		switch (src.type()) {
+			case AlloUInt8Ty:	type(Graphics::UBYTE); break; 
+			case AlloSInt8Ty:	type(Graphics::BYTE); break; 
+			case AlloUInt16Ty:	type(Graphics::SHORT); break; 
+			case AlloSInt16Ty:	type(Graphics::USHORT); break; 
+			case AlloUInt32Ty:	type(Graphics::INT); break; 
+			case AlloSInt32Ty:	type(Graphics::UINT); break; 
+			case AlloFloat32Ty:	type(Graphics::FLOAT); break; 
+			default:
+				printf("invalid array type for texture\n");
+				return;
+		}
+		
+		printf("configured to %dD=%X, type=%X, format %X, align %d\n", src.dimcount(), mTarget, src.type(), mFormat, src.alignment());
 	} 
 	else {
 		if (src.width() != width()) {
@@ -119,6 +132,11 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 		}
 		if (depth() && src.depth() != depth()) {
 			printf("submit failed: source array depth does not match\n");
+			return;
+		}
+		
+		if (Graphics::toDataType(src.type()) != type()) {
+			printf("submit failed: source array type does not match texture\n");
 			return;
 		}
 	

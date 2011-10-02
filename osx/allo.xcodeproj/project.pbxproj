@@ -255,6 +255,27 @@
 		36CF96091412EDBB00B00A30 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4932130E0254007B30A0 /* libsndfile.a */; };
 		36CF960A1412EDBB00B00A30 /* libGamma.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36FE0F5913845E02003AE7BE /* libGamma.a */; };
 		36CF96131412EDCE00B00A30 /* hashSpace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36CF95141412BE3200B00A30 /* hashSpace.cpp */; };
+		36E4907A14380D5D00D7FE2B /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
+		36E4907B14380D5D00D7FE2B /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
+		36E4907C14380D5D00D7FE2B /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC53081162907D0076AA8B /* CoreAudio.framework */; };
+		36E4907D14380D5D00D7FE2B /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
+		36E4907E14380D5D00D7FE2B /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
+		36E4907F14380D5D00D7FE2B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
+		36E4908014380D5D00D7FE2B /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
+		36E4908114380D5D00D7FE2B /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
+		36E4908214380D5D00D7FE2B /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
+		36E4908314380D5D00D7FE2B /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DDF6512B6C8C000F75D2A /* libassimp.a */; };
+		36E4908414380D5D00D7FE2B /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
+		36E4908514380D5D00D7FE2B /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492B130E0254007B30A0 /* libapr-1.a */; };
+		36E4908614380D5D00D7FE2B /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
+		36E4908714380D5D00D7FE2B /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
+		36E4908814380D5D00D7FE2B /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492E130E0254007B30A0 /* libfreetype.a */; };
+		36E4908914380D5D00D7FE2B /* liblua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492F130E0254007B30A0 /* liblua.a */; };
+		36E4908A14380D5D00D7FE2B /* libluajit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4930130E0254007B30A0 /* libluajit.a */; };
+		36E4908B14380D5D00D7FE2B /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4931130E0254007B30A0 /* libportaudio.a */; };
+		36E4908C14380D5D00D7FE2B /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4932130E0254007B30A0 /* libsndfile.a */; };
+		36E4908D14380D5D00D7FE2B /* libGamma.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36FE0F5913845E02003AE7BE /* libGamma.a */; };
+		36E4909414380D7B00D7FE2B /* texture3d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36E4909314380D7B00D7FE2B /* texture3d.cpp */; };
 		36F0ABD2123195F2000A8EBF /* liblua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F0ABD0123195F2000A8EBF /* liblua.a */; };
 		36F596521211D58B003B78B5 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
 		36FE0C4813844E3C003AE7BE /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
@@ -332,6 +353,13 @@
 			remoteInfo = "make allocore";
 		};
 		36CF95F31412EDBB00B00A30 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 36035DB813037E8D001E9BA9;
+			remoteInfo = "make allocore";
+		};
+		36E4907614380D5D00D7FE2B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
@@ -833,6 +861,8 @@
 		36CF98E1141306DB00B00A30 /* apu_version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = apu_version.h; sourceTree = "<group>"; };
 		36CF98E2141306DB00B00A30 /* apu_want.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = apu_want.h; sourceTree = "<group>"; };
 		36E4155711E99BED00A8A63D /* al_ThreadAPR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_ThreadAPR.cpp; sourceTree = "<group>"; };
+		36E4909114380D5D00D7FE2B /* exSimpleGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exSimpleGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
+		36E4909314380D7B00D7FE2B /* texture3d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = texture3d.cpp; sourceTree = "<group>"; };
 		36E4ACC113BCC2400088E632 /* aiAnim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aiAnim.h; sourceTree = "<group>"; };
 		36E4ACC213BCC2400088E632 /* aiAssert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aiAssert.h; sourceTree = "<group>"; };
 		36E4ACC313BCC2400088E632 /* aiCamera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aiCamera.h; sourceTree = "<group>"; };
@@ -1618,6 +1648,33 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		36E4907914380D5D00D7FE2B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				36E4907A14380D5D00D7FE2B /* AudioToolbox.framework in Frameworks */,
+				36E4907B14380D5D00D7FE2B /* AudioUnit.framework in Frameworks */,
+				36E4907C14380D5D00D7FE2B /* CoreAudio.framework in Frameworks */,
+				36E4907D14380D5D00D7FE2B /* GLUT.framework in Frameworks */,
+				36E4907E14380D5D00D7FE2B /* OpenGL.framework in Frameworks */,
+				36E4907F14380D5D00D7FE2B /* Cocoa.framework in Frameworks */,
+				36E4908014380D5D00D7FE2B /* libportaudio.a in Frameworks */,
+				36E4908114380D5D00D7FE2B /* libfreeimage.a in Frameworks */,
+				36E4908214380D5D00D7FE2B /* libapr-1.a in Frameworks */,
+				36E4908314380D5D00D7FE2B /* libassimp.a in Frameworks */,
+				36E4908414380D5D00D7FE2B /* liballocore.a in Frameworks */,
+				36E4908514380D5D00D7FE2B /* libapr-1.a in Frameworks */,
+				36E4908614380D5D00D7FE2B /* libassimp.a in Frameworks */,
+				36E4908714380D5D00D7FE2B /* libfreeimage.a in Frameworks */,
+				36E4908814380D5D00D7FE2B /* libfreetype.a in Frameworks */,
+				36E4908914380D5D00D7FE2B /* liblua.a in Frameworks */,
+				36E4908A14380D5D00D7FE2B /* libluajit.a in Frameworks */,
+				36E4908B14380D5D00D7FE2B /* libportaudio.a in Frameworks */,
+				36E4908C14380D5D00D7FE2B /* libsndfile.a in Frameworks */,
+				36E4908D14380D5D00D7FE2B /* libGamma.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		36FE0C4713844E3C003AE7BE /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1689,6 +1746,7 @@
 				16A60425130345BB0077B460 /* triangleNoise.cpp */,
 				36462C0313EAA5C500F33CA7 /* omnigraphic.cpp */,
 				366E78041405C6B70010B21A /* cubemap.cpp */,
+				36E4909314380D7B00D7FE2B /* texture3d.cpp */,
 			);
 			path = graphics;
 			sourceTree = "<group>";
@@ -1996,6 +2054,7 @@
 				366E78F81407F2D60010B21A /* exSimpleGraphics */,
 				36CF960E1412EDBB00B00A30 /* exSimpleGraphics */,
 				36CA80641418244B00B7CE6B /* exSimpleGraphics */,
+				36E4909114380D5D00D7FE2B /* exSimpleGraphics */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -3588,6 +3647,23 @@
 			productReference = 36CF960E1412EDBB00B00A30 /* exSimpleGraphics */;
 			productType = "com.apple.product-type.tool";
 		};
+		36E4907414380D5D00D7FE2B /* exTexture3d */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 36E4908E14380D5D00D7FE2B /* Build configuration list for PBXNativeTarget "exTexture3d" */;
+			buildPhases = (
+				36E4907714380D5D00D7FE2B /* Sources */,
+				36E4907914380D5D00D7FE2B /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				36E4907514380D5D00D7FE2B /* PBXTargetDependency */,
+			);
+			name = exTexture3d;
+			productName = exSimpleGraphics;
+			productReference = 36E4909114380D5D00D7FE2B /* exSimpleGraphics */;
+			productType = "com.apple.product-type.tool";
+		};
 		36FE0C4413844E3C003AE7BE /* exSeq */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 36FE0C5B13844E3C003AE7BE /* Build configuration list for PBXNativeTarget "exSeq" */;
@@ -3661,6 +3737,7 @@
 				366E78DD1407F2D60010B21A /* exCubemap */,
 				36CF95F11412EDBB00B00A30 /* exHashSpace */,
 				36CA80471418244B00B7CE6B /* exMainLoop */,
+				36E4907414380D5D00D7FE2B /* exTexture3d */,
 			);
 		};
 /* End PBXProject section */
@@ -3894,6 +3971,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		36E4907714380D5D00D7FE2B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				36E4909414380D7B00D7FE2B /* texture3d.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		36FE0C4513844E3C003AE7BE /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3950,6 +4035,11 @@
 			isa = PBXTargetDependency;
 			target = 36035DB813037E8D001E9BA9 /* make allocore */;
 			targetProxy = 36CF95F31412EDBB00B00A30 /* PBXContainerItemProxy */;
+		};
+		36E4907514380D5D00D7FE2B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 36035DB813037E8D001E9BA9 /* make allocore */;
+			targetProxy = 36E4907614380D5D00D7FE2B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -4653,6 +4743,44 @@
 			};
 			name = Release;
 		};
+		36E4908F14380D5D00D7FE2B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\\\\\\\"$(SRCROOT)/../build/lib\\\\\\\"",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = exSimpleGraphics;
+			};
+			name = Debug;
+		};
+		36E4909014380D5D00D7FE2B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\\\\\\\"$(SRCROOT)/../build/lib\\\\\\\"",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = exSimpleGraphics;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		36FE0C5C13844E3C003AE7BE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -4876,6 +5004,15 @@
 			buildConfigurations = (
 				36CF960C1412EDBB00B00A30 /* Debug */,
 				36CF960D1412EDBB00B00A30 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		36E4908E14380D5D00D7FE2B /* Build configuration list for PBXNativeTarget "exTexture3d" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				36E4908F14380D5D00D7FE2B /* Debug */,
+				36E4909014380D5D00D7FE2B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
