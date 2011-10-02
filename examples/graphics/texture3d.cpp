@@ -1,3 +1,14 @@
+/*
+Allocore Example: Texture3D
+
+Description:
+This demonstrates a dynamic 3D texture.
+
+Author:
+Graham Wakefield 2011
+*/
+
+
 #include "allocore/al_Allocore.hpp"
 #include "allocore/graphics/al_Shader.hpp"
 
@@ -17,12 +28,9 @@ int gRenderMode = 0;
 
 
 static const char * vLight = AL_STRINGIFY(
-uniform sampler3D tex; 
 varying vec3 texcoord0;
-varying vec4 color;
 void main(){
 	texcoord0 = vec3(gl_MultiTexCoord0);
-	color = texture3D(tex, texcoord0);
 	gl_Position = ftransform();
 }
 );
@@ -30,8 +38,8 @@ void main(){
 static const char * fLight = AL_STRINGIFY(
 uniform sampler3D tex; 
 varying vec3 texcoord0;
-varying vec4 color;
 void main() {
+	vec4 color = texture3D(tex, texcoord0);
 	gl_FragColor = color;
 }
 );
