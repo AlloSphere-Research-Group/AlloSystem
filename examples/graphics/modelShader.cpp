@@ -1,3 +1,13 @@
+/*
+Allocore Example: modelshader
+
+Description:
+This demonstrates loading an OBJ and applying a shader
+
+Author:
+Graham Wakefield 2011
+*/
+
 #include "allocore/al_Allocore.hpp"
 #include "allocore/graphics/al_Shader.hpp"
 #include "allocore/graphics/al_Texture.hpp"

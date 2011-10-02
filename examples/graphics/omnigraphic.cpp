@@ -1,3 +1,13 @@
+/*
+Allocore Example: omnigraphic
+
+Description:
+This demonstrates stereo panorama by omnigraphic method
+
+Author:
+Graham Wakefield 2011
+*/
+
 #include "allocore/al_Allocore.hpp"
 #include "alloutil/al_ControlNav.hpp"
 

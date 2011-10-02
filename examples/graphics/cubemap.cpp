@@ -1,3 +1,13 @@
+/*
+Allocore Example: cubemap
+
+Description:
+This demonstrates a cubemap render-to-texture.
+
+Author:
+Graham Wakefield 2011
+*/
+
 #include "allocore/al_Allocore.hpp"
 #include "alloutil/al_ControlNav.hpp"
 #include "alloutil/al_OpenGL.hpp"
