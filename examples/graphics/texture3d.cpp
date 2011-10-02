@@ -27,10 +27,19 @@ Shader shaderV, shaderF;
 int gRenderMode = 0;
 
 
+//static const char * vLight = AL_STRINGIFY(
+//varying vec3 texcoord0;
+//void main(){
+//	texcoord0 = vec3(gl_MultiTexCoord0);
+//	gl_Position = ftransform();
+//}
+//);
+
 static const char * vLight = AL_STRINGIFY(
 varying vec3 texcoord0;
 void main(){
-	texcoord0 = vec3(gl_MultiTexCoord0);
+	texcoord0 = gl_Vertex.xyz / 32.; 
+	//texcoord0 = vec3(gl_MultiTexCoord0);
 	gl_Position = ftransform();
 }
 );

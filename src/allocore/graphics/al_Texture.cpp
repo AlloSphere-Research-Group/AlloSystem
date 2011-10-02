@@ -114,12 +114,13 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 			case AlloUInt32Ty:	type(Graphics::INT); break; 
 			case AlloSInt32Ty:	type(Graphics::UINT); break; 
 			case AlloFloat32Ty:	type(Graphics::FLOAT); break; 
+			case AlloFloat64Ty:	type(Graphics::DOUBLE); break; 
 			default:
 				printf("invalid array type for texture\n");
 				return;
 		}
 		
-		printf("configured to %dD=%X, type=%X, format %X, align %d\n", src.dimcount(), mTarget, src.type(), mFormat, src.alignment());
+		//printf("configured to target=%X(%dD), type=%X(%X), format=%X, align=(%d)\n", mTarget, src.dimcount(), type(), src.type(), mFormat, src.alignment());
 	} 
 	else {
 		if (src.width() != width()) {
@@ -184,18 +185,37 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 	// set glPixelStore according to layout:
 	glPixelStorei(GL_UNPACK_ALIGNMENT, mUnpack);
 	
-	
-	int comps = numComponents();
-	
 	// void glTexImage3D(
 	//		GLenum target, GLint level, GLenum internalformat,
 	//		GLsizei width, GLsizei height, GLsizei depth, 
 	//		GLint border, GLenum format, GLenum type, const GLvoid *pixels
 	// );
+	
+	// internal format is important
+	// TODO: complete the derivation, probably do it elsewhere...
+	int internalformat;
+	if (type() == Graphics::FLOAT || type() == Graphics::DOUBLE) {
+		switch (numComponents()) {
+			case 1:
+				internalformat = GL_LUMINANCE32F_ARB;
+			case 2:
+				internalformat = GL_LUMINANCE_ALPHA32F_ARB;
+			case 3:
+				internalformat = GL_RGB32F_ARB;
+			case 4:
+				internalformat = GL_RGBA32F_ARB;
+				break;
+			default:
+				break;
+		}
+	} else {
+		// the old way - let the GPU decide:
+		internalformat = numComponents();
+	}
 	switch(mTarget){
-		case GL_TEXTURE_1D:	glTexImage1D(mTarget, 0, comps, width(), 0, format(), type(), pixels); break;
-		case GL_TEXTURE_2D: glTexImage2D(mTarget, 0, comps, width(), height(), 0, format(), type(), pixels); break;
-		case GL_TEXTURE_3D: glTexImage3D(mTarget, 0, comps, width(), height(), depth(), 0, format(), type(), pixels); break;
+		case GL_TEXTURE_1D:	glTexImage1D(mTarget, 0, internalformat, width(), 0, format(), type(), pixels); break;
+		case GL_TEXTURE_2D: glTexImage2D(mTarget, 0, internalformat, width(), height(), 0, format(), type(), pixels); break;
+		case GL_TEXTURE_3D: glTexImage3D(mTarget, 0, internalformat, width(), height(), depth(), 0, format(), type(), pixels); break;
 		default:;
 	}
 	

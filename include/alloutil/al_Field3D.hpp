@@ -42,7 +42,7 @@ namespace al {
 	Field processing often requires double-buffering
 */
 
-template<typename T=double>
+template<typename T=float>
 class Field3D {
 public:
 	
@@ -127,7 +127,7 @@ protected:
 	Array mArray0, mArray1; //mArrays[2];	// double-buffering
 };
 
-template<typename T=double>
+template<typename T=float>
 class Fluid {
 public:
 	enum BoundaryMode {
