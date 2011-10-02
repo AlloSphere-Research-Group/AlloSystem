@@ -3,6 +3,19 @@
 
 using namespace al;
 
+// 3d array of triplet floats (e.g. color)
+Array data(3, AlloFloat32Ty, 32, 32, 32);
+// texture that will be filled with this data:
+Texture tex;
+
+Graphics gl;
+Mesh mesh;
+ShaderProgram shaderP;
+Shader shaderV, shaderF;
+
+int gRenderMode = 0;
+
+
 static const char * vLight = AL_STRINGIFY(
 uniform sampler3D tex; 
 varying vec3 texcoord0;
@@ -23,25 +36,16 @@ void main() {
 }
 );
 
-using namespace al;
-
-// 3d array of triplet floats (e.g. color)
-Array data(3, AlloFloat32Ty, 32, 32, 32);
-// texture that will be filled with this data:
-Texture tex;
-
-Graphics gl;
-Mesh mesh1, mesh2;
-ShaderProgram shaderP;
-Shader shaderV, shaderF;
-
-int gRenderMode = 0;
-
 // function used to initialize array data:
 void arrayfiller(float * values, double normx, double normy, double normz) {
-	values[0] = sin(normx * M_PI);
-	values[1] = cos(normy * M_2PI);
-	values[2] = sin(normz * M_PI_2);
+	double snormx = normx-0.5;
+	double snormy = normy-0.5;
+	double snormz = normz-0.5;
+	double snorm3 = snormx*snormx + snormy*snormy + snormz*snormz;
+
+	values[0] = sin((snorm3 + al_time()) * M_PI);
+	values[1] = cos((snorm3 + al_time()) * M_2PI);
+	values[2] = sin((snorm3 + al_time()) * M_PI_2);
 }
 
 struct MyWindow : public Window {
@@ -69,22 +73,14 @@ struct MyWindow : public Window {
 		shaderF.printLog();
 		shaderP.printLog();
 
-		// create rendering meshes:
-		mesh1.reset();
-		mesh2.reset();
-		mesh1.primitive(Graphics::POINTS);
-		mesh2.primitive(Graphics::POINTS);
-		
+		// create rendering mesh:
+		mesh.reset();
+		mesh.primitive(Graphics::POINTS);
 		for (int x=0; x<32; x++) {
 		for (int y=0; y<32; y++) {
 		for (int z=0; z<32; z++) {
-			Color color;
-			data.read_interp(color.components, x, y, z);
-			mesh1.color(color);
-			mesh1.vertex(x, y, z);
-			
-			mesh2.texCoord(x/32., y/32., z/32.);
-			mesh2.vertex(x, y, z);
+			mesh.texCoord(x/32., y/32., z/32.);
+			mesh.vertex(x, y, z);
 		}}}
 		
 		return true;
@@ -101,26 +97,38 @@ struct MyWindow : public Window {
 		gl.matrixMode(gl.MODELVIEW);
 		gl.loadMatrix(Matrix4d::lookAt(Vec3d(16, 16, 48), Vec3d(16, 16, 16), Vec3d(0,1,0)));
 		
+		// update data:
+		data.fill(arrayfiller);
+		
 		// how to resubmit data (if it is changing):
-		// tex.submit(data);
+		tex.submit(data);
 		
 		gl.pointSize(gRenderMode+0.5);
 		switch (gRenderMode) {
 			case 0:
+				gl.begin(gl.POINTS);
 				// do it on the CPU:
-				gl.draw(mesh1);
+				for (int x=0; x<32; x++) {
+				for (int y=0; y<32; y++) {
+				for (int z=0; z<32; z++) {
+					Color color;
+					data.read_interp(color.components, x, y, z);
+					gl.color(color);
+					gl.vertex(x, y, z);
+				}}}
+				gl.end();
 				break;
 			case 1:
 				// use 3D texcoords:
 				tex.bind();
-				gl.draw(mesh2);
+				gl.draw(mesh);
 				tex.unbind();
 				break;
 			case 2:
 				// use shader:
 				shaderP.begin();
 				tex.bind();
-				gl.draw(mesh2);
+				gl.draw(mesh);
 				tex.unbind();
 				shaderP.end();
 				break;
