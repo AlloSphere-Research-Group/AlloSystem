@@ -95,12 +95,11 @@ struct MyWindow : public Window {
 		gl.loadMatrix(Matrix4d::lookAt(Vec3d(16, 16, 64), Vec3d(16, 16, 16), Vec3d(0,1,0)));
 		
 		
-		// add some force:
+		// add some forces:
 		float t = MainLoop::now() * 0.25;
 		float r = 20;
 		fluid.addForce(Vec3f(12, 12, 16), Vec3f(r*cos(t), r*sin(t), 0));
-		
-		fluid.addForce(Vec3f(20, 20, 16), Vec3f(-r*cos(t), -r*sin(t), 0));
+		fluid.addForce(Vec3f(20, 20, 16), Vec3f(-r*cos(t*2), -r*sin(t*2), 0));
 		
 		// run a fluid step:
 		fluid.update();
