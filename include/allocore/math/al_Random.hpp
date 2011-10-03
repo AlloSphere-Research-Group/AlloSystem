@@ -86,6 +86,13 @@ public:
 	template <class T>
 	T uniformS(const T& lim){ return lim*uniformS(); }
 
+	/// Returns point within a unit N-ball
+	
+	/// @param[in] point	an array of size N
+	///
+	template <int N, class T>
+	void ball(T * point);
+
 	/// Returns random Gaussian
 	float gaussian(){ float r; gaussian(r,r); return r; }
 
@@ -196,6 +203,16 @@ private:
 /// Get global random number generator
 inline Random<>& global(){ static Random<> r; return r; }
 
+/// Returns point within a unit N-ball
+
+/// @param[in] point	an array of size N
+///
+template <int N, class T>
+inline void ball(T * point){ global().ball<N>(point); }
+
+/// Returns random Gaussian
+inline float gaussian(){ return global().gaussian(); }
+
 /// Returns true with probability p
 inline bool prob(float p=0.5){ return global().prob(p); }
 
@@ -251,6 +268,20 @@ inline void Tausworthe::iterate(){
 	s4 = ((s4 & 0xffffff80) << 13) ^ (((s4 <<  3) ^ s4) >> 12);
 }
 
+
+template <class RNG>
+template <int N, class T>
+void Random<RNG>::ball(T * point){
+	T w;
+	do{
+		w = T(0);
+		for(int i=0; i<N; ++i){
+			float v = uniformS();
+			point[i] = v;
+			w += v*v;
+		}
+	} while(w >= 1.f);
+}
 
 // Box-Muller transform
 //		Box, G. and Muller, M. A note on the generation of normal deviates. 
