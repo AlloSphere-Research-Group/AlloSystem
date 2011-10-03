@@ -28,12 +28,15 @@ struct MyWindow : Window{
 		}}
 		
 		for(int j=0; j<Ny-1; ++j){
-			surface.index(j*Nx);
-		for(int i=0; i<Nx  ; ++i){
-			int idx = j*Nx + i;
+			for(int i=0; i<Nx  ; ++i){
+				int idx = j*Nx + i;
+				surface.index(idx);
+				surface.index(idx+Nx);
+			}
+			int idx = surface.indices().last();
 			surface.index(idx);
-			surface.index(idx+Nx);
-		}}		
+			surface.index(idx - Nx + 1);
+		}
 	}
 
 
