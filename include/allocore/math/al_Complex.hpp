@@ -162,8 +162,10 @@ public:
 		return C(a,b);
 	}
 
-	C cos() const { return C(::cos(r)*::cosh(i),-::sin(r)*::sinh(i)); } ///< Returns cos(z)
-	C sin() const { return C(::sin(r)*::cosh(i), ::cos(r)*::sinh(i)); } ///< Returns sin(z)
+	C cos()  const { return C(::cos(r)*::cosh(i),-::sin(r)*::sinh(i)); } ///< Returns cos(z)
+	C sin()  const { return C(::sin(r)*::cosh(i), ::cos(r)*::sinh(i)); } ///< Returns sin(z)
+	C cosh() const { return C(::cos(i)*::sinh(r), ::sin(i)*::cosh(r)); } ///< Returns cosh(z)
+	C sinh() const { return C(::cos(i)*::cosh(r), ::sin(i)*::sinh(r)); } ///< Returns sinh(z)
 
 	T abs() const { return norm(); }						///< Returns norm (radius), |z|
 	T mag() const { return norm(); }						///< Returns norm (radius), |z|
@@ -171,17 +173,28 @@ public:
 	T phase() const { return arg(); }						///< Returns argument (angle)
 };
 
-#define TEM template <class T>
+#define TEM template <class T> inline
 TEM T abs(const Complex<T>& c){ return c.mag(); }
 TEM Complex<T> exp(const Complex<T>& c){ return c.exp(); }
 TEM Complex<T> log(const Complex<T>& c){ return c.log(); }
 TEM Complex<T> pow(const Complex<T>& b, const Complex<T>& e){ return b.pow(e); }
 TEM Complex<T> pow(const Complex<T>& b, const T& e){ return b.pow(e); }
-TEM Complex<T> operator + (T r, const Complex<T>& c){ return  c+r; }
-TEM Complex<T> operator - (T r, const Complex<T>& c){ return -c+r; }
-TEM Complex<T> operator * (T r, const Complex<T>& c){ return  c*r; }
-TEM Complex<T> operator / (T r, const Complex<T>& c){ return  c.conj()*(r/c.norm()); }
+//TEM Complex<T> sqrt(const Complex<T>& v){ return v.sqrt(); } // TODO: these ambiguate other functions
+//TEM Complex<T> cos(const Complex<T>& v){ return v.cos(); }
+//TEM Complex<T> sin(const Complex<T>& v){ return v.sin(); }
 #undef TEM
+
+template <class T, class S>
+inline Complex<T> operator + (const S& r, const Complex<T>& c){ return  c+r; }
+
+template <class T, class S>
+inline Complex<T> operator - (const S& r, const Complex<T>& c){ return -c+r; }
+
+template <class T, class S>
+inline Complex<T> operator * (const S& r, const Complex<T>& c){ return  c*r; }
+
+template <class T, class S>
+inline Complex<T> operator / (const S& r, const Complex<T>& c){ return  c.conj()*(r/c.norm()); }
 
 
 template <class VecN, class T>
