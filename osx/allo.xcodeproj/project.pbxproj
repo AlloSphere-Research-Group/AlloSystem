@@ -1273,7 +1273,6 @@
 		36FE0CF713844FA4003AE7BE /* Print.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Print.h; sourceTree = "<group>"; };
 		36FE0CF813844FA4003AE7BE /* pstdint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pstdint.h; sourceTree = "<group>"; };
 		36FE0CF913844FA4003AE7BE /* Recorder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Recorder.h; sourceTree = "<group>"; };
-		36FE0CFA13844FA4003AE7BE /* RecurrenceMaps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecurrenceMaps.h; sourceTree = "<group>"; };
 		36FE0CFB13844FA4003AE7BE /* rnd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rnd.h; sourceTree = "<group>"; };
 		36FE0CFC13844FA4003AE7BE /* scl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = scl.h; sourceTree = "<group>"; };
 		36FE0CFD13844FA4003AE7BE /* SoundFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundFile.h; sourceTree = "<group>"; };
@@ -3281,7 +3280,6 @@
 				36FE0CF713844FA4003AE7BE /* Print.h */,
 				36FE0CF813844FA4003AE7BE /* pstdint.h */,
 				36FE0CF913844FA4003AE7BE /* Recorder.h */,
-				36FE0CFA13844FA4003AE7BE /* RecurrenceMaps.h */,
 				36FE0CFB13844FA4003AE7BE /* rnd.h */,
 				36FE0CFC13844FA4003AE7BE /* scl.h */,
 				36FE0CFD13844FA4003AE7BE /* SoundFile.h */,
