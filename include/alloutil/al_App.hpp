@@ -193,8 +193,12 @@ public:
 	/// called multiple times, no state updates should be made in it.
 	virtual void onDraw(Graphics& g, const Viewpoint& v){}
 
+	/// Called upon creation of a window
 	virtual void onCreate(const ViewpointWindow& win){}
+	
+	/// Called upon destruction of a window
 	virtual void onDestroy(const ViewpointWindow& win){}
+
 
 
 	const AudioIO&		audioIO() const { return mAudioIO; }
