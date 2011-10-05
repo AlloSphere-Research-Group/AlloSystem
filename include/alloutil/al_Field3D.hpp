@@ -31,7 +31,9 @@
 
 	File author(s):
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
+	
 */
+
 
 #include "allocore/types/al_Array.hpp"
 #include "allocore/math/al_Functions.hpp"
@@ -99,8 +101,8 @@ public:
 	void boundary();
 	
 	// diffusion
-	void diffuse(T diffusion=T(0.01), int passes=10);
-	static void diffuse(Array& dst, const Array& src, T diffusion=T(0.01), int passes=10);
+	void diffuse(T diffusion=T(0.01), unsigned passes=14);
+	static void diffuse(Array& dst, const Array& src, T diffusion=T(0.01), unsigned passes=14);
 	
 	// advect a field.
 	// velocity field should have 3 components
@@ -141,7 +143,7 @@ public:
 		velocities(3, dim),
 		gradient(1, dim),
 		boundaries(1, Array::type<T>(), dim, dim, dim),
-		passes(10),
+		passes(14),	
 		viscocity(0.00001),
 		diffusion(0.001),
 		selfadvection(0.9),
@@ -274,11 +276,11 @@ T& Field3D<T>::cell(int x, int y, int z, int k) {
 template<typename T>
 void Field3D<T>::setHarmonic(T px, T py, T pz) {
 	T vals[3];
-	for (int z=0;z<mDim;z++) {
+	for (size_t z=0;z<mDim;z++) {
 		vals[2] = sin(pz * M_2PI * z/T(dim()));
-		for (int y=0;y<mDim;y++) {
+		for (size_t y=0;y<mDim;y++) {
 			vals[1] = sin(py * M_2PI * y/T(dim()));
-			for (int x=0;x<mDim;x++) {
+			for (size_t x=0;x<mDim;x++) {
 				vals[0] = sin(px * M_2PI * x/T(dim()));
 				T value = vals[0] * vals[1] * vals[2];
 				front().write(&value, x, y, z);
@@ -290,18 +292,18 @@ void Field3D<T>::setHarmonic(T px, T py, T pz) {
 template<typename T>
 void Field3D<T>::adduniformS(rnd::Random<>& rng, T scalar) {
 	T * p = ptr();
-	for (int k=0;k<length();k++) p[k] += scalar * rng.uniformS();
+	for (unsigned k=0;k<length();k++) p[k] += scalar * rng.uniformS();
 }
 template<typename T>
 void Field3D<T>::adduniform(rnd::Random<>& rng, T scalar) {
 	T * p = ptr();
-	for (int k=0;k<length();k++) p[k] += scalar * rng.uniform();
+	for (unsigned k=0;k<length();k++) p[k] += scalar * rng.uniform();
 }
 
 template<typename T>
 inline void Field3D<T>::scale(T v) {
 	T * p = ptr();
-	for (int k=0;k<length();k++) p[k] *= v;
+	for (unsigned k=0;k<length();k++) p[k] *= v;
 }
 
 template<typename T>
@@ -315,14 +317,14 @@ inline void Field3D<T>::scale(const Array& arr) {
 		// zero the boundary fields
 		char * optr = front().data.ptr;
 		char * vptr = arr.data.ptr;
-		for (int z=0;z<mDim;z++) {
-			for (int y=0;y<mDim;y++) {
-				for (int x=0;x<mDim;x++) {
+		for (size_t z=0;z<mDim;z++) {
+			for (size_t y=0;y<mDim;y++) {
+				for (size_t x=0;x<mDim;x++) {
 					// cell to update:
 					T * cell = INDEX(optr, x, y, z);
 					T * src = INDEX(vptr, x, y, z);
 
-					for (int k=0; k<components(); k++) {
+					for (unsigned k=0; k<components(); k++) {
 						cell[k] *= src[k];
 					}
 				}
@@ -363,13 +365,13 @@ inline void Field3D<T>::scale1(const Array& arr) {
 		// scale the boundary fields
 		char * optr = front().data.ptr;
 		char * aptr = arr.data.ptr;
-		for (int z=0;z<mDim;z++) {
-			for (int y=0;y<mDim;y++) {
-				for (int x=0;x<mDim;x++) {
+		for (size_t z=0;z<mDim;z++) {
+			for (size_t y=0;y<mDim;y++) {
+				for (size_t x=0;x<mDim;x++) {
 					// cell to update:
 					T * cell = INDEX(optr, x, y, z);
 					T v = AINDEX(aptr, x, y, z)[0];
-					for (int k=0; k<components(); k++) {
+					for (unsigned k=0; k<components(); k++) {
 						cell[k] *= v;
 					}
 				}
@@ -394,14 +396,14 @@ inline void Field3D<T>::damp(const Array& arr) {
 		// zero the boundary fields
 		char * optr = front().data.ptr;
 		char * vptr = arr.data.ptr;
-		for (int z=0;z<mDim;z++) {
-			for (int y=0;y<mDim;y++) {
-				for (int x=0;x<mDim;x++) {
+		for (size_t z=0;z<mDim;z++) {
+			for (size_t y=0;y<mDim;y++) {
+				for (size_t x=0;x<mDim;x++) {
 					// cell to update:
 					T * cell = INDEX(optr, x, y, z);
 					T v = fabs(INDEX(vptr, x, y, z)[0]);
 
-					for (int k=0; k<components(); k++) {
+					for (unsigned k=0; k<components(); k++) {
 						cell[k] *= 1./(v+1.);
 					}
 				}
@@ -432,14 +434,14 @@ inline void Field3D<T>::add(Array& src) {
 }
 
 template<typename T>
-inline void Field3D<T> :: diffuse(T diffusion, int passes) {
+inline void Field3D<T> :: diffuse(T diffusion, unsigned passes) {
 	swap(); 
 	diffuse(front(), back(), diffusion, passes);
 }
 
 // Gauss-Seidel relaxation scheme:
 template<typename T>
-inline void Field3D<T> :: diffuse(Array& out, const Array& in, T diffusion, int passes) {
+inline void Field3D<T> :: diffuse(Array& out, const Array& in, T diffusion, unsigned passes) {
 	const size_t stride0 = out.header.stride[0];
 	const size_t stride1 = out.header.stride[1];
 	const size_t stride2 = out.header.stride[2];
@@ -452,9 +454,9 @@ inline void Field3D<T> :: diffuse(Array& out, const Array& in, T diffusion, int 
 	#define INDEX(p, x, y, z) ((T *)(p + ((((x)&dimwrap)*stride0) + (((y)&dimwrap)*stride1) + (((z)&dimwrap)*stride2))))
 	
 	for (unsigned n=0 ; n<passes ; n++) {
-		for (unsigned z=0;z<dim;z++) {
-			for (unsigned y=0;y<dim;y++) {
-				for (unsigned x=0;x<dim;x++) {
+		for (size_t z=0;z<dim;z++) {
+			for (size_t y=0;y<dim;y++) {
+				for (size_t x=0;x<dim;x++) {
 					const T * prev =	INDEX(iptr, x,	y,	z);
 					T *		  next =	INDEX(optr, x,	y,	z);
 					const T * va00 =	INDEX(optr, x-1,y,	z);
@@ -480,17 +482,31 @@ inline void Field3D<T> :: diffuse(Array& out, const Array& in, T diffusion, int 
 	#undef INDEX
 }
 
+/*
+	The solver uses a Merhstellen kernel:
+	0, 1, 0		1, b, 1		0, 1, 0
+	1, b, 1		b, -a, b	1, b, 1
+	0, 1, 0		1, b, 1		0, 1, 0
+	
+	b = 4, a = 36
+	b = 2, a = 24
+*/
 template<typename T>
 inline void Field3D<T> :: relax( double a, int iterations) {
 	char * old = front().data.ptr;
 	char * out = back().data.ptr;
 	const uint32_t comps = components();
+#ifdef NoMerhstellen
 	const double c = 1./(1. + 6.*a); 
+#else
+	const double c = 1./(1. + 24.*a); 
+#endif
 	for (int iter=0; iter<iterations; iter++) {
-		for (int z=0;z<mDim;z++) {
-			for (int y=0;y<mDim;y++) {
-				for (int x=0;x<mDim;x++) {
+		for (size_t z=0;z<mDim;z++) {
+			for (size_t y=0;y<mDim;y++) {
+				for (size_t x=0;x<mDim;x++) {
 					const size_t idx = index(x, y, z);
+#ifdef NoMerhstellen
 					const size_t x0 = index(x-1, y, z);
 					const size_t x1 = index(x+1, y, z);
 					const size_t y0 = index(x, y-1, z);
@@ -507,10 +523,48 @@ inline void Field3D<T> :: relax( double a, int iterations) {
 										)
 									);
 					}
+#else
+					// immediate neighbors
+					const size_t idx011 = index(x-1, y, z);
+					const size_t idx211 = index(x+1, y, z);
+					const size_t idx101 = index(x, y-1, z);
+					const size_t idx121 = index(x, y+1, z);
+					const size_t idx110 = index(x, y, z-1);
+					const size_t idx112 = index(x, y, z+1);
+					// corner neighbors
+					const size_t idx010 = index(x-1, y, z-1);
+					const size_t idx100 = index(x, y-1, z-1);
+					const size_t idx120 = index(x, y+1, z-1);
+					const size_t idx210 = index(x+1, y, z-1);
+					const size_t idx001 = index(x-1, y-1, z);
+					const size_t idx201 = index(x+1, y-1, z);
+					const size_t idx021 = index(x-1, y+1, z);
+					const size_t idx221 = index(x+1, y+1, z);
+					const size_t idx012 = index(x-1, y, z+1);
+					const size_t idx102 = index(x, y-1, z+1);
+					const size_t idx122 = index(x, y+1, z+1);
+					const size_t idx212 = index(x+1, y, z+1);
+					for (unsigned k=0; k<comps; k++) {
+						out[idx+k] = c * (
+										old[idx+k] +
+										a * (2.*(	
+											out[idx011+k] + out[idx211+k] +
+											out[idx101+k] + out[idx121+k] +
+											out[idx110+k] + out[idx112+k]
+										) + out[idx010+k] + out[idx100+k] +
+											out[idx120+k] + out[idx210+k] +
+											out[idx001+k] + out[idx201+k] +
+											out[idx021+k] + out[idx221+k] +
+											out[idx012+k] + out[idx102+k] +
+											out[idx122+k] + out[idx212+k]
+										)
+									);
+					}
+#endif
 				}
 			}
 		}
-		// todo: apply boundary here
+		// todo: apply boundary here?
 	}
 	#undef CELL
 }
@@ -544,9 +598,9 @@ inline void Field3D<T> :: advect(Array& dst, const Array& src, const Array& velo
 	#define CELL(p, x, y, z, k) (((T *)((p) + (((x)&dimwrap)*stride0) +  (((y)&dimwrap)*stride1) +  (((z)&dimwrap)*stride2)))[(k)])
 	#define VCELL(p, x, y, z, k) (((T *)((p) + (((x)&vdimwrap)*vstride0) +  (((y)&vdimwrap)*vstride1) +  (((z)&vdimwrap)*vstride2)))[(k)]) 
 	
-	for (int z=0;z<dim;z++) {
-		for (int y=0;y<dim;y++) {
-			for (int x=0;x<dim;x++) {
+	for (size_t z=0;z<dim;z++) {
+		for (size_t y=0;y<dim;y++) {
+			for (size_t x=0;x<dim;x++) {
 				// back trace: (current cell offset by vector at cell)
 				T * bp  = &(CELL(outptr, x, y, z, 0));
 				T * vp	= &(VCELL(velptr, x, y, z, 0));
@@ -589,9 +643,9 @@ inline void Field3D<T> :: calculateGradientMagnitude(Array& gradient) {
 	char * iptr = front().data.ptr;
 	char * gptr = gradient.data.ptr;
 	
-	for (int z=0;z<mDim;z++) {
-		for (int y=0;y<mDim;y++) {
-			for (int x=0;x<mDim;x++) {
+	for (size_t z=0;z<mDim;z++) {
+		for (size_t y=0;y<mDim;y++) {
+			for (size_t x=0;x<mDim;x++) {
 				// gradients per axis:
 				const T xgrad = CELL(iptr, x+1,y,	z,	0) - CELL(iptr, x-1,y,	z,	0);
 				const T ygrad = CELL(iptr, x,	y+1,z,	1) - CELL(iptr, x,	y-1,z,	1);
@@ -634,9 +688,9 @@ inline void Field3D<T> :: subtractGradientMagnitude(const Array& gradient) {
 	char * optr = front().data.ptr;
 	//const double h = 1.; ///3.;
 	const double h = mDim * 0.5;
-	for (int z=0;z<mDim;z++) {
-		for (int y=0;y<mDim;y++) {
-			for (int x=0;x<mDim;x++) {
+	for (size_t z=0;z<mDim;z++) {
+		for (size_t y=0;y<mDim;y++) {
+			for (size_t x=0;x<mDim;x++) {
 				// cell to update:
 				T * vel = INDEX(optr, x, y, z);
 				// gradients per axis:
@@ -667,22 +721,22 @@ inline void Field3D<T> :: boundary() {
 	#define CELL(p, x, y, z, k) (((T *)((p) + (((x)&mDimWrap)*stride0) +  (((y)&mDimWrap)*stride1) +  (((z)&mDimWrap)*stride2)))[(k)])
 	
 	// x planes
-	for (int z=0;z<mDim;z++) {
-		for (int y=0;y<mDim;y++) {
+	for (size_t z=0;z<mDim;z++) {
+		for (size_t y=0;y<mDim;y++) {
 			CELL(optr, 0, y, z, 0) = T(0);
 			CELL(optr, mDimWrap, y, z, 0) = T(0); 
 		}
 	}
 	// y planes
-	for (int z=0;z<mDim;z++) {
-		for (int x=0;x<mDim;x++) {
+	for (size_t z=0;z<mDim;z++) {
+		for (size_t x=0;x<mDim;x++) {
 			CELL(optr, x, 0, z, 1) = T(0);
 			CELL(optr, x, mDimWrap, z, 1) = T(0); 
 		}
 	}
 	// z planes
-	for (int y=0;y<mDim;y++) {
-		for (int x=0;x<mDim;x++) {
+	for (size_t y=0;y<mDim;y++) {
+		for (size_t x=0;x<mDim;x++) {
 			CELL(optr, x, y, 0, 2) = T(0);
 			CELL(optr, x, y, mDimWrap, 2) = T(0); 
 		}
@@ -705,9 +759,9 @@ inline void Field3D<T> :: add(T * force) {
 
 	// zero the boundary fields
 	char * optr = front().data.ptr;
-	for (int z=0;z<dim2;z++) {
-		for (int y=0;y<dim1;y++) {
-			for (int x=0;x<dim0;x++) {
+	for (size_t z=0;z<dim2;z++) {
+		for (size_t y=0;y<dim1;y++) {
+			for (size_t x=0;x<dim0;x++) {
 				// cell to update:
 				T * vel = INDEX(optr, x, y, z);
 				for (int i=0; i<components; i++ ){
