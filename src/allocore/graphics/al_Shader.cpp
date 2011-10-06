@@ -300,6 +300,18 @@ const ShaderProgram& ShaderProgram::attribute3(const char * name, const float * 
 const ShaderProgram& ShaderProgram::attribute4(const char * name, const float * v) const{
 	glVertexAttrib4fv(attribute(name), v); return *this;
 }
+const ShaderProgram& ShaderProgram::attribute1(int location, const double * v) const{
+	glVertexAttrib1dv(location, v); return *this;
+}
+const ShaderProgram& ShaderProgram::attribute2(int location, const double * v) const{
+	glVertexAttrib2dv(location, v); return *this;
+}
+const ShaderProgram& ShaderProgram::attribute3(int location, const double * v) const{
+	glVertexAttrib3dv(location, v); return *this;
+}
+const ShaderProgram& ShaderProgram::attribute4(int location, const double * v) const{
+	glVertexAttrib4dv(location, v); return *this;
+}
 
 int ShaderProgram::uniform(const char * name) const { 
 	//GLint loc = glGetUniformLocationARB((GLhandleARB)handle(), name);

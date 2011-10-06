@@ -144,6 +144,11 @@ public:
 
 		//textures? non square matrices? attributes?
 	};
+	
+	struct Attribute {
+		
+		
+	};
 
 	ShaderProgram()
 	:	mInPrim(Graphics::TRIANGLES), mOutPrim(Graphics::TRIANGLES), mOutVertices(3),
@@ -215,6 +220,10 @@ public:
 	const ShaderProgram& attribute2(const char * name, const float * v) const;
 	const ShaderProgram& attribute3(const char * name, const float * v) const;
 	const ShaderProgram& attribute4(const char * name, const float * v) const;
+	const ShaderProgram& attribute1(int location, const double * v) const;
+	const ShaderProgram& attribute2(int location, const double * v) const;
+	const ShaderProgram& attribute3(int location, const double * v) const;
+	const ShaderProgram& attribute4(int location, const double * v) const;
 	
 	int uniform(const char * name) const;
 	int attribute(const char * name) const;
