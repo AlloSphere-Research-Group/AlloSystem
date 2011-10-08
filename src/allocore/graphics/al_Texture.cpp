@@ -120,20 +120,28 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 				return;
 		}
 		
+		// reformat internal array to match:
+		if (!mArray.isFormat(src)) mArray.format(src);
+		
 		//printf("configured to target=%X(%dD), type=%X(%X), format=%X, align=(%d)\n", mTarget, src.dimcount(), type(), src.type(), mFormat, src.alignment());
 	} 
 	else {
+		
 		if (src.width() != width()) {
 			printf("submit failed: source array width does not match\n");
 			return;
 		}
-		if (height() && src.height() != height()) {
-			printf("submit failed: source array height does not match\n");
-			return;
-		}
-		if (depth() && src.depth() != depth()) {
-			printf("submit failed: source array depth does not match\n");
-			return;
+		if (target() != TEXTURE_1D) {
+			if (height() && src.height() != height()) {
+				printf("submit failed: source array height does not match\n");
+				return;
+			}
+			if (target() == TEXTURE_3D) {
+				if (depth() && src.depth() != depth()) {
+					printf("submit failed: source array depth does not match\n");
+					return;
+				}
+			}
 		}
 		
 		if (Graphics::toDataType(src.type()) != type()) {
@@ -144,26 +152,26 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 		switch (format()) {
 			case Graphics::ALPHA:
 			case Graphics::LUMINANCE:
-				if (src.dimcount() != 1) {
-					printf("submit failed: source array dimcount does not match\n");
+				if (src.components() != 1) {
+					printf("submit failed: source array component count does not match (got %d, should be 1)\n", src.components());
 					return;
 				}
 				break;
 			case Graphics::LUMINANCE_ALPHA:
-				if (src.dimcount() != 2) {
-					printf("submit failed: source array dimcount does not match\n");
+				if (src.components() != 2) {
+					printf("submit failed: source array component count does not match (got %d, should be 2)\n", src.components());
 					return;
 				}
 				break;
 			case Graphics::RGB:
-				if (src.dimcount() != 3) {
-					printf("submit failed: source array dimcount does not match\n");
+				if (src.components() != 3) {
+					printf("submit failed: source array component count does not match (got %d, should be 3)\n", src.components());
 					return;
 				}
 				break;
 			case Graphics::RGBA:
-				if (src.dimcount() != 4) {
-					printf("submit failed: source array dimcount does not match\n");
+				if (src.components() != 4) {
+					printf("submit failed: source array component count does not match (got %d, should be 4)\n", src.components());
 					return;
 				}
 				break;

@@ -68,6 +68,12 @@ public:
 	// back is used for intermediate processing
 	Array& front() { return mFront ? mArray0 : mArray1; }
 	Array& back() { return mFront ? mArray1 : mArray0; }
+	const Array& front() const { return mFront ? mArray0 : mArray1; }
+	const Array& back() const { return mFront ? mArray1 : mArray0; }
+	
+	/// read the intensity at a particular location:
+	template<typename T1>
+	void read(const Vec<3,T1> pos, T * elems) const;
 	
 	// raw access to internal pointer
 	T * ptr() { return (T *)front().data.ptr; }
@@ -79,19 +85,24 @@ public:
 	// swap buffers:
 	void swap() { mFront = !mFront; }
 
-	// multiply the front array:
+	/// multiply the front array:
 	void scale(T v);
-	// src must have matching layout
+	/// src must have matching layout
 	void scale(const Array& src);	
-	// src must have matching layout, except for components (which may be 1)
+	/// src must have matching layout, except for components (which may be 1)
 	void scale1(const Array& src);	
-	// multiply by 1./(src+1.), as a 'damping' factor:
+	/// multiply by 1./(src+1.), as a 'damping' factor:
 	void damp(const Array& src);	// src must have matching layout
-	// add to front array. src must have matching layout
+	/// add to front array. src must have matching layout
 	void add(Array& src);
-	// add uniform vector to front array. force must have as many components as the field
-	void add(T * force);
-	
+	/// add uniform vector to front array. vec must have as many components as the field
+	void add(T * vec);
+	/// add intensity at a particular location:
+	template<typename T1>
+	void add(const Vec<3,T1> pos, const T * elems);
+	/// single component case:
+	template<typename T1>
+	void add(const Vec<3,T1> pos, T elem);
 	// fill with noise:
 	void adduniform(rnd::Random<>& rng, T scalar = T(1));
 	void adduniformS(rnd::Random<>& rng, T scalar = T(1));
@@ -102,7 +113,38 @@ public:
 	
 	// diffusion
 	void diffuse(T diffusion=T(0.01), unsigned passes=14);
-	static void diffuse(Array& dst, const Array& src, T diffusion=T(0.01), unsigned passes=14);
+	
+	/// Diffusion with arbitrary kernel:
+	/// the kernel layout:
+	enum CellIndex {			
+		C022, C122, C222,
+		C012, C112, C212,
+		C002, C102, C202,
+		
+		C021, C121, C221,
+		C011, C111, C211,
+		C001, C101, C201,
+		
+		C020, C120, C220,
+		C010, C110, C210,
+		C000, C100, C200,
+		
+		CINVALID
+	};
+	struct Kernel3 {
+		T coeffs[27];
+		
+		Kernel3() { zero(); }
+		
+		void blur();
+		void blur3();
+		
+		void zero() { memset(coeffs, 0, 27*sizeof(T)); }
+		/// generates a value for coeffs[C111] that is the negative of
+		/// the sum of all other coeffs (to create a balanced kernel)
+		void calculateCenter();
+	};
+	void diffuse(const Kernel3& kernel, T diffusion=T(0.01), unsigned passes=14);
 	
 	// advect a field.
 	// velocity field should have 3 components
@@ -130,7 +172,7 @@ protected:
 };
 
 template<typename T=float>
-class Fluid {
+class Fluid3D {
 public:
 	enum BoundaryMode {
 		NONE = 0,
@@ -138,49 +180,36 @@ public:
 		FIELD = 2
 	};
 
-	Fluid(int components, int dim) 
-	:	densities(components, dim),
-		velocities(3, dim),
+	Fluid3D(int dim) 
+	:	velocities(3, dim),
 		gradient(1, dim),
 		boundaries(1, Array::type<T>(), dim, dim, dim),
 		passes(14),	
 		viscocity(0.00001),
-		diffusion(0.001),
 		selfadvection(0.9),
 		selfdecay(0.99),
 		selfbackgroundnoise(0.001),
-		decay(0.98),
 		mBoundaryMode(CLAMP)
 	{
 		// set all values to T(1):
 		T one = 1;
 		boundaries.set3d(&one);
 	}
-	~Fluid() {}
+	~Fluid3D() {}
 	
 	template<typename T1>
-	void addForce(const Vec<3,T1> pos, const Vec<3,T> vel) {
-		velocities.front().write_interp(vel.elems(), pos);
+	void addVelocity(const Vec<3,T1> pos, const Vec<3,T> vel) {
+		velocities.add(pos, vel.elems());
 	}
 	
 	template<typename T1>
-	void addDensities(const Vec<3,T1> pos, const T * elems) {
-		densities.front().write_interp(elems, pos);
+	void readVelocity(const Vec<3,T1> pos, Vec<3,T>& vel) const {
+		velocities.read(pos, vel.elems());
 	}
 	
 	template<typename T1>
-	void readVelocity(const Vec<3,T1> pos, Vec<3,T>& vel) {
-		velocities.front().read_interp(vel.elems(), pos);
-	}
-	
-	template<typename T1>
-	void readDensities(const Vec<3,T1> pos, T * elems) {
-		velocities.front().read_interp(elems, pos);
-	}
-	
-	template<typename T1>
-	void readGradient(const Vec<3,T1> pos, float& vel) {
-		gradient.front().read_interp(&vel, pos);
+	void readGradient(const Vec<3,T1> pos, float& vel) const {
+		gradient.read(pos, &vel);
 	}
 	
 	/// fluid simulation step
@@ -209,17 +238,6 @@ public:
 		velocities.scale(selfdecay);
 		// zero velocities at boundaries:
 		boundary();
-
-		// DENSITIES:
-		// assume new data is in front();
-		// smoothen the new data:
-		densities.diffuse(diffusion, passes);
-		//(diffused data now in densities.front())
-		// and advect:
-		densities.advect(velocities.front());
-		//(advected data now in densities.front())
-		// fade, etc.
-		densities.scale(decay);
 	}
 	
 	void boundary() {
@@ -247,34 +265,164 @@ public:
 	
 	void boundary(BoundaryMode b) { mBoundaryMode = b; }
 	
-	Field3D<T> densities, velocities, gradient;
+	Field3D<T> velocities, gradient;
 	Array boundaries;
 	unsigned passes;
-	T viscocity, diffusion, selfadvection, selfdecay, selfbackgroundnoise, decay;
+	T viscocity, selfadvection, selfdecay, selfbackgroundnoise;
 	rnd::Random<> rng;
 	BoundaryMode mBoundaryMode;
 };
 
 
+// a combination of above classes for simplicity:
+template<typename T=float>
+class FluidField3D : public Fluid3D<T> {
+public:
+	typedef Fluid3D<T> Super;
+
+	FluidField3D(int components, int dim) 
+	:	Super(dim),
+		densities(components, dim),
+		diffusion(0.001),
+		decay(0.98)
+	{}
+	~FluidField3D() {}
+	
+	template<typename T1>
+	void addDensities(const Vec<3,T1> pos, const T * elems) {
+		densities.front().write_interp(elems, pos);
+	}
+	
+	template<typename T1>
+	void readDensities(const Vec<3,T1> pos, T * elems) {
+		densities.front().read_interp(elems, pos);
+	}
+	
+	/// fluid simulation step
+	// TODO: add dt param
+	void update() {
+		// VELOCITIES:
+		Super::update();
+		
+		// DENSITIES:
+		// assume new data is in front();
+		// smoothen the new data:
+		densities.diffuse(diffusion, Super::passes);
+		//(diffused data now in densities.front())
+		// and advect:
+		densities.advect(Super::velocities.front());
+		//(advected data now in densities.front())
+		// fade, etc.
+		densities.scale(decay);
+	}
+	
+	Field3D<T> densities;
+	T diffusion, decay;
+};
 
 // INLINE IMPLEMENTATION //
 
-
+template<typename T>
+inline void Field3D<T>::Kernel3::calculateCenter() {
+	coeffs[C111] = -(
+		coeffs[C022] + coeffs[C122] + coeffs[C222] + 
+		coeffs[C012] + coeffs[C112] + coeffs[C212] + 
+		coeffs[C002] + coeffs[C102] + coeffs[C202] + 
+		
+		coeffs[C021] + coeffs[C121] + coeffs[C221] + 
+		coeffs[C011] +				  coeffs[C211] + 
+		coeffs[C001] + coeffs[C101] + coeffs[C201] + 
+		
+		coeffs[C020] + coeffs[C120] + coeffs[C220] + 
+		coeffs[C010] + coeffs[C110] + coeffs[C210] + 
+		coeffs[C000] + coeffs[C100] + coeffs[C200]
+	);
+}
 
 template<typename T>
-size_t Field3D<T>::index(int x, int y, int z) const {
+inline void Field3D<T>::Kernel3::blur() {
+	zero();
+		
+	// axes:
+	coeffs[Field3D<float>::C010] = 
+	coeffs[Field3D<float>::C012] = 
+	coeffs[Field3D<float>::C212] = 
+	coeffs[Field3D<float>::C210] = 
+	coeffs[Field3D<float>::C121] = 
+	coeffs[Field3D<float>::C101] = 1.;
+		
+	// seedskernel[Field3D::C111] = 0.;	// the center value
+	calculateCenter();
+}
+
+template<typename T>
+inline void Field3D<T>::Kernel3::blur3() {
+	zero();
+	
+	// diagonals (12)
+	coeffs[Field3D<float>::C122] = 
+	coeffs[Field3D<float>::C120] = 
+	coeffs[Field3D<float>::C021] = 
+	coeffs[Field3D<float>::C221] = 	
+	
+	coeffs[Field3D<float>::C012] = 
+	coeffs[Field3D<float>::C010] = 
+	coeffs[Field3D<float>::C210] = 
+	coeffs[Field3D<float>::C212] = 
+	
+	coeffs[Field3D<float>::C102] = 
+	coeffs[Field3D<float>::C100] = 
+	coeffs[Field3D<float>::C001] = 
+	coeffs[Field3D<float>::C201] = 1.;
+	
+	// axes (6):
+	coeffs[Field3D<float>::C110] = 
+	coeffs[Field3D<float>::C112] = 
+	coeffs[Field3D<float>::C011] = 
+	coeffs[Field3D<float>::C211] = 
+	coeffs[Field3D<float>::C121] = 
+	coeffs[Field3D<float>::C101] = 2.;
+		
+	// seedskernel[Field3D::C111] = 0.;	// the center value
+	calculateCenter();
+}
+
+template<typename T>
+inline size_t Field3D<T>::index(int x, int y, int z) const {
 	return	((x&mDimWrap) * stride(0)) +
 			((y&mDimWrap) * stride(1)) +
 			((z&mDimWrap) * stride(2));
 }
 
 template<typename T>
-T& Field3D<T>::cell(int x, int y, int z, int k) {
+inline T& Field3D<T>::cell(int x, int y, int z, int k) {
 	return ptr()[index(x, y, z) + k];
 }
 
 template<typename T>
-void Field3D<T>::setHarmonic(T px, T py, T pz) {
+template<typename T1>
+inline void Field3D<T>::add(const Vec<3,T1> pos, const T * elems) {
+	front().write_interp(elems, pos);
+}
+// single component case:
+template<typename T>
+template<typename T1>
+inline void Field3D<T>::add(const Vec<3,T1> pos, T elem) {
+	front().write_interp(&elem, pos);
+}
+
+template<typename T>
+template<typename T1>
+inline void Field3D<T>::read(const Vec<3,T1> pos, T * elems) const {
+	if (mFront) {
+		mArray0.read_interp(elems, pos);
+	} else {
+		mArray1.read_interp(elems, pos);
+	}
+}
+
+template<typename T>
+inline void Field3D<T>::setHarmonic(T px, T py, T pz) {
 	T vals[3];
 	for (size_t z=0;z<mDim;z++) {
 		vals[2] = sin(pz * M_2PI * z/T(dim()));
@@ -290,12 +438,12 @@ void Field3D<T>::setHarmonic(T px, T py, T pz) {
 }
 
 template<typename T>
-void Field3D<T>::adduniformS(rnd::Random<>& rng, T scalar) {
+inline void Field3D<T>::adduniformS(rnd::Random<>& rng, T scalar) {
 	T * p = ptr();
 	for (unsigned k=0;k<length();k++) p[k] += scalar * rng.uniformS();
 }
 template<typename T>
-void Field3D<T>::adduniform(rnd::Random<>& rng, T scalar) {
+inline void Field3D<T>::adduniform(rnd::Random<>& rng, T scalar) {
 	T * p = ptr();
 	for (unsigned k=0;k<length();k++) p[k] += scalar * rng.uniform();
 }
@@ -423,9 +571,6 @@ inline void Field3D<T>::add(Array& src) {
 		T * in  = (T *)src.data.ptr;
 		T * out = (T *)front().data.ptr;
 		for (int i=0; i<count; i++) {
-			T v = in[i];
-//			if (v > 4. || v < -4.) 
-//				printf("oob %f %i\n", v, i);
 			out[i] += in[i];
 		}
 	} else {
@@ -433,15 +578,12 @@ inline void Field3D<T>::add(Array& src) {
 	}
 }
 
+// Gauss-Seidel relaxation scheme:
 template<typename T>
 inline void Field3D<T> :: diffuse(T diffusion, unsigned passes) {
 	swap(); 
-	diffuse(front(), back(), diffusion, passes);
-}
-
-// Gauss-Seidel relaxation scheme:
-template<typename T>
-inline void Field3D<T> :: diffuse(Array& out, const Array& in, T diffusion, unsigned passes) {
+	Array& out = front();
+	const Array& in = back();
 	const size_t stride0 = out.header.stride[0];
 	const size_t stride1 = out.header.stride[1];
 	const size_t stride2 = out.header.stride[2];
@@ -482,6 +624,104 @@ inline void Field3D<T> :: diffuse(Array& out, const Array& in, T diffusion, unsi
 	#undef INDEX
 }
 
+// Gauss-Seidel relaxation scheme:
+template<typename T>
+inline void Field3D<T> :: diffuse(const Kernel3& kernel, T diffusion, unsigned passes) {
+	swap(); 
+	Array& out = front();
+	const Array& in = back();
+	const T a = -kernel.coeffs[C111]; // kernel center value
+	const T afactor = 1./(1. + a*diffusion);	// balancing factor for relaxation scheme
+	const size_t stride0 = out.header.stride[0];
+	const size_t stride1 = out.header.stride[1];
+	const size_t stride2 = out.header.stride[2];
+	const size_t components = out.header.components;
+	const size_t dim = out.header.dim[0];
+	const size_t dimwrap = dim-1;
+	const char * iptr = in.data.ptr;
+	const char * optr = out.data.ptr;
+	#define INDEX(p, x, y, z) ((T *)(p + ((((x)&dimwrap)*stride0) + (((y)&dimwrap)*stride1) + (((z)&dimwrap)*stride2))))
+	
+	for (unsigned n=0 ; n<passes ; n++) {
+		for (size_t z=0;z<dim;z++) {
+			for (size_t y=0;y<dim;y++) {
+				for (size_t x=0;x<dim;x++) {
+					const T * prev =	INDEX(iptr, x,	y,	z);
+					T *		  next =	INDEX(optr, x,	y,	z);
+					// immediate neighbors
+					const T * v011 = INDEX(optr, x-1, y, z);
+					const T * v211 = INDEX(optr, x+1, y, z);
+					const T * v101 = INDEX(optr, x, y-1, z);
+					const T * v121 = INDEX(optr, x, y+1, z);
+					const T * v110 = INDEX(optr, x, y, z-1);
+					const T * v112 = INDEX(optr, x, y, z+1);
+					// mid corner neighbors
+					const T * v010 = INDEX(optr, x-1, y, z-1);
+					const T * v100 = INDEX(optr, x, y-1, z-1);
+					const T * v120 = INDEX(optr, x, y+1, z-1);
+					const T * v210 = INDEX(optr, x+1, y, z-1);
+					const T * v001 = INDEX(optr, x-1, y-1, z);
+					const T * v201 = INDEX(optr, x+1, y-1, z);
+					const T * v021 = INDEX(optr, x-1, y+1, z);
+					const T * v221 = INDEX(optr, x+1, y+1, z);
+					const T * v012 = INDEX(optr, x-1, y, z+1);
+					const T * v102 = INDEX(optr, x, y-1, z+1);
+					const T * v122 = INDEX(optr, x, y+1, z+1);
+					const T * v212 = INDEX(optr, x+1, y, z+1);
+					// far corner neighbors
+					const T * v000 = INDEX(optr, x-1, y-1, z-1);
+					const T * v200 = INDEX(optr, x+1, y-1, z-1);
+					const T * v020 = INDEX(optr, x-1, y+1, z-1);
+					const T * v220 = INDEX(optr, x+1, y+1, z-1);
+					const T * v002 = INDEX(optr, x-1, y-1, z+1);
+					const T * v202 = INDEX(optr, x+1, y-1, z+1);
+					const T * v022 = INDEX(optr, x-1, y+1, z+1);
+					const T * v222 = INDEX(optr, x+1, y+1, z+1);
+					
+					for (size_t k=0;k<components;k++) {
+						next[k] = afactor * (
+										prev[k] +
+										diffusion * (
+											kernel.coeffs[C022] * v022[k] +
+											kernel.coeffs[C122] * v122[k] +
+											kernel.coeffs[C222] * v222[k] +
+											kernel.coeffs[C012] * v012[k] +
+											kernel.coeffs[C112] * v112[k] +
+											kernel.coeffs[C212] * v212[k] +
+											kernel.coeffs[C002] * v002[k] +
+											kernel.coeffs[C102] * v102[k] +
+											kernel.coeffs[C202] * v202[k] +
+											
+											kernel.coeffs[C021] * v021[k] +
+											kernel.coeffs[C121] * v121[k] +
+											kernel.coeffs[C221] * v221[k] +
+											kernel.coeffs[C011] * v011[k] +
+											// no C111 term!
+											kernel.coeffs[C211] * v211[k] +
+											kernel.coeffs[C001] * v001[k] +
+											kernel.coeffs[C101] * v101[k] +
+											kernel.coeffs[C201] * v201[k] +
+											
+											kernel.coeffs[C020] * v020[k] +
+											kernel.coeffs[C120] * v120[k] +
+											kernel.coeffs[C220] * v220[k] +
+											kernel.coeffs[C010] * v010[k] +
+											kernel.coeffs[C110] * v110[k] +
+											kernel.coeffs[C210] * v210[k] +
+											kernel.coeffs[C000] * v000[k] +
+											kernel.coeffs[C100] * v100[k] +
+											kernel.coeffs[C200] * v200[k]
+										)
+									);
+					}
+					
+				}
+			}
+		}
+	}
+	#undef INDEX
+}
+
 /*
 	The solver uses a Merhstellen kernel:
 	0, 1, 0		1, b, 1		0, 1, 0
@@ -492,14 +732,14 @@ inline void Field3D<T> :: diffuse(Array& out, const Array& in, T diffusion, unsi
 	b = 2, a = 24
 */
 template<typename T>
-inline void Field3D<T> :: relax( double a, int iterations) {
+inline void Field3D<T> :: relax( double diffusion, int iterations) {
 	char * old = front().data.ptr;
 	char * out = back().data.ptr;
 	const uint32_t comps = components();
 #ifdef NoMerhstellen
-	const double c = 1./(1. + 6.*a); 
+	const double c = 1./(1. + 6.*diffusion); 
 #else
-	const double c = 1./(1. + 24.*a); 
+	const double c = 1./(1. + 24.*diffusion); 
 #endif
 	for (int iter=0; iter<iterations; iter++) {
 		for (size_t z=0;z<mDim;z++) {
@@ -516,7 +756,7 @@ inline void Field3D<T> :: relax( double a, int iterations) {
 					for (unsigned k=0; k<comps; k++) {
 						out[idx+k] = c * (
 										old[idx+k] +
-										a * (	
+										diffusion * (	
 											out[x0+k] + out[x1+k] +
 											out[y0+k] + out[y1+k] +
 											out[z0+k] + out[z1+k]
@@ -547,7 +787,7 @@ inline void Field3D<T> :: relax( double a, int iterations) {
 					for (unsigned k=0; k<comps; k++) {
 						out[idx+k] = c * (
 										old[idx+k] +
-										a * (2.*(	
+										diffusion * (2.*(	
 											out[idx011+k] + out[idx211+k] +
 											out[idx101+k] + out[idx121+k] +
 											out[idx110+k] + out[idx112+k]

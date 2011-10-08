@@ -156,6 +156,7 @@ public:
 
 	///! Check if this Array conforms to an ArrayHeader format
 	bool isFormat(const AlloArrayHeader &h2) const;
+	bool isFormat(const Array &src) const { return isFormat(src.header); }
 
 	///! verify that Array contains data
 	bool hasData() const { return data.ptr != NULL; }

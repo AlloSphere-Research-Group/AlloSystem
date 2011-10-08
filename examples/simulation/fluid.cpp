@@ -15,37 +15,53 @@ Graham Wakefield 2011
 
 using namespace al;
 
-// create a fluid with 3 components per voxel, on a 32x32x32 grid:
-Fluid<float> fluid(3, 32);
+// create a fluid on a 32x32x32 grid:
+Fluid3D<float> fluid(32);
+
+// create an intensity field (on a 32x32x32 grid) 
+// to be driven around:
+Field3D<float> intensities(3, 32);
 
 // textures to show the fluid densities & velocities
-Texture densityTex, velocityTex;
+Texture intensityTex, velocityTex;
 
 Graphics gl;
 Mesh mesh;
 ShaderProgram shaderP;
 Shader shaderV, shaderF;
 
-static const char * vLight = AL_STRINGIFY(
-uniform sampler3D tex; 
-varying vec3 vel;
+static const char * srcV = AL_STRINGIFY(
+uniform sampler3D velocityTex; 
+uniform sampler3D intensityTex; 
+varying vec3 velocity;
+varying vec3 intensity;
 void main(){
 	vec3 xyz = gl_Vertex.xyz / 32.; 
-	vel = texture3D(tex, xyz).rgb;
+	velocity = texture3D(velocityTex, xyz).rgb;
+	// Array components = 2 defaults to GL_LUMINANCE_ALPHA:
+	intensity = texture3D(intensityTex, xyz).rgb;
 	vec4 vertex1 = gl_Vertex;
 	vec2 texcoord0 = vec2(gl_MultiTexCoord0);
 	if (texcoord0.s > 0.) {
-		vertex1 += vec4(vel, 0);
+		// displace by length:
+		vertex1 += vec4(velocity, 0);
+	} else {
+		// displace with width:
+		float displace = (texcoord0.t - 0.5);
+		vec3 axis = cross(normalize(velocity), vec3(0, 0, -1));
+		vertex1 += vec4(displace * axis, 0);
 	}
+
 	gl_Position = gl_ModelViewProjectionMatrix * vertex1;
 }
 );
 
-static const char * fLight = AL_STRINGIFY(
-varying vec3 vel;
+static const char * srcF = AL_STRINGIFY(
+varying vec3 velocity;
+varying vec3 intensity;
 void main() {
-	float mag = length(vel.xyz);
-	gl_FragColor = vec4(vel+0.5, mag);
+	float mag = 0.1+length(velocity);
+	gl_FragColor = vec4(0.1+intensity, mag);
 }
 );
 
@@ -54,12 +70,12 @@ struct MyWindow : public Window {
 	bool onCreate(){
 	
 		// reconfigure textures based on arrays:
-		densityTex.submit(fluid.densities.front(), true);
+		intensityTex.submit(intensities.front(), true);
 		velocityTex.submit(fluid.velocities.front(), true);
 		
 		// shader method:
-		shaderV.source(vLight, Shader::VERTEX).compile();
-		shaderF.source(fLight, Shader::FRAGMENT).compile();
+		shaderV.source(srcV, Shader::VERTEX).compile();
+		shaderF.source(srcF, Shader::FRAGMENT).compile();
 		shaderP.attach(shaderV).attach(shaderF).link();
 		shaderV.printLog();
 		shaderF.printLog();
@@ -67,7 +83,7 @@ struct MyWindow : public Window {
 
 		// create rendering mesh of lines
 		mesh.reset();
-		mesh.primitive(Graphics::LINES);
+		mesh.primitive(Graphics::TRIANGLES);
 		for (int x=0; x<32; x++) {
 		for (int y=0; y<32; y++) {
 		for (int z=0; z<32; z++) {
@@ -76,7 +92,9 @@ struct MyWindow : public Window {
 			// 'start' and 'end' vertices
 			mesh.texCoord(0, 0);
 			mesh.vertex(x, y, z);
-			mesh.texCoord(1, 1);	
+			mesh.texCoord(0, 1);	
+			mesh.vertex(x, y, z);
+			mesh.texCoord(1, 0);	
 			mesh.vertex(x, y, z);	
 		}}}
 		
@@ -98,14 +116,31 @@ struct MyWindow : public Window {
 		// add some forces:
 		float t = MainLoop::now() * 0.25;
 		float r = 20;
-		fluid.addForce(Vec3f(12, 12, 16), Vec3f(r*cos(t), r*sin(t), 0));
-		fluid.addForce(Vec3f(20, 20, 16), Vec3f(-r*cos(t*2), -r*sin(t*2), 0));
+		fluid.addVelocity(Vec3f(12, 12, 16), Vec3f(r*cos(t), r*sin(t), 1));
+		fluid.addVelocity(Vec3f(20, 20, 16), Vec3f(-r*cos(t*2), -r*sin(t*2), 0));
+		fluid.addVelocity(Vec3f(16, 16, 20), Vec3f(0, -r*cos(t*3), -r*sin(t*3)));
+		
+		// add some intensities:
+		float v = 4;
+		intensities.add(Vec3f(12, 20, 16), Vec3f(v, 0, 0).elems());
+		intensities.add(Vec3f(20, 12, 16), Vec3f(0, v, 0).elems());
+		intensities.add(Vec3f(16, 16, 12), Vec3f(0, 0, v).elems());
+
 		
 		// run a fluid step:
 		fluid.update();
 		
+		// diffuse the intensities:
+		intensities.diffuse();
+		
+		// use the fluid to advect the intensities:
+		intensities.advect(fluid.velocities.front(), 3.);
+		
+		// some decay
+		intensities.scale(0.999);
+		
 		// update texture data:
-		densityTex.submit(fluid.densities.front());
+		intensityTex.submit(intensities.front());
 		velocityTex.submit(fluid.velocities.front());
 		
 		// draw it:
@@ -113,10 +148,16 @@ struct MyWindow : public Window {
 		gl.blendModeAdd();
 		gl.lineWidth(0.5);
 		
+		gl.polygonMode(gl.LINE);
+		
 		shaderP.begin();
-		velocityTex.bind();
+		shaderP.uniform("velocityTex", 0);
+		shaderP.uniform("intensityTex", 1);
+		velocityTex.bind(0);
+		intensityTex.bind(1);
 		gl.draw(mesh);
-		velocityTex.unbind();
+		intensityTex.unbind(1);
+		velocityTex.unbind(0);
 		shaderP.end();
 
 		return true;

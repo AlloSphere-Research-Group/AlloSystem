@@ -152,6 +152,9 @@ public:
 	void allocate(unsigned align=1);
 	
 	void deallocate();
+	
+	/// debug printing
+	void print();
 
 protected:
 //	GLint mLevel;	// TODO: on a rainy day...
@@ -395,12 +398,18 @@ inline void Texture :: deallocate() {
 }
 
 inline Texture& Texture :: wrap(Wrap S, Wrap T, Wrap R){
-		if(S!=mWrapS || T!=mWrapT || R!=mWrapR){
-			mWrapS = S; mWrapT = T; mWrapR = R;
-			mParamsUpdated = true;
-		}
-		return *this;
+	if(S!=mWrapS || T!=mWrapT || R!=mWrapR){
+		mWrapS = S; mWrapT = T; mWrapR = R;
+		mParamsUpdated = true;
 	}
+	return *this;
+}
+
+inline void Texture :: print() {
+	printf("Texture (target=%X(%dD), type=%X(%X), format=%X, align=(%d))\n", mTarget, mArray.dimcount(), type(), mArray.type(), mFormat, mArray.alignment());
+	mArray.print();
+
+}
 
 } // al::
 
