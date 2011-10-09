@@ -298,6 +298,7 @@ inline Array::Array() : AlloArray() {
 	header.type= 0;
 	header.components = 1;
 	header.dimcount = 0;
+	header.dim[0] = 0; header.dim[1] = 0; header.dim[2] = 0;
 }
 
 inline Array& Array::operator= (const AlloArray& cpy) {

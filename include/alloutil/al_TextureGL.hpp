@@ -115,7 +115,7 @@ public:
 	
 	virtual void onCreate() {
 		if (mID == 0) {
-			printf("TextureGL onCreate\n");
+			//printf("TextureGL onCreate\n");
 		
 			glGenTextures(1, (GLuint *)&mID);
 			glBindTexture(mTarget, id());
@@ -235,7 +235,7 @@ public:
 					return;
 			}
 			
-			printf("configured to %dD=%X, format %X, align %d\n", src.dimcount(), mTarget, mInternalFormat, src.alignment());
+			//printf("configured to %dD=%X, format %X, align %d\n", src.dimcount(), mTarget, mInternalFormat, src.alignment());
 		} 
 		else {
 			if (src.width() != width()) {
@@ -348,7 +348,7 @@ public:
 //			mInternalFormat = format;
 //		}
 
-		printf("submitted texture data %p\n", pixels);
+		//printf("submitted texture data %p\n", pixels);
 		
 		glBindTexture(mTarget, 0);
 	}
