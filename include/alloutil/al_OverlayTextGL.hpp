@@ -68,7 +68,6 @@ public:
 			gl.translate(0, -font.size(), 0);
 			//gl.translate(0.5, 0.5, 0);
 			font.render(gl, *it);
-			::printf("rendered\n");
 		}
 		gl.popMatrix();
 		if (lines.size() > mMaxlines) lines.clear();
