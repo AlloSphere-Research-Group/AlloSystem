@@ -59,7 +59,7 @@ void Texture :: determineTarget(){
 
 void Texture :: quad(Graphics& gl, double w, double h, double x0, double y0){
 	bind();
-	gl.color(1, 1, 1, 1);
+	//gl.color(1, 1, 1, 1);
 	gl.pushMatrix();
 	gl.translate(x0, y0, 0);
 	gl.scale(w, h, 1);
