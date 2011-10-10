@@ -61,23 +61,23 @@ public:
 	}
 	
 	void draw() {
+		while (lines.size() > mMaxlines) lines.pop_front();
 		gl.pushMatrix();
 		// because OpenGL/font is upside-down:
 		gl.scale(1, -1, 1);
-		for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end(); it++) {
+		for (std::list<std::string>::iterator it = lines.begin(); it != lines.end(); it++) {
 			gl.translate(0, -font.size(), 0);
 			//gl.translate(0.5, 0.5, 0);
 			font.render(gl, *it);
 		}
 		gl.popMatrix();
-		if (lines.size() > mMaxlines) lines.clear();
 	}
 	
 	void clear() {
 		lines.clear();
 	}
 	
-	std::vector<std::string> lines;
+	std::list<std::string> lines;
 	Graphics gl;
 	Font font;
 	int mMaxlines;
