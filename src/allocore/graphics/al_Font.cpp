@@ -184,7 +184,7 @@ protected:
 
 
 
-Font :: Font(Graphics& g, std::string filename, int font_size, bool anti_aliased)
+Font :: Font(std::string filename, int font_size, bool anti_aliased)
 :	mFontSize(font_size),
 	mAntiAliased(anti_aliased),
 //	mTex(g, 192, 192, Graphics::LUMINANCE, Graphics::UCHAR)

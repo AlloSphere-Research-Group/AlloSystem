@@ -45,8 +45,8 @@ namespace al {
 class OverlayText {
 public:
 	
-	OverlayText(Graphics& gl, std::string fontfile)
-	: font(gl, fontfile) {}
+	OverlayText(std::string fontfile, int maxlines = 20)
+	: font(fontfile), mMaxlines(maxlines) {}
 	
 	void printf(std::string line) {
 		lines.push_back(line);
@@ -60,16 +60,18 @@ public:
 		lines.push_back(line);
 	}
 	
-	void draw(Graphics& gl) {
+	void draw() {
 		gl.pushMatrix();
 		// because OpenGL/font is upside-down:
 		gl.scale(1, -1, 1);
 		for (std::vector<std::string>::iterator it = lines.begin(); it != lines.end(); it++) {
 			gl.translate(0, -font.size(), 0);
+			//gl.translate(0.5, 0.5, 0);
 			font.render(gl, *it);
+			::printf("rendered\n");
 		}
 		gl.popMatrix();
-		lines.clear();
+		if (lines.size() > mMaxlines) lines.clear();
 	}
 	
 	void clear() {
@@ -77,8 +79,9 @@ public:
 	}
 	
 	std::vector<std::string> lines;
-	
+	Graphics gl;
 	Font font;
+	int mMaxlines;
 };
 
 } // al::

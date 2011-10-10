@@ -55,7 +55,7 @@ public:
 		int y_offset;
 	};
 
-	Font(Graphics& g, std::string filename, int font_size=10, bool anti_aliased=true);
+	Font(std::string filename, int font_size=10, bool anti_aliased=true);
 	~Font();
 
 	// Get metrics of a particular character (idx 0..255)
