@@ -764,17 +764,17 @@ public:
 // Non-member binary arithmetic operations
 
 // Vec
-template <int N, class T, class S>
-inline Vec<N,T> operator + (const S& s, const Vec<N,T>& v){ return  v+s; }
+template <int N, class T>
+inline Vec<N,T> operator + (const T& s, const Vec<N,T>& v){ return  v+s; }
 
-template <int N, class T, class S>
-inline Vec<N,T> operator - (const S& s, const Vec<N,T>& v){ return -v+s; }
+template <int N, class T>
+inline Vec<N,T> operator - (const T& s, const Vec<N,T>& v){ return -v+s; }
 
-template <int N, class T, class S>
-inline Vec<N,T> operator * (const S& s, const Vec<N,T>& v){ return  v*s; }
+template <int N, class T>
+inline Vec<N,T> operator * (const T& s, const Vec<N,T>& v){ return  v*s; }
 
-template <int N, class T, class S>
-inline Vec<N,T> operator / (const S& s, const Vec<N,T>& v){
+template <int N, class T>
+inline Vec<N,T> operator / (const T& s, const Vec<N,T>& v){
 	Vec<N,T> r; IT(N){ r[i] = s/v[i]; } return r;
 }
 
@@ -784,14 +784,14 @@ inline T abs(const Vec<N,T>& v){ return v.mag(); }
 
 
 // Mat
-template <int N, class T, class S>
-inline Mat<N,T> operator + (const S& s, const Mat<N,T>& v){ return  v+s; }
+template <int N, class T>
+inline Mat<N,T> operator + (const T& s, const Mat<N,T>& v){ return  v+s; }
 
-template <int N, class T, class S>
-inline Mat<N,T> operator - (const S& s, const Mat<N,T>& v){ return -v+s; }
+template <int N, class T>
+inline Mat<N,T> operator - (const T& s, const Mat<N,T>& v){ return -v+s; }
 
-template <int N, class T, class S>
-inline Mat<N,T> operator * (const S& s, const Mat<N,T>& v){ return  v*s; }
+template <int N, class T>
+inline Mat<N,T> operator * (const T& s, const Mat<N,T>& v){ return  v*s; }
 
 
 // Basic Vec/Mat Arithmetic

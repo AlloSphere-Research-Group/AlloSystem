@@ -184,17 +184,17 @@ TEM Complex<T> pow(const Complex<T>& b, const T& e){ return b.pow(e); }
 //TEM Complex<T> sin(const Complex<T>& v){ return v.sin(); }
 #undef TEM
 
-template <class T, class S>
-inline Complex<T> operator + (const S& r, const Complex<T>& c){ return  c+r; }
+template <class T>
+inline Complex<T> operator + (const T& r, const Complex<T>& c){ return  c+r; }
 
-template <class T, class S>
-inline Complex<T> operator - (const S& r, const Complex<T>& c){ return -c+r; }
+template <class T>
+inline Complex<T> operator - (const T& r, const Complex<T>& c){ return -c+r; }
 
-template <class T, class S>
-inline Complex<T> operator * (const S& r, const Complex<T>& c){ return  c*r; }
+template <class T>
+inline Complex<T> operator * (const T& r, const Complex<T>& c){ return  c*r; }
 
-template <class T, class S>
-inline Complex<T> operator / (const S& r, const Complex<T>& c){ return  c.conj()*(r/c.norm()); }
+template <class T>
+inline Complex<T> operator / (const T& r, const Complex<T>& c){ return  c.conj()*(r/c.norm()); }
 
 
 template <class VecN, class T>
