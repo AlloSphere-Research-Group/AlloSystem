@@ -41,6 +41,9 @@ LDFLAGS		:= $(addprefix -L, $(LIB_DIRS) $(BUILD_DIR)/lib) $(LDFLAGS)
 LINK_LIBS_PATH	= $(wildcard $(BUILD_DIR)lib/*.a)
 LINK_LIBS_FLAGS	=
 
+-include externals/gamma/Makefile.external
+-include externals/glv/Makefile.external
+
 #--------------------------------------------------------------------------
 # Rules
 #--------------------------------------------------------------------------
@@ -123,6 +126,7 @@ externals: gamma glv
 
 gamma glv:
 	@$(MAKE) -C externals/$@ install DESTDIR=../../$(BUILD_DIR)
+	@$(MAKE) -C externals/$@ external
 
 
 #$(EXTRA_MODULES):
