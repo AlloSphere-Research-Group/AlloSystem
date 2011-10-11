@@ -155,6 +155,10 @@ public:
 	
 	/// debug printing
 	void print();
+	
+	/// mark pixels as dirtied (e.g. if modified array contents)
+	/// to ensure they get submitted on the next bind():
+	void dirty() { mPixelsUpdated = true; }
 
 protected:
 //	GLint mLevel;	// TODO: on a rainy day...
@@ -254,8 +258,52 @@ inline Texture& Texture :: wrap(Wrap S, Wrap T, Wrap R){
 }
 
 inline void Texture :: print() {
-	printf("Texture (target=%X(%dD), type=%X(%X), format=%X, align=(%d))\n", mTarget, mArray.dimcount(), type(), mArray.type(), mFormat, mArray.alignment());
-	mArray.print();
+	std::string target = "?";
+	std::string format = "?";
+	std::string type = "?";
+	
+	switch (mTarget) {
+		case TEXTURE_1D: 
+			target = "GL_TEXTURE_1D"; 
+			printf("Texture target=%s, %d(%d), ", target.c_str(), width(), mArray.width());
+			break;
+		case TEXTURE_2D: 
+			target = "GL_TEXTURE_2D";
+			printf("Texture target=%s, %dx%d(%dx%d), ", target.c_str(), width(), height(), mArray.width(), mArray.height()); 
+			break;
+		case TEXTURE_3D: 
+			target = "GL_TEXTURE_3D"; 
+			printf("Texture target=%s, %dx%dx%d(%dx%dx%d), ", target.c_str(), width(), height(), depth(), mArray.width(), mArray.height(), mArray.depth());
+			break;
+		default: break;
+	}
+	switch (mFormat) {
+		case Graphics::DEPTH_COMPONENT: format="GL_DEPTH_COMPONENT"; break;
+		case Graphics::LUMINANCE: format="GL_LUMINANCE"; break;
+		case Graphics::LUMINANCE_ALPHA: format="GL_LUMINANCE_ALPHA"; break;
+		case Graphics::RED: format="GL_RED"; break;
+		case Graphics::GREEN: format="GL_GREEN"; break;
+		case Graphics::BLUE: format="GL_BLUE"; break;
+		case Graphics::ALPHA: format="GL_ALPHA"; break;
+		case Graphics::RGB: format="GL_RGB"; break;
+		case Graphics::RGBA: format="GL_RGBA"; break;
+		case Graphics::BGRA: format="GL_BGRA"; break;		
+		default: break;
+	}	
+	switch (mType) {
+		case GL_BYTE: type = "GL_BYTE"; break;
+		case GL_UNSIGNED_BYTE: type = "GL_UNSIGNED_BYTE"; break;
+		case GL_SHORT: type = "GL_SHORT"; break;
+		case GL_UNSIGNED_SHORT: type = "GL_UNSIGNED_SHORT"; break;
+		case GL_INT: type = "GL_INT"; break;
+		case GL_UNSIGNED_INT: type = "GL_UNSIGNED_INT"; break;
+		case GL_FLOAT: type = "GL_FLOAT"; break;
+		case GL_DOUBLE: type = "GL_DOUBLE"; break;
+		default: break;
+	}
+	
+	printf("type=%s(%s), format=%s(%d), unpack=%d(align=%d))\n", type.c_str(), allo_type_name(mArray.type()), format.c_str(), mArray.components(), mUnpack, mArray.alignment());
+	//mArray.print();
 
 }
 
