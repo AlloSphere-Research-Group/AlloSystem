@@ -132,7 +132,14 @@ public:
 	/// return reference to the internal CPU-side cache
 	/// DO NOT MODIFY THE LAYOUT OR DIMENSIONS OF THIS ARRAY
 	Array& array() { return mArray; }
+
+	/// Get raw pointer to client-side pixel data
+	template<class T> T * data(){ return (T*)(data()); }
+	char * data(){ return array().data.ptr; }
 	
+	/// Flags resubmission of pixel data upon next bind
+	Texture& updatePixels(){ mPixelsUpdated=true; return *this; }
+
 	/// Submit the texture using an Array as source 
 	/// NOTE: the graphics context (e.g. Window) must have been created
 	/// if reconfigure is true, 
