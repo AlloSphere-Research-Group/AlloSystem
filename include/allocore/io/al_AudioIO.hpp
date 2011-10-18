@@ -261,11 +261,12 @@ public:
 
 	audioCallback callback;						///< User specified callback function.
 	
-	/// Add an AudioCallback handler (internal callback is always called first):
-	AudioIO& append(AudioCallback * v);		
-	AudioIO& prepend(AudioCallback * v);
-	/// Remove all input event handlers matching argument:
-	AudioIO& remove(AudioCallback * v);
+	/// Add an AudioCallback handler (internal callback is always called first)
+	AudioIO& append(AudioCallback& v);		
+	AudioIO& prepend(AudioCallback& v);
+
+	/// Remove all input event handlers matching argument
+	AudioIO& remove(AudioCallback& v);
 
 	bool autoZeroOut() const { return mAutoZeroOut; }
 	int channels(bool forOutput) const;

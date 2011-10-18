@@ -284,19 +284,19 @@ void AudioIO::init(){
 	mImpl->setOutDeviceChans(0);
 }
 
-AudioIO& AudioIO::append(AudioCallback * v){
-	mAudioCallbacks.push_back(v);
+AudioIO& AudioIO::append(AudioCallback& v){
+	mAudioCallbacks.push_back(&v);
 	return *this;
 }
 
-AudioIO& AudioIO::prepend(AudioCallback * v){
-	mAudioCallbacks.insert(mAudioCallbacks.begin(), v);
+AudioIO& AudioIO::prepend(AudioCallback& v){
+	mAudioCallbacks.insert(mAudioCallbacks.begin(), &v);
 	return *this;
 }
 
-AudioIO& AudioIO::remove(AudioCallback * v){
+AudioIO& AudioIO::remove(AudioCallback& v){
 	// the proper way to do it:
-	mAudioCallbacks.erase(std::remove(mAudioCallbacks.begin(), mAudioCallbacks.end(), v), mAudioCallbacks.end());
+	mAudioCallbacks.erase(std::remove(mAudioCallbacks.begin(), mAudioCallbacks.end(), &v), mAudioCallbacks.end());
 	return *this;
 }
 
