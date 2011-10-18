@@ -393,69 +393,6 @@
 			remoteGlobalIDString = 36035DB813037E8D001E9BA9;
 			remoteInfo = "make allocore";
 		};
-		36FE0D7F13844FA4003AE7BE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 36FE0D1513844FA4003AE7BE /* gamma.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 16F9A1B50D0DB74000721CC7;
-			remoteInfo = testContainers;
-		};
-		36FE0D8113844FA4003AE7BE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 36FE0D1513844FA4003AE7BE /* gamma.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 16EACA910D15BE150044B3CB;
-			remoteInfo = testConversion;
-		};
-		36FE0D8313844FA4003AE7BE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 36FE0D1513844FA4003AE7BE /* gamma.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 16FC1BBD0DED18E000B9AD13;
-			remoteInfo = testDFT;
-		};
-		36FE0D8513844FA4003AE7BE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 36FE0D1513844FA4003AE7BE /* gamma.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 16F76C740D12058C001C3DCA;
-			remoteInfo = testEnvelope;
-		};
-		36FE0D8713844FA4003AE7BE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 36FE0D1513844FA4003AE7BE /* gamma.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1681B95613392AF200056E42;
-			remoteInfo = testFilter;
-		};
-		36FE0D8F13844FA4003AE7BE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 36FE0D1513844FA4003AE7BE /* gamma.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 16AEEFBE0D3C41AA00AFD3A4;
-			remoteInfo = testOscillator;
-		};
-		36FE0D9513844FA4003AE7BE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 36FE0D1513844FA4003AE7BE /* gamma.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 16F9A1850D0DB63E00721CC7;
-			remoteInfo = testScalar;
-		};
-		36FE0D9713844FA4003AE7BE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 36FE0D1513844FA4003AE7BE /* gamma.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 16F76AD60D11E01C001C3DCA;
-			remoteInfo = testTable;
-		};
-		36FE0D9913844FA4003AE7BE /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 36FE0D1513844FA4003AE7BE /* gamma.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 16EACAA90D15BE960044B3CB;
-			remoteInfo = testTimer;
-		};
 		36FE0D9D13844FA4003AE7BE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 36FE0D1513844FA4003AE7BE /* gamma.xcodeproj */;
@@ -583,6 +520,7 @@
 		16AA9609118F774800B98EC3 /* al_Texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Texture.cpp; sourceTree = "<group>"; };
 		16AA960B118F775E00B98EC3 /* al_Texture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Texture.hpp; sourceTree = "<group>"; };
 		16AA967E118F7D5700B98EC3 /* al_Shader.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Shader.hpp; sourceTree = "<group>"; };
+		16AC482D144D2CED002472D3 /* al_Mat.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Mat.hpp; sourceTree = "<group>"; };
 		16AC529711628D0E0076AA8B /* unitTests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = unitTests; sourceTree = BUILT_PRODUCTS_DIR; };
 		16AC52A011628D4D0076AA8B /* utIOAudioIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utIOAudioIO.cpp; sourceTree = "<group>"; };
 		16AC52A111628D4D0076AA8B /* utAllocore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utAllocore.h; sourceTree = "<group>"; };
@@ -1928,6 +1866,7 @@
 				16FFCB53118BAA8300D4C1BD /* al_Generators.hpp */,
 				16BC66A3117770BF002A0C18 /* al_Interpolation.hpp */,
 				16B74EFD1266B38900D66B0C /* al_Interval.hpp */,
+				16AC482D144D2CED002472D3 /* al_Mat.hpp */,
 				360C404E11D32FED002FE91F /* al_Matrix4.hpp */,
 				16D46542118F4ADA0039A84C /* al_Plane.hpp */,
 				16FFCB51118BA96500D4C1BD /* al_Random.hpp */,
@@ -3346,15 +3285,6 @@
 		36FE0D1613844FA4003AE7BE /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				36FE0D8013844FA4003AE7BE /* testContainers */,
-				36FE0D8213844FA4003AE7BE /* testConversion */,
-				36FE0D8413844FA4003AE7BE /* testDFT */,
-				36FE0D8613844FA4003AE7BE /* testEnvelope */,
-				36FE0D8813844FA4003AE7BE /* testFilter */,
-				36FE0D9013844FA4003AE7BE /* testOscillator */,
-				36FE0D9613844FA4003AE7BE /* testScalar */,
-				36FE0D9813844FA4003AE7BE /* testTable */,
-				36FE0D9A13844FA4003AE7BE /* testTimer */,
 				36FE0D9E13844FA4003AE7BE /* unitTests */,
 				36FE0DA013844FA4003AE7BE /* libgamma.dylib */,
 				36FE0DA213844FA4003AE7BE /* libgamma.a */,
@@ -3819,69 +3749,6 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		36FE0D8013844FA4003AE7BE /* testContainers */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = testContainers;
-			remoteRef = 36FE0D7F13844FA4003AE7BE /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		36FE0D8213844FA4003AE7BE /* testConversion */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = testConversion;
-			remoteRef = 36FE0D8113844FA4003AE7BE /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		36FE0D8413844FA4003AE7BE /* testDFT */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = testDFT;
-			remoteRef = 36FE0D8313844FA4003AE7BE /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		36FE0D8613844FA4003AE7BE /* testEnvelope */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = testEnvelope;
-			remoteRef = 36FE0D8513844FA4003AE7BE /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		36FE0D8813844FA4003AE7BE /* testFilter */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = testFilter;
-			remoteRef = 36FE0D8713844FA4003AE7BE /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		36FE0D9013844FA4003AE7BE /* testOscillator */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = testOscillator;
-			remoteRef = 36FE0D8F13844FA4003AE7BE /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		36FE0D9613844FA4003AE7BE /* testScalar */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = testScalar;
-			remoteRef = 36FE0D9513844FA4003AE7BE /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		36FE0D9813844FA4003AE7BE /* testTable */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = testTable;
-			remoteRef = 36FE0D9713844FA4003AE7BE /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		36FE0D9A13844FA4003AE7BE /* testTimer */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = testTimer;
-			remoteRef = 36FE0D9913844FA4003AE7BE /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		36FE0D9E13844FA4003AE7BE /* unitTests */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
