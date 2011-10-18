@@ -50,6 +50,7 @@
 #include "allocore/math/al_Generators.hpp"
 #include "allocore/math/al_Interpolation.hpp"
 #include "allocore/math/al_Interval.hpp"
+#include "allocore/math/al_Mat.hpp"
 #include "allocore/math/al_Plane.hpp"
 #include "allocore/math/al_Quat.hpp"
 #include "allocore/math/al_Random.hpp"

@@ -36,6 +36,7 @@
 */
 
 #include "allocore/math/al_Constants.hpp"
+#include "allocore/math/al_Mat.hpp"
 #include "allocore/math/al_Vec.hpp"
 
 #define QUAT_ACCURACY_MAX (1.000001)

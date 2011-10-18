@@ -36,6 +36,7 @@
 
 #include "allocore/math/al_Constants.hpp"
 #include "allocore/math/al_Quat.hpp"
+#include "allocore/math/al_Mat.hpp"
 #include "allocore/math/al_Vec.hpp"
 
 namespace al {
