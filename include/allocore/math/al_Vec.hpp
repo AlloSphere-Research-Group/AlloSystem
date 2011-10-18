@@ -343,7 +343,7 @@ public:
 	
 	/// Reflect vector around line
 	Vec reflect(const Vec& normal) {
-		return this - (2 * dot(normal) * normal);
+		return (*this) - (T(2) * dot(normal) * normal);
 	}
 
 	/// Returns closest vector on unit N-sphere
