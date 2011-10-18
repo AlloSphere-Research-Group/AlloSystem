@@ -336,5 +336,28 @@ int addWireBox(Mesh& m, float w, float h, float d){
 }
 
 
+int addSurface(Mesh& m, int Nx, int Ny, float width, float height){
+	int Nv = m.vertices().size();
+
+	for(int j=0; j<Ny; ++j){ float y=(float(j)/(Ny-1) - 0.5f) * height;
+	for(int i=0; i<Nx; ++i){ float x=(float(i)/(Nx-1) - 0.5f) * width;
+		m.vertex(x, y);
+	}}
+
+	// Note: the start and end points of each row are duplicated to create
+	// degenerate triangles.
+	for(int j=0; j<Ny-1; ++j){
+		m.index(j*Nx + Nv);
+		for(int i=0; i<Nx; ++i){
+			int idx = j*Nx + i + Nv;
+			m.index(idx);
+			m.index(idx+Nx);
+		}
+		int idx = m.indices().last();
+		m.index(idx);
+	}
+	return Nx*Ny;
+}
+
 
 }

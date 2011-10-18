@@ -68,6 +68,11 @@ int addSphere(Mesh& m, double radius=1, int slices=8, int stacks=8);
 int addWireBox(Mesh& m, float width, float height, float depth);
 inline int addWireBox(Mesh& m, float size=1){ return addWireBox(m,size,size,size); }
 
+
+/// Add a tessellated rectangular surface; render with triangle strip
+int addSurface(Mesh& m, int dimX, int dimY, float width=2, float height=2);
+
+
 } // al::
 
 #endif
