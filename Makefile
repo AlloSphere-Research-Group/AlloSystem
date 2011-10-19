@@ -68,7 +68,8 @@ endif
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS): allocore alloutil
 #	@echo $(LINK_LIBS_FLAGS)
-	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LDFLAGS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH)
+#	@echo $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS)
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./$(*F)
 endif
@@ -138,7 +139,6 @@ gamma glv:
 # Include files are copied into DESTDIR/include/LIB_NAME
 # Library files are copied into DESTDIR/lib
 install: allocore
-
 #	copy all header files from local build directory to destination
 	@for v in `cd $(BUILD_DIR)/include && find * -type d ! -path '*.*'`; do \
 		$(INSTALL) -d $(DESTDIR)/include/$$v; \
@@ -176,3 +176,4 @@ clean:
 # Build unit tests
 test: allocore external
 	@$(MAKE) -C $(TEST_DIR) test
+
