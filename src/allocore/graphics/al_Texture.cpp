@@ -24,7 +24,7 @@ Texture :: Texture(unsigned width, unsigned height, Graphics::Format format, Gra
 {
 	resetArray(mUnpack);
 	
-	printf("created Texture %p\n", this);
+	//printf("created Texture %p\n", this);
 }
 
 Texture :: Texture(unsigned width, unsigned height, unsigned depth, Graphics::Format format, Graphics::DataType type)
@@ -47,7 +47,7 @@ Texture :: Texture(unsigned width, unsigned height, unsigned depth, Graphics::Fo
 {
 	resetArray(mUnpack);
 	
-	printf("created Texture %p\n", this);
+	//printf("created Texture %p\n", this);
 }
 
 void Texture :: determineTarget(){
@@ -134,7 +134,7 @@ void Texture :: allocate(const Array& src, bool reconfigure) {
 	
 	if (reconfigure) {
 		
-		printf("allocating & reconfiguring %p from\n", this);
+		//printf("allocating & reconfiguring %p from\n", this);
 		src.print();
 		
 		// reconfigure texture from array:
