@@ -78,7 +78,7 @@ void Texture :: quad(Graphics& gl, double w, double h, double x0, double y0){
 }
 
 void Texture :: resetArray(unsigned align) {
-	printf("resetArray %p\n", this);
+	//printf("resetArray %p\n", this);
 	deallocate();
 	
 	// reconfigure the internal array according to the current settings:
@@ -176,19 +176,19 @@ void Texture :: allocate(const Array& src, bool reconfigure) {
 		mArray.format(src);
 		
 		
-		printf("allocating & reconfigured %p\n", this);
+		//printf("allocating & reconfigured %p\n", this);
 		mArray.print();
 		
 		// re-allocate array:
 		allocate(src.alignment());
 		
-		printf("allocated & reconfigured %p\n", this);
+		//printf("allocated & reconfigured %p\n", this);
 		mArray.print();
 		
 	} else {
 		
 		// TODO: read the source into the dst without changing dst layout
-		printf("allocating without reconfiguring %p\n", this);
+		//printf("allocating without reconfiguring %p\n", this);
 		
 		// ensure that array matches texture:
 		if (!src.isFormat(mArray.header)) {
@@ -209,7 +209,7 @@ void Texture :: allocate(const Array& src, bool reconfigure) {
 	memcpy(mArray.data.ptr, src.data.ptr, src.size());
 	mPixels = mArray.data.ptr;
 	
-	printf("copied to mArray %p\n", this);
+	//printf("copied to mArray %p\n", this);
 }
 
 void Texture :: deallocate() {
