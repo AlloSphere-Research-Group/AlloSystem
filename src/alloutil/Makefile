@@ -23,5 +23,8 @@ install: $(SLIB_PATH)
 	@$(INSTALL) -d $(DESTDIR)/lib
 	@$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)
 	@$(INSTALL) -C -m 644 $(INC_DIR)$/*.h* $(DESTDIR)/include/$(LIB_NAME)
-	@$(INSTALL) -C -m 644 $(SLIB_PATH) $(DESTDIR)/lib
+#	@echo $(notdir $(SLIB_PATH))
+#	For some reason this can result in an error if the file exists.
+#	Just ignore it and continue...
+	@-$(INSTALL) -C -m 644 $(SLIB_PATH) $(DESTDIR)/lib
 #	@$(RANLIB) $(DESTDIR)/lib/$(SLIB_FILE)
