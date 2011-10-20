@@ -135,7 +135,7 @@ void Texture :: allocate(const Array& src, bool reconfigure) {
 	if (reconfigure) {
 		
 		//printf("allocating & reconfiguring %p from\n", this);
-		src.print();
+		//src.print();
 		
 		// reconfigure texture from array:
 		switch (src.dimcount()) {
@@ -177,13 +177,13 @@ void Texture :: allocate(const Array& src, bool reconfigure) {
 		
 		
 		//printf("allocating & reconfigured %p\n", this);
-		mArray.print();
+		//mArray.print();
 		
 		// re-allocate array:
 		allocate(src.alignment());
 		
 		//printf("allocated & reconfigured %p\n", this);
-		mArray.print();
+		//mArray.print();
 		
 	} else {
 		
@@ -202,8 +202,8 @@ void Texture :: allocate(const Array& src, bool reconfigure) {
 		allocate();
 	}
 	
-	src.print();
-	mArray.print();
+	//src.print();
+	//mArray.print();
 	
 	// copy data:
 	memcpy(mArray.data.ptr, src.data.ptr, src.size());
