@@ -150,7 +150,10 @@ public:
 	/// NOTE: the graphics context (e.g. Window) must have been created
 	/// If pixels is NULL, then the only effect is to resize the texture
 	/// remotely.
-	virtual void submit(const void * pixels=NULL, uint32_t align=4);
+	void submit(const void * pixels=NULL, uint32_t align=4);
+	
+	/// just submit the existing data
+	void submit() { dirty(); }
 
 	/// allocate the internal Array for a CPU-side cache, copying from src
 	void allocate(const Array& src, bool reconfigure=true);

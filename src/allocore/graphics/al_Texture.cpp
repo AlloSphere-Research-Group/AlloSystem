@@ -134,8 +134,7 @@ void Texture :: allocate(const Array& src, bool reconfigure) {
 	
 	if (reconfigure) {
 		
-		//printf("allocating & reconfiguring %p from\n", this);
-		//src.print();
+		//printf("allocating & reconfiguring %p from\n", this); src.print();
 		
 		// reconfigure texture from array:
 		switch (src.dimcount()) {
@@ -152,6 +151,9 @@ void Texture :: allocate(const Array& src, bool reconfigure) {
 			case 3:	depth(src.depth());
 			case 2:	height(src.height());
 			case 1:	width(src.width()); break;
+			default:
+				printf("texture array must have 1, 2 or 3 dimenions\n");
+				return;
 		}
 		
 		// reconfigure components 
@@ -176,8 +178,7 @@ void Texture :: allocate(const Array& src, bool reconfigure) {
 		mArray.format(src);
 		
 		
-		//printf("allocating & reconfigured %p\n", this);
-		//mArray.print();
+		//printf("allocating & reconfigured %p\n", this); mArray.print();
 		
 		// re-allocate array:
 		allocate(src.alignment());

@@ -261,7 +261,7 @@ public:
 	///	Derive the appropriate stride values for a given alignment
 	static void deriveStride(AlloArrayHeader& h, size_t alignSize);
 
-private:
+protected:
 	void formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, int numDims, size_t align);
 
 	Array(const Array&);
