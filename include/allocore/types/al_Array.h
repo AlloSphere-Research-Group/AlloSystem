@@ -315,19 +315,30 @@ static inline void allo_array_clear(AlloArray * arr) {
 	arr->data.ptr = NULL;
 }
 
+// free memory
+static inline void allo_array_free(AlloArray * arr) {
+	if (NULL != arr->data.ptr) free(arr->data.ptr);
+	arr->data.ptr = NULL;
+}
+
 // Free memory and zero attributes
 static inline void allo_array_destroy(AlloArray * arr) {
-	if(arr->data.ptr) {
-		free(arr->data.ptr);
+	if (NULL != arr->data.ptr) {
+		allo_array_free(arr);
 		allo_array_clear(arr);
 	}
+}
+
+static inline void allo_array_allocate(AlloArray * arr) {
+	arr->data.ptr = (char *)calloc(1, allo_array_size(arr));
 }
 
 static inline void allo_array_create(AlloArray * arr, const AlloArrayHeader *h) {
 	allo_array_destroy(arr);
 	allo_array_setheader(arr, h);
-	arr->data.ptr = (char *)calloc(1, allo_array_size(arr));
+	allo_array_allocate(arr);
 }
+	
 
 static inline void allo_array_create1d(
 	AlloArray * arr, 

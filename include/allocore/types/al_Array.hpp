@@ -29,6 +29,7 @@
 	File author(s):
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 	Wesley Smith, 2010, wesley.hoke@gmail.com
+	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
 #ifndef INCLUDE_ALLO_ARRAY_HPP
@@ -135,20 +136,13 @@ public:
 	/// Returns true if Array contains data, false otherwise
 	bool hasData() const { return NULL != data.ptr; }
 
-	/// Allocate memory for the given header. (warning, does not check if data.ptr was not NULL!)
-	void dataCalloc() { 
-		//void * p = malloc(size());
-		//zero();
-		data.ptr = new char[size()]; //(char *)p; //(char *)calloc(1, size()); 
-		// new[] calls char default constructor which sets all values to 0
-	}
-	void dataFree() { 
-		if(hasData()){
-			//free(data.ptr); 
-			delete[] data.ptr;
-		}
-		data.ptr = NULL; 
-	}
+	/// Allocate memory for the given header.
+	/// Warning: does not check if memory was already allocated;
+	/// Call dataFree() first if you know it will be safe to do so. 
+	void dataCalloc() { allo_array_allocate(this); }
+	
+	/// Free memory and set data.ptr to NULL
+	void dataFree() { allo_array_free(this); }
 
 	/// Set all data to zero
 	void zero() { if(hasData()) bzero(data.ptr, size()); }
@@ -455,7 +449,10 @@ inline void Array::formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, i
 	hh.type = ty;
 	hh.components = comps;
 	hh.dimcount = numDims;
-	for(int i=0; i<ALLO_ARRAY_MAX_DIMS; ++i) hh.dim[i] = dims[i];
+	//for(int i=0; i<ALLO_ARRAY_MAX_DIMS; ++i) hh.dim[i] = dims[i];
+	int i=0;
+	for(; i<ALLO_ARRAY_MAX_DIMS && dims[i] != 0; ++i) hh.dim[i] = dims[i];
+	for(; i<ALLO_ARRAY_MAX_DIMS; ++i) hh.dim[i] = 0;
 	deriveStride(hh, align);
 	format(hh);
 }
