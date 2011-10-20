@@ -28,33 +28,17 @@
 	It is a pointer to data followed by meta-data to describe its type and layout.
 	
 	File author(s):
-	Wesley Smith, 2010, wesley.hoke@gmail.com
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
+	Wesley Smith, 2010, wesley.hoke@gmail.com
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
 #ifndef INCLUDE_ALLO_ARRAY_H
 #define INCLUDE_ALLO_ARRAY_H 1
 
-/*
- 
- 
- Separating the data from the header meta-data allows logic to performed on layouts without data 
- - a specific layout can be defined and checked against
- 
- 
-	 0			1			2			3			4
-	 Specifier	row			column		pillar		file
-	 Tensor		scalar		vector		matrix		
-	 Sound		sample		time		channel		pattern
-	 Polytope	point		line		polygon		polyhedron	polychoron
-	 n-Hypercube	point		line		square		cube		tesseract
-	 Boundary	none		vertex		edge		face		cell
-	 Movement	position	velocity	accel.		jerk		snap
- */
-
 #include "allocore/system/al_Config.h"
 #include <string.h>
+#include <strings.h>
 #include <stdlib.h>
 
 
@@ -264,26 +248,29 @@ static inline void allo_type_fromnumber(const AlloTy ty, double number, char * d
 /*
 	Return the number of elements (cells) in a array
 */
-static inline uint32_t allo_array_elements(const AlloArray * lat) {
+static inline uint32_t allo_array_elements(const AlloArray * arr) {
 	uint32_t i, elements = 1;
-	for (i=0; i<lat->header.dimcount; i++) 
-		elements *= lat->header.dim[i];
+	for (i=0; i<arr->header.dimcount; i++) 
+		elements *= arr->header.dim[i];
 	return elements;
 }
 
 /*
-	Return the memory footprint of a array
+	Returns the total memory footprint, in bytes
 */
-static inline size_t allo_array_size(const AlloArray * lat) {
-	int idx = lat->header.dimcount-1;
-	return lat->header.stride[idx] * lat->header.dim[idx];
+static inline size_t allo_array_size(const AlloArray * arr) {
+	if(arr->header.dimcount != 0){
+		int idx = arr->header.dimcount-1;
+		return arr->header.stride[idx] * arr->header.dim[idx];
+	}
+	return 0;
 }
 
 /*
 	Set a array header, e.g. just after allocating
 */
-static inline void allo_array_setheader(AlloArray * lat, const AlloArrayHeader * header) {
-	memcpy(&lat->header, header, sizeof(AlloArrayHeader));
+static inline void allo_array_setheader(AlloArray * arr, const AlloArrayHeader * header) {
+	memcpy(&arr->header, header, sizeof(AlloArrayHeader));
 }
 
 /*
@@ -317,31 +304,33 @@ static inline int allo_array_equal_headers(AlloArrayHeader *h1, const AlloArrayH
 	return equiv;
 }
 
-
+// Set header attributes to zero
 static inline void allo_array_header_clear(AlloArrayHeader *h) {
-	memset(h, '\0', sizeof(AlloArrayHeader));
+	bzero(h, sizeof(AlloArrayHeader));
 }
 
-static inline void allo_array_clear(AlloArray *lat) {
-	allo_array_header_clear( &(lat->header) );
-	lat->data.ptr = 0;
+// Set all attributes, including header, to zero
+static inline void allo_array_clear(AlloArray * arr) {
+	allo_array_header_clear( &(arr->header) );
+	arr->data.ptr = NULL;
 }
 
-static inline void allo_array_destroy(AlloArray *lat) {
-	if(lat->data.ptr) {
-		free(lat->data.ptr);
-		allo_array_clear(lat);
+// Free memory and zero attributes
+static inline void allo_array_destroy(AlloArray * arr) {
+	if(arr->data.ptr) {
+		free(arr->data.ptr);
+		allo_array_clear(arr);
 	}
 }
 
-static inline void allo_array_create(AlloArray *lat, const AlloArrayHeader *h) {
-	allo_array_destroy(lat);
-	allo_array_setheader(lat, h);
-	lat->data.ptr = (char *)calloc(1, allo_array_size(lat));
+static inline void allo_array_create(AlloArray * arr, const AlloArrayHeader *h) {
+	allo_array_destroy(arr);
+	allo_array_setheader(arr, h);
+	arr->data.ptr = (char *)calloc(1, allo_array_size(arr));
 }
 
 static inline void allo_array_create1d(
-	AlloArray *lat, 
+	AlloArray * arr, 
 	uint8_t components, 
 	AlloTy type, 
 	uint32_t dimx, 
@@ -353,11 +342,11 @@ static inline void allo_array_create1d(
 	header.dimcount = 1;
 	header.dim[0] = dimx;
 	allo_array_setstride(&header, align);
-	allo_array_create(lat, &header);
+	allo_array_create(arr, &header);
 }
 
 static inline void allo_array_create2d(
-	AlloArray *lat, 
+	AlloArray * arr, 
 	uint8_t components, 
 	AlloTy type, 
 	uint32_t dimx, 
@@ -371,21 +360,21 @@ static inline void allo_array_create2d(
 	header.dim[0] = dimx;
 	header.dim[1] = dimy;
 	allo_array_setstride(&header, align);
-	allo_array_create(lat, &header);
+	allo_array_create(arr, &header);
 }
 
 
 /*
 	Adapt a latticle to another size
 */
-static inline void allo_array_adapt(AlloArray *lat, const AlloArrayHeader *h) {
-	if(! allo_array_equal_headers( &(lat->header), h)) {
-		allo_array_create(lat, h);
+static inline void allo_array_adapt(AlloArray * arr, const AlloArrayHeader *h) {
+	if(! allo_array_equal_headers( &(arr->header), h)) {
+		allo_array_create(arr, h);
 	}
 }
 
 static inline void allo_array_adapt2d(
-	AlloArray *lat, 
+	AlloArray * arr, 
 	uint8_t components, 
 	AlloTy type, 
 	uint32_t dimx, 
@@ -399,7 +388,7 @@ static inline void allo_array_adapt2d(
 	header.dim[0] = dimx;
 	header.dim[1] = dimy;
 	allo_array_setstride(&header, align);
-	allo_array_adapt(lat, &header);
+	allo_array_adapt(arr, &header);
 }
 
 /*
@@ -435,6 +424,17 @@ static inline void allo_array_wrapper_release(AlloArrayWrapper *wrap) {
 		allo_array_wrapper_free(wrap);
 	}
 }
+
+/* Multidimensional terminology:
+					1			2			3			4
+	 Specifier		row			column		pillar		file
+	 Tensor			scalar		vector		matrix		
+	 Sound			sample		time		channel		pattern
+	 Polytope		point		line		polygon		polyhedron	polychoron
+	 n-Hypercube	point		line		square		cube		tesseract
+	 Boundary		none		vertex		edge		face		cell
+	 Movement		position	velocity	accel.		jerk		snap
+*/
 
 
 #ifdef __cplusplus

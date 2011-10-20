@@ -34,10 +34,11 @@
 #ifndef INCLUDE_ALLO_ARRAY_HPP
 #define INCLUDE_ALLO_ARRAY_HPP 1
 
+#include <stdlib.h>
+#include <strings.h>
 #include "allocore/types/al_Array.h"
 #include "allocore/math/al_Functions.hpp"
 #include "allocore/math/al_Vec.hpp"
-#include <stdlib.h>
 
 #define AL_ARRAY_DEFAULT_ALIGNMENT (4)
 
@@ -48,17 +49,234 @@
 namespace al {
 
 
-/*
-	A friendlier interface to AlloArray
-		N.B. Derived type of methods only... no instance member data or vtable!
-*/
+/// Object-oriented interface to AlloArray
 class Array : public AlloArray {
 public:
+
+	/// Empty constructor defines a 0-dimensional, 1-component array of void type; unallocated data
+	Array();
+	
+	/// Construct 1-dimensional array
+	Array(int components, AlloTy ty, uint32_t dimx);
+	
+	/// Construct 2-dimensional array
+	Array(int components, AlloTy ty, uint32_t dimx, uint32_t dimy);
+	
+	/// Construct 3-dimensional array
+	Array(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz);
+
+	///	Copy constructor; copies both the layout and data from cpy
+	explicit Array(const AlloArray& cpy);
+	explicit Array(const AlloArrayHeader& h2);
+
+	//~Array(){ allo_array_destroy(this); }
+	~Array(){ dataFree(); }
+
+
+	/// Assignment operator copies format and data (allocates memory if necessary)
+	Array& operator= (const AlloArray& cpy);
+
+
+	/// Get type of elements
+	AlloTy type() const { return header.type; }
+
+	/// Verify elements are a particular type
+	bool isType(AlloTy ty) const { return header.type == ty; }
+	template<typename T> bool isType() { return isType(type<T>()); }
+
+	uint8_t components() const { return header.components; }	///< Get number of components
+	uint8_t dimcount() const { return header.dimcount; }		///< Get number of dimensions
+	uint32_t dim(int i=0) const { return header.dim[i]; }		///< Get size of dimension
+	unsigned width() const { return header.dim[0]; }			///< Get size of first dimension
+	unsigned height() const { return header.dim[1]; }			///< Get size of second dimension
+	unsigned depth() const { return header.dim[2]; }			///< Get size of third dimension
+	uint32_t stride(int i=0) const { return header.stride[i]; }	///< Get stride of dimension, in elements
+	
+	/// Return the packing alignment (1, 2, 4 or 8 byte)
+	uint32_t alignment() const {
+		uint32_t i = stride(1);	// row stride
+		if (i % 2 > 0) return 1;
+		if (i % 4 > 0) return 2;
+		if (i % 8 > 0) return 4;
+		return 8;
+	}
+
+	/// Returns the total memory footprint, in bytes
+	size_t size() const { return allo_array_size(this); }
+
+	///	Change the format (header/layout) of the Array reallocating if necessary
+	void format(const AlloArrayHeader& h2);
+	
+	///	Change the format (header/layout) of the Array reallocating if necessary
+	void format(const AlloArray& array) { format(array.header); }
+
+	///	Change the format (header/layout) of the Array reallocating if necessary
+	void format(int components, AlloTy ty, uint32_t dimx);
+	
+	///	Change the format (header/layout) of the Array reallocating if necessary
+	void format(int components, AlloTy ty, uint32_t dimx, uint32_t dimy);
+	
+	///	Change the format (header/layout) of the Array reallocating if necessary
+	void format(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz);
+	
+	///	Change the format (header/layout) of the Array reallocating if necessary
+	void formatAligned(int components, AlloTy ty, uint32_t dimx, size_t align);
+	
+	///	Change the format (header/layout) of the Array reallocating if necessary
+	void formatAligned(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, size_t align);
+	
+	///	Change the format (header/layout) of the Array reallocating if necessary
+	void formatAligned(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, size_t align);
+
+	/// Check if this Array conforms to an ArrayHeader format
+	bool isFormat(const AlloArrayHeader& h2) const;
+	bool isFormat(const Array& src) const { return isFormat(src.header); }
+
+	/// Returns true if Array contains data, false otherwise
+	bool hasData() const { return NULL != data.ptr; }
+
+	/// Allocate memory for the given header. (warning, does not check if data.ptr was not NULL!)
+	void dataCalloc() { 
+		//void * p = malloc(size());
+		//zero();
+		data.ptr = new char[size()]; //(char *)p; //(char *)calloc(1, size()); 
+		// new[] calls char default constructor which sets all values to 0
+	}
+	void dataFree() { 
+		if(hasData()){
+			//free(data.ptr); 
+			delete[] data.ptr;
+		}
+		data.ptr = NULL; 
+	}
+
+	/// Set all data to zero
+	void zero() { if(hasData()) bzero(data.ptr, size()); }
+
+
+	/// Get mutable component using 1-D index
+	template <class T> T& at(size_t ic, size_t ix){
+		return cell<T>(ix)[ic]; }
+
+	/// Get mutable component using 2-D index
+	template <class T> T& at(size_t ic, size_t ix, size_t iy){
+		return cell<T>(ix,iy)[ic]; }
+
+	/// Get mutable component using 3-D index
+	template <class T> T& at(size_t ic, size_t ix, size_t iy, size_t iz){
+		return cell<T>(ix,iy,iz)[ic]; }
+
+	/// Get const component using 1-D index
+	template <class T> const T& at (size_t ic, size_t ix) const{
+		return cell<T>(ix)[ic]; }
+
+	/// Get const component using 2-D index
+	template <class T> const T& at(size_t ic, size_t ix, size_t iy) const{
+		return cell<T>(ix,iy)[ic]; }
+
+	/// Get const component using 3-D index
+	template <class T> const T& at(size_t ic, size_t ix, size_t iy, size_t iz) const{
+		return cell<T>(ix,iy,iz)[ic]; }
+
+
+	/// Fill with the same cell value throughout
+	template<typename T> void set1d(T * cell);
+	template<typename T> void set2d(T * cell);
+	template<typename T> void set3d(T * cell);
+
+	/// Use a pure C function to fill an array with data
+	template<typename T> void fill(void (*func)(T * values, double normx));
+	template<typename T> void fill(void (*func)(T * values, double normx, double normy));
+	template<typename T> void fill(void (*func)(T * values, double normx, double normy, double normz));
+
+	// TODO: iterators!
+
+	/// Get the components at a given index in the array (no bounds checking)
+	template<typename T> T * cell(size_t x) const;
+	template<typename T> T * cell(size_t x, size_t y) const;
+	template<typename T> T * cell(size_t x, size_t y, size_t z) const;
+
+	template<typename T, typename TP> T * cell(T* val, const Vec<2,TP> p) const { return cell(val, p[0], p[1]); }
+	template<typename T, typename TP> T * cell(T* val, const Vec<3,TP> p) const { return cell(val, p[0], p[1], p[2]); }
+
+	/// Read the component values from array into val array (no bounds checking)
+	template<typename T> void read(T* val, int x) const;
+	template<typename T> void read(T* val, int x, int y) const;
+	template<typename T> void read(T* val, int x, int y, int z) const;
+
+	template<typename T, typename TP> void read(T* val, const Vec<2,TP> p) const { read(val, p[0], p[1]); }
+	template<typename T, typename TP> void read(T* val, const Vec<3,TP> p) const { read(val, p[0], p[1], p[2]); }
+
+	/// Read the component values from array into val array (wraps periodically at bounds)
+	template<typename T> void read_wrap(T* val, int x) const;
+	template<typename T> void read_wrap(T* val, int x, int y) const;
+	template<typename T> void read_wrap(T* val, int x, int y, int z) const;
+
+	template<typename T, typename TP> void read_wrap(T* val, const Vec<2,TP> p) const { read_wrap(val, p[0], p[1]); }
+	template<typename T, typename TP> void read_wrap(T* val, const Vec<3,TP> p) const { read_wrap(val, p[0], p[1], p[2]); }
+
+	/// Linear interpolated lookup (virtual array index)
+	
+	/// Reads the linearly interpolated component values into val array
+	///
+	template<typename T> void read_interp(T * val, double x) const;
+	template<typename T> void read_interp(T * val, double x, double y) const;
+	template<typename T> void read_interp(T * val, double x, double y, double z) const;
+
+	template<typename T, typename TP> void read_interp(T* val, const Vec<2,TP> p) const { read_interp(val, p[0], p[1]); }
+	template<typename T, typename TP> void read_interp(T* val, const Vec<3,TP> p) const { read_interp(val, p[0], p[1], p[2]); }
+
+	/// Write component values from val array into array (no bounds checking)
+	template<typename T> void write(const T* val, int x);
+	template<typename T> void write(const T* val, int x, int y);
+	template<typename T> void write(const T* val, int x, int y, int z);
+
+	template<typename T, typename TP> void write(const T* val, const Vec<2,TP> p) { write(val, p[0], p[1]); }
+	template<typename T, typename TP> void write(const T* val, const Vec<3,TP> p) { write(val, p[0], p[1], p[2]); }
+
+	/// Write plane values from val array into array (wraps periodically at bounds)
+	template<typename T> void write_wrap(const T* val, int x);
+	template<typename T> void write_wrap(const T* val, int x, int y);
+	template<typename T> void write_wrap(const T* val, int x, int y, int z);
+
+	template<typename T, typename TP> void write_wrap(const T* val, const Vec<2,TP> p) { write_wrap(val, p[0], p[1]); }
+	template<typename T, typename TP> void write_wrap(const T* val, const Vec<3,TP> p) { write_wrap(val, p[0], p[1], p[2]); }
+
+	/// Linear interpolated write (virtual array index)
+
+	/// AKA trilinear splat
+	/// writes the linearly interpolated plane values from val array into array
+	template<typename T> void write_interp(const T* val, double x);
+	template<typename T> void write_interp(const T* val, double x, double y);
+	template<typename T> void write_interp(const T* val, double x, double y, double z);
+
+	template<typename T, typename TP> void write_interp(const T* val, const Vec<2,TP> p) { write_interp(val, p[0], p[1]); }
+	template<typename T, typename TP> void write_interp(const T* val, const Vec<3,TP> p) { write_interp(val, p[0], p[1], p[2]); }
+	
+	/// Print array information
+	void print() const;
+
+
+	
+	///	Returns the type enumeration ID (AlloTy) for a given type (given as template argument).
+	
+	/// E.g., assert(Array::type<float>() == AlloFloat32Ty);
+	///
+	template<typename T> static AlloTy type();
+
+	///	Derive the appropriate stride values for a given alignment
+	static void deriveStride(AlloArrayHeader& h, size_t alignSize);
+
+private:
+	void formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, int numDims, size_t align);
+
+	Array(const Array&);
+	Array& operator= (const Array&);
 
 	// temporary hack because the one in al_Function gave a bad result
 	// for e.g. wrap<double>(-64.0, -32.0);
 	template<typename T>
-	static inline T wrap(T v, const T hi=T(1.), const T lo=T(0.)){
+	static T wrap(T v, const T hi=T(1.), const T lo=T(0.)){
 		if(lo == hi) return lo;
 		//if(v >= hi){
 		if(!(v < hi)){
@@ -74,184 +292,6 @@ public:
 		}
 		return v;
 	}
-
-	/*!
-		Returns the type enumeration ID (AlloTy) for a given type (given as template argument)
-		e.g. assert(Array::type<float>() == AlloFloat32Ty);
-	 */
-	template<typename T> inline static AlloTy type();
-
-	/*!
-		Derive the appropriate stride values for a given alignment
-	 */
-	static void deriveStride(AlloArrayHeader& h, size_t alignSize);
-
-	/*!
-	 Standard constructors; will allocate memory accordingly
-	 */
-	Array(int components, AlloTy ty, uint32_t dimx);
-	Array(int components, AlloTy ty, uint32_t dimx, uint32_t dimy);
-	Array(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz);
-
-	/*!
-		Copy constructor; copies both the layout and data from cpy
-	*/
-	Array(const AlloArray& cpy);
-	Array(const AlloArrayHeader& h2);
-
-	/*!
-	 Empty constructor defines a 0-D, 1-plane array of void type; unallocated data
-	 */
-	Array();
-	
-	~Array(){ allo_array_destroy(this); }
-
-	/**
-		Assignment operator copies format and data (allocates memory if necessary)
-	*/
-	Array& operator= (const AlloArray& cpy);
-
-
-	AlloTy type() const { return header.type; }
-	///! verify a type:
-	bool isType(AlloTy ty) const { return header.type == ty; }
-	template<typename T> bool isType() { return isType(type<T>()); }
-	
-	uint8_t components() const { return header.components; }
-	
-	uint8_t dimcount() const { return header.dimcount; }
-	
-	uint32_t dim(int i=0) const { return header.dim[i]; }
-	unsigned width() const { return header.dim[0]; }
-	unsigned height() const { return header.dim[1]; }
-	unsigned depth() const { return header.dim[2]; }
-	
-	uint32_t stride(int i=0) const { return header.stride[i]; }
-	
-	/// return the packing alignment (1, 2, 4 or 8 byte)
-	uint32_t alignment() const {
-		uint32_t i = stride(1);	// row stride
-		if (i % 2 > 0) return 1;
-		if (i % 4 > 0) return 2;
-		if (i % 8 > 0) return 4;
-		return 8;
-	}
-
-	///! Return the memory footprint of a array
-	size_t size() const { return allo_array_size(this); }
-
-	/*!
-		Change the format (header/layout) of the Array
-		Will reallocate if necessary
-	 */
-	void format(const AlloArrayHeader &h2);
-	void format(const AlloArray& array) { format(array.header); }
-
-	void format(int components, AlloTy ty, uint32_t dimx);
-	void format(int components, AlloTy ty, uint32_t dimx, uint32_t dimy);
-	void format(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz);
-	void formatAligned(int components, AlloTy ty, uint32_t dimx, size_t align);
-	void formatAligned(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, size_t align);
-	void formatAligned(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, size_t align);
-
-	///! Check if this Array conforms to an ArrayHeader format
-	bool isFormat(const AlloArrayHeader &h2) const;
-	bool isFormat(const Array &src) const { return isFormat(src.header); }
-
-	///! verify that Array contains data
-	bool hasData() const { return data.ptr != NULL; }
-
-	///! Allocate memory for the given header
-	/// (warning, does not check if data.ptr was not NULL!)
-	void dataCalloc() { 
-		//void * p = malloc(size());
-		data.ptr = new char[size()]; //(char *)p; //(char *)calloc(1, size()); 
-		zero();
-	}
-	void dataFree() { 
-		if(hasData()) 
-			//free(data.ptr); 
-			delete[] data.ptr;
-		data.ptr = NULL; 
-	}
-
-	///! set all data to zero.
-	void zero() { if(hasData()) memset(data.ptr, 0, size()); }
-	
-	///! Fill with the same cell value throughout:
-	template<typename T> void set1d(T * cell);
-	template<typename T> void set2d(T * cell);
-	template<typename T> void set3d(T * cell);
-
-	///! Use a pure C function to fill an array with data:
-	template<typename T> void fill(void (*func)(T * values, double normx));
-	template<typename T> void fill(void (*func)(T * values, double normx, double normy));
-	template<typename T> void fill(void (*func)(T * values, double normx, double normy, double normz));
-
-	/// TODO: iterators!
-
-	///! get the components at a given index in the array (no bounds checking)
-	template<typename T> T * cell(size_t x) const;
-	template<typename T> T * cell(size_t x, size_t y) const;
-	template<typename T> T * cell(size_t x, size_t y, size_t z) const;
-
-	template<typename T, typename TP> T * cell(T* val, const Vec<2,TP> p) const { return cell(val, p[0], p[1]); }
-	template<typename T, typename TP> T * cell(T* val, const Vec<3,TP> p) const { return cell(val, p[0], p[1], p[2]); }
-
-	///! read the plane values from array into val array (no bounds checking)
-	template<typename T> void read(T* val, int x) const;
-	template<typename T> void read(T* val, int x, int y) const;
-	template<typename T> void read(T* val, int x, int y, int z) const;
-
-	template<typename T, typename TP> void read(T* val, const Vec<2,TP> p) const { read(val, p[0], p[1]); }
-	template<typename T, typename TP> void read(T* val, const Vec<3,TP> p) const { read(val, p[0], p[1], p[2]); }
-
-	///! read the plane values from array into val array (wraps periodically at bounds)
-	template<typename T> void read_wrap(T* val, int x) const;
-	template<typename T> void read_wrap(T* val, int x, int y) const;
-	template<typename T> void read_wrap(T* val, int x, int y, int z) const;
-
-	template<typename T, typename TP> void read_wrap(T* val, const Vec<2,TP> p) const { read_wrap(val, p[0], p[1]); }
-	template<typename T, typename TP> void read_wrap(T* val, const Vec<3,TP> p) const { read_wrap(val, p[0], p[1], p[2]); }
-
-	///! linear interpolated lookup (virtual array index)
-	/// reads the linearly interpolated plane values into val array
-	template<typename T> void read_interp(T * val, double x) const;
-	template<typename T> void read_interp(T * val, double x, double y) const;
-	template<typename T> void read_interp(T * val, double x, double y, double z) const;
-
-	template<typename T, typename TP> void read_interp(T* val, const Vec<2,TP> p) const { read_interp(val, p[0], p[1]); }
-	template<typename T, typename TP> void read_interp(T* val, const Vec<3,TP> p) const { read_interp(val, p[0], p[1], p[2]); }
-
-	///! write plane values from val array into array (no bounds checking)
-	template<typename T> void write(const T* val, double x);
-	template<typename T> void write(const T* val, double x, double y);
-	template<typename T> void write(const T* val, double x, double y, double z);
-
-	template<typename T, typename TP> void write(const T* val, const Vec<2,TP> p) { write(val, p[0], p[1]); }
-	template<typename T, typename TP> void write(const T* val, const Vec<3,TP> p) { write(val, p[0], p[1], p[2]); }
-
-
-	///! write plane values from val array into array (wraps periodically at bounds)
-	template<typename T> void write_wrap(const T* val, int x);
-	template<typename T> void write_wrap(const T* val, int x, int y);
-	template<typename T> void write_wrap(const T* val, int x, int y, int z);
-
-	template<typename T, typename TP> void write_wrap(const T* val, const Vec<2,TP> p) { write_wrap(val, p[0], p[1]); }
-	template<typename T, typename TP> void write_wrap(const T* val, const Vec<3,TP> p) { write_wrap(val, p[0], p[1], p[2]); }
-
-	///! linear interpolated write (virtual array index)
-	/// AKA trilinear splat
-	/// writes the linearly interpolated plane values from val array into array
-	template<typename T> void write_interp(const T* val, double x);
-	template<typename T> void write_interp(const T* val, double x, double y);
-	template<typename T> void write_interp(const T* val, double x, double y, double z);
-
-	template<typename T, typename TP> void write_interp(const T* val, const Vec<2,TP> p) { write_interp(val, p[0], p[1]); }
-	template<typename T, typename TP> void write_interp(const T* val, const Vec<3,TP> p) { write_interp(val, p[0], p[1], p[2]); }
-	
-	/// for debugging:
-	void print() const;
 };
 
 
@@ -274,18 +314,18 @@ public:
 /*
 	Type traits by partial specialization:
  */
-template<> inline AlloTy Array::type<uint8_t>() { return AlloUInt8Ty; }
-template<> inline AlloTy Array::type<uint16_t>() { return AlloUInt16Ty; }
-template<> inline AlloTy Array::type<uint32_t>() { return AlloUInt32Ty; }
-template<> inline AlloTy Array::type<uint64_t>() { return AlloUInt64Ty; }
-template<> inline AlloTy Array::type<int8_t>() { return AlloSInt8Ty; }
-template<> inline AlloTy Array::type<int16_t>() { return AlloSInt16Ty; }
-template<> inline AlloTy Array::type<int32_t>() { return AlloSInt32Ty; }
-template<> inline AlloTy Array::type<int64_t>() { return AlloSInt64Ty; }
-template<> inline AlloTy Array::type<float>() { return AlloFloat32Ty; }
-template<> inline AlloTy Array::type<double>() { return AlloFloat64Ty; }
-template<> inline AlloTy Array::type<AlloArray>() { return AlloArrayTy; }
-template<> inline AlloTy Array::type<void *>() { 
+template<> inline AlloTy Array::type<uint8_t  >(){ return AlloUInt8Ty; }
+template<> inline AlloTy Array::type<uint16_t >(){ return AlloUInt16Ty; }
+template<> inline AlloTy Array::type<uint32_t >(){ return AlloUInt32Ty; }
+template<> inline AlloTy Array::type<uint64_t >(){ return AlloUInt64Ty; }
+template<> inline AlloTy Array::type<int8_t   >(){ return AlloSInt8Ty; }
+template<> inline AlloTy Array::type<int16_t  >(){ return AlloSInt16Ty; }
+template<> inline AlloTy Array::type<int32_t  >(){ return AlloSInt32Ty; }
+template<> inline AlloTy Array::type<int64_t  >(){ return AlloSInt64Ty; }
+template<> inline AlloTy Array::type<float    >(){ return AlloFloat32Ty; }
+template<> inline AlloTy Array::type<double   >(){ return AlloFloat64Ty; }
+template<> inline AlloTy Array::type<AlloArray>(){ return AlloArrayTy; }
+template<> inline AlloTy Array::type<void *>(){
 	switch(sizeof(void *)) {
 		case 4: return AlloPointer32Ty; 
 		case 8: return AlloPointer64Ty; 
@@ -293,43 +333,45 @@ template<> inline AlloTy Array::type<void *>() {
 	return 0;
 }
 
-inline Array::Array() : AlloArray() {
-	data.ptr = 0;
+inline Array::Array(){
+	data.ptr = NULL;
 	header.type= 0;
 	header.components = 1;
 	header.dimcount = 0;
-	header.dim[0] = 0; header.dim[1] = 0; header.dim[2] = 0;
+	for(int i=0; i<ALLO_ARRAY_MAX_DIMS; ++i) header.dim[i]=0;
 }
 
-inline Array& Array::operator= (const AlloArray& cpy) {
-	format(cpy.header);
-	if (cpy.data.ptr) {
-		memcpy(data.ptr, cpy.data.ptr, size());
-	}
-	return *this;
-}
-
-inline Array::Array(const AlloArray& cpy) : AlloArray() {
+inline Array::Array(const AlloArray& cpy){
 	(*this) = cpy;
 }
-inline Array::Array(const AlloArrayHeader& h2) : AlloArray() {
-	data.ptr = NULL;
+inline Array::Array(const AlloArrayHeader& h2){
+	allo_array_clear(this);
 	format(h2);
 }
 
-inline Array::Array(int components, AlloTy ty, uint32_t dimx) : AlloArray() {
-	data.ptr = NULL;
-	format(components, ty, dimx);
+inline Array::Array(int comps, AlloTy ty, uint32_t dimx){
+	allo_array_clear(this);
+	format(comps, ty, dimx);
 }
 
-inline Array::Array(int components, AlloTy ty, uint32_t dimx, uint32_t dimy) : AlloArray() {
-	data.ptr = NULL;
-	format(components, ty, dimx, dimy);
+inline Array::Array(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy){
+	allo_array_clear(this);
+	format(comps, ty, dimx, dimy);
 }
 
-inline Array::Array(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz) : AlloArray() {
-	data.ptr = NULL;
-	format(components, ty, dimx, dimy, dimz);
+inline Array::Array(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz){
+	allo_array_clear(this);
+	format(comps, ty, dimx, dimy, dimz);
+}
+
+inline Array& Array::operator= (const AlloArray& cpy) {
+	if(&cpy != this){
+		format(cpy.header);
+		if (cpy.data.ptr) {
+			memcpy(data.ptr, cpy.data.ptr, size());
+		}
+	}
+	return *this;
 }
 
 
@@ -354,27 +396,24 @@ inline void Array::deriveStride(AlloArrayHeader& h, size_t alignSize) {
 	}
 }
 
-///! Check if this Array conforms to an ArrayHeader format
-inline bool Array::isFormat(const AlloArrayHeader &h2) const {
-	bool equiv =	header.components == h2.components &&
-	header.type == h2.type &&
-	header.dimcount == h2.dimcount;
-
-	for(int i=0; i < header.dimcount; i++) {
-		equiv &= header.dim[i] == h2.dim[i];
-		equiv &= header.stride[i] == h2.stride[i];
+// Check if this Array conforms to an ArrayHeader format
+inline bool Array::isFormat(const AlloArrayHeader& h2) const {
+	for(int i=0; i<header.dimcount; ++i){
+		if( (header.dim[i] != h2.dim[i]) || (header.stride[i] != h2.stride[i]) )
+			return false;
 	}
-
-	return equiv;
+	return (header.components == h2.components)
+		&& (header.type == h2.type)
+		&& (header.dimcount == h2.dimcount);
 }
 
-inline void Array::format(const AlloArrayHeader &h2) {
+inline void Array::format(const AlloArrayHeader& h2) {
 	if(!isFormat(h2)) {
 		dataFree();
 		header.type = h2.type;
 		header.components = h2.components;
 		header.dimcount = h2.dimcount;
-		for(int i=0; i < ALLO_ARRAY_MAX_DIMS; i++) {
+		for(int i=0; i < ALLO_ARRAY_MAX_DIMS; ++i) {
 			if (i < header.dimcount) {
 				header.dim[i] = h2.dim[i];
 				header.stride[i] = h2.stride[i];
@@ -388,43 +427,35 @@ inline void Array::format(const AlloArrayHeader &h2) {
 	}
 }
 
-inline void Array::format(int components, AlloTy ty, uint32_t dimx) {
-	formatAligned(components, ty, dimx, AL_ARRAY_DEFAULT_ALIGNMENT);
+inline void Array::format(int comps, AlloTy ty, uint32_t dimx) {
+	formatAligned(comps, ty, dimx, AL_ARRAY_DEFAULT_ALIGNMENT);
 }
-inline void Array::format(int components, AlloTy ty, uint32_t dimx, uint32_t dimy) {
-	formatAligned(components, ty, dimx, dimy, AL_ARRAY_DEFAULT_ALIGNMENT);
+inline void Array::format(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy) {
+	formatAligned(comps, ty, dimx, dimy, AL_ARRAY_DEFAULT_ALIGNMENT);
 }
-inline void Array::format(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz) {
-	formatAligned(components, ty, dimx, dimy, dimz, AL_ARRAY_DEFAULT_ALIGNMENT);
+inline void Array::format(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz) {
+	formatAligned(comps, ty, dimx, dimy, dimz, AL_ARRAY_DEFAULT_ALIGNMENT);
 }
 
-inline void Array::formatAligned(int components, AlloTy ty, uint32_t dimx, size_t align) {
-	AlloArrayHeader hh;
-	hh.type = ty;
-	hh.components = components;
-	hh.dimcount = 1;
-	hh.dim[0] = dimx;
-	deriveStride(hh, align);
-	format(hh);
+inline void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, size_t align) {
+	uint32_t dims[] = {dimx,0,0,0};
+	formatAlignedGeneral(comps, ty, dims, 1, align);
 }
-inline void Array::formatAligned(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, size_t align) {
-	AlloArrayHeader hh;
-	hh.type = ty;
-	hh.components = components;
-	hh.dimcount = 2;
-	hh.dim[0] = dimx;
-	hh.dim[1] = dimy;
-	deriveStride(hh, align);
-	format(hh);
+inline void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, size_t align) {
+	uint32_t dims[] = {dimx,dimy,0,0};
+	formatAlignedGeneral(comps, ty, dims, 2, align);
 }
-inline void Array::formatAligned(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, size_t align) {
+inline void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, size_t align) {
+	uint32_t dims[] = {dimx,dimy,dimz,0};
+	formatAlignedGeneral(comps, ty, dims, 3, align);
+}
+
+inline void Array::formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, int numDims, size_t align) {
 	AlloArrayHeader hh;
 	hh.type = ty;
-	hh.components = components;
-	hh.dimcount = 3;
-	hh.dim[0] = dimx;
-	hh.dim[1] = dimy;
-	hh.dim[2] = dimz;
+	hh.components = comps;
+	hh.dimcount = numDims;
+	for(int i=0; i<ALLO_ARRAY_MAX_DIMS; ++i) hh.dim[i] = dims[i];
 	deriveStride(hh, align);
 	format(hh);
 }
@@ -578,21 +609,21 @@ template<typename T> inline void Array::read_interp(T * val, double x, double y,
 }
 
 // write plane values from val array into array (no bounds checking)
-template<typename T> inline void Array::write(const T* val, double x) {
+template<typename T> inline void Array::write(const T* val, int x) {
 	T * paaa = cell<T>(x);
-	for (uint8_t p=0; p<header.components; p++) {
+	for (uint8_t p=0; p<header.components; ++p) {
 		paaa[p] = val[p];
 	}
 }
-template<typename T> inline void Array::write(const T* val, double x, double y) {
+template<typename T> inline void Array::write(const T* val, int x, int y) {
 	T * paaa = cell<T>(x, y);
-	for (uint8_t p=0; p<header.components; p++) {
+	for (uint8_t p=0; p<header.components; ++p) {
 		paaa[p] = val[p];
 	}
 }
-template<typename T> inline void Array::write(const T* val, double x, double y, double z) {
+template<typename T> inline void Array::write(const T* val, int x, int y, int z) {
 	T * paaa = cell<T>(x, y, z);
-	for (uint8_t p=0; p<header.components; p++) {
+	for (uint8_t p=0; p<header.components; ++p) {
 		paaa[p] = val[p];
 	}
 }
