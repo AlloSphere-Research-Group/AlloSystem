@@ -283,9 +283,58 @@ void Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 			
 //		}
 	}
-
-
 }
+
+
+void Mesh::ribbonize(float * widths, int widthsStride, bool faceBitangent){
+
+	const int N = mVertices.size();
+
+	if(0 == N) return;
+
+	mVertices.size(N*2);
+	mNormals.size(N*2);
+
+	// Store last vertex since it will be overwritten eventually
+	Vertex last = mVertices[N-1]; 
+	
+	int in = faceBitangent ? 2 : 1;
+	int ib = faceBitangent ? 1 : 2;
+	
+	for(int i=N-1; i>=0; --i){
+		int i1 = i;
+		int i0 = i1-1; if(i0< 0) i0+=N;
+		int i2 = i1+1; if(i2>=N) i2-=N;
+
+		const Vertex& v0 = (i0==(N-1)) ? last : mVertices[i0];
+		const Vertex& v1 = mVertices[i1];
+		const Vertex& v2 = mVertices[i2];
+
+		// compute Frenet frame
+		Vertex f[3]; // T,N,B
+		{
+			const Vertex d1 = (v0 - v2)*0.5;
+			const Vertex d2 = (d1 - v1)*2.0;
+			//Vertex& t = f[0];
+			Vertex& n = f[1];
+			Vertex& b = f[2];
+			b = cross(d2, d1).sgn();
+			n = cross(d1, b).sgn();
+			//t = d1.sgn(); // not used
+		}
+		f[ib] *= widths[i0*widthsStride];
+		
+		int i12 = i1<<1;
+		mVertices[i12  ] = v1-f[ib];
+		mVertices[i12+1] = v1+f[ib];
+		mNormals [i12  ].set(f[in][0], f[in][1], f[in][2]);
+		mNormals [i12+1] = mNormals[i12];
+	}
+	
+	if(mColors.size()) mColors.expand<2,true>();
+	if(mColoris.size()) mColoris.expand<2,true>();
+}
+
 
 
 void Mesh::merge(const Mesh& src){

@@ -125,6 +125,24 @@ public:
 	///							face rather than per vertex
 	void createNormalsMesh(Mesh& mesh, float length=0.1, bool perFace=false);
 
+	/// Ribbonize curve
+	
+	/// @param[in] width			Width of ribbon
+	/// @param[in] faceBitangent	If true, surface faces bitangent vector of curve.
+	///								If false, surface faces normal vector of curve.
+	void ribbonize(float width, bool faceBitangent=false){
+		ribbonize(&width, 0, faceBitangent);
+	}
+
+	/// Ribbonize curve
+	
+	/// @param[in] widths			Array specifying width of ribbon at each point along curve
+	/// @param[in] widthsStride		Stride factor of width array
+	/// @param[in] faceBitangent	If true, surface faces bitangent vector of curve.
+	///								If false, surface faces normal vector of curve.	
+	void ribbonize(float * widths, int widthsStride=1, bool faceBitangent=false);
+
+
 	int primitive() const { return mPrimitive; }
 	const Buffer<Vertex>& vertices() const { return mVertices; }
 	const Buffer<Normal>& normals() const { return mNormals; }
