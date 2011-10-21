@@ -142,8 +142,8 @@ int utTypes(){
 					for(int c=0; c<Nc; ++c) assert(y[c] == x[c]);
 				
 					for(int c=0; c<Nc; ++c){
-						a.at<int8_t>(c,i) = t+1;
-						assert(a.at<int8_t>(c,i) == int8_t(t+1));
+						a.elem<int8_t>(c,i) = t+1;
+						assert(a.elem<int8_t>(c,i) == int8_t(t+1));
 						++t;
 					}
 				}
@@ -161,8 +161,8 @@ int utTypes(){
 					for(int c=0; c<Nc; ++c) assert(y[c] == x[c]);
 				
 					for(int c=0; c<Nc; ++c){
-						a.at<int8_t>(c,i,j) = t+1;
-						assert(a.at<int8_t>(c,i,j) == int8_t(t+1));
+						a.elem<int8_t>(c,i,j) = t+1;
+						assert(a.elem<int8_t>(c,i,j) == int8_t(t+1));
 						++t;
 					}
 				}}
@@ -181,8 +181,8 @@ int utTypes(){
 					for(int c=0; c<Nc; ++c) assert(y[c] == x[c]);
 				
 					for(int c=0; c<Nc; ++c){
-						a.at<int8_t>(c,i,j,k) = t+1;
-						assert(a.at<int8_t>(c,i,j,k) == int8_t(t+1));
+						a.elem<int8_t>(c,i,j,k) = t+1;
+						assert(a.elem<int8_t>(c,i,j,k) == int8_t(t+1));
 						++t;
 					}
 				}}}

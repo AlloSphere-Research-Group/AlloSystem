@@ -149,27 +149,27 @@ public:
 
 
 	/// Get mutable component using 1-D index
-	template <class T> T& at(size_t ic, size_t ix){
+	template <class T> T& elem(size_t ic, size_t ix){
 		return cell<T>(ix)[ic]; }
 
 	/// Get mutable component using 2-D index
-	template <class T> T& at(size_t ic, size_t ix, size_t iy){
+	template <class T> T& elem(size_t ic, size_t ix, size_t iy){
 		return cell<T>(ix,iy)[ic]; }
 
 	/// Get mutable component using 3-D index
-	template <class T> T& at(size_t ic, size_t ix, size_t iy, size_t iz){
+	template <class T> T& elem(size_t ic, size_t ix, size_t iy, size_t iz){
 		return cell<T>(ix,iy,iz)[ic]; }
 
 	/// Get const component using 1-D index
-	template <class T> const T& at (size_t ic, size_t ix) const{
+	template <class T> const T& elem(size_t ic, size_t ix) const{
 		return cell<T>(ix)[ic]; }
 
 	/// Get const component using 2-D index
-	template <class T> const T& at(size_t ic, size_t ix, size_t iy) const{
+	template <class T> const T& elem(size_t ic, size_t ix, size_t iy) const{
 		return cell<T>(ix,iy)[ic]; }
 
 	/// Get const component using 3-D index
-	template <class T> const T& at(size_t ic, size_t ix, size_t iy, size_t iz) const{
+	template <class T> const T& elem(size_t ic, size_t ix, size_t iy, size_t iz) const{
 		return cell<T>(ix,iy,iz)[ic]; }
 
 
@@ -432,27 +432,27 @@ inline void Array::format(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, ui
 }
 
 inline void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, size_t align) {
-	uint32_t dims[] = {dimx,0,0,0};
-	formatAlignedGeneral(comps, ty, dims, 1, align);
+	uint32_t dims[] = {dimx};
+	formatAlignedGeneral(comps, ty, dims,1, align);
 }
 inline void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, size_t align) {
-	uint32_t dims[] = {dimx,dimy,0,0};
-	formatAlignedGeneral(comps, ty, dims, 2, align);
+	uint32_t dims[] = {dimx,dimy};
+	formatAlignedGeneral(comps, ty, dims,2, align);
 }
 inline void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, size_t align) {
-	uint32_t dims[] = {dimx,dimy,dimz,0};
-	formatAlignedGeneral(comps, ty, dims, 3, align);
+	uint32_t dims[] = {dimx,dimy,dimz};
+	formatAlignedGeneral(comps, ty, dims,3, align);
 }
 
 inline void Array::formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, int numDims, size_t align) {
+	if(numDims > ALLO_ARRAY_MAX_DIMS) numDims = ALLO_ARRAY_MAX_DIMS;
 	AlloArrayHeader hh;
 	hh.type = ty;
 	hh.components = comps;
-	hh.dimcount = numDims;
-	//for(int i=0; i<ALLO_ARRAY_MAX_DIMS; ++i) hh.dim[i] = dims[i];
+	hh.dimcount = numDims;	
 	int i=0;
-	for(; i<ALLO_ARRAY_MAX_DIMS && dims[i] != 0; ++i) hh.dim[i] = dims[i];
-	for(; i<ALLO_ARRAY_MAX_DIMS; ++i) hh.dim[i] = 0;
+	for(; i<numDims; ++i)				hh.dim[i] = dims[i];
+	for(; i<ALLO_ARRAY_MAX_DIMS; ++i)	hh.dim[i] = 0;
 	deriveStride(hh, align);
 	format(hh);
 }
