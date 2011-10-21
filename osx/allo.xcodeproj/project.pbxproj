@@ -3794,7 +3794,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ../\nmake allocore";
+			shellScript = "cd ../\nmake allocore -j4";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -4133,7 +4133,7 @@
 		1DEB923608733DC60010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				ARCHS = "$(NATIVE_ARCH)";
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)";
 				CONFIGURATION_TEMP_DIR = "$(PROJECT_TEMP_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				DEPLOYMENT_LOCATION = NO;
@@ -4172,7 +4172,7 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				RUN_CLANG_STATIC_ANALYZER = YES;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
+				SDKROOT = "";
 				SYMROOT = ../build/bin;
 				USER_HEADER_SEARCH_PATHS = "$PROJECT_DIR/../include $PROJECT_DIR/../osx/include";
 				VALID_ARCHS = "i386 x86_64";
