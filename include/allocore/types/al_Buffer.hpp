@@ -123,7 +123,9 @@ public:
 
 	/// Appends element to end of buffer growing its size if necessary
 	void append(const T& v, double growFactor=2){
-		if(size() >= capacity()){	// double array size if too small
+	
+		// Grow array if too small
+		if(size() >= capacity()){
 			// Copy argument since it may be an element in current memory range
 			// which may become invalid after the resize.
 			const T vsafecopy = v;
@@ -164,12 +166,13 @@ public:
 
 	/// Add new elements after each existing element
 	
-	/// @param[in] n	Number of elements to add after each existing element
+	/// @param[in] n	Expansion factor
 	/// @param[in] dup	If true, new elements are duplicates of existing elements.
 	///					If false, new elements are default constructed.
-	void expand(int n, bool dup=false){
+	template <int n, bool dup>
+	void expand(){
 		size(size()*n);
-		int Nd = dup ? n : 1;
+		const int Nd = dup ? n : 1;
 		for(int i=size()/n-1; i>=0; --i){
 			const T& v = (*this)[i];
 			for(int j=0; j<Nd; ++j) Alloc::construct(elems()+n*i+j, v);
