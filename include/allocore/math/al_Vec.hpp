@@ -61,20 +61,22 @@ typedef Vec<4,int>		Vec4i;	///< integer 4-vector
 
 template <int N, class T>
 struct VecElems{ T x,y,z,w; private: T data[N-4]; };
+
 template<class T> struct VecElems<0,T>{ static T x; };
+template<class T> T VecElems<0,T>::x=0;
+
 template<class T> struct VecElems<1,T>{ T x; };
 template<class T> struct VecElems<2,T>{ T x,y; };
 template<class T> struct VecElems<3,T>{ 
-	T x,y,z; 
-	
-	/// methods that only make sense for Vec<3,T>:
-	
-	/// returns cross product of this x b
-	inline Vec<3,T> cross(const Vec<3,T>& b) const {
+	T x,y,z;
+
+	/// Returns cross product of this x b
+	Vec<3,T> cross(const Vec<3,T>& b) const {
 		return Vec<3,T>( y*b.z - z*b.y, z*b.x - x*b.z, x*b.y - y*b.x );
 	}
 };
 template<class T> struct VecElems<4,T>{ T x,y,z,w; };
+
 
 
 /// Fixed-size n-vector

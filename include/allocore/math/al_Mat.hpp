@@ -54,6 +54,9 @@ typedef Mat<4,int>		Mat4i;	///< integer 4x4 matrix
 #define IT(n) for(int i=0; i<(n); ++i)
 
 
+static struct MatNoInit{} MAT_NO_INIT;
+
+
 /// Fixed-size n-by-n square matrix
 
 /// Elements are stored in column-major format.
@@ -70,8 +73,7 @@ public:
 	/// param[in] arr	one dimensional array in column-major
 	Mat(const T * arr){ set(arr); }
 
-	static struct NoInit{} NOINIT;
-	Mat(const NoInit& v){}
+	Mat(const MatNoInit& v){}
 
 	///
 	Mat(
@@ -116,7 +118,7 @@ public:
 
 	/// Get identity matrix
 	static Mat identity(){
-		return Mat(NOINIT).setIdentity();
+		return Mat(MAT_NO_INIT).setIdentity();
 	}
 
 	/// Get a rotation transform matrix
@@ -124,7 +126,7 @@ public:
 		double cs = cos(angle);
 		double sn = sin(angle);
 
-		Mat m(NOINIT);
+		Mat m(MAT_NO_INIT);
 		m.setIdentity();
 		m(dim1,dim1) = cs;
 		m(dim1,dim2) =-sn;
@@ -145,7 +147,7 @@ public:
 	/// Get a translation transform matrix
 	template <class V>
 	static Mat translation(const Vec<N-1,V>& v){
-		Mat m(NOINIT);
+		Mat m(MAT_NO_INIT);
 		m.setIdentity();
 		for(int r=0; r<N-1; ++r) m(r,N-1) = v[r];
 		return m;
