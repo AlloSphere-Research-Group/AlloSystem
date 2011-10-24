@@ -757,7 +757,8 @@ TEM inline T wrapOnce(const T& v, const T& hi, const T& lo){
 	return v;
 }
 
-TEM inline T wrapPhase(const T& r){
+TEM inline T wrapPhase(const T& r_){
+	T r = r_;
 	if(r >= T(M_PI)){
 		r -= T(M_2PI);
 		if(r < T(M_PI)) return r;
