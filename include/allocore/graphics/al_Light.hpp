@@ -31,6 +31,7 @@
 
 	File author(s):
 	Lance Putnam, 2010, putnam.lance@gmail.com
+	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
 #include <string>
