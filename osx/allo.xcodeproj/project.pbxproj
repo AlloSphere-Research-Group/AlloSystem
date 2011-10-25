@@ -420,13 +420,6 @@
 			remoteGlobalIDString = 36035DB813037E8D001E9BA9;
 			remoteInfo = "make allocore";
 		};
-		364D324714564500005D2EB0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 36035DB813037E8D001E9BA9;
-			remoteInfo = "make allocore";
-		};
 		366E78FE1407F2E90010B21A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
@@ -3631,7 +3624,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				364D324614564500005D2EB0 /* PBXTargetDependency */,
 			);
 			name = debugTests;
 			productName = exSimpleGraphics;
@@ -4125,11 +4117,6 @@
 			isa = PBXTargetDependency;
 			target = 36035DB813037E8D001E9BA9 /* make allocore */;
 			targetProxy = 36115B1D1438DE3400E121BF /* PBXContainerItemProxy */;
-		};
-		364D324614564500005D2EB0 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 36035DB813037E8D001E9BA9 /* make allocore */;
-			targetProxy = 364D324714564500005D2EB0 /* PBXContainerItemProxy */;
 		};
 		366E78FF1407F2E90010B21A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
