@@ -51,6 +51,8 @@
 		05C9388A128A166B0068F87F /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
 		05C9388B128A166B0068F87F /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
 		05C9388C128A166B0068F87F /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
+		1602B5E7145649AF00ABA5A5 /* al_FileWatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1602B5E6145649AF00ABA5A5 /* al_FileWatcher.cpp */; };
+		1602B5E8145649B200ABA5A5 /* al_App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16B4CE031427EBE000626C03 /* al_App.cpp */; };
 		160C8D0C132082E9006D7A42 /* isosurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16A6041C130345BB0077B460 /* isosurface.cpp */; };
 		163E4934130E0254007B30A0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492B130E0254007B30A0 /* libapr-1.a */; };
 		163E4935130E0254007B30A0 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
@@ -190,7 +192,6 @@
 		364D325214564500005D2EB0 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
 		364D325314564500005D2EB0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		364D325414564500005D2EB0 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DDF6512B6C8C000F75D2A /* libassimp.a */; };
-		364D325514564500005D2EB0 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
 		364D325614564500005D2EB0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492B130E0254007B30A0 /* libapr-1.a */; };
 		364D325714564500005D2EB0 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		364D325814564500005D2EB0 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
@@ -499,6 +500,7 @@
 /* Begin PBXFileReference section */
 		05C93813128A158B0068F87F /* exSimpleGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exSimpleGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
 		05C93890128A166B0068F87F /* exSimpleGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exSimpleGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
+		1602B5E6145649AF00ABA5A5 /* al_FileWatcher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_FileWatcher.cpp; sourceTree = "<group>"; };
 		16054DBA122E12010039003C /* al_FileAPR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_FileAPR.cpp; sourceTree = "<group>"; };
 		16054DC0122E13360039003C /* utThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utThread.cpp; sourceTree = "<group>"; };
 		16054DC1122E13360039003C /* utFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utFile.cpp; sourceTree = "<group>"; };
@@ -1549,7 +1551,6 @@
 				364D325214564500005D2EB0 /* libfreeimage.a in Frameworks */,
 				364D325314564500005D2EB0 /* libapr-1.a in Frameworks */,
 				364D325414564500005D2EB0 /* libassimp.a in Frameworks */,
-				364D325514564500005D2EB0 /* liballocore.a in Frameworks */,
 				364D325614564500005D2EB0 /* libapr-1.a in Frameworks */,
 				364D325714564500005D2EB0 /* libassimp.a in Frameworks */,
 				364D325814564500005D2EB0 /* libfreeimage.a in Frameworks */,
@@ -2992,6 +2993,7 @@
 			isa = PBXGroup;
 			children = (
 				16B4CE031427EBE000626C03 /* al_App.cpp */,
+				1602B5E6145649AF00ABA5A5 /* al_FileWatcher.cpp */,
 				36F3A43612FCCF88004BC82F /* Makefile */,
 			);
 			name = src;
@@ -4014,6 +4016,8 @@
 				364D32F814564662005D2EB0 /* al_ThreadAPR.cpp in Sources */,
 				364D32FA14564662005D2EB0 /* OscPrintReceivedElements.cpp in Sources */,
 				364D32FB14564662005D2EB0 /* UdpSocket.cpp in Sources */,
+				1602B5E7145649AF00ABA5A5 /* al_FileWatcher.cpp in Sources */,
+				1602B5E8145649B200ABA5A5 /* al_App.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
