@@ -222,11 +222,10 @@ protected:
 
 
 /// Interface for objects which can be registered with an audio IO stream
-
 class AudioCallback {
 public:
 	virtual ~AudioCallback() {}
-	virtual void onAudioCB(AudioIOData& io) = 0;
+	virtual void onAudioCB(AudioIOData& io) = 0;	///< Callback
 };
 
 
@@ -238,7 +237,7 @@ class AudioIO : public AudioIOData {
 public:
 
 	/// Creates AudioIO using default I/O devices.
-	///
+
 	/// @param[in] framesPerBuf		Number of sample frames to process per callback
 	/// @param[in] framesPerSec		Frame rate.  Unsupported values will use default rate of device.
 	/// @param[in] callback			Audio processing callback (optional)
