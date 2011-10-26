@@ -66,7 +66,7 @@ public:
 
 
 	// Getters
-	bool created() const { return mID >= 0; }
+	bool created() const { return mID > 0; }
 
 	int id() const { return mInGameMode ? mIDGameMode : mID; }
 
@@ -186,13 +186,6 @@ public:
 		}
 	}
 
-	void scheduleDraw(){
-		if (!mScheduled) {
-			mScheduled = true;
-			//printf("window id: %d\n", id());
-			Main::get().queue().send(0, scheduleDrawStatic, id());
-		}
-	}
 
 	// Returns the implementation of the currently selected window
 	static WindowImpl * getWindowImpl(){ return getWindowImpl(glutGetWindow()); }
@@ -218,10 +211,6 @@ public:
 		//printf("a:%d c:%d s:%d\n", g->keyboard.alt(), g->keyboard.ctrl(), g->keyboard.shift());
 	}
 
-	static void cbDisplay(){
-//		printf("GLUT display\n");
-		// this is empty because we are using a periodic timer for drawing
-	}
 
 	// incoming GLUT keys need to be remapped in certain cases...
 	static unsigned int remapKey(unsigned int key, bool special){
@@ -394,7 +383,7 @@ public:
 		//printf("GLUT reshape: w = %4d, h = %4d\n", w,h);
 		Window * win = getWindow();
 		if(win){
-			win->makeActive();
+			win->makeCurrent();
 
 			Window::Dim& dimPrev = win->mImpl->mDimPrev;
 			Window::Dim& dimCurr = win->mImpl->mDimCurr;
@@ -422,6 +411,13 @@ public:
 		}
 	}
 
+	// This is triggered upon a call to glutPostRedisplay or implicitly as the 
+	// result of window damage reported by the window system.
+	static void cbDisplay(){
+		//printf("GLUT display for window %d\n", glutGetWindow());
+		// this is empty because we are using a periodic timer for drawing
+	}
+
 	static void registerCBs(){
 		glutKeyboardFunc(cbKeyboard);
 		glutKeyboardUpFunc(cbKeyboardUp);
@@ -433,6 +429,15 @@ public:
 		glutReshapeFunc(cbReshape);
 		glutVisibilityFunc(cbVisibility);
 		glutDisplayFunc(cbDisplay);
+	}
+
+
+	void scheduleDraw(){
+		if (!mScheduled) {
+			mScheduled = true;
+			//printf("window id: %d\n", id());
+			Main::get().queue().send(0, scheduleDrawStatic, id());
+		}
 	}
 
 private:
@@ -454,7 +459,9 @@ private:
 					impl->mFrameTime = timeNow;
 				}
 				
+				// this calls the window's onFrame()
 				win->doFrameImpl();
+
 				if(win->fps() > 0) {
 					al_sec next;
 					al_sec rt = M.realtime();	// what time it really is now (after render)
@@ -483,8 +490,7 @@ private:
 		}
 	}
 
-	// Map of windows constructed on first use to avoid static intialization
-	// order problems.
+	// Get ID -> created GLUT window map
 	static WindowsMap& windows(){
 		static WindowsMap* v = new WindowsMap;
 		return *v;
@@ -501,7 +507,6 @@ private:
 	std::string mTitle;
 	Window::Cursor mCursor;
 
-
 	bool mInGameMode;
 	bool mVisible;
 	bool mFullScreen;
@@ -512,6 +517,8 @@ private:
 };
 
 
+
+//******************************************************************************
 
 Window::Window()
 :	mImpl(new WindowImpl(this))
@@ -560,6 +567,7 @@ void Window::create(
 //	printf("%d\n", stat);
 
 	mImpl->mID = glutCreateWindow(mImpl->mTitle.c_str());
+	//assert(mImpl->mID > 0);	// valid IDs start at 1
 	//printf("GLUT created window %d\n",mImpl->mID);
 
 	glutSetWindow(mImpl->mID);
@@ -602,10 +610,10 @@ bool Window::visible() const { return mImpl->mVisible; }
 Window& Window::cursor(Cursor v){
 	mImpl->mCursor = v;
 
-	if(created() && !mImpl->mCursorHide){
+	if(!mImpl->mCursorHide){
 		switch(v){
-			case CROSSHAIR:	makeActive(); glutSetCursor(GLUT_CURSOR_CROSSHAIR);
-			case POINTER:	makeActive(); glutSetCursor(GLUT_CURSOR_INHERIT);
+			case CROSSHAIR:	if(makeCurrent()) glutSetCursor(GLUT_CURSOR_CROSSHAIR); break;
+			case POINTER:	if(makeCurrent()) glutSetCursor(GLUT_CURSOR_INHERIT); break;
 			default:;
 		}
 	}
@@ -614,9 +622,10 @@ Window& Window::cursor(Cursor v){
 
 Window& Window::cursorHide(bool v){
 	mImpl->mCursorHide = v;
-	makeActive();
-	if(created() && v)	glutSetCursor(GLUT_CURSOR_NONE);
-	else				cursor(mImpl->mCursor);
+	if(makeCurrent()){
+		if(v)	glutSetCursor(GLUT_CURSOR_NONE);
+		else	cursor(mImpl->mCursor);
+	}
 	return *this;
 }
 
@@ -642,13 +651,9 @@ void Window::doFrameImpl(){
 	const int winID = mImpl->id();
 	const int current = glutGetWindow();
 	if(winID != current) glutSetWindow(winID);
-//	glutPostRedisplay();
-	//glEnable(GL_DEPTH_TEST);
-
 	doFrame();
-
 	glutSwapBuffers();
-//	if(current > 0 && current != winID) glutSetWindow(current);
+	//if(current > 0 && current != winID) glutSetWindow(current);
 }
 
 Window& Window::fps(double v){
@@ -706,15 +711,20 @@ Window& Window::fullScreen(bool v){
 	return *this;
 }
 
-Window& Window::hide(){ makeActive(); glutHideWindow(); return *this; }
-Window& Window::iconify(){ makeActive(); glutIconifyWindow(); return *this; }
-Window& Window::makeActive(){ glutSetWindow(mImpl->id()); return *this; }
-Window& Window::show(){ makeActive(); glutShowWindow(); return *this; }
+Window& Window::hide(){ if(makeCurrent()) glutHideWindow(); return *this; }
+Window& Window::iconify(){ if(makeCurrent()) glutIconifyWindow(); return *this; }
+bool Window::makeCurrent() const {
+	if(created()){
+		glutSetWindow(mImpl->id());
+		return true;
+	}
+	return false;
+}
+Window& Window::show(){ if(makeCurrent()) glutShowWindow(); return *this; }
 
 Window& Window::title(const std::string& v){
 	mImpl->mTitle = v;
-	if(created()){
-		glutSetWindow(mImpl->mID);
+	if(makeCurrent()){
 		glutSetWindowTitle(mImpl->mTitle.c_str());
 		//printf("Window::title(%s)\n", mImpl->mTitle.c_str());
 	}

@@ -301,7 +301,6 @@ public:
 	Window& fullScreenToggle();					///< Toggle fullscreen
 	Window& hide();								///< Hide window (if showing)
 	Window& iconify();							///< Iconify window
-	Window& makeActive();						///< Bring window to front
 	Window& show();								///< Show window (if hidden)
 	Window& title(const std::string& v);		///< Set title
 	Window& asap(bool v) { mASAP=v; return *this; }	///< Set whether window renders as fast as possible
@@ -364,6 +363,7 @@ protected:
 	DisplayMode mDisplayMode;
 	bool mASAP;
 
+	bool makeCurrent() const;
 	Window& insert(InputEventHandler& v, int i);
 	Window& insert(WindowEventHandler& v, int i);
 
