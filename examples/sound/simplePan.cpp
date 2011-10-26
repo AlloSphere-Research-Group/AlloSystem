@@ -40,7 +40,7 @@ int main() {
     Window::Dim(600,400), // window dimensions
     "Dot", // name on window
     30.0f, // frames per second
-    DisplayMode::DefaultBuf | DisplayMode::Multisample // makes things look nice
+    Window::DEFAULT_BUF | Window::MULTISAMPLE // makes things look nice
   );
 
   app.initAudio(
