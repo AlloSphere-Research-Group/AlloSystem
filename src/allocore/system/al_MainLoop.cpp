@@ -62,11 +62,10 @@ static void mainGLUTTimerFunc(int id);
 static void mainGLUTExitFunc();
 
 static void mainGLUTInit() {
-	int   argc   = 1;
-	char name[] = {'a','l','l','o'};
-	char *argv[] = {name, NULL};
+	int argc = 1;
+	char name[] = {'a','l','l','o','\0'};
+	char * argv[] = {name};
 	glutInit(&argc,argv);
-	
 	atexit(mainGLUTExitFunc);
 }
 
@@ -153,13 +152,12 @@ struct ForceMainThreadMain {
 	}
 };
 
-ForceMainThreadMain fmtm;
+static ForceMainThreadMain fmtm;
 
 void Main::start() {
-
 	if (!mActive) {
 		mActive = true;
-		
+
 		while (mActive) {
 			// check inside sleep loop, so that we can smoothly migrate
 			// from a sleep-loop to a GLUT or NATIVE loop:
