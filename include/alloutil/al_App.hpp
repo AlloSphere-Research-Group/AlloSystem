@@ -35,11 +35,8 @@
 #include <math.h>
 #include <string>
 #include <vector>
-
 #include "allocore/al_Allocore.hpp"
 #include "alloutil/al_ControlNav.hpp"
-
-//#include "GLV/glv.h"
 
 namespace al{
 
@@ -53,9 +50,9 @@ public:
 
 	Viewpoint(const Pose& transform = Pose::identity())
 	:	mViewport(0,0,0,0),
-		mParentTransform(0),
+		mParentTransform(NULL),
 		mAnchorX(0), mAnchorY(0), mStretchX(1), mStretchY(1),
-		mCamera(0), mClearColor(0)
+		mCamera(NULL), mClearColor(NULL)
 	{}
 
 	float anchorX() const { return mAnchorX; }
@@ -79,8 +76,8 @@ public:
 		mStretchX=sx; mStretchY=sy; return *this;
 	}
 
-	bool hasCamera() const { return 0 != mCamera; }
-	bool hasClearColor() const { return 0 != mClearColor; }
+	bool hasCamera() const { return NULL != mCamera; }
+	bool hasClearColor() const { return NULL != mClearColor; }
 
 	const Camera& camera() const { return *mCamera; }
 	Viewpoint& camera(Camera& v){ mCamera=&v; return *this; }
@@ -89,7 +86,8 @@ public:
 	Viewpoint& clearColor(Color& v){ mClearColor=&v; return *this; }
 
 	const Pose* parentTransform() const { return mParentTransform; }
-	Viewpoint& parentTransform(Pose& v){ mParentTransform = &v; return *this; }
+	Viewpoint& parentTransform(Pose& v){ mParentTransform =&v; return *this; }
+	Viewpoint& parentTransform(Pose* v){ mParentTransform = v; return *this; }
 
 	const Pose& transform() const { return mTransform; }
 	Pose& transform(){ return mTransform; }
@@ -113,13 +111,17 @@ protected:
 /// A window with one or more Viewpoints
 class ViewpointWindow : public Window {
 public:
-	using Window::add;
 	typedef std::vector<Viewpoint *> Viewpoints;
 
+	///
 	ViewpointWindow(){
 		init();
 	}
 	
+	/// @param[in] dims		window dimensions
+	/// @param[in] title	window title
+	/// @param[in] fps		frames/second
+	/// @param[in] mode		window display mode
 	ViewpointWindow(
 		const Dim& dims,
 		const std::string title="",
@@ -130,8 +132,10 @@ public:
 		create(dims, title, fps, mode);
 	}
 
+	/// Get the list of viewpoints
 	const Viewpoints& viewpoints() const { return mViewpoints; }
 	
+	/// Add a new viewpoint to the window
 	ViewpointWindow& add(Viewpoint& v){ mViewpoints.push_back(&v); return *this; }
 
 protected:
@@ -140,14 +144,16 @@ protected:
 	virtual bool onResize(int dw, int dh);
 
 private:
+	StandardWindowKeyControls mStandardKeyControls;
 	void init(){
-		add(new StandardWindowKeyControls);
+		append(mStandardKeyControls);
 	}
 };
 
 
 /// Application helper class
 class App {
+//: public WindowEventHandler, public InputEventHandler {
 public:
 
 	typedef std::vector<Listener *>			Listeners;
@@ -158,13 +164,23 @@ public:
 
 
 	/// Initialize audio
+
+	/// @param[in] sampleRate		Sampling rate.  Unsupported values will use default rate of device.
+	/// @param[in] blockSize		Number of sample frames to process per callback
+	/// @param[in] outputChannels	Number of output channels to open
+	/// @param[in] inputChannels	Number of input channels to open
 	void initAudio(
-		double audioRate=44100, int audioBlockSize=128,
-		int audioOutputs=-1, int audioInputs=-1	
+		double audioRate=44100, int blockSize=128,
+		int outputChannels=-1, int inputChannels=-1	
 	);
 	
 	
 	/// Initialize a new window
+
+	/// @param[in] dims				Window dimensions
+	/// @param[in] title			Window title
+	/// @param[in] fps				Frames/second
+	/// @param[in] mode				Window display mode
 	ViewpointWindow * initWindow(
 		const Window::Dim& dims = Window::Dim(800,600),
 		const std::string title="",
@@ -188,16 +204,36 @@ public:
 	virtual void onAnimate(double dt){}
 
 	/// Drawing callback (in world coordinates)
-	
+
 	/// This will be called from the main graphics renderer. Since it may be 
 	/// called multiple times, no state updates should be made in it.
 	virtual void onDraw(Graphics& g, const Viewpoint& v){}
+
+	/// Called when a keyboard key is pressed
+	virtual void onKeyDown(const ViewpointWindow& w, const Keyboard& k){}
+	
+	/// Called when a keyboard key is released
+	virtual void onKeyUp(const ViewpointWindow& w, const Keyboard& k){}
+
+	/// Called when a mouse button is pressed
+	virtual void onMouseDown(const ViewpointWindow& w, const Mouse& m){}
+	
+	/// Called when a mouse button is released
+	virtual void onMouseUp(const ViewpointWindow& w, const Mouse& m){}
+	
+	/// Called when the mouse moves while a button is down
+	virtual void onMouseDrag(const ViewpointWindow& w, const Mouse& m){}
+	
+	/// Called when the mouse moves
+	virtual void onMouseMove(const ViewpointWindow& w, const Mouse& m){}
+
 
 	/// Called upon creation of a window
 	virtual void onCreate(const ViewpointWindow& win){}
 	
 	/// Called upon destruction of a window
 	virtual void onDestroy(const ViewpointWindow& win){}
+
 
 
 
@@ -257,7 +293,7 @@ public:
 
 private:
 
-	typedef std::vector<Viewpoint> Viewpoints;
+	typedef std::vector<Viewpoint *> Viewpoints;
 
 	Viewpoints mFacViewpoints;
 	Windows mFacWindows;
@@ -290,7 +326,6 @@ private:
 
 	// attached to each ViewpointWindow
 	struct SceneWindowHandler : public WindowEventHandler{
-
 		ViewpointWindow& win;
 		App& app;
 
@@ -310,18 +345,40 @@ private:
 	};
 	
 	struct SceneInputHandler : public InputEventHandler{
-		SceneInputHandler(App& a): app(a){}
-		
+		ViewpointWindow& win;
+		App& app;
+
+		SceneInputHandler(ViewpointWindow& w, App& a): win(w), app(a){}
+
 		virtual bool onKeyDown(const Keyboard& k){
+			app.onKeyDown(win, k);
 			switch(k.key()){
 				case Keyboard::TAB: app.stereo().stereo(!app.stereo().stereo()); return false;
 				default:;
 			}
 			return true;
 		}
-
-		App& app;
+		virtual bool onKeyUp(const Keyboard& k){ app.onKeyUp(win,k); return true;}
+		virtual bool onMouseDown(const Mouse& m){ app.onMouseDown(win,m); return true;}
+		virtual bool onMouseUp(const Mouse& m){ app.onMouseUp(win,m); return true;}
+		virtual bool onMouseDrag(const Mouse& m){ app.onMouseDrag(win,m); return true;}
+		virtual bool onMouseMove(const Mouse& m){ app.onMouseMove(win,m); return true;}
 	};
+	
+//	struct SceneInputHandler : public StandardWindowKeyControls{
+//		SceneInputHandler(App& a): app(a){}
+//		
+//		virtual bool onKeyDown(const Keyboard& k){
+//			if(!StandardWindowKeyControls::onKeyDown(k)) return false;
+//			switch(k.key()){
+//				case Keyboard::TAB: app.stereo().stereo(!app.stereo().stereo()); return false;
+//				default:;
+//			}
+//			return true;
+//		}
+//
+//		App& app;
+//	};
 
 };
 

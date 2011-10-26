@@ -9,12 +9,10 @@ bool ViewpointWindow::onResize(int dw, int dh){
 	
 	while(iv != mViewpoints.end()){
 		Viewpoint& vp = **iv;
-
 		vp.viewport().l += dw * vp.anchorX();
 		vp.viewport().b += dh * vp.anchorY();
 		vp.viewport().w += dw * vp.stretchX();
 		vp.viewport().h += dh * vp.stretchY();
-
 		++iv;
 	}
 	return true;
@@ -32,8 +30,12 @@ App::App()
 App::~App(){
 	mAudioIO.close(); // FIXME: can happen after accessed data is freed
 	
+	// delete factory objects
 	for(unsigned i=0; i<mFacWindows.size(); ++i){
 		delete mFacWindows[i];
+	}
+	for(unsigned i=0; i<mFacViewpoints.size(); ++i){
+		delete mFacViewpoints[i];
 	}
 	
 	if(name()!="" && oscSend().opened()) sendDisconnect();
@@ -90,11 +92,11 @@ ViewpointWindow * App::initWindow(
 	int flags
 ){
 	ViewpointWindow * win = new ViewpointWindow(dims, title, fps, mode);
-	mFacViewpoints.push_back(Viewpoint());
+	mFacViewpoints.push_back(new Viewpoint);
 	
 	int last = mFacViewpoints.size()-1;
 	{
-		Viewpoint& vp = mFacViewpoints[last];
+		Viewpoint& vp = *mFacViewpoints[last];
 		vp.parentTransform(nav());
 		win->add(vp);
 	}
@@ -105,26 +107,10 @@ ViewpointWindow * App::initWindow(
 }
 
 
-void App::start(){
-	if(!clockAnimate() && !mWindows.empty()){
-		clockAnimate(mWindows[0]);
-	}
-	if(usingAudio()) mAudioIO.start();
-	if(name()!="" && oscSend().opened()) sendHandshake();
-	
-	if(windows().size()){
-		MainLoop::start();
-	}
-	else{
-		printf("\nPress 'enter' to quit...\n"); getchar();
-	}
-}
-
-
 App& App::add(ViewpointWindow& win){
 	win.append(mNavControl);
 	win.append(*new SceneWindowHandler(win, *this));
-	win.append(*new SceneInputHandler(*this));
+	win.append(*new SceneInputHandler(win, *this));
 	mWindows.push_back(&win);
 
 	// TODO: for now, first window will clock master Nav
@@ -132,6 +118,37 @@ App& App::add(ViewpointWindow& win){
 		mClockNav = mWindows[0];
 	}
 	return *this;
+}
+
+
+void App::start(){
+	if(!clockAnimate() && !mWindows.empty()){
+		clockAnimate(mWindows[0]);
+	}
+	if(usingAudio()) mAudioIO.start();
+	if(name()!="" && oscSend().opened()) sendHandshake();
+
+//	// factories OKAY
+//	for(unsigned i=0; i<mFacViewpoints.size(); ++i)
+//		printf("%p\n", mFacViewpoints[i].parentTransform());
+//
+//	// window pointers OKAY
+//	for(unsigned j=0; j<windows().size(); ++j){
+//		ViewpointWindow& w = *windows()[j];
+//		for(unsigned i=0; i<w.viewpoints().size(); ++i){
+//			Viewpoint& vp = *w.viewpoints()[i];
+//			printf("%d,%d: %p\n", j,i, vp.parentTransform());
+//			printf("anchor : %g %g\n", vp.anchorX(), vp.anchorY());
+//			printf("stretch: %g %g\n", vp.stretchX(), vp.stretchY());
+//		}
+//	}
+
+	if(windows().size()){
+		Main::get().start();	// FIXME: something in this call is stomping on local memory!
+	}
+	else{
+		printf("\nPress 'enter' to quit...\n"); getchar();
+	}
 }
 
 
@@ -160,12 +177,12 @@ bool App::SceneWindowHandler::onFrame(){
 
 	struct DrawFunc : public Drawable {
 		App& app;
-		Viewpoint& v;
-		DrawFunc(App& a, Viewpoint& v_)
-			:	app(a), v(v_){}
+		Viewpoint& vp;
+		DrawFunc(App& a, Viewpoint& v)
+			:	app(a), vp(v){}
 		virtual void onDraw(Graphics& g){
 			g.pushMatrix(g.MODELVIEW);
-			app.onDraw(g,v);
+			app.onDraw(g,vp);
 			g.popMatrix(g.MODELVIEW);
 		}
 	};
@@ -191,7 +208,6 @@ bool App::SceneWindowHandler::onFrame(){
 		app.stereo().draw(g, cam, vp.worldTransform(), vp.viewport(), drawFunc);
 		app.stereo().clearColor(defaultClearColor);
 	}
-
 	return true;
 }
 
