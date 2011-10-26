@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -7,7 +8,8 @@
 namespace al{
 
 MsgQueue :: MsgQueue(int size, malloc_func mfunc, free_func ffunc) 
-:	mHead(NULL), mTail(NULL), mLen(0), mChunkSize(size), mNow(0), 
+:	mHead(NULL), mTail(NULL), mPool(NULL),
+	mLen(0), mChunkSize(size), mNow(0), 
 	mMalloc(mfunc ? mfunc : malloc), mFree(ffunc ? ffunc : free)
 {
 	growPool();
@@ -28,6 +30,7 @@ MsgQueue :: ~MsgQueue() {
 }
 
 void MsgQueue :: growPool() {
+	assert(!mPool); // LJP
 	int size = mChunkSize;
 	mPool = (Msg *)mMalloc(sizeof(Msg));
 	Msg * m = mPool;
@@ -40,6 +43,7 @@ void MsgQueue :: growPool() {
 
 /* push a message back into the pool */
 void MsgQueue :: recycle(Msg * m) {
+	assert(mLen); // LJP
 	m->next = mPool;
 	mPool = m;
 	if (m->isBigMessage()) {
