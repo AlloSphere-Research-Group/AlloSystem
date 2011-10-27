@@ -355,14 +355,14 @@ void Mesh::merge(const Mesh& src){
 	// Source has indices, and I either do or don't.
 	// After this block, I will have indices.
 	if(src.indices().size()){
-		int Nv = vertices().size();
-		int Ni = indices().size();
+		Index Nv = vertices().size();
+		Index Ni = indices().size();
 		// If no indices, must create
 		if(0 == Ni){
 			for(int i=0; i<Nv; ++i) index(i);
 		}
 		// Add source indices offset by my number of vertices
-		index(src.indices().elems(), src.indices().size(), Nv);
+		index(src.indices().elems(), src.indices().size(), (unsigned int)Nv);
 	}
 	
 	// Source doesn't have indices, but I do
