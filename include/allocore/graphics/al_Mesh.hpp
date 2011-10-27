@@ -159,7 +159,7 @@ public:
 	/// Append indices to index buffer	
 	template <class Tindex>
 	void index(const Tindex * buf, int size, Tindex indexOffset=0){
-		for(int i=0; i<size; ++i) index(buf[i] + indexOffset); }
+		for(int i=0; i<size; ++i) index((Index)(buf[i] + indexOffset)); }
 
 
 	/// Append color to color buffer
