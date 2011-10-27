@@ -359,7 +359,7 @@ void Mesh::merge(const Mesh& src){
 		Index Ni = indices().size();
 		// If no indices, must create
 		if(0 == Ni){
-			for(int i=0; i<Nv; ++i) index(i);
+			for(Index i=0; i<Nv; ++i) index(i);
 		}
 		// Add source indices offset by my number of vertices
 		index(src.indices().elems(), src.indices().size(), (unsigned int)Nv);
