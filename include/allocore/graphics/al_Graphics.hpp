@@ -185,6 +185,7 @@ public:
 	void lighting(bool b);
 	void scissor(bool b);
 	void cullFace(bool b);
+	void cullFace(bool b, Face face);
 
 
 	// Other state
@@ -329,6 +330,10 @@ inline void Graphics::depthTesting(bool b){ capability(DEPTH_TEST, b); }
 inline void Graphics::lighting(bool b){ capability(LIGHTING, b); }
 inline void Graphics::scissor(bool b){ capability(SCISSOR_TEST, b); }
 inline void Graphics::cullFace(bool b){ capability(CULL_FACE, b); }
+inline void Graphics::cullFace(bool b, Face face) {
+	capability(CULL_FACE, b);
+	glCullFace(face);
+}
 inline void Graphics::matrixMode(MatrixMode mode){ glMatrixMode(mode); }
 inline void Graphics::pushMatrix(){ glPushMatrix(); }
 inline void Graphics::popMatrix(){ glPopMatrix(); }

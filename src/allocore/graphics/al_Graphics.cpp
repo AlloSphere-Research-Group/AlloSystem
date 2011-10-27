@@ -100,8 +100,6 @@ AlloTy Graphics :: toAlloTy(Graphics::DataType v) {
 	}
 }
 
-
-
 void Graphics::antialiasing(AntiAliasMode v){
 	glHint(GL_POINT_SMOOTH_HINT, v);
 	glHint(GL_LINE_SMOOTH_HINT, v);
