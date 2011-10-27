@@ -158,7 +158,7 @@ public:
 
 	/// Append indices to index buffer	
 	template <class Tindex>
-	void index(const Tindex * buf, int size, int indexOffset=0){
+	void index(const Tindex * buf, int size, Tindex indexOffset=0){
 		for(int i=0; i<size; ++i) index(buf[i] + indexOffset); }
 
 
