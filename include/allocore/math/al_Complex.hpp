@@ -210,6 +210,19 @@ void rotatePlane(VecN& v1, VecN& v2, const Complex<T>& a){
 	v1 = t;
 }
 
+
+/// Stereographically project complex number onto Riemann sphere
+template <class Vec3, class T>
+Vec3 sterProj(const al::Complex<T>& c){	
+	T magSqr = c.magSqr();
+	T mul = 2./(magSqr + 1);
+	return Vec3(
+		c.r*mul,
+		c.i*mul,
+		(magSqr - 1)*mul*0.5
+	);
+}
+
 } // al::
 
 #endif
