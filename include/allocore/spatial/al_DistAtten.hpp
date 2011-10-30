@@ -40,7 +40,7 @@ namespace al{
 
 
 /// Maps a distance into an attenuation factor
-template <class T>
+template <class T = float>
 class DistAtten{
 public:
 
