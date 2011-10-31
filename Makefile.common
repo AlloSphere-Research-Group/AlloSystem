@@ -51,6 +51,8 @@ USING_PUREDYNE	= 0
 #--------------------------------------------------------------------------
 # Build settings
 #--------------------------------------------------------------------------
+# Name of the library
+# This should be defined prior to including this file
 LIB_NAME	?=
 
 # Build configuration: 'Release' or 'Debug'
@@ -62,10 +64,7 @@ VERBOSE		= 0
 # Whether Make should determine the dependencies of each C or C++ file as
 # it compiles it. This will be automatically disabled for universal builds
 # on Mac OSX.
-DEP_TRACK = 1
-ifeq ($(ARCH), 32_64)
-	DEP_TRACK = 0
-endif
+DEP_TRACK	= 1
 
 # Whether to enable strict warnings
 STRICT_WARNINGS = 1
@@ -106,11 +105,21 @@ PLATFORM_DIR ?=
 #--------------------------------------------------------------------------
 
 # NOTE: ar -s is completely equivalent to running ranlib
-
 AR 		= ar crs
 INSTALL		= install
 RANLIB		= ranlib
 RM		= rm -f
+
+
+# Let user override variables
+-include Makefile.user
+
+#--------------------------------------------------------------------------
+# Finalize variables
+#--------------------------------------------------------------------------
+ifeq ($(ARCH), 32_64)
+	DEP_TRACK = 0
+endif
 
 # Linux:
 ifeq ($(PLATFORM), linux)
@@ -172,14 +181,6 @@ else ifeq ($(PLATFORM), windows)
 	DLIB_EXT = dll
 endif
 
-#--------------------------------------------------------------------------
-# Utility functions
-#--------------------------------------------------------------------------
-RemoveDir = @if test -d $(1); then $(RM) $(1)* && rmdir $(1); fi
-
-#--------------------------------------------------------------------------
-# Finalize variables
-#--------------------------------------------------------------------------
 ifeq ($(BUILD_CONFIG), Release)
 	CFLAGS += -O3 -fpeel-loops
 else
@@ -207,3 +208,9 @@ SLIB_FILE = lib$(LIB_NAME).$(SLIB_EXT)
 DLIB_FILE = lib$(LIB_NAME).$(DLIB_EXT)
 DLIB_PATH = $(addprefix $(BUILD_DIR)lib/, $(DLIB_FILE))
 SLIB_PATH = $(addprefix $(BUILD_DIR)lib/, $(SLIB_FILE))
+
+
+#--------------------------------------------------------------------------
+# Utility functions
+#--------------------------------------------------------------------------
+RemoveDir = @if test -d $(1); then $(RM) $(1)* && rmdir $(1); fi
