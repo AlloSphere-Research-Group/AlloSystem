@@ -44,6 +44,11 @@ LINK_LIBS_FLAGS	=
 -include externals/gamma/Makefile.external
 -include externals/glv/Makefile.external
 
+RUN_SRCS	=  $(wildcard $(RUN_SRC_DIRS)/*.c) $(wildcard $(RUN_SRC_DIRS)/*.cpp)
+RUN_OBJS	=  $(addsuffix .o, $(basename $(notdir $(RUN_SRCS)) ))
+#RUN_OBJS	:= $(addsuffix .o, $(basename $(subst /,_,$(RUN_OBJS)) ))
+RUN_OBJS	:= $(addprefix $(OBJ_DIR), $(RUN_OBJS))
+
 #--------------------------------------------------------------------------
 # Rules
 #--------------------------------------------------------------------------
@@ -59,39 +64,42 @@ help:
 
 include Makefile.rules
 
+# For whatever reason, we need this rule so the objects don't get rm'ed by make
+runobjs: $(RUN_OBJS)
 
 # Compile and run source files in examples/ folder
-EXEC_TARGETS = examples/%.cpp
+EXEC_TARGETS  = $(addsuffix %.cpp, $(RUN_DIRS)) $(addsuffix %.c, $(RUN_DIRS))
 ifeq ($(PLATFORM), linux)
 	LINK_LIBS_FLAGS += $(addprefix -l :, $(notdir $(LINK_LIBS_PATH)))
 endif
 .PRECIOUS: $(EXEC_TARGETS)
-$(EXEC_TARGETS): allocore alloutil
-#	@echo $(LINK_LIBS_FLAGS)
-#	@echo $(LDFLAGS)
-	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS)
+$(EXEC_TARGETS): MY_FLAGS = $(shell test -e $(@D)/flags.txt && cat $(@D)/flags.txt)
+$(EXEC_TARGETS): allocore alloutil runobjs
+	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(MY_FLAGS)
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./$(*F)
 endif
 
+#EXEC_TARGETS := $(filter-out $(RUN_SRCS), $(EXEC_TARGETS))
+#$(EXEC_TARGETS): -include ./$(@D)/Makefile.config
+#$(filter-out $(RUN_SRCS), $(EXEC_TARGETS)): allocore alloutil
 
 # Build (and run) from one or more source files in a directory
-EXEC_DIR_TARGETS = examples/%
-.PRECIOUS: $(EXEC_DIR_TARGETS)
-$(EXEC_DIR_TARGETS): LSRC = $(wildcard $@/*.cpp) $(wildcard $@/*.c)
-$(EXEC_DIR_TARGETS): EXEC_NAME = $(subst /,_,$(*D))
-$(EXEC_DIR_TARGETS): allocore alloutil
-	@echo ($@)
-	@echo $(@D)
-	@echo $(*D)
-ifneq ($(*D), .)
-#	@echo $(EXEC_NAME)
-#	@echo $(LSRC)
-	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(EXEC_NAME) $(LSRC) $(LDFLAGS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) -I$@
-ifneq ($(AUTORUN), 0)
-	@cd $(BIN_DIR) && ./$(EXEC_NAME)
-endif
-endif
+#EXEC_DIR_TARGETS = examples/%
+#.PRECIOUS: $(EXEC_DIR_TARGETS)
+#$(EXEC_DIR_TARGETS): LSRC = $(wildcard $@/*.cpp) $(wildcard $@/*.c)
+#$(EXEC_DIR_TARGETS): EXEC_NAME = $(subst /,_,$(*D))
+#$(EXEC_DIR_TARGETS): allocore alloutil
+#ifneq ($(*D), .)
+##	@echo $(EXEC_NAME)
+##	@echo $(LSRC)
+#	@echo run folder: $@
+#	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(EXEC_NAME) $(LSRC) $(LDFLAGS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) -I$@
+#ifneq ($(AUTORUN), 0)
+#	@cd $(BIN_DIR) && ./$(EXEC_NAME)
+#endif
+#endif
+
 
 extended: all alloni
 
@@ -139,6 +147,7 @@ gamma glv:
 # Include files are copied into DESTDIR/include/LIB_NAME
 # Library files are copied into DESTDIR/lib
 install: allocore
+
 #	copy all header files from local build directory to destination
 	@for v in `cd $(BUILD_DIR)/include && find * -type d ! -path '*.*'`; do \
 		$(INSTALL) -d $(DESTDIR)/include/$$v; \
@@ -176,4 +185,3 @@ clean:
 # Build unit tests
 test: allocore external
 	@$(MAKE) -C $(TEST_DIR) test
-
