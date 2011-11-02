@@ -66,7 +66,7 @@ inline void initialize_apr() {
 	if (!initialized) {
 		initialized = true;
 		check_apr(apr_initialize());
-		atexit(apr_terminate);
+		atexit(apr_terminate);	// FIXME - can we have multiple atexit calls?
 	}
 }
 

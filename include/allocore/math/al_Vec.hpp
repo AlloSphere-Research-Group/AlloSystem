@@ -337,7 +337,7 @@ public:
 	}
 	
 	/// Reflect vector around line
-	Vec reflect(const Vec& normal) {
+	Vec reflect(const Vec& normal) const {
 		return (*this) - (T(2) * dot(normal) * normal);
 	}
 

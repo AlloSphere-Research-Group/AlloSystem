@@ -65,6 +65,7 @@ namespace al{
 class FilePath {
 public:
 	FilePath() {};
+	FilePath(const FilePath& cpy) : mPath(cpy.mPath), mFile(cpy.mFile) {}
 	FilePath(std::string file, std::string path) : mPath(path), mFile(file) {}
 	///! this constructor takes a path to a file:
 	FilePath(std::string fullpath);
@@ -100,9 +101,7 @@ public:
 	~SearchPaths() {}
 
 	/// find a file in the searchpaths
-	/// returns true if file found, and fills result with corresponding path & filename
-	/// returns false if file not found
-	FilePath find(const std::string& filename);
+	FilePath find(const std::string& filename) ;
 
 	/// add a path to search in; recursive searching is optional
 	void addSearchPath(const std::string& path, bool recursive = true);

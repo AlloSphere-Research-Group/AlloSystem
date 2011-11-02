@@ -41,6 +41,7 @@ public:
 	
 	Path(const std::string& dirname) : ImplAPR(), dir(NULL), dirname(dirname) {
 		if (APR_SUCCESS != check_apr(apr_dir_open(&dir, dirname.c_str(), mPool))) {
+			printf("dir %p\n", dir);
 			dir=NULL;
 		}
 	}
