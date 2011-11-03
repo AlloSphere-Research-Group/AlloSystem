@@ -44,18 +44,23 @@
 
 namespace al {
 
-///	A coordinate frame
+///	A local coordinate frame
 
-///	Combines a 3-vector position with a quaternion orientation
-///
+///	A Pose is a combined position (3-vector) and orientation (quaternion).
+/// Local coordinate bases are referred to as r, u, and f which stand for 
+/// right, up, and forward, respectively. Global coordinate bases are referred 
+/// to as x, y, and z. The mapping between the two coordinate systems is not 
+/// specified, so one should always use r, u, and f when needing local
+/// coordinates and x, y, z, when needing global (world) coordinates.
 class Pose {
 public:
+	/// Construct from a 
 	Pose(const Vec3d& v=Vec3d(0), const Quatd& q=Quatd::identity())
 	:	mVec(v), mQuat(q)
 	{}
 	
 	Pose(const Pose& p) { set(p); }
-	
+
 	operator Vec3d() { return pos(); }
 	operator Quatd() { return quat(); }
 
@@ -158,7 +163,9 @@ public:
 	Vec3d& vec(){ return mVec; }
 	Quatd& quat(){ return mQuat; }
 	
-	void set(Pose& src) { mVec = src.pos(); mQuat = src.quat(); }
+	/// Copy all attributes from another Pose
+	Pose& set(Pose& src){
+		mVec = src.pos(); mQuat = src.quat(); return *this; }
 
 	/// Set position
 	template <class T>
@@ -185,7 +192,6 @@ public:
 	void print() const { printf("Vec3d(%f, %f, %f);\nQuatd(%f, %f, %f, %f);\n",
 		mVec[0], mVec[1], mVec[2], mQuat[0], mQuat[1], mQuat[2], mQuat[3]); }
 
-	// TODO: conversion operators for Pose->Vec3d, Pose->Quatd?	
 protected:
 	Vec3d mVec;		// position in 3-space
 	Quatd mQuat;	// orientation of reference frame as a quaternion (relative to global axes)
