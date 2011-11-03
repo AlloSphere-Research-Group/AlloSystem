@@ -77,3 +77,31 @@ The following rules are available (to be run from the root directory):
 
 The rules that build examples and tests will automatically run the executable by default. To turn this off, pass AUTORUN=0 to make. The examples and tests rules follow standard Unix conventions so that, for instance, all the tests can be built and run by typing the command 'make tests/test*.cpp'.
 
+
+========================================
+3. Program Execution Using Make
+========================================
+
+The AlloCore Make system permits one to build and automatically run source files with a main() function defined. This is not meant to replace a full-fledged IDE for building complicated projects, but rather serves as a quick way to prototype ideas. By default, any source files located in ./examples or any subfolder thereof, can be built and run using the command
+	
+	make examples/mymain.cpp
+
+and will be linked against Allocore and its dependencies. The following additional capabilities are possible and must be configured manually.
+
+1. Definition of custom build paths.
+Sometimes it is handy to build and run sources files from custom directories as well as include one's own "library" code that is linked with all build-and-run executables. To configure these create a file "Makefile.user" in ./ and add the following variables:
+
+	RUN_DIRS	= directory1 directory2 ...
+	RUN_SRC_DIRS	= directoryA directoryB ...
+
+RUN_DIRS is a list of directories that Make searches recursively for build-and-run source files.
+The directory ./examples is automatically added to this list.
+
+RUN_SRC_DIRS is a list of directories that contain source code for objects files that are to be linked with all build-and-run sources. The sources in RUN_SRC_DIRS can be thought of as your own library source code.
+
+2. Definition of custom build flags.
+In the same directory as the build-and-run source file add a file called "flags.txt" which contains valid flags for the compiler. For example, if you need to link to libfoo.so located in /usr/local/lib, your flags.txt will contain something like:
+
+	-I/usr/local/include -L/usr/local/lib -lfoo
+
+
