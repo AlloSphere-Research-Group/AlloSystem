@@ -48,10 +48,7 @@ namespace al {
 
 ///	A Pose is a combined position (3-vector) and orientation (quaternion).
 /// Local coordinate bases are referred to as r, u, and f which stand for 
-/// right, up, and forward, respectively. Global coordinate bases are referred 
-/// to as x, y, and z. The mapping between the two coordinate systems is not 
-/// specified, so one should always use r, u, and f when needing local
-/// coordinates and x, y, z, when needing global (world) coordinates.
+/// right, up, and forward, respectively.
 class Pose {
 public:
 	/// Construct from a 
