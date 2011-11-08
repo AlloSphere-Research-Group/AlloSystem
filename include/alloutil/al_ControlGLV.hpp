@@ -27,10 +27,9 @@
 
 
 	File description:
-	GLV binding helper
+	A collection of utility classes for using GLV with AlloCore's window
 
 	File author(s):
-	Pablo Colapinto, 2010, wolftype@gmail.com
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
@@ -39,20 +38,28 @@
 
 namespace al {
 
+/// Base class for mapping window and input events to a GLV controller
 struct GLVControl {
 
+	///
 	GLVControl(glv::GLV& v): mGLV(&v){}
 
-	void glv(glv::GLV& v){ mGLV=&v; }
+	/// Set GLV controller
+	GLVControl& glv(glv::GLV& v){ mGLV=&v; return *this; }
+	
+	/// Get mutable GLV controller
 	glv::GLV& glv(){ return *mGLV; }
 
 protected:
 	glv::GLV * mGLV;
 };
 
-/// Mapping from keyboard and mouse controls to a GLV object
+
+
+/// Mapping from keyboard and mouse controls to a GLV controller
 struct GLVInputControl : public GLVControl, public InputEventHandler {
 
+	///
 	GLVInputControl(glv::GLV& v): GLVControl(v){}
 	virtual ~GLVInputControl(){}
 
@@ -106,9 +113,11 @@ protected:
 };
 
 
-/// Mapping from window events to a GLV object
+
+/// Mapping from window events to a GLV controller
 struct GLVWindowControl : public GLVControl, public WindowEventHandler {
 
+	///
 	GLVWindowControl(glv::GLV& v): GLVControl(v){}
 	virtual ~GLVWindowControl(){}
 
@@ -138,6 +147,7 @@ struct GLVWindowControl : public GLVControl, public WindowEventHandler {
 
 	//virtual bool onVisibility(bool v){ return true; }
 };
+
 
 
 /// Pose GLV model
