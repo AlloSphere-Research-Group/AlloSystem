@@ -34,7 +34,9 @@
 */
 
 #include "allocore/io/al_Window.hpp"
+#include "allocore/spatial/al_Pose.hpp"
 #include "GLV/glv_core.h"
+#include "GLV/glv_buttons.h"
 
 namespace al {
 
@@ -63,12 +65,8 @@ struct GLVInputControl : public GLVControl, public InputEventHandler {
 	GLVInputControl(glv::GLV& v): GLVControl(v){}
 	virtual ~GLVInputControl(){}
 
-	virtual bool onMouseDown(const Mouse& m){
-		glv::space_t xrel=m.x(), yrel=m.y();
-		glv().setMouseDown(xrel,yrel, m.button(), 0);
-		glv().setMousePos(m.x(), m.y(), xrel, yrel);
-		return !glv().propagateEvent();
-	}
+	virtual bool onMouseDown(const Mouse& m);
+	virtual bool onMouseUp(const al::Mouse& m);
 
 	virtual bool onMouseDrag(const Mouse& m){
 		return !motionToGLV(m, glv::Event::MouseDrag);
@@ -76,13 +74,6 @@ struct GLVInputControl : public GLVControl, public InputEventHandler {
 
 	virtual bool onMouseMove(const al::Mouse& m){
 		return !motionToGLV(m, glv::Event::MouseMove);
-	}
-
-	virtual bool onMouseUp(const al::Mouse& m){
-		glv::space_t xrel, yrel;
-		glv().setMouseUp(xrel,yrel, m.button(), 0);
-		glv().setMousePos(m.x(), m.y(), xrel, yrel);
-		return !glv().propagateEvent();
 	}
 
 	virtual bool onKeyDown(const Keyboard& k){
@@ -94,15 +85,7 @@ struct GLVInputControl : public GLVControl, public InputEventHandler {
 	}
 
 protected:
-	bool keyToGLV(const al::Keyboard& k, bool down){
-		down ? glv().setKeyDown(k.key()) : glv().setKeyUp(k.key());
-		const_cast<glv::Keyboard*>(&glv().keyboard())->alt(k.alt());
-		const_cast<glv::Keyboard*>(&glv().keyboard())->caps(k.caps());
-		const_cast<glv::Keyboard*>(&glv().keyboard())->ctrl(k.ctrl());
-		const_cast<glv::Keyboard*>(&glv().keyboard())->meta(k.meta());
-		const_cast<glv::Keyboard*>(&glv().keyboard())->shift(k.shift());
-		return glv().propagateEvent();
-	}
+	bool keyToGLV(const al::Keyboard& k, bool down);
 
 	bool motionToGLV(const al::Mouse& m, glv::Event::t e){
 		glv::space_t x = m.x(), y = m.y(), relx = x, rely = y;
@@ -121,15 +104,10 @@ struct GLVWindowControl : public GLVControl, public WindowEventHandler {
 	GLVWindowControl(glv::GLV& v): GLVControl(v){}
 	virtual ~GLVWindowControl(){}
 
-	virtual bool onCreate(){
-		glv().broadcastEvent(glv::Event::WindowCreate);
-		return true;
-	}
-
-	virtual bool onDestroy(){
-		glv().broadcastEvent(glv::Event::WindowDestroy);
-		return true;
-	}
+	virtual bool onCreate();
+	virtual bool onDestroy();
+	virtual bool onResize(int dw, int dh);
+	//virtual bool onVisibility(bool v){ return true; }
 
 	virtual bool onFrame(){
 		glv().drawGLV(glv().w, glv().h, window().spfActual());
@@ -137,15 +115,51 @@ struct GLVWindowControl : public GLVControl, public WindowEventHandler {
 		//glv().drawWidgets(glv().w, glv().h, window().spf());
 		return true;
 	}
+};
 
-	virtual bool onResize(int dw, int dh){
-		glv().extent(glv().width() + dw, glv().height() + dh);
-		//printf("GLVWindowControl onResize: %d %d %f %f\n", dw, dh, glv().width(), glv().height());
-		glv().broadcastEvent(glv::Event::WindowResize);
-		return true;
-	}
 
-	//virtual bool onVisibility(bool v){ return true; }
+
+/// A GLV that can be detached into its own window from a parent window
+class GLVDetachable : public glv::GLV {
+public:
+
+	///
+	GLVDetachable();
+
+	/// @param[in] parent	parent window
+	GLVDetachable(Window& parent);
+	
+	/// Get button for detaching/attaching GUI
+	glv::Button& detachedButton(){ return mDetachedButton; }
+	
+	/// Get parent window
+	Window& parentWindow(){ return *mParentWindow; }
+
+	/// Set parent window
+	GLVDetachable& parentWindow(Window& v);
+
+	/// Get detached window
+	Window& detachedWindow(){ return mDetachedWindow; }
+
+	/// Get whether GUI is detached from parent window
+	bool detached() const { return mDetachedWindow.created(); }
+
+	/// Get whether GUI is detached from parent window
+	GLVDetachable& detached(bool v);
+	
+	/// Toggle whether GUI is detached from parent window
+	GLVDetachable& detachedToggle(){ return detached(!detached()); }
+
+private:
+	Window * mParentWindow;
+	Window mDetachedWindow;
+	GLVInputControl mInputControl;
+	GLVWindowControl mWindowControl;
+	glv::Button mDetachedButton;
+
+	void addGUI(Window& w);
+	void remGUI(Window& w);
+	void init();
 };
 
 

@@ -141,6 +141,7 @@
 		16AC5368116293270076AA8B /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC53081162907D0076AA8B /* CoreAudio.framework */; };
 		16B5C1731189020B0090CE80 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
 		16B5C1741189020B0090CE80 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
+		16C137C31469B83200D8AE8B /* al_ControlGLV.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C137C21469B83200D8AE8B /* al_ControlGLV.cpp */; };
 		16C70699135D13F400FEE5B3 /* helloVirtualWorld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C70697135D13DF00FEE5B3 /* helloVirtualWorld.cpp */; };
 		16C706AE135D148800FEE5B3 /* reverb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168B4E811331383A0076257A /* reverb.cpp */; };
 		360C243811E6599F000FF335 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
@@ -607,6 +608,7 @@
 		16BC66A1117770BF002A0C18 /* al_Constants.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Constants.hpp; sourceTree = "<group>"; };
 		16BC66A2117770BF002A0C18 /* al_Functions.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Functions.hpp; sourceTree = "<group>"; };
 		16BC66A3117770BF002A0C18 /* al_Interpolation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Interpolation.hpp; sourceTree = "<group>"; };
+		16C137C21469B83200D8AE8B /* al_ControlGLV.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_ControlGLV.cpp; sourceTree = "<group>"; };
 		16C70697135D13DF00FEE5B3 /* helloVirtualWorld.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = helloVirtualWorld.cpp; sourceTree = "<group>"; };
 		16C70698135D13DF00FEE5B3 /* simpleWorld.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = simpleWorld.cpp; sourceTree = "<group>"; };
 		16C706B4135D14E400FEE5B3 /* OSC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OSC.cpp; sourceTree = "<group>"; };
@@ -2986,6 +2988,7 @@
 			isa = PBXGroup;
 			children = (
 				16B4CE031427EBE000626C03 /* al_App.cpp */,
+				16C137C21469B83200D8AE8B /* al_ControlGLV.cpp */,
 				1602B5E6145649AF00ABA5A5 /* al_FileWatcher.cpp */,
 				36F3A43612FCCF88004BC82F /* Makefile */,
 			);
@@ -4010,6 +4013,7 @@
 				364D32FB14564662005D2EB0 /* UdpSocket.cpp in Sources */,
 				1602B5E7145649AF00ABA5A5 /* al_FileWatcher.cpp in Sources */,
 				1602B5E8145649B200ABA5A5 /* al_App.cpp in Sources */,
+				16C137C31469B83200D8AE8B /* al_ControlGLV.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
