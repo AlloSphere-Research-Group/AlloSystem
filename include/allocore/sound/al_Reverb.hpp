@@ -155,9 +155,15 @@ public:
 	/// Set tank decay diffusion 2 amount, [0,1)
 	Reverb& diffusionDecay2(const T& v){ mDfDcy2=v; return *this; }
 
+
 	/// Compute wet stereo output from dry mono input
-	void operator()(const T& i0, T& o1, T& o2, T gain = T(0.6)){
-		T v = mPreDelay(i0 * T(0.5));
+	
+	/// @param[ in] in		dry input sample
+	/// @param[out] out1	wet output sample 1
+	/// @param[out] out2	wet output sample 2
+	/// @param[ in] gain	gain of output
+	void operator()(const T& in, T& out1, T& out2, T gain = T(0.6)){
+		T v = mPreDelay(in * T(0.5));
 		v = mOPIn(v);
 		v = mAPIn1.comb(v, mDfIn1,-mDfIn1);
 		v = mAPIn2.comb(v, mDfIn1,-mDfIn1);
@@ -179,28 +185,30 @@ public:
 		b = mAPDecay22.comb(b, mDfDcy2,-mDfDcy2);
 		mDly22.write(b);
 		
-		o1 = gain*(  mDly21.read(266)
+		out1 = (  mDly21.read(266)
 				+ mDly21.read(2974)
 				- mAPDecay22.read(1913)
 				+ mDly22.read(1996)
 				- mDly11.read(1990)
 				- mAPDecay12.read(187)
-				- mDly12.read(1066));
+				- mDly12.read(1066)) * gain;
 
-		o2 = gain*(  mDly11.read(353)
+		out2 = (  mDly11.read(353)
 				+ mDly11.read(3627)
 				- mAPDecay12.read(1228)
 				+ mDly12.read(2673)
 				- mDly21.read(2111)
 				- mAPDecay22.read(335)
-				- mDly22.read(121));
+				- mDly22.read(121)) * gain;
 	}
 
 	/// Compute wet/dry mix stereo output from dry mono input
 	
-	/// \returns dry sample
-	///
-	T mix(T& io0, T& o1, T wetAmt){
+	/// @param[inout] inout1		the input sample and wet/dry output 1
+	/// @param[  out]   out2		wet/dry output 2
+	/// @param[in   ] wetAmt		wet mix amount
+	/// \returns dry input sample
+	T mix(T& inout1, T& out2, T wetAmt){
 		T s = io0;
 		(*this)(s, io0, o1, wetAmt*T(0.6));
 		io0 += s;
