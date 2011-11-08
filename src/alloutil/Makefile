@@ -10,7 +10,7 @@ VPATH		= $(SRC_DIR)
 SRCS		:= $(wildcard $(SRC_DIR)/*.c*)
 OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
-CPPFLAGS	+= -I../../include
+CPPFLAGS	+= -I../../include -I../../externals/glv/
 
 include ../../Makefile.common
 include ../../Makefile.rules
