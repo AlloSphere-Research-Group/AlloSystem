@@ -36,6 +36,74 @@
 
 namespace al{
 
+
+/// Delay-line whose maximum size is fixed
+
+/// The advantage of using a static versus dynamic array is that its elements
+/// can be laid out in a predictable location in memory. This can improve
+/// access speeds if many delay-lines are used within another object, like a
+/// reverb.
+template <int N, class T>
+class StaticDelayLine {
+public:
+
+	StaticDelayLine(): mPos(0){}
+	
+
+	/// Get size of delay-line
+	static int size(){ return N; }
+	
+
+	/// Read value at delay i
+	const T& read(int i) const {
+		int ind = pos()-i;
+		if(ind < 0) ind += size();
+		//else if(ind >= size()) ind -= size();
+		return mBuf[ind];
+	}
+	
+	/// Write value to delay
+	void write(const T& v){
+		mBuf[pos()] = v;
+		++mPos; if(mPos >= size()) mPos=0;
+	}
+
+
+	/// Get element at back
+	const T& back() const { return mBuf[indexBack()]; }
+
+	/// Get index of back element
+	int indexBack() const {
+		int i = pos()+1;
+		return (i < size()) ? i : 0;
+	}
+
+	/// Get absolute index of write tap
+	int pos() const { return mPos; }
+
+	
+	/// Write new value and return oldest value
+	T operator()(const T& v){
+		T r = mBuf[pos()];
+		write(v);
+		return r;
+	}
+	
+	/// Comb filter input using a delay time equal to the maximum size of the delay-line
+	T comb(const T& v, const T& ffd, const T& fbk){
+		T d = mBuf[pos()];
+		T r = v + d*fbk;
+		write(r);
+		return d + r*ffd;
+	}
+
+protected:
+	int mPos;
+	T mBuf[N];
+};
+
+
+
 /// Plate reverberator
 
 /// Design from:
@@ -46,12 +114,7 @@ template <class T = float>
 class Reverb{
 public:
 
-	Reverb()
-	:	mPreDelay(10),
-		mAPIn1(142), mAPIn2(107), mAPIn3(379), mAPIn4(277),
-		mAPDecay11(672), mAPDecay12(1800), mDly11(4453), mDly12(3720),
-		mAPDecay21(908), mAPDecay22(2656), mDly21(4217), mDly22(3163)
-	{
+	Reverb(){
 //		bandwidth(0.9995);
 //		decay(0.5);
 //		damping(0.0005);
@@ -147,94 +210,35 @@ public:
 
 protected:
 
-	class DelayLine {
-	public:
-		DelayLine(int size)
-		:	mPos(0), mSize(0), mBuf(0)
-		{	resize(size); }
-
-		~DelayLine(){ deleteBuf(); }
-
-		/// Read value at delay i
-		const T& read(int i) const {
-			int ind = pos()-i;
-			if(ind < 0) ind += size();
-			//else if(ind >= size()) ind -= size();
-			return mBuf[ind];
-		}
-		
-		/// Write value to delay
-		void write(const T& v){
-			mBuf[pos()] = v;
-			++mPos; if(mPos >= size()) mPos=0;
-		}
-
-
-		const T& back() const { return mBuf[indexBack()]; }
-
-		int indexBack() const {
-			int i = pos()+1;
-			return (i < size()) ? i : 0;
-		}
-
-		/// Get absolute index of write tap
-		int pos() const { return mPos; }
-		
-		int size() const { return mSize; }
-
-
-		
-		/// Write new value and return oldest value
-		T operator()(const T& v){
-			T r = mBuf[pos()];
-			write(v);
-			return r;
-		}
-		
-		T comb(const T& v, const T& ffd, const T& fbk){
-			T d = mBuf[pos()];
-			T r = v + d*fbk;
-			write(r);
-			return d + r*ffd;
-		}
-
-		void resize(int n){
-			if(n != mSize){
-				deleteBuf();
-				mBuf = (T*)::calloc(n, sizeof(T));
-				mSize = n;
-				if(mPos >= n) mPos = mPos % n;
-			}
-		}
-
-	protected:
-		void deleteBuf(){ if(mBuf) ::free(mBuf); mBuf=0; }
-
-		int mPos;
-		int mSize;
-		T * mBuf;
-	};
-
 	class OnePole{
 	public:
-		OnePole(): mO1(0), mA0(1), mB1(0){}
-		void damping(const T& v){ mB1=v; mA0=T(1)-v; }
-		T operator()(const T& i0){ return mO1 = mO1*mB1 + i0*mA0; }
+		OnePole(): mO1(0), mB1(0){}
+		void damping(const T& v){ mB1=v; }
+		T operator()(const T& i0){ return mO1 = (mO1-i0)*mB1 + i0; }
 	protected:
-		T mO1;
-		T mA0, mB1;
+		T mO1; // previous output
+		T mB1; // previous output coef
 	};
 
 	T mDfIn1, mDfIn2, mDfDcy1, mDfDcy2, mDecay;
-	DelayLine mPreDelay;
+
+	StaticDelayLine<  10,T> mPreDelay;
 	OnePole mOPIn;
-	DelayLine mAPIn1, mAPIn2, mAPIn3, mAPIn4;
-	DelayLine mAPDecay11, mAPDecay12, mDly11, mDly12;
+	StaticDelayLine< 142,T> mAPIn1;
+	StaticDelayLine< 107,T> mAPIn2;
+	StaticDelayLine< 379,T> mAPIn3;
+	StaticDelayLine< 277,T> mAPIn4;
+	StaticDelayLine< 672,T> mAPDecay11;
+	StaticDelayLine<1800,T> mAPDecay12;
+	StaticDelayLine<4453,T> mDly11;
+	StaticDelayLine<3720,T> mDly12;
 	OnePole mOP1;
-	DelayLine mAPDecay21, mAPDecay22, mDly21, mDly22;
+	StaticDelayLine< 908,T> mAPDecay21;
+	StaticDelayLine<2656,T> mAPDecay22;
+	StaticDelayLine<4217,T> mDly21;
+	StaticDelayLine<3163,T> mDly22;
 	OnePole mOP2;
 };
-
 
 } // al::
 #endif
