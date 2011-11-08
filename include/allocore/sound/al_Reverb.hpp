@@ -209,10 +209,10 @@ public:
 	/// @param[in   ] wetAmt		wet mix amount
 	/// \returns dry input sample
 	T mix(T& inout1, T& out2, T wetAmt){
-		T s = io0;
-		(*this)(s, io0, o1, wetAmt*T(0.6));
-		io0 += s;
-		o1  += s;
+		T s = inout1;
+		(*this)(s, inout1, out2, wetAmt*T(0.6));
+		inout1 += s;
+		  out2 += s;
 		return s;
 	}
 
