@@ -288,12 +288,24 @@ protected:
 class AudioScene {
 public:
 
+	typedef std::vector<Listener *> Listeners;
+	typedef std::list<SoundSource *> Sources;
+
+
 	AudioScene(int dim, int order, int numFrames) 
 	:	mEncoder(dim, order), mNumFrames(numFrames), mSpeedOfSound(343)
 	{}
-	
+
+
 	int dim() const { return mEncoder.dim(); }
 	int order() const { return mEncoder.order(); }
+
+	Listeners& listeners(){ return mListeners; }
+	const Listeners& listeners() const { return mListeners; }
+
+	Sources& source(){ return mSources; }
+	const Sources& source() const { return mSources; }
+
 	
 	void numFrames(int v){
 		if(mNumFrames != v){
@@ -497,8 +509,6 @@ public:
 	}
 
 protected:
-	typedef std::vector<Listener *> Listeners;
-	typedef std::list<SoundSource *> Sources;
 
 	Listeners mListeners;
 	Sources mSources;
