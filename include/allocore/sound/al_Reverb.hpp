@@ -33,6 +33,7 @@
 */
 
 #include <stdlib.h>
+#include <strings.h>
 
 namespace al{
 
@@ -47,12 +48,24 @@ template <int N, class T>
 class StaticDelayLine {
 public:
 
-	StaticDelayLine(): mPos(0){}
+	StaticDelayLine(): mPos(0){ zero(); }
 	
 
 	/// Get size of delay-line
 	static int size(){ return N; }
-	
+
+	/// Get element at back
+	const T& back() const { return mBuf[indexBack()]; }
+
+	/// Get index of back element
+	int indexBack() const {
+		int i = pos()+1;
+		return (i < size()) ? i : 0;
+	}
+
+	/// Get absolute index of write tap
+	int pos() const { return mPos; }
+
 
 	/// Read value at delay i
 	const T& read(int i) const {
@@ -67,20 +80,6 @@ public:
 		mBuf[pos()] = v;
 		++mPos; if(mPos >= size()) mPos=0;
 	}
-
-
-	/// Get element at back
-	const T& back() const { return mBuf[indexBack()]; }
-
-	/// Get index of back element
-	int indexBack() const {
-		int i = pos()+1;
-		return (i < size()) ? i : 0;
-	}
-
-	/// Get absolute index of write tap
-	int pos() const { return mPos; }
-
 	
 	/// Write new value and return oldest value
 	T operator()(const T& v){
@@ -96,6 +95,9 @@ public:
 		write(r);
 		return d + r*ffd;
 	}
+	
+	/// Zeroes all elements (byte-wise)
+	void zero(){ ::bzero(&mBuf, sizeof(mBuf)); }
 
 protected:
 	int mPos;
