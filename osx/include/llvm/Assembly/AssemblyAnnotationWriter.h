@@ -20,6 +20,7 @@
 namespace llvm {
 
 class Function;
+class Value;
 class BasicBlock;
 class Instruction;
 class raw_ostream;
