@@ -101,15 +101,23 @@ public:
 	}
 };
 
-void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace) {	
+void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace){
+
+	struct F{
+		static void initMesh(Mesh& m, int n){
+			m.vertices().size(n*2);
+			m.reset();
+			m.primitive(Graphics::LINES);		
+		}
+	};
+
 	if (perFace) {	
 		// compute vertex based normals
 		if(indices().size()){
-			mesh.reset();
-			mesh.primitive(Graphics::LINES);
-			
+
 			int Ni = indices().size();
 			Ni = Ni - (Ni%3); // must be multiple of 3
+			F::initMesh(mesh, (Ni/3)*2);
 
 			for(int i=0; i<Ni; i+=3){
 				Index i1 = indices()[i+0];
@@ -120,7 +128,7 @@ void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace) {
 				const Vertex& v3 = vertices()[i3];
 				
 				// get mean:
-				const Vertex& mean = (v1 + v2 + v3)/3.f;
+				const Vertex mean = (v1 + v2 + v3)/3.f;
 				
 				// get face normal:
 				Vertex facenormal = cross(v2-v1, v3-v1);
@@ -128,16 +136,15 @@ void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace) {
 				
 				mesh.vertex(mean);
 				mesh.vertex(mean + (facenormal*length));
-				
 			}
 		} else {
 			printf("createNormalsMesh only valid for indexed meshes\n");
 		}
 	} else {
-		mesh.reset();
-		mesh.primitive(Graphics::LINES);
 		int Ni = al::min(vertices().size(), normals().size());
-		for(int i=0; i<Ni; i+=3){
+		F::initMesh(mesh, Ni*2);
+		
+		for(int i=0; i<Ni; ++i){
 			const Vertex& v = vertices()[i];
 			mesh.vertex(v);
 			mesh.vertex(v + normals()[i]*length);
@@ -296,7 +303,7 @@ void Mesh::ribbonize(float * widths, int widthsStride, bool faceBitangent){
 	mNormals.size(N*2);
 
 	// Store last vertex since it will be overwritten eventually
-	Vertex last = mVertices[N-1]; 
+	const Vertex last = mVertices[N-1]; 
 	
 	int in = faceBitangent ? 2 : 1;
 	int ib = faceBitangent ? 1 : 2;
@@ -318,15 +325,17 @@ void Mesh::ribbonize(float * widths, int widthsStride, bool faceBitangent){
 			//Vertex& t = f[0];
 			Vertex& n = f[1];
 			Vertex& b = f[2];
-			b = cross(d2, d1).sgn();
+			b = cross(d2,d1).sgn();
 			n = cross(d1, b).sgn();
 			//t = d1.sgn(); // not used
 		}
 		f[ib] *= widths[i0*widthsStride];
 		
 		int i12 = i1<<1;
-		mVertices[i12  ] = v1-f[ib];
+		// v1 is ref, so we must write in reverse to properly handle i=0
 		mVertices[i12+1] = v1+f[ib];
+		mVertices[i12  ] = v1-f[ib];
+
 		mNormals [i12  ].set(f[in][0], f[in][1], f[in][2]);
 		mNormals [i12+1] = mNormals[i12];
 	}
