@@ -329,7 +329,7 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 }
 
 void Texture :: submit(const void * pixels, uint32_t align) {
-	//printf("submitting %p\n", this);
+	//printf("submitting %p\n", pixels);
 
 	validate();
 	
@@ -370,7 +370,9 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 		case GL_TEXTURE_1D:	glTexImage1D(mTarget, 0, internalformat, width(), 0, format(), type(), pixels); break;
 		case GL_TEXTURE_2D: glTexImage2D(mTarget, 0, internalformat, width(), height(), 0, format(), type(), pixels); break;
 		case GL_TEXTURE_3D: glTexImage3D(mTarget, 0, internalformat, width(), height(), depth(), 0, format(), type(), pixels); break;
-		default:;
+		default:
+			printf("invalid texture target %d\n", mTarget);
+			break;
 	}
 	
 	// set alignment back to default
