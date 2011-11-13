@@ -87,6 +87,8 @@ protected:
 class SearchPaths {
 public:
 	typedef std::pair<std::string, bool> searchpath;
+	typedef std::list<searchpath> searchpathlist;
+	typedef std::list<searchpath>::iterator iterator;
 	
 	SearchPaths() {}
 	SearchPaths(std::string file) {
@@ -116,6 +118,9 @@ public:
 	const std::string& appPath() const { return mAppPath; }
 	
 	void print();
+	
+	iterator begin() { return mSearchPaths.begin(); }
+	iterator end() { return mSearchPaths.end(); }
 
 protected:	
 	std::list<searchpath> mSearchPaths;

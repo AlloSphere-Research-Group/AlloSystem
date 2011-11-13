@@ -1,5 +1,5 @@
-#ifndef INC_AL_OVERLAY_TEXT_OPENGL_HPP
-#define INC_AL_OVERLAY_TEXT_OPENGL_HPP
+#ifndef INCLUDE_AL_WATCHER_HPP
+#define INCLUDE_AL_WATCHER_HPP
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
@@ -27,59 +27,52 @@
 
 
 	File description:
-	A printf for OpenGL windows:
+	Utility for registering & recieving notifications
 
 	File author(s):
-	Graham Wakefield, 2010, grrrwaaa@gmail.com
+	Graham Wakefield, 2011, grrrwaaa@gmail.com	
 */
 
-#include "allocore/graphics/al_Graphics.hpp"
-#include "allocore/graphics/al_Font.hpp"
-
-/*!
-	A printf for OpenGL windows:
- */
+#include <string>
 
 namespace al {
 
-class OverlayText {
+///! base class for all notifiable objects:
+///	MyWatcher w;
+/// w.watch("foo");
+/// Watcher::notify("foo", "bar");
+class Watcher {
 public:
+	/// destructor automatically un-registers:
+	virtual ~Watcher() { unwatch(); }
+
+	/// get notifications when resource 'name' is modified
+	void watch(std::string name);
 	
-	OverlayText(int maxlines = 20)
-	: mMaxlines(maxlines) {}
+	/// stop notifications from resource 'name'
+	void unwatch(std::string name);
+	/// stop all notifications
+	void unwatch();
+
+	/// the notification handler:
+	virtual void onEvent(std::string resourcename, std::string event) {}
 	
-	void printf(std::string line) {
-		lines.push_back(line);
-	}
-	void printf(const char * fmt, ...) {
-		static char line[1024];
-		va_list args;
-		va_start(args, fmt);
-		vsnprintf(line, 1024, fmt, args);
-		va_end(args);
-		lines.push_back(line);
-	}
-	
-	void draw(Font& font) {
-		while (lines.size() > mMaxlines) lines.pop_front();
-		gl.pushMatrix();
-		// because OpenGL/font is upside-down:
-		for (std::list<std::string>::iterator it = lines.begin(); it != lines.end(); it++) {
-			font.render(gl, *it);
-			gl.translate(0, -font.size(), 0);
-		}
-		gl.popMatrix();
-	}
-	
-	void clear() {
-		lines.clear();
-	}
-	
-	std::list<std::string> lines;
-	Graphics gl;
-	int mMaxlines;
+	/// trigger a notification:
+	static void notify(std::string resourcename, std::string event);
 };
 
-} // al::
+
+} //al::
 
 #endif
+
+
+
+
+
+
+
+
+
+
+

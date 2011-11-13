@@ -41,7 +41,7 @@ public:
 	
 	Path(const std::string& dirname) : ImplAPR(), dir(NULL), dirname(dirname) {
 		if (APR_SUCCESS != check_apr(apr_dir_open(&dir, dirname.c_str(), mPool))) {
-			printf("dir %p\n", dir);
+			//printf("dir %p\n", dir);
 			dir=NULL;
 		}
 	}
@@ -55,6 +55,7 @@ public:
 		if (dir && APR_SUCCESS == check_apr(apr_dir_open(&dir, dirname.c_str(), mPool))) {
 			// iterate over directory:
 			while ((!found) && APR_SUCCESS == (apr_dir_read(&dirent, APR_FINFO_TYPE|APR_FINFO_NAME, dir))) {
+				//printf("test %s %s\n", dirname.c_str(), dirent.name);
 				if (dirent.filetype == APR_REG && dirent.name && std::string(dirent.name) == name) {
 					result.file(dirent.name);
 					result.path(dirname);

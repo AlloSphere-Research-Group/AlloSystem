@@ -128,6 +128,7 @@ public:
 	const Matrix4d& modelView() const { return mModelView; }
 	const Matrix4d& projection() const { return mProjection; }
 	Matrix4d modelViewProjection() const { return mProjection * mModelView; }
+	const Vec3d& eye() const { return mEye; }
 	
 protected:
 	StereoMode mMode;
@@ -139,6 +140,7 @@ protected:
 	double mOmniFov;	// field of view of omnigraphics
 	
 	Matrix4d mProjection, mModelView;
+	Vec3d mEye;
 };
 
 } // al::
