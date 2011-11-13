@@ -46,19 +46,19 @@ public:
 	/// destructor automatically un-registers:
 	virtual ~Watcher() { unwatch(); }
 
-	/// get notifications when resource 'name' is modified
-	void watch(std::string name);
+	/// get notifications from a named resource
+	void watch(std::string resourcename);
 	
-	/// stop notifications from resource 'name'
-	void unwatch(std::string name);
+	/// stop notifications from a named resource
+	void unwatch(std::string resourcename);
 	/// stop all notifications
 	void unwatch();
 
 	/// the notification handler:
-	virtual void onEvent(std::string resourcename, std::string event) {}
+	virtual void onEvent(std::string resourcename, std::string eventname) {}
 	
-	/// trigger a notification:
-	static void notify(std::string resourcename, std::string event);
+	/// trigger a notification for a named resource
+	static void notify(std::string resourcename, std::string eventname);
 };
 
 
