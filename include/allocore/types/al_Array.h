@@ -437,14 +437,16 @@ static inline void allo_array_wrapper_release(AlloArrayWrapper *wrap) {
 }
 
 /* Multidimensional terminology:
-					1			2			3			4
-	 Specifier		row			column		pillar		file
-	 Tensor			scalar		vector		matrix		
-	 Sound			sample		time		channel		pattern
-	 Polytope		point		line		polygon		polyhedron	polychoron
-	 n-Hypercube	point		line		square		cube		tesseract
-	 Boundary		none		vertex		edge		face		cell
-	 Movement		position	velocity	accel.		jerk		snap
+	# Dimensions	0			1			2			3			4
+	----------------------------------------------------------------------------
+	Index						row			column		pillar		file
+	Tensor						scalar		vector		matrix		
+	Sound						sample		time		channel		pattern
+	Polytope		point		line		polygon		polyhedron	polychoron
+	n-cube			point		line		square		cube		tesseract
+	n-sphere					interval	circle		sphere		hypersphere
+	Boundary		none		vertex		edge		face		cell
+	Movement		position	velocity	accel.		jerk		snap
 */
 
 
