@@ -57,31 +57,49 @@
 
 namespace al{
 
-/// Strips a qualified path to a file (src) into a path to the containing folder (dst)
+// Strips a qualified path to a file (src) into a path to the containing folder (dst)
 //void path2dir(char* dst, const char* src);
 
 
-/// a pair of path (folder/directory) and filename
+/// A pair of path (folder/directory) and file name
 class FilePath {
 public:
-	FilePath() {};
-	FilePath(const FilePath& cpy) : mPath(cpy.mPath), mFile(cpy.mFile) {}
-	FilePath(std::string file, std::string path) : mPath(path), mFile(file) {}
-	///! this constructor takes a path to a file:
-	FilePath(std::string fullpath);
+	FilePath(){}
 
+	/// @param[in] file			File name without directory
+	/// @param[in] path			Directory of file
+	FilePath(const std::string& file, const std::string& path)
+	:	mPath(path), mFile(file) {}
+
+	/// @param[in] fullpath		Full path to file (directory + file name)
+	explicit FilePath(std::string fullpath);
+
+
+	/// Get file name without directory
 	const std::string& file() const { return mFile; }
+	
+	/// Get path (directory) of file
 	const std::string& path() const { return mPath; }
 
+	/// Get file with directory
 	std::string filepath() const { return path()+file(); }
+	
+	/// Returns whether file part is valid
+	bool valid() const { return file()!=""; }
 
+
+	/// Set file name without directory
 	FilePath& file(const std::string& v) { mFile=v; return *this; }
+	
+	/// Set path (directory) of file
 	FilePath& path(const std::string& v) { mPath=v; return *this; }
 
 protected:
 	std::string mPath;
 	std::string mFile;
 };
+
+
 
 /// A handy way to manage several possible search paths
 class SearchPaths {
@@ -126,6 +144,7 @@ protected:
 	std::list<searchpath> mSearchPaths;
 	std::string mAppPath;
 };
+
 
 
 /// File
