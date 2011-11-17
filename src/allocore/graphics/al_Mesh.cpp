@@ -160,7 +160,7 @@ void Mesh::invertNormals() {
 void Mesh::compress() {
 	Buffer<Vertex> old;
 	for (int i=vertices().size()-1; i>=0; i--) {
-		printf("%d", i); vertices()[i].print();
+		printf("%d ", i); 
 	}
 }
 
