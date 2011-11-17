@@ -157,11 +157,12 @@ void Mesh::invertNormals() {
 	for(int i=0; i<Nv; ++i) normals()[i] = -normals()[i];
 }
 
-// Old non-functional prototype...
-//	// generates smoothed normals for a set of vertices
-//	// will replace any normals currently in use
-//	// angle - maximum angle (in degrees) to smooth across
-//	void generateNormals(float angle=360);
+void Mesh::compress() {
+	Buffer<Vertex> old;
+	for (int i=vertices().size()-1; i>=0; i--) {
+		printf("%d", i); vertices()[i].print();
+	}
+}
 
 void Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 //	/*

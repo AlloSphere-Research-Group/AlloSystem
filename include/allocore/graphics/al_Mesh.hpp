@@ -105,6 +105,9 @@ public:
 	template <class T>
 	void transform(const Mat<4,T>& m, int begin=0, int end=-1);
 
+	/// Generates indices for a set of vertices
+	void compress();
+
 	/// Generates normals for a set of vertices
 	
 	/// This method will generate a normal for each vertex in the buffer
