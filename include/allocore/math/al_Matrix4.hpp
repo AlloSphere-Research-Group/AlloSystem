@@ -180,8 +180,8 @@ public:
 		Vec<3, T> axis(v);
 		axis.normalize();
 		
-		float c = cos(angle*M_DEG2RAD);
-		float s = sin(angle*M_DEG2RAD);
+		float c = cos(angle);
+		float s = sin(angle);
 			
 		Matrix4 m(
 			axis[0]*axis[0]*(1-c)+c,

@@ -89,7 +89,7 @@ public:
 	Mesh& reset();
 
 	/// Scale all vertices to lie in [-1,1]
-	void unitize();
+	void unitize(bool proportional=true);
 
 	void scale(double x, double y, double z);
 	void scale(Vec3f v) { scale(v[0], v[1], v[2]); }

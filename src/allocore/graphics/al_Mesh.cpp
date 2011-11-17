@@ -411,15 +411,25 @@ Mesh::Vertex Mesh::getCenter() const {
 	return min+(max-min)*0.5;
 }
 
-void Mesh::unitize() {
+void Mesh::unitize(bool proportional) {
 	Vertex min(0), max(0);
 	getBounds(min, max);
-	Vertex avg = (max-min)*0.5;
+	// span of each axis:
+	Vertex span = max-min;	// positive only
+	// center of each axis:	
+	Vertex mid = min + (span * 0.5);
+	// axis scalar:
+	Vertex scale = 2./span;	// positive only
+	
+	// adjust to use scale of largest axis:
+	if (proportional) {
+		float s = al::min(scale.x, al::min(scale.y, scale.z));
+		scale.x = scale.y = scale.z = s;
+	}
+	
 	for (int v=0; v<mVertices.size(); v++) {
 		Vertex& vt = mVertices[v];
-		for (int i=0; i<3; i++) {
-			vt[i] = -1. + (vt[i]-min[i])/avg[i];
-		}
+		vt = (vt-mid)*scale;
 	}
 }
 
