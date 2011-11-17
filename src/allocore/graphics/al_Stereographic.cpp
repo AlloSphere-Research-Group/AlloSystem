@@ -3,22 +3,22 @@
 
 namespace al{
 
-void Stereographic :: draw(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw) {
+void Stereographic :: draw(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear) {
 	if(mStereo){
 		switch(mMode){
-			case ANAGLYPH:	drawAnaglyph(gl, cam, pose, vp, draw); return;
-			case ACTIVE:	drawActive	(gl, cam, pose, vp, draw); return;
-			case DUAL:		drawDual	(gl, cam, pose, vp, draw); return;
-			case LEFT_EYE:	drawLeft	(gl, cam, pose, vp, draw); return;
-			case RIGHT_EYE:	drawRight	(gl, cam, pose, vp, draw); return;
+			case ANAGLYPH:	drawAnaglyph(gl, cam, pose, vp, draw, clear); return;
+			case ACTIVE:	drawActive	(gl, cam, pose, vp, draw, clear); return;
+			case DUAL:		drawDual	(gl, cam, pose, vp, draw, clear); return;
+			case LEFT_EYE:	drawLeft	(gl, cam, pose, vp, draw, clear); return;
+			case RIGHT_EYE:	drawRight	(gl, cam, pose, vp, draw, clear); return;
 			default:;
 		}
 	} else {
-		drawMono(gl, cam, pose, vp, draw);
+		drawMono(gl, cam, pose, vp, draw, clear);
 	}
 }
 
-void Stereographic :: drawMono(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw) 
+void Stereographic :: drawMono(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear) 
 {
 	double near = cam.near();
 	double far = cam.far();
@@ -29,7 +29,7 @@ void Stereographic :: drawMono(Graphics& gl, const Camera& cam, const Pose& pose
 	
 	glDrawBuffer(GL_BACK);
 	gl.viewport(vp.l, vp.b, vp.w, vp.h);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	if (clear) gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
 	mEye = pos;
 	
@@ -54,7 +54,7 @@ void Stereographic :: drawMono(Graphics& gl, const Camera& cam, const Pose& pose
 			mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
 			
 			gl.viewport(vp1.l, vp1.b, vp1.w, vp1.h);
-			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			if (clear) gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 			
 			// apply camera transform:
 			gl.pushMatrix(gl.PROJECTION);
@@ -95,7 +95,7 @@ void Stereographic :: drawMono(Graphics& gl, const Camera& cam, const Pose& pose
 	glPopAttrib();
 }
 
-void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw) 
+void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear) 
 {	
 	double near = cam.near();
 	double far = cam.far();
@@ -108,7 +108,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 	
 	glDrawBuffer(GL_BACK);
 	gl.viewport(vp.l, vp.b, vp.w, vp.h);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	if (clear) gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
 	switch(mAnaglyphMode){
 		case RED_BLUE:
@@ -142,7 +142,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 			mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
 		
 			gl.viewport(vp1.l, vp1.b, vp1.w, vp1.h);
-			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			if (clear) gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 			
 			// apply camera transform:
 			gl.pushMatrix(gl.PROJECTION);
@@ -163,7 +163,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 		Vec3d ux, uy, uz; 
 		pose.unitVectors(ux, uy, uz);
 
-		gl.clear(gl.DEPTH_BUFFER_BIT);
+		if (clear) gl.clear(gl.DEPTH_BUFFER_BIT);
 		
 		// apply camera transform:
 		mEye = pos + (ux * -iod);	// right
@@ -213,7 +213,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 			mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
 		
 			gl.viewport(vp1.l, vp1.b, vp1.w, vp1.h);
-			gl.clear(gl.DEPTH_BUFFER_BIT);				// Note: depth only this pass
+			if (clear) gl.clear(gl.DEPTH_BUFFER_BIT);				// Note: depth only this pass
 			
 			// apply camera transform:
 			gl.pushMatrix(gl.PROJECTION);
@@ -234,7 +234,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 		Vec3d ux, uy, uz; 
 		pose.unitVectors(ux, uy, uz);
 		
-		gl.clear(gl.DEPTH_BUFFER_BIT);
+		if (clear) gl.clear(gl.DEPTH_BUFFER_BIT);
 		
 		// apply camera transform:
 		mEye = pos + (ux * iod);	// left
@@ -257,7 +257,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 	glPopAttrib();
 }
 
-void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw) 
+void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear) 
 {
 	double near = cam.near();
 	double far = cam.far();
@@ -271,7 +271,7 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 	
 	glDrawBuffer(GL_BACK_RIGHT);
 	gl.viewport(vp.l, vp.b, vp.w, vp.h);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	if (clear) gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
 	if (omni()) {
 	
@@ -296,7 +296,7 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 			mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
 			
 			gl.viewport(vp1.l, vp1.b, vp1.w, vp1.h);
-			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			if (clear) gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 			
 			// apply camera transform:
 			gl.pushMatrix(gl.PROJECTION);
@@ -337,7 +337,7 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 	
 	glDrawBuffer(GL_BACK_LEFT);
 	gl.viewport(vp.l, vp.b, vp.w, vp.h);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	if (clear) gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	
 	if (omni()) {
 	
@@ -362,7 +362,7 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 			mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
 	
 			gl.viewport(vp1.l, vp1.b, vp1.w, vp1.h);
-			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			if (clear) gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 			
 			// apply camera transform:
 			gl.pushMatrix(gl.PROJECTION);
@@ -404,7 +404,7 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 	glPopAttrib();
 }
 
-void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw) 
+void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear) 
 {
 	double fovy = cam.fovy();
 	double near = cam.near();
@@ -419,11 +419,12 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 	
 	//pushAttrib(ColorBufferBit | DepthBufferBit | EnableBit | ViewPortBit);
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
-	gl.clearColor(mClearColor);
-	
 	glDrawBuffer(GL_BACK);
 	gl.viewport(vp.l, vp.b, vp.w, vp.h);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	if (clear) {
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		gl.clearColor(mClearColor);
+	}
 	
 	Viewport vpleft(vp.l, vp.b, vp.w*0.5, vp.h);
 	Viewport vpright(vp.l + vp.w*0.5, vp.b, vp.w*0.5, vp.h);
@@ -450,7 +451,7 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 			mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
 			
 			gl.viewport(vp1.l, vp1.b, vp1.w, vp1.h);
-			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			if (clear) gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 			
 			// apply camera transform:
 			gl.pushMatrix(gl.PROJECTION);
@@ -486,7 +487,7 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 			mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
 			
 			gl.viewport(vp1.l, vp1.b, vp1.w, vp1.h);
-			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			if (clear) gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 			
 			// apply camera transform:
 			gl.pushMatrix(gl.PROJECTION);
@@ -541,7 +542,7 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 
 
 
-void Stereographic :: drawLeft(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw) 
+void Stereographic :: drawLeft(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear) 
 {
 	double near = cam.near();
 	double far = cam.far();
@@ -551,14 +552,15 @@ void Stereographic :: drawLeft(Graphics& gl, const Camera& cam, const Pose& pose
 	
 	//pushAttrib(ColorBufferBit | DepthBufferBit | EnableBit | ViewPortBit);
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
-	gl.clearColor(mClearColor);
 	
 	glDrawBuffer(GL_BACK);
 	gl.viewport(vp.l, vp.b, vp.w, vp.h);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	if (clear) {
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		gl.clearColor(mClearColor);
+	}
 	
 	if (omni()) {
-	
 		int wx = vp.l;
 		double fovx = mOmniFov;
 		for (unsigned i=0; i<mSlices; i++) {
@@ -580,7 +582,7 @@ void Stereographic :: drawLeft(Graphics& gl, const Camera& cam, const Pose& pose
 			mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
 	
 			gl.viewport(vp1.l, vp1.b, vp1.w, vp1.h);
-			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			if (clear) gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 			
 			// apply camera transform:
 			gl.pushMatrix(gl.PROJECTION);
@@ -622,7 +624,7 @@ void Stereographic :: drawLeft(Graphics& gl, const Camera& cam, const Pose& pose
 	glPopAttrib();
 }
 
-void Stereographic :: drawRight(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw) 
+void Stereographic :: drawRight(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear) 
 {
 	double near = cam.near();
 	double far = cam.far();
@@ -631,11 +633,13 @@ void Stereographic :: drawRight(Graphics& gl, const Camera& cam, const Pose& pos
 	const Vec3d& pos = pose.pos();
 	
 	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
-	gl.clearColor(mClearColor);
 
 	glDrawBuffer(GL_BACK);
 	gl.viewport(vp.l, vp.b, vp.w, vp.h);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	if (clear) {
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		gl.clearColor(mClearColor);
+	}
 	
 	if (omni()) {
 		int wx = vp.l;
@@ -659,7 +663,7 @@ void Stereographic :: drawRight(Graphics& gl, const Camera& cam, const Pose& pos
 			mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
 		
 			gl.viewport(vp1.l, vp1.b, vp1.w, vp1.h);
-			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			if (clear) gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 			
 			// apply camera transform:
 			gl.pushMatrix(gl.PROJECTION);
