@@ -158,9 +158,69 @@ void Mesh::invertNormals() {
 }
 
 void Mesh::compress() {
-	Buffer<Vertex> old;
+
+	int Ni = indices().size();
+	int Nv = vertices().size();
+	if (Ni) {
+		printf("cannot compress Mesh with indices\n");
+		return;
+	}
+	if (Nv == 0) {
+		printf("cannot compress Mesh with no vertices\n");
+		return;
+	}
+	
+	int Nc = colors().size();
+	int Nci = coloris().size();
+	int Nn = normals().size();
+	int Nt2 = texCoord2s().size();
+	int Nt3 = texCoord3s().size();
+
+	// map tree to uniquely ID vertices with same values:
+	typedef std::map<float, int> Zmap;
+	typedef std::map<float, Zmap> Ymap;
+	typedef std::map<float, Ymap> Xmap;
+	Xmap xmap;
+	
+	// copy current values:
+	Mesh old(*this);
+	
+	// walk backward through the vertex list
+	// create a ID for each one
 	for (int i=vertices().size()-1; i>=0; i--) {
-		printf("%d ", i); 
+		Vertex& v = vertices()[i];
+		xmap[v.x][v.y][v.z] = i;
+	}
+	
+	// map of old vertex index to new vertex index:
+	typedef std::map<int, int> Imap;
+	Imap imap;
+	
+	// reset current mesh:
+	reset();
+	
+	// walk forward, inserting if 
+	for (int i=0; i<old.vertices().size(); i++) {
+		Vertex& v = old.vertices()[i];
+		int idx = xmap[v.x][v.y][v.z];
+		Imap::iterator it = imap.find(idx);
+		if (it != imap.end()) {
+			// use existing
+			index(it->second);
+		} else {
+			// create new
+			int newidx = vertices().size();
+			vertex(v);
+			if (Nc) color(old.colors()[i]);
+			if (Nci) colori(old.coloris()[i]);
+			if (Nn) normal(old.normals()[i]);
+			if (Nt2) texCoord(old.texCoord2s()[i]);
+			if (Nt3) texCoord(old.texCoord3s()[i]);
+			// store new index:
+			imap[idx] = newidx;
+			// use new index:
+			index(newidx);
+		}
 	}
 }
 
