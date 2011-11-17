@@ -419,7 +419,7 @@ void Mesh::unitize(bool proportional) {
 	// center of each axis:	
 	Vertex mid = min + (span * 0.5);
 	// axis scalar:
-	Vertex scale = 2./span;	// positive only
+	Vertex scale(2./span.x, 2./span.y, 2./span.z);	// positive only
 	
 	// adjust to use scale of largest axis:
 	if (proportional) {
