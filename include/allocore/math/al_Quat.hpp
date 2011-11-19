@@ -613,10 +613,10 @@ inline Vec<3,T> Quat<T> :: rotate(const Vec<3,T>& v) const {
 	// faster & simpler:
 	// we know quat(v).w == 0
 	Quat p(
-		-x*v[0] - y*v[1] - z*v[2],
-		 w*v[0] + y*v[2] - z*v[1],
-		 w*v[1] - x*v[2] + z*v[0],
-		 w*v[2] + x*v[1] - y*v[0]
+		-x*v.x - y*v.y - z*v.z,
+		 w*v.x + y*v.z - z*v.y,
+		 w*v.y - x*v.z + z*v.x,
+		 w*v.z + x*v.y - y*v.x
 	);
 	// faster & simpler:
 	// we don't care about the w component
