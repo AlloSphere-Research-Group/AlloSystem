@@ -150,7 +150,7 @@ public:
 	/// NOTE: the graphics context (e.g. Window) must have been created
 	/// If pixels is NULL, then the only effect is to resize the texture
 	/// remotely.
-	void submit(const void * pixels=NULL, uint32_t align=4);
+	void submit(const void * pixels, uint32_t align=4);
 	
 	/// just submit the existing data
 	void submit() { dirty(); }

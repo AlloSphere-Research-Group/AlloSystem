@@ -125,6 +125,9 @@ public:
 
 	/// add a path to search in; recursive searching is optional
 	void addSearchPath(const std::string& path, bool recursive = true);
+	void addRelativePath(std::string rel, bool recursive=true) {
+		addSearchPath(appPath() + rel, recursive);
+	}
 
 	/// adds best estimate of application launch paths (cwd etc.)
 	/// can pass in argv from the main() function if desired.
