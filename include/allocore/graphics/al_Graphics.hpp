@@ -342,6 +342,11 @@ inline void Graphics::loadMatrix(const Matrix4d& m){ glLoadMatrixd(m.elems()); }
 inline void Graphics::multMatrix(const Matrix4d& m){ glMultMatrixd(m.elems()); }
 inline void Graphics::translate(double x, double y, double z){ glTranslated(x,y,z); }
 inline void Graphics::rotate(double angle, double x, double y, double z){ glRotated(angle,x,y,z); }
+inline void Graphics::rotate(const Quatd& q) {
+	Matrix4d m;
+	q.toMatrix(m.elems());
+	multMatrix(m);
+}
 inline void Graphics::scale(double x, double y, double z){ glScaled(x, y, z); }
 
 inline void Graphics::lineWidth(float v) { glLineWidth(v); }
@@ -354,11 +359,7 @@ inline void Graphics::polygonMode(PolygonMode m, Face f){ glPolygonMode(f,m); }
 inline void Graphics::shadeModel(ShadeModel m){ glShadeModel(m); }
 inline void Graphics::currentColor(float r, float g, float b, float a){ glColor4f(r,g,b,a); }
 
-inline void Graphics::rotate(const Quatd& q) {
-	Matrix4d m;
-	q.toMatrix(m.elems());
-	multMatrix(m);
-}
+
 
 inline Graphics::AttributeBit operator| (const Graphics::AttributeBit& a, const Graphics::AttributeBit& b){
 	return static_cast<Graphics::AttributeBit>(+a|+b);

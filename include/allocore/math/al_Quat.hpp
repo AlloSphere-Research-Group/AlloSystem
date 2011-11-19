@@ -603,31 +603,36 @@ inline void Quat<T> :: toVectorZ(T& ax, T& ay, T& az) const {
 }
 
 /*
-	Rotating a vector is simple:
-	
+	Rotating a vector is simple:	
 	v1 = q * qv * q^-1
-	
 	Where v is a 'pure quaternion' derived from the vector, i.e. w = 0. 	
 */
 template<typename T>
 inline Vec<3,T> Quat<T> :: rotate(const Vec<3,T>& v) const {
-	// dst = (q * v * q^-1)
-	// simplified p = (q * v):
+	// dst = ((q * quat(v)) * q^-1)
+	// faster & simpler:
+	// we know quat(v).w == 0
 	Quat p(
 		-x*v[0] - y*v[1] - z*v[2],
 		 w*v[0] + y*v[2] - z*v[1],
 		 w*v[1] - x*v[2] + z*v[0],
 		 w*v[2] + x*v[1] - y*v[0]
 	);
-	p *= conj();	// p * q^-1
-	return Vec<3,T>(p.x, p.y, p.z);
+	// faster & simpler:
+	// we don't care about the w component
+	// and we know that conj() is simply (w, -x, -y, -z):
+	return Vec<3,T>(
+		-p.w*x + p.x*w - p.y*z + p.z*y,
+		-p.w*y + p.y*w - p.z*x + p.x*z,
+		-p.w*z + p.z*w - p.x*y + p.y*x
+	);
+//	p *= conj();	// p * q^-1
+//	return Vec<3,T>(p.x, p.y, p.z);
 }
 
 template<typename T>
 inline Vec<3,T> Quat<T> :: rotateTransposed(const Vec<3,T>& v) const {
-	Quat qi(*this);
-	qi.conj();
-	return qi.conj().rotate(v);
+	return Quat(*this).conj().rotate(v);
 }
 
 template<typename T>

@@ -28,10 +28,6 @@ std::string ResourceManager::data(std::string filename) {
 
 }
 
-bool& ResourceManager::changed(std::string filename) {
-	return get(filename).changed;
-}
-
 bool ResourceManager::add(std::string filename, bool immediate) {
 	FileInfo& info = mFileMap[filename];
 	if (immediate) {
@@ -53,7 +49,6 @@ bool ResourceManager::read(std::string filename) {
 			File f(info.path, "r", true);
 			info.data = f.readAll();
 			f.close();
-			info.changed = true;
 			return true;
 		}
 	}

@@ -53,10 +53,9 @@ public:
 		std::string path;
 		std::string data;
 		al_sec modified;
-		bool changed;
 		
-		FileInfo() : modified(0), changed(false) {}
-		FileInfo(const FileInfo& cpy) : path(cpy.path), modified(cpy.modified), changed(cpy.changed) {}
+		FileInfo() : modified(0) {}
+		FileInfo(const FileInfo& cpy) : path(cpy.path), modified(cpy.modified) {}
 	};
 	
 	///! returns NULL if the file cannot be found
@@ -69,14 +68,11 @@ public:
 	/// get the FileInfo for a given fileanme
 	/// (calls addFile(fileanme) if the file isn't currently in the file map)
 	FileInfo& get(std::string filename);
+	FileInfo& operator[](std::string filename) { return get(filename); }
 	
 	/// get the data for a given filename
 	/// (calls addFile(fileanme) if the file isn't currently in the file map)
 	std::string data(std::string filename);
-	
-	/// get the changed status for a given filename
-	/// (calls addFile(fileanme) if the file isn't currently in the file map)
-	bool& changed(std::string filename);
 	
 	///! updates the modified/changed flags of all files in the filemap:
 	void poll();
@@ -99,7 +95,12 @@ class ManagedShader : public ShaderProgram {
 public:
 	
 	ManagedShader(ResourceManager& rm, std::string vert, std::string frag) 
-	:	ShaderProgram(), rm(rm), vertName(vert), fragName(frag) 
+	:	ShaderProgram(), 
+		rm(rm), 
+		vertName(vert), 
+		fragName(frag), 
+		vertModified(0), 
+		fragModified(0)
 	{
 		rm.add(vert, false);
 		rm.add(frag, false);
@@ -110,25 +111,27 @@ public:
 	// overrides ShaderProgram::begin():
 	void begin() {
 		// update shader sources:
-		if (rm.changed(vertName) || rm.changed(fragName)) {
+		ResourceManager::FileInfo& v = rm[vertName];
+		ResourceManager::FileInfo& f = rm[fragName];
+		if (v.modified > vertModified || f.modified > fragModified) {
+			// mark as read:
+			vertModified = v.modified;
+			fragModified = f.modified;
 			// remove existing:
 			detach(vert).detach(frag);
 			// recompile & link:
-			vert.source(rm.data(vertName), Shader::VERTEX).compile();
-			frag.source(rm.data(fragName), Shader::FRAGMENT).compile();
+			vert.source(v.data, Shader::VERTEX).compile();
+			frag.source(f.data, Shader::FRAGMENT).compile();
 			attach(vert).attach(frag).link();
 			vert.printLog();
 			frag.printLog();
 			printLog();			
-			// mark as read:
-			// TODO: this is bad if >1 user of the filename... 
-			rm.get(vertName).changed = false;
-			rm.get(fragName).changed = false;
 		}
 		ShaderProgram::begin();
 	}
 	
 	ResourceManager& rm;
+	al_sec vertModified, fragModified;
 	std::string vertName, fragName;
 	Shader vert, frag;
 };
