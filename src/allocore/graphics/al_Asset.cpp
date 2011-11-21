@@ -24,10 +24,10 @@ Vec2f vec2FromAIVector3D(aiVector3D& v) {
 	return Vec2f(v.x, v.y);
 }
 
-bool initializedLog = false;
-struct aiLogStream logStream;
 
 void initLogStream() {
+	static bool initializedLog = false;
+	static struct aiLogStream logStream;
 	if (!initializedLog) {
 		initializedLog = true;
 		// get a handle to the predefined STDOUT log stream and attach
@@ -118,7 +118,7 @@ void Scene::verbose(bool b) {
 }
 
 
-Scene * Scene :: import(std::string path, ImportPreset preset) {
+Scene * Scene :: import(const std::string& path, ImportPreset preset) {
 	initLogStream();
 	int flags;
 	switch (preset) {

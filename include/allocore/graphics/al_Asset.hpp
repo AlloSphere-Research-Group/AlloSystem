@@ -119,7 +119,7 @@ public:
 		
 	};
 	
-	static Scene * import(std::string path, ImportPreset preset = MAX_QUALITY);
+	static Scene * import(const std::string& path, ImportPreset preset = MAX_QUALITY);
 	~Scene();
 	
 	/// return number of meshes in scene
