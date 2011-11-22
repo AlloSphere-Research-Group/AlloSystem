@@ -151,7 +151,7 @@ public:
 		glEnable(mTarget);
 		glBindTexture(mTarget, id());
 		
-		Graphics::error("binding texture");
+		Graphics::error("binding texturegl");
 	}
 	
 	void unbind(int unit = 0) {		

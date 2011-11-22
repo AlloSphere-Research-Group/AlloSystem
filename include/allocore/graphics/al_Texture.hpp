@@ -87,7 +87,6 @@ public:
 	
 	virtual ~Texture(){}
 
-	Filter filter() const { return mFilter; }
 	Format format() const { return mFormat; }
 	Target target() const { return mTarget; }
 	DataType type() const { return mType; }	
@@ -96,6 +95,8 @@ public:
 	unsigned height() const { return mHeight; }
 	unsigned depth() const { return mDepth; }
 
+	Filter filter() const { return mFilter; }
+	
 	/// Return number of components per pixel
 	unsigned numComponents() const { return Graphics::numComponents(format()); }
 
@@ -108,7 +109,6 @@ public:
 		return width() * (height()?height():1) * (depth()?depth():1);
 	}
 
-	Texture& filter(Filter v){ return update(v, mFilter, mParamsUpdated); }
 	Texture& format(Format v){ return update(v, mFormat, mPixelsUpdated); }
 	Texture& target(Target v){ return update(v, mTarget, mPixelsUpdated); }
 	Texture& type(DataType v){ return update(v, mType  , mPixelsUpdated); }
@@ -117,6 +117,7 @@ public:
 	Texture& height(unsigned v){ return update(v, mHeight,mPixelsUpdated); }
 	Texture& depth (unsigned v){ return update(v, mDepth ,mPixelsUpdated); }
 
+	Texture& filter(Filter v){ return update(v, mFilter, mParamsUpdated); }
 	Texture& wrap(Wrap v){ return wrap(v,v,v); }
 	Texture& wrap(Wrap S, Wrap T){ return wrap(S,T,mWrapR); }
 	Texture& wrap(Wrap S, Wrap T, Wrap R);

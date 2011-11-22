@@ -54,6 +54,22 @@
 
 namespace al {
 
+/// A framed area on a display screen
+struct Viewport {
+	float l, b, w, h;	///< left, bottom, width, height
+
+	Viewport(float w=800, float h=600) : l(0), b(0), w(w), h(h) {}
+	Viewport(float l, float b, float w, float h) : l(l), b(b), w(w), h(h) {}
+	Viewport(const Viewport& cpy) : l(cpy.l), b(cpy.b), w(cpy.w), h(cpy.h) {}
+
+	/// Get aspect ratio (width divided by height)
+	float aspect() const { return (h!=0 && w!=0) ? float(w)/h : 1; }
+
+	/// Set dimensions
+	void set(float l_, float b_, float w_, float h_){ l=l_; b=b_; w=w_; h=h_; }
+};
+
+
 /// Interface for setting graphics state and rendering Mesh
 
 ///	It also owns a Mesh, to simulate immediate mode (where it draws its own data)
@@ -215,6 +231,7 @@ public:
 
 	// Coordinate Transforms
 	void viewport(int x, int y, int width, int height);
+	void viewport(const Viewport& vp) { viewport(vp.l, vp.b, vp.w, vp.h); }
 	void matrixMode(MatrixMode mode);
 	void pushMatrix();
 	void popMatrix();

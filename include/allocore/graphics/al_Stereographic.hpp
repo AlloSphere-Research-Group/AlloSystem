@@ -41,21 +41,6 @@
 
 namespace al{
 
-/// A framed area on a display screen
-struct Viewport {
-	float l, b, w, h;	///< left, bottom, width, height
-
-	Viewport(float w=800, float h=600) : l(0), b(0), w(w), h(h) {}
-	Viewport(float l, float b, float w, float h) : l(l), b(b), w(w), h(h) {}
-
-	/// Get aspect ratio (width divided by height)
-	float aspect() const { return (h!=0 && w!=0) ? float(w)/h : 1; }
-
-	/// Set dimensions
-	void set(float l_, float b_, float w_, float h_){ l=l_; b=b_; w=w_; h=h_; }
-};
-
-
 ///	Higher-level utility class to manage various stereo rendering techniques
 class Stereographic {
 public:
@@ -129,6 +114,7 @@ public:
 	const Matrix4d& projection() const { return mProjection; }
 	Matrix4d modelViewProjection() const { return mProjection * mModelView; }
 	const Vec3d& eye() const { return mEye; }
+	const Viewport& viewport() const { return mVP; }
 	
 protected:
 	StereoMode mMode;
@@ -141,6 +127,7 @@ protected:
 	
 	Matrix4d mProjection, mModelView;
 	Vec3d mEye;
+	Viewport mVP;
 };
 
 } // al::

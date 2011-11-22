@@ -94,46 +94,72 @@ protected:
 class ManagedShader : public ShaderProgram {
 public:
 	
-	ManagedShader(ResourceManager& rm, std::string vert, std::string frag) 
+	ManagedShader(ResourceManager& rm, std::string vert="", std::string frag="") 
 	:	ShaderProgram(), 
 		rm(rm), 
-		vertName(vert), 
-		fragName(frag), 
-		vertModified(0), 
-		fragModified(0)
+		relink(0)
 	{
-		rm.add(vert, false);
-		rm.add(frag, false);
+		vertex(vert);
+		fragment(frag);
 	}
 	
 	virtual ~ManagedShader() {}
 	
+	ManagedShader& vertex(std::string name) { return add(name, Shader::VERTEX); }
+	ManagedShader& fragment(std::string name) { return add(name, Shader::FRAGMENT); }
+	ManagedShader& geometry(std::string name) { return add(name, Shader::GEOMETRY); }
+	
+	ManagedShader& add(std::string name, Shader::Type type) {
+		if (name != "") {
+			shaders.push_back(ShaderFile());
+			ShaderFile& last = shaders.back();
+			last.name = name;
+			last.type = type;
+			last.modified = 0;
+			relink = true;
+		}
+		return *this;
+	}
+	
 	// overrides ShaderProgram::begin():
 	void begin() {
-		// update shader sources:
-		ResourceManager::FileInfo& v = rm[vertName];
-		ResourceManager::FileInfo& f = rm[fragName];
-		if (v.modified > vertModified || f.modified > fragModified) {
-			// mark as read:
-			vertModified = v.modified;
-			fragModified = f.modified;
-			// remove existing:
-			detach(vert).detach(frag);
-			// recompile & link:
-			vert.source(v.data, Shader::VERTEX).compile();
-			frag.source(f.data, Shader::FRAGMENT).compile();
-			attach(vert).attach(frag).link();
-			vert.printLog();
-			frag.printLog();
-			printLog();			
+		// check all shaders:
+		for (int i=0; i<shaders.size(); i++) {
+			ShaderFile& sf = shaders[i];
+			ResourceManager::FileInfo& info = rm[sf.name];
+			if (sf.modified < info.modified) {
+				// mark as read:
+				sf.modified = info.modified;
+				// remove existing:
+				detach(sf.shader);
+				// recompile & link:
+				sf.shader.source(info.data, sf.type).compile();
+				attach(sf.shader);
+				sf.shader.printLog();
+				// mark needs re-link:
+				relink = true;
+			}
+		}
+		if (relink) {
+			link();
+			printLog();	
+			relink = false;	
 		}
 		ShaderProgram::begin();
 	}
 	
+protected:
+	
+	struct ShaderFile {
+		std::string name;
+		Shader shader;
+		Shader::Type type;
+		al_sec modified;
+	};
+	
 	ResourceManager& rm;
-	al_sec vertModified, fragModified;
-	std::string vertName, fragName;
-	Shader vert, frag;
+	std::vector<ShaderFile> shaders;
+	bool relink;
 };
 
 

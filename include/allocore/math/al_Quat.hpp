@@ -622,9 +622,9 @@ inline Vec<3,T> Quat<T> :: rotate(const Vec<3,T>& v) const {
 	// we don't care about the w component
 	// and we know that conj() is simply (w, -x, -y, -z):
 	return Vec<3,T>(
-		-p.w*x + p.x*w - p.y*z + p.z*y,
-		-p.w*y + p.y*w - p.z*x + p.x*z,
-		-p.w*z + p.z*w - p.x*y + p.y*x
+		p.x*w - p.w*x + p.z*y - p.y*z,
+		p.y*w - p.w*y + p.x*z - p.z*x,
+		p.z*w - p.w*z + p.y*x - p.x*y
 	);
 //	p *= conj();	// p * q^-1
 //	return Vec<3,T>(p.x, p.y, p.z);

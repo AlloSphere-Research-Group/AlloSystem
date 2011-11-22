@@ -35,7 +35,7 @@ namespace al {
 
 class SimpleFBO {
 public:
-	SimpleFBO(Graphics& gl, unsigned width, unsigned height)
+	SimpleFBO(unsigned width, unsigned height)
 	:	width(width),
 		height(height)
 		//tex(gl,width,height,Texture::RGBA,Texture::UCHAR,Texture::CLAMP)
