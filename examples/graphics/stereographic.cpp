@@ -14,6 +14,8 @@ struct MyWindow : Window, public Drawable{
 	bool onKeyDown(const Keyboard& k){	
 		
 		switch(k.key()){
+			case '-': cam.eyeSep(cam.eyeSep() - 0.01); break;
+			case '+': cam.eyeSep(cam.eyeSep() + 0.01); break;
 			case Keyboard::TAB: stereo.stereo(!stereo.stereo()); return false;
 			case '1': stereo.mode(Stereographic::ANAGLYPH); return false;
 			case '2': stereo.mode(Stereographic::ACTIVE); return false;
