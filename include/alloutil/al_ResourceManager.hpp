@@ -124,7 +124,7 @@ public:
 	// overrides ShaderProgram::begin():
 	void begin() {
 		// check all shaders:
-		for (int i=0; i<shaders.size(); i++) {
+		for (unsigned i=0; i<shaders.size(); i++) {
 			ShaderFile& sf = shaders[i];
 			ResourceManager::FileInfo& info = rm[sf.name];
 			if (sf.modified < info.modified) {
