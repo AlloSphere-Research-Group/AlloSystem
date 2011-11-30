@@ -184,7 +184,7 @@ endif
 ifeq ($(BUILD_CONFIG), Release)
 	CFLAGS += -O3 -fpeel-loops
 else
-	CLFAGS += -g -O0 -fno-inline
+	CFLAGS += -g -O0 -fno-inline
 endif
 
 #LDFLAGS += -fvisibility=default
