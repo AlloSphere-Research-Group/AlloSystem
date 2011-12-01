@@ -131,7 +131,7 @@ public:
 				// mark as read:
 				sf.modified = info.modified;
 				// remove existing:
-				detach(sf.shader);
+				if (linked()) detach(sf.shader);
 				// recompile & link:
 				sf.shader.source(info.data, sf.type).compile();
 				attach(sf.shader);
@@ -149,6 +149,15 @@ public:
 	}
 	
 protected:
+
+	virtual void onDestroy() {
+		ShaderProgram::onDestroy();
+	
+		for (unsigned i=0; i<shaders.size(); i++) {
+			ShaderFile& sf = shaders[i];
+			sf.shader.invalidate();
+		}
+	}
 	
 	struct ShaderFile {
 		std::string name;

@@ -85,8 +85,8 @@ public:
 	Thread& joinOnDestroy(bool v){ mJoinOnDestroy=v; return *this; }
 
 	/// Start executing thread function
-	bool start(ThreadFunction& func);	
-
+	bool start(ThreadFunction& func);
+	
 	/// Start executing thread C function with user data
 	bool start(void * (*threadFunc)(void * userData), void * userData);
 
