@@ -139,10 +139,10 @@ public:
 	T * elems(){ return &x; }
 
 	/// Set element at index with no bounds checking
-	T& operator[](int i){ return elems()[i];}
+	inline T& operator[](int i){ return elems()[i];}
 	
 	/// Get element at index with no bounds checking
-	const T& operator[](int i) const { return elems()[i]; }
+	inline const T& operator[](int i) const { return elems()[i]; }
 
 	/// Return true if objects are element-wise equal, false otherwise
 	bool operator ==(const Vec& v) const { IT(N){ if((*this)[i] != v[i]) return false; } return true; }
@@ -202,51 +202,51 @@ public:
 
 	/// Set elements from another vector
 	template <class T2>
-	Vec& set(const Vec<N, T2> &v){ IT(N){ (*this)[i] = T(v[i]); } return *this; }
+	inline Vec& set(const Vec<N, T2> &v){ IT(N){ (*this)[i] = T(v[i]); } return *this; }
 
 	/// Set elements from another vector
 	template <int N2, class T2>
-	Vec& set(const Vec<N2, T2> &v){ IT(N<N2?N:N2){ (*this)[i] = T(v[i]); } return *this; }
+	inline Vec& set(const Vec<N2, T2> &v){ IT(N<N2?N:N2){ (*this)[i] = T(v[i]); } return *this; }
 
 	/// Set elements from another vector and scalar
 	template <class Tv, class Ts>
-	Vec& set(const Vec<N-1, Tv> &v, const Ts& s){ (*this)[N-1]=s; return set(v); }
+	inline Vec& set(const Vec<N-1, Tv> &v, const Ts& s){ (*this)[N-1]=s; return set(v); }
 
 	/// Set all elements to the same value
-	Vec& set(const T& v){ IT(N){ (*this)[i] = v; } return *this; }
+	inline Vec& set(const T& v){ IT(N){ (*this)[i] = v; } return *this; }
 
 	/// Set elements from raw C-pointer
 	template <class T2>
-	Vec& set(const T2 * v){
+	inline Vec& set(const T2 * v){
 		IT(N){ (*this)[i] = T(v[i]); }
 		return *this;
 	}
 	
 	/// Set elements from strided raw C-pointer
 	template <class T2>
-	Vec& set(const T2 * v, int stride){
+	inline Vec& set(const T2 * v, int stride){
 		IT(N){ (*this)[i] = T(v[i*stride]); }
 		return *this;
 	}
 
 	/// Set first 2 elements
-	Vec& set(const T& v1, const T& v2){
+	inline Vec& set(const T& v1, const T& v2){
 		return set(v1,v2,v1,v1,v1,v1); }
 
 	/// Set first 3 elements
-	Vec& set(const T& v1, const T& v2, const T& v3){
+	inline Vec& set(const T& v1, const T& v2, const T& v3){
 		return set(v1,v2,v3,v1,v1,v1); }
 
 	/// Set first 4 elements
-	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4){
+	inline Vec& set(const T& v1, const T& v2, const T& v3, const T& v4){
 		return set(v1,v2,v3,v4,v1,v1); }
 
 	/// Set first 5 elements
-	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5){
+	inline Vec& set(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5){
 		return set(v1,v2,v3,v4,v5,v1); }
 
 	/// Set first 6 elements
-	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6){		
+	inline Vec& set(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6){		
 		switch(N){
 		default:(*this)[5] = v6;
 		case 5: (*this)[4] = v5;
@@ -300,17 +300,17 @@ public:
 	// Linear Operations
 
 	/// Returns dot (inner) product between vectors
-	T dot(const Vec& v) const {
+	inline T dot(const Vec& v) const {
 		T r = (*this)[0] * v[0];
 		for(int i=1; i<N; ++i){ r += (*this)[i] * v[i]; }
 		return r;
 	}
 	
 	/// Returns magnitude
-	T mag() const { return std::sqrt(magSqr()); }
+	inline T mag() const { return std::sqrt(magSqr()); }
 	
 	/// Returns magnitude squared
-	T magSqr() const { return dot(*this); }
+	inline T magSqr() const { return dot(*this); }
 	
 	/// Returns p-norm of elements
 	
@@ -362,7 +362,7 @@ public:
 	Vec& negate(){ IT(N){ (*this)[i] = -(*this)[i]; } return *this; }
 
 	/// Scales elements evenly so magnitude is one
-	Vec& normalize();
+	inline Vec& normalize();
 	
 	/// linear interpolation
 	void lerp(const Vec& target, T amt) { set(lerp(*this, target, amt)); }

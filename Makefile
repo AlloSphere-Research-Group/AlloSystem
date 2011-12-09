@@ -126,7 +126,7 @@ allocore: $(SLIB_PATH)
 	
 #	@$(MAKE) install DESTDIR=$(BUILD_DIR)
 
-allojit alloutil alloni:
+allojit alloutil alloni allonect:
 	@$(MAKE) -C src/$@ install BUILD_DIR=../../$(BUILD_DIR) DESTDIR=../../$(BUILD_DIR)
 
 
