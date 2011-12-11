@@ -10,12 +10,10 @@
 namespace al {
 
 
-
-
 // singleton class:
 class Freenect : public ThreadFunction, public FPS {
 public:
-
+	
 	/// implement this interface to receive depth data updates:
 	class DepthCallback {
 	public:
@@ -80,8 +78,6 @@ protected:
 	std::map<int, Freenect::Device> mDevices;
 	bool mActive;
 };
-
-
 
 
 class FreenectDepthViewer : public Freenect::DepthCallback, public FPS {

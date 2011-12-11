@@ -137,6 +137,8 @@ public:
 			0, 0, 0, 1
 		);
 	}	
+	template<typename T1>
+	static const Matrix4 translate(const Vec<3, T1>& v) { return translate(v.x, v.y, v.z); }
 	
 	static const Matrix4 scale(T x, T y, T z) {
 		return Matrix4(
@@ -146,6 +148,8 @@ public:
 			0,	0,	0,	1
 		);
 	}
+	template<typename T1>
+	static const Matrix4 scale(const Vec<3, T1>& v) { return scale(v.x, v.y, v.z); }
 	
 	static const Matrix4 rotateYZ(T theta) {
 		const T C = cos(theta); 
