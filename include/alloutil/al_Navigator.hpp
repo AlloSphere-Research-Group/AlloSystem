@@ -71,7 +71,7 @@ public:
 		// integrate stored local rotation:
 		p.quat() *= mQuat;
 		// integrated mRelVel (unprojected from from local to global frame):
-		p.pos() += p.quat().rotateVector(mRelVel + mRelVelI + mNudge);
+		p.pos() += p.quat().rotate(mRelVel + mRelVelI + mNudge);
 		mNudge.set(0);
 		mRelVelI.set(0);
 		mEulerI.set(0);
@@ -84,7 +84,7 @@ public:
 		
 		// integrate stored local rotation:
 		target.quat() *= Quatd().fromEuler(mEuler + mEulerI);
-		target.pos() += target.quat().rotateVector(mRelVel + mRelVelI + mNudge);
+		target.pos() += target.quat().rotate(mRelVel + mRelVelI + mNudge);
 		
 		// interpolation is extrapolation:
 		return pose.lerp(target, fraction);
@@ -93,24 +93,24 @@ public:
 	// set stored local frame rotations (more naturally expressed in Euler angles):
 	void turn(const Vec3d& v) { mEuler.set(v);  }
 	void turnU(double degrees) {
-		mEuler[0] = degrees; //mQuat.fromEuler(mEuler);
+		mEuler[0] = M_DEG2RAD * degrees; //mQuat.fromEuler(mEuler);
 	}
 	void turnR(double degrees) {
-		mEuler[1] = degrees; //mQuat.fromEuler(mEuler);
+		mEuler[1] = M_DEG2RAD * degrees; //mQuat.fromEuler(mEuler);
 	}
 	void turnF(double degrees) {
-		mEuler[2] = degrees; //mQuat.fromEuler(mEuler);
+		mEuler[2] = M_DEG2RAD * degrees; //mQuat.fromEuler(mEuler);
 	}
 	
 	void rotate(const Vec3d& v) { mEulerI = v; }
 	void rotateU(double degrees) {
-		mEulerI[0] = degrees; //mQuat.fromEuler(mEuler);
+		mEulerI[0] = M_DEG2RAD * degrees; //mQuat.fromEuler(mEuler);
 	}
 	void rotateR(double degrees) {
-		mEulerI[1] = degrees; //mQuat.fromEuler(mEuler);
+		mEulerI[1] = M_DEG2RAD * degrees; //mQuat.fromEuler(mEuler);
 	}
 	void rotateF(double degrees) {
-		mEulerI[2] = degrees; //mQuat.fromEuler(mEuler);
+		mEulerI[2] = M_DEG2RAD * degrees; //mQuat.fromEuler(mEuler);
 	}
 	
 	// set stored local frame velocity:
