@@ -31,7 +31,7 @@ Freenect :: Freenect() : mNumDevices(0), mActive(0) {
 		printf("freenect_init() failed\n");
 	}
 	
-	freenect_set_log_level(ctx, FREENECT_LOG_DEBUG);
+	//freenect_set_log_level(ctx, FREENECT_LOG_DEBUG);
 	freenect_select_subdevices(ctx, (freenect_device_flags)(FREENECT_DEVICE_MOTOR | FREENECT_DEVICE_CAMERA));
 		
 	mNumDevices = freenect_num_devices (ctx);
