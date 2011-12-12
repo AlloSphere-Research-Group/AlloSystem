@@ -22,8 +22,9 @@ struct MyWindow : Window, public Drawable{
 			case '3': stereo.mode(Stereographic::DUAL); return false;
 			case '4': stereo.mode(Stereographic::LEFT_EYE); return false;
 			case '5': stereo.mode(Stereographic::RIGHT_EYE); return false;
-			default: return true;
+			default:;
 		}
+		return true;
 	}
 
 	bool onFrame(){
