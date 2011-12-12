@@ -250,7 +250,8 @@ public:
 
 	/// @param[in,out] path		Input is a file or directory to search for.
 	///							If the file is found, the output contains a series of
-	///							"../" that can be prefixed to the input
+	///							"../" prefixed to the input. Otherwise, the input
+	///							path is not modified.
 	/// @param[in]  maxDepth	Maximum number of directories to search back
 	/// \returns whether the file or directory was found
 	static bool searchBack(std::string& path, int maxDepth=6){
