@@ -192,7 +192,8 @@ public:
 	
 	/// set the position of an object:
 	HashSpace& move(uint32_t objectId, double x, double y, double z) { return move(objectId, Vec3d(x,y,z)); }
-	HashSpace& move(uint32_t objectId, Vec3d pos);
+	template<typename T>
+	HashSpace& move(uint32_t objectId, Vec<3,T> pos);
 	
 	/// this removes the object from voxels/queries, but does not destroy it
 	/// the objectId can be reused later via move()
@@ -200,15 +201,17 @@ public:
 	
 	/// wrap an absolute position within the space:
 	double wrap(double x) const { return wrap(x, dim()); }
-	Vec3d wrap(Vec3d v) const {
-		return Vec3d( wrap(v.x), wrap(v.y), wrap(v.z) );
+	template<typename T>
+	Vec<3,T> wrap(Vec<3,T> v) const {
+		return Vec<3,T>(wrap(v.x), wrap(v.y), wrap(v.z));
 	}
 	
 	/// wrap a relative vector within the space:
 	/// use this when computing the vector between objects
 	/// to properly take into account toroidal wrapping
 	double wrapRelative(double x) const { return wrap(x, maxRadius()); }
-	Vec3d wrapRelative(Vec3d v) const {
+	template<typename T>
+	Vec<3,T> wrapRelative(Vec<3,T> v) const {
 		return wrap(v + maxRadius()) - maxRadius();
 	}
 
@@ -344,7 +347,8 @@ inline void HashSpace :: numObjects(int numObjects) {
 	}
 }
 
-inline HashSpace& HashSpace :: move(uint32_t objectId, Vec3d pos) {
+template<typename T>
+inline HashSpace& HashSpace :: move(uint32_t objectId, Vec<3,T> pos) {
 	Object& o = mObjects[objectId];
 	o.pos.set(wrap(pos));
 	uint32_t newhash = hash(o.pos);
