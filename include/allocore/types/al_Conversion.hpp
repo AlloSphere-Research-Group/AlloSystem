@@ -159,20 +159,23 @@ template<class T> T uintToUnit (uint32_t v);
 /// Convert 32-bit unsigned integer to unit float in [-1, 1)
 template<class T> T uintToUnitS(uint32_t v);
 
-/// Convert floating point in [0, 1) to unsigned long in [0, 2^32)
+/// Convert float in [-1, 1) to 16-bit signed int in [0, 2^16)
+int16_t unitToInt16(float v);
+
+/// Convert float in [0, 1) to 32-bit unsigned int in [0, 2^32)
 
 /// This conversion is most accurate on a linear scale.
 /// Input values outside [0, 1) result in undefined behavior.
 uint32_t unitToUInt(float u);
 
-/// Convert floating point in [0, 1) to unsigned long in [0, 2^32)
+/// Convert float in [0, 1) to 32-bit unsigned int in [0, 2^32)
 
 /// This conversion is most accurate on an exponential scale.
 ///	Input values outside [-1, 1) return 0.
 ///	Values in [-1, 0] behave as positive values in [0, 1).
 uint32_t unitToUInt2(float u);
 
-/// Convert unit float in [0,1) to 8-bit unsigned int in [0, 256).
+/// Convert float in [0, 1) to 8-bit unsigned int in [0, 256)
 uint8_t unitToUInt8(float u);
 
 
@@ -278,6 +281,11 @@ template<> inline float uintToUnit<float>(uint32_t v){
 template<> inline float uintToUnitS<float>(uint32_t v){
 	v = v >> 9 | 0x40000000;		// float in [2, 4)
 	return punUF(v) - 3.f;
+}
+
+inline int16_t unitToInt16(float v){
+	float r = v + 3.f; // put in [2,4)
+	return int16_t((al::punFU(r) >> 7) + (1<<15));
 }
 
 inline uint32_t unitToUInt(float v){
