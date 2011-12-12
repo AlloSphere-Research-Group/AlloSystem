@@ -54,6 +54,7 @@ typedef Mat<4,int>		Mat4i;	///< integer 4x4 matrix
 #define IT(n) for(int i=0; i<(n); ++i)
 
 
+/// Flag type to prevent element initialization
 static struct MatNoInit{} MAT_NO_INIT;
 
 
