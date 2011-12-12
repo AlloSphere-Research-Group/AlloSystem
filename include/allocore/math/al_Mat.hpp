@@ -68,14 +68,20 @@ public:
 	/// Column-major array of elements
 	T mElems[N*N];
 
+
+	//--------------------------------------------------------------------------
+	// Constructors
+
+	/// Default constructor that initializes elements to zero
 	Mat(){ set(T(0)); }
 
 	/// param[in] arr	one dimensional array in column-major
 	Mat(const T * arr){ set(arr); }
 
+	/// Construct without initializing elements
 	Mat(const MatNoInit& v){}
 
-	///
+	/// 2x2 matrix constructor with element initialization
 	Mat(
 		const T& r1c1, const T& r1c2,
 		const T& r2c1, const T& r2c2
@@ -85,7 +91,7 @@ public:
 		);
 	}
 
-	///
+	/// 3x3 matrix constructor with element initialization
 	Mat(
 		const T& r1c1, const T& r1c2, const T& r1c3,
 		const T& r2c1, const T& r2c2, const T& r2c3,
@@ -97,7 +103,7 @@ public:
 		);
 	}
 
-	///
+	/// 4x4 matrix constructor with element initialization
 	Mat(
 		const T& r1c1, const T& r1c2, const T& r1c3, const T& r1c4,
 		const T& r2c1, const T& r2c2, const T& r2c3, const T& r2c4,
@@ -216,7 +222,7 @@ public:
 	Mat& operator *= (const T& v){ IT(size()){ (*this)[i] *= v; } return *this; }
 	Mat& operator /= (const T& v){ IT(size()){ (*this)[i] /= v; } return *this; }
 
-	Mat operator - () const { Mat r; IT(size()){ r[i]=-(*this)[i]; } return r; }
+	Mat operator - () const { Mat r(MAT_NO_INIT); IT(size()){ r[i]=-(*this)[i]; } return r; }
 	Mat operator + (const Mat& v) const { return Mat(*this) += v; }
 	Mat operator - (const Mat& v) const { return Mat(*this) -= v; }
 	Mat operator * (const Mat& v) const { return Mat(*this) *= v; }
