@@ -291,6 +291,10 @@ public:
 		oscSend().send("/disconnectApplication", name());
 	}
 
+
+	/// Returns true if using audio
+	bool usingAudio() const;
+
 private:
 
 	typedef std::vector<Viewpoint *> Viewpoints;
@@ -321,8 +325,6 @@ private:
 	std::string mName;
 	void * mClockAnimate;
 	void * mClockNav;
-
-	bool usingAudio() const;
 
 	// attached to each ViewpointWindow
 	struct SceneWindowHandler : public WindowEventHandler{
