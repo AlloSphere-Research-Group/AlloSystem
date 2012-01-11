@@ -44,7 +44,8 @@ LINK_LIBS_FLAGS	=
 -include externals/gamma/Makefile.external
 -include externals/glv/Makefile.external
 
-RUN_SRCS	=  $(wildcard $(RUN_SRC_DIRS)/*.c) $(wildcard $(RUN_SRC_DIRS)/*.cpp)
+RUN_SRCS	=  $(wildcard $(addsuffix /*.cpp, $(RUN_SRC_DIRS)))
+RUN_SRCS	+= $(wildcard $(addsuffix /*.c, $(RUN_SRC_DIRS)))
 RUN_OBJS	=  $(addsuffix .o, $(basename $(notdir $(RUN_SRCS)) ))
 #RUN_OBJS	:= $(addsuffix .o, $(basename $(subst /,_,$(RUN_OBJS)) ))
 RUN_OBJS	:= $(addprefix $(OBJ_DIR), $(RUN_OBJS))
@@ -67,7 +68,12 @@ include Makefile.rules
 # For whatever reason, we need this rule so the objects don't get rm'ed by make
 runobjs: $(RUN_OBJS)
 
+# Hack to prevent circular dependencies with compile-and-run rule
+.PHONY: %.hpp
+%.hpp:
+
 # Compile and run source files in examples/ folder
+# FIXME: this rule should only work for .cpp and .c
 EXEC_TARGETS  = $(addsuffix %.cpp, $(RUN_DIRS)) $(addsuffix %.c, $(RUN_DIRS))
 ifeq ($(PLATFORM), linux)
 	LINK_LIBS_FLAGS += $(addprefix -l :, $(notdir $(LINK_LIBS_PATH)))
