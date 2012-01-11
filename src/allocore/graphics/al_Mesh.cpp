@@ -100,7 +100,6 @@ public:
 		normal<float>(norm, p0, p1, p2);
 	}
 };
-
 void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace){
 
 	struct F{
@@ -139,7 +138,7 @@ void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace){
 			}
 		} else {
 			printf("createNormalsMesh only valid for indexed meshes\n");
-		}
+		} 
 	} else {
 		int Ni = al::min(vertices().size(), normals().size());
 		F::initMesh(mesh, Ni*2);
@@ -195,6 +194,7 @@ void Mesh::compress() {
 	// map of old vertex index to new vertex index:
 	typedef std::map<int, int> Imap;
 	Imap imap;
+	
 	
 	// reset current mesh:
 	reset();
