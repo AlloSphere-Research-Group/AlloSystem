@@ -98,8 +98,10 @@ public:
 	///	A \e false return value indicates a problem with the wait call.
 	bool join();
 	
-	/// return pointer to current OS thread object
-	/// e.g. if using pthreads internally, will return the pthread_t
+	/// Return pointer to current OS thread object
+	
+	/// E.g., if using pthreads internally, will return the pthread_t.
+	///
 	static void * current();
 
 protected:
@@ -108,6 +110,71 @@ protected:
 	CThreadFunction mCFunc;
 	bool mJoinOnDestroy;
 };
+
+
+
+/// Multiple threads acting as a single work unit
+template <class ThreadFunction>
+class Threads{
+public:
+
+	/// A thread and function
+	struct Worker{
+		Thread thread;
+		ThreadFunction function;
+	};
+
+
+	/// @param[in] size		number of worker threads
+	Threads(int size)
+	:	mWorkers(0)
+	{
+		resize(size);
+	}
+	
+	~Threads(){ clear(); }
+
+	/// Returns number of workers
+	int size() const { return mSize; }
+
+	/// Resize number of workers
+	void resize(int n){
+		if(n != size()){
+			mSize = n;
+			clear();
+			mWorkers = new Worker[size()];
+		}
+	}
+
+	/// Start all worker threads
+	void start(bool joinAll=true){
+		for(int i=0; i<size(); ++i){
+			thread(i).start(function(i));
+		}
+		if(joinAll) join();
+	}
+	
+	/// Join all worker threads
+	void join(){
+		for(int i=0; i<size(); ++i) thread(i).join();
+	}
+	
+	/// Get a worker
+	Worker& worker(int i){ return mWorkers[i]; }
+	
+	/// Get a worker thread
+	Thread& thread(int i){ return worker(i).thread; }
+	
+	/// Get a worker thread function
+	ThreadFunction& function(int i){ return worker(i).function; }
+
+protected:
+	int mSize;
+	Worker * mWorkers;
+	
+	void clear(){ if(mWorkers) delete[] mWorkers; }
+};
+
 
 
 
