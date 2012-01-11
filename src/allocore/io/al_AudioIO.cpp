@@ -202,7 +202,8 @@ AudioIOData::AudioIOData(void * userData)
 :	mImpl(new Impl),
 	mUser(userData),
 	mFramesPerBuffer(0), mFramesPerSecond(0),
-	mBufI(0), mBufO(0), mBufB(0), mBufT(0), mNumI(0), mNumO(0), mNumB(0)
+	mBufI(0), mBufO(0), mBufB(0), mBufT(0), mNumI(0), mNumO(0), mNumB(0),
+	mGain(1), mGainPrev(1)
 {}
 
 AudioIOData::~AudioIOData(){
@@ -446,7 +447,27 @@ int paCallback(
 	
 	if(io.autoZeroOut()) io.zeroOut();
 
+
 	io.processAudio();	// call callback
+
+
+	// apply smoothly-ramped gain to all output channels
+	if(io.usingGain()){
+	
+		float dgain = (io.mGain-io.mGainPrev) / io.framesPerBuffer();
+	
+		for(int j=0; j<io.channelsOutDevice(); ++j){
+			float * out = io.outBuffer(j);
+			float gain = io.mGainPrev;
+			
+			for(int i=0; i<io.framesPerBuffer(); ++i){
+				out[i] *= gain;
+				gain += dgain;
+			}
+		}
+		
+		io.mGainPrev = io.mGain;
+	}
 
 	// kill pesky nans so we don't hurt anyone's ears
 	if(io.zeroNANs()){
