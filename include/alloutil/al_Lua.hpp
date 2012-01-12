@@ -3,15 +3,15 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
-	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
+	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS).
 	All Rights Reserved.
 
 	Permission to use, copy, modify, distribute, and distribute modified versions
 	of this software and its documentation without fee and without a signed
 	licensing agreement, is hereby granted, provided that the above copyright
-	notice, the list of contributors, this paragraph and the following two paragraphs 
+	notice, the list of contributors, this paragraph and the following two paragraphs
 	appear in all copies, modifications, and distributions.
 
 	IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
@@ -45,15 +45,21 @@ public:
 		L = lua_open();
 		luaL_openlibs(L);
 	}
-	
-	///! destructor calls 
-	~Lua() { 
+
+	///! destructor calls
+	~Lua() {
 		if (L) {
-			lua_close(L); 
-			L = 0; 
+			lua_close(L);
+			L = 0;
 		}
 	}
-	
+
+	Lua& setglobal(const std::string& name, std::string& value) {
+        lua_pushstring(L, value.c_str());
+        lua_setglobal(L, name.c_str());
+        return *this;
+	}
+
 	int lerror(lua_State * L, int err) {
 		if (err) {
 			printf("error: %s\n", lua_tostring(L, -1));
@@ -61,7 +67,7 @@ public:
 		}
 		return err;
 	}
-	
+
 	int pcall(lua_State * L, int nargs) {
 		int debug_idx = -nargs-3;
 		// put debug.traceback just below the function & args
@@ -74,20 +80,20 @@ public:
 		}
 		int top = lua_gettop(L);
 		int res = lerror(L, lua_pcall(L, nargs, LUA_MULTRET, -nargs-2));
-		int nres = lua_gettop(L) - top; 
+		int nres = lua_gettop(L) - top;
 	//	int nres = lua_gettop(L) - top + nargs + 1;
 		lua_remove(L, -(nres+nargs+2)); // remove debug function from stack
 		return res;
 	}
-	
+
 	int dostring(const std::string& code, int nargs=0) {
 		return lerror(L, luaL_loadstring(L, code.c_str())) || pcall(L, nargs);
 	}
-	
+
 	int dofile(const std::string& path, int nargs=0) {
 		return lerror(L, luaL_loadfile(L, path.c_str())) || pcall(L, nargs);
 	}
-	
+
 	///! allow the Lua object to be used in place of a lua_State *
 	operator lua_State *() { return L; }
 	operator const lua_State *() { return L; }
@@ -95,7 +101,7 @@ public:
 protected:
 	lua_State * L;
 };
-	
+
 } // al::
 
 #endif
