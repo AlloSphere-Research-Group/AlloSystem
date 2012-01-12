@@ -81,11 +81,11 @@ public:
 	}
 	
 	int dostring(const std::string& code, int nargs=0) {
-		return luaL_loadstring(L, code.c_str()) || pcall(L, nargs);
+		return lerror(L, luaL_loadstring(L, code.c_str())) || pcall(L, nargs);
 	}
 	
 	int dofile(const std::string& path, int nargs=0) {
-		return luaL_loadfile(L, path.c_str()) || pcall(L, nargs);
+		return lerror(L, luaL_loadfile(L, path.c_str())) || pcall(L, nargs);
 	}
 	
 	///! allow the Lua object to be used in place of a lua_State *
