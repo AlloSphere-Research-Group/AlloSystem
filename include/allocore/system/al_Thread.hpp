@@ -168,6 +168,30 @@ public:
 	/// Get a worker thread function
 	ThreadFunction& function(int i){ return worker(i).function; }
 
+	/// Get worker sub-interval range of a full interval [min, max)
+	
+	/// This is useful for determining how to break up for loops into 
+	/// sub-intervals. E.g., if the full loop interval is [ 0, N ), then the 
+	/// ith worker's interval is [ range(N)*i, range(N)*(i+1) ).
+	template <class T>
+	double range(T max, T min=T(0)){
+		return (max-min) / double(size());
+	}
+	
+	/// Get worker sub-interval of a full interval [min, max)
+	
+	/// @param[out] interval	two-element array containing endpoints of sub-interval
+	/// @param[in]  i			worker index
+	/// @param[in]  max			full interval max endpoint
+	/// @param[in]  min			full interval min endpoint
+	template <class T>
+	void getInterval(T * interval, int i, T max, T min = T(0)){
+		double diam = range(max,min);
+		double left = diam * i + min;
+		interval[0] = left;
+		interval[1] = left + diam;
+	}
+
 protected:
 	int mSize;
 	Worker * mWorkers;
