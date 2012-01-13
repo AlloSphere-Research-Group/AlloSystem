@@ -268,11 +268,16 @@ public:
 
 #else
 
+class ImplBase {
+public:
+
+};
+
 ///! TODO: OSX
-class Client::Impl {
+class Client::Impl : public ImplBase {
 public:
 	
-	Impl(Client * master) : master(master) {}
+	Impl(Client * master) : ImplBase(), master(master) {}
 	virtual ~Impl() {}
 
 	void poll(al_sec timeout) {}
@@ -282,8 +287,13 @@ public:
 
 class Server::Impl : public ImplBase {
 public:
-	Impl(Server * master) : master(master) {}
+	Impl(Server * master, const std::string& name, const std::string& host, uint16_t port, const std::string& type, const std::string& domain) 
+	:	ImplBase(), name(name), host(host), type(type), domain(domain), port(port), master(master) {}
+	
 	virtual ~Impl() {}
+	
+	std::string name, host, type, domain;
+	uint16_t port;
 	Server * master;
 };
 
