@@ -41,7 +41,22 @@
 
 namespace al{
 
+class Zeroconf {
+public:
+	class Impl;
 
+	Zeroconf(const std::string& type = "_osc._udp.", const std::string& domain = "local.");
+	~Zeroconf();
+
+	///! if timeout = 0, non-blocking
+	///! if timeout < 0, block until first event
+	///! if timeout > 0, block until next event or timeout seconds elapsed
+	void poll(al_sec timeout=0);
+
+protected:	
+	std::string type, domain;
+	Impl * mImpl;
+};
 
 } // al::
 	

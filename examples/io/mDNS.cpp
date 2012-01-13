@@ -13,6 +13,9 @@ Graham Wakefield, 2012
 
 using namespace al;
 
+//Zeroconf z("_osc._udp");
+Zeroconf z("_http._tcp");
+
 int main(){
 	printf("starting\n");
 	
@@ -32,7 +35,9 @@ int main(){
 	
 	// stop broadcasting service
 	
-
-	MainLoop::start();
+	while (1) {
+		z.poll();
+		al_sleep(0.1);
+	}
 	return 0;
 }
