@@ -13,30 +13,19 @@ Graham Wakefield, 2012
 
 using namespace al;
 
-//Zeroconf z("_osc._udp");
-Zeroconf z("_http._tcp");
+
+//mdns::Client z("_osc._udp");
+//mdns::Client z("_ssh._tcp");
+mdns::Client z("_http._tcp");
+
+mdns::Server zs("mDNS TEST", Socket::hostIP());
 
 int main(){
-	printf("starting\n");
-	
-	// browse
-	//launch_service_search(service_name ex "_osc._udp", callback);
-	
-	// stop browsing
-
-	// discovery callback
-	// receives list of services containing names / ip / ports
-	
-	// disconnect callback
-	// receives ip / port / name of disconnected service
-	
-	// register
-	// broadcast a service name / ip / port
-	
-	// stop broadcasting service
+	printf("starting on %s\n", Socket::hostIP().c_str());
 	
 	while (1) {
 		z.poll();
+		zs.poll();
 		al_sleep(0.1);
 	}
 	return 0;

@@ -39,25 +39,55 @@
 #include "allocore/io/al_Socket.hpp"
 #include "allocore/system/al_Thread.hpp"
 
-namespace al{
+#include <string>
+#include <stdio.h>
 
-class Zeroconf {
+namespace al{
+namespace mdns{
+
+class Client {
 public:
 	class Impl;
 
-	Zeroconf(const std::string& type = "_osc._udp.", const std::string& domain = "local.");
-	~Zeroconf();
+	Client(const std::string& type = "_osc._udp.", const std::string& domain = "local.");
+	virtual ~Client();
 
 	///! if timeout = 0, non-blocking
 	///! if timeout < 0, block until first event
 	///! if timeout > 0, block until next event or timeout seconds elapsed
 	void poll(al_sec timeout=0);
 
+	///! called when a new device is added:
+	virtual void onServiceNew(const std::string& name, const std::string& type, const std::string& domain) {
+		printf("Zeroconf: new service '%s' of type '%s' in domain '%s'\n", name.c_str(), type.c_str(), domain.c_str());
+	}
+
+	virtual void onServiceRemove(const std::string& name, const std::string& type, const std::string& domain) {
+		printf("Zeroconf: removed service '%s' of type '%s' in domain '%s'\n", name.c_str(), type.c_str(), domain.c_str());
+	}
+
+	virtual void onServiceResolved(const std::string& name, const std::string& host_name, uint16_t port, const std::string& address) {
+		printf("Zeroconf: resolved service '%s' on host '%s' on port %u at address '%s'\n", name.c_str(), host_name.c_str(), port, address.c_str());
+	}
+
 protected:	
 	std::string type, domain;
 	Impl * mImpl;
 };
 
+class Server : public Client {
+public:
+	class Impl;
+
+	Server(const std::string& name, const std::string& host, uint16_t port=4110, const std::string& type="_osc._udp.", const std::string& domain="local.");
+
+	virtual ~Server();
+
+protected:
+	Impl * mImpl;
+};
+
+} // mdns::
 } // al::
 	
 #endif

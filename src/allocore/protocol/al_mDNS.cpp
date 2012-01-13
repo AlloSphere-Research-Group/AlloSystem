@@ -18,49 +18,96 @@
 #include <stdio.h>
 
 using namespace al;
+using namespace al::mdns;
 
 #ifdef AL_LINUX
 
-class Zeroconf::Impl {
+class ImplBase {
+public:
+	ImplBase() : poller(0), client(0) {
+		int error;
+		AvahiClientFlags flags = AVAHI_CLIENT_NO_FAIL;
+		/* Allocate main loop object */
+		if (!(poller = avahi_simple_poll_new())) {
+	   		fprintf(stderr, "Zeroconf: Failed to create simple poll object.\n");
+	    	return;
+		}
+		client = avahi_client_new(avahi_simple_poll_get(poller), flags, client_callback, this, &error);
+		/* Check wether creating the client object succeeded */
+		if (!client) {
+			fprintf(stderr, "Zeroconf: Failed to create client: %s\n", avahi_strerror(error));
+			return;
+		}
+	}
+
+	~ImplBase() {
+		if (client) avahi_client_free(client);
+		if (poller) avahi_simple_poll_free(poller);
+	}
+
+	void poll(al_sec timeout) {
+		int sleep_time = timeout * 1000;
+		int result = avahi_simple_poll_iterate(poller, sleep_time);
+	}
+
+	static void client_callback(AvahiClient *client, AvahiClientState state, void * userdata) {
+		assert(client);
+		ImplBase * self = (ImplBase *)userdata;
+		
+		switch (state) {
+		    case AVAHI_CLIENT_S_RUNNING:
+		        /* The server has startup successfully and registered its host
+		         * name on the network, so it's time to create our services */
+		        //create_services(client);
+		        break;
+
+		    case AVAHI_CLIENT_FAILURE:
+		        fprintf(stderr, "Zeroconf: Client failure: %s\n", avahi_strerror(avahi_client_errno(client)));
+		        avahi_simple_poll_quit(self->poller);
+		        break;
+
+		    case AVAHI_CLIENT_S_COLLISION:
+		        /* Let's drop our registered services. When the server is back
+		         * in AVAHI_SERVER_RUNNING state we will register them
+		         * again with the new host name. */
+
+		    case AVAHI_CLIENT_S_REGISTERING:
+		        /* The server records are now being established. This
+		         * might be caused by a host name change. We need to wait
+		         * for our own records to register until the host name is
+		         * properly esatblished. */
+
+		        //if (group) avahi_entry_group_reset(group);
+
+		        break;
+
+		    default:
+				break;
+		}
+	}
+
+	AvahiSimplePoll * poller;
+	AvahiClient * client;
+};
+
+class Client::Impl : public ImplBase {
 public:
 	
-	Impl(Zeroconf& self) : poller(0), client(0), browser(0) {
+	Impl(Client * master) : browser(0), master(master) {
 		int error;
 		AvahiClientFlags flags = AVAHI_CLIENT_NO_FAIL;
 
-		/* Allocate main loop object */
-		if (!(poller = avahi_simple_poll_new())) {
-	   		fprintf(stderr, "Failed to create simple poll object.\n");
-	    	return;
-		}	
-		client = avahi_client_new(avahi_simple_poll_get(poller), flags, client_callback, &self, &error);
-		/* Check wether creating the client object succeeded */
-		if (!client) {
-		    fprintf(stderr, "Failed to create client: %s\n", avahi_strerror(error));
-			return;
-		}
-
-		/* Create the service browser */
-		if (!(browser = avahi_service_browser_new(client, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, self.type.c_str(), self.domain.c_str(), (AvahiLookupFlags)0, browse_callback, &self))) {
-			fprintf(stderr, "Failed to create service browser: %s\n", avahi_strerror(avahi_client_errno(client)));
-			return;
+		if (client) {	
+			/* Create the service browser */
+			if (!(browser = avahi_service_browser_new(client, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, master->type.c_str(), master->domain.c_str(), (AvahiLookupFlags)0, browse_callback, this))) {
+				fprintf(stderr, "Zeroconf: Failed to create service browser: %s\n", avahi_strerror(avahi_client_errno(client)));
+				return;
+			}
 		}
 	}
 
-	~Impl() {
-		if (client) avahi_client_free(client);
-		if (poller) avahi_simple_poll_free(poller);
+	virtual ~Impl() {
 		if (browser) avahi_service_browser_free(browser);
-	}
-
-	static void client_callback(AvahiClient *client, AvahiClientState state, AVAHI_GCC_UNUSED void * userdata) {
-		assert(client);
-		Zeroconf * self = (Zeroconf *)userdata;
-		/* Called whenever the client or server state changes */
-		if (state == AVAHI_CLIENT_FAILURE) {
-		    fprintf(stderr, "Server connection failure: %s\n", avahi_strerror(avahi_client_errno(client)));
-		    avahi_simple_poll_quit(self->mImpl->poller);
-		}
 	}
 
 	static void browse_callback(
@@ -73,39 +120,38 @@ public:
 		const char *domain,
 		AVAHI_GCC_UNUSED AvahiLookupResultFlags flags,
 		void* userdata) {
-		Zeroconf * self = (Zeroconf *)userdata;
-		AvahiClient * client = self->mImpl->client;
+		Impl * self = (Impl *)userdata;
+		AvahiClient * client = self->client;
 
 		assert(b);
 
 		/* Called whenever a new services becomes available on the LAN or is removed from the LAN */
 		switch (event) {
 		    case AVAHI_BROWSER_FAILURE:
-
-		        fprintf(stderr, "(Browser) %s\n", avahi_strerror(avahi_client_errno(avahi_service_browser_get_client(b))));
-		        avahi_simple_poll_quit(self->mImpl->poller);
+		        fprintf(stderr, "Zeroconf: %s\n", avahi_strerror(avahi_client_errno(avahi_service_browser_get_client(b))));
+		        avahi_simple_poll_quit(self->poller);
 		        return;
 
 		    case AVAHI_BROWSER_NEW:
-		        fprintf(stderr, "(Browser) NEW: service '%s' of type '%s' in domain '%s'\n", name, type, domain);
+				self->master->onServiceNew(name, type, domain);
 
-		        /* We ignore the returned resolver object. In the callback
-		           function we free it. If the server is terminated before
-		           the callback function is called the server will free
-		           the resolver for us. */
+				/* We ignore the returned resolver object. In the callback
+				   function we free it. If the server is terminated before
+				   the callback function is called the server will free
+				   the resolver for us. */
 
-		        if (!(avahi_service_resolver_new(client, interface, protocol, name, type, domain, AVAHI_PROTO_UNSPEC, (AvahiLookupFlags)0, resolve_callback, client)))
-		            fprintf(stderr, "Failed to resolve service '%s': %s\n", name, avahi_strerror(avahi_client_errno(client)));
-
+				if (!(avahi_service_resolver_new(client, interface, protocol, name, type, domain, AVAHI_PROTO_UNSPEC, (AvahiLookupFlags)0, resolve_callback, self)))
+				    fprintf(stderr, "Zeroconf: failed to resolve service '%s': %s\n", name, avahi_strerror(avahi_client_errno(client)));
 		        break;
 
 		    case AVAHI_BROWSER_REMOVE:
-		        fprintf(stderr, "(Browser) REMOVE: service '%s' of type '%s' in domain '%s'\n", name, type, domain);
+				self->master->onServiceRemove(name, type, domain);
 		        break;
 
 		    case AVAHI_BROWSER_ALL_FOR_NOW:
 		    case AVAHI_BROWSER_CACHE_EXHAUSTED:
-		        fprintf(stderr, "(Browser) %s\n", event == AVAHI_BROWSER_CACHE_EXHAUSTED ? "CACHE_EXHAUSTED" : "ALL_FOR_NOW");
+				// TODO: what do these mean?		        
+				fprintf(stderr, "Zeroconf: %s\n", event == AVAHI_BROWSER_CACHE_EXHAUSTED ? "CACHE_EXHAUSTED" : "ALL_FOR_NOW");
 		        break;
 		}
 	}
@@ -125,7 +171,7 @@ public:
 		AvahiLookupResultFlags flags,
 		void* userdata) {
 
-		Zeroconf * self = (Zeroconf *)userdata;
+		Impl * self = (Impl *)userdata;
 
 		assert(r);
 
@@ -133,18 +179,21 @@ public:
 
 		switch (event) {
 		    case AVAHI_RESOLVER_FAILURE:
-		        fprintf(stderr, "(Resolver) Failed to resolve service '%s' of type '%s' in domain '%s': %s\n", name, type, domain, avahi_strerror(avahi_client_errno(avahi_service_resolver_get_client(r))));
+		        fprintf(stderr, "Zeroconf: failed to resolve service '%s' of type '%s' in domain '%s': %s\n", name, type, domain, avahi_strerror(avahi_client_errno(avahi_service_resolver_get_client(r))));
 		        break;
 
 		    case AVAHI_RESOLVER_FOUND: {
 		        char a[AVAHI_ADDRESS_STR_MAX], *t;
 
-		        fprintf(stderr, "Service '%s' of type '%s' in domain '%s':\n", name, type, domain);
-
 		        avahi_address_snprint(a, sizeof(a), address);
+				self->master->onServiceResolved(name, host_name, port, a);
+
+				/*
 		        t = avahi_string_list_to_string(txt);
 		        fprintf(stderr,
-		                "\t%s:%u (%s)\n"
+		                "\tname=%s\n"
+						"\tport=%u\n"
+						"\taddress= %s\n"
 		                "\tTXT=%s\n"
 		                "\tcookie is %u\n"
 		                "\tis_local: %i\n"
@@ -160,47 +209,103 @@ public:
 		                !!(flags & AVAHI_LOOKUP_RESULT_WIDE_AREA),
 		                !!(flags & AVAHI_LOOKUP_RESULT_MULTICAST),
 		                !!(flags & AVAHI_LOOKUP_RESULT_CACHED));
-
 		        avahi_free(t);
+				*/
 		    }
 		}
 
 		avahi_service_resolver_free(r);
 	}
 
-	void poll(al_sec timeout) {
-		int sleep_time = timeout * 1000;
-		int result = avahi_simple_poll_iterate(poller, sleep_time);
+	AvahiServiceBrowser * browser;
+	Client * master;
+};
+
+class Server::Impl : public ImplBase {
+public:
+	Impl(Server * master, const std::string& name, const std::string& host, uint16_t port, const std::string& type, const std::string& domain) 
+:	name(name), host(host), type(type), domain(domain), port(port), group(0), master(master) {
+		int ret;
+		if (client) {	
+			if (!(group = avahi_entry_group_new(client, entry_group_callback, NULL))) {
+		        fprintf(stderr, "avahi_entry_group_new() failed: %s\n", avahi_strerror(avahi_client_errno(client)));
+		        return;
+		    }
+
+			/* If the group is empty (either because it was just created, or
+				 * because it was reset previously, add our entries.  */
+
+			if (avahi_entry_group_is_empty(group)) {
+				printf("Zeroconf: Adding service '%s'\n", name.c_str());
+			}
+
+		    /* Add the service for IPP */
+		    if ((ret = avahi_entry_group_add_service(group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, (AvahiPublishFlags)0, name.c_str(), type.c_str(), domain.c_str(), host.c_str(), port, NULL)) < 0) {
+
+		        if (ret == AVAHI_ERR_COLLISION)
+		            printf("Zeroconf: name collision");
+
+		        printf("Zeroconf: failed to add service %s on %s:%u: %s\n", name.c_str(), host.c_str(), port, avahi_strerror(ret));
+		        return;
+		    }
+
+		}
 	}
 
-	AvahiSimplePoll * poller;
-	AvahiClient * client;
-	AvahiServiceBrowser * browser;
+	~Impl() {
+
+	}
+
+	static void entry_group_callback(AvahiEntryGroup *g, AvahiEntryGroupState state, void *userdata) {
+
+	}
+
+	std::string name, host, type, domain;
+	uint16_t port;
+	AvahiEntryGroup * group;
+	Server * master;
 };
 
 #else
 
 ///! TODO: OSX
-class Zeroconf::Impl {
+class Client::Impl {
 public:
 	
-	Impl(Zeroconf& self) {}
-	~Impl() {}
+	Impl(Client * master) : master(master) {}
+	virtual ~Impl() {}
 
 	void poll(al_sec timeout) {}
+
+	Client * master;
+};
+
+class Server::Impl : public ImplBase {
+public:
+	Impl(Server * master) : master(master) {}
+	virtual ~Impl() {}
+	Server * master;
 };
 
 #endif
 
-Zeroconf::Zeroconf(const std::string& type, const std::string& domain) 
+Client::Client(const std::string& type, const std::string& domain) 
 :	type(type), domain(domain) {
-	mImpl = new Impl(*this);
+	mImpl = new Impl(this);
 }
 
-Zeroconf::~Zeroconf() {
+Client::~Client() {
 	delete mImpl;
 }
 
-void Zeroconf::poll(al_sec timeout) {
+void Client::poll(al_sec timeout) {
 	mImpl->poll(timeout);
+}
+
+Server::Server(const std::string& name, const std::string& host, uint16_t port, const std::string& type, const std::string& domain) {
+	mImpl = new Impl(this, name, host, port, type, domain);
+}
+
+Server::~Server() {
+	delete mImpl;
 }
