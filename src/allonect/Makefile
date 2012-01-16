@@ -9,7 +9,6 @@ OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
 CPPFLAGS	+= -I../../include
 
-
 EXT_LDFLAGS += -lfreenect
 
 ifeq ($(PLATFORM), linux)
