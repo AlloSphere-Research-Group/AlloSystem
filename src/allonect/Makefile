@@ -1,8 +1,3 @@
-#=========================================================================
-# AlloUtil main makefile
-#=========================================================================
-
-include ../../Makefile.common
 
 LIB_NAME	= allonect
 INC_DIR		= ../../include/$(LIB_NAME)/
@@ -13,12 +8,19 @@ SRCS		:= $(wildcard $(SRC_DIR)/*.c*)
 OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
 CPPFLAGS	+= -I../../include
-#ifeq ($(PLATFORM), linux)
-#	CPPFLAGS	+= -I/usr/include/ni -I/usr/include/ni
-#else
-	CPPFLAGS	+= -I../../$(PLATFORM_DIR)/include -I../../$(PLATFORM_DIR)/include
-#endif
 
+
+EXT_LDFLAGS += -lfreenect
+
+ifeq ($(PLATFORM), linux)
+	#nogood because the one in the repos is out of date
+	#CPPFLAGS	+= -I/usr/include
+	CPPFLAGS	+= -I../../$(PLATFORM_DIR)/include -I../../$(PLATFORM_DIR)/include
+else
+	CPPFLAGS	+= -I../../$(PLATFORM_DIR)/include -I../../$(PLATFORM_DIR)/include
+endif
+
+include ../../Makefile.common
 include ../../Makefile.rules
 
 #INC_DIRS	+= DEV_DIR/include/ni
@@ -30,5 +32,8 @@ install: $(SLIB_PATH)
 	@$(INSTALL) -d $(DESTDIR)/lib
 	@$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)
 	@$(INSTALL) -C -m 644 $(INC_DIR)$/*.h* $(DESTDIR)/include/$(LIB_NAME)
-	@$(INSTALL) -C -m 644 $(SLIB_PATH) $(DESTDIR)/lib
+#	@echo $(notdir $(SLIB_PATH))
+#	For some reason this can result in an error if the file exists.
+#	Just ignore it and continue...
+	@-$(INSTALL) -C -m 644 $(SLIB_PATH) $(DESTDIR)/lib
 #	@$(RANLIB) $(DESTDIR)/lib/$(SLIB_FILE)

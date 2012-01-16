@@ -15,7 +15,6 @@ CPPFLAGS	+= -I../../include -I../../externals/glv/
 include ../../Makefile.common
 include ../../Makefile.rules
 
-
 # Install library into path specified by DESTDIR
 # Include files are copied into DESTDIR/include/ and
 # library files are copied to DESTDIR/lib/
