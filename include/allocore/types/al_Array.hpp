@@ -263,9 +263,10 @@ public:
 
 protected:
 	void formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, int numDims, size_t align);
-
+public:	// temporarily made public, because protected broke some other project code -gw
 	Array(const Array&);
 	Array& operator= (const Array&);
+protected:
 
 	// temporary hack because the one in al_Function gave a bad result
 	// for e.g. wrap<double>(-64.0, -32.0);
