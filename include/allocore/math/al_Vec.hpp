@@ -431,7 +431,10 @@ inline Vec<3,T> cross(const Vec<3,T>& a, const Vec<3,T>& b){
 /// Returns angle, in interval [0, pi], between two vectors
 template <int N, class T>
 inline T angle(const Vec<N,T>& a, const Vec<N,T>& b){
-	return std::acos(a.sgn().dot(b.sgn()));
+	T cosAng = a.sgn().dot(b.sgn());
+	if(cosAng >= T( 1)){ return T(0); }		else
+	if(cosAng <= T(-1)){ return T(M_PI); }
+	return std::acos(cosAng);
 }
 
 /*! Centroid of a triangle defined by three points
@@ -505,7 +508,7 @@ TypeString(long double)
 
 template<int N, class T>
 inline void Vec<N,T>::print(FILE * out) const {
-	fprintf(out, "{", N, typeString<T>());
+	fprintf(out, "{");
 	if(size()){
 		fprintf(out, "%g", (double)((*this)[0]));
 		for (int i=1; i<N; ++i) 
