@@ -583,7 +583,7 @@ TEM T laguerreL(int n, int k, T x){
 
 TEM inline T lcm(const T& x, const T& y){ return (x*y)/al::gcd(x,y); }
 
-TEM T legendreP(int l, int m, const T& ct, const T& st){
+TEM T legendreP(int l, int m, T ct, T st){
 
 	if(l<0){ /*printf("l=%d. l must be non-negative.\n");*/ return 0; }
 	if(m<-l || m>l){ /*printf("m=%d. m must be -l <= m <= l.\n");*/ return 0; }
@@ -633,7 +633,7 @@ TEM T legendreP(int l, int m, const T& ct, const T& st){
 	return P;
 }
 
-TEM T legendreP(int l, int m, const T& t){
+TEM T legendreP(int l, int m, T t){
 	return al::legendreP(l,m, std::cos(t), std::sin(t));
 }
 
