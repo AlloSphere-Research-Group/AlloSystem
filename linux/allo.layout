@@ -2,18 +2,21 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
 	<File name="../build/include/allocore/graphics/al_Font.hpp" open="0" top="0" tabpos="0">
-		<Cursor position="3824" topLine="114" />
+		<Cursor position="4088" topLine="134" />
+	</File>
+	<File name="../build/include/allocore/graphics/al_Graphics.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="10378" topLine="333" />
 	</File>
 	<File name="../build/include/allocore/sound/al_Ambisonics.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="5660" topLine="143" />
 	</File>
-	<File name="../build/include/allocore/types/al_Array.h" open="1" top="0" tabpos="2">
+	<File name="../build/include/allocore/types/al_Array.h" open="0" top="0" tabpos="2">
 		<Cursor position="4293" topLine="161" />
 	</File>
-	<File name="../build/include/allocore/types/al_Array.hpp" open="1" top="0" tabpos="4">
-		<Cursor position="9192" topLine="218" />
+	<File name="../build/include/allocore/types/al_Array.hpp" open="0" top="0" tabpos="4">
+		<Cursor position="2591" topLine="54" />
 	</File>
-	<File name="../build/include/allocore/types/al_MsgQueue.hpp" open="1" top="0" tabpos="3">
+	<File name="../build/include/allocore/types/al_MsgQueue.hpp" open="0" top="0" tabpos="3">
 		<Cursor position="9179" topLine="255" />
 	</File>
 	<File name="../examples/exAlloNI.cpp" open="0" top="0" tabpos="2">
@@ -25,10 +28,10 @@
 	<File name="../externals/gamma/src/FFT_fftpack.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="351" topLine="0" />
 	</File>
-	<File name="../include/allocore/types/al_Array.h" open="1" top="0" tabpos="5">
+	<File name="../include/allocore/types/al_Array.h" open="0" top="0" tabpos="5">
 		<Cursor position="4293" topLine="150" />
 	</File>
-	<File name="../include/allocore/types/al_Array.hpp" open="1" top="0" tabpos="1">
+	<File name="../include/allocore/types/al_Array.hpp" open="0" top="0" tabpos="1">
 		<Cursor position="9192" topLine="206" />
 	</File>
 	<File name="../include/allocv/al_OpenCV.hpp" open="0" top="0" tabpos="0">
@@ -37,8 +40,8 @@
 	<File name="../include/alloni/al_Ni.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="1901" topLine="42" />
 	</File>
-	<File name="../include/alloutil/al_ControlGLV.hpp" open="0" top="0" tabpos="0">
-		<Cursor position="100" topLine="0" />
+	<File name="../include/alloutil/al_ControlGLV.hpp" open="1" top="1" tabpos="5">
+		<Cursor position="1562" topLine="27" />
 	</File>
 	<File name="../src/alloni/al_Ni.cpp" open="0" top="0" tabpos="1">
 		<Cursor position="4448" topLine="149" />

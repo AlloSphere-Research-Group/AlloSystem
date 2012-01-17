@@ -1,14 +1,14 @@
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
-	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
+	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS).
 	All Rights Reserved.
 
 	Permission to use, copy, modify, distribute, and distribute modified versions
 	of this software and its documentation without fee and without a signed
 	licensing agreement, is hereby granted, provided that the above copyright
-	notice, the list of contributors, this paragraph and the following two paragraphs 
+	notice, the list of contributors, this paragraph and the following two paragraphs
 	appear in all copies, modifications, and distributions.
 
 	IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
@@ -56,13 +56,13 @@ public:
 
 	/// Empty constructor defines a 0-dimensional, 1-component array of void type; unallocated data
 	Array();
-	
+
 	/// Construct 1-dimensional array
 	Array(int components, AlloTy ty, uint32_t dimx);
-	
+
 	/// Construct 2-dimensional array
 	Array(int components, AlloTy ty, uint32_t dimx, uint32_t dimy);
-	
+
 	/// Construct 3-dimensional array
 	Array(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz);
 
@@ -92,7 +92,7 @@ public:
 	unsigned height() const { return header.dim[1]; }			///< Get size of second dimension
 	unsigned depth() const { return header.dim[2]; }			///< Get size of third dimension
 	uint32_t stride(int i=0) const { return header.stride[i]; }	///< Get stride of dimension, in elements
-	
+
 	/// Return the packing alignment (1, 2, 4 or 8 byte)
 	uint32_t alignment() const {
 		uint32_t i = stride(1);	// row stride
@@ -107,25 +107,25 @@ public:
 
 	///	Change the format (header/layout) of the Array reallocating if necessary
 	void format(const AlloArrayHeader& h2);
-	
+
 	///	Change the format (header/layout) of the Array reallocating if necessary
 	void format(const AlloArray& array) { format(array.header); }
 
 	///	Change the format (header/layout) of the Array reallocating if necessary
 	void format(int components, AlloTy ty, uint32_t dimx);
-	
+
 	///	Change the format (header/layout) of the Array reallocating if necessary
 	void format(int components, AlloTy ty, uint32_t dimx, uint32_t dimy);
-	
+
 	///	Change the format (header/layout) of the Array reallocating if necessary
 	void format(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz);
-	
+
 	///	Change the format (header/layout) of the Array reallocating if necessary
 	void formatAligned(int components, AlloTy ty, uint32_t dimx, size_t align);
-	
+
 	///	Change the format (header/layout) of the Array reallocating if necessary
 	void formatAligned(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, size_t align);
-	
+
 	///	Change the format (header/layout) of the Array reallocating if necessary
 	void formatAligned(int components, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, size_t align);
 
@@ -138,9 +138,9 @@ public:
 
 	/// Allocate memory for the given header.
 	/// Warning: does not check if memory was already allocated;
-	/// Call dataFree() first if you know it will be safe to do so. 
+	/// Call dataFree() first if you know it will be safe to do so.
 	void dataCalloc() { allo_array_allocate(this); }
-	
+
 	/// Free memory and set data.ptr to NULL
 	void dataFree() { allo_array_free(this); }
 
@@ -210,7 +210,7 @@ public:
 	template<typename T, typename TP> void read_wrap(T* val, const Vec<3,TP> p) const { read_wrap(val, p[0], p[1], p[2]); }
 
 	/// Linear interpolated lookup (virtual array index)
-	
+
 	/// Reads the linearly interpolated component values into val array
 	///
 	template<typename T> void read_interp(T * val, double x) const;
@@ -246,14 +246,14 @@ public:
 
 	template<typename T, typename TP> void write_interp(const T* val, const Vec<2,TP> p) { write_interp(val, p[0], p[1]); }
 	template<typename T, typename TP> void write_interp(const T* val, const Vec<3,TP> p) { write_interp(val, p[0], p[1], p[2]); }
-	
+
 	/// Print array information
 	void print() const;
 
 
-	
+
 	///	Returns the type enumeration ID (AlloTy) for a given type (given as template argument).
-	
+
 	/// E.g., assert(Array::type<float>() == AlloFloat32Ty);
 	///
 	template<typename T> static AlloTy type();
@@ -322,8 +322,8 @@ template<> inline AlloTy Array::type<double   >(){ return AlloFloat64Ty; }
 template<> inline AlloTy Array::type<AlloArray>(){ return AlloArrayTy; }
 template<> inline AlloTy Array::type<void *>(){
 	switch(sizeof(void *)) {
-		case 4: return AlloPointer32Ty; 
-		case 8: return AlloPointer64Ty; 
+		case 4: return AlloPointer32Ty;
+		case 8: return AlloPointer64Ty;
 	}
 	return 0;
 }
@@ -338,6 +338,9 @@ inline Array::Array(){
 
 inline Array::Array(const AlloArray& cpy){
 	(*this) = cpy;
+}
+inline Array::Array(const Array& cpy) {
+    (*this) = cpy;
 }
 inline Array::Array(const AlloArrayHeader& h2){
 	allo_array_clear(this);
@@ -357,6 +360,16 @@ inline Array::Array(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy){
 inline Array::Array(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz){
 	allo_array_clear(this);
 	format(comps, ty, dimx, dimy, dimz);
+}
+
+inline Array& Array::operator= (const Array& cpy) {
+	if(&cpy != this){
+		format(cpy.header);
+		if (cpy.data.ptr) {
+			memcpy(data.ptr, cpy.data.ptr, size());
+		}
+	}
+	return *this;
 }
 
 inline Array& Array::operator= (const AlloArray& cpy) {
@@ -380,7 +393,7 @@ inline void Array::deriveStride(AlloArrayHeader& h, size_t alignSize) {
 
 	if(numDims>1){
 		h.stride[1] = h.stride[0] * h.dim[0];		// compute ideal row stride amount
-		
+
 		if(alignSize){	// protection against x % 0, can throw exception...
 			unsigned remain = h.stride[1] % alignSize;		// compute pad bytes
 			if(remain){ h.stride[1] += alignSize - remain;}	// add pad bytes (if any)
@@ -450,7 +463,7 @@ inline void Array::formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, i
 	AlloArrayHeader hh;
 	hh.type = ty;
 	hh.components = comps;
-	hh.dimcount = numDims;	
+	hh.dimcount = numDims;
 	int i=0;
 	for(; i<numDims; ++i)				hh.dim[i] = dims[i];
 	for(; i<ALLO_ARRAY_MAX_DIMS; ++i)	hh.dim[i] = 0;
