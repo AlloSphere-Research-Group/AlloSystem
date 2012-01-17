@@ -545,8 +545,8 @@ inline void frenet(const V3& d1, const V3& d2, V3& t, V3& n, V3& b){
 
 template <class V3>
 inline void frenet(const V3& p2, const V3& p1, const V3& p0, V3& t, V3& n, V3& b){	
-	V3 d1 = (p0 - p2)*0.5;		// 1st (central) difference
-	V3 d2 = (p0 - 2.*p1 + p2);	// 2nd difference
+	V3 d1 = (p0 - p2);			// 1st (central) difference (scaled by 2)
+	V3 d2 = (p0 - p1*2. + p2);	// 2nd difference
 	frenet(d1,d2, t,n,b);
 }
 
@@ -562,7 +562,7 @@ TEM T gudermannian(const T& x) {
 	return T(2) * atan(exp(x)) - T(M_PI_2);
 }
 
-TEM T laguerreL(int n, int k, const T& x) {
+TEM T laguerreL(int n, int k, T x){
 //	T res = 1, bin = 1;
 //	
 //	for(int i=n; i>=1; --i){
