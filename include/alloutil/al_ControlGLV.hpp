@@ -1,5 +1,5 @@
-#ifndef INC_AL_CONTROL_GLV_HPP
-#define INC_AL_CONTROL_GLV_HPP
+#ifndef INCLUDE_AL_CONTROL_GLV_HPP
+#define INCLUDE_AL_CONTROL_GLV_HPP
 
 /*	Allocore --
 	Multimedia / virtual environment application class library

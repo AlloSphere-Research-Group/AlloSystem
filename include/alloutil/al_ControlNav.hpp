@@ -1,5 +1,5 @@
-#ifndef INC_AL_CONTROL_NAV_HPP
-#define INC_AL_CONTROL_NAV_HPP
+#ifndef INCLUDE_AL_CONTROL_NAV_HPP
+#define INCLUDE_AL_CONTROL_NAV_HPP
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
