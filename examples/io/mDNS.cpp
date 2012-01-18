@@ -13,19 +13,20 @@ Graham Wakefield, 2012
 
 using namespace al;
 
+std::string type("_http._tcp"); // "_osc._udp", "_ssh._tcp"
 
-//mdns::Client z("_osc._udp");
-//mdns::Client z("_ssh._tcp");
-mdns::Client z("_http._tcp");
+// a Client can browse and report available services for a given service type:
+mdns::Client z(type);
 
-mdns::Server zs("mDNS TEST", Socket::hostIP());
+// a Service can publish a service on this machine:
+mdns::Service zservice("mDNS TEST", Socket::hostIP(), 4110, type);
 
 int main(){
 	printf("starting on %s\n", Socket::hostIP().c_str());
 	
 	while (1) {
 		z.poll();
-		zs.poll();
+		zservice.poll();
 		al_sleep(0.1);
 	}
 	return 0;

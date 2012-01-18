@@ -75,13 +75,13 @@ protected:
 	Impl * mImpl;
 };
 
-class Server : public Client {
+class Service : public Client {
 public:
 	class Impl;
 
-	Server(const std::string& name, const std::string& host, uint16_t port=4110, const std::string& type="_osc._udp.", const std::string& domain="local.");
+	Service(const std::string& name, const std::string& host, uint16_t port=4110, const std::string& type="_osc._udp.", const std::string& domain="local.");
 
-	virtual ~Server();
+	virtual ~Service();
 
 protected:
 	Impl * mImpl;

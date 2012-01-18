@@ -16,15 +16,19 @@
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
 
 using namespace al;
 using namespace al::mdns;
 
 #ifdef AL_LINUX
 
+template <typename Subclass>
 class ImplBase {
 public:
-	ImplBase() : poller(0), client(0) {
+	ImplBase() : poller(0), client(0) {}
+
+	void start() {
 		int error;
 		AvahiClientFlags flags = AVAHI_CLIENT_NO_FAIL;
 		/* Allocate main loop object */
@@ -52,13 +56,13 @@ public:
 
 	static void client_callback(AvahiClient *client, AvahiClientState state, void * userdata) {
 		assert(client);
-		ImplBase * self = (ImplBase *)userdata;
+		Subclass * self = (Subclass *)userdata;
 		
 		switch (state) {
 		    case AVAHI_CLIENT_S_RUNNING:
 		        /* The server has startup successfully and registered its host
 		         * name on the network, so it's time to create our services */
-		        //create_services(client);
+				Subclass::create_services(client, (Subclass *)userdata);
 		        break;
 
 		    case AVAHI_CLIENT_FAILURE:
@@ -90,13 +94,13 @@ public:
 	AvahiClient * client;
 };
 
-class Client::Impl : public ImplBase {
+class Client::Impl : public ImplBase<Client::Impl> {
 public:
 	
 	Impl(Client * master) : browser(0), master(master) {
 		int error;
 		AvahiClientFlags flags = AVAHI_CLIENT_NO_FAIL;
-
+		start();
 		if (client) {	
 			/* Create the service browser */
 			if (!(browser = avahi_service_browser_new(client, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, master->type.c_str(), master->domain.c_str(), (AvahiLookupFlags)0, browse_callback, this))) {
@@ -109,6 +113,8 @@ public:
 	virtual ~Impl() {
 		if (browser) avahi_service_browser_free(browser);
 	}
+
+	static void create_services(AvahiClient * client, Impl * self) {}
 
 	static void browse_callback(
 		AvahiServiceBrowser *b,
@@ -221,11 +227,12 @@ public:
 	Client * master;
 };
 
-class Server::Impl : public ImplBase {
+class Service::Impl : public ImplBase<Service::Impl> {
 public:
-	Impl(Server * master, const std::string& name, const std::string& host, uint16_t port, const std::string& type, const std::string& domain) 
+	Impl(Service * master, const std::string& name, const std::string& host, uint16_t port, const std::string& type, const std::string& domain) 
 :	name(name), host(host), type(type), domain(domain), port(port), group(0), master(master) {
 		int ret;
+		start();
 		if (client) {	
 			if (!(group = avahi_entry_group_new(client, entry_group_callback, NULL))) {
 		        fprintf(stderr, "avahi_entry_group_new() failed: %s\n", avahi_strerror(avahi_client_errno(client)));
@@ -256,14 +263,74 @@ public:
 
 	}
 
-	static void entry_group_callback(AvahiEntryGroup *g, AvahiEntryGroupState state, void *userdata) {
+	static void create_services(AvahiClient * client, Impl * self) {
+		char *n, r[128];
+		int ret;
+		assert(client);
 
+		/* If this is the first time we're called, let's create a new
+		 * entry group if necessary */
+
+		if (!self->group)
+		    if (!(self->group = avahi_entry_group_new(client, entry_group_callback, self))) {
+		        fprintf(stderr, "avahi_entry_group_new() failed: %s\n", avahi_strerror(avahi_client_errno(client)));
+		        goto fail;
+		    }
+
+		/* If the group is empty (either because it was just created, or
+		 * because it was reset previously, add our entries.  */
+
+		if (avahi_entry_group_is_empty(self->group)) {
+		    fprintf(stderr, "Adding service '%s'\n", self->name.c_str());
+
+		    /* Create some random TXT data */
+		    snprintf(r, sizeof(r), "random=%i", rand());
+
+		    /* Add the service for IPP */
+		    if ((ret = avahi_entry_group_add_service(self->group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, (AvahiPublishFlags)0, self->name.c_str(), self->type.c_str(), NULL, NULL, self->port, "test=blah", r, NULL)) < 0) {
+
+		        if (ret == AVAHI_ERR_COLLISION)
+		            goto collision;
+
+		        fprintf(stderr, "Failed to add _ipp._tcp service: %s\n", avahi_strerror(ret));
+		        goto fail;
+		    }
+
+		    /* Tell the server to register the service */
+		    if ((ret = avahi_entry_group_commit(self->group)) < 0) {
+		        fprintf(stderr, "Failed to commit entry group: %s\n", avahi_strerror(ret));
+		        goto fail;
+		    }
+		}
+
+		return;
+
+	collision:
+
+		/* A service name collision with a local service happened. Let's
+		 * pick a new name */
+		n = avahi_alternative_service_name(self->name.c_str());
+		self->name = n;
+
+		fprintf(stderr, "Service name collision, renaming service to '%s'\n", self->name.c_str());
+
+		avahi_entry_group_reset(self->group);
+
+		create_services(client, self);
+		return;
+
+	fail:
+		avahi_simple_poll_quit(self->poller);
+	}
+
+	static void entry_group_callback(AvahiEntryGroup *g, AvahiEntryGroupState state, void *userdata) {
+		Service * self = (Service *)userdata;
 	}
 
 	std::string name, host, type, domain;
 	uint16_t port;
 	AvahiEntryGroup * group;
-	Server * master;
+	Service * master;
 };
 
 #else
@@ -285,16 +352,16 @@ public:
 	Client * master;
 };
 
-class Server::Impl : public ImplBase {
+class Service::Impl : public ImplBase {
 public:
-	Impl(Server * master, const std::string& name, const std::string& host, uint16_t port, const std::string& type, const std::string& domain) 
+	Impl(Service * master, const std::string& name, const std::string& host, uint16_t port, const std::string& type, const std::string& domain) 
 	:	ImplBase(), name(name), host(host), type(type), domain(domain), port(port), master(master) {}
 	
 	virtual ~Impl() {}
 	
 	std::string name, host, type, domain;
 	uint16_t port;
-	Server * master;
+	Service * master;
 };
 
 #endif
@@ -312,10 +379,10 @@ void Client::poll(al_sec timeout) {
 	mImpl->poll(timeout);
 }
 
-Server::Server(const std::string& name, const std::string& host, uint16_t port, const std::string& type, const std::string& domain) {
+Service::Service(const std::string& name, const std::string& host, uint16_t port, const std::string& type, const std::string& domain) {
 	mImpl = new Impl(this, name, host, port, type, domain);
 }
 
-Server::~Server() {
+Service::~Service() {
 	delete mImpl;
 }
