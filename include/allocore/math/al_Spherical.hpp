@@ -60,7 +60,12 @@ struct SphereCoord {
 	/// @param[in] v	Cartesian position
 	template <class U>
 	SphereCoord(const Vec<3,U>& v){ fromCart(v); }
-	
+
+
+	/// Get negation in Cartesian space
+	SphereCoord operator - () const { return SphereCoord(t, -p); }
+
+
 	T radius() const { return p.mag(); }
 	
 	/// Returns Cartesian coordinate
