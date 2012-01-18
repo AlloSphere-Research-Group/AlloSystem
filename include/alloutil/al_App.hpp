@@ -1,5 +1,5 @@
-#ifndef AL_APP_HPP_INC
-#define AL_APP_HPP_INC
+#ifndef INCLUDE_AL_APP_HPP
+#define INCLUDE_AL_APP_HPP
 /*	Allocore --
 	Multimedia / virtual environment application class library
 	
