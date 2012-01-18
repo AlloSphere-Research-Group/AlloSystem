@@ -500,14 +500,14 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 3696E32614BFA31900D21F2A /* mdns */;
+			remoteGlobalIDString = 3696E32614BFA31900D21F2A;
 			remoteInfo = mdns;
 		};
 		3696E34414BFA41D00D21F2A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 36035DB813037E8D001E9BA9 /* make allocore */;
+			remoteGlobalIDString = 36035DB813037E8D001E9BA9;
 			remoteInfo = "make allocore";
 		};
 		36C9E8D71491FEC4002C8638 /* PBXContainerItemProxy */ = {
@@ -699,6 +699,8 @@
 		16D46542118F4ADA0039A84C /* al_Plane.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Plane.hpp; sourceTree = "<group>"; };
 		16D46562118F55790039A84C /* al_Printing.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Printing.hpp; sourceTree = "<group>"; };
 		16D46563118F57970039A84C /* al_Printing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Printing.cpp; sourceTree = "<group>"; };
+		16ED651414C64DF5002318E0 /* al_ProtoApp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_ProtoApp.hpp; sourceTree = "<group>"; };
+		16ED651514C64E97002318E0 /* al_ProtoApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_ProtoApp.cpp; sourceTree = "<group>"; };
 		16F7F044140D792100DE7EE9 /* al_Spherical.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Spherical.hpp; sourceTree = "<group>"; };
 		16FE4B3E11DB0E62002D3847 /* al_Ambisonics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Ambisonics.cpp; sourceTree = "<group>"; };
 		16FFCB51118BA96500D4C1BD /* al_Random.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Random.hpp; sourceTree = "<group>"; };
@@ -3191,6 +3193,7 @@
 				366E78091405C75B0010B21A /* al_Navigator.hpp */,
 				36CE482F1394378000DF6E6F /* al_OpenGL.hpp */,
 				366E780A1405C75B0010B21A /* al_OverlayTextGL.hpp */,
+				16ED651414C64DF5002318E0 /* al_ProtoApp.hpp */,
 				366E780B1405C75B0010B21A /* al_ShotList.hpp */,
 				36A2AE4F141850A800479687 /* al_TextureGL.hpp */,
 			);
@@ -3204,6 +3207,7 @@
 				16B4CE031427EBE000626C03 /* al_App.cpp */,
 				16C137C21469B83200D8AE8B /* al_ControlGLV.cpp */,
 				1602B5E6145649AF00ABA5A5 /* al_FileWatcher.cpp */,
+				16ED651514C64E97002318E0 /* al_ProtoApp.cpp */,
 				36F3A43612FCCF88004BC82F /* Makefile */,
 			);
 			name = src;
