@@ -245,6 +245,10 @@ int addIcosahedron(Mesh& m){
 }
 
 
+// Stacks are circles cut perpendicular to the z axis while slices are circles 
+// cut through the z axis.
+// The top is (0,0,radius) and the bottom is (0,0,-radius).
+
 int addSphere(Mesh& m, double radius, int slices, int stacks){
 
 	struct CSin{
@@ -263,15 +267,17 @@ int addSphere(Mesh& m, double radius, int slices, int stacks){
 	CSin P( M_PI/stacks); P.r = P.dr*radius; P.i = P.di*radius;
 	CSin T(M_2PI/slices);
 
-	// add top cap
+	// Add top cap
+	// Triangles have one vertex at the north pole and the others on the first
+	// ring down.
 	m.vertex(0,0,radius);
 	for(int i=0; i<slices; ++i){
 		m.index(Nv+1 + i);
 		m.index(Nv+1 + ((i+1)%slices));
-		m.index(Nv);		
+		m.index(Nv);	// the north pole	
 	}
 
-	// add rings
+	// Add rings
 	for(int j=0; j<stacks-2; ++j){
 		int jp1 = j+1;
 	
@@ -295,7 +301,7 @@ int addSphere(Mesh& m, double radius, int slices, int stacks){
 		P();
 	}
 	
-	// add bottom ring and cap
+	// Add bottom ring and cap
 	int icap = m.vertices().size() + slices;
 	for(int i=0; i<slices; ++i){
 		m.vertex(T.r*P.i, T.i*P.i, P.r);
