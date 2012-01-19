@@ -192,9 +192,9 @@ public:
 	/// Generate isosurface from scalar field
 	
 	/// The total number of elements in the field is expected to be nX*nY*nZ.
-	/// The field elements are located at the corners of the cubes used to 
-	/// generate the surface. Thus, the surface is evaluated on a total of
-	/// (nX-1)*(nY-1)*(nZ-1) cubes.
+	/// The field elements are located at the corners of the cuboidal cells used 
+	/// to generate the surface. Thus, the surface is evaluated on a total of
+	/// (nX-1)*(nY-1)*(nZ-1) cells.
 	template <class T>
 	void generate(const T * scalarField, int nX, int nY, int nZ, float cellLengthX, float cellLengthY, float cellLengthZ){
 		fieldDims(nX, nY, nZ);
