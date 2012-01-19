@@ -678,6 +678,8 @@
 		16D46542118F4ADA0039A84C /* al_Plane.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Plane.hpp; sourceTree = "<group>"; };
 		16D46562118F55790039A84C /* al_Printing.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Printing.hpp; sourceTree = "<group>"; };
 		16D46563118F57970039A84C /* al_Printing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Printing.cpp; sourceTree = "<group>"; };
+		16DD16FD14C7C83F00F361F9 /* al_XML.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_XML.hpp; sourceTree = "<group>"; };
+		16DD16FE14C7C85A00F361F9 /* al_XML.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_XML.cpp; sourceTree = "<group>"; };
 		16ED651414C64DF5002318E0 /* al_ProtoApp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_ProtoApp.hpp; sourceTree = "<group>"; };
 		16ED651514C64E97002318E0 /* al_ProtoApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_ProtoApp.cpp; sourceTree = "<group>"; };
 		16F7F044140D792100DE7EE9 /* al_Spherical.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Spherical.hpp; sourceTree = "<group>"; };
@@ -2116,6 +2118,7 @@
 				3602B53C110A6D3D005DC3D0 /* al_OSC.hpp */,
 				3602B53D110A6D3D005DC3D0 /* al_Serialize.h */,
 				3602B53E110A6D3D005DC3D0 /* al_Serialize.hpp */,
+				16DD16FD14C7C83F00F361F9 /* al_XML.hpp */,
 				B9C962871218937700091F80 /* opencl */,
 			);
 			path = protocol;
@@ -2298,6 +2301,7 @@
 				3696E31614BFA2F500D21F2A /* al_mDNS.cpp */,
 				3622BEE5116D527D00928703 /* al_OSC.cpp */,
 				3622BEE7116D527D00928703 /* al_Serialize.cpp */,
+				16DD16FE14C7C85A00F361F9 /* al_XML.cpp */,
 				B9C962931218938C00091F80 /* opencl */,
 				1686186512A58918002AD8AB /* oscpack */,
 			);
