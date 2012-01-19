@@ -114,7 +114,7 @@ all: extensions externals
 # AlloCore extensions
 extensions: alloutil allocore
 
-allocore: $(SLIB_PATH)
+allocore: $(LIB_PATH)
 #	Copy main header files into build directory
 	@for v in `cd $(INC_DIR)/$@ && find * -type d ! -path '*.*'` .; do\
 		$(INSTALL) -d $(BUILD_DIR)/include/$@/$$v;\

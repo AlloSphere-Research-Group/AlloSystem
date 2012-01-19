@@ -55,8 +55,15 @@ USING_PUREDYNE	= 0
 # This should be defined prior to including this file
 LIB_NAME	?=
 
+# Dynamic library major/minor version numbers
+DLIB_MAJ	= 1
+DLIB_MIN	= 0
+
 # Build configuration: 'Release' or 'Debug'
 BUILD_CONFIG	= Release
+
+# Whether to build a dynamic library versus a static library
+DYNAMIC		= 0
 
 # Whether to show verbose output
 VERBOSE		= 0
@@ -80,7 +87,8 @@ DLIB_OPT	= shared
 EXT_CPPFLAGS	?=
 EXT_LDFLAGS	?=
 
-STATIC_LIB_FLAGS ?=
+SLIB_FLAGS ?=
+DLIB_FLAGS ?=
 
 #--------------------------------------------------------------------------
 # Default paths
@@ -142,6 +150,9 @@ ifeq ($(PLATFORM), linux)
 
 	CPPFLAGS += -D__LINUX__ -DLINUX
 	LDFLAGS	+= -lm -lstdc++
+	
+	DLIB_FLAGS += -shared
+	DLIB_FLAGS += -Wl,-soname,$(DLIB_MAJ_FILE)
 
 # Mac OSX:
 else ifeq ($(PLATFORM), macosx)
@@ -156,8 +167,10 @@ else ifeq ($(PLATFORM), macosx)
 		CFLAGS += -arch i386 -arch x86_64
 	endif
 
-	CFLAGS += -isysroot
+	CFLAGS += -fvisibility-inlines-hidden
 
+	# Set system root directory
+	CFLAGS += -isysroot
 	ifeq ($(OSX_VERSION), 10_7)
 		CFLAGS += /Developer/SDKs/MacOSX10.7.sdk -mmacosx-version-min=10.7
 	else ifeq ($(OSX_VERSION), 10_6)
@@ -172,6 +185,9 @@ else ifeq ($(PLATFORM), macosx)
 	DLIB_EXT = dylib
 	DLIB_OPT = dynamiclib
 
+	DLIB_FLAGS += -dynamiclib
+	DLIB_FLAGS += -current_version $(DLIB_MAJ).$(DLIB_MIN) -compatibility_version $(DLIB_MAJ).$(DLIB_MIN)
+	
 # Windows:
 else ifeq ($(PLATFORM), windows)
 
@@ -186,6 +202,7 @@ ifeq ($(BUILD_CONFIG), Release)
 else
 	CFLAGS += -g -O0 -fno-inline
 endif
+
 
 #LDFLAGS += -fvisibility=default
 #LDFLAGS += -fvisibility-inlines-hidden -fvisibility=hidden
@@ -204,10 +221,20 @@ ifneq ($(STRICT_WARNINGS), 0)
 	CXXFLAGS += -Wnon-virtual-dtor -Woverloaded-virtual
 endif
 
-SLIB_FILE = lib$(LIB_NAME).$(SLIB_EXT)
-DLIB_FILE = lib$(LIB_NAME).$(DLIB_EXT)
-DLIB_PATH = $(addprefix $(BUILD_DIR)lib/, $(DLIB_FILE))
-SLIB_PATH = $(addprefix $(BUILD_DIR)lib/, $(SLIB_FILE))
+SLIB_FILE		= lib$(LIB_NAME).$(SLIB_EXT)
+DLIB_FILE		= lib$(LIB_NAME).$(DLIB_EXT)
+DLIB_MAJ_FILE	= lib$(LIB_NAME).$(DLIB_MAJ).$(DLIB_EXT)
+DLIB_MIN_FILE	= lib$(LIB_NAME).$(DLIB_MAJ).$(DLIB_MIN).$(DLIB_EXT)
+DLIB_PATH		= $(addprefix $(BUILD_DIR)lib/, $(DLIB_MIN_FILE))
+SLIB_PATH		= $(addprefix $(BUILD_DIR)lib/, $(SLIB_FILE))
+
+# Set file directory/name of specified library type
+LIB_PATH = $(SLIB_PATH)
+ifneq ($(DYNAMIC), 0)
+	CFLAGS += -fPIC
+	LIB_PATH = $(DLIB_PATH)
+endif
+
 
 
 #--------------------------------------------------------------------------

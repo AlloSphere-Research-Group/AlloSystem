@@ -36,18 +36,21 @@ $(OBJ_DIR)%.o:: %.mm
 
 -include $(wildcard $(OBJ_DIR)*.dep)
 
-all: $(SLIB_PATH)
+all: $(LIB_PATH)
 
 # Build static library
-#$(SLIB_PATH): createFolders $(addprefix $(OBJ_DIR), $(OBJS))
 $(SLIB_PATH): $(addprefix $(OBJ_DIR), $(OBJS))
 	@echo AR $@
 	@$(RM) $@
-	$(AR) $@ $(filter %.o, $^) $(STATIC_LIB_FLAGS)
+	$(AR) $@ $(filter %.o, $^) $(SLIB_FLAGS)
 #	@$(RANLIB) $@
-#	libtool --mode=link --tag=CXX $(filter %.o, $^) $(STATIC_LIB_FLAGS) -o $@
+#	libtool --mode=link --tag=CXX $(filter %.o, $^) $(SLIB_FLAGS) -o $@
 #	@libtool -static $@ $(patsubst %, $(DEV_DIR)lib/lib%.a, $(STATIC_LIBS)) -o $@
 
+# Build dynamic library
+$(DLIB_PATH): $(addprefix $(OBJ_DIR), $(OBJS))
+	@echo DY $@
+	$(CXX) $(DLIB_FLAGS) $(CXXFLAGS) -o $@ $(filter %.o, $^) $(LDFLAGS)
 
 # Dummy target to force rebuilds
 FORCE:
