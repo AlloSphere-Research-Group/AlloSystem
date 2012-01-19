@@ -85,7 +85,7 @@ void swapbytes(T * ptr);
 
 /// swap byte order for an array of numbers:
 template<typename T>
-inline void swapbytes(T * ptr, int count);
+inline void swapbytes(T * ptr, unsigned count);
 
 /// Convert decimal integer to ascii base-36 character
 char base10To36(int dec10);
@@ -331,7 +331,7 @@ template<unsigned N>
 inline void swapbytesN(void * ptr) {
 	char in[N], out[N];
 	memcpy(in, ptr, N);
-	for (int i=0; i<N; i++) out[i] = in[N-1-i];
+	for (unsigned i=0; i<N; i++) out[i] = in[N-1-i];
 	memcpy(ptr, out, N);
 }
 
@@ -339,10 +339,8 @@ template<typename T>
 inline void swapbytes(T * ptr) { swapbytesN<sizeof(T)>(ptr); }
 
 template<typename T>
-inline void swapbytes(T * data, int count) {
-	for (int i=0; i<count; i++) {
-		swapbytes(data+i);
-	}
+inline void swapbytes(T * data, unsigned count) {
+	for (unsigned i=0; i<count; i++) swapbytes(data+i);
 }
 
 #undef bswap_16
