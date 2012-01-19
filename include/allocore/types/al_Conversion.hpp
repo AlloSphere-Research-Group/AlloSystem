@@ -79,6 +79,14 @@ template<> struct Twiddle<double>{
 	union{ int64_t i; uint64_t u; double f; };
 };
 
+/// swap byte order (for 16 or 32 bit values):
+template<typename T>
+inline T byteswap(T x);
+
+/// swap byte order for an array:
+template<typename T>
+inline void byteswap(T * data, int count=1);
+
 /// Convert decimal integer to ascii base-36 character
 char base10To36(int dec10);
 
@@ -317,6 +325,33 @@ inline uint8_t unitToUInt8(float u){
 	++u;
 	return (punFU(u) >> 15) & MaskFrac<float>();
 }
+
+#define bswap_16(x) ((((x) & 0xFF00) >> 8) | (((x) & 0x00FF) << 8))
+#define bswap_32(x) ((((x) & 0xFF000000) >> 24) | \
+					(((x) & 0x00FF0000) >> 8)   | \
+					(((x) & 0x0000FF00) << 8)   | \
+					(((x) & 0x000000FF) << 24) )
+
+template<> inline int8_t byteswap(int8_t x) { return x; }
+template<> inline uint8_t byteswap(uint8_t x) { return x; }
+template<> inline uint16_t byteswap(uint16_t x) { return bswap_16(x); }
+template<> inline int16_t byteswap(int16_t x) { return bswap_16(x); }
+template<> inline uint32_t byteswap(uint32_t x) { return bswap_32(x); }
+template<> inline int32_t byteswap(int32_t x) { return bswap_32(x); }
+template<> inline float byteswap(float x) { 
+	int32_t x1 = *(int32_t *)&x;
+	return bswap_32(x1); 
+}
+
+template<typename T>
+inline void byteswap(T * data, int count) {
+	for (int i=0; i<count; i++) {
+		data[i] = byteswap(data[i]);
+	}
+}
+
+#undef bswap_16
+#undef bswap_32
 
 } // al::
 

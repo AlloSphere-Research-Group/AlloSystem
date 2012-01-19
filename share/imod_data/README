@@ -1,0 +1,76 @@
+This directory contains some data to test with IMOD.
+
+golgi.mrc
+-----------------------------------------------------------------------------
+The data are a subset of a tomographic reconstruction taken from a tilt series 
+in the High Voltage Electron Microscope at Boulder.
+
+The specimen is a normal rat kidney (NRK) cell and the region shown is the 
+trans-Golgi network (TGN).  For more information read
+
+	Ladinsky, M.S., J.R. Kremer, P.S. Furcinitti, J.R. McIntosh, and
+        K.E. Howell (1994) HVEM tomography of the trans-Golgi network:
+        Structural insights and identification of a lace-like vesicle coat.
+        J. Cell Biol. 127: 29-38.  
+
+To view this data set in 3-d use the command,
+% 3dmod golgi.mrc
+
+golgi.imod
+----------------------------------------------------------------------------
+A model in imod format showing a vesicle and a microtubule.
+
+To view the model on a full screen use the command,
+   3dmodv -f golgi.imod
+
+To view both the graphic and model data use the command,
+   3dmod golgi.mrc golgi.imod
+
+To edit and view the graphic data and model use the command
+   3dmod golgi.mrc golgi.imod
+
+See the 3dmod man page for more help in using 3dmod, and the Users Guide at
+http://bio3d.colorado.edu/imod
+
+To recreate the skin that is capped use the command
+   imodmesh -C golgi.imod
+
+yeastpore.mod
+----------------------------------------------------------------------------
+This is a model showing the nuclear envelope and the nuclear pores in a
+dividing yeast cell, reconstructed from electron micrographs of serial
+sections.  For more information on the data, see
+
+	Winey, M., D. Yarar, T.H. Giddings, Jr., and D.N. Mastronarde
+	(1997) Nuclear pore complex number and distribution throughout
+	the Saccharomyces cerevisiae cell cycle by three-dimensional 
+	reconstruction from electron micrographs of nuclear envelopes.  
+	Mol. Biol. Cell 8: 2119-2132.
+
+
+To view the model use the command
+   3dmodv yeastpore.mod
+
+The model demonstrates pseudo-transparency of a meshed surface and scattered
+point displays.  Select the Edit-Objects menu item to adjust colors and
+transparency.  The quality of the scattered points can be increased or
+decreased with the g or G keys.  This model also contains a low-resolution
+mesh that will display more quickly; use the r key to toggle between 
+low-resolution and regular meshes.
+
+The low-resolution mesh was created with 
+   imodmesh -C -l -i 2 yeastpore.mod
+
+You can replace the regular mesh with a more efficient one that will display 
+somewhat faster using the command
+   imodmesh -C -R .25 yeastpore.mod
+
+dual.rec and example.mod
+----------------------------------------------------------------------------
+These are the files used to create the images for the Introduction to 3dmod.
+You can open various dialogs to see the model properties that have been set.
+The image file is a tomographic reconstruction of the kinetochore region of
+a dividing PtK cell.
+
+To view them, use the command
+   3dmod dual.rec example.mod
