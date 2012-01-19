@@ -173,29 +173,29 @@ struct MRCHeader {
 	int32_t   nz;         /*  # of Sections.                */
 	int32_t   mode;       /*  given by #define MRC_MODE...  */
 
-	int32_t   nxstart;    /*  Starting point of sub image.  */
-	int32_t   nystart;
-	int32_t   nzstart;
+	int32_t   startx;    /*  Starting point of sub image.  */
+	int32_t   starty;
+	int32_t   startz;
 
 	int32_t   mx;         /* Number of rows to read.        */
 	int32_t   my;
 	int32_t   mz;
 
-	float   xlen;       /* length of x element in um.     */
-	float   ylen;       /* get scale = xlen/nx ...        */
-	float   zlen;
+	float_t   xlen;       /* length of x element in um.     */
+	float_t   ylen;       /* get scale = xlen/nx ...        */
+	float_t   zlen;
 
-	float   alpha;      /* cell angles, ignore */
-	float   beta;
-	float   gamma;
+	float_t   alpha;      /* cell angles, ignore */
+	float_t   beta;
+	float_t   gamma;
 
-	int32_t   mapc;       /* map coloumn 1=x,2=y,3=z.       */
-	int32_t   mapr;       /* map row     1=x,2=y,3=z.       */
-	int32_t   maps;       /* map section 1=x,2=y,3=z.       */
+	int32_t   mapx;       /* map coloumn 1=x,2=y,3=z.       */
+	int32_t   mapy;       /* map row     1=x,2=y,3=z.       */
+	int32_t   mapz;       /* map section 1=x,2=y,3=z.       */
 
-	float   amin;
-	float   amax;
-	float   amean;
+	float_t   amin;
+	float_t   amax;
+	float_t   amean;
 
 	int16_t   ispg;       /* image type */
 	int16_t   nsymbt;     /* space group number */
@@ -208,10 +208,10 @@ struct MRCHeader {
 	int16_t   nreal;
 	int16_t   sub;
 	int16_t   zfac;
-	float   min2;
-	float   max2;
-	float   min3;
-	float   max3;
+	float_t   min2;
+	float_t   max2;
+	float_t   min3;
+	float_t   max3;
 	int32_t   imodStamp;
 	int32_t   imodFlags;
 	int16_t   idtype;
@@ -220,13 +220,13 @@ struct MRCHeader {
 	int16_t   nd2;
 	int16_t   vd1;
 	int16_t   vd2;
-	float   tiltangles[6];  /* 0,1,2 = original:  3,4,5 = current */
+	float_t   tiltangles[6];  /* 0,1,2 = original:  3,4,5 = current */
 
 	/* MRC 2000 standard */
-	float   origin[3];
+	float_t   origin[3];
 	char    cmap[4];
 	char    machinestamp[4];
-	float   rms;
+	float_t   rms;
 
 	int32_t nlabl;	// number of labels
 	char  labels[10][80];
@@ -235,7 +235,7 @@ struct MRCHeader {
 void mrc_swap_header(MRCHeader * header) {
 	byteswap(&header->nx, 10);
 	byteswap(&header->xlen, 6);
-	byteswap(&header->mapc, 3);
+	byteswap(&header->mapx, 3);
 	byteswap(&header->amin, 3);
 	byteswap(&header->ispg, 2);
 	byteswap(&header->next, 1);
@@ -250,22 +250,23 @@ void mrc_swap_header(MRCHeader * header) {
 	byteswap(&header->nlabl, 1);
 }
 
-void mrcParse(const char * data) {
+MRCHeader& mrcParse(const char * data) {
 	MRCHeader& header = *(MRCHeader *)data;
 	
 	// check for byte swap:
 	bool swapped = 
 		(header.nx <= 0 || header.ny <= 0 || header.nz <= 0 || 
 		(header.nx > 65535 && header.ny > 65535 && header.nz > 65535) ||
-		header.mapc < 0 || header.mapc > 4 ||
-		header.mapr < 0 || header.mapr > 4 ||
-		header.maps < 0 || header.maps > 4);
+		header.mapx < 0 || header.mapx > 4 ||
+		header.mapy < 0 || header.mapy > 4 ||
+		header.mapz < 0 || header.mapz > 4);
 		
 	// ugh.
 	if (swapped) {
+		printf("swapping byte order\n");
 		byteswap(&header.nx, 10);
 		byteswap(&header.xlen, 6);
-		byteswap(&header.mapc, 3);
+		byteswap(&header.mapx, 3);
 		byteswap(&header.amin, 3);
 		byteswap(&header.ispg, 2);
 		byteswap(&header.next, 1);
@@ -280,7 +281,23 @@ void mrcParse(const char * data) {
 		byteswap(&header.nlabl, 1);
 	}
 	
-	printf("swapped %d NX %d NY %d NZ %d\n", swapped, header.nx, header.ny, header.nz);
+	printf("NX %d NY %d NZ %d\n", header.nx, header.ny, header.nz);
+	printf("mode %d\n", header.mode);
+	printf("startX %d startY %d startZ %d\n", header.startx, header.starty, header.startz);
+	printf("intervals X %d intervals Y %d intervals Z %d\n", header.mx, header.my, header.mz);
+	printf("angstroms X %f angstroms Y %f angstroms Z %f\n", header.xlen, header.ylen, header.zlen);
+	printf("axis X %d axis Y %d axis Z %d\n", header.mapx, header.mapy, header.mapz);
+	printf("density min %f max %f mean %f\n", header.amin, header.amax, header.amean);
+	printf("origin %f %f %f\n", header.origin[0], header.origin[1], header.origin[2]);
+	printf("map %s\n", header.cmap);
+	printf("machine stamp %s\n", header.machinestamp);
+	printf("rms %f\n", header.rms);
+	printf("labels %d\n", header.nlabl);
+	for (int i=0; i<header.nlabl; i++) {
+		printf("\t%02d: %s\n", i, header.labels[i]);
+	}	
+	
+	return header;
 }
 
 int main(){
@@ -293,9 +310,9 @@ int main(){
 	printf("golgi: %s\n", mrcpath.c_str());
 	File f(mrcpath, "rb", true);
 	const char * data = f.readAll();
-	mrcParse(data);
+	MRCHeader& header = mrcParse(data);
 	
-	printf("char %d\n", sizeof(char));
+	printf("sizeof header %lu\n", sizeof(header));
 
 	win.append(*new StandardWindowKeyControls);
 	win.create(Window::Dim(640, 480));

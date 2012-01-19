@@ -326,21 +326,42 @@ inline uint8_t unitToUInt8(float u){
 	return (punFU(u) >> 15) & MaskFrac<float>();
 }
 
-#define bswap_16(x) ((((x) & 0xFF00) >> 8) | (((x) & 0x00FF) << 8))
-#define bswap_32(x) ((((x) & 0xFF000000) >> 24) | \
-					(((x) & 0x00FF0000) >> 8)   | \
-					(((x) & 0x0000FF00) << 8)   | \
-					(((x) & 0x000000FF) << 24) )
 
 template<> inline int8_t byteswap(int8_t x) { return x; }
 template<> inline uint8_t byteswap(uint8_t x) { return x; }
-template<> inline uint16_t byteswap(uint16_t x) { return bswap_16(x); }
-template<> inline int16_t byteswap(int16_t x) { return bswap_16(x); }
-template<> inline uint32_t byteswap(uint32_t x) { return bswap_32(x); }
-template<> inline int32_t byteswap(int32_t x) { return bswap_32(x); }
-template<> inline float byteswap(float x) { 
-	int32_t x1 = *(int32_t *)&x;
-	return bswap_32(x1); 
+template<> inline uint16_t byteswap(uint16_t x) { 
+	return ((((x) & 0xFF00) >> 8) | (((x) & 0x00FF) << 8)); 
+}
+template<> inline int16_t byteswap(int16_t x) { 
+	return ((((x) & 0xFF00) >> 8) | (((x) & 0x00FF) << 8)); 
+}
+template<> inline uint32_t byteswap(uint32_t x) { 
+	return __builtin_bswap32(x);		// GCC
+}
+template<> inline int32_t byteswap(int32_t x) { 
+//	return  ((((x) & 0xFF000000) >> 24) |
+//			(((x) & 0x00FF0000) >> 8)   |
+//			(((x) & 0x0000FF00) << 8)   |
+//			(((x) & 0x000000FF) << 24) );
+	return __builtin_bswap32(x);		// GCC
+	
+}
+template<> inline int64_t byteswap(int64_t x) { 
+	return __builtin_bswap64(x);		// GCC
+}
+template<> inline uint64_t byteswap(uint64_t x) { 
+	return __builtin_bswap64(x);		// GCC
+}
+
+// not sure:
+template<> inline float_t byteswap(float_t x) { 
+	uint32_t u = __builtin_bswap32(*(uint32_t*)(&x));
+	return *(float_t *)(&u);
+}
+
+template<> inline double_t byteswap(double_t x) { 
+	uint64_t u = __builtin_bswap64(*(uint64_t*)(&x));
+	return *(double_t *)(&u);
 }
 
 template<typename T>
