@@ -232,23 +232,7 @@ struct MRCHeader {
 	char  labels[10][80];
 } MrcHeader;
 
-void mrc_swap_header(MRCHeader * header) {
-	byteswap(&header->nx, 10);
-	byteswap(&header->xlen, 6);
-	byteswap(&header->mapx, 3);
-	byteswap(&header->amin, 3);
-	byteswap(&header->ispg, 2);
-	byteswap(&header->next, 1);
-	byteswap(&header->creatid, 1);
-	byteswap(&header->nint, 4);
-	byteswap(&header->min2, 4);
-	byteswap(&header->imodStamp, 2);
-	byteswap(&header->idtype, 6);
-	byteswap(&header->tiltangles[0], 6);
-	byteswap(&header->origin[0], 3);
-	byteswap(&header->rms, 1);
-	byteswap(&header->nlabl, 1);
-}
+
 
 MRCHeader& mrcParse(const char * data) {
 	MRCHeader& header = *(MRCHeader *)data;
@@ -264,21 +248,21 @@ MRCHeader& mrcParse(const char * data) {
 	// ugh.
 	if (swapped) {
 		printf("swapping byte order\n");
-		byteswap(&header.nx, 10);
-		byteswap(&header.xlen, 6);
-		byteswap(&header.mapx, 3);
-		byteswap(&header.amin, 3);
-		byteswap(&header.ispg, 2);
-		byteswap(&header.next, 1);
-		byteswap(&header.creatid, 1);
-		byteswap(&header.nint, 4);
-		byteswap(&header.min2, 4);
-		byteswap(&header.imodStamp, 2);
-		byteswap(&header.idtype, 6);
-		byteswap(&header.tiltangles[0], 6);
-		byteswap(&header.origin[0], 3);
-		byteswap(&header.rms, 1);
-		byteswap(&header.nlabl, 1);
+		swapbytes(&header.nx, 10);
+		swapbytes(&header.xlen, 6);
+		swapbytes(&header.mapx, 3);
+		swapbytes(&header.amin, 3);
+		swapbytes(&header.ispg, 2);
+		swapbytes(&header.next, 1);
+		swapbytes(&header.creatid, 1);
+		swapbytes(&header.nint, 4);
+		swapbytes(&header.min2, 4);
+		swapbytes(&header.imodStamp, 2);
+		swapbytes(&header.idtype, 6);
+		swapbytes(&header.tiltangles[0], 6);
+		swapbytes(&header.origin[0], 3);
+		swapbytes(&header.rms, 1);
+		swapbytes(&header.nlabl, 1);
 	}
 	
 	printf("NX %d NY %d NZ %d\n", header.nx, header.ny, header.nz);
@@ -294,7 +278,7 @@ MRCHeader& mrcParse(const char * data) {
 	printf("rms %f\n", header.rms);
 	printf("labels %d\n", header.nlabl);
 	for (int i=0; i<header.nlabl; i++) {
-		printf("\t%02d: %s\n", i, header.labels[i]);
+		//printf("\t%02d: %s\n", i, header.labels[i]);
 	}	
 	
 	return header;

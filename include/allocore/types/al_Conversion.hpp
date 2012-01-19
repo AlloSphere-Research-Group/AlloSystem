@@ -79,13 +79,13 @@ template<> struct Twiddle<double>{
 	union{ int64_t i; uint64_t u; double f; };
 };
 
-/// swap byte order (for 16 or 32 bit values):
-template<typename T>
-inline T byteswap(T x);
+/// swap byte order for a number:
+template<typename T> 
+void swapbytes(T * ptr);
 
-/// swap byte order for an array:
+/// swap byte order for an array of numbers:
 template<typename T>
-inline void byteswap(T * data, int count=1);
+inline void swapbytes(T * ptr, int count);
 
 /// Convert decimal integer to ascii base-36 character
 char base10To36(int dec10);
@@ -327,47 +327,21 @@ inline uint8_t unitToUInt8(float u){
 }
 
 
-template<> inline int8_t byteswap(int8_t x) { return x; }
-template<> inline uint8_t byteswap(uint8_t x) { return x; }
-template<> inline uint16_t byteswap(uint16_t x) { 
-	return ((((x) & 0xFF00) >> 8) | (((x) & 0x00FF) << 8)); 
-}
-template<> inline int16_t byteswap(int16_t x) { 
-	return ((((x) & 0xFF00) >> 8) | (((x) & 0x00FF) << 8)); 
-}
-template<> inline uint32_t byteswap(uint32_t x) { 
-	return __builtin_bswap32(x);		// GCC
-}
-template<> inline int32_t byteswap(int32_t x) { 
-//	return  ((((x) & 0xFF000000) >> 24) |
-//			(((x) & 0x00FF0000) >> 8)   |
-//			(((x) & 0x0000FF00) << 8)   |
-//			(((x) & 0x000000FF) << 24) );
-	return __builtin_bswap32(x);		// GCC
-	
-}
-template<> inline int64_t byteswap(int64_t x) { 
-	return __builtin_bswap64(x);		// GCC
-}
-template<> inline uint64_t byteswap(uint64_t x) { 
-	return __builtin_bswap64(x);		// GCC
-}
-
-// not sure:
-template<> inline float_t byteswap(float_t x) { 
-	uint32_t u = __builtin_bswap32(*(uint32_t*)(&x));
-	return *(float_t *)(&u);
-}
-
-template<> inline double_t byteswap(double_t x) { 
-	uint64_t u = __builtin_bswap64(*(uint64_t*)(&x));
-	return *(double_t *)(&u);
+template<unsigned N>
+inline void swapbytesN(void * ptr) {
+	char in[N], out[N];
+	memcpy(in, ptr, N);
+	for (int i=0; i<N; i++) out[i] = in[N-1-i];
+	memcpy(ptr, out, N);
 }
 
 template<typename T>
-inline void byteswap(T * data, int count) {
+inline void swapbytes(T * ptr) { swapbytesN<sizeof(T)>(ptr); }
+
+template<typename T>
+inline void swapbytes(T * data, int count) {
 	for (int i=0; i<count; i++) {
-		data[i] = byteswap(data[i]);
+		swapbytes(data+i);
 	}
 }
 
