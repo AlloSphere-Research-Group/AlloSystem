@@ -139,11 +139,12 @@ public:
 		
 		if(m < 0) res.i = -res.i;
 
-		T c = l<=L_MAX ? coefTab(l,m) : coefCalc(l,m);
-		c *= al::legendreP(l,m, cphi.r, cphi.i);
-
+		T c = coef(l,m) * al::legendreP(l,m, cphi.r, cphi.i);
 		return res*c;
 	}
+	
+	/// Get normalization coefficient
+	static double coef(int l, int m){ return l<=L_MAX ? coefTab(l,m) : coefCalc(l,m); }
 	
 	/// Get normalization coefficient (tabulated)
 	static const double& coefTab(int l, int m){ return LUT(l,m); }
