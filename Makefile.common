@@ -167,7 +167,7 @@ else ifeq ($(PLATFORM), macosx)
 		CFLAGS += -arch i386 -arch x86_64
 	endif
 
-	CFLAGS += -fvisibility-inlines-hidden
+	#CFLAGS += -fvisibility-inlines-hidden
 
 	# Set system root directory
 	CFLAGS += -isysroot
