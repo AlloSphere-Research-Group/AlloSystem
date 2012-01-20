@@ -11,12 +11,18 @@ Graham Wakefield 2011
 
 #include "allocore/al_Allocore.hpp"
 #include "allocore/graphics/al_Shader.hpp"
+#include "allocore/graphics/al_Isosurface.hpp"
 #include "alloutil/al_Field3D.hpp"
 
 using namespace al;
 
 // As a 3D Texture:
 Texture tex(32, 32, 32, Graphics::LUMINANCE);
+
+float amean;
+
+// As an Isosurface:
+Isosurface iso;
 
 Graphics gl;
 Mesh mesh;
@@ -68,6 +74,7 @@ struct MyWindow : public Window {
 			mesh.texCoord(x/32., y/32., z/32.);
 			mesh.vertex(x, y, z);
 		}}}
+
 		
 		return true;
 	}
@@ -83,12 +90,24 @@ struct MyWindow : public Window {
 		gl.matrixMode(gl.MODELVIEW);
 		gl.loadMatrix(Matrix4d::lookAt(Vec3d(16, 16, 64), Vec3d(16, 16, 16), Vec3d(0,1,0)));
 		
+		gl.lineWidth(0.5);
+		gl.color(1, 1, 1, 0.02);
+		gl.pointSize(1);
+		
+		gl.polygonMode(gl.LINE);
+		
+		
+		iso.level(amean + 4.*sin(fmod(al_time() * 0.125, 1.) * M_2PI));
+		iso.generate((char *)tex.array().data.ptr, 32, 32, 32, 1./32, 1./32, 1./32);
+		
+		gl.pushMatrix();
+			gl.scale(32, 32, 32);
+			gl.draw(iso);
+		gl.popMatrix();
+		
 		// draw it:
 		gl.blending(true);
 		gl.blendModeAdd();
-		gl.lineWidth(0.5);
-		gl.color(1, 1, 1);
-		gl.pointSize(1);
 		
 		shaderP.begin();
 		shaderP.uniform("tex", 0);
@@ -97,6 +116,8 @@ struct MyWindow : public Window {
 		tex.unbind();
 		shaderP.end();
 		
+		gl.polygonMode(gl.FILL);
+		gl.color(1, 1, 1, 1.);
 		float slice = 1.-fmod(al_time() * 0.25, 1.);
 		tex.bind();
 		float s = 32.;
@@ -111,6 +132,8 @@ struct MyWindow : public Window {
 			gl.vertex(s, 0, slice*s);
 		gl.end();
 		tex.unbind();
+		
+		
 		
 		return true;
 	}
@@ -309,11 +332,14 @@ int main(){
 	File f(mrcpath, "rb", true);
 	
 	Array& array = tex.array();
-	mrcParse(f.readAll(), array);
+	MRCHeader& header = mrcParse(f.readAll(), array);
+	
+	amean = header.amean;
 	
 	win.append(*new StandardWindowKeyControls);
 	win.create(Window::Dim(640, 480));
 	
+	iso.primitive(Graphics::TRIANGLES);
 
 	MainLoop::start();
 	return 0;
