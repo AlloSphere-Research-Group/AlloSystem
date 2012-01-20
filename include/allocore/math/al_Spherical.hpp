@@ -125,22 +125,38 @@ public:
 	template <class T>
 	Complex<T> operator()(int l, int m, const Complex<T>& ctheta, const Complex<T>& cphi) const {
 		
+//		Complex<T> res(1, 0);
+//		
+//		// compute e^im recursively
+//		// TODO: this could be turned into a table lookup
+//		for(int i=0; i<al::abs(m); ++i){
+//			res *= ctheta;
+//		}
+//		
+//		//T arg = ctheta.arg();
+//		//Complex<T> res;
+//		//res.fromPolar(arg*m);
+//		
+//		if(m < 0) res.i = -res.i;
+
+		return coef(l,m) * al::legendreP(l,m, cphi.r, cphi.i) * expim(m, ctheta);
+	}
+
+	static Complex<T> expim(int m, const Complex<T>& ctheta){
 		Complex<T> res(1, 0);
-		
+
 		// compute e^im recursively
 		// TODO: this could be turned into a table lookup
 		for(int i=0; i<al::abs(m); ++i){
 			res *= ctheta;
 		}
-		
+
 		//T arg = ctheta.arg();
 		//Complex<T> res;
 		//res.fromPolar(arg*m);
 		
 		if(m < 0) res.i = -res.i;
-
-		T c = coef(l,m) * al::legendreP(l,m, cphi.r, cphi.i);
-		return res*c;
+		return res;
 	}
 	
 	/// Get normalization coefficient
