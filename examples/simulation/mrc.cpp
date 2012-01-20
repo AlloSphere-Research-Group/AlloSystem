@@ -153,7 +153,8 @@ enum MRCMode {
 };
 
 struct MRCHeader {
-
+	// @see http://ami.scripps.edu/software/mrctools/mrc_specification.php
+	// or http://bio3d.colorado.edu/imod/doc/mrc_format.txt
 
 	int32_t   nx;         /*  # of Columns                  */
 	int32_t   ny;         /*  # of Rows                     */
