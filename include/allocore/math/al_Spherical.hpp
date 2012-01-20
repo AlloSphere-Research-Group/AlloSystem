@@ -142,6 +142,8 @@ public:
 		return coef(l,m) * al::legendreP(l,m, cphi.r, cphi.i) * expim(m, ctheta);
 	}
 
+
+	template <class T>
 	static Complex<T> expim(int m, const Complex<T>& ctheta){
 		Complex<T> res(1, 0);
 
