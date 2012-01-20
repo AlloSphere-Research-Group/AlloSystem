@@ -104,6 +104,9 @@ public:
 
 	/// Returns the total memory footprint, in bytes
 	size_t size() const { return allo_array_size(this); }
+	
+	/// Returns number of cells in the Array:
+	unsigned cells() const { return allo_array_elements(this); }
 
 	///	Change the format (header/layout) of the Array reallocating if necessary
 	void format(const AlloArrayHeader& h2);

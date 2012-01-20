@@ -15,53 +15,31 @@ Graham Wakefield 2011
 
 using namespace al;
 
-// create a fluid on a 32x32x32 grid:
-Fluid3D<float> fluid(32);
-
-// create an intensity field (on a 32x32x32 grid) 
-// to be driven around:
-Field3D<float> intensities(3, 32);
-
-// textures to show the fluid densities & velocities
-Texture intensityTex, velocityTex;
+// As a 3D Texture:
+Texture tex(32, 32, 32, Graphics::LUMINANCE);
 
 Graphics gl;
 Mesh mesh;
 ShaderProgram shaderP;
 Shader shaderV, shaderF;
 
-static const char * srcV = AL_STRINGIFY(
-uniform sampler3D velocityTex; 
-uniform sampler3D intensityTex; 
-varying vec3 velocity;
-varying vec3 intensity;
+static const char * vField = AL_STRINGIFY(
+varying vec3 texcoord0;
 void main(){
-	vec3 xyz = gl_Vertex.xyz / 32.; 
-	velocity = texture3D(velocityTex, xyz).rgb;
-	// Array components = 2 defaults to GL_LUMINANCE_ALPHA:
-	intensity = texture3D(intensityTex, xyz).rgb;
-	vec4 vertex1 = gl_Vertex;
-	vec2 texcoord0 = vec2(gl_MultiTexCoord0);
-	if (texcoord0.s > 0.) {
-		// displace by length:
-		vertex1 += vec4(velocity, 0);
-	} else {
-		// displace with width:
-		float displace = (texcoord0.t - 0.5);
-		vec3 axis = cross(normalize(velocity), vec3(0, 0, -1));
-		vertex1 += vec4(displace * axis, 0);
-	}
-
-	gl_Position = gl_ModelViewProjectionMatrix * vertex1;
+	texcoord0 = gl_Vertex.xyz / 32.; 
+	//texcoord0 = vec3(gl_MultiTexCoord0);
+	gl_Position = ftransform();
 }
 );
 
-static const char * srcF = AL_STRINGIFY(
-varying vec3 velocity;
-varying vec3 intensity;
+static const char * fField = AL_STRINGIFY(
+uniform sampler3D tex; 
+varying vec3 texcoord0;
 void main() {
-	float mag = 0.1+length(velocity);
-	gl_FragColor = vec4(0.1+intensity, mag);
+	float intensity = texture3D(tex, texcoord0).r;
+	vec3 rgb = vec3(intensity, intensity, intensity);
+	gl_FragColor = vec4(rgb, 0.5); 
+	//gl_FragColor = vec4(texcoord0, 1);
 }
 );
 
@@ -70,32 +48,25 @@ struct MyWindow : public Window {
 	bool onCreate(){
 	
 		// reconfigure textures based on arrays:
-		intensityTex.submit(intensities.front(), true);
-		velocityTex.submit(fluid.velocities.front(), true);
+		tex.submit(tex.array(), true);
+		
 		
 		// shader method:
-		shaderV.source(srcV, Shader::VERTEX).compile();
-		shaderF.source(srcF, Shader::FRAGMENT).compile();
+		shaderV.source(vField, Shader::VERTEX).compile();
+		shaderF.source(fField, Shader::FRAGMENT).compile();
 		shaderP.attach(shaderV).attach(shaderF).link();
 		shaderV.printLog();
 		shaderF.printLog();
 		shaderP.printLog();
 
-		// create rendering mesh of lines
+		// create rendering mesh:
 		mesh.reset();
-		mesh.primitive(Graphics::TRIANGLES);
+		mesh.primitive(Graphics::POINTS);
 		for (int x=0; x<32; x++) {
 		for (int y=0; y<32; y++) {
 		for (int z=0; z<32; z++) {
-			// render 2 vertices at the same location
-			// using texcoord as an attribute to distinguish 
-			// 'start' and 'end' vertices
-			mesh.texCoord(0, 0);
+			mesh.texCoord(x/32., y/32., z/32.);
 			mesh.vertex(x, y, z);
-			mesh.texCoord(0, 1);	
-			mesh.vertex(x, y, z);
-			mesh.texCoord(1, 0);	
-			mesh.vertex(x, y, z);	
 		}}}
 		
 		return true;
@@ -112,54 +83,35 @@ struct MyWindow : public Window {
 		gl.matrixMode(gl.MODELVIEW);
 		gl.loadMatrix(Matrix4d::lookAt(Vec3d(16, 16, 64), Vec3d(16, 16, 16), Vec3d(0,1,0)));
 		
-		
-		// add some forces:
-		float t = MainLoop::now() * 0.25;
-		float r = 20;
-		fluid.addVelocity(Vec3f(12, 12, 16), Vec3f(r*cos(t), r*sin(t), 1));
-		fluid.addVelocity(Vec3f(20, 20, 16), Vec3f(-r*cos(t*2), -r*sin(t*2), 0));
-		fluid.addVelocity(Vec3f(16, 16, 20), Vec3f(0, -r*cos(t*3), -r*sin(t*3)));
-		
-		// add some intensities:
-		float v = 4;
-		intensities.add(Vec3f(12, 20, 16), Vec3f(v, 0, 0).elems());
-		intensities.add(Vec3f(20, 12, 16), Vec3f(0, v, 0).elems());
-		intensities.add(Vec3f(16, 16, 12), Vec3f(0, 0, v).elems());
-
-		
-		// run a fluid step:
-		fluid.update();
-		
-		// diffuse the intensities:
-		intensities.diffuse();
-		
-		// use the fluid to advect the intensities:
-		intensities.advect(fluid.velocities.front(), 3.);
-		
-		// some decay
-		intensities.scale(0.999);
-		
-		// update texture data:
-		intensityTex.submit(intensities.front());
-		velocityTex.submit(fluid.velocities.front());
-		
 		// draw it:
 		gl.blending(true);
 		gl.blendModeAdd();
 		gl.lineWidth(0.5);
-		
-		gl.polygonMode(gl.LINE);
+		gl.color(1, 1, 1);
+		gl.pointSize(1);
 		
 		shaderP.begin();
-		shaderP.uniform("velocityTex", 0);
-		shaderP.uniform("intensityTex", 1);
-		velocityTex.bind(0);
-		intensityTex.bind(1);
+		shaderP.uniform("tex", 0);
+		tex.bind();
 		gl.draw(mesh);
-		intensityTex.unbind(1);
-		velocityTex.unbind(0);
+		tex.unbind();
 		shaderP.end();
-
+		
+		float slice = 1.-fmod(al_time() * 0.25, 1.);
+		tex.bind();
+		float s = 32.;
+		gl.begin(gl.QUADS);
+			gl.texCoord(0, 0, slice);
+			gl.vertex(0, 0, slice*s);
+			gl.texCoord(0, 1, slice);
+			gl.vertex(0, s, slice*s);
+			gl.texCoord(1, 1, slice);
+			gl.vertex(s, s, slice*s);
+			gl.texCoord(1, 0, slice);
+			gl.vertex(s, 0, slice*s);
+		gl.end();
+		tex.unbind();
+		
 		return true;
 	}
 };
@@ -167,7 +119,19 @@ struct MyWindow : public Window {
 
 MyWindow win;
 
+
+enum MRCMode {
+	MRC_IMAGE_SINT8 = 0,		//image : signed 8-bit bytes range -128 to 127
+	MRC_IMAGE_SINT16 = 1,		//image : 16-bit halfwords
+	MRC_IMAGE_FLOAT32 = 2,		//image : 32-bit reals
+	MRC_TRANSFORM_INT16 = 3,	//transform : complex 16-bit integers
+	MRC_TRANSFORM_FLOAT32 = 4,  //transform : complex 32-bit reals
+	MRC_IMAGE_UINT16 = 6        //image : unsigned 16-bit range 0 to 65535
+};
+
 struct MRCHeader {
+
+
 	int32_t   nx;         /*  # of Columns                  */
 	int32_t   ny;         /*  # of Rows                     */
 	int32_t   nz;         /*  # of Sections.                */
@@ -234,7 +198,7 @@ struct MRCHeader {
 
 
 
-MRCHeader& mrcParse(const char * data) {
+MRCHeader& mrcParse(const char * data, Array& array) {
 	MRCHeader& header = *(MRCHeader *)data;
 	
 	// check for byte swap:
@@ -247,7 +211,7 @@ MRCHeader& mrcParse(const char * data) {
 		
 	// ugh.
 	if (swapped) {
-		printf("swapping byte order\n");
+		printf("swapping byte order...\n");
 		swapbytes(&header.nx, 10);
 		swapbytes(&header.xlen, 6);
 		swapbytes(&header.mapx, 3);
@@ -281,6 +245,56 @@ MRCHeader& mrcParse(const char * data) {
 		//printf("\t%02d: %s\n", i, header.labels[i]);
 	}	
 	
+	const char * start = data + 1024;
+	
+	AlloTy ty;
+	
+	// set type:
+	switch (header.mode) {
+		case MRC_IMAGE_SINT8:
+			printf("signed int 8\n");
+			ty = Array::type<int8_t>();
+			break;
+		case MRC_IMAGE_SINT16:
+			printf("signed int 16\n");
+			ty = Array::type<int16_t>();
+			break;
+		case MRC_IMAGE_FLOAT32:
+			printf("float\n");
+			ty = Array::type<float_t>();
+			break;
+		case MRC_IMAGE_UINT16:
+			printf("unsigned int 16\n");
+			ty = Array::type<uint16_t>();
+			break;
+		default:
+			printf("MRC mode not supported\n");
+			break;
+	}
+	
+	array.formatAligned(1, ty, header.nx, header.ny, header.nz, 0);
+	memcpy(array.data.ptr, start, array.size());
+	
+	if (swapped) {
+		// set type:
+		switch (header.mode) {
+			case MRC_IMAGE_SINT8:
+				swapbytes((int8_t *)array.data.ptr, array.cells());
+				break;
+			case MRC_IMAGE_SINT16:
+				swapbytes((int16_t *)array.data.ptr, array.cells());
+				break;
+			case MRC_IMAGE_FLOAT32:
+				swapbytes((float_t *)array.data.ptr, array.cells());
+				break;
+			case MRC_IMAGE_UINT16:
+				swapbytes((uint16_t *)array.data.ptr, array.cells());
+				break;
+			default:
+				break;
+		}
+	}
+	
 	return header;
 }
 
@@ -293,15 +307,15 @@ int main(){
 	std::string mrcpath = paths.find("golgi.mrc").filepath();
 	printf("golgi: %s\n", mrcpath.c_str());
 	File f(mrcpath, "rb", true);
-	const char * data = f.readAll();
-	MRCHeader& header = mrcParse(data);
 	
-	printf("sizeof header %lu\n", sizeof(header));
-
+	Array& array = tex.array();
+	mrcParse(f.readAll(), array);
+	
 	win.append(*new StandardWindowKeyControls);
 	win.create(Window::Dim(640, 480));
+	
 
-	//MainLoop::start();
+	MainLoop::start();
 	return 0;
 }
 
