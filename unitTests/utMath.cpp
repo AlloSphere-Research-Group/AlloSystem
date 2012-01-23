@@ -440,6 +440,10 @@ int utMath(){
 				T(-1.,-1.) T(-1.2,-1.) T(-1.8,-1.) T(-1000.1,-1000.)
 	#undef T
 
+	#define T(x, y) assert(al::ceilEven(x) == y);
+	T(0, 0) T(1, 2) T(2, 2) T(3, 4) T(1001, 1002)
+	#undef T
+
 	#define T(x, y) assert(al::ceilPow2(x) == y);
 	T(0, 0) T(1, 1) T(2, 2) T(3, 4)
 	T(500, 512) T(999, 1024)

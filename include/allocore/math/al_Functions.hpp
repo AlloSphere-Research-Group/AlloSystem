@@ -94,6 +94,9 @@ template<class T> T ceil(const T& val);
 template<class T> T ceil(const T& val, const T& step);
 template<class T> T ceil(const T& val, const T& step, const T& recStep);
 
+/// Returns even number ceiling
+inline uint32_t ceilEven(uint32_t v){ return v += v & 1UL; }
+
 /// Returns power of two ceiling of value
 
 /// This uses an algorithm devised by Sean Anderson, Sep. 2001.
@@ -220,8 +223,14 @@ template<class T> T min(const T& v1, const T& v2);
 /// Returns minimum of three values
 template<class T> T min(const T& v1, const T& v2, const T& v3);
 
+/// Returns nearest integer division of one value to another
+template<class T> inline T nearestDiv(T of, T to){ return to / round(to/of); }
+
 /// Returns the next representable floating-point or integer value following x in the direction of y
 template<class T> T nextAfter(const T& x, const T& y);
+
+/// Returns next largest value of 'val' that is a multiple of 'multiple'.
+template<class T> T nextMultiple(T val, T multiple);
 
 /// Returns the number of digits in the integer portion
 template<class T> T numInt(const T& v);
@@ -651,6 +660,11 @@ TEM inline T nextAfter(const T& x, const T& y){ return x<y ? x+1 : x-1; }
 template<> inline float nextAfter(const float& x, const float& y){ return nextafterf(x,y); }
 template<> inline double nextAfter(const double& x, const double& y){ return nextafter(x,y); }
 template<> inline long double nextAfter(const long double& x, const long double& y){ return nextafterl(x,y); }
+
+TEM inline T nextMultiple(T v, T m){
+	uint32_t div = (uint32_t)(v / m);
+	return T(div + 1) * m;
+}
 
 TEM inline T numInt(const T& v){ return al::floor(::log10(v)) + 1; }
 
