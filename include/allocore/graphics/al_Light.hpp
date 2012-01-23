@@ -87,7 +87,7 @@ public:
 	const std::string& specularMap() const { return mMapKs; }
 	const std::string& diffuseMap() const { return mMapKd; }
 	const std::string& bumpMap() const { return mMapBump; }
-	const bool useColorMaterial() const { return mUseColorMaterial; }
+	bool useColorMaterial() const { return mUseColorMaterial; }
 
 protected:
 	Color mAmbient;
@@ -101,9 +101,10 @@ protected:
 };
 
 
+/// Light
 class Light{
 public:
-	Light(float x=5, float y=2, float z=-5);
+	Light(float x=0, float y=0, float z=1);
 	~Light();
 
 	/// Send current light settings to GPU

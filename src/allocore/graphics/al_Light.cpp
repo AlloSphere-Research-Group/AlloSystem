@@ -64,7 +64,6 @@ static void freeID(int i){ lightPool()[i]=false; }
 Light::Light(float x, float y, float z)
 :	mID(nextID()), mAmbient(0), mDiffuse(1), mSpecular(1)
 {
-	mPos[3]=1;
 	pos(x,y,z);
 	attenuation(1,0,0);
 }
@@ -80,9 +79,9 @@ void Light::operator()() const {
 	glLightfv(glID, GL_DIFFUSE,		mDiffuse.components);
 	glLightfv(glID, GL_SPECULAR,	mSpecular.components);
 	glLightfv(glID, GL_POSITION,	mPos);
-    glLightf(glID, GL_CONSTANT_ATTENUATION,	mAtten[0]);
-    glLightf(glID, GL_LINEAR_ATTENUATION,	mAtten[1]);
-    glLightf(glID, GL_QUADRATIC_ATTENUATION,mAtten[2]);
+    glLightf (glID, GL_CONSTANT_ATTENUATION,	mAtten[0]);
+    glLightf (glID, GL_LINEAR_ATTENUATION,		mAtten[1]);
+    glLightf (glID, GL_QUADRATIC_ATTENUATION,	mAtten[2]);
 
 	glEnable(glID); // MUST enable each light source after configuration
 //	glShadeModel(GL_SMOOTH); // enabled by default and don't want to force...
@@ -100,8 +99,8 @@ Light& Light::spot(float xDir, float yDir, float zDir, float cutoff, float expo)
 	int glID = lightID(mID);
 	float direction[] = {xDir, yDir, yDir};
 	glLightfv(glID, GL_SPOT_DIRECTION, direction);
-	glLightf(glID, GL_SPOT_CUTOFF, cutoff);
-	glLightf(glID, GL_SPOT_EXPONENT, expo);
+	glLightf (glID, GL_SPOT_CUTOFF, cutoff);
+	glLightf (glID, GL_SPOT_EXPONENT, expo);
 	return *this;
 }
 
