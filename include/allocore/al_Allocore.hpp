@@ -35,6 +35,7 @@
 #include "allocore/graphics/al_Image.hpp"
 //#include "allocore/graphics/al_Isosurface.hpp"
 #include "allocore/graphics/al_Light.hpp"
+#include "allocore/graphics/al_Shader.hpp"
 #include "allocore/graphics/al_Shapes.hpp"
 #include "allocore/graphics/al_Stereographic.hpp"
 #include "allocore/graphics/al_Texture.hpp"
