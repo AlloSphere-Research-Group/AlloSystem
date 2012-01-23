@@ -23,7 +23,7 @@ HashSpace :: HashSpace(uint32_t resolution, uint32_t numObjects)
 	
 	mVoxels.resize(mDim3);
 	mObjects.resize(numObjects);
-	for (int i=0; i<mObjects.size(); i++) {
+	for (unsigned i=0; i<mObjects.size(); i++) {
 		mObjects[i].id = i;
 	}
 	
