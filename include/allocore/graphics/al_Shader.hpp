@@ -30,9 +30,9 @@
 	Wrappers to OpenGL GLSL shaders
 
 	File author(s):
-	Wesley Smith, 2010, wesley.hoke@gmail.com
 	Lance Putnam, 2010, putnam.lance@gmail.com
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
+	Wesley Smith, 2010, wesley.hoke@gmail.com
 */
 
 #include <string>
