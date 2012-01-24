@@ -601,7 +601,7 @@ bool Window::cursorHide() const { return mImpl->mCursorHide; }
 
 Window::Dim Window::dimensions() const { return mImpl->dimensions(); }
 double Window::fps() const { return mImpl->mFPS; }
-double Window::avgFps() const { return mImpl->mAvg; }
+double Window::fpsAvg() const { return mImpl->mAvg; }
 double Window::spfActual() const { return mImpl->mSPFActual; }
 bool Window::fullScreen() const { return mImpl->mFullScreen; }
 const std::string& Window::title() const { return mImpl->mTitle; }

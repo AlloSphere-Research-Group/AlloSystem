@@ -276,7 +276,7 @@ public:
 	bool fullScreen() const;					///< Get whether window is in fullscreen
 	double fps() const;							///< Returns frames/second (requested)
 	double fpsActual() const { return 1./spfActual(); }	///< Returns frames/second (actual)
-	double avgFps() const;						///< Returns frames/second (running average)
+	double fpsAvg() const;						///< Returns frames/second (running average)						
 	double spf() const { return 1./fps(); }		///< Returns seconds/frame (requested)
 	double spfActual() const;					///< Returns seconds/frame (actual)
 	const std::string& title() const;			///< Get title of window
@@ -350,6 +350,9 @@ public:
 	static void startLoop();
 	static void stopLoop();
 	static bool started();
+
+	// DEPRECATED:
+	double avgFps() const { return fpsAvg(); }
 
 protected:
 	typedef std::vector<InputEventHandler *> InputEventHandlers;
