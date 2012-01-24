@@ -255,6 +255,13 @@ template<class T> T pow8(const T& v);		///< Returns value to the 8th power.
 template<class T> T pow16(const T& v);		///< Returns value to the 16th power.
 template<class T> T pow64(const T& v);		///< Returns value to the 64th power.
 
+/// Returns value to a positive integer power
+
+/// @param[in] base		the base value to exponentiate
+/// @param[in] power	the power to exponentiate by
+template<class T>
+T powN(T base, unsigned power);
+
 /// Returns (n+1)th prime number up to n=53.
 unsigned char prime(uint32_t n);
 
@@ -605,6 +612,21 @@ TEM T legendreP(int l, int m, T ct, T st){
 	//		P_m^m(x) = (-1)^m (2m-1)!! (1-x)^{m/2}, 
 	//		P_{m+1}^m(x) = x(2m+1) P_m^m(x).
 
+//	switch(l){
+//		case 0: return 1;
+//		
+//		case 1:
+//			switch(m){
+//				case 0: return ct;
+//				case 1: return -1 * st;
+//			}
+//		
+//		case 2:
+//			switch(m){
+//				case 0: return -0.5 + 1.5*ct*ct;
+//			}
+//	}
+
 	T P = 0;				// the result
 	int M = al::abs(m);		// M = |m|
 	T y1 = 1.;				// recursion state variable
@@ -683,6 +705,26 @@ TEM inline T pow6 (const T& v){ return pow3(pow2(v)); }
 TEM inline T pow8 (const T& v){ return pow4(pow2(v)); }
 TEM inline T pow16(const T& v){ return pow4(pow4(v)); }
 TEM inline T pow64(const T& v){ return pow8(pow8(v)); }
+
+TEM inline T powN(T base, unsigned power){
+	switch(power){
+		case 0: return T(1);
+		case 1: return base;
+		case 2: return pow2(base);
+		case 3: return pow3(base);
+		case 4: return pow4(base);
+		case 5: return pow5(base);
+		case 6: return pow6(base);
+		case 7: return pow6(base)*base;
+		case 8: return pow8(base);
+		case 9: return pow8(base)*base;
+		default:{
+			T r = pow8(base)*pow2(base);
+			for(unsigned i=10; i<power; ++i) r *= base;
+			return r;
+		}
+	}
+}
 
 inline uint8_t prime(uint32_t n){ return mPrimes54[n]; }
 
