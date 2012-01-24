@@ -635,6 +635,7 @@
 		168C16401322C755006D79CC /* utGraphicsDraw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utGraphicsDraw.cpp; sourceTree = "<group>"; };
 		168C46A713FC92C50085BCAD /* al_Speaker.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Speaker.hpp; sourceTree = "<group>"; };
 		168E74291329999D003115DD /* unitTests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = unitTests.cpp; sourceTree = "<group>"; };
+		168E9B7B14CF30F700FD8017 /* al_Curve.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Curve.hpp; sourceTree = "<group>"; };
 		168EC8EB1161CA2C00FCACC7 /* al_Time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Time.h; sourceTree = "<group>"; };
 		168EC8ED1161CA2C00FCACC7 /* al_Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_Config.h; sourceTree = "<group>"; };
 		168EC8EE1161CA2C00FCACC7 /* al_Time.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Time.hpp; sourceTree = "<group>"; };
@@ -1993,6 +1994,7 @@
 			isa = PBXGroup;
 			children = (
 				16AA8F0011C6FDE10053EFE1 /* al_Camera.hpp */,
+				168E9B7B14CF30F700FD8017 /* al_Curve.hpp */,
 				16D050581403125C009A5BEB /* al_DistAtten.hpp */,
 				16D0504A1402F27D009A5BEB /* al_HashSpace.hpp */,
 				16AFFDFD13996032007B3FE6 /* al_Pose.hpp */,
