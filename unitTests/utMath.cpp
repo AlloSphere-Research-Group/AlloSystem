@@ -417,7 +417,7 @@ int utMath(){
 
 
 
-	// Functions
+	// Simple Functions
 	{
 	const double pinf = INFINITY;		// + infinity
 	const double ninf =-INFINITY;		// - infinity
@@ -622,6 +622,102 @@ int utMath(){
 	T(0., 0.)	T( 0.5, 0.5) T( 1.,-1.) T( 1.2,-0.8) T( 2.2, 0.2)
 				T(-0.5,-0.5) T(-1.,-1.) T(-1.2, 0.8) T(-2.2,-0.2)
 	#undef T
+	}
+
+
+
+	// Special Functions
+	{
+		struct F{
+		
+			// Pl,-m(x) = (-1)^m (l-m)! / (l+m)! Pl,m(x)
+			static double testLegendreP(int l, int m, double x){
+				switch(l){
+				case 0:			return 1;
+				case 1:
+					switch(m){
+					case -1:	return -1./(2) * testLegendreP(l,-m,x);
+					case  0:	return x;
+					case  1:	return -sqrt(1 - x*x);
+					}
+					break;
+				case 2:
+					switch(m){
+					case -2:	return +1./(4*3*2*1) * testLegendreP(l,-m,x);
+					case -1:	return -1./(  3*2  ) * testLegendreP(l,-m,x);
+					case  0:	return 0.5 * (3*x*x - 1);
+					case  1:	return -3 * x * sqrt(1 - x*x);
+					case  2:	return 3 * (1 - x*x);
+					}
+					break;
+				case 3:
+					switch(m){
+					case -3:	return -1. / (6*5*4*3*2*1) * testLegendreP(l,-m,x);
+					case -2:	return +1. / (  5*4*3*2  ) * testLegendreP(l,-m,x);
+					case -1:	return -1. / (    4*3    ) * testLegendreP(l,-m,x);
+					case  0:	return 0.5 * x * (5*x*x - 3);
+					case  1:	return 1.5 * (1 - 5*x*x) * sqrt(1-x*x);
+					case  2:	return 15 * x * (1 - x*x);
+					case  3:	return -15 * al::pow3(sqrt(1-x*x));
+					}
+					break;
+				}
+				return 0;	// undefined
+			}
+
+			static double testLaguerre(int n, int k, double x){
+				switch(n){
+				case 0:	return 1;
+				case 1:	return -x + k + 1;
+				case 2: return x*x/2 - (k+2)*x + (k+2)*(k+1)/2;
+				case 3: return -x*x*x/6 + (k+3)*x*x/2 - (k+2)*(k+3)*x/2 + (k+1)*(k+2)*(k+3)/6;
+				default: return 0;
+				}
+			}
+		};
+		
+
+		const int M = 2000;	// granularity of domain
+
+		// test associated legendre
+		for(int l=0; l<=3; ++l){
+		for(int m=-l; m<=l; ++m){
+		for(int i=0; i<M; ++i){
+			double theta = double(i)*M_PI / M;
+			double a = al::legendreP(l, m, theta);
+			double b = F::testLegendreP(l, m, cos(theta));
+	//		if(!al::aeq(a, b, 1<<16)){
+			if(!(al::abs(a - b)<1e-10)){
+				printf("\nP(%d, %d, %g) = %.16g (actual = %.16g)\n", l,m, cos(theta), a,b);
+				assert(false);
+			}
+		}}}
+		
+		// test laguerre
+		for(int n=0; n<=3; ++n){
+		for(int i=0; i<M; ++i){
+			double x =double(i)/M * 4;
+			double a = al::laguerreL(n,1, x);
+			double b = F::testLaguerre(n,1, x);
+
+			if(!(al::abs(a - b)<1e-10)){
+				printf("\nL(%d, %g) = %.16g (actual = %.16g)\n", n, x, a,b);
+				assert(false);
+			}		
+		}}		
+
+		// TODO: spherical harmonics
+//		for(int l=0; l<=SphericalHarmonic::L_MAX; ++l){
+//		for(int m=-l; m<=l; ++m){
+//	//		double c = SphericalHarmonic::coef(l,m);
+//	//		double t = computeCoef(l,m);
+//	//		assert(c == t);
+//		}}
+//
+//		for(int j=0; j<M; ++j){	double ph = double(j)/M * M_PI;
+//		for(int i=0; i<M; ++i){ double th = double(i)/M * M_2PI;
+//			
+//		}}
 	}
 
 
