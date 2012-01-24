@@ -189,8 +189,8 @@ template<class T> T lcm(const T& x, const T& y);
 ///
 /// P_l^m(cos(t)) = (-1)^{l+m} / (2^l l!) sin^m(t) (d/d cos(t))^{l+m} sin^{2l}(t)
 ///
-/// @param[in]	l	degree where  l >= 0
-/// @param[in]	m	order  where -l <= m <=l
+/// @param[in]	l	degree where l >= 0
+/// @param[in]	m	order  where 0 <= m <= l
 /// @param[in]	t	angle in [0, pi]
 ///
 /// http://comp.cs.ehime-u.ac.jp/~ogata/nac/index.html
@@ -601,8 +601,48 @@ TEM inline T lcm(const T& x, const T& y){ return (x*y)/al::gcd(x,y); }
 
 TEM T legendreP(int l, int m, T ct, T st){
 
-	if(l<0){ /*printf("l=%d. l must be non-negative.\n");*/ return 0; }
-	if(m<-l || m>l){ /*printf("m=%d. m must be -l <= m <= l.\n");*/ return 0; }
+	switch(l){
+		case 0: return 1.;
+		
+		case 1:
+			switch(m){
+				case 0: return ct;
+				case 1: return -st;
+				default:return 0.;
+			}
+		
+		case 2:
+			switch(m){
+				case 0: return -0.5 + 1.5*ct*ct;
+				case 1: return -3.0*ct*st;
+				case 2: return  3.0*st*st;
+				default:return 0.;
+			}
+
+		case 3:
+			switch(m){
+				case 0: return ct*(-1.5 + 2.5*ct*ct);
+				case 1: return (1.5 - 7.5*ct*ct)*st;
+				case 2: return  15.*ct*st*st;
+				case 3: return -15.*st*st*st;
+				default:return 0.;
+			}
+		
+		case 4:
+			switch(m){
+				case 0: ct*=ct; return 0.375 + ct*(-3.75 + 4.375*ct);
+				case 1: return ct*(7.5 - 17.5*ct*ct)*st;
+				case 2: return (-7.5 + 52.5*ct*ct)*st*st;
+				case 3: return -105.*ct*st*st*st;
+				case 4: st*=st; return 105.*st*st;
+				default:return 0.;
+			}
+
+		default:;
+	}
+
+//	if(l<0){ /*printf("l=%d. l must be non-negative.\n");*/ return 0; }
+//	if(m<-l || m>l){ /*printf("m=%d. m must be -l <= m <= l.\n");*/ return 0; }
 
 	// First compute answer for |m|
 
@@ -611,21 +651,6 @@ TEM T legendreP(int l, int m, T ct, T st){
 	// with 
 	//		P_m^m(x) = (-1)^m (2m-1)!! (1-x)^{m/2}, 
 	//		P_{m+1}^m(x) = x(2m+1) P_m^m(x).
-
-//	switch(l){
-//		case 0: return 1;
-//		
-//		case 1:
-//			switch(m){
-//				case 0: return ct;
-//				case 1: return -1 * st;
-//			}
-//		
-//		case 2:
-//			switch(m){
-//				case 0: return -0.5 + 1.5*ct*ct;
-//			}
-//	}
 
 	T P = 0;				// the result
 	int M = al::abs(m);		// M = |m|
@@ -652,14 +677,14 @@ TEM T legendreP(int l, int m, T ct, T st){
 		}
 	}
 
-	// In the case that m<0, 
-	// compute P_n^{-|m|}(x) by the formula 
-	//		P_l^{-|m|}(x) = (-1)^{|m|}((l-|m|)!/(l+|m|)!)^{1/2} P_l^{|m|}(x).
-	// NOTE: when l and |m| are large, we risk numerical underflow...
-	if(m<0){
-		for(int i=l-M+1; i<=l+M; ++i) P *= 1. / i;
-		if(al::odd(M)) P = -P;
-	}
+//	// In the case that m<0, 
+//	// compute P_n^{-|m|}(x) by the formula 
+//	//		P_l^{-|m|}(x) = (-1)^{|m|}((l-|m|)!/(l+|m|)!)^{1/2} P_l^{|m|}(x).
+//	// NOTE: when l and |m| are large, we risk numerical underflow...
+//	if(m<0){
+//		for(int i=l-M+1; i<=l+M; ++i) P *= 1. / i;
+//		if(al::odd(M)) P = -P;
+//	}
 
 	return P;
 }

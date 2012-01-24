@@ -124,24 +124,8 @@ public:
 	/// @param[in] cphi		longitudinal complex angle in [0,pi] (in upper half-plane)
 	template <class T>
 	Complex<T> operator()(int l, int m, const Complex<T>& ctheta, const Complex<T>& cphi) const {
-		
-//		Complex<T> res(1, 0);
-//		
-//		// compute e^im recursively
-//		// TODO: this could be turned into a table lookup
-//		for(int i=0; i<al::abs(m); ++i){
-//			res *= ctheta;
-//		}
-//		
-//		//T arg = ctheta.arg();
-//		//Complex<T> res;
-//		//res.fromPolar(arg*m);
-//		
-//		if(m < 0) res.i = -res.i;
-
-		return coef(l,m) * al::legendreP(l,m, cphi.r, cphi.i) * expim(m, ctheta);
+		return coef(l,m) * al::legendreP(l, al::abs(m), cphi.r, cphi.i) * expim(m, ctheta);
 	}
-
 
 	template <class T>
 	static Complex<T> expim(int m, const Complex<T>& ctheta){
@@ -152,10 +136,6 @@ public:
 		for(int i=0; i<al::abs(m); ++i){
 			res *= ctheta;
 		}
-
-		//T arg = ctheta.arg();
-		//Complex<T> res;
-		//res.fromPolar(arg*m);
 		
 		if(m < 0) res.i = -res.i;
 		return res;
@@ -169,7 +149,10 @@ public:
 
 	/// Get normalization coefficient (calculated)
 	static double coefCalc(int l, int m){
-		return ::sqrt((2*l + 1) / M_4PI) * al::factorialSqrt(l-m) / al::factorialSqrt(l+m); }
+		int M = al::abs(m);
+		double res = ::sqrt((2*l + 1) / M_4PI) * al::factorialSqrt(l-M) / al::factorialSqrt(l+M);
+		return (M<0 && al::odd(M)) ? -res : res;
+	}
 
 private:
 	// this holds precomputed coefficients for each basis

@@ -681,7 +681,7 @@ int utMath(){
 
 		// test associated legendre
 		for(int l=0; l<=3; ++l){
-		for(int m=-l; m<=l; ++m){
+		for(int m=0; m<=l; ++m){
 		for(int i=0; i<M; ++i){
 			double theta = double(i)*M_PI / M;
 			double a = al::legendreP(l, m, theta);
