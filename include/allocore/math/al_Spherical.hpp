@@ -106,7 +106,7 @@ typedef SphereCoord<double> SphereCoordd;
 /// surface of a 2-sphere. The solutions are complex functions parameterized by
 /// two integers, l and m, and two angles defining an orientation in space.
 /// The l number determines the number of nodal lines (circles with zero 
-/// magnitude) and m determines the number of longitudinal nodal lines
+/// magnitude) and m determines the number of latitudinal nodal lines
 /// (geodesics intersecting the z axis). When |m| = l, the harmonics are "beach
 /// ball"-like (sectoral) and when m = 0, the harmonics are "target"-like
 /// (zonal). Other values of m produce a checkerboard pattern (tesseral).
@@ -119,9 +119,9 @@ public:
 	}
 
 	/// @param[in] l		number of nodal lines
-	/// @param[in] m		number of longitudinal nodal lines, |m| <= l
-	/// @param[in] ctheta	latitudinal complex angle
-	/// @param[in] cphi		longitudinal complex angle in [0,pi] (in upper half-plane)
+	/// @param[in] m		number of latitudinal nodal lines, |m| <= l
+	/// @param[in] ctheta	longitudinal complex angle in [0, 2pi]
+	/// @param[in] cphi		latitudinal complex angle in [0,pi]
 	template <class T>
 	Complex<T> operator()(int l, int m, const Complex<T>& ctheta, const Complex<T>& cphi) const {
 		return coef(l,m) * al::legendreP(l, al::abs(m), cphi.r, cphi.i) * expim(m, ctheta);
