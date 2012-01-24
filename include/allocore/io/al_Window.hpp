@@ -275,6 +275,7 @@ public:
 	bool enabled(DisplayMode v) const;			///< Get whether display mode flag is set
 	bool fullScreen() const;					///< Get whether window is in fullscreen
 	double fps() const;							///< Returns frames/second (requested)
+	double fpsActual() const { return 1./spfActual(); }	///< Returns frames/second (actual)
 	double avgFps() const;						///< Returns frames/second (running average)
 	double spf() const { return 1./fps(); }		///< Returns seconds/frame (requested)
 	double spfActual() const;					///< Returns seconds/frame (actual)
