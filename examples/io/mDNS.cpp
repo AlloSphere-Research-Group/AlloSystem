@@ -22,13 +22,19 @@ mdns::Service zservice("Allocore mDNS Test", 4110, type);
 // a Client can browse and report available services for a given service type:
 mdns::Client z(type);
 
+void tick(al_sec t) {
+	z.poll();
+	zservice.poll();
+
+	MainLoop::queue().send(0.5, tick);
+}
+
 int main(){
 	printf("starting on %s\n", Socket::hostName().c_str());
 	
-	while (1) {
-		z.poll();
-		zservice.poll();
-		al_sleep(0.1);
-	}
+	//tick(0);
+	
+	MainLoop::start();
+	
 	return 0;
 }

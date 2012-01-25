@@ -33,7 +33,6 @@
 		
 		[browser searchForServicesOfType:@"_osc._udp" inDomain:@""];
 
-		[[NSRunLoop currentRunLoop] run];
 		//[browser scheduleInRunLoop:loop forMode:NSDefaultRunLoopMode];
 		//[loop run];		
 		
@@ -207,7 +206,7 @@ class Service::Impl : public ImplBase {
 public:
 	Impl(Service * master, const std::string& name, const std::string& host, uint16_t port, const std::string& type, const std::string& domain) 
 	:	ImplBase(), name(name), host(host), type(type), domain(domain), port(port), master(master) {
-		//NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+		NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 		delegate = [[ServerDelegate alloc] 
 			initWithDomain:CPP_STRING_TO_NSSTRING(domain) 
 			type:CPP_STRING_TO_NSSTRING(type) 
@@ -215,7 +214,7 @@ public:
 			port:(port)
 		];
 		//printf("delegate %p\n", delegate);
-		//[pool release];
+		[pool release];
 	}
 	
 	virtual ~Impl() {
