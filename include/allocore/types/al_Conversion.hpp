@@ -273,6 +273,9 @@ inline float intToUnit(int16_t v){
 template<int NumBytes> void swapBytesN(void * word);
 
 template<>
+inline void swapBytesN<1>(void * word){}
+
+template<>
 inline void swapBytesN<2>(void * word){
 	uint16_t& v = *(uint16_t *)word;
 	v = (v >> 8) | (v << 8);
@@ -282,8 +285,8 @@ template<>
 inline void swapBytesN<4>(void * word){
 	uint32_t& v = *(uint32_t *)word;
 	v	= ((v >> 24))
-		| ((v >>  8) & 0x0000ff00)
-		| ((v <<  8) & 0x00ff0000)
+		| ((v >>  8) & 0x0000ff00UL)
+		| ((v <<  8) & 0x00ff0000UL)
 		| ((v << 24));
 }
 
@@ -307,25 +310,6 @@ template<class T>
 inline void swapBytes(T * data, unsigned count){
 	for(unsigned i=0; i<count; ++i) swapBytes(data[i]);
 }
-
-template<unsigned N>
-inline void swapbytesN(void * ptr) {
-	char in[N], out[N];
-	memcpy(in, ptr, N);
-	for (unsigned i=0; i<N; i++) out[i] = in[N-1-i];
-	memcpy(ptr, out, N);
-}
-
-template<typename T>
-inline void swapbytes(T * ptr) { swapbytesN<sizeof(T)>(ptr); }
-
-template<typename T>
-inline void swapbytes(T * data, unsigned count) {
-	for (unsigned i=0; i<count; i++) swapbytes(data+i);
-}
-
-#undef bswap_16
-#undef bswap_32
 
 template <class T>
 std::string toString(const T * v, int n, int s){

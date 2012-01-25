@@ -344,7 +344,7 @@ void Client::poll(al_sec timeout) {
 }
 
 Service::Service(const std::string& name, uint16_t port, const std::string& type, const std::string& domain) {
-	mImpl = new Impl(this, name, Socket::hostIP(), port, type, domain);
+	mImpl = new Impl(this, name, Socket::hostName(), port, type, domain);
 }
 
 Service::~Service() {

@@ -235,21 +235,21 @@ MRCHeader& mrcParse(const char * data, Array& array) {
 	// ugh.
 	if (swapped) {
 		printf("swapping byte order...\n");
-		swapbytes(&header.nx, 10);
-		swapbytes(&header.xlen, 6);
-		swapbytes(&header.mapx, 3);
-		swapbytes(&header.amin, 3);
-		swapbytes(&header.ispg, 2);
-		swapbytes(&header.next, 1);
-		swapbytes(&header.creatid, 1);
-		swapbytes(&header.nint, 4);
-		swapbytes(&header.min2, 4);
-		swapbytes(&header.imodStamp, 2);
-		swapbytes(&header.idtype, 6);
-		swapbytes(&header.tiltangles[0], 6);
-		swapbytes(&header.origin[0], 3);
-		swapbytes(&header.rms, 1);
-		swapbytes(&header.nlabl, 1);
+		swapBytes(&header.nx, 10);
+		swapBytes(&header.xlen, 6);
+		swapBytes(&header.mapx, 3);
+		swapBytes(&header.amin, 3);
+		swapBytes(&header.ispg, 2);
+		swapBytes(&header.next, 1);
+		swapBytes(&header.creatid, 1);
+		swapBytes(&header.nint, 4);
+		swapBytes(&header.min2, 4);
+		swapBytes(&header.imodStamp, 2);
+		swapBytes(&header.idtype, 6);
+		swapBytes(&header.tiltangles[0], 6);
+		swapBytes(&header.origin[0], 3);
+		swapBytes(&header.rms, 1);
+		swapBytes(&header.nlabl, 1);
 	}
 	
 	printf("NX %d NY %d NZ %d\n", header.nx, header.ny, header.nz);
@@ -302,16 +302,16 @@ MRCHeader& mrcParse(const char * data, Array& array) {
 		// set type:
 		switch (header.mode) {
 			case MRC_IMAGE_SINT8:
-				swapbytes((int8_t *)array.data.ptr, array.cells());
+				swapBytes((int8_t *)array.data.ptr, array.cells());
 				break;
 			case MRC_IMAGE_SINT16:
-				swapbytes((int16_t *)array.data.ptr, array.cells());
+				swapBytes((int16_t *)array.data.ptr, array.cells());
 				break;
 			case MRC_IMAGE_FLOAT32:
-				swapbytes((float_t *)array.data.ptr, array.cells());
+				swapBytes((float_t *)array.data.ptr, array.cells());
 				break;
 			case MRC_IMAGE_UINT16:
-				swapbytes((uint16_t *)array.data.ptr, array.cells());
+				swapBytes((uint16_t *)array.data.ptr, array.cells());
 				break;
 			default:
 				break;
