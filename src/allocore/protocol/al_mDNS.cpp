@@ -136,7 +136,7 @@ public:
 		        return;
 
 		    case AVAHI_BROWSER_NEW:
-				self->master->onServiceNew(name, type, domain);
+				self->master->onServiceNew(name);
 
 				/* We ignore the returned resolver object. In the callback
 				   function we free it. If the server is terminated before
@@ -148,7 +148,7 @@ public:
 		        break;
 
 		    case AVAHI_BROWSER_REMOVE:
-				self->master->onServiceRemove(name, type, domain);
+				self->master->onServiceRemove(name);
 		        break;
 
 		    case AVAHI_BROWSER_ALL_FOR_NOW:

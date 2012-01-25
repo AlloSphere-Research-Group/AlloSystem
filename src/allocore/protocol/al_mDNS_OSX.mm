@@ -14,6 +14,8 @@
     NSMutableArray *services;
 	BOOL isConnected;
 	NSRunLoop *loop;
+	
+	al::mdns::Client * master;
 }
 
 -(void)search;
@@ -22,22 +24,19 @@
 
 @implementation ClientDelegate
 
--(id)initWithDomain:(NSString *) domain type:(NSString *)type {
+-(id)initWithDomain:(NSString *) domain type:(NSString *)type master:(al::mdns::Client *)ptr {
 	if ((self = [super init])){
+		master = ptr;
 		services = [NSMutableArray new];
-		NSLog(@"allocated browsersssszzzzzzzzzzzzz");
+		//NSLog(@"allocated browsersssszzzzzzzzzzzzz");
 		//browser = [[NSNetServiceBrowser new] autorelease];
 		browser = [NSNetServiceBrowser new];
 		browser.delegate = self;
-		//loop = [[NSRunLoop alloc] init];
-		
-		[browser searchForServicesOfType:@"_osc._udp" inDomain:@""];
+		[browser searchForServicesOfType:type inDomain:domain];
 
 		//[browser scheduleInRunLoop:loop forMode:NSDefaultRunLoopMode];
 		//[loop run];		
 		
-		NSLog(@"after starting search!");
-
 		isConnected = NO;
 		//[self search];
 		//[self performSelector:@selector(search) withObject:nil afterDelay:3];
@@ -47,12 +46,9 @@
 	return self;
 }
 
--(void)search {
-	NSLog(@"searching");
-}
+-(void)search {}
 
 -(void)dealloc {
-	NSLog(@"DEALLOCATED");
 	[loop release];
 	//self.connectedService = nil;
     //self.browser = nil;
@@ -63,37 +59,37 @@
 }
 
 #pragma mark Net Service Browser Delegate Methods
-- (void)netServiceBrowserWillSearch:(NSNetServiceBrowser *)aNetServiceBrowser {
-	NSLog(@"netServiceBrowserWillSearch: %@", aNetServiceBrowser);
-}
-- (void)netServiceBrowserDidStopSearch:(NSNetServiceBrowser *)aNetServiceBrowser {
-	NSLog(@"netServiceBrowserDidStopSearch: %@", aNetServiceBrowser);
-}
+//- (void)netServiceBrowserWillSearch:(NSNetServiceBrowser *)aNetServiceBrowser {
+//	NSLog(@"netServiceBrowserWillSearch: %@", aNetServiceBrowser);
+//}
+//- (void)netServiceBrowserDidStopSearch:(NSNetServiceBrowser *)aNetServiceBrowser {
+//	NSLog(@"netServiceBrowserDidStopSearch: %@", aNetServiceBrowser);
+//}
 - (void)netServiceBrowser:(NSNetServiceBrowser *)aNetServiceBrowser didNotSearch:(NSDictionary *)errorDict {
 	NSLog(@"didNotSearch: %@", errorDict);
 }
-- (void)netServiceBrowser:(NSNetServiceBrowser *)aNetServiceBrowser didFindDomain:(NSString *)domainString moreComing:(BOOL)moreComing {
-	NSLog(@"didFindDomain: %@ %@", domainString, moreComing);
-}
-- (void)netServiceBrowser:(NSNetServiceBrowser *)aNetServiceBrowser didFindService:(NSNetService *)aNetService moreComing:(BOOL)moreComing {
-	NSLog(@"didFindService: %@ %@", aNetService, moreComing);
-	
-	[services addObject:aNetService];
-
+//- (void)netServiceBrowser:(NSNetServiceBrowser *)aNetServiceBrowser didFindDomain:(NSString *)domainString moreComing:(BOOL)moreComing {
+//	NSLog(@"didFindDomain: %@ %@", domainString, moreComing);
+//}
+- (void)netServiceBrowser:(NSNetServiceBrowser *)aNetServiceBrowser didFindService:(NSNetService *)service moreComing:(BOOL)moreComing {
+	//NSLog(@"didFindService: %@ %@", aNetService, moreComing);
+	[services addObject:service];
 	//NSNetService *remoteService = [services objectAtIndex:0];
-    aNetService.delegate = self;
-    [aNetService resolveWithTimeout:0];
+    service.delegate = self;
+    [service resolveWithTimeout:0];
+	master->onServiceNew([[service name] UTF8String]);
 }
-- (void)netServiceBrowser:(NSNetServiceBrowser *)aNetServiceBrowser didRemoveDomain:(NSString *)domainString moreComing:(BOOL)moreComing {
-	NSLog(@"didRemoveDomain: %@ %@", domainString, moreComing);
+- (void)netServiceBrowser:(NSNetServiceBrowser *)aNetServiceBrowser didRemoveService:(NSNetService *)service moreComing:(BOOL)moreComing {
+	//NSLog(@"didRemoveService: %@ %@", aNetService, moreComing);
+	master->onServiceRemove([[service name] UTF8String]);
 }
-- (void)netServiceBrowser:(NSNetServiceBrowser *)aNetServiceBrowser didRemoveService:(NSNetService *)aNetService moreComing:(BOOL)moreComing {
-	NSLog(@"didRemoveService: %@ %@", aNetService, moreComing);
-}
+//- (void)netServiceBrowser:(NSNetServiceBrowser *)aNetServiceBrowser didRemoveDomain:(NSString *)domainString moreComing:(BOOL)moreComing {
+//	NSLog(@"didRemoveDomain: %@ %@", domainString, moreComing);
+//}
 
 -(void)netServiceDidResolveAddress:(NSNetService *)service {
-	NSLog(@"CONNECTED");
-	NSLog(service.domain);
+	//NSLog(@"CONNECTED");
+	//NSLog(service.domain);
     //self.isConnected = YES;
     //self.connectedService = service;
 	
@@ -105,11 +101,8 @@
 		name = [service name];
 		socketAddress = (struct sockaddr_in *)[d bytes];
 		char * ipaddress = inet_ntoa(socketAddress->sin_addr);
-		NSString *ipString = [NSString stringWithFormat: @"%s", ipaddress];	
-	
-		//ipString = [NSString stringWithFormat: @"%s",inet_ntoa (socketAddress->sin_addr)];
 		port = ntohs(socketAddress->sin_port); // ntohs converts from network byte order to host byte order 
-		NSLog(@"Server found is %@ %d",ipString,port);
+		master->onServiceResolved([name UTF8String], [[service hostName] UTF8String], port, ipaddress);
 	}
 }
 
@@ -151,19 +144,19 @@
     NSLog(@"Failed to publish: %@", dict);
 }
 - (void)netServiceWillPublish:(NSNetService *)sender {
-	NSLog(@"Will publish: %@", sender);
+	//NSLog(@"Will publish: %@", sender);
 }
 - (void)netServiceWillResolve:(NSNetService *)sender { 
-	NSLog(@"Will resolve: %@", sender);
+	//NSLog(@"Will resolve: %@", sender);
 }
 - (void)netServiceDidResolveAddress:(NSNetService *)sender {
-	NSLog(@"netServiceDidResolveAddress: %@", sender);
+	//NSLog(@"netServiceDidResolveAddress: %@", sender);
 }
 - (void)netService:(NSNetService *)sender didNotResolve:(NSDictionary *)errorDict {
-	NSLog(@"netServiceDidResolveAddress: %@", errorDict);
+	//NSLog(@"netServiceDidResolveAddress: %@", errorDict);
 }
 - (void)netServiceDidStop:(NSNetService *)sender {
-	NSLog(@"netServiceDidStop: %@", sender);
+	//NSLog(@"netServiceDidStop: %@", sender);
 }
 
 @end
@@ -187,8 +180,8 @@ public:
 		delegate = [[ClientDelegate alloc]
 			initWithDomain:CPP_STRING_TO_NSSTRING(domain)
 			type:CPP_STRING_TO_NSSTRING(type)
+			master:master
 		];
-		printf("delegate %p\n", delegate);
 		[pool release];
 	}
 	virtual ~Impl() {
@@ -213,7 +206,6 @@ public:
 			name:CPP_STRING_TO_NSSTRING(name) 
 			port:(port)
 		];
-		//printf("delegate %p\n", delegate);
 		[pool release];
 	}
 	

@@ -58,11 +58,11 @@ public:
 	void poll(al_sec timeout=0);
 
 	///! called when a new device is added:
-	virtual void onServiceNew(const std::string& name, const std::string& type, const std::string& domain) {
-		printf("Zeroconf: new service '%s' of type '%s' in domain '%s'\n", name.c_str(), type.c_str(), domain.c_str());
+	virtual void onServiceNew(const std::string& name) {
+		printf("New service '%s' of type '%s' in domain '%s'\n", name.c_str(), type.c_str(), domain.c_str());
 	}
 
-	virtual void onServiceRemove(const std::string& name, const std::string& type, const std::string& domain) {
+	virtual void onServiceRemove(const std::string& name) {
 		printf("Zeroconf: removed service '%s' of type '%s' in domain '%s'\n", name.c_str(), type.c_str(), domain.c_str());
 	}
 
