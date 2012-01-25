@@ -17,6 +17,33 @@ int utTypesConversion(){
 	assert(bitsToUInt("10") == 2);
 	assert(bitsToUInt("11") == 3);
 
+//	{
+//		uint16_t v2 = 0x0123;
+//		swapBytes(v2);
+//		assert(v2 == 0x2301);
+//	
+//		uint32_t v4 = 0x01234567;
+//		swapBytes(v4);
+//		assert(v4 == 0x67452301);
+//
+//		uint64_t v8 = 0x0123456789abcdefULL;
+//		swapBytes(v8);
+//		assert(v8 == 0xefcdab8967452301ULL);
+//		
+//		union{
+//			int32_t i;
+//			float f;
+//		} u;
+//		
+//		u.i = 0x01234567;
+//		swapBytes(u.f);
+//		assert(u.i == 0x67452301);
+//	}
+
+	assert(toString(1) == "1");
+	assert(toString(1.1) == "1.1");
+	assert(toString(-1.1) == "-1.1");
+
 	// Signed 16-bit integer and unit real conversions
 	for(int i=-32768; i<32768; ++i){
 		float f = float(i)/32768;
@@ -43,10 +70,6 @@ int utTypesConversion(){
 	assert(unitToUInt8(1./8) ==  32);
 	assert(unitToUInt8(1./4) ==  64);
 	assert(unitToUInt8(1./2) == 128);
-
-	assert(toString(1) == "1");
-	assert(toString(1.1) == "1.1");
-	assert(toString(-1.1) == "-1.1");
 
 	return 0;
 }
