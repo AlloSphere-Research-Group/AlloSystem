@@ -13,13 +13,14 @@ Graham Wakefield, 2012
 
 using namespace al;
 
-std::string type("_http._tcp"); // "_osc._udp", "_ssh._tcp"
+//std::string type("_http._tcp"); // 
+std::string type("_osc._udp"); //, "_ssh._tcp"
+
+// a Service can publish a service on this machine:
+mdns::Service zservice("Allocore mDNS Test", 4110, type);
 
 // a Client can browse and report available services for a given service type:
 mdns::Client z(type);
-
-// a Service can publish a service on this machine:
-mdns::Service zservice("mDNS TEST", Socket::hostIP(), 4110, type);
 
 int main(){
 	printf("starting on %s\n", Socket::hostIP().c_str());

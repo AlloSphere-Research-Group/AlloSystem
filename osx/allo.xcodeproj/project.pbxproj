@@ -155,6 +155,8 @@
 		16C137C31469B83200D8AE8B /* al_ControlGLV.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C137C21469B83200D8AE8B /* al_ControlGLV.cpp */; };
 		16C70699135D13F400FEE5B3 /* helloVirtualWorld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C70697135D13DF00FEE5B3 /* helloVirtualWorld.cpp */; };
 		16C706AE135D148800FEE5B3 /* reverb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168B4E811331383A0076257A /* reverb.cpp */; };
+		3604412414CF5A6F00C95A2F /* allua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3604412314CF5A6F00C95A2F /* allua.cpp */; };
+		3604426314CF672500C95A2F /* al_mDNS_OSX.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3604426214CF672500C95A2F /* al_mDNS_OSX.mm */; };
 		360C243811E6599F000FF335 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		360C243911E6599F000FF335 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		360C243A11E6599F000FF335 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
@@ -491,6 +493,13 @@
 			remoteGlobalIDString = 36035DB813037E8D001E9BA9;
 			remoteInfo = "make allocore";
 		};
+		3604412714CF5AA400C95A2F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 36035DB813037E8D001E9BA9;
+			remoteInfo = "make allocore";
+		};
 		36115B1D1438DE3400E121BF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
@@ -800,6 +809,11 @@
 		36035CBE130372AD001E9BA9 /* tttags.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tttags.h; sourceTree = "<group>"; };
 		36035CBF130372AD001E9BA9 /* ttunpat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ttunpat.h; sourceTree = "<group>"; };
 		36035CC0130372AD001E9BA9 /* ft2build.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ft2build.h; sourceTree = "<group>"; };
+		3604411714CF5A0E00C95A2F /* allua */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = allua; sourceTree = BUILT_PRODUCTS_DIR; };
+		3604412314CF5A6F00C95A2F /* allua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = allua.cpp; sourceTree = "<group>"; };
+		360441AB14CF5BA200C95A2F /* al_Lua.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Lua.hpp; sourceTree = "<group>"; };
+		360441AC14CF5BA200C95A2F /* al_ResourceManager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_ResourceManager.hpp; sourceTree = "<group>"; };
+		3604426214CF672500C95A2F /* al_mDNS_OSX.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = al_mDNS_OSX.mm; sourceTree = "<group>"; };
 		360C244411E6599F000FF335 /* exCompiler */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exCompiler; sourceTree = BUILT_PRODUCTS_DIR; };
 		360C404E11D32FED002FE91F /* al_Matrix4.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Matrix4.hpp; sourceTree = "<group>"; };
 		36115B381438DE3400E121BF /* exSimpleGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exSimpleGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1371,6 +1385,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		3604411514CF5A0E00C95A2F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		360C243711E6599F000FF335 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1851,6 +1872,7 @@
 		08FB7794FE84155DC02AAC07 /* alscheduling */ = {
 			isa = PBXGroup;
 			children = (
+				3604412014CF5A2E00C95A2F /* allua */,
 				16B94F901305D78900CE396B /* allocore */,
 				16B94F8F1305D76F00CE396B /* alloutil */,
 				36C9E8871491FBB1002C8638 /* allonect */,
@@ -2158,6 +2180,7 @@
 				36C9EA6214922511002C8638 /* soundprobe */,
 				3696E34014BFA31900D21F2A /* mdns */,
 				3669723C14C8765D00B82A38 /* exMRC */,
+				3604411714CF5A0E00C95A2F /* allua */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2289,6 +2312,32 @@
 			path = services;
 			sourceTree = "<group>";
 		};
+		3604412014CF5A2E00C95A2F /* allua */ = {
+			isa = PBXGroup;
+			children = (
+				3604412114CF5A3C00C95A2F /* include */,
+				3604412214CF5A4C00C95A2F /* src */,
+			);
+			name = allua;
+			sourceTree = "<group>";
+		};
+		3604412114CF5A3C00C95A2F /* include */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = include;
+			path = ../include/allua;
+			sourceTree = SOURCE_ROOT;
+		};
+		3604412214CF5A4C00C95A2F /* src */ = {
+			isa = PBXGroup;
+			children = (
+				3604412314CF5A6F00C95A2F /* allua.cpp */,
+			);
+			name = src;
+			path = ../src/allua;
+			sourceTree = SOURCE_ROOT;
+		};
 		361BF03011DEAA9400E60A9C /* pending */ = {
 			isa = PBXGroup;
 			children = (
@@ -2350,6 +2399,7 @@
 			children = (
 				3622BEE8116D527D00928703 /* Makefile.config */,
 				3696E31614BFA2F500D21F2A /* al_mDNS.cpp */,
+				3604426214CF672500C95A2F /* al_mDNS_OSX.mm */,
 				3622BEE5116D527D00928703 /* al_OSC.cpp */,
 				3622BEE7116D527D00928703 /* al_Serialize.cpp */,
 				16DD16FE14C7C85A00F361F9 /* al_XML.cpp */,
@@ -3030,10 +3080,12 @@
 				366E78071405C75B0010B21A /* al_FileWatcher.hpp */,
 				36CE482E1394374C00DF6E6F /* al_FrameBufferGL.hpp */,
 				366E78081405C75B0010B21A /* al_FPS.hpp */,
+				360441AB14CF5BA200C95A2F /* al_Lua.hpp */,
 				366E78091405C75B0010B21A /* al_Navigator.hpp */,
 				36CE482F1394378000DF6E6F /* al_OpenGL.hpp */,
 				366E780A1405C75B0010B21A /* al_OverlayTextGL.hpp */,
 				16ED651414C64DF5002318E0 /* al_ProtoApp.hpp */,
+				360441AC14CF5BA200C95A2F /* al_ResourceManager.hpp */,
 				366E780B1405C75B0010B21A /* al_ShotList.hpp */,
 				36A2AE4F141850A800479687 /* al_TextureGL.hpp */,
 			);
@@ -3179,6 +3231,23 @@
 			name = unitTests;
 			productName = unitTests;
 			productReference = 16AC529711628D0E0076AA8B /* unitTests */;
+			productType = "com.apple.product-type.tool";
+		};
+		3604411614CF5A0E00C95A2F /* allua */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3604411F14CF5A1800C95A2F /* Build configuration list for PBXNativeTarget "allua" */;
+			buildPhases = (
+				3604411414CF5A0E00C95A2F /* Sources */,
+				3604411514CF5A0E00C95A2F /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3604412814CF5AA400C95A2F /* PBXTargetDependency */,
+			);
+			name = allua;
+			productName = allua;
+			productReference = 3604411714CF5A0E00C95A2F /* allua */;
 			productType = "com.apple.product-type.tool";
 		};
 		360C243211E6599F000FF335 /* exCompiler */ = {
@@ -3545,6 +3614,7 @@
 				36C9EA4C14922511002C8638 /* soundprobe */,
 				3696E32614BFA31900D21F2A /* mdns */,
 				3669722414C8765D00B82A38 /* exMRC */,
+				3604411614CF5A0E00C95A2F /* allua */,
 			);
 		};
 /* End PBXProject section */
@@ -3624,6 +3694,15 @@
 				168C163E1322C656006D79CC /* utGraphicsMesh.cpp in Sources */,
 				168C16411322C755006D79CC /* utGraphicsDraw.cpp in Sources */,
 				168E742A1329999D003115DD /* unitTests.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3604411414CF5A0E00C95A2F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3604412414CF5A6F00C95A2F /* allua.cpp in Sources */,
+				3604426314CF672500C95A2F /* al_mDNS_OSX.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3838,6 +3917,11 @@
 			isa = PBXTargetDependency;
 			target = 36035DB813037E8D001E9BA9 /* make allocore */;
 			targetProxy = 168B4F0D133180520076257A /* PBXContainerItemProxy */;
+		};
+		3604412814CF5AA400C95A2F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 36035DB813037E8D001E9BA9 /* make allocore */;
+			targetProxy = 3604412714CF5AA400C95A2F /* PBXContainerItemProxy */;
 		};
 		36115B1C1438DE3400E121BF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -4143,6 +4227,56 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				PRODUCT_NAME = "make allocore";
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		3604411914CF5A0E00C95A2F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = (
+					"-lallocore",
+					"-lalloutil",
+					"-lapr-1",
+					"-llua",
+					"-framework",
+					Cocoa,
+					"-framework",
+					GLUT,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = allua;
+			};
+			name = Debug;
+		};
+		3604411A14CF5A0E00C95A2F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = (
+					"-lallocore",
+					"-lalloutil",
+					"-lapr-1",
+					"-llua",
+					"-framework",
+					Cocoa,
+					"-framework",
+					GLUT,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = allua;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -5060,6 +5194,15 @@
 			buildConfigurations = (
 				36035DB913037E8E001E9BA9 /* Debug */,
 				36035DBA13037E8E001E9BA9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3604411F14CF5A1800C95A2F /* Build configuration list for PBXNativeTarget "allua" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3604411914CF5A0E00C95A2F /* Debug */,
+				3604411A14CF5A0E00C95A2F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

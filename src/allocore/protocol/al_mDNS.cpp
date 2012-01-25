@@ -1,7 +1,12 @@
 
 #include "allocore/protocol/al_mDNS.hpp"
 
-#ifdef AL_LINUX
+#include <stdio.h>
+#include <stdlib.h>
+
+// On OSX these are implemented in al_mDNS_OSX.mm instead
+#ifndef AL_OSX
+
 #include <avahi-client/client.h>
 #include <avahi-client/publish.h>
 #include <avahi-client/lookup.h>
@@ -11,17 +16,9 @@
 #include <avahi-common/error.h>
 #include <avahi-common/alternative.h>
 #include <avahi-common/timeval.h>
-#else
-
-#endif
-
-#include <stdio.h>
-#include <stdlib.h>
 
 using namespace al;
 using namespace al::mdns;
-
-#ifdef AL_LINUX
 
 template <typename Subclass>
 class ImplBase {
@@ -333,39 +330,6 @@ public:
 	Service * master;
 };
 
-#else
-
-class ImplBase {
-public:
-
-};
-
-///! TODO: OSX
-class Client::Impl : public ImplBase {
-public:
-	
-	Impl(Client * master) : ImplBase(), master(master) {}
-	virtual ~Impl() {}
-
-	void poll(al_sec timeout) {}
-
-	Client * master;
-};
-
-class Service::Impl : public ImplBase {
-public:
-	Impl(Service * master, const std::string& name, const std::string& host, uint16_t port, const std::string& type, const std::string& domain) 
-	:	ImplBase(), name(name), host(host), type(type), domain(domain), port(port), master(master) {}
-	
-	virtual ~Impl() {}
-	
-	std::string name, host, type, domain;
-	uint16_t port;
-	Service * master;
-};
-
-#endif
-
 Client::Client(const std::string& type, const std::string& domain) 
 :	type(type), domain(domain) {
 	mImpl = new Impl(this);
@@ -379,10 +343,18 @@ void Client::poll(al_sec timeout) {
 	mImpl->poll(timeout);
 }
 
-Service::Service(const std::string& name, const std::string& host, uint16_t port, const std::string& type, const std::string& domain) {
-	mImpl = new Impl(this, name, host, port, type, domain);
+Service::Service(const std::string& name, uint16_t port, const std::string& type, const std::string& domain) {
+	mImpl = new Impl(this, name, Socket::hostIP(), port, type, domain);
 }
 
 Service::~Service() {
 	delete mImpl;
 }
+
+void Service::poll(al_sec timeout) {
+	mImpl->poll(timeout);
+}
+
+
+// end of non-OSX implementation
+#endif

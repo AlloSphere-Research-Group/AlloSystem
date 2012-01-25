@@ -75,13 +75,18 @@ protected:
 	Impl * mImpl;
 };
 
-class Service : public Client {
+class Service {
 public:
 	class Impl;
 
-	Service(const std::string& name, const std::string& host, uint16_t port=4110, const std::string& type="_osc._udp.", const std::string& domain="local.");
+	Service(const std::string& name, uint16_t port=4110, const std::string& type="_osc._udp.", const std::string& domain="local.");
 
 	virtual ~Service();
+	
+	///! if timeout = 0, non-blocking
+	///! if timeout < 0, block until first event
+	///! if timeout > 0, block until next event or timeout seconds elapsed
+	void poll(al_sec timeout=0);
 
 protected:
 	Impl * mImpl;

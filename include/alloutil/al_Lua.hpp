@@ -55,6 +55,52 @@ public:
 			L = 0;
 		}
 	}
+
+	///! allow the Lua object to be used in place of a lua_State *
+	operator lua_State *() { return L; }
+	operator const lua_State *() { return L; }
+	
+	///! push a value onto the Lua stack:
+	template<typename T>
+	Lua& push(T v);
+	///! push nil onto the Lua stack:
+	Lua& push() { lua_pushnil(L); return *this; }
+	
+	///! get value from Lua stack:
+	///! indices from 1 .. top()
+	///! negative indices count backwards from -1 == top()
+	template<typename T>
+	T to(int idx=-1);
+	
+	///! get number of items on the stack:
+	int top() { return lua_gettop(L); }
+	
+	///! remove N elements from top of stack:
+	Lua& pop(int n=1) { lua_pop(L, n); return *this; }
+	
+	///! set value to be a named global
+	template<typename T>
+	Lua& setglobal(const std::string& name, T value);
+	
+	///! set stack top value to be a named global
+	/// pops value from stack
+	Lua& setglobal(const std::string& name);
+
+	///! call function with N args
+	/// function should be at stack index (top - n)
+	/// catches errors and prints a traceback to stdout
+	/// returns 0 if no errors
+	int pcall(lua_State * L, int n);
+
+	///! runs a string of code
+	/// catches errors and prints to stdout
+	/// returns 0 if no errors
+	int dostring(const std::string& code);
+
+	///! loads and runs code from a file
+	/// catches errors and prints to stdout
+	/// returns 0 if no errors
+	int dofile(const std::string& path);
 	
 	template<typename T, int (T::*M)(lua_State *)>
 	struct Bind {
@@ -66,72 +112,89 @@ public:
 		}
 	};
 	
-	
 	template <typename T>
 	Lua& pushmethod(T * self, int (T::*M)(lua_State *)) {
 		lua_pushlightuserdata(L, self);
 		printf("self %p, %p", self, &Bind<T, M>::method);
 		lua_pushcclosure(L, &Bind<T, M>::method, 1);
-		
 		// test it:
-		
-		
 		return *this;
 	}
 	
-	Lua& setglobal(const std::string& name) {
-        lua_setglobal(L, name.c_str());
-        return *this;
-	}
-
-	Lua& setglobal(const std::string& name, std::string& value) {
-        lua_pushstring(L, value.c_str());
-        setglobal(name.c_str());
-        return *this;
-	}
-
-	int lerror(lua_State * L, int err) {
-		if (err) {
-			printf("error: %s\n", lua_tostring(L, -1));
-			lua_pop(L, 1);
-		}
-		return err;
-	}
-
-	int pcall(lua_State * L, int nargs) {
-		int debug_idx = -nargs-3;
-		// put debug.traceback just below the function & args
-		{
-			lua_getglobal(L, "debug");
-			lua_pushliteral(L, "traceback");
-			lua_gettable(L, -2);
-			lua_insert(L, debug_idx);
-			lua_pop(L, 1); // pop debug table
-		}
-		int top = lua_gettop(L);
-		int res = lerror(L, lua_pcall(L, nargs, LUA_MULTRET, -nargs-2));
-		int nres = lua_gettop(L) - top;
-	//	int nres = lua_gettop(L) - top + nargs + 1;
-		lua_remove(L, -(nres+nargs+2)); // remove debug function from stack
-		return res;
-	}
-
-	int dostring(const std::string& code, int nargs=0) {
-		return lerror(L, luaL_loadstring(L, code.c_str())) || pcall(L, nargs);
-	}
-
-	int dofile(const std::string& path, int nargs=0) {
-		return lerror(L, luaL_loadfile(L, path.c_str())) || pcall(L, nargs);
-	}
-
-	///! allow the Lua object to be used in place of a lua_State *
-	operator lua_State *() { return L; }
-	operator const lua_State *() { return L; }
+	int lerror(int err);
 
 protected:
 	lua_State * L;
 	bool mOwner;
 };
+
+template<> inline Lua& Lua::push(const std::string str) { lua_pushstring(L, str.c_str()); return *this; }
+template<> inline Lua& Lua::push(const char * str) { lua_pushstring(L, str); return *this; }
+
+template<> inline Lua& Lua::push(float v) { lua_pushnumber(L, v); return *this; }
+template<> inline Lua& Lua::push(double v) { lua_pushnumber(L, v); return *this; }
+template<> inline Lua& Lua::push(uint16_t v) { lua_pushinteger(L, v); return *this; }
+template<> inline Lua& Lua::push(int16_t v) { lua_pushinteger(L, v); return *this; }
+template<> inline Lua& Lua::push(uint32_t v) { lua_pushinteger(L, v); return *this; }
+template<> inline Lua& Lua::push(int32_t v) { lua_pushinteger(L, v); return *this; }
+template<> inline Lua& Lua::push(uint64_t v) { lua_pushinteger(L, v); return *this; }
+template<> inline Lua& Lua::push(int64_t v) { lua_pushinteger(L, v); return *this; }
+template<> inline Lua& Lua::push(bool v) { lua_pushboolean(L, v); return *this; }
+template<> inline Lua& Lua::push(void * v) { lua_pushlightuserdata(L, v); return *this; }
+
+template<> inline std::string Lua::to(int idx) { return lua_tostring(L, idx); }
+template<> inline const char * Lua::to(int idx) { return lua_tostring(L, idx); }
+template<> inline double Lua::to(int idx) { return lua_tonumber(L, idx); }
+template<> inline float Lua::to(int idx) { return lua_tonumber(L, idx); }
+template<> inline uint16_t Lua::to(int idx) { return lua_tointeger(L, idx); }
+template<> inline int16_t Lua::to(int idx) { return lua_tointeger(L, idx); }
+template<> inline uint32_t Lua::to(int idx) { return lua_tointeger(L, idx); }
+template<> inline int32_t Lua::to(int idx) { return lua_tointeger(L, idx); }
+template<> inline uint64_t Lua::to(int idx) { return lua_tointeger(L, idx); }
+template<> inline int64_t Lua::to(int idx) { return lua_tointeger(L, idx); }
+template<> inline bool Lua::to(int idx) { return lua_toboolean(L, idx); }
+template<> inline void * Lua::to(int idx) { return lua_touserdata(L, idx); }
+
+inline Lua& Lua::setglobal(const std::string& name) { lua_setglobal(L, name.c_str()); return *this; }
+
+template<typename T>
+inline Lua& Lua::setglobal(const std::string& name, T value) {
+	return push(value).setglobal(name); 
+}
+
+inline int Lua::lerror(int err) {
+	if (err) {
+		printf("error: %s\n", lua_tostring(L, -1));
+		lua_pop(L, 1);
+	}
+	return err;
+}
+
+
+inline int Lua::pcall(lua_State * L, int nargs) {
+	int debug_idx = -nargs-3;
+	// put debug.traceback just below the function & args
+	{
+		lua_getglobal(L, "debug");
+		lua_pushliteral(L, "traceback");
+		lua_gettable(L, -2);
+		lua_insert(L, debug_idx);
+		lua_pop(L, 1); // pop debug table
+	}
+	int top = lua_gettop(L);
+	int res = lerror(lua_pcall(L, nargs, LUA_MULTRET, -nargs-2));
+	int nres = lua_gettop(L) - top;
+//	int nres = lua_gettop(L) - top + nargs + 1;
+	lua_remove(L, -(nres+nargs+2)); // remove debug function from stack
+	return res;
+}
+
+inline int Lua::dostring(const std::string& code) {
+	return lerror(luaL_loadstring(L, code.c_str())) || pcall(L, 0);
+}
+inline int Lua::dofile(const std::string& path) {
+	return lerror(luaL_loadfile(L, path.c_str())) || pcall(L, 0);
+}
 
 } // al::
 

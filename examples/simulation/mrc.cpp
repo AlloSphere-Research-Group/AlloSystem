@@ -44,7 +44,7 @@ varying vec3 texcoord0;
 void main() {
 	float intensity = texture3D(tex, texcoord0).r;
 	vec3 rgb = vec3(intensity, intensity, intensity);
-	gl_FragColor = vec4(rgb, 0.5); 
+	gl_FragColor = vec4(rgb, 0.95); 
 	//gl_FragColor = vec4(texcoord0, 1);
 }
 );
@@ -102,7 +102,7 @@ struct MyWindow : public Window {
 		
 		gl.pushMatrix();
 			gl.scale(32, 32, 32);
-			gl.draw(iso);
+			//gl.draw(iso);
 		gl.popMatrix();
 		
 		// draw it:
@@ -112,28 +112,27 @@ struct MyWindow : public Window {
 		shaderP.begin();
 		shaderP.uniform("tex", 0);
 		tex.bind();
-		gl.draw(mesh);
+		//gl.draw(mesh);
 		tex.unbind();
 		shaderP.end();
 		
 		gl.polygonMode(gl.FILL);
-		gl.color(1, 1, 1, 1.);
-		float slice = 1.-fmod(al_time() * 0.25, 1.);
+		gl.color(1, 1, 1, 0.3);
 		tex.bind();
-		float s = 32.;
-		gl.begin(gl.QUADS);
-			gl.texCoord(0, 0, slice);
-			gl.vertex(0, 0, slice*s);
-			gl.texCoord(0, 1, slice);
-			gl.vertex(0, s, slice*s);
-			gl.texCoord(1, 1, slice);
-			gl.vertex(s, s, slice*s);
-			gl.texCoord(1, 0, slice);
-			gl.vertex(s, 0, slice*s);
-		gl.end();
+		for (float slice = 0; slice <= 1.; slice += 0.1) {
+			float s = 32.;
+			gl.begin(gl.QUADS);
+				gl.texCoord(0, 0, slice);
+				gl.vertex(0, 0, slice*s);
+				gl.texCoord(0, 1, slice);
+				gl.vertex(0, s, slice*s);
+				gl.texCoord(1, 1, slice);
+				gl.vertex(s, s, slice*s);
+				gl.texCoord(1, 0, slice);
+				gl.vertex(s, 0, slice*s);
+			gl.end();
+		}
 		tex.unbind();
-		
-		
 		
 		return true;
 	}
@@ -328,8 +327,8 @@ int main(){
 	paths.addAppPaths();
 	paths.addSearchPath(paths.appPath() + "../../", true);
 	paths.print();
-	std::string mrcpath = paths.find("golgi.mrc").filepath();
-	printf("golgi: %s\n", mrcpath.c_str());
+	std::string mrcpath = paths.find("g-actin.mrc").filepath();
+	//std::string mrcpath = paths.find("arp23_cf26.map").filepath();
 	File f(mrcpath, "rb", true);
 	
 	Array& array = tex.array();
