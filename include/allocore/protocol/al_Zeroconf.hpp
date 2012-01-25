@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_MDNS_HPP
-#define INCLUDE_AL_MDNS_HPP
+#ifndef INCLUDE_AL_ZEROCONF_HPP
+#define INCLUDE_AL_ZEROCONF_HPP
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
@@ -43,7 +43,7 @@
 #include <stdio.h>
 
 namespace al{
-namespace mdns{
+namespace zero{
 
 class Client {
 public:
@@ -52,26 +52,15 @@ public:
 	Client(const std::string& type = "_osc._udp.", const std::string& domain = "local.");
 	virtual ~Client();
 
-	///! if timeout = 0, non-blocking
-	///! if timeout < 0, block until first event
-	///! if timeout > 0, block until next event or timeout seconds elapsed
-	void poll(al_sec timeout=0);
-
 	///! called when a new service name is added:
-	virtual void onServiceNew(const std::string& name) {
-		printf("New service '%s' of type '%s' in domain '%s'\n", name.c_str(), type.c_str(), domain.c_str());
-	}
+	virtual void onServiceNew(const std::string& name) {}
 
 	///! usually called after onServiceNew
 	/// identifies the host/port/address(es) associated with the service name
-	virtual void onServiceResolved(const std::string& name, const std::string& host_name, uint16_t port, const std::string& address) {
-		printf("Zeroconf: resolved service '%s' on host '%s' on port %u at address '%s'\n", name.c_str(), host_name.c_str(), port, address.c_str());
-	}
+	virtual void onServiceResolved(const std::string& name, const std::string& host_name, uint16_t port, const std::string& address) {}
 
 	///! called when existing service name is removed:
-	virtual void onServiceRemove(const std::string& name) {
-		printf("Zeroconf: removed service '%s' of type '%s' in domain '%s'\n", name.c_str(), type.c_str(), domain.c_str());
-	}
+	virtual void onServiceRemove(const std::string& name) {}
 
 protected:	
 	std::string type, domain;
@@ -92,7 +81,7 @@ protected:
 	Impl * mImpl;
 };
 
-} // mdns::
+} // zero::
 } // al::
 	
 #endif

@@ -1,5 +1,5 @@
 
-#include "allocore/protocol/al_mDNS.hpp"
+#include "allocore/protocol/al_Zeroconf.hpp"
 #include "allocore/system/al_MainLoop.hpp"
 
 #include <stdio.h>
@@ -19,7 +19,7 @@
 #include <avahi-common/timeval.h>
 
 using namespace al;
-using namespace al::mdns;
+using namespace al::zero;
 
 static AvahiSimplePoll * poller = 0;
 

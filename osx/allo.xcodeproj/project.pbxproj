@@ -156,7 +156,7 @@
 		16C70699135D13F400FEE5B3 /* helloVirtualWorld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C70697135D13DF00FEE5B3 /* helloVirtualWorld.cpp */; };
 		16C706AE135D148800FEE5B3 /* reverb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168B4E811331383A0076257A /* reverb.cpp */; };
 		3604412414CF5A6F00C95A2F /* allua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3604412314CF5A6F00C95A2F /* allua.cpp */; };
-		3604426314CF672500C95A2F /* al_mDNS_OSX.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3604426214CF672500C95A2F /* al_mDNS_OSX.mm */; };
+		3604426314CF672500C95A2F /* al_Zeroconf_OSX.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3604426214CF672500C95A2F /* al_Zeroconf_OSX.mm */; };
 		360C243811E6599F000FF335 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		360C243911E6599F000FF335 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		360C243A11E6599F000FF335 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
@@ -813,7 +813,7 @@
 		3604412314CF5A6F00C95A2F /* allua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = allua.cpp; sourceTree = "<group>"; };
 		360441AB14CF5BA200C95A2F /* al_Lua.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Lua.hpp; sourceTree = "<group>"; };
 		360441AC14CF5BA200C95A2F /* al_ResourceManager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_ResourceManager.hpp; sourceTree = "<group>"; };
-		3604426214CF672500C95A2F /* al_mDNS_OSX.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = al_mDNS_OSX.mm; sourceTree = "<group>"; };
+		3604426214CF672500C95A2F /* al_Zeroconf_OSX.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = al_Zeroconf_OSX.mm; sourceTree = "<group>"; };
 		360C244411E6599F000FF335 /* exCompiler */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exCompiler; sourceTree = BUILT_PRODUCTS_DIR; };
 		360C404E11D32FED002FE91F /* al_Matrix4.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Matrix4.hpp; sourceTree = "<group>"; };
 		36115B381438DE3400E121BF /* exSimpleGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exSimpleGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -877,8 +877,8 @@
 		368672F71491EE5500E4D0D6 /* freenect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = freenect.cpp; sourceTree = "<group>"; };
 		368673421491EEDF00E4D0D6 /* freenect */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = freenect; sourceTree = BUILT_PRODUCTS_DIR; };
 		3687E34111FA4F9500EC6706 /* exIsosurface */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exIsosurface; sourceTree = BUILT_PRODUCTS_DIR; };
-		3696E31514BFA29900D21F2A /* al_mDNS.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_mDNS.hpp; sourceTree = "<group>"; };
-		3696E31614BFA2F500D21F2A /* al_mDNS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_mDNS.cpp; sourceTree = "<group>"; };
+		3696E31514BFA29900D21F2A /* al_Zeroconf.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Zeroconf.hpp; sourceTree = "<group>"; };
+		3696E31614BFA2F500D21F2A /* al_Zeroconf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Zeroconf.cpp; sourceTree = "<group>"; };
 		3696E34014BFA31900D21F2A /* mdns */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = mdns; sourceTree = BUILT_PRODUCTS_DIR; };
 		3696E34614BFA43000D21F2A /* mDNS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mDNS.cpp; sourceTree = "<group>"; };
 		369DDF5012B6C86600F75D2A /* al_Asset.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Asset.hpp; sourceTree = "<group>"; };
@@ -2188,11 +2188,11 @@
 		3602B53B110A6D3D005DC3D0 /* protocol */ = {
 			isa = PBXGroup;
 			children = (
-				3696E31514BFA29900D21F2A /* al_mDNS.hpp */,
 				3602B53C110A6D3D005DC3D0 /* al_OSC.hpp */,
 				3602B53D110A6D3D005DC3D0 /* al_Serialize.h */,
 				3602B53E110A6D3D005DC3D0 /* al_Serialize.hpp */,
 				16DD16FD14C7C83F00F361F9 /* al_XML.hpp */,
+				3696E31514BFA29900D21F2A /* al_Zeroconf.hpp */,
 				B9C962871218937700091F80 /* opencl */,
 			);
 			path = protocol;
@@ -2398,11 +2398,11 @@
 			isa = PBXGroup;
 			children = (
 				3622BEE8116D527D00928703 /* Makefile.config */,
-				3696E31614BFA2F500D21F2A /* al_mDNS.cpp */,
-				3604426214CF672500C95A2F /* al_mDNS_OSX.mm */,
 				3622BEE5116D527D00928703 /* al_OSC.cpp */,
 				3622BEE7116D527D00928703 /* al_Serialize.cpp */,
 				16DD16FE14C7C85A00F361F9 /* al_XML.cpp */,
+				3696E31614BFA2F500D21F2A /* al_Zeroconf.cpp */,
+				3604426214CF672500C95A2F /* al_Zeroconf_OSX.mm */,
 				B9C962931218938C00091F80 /* opencl */,
 				1686186512A58918002AD8AB /* oscpack */,
 			);
@@ -3702,7 +3702,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3604412414CF5A6F00C95A2F /* allua.cpp in Sources */,
-				3604426314CF672500C95A2F /* al_mDNS_OSX.mm in Sources */,
+				3604426314CF672500C95A2F /* al_Zeroconf_OSX.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

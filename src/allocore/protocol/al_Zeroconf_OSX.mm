@@ -1,4 +1,4 @@
-#include "al_mDNS.cpp"
+#include "allocore/protocol/al_Zeroconf.hpp"
 
 #import <Cocoa/Cocoa.h>
 #import <sys/socket.h>
@@ -15,7 +15,7 @@
 	BOOL isConnected;
 	NSRunLoop *loop;
 	
-	al::mdns::Client * master;
+	al::zero::Client * master;
 }
 
 -(void)search;
@@ -24,7 +24,7 @@
 
 @implementation ClientDelegate
 
--(id)initWithDomain:(NSString *) domain type:(NSString *)type master:(al::mdns::Client *)ptr {
+-(id)initWithDomain:(NSString *) domain type:(NSString *)type master:(al::zero::Client *)ptr {
 	if ((self = [super init])){
 		master = ptr;
 		services = [NSMutableArray new];
@@ -168,7 +168,7 @@ public:
 
 
 namespace al {
-namespace mdns {
+namespace zero {
 
 #pragma mark private implementation
 
@@ -242,5 +242,5 @@ Service::~Service() {
 	delete mImpl;
 }
 
-} // ::mdns
+} // ::zero
 } // ::al
