@@ -23,7 +23,7 @@ mdns::Service zservice("Allocore mDNS Test", 4110, type);
 mdns::Client z(type);
 
 int main(){
-	printf("starting on %s\n", Socket::hostIP().c_str());
+	printf("starting on %s\n", Socket::hostName().c_str());
 	
 	while (1) {
 		z.poll();
