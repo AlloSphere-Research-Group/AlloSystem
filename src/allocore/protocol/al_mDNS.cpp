@@ -228,32 +228,7 @@ class Service::Impl : public ImplBase<Service::Impl> {
 public:
 	Impl(Service * master, const std::string& name, const std::string& host, uint16_t port, const std::string& type, const std::string& domain) 
 :	name(name), host(host), type(type), domain(domain), port(port), group(0), master(master) {
-		int ret;
 		start();
-		if (client) {	
-			if (!(group = avahi_entry_group_new(client, entry_group_callback, NULL))) {
-		        fprintf(stderr, "avahi_entry_group_new() failed: %s\n", avahi_strerror(avahi_client_errno(client)));
-		        return;
-		    }
-
-			/* If the group is empty (either because it was just created, or
-				 * because it was reset previously, add our entries.  */
-
-			if (avahi_entry_group_is_empty(group)) {
-				printf("Zeroconf: Adding service '%s'\n", name.c_str());
-			}
-
-		    /* Add the service for IPP */
-		    if ((ret = avahi_entry_group_add_service(group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, (AvahiPublishFlags)0, name.c_str(), type.c_str(), domain.c_str(), host.c_str(), port, NULL)) < 0) {
-
-		        if (ret == AVAHI_ERR_COLLISION)
-		            printf("Zeroconf: name collision");
-
-		        printf("Zeroconf: failed to add service %s on %s:%u: %s\n", name.c_str(), host.c_str(), port, avahi_strerror(ret));
-		        return;
-		    }
-
-		}
 	}
 
 	~Impl() {
@@ -261,6 +236,46 @@ public:
 	}
 
 	static void create_services(AvahiClient * client, Impl * self) {
+		int ret;
+		if (!(self->group = avahi_entry_group_new(client, entry_group_callback, NULL))) {
+	        fprintf(stderr, "avahi_entry_group_new() failed: %s\n", avahi_strerror(avahi_client_errno(client)));
+	        return;
+	    }
+
+		// create an entry group:
+		if (avahi_entry_group_is_empty(self->group)) {
+			printf("Zeroconf: Adding service '%s'\n", self->name.c_str());
+		
+			// add a service to the group:
+			if ((ret = avahi_entry_group_add_service(self->group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, (AvahiPublishFlags)0, self->name.c_str(), self->type.c_str(), self->domain.c_str(), NULL, self->port, NULL)) < 0) {
+				printf("add group error %d - %d\n", ret, AVAHI_ERR_COLLISION);
+
+			    if (ret == AVAHI_ERR_COLLISION) {
+			        printf("Zeroconf: name collision");
+					
+					// A service name collision with a local service happened. Let's pick a new name
+					self->name = avahi_alternative_service_name(self->name.c_str());;
+
+					fprintf(stderr, "Service name collision, renaming service to '%s'\n", self->name.c_str());
+
+					avahi_entry_group_reset(self->group);
+
+					create_services1(client, self);
+					return;
+				}
+			    printf("Zeroconf: failed to add service %s on %s:%u: %s\n", self->name.c_str(), self->host.c_str(), self->port, avahi_strerror(ret));
+			    return;
+			}
+
+			// Tell the server to register the service 
+			if ((ret = avahi_entry_group_commit(self->group)) < 0) {
+			    printf("Zeroconf: Failed to commit entry group: %s\n", avahi_strerror(ret));
+			    return;
+			}
+		}
+	}
+
+	static void create_services1(AvahiClient * client, Impl * self) {
 		char *n, r[128];
 		int ret;
 		assert(client);
@@ -304,16 +319,14 @@ public:
 
 	collision:
 
-		/* A service name collision with a local service happened. Let's
-		 * pick a new name */
-		n = avahi_alternative_service_name(self->name.c_str());
-		self->name = n;
+		// A service name collision with a local service happened. Let's pick a new name
+		self->name = avahi_alternative_service_name(self->name.c_str());;
 
 		fprintf(stderr, "Service name collision, renaming service to '%s'\n", self->name.c_str());
 
 		avahi_entry_group_reset(self->group);
 
-		create_services(client, self);
+		create_services1(client, self);
 		return;
 
 	fail:
