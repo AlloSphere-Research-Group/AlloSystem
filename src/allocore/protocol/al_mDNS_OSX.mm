@@ -234,20 +234,12 @@ Client::~Client() {
 	delete mImpl;
 }
 
-void Client::poll(al_sec timeout) {
-	mImpl->poll(timeout);
-}
-
 Service::Service(const std::string& name, uint16_t port, const std::string& type, const std::string& domain) {
 	mImpl = new Impl(this, name, Socket::hostName(), port, type, domain);
 }
 
 Service::~Service() {
 	delete mImpl;
-}
-
-void Service::poll(al_sec timeout) {
-	mImpl->poll(timeout);
 }
 
 } // ::mdns

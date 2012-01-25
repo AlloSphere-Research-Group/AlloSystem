@@ -40,9 +40,6 @@
 
 namespace al {
 
-// messages that are larger than this will be heap copied
-#define AL_MSGQUEUE_ARGS_SIZE (76)
-
 class MsgQueue {
 public:	
 
@@ -275,6 +272,9 @@ public:
 	void sched(al_sec at, msg_func func, char * data, size_t size);
 	
 protected:
+
+	// messages that are larger than this will be heap copied
+	#define AL_MSGQUEUE_ARGS_SIZE (128 - sizeof(struct Msg *) - sizeof(size_t) - sizeof(al_sec) - sizeof(msg_func))
 
 	struct Msg {
 		struct Msg * next;

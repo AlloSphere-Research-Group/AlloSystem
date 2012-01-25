@@ -124,9 +124,11 @@ void MsgQueue :: update(al_sec until, bool defer) {
 //			al_pq_sched_msg(x, m);
 //		} else {	
 
-		mNow = AL_MAX(mNow, m->t); 
-		(m->func)(mNow, m->args());
-		//(m->func)(m->t, m->args());
+		// only call if it has data associated:
+		//if (m->args) {
+			mNow = AL_MAX(mNow, m->t); 
+			(m->func)(mNow, m->args());
+		//}
 		
 		recycle(m);
 		m = mHead;

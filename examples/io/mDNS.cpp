@@ -18,7 +18,7 @@ using namespace al;
 std::string type("_osc._udp");
 
 // a Service can publish a service on this machine:
-mdns::Service zservice("allocore", 4110, type);
+mdns::Service zservice("allocore:" + Socket::hostName(), 4110, type);
 
 // a Client can browse and report available services on the network for a given service type:
 mdns::Client z(type);
