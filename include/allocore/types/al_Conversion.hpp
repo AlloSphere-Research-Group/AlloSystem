@@ -153,6 +153,14 @@ inline   double punUF(uint64_t v){ Twiddle<double> u(v); return u.f; }
 
 /// Type-pun 64-bit signed int to 64-bit float
 inline   double punIF( int64_t v){ Twiddle<double> u(v); return u.f; }
+//
+///// Swap the bytes of a word in-place
+//template <typename T>
+//void swapBytes(T& word);
+//
+///// Swap the bytes of the words in an array in-place
+//template <typename T>
+//void swapBytes(T * data, unsigned count);
 
 /// Convert numerical type to a string
 template <class T> std::string toString(const T& v);
@@ -260,6 +268,64 @@ inline float intToUnit(int16_t v){
 	uint32_t vu = (((uint32_t)v) + 0x808000) << 7; // set fraction in float [2, 4)
 	return punUF(vu) - 3.f;
 }
+//
+//// This is used by swapBytes
+//template<int NumBytes> void swapBytesN(void * word);
+//
+//template<>
+//inline void swapBytesN<2>(void * word){
+//	uint16_t& v = *(uint16_t *)word;
+//	v = (v >> 8) | (v << 8);
+//}
+//
+//template<>
+//inline void swapBytesN<4>(void * word){
+//	uint32_t& v = *(uint32_t *)word;
+//	v	= ((v >> 24))
+//		| ((v >>  8) & 0x0000ff00)
+//		| ((v <<  8) & 0x00ff0000)
+//		| ((v << 24));
+//}
+//
+//template<>
+//inline void swapBytesN<8>(void * word){
+//	uint64_t& v = *(uint64_t *)word;
+//	v	= ((v >> 56))
+//		| ((v >> 40) & 0x000000000000ff00ULL)
+//		| ((v >> 24) & 0x0000000000ff0000ULL)
+//		| ((v >>  8) & 0x00000000ff000000ULL)
+//		| ((v <<  8) & 0x000000ff00000000ULL)
+//		| ((v << 24) & 0x0000ff0000000000ULL)
+//		| ((v << 40) & 0x00ff000000000000ULL)
+//		| ((v << 56));
+//}
+//
+//template<typename T>
+//inline void swapBytes(T& v){ swapBytesN<sizeof(v)>(&v); }
+//
+//template<class T>
+//inline void swapBytes(T * data, unsigned count){
+//	for(unsigned i=0; i<count; ++i) swapBytes(data[i]);
+//}
+
+template<unsigned N>
+inline void swapbytesN(void * ptr) {
+	char in[N], out[N];
+	memcpy(in, ptr, N);
+	for (unsigned i=0; i<N; i++) out[i] = in[N-1-i];
+	memcpy(ptr, out, N);
+}
+
+template<typename T>
+inline void swapbytes(T * ptr) { swapbytesN<sizeof(T)>(ptr); }
+
+template<typename T>
+inline void swapbytes(T * data, unsigned count) {
+	for (unsigned i=0; i<count; i++) swapbytes(data+i);
+}
+
+#undef bswap_16
+#undef bswap_32
 
 template <class T>
 std::string toString(const T * v, int n, int s){
@@ -325,26 +391,6 @@ inline uint8_t unitToUInt8(float u){
 	++u;
 	return (punFU(u) >> 15) & MaskFrac<float>();
 }
-
-
-template<unsigned N>
-inline void swapbytesN(void * ptr) {
-	char in[N], out[N];
-	memcpy(in, ptr, N);
-	for (unsigned i=0; i<N; i++) out[i] = in[N-1-i];
-	memcpy(ptr, out, N);
-}
-
-template<typename T>
-inline void swapbytes(T * ptr) { swapbytesN<sizeof(T)>(ptr); }
-
-template<typename T>
-inline void swapbytes(T * data, unsigned count) {
-	for (unsigned i=0; i<count; i++) swapbytes(data+i);
-}
-
-#undef bswap_16
-#undef bswap_32
 
 } // al::
 
