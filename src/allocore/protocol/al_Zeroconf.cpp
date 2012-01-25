@@ -24,7 +24,7 @@ using namespace al::zero;
 static AvahiSimplePoll * poller = 0;
 
 void al_avahi_poll(al_sec t) {
-	int result = avahi_simple_poll_iterate(poller, 10);	// 10ms timeout
+	avahi_simple_poll_iterate(poller, 10);	// 10ms timeout
 	MainLoop::queue().send(1, al_avahi_poll);
 }
 
@@ -68,7 +68,7 @@ public:
 
 	static void client_callback(AvahiClient *client, AvahiClientState state, void * userdata) {
 		assert(client);
-		Subclass * self = (Subclass *)userdata;
+		//Subclass * self = (Subclass *)userdata;
 		
 		switch (state) {
 		    case AVAHI_CLIENT_S_RUNNING:
@@ -109,8 +109,6 @@ class Client::Impl : public ImplBase<Client::Impl> {
 public:
 	
 	Impl(Client * master) : browser(0), master(master) {
-		int error;
-		AvahiClientFlags flags = AVAHI_CLIENT_NO_FAIL;
 		start();
 		if (client) {	
 			/* Create the service browser */
@@ -200,7 +198,7 @@ public:
 		        break;
 
 		    case AVAHI_RESOLVER_FOUND: {
-		        char a[AVAHI_ADDRESS_STR_MAX], *t;
+		        char a[AVAHI_ADDRESS_STR_MAX];
 
 		        avahi_address_snprint(a, sizeof(a), address);
 				self->master->onServiceResolved(name, host_name, port, a);
@@ -290,12 +288,8 @@ public:
 	}
 
 	static void create_services1(AvahiClient * client, Impl * self) {
-		char *n, r[128];
+		char r[128];
 		int ret;
-		assert(client);
-
-		/* If this is the first time we're called, let's create a new
-		 * entry group if necessary */
 
 		if (!self->group)
 		    if (!(self->group = avahi_entry_group_new(client, entry_group_callback, self))) {
@@ -303,16 +297,11 @@ public:
 		        goto fail;
 		    }
 
-		/* If the group is empty (either because it was just created, or
-		 * because it was reset previously, add our entries.  */
-
 		if (avahi_entry_group_is_empty(self->group)) {
 		    fprintf(stderr, "Adding service '%s'\n", self->name.c_str());
 
-		    /* Create some random TXT data */
 		    snprintf(r, sizeof(r), "random=%i", rand());
 
-		    /* Add the service for IPP */
 		    if ((ret = avahi_entry_group_add_service(self->group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, (AvahiPublishFlags)0, self->name.c_str(), self->type.c_str(), NULL, NULL, self->port, "test=blah", r, NULL)) < 0) {
 
 		        if (ret == AVAHI_ERR_COLLISION)
@@ -322,7 +311,6 @@ public:
 		        goto fail;
 		    }
 
-		    /* Tell the server to register the service */
 		    if ((ret = avahi_entry_group_commit(self->group)) < 0) {
 		        fprintf(stderr, "Failed to commit entry group: %s\n", avahi_strerror(ret));
 		        goto fail;
@@ -349,7 +337,7 @@ public:
 	}
 
 	static void entry_group_callback(AvahiEntryGroup *g, AvahiEntryGroupState state, void *userdata) {
-		Service * self = (Service *)userdata;
+		//Service * self = (Service *)userdata;
 	}
 
 	std::string name, host, type, domain;
