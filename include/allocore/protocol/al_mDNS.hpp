@@ -57,17 +57,20 @@ public:
 	///! if timeout > 0, block until next event or timeout seconds elapsed
 	void poll(al_sec timeout=0);
 
-	///! called when a new device is added:
+	///! called when a new service name is added:
 	virtual void onServiceNew(const std::string& name) {
 		printf("New service '%s' of type '%s' in domain '%s'\n", name.c_str(), type.c_str(), domain.c_str());
 	}
 
-	virtual void onServiceRemove(const std::string& name) {
-		printf("Zeroconf: removed service '%s' of type '%s' in domain '%s'\n", name.c_str(), type.c_str(), domain.c_str());
-	}
-
+	///! usually called after onServiceNew
+	/// identifies the host/port/address(es) associated with the service name
 	virtual void onServiceResolved(const std::string& name, const std::string& host_name, uint16_t port, const std::string& address) {
 		printf("Zeroconf: resolved service '%s' on host '%s' on port %u at address '%s'\n", name.c_str(), host_name.c_str(), port, address.c_str());
+	}
+
+	///! called when existing service name is removed:
+	virtual void onServiceRemove(const std::string& name) {
+		printf("Zeroconf: removed service '%s' of type '%s' in domain '%s'\n", name.c_str(), type.c_str(), domain.c_str());
 	}
 
 protected:	
@@ -79,14 +82,11 @@ class Service {
 public:
 	class Impl;
 
+	///! create and publish a new service
+	/// the name should be unique
 	Service(const std::string& name, uint16_t port=4110, const std::string& type="_osc._udp.", const std::string& domain="local.");
 
 	virtual ~Service();
-	
-	///! if timeout = 0, non-blocking
-	///! if timeout < 0, block until first event
-	///! if timeout > 0, block until next event or timeout seconds elapsed
-	void poll(al_sec timeout=0);
 
 protected:
 	Impl * mImpl;

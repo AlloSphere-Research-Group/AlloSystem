@@ -14,25 +14,16 @@ Graham Wakefield, 2012
 using namespace al;
 
 //std::string type("_http._tcp"); 
-std::string type("_osc._udp");
 //std::string type("_ssh._tcp");
+std::string type("_osc._udp");
 
 // a Service can publish a service on this machine:
 mdns::Service zservice("allocore", 4110, type);
 
-// a Client can browse and report available services for a given service type:
+// a Client can browse and report available services on the network for a given service type:
 mdns::Client z(type);
 
-void tick(al_sec t) {
-	z.poll();
-	zservice.poll();
-
-	MainLoop::queue().send(0.5, tick);
-}
-
-int main(){
-	tick(0);
-	
+int main() {
 	MainLoop::start();
 	return 0;
 }

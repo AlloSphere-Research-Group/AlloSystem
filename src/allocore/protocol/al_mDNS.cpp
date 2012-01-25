@@ -1,5 +1,6 @@
 
 #include "allocore/protocol/al_mDNS.hpp"
+#include "allocore/system/al_MainLoop.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,17 +21,36 @@
 using namespace al;
 using namespace al::mdns;
 
+static AvahiSimplePoll * poller = 0;
+
+void al_avahi_poll(al_sec t) {
+	int result = avahi_simple_poll_iterate(poller, 10);	// 10ms timeout
+	MainLoop::queue().send(1, al_avahi_poll);
+}
+
+void al_avahi_init() {
+	if (poller == 0) {
+		if (!(poller = avahi_simple_poll_new())) {
+	   		fprintf(stderr, "Zeroconf: Failed to initialize Avahi.\n");
+			return;
+		}
+		// start:
+		al_avahi_poll(0.5);
+	}
+}
+
 template <typename Subclass>
 class ImplBase {
 public:
-	ImplBase() : poller(0), client(0) {}
+	ImplBase() : client(0) {
+		al_avahi_init();
+	}
 
 	void start() {
 		int error;
 		AvahiClientFlags flags = AVAHI_CLIENT_NO_FAIL;
-		/* Allocate main loop object */
-		if (!(poller = avahi_simple_poll_new())) {
-	   		fprintf(stderr, "Zeroconf: Failed to create simple poll object.\n");
+		if (!poller) {
+	   		fprintf(stderr, "Zeroconf: Failed to initialize Avahi.\n");
 	    	return;
 		}
 		client = avahi_client_new(avahi_simple_poll_get(poller), flags, client_callback, this, &error);
@@ -43,12 +63,7 @@ public:
 
 	~ImplBase() {
 		if (client) avahi_client_free(client);
-		if (poller) avahi_simple_poll_free(poller);
-	}
-
-	void poll(al_sec timeout) {
-		int sleep_time = timeout * 1000;
-		int result = avahi_simple_poll_iterate(poller, sleep_time);
+		//if (poller) avahi_simple_poll_free(poller);
 	}
 
 	static void client_callback(AvahiClient *client, AvahiClientState state, void * userdata) {
@@ -64,7 +79,7 @@ public:
 
 		    case AVAHI_CLIENT_FAILURE:
 		        fprintf(stderr, "Zeroconf: Client failure: %s\n", avahi_strerror(avahi_client_errno(client)));
-		        avahi_simple_poll_quit(self->poller);
+		        //avahi_simple_poll_quit(self->poller);
 		        break;
 
 		    case AVAHI_CLIENT_S_COLLISION:
@@ -87,7 +102,6 @@ public:
 		}
 	}
 
-	AvahiSimplePoll * poller;
 	AvahiClient * client;
 };
 
@@ -132,7 +146,7 @@ public:
 		switch (event) {
 		    case AVAHI_BROWSER_FAILURE:
 		        fprintf(stderr, "Zeroconf: %s\n", avahi_strerror(avahi_client_errno(avahi_service_browser_get_client(b))));
-		        avahi_simple_poll_quit(self->poller);
+		        //avahi_simple_poll_quit(self->poller);
 		        return;
 
 		    case AVAHI_BROWSER_NEW:
@@ -154,7 +168,7 @@ public:
 		    case AVAHI_BROWSER_ALL_FOR_NOW:
 		    case AVAHI_BROWSER_CACHE_EXHAUSTED:
 				// TODO: what do these mean?		        
-				fprintf(stderr, "Zeroconf: %s\n", event == AVAHI_BROWSER_CACHE_EXHAUSTED ? "CACHE_EXHAUSTED" : "ALL_FOR_NOW");
+				//fprintf(stderr, "Zeroconf: %s\n", event == AVAHI_BROWSER_CACHE_EXHAUSTED ? "CACHE_EXHAUSTED" : "ALL_FOR_NOW");
 		        break;
 		}
 	}
@@ -330,7 +344,8 @@ public:
 		return;
 
 	fail:
-		avahi_simple_poll_quit(self->poller);
+		//avahi_simple_poll_quit(self->poller);
+		return;
 	}
 
 	static void entry_group_callback(AvahiEntryGroup *g, AvahiEntryGroupState state, void *userdata) {
@@ -352,20 +367,12 @@ Client::~Client() {
 	delete mImpl;
 }
 
-void Client::poll(al_sec timeout) {
-	mImpl->poll(timeout);
-}
-
 Service::Service(const std::string& name, uint16_t port, const std::string& type, const std::string& domain) {
 	mImpl = new Impl(this, name, Socket::hostName(), port, type, domain);
 }
 
 Service::~Service() {
 	delete mImpl;
-}
-
-void Service::poll(al_sec timeout) {
-	mImpl->poll(timeout);
 }
 
 
