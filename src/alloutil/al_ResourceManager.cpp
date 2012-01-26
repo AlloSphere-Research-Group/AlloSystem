@@ -29,7 +29,7 @@ std::string ResourceManager::data(std::string filename) {
 }
 
 bool ResourceManager::add(std::string filename, bool immediate) {
-	FileInfo& info = mFileMap[filename];
+	//FileInfo& info = mFileMap[filename];
 	if (immediate) {
 		return read(filename);
 	}
