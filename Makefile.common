@@ -43,9 +43,7 @@ ifeq ($(UNAMEM), $(findstring $(UNAMEM), x86_64 ia86 amd64))
 else
 	ARCH = 32
 endif
-	ARCH = 64
 
-    OSX_VERSION = 10_6
 
 #
 USING_PUREDYNE	= 0
@@ -169,6 +167,7 @@ else ifeq ($(PLATFORM), macosx)
 		CFLAGS += -arch i386 -arch x86_64
 	endif
 
+	# This triggers an ocean of loader warnings...
 	#CFLAGS += -fvisibility-inlines-hidden
 
 	# Set system root directory
