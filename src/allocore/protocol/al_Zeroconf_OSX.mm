@@ -18,7 +18,10 @@
 	al::zero::Client * master;
 }
 
--(void)search;
+-(void)search:(NSDictionary *) dict;
+- (void)newService:(NSNetService *)service;
+- (void)removedService:(NSNetService *)service;
+- (void)resolvedService:(NSNetService *)service;
 
 @end
 
@@ -28,33 +31,28 @@
 	if ((self = [super init])){
 		master = ptr;
 		services = [NSMutableArray new];
-		//NSLog(@"allocated browsersssszzzzzzzzzzzzz");
-		//browser = [[NSNetServiceBrowser new] autorelease];
-		browser = [NSNetServiceBrowser new];
-		browser.delegate = self;
-		[browser searchForServicesOfType:type inDomain:domain];
-
-		//[browser scheduleInRunLoop:loop forMode:NSDefaultRunLoopMode];
-		//[loop run];		
-		
-		//[[NSRunLoop currentRunLoop] run];
-		[browser scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-		
+				
 		isConnected = NO;
-		//[self search];
-		//[self performSelector:@selector(search) withObject:nil afterDelay:3];
-//		[self performSelector:@selector(search) afterDelay:1];
-		//[browser searchForServicesOfType:type inDomain:@""];
+
+		NSDictionary * dict = [NSDictionary	 dictionaryWithObjectsAndKeys:domain, @"domain", type, @"type", nil];
+		//NSLog(@"NSThread = %@", [[NSThread currentThread] description]);
+
+        [NSThread detachNewThreadSelector:@selector(search:) toTarget:self withObject:dict];
 	}
 	return self;
 }
 
--(void)search {}
+-(void)search:(NSDictionary *) dict {
+    browser = [NSNetServiceBrowser new];
+    browser.delegate = self;
+    [browser searchForServicesOfType:[dict objectForKey:@"type"] inDomain:[dict objectForKey:@"domain"]];
+    
+    [[NSRunLoop currentRunLoop] run];
+}
 
 -(void)dealloc {
 	[loop release];
-	//self.connectedService = nil;
-    //self.browser = nil;
+
 	[browser stop];
     [browser release];
 	[services release];
@@ -78,12 +76,23 @@
 	//NSLog(@"didFindService: %@ %@", aNetService, moreComing);
 	[services addObject:service];
 	//NSNetService *remoteService = [services objectAtIndex:0];
+
     service.delegate = self;
     [service resolveWithTimeout:0];
+
+	[self performSelectorOnMainThread:@selector(newService:) withObject:service waitUntilDone:NO];
+}
+
+- (void)newService:(NSNetService *)service {
 	master->onServiceNew([[service name] UTF8String]);
 }
+
 - (void)netServiceBrowser:(NSNetServiceBrowser *)aNetServiceBrowser didRemoveService:(NSNetService *)service moreComing:(BOOL)moreComing {
 	//NSLog(@"didRemoveService: %@ %@", aNetService, moreComing);
+	[self performSelectorOnMainThread:@selector(removedService:) withObject:service waitUntilDone:NO];
+}
+
+- (void) removedService:(NSNetService *)service {
 	master->onServiceRemove([[service name] UTF8String]);
 }
 //- (void)netServiceBrowser:(NSNetServiceBrowser *)aNetServiceBrowser didRemoveDomain:(NSString *)domainString moreComing:(BOOL)moreComing {
@@ -96,6 +105,12 @@
     //self.isConnected = YES;
     //self.connectedService = service;
 	
+	[self performSelectorOnMainThread:@selector(resolvedService:) withObject:service waitUntilDone:NO];
+}
+
+- (void)resolvedService:(NSNetService *)service {
+	//NSLog(@"NSThread = %@", [[NSThread currentThread] description]);
+
 	NSString *name = nil;
 	int port;
 	
@@ -103,8 +118,12 @@
 		struct sockaddr_in *socketAddress  = (struct sockaddr_in *) [d bytes];
 		name = [service name];
 		socketAddress = (struct sockaddr_in *)[d bytes];
+		
 		char * ipaddress = inet_ntoa(socketAddress->sin_addr);
+		if(strcmp(ipaddress, "0.0.0.0") == 0) continue;
+		
 		port = ntohs(socketAddress->sin_port); // ntohs converts from network byte order to host byte order 
+
 		master->onServiceResolved([name UTF8String], [[service hostName] UTF8String], port, ipaddress);
 	}
 }
