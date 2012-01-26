@@ -285,7 +285,7 @@ struct HSV{
 	HSV& operator= (const Colori& c){ return *this = Color(c); }
 
 	/// Get new HSV with value component multiplied by a scalar
-	HSV  operator* (float a) const { return HSV(*this)*a; }
+	HSV  operator* (float a) const { return HSV(*this)*=a; }
 
 	/// Multiply value component by a scalar
 	HSV& operator*=(float a){ v*=a; return *this; }
