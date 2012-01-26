@@ -8,7 +8,7 @@
 // takes a std::string and returns an NSString *
 #define CPP_STRING_TO_NSSTRING(STR) [NSString stringWithUTF8String:((STR).c_str())]
 
-@interface ClientDelegate : NSObject <NSNetServiceBrowserDelegate, NSNetServiceDelegate> {
+@interface ClientDelegate : NSObject {
 	NSNetServiceBrowser *browser;
     NSNetService *connectedService;
     NSMutableArray *services;
@@ -112,7 +112,7 @@
 
 
 
-@interface ServerDelegate : NSObject <NSNetServiceDelegate> {
+@interface ServerDelegate : NSObject {
     NSNetService * netService;
 }
 @end
