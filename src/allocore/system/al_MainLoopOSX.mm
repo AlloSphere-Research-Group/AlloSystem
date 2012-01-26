@@ -91,6 +91,4 @@ extern "C" void al_main_native_enter(al_sec interval) {
 }
 
 extern "C" void al_main_native_init() {
-	[[NSRunLoop currentRunLoop] run];
-	printf("run current loop\n");
 }

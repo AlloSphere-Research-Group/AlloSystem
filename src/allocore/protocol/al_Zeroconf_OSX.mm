@@ -37,6 +37,8 @@
 		//[browser scheduleInRunLoop:loop forMode:NSDefaultRunLoopMode];
 		//[loop run];		
 		
+		[[NSRunLoop currentRunLoop] run];
+		
 		isConnected = NO;
 		//[self search];
 		//[self performSelector:@selector(search) withObject:nil afterDelay:3];
