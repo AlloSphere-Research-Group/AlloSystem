@@ -3579,6 +3579,7 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "allo" */;
 			compatibilityVersion = "Xcode 3.0";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -4108,7 +4109,6 @@
 		1DEB923608733DC60010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)";
 				CONFIGURATION_TEMP_DIR = "$(PROJECT_TEMP_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				DEPLOYMENT_LOCATION = NO;
@@ -4148,14 +4148,12 @@
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SYMROOT = ../build/bin;
 				USER_HEADER_SEARCH_PATHS = "$PROJECT_DIR/../include $PROJECT_DIR/../osx/include";
-				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
 		};
 		1DEB923708733DC60010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)";
 				CONFIGURATION_TEMP_DIR = "$(PROJECT_TEMP_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 				COPY_PHASE_STRIP = NO;
@@ -4202,7 +4200,6 @@
 				STRIP_STYLE = debugging;
 				SYMROOT = ../build/bin;
 				USER_HEADER_SEARCH_PATHS = "$PROJECT_DIR/../include $PROJECT_DIR/../osx/include";
-				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Release;
 		};
