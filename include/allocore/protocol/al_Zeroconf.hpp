@@ -52,6 +52,9 @@ public:
 	Client(const std::string& type = "_osc._udp.", const std::string& domain = "local.");
 	virtual ~Client();
 
+	///! check for new services:
+	static void poll(al_sec interval = 0.01);
+
 	///! called when a new service name is added:
 	virtual void onServiceNew(const std::string& name) {}
 

@@ -216,10 +216,10 @@ std::string Socket::hostIP(){
 	char * addr;
 	apr_sockaddr_t * sa;
 	check_apr(apr_sockaddr_info_get(&sa, hostName().c_str(), APR_INET, 8000, 0, apr.pool()));
-	printf("%p sa\n", sa);
+	//printf("%p sa\n", sa);
 	while(sa != 0) {
 		check_apr(apr_sockaddr_ip_get(&addr, sa));
-		printf("%s %s %s %d %d\n", addr, sa->hostname, sa->servname, sa->port, sa->family);
+		//printf("%s %s %s %d %d\n", addr, sa->hostname, sa->servname, sa->port, sa->family);
 		sa = sa->next;
 	}
 	return addr;
@@ -229,7 +229,7 @@ std::string Socket::hostName(){
 	char buf[APRMAXHOSTLEN+1];
 	ImplAPR apr;
 	check_apr(apr_gethostname(buf, sizeof(buf), apr.pool()));
-	printf("host %s\n", buf);
+	//printf("host %s\n", buf);
 	return buf;
 }
 

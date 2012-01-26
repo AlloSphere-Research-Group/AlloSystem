@@ -50,8 +50,17 @@ ZeroconfNotifier z(type);
 // a Service can publish a service on this machine:
 zero::Service zservice("allocore:" + Socket::hostName(), 4110, type);
 
+Window win;
 
 int main() {
-	MainLoop::start();
+	//win.create();
+
+	//MainLoop::start();
+	
+	// if the MainLoop::start() was not called, this alternative works:
+	while (1) {
+		z.poll();
+	}
+	
 	return 0;
 }

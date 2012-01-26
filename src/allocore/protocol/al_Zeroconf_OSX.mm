@@ -37,7 +37,8 @@
 		//[browser scheduleInRunLoop:loop forMode:NSDefaultRunLoopMode];
 		//[loop run];		
 		
-		[[NSRunLoop currentRunLoop] run];
+		//[[NSRunLoop currentRunLoop] run];
+		[browser scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
 		
 		isConnected = NO;
 		//[self search];
@@ -234,6 +235,12 @@ Client::Client(const std::string& type, const std::string& domain)
 
 Client::~Client() {
 	delete mImpl;
+}
+
+void Client::poll(al_sec interval) {
+	NSDate * date = [[NSDate alloc] initWithTimeIntervalSinceNow:interval];
+	[[NSRunLoop currentRunLoop] runUntilDate:date];
+	[date release];
 }
 
 Service::Service(const std::string& name, uint16_t port, const std::string& type, const std::string& domain) {

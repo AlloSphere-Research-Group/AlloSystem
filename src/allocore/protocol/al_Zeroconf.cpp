@@ -23,8 +23,8 @@ using namespace al::zero;
 
 static AvahiSimplePoll * poller = 0;
 
-void al_avahi_poll(al_sec t) {
-	avahi_simple_poll_iterate(poller, 10);	// 10ms timeout
+void al_avahi_poll(al_sec interval=0.01) {
+	avahi_simple_poll_iterate(poller, interval * 1000);
 	MainLoop::queue().send(1, al_avahi_poll);
 }
 
@@ -353,6 +353,10 @@ Client::Client(const std::string& type, const std::string& domain)
 
 Client::~Client() {
 	delete mImpl;
+}
+
+Client::poll(al_sec interval) {
+	al_avahi_poll(interval);
 }
 
 Service::Service(const std::string& name, uint16_t port, const std::string& type, const std::string& domain) {
