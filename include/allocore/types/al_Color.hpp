@@ -284,6 +284,13 @@ struct HSV{
 	/// Set from RGB color
 	HSV& operator= (const Colori& c){ return *this = Color(c); }
 
+	/// Get new HSV with value component multiplied by a scalar
+	HSV  operator* (float a) const { return HSV(*this)*a; }
+
+	/// Multiply value component by a scalar
+	HSV& operator*=(float a){ v*=a; return *this; }
+
+
 	/// Rotate hue in interval [0, 1)
 	HSV& rotateHue(float dh){ h += dh; return wrapHue(); }
 
@@ -308,6 +315,8 @@ inline Color operator / (float s, const Color& c){ return Color(s/c.r, s/c.g, s/
 inline Color& Color::operator= (const Colori& v){
 		r=tof(v.r); g=tof(v.g); b=tof(v.b); a=tof(v.a); return *this; }
 
+
+inline HSV operator * (float s, const HSV& c){ return  c*s; }
 
 } // al::
 
