@@ -22,7 +22,7 @@ public:
 	MyApp(){
 		// create a sphere
 		verts.primitive(Graphics::TRIANGLES);
-		addSphere(verts, 0.2);
+		addSphere(verts, 0.5);
 		verts.generateNormals();
 
 		nav().pos(5,5,20);
