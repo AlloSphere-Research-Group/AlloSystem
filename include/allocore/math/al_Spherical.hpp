@@ -110,6 +110,7 @@ typedef SphereCoord<double> SphereCoordd;
 /// (geodesics intersecting the z axis). When |m| = l, the harmonics are "beach
 /// ball"-like (sectoral) and when m = 0, the harmonics are "target"-like
 /// (zonal). Other values of m produce a checkerboard pattern (tesseral).
+/// Th Condon-Shortley phase factor of (-1)^m is included.
 template <int L_MAX=16>
 class SphericalHarmonic{
 public:
@@ -128,15 +129,8 @@ public:
 	}
 
 	template <class T>
-	static Complex<T> expim(int m, const Complex<T>& ctheta){
-		Complex<T> res(1, 0);
-
-		// compute e^im recursively
-		// TODO: this could be turned into a table lookup
-		for(int i=0; i<al::abs(m); ++i){
-			res *= ctheta;
-		}
-		
+	static Complex<T> expim(int m, const Complex<T>& ctheta){		
+		Complex<T> res = al::powN(ctheta, al::abs(m));
 		if(m < 0) res.i = -res.i;
 		return res;
 	}
@@ -151,7 +145,7 @@ public:
 	static double coefCalc(int l, int m){
 		int M = al::abs(m);
 		double res = ::sqrt((2*l + 1) / M_4PI) * al::factorialSqrt(l-M) / al::factorialSqrt(l+M);
-		return (M<0 && al::odd(M)) ? -res : res;
+		return (m<0 && al::odd(M)) ? -res : res;
 	}
 
 private:
