@@ -65,7 +65,7 @@ struct SphereCoord {
 	/// Get negation in Cartesian space
 	SphereCoord operator - () const { return SphereCoord(t, -p); }
 
-
+	/// Get radius
 	T radius() const { return p.mag(); }
 	
 	/// Returns Cartesian coordinate
@@ -183,6 +183,19 @@ private:
 
 /// Spherical harmonic function
 static SphericalHarmonic<> spharm;
+
+
+/// Stereographic projection from an n-sphere to an n-1 dimensional hyperplane
+
+/// \tparam N		dimensions of sphere
+/// \tparam T		element type
+/// @param[in] v	unit n-vector describing point on n-sphere
+/// \returns		vector describing projected coordinate on n-1 hyperplane
+template <int N, class T>
+inline Vec<N-1,T> sterProj(const Vec<N,T>& v){	
+	return sub<N-1>(v) * (T(1)/v[N-1]);
+}
+
 
 } // ::al
 
