@@ -59,7 +59,6 @@ struct MyWindow : Window{
 	Light light;
 	Material material;
 	double angle;
-	bool useShader;
 
 	MyWindow(): angle(0){}
 
@@ -76,8 +75,6 @@ struct MyWindow : Window{
 	}
 
 	bool onFrame(){
-
-		gl.clearColor(1,1,1,1);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.viewport(0,0, width(), height());
 		gl.matrixMode(gl.PROJECTION);
@@ -90,8 +87,6 @@ struct MyWindow : Window{
 		// Create a shape
 		mesh.reset();
 		mesh.primitive(gl.TRIANGLES);
-		//addIcosahedron(mesh);
-		//addDodecahedron(mesh);
 		addSphere(mesh, 1, 16, 16);
 
 		if((angle+=0.003)>=M_2PI) angle-=M_2PI;
@@ -102,22 +97,14 @@ struct MyWindow : Window{
 		xfm.scale(Vec3f(0.5, 0.2, 1));
 
 		mesh.transform(xfm);
-		//mesh.decompress();
 		mesh.generateNormals();
 
 		// Render
 		shaderP.begin();
-
-			material.shininess(2);
-
-			light.ambient(Color(0.1,0,0));
-			light.diffuse(Color(0.9,0,0));
-			light.specular(Color(0.5));
-
+			light.dir(1,1,1);
 			material();
 			light();
 			gl.draw(mesh);
-
 		shaderP.end();
 
 		return true;
@@ -130,12 +117,10 @@ struct MyWindow : Window{
 
 };
 
-MyWindow win1;
+MyWindow win;
 
 int main(){
-	win1.add(new StandardWindowKeyControls);
-	win1.create(Window::Dim(800, 600));
-
+	win.add(new StandardWindowKeyControls);
+	win.create();
 	MainLoop::start();
-	return 0;
 }
