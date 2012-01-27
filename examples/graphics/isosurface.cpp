@@ -10,7 +10,7 @@ Camera cam;
 Nav nav(Vec3d(0,0,5));
 Stereographic stereo;
 
-const int N = 64;
+const int N = 32;
 float volData[N*N*N];
 Isosurface iso;
 double phase=0;
