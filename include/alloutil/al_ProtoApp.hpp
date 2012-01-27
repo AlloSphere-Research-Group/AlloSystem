@@ -66,6 +66,13 @@ public:
 	
 	glv::ParamPanel& paramPanel(){ return mParamPanel; }
 
+	ProtoApp& addParam(
+		glv::View& v, const std::string& label, bool nameViewFromLabel=true
+	){
+		paramPanel().addParam(v,label,nameViewFromLabel);
+		return *this;
+	}
+
 	double gainFactor() const { float v=cnGain.getValue(); return v*v; }
 	double scaleFactor() const { return ::pow(2., cnScale.getValue()); }
 
