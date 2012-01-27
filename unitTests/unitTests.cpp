@@ -21,6 +21,7 @@ int main (int argc, char * const argv[]) {
 		printf(" pass\n")
 
 	RUNTEST(Math);
+	RUNTEST(MathSpherical);
 	RUNTEST(Types);
 	RUNTEST(TypesConversion);
 	RUNTEST(Spatial);

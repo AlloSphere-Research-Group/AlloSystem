@@ -20,6 +20,7 @@ int utIOAudioIO();
 int utIOSocket();
 int utIOWindowGL();
 int utMath();
+int utMathSpherical();
 int utGraphicsDraw();
 int utGraphicsMesh();
 int utProtocolOSC();

@@ -144,6 +144,7 @@
 		168C163E1322C656006D79CC /* utGraphicsMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168C163D1322C656006D79CC /* utGraphicsMesh.cpp */; };
 		168C16411322C755006D79CC /* utGraphicsDraw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168C16401322C755006D79CC /* utGraphicsDraw.cpp */; };
 		168E742A1329999D003115DD /* unitTests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168E74291329999D003115DD /* unitTests.cpp */; };
+		16A5523814D3247900CBD8C2 /* utMathSpherical.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16A5523714D3247900CBD8C2 /* utMathSpherical.cpp */; };
 		16A603DA13033BA50077B460 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DDF6512B6C8C000F75D2A /* libassimp.a */; };
 		16AC52C911628EC50076AA8B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		16AC5315116290AA0076AA8B /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
@@ -657,6 +658,7 @@
 		1697339A11768CDF0025299C /* utMath.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utMath.cpp; sourceTree = "<group>"; };
 		169CD07D134E4FA000D0037B /* al_Info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Info.cpp; sourceTree = "<group>"; };
 		169CD07E134E4FF500D0037B /* al_Info.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Info.hpp; sourceTree = "<group>"; };
+		16A5523714D3247900CBD8C2 /* utMathSpherical.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utMathSpherical.cpp; sourceTree = "<group>"; };
 		16A6041B130345BB0077B460 /* frustumTesting.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = frustumTesting.cpp; sourceTree = "<group>"; };
 		16A6041C130345BB0077B460 /* isosurface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = isosurface.cpp; sourceTree = "<group>"; };
 		16A6041E130345BB0077B460 /* manyShapeMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = manyShapeMesh.cpp; sourceTree = "<group>"; };
@@ -2090,6 +2092,7 @@
 				160DAE0F11C1B15C00C6905A /* utIOSocket.cpp */,
 				16AC52A511628D4D0076AA8B /* utIOWindowGL.cpp */,
 				1697339A11768CDF0025299C /* utMath.cpp */,
+				16A5523714D3247900CBD8C2 /* utMathSpherical.cpp */,
 				168C16401322C755006D79CC /* utGraphicsDraw.cpp */,
 				168C163D1322C656006D79CC /* utGraphicsMesh.cpp */,
 				16AC52A411628D4D0076AA8B /* utProtocolOSC.cpp */,
@@ -3694,6 +3697,7 @@
 				168C163E1322C656006D79CC /* utGraphicsMesh.cpp in Sources */,
 				168C16411322C755006D79CC /* utGraphicsDraw.cpp in Sources */,
 				168E742A1329999D003115DD /* unitTests.cpp in Sources */,
+				16A5523814D3247900CBD8C2 /* utMathSpherical.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4065,6 +4069,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(NATIVE_ARCH)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -4087,6 +4092,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(NATIVE_ARCH)";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
@@ -4511,6 +4517,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(NATIVE_ARCH)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -4540,6 +4547,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(NATIVE_ARCH)";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/bin;
