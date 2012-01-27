@@ -31,6 +31,7 @@
 	interactive multimedia tools and applications.
 */
 
+#include "allocore/graphics/al_DisplayList.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_Image.hpp"
 //#include "allocore/graphics/al_Isosurface.hpp"

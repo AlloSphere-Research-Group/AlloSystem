@@ -27,7 +27,7 @@
 
 
 	File description:
-	GPU buffer object helper
+	GPU display list for drawing static geometry
 
 	File author(s):
 	Lance Putnam, 2010, putnam.lance@gmail.com
@@ -39,25 +39,29 @@
 namespace al{
 
 
-class DisplayList {
+/// Display list for drawing static geometry
+class DisplayList : public GPUObject {
 public:
-	DisplayList() : mID(0) {}
-	~DisplayList() { clear(); }
 
-	void begin() {
-		if (mID)
-			glDeleteLists(mID, 1);
+	/// Begin the display list's rendering commands
+	void begin(){ validate(); glNewList(id(), GL_COMPILE); }
+
+	/// End the display list's rendering commands
+	void end(){ glEndList(); }
+
+	/// Draw the display list
+	void draw(){ glCallList(id()); }
+
+protected:
+	virtual void onCreate(){
 		mID = glGenLists(1);
-		glNewList(mID, GL_COMPILE);
 	}
-	void end() { glEndList(); }
-	void draw() { glCallList(mID); }
-	void clear() { glDeleteLists(mID, 1);}
 
-	unsigned long mID;
+	virtual void onDestroy(){
+		glDeleteLists(mID, 1);
+	}
 };
 
 } // al::
 
-#endif // include guard
-
+#endif
