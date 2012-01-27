@@ -669,8 +669,8 @@ int utMath(){
 				switch(n){
 				case 0:	return 1;
 				case 1:	return -x + k + 1;
-				case 2: return x*x/2 - (k+2)*x + (k+2)*(k+1)/2;
-				case 3: return -x*x*x/6 + (k+3)*x*x/2 - (k+2)*(k+3)*x/2 + (k+1)*(k+2)*(k+3)/6;
+				case 2: return (1./2)*(x*x - 2*(k+2)*x + (k+2)*(k+1));
+				case 3: return (1./6)*(-x*x*x + 3*(k+3)*x*x - 3*(k+2)*(k+3)*x + (k+1)*(k+2)*(k+3));
 				default: return 0;
 				}
 			}
