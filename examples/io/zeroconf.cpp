@@ -54,13 +54,10 @@ Window win;
 
 int main() {
 	//win.create();
-
 	//MainLoop::start();
 	
 	// if the MainLoop::start() was not called, this alternative works:
-	while (1) {
-		z.poll();
-	}
+	while (1) { z.poll(); }
 	
 	return 0;
 }

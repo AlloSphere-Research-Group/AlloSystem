@@ -131,7 +131,6 @@
 @end
 
 
-
 @interface ServerDelegate : NSObject {
     NSNetService * netService;
 }
