@@ -50,8 +50,8 @@ template <class T>
 struct SphereCoord {
 	typedef Complex<T> C;
 
-	C t;	///< Theta component, latitudinal angle (angle from +x towards +y)
-	C p;	///< Phi component, longitudinal angle (angle from +z axis)
+	C t;	///< Theta component, longitudinal angle (angle from +x towards +y)
+	C p;	///< Phi component, latitudinal angle (angle from +z axis)
 
 	///
 	SphereCoord(const C& theta =C(1,0), const C& phi =C(1,0))
@@ -75,8 +75,8 @@ struct SphereCoord {
 	
 	/// Set from two angles, in radians, and radius
 	
-	/// @param[in] theta	latitudinal angle (angle from +x towards +y)
-	/// @param[in] phi		longitudinal angle (angle from +z axis)
+	/// @param[in] theta	longitudinal angle (angle from +x towards +y)
+	/// @param[in] phi		latitudinal angle (angle from +z axis)
 	SphereCoord& fromAngle(const T& theta, const T& phi, const T& radius =T(1)){
 		t.fromPolar(theta);
 		p.fromPolar(radius, phi);
@@ -121,7 +121,7 @@ public:
 	/// @param[in] l		number of nodal lines
 	/// @param[in] m		number of latitudinal nodal lines, |m| <= l
 	/// @param[in] ctheta	longitudinal complex angle in [0, 2pi]
-	/// @param[in] cphi		latitudinal complex angle in [0,pi]
+	/// @param[in] cphi		latitudinal complex angle in [0, pi]
 	template <class T>
 	Complex<T> operator()(int l, int m, const Complex<T>& ctheta, const Complex<T>& cphi) const {
 		return coef(l,m) * al::legendreP(l, al::abs(m), cphi.r, cphi.i) * expim(m, ctheta);
