@@ -354,7 +354,7 @@ void Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 }
 
 
-void Mesh::ribbonize(float * widths, int widthsStride, bool faceBitangent){
+void Mesh::ribbonize(float * widths, int widthsStride, bool faceBinormal){
 
 	const int N = mVertices.size();
 
@@ -366,8 +366,8 @@ void Mesh::ribbonize(float * widths, int widthsStride, bool faceBitangent){
 	// Store last vertex since it will be overwritten eventually
 	const Vertex last = mVertices[N-1]; 
 	
-	int in = faceBitangent ? 2 : 1;
-	int ib = faceBitangent ? 1 : 2;
+	int in = faceBinormal ? 2 : 1;
+	int ib = faceBinormal ? 1 : 2;
 	
 	for(int i=N-1; i>=0; --i){
 		int i1 = i;
@@ -383,6 +383,8 @@ void Mesh::ribbonize(float * widths, int widthsStride, bool faceBitangent){
 		{
 			const Vertex d1 = (v0 - v2)*0.5;
 			const Vertex d2 = (d1 - v1)*2.0;
+//			const Vertex d1 = (v0 - v2);
+//			const Vertex d2 = (v0 - v1 - v1 + v2);
 			//Vertex& t = f[0];
 			Vertex& n = f[1];
 			Vertex& b = f[2];

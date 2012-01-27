@@ -142,20 +142,24 @@ public:
 
 	/// Ribbonize curve
 	
+	/// This creates a two-dimensional ribbon from a one-dimensional space curve.
+	/// The result is to be rendered with a triangle strip.
 	/// @param[in] width			Width of ribbon
-	/// @param[in] faceBitangent	If true, surface faces bitangent vector of curve.
+	/// @param[in] faceBinormal		If true, surface faces binormal vector of curve.
 	///								If false, surface faces normal vector of curve.
-	void ribbonize(float width, bool faceBitangent=false){
-		ribbonize(&width, 0, faceBitangent);
+	void ribbonize(float width=0.04, bool faceBinormal=false){
+		ribbonize(&width, 0, faceBinormal);
 	}
 
 	/// Ribbonize curve
-	
+
+	/// This creates a two-dimensional ribbon from a one-dimensional space curve.
+	/// The result is to be rendered with a triangle strip.
 	/// @param[in] widths			Array specifying width of ribbon at each point along curve
 	/// @param[in] widthsStride		Stride factor of width array
-	/// @param[in] faceBitangent	If true, surface faces bitangent vector of curve.
+	/// @param[in] faceBinormal		If true, surface faces binormal vector of curve.
 	///								If false, surface faces normal vector of curve.	
-	void ribbonize(float * widths, int widthsStride=1, bool faceBitangent=false);
+	void ribbonize(float * widths, int widthsStride=1, bool faceBinormal=false);
 
 
 	int primitive() const { return mPrimitive; }
