@@ -41,6 +41,7 @@ public:
 		light();
 		
 		// call our display list multiple times
+		g.draw(verts, g.CLIENT_BEGIN);
 		for(int k=0; k<10; ++k){
 		for(int j=0; j<10; ++j){
 		for(int i=0; i<10; ++i){
@@ -49,6 +50,7 @@ public:
 				dlist.draw();
 			g.popMatrix();
 		}}}
+		g.draw(verts, g.CLIENT_END);
 	}
 };
 

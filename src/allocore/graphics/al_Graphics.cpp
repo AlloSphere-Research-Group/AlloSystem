@@ -183,7 +183,7 @@ void Graphics::color(double r, double g, double b, double a) {
 
 
 // Buffer drawing
-void Graphics::draw(const Mesh& v) {
+void Graphics::draw(const Mesh& v, CommandMode mode){
 
 	const int Nv = v.vertices().size();
 	if(0 == Nv) return;
@@ -195,71 +195,76 @@ void Graphics::draw(const Mesh& v) {
 	const int Nt3= v.texCoord3s().size();
 	const int Ni = v.indices().size();
 	
+	//printf("client %d, GPU %d\n", clientSide, gpuSide);
 	//printf("Nv %i Nc %i Nn %i Nt2 %i Nt3 %i Ni %i\n", Nv, Nc, Nn, Nt2, Nt3, Ni);
 
-	// Enable arrays and set pointers...
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(3, GL_FLOAT, 0, &v.vertices()[0]);
+	if(CLIENT_BEGIN & mode){
+		// Enable arrays and set pointers...
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glVertexPointer(3, GL_FLOAT, 0, &v.vertices()[0]);
 
-	if(Nn >= Nv){
-		glEnableClientState(GL_NORMAL_ARRAY);
-		glNormalPointer(GL_FLOAT, 0, &v.normals()[0]);
-	}
-	
-	if(Nc >= Nv){
-		glEnableClientState(GL_COLOR_ARRAY);
-		glColorPointer(4, GL_FLOAT, 0, &v.colors()[0]);
-	}
-	else if(Nci >= Nv){
-		glEnableClientState(GL_COLOR_ARRAY);
-		glColorPointer(4, GL_UNSIGNED_BYTE, 0, &v.coloris()[0]);
-//		printf("using integer colors\n");	
-	}
-	else if(0 == Nc && 0 == Nci){
-		// just use whatever the last glColor() call used!
-	}
-	else{
-		if(Nc)
-			//glColor4f(v.colors()[0][0], v.colors()[0][1], v.colors()[0][2], v.colors()[0][3]);
-			glColor4fv(v.colors()[0].components);
-		else
-			glColor3ubv(v.coloris()[0].components);
-	}
-	
-	if(Nt2 || Nt3){
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		if(Nt2 >= Nv) glTexCoordPointer(2, GL_FLOAT, 0, &v.texCoord2s()[0]);
-		if(Nt3 >= Nv) glTexCoordPointer(3, GL_FLOAT, 0, &v.texCoord3s()[0]);
-	}
-	
-	
-	if(Ni){
-		//unsigned vs=0, ve=Nv;	// range of vertex indices to prefetch
-								// NOTE:	if this range exceeds the number of vertices,
-								//			expect a segmentation fault...
-		unsigned is=0, ie=Ni;	// range of indices to draw
-
-//		glDrawRangeElements(v.primitive(), vs, ve, ie-is, GL_UNSIGNED_INT, &v.indices()[is]);
-		glDrawElements(
-			((Graphics::Primitive)v.primitive()), 
-			ie-is, 
-			GL_UNSIGNED_INT, 
-			&v.indices()[is]
-		);
-	}
-	else{
-		glDrawArrays(
-			((Graphics::Primitive)v.primitive()), 
-			0, 
-			v.vertices().size()
-		);
+		if(Nn >= Nv){
+			glEnableClientState(GL_NORMAL_ARRAY);
+			glNormalPointer(GL_FLOAT, 0, &v.normals()[0]);
+		}
+		
+		if(Nc >= Nv){
+			glEnableClientState(GL_COLOR_ARRAY);
+			glColorPointer(4, GL_FLOAT, 0, &v.colors()[0]);
+		}
+		else if(Nci >= Nv){
+			glEnableClientState(GL_COLOR_ARRAY);
+			glColorPointer(4, GL_UNSIGNED_BYTE, 0, &v.coloris()[0]);
+	//		printf("using integer colors\n");	
+		}
+		else if(0 == Nc && 0 == Nci){
+			// just use whatever the last glColor() call used!
+		}
+		else{
+			if(Nc)
+				//glColor4f(v.colors()[0][0], v.colors()[0][1], v.colors()[0][2], v.colors()[0][3]);
+				glColor4fv(v.colors()[0].components);
+			else
+				glColor3ubv(v.coloris()[0].components);
+		}
+		
+		if(Nt2 || Nt3){
+			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+			if(Nt2 >= Nv) glTexCoordPointer(2, GL_FLOAT, 0, &v.texCoord2s()[0]);
+			if(Nt3 >= Nv) glTexCoordPointer(3, GL_FLOAT, 0, &v.texCoord3s()[0]);
+		}
 	}
 
-					glDisableClientState(GL_VERTEX_ARRAY);
-	if(Nn)			glDisableClientState(GL_NORMAL_ARRAY);
-	if(Nc || Nci)	glDisableClientState(GL_COLOR_ARRAY);
-	if(Nt2 || Nt3)	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	if(SERVER & mode){
+		if(Ni){
+			//unsigned vs=0, ve=Nv;	// range of vertex indices to prefetch
+									// NOTE:	if this range exceeds the number of vertices,
+									//			expect a segmentation fault...
+			unsigned is=0, ie=Ni;	// range of indices to draw
 
+	//		glDrawRangeElements(v.primitive(), vs, ve, ie-is, GL_UNSIGNED_INT, &v.indices()[is]);
+			glDrawElements(
+				((Graphics::Primitive)v.primitive()), 
+				ie-is, 
+				GL_UNSIGNED_INT, 
+				&v.indices()[is]
+			);
+		}
+		else{
+			glDrawArrays(
+				((Graphics::Primitive)v.primitive()), 
+				0,
+				v.vertices().size()
+			);
+		}
+	}
+	
+	if(CLIENT_END & mode){
+						glDisableClientState(GL_VERTEX_ARRAY);
+		if(Nn)			glDisableClientState(GL_NORMAL_ARRAY);
+		if(Nc || Nci)	glDisableClientState(GL_COLOR_ARRAY);
+		if(Nt2 || Nt3)	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	}
 }
 
 

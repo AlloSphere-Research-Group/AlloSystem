@@ -54,6 +54,7 @@
 
 namespace al {
 
+
 /// A framed area on a display screen
 struct Viewport {
 	float l, b, w, h;	///< left, bottom, width, height
@@ -120,6 +121,13 @@ public:
 		LIGHTING				= GL_LIGHTING,
 		SCISSOR_TEST			= GL_SCISSOR_TEST,
 		CULL_FACE				= GL_CULL_FACE
+	};
+	
+	enum CommandMode {
+		CLIENT_BEGIN			= 1<<0,
+		CLIENT_END				= 1<<1,
+		CLIENT					= CLIENT_BEGIN | CLIENT_END,
+		SERVER					= 1<<2
 	};
 
 	enum DataType {
@@ -289,9 +297,18 @@ public:
 	void color(const Vec4d& v) { color(v[0], v[1], v[2], v[3]); }
 	void color(const Vec4f& v) { color(v[0], v[1], v[2], v[3]); }
 
+	/// Draw vertex data
+	
+	/// @param[in] v		vertex data to draw
+	/// @param[in] cmdMode	command mode
+	void draw(const Mesh& v, CommandMode cmdMode = CommandMode(CLIENT|SERVER));
+	
+	/// Draw internal vertex data
 
-	void draw(const Mesh& v);
-	void draw(){ draw(mMesh); }
+	/// @param[in] cmdMode	command mode
+	///
+	void draw(CommandMode cmdMode = CommandMode(CLIENT|SERVER)){
+		draw(mMesh, cmdMode); }
 
 
 	// Utility functions: converting, reporting, etc.
@@ -380,6 +397,10 @@ inline void Graphics::currentColor(float r, float g, float b, float a){ glColor4
 
 inline Graphics::AttributeBit operator| (const Graphics::AttributeBit& a, const Graphics::AttributeBit& b){
 	return static_cast<Graphics::AttributeBit>(+a|+b);
+}
+
+inline Graphics::CommandMode operator| (const Graphics::CommandMode& a, const Graphics::CommandMode& b){
+	return static_cast<Graphics::CommandMode>(+a|+b);
 }
 
 } // al::
