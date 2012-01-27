@@ -413,6 +413,12 @@ inline Vec<N1+N2, T1> concat(const Vec<N1,T1>& a, const Vec<N2,T2>& b){
 	return r;
 }
 
+/// Get a subvector
+template <int M, int N, class T>
+inline Vec<M,T> sub(const Vec<N,T>& v, int begin=0){
+	return v.sub<M>(begin);
+}
+
 /// Sets r to cross product, a x b
 template <class T>
 inline void cross(Vec<3,T>& r, const Vec<3,T>& a, const Vec<3,T>& b){
