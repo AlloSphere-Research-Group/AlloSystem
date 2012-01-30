@@ -121,8 +121,8 @@ public:
 
 	/// @param[in] l		number of nodal lines
 	/// @param[in] m		number of latitudinal nodal lines, |m| <= l
-	/// @param[in] ctheta	longitudinal complex angle in [0, 2pi]
-	/// @param[in] cphi		latitudinal complex angle in [0, pi]
+	/// @param[in] ctheta	unit magnitude complex number describing longitudinal angle in [0, 2pi]
+	/// @param[in] cphi		unit magnitude complex number describing latitudinal angle in [0, pi]
 	template <class T>
 	Complex<T> operator()(int l, int m, const Complex<T>& ctheta, const Complex<T>& cphi) const {
 		return coef(l,m) * al::legendreP(l, al::abs(m), cphi.r, cphi.i) * expim(m, ctheta);
