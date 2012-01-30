@@ -86,10 +86,10 @@ struct SphereCoord {
 	/// Set from Cartesian coordinate
 	template <class U>
 	SphereCoord& fromCart(const Vec<3,U>& v){
-		t(v[0], v[1]);
+		t.set(v[0], v[1]);
 		T tmag = t.mag();
-		p(v[2], tmag);
-		tmag != 0 ? t*=(1./tmag) : t(1,0);
+		p.set(v[2], tmag);
+		tmag != 0 ? t*=(1./tmag) : t.set(1,0);
 		return *this;
 	}
 };
