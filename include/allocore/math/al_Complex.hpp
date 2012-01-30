@@ -90,17 +90,19 @@ public:
 	
 	Complex(const Complex& v): r(v.r), i(v.i){}
 	Complex(const Polar<T>& v){ *this = v; }
-	Complex(const T& r=(T)1, const T& i=(T)0): r(r), i(i){}
+	Complex(const T& r=T(1), const T& i=T(0)): r(r), i(i){}
 	Complex(const T& m, const T& p, int fromPolar){ (*this) = Polar<T>(m,p); }
 
 	
-	C& arg(const T& v){ return fromPolar(norm(), v); }					///< Set phase leaving magnitude the same
-	C& fromPolar(const T& phase){ r=::cos(phase); i=::sin(phase); return *this; }	///< Set phase and normalize
-	C& fromPolar(const T& m, const T& p){ return (*this)(Polar<T>(m,p)); }	///< Set magnitude and phase
-	C& norm(const T& v){ return fromPolar(v, arg()); }					///< Set magnitude leaving phase the same
+	C& arg(T v){ return fromPolar(norm(), v); }					///< Set phase leaving magnitude the same
+	C& fromPolar(T phase){ r=::cos(phase); i=::sin(phase); return *this; }	///< Set phase and normalize
+	C& fromPolar(T m, T p){ return set(Polar<T>(m,p)); }		///< Set magnitude and phase
+	C& norm(const T& v){ return fromPolar(v, arg()); }			///< Set magnitude leaving phase the same
 
-	C& operator()(const T& vr, const T& vi){ r=vr; i=vi; return *this; }
-	C& operator()(const Polar<T>& p){ return *this = p; }
+	/// Set real and imaginary components
+	C& set(T vr, T vi){ r=vr; i=vi; return *this; }
+	C& set(const Polar<T>& p){ return *this = p; }
+
 	T& operator[](int i){ return elems[i];}
 	const T& operator[](int i) const { return elems[i]; }
 
@@ -118,25 +120,25 @@ public:
 
 	C& operator = (const Polar<T>& v){ r=v.m*::cos(v.p); i=v.m*::sin(v.p); return *this; }
 	C& operator = (const C& v){ r=v.r; i=v.i; return *this; }
-	C& operator = (const T& v){ r=v;   i=T(0); return *this; }
+	C& operator = (T v){ r=v;   i=T(0); return *this; }
 	C& operator -=(const C& v){ r-=v.r; i-=v.i; return *this; }
-	C& operator -=(const T& v){ r-=v; return *this; }
+	C& operator -=(T v){ r-=v; return *this; }
 	C& operator +=(const C& v){ r+=v.r; i+=v.i; return *this; }
-	C& operator +=(const T& v){ r+=v; return *this; }
-	C& operator *=(const C& v){ return (*this)(r*v.r - i*v.i, i*v.r + r*v.i); }
-	C& operator *=(const T& v){ r*=v; i*=v; return *this; }
+	C& operator +=(T v){ r+=v; return *this; }
+	C& operator *=(const C& v){ return set(r*v.r - i*v.i, i*v.r + r*v.i); }
+	C& operator *=(T v){ r*=v; i*=v; return *this; }
 	C& operator /=(const C& v){ return (*this) *= v.recip(); }
-	C& operator /=(const T& v){ r/=v; i/=v; return *this; }
+	C& operator /=(T v){ r/=v; i/=v; return *this; }
 
 	C operator - () const { return C(-r, -i); }
 	C operator - (const C& v) const { return C(*this) -= v; }
-	C operator - (const T& v) const { return C(*this) -= v; }
+	C operator - (T v) const { return C(*this) -= v; }
 	C operator + (const C& v) const { return C(*this) += v; }
-	C operator + (const T& v) const { return C(*this) += v; }
+	C operator + (T v) const { return C(*this) += v; }
 	C operator * (const C& v) const { return C(*this) *= v; }
-	C operator * (const T& v) const { return C(*this) *= v; }
+	C operator * (T v) const { return C(*this) *= v; }
 	C operator / (const C& v) const { return C(*this) /= v; }
-	C operator / (const T& v) const { return C(*this) /= v; }
+	C operator / (T v) const { return C(*this) /= v; }
 	
 	T arg() const { return atan2(i, r); }					///< Returns argument in [-pi, pi]
 	T argUnit() const { T r=arg()/(2*M_PI); return r>0 ? r : r+1; }	///< Return argument in unit interval [0, 1)
@@ -148,7 +150,7 @@ public:
 	T norm2() const { return dot(*this); }					///< Returns square of norm, |z|^2
 	C& normalize(){ return *this /= norm(); }				///< Sets norm (radius) to 1, |z|=1
 	C pow(const C& v) const { return ((*this).log()*v).exp(); }	///< Returns z^v
-	C pow(const T& v) const { return ((*this).log()*v).exp(); }	///< Returns z^v
+	C pow(T v) const { return ((*this).log()*v).exp(); }	///< Returns z^v
 	C recip() const { return conj()/norm2(); }				///< Return multiplicative inverse, 1/z
 	C sgn() const { return C(*this).normalize(); }			///< Returns signum, z/|z|, the closest point on unit circle
 	C sqr() const { return C(r*r-i*i, T(2)*r*i); }			///< Returns square
@@ -185,16 +187,16 @@ TEM Complex<T> pow(const Complex<T>& b, const T& e){ return b.pow(e); }
 #undef TEM
 
 template <class T>
-inline Complex<T> operator + (const T& r, const Complex<T>& c){ return  c+r; }
+inline Complex<T> operator + (T r, const Complex<T>& c){ return  c+r; }
 
 template <class T>
-inline Complex<T> operator - (const T& r, const Complex<T>& c){ return -c+r; }
+inline Complex<T> operator - (T r, const Complex<T>& c){ return -c+r; }
 
 template <class T>
-inline Complex<T> operator * (const T& r, const Complex<T>& c){ return  c*r; }
+inline Complex<T> operator * (T r, const Complex<T>& c){ return  c*r; }
 
 template <class T>
-inline Complex<T> operator / (const T& r, const Complex<T>& c){ return  c.conj()*(r/c.norm()); }
+inline Complex<T> operator / (T r, const Complex<T>& c){ return  c.conj()*(r/c.norm()); }
 
 
 template <class VecN, class T>
