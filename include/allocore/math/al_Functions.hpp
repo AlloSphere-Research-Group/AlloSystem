@@ -178,7 +178,10 @@ template<class T> T gcd(const T& x, const T& y);
 template<class T> T gudermannian(const T& x);
 
 /// Generalized Laguerre polynomial L{n,k}
-///
+
+/// @param[in] n	degree, a non-negative integer
+/// @param[in] k	order
+/// @param[in] x	position
 /// http://en.wikipedia.org/wiki/Laguerre_polynomials
 template<class T> T laguerreL(int n, int k, T x);
 
@@ -586,6 +589,8 @@ TEM T laguerreL(int n, int k, T x){
 //		res = bin - x * res / i;
 //	}
 //	return res;
+	
+	if(n <0) return T(0);
 	
 	T L1= 0, R = 1;
 	for(int i=1; i<=n; ++i){
