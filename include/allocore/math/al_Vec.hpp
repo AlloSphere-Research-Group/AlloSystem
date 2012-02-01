@@ -342,7 +342,7 @@ public:
 	}
 
 	/// Returns closest vector on unit N-sphere
-	Vec sgn() const { return Vec(*this).normalize(); }
+	Vec sgn(T scale=T(1)) const { return Vec(*this).normalize(scale); }
 
 	/// Returns sum of elements
 	T sum() const {
@@ -361,8 +361,8 @@ public:
 	/// Negates all elements
 	Vec& negate(){ IT(N){ (*this)[i] = -(*this)[i]; } return *this; }
 
-	/// Scales elements evenly so magnitude is one
-	inline Vec& normalize();
+	/// Scales elements uniformly so magnitude is one
+	inline Vec& normalize(T scale=T(1));
 	
 	/// linear interpolation
 	void lerp(const Vec& target, T amt) { set(lerp(*this, target, amt)); }
@@ -488,14 +488,14 @@ inline Vec<N,T> max(const Vec<N,T>& a, const Vec<N,T>& b){
 // Implementation --------------------------------------------------------------
 
 template <int N, class T>
-Vec<N,T>& Vec<N,T>::normalize(){
+Vec<N,T>& Vec<N,T>::normalize(T scale){
 	float m = mag();
 	if(m > T(1e-20)){
-		(*this) /= m;
+		(*this) *= (scale/m);
 	}
 	else{
 		set(T(0));
-		(*this)[0] = T(1);
+		(*this)[0] = scale;
 	}
 	return *this;
 }
