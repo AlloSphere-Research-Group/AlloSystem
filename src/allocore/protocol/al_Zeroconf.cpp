@@ -355,7 +355,7 @@ Client::~Client() {
 	delete mImpl;
 }
 
-Client::poll(al_sec interval) {
+void Client::poll(al_sec interval) {
 	al_avahi_poll(interval);
 }
 
