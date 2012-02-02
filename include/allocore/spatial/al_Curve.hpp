@@ -56,6 +56,8 @@ struct Frenet{
 		init(p2,p1);
 	}
 
+	/// Get point one ahead of currently stored frame
+	const Vec3& point(){ return mp1; }
 
 	/// Get backward first difference
 	const Vec3& db(){ return mdb; }
@@ -74,7 +76,7 @@ struct Frenet{
 	
 	/// For best results, avoid runs of 3 or more colinear points and 2 or more
 	/// duplicate points. Colinear points result in ambiguous normal and 
-	/// bitangent vectors. Duplicated points make the first derivative undefined.
+	/// binormal vectors. Duplicated points make the first derivative undefined.
 	/// Both of these situations are guaranteed to wreak numerical havok.
 	template<bool NormalizeT, bool NormalizeN, bool NormalizeB, bool ComputeN>
 	void next(const Vec3& p0){
@@ -124,7 +126,7 @@ struct Frenet{
 	}
 
 protected:
-	Vec3 mp1;	// previous point
+	Vec3 mp1;	// Previously input point
 	Vec3 mdb;	// Backward first difference
 	Vec3 mdf;	// Forward first difference
 	Vec3 md2;	// (Central) second difference
