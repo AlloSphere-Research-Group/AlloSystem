@@ -65,7 +65,9 @@ public:
 	};
 	
 	Stereographic() 
-	: mMode(ANAGLYPH), mAnaglyphMode(RED_CYAN), mClearColor(Color(0)), mStereo(false), mOmni(0), mSlices(24), mOmniFov(360) {}
+	:	mMode(ANAGLYPH), mAnaglyphMode(RED_CYAN), mClearColor(Color(0)), mSlices(24), mOmniFov(360),
+		mStereo(false), mOmni(0)
+	{}
 
 	~Stereographic() {}
 
@@ -120,14 +122,16 @@ protected:
 	StereoMode mMode;
 	AnaglyphMode mAnaglyphMode;
 	Color mClearColor;
-	bool mStereo;
-	bool mOmni;
 	unsigned mSlices;	// number of omni slices
-	double mOmniFov;	// field of view of omnigraphics
-	
+	double mOmniFov;	// field of view of omnigraphics	
 	Matrix4d mProjection, mModelView;
 	Vec3d mEye;
 	Viewport mVP;
+	bool mStereo;
+	bool mOmni;
+
+	void pushDrawPop(Graphics& gl, Drawable& draw);
+	void sendViewport(Graphics& gl, const Viewport& vp);
 };
 
 } // al::
