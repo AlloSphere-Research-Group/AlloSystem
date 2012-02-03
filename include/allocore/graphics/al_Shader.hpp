@@ -206,6 +206,8 @@ public:
 	const ShaderProgram& uniform3(const char * name, const float * v, int count=1) const;
 	const ShaderProgram& uniform4(const char * name, const float * v, int count=1) const;
 
+	const ShaderProgram& uniformMatrix4(const char * name, const float * v, bool transpose=0) const;
+
 	const ShaderProgram& attribute(const char * name, float v0) const;
 	const ShaderProgram& attribute(const char * name, float v0, float v1) const;
 	const ShaderProgram& attribute(const char * name, float v0, float v1, float v2) const;
