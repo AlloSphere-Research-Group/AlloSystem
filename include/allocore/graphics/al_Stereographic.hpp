@@ -132,6 +132,7 @@ protected:
 
 	void pushDrawPop(Graphics& gl, Drawable& draw);
 	void sendViewport(Graphics& gl, const Viewport& vp);
+	void sendClear(Graphics& gl);
 };
 
 } // al::
