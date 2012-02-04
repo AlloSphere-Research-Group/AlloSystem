@@ -47,7 +47,7 @@ void Stereographic :: drawMono(Graphics& gl, const Camera& cam, const Pose& pose
 	double far = cam.far();
 	const Vec3d& pos = pose.pos();
 	
-	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
+	//glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 
 	// We must configure scissoring BEFORE clearing buffers
 	glEnable(GL_SCISSOR_TEST);
@@ -97,7 +97,8 @@ void Stereographic :: drawMono(Graphics& gl, const Camera& cam, const Pose& pose
 		pushDrawPop(gl,draw);
 	}
 
-	glPopAttrib();
+	//glPopAttrib();
+	glDisable(GL_SCISSOR_TEST);
 }
 
 void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear) 
@@ -108,7 +109,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 	double iod = cam.eyeSep();
 	const Vec3d& pos = pose.pos();
 
-	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
+	//glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 
 	// We must configure scissoring BEFORE clearing buffers
 	glEnable(GL_SCISSOR_TEST);
@@ -231,7 +232,8 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Camera& cam, const Pose& 
 	}
 	
 	glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
-	glPopAttrib();
+	glDisable(GL_SCISSOR_TEST);
+	//glPopAttrib();
 }
 
 
@@ -244,7 +246,7 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 	double iod = cam.eyeSep();
 	const Vec3d& pos = pose.pos();
 
-	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
+	//glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 
 	// We must configure scissoring BEFORE clearing buffers
 	glEnable(GL_SCISSOR_TEST);
@@ -339,7 +341,8 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 		pushDrawPop(gl,draw);
 	}
 
-	glPopAttrib();
+	//glPopAttrib();
+	glDisable(GL_SCISSOR_TEST);
 }
 
 void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear) 
@@ -355,7 +358,7 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 	
 	aspect *= 0.5;	// for split view
 
-	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
+	//glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 
 	glEnable(GL_SCISSOR_TEST);
 	sendViewport(gl, vp);
@@ -441,7 +444,8 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 		pushDrawPop(gl,draw);
 	}	
 
-	glPopAttrib();
+	glDisable(GL_SCISSOR_TEST);
+	//glPopAttrib();
 }
 
 
@@ -454,7 +458,7 @@ void Stereographic :: drawLeft(Graphics& gl, const Camera& cam, const Pose& pose
 	double iod = cam.eyeSep();
 	const Vec3d& pos = pose.pos();
 
-	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
+	//glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 
 	glEnable(GL_SCISSOR_TEST);
 	sendViewport(gl, vp);
@@ -503,7 +507,8 @@ void Stereographic :: drawLeft(Graphics& gl, const Camera& cam, const Pose& pose
 		pushDrawPop(gl,draw);
 	}
 
-	glPopAttrib();
+	glDisable(GL_SCISSOR_TEST);
+	//glPopAttrib();
 }
 
 void Stereographic :: drawRight(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear) 
@@ -514,7 +519,7 @@ void Stereographic :: drawRight(Graphics& gl, const Camera& cam, const Pose& pos
 	double iod = cam.eyeSep();
 	const Vec3d& pos = pose.pos();
 	
-	glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
+	//glPushAttrib(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
 
 	glEnable(GL_SCISSOR_TEST);
 	sendViewport(gl, vp);
@@ -564,7 +569,8 @@ void Stereographic :: drawRight(Graphics& gl, const Camera& cam, const Pose& pos
 		pushDrawPop(gl,draw);		
 	}
 
-	glPopAttrib();
+	glDisable(GL_SCISSOR_TEST);
+	//glPopAttrib();
 }
 
 /// blue line sync for active stereo
