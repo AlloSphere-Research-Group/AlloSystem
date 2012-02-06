@@ -455,6 +455,12 @@ inline void centroid3(Vec<N,T>& c, const Vec<N,T>& p1, const Vec<N,T>& p2, const
 	c = (p1+p2+p3)*_1_3;
 }
 
+/// Returns distance between two vectors
+template <int N, class T, class U>
+inline T dist(const Vec<N,T>& a, const Vec<N,U>& b){
+	return (a-b).mag();
+}
+
 /*! Get the normal to a triangle defined by three points
 	@param p1	Point1
 	@param p2	Point2
