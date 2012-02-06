@@ -84,8 +84,14 @@ protected:
 class GPUObject{
 public:
 	
-	GPUObject(int ctx = GPUContext::defaultContextID()): mID(0) { contextRegister(ctx); }
-	GPUObject(GPUContext& ctx): mID(0), bResubmit(false) { contextRegister(ctx.contextID()); }
+	GPUObject(int ctx = GPUContext::defaultContextID())
+	:	mID(0)
+	{	contextRegister(ctx); }
+
+	GPUObject(GPUContext& ctx)
+	:	mID(0), bResubmit(false)
+	{	contextRegister(ctx.contextID()); }
+
 	virtual ~GPUObject(){ contextUnregister(); }
 	
 	

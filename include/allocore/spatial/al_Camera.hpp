@@ -84,6 +84,9 @@ public:
 	/// ratio.
 	double heightAtDepth(double depth) const { return depth*mTanFOV; }
 	
+	/// Returns half the height of the frustum at the near plane
+	double heightAtNear() const { return heightAtDepth(near()); }
+	
 	// calculate desired fovy, given the Y height of the border at a specified Z depth:
 	static double getFovyForHeight(double height, double depth) {
 		return 2.*M_RAD2DEG*atan(height/depth);

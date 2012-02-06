@@ -79,7 +79,7 @@ public:
 
 	/// This function fills a Buffer with n copies of the given value. Note that
 	/// the assignment completely changes the buffer and that the resulting size
-	/// is the same as the number of elements assigned.  Old data may be lost.
+	/// is the same as the number of elements assigned. Old data may be lost.
 	void assign(int n, const T& v){ mElems.assign(n,v); }
 
 	/// Set element at absolute index
