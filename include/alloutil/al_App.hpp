@@ -91,6 +91,7 @@ public:
 
 	const Pose& transform() const { return mTransform; }
 	Pose& transform(){ return mTransform; }
+	Viewpoint& transform(const Pose& v){ mTransform=v; return *this; }
 	
 	Pose worldTransform() const { return mParentTransform ? (*mParentTransform) * transform() : transform(); }
 	
@@ -133,6 +134,7 @@ public:
 	}
 
 	/// Get the list of viewpoints
+	Viewpoints& viewpoints(){ return mViewpoints; }
 	const Viewpoints& viewpoints() const { return mViewpoints; }
 	
 	/// Add a new viewpoint to the window
