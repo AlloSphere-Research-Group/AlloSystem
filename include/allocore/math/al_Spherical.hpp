@@ -63,7 +63,9 @@ struct SphereCoord {
 
 
 	/// Get negation in Cartesian space
-	SphereCoord operator - () const { return SphereCoord(t, -p); }
+	SphereCoord  operator - () const { return SphereCoord(t, -p); }
+	SphereCoord& operator *=(T v){ p*=v; return *this; }
+	SphereCoord  operator * (T v) const { return SphereCoord(t, p*v); }
 
 	/// Get radius
 	T radius() const { return p.mag(); }
