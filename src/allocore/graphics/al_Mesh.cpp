@@ -354,6 +354,23 @@ void Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 }
 
 
+
+Mesh& Mesh::repeatLast(){
+	if(indices().size()){
+		index(indices().last());
+	}
+	else{
+		if(colors().size()) color(colors().last());
+		else if(coloris().size()) colori(coloris().last());
+		if(vertices().size()) vertex(vertices().last());
+		if(normals().size()) normal(normals().last());
+		if(texCoord2s().size()) texCoord(texCoord2s().last());
+		else if(texCoord3s().size()) texCoord(texCoord3s().last());
+	}
+	return *this;
+}
+
+
 void Mesh::ribbonize(float * widths, int widthsStride, bool faceBinormal){
 
 	const int N = mVertices.size();

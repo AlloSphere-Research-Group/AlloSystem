@@ -172,6 +172,12 @@ public:
 	const Buffer<Index>& indices() const { return mIndices; }
 
 
+	/// Set geometric primitive
+	Mesh& primitive(int prim){ mPrimitive=prim; return *this; }
+	
+	/// Repeat last vertex element(s)
+	Mesh& repeatLast();
+
 	/// Append index to index buffer
 	void index(unsigned int i){ indices().append(i); }
 
@@ -239,8 +245,7 @@ public:
 		for(int i=0; i<size; ++i) vertex(buf[i][0], buf[i][1], buf[i][2]);
 	}
 
-	/// Set geometric primitive
-	Mesh& primitive(int prim){ mPrimitive=prim; return *this; }
+
 	/// Get number of faces (assumes triangles or quads)
 //	int numFaces() const { return mIndices.size() / ( ( mPrimitive == Graphics::TRIANGLES ) ? 3 : 4 ); }
 	/// Get indices as triangles
@@ -269,6 +274,7 @@ protected:
 	
 	int mPrimitive;
 };
+
 
 
 
