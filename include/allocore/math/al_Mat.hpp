@@ -471,6 +471,12 @@ inline Vec<N,T> operator* (const Vec<N,T>& vRow, const Mat<N,T>& m){
 //				(product of diagonal terms in row echelon form)
 //				We need a rowEchelon() method for Mat (should indicate what rows were swapped, if any)
 
+/// Get determinant of 1-by-1 matrix
+template <class T>
+T determinant(const Mat<1,T>& m){
+	return m(0,0);
+}
+
 /// Get determinant of 2-by-2 matrix
 template <class T>
 T determinant(const Mat<2,T>& m){
