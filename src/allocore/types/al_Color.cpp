@@ -2,7 +2,7 @@
 
 namespace al{
 
-Color& Color::operator= (const HSV& hsv){
+RGB& RGB::operator= (const HSV& hsv){
 	
 	float h=hsv.h*6.f, s=hsv.s, v=hsv.v;
 	
@@ -30,7 +30,7 @@ Color& Color::operator= (const HSV& hsv){
 }
 
 
-HSV& HSV::operator= (const Color& c){
+HSV& HSV::operator= (const RGB& c){
 
 	float r=c.r, g=c.g, b=c.b;
 
