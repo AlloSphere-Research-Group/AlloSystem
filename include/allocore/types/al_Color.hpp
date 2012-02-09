@@ -347,19 +347,22 @@ struct RGB{
 			float g;			///< Green component in [0, 1]
 			float b;			///< Blue component in [0, 1]
 		};
-		float components[3];	///< RGBA component vector
+		float components[3];	///< RGB component vector
 	};
 
 
-	/// @param[in] r			red component
-	/// @param[in] g			green component
-	/// @param[in] b			blue component
+	/// @param[in] r		red component
+	/// @param[in] g		green component
+	/// @param[in] b		blue component
 	RGB(float r, float g, float b)
 	:	r(r), g(g), b(b){}
 
-	/// @param[in] gray			red/green/blue components
+	/// @param[in] gray		red/green/blue components
 	RGB(float gray=1.f)
 	:	r(gray), g(gray), b(gray){}
+
+	/// @param[in] v		RGB color to convert from
+	RGB(const Color& v){ *this = v; }
 
 	/// @param[in] hsv			HSV value
 	RGB(const HSV& hsv)
