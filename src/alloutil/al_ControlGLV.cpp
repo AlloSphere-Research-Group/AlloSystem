@@ -98,9 +98,17 @@ GLVDetachable& GLVDetachable::detached(bool v){
 		if(mParentWindow){
 			remGUI(parentWindow());
 		}
-		enable(glv::DrawBack);
-		addGUI(detachedWindow());
 		glv::Rect ru = unionOfChildren();
+		enable(glv::DrawBack);
+		{
+			glv::View * cv = child;
+			while(cv){
+				cv->posAdd(-ru.l, -ru.t);
+				cv = cv->sibling;
+			}
+		}
+		//posAdd(-ru.l, -ru.t);
+		addGUI(detachedWindow());
 		detachedWindow().create(Window::Dim(ru.w, ru.h));
 	}
 	else if(detached()){			// is currently detached, attach back to parent, if any
@@ -108,6 +116,7 @@ GLVDetachable& GLVDetachable::detached(bool v){
 		detachedWindow().destroy();
 		if(mParentWindow){
 			disable(glv::DrawBack);
+			pos(0,0);
 			addGUI(parentWindow());
 		}
 	}
