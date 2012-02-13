@@ -390,21 +390,7 @@ inline Array& Array::operator= (const AlloArray& cpy) {
 	Set stride factors based on a specific byte alignment
  */
 inline void Array::deriveStride(AlloArrayHeader& h, size_t alignSize) {
-	unsigned typeSize = allo_type_size(h.type);
-	unsigned numDims = h.dimcount;
-	h.stride[0] = h.components * typeSize;
-
-	if(numDims>1){
-		h.stride[1] = h.stride[0] * h.dim[0];		// compute ideal row stride amount
-
-		if(alignSize){	// protection against x % 0, can throw exception...
-			unsigned remain = h.stride[1] % alignSize;		// compute pad bytes
-			if(remain){ h.stride[1] += alignSize - remain;}	// add pad bytes (if any)
-		}
-
-		unsigned i=2;
-		for(; i<numDims; ++i){ h.stride[i] = h.stride[i-1] * h.dim[i-1]; }
-	}
+	allo_array_setstride(&h, alignSize);
 }
 
 // Check if this Array conforms to an ArrayHeader format
