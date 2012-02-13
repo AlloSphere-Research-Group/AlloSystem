@@ -221,16 +221,15 @@ struct Colori {
 
 	/// @param[in] hsv			HSV value
 	/// @param[in] a			alpha component
-	Colori(const HSV& hsv, float a=1.f)
-	:	a(toi(a))
+	Colori(const HSV& hsv, uint8_t a=255)
+	:	a(a)
 	{	*this = hsv; }
 
 	/// @param[in] hsv			HSV value
 	/// @param[in] a			alpha component
-	Colori(const RGB& rgb, float a=1.f)
-	:	a(toi(a))
+	Colori(const RGB& rgb, uint8_t a=255)
+	:	a(a)
 	{	*this = rgb; }
-
 
 	/// Set color component at index with no bounds checking
 	uint8_t& operator[](int i){ return components[i]; }
@@ -239,14 +238,14 @@ struct Colori {
 	const uint8_t& operator[](int i) const { return components[i]; }
 
 	/// Set from floating-point color
-	Colori& operator= (const Color& c){
-		r=toi(c.r); g=toi(c.g); b=toi(c.b); a=toi(c.a); return *this; }
+	Colori& operator= (const Color& v){
+		return set(toi(v.r), toi(v.g), toi(v.b), toi(v.a)); }
 
 	/// Set RGB components from HSV
-	Colori& operator= (const HSV& v){ return *this = Color(v); }
+	Colori& operator= (const HSV& v);
 
 	/// Set RGB components from RGB
-	Colori& operator= (const RGB& v){ return *this = Color(v); }
+	Colori& operator= (const RGB& v);
 
 	/// Set RGB components
 	Colori& set(uint8_t re, uint8_t gr, uint8_t bl){
@@ -480,6 +479,14 @@ inline Color& Color::invert(){ rgb().invert(); return *this; }
 
 inline float Color::luminance() const { return rgb().luminance(); }
 
+
+inline Colori& Colori::operator= (const HSV& v){
+	return *this = RGB(v);
+}
+
+inline Colori& Colori::operator= (const RGB& v){
+	return set(toi(v.r), toi(v.g), toi(v.b), 255);
+}
 
 
 inline HSV operator * (float s, const HSV& c){ return  c*s; }
