@@ -24,7 +24,9 @@ ProtoApp::ProtoApp()
 	;
 
 	mGUITable.colors().set(glv::StyleColor::SmokyGray);
-	mGUITable.enable(glv::DrawBack);		
+	//mGUITable.enable(glv::DrawBack);
+	mGUITable.enable(glv::DrawBack | glv::Controllable);
+	mGUITable.addHandler(glv::Event::MouseDrag, glv::Behavior::mouseMove);
 	mGUITable.arrangement(">");
 	mGUITable << mTopBar << mParamPanel;
 
@@ -33,6 +35,22 @@ ProtoApp::ProtoApp()
 	mGUI.parentWindow(*win);
 }
 
+
+static bool toIdentifier(std::string& v){
+	bool modified = false;
+	if(!(isalpha(v[0]) || '_'==v[0])){
+		v = "_" + v;
+		modified = true;
+	}
+
+	for(unsigned i=1; i<v.size(); ++i){
+		if(!(isalnum(v[i]) || '_'==v[i])){
+			v[i] = '_';
+			modified = true;
+		}
+	}
+	return modified;
+}
 
 void ProtoApp::init(){
 	// setup audio
@@ -52,7 +70,12 @@ void ProtoApp::init(){
 	// setup model manager
 	if(!App::name().empty()){
 		glv::ModelManager& MM = mGUI.modelManager();
-		MM.name(App::name());
+		
+		//
+		std::string idName = App::name();
+		toIdentifier(idName);
+		
+		MM.name(idName + "Presets");
 		MM.fileDir(mResourceDir);
 		
 		mGUI.refreshModels();
@@ -76,6 +99,11 @@ ProtoApp& ProtoApp::resourceDir(const std::string& dir, bool searchBack){
 		}
 	}
 	mResourceDir = modDir;
+	
+	if(mResourceDir[mResourceDir.size()-1] != AL_FILE_DELIMITER){
+		mResourceDir += AL_FILE_DELIMITER_STR;
+	}
+	
 	return *this;
 }
 
