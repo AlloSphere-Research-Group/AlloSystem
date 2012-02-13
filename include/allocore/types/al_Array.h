@@ -273,6 +273,25 @@ static inline void allo_array_setheader(AlloArray * arr, const AlloArrayHeader *
 	memcpy(&arr->header, header, sizeof(AlloArrayHeader));
 }
 
+
+/*
+	Set dimension attributes without modifying memory
+*/
+static inline void allo_array_setdim1d(AlloArrayHeader * h, uint32_t nx){
+	h->dimcount	= 1;
+	h->dim[0]	= nx;
+}
+
+/*
+	Set dimension attributes without modifying memory
+*/
+static inline void allo_array_setdim2d(AlloArrayHeader * h, uint32_t nx, uint32_t ny){
+	h->dimcount	= 2;
+	h->dim[0]	= nx;
+	h->dim[1]	= ny;
+}
+
+
 /*
 	Set stride factors based on a specific byte alignment
 */
@@ -280,12 +299,16 @@ static inline void allo_array_setstride(AlloArrayHeader * h, unsigned alignSize)
 	unsigned typeSize = allo_type_size(h->type);
 	unsigned numDims = h->dimcount;
 	h->stride[0] = h->components * typeSize;
-	
+
 	if(numDims>1){
-		h->stride[1] = h->stride[0] * h->dim[0];		// compute ideal row stride amount
-		unsigned remain = h->stride[1] % alignSize;		// compute pad bytes
-		if(remain){ h->stride[1] += alignSize - remain;}// add pad bytes (if any)
-		
+		h->stride[1] = h->stride[0] * h->dim[0];			// compute ideal row stride amount
+
+		// Pad rows to make multiple of alignment
+		if(alignSize > 1){
+			unsigned remain = h->stride[1] % alignSize;		// compute pad bytes
+			if(remain){ h->stride[1] += alignSize - remain;}// add pad bytes (if any)
+		}
+
 		unsigned i=2;
 		for(; i<numDims; ++i){ h->stride[i] = h->stride[i-1] * h->dim[i-1]; }
 	}
@@ -350,8 +373,7 @@ static inline void allo_array_create1d(
 	AlloArrayHeader header;
 	header.type = type;
 	header.components = components;
-	header.dimcount = 1;
-	header.dim[0] = dimx;
+	allo_array_setdim1d(&header, dimx);
 	allo_array_setstride(&header, align);
 	allo_array_create(arr, &header);
 }
@@ -367,9 +389,7 @@ static inline void allo_array_create2d(
 	AlloArrayHeader header;
 	header.type = type;
 	header.components = components;
-	header.dimcount = 2;
-	header.dim[0] = dimx;
-	header.dim[1] = dimy;
+	allo_array_setdim2d(&header, dimx, dimy);
 	allo_array_setstride(&header, align);
 	allo_array_create(arr, &header);
 }
@@ -395,9 +415,7 @@ static inline void allo_array_adapt2d(
 	AlloArrayHeader header;
 	header.type = type;
 	header.components = components;
-	header.dimcount = 2;
-	header.dim[0] = dimx;
-	header.dim[1] = dimy;
+	allo_array_setdim2d(&header, dimx, dimy);
 	allo_array_setstride(&header, align);
 	allo_array_adapt(arr, &header);
 }
