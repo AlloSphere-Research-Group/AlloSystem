@@ -35,20 +35,20 @@ public:
 	}
 	
 	virtual bool load(const std::string& filename, Array &lat) {
-		FREE_IMAGE_FORMAT type = FreeImage_GetFIFFromFilename(filename.data());
+		FREE_IMAGE_FORMAT type = FreeImage_GetFIFFromFilename(filename.c_str());
 		if(type == FIF_UNKNOWN) {
-			printf("image format not recognized: %s\n", filename.data());
+			printf("image format not recognized: %s\n", filename.c_str());
 			return false;
 		}
 		if(!FreeImage_FIFSupportsReading(type)) {
-			printf("image format not supported: %s\n", filename.data());
+			printf("image format not supported: %s\n", filename.c_str());
 			return false;
 		}
 		
 		destroy();
-		mImage = FreeImage_Load(type, filename.data(), 0);
+		mImage = FreeImage_Load(type, filename.c_str(), 0);
 		if (mImage == NULL) {
-			printf("image failed to load: %s\n", filename.data());
+			printf("image failed to load: %s\n", filename.c_str());
 			return false;
 		}
 		
@@ -211,14 +211,14 @@ public:
 	virtual bool save(const std::string& filename, const Array& lat) {
 	
 		// check existing image type
-		FREE_IMAGE_FORMAT type = FreeImage_GetFIFFromFilename(filename.data());
+		FREE_IMAGE_FORMAT type = FreeImage_GetFIFFromFilename(filename.c_str());
 		
 		if(type == FIF_UNKNOWN) {
-			printf("image format not recognized: %s\n", filename.data());
+			printf("image format not recognized: %s\n", filename.c_str());
 			return false;
 		}
 		if(!FreeImage_FIFSupportsWriting(type)) {
-			printf("image format not supported: %s\n", filename.data());
+			printf("image format not supported: %s\n", filename.c_str());
 			return false;
 		}
 		
@@ -240,13 +240,20 @@ public:
 						int rowstride = header.stride[1]; 
 
 						for(unsigned j = 0; j < header.dim[1]; ++j) {
+							
+							// copy Array row to image buffer
+							/*memcpy(
+								FreeImage_GetScanLine(mImage, j),
+								bp + j*rowstride,
+								w*3
+							);*/
+
 							RGBTRIPLE *pix = (RGBTRIPLE *)FreeImage_GetScanLine(mImage, j);
 							Image::RGBPix<uint8_t> *o_pix = (Image::RGBPix<uint8_t> *)(bp + j*rowstride);
 							for(unsigned i=0; i < header.dim[0]; ++i) {
 								pix->rgbtRed = o_pix->r;
 								pix->rgbtGreen = o_pix->g;
 								pix->rgbtBlue = o_pix->b;
-
 								++pix;
 								++o_pix;
 							}
@@ -271,6 +278,14 @@ public:
 						int rowstride = header.stride[1]; 
 
 						for(unsigned j = 0; j < header.dim[1]; ++j) {
+
+							// copy Array row to image buffer
+							/*memcpy(
+								FreeImage_GetScanLine(mImage, j),
+								bp + j*rowstride,
+								w*4
+							);*/
+							
 							RGBQUAD *pix = (RGBQUAD *)FreeImage_GetScanLine(mImage, j);
 							Image::RGBAPix<uint8_t> *o_pix = (Image::RGBAPix<uint8_t> *)(bp + j*rowstride);
 							for(unsigned i=0; i < header.dim[0]; ++i) {
@@ -278,7 +293,6 @@ public:
 								pix->rgbGreen = o_pix->g;
 								pix->rgbBlue = o_pix->r;
 								pix->rgbReserved = o_pix->a;
-
 								++pix;
 								++o_pix;
 							}
@@ -304,7 +318,7 @@ public:
 			return false;
 		}
 		
-		return FreeImage_Save(type, mImage, filename.data(), 0);
+		return FreeImage_Save(type, mImage, filename.c_str(), 0);
 	}
 	
 	void getDim(int &w, int &h) {
