@@ -73,11 +73,11 @@ struct MyWindow : Window{
 	void grid(float w, float h, int rep) {
 		gl.color(HSV(1./rep, 1., 1.));
 		for (int v=w; v<width(); v+=w*2) {
-			gl.vertex(v, 0, 0);
+			gl.vertex(v, 1, 0);
 			gl.vertex(v, height(), 0);
 		}
 		for (int v=h; v<height(); v+=h*2) {
-			gl.vertex(0, v, 0);
+			gl.vertex(1, v, 0);
 			gl.vertex(width(), v, 0);
 
 		}
@@ -86,13 +86,8 @@ struct MyWindow : Window{
 		}
 	}
 
-	bool onFrame(){
-		gl.clearColor(0,0,0,1);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		gl.viewport(0,0, width(), height());
-
-		if (bGrid) {
-			gl.projection(Matrix4d::ortho(0, width(), 0, height(), -1, 1));
+	void drawgrid() {
+		gl.projection(Matrix4d::ortho(0, width(), 0, height(), -1, 1));
 			gl.modelView(Matrix4d::identity());
 
 			// draw grid
@@ -103,18 +98,30 @@ struct MyWindow : Window{
 			float h = height();
 
 			gl.color(1, 1, 1);
-			gl.vertex(0, 0, 0);
-			gl.vertex(0, height(), 0);
-			gl.vertex(width(), 0, 0);
+			gl.vertex(1, 1, 0);
+			gl.vertex(1, height(), 0);
+			gl.vertex(width(), 1, 0);
 			gl.vertex(width(), height(), 0);
-			gl.vertex(0, 0, 0);
+			gl.vertex(1, 1, 0);
 			gl.vertex(width(), 0, 0);
-			gl.vertex(0, height(), 0);
+			gl.vertex(1, height(), 0);
 			gl.vertex(width(), height(), 0);
 		
 			grid(w/2, h/2, 2);
 
 			gl.end();
+	}
+
+	bool onFrame(){
+		gl.clearColor(0,0,0,1);
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		gl.viewport(0,0, width(), height());
+
+		if (bGrid) {
+			gl.viewport(0,0, width(), height()/2);
+			drawgrid();
+			gl.viewport(0,height()/2, width(), height()/2);
+			drawgrid();
 		} else {
 			gl.matrixMode(gl.PROJECTION);
 			gl.loadMatrix(Matrix4d::perspective(45, aspect(), 0.1, 100));
