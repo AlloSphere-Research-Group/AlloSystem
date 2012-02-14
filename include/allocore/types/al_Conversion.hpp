@@ -162,6 +162,9 @@ void swapBytes(T& word);
 template <typename T>
 void swapBytes(T * data, unsigned count);
 
+/// Convert argument to a string using snprintf
+template <class T> std::string toString(const char * fmt, const T& v);
+
 /// Convert numerical type to a string
 template <class T> std::string toString(const T& v);
 
@@ -309,6 +312,13 @@ inline void swapBytes(T& v){ swapBytesN<sizeof(v)>(&v); }
 template<class T>
 inline void swapBytes(T * data, unsigned count){
 	for(unsigned i=0; i<count; ++i) swapBytes(data[i]);
+}
+
+template <class T>
+std::string toString(const char * fmt, const T& v){
+	char buf[32];
+	snprintf(buf, sizeof(buf), fmt, v);
+	return std::string(buf);
 }
 
 template <class T>
