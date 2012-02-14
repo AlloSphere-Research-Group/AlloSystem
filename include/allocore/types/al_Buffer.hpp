@@ -155,8 +155,11 @@ public:
 		size(size() + len);
 		std::copy(src, src + len, mElems.begin() + oldsize);
 	}
-
 	
+	/// Repeat last element
+	void repeatLast(){ append(last()); }
+
+
 	/// Write new element to ring buffer
 	void write(const T& v){
 		++mPos; if(pos() == size()){ mPos=0; }

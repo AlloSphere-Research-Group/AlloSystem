@@ -360,12 +360,12 @@ Mesh& Mesh::repeatLast(){
 		index(indices().last());
 	}
 	else{
-		if(colors().size()) color(colors().last());
-		else if(coloris().size()) colori(coloris().last());
-		if(vertices().size()) vertex(vertices().last());
-		if(normals().size()) normal(normals().last());
-		if(texCoord2s().size()) texCoord(texCoord2s().last());
-		else if(texCoord3s().size()) texCoord(texCoord3s().last());
+		if(colors().size()) colors().repeatLast();
+		else if(coloris().size()) coloris().repeatLast();
+		if(vertices().size()) vertices().repeatLast();
+		if(normals().size()) normals().repeatLast();
+		if(texCoord2s().size()) texCoord2s().repeatLast();
+		else if(texCoord3s().size()) texCoord3s().repeatLast();
 	}
 	return *this;
 }
