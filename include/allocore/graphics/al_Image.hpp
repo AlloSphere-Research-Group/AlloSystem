@@ -70,11 +70,13 @@ public:
 	template<typename T>
 	struct RGBAPix { T r, g, b, a; };
 
+
 	Image();
-	~Image();
 
 	/// @param[in] filename		file name of image; loaded automatically
 	Image(const std::string& filename);
+
+	~Image();
 
 
 	/// Load image with file name. Image type determined by file extension.
@@ -111,7 +113,17 @@ public:
 	void write(const Pix& pix, unsigned x, unsigned y) {
 		array().write(&pix.r, x, y); 
 	}
+
+	/// Quick image writing function
 	
+	/// @param[in] filePath		file path
+	/// @param[in] pixels		pixel data
+	/// @param[in] nx			number of pixels along the x dimension
+	/// @param[in] ny			number of pixels along the y dimension
+	/// @param[in] fmt			pixel format
+	template <class T>
+	static bool write(const std::string& filePath, const T * pixels, int nx, int ny, Format fmt);
+
 	/// Read a pixel from an Image
 	/// Warning: doesn't check that Pix has matching type/component count
 	/// Warning: no bounds checking performed on x and y
@@ -128,7 +140,7 @@ public:
 	/// \returns True on success; false otherwise.
 	template <typename T>
 	bool resize(int dimX, int dimY, Format format){
-		mArray.formatAligned(components(format), Array::type<T>(), dimX, dimY, 0);
+		mArray.formatAligned(components(format), Array::type<T>(), dimX, dimY, 1);
 		return true;
 	}
 
@@ -137,6 +149,7 @@ public:
 	static int components(Format v);
 	
 	static Format getFormat(int planes);
+
 
 	class Impl {
 	public:
@@ -154,6 +167,8 @@ protected:
 
 
 
+
+
 inline int Image::components(Format v){
 	switch(v){
 	case LUMINANCE:	return 1;
@@ -163,6 +178,20 @@ inline int Image::components(Format v){
 	default:;
 	}
 	return 0;
+}
+
+template <class T>
+bool Image::write(const std::string& filePath, const T * pixels, int nx, int ny, Format fmt){
+	Image img;
+	Array& a = img.array();
+	a.data.ptr			= (char *)const_cast<T *>(pixels);
+	a.header.type		= Array::type<T>();
+	a.header.components	= Image::components(fmt);
+	allo_array_setdim2d(&a.header, nx, ny);
+	allo_array_setstride(&a.header, 1);
+	bool res = img.save(filePath);
+	a.data.ptr = NULL; // prevent ~Array from deleting data
+	return res;
 }
 
 
