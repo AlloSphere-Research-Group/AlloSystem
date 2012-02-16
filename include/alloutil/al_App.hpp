@@ -236,6 +236,8 @@ public:
 	/// Called upon destruction of a window
 	virtual void onDestroy(const ViewpointWindow& win){}
 
+	/// Called upon resize of a window
+	virtual void onResize(const ViewpointWindow& win, int dw, int dh){}
 
 
 
@@ -342,6 +344,11 @@ private:
 
 		virtual bool onDestroy(){
 			app.onDestroy(win);
+			return true;
+		}
+
+		virtual bool onResize(int dw, int dh){
+			app.onResize(win, dw,dh);
 			return true;
 		}
 	

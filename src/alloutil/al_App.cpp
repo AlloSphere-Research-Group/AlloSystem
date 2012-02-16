@@ -91,7 +91,14 @@ ViewpointWindow * App::initWindow(
 	Window::DisplayMode mode,
 	int flags
 ){
-	ViewpointWindow * win = new ViewpointWindow(dims, title, fps, mode);
+	//ViewpointWindow * win = new ViewpointWindow(dims, title, fps, mode);
+
+	ViewpointWindow * win = new ViewpointWindow;
+	win->dimensions(dims);
+	win->title(title);
+	win->fps(fps);
+	win->displayMode(mode);
+
 	mFacViewpoints.push_back(new Viewpoint);
 	
 	int last = mFacViewpoints.size()-1;
@@ -144,7 +151,13 @@ void App::start(){
 //	}
 
 	if(windows().size()){
-		Main::get().start();	// FIXME: something in this call is stomping on local memory!
+
+		// create the windows
+		for(unsigned i=0; i<windows().size(); ++i){
+			windows()[i]->create();
+		}
+	
+		Main::get().start();
 	}
 	else{
 		printf("\nPress 'enter' to quit...\n"); getchar();
