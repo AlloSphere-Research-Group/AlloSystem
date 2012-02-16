@@ -1,5 +1,51 @@
 /*
 Projector calibration for the AlloSphere
+
+NOTES:
+
+The clip space z and w can be calculated the same way as orthographic.
+The xy (or uv) must be calculated from the vertex position v. 
+
+We know azimuth/elevation to the corners ABCD. From this we can derive their spatial locations.
+Assume the allosphere is a unit sphere, then the result is simple polar to cartesian.
+	This can be refined by modeling the sphere properly as two unit hemispheres joined by a cylinder of some width W.  
+	The adjustment W can be partially verified by ensuring that the normals of ABC and BCD are equal. 
+Calculate point Q as the center of ABCD (B.x-A.x, D.y-A.y)
+	Again, two ways to calculate Q, which can be used to minimize error in the sphere model.
+	Alternatively, we can measure Q empirically to further minimize error.
+Assume a projector location F (or derive from measuring the lens position). 
+
+Vertex locations v must be projected into the view of the projector, which is a matrix multiplication.
+We only care about the XY components of the result, but these must be scaled such that A is -1,-1 and C is 1, 1. 
+This can be achived by dividing by (the result of projecting QC into the view)
+
+A view matrix can be constructed as:
+		Matrix4(
+			 ux[0], ux[1], ux[2], -(ux.dot(eyePos)),
+			 uy[0], uy[1], uy[2], -(uy.dot(eyePos)),
+			 uz[0], uz[1], uz[2], -(uz.dot(eyePos)),
+			0, 0, 0, 1
+		);
+		
+eye == F
+R = norm(((B+C)/2) - Q)  // unit vector from Q to midpoint of BC 
+uz = norm(FQ)
+ux = -cross(norm(cross(R, uz)), uz) 
+	or, since uz = parallel(R,uz) + perpendicular(R,uz):  
+	perpendicular(R,uz) = uz - parallel(R,uz)
+	ux = uz - R*dot(R, uz)
+	
+uy = cross(ux, uz)
+
+simplified:
+
+
+u = dot(v-F, ux) / dot(QC-F, ux); 
+v = dot(v-F, uy) / dot(QC-F, uy);  
+
+note that denominator is a constant.
+Not sure if v should be normalized or not, or whether this makes any difference at all.
+
 */
 
 #include "allocore/al_Allocore.hpp"

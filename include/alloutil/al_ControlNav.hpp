@@ -143,6 +143,9 @@ struct NavInputControlCosm : public NavInputControl {
 		if(k.ctrl()) v *= 0.1;
 		if(k.alt()) v *= 10;
 		
+		if(k.ctrl()) a *= 0.1;
+		if(k.alt()) a *= 10;
+		
 		switch(k.key()){
 			case '`':				nav().halt().home(); return false;
 			case 'w':				nav().spinR( a); return false;

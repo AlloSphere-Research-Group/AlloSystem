@@ -200,6 +200,25 @@ public:
 	const ShaderProgram& uniform(int location, float v0, float v1) const;
 	const ShaderProgram& uniform(int location, float v0, float v1, float v2) const;
 	const ShaderProgram& uniform(int location, float v0, float v1, float v2, float v3) const;
+	
+	
+	template<typename T>
+	const ShaderProgram& uniform(const char * name, const Vec<2,T>& v) {
+		return uniform(name, v.x, v.y);
+	}
+	template<typename T>
+	const ShaderProgram& uniform(const char * name, const Vec<3,T>& v) {
+		return uniform(name, v.x, v.y, v.z);
+	}
+	template<typename T>
+	const ShaderProgram& uniform(const char * name, const Vec<4,T>& v) {
+		return uniform(name, v.x, v.y, v.z, v.w);
+	}
+	template<typename T>
+	const ShaderProgram& uniform(const char * name, const Quat<T>& q) {
+		// note wxyz => xyzw for GLSL vec4:
+		return uniform(name, q.x, q.y, q.z, q.w);
+	}
 
 	const ShaderProgram& uniform1(const char * name, const float * v, int count=1) const;
 	const ShaderProgram& uniform2(const char * name, const float * v, int count=1) const;
@@ -227,6 +246,24 @@ public:
 	const ShaderProgram& attribute3(int location, const double * v) const;
 	const ShaderProgram& attribute4(int location, const double * v) const;
 	
+	template<typename T>
+	const ShaderProgram& attribute(int location, const Vec<2,T>& v) {
+		return attribute(location, v.x, v.y);
+	}
+	template<typename T>
+	const ShaderProgram& attribute(int location, const Vec<3,T>& v) {
+		return attribute(location, v.x, v.y, v.z);
+	}
+	template<typename T>
+	const ShaderProgram& attribute(int location, const Vec<4,T>& v) {
+		return attribute(location, v.x, v.y, v.z, v.w);
+	}
+	template<typename T>
+	const ShaderProgram& attribute(int location, const Quat<T>& q) {
+		// note wxyz => xyzw for GLSL vec4:
+		return attribute(location, q.x, q.y, q.z, q.w);
+	}
+	
 	int uniform(const char * name) const;
 	int attribute(const char * name) const;
 
@@ -241,6 +278,8 @@ protected:
 	virtual void onCreate();
 	virtual void onDestroy();
 };
+
+
 
 } // ::al
 
