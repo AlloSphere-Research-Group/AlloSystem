@@ -60,20 +60,16 @@ void Texture :: determineTarget(){
 void Texture :: quad(Graphics& gl, double w, double h, double x0, double y0){
 	bind();
 	//gl.color(1, 1, 1, 1);
-	gl.pushMatrix();
-	gl.translate(x0, y0, 0);
-	gl.scale(w, h, 1);
-	gl.begin(gl.QUADS);
+	gl.begin(gl.TRIANGLE_STRIP);
 		gl.texCoord	( 0, 0);
-		gl.vertex	( 0, 0, 0);
-		gl.texCoord	( 0, 1);
-		gl.vertex	( 0, 1, 0);
-		gl.texCoord	( 1, 1);
-		gl.vertex	( 1, 1, 0);
+		gl.vertex	(x0, y0, 0);
 		gl.texCoord	( 1, 0);
-		gl.vertex	( 1, 0, 0);
+		gl.vertex	(x0+w, y0, 0);
+		gl.texCoord	( 0, 1);
+		gl.vertex	(x0, y0+h, 0);
+		gl.texCoord	( 1, 1);
+		gl.vertex	(x0+w, y0+h, 0);
 	gl.end();
-	gl.popMatrix();
 	unbind();
 }
 
