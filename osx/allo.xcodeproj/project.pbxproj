@@ -639,6 +639,8 @@
 		166DD741117CDB6000A8BA12 /* al_Conversion.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Conversion.hpp; sourceTree = "<group>"; };
 		166DD744117CDBFD00A8BA12 /* utTypesConversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utTypesConversion.cpp; sourceTree = "<group>"; };
 		166DD78D117CDF1800A8BA12 /* pstdint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pstdint.h; sourceTree = "<group>"; };
+		16707CF814EC9DF200DF0217 /* al_FBO.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_FBO.hpp; sourceTree = "<group>"; };
+		16707CF914EC9F2000DF0217 /* al_FBO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_FBO.cpp; sourceTree = "<group>"; };
 		1685D3C111C2EDB5009F676C /* al_ImplAPR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = al_ImplAPR.h; sourceTree = "<group>"; };
 		1686186712A58918002AD8AB /* IpEndpointName.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IpEndpointName.cpp; sourceTree = "<group>"; };
 		1686186812A58918002AD8AB /* IpEndpointName.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IpEndpointName.h; sourceTree = "<group>"; };
@@ -846,7 +848,6 @@
 		361AA7A412AEE1AC002E9DFD /* al_Mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Mesh.cpp; sourceTree = "<group>"; };
 		361AA8AD12AEFDF3002E9DFD /* al_GPUObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GPUObject.cpp; sourceTree = "<group>"; };
 		361BF02F11DEA66600E60A9C /* al_BufferObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_BufferObject.hpp; sourceTree = "<group>"; };
-		361BF03111DEAA9400E60A9C /* al_FBO.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_FBO.hpp; sourceTree = "<group>"; };
 		361F442911DBF07F00A5458D /* al_AudioScene.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_AudioScene.hpp; sourceTree = "<group>"; };
 		362127C71173CD72009CB6FC /* al_Graphics.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Graphics.hpp; sourceTree = "<group>"; };
 		362127C81173CDBB009CB6FC /* al_Graphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Graphics.cpp; sourceTree = "<group>"; };
@@ -2089,6 +2090,7 @@
 				369DDF5012B6C86600F75D2A /* al_Asset.hpp */,
 				361BF02F11DEA66600E60A9C /* al_BufferObject.hpp */,
 				36792440142BE0A000E4738E /* al_DisplayList.hpp */,
+				16707CF814EC9DF200DF0217 /* al_FBO.hpp */,
 				36035C3113037120001E9BA9 /* al_Font.hpp */,
 				16AA95E9118F6EEF00B98EC3 /* al_GPUObject.hpp */,
 				16B4CE071428127700626C03 /* al_OpenGL.hpp */,
@@ -2102,7 +2104,6 @@
 				36F0ABCF123195D5000A8EBF /* al_Slab.hpp */,
 				367F0B3812034EDB00FCC534 /* al_Stereographic.hpp */,
 				16AA960B118F775E00B98EC3 /* al_Texture.hpp */,
-				361BF03011DEAA9400E60A9C /* pending */,
 				16AA95ED118F6FB800B98EC3 /* OpenGLSupport.txt */,
 			);
 			path = graphics;
@@ -2113,6 +2114,7 @@
 			children = (
 				36F0ABBF12319586000A8EBF /* Makefile.config */,
 				369DDF5112B6C87200F75D2A /* al_Asset.cpp */,
+				16707CF914EC9F2000DF0217 /* al_FBO.cpp */,
 				36035C3213037130001E9BA9 /* al_Font.cpp */,
 				361AA8AD12AEFDF3002E9DFD /* al_GPUObject.cpp */,
 				362127C81173CDBB009CB6FC /* al_Graphics.cpp */,
@@ -2388,14 +2390,6 @@
 			name = src;
 			path = ../src/allua;
 			sourceTree = SOURCE_ROOT;
-		};
-		361BF03011DEAA9400E60A9C /* pending */ = {
-			isa = PBXGroup;
-			children = (
-				361BF03111DEAA9400E60A9C /* al_FBO.hpp */,
-			);
-			path = pending;
-			sourceTree = "<group>";
 		};
 		3622BEDB116D526700928703 /* examples */ = {
 			isa = PBXGroup;

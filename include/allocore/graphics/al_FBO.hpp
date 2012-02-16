@@ -1,29 +1,64 @@
-#ifndef GLW_FBO_H_INC
-#define GLW_FBO_H_INC
+#ifndef INCLUDE_AL_GRAPHICS_FBO_HPP
+#define INCLUDE_AL_GRAPHICS_FBO_HPP
 
-#include "GPUObject.h"
+/*	Allocore --
+	Multimedia / virtual environment application class library
+	
+	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
+	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
+	All Rights Reserved.
 
-namespace glw{
+	Permission to use, copy, modify, distribute, and distribute modified versions
+	of this software and its documentation without fee and without a signed
+	licensing agreement, is hereby granted, provided that the above copyright
+	notice, the list of contributors, this paragraph and the following two paragraphs 
+	appear in all copies, modifications, and distributions.
+
+	IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+	SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES, INCLUDING LOST PROFITS, ARISING
+	OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF REGENTS HAS
+	BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+	REGENTS SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+	THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+	PURPOSE. THE SOFTWARE AND ACCOMPANYING DOCUMENTATION, IF ANY, PROVIDED
+	HEREUNDER IS PROVIDED "AS IS". REGENTS HAS  NO OBLIGATION TO PROVIDE
+	MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+
+
+	File description:
+	Render and frame buffer object abstractions
+
+	File author(s):
+	Lance Putnam, 2012, putnam.lance@gmail.com
+*/
+
+#include "allocore/graphics/al_OpenGL.hpp"
+#include "allocore/graphics/al_GPUObject.hpp"
+
+namespace al{
 
 
 /// Render buffer object
 class RBO : public GPUObject{
 public:
 
+	/// Pixel format
 	enum PixelFormat{
-		Depth = GL_DEPTH_COMPONENT
+		DEPTH = GL_DEPTH_COMPONENT
 	};
 
-	RBO(GLenum format);
-	virtual ~RBO();
+	///
+	RBO(PixelFormat format=DEPTH);
 
 	static void bind(GLuint id);
 	static void storage(GLenum internalformat, GLsizei width, GLsizei height);
 
-	void bind() const { validate(); bind(id()); }
-	void begin() const { bind(); }
-	static void end() { bind(0); }
 	GLenum format() const { return mFormat; }
+
+	void bind(){ validate(); bind(id()); }
+	void begin(){ bind(); }
+	static void end() { bind(0); }
 
 	void storage(GLsizei width, GLsizei height);
 
@@ -35,33 +70,47 @@ protected:
 };
 
 
+
 /// Frame buffer object
 
-/// All attachments must have the same dimensions
-/// You can only render to RGB, RGBA, and depth textures
+/// All attachments must have the same dimensions. This is a standard
+/// requirement of an FBO, not an implementation imposed limitation.
+/// You can only render to RGB, RGBA, and depth textures.
 class FBO : public GPUObject {
 public:
 
-	FBO(){}
-	virtual ~FBO();
+	/// Attachment type
+	enum Attachment{
+		COLOR_ATTACHMENT0			= GL_COLOR_ATTACHMENT0_EXT,
+		DEPTH_ATTACHMENT			= GL_DEPTH_ATTACHMENT_EXT,
+		STENCIL_ATTACHMENT			= GL_STENCIL_ATTACHMENT_EXT
+	};
 
 	static void bind(GLuint id);
 	static void renderBuffer(const RBO& rbo);
-	static void texture2D(GLuint texID, int attach=0, int level=0);
+	static void texture2D(GLuint texID, Attachment attach=COLOR_ATTACHMENT0, int level=0);
 	
 	FBO& attach(const RBO& rbo);
-	FBO& attachTexture2D(GLuint texID, int attach=0, int level=0);
-	FBO& detachTexture2D(int attach=0, int level=0);
+	
+	/// Attach a texture
+	
+	/// @param[in] texID	texture ID
+	/// @param[in] attach	Attachment type
+	/// @param[in] level	mipmap level of texture
+	FBO& attachTexture2D(GLuint texID, Attachment attach=COLOR_ATTACHMENT0, int level=0);
+
+	/// Detach texture at a specific attachament point
+	FBO& detachTexture2D(Attachment attach, int level=0);
 
 	/// Start rendering to attached objects
-	void begin() const { validate(); bind(id()); }
+	void begin(){ validate(); bind(id()); }
 
 	/// Stop rendering to attached objects
 	static void end(){ bind(0); }
 
-	GLenum status() const;
-	const char * statusString() const;
-	const char * statusString(GLenum stat) const;
+	GLenum status();
+	const char * statusString();
+	const char * statusString(GLenum stat);
 
 protected:
 
