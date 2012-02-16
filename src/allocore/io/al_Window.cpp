@@ -95,7 +95,7 @@ Window& Window::displayMode(DisplayMode v){
 		const bool fullScreen_ = fullScreen();
 		const double fps_ = fps();
 		const std::string& title_ = title();
-		
+
 		destroy();
 		create(dim_, title_, fps_, v);
 		cursor(cursor_);

@@ -70,7 +70,7 @@ public:
 
 	int id() const { return mInGameMode ? mIDGameMode : mID; }
 
-	Window::Dim dimensions() const {
+	Window::Dim dimensionsGLUT() const {
 		Window::Dim d(0,0,0,0);
 		if(created()){
 			glutSetWindow(id());
@@ -157,7 +157,7 @@ public:
 
 			// ensure that current dims are set
 			// GLUT will call the reshape CB upon entering game mode with fullscreen dims
-			mDimCurr = dimensions();
+			mDimCurr = dimensionsGLUT();
 
 //			printf("l=%d, t=%d, w=%d, h=%d\n", mDimCurr.l, mDimCurr.t, mDimCurr.w, mDimCurr.h);
 
@@ -302,7 +302,7 @@ public:
 			key = remapKey(key, false);
 			win->mKeyboard.setKey(key, true);
 			setModifiers(win->mKeyboard);
-			win->doKeyDown(win->mKeyboard);
+			win->callHandlersOnKeyDown(win->mKeyboard);
 		}
 	}
 
@@ -312,7 +312,7 @@ public:
 			key = remapKey(key, false);
 			win->mKeyboard.setKey(key, false);
 			setModifiers(win->mKeyboard);
-			win->doKeyUp(win->mKeyboard);
+			win->callHandlersOnKeyUp(win->mKeyboard);
 		}
 	}
 
@@ -322,7 +322,7 @@ public:
 			key = remapKey(key, true);
 			win->mKeyboard.setKey(key, true);
 			setModifiers(win->mKeyboard);
-			win->doKeyDown(win->mKeyboard);
+			win->callHandlersOnKeyDown(win->mKeyboard);
 		}
 	}
 
@@ -332,7 +332,7 @@ public:
 			key = remapKey(key, true);
 			win->mKeyboard.setKey(key, false);
 			setModifiers(win->mKeyboard);
-			win->doKeyUp(win->mKeyboard);
+			win->callHandlersOnKeyUp(win->mKeyboard);
 		}
 	}
 
@@ -351,11 +351,11 @@ public:
 			Mouse& m = win->mMouse;
 			if(GLUT_DOWN == state){
 				m.position(ax, ay); m.button(btn, true);
-				win->doMouseDown(m);
+				win->callHandlersOnMouseDown(m);
 			}
 			else if(GLUT_UP == state){
 				m.position(ax, ay);	m.button(btn, false);
-				win->doMouseUp(m);
+				win->callHandlersOnMouseUp(m);
 			}
 		}
 	}
@@ -365,7 +365,7 @@ public:
 		Window * win = getWindow();
 		if(win){
 			win->mMouse.position(ax,ay);
-			win->doMouseDrag(win->mMouse);
+			win->callHandlersOnMouseDrag(win->mMouse);
 		}
 	}
 
@@ -373,7 +373,7 @@ public:
 		Window * win = getWindow();
 		if(win){
 			win->mMouse.position(ax,ay);
-			win->doMouseMove(win->mMouse);
+			win->callHandlersOnMouseMove(win->mMouse);
 		}
 	}
 
@@ -389,7 +389,7 @@ public:
 			Window::Dim& dimCurr = win->mImpl->mDimCurr;
 
 			dimPrev = dimCurr;
-			//dimCurr = win->dimensions(); // BUG: not always new dimensions
+			//dimCurr = win->dimensionsGLUT(); // BUG: not always new dimensions
 			dimCurr.w = w;
 			dimCurr.h = h;
 
@@ -397,7 +397,7 @@ public:
 			int dh = h - dimPrev.h;
 
 			//printf("Window: onResize(%d, %d)\n", dw, dh);
-			win->doResize(dw, dh);
+			win->callHandlersOnResize(dw, dh);
 			win->title(win->title());	// TODO: need this hack to get title back
 										// after exiting full screen
 		}
@@ -407,7 +407,7 @@ public:
 		Window * win = getWindow();
 		if(win){
 			win->mImpl->visible(v == GLUT_VISIBLE);
-			win->doVisibility(v == GLUT_VISIBLE);
+			win->callHandlersOnVisibility(v == GLUT_VISIBLE);
 		}
 	}
 
@@ -576,13 +576,13 @@ void Window::create(
 	WindowImpl::windows()[mImpl->mID] = mImpl;
 
 	AL_GRAPHICS_INIT_CONTEXT;
-	doCreate();
+	callHandlersOnCreate();
 
 	mImpl->scheduleDraw();
 }
 
 void Window::destroy(){
-	doDestroy();
+	callHandlersOnDestroy();
 	mImpl->destroy();
 }
 
@@ -599,7 +599,8 @@ bool Window::created() const { return mImpl->created(); }
 Window::Cursor Window::cursor() const { return mImpl->mCursor; }
 bool Window::cursorHide() const { return mImpl->mCursorHide; }
 
-Window::Dim Window::dimensions() const { return mImpl->dimensions(); }
+//Window::Dim Window::dimensions() const { return mImpl->dimensions(); }
+Window::Dim Window::dimensions() const { return mImpl->mDimCurr; }
 double Window::fps() const { return mImpl->mFPS; }
 double Window::fpsAvg() const { return mImpl->mAvg; }
 double Window::spfActual() const { return mImpl->mSPFActual; }
@@ -651,13 +652,17 @@ void Window::doFrameImpl(){
 	const int winID = mImpl->id();
 	const int current = glutGetWindow();
 	if(winID != current) glutSetWindow(winID);
-	doFrame();
+	callHandlersOnFrame();
 	glutSwapBuffers();
 	//if(current > 0 && current != winID) glutSetWindow(current);
 }
 
 Window& Window::fps(double v){
-	if(mImpl->mFPS <= 0 && v > 0) mImpl->scheduleDraw();
+	if(created()){
+		// Note: we can safely call scheduleDraw multiple times...
+		if(v > 0) mImpl->scheduleDraw();
+		//if(mImpl->mFPS <= 0 && v > 0) mImpl->scheduleDraw();
+	}
 	mImpl->mFPS = v;
 	return *this;
 }
@@ -667,18 +672,20 @@ Window& Window::fullScreen(bool v){
 	// exit full screen
 	if(mImpl->mFullScreen && !v){
 		#ifdef AL_LINUX
-			doDestroy();
+			callHandlersOnDestroy();
 			// Must manually set dims since exiting game mode does NOT 
 			// automatically call GLUT reshape callback.
-			mImpl->mDimPrev = dimensions();
+			mImpl->mDimPrev = dimensionsGLUT();
 			mImpl->gameMode(false);
-			mImpl->mDimCurr = dimensions();
-			doCreate();
-			doResize(mImpl->mDimCurr.w - mImpl->mDimPrev.w, mImpl->mDimCurr.h - mImpl->mDimPrev.h);
-			//doResize(mImpl->mWinDim.w, mImpl->mWinDim.h);
+			mImpl->mDimCurr = dimensionsGLUT();
+			callHandlersOnCreate();
+			callHandlersOnResize(
+				mImpl->mDimCurr.w - mImpl->mDimPrev.w,
+				mImpl->mDimCurr.h - mImpl->mDimPrev.h
+			);
+			//callHandlersOnResize(mImpl->mWinDim.w, mImpl->mWinDim.h);
 			hide(); show(); // need to force focus to get key callbacks to work
 		#else
-			//dimensions(mImpl->mWinDim);
 			dimensions(mImpl->mDimPrev);	// calls glutReshapeWindow which leaves full screen
 		#endif
 	}
@@ -686,23 +693,23 @@ Window& Window::fullScreen(bool v){
 	// enter full screen
 	else if(!mImpl->mFullScreen && v){
 
-		//mImpl->mWinDim = dimensions();
+		//mImpl->mWinDim = dimensionsGLUT();
 
 		#ifdef AL_LINUX
-			doDestroy();
+			callHandlersOnDestroy();
 			// TODO: current dims now set in gameMode().
 			// GLUT automatically calls reshape CB upon entering game mode...
-//			mImpl->mDimPrev = dimensions();		// dims of windowed window
+//			mImpl->mDimPrev = dimensionsGLUT();		// dims of windowed window
 			mImpl->gameMode(true);
-//			mImpl->mDimCurr = dimensions();		// dims of fullscreen window
+//			mImpl->mDimCurr = dimensionsGLUT();		// dims of fullscreen window
 
 //			printf("l=%d, t=%d, w=%d, h=%d\n", mImpl->mDimPrev.l, mImpl->mDimPrev.t, mImpl->mDimPrev.w, mImpl->mDimPrev.h);
 //			printf("l=%d, t=%d, w=%d, h=%d\n", mImpl->mDimCurr.l, mImpl->mDimCurr.t, mImpl->mDimCurr.w, mImpl->mDimCurr.h);
-			doCreate();
+			callHandlersOnCreate();
 			cursorHide(cursorHide());
 		#else
 			glutSetWindow(mImpl->mID);
-			mImpl->mDimCurr = dimensions();
+			mImpl->mDimCurr = mImpl->dimensionsGLUT();
 			glutFullScreen(); // calls glutReshapeWindow
 		#endif
 	}

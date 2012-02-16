@@ -247,14 +247,24 @@ public:
 	virtual ~Window();
 
 
-	/// Create a new window
+	/// Create window using current settings
 	
+	/// This will create a new window only if the the window has not already
+	/// been created.
+	void create(){
+		create(dimensions(), title(), fps(), displayMode());
+	}
+
+	/// Create window
+
+	/// This will create a new window only if the the window has not already
+	/// been created.	
 	/// @param[in] dim		Window dimensions in pixels
 	/// @param[in] title	Title of window
 	/// @param[in] fps		Desired frames/second
 	/// @param[in] mode		Display mode bit flags
 	void create(
-		const Dim& dim = Dim(800,600),
+		const Dim& dim,
 		const std::string& title="",
 		double fps=40,
 		DisplayMode mode = DEFAULT_BUF
@@ -304,7 +314,7 @@ public:
 	Window& iconify();							///< Iconify window
 	Window& show();								///< Show window (if hidden)
 	Window& title(const std::string& v);		///< Set title
-	Window& asap(bool v) { mASAP=v; return *this; }	///< Set whether window renders as fast as possible
+	Window& asap(bool v){ mASAP=v; return *this; }	///< Set whether window renders as fast as possible
 
 	/// Append handler to input event handler list
 	
@@ -383,12 +393,12 @@ protected:
 		}\
 	}
 	
-	void doMouseDown(const Mouse& m){ CALL(onMouseDown(m)); }
-	void doMouseDrag(const Mouse& m){ CALL(onMouseDrag(m)); }
-	void doMouseMove(const Mouse& m){ CALL(onMouseMove(m)); }
-	void doMouseUp(const Mouse& m){ CALL(onMouseUp(m)); }
-	void doKeyDown(const Keyboard& k){ CALL(onKeyDown(k)); }
-	void doKeyUp(const Keyboard& k){ CALL(onKeyUp(k)); }
+	void callHandlersOnMouseDown(const Mouse& m){ CALL(onMouseDown(m)); }
+	void callHandlersOnMouseDrag(const Mouse& m){ CALL(onMouseDrag(m)); }
+	void callHandlersOnMouseMove(const Mouse& m){ CALL(onMouseMove(m)); }
+	void callHandlersOnMouseUp(const Mouse& m){ CALL(onMouseUp(m)); }
+	void callHandlersOnKeyDown(const Keyboard& k){ CALL(onKeyDown(k)); }
+	void callHandlersOnKeyUp(const Keyboard& k){ CALL(onKeyUp(k)); }
 	#undef CALL
 	
 	#define CALL(e)	{\
@@ -400,14 +410,14 @@ protected:
 		}\
 	}
 	
-	void doFrame() { CALL(onFrame()); }
-	void doCreate(){ CALL(onCreate()); }				
-	void doDestroy(){
+	void callHandlersOnFrame() { CALL(onFrame()); }
+	void callHandlersOnCreate(){ CALL(onCreate()); }				
+	void callHandlersOnDestroy(){
 		CALL(onDestroy()); 
 		contextDestroy(); 
 	}				
-	void doResize(int w, int h){ CALL(onResize(w, h)); }	
-	void doVisibility(bool v){ CALL(onVisibility(v)); }
+	void callHandlersOnResize(int w, int h){ CALL(onResize(w, h)); }	
+	void callHandlersOnVisibility(bool v){ CALL(onVisibility(v)); }
 	#undef CALL
 };
 
