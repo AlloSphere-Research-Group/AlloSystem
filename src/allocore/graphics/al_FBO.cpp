@@ -1,4 +1,4 @@
-#include "al_FBO.hpp"
+#include "allocore/graphics/al_FBO.hpp"
 #include <stdio.h>
 namespace al{
 
