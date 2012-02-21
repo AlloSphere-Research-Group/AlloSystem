@@ -670,9 +670,9 @@ Window& Window::fullScreen(bool v){
 			callHandlersOnDestroy();
 			// Must manually set dims since exiting game mode does NOT 
 			// automatically call GLUT reshape callback.
-			mImpl->mDimPrev = dimensionsGLUT();
+			mImpl->mDimPrev = mImpl->dimensionsGLUT();
 			mImpl->gameMode(false);
-			mImpl->mDimCurr = dimensionsGLUT();
+			mImpl->mDimCurr = mImpl->dimensionsGLUT();
 			callHandlersOnCreate();
 			callHandlersOnResize(
 				mImpl->mDimCurr.w - mImpl->mDimPrev.w,
