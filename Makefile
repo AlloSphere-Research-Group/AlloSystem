@@ -179,7 +179,7 @@ archive:
 	@$(RM) -R $($@_TMP)
 
 buildtest: allocore gamma glv test
-	@for v in graphics gui io math simulation sound spatial system; do \
+	@for v in graphics gui io simulation sound spatial system; do \
 		$(MAKE) examples/$$v/*.cpp AUTORUN=0; \
 	done
 
