@@ -203,19 +203,19 @@ public:
 	
 	
 	template<typename T>
-	const ShaderProgram& uniform(const char * name, const Vec<2,T>& v) {
+	const ShaderProgram& uniform(const char * name, const Vec<2,T>& v) const {
 		return uniform(name, v.x, v.y);
 	}
 	template<typename T>
-	const ShaderProgram& uniform(const char * name, const Vec<3,T>& v) {
+	const ShaderProgram& uniform(const char * name, const Vec<3,T>& v) const {
 		return uniform(name, v.x, v.y, v.z);
 	}
 	template<typename T>
-	const ShaderProgram& uniform(const char * name, const Vec<4,T>& v) {
+	const ShaderProgram& uniform(const char * name, const Vec<4,T>& v) const {
 		return uniform(name, v.x, v.y, v.z, v.w);
 	}
 	template<typename T>
-	const ShaderProgram& uniform(const char * name, const Quat<T>& q) {
+	const ShaderProgram& uniform(const char * name, const Quat<T>& q) const {
 		// note wxyz => xyzw for GLSL vec4:
 		return uniform(name, q.x, q.y, q.z, q.w);
 	}
@@ -247,19 +247,19 @@ public:
 	const ShaderProgram& attribute4(int location, const double * v) const;
 	
 	template<typename T>
-	const ShaderProgram& attribute(int location, const Vec<2,T>& v) {
+	const ShaderProgram& attribute(int location, const Vec<2,T>& v) const {
 		return attribute(location, v.x, v.y);
 	}
 	template<typename T>
-	const ShaderProgram& attribute(int location, const Vec<3,T>& v) {
+	const ShaderProgram& attribute(int location, const Vec<3,T>& v) const {
 		return attribute(location, v.x, v.y, v.z);
 	}
 	template<typename T>
-	const ShaderProgram& attribute(int location, const Vec<4,T>& v) {
+	const ShaderProgram& attribute(int location, const Vec<4,T>& v) const {
 		return attribute(location, v.x, v.y, v.z, v.w);
 	}
 	template<typename T>
-	const ShaderProgram& attribute(int location, const Quat<T>& q) {
+	const ShaderProgram& attribute(int location, const Quat<T>& q) const {
 		// note wxyz => xyzw for GLSL vec4:
 		return attribute(location, q.x, q.y, q.z, q.w);
 	}
