@@ -15,13 +15,13 @@ include ../Makefile.common
 include ../Makefile.rules
 
 CXXFLAGS	+= -I../include
-LDFLAGS		+= -L../$(BUILD_DIR)lib -L$(BUILD_DIR)lib -l$(LIB_NAME)
+LDFLAGS		:= -L../$(BUILD_DIR)lib -L$(BUILD_DIR)lib $(LDFLAGS) -l$(LIB_NAME)
 
 LINK_LIBS_PATH	= $(wildcard ../$(BUILD_DIR)lib/*.a)
 LINK_LIBS_FLAGS	=
 ifeq ($(PLATFORM), linux)
 	LINK_LIBS_FLAGS += $(addprefix -l :, $(notdir $(LINK_LIBS_PATH)))
-	LDFLAGS += -L/usr/local/lib
+	LDFLAGS := -L/usr/lib/ -L/usr/local/lib/ $(LDFLAGS)
 endif
 
 
@@ -32,7 +32,7 @@ endif
 test: unitTests.cpp $(SLIB_PATH)
 #	@echo $(LINK_LIBS_FLAGS)
 #	@echo LDFLAGS: $(LDFLAGS)
-	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) -o $(BIN_DIR)unitTests
+	$(CXX) $(CXXFLAGS) $^ $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) -o $(BIN_DIR)unitTests
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./unitTests
 endif
