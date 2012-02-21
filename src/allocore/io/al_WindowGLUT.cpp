@@ -520,16 +520,17 @@ private:
 
 //******************************************************************************
 
-Window::Window()
-:	mImpl(new WindowImpl(this))
-{
-	init();
+void Window::implCtor(){
+	mImpl = new WindowImpl(this);
 }
 
-Window::~Window(){
-	//printf("destroying Window\n");
-	destroy();
+void Window::implDtor(){
+	//printf("implDtor\n");
 	delete mImpl;
+}
+
+void Window::implDestroy(){
+	mImpl->destroy();
 }
 
 
@@ -581,11 +582,6 @@ void Window::create(
 	mImpl->scheduleDraw();
 }
 
-void Window::destroy(){
-	callHandlersOnDestroy();
-	mImpl->destroy();
-}
-
 void Window::destroyAll(){
 	WindowImpl::WindowsMap::iterator it = WindowImpl::windows().begin();
 	for(; it != WindowImpl::windows().end(); it++){
@@ -631,9 +627,7 @@ Window& Window::cursorHide(bool v){
 }
 
 Window& Window::dimensions(const Dim& v){
-
-	if(created()){
-		glutSetWindow(mImpl->mID);
+	if(makeCurrent()){
 		glutPositionWindow(v.l, v.t);
 		mImpl->mDimPrev.l = mImpl->mDimCurr.l;
 		mImpl->mDimPrev.t = mImpl->mDimCurr.t;
@@ -642,6 +636,7 @@ Window& Window::dimensions(const Dim& v){
 		glutReshapeWindow(v.w, v.h);
 	}
 	else{
+		//mImpl->mDimPrev = mImpl->mDimCurr;
 		mImpl->mDimPrev.set(0,0,0,0);
 		mImpl->mDimCurr = v;
 	}

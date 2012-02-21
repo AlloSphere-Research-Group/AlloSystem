@@ -377,11 +377,15 @@ protected:
 	DisplayMode mDisplayMode;
 	bool mASAP;
 
+	// defined in pimpl-specific file
+	void implCtor();
+	void implDtor();
+	void implDestroy();
+
 	bool makeCurrent() const;
 	Window& insert(InputEventHandler& v, int i);
 	Window& insert(WindowEventHandler& v, int i);
 
-	void init();					// IMPORTANT: this must be called from the constructor
 	void doFrameImpl();				// Calls onFrame() and swaps buffers
 
 	#define CALL(e)	{\

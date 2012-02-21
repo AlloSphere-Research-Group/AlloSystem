@@ -71,14 +71,34 @@ void WindowEventHandler::removeFromWindow(){
 
 
 
-void Window::init(){
-	// Window has its own built-in handlers (which may be overridden in subclasses)
-	// they are added explicitly here so that the order of handlers can be user controled
+Window::Window()
+:	mDisplayMode(DEFAULT_BUF), mASAP(false)
+{
+	implCtor(); // must call first!
+	dimensions(Dim(800,600));
+	fps(40);
 	append(inputEventHandler());
 	append(windowEventHandler());
-	mDisplayMode = DEFAULT_BUF;
-	mASAP = false;
 }
+
+Window::~Window(){
+	destroy();
+	implDtor();
+}
+
+void Window::destroy(){
+	callHandlersOnDestroy();
+	implDestroy();
+}
+
+//void Window::init(){
+//	// Window has its own built-in handlers (which may be overridden in subclasses)
+//	// they are added explicitly here so that the order of handlers can be user controled
+//	append(inputEventHandler());
+//	append(windowEventHandler());
+//	mDisplayMode = DEFAULT_BUF;
+//	mASAP = false;
+//}
 
 Window& Window::cursorHideToggle(){
 	cursorHide(!cursorHide());

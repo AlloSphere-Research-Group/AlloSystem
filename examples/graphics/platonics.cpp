@@ -61,7 +61,7 @@ struct MyWindow : Window{
 	double angle1, angle2;
 };
 
-MyWindow win1;
+MyWindow win;
 
 int main(){
 
@@ -132,8 +132,7 @@ int main(){
 		solids[4].generateNormals();
 	}
 
-	win1.add(new StandardWindowKeyControls);
-	win1.create();
+	win.add(new StandardWindowKeyControls);
+	win.create();
 	MainLoop::start();
-	return 0;
 }
