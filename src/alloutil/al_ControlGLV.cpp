@@ -107,9 +107,10 @@ GLVDetachable& GLVDetachable::detached(bool v){
 				cv = cv->sibling;
 			}
 		}
+		//ru.print();
 		//posAdd(-ru.l, -ru.t);
-		addGUI(detachedWindow());
 		detachedWindow().create(Window::Dim(ru.w, ru.h));
+		addGUI(detachedWindow());
 	}
 	else if(detached()){			// is currently detached, attach back to parent, if any
 		remGUI(detachedWindow());
