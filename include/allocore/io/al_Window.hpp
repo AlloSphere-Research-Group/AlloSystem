@@ -381,12 +381,11 @@ protected:
 	void implCtor();
 	void implDtor();
 	void implDestroy();
+	void implOnFrame(); // Calls onFrame() and swaps buffers
 
 	bool makeCurrent() const;
 	Window& insert(InputEventHandler& v, int i);
-	Window& insert(WindowEventHandler& v, int i);
-
-	void doFrameImpl();				// Calls onFrame() and swaps buffers
+	Window& insert(WindowEventHandler& v, int i);		
 
 	#define CALL(e)	{\
 		InputEventHandlers::iterator it = mInputEventHandlers.begin(); \

@@ -87,8 +87,10 @@ Window::~Window(){
 }
 
 void Window::destroy(){
-	callHandlersOnDestroy();
-	implDestroy();
+	if(created()){
+		callHandlersOnDestroy();
+		implDestroy();
+	}
 }
 
 //void Window::init(){

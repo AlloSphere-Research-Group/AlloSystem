@@ -460,7 +460,7 @@ private:
 				}
 				
 				// this calls the window's onFrame()
-				win->doFrameImpl();
+				win->implOnFrame();
 
 				if(win->fps() > 0) {
 					al_sec next;
@@ -531,6 +531,15 @@ void Window::implDtor(){
 
 void Window::implDestroy(){
 	mImpl->destroy();
+}
+
+void Window::implOnFrame(){
+	const int winID = mImpl->id();
+	const int current = glutGetWindow();
+	if(winID != current) glutSetWindow(winID);
+	callHandlersOnFrame();
+	glutSwapBuffers();
+	//if(current > 0 && current != winID) glutSetWindow(current);
 }
 
 
@@ -641,15 +650,6 @@ Window& Window::dimensions(const Dim& v){
 		mImpl->mDimCurr = v;
 	}
 	return *this;
-}
-
-void Window::doFrameImpl(){
-	const int winID = mImpl->id();
-	const int current = glutGetWindow();
-	if(winID != current) glutSetWindow(winID);
-	callHandlersOnFrame();
-	glutSwapBuffers();
-	//if(current > 0 && current != winID) glutSetWindow(current);
 }
 
 Window& Window::fps(double v){
