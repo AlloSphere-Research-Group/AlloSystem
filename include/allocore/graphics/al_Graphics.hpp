@@ -207,7 +207,7 @@ public:
 	void depthMask(bool b);
 	void depthTesting(bool b);
 	void lighting(bool b);
-	void scissor(bool b);
+	void scissorTest(bool b);
 	void cullFace(bool b);
 	void cullFace(bool b, Face face);
 
@@ -238,8 +238,14 @@ public:
 
 
 	// Coordinate Transforms
+//	void scissor(int x, int y, int width, int height);
+//	void scissor(const Viewport& v){ scissor(v.l,v.b,v.w,v.h); }
+//	/// Set viewport and scissor region
+//	void viewportScissor(const Viewport& v){ viewport(v); scissor(v); }
+
 	void viewport(int x, int y, int width, int height);
-	void viewport(const Viewport& vp) { viewport(vp.l, vp.b, vp.w, vp.h); }
+	void viewport(const Viewport& v){ viewport(v.l,v.b,v.w,v.h); }
+
 	void matrixMode(MatrixMode mode);
 	void pushMatrix();
 	void popMatrix();
@@ -312,15 +318,17 @@ public:
 
 
 	// Utility functions: converting, reporting, etc.
-	
+
+	/// Print current error state to file
+	static bool error(const char *msg="", FILE * fp=stdout);
+
+	static bool error(int ID, const char * msg, FILE * fp=stdout);
+
 	/// Returns number of components for given color type
 	static int numComponents(Format v);
 	
 	/// Returns number of bytes for given data type
 	static int numBytes(DataType v);
-
-	/// Print current error state to file
-	static bool error(const char *msg="", FILE * fp=stdout);
 	
 	/// Returns AlloTy type for a given GL data type:
 	static AlloTy toAlloTy(DataType v);
@@ -362,7 +370,7 @@ inline void Graphics::blending(bool b){ capability(BLEND, b); }
 inline void Graphics::depthMask(bool b){ glDepthMask(b?GL_TRUE:GL_FALSE); }
 inline void Graphics::depthTesting(bool b){ capability(DEPTH_TEST, b); }
 inline void Graphics::lighting(bool b){ capability(LIGHTING, b); }
-inline void Graphics::scissor(bool b){ capability(SCISSOR_TEST, b); }
+inline void Graphics::scissorTest(bool b){ capability(SCISSOR_TEST, b); }
 inline void Graphics::cullFace(bool b){ capability(CULL_FACE, b); }
 inline void Graphics::cullFace(bool b, Face face) {
 	capability(CULL_FACE, b);

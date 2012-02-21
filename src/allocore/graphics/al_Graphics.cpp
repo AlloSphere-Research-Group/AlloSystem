@@ -42,20 +42,31 @@ int Graphics::numBytes(DataType v){
 }
 
 bool Graphics::error(const char * msg, FILE * fp){
+	return error(-1, msg, fp);
+}
+
+bool Graphics::error(int ID, const char * msg, FILE * fp){
 	GLenum err = glGetError();
 
+	#define CASE(GL_ERR) case GL_ERR:\
+		if(ID>=0)	fprintf(fp,"Error %s (id=%d): %s\n", msg, ID, #GL_ERR);\
+		else		fprintf(fp,"Error %s: %s\n", msg, #GL_ERR);\
+		return true;
 	#define POST "The offending command is ignored and has no other side effect than to set the error flag."
 	switch(err) {
-		case GL_INVALID_ENUM:	fprintf(fp,"%s:\n %s\n", msg, "An unacceptable value is specified for an enumerated argument. "POST); return true;
-		case GL_INVALID_VALUE:	fprintf(fp,"%s:\n %s\n", msg, "A numeric argument is out of range. "POST); return true;
-		case GL_INVALID_OPERATION:fprintf(fp,"%s:\n %s\n", msg, "The specified operation is not allowed in the current state. "POST); return true;
-		case GL_STACK_OVERFLOW:	fprintf(fp,"%s:\n %s\n", msg, "This command would cause a stack overflow. "POST); return true;
-		case GL_STACK_UNDERFLOW:fprintf(fp,"%s:\n %s\n", msg, "This command would cause a stack underflow. "POST); return true;
-		case GL_OUT_OF_MEMORY:	fprintf(fp,"%s:\n %s\n", msg, "There is not enough memory left to execute the command. The state of the GL is undefined, except for the state of the error flags, after this error is recorded."); return true;
-		case GL_TABLE_TOO_LARGE:fprintf(fp,"%s:\n %s\n", msg, "The specified table exceeds the implementation's maximum supported table size. "POST); return true;
-		case GL_NO_ERROR: break;
+//		case GL_INVALID_ENUM:	fprintf(fp,"%s:\n %s\n", msg, "An unacceptable value is specified for an enumerated argument. "POST); return true;
+//		case GL_INVALID_VALUE:	fprintf(fp,"%s:\n %s\n", msg, "A numeric argument is out of range. "POST); return true;
+//		case GL_INVALID_OPERATION:fprintf(fp,"%s:\n %s\n", msg, "The specified operation is not allowed in the current state. "POST); return true;
+//		case GL_STACK_OVERFLOW:	fprintf(fp,"%s:\n %s\n", msg, "This command would cause a stack overflow. "POST); return true;
+//		case GL_STACK_UNDERFLOW:fprintf(fp,"%s:\n %s\n", msg, "This command would cause a stack underflow. "POST); return true;
+//		case GL_OUT_OF_MEMORY:	fprintf(fp,"%s:\n %s\n", msg, "There is not enough memory left to execute the command. The state of the GL is undefined, except for the state of the error flags, after this error is recorded."); return true;
+//		case GL_TABLE_TOO_LARGE:fprintf(fp,"%s:\n %s\n", msg, "The specified table exceeds the implementation's maximum supported table size. "POST); return true;
+		CASE(GL_INVALID_ENUM) CASE(GL_INVALID_VALUE) CASE(GL_INVALID_OPERATION)
+		CASE(GL_STACK_OVERFLOW) CASE(GL_STACK_UNDERFLOW) CASE(GL_OUT_OF_MEMORY)
+		CASE(GL_TABLE_TOO_LARGE)
 		default: break;
 	}
+	#undef CASE
 	#undef POST
 	return false;
 }
