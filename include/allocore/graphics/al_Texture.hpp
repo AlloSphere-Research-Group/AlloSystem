@@ -117,6 +117,10 @@ public:
 	Texture& height(unsigned v){ return update(v, mHeight,mPixelsUpdated); }
 	Texture& depth (unsigned v){ return update(v, mDepth ,mPixelsUpdated); }
 
+	Texture& resize(unsigned w){ return width(w); }
+	Texture& resize(unsigned w, unsigned h){ return width(w).height(h); }
+	Texture& resize(unsigned w, unsigned h, unsigned d){ return width(w).height(h).depth(d); }
+
 	Texture& filter(Filter v){ return update(v, mFilter, mParamsUpdated); }
 	Texture& wrap(Wrap v){ return wrap(v,v,v); }
 	Texture& wrap(Wrap S, Wrap T){ return wrap(S,T,mWrapR); }
@@ -129,7 +133,7 @@ public:
 	
 	/// render the texture onto a quad on the XY plane
 	void quad(Graphics& gl, double w=1, double h=1, double x=0, double y=0);
-	
+
 	/// return reference to the internal CPU-side cache
 	/// DO NOT MODIFY THE LAYOUT OR DIMENSIONS OF THIS ARRAY
 	Array& array() { return mArray; }
@@ -204,26 +208,11 @@ protected:
 	/// ensures that the internal Array format matches the texture format
 	void resetArray(unsigned align);
 
-	void sendParams(bool force=true){
-		if(mParamsUpdated || force){
-			glBindTexture(target(), id());
-			glTexParameterf(target(), GL_TEXTURE_MAG_FILTER, filter());
-			glTexParameterf(target(), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			glTexParameterf(target(), GL_TEXTURE_WRAP_S, mWrapS);
-			glTexParameterf(target(), GL_TEXTURE_WRAP_T, mWrapT);
-			glTexParameterf(target(), GL_TEXTURE_WRAP_R, mWrapR);
-			glTexParameteri(target(), GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
-			glBindTexture(target(), 0);
-			mParamsUpdated = false;
-		}
-	}
+	/// send any pending parameter updates to GPU or do immediately if forced
+	void sendParams(bool force=true);
 	
-	void sendPixels(bool force=true){
-		if(mPixelsUpdated || force){
-			submit(mPixels);
-			mPixelsUpdated = false;
-		}
-	}
+	/// send any pending pixels updates to GPU or do immediately if forced
+	void sendPixels(bool force=true);
 
 	/// determines target (e.g. GL_TEXTURE_2D) from the dimensions
 	void determineTarget();
@@ -237,28 +226,7 @@ protected:
 };
 
 
-inline void Texture :: bind(int unit) {
-	// ensure it is created:
-	validate(); 
-	sendParams(false);
-	sendPixels(false);
-	
-	// multitexturing:
-	glActiveTextureARB(GL_TEXTURE0_ARB + unit);
-	
-	// bind:
-	glEnable(target());
-	glBindTexture(target(), id());
-	
-	Graphics::error("binding texture");
-}
 
-inline void Texture :: unbind(int unit) {		
-	// multitexturing:
-	glActiveTextureARB(GL_TEXTURE0_ARB + unit);
-	glBindTexture(target(), 0);
-	glDisable(target());
-}
 
 inline Texture& Texture :: wrap(Wrap S, Wrap T, Wrap R){
 	if(S!=mWrapS || T!=mWrapT || R!=mWrapR){
