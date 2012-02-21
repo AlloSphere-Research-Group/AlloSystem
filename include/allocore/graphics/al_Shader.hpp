@@ -267,6 +267,8 @@ public:
 	int uniform(const char * name) const;
 	int attribute(const char * name) const;
 
+	static void use(unsigned programID);
+
 protected:
 	Graphics::Primitive mInPrim, mOutPrim;	// IO primitives for geometry shaders
 	unsigned int mOutVertices;

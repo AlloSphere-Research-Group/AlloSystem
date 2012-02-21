@@ -196,22 +196,32 @@ void ShaderProgram::onDestroy(){
 	//glDeleteObjectARB((GLhandleARB)handle()); 
 }
 
-const ShaderProgram& ShaderProgram::use() { 
-	if(active()) {
+void ShaderProgram::use(unsigned programID){
+	glUseProgram(programID);
+}
+
+const ShaderProgram& ShaderProgram::use(){ 
+	//if(active()){
 		validate();
-		glUseProgram(id()); 
-	}
+		use(id()); 
+	//}
 	//glUseProgramObjectARB((GLhandleARB)handle());
 	return *this; 
 }
-bool ShaderProgram::begin() { 
-	use();
-	return active();
+
+bool ShaderProgram::begin(){ 
+	if(active()){
+		use();
+		return true;
+	}
+	return false;
 }
+
 void ShaderProgram::end() const { 
 	if(active()) glUseProgram(0); 
 	//glUseProgramObjectARB(0);
 }
+
 bool ShaderProgram::linked() const { 
 	GLint v; 
 	get(GL_LINK_STATUS, &v); 
@@ -220,19 +230,19 @@ bool ShaderProgram::linked() const {
 // GLint v; glGetProgramiv(id(), GL_LINK_STATUS, &v); return v; }
 
 const ShaderProgram& ShaderProgram::uniform(const char * name, int v0) const{
-	glUniform1i(uniform(name), v0);	return *this;
+	return uniform(uniform(name), v0);
 }
 const ShaderProgram& ShaderProgram::uniform(const char * name, float v0) const{
-	glUniform1f(uniform(name), v0);	return *this;
+	return uniform(uniform(name), v0);
 }
 const ShaderProgram& ShaderProgram::uniform(const char * name, float v0, float v1) const{
-	glUniform2f(uniform(name), v0,v1); return *this;	
+	return uniform(uniform(name), v0,v1);
 }
 const ShaderProgram& ShaderProgram::uniform(const char * name, float v0, float v1, float v2) const{
-	glUniform3f(uniform(name), v0,v1,v2); return *this;	
+	return uniform(uniform(name), v0,v1,v2);
 }
 const ShaderProgram& ShaderProgram::uniform(const char * name, float v0, float v1, float v2, float v3) const{
-	glUniform4f(uniform(name), v0,v1,v2,v3); return *this;	
+	return uniform(uniform(name), v0,v1,v2,v3);
 }
 const ShaderProgram& ShaderProgram::uniform1(const char * name, const float * v, int count) const{
 	glUniform1fv(uniform(name), count, v); return *this;
@@ -281,16 +291,16 @@ const ShaderProgram& ShaderProgram::attribute(int location, float v0, float v1, 
 }
 
 const ShaderProgram& ShaderProgram::attribute(const char * name, float v0) const{
-	glVertexAttrib1f(attribute(name), v0);	return *this;
+	return attribute(attribute(name), v0);
 }
 const ShaderProgram& ShaderProgram::attribute(const char * name, float v0, float v1) const{
-	glVertexAttrib2f(attribute(name), v0,v1); return *this;	
+	return attribute(attribute(name), v0,v1);
 }
 const ShaderProgram& ShaderProgram::attribute(const char * name, float v0, float v1, float v2) const{
-	glVertexAttrib3f(attribute(name), v0,v1,v2); return *this;	
+	return attribute(attribute(name), v0,v1,v2);
 }
 const ShaderProgram& ShaderProgram::attribute(const char * name, float v0, float v1, float v2, float v3) const{
-	glVertexAttrib4f(attribute(name), v0,v1,v2,v3); return *this;	
+	return attribute(attribute(name), v0,v1,v2,v3);
 }
 const ShaderProgram& ShaderProgram::attribute1(const char * name, const float * v) const{
 	glVertexAttrib1fv(attribute(name), v); return *this;
@@ -356,7 +366,7 @@ void ShaderProgram::listParams() const {
 
 		glGetActiveUniform(program,
 							j,
-							256,
+							sizeof(name),
 							&length,
 							&size,
 							&gltype,
@@ -397,7 +407,7 @@ void ShaderProgram::listParams() const {
 
 		glGetActiveAttrib(program,
 							j,
-							256,
+							sizeof(name),
 							&length,
 							&size,
 							&gltype,
@@ -423,50 +433,4 @@ void ShaderProgram::listParams() const {
 	}
 }
 
-
-
-} // ::al
-
-
-//Shader shader1;
-//shader1.set(shaderBuf, GL_FRAGMENT_SHADER);
-//
-//ShaderProgram shaderProgram;
-//
-//shaderProgram.attach(shader1);
-//shaderProgram.link().use();
-
-/*
-
-	char *vs = NULL,*fs = NULL,*fs2 = NULL;
-
-	v = glCreateShader(GL_VERTEX_SHADER);
-	f = glCreateShader(GL_FRAGMENT_SHADER);
-	f2 = glCreateShader(GL_FRAGMENT_SHADER);
-
-	vs = textFileRead("toon.vert");
-	fs = textFileRead("toon.frag");
-	fs2 = textFileRead("toon2.frag");
-
-	const char * ff = fs;
-	const char * ff2 = fs2;
-	const char * vv = vs;
-
-	glShaderSource(v, 1, &vv,NULL);
-	glShaderSource(f, 1, &ff,NULL);
-	glShaderSource(f2, 1, &ff2,NULL);
-
-	free(vs);free(fs);
-
-	glCompileShader(v);
-	glCompileShader(f);
-	glCompileShader(f2);
-
-	p = glCreateProgram();
-	glAttachShader(p,f);
-	glAttachShader(p,f2);
-	glAttachShader(p,v);
-
-	glLinkProgram(p);
-	glUseProgram(p);
-*/
+} // al::
