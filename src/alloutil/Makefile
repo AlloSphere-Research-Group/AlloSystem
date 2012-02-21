@@ -23,7 +23,10 @@ install: $(LIB_PATH)
 	@$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)
 	@$(INSTALL) -C -m 644 $(INC_DIR)$/*.h* $(DESTDIR)/include/$(LIB_NAME)
 #	@echo $(notdir $(SLIB_PATH))
-#	For some reason this can result in an error if the file exists.
-#	Just ignore it and continue...
-	@-$(INSTALL) -C -m 644 $(LIB_PATH) $(DESTDIR)/lib
+
+#	Only copy library if it doesn't exist or is newer than existing
+	@if [ $(LIB_PATH) -nt $(DESTDIR)/lib/$(LIB_FILE) ] || [ ! -e $(DESTDIR)/lib/$(LIB_FILE) ]; then \
+		$(INSTALL) -C -m 644 $(LIB_PATH) $(DESTDIR)/lib;\
+	fi;
 #	@$(RANLIB) $(DESTDIR)/lib/$(SLIB_FILE)
+

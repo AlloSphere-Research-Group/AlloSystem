@@ -230,10 +230,13 @@ DLIB_PATH		= $(addprefix $(BUILD_DIR)lib/, $(DLIB_MIN_FILE))
 SLIB_PATH		= $(addprefix $(BUILD_DIR)lib/, $(SLIB_FILE))
 
 # Set file directory/name of specified library type
-LIB_PATH = $(SLIB_PATH)
 ifneq ($(DYNAMIC), 0)
 	CFLAGS += -fPIC
+	LIB_FILE = $(DLIB_FILE)
 	LIB_PATH = $(DLIB_PATH)
+else
+	LIB_FILE = $(SLIB_FILE)
+	LIB_PATH = $(SLIB_PATH)
 endif
 
 
