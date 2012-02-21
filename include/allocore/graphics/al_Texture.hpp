@@ -131,8 +131,13 @@ public:
 	/// unbind the texture (from a multitexture unit)
 	void unbind(int unit = 0);
 	
-	/// render the texture onto a quad on the XY plane
+	/// Render the texture onto a quad on the XY plane
 	void quad(Graphics& gl, double w=1, double h=1, double x=0, double y=0);
+
+	/// Render the texture onto a quad filling current viewport
+	void quadViewport(
+		Graphics& g, const Color& color = Color(1),
+		double w=2, double h=2, double x=-1, double y=-1);
 
 	/// return reference to the internal CPU-side cache
 	/// DO NOT MODIFY THE LAYOUT OR DIMENSIONS OF THIS ARRAY

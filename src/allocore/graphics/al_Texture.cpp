@@ -50,6 +50,29 @@ Texture :: Texture(unsigned width, unsigned height, unsigned depth, Graphics::Fo
 	//printf("created Texture %p\n", this);
 }
 
+void Texture :: bind(int unit) {
+	// ensure it is created:
+	validate(); 
+	sendParams(false);
+	sendPixels(false);
+	
+	// multitexturing:
+	glActiveTextureARB(GL_TEXTURE0_ARB + unit);
+	
+	// bind:
+	glEnable(target());
+	glBindTexture(target(), id());
+	
+	Graphics::error(id(), "binding texture");
+}
+
+void Texture :: unbind(int unit) {		
+	// multitexturing:
+	glActiveTextureARB(GL_TEXTURE0_ARB + unit);
+	glBindTexture(target(), 0);
+	glDisable(target());
+}
+
 void Texture :: determineTarget(){
 	if(0 == mHeight)		mTarget = TEXTURE_1D;
 	else if(0 == mDepth)	mTarget = TEXTURE_2D;
@@ -71,6 +94,22 @@ void Texture :: quad(Graphics& gl, double w, double h, double x0, double y0){
 		gl.vertex	(x0+w, y0+h, 0);
 	gl.end();
 	unbind();
+}
+
+void Texture::quadViewport(
+	Graphics& g, const Color& color,
+	double w, double h, double x, double y
+){
+	g.pushMatrix(g.PROJECTION);
+	g.loadIdentity();
+	g.pushMatrix(g.MODELVIEW);
+	g.loadIdentity();
+	g.depthMask(0);
+		g.color(color);
+		quad(g, w,h, x,y);
+	g.depthMask(1);	
+	g.popMatrix(g.PROJECTION);
+	g.popMatrix(g.MODELVIEW);
 }
 
 void Texture :: resetArray(unsigned align) {
@@ -212,6 +251,27 @@ void Texture :: allocate(const Array& src, bool reconfigure) {
 void Texture :: deallocate() {
 	mArray.dataFree();
 	mPixels=0;
+}
+
+void Texture::sendParams(bool force){
+	if(mParamsUpdated || force){
+		glBindTexture(target(), id());
+		glTexParameterf(target(), GL_TEXTURE_MAG_FILTER, filter());
+		glTexParameterf(target(), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameterf(target(), GL_TEXTURE_WRAP_S, mWrapS);
+		glTexParameterf(target(), GL_TEXTURE_WRAP_T, mWrapT);
+		glTexParameterf(target(), GL_TEXTURE_WRAP_R, mWrapR);
+		glTexParameteri(target(), GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
+		glBindTexture(target(), 0);
+		mParamsUpdated = false;
+	}
+}
+
+void Texture::sendPixels(bool force){
+	if(mPixelsUpdated || force){
+		submit(mPixels);
+		mPixelsUpdated = false;
+	}
 }
 
 void Texture :: submit(const Array& src, bool reconfigure) {	
@@ -374,7 +434,7 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 	// set alignment back to default
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 	
-	Graphics::error("submitting texture");
+	Graphics::error(id(), "submitting texture");
 	
 //		// OpenGL may have changed the internal format to one it supports:
 //		GLint format;
@@ -391,22 +451,23 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 
 
 void Texture :: print() {
-	std::string target = "?";
-	std::string format = "?";
-	std::string type = "?";
+
+	const char * target = "?";
+	const char * format = "?";
+	const char * type = "?";
 	
 	switch (mTarget) {
 		case TEXTURE_1D: 
 			target = "GL_TEXTURE_1D"; 
-			printf("Texture target=%s, %d(%d), ", target.c_str(), width(), mArray.width());
+			printf("Texture target=%s, %d(%d), ", target, width(), mArray.width());
 			break;
 		case TEXTURE_2D: 
 			target = "GL_TEXTURE_2D";
-			printf("Texture target=%s, %dx%d(%dx%d), ", target.c_str(), width(), height(), mArray.width(), mArray.height()); 
+			printf("Texture target=%s, %dx%d(%dx%d), ", target, width(), height(), mArray.width(), mArray.height()); 
 			break;
 		case TEXTURE_3D: 
 			target = "GL_TEXTURE_3D"; 
-			printf("Texture target=%s, %dx%dx%d(%dx%dx%d), ", target.c_str(), width(), height(), depth(), mArray.width(), mArray.height(), mArray.depth());
+			printf("Texture target=%s, %dx%dx%d(%dx%dx%d), ", target, width(), height(), depth(), mArray.width(), mArray.height(), mArray.depth());
 			break;
 		default: break;
 	}
@@ -435,7 +496,7 @@ void Texture :: print() {
 		default: break;
 	}
 	
-	printf("type=%s(%s), format=%s(%d), unpack=%d(align=%d))\n", type.c_str(), allo_type_name(mArray.type()), format.c_str(), mArray.components(), mUnpack, mArray.alignment());
+	printf("type=%s(%s), format=%s(%d), unpack=%d(align=%d))\n", type, allo_type_name(mArray.type()), format, mArray.components(), mUnpack, mArray.alignment());
 	//mArray.print();
 
 }
