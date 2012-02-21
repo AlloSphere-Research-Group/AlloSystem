@@ -133,15 +133,15 @@ allocore: $(LIB_PATH)
 #	@$(MAKE) install DESTDIR=$(BUILD_DIR)
 
 allojit alloutil alloni allonect:
-	@$(MAKE) -C src/$@ install BUILD_DIR=../../$(BUILD_DIR) DESTDIR=../../$(BUILD_DIR)
+	@$(MAKE) --no-print-directory -C src/$@ install BUILD_DIR=../../$(BUILD_DIR) DESTDIR=../../$(BUILD_DIR)
 
 
 # AlloCore externals
 externals: gamma glv
 
 gamma glv:
-	@$(MAKE) -C externals/$@ install DESTDIR=../../$(BUILD_DIR)
-	@$(MAKE) -C externals/$@ external
+	@$(MAKE) --no-print-directory -C externals/$@ install DESTDIR=../../$(BUILD_DIR)
+	@$(MAKE) --no-print-directory -C externals/$@ external
 
 
 #$(EXTRA_MODULES):
@@ -180,7 +180,7 @@ archive:
 
 buildtest: allocore gamma glv test
 	@for v in graphics gui io simulation sound spatial system; do \
-		$(MAKE) examples/$$v/*.cpp AUTORUN=0; \
+		$(MAKE) --no-print-directory examples/$$v/*.cpp AUTORUN=0; \
 	done
 
 # Remove build files
