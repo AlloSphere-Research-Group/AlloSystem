@@ -8,7 +8,7 @@
 #include <queue>
 
 /**********************************************************************/
-/*! \class MIDI
+/* \class MIDI
     \brief An abstract base class for realtime MIDI input/output.
 
     This class implements some common functionality for the realtime
@@ -46,7 +46,7 @@
 
 namespace al{
 
-///
+/// MIDI error reporting
 class MIDIError : public std::exception
 {
  public:

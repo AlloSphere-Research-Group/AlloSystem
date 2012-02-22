@@ -635,6 +635,8 @@
 		163E4931130E0254007B30A0 /* libportaudio.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libportaudio.a; sourceTree = "<group>"; };
 		163E4932130E0254007B30A0 /* libsndfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsndfile.a; sourceTree = "<group>"; };
 		16586A1C128903C10068E01A /* al_Shader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Shader.cpp; sourceTree = "<group>"; };
+		165D3F6614F576E90015EDC6 /* al_MIDI.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_MIDI.hpp; sourceTree = "<group>"; };
+		165D3F6714F5770F0015EDC6 /* al_MIDI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_MIDI.cpp; sourceTree = "<group>"; };
 		1663FD461280D608002B2979 /* al_Allocore.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Allocore.hpp; sourceTree = "<group>"; };
 		166DD741117CDB6000A8BA12 /* al_Conversion.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Conversion.hpp; sourceTree = "<group>"; };
 		166DD744117CDBFD00A8BA12 /* utTypesConversion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utTypesConversion.cpp; sourceTree = "<group>"; };
@@ -2433,6 +2435,7 @@
 				3622BEE3116D527D00928703 /* Makefile.config */,
 				3622BEDE116D527D00928703 /* al_AudioIO.cpp */,
 				16054DBA122E12010039003C /* al_FileAPR.cpp */,
+				165D3F6714F5770F0015EDC6 /* al_MIDI.cpp */,
 				160DAE1211C1B1FE00C6905A /* al_SocketAPR.cpp */,
 				160C9A4B12763AF70060D732 /* al_Window.cpp */,
 				3622BEE2116D527D00928703 /* al_WindowGLUT.cpp */,
@@ -3157,6 +3160,7 @@
 			children = (
 				36F46821110BE2E90082D21E /* al_AudioIO.hpp */,
 				36F46822110BE2E90082D21E /* al_File.hpp */,
+				165D3F6614F576E90015EDC6 /* al_MIDI.hpp */,
 				36B4BF06110E55AF00F789A8 /* al_Socket.hpp */,
 				160C9A4912763ADA0060D732 /* al_Window.hpp */,
 			);

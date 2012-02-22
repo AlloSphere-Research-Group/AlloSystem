@@ -22,7 +22,7 @@ using namespace al;
 //#include "RtMidi.cpp"
 
 /**********************************************************************/
-/*! \class RtMidi
+/* \class RtMidi
     \brief An abstract base class for realtime MIDI input/output.
 
     This class implements some common functionality for the realtime
