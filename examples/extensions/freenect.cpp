@@ -12,6 +12,8 @@ Graham Wakefield, 2011
 
 #include "allonect/al_Freenect.hpp"
 
+
+
 using namespace al;
 
 Graphics gl;

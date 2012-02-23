@@ -85,6 +85,13 @@ public:
 	*/
 	Texture(unsigned width, unsigned height, unsigned depth, Graphics::Format format=Graphics::RGBA, Graphics::DataType type=Graphics::UBYTE);
 	
+	/** 
+		Construct a Texture object from an Array header:
+	**/
+	Texture(AlloArrayHeader& header);
+	
+	void configure(AlloArrayHeader& header);
+	
 	virtual ~Texture(){}
 
 	Format format() const { return mFormat; }
@@ -191,7 +198,8 @@ protected:
 	unsigned mWidth, mHeight, mDepth;
 	GLint mUnpack;
 	
-	void * mPixels;				// pointer to client-side pixel data (0 if none)
+	// redundant; use mArray.data.ptr instead:
+	//void * mPixels;				// pointer to client-side pixel data (0 if none)
 	Array mArray;				// Array representation of client-side pixel data
 //	void * mBuffer;				// internally allocated pixel buffer
 	bool mParamsUpdated;

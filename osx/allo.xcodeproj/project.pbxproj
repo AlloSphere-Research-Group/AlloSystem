@@ -184,6 +184,11 @@
 		36115B321438DE3400E121BF /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4931130E0254007B30A0 /* libportaudio.a */; };
 		36115B331438DE3400E121BF /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4932130E0254007B30A0 /* libsndfile.a */; };
 		36115B341438DE3400E121BF /* libGamma.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36FE0F5913845E02003AE7BE /* libGamma.a */; };
+		3620B9C314F353DC008EE9F6 /* libfreenect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3620B9C214F353DC008EE9F6 /* libfreenect.a */; };
+		3622B30814F476C800E0ECA7 /* freenect1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622B30714F476C800E0ECA7 /* freenect1.cpp */; };
+		3622B62414F5D12700E0ECA7 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3622B62314F5D12700E0ECA7 /* libusb-1.0.a */; };
+		3622B62B14F5D13F00E0ECA7 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3622B62A14F5D13F00E0ECA7 /* Carbon.framework */; };
+		3622B63714F5D1AA00E0ECA7 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3622B63614F5D1AA00E0ECA7 /* IOKit.framework */; };
 		3622BFC1116D55B500928703 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		3622BFE1116D55DD00928703 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		3622C043116D566C00928703 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
@@ -343,7 +348,6 @@
 		3686733C1491EEDF00E4D0D6 /* libluajit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4930130E0254007B30A0 /* libluajit.a */; };
 		3686733D1491EEDF00E4D0D6 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4931130E0254007B30A0 /* libportaudio.a */; };
 		3686733E1491EEDF00E4D0D6 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4932130E0254007B30A0 /* libsndfile.a */; };
-		368673441491EEFE00E4D0D6 /* freenect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 368672F71491EE5500E4D0D6 /* freenect.cpp */; };
 		3687E33611FA4F9500EC6706 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		3687E33711FA4F9500EC6706 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
 		3687E33811FA4F9500EC6706 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC53081162907D0076AA8B /* CoreAudio.framework */; };
@@ -375,8 +379,6 @@
 		36C13ED211D15D30006196FC /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC53081162907D0076AA8B /* CoreAudio.framework */; };
 		36C13ED411D15D30006196FC /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		36C13ED511D15D30006196FC /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
-		36C9E8451491F384002C8638 /* libfreenect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36C9E8441491F384002C8638 /* libfreenect.a */; };
-		36C9E8A41491FD64002C8638 /* liballonect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36C9E8A31491FD64002C8638 /* liballonect.a */; };
 		36C9EA5014922511002C8638 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		36C9EA5114922511002C8638 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		36C9EA5214922511002C8638 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
@@ -565,13 +567,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 36035DB813037E8D001E9BA9;
 			remoteInfo = "make allocore";
-		};
-		36C9E8D71491FEC4002C8638 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 36C9E8D21491FEBC002C8638;
-			remoteInfo = "make allonect";
 		};
 		36CA80491418244B00B7CE6B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -851,8 +846,14 @@
 		361AA8AD12AEFDF3002E9DFD /* al_GPUObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GPUObject.cpp; sourceTree = "<group>"; };
 		361BF02F11DEA66600E60A9C /* al_BufferObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_BufferObject.hpp; sourceTree = "<group>"; };
 		361F442911DBF07F00A5458D /* al_AudioScene.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_AudioScene.hpp; sourceTree = "<group>"; };
+		3620B97F14F351FE008EE9F6 /* exAlloNI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exAlloNI.cpp; sourceTree = "<group>"; };
+		3620B9C214F353DC008EE9F6 /* libfreenect.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libfreenect.a; sourceTree = "<group>"; };
 		362127C71173CD72009CB6FC /* al_Graphics.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Graphics.hpp; sourceTree = "<group>"; };
 		362127C81173CDBB009CB6FC /* al_Graphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Graphics.cpp; sourceTree = "<group>"; };
+		3622B30714F476C800E0ECA7 /* freenect1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = freenect1.cpp; sourceTree = "<group>"; };
+		3622B62314F5D12700E0ECA7 /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libusb-1.0.a"; sourceTree = "<group>"; };
+		3622B62A14F5D13F00E0ECA7 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
+		3622B63614F5D1AA00E0ECA7 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
 		3622BEDE116D527D00928703 /* al_AudioIO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_AudioIO.cpp; sourceTree = "<group>"; };
 		3622BEE2116D527D00928703 /* al_WindowGLUT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_WindowGLUT.cpp; sourceTree = "<group>"; };
 		3622BEE3116D527D00928703 /* Makefile.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.config; sourceTree = "<group>"; };
@@ -1671,8 +1672,10 @@
 				3686733C1491EEDF00E4D0D6 /* libluajit.a in Frameworks */,
 				3686733D1491EEDF00E4D0D6 /* libportaudio.a in Frameworks */,
 				3686733E1491EEDF00E4D0D6 /* libsndfile.a in Frameworks */,
-				36C9E8451491F384002C8638 /* libfreenect.a in Frameworks */,
-				36C9E8A41491FD64002C8638 /* liballonect.a in Frameworks */,
+				3620B9C314F353DC008EE9F6 /* libfreenect.a in Frameworks */,
+				3622B62414F5D12700E0ECA7 /* libusb-1.0.a in Frameworks */,
+				3622B62B14F5D13F00E0ECA7 /* Carbon.framework in Frameworks */,
+				3622B63714F5D1AA00E0ECA7 /* IOKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1933,6 +1936,8 @@
 				36B4127010EFF864007B16D0 /* osx */,
 				163E4929130E0254007B30A0 /* lib */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
+				3622B62A14F5D13F00E0ECA7 /* Carbon.framework */,
+				3622B63614F5D1AA00E0ECA7 /* IOKit.framework */,
 			);
 			name = alscheduling;
 			sourceTree = "<group>";
@@ -1940,6 +1945,7 @@
 		163E4929130E0254007B30A0 /* lib */ = {
 			isa = PBXGroup;
 			children = (
+				3620B9C214F353DC008EE9F6 /* libfreenect.a */,
 				36C9E8A31491FD64002C8638 /* liballonect.a */,
 				36C9E8441491F384002C8638 /* libfreenect.a */,
 				36FE0F5913845E02003AE7BE /* libGamma.a */,
@@ -2396,6 +2402,7 @@
 		3622BEDB116D526700928703 /* examples */ = {
 			isa = PBXGroup;
 			children = (
+				3620B97F14F351FE008EE9F6 /* exAlloNI.cpp */,
 				3630EF9A14EC3CC60083BEFB /* exMsgTube.cpp */,
 				368672F61491EE4700E4D0D6 /* extensions */,
 				36596982143D5DDB0024236A /* simulation */,
@@ -2518,6 +2525,7 @@
 			isa = PBXGroup;
 			children = (
 				368672F71491EE5500E4D0D6 /* freenect.cpp */,
+				3622B30714F476C800E0ECA7 /* freenect1.cpp */,
 			);
 			path = extensions;
 			sourceTree = "<group>";
@@ -2649,6 +2657,7 @@
 		36B4129710EFF864007B16D0 /* lib */ = {
 			isa = PBXGroup;
 			children = (
+				3622B62314F5D12700E0ECA7 /* libusb-1.0.a */,
 				36035C5E13037289001E9BA9 /* libfreetype.a */,
 				369DDF6512B6C8C000F75D2A /* libassimp.a */,
 				369DDF6612B6C8C000F75D2A /* libluajit.a */,
@@ -3479,7 +3488,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				36C9E8D81491FEC4002C8638 /* PBXTargetDependency */,
 			);
 			name = freenect;
 			productInstallPath = "$(HOME)/bin";
@@ -3647,6 +3655,7 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "allo" */;
 			compatibilityVersion = "Xcode 3.0";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -3900,7 +3909,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				368673441491EEFE00E4D0D6 /* freenect.cpp in Sources */,
+				3622B30814F476C800E0ECA7 /* freenect1.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4035,11 +4044,6 @@
 			isa = PBXTargetDependency;
 			target = 36035DB813037E8D001E9BA9 /* make allocore */;
 			targetProxy = 3696E34414BFA41D00D21F2A /* PBXContainerItemProxy */;
-		};
-		36C9E8D81491FEC4002C8638 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 36C9E8D21491FEBC002C8638 /* make allonect */;
-			targetProxy = 36C9E8D71491FEC4002C8638 /* PBXContainerItemProxy */;
 		};
 		36CA80481418244B00B7CE6B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

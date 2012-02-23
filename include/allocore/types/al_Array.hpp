@@ -107,6 +107,9 @@ public:
 	
 	/// Returns number of cells in the Array:
 	unsigned cells() const { return allo_array_elements(this); }
+	
+	/// Change the format without de/re/allocating:
+	void configure(const AlloArrayHeader& h2);
 
 	///	Change the format (header/layout) of the Array reallocating if necessary
 	void format(const AlloArrayHeader& h2);
@@ -180,6 +183,8 @@ public:
 	template<typename T> void set1d(T * cell);
 	template<typename T> void set2d(T * cell);
 	template<typename T> void set3d(T * cell);
+	
+	template<typename T> void setall(T value);
 
 	/// Use a pure C function to fill an array with data
 	template<typename T> void fill(void (*func)(T * values, double normx));
@@ -404,22 +409,25 @@ inline bool Array::isFormat(const AlloArrayHeader& h2) const {
 		&& (header.dimcount == h2.dimcount);
 }
 
+inline void Array::configure(const AlloArrayHeader& h2) {
+	header.type = h2.type;
+	header.components = h2.components;
+	header.dimcount = h2.dimcount;
+	for(int i=0; i < ALLO_ARRAY_MAX_DIMS; ++i) {
+		if (i < header.dimcount) {
+			header.dim[i] = h2.dim[i];
+			header.stride[i] = h2.stride[i];
+		} else {
+			header.dim[i] = 1;
+			header.stride[i] = h2.stride[i-1];
+		}
+	}
+}
+
 inline void Array::format(const AlloArrayHeader& h2) {
 	if(!isFormat(h2)) {
 		dataFree();
-		header.type = h2.type;
-		header.components = h2.components;
-		header.dimcount = h2.dimcount;
-		for(int i=0; i < ALLO_ARRAY_MAX_DIMS; ++i) {
-			if (i < header.dimcount) {
-				header.dim[i] = h2.dim[i];
-				header.stride[i] = h2.stride[i];
-			} else {
-				header.dim[i] = 1;
-				header.stride[i] = h2.stride[i-1];
-			}
-		}
-		//printf("reformatted array "); print();
+		configure(h2);
 		dataCalloc();
 	}
 }
@@ -789,6 +797,51 @@ template<typename T> inline void Array::fill(void (*func)(T * values, double nor
 			}
 		}
 	}
+}
+
+template<typename T> inline void Array::setall(T value) {
+	int d0 = header.dim[0];
+	int d1 = header.dim[1];
+	int d2 = header.dim[2];
+	int s1 = header.stride[1];
+	int s2 = header.stride[2];
+	int components = header.components;
+	T * vals;
+	switch (header.dimcount) {
+		case 3:
+			for(int z=0; z < d1; z++) {
+				for(int y=0; y < d1; y++) {
+					vals = (T *)(data.ptr + s1*y + s2*z);
+					for(int x=0; x < d0; x++) {
+						for (int i=0; i<components; i++) {
+							vals[i] = value;
+						}
+					}
+				}
+			}
+			break;
+		case 2:
+			for(int y=0; y < d1; y++) {
+				vals = (T *)(data.ptr + s1*y);
+				for(int x=0; x < d0; x++) {
+					for (int i=0; i<components; i++) {
+						vals[i] = value;
+					}
+				}
+			}
+			break;
+		case 1:
+			vals = (T *)(data.ptr);
+			for(int x=0; x < d0; x++) {
+				for (int i=0; i<components; i++) {
+					vals[i] = value;
+				}
+			}
+			break;
+		default:
+			break;
+	}
+	
 }
 
 template<typename T> inline void Array::set1d(T * cell) {

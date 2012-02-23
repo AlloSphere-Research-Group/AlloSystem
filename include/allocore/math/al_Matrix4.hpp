@@ -379,7 +379,6 @@ public:
 	///
 	///
 	static const Matrix4 lookAt(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& eyePos) {
-		// from http://www.opengl.org/wiki/GluLookAt_code
 		return Matrix4(
 			 ux[0], ux[1], ux[2], -(ux.dot(eyePos)),
 			 uy[0], uy[1], uy[2], -(uy.dot(eyePos)),
@@ -389,12 +388,9 @@ public:
 	}
 	
 	static const Matrix4 lookAt(const Vec<3,T>& eyePos, const Vec<3,T>& at, const Vec<3,T>& up) {
-//		Vec<3,T> z = (eyePos-at).normalize();	// from ???
-//		Vec<3,T> x = cross(up, z);
-//		Vec<3,T> y = cross(z, x);
-		Vec<3,T> z = (at - eyePos).normalize();	// from http://www.opengl.org/wiki/GluLookAt_code
+		Vec<3,T> z = (at - eyePos).normalize();	
+		Vec<3,T> y = up; y.normalize();
 		Vec<3,T> x = cross(z, up).normalize();
-		Vec<3,T> y = cross(x, z).normalize();
 		return lookAt(x, y, -z, eyePos);
 	}
 

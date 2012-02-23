@@ -17,14 +17,10 @@ Texture :: Texture(unsigned width, unsigned height, Graphics::Format format, Gra
 	mHeight(height),
 	mDepth(0),
 	mUnpack(1),
-	mPixels(0), 
-	//mBuffer(0),
 	mParamsUpdated(true),
 	mPixelsUpdated(true)
 {
-	resetArray(mUnpack);
-	
-	//printf("created Texture %p\n", this);
+	allocate();
 }
 
 Texture :: Texture(unsigned width, unsigned height, unsigned depth, Graphics::Format format, Graphics::DataType type)
@@ -40,14 +36,70 @@ Texture :: Texture(unsigned width, unsigned height, unsigned depth, Graphics::Fo
 	mHeight(height),
 	mDepth(depth),
 	mUnpack(1),
-	mPixels(0), 
-	//mBuffer(0),
 	mParamsUpdated(true),
 	mPixelsUpdated(true)
 {
-	resetArray(mUnpack);
+	allocate();
+}
+
+Texture :: Texture(AlloArrayHeader& header) 
+:	GPUObject(),
+	mWrapS(CLAMP_TO_EDGE),
+	mWrapT(CLAMP_TO_EDGE),
+	mWrapR(CLAMP_TO_EDGE),
+	mFilter(LINEAR),
+	mUnpack(1),
+	mParamsUpdated(true),
+	mPixelsUpdated(true) 
+{
+	configure(header);
+	mArray.dataCalloc();
+}
+
+void Texture :: configure(AlloArrayHeader& header) {
+	switch (header.dimcount) {
+		case 1: target(TEXTURE_1D); break;
+		case 2: target(TEXTURE_2D); break;
+		case 3: target(TEXTURE_3D); break;
+		default:
+			printf("invalid array dimensions for texture\n");
+			return;
+	}
 	
-	//printf("created Texture %p\n", this);
+	switch (header.dimcount) {
+		case 3:	depth(header.dim[2]);
+		case 2:	height(header.dim[1]);
+		case 1:	width(header.dim[0]); break;
+	}
+
+	switch (header.components) {
+		case 1:	format(Graphics::LUMINANCE); break; // alpha or luminance?
+		case 2:	format(Graphics::LUMINANCE_ALPHA); break;
+		case 3:	format(Graphics::RGB); break;
+		case 4:	format(Graphics::RGBA); break;
+		default:
+			printf("invalid array component count for texture\n");
+			return;
+	}
+	
+	switch (header.type) {
+		case AlloUInt8Ty:	type(Graphics::UBYTE); break; 
+		case AlloSInt8Ty:	type(Graphics::BYTE); break; 
+		case AlloUInt16Ty:	type(Graphics::SHORT); break; 
+		case AlloSInt16Ty:	type(Graphics::USHORT); break; 
+		case AlloUInt32Ty:	type(Graphics::INT); break; 
+		case AlloSInt32Ty:	type(Graphics::UINT); break; 
+		case AlloFloat32Ty:	type(Graphics::FLOAT); break; 
+		case AlloFloat64Ty:	type(Graphics::DOUBLE); break; 
+		default:
+			printf("invalid array type for texture\n");
+			return;
+	}
+	
+	// reconfigure internal array to match:
+	mArray.configure(header);
+	
+	mParamsUpdated = true; 
 }
 
 void Texture :: bind(int unit) {
@@ -151,6 +203,7 @@ void Texture :: resetArray(unsigned align) {
 	uint32_t rowsize = (mArray.stride(1) * Graphics::numBytes(type()) * numComponents());
 	mUnpack = (rowsize % 4 == 0) ? 4 : 1;
 	
+	
 }
 
 
@@ -158,11 +211,7 @@ void Texture :: allocate(unsigned align) {
 	deallocate();
 	resetArray(align);
 	mArray.dataCalloc();
-	mPixels = mArray.data.ptr;
 	mPixelsUpdated = true;
-	
-	//mBuffer = malloc(numElems() * Graphics::numBytes(type()));
-	//mPixels = mBuffer;
 }
 
 void Texture :: allocate(const Array& src, bool reconfigure) {
@@ -243,14 +292,12 @@ void Texture :: allocate(const Array& src, bool reconfigure) {
 	
 	// copy data:
 	memcpy(mArray.data.ptr, src.data.ptr, src.size());
-	mPixels = mArray.data.ptr;
 	
 	//printf("copied to mArray %p\n", this);
 }
 
 void Texture :: deallocate() {
 	mArray.dataFree();
-	mPixels=0;
 }
 
 void Texture::sendParams(bool force){
@@ -269,7 +316,7 @@ void Texture::sendParams(bool force){
 
 void Texture::sendPixels(bool force){
 	if(mPixelsUpdated || force){
-		submit(mPixels);
+		submit(mArray.data.ptr);
 		mPixelsUpdated = false;
 	}
 }
@@ -385,8 +432,6 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 }
 
 void Texture :: submit(const void * pixels, uint32_t align) {
-	//printf("submitting %p\n", pixels);
-
 	validate();
 	
 	determineTarget();	// is this necessary? surely the target is already set!

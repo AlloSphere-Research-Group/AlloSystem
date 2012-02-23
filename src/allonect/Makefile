@@ -9,7 +9,7 @@ OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
 CPPFLAGS	+= -I../../include
 
-EXT_LDFLAGS += -lfreenect
+# EXT_LDFLAGS += -lfreenect
 
 ifeq ($(PLATFORM), linux)
 	#nogood because the one in the repos is out of date
@@ -35,4 +35,4 @@ install: $(LIB_PATH)
 #	For some reason this can result in an error if the file exists.
 #	Just ignore it and continue...
 	@-$(INSTALL) -C -m 644 $(LIB_PATH) $(DESTDIR)/lib
-#	@$(RANLIB) $(DESTDIR)/lib/$(SLIB_FILE)
+#	@$(RANLIB) $(DESTDIRfile://localhost/Users/grahamwakefield/code/allosphere/allocore/build/lib/liballonect.a)/lib/$(SLIB_FILE)
