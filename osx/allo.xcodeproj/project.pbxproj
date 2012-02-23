@@ -185,7 +185,7 @@
 		36115B331438DE3400E121BF /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4932130E0254007B30A0 /* libsndfile.a */; };
 		36115B341438DE3400E121BF /* libGamma.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36FE0F5913845E02003AE7BE /* libGamma.a */; };
 		3620B9C314F353DC008EE9F6 /* libfreenect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3620B9C214F353DC008EE9F6 /* libfreenect.a */; };
-		3622B30814F476C800E0ECA7 /* freenect1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622B30714F476C800E0ECA7 /* freenect1.cpp */; };
+		3622B30814F476C800E0ECA7 /* freenect_calibrate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622B30714F476C800E0ECA7 /* freenect_calibrate.cpp */; };
 		3622B62414F5D12700E0ECA7 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3622B62314F5D12700E0ECA7 /* libusb-1.0.a */; };
 		3622B62B14F5D13F00E0ECA7 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3622B62A14F5D13F00E0ECA7 /* Carbon.framework */; };
 		3622B63714F5D1AA00E0ECA7 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3622B63614F5D1AA00E0ECA7 /* IOKit.framework */; };
@@ -850,7 +850,7 @@
 		3620B9C214F353DC008EE9F6 /* libfreenect.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libfreenect.a; sourceTree = "<group>"; };
 		362127C71173CD72009CB6FC /* al_Graphics.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Graphics.hpp; sourceTree = "<group>"; };
 		362127C81173CDBB009CB6FC /* al_Graphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Graphics.cpp; sourceTree = "<group>"; };
-		3622B30714F476C800E0ECA7 /* freenect1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = freenect1.cpp; sourceTree = "<group>"; };
+		3622B30714F476C800E0ECA7 /* freenect_calibrate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = freenect_calibrate.cpp; sourceTree = "<group>"; };
 		3622B62314F5D12700E0ECA7 /* libusb-1.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libusb-1.0.a"; sourceTree = "<group>"; };
 		3622B62A14F5D13F00E0ECA7 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		3622B63614F5D1AA00E0ECA7 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
@@ -2525,7 +2525,7 @@
 			isa = PBXGroup;
 			children = (
 				368672F71491EE5500E4D0D6 /* freenect.cpp */,
-				3622B30714F476C800E0ECA7 /* freenect1.cpp */,
+				3622B30714F476C800E0ECA7 /* freenect_calibrate.cpp */,
 			);
 			path = extensions;
 			sourceTree = "<group>";
@@ -3909,7 +3909,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3622B30814F476C800E0ECA7 /* freenect1.cpp in Sources */,
+				3622B30814F476C800E0ECA7 /* freenect_calibrate.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
