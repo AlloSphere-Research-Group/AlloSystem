@@ -11,29 +11,24 @@ Graham Wakefield, 2011
 
 #include "allocore/al_Allocore.hpp"
 #include "allonect/al_Freenect.hpp"
+#include "alloutil/al_Lua.hpp"
 
 using namespace al;
 
 Graphics gl;
 SearchPaths paths;
 
-struct MyWindow : public Window, public Freenect1::Callback {
+struct MyWindow : public Window, public Freenect1::Callback, public ThreadFunction {
 
 	MyWindow(int dim = 32) 
 	:	Freenect1::Callback(0), 
 		depthTex(640, 480),
-		scale(1), 
-		azimuth(0),
-		elevation(0),
 		world_dim(dim), 
 		bHideOOB(0)  
 	{
 		pointsMesh.vertices().size(640*480);
 		pointsMesh.colors().size(640*480);
 		pointsMesh.texCoord2s().size(640*480);
-		
-		translate.set(world_dim/2, world_dim/2, 0);
-		updateTransform();
 		
 		frameMesh.reset();
 		frameMesh.primitive(gl.LINES);
@@ -57,10 +52,19 @@ struct MyWindow : public Window, public Freenect1::Callback {
 		}}
 		frameMesh.scale(world_dim);
 		
+		if (netSend.open(4111, "localhost")) {
+			active = true;
+			sendThread.start(*this);
+		} else {
+			printf("error creating netsend\n");
+			exit(0);
+		}
+		
 		startVideo();
 		startDepth();
 	}	
 	virtual ~MyWindow() {
+		sendThread.join();
 		Freenect1::stop();
 	}
 	
@@ -81,22 +85,11 @@ struct MyWindow : public Window, public Freenect1::Callback {
 					);
 	}
 	
-	void updateTransform() {
-		transform = 
-			Matrix4f::translate(translate) * 
-			Matrix4f::rotate(-azimuth, Vec3f(0, 1, 0)) * 
-			Matrix4f::rotate(-elevation, Vec3f(1, 0, 0)) * 
-			Matrix4f::scale(scale, -scale, -scale);
-	}
-	
 	virtual void onVideo(Texture& tex, uint32_t timestamp) {
 		
 	}
 	virtual void onDepth(Texture& tex, uint32_t timestamp) {
 	
-		// get tilt:
-		updateTransform();
-		
 		Array& outArray = depthTex.array();
 		uint16_t * depthPtr = (uint16_t*)tex.data();
 		
@@ -167,39 +160,31 @@ struct MyWindow : public Window, public Freenect1::Callback {
 		
 		depthTex.updatePixels();
 	}
+	
+	// ThreadFunction:
+	virtual void operator()() {
+		Buffer<Vec3f>& vertices = pointsMesh.vertices();
+		while (active) {
+			// now send (some of) these data points:
+			int limit = num_points;
+			int step = 1 + limit/1024;
+			int offset = rng.uniform(step);
+			int count = 0;
+			for (int i=offset;i<limit; i+= step) {
+				count++;
+				// send pixel i
+				Vec3f& p = vertices[i];
+				netSend.send("/point", p.x, p.y, p.z);
+				//printf("/point %f %f %f\n", p.x, p.y, p.z);
+			}
+			al_sleep(0.01);
+		}
+	}
 
 	bool onCreate(){
 		return true;
 	}
 	
-	virtual bool onKeyDown(const Keyboard& k) {
-		Vec3f def(world_dim/2, world_dim/2, 0);
-		switch (k.key()) {
-			case 'z':	// reset transform:
-				elevation = tilt();
-				translate.set(def);
-				break;
-			case 'r':	// reset transform:
-				elevation = tilt();
-				translate += def-vmean;
-				break;
-			case 's': {
-					File f(paths.appPath() + "freenect_calibrate.lua", "w+", true);
-					f.write("freenect_calibrate = ");
-					transform.print(f.filePointer());
-				}
-			case 'p':
-				transform.print(stdout);
-				printf("\n");
-				break;
-			case 'h':
-				bHideOOB = !bHideOOB;
-				break;
-			default:
-				break;
-		}
-		return true;
-	}
 	virtual bool onKeyUp(const Keyboard& k){
 	
 		return true;
@@ -217,51 +202,6 @@ struct MyWindow : public Window, public Freenect1::Callback {
 		return true;
 	}
 	
-	virtual bool onMouseDrag(const Mouse& m) {
-		if (keyboard().ctrl()) {
-			switch (quadrant) {
-				case 0:
-				case 3:
-				case 4:
-					// scale
-					scale += (m.dx()) / panel_width;
-					printf("scale %f\n", scale);
-					break;
-				case 1:
-					elevation += m.dy() / panel_width;
-					printf("elevation %f (tilt %f)\n", elevation, tilt());
-					break;
-				default:
-					break;
-			}
-		} else {
-			// translate
-			switch (quadrant) {
-				case 0:
-					translate.x += m.dx() / panel_width;
-					translate.z += m.dy() / panel_width;
-					break;
-				case 1: 
-					azimuth += m.dx() / panel_width;
-					printf("azimuth %f\n", azimuth);
-					break;
-				case 3:
-					translate.x += m.dx() / panel_width;
-					translate.y -= m.dy() / panel_width;
-					break;
-				case 4:
-					translate.z += m.dx() / panel_width;
-					translate.y -= m.dy() / panel_width;
-					break;
-				default:
-					break;
-			}
-			printf("translate "); translate.print(); printf("\n");
-		}
-		
-		return true;
-	}
-	
 	bool onFrame(){
 		float h = height();
 		float w = width();
@@ -269,72 +209,16 @@ struct MyWindow : public Window, public Freenect1::Callback {
 		panel_width = h/2;
 		
 		float hdim = world_dim;
-	
+		Vec3d center(world_dim/2, world_dim/2, world_dim/2);
+		const double cbrt_1_3 = 0.577350269189626;
+		
 		gl.viewport(0, 0, w, h);
 		gl.clearColor(0,0,0,0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		
-		gl.viewport(panel_width*2, 0, w - panel_width*2, h);
-		gl.matrixMode(gl.PROJECTION);
-		gl.loadMatrix(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
-		gl.matrixMode(gl.MODELVIEW);
-		gl.loadMatrix(Matrix4d::identity());
-		gl.color(1, 1, 1, 1);
-		video.quad	 (gl, 1, 0.5, 0, 0);
-		depthTex.quad(gl, 1, 0.5, 0, 0.5);
-
-		Vec3d center(world_dim/2, world_dim/2, world_dim/2);
-		const double cbrt_1_3 = 0.577350269189626;
-		
-		// quadrant 4 (front)
-		// looking down -z:	(x, y, -z)
-		gl.viewport(0, 0, panel_width, panel_width);
-		gl.projection(Matrix4d::ortho(
-			-hdim, hdim, 
-			-hdim, hdim, 
-			-hdim, hdim
-		));
-		gl.modelView(Matrix4d::lookAt(
-			center + Vec3d(0, 0, world_dim/2),
-			center,
-			Vec3d(0, 1, 0)
-		));
-		drawpoints();
-		
-		// quadrant 5 (side)
-		// looking down x (z, y, x)
-		gl.viewport(panel_width, 0, panel_width, panel_width);
-		gl.projection(Matrix4d::ortho(
-			-hdim, hdim, 
-			-hdim, hdim, 
-			-hdim, hdim
-		));
-		gl.modelView(Matrix4d::lookAt(
-			center + Vec3d(-world_dim/2, 0, 0),
-			center,
-			Vec3d(0, 1, 0)
-		));
-		drawpoints();
-		
-		// quadrant 0 (top)
-		// looking down y (x, -z, -y)
-		gl.viewport(0, panel_width, panel_width, panel_width);
-		gl.projection(Matrix4d::ortho(
-			-hdim, hdim, 
-			-hdim, hdim, 
-			-hdim, hdim
-		));
-		gl.modelView(Matrix4d::lookAt(
-			center + Vec3d(0, world_dim/2, 0),
-			center,
-			Vec3d(0, 0, -1)
-		));
-		drawpoints();
-		
 		// rotated:
-		float t = MainLoop::now();
+		float t = MainLoop::now() * 0.2;
 		float wd2 = world_dim/2;
-		gl.viewport(panel_width, panel_width, panel_width, panel_width);
 		gl.projection(Matrix4d::ortho(
 			-hdim, hdim, 
 			-hdim, hdim, 
@@ -366,14 +250,17 @@ struct MyWindow : public Window, public Freenect1::Callback {
 	MinMeanMax<> mmmx, mmmy, mmmz;
 	Vec3f vmin, vmean, vmax, vrange;
 	Matrix4f transform;
-	Vec3f translate;
-	float scale, azimuth, elevation;
 	
 	double world_dim;
 	double panel_width;
 	int quadrant, mx, my;
 	
+	osc::Send netSend;
+	Thread sendThread;
+	rnd::Random<> rng;
+	
 	bool bHideOOB;
+	bool active;
 };
 
 MyWindow win(32);
@@ -382,8 +269,25 @@ int main(int argc, char * argv[]){
 
 	paths.addAppPaths(argc, argv);
 
+	Lua L;
+	L.dofile(paths.appPath() + "freenect_calibrate.lua");
+	
+	lua_getglobal(L, "freenect_calibrate");
+	int tab = lua_gettop(L);
+	for (int i=1; i<=16; i++) lua_rawgeti(L, tab, i);
+	win.transform = Matrix4f(
+		lua_tonumber(L, tab+1), lua_tonumber(L, tab+2),
+		lua_tonumber(L, tab+3), lua_tonumber(L, tab+4),
+		lua_tonumber(L, tab+5), lua_tonumber(L, tab+6),
+		lua_tonumber(L, tab+7), lua_tonumber(L, tab+8),
+		lua_tonumber(L, tab+9), lua_tonumber(L, tab+10),
+		lua_tonumber(L, tab+11), lua_tonumber(L, tab+12),
+		lua_tonumber(L, tab+13), lua_tonumber(L, tab+14),
+		lua_tonumber(L, tab+15), lua_tonumber(L, tab+16)
+	);
+
 	win.append(*new StandardWindowKeyControls);
-	win.create(Window::Dim(800, 480));
+	win.create(Window::Dim(480, 480));
 	
 	MainLoop::start();
 	return 0;

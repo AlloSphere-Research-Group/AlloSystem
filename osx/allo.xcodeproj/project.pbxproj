@@ -190,13 +190,34 @@
 		3622B63714F5D1AA00E0ECA7 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3622B63614F5D1AA00E0ECA7 /* IOKit.framework */; };
 		3622BFC1116D55B500928703 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		3622BFCE14F6E73600E0ECA7 /* liballonect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36C9E8A31491FD64002C8638 /* liballonect.a */; };
-		3622BFDE14F6E78300E0ECA7 /* freenect_send.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BFBB14F6E61800E0ECA7 /* freenect_send.cpp */; };
 		3622BFE1116D55DD00928703 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
+		3622C02914F6EC7000E0ECA7 /* freenect_send.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BFBB14F6E61800E0ECA7 /* freenect_send.cpp */; };
+		3622C02B14F6EC7000E0ECA7 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
+		3622C02C14F6EC7000E0ECA7 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
+		3622C02D14F6EC7000E0ECA7 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC53081162907D0076AA8B /* CoreAudio.framework */; };
+		3622C02E14F6EC7000E0ECA7 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
+		3622C02F14F6EC7000E0ECA7 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
+		3622C03014F6EC7000E0ECA7 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
+		3622C03114F6EC7000E0ECA7 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
+		3622C03214F6EC7000E0ECA7 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
+		3622C03314F6EC7000E0ECA7 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
+		3622C03414F6EC7000E0ECA7 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
+		3622C03514F6EC7000E0ECA7 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492E130E0254007B30A0 /* libfreetype.a */; };
+		3622C03614F6EC7000E0ECA7 /* liblua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492F130E0254007B30A0 /* liblua.a */; };
+		3622C03714F6EC7000E0ECA7 /* libluajit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4930130E0254007B30A0 /* libluajit.a */; };
+		3622C03814F6EC7000E0ECA7 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4931130E0254007B30A0 /* libportaudio.a */; };
+		3622C03914F6EC7000E0ECA7 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4932130E0254007B30A0 /* libsndfile.a */; };
+		3622C03A14F6EC7000E0ECA7 /* liballonect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36C9E8A31491FD64002C8638 /* liballonect.a */; };
+		3622C03B14F6EC7000E0ECA7 /* libfreenect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3620B9C214F353DC008EE9F6 /* libfreenect.a */; };
+		3622C03C14F6EC7000E0ECA7 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3622B62314F5D12700E0ECA7 /* libusb-1.0.a */; };
+		3622C03D14F6EC7000E0ECA7 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3622B62A14F5D13F00E0ECA7 /* Carbon.framework */; };
+		3622C03E14F6EC7000E0ECA7 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3622B63614F5D1AA00E0ECA7 /* IOKit.framework */; };
 		3622C043116D566C00928703 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		3622C044116D566C00928703 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		3622C045116D566C00928703 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
 		3622C046116D566C00928703 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC53081162907D0076AA8B /* CoreAudio.framework */; };
 		3622C047116D566C00928703 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
+		3622C05814F6ECB400E0ECA7 /* freenect_calibrate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622B30714F476C800E0ECA7 /* freenect_calibrate.cpp */; };
 		3622C087116D57B300928703 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		3622C088116D57B300928703 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		3622C089116D57B300928703 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
@@ -526,6 +547,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = 36035DB813037E8D001E9BA9;
 			remoteInfo = "make allocore";
+		};
+		3622C04614F6EC8300E0ECA7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 36C9E8D21491FEBC002C8638 /* make allonect */;
+			remoteInfo = "make allonect";
+		};
+		3622C04814F6EC8500E0ECA7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 36C9E8D21491FEBC002C8638 /* make allonect */;
+			remoteInfo = "make allonect";
 		};
 		3630EF8214EC3CA70083BEFB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -868,6 +903,7 @@
 		3622BF01116D527D00928703 /* Makefile.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.config; sourceTree = "<group>"; };
 		3622BFBB14F6E61800E0ECA7 /* freenect_send.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = freenect_send.cpp; sourceTree = "<group>"; };
 		3622BFE6116D55DD00928703 /* exMainloopTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exMainloopTool; sourceTree = BUILT_PRODUCTS_DIR; };
+		3622C04214F6EC7100E0ECA7 /* freenect_send */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = freenect_send; sourceTree = BUILT_PRODUCTS_DIR; };
 		3622C079116D575700928703 /* exMainloopCocoa.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = exMainloopCocoa.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3625B540116EEDEF00C685B7 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../Makefile; sourceTree = SOURCE_ROOT; };
 		3625B541116EEDEF00C685B7 /* Makefile.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Makefile.config; path = ../Makefile.config; sourceTree = SOURCE_ROOT; };
@@ -908,7 +944,7 @@
 		368672F41491EE1300E4D0D6 /* simplePan.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = simplePan.cpp; sourceTree = "<group>"; };
 		368672F51491EE1300E4D0D6 /* sinewave.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sinewave.cpp; sourceTree = "<group>"; };
 		368672F71491EE5500E4D0D6 /* freenect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = freenect.cpp; sourceTree = "<group>"; };
-		368673421491EEDF00E4D0D6 /* freenect */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = freenect; sourceTree = BUILT_PRODUCTS_DIR; };
+		368673421491EEDF00E4D0D6 /* freenect_calibrate */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = freenect_calibrate; sourceTree = BUILT_PRODUCTS_DIR; };
 		3687E34111FA4F9500EC6706 /* exIsosurface */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exIsosurface; sourceTree = BUILT_PRODUCTS_DIR; };
 		3696E31514BFA29900D21F2A /* al_Zeroconf.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Zeroconf.hpp; sourceTree = "<group>"; };
 		3696E31614BFA2F500D21F2A /* al_Zeroconf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Zeroconf.cpp; sourceTree = "<group>"; };
@@ -1493,6 +1529,33 @@
 				163E49B7130E0255007B30A0 /* libluajit.a in Frameworks */,
 				163E49B8130E0255007B30A0 /* libportaudio.a in Frameworks */,
 				163E49B9130E0255007B30A0 /* libsndfile.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3622C02A14F6EC7000E0ECA7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3622C02B14F6EC7000E0ECA7 /* AudioToolbox.framework in Frameworks */,
+				3622C02C14F6EC7000E0ECA7 /* AudioUnit.framework in Frameworks */,
+				3622C02D14F6EC7000E0ECA7 /* CoreAudio.framework in Frameworks */,
+				3622C02E14F6EC7000E0ECA7 /* GLUT.framework in Frameworks */,
+				3622C02F14F6EC7000E0ECA7 /* OpenGL.framework in Frameworks */,
+				3622C03014F6EC7000E0ECA7 /* Cocoa.framework in Frameworks */,
+				3622C03114F6EC7000E0ECA7 /* libapr-1.a in Frameworks */,
+				3622C03214F6EC7000E0ECA7 /* liballocore.a in Frameworks */,
+				3622C03314F6EC7000E0ECA7 /* libassimp.a in Frameworks */,
+				3622C03414F6EC7000E0ECA7 /* libfreeimage.a in Frameworks */,
+				3622C03514F6EC7000E0ECA7 /* libfreetype.a in Frameworks */,
+				3622C03614F6EC7000E0ECA7 /* liblua.a in Frameworks */,
+				3622C03714F6EC7000E0ECA7 /* libluajit.a in Frameworks */,
+				3622C03814F6EC7000E0ECA7 /* libportaudio.a in Frameworks */,
+				3622C03914F6EC7000E0ECA7 /* libsndfile.a in Frameworks */,
+				3622C03A14F6EC7000E0ECA7 /* liballonect.a in Frameworks */,
+				3622C03B14F6EC7000E0ECA7 /* libfreenect.a in Frameworks */,
+				3622C03C14F6EC7000E0ECA7 /* libusb-1.0.a in Frameworks */,
+				3622C03D14F6EC7000E0ECA7 /* Carbon.framework in Frameworks */,
+				3622C03E14F6EC7000E0ECA7 /* IOKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2239,12 +2302,13 @@
 				36E4909114380D5D00D7FE2B /* exSimpleGraphics */,
 				36115B381438DE3400E121BF /* exSimpleGraphics */,
 				364D326214564500005D2EB0 /* exSimpleGraphics */,
-				368673421491EEDF00E4D0D6 /* freenect */,
+				368673421491EEDF00E4D0D6 /* freenect_calibrate */,
 				36C9EA6214922511002C8638 /* soundprobe */,
 				3696E34014BFA31900D21F2A /* zeroconf */,
 				3669723C14C8765D00B82A38 /* exMRC */,
 				3604411714CF5A0E00C95A2F /* allua */,
 				3630EF9814EC3CA70083BEFB /* exMsgTube */,
+				3622C04214F6EC7100E0ECA7 /* freenect_send */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -3363,6 +3427,24 @@
 			productReference = 3622BFE6116D55DD00928703 /* exMainloopTool */;
 			productType = "com.apple.product-type.tool";
 		};
+		3622C02714F6EC7000E0ECA7 /* freenect_send */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3622C03F14F6EC7000E0ECA7 /* Build configuration list for PBXNativeTarget "freenect_send" */;
+			buildPhases = (
+				3622C02814F6EC7000E0ECA7 /* Sources */,
+				3622C02A14F6EC7000E0ECA7 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3622C04914F6EC8500E0ECA7 /* PBXTargetDependency */,
+			);
+			name = freenect_send;
+			productInstallPath = "$(HOME)/bin";
+			productName = alscheduling;
+			productReference = 3622C04214F6EC7100E0ECA7 /* freenect_send */;
+			productType = "com.apple.product-type.tool";
+		};
 		3622C078116D575700928703 /* exMainloopCocoa */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3622C07E116D575800928703 /* Build configuration list for PBXNativeTarget "exMainloopCocoa" */;
@@ -3482,9 +3564,9 @@
 			productReference = 367FE55E12A5F4FD002D8350 /* exSimpleGraphics */;
 			productType = "com.apple.product-type.tool";
 		};
-		3686732B1491EEDF00E4D0D6 /* freenect */ = {
+		3686732B1491EEDF00E4D0D6 /* freenect_calibrate */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3686733F1491EEDF00E4D0D6 /* Build configuration list for PBXNativeTarget "freenect" */;
+			buildConfigurationList = 3686733F1491EEDF00E4D0D6 /* Build configuration list for PBXNativeTarget "freenect_calibrate" */;
 			buildPhases = (
 				3686732C1491EEDF00E4D0D6 /* Sources */,
 				3686732E1491EEDF00E4D0D6 /* Frameworks */,
@@ -3492,11 +3574,12 @@
 			buildRules = (
 			);
 			dependencies = (
+				3622C04714F6EC8300E0ECA7 /* PBXTargetDependency */,
 			);
-			name = freenect;
+			name = freenect_calibrate;
 			productInstallPath = "$(HOME)/bin";
 			productName = alscheduling;
-			productReference = 368673421491EEDF00E4D0D6 /* freenect */;
+			productReference = 368673421491EEDF00E4D0D6 /* freenect_calibrate */;
 			productType = "com.apple.product-type.tool";
 		};
 		3687E33011FA4F9500EC6706 /* exIsosurface */ = {
@@ -3691,7 +3774,8 @@
 				36E4907414380D5D00D7FE2B /* exTexture3d */,
 				36115B1B1438DE3400E121BF /* exFluid */,
 				36C9E8D21491FEBC002C8638 /* make allonect */,
-				3686732B1491EEDF00E4D0D6 /* freenect */,
+				3686732B1491EEDF00E4D0D6 /* freenect_calibrate */,
+				3622C02714F6EC7000E0ECA7 /* freenect_send */,
 				36C9EA4C14922511002C8638 /* soundprobe */,
 				3696E32614BFA31900D21F2A /* zeroconf */,
 				3669722414C8765D00B82A38 /* exMRC */,
@@ -3811,6 +3895,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		3622C02814F6EC7000E0ECA7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3622C02914F6EC7000E0ECA7 /* freenect_send.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		3622C076116D575700928703 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3913,7 +4005,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3622BFDE14F6E78300E0ECA7 /* freenect_send.cpp in Sources */,
+				3622C05814F6ECB400E0ECA7 /* freenect_calibrate.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4018,6 +4110,16 @@
 			isa = PBXTargetDependency;
 			target = 36035DB813037E8D001E9BA9 /* make allocore */;
 			targetProxy = 36115B1D1438DE3400E121BF /* PBXContainerItemProxy */;
+		};
+		3622C04714F6EC8300E0ECA7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 36C9E8D21491FEBC002C8638 /* make allonect */;
+			targetProxy = 3622C04614F6EC8300E0ECA7 /* PBXContainerItemProxy */;
+		};
+		3622C04914F6EC8500E0ECA7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 36C9E8D21491FEBC002C8638 /* make allonect */;
+			targetProxy = 3622C04814F6EC8500E0ECA7 /* PBXContainerItemProxy */;
 		};
 		3630EF8114EC3CA70083BEFB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -4502,6 +4604,57 @@
 			};
 			name = Release;
 		};
+		3622C04014F6EC7000E0ECA7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"_GLIBCXX_DEBUG=1",
+					"_GLIBCXX_DEBUG_PEDANTIC=1",
+				);
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\\\\\\\"$(SRCROOT)/../build/lib\\\\\\\"",
+					"\\\"$(SRCROOT)/lib\\\"",
+					"\\\"$(SRCROOT)/../build/lib\\\"",
+				);
+				OTHER_CFLAGS = (
+					"-DAPR_FAST_COMPAT",
+					"-DAPR_STRICT",
+				);
+				PRODUCT_NAME = $TARGET_NAME;
+				USER_HEADER_SEARCH_PATHS = $inherited;
+			};
+			name = Debug;
+		};
+		3622C04114F6EC7000E0ECA7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\\\\\\\"$(SRCROOT)/../build/lib\\\\\\\"",
+					"\\\"$(SRCROOT)/lib\\\"",
+					"\\\"$(SRCROOT)/../build/lib\\\"",
+				);
+				OTHER_CFLAGS = (
+					"-DAPR_FAST_COMPAT",
+					"-DAPR_STRICT",
+				);
+				PRODUCT_NAME = $TARGET_NAME;
+				USER_HEADER_SEARCH_PATHS = $inherited;
+			};
+			name = Release;
+		};
 		3622C07C116D575800928703 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -4860,7 +5013,6 @@
 					"-DAPR_STRICT",
 				);
 				PRODUCT_NAME = $TARGET_NAME;
-				SYMROOT = ../../build;
 				USER_HEADER_SEARCH_PATHS = $inherited;
 			};
 			name = Debug;
@@ -4883,7 +5035,6 @@
 					"-DAPR_STRICT",
 				);
 				PRODUCT_NAME = $TARGET_NAME;
-				SYMROOT = ../../build;
 				USER_HEADER_SEARCH_PATHS = $inherited;
 			};
 			name = Release;
@@ -5376,6 +5527,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		3622C03F14F6EC7000E0ECA7 /* Build configuration list for PBXNativeTarget "freenect_send" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3622C04014F6EC7000E0ECA7 /* Debug */,
+				3622C04114F6EC7000E0ECA7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		3622C07E116D575800928703 /* Build configuration list for PBXNativeTarget "exMainloopCocoa" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -5439,7 +5599,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3686733F1491EEDF00E4D0D6 /* Build configuration list for PBXNativeTarget "freenect" */ = {
+		3686733F1491EEDF00E4D0D6 /* Build configuration list for PBXNativeTarget "freenect_calibrate" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				368673401491EEDF00E4D0D6 /* Debug */,
