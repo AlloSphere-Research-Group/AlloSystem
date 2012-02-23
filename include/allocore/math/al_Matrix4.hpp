@@ -435,12 +435,12 @@ public:
 		return r;
 	}
 	
-	void print() {
+	void print(FILE * out) {
 		Mat<4,T>& m = *this;
-		printf("{ %f, %f, %f, %f,\n",	m[0], m[4], m[8], m[12]);
-		printf("%f, %f, %f, %f,\n",	m[1], m[5], m[9], m[13]);
-		printf("%f, %f, %f, %f,\n",	m[2], m[6], m[10], m[14]);
-		printf("%f, %f, %f, %f }",	m[3], m[7], m[11], m[15]);
+		fprintf(out, "{ %f, %f, %f, %f,\n",	m[0], m[4], m[8], m[12]);
+		fprintf(out, "%f, %f, %f, %f,\n",	m[1], m[5], m[9], m[13]);
+		fprintf(out, "%f, %f, %f, %f,\n",	m[2], m[6], m[10], m[14]);
+		fprintf(out, "%f, %f, %f, %f }",	m[3], m[7], m[11], m[15]);
 	}
 	
 	static const Matrix4 inverse(const Base& m) {

@@ -10,174 +10,12 @@ Graham Wakefield, 2011
 */
 
 #include "allocore/al_Allocore.hpp"
-#include "libfreenect.h"
+#include "allonect/al_Freenect.hpp"
 
 using namespace al;
 
 Graphics gl;
-
-// run libfreenect on a backtround thread to reduce CPU load:
-class Freenect1 : public Thread, public ThreadFunction {
-public:		
-
-	static void depth_cb(freenect_device *dev, void *depth, uint32_t timestamp) {
-		Callback * cb = (Callback * )freenect_get_user(dev);
-		if (cb) {
-			cb->depth.array().data.ptr = (char *)depth;
-			cb->depth.updatePixels();
-			cb->onDepth(cb->depth, timestamp); 
-		}
-	}
-	
-	static void video_cb(freenect_device *dev, void *video, uint32_t timestamp) {
-		Callback * cb = (Callback * )freenect_get_user(dev);
-		if (cb) {
-			cb->video.array().data.ptr = (char *)video;
-			cb->video.updatePixels();
-			cb->onVideo(cb->video, timestamp);
-		}
-	}
-	
-	static bool check(const char * what, int code) {
-		if (code < 0) {
-			printf("error (%s): %d\n", what, code);
-			return false;
-		}
-		return true;
-	}
-
-	class Callback {
-	public:
-		Callback(int idx=0) {
-			Freenect1& self = get();
-			if (check("open", freenect_open_device(self.ctx, &dev, idx))) {
-				freenect_set_user(dev, this); 
-				reconfigure();
-			}
-		}
-		
-		static double rawDepthToMeters(uint16_t raw) {
-			static const double k1 = 1.1863;
-			static const double k2 = 1./2842.5;
-			static const double k3 = 0.1236;
-			return k3 * tan(raw*k2 + k1);
-		}
-		
-		void reconfigure() {
-			AlloArrayHeader header;
-			
-			const freenect_frame_mode dmode = freenect_get_current_depth_mode(dev);
-			header.type = AlloUInt16Ty;
-			header.components = 1;
-			header.dimcount = 2;
-			header.dim[0] = dmode.width;
-			header.dim[1] = dmode.height;
-			header.stride[0] = (dmode.data_bits_per_pixel+dmode.padding_bits_per_pixel)/8;
-			header.stride[1] = header.stride[0] * dmode.width;
-			depth.configure(header);
-			depth.array().dataCalloc();
-			
-			const freenect_frame_mode vmode = freenect_get_current_video_mode(dev);
-			header.type = AlloUInt8Ty;
-			header.components = 3;
-			header.dimcount = 2;
-			header.dim[0] = vmode.width;
-			header.dim[1] = vmode.height;
-			header.stride[0] = (vmode.data_bits_per_pixel+vmode.padding_bits_per_pixel)/8;
-			header.stride[1] = header.stride[0] * vmode.width;
-			video.configure(header);
-			video.array().dataCalloc();
-		}
-		
-		virtual ~Callback() { 
-			freenect_set_user(dev, 0); 
-		}
-		
-		// Warning: these will be called from a background thread:
-		virtual void onVideo(Texture& raw, uint32_t timestamp) {}
-		virtual void onDepth(Texture& raw, uint32_t timestamp) {}
-		
-		bool startVideo() { 
-			freenect_set_video_callback(dev, video_cb);
-			return check("start_video", freenect_start_video(dev)); 
-		}
-		bool stopVideo() { return check("stop_video", freenect_stop_video(dev)); }
-		bool startDepth() { 
-			freenect_set_depth_callback(dev, depth_cb);
-			return check("start_depth", freenect_start_depth(dev)); 
-		}
-		bool stopDepth() { return check("stop_depth", freenect_stop_depth(dev)); }
-		
-		// returns tilt in radians
-		double tilt() {
-			double t = 0;
-			freenect_update_tilt_state(dev);
-			freenect_raw_tilt_state * state = freenect_get_tilt_state(dev);
-			if (state) {
-				t = freenect_get_tilt_degs(state);
-			} else {
-				printf("error: no state\n");
-			}
-			printf("tilt %f\n", t);
-			return t * M_DEG2RAD;
-		}
-		
-		Texture depth, video;
-		
-	protected:
-		freenect_device * dev;
-	};
-	
-	// ThreadFunction:
-	virtual void operator()() {
-		// listen for messages on main thread:
-		while (active) {
-			//printf(".");
-			// blocking call:
-			freenect_process_events(ctx);
-		}
-	}
-	
-	static Freenect1& get();
-	
-	static void stop() {
-		Freenect1& self = get();
-		self.active = 0;
-		self.Thread::join();
-	}
-
-	virtual ~Freenect1() {
-		active = false;
-		Thread::join();
-		freenect_shutdown(ctx);
-	}
-	
-private:
-	Freenect1() : Thread() {
-		// TODO: handle multiple contexts?
-		freenect_usb_context * usb_ctx = NULL;
-		int res = freenect_init(&ctx, usb_ctx);
-		if (res < 0) {
-			printf("error: failed to initialize libfreenect\n");
-			exit(0);
-		}
-		
-		int numdevs = freenect_num_devices(ctx);
-		printf("%d devices\n", numdevs);
-		
-		active = true;
-		Thread::start(*this);
-	}
-	
-	Freenect1 * singleton;
-	freenect_context * ctx;
-	bool active;
-};
-
-Freenect1& Freenect1::get() { 
-	static Freenect1 singleton;
-	return singleton; 
-}
+SearchPaths paths;
 
 struct MyWindow : public Window, public Freenect1::Callback {
 
@@ -345,8 +183,15 @@ struct MyWindow : public Window, public Freenect1::Callback {
 				elevation = tilt();
 				translate += def-vmean;
 				break;
+			case 's': {
+					File f(paths.appPath() + "calibration.lua", "w", true);
+					f.write("freenect_calibrate = ");
+					transform.print(f.filePointer());
+				}
 			case 'p':
-				transform.print();
+				transform.print(stdout);
+				printf("\n");
+				break;
 			case 'h':
 				bHideOOB = !bHideOOB;
 				break;
@@ -373,8 +218,6 @@ struct MyWindow : public Window, public Freenect1::Callback {
 	}
 	
 	virtual bool onMouseDrag(const Mouse& m) {
-		float dx = m.x() - mx;
-		float dy = m.y() - my;
 		if (keyboard().ctrl()) {
 			switch (quadrant) {
 				case 0:
@@ -422,15 +265,10 @@ struct MyWindow : public Window, public Freenect1::Callback {
 	bool onFrame(){
 		float h = height();
 		float w = width();
-		float aspect = w/h;
 		
 		panel_width = h/2;
 		
 		float hdim = world_dim;
-		float wdim = hdim * aspect;
-		float h1 = h/2;
-		float h2 = h1+h1;
-		float w1 = w/2;
 	
 		gl.viewport(0, 0, w, h);
 		gl.clearColor(0,0,0,0);
@@ -540,7 +378,9 @@ struct MyWindow : public Window, public Freenect1::Callback {
 
 MyWindow win(4);
 
-int main(){
+int main(int argc, char * argv[]){
+
+	paths.addAppPaths(argc, argv);
 
 	win.append(*new StandardWindowKeyControls);
 	win.create(Window::Dim(800, 480));

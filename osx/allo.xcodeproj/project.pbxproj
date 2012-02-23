@@ -185,11 +185,12 @@
 		36115B331438DE3400E121BF /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4932130E0254007B30A0 /* libsndfile.a */; };
 		36115B341438DE3400E121BF /* libGamma.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36FE0F5913845E02003AE7BE /* libGamma.a */; };
 		3620B9C314F353DC008EE9F6 /* libfreenect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3620B9C214F353DC008EE9F6 /* libfreenect.a */; };
-		3622B30814F476C800E0ECA7 /* freenect_calibrate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622B30714F476C800E0ECA7 /* freenect_calibrate.cpp */; };
 		3622B62414F5D12700E0ECA7 /* libusb-1.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3622B62314F5D12700E0ECA7 /* libusb-1.0.a */; };
 		3622B62B14F5D13F00E0ECA7 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3622B62A14F5D13F00E0ECA7 /* Carbon.framework */; };
 		3622B63714F5D1AA00E0ECA7 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3622B63614F5D1AA00E0ECA7 /* IOKit.framework */; };
 		3622BFC1116D55B500928703 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
+		3622BFCE14F6E73600E0ECA7 /* liballonect.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36C9E8A31491FD64002C8638 /* liballonect.a */; };
+		3622BFDE14F6E78300E0ECA7 /* freenect_send.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BFBB14F6E61800E0ECA7 /* freenect_send.cpp */; };
 		3622BFE1116D55DD00928703 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		3622C043116D566C00928703 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		3622C044116D566C00928703 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
@@ -865,6 +866,7 @@
 		3622BEFA116D527D00928703 /* al_Time.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Time.cpp; sourceTree = "<group>"; };
 		3622BEFC116D527D00928703 /* Makefile.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.config; sourceTree = "<group>"; };
 		3622BF01116D527D00928703 /* Makefile.config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.config; sourceTree = "<group>"; };
+		3622BFBB14F6E61800E0ECA7 /* freenect_send.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = freenect_send.cpp; sourceTree = "<group>"; };
 		3622BFE6116D55DD00928703 /* exMainloopTool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exMainloopTool; sourceTree = BUILT_PRODUCTS_DIR; };
 		3622C079116D575700928703 /* exMainloopCocoa.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = exMainloopCocoa.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3625B540116EEDEF00C685B7 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../Makefile; sourceTree = SOURCE_ROOT; };
@@ -1672,6 +1674,7 @@
 				3686733C1491EEDF00E4D0D6 /* libluajit.a in Frameworks */,
 				3686733D1491EEDF00E4D0D6 /* libportaudio.a in Frameworks */,
 				3686733E1491EEDF00E4D0D6 /* libsndfile.a in Frameworks */,
+				3622BFCE14F6E73600E0ECA7 /* liballonect.a in Frameworks */,
 				3620B9C314F353DC008EE9F6 /* libfreenect.a in Frameworks */,
 				3622B62414F5D12700E0ECA7 /* libusb-1.0.a in Frameworks */,
 				3622B62B14F5D13F00E0ECA7 /* Carbon.framework in Frameworks */,
@@ -2526,6 +2529,7 @@
 			children = (
 				368672F71491EE5500E4D0D6 /* freenect.cpp */,
 				3622B30714F476C800E0ECA7 /* freenect_calibrate.cpp */,
+				3622BFBB14F6E61800E0ECA7 /* freenect_send.cpp */,
 			);
 			path = extensions;
 			sourceTree = "<group>";
@@ -3909,7 +3913,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3622B30814F476C800E0ECA7 /* freenect_calibrate.cpp in Sources */,
+				3622BFDE14F6E78300E0ECA7 /* freenect_send.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
