@@ -436,11 +436,6 @@ struct MyWindow : public Window, public Freenect1::Callback {
 		gl.clearColor(0,0,0,0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		
-		
-//		printf("\nmin "); vmin.print();
-//		printf("\nmean "); vmean.print();
-//		printf("\nmax "); vmax.print();
-		
 		gl.viewport(panel_width*2, 0, w - panel_width*2, h);
 		gl.matrixMode(gl.PROJECTION);
 		gl.loadMatrix(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
@@ -499,6 +494,8 @@ struct MyWindow : public Window, public Freenect1::Callback {
 		drawpoints();
 		
 		// rotated:
+		float t = MainLoop::now();
+		float wd2 = world_dim/2;
 		gl.viewport(panel_width, panel_width, panel_width, panel_width);
 		gl.projection(Matrix4d::ortho(
 			-hdim, hdim, 
@@ -506,9 +503,9 @@ struct MyWindow : public Window, public Freenect1::Callback {
 			-hdim*2, hdim*2
 		));
 		gl.modelView(Matrix4d::lookAt(
-			center + Vec3d(-world_dim/2, world_dim/2, world_dim/2),
+			center + Vec3d(-wd2*cos(t), wd2, wd2*sin(t)),
 			center,
-			Vec3d(cbrt_1_3, cbrt_1_3, -cbrt_1_3)
+			Vec3d(cbrt_1_3*cos(t), cbrt_1_3, -cbrt_1_3*sin(t))
 		));
 		drawpoints();
 		
