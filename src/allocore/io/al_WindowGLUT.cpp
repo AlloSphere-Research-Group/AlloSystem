@@ -208,7 +208,7 @@ public:
 		k.alt  (mod & GLUT_ACTIVE_ALT);
 		k.ctrl (mod & GLUT_ACTIVE_CTRL);
 		k.shift(mod & GLUT_ACTIVE_SHIFT);
-		//printf("a:%d c:%d s:%d\n", g->keyboard.alt(), g->keyboard.ctrl(), g->keyboard.shift());
+		//printf("a:%d c:%d s:%d\n", k.alt(), k.ctrl(), k.shift());
 	}
 
 
@@ -296,7 +296,6 @@ public:
 	}
 
 	static void cbKeyboard(unsigned char key, int x, int y){
-//		printf("GLUT key down:\n");
 		Window * win = getWindow();
 		if(win){
 			key = remapKey(key, false);
@@ -336,7 +335,6 @@ public:
 		}
 	}
 
-
 	static void cbMouse(int btn, int state, int ax, int ay){
 		//printf("GLUT: mouse click x:%d y:%d bt:#%d,%d\n", ax,ay, btn, state==GLUT_DOWN);
 		Window * win = getWindow();
@@ -347,6 +345,9 @@ public:
 				case GLUT_RIGHT_BUTTON:		btn = Mouse::RIGHT; break;
 				default:					btn = Mouse::EXTRA;		// unrecognized button
 			}
+			
+			// update modifiers here for shift-mouse etc.
+			WindowImpl::setModifiers(win->mKeyboard);
 
 			Mouse& m = win->mMouse;
 			if(GLUT_DOWN == state){
