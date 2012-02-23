@@ -309,6 +309,9 @@ public:
 	/// @param[in] cmdMode	command mode
 	void draw(const Mesh& v, CommandMode cmdMode = CommandMode(CLIENT|SERVER));
 	
+	/// Same as draw(), but limited to num_vertices vertices only
+	void draw(int num_vertices, const Mesh& v, CommandMode cmdMode = CommandMode(CLIENT|SERVER));
+	
 	/// Draw internal vertex data
 
 	/// @param[in] cmdMode	command mode

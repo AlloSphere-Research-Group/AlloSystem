@@ -191,20 +191,21 @@ void Graphics::color(double r, double g, double b, double a) {
 	}
 }
 
-
-
 // Buffer drawing
 void Graphics::draw(const Mesh& v, CommandMode mode){
+	draw(v.vertices().size(), v, mode);
+}
 
-	const int Nv = v.vertices().size();
+void Graphics::draw(int num_vertices, const Mesh& v, CommandMode mode) {
+	const int Nv = al::min(num_vertices, v.vertices().size());
 	if(0 == Nv) return;
 	
-	const int Nc = v.colors().size();
-	const int Nci= v.coloris().size();
-	const int Nn = v.normals().size();
-	const int Nt2= v.texCoord2s().size();
-	const int Nt3= v.texCoord3s().size();
-	const int Ni = v.indices().size();
+	const int Nc = al::min(num_vertices, v.colors().size());
+	const int Nci= al::min(num_vertices, v.coloris().size());
+	const int Nn = al::min(num_vertices, v.normals().size());
+	const int Nt2= al::min(num_vertices, v.texCoord2s().size());
+	const int Nt3= al::min(num_vertices, v.texCoord3s().size());
+	const int Ni = al::min(num_vertices, v.indices().size());
 	
 	//printf("client %d, GPU %d\n", clientSide, gpuSide);
 	//printf("Nv %i Nc %i Nn %i Nt2 %i Nt3 %i Ni %i\n", Nv, Nc, Nn, Nt2, Nt3, Ni);
@@ -265,7 +266,7 @@ void Graphics::draw(const Mesh& v, CommandMode mode){
 			glDrawArrays(
 				((Graphics::Primitive)v.primitive()), 
 				0,
-				v.vertices().size()
+				Nv
 			);
 		}
 	}
