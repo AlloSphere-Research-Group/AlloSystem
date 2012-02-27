@@ -133,18 +133,19 @@ void Texture :: determineTarget(){
 }
 
 void Texture :: quad(Graphics& gl, double w, double h, double x0, double y0){
-	bind();
-	//gl.color(1, 1, 1, 1);
-	gl.begin(gl.TRIANGLE_STRIP);
-		gl.texCoord	( 0, 0);
-		gl.vertex	(x0, y0, 0);
-		gl.texCoord	( 1, 0);
-		gl.vertex	(x0+w, y0, 0);
-		gl.texCoord	( 0, 1);
-		gl.vertex	(x0, y0+h, 0);
-		gl.texCoord	( 1, 1);
-		gl.vertex	(x0+w, y0+h, 0);
-	gl.end();
+	bind();	
+	Mesh& m = gl.mesh();
+	m.reset();
+	m.primitive(gl.TRIANGLE_STRIP);
+		m.texCoord	( 0, 0);
+		m.vertex	(x0, y0, 0);
+		m.texCoord	( 1, 0);
+		m.vertex	(x0+w, y0, 0);
+		m.texCoord	( 0, 1);
+		m.vertex	(x0, y0+h, 0);
+		m.texCoord	( 1, 1);
+		m.vertex	(x0+w, y0+h, 0);
+	gl.draw(m);
 	unbind();
 }
 
@@ -156,7 +157,7 @@ void Texture::quadViewport(
 	g.loadIdentity();
 	g.pushMatrix(g.MODELVIEW);
 	g.loadIdentity();
-	g.depthMask(0);
+	g.depthMask(0); // write only to color buffer
 		g.color(color);
 		quad(g, w,h, x,y);
 	g.depthMask(1);	
