@@ -34,7 +34,11 @@ void FBO::onCreate(){ GLuint i; glGenFramebuffersEXT(1,&i); mID=i; }
 void FBO::onDestroy(){ GLuint i=id(); glDeleteFramebuffersEXT(1,&i); }
 
 FBO& FBO::attach(const RBO& rbo){
-	begin(); renderBuffer(rbo); end(); return *this;
+	begin(); renderBuffer(rbo.id(), rbo.format()); end(); return *this;
+}
+
+FBO& FBO::detach(const RBO& rbo){
+	begin(); renderBuffer(0, rbo.format()); end(); return *this;
 }
 
 FBO& FBO::attachTexture2D(unsigned texID, Attachment att, int level){
@@ -67,19 +71,19 @@ const char * FBO::statusString(GLenum stat){
 }
 
 // static functions
-void FBO::bind(unsigned rboID){ glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, rboID); }
+void FBO::bind(unsigned fboID){ glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboID); }
 
-void FBO::renderBuffer(const RBO& rbo){
+void FBO::renderBuffer(unsigned rboID, RBO::PixelFormat f){
 	GLenum a=0;
-	switch(rbo.format()){
+	switch(f){
 		case RBO::DEPTH: a=GL_DEPTH_ATTACHMENT_EXT; break;
 		default:;
 	}
-	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, a, GL_RENDERBUFFER_EXT, rbo.id());
+	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, a, GL_RENDERBUFFER_EXT, rboID);
 }
 
 void FBO::texture2D(GLuint texID, Attachment att, int level){
 	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, att, GL_TEXTURE_2D, texID, level);
 }
 
-}
+} // al::

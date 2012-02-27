@@ -109,6 +109,8 @@ public:
 	
 	FBO& attach(const RBO& rbo);
 	
+	FBO& detach(const RBO& rbo);
+	
 	/// Attach a texture
 	
 	/// @param[in] texID	texture ID
@@ -116,7 +118,7 @@ public:
 	/// @param[in] level	mipmap level of texture
 	FBO& attachTexture2D(unsigned texID, Attachment attach=COLOR_ATTACHMENT0, int level=0);
 
-	/// Detach texture at a specific attachament point
+	/// Detach texture at a specified attachment point
 	FBO& detachTexture2D(Attachment attach, int level=0);
 
 	/// Start rendering to attached objects
@@ -130,8 +132,8 @@ public:
 	const char * statusString(GLenum stat);
 
 
-	static void bind(unsigned rboID);
-	static void renderBuffer(const RBO& rbo);
+	static void bind(unsigned fboID);
+	static void renderBuffer(unsigned rboID, RBO::PixelFormat f);
 	static void texture2D(unsigned texID, Attachment attach=COLOR_ATTACHMENT0, int level=0);
 
 protected:
