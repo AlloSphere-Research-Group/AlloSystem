@@ -763,7 +763,7 @@
 		16BC66A3117770BF002A0C18 /* al_Interpolation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Interpolation.hpp; sourceTree = "<group>"; };
 		16C137C21469B83200D8AE8B /* al_ControlGLV.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_ControlGLV.cpp; sourceTree = "<group>"; };
 		16C70697135D13DF00FEE5B3 /* helloVirtualWorld.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = helloVirtualWorld.cpp; sourceTree = "<group>"; };
-		16C70698135D13DF00FEE5B3 /* simpleWorld.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = simpleWorld.cpp; sourceTree = "<group>"; };
+		16C70698135D13DF00FEE5B3 /* simpleApp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = simpleApp.cpp; sourceTree = "<group>"; };
 		16C706B4135D14E400FEE5B3 /* OSC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OSC.cpp; sourceTree = "<group>"; };
 		16C706B5135D14E400FEE5B3 /* window.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = window.cpp; sourceTree = "<group>"; };
 		16D0504A1402F27D009A5BEB /* al_HashSpace.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_HashSpace.hpp; sourceTree = "<group>"; };
@@ -2254,13 +2254,13 @@
 			name = allocore;
 			sourceTree = "<group>";
 		};
-		16C70696135D13DF00FEE5B3 /* world */ = {
+		16C70696135D13DF00FEE5B3 /* app */ = {
 			isa = PBXGroup;
 			children = (
 				16C70697135D13DF00FEE5B3 /* helloVirtualWorld.cpp */,
-				16C70698135D13DF00FEE5B3 /* simpleWorld.cpp */,
+				16C70698135D13DF00FEE5B3 /* simpleApp.cpp */,
 			);
-			path = world;
+			path = app;
 			sourceTree = "<group>";
 		};
 		16C706B3135D14E400FEE5B3 /* io */ = {
@@ -2471,6 +2471,7 @@
 			children = (
 				3620B97F14F351FE008EE9F6 /* exAlloNI.cpp */,
 				3630EF9A14EC3CC60083BEFB /* exMsgTube.cpp */,
+				16C70696135D13DF00FEE5B3 /* app */,
 				368672F61491EE4700E4D0D6 /* extensions */,
 				36596982143D5DDB0024236A /* simulation */,
 				36CF95131412BE2100B00A30 /* spatial */,
@@ -2479,7 +2480,6 @@
 				168B4E7E1331382D0076257A /* gui */,
 				16C706B3135D14E400FEE5B3 /* io */,
 				168B4E801331383A0076257A /* sound */,
-				16C70696135D13DF00FEE5B3 /* world */,
 				B9C962C81218943800091F80 /* exOpenCL.cpp */,
 			);
 			name = examples;
