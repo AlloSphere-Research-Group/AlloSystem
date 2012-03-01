@@ -22,7 +22,9 @@ else ifeq ($(UNAME), Darwin)
 	# Mac OS X version
 	UNAMER := $(shell uname -r)
 	UNAMER := $(firstword $(subst ., , $(UNAMER)))
-	ifeq ($(UNAMER), 11)
+	ifeq ($(UNAMER), 12)
+		OSX_VERSION = 10_8
+	else ifeq ($(UNAMER), 11)
 		OSX_VERSION = 10_7
 	else ifeq ($(UNAMER), 10)
 		OSX_VERSION = 10_6
@@ -87,8 +89,8 @@ DLIB_OPT	= shared
 EXT_CPPFLAGS	?=
 EXT_LDFLAGS	?=
 
-SLIB_FLAGS ?=
-DLIB_FLAGS ?=
+SLIB_FLAGS 	?=
+DLIB_FLAGS 	?=
 
 #--------------------------------------------------------------------------
 # Default paths
@@ -168,18 +170,17 @@ else ifeq ($(PLATFORM), macosx)
 	endif
 
 	# This triggers an ocean of loader warnings...
-	#CFLAGS += -fvisibility-inlines-hidden
+	#CFLAGS += -fvisibility=hidden -fvisibility-inlines-hidden
 
 	# Set system root directory
-	CFLAGS += -isysroot
 	ifeq ($(OSX_VERSION), 10_7)
-		CFLAGS += /Developer/SDKs/MacOSX10.7.sdk -mmacosx-version-min=10.7
+		CFLAGS += -isysroot /Developer/SDKs/MacOSX10.7.sdk -mmacosx-version-min=10.7
 	else ifeq ($(OSX_VERSION), 10_6)
-		CFLAGS += /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6
+		CFLAGS += -isysroot /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6
 	else ifeq ($(OSX_VERSION), 10_5)
-		CFLAGS += /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5
+		CFLAGS += -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5
 	else ifeq ($(OSX_VERSION), 10_4)
-		CFLAGS += /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
+		CFLAGS += -isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4
 	endif
 
 	LDFLAGS	+= -lm -lstdc++
@@ -204,10 +205,6 @@ else
 	CFLAGS += -g -O0 -fno-inline
 endif
 
-
-#LDFLAGS += -fvisibility=default
-#LDFLAGS += -fvisibility-inlines-hidden -fvisibility=hidden
-
 ifeq ($(VERBOSE), 0)
 	AR  := @$(AR)
 	CC  := @$(CC)
@@ -222,17 +219,17 @@ ifneq ($(STRICT_WARNINGS), 0)
 	CXXFLAGS += -Wnon-virtual-dtor -Woverloaded-virtual
 endif
 
-SLIB_FILE		= lib$(LIB_NAME).$(SLIB_EXT)
-DLIB_FILE		= lib$(LIB_NAME).$(DLIB_EXT)
+SLIB_FILE	= lib$(LIB_NAME).$(SLIB_EXT)
+DLIB_FILE	= lib$(LIB_NAME).$(DLIB_EXT)
 DLIB_MAJ_FILE	= lib$(LIB_NAME).$(DLIB_MAJ).$(DLIB_EXT)
 DLIB_MIN_FILE	= lib$(LIB_NAME).$(DLIB_MAJ).$(DLIB_MIN).$(DLIB_EXT)
-DLIB_PATH		= $(addprefix $(BUILD_DIR)lib/, $(DLIB_MIN_FILE))
-SLIB_PATH		= $(addprefix $(BUILD_DIR)lib/, $(SLIB_FILE))
+DLIB_PATH	= $(addprefix $(BUILD_DIR)lib/, $(DLIB_MIN_FILE))
+SLIB_PATH	= $(addprefix $(BUILD_DIR)lib/, $(SLIB_FILE))
 
 # Set file directory/name of specified library type
 ifneq ($(DYNAMIC), 0)
 	CFLAGS += -fPIC
-	LIB_FILE = $(DLIB_FILE)
+	LIB_FILE = $(DLIB_MIN_FILE)
 	LIB_PATH = $(DLIB_PATH)
 else
 	LIB_FILE = $(SLIB_FILE)
