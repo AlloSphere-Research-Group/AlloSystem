@@ -13,7 +13,7 @@ ifneq ($(DEP_TRACK), 0)
 	DEPFLAGS = -MMD -MF $(basename $@).dep
 endif
 
-ALL_BUILD_DIRS = $(BIN_DIR) $(OBJ_DIR) $(BUILD_DIR)include $(BUILD_DIR)lib
+ALL_BUILD_DIRS = $(BIN_DIR)/ $(OBJ_DIR)/ $(BUILD_DIR)include/ $(BUILD_DIR)lib/
 
 #--------------------------------------------------------------------------
 # Rules
