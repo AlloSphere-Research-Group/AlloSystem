@@ -46,7 +46,11 @@ namespace al {
 class Camera {
 public:
 
-	///
+	/// @param[in] fovy			vertical field of view, in degrees
+	/// @param[in] nearClip		frustum near plane distance
+	/// @param[in] farClip		frustum far plane distance
+	/// @param[in] focalLength	focal length, distance of zero parallax
+	/// @param[in] eyeSep		eye separation amount
 	Camera(
 		double fovy=30,
 		double nearClip=0.1,
