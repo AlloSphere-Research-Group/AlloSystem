@@ -205,7 +205,7 @@ void Graphics::draw(int num_vertices, const Mesh& v, CommandMode mode) {
 	const int Nn = al::min(num_vertices, v.normals().size());
 	const int Nt2= al::min(num_vertices, v.texCoord2s().size());
 	const int Nt3= al::min(num_vertices, v.texCoord3s().size());
-	const int Ni = al::min(num_vertices, v.indices().size());
+	const int Ni = v.indices().size();
 	
 	//printf("client %d, GPU %d\n", clientSide, gpuSide);
 	//printf("Nv %i Nc %i Nn %i Nt2 %i Nt3 %i Ni %i\n", Nv, Nc, Nn, Nt2, Nt3, Ni);

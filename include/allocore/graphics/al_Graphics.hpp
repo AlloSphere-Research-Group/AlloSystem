@@ -308,9 +308,14 @@ public:
 	/// @param[in] v		vertex data to draw
 	/// @param[in] cmdMode	command mode
 	void draw(const Mesh& v, CommandMode cmdMode = CommandMode(CLIENT|SERVER));
+
+	/// Draw vertex data
 	
-	/// Same as draw(), but limited to num_vertices vertices only
-	void draw(int num_vertices, const Mesh& v, CommandMode cmdMode = CommandMode(CLIENT|SERVER));
+	/// @param[in] numVertices	maximum number of vertices to draw. This is 
+	///							valid only for non-indexed vertex data.
+	/// @param[in] v			vertex data to draw
+	/// @param[in] cmdMode		command mode
+	void draw(int numVertices, const Mesh& v, CommandMode cmdMode = CommandMode(CLIENT|SERVER));
 	
 	/// Draw internal vertex data
 
