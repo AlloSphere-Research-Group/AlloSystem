@@ -2,7 +2,7 @@
 #include <stdio.h>
 namespace al{
 
-RBO::RBO(PixelFormat format): mFormat(format){}
+RBO::RBO(Graphics::Format format): mFormat(format){}
 
 void RBO::onCreate(){ GLuint i; glGenRenderbuffersEXT(1,&i); mID=i; }
 void RBO::onDestroy(){ GLuint i=id(); glDeleteRenderbuffersEXT(1,&i); }
@@ -20,7 +20,7 @@ unsigned RBO::maxSize(){
 
 void RBO::bind(unsigned id){ glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, id); }
 
-bool RBO::resize(PixelFormat format, unsigned w, unsigned h){
+bool RBO::resize(Graphics::Format format, unsigned w, unsigned h){
 	unsigned mx = maxSize();
 	if(w > mx || h > mx) return false;
 	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, format, w, h);
@@ -33,12 +33,12 @@ bool RBO::resize(PixelFormat format, unsigned w, unsigned h){
 void FBO::onCreate(){ GLuint i; glGenFramebuffersEXT(1,&i); mID=i; }
 void FBO::onDestroy(){ GLuint i=id(); glDeleteFramebuffersEXT(1,&i); }
 
-FBO& FBO::attach(const RBO& rbo){
-	begin(); renderBuffer(rbo.id(), rbo.format()); end(); return *this;
+FBO& FBO::attachRBO(const RBO& rbo, Attachment att){
+	begin(); renderBuffer(rbo.id(), att); end(); return *this;
 }
 
-FBO& FBO::detach(const RBO& rbo){
-	begin(); renderBuffer(0, rbo.format()); end(); return *this;
+FBO& FBO::detachRBO(Attachment att){
+	begin(); renderBuffer(0, att); end(); return *this;
 }
 
 FBO& FBO::attachTexture2D(unsigned texID, Attachment att, int level){
@@ -73,13 +73,14 @@ const char * FBO::statusString(GLenum stat){
 // static functions
 void FBO::bind(unsigned fboID){ glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboID); }
 
-void FBO::renderBuffer(unsigned rboID, RBO::PixelFormat f){
-	GLenum a=0;
-	switch(f){
-		case RBO::DEPTH: a=GL_DEPTH_ATTACHMENT_EXT; break;
-		default:;
-	}
-	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, a, GL_RENDERBUFFER_EXT, rboID);
+void FBO::renderBuffer(unsigned rboID, Attachment att){
+//	GLenum a=0;
+//	switch(f){
+//		case Graphics::DEPTH_COMPONENT: a=GL_DEPTH_ATTACHMENT_EXT; break;
+//		default:;
+//	}
+//	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, a, GL_RENDERBUFFER_EXT, rboID);
+	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, att, GL_RENDERBUFFER_EXT, rboID);
 }
 
 void FBO::texture2D(GLuint texID, Attachment att, int level){

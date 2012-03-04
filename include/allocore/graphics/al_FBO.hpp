@@ -33,7 +33,7 @@
 	Lance Putnam, 2012, putnam.lance@gmail.com
 */
 
-#include "allocore/graphics/al_OpenGL.hpp"
+#include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_GPUObject.hpp"
 
 namespace al{
@@ -46,16 +46,14 @@ namespace al{
 class RBO : public GPUObject{
 public:
 
-	/// Pixel format
-	enum PixelFormat{
-		DEPTH = GL_DEPTH_COMPONENT
-	};
-
 	///
-	RBO(PixelFormat format=DEPTH);
+	RBO(Graphics::Format format = Graphics::DEPTH_COMPONENT);
 
-	/// Get pixel format
-	PixelFormat format() const { return mFormat; }
+	/// Get internal pixel format
+	Graphics::Format format() const { return mFormat; }
+
+	/// Set internal pixel format
+	RBO& format(Graphics::Format v){ mFormat=v; return *this; }
 
 	void bind(){ validate(); bind(id()); }
 	void begin(){ bind(); }
@@ -69,10 +67,10 @@ public:
 
 	static unsigned maxSize();
 	static void bind(unsigned id);
-	static bool resize(PixelFormat format, unsigned width, unsigned height);
+	static bool resize(Graphics::Format format, unsigned width, unsigned height);
 
 protected:
-	PixelFormat mFormat;
+	Graphics::Format mFormat;
 	
 	virtual void onCreate();
 	virtual void onDestroy();
@@ -106,10 +104,12 @@ public:
 		STENCIL_ATTACHMENT			= GL_STENCIL_ATTACHMENT_EXT
 	};
 
+
+	/// Attach RBO at specified attachment point
+	FBO& attachRBO(const RBO& rbo, Attachment attach);
 	
-	FBO& attach(const RBO& rbo);
-	
-	FBO& detach(const RBO& rbo);
+	/// Detach RBO at specified attachment point
+	FBO& detachRBO(Attachment attach);
 	
 	/// Attach a texture
 	
@@ -118,7 +118,7 @@ public:
 	/// @param[in] level	mipmap level of texture
 	FBO& attachTexture2D(unsigned texID, Attachment attach=COLOR_ATTACHMENT0, int level=0);
 
-	/// Detach texture at a specified attachment point
+	/// Detach texture at a specified attachment point and mipmap level
 	FBO& detachTexture2D(Attachment attach, int level=0);
 
 	/// Start rendering to attached objects
@@ -133,7 +133,7 @@ public:
 
 
 	static void bind(unsigned fboID);
-	static void renderBuffer(unsigned rboID, RBO::PixelFormat f);
+	static void renderBuffer(unsigned rboID, Attachment attach);
 	static void texture2D(unsigned texID, Attachment attach=COLOR_ATTACHMENT0, int level=0);
 
 protected:
