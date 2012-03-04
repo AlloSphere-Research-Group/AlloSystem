@@ -335,8 +335,12 @@ inline void SearchPaths::addAppPaths(std::string path, bool recursive) {
 inline void SearchPaths::addAppPaths(int argc, char * const argv[], bool recursive) {
 	addAppPaths(recursive);
 	if (argc > 0) {
+		printf("argc >0 %s\n", File::directory(argv[0]).c_str());
 		addAppPaths(File::directory(argv[0]), recursive);
+	} else {
+		printf("argc == 0\n");
 	}
+
 }
 
 inline void SearchPaths::addAppPaths(bool recursive) {
