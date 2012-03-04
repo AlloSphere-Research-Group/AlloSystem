@@ -4,7 +4,11 @@
 
 namespace al{
 
-Texture :: Texture(unsigned width, unsigned height, Graphics::Format format, Graphics::DataType type)
+Texture :: Texture(
+	unsigned width, unsigned height,
+	Graphics::Format format, Graphics::DataType type,
+	bool alloc
+)
 :	GPUObject(),
 	mTarget(TEXTURE_2D),
 	mFormat(format),
@@ -20,10 +24,14 @@ Texture :: Texture(unsigned width, unsigned height, Graphics::Format format, Gra
 	mParamsUpdated(true),
 	mPixelsUpdated(true)
 {
-	allocate();
+	if(alloc) allocate();
 }
 
-Texture :: Texture(unsigned width, unsigned height, unsigned depth, Graphics::Format format, Graphics::DataType type)
+Texture :: Texture(
+	unsigned width, unsigned height, unsigned depth,
+	Graphics::Format format, Graphics::DataType type,
+	bool alloc
+)
 :	GPUObject(),
 	mTarget(TEXTURE_3D),
 	mFormat(format),
@@ -39,7 +47,7 @@ Texture :: Texture(unsigned width, unsigned height, unsigned depth, Graphics::Fo
 	mParamsUpdated(true),
 	mPixelsUpdated(true)
 {
-	allocate();
+	if(alloc) allocate();
 }
 
 Texture :: Texture(AlloArrayHeader& header) 
@@ -317,6 +325,7 @@ void Texture::sendParams(bool force){
 
 void Texture::sendPixels(bool force){
 	if(mPixelsUpdated || force){
+		//printf("%p submitting %p\n", this, mArray.data.ptr);
 		submit(mArray.data.ptr);
 		mPixelsUpdated = false;
 	}
@@ -449,32 +458,49 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 	
 	// internal format is important
 	// TODO: complete the derivation, probably do it elsewhere...
-	int internalformat;
-	if (type() == Graphics::FLOAT || type() == Graphics::DOUBLE) {
-		switch (numComponents()) {
-			case 1:
-				internalformat = GL_LUMINANCE32F_ARB;
-			case 2:
-				internalformat = GL_LUMINANCE_ALPHA32F_ARB;
-			case 3:
-				internalformat = GL_RGB32F_ARB;
-			case 4:
-				internalformat = GL_RGBA32F_ARB;
-				break;
-			default:
-				break;
+	int intFmt;
+	if(type() == Graphics::FLOAT || type() == Graphics::DOUBLE){
+		switch(numComponents()){
+			case 1: intFmt = GL_LUMINANCE32F_ARB; break;
+			case 2: intFmt = GL_LUMINANCE_ALPHA32F_ARB; break;
+			case 3: intFmt = GL_RGB32F_ARB; break;
+			case 4: intFmt = GL_RGBA32F_ARB; break;
+			default:;
 		}
 	} else {
 		// the old way - let the GPU decide:
-		internalformat = numComponents();
+		intFmt = numComponents();
 	}
+
+	// Derive internal texel format from texture data format.
+	// By default, we can just use the texture data format. In cases where
+	// there is no corresponding texel format, just hand in the number of
+	// components.
+//	if(	format() == Graphics::RED ||
+//		format() == Graphics::GREEN ||
+//		format() == Graphics::BLUE
+//	){
+//		intFmt = 1;
+//	}
+//	else if(format() == Graphics::BGRA){
+//		intFmt = 4;
+//	}
+//	else{
+//		intFmt = format();
+//	}
+
 	switch(mTarget){
-		case GL_TEXTURE_1D:	glTexImage1D(mTarget, 0, internalformat, width(), 0, format(), type(), pixels); break;
-		case GL_TEXTURE_2D: glTexImage2D(mTarget, 0, internalformat, width(), height(), 0, format(), type(), pixels); break;
-		case GL_TEXTURE_3D: glTexImage3D(mTarget, 0, internalformat, width(), height(), depth(), 0, format(), type(), pixels); break;
-		default:
-			printf("invalid texture target %d\n", mTarget);
-			break;
+	case GL_TEXTURE_1D:
+		glTexImage1D(mTarget, 0, intFmt, width(), 0, format(), type(), pixels);
+		break;
+	case GL_TEXTURE_2D:
+		glTexImage2D(mTarget, 0, intFmt, width(), height(), 0, format(), type(), pixels);
+		break;
+	case GL_TEXTURE_3D:
+		glTexImage3D(mTarget, 0, intFmt, width(), height(), depth(), 0, format(), type(), pixels);
+		break;
+	default:
+		printf("invalid texture target %d\n", mTarget);
 	}
 	
 	// set alignment back to default
@@ -515,7 +541,7 @@ void Texture :: print() {
 			target = "GL_TEXTURE_3D"; 
 			printf("Texture target=%s, %dx%dx%d(%dx%dx%d), ", target, width(), height(), depth(), mArray.width(), mArray.height(), mArray.depth());
 			break;
-		default: break;
+		default:;
 	}
 	switch (mFormat) {
 		case Graphics::DEPTH_COMPONENT: format="GL_DEPTH_COMPONENT"; break;
@@ -528,7 +554,7 @@ void Texture :: print() {
 		case Graphics::RGB: format="GL_RGB"; break;
 		case Graphics::RGBA: format="GL_RGBA"; break;
 		case Graphics::BGRA: format="GL_BGRA"; break;		
-		default: break;
+		default:;
 	}	
 	switch (mType) {
 		case GL_BYTE: type = "GL_BYTE"; break;
@@ -539,7 +565,7 @@ void Texture :: print() {
 		case GL_UNSIGNED_INT: type = "GL_UNSIGNED_INT"; break;
 		case GL_FLOAT: type = "GL_FLOAT"; break;
 		case GL_DOUBLE: type = "GL_DOUBLE"; break;
-		default: break;
+		default:;
 	}
 	
 	printf("type=%s(%s), format=%s(%d), unpack=%d(align=%d))\n", type, allo_type_name(mArray.type()), format, mArray.components(), mUnpack, mArray.alignment());

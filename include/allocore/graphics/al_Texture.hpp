@@ -49,8 +49,8 @@ namespace al{
 class Texture : public GPUObject {
 public:
 
-	typedef Graphics::Format Format;
-	typedef Graphics::DataType DataType;
+	typedef Graphics::Format	Format;
+	typedef Graphics::DataType	DataType;
 
 	enum Target {
 		TEXTURE_1D				= GL_TEXTURE_1D,
@@ -74,16 +74,25 @@ public:
 		NEAREST_MIPMAP_LINEAR	= GL_NEAREST_MIPMAP_LINEAR,
 		LINEAR_MIPMAP_LINEAR	= GL_LINEAR_MIPMAP_LINEAR,
 	};
-	
+
+
 	/**
 		Construct a 2D Texture object.
 	*/
-	Texture(unsigned width=512, unsigned height=512, Graphics::Format format=Graphics::RGBA, Graphics::DataType type=Graphics::UBYTE);
+	Texture(
+		unsigned width=512, unsigned height=512,
+		Graphics::Format format=Graphics::RGBA, Graphics::DataType type=Graphics::UBYTE,
+		bool allocate=true
+	);
 	
 	/**
 		Construct a 3D Texture object.
 	*/
-	Texture(unsigned width, unsigned height, unsigned depth, Graphics::Format format=Graphics::RGBA, Graphics::DataType type=Graphics::UBYTE);
+	Texture(
+		unsigned width, unsigned height, unsigned depth,
+		Graphics::Format format=Graphics::RGBA, Graphics::DataType type=Graphics::UBYTE,
+		bool allocate=true
+	);
 	
 	/** 
 		Construct a Texture object from an Array header:
