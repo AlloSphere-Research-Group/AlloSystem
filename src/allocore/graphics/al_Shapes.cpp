@@ -106,22 +106,60 @@ int addCube(Mesh& m, bool withNormalsAndTexcoords, float l){
 		
 		return 6*4;
 	} else {
-		static const float vertices[] = {
-			-l, l,-l,	 l, l,-l,	// 0  1
-			-l,-l,-l,	 l,-l,-l,	// 2  3
-			-l, l, l,	 l, l, l,	// 4  5
-			-l,-l, l,	 l,-l, l,	// 6  7
-		};
+	
+	
+		/*
+				0	1
+		
+				2	3
+		4	5
+		
+		6	7
+
+			t	b
+			| /
+		l --+--	r
+		  /	|
+		f	b
+
+		*/
+
+		int Nv = 8;
+		m.vertex(-l, l,-l);	m.vertex( l, l,-l);
+		m.vertex(-l,-l,-l);	m.vertex( l,-l,-l);
+		m.vertex(-l, l, l);	m.vertex( l, l, l);
+		m.vertex(-l,-l, l);	m.vertex( l,-l, l);
 
 		static const int indices[] = {
 			6,5,4, 6,7,5, 7,1,5, 7,3,1, 
 			3,0,1, 3,2,0, 2,4,0, 2,6,4,
 			4,1,0, 4,5,1, 2,3,6, 3,7,6
 		};
-		int Nv = sizeof(vertices)/sizeof(*vertices)/3;
-		m.vertex(vertices, Nv);
+		
 		m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
+
+//		if(withNormalsAndTexcoords){
+//			m.normal();
+//		}
+
 		return Nv;
+
+//		static const float vertices[] = {
+//			-l, l,-l,	 l, l,-l,	// 0  1
+//			-l,-l,-l,	 l,-l,-l,	// 2  3
+//			-l, l, l,	 l, l, l,	// 4  5
+//			-l,-l, l,	 l,-l, l,	// 6  7
+//		};	
+//
+//		static const int indices[] = {
+//			6,5,4, 6,7,5, 7,1,5, 7,3,1, 
+//			3,0,1, 3,2,0, 2,4,0, 2,6,4,
+//			4,1,0, 4,5,1, 2,3,6, 3,7,6
+//		};
+//		int Nv = sizeof(vertices)/sizeof(*vertices)/3;
+//		m.vertex(vertices, Nv);
+//		m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
+//		return Nv;
 	}
 }
 
