@@ -154,14 +154,11 @@ MyWindow win1;
 int main (int argc, char * const argv[]) {
 	searchpaths.addAppPaths(argc, argv);
 	searchpaths.addSearchPath(searchpaths.appPath() + "../../share");
-	
 	searchpaths.print();
-	
 	
 	// load in a "scene"
 	FilePath path = searchpaths.find("ducky.obj");
 	printf("reading %s\n", path.filepath().c_str());
-	exit(0);
 	
 	ascene = Scene::import(path.filepath());
 	if (ascene==0) {

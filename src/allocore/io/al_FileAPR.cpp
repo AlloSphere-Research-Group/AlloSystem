@@ -80,7 +80,7 @@ FilePath SearchPaths::find(const std::string& name) {
 	std::list<SearchPaths::searchpath>::iterator iter = mSearchPaths.begin();
 	while ((!found) && iter != mSearchPaths.end()) {
 		Path path(iter->first.c_str());
-		//found = path.find(name, result, iter->second);
+		found = path.find(name, result, iter->second);
 		iter++;
 	}
 	return result;
