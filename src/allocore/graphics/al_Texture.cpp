@@ -12,6 +12,7 @@ Texture :: Texture(
 :	GPUObject(),
 	mTarget(TEXTURE_2D),
 	mFormat(format),
+	mTexelFormat(0),
 	mType(type),
 	mWrapS(CLAMP_TO_EDGE),
 	mWrapT(CLAMP_TO_EDGE),
@@ -35,6 +36,7 @@ Texture :: Texture(
 :	GPUObject(),
 	mTarget(TEXTURE_3D),
 	mFormat(format),
+	mTexelFormat(0),
 	mType(type),
 	mWrapS(CLAMP_TO_EDGE),
 	mWrapT(CLAMP_TO_EDGE),
@@ -52,6 +54,7 @@ Texture :: Texture(
 
 Texture :: Texture(AlloArrayHeader& header) 
 :	GPUObject(),
+	mTexelFormat(0),
 	mWrapS(CLAMP_TO_EDGE),
 	mWrapT(CLAMP_TO_EDGE),
 	mWrapR(CLAMP_TO_EDGE),
@@ -118,7 +121,7 @@ void Texture :: bind(int unit) {
 	
 	// multitexturing:
 	glActiveTextureARB(GL_TEXTURE0_ARB + unit);
-	
+
 	// bind:
 	glEnable(target());
 	glBindTexture(target(), id());
@@ -211,8 +214,6 @@ void Texture :: resetArray(unsigned align) {
 	// if using array:
 	uint32_t rowsize = (mArray.stride(1) * Graphics::numBytes(type()) * numComponents());
 	mUnpack = (rowsize % 4 == 0) ? 4 : 1;
-	
-	
 }
 
 
@@ -456,38 +457,46 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 	//		GLint border, GLenum format, GLenum type, const GLvoid *pixels
 	// );
 	
-	// internal format is important
-	// TODO: complete the derivation, probably do it elsewhere...
-	int intFmt;
-	if(type() == Graphics::FLOAT || type() == Graphics::DOUBLE){
-		switch(numComponents()){
-			case 1: intFmt = GL_LUMINANCE32F_ARB; break;
-			case 2: intFmt = GL_LUMINANCE_ALPHA32F_ARB; break;
-			case 3: intFmt = GL_RGB32F_ARB; break;
-			case 4: intFmt = GL_RGBA32F_ARB; break;
-			default:;
-		}
-	} else {
-		// the old way - let the GPU decide:
-		intFmt = numComponents();
-	}
+//	// internal format is important
+//	// TODO: complete the derivation, probably do it elsewhere...
+//	if(type() == Graphics::FLOAT || type() == Graphics::DOUBLE){
+//		switch(numComponents()){
+//			case 1: intFmt = GL_LUMINANCE32F_ARB; break;
+//			case 2: intFmt = GL_LUMINANCE_ALPHA32F_ARB; break;
+//			case 3: intFmt = GL_RGB32F_ARB; break;
+//			case 4: intFmt = GL_RGBA32F_ARB; break;
+//			default:;
+//		}
+//	} else {
+//		// the old way - let the GPU decide:
+//		intFmt = numComponents();
+//	}
 
+	int intFmt;
+
+	// Use specified texel format, if defined
+	if(mTexelFormat){
+		intFmt = mTexelFormat;
+	}
+	
 	// Derive internal texel format from texture data format.
 	// By default, we can just use the texture data format. In cases where
 	// there is no corresponding texel format, just hand in the number of
 	// components.
-//	if(	format() == Graphics::RED ||
-//		format() == Graphics::GREEN ||
-//		format() == Graphics::BLUE
-//	){
-//		intFmt = 1;
-//	}
-//	else if(format() == Graphics::BGRA){
-//		intFmt = 4;
-//	}
-//	else{
-//		intFmt = format();
-//	}
+	else{
+		if(	format() == Graphics::RED ||
+			format() == Graphics::GREEN ||
+			format() == Graphics::BLUE
+		){
+			intFmt = 1;
+		}
+		else if(format() == Graphics::BGRA){
+			intFmt = 4;
+		}
+		else{
+			intFmt = format();
+		}	
+	}
 
 	switch(mTarget){
 	case GL_TEXTURE_1D:

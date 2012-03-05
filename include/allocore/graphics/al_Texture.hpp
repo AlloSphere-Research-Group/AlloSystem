@@ -104,6 +104,7 @@ public:
 	virtual ~Texture(){}
 
 	Format format() const { return mFormat; }
+	int texelFormat() const { return mTexelFormat; }
 	Target target() const { return mTarget; }
 	DataType type() const { return mType; }	
 
@@ -126,6 +127,7 @@ public:
 	}
 
 	Texture& format(Format v){ return update(v, mFormat, mPixelsUpdated); }
+	Texture& texelFormat(int v){ return update(v, mTexelFormat, mPixelsUpdated); }
 	Texture& target(Target v){ return update(v, mTarget, mPixelsUpdated); }
 	Texture& type(DataType v){ return update(v, mType  , mPixelsUpdated); }
 
@@ -162,50 +164,56 @@ public:
 	/// Get raw pointer to client-side pixel data
 	template<class T> T * data(){ return (T*)(data()); }
 	char * data(){ return array().data.ptr; }
-	
-	/// Flags resubmission of pixel data upon next bind
-	Texture& updatePixels(){ mPixelsUpdated=true; return *this; }
 
-	/// Submit the texture using an Array as source 
+	/// Flags resubmission of pixel data upon next bind
+	
+	/// Calling this ensures that pixels get submitted on the next bind().
+	///
+	Texture& dirty(){ mPixelsUpdated=true; return *this; }
+
+	/// Submit the texture using an Array as source
+
 	/// NOTE: the graphics context (e.g. Window) must have been created
 	/// if reconfigure is true, 
 	/// it will attempt to derive size & layout from the array
 	void submit(const Array& src, bool reconfigure=false);
 		
 	/// Resize texture data on GPU and copy over pixels
+
 	/// NOTE: the graphics context (e.g. Window) must have been created
 	/// If pixels is NULL, then the only effect is to resize the texture
 	/// remotely.
 	void submit(const void * pixels, uint32_t align=4);
-	
-	/// just submit the existing data
-	void submit() { dirty(); }
 
-	/// allocate the internal Array for a CPU-side cache, copying from src
+	/// Allocate the internal Array for a CPU-side cache, copying from src
 	void allocate(const Array& src, bool reconfigure=true);
-	/// allocate memory for a CPU copy
-	/// reconfigures the internal array 
+
+	/// Allocate memory for a CPU copy (reconfigures the internal array)
 	void allocate(unsigned align=1);
 	
+	/// Deallocate internal memory
 	void deallocate();
 	
 	/// debug printing
 	void print();
-	
-	/// mark pixels as dirtied (e.g. if modified array contents)
-	/// to ensure they get submitted on the next bind():
-	void dirty() { mPixelsUpdated = true; }
+
+
+	// DEPRECATED: use dirty()
+	Texture& updatePixels(){ return dirty(); }
+	// DEPRECATED: use dirty()
+	void submit(){ dirty(); }
 
 protected:
-//	GLint mLevel;	// TODO: on a rainy day...
-//	GLint mBorder;
+//	int mLevel;	// TODO: on a rainy day...
+//	int mBorder;
 	Target mTarget;				// TEXTURE_1D, TEXTURE_2D, etc. 
 	Format mFormat;				// RGBA, ALPHA, etc.
+	int mTexelFormat;			// default is 0 = auto
 	DataType mType;				// UBYTE, FLOAT, etc.
 	Wrap mWrapS, mWrapT, mWrapR;	
 	Filter mFilter;
 	unsigned mWidth, mHeight, mDepth;
-	GLint mUnpack;
+	int mUnpack;
 	
 	// redundant; use mArray.data.ptr instead:
 	//void * mPixels;				// pointer to client-side pixel data (0 if none)
