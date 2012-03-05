@@ -185,7 +185,7 @@ inline int Lua::pcall(lua_State * L, int nargs) {
 	int res = lerror(lua_pcall(L, nargs, LUA_MULTRET, -nargs-2));
 	int nres = lua_gettop(L) - top;
 //	int nres = lua_gettop(L) - top + nargs + 1;
-	lua_remove(L, -(nres+nargs+2)); // remove debug function from stack
+	lua_remove(L, -(nres+1)); // remove debug function from stack
 	return res;
 }
 
