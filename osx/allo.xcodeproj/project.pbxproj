@@ -50,13 +50,11 @@
 		05C93866128A15AB0068F87F /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
 		05C93867128A15AB0068F87F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		05C93868128A15AB0068F87F /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
-		05C9386A128A15AB0068F87F /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		05C9386D128A15BA0068F87F /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
 		05C9386E128A15CA0068F87F /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
 		1602B5E7145649AF00ABA5A5 /* al_FileWatcher.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1602B5E6145649AF00ABA5A5 /* al_FileWatcher.cpp */; };
 		1602B5E8145649B200ABA5A5 /* al_App.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16B4CE031427EBE000626C03 /* al_App.cpp */; };
 		160C8D0C132082E9006D7A42 /* isosurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16A6041C130345BB0077B460 /* isosurface.cpp */; };
-		163E4934130E0254007B30A0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492B130E0254007B30A0 /* libapr-1.a */; };
 		163E4935130E0254007B30A0 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		163E4936130E0254007B30A0 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
 		163E4937130E0254007B30A0 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492E130E0254007B30A0 /* libfreetype.a */; };
@@ -65,7 +63,6 @@
 		163E493A130E0254007B30A0 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4931130E0254007B30A0 /* libportaudio.a */; };
 		163E493B130E0254007B30A0 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4932130E0254007B30A0 /* libsndfile.a */; };
 		163E493C130E0254007B30A0 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
-		163E493D130E0254007B30A0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492B130E0254007B30A0 /* libapr-1.a */; };
 		163E493E130E0254007B30A0 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		163E493F130E0254007B30A0 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
 		163E4940130E0254007B30A0 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492E130E0254007B30A0 /* libfreetype.a */; };
@@ -74,7 +71,6 @@
 		163E4943130E0254007B30A0 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4931130E0254007B30A0 /* libportaudio.a */; };
 		163E4944130E0254007B30A0 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4932130E0254007B30A0 /* libsndfile.a */; };
 		163E4945130E0254007B30A0 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
-		163E4946130E0254007B30A0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492B130E0254007B30A0 /* libapr-1.a */; };
 		163E4947130E0254007B30A0 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		163E4948130E0254007B30A0 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
 		163E4949130E0254007B30A0 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492E130E0254007B30A0 /* libfreetype.a */; };
@@ -89,7 +85,6 @@
 		163E4954130E0254007B30A0 /* libluajit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4930130E0254007B30A0 /* libluajit.a */; };
 		163E4956130E0254007B30A0 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4932130E0254007B30A0 /* libsndfile.a */; };
 		163E4960130E0254007B30A0 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
-		163E4961130E0254007B30A0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492B130E0254007B30A0 /* libapr-1.a */; };
 		163E4962130E0254007B30A0 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		163E4963130E0254007B30A0 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
 		163E4964130E0254007B30A0 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492E130E0254007B30A0 /* libfreetype.a */; };
@@ -98,7 +93,6 @@
 		163E4967130E0254007B30A0 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4931130E0254007B30A0 /* libportaudio.a */; };
 		163E4968130E0254007B30A0 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4932130E0254007B30A0 /* libsndfile.a */; };
 		163E4972130E0255007B30A0 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
-		163E4973130E0255007B30A0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492B130E0254007B30A0 /* libapr-1.a */; };
 		163E4974130E0255007B30A0 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		163E4975130E0255007B30A0 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
 		163E4976130E0255007B30A0 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492E130E0254007B30A0 /* libfreetype.a */; };
@@ -107,7 +101,6 @@
 		163E4979130E0255007B30A0 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4931130E0254007B30A0 /* libportaudio.a */; };
 		163E497A130E0255007B30A0 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4932130E0254007B30A0 /* libsndfile.a */; };
 		163E498D130E0255007B30A0 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
-		163E498E130E0255007B30A0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492B130E0254007B30A0 /* libapr-1.a */; };
 		163E498F130E0255007B30A0 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		163E4990130E0255007B30A0 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
 		163E4991130E0255007B30A0 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492E130E0254007B30A0 /* libfreetype.a */; };
@@ -116,7 +109,6 @@
 		163E4994130E0255007B30A0 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4931130E0254007B30A0 /* libportaudio.a */; };
 		163E4995130E0255007B30A0 /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4932130E0254007B30A0 /* libsndfile.a */; };
 		163E49B1130E0255007B30A0 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
-		163E49B2130E0255007B30A0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492B130E0254007B30A0 /* libapr-1.a */; };
 		163E49B3130E0255007B30A0 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		163E49B4130E0255007B30A0 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
 		163E49B5130E0255007B30A0 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492E130E0254007B30A0 /* libfreetype.a */; };
@@ -138,7 +130,6 @@
 		16AC5365116293100076AA8B /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
 		16AC5368116293270076AA8B /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC53081162907D0076AA8B /* CoreAudio.framework */; };
 		16B5C1731189020B0090CE80 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
-		16B5C1741189020B0090CE80 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		16C137C31469B83200D8AE8B /* al_ControlGLV.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C137C21469B83200D8AE8B /* al_ControlGLV.cpp */; };
 		16C70699135D13F400FEE5B3 /* helloVirtualWorld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C70697135D13DF00FEE5B3 /* helloVirtualWorld.cpp */; };
 		16C706AE135D148800FEE5B3 /* reverb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168B4E811331383A0076257A /* reverb.cpp */; };
@@ -158,10 +149,8 @@
 		36115B261438DE3400E121BF /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		36115B271438DE3400E121BF /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
 		36115B281438DE3400E121BF /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
-		36115B291438DE3400E121BF /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		36115B2A1438DE3400E121BF /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DDF6512B6C8C000F75D2A /* libassimp.a */; };
 		36115B2B1438DE3400E121BF /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
-		36115B2C1438DE3400E121BF /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492B130E0254007B30A0 /* libapr-1.a */; };
 		36115B2D1438DE3400E121BF /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		36115B2E1438DE3400E121BF /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
 		36115B2F1438DE3400E121BF /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492E130E0254007B30A0 /* libfreetype.a */; };
@@ -184,7 +173,6 @@
 		3622C02E14F6EC7000E0ECA7 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
 		3622C02F14F6EC7000E0ECA7 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		3622C03014F6EC7000E0ECA7 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
-		3622C03114F6EC7000E0ECA7 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		3622C03214F6EC7000E0ECA7 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
 		3622C03314F6EC7000E0ECA7 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		3622C03414F6EC7000E0ECA7 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
@@ -216,7 +204,6 @@
 		3630EF8914EC3CA70083BEFB /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
 		3630EF8A14EC3CA70083BEFB /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		3630EF8B14EC3CA70083BEFB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
-		3630EF8C14EC3CA70083BEFB /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		3630EF8D14EC3CA70083BEFB /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
 		3630EF8E14EC3CA70083BEFB /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		3630EF8F14EC3CA70083BEFB /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
@@ -234,9 +221,7 @@
 		364D325014564500005D2EB0 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		364D325114564500005D2EB0 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
 		364D325214564500005D2EB0 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
-		364D325314564500005D2EB0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		364D325414564500005D2EB0 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DDF6512B6C8C000F75D2A /* libassimp.a */; };
-		364D325614564500005D2EB0 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492B130E0254007B30A0 /* libapr-1.a */; };
 		364D325714564500005D2EB0 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		364D325814564500005D2EB0 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
 		364D325914564500005D2EB0 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492E130E0254007B30A0 /* libfreetype.a */; };
@@ -292,7 +277,6 @@
 		36510C4D1502D64C005C548E /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
 		36510C4E1502D64C005C548E /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		36510C4F1502D64C005C548E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
-		36510C501502D64C005C548E /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		36510C511502D64C005C548E /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
 		36510C521502D64C005C548E /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		36510C531502D64C005C548E /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
@@ -309,7 +293,6 @@
 		3669722D14C8765D00B82A38 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
 		3669722E14C8765D00B82A38 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		3669722F14C8765D00B82A38 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
-		3669723014C8765D00B82A38 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		3669723114C8765D00B82A38 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
 		3669723214C8765D00B82A38 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		3669723314C8765D00B82A38 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
@@ -327,10 +310,8 @@
 		366E78E61407F2D60010B21A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		366E78E71407F2D60010B21A /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
 		366E78E81407F2D60010B21A /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
-		366E78E91407F2D60010B21A /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		366E78EA1407F2D60010B21A /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DDF6512B6C8C000F75D2A /* libassimp.a */; };
 		366E78EB1407F2D60010B21A /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
-		366E78EC1407F2D60010B21A /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492B130E0254007B30A0 /* libapr-1.a */; };
 		366E78ED1407F2D60010B21A /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		366E78EE1407F2D60010B21A /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
 		366E78EF1407F2D60010B21A /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492E130E0254007B30A0 /* libfreetype.a */; };
@@ -346,7 +327,6 @@
 		367F0B5412034F1E00FCC534 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
 		367F0B5512034F1E00FCC534 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		367F0B5612034F1E00FCC534 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
-		367F0B5812034F1E00FCC534 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		367FE55112A5F4FD002D8350 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		367FE55212A5F4FD002D8350 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
 		367FE55312A5F4FD002D8350 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC53081162907D0076AA8B /* CoreAudio.framework */; };
@@ -355,14 +335,12 @@
 		367FE55612A5F4FD002D8350 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		367FE55812A5F4FD002D8350 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
 		367FE55912A5F4FD002D8350 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
-		367FE55A12A5F4FD002D8350 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		3686732F1491EEDF00E4D0D6 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		368673301491EEDF00E4D0D6 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
 		368673311491EEDF00E4D0D6 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC53081162907D0076AA8B /* CoreAudio.framework */; };
 		368673321491EEDF00E4D0D6 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
 		368673331491EEDF00E4D0D6 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		368673341491EEDF00E4D0D6 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
-		368673351491EEDF00E4D0D6 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		368673361491EEDF00E4D0D6 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
 		368673381491EEDF00E4D0D6 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		368673391491EEDF00E4D0D6 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
@@ -384,7 +362,6 @@
 		3696E32F14BFA31900D21F2A /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
 		3696E33014BFA31900D21F2A /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		3696E33114BFA31900D21F2A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
-		3696E33214BFA31900D21F2A /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		3696E33314BFA31900D21F2A /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
 		3696E33414BFA31900D21F2A /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		3696E33514BFA31900D21F2A /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
@@ -408,7 +385,6 @@
 		36C9EA5414922511002C8638 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		36C9EA5514922511002C8638 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
 		36C9EA5614922511002C8638 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
-		36C9EA5714922511002C8638 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492B130E0254007B30A0 /* libapr-1.a */; };
 		36C9EA5814922511002C8638 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		36C9EA5914922511002C8638 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
 		36C9EA5A14922511002C8638 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492E130E0254007B30A0 /* libfreetype.a */; };
@@ -425,10 +401,8 @@
 		36CA80521418244B00B7CE6B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		36CA80531418244B00B7CE6B /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
 		36CA80541418244B00B7CE6B /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
-		36CA80551418244B00B7CE6B /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		36CA80561418244B00B7CE6B /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DDF6512B6C8C000F75D2A /* libassimp.a */; };
 		36CA80571418244B00B7CE6B /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
-		36CA80581418244B00B7CE6B /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492B130E0254007B30A0 /* libapr-1.a */; };
 		36CA80591418244B00B7CE6B /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		36CA805A1418244B00B7CE6B /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
 		36CA805B1418244B00B7CE6B /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492E130E0254007B30A0 /* libfreetype.a */; };
@@ -445,10 +419,8 @@
 		36CF95FC1412EDBB00B00A30 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		36CF95FD1412EDBB00B00A30 /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
 		36CF95FE1412EDBB00B00A30 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
-		36CF95FF1412EDBB00B00A30 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		36CF96001412EDBB00B00A30 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DDF6512B6C8C000F75D2A /* libassimp.a */; };
 		36CF96011412EDBB00B00A30 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
-		36CF96021412EDBB00B00A30 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492B130E0254007B30A0 /* libapr-1.a */; };
 		36CF96031412EDBB00B00A30 /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		36CF96041412EDBB00B00A30 /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
 		36CF96051412EDBB00B00A30 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492E130E0254007B30A0 /* libfreetype.a */; };
@@ -466,10 +438,8 @@
 		36E4907F14380D5D00D7FE2B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		36E4908014380D5D00D7FE2B /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
 		36E4908114380D5D00D7FE2B /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
-		36E4908214380D5D00D7FE2B /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		36E4908314380D5D00D7FE2B /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DDF6512B6C8C000F75D2A /* libassimp.a */; };
 		36E4908414380D5D00D7FE2B /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
-		36E4908514380D5D00D7FE2B /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492B130E0254007B30A0 /* libapr-1.a */; };
 		36E4908614380D5D00D7FE2B /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		36E4908714380D5D00D7FE2B /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
 		36E4908814380D5D00D7FE2B /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492E130E0254007B30A0 /* libfreetype.a */; };
@@ -489,10 +459,8 @@
 		36FE0C4D13844E3C003AE7BE /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
 		36FE0C4E13844E3C003AE7BE /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F46844110BE34D0082D21E /* libportaudio.a */; };
 		36FE0C4F13844E3C003AE7BE /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36F596501211D58B003B78B5 /* libfreeimage.a */; };
-		36FE0C5013844E3C003AE7BE /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		36FE0C5113844E3C003AE7BE /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 369DDF6512B6C8C000F75D2A /* libassimp.a */; };
 		36FE0C5213844E3C003AE7BE /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
-		36FE0C5313844E3C003AE7BE /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492B130E0254007B30A0 /* libapr-1.a */; };
 		36FE0C5413844E3C003AE7BE /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
 		36FE0C5513844E3C003AE7BE /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
 		36FE0C5613844E3C003AE7BE /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492E130E0254007B30A0 /* libfreetype.a */; };
@@ -508,7 +476,6 @@
 		B9C962A71218939E00091F80 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
 		B9C962A81218939E00091F80 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		B9C962A91218939E00091F80 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
-		B9C962AB1218939E00091F80 /* libapr-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B4129810EFF864007B16D0 /* libapr-1.a */; };
 		B9C962C41218941800091F80 /* OpenCL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B9C962B1121893F100091F80 /* OpenCL.framework */; };
 		B9C962C91218943800091F80 /* exOpenCL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9C962C81218943800091F80 /* exOpenCL.cpp */; };
 		B9C962CA1218950800091F80 /* al_OpenCLProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9C9629D1218938C00091F80 /* al_OpenCLProgram.cpp */; };
@@ -663,7 +630,6 @@
 		1619909C11743990006FBADF /* al_Color.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Color.cpp; sourceTree = "<group>"; };
 		162B49B313C522A000254153 /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera.cpp; sourceTree = "<group>"; };
 		163E492A130E0254007B30A0 /* liballocore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = liballocore.a; sourceTree = "<group>"; };
-		163E492B130E0254007B30A0 /* libapr-1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libapr-1.a"; sourceTree = "<group>"; };
 		163E492C130E0254007B30A0 /* libassimp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libassimp.a; sourceTree = "<group>"; };
 		163E492D130E0254007B30A0 /* libfreeimage.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libfreeimage.a; sourceTree = "<group>"; };
 		163E492E130E0254007B30A0 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libfreetype.a; sourceTree = "<group>"; };
@@ -1002,7 +968,6 @@
 		36B4129410EFF864007B16D0 /* apr_user.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = apr_user.h; sourceTree = "<group>"; };
 		36B4129510EFF864007B16D0 /* apr_version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = apr_version.h; sourceTree = "<group>"; };
 		36B4129610EFF864007B16D0 /* apr_want.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = apr_want.h; sourceTree = "<group>"; };
-		36B4129810EFF864007B16D0 /* libapr-1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libapr-1.a"; path = "../../build/lib/libapr-1.a"; sourceTree = "<group>"; };
 		36B412AF10EFF916007B16D0 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		36B4BF06110E55AF00F789A8 /* al_Socket.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Socket.hpp; sourceTree = "<group>"; };
 		36B5D3E611D81D2C004D228D /* TODO */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO; sourceTree = "<group>"; };
@@ -1410,7 +1375,6 @@
 				05C93868128A15AB0068F87F /* Cocoa.framework in Frameworks */,
 				05C9386D128A15BA0068F87F /* libportaudio.a in Frameworks */,
 				05C9386E128A15CA0068F87F /* libfreeimage.a in Frameworks */,
-				05C9386A128A15AB0068F87F /* libapr-1.a in Frameworks */,
 				163E494E130E0254007B30A0 /* liballocore.a in Frameworks */,
 				163E4950130E0254007B30A0 /* libassimp.a in Frameworks */,
 				163E4952130E0254007B30A0 /* libfreetype.a in Frameworks */,
@@ -1433,7 +1397,6 @@
 				163E4A26130E0A10007B30A0 /* liballocore.a in Frameworks */,
 				16B5C1731189020B0090CE80 /* libportaudio.a in Frameworks */,
 				369DDF6B12B6C8F300F75D2A /* libassimp.a in Frameworks */,
-				16B5C1741189020B0090CE80 /* libapr-1.a in Frameworks */,
 				36F596521211D58B003B78B5 /* libfreeimage.a in Frameworks */,
 				36F0ABD2123195F2000A8EBF /* liblua.a in Frameworks */,
 			);
@@ -1457,7 +1420,6 @@
 				360C243F11E6599F000FF335 /* Cocoa.framework in Frameworks */,
 				360C244011E6599F000FF335 /* GLUT.framework in Frameworks */,
 				163E4972130E0255007B30A0 /* liballocore.a in Frameworks */,
-				163E4973130E0255007B30A0 /* libapr-1.a in Frameworks */,
 				163E4974130E0255007B30A0 /* libassimp.a in Frameworks */,
 				163E4975130E0255007B30A0 /* libfreeimage.a in Frameworks */,
 				163E4976130E0255007B30A0 /* libfreetype.a in Frameworks */,
@@ -1480,10 +1442,8 @@
 				36115B261438DE3400E121BF /* Cocoa.framework in Frameworks */,
 				36115B271438DE3400E121BF /* libportaudio.a in Frameworks */,
 				36115B281438DE3400E121BF /* libfreeimage.a in Frameworks */,
-				36115B291438DE3400E121BF /* libapr-1.a in Frameworks */,
 				36115B2A1438DE3400E121BF /* libassimp.a in Frameworks */,
 				36115B2B1438DE3400E121BF /* liballocore.a in Frameworks */,
-				36115B2C1438DE3400E121BF /* libapr-1.a in Frameworks */,
 				36115B2D1438DE3400E121BF /* libassimp.a in Frameworks */,
 				36115B2E1438DE3400E121BF /* libfreeimage.a in Frameworks */,
 				36115B2F1438DE3400E121BF /* libfreetype.a in Frameworks */,
@@ -1506,7 +1466,6 @@
 				3622C047116D566C00928703 /* GLUT.framework in Frameworks */,
 				3622BFE1116D55DD00928703 /* Cocoa.framework in Frameworks */,
 				163E49B1130E0255007B30A0 /* liballocore.a in Frameworks */,
-				163E49B2130E0255007B30A0 /* libapr-1.a in Frameworks */,
 				163E49B3130E0255007B30A0 /* libassimp.a in Frameworks */,
 				163E49B4130E0255007B30A0 /* libfreeimage.a in Frameworks */,
 				163E49B5130E0255007B30A0 /* libfreetype.a in Frameworks */,
@@ -1527,7 +1486,6 @@
 				3622C02E14F6EC7000E0ECA7 /* GLUT.framework in Frameworks */,
 				3622C02F14F6EC7000E0ECA7 /* OpenGL.framework in Frameworks */,
 				3622C03014F6EC7000E0ECA7 /* Cocoa.framework in Frameworks */,
-				3622C03114F6EC7000E0ECA7 /* libapr-1.a in Frameworks */,
 				3622C03214F6EC7000E0ECA7 /* liballocore.a in Frameworks */,
 				3622C03314F6EC7000E0ECA7 /* libassimp.a in Frameworks */,
 				3622C03414F6EC7000E0ECA7 /* libfreeimage.a in Frameworks */,
@@ -1567,7 +1525,6 @@
 				3630EF8914EC3CA70083BEFB /* GLUT.framework in Frameworks */,
 				3630EF8A14EC3CA70083BEFB /* OpenGL.framework in Frameworks */,
 				3630EF8B14EC3CA70083BEFB /* Cocoa.framework in Frameworks */,
-				3630EF8C14EC3CA70083BEFB /* libapr-1.a in Frameworks */,
 				3630EF8D14EC3CA70083BEFB /* liballocore.a in Frameworks */,
 				3630EF8E14EC3CA70083BEFB /* libassimp.a in Frameworks */,
 				3630EF8F14EC3CA70083BEFB /* libfreeimage.a in Frameworks */,
@@ -1591,9 +1548,7 @@
 				364D325014564500005D2EB0 /* Cocoa.framework in Frameworks */,
 				364D325114564500005D2EB0 /* libportaudio.a in Frameworks */,
 				364D325214564500005D2EB0 /* libfreeimage.a in Frameworks */,
-				364D325314564500005D2EB0 /* libapr-1.a in Frameworks */,
 				364D325414564500005D2EB0 /* libassimp.a in Frameworks */,
-				364D325614564500005D2EB0 /* libapr-1.a in Frameworks */,
 				364D325714564500005D2EB0 /* libassimp.a in Frameworks */,
 				364D325814564500005D2EB0 /* libfreeimage.a in Frameworks */,
 				364D325914564500005D2EB0 /* libfreetype.a in Frameworks */,
@@ -1615,7 +1570,6 @@
 				36510C4D1502D64C005C548E /* GLUT.framework in Frameworks */,
 				36510C4E1502D64C005C548E /* OpenGL.framework in Frameworks */,
 				36510C4F1502D64C005C548E /* Cocoa.framework in Frameworks */,
-				36510C501502D64C005C548E /* libapr-1.a in Frameworks */,
 				36510C511502D64C005C548E /* liballocore.a in Frameworks */,
 				36510C521502D64C005C548E /* libassimp.a in Frameworks */,
 				36510C531502D64C005C548E /* libfreeimage.a in Frameworks */,
@@ -1637,7 +1591,6 @@
 				3669722D14C8765D00B82A38 /* GLUT.framework in Frameworks */,
 				3669722E14C8765D00B82A38 /* OpenGL.framework in Frameworks */,
 				3669722F14C8765D00B82A38 /* Cocoa.framework in Frameworks */,
-				3669723014C8765D00B82A38 /* libapr-1.a in Frameworks */,
 				3669723114C8765D00B82A38 /* liballocore.a in Frameworks */,
 				3669723214C8765D00B82A38 /* libassimp.a in Frameworks */,
 				3669723314C8765D00B82A38 /* libfreeimage.a in Frameworks */,
@@ -1661,10 +1614,8 @@
 				366E78E61407F2D60010B21A /* Cocoa.framework in Frameworks */,
 				366E78E71407F2D60010B21A /* libportaudio.a in Frameworks */,
 				366E78E81407F2D60010B21A /* libfreeimage.a in Frameworks */,
-				366E78E91407F2D60010B21A /* libapr-1.a in Frameworks */,
 				366E78EA1407F2D60010B21A /* libassimp.a in Frameworks */,
 				366E78EB1407F2D60010B21A /* liballocore.a in Frameworks */,
-				366E78EC1407F2D60010B21A /* libapr-1.a in Frameworks */,
 				366E78ED1407F2D60010B21A /* libassimp.a in Frameworks */,
 				366E78EE1407F2D60010B21A /* libfreeimage.a in Frameworks */,
 				366E78EF1407F2D60010B21A /* libfreetype.a in Frameworks */,
@@ -1686,9 +1637,7 @@
 				367F0B5412034F1E00FCC534 /* GLUT.framework in Frameworks */,
 				367F0B5512034F1E00FCC534 /* OpenGL.framework in Frameworks */,
 				367F0B5612034F1E00FCC534 /* Cocoa.framework in Frameworks */,
-				367F0B5812034F1E00FCC534 /* libapr-1.a in Frameworks */,
 				163E493C130E0254007B30A0 /* liballocore.a in Frameworks */,
-				163E493D130E0254007B30A0 /* libapr-1.a in Frameworks */,
 				163E493E130E0254007B30A0 /* libassimp.a in Frameworks */,
 				163E493F130E0254007B30A0 /* libfreeimage.a in Frameworks */,
 				163E4940130E0254007B30A0 /* libfreetype.a in Frameworks */,
@@ -1711,10 +1660,8 @@
 				367FE55612A5F4FD002D8350 /* Cocoa.framework in Frameworks */,
 				367FE55812A5F4FD002D8350 /* libportaudio.a in Frameworks */,
 				367FE55912A5F4FD002D8350 /* libfreeimage.a in Frameworks */,
-				367FE55A12A5F4FD002D8350 /* libapr-1.a in Frameworks */,
 				16A603DA13033BA50077B460 /* libassimp.a in Frameworks */,
 				163E4960130E0254007B30A0 /* liballocore.a in Frameworks */,
-				163E4961130E0254007B30A0 /* libapr-1.a in Frameworks */,
 				163E4962130E0254007B30A0 /* libassimp.a in Frameworks */,
 				163E4963130E0254007B30A0 /* libfreeimage.a in Frameworks */,
 				163E4964130E0254007B30A0 /* libfreetype.a in Frameworks */,
@@ -1735,7 +1682,6 @@
 				368673321491EEDF00E4D0D6 /* GLUT.framework in Frameworks */,
 				368673331491EEDF00E4D0D6 /* OpenGL.framework in Frameworks */,
 				368673341491EEDF00E4D0D6 /* Cocoa.framework in Frameworks */,
-				368673351491EEDF00E4D0D6 /* libapr-1.a in Frameworks */,
 				368673361491EEDF00E4D0D6 /* liballocore.a in Frameworks */,
 				368673381491EEDF00E4D0D6 /* libassimp.a in Frameworks */,
 				368673391491EEDF00E4D0D6 /* libfreeimage.a in Frameworks */,
@@ -1763,7 +1709,6 @@
 				3687E33A11FA4F9500EC6706 /* OpenGL.framework in Frameworks */,
 				3687E33B11FA4F9500EC6706 /* Cocoa.framework in Frameworks */,
 				163E49C6130E0439007B30A0 /* liballocore.a in Frameworks */,
-				163E4934130E0254007B30A0 /* libapr-1.a in Frameworks */,
 				163E4935130E0254007B30A0 /* libassimp.a in Frameworks */,
 				163E4936130E0254007B30A0 /* libfreeimage.a in Frameworks */,
 				163E4937130E0254007B30A0 /* libfreetype.a in Frameworks */,
@@ -1784,7 +1729,6 @@
 				3696E32F14BFA31900D21F2A /* GLUT.framework in Frameworks */,
 				3696E33014BFA31900D21F2A /* OpenGL.framework in Frameworks */,
 				3696E33114BFA31900D21F2A /* Cocoa.framework in Frameworks */,
-				3696E33214BFA31900D21F2A /* libapr-1.a in Frameworks */,
 				3696E33314BFA31900D21F2A /* liballocore.a in Frameworks */,
 				3696E33414BFA31900D21F2A /* libassimp.a in Frameworks */,
 				3696E33514BFA31900D21F2A /* libfreeimage.a in Frameworks */,
@@ -1807,7 +1751,6 @@
 				36C13ED411D15D30006196FC /* Cocoa.framework in Frameworks */,
 				36C13ED511D15D30006196FC /* GLUT.framework in Frameworks */,
 				163E498D130E0255007B30A0 /* liballocore.a in Frameworks */,
-				163E498E130E0255007B30A0 /* libapr-1.a in Frameworks */,
 				163E498F130E0255007B30A0 /* libassimp.a in Frameworks */,
 				163E4990130E0255007B30A0 /* libfreeimage.a in Frameworks */,
 				163E4991130E0255007B30A0 /* libfreetype.a in Frameworks */,
@@ -1829,7 +1772,6 @@
 				36C9EA5414922511002C8638 /* Cocoa.framework in Frameworks */,
 				36C9EA5514922511002C8638 /* GLUT.framework in Frameworks */,
 				36C9EA5614922511002C8638 /* liballocore.a in Frameworks */,
-				36C9EA5714922511002C8638 /* libapr-1.a in Frameworks */,
 				36C9EA5814922511002C8638 /* libassimp.a in Frameworks */,
 				36C9EA5914922511002C8638 /* libfreeimage.a in Frameworks */,
 				36C9EA5A14922511002C8638 /* libfreetype.a in Frameworks */,
@@ -1852,10 +1794,8 @@
 				36CA80521418244B00B7CE6B /* Cocoa.framework in Frameworks */,
 				36CA80531418244B00B7CE6B /* libportaudio.a in Frameworks */,
 				36CA80541418244B00B7CE6B /* libfreeimage.a in Frameworks */,
-				36CA80551418244B00B7CE6B /* libapr-1.a in Frameworks */,
 				36CA80561418244B00B7CE6B /* libassimp.a in Frameworks */,
 				36CA80571418244B00B7CE6B /* liballocore.a in Frameworks */,
-				36CA80581418244B00B7CE6B /* libapr-1.a in Frameworks */,
 				36CA80591418244B00B7CE6B /* libassimp.a in Frameworks */,
 				36CA805A1418244B00B7CE6B /* libfreeimage.a in Frameworks */,
 				36CA805B1418244B00B7CE6B /* libfreetype.a in Frameworks */,
@@ -1879,10 +1819,8 @@
 				36CF95FC1412EDBB00B00A30 /* Cocoa.framework in Frameworks */,
 				36CF95FD1412EDBB00B00A30 /* libportaudio.a in Frameworks */,
 				36CF95FE1412EDBB00B00A30 /* libfreeimage.a in Frameworks */,
-				36CF95FF1412EDBB00B00A30 /* libapr-1.a in Frameworks */,
 				36CF96001412EDBB00B00A30 /* libassimp.a in Frameworks */,
 				36CF96011412EDBB00B00A30 /* liballocore.a in Frameworks */,
-				36CF96021412EDBB00B00A30 /* libapr-1.a in Frameworks */,
 				36CF96031412EDBB00B00A30 /* libassimp.a in Frameworks */,
 				36CF96041412EDBB00B00A30 /* libfreeimage.a in Frameworks */,
 				36CF96051412EDBB00B00A30 /* libfreetype.a in Frameworks */,
@@ -1906,10 +1844,8 @@
 				36E4907F14380D5D00D7FE2B /* Cocoa.framework in Frameworks */,
 				36E4908014380D5D00D7FE2B /* libportaudio.a in Frameworks */,
 				36E4908114380D5D00D7FE2B /* libfreeimage.a in Frameworks */,
-				36E4908214380D5D00D7FE2B /* libapr-1.a in Frameworks */,
 				36E4908314380D5D00D7FE2B /* libassimp.a in Frameworks */,
 				36E4908414380D5D00D7FE2B /* liballocore.a in Frameworks */,
-				36E4908514380D5D00D7FE2B /* libapr-1.a in Frameworks */,
 				36E4908614380D5D00D7FE2B /* libassimp.a in Frameworks */,
 				36E4908714380D5D00D7FE2B /* libfreeimage.a in Frameworks */,
 				36E4908814380D5D00D7FE2B /* libfreetype.a in Frameworks */,
@@ -1933,10 +1869,8 @@
 				36FE0C4D13844E3C003AE7BE /* Cocoa.framework in Frameworks */,
 				36FE0C4E13844E3C003AE7BE /* libportaudio.a in Frameworks */,
 				36FE0C4F13844E3C003AE7BE /* libfreeimage.a in Frameworks */,
-				36FE0C5013844E3C003AE7BE /* libapr-1.a in Frameworks */,
 				36FE0C5113844E3C003AE7BE /* libassimp.a in Frameworks */,
 				36FE0C5213844E3C003AE7BE /* liballocore.a in Frameworks */,
-				36FE0C5313844E3C003AE7BE /* libapr-1.a in Frameworks */,
 				36FE0C5413844E3C003AE7BE /* libassimp.a in Frameworks */,
 				36FE0C5513844E3C003AE7BE /* libfreeimage.a in Frameworks */,
 				36FE0C5613844E3C003AE7BE /* libfreetype.a in Frameworks */,
@@ -1958,10 +1892,8 @@
 				B9C962A71218939E00091F80 /* GLUT.framework in Frameworks */,
 				B9C962A81218939E00091F80 /* OpenGL.framework in Frameworks */,
 				B9C962A91218939E00091F80 /* Cocoa.framework in Frameworks */,
-				B9C962AB1218939E00091F80 /* libapr-1.a in Frameworks */,
 				B9C962C41218941800091F80 /* OpenCL.framework in Frameworks */,
 				163E4945130E0254007B30A0 /* liballocore.a in Frameworks */,
-				163E4946130E0254007B30A0 /* libapr-1.a in Frameworks */,
 				163E4947130E0254007B30A0 /* libassimp.a in Frameworks */,
 				163E4948130E0254007B30A0 /* libfreeimage.a in Frameworks */,
 				163E4949130E0254007B30A0 /* libfreetype.a in Frameworks */,
@@ -2023,7 +1955,6 @@
 				36C9E8441491F384002C8638 /* libfreenect.a */,
 				36FE0F5913845E02003AE7BE /* libGamma.a */,
 				163E492A130E0254007B30A0 /* liballocore.a */,
-				163E492B130E0254007B30A0 /* libapr-1.a */,
 				163E492C130E0254007B30A0 /* libassimp.a */,
 				163E492D130E0254007B30A0 /* libfreeimage.a */,
 				163E492E130E0254007B30A0 /* libfreetype.a */,
@@ -2738,7 +2669,6 @@
 				369DDF6612B6C8C000F75D2A /* libluajit.a */,
 				369DDF6712B6C8C000F75D2A /* libsndfile.a */,
 				36F46844110BE34D0082D21E /* libportaudio.a */,
-				36B4129810EFF864007B16D0 /* libapr-1.a */,
 				36F0ABD0123195F2000A8EBF /* liblua.a */,
 				36F596501211D58B003B78B5 /* libfreeimage.a */,
 			);
@@ -4307,6 +4237,10 @@
 					$PROJECT_DIR/../osx/lib,
 				);
 				OBJROOT = /build;
+				OTHER_LDFLAGS = (
+					"-lapr-1",
+					"-laprutil-1",
+				);
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				RUN_CLANG_STATIC_ANALYZER = YES;
@@ -4358,6 +4292,10 @@
 					$PROJECT_DIR/../osx/lib,
 				);
 				OBJROOT = /build;
+				OTHER_LDFLAGS = (
+					"-lapr-1",
+					"-laprutil-1",
+				);
 				PREBINDING = NO;
 				PRODUCT_NAME = $TARGET_NAME;
 				RUN_CLANG_STATIC_ANALYZER = YES;
