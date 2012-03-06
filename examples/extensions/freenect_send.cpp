@@ -18,10 +18,10 @@ using namespace al;
 Graphics gl;
 SearchPaths paths;
 
-struct MyWindow : public Window, public Freenect1::Callback, public ThreadFunction {
+struct MyWindow : public Window, public Freenect::Callback, public ThreadFunction {
 
-	MyWindow(int dim = 32) 
-	:	Freenect1::Callback(0), 
+	MyWindow(int dim = 1) 
+	:	Freenect::Callback(0), 
 		depthTex(640, 480),
 		world_dim(dim), 
 		bHideOOB(0)  
@@ -65,24 +65,7 @@ struct MyWindow : public Window, public Freenect1::Callback, public ThreadFuncti
 	}	
 	virtual ~MyWindow() {
 		sendThread.join();
-		Freenect1::stop();
-	}
-	
-	// @see http://nicolas.burrus.name/index.php/Research/KinectCalibration
-	Vec3f depthToEye(int x, int y, uint16_t d) {
-		// size of a pixel in meters, at zero/near plane:
-		static const double metersPerPixelX = 1./594.21434211923247;
-		static const double metersPerPixelY = 1./591.04053696870778;
-		// location of X,Y corner at zero plane, in pixels:
-		static const double edgeX = 339.30780975300314;	// x edge pixel
-		static const double edgeY = 242.73913761751615;	// y edge pixel
-		const double meters = rawDepthToMeters(d);
-		const double disparityX = (x - edgeX);	// in pixels
-		const double disparityY = (y - edgeY);	// in pixels
-		return Vec3f(meters * disparityX * metersPerPixelX,
-					 meters * disparityY * metersPerPixelY,
-					 meters
-					);
+		Freenect::stop();
 	}
 	
 	virtual void onVideo(Texture& tex, uint32_t timestamp) {
@@ -263,7 +246,7 @@ struct MyWindow : public Window, public Freenect1::Callback, public ThreadFuncti
 	bool active;
 };
 
-MyWindow win(32);
+MyWindow win;
 
 int main(int argc, char * argv[]){
 

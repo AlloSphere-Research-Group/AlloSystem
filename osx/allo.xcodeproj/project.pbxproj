@@ -916,7 +916,6 @@
 		367FE55E12A5F4FD002D8350 /* exSimpleGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exSimpleGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
 		368672F41491EE1300E4D0D6 /* simplePan.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = simplePan.cpp; sourceTree = "<group>"; };
 		368672F51491EE1300E4D0D6 /* sinewave.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sinewave.cpp; sourceTree = "<group>"; };
-		368672F71491EE5500E4D0D6 /* freenect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = freenect.cpp; sourceTree = "<group>"; };
 		368673421491EEDF00E4D0D6 /* freenect_calibrate */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = freenect_calibrate; sourceTree = BUILT_PRODUCTS_DIR; };
 		3687E34111FA4F9500EC6706 /* exIsosurface */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exIsosurface; sourceTree = BUILT_PRODUCTS_DIR; };
 		3696E31514BFA29900D21F2A /* al_Zeroconf.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Zeroconf.hpp; sourceTree = "<group>"; };
@@ -2529,7 +2528,6 @@
 		368672F61491EE4700E4D0D6 /* extensions */ = {
 			isa = PBXGroup;
 			children = (
-				368672F71491EE5500E4D0D6 /* freenect.cpp */,
 				3622B30714F476C800E0ECA7 /* freenect_calibrate.cpp */,
 				3622BFBB14F6E61800E0ECA7 /* freenect_send.cpp */,
 			);
