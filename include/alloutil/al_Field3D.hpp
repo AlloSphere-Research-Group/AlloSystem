@@ -180,7 +180,7 @@ public:
 		FIELD = 2
 	};
 
-	Fluid3D(int dim) 
+	Fluid3D(int dim=32) 
 	:	velocities(3, dim),
 		gradient(1, dim),
 		boundaries(1, Array::type<T>(), dim, dim, dim),
