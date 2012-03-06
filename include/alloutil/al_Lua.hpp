@@ -51,11 +51,14 @@ public:
 
 	///! destructor calls
 	~Lua() {
-		if (L && mOwner) {
-			lua_close(L);
-			L = 0;
-		}
+		close();
 	}
+	
+	void close();
+	
+	///! wrap an existing pointer (closes current if owned)
+	void set(lua_State * L1);
+	
 
 	///! allow the Lua object to be used in place of a lua_State *
 	operator lua_State *() { return L; }
@@ -86,12 +89,15 @@ public:
 	///! set stack top value to be a named global
 	/// pops value from stack
 	Lua& setglobal(const std::string& name);
+	
+	///! pushes named global (or nil)
+	Lua& getglobal(const std::string& name);
 
 	///! call function with N args
 	/// function should be at stack index (top - n)
 	/// catches errors and prints a traceback to stdout
 	/// returns 0 if no errors
-	int pcall(lua_State * L, int n);
+	int pcall(int n=0);
 
 	///! runs a string of code
 	/// catches errors and prints to stdout
@@ -129,6 +135,22 @@ protected:
 	bool mOwner;
 };
 
+
+
+
+inline void Lua::set(lua_State * L1) {
+	close();
+	mOwner = 0;
+	L = L1;
+}
+
+inline void Lua::close() {
+	if (L && mOwner) {
+		lua_close(L);
+	}
+	L = 0;
+}
+
 template<> inline Lua& Lua::push(const std::string str) { lua_pushstring(L, str.c_str()); return *this; }
 template<> inline Lua& Lua::push(const char * str) { lua_pushstring(L, str); return *this; }
 
@@ -163,6 +185,10 @@ inline Lua& Lua::setglobal(const std::string& name, T value) {
 	return push(value).setglobal(name); 
 }
 
+inline Lua& Lua::getglobal(const std::string& name) {
+	lua_getglobal(L, name.c_str()); return *this;
+}
+
 inline int Lua::lerror(int err) {
 	if (err) {
 		printf("error: %s\n", lua_tostring(L, -1));
@@ -172,7 +198,7 @@ inline int Lua::lerror(int err) {
 }
 
 
-inline int Lua::pcall(lua_State * L, int nargs) {
+inline int Lua::pcall(int nargs) {
 	int debug_idx = -nargs-3;
 	// put debug.traceback just below the function & args
 	{
@@ -191,10 +217,10 @@ inline int Lua::pcall(lua_State * L, int nargs) {
 }
 
 inline int Lua::dostring(const std::string& code) {
-	return lerror(luaL_loadstring(L, code.c_str())) || pcall(L, 0);
+	return lerror(luaL_loadstring(L, code.c_str())) || pcall(0);
 }
 inline int Lua::dofile(const std::string& path) {
-	return lerror(luaL_loadfile(L, path.c_str())) || pcall(L, 0);
+	return lerror(luaL_loadfile(L, path.c_str())) || pcall(0);
 }
 
 } // al::
