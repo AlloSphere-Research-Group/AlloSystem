@@ -255,6 +255,7 @@ public:
 	void multMatrix(const Matrix4d &m);
 	void multMatrix(const Matrix4f &m);
 	void modelView(const Matrix4d& m){ matrixMode(MODELVIEW); loadMatrix(m); }
+	void modelView(const Matrix4f& m){ matrixMode(MODELVIEW); loadMatrix(m); }
 	void projection(const Matrix4d& m){ matrixMode(PROJECTION); loadMatrix(m); }
 	void projection(const Matrix4f& m){ matrixMode(PROJECTION); loadMatrix(m); }
 	void translate(double x, double y, double z);
