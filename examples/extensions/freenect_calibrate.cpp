@@ -11,22 +11,38 @@ Graham Wakefield, 2011
 
 #include "allocore/al_Allocore.hpp"
 #include "allonect/al_Freenect.hpp"
+#include "alloutil/al_Lua.hpp"
 
 using namespace al;
 
 Graphics gl;
 SearchPaths paths;
 
+const char * man = 
+			"Freenect transform calibrator\n"
+			"The goal is to align the area of interest as closely as possible with the virtual box. Walls, floors etc. should be just outside the virtual box, so that no unwanted noise enters the simulation.\n"
+			"	1. move the point cloud into the center by dragging in the three plane views.\n"
+			"	2. rotate the point cloud by dragging in the rotating orthographic view.\n"
+			"	3. scale the point cloud by ctrl-dragging in any view.\n"
+			"	4. make these adjustments more finely by holding down the shift key before dragging.\n"
+			"	5. if it gets lost, press 'r' or 'z' to reset to the initial state.\n"
+			"	6. To view in more detail and verify, you can press 'esc' to toggle full-screen. Press 'h' to toggle hide/show the particles outside the virtual box. Click on the video / depth image panes to switch the point cloud rendering source. \n"
+			"	7. When you are happy, press 's' to print the transformation matrix to a file (it will be saved next to the application). Press 'p' to see this in the console.  Finally, press 'q' to quit. (If it crashes when quitting, don't worry.)\n"
+;
+
+
 struct MyWindow : public Window, public Freenect1::Callback {
 
 	MyWindow(int dim = 32) 
 	:	Freenect1::Callback(0), 
 		depthTex(640, 480),
-		scale(1), 
+		scale(dim / 4), 
 		azimuth(0),
 		elevation(0),
 		world_dim(dim), 
-		bHideOOB(0)  
+		bUseVideo(0),
+		bHideOOB(0),
+		bReset(0)  
 	{
 		pointsMesh.vertices().size(640*480);
 		pointsMesh.colors().size(640*480);
@@ -89,11 +105,9 @@ struct MyWindow : public Window, public Freenect1::Callback {
 			Matrix4f::scale(scale, -scale, -scale);
 	}
 	
-	virtual void onVideo(Texture& tex, uint32_t timestamp) {
-		
-	}
-	virtual void onDepth(Texture& tex, uint32_t timestamp) {
+	virtual void onVideo(Texture& tex, uint32_t timestamp) {}
 	
+	virtual void onDepth(Texture& tex, uint32_t timestamp) {
 		// get tilt:
 		updateTransform();
 		
@@ -144,9 +158,9 @@ struct MyWindow : public Window, public Freenect1::Callback {
 						vworld.z < 0 || vworld.z > world_dim);
 					
 					// analysis:
-					mmmx(vworld.x);
-					mmmy(vworld.y);
-					mmmz(vworld.z);
+					mmmx(veye.x);
+					mmmy(veye.y);
+					mmmz(veye.z);
 					
 					if (!bHideOOB || !OOB) {
 						float a = 1. - OOB*0.7;
@@ -166,6 +180,7 @@ struct MyWindow : public Window, public Freenect1::Callback {
 		
 		
 		depthTex.updatePixels();
+		
 	}
 
 	bool onCreate(){
@@ -173,20 +188,21 @@ struct MyWindow : public Window, public Freenect1::Callback {
 	}
 	
 	virtual bool onKeyDown(const Keyboard& k) {
-		Vec3f def(world_dim/2, world_dim/2, 0);
 		switch (k.key()) {
 			case 'z':	// reset transform:
-				elevation = tilt();
-				translate.set(def);
-				break;
-			case 'r':	// reset transform:
-				elevation = tilt();
-				translate += def-vmean;
+			case 'r':
+				bReset = 1;
 				break;
 			case 's': {
 					File f(paths.appPath() + "freenect_calibrate.lua", "w+", true);
-					f.write("freenect_calibrate = ");
+					f.write("translate = ");
+					translate.print(f.filePointer());
+					fprintf(f.filePointer(), "\nscale = %f\n", scale);
+					fprintf(f.filePointer(), "azimuth = %f\n", azimuth);
+					fprintf(f.filePointer(), "elevation = %f\n", elevation);
+					f.write("matrix = ");
 					transform.print(f.filePointer());
+					
 				}
 			case 'p':
 				transform.print(stdout);
@@ -194,6 +210,9 @@ struct MyWindow : public Window, public Freenect1::Callback {
 				break;
 			case 'h':
 				bHideOOB = !bHideOOB;
+				break;
+			case 'q':
+				exit(0);
 				break;
 			default:
 				break;
@@ -212,51 +231,46 @@ struct MyWindow : public Window, public Freenect1::Callback {
 		int quadx = m.x() / panel_width;
 		int quady = m.y() / panel_width;
 		quadrant = quadx + quady*3;
+		if (quadrant == 2) bUseVideo = 1;
+		if (quadrant == 5) bUseVideo = 0;
 		//printf("quad %d %d quadrant %d\n", quadx, quady, quadrant);
 		
 		return true;
 	}
 	
 	virtual bool onMouseDrag(const Mouse& m) {
+		float rate = 1. / panel_width; 
+		
+		if (!keyboard().shift()) {
+			rate *= world_dim;
+		}
+		
+		printf("drag %f\n", rate);
+		
 		if (keyboard().ctrl()) {
-			switch (quadrant) {
-				case 0:
-				case 3:
-				case 4:
-					// scale
-					scale += (m.dx()) / panel_width;
-					printf("scale %f\n", scale);
-					break;
-				case 1:
-					elevation += m.dy() / panel_width;
-					printf("elevation %f (tilt %f)\n", elevation, tilt());
-					break;
-				default:
-					break;
-			}
+			// scale
+			scale += (m.dx()) * rate;
 		} else {
 			// translate
 			switch (quadrant) {
 				case 0:
-					translate.x += m.dx() / panel_width;
-					translate.z += m.dy() / panel_width;
+					translate.x += m.dx() * rate;
+					translate.z += m.dy() * rate;
 					break;
 				case 1: 
-					azimuth += m.dx() / panel_width;
-					printf("azimuth %f\n", azimuth);
+					azimuth += (m.dx()) * rate / M_PI;
 					break;
 				case 3:
-					translate.x += m.dx() / panel_width;
-					translate.y -= m.dy() / panel_width;
+					translate.x += m.dx() * rate;
+					translate.y -= m.dy() * rate;
 					break;
 				case 4:
-					translate.z += m.dx() / panel_width;
-					translate.y -= m.dy() / panel_width;
+					translate.z += m.dx() * rate;
+					translate.y -= m.dy() * rate;
 					break;
 				default:
 					break;
 			}
-			printf("translate "); translate.print(); printf("\n");
 		}
 		
 		return true;
@@ -265,6 +279,16 @@ struct MyWindow : public Window, public Freenect1::Callback {
 	bool onFrame(){
 		float h = height();
 		float w = width();
+		
+		if (bReset) {
+			float wd2 = world_dim/2;
+			elevation = tilt();
+			azimuth = 0;
+			translate.set(wd2/2, wd2/2, world_dim*1.5);
+			scale = wd2;
+			updateTransform();
+			bReset = 0;
+		}
 		
 		panel_width = h/2;
 		
@@ -353,9 +377,17 @@ struct MyWindow : public Window, public Freenect1::Callback {
 	void drawpoints() {
 		gl.depthTesting(true);
 		gl.color(1, 1, 1, 1);
-		video.bind();
+		if (bUseVideo) {
+			video.bind();
+		} else {
+			depthTex.bind();
+		}
 		gl.draw(num_points, pointsMesh);
-		video.unbind();
+		if (bUseVideo) {
+			video.unbind();
+		} else {
+			depthTex.unbind();
+		}
 		gl.draw(frameMesh);
 	}	
 	
@@ -373,17 +405,60 @@ struct MyWindow : public Window, public Freenect1::Callback {
 	double panel_width;
 	int quadrant, mx, my;
 	
-	bool bHideOOB;
+	bool bUseVideo, bHideOOB, bReset;
 };
 
 MyWindow win(32);
 
 int main(int argc, char * argv[]){
-
 	paths.addAppPaths(argc, argv);
+	
+	Lua L;
+	L.dofile(paths.appPath() + "freenect_calibrate.lua");
+	
+	lua_getglobal(L, "matrix");
+	int tab = lua_gettop(L);
+	if (lua_istable(L, -1)) {
+		printf("loading from freenect_calibrate.lua\n");
+		for (int i=1; i<=16; i++) lua_rawgeti(L, tab, i);
+		win.transform = Matrix4f(
+			lua_tonumber(L, tab+1), lua_tonumber(L, tab+2),
+			lua_tonumber(L, tab+3), lua_tonumber(L, tab+4),
+			lua_tonumber(L, tab+5), lua_tonumber(L, tab+6),
+			lua_tonumber(L, tab+7), lua_tonumber(L, tab+8),
+			lua_tonumber(L, tab+9), lua_tonumber(L, tab+10),
+			lua_tonumber(L, tab+11), lua_tonumber(L, tab+12),
+			lua_tonumber(L, tab+13), lua_tonumber(L, tab+14),
+			lua_tonumber(L, tab+15), lua_tonumber(L, tab+16)
+		);
+		lua_settop(L, 0);
+		lua_getglobal(L, "scale"); 
+		if (lua_isnumber(L, -1)) win.scale = lua_tonumber(L, -1);
+		lua_settop(L, 0);
+		lua_getglobal(L, "azimuth"); 
+		if (lua_isnumber(L, -1)) win.azimuth = lua_tonumber(L, -1);
+		lua_settop(L, 0);
+		lua_getglobal(L, "elevation"); 
+		if (lua_isnumber(L, -1)) win.elevation = lua_tonumber(L, -1);
+		lua_settop(L, 0);
+		lua_getglobal(L, "translate"); 
+		if (lua_istable(L, -1)) {
+			for (int i=1; i<=3; i++) lua_rawgeti(L, tab, i);
+			win.translate.set(
+				lua_tonumber(L, tab+1), 
+				lua_tonumber(L, tab+2),
+				lua_tonumber(L, tab+3)
+			);
+		}
+	} else {
+		win.bReset = 1;
+	}
+
 
 	win.append(*new StandardWindowKeyControls);
 	win.create(Window::Dim(800, 480));
+	
+	printf(man);
 	
 	MainLoop::start();
 	return 0;
