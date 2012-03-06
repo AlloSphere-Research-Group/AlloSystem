@@ -89,7 +89,8 @@ void err(const char * msg, const char * src="", bool exits=true);
 /// Prints warning message to stderr
 void warn(const char * msg, const char * src="");
 
-
+/// Prints warning message to stderr once during program lifecycle
+void warnOnce(const char * msg);
 
 
 

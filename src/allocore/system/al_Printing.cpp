@@ -1,3 +1,4 @@
+#include <map>
 #include <stdlib.h>
 #include "allocore/system/al_Printing.hpp"
 
@@ -43,5 +44,14 @@ void err(const char * msg, const char * src, bool exits){
 void warn(const char * msg, const char * src){
 	fprintf(stderr, "%s%swarning: %s\n", src, src[0]?" ":"", msg);
 }
+
+void warnOnce(const char * msg){
+	static std::map<const char *, int> M;
+	if(0==M.count(msg)){
+		M[msg]=1;
+		fprintf(stderr, "warning: %s\n", msg);
+	}
+}
+
 
 } // ::al::
