@@ -67,6 +67,18 @@ Texture :: Texture(AlloArrayHeader& header)
 	mArray.dataCalloc();
 }
 
+void Texture::onCreate(){
+	//printf("Texture onCreate\n");
+	glGenTextures(1, (GLuint *)&mID);
+	sendParams();
+	sendPixels();
+	Graphics::error("creating texture");
+}
+	
+void Texture::onDestroy(){
+	glDeleteTextures(1, (GLuint *)&mID);
+}
+
 void Texture :: configure(AlloArrayHeader& header) {
 	switch (header.dimcount) {
 		case 1: target(TEXTURE_1D); break;
@@ -579,7 +591,18 @@ void Texture :: print() {
 	
 	printf("type=%s(%s), format=%s(%d), unpack=%d(align=%d))\n", type, allo_type_name(mArray.type()), format, mArray.components(), mUnpack, mArray.alignment());
 	//mArray.print();
-
 }
+
+
+Texture& Texture::updatePixels(){
+	warnOnce("Texture::updatePixels() deprecated, use Texture::dirty()");
+	return dirty();
+}
+
+void Texture::submit(){
+	warnOnce("Texture::submit() deprecated, use Texture::dirty()");
+	dirty();
+}
+
 
 } // al::

@@ -76,27 +76,36 @@ public:
 	};
 
 
-	/**
-		Construct a 2D Texture object.
-	*/
+	/// Construct a 2D Texture object
+
+	/// @param[in] width		width, in pixels
+	/// @param[in] height		height, in pixels
+	/// @param[in] format		format of pixel data
+	/// @param[in] type			data type of pixel data
+	/// @param[in] clientAlloc	allocate data on the client
 	Texture(
 		unsigned width=512, unsigned height=512,
 		Graphics::Format format=Graphics::RGBA, Graphics::DataType type=Graphics::UBYTE,
-		bool allocate=true
+		bool clientAlloc=true
 	);
 	
-	/**
-		Construct a 3D Texture object.
-	*/
+
+	/// Construct a 3D Texture object
+
+	/// @param[in] width		width, in pixels
+	/// @param[in] height		height, in pixels
+	/// @param[in] depth		depth, in pixels
+	/// @param[in] format		format of pixel data
+	/// @param[in] type			data type of pixel data
+	/// @param[in] clientAlloc	allocate data on the client
 	Texture(
 		unsigned width, unsigned height, unsigned depth,
 		Graphics::Format format=Graphics::RGBA, Graphics::DataType type=Graphics::UBYTE,
-		bool allocate=true
+		bool clientAlloc=true
 	);
 	
-	/** 
-		Construct a Texture object from an Array header:
-	**/
+
+	/// Construct a Texture object from an Array header:
 	Texture(AlloArrayHeader& header);
 	
 	void configure(AlloArrayHeader& header);
@@ -129,7 +138,7 @@ public:
 	Texture& format(Format v){ return update(v, mFormat, mPixelsUpdated); }
 	Texture& texelFormat(int v){ return update(v, mTexelFormat, mPixelsUpdated); }
 	Texture& target(Target v){ return update(v, mTarget, mPixelsUpdated); }
-	Texture& type(DataType v){ return update(v, mType  , mPixelsUpdated); }
+	Texture& type(DataType v){ return update(v, mType, mPixelsUpdated); }
 
 	Texture& width (unsigned v){ return update(v, mWidth, mPixelsUpdated); }
 	Texture& height(unsigned v){ return update(v, mHeight,mPixelsUpdated); }
@@ -144,9 +153,10 @@ public:
 	Texture& wrap(Wrap S, Wrap T){ return wrap(S,T,mWrapR); }
 	Texture& wrap(Wrap S, Wrap T, Wrap R);
 
-	/// bind the texture (to a multitexture unit)
+	/// Bind the texture (to a multitexture unit)
 	void bind(int unit = 0);
-	/// unbind the texture (from a multitexture unit)
+	
+	/// Unbind the texture (from a multitexture unit)
 	void unbind(int unit = 0);
 	
 	/// Render the texture onto a quad on the XY plane
@@ -197,15 +207,6 @@ public:
 	/// debug printing
 	void print();
 
-
-	Texture& updatePixels(){
-		warnOnce("Texture::updatePixels() deprecated, use Texture::dirty()");
-		return dirty(); }
-
-	void submit(){
-		warnOnce("Texture::submit() deprecated, use Texture::dirty()");
-		dirty(); }
-
 protected:
 //	int mLevel;	// TODO: on a rainy day...
 //	int mBorder;
@@ -225,26 +226,17 @@ protected:
 	bool mParamsUpdated;
 	bool mPixelsUpdated;
 	
+
+	virtual void onCreate();
+	virtual void onDestroy();
 	
-	virtual void onCreate(){
-		//printf("Texture onCreate\n");
-		glGenTextures(1, (GLuint *)&mID);
-		sendParams();
-		sendPixels();
-		Graphics::error("creating texture");
-	}
-	
-	virtual void onDestroy(){
-		glDeleteTextures(1, (GLuint *)&mID);
-	}
-	
-	/// ensures that the internal Array format matches the texture format
+	// ensures that the internal Array format matches the texture format
 	void resetArray(unsigned align);
 
-	/// send any pending parameter updates to GPU or do immediately if forced
+	// send any pending parameter updates to GPU or do immediately if forced
 	void sendParams(bool force=true);
 	
-	/// send any pending pixels updates to GPU or do immediately if forced
+	// send any pending pixels updates to GPU or do immediately if forced
 	void sendPixels(bool force=true);
 
 	/// determines target (e.g. GL_TEXTURE_2D) from the dimensions
@@ -256,6 +248,10 @@ protected:
 		if(v!=var){ var=v; flag=true; } 
 		return *this; 
 	}
+
+public: // deprecated
+	Texture& updatePixels();
+	void submit();
 };
 
 
