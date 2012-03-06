@@ -162,7 +162,7 @@ struct MyWindow : public Window, public Freenect::Callback {
 		vrange.set(mmmx.max()-mmmx.min(), mmmy.max()-mmmy.min(), mmmz.max()-mmmz.min());
 		
 		
-		depthTex.updatePixels();
+		depthTex.dirty();
 		
 	}
 

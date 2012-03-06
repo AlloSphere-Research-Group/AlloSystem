@@ -25,7 +25,7 @@ void Freenect::depth_cb(freenect_device *dev, void *depth, uint32_t timestamp) {
 	Callback * cb = (Callback * )freenect_get_user(dev);
 	if (cb) {
 		cb->depth.array().data.ptr = (char *)depth;
-		cb->depth.updatePixels();
+		cb->depth.dirty();
 		cb->onDepth(cb->depth, timestamp); 
 	}
 }
@@ -34,7 +34,7 @@ void Freenect::video_cb(freenect_device *dev, void *video, uint32_t timestamp) {
 	Callback * cb = (Callback * )freenect_get_user(dev);
 	if (cb) {
 		cb->video.array().data.ptr = (char *)video;
-		cb->video.updatePixels();
+		cb->video.dirty();
 		cb->onVideo(cb->video, timestamp);
 	}
 }

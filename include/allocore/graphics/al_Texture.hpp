@@ -35,9 +35,9 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
+#include "allocore/system/al_Printing.hpp"
 #include "allocore/types/al_Array.hpp"
 #include "allocore/types/al_Color.hpp"
-
 #include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_GPUObject.hpp"
 
@@ -198,10 +198,13 @@ public:
 	void print();
 
 
-	// DEPRECATED: use dirty()
-	Texture& updatePixels(){ return dirty(); }
-	// DEPRECATED: use dirty()
-	void submit(){ dirty(); }
+	Texture& updatePixels(){
+		warnOnce("Texture::updatePixels() deprecated, use Texture::dirty()");
+		return dirty(); }
+
+	void submit(){
+		warnOnce("Texture::submit() deprecated, use Texture::dirty()");
+		dirty(); }
 
 protected:
 //	int mLevel;	// TODO: on a rainy day...
