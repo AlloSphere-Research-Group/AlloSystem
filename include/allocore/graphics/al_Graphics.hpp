@@ -251,9 +251,12 @@ public:
 	void popMatrix();
 	void loadIdentity();
 	void loadMatrix(const Matrix4d &m);
+	void loadMatrix(const Matrix4f &m);
 	void multMatrix(const Matrix4d &m);
+	void multMatrix(const Matrix4f &m);
 	void modelView(const Matrix4d& m){ matrixMode(MODELVIEW); loadMatrix(m); }
 	void projection(const Matrix4d& m){ matrixMode(PROJECTION); loadMatrix(m); }
+	void projection(const Matrix4f& m){ matrixMode(PROJECTION); loadMatrix(m); }
 	void translate(double x, double y, double z);
 	void rotate(double angle, double x, double y, double z);
 	void rotate(const Quatd& q);
@@ -389,7 +392,9 @@ inline void Graphics::pushMatrix(){ glPushMatrix(); }
 inline void Graphics::popMatrix(){ glPopMatrix(); }
 inline void Graphics::loadIdentity(){ glLoadIdentity(); }
 inline void Graphics::loadMatrix(const Matrix4d& m){ glLoadMatrixd(m.elems()); }
+inline void Graphics::loadMatrix(const Matrix4f& m){ glLoadMatrixf(m.elems()); }
 inline void Graphics::multMatrix(const Matrix4d& m){ glMultMatrixd(m.elems()); }
+inline void Graphics::multMatrix(const Matrix4f& m){ glMultMatrixf(m.elems()); }
 inline void Graphics::translate(double x, double y, double z){ glTranslated(x,y,z); }
 inline void Graphics::rotate(double angle, double x, double y, double z){ glRotated(angle,x,y,z); }
 inline void Graphics::rotate(const Quatd& q) {
