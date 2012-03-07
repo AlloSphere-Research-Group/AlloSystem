@@ -48,7 +48,7 @@ template<typename T=float>
 class Field3D {
 public:
 	
-	Field3D(int components, int dim) 
+	Field3D(int components=1, int dim=32) 
 	:	mDim(ceilPow2(dim)),
 		mDim3(mDim*mDim*mDim),
 		mDimWrap(mDim-1),
@@ -100,6 +100,7 @@ public:
 	/// add intensity at a particular location:
 	template<typename T1>
 	void add(const Vec<3,T1> pos, const T * elems);
+	void add(int x, int y, int z, const T * elems);
 	/// single component case:
 	template<typename T1>
 	void add(const Vec<3,T1> pos, T elem);
@@ -201,6 +202,9 @@ public:
 	void addVelocity(const Vec<3,T1> pos, const Vec<3,T> vel) {
 		velocities.add(pos, vel.elems());
 	}
+	void addVelocity(int x, int y, int z, const Vec<3,T> vel) {
+		velocities.add(x, y, z, vel.elems());
+	}
 	
 	template<typename T1>
 	void readVelocity(const Vec<3,T1> pos, Vec<3,T>& vel) const {
@@ -208,8 +212,13 @@ public:
 	}
 	
 	template<typename T1>
-	void readGradient(const Vec<3,T1> pos, float& vel) const {
-		gradient.read(pos, &vel);
+	void addGradient(const Vec<3,T1> pos, float& g) {
+		gradient.add(pos, &g);
+	}
+	
+	template<typename T1>
+	void readGradient(const Vec<3,T1> pos, float& g) const {
+		gradient.read(pos, &g);
 	}
 	
 	/// fluid simulation step
@@ -238,6 +247,9 @@ public:
 		velocities.scale(selfdecay);
 		// zero velocities at boundaries:
 		boundary();
+		
+		gradient.front().zero();
+		gradient.back().zero();
 	}
 	
 	void boundary() {
@@ -254,8 +266,8 @@ public:
 	}
 	
 	void project() {
-		// prepare new gradient data:
 		gradient.back().zero();
+		// prepare new gradient data:
 		velocities.calculateGradientMagnitude(gradient.front());
 		// diffuse it:
 		gradient.diffuse(0.5, passes/2);
@@ -403,6 +415,11 @@ template<typename T>
 template<typename T1>
 inline void Field3D<T>::add(const Vec<3,T1> pos, const T * elems) {
 	front().write_interp(elems, pos);
+}
+
+template<typename T>
+inline void Field3D<T>::add(int x, int y, int z, const T * elems) {
+	front().write(elems, x, y, z);
 }
 // single component case:
 template<typename T>
@@ -866,6 +883,7 @@ inline void Field3D<T> :: advect(const Array& velocities, T rate) {
 template<typename T>
 inline void Field3D<T> :: calculateGradientMagnitude(Array& gradient) {
 	gradient.format(1, Array::type<T>(), mDim, mDim, mDim);
+	
 	const size_t stride0 = stride(0);
 	const size_t stride1 = stride(1);
 	const size_t stride2 = stride(2);
@@ -892,8 +910,8 @@ inline void Field3D<T> :: calculateGradientMagnitude(Array& gradient) {
 				const T zgrad = CELL(iptr, x,	y,	z+1,2) - CELL(iptr, x,	y,	z-1,2);
 				// gradient at current cell:
 				const T grad = h * (xgrad+ygrad+zgrad);
-				// store in a 1-plane field
-				CELLG(gptr, x, y, z) = grad;
+				// add to 1-plane field
+				CELLG(gptr, x, y, z) += grad;
 			}
 		}
 	}

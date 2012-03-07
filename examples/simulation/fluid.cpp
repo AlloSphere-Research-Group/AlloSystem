@@ -29,6 +29,7 @@ Graphics gl;
 Mesh mesh;
 ShaderProgram shaderP;
 Shader shaderV, shaderF;
+rnd::Random<> rng;
 
 static const char * srcV = AL_STRINGIFY(
 uniform sampler3D velocityTex; 
@@ -113,12 +114,14 @@ struct MyWindow : public Window {
 		gl.loadMatrix(Matrix4d::lookAt(Vec3d(16, 16, 64), Vec3d(16, 16, 16), Vec3d(0,1,0)));
 		
 		
-		// add some forces:
-		float t = MainLoop::now() * 0.25;
-		float r = 20;
-		fluid.addVelocity(Vec3f(12, 12, 16), Vec3f(r*cos(t), r*sin(t), 1));
-		fluid.addVelocity(Vec3f(20, 20, 16), Vec3f(-r*cos(t*2), -r*sin(t*2), 0));
-		fluid.addVelocity(Vec3f(16, 16, 20), Vec3f(0, -r*cos(t*3), -r*sin(t*3)));
+//		// add some forces:
+//		float t = MainLoop::now() * 0.25;
+//		float r = 20;
+//		fluid.addVelocity(Vec3f(12, 12, 16), Vec3f(r*cos(t), r*sin(t), 1));
+//		fluid.addVelocity(Vec3f(20, 20, 16), Vec3f(-r*cos(t*2), -r*sin(t*2), 0));
+//		fluid.addVelocity(Vec3f(16, 16, 20), Vec3f(0, -r*cos(t*3), -r*sin(t*3)));
+
+
 		
 		// add some intensities:
 		float v = 4;
@@ -126,9 +129,54 @@ struct MyWindow : public Window {
 		intensities.add(Vec3f(20, 12, 16), Vec3f(0, v, 0).elems());
 		intensities.add(Vec3f(16, 16, 12), Vec3f(0, 0, v).elems());
 
+		float g;
+		
+			
+			
+			g = 2;
+			fluid.addGradient(Vec3f(16, 17, 16), g);
+			g = -2;
+			fluid.addGradient(Vec3f(16, 16, 16), g);
 		
 		// run a fluid step:
 		fluid.update();
+		
+		
+//		// VELOCITIES:
+//		// add a bit of random noise:
+//		fluid.velocities.adduniformS(rng, fluid.selfbackgroundnoise);
+//		// assume new data is in front();
+//		// smoothen the new data:
+//		fluid.velocities.diffuse(fluid.viscocity, fluid.passes);
+//		// zero velocities at boundaries:
+//		fluid.boundary();
+//		// (diffused data now in velocities.front())
+//		// stabilize: 
+//		fluid.project();
+////			// prepare new gradient data:
+////			fluid.velocities.calculateGradientMagnitude(fluid.gradient.front());
+////			
+////			// diffuse it (swaps):
+////			fluid.gradient.diffuse(0.5, fluid.passes/2);
+////			//fluid.gradient.back().zero();
+////			
+////			
+////			// subtract from current velocities:
+////			fluid.velocities.subtractGradientMagnitude(fluid.gradient.front());
+//		
+//		// (projected data now in velocities.front())
+//		// advect velocities:
+//		fluid.velocities.advect(fluid.velocities.back(), fluid.selfadvection);
+//		// zero velocities at boundaries:
+//		fluid.boundary();
+//		// (advected data now in velocities.front())
+//		// stabilize again:
+//		fluid.project();
+//		// (projected data now in velocities.front())
+//		fluid.velocities.scale(fluid.selfdecay);
+//		// zero velocities at boundaries:
+//		fluid.boundary();
+		
 		
 		// diffuse the intensities:
 		intensities.diffuse();
