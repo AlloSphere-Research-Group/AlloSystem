@@ -242,17 +242,18 @@ public:
 		const T fn2 = f*n2;
 		return Matrix4(	n2/W,	0,		W2/W,		0, 
 						0,		n2/H,	H2/H,		0, 
-						0,		0,		-D2/D,	-fn2/D,
+						0,		0,		-D2/D,		-fn2/D,
 						0,		0,		-1,			0 );
 	}
 	
 	static const Matrix4 perspective(T fovy, T aspect, T near, T far) {
 		float f = 1/tan(fovy*M_DEG2RAD/2.);
-		return Matrix4(
-			f/aspect,	0, 0,						0,
-			0,			f, 0,						0,
-			0,			0, (far+near)/(near-far),	(2*far*near)/(near-far),
-			0,			0, -1,						0
+		const T D = far-near;	const T D2 = far+near;
+		const T fn2 = far*near*2;
+		return Matrix4(	f/aspect,	0,	0,			0,
+						0,			f,	0,			0,
+						0,			0,	-D2/D,		-fn2/D,
+						0,			0,	-1,			0
 		);
 	}
 	

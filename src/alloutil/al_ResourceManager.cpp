@@ -48,6 +48,7 @@ bool ResourceManager::read(std::string filename) {
 			printf("loaded %s\n", info.path.c_str());
 			File f(info.path, "r", true);
 			info.data = f.readAll();
+			info.loaded = true;
 			f.close();
 			return true;
 		}
@@ -55,9 +56,11 @@ bool ResourceManager::read(std::string filename) {
 	return false;
 }
 
-void ResourceManager::poll() {
+bool ResourceManager::poll() {
+	bool changed = 0;
 	for (FileMap::iterator it=mFileMap.begin(); it!=mFileMap.end(); it++) {
 		std::string name = it->first;
-		read(name);
+		changed = read(name) || changed;
 	}
+	return changed;
 }

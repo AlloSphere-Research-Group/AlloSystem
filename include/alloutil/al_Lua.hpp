@@ -36,6 +36,14 @@
 #include "lua.hpp"
 #include <string>
 
+#ifndef MAX
+	#define MAX(a, b) (a > b ? a : b)
+#endif
+
+#ifndef MIN
+	#define MIN(a, b) (a < b ? a : b)
+#endif
+
 namespace al {
 
 ///! A wrapper around the lua_State:
@@ -76,6 +84,11 @@ public:
 	template<typename T>
 	T to(int idx=-1);
 	
+	///! expects a table on the stack; 
+	/// fills this table into v
+	template<typename T>
+	bool to_vec_t(T * v, int n, int idx=-1);
+	
 	///! get number of items on the stack:
 	int top() { return lua_gettop(L); }
 	
@@ -97,7 +110,7 @@ public:
 	/// function should be at stack index (top - n)
 	/// catches errors and prints a traceback to stdout
 	/// returns 0 if no errors
-	int pcall(int n=0);
+	int pcall(int n=0, const std::string& errname="Lua");
 
 	///! runs a string of code
 	/// catches errors and prints to stdout
@@ -108,6 +121,12 @@ public:
 	/// catches errors and prints to stdout
 	/// returns 0 if no errors
 	int dofile(const std::string& path);
+	
+	
+	///! preloads a C module into the Lua package registry
+	Lua& preloadlib(const std::string& name, lua_CFunction func);
+	
+	Lua& dump(const std::string& msg="Lua");
 	
 	template<typename T, int (T::*M)(lua_State *)>
 	struct Bind {
@@ -128,7 +147,7 @@ public:
 		return *this;
 	}
 	
-	int lerror(int err);
+	int lerror(int err, const std::string& errname="Lua");
 
 protected:
 	lua_State * L;
@@ -178,6 +197,22 @@ template<> inline int64_t Lua::to(int idx) { return lua_tointeger(L, idx); }
 template<> inline bool Lua::to(int idx) { return lua_toboolean(L, idx); }
 template<> inline void * Lua::to(int idx) { return lua_touserdata(L, idx); }
 
+template<typename T> 
+inline bool Lua::to_vec_t(T * v, int n, int idx) {
+	if(lua_istable(L, idx)) {
+		int len = MIN(n, lua_objlen(L, idx));
+		for(int i=0; i < len; i++) {
+			lua_rawgeti(L, idx, i+1);
+			v[i] = to<T>();
+			lua_pop(L, 1);
+		}
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
 inline Lua& Lua::setglobal(const std::string& name) { lua_setglobal(L, name.c_str()); return *this; }
 
 template<typename T>
@@ -189,17 +224,18 @@ inline Lua& Lua::getglobal(const std::string& name) {
 	lua_getglobal(L, name.c_str()); return *this;
 }
 
-inline int Lua::lerror(int err) {
+inline int Lua::lerror(int err, const std::string& errname) {
 	if (err) {
-		printf("error: %s\n", lua_tostring(L, -1));
+		printf("error (%s): %s\n", errname.c_str(), lua_tostring(L, -1));
 		lua_pop(L, 1);
 	}
 	return err;
 }
 
 
-inline int Lua::pcall(int nargs) {
+inline int Lua::pcall(int nargs, const std::string& errname) {
 	int debug_idx = -nargs-3;
+	int top = lua_gettop(L);
 	// put debug.traceback just below the function & args
 	{
 		lua_getglobal(L, "debug");
@@ -208,19 +244,62 @@ inline int Lua::pcall(int nargs) {
 		lua_insert(L, debug_idx);
 		lua_pop(L, 1); // pop debug table
 	}
-	int top = lua_gettop(L);
-	int res = lerror(lua_pcall(L, nargs, LUA_MULTRET, -nargs-2));
+//	dump("before pcall");
+	int res = lerror(lua_pcall(L, nargs, LUA_MULTRET, -nargs-2), errname);
+//	dump("after pcall");
 	int nres = lua_gettop(L) - top;
-//	int nres = lua_gettop(L) - top + nargs + 1;
-	lua_remove(L, -(nres+1)); // remove debug function from stack
+//	printf("nres %d %d\n", res, nres);
+	lua_remove(L, -1 - nres); // remove debug function from stack
+	
+	
 	return res;
 }
 
 inline int Lua::dostring(const std::string& code) {
-	return lerror(luaL_loadstring(L, code.c_str())) || pcall(0);
+	return lerror(luaL_loadstring(L, code.c_str())) || pcall(0, code);
 }
 inline int Lua::dofile(const std::string& path) {
-	return lerror(luaL_loadfile(L, path.c_str())) || pcall(0);
+	return lerror(luaL_loadfile(L, path.c_str())) || pcall(0, path);
+}
+
+inline Lua& Lua::preloadlib(const std::string& name, lua_CFunction func) {
+	lua_getglobal(L, "package");
+	lua_getfield(L, -1, "preload");
+		lua_pushcfunction(L, func);
+		lua_setfield(L, -2, name.c_str());
+	lua_pop(L, 2);
+	return *this;
+}
+
+inline Lua& Lua::dump(const std::string& msg) {
+	printf("Lua (%p): %s\n", L, msg.c_str());
+	int top = lua_gettop(L);
+	for (int i=1; i<=top; i++) {
+		switch(lua_type(L, i)) {
+			case LUA_TNIL:
+				printf("%i (-%i): nil\n", i, top+1-i); break;
+			case LUA_TBOOLEAN:
+				printf("%i (-%i): boolean (%s)\n", i, top+1-i, lua_toboolean(L, i) ? "true" : "false"); break;
+			case LUA_TLIGHTUSERDATA:
+				printf("%i (-%i): lightuserdata (%p)\n", i, top+1-i, lua_topointer(L, i)); break;
+			case LUA_TNUMBER:
+				printf("%i (-%i): number (%f)\n", i, top+1-i, lua_tonumber(L, i)); break;
+			case LUA_TSTRING:
+				printf("%i (-%i): string (%s)\n", i, top+1-i, lua_tostring(L, i)); break;
+			case LUA_TUSERDATA:
+//				printf("%i (-%i): userdata (%p)\n", i, top+1-i, lua_topointer(L, i)); break;
+				lua_getglobal(L, "tostring");
+				lua_pushvalue(L, i);
+				lua_call(L, 1, 1);
+				printf("%i (-%i): %s\n", i, top+1-i, lua_tostring(L, -1));
+				lua_pop(L, 1);
+				break;
+			default:{
+				printf("%i (-%i): %s (%p)\n", i, top+1-i, lua_typename(L, lua_type(L, i)), lua_topointer(L, i));
+			}
+		}
+	}
+	return *this;
 }
 
 } // al::

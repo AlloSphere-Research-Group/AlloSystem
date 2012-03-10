@@ -23,7 +23,8 @@ Texture :: Texture(
 	mDepth(0),
 	mUnpack(1),
 	mParamsUpdated(true),
-	mPixelsUpdated(true)
+	mPixelsUpdated(true),
+	mOwnsData(0) 
 {
 	if(alloc) allocate();
 }
@@ -47,7 +48,8 @@ Texture :: Texture(
 	mDepth(depth),
 	mUnpack(1),
 	mParamsUpdated(true),
-	mPixelsUpdated(true)
+	mPixelsUpdated(true),
+	mOwnsData(0) 
 {
 	if(alloc) allocate();
 }
@@ -61,10 +63,15 @@ Texture :: Texture(AlloArrayHeader& header)
 	mFilter(LINEAR),
 	mUnpack(1),
 	mParamsUpdated(true),
-	mPixelsUpdated(true) 
+	mPixelsUpdated(true),
+	mOwnsData(0) 
 {
 	configure(header);
 	mArray.dataCalloc();
+}
+
+Texture :: ~Texture() {
+	if (!mOwnsData) mArray.data.ptr = 0;
 }
 
 void Texture::onCreate(){

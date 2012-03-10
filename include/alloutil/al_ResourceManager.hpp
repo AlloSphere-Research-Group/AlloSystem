@@ -53,6 +53,7 @@ public:
 		std::string path;
 		std::string data;
 		al_sec modified;
+		bool loaded;	// flag signals when file has been read
 
 		FileInfo() : modified(0) {}
 		FileInfo(const FileInfo& cpy) : path(cpy.path), modified(cpy.modified) {}
@@ -75,7 +76,8 @@ public:
 	std::string data(std::string filename);
 
 	///! updates the modified/changed flags of all files in the filemap:
-	void poll();
+	/// returns true if any of them changed
+	bool poll();
 
 
 	///! list of paths to search for files:
@@ -127,9 +129,10 @@ public:
 		for (unsigned i=0; i<shaders.size(); i++) {
 			ShaderFile& sf = shaders[i];
 			ResourceManager::FileInfo& info = rm[sf.name];
-			if (sf.modified < info.modified) {
+			if (info.loaded) {
 				// mark as read:
 				sf.modified = info.modified;
+				info.loaded = 0;
 				// remove existing:
 				if (sf.shader.compiled()) detach(sf.shader);
 				// recompile & link:

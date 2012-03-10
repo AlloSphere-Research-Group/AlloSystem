@@ -324,13 +324,18 @@ inline bool File::searchBack(std::string& prefixPath, const std::string& matchPa
 	return i<maxDepth;
 }
 
-
 inline void SearchPaths::addAppPaths(std::string path, bool recursive) {
 	std::string filepath = File::directory(path);
 	mAppPath = filepath;
 	addSearchPath(filepath, recursive);
 }
 
+inline void SearchPaths::addAppPaths(int argc, const char ** argv, bool recursive) {
+	addAppPaths(recursive);
+	if (argc > 0) {
+		addAppPaths(File::directory(argv[0]), recursive);
+	} 
+}
 
 inline void SearchPaths::addAppPaths(int argc, char * const argv[], bool recursive) {
 	addAppPaths(recursive);

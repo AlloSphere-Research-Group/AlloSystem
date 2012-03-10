@@ -110,7 +110,7 @@ public:
 	
 	void configure(AlloArrayHeader& header);
 	
-	virtual ~Texture(){}
+	virtual ~Texture();
 
 	Format format() const { return mFormat; }
 	int texelFormat() const { return mTexelFormat; }
@@ -225,6 +225,7 @@ protected:
 //	void * mBuffer;				// internally allocated pixel buffer
 	bool mParamsUpdated;
 	bool mPixelsUpdated;
+	bool mOwnsData;
 	
 
 	virtual void onCreate();
