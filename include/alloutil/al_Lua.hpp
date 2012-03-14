@@ -84,6 +84,13 @@ public:
 	template<typename T>
 	T to(int idx=-1);
 	
+//	template<typename T>
+//	T checkto(int idx=-1) {
+//		if (!is<T>(idx)
+//			luaL_error(L, "unexpected type (index %d)", idx);
+//		return to<T>(idx);
+//	}
+	
 	///! expects a table on the stack; 
 	/// fills this table into v
 	template<typename T>

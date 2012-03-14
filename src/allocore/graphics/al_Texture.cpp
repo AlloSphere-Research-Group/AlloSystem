@@ -139,7 +139,7 @@ void Texture :: bind(int unit) {
 	sendPixels(false);
 	
 	// multitexturing:
-	glActiveTextureARB(GL_TEXTURE0_ARB + unit);
+	glActiveTexture(GL_TEXTURE0 + unit);
 
 	// bind:
 	glEnable(target());
@@ -150,7 +150,7 @@ void Texture :: bind(int unit) {
 
 void Texture :: unbind(int unit) {		
 	// multitexturing:
-	glActiveTextureARB(GL_TEXTURE0_ARB + unit);
+	glActiveTexture(GL_TEXTURE0 + unit);
 	glBindTexture(target(), 0);
 	glDisable(target());
 }
