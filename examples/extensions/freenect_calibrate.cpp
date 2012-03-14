@@ -231,8 +231,14 @@ struct MyWindow : public Window, public Freenect::Callback {
 		printf("drag %f\n", rate);
 		
 		if (keyboard().ctrl()) {
-			// scale
-			scale += (m.dx()) * rate;
+			switch (quadrant) {
+				case 1: 
+					elevation += (m.dx()) * rate / M_PI;
+					break;
+				default:
+					// scale
+					scale += (m.dx()) * rate;
+			}
 		} else {
 			// translate
 			switch (quadrant) {
