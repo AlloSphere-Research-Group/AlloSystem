@@ -462,13 +462,23 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 }
 
 void Texture :: submit(const void * pixels, uint32_t align) {
+	Graphics::error(id(), "Texture::submit (initial)");
 	validate();
 	
 	determineTarget();	// is this necessary? surely the target is already set!
+	
+	sendParams(false);
+	
+	glActiveTexture(GL_TEXTURE0);
+	Graphics::error(id(), "Texture::submit (glActiveTexture)");
+	glEnable(target());
+	Graphics::error(id(), "Texture::submit (glEnable(texture target))");
 	glBindTexture(target(), id());
+	Graphics::error(id(), "Texture::submit (glBindTexture)");
 	
 	// set glPixelStore according to layout:
 	glPixelStorei(GL_UNPACK_ALIGNMENT, mUnpack);
+	Graphics::error(id(), "Texture::submit (glPixelStorei set)");
 	
 	// void glTexImage3D(
 	//		GLenum target, GLint level, GLenum internalformat,
@@ -518,23 +528,23 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 	}
 
 	switch(mTarget){
-	case GL_TEXTURE_1D:
-		glTexImage1D(mTarget, 0, intFmt, width(), 0, format(), type(), pixels);
-		break;
-	case GL_TEXTURE_2D:
-		glTexImage2D(mTarget, 0, intFmt, width(), height(), 0, format(), type(), pixels);
-		break;
-	case GL_TEXTURE_3D:
-		glTexImage3D(mTarget, 0, intFmt, width(), height(), depth(), 0, format(), type(), pixels);
-		break;
-	default:
-		printf("invalid texture target %d\n", mTarget);
+		case GL_TEXTURE_1D:
+			glTexImage1D(mTarget, 0, intFmt, width(), 0, format(), type(), pixels);
+			break;
+		case GL_TEXTURE_2D:
+			glTexImage2D(mTarget, 0, intFmt, width(), height(), 0, format(), type(), pixels);
+			break;
+		case GL_TEXTURE_3D:
+			glTexImage3D(mTarget, 0, intFmt, width(), height(), depth(), 0, format(), type(), pixels);
+			break;
+		default:
+			printf("invalid texture target %d\n", mTarget);
 	}
+	Graphics::error(id(), "Texture::submit (glTexImage)");
 	
 	// set alignment back to default
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-	
-	Graphics::error(id(), "submitting texture");
+	Graphics::error(id(), "Texture::submit (glPixelStorei unset)");
 	
 //		// OpenGL may have changed the internal format to one it supports:
 //		GLint format;
@@ -546,7 +556,9 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 
 	//printf("submitted texture data %p\n", pixels);
 	
+	glDisable(target());
 	glBindTexture(target(), 0);
+	Graphics::error(id(), "Texture::submit (glBindTexture 0)");
 }
 
 

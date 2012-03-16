@@ -171,18 +171,19 @@ const ShaderProgram& ShaderProgram::detach(const Shader& s) const {
 	//glDetachObjectARB((GLhandleARB)handle(), (GLhandleARB)s.handle());
 	return *this; 
 }
-const ShaderProgram& ShaderProgram::link() const { 
+const ShaderProgram& ShaderProgram::link(bool validate) const { 
 	glLinkProgram(id()); 
 	//glLinkProgramARB((GLhandleARB)handle());
 	
-	int isValid;
-	glValidateProgram(id());
-	//glValidateProgramARB((GLhandleARB)handle());
-	glGetProgramiv(id(), GL_VALIDATE_STATUS, &isValid);
-	if (!isValid) {
-		Graphics::error("ShaderProgram::link");
+	if (validate) {
+		int isValid;
+		glValidateProgram(id());
+		//glValidateProgramARB((GLhandleARB)handle());
+		glGetProgramiv(id(), GL_VALIDATE_STATUS, &isValid);
+		if (!isValid) {
+			Graphics::error("ShaderProgram::link");
+		}
 	}
-		
 	return *this; 
 }
 

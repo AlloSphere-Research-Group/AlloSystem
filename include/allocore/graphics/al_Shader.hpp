@@ -167,7 +167,7 @@ public:
 	void setGeometryOutputPrimitive(Graphics::Primitive prim) { mOutPrim = prim; }
 	void setGeometryOutputVertices(unsigned int i) { mOutVertices = i; }
 
-	const ShaderProgram& link() const;
+	const ShaderProgram& link(bool validate=true) const;
 	const ShaderProgram& use();
 
 	/// Get whether program is active

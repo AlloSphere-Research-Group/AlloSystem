@@ -134,7 +134,7 @@ public:
 				sf.modified = info.modified;
 				info.loaded = 0;
 				// remove existing:
-				if (sf.shader.compiled()) detach(sf.shader);
+				if (info.modified != 0) detach(sf.shader);
 				// recompile & link:
 				sf.shader.source(info.data, sf.type).compile();
 				attach(sf.shader);
@@ -144,7 +144,7 @@ public:
 			}
 		}
 		if (relink) {
-			link();
+			link(false);
 			printLog();
 			relink = false;
 		}

@@ -200,6 +200,19 @@ public:
 
 	template<typename T, typename TP> T * cell(T* val, const Vec<2,TP> p) const { return cell(val, p[0], p[1]); }
 	template<typename T, typename TP> T * cell(T* val, const Vec<3,TP> p) const { return cell(val, p[0], p[1], p[2]); }
+	
+	/// Return a particular cell casted to a typed reference (no bounds checking)
+	template<typename T>
+	T& as(int x) { return *cell<T>(x); }
+	template<typename T>
+	T& as(int x, int y) { return *cell<T>(x,y); }
+	template<typename T>
+	T& as(int x, int y, int z) { return *cell<T>(x,y,z); }
+	/// Return casted cell indexed by a vector (no bounds checking)
+	template<typename T, typename TP>
+	T& as(const Vec<2,TP> p) { return *cell<T>(p.x,p.y); }
+	template<typename T, typename TP>
+	T& as(const Vec<3,TP> p) { return *cell<T>(p.x,p.y,p.z); }
 
 	/// Read the component values from array into val array (no bounds checking)
 	template<typename T> void read(T* val, int x) const;
@@ -235,7 +248,7 @@ public:
 
 	template<typename T, typename TP> void write(const T* val, const Vec<2,TP> p) { write(val, p[0], p[1]); }
 	template<typename T, typename TP> void write(const T* val, const Vec<3,TP> p) { write(val, p[0], p[1], p[2]); }
-
+	
 	/// Write plane values from val array into array (wraps periodically at bounds)
 	template<typename T> void write_wrap(const T* val, int x);
 	template<typename T> void write_wrap(const T* val, int x, int y);
