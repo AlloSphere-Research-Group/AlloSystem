@@ -43,21 +43,6 @@ namespace al {
 
 template<class T> class Matrix4;
 
-/*
-	The constructor will map into memory locations as follows:
-
-	Matrix4(arg1, arg2, arg3, ...)
-		
-	arg1 ->m[0]	arg2 ->m[4]	arg3 ->m[8]		arg4 ->m[12]
-	arg5 ->m[1]	arg6 ->m[5]	arg7 ->m[9]		arg8 ->m[13]
-	arg9 ->m[2]	arg10->m[6]	arg11->m[10]	arg12->m[14]
-	arg13->m[3]	arg14->m[7]	arg15->m[11]	arg16->m[15]	
-	
-	Matrix4(r1c1, r1c2, r1c3, r1c4, 
-			r2c1, r2c2, r2c3, r2c4, 
-			r3c1, r3c2, r3c3, r3c4, 
-			r4c1, r4c2, r4c3, r4c4)
-*/
 
 /// 4x4 Matrix (Homogenous Transform)
 template<typename T=double>
@@ -74,6 +59,21 @@ public:
 	)
 	{}
 
+	/*
+		The constructor will map into memory locations as follows:
+
+		Matrix4(arg1, arg2, arg3, ...)
+			
+		arg1 ->m[0]	arg2 ->m[4]	arg3 ->m[8]		arg4 ->m[12]
+		arg5 ->m[1]	arg6 ->m[5]	arg7 ->m[9]		arg8 ->m[13]
+		arg9 ->m[2]	arg10->m[6]	arg11->m[10]	arg12->m[14]
+		arg13->m[3]	arg14->m[7]	arg15->m[11]	arg16->m[15]	
+		
+		Matrix4(r1c1, r1c2, r1c3, r1c4, 
+				r2c1, r2c2, r2c3, r2c4, 
+				r3c1, r3c2, r3c3, r3c4, 
+				r4c1, r4c2, r4c3, r4c4)
+	*/
 	Matrix4(
 		const T& r1c1, const T& r1c2, const T& r1c3, const T& r1c4,
 		const T& r2c1, const T& r2c2, const T& r2c3, const T& r2c4,
@@ -227,6 +227,7 @@ public:
 						0,	0,	1,	0,
 						0,	0,	0,	1	);
 	}
+
 
 	/// @param[in] l	distance from center of near plane to left edge
 	/// @param[in] r	distance from center of near plane to right edge
@@ -476,6 +477,28 @@ public:
 
 typedef Matrix4<double>	Matrix4d;	///< Double-precision 4-by-4 matrix
 typedef Matrix4<float>	Matrix4f;	///< Single-precision 4-by-4 matrix
+
+
+
+/// Get frustum far plane distance from a projection matrix
+template <class T>
+inline T frustumFar(const Mat<4,T>& proj){
+	return proj[14] / (proj[10] + T(1)); }
+
+/// Get frustum near plane distance from a projection matrix
+template <class T>
+inline T frustumNear(const Mat<4,T>& proj){
+	return proj[14] / (proj[10] - T(1)); }
+
+/// Get frustum depth from a projection matrix
+template <class T>
+inline T frustumDepth(const Mat<4,T>& proj){
+	return (T(-2)*proj[14]) / (proj[10]*proj[10] - T(1)); }
+
+/// Get frustum aspect ratio from a projection matrix
+template <class T>
+inline T frustumAspect(const Mat<4,T>& proj){
+	return proj[5] / proj[0]; }
 
 } // al::
 
