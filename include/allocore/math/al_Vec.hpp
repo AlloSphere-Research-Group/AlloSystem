@@ -315,7 +315,7 @@ public:
 	/// Returns p-norm of elements
 	
 	/// The p-norm is pth root of the sum of the absolute value of the elements 
-	/// raised to the pth, (sum |x_n|^p) ^ (1/p).
+	/// raised to the pth power, (sum |x_n|^p) ^ (1/p).
 	T norm(const T& p) const {
 		using namespace std;
 		T r = pow(abs((*this)[0]), p);
@@ -323,7 +323,7 @@ public:
 		return pow(r, T(1)/p);		
 	}
 
-	/// Return 1-norm (sum) of elements
+	/// Return 1-norm of elements
 	T norm1() const { return sumAbs(); }
 	
 	/// Return 2-norm of elements
