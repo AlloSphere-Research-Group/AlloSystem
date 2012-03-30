@@ -79,13 +79,7 @@ template<> struct Twiddle<double>{
 	union{ int64_t i; uint64_t u; double f; };
 };
 
-/// swap byte order for a number:
-template<typename T> 
-void swapbytes(T * ptr);
 
-/// swap byte order for an array of numbers:
-template<typename T>
-inline void swapbytes(T * ptr, unsigned count);
 
 /// Convert decimal integer to ascii base-36 character
 char base10To36(int dec10);
