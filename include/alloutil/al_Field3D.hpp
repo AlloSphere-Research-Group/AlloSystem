@@ -71,6 +71,10 @@ public:
 	const Array& front() const { return mFront ? mArray0 : mArray1; }
 	const Array& back() const { return mFront ? mArray1 : mArray0; }
 	
+	// returns true if the vector v is outside of the field boundaries
+	template <typename T1>
+	inline bool oob(Vec<3,T1> v);
+	
 	/// read the intensity at a particular location:
 	template<typename T1>
 	void read(const Vec<3,T1> pos, T * elems) const;
@@ -333,6 +337,15 @@ public:
 };
 
 // INLINE IMPLEMENTATION //
+
+// returns true if the vector v is outside of the field boundaries
+template <typename T>
+template <typename T1>
+inline bool Field3D<T>::oob(Vec<3,T1> v) {
+	return (v[0] < 0 || v[0] >= dim() 
+		 || v[1] < 0 || v[1] >= dim() 
+		 || v[2] < 0 || v[2] >= dim());
+}
 
 template<typename T>
 inline void Field3D<T>::Kernel3::calculateCenter() {

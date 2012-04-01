@@ -123,6 +123,9 @@ public:
 	/// catches errors and prints to stdout
 	/// returns 0 if no errors
 	int dostring(const std::string& code);
+	
+	///! runs a chunk of binary bytecode
+	int dobuffer(const char * buffer, size_t size, const char * name);
 
 	///! loads and runs code from a file
 	/// catches errors and prints to stdout
@@ -160,9 +163,6 @@ protected:
 	lua_State * L;
 	bool mOwner;
 };
-
-
-
 
 inline void Lua::set(lua_State * L1) {
 	close();
@@ -260,6 +260,10 @@ inline int Lua::pcall(int nargs, const std::string& errname) {
 	
 	
 	return res;
+}
+
+inline int Lua::dobuffer(const char * buffer, size_t size, const char * name) {
+	return lerror((luaL_loadbuffer(L,(const char*)buffer,size,name) || lua_pcall(L, 0, 0, 0)));
 }
 
 inline int Lua::dostring(const std::string& code) {

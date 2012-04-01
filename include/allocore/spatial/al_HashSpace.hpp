@@ -171,6 +171,11 @@ public:
 		Construct a HashSpace
 		locations will range from [0..2^resolution)
 		
+		resolution can be 1 to 10; the dim is 2^resolution i.e. 2..1024
+		(the limit is 10 so that the hash can fit inside a uint32_t integer)
+		default 5 implies 32 units per side
+
+		
 		@param resolution determines the number of voxels as 2^resolution per axis 
 		@param numObjects set how many Object slots to initally allocate
 	*/
