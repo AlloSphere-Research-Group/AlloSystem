@@ -61,7 +61,7 @@ int addIcosahedron(Mesh& m);
 /// @param[in]		radius	radius of sphere
 /// @param[in]		slices	number of slices around z axis
 /// @param[in]		stacks	number of stacks on xy plane
-int addSphere(Mesh& m, double radius=1, int slices=8, int stacks=8);
+int addSphere(Mesh& m, double radius=1, int slices=16, int stacks=16);
 
 
 /// Add wireframe box as line vertices and indices
