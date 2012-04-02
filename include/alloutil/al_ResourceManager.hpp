@@ -38,6 +38,7 @@
 #include "allocore/io/al_File.hpp"
 #include "allocore/system/al_Watcher.hpp"
 #include "allocore/graphics/al_Shader.hpp"
+#include "alloutil/al_Lua.hpp"
 
 #include <map>
 #include <set>
@@ -184,6 +185,30 @@ protected:
 	bool relink;
 };
 
+class ManagedLuaFile {
+public:
+	ManagedLuaFile(ResourceManager& rm) : rm(rm) {}
+	
+	void watch(const std::string& filename) {
+		files.push_back(filename);
+		rm.add(filename);
+	}	
+	
+	void poll(Lua& L) {
+		for (int i=0; i<files.size(); i++) {
+			const std::string& file = files[i];
+			ResourceManager::FileInfo& info = rm[file];
+			if (info.loaded) {
+				info.loaded = 0;
+				printf("running %s\n", info.path.c_str());
+				L.dofile(info.path);
+			}
+		}
+	}
+
+	ResourceManager& rm;
+	std::vector<std::string> files;
+};
 
 } //al::
 
