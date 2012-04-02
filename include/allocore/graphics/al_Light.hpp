@@ -142,9 +142,26 @@ public:
 	template <class VEC3>
 	Light& spot(const VEC3& v, float cutoff, float expo=15){ return spot(v[0],v[1],v[2],cutoff,expo); }
 
+
+	/// Get position array
+	const float * pos() const { return mPos; }
+	float * pos(){ return mPos; }
+	
+	/// Get attenuation array
+	const float * attenuation() const { return mAtten; }
+	float * attenuation(){ return mAtten; }
+
+	/// Get ambient color
 	const Color& ambient() const { return mAmbient; }
+	Color& ambient(){ return mAmbient; }
+	
+	/// Get diffuse color
 	const Color& diffuse() const { return mDiffuse; }
+	Color& diffuse(){ return mDiffuse; }
+	
+	/// Get specular color
 	const Color& specular() const { return mSpecular; }
+	Color& specular(){ return mSpecular; }
 
 	/// Determines how global specular reflection angles are computed
 	static void localViewer(bool v);
