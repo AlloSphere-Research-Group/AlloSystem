@@ -147,9 +147,9 @@ struct MyWindow : public Window, public Freenect::Callback {
 					
 					if (!bHideOOB || !OOB) {
 						float a = 1. - OOB*0.7;
+						colors[pts].set(a, a, a);
 						vertices[pts].set(vworld.x, vworld.y, vworld.z);
 						texCoord2s[pts].set(x*ix, y*iy);
-						colors[pts].set(a, a, a);
 						pts++;
 					}
 				}

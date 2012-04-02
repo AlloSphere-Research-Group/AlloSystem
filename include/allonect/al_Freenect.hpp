@@ -43,6 +43,7 @@ public:
 		
 		// returns tilt in radians
 		double tilt();
+		void tilt(double radians);
 		
 		Texture depth, video;
 		
@@ -178,6 +179,10 @@ inline double Freenect::Callback::tilt() {
 		}
 	}
 	return t * M_DEG2RAD;
+}
+
+inline void Freenect::Callback::tilt(double radians) {
+	freenect_set_tilt_degs(dev, radians * M_RAD2DEG);
 }
 	
 // ThreadFunction:
