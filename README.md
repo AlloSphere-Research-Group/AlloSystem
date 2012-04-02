@@ -5,7 +5,10 @@ University of California, Santa Barbara
 
 
 ========================================
-### 1. About
+### About
 ========================================
 
 The AlloCore is a cross-platform suite of C++ components for building interactive multimedia tools and applications.
+
+
+
