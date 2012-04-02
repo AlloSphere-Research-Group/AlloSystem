@@ -8,7 +8,10 @@ void RBO::onCreate(){ GLuint i; glGenRenderbuffersEXT(1,&i); mID=i; }
 void RBO::onDestroy(){ GLuint i=id(); glDeleteRenderbuffersEXT(1,&i); }
 
 bool RBO::resize(unsigned w, unsigned h){
-	begin(); return resize(format(), w, h);
+	begin(); 
+	bool r = resize(format(), w, h);
+	end();
+	return r;
 }
 
 // static functions
