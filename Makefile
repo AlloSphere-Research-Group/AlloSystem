@@ -116,7 +116,7 @@ allocore: $(LIB_PATH)
 	done
 
 
-allojit alloutil alloni allonect:
+allojit alloutil alloni allonect: allocore
 	@$(MAKE) --no-print-directory -C src/$@ install BUILD_DIR=../../$(BUILD_DIR) DESTDIR=../../$(BUILD_DIR)
 
 
