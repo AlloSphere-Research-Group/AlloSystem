@@ -195,7 +195,7 @@ public:
 	}	
 	
 	void poll(Lua& L) {
-		for (int i=0; i<files.size(); i++) {
+		for (unsigned i=0; i<files.size(); i++) {
 			const std::string& file = files[i];
 			ResourceManager::FileInfo& info = rm[file];
 			if (info.loaded) {
