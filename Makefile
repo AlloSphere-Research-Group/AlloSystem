@@ -72,6 +72,7 @@ runobjs: $(RUN_OBJS)
 .PHONY: %.hpp
 %.hpp:
 
+
 # Compile and run source files in examples/ folder
 # FIXME: this rule should only work for .cpp and .c
 EXEC_TARGETS  = $(addsuffix %.cpp, $(RUN_DIRS)) $(addsuffix %.c, $(RUN_DIRS))
@@ -86,26 +87,6 @@ ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./$(*F)
 endif
 
-#EXEC_TARGETS := $(filter-out $(RUN_SRCS), $(EXEC_TARGETS))
-#$(EXEC_TARGETS): -include ./$(@D)/Makefile.config
-#$(filter-out $(RUN_SRCS), $(EXEC_TARGETS)): allocore alloutil
-
-# Build (and run) from one or more source files in a directory
-#EXEC_DIR_TARGETS = examples/%
-#.PRECIOUS: $(EXEC_DIR_TARGETS)
-#$(EXEC_DIR_TARGETS): LSRC = $(wildcard $@/*.cpp) $(wildcard $@/*.c)
-#$(EXEC_DIR_TARGETS): EXEC_NAME = $(subst /,_,$(*D))
-#$(EXEC_DIR_TARGETS): allocore alloutil
-#ifneq ($(*D), .)
-##	@echo $(EXEC_NAME)
-##	@echo $(LSRC)
-#	@echo run folder: $@
-#	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(EXEC_NAME) $(LSRC) $(LDFLAGS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) -I$@
-#ifneq ($(AUTORUN), 0)
-#	@cd $(BIN_DIR) && ./$(EXEC_NAME)
-#endif
-#endif
-
 
 extended: all alloni
 
@@ -115,22 +96,25 @@ all: extensions externals
 extensions: alloutil allocore
 
 allocore: $(LIB_PATH)
-#	Copy main header files into build directory
+# 	Copy main header files to build directory
 	@for v in `cd $(INC_DIR)/$@ && find * -type d ! -path '*.*'` .; do\
 		$(INSTALL) -d $(BUILD_DIR)/include/$@/$$v;\
 		$(INSTALL) -C -m 644 $(INC_DIR)/$@/$$v/*.h* $(BUILD_DIR)/include/$@/$$v;\
 	done
 
-#	Copy library dependencies
-#	Copying only occurs if the destination file doesn't exist or the source file is newer
+# 	Copy dependency headers to build folder
+	@(cd $(DEV_DIR)/include && tar -cf - `find . -type f ! -name ".*" ! -path "*.svn*" -print` )\
+		| ( cd $(BUILD_DIR)/include && tar xBf - )
+
+# 	Copy dependency binaries to build folder
+# 	Copying only occurs if the destination file doesn't exist or the source file is newer
 	@for v in `cd $(DEV_LIB_DIR) && find . -name \*.$(SLIB_EXT) -or -name \*.$(DLIB_EXT)`; do\
 		if [ $(DEV_LIB_DIR)/$$v -nt $(BUILD_DIR)/lib/$$v ] || [ ! -e $(BUILD_DIR)/lib/$$v ]; then\
 			echo Copying $(DEV_LIB_DIR)/$$v to $(BUILD_DIR)/lib/;\
 			$(INSTALL) -C -m 644 $(DEV_LIB_DIR)/$$v $(BUILD_DIR)/lib/;\
 		fi;\
 	done
-	
-#	@$(MAKE) install DESTDIR=$(BUILD_DIR)
+
 
 allojit alloutil alloni allonect:
 	@$(MAKE) --no-print-directory -C src/$@ install BUILD_DIR=../../$(BUILD_DIR) DESTDIR=../../$(BUILD_DIR)
@@ -144,23 +128,19 @@ gamma glv:
 	@$(MAKE) --no-print-directory -C externals/$@ external
 
 
-#$(EXTRA_MODULES):
-#	@$(MAKE) -C modules/$@ external
-#	@$(MAKE) -C modules/$@ install DESTDIR=`pwd`/$(BUILD_DIR)
-
 
 # Install library into path specified by DESTDIR
 # Include files are copied into DESTDIR/include/LIB_NAME
 # Library files are copied into DESTDIR/lib
 install: allocore
 
-#	copy all header files from local build directory to destination
+#	Install header files from local build directory into DESTDIR
 	@for v in `cd $(BUILD_DIR)/include && find * -type d ! -path '*.*'`; do \
 		$(INSTALL) -d $(DESTDIR)/include/$$v; \
 		$(INSTALL) -C -m 644 $(BUILD_DIR)/include/$$v/*.h* $(DESTDIR)/include/$$v;\
 	done
 
-# 	copy all library files from local build directory to destination
+# 	Install library files from local build directory into DESTDIR
 	@for v in `cd $(BUILD_DIR)/lib && find * -type d ! -path '*.*'` .; do \
 		$(INSTALL) -d $(DESTDIR)/lib/$$v; \
 		$(INSTALL) -C -m 644 $(BUILD_DIR)/lib/$$v/*.a $(DESTDIR)/lib/$$v; \
@@ -178,10 +158,13 @@ archive:
 	@echo Compression complete.
 	@$(RM) -R $($@_TMP)
 
+
+#
 buildtest: allocore gamma glv test
 	@for v in graphics gui io simulation sound spatial system; do \
 		$(MAKE) --no-print-directory examples/$$v/*.cpp AUTORUN=0; \
 	done
+
 
 # Remove build files
 .PHONY: clean
@@ -191,6 +174,7 @@ clean:
 	$(call RemoveDir, $(TEST_DIR)/$(OBJ_DIR))
 	@$(MAKE) -C externals/gamma clean
 	@$(MAKE) -C externals/glv clean
+
 
 # Build unit tests
 test: allocore external
