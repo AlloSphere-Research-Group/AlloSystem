@@ -3,14 +3,17 @@
 #=========================================================================
 
 LIB_NAME	= alloutil
-INC_DIR		= ../../include/$(LIB_NAME)/
+ROOT_DIR	= ../../
+INC_DIR		= $(ROOT_DIR)include/$(LIB_NAME)/
 SRC_DIR		= ./
 VPATH		= $(SRC_DIR)
 
 SRCS		:= $(wildcard $(SRC_DIR)/*.c*)
 OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
-CPPFLAGS	+= -I../../include -I../../externals/glv/ -I../../externals/gamma/
+CPPFLAGS	+= -I$(BUILD_DIR)include
+CPPFLAGS	+= $(addprefix -I$(ROOT_DIR), include externals/glv/ externals/gamma/)
+
 
 include ../../Makefile.common
 include ../../Makefile.rules
