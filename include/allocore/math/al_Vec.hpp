@@ -495,7 +495,7 @@ inline Vec<N,T> max(const Vec<N,T>& a, const Vec<N,T>& b){
 
 template <int N, class T>
 Vec<N,T>& Vec<N,T>::normalize(T scale){
-	float m = mag();
+	T m = mag();
 	if(m > T(1e-20)){
 		(*this) *= (scale/m);
 	}
