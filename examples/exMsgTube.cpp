@@ -109,7 +109,7 @@ AudioIO audio;
 MyWindow win1;
 
 int main(){    
-    win1.create(Window::Dim(800, 600), "Allocore Example: Camera");
+    win1.create(Window::Dim(800, 600), "Allocore Example: MsgTube");
 	
 	audio.append(win1);
 	audio.start();

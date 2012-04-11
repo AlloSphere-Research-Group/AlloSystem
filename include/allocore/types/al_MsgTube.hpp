@@ -33,8 +33,8 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
-#include "allocore/types/jack/ringbuffer.h"
 #include "allocore/system/al_Time.h"
+#include "allocore/types/al_SingleRWRingBuffer.hpp"
 #include <string.h>
 #include <queue>
 #include <cstring>
@@ -42,7 +42,7 @@
 #define AL_MSGTUBE_DEFAULT_SIZE_BITS (14) // 16384 bytes
 
 /*
-	A C++ wrapper around the JACK ringbuffer for deferred function calls
+	A C++ class for deferred function calls
 	Using templates for type-checked functions of variable arguments
 	Adding a cache queue to seamlessly handle buffer overflow
 */
@@ -51,10 +51,6 @@ namespace al {
 
 class MsgTube {
 public:
-	/* 
-		Timestamp applied to sent messages (should increase monotonically)
-	*/
-	al_sec now;
 
 	/* 
 		Messages in the ringbuffer have the following header structure:
@@ -64,12 +60,18 @@ public:
 		al_sec t;
 		void (*func)(char * args);
 	};
+	
+	
+	/* 
+		Timestamp applied to sent messages (should increase monotonically)
+	*/
+	al_sec now;
 
 	/*
-		JACK ringbuffer (single-reader single-writer lock-free fifo)
+		(single-reader single-writer lock-free fifo)
 	*/
-	jack_ringbuffer_t * rb;
 	size_t memsize;
+	SingleRWRingBuffer rb;
 	
 	/*
 		Cache of messages, when the ringbuffer is full
@@ -202,12 +204,12 @@ protected:
 		while (!cacheq.empty()) {
 			char * data = cacheq.front();
 			size_t size = *((size_t *)data);
-			if (size >= jack_ringbuffer_write_space(rb)) {
+			if (size >= rb.writeSpace()) {
 				return false;
 			}
 			
 			// send cached message:
-			jack_ringbuffer_write(rb, data, size);
+			rb.write(data, size);
 			delete[] data;
 			cacheq.pop();
 		}
@@ -218,9 +220,9 @@ protected:
 		if (size >= memsize) {
 			printf("ERROR WRITING TO RINGBUFFER\n");
 		} else
-		if (flushCache() && jack_ringbuffer_write_space(rb) >= size) {
+		if (flushCache() && rb.writeSpace() >= size) {
 			//printf("scheduled message\n");
-			jack_ringbuffer_write(rb, data, size);
+			rb.write(data, size);
 		} else {
 			//printf("cached message\n");
 			char * cpy = new char[size];
@@ -235,29 +237,27 @@ protected:
 */
 #pragma mark Inline Implementation
 
-inline MsgTube :: MsgTube(int bits) {
-	now = 0;
-	memsize = 1<<bits;
-	rb = jack_ringbuffer_create(memsize);
+inline MsgTube :: MsgTube(int bits) 
+:	now(0),
+	memsize(1<<bits),
+	rb(memsize)
+{
 	//printf("created buffer of %d size\n", memsize);
-	jack_ringbuffer_reset(rb);
 }
 
 inline MsgTube :: ~MsgTube() {
 	// TODO: empty the cache
-	// empty the ringbuffer
-	jack_ringbuffer_free(rb);
 }
 
 inline void MsgTube :: executeUntil(al_sec until) {
 	Header header;
-	while (jack_ringbuffer_read_space(rb) > sizeof(header)) {
-		jack_ringbuffer_peek(rb, (char *)&header, sizeof(header));
+	while (rb.readSpace() > sizeof(header)) {
+		rb.peek((char *)&header, sizeof(header));
 		if (header.t > until) {
 			return;
 		}
 		char buf[header.size];
-		jack_ringbuffer_read(rb, buf, header.size);
+		rb.read(buf, header.size);
 		(header.func)(buf);
 	}
 }
