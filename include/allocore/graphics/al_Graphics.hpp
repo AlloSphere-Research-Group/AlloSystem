@@ -122,13 +122,6 @@ public:
 		SCISSOR_TEST			= GL_SCISSOR_TEST,
 		CULL_FACE				= GL_CULL_FACE
 	};
-	
-	enum CommandMode {
-		CLIENT_BEGIN			= 1<<0,
-		CLIENT_END				= 1<<1,
-		CLIENT					= CLIENT_BEGIN | CLIENT_END,
-		SERVER					= 1<<2
-	};
 
 	enum DataType {
 		BYTE					= GL_BYTE,
@@ -310,23 +303,18 @@ public:
 	/// Draw vertex data
 	
 	/// @param[in] v		vertex data to draw
-	/// @param[in] cmdMode	command mode
-	void draw(const Mesh& v, CommandMode cmdMode = CommandMode(CLIENT|SERVER));
+	///
+	void draw(const Mesh& v);
 
 	/// Draw vertex data
 	
 	/// @param[in] numVertices	maximum number of vertices to draw. This is 
 	///							valid only for non-indexed vertex data.
 	/// @param[in] v			vertex data to draw
-	/// @param[in] cmdMode		command mode
-	void draw(int numVertices, const Mesh& v, CommandMode cmdMode = CommandMode(CLIENT|SERVER));
+	void draw(int numVertices, const Mesh& v);
 	
 	/// Draw internal vertex data
-
-	/// @param[in] cmdMode	command mode
-	///
-	void draw(CommandMode cmdMode = CommandMode(CLIENT|SERVER)){
-		draw(mMesh, cmdMode); }
+	void draw(){ draw(mMesh); }
 
 
 	// Utility functions: converting, reporting, etc.
@@ -419,10 +407,6 @@ inline void Graphics::currentColor(float r, float g, float b, float a){ glColor4
 
 inline Graphics::AttributeBit operator| (const Graphics::AttributeBit& a, const Graphics::AttributeBit& b){
 	return static_cast<Graphics::AttributeBit>(+a|+b);
-}
-
-inline Graphics::CommandMode operator| (const Graphics::CommandMode& a, const Graphics::CommandMode& b){
-	return static_cast<Graphics::CommandMode>(+a|+b);
 }
 
 } // al::
