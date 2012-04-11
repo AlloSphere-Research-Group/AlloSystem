@@ -93,13 +93,19 @@ typedef void (* audioCallback)(AudioIOData& io);
 class AudioDevice{
 public:
 
+	/// Stream mode
+	enum StreamMode{
+		INPUT	= 1,	/**< Input stream */
+		OUTPUT	= 2		/**< Output stream */
+	};
+
+
 	/// @param[in] deviceNum	Device enumeration number
 	AudioDevice(int deviceNum);
 	
 	/// @param[in] nameKeyword	Keyword to search for in device name
-	/// @param[in] input		Whether to search input devices
-	/// @param[in] output		Whether to search output devices
-	AudioDevice(const std::string& nameKeyword, bool input=true, bool output=true);
+	/// @param[in] stream		Whether to search for input and/or output devices
+	AudioDevice(const std::string& nameKeyword, StreamMode stream = INPUT | OUTPUT);
 
 	~AudioDevice();
 
@@ -126,6 +132,10 @@ private:
 	int mID;
 	const void * mImpl;
 };
+
+inline AudioDevice::StreamMode operator| (const AudioDevice::StreamMode& a, const AudioDevice::StreamMode& b){
+	return static_cast<AudioDevice::StreamMode>(+a|+b);
+}
 
 
 
