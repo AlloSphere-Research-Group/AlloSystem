@@ -86,10 +86,11 @@ public:
 	template <class T>
 	T uniformS(const T& lim){ return lim*uniformS(); }
 
-	/// Returns point within a unit N-ball
+	/// Returns point within a unit ball
 	
-	/// @param[in] point	an array of size N
-	///
+	/// To get a random point on a sphere, simply normalize the result.
+	/// \tparam		N		dimensions of ball
+	/// @param[in]	point	an array of size N
 	template <int N, class T>
 	void ball(T * point);
 
@@ -203,10 +204,11 @@ private:
 /// Get global random number generator
 inline Random<>& global(){ static Random<> r; return r; }
 
-/// Returns point within a unit N-ball
+/// Returns point within a unit ball
 
-/// @param[in] point	an array of size N
-///
+/// To get a random point on a sphere, simply normalize the result.
+/// \tparam		N		dimensions of ball
+/// @param[in]	point	an array of size N
 template <int N, class T>
 inline void ball(T * point){ global().ball<N>(point); }
 
@@ -280,7 +282,7 @@ void Random<RNG>::ball(T * point){
 			point[i] = v;
 			w += v*v;
 		}
-	} while(w >= 1.f);
+	} while(w >= T(1)); // if on or outside unit ball, try again
 }
 
 // Box-Muller transform
