@@ -33,49 +33,6 @@
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
-/*	This is a simple example demonstrating how to set up a callback
-	and process input and output buffers.
-	
-	struct MyStuff{};
-
-	// Simple: Using automatic indexing
-	void audioCBSimple(AudioIOData& io){
-		
-		MyStuff& stuff = io.user<MyStuff>();
-
-		while(io()){
-
-			float inSample1 = io.in(0);
-			float inSample2 = io.in(1);
-
-			io.out(0) = -inSample1;
-			io.out(1) = -inSample2;
-		}
-	}
-
-	// Advanced: Using manual indexing
-	void audioCB(AudioIOData& io){
-		
-		MyStuff& stuff = io.user<MyStuff>();
-
-		for(unsigned i=0; i<io.framesPerBuffer(); ++i){
-
-			float inSample1 = io.in(0,i);
-			float inSample2 = io.in(1,i);
-
-			io.out(0,i) = -inSample1;
-			io.out(1,i) = -inSample2;
-		}
-	}
-	
-	int main(){
-		MyStuff stuff;
-		
-		AudioIO audioIO(128, 44100, audioCB, &stuff, 2,2);
-		audioIO.start();
-	}
-*/
-
 
 #include <string>
 #include <vector>
@@ -105,7 +62,7 @@ public:
 	
 	/// @param[in] nameKeyword	Keyword to search for in device name
 	/// @param[in] stream		Whether to search for input and/or output devices
-	AudioDevice(const std::string& nameKeyword, StreamMode stream = INPUT | OUTPUT);
+	AudioDevice(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT));
 
 	~AudioDevice();
 
