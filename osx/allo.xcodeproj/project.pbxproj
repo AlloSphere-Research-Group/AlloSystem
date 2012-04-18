@@ -262,7 +262,6 @@
 		364D32EC14564662005D2EB0 /* al_Isosurface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 160FD0E011FA1CF4001E8987 /* al_Isosurface.cpp */; };
 		364D32EE14564662005D2EB0 /* al_MainLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF7116D527D00928703 /* al_MainLoop.cpp */; };
 		364D32EF14564662005D2EB0 /* NetworkingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1686186C12A58918002AD8AB /* NetworkingUtils.cpp */; };
-		364D32F014564662005D2EB0 /* ringbuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = 3659D755117B8AFA0065EBE4 /* ringbuffer.c */; };
 		364D32F214564662005D2EB0 /* al_Serialize.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEE7116D527D00928703 /* al_Serialize.cpp */; };
 		364D32F314564662005D2EB0 /* al_MainLoopOSX.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEF9116D527D00928703 /* al_MainLoopOSX.mm */; };
 		364D32F414564662005D2EB0 /* al_Time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFA116D527D00928703 /* al_Time.cpp */; };
@@ -895,9 +894,6 @@
 		36596984143D5DDB0024236A /* levyFlight.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = levyFlight.cpp; sourceTree = "<group>"; };
 		36596985143D5DDB0024236A /* particleSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = particleSystem.cpp; sourceTree = "<group>"; };
 		3659D750117B8A980065EBE4 /* al_MsgTube.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_MsgTube.hpp; sourceTree = "<group>"; };
-		3659D752117B8AC60065EBE4 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
-		3659D753117B8AC60065EBE4 /* ringbuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ringbuffer.h; sourceTree = "<group>"; };
-		3659D755117B8AFA0065EBE4 /* ringbuffer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ringbuffer.c; sourceTree = "<group>"; };
 		3669723C14C8765D00B82A38 /* exMRC */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exMRC; sourceTree = BUILT_PRODUCTS_DIR; };
 		3669723E14C8767400B82A38 /* mrc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mrc.cpp; sourceTree = "<group>"; };
 		366E78041405C6B70010B21A /* cubemap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cubemap.cpp; sourceTree = "<group>"; };
@@ -2386,7 +2382,6 @@
 		3622BEFD116D527D00928703 /* types */ = {
 			isa = PBXGroup;
 			children = (
-				3659D754117B8AFA0065EBE4 /* jack */,
 				1619909C11743990006FBADF /* al_Color.cpp */,
 				3638136814C8D808007A9604 /* al_Conversion.cpp */,
 				365599FB11D4013600BA01E8 /* al_MsgQueue.cpp */,
@@ -2404,23 +2399,6 @@
 				36596985143D5DDB0024236A /* particleSystem.cpp */,
 			);
 			path = simulation;
-			sourceTree = "<group>";
-		};
-		3659D751117B8AC60065EBE4 /* jack */ = {
-			isa = PBXGroup;
-			children = (
-				3659D753117B8AC60065EBE4 /* ringbuffer.h */,
-			);
-			path = jack;
-			sourceTree = "<group>";
-		};
-		3659D754117B8AFA0065EBE4 /* jack */ = {
-			isa = PBXGroup;
-			children = (
-				3659D752117B8AC60065EBE4 /* config.h */,
-				3659D755117B8AFA0065EBE4 /* ringbuffer.c */,
-			);
-			path = jack;
 			sourceTree = "<group>";
 		};
 		368672F61491EE4700E4D0D6 /* extensions */ = {
@@ -2468,7 +2446,6 @@
 		36B4124D10EFF7B8007B16D0 /* types */ = {
 			isa = PBXGroup;
 			children = (
-				3659D751117B8AC60065EBE4 /* jack */,
 				36B4125210EFF7B8007B16D0 /* al_Array.h */,
 				36B4125310EFF7B8007B16D0 /* al_Array.hpp */,
 				16198FF31173E39B006FBADF /* al_Buffer.hpp */,
@@ -3459,7 +3436,6 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "allo" */;
 			compatibilityVersion = "Xcode 3.0";
-			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -3663,7 +3639,6 @@
 				364D32EC14564662005D2EB0 /* al_Isosurface.cpp in Sources */,
 				364D32EE14564662005D2EB0 /* al_MainLoop.cpp in Sources */,
 				364D32EF14564662005D2EB0 /* NetworkingUtils.cpp in Sources */,
-				364D32F014564662005D2EB0 /* ringbuffer.c in Sources */,
 				364D32F214564662005D2EB0 /* al_Serialize.cpp in Sources */,
 				364D32F314564662005D2EB0 /* al_MainLoopOSX.mm in Sources */,
 				364D32F414564662005D2EB0 /* al_Time.cpp in Sources */,
