@@ -70,10 +70,10 @@ public:
 
 
 	/// Set element at absolute index
-	T& operator[](int i){ return atAbs(i); }
+	T& operator[](int i){ return mElems[i]; }
 	
 	/// Get element at absolute index
-	const T& operator[](int i) const { return atAbs(i); }
+	const T& operator[](int i) const { return mElems[i]; }
 
 	/// Assign value to elements
 
@@ -205,55 +205,46 @@ private:
 
 
 
-template <int N, class T>
-struct Multi{
-	typedef Multi M;
-//	Multi(){}
-//	Multi(const T& e ){ mem::set(elems, N, e); }
-//	Multi(const T* es){ mem::copy(elems, es, N); }
-
-	T elems[N];
-	
-	/// Set element at index with no bounds checking
-	T& operator[](int i){ return elems[i];}
-	
-	/// Get element at index with no bounds checking
-	const T& operator[](int i) const { return elems[i]; }
-
-	#define DO for(int i=0; i<N; ++i)
-
-	bool operator !=(const M& v){ DO{ if((*this)[i] == v[i]) return false; } return true; }
-	bool operator !=(const T& v){ DO{ if((*this)[i] == v   ) return false; } return true; }
-	M& operator   = (const M& v){ DO{ (*this)[i] = v[i]; } return *this; }
-	M& operator   = (const T& v){ DO{ (*this)[i] = v;    } return *this; }
-	bool operator ==(const M& v){ DO{ if((*this)[i] != v[i]) return false; } return true; }
-	bool operator ==(const T& v){ DO{ if((*this)[i] != v   ) return false; } return true; }
-
-	#undef DO
-
-	/// Returns size of array
-	static int size(){ return N; }
-
-	/// Zeros all elements.
-	void zero(){ memset(elems, 0, N * sizeof(T)); }
-};
-
 
 /// Fixed size shift buffer
 template <int N, class T>
-struct ShiftBuffer : public Multi<N,T>{
+class ShiftBuffer{
+public:
 
-	typedef Multi<N,T> Base;
-	using Base::elems;
-	using Base::operator=;
+	/// @param[in] v	Value to initialize all elements to
+	ShiftBuffer(const T& v=T()){ assign(v); }
 
-	ShiftBuffer(const T& v=T()){ *this = v; }
+	/// Get number of elements
+	static int size(){ return N; }
+
+	/// Get pointer to elements (read-only)
+	const T * elems() const { return &mElems[0]; }
+	
+	/// Get pointer to elements
+	T * elems(){ return &mElems[0]; }
+
+	/// Get reference to element at index
+	T& operator[](int i){ return mElems[i];}
+	
+	/// Get reference to element at index (read-only)
+	const T& operator[](int i) const { return mElems[i]; }
+
 
 	/// Push new element onto buffer. Newest element is at index 0.
 	void operator()(const T& v){
-		for(int i=N-1; i>0; --i) elems[i] = elems[i-1];
-		elems[0]=v;
+		for(int i=N-1; i>0; --i) mElems[i] = mElems[i-1];
+		mElems[0]=v;
 	}
+
+
+	/// Set all elements to argument
+	void assign(const T& v){ for(int i=0;i<N;++i) mElems[i]=v; }
+
+	/// Zero bytes of all elements
+	void zero(){ memset(mElems, 0, N * sizeof(T)); }
+
+protected:
+	T mElems[N];
 };
 
 
