@@ -50,20 +50,19 @@ public:
 
 	/// @param[in] size			Initial size
 	explicit Buffer(int size=0)
-	:	mSize(size), mPos(size-1), mElems(size)
+	:	mElems(size), mSize(size)
 	{}
 
 	/// @param[in] size			Initial size
 	/// @param[in] capacity		Initial capacity
 	Buffer(int size, int capacity)
-	:	mSize(size), mPos(size-1), mElems(capacity)
+	:	mElems(capacity), mSize(size)
 	{}
 
 	~Buffer(){}
 
 
 	int capacity() const { return mElems.size(); }		///< Returns total capacity
-	int pos() const { return mPos; }					///< Returns write position
 	int size() const { return mSize; }					///< Returns size
 	const T * elems() const { return &mElems[0]; }		///< Returns C pointer to elements
 	T * elems(){ return &mElems[0]; }					///< Returns C pointer to elements
@@ -83,11 +82,11 @@ public:
 	void assign(int n, const T& v){ mElems.assign(n,v); }
 
 	/// Get last element
-	T& last(){ return mElems[pos()]; }
-	const T& last() const { return mElems[pos()]; }
+	T& last(){ return mElems[size()-1]; }
+	const T& last() const { return mElems[size()-1]; }
 
 	/// Resets size to zero without deallocating allocated memory
-	void reset(){ mSize=0; mPos=-1; }
+	void reset(){ mSize=0; }
 
 	/// Resize buffer
 	
@@ -123,7 +122,6 @@ public:
 		else{
 			super::construct(elems()+size(), v);
 		}
-		mPos=size();
 		++mSize;
 	}
 	/// synonym for append():
@@ -148,7 +146,7 @@ public:
 	void repeatLast(){ append(last()); }
 
 
-	/// Add new elements after each existing element
+	/// Insert new elements after each existing element
 	
 	/// @param[in] n	Expansion factor; new size is n times old size
 	/// @param[in] dup	If true, new elements are duplicates of existing elements.
@@ -164,14 +162,10 @@ public:
 	}
 
 private:
-	int mSize;		// number of elements in array
-	int mPos;		// index of most recently written element
 	std::vector<T, Alloc> mElems;
-	
-	void setSize(int n){
-		mSize=n;
-		if(mPos >=n) mPos  = n-1;
-	}
+	int mSize;		// logical size array
+
+	void setSize(int n){ mSize=n; }
 };
 
 

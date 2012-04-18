@@ -213,6 +213,11 @@ int utTypes(){
 		assert(a.size() == 0);
 		assert(a.capacity() == 4);
 
+		a.append(7);
+		a.repeatLast();
+		assert(a[0] == 7);
+		assert(a[1] == 7);
+
 		// Appending another Buffer
 		{
 			Buffer<int> b(4);
