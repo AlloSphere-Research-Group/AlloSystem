@@ -40,8 +40,9 @@ namespace al{
 
 /// Buffer
 
-///
-///
+/// This buffer automatically expands itself as new elements are added.
+/// Additionally, its logical size can be reduced without triggering memory 
+/// deallocations.
 template <class T, class Alloc=std::allocator<T> >
 class Buffer : protected Alloc{
 	typedef Alloc super;
@@ -49,30 +50,29 @@ public:
 
 	/// @param[in] size			Initial size
 	explicit Buffer(int size=0)
-	:	mSize(size), mFill(0), mPos(size-1), mElems(size)
+	:	mSize(size), mPos(size-1), mElems(size)
 	{}
 
 	/// @param[in] size			Initial size
 	/// @param[in] capacity		Initial capacity
 	Buffer(int size, int capacity)
-	:	mSize(size), mFill(0), mPos(size-1), mElems(capacity)
+	:	mSize(size), mPos(size-1), mElems(capacity)
 	{}
 
 	~Buffer(){}
 
 
 	int capacity() const { return mElems.size(); }		///< Returns total capacity
-	int fill() const { return mFill; }					///< Returns buffer fill amount
 	int pos() const { return mPos; }					///< Returns write position
 	int size() const { return mSize; }					///< Returns size
 	const T * elems() const { return &mElems[0]; }		///< Returns C pointer to elements
 	T * elems(){ return &mElems[0]; }					///< Returns C pointer to elements
 
 
-	/// Set element at absolute index
+	/// Get element at index
 	T& operator[](int i){ return mElems[i]; }
 	
-	/// Get element at absolute index
+	/// Get element at index (read-only)
 	const T& operator[](int i) const { return mElems[i]; }
 
 	/// Assign value to elements
@@ -82,24 +82,12 @@ public:
 	/// is the same as the number of elements assigned. Old data may be lost.
 	void assign(int n, const T& v){ mElems.assign(n,v); }
 
-	/// Set element at absolute index
-	T& atAbs(int i){ return mElems[i]; }
-	
-	/// Get element at absolute index
-	const T& atAbs(int i) const { return mElems[i]; }
-
-	/// Set element at relative index
-	T& atRel(int i){ return mElems[wrapOnce(pos()-i, size())]; }
-	
-	/// Get element at relative index
-	const T& atRel(int i) const { return mElems[wrapOnce(pos()-i, size())]; }
-
 	/// Get last element
-	const T& last() const { return mElems[pos()]; }
 	T& last(){ return mElems[pos()]; }
+	const T& last() const { return mElems[pos()]; }
 
 	/// Resets size to zero without deallocating allocated memory
-	void reset(){ mSize=mFill=0; mPos=-1; }
+	void reset(){ mSize=0; mPos=-1; }
 
 	/// Resize buffer
 	
@@ -160,16 +148,9 @@ public:
 	void repeatLast(){ append(last()); }
 
 
-	/// Write new element to ring buffer
-	void write(const T& v){
-		++mPos; if(pos() == size()){ mPos=0; }
-		Alloc::construct(elems()+pos(), v);
-		if(fill() < size()) ++mFill; 
-	}
-
 	/// Add new elements after each existing element
 	
-	/// @param[in] n	Expansion factor
+	/// @param[in] n	Expansion factor; new size is n times old size
 	/// @param[in] dup	If true, new elements are duplicates of existing elements.
 	///					If false, new elements are default constructed.
 	template <int n, bool dup>
@@ -184,16 +165,75 @@ public:
 
 private:
 	int mSize;		// number of elements in array
-	int	mFill;		// number of elements written to buffer (up to size())
 	int mPos;		// index of most recently written element
 	std::vector<T, Alloc> mElems;
 	
 	void setSize(int n){
 		mSize=n;
-		if(mFill> n) mFill = n;
 		if(mPos >=n) mPos  = n-1;
 	}
+};
+
+
+
+
+/// Ring buffer
+
+/// This buffer allows potentially large amounts of data to be buffered without
+/// moving memory. This is accomplished by use of a moving write tap.
+template <class T, class Alloc=std::allocator<T> >
+class RingBuffer : protected Alloc {
+public:
+
+	/// Default constructor; does not allocate memory
+	RingBuffer(): mPos(-1){}
 	
+	/// @param[in] size		number of elements
+	/// @param[in] v		value to initialize elements to
+	explicit RingBuffer(unsigned size, const T& v=T()){
+		resize(size,v);
+	}
+
+	/// Get number of elements
+	int size() const { return mElems.size(); }
+	
+	/// Get absolute index of most recently written element
+	int pos() const { return mPos; }
+
+
+	/// Get element at absolute index
+	T& operator[](int i){ return mElems[i]; }
+	
+	/// Get element at absolute index (read-only)
+	const T& operator[](int i) const { return mElems[i]; }
+
+
+	/// Write new element
+	void write(const T& v){
+		++mPos; if(pos() == size()){ mPos=0; }
+		Alloc::construct(&mElems[0] + pos(), v);
+	}
+
+	/// Get reference to element relative to newest element
+	T& read(int i){ return mElems[wrapOnce(pos()-i, size())]; }
+
+	/// Get reference to element relative to newest element (read-only)
+	const T& read(int i) const { return mElems[wrapOnce(pos()-i, size())]; }
+
+
+	/// Resize buffer
+	
+	/// @param[in] n	number of elements
+	/// @param[in] v	initialization value of newly allocated elements
+	void resize(int n, const T& v=T()){
+		mElems.resize(n,v);
+		if(mPos >=n) mPos = n-1;
+	}
+
+protected:
+	std::vector<T, Alloc> mElems;
+	int mPos;
+
 	// Moves value one period closer to interval [0, max)
 	static int wrapOnce(int v, int max){
 		if(v <  0)   return v+max;
@@ -204,9 +244,12 @@ private:
 
 
 
+/// Constant size shift buffer
 
-
-/// Fixed size shift buffer
+/// This is a first-in, first-out buffer with a constant number of elements.
+/// Adding new elements to the buffer physically moves existing elements. The
+/// advantage of moving memory like this is that elements stay logically ordered
+/// making access faster and operating on the history easier.
 template <int N, class T>
 class ShiftBuffer{
 public:
@@ -246,7 +289,6 @@ public:
 protected:
 	T mElems[N];
 };
-
 
 
 

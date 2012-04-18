@@ -196,11 +196,10 @@ int utTypes(){
 		Buffer<int> a(0,2);
 		assert(a.size() == 0);
 		assert(a.capacity() == 2);
-		assert(a.fill() == 0);
+		//assert(a.fill() == 0);
 		
 		a.append(1);
 		assert(a[0] == 1);
-		assert(a.atAbs(0) == 1);
 		assert(a.size() == 1);
 		assert(a.last() == 1);
 		
@@ -244,7 +243,10 @@ int utTypes(){
 				assert(a.size() == N);
 			}
 		}
-
+	}
+	
+	{
+		RingBuffer<int> a;
 
 		// Test ring buffering
 		a.resize(4);
@@ -252,7 +254,7 @@ int utTypes(){
 
 		a.write(1);
 		a.write(2);
-		assert(a.fill() == 2);
+		//assert(a.fill() == 2);
 		
 		a.write(3);
 		a.write(4);
@@ -264,19 +266,19 @@ int utTypes(){
 		assert(a[2] == 3);
 		assert(a[3] == 4);
 		
-		assert(a.atRel(0) == 4);
-		assert(a.atRel(1) == 3);
-		assert(a.atRel(2) == 2);
-		assert(a.atRel(3) == 1);
+		assert(a.read(0) == 4);
+		assert(a.read(1) == 3);
+		assert(a.read(2) == 2);
+		assert(a.read(3) == 1);
 		
-		assert(a.fill() == 4);
+		//assert(a.fill() == 4);
 		a.write(5);
-		assert(a.fill() == 4);
+		//assert(a.fill() == 4);
 		assert(a[0] == 5);
-		assert(a.atRel(0) == 5);
-		assert(a.atRel(1) == 4);
-		assert(a.atRel(2) == 3);
-		assert(a.atRel(3) == 2);
+		assert(a.read(0) == 5);
+		assert(a.read(1) == 4);
+		assert(a.read(2) == 3);
+		assert(a.read(3) == 2);
 	}
 
 	return 0;

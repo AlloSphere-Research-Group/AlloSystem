@@ -253,8 +253,8 @@ public:
 	/// the buffer. The index must be less than or equal to bufferSize()-2.
 	float readSample(double index) const {
 		int index0 = index;
-		float a = mSound.atRel(index0);
-		float b = mSound.atRel(index0+1);
+		float a = mSound.read(index0);
+		float b = mSound.read(index0+1);
 		float frac = index - index0;
 		return ipl::linear(frac, a, b);
 	}
@@ -275,9 +275,9 @@ public:
 protected:
 	friend class AudioScene;
 	
-	Buffer<float> mSound;	// spherical wave around position
-	Pose mPose;				// current position/orientation
-	ShiftBuffer<4, Vec3d> mPosHistory; // previous positions
+	RingBuffer<float> mSound;			// spherical wave around position
+	Pose mPose;							// current position/orientation
+	ShiftBuffer<4, Vec3d> mPosHistory;	// previous positions
 	
 	double mRollOff;
 	double mNearClip, mClipRange, mAmpFar;
