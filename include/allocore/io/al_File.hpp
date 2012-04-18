@@ -57,97 +57,8 @@
 
 namespace al{
 
-// Strips a qualified path to a file (src) into a path to the containing folder (dst)
-//void path2dir(char* dst, const char* src);
 
-
-/// A pair of path (folder/directory) and file name
-class FilePath {
-public:
-	FilePath(){}
-
-	/// @param[in] file			File name without directory
-	/// @param[in] path			Directory of file
-	FilePath(const std::string& file, const std::string& path)
-	:	mPath(path), mFile(file) {}
-
-	/// @param[in] fullpath		Full path to file (directory + file name)
-	explicit FilePath(std::string fullpath);
-
-
-	/// Get file name without directory
-	const std::string& file() const { return mFile; }
-	
-	/// Get path (directory) of file
-	const std::string& path() const { return mPath; }
-
-	/// Get file with directory
-	std::string filepath() const { return path()+file(); }
-	
-	/// Returns whether file part is valid
-	bool valid() const { return file()!=""; }
-
-
-	/// Set file name without directory
-	FilePath& file(const std::string& v) { mFile=v; return *this; }
-	
-	/// Set path (directory) of file
-	FilePath& path(const std::string& v) { mPath=v; return *this; }
-
-protected:
-	std::string mPath;
-	std::string mFile;
-};
-
-
-
-/// A handy way to manage several possible search paths
-class SearchPaths {
-public:
-	typedef std::pair<std::string, bool> searchpath;
-	typedef std::list<searchpath> searchpathlist;
-	typedef std::list<searchpath>::iterator iterator;
-	
-	SearchPaths() {}
-	SearchPaths(std::string file) {
-		FilePath fp(file);
-		addAppPaths(fp.path());
-	}
-	SearchPaths(int argc, char * const argv[], bool recursive=true) { addAppPaths(argc,argv,recursive); }
-	SearchPaths(const SearchPaths& cpy) 
-	:	mSearchPaths(cpy.mSearchPaths),
-		mAppPath(cpy.mAppPath)
-	{}
-	~SearchPaths() {}
-
-	/// find a file in the searchpaths
-	FilePath find(const std::string& filename) ;
-
-	/// add a path to search in; recursive searching is optional
-	void addSearchPath(const std::string& path, bool recursive = true);
-	void addRelativePath(std::string rel, bool recursive=true) {
-		addSearchPath(appPath() + rel, recursive);
-	}
-
-	/// adds best estimate of application launch paths (cwd etc.)
-	/// can pass in argv from the main() function if desired.
-	void addAppPaths(int argc, char * const argv[], bool recursive = true);
-	void addAppPaths(int argc, const char ** argv, bool recursive = true);
-	void addAppPaths(std::string path, bool recursive = true);
-	void addAppPaths(bool recursive = true);
-
-	const std::string& appPath() const { return mAppPath; }
-	
-	void print();
-	
-	iterator begin() { return mSearchPaths.begin(); }
-	iterator end() { return mSearchPaths.end(); }
-
-protected:	
-	std::list<searchpath> mSearchPaths;
-	std::string mAppPath;
-};
-
+class FilePath;
 
 
 /// File
@@ -280,6 +191,99 @@ protected:
 	void allocContent(int n);
 	void getSize();
 };
+
+
+
+/// A pair of path (folder/directory) and file name
+class FilePath {
+public:
+	FilePath(){}
+
+	/// @param[in] file			File name without directory
+	/// @param[in] path			Directory of file
+	FilePath(const std::string& file, const std::string& path)
+	:	mPath(path), mFile(file) {}
+
+	/// @param[in] fullpath		Full path to file (directory + file name)
+	explicit FilePath(std::string fullpath);
+
+
+	/// Get file name without directory
+	const std::string& file() const { return mFile; }
+	
+	/// Get path (directory) of file
+	const std::string& path() const { return mPath; }
+
+	/// Get file with directory
+	std::string filepath() const { return path()+file(); }
+	
+	/// Returns whether file part is valid
+	bool valid() const { return file()!=""; }
+
+
+	/// Set file name without directory
+	FilePath& file(const std::string& v) { mFile=v; return *this; }
+	
+	/// Set path (directory) of file
+	FilePath& path(const std::string& v) { mPath=v; return *this; }
+
+protected:
+	std::string mPath;
+	std::string mFile;
+};
+
+
+
+/// A handy way to manage several possible search paths
+class SearchPaths {
+public:
+	typedef std::pair<std::string, bool> searchpath;
+	typedef std::list<searchpath> searchpathlist;
+	typedef std::list<searchpath>::iterator iterator;
+	
+	SearchPaths() {}
+	SearchPaths(std::string file) {
+		FilePath fp(file);
+		addAppPaths(fp.path());
+	}
+	SearchPaths(int argc, char * const argv[], bool recursive=true) { addAppPaths(argc,argv,recursive); }
+	SearchPaths(const SearchPaths& cpy) 
+	:	mSearchPaths(cpy.mSearchPaths),
+		mAppPath(cpy.mAppPath)
+	{}
+	~SearchPaths() {}
+
+	/// find a file in the searchpaths
+	FilePath find(const std::string& filename) ;
+
+	/// add a path to search in; recursive searching is optional
+	void addSearchPath(const std::string& path, bool recursive = true);
+	void addRelativePath(std::string rel, bool recursive=true) {
+		addSearchPath(appPath() + rel, recursive);
+	}
+
+	/// adds best estimate of application launch paths (cwd etc.)
+	/// can pass in argv from the main() function if desired.
+	void addAppPaths(int argc, char * const argv[], bool recursive = true);
+	void addAppPaths(int argc, const char ** argv, bool recursive = true);
+	void addAppPaths(std::string path, bool recursive = true);
+	void addAppPaths(bool recursive = true);
+
+	const std::string& appPath() const { return mAppPath; }
+	
+	void print();
+	
+	iterator begin() { return mSearchPaths.begin(); }
+	iterator end() { return mSearchPaths.end(); }
+
+protected:	
+	std::list<searchpath> mSearchPaths;
+	std::string mAppPath;
+};
+
+
+
+
 
 
 
