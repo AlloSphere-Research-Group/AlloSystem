@@ -513,16 +513,18 @@ void Mesh::unitize(bool proportional) {
 	}
 }
 
-void Mesh::translate(double x, double y, double z){
+Mesh& Mesh::translate(float x, float y, float z){
 	const Vertex xfm(x,y,z);
 	for(int i=0; i<vertices().size(); ++i)
 		mVertices[i] += xfm;
+	return *this;
 }
 
-void Mesh::scale(double x, double y, double z){
+Mesh& Mesh::scale(float x, float y, float z){
 	const Vertex xfm(x,y,z);
 	for(int i=0; i<vertices().size(); ++i)
 		mVertices[i] *= xfm;
+	return *this;
 }
 
-} // ::al
+} // al::

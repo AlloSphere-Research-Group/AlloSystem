@@ -103,11 +103,18 @@ public:
 	/// Scale all vertices to lie in [-1,1]
 	void unitize(bool proportional=true);
 
-	void scale(double x, double y, double z);
-	void scale(Vec3f v) { scale(v[0], v[1], v[2]); }
-	void scale(double s) { scale(s, s, s); }
-	void translate(double x, double y, double z);
-	void translate(Vec3f v) { translate(v[0], v[1], v[2]); }
+	/// Scale all vertices
+	Mesh& scale(float x, float y, float z);
+	Mesh& scale(float s){ return scale(s,s,s); }
+
+	template <class T>
+	Mesh& scale(const Vec<3,T>& v){ return scale(v[0],v[1],v[2]); }
+
+	/// Translate all vertices
+	Mesh& translate(float x, float y, float z);
+	
+	template <class T>
+	Mesh& translate(const Vec<3,T>& v){ return translate(v[0],v[1],v[2]); }
 	
 	/// Transform vertices by projective transform matrix
 	
@@ -115,7 +122,7 @@ public:
 	/// @param[in] begin	beginning index of vertices
 	/// @param[in] end		ending index of vertices, negative amount specify distance from one past last element
 	template <class T>
-	void transform(const Mat<4,T>& m, int begin=0, int end=-1);
+	Mesh& transform(const Mat<4,T>& m, int begin=0, int end=-1);
 
 	/// Generates indices for a set of vertices
 	void compress();
@@ -279,12 +286,13 @@ protected:
 
 
 template <class T>
-void Mesh::transform(const Mat<4,T>& m, int begin, int end){
+Mesh& Mesh::transform(const Mat<4,T>& m, int begin, int end){
 	if(end<0) end += vertices().size()+1; // negative index wraps to end of array
 	for(int i=begin; i<end; ++i){
 		Vertex& v = vertices()[i];
 		v.set(m * Vec<4,T>(v, 1));
 	}
+	return *this;
 }
 
 } // al::
