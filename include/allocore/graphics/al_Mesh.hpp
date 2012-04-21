@@ -58,6 +58,15 @@ public:
 	typedef Vec3i			TriFace;
 	typedef Vec4i			QuadFace;
 
+	typedef Buffer<Vertex>		Vertices;
+	typedef Buffer<Normal>		Normals;
+	typedef Buffer<Color>		Colors;
+	typedef Buffer<Colori>		Coloris;
+	typedef Buffer<TexCoord2>	TexCoord2s;
+	typedef Buffer<TexCoord3>	TexCoord3s;
+	typedef Buffer<Index>		Indices;
+	
+
 	/// @param[in] primitive	renderer-dependent primitive number
 	Mesh(int primitive=0): mPrimitive(primitive){}
 	
@@ -137,6 +146,7 @@ public:
 	/// @param[in] normalize	whether to normalize normals
 	void generateNormals(bool normalize=true, bool equalWeightPerFace=false);
 	
+	/// Invert direction of normals
 	void invertNormals();
 	
 	/// Creates a mesh filled with lines for each normal of the source
@@ -204,6 +214,9 @@ public:
 	void color(const HSV& v) { colors().append(v); }
 
 	/// Append color to color buffer
+	void color(const RGB& v) { colors().append(v); }
+
+	/// Append color to color buffer
 	void color(float r, float g, float b, float a=1){ color(Color(r,g,b,a)); }
 	
 	/// Append color to color buffer
@@ -260,24 +273,24 @@ public:
 	/// Get indices as quads
 //	QuadFace& indexAsQuad(){ return (QuadFace*) indices(); }
 
-	Buffer<Vertex>& vertices(){ return mVertices; }
-	Buffer<Normal>& normals(){ return mNormals; }
-	Buffer<Color>& colors(){ return mColors; }
-	Buffer<Colori>& coloris(){ return mColoris; }
-	Buffer<TexCoord2>& texCoord2s(){ return mTexCoord2s; }
-	Buffer<TexCoord3>& texCoord3s(){ return mTexCoord3s; }
-	Buffer<Index>& indices(){ return mIndices; }
+	Vertices& vertices(){ return mVertices; }
+	Normals& normals(){ return mNormals; }
+	Colors& colors(){ return mColors; }
+	Coloris& coloris(){ return mColoris; }
+	TexCoord2s& texCoord2s(){ return mTexCoord2s; }
+	TexCoord3s& texCoord3s(){ return mTexCoord3s; }
+	Indices& indices(){ return mIndices; }
 	
 protected:
 
 	// Only populated (size>0) buffers will be used
-	Buffer<Vertex> mVertices;
-	Buffer<Normal> mNormals;
-	Buffer<Color> mColors;
-	Buffer<Colori> mColoris;
-	Buffer<TexCoord2> mTexCoord2s;
-	Buffer<TexCoord3> mTexCoord3s;
-	Buffer<Index> mIndices;
+	Vertices mVertices;
+	Normals mNormals;
+	Colors mColors;
+	Coloris mColoris;
+	TexCoord2s mTexCoord2s;
+	TexCoord3s mTexCoord3s;
+	Indices mIndices;
 	
 	int mPrimitive;
 };
