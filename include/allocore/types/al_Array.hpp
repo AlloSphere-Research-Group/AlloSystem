@@ -358,9 +358,11 @@ inline Array::Array(){
 }
 
 inline Array::Array(const AlloArray& cpy){
-	(*this) = cpy;
+	data.ptr = 0;
+    (*this) = cpy;
 }
 inline Array::Array(const Array& cpy) {
+	data.ptr = 0;
     (*this) = cpy;
 }
 inline Array::Array(const AlloArrayHeader& h2){

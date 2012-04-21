@@ -76,3 +76,4 @@
 #include "allocore/types/al_Buffer.hpp"
 #include "allocore/types/al_Conversion.hpp"
 #include "allocore/types/al_Array.hpp"
+#include "allocore/types/al_SingleRWRingBuffer.hpp"

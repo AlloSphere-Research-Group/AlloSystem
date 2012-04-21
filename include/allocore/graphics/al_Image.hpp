@@ -165,10 +165,6 @@ protected:
 	bool mLoaded;			// true after image data is loaded
 };
 
-
-
-
-
 inline int Image::components(Format v){
 	switch(v){
 	case LUMINANCE:	return 1;
