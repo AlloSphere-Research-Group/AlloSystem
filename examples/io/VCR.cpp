@@ -87,6 +87,10 @@ struct App : Window {
 
 int main(){
 	App app;
+    char cwd[1024];
+    getcwd(cwd, sizeof(cwd));
+    vcr.setPath(cwd);
+    
 	
 	MainLoop::start();
 	return 0;
