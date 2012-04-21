@@ -61,8 +61,11 @@ public:
 	Vec<3,T> ntl, ntr, nbl, nbr, ftl, ftr, fbl, fbr;	///< Corners
 	Plane<T> pl[6];										///< Faces
 
+
+	const Vec<3,T>& corner(int i) const { return (&ntl)[i]; }
+
 	const Vec<3,T>& corner(int i0, int i1, int i2) const {
-		return (&ntl)[i2<<2 | i1<<1 | i0];
+		return corner(i2<<2 | i1<<1 | i0);
 	}
 
 	/// Get point in frustum corresponding to fraction along edges
@@ -99,8 +102,13 @@ public:
 	///
 	int testBox(const Vec<3,T>& xyz, const Vec<3,T>& dim) const;
 
+	/// Get axis-aligned bounding box
+	template <class V>
+	void boundingBox(Vec<3,V>& xyz, Vec<3,V>& dim) const;
+
 	/// Returns center of frustum
 	Vec<3,T> center() const { return (ntl+ntr+nbl+nbr+ftl+ftr+fbl+fbr)*0.125; }
+
 
 	/// Compute planes based on frustum corners (planes face to inside)
 	
@@ -117,6 +125,21 @@ private:
 
 
 
+template <class T>
+template <class V>
+void Frustum<T>::boundingBox(Vec<3,V>& xyz, Vec<3,V>& dim) const {
+	Vec<3,T> vmin = corner(0);
+	Vec<3,T> vmax = vmin;
+
+	for(int i=1; i<8; ++i){
+		Vec<3,T> v = corner(i);
+		vmin = min(vmin, v);
+		vmax = max(vmax, v);
+	}
+	
+	xyz = vmin;
+	dim = vmax - vmin;
+}
 
 template <class T>
 void Frustum<T>::computePlanes(){
