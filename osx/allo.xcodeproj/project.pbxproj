@@ -962,6 +962,7 @@
 		360C244411E6599F000FF335 /* exCompiler */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exCompiler; sourceTree = BUILT_PRODUCTS_DIR; };
 		360C404E11D32FED002FE91F /* al_Matrix4.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Matrix4.hpp; sourceTree = "<group>"; };
 		36115B381438DE3400E121BF /* exSimpleGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exSimpleGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
+		3615FFA41543729100036DC0 /* al_VCR.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_VCR.hpp; sourceTree = "<group>"; };
 		361AA7A312AEE173002E9DFD /* al_Mesh.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Mesh.hpp; sourceTree = "<group>"; };
 		361AA7A412AEE1AC002E9DFD /* al_Mesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Mesh.cpp; sourceTree = "<group>"; };
 		361AA8AD12AEFDF3002E9DFD /* al_GPUObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_GPUObject.cpp; sourceTree = "<group>"; };
@@ -4525,6 +4526,7 @@
 				360441AC14CF5BA200C95A2F /* al_ResourceManager.hpp */,
 				366E780B1405C75B0010B21A /* al_ShotList.hpp */,
 				36A2AE4F141850A800479687 /* al_TextureGL.hpp */,
+				3615FFA41543729100036DC0 /* al_VCR.hpp */,
 			);
 			name = include;
 			path = ../include/alloutil;
