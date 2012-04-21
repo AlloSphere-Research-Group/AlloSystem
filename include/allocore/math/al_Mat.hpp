@@ -405,14 +405,7 @@ public:
 
 	/// Scale transformation matrix by uniform amount
 	template<class V>
-	Mat& scale(const V& amount){
-		for(int C=0; C<N-1; ++C){
-			for(int R=0; R<N-1; ++R){
-				(*this)(R,C) *= amount;
-			}
-		}
-		return *this;
-	}
+	Mat& scale(const V& amount){ return scale(Vec<N-1,V>(amount)); }
 
 	/// Scale transformation matrix global coordinates
 	template<class V>
