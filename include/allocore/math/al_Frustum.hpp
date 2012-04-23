@@ -97,9 +97,10 @@ public:
 	int testSphere(const Vec<3,T>& center, float radius) const;
 	
 	/// Test whether axis-aligned box is in frustum
-	
-	/// Note: this can return a false positive
-	///
+
+	/// This will always tell you if the box is in or intersects the frustum.
+	/// Sometimes, boxes that are really outside will not be detected as so,
+	/// thus returning a false positive.
 	int testBox(const Vec<3,T>& xyz, const Vec<3,T>& dim) const;
 
 	/// Get axis-aligned bounding box
