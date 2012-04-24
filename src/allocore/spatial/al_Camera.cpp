@@ -30,7 +30,9 @@ Camera& Camera::fovx(double v, double aspect) {
 	return *this;
 }
 
-void Camera::frustum(Frustumd& f, const Pose& p, double aspect, bool isStereo) const {
+
+// @param[in] isStereo		Whether scene is in stereo (widens near/far planes to fit both eyes)
+void Camera::frustum(Frustumd& f, const Pose& p, double aspect) const {//, bool isStereo) const {
 
 	Vec3d ur, uu, uf;
 	p.directionVectors(ur, uu, uf);
@@ -42,13 +44,13 @@ void Camera::frustum(Frustumd& f, const Pose& p, double aspect, bool isStereo) c
 	double nw = nh * aspect;
 	double fw = fh * aspect;
 	
-	// This effectively creates a union between the near/far planes of the 
-	// left and right eyes. The offsets are computed by using the law
-	// of similar triangles.
-	if(isStereo){
-		nw += fabs(0.5*eyeSep()*(focalLength()-near())/focalLength());
-		fw += fabs(0.5*eyeSep()*(focalLength()- far())/focalLength());
-	}
+//	// This effectively creates a union between the near/far planes of the 
+//	// left and right eyes. The offsets are computed by using the law
+//	// of similar triangles.
+//	if(isStereo){
+//		nw += fabs(0.5*eyeSep()*(focalLength()-near())/focalLength());
+//		fw += fabs(0.5*eyeSep()*(focalLength()- far())/focalLength());
+//	}
 
 	Vec3d nc = pos + uf * near();	// center point of near plane
 	Vec3d fc = pos + uf * far();	// center point of far plane

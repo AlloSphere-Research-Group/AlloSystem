@@ -79,8 +79,7 @@ public:
 	/// @param[in] f			The resulting test frustum
 	/// @param[in] p			A position and orientation in world coordinates
 	/// @param[in] aspect		Aspect ratio (width/height) of viewport
-	/// @param[in] isStereo		Whether scene is in stereo (widens near/far planes to fit both eyes)
-	void frustum(Frustumd& f, const Pose& p, double aspect, bool isStereo=false) const;
+	void frustum(Frustumd& f, const Pose& p, double aspect) const;
 	
 	/// Returns half the height of the frustum at a given depth
 	
