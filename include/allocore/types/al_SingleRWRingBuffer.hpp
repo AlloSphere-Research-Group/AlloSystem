@@ -33,6 +33,8 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
+#include "allocore/system/pstdint.h"
+
 namespace al {
 
 class SingleRWRingBuffer {
@@ -85,26 +87,15 @@ protected:
 
 
 
-//inline unsigned long next_power_of_two(unsigned long v){
-//    --v;
-//    v |= v >> 1;
-//    v |= v >> 2;
-//    v |= v >> 4;
-//    v |= v >> 8;
-//    v |= v >>16;
-//    v |= v >>32;	// FIXME: this throws warnings if sizeof(unsigned long) == 4
-//    return v+1;
-//}
 
-template <class T>
-inline T next_power_of_two(T n){
-	T k=1;
-	--n;
-	do{
-		n |= n >> k;
-		k <<= 1;
-	} while (n & (n+1));
-	return n+1;
+inline uint32_t next_power_of_two(uint32_t v){
+	--v;
+	v |= v >> 1;
+	v |= v >> 2;
+	v |= v >> 4;
+	v |= v >> 8;
+	v |= v >>16;
+	return v+1;
 }
 
 /*
