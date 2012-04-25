@@ -38,7 +38,6 @@
 
 #include "allocore/system/al_Config.h"
 #include <string.h>
-#include <strings.h>
 #include <stdlib.h>
 
 
@@ -329,7 +328,7 @@ static inline int allo_array_equal_headers(AlloArrayHeader *h1, const AlloArrayH
 
 // Set header attributes to zero
 static inline void allo_array_header_clear(AlloArrayHeader *h) {
-	bzero(h, sizeof(AlloArrayHeader));
+	memset(h, 0, sizeof(AlloArrayHeader));
 }
 
 // Set all attributes, including header, to zero

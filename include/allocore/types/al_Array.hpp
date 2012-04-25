@@ -36,7 +36,7 @@
 #define INCLUDE_ALLO_ARRAY_HPP 1
 
 #include <stdlib.h>
-#include <strings.h>
+#include <string.h>
 #include "allocore/types/al_Array.h"
 #include "allocore/math/al_Functions.hpp"
 #include "allocore/math/al_Vec.hpp"
@@ -151,7 +151,7 @@ public:
 	void dataFree() { allo_array_free(this); }
 
 	/// Set all data to zero
-	void zero() { if(hasData()) bzero(data.ptr, size()); }
+	void zero() { if(hasData()) memset(data.ptr, 0, size()); }
 
 
 	/// Get mutable component using 1-D index

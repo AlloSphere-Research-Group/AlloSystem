@@ -35,7 +35,7 @@
 */
 
 #include <math.h>
-#include <strings.h> // bzero
+#include <string.h>
 #include <vector>
 #include <list>
 #include "allocore/types/al_Buffer.hpp"
@@ -142,7 +142,7 @@ protected:
 	unsigned mNumFrames;
 
 	void zeroAmbi(){
-		bzero(ambiChans(), mAmbiDomainChannels.size()*sizeof(ambiChans()[0]));
+		memset(ambiChans(), 0, mAmbiDomainChannels.size()*sizeof(ambiChans()[0]));
 	}
 };
 

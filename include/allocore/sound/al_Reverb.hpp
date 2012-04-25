@@ -33,7 +33,7 @@
 */
 
 #include <stdlib.h>
-#include <strings.h>
+#include <string.h>
 
 namespace al{
 
@@ -97,7 +97,7 @@ public:
 	}
 	
 	/// Zeroes all elements (byte-wise)
-	void zero(){ ::bzero(&mBuf, sizeof(mBuf)); }
+	void zero(){ ::memset(&mBuf, 0, sizeof(mBuf)); }
 
 protected:
 	int mPos;
