@@ -14,7 +14,7 @@
 #ifdef AL_LINUX
 	#include <GL/glut.h>
 #endif
-#ifdef AL_WIN32
+#ifdef AL_WINDOWS
 	#include <GL/glut.h>
 #endif
 

@@ -46,7 +46,7 @@ extern "C" {
 /**! temporal limits */
 #define AL_TIME_NSEC_NEVER (ULLONG_MAX)
 
-#ifdef AL_WIN32
+#ifdef AL_WINDOWS
 /**! print format for al_nsec */
 #define AL_NSEC_FMT "I64d"
 #else

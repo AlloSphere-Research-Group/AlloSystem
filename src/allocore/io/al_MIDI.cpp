@@ -3,7 +3,7 @@
 
 #if defined(AL_OSX)
 	#define __MACOSX_CORE__
-#elif defined(AL_WIN32)
+#elif defined(AL_WINDOWS)
 	#define __WINDOWS_MM__
 #else
 	#define __LINUX_ALSASEQ__

@@ -46,8 +46,8 @@
 
 #define AL_SYSTEM_LIB_VERSION 0.01
 
-#if defined(WIN32) || defined(__WINDOWS_MM__)
-	#define AL_WIN32 1
+#if defined(WIN32) || defined(__WINDOWS_MM__) || defined(WIN64)
+	#define AL_WINDOWS 1
 	#include <windows.h>
 	#ifdef AL_EXPORTS
 		#define AL_API __declspec(dllexport)

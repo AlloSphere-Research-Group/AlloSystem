@@ -48,7 +48,7 @@
 	}
 
 
-#elif defined(AL_WIN32)
+#elif defined(AL_WINDOWS)
 	/* Windows */
 	#include <windows.h>
 

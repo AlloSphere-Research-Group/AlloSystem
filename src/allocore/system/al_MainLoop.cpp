@@ -28,7 +28,7 @@
 			}\
 		}
 #endif
-#ifdef AL_WIN32
+#ifdef AL_WINDOWS
 	#include <windows.h>
 	#include <GL/glut.h>
 

@@ -61,7 +61,7 @@
   				fprintf(stderr, "GLEW Init Error: %s\n", glewGetErrorString(err));\
 			}\
 		}
-#elif defined(AL_WIN32)
+#elif defined(AL_WINDOWS)
 	#define AL_GRAPHICS_USE_OPENGL
 	
 	#include <windows.h>

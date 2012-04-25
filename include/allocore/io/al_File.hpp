@@ -45,7 +45,7 @@
 
 #include "allocore/system/al_Config.h"
 
-#ifdef AL_WIN32
+#ifdef AL_WINDOWS
 	#define AL_FILE_DELIMITER		'\\'
 	#define AL_FILE_DELIMITER_STR	"\\"
 #else

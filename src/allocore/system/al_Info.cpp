@@ -3,7 +3,7 @@
 #include "allocore/system/al_Config.h"
 #include "allocore/system/al_Info.hpp"
 
-#ifdef AL_WIN32
+#ifdef AL_WINDOWS
 #include <windows.h>
 #elif AL_OSX
 #include <sys/param.h>
@@ -15,7 +15,7 @@
 namespace al{
 
 int numProcessors(){
-#ifdef AL_WIN32
+#ifdef AL_WINDOWS
     SYSTEM_INFO sysinfo;
     GetSystemInfo(&sysinfo);
     return sysinfo.dwNumberOfProcessors;
