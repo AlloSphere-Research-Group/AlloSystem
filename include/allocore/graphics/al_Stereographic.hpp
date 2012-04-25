@@ -63,13 +63,15 @@ public:
 		GREEN_RED,		/**< */
 		CYAN_RED		/**< */
 	};
-	
+
+
 	Stereographic() 
 	:	mMode(ANAGLYPH), mAnaglyphMode(RED_CYAN), mClearColor(Color(0)), mSlices(24), mOmniFov(360),
 		mStereo(false), mOmni(false)
 	{}
 
 	~Stereographic(){}
+
 
 	/// Draw the scene according to the stored stereographic mode
 	
