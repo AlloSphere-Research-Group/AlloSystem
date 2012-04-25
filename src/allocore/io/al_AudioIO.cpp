@@ -474,7 +474,8 @@ int paCallback(
 	if(io.zeroNANs()){
 		for(int i=0; i<io.framesPerBuffer()*io.channelsOutDevice(); ++i){
 			float& s = (&io.out(0,0))[i];
-			if(isnan(s)) s = 0.f;
+			//if(isnan(s)) s = 0.f;
+			if(s != s) s = 0.f; // portable isnan; only nans do not equal themselves
 		}
 	}
 	
