@@ -66,15 +66,22 @@ public:
 	
 	Stereographic() 
 	:	mMode(ANAGLYPH), mAnaglyphMode(RED_CYAN), mClearColor(Color(0)), mSlices(24), mOmniFov(360),
-		mStereo(false), mOmni(0)
+		mStereo(false), mOmni(false)
 	{}
 
-	~Stereographic() {}
+	~Stereographic(){}
 
 	/// Draw the scene according to the stored stereographic mode
+	
+	/// @param[in] gl		graphics interface
+	/// @param[in] cam		local viewing frustum
+	/// @param[in] pose		viewer position and orientation
+	/// @param[in] vp		region of screen to render to
+	/// @param[in] draw		function object with drawing commands
+	/// @param[in] clear	whether to clear the color/depth buffers
 	void draw			(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
 	
-	/// So many different ways to draw :-)
+	// So many different ways to draw :-)
 	void drawMono		(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
 	void drawActive		(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
 	void drawAnaglyph	(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
@@ -82,14 +89,24 @@ public:
 	void drawLeft		(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
 	void drawRight		(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
 	
-	/// Blue line sync for active stereo (for those projectors that need it)
-	/// add this call at the end of rendering (just before the swap buffers call)
+	/// Draw blue line for active stereo sync (for those projectors that need it)
+
+	/// Add this call at the end of rendering just before the swap buffers call.
+	///
 	void drawBlueLine(double window_width, double window_height);
 	
-	Stereographic& clearColor(const Color& v){ mClearColor=v; return *this; }	///< Set background clear color
-	Stereographic& mode(StereoMode v){ mMode=v; return *this; }					///< Set stereographic mode
-	Stereographic& stereo(bool v){ mStereo=v; return *this; }					///< Set stereographic active
-	Stereographic& anaglyphMode(AnaglyphMode v) { mAnaglyphMode=v; return *this; }	///< set glasses type
+	/// Set background clear color
+	Stereographic& clearColor(const Color& v){ mClearColor=v; return *this; }
+
+	/// Set stereographic mode
+	Stereographic& mode(StereoMode v){ mMode=v; return *this; }
+
+	/// Set stereographic active
+	Stereographic& stereo(bool v){ mStereo=v; return *this; }
+
+	/// Set anaglyph mode
+	Stereographic& anaglyphMode(AnaglyphMode v){ mAnaglyphMode=v; return *this; }
+
 	/// Set omnigraphic mode
 	/// slices: sets number of sub-viewport slices to render
 	/// fov (degrees) sets field of view (horizontal)
@@ -100,10 +117,19 @@ public:
 	Stereographic& omniFov( double fov ) { mOmniFov = fov; return *this; }
 	Stereographic& omniSlices( int slices ) { mSlices = slices; return *this; }
 
-	const Color& clearColor() const { return mClearColor; }		///< Get background clear color
-	StereoMode mode() const { return mMode; }					///< Get stereographic mode
-	bool stereo() const { return mStereo; }						///< Get stereographic active
-	AnaglyphMode anaglyphMode() const { return mAnaglyphMode; }	///< get anaglyph glasses type
+	/// Get background clear color
+	const Color& clearColor() const { return mClearColor; }
+
+	/// Get stereographic mode
+	StereoMode mode() const { return mMode; }
+
+	/// Get stereographic active
+	bool stereo() const { return mStereo; }
+
+	/// Get anaglyph mode
+	AnaglyphMode anaglyphMode() const { return mAnaglyphMode; }
+
+	/// Get whether omni mode is on
 	bool omni() const { return mOmni; }
 	
 	// These accessors will be valid only during the Drawable's onDraw() event
