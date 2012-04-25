@@ -94,7 +94,8 @@ public:
 	/// Add this call at the end of rendering just before the swap buffers call.
 	///
 	void drawBlueLine(double window_width, double window_height);
-	
+
+
 	/// Set background clear color
 	Stereographic& clearColor(const Color& v){ mClearColor=v; return *this; }
 
@@ -116,6 +117,7 @@ public:
 		mOmni = enable; mSlices = slices; mOmniFov = fov; return *this; }
 	Stereographic& omniFov( double fov ) { mOmniFov = fov; return *this; }
 	Stereographic& omniSlices( int slices ) { mSlices = slices; return *this; }
+
 
 	/// Get background clear color
 	const Color& clearColor() const { return mClearColor; }
