@@ -37,7 +37,7 @@ const char * ShaderBase::log() const {
 
 void ShaderBase::printLog() const {
 	const char * s = log();
-	if(s) printf("%s\n", s);
+	if(s && s[0]) printf("%s\n", s);
 }
 
 void Shader::getLog(char * buf) const {

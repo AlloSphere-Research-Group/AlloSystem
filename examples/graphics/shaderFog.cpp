@@ -14,8 +14,8 @@ Lance Putnam, 9/2011, putnam.lance@gmail.com
 using namespace al;
 
 static const char * fogVert = AL_STRINGIFY(
-	/* 'fogCurve' determines the distribution of fog between the near and far planes. 
-	Positive values give more dense fog while negative values give less dense 
+	/* 'fogCurve' determines the distribution of fog between the near and far planes.
+	Positive values give more dense fog while negative values give less dense
 	fog. A value of	zero results in a linear distribution. */
 	uniform float fogCurve;
 
@@ -59,16 +59,16 @@ struct MyWindow : Window{
 	{}
 
 
-	bool onCreate(){		
+	bool onCreate(){
 		shaderV.source(fogVert, Shader::VERTEX).compile();
 		shaderF.source(fogFrag, Shader::FRAGMENT).compile();
 		shaderP.attach(shaderF).attach(shaderV);
 		shaderP.link();
-		
+
 		shaderV.printLog();
 		shaderF.printLog();
 		shaderP.printLog();
-		
+
 		geom.primitive(gl.TRIANGLES);
 		geom.color(Color(0));
 		Mat4f xfm;
@@ -77,11 +77,11 @@ struct MyWindow : Window{
 			xfm.setIdentity();
 			xfm.scale(Vec3f(0.1, 0.1, 1));
 			xfm.translate(Vec3f(rnd::uniformS(4.), rnd::uniformS(4.), rnd::uniform(farClip, nearClip)));
-			
+
 			int Nv = addCube(geom);
-			geom.transform(xfm, geom.vertices().size()-Nv);		
+			geom.transform(xfm, geom.vertices().size()-Nv);
 		}
-		
+
 		return true;
 	}
 
@@ -90,7 +90,7 @@ struct MyWindow : Window{
 
 		// Update model
 		phase += 0.00017; if(phase>=1) --phase;
-		
+
 		// The fog color and background color will typically be the same
 		Color fogCol(HSV(0.1, 0.5, 1));
 
@@ -122,5 +122,4 @@ int main(){
 	w.add(new StandardWindowKeyControls);
 	w.create(Window::Dim(800, 600));
 	MainLoop::start();
-	return 0;
 }
