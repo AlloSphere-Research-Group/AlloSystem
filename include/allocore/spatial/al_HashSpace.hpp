@@ -147,7 +147,7 @@ public:
 		/** 
 			finds nearest neighbor of an object
 		*/
-		Object * nearest(const HashSpace& space, Vec3d& center, uint32_t results);
+		Object * nearest(const HashSpace& space, const Object * obj);
 		
 		
 		/// get number of results:
@@ -400,7 +400,10 @@ inline int HashSpace::Query :: operator()(const HashSpace& space, const HashSpac
 }
 
 // of the matches, return the best:
-inline HashSpace::Object * HashSpace::Query :: nearest(const HashSpace& space, Vec3d& center, uint32_t results) {
+inline HashSpace::Object * HashSpace::Query :: nearest(const HashSpace& space, const Object * src) {
+	clear();
+	const Vec3d& center = src->pos;
+	uint32_t results = (*this)(space, src, space.mMaxHalfD2);
 	Object * result = 0;
 	double rd2 = space.mMaxHalfD2;
 	for (uint32_t i=0; i<results; i++) {

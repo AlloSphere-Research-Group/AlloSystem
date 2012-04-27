@@ -73,11 +73,8 @@ public:
 		gl.begin(gl.LINES);
 		for (unsigned id=0; id<space.numObjects(); id++) {
 			HashSpace::Object& o =  space.object(id);
-			HashSpace::Object * n = 0;
-			//HashSpace::Object * n = qnearest.nearest(space, &o);
-			qnearest.clear();
-			n = qnearest.nearest(space, o.pos, qnearest(space, &o));					if (n) {
-				
+			HashSpace::Object * n = qnearest.nearest(space, &o);			
+			if (n) {
 				Vec3d& v = n->pos;
 				// don't draw if it is too long:
 				if ((o.pos - v).magSqr() < limit) {
