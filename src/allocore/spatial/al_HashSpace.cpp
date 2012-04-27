@@ -22,6 +22,7 @@ HashSpace :: HashSpace(uint32_t resolution, uint32_t numObjects)
 	mMaxHalfD2 = distanceSquared(mDimHalf, mDimHalf, mDimHalf);
 	
 	mVoxels.resize(mDim3);
+	mVoxelIndicesToDistance.resize(mDim3);
 	mObjects.resize(numObjects);
 	for (unsigned i=0; i<mObjects.size(); i++) {
 		mObjects[i].id = i;
@@ -41,7 +42,7 @@ HashSpace :: HashSpace(uint32_t resolution, uint32_t numObjects)
 		for(int y=-mDimHalf; y < mDimHalf; y++) {
 			for(int z=-mDimHalf; z < mDimHalf; z++) {
 				// each voxel lives at a given distance from the origin:
-				uint32_t d = distanceSquared(x, y, z);
+				uint32_t d = distanceSquared(x-0.5, y-0.5, z-0.5);
 				//printf("%04d %04d %04d -> %8d\n", x, y, z, d);
 				// if this is within the valid query radius:
 				if (d < mMaxHalfD2) {
@@ -62,6 +63,7 @@ HashSpace :: HashSpace(uint32_t resolution, uint32_t numObjects)
 		std::vector<uint32_t>& shell = shells[d];
 		if (!shell.empty()) {
 			mDistanceToVoxelIndices[d] = mVoxelIndices.size();
+			mVoxelIndicesToDistance[mVoxelIndices.size()] = d;
 			for (unsigned j=0; j<shell.size(); j++) {
 				mVoxelIndices.push_back(shell[j]);
 			}

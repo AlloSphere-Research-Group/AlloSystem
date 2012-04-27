@@ -124,12 +124,14 @@ public:
 			
 			@param space the HashSpace object to search in
 			@param center finds objects near to this point
+			@param obj finds objects near to this object
 			@param maxRadius finds objects if they are nearer this distance
 				the maximum permissible value of radius is space.maxRadius()
 			@param minRadius finds objects if they are beyond this distance
 			@return the number of results found
 		*/ 
 		int operator()(const HashSpace& space, const Vec3d center, double maxRadius, double minRadius=0.);
+		int operator()(const HashSpace& space, const Object * obj, double maxRadius, double minRadius=0.);
 		
 		/**
 			finds all the neighbors of the given point, up to maxResults()
@@ -137,8 +139,16 @@ public:
 			
 			@param space the HashSpace object to search in
 			@param center finds objects near to this point
+			@param obj finds objects near to this object
 		*/
 		int operator()(const HashSpace& space, Vec3d center);
+		int operator()(const HashSpace& space, const Object * obj);
+		
+		/** 
+			finds nearest neighbor of an object
+		*/
+		Object * nearest(const HashSpace& space, Vec3d& center, uint32_t results);
+		
 		
 		/// get number of results:
 		unsigned size() const { return mObjects.size(); }
@@ -265,6 +275,7 @@ protected:
 	std::vector<uint32_t> mVoxelIndices;
 	/// a baked array mapping distance to mVoxelIndices offsets 
 	std::vector<uint32_t> mDistanceToVoxelIndices;
+	std::vector<uint32_t> mVoxelIndicesToDistance;
 };
 
 
@@ -303,7 +314,11 @@ inline void HashSpace::Voxel :: remove(Object * o) {
 inline int HashSpace::Query :: operator()(const HashSpace& space, Vec3d center) {
 	return (*this)(space, center, space.maxRadius());
 }
-	
+
+inline int HashSpace::Query :: operator()(const HashSpace& space, const Object * obj) {
+	return (*this)(space, obj, space.maxRadius());
+}
+
 // the maximum permissible value of radius is mDimHalf
 // if int(inner^2) == int(outer^2), only 1 shell will be queried.
 // TODO: non-toroidal version.
@@ -312,18 +327,17 @@ inline int HashSpace::Query :: operator()(const HashSpace& space, Vec3d center, 
 	uint32_t offset = space.hash(center);
 	double minr2 = minRadius*minRadius;
 	double maxr2 = maxRadius*maxRadius;
-	uint32_t iminr2 = al::max(uint32_t(0), uint32_t((minRadius-1)*(minRadius-1)));
+	uint32_t iminr2 = al::max(uint32_t(0), uint32_t(minRadius*minRadius));
 	uint32_t imaxr2 = al::min(space.mMaxHalfD2, uint32_t((maxRadius+1)*(maxRadius+1)));
 	if (iminr2 < imaxr2) { 
 		uint32_t cellstart = space.mDistanceToVoxelIndices[iminr2];
 		uint32_t cellend = space.mDistanceToVoxelIndices[imaxr2];
-		
 		for (uint32_t i = cellstart; i < cellend; i++) {
 			// offset current index by voxel grid:
 			uint32_t index = (offset + space.mVoxelIndices[i]) & space.mWrap3;
-			const Voxel& cell = space.mVoxels[index];
+			const Voxel& voxel = space.mVoxels[index];
 			// now add any objects in this voxel to the result... 
-			Object * head = cell.mObjects;
+			Object * head = voxel.mObjects;
 			if (head) {
 				Object * o = head;
 				do {
@@ -342,6 +356,65 @@ inline int HashSpace::Query :: operator()(const HashSpace& space, Vec3d center, 
 	}
 	return nres;
 }
+
+// the maximum permissible value of radius is mDimHalf
+// if int(inner^2) == int(outer^2), only 1 shell will be queried.
+// TODO: non-toroidal version.
+inline int HashSpace::Query :: operator()(const HashSpace& space, const HashSpace::Object * obj, double maxRadius, double minRadius) {
+	unsigned nres = 0;
+	const Vec3d& center = obj->pos;
+	uint32_t offset = space.hash(center);
+	double minr2 = minRadius*minRadius;
+	double maxr2 = maxRadius*maxRadius;
+	uint32_t iminr2 = al::max(uint32_t(0), uint32_t(minRadius*minRadius));
+	uint32_t imaxr2 = al::min(space.mMaxHalfD2, uint32_t((maxRadius+1)*(maxRadius+1)));
+	if (iminr2 < imaxr2) { 
+		uint32_t cellstart = space.mDistanceToVoxelIndices[iminr2];
+		uint32_t cellend = space.mDistanceToVoxelIndices[imaxr2];
+		for (uint32_t i = cellstart; i < cellend; i++) {
+			// offset current index by voxel grid:
+			uint32_t index = (offset + space.mVoxelIndices[i]) & space.mWrap3;
+			const Voxel& voxel = space.mVoxels[index];
+			// now add any objects in this voxel to the result... 
+			Object * head = voxel.mObjects;
+			if (head) {
+				Object * o = head;
+				do {
+					if (o != obj) {
+						// final check - float version:
+						Vec3d rel = space.wrapRelative(o->pos - center);
+						double d2 = rel.magSqr();
+						if (d2 >= minr2 && d2 <= maxr2) {
+							// here we could insert-sort based on distance...
+							mObjects.push_back(o);
+							nres++;
+						}
+					}
+					o = o->next;
+				} while (o != head && nres < mMaxResults);
+			}
+			if(nres == mMaxResults) break;
+		}
+	}
+	return nres;
+}
+
+// of the matches, return the best:
+inline HashSpace::Object * HashSpace::Query :: nearest(const HashSpace& space, Vec3d& center, uint32_t results) {
+	Object * result = 0;
+	double rd2 = space.mMaxHalfD2;
+	for (uint32_t i=0; i<results; i++) {
+		Object * o = mObjects[i];
+		Vec3d rel = space.wrapRelative(o->pos - center);
+		double d2 = rel.magSqr();
+		if (d2 < rd2) {
+			rd2 = d2;
+			result = o;
+		}
+	}
+	return result;
+}
+
 	
 inline void HashSpace :: numObjects(int numObjects) {
 	mObjects.clear();
