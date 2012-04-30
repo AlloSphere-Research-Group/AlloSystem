@@ -351,10 +351,10 @@ template<class T> T wrapOnce(const T& value, const T& hi=T(1));
 template<class T> T wrapOnce(const T& value, const T& hi, const T& lo);
 
 /// Returns value wrapped in [-pi, pi)
-template<class T> T wrapPhase(const T& radians);			
+template<class T> T wrapPhase(T radians);			
 
 /// Like wrapPhase(), but only wraps once
-template<class T> T wrapPhaseOnce(const T& radians);
+template<class T> T wrapPhaseOnce(T radians);
 
 
 /// Convert spherical to Cartesian coordinates in-place
@@ -869,22 +869,23 @@ TEM inline T wrapOnce(const T& v, const T& hi, const T& lo){
 	return v;
 }
 
-TEM inline T wrapPhase(const T& r_){
-	T r = r_;
+TEM inline T wrapPhase(T r){
+	// The result is		[r+pi - 2pi floor([r+pi] / 2pi)] - pi
+	// which simplified is	r - 2pi floor([r+pi] / 2pi) .
 	if(r >= T(M_PI)){
 		r -= T(M_2PI);
 		if(r < T(M_PI)) return r;
+		return r - T(long((r+M_PI)*M_1_2PI)  )*M_2PI;
 	}
 	else if (r < T(-M_PI)){
 		r += T(M_2PI);
 		if(r >= T(-M_PI)) return r;
+		return r - T(long((r+M_PI)*M_1_2PI)-1)*M_2PI;
 	}
 	else return r;
-	
-	return r - T(M_2PI) * (long)((r + T(M_PI)) * T(M_1_2PI));
 }
 
-TEM inline T wrapPhaseOnce(const T& r){
+TEM inline T wrapPhaseOnce(T r){
 	if(r >= T(M_PI))		return r - T(M_2PI);
 	else if(r < T(-M_PI))	return r + T(M_2PI);
 	return r;

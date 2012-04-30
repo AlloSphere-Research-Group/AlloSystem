@@ -624,7 +624,10 @@ int utMath(){
 	#undef T
 	}
 
-
+	#define T(x, y) assert(eq(al::wrapPhase(x), y));
+	T(0., 0.)	T( 1., 1.) T( M_PI,-M_PI) T( M_PI+1, -M_PI+1) T( 7*M_PI+1, -M_PI+1)
+				T(-1.,-1.) T(-M_PI,-M_PI) T(-M_PI-1,  M_PI-1) T(-7*M_PI+1, -M_PI+1)
+	#undef T
 
 	// Special Functions
 	{
