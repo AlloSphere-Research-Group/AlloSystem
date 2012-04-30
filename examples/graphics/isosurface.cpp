@@ -6,6 +6,7 @@ using namespace al;
 
 Graphics gl;
 Light light;
+Material mtrl;
 Camera cam;
 Nav nav(Vec3d(0,0,5));
 Stereographic stereo;
@@ -23,7 +24,13 @@ struct MyWindow : public Window, public Drawable{
 	void onDraw(Graphics& gl){
 		gl.depthTesting(1);
 
-		gl.enable(gl.COLOR_MATERIAL);
+		light.dir(1,1,1);
+		light.ambient(Color(1));
+		mtrl.useColorMaterial(false);
+		mtrl.ambient(Color(0.1,0,0));
+		mtrl.diffuse(Color(0.7,0,0));
+		mtrl.specular(HSV(0.1,1,0.7));
+		mtrl();		
 		light();
 
 		iso.level(0);
@@ -36,13 +43,8 @@ struct MyWindow : public Window, public Drawable{
 			glEnable(GL_RESCALE_NORMAL);
 			gl.translate(-1,-1,-1);
 			gl.scale(2);
-			iso.color(0.6,0.6,0.6);
 			gl.draw(iso);
 		gl.popMatrix();
-		
-//		gl.mesh().primitive(gl.LINES).reset();
-//		addWireBox(gl.mesh());
-//		gl.draw();
 	}
 
 	bool onFrame(){
@@ -81,10 +83,7 @@ int main(){
 	iso.primitive(Graphics::TRIANGLES);
 
 	win.create(Window::Dim(800,600), "Isosurface Example", 140);
-
 	win.add(new StandardWindowKeyControls);
 	win.add(new NavInputControl(nav));
-
 	Window::startLoop();
-	return 0;
 }
