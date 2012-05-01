@@ -124,6 +124,9 @@ Window& Window::displayMode(DisplayMode v){
 		cursorHide(cursorHide_);
 		fullScreen(fullScreen_);
 	}
+	else{
+		mDisplayMode = v;
+	}
 	return *this;
 }
 
