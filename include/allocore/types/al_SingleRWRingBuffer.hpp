@@ -86,8 +86,6 @@ protected:
 };	
 
 
-
-
 inline uint32_t next_power_of_two(uint32_t v){
 	--v;
 	v |= v >> 1;
