@@ -267,7 +267,7 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
 			double aspect = vp1.aspect(); 
 			double fovy = Camera::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect); 
-			
+
 			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
 			Vec3d ux = q.toVectorX();
 			Vec3d uy = q.toVectorY();
@@ -291,7 +291,7 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 		Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
 		mEye = pos + (ux * -iod);	// right
 		mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
-		mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
+		mModelView = Matrix4d::lookAtRight(ux, uy, uz, mEye, iod);
 
 		pushDrawPop(gl,draw);
 	}
@@ -335,8 +335,8 @@ void Stereographic :: drawActive(Graphics& gl, const Camera& cam, const Pose& po
 		double aspect = vp.aspect();
 		Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
 		mEye = pos + (ux * iod);	// left
-			mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
-		mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
+		mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
+		mModelView = Matrix4d::lookAtLeft(ux, uy, uz, mEye, iod);
 
 		pushDrawPop(gl,draw);
 	}
@@ -430,7 +430,7 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 		// apply camera transform:
 		mEye = pos + (ux * iod);	// left
 		mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
-		mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
+		mModelView = Matrix4d::lookAtLeft(ux, uy, uz, mEye, iod);
 		
 		pushDrawPop(gl,draw);
 		
@@ -439,7 +439,7 @@ void Stereographic :: drawDual(Graphics& gl, const Camera& cam, const Pose& pose
 		// apply camera transform:
 		mEye = pos + (ux * -iod);	// right
 		mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
-		mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
+		mModelView = Matrix4d::lookAtRight(ux, uy, uz, mEye, iod);
 		
 		pushDrawPop(gl,draw);
 	}	
@@ -502,7 +502,7 @@ void Stereographic :: drawLeft(Graphics& gl, const Camera& cam, const Pose& pose
 		Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
 		mEye = pos + (ux * iod);	// left
 		mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
-		mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
+		mModelView = Matrix4d::lookAtLeft(ux, uy, uz, mEye, iod);
 	
 		pushDrawPop(gl,draw);
 	}
@@ -564,7 +564,7 @@ void Stereographic :: drawRight(Graphics& gl, const Camera& cam, const Pose& pos
 		// apply camera transform:
 		mEye = pos + (ux * -iod);	// right
 		mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
-		mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
+		mModelView = Matrix4d::lookAtRight(ux, uy, uz, mEye, iod);
 		
 		pushDrawPop(gl,draw);		
 	}
