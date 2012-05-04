@@ -34,6 +34,7 @@
 */
 
 #include "lua.hpp"
+#include "allocore/system/pstdint.h"
 #include <string>
 
 #ifndef MAX
@@ -207,7 +208,7 @@ template<> inline void * Lua::to(int idx) { return lua_touserdata(L, idx); }
 template<typename T> 
 inline bool Lua::to_vec_t(T * v, int n, int idx) {
 	if(lua_istable(L, idx)) {
-		int len = MIN(n, lua_objlen(L, idx));
+		int len = MIN(n, (int)lua_objlen(L, idx));
 		for(int i=0; i < len; i++) {
 			lua_rawgeti(L, idx, i+1);
 			v[i] = to<T>();
