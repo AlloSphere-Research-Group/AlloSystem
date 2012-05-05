@@ -63,7 +63,7 @@ The following variables can be modified to customize where built files are place
 The following rules are available (to be run from the root directory):
 
 	make allocore		- build allocore library
-	make allojit		- build allocore JIT extension
+	make allojit		- build allocore JIT extension (optional)
 	make alloutil		- build allocore utilities extension
 	make gamma		- build Gamma external library
 	make glv		- build GLV external library
@@ -71,22 +71,31 @@ The following rules are available (to be run from the root directory):
 	make install		- installs built components
 	make clean		- removes binaries from build folder
 
-	make examples/x.cpp	- builds and runs example source file x.cpp
+	make examples/x.cpp	- builds and runs example source file x.cpp (see section 3 below)
 
 	make test		- build and run unit tests
-
-The rules that build examples and tests will automatically run the executable by default. To turn this off, pass AUTORUN=0 to make. The examples and tests rules follow standard Unix conventions so that, for instance, all the tests can be built and run by typing the command 'make tests/test*.cpp'.
 
 
 ========================================
 3. Program Execution Using Make
 ========================================
-
-The AlloCore Make system permits one to build and automatically run source files with a main() function defined. This is not meant to replace a full-fledged IDE for building complicated projects, but rather serves as a quick way to prototype ideas. By default, any source files located in ./examples or any subfolder thereof, can be built and run using the command
+----------------------------------------
+3.1 Automatic "Build and Run"
+----------------------------------------
+The AlloCore Make system permits one to build and automatically run source files with a main() function defined. This is not meant to replace a full-fledged IDE for building complex projects, but rather to serve as a quick way to prototype ideas. By default, any source files located in ./examples or any subfolder thereof, can be built and run using the command
 	
 	make examples/mymain.cpp
 
-and will be linked against Allocore and its dependencies. The following additional capabilities are possible and must be configured manually.
+and will be linked against Allocore and its dependencies. If you are having trouble using tab autocompletion after the 'make' command, then it is likely that a completion rule has been defined elsewhere for make. You can disable this by adding to the bottom of your ~/.bashrc file
+
+	complete -r make
+
+which will restore the default autocompletion using the file system. If you just want to build and executable without running it, then include AUTORUN=0 with the make command.
+
+----------------------------------------
+3.2 User-defined Options
+----------------------------------------
+The following additional capabilities are possible and must be configured manually.
 
 1. Definition of custom build paths.
 Sometimes it is handy to build and run sources files from custom directories as well as include one's own "library" code that is linked with all build-and-run executables. To configure these create a file "Makefile.user" in ./ and add the following variables:
