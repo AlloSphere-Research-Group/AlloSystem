@@ -163,10 +163,17 @@ public:
 	const Color& specular() const { return mSpecular; }
 	Color& specular(){ return mSpecular; }
 
+
+	/// Set global ambient light intensity (default is {0.2, 0.2, 0.2, 1})
+	static void globalAmbient(const Color& v);
+
 	/// Determines how global specular reflection angles are computed
 	static void localViewer(bool v);
 
 	/// Determines whether global lighting is two-sided
+	
+	/// Setting this to true effectively reverses normals of back-facing
+	/// polygons.
 	static void twoSided(bool v);
 
 protected:

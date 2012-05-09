@@ -114,6 +114,10 @@ Light& Light::pos(float x, float y, float z){
 	return *this;
 }
 
+void Light::globalAmbient(const Color& v){
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, v.components);
+}
+
 void Light::localViewer(bool v){
 	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, v ? GL_TRUE : GL_FALSE);
 }
