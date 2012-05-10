@@ -85,7 +85,7 @@ public:
 
 	/// This should still be called via ProtoApp::onAnimate(dt) if overridden
 	virtual void onAnimate(double dt){
-		camera().fovy(cnFOV.getValue());
+		lens().fovy(cnFOV.getValue());
 	}
 
 //	virtual void onDraw(Graphics& g, const Viewpoint& v){}

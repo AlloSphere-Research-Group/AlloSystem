@@ -6,7 +6,7 @@ using namespace al;
 static Graphics gl;
 static Mesh mesh;
 static Stereographic stereo;
-static Camera cam;
+static Lens lens;
 Nav nav;
 
 struct MyWindow : Window, public Drawable{
@@ -14,8 +14,8 @@ struct MyWindow : Window, public Drawable{
 	bool onKeyDown(const Keyboard& k){	
 		
 		switch(k.key()){
-			case '-': cam.eyeSep(cam.eyeSep() - 0.01); break;
-			case '+': cam.eyeSep(cam.eyeSep() + 0.01); break;
+			case '-': lens.eyeSep(lens.eyeSep() - 0.01); break;
+			case '+': lens.eyeSep(lens.eyeSep() + 0.01); break;
 			case Keyboard::TAB: stereo.stereo(!stereo.stereo()); return false;
 			case '1': stereo.mode(Stereographic::ANAGLYPH); return false;
 			case '2': stereo.mode(Stereographic::ACTIVE); return false;
@@ -29,12 +29,12 @@ struct MyWindow : Window, public Drawable{
 
 	bool onFrame(){
 		nav.step();
-		stereo.draw(gl, cam, nav, Viewport(width(), height()), *this);
+		stereo.draw(gl, lens, nav, Viewport(width(), height()), *this);
 		return true;
 	}
 
 	void onDraw(Graphics& gl){
-		gl.fog(cam.far(), cam.far()/2, stereo.clearColor());
+		gl.fog(lens.far(), lens.far()/2, stereo.clearColor());
 		gl.depthTesting(1);
 		gl.draw(mesh);	
 	}
@@ -47,8 +47,8 @@ int main(){
 	nav.smooth(0.8);
 	nav.pos(0, 0, -20);
 
-	cam.near(1).far(100).focalLength(1).fovy(45);
-	cam.eyeSep(cam.eyeSepAuto());
+	lens.near(1).far(100).focalLength(1).fovy(45);
+	lens.eyeSep(lens.eyeSepAuto());
 	stereo.stereo(true);
 	stereo.mode(Stereographic::ACTIVE);
 

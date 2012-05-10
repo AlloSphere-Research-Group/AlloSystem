@@ -192,7 +192,7 @@ struct MyWindow : public Window, public Drawable{
 
 	Graphics gl;
 	Pose transform;
-	Camera cam;
+	Lens cam;
 };
 
 

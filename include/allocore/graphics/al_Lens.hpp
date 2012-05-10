@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_CAMERA_HPP
-#define INCLUDE_AL_CAMERA_HPP
+#ifndef INCLUDE_AL_LENS_HPP
+#define INCLUDE_AL_LENS_HPP
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
@@ -30,9 +30,9 @@
 	Optical properties for scene rendering
 
 	File author(s):
-	Wesley Smith, 2010, wesley.hoke@gmail.com
 	Lance Putnam, 2010, putnam.lance@gmail.com
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
+	Wesley Smith, 2010, wesley.hoke@gmail.com
 */
 
 #include "allocore/math/al_Vec.hpp"
@@ -42,8 +42,8 @@
 
 namespace al {
 
-/// Camera stores optics settings important for rendering
-class Camera {
+/// Stores optics settings important for rendering
+class Lens {
 public:
 
 	/// @param[in] fovy			vertical field of view, in degrees
@@ -51,7 +51,7 @@ public:
 	/// @param[in] farClip		frustum far plane distance
 	/// @param[in] focalLength	focal length, distance of zero parallax
 	/// @param[in] eyeSep		eye separation amount
-	Camera(
+	Lens(
 		double fovy=30,
 		double nearClip=0.1,
 		double farClip=100,
@@ -60,12 +60,12 @@ public:
 	);
 
 	// setters
-	Camera& fovy(double v);									///< Set vertical field of view, in degrees
-	Camera& fovx(double v, double aspect);					///< Set horizontal field of view, in degrees
-	Camera& near(double v){ mNear=v; return *this; }		///< Set frustum near plane distance
-	Camera& far(double v){ mFar=v; return *this; }			///< Set frustum far plane distance
-	Camera& focalLength(double v){ mFocalLength=v; return *this; } ///< Set focal length
-	Camera& eyeSep(double v){ mEyeSep=v; return *this; }	///< Set eye separation
+	Lens& fovy(double v);									///< Set vertical field of view, in degrees
+	Lens& fovx(double v, double aspect);					///< Set horizontal field of view, in degrees
+	Lens& near(double v){ mNear=v; return *this; }			///< Set frustum near plane distance
+	Lens& far(double v){ mFar=v; return *this; }			///< Set frustum far plane distance
+	Lens& focalLength(double v){ mFocalLength=v; return *this; } ///< Set focal length
+	Lens& eyeSep(double v){ mEyeSep=v; return *this; }		///< Set eye separation
 
 	double fovy() const { return mFovy; }					///< Get vertical field of view, in degrees
 	double near() const { return mNear; }					///< Get frustum near plane distance
@@ -98,14 +98,14 @@ public:
 	/// Calculate required fovy to produce a specific fovx
 	/// @param[fovx] field-of-view in X axis to recreate
 	/// @param[aspect] aspect ratio of viewport
-	/// @return field-of-view in Y axis, usable by Camera.fovy() 
+	/// @return field-of-view in Y axis, usable by Lens.fovy() 
 	static double getFovyForFovX(double fovx, double aspect) {
 		double farW = tan(0.5*fovx*M_DEG2RAD);
 		return 2.*M_RAD2DEG*atan(farW/aspect);
 	}
 
 protected:
-	double mFovy;				// Camera aperture (degrees)
+	double mFovy;				// Lens aperture (degrees)
 	double mTanFOV;				// Cached factor for computing frustum dimensions
 	double mNear, mFar;			// Cutting plane distances
 	double mFocalLength;		// Focal length along vd
@@ -113,6 +113,9 @@ protected:
 //	Vec3d mStereoOffset;		// eye offset vector (right eye; left eye is inverse), usually (1, 0, 0)
 };
 
+
+/// Typedef for backwards compatability
+typedef Lens Camera;
 
 
 } // al::

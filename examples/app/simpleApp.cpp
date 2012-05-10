@@ -22,7 +22,7 @@ public:
 	// Ths constructor is where we initialize the application
 	MyApp(): phase(0){
 		// Configure our camera lens
-		camera().near(0.1).far(25).fovy(45);
+		lens().near(0.1).far(25).fovy(45);
 
 		// Set navigation position and orientation
 		nav().pos(0,0,4);

@@ -1,9 +1,9 @@
 #include <math.h>
-#include "allocore/spatial/al_Camera.hpp"
+#include "allocore/graphics/al_Lens.hpp"
 
 namespace al{
 
-Camera :: Camera(
+Lens :: Lens(
 	double fovy_, 
 	double nearClip, 
 	double farClip, 
@@ -18,21 +18,21 @@ Camera :: Camera(
 	fovy(fovy_);
 }
 
-Camera& Camera::fovy(double v){
+Lens& Lens::fovy(double v){
 	static const double cDeg2Rad = M_PI / 180.;
 	mFovy = v;
 	mTanFOV = tan(fovy() * cDeg2Rad*0.5);
 	return *this;
 }
 
-Camera& Camera::fovx(double v, double aspect) {
-	fovy(Camera::getFovyForFovX(v, aspect));
+Lens& Lens::fovx(double v, double aspect) {
+	fovy(Lens::getFovyForFovX(v, aspect));
 	return *this;
 }
 
 
 // @param[in] isStereo		Whether scene is in stereo (widens near/far planes to fit both eyes)
-void Camera::frustum(Frustumd& f, const Pose& p, double aspect) const {//, bool isStereo) const {
+void Lens::frustum(Frustumd& f, const Pose& p, double aspect) const {//, bool isStereo) const {
 
 	Vec3d ur, uu, uf;
 	p.directionVectors(ur, uu, uf);
@@ -68,11 +68,11 @@ void Camera::frustum(Frustumd& f, const Pose& p, double aspect) const {//, bool 
 	f.computePlanes();
 }
 
-//double Camera::height(double distance) {
+//double Lens::height(double distance) {
 //	return 2*distance * tan(mFovy*M_DEG2RAD*0.5);
 //}
 
-//Camera :: Camera(
+//Lens :: Lens(
 //	double fovy, 
 //	double nearClip, 
 //	double farClip, 
@@ -92,7 +92,7 @@ void Camera::frustum(Frustumd& f, const Pose& p, double aspect) const {//, bool 
 //{	smooth(0.8); }
 
 
-//Matrix4d Camera::modelViewMatrix(Eye e) {
+//Matrix4d Lens::modelViewMatrix(Eye e) {
 //	switch(e) {
 //		case RIGHT: 
 //			return Matrix4d::lookAtOffAxis(ur(), uu(), uf(), pos(), mEyeSep);
@@ -104,7 +104,7 @@ void Camera::frustum(Frustumd& f, const Pose& p, double aspect) const {//, bool 
 //	}
 //}
 
-//Matrix4d Camera::projectionMatrix(Eye e) {
+//Matrix4d Lens::projectionMatrix(Eye e) {
 //	if(mAutoEyeSep) {
 //		mEyeSep = mFocalLength/30.;
 //	}
@@ -122,7 +122,7 @@ void Camera::frustum(Frustumd& f, const Pose& p, double aspect) const {//, bool 
 //}
 
 
-//Frustumd Camera::frustum(Eye eye) {
+//Frustumd Lens::frustum(Eye eye) {
 //	Frustumd f;
 //
 ////	static double const tanCoef = 0.01745329252*0.5;	// degree-to-radian over /2

@@ -7,7 +7,7 @@ using namespace al;
 Graphics gl;
 Light light;
 Material mtrl;
-Camera cam;
+Lens lens;
 Nav nav(Vec3d(0,0,5));
 Stereographic stereo;
 
@@ -50,7 +50,7 @@ struct MyWindow : public Window, public Drawable{
 	bool onFrame(){
 		nav.smooth(0.8);
 		nav.step(1.);
-		stereo.draw(gl, cam, nav, Viewport(width(), height()), *this);
+		stereo.draw(gl, lens, nav, Viewport(width(), height()), *this);
 
 		if(evolve){
 			if((phase += 0.0002) > 2*M_PI) phase -= 2*M_PI;

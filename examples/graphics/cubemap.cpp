@@ -18,7 +18,7 @@ using namespace al;
 
 static Graphics gl;
 static Mesh mesh, grid, cube;
-static Camera cam;
+static Lens lens;
 static Nav nav;
 static CubeMapFBO cubeFBO;
 unsigned drawMode = 1;
@@ -33,7 +33,7 @@ struct MyWindow : Window, public Drawable{
 		nav.step();
 		
 		// capture the scene:
-		cubeFBO.capture(gl, cam, nav, *this);
+		cubeFBO.capture(gl, lens, nav, *this);
 
 		// now use the captured texture:		
 		gl.viewport(0, 0, width(), height());
@@ -51,7 +51,7 @@ struct MyWindow : Window, public Drawable{
 					
 					
 		// second, use it to texture a rotating object:
-		gl.projection(Matrix4d::perspective(70, width()/(double)height(), cam.near(), cam.far()));
+		gl.projection(Matrix4d::perspective(70, width()/(double)height(), lens.near(), lens.far()));
 		gl.modelView(Matrix4d::lookAt(Vec3d(0, 0, 4), Vec3d(0, 0, 2), Vec3d(0, 1, 0)));
 		
 		// rotate over time:
@@ -89,7 +89,7 @@ struct MyWindow : Window, public Drawable{
 	}
 
 	void onDraw(Graphics& gl){
-		gl.fog(cam.far(), cam.far()/2, cubeFBO.clearColor());
+		gl.fog(lens.far(), lens.far()/2, cubeFBO.clearColor());
 		gl.depthTesting(1);
 		gl.draw(grid);
 		gl.draw(mesh);	
@@ -103,7 +103,7 @@ int main(){
 	double world_radius = 50;
 	
 	nav.smooth(0.8);
-	cam.near(1).far(world_radius);
+	lens.near(1).far(world_radius);
 	
 	// set up mesh:
 	mesh.primitive(Graphics::TRIANGLES);

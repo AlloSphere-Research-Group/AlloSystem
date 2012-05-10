@@ -16,7 +16,7 @@ using namespace al;
 static Graphics gl;
 static Mesh mesh, grid;
 static Stereographic stereo;
-static Camera cam;
+static Lens lens;
 Nav nav;
 
 /*
@@ -58,12 +58,12 @@ struct MyWindow : Window, public Drawable{
 
 	bool onFrame(){
 		nav.step();
-		stereo.draw(gl, cam, nav, Viewport(width(), height()), *this);
+		stereo.draw(gl, lens, nav, Viewport(width(), height()), *this);
 		return true;
 	}
 
 	void onDraw(Graphics& gl){
-		gl.fog(cam.far(), cam.far()/2, stereo.clearColor());
+		gl.fog(lens.far(), lens.far()/2, stereo.clearColor());
 		gl.depthTesting(1);
 		gl.draw(grid);
 		gl.draw(mesh);	
@@ -77,8 +77,8 @@ int main(){
 	nav.smooth(0.8);
 	nav.pos(0, 0, -20);
 
-	cam.near(1).far(100).focalLength(1).fovy(45);
-	cam.eyeSep(-cam.eyeSepAuto());
+	lens.near(1).far(100).focalLength(1).fovy(45);
+	lens.eyeSep(-lens.eyeSepAuto());
 	stereo.omni(true, 24, 120);
 	stereo.stereo(false);
 	stereo.mode(Stereographic::ANAGLYPH);

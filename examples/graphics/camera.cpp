@@ -19,7 +19,7 @@ struct MyWindow : public Window, public Drawable {
     MyWindow()
 	:	nav(Vec3d(0,0,-2), 0.8)
 	{
-		cam.fovy(90);	// set field of view angle
+		lens.fovy(90);	// set field of view angle
 		
 		add(new StandardWindowKeyControls);
 		add(new NavInputControl(nav));
@@ -42,14 +42,14 @@ struct MyWindow : public Window, public Drawable {
 			}
 		}
 	}
-    
+
 	bool onFrame(){
 
         nav.step();
 
 		gl.depthTesting(true);
 
-		stereo.draw(gl, cam, nav, Viewport(width(), height()), *this);
+		stereo.draw(gl, lens, nav, Viewport(width(), height()), *this);
 
 		return true;
 	}
@@ -60,24 +60,24 @@ struct MyWindow : public Window, public Drawable {
 	
 	virtual bool onKeyDown(const Keyboard& k){
 		switch(k.key()){
-			case 'f': cam.fovy(cam.fovy()-5); break;
-			case 'g': cam.fovy(cam.fovy()+5); break;
+			case 'f': lens.fovy(lens.fovy()-5); break;
+			case 'g': lens.fovy(lens.fovy()+5); break;
 			default:;
 		}
 		return true;
 	}
     
     Graphics gl;
-	Camera cam;
+	Lens lens;
 	Nav nav;
 	Stereographic stereo;
 	Mesh shapes;
 };
 
-MyWindow win1;
+MyWindow win;
 
 int main(){    
-    win1.create(Window::Dim(800, 600), "Allocore Example: Camera");
+    win.create(Window::Dim(800, 600), "Allocore Example: Camera");
 
 	MainLoop::start();
 	return 0;

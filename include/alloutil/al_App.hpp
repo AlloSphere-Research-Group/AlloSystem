@@ -44,7 +44,7 @@ namespace al{
 /// Viewpoint within a scene
 
 /// A viewpoint is an aggregation of a viewport (screen region), a pose
-/// (3D position and orientation), and a camera.
+/// (3D position and orientation), and a lens.
 class Viewpoint{
 public:
 
@@ -52,7 +52,7 @@ public:
 	:	mViewport(0,0,0,0),
 		mParentTransform(NULL),
 		mAnchorX(0), mAnchorY(0), mStretchX(1), mStretchY(1),
-		mCamera(NULL), mClearColor(NULL)
+		mLens(NULL), mClearColor(NULL)
 	{}
 
 	float anchorX() const { return mAnchorX; }
@@ -76,11 +76,11 @@ public:
 		mStretchX=sx; mStretchY=sy; return *this;
 	}
 
-	bool hasCamera() const { return NULL != mCamera; }
+	bool hasLens() const { return NULL != mLens; }
 	bool hasClearColor() const { return NULL != mClearColor; }
 
-	const Camera& camera() const { return *mCamera; }
-	Viewpoint& camera(Camera& v){ mCamera=&v; return *this; }
+	const Lens& lens() const { return *mLens; }
+	Viewpoint& lens(Lens& v){ mLens=&v; return *this; }
 	
 	const Color& clearColor() const { return *mClearColor; }
 	Viewpoint& clearColor(Color& v){ mClearColor=&v; return *this; }
@@ -104,7 +104,7 @@ protected:
 	Pose mTransform;				// local transform
 	float mAnchorX, mAnchorY;		// viewport anchor factors relative to parent window
 	float mStretchX, mStretchY;		// viewport stretch factors relative to parent window
-	Camera * mCamera;				// camera; if not set, will be set to scene's default camera
+	Lens * mLens;					// if not set, will be set to scene's default lens
 	Color * mClearColor;
 };
 
@@ -247,8 +247,8 @@ public:
 	//const AudioScene&	audioScene() const { return mAudioScene; }
 	//AudioScene&			audioScene(){ return mAudioScene; }
 
-	const Camera&		camera() const { return mCamera; }
-	Camera&				camera(){ return mCamera; }
+	const Lens&			lens() const { return mLens; }
+	Lens&				lens(){ return mLens; }
 
 	const Graphics&		graphics() const { return mGraphics; }
 	Graphics&			graphics(){ return mGraphics; }
@@ -308,7 +308,7 @@ private:
 
 	// graphics
 	Windows mWindows;
-	Camera mCamera;
+	Lens mLens;
 	Stereographic mStereo;
 	Graphics mGraphics;
 	

@@ -206,8 +206,8 @@ bool App::SceneWindowHandler::onFrame(){
 		Viewpoint& vp = *(*iv);
 		
 		// if no camera, set to default scene camera
-		if(!vp.hasCamera()) vp.camera(app.camera());
-		const Camera& cam = vp.camera();
+		if(!vp.hasLens()) vp.lens(app.lens());
+		const Lens& lens = vp.lens();
 
 		Color defaultClearColor = app.stereo().clearColor();
 		if(!vp.hasClearColor()){
@@ -218,7 +218,7 @@ bool App::SceneWindowHandler::onFrame(){
 		}
 
 		DrawFunc drawFunc(app, vp);
-		app.stereo().draw(g, cam, vp.worldTransform(), vp.viewport(), drawFunc);
+		app.stereo().draw(g, lens, vp.worldTransform(), vp.viewport(), drawFunc);
 		app.stereo().clearColor(defaultClearColor);
 	}
 	return true;

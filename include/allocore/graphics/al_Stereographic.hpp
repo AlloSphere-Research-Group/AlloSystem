@@ -35,7 +35,7 @@
 */
 
 #include "allocore/graphics/al_Graphics.hpp"
-#include "allocore/spatial/al_Camera.hpp"
+#include "allocore/graphics/al_Lens.hpp"
 #include "allocore/spatial/al_Pose.hpp"
 #include "allocore/types/al_Color.hpp"
 
@@ -76,20 +76,20 @@ public:
 	/// Draw the scene according to the stored stereographic mode
 	
 	/// @param[in] gl		graphics interface
-	/// @param[in] cam		local viewing frustum
+	/// @param[in] lens		local viewing frustum
 	/// @param[in] pose		viewer position and orientation
 	/// @param[in] vp		region of screen to render to
 	/// @param[in] draw		function object with drawing commands
 	/// @param[in] clear	whether to clear the color/depth buffers
-	void draw			(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
+	void draw			(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
 	
 	// So many different ways to draw :-)
-	void drawMono		(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
-	void drawActive		(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
-	void drawAnaglyph	(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
-	void drawDual		(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
-	void drawLeft		(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
-	void drawRight		(Graphics& gl, const Camera& cam, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
+	void drawMono		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
+	void drawActive		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
+	void drawAnaglyph	(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
+	void drawDual		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
+	void drawLeft		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
+	void drawRight		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
 	
 	/// Draw blue line for active stereo sync (for those projectors that need it)
 

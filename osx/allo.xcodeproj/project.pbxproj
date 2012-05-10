@@ -250,7 +250,6 @@
 		364D32C314564662005D2EB0 /* al_Ambisonics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16FE4B3E11DB0E62002D3847 /* al_Ambisonics.cpp */; };
 		364D32C414564662005D2EB0 /* al_Asset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 369DDF5112B6C87200F75D2A /* al_Asset.cpp */; };
 		364D32C514564662005D2EB0 /* al_AudioIO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEDE116D527D00928703 /* al_AudioIO.cpp */; };
-		364D32C614564662005D2EB0 /* al_Camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16AA8F0111C6FE0B0053EFE1 /* al_Camera.cpp */; };
 		364D32C714564662005D2EB0 /* al_Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1619909C11743990006FBADF /* al_Color.cpp */; };
 		364D32C814564662005D2EB0 /* al_FileAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16054DBA122E12010039003C /* al_FileAPR.cpp */; };
 		364D32C914564662005D2EB0 /* al_Font.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36035C3213037130001E9BA9 /* al_Font.cpp */; };
@@ -750,6 +749,8 @@
 		163E4930130E0254007B30A0 /* libluajit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libluajit.a; sourceTree = "<group>"; };
 		163E4931130E0254007B30A0 /* libportaudio.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libportaudio.a; sourceTree = "<group>"; };
 		163E4932130E0254007B30A0 /* libsndfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libsndfile.a; sourceTree = "<group>"; };
+		164E6EF8155B4281001293AA /* al_Lens.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Lens.hpp; sourceTree = "<group>"; };
+		164E6EF9155B4395001293AA /* al_Lens.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Lens.cpp; sourceTree = "<group>"; };
 		16586A1C128903C10068E01A /* al_Shader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Shader.cpp; sourceTree = "<group>"; };
 		165D3F6614F576E90015EDC6 /* al_MIDI.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_MIDI.hpp; sourceTree = "<group>"; };
 		165D3F6714F5770F0015EDC6 /* al_MIDI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_MIDI.cpp; sourceTree = "<group>"; };
@@ -811,8 +812,6 @@
 		16A60423130345BB0077B460 /* simpleGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = simpleGraphics.cpp; sourceTree = "<group>"; };
 		16A60424130345BB0077B460 /* texture.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = texture.cpp; sourceTree = "<group>"; };
 		16A60425130345BB0077B460 /* triangleNoise.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = triangleNoise.cpp; sourceTree = "<group>"; };
-		16AA8F0011C6FDE10053EFE1 /* al_Camera.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Camera.hpp; sourceTree = "<group>"; };
-		16AA8F0111C6FE0B0053EFE1 /* al_Camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Camera.cpp; sourceTree = "<group>"; };
 		16AA8F0E11C6FE6C0053EFE1 /* utSpatial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = utSpatial.cpp; sourceTree = "<group>"; };
 		16AA8FA211C713890053EFE1 /* al_Frustum.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Frustum.hpp; sourceTree = "<group>"; };
 		16AA95E9118F6EEF00B98EC3 /* al_GPUObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_GPUObject.hpp; sourceTree = "<group>"; };
@@ -2536,7 +2535,6 @@
 		16AA8EE511C6F76B0053EFE1 /* spatial */ = {
 			isa = PBXGroup;
 			children = (
-				16AA8F0011C6FDE10053EFE1 /* al_Camera.hpp */,
 				168E9B7B14CF30F700FD8017 /* al_Curve.hpp */,
 				16D050581403125C009A5BEB /* al_DistAtten.hpp */,
 				16D0504A1402F27D009A5BEB /* al_HashSpace.hpp */,
@@ -2549,7 +2547,6 @@
 			isa = PBXGroup;
 			children = (
 				36462C5713EB28F600F33CA7 /* al_HashSpace.cpp */,
-				16AA8F0111C6FE0B0053EFE1 /* al_Camera.cpp */,
 				16AFFE0F139976B0007B3FE6 /* al_Pose.cpp */,
 			);
 			path = spatial;
@@ -2568,6 +2565,7 @@
 				362127C71173CD72009CB6FC /* al_Graphics.hpp */,
 				36F596691211D5AB003B78B5 /* al_Image.hpp */,
 				160FD0DF11FA1CE4001E8987 /* al_Isosurface.hpp */,
+				164E6EF8155B4281001293AA /* al_Lens.hpp */,
 				16AA95EA118F6EEF00B98EC3 /* al_Light.hpp */,
 				361AA7A312AEE173002E9DFD /* al_Mesh.hpp */,
 				16AA967E118F7D5700B98EC3 /* al_Shader.hpp */,
@@ -2591,6 +2589,7 @@
 				362127C81173CDBB009CB6FC /* al_Graphics.cpp */,
 				36F596741211D5F8003B78B5 /* al_Image.cpp */,
 				160FD0E011FA1CF4001E8987 /* al_Isosurface.cpp */,
+				164E6EF9155B4395001293AA /* al_Lens.cpp */,
 				16AA95F2118F74FB00B98EC3 /* al_Light.cpp */,
 				361AA7A412AEE1AC002E9DFD /* al_Mesh.cpp */,
 				16586A1C128903C10068E01A /* al_Shader.cpp */,
@@ -5075,7 +5074,6 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "allo" */;
 			compatibilityVersion = "Xcode 3.0";
-			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -5364,7 +5362,6 @@
 				364D32C314564662005D2EB0 /* al_Ambisonics.cpp in Sources */,
 				364D32C414564662005D2EB0 /* al_Asset.cpp in Sources */,
 				364D32C514564662005D2EB0 /* al_AudioIO.cpp in Sources */,
-				364D32C614564662005D2EB0 /* al_Camera.cpp in Sources */,
 				364D32C714564662005D2EB0 /* al_Color.cpp in Sources */,
 				364D32C814564662005D2EB0 /* al_FileAPR.cpp in Sources */,
 				364D32C914564662005D2EB0 /* al_Font.cpp in Sources */,

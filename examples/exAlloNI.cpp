@@ -24,7 +24,7 @@ struct MyWindow : public Window, public Drawable {
 
 	GraphicsGL gl;
 	Pose transform;
-	Camera cam;
+	Lens cam;
 	Texture depth;
 	al_sec mTime;
 

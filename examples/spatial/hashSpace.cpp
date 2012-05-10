@@ -118,12 +118,12 @@ public:
 
 	virtual bool onFrame(){ 
 	
-		Camera cam;
-		cam.far(200);
+		Lens lens;
+		lens.far(200);
 		Pose pose(Vec3d(space.maxRadius(), space.maxRadius(), space.dim()*2));
 		Viewport vp(win.width(), win.height());
 		
-		stereo.draw(gl, cam, pose, vp, *(Drawable *)this);
+		stereo.draw(gl, lens, pose, vp, *(Drawable *)this);
 		
 		return true;
 	}		
