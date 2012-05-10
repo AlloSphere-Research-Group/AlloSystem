@@ -39,7 +39,9 @@
 	It is optimized for densely packed points and querying for nearest neighbors
 	within given radii (results will be roughly sorted by distance). 
 	
-	TODO: non-toroidal version.
+	TODO: non-toroidal options
+	TODO: have query() automatically (insertion) sort results by distance
+		(perhaps use std::set instead of vector?)
 
 	File author(s):
 	Wesley Smith, 2010, wesley.hoke@gmail.com
@@ -104,8 +106,20 @@ public:
 	*/
 	struct Query {
 		
-		typedef std::vector<HashSpace::Object *> Vector;
-		typedef Vector::iterator Iterator;
+		struct Result {
+			HashSpace::Object * object;
+			double distanceSquared;
+			
+			static bool compare(const Result& x, const Result& y) {
+				return x.distanceSquared > y.distanceSquared;
+			}
+			
+			Result() : object(0), distanceSquared(0) {}
+			Result(const Result& cpy) : object(cpy.object), distanceSquared(cpy.distanceSquared) {}
+		};
+		
+		typedef std::vector<Result> Results;
+		typedef Results::iterator Iterator;
 	
 		/** 
 			Constructor
@@ -153,7 +167,9 @@ public:
 		/// get number of results:
 		unsigned size() const { return mObjects.size(); }
 		/// get each result:
-		Object * operator[](unsigned i) const { return mObjects[i]; }
+		Object * operator[](unsigned i) const { return mObjects[i].object; }
+		double distanceSquared(unsigned i) const { return mObjects[i].distanceSquared; }
+		double distance(unsigned i) const { return sqrt(distanceSquared(i)); }
 		
 		/** 
 			clear is separated from the main query operation, 
@@ -170,11 +186,11 @@ public:
 		/// std::vector interface:
 		Iterator begin() { return mObjects.begin(); }
 		Iterator end() { return mObjects.end(); }
-		Vector& vector() { return mObjects; }
+		Results& results() { return mObjects; }
 		
 	protected:
 		uint32_t mMaxResults;
-		std::vector<Object *> mObjects;
+		Results mObjects;
 	};
 	
 	/** 
@@ -345,7 +361,8 @@ inline int HashSpace::Query :: operator()(const HashSpace& space, Vec3d center, 
 					Vec3d rel = space.wrapRelative(o->pos - center);
 					double d2 = rel.magSqr();
 					if (d2 >= minr2 && d2 <= maxr2) {
-						mObjects.push_back(o);
+						mObjects[nres].object = o;
+						mObjects[nres].distanceSquared = d2;
 						nres++;
 					}
 					o = o->next;
@@ -354,6 +371,7 @@ inline int HashSpace::Query :: operator()(const HashSpace& space, Vec3d center, 
 			if(nres == mMaxResults) break;
 		}
 	}
+	//std::sort(mObjects.begin(), mObjects.end(), Result::compare);
 	return nres;
 }
 
@@ -386,7 +404,8 @@ inline int HashSpace::Query :: operator()(const HashSpace& space, const HashSpac
 						double d2 = rel.magSqr();
 						if (d2 >= minr2 && d2 <= maxr2) {
 							// here we could insert-sort based on distance...
-							mObjects.push_back(o);
+							mObjects[nres].object = o;
+							mObjects[nres].distanceSquared = d2;
 							nres++;
 						}
 					}
@@ -396,6 +415,7 @@ inline int HashSpace::Query :: operator()(const HashSpace& space, const HashSpac
 			if(nres == mMaxResults) break;
 		}
 	}
+	//std::sort(mObjects.begin(), mObjects.end(), Result::compare);
 	return nres;
 }
 
@@ -404,10 +424,11 @@ inline HashSpace::Object * HashSpace::Query :: nearest(const HashSpace& space, c
 	clear();
 	const Vec3d& center = src->pos;
 	uint32_t results = (*this)(space, src, space.mMaxHalfD2);
+	
 	Object * result = 0;
 	double rd2 = space.mMaxHalfD2;
 	for (uint32_t i=0; i<results; i++) {
-		Object * o = mObjects[i];
+		Object * o = mObjects[i].object;
 		Vec3d rel = space.wrapRelative(o->pos - center);
 		double d2 = rel.magSqr();
 		if (d2 < rd2) {

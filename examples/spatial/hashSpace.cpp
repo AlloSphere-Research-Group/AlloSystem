@@ -17,10 +17,7 @@ Stereographic stereo;
 HashSpace space(6, 20000);
 
 // a query object to be re-used for finding neighbors:
-HashSpace::Query qall(space.numObjects());
-
-// another query object that only gets nearest:
-HashSpace::Query qnearest(6);
+HashSpace::Query qnearest(8);
 
 class World : public WindowEventHandler, public Drawable {
 public:

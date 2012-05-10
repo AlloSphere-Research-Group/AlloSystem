@@ -1,8 +1,8 @@
 /*
-Allocore Example: Fluid
+Allocore Example: MRC
 
 Description:
-This demonstrates a 3D fluid simulation
+This demonstrates loading MRC data
 
 Author:
 Graham Wakefield 2011
