@@ -16,9 +16,9 @@ HashSpace :: HashSpace(uint32_t resolution, uint32_t numObjects)
 	mWrap(mDim-1),
 	mWrap3(mDim3-1)
 {
-	printf("shift %d shift2 %d dim %d dim3 %d wrap %d wrap3 %d\n",
-		mShift, mShift2, mDim, mDim3, mWrap, mWrap3);
-	
+	//printf("shift %d shift2 %d dim %d dim3 %d wrap %d wrap3 %d\n",
+//		mShift, mShift2, mDim, mDim3, mWrap, mWrap3);
+//	
 	mMaxD2 = distanceSquared(mWrap, mWrap, mWrap);
 	
 	// half-dim, because of toroidal wrapping
@@ -56,12 +56,6 @@ HashSpace :: HashSpace(uint32_t resolution, uint32_t numObjects)
 					uint32_t h = hash(x, y, z);
 					//uint32_t h = hash(x-0.5, y-0.5, z-0.5);
 					shells[d].push_back(h);
-					
-					if (d < 3) {
-						printf("x, y, z %d, %d, %d: distance %f hash %u\n",
-						x,y,z,d,h);
-					}
-					
 				} else {
 					//printf("out of range"); Vec3i(x, y, z).print();
 				}

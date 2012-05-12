@@ -26,17 +26,17 @@ rnd::Random<> rng;
 Stereographic stereo;
 
 // the space has 2^6 (64) voxels per side 
-// (i.e., for each of the 3 sides) and up to 20000 objects:
-HashSpace space(6, 20000);
+// (i.e., for each of the 3 sides) and up to 10000 objects:
+HashSpace space(6, 10000);
 unsigned maxradius = space.maxRadius();
 
 // a query object to be re-used for finding neighbors
-// it will match up to 1000 neighbors within a radius.
-HashSpace::Query qmany(1000);
+// it will match up to 500 neighbors within a radius.
+HashSpace::Query qmany(500);
 
 // this is used for finding the nearest neighbor. 
-// it will consider 10 matches and return the best.
-HashSpace::Query qnearest(10);
+// it will consider 6 matches and return the best.
+HashSpace::Query qnearest(6);
 
 class World : public WindowEventHandler, public InputEventHandler {
 public:
