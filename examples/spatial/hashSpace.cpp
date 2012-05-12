@@ -1,7 +1,18 @@
 #include "allocore/al_Allocore.hpp"
 #include "allocore/spatial/al_HashSpace.hpp"
 #include "allocore/math/al_Functions.hpp"
-//#include "alloutil/
+
+/*
+Allocore Example: Hashspace for nearest neighbor lookup.
+
+Description:
+Demonstration of neighbor and region lookup in Hashspace.
+This example only uses a 2D slice, but it works just as well in 3D.
+
+Author:
+Graham Wakefield 2012
+*/
+
 
 #include <stdio.h>
 
@@ -14,15 +25,20 @@ Graphics gl;
 rnd::Random<> rng;
 Stereographic stereo;
 
-// the space has 2^6 (64) voxels per side (i.e., for each of the 3 sides) and 10000 objects:
+// the space has 2^6 (64) voxels per side 
+// (i.e., for each of the 3 sides) and up to 20000 objects:
 HashSpace space(6, 20000);
 unsigned maxradius = space.maxRadius();
 
-// a query object to be re-used for finding neighbors:
+// a query object to be re-used for finding neighbors
+// it will match up to 1000 neighbors within a radius.
 HashSpace::Query qmany(1000);
+
+// this is used for finding the nearest neighbor. 
+// it will consider 10 matches and return the best.
 HashSpace::Query qnearest(10);
 
-class World : public WindowEventHandler, public InputEventHandler, public Drawable {
+class World : public WindowEventHandler, public InputEventHandler {
 public:
 	World() {
 		win.append(*(WindowEventHandler *)this);
@@ -30,7 +46,7 @@ public:
 		
 		radius = maxradius * 0.1;
 		
-		// initialize objects with random position
+		// initialize all objects with random position
 		// just 2D for this demo
 		for (unsigned id=0; id<space.numObjects(); id++) {
 			space.move(id, 
@@ -44,86 +60,8 @@ public:
 	virtual bool onMouseDrag(const Mouse& m) {
 		double dx = m.dx()/(double)win.width();
 		radius += dx * maxradius;
-		//printf("%f\n", );
 		return false;
 	}
-
-	virtual void onDraw(Graphics& gl) {
-		al_sec t = al_time();
-		
-		// range of query:
-		double range = fmod(MainLoop::now() * 2., space.maxRadius());
-		double range2 = range/2;
-		
-		// center of query:
-		double p = fmod(MainLoop::now(), space.dim());
-		Vec3d center(p, p, 0);
-		
-		// draw points:
-		gl.pointSize(1);
-		gl.color(1, 0.3, 0);
-		gl.begin(gl.POINTS);
-			for (unsigned id=0; id<space.numObjects(); id++) {
-				HashSpace::Object& o =  space.object(id);
-				double x = 0.5 + o.pos.x * 0.05;
-				double y = 0.5 + o.pos.y * 0.05;
-				
-				double speed = 0.2 * sin(t + atan2(y,x));
-				
-				space.move(id, o.pos + Vec3d(speed*rng.uniformS(), speed*rng.uniformS(), 0.));
-				gl.vertex(o.pos);
-			}
-		gl.end();
-		
-		double limit = space.maxRadius()*space.maxRadius()/4.;
-		
-		// draw nearest neighbor links:
-		gl.color(0.2, 1., 0.2);
-		gl.begin(gl.LINES);
-		for (unsigned id=0; id<space.numObjects(); id++) {
-			HashSpace::Object& o =  space.object(id);
-			HashSpace::Object * n = qnearest.nearest(space, &o);			
-			if (n) {
-				Vec3d& v = n->pos;
-				// don't draw if it is too long:
-				if ((o.pos - v).magSqr() < limit) {
-					gl.vertex(o.pos);
-					gl.vertex(v);
-				}
-			} else{
-				//printf("no nieghbor\n");
-			}
-		}
-		gl.end();
-		
-//		// draw region of interest:
-//		gl.begin(gl.LINE_LOOP);
-//			gl.color(1, 0.3, 0);
-//			for (double a=0; a<M_2PI; a+=0.1) {
-//				gl.vertex(center + Vec3d(range*cos(a), range*sin(a), 0));
-//			}
-//		gl.end();
-//		gl.begin(gl.LINE_LOOP);
-//			gl.color(1, 0.3, 0);
-//			for (double a=0; a<M_2PI; a+=0.1) {
-//				gl.vertex(center + Vec3d(range2*cos(a), range2*sin(a), 0));
-//			}
-//		gl.end();
-//		
-//		// get neighbors:
-//		qall.clear();
-//		qall(space, center, range, range2);
-//
-//		// draw neighbors:
-//		gl.color(0, 0.5, 1.);
-//		gl.begin(gl.POINTS);
-//			gl.pointSize(2.);
-//			for (unsigned i=0; i<qall.size(); i++) {
-//				gl.vertex(qall[i]->pos);
-//			}
-//		gl.end();
-	}
-	
 
 	virtual bool onFrame(){ 
 		al_sec t = al_time();
@@ -132,12 +70,6 @@ public:
 		my = space.dim() * win.mouse().y() / (double)win.height();
 		
 		Viewport vp(win.width(), win.height());
-		
-		//Lens lens;
-		//lens.far(200);
-		//Pose pose(Vec3d(space.maxRadius(), space.maxRadius(), space.dim()*2));
-		//stereo.draw(gl, lens, pose, vp, *(Drawable *)this);
-		
 		
 		gl.viewport(vp);
 		gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
@@ -158,19 +90,18 @@ public:
 		}
 		gl.end();
 		
-		
-		
-		gl.pointSize(3);
+		gl.pointSize(2);
 		gl.color(0.2, 0.5, 0.5);
 		gl.begin(gl.POINTS);
 		for (unsigned id=0; id<space.numObjects(); id++) {
 			HashSpace::Object& o =  space.object(id);
+			
+			// jiggle the objects around:
 			double x = 0.5 + o.pos.x * 0.05;
 			double y = 0.5 + o.pos.y * 0.05;
-			
 			double speed = 0.2 * sin(t + atan2(y,x));
-			
 			space.move(id, o.pos + Vec3d(speed*rng.uniformS(), speed*rng.uniformS(), 0.));
+			
 			gl.vertex(o.pos);
 		}
 		gl.end();
@@ -210,8 +141,6 @@ public:
 					gl.vertex(o.pos);
 					gl.vertex(v);
 				}
-			} else{
-				//printf("no nieghbor\n");
 			}
 		}
 		gl.end();
