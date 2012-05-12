@@ -16,6 +16,9 @@ HashSpace :: HashSpace(uint32_t resolution, uint32_t numObjects)
 	mWrap(mDim-1),
 	mWrap3(mDim3-1)
 {
+	printf("shift %d shift2 %d dim %d dim3 %d wrap %d wrap3 %d\n",
+		mShift, mShift2, mDim, mDim3, mWrap, mWrap3);
+	
 	mMaxD2 = distanceSquared(mWrap, mWrap, mWrap);
 	
 	// half-dim, because of toroidal wrapping
@@ -42,13 +45,23 @@ HashSpace :: HashSpace(uint32_t resolution, uint32_t numObjects)
 		for(int y=-mDimHalf; y < mDimHalf; y++) {
 			for(int z=-mDimHalf; z < mDimHalf; z++) {
 				// each voxel lives at a given distance from the origin:
-				uint32_t d = distanceSquared(x-0.5, y-0.5, z-0.5);
+				//double d = distanceSquared(x+0.5, y+0.5, z+0.5);
+				double d = distanceSquared(x, y, z); 
+				//double d = distanceSquared(x-0.5, y-0.5, z-0.5);
 				//printf("%04d %04d %04d -> %8d\n", x, y, z, d);
 				// if this is within the valid query radius:
 				if (d < mMaxHalfD2) {
 					// store the hash (voxel index) in the corresponding shell:
+					//uint32_t h = hash(x+0.5, y+0.5, z+0.5);
 					uint32_t h = hash(x, y, z);
+					//uint32_t h = hash(x-0.5, y-0.5, z-0.5);
 					shells[d].push_back(h);
+					
+					if (d < 3) {
+						printf("x, y, z %d, %d, %d: distance %f hash %u\n",
+						x,y,z,d,h);
+					}
+					
 				} else {
 					//printf("out of range"); Vec3i(x, y, z).print();
 				}
@@ -75,7 +88,7 @@ HashSpace :: HashSpace(uint32_t resolution, uint32_t numObjects)
 	mDistanceToVoxelIndices[mMaxHalfD2] = mVoxelIndices.size();
 	
 //	// dump the lists:
-//	uint32_t offset = hash(0, 0, 0);
+//	uint32_t offset = hash(0, 1, 0);
 //	printf("offset %d\n", offset);
 //	Vec3i p = unhash(offset); p.print();
 //	for (unsigned d=1; d<mDistanceToVoxelIndices.size(); d++) {
@@ -83,9 +96,9 @@ HashSpace :: HashSpace(uint32_t resolution, uint32_t numObjects)
 //		uint32_t cellend = mDistanceToVoxelIndices[d];
 //		printf("=== shell (squared distance) %d .. %d (%d .. %d) ===\n", d-1, d, cellstart, cellend);
 //		for (uint32_t j=cellstart; j<cellend; j++) {
-//			uint32_t voxel = (offset + mVoxelIndices[j]) & mWrap3;
-//			Vec3i p = unhash(voxel);
-//			//p.print();
+//			uint32_t voxel = unhash(offset + mVoxelIndices[j]) & mWrap3;
+//			Vec3i p1 = unhash(voxel);
+//			p1.print(); printf("\n");
 //		}
 //	}
 }

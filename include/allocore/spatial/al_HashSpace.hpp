@@ -256,22 +256,35 @@ protected:
 
 	// convert x,y,z in range [0..DIM) to unsigned hash:
 	// this is also the valid mVoxels index for the corresponding voxel:
-	template<typename T>
-	uint32_t hash(Vec<3,T> v) const { return hash(v[0], v[1], v[2]); }
-	uint32_t hash(unsigned x, unsigned y, unsigned z) const { 
+	inline uint32_t hash(unsigned x, unsigned y, unsigned z) const { 
 		return hashx(x)+hashy(y)+hashz(z); 
 	}
+	template<typename T>
+	inline uint32_t hash(Vec<3,T> v) const { return hash(v[0], v[1], v[2]); }
+	// generate hash offset by an already generated hash:
+	inline uint32_t hash(uint32_t x, uint32_t y, uint32_t z, uint32_t offset) const {
+		return	hashx(unhashx(offset) + x) + 
+				hashy(unhashy(offset) + y) + 
+				hashz(unhashz(offset) + z);
+	}
+	template<typename T>
+	inline uint32_t hash(Vec<3,T> v, uint32_t offset) const { 
+		return hash(v[0], v[1], v[2], offset); 
+	}
+	
 	
 	inline uint32_t hashx(uint32_t v) const { return v & mWrap; }
 	inline uint32_t hashy(uint32_t v) const { return (v & mWrap)<<mShift; }
 	inline uint32_t hashz(uint32_t v) const { return (v & mWrap)<<mShift2; }
 	
 	// convert unsigned hash to x,y,z in range [0..mDim):
-	Vec3i unhash(uint32_t h) const { return Vec3i(unhashx(h), unhashy(h), unhashz(h)); }
-		
+	inline Vec3i unhash(uint32_t h) const { return Vec3i(unhashx(h), unhashy(h), unhashz(h)); }
+	
 	inline uint32_t unhashx(uint32_t h) const { return (h) & mWrap; }
 	inline uint32_t unhashy(uint32_t h) const { return (h>>mShift) & mWrap; }
 	inline uint32_t unhashz(uint32_t h) const { return (h>>mShift2) & mWrap; }
+	
+	
 	
 	// safe floating-point wrapping
 	static double wrap(double x, double mod);
@@ -340,17 +353,15 @@ inline int HashSpace::Query :: operator()(const HashSpace& space, const Object *
 // TODO: non-toroidal version.
 inline int HashSpace::Query :: operator()(const HashSpace& space, Vec3d center, double maxRadius, double minRadius) {
 	unsigned nres = 0;
-	uint32_t offset = space.hash(center);
 	double minr2 = minRadius*minRadius;
 	double maxr2 = maxRadius*maxRadius;
 	uint32_t iminr2 = al::max(uint32_t(0), uint32_t(minRadius*minRadius));
-	uint32_t imaxr2 = al::min(space.mMaxHalfD2, uint32_t((maxRadius+1)*(maxRadius+1)));
+	uint32_t imaxr2 = al::min(space.mMaxHalfD2, uint32_t(1 + (maxRadius+1)*(maxRadius+1)));
 	if (iminr2 < imaxr2) { 
 		uint32_t cellstart = space.mDistanceToVoxelIndices[iminr2];
 		uint32_t cellend = space.mDistanceToVoxelIndices[imaxr2];
 		for (uint32_t i = cellstart; i < cellend; i++) {
-			// offset current index by voxel grid:
-			uint32_t index = (offset + space.mVoxelIndices[i]) & space.mWrap3;
+			uint32_t index = space.hash(center, space.mVoxelIndices[i]);
 			const Voxel& voxel = space.mVoxels[index];
 			// now add any objects in this voxel to the result... 
 			Object * head = voxel.mObjects;
@@ -368,7 +379,9 @@ inline int HashSpace::Query :: operator()(const HashSpace& space, Vec3d center, 
 					o = o->next;
 				} while (o != head && nres < mMaxResults);
 			}
-			if(nres == mMaxResults) break;
+			if(nres == mMaxResults) {
+				break;
+			}
 		}
 	}
 	//std::sort(mObjects.begin(), mObjects.end(), Result::compare);
@@ -381,17 +394,15 @@ inline int HashSpace::Query :: operator()(const HashSpace& space, Vec3d center, 
 inline int HashSpace::Query :: operator()(const HashSpace& space, const HashSpace::Object * obj, double maxRadius, double minRadius) {
 	unsigned nres = 0;
 	const Vec3d& center = obj->pos;
-	uint32_t offset = space.hash(center);
 	double minr2 = minRadius*minRadius;
 	double maxr2 = maxRadius*maxRadius;
 	uint32_t iminr2 = al::max(uint32_t(0), uint32_t(minRadius*minRadius));
-	uint32_t imaxr2 = al::min(space.mMaxHalfD2, uint32_t((maxRadius+1)*(maxRadius+1)));
+	uint32_t imaxr2 = al::min(space.mMaxHalfD2, uint32_t(1 + (maxRadius+1)*(maxRadius+1)));
 	if (iminr2 < imaxr2) { 
 		uint32_t cellstart = space.mDistanceToVoxelIndices[iminr2];
 		uint32_t cellend = space.mDistanceToVoxelIndices[imaxr2];
 		for (uint32_t i = cellstart; i < cellend; i++) {
-			// offset current index by voxel grid:
-			uint32_t index = (offset + space.mVoxelIndices[i]) & space.mWrap3;
+			uint32_t index = space.hash(center, space.mVoxelIndices[i]);
 			const Voxel& voxel = space.mVoxels[index];
 			// now add any objects in this voxel to the result... 
 			Object * head = voxel.mObjects;
