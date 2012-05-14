@@ -94,10 +94,11 @@ public:
 	Complex(const T& m, const T& p, int fromPolar){ (*this) = Polar<T>(m,p); }
 
 	
-	C& arg(T v){ return fromPolar(norm(), v); }					///< Set phase leaving magnitude the same
+	C& arg(T v){ return fromPolar(norm(), v); }					///< Set argument leaving norm the same
+	C& norm(T v){ return fromPolar(v, arg()); }					///< Set norm leaving argument the same
+
 	C& fromPolar(T phase){ r=::cos(phase); i=::sin(phase); return *this; }	///< Set phase and normalize
 	C& fromPolar(T m, T p){ return set(Polar<T>(m,p)); }		///< Set magnitude and phase
-	C& norm(const T& v){ return fromPolar(v, arg()); }			///< Set magnitude leaving phase the same
 
 	/// Set real and imaginary components
 	C& set(T vr, T vi){ r=vr; i=vi; return *this; }
@@ -115,8 +116,8 @@ public:
 	bool operator ==(const C& v) const { return (r==v.r) && (i==v.i); }		///< Returns true if all components are equal
 	bool operator ==(const T& v) const { return (r==v  ) && (i==T(0));}		///< Returns true if real and equals value
 	bool operator !=(const C& v) const { return (r!=v.r) || (i!=v.i); }		///< Returns true if any components are not equal
-	bool operator > (const C& v) const { return norm2() > v.norm2(); }		///< Returns true if norm is greater than argument's norm
-	bool operator < (const C& c) const { return norm2() < c.norm2(); }		///< Returns true if norm is less than argument's norm
+	bool operator > (const C& v) const { return normSqr() > v.normSqr(); }	///< Returns true if norm is greater than argument's norm
+	bool operator < (const C& c) const { return normSqr() < c.normSqr(); }	///< Returns true if norm is less than argument's norm
 
 	C& operator = (const Polar<T>& v){ r=v.m*::cos(v.p); i=v.m*::sin(v.p); return *this; }
 	C& operator = (const C& v){ r=v.r; i=v.i; return *this; }
@@ -145,14 +146,14 @@ public:
 	C conj() const { return C(r,-i); }						///< Returns conjugate, z*
 	T dot(const C& v) const { return r*v.r + i*v.i; }		///< Returns vector dot product
 	C exp() const { return Polar<T>(::exp(r), i); }			///< Returns e^z
-	C log() const { return Complex<T>(T(0.5)*::log(norm2()), arg()); } ///< Returns log(z)
-	T norm() const { return ::sqrt(norm2()); }				///< Returns norm (radius), |z|
-	T norm2() const { return dot(*this); }					///< Returns square of norm, |z|^2
-	C& normalize(){ return *this /= norm(); }				///< Sets norm (radius) to 1, |z|=1
+	C log() const { return Complex<T>(T(0.5)*::log(normSqr()), arg()); } ///< Returns log(z)
+	T norm() const { return ::sqrt(normSqr()); }			///< Returns norm (radius), |z|
+	T normSqr() const { return dot(*this); }				///< Returns square of norm, |z|^2
+	C& normalize(T m=T(1)){ return *this *= (m/norm()); }	///< Sets magnitude to 1, |z|=1
 	C pow(const C& v) const { return ((*this).log()*v).exp(); }	///< Returns z^v
 	C pow(T v) const { return ((*this).log()*v).exp(); }	///< Returns z^v
-	C recip() const { return conj()/norm2(); }				///< Return multiplicative inverse, 1/z
-	C sgn() const { return C(*this).normalize(); }			///< Returns signum, z/|z|, the closest point on unit circle
+	C recip() const { return conj()/normSqr(); }			///< Return multiplicative inverse, 1/z
+	C sgn(T m=T(1)) const { return C(*this).normalize(m); }	///< Returns signum, z/|z|, the closest point on unit circle
 	C sqr() const { return C(r*r-i*i, T(2)*r*i); }			///< Returns square
 
 	/// Returns square root
@@ -171,7 +172,7 @@ public:
 
 	T abs() const { return norm(); }						///< Returns norm (radius), |z|
 	T mag() const { return norm(); }						///< Returns norm (radius), |z|
-	T magSqr() const { return norm2(); }					///< Returns square of norm, |z|^2
+	T magSqr() const { return normSqr(); }					///< Returns square of norm, |z|^2
 	T phase() const { return arg(); }						///< Returns argument (angle)
 };
 
