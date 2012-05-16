@@ -26,22 +26,22 @@ void Stereographic::sendClear(Graphics& gl){
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 }
 
-void Stereographic :: draw(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear) {
+void Stereographic :: draw(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect) {
 	if(mStereo){
 		switch(mMode){
-			case ANAGLYPH:	drawAnaglyph(gl, lens, pose, vp, draw, clear); return;
-			case ACTIVE:	drawActive	(gl, lens, pose, vp, draw, clear); return;
-			case DUAL:		drawDual	(gl, lens, pose, vp, draw, clear); return;
-			case LEFT_EYE:	drawLeft	(gl, lens, pose, vp, draw, clear); return;
-			case RIGHT_EYE:	drawRight	(gl, lens, pose, vp, draw, clear); return;
+			case ANAGLYPH:	drawAnaglyph(gl, lens, pose, vp, draw, clear, pixelaspect); return;
+			case ACTIVE:	drawActive	(gl, lens, pose, vp, draw, clear, pixelaspect); return;
+			case DUAL:		drawDual	(gl, lens, pose, vp, draw, clear, pixelaspect); return;
+			case LEFT_EYE:	drawLeft	(gl, lens, pose, vp, draw, clear, pixelaspect); return;
+			case RIGHT_EYE:	drawRight	(gl, lens, pose, vp, draw, clear, pixelaspect); return;
 			default:;
 		}
 	} else {
-		drawMono(gl, lens, pose, vp, draw, clear);
+		drawMono(gl, lens, pose, vp, draw, clear, pixelaspect);
 	}
 }
 
-void Stereographic :: drawMono(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear) 
+void Stereographic :: drawMono(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect) 
 {
 	double near = lens.near();
 	double far = lens.far();
@@ -67,7 +67,7 @@ void Stereographic :: drawMono(Graphics& gl, const Lens& lens, const Pose& pose,
 			
 			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
-			double aspect = vp1.aspect(); 
+			double aspect = vp1.aspect() * pixelaspect; 
 			double fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect); 
 			
 			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
@@ -89,7 +89,7 @@ void Stereographic :: drawMono(Graphics& gl, const Lens& lens, const Pose& pose,
 	} else {
 		
 		double fovy = lens.fovy();
-		double aspect = vp.aspect();
+		double aspect = vp.aspect() * pixelaspect;
 		Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
 		mProjection = Matrix4d::perspective(fovy, aspect, near, far);
 		mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
@@ -101,7 +101,7 @@ void Stereographic :: drawMono(Graphics& gl, const Lens& lens, const Pose& pose,
 	glDisable(GL_SCISSOR_TEST);
 }
 
-void Stereographic :: drawAnaglyph(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear) 
+void Stereographic :: drawAnaglyph(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect) 
 {	
 	double near = lens.near();
 	double far = lens.far();
@@ -137,7 +137,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Lens& lens, const Pose& p
 			
 			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
-			double aspect = vp1.aspect(); 
+			double aspect = vp1.aspect() * pixelaspect; 
 			double fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect); 
 			
 			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
@@ -158,7 +158,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Lens& lens, const Pose& p
 		}
 	} else {
 		double fovy = lens.fovy();
-		double aspect = vp.aspect();		
+		double aspect = vp.aspect() * pixelaspect;		
 		Vec3d ux, uy, uz; 
 		pose.unitVectors(ux, uy, uz);
 		
@@ -189,7 +189,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Lens& lens, const Pose& p
 			
 			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
-			double aspect = vp1.aspect(); 
+			double aspect = vp1.aspect() * pixelaspect; 
 			double fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect); 
 			
 			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
@@ -213,7 +213,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Lens& lens, const Pose& p
 		}
 	} else {
 		double fovy = lens.fovy();
-		double aspect = vp.aspect();		
+		double aspect = vp.aspect() * pixelaspect;		
 		Vec3d ux, uy, uz; 
 		pose.unitVectors(ux, uy, uz);
 		
@@ -238,7 +238,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Lens& lens, const Pose& p
 
 
 
-void Stereographic :: drawActive(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear) 
+void Stereographic :: drawActive(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect) 
 {
 	double near = lens.near();
 	double far = lens.far();
@@ -265,7 +265,7 @@ void Stereographic :: drawActive(Graphics& gl, const Lens& lens, const Pose& pos
 			
 			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
-			double aspect = vp1.aspect(); 
+			double aspect = vp1.aspect() * pixelaspect; 
 			double fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect); 
 
 			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
@@ -287,7 +287,7 @@ void Stereographic :: drawActive(Graphics& gl, const Lens& lens, const Pose& pos
 		
 	} else {
 		double fovy = lens.fovy();
-		double aspect = vp.aspect();
+		double aspect = vp.aspect() * pixelaspect;
 		Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
 		mEye = pos + (ux * -iod);	// right
 		mProjection = Matrix4d::perspectiveRight(fovy, aspect, near, far, iod, focal);
@@ -310,7 +310,7 @@ void Stereographic :: drawActive(Graphics& gl, const Lens& lens, const Pose& pos
 			
 			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
-			double aspect = vp1.aspect(); 
+			double aspect = vp1.aspect() * pixelaspect; 
 			double fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect); 
 			
 			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
@@ -332,7 +332,7 @@ void Stereographic :: drawActive(Graphics& gl, const Lens& lens, const Pose& pos
 		
 	} else {
 		double fovy = lens.fovy();
-		double aspect = vp.aspect();
+		double aspect = vp.aspect() * pixelaspect;
 		Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
 		mEye = pos + (ux * iod);	// left
 		mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
@@ -347,14 +347,14 @@ void Stereographic :: drawActive(Graphics& gl, const Lens& lens, const Pose& pos
 	glDisable(GL_SCISSOR_TEST);
 }
 
-void Stereographic :: drawDual(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear) 
+void Stereographic :: drawDual(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect) 
 {
 	double fovy = lens.fovy();
 	double near = lens.near();
 	double far = lens.far();
 	double focal = lens.focalLength();
 	double iod = lens.eyeSep();
-	double aspect = vp.aspect();
+	double aspect = vp.aspect() * pixelaspect;
 	const Vec3d& pos = pose.pos();
 	Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
 	
@@ -380,7 +380,7 @@ void Stereographic :: drawDual(Graphics& gl, const Lens& lens, const Pose& pose,
 			
 			int wx1 = vpleft.l + vpleft.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vpleft.b, wx1-wx, vpleft.h);
-			double aspect = vp1.aspect(); 
+			double aspect = vp1.aspect() * pixelaspect; 
 			double fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vpleft.w, aspect); 
 			
 			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
@@ -407,7 +407,7 @@ void Stereographic :: drawDual(Graphics& gl, const Lens& lens, const Pose& pose,
 			
 			int wx1 = vpright.l + vpright.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vpright.b, wx1-wx, vpright.h);
-			double aspect = vp1.aspect(); 
+			double aspect = vp1.aspect() * pixelaspect; 
 			double fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vpright.w, aspect); 
 			
 			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
@@ -452,7 +452,7 @@ void Stereographic :: drawDual(Graphics& gl, const Lens& lens, const Pose& pose,
 
 
 
-void Stereographic :: drawLeft(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear) 
+void Stereographic :: drawLeft(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect) 
 {
 	double near = lens.near();
 	double far = lens.far();
@@ -477,7 +477,7 @@ void Stereographic :: drawLeft(Graphics& gl, const Lens& lens, const Pose& pose,
 			
 			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
-			double aspect = vp1.aspect(); 
+			double aspect = vp1.aspect() * pixelaspect; 
 			double fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect); 
 			
 			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
@@ -500,7 +500,7 @@ void Stereographic :: drawLeft(Graphics& gl, const Lens& lens, const Pose& pose,
 	} else {
 		
 		double fovy = lens.fovy();
-		double aspect = vp.aspect();
+		double aspect = vp.aspect() * pixelaspect;
 		Vec3d ux, uy, uz; pose.unitVectors(ux, uy, uz);
 		mEye = pos + (ux * iod);	// left
 		mProjection = Matrix4d::perspectiveLeft(fovy, aspect, near, far, iod, focal);
@@ -513,7 +513,7 @@ void Stereographic :: drawLeft(Graphics& gl, const Lens& lens, const Pose& pose,
 	//glPopAttrib();
 }
 
-void Stereographic :: drawRight(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear) 
+void Stereographic :: drawRight(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect) 
 {
 	double near = lens.near();
 	double far = lens.far();
@@ -538,7 +538,7 @@ void Stereographic :: drawRight(Graphics& gl, const Lens& lens, const Pose& pose
 			
 			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
-			double aspect = vp1.aspect(); 
+			double aspect = vp1.aspect() * pixelaspect; 
 			double fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect); 
 			
 			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
@@ -559,7 +559,7 @@ void Stereographic :: drawRight(Graphics& gl, const Lens& lens, const Pose& pose
 		}
 	} else {
 		double fovy = lens.fovy();
-		double aspect = vp.aspect();		
+		double aspect = vp.aspect() * pixelaspect;		
 		Vec3d ux, uy, uz; 
 		pose.unitVectors(ux, uy, uz);
 		

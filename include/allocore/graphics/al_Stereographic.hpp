@@ -81,15 +81,16 @@ public:
 	/// @param[in] vp		region of screen to render to
 	/// @param[in] draw		function object with drawing commands
 	/// @param[in] clear	whether to clear the color/depth buffers
-	void draw			(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
+	/// @param[in] pixelaspect	additional aspect multipler (for non-square pixels)
+	void draw			(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
 	
 	// So many different ways to draw :-)
-	void drawMono		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
-	void drawActive		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
-	void drawAnaglyph	(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
-	void drawDual		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
-	void drawLeft		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
-	void drawRight		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true);
+	void drawMono		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+	void drawActive		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+	void drawAnaglyph	(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+	void drawDual		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+	void drawLeft		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+	void drawRight		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
 	
 	/// Draw blue line for active stereo sync (for those projectors that need it)
 
