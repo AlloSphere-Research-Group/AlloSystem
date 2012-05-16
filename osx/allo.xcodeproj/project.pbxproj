@@ -134,6 +134,21 @@
 		16C70699135D13F400FEE5B3 /* helloVirtualWorld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16C70697135D13DF00FEE5B3 /* helloVirtualWorld.cpp */; };
 		16C706AE135D148800FEE5B3 /* reverb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168B4E811331383A0076257A /* reverb.cpp */; };
 		3604426314CF672500C95A2F /* al_Zeroconf_OSX.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3604426214CF672500C95A2F /* al_Zeroconf_OSX.mm */; };
+		360AC1AE1564332E00AF1B5D /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
+		360AC1AF1564332E00AF1B5D /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
+		360AC1B01564332E00AF1B5D /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC53081162907D0076AA8B /* CoreAudio.framework */; };
+		360AC1B11564332E00AF1B5D /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D311628F860076AA8B /* GLUT.framework */; };
+		360AC1B21564332E00AF1B5D /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
+		360AC1B31564332E00AF1B5D /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 36B412AF10EFF916007B16D0 /* Cocoa.framework */; };
+		360AC1B41564332E00AF1B5D /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492A130E0254007B30A0 /* liballocore.a */; };
+		360AC1B51564332E00AF1B5D /* libassimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492C130E0254007B30A0 /* libassimp.a */; };
+		360AC1B61564332E00AF1B5D /* libfreeimage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492D130E0254007B30A0 /* libfreeimage.a */; };
+		360AC1B71564332E00AF1B5D /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492E130E0254007B30A0 /* libfreetype.a */; };
+		360AC1B81564332E00AF1B5D /* liblua.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E492F130E0254007B30A0 /* liblua.a */; };
+		360AC1B91564332E00AF1B5D /* libluajit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4930130E0254007B30A0 /* libluajit.a */; };
+		360AC1BA1564332E00AF1B5D /* libportaudio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4931130E0254007B30A0 /* libportaudio.a */; };
+		360AC1BB1564332E00AF1B5D /* libsndfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163E4932130E0254007B30A0 /* libsndfile.a */; };
+		360AC1C71564334200AF1B5D /* fbo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 360AC1C61564334200AF1B5D /* fbo.cpp */; };
 		360C243811E6599F000FF335 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC52D411628F860076AA8B /* OpenGL.framework */; };
 		360C243911E6599F000FF335 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
 		360C243A11E6599F000FF335 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC5312116290AA0076AA8B /* AudioUnit.framework */; };
@@ -530,6 +545,13 @@
 			remoteInfo = "make allocore";
 		};
 		3604412714CF5AA400C95A2F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 36035DB813037E8D001E9BA9;
+			remoteInfo = "make allocore";
+		};
+		360AC1AA1564332E00AF1B5D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
 			proxyType = 1;
@@ -978,6 +1000,8 @@
 		360441AB14CF5BA200C95A2F /* al_Lua.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Lua.hpp; sourceTree = "<group>"; };
 		360441AC14CF5BA200C95A2F /* al_ResourceManager.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_ResourceManager.hpp; sourceTree = "<group>"; };
 		3604426214CF672500C95A2F /* al_Zeroconf_OSX.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = al_Zeroconf_OSX.mm; sourceTree = "<group>"; };
+		360AC1BF1564332E00AF1B5D /* exFBO */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exFBO; sourceTree = BUILT_PRODUCTS_DIR; };
+		360AC1C61564334200AF1B5D /* fbo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fbo.cpp; sourceTree = "<group>"; };
 		360C244411E6599F000FF335 /* exCompiler */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exCompiler; sourceTree = BUILT_PRODUCTS_DIR; };
 		360C404E11D32FED002FE91F /* al_Matrix4.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Matrix4.hpp; sourceTree = "<group>"; };
 		36115B381438DE3400E121BF /* exSimpleGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exSimpleGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1888,6 +1912,27 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		360AC1AD1564332E00AF1B5D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				360AC1AE1564332E00AF1B5D /* AudioToolbox.framework in Frameworks */,
+				360AC1AF1564332E00AF1B5D /* AudioUnit.framework in Frameworks */,
+				360AC1B01564332E00AF1B5D /* CoreAudio.framework in Frameworks */,
+				360AC1B11564332E00AF1B5D /* GLUT.framework in Frameworks */,
+				360AC1B21564332E00AF1B5D /* OpenGL.framework in Frameworks */,
+				360AC1B31564332E00AF1B5D /* Cocoa.framework in Frameworks */,
+				360AC1B41564332E00AF1B5D /* liballocore.a in Frameworks */,
+				360AC1B51564332E00AF1B5D /* libassimp.a in Frameworks */,
+				360AC1B61564332E00AF1B5D /* libfreeimage.a in Frameworks */,
+				360AC1B71564332E00AF1B5D /* libfreetype.a in Frameworks */,
+				360AC1B81564332E00AF1B5D /* liblua.a in Frameworks */,
+				360AC1B91564332E00AF1B5D /* libluajit.a in Frameworks */,
+				360AC1BA1564332E00AF1B5D /* libportaudio.a in Frameworks */,
+				360AC1BB1564332E00AF1B5D /* libsndfile.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		360C243711E6599F000FF335 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -2447,6 +2492,7 @@
 				36462C0313EAA5C500F33CA7 /* omnigraphic.cpp */,
 				366E78041405C6B70010B21A /* cubemap.cpp */,
 				36E4909314380D7B00D7FE2B /* texture3d.cpp */,
+				360AC1C61564334200AF1B5D /* fbo.cpp */,
 			);
 			path = graphics;
 			sourceTree = "<group>";
@@ -2774,6 +2820,7 @@
 				36510C5C1502D64C005C548E /* exModelShader */,
 				364BAFF215434B62009789A9 /* exVCR */,
 				36975CEC1558667E00493706 /* exAllosphereCalibration */,
+				360AC1BF1564332E00AF1B5D /* exFBO */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -4802,6 +4849,24 @@
 			productReference = 3604411714CF5A0E00C95A2F /* allua */;
 			productType = "com.apple.product-type.tool";
 		};
+		360AC1A81564332E00AF1B5D /* exFBO */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 360AC1BC1564332E00AF1B5D /* Build configuration list for PBXNativeTarget "exFBO" */;
+			buildPhases = (
+				360AC1AB1564332E00AF1B5D /* Sources */,
+				360AC1AD1564332E00AF1B5D /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				360AC1A91564332E00AF1B5D /* PBXTargetDependency */,
+			);
+			name = exFBO;
+			productInstallPath = "$(HOME)/bin";
+			productName = alscheduling;
+			productReference = 360AC1BF1564332E00AF1B5D /* exFBO */;
+			productType = "com.apple.product-type.tool";
+		};
 		360C243211E6599F000FF335 /* exCompiler */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 360C244111E6599F000FF335 /* Build configuration list for PBXNativeTarget "exCompiler" */;
@@ -5272,6 +5337,7 @@
 				36510C441502D64C005C548E /* exModelShader */,
 				364BAFDB15434B62009789A9 /* exVCR */,
 				36975CD51558667E00493706 /* exAllosphereCalibration */,
+				360AC1A81564332E00AF1B5D /* exFBO */,
 			);
 		};
 /* End PBXProject section */
@@ -5446,6 +5512,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				3604426314CF672500C95A2F /* al_Zeroconf_OSX.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		360AC1AB1564332E00AF1B5D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				360AC1C71564334200AF1B5D /* fbo.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5703,6 +5777,11 @@
 			isa = PBXTargetDependency;
 			target = 36035DB813037E8D001E9BA9 /* make allocore */;
 			targetProxy = 3604412714CF5AA400C95A2F /* PBXContainerItemProxy */;
+		};
+		360AC1A91564332E00AF1B5D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 36035DB813037E8D001E9BA9 /* make allocore */;
+			targetProxy = 360AC1AA1564332E00AF1B5D /* PBXContainerItemProxy */;
 		};
 		36115B1C1438DE3400E121BF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -6049,6 +6128,57 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = allua;
 				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		360AC1BD1564332E00AF1B5D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"_GLIBCXX_DEBUG=1",
+					"_GLIBCXX_DEBUG_PEDANTIC=1",
+				);
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"$(SRCROOT)/../build/lib\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"",
+					"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"$(SRCROOT)/lib\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"",
+					"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"$(SRCROOT)/../build/lib\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"",
+				);
+				OTHER_CFLAGS = (
+					"-DAPR_FAST_COMPAT",
+					"-DAPR_STRICT",
+				);
+				PRODUCT_NAME = $TARGET_NAME;
+				USER_HEADER_SEARCH_PATHS = $inherited;
+			};
+			name = Debug;
+		};
+		360AC1BE1564332E00AF1B5D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"$(SRCROOT)/../build/lib\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"",
+					"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"$(SRCROOT)/lib\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"",
+					"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"$(SRCROOT)/../build/lib\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"",
+				);
+				OTHER_CFLAGS = (
+					"-DAPR_FAST_COMPAT",
+					"-DAPR_STRICT",
+				);
+				PRODUCT_NAME = $TARGET_NAME;
+				USER_HEADER_SEARCH_PATHS = $inherited;
 			};
 			name = Release;
 		};
@@ -7220,6 +7350,15 @@
 			buildConfigurations = (
 				3604411914CF5A0E00C95A2F /* Debug */,
 				3604411A14CF5A0E00C95A2F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		360AC1BC1564332E00AF1B5D /* Build configuration list for PBXNativeTarget "exFBO" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				360AC1BD1564332E00AF1B5D /* Debug */,
+				360AC1BE1564332E00AF1B5D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

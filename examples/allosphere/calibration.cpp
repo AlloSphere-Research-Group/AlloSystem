@@ -12,17 +12,11 @@ Graham Wakefield 2012
 Geometry map UV is normalized in 0..1; values outside that range indicate pixels to be discarded. 
 I think this means that it is a replacement of the NDC coordinates.
 
-
-
-
-
-
-
 */
 
 #include "allocore/al_Allocore.hpp"
 #include "alloutil/al_ControlNav.hpp"
-#include "alloutil/al_OpenGL.hpp"
+#include "alloutil/al_CubeMapFBO.hpp"
 #include "allocore/graphics/al_Shader.hpp"
 
 #define TEST
@@ -299,7 +293,7 @@ struct MyWindow : Window, public Drawable{
 		vscnF.printLog();
 		vscnP.printLog();
 		
-		Image img("./alpha1.jpg");
+		Image img("../../share/sphere_data/alpha1.jpg");
 		alphaMap.submit(img.array(), true);
 
 		return true;
@@ -423,7 +417,7 @@ int main(int argc, char ** argv){
 	cam.near(1).far(world_radius).fovy(90);
 	
 	{
-		File f("./map1.bin", "rb", true); 
+		File f("../../share/sphere_data/map1.bin", "rb", true); 
 		
 		int32_t dim[2];
 		f.read((void *)dim, sizeof(int32_t), 2);
