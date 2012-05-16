@@ -53,7 +53,7 @@ void Stereographic :: drawMono(Graphics& gl, const Lens& lens, const Pose& pose,
 	glEnable(GL_SCISSOR_TEST);
 	sendViewport(gl, vp);
 
-	glDrawBuffer(GL_BACK);
+	// glDrawBuffer(GL_BACK);	// << breaks usage under FBO
 	if(clear) sendClear(gl);
 	
 	mEye = pos;
@@ -115,7 +115,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Lens& lens, const Pose& p
 	glEnable(GL_SCISSOR_TEST);
 	sendViewport(gl, vp);
 
-	glDrawBuffer(GL_BACK);
+	// glDrawBuffer(GL_BACK); //<< this breaks usage within FBO.
 	if(clear) sendClear(gl);
 	
 	switch(mAnaglyphMode){
@@ -340,6 +340,8 @@ void Stereographic :: drawActive(Graphics& gl, const Lens& lens, const Pose& pos
 
 		pushDrawPop(gl,draw);
 	}
+	
+	glDrawBuffer(GL_BACK);
 
 	//glPopAttrib();
 	glDisable(GL_SCISSOR_TEST);
@@ -363,7 +365,7 @@ void Stereographic :: drawDual(Graphics& gl, const Lens& lens, const Pose& pose,
 	glEnable(GL_SCISSOR_TEST);
 	sendViewport(gl, vp);
 
-	glDrawBuffer(GL_BACK);
+	// glDrawBuffer(GL_BACK); //<< this breaks usage within FBO.
 	if(clear) sendClear(gl);
 	
 	Viewport vpleft(vp.l, vp.b, vp.w*0.5, vp.h);
@@ -463,7 +465,7 @@ void Stereographic :: drawLeft(Graphics& gl, const Lens& lens, const Pose& pose,
 	glEnable(GL_SCISSOR_TEST);
 	sendViewport(gl, vp);
 	
-	glDrawBuffer(GL_BACK);
+	// glDrawBuffer(GL_BACK); //<< this breaks usage within FBO.
 	if(clear) sendClear(gl);
 	
 	if (omni()) {
@@ -524,7 +526,7 @@ void Stereographic :: drawRight(Graphics& gl, const Lens& lens, const Pose& pose
 	glEnable(GL_SCISSOR_TEST);
 	sendViewport(gl, vp);
 
-	glDrawBuffer(GL_BACK);
+	// glDrawBuffer(GL_BACK); //<< this breaks usage within FBO.
 	if(clear) sendClear(gl);
 	
 	if (omni()) {
@@ -646,6 +648,8 @@ void Stereographic :: drawBlueLine(double window_width, double window_height)
 		glViewport(vp[0], vp[1], vp[2], vp[3]);
 	}	
 	glPopAttrib();
+	
+	glDrawBuffer(GL_BACK);
 }
 
 } // al::

@@ -117,7 +117,7 @@ public:
 	/// @param[in] attach	Attachment type
 	/// @param[in] level	mipmap level of texture
 	FBO& attachTexture2D(unsigned texID, Attachment attach=COLOR_ATTACHMENT0, int level=0);
-
+	
 	/// Detach texture at a specified attachment point and mipmap level
 	FBO& detachTexture2D(Attachment attach, int level=0);
 
