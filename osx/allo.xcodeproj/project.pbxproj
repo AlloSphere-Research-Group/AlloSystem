@@ -2478,6 +2478,7 @@
 			isa = PBXGroup;
 			children = (
 				162B49B313C522A000254153 /* camera.cpp */,
+				360AC1C61564334200AF1B5D /* fbo.cpp */,
 				16A6041B130345BB0077B460 /* frustumTesting.cpp */,
 				16A6041C130345BB0077B460 /* isosurface.cpp */,
 				16A6041E130345BB0077B460 /* manyShapeMesh.cpp */,
@@ -2492,7 +2493,6 @@
 				36462C0313EAA5C500F33CA7 /* omnigraphic.cpp */,
 				366E78041405C6B70010B21A /* cubemap.cpp */,
 				36E4909314380D7B00D7FE2B /* texture3d.cpp */,
-				360AC1C61564334200AF1B5D /* fbo.cpp */,
 			);
 			path = graphics;
 			sourceTree = "<group>";
