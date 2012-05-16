@@ -818,6 +818,7 @@ template<typename T> inline void Array::setall(T value) {
 	int d0 = header.dim[0];
 	int d1 = header.dim[1];
 	int d2 = header.dim[2];
+	int s0 = header.stride[0];
 	int s1 = header.stride[1];
 	int s2 = header.stride[2];
 	int components = header.components;
@@ -837,8 +838,8 @@ template<typename T> inline void Array::setall(T value) {
 			break;
 		case 2:
 			for(int y=0; y < d1; y++) {
-				vals = (T *)(data.ptr + s1*y);
 				for(int x=0; x < d0; x++) {
+					vals = (T *)(data.ptr + s0*x + s1*y);
 					for (int i=0; i<components; i++) {
 						vals[i] = value;
 					}
