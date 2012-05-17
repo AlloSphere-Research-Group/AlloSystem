@@ -169,8 +169,8 @@ public:
 
 	/// @param[in] sampleRate		Sampling rate.  Unsupported values will use default rate of device.
 	/// @param[in] blockSize		Number of sample frames to process per callback
-	/// @param[in] outputChannels	Number of output channels to open
-	/// @param[in] inputChannels	Number of input channels to open
+	/// @param[in] outputChannels	Number of output channels to open or -1 for all
+	/// @param[in] inputChannels	Number of input channels to open or -1 for all
 	void initAudio(
 		double audioRate=44100, int blockSize=128,
 		int outputChannels=-1, int inputChannels=-1	
