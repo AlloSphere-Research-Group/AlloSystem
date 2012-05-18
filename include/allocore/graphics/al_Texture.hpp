@@ -199,7 +199,7 @@ public:
 	void submit(const void * pixels, uint32_t align=4);
 	
 	/// NOTE: only valid when the graphics context is valid:
-	Texture& generateMipmap() { bind(); glGenerateMipmap(target()); unbind(); return *this; }
+	Texture& generateMipmap() { bind(); glGenerateMipmapEXT(target()); unbind(); return *this; }
 
 	/// Allocate the internal Array for a CPU-side cache, copying from src
 	void allocate(const Array& src, bool reconfigure=true);
