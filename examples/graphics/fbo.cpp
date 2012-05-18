@@ -3,9 +3,16 @@ Allocore Example: FBO
 
 Description:
 This demonstrates how to use an FBO
+MipMaps:
+	
+FBOs won't generate the mip maps automatically
+If texture filterMin is set to a MIPMAP option, then the texture will need to have mipmaps generated manually (after the FBO is unbound), using tex.generateMipmap();
+
 
 Author:
 Graham Wakefield, 2012
+
+
 */
 
 #include "allocore/al_Allocore.hpp"
@@ -27,6 +34,7 @@ struct MyWindow : Window{
 		
 		// both depth and color attachees must be valid on the GPU before use:
 		rbo.resize(w, h);
+		//fbotex.filterMin(Texture::LINEAR_MIPMAP_LINEAR);
 		fbotex.validate();
 		
 		fbo.attachRBO(rbo, FBO::DEPTH_ATTACHMENT);
@@ -59,9 +67,7 @@ struct MyWindow : Window{
 		
 		// generation of Mipmaps must be done manually for FBO-bound textures:
 		// (to see why, comment this code out and then make the window very small).
-		fbotex.bind();
-		glGenerateMipmapEXT(GL_TEXTURE_2D);
-		fbotex.unbind();
+		//fbotex.generateMipmap();
 		
 		// show in blue-world:
 		gl.viewport(0, 0, width(), height());

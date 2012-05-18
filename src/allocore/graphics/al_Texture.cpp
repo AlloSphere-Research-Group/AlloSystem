@@ -17,7 +17,8 @@ Texture :: Texture(
 	mWrapS(CLAMP_TO_EDGE),
 	mWrapT(CLAMP_TO_EDGE),
 	mWrapR(CLAMP_TO_EDGE),
-	mFilter(LINEAR),
+	mFilterMin(LINEAR),
+	mFilterMag(LINEAR),
 	mWidth(width),
 	mHeight(height),
 	mDepth(0),
@@ -42,7 +43,8 @@ Texture :: Texture(
 	mWrapS(CLAMP_TO_EDGE),
 	mWrapT(CLAMP_TO_EDGE),
 	mWrapR(CLAMP_TO_EDGE),
-	mFilter(LINEAR),
+	mFilterMin(LINEAR),
+	mFilterMag(LINEAR),
 	mWidth(width),
 	mHeight(height),
 	mDepth(depth),
@@ -60,7 +62,8 @@ Texture :: Texture(AlloArrayHeader& header)
 	mWrapS(CLAMP_TO_EDGE),
 	mWrapT(CLAMP_TO_EDGE),
 	mWrapR(CLAMP_TO_EDGE),
-	mFilter(LINEAR),
+	mFilterMin(LINEAR),
+	mFilterMag(LINEAR),
 	mUnpack(1),
 	mParamsUpdated(true),
 	mPixelsUpdated(true),
@@ -332,12 +335,14 @@ void Texture :: deallocate() {
 void Texture::sendParams(bool force){
 	if(mParamsUpdated || force){
 		glBindTexture(target(), id());
-		glTexParameterf(target(), GL_TEXTURE_MAG_FILTER, filter());
-		glTexParameterf(target(), GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameterf(target(), GL_TEXTURE_MAG_FILTER, filterMag());
+		glTexParameterf(target(), GL_TEXTURE_MIN_FILTER, filterMin());
 		glTexParameterf(target(), GL_TEXTURE_WRAP_S, mWrapS);
 		glTexParameterf(target(), GL_TEXTURE_WRAP_T, mWrapT);
 		glTexParameterf(target(), GL_TEXTURE_WRAP_R, mWrapR);
-		glTexParameteri(target(), GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
+		if (filterMin() != LINEAR && filterMin() != NEAREST) {
+			glTexParameteri(target(), GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
+		}
 		glBindTexture(target(), 0);
 		mParamsUpdated = false;
 	}

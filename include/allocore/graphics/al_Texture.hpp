@@ -69,6 +69,7 @@ public:
 	enum Filter {
 		NEAREST					= GL_NEAREST,
 		LINEAR					= GL_LINEAR,
+		// first term is within mipmap level, second term is between mipmap levels:
 		NEAREST_MIPMAP_NEAREST	= GL_NEAREST_MIPMAP_NEAREST,
 		LINEAR_MIPMAP_NEAREST	= GL_LINEAR_MIPMAP_NEAREST,
 		NEAREST_MIPMAP_LINEAR	= GL_NEAREST_MIPMAP_LINEAR,
@@ -121,7 +122,8 @@ public:
 	unsigned height() const { return mHeight; }
 	unsigned depth() const { return mDepth; }
 
-	Filter filter() const { return mFilter; }
+	Filter filterMin() const { return mFilterMin; }
+	Filter filterMag() const { return mFilterMag; }
 	
 	/// Return number of components per pixel
 	unsigned numComponents() const { return Graphics::numComponents(format()); }
@@ -148,7 +150,8 @@ public:
 	Texture& resize(unsigned w, unsigned h){ return width(w).height(h); }
 	Texture& resize(unsigned w, unsigned h, unsigned d){ return width(w).height(h).depth(d); }
 
-	Texture& filter(Filter v){ return update(v, mFilter, mParamsUpdated); }
+	Texture& filterMin(Filter v){ return update(v, mFilterMin, mParamsUpdated); }
+	Texture& filterMag(Filter v){ return update(v, mFilterMag, mParamsUpdated); }
 	Texture& wrap(Wrap v){ return wrap(v,v,v); }
 	Texture& wrap(Wrap S, Wrap T){ return wrap(S,T,mWrapR); }
 	Texture& wrap(Wrap S, Wrap T, Wrap R);
@@ -194,6 +197,9 @@ public:
 	/// If pixels is NULL, then the only effect is to resize the texture
 	/// remotely.
 	void submit(const void * pixels, uint32_t align=4);
+	
+	/// NOTE: only valid when the graphics context is valid:
+	Texture& generateMipmap() { bind(); glGenerateMipmap(target()); unbind(); return *this; }
 
 	/// Allocate the internal Array for a CPU-side cache, copying from src
 	void allocate(const Array& src, bool reconfigure=true);
@@ -215,7 +221,7 @@ protected:
 	int mTexelFormat;			// default is 0 = auto
 	DataType mType;				// UBYTE, FLOAT, etc.
 	Wrap mWrapS, mWrapT, mWrapR;	
-	Filter mFilter;
+	Filter mFilterMin, mFilterMag;
 	unsigned mWidth, mHeight, mDepth;
 	int mUnpack;
 	
