@@ -18,7 +18,8 @@ Texture tex(63,63, Graphics::RGB, Graphics::UBYTE);
 struct MyWindow : Window{
 
 	bool onCreate(){
-		tex.filter(Texture::NEAREST);
+		// default magnification filter is linear
+		//tex.filterMag(Texture::NEAREST);
 		
 		int Nx = tex.width();
 		int Ny = tex.height();
@@ -58,8 +59,6 @@ struct MyWindow : Window{
 
 		gl.matrixMode(gl.MODELVIEW);
 		gl.loadMatrix(Matrix4d::lookAt(Vec3d(0,0,3), Vec3d(0,0,0), Vec3d(0,1,0)));
-
-		tex.filter(Texture::LINEAR);
 
 		tex.bind();
 
