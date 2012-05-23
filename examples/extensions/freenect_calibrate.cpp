@@ -33,8 +33,8 @@ const char * man =
 
 struct MyWindow : public Window, public Freenect::Callback {
 
-	MyWindow(int dim = 1) 
-	:	Freenect::Callback(0), 
+	MyWindow(int id, int dim = 1) 
+	:	Freenect::Callback(id), 
 		depthTex(640, 480),
 		scale(dim / 4), 
 		azimuth(0),
@@ -397,55 +397,57 @@ struct MyWindow : public Window, public Freenect::Callback {
 	bool bUseVideo, bHideOOB, bReset;
 };
 
-MyWindow win;
-
 int main(int argc, char * argv[]){
 	paths.addAppPaths(argc, argv);
 	
-	Lua L;
-	L.dofile(paths.appPath() + "freenect_calibrate.lua");
+	for (int id=0; id<2; id++) {
+
+		MyWindow& win = *(new MyWindow(id));
+		Lua L;
+		L.dofile(paths.appPath() + "freenect_calibrate.lua");
 	
-	lua_getglobal(L, "matrix");
-	int tab = lua_gettop(L);
-	if (lua_istable(L, -1)) {
-		printf("loading from freenect_calibrate.lua\n");
-		for (int i=1; i<=16; i++) lua_rawgeti(L, tab, i);
-		win.transform = Matrix4f(
-			lua_tonumber(L, tab+1), lua_tonumber(L, tab+2),
-			lua_tonumber(L, tab+3), lua_tonumber(L, tab+4),
-			lua_tonumber(L, tab+5), lua_tonumber(L, tab+6),
-			lua_tonumber(L, tab+7), lua_tonumber(L, tab+8),
-			lua_tonumber(L, tab+9), lua_tonumber(L, tab+10),
-			lua_tonumber(L, tab+11), lua_tonumber(L, tab+12),
-			lua_tonumber(L, tab+13), lua_tonumber(L, tab+14),
-			lua_tonumber(L, tab+15), lua_tonumber(L, tab+16)
-		);
-		lua_settop(L, 0);
-		lua_getglobal(L, "scale"); 
-		if (lua_isnumber(L, -1)) win.scale = lua_tonumber(L, -1);
-		lua_settop(L, 0);
-		lua_getglobal(L, "azimuth"); 
-		if (lua_isnumber(L, -1)) win.azimuth = lua_tonumber(L, -1);
-		lua_settop(L, 0);
-		lua_getglobal(L, "elevation"); 
-		if (lua_isnumber(L, -1)) win.elevation = lua_tonumber(L, -1);
-		lua_settop(L, 0);
-		lua_getglobal(L, "translate"); 
+		lua_getglobal(L, "matrix");
+		int tab = lua_gettop(L);
 		if (lua_istable(L, -1)) {
-			for (int i=1; i<=3; i++) lua_rawgeti(L, tab, i);
-			win.translate.set(
-				lua_tonumber(L, tab+1), 
-				lua_tonumber(L, tab+2),
-				lua_tonumber(L, tab+3)
+			printf("loading from freenect_calibrate.lua\n");
+			for (int i=1; i<=16; i++) lua_rawgeti(L, tab, i);
+			win.transform = Matrix4f(
+				lua_tonumber(L, tab+1), lua_tonumber(L, tab+2),
+				lua_tonumber(L, tab+3), lua_tonumber(L, tab+4),
+				lua_tonumber(L, tab+5), lua_tonumber(L, tab+6),
+				lua_tonumber(L, tab+7), lua_tonumber(L, tab+8),
+				lua_tonumber(L, tab+9), lua_tonumber(L, tab+10),
+				lua_tonumber(L, tab+11), lua_tonumber(L, tab+12),
+				lua_tonumber(L, tab+13), lua_tonumber(L, tab+14),
+				lua_tonumber(L, tab+15), lua_tonumber(L, tab+16)
 			);
+			lua_settop(L, 0);
+			lua_getglobal(L, "scale"); 
+			if (lua_isnumber(L, -1)) win.scale = lua_tonumber(L, -1);
+			lua_settop(L, 0);
+			lua_getglobal(L, "azimuth"); 
+			if (lua_isnumber(L, -1)) win.azimuth = lua_tonumber(L, -1);
+			lua_settop(L, 0);
+			lua_getglobal(L, "elevation"); 
+			if (lua_isnumber(L, -1)) win.elevation = lua_tonumber(L, -1);
+			lua_settop(L, 0);
+			lua_getglobal(L, "translate"); 
+			if (lua_istable(L, -1)) {
+				for (int i=1; i<=3; i++) lua_rawgeti(L, tab, i);
+				win.translate.set(
+					lua_tonumber(L, tab+1), 
+					lua_tonumber(L, tab+2),
+					lua_tonumber(L, tab+3)
+				);
+			}
+		} else {
+			win.bReset = 1;
 		}
-	} else {
-		win.bReset = 1;
+
+
+		win.append(*new StandardWindowKeyControls);
+		win.create(Window::Dim(800, 480));
 	}
-
-
-	win.append(*new StandardWindowKeyControls);
-	win.create(Window::Dim(800, 480));
 	
 	printf(man);
 	
