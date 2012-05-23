@@ -125,7 +125,11 @@ public:
 	void begin(){ validate(); bind(id()); }
 
 	/// Stop rendering to attached objects
-	static void end(){ bind(0); }
+	static void end(){ 		
+		Graphics::error(0, "end fbo texture");
+		bind(0); 
+		Graphics::error(0, "post end fbo texture");
+}
 
 	GLenum status();
 	const char * statusString();

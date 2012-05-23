@@ -137,17 +137,22 @@ void Texture :: configure(AlloArrayHeader& header) {
 
 void Texture :: bind(int unit) {
 	// ensure it is created:
+	Graphics::error(id(), "prevalidate binding texture");
 	validate(); 
+	//Graphics::error(id(), "validate binding texture");
 	sendParams(false);
+	//Graphics::error(id(), "sendparams binding texture");
 	sendPixels(false);
+	//Graphics::error(id(), "sendpixels binding texture");
 	
 	// multitexturing:
 	glActiveTexture(GL_TEXTURE0 + unit);
+	//Graphics::error(id(), "active texture binding texture");
 
 	// bind:
 	glEnable(target());
+	//Graphics::error(id(), "enable target binding texture");
 	glBindTexture(target(), id());
-	
 	Graphics::error(id(), "binding texture");
 }
 
@@ -165,10 +170,12 @@ void Texture :: determineTarget(){
 	//invalidate(); // FIXME: mPixelsUpdated flag now triggers update
 }
 
-void Texture :: quad(Graphics& gl, double w, double h, double x0, double y0){
+void Texture :: quad(Graphics& gl, double w, double h, double x0, double y0){	
+	//Graphics::error(id(), "prebind quad texture");
 	bind();	
 	Mesh& m = gl.mesh();
 	m.reset();
+	//Graphics::error(id(), "reset mesh quad texture");
 	m.primitive(gl.TRIANGLE_STRIP);
 		m.texCoord	( 0, 0);
 		m.vertex	(x0, y0, 0);
@@ -178,7 +185,9 @@ void Texture :: quad(Graphics& gl, double w, double h, double x0, double y0){
 		m.vertex	(x0, y0+h, 0);
 		m.texCoord	( 1, 1);
 		m.vertex	(x0+w, y0+h, 0);
+	//Graphics::error(id(), "set mesh quad texture");
 	gl.draw(m);
+	//Graphics::error(id(), "draw mesh quad texture");
 	unbind();
 }
 

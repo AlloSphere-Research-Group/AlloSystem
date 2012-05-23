@@ -74,7 +74,11 @@ const char * FBO::statusString(GLenum stat){
 }
 
 // static functions
-void FBO::bind(unsigned fboID){ glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboID); }
+void FBO::bind(unsigned fboID){ 
+	Graphics::error(fboID, "prebind fbo");
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboID); 
+	Graphics::error(fboID, "bind fbo");
+}
 
 void FBO::renderBuffer(unsigned rboID, Attachment att){
 //	GLenum a=0;

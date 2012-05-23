@@ -30,6 +30,7 @@ struct MyWindow : Window, public Drawable{
 	bool onFrame(){
 		nav.step();
 		stereo.draw(gl, lens, nav, Viewport(width(), height()), *this);
+		printf("fps %f\n", avgFps());
 		return true;
 	}
 

@@ -27,6 +27,7 @@ void Stereographic::sendClear(Graphics& gl){
 }
 
 void Stereographic :: draw(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect) {
+	//printf("%d, %d\n", mStereo, mMode);
 	if(mStereo){
 		switch(mMode){
 			case ANAGLYPH:	drawAnaglyph(gl, lens, pose, vp, draw, clear, pixelaspect); return;
