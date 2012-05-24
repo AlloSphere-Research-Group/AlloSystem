@@ -156,16 +156,16 @@ public:
 	}
 	
 	/// Set input diffusion 1 amount, [0,1)
-	Reverb& diffusionIn1(const T& v){ mDfIn1=v; return *this; }
+	Reverb& diffusionIn1(T v){ mDfIn1=v; return *this; }
 	
 	/// Set input diffusion 2 amount, [0,1)
-	Reverb& diffusionIn2(const T& v){ mDfIn2=v; return *this; }
+	Reverb& diffusionIn2(T v){ mDfIn2=v; return *this; }
 	
 	/// Set tank decay diffusion 1 amount, [0,1)
-	Reverb& diffusionDecay1(const T& v){ mDfDcy1=v; return *this; }
+	Reverb& diffusionDecay1(T v){ mDfDcy1=v; return *this; }
 	
 	/// Set tank decay diffusion 2 amount, [0,1)
-	Reverb& diffusionDecay2(const T& v){ mDfDcy2=v; return *this; }
+	Reverb& diffusionDecay2(T v){ mDfDcy2=v; return *this; }
 
 
 	/// Compute wet stereo output from dry mono input
@@ -174,7 +174,7 @@ public:
 	/// @param[out] out1	wet output sample 1
 	/// @param[out] out2	wet output sample 2
 	/// @param[ in] gain	gain of output
-	void operator()(const T& in, T& out1, T& out2, T gain = T(0.6)){
+	void operator()(T in, T& out1, T& out2, T gain = T(0.6)){
 		T v = mPreDelay(in * T(0.5));
 		v = mOPIn(v);
 		v = mAPIn1.allpass(v, mDfIn1);
@@ -235,7 +235,7 @@ protected:
 		OnePole(): mO1(0), mA0(1), mB1(0){}
 		void damping(T v){ coef(v); }
 		void coef(T v){ mA0=T(1)-std::abs(v); mB1=v; }
-		T operator()(const T& i0){ return mO1 = i0*mA0 + mO1*mB1; }
+		T operator()(T i0){ return mO1 = i0*mA0 + mO1*mB1; }
 	protected:
 		T mO1, mA0, mB1;
 	};
