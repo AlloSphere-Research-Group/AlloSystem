@@ -21,7 +21,7 @@ struct Func : public ThreadFunction{
 	Func(): sum(0){}
 
 	void operator()(){
-		printf("Summing %u to %u ...\n", ival[0], ival[1]-1);
+		printf("Summing indices %u to %u ...\n", ival[0], ival[1]-1);
 		for(unsigned i=ival[0]; i<ival[1]; ++i) sum += data[i];
 	}
 
@@ -36,17 +36,17 @@ int main(){
 	const unsigned N = 100000;	// size of our array
 	double data[N];
 
-	// Fill array with parabola
+	// Fill array with polynomial
 	for(unsigned i=0; i<N; ++i){
 		double f = double(i)/N;
-		data[i] = f*f;
+		data[i] = 1 - f*f;
 	}
 
 	Threads<Func> threads(Nthreads);
 	
 	// Setup worker thread summation intervals
 	for(int i=0; i<Nthreads; ++i){
-		threads.getInterval(threads.function(i).ival, i, N+1U, 1U);
+		threads.getInterval(threads.function(i).ival, i, N);
 		threads.function(i).data = data;
 	}
 	
