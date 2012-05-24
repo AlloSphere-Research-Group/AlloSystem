@@ -32,6 +32,7 @@
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
+#include <cmath>
 #include <stdlib.h>
 #include <string.h>
 
@@ -95,6 +96,11 @@ public:
 		write(r);
 		return d + r*ffd;
 	}
+
+	/// Allpass filter input using a delay time equal to the maximum size of the delay-line
+	T allpass(const T& v, const T& ffd){
+		return comb(v, ffd,-ffd);
+	}
 	
 	/// Zeroes all elements (byte-wise)
 	void zero(){ ::memset(&mBuf, 0, sizeof(mBuf)); }
@@ -117,29 +123,33 @@ class Reverb{
 public:
 
 	Reverb(){
-//		bandwidth(0.9995);
-//		decay(0.5);
-//		damping(0.0005);
-//		diffusion(0.75, 0.625, 0.7, 0.5);
 		bandwidth(0.9995);
 		decay(0.85);
 		damping(0.4);
 		diffusion(0.76, 0.666, 0.707, 0.571);
 	}
 
-	/// Set input signal bandwidth, [0,1]
+
+	/// Set input signal bandwidth, in [0,1]
+	
+	/// This sets the cutoff frequency of a one-pole low-pass filter on the
+	/// input signal.
 	Reverb& bandwidth(T v){ mOPIn.damping(T(1)-v); return *this; }
 
-	/// Set high-frequency damping amount, [0, 1]
+	/// Set high-frequency damping amount, in [0, 1]
+	
+	/// Higher amounts will dampen the diffusive sound more quickly.
+	/// Note: values in [-1, 0] create an inverse effect that attentuates low 
+	/// rather than high frequencies.
 	Reverb& damping(T v){ mOP1.damping(v); mOP2.damping(v); return *this; }
 
-	/// Set decay rate, [0, 1)
+	/// Set decay factor, in [0, 1)
 	Reverb& decay(T v){ mDecay=v; return *this; }
 
-	/// Set diffusion amounts
+	/// Set diffusion amounts, in [0, 1)
 	
-	/// The recommended range of these coefficients is from 0.0 to 0.9999999
-	///
+	/// Values near 0.7 are recommended. Moving further away from 0.7 will lead
+	/// to more distinct echoes.
 	Reverb& diffusion(T in1, T in2, T decay1, T decay2){
 		mDfIn1=in1;	mDfIn2=in2; mDfDcy1=decay1; mDfDcy2=decay2;
 		return *this;
@@ -167,24 +177,24 @@ public:
 	void operator()(const T& in, T& out1, T& out2, T gain = T(0.6)){
 		T v = mPreDelay(in * T(0.5));
 		v = mOPIn(v);
-		v = mAPIn1.comb(v, mDfIn1,-mDfIn1);
-		v = mAPIn2.comb(v, mDfIn1,-mDfIn1);
-		v = mAPIn3.comb(v, mDfIn2,-mDfIn2);
-		v = mAPIn4.comb(v, mDfIn2,-mDfIn2);
+		v = mAPIn1.allpass(v, mDfIn1);
+		v = mAPIn2.allpass(v, mDfIn1);
+		v = mAPIn3.allpass(v, mDfIn2);
+		v = mAPIn4.allpass(v, mDfIn2);
 		
 		T a = v + mDly22.back() * mDecay;
 		T b = v + mDly12.back() * mDecay;
 		
-		a = mAPDecay11.comb(a,-mDfDcy1, mDfDcy1);
+		a = mAPDecay11.allpass(a,-mDfDcy1);
 		a = mDly11(a);
 		a = mOP1(a) * mDecay;
-		a = mAPDecay12.comb(a, mDfDcy2,-mDfDcy2);
+		a = mAPDecay12.allpass(a, mDfDcy2);
 		mDly12.write(a);
 
-		b = mAPDecay21.comb(b,-mDfDcy1, mDfDcy1);
+		b = mAPDecay21.allpass(b,-mDfDcy1);
 		b = mDly21(b);
 		b = mOP2(b) * mDecay;
-		b = mAPDecay22.comb(b, mDfDcy2,-mDfDcy2);
+		b = mAPDecay22.allpass(b, mDfDcy2);
 		mDly22.write(b);
 		
 		out1 = (  mDly21.read(266)
@@ -222,12 +232,12 @@ protected:
 
 	class OnePole{
 	public:
-		OnePole(): mO1(0), mB1(0){}
-		void damping(const T& v){ mB1=v; }
-		T operator()(const T& i0){ return mO1 = (mO1-i0)*mB1 + i0; }
+		OnePole(): mO1(0), mA0(1), mB1(0){}
+		void damping(T v){ coef(v); }
+		void coef(T v){ mA0=T(1)-std::abs(v); mB1=v; }
+		T operator()(const T& i0){ return mO1 = i0*mA0 + mO1*mB1; }
 	protected:
-		T mO1; // previous output
-		T mB1; // previous output coef
+		T mO1, mA0, mB1;
 	};
 
 	T mDfIn1, mDfIn2, mDfDcy1, mDfDcy2, mDecay;
