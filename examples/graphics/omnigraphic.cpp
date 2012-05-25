@@ -157,6 +157,8 @@ struct MyWindow : Window, public Drawable{
 		omniV.printLog();
 		omniF.printLog();
 		omniP.printLog();
+		
+		stereo.clearColor(Color(1, 1, 1, 1));
 		return true;
 	}
 
@@ -167,7 +169,7 @@ struct MyWindow : Window, public Drawable{
 				
 				Viewport vp(width(), height());
 				gl.viewport(vp);
-				gl.clearColor(0, 0, 0, 0);
+				gl.clearColor(stereo.clearColor());
 				gl.depthMask(1);
 				gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
 				gl.depthTesting(1);
@@ -211,7 +213,7 @@ struct MyWindow : Window, public Drawable{
 				
 				Viewport vp(width(), height());
 				gl.viewport(vp);
-				gl.clearColor(0, 0, 0, 0);
+				gl.clearColor(stereo.clearColor());
 				gl.depthMask(1);
 				gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
 				gl.depthTesting(1);
@@ -276,6 +278,7 @@ int main(){
 	}
 	
 	grid.primitive(Graphics::LINES);
+	grid.color(0, 0, 0);
 	double stepsize = 1./2;
 	double tsize = 0.1;
 	for (double x=-1; x<=1; x+= stepsize) {
