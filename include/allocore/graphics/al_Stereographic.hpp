@@ -137,6 +137,9 @@ public:
 	/// Get whether omni mode is on
 	bool omni() const { return mOmni; }
 	
+	/// Get current omni fov:
+	double omniFov() { return mOmniFov; }
+	
 	// These accessors will be valid only during the Drawable's onDraw() event
 	// they can be useful to simulate the OpenGL pipeline transforms
 	//	e.g. Matrix4d::multiply(Vec4d eyespace, stereo.modelView(), Vec4d objectspace); 

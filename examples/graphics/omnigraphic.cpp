@@ -10,6 +10,76 @@ Graham Wakefield 2011
 
 #include "allocore/al_Allocore.hpp"
 #include "alloutil/al_ControlNav.hpp"
+#include "allocore/graphics/al_Shader.hpp"
+
+std::string omniVS = AL_STRINGIFY(
+	
+	// distort the scene per-vertex:
+	uniform float fovy, omniFov, aspect, near, far;
+	uniform int omni;
+	varying vec4 color;
+	
+	float M_DEG2RAD = 0.017453292519943;
+	float M_1_PI = 0.31830988618379;
+
+	// optimized application of perspective projection matrix
+	// assumes input vertex w == 1
+	vec4 perspective(in vec3 v, in float fovy, in float aspect, in float near, in float far) {
+		float f = 1./tan(fovy*M_DEG2RAD/2.);
+		float x = v.x * f/aspect;
+		float y = v.y * f;
+		//float d = far-near;
+		//float z = (v.z * -(far+near)/d) + (v.w * -2.*far*near/d);
+		float z = (-v.z*(far+near) - 2.*far*near) / (far-near);
+		float w = -v.z;
+		return vec4(x, y, z, w);
+	}
+	
+	// omnigraphic:
+	vec4 omnigraphic(in vec3 v, in float omniFov, in float aspect, in float near, in float far) {
+		float f = 2./(omniFov * M_DEG2RAD);
+		float azimuth = atan(v.x, -v.z);
+		float elevation = atan(v.y, length(v.xz));
+		float d = length(v.xyz) * sign(v.z);
+		
+		float x = f * azimuth;
+		float y = f * elevation * aspect;
+		
+		// depth ortho-style:
+		float z = (-2.*d - far+near) / (far-near);
+		float w = 1.;	// no perspective effect
+		return vec4(x, y, z, w);
+	}
+
+	void main(void) {
+	
+		// convert object to view space:
+		vec4 vertex = gl_ModelViewMatrix * gl_Vertex;
+		
+		// but bypass the gl_ProjectionMatrix
+		if (omni > 0) {
+			vertex = omnigraphic(vertex.xyz, omniFov, aspect, near, far);
+		} else {
+			vertex = perspective(vertex.xyz, fovy, aspect, near, far);
+		}	
+		
+		gl_Position = vertex;
+		
+		color = gl_Color;
+		
+	}
+);
+
+std::string omniFS = AL_STRINGIFY(
+	// just a typical fragment shader:
+	
+	varying vec4 color;
+	
+	void main(void) {
+		gl_FragColor = color;
+	}
+);
+
 
 using namespace al;
 
@@ -18,6 +88,7 @@ static Mesh mesh, grid;
 static Stereographic stereo;
 static Lens lens;
 Nav nav;
+bool useShader = false;
 
 /*
 	Omnigraphic mode splits up the window into vertical slices (viewports)
@@ -46,6 +117,7 @@ struct MyWindow : Window, public Drawable{
 		
 		switch(k.key()){
 			case 'o': stereo.omni(!stereo.omni()); return false;
+			case 's': useShader = !useShader; return false;
 			case Keyboard::TAB: stereo.stereo(!stereo.stereo()); return false;
 			case '1': stereo.mode(Stereographic::ANAGLYPH); return false;
 			case '2': stereo.mode(Stereographic::ACTIVE); return false;
@@ -55,10 +127,47 @@ struct MyWindow : Window, public Drawable{
 			default: return true;
 		}
 	}
+	
+	bool onCreate(){
+		Shader omniV(omniVS, Shader::VERTEX);
+		Shader omniF(omniFS, Shader::FRAGMENT);
+		omniV.compile();
+		omniF.compile();
+		omniP.attach(omniV).attach(omniF).link();
+		
+		omniV.printLog();
+		omniF.printLog();
+		omniP.printLog();
+		return true;
+	}
 
 	bool onFrame(){
 		nav.step();
-		stereo.draw(gl, lens, nav, Viewport(width(), height()), *this);
+		if (useShader) {
+			Viewport vp(width(), height());
+			gl.viewport(vp);
+			gl.clearColor(0, 0, 0, 0);
+			gl.depthMask(1);
+			gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
+			gl.depthTesting(1);
+			gl.modelView(Matrix4d::lookAt(nav.ux(), nav.uy(), nav.uz(), nav.pos()));
+			
+			omniP.begin();
+			omniP.uniform("fovy", lens.fovy());
+			omniP.uniform("omniFov", stereo.omniFov());
+			omniP.uniform("aspect", vp.aspect());
+			omniP.uniform("near", lens.near());
+			omniP.uniform("far", lens.far());
+			omniP.uniform("omni", stereo.omni());
+			
+			gl.draw(grid);
+			gl.draw(mesh);
+			
+			omniP.end();
+			
+		} else {
+			stereo.draw(gl, lens, nav, Viewport(width(), height()), *this);
+		}
 		return true;
 	}
 
@@ -68,6 +177,8 @@ struct MyWindow : Window, public Drawable{
 		gl.draw(grid);
 		gl.draw(mesh);	
 	}
+	
+	ShaderProgram omniP;
 };
 
 MyWindow win;
@@ -100,21 +211,25 @@ int main(){
 	
 	grid.primitive(Graphics::LINES);
 	double stepsize = 1./2;
+	double tsize = 0.1;
 	for (double x=-1; x<=1; x+= stepsize) {
 	for (double y=-1; y<=1; y+= stepsize) {
-		grid.vertex(x, y, 1);
-		grid.vertex(x, y, -1);
-	}}
+	for (double t=-1; t<1; t+= tsize) {
+		grid.vertex(x, y, t);
+		grid.vertex(x, y, t+tsize);
+	}}}
 	for (double x=-1; x<=1; x+= stepsize) {
 	for (double z=-1; z<=1; z+= stepsize) {
-		grid.vertex(x, 1, z);
-		grid.vertex(x, -1, z);
-	}}
+	for (double t=-1; t<1; t+= tsize) {
+		grid.vertex(x, t, z);
+		grid.vertex(x, t+tsize, z);
+	}}}
 	for (double y=-1; y<=1; y+= stepsize) {
 	for (double z=-1; z<=1; z+= stepsize) {
-		grid.vertex(1, y, z);
-		grid.vertex(-1, y, z);
-	}}
+	for (double t=-1; t<1; t+= tsize) {
+		grid.vertex(t, y, z);
+		grid.vertex(t+tsize, y, z);
+	}}}
 	grid.scale(world_radius);
 	
 	win.create(Window::Dim(100, 0, 640, 480), "Omnigraphic Example", 60);
