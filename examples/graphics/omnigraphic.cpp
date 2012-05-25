@@ -15,7 +15,8 @@ Graham Wakefield 2011
 std::string omniVS = AL_STRINGIFY(
 	
 	// distort the scene per-vertex:
-	uniform float fovy, omniFov, aspect, near, far;
+	uniform float fovy, aspect, near, far;
+	uniform float omniFov, eyeSep, focal;
 	uniform int omni;
 	varying vec4 color;
 	
@@ -50,6 +51,24 @@ std::string omniVS = AL_STRINGIFY(
 		float w = 1.;	// no perspective effect
 		return vec4(x, y, z, w);
 	}
+	
+	vec4 omnigraphic2(in vec3 v, in float omniFov, in float aspect, in float near, in float far, in float eyeSep, in float focal) {
+		float f = 2./(omniFov * M_DEG2RAD);
+		float azimuth = atan(v.x, -v.z);
+		float elevation = atan(v.y, length(v.xz));
+		float d = length(v.xyz) * sign(v.z);
+		
+		// stereo rotation depends on depth:
+		azimuth += eyeSep; // * M_1_PI * (d/focal);
+		
+		float x = f * azimuth;
+		float y = f * elevation * aspect;
+		
+		// depth ortho-style:
+		float z = (-2.*d - far+near) / (far-near);
+		float w = 1.;	// no perspective effect
+		return vec4(x, y, z, w);
+	}
 
 	void main(void) {
 	
@@ -58,7 +77,7 @@ std::string omniVS = AL_STRINGIFY(
 		
 		// but bypass the gl_ProjectionMatrix
 		if (omni > 0) {
-			vertex = omnigraphic(vertex.xyz, omniFov, aspect, near, far);
+			vertex = omnigraphic2(vertex.xyz, omniFov, aspect, near, far, eyeSep, focal);
 		} else {
 			vertex = perspective(vertex.xyz, fovy, aspect, near, far);
 		}	
@@ -144,26 +163,73 @@ struct MyWindow : Window, public Drawable{
 	bool onFrame(){
 		nav.step();
 		if (useShader) {
-			Viewport vp(width(), height());
-			gl.viewport(vp);
-			gl.clearColor(0, 0, 0, 0);
-			gl.depthMask(1);
-			gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
-			gl.depthTesting(1);
-			gl.modelView(Matrix4d::lookAt(nav.ux(), nav.uy(), nav.uz(), nav.pos()));
-			
-			omniP.begin();
-			omniP.uniform("fovy", lens.fovy());
-			omniP.uniform("omniFov", stereo.omniFov());
-			omniP.uniform("aspect", vp.aspect());
-			omniP.uniform("near", lens.near());
-			omniP.uniform("far", lens.far());
-			omniP.uniform("omni", stereo.omni());
-			
-			gl.draw(grid);
-			gl.draw(mesh);
-			
-			omniP.end();
+			if (stereo.stereo()) {
+				
+				Viewport vp(width(), height());
+				gl.viewport(vp);
+				gl.clearColor(0, 0, 0, 0);
+				gl.depthMask(1);
+				gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
+				gl.depthTesting(1);
+				gl.modelView(Matrix4d::lookAt(nav.ux(), nav.uy(), nav.uz(), nav.pos()));
+				
+				glColorMask(GL_TRUE, GL_FALSE,GL_FALSE,GL_TRUE);
+				
+				omniP.begin();
+				omniP.uniform("fovy", lens.fovy());
+				omniP.uniform("omniFov", stereo.omniFov());
+				omniP.uniform("aspect", vp.aspect());
+				omniP.uniform("near", lens.near());
+				omniP.uniform("far", lens.far());
+				omniP.uniform("focal", lens.focalLength());
+				omniP.uniform("omni", stereo.omni());
+				omniP.uniform("eyeSep", lens.eyeSep());
+				gl.draw(grid);
+				gl.draw(mesh);
+				omniP.end();
+				
+				glColorMask(GL_FALSE,GL_TRUE, GL_TRUE, GL_TRUE);
+				gl.clear(Graphics::DEPTH_BUFFER_BIT);
+				
+				omniP.begin();
+				omniP.uniform("fovy", lens.fovy());
+				omniP.uniform("omniFov", stereo.omniFov());
+				omniP.uniform("aspect", vp.aspect());
+				omniP.uniform("near", lens.near());
+				omniP.uniform("far", lens.far());
+				omniP.uniform("focal", lens.focalLength());
+				omniP.uniform("omni", stereo.omni());
+				omniP.uniform("eyeSep", -lens.eyeSep());
+				gl.draw(grid);
+				gl.draw(mesh);
+				omniP.end();
+				
+				glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
+				
+			} else {
+				// MONO:
+				
+				Viewport vp(width(), height());
+				gl.viewport(vp);
+				gl.clearColor(0, 0, 0, 0);
+				gl.depthMask(1);
+				gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
+				gl.depthTesting(1);
+				gl.modelView(Matrix4d::lookAt(nav.ux(), nav.uy(), nav.uz(), nav.pos()));
+
+				omniP.begin();
+				omniP.uniform("fovy", lens.fovy());
+				omniP.uniform("omniFov", stereo.omniFov());
+				omniP.uniform("aspect", vp.aspect());
+				omniP.uniform("near", lens.near());
+				omniP.uniform("far", lens.far());
+				omniP.uniform("focal", lens.focalLength());
+				omniP.uniform("omni", stereo.omni());
+				omniP.uniform("eyeSep", 0.);
+				gl.draw(grid);
+				gl.draw(mesh);
+				omniP.end();
+			}
 			
 		} else {
 			stereo.draw(gl, lens, nav, Viewport(width(), height()), *this);
