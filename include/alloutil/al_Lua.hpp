@@ -128,6 +128,12 @@ public:
 	/// catches errors and prints a traceback to stdout
 	/// returns 0 if no errors
 	int pcall(int n=0, const std::string& errname="Lua");
+	
+	///! call function with N args
+	/// function should be at stack index (top - n)
+	/// catches errors and prints a traceback to stdout
+	/// returns 0 if no errors
+	int resume(int n=0);
 
 	///! runs a string of code
 	/// catches errors and prints to stdout
@@ -142,6 +148,10 @@ public:
 	/// returns 0 if no errors
 	int dofile(const std::string& path);
 	
+	///! loads code from a file & leaves as a function on the stack
+	/// catches errors and prints to stdout
+	/// returns 0 if no errors
+	int loadfile(const std::string& path);
 	
 	///! preloads a C module into the Lua package registry
 	Lua& preloadlib(const std::string& name, lua_CFunction func);
@@ -249,6 +259,19 @@ inline int Lua::lerror(int err, const std::string& errname) {
 	return err;
 }
 
+inline int Lua::resume(int nargs) {	
+	int result = lua_resume(L, nargs);
+	switch (result) {
+		case 0:
+			break;		// program terminated
+		case LUA_YIELD:
+			break;
+		default:		// error
+			lerror(result);
+			break;
+	}
+	return result;
+}
 
 inline int Lua::pcall(int nargs, const std::string& errname) {
 	int debug_idx = -nargs-3;
@@ -278,6 +301,9 @@ inline int Lua::dobuffer(const char * buffer, size_t size, const char * name) {
 
 inline int Lua::dostring(const std::string& code) {
 	return lerror(luaL_loadstring(L, code.c_str())) || pcall(0, code);
+}
+inline int Lua::loadfile(const std::string& path) {
+	return lerror(luaL_loadfile(L, path.c_str()));
 }
 inline int Lua::dofile(const std::string& path) {
 	return lerror(luaL_loadfile(L, path.c_str())) || pcall(0, path);
