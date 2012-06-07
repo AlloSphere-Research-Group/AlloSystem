@@ -107,7 +107,7 @@ inline AudioDevice::StreamMode operator| (const AudioDevice::StreamMode& a, cons
 
 /// Audio data to be sent to callback
 
-/// Audio buffers are guaranteed to be stored in a contiguous deinterleaved 
+/// Audio buffers are guaranteed to be stored in a contiguous non-interleaved 
 /// format, i.e., frames are tightly packed per channel.
 class AudioIOData {
 public:
@@ -210,10 +210,7 @@ public:
 };
 
 
-/// Audio input/output streaming.
-
-///
-/// 
+/// Audio input/output streaming
 class AudioIO : public AudioIOData {
 public:
 
@@ -287,17 +284,13 @@ public:
 
 private:
 	AudioDevice mInDevice, mOutDevice;
-
-	bool mInResizeDeferred, mOutResizeDeferred;
 	bool mZeroNANs;			// whether to zero NANs
 	bool mClipOut;			// whether to clip output between -1 and 1
 	bool mAutoZeroOut;		// whether to automatically zero output buffers each block
-	
 	std::vector<AudioCallback *> mAudioCallbacks;
 
-	void init();		// Initializes PortAudio and member variables.
-	void deferBufferResize(bool forOutput);
-	void reopen();		// reopen stream (restarts stream if needed)
+	void init();			//
+	void reopen();			// reopen stream (restarts stream if needed)
 	void resizeBuffer(bool forOutput);
 };
 
