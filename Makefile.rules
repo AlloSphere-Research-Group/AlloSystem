@@ -42,11 +42,11 @@ $(OBJ_DIR)%.o:: %.mm
 
 # Build static library
 $(SLIB_PATH): $(addprefix $(OBJ_DIR), $(OBJS))
-ifneq ($^,)
+#ifneq ($^,)
 	@echo AR $@
 	@$(RM) $@
 	$(AR) $@ $(filter %.o, $^) $(SLIB_FLAGS)
-endif
+#endif
 #	@$(RANLIB) $@
 #	libtool --mode=link --tag=CXX $(filter %.o, $^) $(SLIB_FLAGS) -o $@
 #	@libtool -static $@ $(patsubst %, $(DEV_DIR)lib/lib%.a, $(STATIC_LIBS)) -o $@
@@ -54,10 +54,10 @@ endif
 
 # Build dynamic library
 $(DLIB_PATH): $(addprefix $(OBJ_DIR), $(OBJS))
-ifneq ($^,)
+#ifneq ($^,)
 	@echo DY $@
 	$(CXX) $(DLIB_FLAGS) $(CXXFLAGS) -o $@ $(filter %.o, $^) $(LDFLAGS)
-endif
+#endif
 
 # Dummy target to force rebuilds
 FORCE:
