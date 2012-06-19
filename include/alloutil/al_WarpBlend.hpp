@@ -44,6 +44,8 @@ public:
 	Matrix4d modelView, perspective;
 
 	std::string imgpath;
+	
+	bool loaded;
 };
 	
 } // al::

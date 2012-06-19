@@ -426,6 +426,7 @@ static const char * warpFS = AL_STRINGIFY(
 );
 
 WarpnBlend::WarpnBlend() {
+	loaded = false;
 	imgpath = "./img/";
 	printf("created WarpnBlend %s\n", imgpath.c_str());
 }
@@ -532,7 +533,7 @@ void WarpnBlend::drawDemo(const Pose& pose, double eyesep) {
 }
 
 void WarpnBlend::drawBlend() {
-	gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
+	gl.projection(Matrix4d::ortho(0, 1, 0, 1, -1, 1));
 	gl.modelView(Matrix4d::identity());
 	alphaMap.quad(gl);
 }
@@ -544,6 +545,7 @@ void WarpnBlend::readID(std::string id) {
 	readBlend(imgpath + "alpha" + id + ".png");
 	readModelView(imgpath + "ModelViewMatrix" + id + ".txt");
 	readPerspective(imgpath + "PerspectiveMatrix" + id+ ".txt");
+	loaded = true;
 }
 
 void WarpnBlend::readBlend(std::string path) {
