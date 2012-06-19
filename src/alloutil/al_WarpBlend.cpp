@@ -236,7 +236,7 @@ static const char * demoFS = AL_STRINGIFY(
 		vec3 p = ro;
 		
 		// initial eye-ray to find object intersection:
-		float mindt = 0.01 + 0.0001;
+		float mindt = 0.001 + 0.0001;
 		float mint = mindt;
 		float maxt = 2.;
 		float t=mint;
@@ -307,9 +307,9 @@ static const char * demoFS = AL_STRINGIFY(
 			float k = 16.;
 
 			// check for shadow:
-			float smint = 0.01;
+			float smint = 0.001;
 			float nudge = 0.1;
-			float smaxt = 12.;
+			float smaxt = maxt;
 			
 			color = //v
 					ambient
