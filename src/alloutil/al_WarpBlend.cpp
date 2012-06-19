@@ -208,13 +208,12 @@ static const char * demoFS = AL_STRINGIFY(
 	
 	void main(){
 	
-		vec3 light1 = vec3(3, param1*4., 1);
-		vec3 light2 = vec3(2, -param1*4., twparam1*3.);
+		vec3 light1 = vec3(3, 4., 1);
+		vec3 light2 = vec3(2, -4., 3.);
 		vec3 color1 = vec3(0.5, 1, 0.5);
-		vec3 color2 = vec3(0.5-0.2*cos(param1), 0.5+0.2*sin(param1), 0.5+0.2*cos(param1));
+		vec3 color2 = vec3(1, 1, 0.1);
 		vec3 ambient = vec3(0.1, 0.1, 0.1);
 
-		
 		// pixel location (observer space):
 		vec3 v = texture2D(pixelMap, texcoord0).rgb;
 		
