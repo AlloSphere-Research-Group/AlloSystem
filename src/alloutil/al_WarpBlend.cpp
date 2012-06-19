@@ -62,8 +62,6 @@ static const char * demoFS = AL_STRINGIFY(
 	uniform vec4 quat;
 	varying vec2 texcoord0;
 	uniform float eyesep;
-	uniform float param1;
-	uniform float twparam1;
 	
 	float pi = 3.141592653589793;
 	float piover2 = 1.570796326794897;
@@ -208,10 +206,10 @@ static const char * demoFS = AL_STRINGIFY(
 	
 	void main(){
 	
-		vec3 light1 = vec3(3, 4., 1);
-		vec3 light2 = vec3(2, -4., 3.);
+		vec3 light1 = vec3(3, 2., 1);
+		vec3 light2 = vec3(2, -2., 3.);
 		vec3 color1 = vec3(0.5, 1, 0.5);
-		vec3 color2 = vec3(1, 1, 0.1);
+		vec3 color2 = vec3(1, 0.2, 1);
 		vec3 ambient = vec3(0.1, 0.1, 0.1);
 
 		// pixel location (observer space):
@@ -483,8 +481,6 @@ void WarpnBlend::drawDemo(const Pose& pose, double eyesep) {
 	demoP.uniform("pos", pose.pos()); 
 	demoP.uniform("quat", pose.quat());
 	demoP.uniform("eyesep", eyesep);
-	demoP.uniform("param1", sin(al_time() * 0.1));
-	demoP.uniform("twparam1", sin(al_time() * 1.1));
 	alphaMap.bind(1);
 	pixelMap.quad(gl);
 	alphaMap.unbind(1);
