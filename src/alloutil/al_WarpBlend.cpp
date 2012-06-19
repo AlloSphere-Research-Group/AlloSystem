@@ -123,14 +123,14 @@ static const char * demoFS = AL_STRINGIFY(
 		return vec3(p.x*c - p.z*s, p.y, p.x*s + p.z*c);
 	}
 	
-	// twist
-	vec3 opTwist( vec3 p ) {
-		float c = cos(twparam1); //*p.y);
-		float s = sin(twparam1); //*p.y);
-		mat2  m = mat2(c,-s,s,c);
-		vec3  q = vec3(m*p.xz,p.y);
-		return q;
-	}
+//	// twist
+//	vec3 opTwist( vec3 p ) {
+//		float c = cos(twparam1); //*p.y);
+//		float s = sin(twparam1); //*p.y);
+//		mat2  m = mat2(c,-s,s,c);
+//		vec3  q = vec3(m*p.xz,p.y);
+//		return q;
+//	}
 
 	// roundedness:
 	float lengthN(vec3 p, float n) {
@@ -184,46 +184,10 @@ static const char * demoFS = AL_STRINGIFY(
 	}
 
 	float map(vec3 p) {
-		
-		vec3 pr = opRepeat(p, vec3(8,8,8));
-		
-		float s = udBox(pr, vec3(1, 3, 0.25));
+		vec3 pr = opRepeat(p, vec3(0.8,0.8,0.8));
+		float s = udBox(pr, vec3(0.1, 0.3, 0.025));
 		return s;
 	}
-
-//	// a 'scene':
-//	float map( vec3 p0 ) {
-//		
-//		vec3 p1 = rotateXZ(p0, 2. * pi * param1);
-//		p1 = translate(p1, vec3(-0.25, 0, 0));
-//
-//		vec3 p2 = rotateYZ(translate(p1, vec3(0.95, 0, 0)), 1. * pi * param1);
-//
-//		vec3 p3 = rotateYZ(translate(p0, vec3(sin(pi * 3. * param1), 0, 0)), param1);
-//
-//		vec3 repeats3 = opRepeat(p3, vec3(0.5, 0.5, 0.5));
-//
-//		float s = sdSphere(repeats3, 0.2);
-//		//float s = sdSphere(p3, 0.5);
-//		float b = udBox(p2, vec3(0.5, 0.2, 0.4));
-//		b = opSubtract(s, b);
-//
-//		float s2 = sdSphere(p3, 0.2);
-//		
-//		float g = opUnion(b, s2);
-//
-//		//return sdSphere(p, 0.5);
-//		
-//		vec3 p4 = rotateYZ(p0, 2. * pi * param1);
-//
-//		vec3 tw = opTwist ( p4 );
-//
-//		float h = udHexPrism( tw, vec2(0.3, 0.2) );
-//		//float m = mix(h, g, 0.5);
-//		float m = opUnion(h, g);
-//
-//		return opUnion(m, p0.y + 1.);
-//	}
 
 	// shadow ray:
 	float shadow( in vec3 ro, in vec3 rd, float mint, float maxt, float mindt, float k ) {
@@ -277,7 +241,7 @@ static const char * demoFS = AL_STRINGIFY(
 		// initial eye-ray to find object intersection:
 		float mindt = 0.01 + 0.0001;
 		float mint = mindt;
-		float maxt = 20.;
+		float maxt = 2.;
 		float t=mint;
 		float h = maxt;
 		int steps = 0;
