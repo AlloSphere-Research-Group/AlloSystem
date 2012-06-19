@@ -185,9 +185,7 @@ static const char * demoFS = AL_STRINGIFY(
 
 	float map(vec3 p) {
 		
-		//vec3 pt = opTwist(p);
 		vec3 pr = opRepeat(p, vec3(8,8,8));
-		//float s = sdSphere(pr), 1.);
 		
 		float s = udBox(pr, vec3(1, 3, 0.25));
 		return s;
@@ -255,12 +253,6 @@ static const char * demoFS = AL_STRINGIFY(
 		
 		// pixel location (observer space):
 		vec3 v = texture2D(pixelMap, texcoord0).rgb;
-		// shift by camera location:
-		v += vec3(
-			param1 * 1.,
-			param1 * 0.2,
-			param1 * 0.2
-		);
 		
 		vec3 nv = normalize(v);
 		
