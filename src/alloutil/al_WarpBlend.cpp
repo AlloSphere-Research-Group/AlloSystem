@@ -533,7 +533,7 @@ void WarpnBlend::drawDemo(const Pose& pose, double eyesep) {
 }
 
 void WarpnBlend::drawBlend() {
-	gl.projection(Matrix4d::ortho(0, 1, 0, 1, -1, 1));
+	gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
 	gl.modelView(Matrix4d::identity());
 	alphaMap.quad(gl);
 }
