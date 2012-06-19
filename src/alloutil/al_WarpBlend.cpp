@@ -480,6 +480,7 @@ void WarpnBlend::onCreate() {
 }
 
 void WarpnBlend::draw(Texture& scene) {
+	if (!loaded) return;
 	gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
 	gl.modelView(Matrix4d::identity());
 	alphaMap.bind(2);
@@ -495,6 +496,7 @@ void WarpnBlend::draw(Texture& scene) {
 }
 
 void WarpnBlend::drawWarp() {
+	if (!loaded) return;
 	gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
 	gl.modelView(Matrix4d::identity());
 	geomP.begin();
@@ -504,6 +506,7 @@ void WarpnBlend::drawWarp() {
 }
 
 void WarpnBlend::drawWarp3D() {
+	if (!loaded) return;
 	gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
 	gl.modelView(Matrix4d::identity());
 	geomP3D.begin();
@@ -516,6 +519,7 @@ void WarpnBlend::drawWarp3D() {
 }
 
 void WarpnBlend::drawDemo(const Pose& pose, double eyesep) {
+	if (!loaded) return;
 	gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
 	gl.modelView(Matrix4d::identity());
 	demoP.begin();
@@ -533,6 +537,7 @@ void WarpnBlend::drawDemo(const Pose& pose, double eyesep) {
 }
 
 void WarpnBlend::drawBlend() {
+	if (!loaded) return;
 	gl.projection(Matrix4d::ortho(0, 1, 0, 1, -1, 1));
 	gl.modelView(Matrix4d::identity());
 	alphaMap.quad(gl);
