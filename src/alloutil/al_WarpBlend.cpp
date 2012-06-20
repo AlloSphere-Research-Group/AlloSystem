@@ -41,7 +41,7 @@ static const char * geomFS3D = AL_STRINGIFY(
 	varying vec2 texcoord0;
 	void main(){
 		vec3 v = texture2D(pixelMap, texcoord0).rgb;
-		float a = texture2D(alphaMap, texcoord0).r;
+		float a = texture2D(alphaMap, vec2(texcoord0.x, 1.-texcoord0.y)).r;
 		v = normalize(v);
 		v = mod(v * 8., 1.);
 		gl_FragColor = vec4(v, a);
