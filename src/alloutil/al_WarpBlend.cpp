@@ -217,20 +217,20 @@ static const char * demoFS = AL_STRINGIFY(
 		vec3 v = texture2D(pixelMap, texcoord0).rgb;
 		// ray direction (observer space):
 		vec3 nv = normalize(v);
-		// ray origin (world space)
-		vec3 ro = pos;
 		
 		// stereo offset: 
 		// should reduce to zero as the nv becomes close to (0, 1, 0)
 		// take the vector of nv in the XZ plane
 		// and rotate it 90' around Y:
-		vec3 nvx = vec3(nv.z, 0., nv.x);
+		vec3 nvx = vec3(-nv.z, 0., nv.x);
 		vec3 eye = nvx * eyesep * 0.02;
 		
 		// ray direction (world space)
 		//vec3 nev = normalize(v - pos);
 		
-		//ro = ro + eye;
+		// ray origin (world space)
+		vec3 ro = pos + eye;
+		// re-compute ray direction accordingly:
 		nv = normalize(nv - eye);
 		
 		// ray direction (world space);
