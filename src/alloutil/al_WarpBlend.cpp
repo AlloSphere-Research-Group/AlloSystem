@@ -236,7 +236,7 @@ static const char * demoFS = AL_STRINGIFY(
 		// ray direction (world space)
 		//vec3 nev = normalize(v - pos);
 		
-		float azimuth = atan(nv.x, -nv.z);
+		float azimuth = atan(nv.x, nv.z);
 			
 		
 		// find object intersection:
