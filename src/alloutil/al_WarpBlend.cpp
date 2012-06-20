@@ -337,6 +337,7 @@ static const char * demoFS = AL_STRINGIFY(
 
 		gl_FragColor = vec4(color, 1);
 		float a = texture2D(alphaMap, texcoord0).r;
+		a = a * a;
 		//gl_FragColor = vec4(test, test, test, 1);
 		
 		gl_FragColor *= a; //(a+0.5);
