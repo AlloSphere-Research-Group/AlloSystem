@@ -223,11 +223,10 @@ static const char * demoFS = AL_STRINGIFY(
 			cos(azimuth),
 			sin(azimuth),
 			0
-		); 
-		// * eyesep * (1.-abs(nv.z)) * 0.1;
+		) * eyesep * (1.-abs(nv.z)) * 0.1;
 	
 		// ray origin (world space)
-		vec3 ro = eye + pos;
+		vec3 ro = pos;
 		
 		// ray direction (world space)
 		vec3 nev = normalize(v - eye);
@@ -309,7 +308,7 @@ static const char * demoFS = AL_STRINGIFY(
 			
 			color = //v
 					ambient
-					+ azimuth
+					+ azimuth * 0.2
 					//+ color1 * ln1 //* shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k) 
 					//+ color2 * ln2 //* shadow(p+normal*smint, ldir2, smint, smaxt, mindt, k)
 					;
