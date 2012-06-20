@@ -221,6 +221,11 @@ static const char * demoFS = AL_STRINGIFY(
 		// ray origin (world space)
 		vec3 ro = pos;
 		
+		// stereo offset: 
+		// should reduce to zero as the nv becomes close to (0, 1, 0)
+		// take the vector of nv in the XZ plane
+		// and rotate it 90' around Y:
+		vec3 nvx = vec3(nv.z, 0., nv.x);
 
 /*		
 		// eye location (observer space):
@@ -317,7 +322,7 @@ static const char * demoFS = AL_STRINGIFY(
 			
 			color = //v
 					//ambient
-					vec3(aa, aa, aa)
+					nvx
 					//abs(nv)
 					//vec3(abs(azimuth))
 					//+ color1 * ln1 //* shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k) 
