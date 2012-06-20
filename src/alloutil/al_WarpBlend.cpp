@@ -317,7 +317,7 @@ static const char * demoFS = AL_STRINGIFY(
 			
 			color = //v
 					//ambient
-					vec3(aa, nv.x, nv.z)
+					vec3(aa, aa, aa)
 					//abs(nv)
 					//vec3(abs(azimuth))
 					//+ color1 * ln1 //* shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k) 
