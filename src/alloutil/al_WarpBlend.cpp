@@ -232,9 +232,10 @@ static const char * demoFS = AL_STRINGIFY(
 		
 		// ray direction (world space)
 		vec3 nev = normalize(v - pos);
-		vec3 rd = quat_rotate(quat, vec3(nev.x, nev.z, -nev.y));
 		
-		float azimuth = atan(rd.x, -rd.z);
+		float azimuth = atan(nev.x, -nev.z);
+			
+		vec3 rd = quat_rotate(quat, vec3(nev.x, nev.z, -nev.y));
 		
 		// find object intersection:
 		vec3 p = ro;
@@ -310,9 +311,13 @@ static const char * demoFS = AL_STRINGIFY(
 			float nudge = 0.01;
 			float smaxt = maxt;
 			
+			float aa = abs(azimuth) / pi;
+			
 			color = //v
 					//ambient
-					abs(azimuth * 0.2)
+					vec3(aa, aa, aa)
+					//abs(nev)
+					//vec3(abs(azimuth))
 					//+ color1 * ln1 //* shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k) 
 					//+ color2 * ln2 //* shadow(p+normal*smint, ldir2, smint, smaxt, mindt, k)
 					;
