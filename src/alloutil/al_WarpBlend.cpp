@@ -269,7 +269,7 @@ static const char * demoFS = AL_STRINGIFY(
 			
 			// Normals computed by central differences on the distance field at the shading point (gradient approximation).
 			// larger eps leads to softer edges
-			float eps = 0.1;
+			float eps = 0.01;
 			vec3 grad = vec3( 
 				map(p+vec3(eps,0,0)) - map(p-vec3(eps,0,0)),
 				map(p+vec3(0,eps,0)) - map(p-vec3(0,eps,0)),
