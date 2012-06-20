@@ -210,7 +210,7 @@ static const char * demoFS = AL_STRINGIFY(
 		vec3 light2 = vec3(2, -2., 3.);
 		vec3 color1 = vec3(0.5, 1, 0.5);
 		vec3 color2 = vec3(1, 0.2, 1);
-		vec3 ambient = vec3(0.1, 0.1, 0.1);
+		vec3 ambient = vec3(0.3, 0.3, 0.3);
 
 		// pixel location (observer space):
 		vec3 v = texture2D(pixelMap, texcoord0).rgb;
@@ -238,7 +238,7 @@ static const char * demoFS = AL_STRINGIFY(
 		// initial eye-ray to find object intersection:
 		float mindt = 0.001 + 0.0001;
 		float mint = mindt;
-		float maxt = 2.;
+		float maxt = 5.;
 		float t=mint;
 		float h = maxt;
 		int steps = 0;
@@ -313,7 +313,7 @@ static const char * demoFS = AL_STRINGIFY(
 			
 			color = //v
 					ambient
-					+ color1 * ln1 * shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k) 
+					+ color1 * ln1 //* shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k) 
 					+ color2 * ln2 //* shadow(p+normal*smint, ldir2, smint, smaxt, mindt, k)
 					;
 			//color = 	ambient +
