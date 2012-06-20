@@ -214,8 +214,13 @@ static const char * demoFS = AL_STRINGIFY(
 
 		// pixel location (observer space):
 		vec3 v = texture2D(pixelMap, texcoord0).rgb;
-		
+		// ray direction (observer space):
 		vec3 nv = normalize(v);
+		// ray direction (world space);
+		vec3 rd = quat_rotate(quat, vec3(nv.x, nv.z, -nv.y));
+		// ray origin (world space)
+		vec3 ro = pos;
+		
 
 /*		
 		// eye location (observer space):
@@ -227,15 +232,12 @@ static const char * demoFS = AL_STRINGIFY(
 		) * eyesep * (1.-abs(nv.z)) * 0.1;
 */	
 		
-		// ray origin (world space)
-		vec3 ro = pos;
 		
 		// ray direction (world space)
-		vec3 nev = normalize(v - pos);
+		//vec3 nev = normalize(v - pos);
 		
 		float azimuth = atan(nv.x, -nv.z);
 			
-		vec3 rd = quat_rotate(quat, vec3(nev.x, nev.z, -nev.y));
 		
 		// find object intersection:
 		vec3 p = ro;
