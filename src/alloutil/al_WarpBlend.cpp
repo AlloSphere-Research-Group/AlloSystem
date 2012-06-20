@@ -227,26 +227,15 @@ static const char * demoFS = AL_STRINGIFY(
 		// take the vector of nv in the XZ plane
 		// and rotate it 90' around Y:
 		vec3 nvx = vec3(nv.z, 0., nv.x);
-
-/*		
-		// eye location (observer space):
-		float azimuth = atan(nv.x, -nv.z);
-		vec3 eye = vec3(
-			cos(azimuth),
-			sin(azimuth),
-			0
-		) * eyesep * (1.-abs(nv.z)) * 0.1;
-*/	
-		
+			
 		
 		// ray direction (world space)
 		//vec3 nev = normalize(v - pos);
 		
-		float azimuth = atan(nv.x, nv.z);
-			
+		ro = ro + nvx * eyesep;
 		
 		// find object intersection:
-		vec3 p = ro + nvx * eyesep;
+		vec3 p = ro;
 		
 		// initial eye-ray to find object intersection:
 		float mindt = 0.001 + 0.0001;
@@ -320,13 +309,11 @@ static const char * demoFS = AL_STRINGIFY(
 			float nudge = 0.01;
 			float smaxt = maxt;
 */			
-			float aa = 0.5 + azimuth * 0.3;
 			
 			color = //v
 					ambient
 					//nvx
 					//abs(nv)
-					//vec3(abs(azimuth))
 					+ color1 * ln1 //* shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k) 
 					+ color2 * ln2 //* shadow(p+normal*smint, ldir2, smint, smaxt, mindt, k)
 					;
