@@ -223,7 +223,7 @@ static const char * demoFS = AL_STRINGIFY(
 		// take the vector of nv in the XZ plane
 		// and rotate it 90' around Y:
 		vec3 nvx = vec3(nv.z, 0., nv.x);
-		vec3 eye = nvx * eyesep * 0.005;
+		vec3 eye = -nvx * eyesep * 0.005;
 		
 		// ray direction (world space)
 		//vec3 nev = normalize(v - pos);
