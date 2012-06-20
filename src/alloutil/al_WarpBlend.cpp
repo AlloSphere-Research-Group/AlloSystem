@@ -313,11 +313,11 @@ static const char * demoFS = AL_STRINGIFY(
 			float nudge = 0.01;
 			float smaxt = maxt;
 */			
-			float aa = azimuth * 0.3;
+			float aa = 0.5 + azimuth * 0.3;
 			
 			color = //v
 					//ambient
-					vec3(aa, aa, aa)
+					vec3(aa, nv.x, nv.z)
 					//abs(nv)
 					//vec3(abs(azimuth))
 					//+ color1 * ln1 //* shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k) 
