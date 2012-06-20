@@ -556,9 +556,10 @@ void WarpnBlend::read3D(std::string path) {
 			int32_t idx = y*w+x;	// row-major format
 		
 			float * cell = arr.cell<float>(x, y);
+			// coordinate system change:
 			cell[0] = t[idx];//*0.5+0.5;
-			cell[1] = u[idx];//*0.5+0.5;
-			cell[2] = v[idx];//*0.5+0.5;
+			cell[1] = v[idx];//*0.5+0.5;
+			cell[2] = u[idx];//*0.5+0.5;
 			
 			if (y == h/2) {
 				//printf("3D %d,%d = %f, %f, %f\n", x, y, cell[0], cell[1], cell[2]);
