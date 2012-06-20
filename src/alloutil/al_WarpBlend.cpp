@@ -324,11 +324,10 @@ static const char * demoFS = AL_STRINGIFY(
 			//color = normal;
 		}
 
-		vec4 s = vec4(color, 1);
 		vec2 texa = vec2(texcoord0.x, 1.-texcoord0.y);
 		float a = texture2D(alphaMap, texa).r;
 		
-		gl_FragColor s * a; 
+		gl_FragColor = vec4(color, 1) * a; 
 	}
 );
 
