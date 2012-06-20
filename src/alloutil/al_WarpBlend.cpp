@@ -282,7 +282,7 @@ static const char * demoFS = AL_STRINGIFY(
 			vec3 normal = normalize(grad);
 
 			
-
+/*
 			// Ambient Occlusion:
 			// sample 5 neighbors in direction of normal
 			float ao = 0.;
@@ -312,8 +312,8 @@ static const char * demoFS = AL_STRINGIFY(
 			float smint = 0.001;
 			float nudge = 0.01;
 			float smaxt = maxt;
-			
-			float aa = abs(azimuth) / pi;
+*/			
+			float aa = abs(azimuth) * 0.1;
 			
 			color = //v
 					//ambient
@@ -327,7 +327,7 @@ static const char * demoFS = AL_STRINGIFY(
 			//		color1 * ln1 + 
 			//		color2 * ln2;
 			//test = ao;
-			color *= ao;
+			//color *= ao;
 			//color = normal;
 		}
 
