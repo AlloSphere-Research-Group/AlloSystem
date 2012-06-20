@@ -286,7 +286,14 @@ static const char * demoFS = AL_STRINGIFY(
 				map(p+vec3(0, 0, eps)) - map(p-vec3(0,0,eps))  
 			);
 			vec3 normal = normalize(grad);
-
+			
+			// compute ray to light source:
+			vec3 ldir1 = normalize(light1 - p);
+			vec3 ldir2 = normalize(light2 - p);
+			
+			// abs for bidirectional surfaces
+			float ln1 = max(0.,dot(ldir1, normal));
+			float ln2 = max(0.,dot(ldir2, normal));
 			
 /*
 			// Ambient Occlusion:
@@ -303,13 +310,7 @@ static const char * demoFS = AL_STRINGIFY(
 			}
 			ao = 1. - aok * ao;
 
-			// compute ray to light source:
-			vec3 ldir1 = normalize(light1 - p);
-			vec3 ldir2 = normalize(light2 - p);
-			
-			// abs for bidirectional surfaces
-			float ln1 = max(0.,dot(ldir1, normal));
-			float ln2 = max(0.,dot(ldir2, normal));
+
 
 			// shadow penumbra coefficient:
 			float k = 16.;
@@ -322,12 +323,12 @@ static const char * demoFS = AL_STRINGIFY(
 			float aa = 0.5 + azimuth * 0.3;
 			
 			color = //v
-					//ambient
-					nvx
+					ambient
+					//nvx
 					//abs(nv)
 					//vec3(abs(azimuth))
-					//+ color1 * ln1 //* shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k) 
-					//+ color2 * ln2 //* shadow(p+normal*smint, ldir2, smint, smaxt, mindt, k)
+					+ color1 * ln1 //* shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k) 
+					+ color2 * ln2 //* shadow(p+normal*smint, ldir2, smint, smaxt, mindt, k)
 					;
 			//color = 	ambient +
 			//		color1 * ln1 + 
