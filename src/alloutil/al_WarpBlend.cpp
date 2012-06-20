@@ -217,8 +217,6 @@ static const char * demoFS = AL_STRINGIFY(
 		vec3 v = texture2D(pixelMap, texcoord0).rgb;
 		// ray direction (observer space):
 		vec3 nv = normalize(v);
-		// ray direction (world space);
-		vec3 rd = quat_rotate(quat, vec3(nv.x, nv.z, -nv.y));
 		// ray origin (world space)
 		vec3 ro = pos;
 		
@@ -227,13 +225,16 @@ static const char * demoFS = AL_STRINGIFY(
 		// take the vector of nv in the XZ plane
 		// and rotate it 90' around Y:
 		vec3 nvx = vec3(nv.z, 0., nv.x);
-			
+		vec3 eye = nvx * eyesep;
 		
 		// ray direction (world space)
 		//vec3 nev = normalize(v - pos);
 		
-		ro = ro + nvx * eyesep;
+		ro = ro + eye;
+		nv = normalize(nv - eye);
 		
+		// ray direction (world space);
+		vec3 rd = quat_rotate(quat, vec3(nv.x, nv.z, -nv.y));
 		// find object intersection:
 		vec3 p = ro;
 		
