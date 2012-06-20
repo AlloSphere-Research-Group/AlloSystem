@@ -246,7 +246,7 @@ static const char * demoFS = AL_STRINGIFY(
 			
 		
 		// find object intersection:
-		vec3 p = ro;
+		vec3 p = ro + nvx * eyesep;
 		
 		// initial eye-ray to find object intersection:
 		float mindt = 0.001 + 0.0001;
