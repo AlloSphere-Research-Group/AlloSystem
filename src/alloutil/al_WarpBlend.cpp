@@ -223,7 +223,8 @@ static const char * demoFS = AL_STRINGIFY(
 			cos(azimuth),
 			sin(azimuth),
 			0
-		) * eyesep * (1.-abs(nv.z)) * 0.1;
+		); 
+		// * eyesep * (1.-abs(nv.z)) * 0.1;
 	
 		// ray origin (world space)
 		vec3 ro = eye + pos;
@@ -252,11 +253,6 @@ static const char * demoFS = AL_STRINGIFY(
 			//t += h * 0.5; //(1.+0.2*t/maxt);	// slight speedup
 			//steps++;
 		}
-
-		// Q: what is the normal at this point?
-		// need normals for 
-		// a) lighting calculation
-		// b) initial nudge for shadow etc.
 
 		// grain:
 		//vec3 grain = texture2D(tex0, gl_TexCoord[0].xy * 20.).grb;
@@ -308,13 +304,14 @@ static const char * demoFS = AL_STRINGIFY(
 
 			// check for shadow:
 			float smint = 0.001;
-			float nudge = 0.1;
+			float nudge = 0.01;
 			float smaxt = maxt;
 			
 			color = //v
 					ambient
-					+ color1 * ln1 //* shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k) 
-					+ color2 * ln2 //* shadow(p+normal*smint, ldir2, smint, smaxt, mindt, k)
+					+ azimuth
+					//+ color1 * ln1 //* shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k) 
+					//+ color2 * ln2 //* shadow(p+normal*smint, ldir2, smint, smaxt, mindt, k)
 					;
 			//color = 	ambient +
 			//		color1 * ln1 + 
