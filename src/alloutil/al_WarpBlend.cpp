@@ -184,7 +184,7 @@ static const char * demoFS = AL_STRINGIFY(
 
 	float map(vec3 p) {
 		vec3 pr = opRepeat(p, vec3(0.8,0.8,0.8));
-		float s = udBox(pr, vec3(0.1, 0.3, 0.025));
+		float s = udBox(pr, vec3(0.1, 0.2, 0.025));
 		return s;
 	}
 
@@ -207,8 +207,8 @@ static const char * demoFS = AL_STRINGIFY(
 	
 	void main(){
 	
-		vec3 light1 = vec3(3, 2., 1);
-		vec3 light2 = vec3(2, -2., 3.);
+		vec3 light1 = pos + vec3(3, 2., 1);
+		vec3 light2 = pos + vec3(2, -2., 3.);
 		vec3 color1 = vec3(0.5, 1, 0.5);
 		vec3 color2 = vec3(1, 0.2, 1);
 		vec3 ambient = vec3(0.3, 0.3, 0.3);
@@ -271,7 +271,7 @@ static const char * demoFS = AL_STRINGIFY(
 			
 			// Normals computed by central differences on the distance field at the shading point (gradient approximation).
 			// larger eps leads to softer edges
-			float eps = 0.01;
+			float eps = 0.005;
 			vec3 grad = vec3( 
 				map(p+vec3(eps,0,0)) - map(p-vec3(eps,0,0)),
 				map(p+vec3(0,eps,0)) - map(p-vec3(0,eps,0)),
@@ -286,8 +286,27 @@ static const char * demoFS = AL_STRINGIFY(
 			// abs for bidirectional surfaces
 			float ln1 = max(0.,dot(ldir1, normal));
 			float ln2 = max(0.,dot(ldir2, normal));
+
+			// shadow penumbra coefficient:
+			float k = 16.;
+
+			// check for shadow:
+			float smint = 0.001;
+			float nudge = 0.01;
+			float smaxt = maxt;
 			
-/*
+			
+			color = ambient
+					+ color1 * ln1 //* shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k) 
+					+ color2 * ln2 //* shadow(p+normal*smint, ldir2, smint, smaxt, mindt, k)
+					;
+				
+			//color = 	ambient +
+			//		color1 * ln1 + 
+			//		color2 * ln2;
+			//test = ao;
+			
+			/*
 			// Ambient Occlusion:
 			// sample 5 neighbors in direction of normal
 			float ao = 0.;
@@ -301,31 +320,8 @@ static const char * demoFS = AL_STRINGIFY(
 				weight *= 0.6;	// decreasing importance
 			}
 			ao = 1. - aok * ao;
-
-
-
-			// shadow penumbra coefficient:
-			float k = 16.;
-
-			// check for shadow:
-			float smint = 0.001;
-			float nudge = 0.01;
-			float smaxt = maxt;
-*/			
-			
-			color = //v
-					ambient
-					//nvx
-					//abs(nv)
-					+ color1 * ln1 //* shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k) 
-					+ color2 * ln2 //* shadow(p+normal*smint, ldir2, smint, smaxt, mindt, k)
-					;
-				
-			//color = 	ambient +
-			//		color1 * ln1 + 
-			//		color2 * ln2;
-			//test = ao;
-			//color *= ao;
+			color *= ao;
+			*/		
 			
 			color *= fog;
 			
