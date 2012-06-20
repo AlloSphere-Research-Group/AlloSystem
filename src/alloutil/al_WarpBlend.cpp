@@ -313,7 +313,7 @@ static const char * demoFS = AL_STRINGIFY(
 			float nudge = 0.01;
 			float smaxt = maxt;
 */			
-			float aa = abs(azimuth) * 0.1;
+			float aa = azimuth * 0.1;
 			
 			color = //v
 					//ambient
