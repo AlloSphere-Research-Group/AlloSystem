@@ -229,7 +229,7 @@ static const char * demoFS = AL_STRINGIFY(
 		vec3 ro = pos;
 		
 		// ray direction (world space)
-		vec3 nev = normalize(v - eye);
+		vec3 nev = normalize(v - pos);
 		vec3 rd = quat_rotate(quat, vec3(nev.x, nev.z, -nev.y));
 		
 		// find object intersection:
@@ -307,8 +307,8 @@ static const char * demoFS = AL_STRINGIFY(
 			float smaxt = maxt;
 			
 			color = //v
-					ambient
-					+ azimuth * 0.2
+					//ambient
+					abs(azimuth * 0.2)
 					//+ color1 * ln1 //* shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k) 
 					//+ color2 * ln2 //* shadow(p+normal*smint, ldir2, smint, smaxt, mindt, k)
 					;
