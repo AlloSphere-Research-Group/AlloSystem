@@ -324,23 +324,11 @@ static const char * demoFS = AL_STRINGIFY(
 			//color = normal;
 		}
 
-		// render as depth:
-		float depth = 1.-t/maxt;
-		//color = vec3(depth, depth, depth);
-
-		// render normal:
-		//color = normal;
-
-		// brighter pixels needed more iterations:
-		//test = 1. - 10./(10.+float(steps));
-		//color += test;
-
-		gl_FragColor = vec4(color, 1);
-		float a = texture2D(alphaMap, texcoord0).r;
-		a = a * a;
-		//gl_FragColor = vec4(test, test, test, 1);
+		vec4 s = vec4(color, 1);
+		vec2 texa = vec2(texcoord0.x, 1.-texcoord0.y);
+		float a = texture2D(alphaMap, texa).r;
 		
-		gl_FragColor *= a; //(a+0.5);
+		gl_FragColor s * a; 
 	}
 );
 
