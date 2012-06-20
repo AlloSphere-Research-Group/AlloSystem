@@ -230,7 +230,7 @@ static const char * demoFS = AL_STRINGIFY(
 		// ray direction (world space)
 		//vec3 nev = normalize(v - pos);
 		
-		ro = ro + eye;
+		//ro = ro + eye;
 		nv = normalize(nv - eye);
 		
 		// ray direction (world space);
