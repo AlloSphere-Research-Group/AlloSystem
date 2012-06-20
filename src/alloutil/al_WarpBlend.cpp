@@ -233,7 +233,7 @@ static const char * demoFS = AL_STRINGIFY(
 		// ray direction (world space)
 		vec3 nev = normalize(v - pos);
 		
-		float azimuth = atan(nev.x, -nev.z);
+		float azimuth = atan(nv.x, -nv.z);
 			
 		vec3 rd = quat_rotate(quat, vec3(nev.x, nev.z, -nev.y));
 		
@@ -316,7 +316,7 @@ static const char * demoFS = AL_STRINGIFY(
 			color = //v
 					//ambient
 					//vec3(aa, aa, aa)
-					abs(nev)
+					abs(nv)
 					//vec3(abs(azimuth))
 					//+ color1 * ln1 //* shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k) 
 					//+ color2 * ln2 //* shadow(p+normal*smint, ldir2, smint, smaxt, mindt, k)
