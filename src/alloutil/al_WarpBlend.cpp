@@ -255,6 +255,8 @@ static const char * demoFS = AL_STRINGIFY(
 			//t += h * 0.5; //(1.+0.2*t/maxt);	// slight speedup
 			//steps++;
 		}
+		
+		float fog = 1. - pow(t/maxt, 2.);
 
 		// grain:
 		//vec3 grain = texture2D(tex0, gl_TexCoord[0].xy * 20.).grb;
@@ -318,11 +320,15 @@ static const char * demoFS = AL_STRINGIFY(
 					+ color1 * ln1 //* shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k) 
 					+ color2 * ln2 //* shadow(p+normal*smint, ldir2, smint, smaxt, mindt, k)
 					;
+				
 			//color = 	ambient +
 			//		color1 * ln1 + 
 			//		color2 * ln2;
 			//test = ao;
 			//color *= ao;
+			
+			color *= fog;
+			
 			//color = normal;
 		}
 
