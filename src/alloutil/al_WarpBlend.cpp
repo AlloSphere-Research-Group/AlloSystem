@@ -241,7 +241,7 @@ static const char * demoFS = AL_STRINGIFY(
 		// initial eye-ray to find object intersection:
 		float mindt = 0.001 + 0.0001;
 		float mint = mindt;
-		float maxt = 5.;
+		float maxt = 15.;
 		float t=mint;
 		float h = maxt;
 		int steps = 0;
