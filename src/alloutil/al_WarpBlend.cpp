@@ -328,7 +328,7 @@ static const char * demoFS = AL_STRINGIFY(
 			
 			color *= fog;
 			
-			vec3 vc = mod(nvx * 8., 1.) * a;
+			vec3 vc = mod(nvx * 8., 1.);
 			color = abs(vc);
 			
 			//color = normal;
