@@ -42,6 +42,7 @@ public:
 	
 	Texture geometryMap, alphaMap, pixelMap;
 	Matrix4d modelView, perspective;
+	Vec3f up;
 
 	std::string imgpath;
 	

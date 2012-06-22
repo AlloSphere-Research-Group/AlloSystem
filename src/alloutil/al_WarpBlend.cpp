@@ -60,6 +60,7 @@ static const char * demoVS = AL_STRINGIFY(
 static const char * demoFS = AL_STRINGIFY(
 	uniform sampler2D pixelMap, alphaMap;
 	uniform vec3 pos;
+	uniform vec3 up;
 	uniform vec4 quat;
 	varying vec2 texcoord0;
 	uniform float eyesep;
@@ -222,8 +223,8 @@ static const char * demoFS = AL_STRINGIFY(
 		// should reduce to zero as the nv becomes close to (0, 1, 0)
 		// take the vector of nv in the XZ plane
 		// and rotate it 90' around Y:
-		vec3 nvx = cross(nv, vec3(0, 1, 0)); //vec3(nv.z, 0., nv.x);
-		nvx *= 1.-abs(dot(nv, vec3(0, 1, 0)));
+		vec3 nvx = cross(nv, up); //vec3(nv.z, 0., nv.x);
+		nvx *= 1.-abs(dot(nv, up));
 		
 		vec3 eye = nvx * eyesep * 0.005;
 		
@@ -377,6 +378,7 @@ static const char * warpFS = AL_STRINGIFY(
 WarpnBlend::WarpnBlend() {
 	loaded = false;
 	imgpath = "./img/";
+	up.set(0, 1, 0);
 	printf("created WarpnBlend %s\n", imgpath.c_str());
 }
 
@@ -477,6 +479,7 @@ void WarpnBlend::drawDemo(const Pose& pose, double eyesep) {
 	demoP.uniform("pos", pose.pos()); 
 	demoP.uniform("quat", pose.quat());
 	demoP.uniform("eyesep", eyesep);
+	demoP.uniform("up", up);
 	alphaMap.bind(1);
 	pixelMap.quad(gl);
 	alphaMap.unbind(1);
