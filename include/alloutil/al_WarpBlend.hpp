@@ -42,8 +42,8 @@ public:
 	
 	Texture geometryMap, alphaMap, pixelMap;
 	Matrix4d modelView, perspective;
-	Vec3f up;
-
+	Pose center;
+	
 	std::string imgpath;
 	
 	bool loaded;

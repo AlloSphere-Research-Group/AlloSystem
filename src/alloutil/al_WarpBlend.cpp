@@ -60,7 +60,8 @@ static const char * demoVS = AL_STRINGIFY(
 static const char * demoFS = AL_STRINGIFY(
 	uniform sampler2D pixelMap, alphaMap;
 	uniform vec3 pos;
-	uniform vec3 up;
+	uniform vec3 centerpos;
+	uniform vec4 centerquat;
 	uniform vec4 quat;
 	varying vec2 texcoord0;
 	uniform float eyesep;
@@ -217,12 +218,13 @@ static const char * demoFS = AL_STRINGIFY(
 		// pixel location (observer space):
 		vec3 v = texture2D(pixelMap, texcoord0).rgb;
 		// ray direction (observer space):
-		vec3 nv = normalize(v);
+		vec3 nv = quat_rotate(centerquat, normalize(v));
 		
 		// stereo offset: 
 		// should reduce to zero as the nv becomes close to (0, 1, 0)
 		// take the vector of nv in the XZ plane
 		// and rotate it 90' around Y:
+		vec3 up = vec3(0, 1, 0);
 		vec3 nvx = normalize(cross(nv, up)); //vec3(nv.z, 0., nv.x);
 		nvx *= 1.-abs(dot(nv, up));
 		
@@ -328,8 +330,8 @@ static const char * demoFS = AL_STRINGIFY(
 			
 			color *= fog;
 			
-			vec3 vc = mod(nvx * 8., 1.);
-			//color = abs(vc);
+			vec3 vc = mod(nv * 8., 1.);
+			color = abs(vc);
 			
 			//color = normal;
 		}
@@ -379,7 +381,6 @@ static const char * warpFS = AL_STRINGIFY(
 WarpnBlend::WarpnBlend() {
 	loaded = false;
 	imgpath = "./img/";
-	up.set(0, 1, 0);
 	printf("created WarpnBlend %s\n", imgpath.c_str());
 }
 
@@ -480,7 +481,8 @@ void WarpnBlend::drawDemo(const Pose& pose, double eyesep) {
 	demoP.uniform("pos", pose.pos()); 
 	demoP.uniform("quat", pose.quat());
 	demoP.uniform("eyesep", eyesep);
-	demoP.uniform("up", up);
+	demoP.uniform("centerpos", center.pos());
+	demoP.uniform("centerquat", center.quat());
 	alphaMap.bind(1);
 	pixelMap.quad(gl);
 	alphaMap.unbind(1);
