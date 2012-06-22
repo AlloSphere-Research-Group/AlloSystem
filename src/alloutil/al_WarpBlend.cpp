@@ -237,7 +237,7 @@ static const char * demoFS = AL_STRINGIFY(
 		//nvx = normalize(nvx); //vec3(nv.z, 0., nv.x);
 		//float amount = 1.-abs(dot(nv, up));
 		//vec3 nvx = vec3(0, nv.r, nv.b);
-		vec3 eye = nvx.zxy * eyesep * 0.005;
+		vec3 eye = nvx.zxy * eyesep * 0.01;
 		
 		// ray direction (world space)
 		//vec3 nev = normalize(v - pos);
