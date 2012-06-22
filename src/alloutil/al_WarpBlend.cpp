@@ -215,11 +215,10 @@ static const char * demoFS = AL_STRINGIFY(
 		vec3 color2 = vec3(1, 0.2, 1);
 		vec3 ambient = vec3(0.3, 0.3, 0.3);
 
-		// pixel location (observer space):
+		// pixel location (calibration space):
 		vec3 v = texture2D(pixelMap, texcoord0).rgb;
-		// ray direction (observer space):
+		// ray direction (allosphere space):
 		vec3 nv = quat_rotate(centerquat, normalize(v-centerpos));
-		
 		// ray direction (world space);
 		vec3 rd = quat_rotate(quat, vec3(nv.x, nv.z, -nv.y));
 		
@@ -227,11 +226,11 @@ static const char * demoFS = AL_STRINGIFY(
 		// should reduce to zero as the nv becomes close to (0, 1, 0)
 		// take the vector of nv in the XZ plane
 		// and rotate it 90' around Y:
-		//vec3 up = vec3(0, 1, 0);
-		//vec3 nvx = normalize(cross(nv, up)); //vec3(nv.z, 0., nv.x);
-		//nvx *= 1.-abs(dot(nv, up));
-		vec3 nvx = vec3(0, nv.r, nv.b);
-		vec3 eye = nvx * eyesep * 0.005;
+		vec3 up = vec3(0, 1, 0);
+		vec3 nvx = normalize(cross(nv, up)); //vec3(nv.z, 0., nv.x);
+		float amount = 1.-abs(dot(nv, up));
+		//vec3 nvx = vec3(0, nv.r, nv.b);
+		vec3 eye = nvx * amount * eyesep * 0.005;
 		
 		// ray direction (world space)
 		//vec3 nev = normalize(v - pos);
@@ -331,6 +330,7 @@ static const char * demoFS = AL_STRINGIFY(
 			
 			color *= fog;
 			color += 0.2*(nv+1.);
+			color *= amount;
 			
 			//color = eye * 10000.;
 			
