@@ -330,7 +330,7 @@ static const char * demoFS = AL_STRINGIFY(
 			*/		
 			
 			color *= fog;
-			color = nv*0.5 + 0.5;
+			color = nv; //*0.5 + 0.5;
 			
 			//color = eye * 10000.;
 			
