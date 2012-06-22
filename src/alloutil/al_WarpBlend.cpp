@@ -227,7 +227,9 @@ static const char * demoFS = AL_STRINGIFY(
 		// take the vector of nv in the XZ plane
 		// and rotate it 90' around Y:
 		vec3 up = vec3(0, 1, 0);
-		vec3 nvx = normalize(cross(nv, up)); //vec3(nv.z, 0., nv.x);
+		vec3 nvx = cross(nv, up);
+		nvx.y = 0.;
+		nvx = normalize(nvx); //vec3(nv.z, 0., nv.x);
 		float amount = 1.-abs(dot(nv, up));
 		//vec3 nvx = vec3(0, nv.r, nv.b);
 		vec3 eye = nvx * amount * eyesep * 0.005;
