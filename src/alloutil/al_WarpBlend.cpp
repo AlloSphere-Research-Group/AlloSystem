@@ -230,7 +230,7 @@ static const char * demoFS = AL_STRINGIFY(
 		//vec3 up = vec3(0, 1, 0);
 		//vec3 nvx = normalize(cross(nv, up)); //vec3(nv.z, 0., nv.x);
 		//nvx *= 1.-abs(dot(nv, up));
-		vec3 nvx = vec3(nv.r, nv.b, 0);
+		vec3 nvx = vec3(0, nv.r, nv.b);
 		vec3 eye = nvx * eyesep * -0.05;
 		
 		// ray direction (world space)
@@ -330,7 +330,7 @@ static const char * demoFS = AL_STRINGIFY(
 			*/		
 			
 			color *= fog;
-			color = nv; //*0.5 + 0.5;
+			color += nv*0.5 + 0.5;
 			
 			//color = eye * 10000.;
 			
