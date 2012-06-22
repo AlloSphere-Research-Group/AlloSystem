@@ -209,9 +209,7 @@ static const char * demoFS = AL_STRINGIFY(
 	
 	// pn is the normal to the plane
 	vec3 projection_on_plane(vec3 v, vec3 pn) {
-		vec3 c = cross(v, pn);
-		vec3 d = cross(c, pn);
-		return d;
+		return v - dot(v, pn) * pn;
 	}
 	
 	void main(){
@@ -239,7 +237,7 @@ static const char * demoFS = AL_STRINGIFY(
 		//nvx = normalize(nvx); //vec3(nv.z, 0., nv.x);
 		//float amount = 1.-abs(dot(nv, up));
 		//vec3 nvx = vec3(0, nv.r, nv.b);
-		vec3 eye = nvx * amount * eyesep * 0.005;
+		vec3 eye = nvx * eyesep * 0.005;
 		
 		// ray direction (world space)
 		//vec3 nev = normalize(v - pos);
