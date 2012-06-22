@@ -218,7 +218,7 @@ static const char * demoFS = AL_STRINGIFY(
 		// pixel location (observer space):
 		vec3 v = texture2D(pixelMap, texcoord0).rgb;
 		// ray direction (observer space):
-		vec3 nv = quat_rotate(centerquat, normalize(v));
+		vec3 nv = quat_rotate(centerquat, normalize(v-centerpos));
 		
 		// stereo offset: 
 		// should reduce to zero as the nv becomes close to (0, 1, 0)
