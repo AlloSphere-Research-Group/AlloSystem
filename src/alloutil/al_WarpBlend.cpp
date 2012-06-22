@@ -220,6 +220,9 @@ static const char * demoFS = AL_STRINGIFY(
 		// ray direction (observer space):
 		vec3 nv = quat_rotate(centerquat, normalize(v-centerpos));
 		
+		// ray direction (world space);
+		vec3 rd = quat_rotate(quat, vec3(nv.x, nv.z, -nv.y));
+		
 		// stereo offset: 
 		// should reduce to zero as the nv becomes close to (0, 1, 0)
 		// take the vector of nv in the XZ plane
@@ -227,9 +230,7 @@ static const char * demoFS = AL_STRINGIFY(
 		//vec3 up = vec3(0, 1, 0);
 		//vec3 nvx = normalize(cross(nv, up)); //vec3(nv.z, 0., nv.x);
 		//nvx *= 1.-abs(dot(nv, up));
-		vec3 nvx = (nv.z, 0, nv.x);
-		
-		vec3 eye = -nvx * eyesep * 0.005;
+		vec3 eye = vec3(rd.z, 0, rd.x) * eyesep * -0.005;
 		
 		// ray direction (world space)
 		//vec3 nev = normalize(v - pos);
@@ -239,8 +240,6 @@ static const char * demoFS = AL_STRINGIFY(
 		// re-compute ray direction accordingly:
 		nv = normalize(nv - eye);
 		
-		// ray direction (world space);
-		vec3 rd = quat_rotate(quat, vec3(nv.x, nv.z, -nv.y));
 		// find object intersection:
 		vec3 p = ro;
 		
