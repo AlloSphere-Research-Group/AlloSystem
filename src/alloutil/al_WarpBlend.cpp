@@ -103,6 +103,13 @@ static const char * demoFS = AL_STRINGIFY(
 			p.w*q.z + p.z*q.w + p.x*q.y - p.y*q.x   // z
 		);
 	}
+	
+	// pn is the normal to the plane
+	vec3 projection_on_plane(vec3 v, vec3 pn) {
+		return v - dot(v, pn) * pn;
+	}
+	
+	// SIGNED DISTANCE ESTIMATION FUNCTIONS //
 
 	// for distance ops, the transforms are inverted:
 	vec3 translate( vec3 p, vec3 tx ) {
@@ -176,7 +183,24 @@ static const char * demoFS = AL_STRINGIFY(
 	float udBox( vec3 p, vec3 b ) {
 	  return length(max(abs(p)-b, 0.0));
 	}
-
+	
+	float sdTorus( vec3 p, vec2 t ){
+		vec2 q = vec2(length(p.xz)-t.x,p.y);
+		return length(q)-t.y;
+	}
+	
+	float length8(vec3 p) {
+		return pow(pow(p.x,8.) + pow(p.y,8.) + pow(p.z,8.),1./8.);
+	}
+	float length8(vec2 p) {
+		return pow(pow(p.x,8.) + pow(p.y,8.),1./8.);
+	}
+	
+	float sdTorus88( vec3 p, vec2 t ) {
+		vec2 q = vec2(length8(p.xz)-t.x,p.y);
+		return length8(q)-t.y;
+	}
+	
 	// hexagoanal prism
 	float udHexPrism( vec3 p, vec2 h )
 	{
@@ -184,10 +208,17 @@ static const char * demoFS = AL_STRINGIFY(
 		return max(q.z-h.y,max(q.x+q.y*0.57735,q.y)-h.x);
 	}
 
+	// MAIN SCENE //
+
 	float map(vec3 p) {
-		vec3 pr = opRepeat(p, vec3(0.8,0.8,0.8));
-		float s = udBox(pr, vec3(0.1, 0.2, 0.025));
-		return s;
+		vec3 pr1 = opRepeat(p, vec3(5, 4, 3));
+		float s1 = udBox(pr1, vec3(0.4, 0.1, 0.8));
+		float s3 = sdSphere(pr1, 0.3);
+		float s2 = sdTorus(pr1, vec2(0.5, 0.1));
+		float s4 = opSubtract(s3, s1);
+		float s5 = mix(s1, s2, s1-s2);
+		float s6 = s5 + 0.02*sin(p.x * 40.)*sin(p.z * 40.)*sin(p.y * 40.);
+		return s6;
 	}
 
 	// shadow ray:
@@ -207,18 +238,12 @@ static const char * demoFS = AL_STRINGIFY(
 		return res;
 	}
 	
-	// pn is the normal to the plane
-	vec3 projection_on_plane(vec3 v, vec3 pn) {
-		return v - dot(v, pn) * pn;
-	}
-	
-	void main(){
-	
-		vec3 light1 = pos + vec3(3, 2., 1);
-		vec3 light2 = pos + vec3(2, -2., 3.);
+	void main(){	
+		vec3 light1 = pos + vec3(1, 2, 3);
+		vec3 light2 = pos + vec3(2, -3, 1);
 		vec3 color1 = vec3(0.5, 1, 0.5);
 		vec3 color2 = vec3(1, 0.2, 1);
-		vec3 ambient = vec3(0.3, 0.3, 0.3);
+		vec3 ambient = vec3(0.2, 0.2, 0.2);
 
 		// pixel location (calibration space):
 		vec3 v = texture2D(pixelMap, texcoord0).rgb;
@@ -232,55 +257,37 @@ static const char * demoFS = AL_STRINGIFY(
 		// take the vector of nv in the XZ plane
 		// and rotate it 90' around Y:
 		vec3 up = vec3(0, 1, 0);
-		vec3 nvx = projection_on_plane(nv, up);
-		//nvx.y = 0.;
-		//nvx = normalize(nvx); //vec3(nv.z, 0., nv.x);
-		//float amount = 1.-abs(dot(nv, up));
-		//vec3 nvx = vec3(0, nv.r, nv.b);
-		vec3 eye = nvx.zxy * eyesep * 0.01;
-		
-		// ray direction (world space)
-		//vec3 nev = normalize(v - pos);
+		vec3 rdx = projection_on_plane(rd, up);
+		vec3 eye = rdx * eyesep * 0.01;
 		
 		// ray origin (world space)
 		vec3 ro = pos + eye;
-		// re-compute ray direction accordingly:
-		nv = normalize(nv - eye);
-		
-		// find object intersection:
-		vec3 p = ro;
 		
 		// initial eye-ray to find object intersection:
-		float mindt = 0.001 + 0.0001;
+		float mindt = 0.01;	// how close to a surface we can get
 		float mint = mindt;
 		float maxt = 15.;
 		float t=mint;
 		float h = maxt;
+		
+		// find object intersection:
+		vec3 p = ro + mint*rd;
+		
 		int steps = 0;
+		int maxsteps = 50;
 		for (t; t<maxt;) {
 			h = map(p);
 			t += h;
 			p = ro + t*rd;
-			if (h < mindt) {
-				break;
-			}
-			//t += h * 0.5; //(1.+0.2*t/maxt);	// slight speedup
-			//steps++;
+			if (h < mindt) { break; }
+			//if (++steps > maxsteps) { t = maxt; break; }
 		}
-		
-		float fog = 1. - pow(t/maxt, 2.);
-
-		// grain:
-		//vec3 grain = texture2D(tex0, gl_TexCoord[0].xy * 20.).grb;
-		//normal = normalize( normal + 0.5*(grain-0.5) );
-
-		float test = 0.;
 
 		// lighting:
 		vec3 color = vec3(0, 0, 0);
 
 		if (t<maxt) {
-			
+
 			// Normals computed by central differences on the distance field at the shading point (gradient approximation).
 			// larger eps leads to softer edges
 			float eps = 0.005;
@@ -307,16 +314,14 @@ static const char * demoFS = AL_STRINGIFY(
 			float nudge = 0.01;
 			float smaxt = maxt;
 			
-			
 			color = ambient
 					+ color1 * ln1 //* shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k) 
 					+ color2 * ln2 //* shadow(p+normal*smint, ldir2, smint, smaxt, mindt, k)
 					;
-				
+	
 			//color = 	ambient +
 			//		color1 * ln1 + 
 			//		color2 * ln2;
-			//test = ao;
 			
 			/*
 			// Ambient Occlusion:
@@ -335,18 +340,11 @@ static const char * demoFS = AL_STRINGIFY(
 			color *= ao;
 			*/		
 			
+		
+			// fog:
+			float tnorm = t/maxt;
+			float fog = 1. - tnorm*tnorm;
 			color *= fog;
-			
-			//color += 0.2*(nv+1.);
-			//color = abs(nvx);
-			//color *= amount;
-			
-			//color = eye * 10000.;
-			
-			//vec3 vc = mod(nv * 8., 1.);
-			//color = abs(nvx);
-			
-			//color = normal;
 		}
 
 		vec2 texa = vec2(texcoord0.x, 1.-texcoord0.y);
@@ -492,8 +490,8 @@ void WarpnBlend::drawDemo(const Pose& pose, double eyesep) {
 	demoP.uniform("pixelMap", 0);
 	demoP.uniform("alphaMap", 1);
 	demoP.uniform("pos", pose.pos()); 
-	demoP.uniform("quat", pose.quat());
 	demoP.uniform("eyesep", eyesep);
+	demoP.uniform("quat", pose.quat());
 	demoP.uniform("centerpos", center.pos());
 	demoP.uniform("centerquat", center.quat());
 	alphaMap.bind(1);
