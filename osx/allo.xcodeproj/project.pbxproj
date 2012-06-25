@@ -311,7 +311,6 @@
 		364D32F414564662005D2EB0 /* al_Time.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3622BEFA116D527D00928703 /* al_Time.cpp */; };
 		364D32F514564662005D2EB0 /* al_MsgQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 365599FB11D4013600BA01E8 /* al_MsgQueue.cpp */; };
 		364D32F714564662005D2EB0 /* al_Printing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16D46563118F57970039A84C /* al_Printing.cpp */; };
-		364D32F814564662005D2EB0 /* al_ThreadAPR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 36E4155711E99BED00A8A63D /* al_ThreadAPR.cpp */; };
 		364D32FA14564662005D2EB0 /* OscPrintReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1686187A12A58918002AD8AB /* OscPrintReceivedElements.cpp */; };
 		364D32FB14564662005D2EB0 /* UdpSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1686186D12A58918002AD8AB /* UdpSocket.cpp */; };
 		36510C4A1502D64C005C548E /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16AC531A116290BE0076AA8B /* AudioToolbox.framework */; };
@@ -1581,7 +1580,6 @@
 		36CE482F1394378000DF6E6F /* al_CubeMapFBO.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_CubeMapFBO.hpp; sourceTree = "<group>"; };
 		36CF95141412BE3200B00A30 /* hashSpace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = hashSpace.cpp; sourceTree = "<group>"; };
 		36CF960E1412EDBB00B00A30 /* exSimpleGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exSimpleGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
-		36E4155711E99BED00A8A63D /* al_ThreadAPR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_ThreadAPR.cpp; sourceTree = "<group>"; };
 		36E4909114380D5D00D7FE2B /* exSimpleGraphics */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exSimpleGraphics; sourceTree = BUILT_PRODUCTS_DIR; };
 		36E4909314380D7B00D7FE2B /* texture3d.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = texture3d.cpp; sourceTree = "<group>"; };
 		36E4ACC113BCC2400088E632 /* aiAnim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aiAnim.h; sourceTree = "<group>"; };
@@ -3072,7 +3070,6 @@
 				3622BEF9116D527D00928703 /* al_MainLoopOSX.mm */,
 				36F2568B121FBF36008C4597 /* al_Memory.cpp */,
 				16D46563118F57970039A84C /* al_Printing.cpp */,
-				36E4155711E99BED00A8A63D /* al_ThreadAPR.cpp */,
 				16B0425D11F78D56002FDB85 /* al_ThreadNative.cpp */,
 				3622BEFA116D527D00928703 /* al_Time.cpp */,
 				3622BEFC116D527D00928703 /* Makefile.config */,
@@ -5687,7 +5684,6 @@
 				364D32F414564662005D2EB0 /* al_Time.cpp in Sources */,
 				364D32F514564662005D2EB0 /* al_MsgQueue.cpp in Sources */,
 				364D32F714564662005D2EB0 /* al_Printing.cpp in Sources */,
-				364D32F814564662005D2EB0 /* al_ThreadAPR.cpp in Sources */,
 				364D32FA14564662005D2EB0 /* OscPrintReceivedElements.cpp in Sources */,
 				364D32FB14564662005D2EB0 /* UdpSocket.cpp in Sources */,
 				1602B5E7145649AF00ABA5A5 /* al_FileWatcher.cpp in Sources */,

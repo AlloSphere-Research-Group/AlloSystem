@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "allocore/system/al_Thread.hpp"
 
 #define USE_PTHREAD		(defined (__APPLE__) || defined (OSX) || defined (__LINUX__) || defined (__UNIX__))
@@ -13,11 +14,24 @@ namespace al {
 //#define THREAD_FUNCTION(name) void * name(void * user)
 
 struct Thread::Impl{
-	Impl(): mHandle(0){}
+	Impl()
+	:	mHandle(0)
+	{
+		pthread_attr_init(&mAttr);
+		
+		// threads are not required to be joinable by default, so make it so
+		pthread_attr_setdetachstate(&mAttr, PTHREAD_CREATE_JOINABLE);
+	}
+
+	~Impl(){
+		pthread_attr_destroy(&mAttr);
+	}
+
 
 	bool start(ThreadFunction& func){
 		if(mHandle) return false;
-		return 0 == pthread_create(&mHandle, NULL, cThreadFunc, &func);
+		//return 0 == pthread_create(&mHandle, NULL, cThreadFunc, &func);
+		return 0 == pthread_create(&mHandle, &mAttr, cThreadFunc, &func);
 	}
 
 	bool join(){
@@ -26,6 +40,24 @@ struct Thread::Impl{
 			return true;
 		}
 		return false;
+	}
+
+	void priority(int v){
+		struct sched_param param;
+		if(v >= 1 && v <= 99){
+			param.sched_priority = v;
+			//pthread_setschedparam(mHandle, SCHED_FIFO, &param);
+			// FIFO and RR (round-robin) are for real-time scheduling
+			pthread_attr_setschedpolicy(&mAttr, SCHED_FIFO);
+			//pthread_attr_setschedpolicy(&mAttr, SCHED_RR);
+			pthread_attr_setschedparam(&mAttr, &param);
+		}
+		else{
+			param.sched_priority = 0;
+			//pthread_setschedparam(mHandle, SCHED_OTHER, &param);
+			pthread_attr_setschedpolicy(&mAttr, SCHED_OTHER);
+			pthread_attr_setschedparam(&mAttr, &param);		
+		}
 	}
 
 //	bool cancel(){
@@ -37,6 +69,7 @@ struct Thread::Impl{
 //	}
 
 	pthread_t mHandle;
+	pthread_attr_t mAttr;
 
 	static void * cThreadFunc(void * user){
 		ThreadFunction& tfunc = *((ThreadFunction*)user);
@@ -44,6 +77,15 @@ struct Thread::Impl{
 		return NULL;
 	}
 };
+
+
+void * Thread::current(){
+	// pthread_t pthread_self(void);
+	static pthread_t r;
+	r = pthread_self();
+	return (void*)(&r);
+}
+
 
 #elif USE_THREADEX
 
@@ -73,6 +115,10 @@ struct Thread::Impl{
 			return true;
 		}
 		return false;
+	}
+	
+	// TODO: Threadx priority
+	void priority(int v){
 	}
 
 //	bool cancel(){
@@ -116,6 +162,12 @@ Thread::Thread(void * (*cThreadFunc)(void * userData), void * userData)
 Thread::~Thread(){
 	if(mJoinOnDestroy) join();
 	delete mImpl;
+}
+
+
+Thread& Thread::priority(int v){
+	mImpl->priority(v);
+	return *this;
 }
 
 bool Thread::start(ThreadFunction& func){

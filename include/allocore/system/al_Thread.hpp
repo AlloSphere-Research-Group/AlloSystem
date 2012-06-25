@@ -93,6 +93,13 @@ public:
 	/// Set whether thread will automatically join upon destruction
 	Thread& joinOnDestroy(bool v){ mJoinOnDestroy=v; return *this; }
 
+	/// Set thread priority
+	
+	/// @param[in] v	priority of thread in [0, 99]. A value greater than 0
+	///					makes the thread "real-time".
+	Thread& priority(int v);
+
+
 	/// Start executing thread function
 	bool start(ThreadFunction& func);
 	
