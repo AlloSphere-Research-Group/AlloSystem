@@ -218,7 +218,7 @@ static const char * demoFS = AL_STRINGIFY(
 		//float s2 = sdTorus(pr1, vec2(0.5, 0.1));
 		//float s4 = opSubtract(s3, s1);
 		//float s5 = mix(s1, s2, s1-s2);
-		float s6 = s1 + 0.003*sin(p.x * 40.)*sin(p.z * 40.)*sin(p.y * 40.);
+		float s6 = s1 + 0.01*sin(p.x * 40.)*sin(p.z * 40.)*sin(p.y * 40.);
 		return s6;
 	}
 
