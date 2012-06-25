@@ -259,7 +259,7 @@ static const char * demoFS = AL_STRINGIFY(
 		// and rotate it 90' around Y:
 		vec3 up = vec3(0, 1, 0);
 		vec3 rdx = projection_on_plane(rd, up);
-		vec3 eye = rdx * eyesep * 0.01;
+		vec3 eye = rdx * eyesep * -0.01;
 		
 		// ray origin (world space)
 		vec3 ro = pos + eye;
