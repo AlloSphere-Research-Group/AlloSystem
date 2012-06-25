@@ -217,7 +217,7 @@ static const char * demoFS = AL_STRINGIFY(
 		//float s2 = sdTorus(pr1, vec2(0.5, 0.1));
 		//float s4 = opSubtract(s3, s1);
 		//float s5 = mix(s1, s2, s1-s2);
-		float s6 = s1 + 0.01*sin(p.x * 40.)*sin(p.z * 40.)*sin(p.y * 40.);
+		float s6 = s1 + 0.003*sin(p.x * 40.)*sin(p.z * 40.)*sin(p.y * 40.);
 		return s6;
 	}
 
@@ -241,7 +241,7 @@ static const char * demoFS = AL_STRINGIFY(
 	void main(){	
 		vec3 light1 = pos + vec3(1, 2, 3);
 		vec3 light2 = pos + vec3(2, -3, 1);
-		vec3 color1 = vec3(0.5, 0.8, 0.6);
+		vec3 color1 = vec3(0.3, 0.7, 0.6);
 		vec3 color2 = vec3(0.6, 0.2, 0.8);
 		vec3 ambient = vec3(0.2, 0.2, 0.2);
 
