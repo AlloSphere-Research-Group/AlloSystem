@@ -243,7 +243,7 @@ static const char * demoFS = AL_STRINGIFY(
 		vec3 light2 = pos + vec3(2, -3, 1);
 		vec3 color1 = vec3(0.3, 0.7, 0.6);
 		vec3 color2 = vec3(0.6, 0.2, 0.8);
-		vec3 ambient = vec3(0.2, 0.2, 0.2);
+		vec3 ambient = vec3(0.1, 0.1, 0.1);
 
 		// pixel location (calibration space):
 		vec3 v = texture2D(pixelMap, texcoord0).rgb;
