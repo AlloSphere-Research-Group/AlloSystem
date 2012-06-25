@@ -213,12 +213,12 @@ static const char * demoFS = AL_STRINGIFY(
 	float map(vec3 p) {
 		vec3 pr1 = opRepeat(p, vec3(5, 4, 3));
 		float s1 = udBox(pr1, vec3(0.4, 0.1, 0.8));
-		//float s3 = sdSphere(pr1, 0.3);
+		float s3 = sdSphere(pr1, 0.3);
 		//float s2 = sdTorus(pr1, vec2(0.5, 0.1));
-		//float s4 = opSubtract(s3, s1);
+		float s4 = opSubtract(s3, s1);
 		//float s5 = mix(s1, s2, s1-s2);
 		//float s6 = s5 + 0.02*sin(p.x * 40.)*sin(p.z * 40.)*sin(p.y * 40.);
-		return s1;
+		return s4;
 	}
 
 	// shadow ray:
