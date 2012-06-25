@@ -214,11 +214,11 @@ static const char * demoFS = AL_STRINGIFY(
 		//vec3 pr2 = rotateYZ(p, p.x);
 		vec3 pr1 = opRepeat(p, vec3(5, 4, 3));
 		float s1 = udBox(pr1, vec3(0.4, 0.1, 0.8));
-		//float s3 = sdSphere(pr1, 0.3);
-		//float s2 = sdTorus(pr1, vec2(0.5, 0.1));
-		//float s4 = opSubtract(s3, s1);
-		//float s5 = mix(s1, s2, s1-s2);
-		float s6 = s1 + 0.01*sin(p.x * 40.)*sin(p.z * 40.)*sin(p.y * 40.);
+		float s3 = sdSphere(pr1, 0.3);
+		float s2 = sdTorus(pr1, vec2(0.5, 0.1));
+		float s4 = opSubtract(s3, s1);
+		float s5 = mix(s1, s2, s1-s2);
+		float s6 = s5 + 0.01*sin(p.x * 40.)*sin(p.z * 40.)*sin(p.y * 40.);
 		return s6;
 	}
 
