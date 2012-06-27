@@ -185,6 +185,9 @@ else ifeq ($(PLATFORM), macosx)
 		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.4u.sdk -mmacosx-version-min=10.4
 	endif
 
+	# Needed to link to libraries installed through MacPorts
+	LDFLAGS += -L/opt/local/lib/
+
 	LDFLAGS	+= -lm -lstdc++
 	DLIB_EXT = dylib
 	DLIB_OPT = dynamiclib
