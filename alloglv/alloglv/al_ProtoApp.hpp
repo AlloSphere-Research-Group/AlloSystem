@@ -44,7 +44,7 @@
 #include <math.h>
 #include <string>
 #include "alloutil/al_App.hpp"
-#include "alloutil/al_ControlGLV.hpp"
+#include "alloglv/al_ControlGLV.hpp"
 
 #include "GLV/glv.h"
 
