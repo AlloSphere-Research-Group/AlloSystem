@@ -3,7 +3,7 @@
 if [ -f /opt/local/bin/port ]; then
  	echo "Found MacPorts"
 	sudo port selfupdate
-#	port install portaudio libsndfile
+	port install portaudio libsndfile
 
 elif [ -f /usr/local/bin/brew ]; then
 	echo "Found Homebrew"
