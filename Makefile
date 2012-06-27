@@ -1,54 +1,10 @@
 #=========================================================================
-# AlloCore main makefile
+# Alloy main makefile
 #=========================================================================
 
-include Makefile.config
+LIB_NAME = alloy
 
-# Include configuration files of AlloCore modules
-# TODO: Permit selective inclusive of modules for building a library
-# and doing unit tests.
-
-MODULE_DIRS := $(GFX_DIR) $(IO_DIR) $(MATH_DIR) $(PRO_DIR) $(SND_DIR) $(SPA_DIR) $(SYS_DIR) $(TYP_DIR)
-
-include $(SRC_DIR)$(GFX_DIR)Makefile.config
-include $(SRC_DIR)$(IO_DIR)Makefile.config
-include $(SRC_DIR)$(MATH_DIR)Makefile.config
-include $(SRC_DIR)$(PRO_DIR)Makefile.config
-include $(SRC_DIR)$(SND_DIR)Makefile.config
-include $(SRC_DIR)$(SPA_DIR)Makefile.config
-include $(SRC_DIR)$(SYS_DIR)Makefile.config
-include $(SRC_DIR)$(TYP_DIR)Makefile.config
-
-# Prefix full path to source files
-GFX_SRC		:= $(addprefix $(SRC_DIR)$(GFX_DIR), $(GFX_SRC))
-IO_SRC		:= $(addprefix $(SRC_DIR)$(IO_DIR), $(IO_SRC))
-MATH_SRC	:= $(addprefix $(SRC_DIR)$(MATH_DIR), $(MATH_SRC))
-PRO_SRC		:= $(addprefix $(SRC_DIR)$(PRO_DIR), $(PRO_SRC))
-TYP_SRC		:= $(addprefix $(SRC_DIR)$(TYP_DIR), $(TYP_SRC))
-SND_SRC		:= $(addprefix $(SRC_DIR)$(SND_DIR), $(SND_SRC))
-SPA_SRC		:= $(addprefix $(SRC_DIR)$(SPA_DIR), $(SPA_SRC))
-SYS_SRC		:= $(addprefix $(SRC_DIR)$(SYS_DIR), $(SYS_SRC))
-
-# These are all the source files
-SRCS		= \
-		$(GFX_SRC) $(IO_SRC) $(PRO_SRC) $(MATH_SRC) \
-		$(SND_SRC) $(SPA_SRC) $(SYS_SRC) $(TYP_SRC)
-
-OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
-
-CPPFLAGS	+= $(addprefix -I, $(INC_DIRS) $(RINC_DIRS) $(BUILD_DIR)/include)
-LDFLAGS		:= $(addprefix -L, $(LIB_DIRS) $(BUILD_DIR)/lib) $(LDFLAGS)
-LINK_LIBS_PATH	= $(wildcard $(BUILD_DIR)lib/*.a)
-LINK_LIBS_FLAGS	=
-
--include externals/gamma/Makefile.external
--include externals/glv/Makefile.external
-
-RUN_SRCS	=  $(wildcard $(addsuffix /*.cpp, $(RUN_SRC_DIRS)))
-RUN_SRCS	+= $(wildcard $(addsuffix /*.c, $(RUN_SRC_DIRS)))
-RUN_OBJS	=  $(addsuffix .o, $(basename $(notdir $(RUN_SRCS)) ))
-#RUN_OBJS	:= $(addsuffix .o, $(basename $(subst /,_,$(RUN_OBJS)) ))
-RUN_OBJS	:= $(addprefix $(OBJ_DIR), $(RUN_OBJS))
+include Makefile.common
 
 #--------------------------------------------------------------------------
 # Rules
@@ -58,124 +14,24 @@ help:
 	@echo No rule specified.
 	@echo The possible rules are:
 	@echo     allocore .... build allocore
-	@echo     allojit ..... build allocore JIT extension
+#	@echo     allojit ..... build allocore JIT extension
 	@echo     alloutil .... build allocore utilities extension
 	@echo     gamma ....... build Gamma external
 	@echo     glv ......... build GLV external
 
 include Makefile.rules
 
-# For whatever reason, we need this rule so the objects don't get rm'ed by make
-runobjs: $(RUN_OBJS)
+allocore: FORCE
+	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR)
+#	@$(MAKE) --no-print-directory -C $@ external
 
-# Hack to prevent circular dependencies with compile-and-run rule
-.PHONY: %.hpp
-%.hpp:
+alloutil: FORCE allocore
+#	@$(MAKE) --no-print-directory -C $@ install BUILD_DIR=../$(BUILD_DIR) DESTDIR=../$(BUILD_DIR)
+	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR)
+#	@$(MAKE) --no-print-directory -C $@ external
 
+glv: FORCE
+	@$(MAKE) --no-print-directory -C $@ install BUILD_DIR=../$(BUILD_DIR) DESTDIR=../$(BUILD_DIR)
 
-# Compile and run source files in examples/ folder
-# FIXME: this rule should only work for .cpp and .c
-EXEC_TARGETS  = $(addsuffix %.cpp, $(RUN_DIRS)) $(addsuffix %.c, $(RUN_DIRS))
-ifeq ($(PLATFORM), linux)
-	LINK_LIBS_FLAGS += $(addprefix -l :, $(notdir $(LINK_LIBS_PATH)))
-endif
-.PRECIOUS: $(EXEC_TARGETS)
-$(EXEC_TARGETS): MY_FLAGS = $(shell test -e $(@D)/flags.txt && cat $(@D)/flags.txt)
-$(EXEC_TARGETS): allocore alloutil runobjs
-	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(MY_FLAGS)
-ifneq ($(AUTORUN), 0)
-	@cd $(BIN_DIR) && ./$(*F)
-endif
-
-
-extended: all alloni
-
-all: extensions externals
-
-# AlloCore extensions
-extensions: alloutil allocore
-
-allocore: $(LIB_PATH)
-# 	Copy main header files to build directory
-	@for v in `cd $(INC_DIR)/$@ && find * -type d ! -path '*.*'` .; do\
-		$(INSTALL) -d $(BUILD_DIR)/include/$@/$$v;\
-		$(INSTALL) -C -m 644 $(INC_DIR)/$@/$$v/*.h* $(BUILD_DIR)/include/$@/$$v;\
-	done
-
-# 	Copy dependency headers to build folder
-	@(cd $(DEV_DIR)/include && tar -cf - `find . -type f ! -name ".*" ! -path "*.svn*" -print` )\
-		| ( cd $(BUILD_DIR)/include && tar xBf - )
-
-# 	Copy dependency binaries to build folder
-# 	Copying only occurs if the destination file doesn't exist or the source file is newer
-	@for v in `cd $(DEV_LIB_DIR) && find . -name \*.$(SLIB_EXT) -or -name \*.$(DLIB_EXT)`; do\
-		if [ $(DEV_LIB_DIR)/$$v -nt $(BUILD_DIR)/lib/$$v ] || [ ! -e $(BUILD_DIR)/lib/$$v ]; then\
-			echo Copying $(DEV_LIB_DIR)/$$v to $(BUILD_DIR)/lib/;\
-			$(INSTALL) -C -m 644 $(DEV_LIB_DIR)/$$v $(BUILD_DIR)/lib/;\
-		fi;\
-	done
-
-
-allojit alloutil alloni allonect: allocore
-	@$(MAKE) --no-print-directory -C src/$@ install BUILD_DIR=../../$(BUILD_DIR) DESTDIR=../../$(BUILD_DIR)
-
-
-# AlloCore externals
-externals: gamma glv
-
-gamma glv:
-	@$(MAKE) --no-print-directory -C externals/$@ install DESTDIR=../../$(BUILD_DIR)
-	@$(MAKE) --no-print-directory -C externals/$@ external
-
-
-
-# Install library into path specified by DESTDIR
-# Include files are copied into DESTDIR/include/LIB_NAME
-# Library files are copied into DESTDIR/lib
-install: allocore
-
-#	Install header files from local build directory into DESTDIR
-	@for v in `cd $(BUILD_DIR)/include && find * -type d ! -path '*.*'`; do \
-		$(INSTALL) -d $(DESTDIR)/include/$$v; \
-		$(INSTALL) -C -m 644 $(BUILD_DIR)/include/$$v/*.h* $(DESTDIR)/include/$$v;\
-	done
-
-# 	Install library files from local build directory into DESTDIR
-	@for v in `cd $(BUILD_DIR)/lib && find * -type d ! -path '*.*'` .; do \
-		$(INSTALL) -d $(DESTDIR)/lib/$$v; \
-		$(INSTALL) -C -m 644 $(BUILD_DIR)/lib/$$v/*.a $(DESTDIR)/lib/$$v; \
-	done
-
-
-# Archive repository
-archive:
-	$(eval $@_TMP := $(shell mktemp -d tmp.XXXXXXXXXX))
-	@echo Creating archive, this may take some time...
-	@echo Creating temporary export...
-	@svn export --force . $($@_TMP)
-	@echo Compressing...
-	@cd $($@_TMP) && tar -czf ../allocore.tar.gz .
-	@echo Compression complete.
-	@$(RM) -R $($@_TMP)
-
-
-#
-buildtest: allocore gamma glv test
-	@for v in graphics gui io simulation sound spatial system; do \
-		$(MAKE) --no-print-directory examples/$$v/*.cpp AUTORUN=0; \
-	done
-
-
-# Remove build files
-.PHONY: clean
-clean:
-# Clean only removes object files for now; avoids unintentional removal of user files
-	$(call RemoveDir, $(OBJ_DIR))
-	$(call RemoveDir, $(TEST_DIR)/$(OBJ_DIR))
-	@$(MAKE) -C externals/gamma clean
-	@$(MAKE) -C externals/glv clean
-
-
-# Build unit tests
-test: allocore external
-	@$(MAKE) -C $(TEST_DIR) test
+alloglv: FORCE allocore glv
+	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR)

@@ -75,3 +75,15 @@ $(addprefix $(OBJ_DIR), $(OBJS)): | $(ALL_BUILD_DIRS)
 # Create file with settings for linking to external libraries
 external:
 	@printf "%b\n" "CPPFLAGS +=$(EXT_CPPFLAGS)\r\nLDFLAGS +=$(EXT_LDFLAGS)"> Makefile.external
+
+
+# Archive repository
+archive:
+	$(eval $@_TMP := $(shell mktemp -d tmp.XXXXXXXXXX))
+	@echo Creating archive, this may take some time...
+	@echo Creating temporary export...
+	@svn export --force . $($@_TMP)
+	@echo Compressing...
+	@cd $($@_TMP) && tar -czf ../$(LIB_NAME).tar.gz .
+	@echo Compression complete.
+	@$(RM) -R $($@_TMP)

@@ -100,7 +100,7 @@ CONFPREFIX	= $(PREFIX)/etc/
 MANPREFIX	= $(PREFIX)/share/man/
 
 # Locations of built objects
-BUILD_DIR	= build/
+BUILD_DIR	?= build/
 BIN_DIR		= $(BUILD_DIR)bin/
 OBJ_DIR		= $(BUILD_DIR)obj/
 
