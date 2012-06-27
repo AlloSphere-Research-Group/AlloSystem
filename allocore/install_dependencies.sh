@@ -11,7 +11,10 @@ elif [ `which port` ]; then
 
 elif [ `which brew` ]; then
 	echo "Found Homebrew"
-#	brew install portaudio libsndfile
+  cd /usr/local/Library/Formula
+  curl --insecure -O "https://raw.github.com/OpenKinect/libfreenect/master/platform/osx/homebrew/libfreenect.rb"
+  curl --insecure -O "https://raw.github.com/OpenKinect/libfreenect/master/platform/osx/homebrew/libusb-freenect.rb"
+  brew install portaudio libsndfile libfreenect assimp freeimage
 
 else
 	echo "Error: No suitable package manager found."

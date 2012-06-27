@@ -187,6 +187,12 @@ else ifeq ($(PLATFORM), macosx)
 
 	# Needed to link to libraries installed through MacPorts
 	LDFLAGS += -L/opt/local/lib/
+	CPPFLAGS += -I/opt/local/include/
+
+	# XXX homebrew
+	LDFLAGS += -L/usr/local/lib/
+	CPPFLAGS += -I/usr/local/include/
+
 
 	LDFLAGS	+= -lm -lstdc++
 	DLIB_EXT = dylib

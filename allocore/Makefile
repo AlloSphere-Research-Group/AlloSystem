@@ -210,8 +210,6 @@ clean:
 # Clean only removes object files for now; avoids unintentional removal of user files
 	$(call RemoveDir, $(OBJ_DIR))
 	$(call RemoveDir, $(TEST_DIR)/$(OBJ_DIR))
-	@$(MAKE) -C externals/gamma clean
-	@$(MAKE) -C externals/glv clean
 
 
 # Build unit tests
