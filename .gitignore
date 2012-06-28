@@ -3,6 +3,7 @@ xcuserdata
 doxygen_objdb_*
 .DS_Store
 
+*~
 *.a
 *.o
 *.lib
