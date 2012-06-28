@@ -42,7 +42,7 @@
 	Graham Wakefield, 2012, grrrwaaa@gmail.com
 */
 
-#include "lua.hpp"
+#include "lua5.1/lua.hpp"
 #include "allocore/system/pstdint.h"
 #include <string>
 
