@@ -45,7 +45,7 @@
 #include <string>
 #include <vector>
 #include "allocore/al_Allocore.hpp"
-#include "alloutil/al_ControlNav.hpp"
+#include "allocore/io/al_ControlNav.hpp"
 
 namespace al{
 

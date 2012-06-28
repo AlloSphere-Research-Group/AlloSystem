@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "alloutil/al_App.hpp"
+#include "allocore/io/al_App.hpp"
 
 namespace al{
 
