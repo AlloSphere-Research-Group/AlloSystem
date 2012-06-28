@@ -1,4 +1,4 @@
-#include "alloglv/al_ControlGLV.hpp"
+#include "alloGLV/al_ControlGLV.hpp"
 
 namespace al{
 

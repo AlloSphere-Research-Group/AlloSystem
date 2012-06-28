@@ -43,8 +43,8 @@
 
 #include <math.h>
 #include <string>
-#include "alloutil/al_App.hpp"
-#include "alloglv/al_ControlGLV.hpp"
+#include "allocore/io/al_App.hpp"
+#include "alloGLV/al_ControlGLV.hpp"
 
 #include "GLV/glv.h"
 

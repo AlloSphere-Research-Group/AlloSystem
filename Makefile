@@ -16,8 +16,8 @@ help:
 	@echo     allocore .... build allocore
 #	@echo     allojit ..... build allocore JIT extension
 	@echo     alloutil .... build allocore utilities extension
-	@echo     gamma ....... build Gamma external
-	@echo     glv ......... build GLV external
+#	@echo     Gamma ....... build Gamma external
+#	@echo     GLV ......... build GLV external
 
 include Makefile.rules
 
@@ -30,9 +30,9 @@ alloutil: FORCE allocore
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR)
 #	@$(MAKE) --no-print-directory -C $@ external
 
-glv: FORCE
-	@$(MAKE) --no-print-directory -C $@ install BUILD_DIR=../$(BUILD_DIR) DESTDIR=../$(BUILD_DIR)
+Gamma GLV: FORCE
+	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR)
 
-alloglv: FORCE allocore glv
+alloGLV: FORCE allocore GLV
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR)
 

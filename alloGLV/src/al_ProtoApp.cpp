@@ -1,4 +1,4 @@
-#include "alloglv/al_ProtoApp.hpp"
+#include "alloGLV/al_ProtoApp.hpp"
 
 namespace al{
 

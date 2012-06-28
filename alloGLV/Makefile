@@ -2,7 +2,7 @@
 # AlloGLV main makefile
 #=========================================================================
 
-LIB_NAME	= alloglv
+LIB_NAME	= alloGLV
 INC_DIR		= $(LIB_NAME)/
 SRC_DIR		= src/
 VPATH		= $(SRC_DIR)
@@ -30,3 +30,4 @@ install: $(LIB_PATH)
 		echo INSTALL $(LIB_PATH) -> $(DESTDIR)/lib/;\
 		$(INSTALL) -C -m 644 $(LIB_PATH) $(DESTDIR)/lib/;\
 	fi;
+
