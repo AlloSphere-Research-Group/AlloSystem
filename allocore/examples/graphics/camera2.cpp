@@ -10,7 +10,7 @@ Modified by Lance Putnam, 4/25/2011
 */
 
 #include "allocore/al_Allocore.hpp"
-#include "alloutil/al_ControlNav.hpp"
+#include "allocore/io/al_ControlNav.hpp"
 
 using namespace al;
 

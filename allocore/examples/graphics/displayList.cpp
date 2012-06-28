@@ -8,7 +8,7 @@ Author:
 Lance Putnam, 1/2012 (putnam.lance at gmail dot com)
 */
 
-#include "alloutil/al_App.hpp"
+#include "allocore/io/al_App.hpp"
 
 using namespace al;
 

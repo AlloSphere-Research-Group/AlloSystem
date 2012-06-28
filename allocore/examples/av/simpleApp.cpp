@@ -9,7 +9,7 @@ Author:
 Lance Putnam, 6/2011, putnam.lance@gmail.com
 */
 
-#include "alloutil/al_App.hpp"
+#include "allocore/io/al_App.hpp"
 
 using namespace al;
 

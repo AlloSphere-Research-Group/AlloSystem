@@ -1,6 +1,6 @@
 #include "allocore/al_Allocore.hpp"
 #include "allocore/graphics/al_Isosurface.hpp"
-#include "alloutil/al_ControlNav.hpp"
+#include "allocore/io/al_ControlNav.hpp"
 
 using namespace al;
 
