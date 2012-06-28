@@ -259,3 +259,12 @@ endif
 # Utility functions
 #--------------------------------------------------------------------------
 RemoveDir = @if test -d $(1); then $(RM) $(1)* && rmdir $(1); fi
+
+define RemoveBuildDir 
+	$(call RemoveDir, $(BUILD_DIR)include/)
+	$(call RemoveDir, $(BUILD_DIR)lib/)
+	$(call RemoveDir, $(BIN_DIR))
+	$(call RemoveDir, $(OBJ_DIR))
+	$(call RemoveDir, $(BUILD_DIR))
+endef
+

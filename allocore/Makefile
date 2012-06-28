@@ -7,7 +7,7 @@
 #include Makefile.config
 # BEGIN old Makefile.config
 LIB_NAME	= allocore
-BUILD_DIR	= ../build/
+BUILD_DIR	= build/
 
 include ../Makefile.common
 
@@ -158,12 +158,12 @@ endif
 
 
 # Build library
-allocore: $(LIB_PATH)
+#allocore: $(LIB_PATH)
 ## 	Copy library header files to build directory
-	@for v in `cd $(INC_DIR)/$@ && find * -type d ! -path '*.*'` .; do\
-		$(INSTALL) -d $(BUILD_DIR)/include/$@/$$v;\
-		$(INSTALL) -C -m 644 $(INC_DIR)/$@/$$v/*.h* $(BUILD_DIR)/include/$@/$$v;\
-	done
+#	@for v in `cd $(INC_DIR)/$@ && find * -type d ! -path '*.*'` .; do\
+#		$(INSTALL) -d $(BUILD_DIR)/include/$@/$$v;\
+#		$(INSTALL) -C -m 644 $(INC_DIR)/$@/$$v/*.h* $(BUILD_DIR)/include/$@/$$v;\
+#	done
 
 ##	Copy dependency headers to build folder
 #	@(cd $(DEV_DIR)/include && tar -cf - `find . -type f ! -name ".*" ! -path "*.svn*" -print` )\
@@ -182,19 +182,32 @@ allocore: $(LIB_PATH)
 # Install library into path specified by DESTDIR
 # Include files are copied into DESTDIR/include/LIB_NAME
 # Library files are copied into DESTDIR/lib
-install: allocore
+install: $(LIB_PATH)
 
-#	Install header files from local build directory into DESTDIR
-	@for v in `cd $(BUILD_DIR)/include && find * -type d ! -path '*.*'`; do \
-		$(INSTALL) -d $(DESTDIR)/include/$$v; \
-		$(INSTALL) -C -m 644 $(BUILD_DIR)/include/$$v/*.h* $(DESTDIR)/include/$$v;\
+## 	Copy library header files to build directory
+	@for v in `cd $(INC_DIR)/$(LIB_NAME) && find * -type d ! -path '*.*'` .; do\
+		$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)/$$v;\
+		$(INSTALL) -C -m 644 $(INC_DIR)/$(LIB_NAME)/$$v/*.h* $(DESTDIR)/include/$(LIB_NAME)/$$v;\
 	done
 
-# 	Install library files from local build directory into DESTDIR
-	@for v in `cd $(BUILD_DIR)/lib && find * -type d ! -path '*.*'` .; do \
-		$(INSTALL) -d $(DESTDIR)/lib/$$v; \
-		$(INSTALL) -C -m 644 $(BUILD_DIR)/lib/$$v/*.a $(DESTDIR)/lib/$$v; \
-	done
+##	Copy library if it doesn't exist or is newer than existing
+	@$(INSTALL) -d $(DESTDIR)/lib/
+	@if [ $(LIB_PATH) -nt $(DESTDIR)/lib/$(LIB_FILE) ] || [ ! -e $(DESTDIR)/lib/$(LIB_FILE) ]; then \
+		echo INSTALL $(LIB_PATH) to $(DESTDIR)/lib/;\
+		$(INSTALL) -C -m 644 $(LIB_PATH) $(DESTDIR)/lib/;\
+	fi;
+
+##	Install header files from local build directory into DESTDIR
+#	@for v in `cd $(BUILD_DIR)/include && find * -type d ! -path '*.*'`; do \
+#		$(INSTALL) -d $(DESTDIR)/include/$$v; \
+#		$(INSTALL) -C -m 644 $(BUILD_DIR)/include/$$v/*.h* $(DESTDIR)/include/$$v;\
+#	done
+
+## 	Install library files from local build directory into DESTDIR
+#	@for v in `cd $(BUILD_DIR)/lib && find * -type d ! -path '*.*'` .; do \
+#		$(INSTALL) -d $(DESTDIR)/lib/$$v; \
+#		$(INSTALL) -C -m 644 $(BUILD_DIR)/lib/$$v/*.a $(DESTDIR)/lib/$$v; \
+#	done
 
 
 #
@@ -203,15 +216,15 @@ buildtest: test
 		$(MAKE) --no-print-directory examples/$$v/*.cpp AUTORUN=0; \
 	done
 
+# Build unit tests
+test: external $(LIB_PATH)
+	@$(MAKE) -C $(TEST_DIR) test
+
 
 # Remove build files
 .PHONY: clean
 clean:
-# Clean only removes object files for now; avoids unintentional removal of user files
+	@$(RM) $(LIB_PATH)
 	$(call RemoveDir, $(OBJ_DIR))
-	$(call RemoveDir, $(TEST_DIR)/$(OBJ_DIR))
+	@$(MAKE) -C $(TEST_DIR) clean
 
-
-# Build unit tests
-test: allocore
-	@$(MAKE) -C $(TEST_DIR) test

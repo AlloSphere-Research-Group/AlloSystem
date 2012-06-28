@@ -1,8 +1,8 @@
 #=========================================================================
-# Alloy main makefile
+# Allos main makefile
 #=========================================================================
 
-LIB_NAME = alloy
+LIB_NAME = allos
 
 include Makefile.common
 
@@ -35,3 +35,4 @@ glv: FORCE
 
 alloglv: FORCE allocore glv
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR)
+

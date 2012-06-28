@@ -2,7 +2,7 @@
 # AlloCore unit tests makefile
 #=========================================================================
 
-LIB_NAME	= allounittests
+LIB_NAME	= allocoreunittest
 INC_DIR		= ./
 SRC_DIR		= ./
 VPATH		= $(SRC_DIR)
@@ -11,10 +11,9 @@ SRCS		= $(wildcard $(SRC_DIR)/ut*.cpp)
 OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
 -include ../Makefile.external
-include ../Makefile.common
-include ../Makefile.rules
+include ../../Makefile.common
 
-CXXFLAGS	+= -I../include
+CPPFLAGS	+= -I../
 LDFLAGS		:= -L../$(BUILD_DIR)lib -L$(BUILD_DIR)lib $(LDFLAGS) -l$(LIB_NAME)
 
 LINK_LIBS_PATH	= $(wildcard ../$(BUILD_DIR)lib/*.a)
@@ -28,11 +27,18 @@ endif
 #-------------------------------------------------------------------------
 # Rules
 #-------------------------------------------------------------------------
+include ../../Makefile.rules
 
-test: unitTests.cpp $(SLIB_PATH)
+test: unitTests.cpp $(LIB_PATH)
 #	@echo $(LINK_LIBS_FLAGS)
 #	@echo LDFLAGS: $(LDFLAGS)
 	$(CXX) $(CXXFLAGS) $^ $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) -o $(BIN_DIR)unitTests
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./unitTests
 endif
+
+# Remove build files
+.PHONY: clean
+clean:
+	$(call RemoveBuildDir)
+
