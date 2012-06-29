@@ -23,16 +23,20 @@ include Makefile.rules
 
 allocore: FORCE
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR)
-#	@$(MAKE) --no-print-directory -C $@ external
+	@$(MAKE) --no-print-directory -C $@ linkfile
 
 alloutil: FORCE allocore
 #	@$(MAKE) --no-print-directory -C $@ install BUILD_DIR=../$(BUILD_DIR) DESTDIR=../$(BUILD_DIR)
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR)
-#	@$(MAKE) --no-print-directory -C $@ external
+	@$(MAKE) --no-print-directory -C $@ linkfile
 
 Gamma GLV: FORCE
-	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR)
+	@$(MAKE) --no-print-directory -C ../$@ install DESTDIR=../$(LIB_NAME)/$(BUILD_DIR)
+	@$(MAKE) --no-print-directory -C ../$@ linkfile
 
 alloGLV: FORCE allocore GLV
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR)
+
+#collate: allocore alloutil Gamma GLV alloGL
+
 

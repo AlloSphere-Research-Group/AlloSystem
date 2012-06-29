@@ -1,28 +1,30 @@
+#=========================================================================
+# Allonect main makefile
+#=========================================================================
 
 LIB_NAME	= allonect
-INC_DIR		= ../../include/$(LIB_NAME)/
-SRC_DIR		= ./
+INC_DIR		= $(LIB_NAME)/
+SRC_DIR		= src/
 VPATH		= $(SRC_DIR)
 
 SRCS		:= $(wildcard $(SRC_DIR)/*.c*)
 OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
 CPPFLAGS	+= -I../../include
-
-EXT_LDFLAGS += -lfreenect -lusb-1.0
+LINK_LDFLAGS	+= -lfreenect -lusb-1.0
 
 ifeq ($(PLATFORM), linux)
 	#nogood because the one in the repos is out of date
 	#CPPFLAGS	+= -I/usr/include
 	CPPFLAGS	+= -I../../$(PLATFORM_DIR)/include -I../../$(PLATFORM_DIR)/include
 else
-	CPPFLAGS	+= -I../../$(PLATFORM_DIR)/include -I../../$(PLATFORM_DIR)/
-	include
-	EXT_LDFLAGS += -framework Carbon -framework IOKit
+	CPPFLAGS	+= -I../../$(PLATFORM_DIR)/include -I../../$(PLATFORM_DIR)/include
+	LINK_LDFLAGS += -framework Carbon -framework IOKit
 endif
 
-include ../../Makefile.common
-include ../../Makefile.rules
+
+include ../Makefile.common
+include ../Makefile.rules
 
 #INC_DIRS	+= DEV_DIR/include/ni
 
