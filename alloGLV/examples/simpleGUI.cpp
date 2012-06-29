@@ -9,7 +9,7 @@ Lance Putnam, 4/25/2011
 */
 
 #include "allocore/al_Allocore.hpp"
-#include "alloutil/al_ControlGLV.hpp"
+#include "alloGLV/al_ControlGLV.hpp"
 #include "GLV/glv.h"
 
 using namespace al;

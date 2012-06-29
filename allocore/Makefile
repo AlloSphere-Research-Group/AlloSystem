@@ -134,6 +134,7 @@ RUN_OBJS	:= $(addprefix $(OBJ_DIR), $(RUN_OBJS))
 
 include ../Makefile.rules
 
+# Compile and run source files in examples/ folder
 # For whatever reason, we need this rule so the objects don't get rm'ed by make
 runobjs: $(RUN_OBJS)
 
@@ -141,8 +142,6 @@ runobjs: $(RUN_OBJS)
 .PHONY: %.hpp
 %.hpp:
 
-
-# Compile and run source files in examples/ folder
 # FIXME: this rule should only work for .cpp and .c
 EXEC_TARGETS  = $(addsuffix %.cpp, $(RUN_DIRS)) $(addsuffix %.c, $(RUN_DIRS))
 ifeq ($(PLATFORM), linux)
