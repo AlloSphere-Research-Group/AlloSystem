@@ -6,6 +6,11 @@ doxygen_objdb_*
 *~
 *.a
 *.o
+*.so
+*.slo
+*.lo
+*.lai
+*.la
 *.lib
 *.spec
 *.d
