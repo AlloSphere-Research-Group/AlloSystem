@@ -12,6 +12,11 @@ if [ `which apt-get` ]; then
 	cmake .
 	make
 	sudo make install
+	cd ../
+	echo You need to give freenect permissions:
+	echo sudo cp 66-kinect.rules /etc/udev/rules.d/66-kinect.rules
+	echo sudo adduser YOURNAME video
+	echo and reboot
 
 elif [ `which port` ]; then
 	echo "Found MacPorts"
