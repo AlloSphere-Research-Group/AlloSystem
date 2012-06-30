@@ -2,8 +2,9 @@
 
 if [ `which apt-get` ]; then
 	echo "Found apt-get"
-	sudo apt-get update
-#	sudo apt-get install freenect
+#	sudo apt-get update
+#	sudo apt-get install libfreenect-dev # no good; this version is too old
+	sudo apt-get install libusb-1.0-0-dev libxmu-dev libxi-dev
 
 elif [ `which port` ]; then
 	echo "Found MacPorts"
