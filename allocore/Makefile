@@ -75,13 +75,13 @@ INC_DIRS += $(INC_DIR) $(DEV_DIR)include/
 LIB_DIRS += $(DEV_DIR)lib/
 
 ifeq ($(RUNTIME_BINDING), APR)
-	EXT_LDFLAGS += -lapr-1 -laprutil-1
+	LINK_LDFLAGS += -lapr-1 -laprutil-1
 endif
 
 VPATH += $(addprefix $(SRC_DIR), $(GFX_DIR) $(IO_DIR) $(PRO_DIR) $(MATH_DIR) $(SND_DIR) $(SPA_DIR) $(SYS_DIR) $(TYP_DIR))
 VPATH += $(RUN_SRC_DIRS)
 
-# END dol Makefile.config
+# END old Makefile.config
 
 
 

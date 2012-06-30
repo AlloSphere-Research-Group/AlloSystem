@@ -1,6 +1,6 @@
 #RUN_INC_DIRS	?=
 #RUN_SRC_DIRS	?=
-RUN_DIRS		?= examples/
+RUN_DIRS	?= examples/
 
 VPATH += $(RUN_SRC_DIRS)
 
@@ -27,7 +27,7 @@ endif
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS): MY_FLAGS = $(shell test -e $(@D)/flags.txt && cat $(@D)/flags.txt)
 $(EXEC_TARGETS): FORCE runobjs
-	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(MY_FLAGS)
+	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(MY_FLAGS) -l$(LIB_NAME)
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./$(*F)
 endif

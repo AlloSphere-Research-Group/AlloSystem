@@ -6,17 +6,28 @@ LIB_NAME	= alloGLV
 INC_DIR		= $(LIB_NAME)/
 SRC_DIR		= src/
 VPATH		= $(SRC_DIR)
-BUILD_DIR	= ../build/
+BUILD_DIR	= build/
 RUN_DIRS	+= examples/
 
 SRCS		:= $(wildcard $(SRC_DIR)/*.c*)
 OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
-CPPFLAGS	+= -I$(BUILD_DIR)include -I../$(INC_DIR)
+# include dependency headers directly
+#CPPFLAGS	+= -I../allocore/
+#CPPFLAGS	+= -I../../GLV/
+#CPPFLAGS	+= -I../../Gamma/
 
-# TODO: how to include all the linker flags???
-#include ../allocore/Makefile.external
-#LDFLAGS		+= -lallocore -lGLV -lglut -L../build/lib/
+# include dependencies from parent build folder
+CPPFLAGS	+= -I../build/include
+LDFLAGS		+= -L../build/lib/
+
+CPPFLAGS	+= -I./ -I$(BUILD_DIR)include
+
+# include all the linker flags
+-include ../allocore/Makefile.link
+-include ../../GLV/Makefile.link
+-include ../../Gamma/Makefile.link
+
 
 include ../Makefile.common
 include ../Makefile.rules
@@ -31,9 +42,13 @@ install: $(LIB_PATH)
 
 ##	Only copy library if it doesn't exist or is newer than existing
 	@if [ $(LIB_PATH) -nt $(DESTDIR)/lib/$(LIB_FILE) ] || [ ! -e $(DESTDIR)/lib/$(LIB_FILE) ]; then \
-		echo INSTALL $(LIB_PATH) -> $(DESTDIR)/lib/;\
+		echo INSTALL $(LIB_PATH) to $(DESTDIR)/lib/;\
 		$(INSTALL) -C -m 644 $(LIB_PATH) $(DESTDIR)/lib/;\
 	fi;
 
-include ../Makefile.buildandrun
+# Remove build files
+.PHONY: clean
+clean:
+	$(call RemoveBuildDir)
 
+include ../Makefile.buildandrun

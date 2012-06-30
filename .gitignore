@@ -4,6 +4,7 @@ doxygen_objdb_*
 .DS_Store
 
 *~
+*.link
 *.a
 *.o
 *.so
