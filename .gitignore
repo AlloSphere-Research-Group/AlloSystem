@@ -2,6 +2,7 @@ build/
 xcuserdata
 doxygen_objdb_*
 .DS_Store
+.svn
 
 *~
 *.link
