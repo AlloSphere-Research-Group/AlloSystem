@@ -14,7 +14,7 @@ OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 #CPPFLAGS	+= -I$(BUILD_DIR)include -I../$(INC_DIR)
 #CPPFLAGS	+= -I../$(LIB_NAME)
 CPPFLAGS	+= -I./
-CPPFLAGS	+= -I../allocore/ -I../alloutil -I/usr/local/include/libfreenect -I../linux/include
+CPPFLAGS	+= -I../allocore/ -I../alloutil -I/usr/local/include/libfreenect -I../../linux/include
 
 LINK_LDFLAGS	+= -lfreenect -lusb-1.0
 
