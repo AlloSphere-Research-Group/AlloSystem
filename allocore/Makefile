@@ -22,6 +22,13 @@ STRICT_WARNINGS = 1
 LIB_DIRS	= /usr/lib/
 INC_DIRS	= /usr/include/ 
 
+ifeq ($(PLATFORM), linux)
+	CPPFLAGS	+= -I../../$(PLATFORM_DIR)/include
+else
+#	#CPPFLAGS	+= -I../../$(PLATFORM_DIR)/include -I../../$(PLATFORM_DIR)/include
+#	LINK_LDFLAGS += -framework Carbon -framework IOKit
+endif
+
 #-------------------------------------------------------------------------
 # Default variables
 #-------------------------------------------------------------------------
