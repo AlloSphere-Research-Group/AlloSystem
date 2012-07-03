@@ -14,7 +14,7 @@ OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 #CPPFLAGS	+= -I$(BUILD_DIR)include -I../$(INC_DIR)
 #CPPFLAGS	+= -I../$(LIB_NAME)
 CPPFLAGS	+= -I./
-CPPFLAGS	+= -I../allocore/ -I/usr/local/include/ -I/usr/local/include/lua5.1
+CPPFLAGS	+= -I../allocore/ -I/usr/local/include/ -I/usr/include/lua5.1
 
 
 include ../Makefile.common
