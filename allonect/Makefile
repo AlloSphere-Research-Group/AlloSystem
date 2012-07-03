@@ -14,18 +14,18 @@ OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 #CPPFLAGS	+= -I$(BUILD_DIR)include -I../$(INC_DIR)
 #CPPFLAGS	+= -I../$(LIB_NAME)
 CPPFLAGS	+= -I./
-CPPFLAGS	+= -I../allocore/ -I../alloutil -I/usr/local/include/libfreenect 
+CPPFLAGS	+= -I../allocore/ -I../alloutil -I/usr/local/include/libfreenect -I../../linux/include
 
 LINK_LDFLAGS	+= -lfreenect -lusb-1.0
 
-ifeq ($(PLATFORM), linux)
+#ifeq ($(PLATFORM), linux)
 #	#nogood because the one in the repos is out of date
 #	CPPFLAGS	+= -I/usr/local/include/libfreenect
-	CPPFLAGS	+= -I../../$(PLATFORM_DIR)/include -I../../$(PLATFORM_DIR)/include
-else
+#	CPPFLAGS	+= -I../../$(PLATFORM_DIR)/include -I../../$(PLATFORM_DIR)/include
+#else
 #	#CPPFLAGS	+= -I../../$(PLATFORM_DIR)/include -I../../$(PLATFORM_DIR)/include
 #	LINK_LDFLAGS += -framework Carbon -framework IOKit
-endif
+#endif
 
 include ../Makefile.common
 include ../Makefile.rules
