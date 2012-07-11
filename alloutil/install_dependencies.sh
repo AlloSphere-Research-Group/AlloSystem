@@ -9,6 +9,7 @@ echo Installing for $PLATFORM $ARCH from $ROOT
 if [ `which apt-get` ]; then
 	echo "Found apt-get"
 	sudo apt-get update
+	sudo apt-get install liblua5.1-dev
 	
 elif [ `which port` ]; then
 	echo "Found MacPorts"
