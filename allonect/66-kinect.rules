@@ -1,0 +1,8 @@
+# copy this into /etc/udev/rules.d/66-kinect.rules
+# then add your username to the video group, and reboot
+# sudo adduser YOURNAME video
+#Rules for Kinect ####################################################
+SYSFS{idVendor}=="045e", SYSFS{idProduct}=="02ae", MODE="0660",GROUP="video"
+SYSFS{idVendor}=="045e", SYSFS{idProduct}=="02ad", MODE="0660",GROUP="video"
+SYSFS{idVendor}=="045e", SYSFS{idProduct}=="02b0", MODE="0660",GROUP="video"
+### END #############################################################

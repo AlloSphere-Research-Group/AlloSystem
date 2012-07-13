@@ -3,9 +3,17 @@
 #include "allocore/graphics/al_Graphics.hpp"
 
 #include "assimp/assimp.h"
+#include "assimp/aiTypes.h"
 #include "assimp/aiPostProcess.h"
 #include "assimp/aiScene.h"
 #include "assimp/aiMaterial.h"
+
+/*
+#include "assimp/types.h"
+#include "assimp/postprocess.h"
+#include "assimp/scene.h"
+#include "assimp/material.h"
+*/
 
 #include <stdio.h>
 #include <map>

@@ -29,6 +29,10 @@ alloutil: FORCE allocore
 #	@$(MAKE) --no-print-directory -C $@ install BUILD_DIR=../$(BUILD_DIR) DESTDIR=../$(BUILD_DIR)
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR) linkfile
 
+allonect: FORCE allocore alloutil
+	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR)
+
+
 Gamma GLV: FORCE
 	@$(MAKE) --no-print-directory -C ../$@ install DESTDIR=../$(LIB_NAME)/$(BUILD_DIR) linkfile
 

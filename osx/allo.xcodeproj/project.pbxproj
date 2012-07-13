@@ -1528,29 +1528,6 @@
 		3696E34614BFA43000D21F2A /* zeroconf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = zeroconf.cpp; sourceTree = "<group>"; };
 		36975CEC1558667E00493706 /* exAllosphereCalibration */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = exAllosphereCalibration; sourceTree = BUILT_PRODUCTS_DIR; };
 		36975CF1155866A500493706 /* calibration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = calibration.cpp; sourceTree = "<group>"; };
-		36975F2515587AE900493706 /* VeraMoBd.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = VeraMoBd.ttf; sourceTree = "<group>"; };
-		36975F2615587AE900493706 /* VeraMoBI.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = VeraMoBI.ttf; sourceTree = "<group>"; };
-		36975F2715587AE900493706 /* VeraMoIt.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = VeraMoIt.ttf; sourceTree = "<group>"; };
-		36975F2815587AE900493706 /* VeraMono.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = VeraMono.ttf; sourceTree = "<group>"; };
-		36975F2B15587AE900493706 /* full_fly_glyph.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = full_fly_glyph.jpg; sourceTree = "<group>"; };
-		36975F2C15587AE900493706 /* record_anaglyph.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = record_anaglyph.jpg; sourceTree = "<group>"; };
-		36975F2D15587AE900493706 /* hubble.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = hubble.jpg; sourceTree = "<group>"; };
-		36975F2F15587AE900493706 /* g-actin.mrc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "g-actin.mrc"; sourceTree = "<group>"; };
-		36975F3015587AE900493706 /* golgi.mrc */ = {isa = PBXFileReference; lastKnownFileType = file; path = golgi.mrc; sourceTree = "<group>"; };
-		36975F3115587AE900493706 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
-		36975F3315587AE900493706 /* bunny.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bunny.obj; sourceTree = "<group>"; };
-		36975F3415587AE900493706 /* bunny_small.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = bunny_small.obj; sourceTree = "<group>"; };
-		36975F3515587AE900493706 /* ducky.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ducky.obj; sourceTree = "<group>"; };
-		36975F3715587AE900493706 /* basicFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = basicFragment.glsl; sourceTree = "<group>"; };
-		36975F3815587AE900493706 /* basicVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = basicVertex.glsl; sourceTree = "<group>"; };
-		36975F3915587AE900493706 /* cel.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cel.fs; sourceTree = "<group>"; };
-		36975F3A15587AE900493706 /* cel.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cel.vs; sourceTree = "<group>"; };
-		36975F3B15587AE900493706 /* celshader.sbproj */ = {isa = PBXFileReference; lastKnownFileType = file; path = celshader.sbproj; sourceTree = "<group>"; };
-		36975F3C15587AE900493706 /* omni.sbproj */ = {isa = PBXFileReference; lastKnownFileType = file; path = omni.sbproj; sourceTree = "<group>"; };
-		36975F3D15587AE900493706 /* omniFragment.glsl.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = omniFragment.glsl.fs; sourceTree = "<group>"; };
-		36975F3E15587AE900493706 /* omniVertex.glsl.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = omniVertex.glsl.vs; sourceTree = "<group>"; };
-		36975F3F15587AE900493706 /* stereoFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stereoFragment.glsl; sourceTree = "<group>"; };
-		36975F4015587AE900493706 /* stereoVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = stereoVertex.glsl; sourceTree = "<group>"; };
 		369DDF5012B6C86600F75D2A /* al_Asset.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Asset.hpp; sourceTree = "<group>"; };
 		369DDF5112B6C87200F75D2A /* al_Asset.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Asset.cpp; sourceTree = "<group>"; };
 		369DDF6512B6C8C000F75D2A /* libassimp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libassimp.a; path = ../../build/lib/libassimp.a; sourceTree = "<group>"; };
@@ -2542,7 +2519,6 @@
 		08FB7794FE84155DC02AAC07 /* alscheduling */ = {
 			isa = PBXGroup;
 			children = (
-				36975F2315587AE900493706 /* share */,
 				16B94F901305D78900CE396B /* allocore */,
 				16B94F8F1305D76F00CE396B /* alloutil */,
 				36C9E8871491FBB1002C8638 /* allonect */,
@@ -2575,9 +2551,8 @@
 				163E4931130E0254007B30A0 /* libportaudio.a */,
 				163E4932130E0254007B30A0 /* libsndfile.a */,
 			);
-			name = lib;
-			path = ../build/lib;
-			sourceTree = SOURCE_ROOT;
+			path = lib;
+			sourceTree = "<group>";
 		};
 		1685D3C011C2EDB5009F676C /* private */ = {
 			isa = PBXGroup;
@@ -2778,7 +2753,7 @@
 				364D326714564519005D2EB0 /* debugTests.cpp */,
 			);
 			name = unitTests;
-			path = ../unitTests;
+			path = ../allocore/unitTests;
 			sourceTree = "<group>";
 		};
 		16B94F8F1305D76F00CE396B /* alloutil */ = {
@@ -3013,7 +2988,7 @@
 				B9C962C81218943800091F80 /* exOpenCL.cpp */,
 			);
 			name = examples;
-			path = ../examples;
+			path = ../allocore/examples;
 			sourceTree = SOURCE_ROOT;
 		};
 		3622BEDC116D527D00928703 /* src */ = {
@@ -4168,85 +4143,6 @@
 			path = allosphere;
 			sourceTree = "<group>";
 		};
-		36975F2315587AE900493706 /* share */ = {
-			isa = PBXGroup;
-			children = (
-				36975F2415587AE900493706 /* fonts */,
-				36975F2915587AE900493706 /* images */,
-				36975F2E15587AE900493706 /* imod_data */,
-				36975F3215587AE900493706 /* models */,
-				36975F3615587AE900493706 /* shaders */,
-			);
-			name = share;
-			path = ../share;
-			sourceTree = SOURCE_ROOT;
-		};
-		36975F2415587AE900493706 /* fonts */ = {
-			isa = PBXGroup;
-			children = (
-				36975F2515587AE900493706 /* VeraMoBd.ttf */,
-				36975F2615587AE900493706 /* VeraMoBI.ttf */,
-				36975F2715587AE900493706 /* VeraMoIt.ttf */,
-				36975F2815587AE900493706 /* VeraMono.ttf */,
-			);
-			path = fonts;
-			sourceTree = "<group>";
-		};
-		36975F2915587AE900493706 /* images */ = {
-			isa = PBXGroup;
-			children = (
-				36975F2A15587AE900493706 /* anaglyph */,
-				36975F2D15587AE900493706 /* hubble.jpg */,
-			);
-			path = images;
-			sourceTree = "<group>";
-		};
-		36975F2A15587AE900493706 /* anaglyph */ = {
-			isa = PBXGroup;
-			children = (
-				36975F2B15587AE900493706 /* full_fly_glyph.jpg */,
-				36975F2C15587AE900493706 /* record_anaglyph.jpg */,
-			);
-			path = anaglyph;
-			sourceTree = "<group>";
-		};
-		36975F2E15587AE900493706 /* imod_data */ = {
-			isa = PBXGroup;
-			children = (
-				36975F2F15587AE900493706 /* g-actin.mrc */,
-				36975F3015587AE900493706 /* golgi.mrc */,
-				36975F3115587AE900493706 /* README */,
-			);
-			path = imod_data;
-			sourceTree = "<group>";
-		};
-		36975F3215587AE900493706 /* models */ = {
-			isa = PBXGroup;
-			children = (
-				36975F3315587AE900493706 /* bunny.obj */,
-				36975F3415587AE900493706 /* bunny_small.obj */,
-				36975F3515587AE900493706 /* ducky.obj */,
-			);
-			path = models;
-			sourceTree = "<group>";
-		};
-		36975F3615587AE900493706 /* shaders */ = {
-			isa = PBXGroup;
-			children = (
-				36975F3715587AE900493706 /* basicFragment.glsl */,
-				36975F3815587AE900493706 /* basicVertex.glsl */,
-				36975F3915587AE900493706 /* cel.fs */,
-				36975F3A15587AE900493706 /* cel.vs */,
-				36975F3B15587AE900493706 /* celshader.sbproj */,
-				36975F3C15587AE900493706 /* omni.sbproj */,
-				36975F3D15587AE900493706 /* omniFragment.glsl.fs */,
-				36975F3E15587AE900493706 /* omniVertex.glsl.vs */,
-				36975F3F15587AE900493706 /* stereoFragment.glsl */,
-				36975F4015587AE900493706 /* stereoVertex.glsl */,
-			);
-			path = shaders;
-			sourceTree = "<group>";
-		};
 		36B4124410EFF7B8007B16D0 /* include */ = {
 			isa = PBXGroup;
 			children = (
@@ -5346,6 +5242,7 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "allo" */;
 			compatibilityVersion = "Xcode 3.0";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -5518,7 +5415,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd ../\nmake allocore -j4\nmake alloutil -j4\nmake gamma -j4\n";
+			shellScript = "cd ../\nmake allocore -j4\nmake alloutil -j4\n";
 		};
 		36C9E8D31491FEBC002C8638 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
