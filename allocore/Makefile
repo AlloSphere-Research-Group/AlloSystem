@@ -2,8 +2,8 @@
 # AlloCore main makefile
 #=========================================================================
 
-# We used to include another configuration file here, but it doesn't seem to serve any purpose
-# other than complicate things.
+# We used to include another configuration file here, but it doesn't seem
+# to serve any purpose other than complicate things more than necessary.
 #include Makefile.config
 # BEGIN old Makefile.config
 LIB_NAME	= allocore
@@ -156,7 +156,7 @@ ifeq ($(PLATFORM), linux)
 endif
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS): MY_FLAGS = $(shell test -e $(@D)/flags.txt && cat $(@D)/flags.txt)
-$(EXEC_TARGETS): FORCE allocore runobjs
+$(EXEC_TARGETS): FORCE $(LIB_PATH) runobjs
 	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(MY_FLAGS)
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./$(*F)

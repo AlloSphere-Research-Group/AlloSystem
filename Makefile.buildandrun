@@ -26,7 +26,7 @@ ifeq ($(PLATFORM), linux)
 endif
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS): MY_FLAGS = $(shell test -e $(@D)/flags.txt && cat $(@D)/flags.txt)
-$(EXEC_TARGETS): FORCE runobjs
+$(EXEC_TARGETS): FORCE $(LIB_PATH) runobjs
 	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(MY_FLAGS) -l$(LIB_NAME)
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./$(*F)
