@@ -8,13 +8,13 @@ SRC_DIR		= src/
 VPATH		= $(SRC_DIR)
 BUILD_DIR	= build/
 
-SRCS		:= $(wildcard $(SRC_DIR)/*.c*)
-OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
+SRCS		= $(UTIL_SRC) #= $(wildcard $(SRC_DIR)/*.c*)
+OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
 #CPPFLAGS	+= -I$(BUILD_DIR)include -I../$(INC_DIR)
 #CPPFLAGS	+= -I../$(LIB_NAME)
 CPPFLAGS	+= -I./
-CPPFLAGS	+= -I../allocore/ -I/usr/local/include/ -I/usr/include/lua5.1
+CPPFLAGS	+= -I../allocore/ -I/usr/local/include/ -I/usr/include/lua5.1 -I/usr/include/
 
 
 include ../Makefile.common

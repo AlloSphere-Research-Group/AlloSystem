@@ -307,7 +307,7 @@ static inline void allo_array_setstride(AlloArrayHeader * h, unsigned alignSize)
 	unsigned typeSize = allo_type_size(h->type);
 	unsigned numDims = h->dimcount;
 	h->stride[0] = h->components * typeSize;
-
+	
 	if(numDims>1){
 		h->stride[1] = h->stride[0] * h->dim[0];			// compute ideal row stride amount
 
