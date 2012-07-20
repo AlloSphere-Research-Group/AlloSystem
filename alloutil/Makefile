@@ -18,6 +18,7 @@ CPPFLAGS	+= -I../allocore/ -I/usr/local/include/ -I/usr/include/lua5.1 -I/usr/in
 
 
 include ../Makefile.common
+include $(SRC_DIR)Makefile.config
 include ../Makefile.rules
 
 # Install library into path specified by DESTDIR
