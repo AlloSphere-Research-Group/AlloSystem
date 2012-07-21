@@ -826,7 +826,7 @@ template<typename T> inline void Array::fill(void (*func)(T * values, double nor
 template<typename T> inline void Array::setall(T value) {
 	int d0 = header.dim[0];
 	int d1 = header.dim[1];
-	int d2 = header.dim[2];
+	//int d2 = header.dim[2];
 	int s0 = header.stride[0];
 	int s1 = header.stride[1];
 	int s2 = header.stride[2];
