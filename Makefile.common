@@ -149,7 +149,7 @@ ifeq ($(PLATFORM), linux)
 	endif
 
 	CPPFLAGS += -D__LINUX__ -DLINUX
-	LDFLAGS	+= -lm -lstdc++ -lapr-1 -laprutil-1 -lglut -lglew -lportaudio -lasound -lrt
+	LDFLAGS	+= -lm -lstdc++
 	
 	DLIB_FLAGS += -shared
 	DLIB_FLAGS += -Wl,-soname,$(DLIB_MAJ_FILE)
@@ -189,10 +189,9 @@ else ifeq ($(PLATFORM), macosx)
 	LDFLAGS += -L/opt/local/lib/
 	CPPFLAGS += -I/opt/local/include/
 
-	# XXX homebrew
+	# Same for homebrew...
 	LDFLAGS += -L/usr/local/lib/
 	CPPFLAGS += -I/usr/local/include/
-
 
 	LDFLAGS	+= -lm -lstdc++
 	DLIB_EXT = dylib
@@ -261,10 +260,9 @@ endif
 RemoveDir = @if test -d $(1); then $(RM) $(1)* && rmdir $(1); fi
 
 define RemoveBuildDir 
-	$(call RemoveDir, $(BUILD_DIR)include/)
-	$(call RemoveDir, $(BUILD_DIR)lib/)
-	$(call RemoveDir, $(BIN_DIR))
-	$(call RemoveDir, $(OBJ_DIR))
-	$(call RemoveDir, $(BUILD_DIR))
+       $(call RemoveDir, $(BUILD_DIR)include/)
+       $(call RemoveDir, $(BUILD_DIR)lib/)
+       $(call RemoveDir, $(BIN_DIR))
+       $(call RemoveDir, $(OBJ_DIR))
+       $(call RemoveDir, $(BUILD_DIR))
 endef
-
