@@ -20,7 +20,30 @@
 		};
 /* End PBXAggregateTarget section */
 
+/* Begin PBXBuildFile section */
+		360BCBBE15BB6D59008921E9 /* fluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 361882B515B936340009AD7E /* fluid.cpp */; };
+		360BCBBF15BB6D5E008921E9 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3618842A15B936340009AD7E /* liballocore.a */; };
+		360BCBC015BB6D5E008921E9 /* liballoutil.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3618842B15B936340009AD7E /* liballoutil.a */; };
+		360BCBC215BB6D70008921E9 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 360BCBC115BB6D70008921E9 /* Cocoa.framework */; };
+		360BCBC415BB6D70008921E9 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 360BCBC315BB6D70008921E9 /* GLUT.framework */; };
+		360BCBC615BB6D70008921E9 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 360BCBC515BB6D70008921E9 /* OpenGL.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		360BCBBC15BB6D4F008921E9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 36035DB813037E8D001E9BA9;
+			remoteInfo = "make allocore";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		360BCBB815BB6D4A008921E9 /* fluid */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = fluid; sourceTree = BUILT_PRODUCTS_DIR; };
+		360BCBC115BB6D70008921E9 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		360BCBC315BB6D70008921E9 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
+		360BCBC515BB6D70008921E9 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		361881BD15B936330009AD7E /* al_Allocore.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Allocore.hpp; sourceTree = "<group>"; };
 		361881BF15B936330009AD7E /* al_Asset.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Asset.hpp; sourceTree = "<group>"; };
 		361881C015B936330009AD7E /* al_BufferObject.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_BufferObject.hpp; sourceTree = "<group>"; };
@@ -2881,6 +2904,21 @@
 		36188D6015B936360009AD7E /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = README.md; path = ../README.md; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
+/* Begin PBXFrameworksBuildPhase section */
+		360BCBB615BB6D4A008921E9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				360BCBBF15BB6D5E008921E9 /* liballocore.a in Frameworks */,
+				360BCBC015BB6D5E008921E9 /* liballoutil.a in Frameworks */,
+				360BCBC215BB6D70008921E9 /* Cocoa.framework in Frameworks */,
+				360BCBC415BB6D70008921E9 /* GLUT.framework in Frameworks */,
+				360BCBC615BB6D70008921E9 /* OpenGL.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
 /* Begin PBXGroup section */
 		08FB7794FE84155DC02AAC07 /* alscheduling */ = {
 			isa = PBXGroup;
@@ -2901,6 +2939,9 @@
 				36188C3F15B936360009AD7E /* osx */,
 				36188D6015B936360009AD7E /* README.md */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
+				360BCBC115BB6D70008921E9 /* Cocoa.framework */,
+				360BCBC315BB6D70008921E9 /* GLUT.framework */,
+				360BCBC515BB6D70008921E9 /* OpenGL.framework */,
 			);
 			name = alscheduling;
 			sourceTree = "<group>";
@@ -2908,6 +2949,7 @@
 		1AB674ADFE9D54B511CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				360BCBB815BB6D4A008921E9 /* fluid */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -6749,6 +6791,26 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXNativeTarget section */
+		360BCBB715BB6D4A008921E9 /* fluid */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 360BCBCD15BB6D71008921E9 /* Build configuration list for PBXNativeTarget "fluid" */;
+			buildPhases = (
+				360BCBB515BB6D4A008921E9 /* Sources */,
+				360BCBB615BB6D4A008921E9 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				360BCBBD15BB6D4F008921E9 /* PBXTargetDependency */,
+			);
+			name = fluid;
+			productName = fluid;
+			productReference = 360BCBB815BB6D4A008921E9 /* fluid */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
 /* Begin PBXProject section */
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
@@ -6773,6 +6835,7 @@
 			projectRoot = "";
 			targets = (
 				36035DB813037E8D001E9BA9 /* make allocore */,
+				360BCBB715BB6D4A008921E9 /* fluid */,
 			);
 		};
 /* End PBXProject section */
@@ -6792,6 +6855,25 @@
 			shellScript = "cd ../\nmake allocore -j4\nmake alloutil -j4\n";
 		};
 /* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		360BCBB515BB6D4A008921E9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				360BCBBE15BB6D59008921E9 /* fluid.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		360BCBBD15BB6D4F008921E9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 36035DB813037E8D001E9BA9 /* make allocore */;
+			targetProxy = 360BCBBC15BB6D4F008921E9 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		1DEB923608733DC60010E9CD /* Debug */ = {
@@ -6928,6 +7010,44 @@
 			};
 			name = Release;
 		};
+		360BCBBA15BB6D4B008921E9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../build/lib\"",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = fluid;
+			};
+			name = Debug;
+		};
+		360BCBBB15BB6D4B008921E9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../build/lib\"",
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = fluid;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -6945,6 +7065,15 @@
 			buildConfigurations = (
 				36035DB913037E8E001E9BA9 /* Debug */,
 				36035DBA13037E8E001E9BA9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		360BCBCD15BB6D71008921E9 /* Build configuration list for PBXNativeTarget "fluid" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				360BCBBA15BB6D4B008921E9 /* Debug */,
+				360BCBBB15BB6D4B008921E9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
