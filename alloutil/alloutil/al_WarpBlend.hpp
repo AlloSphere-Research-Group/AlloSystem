@@ -28,6 +28,7 @@ public:
 	// debugging:
 	void drawWarp();
 	void drawWarp3D();
+	void drawInverseWarp3D();
 	void drawBlend();
 	void drawDemo(const Pose& pose, double eyesep);
 	
@@ -35,12 +36,14 @@ public:
 	Shader geomV, geomF;
 	ShaderProgram geomP3D;
 	Shader geomV3D, geomF3D;
+	ShaderProgram geomPI3D;
+	Shader geomVI3D, geomFI3D;
 	ShaderProgram warpP;
 	Shader warpV, warpF;
 	ShaderProgram demoP;
 	Shader demoV, demoF;
 	
-	Texture geometryMap, alphaMap, pixelMap;
+	Texture geometryMap, alphaMap, pixelMap, inversePixelMap;
 	Matrix4d modelView, perspective;
 	Pose center;
 	

@@ -44,11 +44,11 @@ The build folder (typically ./build/) is organized using a Unix-style hierarchy 
 ----------------------------------------
 ### 2.1 Installing Dependencies
 ----------------------------------------
-For Linux, run the script
+Run the script:
 
-	./linux/install_dependencies.sh
+	./allocore/install_dependencies.sh
 
-which will download and install all the Allocore dependencies using apt-get.
+which will download and install all the Allocore dependencies using apt-get, macports or homebrew.
 
 ----------------------------------------
 ### 2.2 Building a Library
