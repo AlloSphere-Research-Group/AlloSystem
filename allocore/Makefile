@@ -63,13 +63,13 @@ ifeq ($(PLATFORM), linux)
 	INC_DIRS += $(PREFIX)include/
 	LIB_DIRS += $(PREFIX)lib/
 	DEV_DIR   = linux/
-	DEV_LIB_DIR = linux/lib$(ARCH)
+#	DEV_LIB_DIR = linux/lib$(ARCH)
 
 # Mac OS X:
 else ifeq ($(PLATFORM), macosx)
 	LDFLAGS	+= -framework Carbon -framework Cocoa -framework IOKit
 	DEV_DIR  = osx/
-	DEV_LIB_DIR = osx/lib
+#	DEV_LIB_DIR = osx/lib
 
 # Windows
 else ifeq ($(PLATFORM), windows)
@@ -78,8 +78,10 @@ endif
 #-------------------------------------------------------------------------
 # Finalize compilation flags
 #-------------------------------------------------------------------------
-INC_DIRS += $(INC_DIR) $(DEV_DIR)include/
-LIB_DIRS += $(DEV_DIR)lib/
+INC_DIRS += $(INC_DIR) 
+
+#INC_DIRS += $(DEV_DIR)include/
+#LIB_DIRS += $(DEV_DIR)lib/
 
 ifeq ($(RUNTIME_BINDING), APR)
 	LINK_LDFLAGS += -lapr-1 -laprutil-1
