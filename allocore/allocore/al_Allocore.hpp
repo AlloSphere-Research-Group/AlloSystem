@@ -52,6 +52,7 @@
 #include "allocore/graphics/al_Stereographic.hpp"
 #include "allocore/graphics/al_Texture.hpp"
 #include "allocore/io/al_AudioIO.hpp"
+#include "allocore/io/al_ControlNav.hpp"
 #include "allocore/io/al_File.hpp"
 #include "allocore/io/al_Socket.hpp"
 #include "allocore/io/al_Window.hpp"
