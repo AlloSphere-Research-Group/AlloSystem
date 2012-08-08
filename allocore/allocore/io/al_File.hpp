@@ -318,7 +318,7 @@ inline std::string File::directory(const std::string& src){
 	if(std::string::npos != pos){
 		return src.substr(0, pos+1);
 	}
-	return "."AL_FILE_DELIMITER_STR;
+	return "." AL_FILE_DELIMITER_STR;
 }
 
 inline bool File::exists(const std::string& path){
@@ -332,7 +332,7 @@ inline bool File::searchBack(std::string& prefixPath, const std::string& matchPa
 
 	for(; i<maxDepth; ++i){
 		if(File::exists(prefixPath + matchPath)) break;
-		prefixPath = ".."AL_FILE_DELIMITER_STR + prefixPath;
+		prefixPath = ".." AL_FILE_DELIMITER_STR + prefixPath;
 	}
 	return i<maxDepth;
 }

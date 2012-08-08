@@ -2,6 +2,7 @@
 #include "allocore/graphics/al_Image.hpp"
 #include "allocore/graphics/al_Shader.hpp"
 #include "allocore/io/al_File.hpp"
+#include "allocore/math/al_Functions.hpp"
 #include "allocore/system/al_Time.hpp"
 
 using namespace al;
@@ -44,6 +45,26 @@ static const char * geomFS3D = AL_STRINGIFY(
 		float a = texture2D(alphaMap, vec2(texcoord0.x, 1.-texcoord0.y)).r;
 		v = normalize(v);
 		v = mod(v * 8., 1.) * a;
+		gl_FragColor = vec4(v, 1.);
+	}
+);
+
+// this shader is just to show the inverse 3D geometry map:
+static const char * geomVSI3D = AL_STRINGIFY(
+	varying vec2 texcoord0;
+	void main(){
+		texcoord0 = vec2(gl_MultiTexCoord0);
+		vec4 vertex = gl_Vertex;
+		gl_Position = gl_ModelViewProjectionMatrix * vertex;
+	}
+);
+static const char * geomFSI3D = AL_STRINGIFY(
+	uniform sampler2D inversePixelMap;
+	varying vec2 texcoord0;
+	void main(){
+		vec3 v = texture2D(inversePixelMap, texcoord0).rgb;
+		//v = mod(v * 8., 1.);
+		v = 0.5 * (v + 1.);
 		gl_FragColor = vec4(v, 1.);
 	}
 );
@@ -267,7 +288,7 @@ static const char * demoFS = AL_STRINGIFY(
 		// initial eye-ray to find object intersection:
 		float mindt = 0.01;	// how close to a surface we can get
 		float mint = mindt;
-		float maxt = 15.;
+		float maxt = 50.;
 		float t=mint;
 		float h = maxt;
 		
@@ -345,7 +366,7 @@ static const char * demoFS = AL_STRINGIFY(
 			// fog:
 			float tnorm = t/maxt;
 			float fog = 1. - tnorm*tnorm;
-			color *= fog;
+			//color *= fog;
 		}
 
 		vec2 texa = vec2(texcoord0.x, 1.-texcoord0.y);
@@ -394,6 +415,8 @@ WarpnBlend::WarpnBlend() {
 	loaded = false;
 	imgpath = "./img/";
 	printf("created WarpnBlend %s\n", imgpath.c_str());
+	
+	pixelMesh.primitive(gl.POINTS);
 }
 
 void WarpnBlend::onCreate() {
@@ -412,6 +435,14 @@ void WarpnBlend::onCreate() {
 	geomV3D.printLog();
 	geomF3D.printLog();
 	geomP3D.printLog();
+	
+	geomVI3D.source(geomVSI3D, Shader::VERTEX).compile();
+	geomFI3D.source(geomFSI3D, Shader::FRAGMENT).compile();
+	geomPI3D.attach(geomVI3D).attach(geomFI3D).link();
+	
+	geomVI3D.printLog();
+	geomFI3D.printLog();
+	geomPI3D.printLog();
 	
 	demoV.source(demoVS, Shader::VERTEX).compile();
 	demoF.source(demoFS, Shader::FRAGMENT).compile();
@@ -438,6 +469,12 @@ void WarpnBlend::onCreate() {
 	pixelMap.filterMag(Texture::LINEAR);
 	pixelMap.texelFormat(GL_RGB32F_ARB);
 	pixelMap.dirty();
+	
+//	inversePixelMap.filterMin(Texture::LINEAR_MIPMAP_LINEAR);
+//	inversePixelMap.filterMag(Texture::LINEAR);
+//	inversePixelMap.texelFormat(GL_RGB32F_ARB);
+//	inversePixelMap.wrap(Texture::REPEAT);
+//	inversePixelMap.dirty();
 	
 	alphaMap.filterMin(Texture::LINEAR_MIPMAP_LINEAR);
 	alphaMap.filterMag(Texture::LINEAR);
@@ -482,6 +519,16 @@ void WarpnBlend::drawWarp3D() {
 	alphaMap.unbind(1);
 	geomP3D.end();
 }
+
+//void WarpnBlend::drawInverseWarp3D() {
+//	if (!loaded) return;
+//	gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
+//	gl.modelView(Matrix4d::identity());
+//	geomPI3D.begin();
+//	geomPI3D.uniform("inversePixelMap", 0);
+//	inversePixelMap.quad(gl);
+//	geomPI3D.end();
+//}
 
 void WarpnBlend::drawDemo(const Pose& pose, double eyesep) {
 	if (!loaded) return;
@@ -565,6 +612,17 @@ void WarpnBlend::read3D(std::string path) {
 	pixelMap.array().print();
 	Array& arr = pixelMap.array();
 	
+//	inversePixelMap.resize(w, h);
+//	inversePixelMap.target(Texture::TEXTURE_2D);
+//	inversePixelMap.format(Graphics::RGBA);
+//	inversePixelMap.type(Graphics::FLOAT);
+//	inversePixelMap.filterMin(Texture::LINEAR);
+//	inversePixelMap.allocate(4);
+//	inversePixelMap.print();
+//	inversePixelMap.array().print();
+//	Array& arrinv = inversePixelMap.array();
+//	arrinv.setall(0);
+	
 	for (int y=0; y<h; y++) {
 		for (int x=0; x<w; x++) {
 			int32_t idx = y*w+x;	// row-major format
@@ -578,8 +636,49 @@ void WarpnBlend::read3D(std::string path) {
 			if (y == h/2) {
 				//printf("3D %d,%d = %f, %f, %f\n", x, y, cell[0], cell[1], cell[2]);
 			}
+			
+			/*
+			Vec3f n(cell[0], cell[1], cell[2]);
+			// TODO: subtract from center & rotate first...
+			n = n.normalize();
+			
+			// convert to polar:
+			float d = sqrt(n.x*n.x + n.y*n.y + n.z*n.z);
+			float a = atan2(n.z, n.x);	// -pi..pi
+			float e = acos(n.y/d);	// 0..pi
+			
+			if (d >= 0.) {
+				
+				// normalize azimuth/elevation to texture dimensions:
+				int x1 = w * fmod(a + M_2PI, M_2PI) / M_2PI; //((a/M_PI)+0.5) * w;
+				int y1 = (e/M_PI) * h;
+				
+				if (x == w/2) {
+					//printf("%d, %d: ", x, y); n.print(); printf("-> %d %d (%f %f %f)\n", x1, y1, a, e, d);
+				}
+				
+				if (x1 >= 0 && x1 < w && y1 >= 0 && y1 < h) {
+					// TODO: use a blending splat instead:
+					float * cellinv = arrinv.cell<float>(x1, y1);
+					cellinv[0] = n.x;
+					cellinv[1] = n.y;
+					cellinv[2] = n.z;
+					cellinv[3] = 1.;
+				}
+			}
+			*/
 		}
 	}
+	
+	// also write this data into a mesh:
+	arr = pixelMap.array();
+	for (unsigned y=0; y<arr.height(); y++) {
+	for (unsigned x=0; x<arr.width(); x++) {
+		Vec3f v(arr.cell<float>(x, y));
+		pixelMesh.vertex(v);
+		pixelMesh.color(x/float(arr.width()), y/float(arr.height()), 0.);
+		pixelMesh.texCoord(x/float(arr.width()), y/float(arr.height()));
+	}}
 	
 	free(t);
 	free(u);

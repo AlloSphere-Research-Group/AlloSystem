@@ -224,6 +224,7 @@ public:
 		
 		destroy();
 		
+		
 		const AlloArrayHeader& header = lat.header;
 		int w = header.dim[0];
 		int h = (header.dimcount > 1) ? header.dim[1] : 1;
@@ -269,14 +270,17 @@ public:
 			break;
 
 			case Image::RGBA: {
+				
 				switch(header.type) {
 
 					case AlloUInt8Ty: {
+	
 						int bpp = header.stride[0]; 
 						mImage = FreeImage_AllocateT(FIT_BITMAP, w, h, bpp*8);
+						
 						char *bp = (char *)(lat.data.ptr);
 						int rowstride = header.stride[1]; 
-
+						
 						for(unsigned j = 0; j < header.dim[1]; ++j) {
 
 							// copy Array row to image buffer
@@ -313,10 +317,12 @@ public:
 			}
 		}
 		
+		
 		if (mImage == NULL) {
 			printf("Image could not be understood\n");
 			return false;
 		}
+		
 		
 		return FreeImage_Save(type, mImage, filename.c_str(), 0);
 	}

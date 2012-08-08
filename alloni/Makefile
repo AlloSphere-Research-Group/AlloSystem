@@ -1,25 +1,29 @@
 #=========================================================================
-# AlloUtil main makefile
+# AlloNi main makefile
 #=========================================================================
 
-include ../../Makefile.common
-
 LIB_NAME	= alloni
-INC_DIR		= ../../include/$(LIB_NAME)/
-SRC_DIR		= ./
+include ../Makefile.common
+
+INC_DIR		= $(LIB_NAME)/
+SRC_DIR		= src/
 VPATH		= $(SRC_DIR)
 
 SRCS		:= $(wildcard $(SRC_DIR)/*.c*)
 OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
-CPPFLAGS	+= -I../../include
+CPPFLAGS	+= -I./
+CPPFLAGS	+= -I../allocore/
+
 ifeq ($(PLATFORM), linux)
-	CPPFLAGS	+= -I/usr/include/ni -I/usr/include/ni
+	CPPFLAGS	+= -I/usr/include/ni/ -I/usr/include/nite/
 else
-	CPPFLAGS	+= -I../../$(PLATFORM_DIR)/include/ni -I../../$(PLATFORM_DIR)/include/nite
+	CPPFLAGS	+= -I$(PLATFORM_DIR)/include/ni/ -I$(PLATFORM_DIR)/include/nite/
 endif
 
-include ../../Makefile.rules
+LINK_LDFLAGS += -lOpenNI
+
+include ../Makefile.rules
 
 #INC_DIRS	+= DEV_DIR/include/ni
 
@@ -31,4 +35,9 @@ install: $(SLIB_PATH)
 	@$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)
 	@$(INSTALL) -C -m 644 $(INC_DIR)$/*.h* $(DESTDIR)/include/$(LIB_NAME)
 	@$(INSTALL) -C -m 644 $(SLIB_PATH) $(DESTDIR)/lib
-#	@$(RANLIB) $(DESTDIR)/lib/$(SLIB_FILE)
+
+# Remove build files
+.PHONY: clean
+clean:
+	@$(RM) $(LIB_PATH)
+	$(call RemoveDir, $(OBJ_DIR))

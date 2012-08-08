@@ -3,22 +3,39 @@
 #=========================================================================
 
 LIB_NAME	= alloutil
+include ../Makefile.common
+
 INC_DIR		= $(LIB_NAME)/
 SRC_DIR		= src/
-VPATH		= $(SRC_DIR)
-BUILD_DIR	= build/
+VPATH		+= $(SRC_DIR)
 
-SRCS		:= $(wildcard $(SRC_DIR)/*.c*)
-OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
+SRCS		= $(wildcard $(SRC_DIR)*.c*)
+OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
-#CPPFLAGS	+= -I$(BUILD_DIR)include -I../$(INC_DIR)
-#CPPFLAGS	+= -I../$(LIB_NAME)
+CPPFLAGS	+= -I/usr/local/include/ -I/usr/include/
 CPPFLAGS	+= -I./
-CPPFLAGS	+= -I../allocore/ -I/usr/local/include/ -I/usr/include/lua5.1
+LDFLAGS		+= -L$(BUILD_DIR)lib
 
+-include ../allocore/Makefile.link
 
-include ../Makefile.common
+CPPFLAGS	+= -I../$(BUILD_DIR)include
+LDFLAGS		+= -L../$(BUILD_DIR)lib
+
+# Define flags for external dependencies
+LINK_CPPFLAGS 	+= -I/usr/include/lua5.1/
+
+LINK_LDFLAGS	+= -lallocore
+
+ifeq ($(PLATFORM), linux)
+	LINK_LDFLAGS += -llua5.1
+else ifeq ($(PLATFORM), macosx)
+	LINK_LDFLAGS += -llua
+else ifeq ($(PLATFORM), windows)
+	LINK_LDFLAGS += -llua
+endif
+
 include ../Makefile.rules
+include ../Makefile.buildandrun
 
 # Install library into path specified by DESTDIR
 # Include files are copied into DESTDIR/include/ and

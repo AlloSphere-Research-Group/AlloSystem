@@ -135,7 +135,7 @@ int utTypes(){
 				Array a(Nc, AlloSInt8Ty, N);
 				for(int i=0,t=0; i<N; ++i){
 				
-					int8_t x[Nc] = {i, i+1, i+2};
+					int8_t x[Nc] = {int8_t(i), int8_t(i+1), int8_t(i+2)};
 					int8_t y[Nc] = {-1,-1,-1};
 					a.write(x, i);
 					a.read(y, i);
@@ -154,7 +154,7 @@ int utTypes(){
 				for(int j=0,t=0; j<N; ++j){
 				for(int i=0; i<N; ++i){
 				
-					int8_t x[Nc] = {j, j+1, j+2};
+					int8_t x[Nc] = {int8_t(j), int8_t(j+1), int8_t(j+2)};
 					int8_t y[Nc] = {-1,-1,-1};
 					a.write(x, i,j);
 					a.read(y, i,j);
@@ -174,7 +174,7 @@ int utTypes(){
 				for(int j=0; j<N; ++j){
 				for(int i=0; i<N; ++i){
 				
-					int8_t x[Nc] = {k, k+1, k+2};
+					int8_t x[Nc] = {int8_t(k), int8_t(k+1), int8_t(k+2)};
 					int8_t y[Nc] = {-1,-1,-1};
 					a.write(x, i,j,k);
 					a.read(y, i,j,k);

@@ -187,6 +187,7 @@ inline int Image::components(Format v){
 
 template <class T>
 bool Image::write(const std::string& filePath, const T * pixels, int nx, int ny, Format fmt){
+	
 	Image img;
 	Array& a = img.array();
 	a.data.ptr			= (char *)const_cast<T *>(pixels);
