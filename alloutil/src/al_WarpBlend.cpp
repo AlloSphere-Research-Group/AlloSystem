@@ -666,6 +666,16 @@ void WarpnBlend::read3D(std::string path) {
 		}
 	}
 	
+	// also write this data into a mesh:
+	arr = pixelMap.array();
+	for (unsigned y=0; y<arr.height(); y++) {
+	for (unsigned x=0; x<arr.width(); x++) {
+		Vec3f v(arr.cell<float>(x, y));
+		pixelMesh.vertex(v);
+		pixelMesh.color(x/float(arr.width()), y/float(arr.height()), 0.);
+		pixelMesh.texCoord(x/float(arr.width()), y/float(arr.height()));
+	}}
+	
 	free(t);
 	free(u);
 	free(v);

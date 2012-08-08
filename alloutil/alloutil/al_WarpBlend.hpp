@@ -44,6 +44,7 @@ public:
 	Shader demoV, demoF;
 	
 	Texture geometryMap, alphaMap, pixelMap, inversePixelMap;
+	Mesh pixelMesh;
 	Matrix4d modelView, perspective;
 	Pose center;
 	
