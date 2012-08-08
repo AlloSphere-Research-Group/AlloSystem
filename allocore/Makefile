@@ -225,7 +225,7 @@ buildtest: test
 	done
 
 # Build unit tests
-test: external $(LIB_PATH)
+test: linkfile $(LIB_PATH)
 	@$(MAKE) -C $(TEST_DIR) test
 
 
