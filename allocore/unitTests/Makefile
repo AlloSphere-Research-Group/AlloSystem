@@ -10,7 +10,7 @@ VPATH		= $(SRC_DIR)
 SRCS		= $(wildcard $(SRC_DIR)/ut*.cpp)
 OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
--include ../Makefile.external
+-include ../Makefile.link
 include ../../Makefile.common
 
 CPPFLAGS	+= -I../
