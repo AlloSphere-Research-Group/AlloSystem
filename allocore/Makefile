@@ -7,9 +7,8 @@
 #include Makefile.config
 # BEGIN old Makefile.config
 LIB_NAME	= allocore
-BUILD_DIR	= build/
-
 include ../Makefile.common
+
 
 BIG_ENDIAN	= 0
 AUDIO_BINDING	= PortAudio
@@ -131,39 +130,13 @@ LDFLAGS		:= $(addprefix -L, $(LIB_DIRS) $(BUILD_DIR)/lib) $(LDFLAGS)
 LINK_LIBS_PATH	= $(wildcard $(BUILD_DIR)lib/*.a)
 LINK_LIBS_FLAGS	=
 
-RUN_SRCS	=  $(wildcard $(addsuffix /*.cpp, $(RUN_SRC_DIRS)))
-RUN_SRCS	+= $(wildcard $(addsuffix /*.c, $(RUN_SRC_DIRS)))
-RUN_OBJS	=  $(addsuffix .o, $(basename $(notdir $(RUN_SRCS)) ))
-#RUN_OBJS	:= $(addsuffix .o, $(basename $(subst /,_,$(RUN_OBJS)) ))
-RUN_OBJS	:= $(addprefix $(OBJ_DIR), $(RUN_OBJS))
 
 #--------------------------------------------------------------------------
 # Rules
 #--------------------------------------------------------------------------
 
 include ../Makefile.rules
-
-# Compile and run source files in examples/ folder
-# For whatever reason, we need this rule so the objects don't get rm'ed by make
-runobjs: $(RUN_OBJS)
-
-# Hack to prevent circular dependencies with compile-and-run rule
-.PHONY: %.hpp
-%.hpp:
-
-# FIXME: this rule should only work for .cpp and .c
-EXEC_TARGETS  = $(addsuffix %.cpp, $(RUN_DIRS)) $(addsuffix %.c, $(RUN_DIRS))
-ifeq ($(PLATFORM), linux)
-	LINK_LIBS_FLAGS += $(addprefix -l :, $(notdir $(LINK_LIBS_PATH)))
-endif
-.PRECIOUS: $(EXEC_TARGETS)
-$(EXEC_TARGETS): MY_FLAGS = $(shell test -e $(@D)/flags.txt && cat $(@D)/flags.txt)
-$(EXEC_TARGETS): FORCE $(LIB_PATH) runobjs
-	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(MY_FLAGS)
-ifneq ($(AUTORUN), 0)
-	@cd $(BIN_DIR) && ./$(*F)
-endif
-
+include ../Makefile.buildandrun
 
 # Build library
 #allocore: $(LIB_PATH)
