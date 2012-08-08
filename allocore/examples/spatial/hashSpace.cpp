@@ -112,7 +112,7 @@ public:
 		// draw active points:
 		gl.color(1, 0.5, 0.2);
 		gl.begin(gl.POINTS);
-		for (unsigned i=0; i<results; i++) {
+		for (int i=0; i<results; i++) {
 			gl.vertex(qmany[i]->pos);
 		}
 		gl.end();
