@@ -415,6 +415,8 @@ WarpnBlend::WarpnBlend() {
 	loaded = false;
 	imgpath = "./img/";
 	printf("created WarpnBlend %s\n", imgpath.c_str());
+	
+	pixelMesh.primitive(gl.POINTS);
 }
 
 void WarpnBlend::onCreate() {
