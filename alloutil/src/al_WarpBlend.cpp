@@ -288,7 +288,7 @@ static const char * demoFS = AL_STRINGIFY(
 		// initial eye-ray to find object intersection:
 		float mindt = 0.01;	// how close to a surface we can get
 		float mint = mindt;
-		float maxt = 15.;
+		float maxt = 50.;
 		float t=mint;
 		float h = maxt;
 		
@@ -366,7 +366,7 @@ static const char * demoFS = AL_STRINGIFY(
 			// fog:
 			float tnorm = t/maxt;
 			float fog = 1. - tnorm*tnorm;
-			color *= fog;
+			//color *= fog;
 		}
 
 		vec2 texa = vec2(texcoord0.x, 1.-texcoord0.y);
