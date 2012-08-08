@@ -468,11 +468,11 @@ void WarpnBlend::onCreate() {
 	pixelMap.texelFormat(GL_RGB32F_ARB);
 	pixelMap.dirty();
 	
-	inversePixelMap.filterMin(Texture::LINEAR_MIPMAP_LINEAR);
-	inversePixelMap.filterMag(Texture::LINEAR);
-	inversePixelMap.texelFormat(GL_RGB32F_ARB);
-	inversePixelMap.wrap(Texture::REPEAT);
-	inversePixelMap.dirty();
+//	inversePixelMap.filterMin(Texture::LINEAR_MIPMAP_LINEAR);
+//	inversePixelMap.filterMag(Texture::LINEAR);
+//	inversePixelMap.texelFormat(GL_RGB32F_ARB);
+//	inversePixelMap.wrap(Texture::REPEAT);
+//	inversePixelMap.dirty();
 	
 	alphaMap.filterMin(Texture::LINEAR_MIPMAP_LINEAR);
 	alphaMap.filterMag(Texture::LINEAR);
@@ -518,15 +518,15 @@ void WarpnBlend::drawWarp3D() {
 	geomP3D.end();
 }
 
-void WarpnBlend::drawInverseWarp3D() {
-	if (!loaded) return;
-	gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
-	gl.modelView(Matrix4d::identity());
-	geomPI3D.begin();
-	geomPI3D.uniform("inversePixelMap", 0);
-	inversePixelMap.quad(gl);
-	geomPI3D.end();
-}
+//void WarpnBlend::drawInverseWarp3D() {
+//	if (!loaded) return;
+//	gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
+//	gl.modelView(Matrix4d::identity());
+//	geomPI3D.begin();
+//	geomPI3D.uniform("inversePixelMap", 0);
+//	inversePixelMap.quad(gl);
+//	geomPI3D.end();
+//}
 
 void WarpnBlend::drawDemo(const Pose& pose, double eyesep) {
 	if (!loaded) return;
@@ -610,16 +610,16 @@ void WarpnBlend::read3D(std::string path) {
 	pixelMap.array().print();
 	Array& arr = pixelMap.array();
 	
-	inversePixelMap.resize(w, h);
-	inversePixelMap.target(Texture::TEXTURE_2D);
-	inversePixelMap.format(Graphics::RGBA);
-	inversePixelMap.type(Graphics::FLOAT);
-	inversePixelMap.filterMin(Texture::LINEAR);
-	inversePixelMap.allocate(4);
-	inversePixelMap.print();
-	inversePixelMap.array().print();
-	Array& arrinv = inversePixelMap.array();
-	arrinv.setall(0);
+//	inversePixelMap.resize(w, h);
+//	inversePixelMap.target(Texture::TEXTURE_2D);
+//	inversePixelMap.format(Graphics::RGBA);
+//	inversePixelMap.type(Graphics::FLOAT);
+//	inversePixelMap.filterMin(Texture::LINEAR);
+//	inversePixelMap.allocate(4);
+//	inversePixelMap.print();
+//	inversePixelMap.array().print();
+//	Array& arrinv = inversePixelMap.array();
+//	arrinv.setall(0);
 	
 	for (int y=0; y<h; y++) {
 		for (int x=0; x<w; x++) {
@@ -635,6 +635,7 @@ void WarpnBlend::read3D(std::string path) {
 				//printf("3D %d,%d = %f, %f, %f\n", x, y, cell[0], cell[1], cell[2]);
 			}
 			
+			/*
 			Vec3f n(cell[0], cell[1], cell[2]);
 			// TODO: subtract from center & rotate first...
 			n = n.normalize();
@@ -663,6 +664,7 @@ void WarpnBlend::read3D(std::string path) {
 					cellinv[3] = 1.;
 				}
 			}
+			*/
 		}
 	}
 	
