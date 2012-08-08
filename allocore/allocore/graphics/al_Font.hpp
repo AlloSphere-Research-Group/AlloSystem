@@ -93,7 +93,7 @@ public:
 		Example usage:
 		<pre>		
 			Mesh mesh;
-			font.render("allocore", mesh);
+			font.write("allocore", mesh);
 		
 			font.texture().bind();
 			gl.draw(mesh);

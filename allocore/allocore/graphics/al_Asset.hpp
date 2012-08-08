@@ -137,6 +137,8 @@ public:
 	void mesh(unsigned int i, Mesh& mesh) const;
 	/// alternative read a mesh from the Scene:
 	void meshAlt(unsigned int i, Mesh& mesh) const;	
+	// read all meshes:
+	void meshAll(Mesh& dst) const { for (unsigned i=0; i<meshes(); i++) mesh(i, dst); }
 	/// get the material index for a given mesh:
 	unsigned int meshMaterial(unsigned int i) const;
 	/// get the name of a given mesh

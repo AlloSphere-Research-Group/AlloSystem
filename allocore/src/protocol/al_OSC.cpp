@@ -7,6 +7,7 @@
 #include "oscpack/osc/OscPacketListener.h"
 #include "oscpack/osc/OscReceivedElements.h"
 #include "oscpack/osc/OscTypes.h"
+#include "oscpack/osc/OscException.h"
 
 /*
 Summary of OSC 1.0 spec from http://opensoundcontrol.org
@@ -51,6 +52,12 @@ etc.												Addtional bundle elements
 
 */
 
+#define OSCTRY(expr) try { \
+		expr \
+	} catch (::osc::Exception& e) { \
+		printf("OSC error: %s\n", e.what()); \
+	}
+
 namespace al{
 namespace osc{
 
@@ -63,52 +70,87 @@ public:
 
 
 Packet::Packet(int size)
-:	mData(size)
+:	mData(size), mImpl(0)
 {
-	mImpl = new Impl(&mData[0], size);
+	OSCTRY(mImpl = new Impl(&mData[0], size);)
 }
 
 Packet::Packet(const char * contents, int size)
-:	mData(size)
+:	mData(size), mImpl(0)
 {
-	memcpy(&mData[0], contents, size);
-	mImpl = new Impl(&mData[0], size);
+	OSCTRY(
+		memcpy(&mData[0], contents, size);
+		mImpl = new Impl(&mData[0], size);
+	)
 }
 
 Packet::~Packet(){ delete mImpl; }
 
-Packet& Packet::operator<< (int v){ (*mImpl) << (::osc::int32)v; return *this; }
-Packet& Packet::operator<< (unsigned v){ (*mImpl) << (::osc::int32)v; return *this; }
-Packet& Packet::operator<< (float v){ (*mImpl) << v; return *this; }
-Packet& Packet::operator<< (double v){ (*mImpl) << v; return *this; }
-Packet& Packet::operator<< (char v){ (*mImpl) << v; return *this; }
-Packet& Packet::operator<< (const char * v){ (*mImpl) << v; return *this; }
-Packet& Packet::operator<< (const std::string& v){ (*mImpl) << v.c_str(); return *this; }
-Packet& Packet::operator<< (const Blob& v){ (*mImpl) << ::osc::Blob(v.data, v.size); return *this; }
+Packet& Packet::operator<< (int v){ 
+	OSCTRY( (*mImpl) << (::osc::int32)v;) 
+	return *this; 
+}
+Packet& Packet::operator<< (unsigned v){ 
+	OSCTRY( (*mImpl) << (::osc::int32)v;) 
+	return *this; 
+}
+Packet& Packet::operator<< (float v){ 
+	OSCTRY( (*mImpl) << v;) 
+	return *this; 
+}
+Packet& Packet::operator<< (double v){ 
+	OSCTRY( (*mImpl) << v;) 
+	return *this; 
+}
+Packet& Packet::operator<< (char v){ 
+	OSCTRY( (*mImpl) << v;) 
+	return *this; 
+}
+Packet& Packet::operator<< (const char * v){ 
+	OSCTRY( (*mImpl) << v;) 
+	return *this; 
+}
+Packet& Packet::operator<< (const std::string& v){ 
+	OSCTRY( (*mImpl) << v.c_str();) 
+	return *this; 
+}
+Packet& Packet::operator<< (const Blob& v){ 
+	OSCTRY( (*mImpl) << ::osc::Blob(v.data, v.size);) 
+	return *this; 
+}
 
 Packet& Packet::beginMessage(const std::string& addr){
-	(*mImpl) << ::osc::BeginMessage(addr.c_str());
+	OSCTRY( (*mImpl) << ::osc::BeginMessage(addr.c_str());)
 	return *this;
 }
 
 Packet& Packet::endMessage(){
-	(*mImpl) << ::osc::EndMessage; return *this;
+	OSCTRY( (*mImpl) << ::osc::EndMessage;) return *this;
 }
 
 Packet& Packet::beginBundle(TimeTag timeTag){
-	(*mImpl) << ::osc::BeginBundle(timeTag); return *this;
+	OSCTRY( (*mImpl) << ::osc::BeginBundle(timeTag);) return *this;
 }
 
 Packet& Packet::endBundle(){
-	(*mImpl) << ::osc::EndBundle; return *this;
+	OSCTRY( (*mImpl) << ::osc::EndBundle;) return *this;
 }
 
-Packet& Packet::clear(){ mImpl->Clear(); return *this; }
+Packet& Packet::clear(){ 
+	OSCTRY(mImpl->Clear();) 
+	return *this; 
+}
 
-const char * Packet::data() const { return mImpl->Data(); }
+const char * Packet::data() const { 
+	return mImpl->Data(); 
+}
 
-bool Packet::isBundle() const { return ::osc::ReceivedPacket(data(), size()).IsBundle(); }
-bool Packet::isMessage() const { return ::osc::ReceivedPacket(data(), size()).IsMessage(); }
+bool Packet::isBundle() const { 
+	return ::osc::ReceivedPacket(data(), size()).IsBundle(); 
+}
+bool Packet::isMessage() const { 
+	return ::osc::ReceivedPacket(data(), size()).IsMessage(); 
+}
 
 void Packet::printRaw() const {
 	for(int i=0; i<size(); ++i){
@@ -131,7 +173,7 @@ struct Message::Impl
 	{}
 	
 	template <class T>
-	void operator>> (T& v){ args>>v; }
+	void operator>> (T& v){ OSCTRY(args>>v;) }
 	
 	::osc::ReceivedMessageArgumentStream args;
 };
@@ -139,72 +181,106 @@ struct Message::Impl
 Message::Message(const char * message, int size, const TimeTag& timeTag)
 :	mImpl(new Impl(message, size)), mTimeTag(timeTag)
 {
-	mAddressPattern = mImpl->AddressPattern();
-	mTypeTags = mImpl->ArgumentCount() ? mImpl->TypeTags() : "";
-	resetStream();
+	OSCTRY(
+		mAddressPattern = mImpl->AddressPattern();
+		mTypeTags = mImpl->ArgumentCount() ? mImpl->TypeTags() : "";
+		resetStream();
+	)
 }
 	
 Message::~Message() {
-	delete mImpl;
+	OSCTRY(delete mImpl;)
 }
 
 void Message::print() const {
-	printf("%s, %s %lld\n", addressPattern().c_str(), typeTags().c_str(), timeTag());
-	
-	::osc::ReceivedMessageArgumentIterator it = mImpl->ArgumentsBegin();
-	
-	printf("\targs = (");
-	for(unsigned i=0; i<typeTags().size(); ++i){
-		char tag = typeTags()[i];
-		switch(tag){
-			case 'f': {float v = it->AsFloat(); printf("%g", v);} break;
-			case 'i': {long v = it->AsInt32(); printf("%ld", v);} break;
-			case 'h': {long long v = it->AsInt64(); printf("%lld", v);} break;
-			case 'c': {char v = it->AsChar(); printf("'%c' (=%3d)", isprint(v) ? v : ' ', v);} break;
-			case 'd': {double v = it->AsDouble(); printf("%g", v);} break;
-			case 's': {const char * v = it->AsString(); printf("%s", v);} break;
-			case 'b': printf("blob"); break;
-			default:  printf("?");
+	OSCTRY(
+		printf("%s, %s %lld\n", addressPattern().c_str(), typeTags().c_str(), timeTag());
+		
+		::osc::ReceivedMessageArgumentIterator it = mImpl->ArgumentsBegin();
+		
+		printf("\targs = (");
+		for(unsigned i=0; i<typeTags().size(); ++i){
+			char tag = typeTags()[i];
+			switch(tag){
+				case 'f': {float v = it->AsFloat(); printf("%g", v);} break;
+				case 'i': {long v = it->AsInt32(); printf("%ld", v);} break;
+				case 'h': {long long v = it->AsInt64(); printf("%lld", v);} break;
+				case 'c': {char v = it->AsChar(); printf("'%c' (=%3d)", isprint(v) ? v : ' ', v);} break;
+				case 'd': {double v = it->AsDouble(); printf("%g", v);} break;
+				case 's': {const char * v = it->AsString(); printf("%s", v);} break;
+				case 'b': printf("blob"); break;
+				default:  printf("?");
+			}
+			if(i < (typeTags().size() - 1)) printf(", ");
+			++it;
 		}
-		if(i < (typeTags().size() - 1)) printf(", ");
-		++it;
-	}
-	printf(")\n");
+		printf(")\n");
+	)
 }
 
 Message& Message::resetStream(){ mImpl->args = mImpl->ArgumentStream(); return *this; }
-Message& Message::operator>> (int& v){ ::osc::int32 r; (*mImpl)>>r; v=r; return *this; }
-Message& Message::operator>> (float& v){ (*mImpl)>>v; return *this; }
-Message& Message::operator>> (double& v){ (*mImpl)>>v; return *this; }
-Message& Message::operator>> (char& v){ (*mImpl)>>v; return *this; }
-Message& Message::operator>> (const char*& v){ (*mImpl)>>v; return *this; }
-Message& Message::operator>> (std::string& v){ const char * r; (*mImpl)>>r; v=r; return *this; }
-Message& Message::operator>> (Blob& v){ ::osc::Blob b; (*mImpl)>>b; v.data=b.data; v.size=b.size; return *this; }
+Message& Message::operator>> (int& v){ 
+	::osc::int32 r; 
+	OSCTRY((*mImpl)>>r;)
+	v=r; 
+	return *this; 
+}
+Message& Message::operator>> (float& v){ 
+	OSCTRY((*mImpl)>>v;) 
+	return *this; 
+}
+Message& Message::operator>> (double& v){ 
+	OSCTRY((*mImpl)>>v;) 
+	return *this; 
+}
+Message& Message::operator>> (char& v){ 
+	OSCTRY((*mImpl)>>v;) 
+	return *this; 
+}
+Message& Message::operator>> (const char*& v){ 
+	OSCTRY((*mImpl)>>v;)
+	return *this; 
+}
+Message& Message::operator>> (std::string& v){ 
+	const char * r; 
+	OSCTRY((*mImpl)>>r;) 
+	v=r; 
+	return *this; 
+}
+Message& Message::operator>> (Blob& v){ 
+	::osc::Blob b; 
+	OSCTRY((*mImpl)>>b;) 
+	v.data=b.data; 
+	v.size=b.size; 
+	return *this; 
+}
 
 
 void PacketHandler::parse(const char *packet, int size, TimeTag timeTag){
-//	printf("PacketHandler::parse: %d\n", size);
-//	for(int i=0; i<size; ++i) printf("%c", packet[i]); printf("\n");
-
-	// this is the only generic entry point for parsing packets
-	::osc::ReceivedPacket p(packet, size);
-
-	// iterate through all the bundle elements (bundles or messages)
-	if(p.IsBundle()){
-		::osc::ReceivedBundle r(p);
+	OSCTRY(
+		//	printf("PacketHandler::parse: %d\n", size);
+		//	for(int i=0; i<size; ++i) printf("%c", packet[i]); printf("\n");
 		
-		::osc::ReceivedBundleElementIterator it = r.ElementsBegin();
-		
-		while(it != r.ElementsEnd()){
-			const ::osc::ReceivedBundleElement& e = *it++;
-			parse(e.Contents(), e.Size(), r.TimeTag());
+		// this is the only generic entry point for parsing packets
+		::osc::ReceivedPacket p(packet, size);
+
+		// iterate through all the bundle elements (bundles or messages)
+		if(p.IsBundle()){
+			::osc::ReceivedBundle r(p);
+			
+			::osc::ReceivedBundleElementIterator it = r.ElementsBegin();
+			
+			while(it != r.ElementsEnd()){
+				const ::osc::ReceivedBundleElement& e = *it++;
+				parse(e.Contents(), e.Size(), r.TimeTag());
+			}
+			
 		}
-		
-	}
-	else if(p.IsMessage()){
-		Message m(packet, size, timeTag);
-		onMessage(m);
-	}
+		else if(p.IsMessage()){
+			Message m(packet, size, timeTag);
+			onMessage(m);
+		}
+	)
 }
 
 
@@ -216,12 +292,14 @@ Send::Send(uint16_t port, const char * address, al_sec timeout)
 int Send::send(){
 	//int r = SocketSend::send(Packet::data(), Packet::size());
 	int r = send(*this);
-	Packet::clear();
+	OSCTRY(Packet::clear();)
 	return r;
 }
 
 int Send::send(const Packet& p){
-	return SocketSend::send(p.data(), p.size());
+	int r = 0;
+	OSCTRY(r = SocketSend::send(p.data(), p.size());)
+	return r;
 }
 
 
@@ -245,10 +323,13 @@ Recv::Recv(uint16_t port, const char * address, al_sec timeout)
 {}
 
 int Recv::recv(){
-	int r = SocketRecv::recv(&mBuffer[0], mBuffer.size());
-	if(r && mHandler){
-		mHandler->parse(&mBuffer[0], r);
-	}
+	int r = 0;
+	OSCTRY(
+		SocketRecv::recv(&mBuffer[0], mBuffer.size());
+		if(r && mHandler){
+			mHandler->parse(&mBuffer[0], r);
+		}
+	)
 	return r;
 }
 
@@ -271,329 +352,3 @@ void Recv::stop(){
 
 } // osc::
 } // al::
-
-
-
-
-// OLD al_OSC.hpp
-
-/*
-Example receive code:
-
-	void onRecv(const osc::RecvPacket& p, void * user){
-		printf("sender:    %s %d\n", p.remoteIP().c_str(), p.remotePort());
-		printf("time:      %d\n", p.time);
-		printf("arguments: %d\n", p.argc());
-		printf("message:   %s %s\n", p.addr().c_str(), p.tags().c_str());
-	}
-	
-	OSCRecv r(12000, onRecv);
-	r.start();	// or, call r.recv() periodically in another loop
-
-	
-Example send code:
-
-	OSCSend s("127.0.0.1", 12000);
-
-    s << osc::BeginBundleImmediate
-        << osc::BeginMessage( "/test1" ) 
-            << true << 23 << (float)3.1415 << "hello" << osc::EndMessage
-        << osc::BeginMessage( "/test2" ) 
-            << true << 24 << (float)10.8 << "world" << osc::EndMessage
-        << osc::EndBundle;
-		
-	s.send();
-	s.send("/test1", true, 23, 3.1415f, "hello");
-
-*/
-
-//
-////namespace al{
-//namespace osc{
-//
-//// Simplified names
-//typedef ReceivedBundle		OSCBundle;
-//typedef ReceivedMessage		OSCMsg;
-//typedef IpEndpointName		NetAddr;
-//
-//
-///// Received packet (for callbacks)
-//struct RecvPacket{
-//	RecvPacket(const osc::OSCMsg& m, const osc::NetAddr& r, osc::uint64 t)
-//	:	msg(m), remote(r), time(t){}
-//	
-//	unsigned long argc() const { return msg.ArgumentCount(); }
-//	std::string addr() const { return msg.AddressPattern() ? msg.AddressPattern() : ""; }
-//	std::string tags() const { return msg.TypeTags() ? msg.TypeTags() : ""; }
-//	osc::ReceivedMessageArgumentStream args() const { return msg.ArgumentStream(); }
-//	osc::ReceivedMessage::const_iterator argi() const { return msg.ArgumentsBegin(); }
-//
-//	void print(FILE * f=stdout) const;
-//	void printVerbose(FILE * f=stdout) const;
-//	
-//	std::string remoteIP() const { char b[32]; remote.AddressAsString(b); return b; }
-//	int remotePort() const { return remote.port; }
-//
-//	const osc::OSCMsg& msg;
-//	const osc::NetAddr& remote;
-//	osc::uint64 time;
-//};
-//
-//
-///// Open Sound Control Receiver
-//
-///// Start its own listening thread and calls callback in its own thread.
-/////
-//class OSCRecv : public osc::OscPacketListener {
-//public:
-//	typedef void (* networkRecvCB)(const RecvPacket& p, void * user);
-//
-//	OSCRecv(networkRecvCB cb=0, void * userData=0);
-//	OSCRecv(uint16_t port, networkRecvCB cb, void * userData=0);
-//
-//	~OSCRecv();
-//
-//	networkRecvCB callback;	///< Receive callback
-//	void * user;			///< User data passed into callback
-//	
-//	/// Change port number to receive messages on.
-//	
-//	/// If the receiver has already been started, it will be stopped and
-//	/// restarted using the new port number.
-//	OSCRecv& port(uint16_t p);
-//	
-//	/// Start the OSC receive thread
-//	void start();
-//	
-//	/// Stop the OSC receive thread.
-//	void stop();
-//	
-//	/// Get the receiving port number
-//	uint16_t port() const { return mPort; }
-//	
-//	/// Get whether the receiving thread has been started
-//	bool started() const { return mStarted; }
-//	
-//protected:
-//	al::Thread mThread;
-//	uint16_t mPort;
-//	osc::uint64 mTime;
-//	UdpListeningReceiveSocket * mSocket;
-//	bool mStarted;
-//	
-//	//static THREAD_FUNCTION(threadFunc);
-//	static void * threadFunc(void * user);
-//	virtual void ProcessMessage(const OSCMsg& m, const NetAddr& remote);
-//	virtual void ProcessBundle(const OSCBundle& b, const NetAddr& remote);
-//};
-//
-//
-//
-///// Open Sound Control Sender
-//class OSCSend{
-//public:
-//
-//	OSCSend(int maxPacketSizeBytes=4096);
-//	OSCSend(const char * remoteIP, int port, int maxPacketSizeBytes=4096);
-//	~OSCSend();
-//
-//	/// Add data to current packet
-//	template <class T>
-//	OSCSend& operator << (T data){ (*mStream) << data; return *this; }
-//
-//	/// Add string to current packet
-//	OSCSend& operator << (const std::string& v){ (*mStream) << v.c_str(); return *this; }
-//
-//	/// Add unsigned integer to current packet
-//	OSCSend& operator << (unsigned int v){ (*mStream) << osc::int32(v); return *this; }
-//	
-//	/// Adds a remote endpoint to receive messages
-//	OSCSend& add(const char * remoteIP, int port);
-//	
-//	/// Removes all endpoints
-//	void clearEndpoints() { mEndpoints.clear(); }
-//
-//	/// Removes an existing endpoint
-//	OSCSend& remove(const char * remoteIP, int port);
-//	
-//	/// Get endpoints
-//	std::vector<NetAddr>& endpoints(){ return mEndpoints; }
-//	const std::vector<NetAddr>& endpoints() const { return mEndpoints; }
-//
-//
-//	/// Set maximum outbound packet size
-//	void maxPacketSize(int bytes);
-//	
-//	/// Sends the current outbound packet and then clears it.
-//	void send();
-//
-//	/// Send address pattern along with 1 argument immediately
-//	template <class T1>
-//	void send(const std::string& addressPattern, const T1& arg1);
-//
-//	/// Send address pattern along with 2 arguments immediately
-//	template <class T1, class T2>
-//	void send(const std::string& addressPattern, const T1& arg1, const T2& arg2);
-//	
-//	/// Send address pattern along with 3 arguments immediately
-//	template <class T1, class T2, class T3>
-//	void send(const std::string& addressPattern, const T1& arg1, const T2& arg2, const T3& arg3);
-//
-//private:	
-//	char * mBuffer;
-//	std::vector<NetAddr> mEndpoints;
-//	OutboundPacketStream * mStream;
-//	UdpSocket mSocket;
-//};
-//
-//
-//
-//template <class T1>
-//void OSCSend::send(const std::string& p, const T1& a1){
-//	((*this) << osc::BeginMessage(p.c_str()) << a1 << osc::EndMessage); send();
-//}
-//
-//template <class T1, class T2>
-//void OSCSend::send(const std::string& p, const T1& a1, const T2& a2){
-//	((*this) << osc::BeginMessage(p.c_str()) << a1<<a2 << osc::EndMessage); send();
-//}
-//
-//template <class T1, class T2, class T3>
-//void OSCSend::send(const std::string& p, const T1& a1, const T2& a2, const T3& a3){
-//	((*this) << osc::BeginMessage(p.c_str()) << a1<<a2<<a3 << osc::EndMessage); send();
-//}
-//
-//
-//} // osc::
-////} // al::
-
-
-//	OLD al_OSC.cpp
-//
-////namespace al{
-//namespace osc{
-//
-//void RecvPacket::print(FILE * f) const {
-//	fprintf(f,"[%15s %d] %s %s\n", remoteIP().c_str(), remotePort(), addr().c_str(), tags().c_str());
-//}
-//
-//void RecvPacket::printVerbose(FILE * f) const {
-//	fprintf(f,"sender:    %s %d\n", remoteIP().c_str(), remotePort());
-//	fprintf(f,"time:      %lld\n", time);
-//	fprintf(f,"arguments: %ld\n", argc());
-//	fprintf(f,"message:   %s %s\n", addr().c_str(), tags().c_str());
-//}
-//
-//
-//
-//OSCRecv::OSCRecv(networkRecvCB cb, void * userData)
-//:	callback(cb), user(userData), mPort(0), mTime(1), mStarted(false)
-//{}
-//
-//OSCRecv::OSCRecv(uint16_t port, networkRecvCB cb, void * userData)
-//:	callback(cb), user(userData), mPort(port), mTime(1), mStarted(false)
-//{}
-//
-//OSCRecv::~OSCRecv(){ stop(); }
-//
-//OSCRecv& OSCRecv::port(uint16_t p){
-//	mPort = p;
-//	if(started()){ stop(); start(); }
-//	return *this;
-//}
-//
-//void OSCRecv::ProcessMessage(const OSCMsg& m, const NetAddr& remote){
-//	if(callback) callback(RecvPacket(m, remote, mTime), user);
-//}
-//
-//void OSCRecv::ProcessBundle(const OSCBundle& b, const NetAddr& remote){
-//	mTime = b.TimeTag();
-//	OscPacketListener::ProcessBundle(b, remote); // this calls ProcessMessage multiple times
-//}
-//
-//void OSCRecv::start(){
-//	if(started()) return;
-//	mStarted = true;
-//	mThread.start(threadFunc, this);
-//}
-//
-//void OSCRecv::stop(){
-//	if(started() && mSocket){
-//		mSocket->AsynchronousBreak();
-//		mThread.wait();
-//	}
-//	mStarted=false;
-//}
-//
-////THREAD_FUNCTION(OSCRecv::threadFunc){
-//void * OSCRecv::threadFunc(void * user){
-//	OSCRecv * oscRecv = (OSCRecv *)user;
-//	UdpListeningReceiveSocket listeningSocket(
-//		NetAddr(NetAddr::ANY_ADDRESS, oscRecv->port()), oscRecv);
-//	oscRecv->mSocket = &listeningSocket;
-//	listeningSocket.Run();
-//	oscRecv->mSocket = 0;
-//	return 0;
-//}
-//
-//
-//
-//
-//OSCSend::OSCSend(int maxPacketSizeBytes)
-//:	mBuffer(0), mStream(0)
-//{
-//	maxPacketSize(maxPacketSizeBytes);
-//}
-//
-//OSCSend::OSCSend(const char * remoteIP, int port, int maxPacketSizeBytes)
-//:	mBuffer(0), mStream(0)
-//{
-//	maxPacketSize(maxPacketSizeBytes);
-//	add(remoteIP, port);
-//}
-//
-//OSCSend::~OSCSend(){ delete[] mBuffer; delete mStream; }
-//
-//OSCSend& OSCSend::add(const char * remoteIP, int port){
-//	mEndpoints.push_back(NetAddr(remoteIP, port));
-//	return *this;
-//}
-//
-//OSCSend& OSCSend::remove(const char * remoteIP, int port){
-//
-//	NetAddr v(remoteIP, port);
-//	
-//	std::vector<NetAddr>::iterator it = mEndpoints.begin();
-//	for(; it<mEndpoints.end(); it++){
-//		if(v == *it) mEndpoints.erase(it);
-//	}
-//	
-//	return *this;
-//}
-//
-//void OSCSend::maxPacketSize(int bytes){
-//	if(mBuffer) delete[] mBuffer;
-//	mBuffer = new char[bytes];
-//	
-//	if(mStream) delete mStream;
-//	mStream = new osc::OutboundPacketStream(mBuffer, bytes);
-//
-//	mStream->Clear();
-//}
-//
-///// Sends the current outbound packet and then clears it.
-//void OSCSend::send(){
-//	//for(int i=0; i<mStream->Size(); ++i) printf("%c", mStream->Data()[i]); printf("\n");
-//	
-////	mSocket.Connect(IpEndpointName("127.0.0.1", 12000));
-////	mSocket.Send(mStream->Data(), mStream->Size());
-//	
-//	for(unsigned i=0; i<mEndpoints.size(); ++i){
-//		//printf("%d %d\n", mEndpoints[i].address, mEndpoints[i].port);
-//		mSocket.SendTo(mEndpoints[i], mStream->Data(), mStream->Size());
-//	}
-//	mStream->Clear();
-//}
-//
-//} // osc::
-////} // al::
