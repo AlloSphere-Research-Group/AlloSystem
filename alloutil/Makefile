@@ -2,15 +2,13 @@
 # AlloUtil main makefile
 #=========================================================================
 
-# Setup library
 LIB_NAME	= alloutil
+
+include ../Makefile.common
+
 INC_DIR		= $(LIB_NAME)/
 SRC_DIR		= src/
 VPATH		+= $(SRC_DIR)
-
-# Create common variables, etc.
-include ../Makefile.common
-
 
 SRCS		= $(wildcard $(SRC_DIR)*.c*)
 OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
