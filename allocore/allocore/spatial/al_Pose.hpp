@@ -409,13 +409,14 @@ public:
 	
 		double amt = 1.-smooth();	// TODO: adjust for dt
 
-		Vec3d angVel = mSpin0 + mTurn;
+		//Vec3d angVel = mSpin0 + mTurn;
 
 		// low-pass filter velocities
 		mMove1.lerp(mMove0*dt + mNudge, amt);
 		mSpin1.lerp(mSpin0*dt + mTurn, amt);
 
-		mTurn.set(0); // turn is just a one-shot increment, so clear each frame
+		// turn and nudge are a one-shot increments, so clear each frame
+		mTurn.set(0);
 		mNudge.set(0);
 
 		mQuat *= vel().quat();
