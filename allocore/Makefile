@@ -220,7 +220,7 @@ install: $(LIB_PATH)
 
 #
 buildtest: test
-	@for v in graphics gui io simulation sound spatial system; do \
+	@for v in graphics io simulation sound spatial system; do \
 		$(MAKE) --no-print-directory examples/$$v/*.cpp AUTORUN=0; \
 	done
 
