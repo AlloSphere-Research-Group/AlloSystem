@@ -21,6 +21,8 @@ else
 	CPPFLAGS	+= -I$(PLATFORM_DIR)/include/ni/ -I$(PLATFORM_DIR)/include/nite/
 endif
 
+LINK_LDFLAGS += -lOpenNI
+
 include ../Makefile.rules
 
 #INC_DIRS	+= DEV_DIR/include/ni
@@ -33,3 +35,9 @@ install: $(SLIB_PATH)
 	@$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)
 	@$(INSTALL) -C -m 644 $(INC_DIR)$/*.h* $(DESTDIR)/include/$(LIB_NAME)
 	@$(INSTALL) -C -m 644 $(SLIB_PATH) $(DESTDIR)/lib
+
+# Remove build files
+.PHONY: clean
+clean:
+	@$(RM) $(LIB_PATH)
+	$(call RemoveDir, $(OBJ_DIR))
