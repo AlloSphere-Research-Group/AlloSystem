@@ -3,7 +3,6 @@
 #=========================================================================
 
 LIB_NAME	= alloutil
-
 include ../Makefile.common
 
 INC_DIR		= $(LIB_NAME)/

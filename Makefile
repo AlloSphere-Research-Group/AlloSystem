@@ -22,6 +22,11 @@ help:
 
 include Makefile.rules
 
+all:
+	@for v in `ls -d */ | grep allo`; do\
+		$(MAKE) --no-print-directory -C $$v install DESTDIR=../$(BUILD_DIR) linkfile -j3;\
+	done
+
 allocore: FORCE
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR) linkfile
 
@@ -39,9 +44,13 @@ Gamma GLV: FORCE
 alloGLV: FORCE allocore GLV
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR)
 
-#collate: allocore alloutil Gamma GLV alloGLV
 
-collate:
+clean:
+	@for v in `ls -d */ | grep allo`; do\
+		$(MAKE) --no-print-directory -C $$v clean;\
+	done
+
+printallos:
 	@for v in `ls -d */ | grep allo`; do\
 		echo $$v;\
 	done
