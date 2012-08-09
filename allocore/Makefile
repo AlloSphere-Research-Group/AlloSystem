@@ -127,8 +127,6 @@ OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
 CPPFLAGS	+= $(addprefix -I, $(INC_DIRS) $(BUILD_DIR)/include)
 LDFLAGS		:= $(addprefix -L, $(LIB_DIRS) $(BUILD_DIR)/lib) $(LDFLAGS)
-LINK_LIBS_PATH	= $(wildcard $(BUILD_DIR)lib/*.a)
-LINK_LIBS_FLAGS	=
 
 
 #--------------------------------------------------------------------------
