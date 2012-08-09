@@ -56,5 +56,5 @@ printallos:
 		echo $$v;\
 	done
 
-RUN_DIRS += ljp/
+
 include Makefile.buildandrun
