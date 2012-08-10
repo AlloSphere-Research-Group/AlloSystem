@@ -9,7 +9,6 @@ Graham Wakefield 2011
 */
 
 #include "allocore/al_Allocore.hpp"
-#include "alloutil/al_ControlNav.hpp"
 #include "allocore/graphics/al_Shader.hpp"
 
 std::string omniVS = AL_STRINGIFY(

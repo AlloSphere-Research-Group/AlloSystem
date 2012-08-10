@@ -9,7 +9,6 @@ Graham Wakefield 2011
 */
 
 #include "allocore/al_Allocore.hpp"
-#include "alloutil/al_ControlNav.hpp"
 #include "alloutil/al_CubeMapFBO.hpp"
 
 #define TEST
