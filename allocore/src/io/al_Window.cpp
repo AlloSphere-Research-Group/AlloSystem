@@ -158,6 +158,7 @@ Window& Window::insert(WindowEventHandler& v, int i){
 		// notify new handler of changes if the window already is created
 		// otherwise, the window will call the proper handlers when created
 		if(created()){
+			printf("onCreate for new addition to existing window\n");
 			v.onCreate();
 		}
 		if(started()){
