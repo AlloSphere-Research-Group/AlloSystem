@@ -1,6 +1,6 @@
 #include "allocore/io/al_Window.hpp"
 #include "allocore/system/al_MainLoop.hpp"
-#include <stdio>
+#include <stdio.h>
 
 namespace al{
 
