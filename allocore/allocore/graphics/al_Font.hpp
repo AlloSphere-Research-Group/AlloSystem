@@ -72,7 +72,7 @@ public:
 
 	// returns the width of a text string in pixels
 	float width(std::string text);
-	float width(unsigned char c) { return mChars[c].width; }
+	float width(unsigned char c) { return mChars[int(c)].width; }
 
 	// returns the "above-line" height of the font in pixels
 	float ascender();
