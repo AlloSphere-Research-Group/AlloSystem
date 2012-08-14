@@ -56,7 +56,7 @@ clean:
 
 
 # This attempts to determine what modules have been built by looking in the build dir
-BUILT_MODULES := $(basename $(shell ls $(BUILD_DIR)/lib/))
+BUILT_MODULES := $(basename $(shell if [ -d $(BUILD_DIR)/lib/ ]; then ls $(BUILD_DIR)/lib/; fi))
 BUILT_MODULES := $(subst lib,,$(BUILT_MODULES))
 BUILT_MODULES := $(filter allo%, $(BUILT_MODULES))
 
