@@ -258,7 +258,7 @@ Message& Message::operator>> (Blob& v){
 
 void PacketHandler::parse(const char *packet, int size, TimeTag timeTag){
 	OSCTRY(
-		//	printf("PacketHandler::parse: %d\n", size);
+	       // printf("PacketHandler::parse(size %d)\n", size);
 		//	for(int i=0; i<size; ++i) printf("%c", packet[i]); printf("\n");
 		
 		// this is the only generic entry point for parsing packets
@@ -315,18 +315,24 @@ static void * recvThreadFunc(void * user){
 
 Recv::Recv()
 :	SocketRecv(), mHandler(0), mBuffer(1024), mBackground(false)
-{}
+{
+  // printf("Entering Recv::Recv()\n");
+}
 
 
 Recv::Recv(uint16_t port, const char * address, al_sec timeout)
 :	SocketRecv(port, address, timeout), mHandler(0), mBuffer(1024), mBackground(false)
-{}
+{
+  // printf("Entering Recv::Recv(port=%d, addr=%s)\n", port, address);
+}
 
 int Recv::recv(){
-	int r = 0;
+	int r;
+	// printf("Entering Recv::recv()\n");
 	OSCTRY(
-		SocketRecv::recv(&mBuffer[0], mBuffer.size());
+		r = SocketRecv::recv(&mBuffer[0], mBuffer.size());
 		if(r && mHandler){
+		  // printf("Recv:recv() Received %d bytes; parsing...\n", r);
 			mHandler->parse(&mBuffer[0], r);
 		}
 	)
@@ -334,6 +340,7 @@ int Recv::recv(){
 }
 
 bool Recv::start(){
+  //  printf("Entering Recv::start()\n");
 	mBackground = true;
 	if (timeout() <= 0) {
 		printf("warning (osc::Recv): timeout <= 0 and background polling may eat up your CPU! Set timeout(seconds) to avoid this.\n");

@@ -548,6 +548,10 @@ void Window::create(
 	const Dim& dim, const std::string& title, double fps, DisplayMode mode
 )
 {
+  printf("al_WindowsGLUT's Window::create called:\n");
+  dim.print();
+  printf("\ttitle: %s\n\tfps %f\n", title.c_str(), fps);
+
 	if(created()) return;
 
 	// switch mainloop to GLUT mode:

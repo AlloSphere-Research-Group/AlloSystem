@@ -48,6 +48,7 @@
 #include <algorithm>
 #include <vector>
 #include <string>
+#include <stdio.h>
 
 namespace al{
 
@@ -249,6 +250,7 @@ public:
 		void set(int l_, int t_, int w_, int h_){l=l_;t=t_;w=w_;h=h_;}
 		
 		float aspect() const { return (w!=0 && h!=0) ? double(w)/h : 1; }
+	  void print() const {printf("Dim:  l %d, t %d, w %d, h %d\n", l, t, w, h); }
 	};
 
 
@@ -261,7 +263,9 @@ public:
 	/// This will create a new window only if the the window has not already
 	/// been created.
 	void create(){
-		create(dimensions(), title(), fps(), displayMode());
+	  printf("Window::Create() called.\n");
+	  dimensions().print();
+	  create(dimensions(), title(), fps(), displayMode());
 	}
 
 	/// Create window
@@ -423,7 +427,9 @@ protected:
 	}
 	
 	void callHandlersOnFrame() { CALL(onFrame()); }
-	void callHandlersOnCreate(){ CALL(onCreate()); }				
+	void callHandlersOnCreate(){ 
+	  printf("Called callHandlersOnCreate()\n");
+	  CALL(onCreate()); }				
 	void callHandlersOnDestroy(){
 		CALL(onDestroy()); 
 		contextDestroy(); 
