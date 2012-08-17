@@ -397,10 +397,12 @@ public:
 			int dw = w - dimPrev.w;
 			int dh = h - dimPrev.h;
 
-			//printf("Window: onResize(%d, %d)\n", dw, dh);
-			win->callHandlersOnResize(dw, dh);
-			win->title(win->title());	// TODO: need this hack to get title back
-										// after exiting full screen
+			if(dw || dh){
+				//printf("Window: onResize(%d, %d)\n", dw, dh);
+				win->callHandlersOnResize(dw, dh);
+				win->title(win->title());	// TODO: need this hack to get title
+											// back after exiting full screen
+			}
 		}
 	}
 
@@ -544,15 +546,13 @@ void Window::implOnFrame(){
 }
 
 
-void Window::create(
+bool Window::create(
 	const Dim& dim, const std::string& title, double fps, DisplayMode mode
 )
 {
-  printf("al_WindowsGLUT's Window::create called:\n");
-  dim.print();
-  printf("\ttitle: %s\n\tfps %f\n", title.c_str(), fps);
+	//printf("Window::create called (in al_WindowGLUT.hpp)\n");
 
-	if(created()) return;
+	if(created()) return true;
 
 	// switch mainloop to GLUT mode:
 	Main::get().driver(Main::GLUT);
@@ -582,7 +582,11 @@ void Window::create(
 //	printf("%d\n", stat);
 
 	mImpl->mID = glutCreateWindow(mImpl->mTitle.c_str());
-	//assert(mImpl->mID > 0);	// valid IDs start at 1
+
+	// check that the window was created...
+	if(!(mImpl->mID > 0)){
+		return false;
+	}
 	//printf("GLUT created window %d\n",mImpl->mID);
 
 	glutSetWindow(mImpl->mID);
@@ -593,7 +597,14 @@ void Window::create(
 	AL_GRAPHICS_INIT_CONTEXT;
 	callHandlersOnCreate();
 
+	// We need to manually call this because GLUT will not call its reshape
+	// callback until the main loop is started. By forcing it here, we ensure
+	// that the requested window width and height get properly stored.
+	WindowImpl::cbReshape(dim.w, dim.h);
+
 	mImpl->scheduleDraw();
+
+	return true;
 }
 
 void Window::destroyAll(){
@@ -641,6 +652,7 @@ Window& Window::cursorHide(bool v){
 }
 
 Window& Window::dimensions(const Dim& v){
+	//printf("Window::dimensions(const Dim&)\n");
 	if(makeCurrent()){
 		glutPositionWindow(v.l, v.t);
 		mImpl->mDimPrev.l = mImpl->mDimCurr.l;
@@ -719,7 +731,9 @@ Window& Window::fullScreen(bool v){
 }
 
 Window& Window::hide(){ if(makeCurrent()) glutHideWindow(); return *this; }
+
 Window& Window::iconify(){ if(makeCurrent()) glutIconifyWindow(); return *this; }
+
 bool Window::makeCurrent() const {
 	if(created()){
 		glutSetWindow(mImpl->id());
@@ -727,6 +741,7 @@ bool Window::makeCurrent() const {
 	}
 	return false;
 }
+
 Window& Window::show(){ if(makeCurrent()) glutShowWindow(); return *this; }
 
 Window& Window::title(const std::string& v){
