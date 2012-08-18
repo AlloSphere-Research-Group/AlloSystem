@@ -137,7 +137,7 @@ void Texture :: configure(AlloArrayHeader& header) {
 
 void Texture :: bind(int unit) {
 	// ensure it is created:
-	Graphics::error(id(), "prevalidate binding texture");
+	Graphics::error(id(), "before binding texture");
 	validate(); 
 	//Graphics::error(id(), "validate binding texture");
 	sendParams(false);

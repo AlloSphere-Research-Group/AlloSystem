@@ -9,6 +9,21 @@ namespace al {
 
 class WarpnBlend {
 public:
+	struct Projector {
+		float projnum;			// ID of the projector
+		float width, height;	// width/height in pixels
+		Vec3f projcoord, normal_unit, x_vec, y_vec;
+		
+		// calculated on init
+		Vec3f x_unit;
+		Vec3f y_unit;
+		float x_dist, y_dist;
+		float x_pixel, y_pixel;
+		
+		void init();	// calculate additional members
+		void print();	// debug printout
+	};
+
 	WarpnBlend();
 
 	void readID(std::string id);
@@ -18,6 +33,7 @@ public:
 	void read3D(std::string path);
 	void readModelView(std::string path);
 	void readPerspective(std::string path, double near = 0.1, double far = 100);
+	void readProj(std::string path);
 	
 	void rotate(const Matrix4d& r);
 	
@@ -32,6 +48,17 @@ public:
 	void drawBlend();
 	void drawDemo(const Pose& pose, double eyesep);
 	
+	void drawPreDistortDemo(const Pose& pose, float aspect);
+
+	
+	Projector projector;
+	Texture geometryMap, alphaMap, pixelMap; //, inversePixelMap;
+	Mesh pixelMesh;
+	Matrix4d modelView, perspective;
+	Pose center;
+	
+	Mesh testscene;
+	
 	ShaderProgram geomP;
 	Shader geomV, geomF;
 	ShaderProgram geomP3D;
@@ -40,16 +67,11 @@ public:
 	Shader geomVI3D, geomFI3D;
 	ShaderProgram warpP;
 	Shader warpV, warpF;
+	ShaderProgram predistortP;
+	Shader predistortV, predistortF;
 	ShaderProgram demoP;
 	Shader demoV, demoF;
-	
-	Texture geometryMap, alphaMap, pixelMap; //, inversePixelMap;
-	Mesh pixelMesh;
-	Matrix4d modelView, perspective;
-	Pose center;
-	
 	std::string imgpath;
-	
 	bool loaded;
 };
 	

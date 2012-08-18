@@ -9,6 +9,63 @@ using namespace al;
 
 Graphics gl;
 
+// this shader performs Kenny's transformation:
+static const char * predistortVS = AL_STRINGIFY(
+	uniform vec3 projcoord;
+	uniform vec3 normal_unit;
+	uniform vec3 x_unit, y_unit;
+	uniform float x_pixel, y_pixel;
+	uniform float width, height;
+	
+	varying vec2 debug;
+	
+	float THRESHOLD = 0.1; // could be larger
+	
+	void main(){
+		// input point in eyespace:
+		vec4 P = gl_ModelViewMatrix * gl_Vertex;
+		
+		vec3 V = P.xyz;
+		
+		// find input point's distance along the normal vector
+		float perpendicular_dist = dot(V - projcoord, normal_unit);
+		
+		// input point is behind the plane or near the edge
+		if (perpendicular_dist < THRESHOLD) {
+			V -= normal_unit; // * maybe_slightly_scaled;
+			perpendicular_dist = dot(V - projcoord, normal_unit);
+			//isValid = false; // deassert flag
+		}
+		
+		float ratio = 1. / perpendicular_dist; // 1 is the distance of uv plane from projcoord
+		
+		// calculate input point's intersection with uv plane
+		vec3 compensated_input = (V-projcoord) * ratio + projcoord;
+		
+		// calculate xy offset from the center
+		float raw_x = dot(compensated_input-projcoord, x_unit);
+		float raw_y = dot(compensated_input-projcoord, y_unit);
+		
+		// calculate xy position
+		float x = raw_x / x_pixel + width / 2.;
+		float y = raw_y / y_pixel + height / 2.;
+		
+		debug.x = x / width;
+		debug.y = y / height;
+		
+		// standard pipeline
+		gl_Position = gl_ProjectionMatrix * P;
+	}
+);
+static const char * predistortFS = AL_STRINGIFY(
+	varying vec2 debug;
+	
+	void main(){
+		gl_FragColor = vec4(debug, 1, 1);
+	}	
+);
+
+
 // this shader is just to show the geometry map:
 static const char * geomVS = AL_STRINGIFY(
 	varying vec2 texcoord0;
@@ -411,12 +468,59 @@ static const char * warpFS = AL_STRINGIFY(
 	}
 );
 
+void WarpnBlend::Projector::print() {
+	printf("Projector %d width %d height %d\n", (int)projnum, (int)width, (int)height);
+	projcoord.print(); printf(" = projCoord\n");
+	normal_unit.print(); printf(" = normal_unit\n");
+	x_vec.print(); printf(" = x_vec\n");
+	y_vec.print(); printf(" = y_vec\n");
+	x_unit.print(); printf(" = x_unit\n");
+	y_unit.print(); printf(" = y_unit\n");
+	printf("x_dist %f y_dist %f\n", x_dist, y_dist);
+	printf("x_pixel %f y_pixel %f\n", x_pixel, y_pixel);
+
+}	
+
+void WarpnBlend::Projector::init() {
+	// calculate uv parameters
+	x_dist = x_vec.mag();
+	x_unit = x_vec / x_dist;
+	x_pixel = x_dist / width;
+	
+	y_dist = y_vec.mag();
+	y_unit = y_vec / y_dist;
+	y_pixel = y_dist / height;
+}	
+
 WarpnBlend::WarpnBlend() {
 	loaded = false;
 	imgpath = "./img/";
 	printf("created WarpnBlend %s\n", imgpath.c_str());
 	
 	pixelMesh.primitive(gl.POINTS);
+	
+	testscene.primitive(gl.LINES);
+	float step = 0.1;
+	for (float x=0; x<1; x+=step) {
+	for (float y=0; y<1; y+=step) {
+	for (float z=0; z<1; z+=step) {
+		testscene.color(x, y, z);
+		testscene.vertex(x, y, z);
+		testscene.color(x, y, z+step);
+		testscene.vertex(x, y, z+step);
+		
+		testscene.color(y, z, x);
+		testscene.vertex(y, z, x);
+		testscene.color(y, z+step, x);
+		testscene.vertex(y, z+step, x);
+		
+		testscene.color(z, x, y);
+		testscene.vertex(z, x, y);
+		testscene.color(z+step, x, y);
+		testscene.vertex(z+step, x, y);
+	}}}
+	testscene.translate(-0.5, -0.5, -0.5);
+	testscene.scale(1./step);
 }
 
 void WarpnBlend::onCreate() {
@@ -459,6 +563,14 @@ void WarpnBlend::onCreate() {
 	warpV.printLog();
 	warpF.printLog();
 	warpP.printLog();
+	
+	predistortV.source(predistortVS, Shader::VERTEX).compile();
+	predistortF.source(predistortFS, Shader::FRAGMENT).compile();
+	predistortP.attach(predistortV).attach(predistortF).link();
+	
+	predistortV.printLog();
+	predistortF.printLog();
+	predistortP.printLog();
 	
 	geometryMap.filterMin(Texture::LINEAR_MIPMAP_LINEAR);
 	geometryMap.filterMag(Texture::LINEAR);
@@ -520,6 +632,29 @@ void WarpnBlend::drawWarp3D() {
 	geomP3D.end();
 }
 
+void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect) {
+	if (!loaded) return;
+	Graphics gl;
+	gl.projection(Matrix4d::perspective(72, aspect, 0.1, 100));
+	gl.modelView(Matrix4d::lookAt(pose.pos(), pose.pos() + pose.uf(), pose.uy()));
+	
+	
+	predistortP.begin();
+	predistortP.uniform("projcoord", projector.projcoord);
+	predistortP.uniform("normal_unit", projector.normal_unit);
+	predistortP.uniform("x_unit", projector.x_unit);
+	predistortP.uniform("y_unit", projector.y_unit);
+	predistortP.uniform("x_pixel", projector.x_pixel);
+	predistortP.uniform("y_pixel", projector.y_pixel);
+	predistortP.uniform("x_unit", projector.x_unit);
+	predistortP.uniform("y_unit", projector.y_unit);
+	
+	// draw some stuff:
+	gl.draw(testscene);
+	
+	predistortP.end();
+}
+
 //void WarpnBlend::drawInverseWarp3D() {
 //	if (!loaded) return;
 //	gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
@@ -562,6 +697,7 @@ void WarpnBlend::readID(std::string id) {
 	readBlend(imgpath + "alpha" + id + ".png");
 	readModelView(imgpath + "ModelViewMatrix" + id + ".txt");
 	readPerspective(imgpath + "PerspectiveMatrix" + id+ ".txt");
+	readProj(imgpath + "proj" + id + ".bin");
 	loaded = true;
 }
 
@@ -584,21 +720,21 @@ void WarpnBlend::read3D(std::string path) {
 	int32_t w = dim[1];
 	int32_t h = dim[0]/3;
 	int32_t elems = w*h;
-	printf("array %dx%d = %d\n", w, h, elems);
+	//printf("array %dx%d = %d\n", w, h, elems);
 	
 	int r = 0;	
 	
 	float * t = (float *)malloc(sizeof(float) * elems);
 	r = f.read((void *)t, sizeof(float), elems);
-	printf("read %d elements (array size %d)\n", r, elems);
+	//printf("read %d elements (array size %d)\n", r, elems);
 	
 	float * u = (float *)malloc(sizeof(float) * elems);
 	r = f.read((void *)u, sizeof(float), elems);
-	printf("read %d elements (array size %d)\n", r, elems);
+	//printf("read %d elements (array size %d)\n", r, elems);
 	
 	float * v = (float *)malloc(sizeof(float) * elems);
 	r = f.read((void *)v, sizeof(float), elems);
-	printf("read %d elements (array size %d)\n", r, elems);
+	//printf("read %d elements (array size %d)\n", r, elems);
 	
 	f.close();
 	
@@ -609,7 +745,7 @@ void WarpnBlend::read3D(std::string path) {
 	pixelMap.filterMin(Texture::LINEAR);
 	pixelMap.allocate(4);
 	pixelMap.print();
-	pixelMap.array().print();
+	//pixelMap.array().print();
 	Array& arr = pixelMap.array();
 	
 //	inversePixelMap.resize(w, h);
@@ -685,6 +821,21 @@ void WarpnBlend::read3D(std::string path) {
 	free(v);
 }
 
+void WarpnBlend::readProj(std::string path) {
+	File f(path, "rb");
+	if (!f.open()) {
+		printf("failed to open Projector configuration file %s\n", path.c_str());
+		return;
+	}
+	
+	f.read((void *)&projector, sizeof(Projector), 1);
+	f.close();
+	
+	projector.init();
+	projector.print();
+	
+}
+
 void WarpnBlend::readWarp(std::string path) {
 	File f(path, "rb");
 	if (!f.open()) {
@@ -699,17 +850,17 @@ void WarpnBlend::readWarp(std::string path) {
 	int32_t w = dim[1];
 	int32_t h = dim[0]/2;
 	int32_t elems = w*h;
-	printf("array %dx%d = %d\n", w, h, elems);
+	//printf("array %dx%d = %d\n", w, h, elems);
 	
 	int r = 0;	
 	
 	float * u = (float *)malloc(sizeof(float) * elems);
 	r = f.read((void *)u, sizeof(float), elems);
-	printf("read %d elements (array size %d)\n", r, elems);
+	//printf("read %d elements (array size %d)\n", r, elems);
 	
 	float * v = (float *)malloc(sizeof(float) * elems);
 	r = f.read((void *)v, sizeof(float), elems);
-	printf("read %d elements (array size %d)\n", r, elems);
+	//printf("read %d elements (array size %d)\n", r, elems);
 
 	f.close();
 	
@@ -720,7 +871,7 @@ void WarpnBlend::readWarp(std::string path) {
 	geometryMap.filterMin(Texture::LINEAR_MIPMAP_LINEAR);
 	geometryMap.allocate(4);
 	geometryMap.print();
-	geometryMap.array().print();
+	//geometryMap.array().print();
 	Array& arr = geometryMap.array();
 	
 	float c0, c1;
@@ -754,7 +905,7 @@ void WarpnBlend::readModelView(std::string path){
 	}
 	
 	const char * src = f.readAll();
-	printf("mv %s\n", src);
+	//printf("mv %s\n", src);
 	f.close();
 	
 	float p[16];
@@ -767,9 +918,9 @@ void WarpnBlend::readModelView(std::string path){
 	for (int i=0; i<16; i++) {
 		modelView[i] = p[i];
 	}
-	printf("modelView = ");
-	modelView.print(stdout);
-	printf("\n");
+	//printf("modelView = ");
+	//modelView.print(stdout);
+	//printf("\n");
 	
 }
 void WarpnBlend::readPerspective(std::string path, double near, double far){
@@ -780,7 +931,7 @@ void WarpnBlend::readPerspective(std::string path, double near, double far){
 	}
 	
 	const char * src = f.readAll();
-	printf("mv %s\n", src);
+	//printf("mv %s\n", src);
 	f.close();
 	
 	float p[16];
@@ -801,9 +952,9 @@ void WarpnBlend::readPerspective(std::string path, double near, double far){
 	perspective[10] = -D2/D;
 	perspective[14] = -fn2/D;
 	
-	printf("Perspective = ");
-	perspective.print(stdout);
-	printf("\n");
+	//printf("Perspective = ");
+	//perspective.print(stdout);
+	//printf("\n");
 }
 	
 void WarpnBlend::rotate(const Matrix4d& r) {
