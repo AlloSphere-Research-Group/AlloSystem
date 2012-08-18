@@ -48,6 +48,7 @@
 #include <algorithm>
 #include <vector>
 #include <string>
+#include <stdio.h>
 
 namespace al{
 
@@ -249,6 +250,7 @@ public:
 		void set(int l_, int t_, int w_, int h_){l=l_;t=t_;w=w_;h=h_;}
 		
 		float aspect() const { return (w!=0 && h!=0) ? double(w)/h : 1; }
+		void print() const {printf("Dim: %4d x %4d @ (%4d, %4d)\n", w,h, l,t); }
 	};
 
 
@@ -256,30 +258,32 @@ public:
 	virtual ~Window();
 
 
-	/// Create window using current settings
+	/// Create window and its associated graphics context using current settings
 	
 	/// This will create a new window only if the the window has not already
 	/// been created.
-	void create(){
-		create(dimensions(), title(), fps(), displayMode());
+	/// \returns whether a valid window is created
+	bool create(){
+		return create(dimensions(), title(), fps(), displayMode());
 	}
 
-	/// Create window
+	/// Create window and its associated graphics context
 
 	/// This will create a new window only if the the window has not already
-	/// been created.	
+	/// been created.
+	/// \returns whether a valid window is created
 	/// @param[in] dim		Window dimensions in pixels
 	/// @param[in] title	Title of window
 	/// @param[in] fps		Desired frames/second
 	/// @param[in] mode		Display mode bit flags
-	void create(
+	bool create(
 		const Dim& dim,
 		const std::string& title="",
 		double fps=40,
 		DisplayMode mode = DEFAULT_BUF
 	);
 	
-	/// Destroys current window and its associated OpenGL context
+	/// Destroy current window and its associated graphics context
 	void destroy();
 
 	const Keyboard& keyboard() const { return mKeyboard; }	///< Get current keyboard state
@@ -423,7 +427,7 @@ protected:
 	}
 	
 	void callHandlersOnFrame() { CALL(onFrame()); }
-	void callHandlersOnCreate(){ CALL(onCreate()); }				
+	void callHandlersOnCreate(){ CALL(onCreate()); }
 	void callHandlersOnDestroy(){
 		CALL(onDestroy()); 
 		contextDestroy(); 

@@ -9,7 +9,7 @@ Author:
 Lance Putnam, 9/2011
 */
 
-#include "alloutil/al_App.hpp"
+#include "allocore/io/al_App.hpp"
 #include "Gamma/Containers.h"
 using namespace al;
 
