@@ -11,60 +11,63 @@ Graphics gl;
 
 // this shader performs Kenny's transformation:
 static const char * predistortVS = AL_STRINGIFY(
-	uniform vec3 projcoord;
-	uniform vec3 normal_unit;
-	uniform vec3 x_unit, y_unit;
-	uniform float x_pixel, y_pixel;
-	uniform float width, height;
+
+	uniform vec3 projcoord;						// the projector location
+	uniform vec3 x_unit, y_unit, normal_unit; 	// the projector coordinate frame
+	uniform float aspect, near, far;			// projection rendering parameters
 	
-	varying vec2 debug;
+	varying vec3 C; // for debugging
 	
-	float THRESHOLD = 0.1; // could be larger
-	
-	void main(){
+	mat4 warp(in vec3 projcoord, in vec3 x_unit, in vec3 y_unit, in vec3 z_unit, in float aspect, in float near, in float far) {
+		// create translation matrix to position vertex in projector's coordinate frame:
+		mat4 transmat = mat4(
+			1.,  0., 	0., 	0.,
+			0., 	1.,  0.,	0.,
+			0., 	0., 	1.,	0.,
+			-projcoord,	1.
+		);
+
+		// create rotation matrix to rotate vertex into projector's coordinate frame:
+		mat4 projmat = mat4(
+			x_unit.x, 	y_unit.x, 	z_unit.x, 0.,
+			x_unit.y, 	y_unit.y, 	z_unit.y,	 0.,
+			x_unit.z, 	y_unit.z, 	z_unit.z,	 0.,
+			0.,			0.,			0.,		1.
+		);
+		
+		// create GLSL projection matrix (for 90 degree fovy):
+		mat4 perspmat = mat4(
+			1./aspect,	0., 0.,						0.,
+			0.,			1.,	0.,						0.,
+			0.,			0., (far+near)/(near-far),		-1.,
+			0.,			0., (2.*far*near)/(near-far),	0.
+		);
+
+		// combine matrices to produce the warp matrix:
+		return perspmat * projmat * transmat;
+	}
+
+	void main() {
+
 		// input point in eyespace:
-		vec4 P = gl_ModelViewMatrix * gl_Vertex;
+		vec4 V = gl_ModelViewMatrix * gl_Vertex;
+
+		// get warp matrix:
+		mat4 warpmat = warp(projcoord, x_unit, y_unit, normal_unit, aspect, near, far);
 		
-		vec3 V = P.xyz;
+		// apply warp:
+		gl_Position = warpmat * V;
 		
-		// find input point's distance along the normal vector
-		float perpendicular_dist = dot(V - projcoord, normal_unit);
-		
-		// input point is behind the plane or near the edge
-		if (perpendicular_dist < THRESHOLD) {
-			V -= normal_unit; // * maybe_slightly_scaled;
-			perpendicular_dist = dot(V - projcoord, normal_unit);
-			//isValid = false; // deassert flag
-		}
-		
-		float ratio = 1. / perpendicular_dist; // 1 is the distance of uv plane from projcoord
-		
-		// calculate input point's intersection with uv plane
-		vec3 compensated_input = (V-projcoord) * ratio + projcoord;
-		
-		// calculate xy offset from the center
-		float raw_x = dot(compensated_input-projcoord, x_unit);
-		float raw_y = dot(compensated_input-projcoord, y_unit);
-		
-		// calculate xy position
-		float x = raw_x / x_pixel + width / 2.;
-		float y = raw_y / y_pixel + height / 2.;
-		
-		debug.x = x / width;
-		debug.y = y / height;
-		
-		// standard pipeline
-		gl_Position = gl_ProjectionMatrix * P;
+		C = gl_Position.xyz * 0.5 + 0.5;
 	}
 );
 static const char * predistortFS = AL_STRINGIFY(
-	varying vec2 debug;
+	varying vec3 C; // for debugging
 	
 	void main(){
-		gl_FragColor = vec4(debug, 1, 1);
+		gl_FragColor = vec4(C, 1);
 	}	
 );
-
 
 // this shader is just to show the geometry map:
 static const char * geomVS = AL_STRINGIFY(
@@ -478,6 +481,7 @@ void WarpnBlend::Projector::print() {
 	y_unit.print(); printf(" = y_unit\n");
 	printf("x_dist %f y_dist %f\n", x_dist, y_dist);
 	printf("x_pixel %f y_pixel %f\n", x_pixel, y_pixel);
+	
 
 }	
 
@@ -520,7 +524,7 @@ WarpnBlend::WarpnBlend() {
 		testscene.vertex(z+step, x, y);
 	}}}
 	testscene.translate(-0.5, -0.5, -0.5);
-	testscene.scale(1./step);
+	testscene.scale(8./step);
 }
 
 void WarpnBlend::onCreate() {
@@ -635,19 +639,21 @@ void WarpnBlend::drawWarp3D() {
 void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect) {
 	if (!loaded) return;
 	Graphics gl;
-	gl.projection(Matrix4d::perspective(72, aspect, 0.1, 100));
+	
+	gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
+	//gl.projection(Matrix4d::perspective(72, aspect, 0.1, 100));
 	gl.modelView(Matrix4d::lookAt(pose.pos(), pose.pos() + pose.uf(), pose.uy()));
 	
 	
 	predistortP.begin();
 	predistortP.uniform("projcoord", projector.projcoord);
+	//predistortP.uniform("projcoord", Vec3f(0.5, 0.5, 0.5));
 	predistortP.uniform("normal_unit", projector.normal_unit);
 	predistortP.uniform("x_unit", projector.x_unit);
 	predistortP.uniform("y_unit", projector.y_unit);
-	predistortP.uniform("x_pixel", projector.x_pixel);
-	predistortP.uniform("y_pixel", projector.y_pixel);
-	predistortP.uniform("x_unit", projector.x_unit);
-	predistortP.uniform("y_unit", projector.y_unit);
+	predistortP.uniform("near", 1.f);
+	predistortP.uniform("far", 100.f);
+	predistortP.uniform("aspect", aspect);
 	
 	// draw some stuff:
 	gl.draw(testscene);
