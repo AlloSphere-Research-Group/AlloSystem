@@ -4,7 +4,7 @@
 #include "allocore/system/al_Config.h"
 
 #include "FreeImage.h"
-/*!
+/*
 	\class FreeImageImpl
 
 	Loads and saves images using the FreeImage library.  Supported formats include:
