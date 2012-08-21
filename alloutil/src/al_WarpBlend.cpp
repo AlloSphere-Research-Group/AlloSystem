@@ -102,7 +102,7 @@ static const char * geomFS3D = AL_STRINGIFY(
 	varying vec2 texcoord0;
 	void main(){
 		vec3 v = texture2D(pixelMap, texcoord0).rgb;
-		float a = texture2D(alphaMap, vec2(texcoord0.x, 1.-texcoord0.y)).r;
+		float a = texture2D(alphaMap, texcoord0).r;
 		v = normalize(v);
 		v = mod(v * 8., 1.) * a;
 		gl_FragColor = vec4(v, 1.);
@@ -134,8 +134,7 @@ static const char * demoVS = AL_STRINGIFY(
 	varying vec2 texcoord0;
 	void main(){
 		texcoord0 = vec2(gl_MultiTexCoord0);
-		vec4 vertex = gl_Vertex;
-		gl_Position = gl_ModelViewProjectionMatrix * vertex;
+		gl_Position = vec4(texcoord0 * 2.-1., 0., 1.);
 	}
 );
 static const char * demoFS = AL_STRINGIFY(
@@ -332,7 +331,7 @@ static const char * demoFS = AL_STRINGIFY(
 		// ray direction (allosphere space):
 		vec3 nv = quat_rotate(centerquat, normalize(v-centerpos));
 		// ray direction (world space);
-		vec3 rd = quat_rotate(quat, vec3(nv.x, nv.z, -nv.y));
+		vec3 rd = quat_rotate(quat, nv);
 		
 		// stereo offset: 
 		// should reduce to zero as the nv becomes close to (0, 1, 0)
@@ -429,7 +428,7 @@ static const char * demoFS = AL_STRINGIFY(
 			//color *= fog;
 		}
 
-		vec2 texa = vec2(texcoord0.x, 1.-texcoord0.y);
+		vec2 texa = vec2(texcoord0);
 		float a = texture2D(alphaMap, texa).r;
 		
 		gl_FragColor = vec4(color, 1) * a; 
@@ -767,17 +766,16 @@ void WarpnBlend::read3D(std::string path) {
 	
 	for (int y=0; y<h; y++) {
 		for (int x=0; x<w; x++) {
-			int32_t idx = y*w+x;	// row-major format
+			// Y axis appears to be inverted
+			int32_t y1 = (h-y-1);
+			// input data is row-major format
+			int32_t idx = y1*w+x;	
 		
 			float * cell = arr.cell<float>(x, y);
 			// coordinate system change:
 			cell[0] = t[idx];//*0.5+0.5;
 			cell[1] = v[idx];//*0.5+0.5;
 			cell[2] = u[idx];//*0.5+0.5;
-			
-			if (y == h/2) {
-				//printf("3D %d,%d = %f, %f, %f\n", x, y, cell[0], cell[1], cell[2]);
-			}
 			
 			/*
 			Vec3f n(cell[0], cell[1], cell[2]);
