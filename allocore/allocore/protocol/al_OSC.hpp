@@ -50,6 +50,8 @@
 #include "allocore/system/al_Thread.hpp"
 
 namespace al{
+
+/// Open Sound Control (OSC) utilities
 namespace osc{
 
 /// User-defined data
