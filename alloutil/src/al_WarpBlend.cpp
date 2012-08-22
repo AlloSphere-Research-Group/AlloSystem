@@ -134,7 +134,8 @@ static const char * demoVS = AL_STRINGIFY(
 	varying vec2 texcoord0;
 	void main(){
 		texcoord0 = vec2(gl_MultiTexCoord0);
-		gl_Position = vec4(texcoord0 * 2.-1., 0., 1.);
+		//gl_Position = vec4(texcoord0 * 2.-1., 0., 1.);
+		gl_Position = gl_ModelViewProjectionMatrix * vertex;
 	}
 );
 static const char * demoFS = AL_STRINGIFY(
