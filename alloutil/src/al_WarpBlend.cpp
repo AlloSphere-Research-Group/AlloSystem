@@ -18,47 +18,108 @@ static const char * predistortVS = AL_STRINGIFY(
 	
 	varying vec3 C; // for debugging
 	
-	mat4 warp(in vec3 projcoord, in vec3 x_unit, in vec3 y_unit, in vec3 z_unit, in float aspect, in float near, in float far) {
-		// create translation matrix to position vertex in projector's coordinate frame:
-		mat4 transmat = mat4(
-			1.,  0., 	0., 	0.,
-			0., 	1.,  0.,	0.,
-			0., 	0., 	1.,	0.,
-			-projcoord,	1.
+	vec4 warp(in vec3 vertex, in vec3 projcoord, in vec3 x_unit, in vec3 y_unit, in vec3 z_unit, in float aspect, in float near, in float far) {
+	
+		vec3 sphere_center = vec3(0, 0, 0);
+		float sphere_radius = 6.;
+		
+		// translate the vertex into sphere-space:
+		vec3 vertex_in_sphere = vertex - sphere_center;
+		
+		// depth based on the eye-space length:
+		float distance = length(vertex_in_sphere);
+		
+		// find intersection point with sphere surface:
+		vec3 surface_intersection = sphere_radius * vertex_in_sphere / distance;
+	
+		// translate & rotate this into the projector's coordinate frame
+		// this will be used to determine the XY position
+		mat3 rotmat = mat3(
+			x_unit.x, 	y_unit.x, 	z_unit.x, 
+			x_unit.y, 	y_unit.y, 	z_unit.y,
+			x_unit.z, 	y_unit.z, 	z_unit.z
 		);
+		vec3 vertex_in_projector = rotmat * (surface_intersection - projcoord);
+		
+		// do perspective division on this vertex
+		// according to the distance from the projector:
+		vec2 uv = vertex_in_projector.xy / vertex_in_projector.z;
+		
+		// take into account the aspect ratio of the viewport:
+		uv.x /= aspect;
+	
+		// depth value should relate to the length of vertex_in_sphere
+		// but sign of depth depends on whether the vertex is in front or behind the projection plane
+		float depth = -distance * sign(vertex_in_projector.z);
+		
+		// scale z to the near/far planes:
+		float z = (-2.*depth - far+near) / (far-near);
+
+		// assign to output
+		return vec4(uv, z, 1);		
+		
+		
+		
+		
+		
+		// create translation matrix to position vertex in projector's coordinate frame:
+//		mat4 transmat = mat4(
+//			1.,  0., 	0., 	0.,
+//			0., 	1.,  0.,	0.,
+//			0., 	0., 	1.,	0.,
+//			-projcoord,	1.
+//		);
 
 		// create rotation matrix to rotate vertex into projector's coordinate frame:
-		mat4 projmat = mat4(
-			x_unit.x, 	y_unit.x, 	z_unit.x, 0.,
-			x_unit.y, 	y_unit.y, 	z_unit.y,	 0.,
-			x_unit.z, 	y_unit.z, 	z_unit.z,	 0.,
-			0.,			0.,			0.,		1.
-		);
+//		mat4 projmat = mat4(
+//			x_unit.x, 	y_unit.x, 	z_unit.x, 0.,
+//			x_unit.y, 	y_unit.y, 	z_unit.y,	 0.,
+//			x_unit.z, 	y_unit.z, 	z_unit.z,	 0.,
+//			0.,			0.,			0.,		1.
+//		);
 		
-		// create GLSL projection matrix (for 90 degree fovy):
-		mat4 perspmat = mat4(
-			1./aspect,	0., 0.,						0.,
-			0.,			1.,	0.,						0.,
-			0.,			0., (far+near)/(near-far),		-1.,
-			0.,			0., (2.*far*near)/(near-far),	0.
-		);
-
-		// combine matrices to produce the warp matrix:
-		return perspmat * projmat * transmat;
+//		// create GLSL projection matrix (for 90 degree fovy):
+//		mat4 perspmat = mat4(
+//			1./aspect,	0., 0.,						0.,
+//			0.,			1.,	0.,						0.,
+//			0.,			0., (far+near)/(near-far),		-1.,
+//			0.,			0., (2.*far*near)/(near-far),	0.
+//		);
+//		
+//		float d = length(vertex);
+//		
+//		// sign of depth depends on whether the vertex is in front or behind the projection plane
+//		distance *= sign(vertex_in_projector.z);
+//		
+//		float scale = 2.;
+//		
+//		vec4 warped = vec4(
+//			vertex_in_projector.x * scale / aspect,
+//			vertex_in_projector.y * scale,
+//			d * (far+near)/(near-far) + (2.*far*near)/(near-far),
+//			-d
+//		);
 	}
 
 	void main() {
 
 		// input point in eyespace:
-		vec4 V = gl_ModelViewMatrix * gl_Vertex;
+		vec4 vertex = gl_ModelViewMatrix * gl_Vertex;
 
 		// get warp matrix:
-		mat4 warpmat = warp(projcoord, x_unit, y_unit, normal_unit, aspect, near, far);
+		//mat4 warpmat = warp(projcoord, x_unit, y_unit, normal_unit, aspect, near, far);
+		
+		
 		
 		// apply warp:
-		gl_Position = warpmat * V;
+		vec4 warped = warp(vertex.xyz, projcoord, x_unit, y_unit, normal_unit, aspect, near, far);
+
+		// normalize [-1,1] to [0,1]
+		C = warped.www * 0.5 + 0.5;
 		
-		C = gl_Position.xyz * 0.5 + 0.5;
+		
+		gl_Position = gl_ProjectionMatrix * vertex;
+		gl_Position = warped;
 	}
 );
 static const char * predistortFS = AL_STRINGIFY(
@@ -93,8 +154,9 @@ static const char * geomVS3D = AL_STRINGIFY(
 	varying vec2 texcoord0;
 	void main(){
 		texcoord0 = vec2(gl_MultiTexCoord0);
-		vec4 vertex = gl_Vertex;
-		gl_Position = gl_ModelViewProjectionMatrix * vertex;
+		//vec4 vertex = gl_Vertex;
+		//gl_Position = gl_ModelViewProjectionMatrix * vertex;
+		gl_Position = vec4(texcoord0 * 2.-1., 0., 1.);
 	}
 );
 static const char * geomFS3D = AL_STRINGIFY(
@@ -114,8 +176,9 @@ static const char * geomVSI3D = AL_STRINGIFY(
 	varying vec2 texcoord0;
 	void main(){
 		texcoord0 = vec2(gl_MultiTexCoord0);
-		vec4 vertex = gl_Vertex;
-		gl_Position = gl_ModelViewProjectionMatrix * vertex;
+		//vec4 vertex = gl_Vertex;
+		//gl_Position = gl_ModelViewProjectionMatrix * vertex;
+		gl_Position = vec4(texcoord0 * 2.-1., 0., 1.);
 	}
 );
 static const char * geomFSI3D = AL_STRINGIFY(
@@ -134,8 +197,8 @@ static const char * demoVS = AL_STRINGIFY(
 	varying vec2 texcoord0;
 	void main(){
 		texcoord0 = vec2(gl_MultiTexCoord0);
-		//gl_Position = vec4(texcoord0 * 2.-1., 0., 1.);
-		gl_Position = gl_ModelViewProjectionMatrix * vertex;
+		gl_Position = vec4(texcoord0 * 2.-1., 0., 1.);
+		//gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 	}
 );
 static const char * demoFS = AL_STRINGIFY(
@@ -429,8 +492,7 @@ static const char * demoFS = AL_STRINGIFY(
 			//color *= fog;
 		}
 
-		vec2 texa = vec2(texcoord0);
-		float a = texture2D(alphaMap, texa).r;
+		float a = texture2D(alphaMap, texcoord0).r;
 		
 		gl_FragColor = vec4(color, 1) * a; 
 	}
@@ -640,8 +702,8 @@ void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect) {
 	if (!loaded) return;
 	Graphics gl;
 	
-	gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
-	//gl.projection(Matrix4d::perspective(72, aspect, 0.1, 100));
+	//gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
+	gl.projection(Matrix4d::perspective(72, aspect, 0.1, 100));
 	gl.modelView(Matrix4d::lookAt(pose.pos(), pose.pos() + pose.uf(), pose.uy()));
 	
 	
@@ -764,6 +826,9 @@ void WarpnBlend::read3D(std::string path) {
 //	inversePixelMap.array().print();
 //	Array& arrinv = inversePixelMap.array();
 //	arrinv.setall(0);
+
+	int total = 0;
+	float sum = 0;
 	
 	for (int y=0; y<h; y++) {
 		for (int x=0; x<w; x++) {
@@ -777,6 +842,11 @@ void WarpnBlend::read3D(std::string path) {
 			cell[0] = t[idx];//*0.5+0.5;
 			cell[1] = v[idx];//*0.5+0.5;
 			cell[2] = u[idx];//*0.5+0.5;
+			
+			Vec3f n(cell[0], cell[1], cell[2]);
+			float mag = n.mag();
+			sum += mag;
+			total++;
 			
 			/*
 			Vec3f n(cell[0], cell[1], cell[2]);
@@ -810,6 +880,9 @@ void WarpnBlend::read3D(std::string path) {
 			*/
 		}
 	}
+	
+	float avg = sum / total;
+	printf("average radius %f\n", avg);
 	
 	// also write this data into a mesh:
 	arr = pixelMap.array();
