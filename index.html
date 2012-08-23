@@ -1,0 +1,168 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Allosystem by AlloSphere-Research-Group</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Allosystem</h1>
+        <p>The AlloSystem is a cross-platform suite of C++ components for building interactive multimedia tools and applications.</p>
+
+        <p class="view"><a href="https://github.com/AlloSphere-Research-Group/AlloSystem">View the Project on GitHub <small>AlloSphere-Research-Group/AlloSystem</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/AlloSphere-Research-Group/AlloSystem/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/AlloSphere-Research-Group/AlloSystem/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/AlloSphere-Research-Group/AlloSystem">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>AlloSphere Core C/C++ Libraries</h1>
+
+<p>AlloSphere Research Group
+University of California, Santa Barbara</p>
+
+<h1></h1>
+
+<h2>1. About</h2>
+
+<h1></h1>
+
+<p>The AlloCore is a cross-platform suite of C++ components for building interactive multimedia tools and applications.</p>
+
+<hr><h3>1.1 Directory Structure</h3>
+
+<hr><p>The project root is organized into the following main directories:</p>
+
+<pre><code>include/    - AlloCore header files organized by module name
+src/        - AlloCore source files (.c, .cpp)
+
+external/   - optional external libraries included for convenience
+
+linux/      - Linux specific project files and dependent libraries
+osx/        - Mac OSX specific project files and dependent libraries
+share/      - resource files for testing and demonstration purposes
+
+examples/   - example projects using library
+unitTests/  - unit tests for library
+
+build/      - default build folder, constructed on first use
+</code></pre>
+
+<p>The build folder (typically ./build/) is organized using a Unix-style hierarchy as follows:</p>
+
+<pre><code>bin/        - binary executables
+include/    - library header files
+lib/        - libraries
+obj/        - built object files
+</code></pre>
+
+<h1></h1>
+
+<h2>2. Compilation Instructions</h2>
+
+<h1></h1>
+
+<hr><h3>2.1 Installing Dependencies</h3>
+
+<hr><p>Run the script:</p>
+
+<pre><code>./allocore/install_dependencies.sh
+</code></pre>
+
+<p>which will download and install all the Allocore dependencies using apt-get, macports or homebrew.</p>
+
+<hr><h3>2.2 Building a Library</h3>
+
+<hr><p>........................................
+Make (Linux, OS X)
+........................................</p>
+
+<p>The following variables can be modified to customize where built files are placed:</p>
+
+<pre><code>BUILD_DIR       - location to build files into (default = ./build)
+DESTDIR         - location to install built files into (default = /usr/local/)
+</code></pre>
+
+<p>The following rules are available (to be run from the root directory):</p>
+
+<pre><code>make allocore       - build allocore library
+make allojit        - build allocore JIT extension (optional)
+make alloutil       - build allocore utilities extension
+make gamma      - build Gamma external library
+make glv        - build GLV external library
+
+make install        - installs built components
+make clean      - removes binaries from build folder
+
+make examples/x.cpp - builds and runs example source file x.cpp (see section 3 below)
+
+make test       - build and run unit tests
+</code></pre>
+
+<h1></h1>
+
+<h2>3. Program Execution Using Make</h2>
+
+<h1></h1>
+
+<hr><h3>3.1 Automatic "Build and Run"</h3>
+
+<hr><p>The AlloCore Make system permits one to build and automatically run source files with a main() function defined. This is not meant to replace a full-fledged IDE for building complex projects, but rather to serve as a quick way to prototype ideas. By default, any source files located in ./examples or any subfolder thereof, can be built and run using the command</p>
+
+<pre><code>make examples/mymain.cpp
+</code></pre>
+
+<p>and will be linked against Allocore and its dependencies. If you are having trouble using tab autocompletion after the 'make' command, then it is likely that a completion rule has been defined elsewhere for make. You can disable this by adding to the bottom of your ~/.bashrc file</p>
+
+<pre><code>complete -r make
+</code></pre>
+
+<p>which will restore the default autocompletion using the file system. If you just want to build and executable without running it, then include AUTORUN=0 with the make command.</p>
+
+<hr><h3>3.2 User-defined Options</h3>
+
+<hr><p>The following additional capabilities are possible and must be configured manually.</p>
+
+<ol>
+<li>
+<p>Definition of custom build paths.
+Sometimes it is handy to build and run sources files from custom directories as well as include one's own "library" code that is linked with all build-and-run executables. To configure these create a file "Makefile.user" in ./ and add the following variables:</p>
+
+<p>RUN_DIRS    = directory1 directory2 ...
+RUN_SRC_DIRS    = directoryA directoryB ...</p>
+</li>
+</ol><p>RUN_DIRS is a list of directories that Make searches recursively for build-and-run source files.
+The directory ./examples is automatically added to this list.</p>
+
+<p>RUN_SRC_DIRS is a list of directories that contain source code for objects files that are to be linked with all build-and-run sources. The sources in RUN_SRC_DIRS can be thought of as your own library source code.</p>
+
+<ol>
+<li>
+<p>Definition of custom build flags.
+In the same directory as the build-and-run source file add a file called "flags.txt" which contains valid flags for the compiler. For example, if you need to link to libfoo.so located in /usr/local/lib, your flags.txt will contain something like:</p>
+
+<p>-I/usr/local/include -L/usr/local/lib -lfoo</p>
+</li>
+</ol>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/AlloSphere-Research-Group">AlloSphere-Research-Group</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
