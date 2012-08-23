@@ -1,12 +1,16 @@
 #include <stdio.h>
+#include "allocore/system/al_Config.h"
 #include "allocore/system/al_Thread.hpp"
 
-#define USE_PTHREAD		(defined (__APPLE__) || defined (OSX) || defined (__LINUX__) || defined (__UNIX__))
-#define USE_THREADEX	(defined(WIN32))
+#ifdef AL_WINDOWS
+	#define USE_THREADEX
+#else
+	#define USE_PTHREAD
+#endif
 
 namespace al {
 
-#if USE_PTHREAD
+#ifdef USE_PTHREAD
 #include <pthread.h>
 
 //typedef pthread_t ThreadHandle;
@@ -87,8 +91,9 @@ void * Thread::current(){
 }
 
 
-#elif USE_THREADEX
+#elif defined(USE_THREADEX)
 
+#define WIN32_MEAN_AND_LEAN
 #include <windows.h>
 #include <process.h>
 
@@ -132,10 +137,10 @@ struct Thread::Impl{
 	unsigned long mHandle;
 //	ThreadFunction mRoutine;
 
-	static unsigned _stdcall * cThreadFunc(void * user){
+	static unsigned _stdcall cThreadFunc(void * user){
 		ThreadFunction& tfunc = *((ThreadFunction*)user);
 		tfunc();
-		return NULL;
+		return 0;
 	}
 };
 

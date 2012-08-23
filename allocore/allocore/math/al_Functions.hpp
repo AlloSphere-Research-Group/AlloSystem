@@ -44,6 +44,7 @@
 */
 
 #include <cmath>
+#include <float.h>
 #include <math.h>
 #include <stdlib.h>
 #include "allocore/system/al_Config.h"
@@ -52,12 +53,6 @@
 
 // Undefine these macros if found (in windows.h) in favor of proper functions
 // defined in this file.
-#ifdef max
-#undef max
-#endif
-#ifdef min
-#undef min
-#endif
 #ifdef sinc
 #undef sinc
 #endif
@@ -725,7 +720,8 @@ TEM inline T min(const T& v1, const T& v2){ return v1<v2?v1:v2; }
 TEM inline T min(const T& v1, const T& v2, const T& v3){ return al::min(al::min(v1,v2),v3); }
 
 TEM inline T nextAfter(const T& x, const T& y){ return x<y ? x+1 : x-1; }
-template<> inline float nextAfter(const float& x, const float& y){ return nextafterf(x,y); }
+//template<> inline float nextAfter(const float& x, const float& y){ return nextafterf(x,y); }
+template<> inline float nextAfter(const float& x, const float& y){ return x > y ? x - FLT_EPSILON : x + FLT_EPSILON; }
 template<> inline double nextAfter(const double& x, const double& y){ return nextafter(x,y); }
 template<> inline long double nextAfter(const long double& x, const long double& y){ return nextafterl(x,y); }
 

@@ -61,13 +61,15 @@
 			This code is public domain.
 */
 
+#include "allocore/system/al_Config.h"
+#ifdef AL_WINDOWS
+	#include <tr1/unordered_map>
+	//#include <unordered_map>
+#else
+	#include <tr1/unordered_map>
+#endif
 #include <map>
 #include <vector>
-#if defined(WIN32) || defined(__WINDOWS_MM__)
-#include <unordered_map>
-#else
-#include <tr1/unordered_map>
-#endif
 #include "allocore/types/al_Buffer.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
 
@@ -235,7 +237,11 @@ protected:
 	//	size_t operator()(int v) const { return v*2654435761UL; }
 	};
 
+	//#ifdef AL_WINDOWS
+	//typedef std::unordered_map<int, int, IsosurfaceHashInt> EdgeToVertex;
+	//#else
 	typedef std::tr1::unordered_map<int, int, IsosurfaceHashInt> EdgeToVertex;
+	//#endif
 //	typedef std::tr1::unordered_map<int, VertexData, IsosurfaceHashInt> EdgeToVertex;
 //	typedef std::hash_map<int, VertexData, IsosurfaceHashInt> EdgeToVertex;
 //	typedef std::map<int, VertexData> EdgeToVertex;

@@ -119,21 +119,28 @@ inline char intensityToASCII(float v){
 #define DEF_PRINT(T, code)\
 template<>\
 inline void print<T>(const T * arr, int size, const char * append){\
-	for(int i=0; i<size; ++i){ printf(code" ", arr[i]); } if(append[0]) printf("%s", append);\
+	for(int i=0; i<size; ++i){ printf(code " ", arr[i]); } if(append[0]) printf("%s", append);\
 }
 
 DEF_PRINT(float, "%g")
 DEF_PRINT(double, "%g")
 DEF_PRINT(char, "%d")
-DEF_PRINT(unsigned char, "%d")
+DEF_PRINT(unsigned char, "%u")
 DEF_PRINT(short, "%d")
-DEF_PRINT(unsigned short, "%d")
+DEF_PRINT(unsigned short, "%u")
 DEF_PRINT(int, "%d")
-DEF_PRINT(unsigned int, "%d")
+DEF_PRINT(unsigned int, "%u")
 DEF_PRINT(long, "%ld")
-DEF_PRINT(unsigned long, "%ld")
+DEF_PRINT(unsigned long, "%lu")
+#ifdef AL_WINDOWS
+DEF_PRINT(long long, "%I64i")
+DEF_PRINT(unsigned long long, "%I64u")
+#else
 DEF_PRINT(long long, "%lld")
-DEF_PRINT(unsigned long long, "%lld")
+DEF_PRINT(unsigned long long, "%llu")
+#endif
+//DEF_PRINT(long long, "%" PRIi64)
+//DEF_PRINT(unsigned long long, "%" PRIu64)
 
 #undef DEF_PRINT
 
