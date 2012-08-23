@@ -47,6 +47,8 @@ static const char * predistortVS = AL_STRINGIFY(
 		
 		// take into account the aspect ratio of the viewport:
 		uv.x /= aspect;
+		
+		// todo: take into account projection field of view (lens angle)
 	
 		// depth value should relate to the length of vertex_in_sphere
 		// but sign of depth depends on whether the vertex is in front or behind the projection plane
@@ -57,48 +59,6 @@ static const char * predistortVS = AL_STRINGIFY(
 
 		// assign to output
 		return vec4(uv, z, 1);		
-		
-		
-		
-		
-		
-		// create translation matrix to position vertex in projector's coordinate frame:
-//		mat4 transmat = mat4(
-//			1.,  0., 	0., 	0.,
-//			0., 	1.,  0.,	0.,
-//			0., 	0., 	1.,	0.,
-//			-projcoord,	1.
-//		);
-
-		// create rotation matrix to rotate vertex into projector's coordinate frame:
-//		mat4 projmat = mat4(
-//			x_unit.x, 	y_unit.x, 	z_unit.x, 0.,
-//			x_unit.y, 	y_unit.y, 	z_unit.y,	 0.,
-//			x_unit.z, 	y_unit.z, 	z_unit.z,	 0.,
-//			0.,			0.,			0.,		1.
-//		);
-		
-//		// create GLSL projection matrix (for 90 degree fovy):
-//		mat4 perspmat = mat4(
-//			1./aspect,	0., 0.,						0.,
-//			0.,			1.,	0.,						0.,
-//			0.,			0., (far+near)/(near-far),		-1.,
-//			0.,			0., (2.*far*near)/(near-far),	0.
-//		);
-//		
-//		float d = length(vertex);
-//		
-//		// sign of depth depends on whether the vertex is in front or behind the projection plane
-//		distance *= sign(vertex_in_projector.z);
-//		
-//		float scale = 2.;
-//		
-//		vec4 warped = vec4(
-//			vertex_in_projector.x * scale / aspect,
-//			vertex_in_projector.y * scale,
-//			d * (far+near)/(near-far) + (2.*far*near)/(near-far),
-//			-d
-//		);
 	}
 
 	void main() {
@@ -106,20 +66,14 @@ static const char * predistortVS = AL_STRINGIFY(
 		// input point in eyespace:
 		vec4 vertex = gl_ModelViewMatrix * gl_Vertex;
 
-		// get warp matrix:
-		//mat4 warpmat = warp(projcoord, x_unit, y_unit, normal_unit, aspect, near, far);
-		
-		
-		
 		// apply warp:
 		vec4 warped = warp(vertex.xyz, projcoord, x_unit, y_unit, normal_unit, aspect, near, far);
-
-		// normalize [-1,1] to [0,1]
-		C = warped.www * 0.5 + 0.5;
 		
-		
-		gl_Position = gl_ProjectionMatrix * vertex;
 		gl_Position = warped;
+		
+		
+		// debug coloring
+		C = abs(vertex);
 	}
 );
 static const char * predistortFS = AL_STRINGIFY(
