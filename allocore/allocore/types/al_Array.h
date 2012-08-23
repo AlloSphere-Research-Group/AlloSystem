@@ -46,6 +46,7 @@
 #define INCLUDE_ALLO_ARRAY_H 1
 
 #include "allocore/system/al_Config.h"
+#include <limits.h> // ULONG_MAX
 #include <string.h>
 #include <stdlib.h>
 
