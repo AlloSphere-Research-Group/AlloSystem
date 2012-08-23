@@ -95,12 +95,14 @@
 /* 
 	primitive typedefs
 */
-#if defined(AL_LINUX) || defined(AL_OSX)
-	#include "allocore/system/pstdint.h"
-
-#else
+#ifdef AL_WINDOWS
 	#include <stdint.h>
+	#define AL_PRINTF_LL "I64"
+#else
+	#include "allocore/system/pstdint.h"
+	#define AL_PRINTF_LL "ll"
 #endif
+
 	
 typedef long long int al_nsec;				/**< nanoseconds type (accurate to +/- 292.5 years) */
 typedef double al_sec;						/**< seconds type */
@@ -108,11 +110,11 @@ typedef double al_sec;						/**< seconds type */
 #define AL_STRINGIFY(...) #__VA_ARGS__
 #define AL_DEBUGLN printf("In %s: line %d\n", __FILE__, __LINE__);
 
-#if !defined(AL_MIN)
+#ifndef AL_MIN
 	#define AL_MIN(A,B)	({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __a : __b; })
 #endif
 
-#if !defined(AL_MAX)
+#ifndef AL_MAX
 	#define AL_MAX(A,B)	({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __b : __a; })
 #endif
 

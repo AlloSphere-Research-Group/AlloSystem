@@ -132,16 +132,9 @@ DEF_PRINT(int, "%d")
 DEF_PRINT(unsigned int, "%u")
 DEF_PRINT(long, "%ld")
 DEF_PRINT(unsigned long, "%lu")
-#ifdef AL_WINDOWS
-DEF_PRINT(long long, "%I64i")
-DEF_PRINT(unsigned long long, "%I64u")
-#else
-DEF_PRINT(long long, "%lld")
-DEF_PRINT(unsigned long long, "%llu")
-#endif
-//DEF_PRINT(long long, "%" PRIi64)
-//DEF_PRINT(unsigned long long, "%" PRIu64)
-
+DEF_PRINT(long long, "%" AL_PRINTF_LL "d")
+DEF_PRINT(unsigned long long, "%" AL_PRINTF_LL "u")
+	
 #undef DEF_PRINT
 
 template<class T> void print2D(const T* pix, int nx, int ny, FILE * fp){
