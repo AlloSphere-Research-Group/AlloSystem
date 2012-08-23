@@ -51,21 +51,42 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include "allocore/system/pstdint.h"
-
 #define AL_SYSTEM_LIB_VERSION 0.01
 
 #if defined(WIN32) || defined(__WINDOWS_MM__) || defined(WIN64)
 	#define AL_WINDOWS 1
+	#define WIN32_LEAN_AND_MEAN
+	#define VC_EXTRALEAN
 	#include <windows.h>
+
+	// undefine macros of common words
+	#ifdef DELETE
+	#undef DELETE
+	#endif
+	#ifdef max
+	#undef max
+	#endif
+	#ifdef min
+	#undef min
+	#endif
+	// windef.h defines these for backwards compatability with 16-bit compilers
+	#ifdef near
+	#undef near
+	#endif
+	#ifdef far
+	#undef far
+	#endif
+	
 	#ifdef AL_EXPORTS
 		#define AL_API __declspec(dllexport)
 	#else
 		#define AL_API __declspec(dllimport)
 	#endif
+
 #elif defined( __APPLE__ ) && defined( __MACH__ )
 	#define AL_OSX 1
 	#define AL_API extern
+
 #else
 	#define AL_LINUX 1
 	#define AL_API extern
@@ -74,6 +95,13 @@
 /* 
 	primitive typedefs
 */
+#if defined(AL_LINUX) || defined(AL_OSX)
+	#include "allocore/system/pstdint.h"
+
+#else
+	#include <stdint.h>
+#endif
+	
 typedef long long int al_nsec;				/**< nanoseconds type (accurate to +/- 292.5 years) */
 typedef double al_sec;						/**< seconds type */
 
