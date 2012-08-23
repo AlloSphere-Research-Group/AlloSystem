@@ -42,7 +42,7 @@
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
-#include "allocore/system/pstdint.h"
+#include "allocore/system/al_Config.h"
 
 namespace al{
 
@@ -348,6 +348,9 @@ struct HSV{
 
 /// This offers an alternative to the Color class where the alpha component
 /// is not required for computation.
+#ifdef RGB	/* Windows related fix */
+#undef RGB
+#endif
 struct RGB{
 	union{
 		struct{
