@@ -50,7 +50,17 @@ extern "C" void al_main_native_enter(al_sec interval);
 		printf("Linux native loop not yet implemented\n");
 	}
 	extern "C" void al_main_native_init() {}
+
+#elif defined AL_WINDOWS
+	extern "C" void al_main_native_attach(al_sec interval) {
+		printf("Win32 native loop not yet implemented\n");
+	}
+	extern "C" void al_main_native_enter(al_sec interval) {
+		printf("Win32 native loop not yet implemented\n");
+	}
+	extern "C" void al_main_native_init() {}
 #endif
+
 
 namespace al {
 
