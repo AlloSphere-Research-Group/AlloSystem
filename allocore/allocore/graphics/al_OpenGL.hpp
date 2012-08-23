@@ -44,7 +44,7 @@
 
 #include "allocore/system/al_Config.h"
 
-#if defined(AL_OSX)
+#if defined AL_OSX 
 	#define AL_GRAPHICS_USE_OPENGL	
 	#include <OpenGL/OpenGL.h>
 	#include <OpenGL/gl.h>
@@ -55,10 +55,10 @@
 		{	GLint MacHackVBL = 1;\
 			CGLContextObj ctx = CGLGetCurrentContext();\
 			CGLSetParameter(ctx,  kCGLCPSwapInterval, &MacHackVBL); }
-			
-#elif defined(AL_LINUX)
+
+#elif defined AL_LINUX 
 	#define AL_GRAPHICS_USE_OPENGL
-	#include <GL/glew.h>
+	#include <GL/glew.h> // needed for certain parts of OpenGL API
 	#include <GL/gl.h>
 	#include <GL/glext.h>
 	#include <GL/glu.h>
@@ -70,17 +70,22 @@
   				fprintf(stderr, "GLEW Init Error: %s\n", glewGetErrorString(err));\
 			}\
 		}
-#elif defined(AL_WINDOWS)
+#elif defined AL_WINDOWS
 	#define AL_GRAPHICS_USE_OPENGL
-	
-	#include <windows.h>
-	#include <gl/gl.h>
-	#include <gl/glu.h>
+	#include <GL/glew.h> // needed for certain parts of OpenGL API
+	#include <GL/gl.h>
+	#include <GL/glu.h>
 	#pragma comment( lib, "winmm.lib")
 	#pragma comment( lib, "opengl32.lib" )
-	#pragma comment( lib, "glu32.lib" )	
-	#define AL_GRAPHICS_INIT_CONTEXT
-	
+	#pragma comment( lib, "glu32.lib" )
+	#define AL_GRAPHICS_INIT_CONTEXT\
+		{	GLenum err = glewInit();\
+			if (GLEW_OK != err){\
+  				/* Problem: glewInit failed, something is seriously wrong. */\
+  				fprintf(stderr, "GLEW Init Error: %s\n", glewGetErrorString(err));\
+			}\
+		}
+
 #else
 	#ifdef __IPHONE_2_0
 		#define AL_GRAPHICS_USE_OPENGLES1
