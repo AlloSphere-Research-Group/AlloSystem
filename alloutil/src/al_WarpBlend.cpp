@@ -49,14 +49,21 @@ static const char * predistortVS = AL_STRINGIFY(
 		uv.x /= aspect;
 		
 		// todo: take into account projection field of view (lens angle)
+		float scalar = 3.;
+		uv *= scalar;
 	
 		// depth value should relate to the length of vertex_in_sphere
 		// but sign of depth depends on whether the vertex is in front or behind the projection plane
 		float depth = -distance * sign(vertex_in_projector.z);
 		
-		// scale z to the near/far planes:
-		float z = (-2.*depth - far+near) / (far-near);
-
+		// scale z to the near/far planes for depth-testing / clipping
+		// not sure whether ortho, perspective or some other mapping makes more sense
+		// ortho-style depth:
+		//float z = (-2.*depth - far+near) / (far-near);
+		// perspective-style depth (divided by -depth for the perspective)
+		float z = ((2./depth)*far*near + far+near)/(far-near); 
+		
+		
 		// assign to output
 		return vec4(uv, z, 1);		
 	}
@@ -73,7 +80,7 @@ static const char * predistortVS = AL_STRINGIFY(
 		
 		
 		// debug coloring
-		C = abs(vertex);
+		C = abs(vertex.xyz);
 	}
 );
 static const char * predistortFS = AL_STRINGIFY(
