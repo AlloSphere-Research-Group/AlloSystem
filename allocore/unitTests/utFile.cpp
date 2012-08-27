@@ -3,7 +3,8 @@
 int utFile() {
 
 	// static functions
-	assert(File::exists("./"));
+	assert(File::exists("."));
+	//assert(File::exists("." AL_FILE_DELIMITER_STR)); // fails under win32
 
 	// simple file/directory searching
 	{
@@ -26,7 +27,7 @@ int utFile() {
 
 	{
 		const char * path = "utFile.txt";
-		const char * text = "This is a test of AlloCore file i/o functionality.\nYou can safely delete this file.";
+		const char * text = "This is a test of AlloCore file i/o functionality. You can safely delete this file.";
 
 		// write data
 		File f(path, "w");

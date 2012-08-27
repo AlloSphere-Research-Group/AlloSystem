@@ -119,22 +119,22 @@ inline char intensityToASCII(float v){
 #define DEF_PRINT(T, code)\
 template<>\
 inline void print<T>(const T * arr, int size, const char * append){\
-	for(int i=0; i<size; ++i){ printf(code" ", arr[i]); } if(append[0]) printf("%s", append);\
+	for(int i=0; i<size; ++i){ printf(code " ", arr[i]); } if(append[0]) printf("%s", append);\
 }
 
 DEF_PRINT(float, "%g")
 DEF_PRINT(double, "%g")
 DEF_PRINT(char, "%d")
-DEF_PRINT(unsigned char, "%d")
+DEF_PRINT(unsigned char, "%u")
 DEF_PRINT(short, "%d")
-DEF_PRINT(unsigned short, "%d")
+DEF_PRINT(unsigned short, "%u")
 DEF_PRINT(int, "%d")
-DEF_PRINT(unsigned int, "%d")
+DEF_PRINT(unsigned int, "%u")
 DEF_PRINT(long, "%ld")
-DEF_PRINT(unsigned long, "%ld")
-DEF_PRINT(long long, "%lld")
-DEF_PRINT(unsigned long long, "%lld")
-
+DEF_PRINT(unsigned long, "%lu")
+DEF_PRINT(long long, "%" AL_PRINTF_LL "d")
+DEF_PRINT(unsigned long long, "%" AL_PRINTF_LL "u")
+	
 #undef DEF_PRINT
 
 template<class T> void print2D(const T* pix, int nx, int ny, FILE * fp){

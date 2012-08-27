@@ -50,6 +50,8 @@
 #include "allocore/math/al_Generators.hpp"
 
 namespace al {
+
+/// Random number generation utilities
 namespace rnd{
 
 class LinCon;

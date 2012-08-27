@@ -3,15 +3,15 @@
 #=========================================================================
 
 LIB_NAME	= allocoreunittest
+include ../../Makefile.common
+
 INC_DIR		= ./
 SRC_DIR		= ./
 VPATH		= $(SRC_DIR)
-
 SRCS		= $(wildcard $(SRC_DIR)/ut*.cpp)
 OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
 -include ../Makefile.link
-include ../../Makefile.common
 
 CPPFLAGS	+= -I../
 LDFLAGS		:= -L../$(BUILD_DIR)lib -L$(BUILD_DIR)lib $(LDFLAGS) -l$(LIB_NAME)

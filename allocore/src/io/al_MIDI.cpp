@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "allocore/system/al_Config.h"
 #include "allocore/io/al_MIDI.hpp"
 

@@ -45,6 +45,8 @@
 
 
 namespace al {
+
+/// Utilities for interpolation
 namespace ipl{
 
 /// First order allpass interpolation

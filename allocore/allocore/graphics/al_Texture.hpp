@@ -265,9 +265,9 @@ protected:
 		return *this; 
 	}
 
-public: // deprecated
-	Texture& updatePixels();
-	void submit();
+public:
+	Texture& updatePixels(); /// \deprecated use dirty() instead
+	void submit(); /// \deprecated use dirty() instead
 };
 
 

@@ -84,9 +84,9 @@ int utTypes(){
 		const int Nc= 3;
 		const int Ns[] = {1, 4, 5, 6, 7, 64, 128, 129};
 
-		for(unsigned IN=0; IN<sizeof(Ns)/sizeof(*Ns); ++IN){
+		for(unsigned iN=0; iN<sizeof(Ns)/sizeof(*Ns); ++iN){
 
-			int N = Ns[IN]; // number of cells along each dimension
+			int N = Ns[iN]; // number of cells along each dimension
 
 			{	// Constructors
 				{	Array a(Nc, AlloFloat32Ty, N);

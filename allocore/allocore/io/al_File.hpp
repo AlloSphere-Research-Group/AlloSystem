@@ -308,9 +308,15 @@ inline std::string File::conformPath(const std::string& src) {
 }
 
 inline std::string File::absolutePath(const std::string& src) {
+#ifdef AL_WINDOWS
+	char temp[_MAX_PATH];
+	char * result = _fullpath(temp, src.c_str(), sizeof(temp));
+	return result ? result : "";
+#else
 	char temp[PATH_MAX];
 	char * result = realpath(src.c_str(), temp);
 	return result ? result : "";
+#endif
 }
 
 inline std::string File::directory(const std::string& src){

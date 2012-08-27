@@ -54,6 +54,8 @@
 */
 
 namespace al {
+
+/// Classes for generating sequences of numbers
 namespace gen{
 
 // This is needed since templates are not always smart about inheriting super members.

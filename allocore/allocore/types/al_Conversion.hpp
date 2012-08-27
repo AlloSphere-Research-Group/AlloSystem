@@ -60,16 +60,16 @@ namespace al{
 #define UINT64_C(v) v ## ULL
 #endif 
 
-#define CONST(N, vf, vd)\
+#define CONST_(N, vf, vd)\
 	template <class T> struct N;\
 	template<> struct N< float>{ operator uint32_t() const { return UINT32_C(vf); } };\
 	template<> struct N<double>{ operator uint64_t() const { return UINT64_C(vd); } };
 
-	CONST(MaskExpo, 0x7F800000, 0x7FF0000000000000)	// IEEE-754 floating-point exponent bit mask
-	CONST(MaskFrac, 0x007FFFFF, 0x000FFFFFFFFFFFFF) // IEEE-754 floating-point fraction bit mask
-	CONST(MaskSign, 0x80000000, 0x8000000000000000) // IEEE-754 floating-point sign bit mask
-	CONST(Expo1   , 0x3F800000, 0x3FF0000000000000) // IEEE-754 floating-point [1-2) exponent interval
-#undef CONST
+	CONST_(MaskExpo, 0x7F800000, 0x7FF0000000000000) // IEEE-754 floating-point exponent bit mask
+	CONST_(MaskFrac, 0x007FFFFF, 0x000FFFFFFFFFFFFF) // IEEE-754 floating-point fraction bit mask
+	CONST_(MaskSign, 0x80000000, 0x8000000000000000) // IEEE-754 floating-point sign bit mask
+	CONST_(Expo1   , 0x3F800000, 0x3FF0000000000000) // IEEE-754 floating-point [1-2) exponent interval
+#undef CONST_
 
 
 /// Union for twiddling bits of floats

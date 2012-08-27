@@ -52,7 +52,8 @@ etc.												Addtional bundle elements
 
 */
 
-#define OSCTRY(expr) try { \
+#define OSCTRY(expr) \
+	try { \
 		expr \
 	} catch (::osc::Exception& e) { \
 		printf("OSC error: %s\n", e.what()); \
@@ -194,7 +195,8 @@ Message::~Message() {
 
 void Message::print() const {
 	OSCTRY(
-		printf("%s, %s %lld\n", addressPattern().c_str(), typeTags().c_str(), timeTag());
+		printf("%s, %s %" AL_PRINTF_LL "d\n",
+			addressPattern().c_str(), typeTags().c_str(), timeTag());
 		
 		::osc::ReceivedMessageArgumentIterator it = mImpl->ArgumentsBegin();
 		
@@ -204,7 +206,7 @@ void Message::print() const {
 			switch(tag){
 				case 'f': {float v = it->AsFloat(); printf("%g", v);} break;
 				case 'i': {long v = it->AsInt32(); printf("%ld", v);} break;
-				case 'h': {long long v = it->AsInt64(); printf("%lld", v);} break;
+				case 'h': {long long v = it->AsInt64(); printf("%" AL_PRINTF_LL "d", v);} break;
 				case 'c': {char v = it->AsChar(); printf("'%c' (=%3d)", isprint(v) ? v : ' ', v);} break;
 				case 'd': {double v = it->AsDouble(); printf("%g", v);} break;
 				case 's': {const char * v = it->AsString(); printf("%s", v);} break;
