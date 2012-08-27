@@ -15,6 +15,7 @@ static const char * predistortVS = AL_STRINGIFY(
 	uniform vec3 projcoord;						// the projector location
 	uniform vec3 x_unit, y_unit, normal_unit; 	// the projector coordinate frame
 	uniform float aspect, near, far;			// projection rendering parameters
+	uniform float uvscalar;						// tweak factor
 	
 	varying vec3 C; // for debugging
 	
@@ -49,8 +50,7 @@ static const char * predistortVS = AL_STRINGIFY(
 		uv.x /= aspect;
 		
 		// todo: take into account projection field of view (lens angle)
-		float scalar = 3.;
-		uv *= scalar;
+		uv *= uvscalar;
 	
 		// depth value should relate to the length of vertex_in_sphere
 		// but sign of depth depends on whether the vertex is in front or behind the projection plane
@@ -659,7 +659,7 @@ void WarpnBlend::drawWarp3D() {
 	geomP3D.end();
 }
 
-void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect) {
+void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect, double uvscalar) {
 	if (!loaded) return;
 	Graphics gl;
 	
@@ -677,6 +677,7 @@ void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect) {
 	predistortP.uniform("near", 1.f);
 	predistortP.uniform("far", 100.f);
 	predistortP.uniform("aspect", aspect);
+	predistortP.uniform("uvscalar", uvscalar);
 	
 	// draw some stuff:
 	gl.draw(testscene);

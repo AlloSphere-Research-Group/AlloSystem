@@ -48,7 +48,7 @@ public:
 	void drawBlend();
 	void drawDemo(const Pose& pose, double eyesep);
 	
-	void drawPreDistortDemo(const Pose& pose, float aspect);
+	void drawPreDistortDemo(const Pose& pose, float aspect, double uvscalar);
 
 	
 	Projector projector;
