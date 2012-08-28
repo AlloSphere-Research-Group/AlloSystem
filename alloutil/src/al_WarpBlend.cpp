@@ -53,6 +53,8 @@ static const char * predistortVS = AL_STRINGIFY(
 		
 		// todo: take into account projection field of view (lens angle)
 		uv *= uvscalar;
+		
+		uv.y *= -1.; // GL is upside down?
 	
 		// depth value should relate to the length of vertex_in_sphere
 		// but sign of depth depends on whether the vertex is in front or behind the projection plane
@@ -536,7 +538,7 @@ WarpnBlend::WarpnBlend() {
 	pixelMesh.primitive(gl.POINTS);
 	
 	testscene.primitive(gl.LINES);
-	float step = 0.4;
+	float step = 0.2;
 	for (float x=0; x<1; x+=step) {
 	for (float y=0; y<1; y+=step) {
 	for (float z=0; z<1; z+=step) {
