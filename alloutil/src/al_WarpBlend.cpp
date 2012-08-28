@@ -112,7 +112,7 @@ static const char * alphaFS = AL_STRINGIFY(
 	void main(){
 		float a = texture2D(alphaMap, texcoord0).r;
 		//g.y = 1.-g.y;
-		gl_FragColor = vec4(0, 0, 0, a);
+		gl_FragColor = vec4(0, 0, 0, 1.-a);
 	}
 );
 
@@ -708,6 +708,7 @@ void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect, double uvsca
 	if (!loaded) return;
 	Graphics gl;
 	
+	
 	//gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
 	gl.projection(Matrix4d::perspective(72, aspect, 0.1, 100));
 	gl.modelView(Matrix4d::lookAt(pose.pos(), pose.pos() + pose.uf(), pose.uy()));
@@ -744,11 +745,18 @@ void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect, double uvsca
 	gl.modelView(Matrix4d::identity());
 	
 	// now draw the blend mask:
+	gl.blending(true);
+	gl.blendMode(Graphics::SRC_ALPHA, Graphics::ONE_MINUS_SRC_ALPHA, Graphics::FUNC_ADD);
+	gl.depthTesting(false);
+	gl.depthMask(false);
+	
 	alphaP.begin();
 	alphaMap.quad(gl);
 	alphaP.end();
 	
-	
+	gl.blending(false);
+	gl.depthTesting(true);
+	gl.depthMask(true);
 }
 
 //void WarpnBlend::drawInverseWarp3D() {

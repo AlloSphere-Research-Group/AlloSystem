@@ -74,6 +74,8 @@ public:
 	Shader predistortV, predistortF;
 	ShaderProgram demoP;
 	Shader demoV, demoF;
+	Shader alphaV, alphaF; 
+	ShaderProgram alphaP;
 	std::string imgpath;
 	bool loaded;
 };
