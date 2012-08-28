@@ -26,6 +26,9 @@ static const char * predistortVS = AL_STRINGIFY(
 		// translate the vertex into sphere-space:
 		vec3 vertex_in_sphere = vertex - sphere_center;
 		
+		// translate the projector into sphere-space:
+		vec3 projector_pos = projector_position - sphere_center;
+		
 		// depth based on the eye-space length:
 		float distance = length(vertex_in_sphere);
 		
@@ -39,7 +42,7 @@ static const char * predistortVS = AL_STRINGIFY(
 			x_unit.y, 	y_unit.y, 	z_unit.y,
 			x_unit.z, 	y_unit.z, 	z_unit.z
 		);
-		vec3 vertex_in_projector = rotmat * (surface_intersection - projector_position);
+		vec3 vertex_in_projector = rotmat * (surface_intersection - projector_pos);
 		
 		// do perspective division on this vertex
 		// according to the distance from the projector:
