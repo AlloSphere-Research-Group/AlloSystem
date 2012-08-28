@@ -59,16 +59,16 @@ static const char * predistortVS = AL_STRINGIFY(
 		
 		uv.y *= -1.; // GL is upside down
 		
+		// reverse the XY position for points behind
+		uv.xy *= sign(vertex_in_projector.z);
+	
 		// depth value should relate to the length of vertex_in_sphere
 		// but sign of depth depends on whether the vertex is in front or behind the projection plane
-		float depth = -distance;
+		float depth = -distance * sign(vertex_in_projector.z);
 		
 		// scale z to the near/far planes for depth-testing / clipping
 		// perspective-style depth (divided by -depth for the perspective)
 		float z = ((2./depth)*far*near + far+near)/(far-near); 
-		
-		// flip for points behind the projector:
-		uv.xyz *= sign(vertex_in_projector.z);
 		
 		// assign to output
 		return vec4(uv, z, 1);		
