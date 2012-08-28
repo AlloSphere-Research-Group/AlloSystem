@@ -84,7 +84,7 @@ static const char * predistortVS = AL_STRINGIFY(
 		
 		
 		// debug coloring
-		C = abs(gl_Vertex.xyz / 16.);
+		C = abs(gl_Vertex.xyz / 8.);
 	}
 );
 static const char * predistortFS = AL_STRINGIFY(
@@ -538,10 +538,10 @@ WarpnBlend::WarpnBlend() {
 	pixelMesh.primitive(gl.POINTS);
 	
 	testscene.primitive(gl.LINES);
-	float step = 0.2;
-	for (float x=0; x<1; x+=step) {
-	for (float y=0; y<1; y+=step) {
-	for (float z=0; z<1; z+=step) {
+	float step = 0.02;
+	for (int x=0; x<=1; x++) { //x+=step) {
+	for (int y=0; y<=1; y++) { //y+=step) {
+	for (float z=0; z<(1.-step); z+=step) {
 		testscene.color(x, y, z);
 		testscene.vertex(x, y, z);
 		testscene.color(x, y, z+step);
@@ -558,7 +558,7 @@ WarpnBlend::WarpnBlend() {
 		testscene.vertex(z+step, x, y);
 	}}}
 	testscene.translate(-0.5, -0.5, -0.5);
-	testscene.scale(16./step);
+	testscene.scale(8.);
 }
 
 void WarpnBlend::onCreate() {
