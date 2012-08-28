@@ -12,7 +12,7 @@ public:
 	struct Projector {
 		float projnum;			// ID of the projector
 		float width, height;	// width/height in pixels
-		Vec3f projCoord, sphere_center, screen_center, normal_unit, x_vec, y_vec;
+		Vec3f projector_position, sphere_center, screen_center, normal_unit, x_vec, y_vec;
 		
 		// calculated on init
 		float screen_radius;

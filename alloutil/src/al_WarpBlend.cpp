@@ -12,18 +12,17 @@ Graphics gl;
 // this shader performs Kenny's transformation:
 static const char * predistortVS = AL_STRINGIFY(
 
-	uniform vec3 projcoord;						// the projector location
+	uniform vec3 projector_position;						// the projector location
 	uniform vec3 x_unit, y_unit, normal_unit; 	// the projector coordinate frame
 	uniform float aspect, near, far;			// projection rendering parameters
 	uniform float uvscalar;						// tweak factor
+	uniform vec3 sphere_center;
+	uniform float sphere_radius;
 	
 	varying vec3 C; // for debugging
 	
-	vec4 warp(in vec3 vertex, in vec3 projcoord, in vec3 x_unit, in vec3 y_unit, in vec3 z_unit, in float aspect, in float near, in float far) {
+	vec4 warp(in vec3 vertex, in vec3 projector_position, in vec3 x_unit, in vec3 y_unit, in vec3 z_unit, in float aspect, in float near, in float far) {
 	
-		vec3 sphere_center = vec3(0, 0, 0);
-		float sphere_radius = 6.;
-		
 		// translate the vertex into sphere-space:
 		vec3 vertex_in_sphere = vertex - sphere_center;
 		
@@ -40,7 +39,7 @@ static const char * predistortVS = AL_STRINGIFY(
 			x_unit.y, 	y_unit.y, 	z_unit.y,
 			x_unit.z, 	y_unit.z, 	z_unit.z
 		);
-		vec3 vertex_in_projector = rotmat * (surface_intersection - projcoord);
+		vec3 vertex_in_projector = rotmat * (surface_intersection - projector_position);
 		
 		// do perspective division on this vertex
 		// according to the distance from the projector:
@@ -74,7 +73,7 @@ static const char * predistortVS = AL_STRINGIFY(
 		vec4 vertex = gl_ModelViewMatrix * gl_Vertex;
 
 		// apply warp:
-		vec4 warped = warp(vertex.xyz, projcoord, x_unit, y_unit, normal_unit, aspect, near, far);
+		vec4 warped = warp(vertex.xyz, projector_position, x_unit, y_unit, normal_unit, aspect, near, far);
 		
 		gl_Position = warped;
 		
@@ -496,7 +495,7 @@ static const char * warpFS = AL_STRINGIFY(
 
 void WarpnBlend::Projector::print() {
 	printf("Projector %d width %d height %d\n", (int)projnum, (int)width, (int)height);
-	projcoord.print(); printf(" = projCoord\n");
+	projector_position.print(); printf(" = projector_position\n");
 	sphere_center.print(); printf(" = sphere_center\n");
 	screen_center.print(); printf(" = screen_center\n");
 	normal_unit.print(); printf(" = normal_unit\n");
@@ -512,19 +511,19 @@ void WarpnBlend::Projector::init() {
 	screen_radius = screen_center.mag();
 	screen_center_unit = screen_center / screen_radius;
 	
-	float screen_perpendicular_dist = normal_unit.dot(sphere_center + screen_center - projCoord);
-	Vec3f compensated_center = (sphere_center + screen_center - projCoord) / screen_perpendicular_dist + projCoord;
+	float screen_perpendicular_dist = normal_unit.dot(sphere_center + screen_center - projector_position);
+	Vec3f compensated_center = (sphere_center + screen_center - projector_position) / screen_perpendicular_dist + projector_position;
 	
 	// calculate uv parameters
 	float x_dist = x_vec.mag();
 	x_unit = x_vec / x_dist;
 	x_pixel = x_dist / width;
-	x_offset = x_unit.dot(compensated_center - projCoord);
+	x_offset = x_unit.dot(compensated_center - projector_position);
 	
 	float y_dist = y_vec.mag();
 	y_unit = y_vec / y_dist;
 	y_pixel = y_dist / height;
-	y_offset = y_unit.dot(compensated_center - projCoord);
+	y_offset = y_unit.dot(compensated_center - projector_position);
 }	
 
 WarpnBlend::WarpnBlend() {
@@ -677,8 +676,8 @@ void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect, double uvsca
 	
 	
 	predistortP.begin();
-	predistortP.uniform("projcoord", projector.projcoord);
-	//predistortP.uniform("projcoord", Vec3f(0.5, 0.5, 0.5));
+	predistortP.uniform("projector_position", projector.projector_position);
+	//predistortP.uniform("projector_position", Vec3f(0.5, 0.5, 0.5));
 	predistortP.uniform("normal_unit", projector.normal_unit);
 	predistortP.uniform("x_unit", projector.x_unit);
 	predistortP.uniform("y_unit", projector.y_unit);
@@ -686,6 +685,9 @@ void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect, double uvsca
 	predistortP.uniform("far", 100.f);
 	predistortP.uniform("aspect", aspect);
 	predistortP.uniform("uvscalar", uvscalar);
+	predistortP.uniform("sphere_center", projector.sphere_center);
+	predistortP.uniform("sphere_radius", projector.sphere_radius);
+	
 	
 	// draw some stuff:
 	gl.draw(testscene);
