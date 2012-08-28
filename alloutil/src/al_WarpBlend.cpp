@@ -68,8 +68,9 @@ static const char * predistortVS = AL_STRINGIFY(
 		// ortho-style depth:
 		//float z = (-2.*depth - far+near) / (far-near);
 		// perspective-style depth (divided by -depth for the perspective)
-		//float z = ((2./depth)*far*near + far+near)/(far-near); 
-		float z = (distance-near)/(far-near);
+		float z = ((2./depth)*far*near + far+near)/(far-near); 
+		// naive depth:
+		//float z = (distance-near)/(far-near);
 		
 		// assign to output
 		return vec4(uv, z, 1);		
