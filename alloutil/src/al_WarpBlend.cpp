@@ -14,6 +14,7 @@ static const char * predistortVS = AL_STRINGIFY(
 
 	uniform vec3 projector_position;						// the projector location
 	uniform vec3 x_unit, y_unit, normal_unit; 	// the projector coordinate frame
+	uniform vec3 x_vec, y_vec; 	// the projector coordinate frame
 	uniform float aspect, near, far;			// projection rendering parameters
 	uniform float uvscalar;						// tweak factor
 	uniform vec3 sphere_center;
@@ -48,11 +49,9 @@ static const char * predistortVS = AL_STRINGIFY(
 		// according to the distance from the projector:
 		vec2 uv = vertex_in_projector.xy / vertex_in_projector.z;
 		
-		// take into account the aspect ratio of the viewport:
-		uv.x /= aspect;
-		
-		// todo: take into account projection field of view (lens angle)
-		uv *= uvscalar;
+		// take into account the field of view:
+		uv.x /= length(x_vec)/2.;
+		uv.y /= length(y_vec)/2.;
 		
 		uv.y *= -1.; // GL is upside down?
 	
@@ -686,10 +685,12 @@ void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect, double uvsca
 	predistortP.uniform("normal_unit", projector.normal_unit);
 	predistortP.uniform("x_unit", projector.x_unit);
 	predistortP.uniform("y_unit", projector.y_unit);
+	predistortP.uniform("x_vec", projector.x_vec);
+	predistortP.uniform("y_vec", projector.y_vec);
 	predistortP.uniform("near", 1.f);
 	predistortP.uniform("far", 100.f);
 	predistortP.uniform("aspect", aspect);
-	predistortP.uniform("uvscalar", uvscalar);
+	//predistortP.uniform("uvscalar", uvscalar);
 	predistortP.uniform("sphere_center", projector.sphere_center);
 	predistortP.uniform("sphere_radius", projector.screen_radius);
 	//predistortP.uniform("alphaMap", 1);
