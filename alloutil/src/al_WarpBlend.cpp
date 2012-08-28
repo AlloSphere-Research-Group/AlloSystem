@@ -98,6 +98,25 @@ static const char * predistortFS = AL_STRINGIFY(
 );
 
 // this shader is just to show the geometry map:
+static const char * alphaVS = AL_STRINGIFY(
+	varying vec2 texcoord0;
+	void main(){
+		texcoord0 = vec2(gl_MultiTexCoord0);
+		vec4 vertex = gl_Vertex;
+		gl_Position = gl_ModelViewProjectionMatrix * vertex;
+	}
+);
+static const char * alphaFS = AL_STRINGIFY(
+	uniform sampler2D alphaMap;
+	varying vec2 texcoord0;
+	void main(){
+		float a = texture2D(alphaMap, texcoord0).r;
+		//g.y = 1.-g.y;
+		gl_FragColor = vec4(0, 0, 0, a);
+	}
+);
+
+// this shader is just to show the geometry map:
 static const char * geomVS = AL_STRINGIFY(
 	varying vec2 texcoord0;
 	void main(){
@@ -593,6 +612,14 @@ void WarpnBlend::onCreate() {
 	geomFI3D.printLog();
 	geomPI3D.printLog();
 	
+	alphaV.source(alphaVS, Shader::VERTEX).compile();
+	alphaF.source(alphaFS, Shader::FRAGMENT).compile();
+	alphaP.attach(alphaV).attach(alphaF).link();
+	
+	alphaV.printLog();
+	alphaF.printLog();
+	alphaP.printLog();
+	
 	demoV.source(demoVS, Shader::VERTEX).compile();
 	demoF.source(demoFS, Shader::FRAGMENT).compile();
 	demoP.attach(demoV).attach(demoF).link();
@@ -712,6 +739,16 @@ void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect, double uvsca
 	//alphaMap.unbind(1);
 	
 	predistortP.end();
+	
+	gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
+	gl.modelView(Matrix4d::identity());
+	
+	// now draw the blend mask:
+	alphaP.begin();
+	alphaMap.quad(gl);
+	alphaP.end();
+	
+	
 }
 
 //void WarpnBlend::drawInverseWarp3D() {
