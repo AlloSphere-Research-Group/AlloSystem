@@ -27,7 +27,7 @@ static const char * predistortVS = AL_STRINGIFY(
 		vec3 vertex_in_sphere = vertex - sphere_center;
 		
 		// translate the projector into sphere-space:
-		vec3 projector_pos = projector_position - sphere_center;
+		vec3 projector_in_sphere = projector_position - sphere_center;
 		
 		// depth based on the eye-space length:
 		float distance = length(vertex_in_sphere);
@@ -42,7 +42,7 @@ static const char * predistortVS = AL_STRINGIFY(
 			x_unit.y, 	y_unit.y, 	z_unit.y,
 			x_unit.z, 	y_unit.z, 	z_unit.z
 		);
-		vec3 vertex_in_projector = rotmat * (surface_intersection - projector_pos);
+		vec3 vertex_in_projector = rotmat * (surface_intersection - projector_in_sphere);
 		
 		// do perspective division on this vertex
 		// according to the distance from the projector:
@@ -508,6 +508,7 @@ void WarpnBlend::Projector::print() {
 	y_vec.print(); printf(" = y_vec\n");
 	x_unit.print(); printf(" = x_unit\n");
 	y_unit.print(); printf(" = y_unit\n");
+	printf("%f = screen_radius\n", screen_radius);
 }	
 
 void WarpnBlend::Projector::init() {
