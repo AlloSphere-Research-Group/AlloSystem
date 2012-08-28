@@ -84,7 +84,7 @@ static const char * predistortVS = AL_STRINGIFY(
 		
 		
 		// debug coloring
-		C = abs(gl_Vertex.xyz / 8.);
+		C = gl_Color.rgb; //abs(gl_Vertex.xyz / 8.);
 	}
 );
 static const char * predistortFS = AL_STRINGIFY(
