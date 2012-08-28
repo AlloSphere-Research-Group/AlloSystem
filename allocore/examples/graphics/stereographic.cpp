@@ -67,10 +67,11 @@ int main(){
 			mesh.vertex(x+rnd::uniformS(tri_size), y+rnd::uniformS(tri_size), z+rnd::uniformS(tri_size));
 		}
 	}
-
-	win.create(Window::Dim(100, 0, 640, 480), "Stereographic Example", 60);
 	
-	win.displayMode(win.displayMode() | Window::STEREO_BUF);
+	win.create(Window::Dim(100, 0, 640, 480), "Stereographic Example", 60, Window::DEFAULT_BUF | Window::STEREO_BUF);
+
+	//win.create(Window::Dim(100, 0, 640, 480), "Stereographic Example", 60);
+	//win.displayMode(win.displayMode() | Window::STEREO_BUF);
 
 	win.append(*new StandardWindowKeyControls);
 	win.append(*new NavInputControl(nav));

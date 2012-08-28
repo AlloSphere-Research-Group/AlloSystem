@@ -176,7 +176,13 @@ public:
 	void setGeometryOutputPrimitive(Graphics::Primitive prim) { mOutPrim = prim; }
 	void setGeometryOutputVertices(unsigned int i) { mOutVertices = i; }
 
-	const ShaderProgram& link(bool validate=true) const;
+	// If dovalidate == true, immediately calls validate() 
+	// you might not want to do this if you need to set uniforms before validating
+	// e.g. when using different texture sampler types in the same shader
+	const ShaderProgram& link(bool dovalidate=true) const;
+	// check if compilation/linking was successful (prints an error on failure)
+	const ShaderProgram& validate_linker() const;
+	
 	const ShaderProgram& use();
 
 	/// Get whether program is active
