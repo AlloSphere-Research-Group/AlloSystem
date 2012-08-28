@@ -14,11 +14,11 @@ static const char * predistortVS = AL_STRINGIFY(
 
 	uniform vec3 projector_position;						// the projector location
 	uniform vec3 x_unit, y_unit, normal_unit; 	// the projector coordinate frame
-	uniform vec3 x_vec, y_vec; 	// the projector coordinate frame
 	uniform float aspect, near, far;			// projection rendering parameters
 	uniform float uvscalar;						// tweak factor
 	uniform vec3 sphere_center;
 	uniform float sphere_radius;
+	uniform float x_scale, y_scale, x_shift, y_shift;
 	
 	varying vec3 C; // for debugging
 	
@@ -50,8 +50,12 @@ static const char * predistortVS = AL_STRINGIFY(
 		vec2 uv = vertex_in_projector.xy / vertex_in_projector.z;
 		
 		// take into account the field of view:
-		uv.x /= length(x_vec)/2.;
-		uv.y /= length(y_vec)/2.;
+		uv.x *= x_scale;
+		uv.y *= y_scale;
+		
+		// adjust for projector lens shift
+		uv.x -= x_shift;
+		uv.y -= y_shift;
 		
 		uv.y *= -1.; // GL is upside down
 	
@@ -64,8 +68,8 @@ static const char * predistortVS = AL_STRINGIFY(
 		// ortho-style depth:
 		//float z = (-2.*depth - far+near) / (far-near);
 		// perspective-style depth (divided by -depth for the perspective)
-		float z = ((2./depth)*far*near + far+near)/(far-near); 
-		
+		//float z = ((2./depth)*far*near + far+near)/(far-near); 
+		float z = (distance-near)/(far-near);
 		
 		// assign to output
 		return vec4(uv, z, 1);		
@@ -508,6 +512,8 @@ void WarpnBlend::Projector::print() {
 	x_unit.print(); printf(" = x_unit\n");
 	y_unit.print(); printf(" = y_unit\n");
 	printf("%f = screen_radius\n", screen_radius);
+	printf("%f = x_pixel\n", x_pixel);
+	printf("%f = y_pixel\n", y_pixel);
 }	
 
 void WarpnBlend::Projector::init() {
@@ -515,8 +521,10 @@ void WarpnBlend::Projector::init() {
 	screen_radius = screen_center.mag();
 	screen_center_unit = screen_center / screen_radius;
 	
-	float screen_perpendicular_dist = normal_unit.dot(sphere_center + screen_center - projector_position);
-	Vec3f compensated_center = (sphere_center + screen_center - projector_position) / screen_perpendicular_dist + projector_position;
+	Vec3f v = sphere_center + screen_center - projector_position;
+	
+	float screen_perpendicular_dist = normal_unit.dot(v);
+	Vec3f compensated_center = (v) / screen_perpendicular_dist + projector_position;
 	
 	// calculate uv parameters
 	float x_dist = x_vec.mag();
@@ -685,10 +693,12 @@ void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect, double uvsca
 	predistortP.uniform("normal_unit", projector.normal_unit);
 	predistortP.uniform("x_unit", projector.x_unit);
 	predistortP.uniform("y_unit", projector.y_unit);
-	predistortP.uniform("x_vec", projector.x_vec);
-	predistortP.uniform("y_vec", projector.y_vec);
-	predistortP.uniform("near", 1.f);
-	predistortP.uniform("far", 100.f);
+	predistortP.uniform("x_scale", 2./projector.x_vec.mag());
+	predistortP.uniform("y_scale", 2./projector.y_vec.mag());
+	predistortP.uniform("x_shift", projector.x_offset/projector.width);
+	predistortP.uniform("y_shift", projector.y_offset/projector.height);
+	predistortP.uniform("near", 2.f);
+	predistortP.uniform("far", 200.f);
 	predistortP.uniform("aspect", aspect);
 	//predistortP.uniform("uvscalar", uvscalar);
 	predistortP.uniform("sphere_center", projector.sphere_center);
