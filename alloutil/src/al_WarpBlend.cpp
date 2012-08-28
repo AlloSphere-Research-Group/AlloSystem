@@ -698,7 +698,7 @@ void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect, double uvsca
 	predistortP.uniform("y_shift", projector.y_offset/projector.height);
 	predistortP.uniform("near", 0.1f);
 	predistortP.uniform("far", 200.f);
-	predistortP.uniform("aspect", aspect);
+	//predistortP.uniform("aspect", aspect);
 	//predistortP.uniform("uvscalar", uvscalar);
 	predistortP.uniform("sphere_center", projector.sphere_center);
 	predistortP.uniform("sphere_radius", projector.screen_radius);
