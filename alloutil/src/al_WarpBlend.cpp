@@ -53,7 +53,7 @@ static const char * predistortVS = AL_STRINGIFY(
 		uv.x /= length(x_vec)/2.;
 		uv.y /= length(y_vec)/2.;
 		
-		uv.y *= -1.; // GL is upside down?
+		uv.y *= -1.; // GL is upside down
 	
 		// depth value should relate to the length of vertex_in_sphere
 		// but sign of depth depends on whether the vertex is in front or behind the projection plane
