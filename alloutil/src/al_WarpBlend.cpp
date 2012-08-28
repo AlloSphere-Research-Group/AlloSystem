@@ -497,26 +497,34 @@ static const char * warpFS = AL_STRINGIFY(
 void WarpnBlend::Projector::print() {
 	printf("Projector %d width %d height %d\n", (int)projnum, (int)width, (int)height);
 	projcoord.print(); printf(" = projCoord\n");
+	sphere_center.print(); printf(" = sphere_center\n");
+	screen_center.print(); printf(" = screen_center\n");
 	normal_unit.print(); printf(" = normal_unit\n");
 	x_vec.print(); printf(" = x_vec\n");
 	y_vec.print(); printf(" = y_vec\n");
 	x_unit.print(); printf(" = x_unit\n");
 	y_unit.print(); printf(" = y_unit\n");
-	printf("x_dist %f y_dist %f\n", x_dist, y_dist);
 	printf("x_pixel %f y_pixel %f\n", x_pixel, y_pixel);
-	
-
 }	
 
 void WarpnBlend::Projector::init() {
+
+	screen_radius = screen_center.mag();
+	screen_center_unit = screen_center / screen_radius;
+	
+	float screen_perpendicular_dist = normal_unit.dot(sphere_center + screen_center - projCoord);
+	Vec3f compensated_center = (sphere_center + screen_center - projCoord) / screen_perpendicular_dist + projCoord;
+	
 	// calculate uv parameters
-	x_dist = x_vec.mag();
+	float x_dist = x_vec.mag();
 	x_unit = x_vec / x_dist;
 	x_pixel = x_dist / width;
+	x_offset = x_unit.dot(compensated_center - projCoord);
 	
-	y_dist = y_vec.mag();
+	float y_dist = y_vec.mag();
 	y_unit = y_vec / y_dist;
 	y_pixel = y_dist / height;
+	y_offset = y_unit.dot(compensated_center - projCoord);
 }	
 
 WarpnBlend::WarpnBlend() {
@@ -527,7 +535,7 @@ WarpnBlend::WarpnBlend() {
 	pixelMesh.primitive(gl.POINTS);
 	
 	testscene.primitive(gl.LINES);
-	float step = 0.1;
+	float step = 0.4;
 	for (float x=0; x<1; x+=step) {
 	for (float y=0; y<1; y+=step) {
 	for (float z=0; z<1; z+=step) {
