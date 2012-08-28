@@ -59,7 +59,7 @@ static const char * predistortVS = AL_STRINGIFY(
 		
 		uv.y *= -1.; // GL is upside down
 		
-		// reverse the XY position for points behind the projector
+		// reverse the XY position for points behind
 		uv.xy *= sign(vertex_in_projector.z);
 	
 		// depth value should relate to the length of vertex_in_sphere
@@ -67,13 +67,8 @@ static const char * predistortVS = AL_STRINGIFY(
 		float depth = -distance * sign(vertex_in_projector.z);
 		
 		// scale z to the near/far planes for depth-testing / clipping
-		// not sure whether ortho, perspective or some other mapping makes more sense
-		// ortho-style depth:
-		//float z = (-2.*depth - far+near) / (far-near);
 		// perspective-style depth (divided by -depth for the perspective)
 		float z = ((2./depth)*far*near + far+near)/(far-near); 
-		// naive depth:
-		//float z = (distance-near)/(far-near);
 		
 		// assign to output
 		return vec4(uv, z, 1);		
@@ -701,7 +696,7 @@ void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect, double uvsca
 	predistortP.uniform("y_scale", 2./projector.y_vec.mag());
 	predistortP.uniform("x_shift", projector.x_offset/projector.width);
 	predistortP.uniform("y_shift", projector.y_offset/projector.height);
-	predistortP.uniform("near", 2.f);
+	predistortP.uniform("near", 0.1f);
 	predistortP.uniform("far", 200.f);
 	predistortP.uniform("aspect", aspect);
 	//predistortP.uniform("uvscalar", uvscalar);
