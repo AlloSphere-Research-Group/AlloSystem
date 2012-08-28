@@ -79,7 +79,7 @@ static const char * predistortVS = AL_STRINGIFY(
 		
 		
 		// debug coloring
-		C = abs(vertex.xyz);
+		C = abs(vertex.xyz / sphere_radius);
 	}
 );
 static const char * predistortFS = AL_STRINGIFY(
@@ -503,7 +503,6 @@ void WarpnBlend::Projector::print() {
 	y_vec.print(); printf(" = y_vec\n");
 	x_unit.print(); printf(" = x_unit\n");
 	y_unit.print(); printf(" = y_unit\n");
-	printf("x_pixel %f y_pixel %f\n", x_pixel, y_pixel);
 }	
 
 void WarpnBlend::Projector::init() {
@@ -686,7 +685,7 @@ void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect, double uvsca
 	predistortP.uniform("aspect", aspect);
 	predistortP.uniform("uvscalar", uvscalar);
 	predistortP.uniform("sphere_center", projector.sphere_center);
-	predistortP.uniform("sphere_radius", projector.sphere_radius);
+	predistortP.uniform("sphere_radius", projector.screen_radius);
 	
 	
 	// draw some stuff:
