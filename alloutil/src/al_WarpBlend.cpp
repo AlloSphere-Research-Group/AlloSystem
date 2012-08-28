@@ -84,7 +84,7 @@ static const char * predistortVS = AL_STRINGIFY(
 		
 		
 		// debug coloring
-		C = abs(vertex.xyz / sphere_radius);
+		C = abs(gl_Vertex.xyz / sphere_radius);
 	}
 );
 static const char * predistortFS = AL_STRINGIFY(
@@ -691,10 +691,14 @@ void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect, double uvsca
 	predistortP.uniform("uvscalar", uvscalar);
 	predistortP.uniform("sphere_center", projector.sphere_center);
 	predistortP.uniform("sphere_radius", projector.screen_radius);
+	//predistortP.uniform("alphaMap", 1);
 	
+	//alphaMap.bind(1);
 	
 	// draw some stuff:
 	gl.draw(testscene);
+	
+	//alphaMap.unbind(1);
 	
 	predistortP.end();
 }
