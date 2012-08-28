@@ -538,7 +538,7 @@ WarpnBlend::WarpnBlend() {
 	pixelMesh.primitive(gl.POINTS);
 	
 	testscene.primitive(gl.LINES);
-	float step = 0.2;
+	float step = 0.4;
 	for (float x=0; x<1; x+=step) {
 	for (float y=0; y<1; y+=step) {
 	for (float z=0; z<1; z+=step) {
@@ -558,7 +558,7 @@ WarpnBlend::WarpnBlend() {
 		testscene.vertex(z+step, x, y);
 	}}}
 	testscene.translate(-0.5, -0.5, -0.5);
-	testscene.scale(8./step);
+	testscene.scale(16./step);
 }
 
 void WarpnBlend::onCreate() {
