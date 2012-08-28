@@ -704,7 +704,7 @@ void WarpnBlend::drawWarp3D() {
 	geomP3D.end();
 }
 
-void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect, double uvscalar) {
+void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect, double uvscalar, bool blend) {
 	if (!loaded) return;
 	Graphics gl;
 	
@@ -741,22 +741,24 @@ void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect, double uvsca
 	
 	predistortP.end();
 	
-	gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
-	gl.modelView(Matrix4d::identity());
-	
-	// now draw the blend mask:
-	gl.blending(true);
-	gl.blendMode(Graphics::SRC_ALPHA, Graphics::ONE_MINUS_SRC_ALPHA, Graphics::FUNC_ADD);
-	gl.depthTesting(false);
-	gl.depthMask(false);
-	
-	alphaP.begin();
-	alphaMap.quad(gl);
-	alphaP.end();
-	
-	gl.blending(false);
-	gl.depthTesting(true);
-	gl.depthMask(true);
+	if (blend) {
+		gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
+		gl.modelView(Matrix4d::identity());
+		
+		// now draw the blend mask:
+		gl.blending(true);
+		gl.blendMode(Graphics::SRC_ALPHA, Graphics::ONE_MINUS_SRC_ALPHA, Graphics::FUNC_ADD);
+		gl.depthTesting(false);
+		gl.depthMask(false);
+		
+		alphaP.begin();
+		alphaMap.quad(gl);
+		alphaP.end();
+		
+		gl.blending(false);
+		gl.depthTesting(true);
+		gl.depthMask(true);
+	}
 }
 
 //void WarpnBlend::drawInverseWarp3D() {
