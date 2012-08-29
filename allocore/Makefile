@@ -166,14 +166,14 @@ install: $(LIB_PATH)
 ## 	Copy library header files to build directory
 	@for v in `cd $(INC_DIR)/$(LIB_NAME) && find * -type d ! -path '*.*'` .; do\
 		$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)/$$v;\
-		$(INSTALL) -C -m 644 $(INC_DIR)/$(LIB_NAME)/$$v/*.h* $(DESTDIR)/include/$(LIB_NAME)/$$v;\
+		$(INSTALL) -m 644 $(INC_DIR)/$(LIB_NAME)/$$v/*.h* $(DESTDIR)/include/$(LIB_NAME)/$$v;\
 	done
 
 ##	Copy library if it doesn't exist or is newer than existing
 	@$(INSTALL) -d $(DESTDIR)/lib/
 	@if [ $(LIB_PATH) -nt $(DESTDIR)/lib/$(LIB_FILE) ] || [ ! -e $(DESTDIR)/lib/$(LIB_FILE) ]; then \
 		echo INSTALL $(LIB_PATH) to $(DESTDIR)/lib/;\
-		$(INSTALL) -C -m 644 $(LIB_PATH) $(DESTDIR)/lib/;\
+		$(INSTALL) -m 644 $(LIB_PATH) $(DESTDIR)/lib/;\
 	fi;
 
 ##	Install header files from local build directory into DESTDIR
