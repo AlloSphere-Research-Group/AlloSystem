@@ -45,7 +45,15 @@
 #include <string>
 #include <vector>
 #include "allocore/al_Allocore.hpp"
-#include "allocore/io/al_ControlNav.hpp"
+
+/*#include "allocore/io/al_AudioIO.hpp"
+#include "allocore/sound/al_AudioScene.hpp"
+#include "allocore/types/al_Color.hpp"
+#include "allocore/graphics/al_Lens.hpp"
+#include "allocore/graphics/al_Stereographic.hpp"
+#include "allocore/io/al_Window.hpp"
+#include "allocore/protocol/al_OSC.hpp"
+#include "allocore/io/al_ControlNav.hpp"*/
 
 namespace al{
 
@@ -107,7 +115,10 @@ public:
 	const Viewport& viewport() const { return mViewport; }
 	Viewport& viewport(){ return mViewport; }
 
-protected:
+	/// Call to update viewport using stretch/anchor amounts when parent dimensions change
+	void onParentResize(int dw, int dh);
+
+private:
 	Viewport mViewport;				// screen display region
 	Pose * mParentTransform;		// parent transform, 0 if none
 	Pose mTransform;				// local transform
@@ -147,7 +158,7 @@ public:
 	const Viewpoints& viewpoints() const { return mViewpoints; }
 	
 	/// Add a new viewpoint to the window
-	ViewpointWindow& add(Viewpoint& v){ mViewpoints.push_back(&v); return *this; }
+	ViewpointWindow& add(Viewpoint& v);
 
 protected:
 	Viewpoints mViewpoints;
@@ -156,9 +167,7 @@ protected:
 
 private:
 	StandardWindowKeyControls mStandardKeyControls;
-	void init(){
-		append(mStandardKeyControls);
-	}
+	void init(){ append(mStandardKeyControls); }
 };
 
 
