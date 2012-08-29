@@ -550,7 +550,7 @@ bool Window::create(
 	const Dim& dim, const std::string& title, double fps, DisplayMode mode
 )
 {
-	//printf("Window::create called (in al_WindowGLUT.hpp)\n");
+	//printf("Window::create called (in al_WindowGLUT.cpp)\n");
 
 	if(created()) return true;
 
