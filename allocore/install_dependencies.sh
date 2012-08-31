@@ -13,9 +13,14 @@ if [ `which apt-get` ]; then
 elif [ `which port` ]; then
 	echo "Found MacPorts"
 	sudo port selfupdate
-	port install portaudio libsndfile
-	port install glew
-	port install assimp freeimage
+	sudo port install portaudio libsndfile +universal
+	sudo port install glew +universal
+
+	# Since we only support v.2, we need to use an old Portfile
+	#sudo port install assimp
+	pushd pkg/port/assimp2/; sudo port install; popd
+
+	sudo port install freeimage +universal
 
 elif [ `which brew` ]; then
 	echo "Found Homebrew"
