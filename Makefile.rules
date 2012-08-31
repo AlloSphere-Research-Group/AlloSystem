@@ -38,11 +38,15 @@ $(OBJ_DIR)%.o:: %.mm
 	@echo CC $< $@
 	$(CXX) -c $(CFLAGS) $< -o $@ $(DEPFLAGS)
 
+$(OBJ_DIR)%.hpp.gch:: %.hpp
+	@echo CXX $< $@
+	$(CXX) -x c++ -c $(CXXFLAGS) -Winvalid-pch $< -o $@ $(DEPFLAGS)
+
 -include $(wildcard $(OBJ_DIR)*.dep)
 
 
 # Build static library
-$(SLIB_PATH): $(addprefix $(OBJ_DIR), $(OBJS))
+$(SLIB_PATH): $(addprefix $(OBJ_DIR), $(OBJS) $(PCHS))
 ifneq ($(OBJS),)
 	@echo AR $@
 	@$(RM) $@
