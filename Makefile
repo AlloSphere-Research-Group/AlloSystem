@@ -54,6 +54,17 @@ clean:
 		$(MAKE) --no-print-directory -C $$v clean;\
 	done
 
+# Create symlinks to all examples/ directories found in modules
+gatherexamples:
+	@install -d examples
+	@for v in $(subst /,,$(MODULE_DIRS)); do\
+		if [ -d $$v/examples/ ]; then\
+			cd examples/;\
+			ln -s ../$$v/examples/ $$v;\
+			cd ..;\
+		fi;\
+	done
+
 
 # This attempts to determine what modules have been built by looking in the build dir
 BUILT_MODULES := $(basename $(shell if [ -d $(BUILD_DIR)/lib/ ]; then ls $(BUILD_DIR)/lib/; fi))
