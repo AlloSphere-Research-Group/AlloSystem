@@ -25,9 +25,12 @@ elif [ `which port` ]; then
 
 elif [ `which brew` ]; then
 	echo "Found Homebrew"
+	sudo brew update
 	brew install portaudio libsndfile
 	brew install glew
-	brew install assimp freeimage
+	brew install assimp
+	brew install freeimage
+	brew install freetype
 
 elif [ `uname | grep MINGW` ]; then
 	echo "Found MinGW / MSYS"
