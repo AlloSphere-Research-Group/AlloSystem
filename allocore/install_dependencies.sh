@@ -21,6 +21,7 @@ elif [ `which port` ]; then
 	pushd pkg/port/assimp2/; sudo port install; popd
 
 	sudo port install freeimage +universal
+	sudo port install freetype +universal
 
 elif [ `which brew` ]; then
 	echo "Found Homebrew"
@@ -89,7 +90,6 @@ elif [ `uname | grep MINGW` ]; then
 		PKG=freetype-dev_2.4.2-1_win32
 		wget http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/$PKG.zip
 		unzip $PKG.zip -d $PKG
-		exit
 		cp $PKG/lib/* $DESTDIR/lib/
 		cp -r $PKG/include/* $DESTDIR/include/
 		rm -rf $PKG
