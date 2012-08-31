@@ -87,7 +87,6 @@ ifeq ($(RUNTIME_BINDING), APR)
 endif
 
 VPATH += $(addprefix $(SRC_DIR), $(GFX_DIR) $(IO_DIR) $(PRO_DIR) $(MATH_DIR) $(SND_DIR) $(SPA_DIR) $(SYS_DIR) $(TYP_DIR))
-VPATH += $(RUN_SRC_DIRS)
 
 # END old Makefile.config
 
@@ -128,6 +127,13 @@ OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 CPPFLAGS	+= $(addprefix -I, $(INC_DIRS) $(BUILD_DIR)/include)
 LDFLAGS		:= $(addprefix -L, $(LIB_DIRS) $(BUILD_DIR)/lib) $(LDFLAGS)
 
+
+
+#VPATH += allocore/graphics/ allocore/io/ allocore/math/
+#PCHS		=
+#PCHS		+= $(addsuffix .gch, $(notdir $(wildcard allocore/graphics/*.hpp)))
+#PCHS		+= $(addsuffix .gch, $(notdir $(wildcard allocore/io/*.hpp)))
+#PCHS		+= $(addsuffix .gch, $(notdir $(wildcard allocore/math/*.hpp)))
 
 #--------------------------------------------------------------------------
 # Rules
