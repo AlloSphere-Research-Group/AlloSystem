@@ -58,20 +58,26 @@ template<typename T=float>
 class Field3D {
 public:
 	
-	Field3D(int components=1, int dim=32) 
-	:	mDim(ceilPow2(dim)),
-		mDim3(mDim*mDim*mDim),
-		mDimWrap(mDim-1),
+	Field3D(int components=1, int dimx=32, int dimy=32, int dimz=32) 
+	:	mDimX(ceilPow2(dimx)), 
+		mDimY(ceilPow2(dimy)), 
+		mDimZ(ceilPow2(dimz)),
+		mDim3(mDimX*mDimY*mDimZ),
+		mDimWrapX(mDimX-1),
+		mDimWrapY(mDimY-1),
+		mDimWrapZ(mDimZ-1),
 		mFront(1),
-		mArray0(components, Array::type<T>(), mDim, mDim, mDim),
-		mArray1(components, Array::type<T>(), mDim, mDim, mDim)
+		mArray0(components, Array::type<T>(), mDimX, mDimY, mDimZ),
+		mArray1(components, Array::type<T>(), mDimX, mDimY, mDimZ)
 	{}
 	
 	~Field3D() {}
 	
 	unsigned length() const { return components()*mDim3; }
 	unsigned components() const { return mArray0.header.components; }
-	unsigned dim() const { return mDim; }
+	unsigned dimx() const { return mDimX; }
+	unsigned dimy() const { return mDimY; }
+	unsigned dimz() const { return mDimZ; }
 	size_t stride(int dim=0) const { return mArray0.header.stride[dim]; }
 	
 	// front is what is currently interacted with
@@ -181,7 +187,7 @@ public:
 	void relax(double a, int iterations);
 	
 protected:
-	size_t mDim, mDim3, mDimWrap;
+	size_t mDimX, mDimY, mDimZ, mDim3, mDimWrapX, mDimWrapY, mDimWrapZ;
 	volatile int mFront;	// which one is the front buffer?
 	Array mArray0, mArray1; //mArrays[2];	// double-buffering
 };
@@ -352,9 +358,9 @@ public:
 template <typename T>
 template <typename T1>
 inline bool Field3D<T>::oob(Vec<3,T1> v) {
-	return (v[0] < 0 || v[0] >= dim() 
-		 || v[1] < 0 || v[1] >= dim() 
-		 || v[2] < 0 || v[2] >= dim());
+	return (v[0] < 0 || v[0] >= dimx() 
+		 || v[1] < 0 || v[1] >= dimy() 
+		 || v[2] < 0 || v[2] >= dimz());
 }
 
 template<typename T>
@@ -424,9 +430,9 @@ inline void Field3D<T>::Kernel3::blur3() {
 
 template<typename T>
 inline size_t Field3D<T>::index(int x, int y, int z) const {
-	return	((x&mDimWrap) * stride(0)) +
-			((y&mDimWrap) * stride(1)) +
-			((z&mDimWrap) * stride(2));
+	return	((x&mDimWrapX) * stride(0)) +
+			((y&mDimWrapY) * stride(1)) +
+			((z&mDimWrapZ) * stride(2));
 }
 
 template<typename T>
@@ -464,12 +470,12 @@ inline void Field3D<T>::read(const Vec<3,T1> pos, T * elems) const {
 template<typename T>
 inline void Field3D<T>::setHarmonic(T px, T py, T pz) {
 	T vals[3];
-	for (size_t z=0;z<mDim;z++) {
-		vals[2] = sin(pz * M_2PI * z/T(dim()));
-		for (size_t y=0;y<mDim;y++) {
-			vals[1] = sin(py * M_2PI * y/T(dim()));
-			for (size_t x=0;x<mDim;x++) {
-				vals[0] = sin(px * M_2PI * x/T(dim()));
+	for (size_t z=0;z<dimx();z++) {
+		vals[2] = sin(pz * M_2PI * z/T(dimx()));
+		for (size_t y=0;y<dimy();y++) {
+			vals[1] = sin(py * M_2PI * y/T(dimy()));
+			for (size_t x=0;x<dimz();x++) {
+				vals[0] = sin(px * M_2PI * x/T(dimz()));
 				T value = vals[0] * vals[1] * vals[2];
 				front().write(&value, x, y, z);
 			}
@@ -500,14 +506,14 @@ inline void Field3D<T>::scale(const Array& arr) {
 		const size_t stride0 = stride(0);
 		const size_t stride1 = stride(1);
 		const size_t stride2 = stride(2);
-		#define INDEX(p, x, y, z) ((T *)((p) + (((x)&mDimWrap)*stride0) +  (((y)&mDimWrap)*stride1) +  (((z)&mDimWrap)*stride2)))
+		#define INDEX(p, x, y, z) ((T *)((p) + (((x)&mDimWrapX)*stride0) +  (((y)&mDimWrapY)*stride1) + (((z)&mDimWrapZ)*stride2)))
 
 		// zero the boundary fields
 		char * optr = front().data.ptr;
 		char * vptr = arr.data.ptr;
-		for (size_t z=0;z<mDim;z++) {
-			for (size_t y=0;y<mDim;y++) {
-				for (size_t x=0;x<mDim;x++) {
+		for (size_t z=0;z<mDimZ;z++) {
+			for (size_t y=0;y<mDimY;y++) {
+				for (size_t x=0;x<mDimX;x++) {
 					// cell to update:
 					T * cell = INDEX(optr, x, y, z);
 					T * src = INDEX(vptr, x, y, z);
@@ -546,16 +552,16 @@ inline void Field3D<T>::scale1(const Array& arr) {
 		const size_t astride0 = arr.stride(0);
 		const size_t astride1 = arr.stride(1);
 		const size_t astride2 = arr.stride(2);
-		#define INDEX(p, x, y, z) ((T *)((p) + (((x)&mDimWrap)*stride0) +  (((y)&mDimWrap)*stride1) +  (((z)&mDimWrap)*stride2)))
+		#define INDEX(p, x, y, z) ((T *)((p) + (((x)&mDimWrapX)*stride0) +  (((y)&mDimWrapY)*stride1) +  (((z)&mDimWrapZ)*stride2)))
 		
-		#define AINDEX(p, x, y, z) ((T *)((p) + (((x)&mDimWrap)*astride0) +  (((y)&mDimWrap)*astride1) +  (((z)&mDimWrap)*astride2)))
+		#define AINDEX(p, x, y, z) ((T *)((p) + (((x)&mDimWrapX)*astride0) +  (((y)&mDimWrapY)*astride1) +  (((z)&mDimWrapZ)*astride2)))
 
 		// scale the boundary fields
 		char * optr = front().data.ptr;
 		char * aptr = arr.data.ptr;
-		for (size_t z=0;z<mDim;z++) {
-			for (size_t y=0;y<mDim;y++) {
-				for (size_t x=0;x<mDim;x++) {
+		for (size_t z=0;z<mDimZ;z++) {
+			for (size_t y=0;y<mDimY;y++) {
+				for (size_t x=0;x<mDimX;x++) {
 					// cell to update:
 					T * cell = INDEX(optr, x, y, z);
 					T v = AINDEX(aptr, x, y, z)[0];
@@ -579,14 +585,14 @@ inline void Field3D<T>::damp(const Array& arr) {
 		const size_t stride0 = stride(0);
 		const size_t stride1 = stride(1);
 		const size_t stride2 = stride(2);
-		#define INDEX(p, x, y, z) ((T *)((p) + (((x)&mDimWrap)*stride0) +  (((y)&mDimWrap)*stride1) +  (((z)&mDimWrap)*stride2)))
+		#define INDEX(p, x, y, z) ((T *)((p) + (((x)&mDimWrapX)*stride0) +  (((y)&mDimWrapY)*stride1) +  (((z)&mDimWrapZ)*stride2)))
 
 		// zero the boundary fields
 		char * optr = front().data.ptr;
 		char * vptr = arr.data.ptr;
-		for (size_t z=0;z<mDim;z++) {
-			for (size_t y=0;y<mDim;y++) {
-				for (size_t x=0;x<mDim;x++) {
+		for (size_t z=0;z<mDimZ;z++) {
+			for (size_t y=0;y<mDimY;y++) {
+				for (size_t x=0;x<mDimX;x++) {
 					// cell to update:
 					T * cell = INDEX(optr, x, y, z);
 					T v = fabs(INDEX(vptr, x, y, z)[0]);
@@ -628,17 +634,15 @@ inline void Field3D<T> :: diffuse(T diffusion, unsigned passes) {
 	const size_t stride1 = out.header.stride[1];
 	const size_t stride2 = out.header.stride[2];
 	const size_t components = out.header.components;
-	const size_t dim = out.header.dim[0];
-	const size_t dimwrap = dim-1;
 	const char * iptr = in.data.ptr;
 	const char * optr = out.data.ptr;
 	double div = 1.0/((1.+6.*diffusion));
-	#define INDEX(p, x, y, z) ((T *)(p + ((((x)&dimwrap)*stride0) + (((y)&dimwrap)*stride1) + (((z)&dimwrap)*stride2))))
+	#define INDEX(p, x, y, z) ((T *)(p + ((((x)&mDimWrapX)*stride0) + (((y)&mDimWrapY)*stride1) + (((z)&mDimWrapZ)*stride2))))
 	
 	for (unsigned n=0 ; n<passes ; n++) {
-		for (size_t z=0;z<dim;z++) {
-			for (size_t y=0;y<dim;y++) {
-				for (size_t x=0;x<dim;x++) {
+		for (size_t z=0;z<mDimZ;z++) {
+			for (size_t y=0;y<mDimY;y++) {
+				for (size_t x=0;x<mDimX;x++) {
 					const T * prev =	INDEX(iptr, x,	y,	z);
 					T *		  next =	INDEX(optr, x,	y,	z);
 					const T * va00 =	INDEX(optr, x-1,y,	z);
@@ -676,16 +680,14 @@ inline void Field3D<T> :: diffuse(const Kernel3& kernel, T diffusion, unsigned p
 	const size_t stride1 = out.header.stride[1];
 	const size_t stride2 = out.header.stride[2];
 	const size_t components = out.header.components;
-	const size_t dim = out.header.dim[0];
-	const size_t dimwrap = dim-1;
 	const char * iptr = in.data.ptr;
 	const char * optr = out.data.ptr;
-	#define INDEX(p, x, y, z) ((T *)(p + ((((x)&dimwrap)*stride0) + (((y)&dimwrap)*stride1) + (((z)&dimwrap)*stride2))))
+	#define INDEX(p, x, y, z) ((T *)(p + ((((x)&mDimWrapX)*stride0) + (((y)&mDimWrapY)*stride1) + (((z)&mDimWrapZ)*stride2))))
 	
 	for (unsigned n=0 ; n<passes ; n++) {
-		for (size_t z=0;z<dim;z++) {
-			for (size_t y=0;y<dim;y++) {
-				for (size_t x=0;x<dim;x++) {
+		for (size_t z=0;z<mDimZ;z++) {
+			for (size_t y=0;y<mDimY;y++) {
+				for (size_t x=0;x<mDimX;x++) {
 					const T * prev =	INDEX(iptr, x,	y,	z);
 					T *		  next =	INDEX(optr, x,	y,	z);
 					// immediate neighbors
@@ -782,9 +784,9 @@ inline void Field3D<T> :: relax( double diffusion, int iterations) {
 	const double c = 1./(1. + 24.*diffusion); 
 #endif
 	for (int iter=0; iter<iterations; iter++) {
-		for (size_t z=0;z<mDim;z++) {
-			for (size_t y=0;y<mDim;y++) {
-				for (size_t x=0;x<mDim;x++) {
+		for (size_t z=0;z<mDimZ;z++) {
+			for (size_t y=0;y<mDimY;y++) {
+				for (size_t x=0;x<mDimX;x++) {
 					const size_t idx = index(x, y, z);
 #ifdef NoMerhstellen
 					const size_t x0 = index(x-1, y, z);
@@ -854,14 +856,18 @@ inline void Field3D<T> :: advect(Array& dst, const Array& src, const Array& velo
 	const size_t stride0 = src.stride(0);
 	const size_t stride1 = src.stride(1);
 	const size_t stride2 = src.stride(2);
-	const size_t dim = src.dim(0);
-	const size_t dimwrap = dim-1;
+	const size_t dim0 = src.dim(0);
+	const size_t dim1 = src.dim(1);
+	const size_t dim2 = src.dim(2);
+	const size_t dimwrap0 = dim0-1;
+	const size_t dimwrap1 = dim1-1;
+	const size_t dimwrap2 = dim2-1;
 	
 	if (velocities.header.type != src.header.type ||
 		velocities.header.components < 3 ||
-		velocities.header.dim[0] != dim ||
-		velocities.header.dim[1] != dim ||
-		velocities.header.dim[2] != dim) 
+		velocities.header.dim[0] != dim0 ||
+		velocities.header.dim[1] != dim1 ||
+		velocities.header.dim[2] != dim2) 
 	{
 		printf("Array format mismatch\n");
 		return;
@@ -872,15 +878,13 @@ inline void Field3D<T> :: advect(Array& dst, const Array& src, const Array& velo
 	const size_t vstride0 = velocities.stride(0);
 	const size_t vstride1 = velocities.stride(1);
 	const size_t vstride2 = velocities.stride(2);
-	const size_t vdim = velocities.dim(0);
-	const size_t vdimwrap = vdim-1;
-
-	#define CELL(p, x, y, z, k) (((T *)((p) + (((x)&dimwrap)*stride0) +  (((y)&dimwrap)*stride1) +  (((z)&dimwrap)*stride2)))[(k)])
-	#define VCELL(p, x, y, z, k) (((T *)((p) + (((x)&vdimwrap)*vstride0) +  (((y)&vdimwrap)*vstride1) +  (((z)&vdimwrap)*vstride2)))[(k)]) 
 	
-	for (size_t z=0;z<dim;z++) {
-		for (size_t y=0;y<dim;y++) {
-			for (size_t x=0;x<dim;x++) {
+	#define CELL(p, x, y, z, k) (((T *)((p) + (((x)&dimwrap0)*stride0) +  (((y)&dimwrap1)*stride1) +  (((z)&dimwrap2)*stride2)))[(k)])
+	#define VCELL(p, x, y, z, k) (((T *)((p) + (((x)&dimwrap0)*vstride0) +  (((y)&dimwrap1)*vstride1) +  (((z)&dimwrap2)*vstride2)))[(k)]) 
+	
+	for (size_t z=0;z<dim2;z++) {
+		for (size_t y=0;y<dim1;y++) {
+			for (size_t x=0;x<dim0;x++) {
 				// back trace: (current cell offset by vector at cell)
 				T * bp  = &(CELL(outptr, x, y, z, 0));
 				T * vp	= &(VCELL(velptr, x, y, z, 0));
@@ -905,7 +909,7 @@ inline void Field3D<T> :: advect(const Array& velocities, T rate) {
 
 template<typename T>
 inline void Field3D<T> :: calculateGradientMagnitude(Array& gradient) {
-	gradient.format(1, Array::type<T>(), mDim, mDim, mDim);
+	gradient.format(1, Array::type<T>(), mDimX, mDimY, mDimZ);
 	
 	const size_t stride0 = stride(0);
 	const size_t stride1 = stride(1);
@@ -914,25 +918,27 @@ inline void Field3D<T> :: calculateGradientMagnitude(Array& gradient) {
 	const size_t gstride1 = gradient.stride(1);
 	const size_t gstride2 = gradient.stride(2);
 	
-	#define CELL(p, x, y, z, k) (((T *)((p) + (((x)&mDimWrap)*stride0) +  (((y)&mDimWrap)*stride1) +  (((z)&mDimWrap)*stride2)))[(k)])
-	#define CELLG(p, x, y, z) (((T *)((p) + (((x)&mDimWrap)*gstride0) +  (((y)&mDimWrap)*gstride1) +  (((z)&mDimWrap)*gstride2)))[0])
+	#define CELL(p, x, y, z, k) (((T *)((p) + (((x)&mDimWrapX)*stride0) +  (((y)&mDimWrapY)*stride1) +  (((z)&mDimWrapZ)*stride2)))[(k)])
+	#define CELLG(p, x, y, z) (((T *)((p) + (((x)&mDimWrapX)*gstride0) +  (((y)&mDimWrapY)*gstride1) +  (((z)&mDimWrapZ)*gstride2)))[0])
 	
 	// calculate gradient.
 	// previous instantaneous magnitude of velocity gradient
 	//		= average of velocity gradients per axis:
-	const double h = -0.5/mDim; //1./3.; //0.5/mDim;
+	const double hx = -0.5/mDimX; //1./3.; //0.5/mDim;
+	const double hy = -0.5/mDimY; //1./3.; //0.5/mDim;
+	const double hz = -0.5/mDimZ; //1./3.; //0.5/mDim;
 	char * iptr = front().data.ptr;
 	char * gptr = gradient.data.ptr;
 	
-	for (size_t z=0;z<mDim;z++) {
-		for (size_t y=0;y<mDim;y++) {
-			for (size_t x=0;x<mDim;x++) {
+	for (size_t z=0;z<mDimZ;z++) {
+		for (size_t y=0;y<mDimY;y++) {
+			for (size_t x=0;x<mDimX;x++) {
 				// gradients per axis:
 				const T xgrad = CELL(iptr, x+1,y,	z,	0) - CELL(iptr, x-1,y,	z,	0);
 				const T ygrad = CELL(iptr, x,	y+1,z,	1) - CELL(iptr, x,	y-1,z,	1);
 				const T zgrad = CELL(iptr, x,	y,	z+1,2) - CELL(iptr, x,	y,	z-1,2);
 				// gradient at current cell:
-				const T grad = h * (xgrad+ygrad+zgrad);
+				const T grad = hx*xgrad + hy*ygrad + hz*zgrad;
 				// add to 1-plane field
 				CELLG(gptr, x, y, z) += grad;
 			}
@@ -947,9 +953,9 @@ inline void Field3D<T> :: calculateGradientMagnitude(Array& gradient) {
 template<typename T>
 inline void Field3D<T> :: subtractGradientMagnitude(const Array& gradient) {
 	if (gradient.header.type != Array::type<T>() ||
-		gradient.header.dim[0] != mDim ||
-		gradient.header.dim[1] != mDim ||
-		gradient.header.dim[2] != mDim) 
+		gradient.header.dim[0] != mDimX ||
+		gradient.header.dim[1] != mDimY ||
+		gradient.header.dim[2] != mDimZ) 
 	{
 		printf("Array format mismatch\n");
 		return;
@@ -961,23 +967,25 @@ inline void Field3D<T> :: subtractGradientMagnitude(const Array& gradient) {
 	const size_t gstride1 = gradient.stride(1);
 	const size_t gstride2 = gradient.stride(2);
 	
-	#define INDEX(p, x, y, z) ((T *)(p + ((((x)&mDimWrap)*stride0) + (((y)&mDimWrap)*stride1) + (((z)&mDimWrap)*stride2))))
-	#define CELLG(p, x, y, z) (((T *)((p) + (((x)&mDimWrap)*gstride0) +  (((y)&mDimWrap)*gstride1) +  (((z)&mDimWrap)*gstride2)))[0])
+	#define INDEX(p, x, y, z) ((T *)(p + ((((x)&mDimWrapX)*stride0) + (((y)&mDimWrapY)*stride1) + (((z)&mDimWrapZ)*stride2))))
+	#define CELLG(p, x, y, z) (((T *)((p) + (((x)&mDimWrapX)*gstride0) +  (((y)&mDimWrapY)*gstride1) +  (((z)&mDimWrapZ)*gstride2)))[0])
 	
 	// now subtract gradient from current field:
 	char * gptr = gradient.data.ptr;
 	char * optr = front().data.ptr;
 	//const double h = 1.; ///3.;
-	const double h = mDim * 0.5;
-	for (size_t z=0;z<mDim;z++) {
-		for (size_t y=0;y<mDim;y++) {
-			for (size_t x=0;x<mDim;x++) {
+	const double hx = mDimX * 0.5;
+	const double hy = mDimY * 0.5;
+	const double hz = mDimZ * 0.5;
+	for (size_t z=0;z<mDimZ;z++) {
+		for (size_t y=0;y<mDimY;y++) {
+			for (size_t x=0;x<mDimX;x++) {
 				// cell to update:
 				T * vel = INDEX(optr, x, y, z);
 				// gradients per axis:
-				vel[0] -= h * ( CELLG(gptr, x+1,y,	z  ) - CELLG(gptr, x-1,y,	z  ) );
-				vel[1] -= h * ( CELLG(gptr, x,	y+1,z  ) - CELLG(gptr, x,	y-1,z  ) );
-				vel[2] -= h * ( CELLG(gptr, x,	y,	z+1) - CELLG(gptr, x,	y,	z-1) );
+				vel[0] -= hx * ( CELLG(gptr, x+1,y,	z  ) - CELLG(gptr, x-1,y,	z  ) );
+				vel[1] -= hy * ( CELLG(gptr, x,	y+1,z  ) - CELLG(gptr, x,	y-1,z  ) );
+				vel[2] -= hz * ( CELLG(gptr, x,	y,	z+1) - CELLG(gptr, x,	y,	z-1) );
 			}
 		}
 	}
@@ -999,27 +1007,27 @@ inline void Field3D<T> :: boundary() {
 	const size_t stride2 = stride(2);
 	char * optr = front().data.ptr;
 
-	#define CELL(p, x, y, z, k) (((T *)((p) + (((x)&mDimWrap)*stride0) +  (((y)&mDimWrap)*stride1) +  (((z)&mDimWrap)*stride2)))[(k)])
+	#define CELL(p, x, y, z, k) (((T *)((p) + (((x)&mDimWrapX)*stride0) +  (((y)&mDimWrapY)*stride1) +  (((z)&mDimWrapZ)*stride2)))[(k)])
 	
 	// x planes
-	for (size_t z=0;z<mDim;z++) {
-		for (size_t y=0;y<mDim;y++) {
+	for (size_t z=0;z<mDimZ;z++) {
+		for (size_t y=0;y<mDimY;y++) {
 			CELL(optr, 0, y, z, 0) = T(0);
-			CELL(optr, mDimWrap, y, z, 0) = T(0); 
+			CELL(optr, mDimWrapX, y, z, 0) = T(0); 
 		}
 	}
 	// y planes
-	for (size_t z=0;z<mDim;z++) {
-		for (size_t x=0;x<mDim;x++) {
+	for (size_t z=0;z<mDimZ;z++) {
+		for (size_t x=0;x<mDimX;x++) {
 			CELL(optr, x, 0, z, 1) = T(0);
-			CELL(optr, x, mDimWrap, z, 1) = T(0); 
+			CELL(optr, x, mDimWrapY, z, 1) = T(0); 
 		}
 	}
 	// z planes
-	for (size_t y=0;y<mDim;y++) {
-		for (size_t x=0;x<mDim;x++) {
+	for (size_t y=0;y<mDimY;y++) {
+		for (size_t x=0;x<mDimX;x++) {
 			CELL(optr, x, y, 0, 2) = T(0);
-			CELL(optr, x, y, mDimWrap, 2) = T(0); 
+			CELL(optr, x, y, mDimWrapZ, 2) = T(0); 
 		}
 	}
 	
@@ -1036,7 +1044,7 @@ inline void Field3D<T> :: add(T * force) {
 	const uint32_t dim1 = front().dim(1);
 	const uint32_t dim2 = front().dim(2);
 	const uint8_t components = front().components();
-	#define INDEX(p, x, y, z) ((T *)((p) + (((x)&mDimWrap)*stride0) +  (((y)&mDimWrap)*stride1) +  (((z)&mDimWrap)*stride2)))
+	#define INDEX(p, x, y, z) ((T *)((p) + (((x)&mDimWrapX)*stride0) +  (((y)&mDimWrapY)*stride1) +  (((z)&mDimWrapZ)*stride2)))
 
 	// zero the boundary fields
 	char * optr = front().data.ptr;
