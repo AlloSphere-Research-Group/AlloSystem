@@ -1,0 +1,25 @@
+# The sole purpose of this file is to serve as a template for 
+# Makefile.user. Typically, you will want to do something like
+#
+#	cp Makefile.usertemplate Makefile.user
+#
+# and then proceed to customize Makefile.user. You will also probably want
+# to remove this comment.
+
+
+# STANDARD BUILD CONFIGURATION
+
+#ARCH = 64
+#CXX = @clang++-mp-3.1 -std=c++11
+#CPPFLAGS += 
+#LDFLAGS += 
+
+
+# BUILD-AND-RUN CONFIGURATION
+
+# Where to search for .cpp files implementing main()
+#RUN_DIRS += foo/
+
+# Where to search for custom source/header files
+#RUN_SRC_DIRS += foo/src/
+

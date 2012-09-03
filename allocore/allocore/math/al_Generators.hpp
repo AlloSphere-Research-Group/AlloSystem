@@ -53,6 +53,8 @@
 	Lance Putnam, 2006, putnam.lance@gmail.com
 */
 
+#include "allocore/math/al_Constants.hpp"
+
 namespace al {
 
 /// Classes for generating sequences of numbers

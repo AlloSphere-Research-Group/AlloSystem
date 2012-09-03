@@ -46,19 +46,14 @@
 
 #include <stdio.h>
 
+#include "allocore/math/al_Vec.hpp"
+#include "allocore/math/al_Quat.hpp"
 #include "allocore/math/al_Matrix4.hpp"
 #include "allocore/types/al_Array.hpp"
 #include "allocore/types/al_Color.hpp"
 
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_OpenGL.hpp"
-
-//#include "allocore/math/al_Vec.hpp"
-//#include "allocore/math/al_Quat.hpp"
-//#include "allocore/types/al_Buffer.hpp"
-
-//#include "allocore/graphics/al_Texture.hpp"
-//#include "allocore/graphics/al_Surface.hpp"
 
 
 namespace al {
@@ -68,9 +63,18 @@ namespace al {
 struct Viewport {
 	float l, b, w, h;	///< left, bottom, width, height
 
-	Viewport(float w=800, float h=600) : l(0), b(0), w(w), h(h) {}
-	Viewport(float l, float b, float w, float h) : l(l), b(b), w(w), h(h) {}
-	Viewport(const Viewport& cpy) : l(cpy.l), b(cpy.b), w(cpy.w), h(cpy.h) {}
+	/// @param[in] w	width
+	/// @param[in] h	height
+	Viewport(float w=800, float h=600): l(0), b(0), w(w), h(h) {}
+	
+	/// @param[in] l	left edge coordinate
+	/// @param[in] b	bottom edge coordinate
+	/// @param[in] w	width
+	/// @param[in] h	height
+	Viewport(float l, float b, float w, float h): l(l), b(b), w(w), h(h) {}
+	
+	///
+	Viewport(const Viewport& cpy): l(cpy.l), b(cpy.b), w(cpy.w), h(cpy.h) {}
 
 	/// Get aspect ratio (width divided by height)
 	float aspect() const { return (h!=0 && w!=0) ? float(w)/h : 1; }
@@ -88,9 +92,9 @@ class Graphics {
 public:
 
 	enum AntiAliasMode {
-		DONT_CARE				= GL_DONT_CARE,
-		FASTEST					= GL_FASTEST,
-		NICEST					= GL_NICEST
+		DONT_CARE				= GL_DONT_CARE,				/**< No preference */
+		FASTEST					= GL_FASTEST,				/**< Fastest render, possibly lower quality */
+		NICEST					= GL_NICEST					/**< Highest quality, possibly slower render */
 	};
 
 	enum AttributeBit {
@@ -101,94 +105,94 @@ public:
 	};
 
 	enum BlendFunc {
-		SRC_ALPHA				= GL_SRC_ALPHA,
-		ONE_MINUS_SRC_ALPHA		= GL_ONE_MINUS_SRC_ALPHA,
-		SRC_COLOR				= GL_SRC_COLOR,
-		ONE_MINUS_SRC_COLOR		= GL_ONE_MINUS_SRC_COLOR,
-		DST_ALPHA				= GL_DST_ALPHA,
-		ONE_MINUS_DST_ALPHA		= GL_ONE_MINUS_DST_ALPHA,
-		DST_COLOR				= GL_DST_COLOR,
-		ONE_MINUS_DST_COLOR		= GL_ONE_MINUS_DST_COLOR,
-		ZERO					= GL_ZERO,
-		ONE						= GL_ONE,
-		SRC_ALPHA_SATURATE		= GL_SRC_ALPHA_SATURATE
+		SRC_ALPHA				= GL_SRC_ALPHA,				/**< */
+		ONE_MINUS_SRC_ALPHA		= GL_ONE_MINUS_SRC_ALPHA,	/**< */
+		SRC_COLOR				= GL_SRC_COLOR,				/**< */
+		ONE_MINUS_SRC_COLOR		= GL_ONE_MINUS_SRC_COLOR,	/**< */
+		DST_ALPHA				= GL_DST_ALPHA,				/**< */
+		ONE_MINUS_DST_ALPHA		= GL_ONE_MINUS_DST_ALPHA,	/**< */
+		DST_COLOR				= GL_DST_COLOR,				/**< */
+		ONE_MINUS_DST_COLOR		= GL_ONE_MINUS_DST_COLOR,	/**< */
+		ZERO					= GL_ZERO,					/**< */
+		ONE						= GL_ONE,					/**< */
+		SRC_ALPHA_SATURATE		= GL_SRC_ALPHA_SATURATE		/**< */
 	};
 	
 	enum BlendEq {
-		FUNC_ADD				= GL_FUNC_ADD,
-		FUNC_SUBTRACT			= GL_FUNC_SUBTRACT,
-		FUNC_REVERSE_SUBTRACT	= GL_FUNC_REVERSE_SUBTRACT, 
-		MIN						= GL_MIN,
-		MAX						= GL_MAX
+		FUNC_ADD				= GL_FUNC_ADD,				/**< Source + destination */
+		FUNC_SUBTRACT			= GL_FUNC_SUBTRACT,			/**< Source - destination */
+		FUNC_REVERSE_SUBTRACT	= GL_FUNC_REVERSE_SUBTRACT, /**< Destination - source */
+		MIN						= GL_MIN,					/**< Minimum value of source and destination */
+		MAX						= GL_MAX					/**< Maximum value of source and destination */
 	};
 
 	enum Capability {
-		BLEND					= GL_BLEND,
-		COLOR_MATERIAL			= GL_COLOR_MATERIAL,
-		DEPTH_TEST				= GL_DEPTH_TEST,
-		FOG						= GL_FOG,
-		LIGHTING				= GL_LIGHTING,
-		SCISSOR_TEST			= GL_SCISSOR_TEST,
-		CULL_FACE				= GL_CULL_FACE
+		BLEND					= GL_BLEND,					/**< Blend rather than replace existing colors with new colors */
+		COLOR_MATERIAL			= GL_COLOR_MATERIAL,		/**< Use vertex colors with materials */
+		DEPTH_TEST				= GL_DEPTH_TEST,			/**< Test depth of incoming fragments */
+		FOG						= GL_FOG,					/**< Apply fog effect */
+		LIGHTING				= GL_LIGHTING,				/**< Use lighting */
+		SCISSOR_TEST			= GL_SCISSOR_TEST,			/**< Crop fragments according to scissor region */
+		CULL_FACE				= GL_CULL_FACE				/**< Cull faces */
 	};
 
 	enum DataType {
-		BYTE					= GL_BYTE,
-		UBYTE					= GL_UNSIGNED_BYTE,
-		SHORT					= GL_SHORT,
-		USHORT					= GL_UNSIGNED_SHORT,
-		INT						= GL_INT,
-		UINT					= GL_UNSIGNED_INT,
-		FLOAT					= GL_FLOAT,
-		DOUBLE					= GL_DOUBLE
+		BYTE					= GL_BYTE,					/**< */
+		UBYTE					= GL_UNSIGNED_BYTE,			/**< */
+		SHORT					= GL_SHORT,					/**< */
+		USHORT					= GL_UNSIGNED_SHORT,		/**< */
+		INT						= GL_INT,					/**< */
+		UINT					= GL_UNSIGNED_INT,			/**< */
+		FLOAT					= GL_FLOAT,					/**< */
+		DOUBLE					= GL_DOUBLE					/**< */
 	};
 
 	enum Face {
-		FRONT					= GL_FRONT,
-		BACK					= GL_BACK,
-		FRONT_AND_BACK			= GL_FRONT_AND_BACK
+		FRONT					= GL_FRONT,					/**< Front face */
+		BACK					= GL_BACK,					/**< Back face */
+		FRONT_AND_BACK			= GL_FRONT_AND_BACK			/**< Front and back face */
 	};
 
 	enum Format {
-		DEPTH_COMPONENT			= GL_DEPTH_COMPONENT,
-		LUMINANCE				= GL_LUMINANCE,
-		LUMINANCE_ALPHA			= GL_LUMINANCE_ALPHA,
-		RED						= GL_RED,
-		GREEN					= GL_GREEN,
-		BLUE					= GL_BLUE,
-		ALPHA					= GL_ALPHA,
-		RGB						= GL_RGB,
-		RGBA					= GL_RGBA,
-		BGRA					= GL_BGRA
+		DEPTH_COMPONENT			= GL_DEPTH_COMPONENT,		/**< */
+		LUMINANCE				= GL_LUMINANCE,				/**< */
+		LUMINANCE_ALPHA			= GL_LUMINANCE_ALPHA,		/**< */
+		RED						= GL_RED,					/**< */
+		GREEN					= GL_GREEN,					/**< */
+		BLUE					= GL_BLUE,					/**< */
+		ALPHA					= GL_ALPHA,					/**< */
+		RGB						= GL_RGB,					/**< */
+		RGBA					= GL_RGBA,					/**< */
+		BGRA					= GL_BGRA					/**< */
 	};
 
 	enum MatrixMode {
-		MODELVIEW				= GL_MODELVIEW,
-		PROJECTION				= GL_PROJECTION
+		MODELVIEW				= GL_MODELVIEW,				/**< Modelview matrix */
+		PROJECTION				= GL_PROJECTION				/**< Projection matrix */
 	};
 
 	enum PolygonMode {
-		POINT					= GL_POINT,
-		LINE					= GL_LINE,
-		FILL					= GL_FILL
+		POINT					= GL_POINT,					/**< Render only points at each vertex */
+		LINE					= GL_LINE,					/**< Render only lines along vertex path */
+		FILL					= GL_FILL					/**< Render vertices normally according to primitive */
 	};
 
 	enum Primitive {
-		POINTS					= GL_POINTS,
-		LINES					= GL_LINES,
-		LINE_STRIP				= GL_LINE_STRIP,
-		LINE_LOOP				= GL_LINE_LOOP,
-		TRIANGLES				= GL_TRIANGLES,
-		TRIANGLE_STRIP			= GL_TRIANGLE_STRIP,
-		TRIANGLE_FAN			= GL_TRIANGLE_FAN,
-		QUADS					= GL_QUADS,
-		QUAD_STRIP				= GL_QUAD_STRIP,
-		POLYGON					= GL_POLYGON
+		POINTS					= GL_POINTS,				/**< Points */
+		LINES					= GL_LINES,					/**< Connect sequential vertex pairs with lines */
+		LINE_STRIP				= GL_LINE_STRIP,			/**< Connect sequential vertices with a continuous line */
+		LINE_LOOP				= GL_LINE_LOOP,				/**< Connect sequential vertices with a continuous line loop */
+		TRIANGLES				= GL_TRIANGLES,				/**< Draw triangles using sequential vertex triplets */
+		TRIANGLE_STRIP			= GL_TRIANGLE_STRIP,		/**< Draw triangle strip using sequential vertices */
+		TRIANGLE_FAN			= GL_TRIANGLE_FAN,			/**< Draw triangle fan using sequential vertices */
+		QUADS					= GL_QUADS,					/**< Draw quadrilaterals using sequential vertex quadruplets */
+		QUAD_STRIP				= GL_QUAD_STRIP,			/**< Draw quadrilateral strip using sequential vertices */
+		POLYGON					= GL_POLYGON				/**< Draw polygon using sequential vertices */
 	};
 
 	enum ShadeModel {
-		FLAT					= GL_FLAT,
-		SMOOTH					= GL_SMOOTH
+		FLAT					= GL_FLAT,					/**< */
+		SMOOTH					= GL_SMOOTH					/**< */
 	};
 
 
@@ -197,33 +201,60 @@ public:
 	virtual ~Graphics();
 
 
-	const Mesh& mesh() const { return mMesh; }
+	/// Get the temporary mesh
 	Mesh& mesh(){ return mMesh; }
+	const Mesh& mesh() const { return mMesh; }
 
 
 	// Capabilities
+	
+	/// Enable a capability
 	void enable(Capability v){ glEnable(v); }
+	
+	/// Disable a capability
 	void disable(Capability v){ glDisable(v); }
+	
+	/// Set a capability
 	void capability(Capability cap, bool value);
-	void blending(bool b);	
+	
+	/// Turn blending on/off
+	void blending(bool b);
+	
+	/// Turn the depth mask on/off
 	void depthMask(bool b);
+	
+	/// Turn depth testing on/off
 	void depthTesting(bool b);
+	
+	/// Turn lighting on/off
 	void lighting(bool b);
+	
+	/// Turn scissor testing on/off
 	void scissorTest(bool b);
+	
+	/// Turn face culling on/off
 	void cullFace(bool b);
+	
+	/// Turn face culling on/off and set the culled face
 	void cullFace(bool b, Face face);
 
-
-	// Other state
+	/// Set antialiasing mode
 	void antialiasing(AntiAliasMode v);
+	
+	/// Set width, in pixels, of lines
 	void lineWidth(float v);
+
+	/// Set diameter, in pixels, of points
+	void pointSize(float v);
 
 	/// Set distance attenuation of points. The scaling formula is clamp(size * sqrt(1/(c0 + c1*d + c2*d^2)))
 	void pointAtten(float c2=0, float c1=0, float c0=1);
-	void pointSize(float v);
+
+	/// Set polygon drawing mode
 	void polygonMode(PolygonMode m, Face f=FRONT_AND_BACK);
+	
+	/// Set shading model
 	void shadeModel(ShadeModel m);
-	void fog(float end, float start, const Color& c);
 
 	/// Set blending mode
 	void blendMode(BlendFunc src, BlendFunc dst, BlendEq eq=FUNC_ADD);
@@ -233,10 +264,23 @@ public:
 	
 	/// Set blending mode to transparent
 	void blendModeTrans(){ blendMode(SRC_ALPHA, ONE_MINUS_SRC_ALPHA, FUNC_ADD); }
-								
+
+	/// Clear frame buffer(s)
 	void clear(AttributeBit bits);
+	
+	/// Set clear color
 	void clearColor(float r, float g, float b, float a);
+	
+	/// Set clear color
 	void clearColor(const Color& color) { clearColor(color.r, color.g, color.b, color.a); }
+
+
+	/// Set linear fog parameters
+	
+	/// \param[in] end		distance from viewer to fog end
+	/// \param[in] start	distance from viewer to fog start
+	/// \param[in] col		fog color
+	void fog(float end, float start, const Color& col);
 
 
 	// Coordinate Transforms
@@ -248,31 +292,76 @@ public:
 	void viewport(int x, int y, int width, int height);
 	void viewport(const Viewport& v){ viewport(v.l,v.b,v.w,v.h); }
 
+	/// Set current matrix
 	void matrixMode(MatrixMode mode);
+	
+	/// Push current matrix stack
 	void pushMatrix();
+
+	/// Push designated matrix stack
+	void pushMatrix(MatrixMode v){ matrixMode(v); pushMatrix(); }
+
+	/// Pop current matrix stack
 	void popMatrix();
+
+	/// Pop designated matrix stack
+	void popMatrix(MatrixMode v){ matrixMode(v); popMatrix(); }
+
+	/// Set current matrix to identity
 	void loadIdentity();
+	
+	/// Set current matrix
 	void loadMatrix(const Matrix4d &m);
 	void loadMatrix(const Matrix4f &m);
+	
+	/// Multiply current matrix
 	void multMatrix(const Matrix4d &m);
 	void multMatrix(const Matrix4f &m);
+
+	/// Set modelview matrix
 	void modelView(const Matrix4d& m){ matrixMode(MODELVIEW); loadMatrix(m); }
 	void modelView(const Matrix4f& m){ matrixMode(MODELVIEW); loadMatrix(m); }
+	
+	/// Set projection matrix
 	void projection(const Matrix4d& m){ matrixMode(PROJECTION); loadMatrix(m); }
 	void projection(const Matrix4f& m){ matrixMode(PROJECTION); loadMatrix(m); }
-	void translate(double x, double y, double z);
+
+
+
+	/// Rotate current matrix
+	
+	/// \param[in] angle	angle, in degrees
+	/// \param[in] x		x component of rotation axis
+	/// \param[in] y		y component of rotation axis
+	/// \param[in] z		z component of rotation axis
 	void rotate(double angle, double x, double y, double z);
+
+	/// Rotate current matrix
 	void rotate(const Quatd& q);
+	
+	/// Rotate current matrix
+	
+	/// \param[in] angle	angle, in degrees
+	/// \param[in] v		rotation axis
+	void rotate(double angle, const Vec3d& v) { rotate(angle, v[0], v[1], v[2]); }
+
+	/// Scale current matrix uniformly
+	void scale(double s) { scale(s, s, s); }
+
+	/// Scale current matrix along each dimension
 	void scale(double x, double y, double z);
 	
-	void pushMatrix(MatrixMode v){ matrixMode(v); pushMatrix(); }
-	void popMatrix(MatrixMode v){ matrixMode(v); popMatrix(); }
-	void translate(const Vec3d& v) { translate(v[0], v[1], v[2]); }
-	void translate(const Vec3f& v) { translate(v[0], v[1], v[2]); }
-	void rotate(double angle, const Vec3d& v) { rotate(angle, v[0], v[1], v[2]); }
-	void scale(double s) { scale(s, s, s); }
+	/// Scale current matrix along each dimension
 	void scale(const Vec3d& v) { scale(v[0], v[1], v[2]); }
 	void scale(const Vec3f& v) { scale(v[0], v[1], v[2]); }
+
+	/// Translate current matrix
+	void translate(double x, double y, double z);
+
+	/// Translate current matrix
+	void translate(const Vec3d& v) { translate(v[0], v[1], v[2]); }
+	void translate(const Vec3f& v) { translate(v[0], v[1], v[2]); }
+
 
 	// Immediate Mode
 
@@ -282,14 +371,17 @@ public:
 	/// End "immediate" mode
 	void end();
 
+	/// Set current color
 	void currentColor(float r, float g, float b, float a);
 
+	/// Add vertex (immediate mode)
 	void vertex(double x, double y, double z=0.);
 	void vertex(const Vec2d& v) { vertex(v[0], v[1], 0); }
 	void vertex(const Vec2f& v) { vertex(v[0], v[1], 0); }
 	void vertex(const Vec3d& v) { vertex(v[0], v[1], v[2]); }
 	void vertex(const Vec3f& v) { vertex(v[0], v[1], v[2]); }
 	
+	/// Add texture coordinate (immediate mode)
 	void texCoord(double u, double v);
 	void texCoord(const Vec2d& v) { texCoord(v[0], v[1]); }
 	void texCoord(const Vec2f& v) { texCoord(v[0], v[1]); }
@@ -297,10 +389,12 @@ public:
 	void texCoord(const Vec3d& v) { texCoord(v[0], v[1], v[2]); }
 	void texCoord(const Vec3f& v) { texCoord(v[0], v[1], v[2]); }
 	
+	/// Add normal (immediate mode)
 	void normal(double x, double y, double z=0.);
 	void normal(const Vec3d& v) { normal(v[0], v[1], v[2]); }
 	void normal(const Vec3f& v) { normal(v[0], v[1], v[2]); }
 	
+	/// Add color (immediate mode)
 	void color(double r, double g, double b, double a=1.);
 	void color(double gray, double a=1.) { color(gray, gray, gray, a); }
 	void color(const Color& v){ color(v.r, v.g, v.b, v.a); }
@@ -355,7 +449,10 @@ protected:
 ///	Abstract base class for any object that can be rendered via Graphics
 class Drawable {
 public:
+
+	/// Place drawing code here
 	virtual void onDraw(Graphics& gl) = 0;
+
 	virtual ~Drawable(){}
 };
 

@@ -41,10 +41,10 @@
 	File author(s):
 	Wesley Smith, 2010, wesley.hoke@gmail.com
 */
-
-#include "graphics/al_Shader.hpp"
-#include "graphics/al_Texture.hpp"
-#include "graphics/al_GPUObject.hpp"
+/*
+#include "allocore/graphics/al_Shader.hpp"
+#include "allocore/graphics/al_Texture.hpp"
+#include "allocore/graphics/al_GPUObject.hpp"
 
 #define SLAB_MAX_RENDER_TARGETS	8
 
@@ -92,5 +92,5 @@ protected:
 };
 
 } // al::
-
+*/
 #endif // AL_SLAB_H

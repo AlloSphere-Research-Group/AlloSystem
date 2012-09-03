@@ -23,15 +23,12 @@ LDFLAGS		+= -L../$(BUILD_DIR)lib
 
 # Define flags for external dependencies
 LINK_CPPFLAGS 	+= -I/usr/include/lua5.1/
-
 LINK_LDFLAGS	+= -lallocore
 
-ifeq ($(PLATFORM), linux)
+ifeq ($(PLATFORM), macosx)
+	LINK_LDFLAGS += -llua
+else
 	LINK_LDFLAGS += -llua5.1
-else ifeq ($(PLATFORM), macosx)
-	LINK_LDFLAGS += -llua
-else ifeq ($(PLATFORM), windows)
-	LINK_LDFLAGS += -llua
 endif
 
 include ../Makefile.rules

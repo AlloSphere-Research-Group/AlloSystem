@@ -87,7 +87,6 @@ ifeq ($(RUNTIME_BINDING), APR)
 endif
 
 VPATH += $(addprefix $(SRC_DIR), $(GFX_DIR) $(IO_DIR) $(PRO_DIR) $(MATH_DIR) $(SND_DIR) $(SPA_DIR) $(SYS_DIR) $(TYP_DIR))
-VPATH += $(RUN_SRC_DIRS)
 
 # END old Makefile.config
 
@@ -129,6 +128,13 @@ CPPFLAGS	+= $(addprefix -I, $(INC_DIRS) $(BUILD_DIR)/include)
 LDFLAGS		:= $(addprefix -L, $(LIB_DIRS) $(BUILD_DIR)/lib) $(LDFLAGS)
 
 
+
+#VPATH += allocore/graphics/ allocore/io/ allocore/math/
+#PCHS		=
+#PCHS		+= $(addsuffix .gch, $(notdir $(wildcard allocore/graphics/*.hpp)))
+#PCHS		+= $(addsuffix .gch, $(notdir $(wildcard allocore/io/*.hpp)))
+#PCHS		+= $(addsuffix .gch, $(notdir $(wildcard allocore/math/*.hpp)))
+
 #--------------------------------------------------------------------------
 # Rules
 #--------------------------------------------------------------------------
@@ -166,14 +172,14 @@ install: $(LIB_PATH)
 ## 	Copy library header files to build directory
 	@for v in `cd $(INC_DIR)/$(LIB_NAME) && find * -type d ! -path '*.*'` .; do\
 		$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)/$$v;\
-		$(INSTALL) -C -m 644 $(INC_DIR)/$(LIB_NAME)/$$v/*.h* $(DESTDIR)/include/$(LIB_NAME)/$$v;\
+		$(INSTALL) -m 644 $(INC_DIR)/$(LIB_NAME)/$$v/*.h* $(DESTDIR)/include/$(LIB_NAME)/$$v;\
 	done
 
 ##	Copy library if it doesn't exist or is newer than existing
 	@$(INSTALL) -d $(DESTDIR)/lib/
 	@if [ $(LIB_PATH) -nt $(DESTDIR)/lib/$(LIB_FILE) ] || [ ! -e $(DESTDIR)/lib/$(LIB_FILE) ]; then \
 		echo INSTALL $(LIB_PATH) to $(DESTDIR)/lib/;\
-		$(INSTALL) -C -m 644 $(LIB_PATH) $(DESTDIR)/lib/;\
+		$(INSTALL) -m 644 $(LIB_PATH) $(DESTDIR)/lib/;\
 	fi;
 
 ##	Install header files from local build directory into DESTDIR
