@@ -46,6 +46,7 @@
 
 #include "allocore/types/al_Array.hpp"
 #include "allocore/math/al_Functions.hpp"
+#include "allocore/math/al_Random.hpp"
 
 namespace al {
 
