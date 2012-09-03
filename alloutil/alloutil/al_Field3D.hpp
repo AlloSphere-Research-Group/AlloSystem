@@ -201,10 +201,10 @@ public:
 		FIELD = 2
 	};
 
-	Fluid3D(int dim=32) 
-	:	velocities(3, dim),
-		gradient(1, dim),
-		boundaries(1, Array::type<T>(), dim, dim, dim),
+	Fluid3D(int dimx=32, int dimy=32, int dimz=32) 
+	:	velocities(3, dimx, dimy, dimz),
+		gradient(1, dimx, dimy, dimz),
+		boundaries(1, Array::type<T>(), dimx, dimy, dimz),
 		passes(14),	
 		viscocity(0.00001),
 		selfadvection(0.9),
