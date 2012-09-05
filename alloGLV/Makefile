@@ -18,7 +18,7 @@ OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 #CPPFLAGS	+= -I../../Gamma/
 
 # include dependencies from parent build folder
-CPPFLAGS	+= -I../build/include
+CPPFLAGS	+= -I../build/include/
 LDFLAGS		+= -L../build/lib/
 
 CPPFLAGS	+= -I./ -I$(BUILD_DIR)include
