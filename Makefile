@@ -1,8 +1,8 @@
 #=========================================================================
-# Allos main makefile
+# AlloSystem main Makefile
 #=========================================================================
 
-LIB_NAME = allos
+LIB_NAME = allosystem
 
 include Makefile.common
 
@@ -41,9 +41,8 @@ alloutil: FORCE allocore
 allonect: FORCE allocore alloutil
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR)
 
-
 Gamma GLV: FORCE
-	@$(MAKE) --no-print-directory -C ../$@ install DESTDIR=../$(LIB_NAME)/$(BUILD_DIR) linkfile
+	@$(MAKE) --no-print-directory -C ../$@ install DESTDIR=$(CURDIR)/$(BUILD_DIR) linkfile
 
 alloGLV: FORCE allocore GLV
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR)
