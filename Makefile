@@ -45,7 +45,7 @@ Gamma GLV: FORCE
 	@$(MAKE) --no-print-directory -C ../$@ install DESTDIR=$(CURDIR)/$(BUILD_DIR) linkfile
 
 alloGLV: FORCE allocore GLV
-	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR)
+	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR) linkfile
 
 
 clean:

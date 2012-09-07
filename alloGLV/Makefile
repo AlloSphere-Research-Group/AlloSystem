@@ -23,6 +23,8 @@ LDFLAGS		+= -L../build/lib/
 
 CPPFLAGS	+= -I./ -I$(BUILD_DIR)include
 
+LINK_LDFLAGS	+= -lGLV
+
 # include all the linker flags
 -include ../allocore/Makefile.link
 -include ../../GLV/Makefile.link
