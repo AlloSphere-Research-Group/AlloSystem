@@ -38,12 +38,12 @@ include ../Makefile.rules
 install: $(LIB_PATH)
 	@$(INSTALL) -d $(DESTDIR)/lib/
 	@$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)/
-	@$(INSTALL) -C -m 644 $(INC_DIR)/*.h* $(DESTDIR)/include/$(LIB_NAME)/
+	@$(INSTALL) -m 644 $(INC_DIR)/*.h* $(DESTDIR)/include/$(LIB_NAME)/
 
 ##	Only copy library if it doesn't exist or is newer than existing
 	@if [ $(LIB_PATH) -nt $(DESTDIR)/lib/$(LIB_FILE) ] || [ ! -e $(DESTDIR)/lib/$(LIB_FILE) ]; then \
 		echo INSTALL $(LIB_PATH) to $(DESTDIR)/lib/;\
-		$(INSTALL) -C -m 644 $(LIB_PATH) $(DESTDIR)/lib/;\
+		$(INSTALL) -m 644 $(LIB_PATH) $(DESTDIR)/lib/;\
 	fi;
 
 # Remove build files
