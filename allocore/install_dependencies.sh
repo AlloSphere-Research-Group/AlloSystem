@@ -81,16 +81,26 @@ elif [ `uname | grep MINGW` ]; then
 		rm -rf $PKG
 		rm $PKG.zip
 
-		PKG=glew-1.9.0-win32
+		# These MSVC binaries don't work with MinGW/Msys :(
+		#PKG=glew-1.9.0-win32
+		#wget http://downloads.sourceforge.net/project/glew/glew/1.9.0/$PKG.zip
+		#unzip $PKG.zip
+		#mv glew-1.9.0 $PKG
+		#cp $PKG/bin/*.dll $DESTDIR/bin/
+		#cp $PKG/lib/*.lib $DESTDIR/lib/
+		#cp -r $PKG/include/* $DESTDIR/include/
+		#rm -rf $PKG
+		#rm $PKG.zip
+
+		PKG=glew-1.9.0
 		wget http://downloads.sourceforge.net/project/glew/glew/1.9.0/$PKG.zip
-		unzip $PKG.zip
-		mv glew-1.9.0 $PKG
-		cp $PKG/bin/*.dll $DESTDIR/bin/
-		cp $PKG/lib/*.lib $DESTDIR/lib/
-		cp -r $PKG/include/* $DESTDIR/include/
+		unzip -q $PKG.zip
+		pushd $PKG
+			make install GLEW_DEST=/usr/local/ -j3
+		popd
 		rm -rf $PKG
 		rm $PKG.zip
-		
+
 		PKG=freetype-dev_2.4.2-1_win32
 		wget http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/$PKG.zip
 		unzip $PKG.zip -d $PKG
