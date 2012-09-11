@@ -70,10 +70,13 @@ BUILT_MODULES := $(basename $(shell if [ -d $(BUILD_DIR)/lib/ ]; then ls $(BUILD
 BUILT_MODULES := $(subst lib,,$(BUILT_MODULES))
 BUILT_MODULES := $(filter allo%, $(BUILT_MODULES))
 
-# This is a hack to ensure that Gamma's linker dependencies are included.
+# This is a hack to ensure that Gamma and GLV linker dependencies are included.
 # A better, more general solution would involve having a user dependency directory that is scanned.
 ifneq ($(shell ls $(BUILD_DIR)/lib/ | grep Gamma),)
 	BUILT_MODULES += ../Gamma/
+endif
+ifneq ($(shell ls $(BUILD_DIR)/lib/ | grep GLV),)
+	BUILT_MODULES += ../GLV/
 endif
 
 -include $(addsuffix /Makefile.link, $(BUILT_MODULES))
