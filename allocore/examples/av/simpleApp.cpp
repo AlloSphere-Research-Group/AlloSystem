@@ -5,6 +5,39 @@ Description:
 This example demonstrates how to use the App class to create a 3D space with
 audio and graphics rendering callbacks.
 
+The App class (and any subclass thereof) has some default keyboard and mouse
+controls assigned automatically. These are:
+
+	Keyboard		Action
+	'w'				move forward
+	'x'				move back
+	'a'				move left
+	'd'				move right
+	'e'				move up
+	'c'				move down
+
+	'q'				roll counter-clockwise
+	'z'				roll clockwise
+	left arrow		turn left
+	right arrow		turn right
+	up arrow		turn up
+	down arrow		turn down
+
+	Mouse
+	drag left		turn left
+	drag right		turn right
+	drag up			turn up
+	drag down		turn down
+
+For the camera, the coordinate conventions are:
+
+	-x is left
+	+x is right
+	-y is down
+	+y is up
+	-z is forward 
+	+z is backward
+
 Author:
 Lance Putnam, 6/2011, putnam.lance@gmail.com
 */
@@ -19,26 +52,29 @@ public:
 
 	double phase;
 
-	// Ths constructor is where we initialize the application
+	// This constructor is where we initialize the application
 	MyApp(): phase(0){
-		// Configure our camera lens
+
+		// Configure the camera lens
 		lens().near(0.1).far(25).fovy(45);
 
 		// Set navigation position and orientation
 		nav().pos(0,0,4);
 		nav().quat().fromAxisAngle(0, 0,0,1);
 
-		// Initialize a single window
-		// Anything in App::onDraw will be rendered
-		initWindow(Window::Dim(600,400));
+		// Initialize a single window; anything in App::onDraw will be rendered
+		// Arguments: position/dimensions, title, frames/second
+		initWindow(Window::Dim(0,0, 600,400), "Untitled", 40);
 		
+		// Uncomment this to disable the default navigation keyboard/mouse controls
+		//window().remove(navControl());
+
+		// Set background color
+		//stereo().clearColor(HSV(0,0,1));
+
 		// Initialize audio so that App::onSound is called
-		initAudio(
-			44100,		// sample rate, in Hz
-			128,		// block size
-			2,			// number of output channels to open
-			1			// number of input channels to open
-		);
+		// Arguments: sample rate (Hz), block size, output channels, input channels
+		initAudio(44100, 128, 2, 1);
 	}
 
 
@@ -73,8 +109,8 @@ public:
 
 	// This is the application's view update.
 	// This is called one or more times per frame, for each window, viewport,
-	// and eye (for stereoscopic). Typically, this is where you send drawing
-	// commands to the GPU.
+	// and eye (for stereoscopic). Typically, this is where you instruct the
+	// GPU to render something.
 	virtual void onDraw(Graphics& g, const Viewpoint& v){
 		
 		// Note: we don't need to do all the normal graphics setup as this
@@ -94,16 +130,37 @@ public:
 
 		g.draw(m);
 	}
-	
-	// This is the application's key down controller.
+
+
+	// This is called whenever a key is pressed.
 	virtual void onKeyDown(const ViewpointWindow& w, const Keyboard& k){
-		printf("Pressed the %c key.\n", k.key());
+		switch(k.key()){
+		case 'n': break;
+		}
 	}
+
+	// This is called whenever a mouse button is pressed.
+	virtual void onMouseDown(const ViewpointWindow& w, const Mouse& m){
+		switch(m.button()){
+		case Mouse::LEFT: break;
+		case Mouse::RIGHT: break;
+		case Mouse::MIDDLE: break;
+		}
+	}
+	
+	// This is called whenever the mouse is dragged.
+	virtual void onMouseDrag(const ViewpointWindow& w, const Mouse& m){
+		// Get mouse coordinates, in pixels, relative to top-left corner of window
+		int x = m.x();
+		int y = m.y();
+		printf("Mouse dragged: %3d, %3d\n", x,y);
+	}
+	
+	// *****************************************************
+	// NOTE: check the App class for more callback functions
 };
 
 
-MyApp app;
-
 int main(){
-	app.start();
+	MyApp().start();
 }
