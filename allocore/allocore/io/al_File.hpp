@@ -92,7 +92,7 @@ public:
 
 	/// Write string to file
 	int write(const std::string& v){ return write(v.data(), 1, v.length()); }
-	
+
 	/// Write memory elements to file
 	int write(const void * v, int itemSizeInBytes, int items=1){
 		int itemsWritten = fwrite(v, itemSizeInBytes, items, mFP);
@@ -146,7 +146,7 @@ public:
 	static std::string conformDirectory(const std::string& dir);
 
 	/// Conforms path
-	
+
 	/// This function takes a path as an argument and returns a new path with
 	/// correct platform-specific directory delimiters, '/' or '\' and
 	/// an extra delimiter at the end if the argument is a valid directory.
@@ -193,12 +193,13 @@ public:
 	/// \returns whether the file or directory was found
 	static bool searchBack(std::string& path, int maxDepth=6);
 
-/*	static al_sec modified(const std::string& path){ return File(path).modified(); }
+	// TODO: why have these?
+	static al_sec modified(const std::string& path){ return File(path).modified(); }
 	static al_sec accessed(const std::string& path){ return File(path).accessed(); }
 	static al_sec created (const std::string& path){ return File(path).created(); }
 	static size_t sizeFile(const std::string& path){ return File(path).sizeFile(); }
 	static size_t storage (const std::string& path){ return File(path).storage(); }
-*/
+
 protected:
 	class Impl; Impl * mImpl;
 
