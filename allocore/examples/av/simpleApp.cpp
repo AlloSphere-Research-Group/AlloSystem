@@ -60,7 +60,7 @@ public:
 
 		// Set navigation position and orientation
 		nav().pos(0,0,4);
-		nav().quat().fromAxisAngle(0, 0,0,1);
+		nav().quat().fromAxisAngle(0.*M_2PI, 0,1,0);
 
 		// Initialize a single window; anything in App::onDraw will be rendered
 		// Arguments: position/dimensions, title, frames/second
