@@ -1,6 +1,10 @@
 #include <cstring>
-
 #include "allocore/io/al_File.hpp"
+
+// TODO:
+// At the moment, we only use APR for getting modification times of files
+// and for scanning directories. It would be better to have native solutions
+// for these two tasks...
 
 #include "../private/al_ImplAPR.h"
 #ifdef AL_LINUX
@@ -10,16 +14,6 @@
 #endif
 
 namespace al{
-
-//void path2dir(char* dst, const char* src) {
-//    char* s;
-//	snprintf(dst, AL_PATH_MAX, "%s", src);
-//    s = strrchr(dst, '/');
-//    if (s)
-//        s[1] = '\0';
-//    else
-//        dst[0] = '\0';
-//}
 
 struct File::Impl : public ImplAPR {
 public:
@@ -74,30 +68,6 @@ public:
 };
 
 
-FilePath SearchPaths::find(const std::string& name) {
-	FilePath result;
-	bool found = false;
-	std::list<SearchPaths::searchpath>::iterator iter = mSearchPaths.begin();
-	while ((!found) && iter != mSearchPaths.end()) {
-		Path path(iter->first.c_str());
-		found = path.find(name, result, iter->second);
-		iter++;
-	}
-	return result;
-}
-
-FilePath::FilePath(std::string fullpath) {
-	size_t found = fullpath.rfind(AL_FILE_DELIMITER);
-	if (found!=std::string::npos) {
-		mPath = fullpath.substr(0, found+1);
-		mFile = fullpath.substr(found+1);
-	} else {
-		mPath = "/";
-		mFile = fullpath;
-	}
-
-}
-
 File::File(const std::string& path, const std::string& mode, bool open_)
 :	mImpl(new Impl()), 
 	mPath(path), mMode(mode), mContent(0), mSizeBytes(0), mFP(0)
@@ -108,61 +78,10 @@ File::File(const FilePath& path, const std::string& mode, bool open_)
 	mPath(path.filepath()), mMode(mode), mContent(0), mSizeBytes(0), mFP(0)
 {	if(open_) open(); }
 
-File::~File(){ close(); freeContent(); delete mImpl; }
-
-void File::allocContent(int n){
-	if(mContent) freeContent();
-	mContent = new char[n+1];
-	mContent[n] = '\0';
+File::~File(){
+	dtor();
+	delete mImpl;
 }
-
-
-void File::freeContent(){ delete[] mContent; }
-
-void File::getSize(){
-	int r=0;
-	if(opened()){
-		fseek(mFP, 0, SEEK_END);
-		r = ftell(mFP);
-		rewind(mFP);
-//		printf("File::getSize %d (%s)\n", r, mode().c_str());
-	}
-	mSizeBytes = r;
-}
-
-bool File::open(){
-	if(0 == mFP){
-		mFP = fopen(path().c_str(), mode().c_str());
-		if(mFP){
-			getSize();
-			return true;
-		}
-	}
-	return false;
-}
-
-void File::close(){ if(opened()){ fclose(mFP); } mFP=0; mSizeBytes=0; }
-
-const char * File::readAll(){
-	if(opened() && mMode[0]=='r'){
-		int n = size();
-		allocContent(n);
-		int numRead = fread(mContent, sizeof(char), n, mFP);
-		if(numRead < n){}
-	}
-	return mContent;
-}
-
-int File::write(const std::string& path, const void * v, int size, int items){
-	File f(path, "w");
-	int r = 0;
-	if(f.open()){
-		r = f.write(v, size, items);
-		f.close();
-	}
-	return r;
-}
-
 
 al_sec File :: modified() const {
 	if (mImpl->getInfo(path().c_str(), APR_FINFO_MTIME)) {
@@ -199,6 +118,19 @@ size_t File :: storage() const {
 	return 0;
 }
 
+
+// This is the one sour egg that needs APR impl for directory scanning...
+FilePath SearchPaths::find(const std::string& name) {
+	FilePath result;
+	bool found = false;
+	std::list<SearchPaths::searchpath>::iterator iter = mSearchPaths.begin();
+	while ((!found) && iter != mSearchPaths.end()) {
+		Path path(iter->first.c_str());
+		found = path.find(name, result, iter->second);
+		iter++;
+	}
+	return result;
+}
 
 } // al::
 
