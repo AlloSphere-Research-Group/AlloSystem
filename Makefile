@@ -16,13 +16,14 @@ MODULE_DIRS := $(shell ls -d */ | grep allo)
 help:
 	@echo No rule specified.
 	@echo The possible rules are:
-	@echo "    all ......... build all modules found in this directory"
-	@echo "    allocore .... build allocore"
-	@echo "    alloutil .... build allocore utilities extension"
-	@echo "    alloGLV ..... build allocore/GLV binding"
-	@echo "    Gamma ....... build Gamma external"
-	@echo "    GLV ......... build GLV external"
-	@echo "    clean........ clean all modules found in this directory"
+	@echo "    all .............. build all modules found in this directory"
+	@echo "    allocore ......... build allocore"
+	@echo "    alloutil ......... build allocore utilities extension"
+	@echo "    alloGLV .......... build allocore/GLV binding"
+	@echo "    Gamma ............ build Gamma external"
+	@echo "    GLV .............. build GLV external"
+	@echo "    clean ............ clean all modules found in this directory"
+	@echo "    gatherexamples ... create examples/ directory with symlinks to module examples"
 
 include Makefile.rules
 
