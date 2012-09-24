@@ -10,12 +10,14 @@ ProtoApp::ProtoApp()
 
 	Window * win = initWindow();
 
-	cnFOV.setValue(60);
-
 	mTopBar.arrangement("<>");
 	//mTopBar.stretch(1,0);
 	//mTopBar.enable(glv::DrawBorder);
 	mTopBar << mAppLabel << mGUI.detachedButton();
+
+	cnFOV.setValue(60);
+	cnScale.setValue(1);
+	cnGain.setValue(0.5);
 
 	mParamPanel
 		.addParam(cnFOV, "FOV")
