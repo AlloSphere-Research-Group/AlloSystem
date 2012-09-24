@@ -117,34 +117,57 @@ public:
 		// is handled by the App's stereographic object. We can just draw
 		// our geometry immediately!
 		
+		// Graphics has a Mesh for temporary use
 		Mesh& m = g.mesh();
 		
+		// We must clear the Mesh each frame because we are regenerating its
+		// vertices each frame.
 		m.reset();
+		
+		// Set drawing primitive of Mesh
 		m.primitive(g.TRIANGLES);
 
+		// Add new vertices to the Mesh in the shape of a sphere.
+		// The return value is the number of vertices added.
 		int N = addSphere(m, 1, 32, 32);
 
+		// We add new colors for each vertex generated in the call above.
 		for(int i=0; i<N; ++i){
 			m.color(HSV(0.1, 0.5, al::fold(phase + i*0.5/N, 0.5)+0.5));
 		}
 
+		// Finally, command Graphics to draw the Mesh
 		g.draw(m);
 	}
 
 
 	// This is called whenever a key is pressed.
 	virtual void onKeyDown(const ViewpointWindow& w, const Keyboard& k){
+	
+		// Use a switch to do something when a particular key is pressed
 		switch(k.key()){
-		case 'n': break;
+
+		// For printable keys, we just use its character symbol:
+		case '1': printf("Pressed 1.\n"); break;
+		case 'y': printf("Pressed y.\n"); break;
+		case 'n': printf("Pressed n.\n"); break;
+		case '.': printf("Pressed period.\n"); break;
+		case ' ': printf("Pressed space bar.\n"); break;
+		
+		// For non-printable keys, we have to use the enums described in the
+		// Keyboard class:
+		case Keyboard::RETURN: printf("Pressed return.\n"); break;
+		case Keyboard::DELETE: printf("Pressed delete.\n"); break;
+		case Keyboard::F1: printf("Pressed F1.\n"); break;
 		}
 	}
 
 	// This is called whenever a mouse button is pressed.
 	virtual void onMouseDown(const ViewpointWindow& w, const Mouse& m){
 		switch(m.button()){
-		case Mouse::LEFT: break;
-		case Mouse::RIGHT: break;
-		case Mouse::MIDDLE: break;
+		case Mouse::LEFT: printf("Pressed left mouse button.\n"); break;
+		case Mouse::RIGHT: printf("Pressed right mouse button.\n"); break;
+		case Mouse::MIDDLE: printf("Pressed middle mouse button.\n"); break;
 		}
 	}
 	
