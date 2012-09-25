@@ -66,6 +66,10 @@ int addIcosahedron(Mesh& m);
 
 /// Add sphere as triangle vertices and indices
 
+/// Vertices go stack-by-stack, then slice-by-slice. The stacks start at the
+/// north pole (0,0,radius) and end at the south pole (0,0,-radius). 
+/// The slices start on the x axis and go counter-clockwise on the xy plane.
+///
 /// @param[in,out]	m		mesh to add vertices and indices to
 /// @param[in]		radius	radius of sphere
 /// @param[in]		slices	number of slices around z axis

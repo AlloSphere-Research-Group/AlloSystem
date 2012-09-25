@@ -2,9 +2,39 @@
 
 int utFile() {
 
+	#define DELIM AL_FILE_DELIMITER_STR
+
 	// static functions
 	assert(File::exists("."));
-	//assert(File::exists("." AL_FILE_DELIMITER_STR)); // fails under win32
+	//assert(File::exists("." DELIM)); // fails under win32
+
+	assert(File::isDirectory("."));
+	assert(File::isDirectory(".." DELIM));
+	assert(!File::isDirectory(".." DELIM ".." DELIM "Makefile"));
+
+	assert(
+		File::conformDirectory("test") 
+		== "test" DELIM
+	);
+	assert(
+		File::conformDirectory("test" DELIM) 
+		== "test" DELIM
+	);
+
+	assert(
+		File::conformPathToOS("..\\../Makefile")
+		== ".." DELIM ".." DELIM "Makefile"
+	);
+
+	assert(
+		File::conformPathToOS("..\\../")
+		== ".." DELIM ".." DELIM
+	);
+
+	assert(
+		File::conformPathToOS("..\\..")
+		== ".." DELIM ".." DELIM
+	);
 
 	// simple file/directory searching
 	{
@@ -17,12 +47,12 @@ int utFile() {
 		assert(r);
 		assert(File::exists(dir + find));
 		
-		find = ".." AL_FILE_DELIMITER_STR + find;	// check for a file with path
+		find = ".." DELIM + find;	// check for a file with path
 		r = File::searchBack(dir, find);
 		assert(r);
 		assert(File::exists(dir + find));
 
-		assert(!File::searchBack(dir, "thisdirectorydoesnotexist" AL_FILE_DELIMITER_STR "thisfiledoesnotexist.ext"));
+		assert(!File::searchBack(dir, "thisdirectorydoesnotexist" DELIM "thisfiledoesnotexist.ext"));
 	}
 
 	{
@@ -64,8 +94,8 @@ int utFile() {
 		f.close();
 		
 		f.path(
-			"thisdirectroydoesnotexist" AL_FILE_DELIMITER_STR
-			"neitherdoesthisone" AL_FILE_DELIMITER_STR
+			"thisdirectroydoesnotexist" DELIM
+			"neitherdoesthisone" DELIM
 			"notafile.txt"
 		);
 		assert(!f.open());
@@ -85,5 +115,6 @@ int utFile() {
 		//printf("%s\n", fp.filepath().c_str());
 	}
 	
+	#undef DELIM
 	return 0;
 }

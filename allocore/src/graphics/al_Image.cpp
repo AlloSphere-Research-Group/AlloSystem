@@ -121,15 +121,9 @@ public:
 							RGBTRIPLE * pix = (RGBTRIPLE *)FreeImage_GetScanLine(mImage, j);
 							Image::RGBPix<uint8_t> *o_pix = (Image::RGBPix<uint8_t> *)(bp + j*rowstride);
 							for(unsigned i=0; i < lat.header.dim[0]; ++i) {
-								#if (defined(AL_LINUX) || defined(AL_OSX))
 								o_pix->r = pix->rgbtRed;
 								o_pix->g = pix->rgbtGreen;
 								o_pix->b = pix->rgbtBlue;
-								#else
-								o_pix->r = pix->rgbtBlue;
-								o_pix->g = pix->rgbtGreen;
-								o_pix->b = pix->rgbtRed;
-								#endif
 								++pix;
 								++o_pix;
 							}
@@ -165,18 +159,10 @@ public:
 							RGBQUAD *pix = (RGBQUAD *)FreeImage_GetScanLine(mImage, j);
 							Image::RGBAPix<uint8_t> *o_pix = (Image::RGBAPix<uint8_t> *)(bp + j*rowstride);
 							for(unsigned i=0; i < lat.header.dim[0]; ++i) {
-								#if (defined(AL_LINUX) || defined(AL_OSX))
 								o_pix->r = pix->rgbRed;
 								o_pix->g = pix->rgbGreen;
 								o_pix->b = pix->rgbBlue;
 								o_pix->a = pix->rgbReserved;
-								#else
-								o_pix->r = pix->rgbBlue;
-								o_pix->g = pix->rgbGreen;
-								o_pix->b = pix->rgbRed;
-								o_pix->a = pix->rgbReserved;
-								#endif
-
 								++pix;
 								++o_pix;
 							}
