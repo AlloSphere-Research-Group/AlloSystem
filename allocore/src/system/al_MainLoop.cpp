@@ -4,35 +4,21 @@
 #include <assert.h>
 #include <stdio.h>		// snprintf
 #include <stdlib.h>		// exit
-#include <map>
+#include <algorithm>	// std::find
+
 
 // GLUT includes:
 #ifdef AL_OSX
 	#include <OpenGL/OpenGL.h>
 	#include <GLUT/glut.h>
-	#define AL_GRAPHICS_INIT_CONTEXT\
-		/* prevents tearing */ \
-		{	GLint MacHackVBL = 1;\
-			CGLContextObj ctx = CGLGetCurrentContext();\
-			CGLSetParameter(ctx,  kCGLCPSwapInterval, &MacHackVBL); }
 #endif
 #ifdef AL_LINUX
 	#include <GL/glew.h>
 	#include <GL/glut.h>
-
-	#define AL_GRAPHICS_INIT_CONTEXT\
-		{	GLenum err = glewInit();\
-			if (GLEW_OK != err){\
-  				/* Problem: glewInit failed, something is seriously wrong. */\
-  				fprintf(stderr, "GLEW Init Error: %s\n", glewGetErrorString(err));\
-			}\
-		}
 #endif
 #ifdef AL_WINDOWS
-	#include <windows.h>
+	#include <GL/glew.h>
 	#include <GL/glut.h>
-
-	#define AL_GRAPHICS_INIT_CONTEXT
 #endif
 
 
@@ -112,11 +98,8 @@ Main::Main()
 	mActive(false)
 {
 	if (!gInitialized) {
-		
 		mainGLUTInit();
-	
 		al_main_native_init();
-	
 		gInitialized = true;
 	}
 }

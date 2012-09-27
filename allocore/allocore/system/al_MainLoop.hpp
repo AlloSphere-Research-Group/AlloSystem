@@ -45,12 +45,10 @@
 #include "allocore/system/al_Config.h"
 #include "allocore/system/al_Time.h"
 #include "allocore/types/al_MsgQueue.hpp"
-
 #include <vector>
-#include <algorithm>
+
 
 namespace al {
-
 
 class Main {
 public:
