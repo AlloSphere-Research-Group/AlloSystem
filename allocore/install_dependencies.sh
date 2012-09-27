@@ -25,7 +25,7 @@ elif [ `which port` ]; then
 
 elif [ `which brew` ]; then
 	echo "Found Homebrew"
-	sudo brew update
+	brew update
 	brew install portaudio libsndfile
 	brew install glew
 	brew install assimp

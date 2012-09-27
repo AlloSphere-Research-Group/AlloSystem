@@ -18,7 +18,7 @@ elif [ `which port` ]; then
 
 elif [ `which brew` ]; then
 	echo "Found Homebrew"
-	sudo brew update
+	brew update
 	brew install lua
 
 elif [ `uname | grep MINGW` ]; then
