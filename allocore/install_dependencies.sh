@@ -1,16 +1,16 @@
 #!/bin/bash
 # AlloCore dependencies install script
 
-if [ `which apt-get` ]; then
+if [ `which apt-get 2>/dev/null` ]; then
 	echo "Found apt-get"
 	sudo apt-get update
 	sudo apt-get install libapr1-dev libaprutil1-dev
 	sudo apt-get install portaudio19-dev libsndfile1-dev
 	sudo apt-get install libglew-dev freeglut3-dev 
-	sudo apt-get install libassimp-dev libfreeimage-dev libfreetype6-dev
 	sudo apt-get install libavahi-client-dev	# for protocol/al_ZeroConf
+	sudo apt-get install libassimp-dev libfreeimage-dev libfreetype6-dev
 
-elif [ `which port` ]; then
+elif [ `which port 2>/dev/null` ]; then
 	echo "Found MacPorts"
 	sudo port selfupdate
 	sudo port install portaudio libsndfile +universal
@@ -23,9 +23,9 @@ elif [ `which port` ]; then
 	sudo port install freeimage +universal
 	sudo port install freetype +universal
 
-elif [ `which brew` ]; then
+elif [ `which brew 2>/dev/null` ]; then
 	echo "Found Homebrew"
-	brew update
+	sudo brew update
 	brew install portaudio libsndfile
 	brew install glew
 	brew install assimp
@@ -44,7 +44,6 @@ elif [ `uname | grep MINGW` ]; then
 		DESTDIR=/usr/local/
 		#DESTDIR=local/
 		install -d $DESTDIR/bin/ $DESTDIR/include/ $DESTDIR/lib/
-
 		
 		PKG=libsndfile-1.0.25
 		wget http://www.mega-nerd.com/libsndfile/files/$PKG.tar.gz
@@ -70,7 +69,7 @@ elif [ `uname | grep MINGW` ]; then
 
 		PKG=apr-1.3.6-iconv-1.2.1-util-1.3.8-win32-x86-msvcrt60
 		wget http://mirrors.rackhosting.com/apache/apr/binaries/win32/$PKG.zip
-		unzip $PKG.zip
+		unzip -q $PKG.zip
 		mv apr-dist $PKG
 		cp $PKG/bin/libapr-1.dll		$DESTDIR/bin/
 		cp $PKG/bin/libaprutil-1.dll	$DESTDIR/bin/
@@ -103,7 +102,7 @@ elif [ `uname | grep MINGW` ]; then
 
 		PKG=freetype-dev_2.4.2-1_win32
 		wget http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/$PKG.zip
-		unzip $PKG.zip -d $PKG
+		unzip -q $PKG.zip -d $PKG
 		cp $PKG/lib/* $DESTDIR/lib/
 		cp -r $PKG/include/* $DESTDIR/include/
 		rm -rf $PKG
@@ -111,7 +110,7 @@ elif [ `uname | grep MINGW` ]; then
 		
 		PKG=FreeImage3153Win32
 		wget http://downloads.sourceforge.net/freeimage/$PKG.zip
-		unzip $PKG.zip
+		unzip -q $PKG.zip
 		mv FreeImage $PKG
 		cp $PKG/Dist/FreeImage.dll $DESTDIR/bin/
 		cp $PKG/Dist/FreeImage.lib $DESTDIR/lib/
@@ -121,7 +120,7 @@ elif [ `uname | grep MINGW` ]; then
 		
 		PKG=assimp--2.0.863-sdk
 		wget http://downloads.sourceforge.net/project/assimp/assimp-2.0/$PKG.zip
-		unzip $PKG.zip
+		unzip -q $PKG.zip
 		install -d $DESTDIR/include/assimp/Compiler/
 		cp -r $PKG/include/* $DESTDIR/include/assimp/
 		cp $PKG/bin/assimp_release-dll_win32/Assimp32.dll $DESTDIR/bin/
@@ -129,9 +128,20 @@ elif [ `uname | grep MINGW` ]; then
 		rm -rf $PKG
 		rm $PKG.zip
 
-		PKG=glut-3.7.6-bin
-		wget http://user.xmission.com/~nate/glut/$PKG.zip
-		unzip $PKG.zip
+		# This site always seems to be down...
+		#PKG=glut-3.7.6-bin
+		#wget http://user.xmission.com/~nate/glut/$PKG.zip
+		#unzip -q $PKG.zip
+		#install -d $DESTDIR/include/GL/
+		#cp $PKG/glut.h $DESTDIR/include/GL/
+		#cp $PKG/glut32.dll $DESTDIR/bin/
+		#cp $PKG/glut32.lib $DESTDIR/lib/
+		#rm -rf $PKG
+		#rm $PKG.zip
+
+		PKG=glutdlls37beta
+		wget http://www.opengl.org/resources/libraries/glut/$PKG.zip
+		unzip -q $PKG.zip -d $PKG
 		install -d $DESTDIR/include/GL/
 		cp $PKG/glut.h $DESTDIR/include/GL/
 		cp $PKG/glut32.dll $DESTDIR/bin/
