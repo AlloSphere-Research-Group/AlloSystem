@@ -73,7 +73,7 @@ void WindowEventHandler::removeFromWindow(){
 
 
 Window::Window()
-:	mDisplayMode(DEFAULT_BUF), mASAP(false)
+:	mDisplayMode(DEFAULT_BUF), mASAP(false), mVSync(true)
 {
 	implCtor(); // must call first!
 	dimensions(Dim(800,600));

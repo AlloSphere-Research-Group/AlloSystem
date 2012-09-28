@@ -304,6 +304,7 @@ public:
 	double spfActual() const;					///< Returns seconds/frame (actual)
 	const std::string& title() const;			///< Get title of window
 	bool visible() const;						///< Get whether window is visible
+	bool vsync() const { return mVSync; }		///< Get whether v-sync is enabled
 	bool asap() const { return mASAP; }			///< Get whether window is rendering as fast as possible
 
 	int height() const { return dimensions().h; }
@@ -327,6 +328,7 @@ public:
 	Window& iconify();							///< Iconify window
 	Window& show();								///< Show window (if hidden)
 	Window& title(const std::string& v);		///< Set title
+	Window& vsync(bool v);						///< Set whether to sync the frame rate to the monitor's refresh rate 
 	Window& asap(bool v){ mASAP=v; return *this; }	///< Set whether window renders as fast as possible
 
 	/// Append handler to input event handler list
@@ -389,6 +391,7 @@ protected:
 	WindowEventHandlers mWindowEventHandlers;
 	DisplayMode mDisplayMode;
 	bool mASAP;
+	bool mVSync;
 
 	// defined in pimpl-specific file
 	void implCtor();

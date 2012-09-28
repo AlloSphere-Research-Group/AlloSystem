@@ -595,6 +595,7 @@ bool Window::create(
 	WindowImpl::windows()[mImpl->mID] = mImpl;
 
 	AL_GRAPHICS_INIT_CONTEXT;
+	vsync(mVSync);
 	callHandlersOnCreate();
 
 	// We need to manually call this because GLUT will not call its reshape
@@ -749,6 +750,20 @@ Window& Window::title(const std::string& v){
 	if(makeCurrent()){
 		glutSetWindowTitle(mImpl->mTitle.c_str());
 		//printf("Window::title(%s)\n", mImpl->mTitle.c_str());
+	}
+	return *this;
+}
+
+Window& Window::vsync(bool v){
+	if(makeCurrent()){
+		mVSync = v;
+		#if defined AL_OSX
+			GLint VBL = v ? 1 : 0;
+			CGLContextObj ctx = CGLGetCurrentContext();
+			CGLSetParameter(ctx, kCGLCPSwapInterval, &VBL);
+		#elif defined AL_LINUX
+		#elif defined AL_WINDOWS
+		#endif
 	}
 	return *this;
 }

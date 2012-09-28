@@ -49,12 +49,13 @@
 	#include <OpenGL/OpenGL.h>
 	#include <OpenGL/gl.h>
 	#include <OpenGL/glext.h>
-	#include <OpenGL/glu.h>	
-	#define AL_GRAPHICS_INIT_CONTEXT\
-		/* prevents tearing */ \
-		{	GLint MacHackVBL = 1;\
-			CGLContextObj ctx = CGLGetCurrentContext();\
-			CGLSetParameter(ctx,  kCGLCPSwapInterval, &MacHackVBL); }
+	#include <OpenGL/glu.h>
+	#define AL_GRAPHICS_INIT_CONTEXT
+//	#define AL_GRAPHICS_INIT_CONTEXT\
+//		/* prevents tearing */ \
+//		{	GLint MacHackVBL = 1;\
+//			CGLContextObj ctx = CGLGetCurrentContext();\
+//			CGLSetParameter(ctx, kCGLCPSwapInterval, &MacHackVBL); }
 
 #elif defined AL_LINUX 
 	#define AL_GRAPHICS_USE_OPENGL
