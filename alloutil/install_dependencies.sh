@@ -14,10 +14,11 @@ if [ `which apt-get` ]; then
 elif [ `which port` ]; then
 	echo "Found MacPorts"
 	sudo port selfupdate 
-	port install lua
+	sudo port install lua
 
 elif [ `which brew` ]; then
 	echo "Found Homebrew"
+	brew update
 	brew install lua
 
 elif [ `uname | grep MINGW` ]; then

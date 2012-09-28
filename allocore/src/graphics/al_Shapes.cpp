@@ -25,84 +25,60 @@ int addTetrahedron(Mesh& m){
 }
 
 int addCube(Mesh& m, bool withNormalsAndTexcoords, float l){
-	if (withNormalsAndTexcoords) {
-		m.normal	( 1, 0, 0);
-		m.texCoord	( 0, 0);
-		m.vertex	( l,-l, l);
-		m.normal	( 1, 0, 0);
-		m.texCoord	( 1, 0);
-		m.vertex	( l,-l,-l);
-		m.normal	( 1, 0, 0);
-		m.texCoord	( 1, 1);
-		m.vertex	( l, l,-l);
-		m.normal	( 1, 0, 0);
-		m.texCoord	( 0, 1);
-		m.vertex	( l, l, l);
-		
-		m.normal	(-1, 0, 0);
-		m.texCoord	( 0, 0);
-		m.vertex	(-l, l, l);
-		m.normal	(-1, 0, 0);
-		m.texCoord	( 1, 0);
-		m.vertex	(-l, l,-l);
-		m.normal	(-1, 0, 0);
-		m.texCoord	( 1, 1);
-		m.vertex	(-l,-l,-l);
-		m.normal	(-1, 0, 0);
-		m.texCoord	( 0, 1);
-		m.vertex	(-l,-l, l);
-		
-		m.normal	( 0, 1, 0);
-		m.texCoord	( 0, 0);
-		m.vertex	(-l, l, l);
-		m.normal	( 0, 1, 0);
-		m.texCoord	( 1, 0);
-		m.vertex	( l, l, l);
-		m.normal	( 0, 1, 0);
-		m.texCoord	( 1, 1);
-		m.vertex	( l, l,-l);
-		m.normal	( 0, 1, 0);
-		m.texCoord	( 0, 1);
-		m.vertex	(-l, l,-l);
-		
-		m.normal	( 0,-1, 0);
-		m.texCoord	( 0, 0);
-		m.vertex	(-l,-l,-l);
-		m.normal	( 0,-1, 0);
-		m.texCoord	( 1, 0);
-		m.vertex	( l,-l,-l);
-		m.normal	( 0,-1, 0);
-		m.texCoord	( 1, 1);
-		m.vertex	( l,-l, l);
-		m.normal	( 0,-1, 0);
-		m.texCoord	( 0, 1);
-		m.vertex	(-l,-l, l);
-		
-		m.normal	( 0, 0, 1);
-		m.texCoord	( 0, 0);
-		m.vertex	(-l,-l, l);
-		m.normal	( 0, 0, 1);
-		m.texCoord	( 1, 0);
-		m.vertex	( l,-l, l);
-		m.normal	( 0, 0, 1);
-		m.texCoord	( 1, 1);
-		m.vertex	( l, l, l);
-		m.normal	( 0, 0, 1);
-		m.texCoord	( 0, 1);
-		m.vertex	(-l, l, l);
-		
-		m.normal	( 0, 0,-1);
-		m.texCoord	( 0, 0);
-		m.vertex	(-l, l,-l);
-		m.normal	( 0, 0,-1);
-		m.texCoord	( 1, 0);
-		m.vertex	( l, l,-l);
-		m.normal	( 0, 0,-1);
-		m.texCoord	( 1, 1);
-		m.vertex	( l,-l,-l);
-		m.normal	( 0, 0,-1);
-		m.texCoord	( 0, 1);
-		m.vertex	(-l,-l,-l);
+
+	// This generates a cube with face-oriented normals and unit texture 
+	// coordinates per face. It should be rendered using a quad primitive.
+	if(withNormalsAndTexcoords){
+
+		// All six faces will have the same tex coords
+		for(int i=0;i<6;++i){
+			m.texCoord( 0, 0);
+			m.texCoord( 1, 0);
+			m.texCoord( 1, 1);
+			m.texCoord( 0, 1);
+		}
+
+		// +x face
+		for(int i=0;i<4;++i) m.normal( 1, 0, 0);
+		m.vertex( l,-l, l);
+		m.vertex( l,-l,-l);
+		m.vertex( l, l,-l);
+		m.vertex( l, l, l);
+
+		// -x face
+		for(int i=0;i<4;++i) m.normal(-1, 0, 0);
+		m.vertex(-l, l, l);
+		m.vertex(-l, l,-l);
+		m.vertex(-l,-l,-l);
+		m.vertex(-l,-l, l);
+
+		// +y face
+		for(int i=0;i<4;++i) m.normal( 0, 1, 0);
+		m.vertex(-l, l, l);
+		m.vertex( l, l, l);
+		m.vertex( l, l,-l);
+		m.vertex(-l, l,-l);
+
+		// -y face
+		for(int i=0;i<4;++i) m.normal( 0,-1, 0);
+		m.vertex(-l,-l,-l);
+		m.vertex( l,-l,-l);
+		m.vertex( l,-l, l);
+		m.vertex(-l,-l, l);
+
+		// +z face
+		for(int i=0;i<4;++i) m.normal( 0, 0, 1);
+		m.vertex(-l,-l, l);
+		m.vertex( l,-l, l);
+		m.vertex( l, l, l);
+		m.vertex(-l, l, l);
+
+		// -z face
+		for(int i=0;i<4;++i) m.normal( 0, 0,-1);
+		m.vertex(-l, l,-l);
+		m.vertex( l, l,-l);
+		m.vertex( l,-l,-l);
+		m.vertex(-l,-l,-l);
 		
 		return 6*4;
 	} else {

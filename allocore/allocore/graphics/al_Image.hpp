@@ -114,7 +114,14 @@ public:
 	/// Get pointer to pixels (read-only)
 	template <typename T>
 	const T * pixels() const { return (const T*)(mArray.data.ptr); }
+
+	/// Get width, in pixels
+	unsigned width() const { return array().width(); }
 	
+	/// Get height, in pixels
+	unsigned height() const { return array().height(); }
+
+
 	/// Write a pixel to an Image
 	/// Warning: doesn't check that Pix has matching type/component count
 	/// Warning: no bounds checking performed on x and y

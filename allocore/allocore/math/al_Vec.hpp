@@ -344,14 +344,6 @@ public:
 		for(int i=1; i<N; ++i){ r *= (*this)[i]; }
 		return r;
 	}
-	
-	/// Reflect vector around line
-	Vec reflect(const Vec& normal) const {
-		return (*this) - (T(2) * dot(normal) * normal);
-	}
-
-	/// Returns closest vector on unit N-sphere
-	Vec sgn(T scale=T(1)) const { return Vec(*this).normalize(scale); }
 
 	/// Returns sum of elements
 	T sum() const {
@@ -378,10 +370,39 @@ public:
 	static Vec lerp(const Vec& input, const Vec& target, T amt) {
 		return input+amt*(target-input);
 	}
+
+
+	/// Returns a nearby vector along some dimension
+	
+	/// \tparam 	Dimension	The dimension along which to get a nearby vector
+	/// \param[in]	ds			The amount to shift along specified dimension
+	template<int Dimension>
+	Vec by(T shift) const {
+		Vec res(*this);
+		res[Dimension] += shift;
+		return res;
+	}
+
+	/// Returns a nearby vector along x
+	Vec byx(T shift) const { return by<0>(shift); }
+
+	/// Returns a nearby vector along y
+	Vec byy(T shift) const { return by<1>(shift); }
+
+	/// Returns a nearby vector along z
+	Vec byz(T shift) const { return by<2>(shift); }
+
+	/// Returns relection of vector around line
+	Vec reflect(const Vec& normal) const {
+		return (*this) - (T(2) * dot(normal) * normal);
+	}
+
+	/// Returns closest vector on unit N-sphere
+	Vec sgn(T scale=T(1)) const { return Vec(*this).normalize(scale); }
+
 	
 	/// debug printing
-	void print(FILE * out=stdout) const;
-	
+	void print(FILE * out=stdout) const;	
 };
 
 

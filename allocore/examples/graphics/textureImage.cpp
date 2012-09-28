@@ -83,7 +83,8 @@ struct MyApp : App {
 
         // read the pixel at (row, col) and print
         //
-        array.read(&pixel, row, col);
+        //array.read(&pixel, row, col);
+        array.read(&pixel, col, row);
         cout << "image[" << row << "," << col << "]=" <<
         (int)pixel.r << "," << (int)pixel.g << "," << (int)pixel.b << endl;
       }

@@ -25,7 +25,7 @@ elif [ `which port` ]; then
 
 elif [ `which brew` ]; then
 	echo "Found Homebrew"
-	sudo brew update
+	brew update
 	brew install portaudio libsndfile
 	brew install glew
 	brew install assimp
@@ -45,6 +45,7 @@ elif [ `uname | grep MINGW` ]; then
 		#DESTDIR=local/
 		install -d $DESTDIR/bin/ $DESTDIR/include/ $DESTDIR/lib/
 
+		
 		PKG=libsndfile-1.0.25
 		wget http://www.mega-nerd.com/libsndfile/files/$PKG.tar.gz
 		tar -xzf $PKG.tar.gz
@@ -80,16 +81,26 @@ elif [ `uname | grep MINGW` ]; then
 		rm -rf $PKG
 		rm $PKG.zip
 
-		PKG=glew-1.9.0-win32
+		# These MSVC binaries don't work with MinGW/Msys :(
+		#PKG=glew-1.9.0-win32
+		#wget http://downloads.sourceforge.net/project/glew/glew/1.9.0/$PKG.zip
+		#unzip $PKG.zip
+		#mv glew-1.9.0 $PKG
+		#cp $PKG/bin/*.dll $DESTDIR/bin/
+		#cp $PKG/lib/*.lib $DESTDIR/lib/
+		#cp -r $PKG/include/* $DESTDIR/include/
+		#rm -rf $PKG
+		#rm $PKG.zip
+
+		PKG=glew-1.9.0
 		wget http://downloads.sourceforge.net/project/glew/glew/1.9.0/$PKG.zip
-		unzip $PKG.zip
-		mv glew-1.9.0 $PKG
-		cp $PKG/bin/*.dll $DESTDIR/bin/
-		cp $PKG/lib/*.lib $DESTDIR/lib/
-		cp -r $PKG/include/* $DESTDIR/include/
+		unzip -q $PKG.zip
+		pushd $PKG
+			make install GLEW_DEST=/usr/local/ -j3
+		popd
 		rm -rf $PKG
 		rm $PKG.zip
-		
+
 		PKG=freetype-dev_2.4.2-1_win32
 		wget http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/$PKG.zip
 		unzip $PKG.zip -d $PKG
@@ -111,17 +122,18 @@ elif [ `uname | grep MINGW` ]; then
 		PKG=assimp--2.0.863-sdk
 		wget http://downloads.sourceforge.net/project/assimp/assimp-2.0/$PKG.zip
 		unzip $PKG.zip
-		install -d $DESTDIR/include/assimp/
-		cp $PKG/include/* $DESTDIR/include/assimp/
+		install -d $DESTDIR/include/assimp/Compiler/
+		cp -r $PKG/include/* $DESTDIR/include/assimp/
 		cp $PKG/bin/assimp_release-dll_win32/Assimp32.dll $DESTDIR/bin/
 		cp $PKG/lib/assimp_release-dll_win32/assimp.lib $DESTDIR/lib/
 		rm -rf $PKG
 		rm $PKG.zip
-		
+
 		PKG=glut-3.7.6-bin
 		wget http://user.xmission.com/~nate/glut/$PKG.zip
 		unzip $PKG.zip
-		cp $PKG/glut.h $DESTDIR/include/
+		install -d $DESTDIR/include/GL/
+		cp $PKG/glut.h $DESTDIR/include/GL/
 		cp $PKG/glut32.dll $DESTDIR/bin/
 		cp $PKG/glut32.lib $DESTDIR/lib/
 		rm -rf $PKG

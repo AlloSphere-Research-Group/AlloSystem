@@ -12,7 +12,6 @@ stereographic rendering
 */
 
 #include "allocore/al_Allocore.hpp"
-#include "alloutil/al_ControlNav.hpp"
 using namespace al;
 
 struct Agent : public SoundSource, public Nav, public Drawable{

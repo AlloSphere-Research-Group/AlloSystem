@@ -334,7 +334,7 @@ public:
 	/// \param[in] x		x component of rotation axis
 	/// \param[in] y		y component of rotation axis
 	/// \param[in] z		z component of rotation axis
-	void rotate(double angle, double x, double y, double z);
+	void rotate(double angle, double x=0., double y=0., double z=1.);
 
 	/// Rotate current matrix
 	void rotate(const Quatd& q);
@@ -349,14 +349,14 @@ public:
 	void scale(double s) { scale(s, s, s); }
 
 	/// Scale current matrix along each dimension
-	void scale(double x, double y, double z);
+	void scale(double x, double y, double z=1.);
 	
 	/// Scale current matrix along each dimension
 	void scale(const Vec3d& v) { scale(v[0], v[1], v[2]); }
 	void scale(const Vec3f& v) { scale(v[0], v[1], v[2]); }
 
 	/// Translate current matrix
-	void translate(double x, double y, double z);
+	void translate(double x, double y, double z=1.);
 
 	/// Translate current matrix
 	void translate(const Vec3d& v) { translate(v[0], v[1], v[2]); }

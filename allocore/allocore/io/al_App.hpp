@@ -291,6 +291,9 @@ public:
 
 	const Windows&		windows() const { return mWindows; }
 	Windows&			windows(){ return mWindows; }
+	
+	const ViewpointWindow& window(int i=0) const { return *(windows()[i]); }
+	ViewpointWindow& window(int i=0){ return *(windows()[i]); }
 
 	const void *		clockAnimate() const { return mClockAnimate; }
 	App&				clockAnimate(void * v){ mClockAnimate=v; return *this; }

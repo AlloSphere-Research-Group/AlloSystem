@@ -50,7 +50,7 @@ int main (int argc, char * argv[]){
 
 	AudioDevice::printAll();
 
-	AudioDevice dev(0);
+	const AudioDevice& dev = AudioDevice::defaultOutput();
 	channels = dev.channelsOutMax();
 
 	gains.resize(channels);
@@ -58,7 +58,10 @@ int main (int argc, char * argv[]){
 	dev.print();
 	
 
-	AudioIO audioIO(256, dev.defaultSampleRate(), audioCB, 0, dev.channelsOutMax(), 0);
+	AudioIO audioIO; 
+	audioIO.deviceIn(AudioDevice::defaultInput());
+	audioIO.deviceOut(AudioDevice::defaultOutput());
+	audioIO.callback = audioCB;
 	audioIO.start();
 	
 	printf("\nPress + and - (and return) to adjust volume\nPress a number (and return) to solo the channel\nPress 'space' (and return) to hear all channels\nPress 'q' (and return) to quit...\n"); 
