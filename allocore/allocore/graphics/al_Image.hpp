@@ -89,9 +89,13 @@ public:
 
 
 	/// Load image with file name. Image type determined by file extension.
+
+        // return true for success or print error message and return false
 	bool load(const std::string& filename);
 	
-	/// Save image with file name. Image type determined by file extension.
+	/// Save image with file name. Image type determined by file extension. 
+
+        // return true for success or print error message and return false
 	bool save(const std::string& filename);
 	
 	/// File path to image
@@ -123,6 +127,7 @@ public:
 
 
 	/// Write a pixel to an Image
+
 	/// Warning: doesn't check that Pix has matching type/component count
 	/// Warning: no bounds checking performed on x and y
 	template<typename Pix>
@@ -141,6 +146,7 @@ public:
 	static bool write(const std::string& filePath, const T * pixels, int nx, int ny, Format fmt);
 
 	/// Read a pixel from an Image
+
 	/// Warning: doesn't check that Pix has matching type/component count
 	/// Warning: no bounds checking performed on x and y
 	template<typename Pix>
