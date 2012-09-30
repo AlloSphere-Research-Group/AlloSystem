@@ -51,6 +51,9 @@ void Mouse::button(int b, bool v){ mButton=b; mB[b]=v; if(v){ mBX[b]=mX; mBY[b]=
 void Mouse::position(int x, int y){ mDX=x-mX; mDY=y-mY; mX=x; mY=y; }
 
 
+InputEventHandler::InputEventHandler()
+:	mWindow(NULL)
+{}
 
 InputEventHandler::~InputEventHandler(){
 	removeFromWindow();
@@ -59,6 +62,12 @@ InputEventHandler::~InputEventHandler(){
 void InputEventHandler::removeFromWindow(){
 	if(attached()) window().remove(this);
 }
+
+
+
+WindowEventHandler::WindowEventHandler()
+:	mWindow(NULL)
+{}
 
 WindowEventHandler::~WindowEventHandler(){
 	removeFromWindow();

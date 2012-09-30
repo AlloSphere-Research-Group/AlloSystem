@@ -81,27 +81,26 @@ public:
 		INSERT, LEFT, UP, RIGHT, DOWN, PAGE_DOWN, PAGE_UP, END, HOME
 	};
 
-	/// Constructor.
 	Keyboard();
 	
-	int key() const;			///< Returns key code (non-shifted character) of last key event.
+	int key() const;			///< Returns character or code of last key event
 	int keyAsNumber() const;	///< Returns decimal number correlating to key code
-	bool alt() const;			///< Whether an alt key is down.
-	bool caps() const;			///< Whether capslock is down.
-	bool ctrl() const;			///< Whether a ctrl key is down.
-	bool meta() const;			///< Whether a meta (e.g. windows, apple) key is down.
-	bool shift() const;			///< Whether a shift key is down.
-	bool down() const;			///< Whether last event was button down.
+	bool alt() const;			///< Whether an alt key is down
+	bool caps() const;			///< Whether capslock is down
+	bool ctrl() const;			///< Whether a control key is down
+	bool meta() const;			///< Whether a meta (e.g. windows, apple) key is down
+	bool shift() const;			///< Whether a shift key is down
+	bool down() const;			///< Whether last event was button down
 	bool isNumber() const;		///< Whether key is a number key
-	bool key(int k) const;		///< Whether the last key was 'k'.
+	bool key(int k) const;		///< Whether the last key was 'k'
 
-	void alt  (bool state);		///< Set alt key state.
-	void caps (bool state);		///< Set alt key state.
-	void ctrl (bool state);		///< Set ctrl key state.
-	void meta (bool state);		///< Set meta key state.
-	void shift(bool state);		///< Set shift key state.
+	void alt  (bool state);		///< Set alt key state
+	void caps (bool state);		///< Set alt key state
+	void ctrl (bool state);		///< Set ctrl key state
+	void meta (bool state);		///< Set meta key state
+	void shift(bool state);		///< Set shift key state
 
-	void print() const;			///< Print keyboard state to stdout.
+	void print() const;			///< Print keyboard state to stdout
 
 protected:
 	friend class WindowImpl;
@@ -118,25 +117,25 @@ protected:
 class Mouse{
 public:
 	enum{
-		LEFT	= 0,				/**< Left button */
-		MIDDLE	= 1,				/**< Middle button */
-		RIGHT	= 2,				/**< Right button */
-		EXTRA	= 3					/**< Start of any extra buttons */
+		LEFT	= 0,			/**< Left button */
+		MIDDLE	= 1,			/**< Middle button */
+		RIGHT	= 2,			/**< Right button */
+		EXTRA	= 3				/**< Start of any extra buttons */
 	};
 	
 	Mouse();
 	
-	int x() const;					///< Get x position in screen pixels
-	int y() const;					///< Get y position in screen pixels
-	int dx() const;					///< Get change in x position in screen pixels
-	int dy() const;					///< Get change in y position in screen pixels
+	int x() const;				///< Get x position relative to top-left corner of window, in pixels
+	int y() const;				///< Get x position relative to top-left corner of window, in pixels
+	int dx() const;				///< Get change in x position, in pixels
+	int dy() const;				///< Get change in y position, in pixels
 
-	int button() const;				///< Get last clicked button
-	bool down() const;				///< Get state of last clicked button
-	bool down(int button) const;	///< Get state of a button
-	bool left() const;				///< Get whether left button is down
-	bool middle() const;			///< Get whether middle button is down
-	bool right() const;				///< Get whether right button is down
+	int button() const;			///< Get last clicked button
+	bool down() const;			///< Get state of last clicked button
+	bool down(int button) const;///< Get state of a button
+	bool left() const;			///< Get whether left button is down
+	bool middle() const;		///< Get whether middle button is down
+	bool right() const;			///< Get whether right button is down
 	
 protected:
 	friend class WindowImpl;
@@ -158,19 +157,34 @@ protected:
 
 /// The return value of the event handlers determines whether or not
 /// the event should be propagated to other handlers.
-struct InputEventHandler{
-	InputEventHandler() : mWindow(NULL) {}
+class InputEventHandler{
+public:
+	InputEventHandler();
 	virtual ~InputEventHandler();
 
-	virtual bool onKeyDown(const Keyboard& k){return true;}	///< Called when a keyboard key is pressed
-	virtual bool onKeyUp(const Keyboard& k){return true;}	///< Called when a keyboard key is released
 
-	virtual bool onMouseDown(const Mouse& m){return true;}	///< Called when a mouse button is pressed
-	virtual bool onMouseDrag(const Mouse& m){return true;}	///< Called when the mouse moves while a button is down
-	virtual bool onMouseMove(const Mouse& m){return true;}	///< Called when the mouse moves
-	virtual bool onMouseUp(const Mouse& m){return true;}	///< Called when a mouse button is released
+	/// Called when a keyboard key is pressed
+	virtual bool onKeyDown(const Keyboard& k){return true;}
+	
+	/// Called when a keyboard key is released
+	virtual bool onKeyUp(const Keyboard& k){return true;}
 
-	InputEventHandler& inputEventHandler(){ return *this; }	///< Return self
+
+	/// Called when a mouse button is pressed
+	virtual bool onMouseDown(const Mouse& m){return true;}
+	
+	/// Called when the mouse moves while a button is down
+	virtual bool onMouseDrag(const Mouse& m){return true;}
+	
+	/// Called when the mouse moves
+	virtual bool onMouseMove(const Mouse& m){return true;}
+	
+	/// Called when a mouse button is released
+	virtual bool onMouseUp(const Mouse& m){return true;}
+
+
+	/// Return self
+	InputEventHandler& inputEventHandler(){ return *this; }
 
 	bool attached() const { return NULL != mWindow; }
 	Window& window(){ return *mWindow; }
@@ -188,17 +202,31 @@ private:
 
 /// The return value of the event handlers determines whether or not
 /// the event should be propagated to other handlers.
-struct WindowEventHandler {
-	WindowEventHandler() : mWindow(NULL) {}
+class WindowEventHandler {
+public:
+	WindowEventHandler();
 	virtual ~WindowEventHandler();
 
-	virtual bool onCreate(){ return true; }					///< Called after window is created with valid OpenGL context
-	virtual bool onDestroy(){ return true; }				///< Called before the window and its OpenGL context are destroyed
-	virtual bool onFrame(){ return true; }					///< Called every frame
-	virtual bool onResize(int dw, int dh){ return true; }	///< Called whenever window dimensions change
-	virtual bool onVisibility(bool v){ return true; }		///< Called when window changes from hidden to shown and vice versa
 
-	WindowEventHandler& windowEventHandler(){ return *this; }///< Return self
+	/// Called after window is created with valid OpenGL context
+	virtual bool onCreate(){ return true; }
+	
+	/// Called before the window and its OpenGL context are destroyed
+	virtual bool onDestroy(){ return true; }
+	
+	/// Called every frame
+	virtual bool onFrame(){ return true; }
+	
+	/// Called whenever window dimensions change
+	virtual bool onResize(int dw, int dh){ return true; }
+	
+	/// Called when window changes from hidden to shown and vice versa
+	virtual bool onVisibility(bool v){ return true; }
+
+
+	/// Return self
+	WindowEventHandler& windowEventHandler(){ return *this; }
+
 
 	bool attached() const { return NULL != mWindow; }
 	Window& window(){ return *mWindow; }
@@ -360,6 +388,7 @@ public:
 
 	/// Remove all window event handlers matching argument
 	Window& remove(WindowEventHandler& v);
+
 
 	/// DEPRECATED, do not use!
 	Window& add(InputEventHandler * v){ return append(*v); }
