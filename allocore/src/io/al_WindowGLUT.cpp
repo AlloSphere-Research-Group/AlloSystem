@@ -191,8 +191,9 @@ public:
 	static WindowImpl * getWindowImpl(){ return getWindowImpl(glutGetWindow()); }
 
 	static WindowImpl * getWindowImpl(int id){
-		if(windows().count(id) > 0){
-			return windows()[id];
+		WindowsMap::iterator it = windows().find(id);
+		if(windows().end() != it){
+			return it->second;
 		}
 		return 0;
 	}
