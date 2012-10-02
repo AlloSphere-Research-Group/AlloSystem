@@ -609,11 +609,14 @@ bool Window::create(
 	return true;
 }
 
-void Window::destroyAll(){
+void Window::destroyAll(){ //printf("Window::destroyAll\n");
 	WindowImpl::WindowsMap::iterator it = WindowImpl::windows().begin();
-	for(; it != WindowImpl::windows().end(); it++){
+	while(it != WindowImpl::windows().end()){
 		if(it->second && it->second->mWindow){
-			it->second->mWindow->destroy();
+			(it++)->second->mWindow->destroy();
+		}
+		else{
+			++it;
 		}
 	}
 }
