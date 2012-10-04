@@ -152,7 +152,7 @@ inline void Font :: render(Graphics& g, std::string text) {
 inline float Font :: width(std::string text) {
 	float total = 0.f;
 	for (unsigned i=0; i < text.size(); i++) {
-		total += mChars[text[i]].width;
+		total += mChars[ (int)text[i] ].width;
 	}
 	return total;
 }
