@@ -13,9 +13,9 @@ SRCS		:= $(wildcard $(SRC_DIR)/*.c*)
 OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
 # include dependency headers directly
-#CPPFLAGS	+= -I../allocore/
-#CPPFLAGS	+= -I../../GLV/
-#CPPFLAGS	+= -I../../Gamma/
+CPPFLAGS	+= -I../allocore/
+CPPFLAGS	+= -I../../GLV/
+CPPFLAGS	+= -I../../Gamma/
 
 # include dependencies from parent build folder
 CPPFLAGS	+= -I../build/include/
