@@ -798,7 +798,7 @@ void WarpnBlend::drawBlend() {
 
 void WarpnBlend::readID(std::string id) {
 	printf("%s %s\n", imgpath.c_str(), id.c_str());
-	readWarp(imgpath + "uv" + id + ".bin");
+	//readWarp(imgpath + "uv" + id + ".bin");
 	read3D(imgpath + "map3D" + id + ".bin");
 	readBlend(imgpath + "alpha" + id + ".png");
 	readModelView(imgpath + "ModelViewMatrix" + id + ".txt");

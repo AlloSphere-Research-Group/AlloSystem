@@ -24,7 +24,15 @@ struct MyApp : App {
 
     // Load a .jpg file
     //
-    image.load("../../share/images/tiny.jpg");
+    char *filename = "../../share/images/tiny.jpg";
+
+    if (image.load(filename)) {
+      printf("Read image from %s\n", filename);
+    } else {
+      printf("Failed to read image from %s!  Quitting.\n", filename);
+      exit(-1);
+    }
+
     texture.allocate(image.array());
 
     // Don't bother trying to print the image or the image's array directly
@@ -53,15 +61,16 @@ struct MyApp : App {
     //
     printf("Array's type (human readable) is %s\n", allo_type_name(array.type()));
 
-    // Code below assumes this type is 8-bit unsigned integer, so this line
-    // guarantees that's the case, or else crashes the program if not:
-    //
-    assert(array.type() == AlloUInt8Ty);
-
     // The array itself also has a print method:
     //
     cout << "Array.print: "  << endl << "   ";
     array.print();    
+
+
+    // Code below assumes this type is 8-bit unsigned integer, so this line
+    // guarantees that's the case, or else crashes the program if not:
+    //
+    assert(array.type() == AlloUInt8Ty);
 
     // AlloCore's image class provides a type for an RGBA pixel, which is of
     // course templated on the numeric type used to represent each value in the
@@ -74,7 +83,7 @@ struct MyApp : App {
     // right and the rows go from bottom to top.  (So the "row" and "column"
     // are like X and Y coordinates on the Cartesian plane, with the entire
     // image living in the quadrant with positive X and positive Y --- in other
-    // words the origin is in the lower left of the image.
+    // words the origin is in the lower left of the image.)
     //
     cout << "Display ALL the pixels !!! " << endl;
 
@@ -98,7 +107,7 @@ struct MyApp : App {
 
     g.pushMatrix();
 
-      // Push the texture/quad back 5 units
+      // Push the texture/quad back 5 units (away from the camera)
       //
       g.translate(0, 0, -5);
 
