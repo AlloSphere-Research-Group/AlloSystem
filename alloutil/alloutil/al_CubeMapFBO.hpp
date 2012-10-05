@@ -43,6 +43,7 @@
 */
 
 #include "allocore/graphics/al_Graphics.hpp"
+#include "allocore/graphics/al_Lens.hpp"
 #include "allocore/graphics/al_DisplayList.hpp"
 #include "alloutil/al_TextureGL.hpp"
 
@@ -107,7 +108,7 @@ public:
 		CubeMapTexture::onDestroy();
 	}
 	
-	void capture(Graphics& gl, const Camera& cam, const Pose& pose, Drawable& draw) {
+	void capture(Graphics& gl, const Lens& cam, const Pose& pose, Drawable& draw) {
 		validate();
 		
 		glPushAttrib(GL_ALL_ATTRIB_BITS);
