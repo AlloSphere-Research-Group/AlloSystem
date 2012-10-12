@@ -24,7 +24,7 @@ runobjs: $(RUN_OBJS)
 %.hpp:
 
 # FIXME: this rule should only work for .cpp and .c
-EXEC_TARGETS  = $(addsuffix %.cpp, $(RUN_DIRS)) $(addsuffix %.c, $(RUN_DIRS))
+EXEC_TARGETS = $(addsuffix %.cpp, $(RUN_DIRS)) $(addsuffix %.c, $(RUN_DIRS))
 ifeq ($(PLATFORM), linux)
 	LINK_LIBS_FLAGS += $(addprefix -l :, $(notdir $(LINK_LIBS_PATH)))
 endif
@@ -32,7 +32,9 @@ endif
 $(EXEC_TARGETS): MY_FLAGS = $(shell test -e $(@D)/flags.txt && cat $(@D)/flags.txt)
 #$(EXEC_TARGETS): MY_FLAGS += -l$(LIB_NAME)
 $(EXEC_TARGETS): FORCE $(ALL_BUILD_DIRS) $(LIB_PATH) runobjs
-	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ -I$(BUILD_DIR)/include/ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(MY_FLAGS)
+#	@echo $(PROJECT_DIR)
+	@echo $(MY_FLAGS)
+	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ -I$(BUILD_DIR)/include/ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(subst $$(PROJECT_DIR),$(@D)/,$(MY_FLAGS))
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./$(*F)
 endif

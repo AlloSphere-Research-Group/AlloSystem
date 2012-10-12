@@ -106,3 +106,6 @@ In the same directory as the build-and-run source file add a file called "flags.
 
 	-I/usr/local/include -L/usr/local/lib -lfoo
 
+It is also possible to use the variable $(PROJECT_DIR) in flags.txt to refer to the directory the build-and-run source file is located in.
+
+
