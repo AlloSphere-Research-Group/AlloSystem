@@ -18,7 +18,7 @@ elif [ `which port 2>/dev/null` ]; then
 
 	# Since we only support v.2, we need to use an old Portfile
 	#sudo port install assimp
-	pushd pkg/port/assimp2/; sudo port install assimp; popd
+	pushd `find . -name assimp2 -type d`; sudo port install; popd
 
 	sudo port install freeimage +universal
 	sudo port install freetype +universal
