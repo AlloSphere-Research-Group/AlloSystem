@@ -90,7 +90,7 @@ which will restore the default autocompletion using the file system. If you just
 ----------------------------------------
 The following additional capabilities are possible and must be configured manually.
 
-1. Definition of custom build paths.
+### Custom Build Paths
 Sometimes it is handy to build and run sources files from custom directories as well as include one's own "library" code that is linked with all build-and-run executables. To configure these, first create a new file "Makefile.user" in ./ . For convenience, you can copy the file Makefile.usertemplate. Next, add/modify the following variables:
 
 	RUN_DIRS	= directory1 directory2 ...
@@ -101,7 +101,7 @@ The directory ./examples is automatically added to this list.
 
 RUN_SRC_DIRS is a list of directories that contain source code for objects files that are to be linked with all build-and-run sources. The sources in RUN_SRC_DIRS can be thought of as your own library source code.
 
-2. Definition of custom build flags.
+### Custom Build Flags
 In the same directory as the build-and-run source file add a file called "flags.txt" which contains valid flags for the compiler. For example, if you need to link to libfoo.so located in /usr/local/lib, your flags.txt will contain something like:
 
 	-I/usr/local/include -L/usr/local/lib -lfoo
