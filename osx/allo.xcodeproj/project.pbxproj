@@ -43,9 +43,7 @@
 		361881CE15B936330009AD7E /* al_Slab.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Slab.hpp; sourceTree = "<group>"; };
 		361881CF15B936330009AD7E /* al_Stereographic.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Stereographic.hpp; sourceTree = "<group>"; };
 		361881D015B936330009AD7E /* al_Texture.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Texture.hpp; sourceTree = "<group>"; };
-		361881D515B936330009AD7E /* al_Surface.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Surface.hpp; sourceTree = "<group>"; };
 		361881D615B936330009AD7E /* OpenGLSupport.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = OpenGLSupport.txt; sourceTree = "<group>"; };
-		361881D815B936330009AD7E /* al_Surface.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Surface.hpp; sourceTree = "<group>"; };
 		361881DA15B936330009AD7E /* al_App.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_App.hpp; sourceTree = "<group>"; };
 		361881DB15B936330009AD7E /* al_AudioIO.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_AudioIO.hpp; sourceTree = "<group>"; };
 		361881DC15B936330009AD7E /* al_ControlNav.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_ControlNav.hpp; sourceTree = "<group>"; };
@@ -1409,27 +1407,9 @@
 				361881CE15B936330009AD7E /* al_Slab.hpp */,
 				361881CF15B936330009AD7E /* al_Stereographic.hpp */,
 				361881D015B936330009AD7E /* al_Texture.hpp */,
-				361881D115B936330009AD7E /* archived */,
 				361881D615B936330009AD7E /* OpenGLSupport.txt */,
-				361881D715B936330009AD7E /* pending */,
 			);
 			path = graphics;
-			sourceTree = "<group>";
-		};
-		361881D115B936330009AD7E /* archived */ = {
-			isa = PBXGroup;
-			children = (
-				361881D515B936330009AD7E /* al_Surface.hpp */,
-			);
-			path = archived;
-			sourceTree = "<group>";
-		};
-		361881D715B936330009AD7E /* pending */ = {
-			isa = PBXGroup;
-			children = (
-				361881D815B936330009AD7E /* al_Surface.hpp */,
-			);
-			path = pending;
 			sourceTree = "<group>";
 		};
 		361881D915B936330009AD7E /* io */ = {
