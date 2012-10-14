@@ -85,8 +85,12 @@ public:
 	/// Default constructor that initializes elements to zero
 	Mat(){ set(T(0)); }
 
-	/// param[in] arr	one dimensional array in column-major
+	/// @param[in] arr	one dimensional array in column-major
 	Mat(const T * arr){ set(arr); }
+	
+	/// @param[in] src	matrix with same dimension, but possibly different type
+	template <class U>
+	Mat(const Mat<N,U>& src){ set(src.elems()); }
 
 	/// Construct without initializing elements
 	Mat(const MatNoInit& v){}
@@ -215,6 +219,16 @@ public:
 			T& b = (*this)(j,i);
 			T c = a; a = b;	b = c;	// swap elements
 		}} return *this;
+	}
+
+	/// Get a submatrix
+	template <int M>
+	Mat<M,T> sub(int row=0, int col=0) const {
+		Mat<M,T> res(MAT_NO_INIT);
+		for(int j=0; j<M; ++j){
+		for(int i=0; i<M; ++i){
+			res(j,i) = (*this)(j+row, i+col);
+		}}
 	}
 
 	/// Return matrix punned as a vector
