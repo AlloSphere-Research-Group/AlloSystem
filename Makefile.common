@@ -200,7 +200,6 @@ else ifeq ($(PLATFORM), macosx)
 	# Set system root directory for stdc++ etc.
 	ifeq ($(OSX_VERSION), 10_8)
 		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.8.sdk -mmacosx-version-min=10.8
-		CFLAGS += -I /usr/local/include/freetype2
 	else ifeq ($(OSX_VERSION), 10_7)
 		CFLAGS += -isysroot $(OSX_SDK_PATH)MacOSX10.7.sdk -mmacosx-version-min=10.7
 	else ifeq ($(OSX_VERSION), 10_6)
