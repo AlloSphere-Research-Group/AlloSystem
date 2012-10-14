@@ -235,9 +235,6 @@ public:
 		return uniform(name, v.x, v.y, v.z, v.w);
 	}
 
-	//template <typename T>
-	//const ShaderProgram& uniform(const char * name, const Mat<4,T>& m) const;
-
 	const ShaderProgram& ShaderProgram::uniform(const char * name, const Mat<4,float>& m) const{
 		return uniformMatrix4(name, m.elems());
 	}
@@ -315,21 +312,6 @@ protected:
 	virtual void onCreate();
 	virtual void onDestroy();
 };
-
-
-
-//template<>
-//inline const ShaderProgram& ShaderProgram::uniform<float>(const char * name, const Mat<4,float>& m) const{
-//	return uniformMatrix4(name, m.elems());
-//}
-//
-//template<typename T>
-//inline const ShaderProgram& ShaderProgram::uniform(const char * name, const Mat<4,T>& m) const{
-////	float mf[16];
-////	return uniformMatrix4(name, mf);
-//	return uniform(name, Mat4f(m));
-//}
-
 
 } // ::al
 
