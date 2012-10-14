@@ -15,8 +15,7 @@ void OBJReader :: readOBJ(std::string path, std::string filename) {
     // open the file
     file = fopen(fullpath.data(), "r");
     if (!file) {
-        fprintf(stderr, "Model readOBJ failed: can't open data file \"%s\".\n",
-            filename.data());
+        AL_WARN("readOBJ failed: can't open data file \"%s\"", filename.data());
 		return;
     }
 	mPath = path;
@@ -134,8 +133,7 @@ void OBJReader :: readMTL(std::string path, std::string name)
 
     file = fopen(filename.data(), "r");
     if (!file) {
-        fprintf(stderr, "readMTL() failed: can't open material file \"%s\".\n",
-            filename.data());
+        AL_WARN("readMTL() failed: can't open material file \"%s\"", filename.data());
         return;
     }
 

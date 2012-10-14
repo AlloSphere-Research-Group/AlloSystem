@@ -52,6 +52,7 @@ TCP Server:
 #include <cstring>
 #include "allocore/io/al_Socket.hpp"
 #include "allocore/system/al_Config.h"
+#include "allocore/system/al_Printing.hpp"
 
 #include "../private/al_ImplAPR.h"
 #ifdef AL_LINUX
@@ -88,7 +89,7 @@ struct Socket::Impl : public ImplAPR {
 
 	#define BAILONFAIL(func)\
 		if(APR_SUCCESS != check_apr(func)){\
-			printf("failed to create socket at %s:%i\n", address.c_str(), port);\
+			AL_WARN("failed to create socket at %s:%i\n", address.c_str(), port);\
 			close();\
 			return false;\
 		}

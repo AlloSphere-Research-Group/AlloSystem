@@ -1,6 +1,7 @@
 #include <ctype.h> // isgraph
 #include <stdio.h> // printf
 #include <string.h>
+#include "allocore/system/al_Printing.hpp"
 #include "allocore/protocol/al_OSC.hpp"
 
 #include "oscpack/osc/OscOutboundPacketStream.h"
@@ -56,7 +57,7 @@ etc.												Addtional bundle elements
 	try { \
 		expr \
 	} catch (::osc::Exception& e) { \
-		printf("OSC error: %s\n", e.what()); \
+		AL_WARN("OSC error: %s", e.what()); \
 	}
 
 namespace al{

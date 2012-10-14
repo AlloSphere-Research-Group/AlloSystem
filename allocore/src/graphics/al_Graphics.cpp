@@ -3,6 +3,7 @@
 //#include <string>
 #include <stdio.h>
 
+#include "allocore/system/al_Printing.hpp"
 #include "allocore/types/al_Array.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
 
@@ -41,18 +42,19 @@ int Graphics::numBytes(DataType v){
 	#undef CS
 }
 
-bool Graphics::error(const char * msg, FILE * fp){
-	return error(-1, msg, fp);
+bool Graphics::error(const char * msg){
+	return error(-1, msg);
 }
 
-bool Graphics::error(int ID, const char * msg, FILE * fp){
+bool Graphics::error(int ID, const char * msg){
 	GLenum err = glGetError();
 
 	#define CASE(GL_ERR) case GL_ERR:\
-		if(ID>=0)	fprintf(fp,"Error %s (id=%d): %s\n", msg, ID, #GL_ERR);\
-		else		fprintf(fp,"Error %s: %s\n", msg, #GL_ERR);\
+		if(ID>=0)	AL_WARN_ONCE("Error %s (id=%d): %s", msg, ID, #GL_ERR);\
+		else		AL_WARN_ONCE("Error %s: %s", msg, #GL_ERR);\
 		return true;
-	#define POST "The offending command is ignored and has no other side effect than to set the error flag."
+
+	//#define POST "The offending command is ignored and has no other side effect than to set the error flag."
 	switch(err) {
 //		case GL_INVALID_ENUM:	fprintf(fp,"%s:\n %s\n", msg, "An unacceptable value is specified for an enumerated argument. "POST); return true;
 //		case GL_INVALID_VALUE:	fprintf(fp,"%s:\n %s\n", msg, "A numeric argument is out of range. "POST); return true;
@@ -67,7 +69,7 @@ bool Graphics::error(int ID, const char * msg, FILE * fp){
 		default: break;
 	}
 	#undef CASE
-	#undef POST
+	//#undef POST
 	return false;
 }
 

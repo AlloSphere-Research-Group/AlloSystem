@@ -65,7 +65,7 @@ inline bool initialize_font() {
 		if(!front_freetype_library) {
 			FT_Error err = FT_Init_FreeType(&front_freetype_library);
 			if(err) {
-				fprintf(stderr, "font: error initializing FreeType library\n");
+				AL_WARN("error initializing FreeType library");
 				return false;
 			}
 		}
@@ -84,11 +84,11 @@ public:
 		FT_Face face;
 		FT_Error err = FT_New_Face(front_freetype_library, filename.c_str(), 0, &face);
 		if(err) {
-			fprintf(stderr, "font: error loading font face for %s\n", filename.c_str());
+			AL_WARN("error loading font face for %s", filename.c_str());
 			return 0;
 		}
 		if(FT_Set_Pixel_Sizes(face, 0, font.mFontSize)) {
-			fprintf(stderr, "font: error setting font size");
+			AL_WARN("error setting font size");
 			FT_Done_Face(face);
 			return 0;
 		}

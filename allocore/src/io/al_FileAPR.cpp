@@ -1,5 +1,6 @@
 #include <cstring>
 #include "allocore/io/al_File.hpp"
+#include "allocore/system/al_Printing.hpp"
 
 // TODO:
 // At the moment, we only use APR for getting modification times of files
@@ -61,7 +62,7 @@ public:
 				}
 			}
 		} else {
-			printf("couldn't open directory %s\n", dirname.c_str());
+			AL_WARN("couldn't open directory %s", dirname.c_str());
 		}
 		return found;
 	}

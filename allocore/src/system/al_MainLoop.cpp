@@ -1,5 +1,7 @@
 #include "allocore/system/al_MainLoop.hpp"
 #include "allocore/system/al_Thread.hpp"
+#include "allocore/system/al_Printing.hpp"
+
 #include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>		// snprintf
@@ -30,19 +32,19 @@ extern "C" void al_main_native_enter(al_sec interval);
 
 #ifdef AL_LINUX
 	extern "C" void al_main_native_attach(al_sec interval) {
-		printf("Linux native loop not yet implemented\n");
+		AL_WARN("Linux native loop not yet implemented");
 	}
 	extern "C" void al_main_native_enter(al_sec interval) {
-		printf("Linux native loop not yet implemented\n");
+		AL_WARN("Linux native loop not yet implemented");
 	}
 	extern "C" void al_main_native_init() {}
 
 #elif defined AL_WINDOWS
 	extern "C" void al_main_native_attach(al_sec interval) {
-		printf("Win32 native loop not yet implemented\n");
+		AL_WARN("Win32 native loop not yet implemented");
 	}
 	extern "C" void al_main_native_enter(al_sec interval) {
-		printf("Win32 native loop not yet implemented\n");
+		AL_WARN("Win32 native loop not yet implemented");
 	}
 	extern "C" void al_main_native_init() {}
 #endif

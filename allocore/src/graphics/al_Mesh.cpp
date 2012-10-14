@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "allocore/system/al_Config.h"
+#include "allocore/system/al_Printing.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
 
@@ -137,7 +138,7 @@ void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace){
 				mesh.vertex(mean + (facenormal*length));
 			}
 		} else {
-			printf("createNormalsMesh only valid for indexed meshes\n");
+			AL_WARN_ONCE("createNormalsMesh only valid for indexed meshes");
 		} 
 	} else {
 		int Ni = al::min(vertices().size(), normals().size());
@@ -161,11 +162,11 @@ void Mesh::compress() {
 	int Ni = indices().size();
 	int Nv = vertices().size();
 	if (Ni) {
-		printf("cannot compress Mesh with indices\n");
+		AL_WARN_ONCE("cannot compress Mesh with indices");
 		return;
 	}
 	if (Nv == 0) {
-		printf("cannot compress Mesh with no vertices\n");
+		AL_WARN_ONCE("cannot compress Mesh with no vertices");
 		return;
 	}
 	
@@ -428,7 +429,7 @@ void Mesh::ribbonize(float * widths, int widthsStride, bool faceBinormal){
 
 void Mesh::merge(const Mesh& src){
 //	if (indices().size() || src.indices().size()) {
-//		printf("error: Mesh merging with indexed meshes not yet supported\n");
+//		fprintf(stderr, "error: Mesh merging with indexed meshes not yet supported\n");
 //		return;
 //	}
 

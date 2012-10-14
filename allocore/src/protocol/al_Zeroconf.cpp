@@ -1,6 +1,6 @@
-
 #include "allocore/protocol/al_Zeroconf.hpp"
 #include "allocore/system/al_MainLoop.hpp"
+#include "allocore/system/al_Printing.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,7 +31,7 @@ void al_avahi_poll(al_sec interval=0.01) {
 void al_avahi_init() {
 	if (poller == 0) {
 		if (!(poller = avahi_simple_poll_new())) {
-	   		fprintf(stderr, "Zeroconf: Failed to initialize Avahi.\n");
+	   		AL_WARN("Zeroconf: Failed to initialize Avahi");
 			return;
 		}
 		// start:
@@ -50,13 +50,13 @@ public:
 		int error;
 		AvahiClientFlags flags = AVAHI_CLIENT_NO_FAIL;
 		if (!poller) {
-	   		fprintf(stderr, "Zeroconf: Failed to initialize Avahi.\n");
+	   		AL_WARN("Zeroconf: Failed to initialize Avahi");
 	    	return;
 		}
 		client = avahi_client_new(avahi_simple_poll_get(poller), flags, client_callback, this, &error);
 		/* Check wether creating the client object succeeded */
 		if (!client) {
-			fprintf(stderr, "Zeroconf: Failed to create client: %s\n", avahi_strerror(error));
+			AL_WARN("Zeroconf: Failed to create client: %s", avahi_strerror(error));
 			return;
 		}
 	}
@@ -78,7 +78,7 @@ public:
 		        break;
 
 		    case AVAHI_CLIENT_FAILURE:
-		        fprintf(stderr, "Zeroconf: Client failure: %s\n", avahi_strerror(avahi_client_errno(client)));
+		        AL_WARN("Zeroconf: Client failure: %s", avahi_strerror(avahi_client_errno(client)));
 		        //avahi_simple_poll_quit(self->poller);
 		        break;
 
@@ -113,7 +113,7 @@ public:
 		if (client) {	
 			/* Create the service browser */
 			if (!(browser = avahi_service_browser_new(client, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, master->type.c_str(), master->domain.c_str(), (AvahiLookupFlags)0, browse_callback, this))) {
-				fprintf(stderr, "Zeroconf: Failed to create service browser: %s\n", avahi_strerror(avahi_client_errno(client)));
+				AL_WARN("Zeroconf: Failed to create service browser: %s", avahi_strerror(avahi_client_errno(client)));
 				return;
 			}
 		}
@@ -143,7 +143,7 @@ public:
 		/* Called whenever a new services becomes available on the LAN or is removed from the LAN */
 		switch (event) {
 		    case AVAHI_BROWSER_FAILURE:
-		        fprintf(stderr, "Zeroconf: %s\n", avahi_strerror(avahi_client_errno(avahi_service_browser_get_client(b))));
+		        AL_WARN("Zeroconf: %s", avahi_strerror(avahi_client_errno(avahi_service_browser_get_client(b))));
 		        //avahi_simple_poll_quit(self->poller);
 		        return;
 
@@ -156,7 +156,7 @@ public:
 				   the resolver for us. */
 
 				if (!(avahi_service_resolver_new(client, interface, protocol, name, type, domain, AVAHI_PROTO_UNSPEC, (AvahiLookupFlags)0, resolve_callback, self)))
-				    fprintf(stderr, "Zeroconf: failed to resolve service '%s': %s\n", name, avahi_strerror(avahi_client_errno(client)));
+				    AL_WARN("Zeroconf: failed to resolve service '%s': %s", name, avahi_strerror(avahi_client_errno(client)));
 		        break;
 
 		    case AVAHI_BROWSER_REMOVE:
@@ -166,7 +166,7 @@ public:
 		    case AVAHI_BROWSER_ALL_FOR_NOW:
 		    case AVAHI_BROWSER_CACHE_EXHAUSTED:
 				// TODO: what do these mean?		        
-				//fprintf(stderr, "Zeroconf: %s\n", event == AVAHI_BROWSER_CACHE_EXHAUSTED ? "CACHE_EXHAUSTED" : "ALL_FOR_NOW");
+				//AL_WARN("Zeroconf: %s", event == AVAHI_BROWSER_CACHE_EXHAUSTED ? "CACHE_EXHAUSTED" : "ALL_FOR_NOW");
 		        break;
 		}
 	}
@@ -194,7 +194,7 @@ public:
 
 		switch (event) {
 		    case AVAHI_RESOLVER_FAILURE:
-		        fprintf(stderr, "Zeroconf: failed to resolve service '%s' of type '%s' in domain '%s': %s\n", name, type, domain, avahi_strerror(avahi_client_errno(avahi_service_resolver_get_client(r))));
+		        AL_WARN("Zeroconf: failed to resolve service '%s' of type '%s' in domain '%s': %s", name, type, domain, avahi_strerror(avahi_client_errno(avahi_service_resolver_get_client(r))));
 		        break;
 
 		    case AVAHI_RESOLVER_FOUND: {
@@ -250,7 +250,7 @@ public:
 	static void create_services(AvahiClient * client, Impl * self) {
 		int ret;
 		if (!(self->group = avahi_entry_group_new(client, entry_group_callback, NULL))) {
-	        fprintf(stderr, "avahi_entry_group_new() failed: %s\n", avahi_strerror(avahi_client_errno(client)));
+	        AL_WARN("avahi_entry_group_new() failed: %s", avahi_strerror(avahi_client_errno(client)));
 	        return;
 	    }
 
@@ -260,28 +260,28 @@ public:
 		
 			// add a service to the group:
 			if ((ret = avahi_entry_group_add_service(self->group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, (AvahiPublishFlags)0, self->name.c_str(), self->type.c_str(), self->domain.c_str(), NULL, self->port, NULL)) < 0) {
-				printf("add group error %d - %d\n", ret, AVAHI_ERR_COLLISION);
+				AL_WARN("add group error %d - %d", ret, AVAHI_ERR_COLLISION);
 
 			    if (ret == AVAHI_ERR_COLLISION) {
-			        printf("Zeroconf: name collision");
+			        AL_WARN("Zeroconf: name collision");
 					
 					// A service name collision with a local service happened. Let's pick a new name
 					self->name = avahi_alternative_service_name(self->name.c_str());;
 
-					fprintf(stderr, "Service name collision, renaming service to '%s'\n", self->name.c_str());
+					AL_WARN("Service name collision, renaming service to '%s'", self->name.c_str());
 
 					avahi_entry_group_reset(self->group);
 
 					create_services1(client, self);
 					return;
 				}
-			    printf("Zeroconf: failed to add service %s on %s:%u: %s\n", self->name.c_str(), self->host.c_str(), self->port, avahi_strerror(ret));
+			    AL_WARN("Zeroconf: failed to add service %s on %s:%u: %s", self->name.c_str(), self->host.c_str(), self->port, avahi_strerror(ret));
 			    return;
 			}
 
 			// Tell the server to register the service 
 			if ((ret = avahi_entry_group_commit(self->group)) < 0) {
-			    printf("Zeroconf: Failed to commit entry group: %s\n", avahi_strerror(ret));
+			    AL_WARN("Zeroconf: Failed to commit entry group: %s", avahi_strerror(ret));
 			    return;
 			}
 		}
@@ -293,12 +293,12 @@ public:
 
 		if (!self->group)
 		    if (!(self->group = avahi_entry_group_new(client, entry_group_callback, self))) {
-		        fprintf(stderr, "avahi_entry_group_new() failed: %s\n", avahi_strerror(avahi_client_errno(client)));
+		        AL_WARN("avahi_entry_group_new() failed: %s", avahi_strerror(avahi_client_errno(client)));
 		        goto fail;
 		    }
 
 		if (avahi_entry_group_is_empty(self->group)) {
-		    fprintf(stderr, "Adding service '%s'\n", self->name.c_str());
+		    printf("Adding service '%s'\n", self->name.c_str());
 
 		    snprintf(r, sizeof(r), "random=%i", rand());
 
@@ -307,12 +307,12 @@ public:
 		        if (ret == AVAHI_ERR_COLLISION)
 		            goto collision;
 
-		        fprintf(stderr, "Failed to add _ipp._tcp service: %s\n", avahi_strerror(ret));
+		        AL_WARN("Failed to add _ipp._tcp service: %s", avahi_strerror(ret));
 		        goto fail;
 		    }
 
 		    if ((ret = avahi_entry_group_commit(self->group)) < 0) {
-		        fprintf(stderr, "Failed to commit entry group: %s\n", avahi_strerror(ret));
+		        AL_WARN("Failed to commit entry group: %s", avahi_strerror(ret));
 		        goto fail;
 		    }
 		}
@@ -324,7 +324,7 @@ public:
 		// A service name collision with a local service happened. Let's pick a new name
 		self->name = avahi_alternative_service_name(self->name.c_str());;
 
-		fprintf(stderr, "Service name collision, renaming service to '%s'\n", self->name.c_str());
+		AL_WARN("Service name collision, renaming service to '%s'", self->name.c_str());
 
 		avahi_entry_group_reset(self->group);
 

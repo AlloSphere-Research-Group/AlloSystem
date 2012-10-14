@@ -181,7 +181,7 @@ inline void VCR::onAudioCB(AudioIOData& io) {
 	sampletime ahead = w - r;	// how much writer is ahead of reader
 	if (ahead > (length - numSamples)) {
 		// not enough space left in ringbuffer!
-		printf("audio underflow\n");
+		fprintf(stderr, "audio underflow\n");
 		mAudioUnderflows++;
 		return;
 	}
@@ -249,7 +249,7 @@ inline void VCR::writeToOpenSoundFile(gam::SoundFile& sf) {
 	sampletime ahead = w - r;	// how much writer is ahead of reader
 	if (ahead > length) {
 		// buffer is over-full!
-		printf("audio overflow\n");
+		fprintf(stderr, "audio overflow\n");
 		mAudioOverflows++;
 		
 		ahead = length;

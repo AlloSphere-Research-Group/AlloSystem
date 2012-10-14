@@ -1,3 +1,4 @@
+#include "allocore/system/al_Printing.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/graphics/al_Shader.hpp"
 
@@ -338,7 +339,7 @@ int ShaderProgram::uniform(const char * name) const {
 	//GLint loc = glGetUniformLocationARB((GLhandleARB)handle(), name);
 	GLint loc = glGetUniformLocation(id(), name);
 	if (loc == -1)
-        printf("No such uniform named \"%s\"\n", name);
+		AL_WARN_ONCE("No such uniform named \"%s\"", name);
 	return loc; 
 }
 
@@ -346,7 +347,7 @@ int ShaderProgram::attribute(const char * name) const {
 	//GLint loc = glGetAttribLocationARB((GLhandleARB)handle(), name);
 	GLint loc = glGetAttribLocation(id(), name);
 	if (loc == -1)
-        printf("No such attribute named \"%s\"\n", name);
+        AL_WARN_ONCE("No such attribute named \"%s\"", name);
 	return loc;  
 }
 

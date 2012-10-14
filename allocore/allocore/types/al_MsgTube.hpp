@@ -227,7 +227,7 @@ protected:
 	
 	void writeData(char * data, size_t size) {
 		if (size >= memsize) {
-			printf("ERROR WRITING TO RINGBUFFER\n");
+			AL_WARN("ERROR WRITING TO RINGBUFFER");
 		} else
 		if (flushCache() && rb.writeSpace() >= size) {
 			//printf("scheduled message\n");

@@ -44,8 +44,6 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
-#include <stdio.h>
-
 #include "allocore/math/al_Vec.hpp"
 #include "allocore/math/al_Quat.hpp"
 #include "allocore/math/al_Matrix4.hpp"
@@ -425,10 +423,10 @@ public:
 
 	// Utility functions: converting, reporting, etc.
 
-	/// Print current error state to file
-	static bool error(const char *msg="", FILE * fp=stdout);
+	/// Print current error state
+	static bool error(const char *msg="");
 
-	static bool error(int ID, const char * msg, FILE * fp=stdout);
+	static bool error(int ID, const char * msg);
 
 	/// Returns number of components for given color type
 	static int numComponents(Format v);

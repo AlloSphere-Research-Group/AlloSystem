@@ -165,7 +165,7 @@ public:
 				return;
 			}
 		}
-		printf("error shot %s not found\n", shotname.c_str());
+		AL_WARN("error shot %s not found", shotname.c_str());
 	}
 
 	// jump to particular shot by iterator:

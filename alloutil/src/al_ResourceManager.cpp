@@ -1,3 +1,4 @@
+#include "allocore/system/al_Printing.hpp"
 #include "alloutil/al_ResourceManager.hpp"
 
 using namespace al;
@@ -7,7 +8,7 @@ const char * ResourceManager::find(std::string filename) {
 	FilePath fp = paths.find(filename);
 	std::string result = fp.filepath();
 	if (result == "") {
-		printf("could not find: %s\n", filename.c_str());
+		AL_WARN("al::ResourceManager: could not find: %s", filename.c_str());
 		return NULL;
 	} else {
 		return result.c_str();

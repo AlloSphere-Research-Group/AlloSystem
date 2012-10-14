@@ -95,7 +95,7 @@ void Texture :: configure(AlloArrayHeader& header) {
 		case 2: target(TEXTURE_2D); break;
 		case 3: target(TEXTURE_3D); break;
 		default:
-			printf("invalid array dimensions for texture\n");
+			AL_WARN("invalid array dimensions for texture");
 			return;
 	}
 	
@@ -111,7 +111,7 @@ void Texture :: configure(AlloArrayHeader& header) {
 		case 3:	format(Graphics::RGB); break;
 		case 4:	format(Graphics::RGBA); break;
 		default:
-			printf("invalid array component count for texture\n");
+			AL_WARN("invalid array component count for texture");
 			return;
 	}
 	
@@ -125,7 +125,7 @@ void Texture :: configure(AlloArrayHeader& header) {
 		case AlloFloat32Ty:	type(Graphics::FLOAT); break; 
 		case AlloFloat64Ty:	type(Graphics::DOUBLE); break; 
 		default:
-			printf("invalid array type for texture\n");
+			AL_WARN("invalid array type for texture");
 			return;
 	}
 	
@@ -267,7 +267,7 @@ void Texture :: allocate(const Array& src, bool reconfigure) {
 			case 2: target(TEXTURE_2D); break;
 			case 3: target(TEXTURE_3D); break;
 			default:
-				printf("invalid array dimensions for texture\n");
+				AL_WARN("invalid array dimensions for texture");
 				return;
 		}
 		
@@ -277,7 +277,7 @@ void Texture :: allocate(const Array& src, bool reconfigure) {
 			case 2:	height(src.height());
 			case 1:	width(src.width()); break;
 			default:
-				printf("texture array must have 1, 2 or 3 dimenions\n");
+				AL_WARN("texture array must have 1, 2 or 3 dimenions");
 				return;
 		}
 		
@@ -295,7 +295,7 @@ void Texture :: allocate(const Array& src, bool reconfigure) {
 				case 4:	
 					format(Graphics::RGBA); break;
 				default:
-					printf("invalid array component count for texture\n");
+					AL_WARN("invalid array component count for texture");
 					return;
 			}
 		}
@@ -318,7 +318,7 @@ void Texture :: allocate(const Array& src, bool reconfigure) {
 		
 		// ensure that array matches texture:
 		if (!src.isFormat(mArray.header)) {
-			printf("couldn't allocate array, mismatch format\n");
+			AL_WARN("couldn't allocate array, mismatch format");
 			mArray.print();
 			src.print();
 			return;
@@ -378,7 +378,7 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 			case 2: target(TEXTURE_2D); break;
 			case 3: target(TEXTURE_3D); break;
 			default:
-				printf("invalid array dimensions for texture\n");
+				AL_WARN("invalid array dimensions for texture");
 				return;
 		}
 		
@@ -394,7 +394,7 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 			case 3:	format(Graphics::RGB); break;
 			case 4:	format(Graphics::RGBA); break;
 			default:
-				printf("invalid array component count for texture\n");
+				AL_WARN("invalid array component count for texture");
 				return;
 		}
 		
@@ -408,7 +408,7 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 			case AlloFloat32Ty:	type(Graphics::FLOAT); break; 
 			case AlloFloat64Ty:	type(Graphics::DOUBLE); break; 
 			default:
-				printf("invalid array type for texture\n");
+				AL_WARN("invalid array type for texture");
 				return;
 		}
 		
@@ -420,24 +420,24 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 	else {
 		
 		if (src.width() != width()) {
-			printf("submit failed: source array width does not match\n");
+			AL_WARN("submit failed: source array width does not match");
 			return;
 		}
 		if (target() != TEXTURE_1D) {
 			if (height() && src.height() != height()) {
-				printf("submit failed: source array height does not match\n");
+				AL_WARN("submit failed: source array height does not match");
 				return;
 			}
 			if (target() == TEXTURE_3D) {
 				if (depth() && src.depth() != depth()) {
-					printf("submit failed: source array depth does not match\n");
+					AL_WARN("submit failed: source array depth does not match");
 					return;
 				}
 			}
 		}
 		
 		if (Graphics::toDataType(src.type()) != type()) {
-			printf("submit failed: source array type does not match texture\n");
+			AL_WARN("submit failed: source array type does not match texture");
 			return;
 		}
 	
@@ -445,25 +445,25 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 			case Graphics::ALPHA:
 			case Graphics::LUMINANCE:
 				if (src.components() != 1) {
-					printf("submit failed: source array component count does not match (got %d, should be 1)\n", src.components());
+					AL_WARN("submit failed: source array component count does not match (got %d, should be 1)", src.components());
 					return;
 				}
 				break;
 			case Graphics::LUMINANCE_ALPHA:
 				if (src.components() != 2) {
-					printf("submit failed: source array component count does not match (got %d, should be 2)\n", src.components());
+					AL_WARN("submit failed: source array component count does not match (got %d, should be 2)", src.components());
 					return;
 				}
 				break;
 			case Graphics::RGB:
 				if (src.components() != 3) {
-					printf("submit failed: source array component count does not match (got %d, should be 3)\n", src.components());
+					AL_WARN("submit failed: source array component count does not match (got %d, should be 3)", src.components());
 					return;
 				}
 				break;
 			case Graphics::RGBA:
 				if (src.components() != 4) {
-					printf("submit failed: source array component count does not match (got %d, should be 4)\n", src.components());
+					AL_WARN("submit failed: source array component count does not match (got %d, should be 4)", src.components());
 					return;
 				}
 				break;
@@ -552,7 +552,7 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 			glTexImage3D(mTarget, 0, intFmt, width(), height(), depth(), 0, format(), type(), pixels);
 			break;
 		default:
-			printf("invalid texture target %d\n", mTarget);
+			AL_WARN("invalid texture target %d", mTarget);
 	}
 	Graphics::error(id(), "Texture::submit (glTexImage)");
 	
@@ -628,12 +628,12 @@ void Texture :: print() {
 
 
 Texture& Texture::updatePixels(){
-	warnOnce("Texture::updatePixels() deprecated, use Texture::dirty()");
+	AL_WARN_ONCE("Texture::updatePixels() deprecated, use Texture::dirty()");
 	return dirty();
 }
 
 void Texture::submit(){
-	warnOnce("Texture::submit() deprecated, use Texture::dirty()");
+	AL_WARN_ONCE("Texture::submit() deprecated, use Texture::dirty()");
 	dirty();
 }
 

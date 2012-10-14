@@ -2,6 +2,7 @@
 
 #include "allocore/graphics/al_Image.hpp"
 #include "allocore/system/al_Config.h"
+#include "allocore/system/al_Printing.hpp"
 
 #include "FreeImage.h"
 /*
@@ -37,18 +38,18 @@ public:
 	virtual bool load(const std::string& filename, Array &lat) {
 		FREE_IMAGE_FORMAT type = FreeImage_GetFIFFromFilename(filename.c_str());
 		if(type == FIF_UNKNOWN) {
-			printf("image format not recognized: %s\n", filename.c_str());
+			AL_WARN("image format not recognized: %s", filename.c_str());
 			return false;
 		}
 		if(!FreeImage_FIFSupportsReading(type)) {
-			printf("image format not supported: %s\n", filename.c_str());
+			AL_WARN("image format not supported: %s", filename.c_str());
 			return false;
 		}
 		
 		destroy();
 		mImage = FreeImage_Load(type, filename.c_str(), 0);
 		if (mImage == NULL) {
-			printf("image failed to load: %s\n", filename.c_str());
+			AL_WARN("image failed to load: %s", filename.c_str());
 			return false;
 		}
 		
@@ -77,7 +78,7 @@ public:
 				break;
 
 			case FIC_CMYK: {
-					printf("CMYK images currently not supported\n");
+					AL_WARN("CMYK images currently not supported");
 					return false;
 				}
 				break;
@@ -187,7 +188,7 @@ public:
 			break;
 			
 			default: 
-				printf("image data not understood\n");
+				AL_WARN("image data not understood");
 				destroy();
 				return false;
 		}
@@ -200,11 +201,11 @@ public:
 		FREE_IMAGE_FORMAT type = FreeImage_GetFIFFromFilename(filename.c_str());
 		
 		if(type == FIF_UNKNOWN) {
-			printf("image format not recognized: %s\n", filename.c_str());
+			AL_WARN("image format not recognized: %s", filename.c_str());
 			return false;
 		}
 		if(!FreeImage_FIFSupportsWriting(type)) {
-			printf("image format not supported: %s\n", filename.c_str());
+			AL_WARN("image format not supported: %s", filename.c_str());
 			return false;
 		}
 		
@@ -249,7 +250,7 @@ public:
 					break;
 
 					default:
-						printf("Input Matrix type not supported\n");
+						AL_WARN("input matrix type not supported");
 						break;
 				}
 			}
@@ -291,21 +292,21 @@ public:
 					break;
 
 					default:
-						printf("Input Matrix type not supported\n");
+						AL_WARN("input matrix type not supported");
 						return false;
 				}
 			}
 			break;
 
 			default: {
-				printf("Input Matrix format not supported\n");
+				AL_WARN("input matrix format not supported");
 				return false;
 			}
 		}
 		
 		
 		if (mImage == NULL) {
-			printf("Image could not be understood\n");
+			AL_WARN("image could not be understood");
 			return false;
 		}
 		

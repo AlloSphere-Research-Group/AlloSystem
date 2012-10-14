@@ -110,7 +110,7 @@ private:
 	
 inline bool Freenect::check(const char * what, int code) {
 	if (code < 0) {
-		printf("error (%s): %d\n", what, code);
+		AL_WARN("Error (%s): %d", what, code);
 		return false;
 	}
 	return true;
@@ -215,7 +215,7 @@ inline double Freenect::Callback::tilt() {
 		if (state) {
 			t = freenect_get_tilt_degs(state);
 		} else {
-			printf("error: no state\n");
+			AL_WARN("Error: no state");
 		}
 	}
 	return t * M_DEG2RAD;
@@ -254,7 +254,7 @@ inline Freenect::Freenect() : Thread() {
 	freenect_usb_context * usb_ctx = NULL;
 	int res = freenect_init(&ctx, usb_ctx);
 	if (res < 0) {
-		printf("error: failed to initialize libfreenect\n");
+		AL_WARN("Error: failed to initialize libfreenect");
 		exit(0);
 	}
 	

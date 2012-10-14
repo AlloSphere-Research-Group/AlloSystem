@@ -6,10 +6,6 @@ ProtoApp::ProtoApp()
 :	cnFOV(3,2,360,0), cnScale(2,4, 20,-20),
 	cnGain(1,4,4,0)
 {
-	initAudio();
-
-	Window * win = initWindow();
-
 	mTopBar.arrangement("<>");
 	//mTopBar.stretch(1,0);
 	//mTopBar.enable(glv::DrawBorder);
@@ -34,7 +30,6 @@ ProtoApp::ProtoApp()
 
 	mGUI.cloneStyle().colors().back.set(0,0,0,1);
 	mGUI.detachedButton().padding(4);
-	mGUI.parentWindow(*win);
 }
 
 
@@ -54,11 +49,27 @@ static bool toIdentifier(std::string& v){
 	return modified;
 }
 
-void ProtoApp::init(){
+void ProtoApp::init(
+	const Window::Dim& dim,
+	const std::string title,
+	double fps,
+	Window::DisplayMode mode,
+	double sampleRate,
+	int blockSize,
+	int chansOut,
+	int chansIn
+){
+
+	initAudio(sampleRate, blockSize, chansOut, chansIn);
+
 	// setup audio
 	if(usingAudio()){
 		gam::Sync::master().spu(audioIO().fps());
 	}
+
+
+	Window * win = initWindow(dim, title, fps, mode);
+	mGUI.parentWindow(*win);
 
 	// setup GUI
 	mAppLabel.setValue(App::name());
@@ -96,7 +107,7 @@ ProtoApp& ProtoApp::resourceDir(const std::string& dir, bool searchBack){
 
 	if(searchBack){
 		if(!al::File::searchBack(modDir)){
-			printf("Could not find %s\n", modDir.c_str());
+			AL_WARN("Could not find %s", modDir.c_str());
 			exit(0);
 		}
 	}

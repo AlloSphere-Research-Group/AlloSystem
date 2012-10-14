@@ -96,10 +96,13 @@ void printPlot(float value, uint32_t width=50, bool spaces=true, const char * po
 void err(const char * msg, const char * src="", bool exits=true);
 
 /// Prints warning message to stderr
-void warn(const char * msg, const char * src="");
+#define AL_WARN(fmt, ...) ::al::_warn(__FILE__, __LINE__, fmt "\n", ##__VA_ARGS__)
 
 /// Prints warning message to stderr once during program lifecycle
-void warnOnce(const char * msg);
+#define AL_WARN_ONCE(fmt, ...) ::al::_warnOnce(__FILE__, __LINE__, fmt "\n", ##__VA_ARGS__)
+
+void _warn(const char * fileName, int lineNumber, const char * fmt, ...);
+void _warnOnce(const char * fileName, int lineNumber, const char * fmt, ...);
 
 
 

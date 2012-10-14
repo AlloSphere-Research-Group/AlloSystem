@@ -68,7 +68,16 @@ public:
 	ProtoApp();
 	
 	/// This should be called after configuring everything else with the app
-	void init();
+	void init(
+		const Window::Dim& dim = Window::Dim(800,600),
+		const std::string title="",
+		double fps=40,
+		Window::DisplayMode mode = Window::DEFAULT_BUF,
+		double sampleRate = 44100,
+		int blockSize = 256,
+		int chansOut = -1,
+		int chansIn = -1
+	);
 	
 	/// Set the directory for application resources
 	ProtoApp& resourceDir(const std::string& dir, bool searchBack=true);

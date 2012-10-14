@@ -1,4 +1,7 @@
 #include <map>
+#include <string>
+#include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include "allocore/system/al_Printing.hpp"
 
@@ -53,5 +56,33 @@ void warnOnce(const char * msg){
 	}
 }
 
+
+void _warn(const char * fileName, int lineNumber, const char * fmt, ...){
+	fprintf(stderr, "From %s:%d: ", fileName, lineNumber);
+	va_list arg;
+	va_start(arg, fmt);
+	vfprintf(stderr, fmt, arg);
+	va_end(arg);
+}
+
+
+void _warnOnce(const char * fileName, int lineNumber, const char * fmt, ...){
+	static std::string msg;
+	static std::map<std::string, int> M;
+	static char buf[256];
+
+	va_list arg;
+	va_start(arg, fmt);
+	vsprintf(buf, fmt, arg);
+	va_end(arg);
+
+	msg = buf;
+
+	if(0==M.count(msg)){
+		M[msg]=1;
+		fprintf(stderr, "From %s:%d: ", fileName, lineNumber);
+		fprintf(stderr, "%s", buf);
+	}
+}
 
 } // ::al::
