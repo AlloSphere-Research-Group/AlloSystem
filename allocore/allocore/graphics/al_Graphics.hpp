@@ -247,6 +247,9 @@ public:
 	/// Set diameter, in pixels, of points
 	void pointSize(float v);
 
+	/// Set both line width and point diameter
+	void stroke(float v){ lineWidth(v); pointSize(v); }
+
 	/// Set distance attenuation of points. The scaling formula is clamp(size * sqrt(1/(c0 + c1*d + c2*d^2)))
 	void pointAtten(float c2=0, float c1=0, float c0=1);
 
