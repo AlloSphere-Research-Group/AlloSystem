@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXFileReference section */
+		165C2E18162AE6C900E1BC69 /* al_Array.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Array.cpp; sourceTree = "<group>"; };
 		360BCBC115BB6D70008921E9 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		360BCBC315BB6D70008921E9 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
 		360BCBC515BB6D70008921E9 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
@@ -1900,6 +1901,7 @@
 		3618834915B936340009AD7E /* types */ = {
 			isa = PBXGroup;
 			children = (
+				165C2E18162AE6C900E1BC69 /* al_Array.cpp */,
 				3618834A15B936340009AD7E /* al_Color.cpp */,
 				3618834B15B936340009AD7E /* al_Conversion.cpp */,
 				3618834C15B936340009AD7E /* al_MsgQueue.cpp */,

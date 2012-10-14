@@ -38,7 +38,6 @@
 	File author(s):
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 	Wesley Smith, 2010, wesley.hoke@gmail.com
-	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
 #ifndef INCLUDE_ALLO_ARRAY_HPP
@@ -79,8 +78,7 @@ public:
 	explicit Array(const AlloArray& cpy);
 	explicit Array(const AlloArrayHeader& h2);
 
-	//~Array(){ allo_array_destroy(this); }
-	~Array(){ dataFree(); }
+	~Array();
 
 
 	/// Assignment operator copies format and data (allocates memory if necessary)
@@ -358,102 +356,8 @@ template<> inline AlloTy Array::type<void *>(){
 	return 0;
 }
 
-inline Array::Array(){
-	data.ptr = NULL;
-	header.type= 0;
-	header.components = 1;
-	header.dimcount = 0;
-	for(int i=0; i<ALLO_ARRAY_MAX_DIMS; ++i) header.dim[i]=0;
-}
-
-inline Array::Array(const AlloArray& cpy){
-	data.ptr = 0;
-    (*this) = cpy;
-}
-inline Array::Array(const Array& cpy) {
-	data.ptr = 0;
-    (*this) = cpy;
-}
-inline Array::Array(const AlloArrayHeader& h2){
-	allo_array_clear(this);
-	format(h2);
-}
-
-inline Array::Array(int comps, AlloTy ty, uint32_t dimx){
-	allo_array_clear(this);
-	format(comps, ty, dimx);
-}
-
-inline Array::Array(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy){
-	allo_array_clear(this);
-	format(comps, ty, dimx, dimy);
-}
-
-inline Array::Array(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz){
-	allo_array_clear(this);
-	format(comps, ty, dimx, dimy, dimz);
-}
-
-inline Array& Array::operator= (const Array& cpy) {
-	if(&cpy != this){
-		format(cpy.header);
-		if (cpy.data.ptr) {
-			memcpy(data.ptr, cpy.data.ptr, size());
-		}
-	}
-	return *this;
-}
-
-inline Array& Array::operator= (const AlloArray& cpy) {
-	if(&cpy != this){
-		format(cpy.header);
-		if (cpy.data.ptr) {
-			memcpy(data.ptr, cpy.data.ptr, size());
-		}
-	}
-	return *this;
-}
-
-
-/*
-	Set stride factors based on a specific byte alignment
- */
 inline void Array::deriveStride(AlloArrayHeader& h, size_t alignSize) {
 	allo_array_setstride(&h, alignSize);
-}
-
-// Check if this Array conforms to an ArrayHeader format
-inline bool Array::isFormat(const AlloArrayHeader& h2) const {
-	for(int i=0; i<header.dimcount; ++i){
-		if( (header.dim[i] != h2.dim[i]) || (header.stride[i] != h2.stride[i]) )
-			return false;
-	}
-	return (header.components == h2.components)
-		&& (header.type == h2.type)
-		&& (header.dimcount == h2.dimcount);
-}
-
-inline void Array::configure(const AlloArrayHeader& h2) {
-	header.type = h2.type;
-	header.components = h2.components;
-	header.dimcount = h2.dimcount;
-	for(int i=0; i < ALLO_ARRAY_MAX_DIMS; ++i) {
-		if (i < header.dimcount) {
-			header.dim[i] = h2.dim[i];
-			header.stride[i] = h2.stride[i];
-		} else {
-			header.dim[i] = 1;
-			header.stride[i] = h2.stride[i-1];
-		}
-	}
-}
-
-inline void Array::format(const AlloArrayHeader& h2) {
-	if(!isFormat(h2)) {
-		dataFree();
-		configure(h2);
-		dataCalloc();
-	}
 }
 
 inline void Array::format(int comps, AlloTy ty, uint32_t dimx) {
@@ -477,19 +381,6 @@ inline void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, uint32_t d
 inline void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, size_t align) {
 	uint32_t dims[] = {dimx,dimy,dimz};
 	formatAlignedGeneral(comps, ty, dims,3, align);
-}
-
-inline void Array::formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, int numDims, size_t align) {
-	if(numDims > ALLO_ARRAY_MAX_DIMS) numDims = ALLO_ARRAY_MAX_DIMS;
-	AlloArrayHeader hh;
-	hh.type = ty;
-	hh.components = comps;
-	hh.dimcount = numDims;
-	int i=0;
-	for(; i<numDims; ++i)				hh.dim[i] = dims[i];
-	for(; i<ALLO_ARRAY_MAX_DIMS; ++i)	hh.dim[i] = 0;
-	deriveStride(hh, align);
-	format(hh);
 }
 
 template<typename T> inline T * Array::cell(size_t x) const {
@@ -772,7 +663,7 @@ template<typename T> inline void Array::write_interp(const T* val, double x0, do
 }
 
 
-template<typename T> inline void Array::fill(void (*func)(T * values, double normx)) {
+template<typename T> void Array::fill(void (*func)(T * values, double normx)) {
 	int d0 = header.dim[0];
 	double inv_d0 = 1.0/(double)d0;
 	int components = header.components;
@@ -784,7 +675,7 @@ template<typename T> inline void Array::fill(void (*func)(T * values, double nor
 	}
 }
 
-template<typename T> inline void Array::fill(void (*func)(T * values, double normx, double normy)) {
+template<typename T> void Array::fill(void (*func)(T * values, double normx, double normy)) {
 	int d0 = header.dim[0];
 	int d1 = header.dim[1];
 	int s1 = header.stride[1];
@@ -801,7 +692,7 @@ template<typename T> inline void Array::fill(void (*func)(T * values, double nor
 	}
 }
 
-template<typename T> inline void Array::fill(void (*func)(T * values, double normx, double normy, double normz)) {
+template<typename T> void Array::fill(void (*func)(T * values, double normx, double normy, double normz)) {
 	int d0 = header.dim[0];
 	int d1 = header.dim[1];
 	int d2 = header.dim[2];
@@ -823,7 +714,7 @@ template<typename T> inline void Array::fill(void (*func)(T * values, double nor
 	}
 }
 
-template<typename T> inline void Array::setall(T value) {
+template<typename T> void Array::setall(T value) {
 	int d0 = header.dim[0];
 	int d1 = header.dim[1];
 	//int d2 = header.dim[2];
@@ -869,7 +760,7 @@ template<typename T> inline void Array::setall(T value) {
 	
 }
 
-template<typename T> inline void Array::set1d(T * cell) {
+template<typename T> void Array::set1d(T * cell) {
 	int d0 = header.dim[0];
 	int s0 = header.stride[0];
 	int components = header.components;
@@ -882,8 +773,7 @@ template<typename T> inline void Array::set1d(T * cell) {
 	}
 }
 
-
-template<typename T> inline void Array::set2d(T * cell) {
+template<typename T> void Array::set2d(T * cell) {
 	int d0 = header.dim[0];
 	int d1 = header.dim[1];
 	int s0 = header.stride[0];
@@ -900,7 +790,7 @@ template<typename T> inline void Array::set2d(T * cell) {
 	}
 }
 
-template<typename T> inline void Array::set3d(T * cell) {
+template<typename T> void Array::set3d(T * cell) {
 	int d0 = header.dim[0];
 	int d1 = header.dim[1];
 	int d2 = header.dim[2];
@@ -919,12 +809,6 @@ template<typename T> inline void Array::set3d(T * cell) {
 			}
 		}
 	}
-}
-
-inline void Array::print() const {
-	printf("Array %p type %s components %d %d-D: ( ", this, allo_type_name(type()), components(), dimcount());
-	for (int i=0; i<dimcount(); i++) printf("%d(stride %d) ", dim(i), stride(i));
-	printf(") %d bytes, data: %p)\n", int(size()), data.ptr);
 }
 
 #undef DOUBLE_FLOOR
