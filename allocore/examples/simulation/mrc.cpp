@@ -12,7 +12,6 @@ Graham Wakefield 2011
 #include "allocore/al_Allocore.hpp"
 #include "allocore/graphics/al_Shader.hpp"
 #include "allocore/graphics/al_Isosurface.hpp"
-#include "alloutil/al_Field3D.hpp"
 
 using namespace al;
 
@@ -137,7 +136,6 @@ struct MyWindow : public Window {
 		return true;
 	}
 };
-
 
 MyWindow win;
 
@@ -327,21 +325,26 @@ int main(){
 	paths.addAppPaths();
 	paths.addSearchPath(paths.appPath() + "../../", true);
 	paths.print();
-	std::string mrcpath = paths.find("g-actin.mrc").filepath();
+	std::string mrcpath = paths.find("golgi.mrc").filepath();
+	//std::string mrcpath = paths.find("g-actin.mrc").filepath();
 	//std::string mrcpath = paths.find("arp23_cf26.map").filepath();
-	File f(mrcpath, "rb", true);
+	File f(mrcpath, "rb");
+	
+	if(!f.open()){
+		AL_WARN("Cannot open MRC file.", mrcpath.c_str());
+		exit(EXIT_FAILURE);
+	}
 	
 	Array& array = tex.array();
 	MRCHeader& header = mrcParse(f.readAll(), array);
 	
 	amean = header.amean;
-	
+
 	win.append(*new StandardWindowKeyControls);
 	win.create(Window::Dim(640, 480));
 	
 	iso.primitive(Graphics::TRIANGLES);
 
 	MainLoop::start();
-	return 0;
 }
 
