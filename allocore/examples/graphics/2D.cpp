@@ -34,15 +34,22 @@ public:
 
 	virtual void onDraw(Graphics& g, const Viewpoint& v){
 		
+		// Start with a new projection matrix
 		g.pushMatrix(g.PROJECTION);
 		g.loadIdentity();
+
+		// Set up 2D orthographic projection coordinates
+		// The args are left, right, bottom, top
 		gluOrtho2D(-1,1,-1,1);
+
 		g.pushMatrix(g.MODELVIEW);
 		g.loadIdentity();
-		
+
 			g.draw(verts);
-		
+
 		g.popMatrix();
+
+		// Don't forget to restore original projection matrix
 		g.popMatrix(g.PROJECTION);
 	}
 };
