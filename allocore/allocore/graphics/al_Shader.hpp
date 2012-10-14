@@ -114,7 +114,7 @@ private:
 /// Shader program object
 
 /// A program object represents a useable part of render pipeline. 
-/// Links shaders to one program object
+/// It links one or more shader units into a single program object.
 class ShaderProgram : public ShaderBase{
 public:
 
@@ -153,11 +153,10 @@ public:
 
 		//textures? non square matrices? attributes?
 	};
-	
+
 	struct Attribute {
-		
-		
 	};
+
 
 	ShaderProgram()
 	:	mInPrim(Graphics::TRIANGLES), mOutPrim(Graphics::TRIANGLES), mOutVertices(3),
@@ -172,14 +171,15 @@ public:
 	const ShaderProgram& detach(const Shader& s) const;
 	
 	// These parameters must be set before attaching geometry shaders
-	void setGeometryInputPrimitive(Graphics::Primitive prim) { mInPrim = prim; }
-	void setGeometryOutputPrimitive(Graphics::Primitive prim) { mOutPrim = prim; }
-	void setGeometryOutputVertices(unsigned int i) { mOutVertices = i; }
+	void setGeometryInputPrimitive(Graphics::Primitive prim){ mInPrim = prim; }
+	void setGeometryOutputPrimitive(Graphics::Primitive prim){ mOutPrim = prim; }
+	void setGeometryOutputVertices(unsigned int i){ mOutVertices = i; }
 
 	// If dovalidate == true, immediately calls validate() 
 	// you might not want to do this if you need to set uniforms before validating
 	// e.g. when using different texture sampler types in the same shader
-	const ShaderProgram& link(bool dovalidate=true) const;
+	const ShaderProgram& link(bool doValidate=true) const;
+
 	// check if compilation/linking was successful (prints an error on failure)
 	const ShaderProgram& validate_linker() const;
 	
@@ -194,7 +194,10 @@ public:
 	/// Toggle active state
 	ShaderProgram& toggleActive(){ mActive^=true; return *this; }
 
+	/// Begin use of shader program
 	bool begin();
+	
+	/// End use of shader program
 	void end() const;
 
 	/// Returns whether program linked successfully.
@@ -217,29 +220,46 @@ public:
 	const ShaderProgram& uniform(int location, float v0, float v1, float v2, float v3) const;
 	
 	
-	template<typename T>
+	template <typename T>
 	const ShaderProgram& uniform(const char * name, const Vec<2,T>& v) const {
 		return uniform(name, v.x, v.y);
 	}
-	template<typename T>
+
+	template <typename T>
 	const ShaderProgram& uniform(const char * name, const Vec<3,T>& v) const {
 		return uniform(name, v.x, v.y, v.z);
 	}
-	template<typename T>
+
+	template <typename T>
 	const ShaderProgram& uniform(const char * name, const Vec<4,T>& v) const {
 		return uniform(name, v.x, v.y, v.z, v.w);
 	}
+
+	//template <typename T>
+	//const ShaderProgram& uniform(const char * name, const Mat<4,T>& m) const;
+
+	const ShaderProgram& ShaderProgram::uniform(const char * name, const Mat<4,float>& m) const{
+		return uniformMatrix4(name, m.elems());
+	}
+
 	template<typename T>
+	const ShaderProgram& ShaderProgram::uniform(const char * name, const Mat<4,T>& m) const{
+		return uniform(name, Mat4f(m));
+	}
+
+	template <typename T>
 	const ShaderProgram& uniform(const char * name, const Quat<T>& q) const {
 		// note wxyz => xyzw for GLSL vec4:
 		return uniform(name, q.x, q.y, q.z, q.w);
 	}
+
 
 	const ShaderProgram& uniform1(const char * name, const float * v, int count=1) const;
 	const ShaderProgram& uniform2(const char * name, const float * v, int count=1) const;
 	const ShaderProgram& uniform3(const char * name, const float * v, int count=1) const;
 	const ShaderProgram& uniform4(const char * name, const float * v, int count=1) const;
 
+	const ShaderProgram& uniformMatrix3(const char * name, const float * v, bool transpose=0) const;
 	const ShaderProgram& uniformMatrix4(const char * name, const float * v, bool transpose=0) const;
 
 	const ShaderProgram& attribute(const char * name, float v0) const;
@@ -296,6 +316,19 @@ protected:
 	virtual void onDestroy();
 };
 
+
+
+//template<>
+//inline const ShaderProgram& ShaderProgram::uniform<float>(const char * name, const Mat<4,float>& m) const{
+//	return uniformMatrix4(name, m.elems());
+//}
+//
+//template<typename T>
+//inline const ShaderProgram& ShaderProgram::uniform(const char * name, const Mat<4,T>& m) const{
+////	float mf[16];
+////	return uniformMatrix4(name, mf);
+//	return uniform(name, Mat4f(m));
+//}
 
 
 } // ::al

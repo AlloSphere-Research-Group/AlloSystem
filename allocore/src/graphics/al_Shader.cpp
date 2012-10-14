@@ -277,6 +277,9 @@ const ShaderProgram& ShaderProgram::uniform(int location, float v0, float v1, fl
 	glUniform4f(location, v0,v1,v2,v3); return *this;	
 }
 
+const ShaderProgram& ShaderProgram::uniformMatrix3(const char * name, const float * v, bool transpose) const{
+	glUniformMatrix3fv(uniform(name), 1, transpose, v); return *this;
+}
 const ShaderProgram& ShaderProgram::uniformMatrix4(const char * name, const float * v, bool transpose) const{
 	glUniformMatrix4fv(uniform(name), 1, transpose, v); return *this;
 }
