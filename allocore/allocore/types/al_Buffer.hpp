@@ -189,19 +189,25 @@ class RingBuffer : protected Alloc {
 public:
 
 	/// Default constructor; does not allocate memory
-	RingBuffer(): mPos(-1){}
+	RingBuffer(): mPos(-1), mFill(0){}
 	
 	/// @param[in] size		number of elements
 	/// @param[in] v		value to initialize elements to
-	explicit RingBuffer(unsigned size, const T& v=T()){
+	explicit RingBuffer(unsigned size, const T& v=T())
+	:	mPos(size), mFill(0)
+	{
 		resize(size,v);
 	}
+
 
 	/// Get number of elements
 	int size() const { return mElems.size(); }
 	
 	/// Get absolute index of most recently written element
 	int pos() const { return mPos; }
+
+	/// Get fill amount of buffer
+	int fill() const { return mFill; }
 
 
 	/// Get element at absolute index
@@ -213,6 +219,7 @@ public:
 
 	/// Write new element
 	void write(const T& v){
+		if(mFill < size()) ++mFill;
 		++mPos; if(pos() == size()){ mPos=0; }
 		Alloc::construct(&mElems[0] + pos(), v);
 	}
@@ -221,7 +228,21 @@ public:
 	T& read(int i){ return mElems[wrapOnce(pos()-i, size())]; }
 
 	/// Get reference to element relative to newest element (read-only)
-	const T& read(int i) const { return mElems[wrapOnce(pos()-i, size())]; }
+	const T& read(int i) const { return readFrom(pos(), i); }
+
+	/// Get reference to older element relative to some newer element (read-only)
+	
+	/// @param[in] from		absolute index the read is relative to
+	/// @param[in] dist		distance into past relative to 'from' of the returned element
+	const T& readFrom(int from, int dist) const {
+		return mElems[wrapOnce(from-dist, size())];
+	}
+
+	/// \returns reference to newest element
+	T& newest(){ return mElems[pos()]; }
+
+	/// \returns reference to newest element (read-only)
+	const T& newest() const { return mElems[pos()]; }
 
 
 	/// Resize buffer
@@ -236,6 +257,7 @@ public:
 protected:
 	std::vector<T, Alloc> mElems;
 	int mPos;
+	int mFill;
 
 	// Moves value one period closer to interval [0, max)
 	static int wrapOnce(int v, int max){
