@@ -585,7 +585,7 @@ int utMath(){
 	#undef T
 
 	#define T(x,r) assert(al::sgn(x) == r);
-	T(0., 1.) T(0.1, 1.) T(-0.1, -1.)
+	T(-0.1, -1.) T(0.1, 1.) T(0., 0.)
 	#undef T
 
 	#define T(x1,y1,x2,y2, r) assert(al::slope(x1,y1,x2,y2) == r);
