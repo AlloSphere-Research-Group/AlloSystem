@@ -113,7 +113,7 @@ int utMath(){
 			
 		a.set(1).negate();		assert(a == -1);
 		a.set(1).normalize();	assert(a == 1./sqrt(N));
-		assert(a == b.set(10).sgn());
+		assert(a == b.set(10).normalized());
 		
 		b = a = 1;
 		assert(concat(a,b) == 1);

@@ -308,6 +308,26 @@ public:
 	//--------------------------------------------------------------------------
 	// Linear Operations
 
+	/// Returns a nearby vector along some dimension
+	
+	/// \tparam 	Dimension	The dimension along which to get a nearby vector
+	/// \param[in]	ds			The amount to shift along specified dimension
+	template<int Dimension>
+	Vec by(T shift) const {
+		Vec res(*this);
+		res[Dimension] += shift;
+		return res;
+	}
+
+	/// Returns a nearby vector along x
+	Vec byx(T shift) const { return by<0>(shift); }
+
+	/// Returns a nearby vector along y
+	Vec byy(T shift) const { return by<1>(shift); }
+
+	/// Returns a nearby vector along z
+	Vec byz(T shift) const { return by<2>(shift); }
+
 	/// Returns dot (inner) product between vectors
 	T dot(const Vec& v) const {
 		T r = (*this)[0] * v[0];
@@ -359,46 +379,33 @@ public:
 		return r;
 	}
 
-	/// Negates all elements
-	Vec& negate(){ IT(N){ (*this)[i] = -(*this)[i]; } return *this; }
-
-	/// Scales elements uniformly so magnitude is one
-	Vec& normalize(T scale=T(1));
-	
 	/// linear interpolation
 	void lerp(const Vec& target, T amt) { set(lerp(*this, target, amt)); }
 	static Vec lerp(const Vec& input, const Vec& target, T amt) {
 		return input+amt*(target-input);
 	}
 
+	/// Negates all elements
+	Vec& negate(){
+		IT(N){ (*this)[i] = -(*this)[i]; } return *this; }
 
-	/// Returns a nearby vector along some dimension
+	/// Set magnitude to one without changing direction
 	
-	/// \tparam 	Dimension	The dimension along which to get a nearby vector
-	/// \param[in]	ds			The amount to shift along specified dimension
-	template<int Dimension>
-	Vec by(T shift) const {
-		Vec res(*this);
-		res[Dimension] += shift;
-		return res;
-	}
+	/// @param[in] scale	amount to scale magnitude
+	///
+	Vec& normalize(T scale=T(1));
+	
+	/// Return closest vector lying on unit sphere
 
-	/// Returns a nearby vector along x
-	Vec byx(T shift) const { return by<0>(shift); }
-
-	/// Returns a nearby vector along y
-	Vec byy(T shift) const { return by<1>(shift); }
-
-	/// Returns a nearby vector along z
-	Vec byz(T shift) const { return by<2>(shift); }
+	/// @param[in] scale	amount to scale magnitude of result
+	///
+	Vec normalized(T scale=T(1)) const {
+		return Vec(*this).normalize(scale); }
 
 	/// Returns relection of vector around line
 	Vec reflect(const Vec& normal) const {
 		return (*this) - (T(2) * dot(normal) * normal);
 	}
-
-	/// Returns closest vector on unit N-sphere
-	Vec sgn(T scale=T(1)) const { return Vec(*this).normalize(scale); }
 
 	
 	/// debug printing
@@ -467,7 +474,7 @@ inline Vec<3,T> cross(const Vec<3,T>& a, const Vec<3,T>& b){
 /// Returns angle, in interval [0, pi], between two vectors
 template <int N, class T>
 inline T angle(const Vec<N,T>& a, const Vec<N,T>& b){
-	T cosAng = a.sgn().dot(b.sgn());
+	T cosAng = a.normalized().dot(b.normalized());
 	if(cosAng >= T( 1)){ return T(0); }		else
 	if(cosAng <= T(-1)){ return T(M_PI); }
 	return std::acos(cosAng);

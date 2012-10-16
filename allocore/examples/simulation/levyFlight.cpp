@@ -34,8 +34,8 @@ public:
 			float r = p.magSqr();
 			float l = 0.04;				// spread of steps; lower is more flighty
 			float v = l/(r+l*l) * 0.1;	// map uniform to Cauchy distribution
-			
-			p = p.sgn() * v;
+
+			p = p.normalized() * v;
 			p += A.newest();
 			A.write(p);
 		}

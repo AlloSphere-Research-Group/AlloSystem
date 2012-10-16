@@ -406,9 +406,9 @@ void Mesh::ribbonize(float * widths, int widthsStride, bool faceBinormal){
 			//Vertex& t = f[0];
 			Vertex& n = f[1];
 			Vertex& b = f[2];
-			b = cross(d2,d1).sgn();
-			n = cross(d1, b).sgn();
-			//t = d1.sgn(); // not used
+			b = cross(d2,d1).normalized();
+			n = cross(d1, b).normalized();
+			//t = d1.normalized(); // not used
 		}
 		f[ib] *= widths[i0*widthsStride];
 		
