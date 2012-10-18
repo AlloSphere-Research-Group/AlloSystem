@@ -235,12 +235,12 @@ public:
 		return uniform(name, v.x, v.y, v.z, v.w);
 	}
 
-	const ShaderProgram& ShaderProgram::uniform(const char * name, const Mat<4,float>& m) const{
+	const ShaderProgram& uniform(const char * name, const Mat<4,float>& m) const{
 		return uniformMatrix4(name, m.elems());
 	}
 
 	template<typename T>
-	const ShaderProgram& ShaderProgram::uniform(const char * name, const Mat<4,T>& m) const{
+	const ShaderProgram& uniform(const char * name, const Mat<4,T>& m) const{
 		return uniform(name, Mat4f(m));
 	}
 
