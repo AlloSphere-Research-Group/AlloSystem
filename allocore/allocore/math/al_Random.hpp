@@ -88,12 +88,12 @@ public:
 	
 	/// Returns uniform random in [lo, hi)
 	template <class T>
-	T uniform(const T& hi, const T& lo){ return (hi-lo)*uniform() + lo; }
+	T uniform(const T& hi, const T& lo){ return T((hi-lo)*uniform()) + lo; }
 
-	/// Returns uniform random in (-1, 1)
+	/// Returns uniform random in [-1, 1)
 	float uniformS(){ return al::uintToUnitS<float>(mRNG()); }
 
-	/// Returns uniform random in (-lim, lim)
+	/// Returns uniform random in [-lim, lim)
 	template <class T>
 	T uniformS(const T& lim){ return lim*uniformS(); }
 

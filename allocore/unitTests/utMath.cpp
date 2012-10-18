@@ -804,50 +804,64 @@ int utMath(){
 	// Random
 	{
 		using namespace al::rnd;
-		//for(int i=0; i<8; ++i) printf("%u\n", al::rnd::seed());
-		{
-			rnd::LinCon r;
-	//		printf("%u\n", r());
-	//		printf("%u\n", r());
-	//		r.seed(137);
-	//		for(int i=0; i<4; ++i) printf("%u\n", r());
-			
-			//for(int i=0; i<400; ++i) printf("% d ", rnd::uniform(2));
-		}
-
-		assert(seed() != seed());
 		
-		// ensure results are unique
-		{	LinCon r;
-			assert(r() != r());
+		// Ensure uniqueness of sequences
+		assert(seed() != seed());
+
+		{	LinCon a,b;
+			assert(a() != b()); // sequences are unique
+			assert(a() != a());	// successive values are unique
 		}
 
-		{	MulLinCon r;
-			assert(r() != r());
+		{	MulLinCon a,b;
+			assert(a() != b()); // sequences are unique
+			assert(a() != a()); // successive values are unique
 		}
 
-		{	Tausworthe r;
-			assert(r() != r());
+		{	Tausworthe a,b;			
+			assert(a() != b()); // sequences are unique
+			assert(a() != a()); // successive values are unique
 		}
+
 
 		Random<> r;
-		int N = 100000;
+		int N = 1000000;
 		for(int i=0; i<N; ++i){ float v=r.uniform(); assert(  0 <= v && v < 1); }
 		for(int i=0; i<N; ++i){ int v=r.uniform(20,  0); assert(  0 <= v && v < 20); }
 		for(int i=0; i<N; ++i){ int v=r.uniform(20, 10); assert( 10 <= v && v < 20); }
 		for(int i=0; i<N; ++i){ int v=r.uniform(20,-10); assert(-10 <= v && v < 20); }
 
-		for(int i=0; i<N; ++i){ float v=r.uniformS(); assert(  -1 < v && v < 1); }
-		for(int i=0; i<N; ++i){ int v=r.uniformS(20); assert( -20 < v && v < 20); }
+		for(int i=0; i<N; ++i){ float v=r.uniformS(); assert(  -1 <= v && v <  1); }
+		for(int i=0; i<N; ++i){ int v=r.uniformS(20); assert( -20 <= v && v < 20); }
 
 		//for(int i=0; i<32; ++i) printf("% g ", r.uniformS());
 		//for(int i=0; i<32; ++i) printf("%d ", r.prob(0.1));
 		//for(int i=0; i<128; ++i) printf("% g\n", r.gaussian());
 		
-		int arr[] = {1,2,3,4,5,6,7,8};
+		int arr[] = {0,1,2,3,4,5,6,7};
 		r.shuffle(arr, 8);
 		//for(int i=0; i<8; ++i) printf("%d\n", arr[i]);
 		//printf("\n");
+
+		// Test uniformity of random sequence
+		{
+			Random<> r;
+			const int N=64;
+			const int M=1000;
+			const int eps=M*0.2;
+			int histo[N] = {0};
+
+			for(int i=0; i<M*N; ++i){
+				int idx = r.uniform(N);
+				++histo[idx];
+			}
+
+			for(int i=0; i<N; ++i){
+				int cnt = histo[i];
+				//printf("%d\n", cnt);
+				assert(M-eps < cnt && cnt < M+eps);
+			}
+		}
 	}
 	
 	
