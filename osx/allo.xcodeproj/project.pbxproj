@@ -57,7 +57,6 @@
 		361881E415B936330009AD7E /* al_Constants.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Constants.hpp; sourceTree = "<group>"; };
 		361881E515B936330009AD7E /* al_Frustum.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Frustum.hpp; sourceTree = "<group>"; };
 		361881E615B936330009AD7E /* al_Functions.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Functions.hpp; sourceTree = "<group>"; };
-		361881E715B936330009AD7E /* al_Generators.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Generators.hpp; sourceTree = "<group>"; };
 		361881E815B936330009AD7E /* al_Interpolation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Interpolation.hpp; sourceTree = "<group>"; };
 		361881E915B936330009AD7E /* al_Interval.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Interval.hpp; sourceTree = "<group>"; };
 		361881EA15B936330009AD7E /* al_Mat.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Mat.hpp; sourceTree = "<group>"; };
@@ -439,7 +438,6 @@
 				361881E415B936330009AD7E /* al_Constants.hpp */,
 				361881E515B936330009AD7E /* al_Frustum.hpp */,
 				361881E615B936330009AD7E /* al_Functions.hpp */,
-				361881E715B936330009AD7E /* al_Generators.hpp */,
 				361881E815B936330009AD7E /* al_Interpolation.hpp */,
 				361881E915B936330009AD7E /* al_Interval.hpp */,
 				361881EA15B936330009AD7E /* al_Mat.hpp */,

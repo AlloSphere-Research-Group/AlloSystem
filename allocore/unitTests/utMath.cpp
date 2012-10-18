@@ -724,38 +724,6 @@ int utMath(){
 	}
 
 
-	// Generators
-	{
-		{
-		al::gen::Val<int> g(0);
-		assert(g() == 0);
-		assert(g() == 0);
-		g = 1;
-		assert(g() == 1);
-		}{
-		al::gen::RAdd<int> g(1,0);
-		assert(g() == 0);
-		assert(g() == 1);
-		assert(g() == 2);
-		assert(g() == 3);
-		}{
-		al::gen::RMul<int> g(2,1);
-		assert(g() == 1);
-		assert(g() == 2);
-		assert(g() == 4);
-		assert(g() == 8);
-		assert(g() ==16);
-		}{
-		al::gen::RMulAdd<int> g(2,1,1);
-		assert(g() == 1);
-		assert(g() == 3);
-		assert(g() == 7);
-		assert(g() ==15);
-		assert(g() ==31);
-		}
-	}
-
-
 	// Interval
 	{
 		Interval<double> i(0,1);
