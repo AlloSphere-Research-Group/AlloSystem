@@ -36,7 +36,7 @@
 
 
 	File description:
-	Various flavors of pseudo-random number generators nad distributions
+	Various flavors of pseudo-random number generators and distributions
 
 	File author(s):
 	Lance Putnam, 2006, putnam.lance@gmail.com
@@ -47,7 +47,6 @@
 #include <cmath>
 #include "allocore/types/al_Conversion.hpp"	/* req'd for int to float conversion */
 #include "allocore/math/al_Constants.hpp"
-#include "allocore/math/al_Generators.hpp"
 
 namespace al {
 
@@ -62,8 +61,8 @@ template<class RNG> class Random;
 
 /// Get a random seed in interval [0, 4294967296)
 inline static uint32_t seed(){
-	static gen::RMulAdd<uint32_t> seedGen(1664525, 1013904223, time(NULL));
-	return seedGen();
+	static uint32_t val = time(NULL);
+	return val = val*1664525UL + 1013904223UL;
 }
 
 
@@ -72,9 +71,12 @@ template <class RNG=al::rnd::Tausworthe>
 class Random{
 public:
 
+	/// Default constructor uses a randomly generated seed
 	Random(){}
 
+	/// @param[in] seed		Initial seed value
 	Random(uint32_t seed): mRNG(seed){}
+
 
 	/// Set seed
 	Random& seed(uint32_t v){ mRNG.seed(v); return *this; }
@@ -127,21 +129,33 @@ protected:
 
 /// Linear congruential uniform pseudo-random number generator.
 
-///	This generator is very fast requiring only a single integer multiply and add per
-/// iteration.  However, the least significant bits of the numbers are less 
-/// random; the most extreme case being the LSB which at best flips between 0 and 1.
-/// This generator also exhibits poor dimensional distribution, therefore it is
-/// best to have a different generator for each dimension, rather than sharing one.
-class LinCon : public gen::RMulAdd<uint32_t>{
+///	This generator is very fast requiring only a single integer multiply and add
+/// per iteration.  However, the least significant bits of the numbers are less 
+/// random; the most extreme case being the LSB which at best flips between 
+/// 0 and 1. This generator also exhibits poor dimensional distribution,
+/// therefore it is best to have a different generator for each dimension, 
+/// rather than sharing one.
+class LinCon {
 public:
+	/// Default constructor uses a randomly generated seed
+	LinCon(){
+		seed(al::rnd::seed());
+		type(0);
+	}
 
-	LinCon(){ val=al::rnd::seed(); type(0); }
+	/// @param[in] seed		Initial seed value
+	LinCon(uint32_t seed)
+	:	mVal(seed)
+	{	type(0); }
 
-	/// @param[in] seed	Initial seed value
-	LinCon(uint32_t seed): gen::RMulAdd<uint32_t>(1,0,seed){ type(0); }
+
+	/// Generate next uniform random integer in [0, 2^32)
+	uint32_t operator()(){
+		return mVal = mVal*mMul + mAdd;
+	}
 
 	/// Set seed
-	void seed(uint32_t v){ (*this)=v; }
+	void seed(uint32_t v){ mVal=v; }
 
 	/// Change the type of equation used.
 	
@@ -149,28 +163,47 @@ public:
 	/// 1 - BCPL
 	void type(int v){
 		switch(v){
-		case 1:	mul = 2147001325; add =  715136305; break; // BCPL
-		default:mul =    1664525; add = 1013904223;        // Knuth, Numerical Recipes in C
+		default:
+		case 0: mMul =    1664525; mAdd = 1013904223; break;
+		case 1:	mMul = 2147001325; mAdd =  715136305; break;
 		}
 	}
+
+private:
+	uint32_t mVal;
+	uint32_t mMul, mAdd;
 };
 
 
 
 /// Multiplicative linear congruential uniform pseudo-random number generator.
 
-///	This generator is a faster LCG requiring only a single integer multiply.
-///
-class MulLinCon : public gen::RMul<uint32_t>{
+///	This generator is faster than LinCon requiring only a single integer
+/// multiply per iteration. However, the downside is that it produces lower
+/// quality (less "random") results than LinCon. Because of this, it is really 
+/// not appropriate for simulations, but due to its speed it is very useful for 
+/// synthesizing noise for audio and graphics.
+class MulLinCon{
 public:
-
-	MulLinCon(){ val=al::rnd::seed(); type(0); }
+	/// Default constructor uses a randomly generated seed
+	MulLinCon(){
+		seed(al::rnd::seed());
+		type(0);
+	}
 	
 	/// @param[in] seed	Initial seed value
-	MulLinCon(uint32_t seed): gen::RMul<uint32_t>(1,seed){ type(0); }
+	MulLinCon(uint32_t seed)
+	:	mVal(seed)
+	{	type(0); }
+
+
+	/// Generate next uniform random integer in [0, 2^32)
+	uint32_t operator()(){
+		return mVal *= mMul;
+	}
 
 	/// Set seed
-	void seed(uint32_t v){ (*this)=v; }
+	void seed(uint32_t v){ mVal=v; }
 
 	/// Change the type of equation used.
 
@@ -178,9 +211,14 @@ public:
 	///
 	void type(int v){
 		switch(v){
-		default: mul = 69069;	// Super-duper
+		default: 
+		case 0: mMul = 69069; break;
 		}
 	}
+
+private:
+	uint32_t mVal;
+	uint32_t mMul;
 };
 
 
@@ -196,15 +234,21 @@ public:
 class Tausworthe{
 public:
 
+	/// Default constructor uses a randomly generated seed
 	Tausworthe();
 
 	/// @param[in] seed		Initial seed value
 	Tausworthe(uint32_t seed);
 	
-	uint32_t operator()();				///< Generates uniform random unsigned integer in [0, 2^32).
 
-	void seed(uint32_t v);				///< Set seed
-	void seed(uint32_t v1, uint32_t v2, uint32_t v3, uint32_t v4); ///< Set seed
+	/// Generate next uniform random integer in [0, 2^32)
+	uint32_t operator()();
+
+	/// Set seed
+	void seed(uint32_t v);
+
+	/// Set seed
+	void seed(uint32_t v1, uint32_t v2, uint32_t v3, uint32_t v4);
 
 private:
 	uint32_t s1, s2, s3, s4;
@@ -248,9 +292,8 @@ template <class T>
 inline T uniformS(const T& lim){ return global().uniformS(lim); }
 
 
-// Implementation_______________________________________________________________
 
-//---- Tausworthe
+// Implementation_______________________________________________________________
 
 inline Tausworthe::Tausworthe(){ seed(al::rnd::seed()); }
 inline Tausworthe::Tausworthe(uint32_t sd){ seed(sd); }
@@ -334,5 +377,5 @@ void Random<RNG>::shuffle(T * arr, uint32_t len){
 
 } // al::rnd::
 } // al::
-
 #endif
+
