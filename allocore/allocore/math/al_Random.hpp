@@ -107,20 +107,24 @@ public:
 	template <int N, class T>
 	void ball(T * point);
 
-	/// Returns random Gaussian
-	float gaussian(){ float r; gaussian(r,r); return r; }
+	/// Returns standard normal variate
+	float normal(){ float r; normal(r,r); return r; }
 
-	/// Returns two random Gaussians
+	/// Returns two standard normal variates (for the price of one)
 	template <class T>
-	void gaussian(T& y1, T& y2);
+	void normal(T& y1, T& y2);
 
-	/// Returns true with a probability of p.
+	/// Returns true with a probability of p
 	bool prob(float p=0.5f){ return uniform() < p; }
 
-	/// Randomly shuffles elements in array.
+	/// Randomly shuffles elements in array
 	template <class T>
 	void shuffle(T * arr, uint32_t len);
 
+
+	// DEPRECATED:
+	float gaussian(){ return normal(); }
+	template <class T> void gaussian(T& y1, T& y2){ normal(y1,y2); }
 protected:
 	RNG mRNG;
 };
@@ -267,8 +271,9 @@ inline Random<>& global(){ static Random<> r; return r; }
 template <int N, class T>
 inline void ball(T * point){ global().ball<N>(point); }
 
-/// Returns random Gaussian
-inline float gaussian(){ return global().gaussian(); }
+/// Returns standard normal variate
+inline float normal(){ return global().normal(); }
+inline float gaussian(){ return normal(); }
 
 /// Returns true with probability p
 inline bool prob(float p=0.5){ return global().prob(p); }
@@ -345,7 +350,7 @@ void Random<RNG>::ball(T * point){
 //
 // http://en.wikipedia.org/wiki/Box–Muller_transform
 template <class RNG>
-template <class T> void Random<RNG>::gaussian(T& y1, T& y2){
+template <class T> void Random<RNG>::normal(T& y1, T& y2){
 	float x1, x2, w;
 
 	// Search for point within unit circle using sample-reject.
