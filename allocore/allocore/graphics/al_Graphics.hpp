@@ -236,26 +236,35 @@ public:
 	/// Turn face culling on/off and set the culled face
 	void cullFace(bool b, Face face);
 
+
 	/// Set antialiasing mode
 	void antialiasing(AntiAliasMode v);
+
+	/// Set antialiasing to nicest
+	void nicest(){ antialiasing(NICEST); }
 	
+	/// Set antialiasing to fastest
+	void fastest(){ antialiasing(FASTEST); }
+
+	/// Set both line width and point diameter
+	void stroke(float v){ lineWidth(v); pointSize(v); }
+
 	/// Set width, in pixels, of lines
 	void lineWidth(float v);
 
 	/// Set diameter, in pixels, of points
 	void pointSize(float v);
 
-	/// Set both line width and point diameter
-	void stroke(float v){ lineWidth(v); pointSize(v); }
-
 	/// Set distance attenuation of points. The scaling formula is clamp(size * sqrt(1/(c0 + c1*d + c2*d^2)))
 	void pointAtten(float c2=0, float c1=0, float c0=1);
+
 
 	/// Set polygon drawing mode
 	void polygonMode(PolygonMode m, Face f=FRONT_AND_BACK);
 	
 	/// Set shading model
 	void shadeModel(ShadeModel m);
+
 
 	/// Set blending mode
 	void blendMode(BlendFunc src, BlendFunc dst, BlendEq eq=FUNC_ADD);
@@ -265,6 +274,17 @@ public:
 	
 	/// Set blending mode to transparent
 	void blendModeTrans(){ blendMode(SRC_ALPHA, ONE_MINUS_SRC_ALPHA, FUNC_ADD); }
+
+	/// Set states for transparent blending
+	
+	/// This will disable depth testing, enable blending, and set the blend mode.
+	///
+	void blendTrans(){
+		disable(DEPTH_TEST);
+		enable(BLEND);
+		blendModeTrans();
+	}
+
 
 	/// Clear frame buffer(s)
 	void clear(AttributeBit bits);
