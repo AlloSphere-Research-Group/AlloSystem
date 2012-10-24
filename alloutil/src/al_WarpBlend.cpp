@@ -388,7 +388,7 @@ static const char * demoFS = AL_STRINGIFY(
 		// take the vector of nv in the XZ plane
 		// and rotate it 90' around Y:
 		vec3 up = vec3(0, 1, 0);
-		vec3 rdx = cross(normalize(rd), up); //projection_on_plane(rd, up);
+		vec3 rdx = projection_on_plane(rd, up);
 		vec3 eye = rdx * eyesep * 0.02;
 		
 		// ray origin (world space)
