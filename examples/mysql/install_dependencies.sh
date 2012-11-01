@@ -4,6 +4,7 @@ if [ `which apt-get` ]; then
 	echo "Found apt-get"
 	sudo apt-get update
 	sudo apt-get install libmysql++-dev
+  echo "-I/usr/include/mysql -lmysqlpp" > flags.txt
 
 elif [ `which port` ]; then
 	echo "Found MacPorts"
