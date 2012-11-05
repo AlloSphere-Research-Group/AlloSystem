@@ -81,6 +81,10 @@ public:
 	/// Set seed
 	Random& seed(uint32_t v){ mRNG.seed(v); return *this; }
 
+	/// Get underlying random number generator
+	RNG& rng(){ return mRNG; }
+
+
 	/// Returns uniform random in [0, 1)
 	float uniform(){ return al::uintToUnit<float>(mRNG()); }
 
@@ -114,8 +118,11 @@ public:
 	template <class T>
 	void normal(T& y1, T& y2);
 
+	/// Returns true with a probability of 0.5
+	bool prob(){ return mRNG()&0x80000000; }
+
 	/// Returns true with a probability of p
-	bool prob(float p=0.5f){ return uniform() < p; }
+	bool prob(float p){ return uniform() < p; }
 
 	/// Randomly shuffles elements in array
 	template <class T>
@@ -275,8 +282,11 @@ inline void ball(T * point){ global().ball<N>(point); }
 inline float normal(){ return global().normal(); }
 inline float gaussian(){ return normal(); }
 
+/// Returns true with probability 0.5
+inline bool prob(){ return global().prob(); }
+
 /// Returns true with probability p
-inline bool prob(float p=0.5){ return global().prob(p); }
+inline bool prob(float p){ return global().prob(p); }
 
 /// Returns uniform random in [0, 1)
 inline float uniform(){ return global().uniform(); }
@@ -321,7 +331,7 @@ inline void Tausworthe::seed(uint32_t v1, uint32_t v2, uint32_t v3, uint32_t v4)
 	v3 & 0xffffff0 ? s3 = v3 : s3 = ~v3;
 	v4 & 0xfffff80 ? s4 = v4 : s4 = ~v4;
 }
-	
+
 inline void Tausworthe::iterate(){
 	s1 = ((s1 & 0xfffffffe) << 18) ^ (((s1 <<  6) ^ s1) >> 13);
 	s2 = ((s2 & 0xfffffff8) <<  2) ^ (((s2 <<  2) ^ s2) >> 27);
