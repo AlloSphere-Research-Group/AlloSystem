@@ -49,17 +49,6 @@ namespace al {
 /// Utilities for interpolation
 namespace ipl{
 
-/// First order allpass interpolation
-
-/// Best for delay lines, not good for random access.
-///
-template <class Tf, class Tv>
-Tv allpass(Tf frac, const Tv& x, const Tv& y, Tv& o1);
-
-/// First order allpass interpolation with warped fraction.
-template <class Tf, class Tv>
-Tv allpassFixed(Tf frac, const Tv& x, const Tv& y, Tv& o1);
-
 /// Bezier curve, 3-point quadratic
 
 /// 'frac' [0, 1) is the value on the curve btw x2 and x0
@@ -104,12 +93,6 @@ template <class T> void lagrange2(T * h, T delay);
 
 /// Optimized lagrange() for third order
 template <class T> void lagrange3(T * h, T delay);
-
-/// Simplified parabolic interpolation of 3 points
-
-/// This assumes the points are spaced evenly on the x axis from [-1, 1].
-/// The output is an offset from 0.
-template <class T> T parabolic(const T& xm1, const T& x, const T& xp1);
 
 
 // Various functions to perform Waring-Lagrange interpolation.
@@ -159,10 +142,6 @@ void linear(Tv * dst, const Tv * xs, const Tv * xp1s, int len, const Tf& frac);
 /// Nearest neighbor interpolation
 template <class Tf, class Tv>
 Tv nearest(Tf frac, const Tv& x, const Tv& y);
-
-/// Quadratic interpolation
-template <class Tf, class Tv>
-Tv quadratic(Tf frac, const Tv& x, const Tv& y, const Tv& z); 
 
 
 /// Bilinear interpolation between values on corners of quadrilateral
@@ -225,29 +204,6 @@ inline Tv trilinear(
 //------------------------------------------------------------------------------
 // Implementation
 //------------------------------------------------------------------------------
-
-template <class Tf, class Tv>
-inline Tv allpass(Tf f, const Tv& x, const Tv& y, Tv& o1){
-	//f = f * 0.87 - 0.05;	// avoid pole near z = -1
-	return o1 = (y - o1) * f + x;
-}
-
-template <class Tf, class Tv>
-inline Tv allpassFixed(Tf f, const Tv& x, const Tv& y, Tv& o1){
-//	f = 1.f-f;
-//	f = allpassCoef(f);						// compute allpass coefficient
-//	return allpass(f, x, xp1, ym1);	// apply filter
-	
-	//f = f / (2.f - f);	// warp down
-	f = (Tf(2) * f) / (Tf(1) + f);	// warp up
-	//f = (1.5f * f) / (0.5f + f);
-	f -= Tf(0.1);				// avoid pole near z = -1
-	return allpass(f, x, y, o1);	// apply filter
-}
-//
-//inline float Ipol::allpassCoef(float f, float offset){
-//	return (1.f - f) / (1.f + f) + offset;
-//}
 
 template <class Tf, class Tv>
 inline Tv bezier(Tf d, const Tv& x2, const Tv& x1, const Tv& x0){
@@ -471,18 +427,6 @@ inline Tv linearCyclic(Tf frac, const Tv& x, const Tv& y, const Tv& z){
 template <class Tf, class Tv>
 inline Tv nearest(Tf f, const Tv& x, const Tv& y){
 	return (f < Tf(0.5)) ? x : y;
-}
-
-template <class T> inline T parabolic(const T& xm1, const T& x, const T& xp1){
-	return T(-0.5) * (xm1 - xp1) / (x - xp1 + x - xm1);
-}
-
-template <class Tf, class Tv>
-inline Tv quadratic(Tf f, const Tv& x, const Tv& y, const Tv& z){
-	Tv c2 = (x + z)*Tf(0.5) - y;
-	//Tv c1 = x*(Tf)-1.5 + y*(Tf)2 - z*(Tf)0.5;
-	Tv c1 = -x + y - c2;
-	return (c2 * f + c1) * f + x;
 }
 
 } // al::ipl
