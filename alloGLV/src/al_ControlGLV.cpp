@@ -65,6 +65,7 @@ GLVDetachable::GLVDetachable(Window& parent)
 
 static void ntDetachedButton(const glv::Notification& n){
 	GLVDetachable * R = n.receiver<GLVDetachable>();
+	//if(R->mouse().isDown()) return;
 	if(n.sender<glv::Button>()->getValue()){
 		R->detached(true);
 	}
@@ -109,10 +110,17 @@ GLVDetachable& GLVDetachable::detached(bool v){
 		}
 		//ru.print();
 		//posAdd(-ru.l, -ru.t);
-		detachedWindow().create(Window::Dim(ru.w, ru.h));
+		//detachedWindow().create(Window::Dim(ru.w, ru.h));
+		int pl=0, pt=0;
+		if(mParentWindow){
+			pl = parentWindow().dimensions().l;
+			pt = parentWindow().dimensions().t;
+			//printf("%d %d\n", pl, pt);
+		}
+		detachedWindow().create(Window::Dim(pl, pt, ru.w, ru.h));
 		addGUI(detachedWindow());
 	}
-	else if(detached()){			// is currently detached, attach back to parent, if any
+	else if(detached()){ // is currently detached, attach back to parent, if any
 		remGUI(detachedWindow());
 		detachedWindow().destroy();
 		if(mParentWindow){
@@ -121,6 +129,17 @@ GLVDetachable& GLVDetachable::detached(bool v){
 			addGUI(parentWindow());
 		}
 	}
+
+	// This is a hack to ensure all GLV mouse button states are "up" (false).
+	// Because the GLV changes windows between mouse down and mouse up calls,
+	// the mouse relative position gets into an inconsistent state on mouse up.
+	const int mx = mouse().x();
+	const int my = mouse().y();
+	for(int i=0; i<GLV_MAX_MOUSE_BUTTONS; ++i){
+		glv::space_t x=mx,y=my;
+		setMouseUp(x,y, i, 1);
+	}
+
 	return *this;
 }
 
