@@ -4,74 +4,119 @@ static Graphics gl;
 
 struct MyWindow : Window{
 
-	bool onCreate(){ 					printf("onCreate\n"); return true; }
-	bool onDestroy(){					printf("onDestroy\n"); return true; }
-	bool onResize(int w, int h){		printf("onResize     %d, %d\n", w, h); return true; }
-	bool onVisibility(bool v){			printf("onVisibility %s\n", v?"true":"false"); return true; }
+	int frameNum;
+	int onCreateCalls;
+	int onDestroyCalls;
+	int onResizeCalls;
 	
-	bool onKeyDown(const Keyboard& k){	printf("onKeyDown    "); printKey(); return true; }
-	bool onKeyUp(const Keyboard& k){	printf("onKeyUp      "); printKey(); return true; }
+	static const Window::Dim& defaultDim(){
+		static Window::Dim res(40,50, 400,300);
+		return res;
+	}
 	
-	bool onMouseDown(const Mouse& m){	printf("onMouseDown  "); printMouse(); return true; }
-	bool onMouseUp(const Mouse& m){		printf("onMouseUp    "); printMouse(); return true; }
-	bool onMouseDrag(const Mouse& m){	printf("onMouseDrag  "); printMouse(); return true; }
-	//void onMouseMove(const Mouse& m){	printf("onMouseMove  "); printMouse(); return true; }
-	
-	void printMouse(){
-		const Mouse& m = mouse();
-		printf("x:%4d y:%4d b:%d,%d\n", m.x(), m.y(), m.button(), m.down());
+	static const std::string& defaultTitle(){
+		static std::string res("Test Window");
+		return res;
 	}
 
-	void printKey(){
-		const Keyboard& k = keyboard();
-		printf("k:%3d, %d s:%d c:%d a:%d\n", k.key(), k.down(), k.shift(), k.ctrl(), k.alt());
+	MyWindow(){
+		onCreateCalls = onDestroyCalls = onResizeCalls = 0;
+		frameNum = 0;
 	}
 
-	bool onFrame(){
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		gl.loadIdentity();
-		gl.viewport(0,0, dimensions().w, dimensions().h);
-		
-		gl.begin(gl.LINE_STRIP);
-			static float limit = 120;
-			for (float i = 0; i<limit; i++) {
-				float p = i / limit;
-				gl.color(1, p, 1-p);
-				p *= 6.283185308;
-				gl.vertex(cos(p*freq1), sin(p*freq2), 0);
-			}
-		gl.end();
-//printf("%p: %d x %d\n", this, dimensions().w, dimensions().h);
+	bool onCreate(){
+		++onCreateCalls;
+		return true;
+	}
+
+	bool onDestroy(){
+		++onDestroyCalls;
+		return true;
+	}
+
+	bool onResize(int dw, int dh){
+		assert(onCreateCalls);	// at least one onCreate called
+		if(onCreateCalls == 1){
+			assert(dw == dimensions().w);
+			assert(dh == dimensions().h);
+		}
+		++onResizeCalls;
 		return true;
 	}
 	
-	void freqs(float v1, float v2){ freq1=v1; freq2=v2; }
+	bool onVisibility(bool v){ return true; }
+	
+	bool onKeyDown(const Keyboard& k){ return true; }
+	bool onKeyUp(const Keyboard& k){ return true; }
+	bool onMouseDown(const Mouse& m){ return true; }
+	bool onMouseUp(const Mouse& m){ return true; }
+	bool onMouseDrag(const Mouse& m){ return true; }
+	bool onMouseMove(const Mouse& m){ return true; }
 
-	float freq1, freq2;
+	bool onFrame(){
+	
+		assert(onCreateCalls != 0);
+		assert(onResizeCalls != 0);
+		
+		assert(created());
+		
+		assert(aspect() == defaultDim().aspect());
+		
+		assert(defaultTitle() == title());
+		
+		Window::Dim dim = dimensions();
+		assert(defaultDim().l == dim.l);
+		assert(defaultDim().t == dim.t);
+		assert(defaultDim().w == dim.w);
+		assert(defaultDim().h == dim.h);
+	
+		Window::stopLoop();
+		return true;
+	}
 };
 
 
 int utIOWindowGL(){
 
+	// Do some basic testing of the event handlers
+	{
+		InputEventHandler ih[3];
+		WindowEventHandler wh[3];
+		
+		Window win;
+
+		win.remove(win.inputEventHandler());
+		win.remove(win.windowEventHandler());
+
+		win.append(ih[1]);
+		win.append(ih[2]);
+		win.prepend(ih[0]);
+		win.append(wh[1]);
+		win.append(wh[2]);
+		win.prepend(wh[0]);
+		
+		for(int i=0; i<3; ++i){
+			assert( ih[i].attached());
+			assert(&ih[i].window() == &win);
+
+			assert( wh[i].attached());
+			assert(&wh[i].window() == &win);
+		}
+
+		for(int i=0; i<3; ++i){
+			assert(win. inputEventHandlers()[i] == &ih[i]);
+			assert(win.windowEventHandlers()[i] == &wh[i]);
+		}
+
+		/*Window::InputEventHandlers::const_iterator it = win.inputEventHandlers().begin();
+		while(it){
+			++it;
+		}*/
+	}
+
+
 	MyWindow win;
-	MyWindow win2;
-	
-	
-//	struct Func:TimedFunction{
-//		void onExecute(){ printf("hello\n"); }
-//	};
-//
-//	Func tf;
-//	tf(1000);
-
-	win.create(Window::Dim(100,0, 200,200), "Window 1", 40);
-	win2.create(Window::Dim(300,0, 200,200), "Window 2", 40);
-//	win2.create(Window::Dim(200,200,300), "Window 2", 40, SingleBuf);
-
-	win.freqs(1,2);
-	win2.freqs(3,4);
-
-//win.cursorHide(true);
+	win.create(MyWindow::defaultDim(), MyWindow::defaultTitle(), 40);
 
 	Window::startLoop();
 	return 0;

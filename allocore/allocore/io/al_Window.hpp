@@ -248,6 +248,9 @@ private:
 class Window : public InputEventHandler, public WindowEventHandler, public GPUContext {
 public:
 
+	typedef std::vector<InputEventHandler *> InputEventHandlers;
+	typedef std::vector<WindowEventHandler *> WindowEventHandlers;
+
 	/// Window display mode bit flags
 	enum DisplayMode{
 		SINGLE_BUF	= 1<<0,		/**< Do single-buffering */
@@ -359,6 +362,14 @@ public:
 	Window& vsync(bool v);						///< Set whether to sync the frame rate to the monitor's refresh rate 
 	Window& asap(bool v){ mASAP=v; return *this; }	///< Set whether window renders as fast as possible
 
+
+	const InputEventHandlers& inputEventHandlers() const {
+		return mInputEventHandlers; }
+
+	const WindowEventHandlers& windowEventHandlers() const {
+		return mWindowEventHandlers; }
+
+
 	/// Append handler to input event handler list
 	
 	/// The order of handlers in the list matches their calling order.
@@ -409,8 +420,6 @@ public:
 	double avgFps() const { return fpsAvg(); }
 
 protected:
-	typedef std::vector<InputEventHandler *> InputEventHandlers;
-	typedef std::vector<WindowEventHandler *> WindowEventHandlers;
 	friend class WindowImpl;
 
 	class WindowImpl * mImpl;
