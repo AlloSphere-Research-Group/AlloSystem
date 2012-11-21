@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9B39FAD9165C2AA200C3776D /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B39FAD8165C2AA200C3776D /* main.cpp */; };
 		9B39FADB165C2AA200C3776D /* allovsr.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B39FADA165C2AA200C3776D /* allovsr.1 */; };
+		9BC5A61D165C464E0082D7EA /* interface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9BC5A61C165C464E0082D7EA /* interface.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -26,8 +26,12 @@
 
 /* Begin PBXFileReference section */
 		9B39FAD4165C2AA200C3776D /* allovsr */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = allovsr; sourceTree = BUILT_PRODUCTS_DIR; };
-		9B39FAD8165C2AA200C3776D /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		9B39FADA165C2AA200C3776D /* allovsr.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = allovsr.1; sourceTree = "<group>"; };
+		9B39FAE2165C2C4900C3776D /* al_vsrInterface.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_vsrInterface.hpp; path = ../../allovsr/al_vsrInterface.hpp; sourceTree = "<group>"; };
+		9B39FAE3165C2E0400C3776D /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../../Makefile; sourceTree = "<group>"; };
+		9B39FAE5165C2E5500C3776D /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../Makefile; sourceTree = "<group>"; };
+		9BC5A61B165C43D90082D7EA /* al_vsr.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_vsr.hpp; path = ../../allovsr/al_vsr.hpp; sourceTree = "<group>"; };
+		9BC5A61C165C464E0082D7EA /* interface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = interface.cpp; path = ../../../examples/interface.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,8 +48,12 @@
 		9B39FAC9165C2AA200C3776D = {
 			isa = PBXGroup;
 			children = (
+				9BC5A61B165C43D90082D7EA /* al_vsr.hpp */,
+				9B39FAE2165C2C4900C3776D /* al_vsrInterface.hpp */,
 				9B39FAD7165C2AA200C3776D /* allovsr */,
 				9B39FAD5165C2AA200C3776D /* Products */,
+				9B39FAE4165C2E1B00C3776D /* allocore */,
+				9B39FAE5165C2E5500C3776D /* Makefile */,
 			);
 			sourceTree = "<group>";
 		};
@@ -60,10 +68,18 @@
 		9B39FAD7165C2AA200C3776D /* allovsr */ = {
 			isa = PBXGroup;
 			children = (
-				9B39FAD8165C2AA200C3776D /* main.cpp */,
+				9BC5A61C165C464E0082D7EA /* interface.cpp */,
 				9B39FADA165C2AA200C3776D /* allovsr.1 */,
 			);
 			path = allovsr;
+			sourceTree = "<group>";
+		};
+		9B39FAE4165C2E1B00C3776D /* allocore */ = {
+			isa = PBXGroup;
+			children = (
+				9B39FAE3165C2E0400C3776D /* Makefile */,
+			);
+			name = allocore;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -116,7 +132,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9B39FAD9165C2AA200C3776D /* main.cpp in Sources */,
+				9BC5A61D165C464E0082D7EA /* interface.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -171,14 +187,58 @@
 		9B39FADF165C2AA200C3776D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					$SRCROOT/../../../build/lib/,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "$SRCROOT/../../ $SRCROOT/../../../build/include/vsr/ $SRCROOT/../../../build/include/ $SRCROOT/../../../build/include/vsr/Elements/";
 			};
 			name = Debug;
 		};
 		9B39FAE0165C2AA200C3776D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					$SRCROOT/../../../build/lib/,
+				);
+				"OTHER_LDFLAGS[arch=*]" = (
+					"-lGLV",
+					"-lvsr",
+					"-lalloGLV",
+					"-lapr-1",
+					"-laprutil-1",
+					"-lfreeimage",
+					"-lassimp",
+					"-lfreetype",
+					"-L/usr/X11/lib/",
+					"-framework",
+					AudioUnit,
+					"-framework",
+					AudioToolbox,
+					"-framework",
+					CoreAudio,
+					"-framework",
+					CoreMidi,
+					"-framework",
+					Carbon,
+					"-lportaudio",
+					"-framework",
+					AGL,
+					"-framework",
+					OpenGL,
+					"-framework",
+					GLUT,
+					"-lpthread",
+					"-framework",
+					Cocoa,
+					"-framework",
+					Foundation,
+					"-lallocore",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "$SRCROOT/../../ $SRCROOT/../../../build/include/vsr/ $SRCROOT/../../../build/include/ $SRCROOT/../../../build/include/vsr/Elements/";
 			};
 			name = Release;
 		};
@@ -201,6 +261,7 @@
 				9B39FAE0165C2AA200C3776D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
