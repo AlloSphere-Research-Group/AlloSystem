@@ -27,7 +27,7 @@
 namespace al {
     
     using vsr::Frame;
-    using vsr::Camera;
+//    using vsr::Camera;
     using vsr::Scene;
     using vsr::Interface;
     using vsr::MouseData;

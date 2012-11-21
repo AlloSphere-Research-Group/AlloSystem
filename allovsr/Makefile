@@ -63,7 +63,7 @@ dir:
 
 $(EXEC_TARGETS): FORCE
 	@echo Building $@
-	$(CXX) $(CXXFLAGS) $(HPATH) $@ -o $(BIN_DIR)$(*F) $(LDFLAGS) -lvsr -lGLV -lalloGLV
+	$(CXX) $(CXXFLAGS) $(HPATH) -H $@ -o $(BIN_DIR)$(*F) $(LDFLAGS) -lvsr -lGLV -lalloGLV
 	@cd $(BIN_DIR) && ./$(*F)
 
 install: FORCE
