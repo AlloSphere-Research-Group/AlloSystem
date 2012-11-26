@@ -799,6 +799,58 @@ void WarpnBlend::drawBlend() {
 	alphaMap.quad(gl);
 }
 
+void alphademo(uint8_t * value, double normx, double normy) {
+	//*value = 255.;
+	// fade out at edges:
+	*value = 255. * al::min(1., 10.*(0.5 - fabs(normx-0.5))) * al::min(1., 10.*(0.5 - fabs(normy-0.5))); 
+}
+
+void pixeldemo(float * value, double normx, double normy) {
+	// spherical map:
+	float az = M_2_PI * (normx - 0.5);
+	float el = M_PI * (normy - 0.5);
+	
+	// is this the right axis convention?
+	value[0] = sin(el)*cos(az);
+	value[1] = cos(el)*sin(az);
+	value[2] = sin(el);
+}
+
+void WarpnBlend::readNone() {
+	printf("readNone\n");
+	Array a(1, AlloUInt8Ty, 64, 64);
+	//a.setall<uint8_t>(255);
+	uint8_t white = 255;
+	a.set2d(&white);
+	alphaMap.allocate(a, true);
+	//alphaMap.array().fill(alphademo);
+	printf("readNone End\n");
+
+//	// generate a blend map:
+//	alphaMap.resize(64, 64);
+//	alphaMap.target(Texture::TEXTURE_2D)
+//			.format(Graphics::RGBA)
+//			.type(Graphics::FLOAT)
+//			.filterMin(Texture::LINEAR)
+//			.allocate(4);
+//	//alphaMap.array().fill(alphademo);
+//	alphaMap.array().setall(1.f);
+//	alphaMap.dirty();
+//	alphaMap.print();
+//	
+//	// generate a map3D:
+//	pixelMap.resize(64, 64);
+//	pixelMap.target(Texture::TEXTURE_2D);
+//	pixelMap.format(Graphics::RGB);
+//	pixelMap.type(Graphics::FLOAT);
+//	pixelMap.filterMin(Texture::LINEAR);
+//	pixelMap.allocate(4);
+//	pixelMap.array().fill(pixeldemo);
+//	pixelMap.dirty();
+//	
+//	printf("loaded warpnblend defaults\n");
+}
+
 void WarpnBlend::readID(std::string id) {
 	printf("%s %s\n", imgpath.c_str(), id.c_str());
 	//readWarp(imgpath + "uv" + id + ".bin");
@@ -811,8 +863,12 @@ void WarpnBlend::readID(std::string id) {
 }
 
 void WarpnBlend::readBlend(std::string path) {
+	printf("blend:\n");
+	
 	Image img(path);
+	img.array().print();
 	alphaMap.allocate(img.array(), true);
+	alphaMap.print();
 }
 
 void WarpnBlend::read3D(std::string path) {

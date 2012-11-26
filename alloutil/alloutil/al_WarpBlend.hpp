@@ -29,6 +29,7 @@ public:
 
 	WarpnBlend();
 
+	void readNone();
 	void readID(std::string id);
 
 	void readBlend(std::string path);
