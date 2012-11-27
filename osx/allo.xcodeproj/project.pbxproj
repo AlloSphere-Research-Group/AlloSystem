@@ -432,11 +432,6 @@
 		3618837A15B936340009AD7E /* install_dependencies.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = install_dependencies.sh; sourceTree = "<group>"; };
 		3618837C15B936340009AD7E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		3618837E15B936340009AD7E /* al_Freenect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Freenect.cpp; sourceTree = "<group>"; };
-		3618838115B936340009AD7E /* about.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = about.txt; sourceTree = "<group>"; };
-		3618838215B936340009AD7E /* al_Ni.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Ni.hpp; sourceTree = "<group>"; };
-		3618838415B936340009AD7E /* exAlloNI.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = exAlloNI.cpp; sourceTree = "<group>"; };
-		3618838515B936340009AD7E /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
-		3618838715B936340009AD7E /* al_Ni.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Ni.cpp; sourceTree = "<group>"; };
 		3618838A15B936340009AD7E /* al_AlloSphere.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_AlloSphere.hpp; sourceTree = "<group>"; };
 		3618838B15B936340009AD7E /* al_CubeMapFBO.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_CubeMapFBO.hpp; sourceTree = "<group>"; };
 		3618838C15B936340009AD7E /* al_Field3D.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Field3D.hpp; sourceTree = "<group>"; };
@@ -2927,7 +2922,6 @@
 				3618836415B936340009AD7E /* allocv */,
 				3618836715B936340009AD7E /* alloglv */,
 				3618837215B936340009AD7E /* allonect */,
-				3618837F15B936340009AD7E /* alloni */,
 				3618838815B936340009AD7E /* alloutil */,
 				361883AD15B936340009AD7E /* build */,
 				3618842C15B936340009AD7E /* doc */,
@@ -3850,43 +3844,6 @@
 			isa = PBXGroup;
 			children = (
 				3618837E15B936340009AD7E /* al_Freenect.cpp */,
-			);
-			path = src;
-			sourceTree = "<group>";
-		};
-		3618837F15B936340009AD7E /* alloni */ = {
-			isa = PBXGroup;
-			children = (
-				3618838015B936340009AD7E /* alloni */,
-				3618838315B936340009AD7E /* examples */,
-				3618838515B936340009AD7E /* Makefile */,
-				3618838615B936340009AD7E /* src */,
-			);
-			name = alloni;
-			path = ../alloni;
-			sourceTree = SOURCE_ROOT;
-		};
-		3618838015B936340009AD7E /* alloni */ = {
-			isa = PBXGroup;
-			children = (
-				3618838115B936340009AD7E /* about.txt */,
-				3618838215B936340009AD7E /* al_Ni.hpp */,
-			);
-			path = alloni;
-			sourceTree = "<group>";
-		};
-		3618838315B936340009AD7E /* examples */ = {
-			isa = PBXGroup;
-			children = (
-				3618838415B936340009AD7E /* exAlloNI.cpp */,
-			);
-			path = examples;
-			sourceTree = "<group>";
-		};
-		3618838615B936340009AD7E /* src */ = {
-			isa = PBXGroup;
-			children = (
-				3618838715B936340009AD7E /* al_Ni.cpp */,
 			);
 			path = src;
 			sourceTree = "<group>";

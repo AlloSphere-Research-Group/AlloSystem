@@ -333,6 +333,7 @@ public:
 	void moveR(double v){ mMove0[0] = v; }
 	void moveU(double v){ mMove0[1] = v; }
 	void moveF(double v){ mMove0[2] = v; }
+	Vec3d& move() { return mMove0; }
 
 	/// Accelerate
 	void nudge(double ddr, double ddu, double ddf) { nudgeR(ddr); nudgeU(ddu); nudgeF(ddf); }
@@ -352,6 +353,9 @@ public:
 	
 	/// Set angular velocity around forward vector, in radians
 	void spinF(double v){ mSpin0[2] = v; }
+	
+	/// Set angular velocity directly:
+	Vec3d& spin() { return mSpin0; }
 
 	/// Turn by a single increment for one step, in radians
 	void turn(double a, double e, double b){ turnR(e); turnU(a); turnF(b); }
