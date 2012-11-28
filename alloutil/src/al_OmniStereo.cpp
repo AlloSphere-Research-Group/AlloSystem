@@ -522,7 +522,7 @@ void OmniStereo::capture(OmniStereo::Drawable& drawable, const Lens& lens, const
 			gl.depthTesting(1);
 			gl.depthMask(1);
 			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-			drawable.onDraw(*this);		
+			drawable.onDrawOmni(*this);		
 		}
 	}
 	

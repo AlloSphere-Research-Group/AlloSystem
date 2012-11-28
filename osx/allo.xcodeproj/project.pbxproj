@@ -2899,6 +2899,32 @@
 		36188D6015B936360009AD7E /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = README.md; path = ../README.md; sourceTree = SOURCE_ROOT; };
 		36E9C8791666AC0700925E1F /* al_OmniStereo.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OmniStereo.hpp; sourceTree = "<group>"; };
 		36E9C87A1666AC1600925E1F /* al_OmniStereo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_OmniStereo.cpp; sourceTree = "<group>"; };
+		36E9C8961666B55200925E1F /* config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = config; sourceTree = "<group>"; };
+		36E9C8971666B55200925E1F /* description */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = description; sourceTree = "<group>"; };
+		36E9C8981666B55200925E1F /* HEAD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = HEAD; sourceTree = "<group>"; };
+		36E9C89A1666B55200925E1F /* applypatch-msg.sample */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "applypatch-msg.sample"; sourceTree = "<group>"; };
+		36E9C89B1666B55200925E1F /* commit-msg.sample */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "commit-msg.sample"; sourceTree = "<group>"; };
+		36E9C89C1666B55200925E1F /* post-commit.sample */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "post-commit.sample"; sourceTree = "<group>"; };
+		36E9C89D1666B55200925E1F /* post-receive.sample */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "post-receive.sample"; sourceTree = "<group>"; };
+		36E9C89E1666B55200925E1F /* post-update.sample */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "post-update.sample"; sourceTree = "<group>"; };
+		36E9C89F1666B55200925E1F /* pre-applypatch.sample */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "pre-applypatch.sample"; sourceTree = "<group>"; };
+		36E9C8A01666B55200925E1F /* pre-commit.sample */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "pre-commit.sample"; sourceTree = "<group>"; };
+		36E9C8A11666B55200925E1F /* pre-rebase.sample */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "pre-rebase.sample"; sourceTree = "<group>"; };
+		36E9C8A21666B55200925E1F /* prepare-commit-msg.sample */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "prepare-commit-msg.sample"; sourceTree = "<group>"; };
+		36E9C8A31666B55200925E1F /* update.sample */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = update.sample; sourceTree = "<group>"; };
+		36E9C8A41666B55200925E1F /* index */ = {isa = PBXFileReference; lastKnownFileType = file; path = index; sourceTree = "<group>"; };
+		36E9C8A61666B55200925E1F /* exclude */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = exclude; sourceTree = "<group>"; };
+		36E9C8A81666B55200925E1F /* HEAD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = HEAD; sourceTree = "<group>"; };
+		36E9C8AB1666B55200925E1F /* master */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = master; sourceTree = "<group>"; };
+		36E9C8AF1666B55200925E1F /* pack-486b8b166cbe09f042821ed5a8062d64b0501c57.idx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "pack-486b8b166cbe09f042821ed5a8062d64b0501c57.idx"; sourceTree = "<group>"; };
+		36E9C8B01666B55300925E1F /* pack-486b8b166cbe09f042821ed5a8062d64b0501c57.pack */ = {isa = PBXFileReference; lastKnownFileType = file; path = "pack-486b8b166cbe09f042821ed5a8062d64b0501c57.pack"; sourceTree = "<group>"; };
+		36E9C8B11666B55300925E1F /* packed-refs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "packed-refs"; sourceTree = "<group>"; };
+		36E9C8B41666B55300925E1F /* master */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = master; sourceTree = "<group>"; };
+		36E9C8B71666B55300925E1F /* HEAD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = HEAD; sourceTree = "<group>"; };
+		36E9C8B91666B55300925E1F /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		36E9C8BA1666B55300925E1F /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
+		36E9C8BB1666B57200925E1F /* al_OmniApp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OmniApp.hpp; sourceTree = "<group>"; };
+		36E9C8BC1666B57A00925E1F /* omni.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = omni.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2920,6 +2946,7 @@
 		08FB7794FE84155DC02AAC07 /* alscheduling */ = {
 			isa = PBXGroup;
 			children = (
+				36E9C8931666B55200925E1F /* omni */,
 				361881BB15B936330009AD7E /* allocore */,
 				3618836415B936340009AD7E /* allocv */,
 				3618836715B936340009AD7E /* alloglv */,
@@ -6748,6 +6775,160 @@
 				36188D5F15B936360009AD7E /* openCV.a */,
 			);
 			path = lib32;
+			sourceTree = "<group>";
+		};
+		36E9C8931666B55200925E1F /* omni */ = {
+			isa = PBXGroup;
+			children = (
+				36E9C8941666B55200925E1F /* .git */,
+				36E9C8B91666B55300925E1F /* .gitignore */,
+				36E9C8BA1666B55300925E1F /* README.md */,
+				36E9C8BB1666B57200925E1F /* al_OmniApp.hpp */,
+				36E9C8BC1666B57A00925E1F /* omni.cpp */,
+			);
+			name = omni;
+			path = ../examples/omni;
+			sourceTree = SOURCE_ROOT;
+		};
+		36E9C8941666B55200925E1F /* .git */ = {
+			isa = PBXGroup;
+			children = (
+				36E9C8951666B55200925E1F /* branches */,
+				36E9C8961666B55200925E1F /* config */,
+				36E9C8971666B55200925E1F /* description */,
+				36E9C8981666B55200925E1F /* HEAD */,
+				36E9C8991666B55200925E1F /* hooks */,
+				36E9C8A41666B55200925E1F /* index */,
+				36E9C8A51666B55200925E1F /* info */,
+				36E9C8A71666B55200925E1F /* logs */,
+				36E9C8AC1666B55200925E1F /* objects */,
+				36E9C8B11666B55300925E1F /* packed-refs */,
+				36E9C8B21666B55300925E1F /* refs */,
+			);
+			path = .git;
+			sourceTree = "<group>";
+		};
+		36E9C8951666B55200925E1F /* branches */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = branches;
+			sourceTree = "<group>";
+		};
+		36E9C8991666B55200925E1F /* hooks */ = {
+			isa = PBXGroup;
+			children = (
+				36E9C89A1666B55200925E1F /* applypatch-msg.sample */,
+				36E9C89B1666B55200925E1F /* commit-msg.sample */,
+				36E9C89C1666B55200925E1F /* post-commit.sample */,
+				36E9C89D1666B55200925E1F /* post-receive.sample */,
+				36E9C89E1666B55200925E1F /* post-update.sample */,
+				36E9C89F1666B55200925E1F /* pre-applypatch.sample */,
+				36E9C8A01666B55200925E1F /* pre-commit.sample */,
+				36E9C8A11666B55200925E1F /* pre-rebase.sample */,
+				36E9C8A21666B55200925E1F /* prepare-commit-msg.sample */,
+				36E9C8A31666B55200925E1F /* update.sample */,
+			);
+			path = hooks;
+			sourceTree = "<group>";
+		};
+		36E9C8A51666B55200925E1F /* info */ = {
+			isa = PBXGroup;
+			children = (
+				36E9C8A61666B55200925E1F /* exclude */,
+			);
+			path = info;
+			sourceTree = "<group>";
+		};
+		36E9C8A71666B55200925E1F /* logs */ = {
+			isa = PBXGroup;
+			children = (
+				36E9C8A81666B55200925E1F /* HEAD */,
+				36E9C8A91666B55200925E1F /* refs */,
+			);
+			path = logs;
+			sourceTree = "<group>";
+		};
+		36E9C8A91666B55200925E1F /* refs */ = {
+			isa = PBXGroup;
+			children = (
+				36E9C8AA1666B55200925E1F /* heads */,
+			);
+			path = refs;
+			sourceTree = "<group>";
+		};
+		36E9C8AA1666B55200925E1F /* heads */ = {
+			isa = PBXGroup;
+			children = (
+				36E9C8AB1666B55200925E1F /* master */,
+			);
+			path = heads;
+			sourceTree = "<group>";
+		};
+		36E9C8AC1666B55200925E1F /* objects */ = {
+			isa = PBXGroup;
+			children = (
+				36E9C8AD1666B55200925E1F /* info */,
+				36E9C8AE1666B55200925E1F /* pack */,
+			);
+			path = objects;
+			sourceTree = "<group>";
+		};
+		36E9C8AD1666B55200925E1F /* info */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = info;
+			sourceTree = "<group>";
+		};
+		36E9C8AE1666B55200925E1F /* pack */ = {
+			isa = PBXGroup;
+			children = (
+				36E9C8AF1666B55200925E1F /* pack-486b8b166cbe09f042821ed5a8062d64b0501c57.idx */,
+				36E9C8B01666B55300925E1F /* pack-486b8b166cbe09f042821ed5a8062d64b0501c57.pack */,
+			);
+			path = pack;
+			sourceTree = "<group>";
+		};
+		36E9C8B21666B55300925E1F /* refs */ = {
+			isa = PBXGroup;
+			children = (
+				36E9C8B31666B55300925E1F /* heads */,
+				36E9C8B51666B55300925E1F /* remotes */,
+				36E9C8B81666B55300925E1F /* tags */,
+			);
+			path = refs;
+			sourceTree = "<group>";
+		};
+		36E9C8B31666B55300925E1F /* heads */ = {
+			isa = PBXGroup;
+			children = (
+				36E9C8B41666B55300925E1F /* master */,
+			);
+			path = heads;
+			sourceTree = "<group>";
+		};
+		36E9C8B51666B55300925E1F /* remotes */ = {
+			isa = PBXGroup;
+			children = (
+				36E9C8B61666B55300925E1F /* origin */,
+			);
+			path = remotes;
+			sourceTree = "<group>";
+		};
+		36E9C8B61666B55300925E1F /* origin */ = {
+			isa = PBXGroup;
+			children = (
+				36E9C8B71666B55300925E1F /* HEAD */,
+			);
+			path = origin;
+			sourceTree = "<group>";
+		};
+		36E9C8B81666B55300925E1F /* tags */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = tags;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

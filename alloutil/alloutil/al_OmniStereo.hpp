@@ -74,7 +74,7 @@ public:
 	public:
 
 		/// Place drawing code here
-		virtual void onDraw(OmniStereo& omni) = 0;
+		virtual void onDrawOmni(OmniStereo& omni) = 0;
 		
 		virtual ~Drawable(){}
 	};
