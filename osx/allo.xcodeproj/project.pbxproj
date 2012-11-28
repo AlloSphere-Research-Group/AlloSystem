@@ -2897,6 +2897,8 @@
 		36188D5D15B936360009AD7E /* libuv.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libuv.a; sourceTree = "<group>"; };
 		36188D5F15B936360009AD7E /* openCV.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = openCV.a; sourceTree = "<group>"; };
 		36188D6015B936360009AD7E /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = README.md; path = ../README.md; sourceTree = SOURCE_ROOT; };
+		36E9C8791666AC0700925E1F /* al_OmniStereo.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OmniStereo.hpp; sourceTree = "<group>"; };
+		36E9C87A1666AC1600925E1F /* al_OmniStereo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_OmniStereo.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -3873,6 +3875,7 @@
 				3618838F15B936340009AD7E /* al_FrameBufferGL.hpp */,
 				3618839015B936340009AD7E /* al_Lua.hpp */,
 				3618839115B936340009AD7E /* al_Navigator.hpp */,
+				36E9C8791666AC0700925E1F /* al_OmniStereo.hpp */,
 				3618839215B936340009AD7E /* al_OverlayTextGL.hpp */,
 				3618839315B936340009AD7E /* al_ResourceManager.hpp */,
 				3618839415B936340009AD7E /* al_ShotList.hpp */,
@@ -3934,6 +3937,7 @@
 			isa = PBXGroup;
 			children = (
 				361883A915B936340009AD7E /* al_FileWatcher.cpp */,
+				36E9C87A1666AC1600925E1F /* al_OmniStereo.cpp */,
 				361883AA15B936340009AD7E /* al_ResourceManager.cpp */,
 				361883AB15B936340009AD7E /* al_WarpBlend.cpp */,
 				361883AC15B936340009AD7E /* Makefile.config */,
