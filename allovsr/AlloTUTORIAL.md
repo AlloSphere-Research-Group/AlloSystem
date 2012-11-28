@@ -3,7 +3,7 @@ CSS: style0.css
 Versor-with-AlloCore
 ===
 
-For general Versor use please also see the README.md file in the VSR distro
+For a general introduction to Versor use please see the README.md file in the VSR repo
 
 * [Introduction](#introduction)
 * [Download](#download)
@@ -21,7 +21,7 @@ operators that spin, twist, dilate, and bend those variables.  Both these elemen
 
 The backbone of Versor's library is a precomputation table of the most likely (though _not all_) multiplications you could possibly hope to use.  
 
-A Circle, for instance, can be _outer-multiplied_ by a Plane to get the Point Pair where they intersect.  
+A Circle, for instance, can be _outer_-multiplied by a Plane to get the Point Pair where they intersect.  
 
 The current version of Versor is built for speed, with the expense of longer compile times.  Future versions
 will likely use jit compilation to take care of this (i.e. combine speed with lightweight implementation), by hooking into 
