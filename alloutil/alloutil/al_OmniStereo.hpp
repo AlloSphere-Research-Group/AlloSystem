@@ -8,64 +8,66 @@
 
 namespace al {
 
-// prefix this string to each vertex shader used in rendering the scene
-// use it as e.g.:
-// gl_Position = omni_cube(gl_ModelViewMatrix * gl_Vertex);
-// also be sure to call omni.uniforms(shader) in the OmniStereoDrawable callback
-
-#define AL_OMNISTEREOCUBEMAP_GLSL "\n\
-	// AL_OMNISTEREOCUBEMAP_GLSL	\n\
-		\n\
-	// @omni_eye: the eye parallax distance. 	\n\
-	//	This will be zero for mono, and positive/negative for right/left eyes.	\n\
-	//	Pass this uniform to the shader in the OmniStereoDrawable callback 	\n\
-	uniform float omni_eye;	\n\
-	// @omni_face: the GL_TEXTURE_CUBE_MAP face being rendered. 	\n\
-	//	For a typical forward-facing view, this should == 5.	\n\
-	//	Pass this uniform to the shader in the OmniStereoDrawable callback 	\n\
-	uniform int omni_face;	\n\
-	// @omni_near: the near clipping plane. 	\n\
-	uniform float omni_near;	\n\
-	// @omni_far: the far clipping plane. 	\n\
-	uniform float omni_far;	\n\
-		\n\
-	// omni_render(vertex)	\n\
-	// @vertex: the eye-space vertex to be rendered.	\n\
-	//	Typically gl_Position = omni_render(gl_ModelViewMatrix * gl_Vertex);	\n\
-	vec4 omni_render(in vec4 vertex) {	\n\
-		// unit direction vector:	\n\
-		vec3 vn = normalize(vertex.xyz);	\n\
-		// omni-stereo effect (in eyespace XZ plane)	\n\
-		// cross-product with up vector also ensures stereo fades out at Y poles	\n\
-		//v.xyz -= omni_eye * cross(vn, vec3(0, 1, 0));	\n\
-		// simplified:	\n\
-		vertex.xz += vec2(omni_eye * vn.z, omni_eye * -vn.x);	\n\
-		// convert eye-space into cubemap-space:	\n\
-		// GL_TEXTURE_CUBE_MAP_POSITIVE_X  	\n\
-		     if (omni_face == 0) { vertex.xyz = vec3(-vertex.z, -vertex.y, -vertex.x); }	\n\
-		// GL_TEXTURE_CUBE_MAP_NEGATIVE_X	\n\
-		else if (omni_face == 1) { vertex.xyz = vec3( vertex.z, -vertex.y,  vertex.x); }	\n\
-		// GL_TEXTURE_CUBE_MAP_POSITIVE_Y  	\n\
-		else if (omni_face == 2) { vertex.xyz = vec3( vertex.x,  vertex.z, -vertex.y); }	\n\
-		// GL_TEXTURE_CUBE_MAP_NEGATIVE_Y 	\n\
-		else if (omni_face == 3) { vertex.xyz = vec3( vertex.x, -vertex.z,  vertex.y); }	\n\
-		// GL_TEXTURE_CUBE_MAP_POSITIVE_Z  	\n\
-		else if (omni_face == 4) { vertex.xyz = vec3( vertex.x, -vertex.y, -vertex.z); }	\n\
-		// GL_TEXTURE_CUBE_MAP_NEGATIVE_Z   \n\
-		else					 { vertex.xyz = vec3(-vertex.x, -vertex.y,  vertex.z); }	\n\
-		// convert into screen-space:	\n\
-		// simplified perspective projection since fovy = 90 and aspect = 1	\n\
-		vertex.zw = vec2(	\n\
-			(vertex.z*(omni_far+omni_near) + vertex.w*omni_far*omni_near*2.)/(omni_near-omni_far),	\n\
-			-vertex.z	\n\
-		);	\n\
-		return vertex;	\n\
-	}	\n\
-	"
-
 // Object to encapsulate rendering omni-stereo worlds via cube-maps:
 class OmniStereo {
 public:
+
+	// prefix this string to every vertex shader used in rendering the scene
+	// use it as e.g.:
+	// gl_Position = omni_cube(gl_ModelViewMatrix * gl_Vertex);
+	// also be sure to call omni.uniforms(shader) in the OmniStereoDrawable callback
+	static std::string glsl() {
+		return AL_STRINGIFY(	
+			// @omni_eye: the eye parallax distance. 	
+			//	This will be zero for mono, and positive/negative for right/left eyes.
+			//	Pass this uniform to the shader in the OmniStereoDrawable callback 
+			uniform float omni_eye;
+				
+			// @omni_face: the GL_TEXTURE_CUBE_MAP face being rendered. 	
+			//	For a typical forward-facing view, this should == 5.	
+			//	Pass this uniform to the shader in the OmniStereoDrawable callback 
+			uniform int omni_face;	
+
+			// @omni_near: the near clipping plane. 	
+			uniform float omni_near;	
+
+			// @omni_far: the far clipping plane. 	
+			uniform float omni_far;	
+				
+			// omni_render(vertex)	
+			// @vertex: the eye-space vertex to be rendered.	
+			//	Typically gl_Position = omni_render(gl_ModelViewMatrix * gl_Vertex);	
+			vec4 omni_render(in vec4 vertex) {	
+				// unit direction vector:	
+				vec3 vn = normalize(vertex.xyz);	
+				// omni-stereo effect (in eyespace XZ plane)	
+				// cross-product with up vector also ensures stereo fades out at Y poles	
+				//v.xyz -= omni_eye * cross(vn, vec3(0, 1, 0));	
+				// simplified:	
+				vertex.xz += vec2(omni_eye * vn.z, omni_eye * -vn.x);	
+				// convert eye-space into cubemap-space:	
+				// GL_TEXTURE_CUBE_MAP_POSITIVE_X  	
+					 if (omni_face == 0) { vertex.xyz = vec3(-vertex.z, -vertex.y, -vertex.x); }	
+				// GL_TEXTURE_CUBE_MAP_NEGATIVE_X	
+				else if (omni_face == 1) { vertex.xyz = vec3( vertex.z, -vertex.y,  vertex.x); }	
+				// GL_TEXTURE_CUBE_MAP_POSITIVE_Y  	
+				else if (omni_face == 2) { vertex.xyz = vec3( vertex.x,  vertex.z, -vertex.y); }	
+				// GL_TEXTURE_CUBE_MAP_NEGATIVE_Y 	
+				else if (omni_face == 3) { vertex.xyz = vec3( vertex.x, -vertex.z,  vertex.y); }	
+				// GL_TEXTURE_CUBE_MAP_POSITIVE_Z  	
+				else if (omni_face == 4) { vertex.xyz = vec3( vertex.x, -vertex.y, -vertex.z); }	
+				// GL_TEXTURE_CUBE_MAP_NEGATIVE_Z   
+				else					 { vertex.xyz = vec3(-vertex.x, -vertex.y,  vertex.z); }	
+				// convert into screen-space:	
+				// simplified perspective projection since fovy = 90 and aspect = 1	
+				vertex.zw = vec2(	
+					(vertex.z*(omni_far+omni_near) + vertex.w*omni_far*omni_near*2.)/(omni_near-omni_far),	
+					-vertex.z	
+				);	
+				return vertex;	
+			}
+		);
+	}
 
 	///	Abstract base class for any object that can be rendered via OmniStereo:
 	class Drawable  {
@@ -100,8 +102,7 @@ public:
 		DUAL,			/**< Dual side-by-side stereo */
 		ANAGLYPH,		/**< Red (left eye) / cyan (right eye) stereo */
 		LEFT_EYE,		/**< Left eye only */
-		RIGHT_EYE		/**< Right eye only */
-		
+		RIGHT_EYE		/**< Right eye only */		
 	};
 	
 	enum WarpMode {
@@ -185,17 +186,10 @@ public:
 	void drawDemo(const Lens& lens, const Pose& pose, const Viewport& vp);
 	
 	Projection& projection(int i) { return mProjections[i]; }
-	//WarpnBlend& warp(int i) { return warps[i]; }
 	
 protected:
-
-	
-
 	// supports up to 4 warps/viewports
 	Projection mProjections[4];
-	
-//	WarpnBlend warps[4];
-//	Viewport vps[4];
 
 	void capture_eye(GLuint& tex, OmniStereo::Drawable& drawable);
 	
