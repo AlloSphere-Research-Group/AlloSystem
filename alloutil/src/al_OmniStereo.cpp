@@ -845,7 +845,11 @@ void OmniStereo::capture(OmniStereo::Drawable& drawable, const Lens& lens, const
 }	
 
 void OmniStereo::drawEye(double eye) {
-	glBindTexture(GL_TEXTURE_CUBE_MAP, mTex[eye > 0.]);
+	if (eye > 0.) {
+		glBindTexture(GL_TEXTURE_CUBE_MAP, mTex[1]);
+	} else {
+		glBindTexture(GL_TEXTURE_CUBE_MAP, mTex[0]);
+	}
 	gl.draw(mQuad);
 }
 
@@ -858,6 +862,7 @@ void OmniStereo::draw(const Lens& lens, const Pose& pose, const Viewport& vp) {
 	// TODO: which loop is more expensive?
 	// which GL state changes are more expensive?
 	for (int i=mNumProjections-1; i>=0; i--) {
+		
 		Projection& p = mProjections[i];
 		Texture& warp = p.mWarp;
 		Texture& blend = p.mBlend;
@@ -871,6 +876,8 @@ void OmniStereo::draw(const Lens& lens, const Pose& pose, const Viewport& vp) {
 		gl.viewport(viewport);
 		gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
 		
+		gl.error("OmniStereo cube draw begin");
+		
 		mCubeProgram.begin();
 		blend.bind(2);
 		warp.bind(1);
@@ -878,46 +885,6 @@ void OmniStereo::draw(const Lens& lens, const Pose& pose, const Viewport& vp) {
 		glEnable(GL_TEXTURE_CUBE_MAP);
 		
 		drawStereo<&OmniStereo::drawEye>(lens, pose, viewport);		
-	
-		//switch (mMode) {
-//			case SEQUENTIAL:
-//				// frame sequential:
-//				glBindTexture(GL_TEXTURE_CUBE_MAP, mTex[sequential_frame]);
-//				gl.draw(mQuad);
-//				break;
-//				
-//			case ACTIVE:
-//				glDrawBuffer(GL_BACK_RIGHT);
-//				glBindTexture(GL_TEXTURE_CUBE_MAP, mTex[1]);
-//				gl.draw(mQuad);
-//				
-//				glDrawBuffer(GL_BACK_LEFT);
-//				glBindTexture(GL_TEXTURE_CUBE_MAP, mTex[0]);
-//				gl.draw(mQuad);
-//				
-//				glDrawBuffer(GL_BACK);
-//				break;
-//			
-//			case DUAL:
-//				// TODO:
-//				break;
-//				
-//			case ANAGLYPH:
-//				// TODO:
-//				break;
-//			
-//			case RIGHT_EYE:
-//				glBindTexture(GL_TEXTURE_CUBE_MAP, mTex[1]);
-//				gl.draw(mQuad);
-//				break;
-//			
-//			case LEFT_EYE:
-//			case MONO:
-//			default:
-//				glBindTexture(GL_TEXTURE_CUBE_MAP, mTex[0]);
-//				gl.draw(mQuad);
-//				break;
-//		}
 		
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 		glDisable(GL_TEXTURE_CUBE_MAP);
@@ -926,8 +893,9 @@ void OmniStereo::draw(const Lens& lens, const Pose& pose, const Viewport& vp) {
 		warp.unbind(1);
 		mCubeProgram.end();
 		
+		gl.error("OmniStereo cube draw end");
 	}
-	gl.error("OmniStereo end begin");
+	gl.error("OmniStereo draw end");
 }
 
 void OmniStereo::drawQuadEye(double eye) {
