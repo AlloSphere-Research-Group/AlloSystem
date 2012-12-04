@@ -885,6 +885,7 @@ void OmniStereo::draw(const Lens& lens, const Pose& pose, const Viewport& vp) {
 		glEnable(GL_TEXTURE_CUBE_MAP);
 		
 		drawStereo<&OmniStereo::drawEye>(lens, pose, viewport);		
+		gl.error("OmniStereo cube drawStereo end");
 		
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 		glDisable(GL_TEXTURE_CUBE_MAP);
