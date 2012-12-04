@@ -46,6 +46,76 @@
 
 namespace al{
 
+
+/// Utilities for parsing MIDI bytes
+class MIDIByte{
+public:
+
+	#define BITS_(a,b,c,d,e,f,g,h)\
+		(a<<7 | b<<6 | c<<5 | d<<4 | e<<3 | f<<2 | g<<1 | h)
+
+	// Constants for checking the first message byte
+	// http://www.midi.org/techspecs/midimessages.php
+	static const unsigned char 
+		CHANNEL_MASK	= BITS_(0,0,0,0, 1,1,1,1), ///< Channel message status byte channel mask
+		MESSAGE_MASK	= BITS_(1,1,1,1, 0,0,0,0), ///< Message status byte type mask
+
+		NOTE_OFF		= BITS_(1,0,0,0, 0,0,0,0), ///< Note off channel message type
+		NOTE_ON			= BITS_(1,0,0,1, 0,0,0,0), ///< Note on channel message type
+		CONTROL_CHANGE	= BITS_(1,0,1,1, 0,0,0,0), ///< Control change channel message type
+		 BANK_SELECT	= 0x00, ///< Bank select control number
+		 MODULATION		= 0x01, ///< Modulation wheel/stick control number
+		 BREATH			= 0x02, ///< Breath controller control number
+		 FOOT			= 0x04, ///< Foot controller control number
+		 PORTAMENTO_TIME= 0x05, ///< Portamento time control number
+		 VOLUME			= 0x07, ///< Channel volume control number
+		 BALANCE		= 0x08, ///< Balance control number
+		 PAN			= 0x0A, ///< Pan control number
+		 EXPRESSION		= 0x0B, ///< Expression controller control number
+		 DAMPER_PEDAL	= 0x40, ///< Damper pedal control number
+		 PORTAMENTO_ON	= 0x41, ///< Portamento on/off control number
+		 SOSTENUTO_ON	= 0x42, ///< Sostenuto on/off control number
+		 SOFT_PEDAL		= 0x43, ///< Soft pedal control number
+		 LEGATO_ON		= 0x44, ///< Legato on/off control number
+		 
+		PROGRAM_CHANGE	= BITS_(1,1,0,0, 0,0,0,0), ///< Program change channel message type
+		PRESSURE_POLY	= BITS_(1,0,1,0, 0,0,0,0), ///< Polyphonic pressure (aftertouch) channel message type
+		PRESSURE_CHAN	= BITS_(1,1,0,1, 0,0,0,0), ///< Channel pressure (aftertouch) channel message type
+		PITCH_WHEEL		= BITS_(1,1,1,0, 0,0,0,0), ///< Pitch wheel channel message type
+
+		SYSTEM_MSG		= BITS_(1,1,1,1, 0,0,0,0), ///< System message type
+		
+		SYS_EX			= BITS_(1,1,1,1, 0,0,0,0), ///< System exclusive system message type
+		SYS_EX_END		= BITS_(1,1,1,1, 0,1,1,1), ///< End of system exclusive system message type
+		TIME_CODE		= BITS_(1,1,1,1, 0,0,0,1), ///< Time code system message type
+		SONG_POSITION	= BITS_(1,1,1,1, 0,0,1,0), ///< Song position system message type
+		SONG_SELECT		= BITS_(1,1,1,1, 0,0,1,1), ///< Song select system message type
+		TUNE_REQUEST	= BITS_(1,1,1,1, 0,1,1,0), ///< Tune request system message type
+		TIMING_CLOCK	= BITS_(1,1,1,1, 1,0,0,0), ///< Timing clock system message type
+		SEQ_START		= BITS_(1,1,1,1, 1,0,1,0), ///< Start sequence system message type
+		SEQ_CONTINUE	= BITS_(1,1,1,1, 1,0,1,1), ///< Continue sequence system message type
+		SEQ_STOP		= BITS_(1,1,1,1, 1,1,0,0), ///< Stop sequence system message type
+		ACTIVE_SENSING	= BITS_(1,1,1,1, 1,1,1,0), ///< Active sensing system message type
+		RESET			= BITS_(1,1,1,1, 1,1,1,1), ///< Reset all receivers system message type
+	;
+	#undef BITS_
+
+	/// Check status byte to see if the message is a channel message
+	static bool isChannelMessage(unsigned char statusByte){
+		return (statusByte & MESSAGE_MASK) != SYSTEM_MSG;
+	}
+
+	/// Get string with message type from status byte
+	static const char * messageTypeString(unsigned char statusByte);
+
+	/// Get string with control type from control number
+	static const char * controlNumberString(unsigned char controlNumber);
+	
+	/// Convert pitch wheel message bytes into a 14-bit value in [0, 16384)
+	static unsigned short convertPitchWheel(unsigned char byte2, unsigned char byte3);
+};
+
+
 /// MIDI error reporting
 class MIDIError : public std::exception
 {

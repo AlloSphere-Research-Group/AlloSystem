@@ -20,7 +20,52 @@ using namespace al;
 #define MidiMessage		MIDIMessage
 #define RtMidiInData	MIDIInData
 
-//#include "RtMidi.cpp"
+
+const char * MIDIByte::messageTypeString(unsigned char statusByte){
+	switch(statusByte & MESSAGE_MASK){		
+	case NOTE_OFF:			return "NOTE_OFF";
+	case NOTE_ON:			return "NOTE_ON";
+	case CONTROL_CHANGE:	return "CONTROL_CHANGE";
+	case PROGRAM_CHANGE:	return "PROGRAM_CHANGE";
+	case PRESSURE_POLY:		return "PRESSURE_POLY";
+	case PRESSURE_CHAN:		return "PRESSURE_CHAN";
+	case PITCH_WHEEL:		return "PITCH_WHEEL";
+	case SYSTEM_MSG:
+		switch(statusByte){
+		case SYS_EX:			return "SYS_EX";
+		case SYS_EX_END:		return "SYS_EX_END";
+		case TIME_CODE:			return "TIME_CODE";
+		case SONG_POSITION:		return "SONG_POSITION";
+		case SONG_SELECT:		return "SONG_SELECT";
+		case TUNE_REQUEST:		return "TUNE_REQUEST";
+		case TIMING_CLOCK:		return "TIMING_CLOCK";
+		case SEQ_START:			return "SEQ_START";
+		case SEQ_CONTINUE:		return "SEQ_CONTINUE";
+		case SEQ_STOP:			return "SEQ_STOP";
+		case ACTIVE_SENSING:	return "ACTIVE_SENSING";
+		case RESET:				return "RESET";
+		}
+	default: return "";
+	}
+}
+
+const char * MIDIByte::controlNumberString(unsigned char controlNumber){
+	switch(controlNumber){
+	case MODULATION:	return "MODULATION";
+	case EXPRESSION:	return "EXPRESSION";
+	default: return "";
+	}
+}
+
+unsigned short MIDIByte::convertPitchWheel(unsigned char byte2, unsigned char byte3){
+	unsigned short r = byte3;
+	return (r<<7) | byte2;
+}
+
+/*
+DO NOT MODIFY BELOW THIS POINT!!!
+Below is the RtMidi implementation code verbatim (w/o RtMidi.h header include). 
+*/
 
 /**********************************************************************/
 /* \class RtMidi
@@ -2790,5 +2835,3 @@ void RtMidiOut :: sendMessage( std::vector<unsigned char> *message )
 }
 
 #endif  // __LINUX_JACK__
-
-//} // al::
