@@ -89,7 +89,7 @@ public:
 		// load warp/blend from disk:
 		void readBlend(std::string path);
 		void readWarp(std::string path);
-				
+		
 		Texture mBlend, mWarp;
 		Viewport mViewport;
 	};
@@ -103,6 +103,16 @@ public:
 		ANAGLYPH,		/**< Red (left eye) / cyan (right eye) stereo */
 		LEFT_EYE,		/**< Left eye only */
 		RIGHT_EYE		/**< Right eye only */		
+	};
+	
+	/// Anaglyph mode
+	enum AnaglyphMode {
+		RED_BLUE = 0,	/**< */
+		RED_GREEN,		/**< */
+		RED_CYAN,		/**< */
+		BLUE_RED,		/**< */
+		GREEN_RED,		/**< */
+		CYAN_RED		/**< */
 	};
 	
 	enum WarpMode {
@@ -139,13 +149,13 @@ public:
 	void capture(OmniStereo::Drawable& drawable, const Lens& lens, const Pose& pose);
 	
 	// render the captured scene to multiple warp maps and viewports
-	// @w, @h are the pixel dimensions of the window
-	void draw(const Viewport& vp);
+	// @viewport is the pixel dimensions of the window
+	void draw(const Lens& lens, const Pose& pose, const Viewport& vp);
 	
 	// typically they would be combined like this:
 	void onFrame(OmniStereo::Drawable& drawable, const Lens& lens, const Pose& pose, const Viewport& vp) {
 		capture(drawable, lens, pose);
-		draw(vp);
+		draw(lens, pose, vp);
 	}
 	
 	// send the proper uniforms to the shader:
@@ -183,6 +193,7 @@ public:
 	// debugging:
 	void drawWarp(const Viewport& vp);
 	void drawBlend(const Viewport& vp);
+	void drawSphereMap(Texture& map, const Lens& lens, const Pose& pose, const Viewport& vp);
 	void drawDemo(const Lens& lens, const Pose& pose, const Viewport& vp);
 	
 	Projection& projection(int i) { return mProjections[i]; }
@@ -190,13 +201,23 @@ public:
 protected:
 	// supports up to 4 warps/viewports
 	Projection mProjections[4];
+	
+	typedef void (OmniStereo::*DrawMethod)(double eye);
+	void drawEye(double eye);
+	void drawQuadEye(double eye);
+	void drawDemoEye(double eye);
+	
+	template<DrawMethod F>
+	void drawStereo(const Lens& lens, const Pose& pose, const Viewport& viewport);
+	
+	void drawQuad();
 
 	void capture_eye(GLuint& tex, OmniStereo::Drawable& drawable);
 	
 	GLuint mTex[2];	// the cube map textures
 	GLuint mFbo;
 	GLuint mRbo;	// TODO: alternative depth cube-map texture option?
-	ShaderProgram mCubeProgram;
+	ShaderProgram mCubeProgram, mSphereProgram, mWarpProgram, mDemoProgram;
 	Mesh mQuad;
 	
 	Graphics gl;
@@ -209,8 +230,10 @@ protected:
 	
 	unsigned mResolution;
 	unsigned mNumProjections;
+	int mFrame;
 	
 	StereoMode mMode;
+	AnaglyphMode mAnaglyphMode;
 	
 	bool mStereo, mMipmap;	
 }; 	
@@ -224,6 +247,79 @@ void OmniStereo::uniforms(ShaderProgram& program) const {
 	program.uniform("omni_near", mNear);
 	program.uniform("omni_far", mFar);
 	gl.error("sending OmniStereo uniforms");
+}
+
+template<OmniStereo::DrawMethod F>
+inline void OmniStereo::drawStereo(const Lens& lens, const Pose& pose, const Viewport& vp) {
+	double eye = lens.eyeSep();
+	switch (mMode) {
+		case SEQUENTIAL:
+			if (mFrame & 1) {
+				(this->*F)(eye);
+			} else {
+				(this->*F)(-eye);
+			}
+			break;
+			
+		case ACTIVE:
+			glDrawBuffer(GL_BACK_RIGHT);
+			(this->*F)(eye);
+			
+			glDrawBuffer(GL_BACK_LEFT);
+			(this->*F)(-eye);
+			
+			glDrawBuffer(GL_BACK);
+			break;
+		
+		case DUAL:
+			gl.viewport(vp.l + vp.w*0.5, vp.b, vp.w*0.5, vp.h);
+			(this->*F)(eye);
+			gl.viewport(vp.l, vp.b, vp.w*0.5, vp.h);
+			(this->*F)(-eye);
+			break;
+			
+		case ANAGLYPH:
+			switch(mAnaglyphMode){
+				case RED_BLUE:
+				case RED_GREEN:
+				case RED_CYAN:	glColorMask(GL_TRUE, GL_FALSE,GL_FALSE,GL_TRUE); break;
+				case BLUE_RED:	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE, GL_TRUE); break;
+				case GREEN_RED:	glColorMask(GL_FALSE,GL_TRUE, GL_FALSE,GL_TRUE); break;
+				case CYAN_RED:	glColorMask(GL_FALSE,GL_TRUE, GL_TRUE, GL_TRUE); break;
+				default:		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE ,GL_TRUE);
+			} 
+			(this->*F)(eye);
+			
+			switch(mAnaglyphMode){
+				case RED_BLUE:	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE, GL_TRUE); break;
+				case RED_GREEN:	glColorMask(GL_FALSE,GL_TRUE, GL_FALSE,GL_TRUE); break;
+				case RED_CYAN:	glColorMask(GL_FALSE,GL_TRUE, GL_TRUE, GL_TRUE); break;
+				case BLUE_RED:
+				case GREEN_RED:
+				case CYAN_RED:	glColorMask(GL_TRUE, GL_FALSE,GL_FALSE,GL_TRUE); break;
+				default:		glColorMask(GL_TRUE, GL_TRUE ,GL_TRUE, GL_TRUE);
+			}
+			// clear depth before this pass:
+			gl.depthMask(1);
+			gl.depthTesting(1);
+			gl.clear(gl.DEPTH_BUFFER_BIT);
+			(this->*F)(-eye);
+			
+			break;
+		
+		case RIGHT_EYE:
+			(this->*F)(eye);
+			break;
+		
+		case LEFT_EYE:
+			(this->*F)(-eye);
+			break;
+			
+		case MONO:
+		default:
+			(this->*F)(0);
+			break;
+	}
 }
 	
 } // al::
