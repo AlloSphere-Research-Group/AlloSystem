@@ -850,7 +850,9 @@ void OmniStereo::drawEye(double eye) {
 	} else {
 		glBindTexture(GL_TEXTURE_CUBE_MAP, mTex[0]);
 	}
+	gl.error("OmniStereo drawEye after texture");
 	gl.draw(mQuad);
+	gl.error("OmniStereo drawEye after quad");
 }
 
 void OmniStereo::draw(const Lens& lens, const Pose& pose, const Viewport& vp) {
@@ -882,8 +884,9 @@ void OmniStereo::draw(const Lens& lens, const Pose& pose, const Viewport& vp) {
 		blend.bind(2);
 		warp.bind(1);
 		glActiveTexture(GL_TEXTURE0);
-		glEnable(GL_TEXTURE_CUBE_MAP);
+		glEnable(GL_TEXTURE_CUBE_MAP);	
 		
+		gl.error("OmniStereo cube drawStereo begin");
 		drawStereo<&OmniStereo::drawEye>(lens, pose, viewport);		
 		gl.error("OmniStereo cube drawStereo end");
 		

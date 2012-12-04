@@ -263,12 +263,15 @@ inline void OmniStereo::drawStereo(const Lens& lens, const Pose& pose, const Vie
 			
 		case ACTIVE:
 			glDrawBuffer(GL_BACK_RIGHT);
+			gl.error("OmniStereo drawStereo GL_BACK_RIGHT");
 			(this->*F)(eye);
 			
 			glDrawBuffer(GL_BACK_LEFT);
+			gl.error("OmniStereo drawStereo GL_BACK_LEFT");
 			(this->*F)(-eye);
 			
 			glDrawBuffer(GL_BACK);
+			gl.error("OmniStereo drawStereo GL_BACK");
 			break;
 		
 		case DUAL:
