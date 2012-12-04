@@ -12,22 +12,17 @@
 #define al_vsrInterfaceImpl_included
 
 //ABSTRACT BASE CLASS
-#include "vsr/vsr_interface.h"
 #include "allocore/al_allocore.hpp"
-#include "alloGLV/al_ControlGLV.hpp"
-
-#include "vsr/vsr_gui.h"
-//#include "allovsr/al_vsr.hpp"
 #include "allovsr/al_vsr.hpp"
 
-//GL2PS
-//#include "gl2ps/gl2ps.h"
+#include "vsr/vsr_interface.h"
+#include "vsr/vsr_gui.h"
+#include "alloGLV/al_ControlGLV.hpp"
 
 
 namespace al {
     
     using vsr::Frame;
-//    using vsr::Camera;
     using vsr::Scene;
     using vsr::Interface;
     using vsr::MouseData;
@@ -150,7 +145,7 @@ namespace al {
     
     //A GLV Object with built in GUI for easy prototyping
     struct VsrGui : public GLVDetachable {
-        VsrGui() : GLVDetachable() { *this << gui; }
+        VsrGui() : GLVDetachable(), gui() { *this << gui; }
         glv::Gui gui;
     };
     

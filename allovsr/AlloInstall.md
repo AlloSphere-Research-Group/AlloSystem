@@ -3,32 +3,10 @@ CSS: style0.css
 Versor-with-AlloCore
 ===
 
-For a general introduction to Versor use please see the README.md file in the VSR repo
+This document describes installation of libvsr for integration with AlloCore.  For an introduction to Versor itself use please see the README.md file in the VSR repo
 
-* [Introduction](#introduction)
 * [Download](#download)
 * [Installation](#installation)
-
----
-
-Introduction
----
-
-Typical matrix operation libraries have templated inlined functions for Vector and Matrix multiplication.  Versor
-is similar, but on steroids, where _vectors_ and sparse _matrices_ of various sizes are all just called _multivectors_ and represent geometric
-elements beyond just xyz directions and transformation matrices. Circles, lines, spheres, planes, points are all algebraic elements, as are 
-operators that spin, twist, dilate, and bend those variables.  Both these elements and operators are _multivectors_ which multiply together in many many many different ways.  
-
-The backbone of Versor's library is a precomputation table of the most likely (though _not all_) multiplications you could possibly hope to use.  
-
-A Circle, for instance, can be _outer_-multiplied by a Plane to get the Point Pair where they intersect.  
-
-The current version of Versor is built for speed, with the expense of longer compile times.  Future versions
-will likely use jit compilation to take care of this (i.e. combine speed with lightweight implementation), by hooking into 
-luajit for instance.  I am working on that under Graham's thoughtful guidance and tutelage.  
-
-THERE WILL BE A FULL TUTORIAL! [Soon]  You can also read the README file which helps a bit.  For now at least please try to compile it so I can shake out any bugs.  
-There are a lot of warnings that get thrown around during compilation.  I'm aware of them and need to abolish them . . . Doesn't effect performance for now though.
 
 ---
 
@@ -63,6 +41,8 @@ Thereafter, the precompiled header (.gch file) that is created and installed sho
   
 Any thoughts on shrinking that PCH would be welcome.  For now, though, it seems to have no side effect except to take up some space on your laptop.
 You can always delete the file (with the expense of much longer compile times).
+
+There are currently a lot of warnings that get thrown around during compilation.  I'm aware of them and need to abolish them . . . Doesn't effect performance for now though.
 
 Try one of the examples:
 

@@ -7,11 +7,29 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9B265FE2166D4289005D9135 /* allovsr.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B39FADA165C2AA200C3776D /* allovsr.1 */; };
+		9B265FEA166D42CE005D9135 /* robot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B265FE9166D42CE005D9135 /* robot.cpp */; };
 		9B39FADB165C2AA200C3776D /* allovsr.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B39FADA165C2AA200C3776D /* allovsr.1 */; };
+		9B44DF51166D8955007F1070 /* allovsr.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B39FADA165C2AA200C3776D /* allovsr.1 */; };
+		9B44DF59166D89A3007F1070 /* twists.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B44DF58166D89A3007F1070 /* twists.cpp */; };
+		9BC0A7741666B68F006F7FE8 /* allovsr.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B39FADA165C2AA200C3776D /* allovsr.1 */; };
+		9BC0A77C1666B6EF006F7FE8 /* hopf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9BC0A77B1666B6EF006F7FE8 /* hopf.cpp */; };
 		9BC5A61D165C464E0082D7EA /* interface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9BC5A61C165C464E0082D7EA /* interface.cpp */; };
+		9BD11CAE166E800D00832FA5 /* allovsr.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B39FADA165C2AA200C3776D /* allovsr.1 */; };
+		9BD11CB6166E804200832FA5 /* empty.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9BD11CB5166E804200832FA5 /* empty.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		9B265FE1166D4289005D9135 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				9B265FE2166D4289005D9135 /* allovsr.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		9B39FAD2165C2AA200C3776D /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -22,20 +40,86 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
+		9B44DF50166D8955007F1070 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				9B44DF51166D8955007F1070 /* allovsr.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		9BC0A7731666B68F006F7FE8 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				9BC0A7741666B68F006F7FE8 /* allovsr.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		9BD11CAD166E800D00832FA5 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				9BD11CAE166E800D00832FA5 /* allovsr.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		9B265FE6166D4289005D9135 /* hopf copy */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = "hopf copy"; path = robot; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B265FE9166D42CE005D9135 /* robot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = robot.cpp; path = ../../../examples/robot.cpp; sourceTree = "<group>"; };
 		9B39FAD4165C2AA200C3776D /* allovsr */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = allovsr; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B39FADA165C2AA200C3776D /* allovsr.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = allovsr.1; sourceTree = "<group>"; };
 		9B39FAE2165C2C4900C3776D /* al_vsrInterface.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_vsrInterface.hpp; path = ../../allovsr/al_vsrInterface.hpp; sourceTree = "<group>"; };
 		9B39FAE3165C2E0400C3776D /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../../Makefile; sourceTree = "<group>"; };
 		9B39FAE5165C2E5500C3776D /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../Makefile; sourceTree = "<group>"; };
+		9B44DF55166D8955007F1070 /* twists */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = twists; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B44DF58166D89A3007F1070 /* twists.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = twists.cpp; path = ../../../examples/twists.cpp; sourceTree = "<group>"; };
+		9BC0A7781666B68F006F7FE8 /* allovsr copy */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = "allovsr copy"; path = hopf; sourceTree = BUILT_PRODUCTS_DIR; };
+		9BC0A77B1666B6EF006F7FE8 /* hopf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = hopf.cpp; path = ../../../examples/hopf.cpp; sourceTree = "<group>"; };
 		9BC5A61B165C43D90082D7EA /* al_vsr.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_vsr.hpp; path = ../../allovsr/al_vsr.hpp; sourceTree = "<group>"; };
 		9BC5A61C165C464E0082D7EA /* interface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = interface.cpp; path = ../../../examples/interface.cpp; sourceTree = "<group>"; };
+		9BD11CB2166E800D00832FA5 /* empty */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = empty; sourceTree = BUILT_PRODUCTS_DIR; };
+		9BD11CB5166E804200832FA5 /* empty.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = empty.cpp; path = ../../../examples/empty.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		9B265FE0166D4289005D9135 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9B39FAD1165C2AA200C3776D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9B44DF4F166D8955007F1070 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9BC0A7721666B68F006F7FE8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9BD11CAC166E800D00832FA5 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -61,6 +145,10 @@
 			isa = PBXGroup;
 			children = (
 				9B39FAD4165C2AA200C3776D /* allovsr */,
+				9BC0A7781666B68F006F7FE8 /* allovsr copy */,
+				9B265FE6166D4289005D9135 /* hopf copy */,
+				9B44DF55166D8955007F1070 /* twists */,
+				9BD11CB2166E800D00832FA5 /* empty */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -68,7 +156,11 @@
 		9B39FAD7165C2AA200C3776D /* allovsr */ = {
 			isa = PBXGroup;
 			children = (
+				9BD11CB5166E804200832FA5 /* empty.cpp */,
 				9BC5A61C165C464E0082D7EA /* interface.cpp */,
+				9BC0A77B1666B6EF006F7FE8 /* hopf.cpp */,
+				9B265FE9166D42CE005D9135 /* robot.cpp */,
+				9B44DF58166D89A3007F1070 /* twists.cpp */,
 				9B39FADA165C2AA200C3776D /* allovsr.1 */,
 			);
 			path = allovsr;
@@ -85,6 +177,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		9B265FDD166D4289005D9135 /* robot */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9B265FE3166D4289005D9135 /* Build configuration list for PBXNativeTarget "robot" */;
+			buildPhases = (
+				9B265FDE166D4289005D9135 /* Sources */,
+				9B265FE0166D4289005D9135 /* Frameworks */,
+				9B265FE1166D4289005D9135 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = robot;
+			productName = allovsr;
+			productReference = 9B265FE6166D4289005D9135 /* hopf copy */;
+			productType = "com.apple.product-type.tool";
+		};
 		9B39FAD3165C2AA200C3776D /* allovsr */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9B39FADE165C2AA200C3776D /* Build configuration list for PBXNativeTarget "allovsr" */;
@@ -100,6 +209,57 @@
 			name = allovsr;
 			productName = allovsr;
 			productReference = 9B39FAD4165C2AA200C3776D /* allovsr */;
+			productType = "com.apple.product-type.tool";
+		};
+		9B44DF4C166D8955007F1070 /* twists */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9B44DF52166D8955007F1070 /* Build configuration list for PBXNativeTarget "twists" */;
+			buildPhases = (
+				9B44DF4D166D8955007F1070 /* Sources */,
+				9B44DF4F166D8955007F1070 /* Frameworks */,
+				9B44DF50166D8955007F1070 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = twists;
+			productName = allovsr;
+			productReference = 9B44DF55166D8955007F1070 /* twists */;
+			productType = "com.apple.product-type.tool";
+		};
+		9BC0A76F1666B68F006F7FE8 /* hopf */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9BC0A7751666B68F006F7FE8 /* Build configuration list for PBXNativeTarget "hopf" */;
+			buildPhases = (
+				9BC0A7701666B68F006F7FE8 /* Sources */,
+				9BC0A7721666B68F006F7FE8 /* Frameworks */,
+				9BC0A7731666B68F006F7FE8 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = hopf;
+			productName = allovsr;
+			productReference = 9BC0A7781666B68F006F7FE8 /* allovsr copy */;
+			productType = "com.apple.product-type.tool";
+		};
+		9BD11CA9166E800D00832FA5 /* empty */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9BD11CAF166E800D00832FA5 /* Build configuration list for PBXNativeTarget "empty" */;
+			buildPhases = (
+				9BD11CAA166E800D00832FA5 /* Sources */,
+				9BD11CAC166E800D00832FA5 /* Frameworks */,
+				9BD11CAD166E800D00832FA5 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = empty;
+			productName = allovsr;
+			productReference = 9BD11CB2166E800D00832FA5 /* empty */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -123,11 +283,23 @@
 			projectRoot = "";
 			targets = (
 				9B39FAD3165C2AA200C3776D /* allovsr */,
+				9BC0A76F1666B68F006F7FE8 /* hopf */,
+				9B265FDD166D4289005D9135 /* robot */,
+				9B44DF4C166D8955007F1070 /* twists */,
+				9BD11CA9166E800D00832FA5 /* empty */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		9B265FDE166D4289005D9135 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B265FEA166D42CE005D9135 /* robot.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9B39FAD0165C2AA200C3776D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -136,9 +308,125 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9B44DF4D166D8955007F1070 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B44DF59166D89A3007F1070 /* twists.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9BC0A7701666B68F006F7FE8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9BC0A77C1666B6EF006F7FE8 /* hopf.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9BD11CAA166E800D00832FA5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9BD11CB6166E804200832FA5 /* empty.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		9B265FE4166D4289005D9135 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					$SRCROOT/../../../build/lib/,
+				);
+				OTHER_LDFLAGS = (
+					"-lGLV",
+					"-lvsr",
+					"-lalloGLV",
+					"-lapr-1",
+					"-laprutil-1",
+					"-lfreeimage",
+					"-lassimp",
+					"-lfreetype",
+					"-L/usr/X11/lib/",
+					"-framework",
+					AudioUnit,
+					"-framework",
+					AudioToolbox,
+					"-framework",
+					CoreAudio,
+					"-framework",
+					CoreMidi,
+					"-framework",
+					Carbon,
+					"-lportaudio",
+					"-framework",
+					AGL,
+					"-framework",
+					OpenGL,
+					"-framework",
+					GLUT,
+					"-lpthread",
+					"-framework",
+					Cocoa,
+					"-framework",
+					Foundation,
+					"-lallocore",
+				);
+				PRODUCT_NAME = robot;
+				USER_HEADER_SEARCH_PATHS = "$SRCROOT/../../ $SRCROOT/../../../build/include/vsr/ $SRCROOT/../../../build/include/ $SRCROOT/../../../build/include/vsr/Elements/";
+			};
+			name = Debug;
+		};
+		9B265FE5166D4289005D9135 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					$SRCROOT/../../../build/lib/,
+				);
+				"OTHER_LDFLAGS[arch=*]" = (
+					"-lGLV",
+					"-lvsr",
+					"-lalloGLV",
+					"-lapr-1",
+					"-laprutil-1",
+					"-lfreeimage",
+					"-lassimp",
+					"-lfreetype",
+					"-L/usr/X11/lib/",
+					"-framework",
+					AudioUnit,
+					"-framework",
+					AudioToolbox,
+					"-framework",
+					CoreAudio,
+					"-framework",
+					CoreMidi,
+					"-framework",
+					Carbon,
+					"-lportaudio",
+					"-framework",
+					AGL,
+					"-framework",
+					OpenGL,
+					"-framework",
+					GLUT,
+					"-lpthread",
+					"-framework",
+					Cocoa,
+					"-framework",
+					Foundation,
+					"-lallocore",
+				);
+				PRODUCT_NAME = robot;
+				USER_HEADER_SEARCH_PATHS = "$SRCROOT/../../ $SRCROOT/../../../build/include/vsr/ $SRCROOT/../../../build/include/ $SRCROOT/../../../build/include/vsr/Elements/";
+			};
+			name = Release;
+		};
 		9B39FADC165C2AA200C3776D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -242,9 +530,260 @@
 			};
 			name = Release;
 		};
+		9B44DF53166D8955007F1070 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					$SRCROOT/../../../build/lib/,
+				);
+				OTHER_LDFLAGS = (
+					"-lGLV",
+					"-lvsr",
+					"-lalloGLV",
+					"-lapr-1",
+					"-laprutil-1",
+					"-lfreeimage",
+					"-lassimp",
+					"-lfreetype",
+					"-L/usr/X11/lib/",
+					"-framework",
+					AudioUnit,
+					"-framework",
+					AudioToolbox,
+					"-framework",
+					CoreAudio,
+					"-framework",
+					CoreMidi,
+					"-framework",
+					Carbon,
+					"-lportaudio",
+					"-framework",
+					AGL,
+					"-framework",
+					OpenGL,
+					"-framework",
+					GLUT,
+					"-lpthread",
+					"-framework",
+					Cocoa,
+					"-framework",
+					Foundation,
+					"-lallocore",
+				);
+				PRODUCT_NAME = twists;
+				USER_HEADER_SEARCH_PATHS = "$SRCROOT/../../ $SRCROOT/../../../build/include/vsr/ $SRCROOT/../../../build/include/ $SRCROOT/../../../build/include/vsr/Elements/";
+			};
+			name = Debug;
+		};
+		9B44DF54166D8955007F1070 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					$SRCROOT/../../../build/lib/,
+				);
+				"OTHER_LDFLAGS[arch=*]" = (
+					"-lGLV",
+					"-lvsr",
+					"-lalloGLV",
+					"-lapr-1",
+					"-laprutil-1",
+					"-lfreeimage",
+					"-lassimp",
+					"-lfreetype",
+					"-L/usr/X11/lib/",
+					"-framework",
+					AudioUnit,
+					"-framework",
+					AudioToolbox,
+					"-framework",
+					CoreAudio,
+					"-framework",
+					CoreMidi,
+					"-framework",
+					Carbon,
+					"-lportaudio",
+					"-framework",
+					AGL,
+					"-framework",
+					OpenGL,
+					"-framework",
+					GLUT,
+					"-lpthread",
+					"-framework",
+					Cocoa,
+					"-framework",
+					Foundation,
+					"-lallocore",
+				);
+				PRODUCT_NAME = twists;
+				USER_HEADER_SEARCH_PATHS = "$SRCROOT/../../ $SRCROOT/../../../build/include/vsr/ $SRCROOT/../../../build/include/ $SRCROOT/../../../build/include/vsr/Elements/";
+			};
+			name = Release;
+		};
+		9BC0A7761666B68F006F7FE8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					$SRCROOT/../../../build/lib/,
+				);
+				PRODUCT_NAME = hopf;
+				USER_HEADER_SEARCH_PATHS = "$SRCROOT/../../ $SRCROOT/../../../build/include/vsr/ $SRCROOT/../../../build/include/ $SRCROOT/../../../build/include/vsr/Elements/";
+			};
+			name = Debug;
+		};
+		9BC0A7771666B68F006F7FE8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					$SRCROOT/../../../build/lib/,
+				);
+				"OTHER_LDFLAGS[arch=*]" = (
+					"-lGLV",
+					"-lvsr",
+					"-lalloGLV",
+					"-lapr-1",
+					"-laprutil-1",
+					"-lfreeimage",
+					"-lassimp",
+					"-lfreetype",
+					"-L/usr/X11/lib/",
+					"-framework",
+					AudioUnit,
+					"-framework",
+					AudioToolbox,
+					"-framework",
+					CoreAudio,
+					"-framework",
+					CoreMidi,
+					"-framework",
+					Carbon,
+					"-lportaudio",
+					"-framework",
+					AGL,
+					"-framework",
+					OpenGL,
+					"-framework",
+					GLUT,
+					"-lpthread",
+					"-framework",
+					Cocoa,
+					"-framework",
+					Foundation,
+					"-lallocore",
+				);
+				PRODUCT_NAME = hopf;
+				USER_HEADER_SEARCH_PATHS = "$SRCROOT/../../ $SRCROOT/../../../build/include/vsr/ $SRCROOT/../../../build/include/ $SRCROOT/../../../build/include/vsr/Elements/";
+			};
+			name = Release;
+		};
+		9BD11CB0166E800D00832FA5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					$SRCROOT/../../../build/lib/,
+				);
+				OTHER_LDFLAGS = (
+					"-lGLV",
+					"-lvsr",
+					"-lalloGLV",
+					"-lapr-1",
+					"-laprutil-1",
+					"-lfreeimage",
+					"-lassimp",
+					"-lfreetype",
+					"-L/usr/X11/lib/",
+					"-framework",
+					AudioUnit,
+					"-framework",
+					AudioToolbox,
+					"-framework",
+					CoreAudio,
+					"-framework",
+					CoreMidi,
+					"-framework",
+					Carbon,
+					"-lportaudio",
+					"-framework",
+					AGL,
+					"-framework",
+					OpenGL,
+					"-framework",
+					GLUT,
+					"-lpthread",
+					"-framework",
+					Cocoa,
+					"-framework",
+					Foundation,
+					"-lallocore",
+				);
+				PRODUCT_NAME = empty;
+				USER_HEADER_SEARCH_PATHS = "$SRCROOT/../../ $SRCROOT/../../../build/include/vsr/ $SRCROOT/../../../build/include/ $SRCROOT/../../../build/include/vsr/Elements/";
+			};
+			name = Debug;
+		};
+		9BD11CB1166E800D00832FA5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					$SRCROOT/../../../build/lib/,
+				);
+				"OTHER_LDFLAGS[arch=*]" = (
+					"-lGLV",
+					"-lvsr",
+					"-lalloGLV",
+					"-lapr-1",
+					"-laprutil-1",
+					"-lfreeimage",
+					"-lassimp",
+					"-lfreetype",
+					"-L/usr/X11/lib/",
+					"-framework",
+					AudioUnit,
+					"-framework",
+					AudioToolbox,
+					"-framework",
+					CoreAudio,
+					"-framework",
+					CoreMidi,
+					"-framework",
+					Carbon,
+					"-lportaudio",
+					"-framework",
+					AGL,
+					"-framework",
+					OpenGL,
+					"-framework",
+					GLUT,
+					"-lpthread",
+					"-framework",
+					Cocoa,
+					"-framework",
+					Foundation,
+					"-lallocore",
+				);
+				PRODUCT_NAME = empty;
+				USER_HEADER_SEARCH_PATHS = "$SRCROOT/../../ $SRCROOT/../../../build/include/vsr/ $SRCROOT/../../../build/include/ $SRCROOT/../../../build/include/vsr/Elements/";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		9B265FE3166D4289005D9135 /* Build configuration list for PBXNativeTarget "robot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9B265FE4166D4289005D9135 /* Debug */,
+				9B265FE5166D4289005D9135 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		9B39FACE165C2AA200C3776D /* Build configuration list for PBXProject "allovsr" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -259,6 +798,33 @@
 			buildConfigurations = (
 				9B39FADF165C2AA200C3776D /* Debug */,
 				9B39FAE0165C2AA200C3776D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9B44DF52166D8955007F1070 /* Build configuration list for PBXNativeTarget "twists" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9B44DF53166D8955007F1070 /* Debug */,
+				9B44DF54166D8955007F1070 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9BC0A7751666B68F006F7FE8 /* Build configuration list for PBXNativeTarget "hopf" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9BC0A7761666B68F006F7FE8 /* Debug */,
+				9BC0A7771666B68F006F7FE8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9BD11CAF166E800D00832FA5 /* Build configuration list for PBXNativeTarget "empty" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9BD11CB0166E800D00832FA5 /* Debug */,
+				9BD11CB1166E800D00832FA5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
