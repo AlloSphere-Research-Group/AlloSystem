@@ -781,6 +781,7 @@ void OmniStereo::onDestroy() {
 
 void OmniStereo::capture(OmniStereo::Drawable& drawable, const Lens& lens, const Pose& pose) {
 	if (mCubeProgram.id() == 0) onCreate();
+	gl.error("OmniStereo capture begin");
 	
 	Vec3d pos = pose.pos();
 	Vec3d ux, uy, uz; 
@@ -820,6 +821,7 @@ void OmniStereo::capture(OmniStereo::Drawable& drawable, const Lens& lens, const
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glPopAttrib();
 	gl.popMatrix(gl.MODELVIEW);
+	gl.error("OmniStereo capture end");
 	
 	// FBOs don't generate mipmaps by default; do it here:
 	if (mMipmap) {
@@ -839,6 +841,7 @@ void OmniStereo::capture(OmniStereo::Drawable& drawable, const Lens& lens, const
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 		glDisable(GL_TEXTURE_CUBE_MAP);
 	}
+	gl.error("OmniStereo FBO mipmap end");
 }	
 
 void OmniStereo::drawEye(double eye) {
@@ -849,6 +852,8 @@ void OmniStereo::drawEye(double eye) {
 void OmniStereo::draw(const Lens& lens, const Pose& pose, const Viewport& vp) {
 	mFrame++;
 	if (mCubeProgram.id() == 0) onCreate();
+	
+	gl.error("OmniStereo draw begin");
 	
 	// TODO: which loop is more expensive?
 	// which GL state changes are more expensive?
@@ -922,6 +927,7 @@ void OmniStereo::draw(const Lens& lens, const Pose& pose, const Viewport& vp) {
 		mCubeProgram.end();
 		
 	}
+	gl.error("OmniStereo end begin");
 }
 
 void OmniStereo::drawQuadEye(double eye) {
