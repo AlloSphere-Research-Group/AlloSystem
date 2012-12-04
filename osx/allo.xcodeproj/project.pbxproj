@@ -6,41 +6,7 @@
 	objectVersion = 44;
 	objects = {
 
-/* Begin PBXAggregateTarget section */
-		36035DB813037E8D001E9BA9 /* make allocore */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = 36035DC713037EB7001E9BA9 /* Build configuration list for PBXAggregateTarget "make allocore" */;
-			buildPhases = (
-				36035DB713037E8D001E9BA9 /* ShellScript */,
-			);
-			dependencies = (
-			);
-			name = "make allocore";
-			productName = "make allocore";
-		};
-/* End PBXAggregateTarget section */
-
-/* Begin PBXBuildFile section */
-		360BCBBE15BB6D59008921E9 /* fluid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 361882B515B936340009AD7E /* fluid.cpp */; };
-		360BCBBF15BB6D5E008921E9 /* liballocore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3618842A15B936340009AD7E /* liballocore.a */; };
-		360BCBC015BB6D5E008921E9 /* liballoutil.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3618842B15B936340009AD7E /* liballoutil.a */; };
-		360BCBC215BB6D70008921E9 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 360BCBC115BB6D70008921E9 /* Cocoa.framework */; };
-		360BCBC415BB6D70008921E9 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 360BCBC315BB6D70008921E9 /* GLUT.framework */; };
-		360BCBC615BB6D70008921E9 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 360BCBC515BB6D70008921E9 /* OpenGL.framework */; };
-/* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		360BCBBC15BB6D4F008921E9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 08FB7793FE84155DC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 36035DB813037E8D001E9BA9;
-			remoteInfo = "make allocore";
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXFileReference section */
-		360BCBB815BB6D4A008921E9 /* fluid */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = fluid; sourceTree = BUILT_PRODUCTS_DIR; };
 		360BCBC115BB6D70008921E9 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		360BCBC315BB6D70008921E9 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
 		360BCBC515BB6D70008921E9 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
@@ -2899,54 +2865,12 @@
 		36188D6015B936360009AD7E /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = README.md; path = ../README.md; sourceTree = SOURCE_ROOT; };
 		36E9C8791666AC0700925E1F /* al_OmniStereo.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OmniStereo.hpp; sourceTree = "<group>"; };
 		36E9C87A1666AC1600925E1F /* al_OmniStereo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_OmniStereo.cpp; sourceTree = "<group>"; };
-		36E9C8961666B55200925E1F /* config */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = config; sourceTree = "<group>"; };
-		36E9C8971666B55200925E1F /* description */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = description; sourceTree = "<group>"; };
-		36E9C8981666B55200925E1F /* HEAD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = HEAD; sourceTree = "<group>"; };
-		36E9C89A1666B55200925E1F /* applypatch-msg.sample */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "applypatch-msg.sample"; sourceTree = "<group>"; };
-		36E9C89B1666B55200925E1F /* commit-msg.sample */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "commit-msg.sample"; sourceTree = "<group>"; };
-		36E9C89C1666B55200925E1F /* post-commit.sample */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "post-commit.sample"; sourceTree = "<group>"; };
-		36E9C89D1666B55200925E1F /* post-receive.sample */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "post-receive.sample"; sourceTree = "<group>"; };
-		36E9C89E1666B55200925E1F /* post-update.sample */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "post-update.sample"; sourceTree = "<group>"; };
-		36E9C89F1666B55200925E1F /* pre-applypatch.sample */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "pre-applypatch.sample"; sourceTree = "<group>"; };
-		36E9C8A01666B55200925E1F /* pre-commit.sample */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "pre-commit.sample"; sourceTree = "<group>"; };
-		36E9C8A11666B55200925E1F /* pre-rebase.sample */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "pre-rebase.sample"; sourceTree = "<group>"; };
-		36E9C8A21666B55200925E1F /* prepare-commit-msg.sample */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = "prepare-commit-msg.sample"; sourceTree = "<group>"; };
-		36E9C8A31666B55200925E1F /* update.sample */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = update.sample; sourceTree = "<group>"; };
-		36E9C8A41666B55200925E1F /* index */ = {isa = PBXFileReference; lastKnownFileType = file; path = index; sourceTree = "<group>"; };
-		36E9C8A61666B55200925E1F /* exclude */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = exclude; sourceTree = "<group>"; };
-		36E9C8A81666B55200925E1F /* HEAD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = HEAD; sourceTree = "<group>"; };
-		36E9C8AB1666B55200925E1F /* master */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = master; sourceTree = "<group>"; };
-		36E9C8AF1666B55200925E1F /* pack-486b8b166cbe09f042821ed5a8062d64b0501c57.idx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "pack-486b8b166cbe09f042821ed5a8062d64b0501c57.idx"; sourceTree = "<group>"; };
-		36E9C8B01666B55300925E1F /* pack-486b8b166cbe09f042821ed5a8062d64b0501c57.pack */ = {isa = PBXFileReference; lastKnownFileType = file; path = "pack-486b8b166cbe09f042821ed5a8062d64b0501c57.pack"; sourceTree = "<group>"; };
-		36E9C8B11666B55300925E1F /* packed-refs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "packed-refs"; sourceTree = "<group>"; };
-		36E9C8B41666B55300925E1F /* master */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = master; sourceTree = "<group>"; };
-		36E9C8B71666B55300925E1F /* HEAD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = HEAD; sourceTree = "<group>"; };
-		36E9C8B91666B55300925E1F /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
-		36E9C8BA1666B55300925E1F /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
-		36E9C8BB1666B57200925E1F /* al_OmniApp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_OmniApp.hpp; sourceTree = "<group>"; };
-		36E9C8BC1666B57A00925E1F /* omni.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = omni.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFrameworksBuildPhase section */
-		360BCBB615BB6D4A008921E9 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				360BCBBF15BB6D5E008921E9 /* liballocore.a in Frameworks */,
-				360BCBC015BB6D5E008921E9 /* liballoutil.a in Frameworks */,
-				360BCBC215BB6D70008921E9 /* Cocoa.framework in Frameworks */,
-				360BCBC415BB6D70008921E9 /* GLUT.framework in Frameworks */,
-				360BCBC615BB6D70008921E9 /* OpenGL.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		08FB7794FE84155DC02AAC07 /* alscheduling */ = {
 			isa = PBXGroup;
 			children = (
-				36E9C8931666B55200925E1F /* omni */,
 				361881BB15B936330009AD7E /* allocore */,
 				3618836415B936340009AD7E /* allocv */,
 				3618836715B936340009AD7E /* alloglv */,
@@ -2972,7 +2896,6 @@
 		1AB674ADFE9D54B511CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				360BCBB815BB6D4A008921E9 /* fluid */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -6777,181 +6700,7 @@
 			path = lib32;
 			sourceTree = "<group>";
 		};
-		36E9C8931666B55200925E1F /* omni */ = {
-			isa = PBXGroup;
-			children = (
-				36E9C8941666B55200925E1F /* .git */,
-				36E9C8B91666B55300925E1F /* .gitignore */,
-				36E9C8BA1666B55300925E1F /* README.md */,
-				36E9C8BB1666B57200925E1F /* al_OmniApp.hpp */,
-				36E9C8BC1666B57A00925E1F /* omni.cpp */,
-			);
-			name = omni;
-			path = ../examples/omni;
-			sourceTree = SOURCE_ROOT;
-		};
-		36E9C8941666B55200925E1F /* .git */ = {
-			isa = PBXGroup;
-			children = (
-				36E9C8951666B55200925E1F /* branches */,
-				36E9C8961666B55200925E1F /* config */,
-				36E9C8971666B55200925E1F /* description */,
-				36E9C8981666B55200925E1F /* HEAD */,
-				36E9C8991666B55200925E1F /* hooks */,
-				36E9C8A41666B55200925E1F /* index */,
-				36E9C8A51666B55200925E1F /* info */,
-				36E9C8A71666B55200925E1F /* logs */,
-				36E9C8AC1666B55200925E1F /* objects */,
-				36E9C8B11666B55300925E1F /* packed-refs */,
-				36E9C8B21666B55300925E1F /* refs */,
-			);
-			path = .git;
-			sourceTree = "<group>";
-		};
-		36E9C8951666B55200925E1F /* branches */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = branches;
-			sourceTree = "<group>";
-		};
-		36E9C8991666B55200925E1F /* hooks */ = {
-			isa = PBXGroup;
-			children = (
-				36E9C89A1666B55200925E1F /* applypatch-msg.sample */,
-				36E9C89B1666B55200925E1F /* commit-msg.sample */,
-				36E9C89C1666B55200925E1F /* post-commit.sample */,
-				36E9C89D1666B55200925E1F /* post-receive.sample */,
-				36E9C89E1666B55200925E1F /* post-update.sample */,
-				36E9C89F1666B55200925E1F /* pre-applypatch.sample */,
-				36E9C8A01666B55200925E1F /* pre-commit.sample */,
-				36E9C8A11666B55200925E1F /* pre-rebase.sample */,
-				36E9C8A21666B55200925E1F /* prepare-commit-msg.sample */,
-				36E9C8A31666B55200925E1F /* update.sample */,
-			);
-			path = hooks;
-			sourceTree = "<group>";
-		};
-		36E9C8A51666B55200925E1F /* info */ = {
-			isa = PBXGroup;
-			children = (
-				36E9C8A61666B55200925E1F /* exclude */,
-			);
-			path = info;
-			sourceTree = "<group>";
-		};
-		36E9C8A71666B55200925E1F /* logs */ = {
-			isa = PBXGroup;
-			children = (
-				36E9C8A81666B55200925E1F /* HEAD */,
-				36E9C8A91666B55200925E1F /* refs */,
-			);
-			path = logs;
-			sourceTree = "<group>";
-		};
-		36E9C8A91666B55200925E1F /* refs */ = {
-			isa = PBXGroup;
-			children = (
-				36E9C8AA1666B55200925E1F /* heads */,
-			);
-			path = refs;
-			sourceTree = "<group>";
-		};
-		36E9C8AA1666B55200925E1F /* heads */ = {
-			isa = PBXGroup;
-			children = (
-				36E9C8AB1666B55200925E1F /* master */,
-			);
-			path = heads;
-			sourceTree = "<group>";
-		};
-		36E9C8AC1666B55200925E1F /* objects */ = {
-			isa = PBXGroup;
-			children = (
-				36E9C8AD1666B55200925E1F /* info */,
-				36E9C8AE1666B55200925E1F /* pack */,
-			);
-			path = objects;
-			sourceTree = "<group>";
-		};
-		36E9C8AD1666B55200925E1F /* info */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = info;
-			sourceTree = "<group>";
-		};
-		36E9C8AE1666B55200925E1F /* pack */ = {
-			isa = PBXGroup;
-			children = (
-				36E9C8AF1666B55200925E1F /* pack-486b8b166cbe09f042821ed5a8062d64b0501c57.idx */,
-				36E9C8B01666B55300925E1F /* pack-486b8b166cbe09f042821ed5a8062d64b0501c57.pack */,
-			);
-			path = pack;
-			sourceTree = "<group>";
-		};
-		36E9C8B21666B55300925E1F /* refs */ = {
-			isa = PBXGroup;
-			children = (
-				36E9C8B31666B55300925E1F /* heads */,
-				36E9C8B51666B55300925E1F /* remotes */,
-				36E9C8B81666B55300925E1F /* tags */,
-			);
-			path = refs;
-			sourceTree = "<group>";
-		};
-		36E9C8B31666B55300925E1F /* heads */ = {
-			isa = PBXGroup;
-			children = (
-				36E9C8B41666B55300925E1F /* master */,
-			);
-			path = heads;
-			sourceTree = "<group>";
-		};
-		36E9C8B51666B55300925E1F /* remotes */ = {
-			isa = PBXGroup;
-			children = (
-				36E9C8B61666B55300925E1F /* origin */,
-			);
-			path = remotes;
-			sourceTree = "<group>";
-		};
-		36E9C8B61666B55300925E1F /* origin */ = {
-			isa = PBXGroup;
-			children = (
-				36E9C8B71666B55300925E1F /* HEAD */,
-			);
-			path = origin;
-			sourceTree = "<group>";
-		};
-		36E9C8B81666B55300925E1F /* tags */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = tags;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
-
-/* Begin PBXNativeTarget section */
-		360BCBB715BB6D4A008921E9 /* fluid */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 360BCBCD15BB6D71008921E9 /* Build configuration list for PBXNativeTarget "fluid" */;
-			buildPhases = (
-				360BCBB515BB6D4A008921E9 /* Sources */,
-				360BCBB615BB6D4A008921E9 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				360BCBBD15BB6D4F008921E9 /* PBXTargetDependency */,
-			);
-			name = fluid;
-			productName = fluid;
-			productReference = 360BCBB815BB6D4A008921E9 /* fluid */;
-			productType = "com.apple.product-type.tool";
-		};
-/* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
@@ -6976,46 +6725,9 @@
 			);
 			projectRoot = "";
 			targets = (
-				36035DB813037E8D001E9BA9 /* make allocore */,
-				360BCBB715BB6D4A008921E9 /* fluid */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		36035DB713037E8D001E9BA9 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cd ../\nmake allocore -j4\nmake alloutil -j4\n";
-		};
-/* End PBXShellScriptBuildPhase section */
-
-/* Begin PBXSourcesBuildPhase section */
-		360BCBB515BB6D4A008921E9 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				360BCBBE15BB6D59008921E9 /* fluid.cpp in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		360BCBBD15BB6D4F008921E9 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 36035DB813037E8D001E9BA9 /* make allocore */;
-			targetProxy = 360BCBBC15BB6D4F008921E9 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		1DEB923608733DC60010E9CD /* Debug */ = {
@@ -7131,65 +6843,6 @@
 			};
 			name = Release;
 		};
-		36035DB913037E8E001E9BA9 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				PRODUCT_NAME = "make allocore";
-			};
-			name = Debug;
-		};
-		36035DBA13037E8E001E9BA9 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				PRODUCT_NAME = "make allocore";
-				ZERO_LINK = NO;
-			};
-			name = Release;
-		};
-		360BCBBA15BB6D4B008921E9 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../build/lib\"",
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = fluid;
-			};
-			name = Debug;
-		};
-		360BCBBB15BB6D4B008921E9 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_MODEL_TUNING = G5;
-				INSTALL_PATH = /usr/local/bin;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../build/lib\"",
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = fluid;
-				ZERO_LINK = NO;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -7198,24 +6851,6 @@
 			buildConfigurations = (
 				1DEB923608733DC60010E9CD /* Debug */,
 				1DEB923708733DC60010E9CD /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		36035DC713037EB7001E9BA9 /* Build configuration list for PBXAggregateTarget "make allocore" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				36035DB913037E8E001E9BA9 /* Debug */,
-				36035DBA13037E8E001E9BA9 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		360BCBCD15BB6D71008921E9 /* Build configuration list for PBXNativeTarget "fluid" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				360BCBBA15BB6D4B008921E9 /* Debug */,
-				360BCBBB15BB6D4B008921E9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
