@@ -159,9 +159,9 @@ static const char * fSphere = AL_STRINGIFY(
 		vec3 rd = quat_rotate(quat, v);
 
 		// derive new texture coordinates from polar direction:
-		float elevation = acos(rd.y) * one_over_pi;
-		float azimuth = -atan(rd.z, rd.x) * one_over_pi;
-		azimuth = (azimuth + 1.)*0.5;	// scale from -1,1 to 0,1
+		float elevation = acos(-rd.y) * one_over_pi;
+		float azimuth = atan(-rd.x, -rd.z) * one_over_pi;
+		azimuth = (1. - azimuth)*0.5;	// scale from -1,1 to 1,0
 		vec2 sphereT = vec2(azimuth, elevation);
 		
 		// read maps:
