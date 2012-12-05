@@ -90,6 +90,11 @@ public:
 		void readBlend(std::string path);
 		void readWarp(std::string path);
 		
+		Texture& blend() { return mBlend; }
+		Texture& warp() { return mWarp; }
+		Viewport& viewport() { return mViewport; }
+		
+	protected:	
 		Texture mBlend, mWarp;
 		Viewport mViewport;
 	};
@@ -177,6 +182,10 @@ public:
 	// get/set the background color
 	Color& clearColor() { return mClearColor; }
 	
+	// get individual projector configurations:
+	Projection& projection(int i) { return mProjections[i]; }
+	int numProjections() const { return mNumProjections; }
+	
 	// useful accessors:
 	GLuint texture() const { return mTex[0]; }
 	GLuint textureLeft() const { return mTex[0]; }
@@ -202,16 +211,14 @@ public:
 	void drawSphereMap(Texture& map, const Lens& lens, const Pose& pose, const Viewport& vp);
 	void drawDemo(const Lens& lens, const Pose& pose, const Viewport& vp);
 	
-	Projection& projection(int i) { return mProjections[i]; }
-	
 protected:
 	// supports up to 4 warps/viewports
 	Projection mProjections[4];
 	
-	typedef void (OmniStereo::*DrawMethod)(double eye);
-	void drawEye(double eye);
-	void drawQuadEye(double eye);
-	void drawDemoEye(double eye);
+	typedef void (OmniStereo::*DrawMethod)(const Pose& pose, double eye);
+	void drawEye(const Pose& pose, double eye);
+	void drawQuadEye(const Pose& pose, double eye);
+	void drawDemoEye(const Pose& pose, double eye);
 	
 	template<DrawMethod F>
 	void drawStereo(const Lens& lens, const Pose& pose, const Viewport& viewport);
@@ -261,20 +268,20 @@ inline void OmniStereo::drawStereo(const Lens& lens, const Pose& pose, const Vie
 	switch (mMode) {
 		case SEQUENTIAL:
 			if (mFrame & 1) {
-				(this->*F)(eye);
+				(this->*F)(pose, eye);
 			} else {
-				(this->*F)(-eye);
+				(this->*F)(pose, -eye);
 			}
 			break;
 			
 		case ACTIVE:
 			glDrawBuffer(GL_BACK_RIGHT);
 			gl.error("OmniStereo drawStereo GL_BACK_RIGHT");
-			(this->*F)(eye);
+			(this->*F)(pose, eye);
 			
 			glDrawBuffer(GL_BACK_LEFT);
 			gl.error("OmniStereo drawStereo GL_BACK_LEFT");
-			(this->*F)(-eye);
+			(this->*F)(pose, -eye);
 			
 			glDrawBuffer(GL_BACK);
 			gl.error("OmniStereo drawStereo GL_BACK");
@@ -282,9 +289,9 @@ inline void OmniStereo::drawStereo(const Lens& lens, const Pose& pose, const Vie
 		
 		case DUAL:
 			gl.viewport(vp.l + vp.w*0.5, vp.b, vp.w*0.5, vp.h);
-			(this->*F)(eye);
+			(this->*F)(pose, eye);
 			gl.viewport(vp.l, vp.b, vp.w*0.5, vp.h);
-			(this->*F)(-eye);
+			(this->*F)(pose, -eye);
 			break;
 			
 		case ANAGLYPH:
@@ -297,7 +304,7 @@ inline void OmniStereo::drawStereo(const Lens& lens, const Pose& pose, const Vie
 				case CYAN_RED:	glColorMask(GL_FALSE,GL_TRUE, GL_TRUE, GL_TRUE); break;
 				default:		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE ,GL_TRUE);
 			} 
-			(this->*F)(eye);
+			(this->*F)(pose, eye);
 			
 			switch(mAnaglyphMode){
 				case RED_BLUE:	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE, GL_TRUE); break;
@@ -312,21 +319,21 @@ inline void OmniStereo::drawStereo(const Lens& lens, const Pose& pose, const Vie
 			gl.depthMask(1);
 			gl.depthTesting(1);
 			gl.clear(gl.DEPTH_BUFFER_BIT);
-			(this->*F)(-eye);
+			(this->*F)(pose, -eye);
 			
 			break;
 		
 		case RIGHT_EYE:
-			(this->*F)(eye);
+			(this->*F)(pose, eye);
 			break;
 		
 		case LEFT_EYE:
-			(this->*F)(-eye);
+			(this->*F)(pose, -eye);
 			break;
 			
 		case MONO:
 		default:
-			(this->*F)(0);
+			(this->*F)(pose, 0);
 			break;
 	}
 }
