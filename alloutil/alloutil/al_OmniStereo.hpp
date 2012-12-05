@@ -168,6 +168,12 @@ public:
 	OmniStereo& mode(StereoMode m) { mMode = m; return *this; }
 	StereoMode mode() { return mMode; }
 	
+	// returns true if configured for active stereo:
+	bool activeStereo() { return mMode == ACTIVE; }
+	
+	// returns true if config file suggested fullscreen by default
+	bool fullScreen() { return mFullScreen; }
+	
 	// get/set the background color
 	Color& clearColor() { return mClearColor; }
 	
@@ -235,7 +241,7 @@ protected:
 	StereoMode mMode;
 	AnaglyphMode mAnaglyphMode;
 	
-	bool mStereo, mMipmap;	
+	bool mStereo, mMipmap, mFullScreen;	
 }; 	
 
 /* inline implementation */

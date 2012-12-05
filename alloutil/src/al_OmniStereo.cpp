@@ -471,7 +471,8 @@ OmniStereo::OmniStereo(unsigned resolution, bool useMipMaps)
 	mMode(MONO),
 	mStereo(0),
 	mAnaglyphMode(RED_CYAN),
-	mMipmap(useMipMaps)
+	mMipmap(useMipMaps),
+	mFullScreen(false)
 {
 	mFbo = mRbo = 0;
 	mTex[0] = mTex[1] = 0;
@@ -555,7 +556,28 @@ OmniStereo& OmniStereo::configure(std::string configpath, std::string configname
 	}
 	int projections = L.top();
 	
-	mNumProjections = lua_objlen(L, -1);
+	// set active stereo
+	lua_getfield(L, projections, "active");
+	if (lua_toboolean(L, -1)) {
+		mMode = ACTIVE;
+	}
+	L.pop(); //active
+	
+	// set fullscreen by default mode?
+	lua_getfield(L, projections, "fullscreen");
+	if (lua_toboolean(L, -1)) {
+		mFullScreen = true;
+	}
+	L.pop(); // fullscreen
+	
+	// set resolution?
+	lua_getfield(L, projections, "resolution");
+	if (lua_isnumber(L, -1)) {
+		resolution(lua_tonumber(L, -1));
+	}
+	L.pop(); // resolution
+	
+	mNumProjections = lua_objlen(L, projections);
 	printf("found %d viewports\n", mNumProjections);
 	
 	for (unsigned i=0; i<mNumProjections; i++) {
