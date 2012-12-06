@@ -1,4 +1,4 @@
-#include "al_OmniApp.hpp"
+#include "alloutil/al_OmniApp.hpp"
 using namespace al;
 
 struct MyApp : OmniApp {
