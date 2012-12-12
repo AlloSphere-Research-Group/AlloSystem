@@ -7,8 +7,13 @@
 #include "alloutil/al_FPS.hpp"
 #include "alloutil/al_OmniStereo.hpp"
 
-#define DEVICE_SERVER_RECEIVE_PORT 12000
-#define DEVICE_SERVER_SEND_PORT (DEVICE_SERVER_RECEIVE_PORT+1)
+#define PORT_FROM_DEVICE_SERVER (12000)
+#define PORT_TO_DEVICE_SERVER (PORT_FROM_DEVICE_SERVER+1)
+
+// deprecated, do not use:
+#define DEVICE_SERVER_SEND_PORT (PORT_FROM_DEVICE_SERVER)
+#define DEVICE_SERVER_RECEIVE_PORT (PORT_TO_DEVICE_SERVER)
+
 #define DEVICE_SERVER_IP_ADDRESS "BOSSANOVA"
 
 namespace al {
@@ -99,8 +104,8 @@ protected:
 
 inline OmniApp::OmniApp(std::string name)
 :	mNavControl(mNav),
-	mOSCRecv(DEVICE_SERVER_SEND_PORT),
-	mOSCSend(DEVICE_SERVER_RECEIVE_PORT, DEVICE_SERVER_IP_ADDRESS) {
+	mOSCRecv(PORT_FROM_DEVICE_SERVER),
+	mOSCSend(PORT_TO_DEVICE_SERVER, DEVICE_SERVER_IP_ADDRESS) {
 	mHostName = Socket::hostName();
 	mName = name;
 	
