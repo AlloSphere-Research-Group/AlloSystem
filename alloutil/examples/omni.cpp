@@ -37,6 +37,9 @@ struct MyApp : OmniApp {
     }
   }
 
+  virtual void onMessage(osc::Message& m) {
+  }
+
   virtual bool onKeyDown(const Keyboard& k){
     return true;
   }
