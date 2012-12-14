@@ -160,6 +160,8 @@ inline void OmniApp::initAudio(
 ) {
 	AudioDevice indev(devicename, AudioDevice::INPUT);
 	AudioDevice outdev(devicename, AudioDevice::OUTPUT);
+  indev.print();
+  outdev.print();
   mAudioIO.deviceIn(indev);
   mAudioIO.deviceOut(outdev);
 	mAudioIO.channelsOut(audioOutputs);
