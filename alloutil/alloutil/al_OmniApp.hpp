@@ -58,7 +58,7 @@ public:
 	void initAudio(
 		std::string devicename, 
     double audioRate, int audioBlockSize,
-		int audioOutputs, int audioInputs
+		int audioInputs, int audioOutputs
 	);
 	void initOmni(std::string path = "/home/sphere/code/allosphere/calibration-current/");
 	
@@ -151,7 +151,7 @@ inline void OmniApp::initAudio(
 inline void OmniApp::initAudio( 
   std::string devicename,
 	double audioRate, int audioBlockSize,
-	int audioOutputs, int audioInputs
+	int audioInputs, int audioOutputs
 ) {
 	AudioDevice indev(devicename, AudioDevice::INPUT);
 	AudioDevice outdev(devicename, AudioDevice::OUTPUT);
