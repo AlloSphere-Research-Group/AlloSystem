@@ -516,6 +516,30 @@ public:
 			l.mDecoder.decode(outs, l.ambiChans(), numFrames);
 		}
 	}
+	
+	/// Copy the encoded channels directly to the output channels:
+	
+	/// @param[out] outs		1D array of output (non-interleaved)
+	/// @param[in ] numOuts		number of channels in the outs array
+	/// @param[in ] numFrames	number of frames per channel buffer
+	void copyAmbiChannels(float * outs, const int& numOuts, const int& numFrames) const {
+		unsigned limit = al::min(numOuts, mEncoder.channels());
+		unsigned frames = al::min(numFrames, mNumFrames);
+		
+		// for each listener
+		for(unsigned il=0; il<mListeners.size(); ++il){
+			Listener& l = *mListeners[il];
+			// for each channel:
+			for (unsigned c=0; c<limit; c++) {
+				// copy the ambi channel into the output channel:
+				float * out = outs + c;
+				float * in = l.ambiChans(c);
+				for (unsigned i=0; i<frames; i++) {
+					*out++ += *in++;
+				}
+			}
+		}
+	}
 
 protected:
 
