@@ -509,20 +509,20 @@ OmniStereo& OmniStereo::configure(WarpMode wm, float a, float f) {
 		case FISHEYE:
 			fovy = f;
 			aspect = a;
-			p.mWarp.array().fill(fillFishEye);
-			p.mWarp.dirty();
+			p.warp().array().fill(fillFishEye);
+			p.warp().dirty();
 			break;
 		case CYLINDER:
 			fovy = f / M_PI;
 			aspect = a;
-			p.mWarp.array().fill(fillCylinder);
-			p.mWarp.dirty();
+			p.warp().array().fill(fillCylinder);
+			p.warp().dirty();
 			break;
 		default:
 			fovy = f / 2.;
 			aspect = a;
-			p.mWarp.array().fill(fillRect);
-			p.mWarp.dirty();
+			p.warp().array().fill(fillRect);
+			p.warp().dirty();
 			break;
 	}
 	return *this;
@@ -533,14 +533,14 @@ OmniStereo& OmniStereo::configure(BlendMode bm) {
 	Projection& p = mProjections[0];
 	switch (bm) {
 		case SOFTEDGE:
-			p.mBlend.array().fill(softEdge);
-			p.mBlend.dirty();
+			p.blend().array().fill(softEdge);
+			p.blend().dirty();
 			break;
 		default:
 			// default blend of 1:	
 			uint8_t white = 255;
-			p.mBlend.array().set2d(&white);
-			p.mBlend.dirty();
+			p.blend().array().set2d(&white);
+			p.blend().dirty();
 			break;
 	}
 	return *this;
@@ -590,19 +590,19 @@ OmniStereo& OmniStereo::configure(std::string configpath, std::string configname
 		if (lua_istable(L, -1)) {
 			int viewport = L.top();
 			lua_getfield(L, viewport, "l");
-			mProjections[i].mViewport.l = L.to<float>(-1);
+			mProjections[i].viewport().l = L.to<float>(-1);
 			L.pop();
 			
 			lua_getfield(L, viewport, "b");
-			mProjections[i].mViewport.b = L.to<float>(-1);
+			mProjections[i].viewport().b = L.to<float>(-1);
 			L.pop();
 			
 			lua_getfield(L, viewport, "w");
-			mProjections[i].mViewport.w = L.to<float>(-1);
+			mProjections[i].viewport().w = L.to<float>(-1);
 			L.pop();
 			
 			lua_getfield(L, viewport, "h");
-			mProjections[i].mViewport.h = L.to<float>(-1);
+			mProjections[i].viewport().h = L.to<float>(-1);
 			L.pop();
 			
 		}
@@ -866,7 +866,7 @@ void OmniStereo::capture(OmniStereo::Drawable& drawable, const Lens& lens, const
 	gl.error("OmniStereo FBO mipmap end");
 }	
 
-void OmniStereo::drawEye(double eye) {
+void OmniStereo::drawEye(const Pose& pose, double eye) {
 	if (eye > 0.) {
 		glBindTexture(GL_TEXTURE_CUBE_MAP, mTex[1]);
 	} else {
@@ -883,14 +883,11 @@ void OmniStereo::draw(const Lens& lens, const Pose& pose, const Viewport& vp) {
 	
 	gl.error("OmniStereo draw begin");
 	
-	// TODO: which loop is more expensive?
-	// which GL state changes are more expensive?
-	for (int i=mNumProjections-1; i>=0; i--) {
-		
-		Projection& p = mProjections[i];
-		Texture& warp = p.mWarp;
-		Texture& blend = p.mBlend;
-		Viewport& v = p.mViewport;
+	gl.viewport(vp);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	for (int i=0; i<numProjections(); i++) {
+		Projection& p = projection(i);
+		Viewport& v = p.viewport();
 		Viewport viewport(
 			vp.l + v.l * vp.w,
 			vp.b + v.b * vp.h,
@@ -899,32 +896,34 @@ void OmniStereo::draw(const Lens& lens, const Pose& pose, const Viewport& vp) {
 		);
 		gl.viewport(viewport);
 		gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
-		
+		p.blend().bind(2);
+		p.warp().bind(1);
+	
 		gl.error("OmniStereo cube draw begin");
 		
 		mCubeProgram.begin();
-		blend.bind(2);
-		warp.bind(1);
 		glActiveTexture(GL_TEXTURE0);
 		glEnable(GL_TEXTURE_CUBE_MAP);	
 		
 		gl.error("OmniStereo cube drawStereo begin");
+		
 		drawStereo<&OmniStereo::drawEye>(lens, pose, viewport);		
+		
 		gl.error("OmniStereo cube drawStereo end");
 		
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 		glDisable(GL_TEXTURE_CUBE_MAP);
 		
-		blend.unbind(2);
-		warp.unbind(1);
 		mCubeProgram.end();
-		
 		gl.error("OmniStereo cube draw end");
+		
+		p.blend().unbind(2);
+		p.warp().unbind(1);
 	}
 	gl.error("OmniStereo draw end");
 }
 
-void OmniStereo::drawQuadEye(double eye) {
+void OmniStereo::drawQuadEye(const Pose& pose, double eye) {
 	gl.draw(mQuad);
 }
 
@@ -934,37 +933,38 @@ void OmniStereo::drawSphereMap(Texture& map, const Lens& lens, const Pose& pose,
 	
 	gl.viewport(vp);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	for (unsigned i=0; i<mNumProjections; i++) {
-		Projection& p = mProjections[i];
-		Texture& warp = p.mWarp;
-		Texture& blend = p.mBlend;
-		Viewport& v = p.mViewport;
-		gl.viewport(
+	for (int i=0; i<numProjections(); i++) {
+		Projection& p = projection(i);
+		Viewport& v = p.viewport();
+		Viewport viewport(
 			vp.l + v.l * vp.w,
 			vp.b + v.b * vp.h,
 			v.w * vp.w,
 			v.h * vp.h
 		);
+		gl.viewport(viewport);
 		gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
+		p.blend().bind(2);
+		p.warp().bind(1);
 		
+		map.bind(0);
 		mSphereProgram.begin();
 		mSphereProgram.uniform("quat", pose.quat());
 		
-		blend.bind(2);
-		warp.bind(1);
-		map.bind(0);
-		
 		drawQuad();
 			
-		blend.unbind(2);
-		warp.unbind(1);
-		map.unbind(0);
 		mSphereProgram.end();
+		map.unbind(0);
+		
+		p.blend().unbind(2);
+		p.warp().unbind(1);
 	}
 }
 
-void OmniStereo::drawDemoEye(double eye) {
+void OmniStereo::drawDemoEye(const Pose& pose, double eye) {
 	mDemoProgram.uniform("eyesep", eye);
+	mDemoProgram.uniform("pos", pose.pos()); 
+	mDemoProgram.uniform("quat", pose.quat());
 	gl.draw(mQuad);
 }
 
@@ -974,12 +974,9 @@ void OmniStereo::drawDemo(const Lens& lens, const Pose& pose, const Viewport& vp
 	
 	gl.viewport(vp);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	for (unsigned i=0; i<mNumProjections; i++) {
-		Projection& p = mProjections[i];
-		Texture& warp = p.mWarp;
-		Texture& blend = p.mBlend;
-		Viewport& v = p.mViewport;
-		
+	for (int i=0; i<numProjections(); i++) {
+		Projection& p = projection(i);
+		Viewport& v = p.viewport();
 		Viewport viewport(
 			vp.l + v.l * vp.w,
 			vp.b + v.b * vp.h,
@@ -988,20 +985,17 @@ void OmniStereo::drawDemo(const Lens& lens, const Pose& pose, const Viewport& vp
 		);
 		gl.viewport(viewport);
 		gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
+		p.blend().bind(2);
+		p.warp().bind(1);
 		
-		// TODO: draw according to stereo mode:
 		mDemoProgram.begin();
-		blend.bind(2);
-		warp.bind(1);
-		
-		mDemoProgram.uniform("pos", pose.pos()); 
-		mDemoProgram.uniform("quat", pose.quat());
 		
 		drawStereo<&OmniStereo::drawDemoEye>(lens, pose, viewport);	
 		
-		blend.unbind(2);
-		warp.unbind(1);
 		mDemoProgram.end();
+		
+		p.blend().unbind(2);
+		p.warp().unbind(1);
 	}
 }
 
@@ -1011,28 +1005,28 @@ void OmniStereo::drawWarp(const Viewport& vp) {
 	
 	gl.viewport(vp);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	for (unsigned i=0; i<mNumProjections; i++) {
-		Projection& p = mProjections[i];
-		Texture& warp = p.mWarp;
-		Texture& blend = p.mBlend;
-		Viewport& v = p.mViewport;
-		gl.viewport(
+	for (int i=0; i<numProjections(); i++) {
+		Projection& p = projection(i);
+		Viewport& v = p.viewport();
+		Viewport viewport(
 			vp.l + v.l * vp.w,
 			vp.b + v.b * vp.h,
 			v.w * vp.w,
 			v.h * vp.h
 		);
+		gl.viewport(viewport);
 		gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
+		p.blend().bind(2);
+		p.warp().bind(1);
 		
 		mWarpProgram.begin();
-		blend.bind(2);
-		warp.bind(1);
 		
 		drawQuad();
 		
-		blend.unbind(2);
-		warp.unbind(1);
 		mWarpProgram.end();
+		
+		p.blend().unbind(2);
+		p.warp().unbind(1);
 	}
 }
 
@@ -1042,24 +1036,26 @@ void OmniStereo::drawBlend(const Viewport& vp) {
 	
 	gl.viewport(vp);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-	for (unsigned i=0; i<mNumProjections; i++) {
-		Projection& p = mProjections[i];
-		Texture& blend = p.mBlend;
-		Viewport& v = p.mViewport;
-		gl.viewport(
+	for (int i=0; i<numProjections(); i++) {
+		Projection& p = projection(i);
+		Viewport& v = p.viewport();
+		Viewport viewport(
 			vp.l + v.l * vp.w,
 			vp.b + v.b * vp.h,
 			v.w * vp.w,
 			v.h * vp.h
 		);
+		gl.viewport(viewport);
 		gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
 		
 		gl.projection(Matrix4d::ortho(0, 1, 0, 1, -1, 1));
 		gl.modelView(Matrix4d::identity());
 		
-		blend.bind(0);
+		p.blend().bind(0);
+		
 		drawQuad();
-		blend.unbind(0);
+		
+		p.blend().unbind(0);
 	}
 }
 
