@@ -7,8 +7,8 @@
 #include "alloutil/al_FPS.hpp"
 #include "alloutil/al_OmniStereo.hpp"
 
-#define PORT_FROM_DEVICE_SERVER (12000)
-#define PORT_TO_DEVICE_SERVER (PORT_FROM_DEVICE_SERVER+1)
+#define PORT_TO_DEVICE_SERVER (12000)
+#define PORT_FROM_DEVICE_SERVER (PORT_TO_DEVICE_SERVER+1)
 
 // deprecated, do not use:
 #define DEVICE_SERVER_SEND_PORT (PORT_FROM_DEVICE_SERVER)
@@ -277,7 +277,7 @@ inline std::string	OmniApp::vertexCode() {
 
 inline std::string OmniApp::fragmentCode() {
 	return AL_STRINGIFY(
-    uniform float lighting;
+		uniform float lighting;
 		varying vec4 color;
 		varying vec3 normal, lightDir, eyeVec;
     	void main() {
