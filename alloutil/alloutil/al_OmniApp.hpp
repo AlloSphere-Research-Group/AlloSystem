@@ -61,8 +61,9 @@ public:
 	);
 	
 	void initAudio(
-		double audioRate, int audioBlockSize,
-		int audioOutputs, int audioInputs
+		std::string devicename, 
+    double audioRate, int audioBlockSize,
+		int audioInputs, int audioOutputs
 	);
 	void initOmni(std::string path = "/home/sphere/code/allosphere/calibration-current/");
 	
@@ -152,13 +153,20 @@ inline void OmniApp::initAudio(
 	mAudioIO.framesPerBuffer(audioBlockSize);
 }
 
-inline void OmniApp::initAudio(
+inline void OmniApp::initAudio( 
+  std::string devicename,
 	double audioRate, int audioBlockSize,
-	int audioOutputs, int audioInputs
+	int audioInputs, int audioOutputs
 ) {
-	initAudio(audioRate, audioBlockSize);
+	AudioDevice indev(devicename, AudioDevice::INPUT);
+	AudioDevice outdev(devicename, AudioDevice::OUTPUT);
+  indev.print();
+  outdev.print();
+  mAudioIO.deviceIn(indev);
+  mAudioIO.deviceOut(outdev);
 	mAudioIO.channelsOut(audioOutputs);
 	mAudioIO.channelsIn(audioInputs);
+  initAudio(audioRate, audioBlockSize);
 }
 
 inline void OmniApp::sendHandshake(){
