@@ -394,6 +394,52 @@ void OmniStereo::Projection::onCreate() {
 	mBlend.dirty();
 }
 
+void OmniStereo::Projection::readParameters(std::string path, bool verbose) {
+	File f(path, "rb");
+	if (!f.open()) {
+		printf("failed to open Projector configuration file %s\n", path.c_str());
+		return;
+	}
+	
+	f.read((void *)(&params), sizeof(OmniStereo::Projection::Parameters), 1);
+	f.close();
+	
+	initParameters(verbose);
+}
+
+void OmniStereo::Projection::initParameters(bool verbose) {
+	// initialize:
+	Vec3f v = params.screen_center - params.projector_position;
+	float screen_perpendicular_dist = params.normal_unit.dot(v);
+	Vec3f compensated_center = (v) / screen_perpendicular_dist + params.projector_position;
+	
+	// calculate uv parameters
+	float x_dist = params.x_vec.mag();
+	x_unit = params.x_vec / x_dist;
+	x_pixel = x_dist / params.width;
+	x_offset = x_unit.dot(compensated_center - params.projector_position);
+	
+	float y_dist = params.y_vec.mag();
+	y_unit = params.y_vec / y_dist;
+	y_pixel = y_dist / params.height;
+	y_offset = y_unit.dot(compensated_center - params.projector_position);
+	
+	if (verbose) {
+		printf("Projector %d width %d height %d\n", (int)params.projnum, (int)params.width, (int)params.height);
+		params.projector_position.print(); printf(" = projector_position\n");
+		params.screen_center.print(); printf(" = screen_center\n");
+		params.normal_unit.print(); printf(" = normal_unit\n");
+		params.x_vec.print(); printf(" = x_vec\n");
+		params.y_vec.print(); printf(" = y_vec\n");
+		x_unit.print(); printf(" = x_unit\n");
+		y_unit.print(); printf(" = y_unit\n");
+		printf("%f = screen_radius\n", params.screen_radius);
+		printf("%f = x_pixel\n", x_pixel);
+		printf("%f = y_pixel\n", y_pixel);
+
+	}
+}
+
 void OmniStereo::Projection::readBlend(std::string path) {
 	Image img(path);
 	mBlend.allocate(img.array(), true);

@@ -50,6 +50,8 @@ public:
 	osc::Recv&			oscRecv(){ return mOSCRecv; }
 	osc::Send&			oscSend(){ return mOSCSend; }
 	
+	const std::string&	hostName() const { return mHostName; }
+	
 	void initWindow(
 		const Window::Dim& dims = Window::Dim(800, 400),
 		const std::string title = "OmniApp",
@@ -160,13 +162,13 @@ inline void OmniApp::initAudio(
 ) {
 	AudioDevice indev(devicename, AudioDevice::INPUT);
 	AudioDevice outdev(devicename, AudioDevice::OUTPUT);
-  indev.print();
-  outdev.print();
-  mAudioIO.deviceIn(indev);
-  mAudioIO.deviceOut(outdev);
+	indev.print();
+	outdev.print();
+	mAudioIO.deviceIn(indev);
+	mAudioIO.deviceOut(outdev);
 	mAudioIO.channelsOut(audioOutputs);
 	mAudioIO.channelsIn(audioInputs);
-  initAudio(audioRate, audioBlockSize);
+	initAudio(audioRate, audioBlockSize);
 }
 
 inline void OmniApp::sendHandshake(){
@@ -205,9 +207,9 @@ inline bool OmniApp::onCreate() {
 	frag.printLog();
 	mShader.attach(vert).attach(frag).link();
 	mShader.printLog();
-  mShader.begin();
-  mShader.uniform("lighting", 1.0);
-  mShader.end();
+	mShader.begin();
+	mShader.uniform("lighting", 1.0);
+	mShader.end();
 	
 	return true;
 }
@@ -222,6 +224,8 @@ inline bool OmniApp::onFrame() {
 	onAnimate(dt);
 	
 	Viewport vp(width(), height());
+	
+	
 	mOmni.onFrame(*this, lens(), nav(), vp);
 	
 	return true;
@@ -293,11 +297,11 @@ inline std::string OmniApp::fragmentCode() {
 			vec3 N = normalize(normal);
 			vec3 L = lightDir;
 			float lambertTerm = max(dot(N, L), 0.0);
-      final_color += gl_LightSource[0].diffuse * color * lambertTerm;
-      vec3 E = eyeVec;
-      vec3 R = reflect(-L, N);
-      float spec = pow(max(dot(R, E), 0.0), 0.9 + 1e-20);
-      final_color += gl_LightSource[0].specular * spec;
+			final_color += gl_LightSource[0].diffuse * color * lambertTerm;
+			vec3 E = eyeVec;
+			vec3 R = reflect(-L, N);
+			float spec = pow(max(dot(R, E), 0.0), 0.9 + 1e-20);
+			final_color += gl_LightSource[0].specular * spec;
 			gl_FragColor = mix(color, final_color, lighting);
 		}
 	);

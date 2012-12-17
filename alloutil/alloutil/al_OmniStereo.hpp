@@ -82,6 +82,13 @@ public:
 	/// Encapsulate the trio of fractional viewport, warp & blend maps:
 	class Projection {
 	public:
+		struct Parameters {
+			float projnum;			// ID of the projector
+			float width, height;	// width/height in pixels
+			Vec3f projector_position, screen_center, normal_unit, x_vec, y_vec;
+			float screen_radius, bridge_radius, unused0;
+		};
+		
 		Projection();
 		
 		void onCreate();
@@ -89,12 +96,22 @@ public:
 		// load warp/blend from disk:
 		void readBlend(std::string path);
 		void readWarp(std::string path);
+		void readParameters(std::string path, bool verbose=true);
+		void initParameters(bool verbose=true);
 		
 		Texture& blend() { return mBlend; }
 		Texture& warp() { return mWarp; }
 		Viewport& viewport() { return mViewport; }
 		
 	protected:	
+		
+		Parameters params;
+		
+		// derived:
+		Vec3f x_unit, y_unit;
+		float x_pixel, y_pixel;
+		float x_offset, y_offset;
+		
 		Texture mBlend, mWarp;
 		Viewport mViewport;
 	};

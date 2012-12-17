@@ -543,7 +543,6 @@ void WarpnBlend::Projector::init() {
 	screen_center_unit = screen_center / screen_radius;
 	
 	Vec3f v = sphere_center + screen_center - projector_position;
-	
 	float screen_perpendicular_dist = normal_unit.dot(v);
 	Vec3f compensated_center = (v) / screen_perpendicular_dist + projector_position;
 	
