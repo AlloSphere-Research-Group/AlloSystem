@@ -696,6 +696,21 @@ OmniStereo& OmniStereo::configure(std::string configpath, std::string configname
 		}
 		L.pop(); // blend
 		
+		lua_getfield(L, projection, "params");
+		if (lua_istable(L, -1)) {
+			int params = L.top();
+			lua_getfield(L, params, "file");
+			if (lua_isstring(L, -1)) {
+				// load from file
+				mProjections[i].readParameters(configpath + "/" + lua_tostring(L, -1), true);
+			} else {
+				// TODO: generate blend...
+			}
+			L.pop();
+		}
+		L.pop(); // params
+
+		
 		L.pop(); // projector
 	}
 	
