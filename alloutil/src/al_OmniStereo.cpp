@@ -381,6 +381,8 @@ OmniStereo::Projection::Projection()
 		.type(Graphics::FLOAT)
 		.filterMin(Texture::LINEAR)
 		.allocate();
+		
+	t = u = v = 0;
 }
 
 void OmniStereo::Projection::onCreate() {
@@ -392,6 +394,10 @@ void OmniStereo::Projection::onCreate() {
 	mBlend.filterMin(Texture::LINEAR_MIPMAP_LINEAR);
 	mBlend.filterMag(Texture::LINEAR);
 	mBlend.dirty();
+}
+
+void OmniStereo::Projection::registrationPosition(const Vec3d& pos) {
+	
 }
 
 void OmniStereo::Projection::readParameters(std::string path, bool verbose) {
@@ -452,19 +458,23 @@ void OmniStereo::Projection::readWarp(std::string path) {
 		exit(-1);
 	}
 	
+	if (t) free(t);
+	if (u) free(u);
+	if (v) free(v);
+	
 	int32_t dim[2];
 	f.read((void *)dim, sizeof(int32_t), 2);
 	
 	int32_t w = dim[1];
 	int32_t h = dim[0]/3;
 	int32_t elems = w*h;
+	t = (float *)malloc(sizeof(float) * elems);
+	u = (float *)malloc(sizeof(float) * elems);
+	v = (float *)malloc(sizeof(float) * elems);
 	
 	int r = 0;	
-	float * t = (float *)malloc(sizeof(float) * elems);
 	r = f.read((void *)t, sizeof(float), elems);
-	float * u = (float *)malloc(sizeof(float) * elems);
 	r = f.read((void *)u, sizeof(float), elems);
-	float * v = (float *)malloc(sizeof(float) * elems);
 	r = f.read((void *)v, sizeof(float), elems);
 	f.close();
 	
@@ -474,8 +484,14 @@ void OmniStereo::Projection::readWarp(std::string path) {
 		.type(Graphics::FLOAT)
 		.filterMin(Texture::LINEAR)
 		.allocate();
-	
+		
+	updatedWarp();
+}
+
+void OmniStereo::Projection::updatedWarp() {	
 	Array& arr = mWarp.array();
+	int w = arr.width();
+	int h = arr.height();
 	for (int y=0; y<h; y++) {
 		for (int x=0; x<w; x++) {
 			// Y axis appears to be inverted
@@ -498,10 +514,6 @@ void OmniStereo::Projection::readWarp(std::string path) {
 			cell[3] = 1.;
 		}
 	}
-	
-	free(t);
-	free(u);
-	free(v);
 }	
 
 #pragma mark OmniStereo

@@ -99,11 +99,16 @@ public:
 		void readParameters(std::string path, bool verbose=true);
 		void initParameters(bool verbose=true);
 		
+		// adjust the registration position:
+		void registrationPosition(const Vec3d& pos);
+		
 		Texture& blend() { return mBlend; }
 		Texture& warp() { return mWarp; }
 		Viewport& viewport() { return mViewport; }
 		
 	protected:	
+		
+		void updatedWarp();
 		
 		Parameters params;
 		
@@ -114,6 +119,14 @@ public:
 		
 		Texture mBlend, mWarp;
 		Viewport mViewport;
+		
+		// the position/orientation of the raw map data relative to the real world
+		Pose mRegistration;
+		
+		// the raw warp data:
+		float * t;
+		float * u;
+		float * v;
 	};
 	
 	/// Stereographic mode
@@ -227,6 +240,13 @@ public:
 	void drawBlend(const Viewport& vp);
 	void drawSphereMap(Texture& map, const Lens& lens, const Pose& pose, const Viewport& vp);
 	void drawDemo(const Lens& lens, const Pose& pose, const Viewport& vp);
+	
+	// adjust the registration position:
+	void registrationPosition(const Vec3d& pos) {
+		for (int i=0; i<numProjections(); i++) {
+			projection(i).registrationPosition(pos);
+		}
+	}
 	
 protected:
 	// supports up to 4 warps/viewports
