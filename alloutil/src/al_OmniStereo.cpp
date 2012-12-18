@@ -111,8 +111,7 @@ static const char * fCube = AL_STRINGIFY(
 	
 	void main (void){
 		// ray location (calibration space):
-		// this should be already normalized in the texture
-		vec3 v = texture2D(pixelMap, T).rgb;
+		vec3 v = normalize(texture2D(pixelMap, T).rgb);
 		
 		// index into cubemap:
 		vec3 rgb = textureCube(cubeMap, v).rgb * texture2D(alphaMap, T).rgb;
@@ -152,8 +151,7 @@ static const char * fSphere = AL_STRINGIFY(
 	
 	void main (void){
 		// ray location (calibration space):
-		// this should be already normalized in the texture
-		vec3 v = texture2D(pixelMap, T).rgb;
+		vec3 v = normalize(texture2D(pixelMap, T).rgb);
 		
 		// ray direction (world space);
 		vec3 rd = quat_rotate(quat, v);
@@ -253,7 +251,7 @@ static const char * fDemo = AL_STRINGIFY(
 		vec3 ambient = vec3(0.1, 0.1, 0.1);
 
 		// pixel location (calibration space):
-		vec3 v = texture2D(pixelMap, T).rgb;
+		vec3 v = normalize(texture2D(pixelMap, T).rgb);
 		// ray direction (world space);
 		vec3 rd = quat_rotate(quat, v);
 		
@@ -507,8 +505,13 @@ void OmniStereo::Projection::updatedWarp() {
 			out.y = u[idx];
 			out.z = -t[idx];
 			
+			// TODO:
+			// out -= mRegistration.pos();
+			// // & unrotate by mRegistration.quat()
+			// do not normalize; instead capsule fit
+			
 			// normalize here so the shaders don't have to
-			out.normalize();
+			//out.normalize();
 			
 			// fourth element is currently unused:
 			cell[3] = 1.;
