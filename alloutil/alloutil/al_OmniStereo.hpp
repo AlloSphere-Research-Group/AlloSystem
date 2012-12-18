@@ -106,7 +106,6 @@ public:
 		Texture& warp() { return mWarp; }
 		Viewport& viewport() { return mViewport; }
 		
-	protected:	
 		
 		void updatedWarp();
 		
@@ -116,7 +115,8 @@ public:
 		Vec3f x_unit, y_unit;
 		float x_pixel, y_pixel;
 		float x_offset, y_offset;
-		
+	
+	protected:		
 		Texture mBlend, mWarp;
 		Viewport mViewport;
 		
