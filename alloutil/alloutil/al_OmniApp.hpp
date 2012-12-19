@@ -50,6 +50,8 @@ public:
 	osc::Recv&			oscRecv(){ return mOSCRecv; }
 	osc::Send&			oscSend(){ return mOSCSend; }
 	
+	OmniStereo&			omni() { return mOmni; }
+	
 	const std::string&	hostName() const { return mHostName; }
 	
 	void initWindow(
