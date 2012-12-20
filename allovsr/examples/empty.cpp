@@ -46,6 +46,23 @@ struct MyApp : public al::VsrApp {
     virtual void onDraw(Graphics& gl){
     
     //YOUR CODE HERE
+    
+        static Frame fa( PT(-1,0,0) );
+        static Frame fb( PT(1,0,0) );
+        DRAW(fa); DRAW(fb);
+        
+        interface.touch(fa);
+        interface.touch(fb);
+        
+        for (int i = 0; i < 1000; ++i){
+            double t= 1.0 * i/1000;
+             
+            Dll dll = fa.dll() * (1-t) + fb.dll() * t;                       
+            Frame frame(Gen::mot(dll) );//Frame::Twist( fa, fb, t );
+            
+            DRAW(frame);
+        }
+    
     }
     
     
