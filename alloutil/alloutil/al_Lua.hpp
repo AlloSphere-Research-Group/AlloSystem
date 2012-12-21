@@ -133,12 +133,12 @@ public:
 	/// function should be at stack index (top - n)
 	/// catches errors and prints a traceback to stdout
 	/// returns 0 if no errors
-	int resume(int n=0);
+	int resume(int nargs=0);
 
 	///! runs a string of code
 	/// catches errors and prints to stdout
 	/// returns 0 if no errors
-	int dostring(const std::string& code);
+	int dostring(const std::string& code, int nargs=0);
 	
 	///! runs a chunk of binary bytecode
 	int dobuffer(const char * buffer, size_t size, const char * name);
@@ -146,7 +146,7 @@ public:
 	///! loads and runs code from a file
 	/// catches errors and prints to stdout
 	/// returns 0 if no errors
-	int dofile(const std::string& path);
+	int dofile(const std::string& path, int nargs=0);
 	
 	///! loads code from a file & leaves as a function on the stack
 	/// catches errors and prints to stdout
@@ -209,6 +209,7 @@ template<> inline Lua& Lua::push(int32_t v) { lua_pushinteger(L, v); return *thi
 template<> inline Lua& Lua::push(uint64_t v) { lua_pushinteger(L, v); return *this; }
 template<> inline Lua& Lua::push(int64_t v) { lua_pushinteger(L, v); return *this; }
 template<> inline Lua& Lua::push(bool v) { lua_pushboolean(L, v); return *this; }
+template<> inline Lua& Lua::push(lua_CFunction v) { lua_pushcfunction(L, v); return *this; }
 template<> inline Lua& Lua::push(void * v) { lua_pushlightuserdata(L, v); return *this; }
 
 template<> inline std::string Lua::to(int idx) { return lua_tostring(L, idx); }
@@ -284,14 +285,12 @@ inline int Lua::pcall(int nargs, const std::string& errname) {
 		lua_insert(L, debug_idx);
 		lua_pop(L, 1); // pop debug table
 	}
-//	dump("before pcall");
+	//dump("before pcall");
 	int res = lerror(lua_pcall(L, nargs, LUA_MULTRET, -nargs-2), errname);
-//	dump("after pcall");
+	//dump("after pcall");
 	int nres = lua_gettop(L) - top;
-//	printf("nres %d %d\n", res, nres);
+	//printf("nres %d %d\n", res, nres);
 	lua_remove(L, -1 - nres); // remove debug function from stack
-	
-	
 	return res;
 }
 
@@ -299,14 +298,24 @@ inline int Lua::dobuffer(const char * buffer, size_t size, const char * name) {
 	return lerror((luaL_loadbuffer(L,(const char*)buffer,size,name) || lua_pcall(L, 0, 0, 0)));
 }
 
-inline int Lua::dostring(const std::string& code) {
-	return lerror(luaL_loadstring(L, code.c_str())) || pcall(0, code);
+inline int Lua::dostring(const std::string& code, int nargs) {
+	int err = lerror(luaL_loadstring(L, code.c_str()));
+	if (err == 0) {
+		if (nargs) lua_insert(L, top() - nargs);
+		err = lerror(pcall(nargs, code));
+	}
+	return err;
 }
 inline int Lua::loadfile(const std::string& path) {
 	return lerror(luaL_loadfile(L, path.c_str()));
 }
-inline int Lua::dofile(const std::string& path) {
-	return lerror(luaL_loadfile(L, path.c_str())) || pcall(0, path);
+inline int Lua::dofile(const std::string& path, int nargs) {
+	int err = lerror(luaL_loadfile(L, path.c_str()));
+	if (err == 0) {
+		if (nargs) lua_insert(L, top() - nargs);
+		err = lerror(pcall(nargs, path));
+	}
+	return err;
 }
 
 inline Lua& Lua::preloadlib(const std::string& name, lua_CFunction func) {

@@ -159,6 +159,8 @@ public:
 	}
 	template<typename T1>
 	static const Matrix4 scale(const Vec<3, T1>& v) { return scale(v.x, v.y, v.z); }
+	template<typename T1>
+	static const Matrix4 scale(const T1 v) { return scale(v, v, v); }
 	
 	static const Matrix4 rotateYZ(T theta) {
 		const T C = cos(theta); 

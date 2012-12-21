@@ -53,7 +53,7 @@ etc.												Addtional bundle elements
 
 */
 
-#define OSCTRY(expr) \
+#define OSCTRY(msg, expr) \
 	try { \
 		expr \
 	} catch (::osc::Exception& e) { \
@@ -74,13 +74,13 @@ public:
 Packet::Packet(int size)
 :	mData(size), mImpl(0)
 {
-	OSCTRY(mImpl = new Impl(&mData[0], size);)
+	OSCTRY("Packet::Packet", mImpl = new Impl(&mData[0], size);)
 }
 
 Packet::Packet(const char * contents, int size)
 :	mData(size), mImpl(0)
 {
-	OSCTRY(
+	OSCTRY("Packet::Packet1", 
 		memcpy(&mData[0], contents, size);
 		mImpl = new Impl(&mData[0], size);
 	)
@@ -89,57 +89,57 @@ Packet::Packet(const char * contents, int size)
 Packet::~Packet(){ delete mImpl; }
 
 Packet& Packet::operator<< (int v){ 
-	OSCTRY( (*mImpl) << (::osc::int32)v;) 
+	OSCTRY("Packet::<<int",  (*mImpl) << (::osc::int32)v;) 
 	return *this; 
 }
 Packet& Packet::operator<< (unsigned v){ 
-	OSCTRY( (*mImpl) << (::osc::int32)v;) 
+	OSCTRY("Packet::<<unsigned",  (*mImpl) << (::osc::int32)v;) 
 	return *this; 
 }
 Packet& Packet::operator<< (float v){ 
-	OSCTRY( (*mImpl) << v;) 
+	OSCTRY("Packet::<<float",  (*mImpl) << v;) 
 	return *this; 
 }
 Packet& Packet::operator<< (double v){ 
-	OSCTRY( (*mImpl) << v;) 
+	OSCTRY("Packet::<<double",  (*mImpl) << v;) 
 	return *this; 
 }
 Packet& Packet::operator<< (char v){ 
-	OSCTRY( (*mImpl) << v;) 
+	OSCTRY("Packet<<char", (*mImpl) << v;) 
 	return *this; 
 }
 Packet& Packet::operator<< (const char * v){ 
-	OSCTRY( (*mImpl) << v;) 
+	OSCTRY("Packet::<<const char *",  (*mImpl) << v;) 
 	return *this; 
 }
 Packet& Packet::operator<< (const std::string& v){ 
-	OSCTRY( (*mImpl) << v.c_str();) 
+	OSCTRY("Packet::<< string",  (*mImpl) << v.c_str();) 
 	return *this; 
 }
 Packet& Packet::operator<< (const Blob& v){ 
-	OSCTRY( (*mImpl) << ::osc::Blob(v.data, v.size);) 
+	OSCTRY("Packet::<<Blob",  (*mImpl) << ::osc::Blob(v.data, v.size);) 
 	return *this; 
 }
 
 Packet& Packet::beginMessage(const std::string& addr){
-	OSCTRY( (*mImpl) << ::osc::BeginMessage(addr.c_str());)
+	OSCTRY("Packet::beginMessage",  (*mImpl) << ::osc::BeginMessage(addr.c_str());)
 	return *this;
 }
 
 Packet& Packet::endMessage(){
-	OSCTRY( (*mImpl) << ::osc::EndMessage;) return *this;
+	OSCTRY("Packet::endMessage",   (*mImpl) << ::osc::EndMessage;) return *this;
 }
 
 Packet& Packet::beginBundle(TimeTag timeTag){
-	OSCTRY( (*mImpl) << ::osc::BeginBundle(timeTag);) return *this;
+	OSCTRY("Packet::beginBundle",  (*mImpl) << ::osc::BeginBundle(timeTag);) return *this;
 }
 
 Packet& Packet::endBundle(){
-	OSCTRY( (*mImpl) << ::osc::EndBundle;) return *this;
+	OSCTRY("Packet::endBundle",  (*mImpl) << ::osc::EndBundle;) return *this;
 }
 
 Packet& Packet::clear(){ 
-	OSCTRY(mImpl->Clear();) 
+	OSCTRY("Packet::clear", mImpl->Clear();) 
 	return *this; 
 }
 
@@ -175,7 +175,7 @@ struct Message::Impl
 	{}
 	
 	template <class T>
-	void operator>> (T& v){ OSCTRY(args>>v;) }
+	void operator>> (T& v){ OSCTRY("Message>>", args>>v;) }
 	
 	::osc::ReceivedMessageArgumentStream args;
 };
@@ -183,7 +183,7 @@ struct Message::Impl
 Message::Message(const char * message, int size, const TimeTag& timeTag)
 :	mImpl(new Impl(message, size)), mTimeTag(timeTag)
 {
-	OSCTRY(
+	OSCTRY("Message()", 
 		mAddressPattern = mImpl->AddressPattern();
 		mTypeTags = mImpl->ArgumentCount() ? mImpl->TypeTags() : "";
 		resetStream();
@@ -191,11 +191,11 @@ Message::Message(const char * message, int size, const TimeTag& timeTag)
 }
 	
 Message::~Message() {
-	OSCTRY(delete mImpl;)
+	OSCTRY("~Message()", delete mImpl;)
 }
 
 void Message::print() const {
-	OSCTRY(
+	OSCTRY("Message::print", 
 		printf("%s, %s %" AL_PRINTF_LL "d\n",
 			addressPattern().c_str(), typeTags().c_str(), timeTag());
 		
@@ -224,35 +224,35 @@ void Message::print() const {
 Message& Message::resetStream(){ mImpl->args = mImpl->ArgumentStream(); return *this; }
 Message& Message::operator>> (int& v){ 
 	::osc::int32 r; 
-	OSCTRY((*mImpl)>>r;)
+	OSCTRY("Message::resetStream", (*mImpl)>>r;)
 	v=r; 
 	return *this; 
 }
 Message& Message::operator>> (float& v){ 
-	OSCTRY((*mImpl)>>v;) 
+	OSCTRY("Message >> float", (*mImpl)>>v;) 
 	return *this; 
 }
 Message& Message::operator>> (double& v){ 
-	OSCTRY((*mImpl)>>v;) 
+	OSCTRY("Message >> double", (*mImpl)>>v;) 
 	return *this; 
 }
 Message& Message::operator>> (char& v){ 
-	OSCTRY((*mImpl)>>v;) 
+	OSCTRY("Message >> char", (*mImpl)>>v;) 
 	return *this; 
 }
 Message& Message::operator>> (const char*& v){ 
-	OSCTRY((*mImpl)>>v;)
+	OSCTRY("Message >> const char *", (*mImpl)>>v;)
 	return *this; 
 }
 Message& Message::operator>> (std::string& v){ 
 	const char * r; 
-	OSCTRY((*mImpl)>>r;) 
+	OSCTRY("Message >> string", (*mImpl)>>r;) 
 	v=r; 
 	return *this; 
 }
 Message& Message::operator>> (Blob& v){ 
 	::osc::Blob b; 
-	OSCTRY((*mImpl)>>b;) 
+	OSCTRY("Message >> Blob", (*mImpl)>>b;) 
 	v.data=b.data; 
 	v.size=b.size; 
 	return *this; 
@@ -260,7 +260,7 @@ Message& Message::operator>> (Blob& v){
 
 
 void PacketHandler::parse(const char *packet, int size, TimeTag timeTag){
-	OSCTRY(
+	OSCTRY("PacketHandler::parse", 
 	       // printf("PacketHandler::parse(size %d)\n", size);
 		//	for(int i=0; i<size; ++i) printf("%c", packet[i]); printf("\n");
 		
@@ -295,13 +295,13 @@ Send::Send(uint16_t port, const char * address, al_sec timeout)
 int Send::send(){
 	//int r = SocketSend::send(Packet::data(), Packet::size());
 	int r = send(*this);
-	OSCTRY(Packet::clear();)
+	OSCTRY("Packet::endMessage", Packet::clear();)
 	return r;
 }
 
 int Send::send(const Packet& p){
 	int r = 0;
-	OSCTRY(r = SocketSend::send(p.data(), p.size());)
+	OSCTRY("Packet::endMessage", r = SocketSend::send(p.data(), p.size());)
 	return r;
 }
 
@@ -332,7 +332,7 @@ Recv::Recv(uint16_t port, const char * address, al_sec timeout)
 int Recv::recv(){
 	int r;
 	// printf("Entering Recv::recv()\n");
-	OSCTRY(
+	OSCTRY("Packet::endMessage", 
 		r = SocketRecv::recv(&mBuffer[0], mBuffer.size());
 		if(r && mHandler){
 		  // printf("Recv:recv() Received %d bytes; parsing...\n", r);
