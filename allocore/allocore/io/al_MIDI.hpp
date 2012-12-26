@@ -96,7 +96,7 @@ public:
 		SEQ_CONTINUE	= BITS_(1,1,1,1, 1,0,1,1), ///< Continue sequence system message type
 		SEQ_STOP		= BITS_(1,1,1,1, 1,1,0,0), ///< Stop sequence system message type
 		ACTIVE_SENSING	= BITS_(1,1,1,1, 1,1,1,0), ///< Active sensing system message type
-		RESET			= BITS_(1,1,1,1, 1,1,1,1), ///< Reset all receivers system message type
+		RESET			= BITS_(1,1,1,1, 1,1,1,1) ///< Reset all receivers system message type
 	;
 	#undef BITS_
 
