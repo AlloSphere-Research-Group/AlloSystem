@@ -505,6 +505,10 @@ void OmniStereo::Projection::updatedWarp() {
 			out.y = u[idx];
 			out.z = -t[idx];
 			
+			out.x = t[idx];
+			out.y = u[idx];
+			out.z = v[idx];
+			
 			// TODO:
 			// out -= mRegistration.pos();
 			// // & unrotate by mRegistration.quat()
