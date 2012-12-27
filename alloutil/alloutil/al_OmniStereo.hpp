@@ -115,6 +115,7 @@ public:
 		Vec3f x_unit, y_unit;
 		float x_pixel, y_pixel;
 		float x_offset, y_offset;
+		Vec3d position;
 	
 	protected:		
 		Texture mBlend, mWarp;
