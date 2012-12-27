@@ -484,6 +484,8 @@ void OmniStereo::Projection::readWarp(std::string path) {
 		.allocate();
 		
 	updatedWarp();
+	
+	printf("read %s\n", path.c_str());
 }
 
 void OmniStereo::Projection::updatedWarp() {	
@@ -706,7 +708,7 @@ OmniStereo& OmniStereo::configure(std::string configpath, std::string configname
 			lua_getfield(L, params, "file");
 			if (lua_isstring(L, -1)) {
 				// load from file
-				mProjections[i].readParameters(configpath + "/" + lua_tostring(L, -1), true);
+				mProjections[i].readParameters(configpath + "/" + lua_tostring(L, -1)); //, true);
 			} else {
 				// TODO: generate blend...
 			}
