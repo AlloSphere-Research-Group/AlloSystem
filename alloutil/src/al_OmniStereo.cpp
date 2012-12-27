@@ -510,9 +510,9 @@ void OmniStereo::Projection::updatedWarp() {
 			out.y = u[idx];
 			out.z = -t[idx];
 			
-			out.x = t[idx];
-			out.y = u[idx];
-			out.z = v[idx];
+//			out.x = t[idx];
+//			out.y = u[idx];
+//			out.z = v[idx];
 			
 			// TODO:
 			// out -= mRegistration.pos();
@@ -524,6 +524,12 @@ void OmniStereo::Projection::updatedWarp() {
 			
 			// fourth element is currently unused:
 			cell[3] = 1.;
+			
+			if (y == 32 && x == 32) {
+				printf("example: %f %f %f -> %f %f %f\n", 
+					t[idx], u[idx], v[idx],
+					cell[0], cell[1], cell[2]);
+			}
 		}
 	}
 	
