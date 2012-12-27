@@ -523,6 +523,10 @@ void OmniStereo::Projection::updatedWarp() {
 			cell[3] = 1.;
 		}
 	}
+	
+	mWarp.dirty();
+	
+	printf("updated Warp\n");
 }	
 
 #pragma mark OmniStereo
