@@ -428,20 +428,20 @@ void OmniStereo::Projection::initParameters(bool verbose) {
 	y_pixel = y_dist / params.height;
 	y_offset = y_unit.dot(compensated_center - params.projector_position);
 	
-	if (verbose) {
-		printf("Projector %d width %d height %d\n", (int)params.projnum, (int)params.width, (int)params.height);
-		params.projector_position.print(); printf(" = projector_position\n");
-		params.screen_center.print(); printf(" = screen_center\n");
-		params.normal_unit.print(); printf(" = normal_unit\n");
-		params.x_vec.print(); printf(" = x_vec\n");
-		params.y_vec.print(); printf(" = y_vec\n");
-		x_unit.print(); printf(" = x_unit\n");
-		y_unit.print(); printf(" = y_unit\n");
-		printf("%f = screen_radius\n", params.screen_radius);
-		printf("%f = x_pixel\n", x_pixel);
-		printf("%f = y_pixel\n", y_pixel);
-
-	}
+//	if (verbose) {
+//		printf("Projector %d width %d height %d\n", (int)params.projnum, (int)params.width, (int)params.height);
+//		params.projector_position.print(); printf(" = projector_position\n");
+//		params.screen_center.print(); printf(" = screen_center\n");
+//		params.normal_unit.print(); printf(" = normal_unit\n");
+//		params.x_vec.print(); printf(" = x_vec\n");
+//		params.y_vec.print(); printf(" = y_vec\n");
+//		x_unit.print(); printf(" = x_unit\n");
+//		y_unit.print(); printf(" = y_unit\n");
+//		printf("%f = screen_radius\n", params.screen_radius);
+//		printf("%f = x_pixel\n", x_pixel);
+//		printf("%f = y_pixel\n", y_pixel);
+//
+//	}
 }
 
 void OmniStereo::Projection::readBlend(std::string path) {
