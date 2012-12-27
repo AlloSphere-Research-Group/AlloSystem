@@ -409,6 +409,8 @@ void OmniStereo::Projection::readParameters(std::string path, bool verbose) {
 	f.close();
 	
 	initParameters(verbose);
+	
+	printf("read %s\n", path.c_str());
 }
 
 void OmniStereo::Projection::initParameters(bool verbose) {
@@ -447,6 +449,7 @@ void OmniStereo::Projection::initParameters(bool verbose) {
 void OmniStereo::Projection::readBlend(std::string path) {
 	Image img(path);
 	mBlend.allocate(img.array(), true);
+	printf("read & allocated %s\n", path.c_str());
 }
 
 void OmniStereo::Projection::readWarp(std::string path) {
@@ -679,21 +682,6 @@ OmniStereo& OmniStereo::configure(std::string configpath, std::string configname
 		}
 		L.pop(); // viewport
 		
-		lua_getfield(L, projection, "position");
-		if (lua_istable(L, -1)) {
-			int position = L.top();
-			lua_rawgeti(L, position, 1);
-			mProjections[i].position.x = L.to<double>(-1);
-			L.pop();
-			lua_rawgeti(L, position, 2);
-			mProjections[i].position.y = L.to<double>(-1);
-			L.pop();
-			lua_rawgeti(L, position, 3);
-			mProjections[i].position.z = L.to<double>(-1);
-			L.pop();			
-		}
-		L.pop(); // position
-		
 		lua_getfield(L, projection, "warp");
 		if (lua_istable(L, -1)) {
 			int warp = L.top();
@@ -728,12 +716,25 @@ OmniStereo& OmniStereo::configure(std::string configpath, std::string configname
 			if (lua_isstring(L, -1)) {
 				// load from file
 				mProjections[i].readParameters(configpath + "/" + lua_tostring(L, -1)); //, true);
-			} else {
-				// TODO: generate blend...
-			}
+			} 
 			L.pop();
 		}
 		L.pop(); // params
+		
+		lua_getfield(L, projection, "position");
+		if (lua_istable(L, -1)) {
+			int position = L.top();
+			lua_rawgeti(L, position, 1);
+			mProjections[i].position.x = L.to<double>(-1);
+			L.pop();
+			lua_rawgeti(L, position, 2);
+			mProjections[i].position.y = L.to<double>(-1);
+			L.pop();
+			lua_rawgeti(L, position, 3);
+			mProjections[i].position.z = L.to<double>(-1);
+			L.pop();			
+		}
+		L.pop(); // position
 
 		
 		L.pop(); // projector
