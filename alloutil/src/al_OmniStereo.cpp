@@ -466,8 +466,8 @@ void OmniStereo::Projection::readWarp(std::string path) {
 	int32_t dim[2];
 	f.read((void *)dim, sizeof(int32_t), 2);
 	
-	int32_t w = dim[1];
-	int32_t h = dim[0]/3;
+	int32_t w = warpwidth; //dim[1];
+	int32_t h = warpheight; //dim[0]/3;
 	
 	printf("warp dim %dx%d\n", w, h);
 	
@@ -694,12 +694,24 @@ OmniStereo& OmniStereo::configure(std::string configpath, std::string configname
 		lua_getfield(L, projection, "warp");
 		if (lua_istable(L, -1)) {
 			int warp = L.top();
+			
+			lua_getfield(L, warp, "width");
+			if (lua_isnumber(L, -1)) {
+				mProjections[i].warpwidth = lua_tonumber(L, -1);
+			}
+			L.pop();
+			
+			lua_getfield(L, warp, "height");
+			if (lua_isnumber(L, -1)) {
+				mProjections[i].warpheight = lua_tonumber(L, -1);
+			}
+			L.pop();
+			
 			lua_getfield(L, warp, "file");
 			if (lua_isstring(L, -1)) {
 				// load from file
 				mProjections[i].readWarp(configpath + "/" + lua_tostring(L, -1));
 			}
-			//L.dump("warp");
 			L.pop();
 		}
 		L.pop(); // warp
