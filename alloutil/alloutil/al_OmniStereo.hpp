@@ -116,6 +116,9 @@ public:
 		float x_pixel, y_pixel;
 		float x_offset, y_offset;
 		Vec3d position;
+		
+		// TODO: remove this
+		int warpwidth, warpheight;
 	
 	protected:		
 		Texture mBlend, mWarp;
