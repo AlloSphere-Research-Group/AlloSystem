@@ -466,8 +466,8 @@ void OmniStereo::Projection::readWarp(std::string path) {
 	int32_t dim[2];
 	f.read((void *)dim, sizeof(int32_t), 2);
 	
-	int32_t w = warpwidth; //dim[1];
-	int32_t h = warpheight; //dim[0]/3;
+	int32_t w = dim[1];
+	int32_t h = dim[0]/3;
 	
 	printf("warp dim %dx%d\n", w, h);
 	
