@@ -186,7 +186,6 @@ public:
 	// @lens is used for near/far clipping planes, and eye separation
 	// @pose sets the camera position/orientation
 	void capture(OmniStereo::Drawable& drawable, const Lens& lens, const Pose& pose);
-	
 	// render the captured scene to multiple warp maps and viewports
 	// @viewport is the pixel dimensions of the window
 	void draw(const Lens& lens, const Pose& pose, const Viewport& vp);
@@ -197,6 +196,9 @@ public:
 		draw(lens, pose, vp);
 	}
 	
+	// render front-view only (bypass FBO)
+	void onFrameFront(OmniStereo::Drawable& drawable, const Lens& lens, const Pose& pose, const Viewport& vp);
+		
 	// send the proper uniforms to the shader:
 	void uniforms(ShaderProgram& program) const;
 	

@@ -989,6 +989,53 @@ void OmniStereo::capture(OmniStereo::Drawable& drawable, const Lens& lens, const
 	gl.error("OmniStereo FBO mipmap end");
 }	
 
+void OmniStereo::onFrameFront(OmniStereo::Drawable& drawable, const Lens& lens, const Pose& pose, const Viewport& vp) {
+	mFrame++;
+	if (mCubeProgram.id() == 0) onCreate();
+	
+	gl.error("OmniStereo onFrameFront begin");
+	
+	gl.viewport(vp);
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	for (int i=0; i<numProjections(); i++) {
+		Projection& p = projection(i);
+		Viewport& v = p.viewport();
+		Viewport viewport(
+			vp.l + v.l * vp.w,
+			vp.b + v.b * vp.h,
+			v.w * vp.w,
+			v.h * vp.h
+		);
+		gl.viewport(viewport);
+		
+		mFace = 5; // draw negative z
+		
+		{
+			Vec3d pos = pose.pos();
+			Vec3d ux, uy, uz; 
+			pose.unitVectors(ux, uy, uz);
+			mModelView = Matrix4d::lookAt(ux, uy, uz, pos);
+			
+			mNear = lens.near();
+			mFar = lens.far();
+			const double eyeSep = mStereo ? lens.eyeSep() : 0.;
+			
+			// apply camera transform:
+			gl.pushMatrix(gl.MODELVIEW);
+			gl.loadMatrix(mModelView);
+			
+			gl.clearColor(mClearColor);
+			gl.depthTesting(1);
+			gl.depthMask(1);
+			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+			
+			drawable.onDrawOmni(*this);	
+		}
+	}
+		
+	gl.error("OmniStereo onFrameFront end");
+}	
+
 void OmniStereo::drawEye(const Pose& pose, double eye) {
 	if (eye > 0.) {
 		glBindTexture(GL_TEXTURE_CUBE_MAP, mTex[1]);
