@@ -54,6 +54,9 @@ public:
 	
 	const std::string&	hostName() const { return mHostName; }
 	
+	bool				omniEnable() const { return bOmniEnable; }
+	void				omniEnable(bool b) { bOmniEnable = b; }
+	
 	void initWindow(
 		const Window::Dim& dims = Window::Dim(800, 400),
 		const std::string title = "OmniApp",
@@ -101,6 +104,8 @@ protected:
 	std::string mName;
 	std::string mHostName;
 	
+	bool bOmniEnable;
+	
 	static void AppAudioCB(AudioIOData& io);
 };
 
@@ -110,7 +115,9 @@ protected:
 inline OmniApp::OmniApp(std::string name)
 :	mNavControl(mNav),
 	mOSCRecv(PORT_FROM_DEVICE_SERVER),
-	mOSCSend(PORT_TO_DEVICE_SERVER, DEVICE_SERVER_IP_ADDRESS) {
+	mOSCSend(PORT_TO_DEVICE_SERVER, DEVICE_SERVER_IP_ADDRESS) 
+{	
+	bOmniEnable = true;
 	mHostName = Socket::hostName();
 	mName = name;
 	
@@ -227,9 +234,11 @@ inline bool OmniApp::onFrame() {
 	
 	Viewport vp(width(), height());
 	
-	
-	mOmni.onFrame(*this, lens(), nav(), vp);
-	
+	if (bOmniEnable) {
+		mOmni.onFrame(*this, lens(), nav(), vp);
+	} else {
+		mOmni.onFrameFront(*this, lens(), nav(), vp);
+	}
 	return true;
 }
 
