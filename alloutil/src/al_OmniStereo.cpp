@@ -937,6 +937,8 @@ void OmniStereo::capture(OmniStereo::Drawable& drawable, const Lens& lens, const
 	mFar = lens.far();
 	const double eyeSep = mStereo ? lens.eyeSep() : 0.;
 	
+	gl.projection(Matrix4d::identity());
+	
 	// apply camera transform:
 	gl.pushMatrix(gl.MODELVIEW);
 	gl.loadMatrix(mModelView);
@@ -995,8 +997,6 @@ void OmniStereo::onFrameFront(OmniStereo::Drawable& drawable, const Lens& lens, 
 	
 	gl.error("OmniStereo onFrameFront begin");
 	
-	gl.viewport(vp);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	for (int i=0; i<numProjections(); i++) {
 		Projection& p = projection(i);
 		Viewport& v = p.viewport();
@@ -1008,22 +1008,22 @@ void OmniStereo::onFrameFront(OmniStereo::Drawable& drawable, const Lens& lens, 
 		);
 		gl.viewport(viewport);
 		
+		gl.projection(Matrix4d::perspective(lens.fovy(), 1, lens.near(), lens.far()));
+		
 		mFace = 5; // draw negative z
 		
 		{
 			Vec3d pos = pose.pos();
 			Vec3d ux, uy, uz; 
 			pose.unitVectors(ux, uy, uz);
-			mModelView = Matrix4d::lookAt(ux, uy, uz, pos);
+			mModelView = Matrix4d::lookAt(-ux, -uy, uz, pos);
 			
 			mNear = lens.near();
 			mFar = lens.far();
-			const double eyeSep = mStereo ? lens.eyeSep() : 0.;
+			//const double eyeSep = mStereo ? lens.eyeSep() : 0.;
 			
 			// apply camera transform:
-			gl.pushMatrix(gl.MODELVIEW);
-			gl.loadMatrix(mModelView);
-			
+			gl.modelView(mModelView);
 			gl.clearColor(mClearColor);
 			gl.depthTesting(1);
 			gl.depthMask(1);
@@ -1032,7 +1032,6 @@ void OmniStereo::onFrameFront(OmniStereo::Drawable& drawable, const Lens& lens, 
 			drawable.onDrawOmni(*this);	
 		}
 	}
-		
 	gl.error("OmniStereo onFrameFront end");
 }	
 
