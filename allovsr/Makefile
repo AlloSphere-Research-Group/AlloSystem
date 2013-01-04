@@ -71,6 +71,11 @@ install: FORCE
 	@$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)
 	@$(INSTALL) -m 644 $(LIB_NAME)/* $(DESTDIR)/include/$(LIB_NAME)
 
-# .PHONY: clean
-# clean: 
-# 	$(call RemoveBuildDir)
+# Create file with settings for linking to external libraries
+linkfile:
+	@printf "%b\n" "CPPFLAGS +=$(LINK_CPPFLAGS)\r\nLDFLAGS +=$(LINK_LDFLAGS) -l$(LIB_NAME)"> Makefile.link
+
+.PHONY: clean
+clean:
+	@echo "cleaning allovsr	"
+	$(call RemoveBuildDir)

@@ -54,8 +54,8 @@ vsr: FORCE
 	@echo "compiling versor library and installing to AlloSystem/build directory"
 	@$(MAKE) --no-print-directory -C ../$@ install INSTALL_PCH=1 DESTDIR=$(CURDIR)/$(BUILD_DIR) linkfile
 
-allovsr: FORCE
-	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR)
+allovsr: FORCE allocore
+	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR) linkfile
 
 
 clean:
