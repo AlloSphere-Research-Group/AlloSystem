@@ -630,7 +630,7 @@ OmniStereo& OmniStereo::configure(BlendMode bm) {
 }
 
 OmniStereo& OmniStereo::configure(std::string configpath, std::string configname) {
-	if (L.dofile(configpath + "/" + configname + ".lua", 0)) return *this;
+	if (L.dofile(configpath + configname + ".lua", 0)) return *this;
 	
 	L.getglobal("projections");
 	if (!lua_istable(L, -1)) {
