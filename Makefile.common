@@ -267,7 +267,8 @@ ifneq ($(STRICT_WARNINGS), 0)
 	CFLAGS += \
 		-Wreturn-type \
 		-Wformat -Wmissing-braces -Wparentheses -Wswitch \
-		-Wunused-variable -Wsign-compare -Wno-unknown-pragmas 
+		-Wunused-variable -Wsign-compare -Wno-unknown-pragmas \
+		-Wuninitialized -Winit-self
 	CXXFLAGS += -Wnon-virtual-dtor -Woverloaded-virtual
 endif
 
