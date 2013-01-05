@@ -38,6 +38,7 @@ $(OBJ_DIR)%.o:: %.mm
 	@echo CC $< $@
 	$(CXX) -c $(CFLAGS) $< -o $@ $(DEPFLAGS)
 
+# Build pre-compiled headers
 $(OBJ_DIR)%.hpp.gch:: %.hpp
 	@echo CXX $< $@
 	$(CXX) -x c++ -c $(CXXFLAGS) -Winvalid-pch $< -o $@ $(DEPFLAGS)
