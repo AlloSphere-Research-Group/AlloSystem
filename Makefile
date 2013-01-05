@@ -76,16 +76,17 @@ gatherexamples:
 
 
 # This attempts to determine what modules have been built by looking in the build dir
-BUILT_MODULES := $(basename $(shell if [ -d $(BUILD_DIR)/lib/ ]; then ls $(BUILD_DIR)/lib/; fi))
+#BUILT_MODULES := $(basename $(shell if [ -d $(BUILD_DIR)/lib/ ]; then ls $(BUILD_DIR)/lib/; fi))
+BUILT_MODULES := $(basename $(shell ls $(BUILD_DIR)/lib/ 2> /dev/null))
 BUILT_MODULES := $(subst lib,,$(BUILT_MODULES))
 BUILT_MODULES := $(filter allo%, $(BUILT_MODULES))
 
 # This is a hack to ensure that Gamma and GLV linker dependencies are included.
 # A better, more general solution would involve having a user dependency directory that is scanned.
-ifneq ($(shell ls $(BUILD_DIR)/lib/ | grep Gamma),)
+ifneq ($(shell ls $(BUILD_DIR)/lib/ 2> /dev/null | grep Gamma),)
 	BUILT_MODULES += ../Gamma/
 endif
-ifneq ($(shell ls $(BUILD_DIR)/lib/ | grep GLV),)
+ifneq ($(shell ls $(BUILD_DIR)/lib/ 2> /dev/null | grep GLV),)
 	BUILT_MODULES += ../GLV/
 endif
 
