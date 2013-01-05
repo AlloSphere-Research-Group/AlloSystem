@@ -72,7 +72,7 @@ public:
     double audioRate, int audioBlockSize,
 		int audioInputs, int audioOutputs
 	);
-	void initOmni(std::string path = "~/code/allosphere/calibration-current/");
+	void initOmni(std::string path = "../../allosphere/calibration-current/");
 	
 	void sendHandshake();
 	void sendDisconnect();
