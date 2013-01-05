@@ -130,6 +130,8 @@ public:
 		createLUT();
 	}
 
+	/// Evaluate spherical harmonic
+
 	/// @param[in] l		number of nodal lines
 	/// @param[in] m		number of latitudinal nodal lines, |m| <= l
 	/// @param[in] ctheta	unit magnitude complex number describing longitudinal angle in [0, 2pi]
