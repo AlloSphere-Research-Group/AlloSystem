@@ -1008,7 +1008,7 @@ void OmniStereo::onFrameFront(OmniStereo::Drawable& drawable, const Lens& lens, 
 		);
 		gl.viewport(viewport);
 		
-		gl.projection(Matrix4d::perspective(lens.fovy(), 1, lens.near(), lens.far()));
+		gl.projection(Matrix4d::perspective(lens.fovy(), viewport.w / (float)viewport.h, lens.near(), lens.far()));
 		
 		mFace = 5; // draw negative z
 		
