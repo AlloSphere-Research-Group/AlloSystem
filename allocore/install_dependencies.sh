@@ -31,7 +31,6 @@ elif [ `which brew 2>/dev/null` ]; then
 	brew install assimp
 	brew install freeimage
 	brew install freetype
-	brew link freetype
 
 elif [ `uname | grep MINGW` ]; then
 	echo "Found MinGW / MSYS"
