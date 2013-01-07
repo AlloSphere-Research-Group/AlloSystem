@@ -835,33 +835,33 @@ void OmniStereo::onCreate() {
 	}
 	
 	// one FBO to rule them all...
-	glGenFramebuffers(1, &mFbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, mFbo);
+	glGenFramebuffersEXT(1, &mFbo);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFbo);
 	//Attach one of the faces of the Cubemap texture to this FBO
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X, mTex[0], 0);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_CUBE_MAP_POSITIVE_X, mTex[0], 0);
 	
-	glGenRenderbuffers(1, &mRbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, mRbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mResolution, mResolution);
+	glGenRenderbuffersEXT(1, &mRbo);
+	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, mRbo);
+	glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, mResolution, mResolution);
 	// Attach depth buffer to FBO
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRbo);
+	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, mRbo);
 	
 	// ...and in the darkness bind them:
 	for (mFace=0; mFace<6; mFace++) {
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+mFace, GL_TEXTURE_CUBE_MAP_POSITIVE_X+mFace, mTex[0], 0);
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT+mFace, GL_TEXTURE_CUBE_MAP_POSITIVE_X+mFace, mTex[0], 0);
 	}
 	
 	//Does the GPU support current FBO configuration?
 	GLenum status;
-	status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if (status != GL_FRAMEBUFFER_COMPLETE) {
+	status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+	if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
 		printf("GPU does not support required FBO configuration\n");
 		exit(0);
 	}
 	
 	// cleanup:
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 	
 	Graphics::error("OmniStereo onCreate");
 }
@@ -872,8 +872,8 @@ void OmniStereo::onDestroy() {
 	glDeleteTextures(2, mTex);
 	mTex[0] = mTex[1] = 0;
 	
-	glDeleteRenderbuffers(1, &mRbo);
-	glDeleteFramebuffers(1, &mFbo);
+	glDeleteRenderbuffersEXT(1, &mRbo);
+	glDeleteFramebuffersEXT(1, &mFbo);
 	mRbo = mFbo = 0;
 }
 
@@ -894,17 +894,17 @@ void OmniStereo::capture(OmniStereo::Drawable& drawable, const Lens& lens, const
 	gl.pushMatrix(gl.MODELVIEW);
 	gl.loadMatrix(mModelView);
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
-	glBindFramebuffer(GL_FRAMEBUFFER, mFbo);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFbo);
 	gl.viewport(0, 0, mResolution, mResolution);
 	
 	for (int i=0; i<(mStereo+1); i++) {
 		mEyeParallax = eyeSep * (i-0.5);
 		for (mFace=0; mFace<6; mFace++) {
 			
-			glDrawBuffer(GL_COLOR_ATTACHMENT0 + mFace);
-			glFramebufferTexture2D(
-				GL_FRAMEBUFFER, 
-				GL_COLOR_ATTACHMENT0 + mFace, 
+			glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT + mFace);
+			glFramebufferTexture2DEXT(
+				GL_FRAMEBUFFER_EXT, 
+				GL_COLOR_ATTACHMENT0_EXT + mFace, 
 				GL_TEXTURE_CUBE_MAP_POSITIVE_X + mFace, 
 				mTex[i], 0);
 			
@@ -916,7 +916,7 @@ void OmniStereo::capture(OmniStereo::Drawable& drawable, const Lens& lens, const
 		}
 	}
 	
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 	glPopAttrib();
 	gl.popMatrix(gl.MODELVIEW);
 	gl.error("OmniStereo capture end");
@@ -927,12 +927,12 @@ void OmniStereo::capture(OmniStereo::Drawable& drawable, const Lens& lens, const
 		glEnable(GL_TEXTURE_CUBE_MAP);
 		
 		glBindTexture(GL_TEXTURE_CUBE_MAP, mTex[0]);
-		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+		glGenerateMipmapEXT(GL_TEXTURE_CUBE_MAP);
 		gl.error("generating mipmap");
 		
 		if (mStereo) {
 			glBindTexture(GL_TEXTURE_CUBE_MAP, mTex[1]);
-			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+			glGenerateMipmapEXT(GL_TEXTURE_CUBE_MAP);
 			gl.error("generating mipmap");
 		}
 		
