@@ -12,7 +12,7 @@
 #define al_vsrInterfaceImpl_included
 
 //ABSTRACT BASE CLASS
-#include "allocore/al_allocore.hpp"
+#include "allocore/al_Allocore.hpp"
 #include "allovsr/al_vsr.hpp"
 
 #include "vsr/vsr_interface.h"
