@@ -16,7 +16,7 @@
 //allo includes
 #include "allocore/al_Allocore.hpp"
 #include "allocore/io/al_ControlNav.hpp"
-#include "alloGLV/al_controlGLV.hpp"
+#include "alloGLV/al_ControlGLV.hpp"
 
 //Glue
 #include "allovsr/al_vsrInterface.hpp"
