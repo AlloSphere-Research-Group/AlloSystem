@@ -145,7 +145,10 @@ namespace al {
     
     //A GLV Object with built in GUI for easy prototyping
     struct VsrGui : public GLVDetachable {
-        VsrGui() : GLVDetachable(), gui() { *this << gui; }
+        VsrGui() : GLVDetachable(), gui() { 
+            *this << gui; 
+            gui.colors().back.set(.3,.3,.3);
+        }
         glv::Gui gui;
     };
     
@@ -179,6 +182,7 @@ namespace al {
             add(&interface.input());
             add(&interface.view());
             glv.parentWindow(*this);
+            glv.gui.colors().back.set(.3,.3,.3);
         }
         
         
@@ -188,6 +192,7 @@ namespace al {
             add(&interface.input());
             add(&interface.view());
             glv.parentWindow(*this);
+            glv.gui.colors().back.set(.3,.3,.3);
         }
         
         virtual void onDraw(Graphics& gl){}

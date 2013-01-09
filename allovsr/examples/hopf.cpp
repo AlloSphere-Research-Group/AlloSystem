@@ -25,6 +25,11 @@
 using namespace al;
 using namespace vsr;
 
+#define PRESET \
+    static bool bSet = 0;\
+    if (!bSet) { \
+        bSet = 1; 
+
 struct HopfFiber{
     /// Feed in Spherical Coordinates of a 2-Sphere, get 3-Sphere Fiber out
     
@@ -54,6 +59,10 @@ struct HopfFiber{
         return mCir.sp( mot * Gen::trv(v * phi )  ) ; 
         
     }
+    
+    Pnt phase(double theta, double phi, double phs){
+        return Ro::pnt_cir( cir(theta,phi), phs * PI);
+    }
 };
 
 void hopf(al::VsrApp& app){
@@ -78,38 +87,40 @@ void hopf(al::VsrApp& app){
     }    
     
     //TRACE
-    static Pnt pnt = Ro::null(1,1,1);
-    if (bReset) { pnt = Ro::null(1,1,1); bReset = false; }
-    app.interface.touch(pnt); DRAW(pnt);
+//    static Pnt pnt = Ro::null(1,1,1);
+//    if (bReset) { pnt = Ro::null(1,1,1); bReset = false; }
+//    app.interface.touch(pnt); DRAW(pnt);
     
-    Par par;
+    vector<Pnt> vp;
     for (int i = 0; i < num; ++i){
         double u = 1.0 * i/num;
+
         for (int j = 0; j < res; ++j){
-            double v = 1.0 * i/res;
+            double v = 1.0 * j/res;
+
             Cir tc = hf.cir(-1.0 + 2*u, v);
             Pnt tp = Ro::pnt_cir( tc, tphase * Ro::cur(tc) * phase);
             if(bDrawPnt)DRAW3(tp,u,v,1-u);
             if(bDrawCir)DRAW3(tc,v,u,1-u);
         
-            Cir ttc= pnt ^ tc.dual();
-            double dist = Ro::size(ttc, false);
-            if (dist < minDistance) {
-                par += tc.dual() * 1.0/dist;
-            }
+            vp.push_back( Ro::pnt_cir( tc, v * u * PI ) );
         }
     }
         
     pnt = Ro::loc( pnt.sp( Gen::bst(par * amt) ) );
     DRAW3(Ro::dls_pnt(pnt,.2),1,0,0);
 
-}
+
 
 class MyApp : public al::VsrApp {
 
     public:
     
-    MyApp() : al::VsrApp() { }
+    MyApp() : al::VsrApp() { 
+        
+       
+    
+    }
 
     virtual void onDraw(Graphics& gl){
         

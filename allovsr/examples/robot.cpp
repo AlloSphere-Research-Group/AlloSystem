@@ -119,7 +119,7 @@ struct MyApp : public al::VsrApp {
         k[0].rot( r1 );
         
         //calculate joint rotations and link lengths from current positions
-        k.joints(1); 
+        k.joints(0); 
         //k.links();
         
         for (int i = 0; i < 5; ++i){
