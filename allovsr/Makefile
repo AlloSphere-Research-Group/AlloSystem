@@ -67,7 +67,7 @@ $(EXEC_TARGETS): FORCE
 	@cd $(BIN_DIR) && ./$(*F)
 
 install: FORCE
-	@echo installing allovsr to $(DESTIDIR)/include/$(LIB_NAME)
+	@echo installing allovsr to $(DESTDIR)/include/$(LIB_NAME)
 	@$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)
 	@$(INSTALL) -m 644 $(LIB_NAME)/* $(DESTDIR)/include/$(LIB_NAME)
 

@@ -25,6 +25,11 @@
 using namespace al;
 using namespace vsr;
 
+#define PRESET \
+    static bool bSet = 0;\
+    if (!bSet) { \
+        bSet = 1; 
+
 struct HopfFiber{
     /// Feed in Spherical Coordinates of a 2-Sphere, get 3-Sphere Fiber out
     
@@ -54,6 +59,10 @@ struct HopfFiber{
         return mCir.sp( mot * Gen::trv(v * phi )  ) ; 
         
     }
+    
+    Pnt phase(double theta, double phi, double phs){
+        return Ro::pnt_cir( cir(theta,phi), phs * PI);
+    }
 };
 
 void hopf(al::VsrApp& app){
@@ -78,30 +87,69 @@ void hopf(al::VsrApp& app){
     }    
     
     //TRACE
-    static Pnt pnt = Ro::null(1,1,1);
-    if (bReset) { pnt = Ro::null(1,1,1); bReset = false; }
-    app.interface.touch(pnt); DRAW(pnt);
+//    static Pnt pnt = Ro::null(1,1,1);
+//    if (bReset) { pnt = Ro::null(1,1,1); bReset = false; }
+//    app.interface.touch(pnt); DRAW(pnt);
     
-    Par par;
+    vector<Pnt> vp;
     for (int i = 0; i < num; ++i){
         double u = 1.0 * i/num;
+
         for (int j = 0; j < res; ++j){
-            double v = 1.0 * i/res;
+            double v = 1.0 * j/res;
+
             Cir tc = hf.cir(-1.0 + 2*u, v);
             Pnt tp = Ro::pnt_cir( tc, tphase * Ro::cur(tc) * phase);
             if(bDrawPnt)DRAW3(tp,u,v,1-u);
             if(bDrawCir)DRAW3(tc,v,u,1-u);
         
-            Cir ttc= pnt ^ tc.dual();
-            double dist = Ro::size(ttc, false);
-            if (dist < minDistance) {
-                par += tc.dual() * 1.0/dist;
-            }
+            vp.push_back( Ro::pnt_cir( tc, v * u * PI ) );
         }
     }
         
-    pnt = Ro::loc( pnt.sp( Gen::bst(par * amt) ) );
-    DRAW3(Ro::dls_pnt(pnt,.2),1,0,0);
+    glBegin(GL_LINE_STRIP);
+
+        for (int i = 0; i<vp.size(); ++i ){
+            GL::vertex( vp[i].w() );
+        }
+
+    glEnd();
+    
+}
+
+void knot(al::VsrApp& app){
+//    HopfFiber hf;
+//    Cir ca = hf.mCir;
+//    Dll cb = hf.mInf.dual(); 
+    
+    static Cir ca = CXZ(1);
+    Dll cb = Inf(1) <= ca;
+    app.interface.touch(ca);
+    
+    static Pnt pt = PT(1,0,0); 
+    app.interface.touch(pt); DRAW3(pt,1,0,0);
+    
+    static double m,n,amt,iter;
+    PRESET
+        app.glv.gui(m,"m",0,10)(n,"n",0,10)(amt,"amt",-10,10)(iter,"iter",1,1000);
+        m = 3; n = 2; amt = .0001; iter = 1000;
+    }
+    
+    Par tp = ca.dual() * PI/m + cb * PI/n;
+    DRAW3(ca,0,0,1); DRAW3(cb,0,1,0);
+    
+    vector<Pnt> vp;
+    Pnt np = pt;
+    for (int i = 0; i < iter; ++i){
+        np = Ro::loc( np.sp( Gen::bst(tp*amt) ) );
+        vp.push_back(np);
+    }
+    
+    glBegin(GL_LINE_STRIP);
+        for (int i = 0; i < vp.size(); ++i){
+            GL::vertex(vp[i].w());
+        }   
+    glEnd();
     
 }
 
@@ -109,7 +157,11 @@ class MyApp : public al::VsrApp {
 
     public:
     
-    MyApp() : al::VsrApp() { }
+    MyApp() : al::VsrApp() { 
+        
+       
+    
+    }
 
     virtual void onDraw(Graphics& gl){
         
@@ -117,8 +169,8 @@ class MyApp : public al::VsrApp {
         Rot t = Gen::aa( scene().model.rot() ); 
         GL::rotate( t.w() );
         
-       hopf(*this);
-        
+        //hopf(*this);
+        knot(*this);
     }
 
 };
