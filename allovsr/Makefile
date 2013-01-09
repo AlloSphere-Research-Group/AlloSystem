@@ -32,7 +32,7 @@ CFLAGS += -Wno-deprecated
 DEPFLAGS = -MMD -MF $(basename $@).dep
 
 #Link
-LDFLAGS	+= -L$(LIB_DIR) 
+VSRLDFLAGS	= -L$(LIB_DIR) 
 
 -include ../allocore/Makefile.link
 
@@ -63,7 +63,7 @@ dir:
 
 $(EXEC_TARGETS): FORCE dir
 	@echo Building $@
-	$(CXX) $(CXXFLAGS) $(HPATH) $@ -o $(BIN_DIR)$(*F) $(LDFLAGS) -lvsr -lGLV -lalloGLV
+	$(CXX) $(CXXFLAGS) $(HPATH) $@ -o $(BIN_DIR)$(*F) $(VSRLDFLAGS) $(LDFLAGS) -lvsr -lGLV -lalloGLV
 	@cd $(BIN_DIR) && ./$(*F)
 
 install: FORCE
