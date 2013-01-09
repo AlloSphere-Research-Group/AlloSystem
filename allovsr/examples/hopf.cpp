@@ -109,7 +109,9 @@ void hopf(al::VsrApp& app){
         
     pnt = Ro::loc( pnt.sp( Gen::bst(par * amt) ) );
     DRAW3(Ro::dls_pnt(pnt,.2),1,0,0);
+    
 }
+
 
 class MyApp : public al::VsrApp {
 
@@ -127,7 +129,7 @@ class MyApp : public al::VsrApp {
         Rot t = Gen::aa( scene().model.rot() ); 
         GL::rotate( t.w() );
         
-       hopf(*this);
+        hopf(*this);
     }
 
 };
