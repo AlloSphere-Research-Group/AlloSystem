@@ -2,10 +2,6 @@ title:
 	@echo
 	@echo
 	@echo /////////////////////////////////////////////////////////////////////////////
-	@echo versor: made by pablo colapinto at the university of california santa barbara 
-	@echo /////////////////////////////////////////////////////////////////////////////
-	@echo
-	
 
 LIB_NAME = allovsr
 STRICT_WARNINGS = 0
@@ -32,7 +28,7 @@ CFLAGS += -Wno-deprecated
 DEPFLAGS = -MMD -MF $(basename $@).dep
 
 #Link
-VSRLDFLAGS	= -L$(LIB_DIR) 
+VSRLDFLAGS	= -L$(LIB_DIR) -L../build/lib/
 
 -include ../allocore/Makefile.link
 
