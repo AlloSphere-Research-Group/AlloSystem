@@ -107,13 +107,13 @@ void hopf(al::VsrApp& app){
         }
     }
         
-    glBegin(GL_LINE_STRIP);
-
-        for (int i = 0; i<vp.size(); ++i ){
-            GL::vertex( vp[i].w() );
-        }
-
-    glEnd();
+    // glBegin(GL_LINE_STRIP);
+    // 
+    //     for (int i = 0; i<vp.size(); ++i ){
+    //         GL::vertex( vp[i].w() );
+    //     }
+    // 
+    // glEnd();
     
 }
 
@@ -169,8 +169,7 @@ class MyApp : public al::VsrApp {
         Rot t = Gen::aa( scene().model.rot() ); 
         GL::rotate( t.w() );
         
-        //hopf(*this);
-        knot(*this);
+        hopf(*this);
     }
 
 };

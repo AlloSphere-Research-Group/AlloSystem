@@ -61,7 +61,7 @@ FORCE:
 dir:
 	@mkdir -p $(BIN_DIR)
 
-$(EXEC_TARGETS): FORCE
+$(EXEC_TARGETS): FORCE dir
 	@echo Building $@
 	$(CXX) $(CXXFLAGS) $(HPATH) $@ -o $(BIN_DIR)$(*F) $(LDFLAGS) -lvsr -lGLV -lalloGLV
 	@cd $(BIN_DIR) && ./$(*F)
