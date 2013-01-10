@@ -29,10 +29,11 @@ CFLAGS += -Wno-deprecated
 #Dependencies
 DEPFLAGS = -MMD -MF $(basename $@).dep
 
+-include ../allocore/Makefile.link
+
 #Link
 LDFLAGS += -L$(LIB_DIR) -lvsr -lGLV -lalloGLV
 
--include ../allocore/Makefile.link
 
 IPATH = $(PCH_DIR) \
 		$(INC_DIR)vsr/Elements/\
