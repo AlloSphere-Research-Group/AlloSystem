@@ -80,7 +80,8 @@ $(addprefix $(OBJ_DIR), $(OBJS)): | $(ALL_BUILD_DIRS)
 
 # Create file with settings for linking to external libraries
 linkfile:
-	@printf "%b\n" "CPPFLAGS +=$(LINK_CPPFLAGS)\r\nLDFLAGS +=$(LINK_LDFLAGS) -l$(LIB_NAME)"> Makefile.link
+	@printf "%b\n" "CPPFLAGS +=$(LINK_CPPFLAGS)\r\nLDFLAGS +=-l$(LIB_NAME) $(LINK_LDFLAGS)"> Makefile.link
+#	@printf "%b(LDFLAGS)\n" "CPPFLAGS +=$(LINK_CPPFLAGS)\r\nLDFLAGS :=-l$(LIB_NAME) $(LINK_LDFLAGS) $$"> Makefile.link
 
 
 # Archive repository
