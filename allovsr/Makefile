@@ -32,7 +32,7 @@ DEPFLAGS = -MMD -MF $(basename $@).dep
 -include ../allocore/Makefile.link
 
 #Link
-LDFLAGS += -L$(LIB_DIR) -lvsr -lGLV -lalloGLV
+LDFLAGS := -lvsr -lGLV -lalloGLV $(LDFLAGS)
 
 
 IPATH = $(PCH_DIR) \
@@ -62,7 +62,7 @@ dir:
 
 $(EXEC_TARGETS): FORCE dir
 	@echo Building $@ with $(LDFLAGS)
-	$(CXX) $(CXXFLAGS) $(HPATH) $@ -o $(BIN_DIR)$(*F) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $(HPATH) $@ -o $(BIN_DIR)$(*F) -L$(LIB_DIR) $(LDFLAGS)
 	@cd $(BIN_DIR) && ./$(*F)
 
 install: FORCE
@@ -72,7 +72,7 @@ install: FORCE
 
 # Create file with settings for linking to external libraries
 linkfile:
-	@printf "%b\n" "CPPFLAGS +=$(LINK_CPPFLAGS)\r\nLDFLAGS +=$(LINK_LDFLAGS) -l$(LIB_NAME)"> Makefile.link
+	@printf "%b\n" "CPPFLAGS +=$(LINK_CPPFLAGS)\r\nLDFLAGS := -l$(LIB_NAME) $(LINK_LDFLAGS) $(LDFLAGS) "> Makefile.link
 
 .PHONY: clean
 clean:
