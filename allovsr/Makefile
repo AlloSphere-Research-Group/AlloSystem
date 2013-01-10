@@ -1,3 +1,5 @@
+####### ALLOVSR MAKEFILE ###########
+
 title: 
 	@echo
 	@echo
@@ -28,7 +30,7 @@ CFLAGS += -Wno-deprecated
 DEPFLAGS = -MMD -MF $(basename $@).dep
 
 #Link
-VSRLDFLAGS	= -L$(LIB_DIR) -L../build/lib/
+LDFLAGS += -L$(LIB_DIR) -lvsr -lGLV -lalloGLV
 
 -include ../allocore/Makefile.link
 
@@ -41,7 +43,7 @@ IPATH = $(PCH_DIR) \
 HPATH = $(addprefix -I, $(IPATH))
 
 CPPFLAGS	+= $(LINK_CPPFLAGS) 
-LDFLAGS		+= $(LINK_LDFLAGS)
+#LDFLAGS		+= $(LINK_LDFLAGS)
 
 CFLAGS		:= $(CPPFLAGS) $(CFLAGS)
 CXXFLAGS	:= $(CFLAGS) $(CXXFLAGS)
@@ -58,8 +60,8 @@ dir:
 	@mkdir -p $(BIN_DIR)
 
 $(EXEC_TARGETS): FORCE dir
-	@echo Building $@
-	$(CXX) $(CXXFLAGS) $(HPATH) $@ -o $(BIN_DIR)$(*F) $(VSRLDFLAGS) $(LDFLAGS) -lvsr -lGLV -lalloGLV
+	@echo Building $@ with $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $(HPATH) $@ -o $(BIN_DIR)$(*F) $(LDFLAGS)
 	@cd $(BIN_DIR) && ./$(*F)
 
 install: FORCE
