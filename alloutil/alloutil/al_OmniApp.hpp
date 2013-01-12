@@ -20,7 +20,7 @@ namespace al {
 
 class OmniApp : public Window, public osc::PacketHandler, public FPS, public OmniStereo::Drawable {
 public:
-	OmniApp(std::string name = "omniapp");
+	OmniApp(std::string name = "omniapp", bool slave=false);
 	virtual ~OmniApp();
 
 	void start();
@@ -112,7 +112,7 @@ protected:
 
 // INLINE IMPLEMENTATION //
 
-inline OmniApp::OmniApp(std::string name)
+inline OmniApp::OmniApp(std::string name, bool slave)
 :	mNavControl(mNav),
 	mOSCRecv(PORT_FROM_DEVICE_SERVER),
 	mOSCSend(PORT_TO_DEVICE_SERVER, DEVICE_SERVER_IP_ADDRESS) 
@@ -122,13 +122,13 @@ inline OmniApp::OmniApp(std::string name)
 	mName = name;
 	
 	Window::append(mStdControls);
-	Window::append(mNavControl);
+	if (!slave) Window::append(mNavControl);
 	
 	oscRecv().bufferSize(32000);
 	oscRecv().handler(*this);
-	sendHandshake();
+	if (!slave) sendHandshake();
 										
-	initAudio();
+	if (!slave) initAudio();
 	initWindow();
 	initOmni();
 	
@@ -137,7 +137,7 @@ inline OmniApp::OmniApp(std::string name)
 }
 
 inline OmniApp::~OmniApp() {
-	sendDisconnect();
+	if (!slave) sendDisconnect();
 }
 
 inline void OmniApp::initOmni(std::string path) {
