@@ -196,8 +196,6 @@ inline void OmniApp::start() {
 		Window::displayMode(Window::displayMode() | Window::STEREO_BUF);
 	}
 	
-	if(oscSend().opened()) sendHandshake();
-	
 	create();
 	
 	if (mOmni.fullScreen()) {
@@ -205,7 +203,11 @@ inline void OmniApp::start() {
 		cursorHide(true);
 	}
 	
-	mAudioIO.start();
+	if (!bSlave) { 
+		if(oscSend().opened()) sendHandshake();
+		mAudioIO.start();
+	}
+	
 	Main::get().start();
 }
 
