@@ -44,7 +44,7 @@
 
 #include "allocore/al_Allocore.hpp"
 #include "alloutil/al_FPS.hpp"
-#include "libfreenect.h"
+#include "libfreenect/libfreenect.h"
 
 #include <map>
 

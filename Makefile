@@ -50,9 +50,11 @@ Gamma GLV: FORCE
 alloGLV: FORCE allocore GLV
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR) linkfile
 
+#Default Installs Precompiled Header -- set to 0 to avoid this copy
+INSTALL_VSR_PCH = 1
 vsr: FORCE
 	@echo "compiling versor library and installing to AlloSystem/build directory"
-	@$(MAKE) --no-print-directory -C ../$@ install INSTALL_PCH=1 DESTDIR=$(CURDIR)/$(BUILD_DIR) linkfile
+	@$(MAKE) --no-print-directory -C ../$@ install INSTALL_PCH=$(INSTALL_VSR_PCH) DESTDIR=$(CURDIR)/$(BUILD_DIR) linkfile
 
 allovsr: FORCE allocore
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR) linkfile
