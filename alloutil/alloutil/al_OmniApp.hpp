@@ -104,7 +104,7 @@ protected:
 	std::string mName;
 	std::string mHostName;
 	
-	bool bOmniEnable;
+	bool bOmniEnable, bSlave;
 	
 	static void AppAudioCB(AudioIOData& io);
 };
@@ -115,29 +115,32 @@ protected:
 inline OmniApp::OmniApp(std::string name, bool slave)
 :	mNavControl(mNav),
 	mOSCRecv(PORT_FROM_DEVICE_SERVER),
-	mOSCSend(PORT_TO_DEVICE_SERVER, DEVICE_SERVER_IP_ADDRESS) 
+	mOSCSend(PORT_TO_DEVICE_SERVER, DEVICE_SERVER_IP_ADDRESS),
+	bSlave(slave)
 {	
 	bOmniEnable = true;
 	mHostName = Socket::hostName();
 	mName = name;
 	
-	Window::append(mStdControls);
-	if (!slave) Window::append(mNavControl);
+	lens().near(0.01).far(40).eyeSep(0.03);
+	nav().smooth(0.8);
 	
-	oscRecv().bufferSize(32000);
-	oscRecv().handler(*this);
-	if (!slave) sendHandshake();
-										
-	if (!slave) initAudio();
+	Window::append(mStdControls);
 	initWindow();
 	initOmni();
 	
-	lens().near(0.01).far(40).eyeSep(0.03);
-	nav().smooth(0.8);
+	if (!bSlave) {
+		Window::append(mNavControl);					
+		initAudio();
+	
+		oscRecv().bufferSize(32000);
+		oscRecv().handler(*this);
+		sendHandshake();
+	}
 }
 
 inline OmniApp::~OmniApp() {
-	if (!slave) sendDisconnect();
+	if (!bSlave) sendDisconnect();
 }
 
 inline void OmniApp::initOmni(std::string path) {
