@@ -509,13 +509,13 @@ void OmniStereo::Projection::updatedWarp() {
 			Vec3f& out = *(Vec3f *)cell;
 			
 //			// coordinate system change?
-//			out.x = v[idx];
-//			out.y = u[idx];
-//			out.z = -t[idx];
-			
-			out.x = t[idx];
+			out.x = v[idx];
 			out.y = u[idx];
-			out.z = v[idx];
+			out.z = -t[idx];
+			
+//			out.x = t[idx];
+//			out.y = u[idx];
+//			out.z = v[idx];
 			
 			// TODO:
 			// out -= mRegistration.pos();
