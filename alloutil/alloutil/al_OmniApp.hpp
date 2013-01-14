@@ -104,6 +104,8 @@ protected:
 	std::string mName;
 	std::string mHostName;
 	
+	double mNavSpeed, mNavTurnSpeed;
+	
 	bool bOmniEnable, bSlave;
 	
 	static void AppAudioCB(AudioIOData& io);
@@ -121,6 +123,9 @@ inline OmniApp::OmniApp(std::string name, bool slave)
 	bOmniEnable = true;
 	mHostName = Socket::hostName();
 	mName = name;
+	
+	mNavSpeed = 1;
+	mNavTurnSpeed = 0.02;
 	
 	lens().near(0.01).far(40).eyeSep(0.03);
 	nav().smooth(0.8);
@@ -262,27 +267,27 @@ inline void OmniApp::onMessage(osc::Message& m) {
 	float x;
 	if (m.addressPattern() == "/mx") {
 		m >> x;
-		nav().moveR(-x);
+		nav().moveR(-x * mNavSpeed);
 
 	} else if (m.addressPattern() == "/my") {
 		m >> x;
-		nav().moveU(x);
+		nav().moveU(x * mNavSpeed);
 
 	} else if (m.addressPattern() == "/mz") {
 		m >> x;
-		nav().moveF(x);
+		nav().moveF(x * mNavSpeed);
 
 	} else if (m.addressPattern() == "/tx") {
 		m >> x;
-		nav().spinR(x * -0.02);
+		nav().spinR(x * -mNavTurnSpeed);
 
 	} else if (m.addressPattern() == "/ty") {
 		m >> x;
-		nav().spinU(x * 0.02);
+		nav().spinU(x * mNavTurnSpeed);
 
 	} else if (m.addressPattern() == "/tz") {
 		m >> x;
-		nav().spinF(x * -0.02);
+		nav().spinF(x * -mNavTurnSpeed);
 
 	}
 }
