@@ -289,6 +289,12 @@ inline void OmniApp::onMessage(osc::Message& m) {
 		m >> x;
 		nav().spinF(x * -mNavTurnSpeed);
 
+	} else if (m.addressPattern() == "/home") {
+		nav().home();
+		
+	} else if (m.addressPattern() == "/halt") {
+		nav().halt();
+		
 	}
 }
 
