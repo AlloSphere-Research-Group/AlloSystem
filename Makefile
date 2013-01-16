@@ -23,7 +23,7 @@ help:
 	@echo "    allovsr .......... build allocore/vsr binding"
 	@echo "    Gamma ............ build Gamma external"
 	@echo "    GLV .............. build GLV external"
-	@echo "    vsr .............. build vsr external"
+	@echo "    vsr .............. build vsr external [use with optional INSTALL_VSR_PCH flag set to 1 or 0]"
 	@echo "    clean ............ clean all modules found in this directory"
 	@echo "    gatherexamples ... create examples/ directory with symlinks to module examples"
 

@@ -894,6 +894,7 @@
 					Cocoa,
 					"-framework",
 					Foundation,
+					"-lGamma",
 					"-lallocore",
 				);
 				PRODUCT_NAME = knot;
@@ -940,6 +941,7 @@
 					Cocoa,
 					"-framework",
 					Foundation,
+					"-lGamma",
 					"-lallocore",
 				);
 				PRODUCT_NAME = knot;
