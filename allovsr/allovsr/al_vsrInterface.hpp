@@ -227,6 +227,11 @@ namespace al {
             glv::draw::pop();
         }
         
+        void modelTransform(){
+            Rot t = vsr::Gen::aa( scene().model.rot() ); 
+            vsr::GL::rotate( t.w() );
+        }
+        
     };
     
     
