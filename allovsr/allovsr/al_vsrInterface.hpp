@@ -12,7 +12,7 @@
 #define al_vsrInterfaceImpl_included
 
 //ABSTRACT BASE CLASS
-#include "allocore/al_allocore.hpp"
+#include "allocore/al_Allocore.hpp"
 #include "allovsr/al_vsr.hpp"
 
 #include "vsr/vsr_interface.h"
@@ -145,7 +145,10 @@ namespace al {
     
     //A GLV Object with built in GUI for easy prototyping
     struct VsrGui : public GLVDetachable {
-        VsrGui() : GLVDetachable(), gui() { *this << gui; }
+        VsrGui() : GLVDetachable(), gui() { 
+            *this << gui; 
+            gui.colors().back.set(.3,.3,.3);
+        }
         glv::Gui gui;
     };
     
@@ -179,6 +182,7 @@ namespace al {
             add(&interface.input());
             add(&interface.view());
             glv.parentWindow(*this);
+            glv.gui.colors().back.set(.3,.3,.3);
         }
         
         
@@ -188,6 +192,7 @@ namespace al {
             add(&interface.input());
             add(&interface.view());
             glv.parentWindow(*this);
+            glv.gui.colors().back.set(.3,.3,.3);
         }
         
         virtual void onDraw(Graphics& gl){}
@@ -220,6 +225,11 @@ namespace al {
                 glv::draw::text( s.c_str() );
             //vsr::gl::draw::
             glv::draw::pop();
+        }
+        
+        void modelTransform(){
+            Rot t = vsr::Gen::aa( scene().model.rot() ); 
+            vsr::GL::rotate( t.w() );
         }
         
     };

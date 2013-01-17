@@ -23,7 +23,7 @@ help:
 	@echo "    allovsr .......... build allocore/vsr binding"
 	@echo "    Gamma ............ build Gamma external"
 	@echo "    GLV .............. build GLV external"
-	@echo "    vsr .............. build vsr external"
+	@echo "    vsr .............. build vsr external [use with optional INSTALL_VSR_PCH flag set to 1 or 0]"
 	@echo "    clean ............ clean all modules found in this directory"
 	@echo "    gatherexamples ... create examples/ directory with symlinks to module examples"
 
@@ -49,9 +49,11 @@ Gamma GLV: FORCE
 alloGLV: FORCE allocore GLV
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR) linkfile
 
+#Default Installs Precompiled Header -- set to 0 to avoid this copy
+INSTALL_VSR_PCH = 1
 vsr: FORCE
 	@echo "compiling versor library and installing to AlloSystem/build directory"
-	@$(MAKE) --no-print-directory -C ../$@ install INSTALL_PCH=1 DESTDIR=$(CURDIR)/$(BUILD_DIR) linkfile
+	@$(MAKE) --no-print-directory -C ../$@ install INSTALL_PCH=$(INSTALL_VSR_PCH) DESTDIR=$(CURDIR)/$(BUILD_DIR) linkfile
 
 allovsr: FORCE
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR)

@@ -1,11 +1,9 @@
+####### ALLOVSR MAKEFILE ###########
+
 title: 
 	@echo
 	@echo
 	@echo /////////////////////////////////////////////////////////////////////////////
-	@echo versor: made by pablo colapinto at the university of california santa barbara 
-	@echo /////////////////////////////////////////////////////////////////////////////
-	@echo
-	
 
 LIB_NAME = allovsr
 STRICT_WARNINGS = 0
@@ -31,10 +29,11 @@ CFLAGS += -Wno-deprecated
 #Dependencies
 DEPFLAGS = -MMD -MF $(basename $@).dep
 
-#Link
-LDFLAGS	+= -L$(LIB_DIR) 
-
 -include ../allocore/Makefile.link
+
+#Link
+LDFLAGS := -lvsr -lGLV -lalloGLV $(LDFLAGS)
+
 
 IPATH = $(PCH_DIR) \
 		$(INC_DIR)vsr/Elements/\
@@ -45,7 +44,7 @@ IPATH = $(PCH_DIR) \
 HPATH = $(addprefix -I, $(IPATH))
 
 CPPFLAGS	+= $(LINK_CPPFLAGS) 
-LDFLAGS		+= $(LINK_LDFLAGS)
+#LDFLAGS		+= $(LINK_LDFLAGS)
 
 CFLAGS		:= $(CPPFLAGS) $(CFLAGS)
 CXXFLAGS	:= $(CFLAGS) $(CXXFLAGS)
@@ -61,16 +60,23 @@ FORCE:
 dir:
 	@mkdir -p $(BIN_DIR)
 
-$(EXEC_TARGETS): FORCE
-	@echo Building $@
-	$(CXX) $(CXXFLAGS) $(HPATH) $@ -o $(BIN_DIR)$(*F) $(LDFLAGS) -lvsr -lGLV -lalloGLV
+$(EXEC_TARGETS): FORCE dir
+	@echo Building $@ with $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $(HPATH) $@ -o $(BIN_DIR)$(*F) -L$(LIB_DIR) $(LDFLAGS)
 	@cd $(BIN_DIR) && ./$(*F)
 
 install: FORCE
-	@echo installing allovsr to $(DESTIDIR)/include/$(LIB_NAME)
+	@echo installing allovsr to $(DESTDIR)/include/$(LIB_NAME)
 	@$(INSTALL) -d $(DESTDIR)/include/$(LIB_NAME)
 	@$(INSTALL) -m 644 $(LIB_NAME)/* $(DESTDIR)/include/$(LIB_NAME)
 
-# .PHONY: clean
-# clean: 
-# 	$(call RemoveBuildDir)
+# Create file with settings for linking to external libraries
+linkfile:
+	@echo CPPFLAGS +=
+	@echo $(LINK_CPPFLAGS) LDFLAGS += -l$(LIB_NAME) $(LDFLAGS)
+	@printf "%b\n" "CPPFLAGS +=$(LINK_CPPFLAGS)\r\nLDFLAGS += -l$(LIB_NAME) $(LDFLAGS) "> Makefile.link
+
+.PHONY: clean
+clean:
+	@echo "cleaning allovsr	"
+	$(call RemoveBuildDir)
