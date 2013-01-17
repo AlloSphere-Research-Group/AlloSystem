@@ -224,7 +224,7 @@ class MyApp : public al::VsrApp {
         stereo.stereo(true);
         stereo.mode( Stereographic::ACTIVE );
     
-	lens.eyeSep(lens.eyeSepAuto()); 
+	lens.eyeSep(lens.eyeSepAuto() *-1); 
         //cout << lens.eyeSep() << endl;
 	//displayMode ( DEFAULT_BUF | STEREO_BUF );
     }
@@ -244,7 +244,8 @@ MyApp app;
 
 int main(int argc, const char * argv[]){
 
-    app.create(Window::Dim(800, 600), "Allovsr Demo: Hopf Fibration", 40, Window::DEFAULT_BUF | Window::STEREO_BUF);
+    app.create(Window::Dim(800, 600), "Allovsr Demo: Hopf Fibration", 60, Window::DEFAULT_BUF | Window::STEREO_BUF);
+    //app.lens.eyeSep( app.lens.eyeSepAuto() );
     cout << app.lens.eyeSep() << endl;	  
     MainLoop::start();
     

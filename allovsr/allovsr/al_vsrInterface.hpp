@@ -207,7 +207,9 @@ namespace al {
             model().step();
             
             glColor3f(1,1,1);
-                            
+             
+		//if (stereo.stereo()) printf("stereo!\n");
+              
             stereo.draw( gl, lens, Frame2Pose( camera() ), Viewport( width(), height() ), *this );
                                     
             vsr :: GL :: disablePreset();
