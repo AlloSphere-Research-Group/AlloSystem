@@ -57,15 +57,21 @@ void knot(al::VsrApp& app){
     static double ntrace, traceamt, bandres;
     static bool bReset, bCirFlow, bDrawCirStrip, bDrawStrip, bDrawSrc;
     
+	//stereo controls
+	static double eyesep, fovy;
     
     PRESET
         app.glv.gui(m,"m",0,10)(n,"n",0,10)(amt,"amt",-10,10)(iter,"iter",1,1000);
         app.glv.gui(theta)(phi)(gamma);
         app.glv.gui(ntrace,"trace",0,1000)(traceamt,"trace_amt",0,10)(bandres,"band_res",0,100);
         app.glv.gui(bReset,"reset")(bCirFlow,"cirFlow")(bDrawCirStrip,"cir_strip")(bDrawStrip, "strip")(bDrawSrc, "src");
+	app.glv.gui(eyesep,"eyesep",0,2)(fovy,"fovy",0,180);
         m = 1; n = 5; amt = .005; iter = 1000; ntrace = 10; traceamt = .1;
+	eyesep = .2; fovy = 45;
     }
     
+	app.lens.eyeSep(eyesep*-1); app.lens.fovy(fovy);
+
     /////////////////////////////////
     /* The Transformation Operator */
     /////////////////////////////////
@@ -224,6 +230,7 @@ class MyApp : public al::VsrApp {
         stereo.stereo(true);
         stereo.mode( Stereographic::ACTIVE );
     
+	lens.fovy(45);
 	lens.eyeSep(lens.eyeSepAuto() *-1); 
         //cout << lens.eyeSep() << endl;
 	//displayMode ( DEFAULT_BUF | STEREO_BUF );
