@@ -33,7 +33,8 @@ DEPFLAGS = -MMD -MF $(basename $@).dep
 
 #Link
 LDFLAGS := -lvsr -lGLV -lalloGLV $(LDFLAGS)
-
+#Link Twice
+LDFLAGS += $(LDFLAGS)
 
 IPATH = $(PCH_DIR) \
 		$(INC_DIR)vsr/Elements/\

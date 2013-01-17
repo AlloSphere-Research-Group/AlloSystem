@@ -13,7 +13,7 @@
 #include "vsr/vsr_camera.h"
 #include "vsr/vsr_fiber.h"
 #include "vsr/vsr_stat.h"
-#include "vsr/vsr_gamma.h"
+//#include "vsr/vsr_gamma.h"
 
 //allo includes
 #include "allocore/al_Allocore.hpp"
@@ -21,7 +21,7 @@
 #include "alloGLV/al_ControlGLV.hpp"
 
 //gamma
-#include "Gamma/Oscillator.h"
+//#include "Gamma/Oscillator.h"
 
 //Glue
 #include "allovsr/al_vsrInterface.hpp"
@@ -221,8 +221,12 @@ class MyApp : public al::VsrApp {
     
     MyApp() : al::VsrApp() { 
         
-       
+        stereo.stereo(true);
+        stereo.mode( Stereographic::ACTIVE );
     
+	lens.eyeSep(lens.eyeSepAuto()); 
+        //cout << lens.eyeSep() << endl;
+	//displayMode ( DEFAULT_BUF | STEREO_BUF );
     }
 
     virtual void onDraw(Graphics& gl){
@@ -240,8 +244,8 @@ MyApp app;
 
 int main(int argc, const char * argv[]){
 
-    app.create(Window::Dim(800, 600), "Allovsr Demo: Hopf Fibration");
-	
+    app.create(Window::Dim(800, 600), "Allovsr Demo: Hopf Fibration", 40, Window::DEFAULT_BUF | Window::STEREO_BUF);
+    cout << app.lens.eyeSep() << endl;	  
     MainLoop::start();
     
 	return 0;
