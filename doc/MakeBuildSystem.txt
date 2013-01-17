@@ -26,6 +26,8 @@ At the root level is the file Makefile which permits building of modules. The fi
 		# clean commands...
 
 
+Makefile.common
+---------------
 Makefile.common detects the platform (Linux, OSX, etc.) and creates some common variables used by the modules during their build phase.
 
 	PLATFORM *	One of 'linux', 'macosx', or 'windows'
@@ -62,6 +64,8 @@ Makefile.common detects the platform (Linux, OSX, etc.) and creates some common 
 	(* = auto-detected)
 
 
+Makefile.rules
+--------------
 Makefile.rules consists of rules for building object (.o) files from source and building a dynamic or static library using those object files. The variable 'OBJ' (defined before including Makefile.rules) is to contain a list of all object files to be built.
 
 Makefile.rules has the additional rules:
@@ -73,18 +77,21 @@ Makefile.rules has the additional rules:
 'archive' creates a compressed file of the module's repository.
 
 
+Makefile.buildandrun
+--------------------
+Makefile.buildandrun can be included optionally to permit building and running of examples supplied with a module. It should be included AFTER Makefile.common. If included, it is then possible to build and run any source file including a main function by typing the command:
 
-Notes on build flags:
+	$ make examples/myexample.cpp
 
-module library
-	-l	nothing
-	-L	
-	-I	own headers, dependency headers
+Makefile.buildandrun understands several variables:
 
-examples
-	-l	own library, dependency libraries
-	-L	./build/lib/, $(DEP_DIR)lib/,
-	-I	./build/include/, $(DEP_DIR)include/
+$(RUN_DIRS)		A list of directories to scan for example source code.
+			The directory examples/ is automatically included in the list.
 
-$(DEP_DIR) is the directory where dependencies are installed. It can be /usr/, /usr/local/, or /opt/local/ (MacPorts).
+$(RUN_SRC_DIRS)		A list of directories containing source files that will be compiled
+			and linked to in the resulting example binary. At the moment, only
+			sources with the .cpp and .c extensions are recognized.
+
+It is possible to include a file called flags.txt within any build-and-run directory or subdirectory which includes additional flags to be passed to the compiler when building the executable. This can be useful if you need to link the executable to specific libraries installed on your system.
+
 
