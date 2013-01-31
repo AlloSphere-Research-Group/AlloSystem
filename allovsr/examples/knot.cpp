@@ -6,6 +6,8 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
+#define ALLOSPHERE 0
+
 //vsr Includes
 #include "vsr/vsr.h"
 #include "vsr/vsr_op.h"
@@ -62,7 +64,7 @@ void knot(al::VsrApp& app){
     
     PRESET
         app.glv.gui(m,"m",0,10)(n,"n",0,10)(amt,"amt",-10,10)(iter,"iter",1,1000);
-        app.glv.gui(theta)(phi)(gamma);
+        app.glv.gui(theta,"theta",0,100)(phi,"phi",0,100);//(gamma);
         app.glv.gui(ntrace,"trace",0,1000)(traceamt,"trace_amt",0,10)(bandres,"band_res",0,100);
         app.glv.gui(bReset,"reset")(bCirFlow,"cirFlow")(bDrawCirStrip,"cir_strip")(bDrawStrip, "strip")(bDrawSrc, "src");
 	app.glv.gui(eyesep,"eyesep",0,2)(fovy,"fovy",0,180);
@@ -77,7 +79,10 @@ void knot(al::VsrApp& app){
     /////////////////////////////////
 
     //HOPF LINKS at Poles (orthogonal)
-    vector<Cir> cp = hf.poles(-1 + theta * 2,phi);
+    
+    static double th = 0; th += theta;
+    static double ph = 0; ph += phi;
+    vector<Cir> cp = hf.poles(-1 + fmod(th,1) * 2,  fabs( sin(ph) ) );
 
     //A Point Pair "Boost" Generator . . .
     PointPair tp = cp[0].dual() * PI/m + cp[1].dual() * PI/n;
@@ -105,7 +110,9 @@ void knot(al::VsrApp& app){
     //CIRCLES ALONG THE KNOT
 
     //A Circle at point
-    Circle ct = Ro::cir( pt, Biv::yz  + Biv::xy * gamma * PI, .2);
+    static Circle ct = Ro::cir( pt, Biv::yz  + Biv::xy * gamma * PI, .2);
+    app.interface.touch(ct);
+
 
     vector<Cir> cirp;
     Circle ncirp = ct;
@@ -227,13 +234,13 @@ class MyApp : public al::VsrApp {
     
     MyApp() : al::VsrApp() { 
         
-        stereo.stereo(true);
-        stereo.mode( Stereographic::ACTIVE );
+        if (ALLOSPHERE){
+            stereo.stereo(true);
+            stereo.mode( Stereographic::ACTIVE );
     
-	lens.fovy(45);
-	lens.eyeSep(lens.eyeSepAuto() *-1); 
-        //cout << lens.eyeSep() << endl;
-	//displayMode ( DEFAULT_BUF | STEREO_BUF );
+            lens.fovy(45);
+            lens.eyeSep(lens.eyeSepAuto() *-1); 
+
     }
 
     virtual void onDraw(Graphics& gl){
@@ -251,7 +258,9 @@ MyApp app;
 
 int main(int argc, const char * argv[]){
 
-    app.create(Window::Dim(800, 600), "Allovsr Demo: Hopf Fibration", 60, Window::DEFAULT_BUF | Window::STEREO_BUF);
+    Window::DisplayMode DM = ALLOSPHERE ? Window::DEFAULT_BUF : Window::DEFAULT_BUF | Window::STEREO_BUF;
+
+    app.create(Window::Dim(800, 600), "Hopf Fibration and Knots", 60, DM);
     //app.lens.eyeSep( app.lens.eyeSepAuto() );
     cout << app.lens.eyeSep() << endl;	  
     MainLoop::start();
