@@ -974,13 +974,33 @@ Build AlloSystem
 \end_layout
 
 \begin_layout Standard
-Download the AlloSystem source code from 
+Download the AlloSystem source code  
 \begin_inset Flex URL
 status open
 
 \begin_layout Plain Layout
 
+https://github.com/AlloSphere-Research-Group/AlloSystem/archive/stable13feb.zip
+\end_layout
+
+\end_inset
+
+
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
 https://github.com/AlloSphere-Research-Group/AlloSystem/zipball/aau12f
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
