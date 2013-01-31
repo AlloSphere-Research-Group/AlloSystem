@@ -522,65 +522,13 @@ After downloading the disk images (
  If you downloaded Xcode 4.4.1, then drag-n-drop the Xcode icon into your
  Applications folder and then run the Command Line Tools installer.
  When installation is complete, you will have both an editor and all the
- command-line tools we will be using such as `make' and `g++'.
-\end_layout
-
-\begin_layout Subsubsection*
-Notes On Multiple Versions of Xcode
-\end_layout
-
-\begin_layout Standard
-This section is only relevant if you have older versions of Xcode installed
- and are trying to install a newer version.
- If you are installing Xcode for the first time, then skip to the next section.
-\end_layout
-
-\begin_layout Standard
-If you have older versions of Xcode installed and want to remove them (i.e.,
- to save space or fix installation problems) you can uninstall them by running
- in a terminal
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-$ sudo /Developer/Library/uninstall-devtools --mode=all
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-If you want to keep multiple versions of Xcode installed on your machine,
- you can switch between them by running
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-$ sudo xcode-select -switch [path to Xcode]
-\end_layout
-
-\end_inset
-
-where the path after 
+ command-line tools we will be using such as 
 \family typewriter
--switch
+make
 \family default
- is the version of Xcode you want to use, e.g.
- 
+ and 
 \family typewriter
-/Applications/Xcode.app/
+g++
 \family default
 .
 \end_layout
@@ -1128,30 +1076,7 @@ $ cd ..
 
 If prompted for your password, enter the same password you use to log in
  to the OS.
- If you have trouble getting either of the scripts to run (the 
-\family typewriter
-.
-\family default
-sh files), then it's possible that the file modes are incorrect.
- Simply run 
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-$ chmod u+x install_dependencies.sh
-\end_layout
-
-\end_inset
-
-on the troublesome script(s).
- This will make them executable.
-\end_layout
-
-\begin_layout Standard
-Installing all the dependencies can take anywhere from a few minutes to
- an hour.
+ Installing all the dependencies may take some time, so please be patient.
  After dependencies are installed, the next step is to build the AlloCore
  and AlloUtil modules with the following commands:
 \end_layout
@@ -1703,6 +1628,113 @@ RUN_SRC_DIRS += myutils/
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Troubleshooting
+\end_layout
+
+\begin_layout Subsection
+`No such file or directory'
+\end_layout
+
+\begin_layout Standard
+This error message is typically the result of misspelling a file or directory
+ name or being in the wrong directory.
+ Always use tab autocompletion when typing file/directory names to ensure
+ that they exist and are spelled correctly.
+\end_layout
+
+\begin_layout Subsection
+Bash Script (.sh file) Does Not Execute Properly
+\end_layout
+
+\begin_layout Standard
+If you get an error when trying to execute a Bash script (
+\family typewriter
+.
+\family default
+sh file), then it is possible that its file mode is incorrect.
+ Simply run 
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ chmod u+x <filename>.sh
+\end_layout
+
+\end_inset
+
+on the troublesome script.
+ This will make it executable.
+\end_layout
+
+\begin_layout Subsection
+Problems With Multiple Versions of Xcode
+\end_layout
+
+\begin_layout Standard
+If you have older versions of Xcode installed and want to remove them (i.e.,
+ to save space or fix installation problems) you can uninstall them by running
+ in a terminal
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ sudo /Developer/Library/uninstall-devtools --mode=all
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Typically, you will want to remove old versions 
+\emph on
+before
+\emph default
+ trying to install a newer version.
+ If you want to keep multiple versions of Xcode installed on your machine,
+ you can switch between them by running
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ sudo xcode-select -switch [path to Xcode]
+\end_layout
+
+\end_inset
+
+where the path after 
+\family typewriter
+-switch
+\family default
+ is the version of Xcode you want to use, e.g.
+ 
+\family typewriter
+/Applications/Xcode.app/
+\family default
+.
 \end_layout
 
 \end_body
