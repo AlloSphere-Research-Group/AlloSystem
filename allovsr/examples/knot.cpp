@@ -82,8 +82,13 @@ void knot(al::VsrApp& app){
     
     static double th = 0; th += theta;
     static double ph = 0; ph += phi;
-    vector<Cir> cp = hf.poles(-1 + fmod(th,1) * 2,  fabs( sin(ph) ) );
+    
+    //vector<Cir> cp = hf.poles(-1 + fmod(th,1) * 2,  fabs( sin(ph) ) );
+    vector<Cir> cp;
+    Cir cone = hf.fiber(0,-.5);
+    Cir ctwo = hf.fiber(0, .5);
 
+    cp.push_back( cone); cp.push_back(ctwo);
     //A Point Pair "Boost" Generator . . .
     PointPair tp = cp[0].dual() * PI/m + cp[1].dual() * PI/n;
     
@@ -234,6 +239,8 @@ class MyApp : public al::VsrApp {
     
     MyApp() : al::VsrApp() { 
         
+        glv.gui.colors().back.set(.3,.3,.3);
+        
         if (ALLOSPHERE){
             stereo.stereo(true);
             stereo.mode( Stereographic::ACTIVE );
@@ -241,6 +248,7 @@ class MyApp : public al::VsrApp {
             lens.fovy(45);
             lens.eyeSep(lens.eyeSepAuto() *-1); 
 
+        }
     }
 
     virtual void onDraw(Graphics& gl){
@@ -262,7 +270,7 @@ int main(int argc, const char * argv[]){
 
     app.create(Window::Dim(800, 600), "Hopf Fibration and Knots", 60, DM);
     //app.lens.eyeSep( app.lens.eyeSepAuto() );
-    cout << app.lens.eyeSep() << endl;	  
+    //cout << app.lens.eyeSep() << endl;	  
     MainLoop::start();
     
 	return 0;
