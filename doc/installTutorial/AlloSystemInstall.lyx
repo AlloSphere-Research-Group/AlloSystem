@@ -1246,12 +1246,12 @@ $ make alloGLV
 \end_layout
 
 \begin_layout Section
-Creating Your Own Projects
+Build-and-Run Applications
 \end_layout
 
 \begin_layout Standard
 While AlloSystem is intended to be used mainly as a library, it does provide
- a simple means of compiling and running custom applications that link to
+ a simple means of building and running custom applications that link to
  AlloSystem.
  It is flexible enough to be used all the way from building simple prototypes
  to creating complex applications.
@@ -1259,13 +1259,108 @@ While AlloSystem is intended to be used mainly as a library, it does provide
  capability.
 \end_layout
 
-\begin_layout Subsection
-Create Project Directory
+\begin_layout Standard
+By default, there are two directories recognized by the AlloSystem build-and-run
+ facility: 
+\family typewriter
+examples/
+\family default
+ and 
+\family typewriter
+work/
+\family default
+.
+ The directory 
+\family typewriter
+examples/
+\family default
+ contains example source code for libraries.
+ The directory 
+\family typewriter
+work/
+\family default
+ is for user application source files and thus will be of primary concern
+ here.
+ You can place any source (
+\family typewriter
+.cpp
+\family default
+) files having a 
+\family typewriter
+main()
+\family default
+ function in the 
+\family typewriter
+work/
+\family default
+ directory (or any subdirectories thereof) and compile and run the source
+ with the command
 \end_layout
 
 \begin_layout Standard
-The first step will be to configure AlloSystem to use your own custom project
- directory.
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ make work/myfile.cpp
+\end_layout
+
+\end_inset
+
+Remember, you must be in 
+\family typewriter
+~/code/allosystem/
+\family default
+ when running the 
+\family typewriter
+make
+\family default
+ command.
+ The executable binary is placed in 
+\family typewriter
+build/bin/
+\family default
+ and has the same name as the source file.
+ If you would only like to build the application, without also running it,
+ then you can append 
+\family typewriter
+AUTORUN=0
+\family default
+ to the line above, i.e.,
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ make work/myfile.cpp AUTORUN=0
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Advanced Project Configuration
+\end_layout
+
+\begin_layout Subsection
+Custom Project Directories
+\end_layout
+
+\begin_layout Standard
+It is possible to configure AlloSystem to use your own custom project directory
+ for its build-and-run facility.
  We will call this your 
 \emph on
 user directory
@@ -1444,57 +1539,6 @@ This creates a symbolic link to
 [userdir]/[targetdir]/
 \family default
 .
-\end_layout
-
-\begin_layout Subsection
-Compiling and Running Applications
-\end_layout
-
-\begin_layout Standard
-At this point, you can place any source (
-\family typewriter
-.cpp
-\family default
-) files having a 
-\family typewriter
-main()
-\family default
- function in any of your user directories (or any subdirectories thereof)
- and compile and run the source with the command
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-$ make [userdir]/myfile.cpp
-\end_layout
-
-\end_inset
-
-Remember, you must be in 
-\family typewriter
-~/code/allosystem/
-\family default
- when running the 
-\family typewriter
-make
-\family default
- command.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Newpage pagebreak
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section
-Advanced Project Configuration
 \end_layout
 
 \begin_layout Subsection

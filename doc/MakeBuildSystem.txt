@@ -86,7 +86,7 @@ Makefile.buildandrun can be included optionally to permit building and running o
 Makefile.buildandrun understands several variables:
 
 $(RUN_DIRS)		A list of directories to scan for example source code.
-			The directory examples/ is automatically included in the list.
+			The directories examples/ and work/ are automatically included in the list.
 
 $(RUN_SRC_DIRS)		A list of directories containing source files that will be compiled
 			and linked to in the resulting example binary. At the moment, only
