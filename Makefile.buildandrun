@@ -1,6 +1,6 @@
 #RUN_INC_DIRS	?=
 #RUN_SRC_DIRS	?=
-RUN_DIRS	+= examples/
+RUN_DIRS	+= examples/ work/
 
 VPATH += $(RUN_SRC_DIRS)
 
