@@ -8,7 +8,7 @@ if [ `which apt-get 2>/dev/null` ]; then
 	sudo apt-get install portaudio19-dev libsndfile1-dev
 	sudo apt-get install libglew-dev freeglut3-dev 
 	sudo apt-get install libavahi-client-dev	# for protocol/al_ZeroConf
-	sudo apt-get install libassimp-dev libfreeimage-dev libfreetype6-dev
+	sudo apt-get install libassimp-dev=2.0.863+dfsg-2 libfreeimage-dev libfreetype6-dev
 
 elif [ `which port 2>/dev/null` ]; then
 	echo "Found MacPorts"
