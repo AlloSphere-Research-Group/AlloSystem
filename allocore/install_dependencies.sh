@@ -93,31 +93,6 @@ elif [ `uname | grep MINGW` ]; then
 			rm -rf $PKG
 			rm $PKG.zip
 		fi
-
-		LIBFILES=($DESTDIR/lib/glew32*)
-		if [ -e ${LIBFILES[0]} ]; then
-			echo "Found GLEW"
-		else
-			# These MSVC binaries don't work with MinGW/Msys :(
-			#PKG=glew-1.9.0-win32
-			#wget http://downloads.sourceforge.net/project/glew/glew/1.9.0/$PKG.zip
-			#unzip $PKG.zip
-			#mv glew-1.9.0 $PKG
-			#cp $PKG/bin/*.dll $DESTDIR/bin/
-			#cp $PKG/lib/*.lib $DESTDIR/lib/
-			#cp -r $PKG/include/* $DESTDIR/include/
-			#rm -rf $PKG
-			#rm $PKG.zip
-	
-			PKG=glew-1.9.0
-			wget http://downloads.sourceforge.net/project/glew/glew/1.9.0/$PKG.zip
-			unzip -q $PKG.zip
-			pushd $PKG
-				make install GLEW_DEST=/usr/local/ -j3
-			popd
-			rm -rf $PKG
-			rm $PKG.zip
-		fi
 	
 		LIBFILES=($DESTDIR/lib/*freetype*)
 		if [ -e ${LIBFILES[0]} ]; then
@@ -158,6 +133,31 @@ elif [ `uname | grep MINGW` ]; then
 			cp -r $PKG/include/* $DESTDIR/include/assimp/
 			cp $PKG/bin/assimp_release-dll_win32/Assimp32.dll $DESTDIR/bin/
 			cp $PKG/lib/assimp_release-dll_win32/assimp.lib $DESTDIR/lib/
+			rm -rf $PKG
+			rm $PKG.zip
+		fi
+
+		LIBFILES=($DESTDIR/lib/libglew32*)
+		if [ -e ${LIBFILES[0]} ]; then
+			echo "Found GLEW"
+		else
+			# These MSVC binaries don't work with MinGW/Msys :(
+			#PKG=glew-1.9.0-win32
+			#wget http://downloads.sourceforge.net/project/glew/glew/1.9.0/$PKG.zip
+			#unzip $PKG.zip
+			#mv glew-1.9.0 $PKG
+			#cp $PKG/bin/*.dll $DESTDIR/bin/
+			#cp $PKG/lib/*.lib $DESTDIR/lib/
+			#cp -r $PKG/include/* $DESTDIR/include/
+			#rm -rf $PKG
+			#rm $PKG.zip
+	
+			PKG=glew-1.9.0
+			wget http://downloads.sourceforge.net/project/glew/glew/1.9.0/$PKG.zip
+			unzip -q $PKG.zip
+			pushd $PKG
+				make install GLEW_DEST=/usr/local/ -j3
+			popd
 			rm -rf $PKG
 			rm $PKG.zip
 		fi
