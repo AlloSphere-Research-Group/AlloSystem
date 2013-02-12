@@ -45,109 +45,148 @@ elif [ `uname | grep MINGW` ]; then
 		#DESTDIR=local/
 		install -d $DESTDIR/bin/ $DESTDIR/include/ $DESTDIR/lib/
 		
-		PKG=libsndfile-1.0.25
-		wget http://www.mega-nerd.com/libsndfile/files/$PKG.tar.gz
-		tar -xzf $PKG.tar.gz
-		pushd $PKG
-			./configure --prefix=$DESTDIR
-			make install -j3
-		popd
-		rm -rf $PKG
-		rm $PKG.tar.gz
-		
-		PKG=pa_stable_v19_20111121
-		wget http://www.portaudio.com/archives/$PKG.tgz
-		tar -xzf $PKG.tgz
-		mv portaudio $PKG
-		pushd $PKG
-			./configure --prefix=$DESTDIR
-			make install -j3
-		popd
-		rm -rf $PKG
-		rm $PKG.tgz
+		LIBFILES=($DESTDIR/lib/libsndfile*)
+		if [ -e ${LIBFILES[0]} ]; then
+			echo "Found libsndfile"
+		else
+			PKG=libsndfile-1.0.25
+			wget http://www.mega-nerd.com/libsndfile/files/$PKG.tar.gz
+			tar -xzf $PKG.tar.gz
+			pushd $PKG
+				./configure --prefix=$DESTDIR
+				make install -j3
+			popd
+			rm -rf $PKG
+			rm $PKG.tar.gz
+		fi
 
+		LIBFILES=($DESTDIR/lib/libportaudio*)
+		if [ -e ${LIBFILES[0]} ]; then
+			echo "Found PortAudio"
+		else
+			PKG=pa_stable_v19_20111121
+			wget http://www.portaudio.com/archives/$PKG.tgz
+			tar -xzf $PKG.tgz
+			mv portaudio $PKG
+			pushd $PKG
+				./configure --prefix=$DESTDIR
+				make install -j3
+			popd
+			rm -rf $PKG
+			rm $PKG.tgz
+		fi
 
-		PKG=apr-1.3.6-iconv-1.2.1-util-1.3.8-win32-x86-msvcrt60
-		wget http://mirrors.rackhosting.com/apache/apr/binaries/win32/$PKG.zip
-		unzip -q $PKG.zip
-		mv apr-dist $PKG
-		cp $PKG/bin/libapr-1.dll		$DESTDIR/bin/
-		cp $PKG/bin/libaprutil-1.dll	$DESTDIR/bin/
-		cp $PKG/lib/libapr-1.lib		$DESTDIR/lib/libapr-1.dll.a
-		cp $PKG/lib/libaprutil-1.lib	$DESTDIR/lib/libaprutil-1.dll.a
-		install -d $DESTDIR/include/apr-1/
-		cp -r $PKG/include/*			$DESTDIR/include/apr-1/
-		rm -rf $PKG
-		rm $PKG.zip
+		LIBFILES=($DESTDIR/lib/libapr*)
+		if [ -e ${LIBFILES[0]} ]; then
+			echo "Found APR"
+		else
+			PKG=apr-1.3.6-iconv-1.2.1-util-1.3.8-win32-x86-msvcrt60
+			wget http://mirrors.rackhosting.com/apache/apr/binaries/win32/$PKG.zip
+			unzip -q $PKG.zip
+			mv apr-dist $PKG
+			cp $PKG/bin/libapr-1.dll		$DESTDIR/bin/
+			cp $PKG/bin/libaprutil-1.dll	$DESTDIR/bin/
+			cp $PKG/lib/libapr-1.lib		$DESTDIR/lib/libapr-1.dll.a
+			cp $PKG/lib/libaprutil-1.lib	$DESTDIR/lib/libaprutil-1.dll.a
+			install -d $DESTDIR/include/apr-1/
+			cp -r $PKG/include/*			$DESTDIR/include/apr-1/
+			rm -rf $PKG
+			rm $PKG.zip
+		fi
 
-		# These MSVC binaries don't work with MinGW/Msys :(
-		#PKG=glew-1.9.0-win32
-		#wget http://downloads.sourceforge.net/project/glew/glew/1.9.0/$PKG.zip
-		#unzip $PKG.zip
-		#mv glew-1.9.0 $PKG
-		#cp $PKG/bin/*.dll $DESTDIR/bin/
-		#cp $PKG/lib/*.lib $DESTDIR/lib/
-		#cp -r $PKG/include/* $DESTDIR/include/
-		#rm -rf $PKG
-		#rm $PKG.zip
+		LIBFILES=($DESTDIR/lib/glew32*)
+		if [ -e ${LIBFILES[0]} ]; then
+			echo "Found GLEW"
+		else
+			# These MSVC binaries don't work with MinGW/Msys :(
+			#PKG=glew-1.9.0-win32
+			#wget http://downloads.sourceforge.net/project/glew/glew/1.9.0/$PKG.zip
+			#unzip $PKG.zip
+			#mv glew-1.9.0 $PKG
+			#cp $PKG/bin/*.dll $DESTDIR/bin/
+			#cp $PKG/lib/*.lib $DESTDIR/lib/
+			#cp -r $PKG/include/* $DESTDIR/include/
+			#rm -rf $PKG
+			#rm $PKG.zip
+	
+			PKG=glew-1.9.0
+			wget http://downloads.sourceforge.net/project/glew/glew/1.9.0/$PKG.zip
+			unzip -q $PKG.zip
+			pushd $PKG
+				make install GLEW_DEST=/usr/local/ -j3
+			popd
+			rm -rf $PKG
+			rm $PKG.zip
+		fi
+	
+		LIBFILES=($DESTDIR/lib/*freetype*)
+		if [ -e ${LIBFILES[0]} ]; then
+			echo "Found FreeType"
+		else
+			PKG=freetype-dev_2.4.2-1_win32
+			wget http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/$PKG.zip
+			unzip -q $PKG.zip -d $PKG
+			cp $PKG/lib/* $DESTDIR/lib/
+			cp -r $PKG/include/* $DESTDIR/include/
+			rm -rf $PKG
+			rm $PKG.zip
+		fi
 
-		PKG=glew-1.9.0
-		wget http://downloads.sourceforge.net/project/glew/glew/1.9.0/$PKG.zip
-		unzip -q $PKG.zip
-		pushd $PKG
-			make install GLEW_DEST=/usr/local/ -j3
-		popd
-		rm -rf $PKG
-		rm $PKG.zip
+		LIBFILES=($DESTDIR/lib/FreeImage*)
+		if [ -e ${LIBFILES[0]} ]; then
+			echo "Found FreeImage"
+		else
+			PKG=FreeImage3153Win32
+			wget http://downloads.sourceforge.net/freeimage/$PKG.zip
+			unzip -q $PKG.zip
+			mv FreeImage $PKG
+			cp $PKG/Dist/FreeImage.dll $DESTDIR/bin/
+			cp $PKG/Dist/FreeImage.lib $DESTDIR/lib/
+			cp $PKG/Dist/FreeImage.h $DESTDIR/include/
+			rm -rf $PKG
+			rm $PKG.zip
+		fi
 
-		PKG=freetype-dev_2.4.2-1_win32
-		wget http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/$PKG.zip
-		unzip -q $PKG.zip -d $PKG
-		cp $PKG/lib/* $DESTDIR/lib/
-		cp -r $PKG/include/* $DESTDIR/include/
-		rm -rf $PKG
-		rm $PKG.zip
-		
-		PKG=FreeImage3153Win32
-		wget http://downloads.sourceforge.net/freeimage/$PKG.zip
-		unzip -q $PKG.zip
-		mv FreeImage $PKG
-		cp $PKG/Dist/FreeImage.dll $DESTDIR/bin/
-		cp $PKG/Dist/FreeImage.lib $DESTDIR/lib/
-		cp $PKG/Dist/FreeImage.h $DESTDIR/include/
-		rm -rf $PKG
-		rm $PKG.zip
-		
-		PKG=assimp--2.0.863-sdk
-		wget http://downloads.sourceforge.net/project/assimp/assimp-2.0/$PKG.zip
-		unzip -q $PKG.zip
-		install -d $DESTDIR/include/assimp/Compiler/
-		cp -r $PKG/include/* $DESTDIR/include/assimp/
-		cp $PKG/bin/assimp_release-dll_win32/Assimp32.dll $DESTDIR/bin/
-		cp $PKG/lib/assimp_release-dll_win32/assimp.lib $DESTDIR/lib/
-		rm -rf $PKG
-		rm $PKG.zip
+		LIBFILES=($DESTDIR/lib/assimp*)
+		if [ -e ${LIBFILES[0]} ]; then
+			echo "Found AssImp"
+		else
+			PKG=assimp--2.0.863-sdk
+			wget http://downloads.sourceforge.net/project/assimp/assimp-2.0/$PKG.zip
+			unzip -q $PKG.zip
+			install -d $DESTDIR/include/assimp/Compiler/
+			cp -r $PKG/include/* $DESTDIR/include/assimp/
+			cp $PKG/bin/assimp_release-dll_win32/Assimp32.dll $DESTDIR/bin/
+			cp $PKG/lib/assimp_release-dll_win32/assimp.lib $DESTDIR/lib/
+			rm -rf $PKG
+			rm $PKG.zip
+		fi
 
-		# This site always seems to be down...
-		#PKG=glut-3.7.6-bin
-		#wget http://user.xmission.com/~nate/glut/$PKG.zip
-		#unzip -q $PKG.zip
-		#install -d $DESTDIR/include/GL/
-		#cp $PKG/glut.h $DESTDIR/include/GL/
-		#cp $PKG/glut32.dll $DESTDIR/bin/
-		#cp $PKG/glut32.lib $DESTDIR/lib/
-		#rm -rf $PKG
-		#rm $PKG.zip
-
-		PKG=glutdlls37beta
-		wget http://www.opengl.org/resources/libraries/glut/$PKG.zip
-		unzip -q $PKG.zip -d $PKG
-		install -d $DESTDIR/include/GL/
-		cp $PKG/glut.h $DESTDIR/include/GL/
-		cp $PKG/glut32.dll $DESTDIR/bin/
-		cp $PKG/glut32.lib $DESTDIR/lib/
-		rm -rf $PKG
-		rm $PKG.zip
+		LIBFILES=($DESTDIR/lib/glut32*)
+		if [ -e ${LIBFILES[0]} ]; then
+			echo "Found GLUT"
+		else
+			# This site always seems to be down...
+			#PKG=glut-3.7.6-bin
+			#wget http://user.xmission.com/~nate/glut/$PKG.zip
+			#unzip -q $PKG.zip
+			#install -d $DESTDIR/include/GL/
+			#cp $PKG/glut.h $DESTDIR/include/GL/
+			#cp $PKG/glut32.dll $DESTDIR/bin/
+			#cp $PKG/glut32.lib $DESTDIR/lib/
+			#rm -rf $PKG
+			#rm $PKG.zip
+	
+			PKG=glutdlls37beta
+			wget http://www.opengl.org/resources/libraries/glut/$PKG.zip
+			unzip -q $PKG.zip -d $PKG
+			install -d $DESTDIR/include/GL/
+			cp $PKG/glut.h $DESTDIR/include/GL/
+			cp $PKG/glut32.dll $DESTDIR/bin/
+			cp $PKG/glut32.lib $DESTDIR/lib/
+			rm -rf $PKG
+			rm $PKG.zip
+		fi
 	fi
 
 else
