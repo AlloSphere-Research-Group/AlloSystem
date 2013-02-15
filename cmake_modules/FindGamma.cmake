@@ -4,7 +4,7 @@
 #
 # Find Gamma.
 
-#FIND_PATH(GAMMA_INCLUDE_DIR sndfile.h)
+#FIND_PATH(GAMMA_INCLUDE_DIR Gamma.h)
 
 #SET(GAMMA_NAMES ${GAMMA_NAMES} Gamma libGamma)
 #FIND_LIBRARY(GAMMA_LIBRARY NAMES ${GAMMA_NAMES} PATH)
@@ -24,12 +24,12 @@
 #ENDIF (GAMMA_FOUND)
 
 
-# - Try to find libsndfile
+# - Try to find Gamma
 # Once done this will define
 
-#  GAMMA_FOUND - system has libsndfile
-#  GAMMA_INCLUDE_DIRS - the libsndfile include directory
-#  GAMMA_LIBRARIES - Link these to use libsndfile
+#  GAMMA_FOUND - system has Gamma
+#  GAMMA_INCLUDE_DIRS - the Gamma include directory
+#  GAMMA_LIBRARIES - Link these to use Gamma
 
 #  Copyright (C) 2006  Wengo
 
@@ -47,10 +47,10 @@ else (GAMMA_LIBRARIES AND GAMMA_INCLUDE_DIRS)
     NAMES
 	  Gamma.h
     PATHS
-      /usr/include
-      /usr/local/include
-      /opt/local/include
-      /sw/include
+      /usr/include/Gamma
+      /usr/local/include/Gamma
+      /opt/local/include/Gamma
+      /sw/include/Gamma
   )
 
   find_library(GAMMA_LIBRARY
@@ -63,6 +63,17 @@ else (GAMMA_LIBRARIES AND GAMMA_INCLUDE_DIRS)
       /opt/local/lib
       /sw/lib
   )
+
+  if (${GAMMA_LIBRARY} STREQUAL "")
+    find_path(GAMMA_LIBRARY
+    libGamma.a
+    PATHS
+      /usr/lib
+      /usr/local/lib
+      /opt/local/lib
+      /sw/lib)
+  endif()
+
 
   set(GAMMA_INCLUDE_DIRS
 	${GAMMA_INCLUDE_DIR}

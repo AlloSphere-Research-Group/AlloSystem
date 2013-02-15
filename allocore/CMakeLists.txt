@@ -45,6 +45,14 @@ src/types/al_Array.cpp
 src/types/al_Color.cpp
 src/types/al_MsgQueue.cpp)
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+set(ALLOCORE_SRC ${ALLOCORE_SRC}
+ src/system/al_MainLoopOSX.mm
+ src/system/al_InfoOSX.mm
+ src/protocol/al_Zeroconf_OSX.mm)
+
+endif()
+
 include_directories(${CMAKE_SOURCE_DIR})
 add_library(allocore ${ALLOCORE_SRC})
 
@@ -96,15 +104,26 @@ include_directories(${APR_INCLUDE_DIR}
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 # Needed by portaudio
+add_definitions(-DAL_OSX)
    find_library(AUDIOUNIT_FM AudioUnit)
    find_library(COREAUDIO_FM CoreAudio)
+   find_library(COREMIDI_FM CoreMidi)
    find_library(CORESERVICES_FM CoreServices)
    find_library(AUDIOTOOLBOX_FM AudioToolbox)
-   set(PA_FRAMEWORKS ${AUDIOUNIT_FM} ${COREAUDIO_FM} ${CORESERVICES_FM} ${AUDIOTOOLBOX_FM})
+   set(PA_FRAMEWORKS ${AUDIOUNIT_FM} ${COREAUDIO_FM} ${COREMIDI_FM} ${CORESERVICES_FM} ${AUDIOTOOLBOX_FM})
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+add_definitions(-DAL_LINUX)
+set(ALLOCORE_LINK_LIBRARIES ${ALLOCORE_LIBRARIES} avahi-common avahi-client)
+endif()
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+add_definitions(-DAL_WINDOWS)
+endif()
+
 # TODO are avahi libraries needed on all platforms?
-set(ALLOCORE_LINK_LIBRARIES
+set(ALLOCORE_LINK_LIBRARIES ${ALLOCORE_LIBRARIES}
 ${APR_LIBRARY}
 ${ASSIMP_LIBRARY}
 ${FREEIMAGE_LIBRARY}
@@ -117,15 +136,15 @@ ${PORTAUDIO_LIBRARY}
 ${PORTAUDIO_LIBRARIES}
 ${SNDFILE_LIBRARIES}
 ${GAMMA_LIBRARIES}
-avahi-common avahi-client
 ${PA_FRAMEWORKS})
+
 
 target_link_libraries(allocore ${ALLOCORE_LINK_LIBRARIES})
 
 message(${GAMMA_LIBRARIES})
 
 # Examples
-set(EXAMPLE_DIRS algorithmic curves effects filter function generator io spectral)
+set(EXAMPLE_DIRS av graphics io math simulation sound spatial system)
 foreach(dir ${EXAMPLE_DIRS})
   file(GLOB EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/${dir}/*.cpp)
   foreach(example ${EXAMPLE_FILES})
