@@ -165,18 +165,6 @@ template<class T> T fold(const T& value, const T& hi=T(1), const T& lo=T(0));
 /// Returns value folded into [lo, hi] one time.
 template<class T> T foldOnce(const T& value, const T& hi=T(1), const T& lo=T(0));
 
-/// Compute Frenet frame (tangent, normal) from 1st difference
-template <class V2>
-void frenet(const V2& d1, V2& t, V2& n);
-
-/// Compute Frenet frame (tangent, normal, binormal) from 1st and 2nd differences
-template <class V3>
-void frenet(const V3& d1, const V3& d2, V3& t, V3& n, V3& b);
-
-/// Compute Frenet frame (tangent, normal, binormal) from 3 consecutive points
-template <class V3>
-void frenet(const V3& p2, const V3& p1, const V3& p0, V3& t, V3& n, V3& b);
-
 /// Returns e^(-v*v)
 template<class T> T gaussian(const T& v);
 
@@ -554,30 +542,6 @@ TEM inline T foldOnce(const T& v, const T& hi, const T& lo){
 	if(v > hi) return hi + (hi - v);
 	if(v < lo) return lo + (lo - v);
 	return v;
-}
-
-template <class V2>
-inline void frenet(const V2& d1, V2& t, V2& n){
-	t = d1;
-	t.normalize();
-	n(-t[1], t[0]);	// normal according to right-hand rule
-}
-
-template <class V3>
-inline void frenet(const V3& d1, const V3& d2, V3& t, V3& n, V3& b){	
-	b = cross(d2, d1);
-	n = cross(d1, b);
-	t = d1;
-	t.normalize();
-	b.normalize();
-	n.normalize();
-}
-
-template <class V3>
-inline void frenet(const V3& p2, const V3& p1, const V3& p0, V3& t, V3& n, V3& b){	
-	V3 d1 = (p0 - p2);			// 1st (central) difference (scaled by 2)
-	V3 d2 = (p0 - p1*2. + p2);	// 2nd difference
-	frenet(d1,d2, t,n,b);
 }
 
 TEM inline T gaussian(const T& v){ return ::exp(-v*v); }
