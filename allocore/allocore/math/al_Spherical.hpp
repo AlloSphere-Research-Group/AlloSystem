@@ -49,6 +49,43 @@
 
 namespace al{
 
+template <class T> class SphereCoord;
+
+typedef SphereCoord<float> SphereCoordf;	///< float SphereCoord
+typedef SphereCoord<double> SphereCoordd;	///< double SphereCoord
+
+
+
+/// Convert spherical to Cartesian coordinates in-place
+
+/// @param[in,out] r2x		radius to x coordinate
+/// @param[in,out] t2y		theta (angle on xy plane), in [-pi, pi], to z coordinate
+/// @param[in,out] p2z		phi (angle from z axis), in [0, pi], to y coordinate
+template<class T> void sphericalToCart(T& r2x, T& t2y, T& p2z);
+
+/// Convert spherical to Cartesian coordinates in-place
+template<class T> void sphericalToCart(T * vec3);
+
+/// Convert Cartesian to spherical coordinates in-place
+
+/// @param[in,out] x2r		x coordinate to radius
+/// @param[in,out] y2t		y coordinate to theta (angle on xy plane), in [-pi, pi]
+/// @param[in,out] z2p		z coordinate to phi (angle from z axis), in [0, pi]
+template<class T> void cartToSpherical(T& x2r, T& y2t, T& z2p);
+
+/// Convert Cartesian to spherical coordinates in-place
+template<class T> void cartToSpherical(T * vec3);
+
+/// Stereographic projection from an n-sphere to an n-1 dimensional hyperplane
+
+/// \tparam N		dimensions of sphere
+/// \tparam T		element type
+/// @param[in] v	unit n-vector describing point on n-sphere
+/// \returns		vector describing projected coordinate on n-1 hyperplane
+template <int N, class T>
+Vec<N-1,T> sterProj(const Vec<N,T>& v);
+
+
 
 /// Spherical coordinate in terms of two complex numbers
 
@@ -104,10 +141,6 @@ struct SphereCoord {
 		return *this;
 	}
 };
-
-typedef SphereCoord<float> SphereCoordf;
-typedef SphereCoord<double> SphereCoordd;
-
 
 
 
@@ -169,9 +202,7 @@ private:
 	}
 
 	static void createLUT(){
-	
 		static bool make=true;
-
 		if(make){
 			make=false;
 			for(int l=0; l<=L_MAX; ++l){
@@ -184,7 +215,6 @@ private:
 			}
 		}
 	}
-
 };
 
 
@@ -192,16 +222,39 @@ private:
 static SphericalHarmonic<> spharm;
 
 
-/// Stereographic projection from an n-sphere to an n-1 dimensional hyperplane
 
-/// \tparam N		dimensions of sphere
-/// \tparam T		element type
-/// @param[in] v	unit n-vector describing point on n-sphere
-/// \returns		vector describing projected coordinate on n-1 hyperplane
+// Implementation
+//------------------------------------------------------------------------------
+
+template <class T>
+void sphericalToCart(T& r, T& t, T& p){
+	T rsinp = r * sin(p);
+	T rcosp = r * cos(p);
+	r = rsinp * cos(t);
+	t = rsinp * sin(t);
+	p = rcosp;
+}
+
+template <class T>
+inline void sphericalToCart(T * vec3){ sphericalToCart(vec3[0], vec3[1], vec3[2]); }
+
+template <class T>
+void cartToSpherical(T& x, T& y, T& z){
+	T r = sqrt(x*x + y*y + z*z);
+	T t = atan2(y, x);
+	z = acos(z/r);
+	y = t;	
+	x = r;
+}
+
+template <class T>
+inline void cartToSpherical(T * vec3){ cartToSpherical(vec3[0], vec3[1], vec3[2]); }
+
 template <int N, class T>
 inline Vec<N-1,T> sterProj(const Vec<N,T>& v){	
 	return sub<N-1>(v) * (T(1)/v[N-1]);
 }
+
 
 
 } // ::al
