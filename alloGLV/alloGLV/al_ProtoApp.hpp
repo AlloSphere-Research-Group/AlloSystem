@@ -66,7 +66,7 @@ public:
 	glv::NumberDialer cnGain;
 
 	ProtoApp();
-	
+
 	/// This should be called after configuring everything else with the app
 	void init(
 		const Window::Dim& dim = Window::Dim(800,600),
@@ -78,10 +78,11 @@ public:
 		int chansOut = -1,
 		int chansIn = -1
 	);
-	
+
 	/// Set the directory for application resources
 	ProtoApp& resourceDir(const std::string& dir, bool searchBack=true);
-	
+
+	GLVDetachable& gui(){ return mGUI; }
 	glv::ParamPanel& paramPanel(){ return mParamPanel; }
 
 	ProtoApp& addParam(
