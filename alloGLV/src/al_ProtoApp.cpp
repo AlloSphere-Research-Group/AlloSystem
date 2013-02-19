@@ -2,6 +2,18 @@
 
 namespace al{
 
+
+struct GUIKeyDownHandler : public glv::EventHandler{
+	bool onEvent(glv::View& v, glv::GLV& g){
+		switch(g.keyboard().key()){
+			case 'g': g.toggle(glv::Visible); return false;
+		}
+		return true;
+	}
+};
+static GUIKeyDownHandler mGUIKeyDownHandler;
+
+
 ProtoApp::ProtoApp()
 :	cnFOV(3,2,360,0), cnScale(2,4, 20,-20),
 	cnGain(1,4,4,0)
@@ -20,6 +32,8 @@ ProtoApp::ProtoApp()
 		.addParam(cnScale, "scale")
 		.addParam(cnGain, "gain")
 	;
+
+	mGUI.addHandler(glv::Event::KeyDown, mGUIKeyDownHandler);
 
 	mGUITable.colors().set(glv::StyleColor::SmokyGray);
 	//mGUITable.enable(glv::DrawBack);
