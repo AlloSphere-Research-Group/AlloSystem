@@ -150,11 +150,16 @@ inline OmniApp::~OmniApp() {
 
 inline void OmniApp::initOmni(std::string path) {
   if (path == "") {
-    FILE *pipe = popen("echo ~", "r+");
-    char c;
-    while((c = getc(pipe)) != EOF)
-      path += c;
-    pclose(pipe);
+    FILE *pipe = popen("echo ~", "r");
+    if (pipe) {
+      char c;
+      while((c = getc(pipe)) != EOF) {
+	if (c == '\r' || c == '\n')
+          break;
+	path += c;
+      }
+      pclose(pipe);
+    }
     path += "/calibration-current/";
   }
 
