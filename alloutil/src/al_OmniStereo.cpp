@@ -512,8 +512,9 @@ void OmniStereo::Projection::updatedWarp() {
 //			out.x = v[idx];
 //			out.y = u[idx];
 //			out.z = -t[idx];
-			
-			out.x = t[idx];
+
+// Matt negates x as a quick expedient:
+			out.x = -t[idx];
 			out.y = u[idx];
 			out.z = v[idx];
 			
