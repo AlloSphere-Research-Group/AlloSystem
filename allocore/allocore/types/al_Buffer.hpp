@@ -217,11 +217,22 @@ public:
 	const T& operator[](int i) const { return mElems[i]; }
 
 
-	/// Write new element
-	void write(const T& v){
+	/// Obtain next element in buffer
+	
+	/// This method returns a reference to the next available element in the
+	/// buffer. This is an alternative to calling write() that does not require
+	/// constructing a new object, but instead returns the oldest element in 
+	/// the buffer. The returned reference should be assumed to be in an unknown 
+	/// state, thus should be initialized properly.
+	T& next(){
 		if(mFill < size()) ++mFill;
 		++mPos; if(pos() == size()){ mPos=0; }
-		Alloc::construct(&mElems[0] + pos(), v);
+		return mElems[pos()];
+	}
+
+	/// Write new element
+	void write(const T& v){
+		Alloc::construct(&next(), v);
 	}
 
 	/// Get reference to element relative to newest element
