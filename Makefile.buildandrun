@@ -3,8 +3,10 @@
 RUN_DIRS	+= examples/ work/
 
 VPATH += $(RUN_SRC_DIRS)
+CPPFLAGS := $(addprefix -I, $(RUN_SRC_DIRS)) $(CPPFLAGS)
 
 RUN_SRCS	=  $(wildcard $(addsuffix /*.cpp, $(RUN_SRC_DIRS)))
+RUN_SRCS	+= $(wildcard $(addsuffix /*.cc, $(RUN_SRC_DIRS)))
 RUN_SRCS	+= $(wildcard $(addsuffix /*.c, $(RUN_SRC_DIRS)))
 RUN_OBJS	=  $(addsuffix .o, $(basename $(notdir $(RUN_SRCS)) ))
 #RUN_OBJS	:= $(addsuffix .o, $(basename $(subst /,_,$(RUN_OBJS)) ))
