@@ -100,7 +100,21 @@ int utFile() {
 		);
 		assert(!f.open());
 	}
-	
+
+
+	{
+		// For now, just make sure this compiles and doesn't crash. :)
+		Dir dir;
+		if(dir.open("/")){
+			for(int i=0; i<1; ++i){
+				dir.rewind();
+				while(dir.read()){
+					//printf("%c %s\n", dir.entry().type() == FileInfo::DIR ? 'd':' ', dir.entry().name().c_str());
+				}
+			}
+		}
+	}
+
 	
 	{
 		// TODO:

@@ -69,6 +69,39 @@ namespace al{
 class FilePath;
 
 
+/// File information
+class FileInfo{
+public:
+	enum Type{
+		NOFILE,				/**< No file type determined */
+		REG,				/**< Regular file */
+		DIR,				/**< Directory */
+		CHR,				/**< Character device */
+		BLOCK,				/**< A block device */
+		PIPE,				/**< FIFO or pipe */
+		LINK,				/**< Symbolic link */
+		SOCKET,				/**< Socket */
+		UNKNOWN = 127		/**< File type exists, but doesn't match any known types */
+	};
+
+	/// Set type
+	FileInfo& type(Type v){ mType=v; return *this; }
+	
+	/// Get type
+	const Type type() const { return mType; }
+
+	/// Set name
+	FileInfo& name(const std::string& v){ mName=v; return *this; }
+	
+	/// Get name
+	const std::string& name() const { return mName; }
+
+private:
+	Type mType;
+	std::string mName;
+};
+
+
 /// File
 
 /// Used to retrieve data from and store data to disk.
@@ -213,6 +246,53 @@ protected:
 	void freeContent();
 	void allocContent(int n);
 	void getSize();
+	
+	friend class Dir;
+};
+
+
+
+
+/// Filesystem directory
+class Dir{
+public:
+
+	/// Constructor. This does not attempt to open the directory.
+	Dir();
+	
+	/// @param[in] dirToOpen	path to directory to open
+	Dir(const std::string& dirToOpen);
+
+	~Dir();
+
+
+	/// Open a directory
+	
+	/// @param[in] dirPath	path to directory
+	/// \returns whether the directory was successfully opened
+	bool open(const std::string& dirPath);
+	
+	/// Close directory
+	
+	/// \returns whether directory was successfully closed
+	///
+	bool close();
+
+	/// Read the next entry in the currently opened directory
+	
+	/// No ordering is guaranteed for the entries read.
+	/// \returns whether there is another entry to read
+	bool read();
+
+	/// Get current directory entry (file) information
+	const FileInfo& entry() const { return mEntry; }
+
+	/// Go back to first entry in directory
+	bool rewind();
+
+private:
+	class Impl; Impl * mImpl;
+	FileInfo mEntry;
 };
 
 
@@ -296,6 +376,7 @@ protected:
 	std::list<searchpath> mSearchPaths;
 	std::string mAppPath;
 };
+
 
 } // al::
 
