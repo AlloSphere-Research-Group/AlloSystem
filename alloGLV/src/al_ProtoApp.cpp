@@ -78,7 +78,7 @@ void ProtoApp::init(
 
 	// setup audio
 	if(usingAudio()){
-		gam::Sync::master().spu(audioIO().fps());
+		//gam::Sync::master().spu(audioIO().fps());
 	}
 
 
