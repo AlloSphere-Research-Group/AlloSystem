@@ -14,6 +14,20 @@
 		9B3EC8D816DD6517005FA527 /* omni.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B3EC8D716DD6517005FA527 /* omni.cpp */; };
 		9B44DF51166D8955007F1070 /* allovsr.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B39FADA165C2AA200C3776D /* allovsr.1 */; };
 		9B44DF59166D89A3007F1070 /* twists.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B44DF58166D89A3007F1070 /* twists.cpp */; };
+		9BBA127516E562EA00F04632 /* allovsr.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B39FADA165C2AA200C3776D /* allovsr.1 */; };
+		9BBA127D16E5634900F04632 /* coordinate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9BBA127C16E5634900F04632 /* coordinate.cpp */; };
+		9BBA129716E6952400F04632 /* map3D1.bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9BBA129616E6951C00F04632 /* map3D1.bin */; };
+		9BBA12A416E69FD500F04632 /* map3D2.bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9BBA129916E69FC900F04632 /* map3D2.bin */; };
+		9BBA12A516E69FDD00F04632 /* map3D3.bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9BBA129A16E69FC900F04632 /* map3D3.bin */; };
+		9BBA12A616E69FDD00F04632 /* map3D4.bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9BBA129B16E69FC900F04632 /* map3D4.bin */; };
+		9BBA12A716E69FDD00F04632 /* map3D5.bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9BBA129C16E69FC900F04632 /* map3D5.bin */; };
+		9BBA12A816E69FDD00F04632 /* map3D6.bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9BBA129D16E69FC900F04632 /* map3D6.bin */; };
+		9BBA12A916E69FDD00F04632 /* map3D7.bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9BBA129E16E69FC900F04632 /* map3D7.bin */; };
+		9BBA12AA16E69FDD00F04632 /* map3D8.bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9BBA129F16E69FC900F04632 /* map3D8.bin */; };
+		9BBA12AB16E69FDD00F04632 /* map3D9.bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9BBA12A016E69FC900F04632 /* map3D9.bin */; };
+		9BBA12AC16E69FDD00F04632 /* map3D10.bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9BBA12A116E69FC900F04632 /* map3D10.bin */; };
+		9BBA12AD16E69FDD00F04632 /* map3D11.bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9BBA12A216E69FC900F04632 /* map3D11.bin */; };
+		9BBA12AE16E69FDD00F04632 /* map3D12.bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9BBA12A316E69FC900F04632 /* map3D12.bin */; };
 		9BC0A7741666B68F006F7FE8 /* allovsr.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B39FADA165C2AA200C3776D /* allovsr.1 */; };
 		9BC0A77C1666B6EF006F7FE8 /* hopf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9BC0A77B1666B6EF006F7FE8 /* hopf.cpp */; };
 		9BC5A61D165C464E0082D7EA /* interface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9BC5A61C165C464E0082D7EA /* interface.cpp */; };
@@ -64,6 +78,28 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
+		9BBA127416E562EA00F04632 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 12;
+			dstPath = "";
+			dstSubfolderSpec = 16;
+			files = (
+				9BBA12A516E69FDD00F04632 /* map3D3.bin in CopyFiles */,
+				9BBA12A616E69FDD00F04632 /* map3D4.bin in CopyFiles */,
+				9BBA12A716E69FDD00F04632 /* map3D5.bin in CopyFiles */,
+				9BBA12A816E69FDD00F04632 /* map3D6.bin in CopyFiles */,
+				9BBA12A916E69FDD00F04632 /* map3D7.bin in CopyFiles */,
+				9BBA12AA16E69FDD00F04632 /* map3D8.bin in CopyFiles */,
+				9BBA12AB16E69FDD00F04632 /* map3D9.bin in CopyFiles */,
+				9BBA12AC16E69FDD00F04632 /* map3D10.bin in CopyFiles */,
+				9BBA12AD16E69FDD00F04632 /* map3D11.bin in CopyFiles */,
+				9BBA12AE16E69FDD00F04632 /* map3D12.bin in CopyFiles */,
+				9BBA129716E6952400F04632 /* map3D1.bin in CopyFiles */,
+				9BBA127516E562EA00F04632 /* allovsr.1 in CopyFiles */,
+				9BBA12A416E69FD500F04632 /* map3D2.bin in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9BC0A7731666B68F006F7FE8 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -113,6 +149,20 @@
 		9B3EC8DD16DD7ACC005FA527 /* al_WarpBlend.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_WarpBlend.hpp; path = ../../../alloutil/alloutil/al_WarpBlend.hpp; sourceTree = "<group>"; };
 		9B44DF55166D8955007F1070 /* twists */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = twists; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B44DF58166D89A3007F1070 /* twists.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = twists.cpp; path = ../../../examples/twists.cpp; sourceTree = "<group>"; };
+		9BBA127916E562EA00F04632 /* coordinates */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = coordinates; sourceTree = BUILT_PRODUCTS_DIR; };
+		9BBA127C16E5634900F04632 /* coordinate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = coordinate.cpp; path = ../../../tests/coordinate.cpp; sourceTree = "<group>"; };
+		9BBA129616E6951C00F04632 /* map3D1.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = map3D1.bin; path = "../../../../allostuff/calibration-current/map3D1.bin"; sourceTree = "<group>"; };
+		9BBA129916E69FC900F04632 /* map3D2.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = map3D2.bin; path = "../../../../allostuff/calibration-current/map3D2.bin"; sourceTree = "<group>"; };
+		9BBA129A16E69FC900F04632 /* map3D3.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = map3D3.bin; path = "../../../../allostuff/calibration-current/map3D3.bin"; sourceTree = "<group>"; };
+		9BBA129B16E69FC900F04632 /* map3D4.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = map3D4.bin; path = "../../../../allostuff/calibration-current/map3D4.bin"; sourceTree = "<group>"; };
+		9BBA129C16E69FC900F04632 /* map3D5.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = map3D5.bin; path = "../../../../allostuff/calibration-current/map3D5.bin"; sourceTree = "<group>"; };
+		9BBA129D16E69FC900F04632 /* map3D6.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = map3D6.bin; path = "../../../../allostuff/calibration-current/map3D6.bin"; sourceTree = "<group>"; };
+		9BBA129E16E69FC900F04632 /* map3D7.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = map3D7.bin; path = "../../../../allostuff/calibration-current/map3D7.bin"; sourceTree = "<group>"; };
+		9BBA129F16E69FC900F04632 /* map3D8.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = map3D8.bin; path = "../../../../allostuff/calibration-current/map3D8.bin"; sourceTree = "<group>"; };
+		9BBA12A016E69FC900F04632 /* map3D9.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = map3D9.bin; path = "../../../../allostuff/calibration-current/map3D9.bin"; sourceTree = "<group>"; };
+		9BBA12A116E69FC900F04632 /* map3D10.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = map3D10.bin; path = "../../../../allostuff/calibration-current/map3D10.bin"; sourceTree = "<group>"; };
+		9BBA12A216E69FC900F04632 /* map3D11.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = map3D11.bin; path = "../../../../allostuff/calibration-current/map3D11.bin"; sourceTree = "<group>"; };
+		9BBA12A316E69FC900F04632 /* map3D12.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = map3D12.bin; path = "../../../../allostuff/calibration-current/map3D12.bin"; sourceTree = "<group>"; };
 		9BC0A7781666B68F006F7FE8 /* hopf */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = hopf; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BC0A77B1666B6EF006F7FE8 /* hopf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = hopf.cpp; path = ../../../examples/hopf.cpp; sourceTree = "<group>"; };
 		9BC5A61B165C43D90082D7EA /* al_vsr.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_vsr.hpp; path = ../../allovsr/al_vsr.hpp; sourceTree = "<group>"; };
@@ -121,6 +171,10 @@
 		9BD11CB5166E804200832FA5 /* empty.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = empty.cpp; path = ../../../examples/empty.cpp; sourceTree = "<group>"; };
 		9BF010AD169CB1240079F394 /* knot */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = knot; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BF010B0169CB17B0079F394 /* knot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = knot.cpp; path = ../../../examples/knot.cpp; sourceTree = "<group>"; };
+		9BF6714516E6C88500884A9E /* al_Projection.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_Projection.hpp; path = ../../../alloutil/alloutil/al_Projection.hpp; sourceTree = "<group>"; };
+		9BF6714616E6DBC000884A9E /* al_OmniUtil.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_OmniUtil.hpp; path = ../../../alloutil/alloutil/al_OmniUtil.hpp; sourceTree = "<group>"; };
+		9BF6714716E6DE2600884A9E /* al_OmniStereo2.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_OmniStereo2.hpp; path = ../../../alloutil/alloutil/al_OmniStereo2.hpp; sourceTree = "<group>"; };
+		9BF6714816E6EA8500884A9E /* al_OmniStereo2.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = al_OmniStereo2.cpp; path = ../../../alloutil/alloutil/al_OmniStereo2.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,6 +200,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		9B44DF4F166D8955007F1070 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9BBA127316E562EA00F04632 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -188,8 +249,13 @@
 				9B3EC8D916DD6A0A005FA527 /* al_OmniApp.hpp */,
 				9B3EC8DA16DD6A0A005FA527 /* al_OmniStereo.hpp */,
 				9B3EC8DB16DD6A15005FA527 /* al_OmniStereo.cpp */,
+				9BF6714616E6DBC000884A9E /* al_OmniUtil.hpp */,
+				9BF6714516E6C88500884A9E /* al_Projection.hpp */,
+				9BF6714716E6DE2600884A9E /* al_OmniStereo2.hpp */,
+				9BF6714816E6EA8500884A9E /* al_OmniStereo2.cpp */,
 				9B3EC8DC16DD7AC2005FA527 /* al_WarpBlend.cpp */,
 				9B3EC8DD16DD7ACC005FA527 /* al_WarpBlend.hpp */,
+				9BBA129816E69FB000F04632 /* warpmaps */,
 			);
 			sourceTree = "<group>";
 		};
@@ -203,6 +269,7 @@
 				9BD11CB2166E800D00832FA5 /* empty */,
 				9BF010AD169CB1240079F394 /* knot */,
 				9B3EC8D416DD64A9005FA527 /* omni */,
+				9BBA127916E562EA00F04632 /* coordinates */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -211,6 +278,7 @@
 			isa = PBXGroup;
 			children = (
 				9BD11CB5166E804200832FA5 /* empty.cpp */,
+				9BBA127C16E5634900F04632 /* coordinate.cpp */,
 				9BC5A61C165C464E0082D7EA /* interface.cpp */,
 				9BC0A77B1666B6EF006F7FE8 /* hopf.cpp */,
 				9BF010B0169CB17B0079F394 /* knot.cpp */,
@@ -228,6 +296,25 @@
 				9B39FAE3165C2E0400C3776D /* Makefile */,
 			);
 			name = allocore;
+			sourceTree = "<group>";
+		};
+		9BBA129816E69FB000F04632 /* warpmaps */ = {
+			isa = PBXGroup;
+			children = (
+				9BBA129916E69FC900F04632 /* map3D2.bin */,
+				9BBA129A16E69FC900F04632 /* map3D3.bin */,
+				9BBA129B16E69FC900F04632 /* map3D4.bin */,
+				9BBA129C16E69FC900F04632 /* map3D5.bin */,
+				9BBA129D16E69FC900F04632 /* map3D6.bin */,
+				9BBA129E16E69FC900F04632 /* map3D7.bin */,
+				9BBA129F16E69FC900F04632 /* map3D8.bin */,
+				9BBA12A016E69FC900F04632 /* map3D9.bin */,
+				9BBA12A116E69FC900F04632 /* map3D10.bin */,
+				9BBA12A216E69FC900F04632 /* map3D11.bin */,
+				9BBA12A316E69FC900F04632 /* map3D12.bin */,
+				9BBA129616E6951C00F04632 /* map3D1.bin */,
+			);
+			name = warpmaps;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -299,6 +386,23 @@
 			name = twists;
 			productName = allovsr;
 			productReference = 9B44DF55166D8955007F1070 /* twists */;
+			productType = "com.apple.product-type.tool";
+		};
+		9BBA127016E562EA00F04632 /* coordinates */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9BBA127616E562EA00F04632 /* Build configuration list for PBXNativeTarget "coordinates" */;
+			buildPhases = (
+				9BBA127116E562EA00F04632 /* Sources */,
+				9BBA127316E562EA00F04632 /* Frameworks */,
+				9BBA127416E562EA00F04632 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = coordinates;
+			productName = allovsr;
+			productReference = 9BBA127916E562EA00F04632 /* coordinates */;
 			productType = "com.apple.product-type.tool";
 		};
 		9BC0A76F1666B68F006F7FE8 /* hopf */ = {
@@ -379,6 +483,7 @@
 				9BD11CA9166E800D00832FA5 /* empty */,
 				9BF010A4169CB1240079F394 /* knot */,
 				9B3EC8CB16DD64A9005FA527 /* omni */,
+				9BBA127016E562EA00F04632 /* coordinates */,
 			);
 		};
 /* End PBXProject section */
@@ -413,6 +518,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				9B44DF59166D89A3007F1070 /* twists.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9BBA127116E562EA00F04632 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9BBA127D16E5634900F04632 /* coordinate.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -824,6 +937,100 @@
 			};
 			name = Release;
 		};
+		9BBA127716E562EA00F04632 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEPLOYMENT_LOCATION = YES;
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					$SRCROOT/../../../build/lib/,
+				);
+				OTHER_LDFLAGS = (
+					"-lGLV",
+					"-lvsr",
+					"-lalloGLV",
+					"-lapr-1",
+					"-laprutil-1",
+					"-lfreeimage",
+					"-lassimp",
+					"-lfreetype",
+					"-L/usr/X11/lib/",
+					"-framework",
+					AudioUnit,
+					"-framework",
+					AudioToolbox,
+					"-framework",
+					CoreAudio,
+					"-framework",
+					CoreMidi,
+					"-framework",
+					Carbon,
+					"-lportaudio",
+					"-framework",
+					AGL,
+					"-framework",
+					OpenGL,
+					"-framework",
+					GLUT,
+					"-lpthread",
+					"-framework",
+					Cocoa,
+					"-framework",
+					Foundation,
+					"-lallocore",
+				);
+				PRODUCT_NAME = coordinates;
+				USER_HEADER_SEARCH_PATHS = "$SRCROOT/../../ $SRCROOT/../../../build/include/vsr/ $SRCROOT/../../../build/include/ $SRCROOT/../../../build/include/vsr/Elements/";
+			};
+			name = Debug;
+		};
+		9BBA127816E562EA00F04632 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEPLOYMENT_LOCATION = YES;
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					$SRCROOT/../../../build/lib/,
+				);
+				"OTHER_LDFLAGS[arch=*]" = (
+					"-lGLV",
+					"-lvsr",
+					"-lalloGLV",
+					"-lapr-1",
+					"-laprutil-1",
+					"-lfreeimage",
+					"-lassimp",
+					"-lfreetype",
+					"-L/usr/X11/lib/",
+					"-framework",
+					AudioUnit,
+					"-framework",
+					AudioToolbox,
+					"-framework",
+					CoreAudio,
+					"-framework",
+					CoreMidi,
+					"-framework",
+					Carbon,
+					"-lportaudio",
+					"-framework",
+					AGL,
+					"-framework",
+					OpenGL,
+					"-framework",
+					GLUT,
+					"-lpthread",
+					"-framework",
+					Cocoa,
+					"-framework",
+					Foundation,
+					"-lallocore",
+				);
+				PRODUCT_NAME = coordinates;
+				USER_HEADER_SEARCH_PATHS = "$SRCROOT/../../ $SRCROOT/../../../build/include/vsr/ $SRCROOT/../../../build/include/ $SRCROOT/../../../build/include/vsr/Elements/";
+			};
+			name = Release;
+		};
 		9BC0A7761666B68F006F7FE8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1011,6 +1218,7 @@
 		9BF010AB169CB1240079F394 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = YES;
 				LIBRARY_SEARCH_PATHS = (
 					/opt/local/lib,
 					$SRCROOT/../../../build/lib/,
@@ -1058,6 +1266,7 @@
 		9BF010AC169CB1240079F394 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = YES;
 				LIBRARY_SEARCH_PATHS = (
 					/opt/local/lib,
 					$SRCROOT/../../../build/lib/,
@@ -1146,6 +1355,15 @@
 			buildConfigurations = (
 				9B44DF53166D8955007F1070 /* Debug */,
 				9B44DF54166D8955007F1070 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9BBA127616E562EA00F04632 /* Build configuration list for PBXNativeTarget "coordinates" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9BBA127716E562EA00F04632 /* Debug */,
+				9BBA127816E562EA00F04632 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

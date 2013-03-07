@@ -46,10 +46,26 @@ public:
 				// simplified:	
 				vertex.xz += vec2(omni_eye * vn.z, omni_eye * -vn.x);	
 				// convert eye-space into cubemap-space:	
+
+                //OLD WAY:
+//				// GL_TEXTURE_CUBE_MAP_POSITIVE_X  	
+//					 if (omni_face == 0) { vertex.xyz = vec3(-vertex.z, -vertex.y, -vertex.x); }	
+//				// GL_TEXTURE_CUBE_MAP_NEGATIVE_X	
+//				else if (omni_face == 1) { vertex.xyz = vec3( vertex.z, -vertex.y,  vertex.x); }	
+//				// GL_TEXTURE_CUBE_MAP_POSITIVE_Y  	
+//				else if (omni_face == 2) { vertex.xyz = vec3( vertex.x,  vertex.z, -vertex.y); }	
+//				// GL_TEXTURE_CUBE_MAP_NEGATIVE_Y 	
+//				else if (omni_face == 3) { vertex.xyz = vec3( vertex.x, -vertex.z,  vertex.y); }	
+//				// GL_TEXTURE_CUBE_MAP_POSITIVE_Z  	
+//				else if (omni_face == 4) { vertex.xyz = vec3( vertex.x, -vertex.y, -vertex.z); }	
+//				// GL_TEXTURE_CUBE_MAP_NEGATIVE_Z   
+//				else					 { vertex.xyz = vec3(-vertex.x, -vertex.y,  vertex.z); }	
+
+                //NEW WAY
 				// GL_TEXTURE_CUBE_MAP_POSITIVE_X  	
-					 if (omni_face == 0) { vertex.xyz = vec3(-vertex.z, -vertex.y, -vertex.x); }	
+					 if (omni_face == 0) { vertex.xyz = vec3( vertex.z, -vertex.y, -vertex.x); }	
 				// GL_TEXTURE_CUBE_MAP_NEGATIVE_X	
-				else if (omni_face == 1) { vertex.xyz = vec3( vertex.z, -vertex.y,  vertex.x); }	
+				else if (omni_face == 1) { vertex.xyz = vec3( -vertex.z, -vertex.y,  vertex.x); }	
 				// GL_TEXTURE_CUBE_MAP_POSITIVE_Y  	
 				else if (omni_face == 2) { vertex.xyz = vec3( vertex.x,  vertex.z, -vertex.y); }	
 				// GL_TEXTURE_CUBE_MAP_NEGATIVE_Y 	
@@ -58,6 +74,7 @@ public:
 				else if (omni_face == 4) { vertex.xyz = vec3( vertex.x, -vertex.y, -vertex.z); }	
 				// GL_TEXTURE_CUBE_MAP_NEGATIVE_Z   
 				else					 { vertex.xyz = vec3(-vertex.x, -vertex.y,  vertex.z); }	
+
 				// convert into screen-space:	
 				// simplified perspective projection since fovy = 90 and aspect = 1	
 				vertex.zw = vec2(	
@@ -258,11 +275,15 @@ protected:
 	// supports up to 4 warps/viewports
 	Projection mProjections[4];
 	
+    //Function Pointer to Draw Methods
 	typedef void (OmniStereo::*DrawMethod)(const Pose& pose, double eye);
+    
+    //Possible DrawMethods
 	void drawEye(const Pose& pose, double eye);
 	void drawQuadEye(const Pose& pose, double eye);
 	void drawDemoEye(const Pose& pose, double eye);
 	
+    //Stereomode-switcher and DrawMethod-caller
 	template<DrawMethod F>
 	void drawStereo(const Lens& lens, const Pose& pose, const Viewport& viewport);
 	

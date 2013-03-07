@@ -57,7 +57,8 @@ namespace al {
 
 ///	A Pose is a combined position (3-vector) and orientation (quaternion).
 /// Local coordinate bases are referred to as r, u, and f which stand for 
-/// right, up, and forward, respectively.
+/// right, up, and forward, respectively.  
+/// Forward is -Z in a right handed system.
 class Pose {
 public:
 	/// Construct from a 

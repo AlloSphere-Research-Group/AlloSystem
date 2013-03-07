@@ -452,6 +452,8 @@ void OmniStereo::Projection::readBlend(std::string path) {
 	printf("read & allocated %s\n", path.c_str());
 }
 
+
+//READS IN UV PIXEL LOCATION DATA.  Handedness Confirmed
 void OmniStereo::Projection::readWarp(std::string path) {
 	File f(path, "rb");
 	if (!f.open()) {
@@ -482,6 +484,7 @@ void OmniStereo::Projection::readWarp(std::string path) {
 	r = f.read((void *)v, sizeof(float), elems);
 	f.close();
 	
+    //this keeps being reset -- reset once!
 	mWarp.resize(w, h)
 		.target(Texture::TEXTURE_2D)
 		.format(Graphics::RGBA)
@@ -494,30 +497,33 @@ void OmniStereo::Projection::readWarp(std::string path) {
 	printf("read %s\n", path.c_str());
 }
 
+
+//Update to texture 
 void OmniStereo::Projection::updatedWarp() {	
 	Array& arr = mWarp.array();
 	int w = arr.width();
 	int h = arr.height();
 	for (int y=0; y<h; y++) {
 		for (int x=0; x<w; x++) {
+
 			// Y axis appears to be inverted
 			int32_t y1 = (h-y-1);
+            
 			// input data is row-major format
 			int32_t idx = y1*w+x;	
 		
 			float * cell = arr.cell<float>(x, y);
 			Vec3f& out = *(Vec3f *)cell;
 			
-//			// coordinate system change?
-//			out.x = v[idx];
-//			out.y = u[idx];
-//			out.z = -t[idx];
-
-// Matt negates x as a quick expedient:
 			out.x = -t[idx];
 			out.y = u[idx];
 			out.z = v[idx];
-			
+            
+			// fourth element is currently unused:
+			cell[3] = 1.;
+
+
+
 			// TODO:
 			// out -= mRegistration.pos();
 			// // & unrotate by mRegistration.quat()
@@ -526,14 +532,11 @@ void OmniStereo::Projection::updatedWarp() {
 			// normalize here so the shaders don't have to
 			//out.normalize();
 			
-			// fourth element is currently unused:
-			cell[3] = 1.;
-			
-			if (y == 32 && x == 32) {
-				printf("example: %f %f %f -> %f %f %f\n", 
-					t[idx], u[idx], v[idx],
-					cell[0], cell[1], cell[2]);
-			}
+//			if (y == 32 && x == 32) {
+//				printf("example: %f %f %f -> %f %f %f\n", 
+//					t[idx], u[idx], v[idx],
+//					cell[0], cell[1], cell[2]);
+//			}
 		}
 	}
 	
@@ -856,6 +859,7 @@ void OmniStereo::onCreate() {
 		
 		// TODO: verify? 
 		// Domagoj also has:
+        // but these auto texcoord generators are only applied if enabled right?. . .
 		glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
 		glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
 		glTexGeni( GL_R, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
@@ -873,7 +877,7 @@ void OmniStereo::onCreate() {
 				GL_TEXTURE_CUBE_MAP_POSITIVE_X+f, 
 				0, GL_RGBA8, 
 				mResolution, mResolution, 
-				0, GL_BGRA, GL_UNSIGNED_BYTE, 
+				0, GL_BGRA, GL_UNSIGNED_BYTE,  //GL_BGRA
 				NULL);
 		}
 		
@@ -943,7 +947,11 @@ void OmniStereo::capture(OmniStereo::Drawable& drawable, const Lens& lens, const
 	// apply camera transform:
 	gl.pushMatrix(gl.MODELVIEW);
 	gl.loadMatrix(mModelView);
-	glPushAttrib(GL_ALL_ATTRIB_BITS);
+	
+    //Push Attributes
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
+    
+    //Bind Framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, mFbo);
 	gl.viewport(0, 0, mResolution, mResolution);
 	

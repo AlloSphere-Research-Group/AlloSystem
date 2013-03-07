@@ -144,9 +144,11 @@ inline OmniApp::OmniApp(std::string name, bool slave)
 	}
 }
 
+
 inline OmniApp::~OmniApp() {
 	if (!bSlave) sendDisconnect();
 }
+
 
 inline void OmniApp::initOmni(std::string path) {
   if (path == "") {
@@ -168,6 +170,7 @@ inline void OmniApp::initOmni(std::string path) {
 		mOmni.mode(OmniStereo::ACTIVE).stereo(true);
 	}
 }
+
 
 inline void OmniApp::initWindow(
 	const Window::Dim& dims, const std::string title, double fps, Window::DisplayMode mode) {
