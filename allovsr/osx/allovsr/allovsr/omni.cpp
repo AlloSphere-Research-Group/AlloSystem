@@ -13,12 +13,23 @@
 #include "alloutil/al_OmniApp.hpp"
 
 using namespace al;
+using namespace vsr;
+
+#define PRESET \
+    static bool bSet = 0;\
+    if (!bSet) { \
+        bSet = 1; 
+
+#define ENDSET }
 
 struct MyApp : OmniApp {
-  Mesh mesh;
   Light light;
 
   MyApp() {
+  
+    mOmni.mode( OmniStereo::DUAL ).stereo(true);
+
+     //   omniEnable( false );
 
 //    mesh.primitive(Graphics::TRIANGLES);
 //    addSphere(mesh, 1.0, 32, 32);
@@ -34,14 +45,26 @@ struct MyApp : OmniApp {
   
   }
 
-  virtual ~MyApp() {}
+  virtual ~MyApp() {
+    
+  
+  }
   
   virtual void onDraw(Graphics& g) {
     light();
     // say how much lighting you want
     shader().uniform("lighting", 1.0);
-    
-    
+
+    static double ls = -10;
+//    ls += .01;
+//    if (ls > 10 ) ls = 0;
+    mLens.eyeSep(-ls);
+
+
+    GL::push();
+    DRAW3(CXY(.3),1,0,0);
+    DRAW3(Vector(0,1,0),0,1,0);
+    GL::pop();
     //g.draw(mesh);
   }
 
