@@ -35,8 +35,9 @@ using namespace std;
 int run(int argc, char **argv){
 
 	if(argc < 3) {
-		cerr << "Usage: test_serial <serial port address> ";
-		cerr << "<baudrate> [test string]" << endl;
+		cerr<< "Usage: " << argv[0]
+			<< " <serial port address>" << " <baudrate> [test string]"
+			<< endl;
 		return 0;
 	}
 	// Argument 1 is the serial port
@@ -50,17 +51,16 @@ int run(int argc, char **argv){
 	string test_string = (argc == 4) ? argv[3] : "Testing.";
 
 
-	// port, baudrate, timeout in milliseconds
+	// Create and open serial port with address and baudrate as arguments
 	serial::Serial my_serial(port, baud);
 	
-	cout << "Is the serial port open?";
-	cout << my_serial.isOpen() ? "Yes." : "No.";
+	cout << "Is the serial port open? " << (my_serial.isOpen() ? "Yes.\n" : "No.\n");
 
 	// Wait a bit for serial device to setup
 	al::wait(1);
 	
 	// Flush buffers
-	//my_serial.flush();
+	my_serial.flush();
 	
 	// Test the timeout, there should be 1 second between prints
 	my_serial.setTimeout(1000);
