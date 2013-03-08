@@ -411,6 +411,12 @@ public:
 
   /*! Sets the timeout for reads and writes. */
   void
+  setTimeout (uint32_t timeout_constant){
+    setTimeout(Timeout::max(), timeout_constant, 0, timeout_constant, 0);
+  }
+  
+  /*! Sets the timeout for reads and writes. */
+  void
   setTimeout (uint32_t inter_byte_timeout, uint32_t read_timeout_constant,
               uint32_t read_timeout_multiplier, uint32_t write_timeout_constant,
               uint32_t write_timeout_multiplier)
