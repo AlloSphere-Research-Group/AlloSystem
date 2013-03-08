@@ -21,7 +21,7 @@ Here are the typical Arduino port addresses for each platform:
 
 OSX		/dev/tty.usbmodem***
 Linux	/dev/ttyACM0
-MinGW	\\\\.\\COM14
+MinGW	\\\\.\\COM3
 */
 
 #include <string>
@@ -51,7 +51,7 @@ int run(int argc, char **argv){
 
 
 	// port, baudrate, timeout in milliseconds
-	serial::Serial my_serial(port, baud, serial::Timeout::simpleTimeout(1000));
+	serial::Serial my_serial(port, baud);
 	
 	cout << "Is the serial port open?";
 	cout << my_serial.isOpen() ? "Yes." : "No.";
@@ -60,9 +60,10 @@ int run(int argc, char **argv){
 	al::wait(1);
 	
 	// Flush buffers
-	my_serial.flush();
+	//my_serial.flush();
 	
 	// Test the timeout, there should be 1 second between prints
+	my_serial.setTimeout(1000);
 	cout << "Timeout == 1000ms, asking for 1 more byte than written." << endl;
 	for(int count=0; count<10; ++count){
 		size_t bytes_wrote = my_serial.write(test_string);
@@ -77,7 +78,7 @@ int run(int argc, char **argv){
 	}
 	
 	// Test the timeout at 250ms
-	my_serial.setTimeout(serial::Timeout::max(), 250, 0, 250, 0);
+	my_serial.setTimeout(250);
 	cout << "Timeout == 250ms, asking for 1 more byte than written." << endl;
 	for(int count=0; count<10; ++count){
 		size_t bytes_wrote = my_serial.write(test_string);
