@@ -33,7 +33,7 @@
 #include "allocore/io/al_ControlNav.hpp"
 
 //alloGLV
-#include "alloGLV/al_controlGLV.hpp"
+#include "alloGLV/al_ControlGLV.hpp"
 
 //allovsr includes
 #include "allovsr/al_omnivsr.hpp"

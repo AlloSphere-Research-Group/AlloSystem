@@ -243,10 +243,10 @@ class MyApp : public al::VsrApp {
         glv.gui.colors().back.set(.3,.3,.3);
    
         
-        stereo.stereo(true);
-        stereo.mode( Stereographic::ANAGLYPH );
-        lens.fovy(45);
-        lens.eyeSep(lens.eyeSepAuto() *-1); 
+//        stereo.stereo(true);
+//        stereo.mode( Stereographic::ANAGLYPH );
+//        lens.fovy(45);
+//        lens.eyeSep(lens.eyeSepAuto() *-1); 
                              
         if (ALLOSPHERE){
             stereo.stereo(true);
