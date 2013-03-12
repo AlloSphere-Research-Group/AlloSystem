@@ -33,7 +33,7 @@ DEPFLAGS = -MMD -MF $(basename $@).dep
 -include ../alloutil/Makefile.link
 
 #Link
-LDFLAGS := -lvsr -lGLV -lalloGLV $(LDFLAGS)
+LDFLAGS += -lvsr -lGLV -lalloGLV $(LDFLAGS)
 #Link Twice
 LDFLAGS += $(LDFLAGS)
 
