@@ -30,6 +30,7 @@ CFLAGS += -Wno-deprecated
 DEPFLAGS = -MMD -MF $(basename $@).dep
 
 -include ../allocore/Makefile.link
+-include ../alloutil/Makefile.link
 
 #Link
 LDFLAGS := -lvsr -lGLV -lalloGLV $(LDFLAGS)
