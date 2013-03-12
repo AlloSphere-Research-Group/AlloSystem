@@ -33,9 +33,9 @@ DEPFLAGS = -MMD -MF $(basename $@).dep
 -include ../alloutil/Makefile.link
 
 #Link
-LDFLAGS += -lvsr -lGLV -lalloGLV $(LDFLAGS)
+LDFLAGS += -lvsr -lGLV -lalloGLV
 #Link Twice
-LDFLAGS += $(LDFLAGS)
+#LDFLAGS := $(LDFLAGS)
 
 IPATH = $(PCH_DIR) \
 		$(INC_DIR)vsr/Elements/\
@@ -64,7 +64,7 @@ dir:
 
 $(EXEC_TARGETS): FORCE dir
 	@echo Building $@ with $(LDFLAGS)
-	$(CXX) $(CXXFLAGS) $(HPATH) $@ -o $(BIN_DIR)$(*F) -L$(LIB_DIR) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $(HPATH) $@ -o $(BIN_DIR)$(*F) -L$(LIB_DIR) $(LDFLAGS) $(LDFLAGS)
 	@cd $(BIN_DIR) && ./$(*F)
 
 install: FORCE
