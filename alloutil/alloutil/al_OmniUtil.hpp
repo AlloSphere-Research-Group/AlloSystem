@@ -1,5 +1,5 @@
 //
-//  al_OmniGLSL.hpp
+//  al_OmniUtil.hpp
 //  
 //
 //  Created by Graham Wakefield, Pablo Colapinto on 3/5/13.
@@ -107,12 +107,47 @@ namespace al {
         ////////////////////////////////////
 
 
+
+
+    namespace GLSL {
+    
 	// prefix this string to every vertex shader used in rendering the scene
 	// use it as e.g.:
 	// gl_Position = omni_cube(gl_ModelViewMatrix * gl_Vertex);
-	// also be sure to call omni.uniforms(shader) in the OmniStereoDrawable callback
+	// also be sure to call omni.uniforms(shader) in the OmniStereoDrawable callback    
+    static std::string	OmniBasicVertex = AL_STRINGIFY(
+            varying vec4 color;
+            varying vec3 normal, lightDir, eyeVec;
+            void main(){
+                color = gl_Color;
+                vec4 vertex = gl_ModelViewMatrix * gl_Vertex;
+                normal = gl_NormalMatrix * gl_Normal;
+                vec3 V = vertex.xyz;
+                eyeVec = normalize(-V);
+                lightDir = normalize(vec3(gl_LightSource[0].position.xyz - V));
+                gl_Position = omni_render(vertex); 
+            }
+        );
 
-	std::string MakeCubeMap = 
+     static std::string OmniBasicFragment = AL_STRINGIFY(
+            uniform float lighting;
+            varying vec4 color;
+            varying vec3 normal, lightDir, eyeVec;
+            void main() {
+                vec4 final_color = color * gl_LightSource[0].ambient;
+                vec3 N = normalize(normal);
+                vec3 L = lightDir;
+                float lambertTerm = max(dot(N, L), 0.0);
+                final_color += gl_LightSource[0].diffuse * color * lambertTerm;
+                vec3 E = eyeVec;
+                vec3 R = reflect(-L, N);
+                float spec = pow(max(dot(R, E), 0.0), 0.9 + 1e-20);
+                final_color += gl_LightSource[0].specular * spec;
+                gl_FragColor = mix(color, final_color, lighting);
+            }
+        );
+
+	static std::string OmniCubeMap = 
 		 AL_STRINGIFY(	
 			// @omni_eye: the eye parallax distance. 	
 			//	This will be zero for mono, and positive/negative for right/left eyes.
@@ -143,21 +178,35 @@ namespace al {
 				vertex.xz += vec2(omni_eye * vn.z, omni_eye * -vn.x);	
 				// convert eye-space into cubemap-space:	
 
-                //OLD WAY:
+
 				// GL_TEXTURE_CUBE_MAP_POSITIVE_X  	
-					 if (omni_face == 0) { vertex.xyz = vec3(-vertex.z, -vertex.y, -vertex.x); }	
+//                if (omni_face == 0) { vertex.xyz = vec3(-vertex.z, -vertex.y, -vertex.x); }	
+//				// GL_TEXTURE_CUBE_MAP_NEGATIVE_X	
+//				else if (omni_face == 1) { vertex.xyz = vec3( vertex.z, -vertex.y,  vertex.x); }	
+//				// GL_TEXTURE_CUBE_MAP_POSITIVE_Y  	
+//				else if (omni_face == 2) { vertex.xyz = vec3( vertex.x,  vertex.z, -vertex.y); }	
+//				// GL_TEXTURE_CUBE_MAP_NEGATIVE_Y 	
+//				else if (omni_face == 3) { vertex.xyz = vec3( vertex.x, -vertex.z,  vertex.y); }	
+//				// GL_TEXTURE_CUBE_MAP_POSITIVE_Z  	
+//				else if (omni_face == 4) { vertex.xyz = vec3( vertex.x, -vertex.y, -vertex.z); }	
+//				// GL_TEXTURE_CUBE_MAP_NEGATIVE_Z   
+//				else					 { vertex.xyz = vec3( -vertex.x, -vertex.y,  vertex.z); }	
+                //A RIGHT-HANDED WORLD DRAWN INSIDE A LEFT-HANDED CUBE
+
+				// GL_TEXTURE_CUBE_MAP_POSITIVE_X  	
+                if (omni_face == 0) { vertex.xyz = vec3( vertex.z, -vertex.y, -vertex.x); }	// or -x
 				// GL_TEXTURE_CUBE_MAP_NEGATIVE_X	
-				else if (omni_face == 1) { vertex.xyz = vec3( vertex.z, -vertex.y,  vertex.x); }	
+				else if (omni_face == 1) { vertex.xyz = vec3( -vertex.z, -vertex.y,  vertex.x); }	//or x
 				// GL_TEXTURE_CUBE_MAP_POSITIVE_Y  	
-				else if (omni_face == 2) { vertex.xyz = vec3( vertex.x,  vertex.z, -vertex.y); }	
+				else if (omni_face == 2) { vertex.xyz = vec3( vertex.x,  -vertex.z, -vertex.y); }	//or -y
 				// GL_TEXTURE_CUBE_MAP_NEGATIVE_Y 	
-				else if (omni_face == 3) { vertex.xyz = vec3( vertex.x, -vertex.z,  vertex.y); }	
+				else if (omni_face == 3) { vertex.xyz = vec3( vertex.x, vertex.z,  vertex.y); }	//or y
 				// GL_TEXTURE_CUBE_MAP_POSITIVE_Z  	
-				else if (omni_face == 4) { vertex.xyz = vec3( vertex.x, -vertex.y, -vertex.z); }	
+				else if (omni_face == 4) { vertex.xyz = vec3(  vertex.x, -vertex.y, vertex.z); }	//or z
 				// GL_TEXTURE_CUBE_MAP_NEGATIVE_Z   
-				else					 { vertex.xyz = vec3(-vertex.x, -vertex.y,  vertex.z); }	
+				else					 { vertex.xyz = vec3( -vertex.x, -vertex.y,  -vertex.z); }   //or -z
                 
-				// convert into screen-space:	
+ 				// convert into screen-space:	
 				// simplified perspective projection since fovy = 90 and aspect = 1	
 				vertex.zw = vec2(	
 					(vertex.z*(omni_far+omni_near) + vertex.w*omni_far*omni_near*2.)/(omni_near-omni_far),	
@@ -168,8 +217,9 @@ namespace al {
 		);
         
         
+        //GENERIC PASS THROUGH OF CORNER TEXTURE COORDINATES ON A SLAB
         #pragma mark GLSL
-        string vGeneric = AL_STRINGIFY(
+        static string vGeneric = AL_STRINGIFY(
             varying vec2 T;
             void main(void) {
                 // pass through the texture coordinate (normalized pixel):
@@ -178,8 +228,9 @@ namespace al {
             }
         );
 
+        //USES PIXELMAP TEXTURES (written to by fillFishEye or MAP.bin data) TO INDEX CUBEMAP
         #pragma mark Cube GLSL
-        string fCube = AL_STRINGIFY(
+        static string fCube = AL_STRINGIFY(
             uniform sampler2D pixelMap;
             uniform sampler2D alphaMap;
             uniform samplerCube cubeMap;
@@ -187,8 +238,11 @@ namespace al {
             varying vec2 T;
             
             void main (void){
-                // ray location (calibration space):
+                // RIGHT-HANDED ray location (calibration space):
                 vec3 v = normalize(texture2D(pixelMap, T).rgb);
+                
+                //WATCHOUT: LEFT-HANDED CUBEMAPS!
+                //v.z = -v.z;
                 
                 // index into cubemap:
                 vec3 rgb = textureCube(cubeMap, v).rgb * texture2D(alphaMap, T).rgb;
@@ -197,8 +251,9 @@ namespace al {
             }
         );
 
+        //MAPS SPHERICAL COORDINATES TO 2D IMAGE PLANE (NO WARP DATA)
         #pragma mark Sphere GLSL
-        string fSphere = AL_STRINGIFY(	
+        static string fSphere = AL_STRINGIFY(	
             uniform sampler2D pixelMap;
             uniform sampler2D alphaMap;
             uniform sampler2D sphereMap;	
@@ -245,22 +300,24 @@ namespace al {
             }
         );
 
-        #pragma mark Warp GLSL
-        string fWarp = AL_STRINGIFY(
-            uniform sampler2D pixelMap;
-            uniform sampler2D alphaMap;
-            varying vec2 T;
-            void main (void){
-                vec3 v = texture2D(pixelMap, T).rgb;
-                v = normalize(v);
-                v = mod(v * 8., 1.);
-                v *= texture2D(alphaMap, T).rgb;
-                gl_FragColor = vec4(v, 1.);
-            }
-        );
+    // USE FOR TESTING (DRAWS WARP DATA AS COLOR)
+    #pragma mark Warp GLSL
+    static string fWarp = AL_STRINGIFY(
+        uniform sampler2D pixelMap;
+        uniform sampler2D alphaMap;
+        varying vec2 T;
+        void main (void){
+            vec3 v = texture2D(pixelMap, T).rgb;
+            v = normalize(v);
+            v = mod(v * 8., 1.);
+            v *= texture2D(alphaMap, T).rgb;
+            gl_FragColor = vec4(v, 1.);
+        }
+    );
 
+    // NOT SURE WHAT THIS DOES (TESTING)
     #pragma mark Demo GLSL
-    string fDemo = AL_STRINGIFY(
+    static string fDemo = AL_STRINGIFY(
         uniform sampler2D pixelMap;
         uniform sampler2D alphaMap;
         uniform vec4 quat;
@@ -435,8 +492,8 @@ namespace al {
         }
     );
     
-    
+    } //GLSL
 
-}
+} //AL
 
 #endif

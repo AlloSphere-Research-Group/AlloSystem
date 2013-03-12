@@ -515,7 +515,7 @@ void OmniStereo::Projection::updatedWarp() {
 			float * cell = arr.cell<float>(x, y);
 			Vec3f& out = *(Vec3f *)cell;
 			
-			out.x = -t[idx];
+			out.x = t[idx];
 			out.y = u[idx];
 			out.z = v[idx];
             

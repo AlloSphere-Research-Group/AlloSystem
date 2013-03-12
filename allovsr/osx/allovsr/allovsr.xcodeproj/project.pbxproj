@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9B015AC316EE6B9100461984 /* allovsr.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B39FADA165C2AA200C3776D /* allovsr.1 */; };
+		9B015ACB16EE6C0900461984 /* omnivsr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B015ACA16EE6C0900461984 /* omnivsr.cpp */; };
 		9B265FE2166D4289005D9135 /* allovsr.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B39FADA165C2AA200C3776D /* allovsr.1 */; };
 		9B265FEA166D42CE005D9135 /* robot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B265FE9166D42CE005D9135 /* robot.cpp */; };
 		9B39FADB165C2AA200C3776D /* allovsr.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B39FADA165C2AA200C3776D /* allovsr.1 */; };
@@ -38,6 +40,16 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		9B015AC216EE6B9100461984 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				9B015AC316EE6B9100461984 /* allovsr.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		9B265FE1166D4289005D9135 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -133,6 +145,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		9B015AC716EE6B9100461984 /* omnivsr */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = omnivsr; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B015ACA16EE6C0900461984 /* omnivsr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = omnivsr.cpp; path = ../../../examples/omnivsr.cpp; sourceTree = "<group>"; };
+		9B015AD416EE988400461984 /* al_OmniStereo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = al_OmniStereo.cpp; path = ../../../alloutil/src/al_OmniStereo.cpp; sourceTree = "<group>"; };
+		9B015AEA16EEB75C00461984 /* al_OmniStereo2.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_OmniStereo2.hpp; path = ../../../alloutil/alloutil/al_OmniStereo2.hpp; sourceTree = "<group>"; };
+		9B015AEB16EEB75C00461984 /* al_OmniUtil.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_OmniUtil.hpp; path = ../../../alloutil/alloutil/al_OmniUtil.hpp; sourceTree = "<group>"; };
+		9B015AEC16EEB75C00461984 /* al_Projection.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_Projection.hpp; path = ../../../alloutil/alloutil/al_Projection.hpp; sourceTree = "<group>"; };
+		9B015AED16EEB91500461984 /* al_OmniStereo2.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = al_OmniStereo2.cpp; path = ../../../alloutil/src/al_OmniStereo2.cpp; sourceTree = "<group>"; };
 		9B265FE6166D4289005D9135 /* hopf copy */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = "hopf copy"; path = robot; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B265FE9166D42CE005D9135 /* robot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = robot.cpp; path = ../../../examples/robot.cpp; sourceTree = "<group>"; };
 		9B39FAD4165C2AA200C3776D /* allovsr */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = allovsr; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -144,11 +163,11 @@
 		9B3EC8D716DD6517005FA527 /* omni.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = omni.cpp; sourceTree = "<group>"; };
 		9B3EC8D916DD6A0A005FA527 /* al_OmniApp.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_OmniApp.hpp; path = ../../../alloutil/alloutil/al_OmniApp.hpp; sourceTree = "<group>"; };
 		9B3EC8DA16DD6A0A005FA527 /* al_OmniStereo.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_OmniStereo.hpp; path = ../../../alloutil/alloutil/al_OmniStereo.hpp; sourceTree = "<group>"; };
-		9B3EC8DB16DD6A15005FA527 /* al_OmniStereo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = al_OmniStereo.cpp; path = ../../../alloutil/src/al_OmniStereo.cpp; sourceTree = "<group>"; };
 		9B3EC8DC16DD7AC2005FA527 /* al_WarpBlend.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = al_WarpBlend.cpp; path = ../../../alloutil/src/al_WarpBlend.cpp; sourceTree = "<group>"; };
 		9B3EC8DD16DD7ACC005FA527 /* al_WarpBlend.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_WarpBlend.hpp; path = ../../../alloutil/alloutil/al_WarpBlend.hpp; sourceTree = "<group>"; };
 		9B44DF55166D8955007F1070 /* twists */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = twists; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B44DF58166D89A3007F1070 /* twists.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = twists.cpp; path = ../../../examples/twists.cpp; sourceTree = "<group>"; };
+		9B5E943D16EBC6900019BAC8 /* al_omnivsr.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_omnivsr.hpp; path = ../../allovsr/al_omnivsr.hpp; sourceTree = "<group>"; };
 		9BBA127916E562EA00F04632 /* coordinates */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = coordinates; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BBA127C16E5634900F04632 /* coordinate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = coordinate.cpp; path = ../../../tests/coordinate.cpp; sourceTree = "<group>"; };
 		9BBA129616E6951C00F04632 /* map3D1.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = map3D1.bin; path = "../../../../allostuff/calibration-current/map3D1.bin"; sourceTree = "<group>"; };
@@ -171,13 +190,16 @@
 		9BD11CB5166E804200832FA5 /* empty.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = empty.cpp; path = ../../../examples/empty.cpp; sourceTree = "<group>"; };
 		9BF010AD169CB1240079F394 /* knot */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = knot; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BF010B0169CB17B0079F394 /* knot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = knot.cpp; path = ../../../examples/knot.cpp; sourceTree = "<group>"; };
-		9BF6714516E6C88500884A9E /* al_Projection.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_Projection.hpp; path = ../../../alloutil/alloutil/al_Projection.hpp; sourceTree = "<group>"; };
-		9BF6714616E6DBC000884A9E /* al_OmniUtil.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_OmniUtil.hpp; path = ../../../alloutil/alloutil/al_OmniUtil.hpp; sourceTree = "<group>"; };
-		9BF6714716E6DE2600884A9E /* al_OmniStereo2.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_OmniStereo2.hpp; path = ../../../alloutil/alloutil/al_OmniStereo2.hpp; sourceTree = "<group>"; };
-		9BF6714816E6EA8500884A9E /* al_OmniStereo2.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = al_OmniStereo2.cpp; path = ../../../alloutil/alloutil/al_OmniStereo2.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		9B015AC116EE6B9100461984 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9B265FE0166D4289005D9135 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -242,19 +264,20 @@
 			children = (
 				9BC5A61B165C43D90082D7EA /* al_vsr.hpp */,
 				9B39FAE2165C2C4900C3776D /* al_vsrInterface.hpp */,
+				9B5E943D16EBC6900019BAC8 /* al_omnivsr.hpp */,
 				9B39FAD7165C2AA200C3776D /* allovsr */,
 				9B39FAD5165C2AA200C3776D /* Products */,
 				9B39FAE4165C2E1B00C3776D /* allocore */,
 				9B39FAE5165C2E5500C3776D /* Makefile */,
 				9B3EC8D916DD6A0A005FA527 /* al_OmniApp.hpp */,
 				9B3EC8DA16DD6A0A005FA527 /* al_OmniStereo.hpp */,
-				9B3EC8DB16DD6A15005FA527 /* al_OmniStereo.cpp */,
-				9BF6714616E6DBC000884A9E /* al_OmniUtil.hpp */,
-				9BF6714516E6C88500884A9E /* al_Projection.hpp */,
-				9BF6714716E6DE2600884A9E /* al_OmniStereo2.hpp */,
-				9BF6714816E6EA8500884A9E /* al_OmniStereo2.cpp */,
 				9B3EC8DC16DD7AC2005FA527 /* al_WarpBlend.cpp */,
+				9B015AED16EEB91500461984 /* al_OmniStereo2.cpp */,
+				9B015AD416EE988400461984 /* al_OmniStereo.cpp */,
 				9B3EC8DD16DD7ACC005FA527 /* al_WarpBlend.hpp */,
+				9B015AEA16EEB75C00461984 /* al_OmniStereo2.hpp */,
+				9B015AEB16EEB75C00461984 /* al_OmniUtil.hpp */,
+				9B015AEC16EEB75C00461984 /* al_Projection.hpp */,
 				9BBA129816E69FB000F04632 /* warpmaps */,
 			);
 			sourceTree = "<group>";
@@ -270,6 +293,7 @@
 				9BF010AD169CB1240079F394 /* knot */,
 				9B3EC8D416DD64A9005FA527 /* omni */,
 				9BBA127916E562EA00F04632 /* coordinates */,
+				9B015AC716EE6B9100461984 /* omnivsr */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -284,6 +308,7 @@
 				9BF010B0169CB17B0079F394 /* knot.cpp */,
 				9B265FE9166D42CE005D9135 /* robot.cpp */,
 				9B3EC8D716DD6517005FA527 /* omni.cpp */,
+				9B015ACA16EE6C0900461984 /* omnivsr.cpp */,
 				9B44DF58166D89A3007F1070 /* twists.cpp */,
 				9B39FADA165C2AA200C3776D /* allovsr.1 */,
 			);
@@ -320,6 +345,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		9B015ABE16EE6B9100461984 /* omnivsr */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9B015AC416EE6B9100461984 /* Build configuration list for PBXNativeTarget "omnivsr" */;
+			buildPhases = (
+				9B015ABF16EE6B9100461984 /* Sources */,
+				9B015AC116EE6B9100461984 /* Frameworks */,
+				9B015AC216EE6B9100461984 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = omnivsr;
+			productName = allovsr;
+			productReference = 9B015AC716EE6B9100461984 /* omnivsr */;
+			productType = "com.apple.product-type.tool";
+		};
 		9B265FDD166D4289005D9135 /* robot */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9B265FE3166D4289005D9135 /* Build configuration list for PBXNativeTarget "robot" */;
@@ -484,11 +526,20 @@
 				9BF010A4169CB1240079F394 /* knot */,
 				9B3EC8CB16DD64A9005FA527 /* omni */,
 				9BBA127016E562EA00F04632 /* coordinates */,
+				9B015ABE16EE6B9100461984 /* omnivsr */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
+		9B015ABF16EE6B9100461984 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B015ACB16EE6C0900461984 /* omnivsr.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9B265FDE166D4289005D9135 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -556,6 +607,100 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		9B015AC516EE6B9100461984 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					$SRCROOT/../../../build/lib/,
+				);
+				OTHER_LDFLAGS = (
+					"-llua",
+					"-lalloutil",
+					"-lGLV",
+					"-lvsr",
+					"-lalloGLV",
+					"-lapr-1",
+					"-laprutil-1",
+					"-lfreeimage",
+					"-lassimp",
+					"-lfreetype",
+					"-L/usr/X11/lib/",
+					"-framework",
+					AudioUnit,
+					"-framework",
+					AudioToolbox,
+					"-framework",
+					CoreAudio,
+					"-framework",
+					CoreMidi,
+					"-framework",
+					Carbon,
+					"-lportaudio",
+					"-framework",
+					AGL,
+					"-framework",
+					OpenGL,
+					"-framework",
+					GLUT,
+					"-lpthread",
+					"-framework",
+					Cocoa,
+					"-framework",
+					Foundation,
+					"-lallocore",
+				);
+				PRODUCT_NAME = omnivsr;
+				USER_HEADER_SEARCH_PATHS = "$SRCROOT/../../ $SRCROOT/../../../build/include/vsr/ $SRCROOT/../../../build/include/ $SRCROOT/../../../build/include/vsr/Elements/";
+			};
+			name = Debug;
+		};
+		9B015AC616EE6B9100461984 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					$SRCROOT/../../../build/lib/,
+				);
+				"OTHER_LDFLAGS[arch=*]" = (
+					"-lGLV",
+					"-lvsr",
+					"-lalloGLV",
+					"-lapr-1",
+					"-laprutil-1",
+					"-lfreeimage",
+					"-lassimp",
+					"-lfreetype",
+					"-L/usr/X11/lib/",
+					"-framework",
+					AudioUnit,
+					"-framework",
+					AudioToolbox,
+					"-framework",
+					CoreAudio,
+					"-framework",
+					CoreMidi,
+					"-framework",
+					Carbon,
+					"-lportaudio",
+					"-framework",
+					AGL,
+					"-framework",
+					OpenGL,
+					"-framework",
+					GLUT,
+					"-lpthread",
+					"-framework",
+					Cocoa,
+					"-framework",
+					Foundation,
+					"-lallocore",
+				);
+				PRODUCT_NAME = omnivsr;
+				USER_HEADER_SEARCH_PATHS = "$SRCROOT/../../ $SRCROOT/../../../build/include/vsr/ $SRCROOT/../../../build/include/ $SRCROOT/../../../build/include/vsr/Elements/";
+			};
+			name = Release;
+		};
 		9B265FE4166D4289005D9135 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1314,6 +1459,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		9B015AC416EE6B9100461984 /* Build configuration list for PBXNativeTarget "omnivsr" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9B015AC516EE6B9100461984 /* Debug */,
+				9B015AC616EE6B9100461984 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		9B265FE3166D4289005D9135 /* Build configuration list for PBXNativeTarget "robot" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

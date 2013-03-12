@@ -17,6 +17,10 @@
 
 */
 
+
+#include "allocore/al_Allocore.hpp"
+
+
 namespace al {
 
     struct Projection {
@@ -29,7 +33,8 @@ namespace al {
 			float screen_radius, bridge_radius, unused0;
 		};
 
-        void loadParameters(){
+        //Load Parameters 
+        void loadParameters(std::string path){
         
             File f(path, "rb");
             if (!f.open()) {
@@ -58,11 +63,11 @@ namespace al {
             float x_dist = p.x_vec.mag();
             float y_dist = p.y_vec.mag();
             
-            x_unit = x_vec / x_dist;
+            x_unit = p.x_vec / x_dist;
             x_pixel = x_dist / p.width;
             x_offset = x_unit.dot(cv);
             
-            y_unit = y_vec / y_dist;
+            y_unit = p.y_vec / y_dist;
             y_pixel = y_dist / p.height;
             y_offset = y_unit.dot( cv );
         }
@@ -76,9 +81,10 @@ namespace al {
             
             int32_t num, width, height;
 
-            WarpData(std::string path) : load(path) {}
+            WarpData(){}
+            WarpData(std::string path) { load(path); }
             
-            Vector at(int idx) { return Vector(t[idx],u[idx],v[idx]); }
+            Vec3f at(int idx) { return Vec3f(t[idx],u[idx],v[idx]); }
 
             //Loads Warp Data
             void load(std::string path) {
@@ -123,21 +129,48 @@ namespace al {
         };
         
         
-        Projection(){}
+        Projection() 
+        :	mViewport(0, 0, 1, 1) {
+	
+            // allocate blend map:
+            mBlendTex.resize(128, 128)
+                .target(Texture::TEXTURE_2D)
+                .format(Graphics::LUMINANCE)
+                .type(Graphics::UBYTE)
+                .filterMin(Texture::LINEAR)
+                .allocate();
+                
+
+            // allocate warp map:
+            mWarpTex.resize(256, 256)
+                .target(Texture::TEXTURE_2D)
+                .format(Graphics::RGBA)
+                .type(Graphics::FLOAT)
+                .filterMin(Texture::LINEAR)
+                .allocate();
+                
+            mWarpData.t = mWarpData.u = mWarpData.v = 0;
+        }
         
         void onCreate(){
+            //DEFAULTS USED IF CONFIGURATION FILES ARE NOT FOUND
+            mWarpTex.filterMin(Texture::LINEAR_MIPMAP_LINEAR);
+            mWarpTex.filterMag(Texture::LINEAR);
+            mWarpTex.texelFormat(GL_RGB32F_ARB);
+            mWarpTex.dirty();
             
-            loadParameters()
-            readWarp();
-            readBlend();
+            mBlendTex.filterMin(Texture::LINEAR_MIPMAP_LINEAR);
+            mBlendTex.filterMag(Texture::LINEAR);
+            mBlendTex.dirty();
+
         }
 
     
-        void readWarp(){
+        void readWarp(std::string path){
             
             //Load Warp Data
-            stringstream os; os << "map3D"<<mParam.projnum<<".bin";            
-            mWarpData.load( os.str() );
+//            stringstream os; os << "map3D"<<mParam.projnum<<".bin";            
+            mWarpData.load( path );
 
             //Save to Texture
             mWarpTex.resize( mWarpData.width, mWarpData.height)
@@ -149,7 +182,7 @@ namespace al {
                     .allocate();
         }
         
-        void readBlend(){
+        void readBlend(std::string path){
             
             //Load Blend Alpha Data
             Image img(path);
@@ -163,15 +196,29 @@ namespace al {
         // MEMBERS      ///
         ///////////////////
         
-        Viewport mViewport;                 ///< Width, Height, Registration
-        WarpData mWarpData;                 ///< Data from map3d.bin files
-        Texture mWarpTex, mBlendTex;        ///< Textures of Data 
+        Viewport& viewport() { return mViewport; }
+        Viewport viewport() const { return mViewport; }
+        WarpData& warpData() { return mWarpData; }
+        WarpData warpData() const { return mWarpData; }
 
+        Texture& warp() { return mWarpTex; }
+        Texture& blend() { return mBlendTex; }
+        Texture warp() const { return mWarpTex; }
+        Texture blend() const { return mBlendTex; }
+        
         Vec3d position;
 
         Vec3f x_unit, y_unit;
 		float x_pixel, y_pixel;
-		float x_offset, y_offset;
+		float x_offset, y_offset;      
+        
+        protected:
+        
+        Viewport mViewport;                 ///< Width, Height, Registration
+        WarpData mWarpData;                 ///< Data from map3d.bin files
+        Texture mWarpTex, mBlendTex;        ///< Textures of Data 
+
+
         Parameters mParam;
         
     };

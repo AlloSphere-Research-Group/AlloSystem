@@ -55,16 +55,30 @@ struct MyApp : OmniApp {
     // say how much lighting you want
     shader().uniform("lighting", 1.0);
 
-    static double ls = -10;
+    //mNav.print();
+    
+    
+    //arrows should point away from each other
+    static double ls = 10;
 //    ls += .01;
 //    if (ls > 10 ) ls = 0;
-    mLens.eyeSep(-ls);
+    mLens.eyeSep(ls);
 
-
-    GL::push();
-    DRAW3(CXY(.3),1,0,0);
-    DRAW3(Vector(0,1,0),0,1,0);
-    GL::pop();
+        glBegin(GL_LINES);
+        glColor3f(1,1,1);
+        glVertex3f(-1,-1,0);
+        glVertex3f(1,1,0);
+        glVertex3f(1,-1,0);
+        glVertex3f(-1,1,0);
+        glVertex3f(-1,0,-1);
+        glVertex3f(1,-1,1);
+        glVertex3f(1,1,-1);
+        glVertex3f(1,1,1);
+        glEnd();
+//    GL::push();
+//    DRAW3(CXY(.3),1,0,0);
+//    DRAW3(Vector(0,1,0),0,1,0);
+//    GL::pop();
     //g.draw(mesh);
   }
 

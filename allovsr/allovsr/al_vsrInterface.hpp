@@ -96,6 +96,7 @@ namespace al {
         virtual bool onKeyDown(const Keyboard& k ){
             getKeyboardData(k);
             interface->onKeyDown();
+//            cout << (interface->keyboard.alt) << endl; 
             return true;
         }
         virtual bool onKeyUp(const Keyboard& k){

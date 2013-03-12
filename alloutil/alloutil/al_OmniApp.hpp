@@ -165,6 +165,7 @@ inline void OmniApp::initOmni(std::string path) {
     path += "/calibration-current/";
   }
 
+    //Reconfigures Projections
 	mOmni.configure(path, mHostName);
 	if (mOmni.activeStereo()) {
 		mOmni.mode(OmniStereo::ACTIVE).stereo(true);
@@ -262,6 +263,7 @@ inline bool OmniApp::onFrame() {
 	Viewport vp(width(), height());
 	
 	if (bOmniEnable) {
+        //cout << "enabled" << endl; 
 		mOmni.onFrame(*this, lens(), nav(), vp);
 	} else {
 		mOmni.onFrameFront(*this, lens(), nav(), vp);

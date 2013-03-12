@@ -12,9 +12,24 @@
 #include "al_Projection.hpp"
 #include "al_OmniUtil.hpp"
 
+//#include "allocore/graphics/al_Lens.hpp"
+#include "allocore/graphics/al_Shader.hpp"
+#include "allocore/graphics/al_Texture.hpp"
+
 namespace al {
 
-    class OmniStereo {
+    class OmniStereo2 {
+    
+        public:
+        
+        ///	Abstract base class for any object that can be rendered via OmniStereo:
+        class Drawable  {
+        public:
+
+            virtual void onDrawOmni(OmniStereo2& omni) = 0;
+            
+            virtual ~Drawable(){}
+        };
     
     	/// Stereographic mode
         enum StereoMode {
@@ -50,18 +65,18 @@ namespace al {
 
         
 	// @resolution sets the resolution of the cube textures / render buffers:
-	OmniStereo(unsigned resolution = 1024, bool useMipMaps=true);
+	OmniStereo2(unsigned resolution = 1024, bool useMipMaps=true);
 
 	// @resolution should be a power of 2
-	OmniStereo& resolution(unsigned resolution);
+	OmniStereo2& resolution(unsigned resolution);
 	unsigned resolution() { return mResolution; }
 	
 	// configure the projections according to files
-	OmniStereo& configure(std::string configpath, std::string configname="default");
+	OmniStereo2& configure(std::string configpath, std::string configname="default");
 	
-	// configure generatively:
-	OmniStereo& configure(WarpMode wm, float aspect=2., float fovy=M_PI);
-	OmniStereo& configure(BlendMode bm);
+	// configure generatively: (not sure what this means -pc)
+	OmniStereo2& configure(WarpMode wm, float aspect=2., float fovy=M_PI);
+	OmniStereo2& configure(BlendMode bm);
 	
 	// capture a scene to the cubemap textures 
 	// this is likely to be an expensive call, as it will render the scene 
@@ -69,29 +84,31 @@ namespace al {
 	// @draw should render without changing the viewport, modelview or projection matrices
 	// @lens is used for near/far clipping planes, and eye separation
 	// @pose sets the camera position/orientation
-	void capture(OmniStereo::Drawable& drawable, const Lens& lens, const Pose& pose);
+	void capture(OmniStereo2::Drawable& drawable, const Lens& lens, const Pose& pose);
 	// render the captured scene to multiple warp maps and viewports
 	// @viewport is the pixel dimensions of the window
 	void draw(const Lens& lens, const Pose& pose, const Viewport& vp);
 	
 	// typically they would be combined like this:
-	void onFrame(OmniStereo::Drawable& drawable, const Lens& lens, const Pose& pose, const Viewport& vp) {
+	void onFrame(OmniStereo2::Drawable& drawable, const Lens& lens, const Pose& pose, const Viewport& vp) {
 		capture(drawable, lens, pose);
 		draw(lens, pose, vp);
 	}
 	
 	// render front-view only (bypass FBO)
-	void onFrameFront(OmniStereo::Drawable& drawable, const Lens& lens, const Pose& pose, const Viewport& vp);
+	void onFrameFront(OmniStereo2::Drawable& drawable, const Lens& lens, const Pose& pose, const Viewport& vp);
 		
 	// send the proper uniforms to the shader:
 	void uniforms(ShaderProgram& program) const;
 	
 	// enable/disable stereographic mode:
-	OmniStereo& stereo(bool b) { mStereo = b; return *this; }
+	OmniStereo2& stereo(bool b) { mStereo = b; return *this; }
 	bool stereo() const { return mStereo; }	
 
-	OmniStereo& mode(StereoMode m) { mMode = m; return *this; }
+	OmniStereo2& mode(StereoMode m) { mMode = m; return *this; }
 	StereoMode mode() { return mMode; }
+    AnaglyphMode amode() { return mAnaglyphMode; }
+    OmniStereo2& amode( AnaglyphMode am ) { mAnaglyphMode = am; return *this; }
 	
 	// returns true if configured for active stereo:
 	bool activeStereo() { return mMode == ACTIVE; }
@@ -123,7 +140,7 @@ namespace al {
 	void onDestroy();
 	void compile();     ///< Compile Shaders
     void generate();    ///< Generate Cubemap Textures
-    void mipmap();      ///< Generate MipMap for Cubemap Texturs
+    void mipmap();      ///< Generate MipMap for Cubemap Textures (if bMipMap)
     
     
 	// configure the warp maps
@@ -136,16 +153,16 @@ namespace al {
 	void drawDemo(const Lens& lens, const Pose& pose, const Viewport& vp);
 	
 	// adjust the registration position:
-	void registrationPosition(const Vec3d& pos) {
-		for (int i=0; i<numProjections(); i++) {
-			projection(i).registrationPosition(pos);
-		}
-	}
+//	void registrationPosition(const Vec3d& pos) {
+//		for (int i=0; i<numProjections(); i++) {
+//			projection(i).registrationPosition(pos);
+//		}
+//	}
         
         
         protected:
         
-            // supports up to 4 warps/viewports
+            //HAS a PROJECTION (up to 4 -- or maybe 12 if working in Simulation Mode??
             Projection mProjections[4];
             
             unsigned mResolution;
@@ -158,7 +175,7 @@ namespace al {
             Matrix4d mModelView;                    ///< 
             
             //Function Pointer to Draw Methods
-            typedef void (OmniStereo::*DrawMethod)(const Pose& pose, double eye);
+            typedef void (OmniStereo2::*DrawMethod)(const Pose& pose, double eye);
             
             //Possible DrawMethods
             void drawEye(const Pose& pose, double eye);
@@ -171,7 +188,7 @@ namespace al {
             
             void drawQuad();
 
-            void capture_eye(GLuint& tex, OmniStereo::Drawable& drawable);
+            void capture_eye(GLuint& tex, OmniStereo2::Drawable& drawable);
             
 
             GLuint mTex[2];             // the cube map textures
@@ -195,8 +212,9 @@ namespace al {
     
     /* inline implementation */
 
+//SENDS UNIFORMS TO SHADER (SHADER IS TYPICALLY BOUND BY AN OMNISTEREO::DRAWABLE)
 inline 
-void OmniStereo::uniforms(ShaderProgram& program) const {
+void OmniStereo2::uniforms(ShaderProgram& program) const {
 	program.uniform("omni_face", mFace);
 	program.uniform("omni_eye", mEyeParallax);
 	program.uniform("omni_near", mNear);
@@ -205,8 +223,8 @@ void OmniStereo::uniforms(ShaderProgram& program) const {
 }
 
 //DRAWS DEPENDENDING ON STEREO MODE
-template<OmniStereo::DrawMethod F>
-inline void OmniStereo::drawStereo(const Lens& lens, const Pose& pose, const Viewport& vp) {
+template<OmniStereo2::DrawMethod F>
+inline void OmniStereo2::drawStereo(const Lens& lens, const Pose& pose, const Viewport& vp) {
 	double eye = lens.eyeSep();
 	switch (mMode) {
 		case SEQUENTIAL:
@@ -231,6 +249,7 @@ inline void OmniStereo::drawStereo(const Lens& lens, const Pose& pose, const Vie
 			break;
 		
 		case DUAL:
+            //std::cout << "dual draw" << std::endl; 
 			gl.viewport(vp.l + vp.w*0.5, vp.b, vp.w*0.5, vp.h);
 			(this->*F)(pose, eye);
 			gl.viewport(vp.l, vp.b, vp.w*0.5, vp.h);
@@ -238,6 +257,9 @@ inline void OmniStereo::drawStereo(const Lens& lens, const Pose& pose, const Vie
 			break;
 			
 		case ANAGLYPH:
+        
+            glEnable(GL_SCISSOR_TEST);
+            
 			switch(mAnaglyphMode){
 				case RED_BLUE:
 				case RED_GREEN:
@@ -264,6 +286,8 @@ inline void OmniStereo::drawStereo(const Lens& lens, const Pose& pose, const Vie
 			gl.clear(gl.DEPTH_BUFFER_BIT);
 			(this->*F)(pose, -eye);
 			
+            glColorMask(GL_TRUE, GL_TRUE ,GL_TRUE, GL_TRUE);
+            glDisable(GL_SCISSOR_TEST);
 			break;
 		
 		case RIGHT_EYE:
