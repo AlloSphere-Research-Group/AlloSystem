@@ -13,9 +13,9 @@
 		9B265FEA166D42CE005D9135 /* robot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B265FE9166D42CE005D9135 /* robot.cpp */; };
 		9B39FADB165C2AA200C3776D /* allovsr.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B39FADA165C2AA200C3776D /* allovsr.1 */; };
 		9B3EC8D016DD64A9005FA527 /* allovsr.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B39FADA165C2AA200C3776D /* allovsr.1 */; };
-		9B3EC8D816DD6517005FA527 /* omni.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B3EC8D716DD6517005FA527 /* omni.cpp */; };
 		9B44DF51166D8955007F1070 /* allovsr.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B39FADA165C2AA200C3776D /* allovsr.1 */; };
 		9B44DF59166D89A3007F1070 /* twists.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B44DF58166D89A3007F1070 /* twists.cpp */; };
+		9B6A69A816EFF14C0055294C /* omni.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B6A69A716EFF14C0055294C /* omni.cpp */; };
 		9BBA127516E562EA00F04632 /* allovsr.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B39FADA165C2AA200C3776D /* allovsr.1 */; };
 		9BBA127D16E5634900F04632 /* coordinate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9BBA127C16E5634900F04632 /* coordinate.cpp */; };
 		9BBA129716E6952400F04632 /* map3D1.bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9BBA129616E6951C00F04632 /* map3D1.bin */; };
@@ -160,7 +160,6 @@
 		9B39FAE3165C2E0400C3776D /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../../Makefile; sourceTree = "<group>"; };
 		9B39FAE5165C2E5500C3776D /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../Makefile; sourceTree = "<group>"; };
 		9B3EC8D416DD64A9005FA527 /* omni */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = omni; sourceTree = BUILT_PRODUCTS_DIR; };
-		9B3EC8D716DD6517005FA527 /* omni.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = omni.cpp; sourceTree = "<group>"; };
 		9B3EC8D916DD6A0A005FA527 /* al_OmniApp.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_OmniApp.hpp; path = ../../../alloutil/alloutil/al_OmniApp.hpp; sourceTree = "<group>"; };
 		9B3EC8DA16DD6A0A005FA527 /* al_OmniStereo.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_OmniStereo.hpp; path = ../../../alloutil/alloutil/al_OmniStereo.hpp; sourceTree = "<group>"; };
 		9B3EC8DC16DD7AC2005FA527 /* al_WarpBlend.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = al_WarpBlend.cpp; path = ../../../alloutil/src/al_WarpBlend.cpp; sourceTree = "<group>"; };
@@ -168,6 +167,7 @@
 		9B44DF55166D8955007F1070 /* twists */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = twists; sourceTree = BUILT_PRODUCTS_DIR; };
 		9B44DF58166D89A3007F1070 /* twists.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = twists.cpp; path = ../../../examples/twists.cpp; sourceTree = "<group>"; };
 		9B5E943D16EBC6900019BAC8 /* al_omnivsr.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_omnivsr.hpp; path = ../../allovsr/al_omnivsr.hpp; sourceTree = "<group>"; };
+		9B6A69A716EFF14C0055294C /* omni.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = omni.cpp; path = ../../../examples/omni.cpp; sourceTree = "<group>"; };
 		9BBA127916E562EA00F04632 /* coordinates */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = coordinates; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BBA127C16E5634900F04632 /* coordinate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = coordinate.cpp; path = ../../../tests/coordinate.cpp; sourceTree = "<group>"; };
 		9BBA129616E6951C00F04632 /* map3D1.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = map3D1.bin; path = "../../../../allostuff/calibration-current/map3D1.bin"; sourceTree = "<group>"; };
@@ -307,7 +307,7 @@
 				9BC0A77B1666B6EF006F7FE8 /* hopf.cpp */,
 				9BF010B0169CB17B0079F394 /* knot.cpp */,
 				9B265FE9166D42CE005D9135 /* robot.cpp */,
-				9B3EC8D716DD6517005FA527 /* omni.cpp */,
+				9B6A69A716EFF14C0055294C /* omni.cpp */,
 				9B015ACA16EE6C0900461984 /* omnivsr.cpp */,
 				9B44DF58166D89A3007F1070 /* twists.cpp */,
 				9B39FADA165C2AA200C3776D /* allovsr.1 */,
@@ -560,7 +560,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9B3EC8D816DD6517005FA527 /* omni.cpp in Sources */,
+				9B6A69A816EFF14C0055294C /* omni.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
