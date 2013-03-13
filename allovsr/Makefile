@@ -64,7 +64,7 @@ dir:
 
 $(EXEC_TARGETS): FORCE dir
 	@echo Building $@ with $(LDFLAGS)
-	$(CXX) $(CXXFLAGS) $(HPATH) $@ -o $(BIN_DIR)$(*F) -L$(LIB_DIR) $(LDFLAGS) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $(HPATH) $@ -o $(BIN_DIR)$(*F) -L$(LIB_DIR) -L/usr/local/lib -L/usr/lib $(LDFLAGS) $(LDFLAGS)
 	@cd $(BIN_DIR) && ./$(*F)
 
 install: FORCE
