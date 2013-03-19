@@ -130,6 +130,7 @@ namespace al {
             Viewport vp( width(), height() );
     
             vsr :: GL :: enablePreset();
+            
             mGraphics.depthTesting(true);
 
                 //Update ModelView Physics

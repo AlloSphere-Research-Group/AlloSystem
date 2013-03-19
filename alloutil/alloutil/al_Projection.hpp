@@ -210,7 +210,25 @@ namespace al {
 
         Vec3f x_unit, y_unit;
 		float x_pixel, y_pixel;
-		float x_offset, y_offset;      
+		float x_offset, y_offset;  
+        
+        //remapping experiments (flip z for reading left handed cubemap)   
+        void flipZ(){
+            Array& arr = mWarpTex.array();
+            int w= arr.width();
+            int h = arr.height();
+            for (int y=0; y<h; y++) {
+                for (int x=0; x<w; x++) {
+                
+                    float * cell = arr.cell<float>(x, y);
+                    Vec3f& out = *(Vec3f *)cell;
+                    out.z = -out.z;
+                }
+            }
+            
+            mWarpTex.dirty();
+        }
+        
         
         protected:
         
@@ -220,6 +238,8 @@ namespace al {
 
 
         Parameters mParam;
+        
+        
         
     };
 

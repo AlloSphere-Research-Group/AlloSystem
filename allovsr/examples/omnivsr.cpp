@@ -26,7 +26,7 @@
 #include "vsr/vsr_op.h"
 #include "vsr/vsr_draw.h"
 #include "vsr/vsr_frame.h"
-#include "vsr/vsr_field.h"
+//#include "vsr/vsr_field.h"
 
 //allocore includes
 #include "allocore/al_Allocore.hpp"
@@ -54,8 +54,8 @@ if(!bSet){ bSet = true;
 
 #define ENDSET }
 
+//CUBE MAP SANITY CHECK!
 void cmcheck(){
-    //CUBE MAP SANITY CHECK!
     double t = 3;
     //X Direction Facing a Sphere
     DRAW( Ro::dls(t,0.0,0.0) );
@@ -76,9 +76,13 @@ struct MyApp : public al::OmniVsrApp {
     Light light;
 
     MyApp() : al::OmniVsrApp() { 
-        mOmni.mode( Renderer::ANAGLYPH ).amode( Renderer::RED_CYAN).stereo(true);
+        //mOmni.mode( Renderer::ANAGLYPH ).stereo(true); //amode( Renderer::RED_CYAN).
+        
         camera().pos(0,0,0); // center camera
-            
+
+        for (int i = 0; i < mOmni.numProjections(); ++i){
+            mOmni.projection(i).flipZ();
+        }
     }
     
       virtual ~MyApp() {
@@ -88,7 +92,7 @@ struct MyApp : public al::OmniVsrApp {
   
     virtual void onDraw(Graphics& gl){
     
-        static Field<Cir> f(4,4,4);
+//        static Field<Cir> f(4,4,4);
     
         static double eyesep, fovy;
         
@@ -96,9 +100,9 @@ struct MyApp : public al::OmniVsrApp {
             glv.gui(eyesep, "eyesep",-10,10)(fovy,"fovy",0,180);
             eyesep = .02; fovy = 45;
             
-            for (int i = 0; i < f.num(); ++i){
-                f[i] = CXY(1).trs( f.grid(i) );
-            }
+//            for (int i = 0; i < f.num(); ++i){
+//                f[i] = CXY(1).trs( f.grid(i) );
+//            }
         ENDSET
     
         light();
@@ -112,6 +116,7 @@ struct MyApp : public al::OmniVsrApp {
         mLens.fovy(fovy);
         
         cmcheck();
+        
         //f.draw();
 
     }
