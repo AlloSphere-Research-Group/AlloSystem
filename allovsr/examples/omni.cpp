@@ -44,7 +44,7 @@ struct MyApp : OmniApp {
 
   MyApp() {
   
-    //mOmni.mode( OmniStereo::DUAL ).stereo(true);
+    mOmni.mode( OmniStereo::ACTIVE ).stereo(true);
 
      //   omniEnable( false );
 
@@ -79,7 +79,7 @@ struct MyApp : OmniApp {
     static double ls = 10;
 //    ls += .01;
 //    if (ls > 10 ) ls = 0;
-    mLens.eyeSep(ls);
+//    mLens.eyeSep(ls);
 
     cmcheck();
 //    GL::push();

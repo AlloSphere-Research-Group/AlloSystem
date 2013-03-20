@@ -62,17 +62,17 @@ public:
 //				else					 { vertex.xyz = vec3(-vertex.x, -vertex.y,  vertex.z); }	
 
 				// GL_TEXTURE_CUBE_MAP_POSITIVE_X  	
-                if (omni_face == 0) { vertex.xyz = vec3( vertex.z, -vertex.y, -vertex.x); }	// or -x
+                if (omni_face == 0) { vertex.xyz = vec3( vertex.z, -vertex.y, vertex.x); }	// or -x
 				// GL_TEXTURE_CUBE_MAP_NEGATIVE_X	
-				else if (omni_face == 1) { vertex.xyz = vec3( -vertex.z, -vertex.y,  vertex.x); }	//or x
+				else if (omni_face == 1) { vertex.xyz = vec3( -vertex.z, -vertex.y,  -vertex.x); }	//or x
 				// GL_TEXTURE_CUBE_MAP_POSITIVE_Y  	
-				else if (omni_face == 2) { vertex.xyz = vec3( vertex.x,  -vertex.z, -vertex.y); }	//or -y
+				else if (omni_face == 2) { vertex.xyz = vec3( vertex.x,  -vertex.z, vertex.y); }	//or -y
 				// GL_TEXTURE_CUBE_MAP_NEGATIVE_Y 	
-				else if (omni_face == 3) { vertex.xyz = vec3( vertex.x, vertex.z,  vertex.y); }	//or y
+				else if (omni_face == 3) { vertex.xyz = vec3( vertex.x, vertex.z,  -vertex.y); }	//or y
 				// GL_TEXTURE_CUBE_MAP_POSITIVE_Z  	
-				else if (omni_face == 4) { vertex.xyz = vec3(  vertex.x, -vertex.y, vertex.z); }	//or z
+				else if (omni_face == 4) { vertex.xyz = vec3(  vertex.x, -vertex.y, -vertex.z); }	//or z
 				// GL_TEXTURE_CUBE_MAP_NEGATIVE_Z   
-				else					 { vertex.xyz = vec3( -vertex.x, -vertex.y,  -vertex.z); }   //or -z
+				else					 { vertex.xyz = vec3( -vertex.x, -vertex.y,  vertex.z); }   //or -z
 
 				// convert into screen-space:	
 				// simplified perspective projection since fovy = 90 and aspect = 1	
