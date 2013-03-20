@@ -517,7 +517,7 @@ void OmniStereo::Projection::updatedWarp() {
 			
 			out.x = t[idx];
 			out.y = u[idx];
-			out.z = -v[idx];
+			out.z = v[idx];
             
 			// fourth element is currently unused:
 			cell[3] = 1.;
