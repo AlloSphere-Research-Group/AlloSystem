@@ -43,7 +43,9 @@ public:
 				// omni-stereo effect (in eyespace XZ plane)	
 				// cross-product with up vector also ensures stereo fades out at Y poles	
 				//v.xyz -= omni_eye * cross(vn, vec3(0, 1, 0));	
-				// simplified:	
+				// simplified:
+                vertex.z = -vertex.z;
+                	
 				vertex.xz += vec2(omni_eye * vn.z, omni_eye * -vn.x);	
 				// convert eye-space into cubemap-space:	
 
@@ -74,7 +76,7 @@ public:
 				// GL_TEXTURE_CUBE_MAP_NEGATIVE_Z   
 				else					 { vertex.xyz = vec3( -vertex.x, -vertex.y,  -vertex.z); }   //or -z
 
-                //vertex.z = -vertex.z;
+                vertex.z = -vertex.z;
 				// convert into screen-space:	
 				// simplified perspective projection since fovy = 90 and aspect = 1	
 				vertex.zw = vec2(	
