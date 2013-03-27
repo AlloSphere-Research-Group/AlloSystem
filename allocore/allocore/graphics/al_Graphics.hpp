@@ -426,16 +426,14 @@ public:
 
 	/// Draw vertex data
 	
-	/// @param[in] v		vertex data to draw
+	/// This draws a range of vertices from a mesh. If the mesh contains
+	/// vertex indices, then the range corresponds to the vertex indices array.
+	/// Negative index amounts are relative at one past the maximum index.
 	///
-	void draw(const Mesh& v);
-
-	/// Draw vertex data
-	
-	/// @param[in] numVertices	maximum number of vertices to draw. This is 
-	///							valid only for non-indexed vertex data.
-	/// @param[in] v			vertex data to draw
-	void draw(int numVertices, const Mesh& v);
+	/// @param[in] m		Vertex data to draw
+	/// @param[in] iend		End index of vertices or indices to draw (exclusive)
+	/// @param[in] ibeg		Begin index of vertices or indices to draw (inclusive)
+	void draw(const Mesh& m, int iend=-1, int ibeg=0);
 	
 	/// Draw internal vertex data
 	void draw(){ draw(mMesh); }
@@ -459,7 +457,10 @@ public:
 
 	/// Returns DataType for a given AlloTy
 	static DataType toDataType(AlloTy type);
-	
+
+
+	void draw(int numVertices, const Mesh& v);
+
 protected:
 	Mesh mMesh;				// used for immediate mode style rendering
 	bool mInImmediateMode;	// flag for whether or not in immediate mode

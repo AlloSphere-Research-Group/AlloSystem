@@ -194,24 +194,37 @@ void Graphics::color(double r, double g, double b, double a) {
 }
 
 // Buffer drawing
-void Graphics::draw(const Mesh& v){
-	draw(v.vertices().size(), v);
+void Graphics::draw(int num_vertices, const Mesh& m){
+	draw(m, num_vertices);
 }
 
-void Graphics::draw(int num_vertices, const Mesh& v){
-	const int Nv = al::min(num_vertices, v.vertices().size());
-	if(0 == Nv) return;
-	
-	const int Nc = al::min(num_vertices, v.colors().size());
-	const int Nci= al::min(num_vertices, v.coloris().size());
-	const int Nn = al::min(num_vertices, v.normals().size());
-	const int Nt2= al::min(num_vertices, v.texCoord2s().size());
-	const int Nt3= al::min(num_vertices, v.texCoord3s().size());
+void Graphics::draw(const Mesh& v, int iend, int ibeg){
+
+	const int Nv = v.vertices().size();
+	if(0 == Nv) return; // nothing to draw, so just return...
+
 	const int Ni = v.indices().size();
+
+	const int Nmax = Ni ? Ni : Nv;
+
+	// Adjust negative indices
+	if(iend < 0) iend += Nmax+1;
+	if(ibeg < 0) ibeg += Nmax+1;
+
+	// Safety checks...
+	if(iend > Nmax) iend = Nmax;
+	if(ibeg >= iend) return;
+
+	int len = iend - ibeg;
+
+	const int Nc = v.colors().size();
+	const int Nci= v.coloris().size();
+	const int Nn = v.normals().size();
+	const int Nt2= v.texCoord2s().size();
+	const int Nt3= v.texCoord3s().size();
 	
 	//printf("client %d, GPU %d\n", clientSide, gpuSide);
 	//printf("Nv %i Nc %i Nn %i Nt2 %i Nt3 %i Ni %i\n", Nv, Nc, Nn, Nt2, Nt3, Ni);
-
 
 	// Enable arrays and set pointers...
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -248,30 +261,22 @@ void Graphics::draw(int num_vertices, const Mesh& v){
 		if(Nt3 >= Nv) glTexCoordPointer(3, GL_FLOAT, 0, &v.texCoord3s()[0]);
 	}
 
-
 	// Draw
 	if(Ni){
-		//unsigned vs=0, ve=Nv;	// range of vertex indices to prefetch
-								// NOTE:	if this range exceeds the number of vertices,
-								//			expect a segmentation fault...
-		unsigned is=0, ie=Ni;	// range of indices to draw
-
-		//glDrawRangeElements(v.primitive(), vs, ve, ie-is, GL_UNSIGNED_INT, &v.indices()[is]);
 		glDrawElements(
 			((Graphics::Primitive)v.primitive()), 
-			ie-is, 
+			len, // number of indexed elements to render
 			GL_UNSIGNED_INT, 
-			&v.indices()[is]
+			&v.indices()[ibeg]
 		);
 	}
 	else{
 		glDrawArrays(
 			((Graphics::Primitive)v.primitive()), 
-			0,
-			Nv
+			ibeg,
+			len
 		);
 	}
-
 
 	// Disable arrays
 					glDisableClientState(GL_VERTEX_ARRAY);
