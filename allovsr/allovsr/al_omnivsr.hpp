@@ -65,6 +65,8 @@ namespace al {
             osc::Recv mOSCRecv;
             osc::Send mOSCSend;
             
+            //tmp
+            Nav mNav;
     
             StandardWindowKeyControls mStdControls;
         
@@ -108,6 +110,10 @@ namespace al {
                 oscSend().send("/disconnectApplication", name());
             }
         
+        
+        //tmp
+        const Nav&			nav() const { return mNav; }
+        Nav&				nav(){ return mNav; }
         
         ///////////////////
         // CallBacks    ///
