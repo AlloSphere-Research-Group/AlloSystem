@@ -374,6 +374,20 @@ Mesh& Mesh::repeatLast(){
 
 void Mesh::ribbonize(float * widths, int widthsStride, bool faceBinormal){
 
+	struct F{
+		static void frenet(
+			Vertex * f, const Vertex& v0, const Vertex& v1, const Vertex& v2
+		){
+			const Vertex vf = v2 - v1; // forward difference
+			const Vertex vb = v1 - v0; // backward difference
+			const Vertex d1 = vf + vb; // first difference (x 2)
+			const Vertex d2 = vf - vb; // second difference
+			f[2] = cross(d2,  d1).normalized(); // binormal
+			f[1] = cross(d1,f[2]).normalized();	// normal
+			//f[0] = d1.normalized(); // tangent (not used)
+		}
+	};
+
 	const int N = mVertices.size();
 
 	if(0 == N) return;
@@ -381,46 +395,56 @@ void Mesh::ribbonize(float * widths, int widthsStride, bool faceBinormal){
 	mVertices.size(N*2);
 	mNormals.size(N*2);
 
+	int in = faceBinormal ? 2 : 1;
+	int ib = faceBinormal ? 1 : 2;
+
+	Vertex ff[3]; // T,N,B
+
+	// Compute second and second to last Frenet frames used later to ribbonize
+	// the first and last vertices.
+	F::frenet(ff, mVertices[0], mVertices[1], mVertices[2]);
+	const Vertex n1 = ff[in];
+	const Vertex b1 = ff[ib] * widths[0];
+	F::frenet(ff, mVertices[N-3], mVertices[N-2], mVertices[N-1]);
+	const Vertex nN = ff[in];
+	const Vertex bN = ff[ib] * widths[(N-1)*widthsStride];
+
 	// Store last vertex since it will be overwritten eventually
 	const Vertex last = mVertices[N-1]; 
 	
-	int in = faceBinormal ? 2 : 1;
-	int ib = faceBinormal ? 1 : 2;
-	
-	for(int i=N-1; i>=0; --i){
+	// Go backwards through vertices since we are processing in place
+	for(int i=N-2; i>=1; --i){		
+		int i0 = i-1;
 		int i1 = i;
-		int i0 = i1-1; if(i0< 0) i0+=N;
-		int i2 = i1+1; if(i2>=N) i2-=N;
-
-		const Vertex& v0 = (i0==(N-1)) ? last : mVertices[i0];
+		int i2 = i+1;
+		const Vertex& v0 = mVertices[i0];
 		const Vertex& v1 = mVertices[i1];
 		const Vertex& v2 = mVertices[i2];
 
-		// compute Frenet frame
-		Vertex f[3]; // T,N,B
-		{
-			const Vertex d1 = (v0 - v2)*0.5;
-			const Vertex d2 = (d1 - v1)*2.0;
-//			const Vertex d1 = (v0 - v2);
-//			const Vertex d2 = (v0 - v1 - v1 + v2);
-			//Vertex& t = f[0];
-			Vertex& n = f[1];
-			Vertex& b = f[2];
-			b = cross(d2,d1).normalized();
-			n = cross(d1, b).normalized();
-			//t = d1.normalized(); // not used
-		}
-		f[ib] *= widths[i0*widthsStride];
+		// Compute Frenet frame
+		F::frenet(ff, v0,v1,v2);
+
+		// Scale binormal by ribbon width
+		ff[ib] *= widths[i1*widthsStride];
 		
 		int i12 = i1<<1;
 		// v1 is ref, so we must write in reverse to properly handle i=0
-		mVertices[i12+1] = v1+f[ib];
-		mVertices[i12  ] = v1-f[ib];
+		mVertices[i12+1] = v1+ff[ib];
+		mVertices[i12  ] = v1-ff[ib];
 
-		mNormals [i12  ].set(f[in][0], f[in][1], f[in][2]);
+		mNormals [i12  ].set(ff[in][0], ff[in][1], ff[in][2]);
 		mNormals [i12+1] = mNormals[i12];
 	}
 	
+	// Ribbonize first and last vertices
+	mVertices[1] = mVertices[0] + b1;
+	mVertices[0] = mVertices[0] - b1;
+	mNormals[0] = mNormals[1] = n1;
+	int iN = (N-1)*2;
+	mVertices[iN+1] = last + bN;
+	mVertices[iN+0] = last - bN;
+	mNormals[iN+0] = mNormals[iN+1] = nN;
+
 	if(mColors.size()) mColors.expand<2,true>();
 	if(mColoris.size()) mColoris.expand<2,true>();
 }
