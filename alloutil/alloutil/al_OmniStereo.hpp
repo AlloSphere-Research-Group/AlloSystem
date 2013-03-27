@@ -44,7 +44,6 @@ public:
 				// cross-product with up vector also ensures stereo fades out at Y poles	
 				//v.xyz -= omni_eye * cross(vn, vec3(0, 1, 0));	
 				// simplified:
-                vertex.z = -vertex.z;
                 	
 				vertex.xz += vec2(omni_eye * vn.z, omni_eye * -vn.x);	
 				// convert eye-space into cubemap-space:	
@@ -83,6 +82,7 @@ public:
 					(vertex.z*(omni_far+omni_near) + vertex.w*omni_far*omni_near*2.)/(omni_near-omni_far),	
 					-vertex.z	
 				);	
+                
 				return vertex;	
 			}
 		);
