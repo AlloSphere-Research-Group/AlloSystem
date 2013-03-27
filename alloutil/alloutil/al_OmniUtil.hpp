@@ -169,42 +169,32 @@ namespace al {
 			// @vertex: the eye-space vertex to be rendered.	
 			//	Typically gl_Position = omni_render(gl_ModelViewMatrix * gl_Vertex);	
 			vec4 omni_render(in vec4 vertex) {	
-				// unit direction vector:	
+				
+                // unit direction vector:	
 				vec3 vn = normalize(vertex.xyz);	
+                
 				// omni-stereo effect (in eyespace XZ plane)	
 				// cross-product with up vector also ensures stereo fades out at Y poles	
 				//v.xyz -= omni_eye * cross(vn, vec3(0, 1, 0));	
 				// simplified:	
 				vertex.xz += vec2(omni_eye * vn.z, omni_eye * -vn.x);	
-				// convert eye-space into cubemap-space:	
+                
+				// convert RH eye-space into LH cubemap-space:	
+                vertex.z = -vertex.z;
 
-
+                //MAP TO A LH CUBE
 				// GL_TEXTURE_CUBE_MAP_POSITIVE_X  	
-//                if (omni_face == 0) { vertex.xyz = vec3(-vertex.z, -vertex.y, -vertex.x); }	
-//				// GL_TEXTURE_CUBE_MAP_NEGATIVE_X	
-//				else if (omni_face == 1) { vertex.xyz = vec3( vertex.z, -vertex.y,  vertex.x); }	
-//				// GL_TEXTURE_CUBE_MAP_POSITIVE_Y  	
-//				else if (omni_face == 2) { vertex.xyz = vec3( vertex.x,  vertex.z, -vertex.y); }	
-//				// GL_TEXTURE_CUBE_MAP_NEGATIVE_Y 	
-//				else if (omni_face == 3) { vertex.xyz = vec3( vertex.x, -vertex.z,  vertex.y); }	
-//				// GL_TEXTURE_CUBE_MAP_POSITIVE_Z  	
-//				else if (omni_face == 4) { vertex.xyz = vec3( vertex.x, -vertex.y, -vertex.z); }	
-//				// GL_TEXTURE_CUBE_MAP_NEGATIVE_Z   
-//				else					 { vertex.xyz = vec3( -vertex.x, -vertex.y,  vertex.z); }	
-                //A RIGHT-HANDED WORLD DRAWN INSIDE A LEFT-HANDED CUBE
-
-				// GL_TEXTURE_CUBE_MAP_POSITIVE_X  	
-                if (omni_face == 0) { vertex.xyz = vec3( vertex.z, -vertex.y, -vertex.x); }	// or -x
+                if (omni_face == 0) { vertex.xyz = vec3( vertex.z, -vertex.y, -vertex.x); }
 				// GL_TEXTURE_CUBE_MAP_NEGATIVE_X	
-				else if (omni_face == 1) { vertex.xyz = vec3( -vertex.z, -vertex.y,  vertex.x); }	//or x
+				else if (omni_face == 1) { vertex.xyz = vec3( -vertex.z, -vertex.y,  vertex.x); }	
 				// GL_TEXTURE_CUBE_MAP_POSITIVE_Y  	
-				else if (omni_face == 2) { vertex.xyz = vec3( vertex.x,  -vertex.z, -vertex.y); }	//or -y
+				else if (omni_face == 2) { vertex.xyz = vec3( vertex.x,  -vertex.z, -vertex.y); }	
 				// GL_TEXTURE_CUBE_MAP_NEGATIVE_Y 	
-				else if (omni_face == 3) { vertex.xyz = vec3( vertex.x, vertex.z,  vertex.y); }	//or y
+				else if (omni_face == 3) { vertex.xyz = vec3( vertex.x, vertex.z,  vertex.y); }	
 				// GL_TEXTURE_CUBE_MAP_POSITIVE_Z  	
-				else if (omni_face == 4) { vertex.xyz = vec3(  vertex.x, -vertex.y, vertex.z); }	//or z
+				else if (omni_face == 4) { vertex.xyz = vec3(  vertex.x, -vertex.y, vertex.z); }	
 				// GL_TEXTURE_CUBE_MAP_NEGATIVE_Z   
-				else					 { vertex.xyz = vec3( -vertex.x, -vertex.y,  -vertex.z); }   //or -z
+				else					 { vertex.xyz = vec3( -vertex.x, -vertex.y,  -vertex.z); }
                 
  				// convert into screen-space:	
 				// simplified perspective projection since fovy = 90 and aspect = 1	
@@ -212,6 +202,7 @@ namespace al {
 					(vertex.z*(omni_far+omni_near) + vertex.w*omni_far*omni_near*2.)/(omni_near-omni_far),	
 					-vertex.z	
 				);	
+                
 				return vertex;	
 			}
 		);

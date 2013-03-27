@@ -124,6 +124,63 @@ struct MyApp : public al::OmniVsrApp {
     virtual bool onKeyDown(){
         return true;
     }
+    
+    virtual void onAnimate(al_sec dt) {
+		osc::Packet p;
+		p.beginMessage("/nav");
+		p << camera().pos()[0] <<  camera().pos()[1] <<  camera().pos()[2] <<  camera().rot()[0] << camera().rot()[1]<< camera().rot()[2] << camera().rot()[3];
+		p.endMessage();
+		
+		osc::Send(12001, "192.168.0.26").send(p);
+		osc::Send(12001, "192.168.0.27").send(p);
+		osc::Send(12001, "192.168.0.28").send(p);
+		osc::Send(12001, "192.168.0.29").send(p);
+    }
+    
+   virtual void onMessage(osc::Message& message) {
+		message.print();
+        
+        if(Socket::hostName() == "photon") {
+            
+            float value;
+            
+            if (message.addressPattern() == "/mx") {
+				message >> value;
+				camera().dx() = Vector(-value, 0, 0);
+            }
+            else if (message.addressPattern() == "/my") {
+				message >> value;
+				camera().dx() = Vector(0, value, 0);
+			}
+            else if (message.addressPattern() == "/mz") {
+				message >> value;
+				camera().dx() = Vector(0,0,-value);
+			}
+            else if (message.addressPattern() == "/tx") {
+				message >> value;
+				camera().db() = Biv::xz * -value;
+			}
+            else if (message.addressPattern() == "/ty") {
+				message >> value;
+				camera().db() = Biv::yz * value;
+			}
+            else if (message.addressPattern() == "/tz") {
+				message >> value;
+				camera().db() = Biv::xy * value;
+			}
+            else if (message.addressPattern() == "/h") {
+				camera().reset();
+			}
+		}
+		else {
+			double px, py, pz, qx, qy, qz, qw;
+			if (message.addressPattern() == "/nav") {
+				message >> px >> py >> pz >> qx >> qy >> qz >> qw;
+				camera().pos() = PT(px, py, pz);
+				camera().rot() = Rot(qw, qx, qy, qz);
+			}
+		}
+	}
 };
 
 //MyApp app;
