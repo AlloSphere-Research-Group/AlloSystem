@@ -92,10 +92,17 @@ struct MyApp : OmniApp {
     //g.draw(mesh);
   }
 
-  virtual void onAnimate(al_sec dt) {
-    //light.pos(nav().pos());
-    //std::cout << dt << std::endl;
-  }
+virtual void onAnimate(al_sec dt) {
+    osc::Packet p;
+    p.beginMessage("/nav");
+    p << nav().pos().x << nav().pos().y << nav().pos().z << nav().quat().x << nav().quat().y << nav().quat().z << nav().quat().w;
+    p.endMessage();
+    
+    osc::Send(12001, "192.168.0.26").send(p);
+    osc::Send(12001, "192.168.0.27").send(p);
+    osc::Send(12001, "192.168.0.28").send(p);
+    osc::Send(12001, "192.168.0.29").send(p);
+}
 
   virtual void onSound(AudioIOData& io) {
     while (io()) {
