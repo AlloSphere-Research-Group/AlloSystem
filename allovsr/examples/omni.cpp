@@ -27,16 +27,19 @@ void cmcheck(){
     double t = 3;
     //X Direction Facing a Sphere
     DRAW( Ro::dls(t,0.0,0.0) );
-    //NX Direction Facing a Circle
+    //NX Direction Facing a Circle with a LINE BEHIND IT
     DRAW( CYZ(1).trs(-t,0,0) );
+    DRAW( DLN(0,1,0).trs(-t*1.1,0,0) );
     //Y Direction Facing A Small Red Circle
     DRAW3( CXZ(.3).trs(0,t,0), 1,0,0 );
     //NY Direction Facing A Pair of Green Points 
     DRAW3( PAIR(1,0,0).trs(0,-t,0), 0,1,0 );
     //Z Direction an Arrow Pointing to WORLD SPACE -X, Y (tricky one . . .)
     GL::push(); GL::translate(0.,0.,t); DRAW( Vector(-1,1,0) ) ; GL::pop();
-    //NZ Direction a Plane (FRONT)
+    //NZ Direction a Plane (FRONT) with a circle BEHIND it
     DRAW( Dlp(0,0,1,0).trs(0,0,-t) );
+    DRAW( CXY(.5).trs(0,0,-t*1.1) );
+
 }
 
 struct MyApp : OmniApp {

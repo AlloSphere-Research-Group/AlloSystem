@@ -75,15 +75,19 @@ public:
 				// GL_TEXTURE_CUBE_MAP_NEGATIVE_Z   
 				else					 { vertex.xyz = vec3( -vertex.x, -vertex.y,  -vertex.z); }   //or -z
 
-                //vertex.z = -vertex.z;
+                //
 				// convert into screen-space:	
 				// simplified perspective projection since fovy = 90 and aspect = 1	
+
 				vertex.zw = vec2(	
 					(vertex.z*(omni_far+omni_near) + vertex.w*omni_far*omni_near*2.)/(omni_near-omni_far),	
 					-vertex.z	
 				);	
+                //vertex.z = -vertex.z;
+                 
                 
-				return vertex;	
+				
+                return vertex;	
 			}
 		);
 	}
