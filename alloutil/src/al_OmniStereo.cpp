@@ -15,6 +15,9 @@ static float fovy = M_PI;
 static float aspect = 2.;
 
 static void fillFishEye(float * value, double normx, double normy) {
+    
+    printf("filling fish eye\n"); 
+
 	Vec3f& out = *(Vec3f *)value;
 	
 	// move (0,0) to center of texture:
@@ -34,13 +37,17 @@ static void fillFishEye(float * value, double normx, double normy) {
 	// -Z forward, Y up, X right
 	out.x =  cel*saz;
 	out.y =  sel;
-	out.z = -cel*caz;
+	out.z =  cel*caz;
+    
 	out.normalize();
 	
 	value[3] = 1.;	
 }
 
 static void fillCylinder(float * value, double normx, double normy) {
+
+    printf("filling cylinder\n"); 
+
 	Vec3f& out = *(Vec3f *)value;
 	
 	// move (0,0) to center of texture:
@@ -66,6 +73,9 @@ static void fillCylinder(float * value, double normx, double normy) {
 }
 
 static void fillRect(float * value, double normx, double normy) {
+
+    printf("filling rect\n"); 
+
 	Vec3f& out = *(Vec3f *)value;
 	
 	// move (0,0) to center of texture:
@@ -517,7 +527,7 @@ void OmniStereo::Projection::updatedWarp() {
 			
 			out.x = t[idx];
 			out.y = u[idx];
-			out.z = -v[idx];
+			out.z = v[idx];
             
 			// fourth element is currently unused:
 			cell[3] = 1.;
