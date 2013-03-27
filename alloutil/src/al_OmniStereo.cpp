@@ -37,7 +37,7 @@ static void fillFishEye(float * value, double normx, double normy) {
 	// -Z forward, Y up, X right
 	out.x =  cel*saz;
 	out.y =  sel;
-	out.z =  cel*caz;
+	out.z =  -cel*caz;
     
 	out.normalize();
 	

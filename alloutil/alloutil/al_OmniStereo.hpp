@@ -62,6 +62,8 @@ public:
 //				// GL_TEXTURE_CUBE_MAP_NEGATIVE_Z   
 //				else					 { vertex.xyz = vec3(-vertex.x, -vertex.y,  vertex.z); }	
 
+                vertex.z = -vertex.z;
+
 				// GL_TEXTURE_CUBE_MAP_POSITIVE_X  	
                 if (omni_face == 0) { vertex.xyz = vec3( vertex.z, -vertex.y, -vertex.x); }	// or -x
 				// GL_TEXTURE_CUBE_MAP_NEGATIVE_X	
