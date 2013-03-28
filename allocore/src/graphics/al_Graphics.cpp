@@ -198,7 +198,7 @@ void Graphics::draw(int num_vertices, const Mesh& m){
 	draw(m, num_vertices);
 }
 
-void Graphics::draw(const Mesh& v, int iend, int ibeg){
+void Graphics::draw(const Mesh& v, int count, int begin){
 
 	const int Nv = v.vertices().size();
 	if(0 == Nv) return; // nothing to draw, so just return...
@@ -207,15 +207,18 @@ void Graphics::draw(const Mesh& v, int iend, int ibeg){
 
 	const int Nmax = Ni ? Ni : Nv;
 
-	// Adjust negative indices
-	if(iend < 0) iend += Nmax+1;
-	if(ibeg < 0) ibeg += Nmax+1;
+	// Adjust negative amounts
+	if(count < 0) count += Nmax+1;
+	if(begin < 0) begin += Nmax+1;
 
 	// Safety checks...
-	if(iend > Nmax) iend = Nmax;
-	if(ibeg >= iend) return;
+	//if(count > Nmax) count = Nmax;
+	//if(begin+count >= iend) return;
 
-	int len = iend - ibeg;
+	if(begin >= Nmax) return;	// Begin index past end?
+	if(begin + count > Nmax){	// If end index past end, then truncate it
+		count = Nmax - begin;
+	}
 
 	const int Nc = v.colors().size();
 	const int Nci= v.coloris().size();
@@ -265,16 +268,16 @@ void Graphics::draw(const Mesh& v, int iend, int ibeg){
 	if(Ni){
 		glDrawElements(
 			((Graphics::Primitive)v.primitive()), 
-			len, // number of indexed elements to render
+			count, // number of indexed elements to render
 			GL_UNSIGNED_INT, 
-			&v.indices()[ibeg]
+			&v.indices()[begin]
 		);
 	}
 	else{
 		glDrawArrays(
 			((Graphics::Primitive)v.primitive()), 
-			ibeg,
-			len
+			begin,
+			count
 		);
 	}
 

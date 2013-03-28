@@ -428,12 +428,13 @@ public:
 	
 	/// This draws a range of vertices from a mesh. If the mesh contains
 	/// vertex indices, then the range corresponds to the vertex indices array.
-	/// Negative index amounts are relative at one past the maximum index.
+	/// Negative count or index amounts are relative to one plus the maximum 
+	/// possible value.
 	///
 	/// @param[in] m		Vertex data to draw
-	/// @param[in] iend		End index of vertices or indices to draw (exclusive)
-	/// @param[in] ibeg		Begin index of vertices or indices to draw (inclusive)
-	void draw(const Mesh& m, int iend=-1, int ibeg=0);
+	/// @param[in] count	Number of vertices or indices to draw
+	/// @param[in] begin	Begin index of vertices or indices to draw (inclusive)
+	void draw(const Mesh& m, int count=-1, int begin=0);
 	
 	/// Draw internal vertex data
 	void draw(){ draw(mMesh); }
