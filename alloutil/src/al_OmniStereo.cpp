@@ -513,8 +513,8 @@ void OmniStereo::Projection::updatedWarp() {
 //			out.y = u[idx];
 //			out.z = -t[idx];
 
-// Matt negates x as a quick expedient:
-			out.x = -t[idx];
+            // Matt negates x as an expedient: pablo undoes
+			out.x = t[idx];
 			out.y = u[idx];
 			out.z = v[idx];
 			
