@@ -631,6 +631,22 @@ OmniStereo& OmniStereo::configure(BlendMode bm) {
 }
 
 OmniStereo& OmniStereo::configure(std::string configpath, std::string configname) {
+ 
+    if (configpath == "") {
+        FILE *pipe = popen("echo ~", "r");
+        if (pipe) {
+          char c;
+          while((c = getc(pipe)) != EOF) {
+        if (c == '\r' || c == '\n')
+              break;
+        configpath += c;
+          }
+          pclose(pipe);
+        }
+        configpath += "/calibration-current/";
+      }
+
+
 	if (L.dofile(configpath + "/" + configname + ".lua", 0)) return *this;
 	
 	L.getglobal("projections");

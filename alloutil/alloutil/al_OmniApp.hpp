@@ -149,19 +149,7 @@ inline OmniApp::~OmniApp() {
 }
 
 inline void OmniApp::initOmni(std::string path) {
-  if (path == "") {
-    FILE *pipe = popen("echo ~", "r");
-    if (pipe) {
-      char c;
-      while((c = getc(pipe)) != EOF) {
-	if (c == '\r' || c == '\n')
-          break;
-	path += c;
-      }
-      pclose(pipe);
-    }
-    path += "/calibration-current/";
-  }
+
 
 	mOmni.configure(path, mHostName);
 	if (mOmni.activeStereo()) {
