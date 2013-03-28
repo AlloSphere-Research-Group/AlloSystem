@@ -24,7 +24,7 @@ using namespace vsr;
 
 void cmcheck(){
     //CUBE MAP SANITY CHECK!
-    double t = 3;
+    double t = 2;
     //X Direction Facing a Sphere
     DRAW3( Ro::dls(t,0.0,0.0), 1, 0, 0 );
     //NX Direction Facing a Circle with a LINE BEHIND IT
@@ -73,7 +73,7 @@ struct MyApp : OmniApp {
   virtual void onDraw(Graphics& g) {
   
     light();
-    shader().uniform("lighting", 1.0);    
+    shader().uniform("lighting", 0.5);    
     
     //arrows should point away from each other
     cmcheck();
