@@ -17,7 +17,6 @@ CPPFLAGS	+= -I./ -I$(BUILD_DIR)include
 # include dependency headers directly
 CPPFLAGS	+= -I../allocore/
 CPPFLAGS	+= -I../../GLV/
-CPPFLAGS	+= -I../../Gamma/
 
 # include dependencies from parent build folder
 CPPFLAGS	+= -I../build/include/
@@ -28,7 +27,6 @@ LINK_LDFLAGS	+= -lGLV
 # include all the linker flags
 -include ../allocore/Makefile.link
 -include ../../GLV/Makefile.link
--include ../../Gamma/Makefile.link
 
 
 include ../Makefile.common
