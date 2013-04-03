@@ -82,7 +82,7 @@ void Texture::onCreate(){
 	glGenTextures(1, (GLuint *)&mID);
 	sendParams();
 	sendPixels();
-	Graphics::error("creating texture");
+	AL_GRAPHICS_ERROR("creating texture", id());
 }
 	
 void Texture::onDestroy(){
@@ -137,23 +137,23 @@ void Texture :: configure(AlloArrayHeader& header) {
 
 void Texture :: bind(int unit) {
 	// ensure it is created:
-	Graphics::error(id(), "before binding texture");
-	validate(); 
-	//Graphics::error(id(), "validate binding texture");
+	AL_GRAPHICS_ERROR("(before Texture::bind)", id());
+	validate();
+	//AL_GRAPHICS_ERROR("validate binding texture", id());
 	sendParams(false);
-	//Graphics::error(id(), "sendparams binding texture");
+	//AL_GRAPHICS_ERROR("sendparams binding texture", id());
 	sendPixels(false);
-	//Graphics::error(id(), "sendpixels binding texture");
+	//AL_GRAPHICS_ERROR("sendpixels binding texture", id());
 	
 	// multitexturing:
 	glActiveTexture(GL_TEXTURE0 + unit);
-	//Graphics::error(id(), "active texture binding texture");
+	//AL_GRAPHICS_ERROR("active texture binding texture", id());
 
 	// bind:
 	glEnable(target());
-	//Graphics::error(id(), "enable target binding texture");
+	//AL_GRAPHICS_ERROR("enable target binding texture", id());
 	glBindTexture(target(), id());
-	Graphics::error(id(), "binding texture");
+	AL_GRAPHICS_ERROR("binding texture", id());
 }
 
 void Texture :: unbind(int unit) {		
@@ -476,7 +476,7 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 }
 
 void Texture :: submit(const void * pixels, uint32_t align) {
-	Graphics::error(id(), "Texture::submit (initial)");
+	AL_GRAPHICS_ERROR("(before Texture::submit)", id());
 	validate();
 	
 	determineTarget();	// is this necessary? surely the target is already set!
@@ -484,15 +484,15 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 	sendParams(false);
 	
 	glActiveTexture(GL_TEXTURE0);
-	Graphics::error(id(), "Texture::submit (glActiveTexture)");
+	AL_GRAPHICS_ERROR("Texture::submit (glActiveTexture)", id());
 	glEnable(target());
-	Graphics::error(id(), "Texture::submit (glEnable(texture target))");
+	AL_GRAPHICS_ERROR("Texture::submit (glEnable(texture target))", id());
 	glBindTexture(target(), id());
-	Graphics::error(id(), "Texture::submit (glBindTexture)");
+	AL_GRAPHICS_ERROR("Texture::submit (glBindTexture)", id());
 	
 	// set glPixelStore according to layout:
 	glPixelStorei(GL_UNPACK_ALIGNMENT, mUnpack);
-	Graphics::error(id(), "Texture::submit (glPixelStorei set)");
+	AL_GRAPHICS_ERROR("Texture::submit (glPixelStorei set)", id());
 	
 	// void glTexImage3D(
 	//		GLenum target, GLint level, GLenum internalformat,
@@ -554,11 +554,11 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 		default:
 			AL_WARN("invalid texture target %d", mTarget);
 	}
-	Graphics::error(id(), "Texture::submit (glTexImage)");
+	AL_GRAPHICS_ERROR("Texture::submit (glTexImage)", id());
 	
 	// set alignment back to default
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-	Graphics::error(id(), "Texture::submit (glPixelStorei unset)");
+	AL_GRAPHICS_ERROR("Texture::submit (glPixelStorei unset)", id());
 	
 //		// OpenGL may have changed the internal format to one it supports:
 //		GLint format;
@@ -572,7 +572,7 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 	
 	glDisable(target());
 	glBindTexture(target(), 0);
-	Graphics::error(id(), "Texture::submit (glBindTexture 0)");
+	AL_GRAPHICS_ERROR("Texture::submit (glBindTexture 0)", id());
 }
 
 

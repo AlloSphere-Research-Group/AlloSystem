@@ -49,6 +49,7 @@
 #include "allocore/math/al_Matrix4.hpp"
 #include "allocore/types/al_Array.hpp"
 #include "allocore/types/al_Color.hpp"
+#include "allocore/system/al_Printing.hpp"
 
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_OpenGL.hpp"
@@ -447,6 +448,9 @@ public:
 
 	static bool error(int ID, const char * msg);
 
+	/// Get current error string
+	static const char * errorString(bool verbose=false);
+
 	/// Returns number of components for given color type
 	static int numComponents(Format v);
 	
@@ -480,6 +484,20 @@ public:
 };
 
 
+
+// Used for error reporting in source files
+#define AL_GRAPHICS_ERROR(msg, ID)\
+{	const char * errStr = al::Graphics::errorString();\
+	if(errStr[0]){\
+		if(ID>=0)	AL_WARN_ONCE("Error " msg " (id=%d): %s", ID, errStr);\
+		else		AL_WARN_ONCE("Error " msg ": %s", errStr);\
+	}\
+}
+
+//#ifdef NDEBUG
+//#undef AL_GRAPHICS_ERROR
+//#define AL_GRAPHICS_ERROR(msg, ID)
+//#endif
 
 // ============== INLINE ============== 
 
