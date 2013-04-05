@@ -148,10 +148,11 @@ public:
 	GLVDetachable& parentWindow(Window& v);
 
 	/// Get detached window
-	Window& detachedWindow(){ return mDetachedWindow; }
+	Window& detachedWindow(){ return mDetachedWindow(); }
+	const Window& detachedWindow() const { return mDetachedWindow(); }
 
 	/// Get whether GUI is detached from parent window
-	bool detached() const { return mDetachedWindow.created(); }
+	bool detached() const { return detachedWindow().created(); }
 
 	/// Get whether GUI is detached from parent window
 	GLVDetachable& detached(bool v);
@@ -161,7 +162,7 @@ public:
 
 private:
 	Window * mParentWindow;
-	Window mDetachedWindow;
+	glv::Lazy<Window> mDetachedWindow;
 	GLVInputControl mInputControl;
 	GLVWindowControl mWindowControl;
 	glv::Button mDetachedButton;
