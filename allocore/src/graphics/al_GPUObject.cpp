@@ -5,10 +5,10 @@
 
 using namespace al;
 
-typedef std::set<al::GPUObject *> ResourceSet;
-typedef std::map<int, ResourceSet> ContextMap;
-typedef std::map<al::GPUObject *, int> ResourceMap;
-
+typedef std::set<al::GPUObject *>		ResourceSet;	// resource list
+typedef std::map<int, ResourceSet>		ContextMap;		// context ID to resource list
+typedef std::map<al::GPUObject *, int>	ResourceMap;	//
+typedef std::map<int, al::GPUContext *>	Contexts;		// context ID to context object
 
 ContextMap& getContextMap() {
 	static ContextMap * instance = new ContextMap;
@@ -28,8 +28,6 @@ int getNextContextID() {
 	return result;
 }
 
-
-typedef std::map<int, al::GPUContext *> Contexts;
 Contexts& getContexts(){
 	static Contexts * r = new Contexts;
 	return *r;
@@ -114,13 +112,13 @@ void GPUContext::makeDefaultContext(){
 
 void GPUContext :: contextDestroy() { //printf("GPUContext::contextDestroy %d\n", mContextID);
 	ContextMap& contexts = getContextMap();
-	ContextMap::iterator it = contexts.find(mContextID);
-	if(it != contexts.end()) {
-		ResourceSet &ctx_set = it->second;
-		ResourceSet::iterator sit = ctx_set.begin();
-		ResourceSet::iterator site = ctx_set.end();
-		for(; sit != site; ++sit) {
-			(*sit)->destroy();
+	ContextMap::iterator cit = contexts.find(mContextID);
+	if(cit != contexts.end()) {
+		ResourceSet &ctx_set = cit->second;
+		ResourceSet::iterator it = ctx_set.begin();
+		ResourceSet::iterator end = ctx_set.end();
+		for(; it != end; ++it) {
+			(*it)->destroy();
 		}
 	}
 }
