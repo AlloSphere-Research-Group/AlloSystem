@@ -64,11 +64,7 @@ const char * Graphics::errorString(bool verbose){
 	#undef CS
 }
 
-bool Graphics::error(const char * msg){
-	return error(-1, msg);
-}
-
-bool Graphics::error(int ID, const char * msg){
+bool Graphics::error(const char * msg, int ID){
 	const char * errStr = errorString();
 	if(errStr[0]){
 		if(ID>=0)	AL_WARN_ONCE("Error %s (id=%d): %s", msg, ID, errStr);

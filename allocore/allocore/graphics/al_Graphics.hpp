@@ -444,11 +444,21 @@ public:
 	// Utility functions: converting, reporting, etc.
 
 	/// Print current error state
-	static bool error(const char *msg="");
+	//static bool error(const char *msg="");
 
-	static bool error(int ID, const char * msg);
+	//static bool error(int ID, const char * msg);
 
-	/// Get current error string
+	/// Print current GPU error state
+
+	/// @param[in] msg		Custom error message
+	/// @param[in] ID		Graphics object ID (-1 for none)
+	/// \returns whether there was an error
+	static bool error(const char *msg="", int ID=-1);
+
+	/// Get current GPU error string
+
+	/// \returns the error string or an empty string if no error
+	///
 	static const char * errorString(bool verbose=false);
 
 	/// Returns number of components for given color type
