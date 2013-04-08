@@ -55,6 +55,23 @@
 #include "allocore/graphics/al_OpenGL.hpp"
 
 
+/*!
+	\def AL_GRAPHICS_ERROR(msg, ID)
+	Used for reporting graphics errors from source files
+*/
+#ifdef AL_ENABLE_DEBUG
+#define AL_GRAPHICS_ERROR(msg, ID)\
+{	const char * errStr = al::Graphics::errorString();\
+	if(errStr[0]){\
+		if(ID>=0)	AL_WARN_ONCE("Error " msg " (id=%d): %s", ID, errStr);\
+		else		AL_WARN_ONCE("Error " msg ": %s", errStr);\
+	}\
+}
+#else
+#define AL_GRAPHICS_ERROR(msg, ID) ((void)0)
+#endif
+
+
 namespace al {
 
 
@@ -443,11 +460,6 @@ public:
 
 	// Utility functions: converting, reporting, etc.
 
-	/// Print current error state
-	//static bool error(const char *msg="");
-
-	//static bool error(int ID, const char * msg);
-
 	/// Print current GPU error state
 
 	/// @param[in] msg		Custom error message
@@ -493,25 +505,6 @@ public:
 	virtual ~Drawable(){}
 };
 
-
-
-// Used for error reporting in source files
-#ifdef AL_ENABLE_DEBUG
-#define AL_GRAPHICS_ERROR(msg, ID)\
-{	const char * errStr = al::Graphics::errorString();\
-	if(errStr[0]){\
-		if(ID>=0)	AL_WARN_ONCE("Error " msg " (id=%d): %s", ID, errStr);\
-		else		AL_WARN_ONCE("Error " msg ": %s", errStr);\
-	}\
-}
-#else
-#define AL_GRAPHICS_ERROR(msg, ID) ((void)0)
-#endif
-
-//#ifdef NDEBUG
-//#undef AL_GRAPHICS_ERROR
-//#define AL_GRAPHICS_ERROR(msg, ID)
-//#endif
 
 // ============== INLINE ============== 
 
