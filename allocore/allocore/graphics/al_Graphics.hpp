@@ -496,6 +496,7 @@ public:
 
 
 // Used for error reporting in source files
+#ifdef AL_ENABLE_DEBUG
 #define AL_GRAPHICS_ERROR(msg, ID)\
 {	const char * errStr = al::Graphics::errorString();\
 	if(errStr[0]){\
@@ -503,6 +504,9 @@ public:
 		else		AL_WARN_ONCE("Error " msg ": %s", errStr);\
 	}\
 }
+#else
+#define AL_GRAPHICS_ERROR(msg, ID) ((void)0)
+#endif
 
 //#ifdef NDEBUG
 //#undef AL_GRAPHICS_ERROR
