@@ -21,6 +21,11 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXFileReference section */
+		161B6CBD17144B0800750A16 /* al_File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_File.cpp; sourceTree = "<group>"; };
+		161B6CBE17144B4C00750A16 /* serial.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = serial.cc; sourceTree = "<group>"; };
+		161B6CBF17144B4C00750A16 /* serial_unix.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = serial_unix.cc; sourceTree = "<group>"; };
+		161B6CC017144B4C00750A16 /* serial_win.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = serial_win.cc; sourceTree = "<group>"; };
+		161B6CC117144B4C00750A16 /* al_Serial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Serial.cpp; sourceTree = "<group>"; };
 		165C2E18162AE6C900E1BC69 /* al_Array.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Array.cpp; sourceTree = "<group>"; };
 		360BCBC115BB6D70008921E9 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		360BCBC315BB6D70008921E9 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
@@ -729,8 +734,13 @@
 			children = (
 				361882FA15B936340009AD7E /* al_App.cpp */,
 				361882FB15B936340009AD7E /* al_AudioIO.cpp */,
+				161B6CBD17144B0800750A16 /* al_File.cpp */,
 				361882FC15B936340009AD7E /* al_FileAPR.cpp */,
 				361882FD15B936340009AD7E /* al_MIDI.cpp */,
+				161B6CC117144B4C00750A16 /* al_Serial.cpp */,
+				161B6CBE17144B4C00750A16 /* serial.cc */,
+				161B6CBF17144B4C00750A16 /* serial_unix.cc */,
+				161B6CC017144B4C00750A16 /* serial_win.cc */,
 				361882FE15B936340009AD7E /* al_SocketAPR.cpp */,
 				361882FF15B936340009AD7E /* al_Window.cpp */,
 				3618830015B936340009AD7E /* al_WindowGLUT.cpp */,
