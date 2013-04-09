@@ -79,11 +79,13 @@ int File::write(const std::string& path, const void * v, int size, int items){
 
 
 std::string File::conformDirectory(const std::string& src){
-	std::string res(src);
-	if(AL_FILE_DELIMITER != res[res.size()-1]){
-		res += AL_FILE_DELIMITER;
+	if(src[0]){
+		if(AL_FILE_DELIMITER != src[src.size()-1]){
+			return src + AL_FILE_DELIMITER;
+		}
+		return src;
 	}
-	return res;
+	return "." AL_FILE_DELIMITER_STR;
 }
 
 std::string File::conformPathToOS(const std::string& src){
@@ -129,17 +131,6 @@ bool File::exists(const std::string& path){
 	return ::stat(path.c_str(), &s) == 0;
 }
 
-bool File::searchBack(std::string& prefixPath, const std::string& matchPath, int maxDepth){
-	int i=0;
-	prefixPath="";
-
-	for(; i<maxDepth; ++i){
-		if(File::exists(prefixPath + matchPath)) break;
-		prefixPath = ".." AL_FILE_DELIMITER_STR + prefixPath;
-	}
-	return i<maxDepth;
-}
-
 bool File::isDirectory(const std::string& src){
 	struct stat s;
 	if(0 == ::stat(src.c_str(), &s)){	// exists?
@@ -149,6 +140,18 @@ bool File::isDirectory(const std::string& src){
 	}
 	// if(s.st_mode & S_IFREG) // is file?
 	return false;
+}
+
+bool File::searchBack(std::string& prefixPath, const std::string& matchPath, int maxDepth){
+	if(prefixPath[0]){
+		prefixPath = conformDirectory(prefixPath);
+	}
+	int i=0;
+	for(; i<maxDepth; ++i){
+		if(File::exists(prefixPath + matchPath)) break;
+		prefixPath += ".." AL_FILE_DELIMITER_STR;
+	}
+	return i<maxDepth;
 }
 
 bool File::searchBack(std::string& path, int maxDepth){

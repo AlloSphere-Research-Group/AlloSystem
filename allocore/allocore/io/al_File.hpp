@@ -208,13 +208,15 @@ public:
 
 	/// Search for file or directory back from current directory
 
-	/// @param[out] prefixPath	If the file is found, this contains a series of
-	///							"../" that can be prefixed to 'matchPath' to get
-	///							its actual location.
+	/// @param[inout] rootPath	The input should contain the path to search
+	///							relative to. If the input is empty, then "./" is
+	///							assumed. If a match is made, then the output is
+	///							a string that can be prefixed to 'matchPath' to 
+	///							get the actual location of the match.
 	/// @param[in]  matchPath	File or directory to search for
 	/// @param[in]  maxDepth	Maximum number of directories to search back
 	/// \returns whether the file or directory was found
-	static bool searchBack(std::string& prefixPath, const std::string& matchPath, int maxDepth=6);
+	static bool searchBack(std::string& rootPath, const std::string& matchPath, int maxDepth=6);
 
 	/// Search for file or directory back from current directory
 
