@@ -381,9 +381,8 @@ void Mesh::ribbonize(float * widths, int widthsStride, bool faceBinormal){
 			const Vertex vf = v2 - v1; // forward difference
 			const Vertex vb = v1 - v0; // backward difference
 			const Vertex d1 = vf + vb; // first difference (x 2)
-			const Vertex d2 = vf - vb; // second difference
-			f[2] = cross(d2,  d1).normalized(); // binormal
-			f[1] = cross(d1,f[2]).normalized();	// normal
+			f[2] = cross(vb,  vf).normalized(); // binormal
+			f[1] = cross(d1,f[2]).normalized();	// normal (T x B)
 			//f[0] = d1.normalized(); // tangent (not used)
 		}
 	};
