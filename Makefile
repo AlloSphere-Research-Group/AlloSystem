@@ -27,7 +27,6 @@ help:
 	@echo "    clean ............ clean all modules found in this directory"
 	@echo "    gatherexamples ... create examples/ directory with symlinks to module examples"
 
-include Makefile.rules
 
 all:
 	@for v in $(MODULE_DIRS); do\
@@ -76,14 +75,15 @@ gatherexamples:
 	done
 
 
-# This attempts to determine what modules have been built by looking in the build dir
-#BUILT_MODULES := $(basename $(shell if [ -d $(BUILD_DIR)/lib/ ]; then ls $(BUILD_DIR)/lib/; fi))
+# This attempts to determine what modules have been built by looking in the 
+# build directory.
 BUILT_MODULES := $(basename $(shell ls $(BUILD_DIR)/lib/ 2> /dev/null))
 BUILT_MODULES := $(subst lib,,$(BUILT_MODULES))
 BUILT_MODULES := $(filter allo%, $(BUILT_MODULES))
 
 # This is a hack to ensure that Gamma and GLV linker dependencies are included.
-# A better, more general solution would involve having a user dependency directory that is scanned.
+# A better, more general solution would involve having a user dependency 
+# directory that is scanned.
 ifneq ($(shell ls $(BUILD_DIR)/lib/ 2> /dev/null | grep Gamma),)
 	BUILT_MODULES += ../Gamma/
 endif
@@ -94,3 +94,5 @@ endif
 -include $(addsuffix /Makefile.link, $(BUILT_MODULES))
 LDFLAGS += -L$(BUILD_DIR)/lib/
 include Makefile.buildandrun
+
+include Makefile.rules
