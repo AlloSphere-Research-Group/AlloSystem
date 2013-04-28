@@ -265,7 +265,10 @@ void Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 //		}
 //	}
 
-	int Nv = vertices().size();
+	unsigned Nv = vertices().size();
+	
+	// need at least one triangle
+	if(Nv < 3) return;
 
 	// same number of normals as vertices
 	normals().size(Nv);
@@ -274,83 +277,93 @@ void Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 	// compute vertex based normals
 	if(indices().size()){
 
-		for(int i=0; i<Nv; ++i) normals()[i].set(0,0,0);
+		for(unsigned i=0; i<Nv; ++i) normals()[i].set(0,0,0);
 
-		int Ni = indices().size();
+		unsigned Ni = indices().size();
 
-//		if(primitive() == TRIANGLES){
-			Ni = Ni - (Ni%3); // must be multiple of 3
-
-			for(int i=0; i<Ni; i+=3){
-				Index i1 = indices()[i+0];
-				Index i2 = indices()[i+1];
-				Index i3 = indices()[i+2];
-				const Vertex& v1 = vertices()[i1];
-				const Vertex& v2 = vertices()[i2];
-				const Vertex& v3 = vertices()[i3];
-				
+		struct F{
+			static Vertex calcNormal(const Vertex& v1, const Vertex& v2, const Vertex& v3, bool MWE){
 				// MWAAT (mean weighted by areas of adjacent triangles)
 				Vertex vn = cross(v2-v1, v3-v1);
 
 				// MWE (mean weighted equally)
-				if (equalWeightPerFace) vn.normalize();
+				if(MWE) vn.normalize();
 
 				// MWA (mean weighted by angle)
 				// This doesn't work well with dynamic marching cubes- normals
 				// pop in and out for small triangles.
-//				Vertex v12= v2-v1;
-//				Vertex v13= v3-v1;
-//				Vertex vn = cross(v12, v13).normalize();
-//				vn *= angle(v12, v13) / M_PI;
+				/*Vertex v12= v2-v1;
+				Vertex v13= v3-v1;
+				Vertex vn = cross(v12, v13).normalize();
+				vn *= angle(v12, v13) / M_PI;*/
+
+				return vn;				
+			}
+		};
+
+		if(primitive() == Graphics::TRIANGLES){
+			Ni = Ni - (Ni%3); // must be multiple of 3
+
+			for(unsigned i=0; i<Ni; i+=3){
+				Index i1 = indices()[i  ];
+				Index i2 = indices()[i+1];
+				Index i3 = indices()[i+2];
 				
+				Vertex vn = F::calcNormal(
+					vertices()[i1], vertices()[i2], vertices()[i3],
+					equalWeightPerFace
+				);
+
 				normals()[i1] += vn;
 				normals()[i2] += vn;
 				normals()[i3] += vn;
 			}
-//		}
-//		else if(primitive() == TRIANGLE_STRIP){
-//			for(int i=2; i<Ni; ++i){
-//				Index i1 = indices()[i-2];
-//				Index i2 = indices()[i-1];
-//				Index i3 = indices()[i-0];
-//				const Vertex& v1 = vertices()[i1];
-//				const Vertex& v2 = vertices()[i2];
-//				const Vertex& v3 = vertices()[i3];
-//				
-//				Vertex vn = cross(v2-v1, v3-v1);
-//				
-//				normals()[i1] += vn;
-//				normals()[i2] += vn;
-//				normals()[i3] += vn;
-//			}
-//		}
+		}
+		else if(primitive() == Graphics::TRIANGLE_STRIP){
+			for(unsigned i=0; i<Ni-2; ++i){
+				Index i1 = indices()[i  ];
+				Index i2 = indices()[i+1];
+				Index i3 = indices()[i+2];
+				
+				Vertex vn = F::calcNormal(
+					vertices()[i1], vertices()[i2], vertices()[i3],
+					equalWeightPerFace
+				);
+
+				// Flip every other normal due to change in winding direction
+				if(i & 1) vn.negate();
+
+				normals()[i1] += vn;
+				normals()[i2] += vn;
+				normals()[i3] += vn;
+			}
+		}
 
 		// normalize the normals
-		if(normalize) for(int i=0; i<Nv; ++i) normals()[i].normalize();
+		if(normalize) for(unsigned i=0; i<Nv; ++i) normals()[i].normalize();
 	}
-	
+
 	// compute face based normals
 	else{
-//		if(primitive() == TRIANGLES){
-			int N = Nv - (Nv % 3);
+		//if(primitive() == Graphics::TRIANGLES){
+			unsigned N = Nv - (Nv % 3);
 
-			for(int i=0; i<N; i+=3){
-				int i1 = i+0;
-				int i2 = i+1;
-				int i3 = i+2;
+			for(unsigned i=0; i<N; i+=3){
+				unsigned i1 = i+0;
+				unsigned i2 = i+1;
+				unsigned i3 = i+2;
 				const Vertex& v1 = vertices()[i1];
 				const Vertex& v2 = vertices()[i2];
 				const Vertex& v3 = vertices()[i3];
-				
+
 				Vertex vn = cross(v2-v1, v3-v1);
 				if(normalize) vn.normalize();
-				
+
 				normals()[i1] = vn;
 				normals()[i2] = vn;
 				normals()[i3] = vn;
-			}			
-			
-//		}
+			}
+		//}
 	}
 }
 
