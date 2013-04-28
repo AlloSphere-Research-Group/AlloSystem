@@ -76,6 +76,10 @@ int File::write(const std::string& path, const void * v, int size, int items){
 	return r;
 }
 
+int File::write(const std::string& path, const std::string& data){
+	return File::write(path, &data[0], data.size());
+}
+
 
 
 std::string File::conformDirectory(const std::string& src){

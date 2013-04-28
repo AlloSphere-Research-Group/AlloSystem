@@ -117,6 +117,7 @@ public:
 
 	~File();
 
+
 	void close();	///< Close file
 	bool open();	///< Open file with specified i/o mode
 
@@ -136,11 +137,9 @@ public:
 	/// Read memory elements from file
 	int read(void * v, int size, int items=1){ return fread(v, size, items, mFP); }
 
-	/// Quick and dirty write memory to file
-	static int write(const std::string& path, const void * v, int size, int items=1);
-
 	/// Returns character string of file contents (read mode only)
 	const char * readAll();
+
 
 	/// Returns whether file is open
 	bool opened() const { return 0 != mFP; }
@@ -171,6 +170,12 @@ public:
 
 	FILE * filePointer() { return mFP; }
 
+
+	/// Quick and dirty write memory to file
+	static int write(const std::string& path, const void * v, int size, int items=1);
+
+	/// Quick and dirty write character string to file
+	static int write(const std::string& path, const std::string& data);
 
 	/// Returns string ensured to having an ending delimiter
 	
