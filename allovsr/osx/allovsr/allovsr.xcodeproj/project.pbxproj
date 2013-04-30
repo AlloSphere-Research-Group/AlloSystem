@@ -16,6 +16,10 @@
 		9B44DF51166D8955007F1070 /* allovsr.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B39FADA165C2AA200C3776D /* allovsr.1 */; };
 		9B44DF59166D89A3007F1070 /* twists.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B44DF58166D89A3007F1070 /* twists.cpp */; };
 		9B6A69A816EFF14C0055294C /* omni.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B6A69A716EFF14C0055294C /* omni.cpp */; };
+		9B8A3B67172B5FB400441F21 /* allovsr.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B39FADA165C2AA200C3776D /* allovsr.1 */; };
+		9B8A3B6E172B605C00441F21 /* audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9B8A3B6D172B5FEB00441F21 /* audio.cpp */; };
+		9BAB010F17260658007F7270 /* allovsr.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B39FADA165C2AA200C3776D /* allovsr.1 */; };
+		9BAB0117172606D5007F7270 /* vortex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9BAB0116172606D4007F7270 /* vortex.cpp */; };
 		9BBA127516E562EA00F04632 /* allovsr.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9B39FADA165C2AA200C3776D /* allovsr.1 */; };
 		9BBA127D16E5634900F04632 /* coordinate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9BBA127C16E5634900F04632 /* coordinate.cpp */; };
 		9BBA129716E6952400F04632 /* map3D1.bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9BBA129616E6951C00F04632 /* map3D1.bin */; };
@@ -87,6 +91,26 @@
 			dstSubfolderSpec = 0;
 			files = (
 				9B44DF51166D8955007F1070 /* allovsr.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		9B8A3B66172B5FB400441F21 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				9B8A3B67172B5FB400441F21 /* allovsr.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		9BAB010E17260658007F7270 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				9BAB010F17260658007F7270 /* allovsr.1 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
@@ -168,6 +192,19 @@
 		9B44DF58166D89A3007F1070 /* twists.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = twists.cpp; path = ../../../examples/twists.cpp; sourceTree = "<group>"; };
 		9B5E943D16EBC6900019BAC8 /* al_omnivsr.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = al_omnivsr.hpp; path = ../../allovsr/al_omnivsr.hpp; sourceTree = "<group>"; };
 		9B6A69A716EFF14C0055294C /* omni.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = omni.cpp; path = ../../../examples/omni.cpp; sourceTree = "<group>"; };
+		9B8A3B55172B1DD300441F21 /* air_audioGraph.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = air_audioGraph.cpp; path = ../../../../allostuff/pablo/air_audioGraph.cpp; sourceTree = "<group>"; };
+		9B8A3B56172B1DD300441F21 /* air_audioGraph.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = air_audioGraph.h; path = ../../../../allostuff/pablo/air_audioGraph.h; sourceTree = "<group>"; };
+		9B8A3B57172B1DD300441F21 /* air_scheduler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = air_scheduler.cpp; path = ../../../../allostuff/pablo/air_scheduler.cpp; sourceTree = "<group>"; };
+		9B8A3B58172B1DD300441F21 /* air_scheduler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = air_scheduler.h; path = ../../../../allostuff/pablo/air_scheduler.h; sourceTree = "<group>"; };
+		9B8A3B59172B1DD300441F21 /* air_spatializer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = air_spatializer.cpp; path = ../../../../allostuff/pablo/air_spatializer.cpp; sourceTree = "<group>"; };
+		9B8A3B5A172B1DD300441F21 /* air_spatializer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = air_spatializer.h; path = ../../../../allostuff/pablo/air_spatializer.h; sourceTree = "<group>"; };
+		9B8A3B5D172B2A9900441F21 /* air_synth.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = air_synth.h; path = ../../../../allostuff/pablo/air_synth.h; sourceTree = "<group>"; };
+		9B8A3B61172B422A00441F21 /* OmniAppRedux.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = OmniAppRedux.h; path = ../../../../../allostuff/pablo/OmniAppRedux.h; sourceTree = "<group>"; };
+		9B8A3B6B172B5FB400441F21 /* audio */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = audio; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B8A3B6D172B5FEB00441F21 /* audio.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = audio.cpp; path = ../../../../../allostuff/pablo/audio.cpp; sourceTree = "<group>"; };
+		9B8A3B6F172B6DA800441F21 /* gam_GxSync.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = gam_GxSync.h; path = ../../../../../allostuff/pablo/gam_GxSync.h; sourceTree = "<group>"; };
+		9BAB011317260658007F7270 /* vortex */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = vortex; sourceTree = BUILT_PRODUCTS_DIR; };
+		9BAB0116172606D4007F7270 /* vortex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = vortex.cpp; path = ../../../../../allostuff/pablo/vortex.cpp; sourceTree = "<group>"; };
 		9BBA127916E562EA00F04632 /* coordinates */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = coordinates; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BBA127C16E5634900F04632 /* coordinate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = coordinate.cpp; path = ../../../tests/coordinate.cpp; sourceTree = "<group>"; };
 		9BBA129616E6951C00F04632 /* map3D1.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = map3D1.bin; path = "../../../../allostuff/calibration-current/map3D1.bin"; sourceTree = "<group>"; };
@@ -228,6 +265,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9B8A3B65172B5FB400441F21 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9BAB010D17260658007F7270 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9BBA127316E562EA00F04632 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -278,6 +329,7 @@
 				9B3EC8DD16DD7ACC005FA527 /* al_WarpBlend.hpp */,
 				9B015AEB16EEB75C00461984 /* al_OmniUtil.hpp */,
 				9B015AEC16EEB75C00461984 /* al_Projection.hpp */,
+				9B8A3B5C172B1DDC00441F21 /* air */,
 				9BBA129816E69FB000F04632 /* warpmaps */,
 			);
 			sourceTree = "<group>";
@@ -294,6 +346,8 @@
 				9B3EC8D416DD64A9005FA527 /* omni */,
 				9BBA127916E562EA00F04632 /* coordinates */,
 				9B015AC716EE6B9100461984 /* omnivsr */,
+				9BAB011317260658007F7270 /* vortex */,
+				9B8A3B6B172B5FB400441F21 /* audio */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -308,6 +362,10 @@
 				9BF010B0169CB17B0079F394 /* knot.cpp */,
 				9B265FE9166D42CE005D9135 /* robot.cpp */,
 				9B6A69A716EFF14C0055294C /* omni.cpp */,
+				9BAB0116172606D4007F7270 /* vortex.cpp */,
+				9B8A3B6D172B5FEB00441F21 /* audio.cpp */,
+				9B8A3B6F172B6DA800441F21 /* gam_GxSync.h */,
+				9B8A3B61172B422A00441F21 /* OmniAppRedux.h */,
 				9B015ACA16EE6C0900461984 /* omnivsr.cpp */,
 				9B44DF58166D89A3007F1070 /* twists.cpp */,
 				9B39FADA165C2AA200C3776D /* allovsr.1 */,
@@ -321,6 +379,20 @@
 				9B39FAE3165C2E0400C3776D /* Makefile */,
 			);
 			name = allocore;
+			sourceTree = "<group>";
+		};
+		9B8A3B5C172B1DDC00441F21 /* air */ = {
+			isa = PBXGroup;
+			children = (
+				9B8A3B55172B1DD300441F21 /* air_audioGraph.cpp */,
+				9B8A3B56172B1DD300441F21 /* air_audioGraph.h */,
+				9B8A3B5D172B2A9900441F21 /* air_synth.h */,
+				9B8A3B57172B1DD300441F21 /* air_scheduler.cpp */,
+				9B8A3B58172B1DD300441F21 /* air_scheduler.h */,
+				9B8A3B59172B1DD300441F21 /* air_spatializer.cpp */,
+				9B8A3B5A172B1DD300441F21 /* air_spatializer.h */,
+			);
+			name = air;
 			sourceTree = "<group>";
 		};
 		9BBA129816E69FB000F04632 /* warpmaps */ = {
@@ -430,6 +502,40 @@
 			productReference = 9B44DF55166D8955007F1070 /* twists */;
 			productType = "com.apple.product-type.tool";
 		};
+		9B8A3B62172B5FB400441F21 /* audio */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9B8A3B68172B5FB400441F21 /* Build configuration list for PBXNativeTarget "audio" */;
+			buildPhases = (
+				9B8A3B63172B5FB400441F21 /* Sources */,
+				9B8A3B65172B5FB400441F21 /* Frameworks */,
+				9B8A3B66172B5FB400441F21 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = audio;
+			productName = allovsr;
+			productReference = 9B8A3B6B172B5FB400441F21 /* audio */;
+			productType = "com.apple.product-type.tool";
+		};
+		9BAB010A17260658007F7270 /* vortex */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9BAB011017260658007F7270 /* Build configuration list for PBXNativeTarget "vortex" */;
+			buildPhases = (
+				9BAB010B17260658007F7270 /* Sources */,
+				9BAB010D17260658007F7270 /* Frameworks */,
+				9BAB010E17260658007F7270 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = vortex;
+			productName = allovsr;
+			productReference = 9BAB011317260658007F7270 /* vortex */;
+			productType = "com.apple.product-type.tool";
+		};
 		9BBA127016E562EA00F04632 /* coordinates */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9BBA127616E562EA00F04632 /* Build configuration list for PBXNativeTarget "coordinates" */;
@@ -527,6 +633,8 @@
 				9B3EC8CB16DD64A9005FA527 /* omni */,
 				9BBA127016E562EA00F04632 /* coordinates */,
 				9B015ABE16EE6B9100461984 /* omnivsr */,
+				9BAB010A17260658007F7270 /* vortex */,
+				9B8A3B62172B5FB400441F21 /* audio */,
 			);
 		};
 /* End PBXProject section */
@@ -569,6 +677,22 @@
 			buildActionMask = 2147483647;
 			files = (
 				9B44DF59166D89A3007F1070 /* twists.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9B8A3B63172B5FB400441F21 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B8A3B6E172B605C00441F21 /* audio.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9BAB010B17260658007F7270 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9BAB0117172606D5007F7270 /* vortex.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1082,6 +1206,206 @@
 			};
 			name = Release;
 		};
+		9B8A3B69172B5FB400441F21 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../../../allostuff/pablo\"";
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					$SRCROOT/../../../build/lib/,
+				);
+				OTHER_LDFLAGS = (
+					"-lGamma",
+					"-llua",
+					"-lalloutil",
+					"-lGLV",
+					"-lvsr",
+					"-lalloGLV",
+					"-lapr-1",
+					"-laprutil-1",
+					"-lfreeimage",
+					"-lassimp",
+					"-lfreetype",
+					"-L/usr/X11/lib/",
+					"-framework",
+					AudioUnit,
+					"-framework",
+					AudioToolbox,
+					"-framework",
+					CoreAudio,
+					"-framework",
+					CoreMidi,
+					"-framework",
+					Carbon,
+					"-lsndfile",
+					"-lportaudio",
+					"-framework",
+					AGL,
+					"-framework",
+					OpenGL,
+					"-framework",
+					GLUT,
+					"-lpthread",
+					"-framework",
+					Cocoa,
+					"-framework",
+					Foundation,
+					"-lallocore",
+				);
+				PRODUCT_NAME = audio;
+				USER_HEADER_SEARCH_PATHS = "$SRCROOT/../../ $SRCROOT/../../../build/include/vsr/ $SRCROOT/../../../build/include/ $SRCROOT/../../../build/include/vsr/Elements/";
+			};
+			name = Debug;
+		};
+		9B8A3B6A172B5FB400441F21 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../../../allostuff/pablo\"";
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					$SRCROOT/../../../build/lib/,
+				);
+				"OTHER_LDFLAGS[arch=*]" = (
+					"-lsndfile",
+					"-lGamma",
+					"-lGLV",
+					"-lvsr",
+					"-lalloGLV",
+					"-lapr-1",
+					"-laprutil-1",
+					"-lfreeimage",
+					"-lassimp",
+					"-lfreetype",
+					"-L/usr/X11/lib/",
+					"-framework",
+					AudioUnit,
+					"-framework",
+					AudioToolbox,
+					"-framework",
+					CoreAudio,
+					"-framework",
+					CoreMidi,
+					"-framework",
+					Carbon,
+					"-lportaudio",
+					"-framework",
+					AGL,
+					"-framework",
+					OpenGL,
+					"-framework",
+					GLUT,
+					"-lpthread",
+					"-framework",
+					Cocoa,
+					"-framework",
+					Foundation,
+					"-lallocore",
+				);
+				PRODUCT_NAME = audio;
+				USER_HEADER_SEARCH_PATHS = "$SRCROOT/../../ $SRCROOT/../../../build/include/vsr/ $SRCROOT/../../../build/include/ $SRCROOT/../../../build/include/vsr/Elements/";
+			};
+			name = Release;
+		};
+		9BAB011117260658007F7270 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../../../allostuff/pablo\"";
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					$SRCROOT/../../../build/lib/,
+				);
+				OTHER_LDFLAGS = (
+					"-lGamma",
+					"-llua",
+					"-lalloutil",
+					"-lGLV",
+					"-lvsr",
+					"-lalloGLV",
+					"-lapr-1",
+					"-laprutil-1",
+					"-lfreeimage",
+					"-lassimp",
+					"-lfreetype",
+					"-L/usr/X11/lib/",
+					"-framework",
+					AudioUnit,
+					"-framework",
+					AudioToolbox,
+					"-framework",
+					CoreAudio,
+					"-framework",
+					CoreMidi,
+					"-framework",
+					Carbon,
+					"-lsndfile",
+					"-lportaudio",
+					"-framework",
+					AGL,
+					"-framework",
+					OpenGL,
+					"-framework",
+					GLUT,
+					"-lpthread",
+					"-framework",
+					Cocoa,
+					"-framework",
+					Foundation,
+					"-lallocore",
+				);
+				PRODUCT_NAME = vortex;
+				USER_HEADER_SEARCH_PATHS = "$SRCROOT/../../ $SRCROOT/../../../build/include/vsr/ $SRCROOT/../../../build/include/ $SRCROOT/../../../build/include/vsr/Elements/";
+			};
+			name = Debug;
+		};
+		9BAB011217260658007F7270 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../../../allostuff/pablo\"";
+				LIBRARY_SEARCH_PATHS = (
+					/opt/local/lib,
+					$SRCROOT/../../../build/lib/,
+				);
+				"OTHER_LDFLAGS[arch=*]" = (
+					"-lsndfile",
+					"-lGamma",
+					"-lGLV",
+					"-lvsr",
+					"-lalloGLV",
+					"-lapr-1",
+					"-laprutil-1",
+					"-lfreeimage",
+					"-lassimp",
+					"-lfreetype",
+					"-L/usr/X11/lib/",
+					"-framework",
+					AudioUnit,
+					"-framework",
+					AudioToolbox,
+					"-framework",
+					CoreAudio,
+					"-framework",
+					CoreMidi,
+					"-framework",
+					Carbon,
+					"-lportaudio",
+					"-framework",
+					AGL,
+					"-framework",
+					OpenGL,
+					"-framework",
+					GLUT,
+					"-lpthread",
+					"-framework",
+					Cocoa,
+					"-framework",
+					Foundation,
+					"-lallocore",
+				);
+				PRODUCT_NAME = vortex;
+				USER_HEADER_SEARCH_PATHS = "$SRCROOT/../../ $SRCROOT/../../../build/include/vsr/ $SRCROOT/../../../build/include/ $SRCROOT/../../../build/include/vsr/Elements/";
+			};
+			name = Release;
+		};
 		9BBA127716E562EA00F04632 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1509,6 +1833,24 @@
 			buildConfigurations = (
 				9B44DF53166D8955007F1070 /* Debug */,
 				9B44DF54166D8955007F1070 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9B8A3B68172B5FB400441F21 /* Build configuration list for PBXNativeTarget "audio" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9B8A3B69172B5FB400441F21 /* Debug */,
+				9B8A3B6A172B5FB400441F21 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9BAB011017260658007F7270 /* Build configuration list for PBXNativeTarget "vortex" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9BAB011117260658007F7270 /* Debug */,
+				9BAB011217260658007F7270 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

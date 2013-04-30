@@ -69,7 +69,7 @@ public:
 	
 	void initAudio(
 		std::string devicename, 
-    double audioRate, int audioBlockSize,
+        double audioRate, int audioBlockSize,
 		int audioInputs, int audioOutputs
 	);
 	void initOmni(std::string path = "");

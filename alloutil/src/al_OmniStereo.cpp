@@ -16,7 +16,7 @@ static float aspect = 2.;
 
 static void fillFishEye(float * value, double normx, double normy) {
     
-    printf("filling fish eye\n"); 
+//    printf("filling fish eye\n"); 
 
 	Vec3f& out = *(Vec3f *)value;
 	
@@ -46,7 +46,7 @@ static void fillFishEye(float * value, double normx, double normy) {
 
 static void fillCylinder(float * value, double normx, double normy) {
 
-    printf("filling cylinder\n"); 
+//    printf("filling cylinder\n"); 
 
 	Vec3f& out = *(Vec3f *)value;
 	
@@ -74,7 +74,7 @@ static void fillCylinder(float * value, double normx, double normy) {
 
 static void fillRect(float * value, double normx, double normy) {
 
-    printf("filling rect\n"); 
+//    printf("filling rect\n"); 
 
 	Vec3f& out = *(Vec3f *)value;
 	
