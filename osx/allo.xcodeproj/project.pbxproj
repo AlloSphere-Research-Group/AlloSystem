@@ -21,6 +21,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXFileReference section */
+		1606F2AE173514EB00E24228 /* al_Serial.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Serial.hpp; sourceTree = "<group>"; };
 		161B6CBD17144B0800750A16 /* al_File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_File.cpp; sourceTree = "<group>"; };
 		161B6CBE17144B4C00750A16 /* serial.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = serial.cc; sourceTree = "<group>"; };
 		161B6CBF17144B4C00750A16 /* serial_unix.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = serial_unix.cc; sourceTree = "<group>"; };
@@ -432,6 +433,7 @@
 				361881DC15B936330009AD7E /* al_ControlNav.hpp */,
 				361881DD15B936330009AD7E /* al_File.hpp */,
 				361881DE15B936330009AD7E /* al_MIDI.hpp */,
+				1606F2AE173514EB00E24228 /* al_Serial.hpp */,
 				361881DF15B936330009AD7E /* al_Socket.hpp */,
 				361881E015B936330009AD7E /* al_Window.hpp */,
 			);
@@ -1123,6 +1125,7 @@
 			isa = PBXProject;
 			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "allo" */;
 			compatibilityVersion = "Xcode 3.0";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
