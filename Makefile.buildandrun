@@ -35,7 +35,6 @@ endif
 $(EXEC_TARGETS): MY_FLAGS = $(shell test -e $(@D)/flags.txt && cat $(@D)/flags.txt)
 #$(EXEC_TARGETS): MY_FLAGS += -l$(LIB_NAME)
 $(EXEC_TARGETS): FORCE $(ALL_BUILD_DIRS) $(LIB_PATH) runobjs
-	@echo $(RUN_SRCS)
 	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ -I$(BUILD_DIR)/include/ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(subst $$(PROJECT_DIR),$(@D)/,$(MY_FLAGS))
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./$(*F)
