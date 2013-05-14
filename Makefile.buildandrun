@@ -8,7 +8,12 @@ CPPFLAGS := $(addprefix -I, $(RUN_SRC_DIRS)) $(CPPFLAGS)
 RUN_SRCS	 = $(wildcard $(addsuffix /*.cpp, $(RUN_SRC_DIRS)))
 RUN_SRCS	+= $(wildcard $(addsuffix /*.cc, $(RUN_SRC_DIRS)))
 RUN_SRCS	+= $(wildcard $(addsuffix /*.c, $(RUN_SRC_DIRS)))
+
+# Add Objective-C++ support if using OSX
+ifeq ($(PLATFORM), macosx)
 RUN_SRCS	+= $(wildcard $(addsuffix /*.mm, $(RUN_SRC_DIRS)))
+endif
+
 RUN_OBJS	 = $(addsuffix .o, $(basename $(notdir $(RUN_SRCS)) ))
 #RUN_OBJS	:= $(addsuffix .o, $(basename $(subst /,_,$(RUN_OBJS)) ))
 RUN_OBJS	:= $(addprefix $(OBJ_DIR), $(RUN_OBJS))
