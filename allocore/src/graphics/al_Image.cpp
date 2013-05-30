@@ -280,9 +280,9 @@ public:
 							RGBQUAD *pix = (RGBQUAD *)FreeImage_GetScanLine(mImage, j);
 							Image::RGBAPix<uint8_t> *o_pix = (Image::RGBAPix<uint8_t> *)(bp + j*rowstride);
 							for(unsigned i=0; i < header.dim[0]; ++i) {
-								pix->rgbRed = o_pix->b;
+								pix->rgbRed = o_pix->r;
 								pix->rgbGreen = o_pix->g;
-								pix->rgbBlue = o_pix->r;
+								pix->rgbBlue = o_pix->b;
 								pix->rgbReserved = o_pix->a;
 								++pix;
 								++o_pix;
