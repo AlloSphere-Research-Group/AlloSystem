@@ -71,11 +71,13 @@ public:
 		LUMINANCE = 0,	//!< luminance (1-plane)
 		LUMALPHA,		//!< lumalpha (2-plane)
 		RGB,			//!< rgb (3-plane)
-		RGBA			//!< rgba (4-plane)
+		RGBA,			//!< rgba (4-plane)
+		UNKNOWN_FORMAT
 	};
 	
 	template<typename T>
 	struct RGBPix { T r, g, b; };
+
 	template<typename T>
 	struct RGBAPix { T r, g, b, a; };
 
@@ -107,10 +109,10 @@ public:
 
 	/// Get pixels as an Array
 	Array& array(){ return mArray; }
-	
+
 	/// Get pixels as an Array (read-only)
 	const Array& array() const { return mArray; }
-	
+
 	/// Get pointer to pixels
 	template <typename T>
 	T * pixels(){ return (T*)(mArray.data.ptr); }
@@ -118,6 +120,13 @@ public:
 	/// Get pointer to pixels (read-only)
 	template <typename T>
 	const T * pixels() const { return (const T*)(mArray.data.ptr); }
+
+
+	/// Get number of bytes per pixel
+	unsigned bytesPerPixel() const { return allo_type_size(array().type()) * array().components(); }
+
+	/// Get pixel format
+	Format format() const;
 
 	/// Get width, in pixels
 	unsigned width() const { return array().width(); }
@@ -172,7 +181,6 @@ public:
 	
 	static Format getFormat(int planes);
 
-
 	class Impl {
 	public:
 		virtual ~Impl() {};
@@ -180,13 +188,17 @@ public:
 		virtual bool save(const std::string& filename, const Array& lat) = 0;
 	};
 
-protected: 
+protected:
 	Array mArray;			// pixel data
 	Impl * mImpl;			// library implementation
 	std::string mFilename;
 	bool mLoaded;			// true after image data is loaded
 };
 
+
+
+
+// Implementation ______________________________________________________________
 inline int Image::components(Format v){
 	switch(v){
 	case LUMINANCE:	return 1;
@@ -200,7 +212,6 @@ inline int Image::components(Format v){
 
 template <class T>
 bool Image::write(const std::string& filePath, const T * pixels, int nx, int ny, Format fmt){
-	
 	Image img;
 	Array& a = img.array();
 	a.data.ptr			= (char *)const_cast<T *>(pixels);

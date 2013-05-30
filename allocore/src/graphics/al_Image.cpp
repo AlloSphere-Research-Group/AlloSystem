@@ -389,15 +389,19 @@ bool Image :: save(const std::string& filename) {
 	return mLoaded;
 }
 
+Image::Format Image::format() const {	
+	return getFormat(array().components());
+}
 
 Image::Format Image :: getFormat(int planes) {
 	switch(planes) {
 		case 1:		return LUMINANCE;
 		case 2:		return LUMALPHA;
 		case 3:		return RGB;
-		case 4:
-		default:	return RGBA;
+		case 4:		return RGBA;
+		default:;
 	}
+	return UNKNOWN_FORMAT;
 }
 
 } // al::
