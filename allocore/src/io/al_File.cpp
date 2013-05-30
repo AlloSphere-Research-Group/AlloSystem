@@ -122,12 +122,25 @@ std::string File::absolutePath(const std::string& src) {
 #endif
 }
 
+std::string File::baseName(const std::string& src){
+	size_t pos = src.find_last_of('.');
+	return src.substr(0, pos);
+}
+
 std::string File::directory(const std::string& src){
 	size_t pos = src.find_last_of(AL_FILE_DELIMITER);
 	if(std::string::npos != pos){
 		return src.substr(0, pos+1);
 	}
 	return "." AL_FILE_DELIMITER_STR;
+}
+
+std::string File::extension(const std::string& src){
+	size_t pos = src.find_last_of('.');
+	if(src.npos != pos){
+		return src.substr(pos);
+	}
+	return "";
 }
 
 bool File::exists(const std::string& path){

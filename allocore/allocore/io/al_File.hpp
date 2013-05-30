@@ -53,13 +53,16 @@
 
 #include "allocore/system/al_Config.h"
 
-#ifdef AL_WINDOWS
-	#define AL_FILE_DELIMITER		'\\'
-	#define AL_FILE_DELIMITER_STR	"\\"
-#else
-	#define AL_FILE_DELIMITER		'/'
-	#define AL_FILE_DELIMITER_STR	"/"
+#ifndef AL_FILE_DELIMITER_STR
+	#ifdef AL_WINDOWS
+		#define AL_FILE_DELIMITER_STR	"\\"
+	#else
+		#define AL_FILE_DELIMITER_STR	"/"
+	#endif
 #endif
+
+#define AL_FILE_DELIMITER (AL_FILE_DELIMITER_STR[0])
+
 
 #define AL_PATH_MAX (4096)
 
@@ -193,12 +196,25 @@ public:
 	/// Convert relative paths to absolute paths
 	static std::string absolutePath(const std::string& src);
 
-	/// Extracts the directory-part of file name.
+	/// Returns the base name of path.
+
+	/// The base name is everything up to the last period.
+	///
+	static std::string baseName(const std::string& src);
+
+	/// Returns the directory part of path.
 	
-	/// The directory-part of the file name is everything up through (and 
-	/// including) the last slash in it. If the file name contains no slash, 
-	/// the directory part is the string ‘./’. E.g., /usr/bin/man -> /usr/bin/.
+	/// The directory part of the path is everything up through (and  including)
+	/// the last slash in it. If the path contains no slash, the directory part
+	/// is the string ‘./’. E.g., /usr/bin/man -> /usr/bin/.
 	static std::string directory(const std::string& src);
+
+	/// Returns extension of file name.
+
+	/// The extension is everything including and after the last period.
+	/// If there is no period, an empty string is returned.
+	static std::string extension(const std::string& src);
+
 
 	/// Returns whether a file or directory exists
 	static bool exists(const std::string& path);
