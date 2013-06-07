@@ -15,7 +15,8 @@ void GraphicsBackendOpenGL::gl_error(const char *msg) {
 		case GL_STACK_UNDERFLOW:printf("%s:\n %s\n", msg, "This command would cause a stack underflow. "POST); break;
 		case GL_OUT_OF_MEMORY:	printf("%s:\n %s\n", msg, "There is not enough memory left to execute the command. The state of the GL is undefined, except for the state of the error flags, after this error is recorded."); break;
 		case GL_TABLE_TOO_LARGE:printf("%s:\n %s\n", msg, "The specified table exceeds the implementation's maximum supported table size. "POST); break;
-		case GL_NO_ERROR: break;
+    case GL_INVALID_FRAMEBUFFER_OPERATION:printf("%s:\n %s\n", msg, "The framebuffer object is not complete. "POST); break;
+    case GL_NO_ERROR: break;
 		default: break;
 	}
 	#undef POST
