@@ -45,11 +45,8 @@
 #include <string>
 #include "allocore/io/al_App.hpp"
 #include "alloGLV/al_ControlGLV.hpp"
-
 #include "GLV/glv.h"
 
-#define GAMMA_H_INC_ALL
-#include "Gamma/Gamma.h"
 
 namespace al{
 
