@@ -256,6 +256,12 @@ public:
 	const T& newest() const { return mElems[pos()]; }
 
 
+	/// Set write position to start of array and zero fill amount
+	void reset(){
+		mPos = size()-1;
+		mFill = 0;
+	}
+
 	/// Resize buffer
 	
 	/// @param[in] n	number of elements
