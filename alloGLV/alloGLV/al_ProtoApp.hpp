@@ -50,7 +50,6 @@
 
 namespace al{
 
-
 /// Application for audio/visual prototyping
 
 /// This App subclass provides a simpler way to setup an audio/visual app
@@ -59,7 +58,7 @@ namespace al{
 class ProtoApp : public App{
 public:
 
-	glv::NumberDialer cnFOV, cnScale;
+	glv::NumberDialer cnNear, cnFar, cnFOV, cnScale;
 	glv::NumberDialer cnGain;
 
 	ProtoApp();
@@ -67,7 +66,7 @@ public:
 	/// This should be called after configuring everything else with the app
 	void init(
 		const Window::Dim& dim = Window::Dim(800,600),
-		const std::string title="",
+		const std::string& title="",
 		double fps=40,
 		Window::DisplayMode mode = Window::DEFAULT_BUF,
 		double sampleRate = 44100,
@@ -101,7 +100,10 @@ public:
 
 	/// This should still be called via ProtoApp::onAnimate(dt) if overridden
 	virtual void onAnimate(double dt){
-		lens().fovy(cnFOV.getValue());
+		lens()
+			.near(cnNear.getValue())
+			.far(cnFar.getValue())
+			.fovy(cnFOV.getValue());
 	}
 
 //	virtual void onDraw(Graphics& g, const Viewpoint& v){}
