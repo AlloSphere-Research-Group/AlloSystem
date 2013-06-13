@@ -83,12 +83,13 @@ void knot(al::VsrApp& app){
     static double th = 0; th += theta;
     static double ph = 0; ph += phi;
     
-    //vector<Cir> cp = hf.poles(-1 + fmod(th,1) * 2,  fabs( sin(ph) ) );
-    vector<Cir> cp;
-    Cir cone = hf.fiber(0,-.5);
-    Cir ctwo = hf.fiber(0, .5);
+    vector<Cir> cp = hf.poles(-1 + fmod(th,1) * 2,  fabs( sin(ph) ) );
+    
+//    vector<Cir> cp;
+//    Cir cone = hf.fiber(0,-.5);
+//    Cir ctwo = hf.fiber(0, .5);
 
-    cp.push_back( cone); cp.push_back(ctwo);
+//    cp.push_back( cone); cp.push_back(ctwo);
     //A Point Pair "Boost" Generator . . .
     PointPair tp = cp[0].dual() * PI/m + cp[1].dual() * PI/n;
     

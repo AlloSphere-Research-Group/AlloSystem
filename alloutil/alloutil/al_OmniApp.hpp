@@ -72,7 +72,7 @@ public:
     double audioRate, int audioBlockSize,
 		int audioInputs, int audioOutputs
 	);
-	void initOmni(std::string path = "../../allosphere/calibration-current/");
+	void initOmni(std::string path = "");
 	
 	void sendHandshake();
 	void sendDisconnect();
@@ -149,6 +149,8 @@ inline OmniApp::~OmniApp() {
 }
 
 inline void OmniApp::initOmni(std::string path) {
+
+
 	mOmni.configure(path, mHostName);
 	if (mOmni.activeStereo()) {
 		mOmni.mode(OmniStereo::ACTIVE).stereo(true);
