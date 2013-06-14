@@ -77,8 +77,10 @@ bool Shader::compiled() const {
 void Shader::get(int pname, void * params) const { glGetShaderiv(id(), pname, (GLint *)params); }
 
 void Shader::onCreate(){
-	AL_GRAPHICS_ERROR("(before glCreateShader)", id());
+	AL_GRAPHICS_ERROR("(before Shader::onCreate)", id());
 	mID = glCreateShader(gl_shader_type(mType));
+//printf("Create shader %lu\n",id());
+	if(0==id()) AL_WARN("Error creating shader object");
 	AL_GRAPHICS_ERROR("glCreateShader", id());
 	//mHandle = glCreateShaderObjectARB(gl_shader_type(mType));
 	//mID = (long)handle();
@@ -90,9 +92,12 @@ void Shader::onCreate(){
 	}
 }
 
-void Shader::onDestroy(){ 
+void Shader::onDestroy(){
+	AL_GRAPHICS_ERROR("(before Shader::onDestroy)", id());
+//printf("Destroy shader %lu\n", id());
 	//glDeleteObjectARB((GLhandleARB)handle());
-	glDeleteShader(id()); 
+	glDeleteShader(id());
+	AL_GRAPHICS_ERROR("glDeleteShader", id());
 }
 
 void Shader::sendSource(){
