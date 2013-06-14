@@ -1,17 +1,18 @@
+#include <stdio.h>
 #include "allocore/system/al_Time.hpp"
 #include "allocore/io/al_HID.hpp"
 
 int main(){
 
 	al::HID hid;
-	
+
 	int vid=0x046d, pid=0xc06c; // Logitech, USB Optical Mouse
 	//int vid=0x046d, pid=0xc218; // Logitech, Logitech RumblePad 2 USB
 	
 	if(!hid.open(vid, pid)){
 		printf("Unable to open HID device\n");
 	}
-	
+
 	printf("Manufacturer:  %ls\n", hid.manufacturer().c_str());
 	printf("Product:       %ls\n", hid.product().c_str());
 	printf("Serial number: %ls\n", hid.serialNumber().c_str());
