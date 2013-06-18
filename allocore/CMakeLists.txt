@@ -51,15 +51,12 @@ add_library(allocore ${ALLOCORE_SRC})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/../build/lib)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/../build/bin)
 
-# FIXME check for endianness!
 include(TestBigEndian)
 test_big_endian(TEST_ENDIAN)
 if (TEST_ENDIAN MATCHES 0)
   add_definitions(-DOSC_HOST_LITTLE_ENDIAN)
-  #add_definitions(-D__LITTLE_ENDIAN__)
 else()
   add_definitions(-DOSC_HOST_BIG_ENDIAN)
-  #add_definitions(-D__BIG_ENDIAN__)
 endif()
 
 # Dependencies
@@ -94,6 +91,7 @@ include_directories(${APR_INCLUDE_DIR}
   ${SNDFILE_INCLUDE_DIRS}
   ${GAMMA_INCLUDE_DIRS})
 
+#System dependent libs
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 # Needed by portaudio
    find_library(AUDIOUNIT_FM AudioUnit)
@@ -103,7 +101,11 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    set(PA_FRAMEWORKS ${AUDIOUNIT_FM} ${COREAUDIO_FM} ${CORESERVICES_FM} ${AUDIOTOOLBOX_FM})
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
-# TODO are avahi libraries needed on all platforms?
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+set(LINUX_LIBS avahi-common avahi-client)
+set(EXAMPLE_LINUX_LIBS asound pthread)
+endif()
+
 set(ALLOCORE_LINK_LIBRARIES
 ${APR_LIBRARY}
 ${ASSIMP_LIBRARY}
@@ -117,15 +119,14 @@ ${PORTAUDIO_LIBRARY}
 ${PORTAUDIO_LIBRARIES}
 ${SNDFILE_LIBRARIES}
 ${GAMMA_LIBRARIES}
-avahi-common avahi-client
-${PA_FRAMEWORKS})
+${PA_FRAMEWORKS}
+${LINUX_LIBS})
 
 target_link_libraries(allocore ${ALLOCORE_LINK_LIBRARIES})
 
-message(${GAMMA_LIBRARIES})
-
+#--------------------------------------------------------------------------
 # Examples
-set(EXAMPLE_DIRS algorithmic curves effects filter function generator io spectral)
+set(EXAMPLE_DIRS av graphics io math simulation sound spatial system)
 foreach(dir ${EXAMPLE_DIRS})
   file(GLOB EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/${dir}/*.cpp)
   foreach(example ${EXAMPLE_FILES})
@@ -135,7 +136,8 @@ foreach(dir ${EXAMPLE_DIRS})
 	if (apple)
 	  find_library(AUDIOUNIT_FM AudioUnit)
 	  target_link_libraries(${dir}_${EXAMPLE_NAME} ${AUDIOUNIT_FM})
-	endif()
+        endif()
+        target_link_libraries(${dir}_${EXAMPLE_NAME} ${EXAMPLE_LINUX_LIBS})
   endforeach(example)
 endforeach(dir)
 

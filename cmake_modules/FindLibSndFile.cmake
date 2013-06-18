@@ -25,17 +25,17 @@
 
 # - Try to find libsndfile
 # Once done this will define
-
+#
 #  SNDFILE_FOUND - system has libsndfile
 #  SNDFILE_INCLUDE_DIRS - the libsndfile include directory
 #  SNDFILE_LIBRARIES - Link these to use libsndfile
-
+#
 #  Copyright (C) 2006  Wengo
-
+#
 #  Redistribution and use is allowed according to the terms of the New
 #  BSD license.
 #  For details see the accompanying COPYING-CMAKE-SCRIPTS file.
-
+#
 
 if (SNDFILE_LIBRARIES AND SNDFILE_INCLUDE_DIRS)
   # in cache already
