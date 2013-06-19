@@ -11,6 +11,7 @@ int main(){
 	
 	if(!hid.open(vid, pid)){
 		printf("Unable to open HID device\n");
+		return -1;
 	}
 
 	printf("Manufacturer:  %ls\n", hid.manufacturer().c_str());

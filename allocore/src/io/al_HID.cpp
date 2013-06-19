@@ -1,6 +1,6 @@
 #include "allocore/io/al_HID.hpp"
 #include "hidapi/hidapi.h"
-
+#include <stdio.h>
 namespace al{
 
 class HID::Impl{
@@ -20,8 +20,11 @@ public:
 
 	bool open(unsigned short vid, unsigned short pid, const wchar_t *ser){
 		mHandle = hid_open(vid, pid, ser);
-		nonblocking(true);
-		return opened();
+		if(opened()){
+			nonblocking(true);
+			return true;
+		}
+		return false;
 	}
 
 	void close(){
