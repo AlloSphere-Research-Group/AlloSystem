@@ -4,6 +4,8 @@
 
 int main(){
 
+	al::HID::printDevices();
+
 	al::HID hid;
 
 	int vid=0x046d, pid=0xc06c; // Logitech, USB Optical Mouse

@@ -50,6 +50,9 @@ public:
 	/// Get serial number string
 	std::wstring serialNumber() const;
 
+
+	static void printDevices(unsigned short vendorID=0, unsigned short productID=0);
+
 private:
 	class Impl;
 	Impl * mImpl;

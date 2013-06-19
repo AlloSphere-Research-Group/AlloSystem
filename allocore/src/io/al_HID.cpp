@@ -65,6 +65,28 @@ public:
 	
 	#undef RETURN_STRING
 
+	static void print(hid_device_info& d){
+		printf("Path:               %s\n", d.path);		
+		printf("Vendor, product ID: %#.4x, %#.4x\n", d.vendor_id, d.product_id);
+		printf("Manufacturer:       %ls\n", d.manufacturer_string);
+		printf("Product:            %ls\n", d.product_string);
+		printf("Serial number:      %ls\n", d.serial_number);
+	}
+
+	static void printDevices(unsigned short vID, unsigned short pID){
+		struct hid_device_info * begin = hid_enumerate(vID, pID);
+		struct hid_device_info * d = begin;
+		
+		if(NULL != begin){
+			while(NULL != d){
+				print(*d);
+				printf("\n");
+				d = d->next;
+			}
+			hid_free_enumeration(begin);
+		}
+	}
+
 private:
 	hid_device * mHandle;
 
@@ -119,6 +141,10 @@ std::wstring HID::product() const {
 
 std::wstring HID::serialNumber() const {
 	return mImpl->serialNumber();
+}
+
+void HID::printDevices(unsigned short vID, unsigned short pID){
+	return Impl::printDevices(vID, pID);
 }
 
 } // al::
