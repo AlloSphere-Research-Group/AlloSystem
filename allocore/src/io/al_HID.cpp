@@ -3,23 +3,38 @@
 #include <stdio.h>
 namespace al{
 
+struct HIDSetup{
+	HIDSetup(){
+		hid_init();
+	}
+	~HIDSetup(){
+		hid_exit();
+	}
+} hidSetup;
+
+
 class HID::Impl{
 public:
 	Impl()
-	:	mHandle(NULL)
-	{
-		if(refCount() == 0) hid_init();//init();
-		refCount()++;
-	}
+	:	mHandle(NULL), mTimeout(0)
+	{}
 	
 	~Impl(){
 		close();
-		refCount()--;
-		if(refCount() == 0) hid_exit();
 	}
 
 	bool open(unsigned short vid, unsigned short pid, const wchar_t *ser){
 		mHandle = hid_open(vid, pid, ser);
+		//printf("%p\n", mHandle);
+		if(opened()){
+			nonblocking(true);
+			return true;
+		}
+		return false;
+	}
+
+	bool open(const char * path){
+		mHandle = hid_open_path(path);
 		if(opened()){
 			nonblocking(true);
 			return true;
@@ -31,12 +46,21 @@ public:
 		if(opened()) hid_close(mHandle);
 	}
 
+	void timeout(int msec){
+		mTimeout = msec;
+	}
+
 	bool nonblocking(bool v){
 		return 0 == hid_set_nonblocking(mHandle, v);
 	}
 
 	int read(unsigned char * data, size_t length){
-		return hid_read(mHandle, data, length);
+		if(mTimeout == 0){		
+			return hid_read(mHandle, data, length);
+		}
+		else{
+			return hid_read_timeout(mHandle, data, length, mTimeout);
+		}
 	}
 	
 	bool opened() const {
@@ -66,11 +90,14 @@ public:
 	#undef RETURN_STRING
 
 	static void print(hid_device_info& d){
-		printf("Path:               %s\n", d.path);		
-		printf("Vendor, product ID: %#.4x, %#.4x\n", d.vendor_id, d.product_id);
-		printf("Manufacturer:       %ls\n", d.manufacturer_string);
 		printf("Product:            %ls\n", d.product_string);
+		printf("Manufacturer:       %ls\n", d.manufacturer_string);
+		printf("Vendor, product ID: %#.4x, %#.4x\n", d.vendor_id, d.product_id);		
 		printf("Serial number:      %ls\n", d.serial_number);
+		printf("Path:               %s\n", d.path);
+		//#ifndef AL_LINUX
+		printf("Usage, page:        %#x, %#x\n", d.usage, d.usage_page);
+		//#endif
 	}
 
 	static void printDevices(unsigned short vID, unsigned short pID){
@@ -89,20 +116,7 @@ public:
 
 private:
 	hid_device * mHandle;
-
-	static int& refCount(){
-		static int count = 0;
-		return count;
-	}
-	
-	//static bool init(){
-	//	static bool inited = false;
-	//	if(!inited){
-	//		if(0 == hid_init())
-	//			inited = true;
-	//	}
-	//	return inited;
-	//}
+	int mTimeout;
 };
 
 
@@ -119,8 +133,16 @@ bool HID::open(unsigned short vid, unsigned short pid, const wchar_t *ser){
 	return mImpl->open(vid, pid, ser);
 }
 
+bool HID::open(const char * path){
+	return mImpl->open(path);
+}
+
 void HID::close(){
 	mImpl->close();
+}
+
+void HID::timeout(int msec){
+	mImpl->timeout(msec);
 }
 
 int HID::read(unsigned char * data, size_t length){

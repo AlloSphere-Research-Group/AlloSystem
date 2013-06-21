@@ -3,7 +3,6 @@
 
 #include <wchar.h>
 #include <string>
-#define AL_HID_BUFFER_SIZE	256
 
 namespace al{
 
@@ -21,8 +20,22 @@ public:
 	/// \returns whether the device was opened.					
 	bool open(unsigned short vendorID, unsigned short productID, const wchar_t *serialNumber = NULL);
 
+	/// Open a HID device
+
+	/// @param[in] path			A platform specific path to the device,
+	///							e.g., /dev/hidraw0
+	bool open(const char * path);
+
+
 	/// Close HID device
 	void close();
+
+
+	/// Set read timeout, in milliseconds
+
+	/// @param[in] msec			Read timeout, in milliseconds or
+	///							-1 for a blocking read.
+	void timeout(int msec);	
 
 
 	/// Read an input report from the HID device
@@ -56,7 +69,6 @@ public:
 private:
 	class Impl;
 	Impl * mImpl;
-	unsigned char mBuf[AL_HID_BUFFER_SIZE];
 };
 
 } // al::

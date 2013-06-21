@@ -8,9 +8,11 @@ int main(){
 
 	al::HID hid;
 
-	int vid=0x046d, pid=0xc06c; // Logitech, USB Optical Mouse
+	//int vid=0x046d, pid=0xc06c; // Logitech, USB Optical Mouse
 	//int vid=0x046d, pid=0xc218; // Logitech, Logitech RumblePad 2 USB
-	
+	int vid=0x045e, pid=0x0040; // Microsoft 3-Button Mouse with IntelliEye(TM)
+	//int vid=0x045e, pid=0x00dd;	
+
 	if(!hid.open(vid, pid)){
 		printf("Unable to open HID device\n");
 		return -1;
