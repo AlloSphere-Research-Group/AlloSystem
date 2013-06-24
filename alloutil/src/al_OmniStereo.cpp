@@ -509,13 +509,14 @@ void OmniStereo::Projection::updatedWarp() {
 			Vec3f& out = *(Vec3f *)cell;
 			
 //			// coordinate system change?
-			out.x = v[idx];
-			out.y = u[idx];
-			out.z = -t[idx];
-			
-//			out.x = t[idx];
+//			out.x = v[idx];
 //			out.y = u[idx];
-//			out.z = v[idx];
+//			out.z = -t[idx];
+
+            // Matt negates x as an expedient: pablo undoes
+			out.x = t[idx];
+			out.y = u[idx];
+			out.z = v[idx];
 			
 			// TODO:
 			// out -= mRegistration.pos();
@@ -630,6 +631,22 @@ OmniStereo& OmniStereo::configure(BlendMode bm) {
 }
 
 OmniStereo& OmniStereo::configure(std::string configpath, std::string configname) {
+ 
+    if (configpath == "") {
+        FILE *pipe = popen("echo ~", "r");
+        if (pipe) {
+          char c;
+          while((c = getc(pipe)) != EOF) {
+        if (c == '\r' || c == '\n')
+              break;
+        configpath += c;
+          }
+          pclose(pipe);
+        }
+        configpath += "/calibration-current/";
+      }
+
+
 	if (L.dofile(configpath + "/" + configname + ".lua", 0)) return *this;
 	
 	L.getglobal("projections");
