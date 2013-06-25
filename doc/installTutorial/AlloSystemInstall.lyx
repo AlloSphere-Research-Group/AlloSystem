@@ -112,6 +112,13 @@ LatexCommand tableofcontents
 
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 Introduction
 \end_layout
@@ -329,19 +336,11 @@ This takes you to a search page.
 \end_layout
 
 \begin_layout Standard
-Enter `Xcode' into the search bar and get the latest version of 
+Enter `Xcode' into the search bar and get the latest version of Xcode 
 \emph on
-Xcode
-\emph default
- 
-\series bold
 and
-\series default
- 
-\emph on
-Command Line Tools
 \emph default
- that work for your version of OS X.
+ Command Line Tools that work for your version of OS X.
  (Note that with older versions of Xcode the command line tools are included
  with Xcode.) Unfortunately, every major version of OS X seems to have a
  new and backwards-incompatible version of Xcode.
@@ -519,8 +518,11 @@ After downloading the disk images (
 .pkg
 \family default
 ) file inside the mounted drive to run the installer.
- If you downloaded Xcode 4.4.1, then drag-n-drop the Xcode icon into your
- Applications folder and then run the Command Line Tools installer.
+ If you downloaded Xcode 4.4.1, then drag-n-drop the Xcode icon into the 
+\family typewriter
+/Applications
+\family default
+ folder and then run the Command Line Tools installer.
  When installation is complete, you will have both an editor and all the
  command-line tools we will be using such as 
 \family typewriter
@@ -815,6 +817,40 @@ msys
 /usr
 \family default
 /.
+ The first time you run MSYS it will create a 
+\family typewriter
+home
+\family default
+ directory in 
+\family typewriter
+C:
+\backslash
+MinGW
+\backslash
+msys
+\backslash
+1.0
+\family default
+.
+ The 
+\family typewriter
+~
+\family default
+ (user home) directory will be something like 
+\family typewriter
+C:
+\backslash
+MinGW
+\backslash
+msys
+\backslash
+1.0
+\backslash
+home
+\backslash
+<username>
+\family default
+.
  Traditional Windows drives, like 
 \family typewriter
 C:
@@ -825,13 +861,13 @@ D:
 \family default
 , can be accessed as 
 \family typewriter
-/d
+/c
 \family default
  or 
 \family typewriter
-/e
+/d
 \family default
-.
+, respectively.
  Use the 
 \family typewriter
 mount
@@ -912,17 +948,42 @@ $ git clone https://github.com/AlloSphere-Research-Group/GLV.git
 $ git clone https://github.com/LancePutnam/Gamma.git
 \end_layout
 
+\begin_layout Plain Layout
+-
+\end_layout
+
+\begin_layout Plain Layout
+https://github.com/AlloSphere-Research-Group/AlloSystem/zipball/aau12f
+\end_layout
+
+\begin_layout Plain Layout
+https://github.com/AlloSphere-Research-Group/AlloSystem/archive/stable13feb.zip
+\end_layout
+
 \end_inset
 
 
 \end_layout
 
-\begin_layout Subsection
-Build AlloSystem
+\begin_layout Standard
+First, create a new directory 
+\family typewriter
+~/code/
+\family default
+.
+ This can be done from the Unix shell with the command
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ mkdir ~/code
 \end_layout
 
-\begin_layout Standard
-Download the AlloSystem source code  
+\end_inset
+
+Next, download the AlloSystem source code  
 \begin_inset Flex URL
 status open
 
@@ -933,47 +994,40 @@ https://github.com/AlloSphere-Research-Group/AlloSystem/archive/stable13feb.zip
 
 \end_inset
 
-
-\begin_inset Note Note
-status open
-
-\begin_layout Plain Layout
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-https://github.com/AlloSphere-Research-Group/AlloSystem/zipball/aau12f
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
 .
- Unzip the contents to 
+ Within the 
 \family typewriter
-~/code/allosystem/
+.zip
 \family default
- (if using Windows and MinGW/MSYS 
+ file should be another directory having a name of something like 
 \family typewriter
-~
+AlloSystem-xxx
 \family default
- will be something like 
+.
+ You should move this directory to the directory 
 \family typewriter
-C:/MinGW/msys/1.0/home/<username>
+~/code/
 \family default
-).
- From the Unix shell, `
+ you just made.
+ After the directory 
+\family typewriter
+AlloSystem-xxx
+\family default
+ is moved, rename it to 
+\family typewriter
+allosystem
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+From the Unix shell, `
 \family typewriter
 cd
 \family default
 ' into the 
 \family typewriter
-allosystem/
+~/code/allosystem/
 \family default
  directory.
  If you do `
@@ -995,7 +1049,7 @@ $ ls
 
 \begin_layout Plain Layout
 
-Makefile				alloGLV			alloutil
+Makefile				alloGLV			allovsr
 \end_layout
 
 \begin_layout Plain Layout
@@ -1015,7 +1069,7 @@ Makefile.rules			allonect		osx
 
 \begin_layout Plain Layout
 
-README.md				alloni
+README.md				alloutil		work
 \end_layout
 
 \end_inset
@@ -1026,12 +1080,13 @@ README.md				alloni
 \begin_layout Standard
 Next, you need to install the necessary dependencies for AlloSystem.
  (Windows users only: you must 
-\bar under
-deactivate any virus checkers
-\bar default
+\emph on
+deactivate all virus checkers and antispyware programs, such as Windows
+ Defender
+\emph default
 .
- Many virus checkers are know to terminate important configuration processes
- that take place in the following steps.
+ These monitoring programs are know to terminate or halt important configuration
+ processes that take place in the following steps.
  If you do not disable them, then the libraries will not get installed properly.)
  Install dependencies with the following commands (notice if you are using
  MinGW/MSYS then you don't need the sudo in front of the command):
@@ -1103,7 +1158,7 @@ To check if the system is installed successfully you can build an example
 \family typewriter
 ~/code/allosystem/allocore
 \family default
- folder and run the following command:
+ folder and then running the following command:
 \end_layout
 
 \begin_layout Standard
@@ -1118,22 +1173,118 @@ $ make examples/av/simpleApp.cpp
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
 If a ball with oscillating color shows up, then your system is configured
  correctly.
 \end_layout
 
-\begin_layout Subsection
-Build GLV and Gamma
+\begin_layout Section
+Build-and-Run Applications
 \end_layout
 
 \begin_layout Standard
-GLV is a GUI toolkit and Gamma is an audio synthesis library.
- We will use these libraries to extend the functionality of AlloSystem.
- First, download the source code of each at 
+While AlloSystem is intended to be used mainly as a library, it does provide
+ a simple means of building and running custom applications that link to
+ AlloSystem.
+ It is flexible enough to be used all the way from building simple prototypes
+ to creating complex applications.
+ This section describes how to setup and use AlloSystem's ``build-and-run''
+ capability.
+\end_layout
+
+\begin_layout Standard
+By default, there are two directories recognized by the AlloSystem build-and-run
+ facility: 
+\family typewriter
+examples/
+\family default
+ and 
+\family typewriter
+work/
+\family default
+.
+ The directory 
+\family typewriter
+examples/
+\family default
+ contains example source code for libraries.
+ The directory 
+\family typewriter
+work/
+\family default
+ is for user application source files and thus will be of primary concern
+ here.
+ You can place any source (
+\family typewriter
+.cpp
+\family default
+) files having a 
+\family typewriter
+main()
+\family default
+ function in the 
+\family typewriter
+work/
+\family default
+ directory (or any subdirectories thereof) and compile and run the source
+ with the command
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ make work/myfile.cpp
+\end_layout
+
+\end_inset
+
+Remember, you must be in 
+\family typewriter
+~/code/allosystem/
+\family default
+ when running the 
+\family typewriter
+make
+\family default
+ command.
+ The executable binary is placed in 
+\family typewriter
+build/bin/
+\family default
+ and has the same name as the source file.
+ If you would only like to build the application, without also running it,
+ then you can append 
+\family typewriter
+AUTORUN=0
+\family default
+ to the line above, i.e.,
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ make work/myfile.cpp AUTORUN=0
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+GUI and Sound
+\end_layout
+
+\begin_layout Standard
+The following instructions are only required if you would like to use graphical
+ user interface (GUI) or sound synthesis components in conjunction with
+ AlloSystem.
+ We use GLV as the GUI toolkit and Gamma as the sound synthesis library.
+ Download the source code of each at 
 \begin_inset Flex URL
 status collapsed
 
@@ -1246,116 +1397,18 @@ $ make alloGLV
 \end_layout
 
 \begin_layout Section
-Build-and-Run Applications
-\end_layout
-
-\begin_layout Standard
-While AlloSystem is intended to be used mainly as a library, it does provide
- a simple means of building and running custom applications that link to
- AlloSystem.
- It is flexible enough to be used all the way from building simple prototypes
- to creating complex applications.
- This section describes how to setup and use AlloSystem's ``build-and-run''
- capability.
-\end_layout
-
-\begin_layout Standard
-By default, there are two directories recognized by the AlloSystem build-and-run
- facility: 
-\family typewriter
-examples/
-\family default
- and 
-\family typewriter
-work/
-\family default
-.
- The directory 
-\family typewriter
-examples/
-\family default
- contains example source code for libraries.
- The directory 
-\family typewriter
-work/
-\family default
- is for user application source files and thus will be of primary concern
- here.
- You can place any source (
-\family typewriter
-.cpp
-\family default
-) files having a 
-\family typewriter
-main()
-\family default
- function in the 
-\family typewriter
-work/
-\family default
- directory (or any subdirectories thereof) and compile and run the source
- with the command
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-$ make work/myfile.cpp
-\end_layout
-
-\end_inset
-
-Remember, you must be in 
-\family typewriter
-~/code/allosystem/
-\family default
- when running the 
-\family typewriter
-make
-\family default
- command.
- The executable binary is placed in 
-\family typewriter
-build/bin/
-\family default
- and has the same name as the source file.
- If you would only like to build the application, without also running it,
- then you can append 
-\family typewriter
-AUTORUN=0
-\family default
- to the line above, i.e.,
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-$ make work/myfile.cpp AUTORUN=0
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Newpage pagebreak
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section
-Advanced Project Configuration
+Advanced Configuration
 \end_layout
 
 \begin_layout Subsection
 Custom Project Directories
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Custom-Project-Directories"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1365,16 +1418,13 @@ It is possible to configure AlloSystem to use your own custom project directory
 \emph on
 user directory
 \emph default
- and specify it generically as 
+ and refer to it in this document generically as 
 \family typewriter
-[userdir]
+<userdir>
 \family default
-.
- 
-\family typewriter
-[userdir]
-\family default
- can be anything you choose as long as it is a valid path, e.g., 
+ from this point onward.
+ The actual name of the user directory can be anything you choose as long
+ as it is a valid path, e.g., 
 \family typewriter
 myprojects
 \family default
@@ -1389,7 +1439,7 @@ ljp
 .
  Start by creating the directory 
 \family typewriter
-~/code/allosystem/[userdir]
+~/code/allosystem/<userdir>
 \family default
 /.
  Next, make a copy of the file 
@@ -1430,10 +1480,6 @@ $ cp Makefile.usertemplate Makefile.user
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
 Now, open 
 \family typewriter
 Makefile.user
@@ -1467,7 +1513,7 @@ status open
 
 \begin_layout Plain Layout
 
-RUN_DIRS += [userdir]/
+RUN_DIRS += <userdir>/
 \end_layout
 
 \end_inset
@@ -1480,7 +1526,7 @@ using the same directory name you created in the previous step.
  (comment symbol) is removed.
  Also, do not forget the trailing slash after 
 \family typewriter
-[userdir]
+<userdir>
 \family default
 .
  Relative paths in 
@@ -1525,18 +1571,18 @@ $ cd ~/code/allosystem/
 
 \begin_layout Plain Layout
 
-$ ln -s [sourcedir]/ [userdir]/[targetdir]
+$ ln -s sourcedir/ <userdir>/targetdir
 \end_layout
 
 \end_inset
 
 This creates a symbolic link to 
 \family typewriter
-[sourcedir]/
+sourcedir/
 \family default
  that is treated like the directory 
 \family typewriter
-[userdir]/[targetdir]/
+<userdir>/targetdir/
 \family default
 .
 \end_layout
@@ -1686,6 +1732,48 @@ Troubleshooting
 \end_layout
 
 \begin_layout Subsection
+CasE SensitiviTy
+\end_layout
+
+\begin_layout Standard
+If your commands are not working, it is possible that the case of one or
+ more characters in the command is wrong.
+ Many Unix systems are case sensitive.
+\end_layout
+
+\begin_layout Subsection
+I Can't Find The '~' Directory!
+\end_layout
+
+\begin_layout Standard
+The character '
+\family typewriter
+~
+\family default
+' designates the home directory of the current user.
+ This is usually where you start out when you first open a terminal.
+ The exact location of 
+\family typewriter
+~
+\family default
+ varies by platform.
+ If you want to know exactly where it is, enter the following in the terminal
+ 
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ file ~
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
 `No such file or directory'
 \end_layout
 
@@ -1697,16 +1785,155 @@ This error message is typically the result of misspelling a file or directory
 \end_layout
 
 \begin_layout Subsection
-Bash Script (.sh file) Does Not Execute Properly
+make: Nothing to be done for `xxx'.
 \end_layout
 
 \begin_layout Standard
-If you get an error when trying to execute a Bash script (
+This means all dependencies of the rule you specified are up-to-date.
+\end_layout
+
+\begin_layout Subsection
+make: *** No rule to make target `xxx'.
+ Stop.
+\end_layout
+
+\begin_layout Standard
+The Makefile does not contain the rule you specified.
+ The rule is the thing you are specifying after typing 
+\family typewriter
+make
+\family default
+.
+ If you are attempting to build and run a source file, then this message
+ means that the directory of the source file does not exist where you specified.
+ A common cause is that you are in the wrong directory.
+ Always use tab autocompletion to ensure that you have file paths correct.
+ Another cause is that you are trying to build and run a source file that
+ is not in 
+\family typewriter
+work/
+\family default
+ or one of your build-and-run user directories (
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Custom-Project-Directories"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Subsection
+MinGW/MSYS: Spaces in User Name
+\end_layout
+
+\begin_layout Standard
+MSYS simply does not like user names with spaces in them.
+ If your user name contains spaces, then it will create problems with many
+ of the build tools.
+ To solve the problem, you must change your user name in MSYS.
+ Add the line 
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+set USERNAME=<myname> 
+\end_layout
+
+\end_inset
+
+to the beginning of 
+\family typewriter
+C:
+\backslash
+MinGW
+\backslash
+msys
+\backslash
+1.0
+\backslash
+msys.bat
+\family default
+ where 
+\family typewriter
+<myname>
+\family default
+ does not have spaces.
+\end_layout
+
+\begin_layout Subsection
+MinGW/MSYS: Permission Denied
+\end_layout
+
+\begin_layout Standard
+If you see a message `Permission denied', it is possible that the Windows
+ Application Experience service is not configured properly.
+ Usually, logging out of Windows and logging back in fixes the problem (no
+ need to restart Windows).
+ If the problem persists, you will need to manually configure Windows group
+ policies.
+\end_layout
+
+\begin_layout Standard
+To configure group policies, click the Start button and in the search bar
+ type: 
+\family typewriter
+gpedit.msc
+\family default
+.
+ Click this file to start the Local Group Policy Editor.
+ Next, navigate to 
+\family typewriter
+Local Computer Policy -> Computer Configuration -> Administrative Templates
+ -> Windows Components -> Application Compatibility
+\family default
+ and do the following
+\end_layout
+
+\begin_layout Itemize
+Select Turn Off Application Compatibility Engine 
+\end_layout
+
+\begin_layout Itemize
+Select Enabled under the Settings tab 
+\end_layout
+
+\begin_layout Itemize
+Select Turn off Program Compatibility Assistant 
+\end_layout
+
+\begin_layout Itemize
+Select Enabled under the Settings tab
+\end_layout
+
+\begin_layout Standard
+See 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.blackviper.com/windows-services/application-experience/
+\end_layout
+
+\end_inset
+
+ for more information.
+\end_layout
+
+\begin_layout Subsection
+Bash Script (.sh file) Does Not Execute (Properly)
+\end_layout
+
+\begin_layout Standard
+If you have problems trying to execute a Bash script (
 \family typewriter
 .
 \family default
 sh file), then it is possible that its file mode is incorrect.
- Simply run 
+ Make the script executable by running 
 \begin_inset listings
 inline false
 status open
@@ -1718,8 +1945,43 @@ $ chmod u+x <filename>.sh
 
 \end_inset
 
-on the troublesome script.
- This will make it executable.
+
+\end_layout
+
+\begin_layout Subsection
+'<cmath> not found' When Compiling Sources
+\end_layout
+
+\begin_layout Standard
+This occurs for users with OSX 10.7 and above who have installed Xcode 4.4.1
+ and above.
+ The cause is that Xcode is not found by the build system.
+ To fix the problem, ensure that Xcode.app is placed in 
+\family typewriter
+/Applications
+\family default
+ and not 
+\family typewriter
+~/Applications
+\family default
+ or some other folder.
+ If you cannot navigate to 
+\family typewriter
+/Applications
+\family default
+ from Finder, then open a Terminal and type 
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ open /Applications
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsection
