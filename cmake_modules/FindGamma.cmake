@@ -1,9 +1,16 @@
 # - Try to find Gamma
 # Once done this will define
 
-#  GAMMA_FOUND - system has libsndfile
-#  GAMMA_INCLUDE_DIRS - the libsndfile include directory
-#  GAMMA_LIBRARIES - Link these to use libsndfile
+#  GAMMA_FOUND - system has Gamma
+#  GAMMA_INCLUDE_DIRS - the Gamma include directory
+#  GAMMA_LIBRARIES - Link these to use Gamma
+
+#  Copyright (C) 2006  Wengo
+
+#  Redistribution and use is allowed according to the terms of the New
+#  BSD license.
+#  For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+
 
 if (GAMMA_LIBRARIES AND GAMMA_INCLUDE_DIRS)
   # in cache already
@@ -14,9 +21,11 @@ else (GAMMA_LIBRARIES AND GAMMA_INCLUDE_DIRS)
     NAMES
 	  Gamma.h
     PATHS
+	${CMAKE_SOURCE_DIR}/../../Gamma/Gamma
       /usr/include/Gamma
       /usr/local/include/Gamma
       /opt/local/include/Gamma
+      /sw/include/Gamma
   )
 
   find_library(GAMMA_LIBRARY
@@ -24,14 +33,34 @@ else (GAMMA_LIBRARIES AND GAMMA_INCLUDE_DIRS)
 	  Gamma
 	  libGamma
     PATHS
+	${CMAKE_SOURCE_DIR}/../../Gamma/build/lib
+      /usr/lib
+      /opt/local/lib
+      /usr/local/lib
+      /sw/lib
+  )
+
+  if (${GAMMA_LIBRARY} STREQUAL "")
+    find_path(GAMMA_LIBRARY
+    libGamma.a
+    PATHS
       /usr/lib
       /usr/local/lib
       /opt/local/lib
+      /sw/lib)
+  endif()
+
+
+  set(GAMMA_INCLUDE_DIRS
+	${GAMMA_INCLUDE_DIR}
+  )
+  set(GAMMA_LIBRARIES
+	${GAMMA_LIBRARY}
   )
 
-  if (GAMMA_INCLUDE_DIR AND GAMMA_LIBRARY)
+  if (GAMMA_INCLUDE_DIRS AND GAMMA_LIBRARIES)
 	set(GAMMA_FOUND TRUE)
-  endif (GAMMA_INCLUDE_DIR AND GAMMA_LIBRARY)
+  endif (GAMMA_INCLUDE_DIRS AND GAMMA_LIBRARIES)
 
   if (GAMMA_FOUND)
 	if (NOT Gamma_FIND_QUIETLY)

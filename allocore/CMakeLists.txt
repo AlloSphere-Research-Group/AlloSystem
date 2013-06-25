@@ -45,6 +45,14 @@ src/types/al_Array.cpp
 src/types/al_Color.cpp
 src/types/al_MsgQueue.cpp)
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+set(ALLOCORE_SRC ${ALLOCORE_SRC}
+ src/system/al_MainLoopOSX.mm
+ src/system/al_InfoOSX.mm
+ src/protocol/al_Zeroconf_OSX.mm)
+
+endif()
+
 include_directories(${CMAKE_SOURCE_DIR})
 add_library(allocore ${ALLOCORE_SRC})
 
@@ -94,19 +102,29 @@ include_directories(${APR_INCLUDE_DIR}
 #System dependent libs
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 # Needed by portaudio
+add_definitions(-DAL_OSX)
    find_library(AUDIOUNIT_FM AudioUnit)
    find_library(COREAUDIO_FM CoreAudio)
+   find_library(COREMIDI_FM CoreMidi)
    find_library(CORESERVICES_FM CoreServices)
    find_library(AUDIOTOOLBOX_FM AudioToolbox)
-   set(PA_FRAMEWORKS ${AUDIOUNIT_FM} ${COREAUDIO_FM} ${CORESERVICES_FM} ${AUDIOTOOLBOX_FM})
+   set(PA_FRAMEWORKS ${AUDIOUNIT_FM} ${COREAUDIO_FM} ${COREMIDI_FM} ${CORESERVICES_FM} ${AUDIOTOOLBOX_FM})
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-set(LINUX_LIBS avahi-common avahi-client)
+
 set(EXAMPLE_LINUX_LIBS asound pthread)
+
+add_definitions(-DAL_LINUX)
+set(ALLOCORE_LINK_LIBRARIES ${ALLOCORE_LIBRARIES} avahi-common avahi-client)
 endif()
 
-set(ALLOCORE_LINK_LIBRARIES
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+add_definitions(-DAL_WINDOWS)
+endif()
+
+# TODO are avahi libraries needed on all platforms?
+set(ALLOCORE_LINK_LIBRARIES ${ALLOCORE_LIBRARIES}
 ${APR_LIBRARY}
 ${ASSIMP_LIBRARY}
 ${FREEIMAGE_LIBRARY}
