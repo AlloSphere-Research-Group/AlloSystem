@@ -230,6 +230,13 @@ static HANDLE open_device(const char *path, BOOL enumerate)
 		OPEN_EXISTING,
 		FILE_FLAG_OVERLAPPED,/*FILE_ATTRIBUTE_NORMAL,*/
 		0);
+		
+	if(handle == INVALID_HANDLE_VALUE){
+		DWORD err = GetLastError();
+		printf("hid_windows.c:236: System error %d\n", (unsigned)err);
+		/*DWORD attrib = GetFileAttributesA(path);
+		printf("%#x\n", (unsigned)attrib);*/
+	}
 
 	return handle;
 }

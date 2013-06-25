@@ -23,6 +23,18 @@ public:
 		close();
 	}
 
+	/*	
+	"I'm not sure the actual criteria which determines whether shared mode is 
+	required. Keyboards and mice cannot be opened at all in Windows using the 
+	HID interface, and thus can't be opened using HIDAPI.
+
+	On Linux, it depends on the implementation you use. For Linux/hidraw, 
+	devices can be opened multiple times. On Linux/libusb, they can only be 
+	opened once. Actually, opening it a second time will steal the device from
+	the first instance. On mac, it allows multiple opens."
+	
+		signal11, https://github.com/signal11/hidapi/issues/23
+	*/
 	bool open(unsigned short vid, unsigned short pid, const wchar_t *ser){
 		mHandle = hid_open(vid, pid, ser);
 		//printf("%p\n", mHandle);
