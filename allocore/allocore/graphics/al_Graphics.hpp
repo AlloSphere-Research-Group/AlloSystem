@@ -311,7 +311,7 @@ public:
 	void clearColor(float r, float g, float b, float a);
 	
 	/// Set clear color
-	void clearColor(const Color& color) { clearColor(color.r, color.g, color.b, color.a); }
+	void clearColor(const Color& color);
 
 
 	/// Set linear fog parameters
@@ -328,8 +328,15 @@ public:
 //	/// Set viewport and scissor region
 //	void viewportScissor(const Viewport& v){ viewport(v); scissor(v); }
 
-	void viewport(int x, int y, int width, int height);
+	/// Set viewport
+	void viewport(int left, int bottom, int width, int height);
+	
+	/// Set viewport
 	void viewport(const Viewport& v){ viewport(v.l,v.b,v.w,v.h); }
+
+	/// Get current viewport
+	Viewport viewport() const;
+
 
 	/// Set current matrix
 	void matrixMode(MatrixMode mode);
@@ -510,6 +517,7 @@ public:
 
 inline void Graphics::clear(AttributeBit bits){ glClear(bits); }
 inline void Graphics::clearColor(float r, float g, float b, float a){ glClearColor(r, g, b, a); }
+inline void Graphics::clearColor(const Color& c) { clearColor(c.r, c.g, c.b, c.a); }
 
 inline void Graphics::blendMode(BlendFunc src, BlendFunc dst, BlendEq eq){
 	glBlendEquation(eq);
@@ -556,8 +564,6 @@ inline void Graphics::pointAtten(float c2, float c1, float c0){
 inline void Graphics::polygonMode(PolygonMode m, Face f){ glPolygonMode(f,m); }
 inline void Graphics::shadeModel(ShadeModel m){ glShadeModel(m); }
 inline void Graphics::currentColor(float r, float g, float b, float a){ glColor4f(r,g,b,a); }
-
-
 
 inline Graphics::AttributeBit operator| (const Graphics::AttributeBit& a, const Graphics::AttributeBit& b){
 	return static_cast<Graphics::AttributeBit>(+a|+b);

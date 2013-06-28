@@ -144,6 +144,12 @@ void Graphics::viewport(int x, int y, int width, int height) {
 	glScissor(x, y, width, height);
 }
 
+Viewport Graphics::viewport() const {
+	GLint vp[4];
+	glGetIntegerv(GL_VIEWPORT, vp);
+	return Viewport(vp[0], vp[1], vp[2], vp[3]);
+}
+
 
 // Immediate Mode
 void Graphics::begin(Primitive v) {
