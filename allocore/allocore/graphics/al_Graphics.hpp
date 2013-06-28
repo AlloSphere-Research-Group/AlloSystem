@@ -323,10 +323,6 @@ public:
 
 
 	// Coordinate Transforms
-//	void scissor(int x, int y, int width, int height);
-//	void scissor(const Viewport& v){ scissor(v.l,v.b,v.w,v.h); }
-//	/// Set viewport and scissor region
-//	void viewportScissor(const Viewport& v){ viewport(v); scissor(v); }
 
 	/// Set viewport
 	void viewport(int left, int bottom, int width, int height);
@@ -388,25 +384,27 @@ public:
 	/// Rotate current matrix
 	
 	/// \param[in] angle	angle, in degrees
-	/// \param[in] v		rotation axis
-	void rotate(double angle, const Vec3d& v) { rotate(angle, v[0], v[1], v[2]); }
+	/// \param[in] axis		rotation axis
+	template <class T>
+	void rotate(double angle, const Vec<3,T>& axis){
+		rotate(angle, axis[0],axis[1],axis[2]); }
 
 	/// Scale current matrix uniformly
-	void scale(double s) { scale(s, s, s); }
+	void scale(double s){ scale(s, s, s); }
 
 	/// Scale current matrix along each dimension
 	void scale(double x, double y, double z=1.);
 	
 	/// Scale current matrix along each dimension
-	void scale(const Vec3d& v) { scale(v[0], v[1], v[2]); }
-	void scale(const Vec3f& v) { scale(v[0], v[1], v[2]); }
+	template <class T>
+	void scale(const Vec<3,T>& v){ scale(v[0],v[1],v[2]); }
 
 	/// Translate current matrix
 	void translate(double x, double y, double z=1.);
 
 	/// Translate current matrix
-	void translate(const Vec3d& v) { translate(v[0], v[1], v[2]); }
-	void translate(const Vec3f& v) { translate(v[0], v[1], v[2]); }
+	template <class T>
+	void translate(const Vec<3,T>& v){ translate(v[0],v[1],v[2]); }
 
 
 	// Immediate Mode
@@ -422,24 +420,33 @@ public:
 
 	/// Add vertex (immediate mode)
 	void vertex(double x, double y, double z=0.);
-	void vertex(const Vec2d& v) { vertex(v[0], v[1], 0); }
-	void vertex(const Vec2f& v) { vertex(v[0], v[1], 0); }
-	void vertex(const Vec3d& v) { vertex(v[0], v[1], v[2]); }
-	void vertex(const Vec3f& v) { vertex(v[0], v[1], v[2]); }
+
+	template<class T>
+	void vertex(const Vec<2,T>& v){ vertex(v[0],v[1],T(0)); }
+
+	template<class T>
+	void vertex(const Vec<3,T>& v){ vertex(v[0],v[1],v[2]); }
+
 	
 	/// Add texture coordinate (immediate mode)
 	void texCoord(double u, double v);
-	void texCoord(const Vec2d& v) { texCoord(v[0], v[1]); }
-	void texCoord(const Vec2f& v) { texCoord(v[0], v[1]); }
+
+	template<class T>
+	void texCoord(const Vec<2,T>& v){ texCoord(v[0],v[1]); }
+
 	void texCoord(double u, double v, double w);
-	void texCoord(const Vec3d& v) { texCoord(v[0], v[1], v[2]); }
-	void texCoord(const Vec3f& v) { texCoord(v[0], v[1], v[2]); }
-	
+
+	template<class T>
+	void texCoord(const Vec<3,T>& v){ texCoord(v[0],v[1],v[2]); }
+
+
 	/// Add normal (immediate mode)
 	void normal(double x, double y, double z=0.);
-	void normal(const Vec3d& v) { normal(v[0], v[1], v[2]); }
-	void normal(const Vec3f& v) { normal(v[0], v[1], v[2]); }
-	
+
+	template<class T>
+	void normal(const Vec<3,T>& v){ normal(v[0],v[1],v[2]); }
+
+
 	/// Add color (immediate mode)
 	void color(double r, double g, double b, double a=1.);
 	void color(double gray, double a=1.) { color(gray, gray, gray, a); }
