@@ -1,29 +1,3 @@
-# Base Io build system
-# Written by Jeremy Tregunna <jeremy.tregunna@me.com>
-# Modified by Andres Cabrera <andres@mat.ucsb.edu>
-#
-# Find Gamma.
-
-#FIND_PATH(GAMMA_INCLUDE_DIR Gamma.h)
-
-#SET(GAMMA_NAMES ${GAMMA_NAMES} Gamma libGamma)
-#FIND_LIBRARY(GAMMA_LIBRARY NAMES ${GAMMA_NAMES} PATH)
-
-#IF(GAMMA_INCLUDE_DIR AND GAMMA_LIBRARY)
-#	SET(GAMMA_FOUND TRUE)
-#ENDIF(GAMMA_INCLUDE_DIR AND GAMMA_LIBRARY)
-
-#IF(GAMMA_FOUND)
-#	IF(NOT Gamma_FIND_QUIETLY)
-#		MESSAGE(STATUS "Found Gamma: ${GAMMA_LIBRARY}")
-#	ENDIF (NOT Gamma_FIND_QUIETLY)
-#ELSE(GAMMA_FOUND)
-#	IF(Gamma_FIND_REQUIRED)
-#		MESSAGE(FATAL_ERROR "Could not find Gamma")
-#	ENDIF(Gamma_FIND_REQUIRED)
-#ENDIF (GAMMA_FOUND)
-
-
 # - Try to find Gamma
 # Once done this will define
 
@@ -99,6 +73,6 @@ else (GAMMA_LIBRARIES AND GAMMA_INCLUDE_DIRS)
   endif (GAMMA_FOUND)
 
   # show the GAMMA_INCLUDE_DIRS and GAMMA_LIBRARIES variables only in the advanced view
-  mark_as_advanced(GAMMA_INCLUDE_DIRS GAMMA_LIBRARIES)
+  # mark_as_advanced(GAMMA_INCLUDE_DIRS GAMMA_LIBRARIES)
 
 endif (GAMMA_LIBRARIES AND GAMMA_INCLUDE_DIRS)

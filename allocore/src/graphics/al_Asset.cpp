@@ -2,18 +2,22 @@
 
 #include "allocore/graphics/al_Graphics.hpp"
 
-#include "assimp/assimp.h"
-#include "assimp/aiTypes.h"
-#include "assimp/aiPostProcess.h"
-#include "assimp/aiScene.h"
-#include "assimp/aiMaterial.h"
+//#define USE_ASSIMP3
 
-/*
+#ifdef USE_ASSIMP3
+#include "assimp/cimport.h"
+#include "assimp/matrix4x4.h"
 #include "assimp/types.h"
 #include "assimp/postprocess.h"
 #include "assimp/scene.h"
 #include "assimp/material.h"
-*/
+#else
+#include "assimp/assimp.h"
+#include "assimp/aiTypes.h"
+#include "assimp/aiPostProcess.h"
+#include "assimp/scene.h"
+#include "assimp/aiMaterial.h"
+#endif
 
 #include <stdio.h>
 #include <map>
@@ -376,15 +380,28 @@ Scene::Node& Scene :: node(unsigned int i) const {
 	return mImpl->nodes[i];
 }
 
+#ifdef USE_ASSIMP3
+void get_bounding_box_for_node(const aiScene * scene, const struct aiNode* nd, Vec3f& min, Vec3f& max, aiMatrix4x4* trafo) {
+    aiMatrix4x4 prev;
+#else
 void get_bounding_box_for_node(const aiScene * scene, const struct aiNode* nd, Vec3f& min, Vec3f& max, struct aiMatrix4x4* trafo) {
-	struct aiMatrix4x4 prev;
+    struct aiMatrix4x4 prev;
+#endif
 	unsigned int n = 0, t;
 	prev = *trafo;
 	aiMultiplyMatrix4(trafo,&nd->mTransformation);
-	for (; n < nd->mNumMeshes; ++n) {
-		const struct aiMesh * mesh = scene->mMeshes[nd->mMeshes[n]];
-			for (t = 0; t < mesh->mNumVertices; ++t) {
-			struct aiVector3D tmp = mesh->mVertices[t];
+    for (; n < nd->mNumMeshes; ++n) {
+#ifdef USE_ASSIMP3
+        const aiMesh * mesh = scene->mMeshes[nd->mMeshes[n]];
+#else
+        const struct aiMesh * mesh = scene->mMeshes[nd->mMeshes[n]];
+#endif
+        for (t = 0; t < mesh->mNumVertices; ++t) {
+#ifdef USE_ASSIMP3
+            aiVector3D tmp = mesh->mVertices[t];
+#else
+            struct aiVector3D tmp = mesh->mVertices[t];
+#endif
 			aiTransformVecByMatrix4(&tmp,trafo);
 			min[0] = AL_MIN(min[0],tmp.x);
 			min[1] = AL_MIN(min[1],tmp.y);
@@ -401,7 +418,11 @@ void get_bounding_box_for_node(const aiScene * scene, const struct aiNode* nd, V
 }
 		
 void Scene :: getBounds(Vec3f& min, Vec3f& max) const {
-	struct aiMatrix4x4 trafo;
+#ifdef USE_ASSIMP3
+    aiMatrix4x4 trafo;
+#else
+    struct aiMatrix4x4 trafo;
+#endif
 	aiIdentityMatrix4(&trafo);
 	min.set(1e10f, 1e10f, 1e10f);
 	max.set(-1e10f, -1e10f, -1e10f);

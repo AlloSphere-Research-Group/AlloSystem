@@ -1,0 +1,121 @@
+cmake_minimum_required (VERSION 2.8)
+project (alloGLV)
+
+aux_source_directory(src ALLOGLV_SRC)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+add_library(alloGLV ${ALLOGLV_SRC})
+
+set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
+
+## FIXME check for endianness!
+#include(TestBigEndian)
+#test_big_endian(TEST_ENDIAN)
+#if (TEST_ENDIAN MATCHES 0)
+#  add_definitions(-DOSC_HOST_LITTLE_ENDIAN)
+#  #add_definitions(-D__LITTLE_ENDIAN__)
+#else()
+#  add_definitions(-DOSC_HOST_BIG_ENDIAN)
+#  #add_definitions(-D__BIG_ENDIAN__)
+#endif()
+
+# Dependencies
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../cmake_modules")
+find_package(Portaudio REQUIRED)
+message("-- Portaudio headers: ${PORTAUDIO_INCLUDE_DIRS}   ${PORTAUDIO_DEFINITIONS}")
+find_package(LibSndFile REQUIRED)
+message("-- libsndfile headers: ${SNDFILE_INCLUDE_DIRS}")
+
+find_package(Allocore REQUIRED)
+find_package(GLV REQUIRED)
+#find_package(APR REQUIRED)
+#find_package(Assimp REQUIRED)
+#find_package(FreeImage REQUIRED)
+#find_package(Freetype REQUIRED)
+#find_package(GLEW REQUIRED)
+#find_package(GLUT REQUIRED)
+#find_package(LibSndFile REQUIRED)
+#find_package(OpenGL REQUIRED)
+#find_package(Portaudio REQUIRED)
+#find_package(Gamma REQUIRED)
+
+
+if(ALLOCORE_FOUND)
+include_directories(${ALLOCORE_INCLUDE_DIR})
+else()
+include_directories(../allocore)
+endif()
+
+if(GLV_FOUND)
+include_directories(${GLV_INCLUDE_DIR})
+message(${GLV_LIBRARY})
+else()
+include_directories(../../GLV)
+endif()
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
+target_link_libraries(alloGLV ${ALLOCORE_LIBRARIES} ${GLV_LIBRARY})
+
+#include_directories(${APR_INCLUDE_DIR}
+#  ${ASSIMP_INCLUDE_DIR}
+#  ${FREEIMAGE_INCLUDE_DIR}
+#  ${FREETYPE_INCLUDE_DIRS}
+#  ${GLEW_INCLUDE_DIR}
+#  ${GLUT_INCLUDE_DIR}
+#  ${LIBSNDFILE_INCLUDE_DIR}
+#  ${OPENGL_INCLUDE_DIR}
+#  ${PORTAUDIO_INCLUDE_DIR}
+#  ${PORTAUDIO_INCLUDE_DIRS}
+#  ${SNDFILE_INCLUDE_DIRS}
+#  ${GAMMA_INCLUDE_DIRS})
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+# Needed by portaudio
+   find_library(AUDIOUNIT_FM AudioUnit)
+   find_library(COREAUDIO_FM CoreAudio)
+   find_library(CORESERVICES_FM CoreServices)
+   find_library(AUDIOTOOLBOX_FM AudioToolbox)
+   set(PA_FRAMEWORKS ${AUDIOUNIT_FM} ${COREAUDIO_FM} ${CORESERVICES_FM} ${AUDIOTOOLBOX_FM})
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+
+# TODO are avahi libraries needed on all platforms?
+#set(ALLOCORE_LINK_LIBRARIES
+#${APR_LIBRARY}
+#${ASSIMP_LIBRARY}
+#${FREEIMAGE_LIBRARY}
+#${FREETYPE_LIBRARY}
+#${GLEW_LIBRARY}
+#${GLUT_LIBRARY}
+#${LIBSNDFILE_LIBRARY}
+#${OPENGL_LIBRARY}
+#${PORTAUDIO_LIBRARY}
+#${PORTAUDIO_LIBRARIES}
+#${SNDFILE_LIBRARIES}
+#${GAMMA_LIBRARIES}
+#avahi-common avahi-client
+#${PA_FRAMEWORKS})
+
+#target_link_libraries(allocore ${ALLOCORE_LINK_LIBRARIES})
+
+#message(${GAMMA_LIBRARIES})
+
+# Examples\
+file(GLOB ALLOGLV_EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/*.cpp)
+foreach(example ${ALLOGLV_EXAMPLE_FILES})
+	get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
+        add_executable(alloGLV_${EXAMPLE_NAME} ${example})
+        target_link_libraries(alloGLV_${EXAMPLE_NAME} allocore ${ALLOCORE_LINK_LIBRARIES} ${GLV_LIBRARY} alloGLV)
+	if (apple)
+	  find_library(AUDIOUNIT_FM AudioUnit)
+          target_link_libraries(alloGLV_${EXAMPLE_NAME} ${AUDIOUNIT_FM})
+        endif()
+endforeach(example)
+
+
+# Unit tests
+# TODO make optional
+#add_executable(unitTests tests/unitTests.cpp)
+#target_link_libraries(unitTests Gamma portaudio sndfile ${PA_FRAMEWORKS})

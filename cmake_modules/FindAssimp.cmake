@@ -6,39 +6,52 @@
 #  ASSIMP_LIBRARIES - Link these to use Assimp
 #
 
-SET(ASSIMP "assimp")
+include(LibFindMacros)
 
-FIND_PATH(ASSIMP_INCLUDE_DIR
-  NAMES
-    assimp.h
-  PATHS
-    /usr/include/assimp
-    /usr/local/include
-    /opt/local/include/assimp
-    /usr/local/Cellar/assimp/2.0.863/include/assimp
-)
- 
+# Dependencies
+#libfind_package(LO Magick)
 
-FIND_LIBRARY(LIBASSIMP
-  NAMES 
-    ${ASSIMP}
-  PATHS
-    /usr/lib
-    /usr/local/lib
-    /opt/local/lib
+# Use pkg-config to get hints about paths
+libfind_pkg_check_modules(ASSIMP_PKGCONF libassimp)
+
+# Include dir
+find_path(ASSIMP2_INCLUDE_DIR
+  NAMES assimp.h
+  PATHS ${ASSIMP_PKGCONF_INCLUDE_DIRS} /usr/lib /usr/local/lib /opt/local/lib
 )
 
-SET (ASSIMP_LIBRARY
-  ${LIBASSIMP} 
+find_path(ASSIMP3_INCLUDE_DIR
+  NAMES assimp/types.h
+  PATHS ${ASSIMP_PKGCONF_INCLUDE_DIRS} /usr/lib /usr/local/lib /opt/local/lib
 )
 
-IF(ASSIMP_INCLUDE_DIR AND ASSIMP_LIBRARY)
-   SET(ASSIMP_FOUND TRUE)
-ENDIF(ASSIMP_INCLUDE_DIR AND ASSIMP_LIBRARY)
+if (ASSIMP2_INCLUDE_DIR)
+message("Assimp 2 found")
+set(ASSIMP_INCLUDE_DIR ${ASSIMP2_INCLUDE_DIR})
+endif(ASSIMP2_INCLUDE_DIR)
 
-# show the COLLADA_DOM_INCLUDE_DIR and COLLADA_DOM_LIBRARIES variables only in the advanced view
-IF(ASSIMP_FOUND)
-  MARK_AS_ADVANCED(ASSIMP_INCLUDE_DIR ASSIMP_LIBRARIES )
-ENDIF(ASSIMP_FOUND)
+if (ASSIMP3_INCLUDE_DIR)
+message("Assimp 3 found")
+set(ASSIMP_INCLUDE_DIR ${ASSIMP3_INCLUDE_DIR})
+add_definitions(-DUSE_ASSIMP3)
+endif(ASSIMP3_INCLUDE_DIR)
+
+# Finally the library itself
+find_library(ASSIMP_LIBRARY
+  NAMES assimp
+  PATHS ${ASSIMP_PKGCONF_LIBRARY_DIRS}
+)
+
+#/usr/include/assimp
+#/usr/local/include
+#/opt/local/include/assimp
+#/usr/local/Cellar/assimp/2.0.863/include/assimp
+
+# Set the include dir variables and the libraries and let libfind_process do the rest.
+# NOTE: Singular variables for this library, plural for libraries this this lib depends on.
+set(ASSIMP_PROCESS_INCLUDES ASSIMP_INCLUDE_DIR)
+set(ASSIMP_PROCESS_LIBS ASSIMP_LIBRARY)
+libfind_process(ASSIMP)
+
 
 

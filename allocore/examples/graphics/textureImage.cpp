@@ -24,7 +24,7 @@ struct MyApp : App {
 
     // Load a .jpg file
     //
-    char *filename = "../../share/images/tiny.jpg";
+    const char *filename = "../../share/images/tiny.jpg";
 
     if (image.load(filename)) {
       printf("Read image from %s\n", filename);

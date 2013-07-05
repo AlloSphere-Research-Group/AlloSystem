@@ -52,13 +52,13 @@ ELSE (WIN32)
       /usr/openwin/lib
       )
     
-    FIND_LIBRARY( GLUT_Xi_LIBRARY Xi
-      /usr/openwin/lib
-      )
+#    FIND_LIBRARY( GLUT_Xi_LIBRARY Xi
+#      /usr/openwin/lib
+#      )
     
-    FIND_LIBRARY( GLUT_Xmu_LIBRARY Xmu
-      /usr/openwin/lib
-      )
+#    FIND_LIBRARY( GLUT_Xmu_LIBRARY Xmu
+#      /usr/openwin/lib
+#      )
     
   ENDIF (APPLE)
   
@@ -87,6 +87,6 @@ ENDIF(GLUT_INCLUDE_DIR)
 MARK_AS_ADVANCED(
   GLUT_INCLUDE_DIR
   GLUT_glut_LIBRARY
-  GLUT_Xmu_LIBRARY
-  GLUT_Xi_LIBRARY
+#  GLUT_Xmu_LIBRARY
+#  GLUT_Xi_LIBRARY
   )
