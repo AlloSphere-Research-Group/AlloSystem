@@ -45,6 +45,7 @@ src/types/al_Array.cpp
 src/types/al_Color.cpp
 src/types/al_MsgQueue.cpp)
 
+
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 set(ALLOCORE_SRC ${ALLOCORE_SRC}
  src/system/al_MainLoopOSX.mm
@@ -53,11 +54,13 @@ set(ALLOCORE_SRC ${ALLOCORE_SRC}
 
 endif()
 
-include_directories(${CMAKE_SOURCE_DIR})
-add_library(allocore ${ALLOCORE_SRC})
+file(GLOB ALLOCORE_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} allocore/*/*.hpp)
+#file(GLOB ALLOCORE_HEADER_DIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} allocore/*)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+add_library(allocore ${ALLOCORE_SRC} ${ALLOCORE_HEADERS})
 
-set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/../build/lib)
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/../build/bin)
+set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 
 include(TestBigEndian)
 test_big_endian(TEST_ENDIAN)
@@ -86,7 +89,7 @@ find_package(OpenGL REQUIRED)
 find_package(Portaudio REQUIRED)
 find_package(Gamma REQUIRED)
 
-include_directories(${APR_INCLUDE_DIR}
+set(ALLOCORE_INCLUDE_DIRS ${APR_INCLUDE_DIR}
   ${ASSIMP_INCLUDE_DIR}
   ${FREEIMAGE_INCLUDE_DIR}
   ${FREETYPE_INCLUDE_DIRS}
@@ -98,6 +101,8 @@ include_directories(${APR_INCLUDE_DIR}
   ${PORTAUDIO_INCLUDE_DIRS}
   ${SNDFILE_INCLUDE_DIRS}
   ${GAMMA_INCLUDE_DIRS})
+
+include_directories(${ALLOCORE_INCLUDE_DIRS})
 
 #System dependent libs
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -124,7 +129,7 @@ add_definitions(-DAL_WINDOWS)
 endif()
 
 # TODO are avahi libraries needed on all platforms?
-set(ALLOCORE_LINK_LIBRARIES ${ALLOCORE_LIBRARIES}
+set(ALLOCORE_LINK_LIBRARIES ${ALLOCORE_LINK_LIBRARIES}
 ${APR_LIBRARY}
 ${ASSIMP_LIBRARY}
 ${FREEIMAGE_LIBRARY}

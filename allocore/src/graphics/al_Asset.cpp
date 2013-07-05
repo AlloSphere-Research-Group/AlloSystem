@@ -2,7 +2,7 @@
 
 #include "allocore/graphics/al_Graphics.hpp"
 
-#define USE_ASSIMP3
+//#define USE_ASSIMP3
 
 #ifdef USE_ASSIMP3
 #include "assimp/cimport.h"
