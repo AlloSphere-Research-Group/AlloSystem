@@ -5,17 +5,18 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake_modules")
 
 add_subdirectory( allocore )
 
-set(GLV_RELATIVE_DIR ${CMAKE_SOURCE_DIR}/../GLV})
+set(GLV_RELATIVE_DIR ${CMAKE_SOURCE_DIR}/../GLV)
 
-if(EXISTS ${GLV_RELATIVE_DIR} AND IS_DIRECTORY ${GLV_RELATIVE_DIR})
-message("Building GLV")
-add_subdirectory(${CMAKE_SOURCE_DIR}/../GLV ${CMAKE_SOURCE_DIR}/../GLV-build)
-endif()
-
+if(EXISTS "${GLV_RELATIVE_DIR}" AND IS_DIRECTORY "${GLV_RELATIVE_DIR}")
+  message("Building GLV")
+  set(BUILDING_GLV 1)
+  add_subdirectory(${CMAKE_SOURCE_DIR}/../GLV ${CMAKE_SOURCE_DIR}/../GLV-build)
+  add_subdirectory( alloGLV )
+else()
 find_package(GLV)
-
-if(${GLV_FOUND})
-add_subdirectory( alloGLV )
+  if(${GLV_FOUND})
+    add_subdirectory( alloGLV )
+  endif()
 endif()
 
 #from old Makefile

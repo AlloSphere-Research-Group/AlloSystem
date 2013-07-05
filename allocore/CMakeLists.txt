@@ -87,7 +87,7 @@ find_package(GLUT REQUIRED)
 find_package(LibSndFile REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(Portaudio REQUIRED)
-find_package(Gamma REQUIRED)
+find_package(Gamma)
 
 set(ALLOCORE_INCLUDE_DIRS ${APR_INCLUDE_DIR}
   ${ASSIMP_INCLUDE_DIR}
@@ -141,7 +141,6 @@ ${OPENGL_LIBRARY}
 ${PORTAUDIO_LIBRARY}
 ${PORTAUDIO_LIBRARIES}
 ${SNDFILE_LIBRARIES}
-${GAMMA_LIBRARIES}
 ${PA_FRAMEWORKS}
 ${LINUX_LIBS})
 
@@ -149,7 +148,7 @@ target_link_libraries(allocore ${ALLOCORE_LINK_LIBRARIES})
 
 #--------------------------------------------------------------------------
 # Examples
-set(EXAMPLE_DIRS av graphics io math simulation sound spatial system)
+set(EXAMPLE_DIRS av graphics io math simulation spatial system)
 foreach(dir ${EXAMPLE_DIRS})
   file(GLOB EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/${dir}/*.cpp)
   foreach(example ${EXAMPLE_FILES})
@@ -163,6 +162,20 @@ foreach(dir ${EXAMPLE_DIRS})
         target_link_libraries(${dir}_${EXAMPLE_NAME} ${EXAMPLE_LINUX_LIBS})
   endforeach(example)
 endforeach(dir)
+
+if (GAMMA_FOUND)
+file(GLOB EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/sound/*.cpp)
+foreach(example ${EXAMPLE_FILES})
+      get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
+      add_executable(${dir}_${EXAMPLE_NAME} ${example})
+      target_link_libraries(${dir}_${EXAMPLE_NAME} allocore ${ALLOCORE_LINK_LIBRARIES})
+      if (apple)
+        find_library(AUDIOUNIT_FM AudioUnit)
+        target_link_libraries(${dir}_${EXAMPLE_NAME} ${AUDIOUNIT_FM})
+      endif()
+      target_link_libraries(${dir}_${EXAMPLE_NAME} ${EXAMPLE_LINUX_LIBS} ${GAMMA_LIBRARIES})
+endforeach(example)
+endif()
 
 
 # Unit tests
