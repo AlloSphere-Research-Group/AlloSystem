@@ -19,6 +19,7 @@ message("-- libsndfile headers: ${SNDFILE_INCLUDE_DIRS}")
 
 find_package(Allocore)
 find_package(GLV)
+find_package(Gamma)
 
 if(ALLOCORE_FOUND)
 include_directories(${ALLOCORE_INCLUDE_DIR})
@@ -29,10 +30,15 @@ endif()
 
 if(GLV_FOUND)
 include_directories(${GLV_INCLUDE_DIR})
-message(${GLV_LIBRARY})
 else()
 include_directories(../../GLV)
 set(GLV_LIBRARY GLV)
+endif()
+
+if(GAMMA_FOUND)
+include_directories(${GAMMA_INCLUDE_DIR})
+else()
+include_directories(../../Gamma)
 endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
