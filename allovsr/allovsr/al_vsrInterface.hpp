@@ -35,10 +35,12 @@ namespace al {
         
         virtual bool onFrame(){
             //Copy Scene View Data (move to impl.onFrame() )
-            vsr::Mat4f t = interface -> scene().mvm();            
+            //vsr::Mat4f t = interface -> scene().mvm();  
+            gfx::Mat4f t = interface -> scene().mvm();           
             std::copy(t.val(), t.val() + 16, interface -> scene().xf.modelView);
             
-            vsr::Mat4f t2 = interface -> scene().proj();        
+//            vsr::Mat4f t2 = interface -> scene().proj();
+            gfx::Mat4f t2 = interface -> scene().proj();          
             std::copy(t2.val(), t2.val() + 16, interface -> scene().xf.proj);
             
             interface -> scene().xf.toDoubles();
@@ -199,7 +201,7 @@ namespace al {
         
         bool onFrame(){
             
-            vsr :: GL :: enablePreset();
+            gfx :: GL :: enablePreset();
             gl.depthTesting(true);
 
             //Update Physics
@@ -212,7 +214,7 @@ namespace al {
               
             stereo.draw( gl, lens, Frame2Pose( camera() ), Viewport( width(), height() ), *this );
                                     
-            vsr :: GL :: disablePreset();
+            gfx :: GL :: disablePreset();
             
             return true;
             
@@ -231,7 +233,7 @@ namespace al {
         
         void modelTransform(){
             Rot t = vsr::Gen::aa( scene().model.rot() ); 
-            vsr::GL::rotate( t.w() );
+            gfx::GL::rotate( t.w() );
         }
         
     };
