@@ -3,7 +3,7 @@
 require 'formula'
 
 class Allosystem < Formula
-  head 'https://github.com/mantaraya36/AlloSystem.git', :tag => 'homebrew_testing'
+  head 'https://github.com/mantaraya36/AlloSystem.git', :tag => 'homebrew_testing2'
 
   depends_on 'cmake' => :build
   depends_on 'libsndfile'
