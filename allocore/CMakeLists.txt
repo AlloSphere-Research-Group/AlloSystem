@@ -178,7 +178,6 @@ endforeach(example)
 endif()
 
 
-# Unit tests
-# TODO make optional
-#add_executable(unitTests tests/unitTests.cpp)
-#target_link_libraries(unitTests Gamma portaudio sndfile ${PA_FRAMEWORKS})
+# installation
+install(DIRECTORY allocore/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include/allocore)
+install(TARGETS allocore DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

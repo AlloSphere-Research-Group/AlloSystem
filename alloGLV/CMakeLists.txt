@@ -66,8 +66,5 @@ foreach(example ${ALLOGLV_EXAMPLE_FILES})
         endif()
 endforeach(example)
 
-
-# Unit tests
-# TODO make optional
-#add_executable(unitTests tests/unitTests.cpp)
-#target_link_libraries(unitTests Gamma portaudio sndfile ${PA_FRAMEWORKS})
+install(DIRECTORY alloGLV/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include/alloGLV)
+install(TARGETS alloGLV DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
