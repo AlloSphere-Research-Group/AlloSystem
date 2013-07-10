@@ -16,13 +16,13 @@ libfind_pkg_check_modules(ASSIMP_PKGCONF libassimp)
 
 # Include dir
 find_path(ASSIMP2_INCLUDE_DIR
-  NAMES assimp.h
-  PATHS ${ASSIMP_PKGCONF_INCLUDE_DIRS} /usr/lib /usr/local/lib /opt/local/lib
+  NAMES assimp/assimp.h
+  PATHS ${ASSIMP_PKGCONF_INCLUDE_DIRS} /usr/include /usr/local/include /opt/local/include
 )
 
 find_path(ASSIMP3_INCLUDE_DIR
   NAMES assimp/types.h
-  PATHS ${ASSIMP_PKGCONF_INCLUDE_DIRS} /usr/lib /usr/local/lib /opt/local/lib
+  PATHS ${ASSIMP_PKGCONF_INCLUDE_DIRS} /usr/include /usr/local/include /opt/local/include
 )
 
 if (ASSIMP2_INCLUDE_DIR)
