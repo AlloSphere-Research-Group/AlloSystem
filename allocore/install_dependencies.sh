@@ -16,11 +16,7 @@ elif [ `which port 2>/dev/null` ]; then
 	sudo port selfupdate
 	sudo port install portaudio libsndfile +universal
 	sudo port install glew +universal
-
-	# Since we only support v.2, we need to use an old Portfile
-	#sudo port install assimp
-	pushd `find . -name assimp2 -type d`; sudo port install; popd
-
+	sudo port install assimp +universal
 	sudo port install freeimage +universal
 	sudo port install freetype +universal
 
