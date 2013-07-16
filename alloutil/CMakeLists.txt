@@ -25,7 +25,7 @@ if(ALLOSYSTEM_BUILD)
 message("Allosystem build!")
 set(ALLOCORE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../allocore)
 set(ALLOCORE_LIBRARY allocore)
-else()
+else(ALLOSYSTEM_BUILD)
 find_package(Allocore REQUIRED)
 endif(ALLOSYSTEM_BUILT)
 
