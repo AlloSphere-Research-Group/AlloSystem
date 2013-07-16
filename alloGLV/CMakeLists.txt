@@ -21,25 +21,9 @@ find_package(Allocore)
 find_package(GLV)
 find_package(Gamma)
 
-if(ALLOCORE_FOUND)
 include_directories(${ALLOCORE_INCLUDE_DIR})
-else()
-include_directories(../allocore)
-set(GLV_LIBRARY GLV)
-endif()
-
-if(GLV_FOUND)
 include_directories(${GLV_INCLUDE_DIR})
-else()
-include_directories(../../GLV)
-set(GLV_LIBRARY GLV)
-endif()
 
-if(GAMMA_FOUND)
-include_directories(${GAMMA_INCLUDE_DIR})
-else()
-include_directories(../../Gamma)
-endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -55,6 +39,12 @@ target_link_libraries(alloGLV ${ALLOCORE_LIBRARIES} ${GLV_LIBRARY})
 #endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 # Examples\
+if(NOT NO_EXAMPLES)
+if(GAMMA_FOUND)
+include_directories(${GAMMA_INCLUDE_DIR})
+else()
+include_directories(../../Gamma)
+endif()
 file(GLOB ALLOGLV_EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/*.cpp)
 foreach(example ${ALLOGLV_EXAMPLE_FILES})
 	get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
@@ -65,6 +55,7 @@ foreach(example ${ALLOGLV_EXAMPLE_FILES})
           target_link_libraries(alloGLV_${EXAMPLE_NAME} ${AUDIOUNIT_FM})
         endif()
 endforeach(example)
+endif(NOT NO_EXAMPLES)
 
 install(DIRECTORY alloGLV/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include/alloGLV)
 install(TARGETS alloGLV DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

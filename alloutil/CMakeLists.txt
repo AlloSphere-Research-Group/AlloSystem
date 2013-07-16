@@ -22,17 +22,14 @@ GET_DIRECTORY_PROPERTY(ALLOSYSTEM_BUILD DIRECTORY ${CMAKE_SOURCE_DIR}
 DEFINITION ALLOSYSTEM_BUILD)
 
 if(ALLOSYSTEM_BUILD)
-message("Allosystem build!")
 set(ALLOCORE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../allocore)
 set(ALLOCORE_LIBRARY allocore)
 else(ALLOSYSTEM_BUILD)
 find_package(Allocore REQUIRED)
-endif(ALLOSYSTEM_BUILT)
+endif(ALLOSYSTEM_BUILD)
 
 get_property(allocore_location TARGET allocore PROPERTY LOCATION)
-message (STATUS "allocore_location == ${fancy_lib_location}")
-
-message(allocore)
+message (STATUS "allocore_location for alloutil == ${allocore_location}")
 
 include_directories(${LUA_INCLUDE_DIR} ${ALLOCORE_INCLUDE_DIR})
 set(ALLOUTIL_LINK_LIBRARIES ${LUA_LIBRARIES} ${ALLOCORE_LIBRARY})
@@ -42,7 +39,7 @@ set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 
 # Examples
-if(ALLOUTIL_BUILD_EXAMPLES)
+if(NOT NO_EXAMPLES)
 find_package(APR REQUIRED)
 find_package(Assimp REQUIRED)
 find_package(FreeImage REQUIRED)
@@ -100,7 +97,7 @@ get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
 add_executable(alloutil_${EXAMPLE_NAME} ${example})
 target_link_libraries(alloutil_${EXAMPLE_NAME} alloutil ${ALLOUTIL_LINK_LIBRARIES} ${ALLOCORE_LINK_LIBRARIES})
 endforeach(example)
-endif(ALLOUTIL_BUILD_EXAMPLES)
+endif(NOT NO_EXAMPLES)
 
 
 # installation

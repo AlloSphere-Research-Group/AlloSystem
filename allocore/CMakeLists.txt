@@ -146,6 +146,7 @@ target_link_libraries(allocore ${ALLOCORE_LINK_LIBRARIES})
 
 #--------------------------------------------------------------------------
 # Examples
+if(NOT NO_EXAMPLES)
 set(EXAMPLE_DIRS av graphics io math simulation spatial system)
 foreach(dir ${EXAMPLE_DIRS})
   file(GLOB EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/${dir}/*.cpp)
@@ -170,11 +171,12 @@ foreach(example ${EXAMPLE_FILES})
       include_directories(${GAMMA_INCLUDE_DIRS})
       if (apple)
         find_library(AUDIOUNIT_FM AudioUnit)
-        target_link_libraries(${dir}_${EXAMPLE_NAME} ${AUDIOUNIT_FM})
+        target_link_libraries(sound_${EXAMPLE_NAME} ${AUDIOUNIT_FM})
       endif()
       target_link_libraries(${dir}_${EXAMPLE_NAME} ${EXAMPLE_LINUX_LIBS} ${GAMMA_LIBRARIES})
 endforeach(example)
-endif()
+endif(GAMMA_FOUND)
+endif(NOT NO_EXAMPLES)
 
 
 # installation
