@@ -17,13 +17,15 @@ libfind_pkg_check_modules(ALLOCORE_PKGCONF liballocore)
 # Include dir
 find_path(ALLOCORE_INCLUDE_DIR
   NAMES allocore/al_Allocore.hpp
-  PATHS ${ALLOCORE_PKGCONF_INCLUDE_DIRS} ./ ../allocore /usr/include /usr/local/include /opt/local/include  ../AlloSystem/allocore
+  PATHS ${ALLOCORE_PKGCONF_INCLUDE_DIRS} ./ ../allocore /usr/include /usr/local/include /opt/local/include  
+        ${CMAKE_CURRENT_SOURCE_DIR}/../AlloSystem/allocore
 )
 
 # Finally the library itself
 find_library(ALLOCORE_LIBRARY
   NAMES allocore
-  PATHS ${ALLOCORE_PKGCONF_LIBRARY_DIRS} ./build/lib ../build/lib /usr/lib /usr/local/lib /opt/local/lib  ../AlloSystem/build/lib
+  PATHS ${ALLOCORE_PKGCONF_LIBRARY_DIRS} ./build/lib ../build/lib /usr/lib /usr/local/lib /opt/local/lib 
+        ${CMAKE_CURRENT_SOURCE_DIR}/../AlloSystem/build/lib
 )
 
 #/usr/include/assimp
