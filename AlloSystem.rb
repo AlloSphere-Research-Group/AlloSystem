@@ -3,7 +3,7 @@
 require 'formula'
 
 class Allosystem < Formula
-  head 'https://github.com/mantaraya36/AlloSystem.git', :tag => 'homebrew_testing3'
+  head 'https://github.com/mantaraya36/AlloSystem.git', :tag => 'homebrew_testing4'
 
   depends_on 'cmake' => :build
   depends_on 'libsndfile'
@@ -14,7 +14,7 @@ class Allosystem < Formula
 	depends_on 'freetype'
 
   def install
-    system "cmake", ".", *std_cmake_args
+    system "cmake", ".", "-DNO_EXAMPLES=1", *std_cmake_args
     system "make"
     system "make install"
   end
