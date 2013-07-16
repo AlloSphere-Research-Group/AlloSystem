@@ -1,9 +1,9 @@
-# - Try to find Allocore
+# - Try to find Alloutil
 # Once done this will define
 #
-#  ALLOUTIL_FOUND - system has Allocore
-#  ALLOUTIL_INCLUDE_DIR - the Allocore include directory
-#  ALLOUTIL_LIBRARY - Link these to use Allocore
+#  ALLOUTIL_FOUND - system has Alloutil
+#  ALLOUTIL_INCLUDE_DIR - the Alloutil include directory
+#  ALLOUTIL_LIBRARY - Link these to use Alloutil
 #
 
 include(LibFindMacros)
