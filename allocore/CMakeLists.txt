@@ -99,8 +99,7 @@ set(ALLOCORE_INCLUDE_DIRS ${APR_INCLUDE_DIR}
   ${OPENGL_INCLUDE_DIR}
   ${PORTAUDIO_INCLUDE_DIR}
   ${PORTAUDIO_INCLUDE_DIRS}
-  ${SNDFILE_INCLUDE_DIRS}
-  ${GAMMA_INCLUDE_DIRS})
+  ${SNDFILE_INCLUDE_DIRS})
 
 include_directories(${ALLOCORE_INCLUDE_DIRS})
 
@@ -128,7 +127,6 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 add_definitions(-DAL_WINDOWS)
 endif()
 
-# TODO are avahi libraries needed on all platforms?
 set(ALLOCORE_LINK_LIBRARIES ${ALLOCORE_LINK_LIBRARIES}
 ${APR_LIBRARY}
 ${ASSIMP_LIBRARY}
@@ -169,6 +167,7 @@ foreach(example ${EXAMPLE_FILES})
       get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
       add_executable(${dir}_${EXAMPLE_NAME} ${example})
       target_link_libraries(${dir}_${EXAMPLE_NAME} allocore ${ALLOCORE_LINK_LIBRARIES})
+      include_directories(${GAMMA_INCLUDE_DIRS})
       if (apple)
         find_library(AUDIOUNIT_FM AudioUnit)
         target_link_libraries(${dir}_${EXAMPLE_NAME} ${AUDIOUNIT_FM})
