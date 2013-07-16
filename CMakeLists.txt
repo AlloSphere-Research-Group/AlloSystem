@@ -7,9 +7,9 @@ add_subdirectory(allocore)
 
 # check for Lua to build alloutil
 find_package(Lua51)
-if(LUA_FOUND)
+if(LUA51_FOUND)
 add_subdirectory(alloutil)
-endif(LUA_FOUND)
+endif(LUA51_FOUND)
 
 # check for GLV to build alloGLV
 set(GLV_RELATIVE_DIR ${CMAKE_SOURCE_DIR}/../GLV)
