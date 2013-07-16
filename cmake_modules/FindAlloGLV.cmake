@@ -17,13 +17,13 @@ libfind_pkg_check_modules(ALLOGLV_PKGCONF liballoGLV)
 # Include dir
 find_path(ALLOGLV_INCLUDE_DIR
   NAMES alloGLV/al_ControlGLV.hpp
-  PATHS ${ALLOGLV_PKGCONF_INCLUDE_DIRS} ./ ../alloGLV /usr/include /usr/local/include /opt/local/include
+  PATHS ${ALLOGLV_PKGCONF_INCLUDE_DIRS} ./ ../alloGLV /usr/include /usr/local/include /opt/local/include ../AlloSystem/alloGLV
 )
 
 # Finally the library itself
 find_library(ALLOGLV_LIBRARY
   NAMES alloGLV
-  PATHS ${ALLOGLV_PKGCONF_LIBRARY_DIRS} ./build/lib ../build/lib /usr/lib /usr/local/lib /opt/local/lib
+  PATHS ${ALLOGLV_PKGCONF_LIBRARY_DIRS} ./build/lib ../build/lib /usr/lib /usr/local/lib /opt/local/lib ../AlloSystem/build/lib
 )
 
 #/usr/include/assimp
