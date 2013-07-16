@@ -18,12 +18,21 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../cmake_modules
 
 find_package(Lua51 REQUIRED)
 
-if(ALLOCORE_BUILT)
+GET_DIRECTORY_PROPERTY(ALLOSYSTEM_BUILD DIRECTORY ${CMAKE_SOURCE_DIR}
+DEFINITION ALLOSYSTEM_BUILD)
+
+if(ALLOSYSTEM_BUILD)
+message("Allosystem build!")
 set(ALLOCORE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../allocore)
 set(ALLOCORE_LIBRARY allocore)
 else()
 find_package(Allocore REQUIRED)
-endif(ALLOCORE_BUILT)
+endif(ALLOSYSTEM_BUILT)
+
+get_property(allocore_location TARGET allocore PROPERTY LOCATION)
+message (STATUS "allocore_location == ${fancy_lib_location}")
+
+message(allocore)
 
 include_directories(${LUA_INCLUDE_DIR} ${ALLOCORE_INCLUDE_DIR})
 set(ALLOUTIL_LINK_LIBRARIES ${LUA_LIBRARIES} ${ALLOCORE_LIBRARY})

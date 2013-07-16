@@ -5,6 +5,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake_modules")
 
 add_subdirectory(allocore)
 
+set(ALLOSYSTEM_BUILD 1) # Bulding all of allosystem
+
 # check for Lua to build alloutil
 find_package(Lua51)
 if(LUA51_FOUND)
