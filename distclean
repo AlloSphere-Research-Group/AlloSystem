@@ -1,1 +1,14 @@
 rm -rf build/ CMakeCache.txt CMakeFiles/ cmake_install.cmake Makefile build.ninja rules.ninja AlloSystem.xcodeproj AlloSystem.build CMakeScripts
+
+cd allocore
+rm -rf build/ CMakeCache.txt CMakeFiles/ cmake_install.cmake Makefile build.ninja rules.ninja AlloSystem.xcodeproj AlloSystem.build CMakeScripts
+cd ..
+
+cd alloGLV
+rm -rf build/ CMakeCache.txt CMakeFiles/ cmake_install.cmake Makefile build.ninja rules.ninja AlloSystem.xcodeproj AlloSystem.build CMakeScripts
+cd ..
+
+cd alloutil
+rm -rf build/ CMakeCache.txt CMakeFiles/ cmake_install.cmake Makefile build.ninja rules.ninja AlloSystem.xcodeproj AlloSystem.build CMakeScripts
+cd ..
+
