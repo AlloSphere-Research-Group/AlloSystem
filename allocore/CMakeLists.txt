@@ -1,6 +1,8 @@
 cmake_minimum_required (VERSION 2.8)
 project (Allocore)
 
+set(ALLOCORE_BUILT) # to let other modules know that allocore will be built
+
 # Allocore Library
 set(ALLOCORE_SRC src/graphics/al_Asset.cpp
 src/graphics/al_FBO.cpp
