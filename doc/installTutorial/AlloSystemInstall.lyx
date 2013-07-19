@@ -1286,22 +1286,22 @@ The following instructions are only required if you would like to use graphical
  We use GLV as the GUI toolkit and Gamma as the sound synthesis library.
  Download the source code of each at 
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
-https://github.com/AlloSphere-Research-Group/GLV/zipball/master
+https://github.com/AlloSphere-Research-Group/GLV/archive/master.zip
 \end_layout
 
 \end_inset
 
  and 
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
-https://github.com/LancePutnam/Gamma/zipball/master
+https://github.com/LancePutnam/Gamma/archive/devel.zip
 \end_layout
 
 \end_inset
