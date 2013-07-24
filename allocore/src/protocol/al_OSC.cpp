@@ -376,7 +376,9 @@ int Recv::recv(){
 	OSCTRY("Packet::endMessage", 
 		r = SocketRecv::recv(&mBuffer[0], mBuffer.size());
 		if(r && mHandler){
+#ifdef VERBOSE                  
 		  printf("Recv:recv() Received %d bytes; parsing...\n", r);
+#endif
 			mHandler->parse(&mBuffer[0], r);
 		}
 	)
