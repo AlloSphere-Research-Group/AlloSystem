@@ -259,31 +259,62 @@ Message& Message::operator>> (Blob& v){
 }
 
 
+#ifdef VERBOSE
+#include <netinet/in.h>  // for ntohl
+#endif
+
 void PacketHandler::parse(const char *packet, int size, TimeTag timeTag){
 	OSCTRY("PacketHandler::parse", 
-	       // printf("PacketHandler::parse(size %d)\n", size);
-		//	for(int i=0; i<size; ++i) printf("%c", packet[i]); printf("\n");
+#ifdef VERBOSE	      
+	       printf("PacketHandler::parse(size %d, packet %p)\n", size, packet);
+	       for(int i=0; i<size; ++i) printf("%c", packet[i]); printf("\n");
+#endif
+
 		
 		// this is the only generic entry point for parsing packets
 		::osc::ReceivedPacket p(packet, size);
 
 		// iterate through all the bundle elements (bundles or messages)
 		if(p.IsBundle()){
-			::osc::ReceivedBundle r(p);
+
+#ifdef VERBOSE
+		  printf("It's a bundle\n");
+
+		  char *afterTimeTag = (char *)packet+16;  // "#bundle\0" plus 8-byte time tag
+		  int firstBundleElementSize = ntohl(* ((int *)  afterTimeTag));
+		  printf("First bundle element has size %d\n", firstBundleElementSize);
+#endif
+
+		  ::osc::ReceivedBundle r(p);
+		  
+		  ::osc::ReceivedBundleElementIterator it = r.ElementsBegin();
 			
-			::osc::ReceivedBundleElementIterator it = r.ElementsBegin();
-			
-			while(it != r.ElementsEnd()){
-				const ::osc::ReceivedBundleElement& e = *it++;
-				parse(e.Contents(), e.Size(), r.TimeTag());
-			}
-			
+#ifdef VERBOSE
+		  int i = 1;
+#endif
+		  while(it != r.ElementsEnd()){
+		    const ::osc::ReceivedBundleElement& e = *it;
+		    it++;
+
+#ifdef VERBOSE
+		    printf("Parsing bundle element %d\n", i++);
+		    printf("Made an ::osc::ReceivedBundleElement out of the iterator.\n");
+		    printf("\tcontents: %p\n", e.Contents());
+		    printf("\tsize: %d\n",e.Size());
+		    printf("\ttimeTag %ld\n", r.TimeTag());
+		    printf("\tLet's try to parse it...\n");
+#endif
+		    parse(e.Contents(), e.Size(), r.TimeTag());
+		  }
 		}
 		else if(p.IsMessage()){
-			Message m(packet, size, timeTag);
-			onMessage(m);
+#ifdef VERBOSE
+		  printf("Parsing a message\n");
+#endif
+		  Message m(packet, size, timeTag);
+		  onMessage(m);
 		}
-	)
+	       )
 }
 
 
@@ -332,10 +363,20 @@ Recv::Recv(uint16_t port, const char * address, al_sec timeout)
 int Recv::recv(){
 	int r;
 	// printf("Entering Recv::recv()\n");
+	// printf("mBuffer = %p\n", &mBuffer[0]);
+	// printf("mBuffer.size() = %d\n", mBuffer.size());
+
+	
+	/*	printf("Here's what's in my buffer before recv...\n");
+	for (int i = 0; i < mBuffer.size(); ++i) {
+	  if (mBuffer[i] != 0)  printf("Byte %d: %d (%c)\n", i, mBuffer[i], mBuffer[i]);
+	}
+	*/
+
 	OSCTRY("Packet::endMessage", 
 		r = SocketRecv::recv(&mBuffer[0], mBuffer.size());
 		if(r && mHandler){
-		  // printf("Recv:recv() Received %d bytes; parsing...\n", r);
+		  printf("Recv:recv() Received %d bytes; parsing...\n", r);
 			mHandler->parse(&mBuffer[0], r);
 		}
 	)
