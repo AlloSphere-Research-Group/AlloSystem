@@ -172,7 +172,9 @@ struct Message::Impl
 {
 	Impl(const char * message, int size)
 	:	::osc::ReceivedMessage(::osc::ReceivedPacket(message,size)), args(ArgumentStream())
-	{}
+	{
+          // printf("made an ::osc::ReceivedMessage out of message %p and size %d\n", message, size);
+        }
 	
 	template <class T>
 	void operator>> (T& v){ OSCTRY("Message>>", args>>v;) }
@@ -258,7 +260,6 @@ Message& Message::operator>> (Blob& v){
 	return *this; 
 }
 
-
 #ifdef VERBOSE
 #include <netinet/in.h>  // for ntohl
 #endif
@@ -267,36 +268,58 @@ void PacketHandler::parse(const char *packet, int size, TimeTag timeTag){
 	OSCTRY("PacketHandler::parse", 
 #ifdef VERBOSE	      
 	       printf("PacketHandler::parse(size %d, packet %p)\n", size, packet);
+	       printf("Data to parse: ");
 	       for(int i=0; i<size; ++i) printf("%c", packet[i]); printf("\n");
 #endif
 
 		
 		// this is the only generic entry point for parsing packets
 		::osc::ReceivedPacket p(packet, size);
+#ifdef VERBOSE
+	       printf("Just made an ::osc::ReceivedPacket that has contents %p and size %d\n",
+		      p.Contents(), p.Size());
+#endif
 
 		// iterate through all the bundle elements (bundles or messages)
 		if(p.IsBundle()){
 
 #ifdef VERBOSE
 		  printf("It's a bundle\n");
-
 		  char *afterTimeTag = (char *)packet+16;  // "#bundle\0" plus 8-byte time tag
 		  int firstBundleElementSize = ntohl(* ((int *)  afterTimeTag));
 		  printf("First bundle element has size %d\n", firstBundleElementSize);
 #endif
 
 		  ::osc::ReceivedBundle r(p);
+#ifdef VERBOSE
+		  printf("Just made an ::osc::ReceivedBundle that has time tag at %p and %d elements\n",
+			 r.timeTag_, r.ElementCount() );
+#endif
+
 		  
 		  ::osc::ReceivedBundleElementIterator it = r.ElementsBegin();
+#ifdef VERBOSE
+		  printf("Just made an ::osc::ReceivedBundleElementIterator\n");
+#endif
+
 			
 #ifdef VERBOSE
 		  int i = 1;
 #endif
 		  while(it != r.ElementsEnd()){
 		    const ::osc::ReceivedBundleElement& e = *it;
-		    it++;
+#ifdef VERBOSE
+		    printf("Just made an ::osc::ReceivedBundleElement with contents %p and size %d\n",
+			   e.Contents(), e.Size());
+#endif
+		    
+
 
 #ifdef VERBOSE
+		    printf("After it++, the same ::osc::ReceivedBundleElement has contents %p and size %d\n",
+                           e.Contents(), e.Size());
+
+
 		    printf("Parsing bundle element %d\n", i++);
 		    printf("Made an ::osc::ReceivedBundleElement out of the iterator.\n");
 		    printf("\tcontents: %p\n", e.Contents());
@@ -305,6 +328,8 @@ void PacketHandler::parse(const char *packet, int size, TimeTag timeTag){
 		    printf("\tLet's try to parse it...\n");
 #endif
 		    parse(e.Contents(), e.Size(), r.TimeTag());
+
+		    it++;
 		  }
 		}
 		else if(p.IsMessage()){
