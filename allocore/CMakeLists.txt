@@ -24,6 +24,9 @@ src/io/al_Window.cpp
 src/io/al_FileAPR.cpp
 src/io/al_SocketAPR.cpp
 src/io/al_WindowGLUT.cpp
+src/io/al_HID.cpp
+src/io/al_Serial.cpp
+src/io/hidapi.c
 src/protocol/oscpack/osc/OscOutboundPacketStream.cpp
 src/protocol/oscpack/osc/OscPrintReceivedElements.cpp
 src/protocol/oscpack/osc/OscReceivedElements.cpp
@@ -103,30 +106,47 @@ set(ALLOCORE_INCLUDE_DIRS ${APR_INCLUDE_DIR}
 
 include_directories(${ALLOCORE_INCLUDE_DIRS})
 
-#System dependent libs
+# System dependent libs
+# ---- OS X ----
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+   add_definitions(-DAL_OSX)
 # Needed by portaudio
-add_definitions(-DAL_OSX)
    find_library(AUDIOUNIT_FM AudioUnit)
    find_library(COREAUDIO_FM CoreAudio)
    find_library(COREMIDI_FM CoreMidi)
    find_library(CORESERVICES_FM CoreServices)
    find_library(AUDIOTOOLBOX_FM AudioToolbox)
-   set(PA_FRAMEWORKS ${AUDIOUNIT_FM} ${COREAUDIO_FM} ${COREMIDI_FM} ${CORESERVICES_FM} ${AUDIOTOOLBOX_FM})
+   set(MAC_LIBS ${MAC_LIBS} ${AUDIOUNIT_FM} ${COREAUDIO_FM} ${COREMIDI_FM} ${CORESERVICES_FM} ${AUDIOTOOLBOX_FM})
+# Needed by HID
+   find_library(IOKIT_FM IOKit)
+   find_library(COREFOUNDATION_FM CoreFoundation)
+   set(MAC_LIBS ${MAC_LIBS} ${IOKIT_FM} ${COREFOUNDATION_FM})
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
+
+# ---- Linux ------
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-
 set(EXAMPLE_LINUX_LIBS asound pthread)
-
 add_definitions(-DAL_LINUX)
-set(ALLOCORE_LINK_LIBRARIES ${ALLOCORE_LIBRARIES} avahi-common avahi-client)
+
+set(LINUX_LIBS ${LINUX_LIBS} avahi-common avahi-client)
+# For HID
+find_package(Udev REQUIRED)
+include_directories(${UDEV_INCLUDE_DIR})
+find_package(Libusb REQUIRED)
+set(LINUX_LIBS ${LINUX_LIBS} ${LIBUSB_1_LIBRARY} ${UDEV_LIBRARY})
+message("libudev lib = ${UDEV_LIBRARY}")
+
 endif()
 
+# ---- Windows ----
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 add_definitions(-DAL_WINDOWS)
+# For HID
+set(WINDOWS_LIBS windows setupapi)
 endif()
 
+# Link libraries
 set(ALLOCORE_LINK_LIBRARIES ${ALLOCORE_LINK_LIBRARIES}
 ${APR_LIBRARY}
 ${ASSIMP_LIBRARY}
@@ -139,8 +159,9 @@ ${OPENGL_LIBRARY}
 ${PORTAUDIO_LIBRARY}
 ${PORTAUDIO_LIBRARIES}
 ${SNDFILE_LIBRARIES}
-${PA_FRAMEWORKS}
-${LINUX_LIBS})
+${MAC_LIBS}
+${LINUX_LIBS}
+${WINDOWS_LIBS})
 
 target_link_libraries(allocore ${ALLOCORE_LINK_LIBRARIES})
 
