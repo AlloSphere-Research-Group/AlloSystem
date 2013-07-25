@@ -6,6 +6,8 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
+#define ALLOSPHERE 0
+
 //vsr Includes
 #include "vsr/vsr.h"
 #include "vsr/vsr_op.h"
@@ -13,7 +15,7 @@
 #include "vsr/vsr_camera.h"
 #include "vsr/vsr_fiber.h"
 #include "vsr/vsr_stat.h"
-#include "vsr/vsr_gamma.h"
+//#include "vsr/vsr_gamma.h"
 
 //allo includes
 #include "allocore/al_Allocore.hpp"
@@ -21,7 +23,7 @@
 #include "alloGLV/al_ControlGLV.hpp"
 
 //gamma
-#include "Gamma/Oscillator.h"
+//#include "Gamma/Oscillator.h"
 
 //Glue
 #include "allovsr/al_vsrInterface.hpp"
@@ -57,22 +59,37 @@ void knot(al::VsrApp& app){
     static double ntrace, traceamt, bandres;
     static bool bReset, bCirFlow, bDrawCirStrip, bDrawStrip, bDrawSrc;
     
+	//stereo controls
+	static double eyesep, fovy;
     
     PRESET
         app.glv.gui(m,"m",0,10)(n,"n",0,10)(amt,"amt",-10,10)(iter,"iter",1,1000);
-        app.glv.gui(theta)(phi)(gamma);
+        app.glv.gui(theta,"theta",0,100)(phi,"phi",0,100);//(gamma);
         app.glv.gui(ntrace,"trace",0,1000)(traceamt,"trace_amt",0,10)(bandres,"band_res",0,100);
         app.glv.gui(bReset,"reset")(bCirFlow,"cirFlow")(bDrawCirStrip,"cir_strip")(bDrawStrip, "strip")(bDrawSrc, "src");
+	app.glv.gui(eyesep,"eyesep",0,2)(fovy,"fovy",0,180);
         m = 1; n = 5; amt = .005; iter = 1000; ntrace = 10; traceamt = .1;
+	eyesep = .2; fovy = 45;
     }
     
+	app.lens.eyeSep(eyesep*-1); app.lens.fovy(fovy);
+
     /////////////////////////////////
     /* The Transformation Operator */
     /////////////////////////////////
 
     //HOPF LINKS at Poles (orthogonal)
-    vector<Cir> cp = hf.poles(-1 + theta * 2,phi);
+    
+    static double th = 0; th += theta;
+    static double ph = 0; ph += phi;
+    
+    vector<Cir> cp = hf.poles(-1 + fmod(th,1) * 2,  fabs( sin(ph) ) );
+    
+//    vector<Cir> cp;
+//    Cir cone = hf.fiber(0,-.5);
+//    Cir ctwo = hf.fiber(0, .5);
 
+//    cp.push_back( cone); cp.push_back(ctwo);
     //A Point Pair "Boost" Generator . . .
     PointPair tp = cp[0].dual() * PI/m + cp[1].dual() * PI/n;
     
@@ -99,7 +116,9 @@ void knot(al::VsrApp& app){
     //CIRCLES ALONG THE KNOT
 
     //A Circle at point
-    Circle ct = Ro::cir( pt, Biv::yz  + Biv::xy * gamma * PI, .2);
+    static Circle ct = Ro::cir( pt, Biv::yz  + Biv::xy * gamma * PI, .2);
+    app.interface.touch(ct);
+
 
     vector<Cir> cirp;
     Circle ncirp = ct;
@@ -221,8 +240,16 @@ class MyApp : public al::VsrApp {
     
     MyApp() : al::VsrApp() { 
         
-       
+        glv.gui.colors().back.set(.3,.3,.3);
+        
+        if (ALLOSPHERE){
+            stereo.stereo(true);
+            stereo.mode( Stereographic::ACTIVE );
     
+            lens.fovy(45);
+            lens.eyeSep(lens.eyeSepAuto() *-1); 
+
+        }
     }
 
     virtual void onDraw(Graphics& gl){
@@ -240,8 +267,11 @@ MyApp app;
 
 int main(int argc, const char * argv[]){
 
-    app.create(Window::Dim(800, 600), "Allovsr Demo: Hopf Fibration");
-	
+    Window::DisplayMode DM = ALLOSPHERE ? Window::DEFAULT_BUF : Window::DEFAULT_BUF | Window::STEREO_BUF;
+
+    app.create(Window::Dim(800, 600), "Hopf Fibration and Knots", 60, DM);
+    //app.lens.eyeSep( app.lens.eyeSepAuto() );
+    //cout << app.lens.eyeSep() << endl;	  
     MainLoop::start();
     
 	return 0;

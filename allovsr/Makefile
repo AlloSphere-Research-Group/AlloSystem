@@ -33,7 +33,8 @@ DEPFLAGS = -MMD -MF $(basename $@).dep
 
 #Link
 LDFLAGS := -lvsr -lGLV -lalloGLV $(LDFLAGS)
-
+#Link Twice
+LDFLAGS += $(LDFLAGS)
 
 IPATH = $(PCH_DIR) \
 		$(INC_DIR)vsr/Elements/\
@@ -72,9 +73,7 @@ install: FORCE
 
 # Create file with settings for linking to external libraries
 linkfile:
-	@echo CPPFLAGS +=
-	@echo $(LINK_CPPFLAGS) LDFLAGS += -l$(LIB_NAME) $(LDFLAGS)
-	@printf "%b\n" "CPPFLAGS +=$(LINK_CPPFLAGS)\r\nLDFLAGS += -l$(LIB_NAME) $(LDFLAGS) "> Makefile.link
+	@printf "%b\n" "CPPFLAGS +=$(LINK_CPPFLAGS)\r\nLDFLAGS := -l$(LIB_NAME) $(LINK_LDFLAGS) $(LDFLAGS) "> Makefile.link
 
 .PHONY: clean
 clean:

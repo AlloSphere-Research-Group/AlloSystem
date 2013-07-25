@@ -20,7 +20,7 @@ namespace al {
 
 class OmniApp : public Window, public osc::PacketHandler, public FPS, public OmniStereo::Drawable {
 public:
-	OmniApp(std::string name = "omniapp");
+	OmniApp(std::string name = "omniapp", bool slave=false);
 	virtual ~OmniApp();
 
 	void start();
@@ -72,7 +72,7 @@ public:
     double audioRate, int audioBlockSize,
 		int audioInputs, int audioOutputs
 	);
-	void initOmni(std::string path = "~/code/allosphere/calibration-current/");
+	void initOmni(std::string path = "");
 	
 	void sendHandshake();
 	void sendDisconnect();
@@ -104,7 +104,9 @@ protected:
 	std::string mName;
 	std::string mHostName;
 	
-	bool bOmniEnable;
+	double mNavSpeed, mNavTurnSpeed;
+	
+	bool bOmniEnable, bSlave;
 	
 	static void AppAudioCB(AudioIOData& io);
 };
@@ -112,35 +114,43 @@ protected:
 
 // INLINE IMPLEMENTATION //
 
-inline OmniApp::OmniApp(std::string name)
+inline OmniApp::OmniApp(std::string name, bool slave)
 :	mNavControl(mNav),
 	mOSCRecv(PORT_FROM_DEVICE_SERVER),
-	mOSCSend(PORT_TO_DEVICE_SERVER, DEVICE_SERVER_IP_ADDRESS) 
+	mOSCSend(PORT_TO_DEVICE_SERVER, DEVICE_SERVER_IP_ADDRESS),
+	bSlave(slave)
 {	
 	bOmniEnable = true;
 	mHostName = Socket::hostName();
 	mName = name;
 	
-	Window::append(mStdControls);
-	Window::append(mNavControl);
-	
-	oscRecv().bufferSize(32000);
-	oscRecv().handler(*this);
-	sendHandshake();
-										
-	initAudio();
-	initWindow();
-	initOmni();
+	mNavSpeed = 1;
+	mNavTurnSpeed = 0.02;
 	
 	lens().near(0.01).far(40).eyeSep(0.03);
 	nav().smooth(0.8);
+	
+	Window::append(mStdControls);
+	initWindow();
+	initOmni();
+	
+	if (!bSlave) {
+		Window::append(mNavControl);					
+		initAudio();
+	
+		oscRecv().bufferSize(32000);
+		oscRecv().handler(*this);
+		sendHandshake();
+	}
 }
 
 inline OmniApp::~OmniApp() {
-	sendDisconnect();
+	if (!bSlave) sendDisconnect();
 }
 
 inline void OmniApp::initOmni(std::string path) {
+
+
 	mOmni.configure(path, mHostName);
 	if (mOmni.activeStereo()) {
 		mOmni.mode(OmniStereo::ACTIVE).stereo(true);
@@ -193,8 +203,6 @@ inline void OmniApp::start() {
 		Window::displayMode(Window::displayMode() | Window::STEREO_BUF);
 	}
 	
-	if(oscSend().opened()) sendHandshake();
-	
 	create();
 	
 	if (mOmni.fullScreen()) {
@@ -202,7 +210,11 @@ inline void OmniApp::start() {
 		cursorHide(true);
 	}
 	
-	mAudioIO.start();
+	if (!bSlave) { 
+		if(oscSend().opened()) sendHandshake();
+		mAudioIO.start();
+	}
+	
 	Main::get().start();
 }
 
@@ -257,28 +269,34 @@ inline void OmniApp::onMessage(osc::Message& m) {
 	float x;
 	if (m.addressPattern() == "/mx") {
 		m >> x;
-		nav().moveR(-x);
+		nav().moveR(-x * mNavSpeed);
 
 	} else if (m.addressPattern() == "/my") {
 		m >> x;
-		nav().moveU(x);
+		nav().moveU(x * mNavSpeed);
 
 	} else if (m.addressPattern() == "/mz") {
 		m >> x;
-		nav().moveF(x);
+		nav().moveF(x * mNavSpeed);
 
 	} else if (m.addressPattern() == "/tx") {
 		m >> x;
-		nav().spinR(x * -0.02);
+		nav().spinR(x * -mNavTurnSpeed);
 
 	} else if (m.addressPattern() == "/ty") {
 		m >> x;
-		nav().spinU(x * 0.02);
+		nav().spinU(x * mNavTurnSpeed);
 
 	} else if (m.addressPattern() == "/tz") {
 		m >> x;
-		nav().spinF(x * -0.02);
+		nav().spinF(x * -mNavTurnSpeed);
 
+	} else if (m.addressPattern() == "/home") {
+		nav().home();
+		
+	} else if (m.addressPattern() == "/halt") {
+		nav().halt();
+		
 	}
 }
 
