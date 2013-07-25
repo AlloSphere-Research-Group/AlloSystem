@@ -362,9 +362,9 @@ Recv::Recv(uint16_t port, const char * address, al_sec timeout)
 
 int Recv::recv(){
 	int r;
-	// printf("Entering Recv::recv()\n");
-	// printf("mBuffer = %p\n", &mBuffer[0]);
-	// printf("mBuffer.size() = %d\n", mBuffer.size());
+#ifdef VERBOSE
+        printf("Entering Recv::recv() - mBuffer = %p and mBuffer.size() = %d\n", &mBuffer[0], mBuffer.size());
+#endif
 
 	
 	/*	printf("Here's what's in my buffer before recv...\n");
@@ -382,6 +382,10 @@ int Recv::recv(){
 			mHandler->parse(&mBuffer[0], r);
 		}
 	)
+
+#ifdef VERBOSE
+        printf("Exiting Recv::recv() - mBuffer = %p and mBuffer.size() = %d\n", &mBuffer[0], mBuffer.size());
+#endif
 	return r;
 }
 
