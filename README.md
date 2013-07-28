@@ -15,19 +15,16 @@ AlloSystem is a cross-platform suite of C++ components for building interactive 
 
 AlloSystem modules are located in subdirectories beginning with "allo". Each module has the general directory layout:
 
-	include/	- Header files (.h, .hpp)
+	MODULE_NAME/	- Header files (.h, .hpp)
 	src/		- Source files (.c, .cpp)
 	examples/	- example code pertaining to this module
 	share/		- resource files for testing and demonstration purposes
 	unitTests/	- unit tests
-	build/		- default build folder, constructed on first use
 
 The build folder (typically ./build/) is organized using a Unix-style hierarchy as follows:
 
 	bin/		- binary executables
-	include/	- library header files
 	lib/		- libraries
-	obj/		- built object files
 
 
 
@@ -36,6 +33,33 @@ The build folder (typically ./build/) is organized using a Unix-style hierarchy 
 
 2.1 Installing Dependencies
 ----------------------------------------
+
+Allosystem depends on:
+
+ * Cmake
+
+ * APR
+
+ * Assimp (v.2 or v.3 supported)
+
+ * Freeimage
+
+ * Freetype
+
+ * GLEW
+
+ * GLUT
+
+ * Libsndfile
+
+ * GLV
+
+ * vsr
+
+You may not need all these dependencies if you plan to build only part of Allosystem.
+
+Some of the examples also depend on Gamma. If you don't have Gamma you will need to disable building the examples. See below.
+
 From the AlloSystem/ root directory, cd into a module directory and run the script install_dependencies.sh. For example, to install AlloCore dependencies, you would run these commands from AlloSystem/:
 
 	$ cd allocore
@@ -45,67 +69,55 @@ From the AlloSystem/ root directory, cd into a module directory and run the scri
 This will download and install all the AlloCore dependencies using apt-get, MacPorts or homebrew.
 
 
-2.2 Building a Library
+2.2 Building Allosystem (Makefiles on all systems)
 ----------------------------------------
 
-### Make (Linux, OS X)
-........................................
+You need to use cmake to configure the build for your system. You can build Allocore like this: 
 
-The following variables can be modified to customize where built files are placed:
+	./distclean
+	cmake .
+	make
 
-	BUILD_DIR		- location to build files into (default = ./build)
-	DESTDIR			- location to install built files into (default = /usr/local/)
+This will build all Allosystem libraries in the build/lib folder and the examples in the build/bin folder.
 
-The following rules are available (to be run from the root directory):
+If you want to build wihtout examples:
 
-	make allocore		- build allocore module
-	make alloutil		- build utilities extension
-	make Gamma		- build Gamma external library
-	make GLV		- build GLV external library
+	./distclean
+	cmake . -DNO_EXAMPLES=1
+	make
 
-	make clean		- removes binaries from build folder
+To produce a debug build:
 
-	make gatherexamples	- create symlinks to examples found in each allo module directory
-	make examples/x.cpp	- builds and runs example source file x.cpp (see section 3 below)
+	./distclean
+	cmake . -DCMAKE_BUILD_TYPE=Debug
+	make
 
-
-
-3. Program Execution Using Make
-========================================
-
-3.1 Automatic "Build and Run"
+2.3 Building Allosystem (XCode project)
 ----------------------------------------
-The AlloCore Make system permits one to build and automatically run source files with a main() function defined. This is not meant to replace a full-fledged IDE for building complex projects, but rather to serve as a quick way to prototype ideas. By default, any source files located in ./examples or any subfolder thereof, can be built and run using the command
-	
-	make examples/mymain.cpp
 
-and will be linked against Allocore and its dependencies. If you are having trouble using tab autocompletion after the 'make' command, then it is likely that a completion rule has been defined elsewhere for make. You can disable this by adding to the bottom of your ~/.bashrc file
+Do:
 
-	complete -r make
+	./distclean
+	cmake . -GXcode
+	open Allosystem.xcodeprj
 
-which will restore the default autocompletion using the file system. If you just want to build and executable without running it, then include AUTORUN=0 with the make command.
+You will be able to run examples and debug from Xcode
 
-
-3.2 User-defined Options
+2.4 Building Allosystem (Visual Studio project)
 ----------------------------------------
-The following additional capabilities are possible and must be configured manually.
 
-### Custom Build Paths
-Sometimes it is handy to build and run sources files from custom directories as well as include one's own "library" code that is linked with all build-and-run executables. To configure these, first create a new file "Makefile.user" in ./ . For convenience, you can copy the file Makefile.usertemplate. Next, add/modify the following variables:
+Coming soon...
 
-	RUN_DIRS	= directory1 directory2 ...
-	RUN_SRC_DIRS	= directoryA directoryB ...
+2.4 Installing Allosystem
+----------------------------------------
 
-RUN_DIRS is a list of directories that Make searches recursively for build-and-run source files.
-The directory ./examples is automatically added to this list.
+Using cmake configured for Makefiles, you will be able to install all of Allosystem with headers by doing:
 
-RUN_SRC_DIRS is a list of directories that contain source code for objects files that are to be linked with all build-and-run sources. The sources in RUN_SRC_DIRS can be thought of as your own library source code.
+	sudo make install
 
-### Custom Build Flags
-In the same directory as the build-and-run source file add a file called "flags.txt" which contains valid flags for the compiler. For example, if you need to link to libfoo.so located in /usr/local/lib, your flags.txt will contain something like:
+You can specify a different install path by doing (to install in /opt/local):
 
-	-I/usr/local/include -L/usr/local/lib -lfoo
-
-It is also possible to use the variable $(PROJECT_DIR) in flags.txt to refer to the directory the build-and-run source file is located in.
-
+	./distclean
+	cmake -DCMAKE_INSTALL_PREFIX:PATH=/opt/local .
+	sudo make install
 
