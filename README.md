@@ -37,23 +37,14 @@ The build folder (typically ./build/) is organized using a Unix-style hierarchy 
 Allosystem depends on:
 
  * Cmake
-
  * APR
-
  * Assimp (v.2 or v.3 supported)
-
  * Freeimage
-
  * Freetype
-
  * GLEW
-
  * GLUT
-
  * Libsndfile
-
  * GLV
-
  * vsr
 
 You may not need all these dependencies if you plan to build only part of Allosystem.
