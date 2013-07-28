@@ -8,17 +8,17 @@
 */
 
 //vsr Includes
-#include "vsr/vsr.h"
-#include "vsr/vsr_op.h"
-#include "vsr/vsr_draw.h"
-//#include "vsr/vsr_camera.h"
-#include "vsr/vsr_frame.h"
-#include "vsr/vsr_chain.h"
+#include "VSR/vsr.h"
+#include "VSR/vsr_op.h"
+#include "VSR/vsr_draw.h"
+//#include "VSR/vsr_camera.h"
+#include "VSR/vsr_frame.h"
+#include "VSR/vsr_chain.h"
 
 //allo includes
 #include "allocore/al_Allocore.hpp"
 #include "allocore/io/al_ControlNav.hpp"
-#include "alloGLV/al_controlGLV.hpp"
+#include "alloGLV/al_ControlGLV.hpp"
 
 //Glue
 #include "allovsr/al_vsrInterface.hpp"

@@ -15,8 +15,8 @@
 #include "allocore/al_Allocore.hpp"
 #include "allovsr/al_vsr.hpp"
 
-#include "vsr/vsr_interface.h"
-#include "vsr/vsr_gui.h"
+#include "VSR/vsr_interface.h"
+#include "VSR/vsr_gui.h"
 #include "alloGLV/al_ControlGLV.hpp"
 
 

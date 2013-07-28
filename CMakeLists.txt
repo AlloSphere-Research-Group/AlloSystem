@@ -29,6 +29,21 @@ find_package(GLV)
 endif()
 
 
+# check for vsr to build allovsr
+set(VSR_RELATIVE_DIR ${CMAKE_SOURCE_DIR}/../vsr)
+
+if(EXISTS "${VSR_RELATIVE_DIR}" AND IS_DIRECTORY "${VSR_RELATIVE_DIR}")
+  message("Building VSR")
+  set(BUILDING_VSR 1)
+  add_subdirectory(${CMAKE_SOURCE_DIR}/../vsr ${CMAKE_SOURCE_DIR}/../vsr-build)
+  add_subdirectory( allovsr )
+else()
+find_package(vsr)
+  if(${VSR_FOUND})
+    add_subdirectory( allovsr )
+  endif()
+endif()
+
 #from old Makefile
 
 #Linux

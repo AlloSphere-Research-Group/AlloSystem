@@ -9,12 +9,12 @@
 #define ALLOSPHERE 0
 
 //vsr Includes
-#include "vsr/vsr.h"
-#include "vsr/vsr_op.h"
-#include "vsr/vsr_draw.h"
-#include "vsr/vsr_camera.h"
-#include "vsr/vsr_fiber.h"
-#include "vsr/vsr_stat.h"
+#include "VSR/vsr.h"
+#include "VSR/vsr_op.h"
+#include "VSR/vsr_draw.h"
+#include "VSR/vsr_camera.h"
+#include "VSR/vsr_fiber.h"
+#include "VSR/vsr_stat.h"
 //#include "vsr/vsr_gamma.h"
 
 //allo includes

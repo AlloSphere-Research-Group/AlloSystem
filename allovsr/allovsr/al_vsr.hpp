@@ -12,7 +12,7 @@
 #define Versor_vsr_allovsr_h
 
 #include "allocore/spatial/al_Pose.hpp"
-#include "vsr/vsr_frame.h"
+#include "VSR/vsr_frame.h"
 
 namespace al {
 
