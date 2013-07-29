@@ -19,13 +19,14 @@ else (GAMMA_LIBRARIES AND GAMMA_INCLUDE_DIRS)
 
   find_path(GAMMA_INCLUDE_DIR
     NAMES
-	  Gamma.h
+          Gamma/Gamma.h
     PATHS
-	${CMAKE_SOURCE_DIR}/../../Gamma/Gamma
-      /usr/include/Gamma
-      /usr/local/include/Gamma
-      /opt/local/include/Gamma
-      /sw/include/Gamma
+        ${CMAKE_SOURCE_DIR}/../../Gamma
+        ${CMAKE_SOURCE_DIR}/../Gamma
+      /usr/include
+      /usr/local/include
+      /opt/local/include
+      /sw/include
   )
 
   find_library(GAMMA_LIBRARY
@@ -34,6 +35,7 @@ else (GAMMA_LIBRARIES AND GAMMA_INCLUDE_DIRS)
 	  libGamma
     PATHS
 	${CMAKE_SOURCE_DIR}/../../Gamma/build/lib
+        ${CMAKE_SOURCE_DIR}/../Gamma/build/lib
       /usr/lib
       /opt/local/lib
       /usr/local/lib

@@ -89,6 +89,8 @@ ${PA_FRAMEWORKS}
 ${LINUX_LIBS}
 ${EXAMPLE_LINUX_LIBS})
 
+include_directories(${GAMMA_INCLUDE_DIRS})
+
 file(GLOB EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/*.cpp)
 foreach(example ${EXAMPLE_FILES})
 get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
