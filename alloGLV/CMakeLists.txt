@@ -17,14 +17,23 @@ message("-- Portaudio headers: ${PORTAUDIO_INCLUDE_DIRS}   ${PORTAUDIO_DEFINITIO
 find_package(LibSndFile REQUIRED)
 message("-- libsndfile headers: ${SNDFILE_INCLUDE_DIRS}")
 
-find_package(Allocore)
-find_package(GLV)
-find_package(Gamma)
+if(ALLOSYSTEM_BUILD)
+set(ALLOCORE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../allocore)
+set(ALLOCORE_LIBRARY allocore)
+get_property(allocore_location TARGET allocore PROPERTY LOCATION)
+message (STATUS "allocore_location for alloGLV == ${allocore_location}")
+
+set(GLV_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../GLV)
+set(GLV_LIBRARY allocore)
+get_property(glv_location TARGET GLV PROPERTY LOCATION)
+message (STATUS "glv_location for alloGLV == ${glv_location}")
+else(ALLOSYSTEM_BUILD)
+find_package(Allocore REQUIRED)
+find_package(GLV REQUIRED)
+endif(ALLOSYSTEM_BUILD)
 
 include_directories(${ALLOCORE_INCLUDE_DIR})
 include_directories(${GLV_INCLUDE_DIR})
-
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(alloGLV ${ALLOCORE_LIBRARIES} ${GLV_LIBRARY})
@@ -40,21 +49,23 @@ target_link_libraries(alloGLV ${ALLOCORE_LIBRARIES} ${GLV_LIBRARY})
 
 # Examples\
 if(NOT NO_EXAMPLES)
+find_package(Gamma)
 if(GAMMA_FOUND)
 include_directories(${GAMMA_INCLUDE_DIR})
-else()
-include_directories(../../Gamma)
-endif()
 file(GLOB ALLOGLV_EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/*.cpp)
 foreach(example ${ALLOGLV_EXAMPLE_FILES})
-	get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
+        get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
         add_executable(alloGLV_${EXAMPLE_NAME} ${example})
         target_link_libraries(alloGLV_${EXAMPLE_NAME} allocore ${ALLOCORE_LINK_LIBRARIES} ${GLV_LIBRARY} alloGLV)
-	if (apple)
-	  find_library(AUDIOUNIT_FM AudioUnit)
+        if (apple)
+          find_library(AUDIOUNIT_FM AudioUnit)
           target_link_libraries(alloGLV_${EXAMPLE_NAME} ${AUDIOUNIT_FM})
         endif()
 endforeach(example)
+else()
+message("Gamma not found. not building alloGLV examples.")
+endif()
+
 endif(NOT NO_EXAMPLES)
 
 install(DIRECTORY alloGLV/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include/alloGLV)
