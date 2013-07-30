@@ -47,7 +47,11 @@ find_package(GLUT REQUIRED)
 find_package(LibSndFile REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(Portaudio REQUIRED)
-find_package(Gamma REQUIRED)
+find_package(Gamma)
+
+if(NOT GAMMA_FOUND)
+message( FATAL_ERROR "Gamma is required to build alloutil examples, and it was not found. You can run cmake with -DNO_EXAMPLES=1 to disable examples." )
+endif(NOT GAMMA_FOUND)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 # Needed by portaudio

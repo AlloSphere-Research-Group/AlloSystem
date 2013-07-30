@@ -90,7 +90,6 @@ find_package(GLUT REQUIRED)
 find_package(LibSndFile REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(Portaudio REQUIRED)
-find_package(Gamma)
 
 set(ALLOCORE_INCLUDE_DIRS ${APR_INCLUDE_DIR}
   ${ASSIMP_INCLUDE_DIR}
@@ -196,6 +195,8 @@ foreach(example ${EXAMPLE_FILES})
       endif()
       target_link_libraries(${dir}_${EXAMPLE_NAME} ${EXAMPLE_LINUX_LIBS} ${GAMMA_LIBRARIES})
 endforeach(example)
+else()
+message("Gamma not found. Not building allocore sound examples.")
 endif(GAMMA_FOUND)
 endif(NOT NO_EXAMPLES)
 
