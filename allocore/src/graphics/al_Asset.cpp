@@ -1,12 +1,28 @@
 #include "allocore/graphics/al_Asset.hpp"
 
+
 #include "allocore/graphics/al_Graphics.hpp"
+
+#define USE_ASSIMP3 1
+
+#ifdef USE_ASSIMP3
+
+#include "assimp/Importer.hpp"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
+#include "assimp/cimport.h"
+#include "assimp/types.h"
+#include "assimp/matrix4x4.h"
+
+#else
 
 #include "assimp/assimp.h"
 #include "assimp/aiTypes.h"
 #include "assimp/aiPostProcess.h"
 #include "assimp/aiScene.h"
 #include "assimp/aiMaterial.h"
+
+#endif
 
 /*
 #include "assimp/types.h"
@@ -376,9 +392,47 @@ Scene::Node& Scene :: node(unsigned int i) const {
 	return mImpl->nodes[i];
 }
 
-void get_bounding_box_for_node(const aiScene * scene, const struct aiNode* nd, Vec3f& min, Vec3f& max, struct aiMatrix4x4* trafo) {
-	struct aiMatrix4x4 prev;
-	unsigned int n = 0, t;
+
+
+    
+#ifdef USE_ASSIMP3
+  void get_bounding_box_for_node(const aiScene * scene, const struct aiNode* nd, Vec3f& min, Vec3f& max, aiMatrix4x4* trafo) {	
+    aiMatrix4x4 prev;
+     unsigned int n = 0, t;
+	prev = *trafo;
+	aiMultiplyMatrix4(trafo,&nd->mTransformation);
+	for (; n < nd->mNumMeshes; ++n) {
+		const struct aiMesh * mesh = scene->mMeshes[nd->mMeshes[n]];
+			for (t = 0; t < mesh->mNumVertices; ++t) {
+			aiVector3D tmp = mesh->mVertices[t];
+			aiTransformVecByMatrix4(&tmp,trafo);
+			min[0] = AL_MIN(min[0],tmp.x);
+			min[1] = AL_MIN(min[1],tmp.y);
+			min[2] = AL_MIN(min[2],tmp.z);
+			max[0] = AL_MAX(max[0],tmp.x);
+			max[1] = AL_MAX(max[1],tmp.y);
+			max[2] = AL_MAX(max[2],tmp.z);
+		}
+	}
+	for (n = 0; n < nd->mNumChildren; ++n) {
+		get_bounding_box_for_node(scene, nd->mChildren[n],min,max,trafo);
+	}
+	*trafo = prev;
+}
+
+	
+void Scene :: getBounds(Vec3f& min, Vec3f& max) const {
+	aiMatrix4x4 trafo;
+	aiIdentityMatrix4(&trafo);
+	min.set(1e10f, 1e10f, 1e10f);
+	max.set(-1e10f, -1e10f, -1e10f);
+	get_bounding_box_for_node(mImpl->scene, mImpl->scene->mRootNode,min,max,&trafo);
+}
+
+#else
+  void get_bounding_box_for_node(const aiScene * scene, const struct aiNode* nd, Vec3f& min, Vec3f& max, struct aiMatrix4x4* trafo) {
+    struct aiMatrix4x4 prev;
+     unsigned int n = 0, t;
 	prev = *trafo;
 	aiMultiplyMatrix4(trafo,&nd->mTransformation);
 	for (; n < nd->mNumMeshes; ++n) {
@@ -399,7 +453,8 @@ void get_bounding_box_for_node(const aiScene * scene, const struct aiNode* nd, V
 	}
 	*trafo = prev;
 }
-		
+
+	
 void Scene :: getBounds(Vec3f& min, Vec3f& max) const {
 	struct aiMatrix4x4 trafo;
 	aiIdentityMatrix4(&trafo);
@@ -408,6 +463,8 @@ void Scene :: getBounds(Vec3f& min, Vec3f& max) const {
 	get_bounding_box_for_node(mImpl->scene, mImpl->scene->mRootNode,min,max,&trafo);
 }
 
+#endif
+	
 void dumpNode(aiNode * x, std::string indent) {
 	printf("%sNode (%s) with %d meshes (", indent.c_str(), x->mName.data, x->mNumMeshes);
 	for (unsigned int i=0; i<x->mNumMeshes; i++) {
