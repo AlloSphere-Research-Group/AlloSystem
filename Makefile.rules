@@ -28,6 +28,10 @@ $(OBJ_DIR)%.o:: %.cpp
 	@echo CXX $< $@
 	$(CXX) -c $(CXXFLAGS) $< -o $@ $(DEPFLAGS)
 
+$(OBJ_DIR)%.o:: %.cc
+	@echo CXX $< $@
+	$(CXX) -c $(CXXFLAGS) $< -o $@ $(DEPFLAGS)
+
 # Build object file from C source
 $(OBJ_DIR)%.o:: %.c
 	@echo CC $< $@
@@ -38,12 +42,20 @@ $(OBJ_DIR)%.o:: %.mm
 	@echo CC $< $@
 	$(CXX) -c $(CFLAGS) $< -o $@ $(DEPFLAGS)
 
+# Build pre-compiled headers
 $(OBJ_DIR)%.hpp.gch:: %.hpp
 	@echo CXX $< $@
 	$(CXX) -x c++ -c $(CXXFLAGS) -Winvalid-pch $< -o $@ $(DEPFLAGS)
 
+# Include GCC generated dependency files
 -include $(wildcard $(OBJ_DIR)*.dep)
 
+# Prevent Make from automatically searching its predefined implicit rules
+%.dep: ;
+Makefile.%: ;
+%.inl: ;
+%.h: ;
+%.hpp: ;
 
 # Build static library
 $(SLIB_PATH): $(addprefix $(OBJ_DIR), $(OBJS) $(PCHS))
@@ -66,7 +78,7 @@ endif
 
 
 # Dummy target to force rebuilds
-FORCE:
+FORCE: ;
 
 
 # This creates a particular build folder
@@ -79,8 +91,8 @@ $(addprefix $(OBJ_DIR), $(OBJS)): | $(ALL_BUILD_DIRS)
 
 # Create file with settings for linking to external libraries
 linkfile:
-	@printf "%b\n" "CPPFLAGS +=$(LINK_CPPFLAGS)\r\nLDFLAGS +=$(LINK_LDFLAGS) -l$(LIB_NAME)"> Makefile.link
-#	@printf "%b\n" "CPPFLAGS +=$(LINK_CPPFLAGS)\r\n$(addprefix -l$(LIB_NAME) $(LINK_LDFLAGS), $(LDFLAGS))"> Makefile.link
+	@printf "%b\n" "CPPFLAGS +=$(LINK_CPPFLAGS)\r\nLDFLAGS +=-l$(LIB_NAME) $(LINK_LDFLAGS)"> Makefile.link
+#	@printf "%b(LDFLAGS)\n" "CPPFLAGS +=$(LINK_CPPFLAGS)\r\nLDFLAGS :=-l$(LIB_NAME) $(LINK_LDFLAGS) $$"> Makefile.link
 
 
 # Archive repository

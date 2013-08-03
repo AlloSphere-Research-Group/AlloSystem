@@ -76,14 +76,20 @@ int File::write(const std::string& path, const void * v, int size, int items){
 	return r;
 }
 
+int File::write(const std::string& path, const std::string& data){
+	return File::write(path, &data[0], data.size());
+}
+
 
 
 std::string File::conformDirectory(const std::string& src){
-	std::string res(src);
-	if(AL_FILE_DELIMITER != res[res.size()-1]){
-		res += AL_FILE_DELIMITER;
+	if(src[0]){
+		if(AL_FILE_DELIMITER != src[src.size()-1]){
+			return src + AL_FILE_DELIMITER;
+		}
+		return src;
 	}
-	return res;
+	return "." AL_FILE_DELIMITER_STR;
 }
 
 std::string File::conformPathToOS(const std::string& src){
@@ -116,6 +122,11 @@ std::string File::absolutePath(const std::string& src) {
 #endif
 }
 
+std::string File::baseName(const std::string& src){
+	size_t pos = src.find_last_of('.');
+	return src.substr(0, pos);
+}
+
 std::string File::directory(const std::string& src){
 	size_t pos = src.find_last_of(AL_FILE_DELIMITER);
 	if(std::string::npos != pos){
@@ -124,20 +135,17 @@ std::string File::directory(const std::string& src){
 	return "." AL_FILE_DELIMITER_STR;
 }
 
+std::string File::extension(const std::string& src){
+	size_t pos = src.find_last_of('.');
+	if(src.npos != pos){
+		return src.substr(pos);
+	}
+	return "";
+}
+
 bool File::exists(const std::string& path){
 	struct stat s;
 	return ::stat(path.c_str(), &s) == 0;
-}
-
-bool File::searchBack(std::string& prefixPath, const std::string& matchPath, int maxDepth){
-	int i=0;
-	prefixPath="";
-
-	for(; i<maxDepth; ++i){
-		if(File::exists(prefixPath + matchPath)) break;
-		prefixPath = ".." AL_FILE_DELIMITER_STR + prefixPath;
-	}
-	return i<maxDepth;
 }
 
 bool File::isDirectory(const std::string& src){
@@ -149,6 +157,18 @@ bool File::isDirectory(const std::string& src){
 	}
 	// if(s.st_mode & S_IFREG) // is file?
 	return false;
+}
+
+bool File::searchBack(std::string& prefixPath, const std::string& matchPath, int maxDepth){
+	if(prefixPath[0]){
+		prefixPath = conformDirectory(prefixPath);
+	}
+	int i=0;
+	for(; i<maxDepth; ++i){
+		if(File::exists(prefixPath + matchPath)) break;
+		prefixPath += ".." AL_FILE_DELIMITER_STR;
+	}
+	return i<maxDepth;
 }
 
 bool File::searchBack(std::string& path, int maxDepth){

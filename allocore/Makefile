@@ -3,7 +3,7 @@
 #=========================================================================
 
 # We used to include another configuration file here, but it doesn't seem
-# to serve any purpose other than complicate things more than necessary.
+# to serve any purpose other than add complexity.
 #include Makefile.config
 # BEGIN old Makefile.config
 LIB_NAME	= allocore
@@ -20,13 +20,6 @@ STRICT_WARNINGS = 1
 
 LIB_DIRS	= /usr/lib/
 INC_DIRS	= /usr/include/ 
-
-ifeq ($(PLATFORM), linux)
-	CPPFLAGS	+= -I../$(PLATFORM_DIR)/include
-else
-#	#CPPFLAGS	+= -I../../$(PLATFORM_DIR)/include -I../../$(PLATFORM_DIR)/include
-#	LINK_LDFLAGS += -framework Carbon -framework IOKit
-endif
 
 #-------------------------------------------------------------------------
 # Default variables
@@ -61,13 +54,13 @@ RUN_DIRS	+= examples/
 ifeq ($(PLATFORM), linux)
 	INC_DIRS += $(PREFIX)include/
 	LIB_DIRS += $(PREFIX)lib/
-	DEV_DIR   = linux/
+#	DEV_DIR   = linux/
 #	DEV_LIB_DIR = linux/lib$(ARCH)
 
 # Mac OS X:
 else ifeq ($(PLATFORM), macosx)
 	LDFLAGS	+= -framework Carbon -framework Cocoa -framework IOKit
-	DEV_DIR  = osx/
+#	DEV_DIR  = osx/
 #	DEV_LIB_DIR = osx/lib
 
 # Windows

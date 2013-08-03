@@ -165,18 +165,6 @@ template<class T> T fold(const T& value, const T& hi=T(1), const T& lo=T(0));
 /// Returns value folded into [lo, hi] one time.
 template<class T> T foldOnce(const T& value, const T& hi=T(1), const T& lo=T(0));
 
-/// Compute Frenet frame (tangent, normal) from 1st difference
-template <class V2>
-void frenet(const V2& d1, V2& t, V2& n);
-
-/// Compute Frenet frame (tangent, normal, binormal) from 1st and 2nd differences
-template <class V3>
-void frenet(const V3& d1, const V3& d2, V3& t, V3& n, V3& b);
-
-/// Compute Frenet frame (tangent, normal, binormal) from 3 consecutive points
-template <class V3>
-void frenet(const V3& p2, const V3& p1, const V3& p0, V3& t, V3& n, V3& b);
-
 /// Returns e^(-v*v)
 template<class T> T gaussian(const T& v);
 
@@ -361,27 +349,6 @@ template<class T> T wrapPhase(const T& radians);
 template<class T> T wrapPhaseOnce(const T& radians);
 
 
-/// Convert spherical to Cartesian coordinates in-place
-
-/// @param[in,out] r2x		radius to x coordinate
-/// @param[in,out] t2y		theta (angle on xy plane), in [-pi, pi], to z coordinate
-/// @param[in,out] p2z		phi (angle from z axis), in [0, pi], to y coordinate
-template<class T> void sphericalToCart(T& r2x, T& t2y, T& p2z);
-
-/// Convert spherical to Cartesian coordinates in-place
-template<class T> void sphericalToCart(T * vec3);
-
-/// Convert Cartesian to spherical coordinates in-place
-
-/// @param[in,out] x2r		x coordinate to radius
-/// @param[in,out] y2t		y coordinate to theta (angle on xy plane), in [-pi, pi]
-/// @param[in,out] z2p		z coordinate to phi (angle from z axis), in [0, pi]
-template<class T> void cartToSpherical(T& x2r, T& y2t, T& z2p);
-
-/// Convert Cartesian to spherical coordinates in-place
-template<class T> void cartToSpherical(T * vec3);
-
-
 
 
 // Implementation
@@ -554,30 +521,6 @@ TEM inline T foldOnce(const T& v, const T& hi, const T& lo){
 	if(v > hi) return hi + (hi - v);
 	if(v < lo) return lo + (lo - v);
 	return v;
-}
-
-template <class V2>
-inline void frenet(const V2& d1, V2& t, V2& n){
-	t = d1;
-	t.normalize();
-	n(-t[1], t[0]);	// normal according to right-hand rule
-}
-
-template <class V3>
-inline void frenet(const V3& d1, const V3& d2, V3& t, V3& n, V3& b){	
-	b = cross(d2, d1);
-	n = cross(d1, b);
-	t = d1;
-	t.normalize();
-	b.normalize();
-	n.normalize();
-}
-
-template <class V3>
-inline void frenet(const V3& p2, const V3& p1, const V3& p0, V3& t, V3& n, V3& b){	
-	V3 d1 = (p0 - p2);			// 1st (central) difference (scaled by 2)
-	V3 d2 = (p0 - p1*2. + p2);	// 2nd difference
-	frenet(d1,d2, t,n,b);
 }
 
 TEM inline T gaussian(const T& v){ return ::exp(-v*v); }
@@ -897,30 +840,6 @@ TEM inline T wrapPhaseOnce(const T& r){
 	return r;
 }
 
-
-TEM inline void sphericalToCart(T& r, T& t, T& p){
-	T rsinp = r * sin(p);
-	T rcosp = r * cos(p);
-	r = rsinp * cos(t);
-	t = rsinp * sin(t);
-	p = rcosp;
-}
-
-TEM inline void sphericalToCart(T * vec3){ sphericalToCart(vec3[0], vec3[1], vec3[2]); }
-
-TEM inline void cartToSpherical(T& x, T& y, T& z){
-	T r = sqrt(x*x + y*y + z*z);
-	T t = atan2(y, x);
-	z = acos(z/r);
-	y = t;	
-	x = r;
-}
-
-TEM inline void cartToSpherical(T * vec3){ cartToSpherical(vec3[0], vec3[1], vec3[2]); }
-
-
 #undef TEM
-
 } // ::al::
-
 #endif

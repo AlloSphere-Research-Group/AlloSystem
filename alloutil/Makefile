@@ -12,8 +12,8 @@ VPATH		+= $(SRC_DIR)
 SRCS		= $(wildcard $(SRC_DIR)*.c*)
 OBJS		= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
-CPPFLAGS	+= -I/usr/local/include/ -I/usr/include/
 CPPFLAGS	+= -I./
+CPPFLAGS	+= -I../allocore/
 LDFLAGS		+= -L$(BUILD_DIR)lib
 
 -include ../allocore/Makefile.link
@@ -32,7 +32,6 @@ else
 endif
 
 include ../Makefile.rules
-include ../Makefile.buildandrun
 
 # Install library into path specified by DESTDIR
 # Include files are copied into DESTDIR/include/ and
@@ -54,3 +53,4 @@ clean:
 	@$(RM) $(LIB_PATH)
 	$(call RemoveDir, $(OBJ_DIR))
 
+include ../Makefile.buildandrun

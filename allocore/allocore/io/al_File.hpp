@@ -53,13 +53,16 @@
 
 #include "allocore/system/al_Config.h"
 
-#ifdef AL_WINDOWS
-	#define AL_FILE_DELIMITER		'\\'
-	#define AL_FILE_DELIMITER_STR	"\\"
-#else
-	#define AL_FILE_DELIMITER		'/'
-	#define AL_FILE_DELIMITER_STR	"/"
+#ifndef AL_FILE_DELIMITER_STR
+	#ifdef AL_WINDOWS
+		#define AL_FILE_DELIMITER_STR	"\\"
+	#else
+		#define AL_FILE_DELIMITER_STR	"/"
+	#endif
 #endif
+
+#define AL_FILE_DELIMITER (AL_FILE_DELIMITER_STR[0])
+
 
 #define AL_PATH_MAX (4096)
 
@@ -67,6 +70,39 @@ namespace al{
 
 
 class FilePath;
+
+
+/// File information
+class FileInfo{
+public:
+	enum Type{
+		NOFILE,				/**< No file type determined */
+		REG,				/**< Regular file */
+		DIR,				/**< Directory */
+		CHR,				/**< Character device */
+		BLOCK,				/**< A block device */
+		PIPE,				/**< FIFO or pipe */
+		LINK,				/**< Symbolic link */
+		SOCKET,				/**< Socket */
+		UNKNOWN = 127		/**< File type exists, but doesn't match any known types */
+	};
+
+	/// Set type
+	FileInfo& type(Type v){ mType=v; return *this; }
+	
+	/// Get type
+	const Type type() const { return mType; }
+
+	/// Set name
+	FileInfo& name(const std::string& v){ mName=v; return *this; }
+	
+	/// Get name
+	const std::string& name() const { return mName; }
+
+private:
+	Type mType;
+	std::string mName;
+};
 
 
 /// File
@@ -83,6 +119,7 @@ public:
 	File(const FilePath& path, const std::string& mode="r", bool open=false);
 
 	~File();
+
 
 	void close();	///< Close file
 	bool open();	///< Open file with specified i/o mode
@@ -103,11 +140,9 @@ public:
 	/// Read memory elements from file
 	int read(void * v, int size, int items=1){ return fread(v, size, items, mFP); }
 
-	/// Quick and dirty write memory to file
-	static int write(const std::string& path, const void * v, int size, int items=1);
-
 	/// Returns character string of file contents (read mode only)
 	const char * readAll();
+
 
 	/// Returns whether file is open
 	bool opened() const { return 0 != mFP; }
@@ -139,6 +174,12 @@ public:
 	FILE * filePointer() { return mFP; }
 
 
+	/// Quick and dirty write memory to file
+	static int write(const std::string& path, const void * v, int size, int items=1);
+
+	/// Quick and dirty write character string to file
+	static int write(const std::string& path, const std::string& data);
+
 	/// Returns string ensured to having an ending delimiter
 	
 	/// The directory string argument is not checked to actually exist in
@@ -155,12 +196,25 @@ public:
 	/// Convert relative paths to absolute paths
 	static std::string absolutePath(const std::string& src);
 
-	/// Extracts the directory-part of file name.
+	/// Returns the base name of path.
+
+	/// The base name is everything up to the last period.
+	///
+	static std::string baseName(const std::string& src);
+
+	/// Returns the directory part of path.
 	
-	/// The directory-part of the file name is everything up through (and 
-	/// including) the last slash in it. If the file name contains no slash, 
-	/// the directory part is the string ‘./’. E.g., /usr/bin/man -> /usr/bin/.
+	/// The directory part of the path is everything up through (and  including)
+	/// the last slash in it. If the path contains no slash, the directory part
+	/// is the string ‘./’. E.g., /usr/bin/man -> /usr/bin/.
 	static std::string directory(const std::string& src);
+
+	/// Returns extension of file name.
+
+	/// The extension is everything including and after the last period.
+	/// If there is no period, an empty string is returned.
+	static std::string extension(const std::string& src);
+
 
 	/// Returns whether a file or directory exists
 	static bool exists(const std::string& path);
@@ -175,13 +229,15 @@ public:
 
 	/// Search for file or directory back from current directory
 
-	/// @param[out] prefixPath	If the file is found, this contains a series of
-	///							"../" that can be prefixed to 'matchPath' to get
-	///							its actual location.
+	/// @param[inout] rootPath	The input should contain the path to search
+	///							relative to. If the input is empty, then "./" is
+	///							assumed. If a match is made, then the output is
+	///							a string that can be prefixed to 'matchPath' to 
+	///							get the actual location of the match.
 	/// @param[in]  matchPath	File or directory to search for
 	/// @param[in]  maxDepth	Maximum number of directories to search back
 	/// \returns whether the file or directory was found
-	static bool searchBack(std::string& prefixPath, const std::string& matchPath, int maxDepth=6);
+	static bool searchBack(std::string& rootPath, const std::string& matchPath, int maxDepth=6);
 
 	/// Search for file or directory back from current directory
 
@@ -213,6 +269,53 @@ protected:
 	void freeContent();
 	void allocContent(int n);
 	void getSize();
+	
+	friend class Dir;
+};
+
+
+
+
+/// Filesystem directory
+class Dir{
+public:
+
+	/// Constructor. This does not attempt to open the directory.
+	Dir();
+	
+	/// @param[in] dirToOpen	path to directory to open
+	Dir(const std::string& dirToOpen);
+
+	~Dir();
+
+
+	/// Open a directory
+	
+	/// @param[in] dirPath	path to directory
+	/// \returns whether the directory was successfully opened
+	bool open(const std::string& dirPath);
+	
+	/// Close directory
+	
+	/// \returns whether directory was successfully closed
+	///
+	bool close();
+
+	/// Read the next entry in the currently opened directory
+	
+	/// No ordering is guaranteed for the entries read.
+	/// \returns whether there is another entry to read
+	bool read();
+
+	/// Get current directory entry (file) information
+	const FileInfo& entry() const { return mEntry; }
+
+	/// Go back to first entry in directory
+	bool rewind();
+
+private:
+	class Impl; Impl * mImpl;
+	FileInfo mEntry;
 };
 
 
@@ -296,6 +399,7 @@ protected:
 	std::list<searchpath> mSearchPaths;
 	std::string mAppPath;
 };
+
 
 } // al::
 

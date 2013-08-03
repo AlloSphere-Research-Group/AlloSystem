@@ -48,7 +48,7 @@ ifeq ($(shell which getconf 2>/dev/null),)
 	endif
 else
 	# Set equal to number of bits in a type long int
-	ARCH = $(shell getconf LONG_BIT)
+	ARCH := $(shell getconf LONG_BIT)
 endif
 
 
@@ -172,7 +172,8 @@ ifeq ($(PLATFORM), linux)
 	endif
 
 	CPPFLAGS += -D__LINUX__ -DLINUX
-	LDFLAGS	+= -lm -lstdc++
+	CPPFLAGS += -I/usr/local/include/ -I/usr/include/
+	LDFLAGS	 += -lm -lstdc++
 	
 	DLIB_FLAGS += -shared
 	DLIB_FLAGS += -Wl,-soname,$(DLIB_MAJ_FILE)
@@ -217,10 +218,13 @@ else ifeq ($(PLATFORM), macosx)
 	endif
 
 	# Needed to link to libraries installed through homebrew or by user
-	ifdef HAS_USR_LOCAL
+	ifneq ($(wildcard /usr/local/lib),)
 		LDFLAGS  += -L/usr/local/lib/
+	endif
+	ifneq ($(wildcard /usr/local/include),)
 		CPPFLAGS += -I/usr/local/include/
 	endif
+
 
 	LDFLAGS	+= -lm -lstdc++
 	DLIB_EXT = dylib
@@ -267,7 +271,8 @@ ifneq ($(STRICT_WARNINGS), 0)
 	CFLAGS += \
 		-Wreturn-type \
 		-Wformat -Wmissing-braces -Wparentheses -Wswitch \
-		-Wunused-variable -Wsign-compare -Wno-unknown-pragmas 
+		-Wunused-variable -Wsign-compare -Wno-unknown-pragmas \
+		-Wuninitialized -Winit-self
 	CXXFLAGS += -Wnon-virtual-dtor -Woverloaded-virtual
 endif
 

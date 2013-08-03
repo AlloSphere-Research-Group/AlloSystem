@@ -39,7 +39,7 @@ void Pose :: toAED(const Vec3d& to, double& azimuth, double& elevation, double& 
 	Vec3d rel = to - vec();
 	distance = rel.mag();
 	
-	if (distance > QUAT_EPSILON*2) 
+	if (distance > quat().eps()*2) 
 	{
 		rel.normalize();
 		

@@ -42,34 +42,35 @@ int Graphics::numBytes(DataType v){
 	#undef CS
 }
 
-bool Graphics::error(const char * msg){
-	return error(-1, msg);
+const char * Graphics::errorString(bool verbose){
+	GLenum err = glGetError();
+	#define CS(GL_ERR, desc) case GL_ERR: return verbose ? #GL_ERR ", " desc : #GL_ERR;
+	switch(err){
+		case GL_NO_ERROR: return "";
+		CS(GL_INVALID_ENUM, "An unacceptable value is specified for an enumerated argument.")
+		CS(GL_INVALID_VALUE, "A numeric argument is out of range.")
+		CS(GL_INVALID_OPERATION, "The specified operation is not allowed in the current state.")
+	#ifdef GL_INVALID_FRAMEBUFFER_OPERATION
+		CS(GL_INVALID_FRAMEBUFFER_OPERATION, "The framebuffer object is not complete.")
+	#endif
+		CS(GL_OUT_OF_MEMORY, "There is not enough memory left to execute the command.")
+		CS(GL_STACK_OVERFLOW, "This command would cause a stack overflow.")
+		CS(GL_STACK_UNDERFLOW, "This command would cause a stack underflow.")
+	#ifdef GL_TABLE_TOO_LARGE
+		CS(GL_TABLE_TOO_LARGE, "The specified table exceeds the implementation's maximum supported table size.")
+	#endif
+		default: return "Unknown error code.";
+	}
+	#undef CS
 }
 
-bool Graphics::error(int ID, const char * msg){
-	GLenum err = glGetError();
-
-	#define CASE(GL_ERR) case GL_ERR:\
-		if(ID>=0)	AL_WARN_ONCE("Error %s (id=%d): %s", msg, ID, #GL_ERR);\
-		else		AL_WARN_ONCE("Error %s: %s", msg, #GL_ERR);\
+bool Graphics::error(const char * msg, int ID){
+	const char * errStr = errorString();
+	if(errStr[0]){
+		if(ID>=0)	AL_WARN_ONCE("Error %s (id=%d): %s", msg, ID, errStr);
+		else		AL_WARN_ONCE("Error %s: %s", msg, errStr);
 		return true;
-
-	//#define POST "The offending command is ignored and has no other side effect than to set the error flag."
-	switch(err) {
-//		case GL_INVALID_ENUM:	fprintf(fp,"%s:\n %s\n", msg, "An unacceptable value is specified for an enumerated argument. "POST); return true;
-//		case GL_INVALID_VALUE:	fprintf(fp,"%s:\n %s\n", msg, "A numeric argument is out of range. "POST); return true;
-//		case GL_INVALID_OPERATION:fprintf(fp,"%s:\n %s\n", msg, "The specified operation is not allowed in the current state. "POST); return true;
-//		case GL_STACK_OVERFLOW:	fprintf(fp,"%s:\n %s\n", msg, "This command would cause a stack overflow. "POST); return true;
-//		case GL_STACK_UNDERFLOW:fprintf(fp,"%s:\n %s\n", msg, "This command would cause a stack underflow. "POST); return true;
-//		case GL_OUT_OF_MEMORY:	fprintf(fp,"%s:\n %s\n", msg, "There is not enough memory left to execute the command. The state of the GL is undefined, except for the state of the error flags, after this error is recorded."); return true;
-//		case GL_TABLE_TOO_LARGE:fprintf(fp,"%s:\n %s\n", msg, "The specified table exceeds the implementation's maximum supported table size. "POST); return true;
-		CASE(GL_INVALID_ENUM) CASE(GL_INVALID_VALUE) CASE(GL_INVALID_OPERATION)
-		CASE(GL_STACK_OVERFLOW) CASE(GL_STACK_UNDERFLOW) CASE(GL_OUT_OF_MEMORY)
-		CASE(GL_TABLE_TOO_LARGE)
-		default: break;
 	}
-	#undef CASE
-	//#undef POST
 	return false;
 }
 
@@ -143,6 +144,12 @@ void Graphics::viewport(int x, int y, int width, int height) {
 	glScissor(x, y, width, height);
 }
 
+Viewport Graphics::viewport() const {
+	GLint vp[4];
+	glGetIntegerv(GL_VIEWPORT, vp);
+	return Viewport(vp[0], vp[1], vp[2], vp[3]);
+}
+
 
 // Immediate Mode
 void Graphics::begin(Primitive v) {
@@ -194,24 +201,40 @@ void Graphics::color(double r, double g, double b, double a) {
 }
 
 // Buffer drawing
-void Graphics::draw(const Mesh& v){
-	draw(v.vertices().size(), v);
+void Graphics::draw(int num_vertices, const Mesh& m){
+	draw(m, num_vertices);
 }
 
-void Graphics::draw(int num_vertices, const Mesh& v){
-	const int Nv = al::min(num_vertices, v.vertices().size());
-	if(0 == Nv) return;
-	
-	const int Nc = al::min(num_vertices, v.colors().size());
-	const int Nci= al::min(num_vertices, v.coloris().size());
-	const int Nn = al::min(num_vertices, v.normals().size());
-	const int Nt2= al::min(num_vertices, v.texCoord2s().size());
-	const int Nt3= al::min(num_vertices, v.texCoord3s().size());
+void Graphics::draw(const Mesh& v, int count, int begin){
+
+	const int Nv = v.vertices().size();
+	if(0 == Nv) return; // nothing to draw, so just return...
+
 	const int Ni = v.indices().size();
+
+	const int Nmax = Ni ? Ni : Nv;
+
+	// Adjust negative amounts
+	if(count < 0) count += Nmax+1;
+	if(begin < 0) begin += Nmax+1;
+
+	// Safety checks...
+	//if(count > Nmax) count = Nmax;
+	//if(begin+count >= iend) return;
+
+	if(begin >= Nmax) return;	// Begin index past end?
+	if(begin + count > Nmax){	// If end index past end, then truncate it
+		count = Nmax - begin;
+	}
+
+	const int Nc = v.colors().size();
+	const int Nci= v.coloris().size();
+	const int Nn = v.normals().size();
+	const int Nt2= v.texCoord2s().size();
+	const int Nt3= v.texCoord3s().size();
 	
 	//printf("client %d, GPU %d\n", clientSide, gpuSide);
 	//printf("Nv %i Nc %i Nn %i Nt2 %i Nt3 %i Ni %i\n", Nv, Nc, Nn, Nt2, Nt3, Ni);
-
 
 	// Enable arrays and set pointers...
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -248,30 +271,22 @@ void Graphics::draw(int num_vertices, const Mesh& v){
 		if(Nt3 >= Nv) glTexCoordPointer(3, GL_FLOAT, 0, &v.texCoord3s()[0]);
 	}
 
-
 	// Draw
 	if(Ni){
-		//unsigned vs=0, ve=Nv;	// range of vertex indices to prefetch
-								// NOTE:	if this range exceeds the number of vertices,
-								//			expect a segmentation fault...
-		unsigned is=0, ie=Ni;	// range of indices to draw
-
-		//glDrawRangeElements(v.primitive(), vs, ve, ie-is, GL_UNSIGNED_INT, &v.indices()[is]);
 		glDrawElements(
 			((Graphics::Primitive)v.primitive()), 
-			ie-is, 
+			count, // number of indexed elements to render
 			GL_UNSIGNED_INT, 
-			&v.indices()[is]
+			&v.indices()[begin]
 		);
 	}
 	else{
 		glDrawArrays(
 			((Graphics::Primitive)v.primitive()), 
-			0,
-			Nv
+			begin,
+			count
 		);
 	}
-
 
 	// Disable arrays
 					glDisableClientState(GL_VERTEX_ARRAY);

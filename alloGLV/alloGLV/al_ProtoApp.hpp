@@ -45,14 +45,10 @@
 #include <string>
 #include "allocore/io/al_App.hpp"
 #include "alloGLV/al_ControlGLV.hpp"
-
 #include "GLV/glv.h"
 
-#define GAMMA_H_INC_ALL
-#include "Gamma/Gamma.h"
 
 namespace al{
-
 
 /// Application for audio/visual prototyping
 
@@ -62,15 +58,15 @@ namespace al{
 class ProtoApp : public App{
 public:
 
-	glv::NumberDialer cnFOV, cnScale;
+	glv::NumberDialer cnNear, cnFar, cnFOV, cnScale;
 	glv::NumberDialer cnGain;
 
 	ProtoApp();
-	
+
 	/// This should be called after configuring everything else with the app
 	void init(
 		const Window::Dim& dim = Window::Dim(800,600),
-		const std::string title="",
+		const std::string& title="",
 		double fps=40,
 		Window::DisplayMode mode = Window::DEFAULT_BUF,
 		double sampleRate = 44100,
@@ -78,10 +74,11 @@ public:
 		int chansOut = -1,
 		int chansIn = -1
 	);
-	
+
 	/// Set the directory for application resources
 	ProtoApp& resourceDir(const std::string& dir, bool searchBack=true);
-	
+
+	GLVDetachable& gui(){ return mGUI; }
 	glv::ParamPanel& paramPanel(){ return mParamPanel; }
 
 	ProtoApp& addParam(
@@ -103,7 +100,10 @@ public:
 
 	/// This should still be called via ProtoApp::onAnimate(dt) if overridden
 	virtual void onAnimate(double dt){
-		lens().fovy(cnFOV.getValue());
+		lens()
+			.near(cnNear.getValue())
+			.far(cnFar.getValue())
+			.fovy(cnFOV.getValue());
 	}
 
 //	virtual void onDraw(Graphics& g, const Viewpoint& v){}

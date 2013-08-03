@@ -49,9 +49,27 @@
 #include "allocore/math/al_Matrix4.hpp"
 #include "allocore/types/al_Array.hpp"
 #include "allocore/types/al_Color.hpp"
+#include "allocore/system/al_Printing.hpp"
 
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_OpenGL.hpp"
+
+
+/*!
+	\def AL_GRAPHICS_ERROR(msg, ID)
+	Used for reporting graphics errors from source files
+*/
+#ifdef AL_ENABLE_DEBUG
+#define AL_GRAPHICS_ERROR(msg, ID)\
+{	const char * errStr = al::Graphics::errorString();\
+	if(errStr[0]){\
+		if(ID>=0)	AL_WARN_ONCE("Error " msg " (id=%d): %s", ID, errStr);\
+		else		AL_WARN_ONCE("Error " msg ": %s", errStr);\
+	}\
+}
+#else
+#define AL_GRAPHICS_ERROR(msg, ID) ((void)0)
+#endif
 
 
 namespace al {
@@ -293,7 +311,7 @@ public:
 	void clearColor(float r, float g, float b, float a);
 	
 	/// Set clear color
-	void clearColor(const Color& color) { clearColor(color.r, color.g, color.b, color.a); }
+	void clearColor(const Color& color);
 
 
 	/// Set linear fog parameters
@@ -305,13 +323,16 @@ public:
 
 
 	// Coordinate Transforms
-//	void scissor(int x, int y, int width, int height);
-//	void scissor(const Viewport& v){ scissor(v.l,v.b,v.w,v.h); }
-//	/// Set viewport and scissor region
-//	void viewportScissor(const Viewport& v){ viewport(v); scissor(v); }
 
-	void viewport(int x, int y, int width, int height);
+	/// Set viewport
+	void viewport(int left, int bottom, int width, int height);
+	
+	/// Set viewport
 	void viewport(const Viewport& v){ viewport(v.l,v.b,v.w,v.h); }
+
+	/// Get current viewport
+	Viewport viewport() const;
+
 
 	/// Set current matrix
 	void matrixMode(MatrixMode mode);
@@ -363,25 +384,27 @@ public:
 	/// Rotate current matrix
 	
 	/// \param[in] angle	angle, in degrees
-	/// \param[in] v		rotation axis
-	void rotate(double angle, const Vec3d& v) { rotate(angle, v[0], v[1], v[2]); }
+	/// \param[in] axis		rotation axis
+	template <class T>
+	void rotate(double angle, const Vec<3,T>& axis){
+		rotate(angle, axis[0],axis[1],axis[2]); }
 
 	/// Scale current matrix uniformly
-	void scale(double s) { scale(s, s, s); }
+	void scale(double s){ scale(s, s, s); }
 
 	/// Scale current matrix along each dimension
 	void scale(double x, double y, double z=1.);
 	
 	/// Scale current matrix along each dimension
-	void scale(const Vec3d& v) { scale(v[0], v[1], v[2]); }
-	void scale(const Vec3f& v) { scale(v[0], v[1], v[2]); }
+	template <class T>
+	void scale(const Vec<3,T>& v){ scale(v[0],v[1],v[2]); }
 
 	/// Translate current matrix
 	void translate(double x, double y, double z=1.);
 
 	/// Translate current matrix
-	void translate(const Vec3d& v) { translate(v[0], v[1], v[2]); }
-	void translate(const Vec3f& v) { translate(v[0], v[1], v[2]); }
+	template <class T>
+	void translate(const Vec<3,T>& v){ translate(v[0],v[1],v[2]); }
 
 
 	// Immediate Mode
@@ -397,24 +420,33 @@ public:
 
 	/// Add vertex (immediate mode)
 	void vertex(double x, double y, double z=0.);
-	void vertex(const Vec2d& v) { vertex(v[0], v[1], 0); }
-	void vertex(const Vec2f& v) { vertex(v[0], v[1], 0); }
-	void vertex(const Vec3d& v) { vertex(v[0], v[1], v[2]); }
-	void vertex(const Vec3f& v) { vertex(v[0], v[1], v[2]); }
+
+	template<class T>
+	void vertex(const Vec<2,T>& v){ vertex(v[0],v[1],T(0)); }
+
+	template<class T>
+	void vertex(const Vec<3,T>& v){ vertex(v[0],v[1],v[2]); }
+
 	
 	/// Add texture coordinate (immediate mode)
 	void texCoord(double u, double v);
-	void texCoord(const Vec2d& v) { texCoord(v[0], v[1]); }
-	void texCoord(const Vec2f& v) { texCoord(v[0], v[1]); }
+
+	template<class T>
+	void texCoord(const Vec<2,T>& v){ texCoord(v[0],v[1]); }
+
 	void texCoord(double u, double v, double w);
-	void texCoord(const Vec3d& v) { texCoord(v[0], v[1], v[2]); }
-	void texCoord(const Vec3f& v) { texCoord(v[0], v[1], v[2]); }
-	
+
+	template<class T>
+	void texCoord(const Vec<3,T>& v){ texCoord(v[0],v[1],v[2]); }
+
+
 	/// Add normal (immediate mode)
 	void normal(double x, double y, double z=0.);
-	void normal(const Vec3d& v) { normal(v[0], v[1], v[2]); }
-	void normal(const Vec3f& v) { normal(v[0], v[1], v[2]); }
-	
+
+	template<class T>
+	void normal(const Vec<3,T>& v){ normal(v[0],v[1],v[2]); }
+
+
 	/// Add color (immediate mode)
 	void color(double r, double g, double b, double a=1.);
 	void color(double gray, double a=1.) { color(gray, gray, gray, a); }
@@ -426,16 +458,15 @@ public:
 
 	/// Draw vertex data
 	
-	/// @param[in] v		vertex data to draw
+	/// This draws a range of vertices from a mesh. If the mesh contains
+	/// vertex indices, then the range corresponds to the vertex indices array.
+	/// Negative count or index amounts are relative to one plus the maximum 
+	/// possible value.
 	///
-	void draw(const Mesh& v);
-
-	/// Draw vertex data
-	
-	/// @param[in] numVertices	maximum number of vertices to draw. This is 
-	///							valid only for non-indexed vertex data.
-	/// @param[in] v			vertex data to draw
-	void draw(int numVertices, const Mesh& v);
+	/// @param[in] m		Vertex data to draw
+	/// @param[in] count	Number of vertices or indices to draw
+	/// @param[in] begin	Begin index of vertices or indices to draw (inclusive)
+	void draw(const Mesh& m, int count=-1, int begin=0);
 	
 	/// Draw internal vertex data
 	void draw(){ draw(mMesh); }
@@ -443,10 +474,18 @@ public:
 
 	// Utility functions: converting, reporting, etc.
 
-	/// Print current error state
-	static bool error(const char *msg="");
+	/// Print current GPU error state
 
-	static bool error(int ID, const char * msg);
+	/// @param[in] msg		Custom error message
+	/// @param[in] ID		Graphics object ID (-1 for none)
+	/// \returns whether there was an error
+	static bool error(const char *msg="", int ID=-1);
+
+	/// Get current GPU error string
+
+	/// \returns the error string or an empty string if no error
+	///
+	static const char * errorString(bool verbose=false);
 
 	/// Returns number of components for given color type
 	static int numComponents(Format v);
@@ -459,7 +498,10 @@ public:
 
 	/// Returns DataType for a given AlloTy
 	static DataType toDataType(AlloTy type);
-	
+
+
+	void draw(int numVertices, const Mesh& v);
+
 protected:
 	Mesh mMesh;				// used for immediate mode style rendering
 	bool mInImmediateMode;	// flag for whether or not in immediate mode
@@ -478,11 +520,11 @@ public:
 };
 
 
-
 // ============== INLINE ============== 
 
 inline void Graphics::clear(AttributeBit bits){ glClear(bits); }
 inline void Graphics::clearColor(float r, float g, float b, float a){ glClearColor(r, g, b, a); }
+inline void Graphics::clearColor(const Color& c) { clearColor(c.r, c.g, c.b, c.a); }
 
 inline void Graphics::blendMode(BlendFunc src, BlendFunc dst, BlendEq eq){
 	glBlendEquation(eq);
@@ -529,8 +571,6 @@ inline void Graphics::pointAtten(float c2, float c1, float c0){
 inline void Graphics::polygonMode(PolygonMode m, Face f){ glPolygonMode(f,m); }
 inline void Graphics::shadeModel(ShadeModel m){ glShadeModel(m); }
 inline void Graphics::currentColor(float r, float g, float b, float a){ glColor4f(r,g,b,a); }
-
-
 
 inline Graphics::AttributeBit operator| (const Graphics::AttributeBit& a, const Graphics::AttributeBit& b){
 	return static_cast<Graphics::AttributeBit>(+a|+b);

@@ -138,17 +138,17 @@ int utMath(){
 		t = a.sub<2>(2);		assert(t[0] == 2 && t[1] == 3);
 		}
 		
-		assert(angle(Vec3d(1,0,0), Vec3d(1,0,0)) == 0);
-		assert(angle(Vec3d(1,0,0), Vec3d(0,1,0)) == M_PI_2);
-		assert(angle(Vec3d(1,0,0), Vec3d(0,-1,0)) == M_PI_2);
+		assert(eq(angle(Vec3d(1,0,0), Vec3d(1, 0, 0)), 0.));
+		assert(eq(angle(Vec3d(1,0,0), Vec3d(0, 1, 0)), M_PI_2));
+		assert(eq(angle(Vec3d(1,0,0), Vec3d(0,-1, 0)), M_PI_2));
 		
 		{
 		Vec3d r;
 		centroid3(r, Vec3d(1,0,0), Vec3d(0,1,0), Vec3d(0,0,1));
-		assert(r == 1/3.);
+		assert(eq(r, Vec3d(1/3.)));
 		
 		normal(r, Vec3d(1,0,0), Vec3d(0,1,0), Vec3d(-1,0,0));
-		assert(r == Vec3d(0,0,1));
+		assert(eq(r, Vec3d(0,0,1)));
 		
 		Vec3d pos(1,2,3);
 		Vec3d to(4,5,6);

@@ -142,8 +142,8 @@ public:
 
 
 	/// @param[in] size		number of worker threads
-	Threads(int size)
-	:	mWorkers(0)
+	Threads(int size = 0)
+	:	mSize(0), mWorkers(0)
 	{
 		resize(size);
 	}

@@ -12,23 +12,21 @@ RUN_DIRS	+= examples/
 SRCS		:= $(wildcard $(SRC_DIR)/*.c*)
 OBJS		:= $(addsuffix .o, $(basename $(notdir $(SRCS))))
 
+CPPFLAGS	+= -I./ -I$(BUILD_DIR)include
+
 # include dependency headers directly
 CPPFLAGS	+= -I../allocore/
 CPPFLAGS	+= -I../../GLV/
-CPPFLAGS	+= -I../../Gamma/
 
 # include dependencies from parent build folder
 CPPFLAGS	+= -I../build/include/
 LDFLAGS		+= -L../build/lib/
-
-CPPFLAGS	+= -I./ -I$(BUILD_DIR)include
 
 LINK_LDFLAGS	+= -lGLV
 
 # include all the linker flags
 -include ../allocore/Makefile.link
 -include ../../GLV/Makefile.link
--include ../../Gamma/Makefile.link
 
 
 include ../Makefile.common

@@ -58,7 +58,7 @@ void warnOnce(const char * msg){
 
 
 void _warn(const char * fileName, int lineNumber, const char * fmt, ...){
-	fprintf(stderr, "From %s:%d: ", fileName, lineNumber);
+	fprintf(stderr, "%s:%d: ", fileName, lineNumber);
 	va_list arg;
 	va_start(arg, fmt);
 	vfprintf(stderr, fmt, arg);
@@ -80,8 +80,7 @@ void _warnOnce(const char * fileName, int lineNumber, const char * fmt, ...){
 
 	if(0==M.count(msg)){
 		M[msg]=1;
-		fprintf(stderr, "From %s:%d: ", fileName, lineNumber);
-		fprintf(stderr, "%s", buf);
+		fprintf(stderr, "%s:%d: %s", fileName, lineNumber, buf);
 	}
 }
 

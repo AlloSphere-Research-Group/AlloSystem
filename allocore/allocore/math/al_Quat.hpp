@@ -48,14 +48,6 @@
 #include "allocore/math/al_Mat.hpp"
 #include "allocore/math/al_Vec.hpp"
 
-#define QUAT_ACCURACY_MAX (1.000001)
-#define QUAT_ACCURACY_MIN (0.999999)
-#define QUAT_EPSILON (0.0000001)
-//#define QUAT_DEG2RAD_BY2 (M_DEG2RAD/2.)
-
-#ifndef ABS
-	#define ABS(x) ((x)<0?-(x):(x))
-#endif
 
 namespace al {
 
@@ -80,7 +72,6 @@ public:
 		};
 		T components[4];	///< component vector
 	};
-
 
 
 	///
@@ -212,9 +203,8 @@ public:
 	/// Set to identity
 	Quat& setIdentity(){ return (*this) = Quat::identity(); }
 
-	/// Set as versor rotated by angle, in radians, around unit vector
-	/// (x1,y1,z1) MUST BE A UNIT VECTOR
-	Quat& fromAxisAngle(const T& angle, const T& x1, const T& y1, const T& z1);
+	/// Set as versor rotated by angle, in radians, around unit vector (ux,uy,uz)
+	Quat& fromAxisAngle(const T& angle, const T& ux, const T& uy, const T& uz);
 
 	/// Set as versor rotated by angle, in radians, around unit vector
 	Quat& fromAxisAngle(const T& angle, const Vec<3,T>& axis);
@@ -313,14 +303,12 @@ public:
 	void print(FILE * out = stdout) const { fprintf(out, "Quat(%f, %f, %f, %f)\n", w, x, y, z); }
 
 
-//	/// these are 180 degree rotations around the various axes:
-//	void flipX() { return set(T(0), T(1), T(0), T(0)); } 
-//	void flipY() { return set(T(0), T(0), T(1), T(0)); } 
-//	void flipZ() { return set(T(0), T(0), T(0), T(1)); }
+	static T accuracyMax(){ return 1.000001; }
+	static T accuracyMin(){ return 0.999999; }
+	static T eps(){ return 0.0000001; }
 
-protected:
-//	static const double degToHalfRad(){ return 0.5*M_DEG2RAD; }
-//	static const double halfRadToDeg(){ return 2.0*M_RAD2DEG; }
+private:
+	static T abs(T v){ return v>T(0) ? v : -v; }
 };
 
 template<class T> Quat<T> operator + (T r, const Quat<T>& q){ return  q+r; }
@@ -337,11 +325,11 @@ template<class T> Quat<T> operator / (T r, const Quat<T>& q){ return  q.conjugat
 template<typename T>
 inline Quat<T>& Quat<T> :: normalize() {
 	T unit = magSqr();
-	if(unit*unit < QUAT_EPSILON){
+	if(unit*unit < eps()){
 		// unit too close to epsilon, set to default transform
 		setIdentity();
 	}
-	else if(unit > QUAT_ACCURACY_MAX || unit < QUAT_ACCURACY_MIN){
+	else if(unit > accuracyMax() || unit < accuracyMin()){
 		(*this) *= 1./sqrt(unit);
 	}
 	return *this;
@@ -365,18 +353,18 @@ inline Quat<T> Quat<T> :: reverseMultiply(const Quat<T> & q) const {
 
 template<typename T>
 inline Quat<T>& Quat<T> :: fromAxisAngle(const T& angle, const Vec<3,T>& axis) {
-	T t2 = angle * T(0.5);
-	T sinft2 = sin(t2);	
-	w = cos(t2);
-	x = axis[0] * sinft2;
-	y = axis[1] * sinft2;
-	z = axis[2] * sinft2;
-	return *this;
+	return fromAxisAngle(angle, axis[0],axis[1],axis[2]);
 }
 
 template<typename T>
-inline Quat<T>& Quat<T> :: fromAxisAngle(const T& angle, const T& x1, const T& y1, const T& z1) {
-	return fromAxisAngle(angle, Vec<3,T>(x1, y1, z1));
+inline Quat<T>& Quat<T> :: fromAxisAngle(const T& angle, const T& ux, const T& uy, const T& uz) {
+	T t2 = angle * T(0.5);
+	T sinft2 = sin(t2);	
+	w = cos(t2);
+	x = ux * sinft2;
+	y = uy * sinft2;
+	z = uz * sinft2;
+	return *this;
 }
 
 template<typename T>
@@ -490,7 +478,7 @@ inline Quat<T>& Quat<T> :: fromMatrixTransposed(const T * m) {
 template<typename T>
 inline void Quat<T> :: toAxisAngle(T& aa, T& ax, T& ay, T& az) const {
 	T unit = w*w;
-	if(unit < QUAT_ACCURACY_MIN){ // |cos x| must always be less than or equal to 1!
+	if(unit < accuracyMin()){ // |cos x| must always be less than or equal to 1!
 		T invSinAngle = 1./sqrt(1. - unit); // = 1/sqrt(1 - cos^2(theta/2))
 
 		aa = ::acos(w) * T(2);
@@ -668,7 +656,7 @@ Quat<T> Quat<T> :: slerp(const Quat& input, const Quat& target, T amt){
 	}
 
 	T cos_angle = acos(dot_prod);
-	if(ABS(cos_angle) > QUAT_EPSILON) {
+	if(Quat::abs(cos_angle) > eps()) {
 		T sine = sin(cos_angle);
 		T inv_sine = 1./sine;
 
@@ -736,7 +724,7 @@ void Quat<T> :: slerpBuffer(const Quat& input, const Quat& target, Quat<T> * buf
 	const T cos_angle = acos(dot_prod);
 	const T inv_frames = 1./((T)numFrames);
 
-	if(ABS(cos_angle) > QUAT_EPSILON)
+	if(Quat::abs(cos_angle) > eps())
 	{
 		const T sine = sin(cos_angle);
 		const T inv_sine = 1./sine;
@@ -839,7 +827,7 @@ void Quat<T> :: towardPoint(const Vec<3,T>& pos, const Quat<T>& q, const Vec<3,T
 	}
 
 	if(along < 0.9995 && axis_mag_sqr > 0.001) {
-		float theta = ABS(amt)*acos(along);
+		float theta = Quat::abs(amt)*acos(along);
 //			printf("theta: %f  amt: %f\n", theta, amt);
 		fromAxisAngle(theta, axis[0], axis[1], axis[2]);
 	}

@@ -1,12 +1,21 @@
 #RUN_INC_DIRS	?=
 #RUN_SRC_DIRS	?=
-RUN_DIRS	+= examples/
+RUN_DIRS	+= examples/ work/
 
 VPATH += $(RUN_SRC_DIRS)
+CPPFLAGS := -I$(BUILD_DIR)/include/ $(CPPFLAGS)
+CPPFLAGS := $(addprefix -I, $(RUN_SRC_DIRS)) $(CPPFLAGS)
 
-RUN_SRCS	=  $(wildcard $(addsuffix /*.cpp, $(RUN_SRC_DIRS)))
+RUN_SRCS	 = $(wildcard $(addsuffix /*.cpp, $(RUN_SRC_DIRS)))
+RUN_SRCS	+= $(wildcard $(addsuffix /*.cc, $(RUN_SRC_DIRS)))
 RUN_SRCS	+= $(wildcard $(addsuffix /*.c, $(RUN_SRC_DIRS)))
-RUN_OBJS	=  $(addsuffix .o, $(basename $(notdir $(RUN_SRCS)) ))
+
+# Add Objective-C++ support if using OSX
+ifeq ($(PLATFORM), macosx)
+RUN_SRCS	+= $(wildcard $(addsuffix /*.mm, $(RUN_SRC_DIRS)))
+endif
+
+RUN_OBJS	 = $(addsuffix .o, $(basename $(notdir $(RUN_SRCS)) ))
 #RUN_OBJS	:= $(addsuffix .o, $(basename $(subst /,_,$(RUN_OBJS)) ))
 RUN_OBJS	:= $(addprefix $(OBJ_DIR), $(RUN_OBJS))
 
@@ -31,8 +40,8 @@ endif
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS): MY_FLAGS = $(shell test -e $(@D)/flags.txt && cat $(@D)/flags.txt)
 #$(EXEC_TARGETS): MY_FLAGS += -l$(LIB_NAME)
-$(EXEC_TARGETS): FORCE $(ALL_BUILD_DIRS) $(LIB_PATH) runobjs
-	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ -I$(BUILD_DIR)/include/ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(subst $$(PROJECT_DIR),$(@D)/,$(MY_FLAGS))
+$(EXEC_TARGETS): FORCE $(BIN_DIR) $(ALL_BUILD_DIRS) $(LIB_PATH) runobjs
+	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(subst $$(PROJECT_DIR),$(@D)/,$(MY_FLAGS))
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./$(*F)
 endif
