@@ -274,8 +274,9 @@ void PacketHandler::parse(const char *packet, int size, TimeTag timeTag){
 			::osc::ReceivedBundleElementIterator it = r.ElementsBegin();
 			
 			while(it != r.ElementsEnd()){
-				const ::osc::ReceivedBundleElement& e = *it++;
+				const ::osc::ReceivedBundleElement& e = *it;
 				parse(e.Contents(), e.Size(), r.TimeTag());
+				it++;
 			}
 			
 		}
