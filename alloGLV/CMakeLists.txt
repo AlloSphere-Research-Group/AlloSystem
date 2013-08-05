@@ -1,6 +1,9 @@
 cmake_minimum_required (VERSION 2.8)
 project (alloGLV)
 
+message("Building alloGLV.")
+set(CMAKE_BUILD_TYPE Release)
+
 aux_source_directory(src ALLOGLV_SRC)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
@@ -22,8 +25,7 @@ set(ALLOCORE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../allocore)
 set(ALLOCORE_LIBRARY allocore)
 get_property(allocore_location TARGET allocore PROPERTY LOCATION)
 message (STATUS "allocore_location for alloGLV == ${allocore_location}")
-
-set(GLV_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../GLV)
+set(GLV_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../GLV)
 set(GLV_LIBRARY allocore)
 get_property(glv_location TARGET GLV PROPERTY LOCATION)
 message (STATUS "glv_location for alloGLV == ${glv_location}")

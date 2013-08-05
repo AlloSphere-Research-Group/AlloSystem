@@ -1,6 +1,9 @@
 cmake_minimum_required (VERSION 2.8)
 project (Allocore)
 
+message("Building allocore.")
+set(CMAKE_BUILD_TYPE Release)
+
 # Allocore Library
 set(ALLOCORE_SRC src/graphics/al_Asset.cpp
 src/graphics/al_FBO.cpp

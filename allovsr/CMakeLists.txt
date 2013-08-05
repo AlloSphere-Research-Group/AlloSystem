@@ -1,7 +1,8 @@
 cmake_minimum_required (VERSION 2.8)
 project (Allovsr)
 
-set(ALLOVSR_BUILD_EXAMPLES 1)
+message("Building allovsr.")
+set(CMAKE_BUILD_TYPE Release)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../cmake_modules")
@@ -16,16 +17,16 @@ set(ALLOCORE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../allocore)
 set(ALLOCORE_LIBRARY allocore)
 set(ALLOGLV_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../alloGLV)
 set(ALLOGLV_LIBRARY alloGLV)
+set(VSR_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../vsr)
+set(VSR_LIBRARY vsr)
 get_property(allocore_location TARGET allocore PROPERTY LOCATION)
 message (STATUS "allocore_location for allovsr == ${allocore_location}")
 else()
 find_package(Allocore REQUIRED)
 find_package(AlloGLV REQUIRED)
+find_package(vsr REQUIRED)
 endif(ALLOSYSTEM_BUILD)
 
-
-# --- Check for vsr
-find_package(vsr REQUIRED)
 message (STATUS "vsr_location for allovsr == ${VSR_INCLUDE_DIR}")
 
 # --- configure

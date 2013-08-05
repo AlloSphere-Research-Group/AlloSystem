@@ -1,6 +1,9 @@
 cmake_minimum_required (VERSION 2.8)
 project (Alloutil)
 
+message("Building alloutil.")
+set(CMAKE_BUILD_TYPE Release)
+
 set(ALLOUTIL_BUILD_EXAMPLES 1)
 
 set(ALLOUTIL_SRC
