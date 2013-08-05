@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8)
 project (Allocore)
 
-message("Building allocore.")
+message("==== Configuring allocore.")
 set(CMAKE_BUILD_TYPE Release)
 
 # Allocore Library
@@ -79,34 +79,17 @@ endif()
 # Dependencies
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../cmake_modules")
-find_package(Portaudio REQUIRED)
-message("-- Portaudio headers: ${PORTAUDIO_INCLUDE_DIRS}   ${PORTAUDIO_DEFINITIONS}")
-find_package(LibSndFile REQUIRED)
-message("-- libsndfile headers: ${SNDFILE_INCLUDE_DIRS}")
-
-find_package(APR REQUIRED)
-find_package(Assimp REQUIRED)
-find_package(FreeImage REQUIRED)
-find_package(Freetype REQUIRED)
-find_package(GLEW REQUIRED)
-find_package(GLUT REQUIRED)
-find_package(LibSndFile REQUIRED)
-find_package(OpenGL REQUIRED)
-find_package(Portaudio REQUIRED)
-
-set(ALLOCORE_INCLUDE_DIRS ${APR_INCLUDE_DIR}
-  ${ASSIMP_INCLUDE_DIR}
-  ${FREEIMAGE_INCLUDE_DIR}
-  ${FREETYPE_INCLUDE_DIRS}
-  ${GLEW_INCLUDE_DIR}
-  ${GLUT_INCLUDE_DIR}
-  ${LIBSNDFILE_INCLUDE_DIR}
-  ${OPENGL_INCLUDE_DIR}
-  ${PORTAUDIO_INCLUDE_DIR}
-  ${PORTAUDIO_INCLUDE_DIRS}
-  ${SNDFILE_INCLUDE_DIRS})
-
-include_directories(${ALLOCORE_INCLUDE_DIRS})
+find_package(Portaudio REQUIRED QUIET)
+find_package(LibSndFile REQUIRED QUIET)
+find_package(APR REQUIRED QUIET)
+find_package(Assimp REQUIRED QUIET)
+find_package(FreeImage REQUIRED QUIET)
+find_package(Freetype REQUIRED QUIET)
+find_package(GLEW REQUIRED QUIET)
+find_package(GLUT REQUIRED QUIET)
+find_package(LibSndFile REQUIRED QUIET)
+find_package(OpenGL REQUIRED QUIET)
+find_package(Portaudio REQUIRED QUIET)
 
 # System dependent libs
 # ---- OS X ----
@@ -133,12 +116,11 @@ add_definitions(-DAL_LINUX)
 
 set(LINUX_LIBS ${LINUX_LIBS} avahi-common avahi-client)
 # For HID
-find_package(Udev REQUIRED)
+find_package(Udev REQUIRED QUIET)
 include_directories(${UDEV_INCLUDE_DIR})
-find_package(Libusb REQUIRED)
+find_package(Libusb REQUIRED QUIET)
 set(LINUX_LIBS ${LINUX_LIBS} ${LIBUSB_1_LIBRARY} ${UDEV_LIBRARY})
-message("libudev lib = ${UDEV_LIBRARY}")
-
+#message("libudev lib = ${UDEV_LIBRARY}")
 endif()
 
 # ---- Windows ----
@@ -147,6 +129,21 @@ add_definitions(-DAL_WINDOWS)
 # For HID
 set(WINDOWS_LIBS windows setupapi)
 endif()
+
+# Include directories
+set(ALLOCORE_INCLUDE_DIRS ${APR_INCLUDE_DIR}
+  ${ASSIMP_INCLUDE_DIR}
+  ${FREEIMAGE_INCLUDE_DIR}
+  ${FREETYPE_INCLUDE_DIRS}
+  ${GLEW_INCLUDE_DIR}
+  ${GLUT_INCLUDE_DIR}
+  ${LIBSNDFILE_INCLUDE_DIR}
+  ${OPENGL_INCLUDE_DIR}
+  ${PORTAUDIO_INCLUDE_DIR}
+  ${PORTAUDIO_INCLUDE_DIRS}
+  ${SNDFILE_INCLUDE_DIRS})
+
+include_directories(${ALLOCORE_INCLUDE_DIRS})
 
 # Link libraries
 set(ALLOCORE_LINK_LIBRARIES ${ALLOCORE_LINK_LIBRARIES}
@@ -167,6 +164,7 @@ ${WINDOWS_LIBS})
 
 target_link_libraries(allocore ${ALLOCORE_LINK_LIBRARIES})
 
+
 #--------------------------------------------------------------------------
 # Examples
 if(NOT NO_EXAMPLES)
@@ -175,13 +173,13 @@ foreach(dir ${EXAMPLE_DIRS})
   file(GLOB EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/${dir}/*.cpp)
   foreach(example ${EXAMPLE_FILES})
 	get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
-	add_executable(${dir}_${EXAMPLE_NAME} ${example})
-	target_link_libraries(${dir}_${EXAMPLE_NAME} allocore ${ALLOCORE_LINK_LIBRARIES})
+        add_executable(allocore_${dir}_${EXAMPLE_NAME} ${example})
+        target_link_libraries(allocore_${dir}_${EXAMPLE_NAME} allocore ${ALLOCORE_LINK_LIBRARIES})
 	if (apple)
 	  find_library(AUDIOUNIT_FM AudioUnit)
-	  target_link_libraries(${dir}_${EXAMPLE_NAME} ${AUDIOUNIT_FM})
+          target_link_libraries(allocore_${dir}_${EXAMPLE_NAME} ${AUDIOUNIT_FM})
         endif()
-        target_link_libraries(${dir}_${EXAMPLE_NAME} ${EXAMPLE_LINUX_LIBS})
+        target_link_libraries(allocore_${dir}_${EXAMPLE_NAME} ${EXAMPLE_LINUX_LIBS})
   endforeach(example)
 endforeach(dir)
 

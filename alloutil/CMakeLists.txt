@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8)
 project (Alloutil)
 
-message("Building alloutil.")
+message("==== Configuring alloutil.")
 set(CMAKE_BUILD_TYPE Release)
 
 set(ALLOUTIL_BUILD_EXAMPLES 1)
@@ -41,20 +41,20 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 
 # Examples
 if(NOT NO_EXAMPLES)
-find_package(APR REQUIRED)
-find_package(Assimp REQUIRED)
-find_package(FreeImage REQUIRED)
-find_package(Freetype REQUIRED)
-find_package(GLEW REQUIRED)
-find_package(GLUT REQUIRED)
-find_package(LibSndFile REQUIRED)
-find_package(OpenGL REQUIRED)
-find_package(Portaudio REQUIRED)
-find_package(Gamma)
+find_package(APR REQUIRED QUIET)
+find_package(Assimp REQUIRED QUIET)
+find_package(FreeImage REQUIRED QUIET)
+find_package(Freetype REQUIRED QUIET)
+find_package(GLEW REQUIRED QUIET)
+find_package(GLUT REQUIRED QUIET)
+find_package(LibSndFile REQUIRED QUIET)
+find_package(OpenGL REQUIRED QUIET)
+find_package(Portaudio REQUIRED QUIET)
+find_package(Gamma QUIET)
 
 if(NOT GAMMA_FOUND)
-message( FATAL_ERROR "Gamma is required to build alloutil examples, and it was not found. You can run cmake with -DNO_EXAMPLES=1 to disable examples." )
-endif(NOT GAMMA_FOUND)
+message("Alloutil: Gamma not found. Not building examples." )
+else()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 # Needed by portaudio
@@ -104,6 +104,7 @@ get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
 add_executable(alloutil_${EXAMPLE_NAME} ${example})
 target_link_libraries(alloutil_${EXAMPLE_NAME} alloutil ${ALLOUTIL_LINK_LIBRARIES} ${ALLOCORE_LINK_LIBRARIES})
 endforeach(example)
+endif(NOT GAMMA_FOUND)
 endif(NOT NO_EXAMPLES)
 
 
