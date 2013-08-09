@@ -9,7 +9,38 @@ if [ `which apt-get 2>/dev/null` ]; then
 	sudo apt-get install libglew-dev freeglut3-dev 
 	sudo apt-get install libavahi-client-dev	# for protocol/al_ZeroConf
 	sudo apt-get install libudev-dev libusb-1.0-0-dev # for io/al_HID
-	sudo apt-get install libassimp-dev=2.0.863+dfsg-2 libfreeimage-dev libfreetype6-dev
+	sudo apt-get install libfreeimage-dev libfreetype6-dev
+	
+	# Ensure that assimp3 headers are being installed.
+	available_assimp_version=$(apt-cache madison libassimp-dev | head -1 | cut -f2 -d\|)
+	assimp3_available=$(dpkg --compare-versions ${available_assimp_version} ge 3);
+
+	if [[ $assimp3_available -eq $zero ]]; then
+  		sudo apt-get install libassimp-dev
+	# Otherwise build assimp3 from source and install.
+	else
+		pushd .
+
+		TMP_DIR=$(mktemp -d)
+		cd ${TMP_DIR}
+
+		wget http://downloads.sourceforge.net/project/assimp/assimp-3.0/assimp--3.0.1270-s$
+		# Only one dependency and it's a whopper!
+		wget http://downloads.sourceforge.net/project/boost/boost/1.54.0/boost_1_54_0.tar.$
+
+		unzip -qq assimp--3.0.1270-source-only.zip
+		tar -zxf boost_1_54_0.tar.gz
+
+		cd assimp--3.0.1270-source-only
+		export BOOST_ROOT="../boost_1_54_0"
+		cmake .
+		make
+		sudo make install
+
+		unset BOOST_ROOT
+
+		popd
+	fi
 
 elif [ `which port 2>/dev/null` ]; then
 	echo "Found MacPorts"
