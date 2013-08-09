@@ -48,8 +48,8 @@
 
 #include "GLV/glv.h"
 
-#define GAMMA_H_INC_ALL
-#include "Gamma/Gamma.h"
+//#define GAMMA_H_INC_ALL
+//#include "Gamma/Gamma.h"
 
 namespace al{
 
