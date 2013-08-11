@@ -8,10 +8,10 @@ set(CMAKE_BUILD_TYPE Release)
 add_subdirectory(allocore)
 
 set(ALLOSYSTEM_BUILD 1) # Bulding all of allosystem
-set(BUILD_GAMMA 1)
-set(BUILD_GLV 1)
-set(BUILD_ALLOGLV 1)
-set(BUILD_ALLOUTIL 1)
+#set(BUILD_GAMMA 1)
+#set(BUILD_GLV 1)
+#set(BUILD_ALLOGLV 1)
+#set(BUILD_ALLOUTIL 1)
 
 # check for Lua to build alloutil --------------------------
 find_package(Lua51 QUIET)
@@ -61,7 +61,7 @@ if(BUILD_ALLOGLV)
       set(GLV_INCLUDE_DIR ${GLV_RELATIVE_DIR})
     endif()
   endif(BUILDING_GLV)
-if(BUILD_ALLOGLV)
+endif(BUILD_ALLOGLV)
 
 # check for vsr to build allovsr ----------------------------------
 set(VSR_RELATIVE_DIR ${CMAKE_SOURCE_DIR}/../vsr)

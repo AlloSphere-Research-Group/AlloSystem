@@ -77,8 +77,8 @@ else()
 endif()
 
 # Dependencies
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules")
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../cmake_modules")
 find_package(Portaudio REQUIRED QUIET)
 find_package(LibSndFile REQUIRED QUIET)
 find_package(APR REQUIRED QUIET)
