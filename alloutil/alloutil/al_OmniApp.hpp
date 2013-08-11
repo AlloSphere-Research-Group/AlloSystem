@@ -230,6 +230,7 @@ inline bool OmniApp::onCreate() {
 	mShader.printLog();
 	mShader.begin();
 	mShader.uniform("lighting", 1.0);
+	mShader.uniform("texture", 0.0);
 	mShader.end();
 	
 	return true;
@@ -304,6 +305,7 @@ inline std::string	OmniApp::vertexCode() {
 	return AL_STRINGIFY(
 		varying vec4 color;
 		varying vec3 normal, lightDir, eyeVec;
+
 		void main(){
 			color = gl_Color;
 			vec4 vertex = gl_ModelViewMatrix * gl_Vertex;
@@ -311,6 +313,7 @@ inline std::string	OmniApp::vertexCode() {
 			vec3 V = vertex.xyz;
 			eyeVec = normalize(-V);
 			lightDir = normalize(vec3(gl_LightSource[0].position.xyz - V));
+			gl_TexCoord[0] = gl_MultiTexCoord0;
 			gl_Position = omni_render(vertex); 
 		}
 	);
@@ -319,19 +322,30 @@ inline std::string	OmniApp::vertexCode() {
 inline std::string OmniApp::fragmentCode() {
 	return AL_STRINGIFY(
 		uniform float lighting;
+		uniform float texture;
+		uniform sampler2D texture0;
 		varying vec4 color;
 		varying vec3 normal, lightDir, eyeVec;
     	void main() {
-			vec4 final_color = color * gl_LightSource[0].ambient;
+    		
+    		vec4 colorMixed;
+    		if( texture > 0.0){
+    			vec4 textureColor = texture2D(texture0, gl_TexCoord[0].st);
+    			colorMixed = mix(color, textureColor, texture);
+    		}else{
+    			colorMixed = color;
+    		}
+
+			vec4 final_color = colorMixed * gl_LightSource[0].ambient;
 			vec3 N = normalize(normal);
 			vec3 L = lightDir;
 			float lambertTerm = max(dot(N, L), 0.0);
-			final_color += gl_LightSource[0].diffuse * color * lambertTerm;
+			final_color += gl_LightSource[0].diffuse * colorMixed * lambertTerm;
 			vec3 E = eyeVec;
 			vec3 R = reflect(-L, N);
 			float spec = pow(max(dot(R, E), 0.0), 0.9 + 1e-20);
 			final_color += gl_LightSource[0].specular * spec;
-			gl_FragColor = mix(color, final_color, lighting);
+			gl_FragColor = mix(colorMixed, final_color, lighting);
 		}
 	);
 }

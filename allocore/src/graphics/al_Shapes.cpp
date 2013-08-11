@@ -329,6 +329,50 @@ int addSphere(Mesh& m, double radius, int slices, int stacks){
 	return m.vertices().size()-Nv;
 }
 
+// create sphere with texture coordinates and normals
+int addSphereWithTexcoords(Mesh& m, double radius, int bands ){
+
+	double r = radius;
+
+	// calculate vertex data with closing duplicate vertices for texturing
+	for ( int lat=0; lat <= bands; lat++ ){
+		double theta = lat * M_PI / bands;
+		double sinTheta = sin(theta);
+		double cosTheta = cos(theta);
+
+		for (int lon=0; lon <= bands; lon++ ){
+			double phi = lon * 2.0 * M_PI / bands;
+			double sinPhi = sin(phi);
+			double cosPhi = cos(phi);
+			double x = cosPhi * sinTheta;
+			double y = cosTheta;
+			double z = sinPhi * sinTheta;
+			double u = 1.0 - ((double)lon / bands);
+			double v = (double)lat / bands;
+			m.vertex(r*x, r*y, r*z);
+			m.texCoord(u,v);
+			m.normal(x,y,z);
+		}
+	}
+
+  	// add indices 
+	for ( int lat=0; lat < bands; lat++ ){
+		for (int lon=0; lon < bands; lon++ ){
+			int first = (lat * (bands + 1)) + lon;
+			int second = first + bands + 1;
+			m.index( first );
+			m.index( second );
+			m.index( (first + 1) );
+			m.index( second );
+			m.index( (second + 1) );
+			m.index( (first + 1) );
+		}
+	}
+
+	return m.vertices().size();
+}
+
+
 
 int addWireBox(Mesh& m, float w, float h, float d){
 

@@ -77,7 +77,9 @@ struct Socket::Impl : public ImplAPR {
 	{
 //		// opens the socket also:
 //		timeout(timeout_);
-		open(port, address, timeout_, sender);
+	  if (! open(port, address, timeout_, sender)) {
+	    printf("Warning: Socket::Impl failed to open port %d / address \"%s\"\n", port, address);
+	  }
 	}
 
 	void close(){
@@ -133,8 +135,10 @@ struct Socket::Impl : public ImplAPR {
 			}
 			
 			mTimeout = timeout;
+		} else {
+		  printf("Warning: inside Socket::Impl::open(), mSock is zero!!!\n");
 		}
-
+			 
 		return true;
 	}
 
@@ -159,12 +163,19 @@ Socket::Socket()
 :	mImpl(0)
 {
 	mImpl = new Impl;
+	if (mImpl == 0) {
+	  printf("Socket::Socket():  mImpl is zero!!!\n");
+	}
 }
 
 Socket::Socket(uint16_t port, const char * address, al_sec timeout, bool sender)
 : mImpl(0)
 {
 	mImpl = new Impl(port, address, timeout, sender);
+	if (mImpl == 0) {
+          printf("Socket::Socket(uint16_t port, const char * address, al_sec timeout, bool sender):  mImpl is zero!!!\n");
+	}
+
 }
 
 Socket::~Socket(){
@@ -193,7 +204,12 @@ void Socket::timeout(al_sec v){ mImpl->timeout(v); }
 
 size_t Socket::recv(char * buffer, size_t maxlen) {
 	apr_size_t len = maxlen;
+
+	// printf("About to call apr_socket_recv(%p, %p, %d)\n", mImpl->mSock, buffer, len);
+
 	apr_status_t r = apr_socket_recv(mImpl->mSock, buffer, &len);
+
+	// printf("apr_socket_recv returned\n");
 	
 	// only error check if not error# 35: Resource temporarily unavailable
 	if(len){ check_apr(r); }

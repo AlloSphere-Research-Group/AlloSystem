@@ -1,22 +1,27 @@
 #include "allocore/graphics/al_Asset.hpp"
 
+
 #include "allocore/graphics/al_Graphics.hpp"
 
 //#define USE_ASSIMP3
 
 #ifdef USE_ASSIMP3
-#include "assimp/cimport.h"
-#include "assimp/matrix4x4.h"
-#include "assimp/types.h"
-#include "assimp/postprocess.h"
+
+#include "assimp/Importer.hpp"
 #include "assimp/scene.h"
-#include "assimp/material.h"
+#include "assimp/postprocess.h"
+#include "assimp/cimport.h"
+#include "assimp/types.h"
+#include "assimp/matrix4x4.h"
+
 #else
+
 #include "assimp/assimp.h"
 #include "assimp/aiTypes.h"
 #include "assimp/aiPostProcess.h"
 #include "assimp/aiScene.h"
 #include "assimp/aiMaterial.h"
+
 #endif
 
 #include <stdio.h>
