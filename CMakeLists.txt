@@ -10,7 +10,7 @@ add_subdirectory(allocore)
 set(ALLOSYSTEM_BUILD 1) # Bulding all of allosystem
 #set(BUILD_GAMMA 1)
 #set(BUILD_GLV 1)
-#set(BUILD_ALLOGLV 1)
+set(BUILD_ALLOGLV 1)
 set(BUILD_ALLOUTIL 1)
 
 # check for Lua to build alloutil --------------------------
@@ -22,28 +22,28 @@ endif(LUA51_FOUND AND BUILD_ALLOUTIL)
 
 # check for Gamma and build ---------------------------------
 if(BUILD_GAMMA)
-set(GAMMA_RELATIVE_DIR ${CMAKE_SOURCE_DIR}/../Gamma)
-if(EXISTS "${GAMMA_RELATIVE_DIR}" AND IS_DIRECTORY "${GAMMA_RELATIVE_DIR}")
-  message("Allosystem: GAMMA sources found. Building ammaA.")
-  set(BUILDING_GAMMA 1)
-  execute_process(COMMAND "${GAMMA_RELATIVE_DIR}/distclean"
-                  WORKING_DIRECTORY "${GAMMA_RELATIVE_DIR}")
-  add_subdirectory(${GAMMA_RELATIVE_DIR} ${GAMMA_RELATIVE_DIR})
-  set(GAMMA_INCLUDE_DIR ${GAMMA_RELATIVE_DIR})
-endif()
+  set(GAMMA_RELATIVE_DIR ${CMAKE_SOURCE_DIR}/../Gamma)
+  if(EXISTS "${GAMMA_RELATIVE_DIR}" AND IS_DIRECTORY "${GAMMA_RELATIVE_DIR}")
+    message("Allosystem: GAMMA sources found. Building ammaA.")
+    set(BUILDING_GAMMA 1)
+    execute_process(COMMAND "${GAMMA_RELATIVE_DIR}/distclean"
+      WORKING_DIRECTORY "${GAMMA_RELATIVE_DIR}")
+    add_subdirectory(${GAMMA_RELATIVE_DIR} ${GAMMA_RELATIVE_DIR})
+    set(GAMMA_INCLUDE_DIR ${GAMMA_RELATIVE_DIR})
+  endif()
 endif(BUILD_GAMMA)
 
 # check for GLV and build ---------------------------------
 if(BUILD_GLV)
-set(GLV_RELATIVE_DIR ${CMAKE_SOURCE_DIR}/../GLV)
-if(EXISTS "${GLV_RELATIVE_DIR}" AND IS_DIRECTORY "${GLV_RELATIVE_DIR}")
-  message("Allosystem: GLV sources found. Building GLV.")
-  set(BUILDING_GLV 1)
-  execute_process(COMMAND "${GLV_RELATIVE_DIR}/distclean"
-                  WORKING_DIRECTORY "${GLV_RELATIVE_DIR}")
-  add_subdirectory(${GLV_RELATIVE_DIR} ${GLV_RELATIVE_DIR})
-  set(GLV_INCLUDE_DIR ${GLV_RELATIVE_DIR})
-endif()
+  set(GLV_RELATIVE_DIR ${CMAKE_SOURCE_DIR}/../GLV)
+  if(EXISTS "${GLV_RELATIVE_DIR}" AND IS_DIRECTORY "${GLV_RELATIVE_DIR}")
+    message("Allosystem: GLV sources found. Building GLV.")
+    set(BUILDING_GLV 1)
+    execute_process(COMMAND "${GLV_RELATIVE_DIR}/distclean"
+      WORKING_DIRECTORY "${GLV_RELATIVE_DIR}")
+    add_subdirectory(${GLV_RELATIVE_DIR} ${GLV_RELATIVE_DIR})
+    set(GLV_INCLUDE_DIR ${GLV_RELATIVE_DIR})
+  endif()
 endif(BUILD_GLV)
 
 # Check and build alloGLV ---------------------------------------
@@ -70,7 +70,7 @@ if((EXISTS "${VSR_RELATIVE_DIR}" AND IS_DIRECTORY "${VSR_RELATIVE_DIR}"))
   execute_process(COMMAND "${VSR_RELATIVE_DIR}/distclean"
                   WORKING_DIRECTORY "${VSR_RELATIVE_DIR}")
   add_subdirectory(${VSR_RELATIVE_DIR} ${VSR_RELATIVE_DIR})
-  set_target_properties(vsr PROPERTIES GLV_INCLUDE_DIR ${GLV_RELATIVE_DIR}
+  set_target_properties(vsr PROPERTIES GLV_INCLUDE_DIR "${GLV_RELATIVE_DIR}"
                                        GLV_LIBRARY "${GLV_LIBRARY}")
   set(VSR_INCLUDE_DIR ${VSR_RELATIVE_DIR})
   set(VSR_LIBRARY vsr)
@@ -83,7 +83,6 @@ else()
     add_subdirectory(allovsr)
   endif()
 endif()
-
 
 # ----------------------------  Projects
 if(NOT NO_PROJECTS)

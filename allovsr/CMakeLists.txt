@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8)
 project (Allovsr)
 
-message("Configuring allovsr build.")
+message("==== Configuring allovsr")
 set(CMAKE_BUILD_TYPE Release)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
@@ -99,7 +99,7 @@ if(NOT NO_EXAMPLES)
       add_executable(allovsr_${EXAMPLE_NAME} ${example})
       target_link_libraries(allovsr_${EXAMPLE_NAME} ${ALLOVSR_LINK_LIBRARIES} ${ALLOCORE_LINK_LIBRARIES})
     endforeach(example)
-  endif(GAMMA_FOUND)
+  endif(NOT GAMMA_FOUND)
 endif(NOT NO_EXAMPLES)
 
 
