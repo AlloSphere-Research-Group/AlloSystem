@@ -11,7 +11,7 @@ set(ALLOSYSTEM_BUILD 1) # Bulding all of allosystem
 #set(BUILD_GAMMA 1)
 #set(BUILD_GLV 1)
 #set(BUILD_ALLOGLV 1)
-#set(BUILD_ALLOUTIL 1)
+set(BUILD_ALLOUTIL 1)
 
 # check for Lua to build alloutil --------------------------
 find_package(Lua51 QUIET)

@@ -13,22 +13,27 @@ set(ALLOUTIL_SRC
   src/al_WarpBlend.cpp
 )
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-add_library(alloutil ${ALLOUTIL_SRC})
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules")
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
+add_library(alloutil ${ALLOUTIL_SRC})
+set_target_properties(alloutil 
+  PROPERTIES 
+  ALLOUTIL_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
+  ALLOUTIL_LIBRARY alloutil)
 
 find_package(Lua51 REQUIRED)
 
-GET_DIRECTORY_PROPERTY(ALLOSYSTEM_BUILD DIRECTORY ${CMAKE_SOURCE_DIR}
-DEFINITION ALLOSYSTEM_BUILD)
+#GET_DIRECTORY_PROPERTY(ALLOSYSTEM_BUILD DIRECTORY Allosystem
+#DEFINITION ALLOSYSTEM_BUILD)
 
 if(ALLOSYSTEM_BUILD)
-set(ALLOCORE_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../allocore)
-set(ALLOCORE_LIBRARY allocore)
-get_property(allocore_location TARGET allocore PROPERTY LOCATION)
-message (STATUS "allocore_location for alloutil == ${allocore_location}")
+  get_target_property(ALLOCORE_INCLUDE_DIR allocore ALLOCORE_INCLUDE_DIR)
+  get_target_property(ALLOCORE_LIBRARY allocore ALLOCORE_LIBRARY)
+  get_property(allocore_location TARGET allocore PROPERTY LOCATION)
+  message (STATUS "allocore_location for alloutil == ${allocore_location}")
 else(ALLOSYSTEM_BUILD)
-find_package(Allocore REQUIRED)
+  find_package(Allocore REQUIRED)
 endif(ALLOSYSTEM_BUILD)
 
 
