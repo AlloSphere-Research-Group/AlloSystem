@@ -76,7 +76,7 @@ else (SNDFILE_LIBRARIES AND SNDFILE_INCLUDE_DIRS)
 
   if (SNDFILE_FOUND)
     if (NOT SndFile_FIND_QUIETLY)
-      message(STATUS "Found libsndfile: ${SNDFILE_LIBRARIES}")
+#      message(STATUS "Found libsndfile: ${SNDFILE_LIBRARIES}")
     endif (NOT SndFile_FIND_QUIETLY)
   else (SNDFILE_FOUND)
     if (SndFile_FIND_REQUIRED)

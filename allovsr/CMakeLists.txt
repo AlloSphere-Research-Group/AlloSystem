@@ -11,20 +11,20 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../cmake_modules
 GET_DIRECTORY_PROPERTY(ALLOSYSTEM_BUILD DIRECTORY ${CMAKE_SOURCE_DIR}
   DEFINITION ALLOSYSTEM_BUILD)
 
-if(ALLOSYSTEM_BUILD)
-  get_property(allocore_location TARGET allocore PROPERTY LOCATION)
-  message(STATUS "allocore_location for allovsr == ${allocore_location}")
-  message("--------- " ${ALLOCORE_INCLUDE_DIR})
-else()
+if(NOT ALLOSYSTEM_BUILD)
   find_package(Allocore REQUIRED QUIET)
   find_package(AlloGLV REQUIRED QUIET)
   find_package(vsr REQUIRED QUIET)
-endif(ALLOSYSTEM_BUILD)
+endif(NOT ALLOSYSTEM_BUILD)
 
-message (STATUS "vsr_location for allovsr == ${VSR_INCLUDE_DIR}")
+message (STATUS "vsr headers for allovsr == ${VSR_INCLUDE_DIR}")
+message (STATUS "vsr lib for allovsr == ${VSR_LIBRARY}")
+message (STATUS "allocore headers for allovsr == ${ALLOCORE_INCLUDE_DIR}")
+message (STATUS "allocore lib for allovsr == ${ALLOCORE_LIBRARY}")
+message (STATUS "alloGLV headers for allovsr == ${ALLOGLV_INCLUDE_DIR}")
+message (STATUS "alloGLV lib for allovsr == ${ALLOGLV_LIBRARY}")
 
 # --- configure
-message ("${ALLOGLV_INCLUDE_DIR}")
 include_directories(${ALLOCORE_INCLUDE_DIR} ${ALLOGLV_INCLUDE_DIR} ${VSR_INCLUDE_DIR})
 set(ALLOVSR_LINK_LIBRARIES ${ALLOCORE_LIBRARY} ${ALLOGLV_LIBRARY} ${VSR_LIBRARY} ${GLV_LIBRARY})
 
@@ -33,6 +33,7 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 
 # Examples
 if(NOT NO_EXAMPLES)
+
   find_package(APR REQUIRED QUIET)
   find_package(Assimp REQUIRED QUIET)
   find_package(FreeImage REQUIRED QUIET)
@@ -42,10 +43,10 @@ if(NOT NO_EXAMPLES)
   find_package(LibSndFile REQUIRED QUIET)
   find_package(OpenGL REQUIRED QUIET)
   find_package(Portaudio REQUIRED QUIET)
-  find_package(Gamma QUIET)
-  #find_package(GLV REQUIRED QUIET)
+#  find_package(Gamma QUIET)
+  find_package(GLV QUIET)
 
-  if (NOT GAMMA_FOUND)
+  if (NOT GAMMA_LIBRARY)
     message("allovsr: Gamma not found. Not building allovsr examples.")
   else()
     if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -97,9 +98,10 @@ if(NOT NO_EXAMPLES)
     foreach(example ${EXAMPLE_FILES})
       get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
       add_executable(allovsr_${EXAMPLE_NAME} ${example})
+      add_dependencies(allovsr_${EXAMPLE_NAME} GLV vsr alloGLV)
       target_link_libraries(allovsr_${EXAMPLE_NAME} ${ALLOVSR_LINK_LIBRARIES} ${ALLOCORE_LINK_LIBRARIES})
     endforeach(example)
-  endif(NOT GAMMA_FOUND)
+  endif(NOT GAMMA_LIBRARY)
 endif(NOT NO_EXAMPLES)
 
 

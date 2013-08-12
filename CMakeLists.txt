@@ -5,14 +5,15 @@ set(CMAKE_BUILD_TYPE Release) # Build release by default
 
 set(ALLOSYSTEM_BUILD 1) # Bulding all of allosystem (do not change this manually)
 
-# default build set (
-#set(BUILD_GAMMA 1)
-#set(BUILD_GLV 1)
-set(BUILD_ALLOGLV 1)
-set(BUILD_ALLOUTIL 1)
-set(BUILD_ALLOVSR 1)
+# default build set
+set(BUILD_GAMMA 0 CACHE STRING "Build external Gamma")
+set(BUILD_GLV 0 CACHE STRING "Build external GLV")
+set(BUILD_ALLOGLV 1 CACHE STRING "Build AlloGLV")
+set(BUILD_ALLOUTIL 1 CACHE STRING "Build alloutil")
+set(BUILD_ALLOVSR 0 CACHE STRING "Build allovsr")
+set(BUILD_VSR 1 CACHE STRING "Build vsr (only if allovsr is being built)")
 
-# External dependencies (Gamma and GLV)
+# External dependencies (Gamma, GLV and vsr)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake_modules")
 
 # check for Gamma and build ---------------------------------
@@ -23,7 +24,12 @@ if(BUILD_GAMMA)
     set(BUILDING_GAMMA 1)
     add_subdirectory(${GAMMA_RELATIVE_DIR} ${GAMMA_RELATIVE_DIR}/AlloSystem-build)
     set(GAMMA_INCLUDE_DIR ${GAMMA_RELATIVE_DIR})
+    get_target_property(GAMMA_LIBRARY Gamma LOCATION)
+    else()
+    message(FATAL_ERROR "Allosystem: Gamma sources NOT found. Can't build Gamma.")
   endif()
+else()
+  find_package(Gamma)
 endif(BUILD_GAMMA)
 
 # check for GLV and build ---------------------------------
@@ -34,11 +40,33 @@ if(BUILD_GLV)
     set(BUILDING_GLV 1)
     add_subdirectory(${GLV_RELATIVE_DIR} ${GLV_RELATIVE_DIR}/AlloSystem-build)
     set(GLV_INCLUDE_DIR ${GLV_RELATIVE_DIR})
+    get_target_property(GLV_LIBRARY GLV LOCATION)
+  else()
+    message(FATAL_ERROR "Allosystem: GLV sources NOT found. Can't build GLV.")
   endif()
+else()
+  find_package(GLV)
 endif(BUILD_GLV)
+
+# check for vsr and build ----------------------------
+if(BUILD_VSR AND BUILD_ALLOVSR)
+  set(VSR_RELATIVE_DIR ${CMAKE_SOURCE_DIR}/../vsr)
+  if((EXISTS "${VSR_RELATIVE_DIR}" AND IS_DIRECTORY "${VSR_RELATIVE_DIR}"))
+    set(BUILDING_VSR 1)
+    add_subdirectory(${VSR_RELATIVE_DIR} ${VSR_RELATIVE_DIR}/Allosystem-build)
+    set_target_properties(vsr PROPERTIES GLV_INCLUDE_DIR "${GLV_RELATIVE_DIR}"
+      GLV_LIBRARY "${GLV_LIBRARY}")
+    set(VSR_INCLUDE_DIR ${VSR_RELATIVE_DIR})
+    get_target_property(VSR_LIBRARY vsr LOCATION)
+  else()
+    message(FATAL_ERROR "Allosystem: vsr sources NOT found. Can't build vsr.")
+  endif()
+endif(BUILD_VSR AND BUILD_ALLOVSR)
 
 # Allocore --------------------------------
 add_subdirectory(allocore)
+get_target_property(ALLOCORE_LIBRARY allocore LOCATION)
+get_target_property(ALLOCORE_INCLUDE_DIR allocore ALLOCORE_INCLUDE_DIR)
 
 # Alloutil ----------------------------------
 if(BUILD_ALLOUTIL)
@@ -47,8 +75,12 @@ if(BUILD_ALLOUTIL)
     message("Allosystem: LUA found. Building alloutil.")
     add_subdirectory(alloutil)
   else()
-    message(WARNING "Allosystem: LUA NOT found. NOT Building alloutil.")
+    message(FATAL_ERROR "Allosystem: LUA NOT found. NOT Building alloutil.")
   endif(LUA51_FOUND)
+  get_target_property(ALLOUTIL_LIBRARY alloutil LOCATION)
+  get_target_property(ALLOUTIL_INCLUDE_DIR alloutil ALLOUTIL_INCLUDE_DIR)
+else()
+  find_package(Alloutil)
 endif(BUILD_ALLOUTIL)
 
 # alloGLV ---------------------------------------
@@ -65,37 +97,27 @@ if(BUILD_ALLOGLV)
       get_target_property(GLV_LIBRARY GLV GLV_LIBRARY)
       set(GLV_INCLUDE_DIR ${GLV_RELATIVE_DIR})
     else()
-      message(WARNING "Allosystem: GLV NOT found. NOT building alloGLV.")
+      message(FATAL_ERROR "Allosystem: GLV NOT found. Can't build alloGLV.")
     endif()
   endif(BUILDING_GLV)
+    get_target_property(ALLOGLV_LIBRARY alloGLV LOCATION)
+    get_target_property(ALLOGLV_INCLUDE_DIR alloGLV ALLOGLV_INCLUDE_DIR)
+else()
+  find_package(alloGLV)
 endif(BUILD_ALLOGLV)
 
 # allovsr ----------------------------------
 if(BUILD_ALLOVSR)
-  set(VSR_RELATIVE_DIR ${CMAKE_SOURCE_DIR}/../vsr)
-  if((EXISTS "${VSR_RELATIVE_DIR}" AND IS_DIRECTORY "${VSR_RELATIVE_DIR}"))
-    set(BUILDING_VSR 1)
-    execute_process(COMMAND "${VSR_RELATIVE_DIR}/distclean"
-      WORKING_DIRECTORY "${VSR_RELATIVE_DIR}")
-    add_subdirectory(${VSR_RELATIVE_DIR} ${VSR_RELATIVE_DIR})
-    set_target_properties(vsr PROPERTIES GLV_INCLUDE_DIR "${GLV_RELATIVE_DIR}"
-      GLV_LIBRARY "${GLV_LIBRARY}")
-    set(VSR_INCLUDE_DIR ${VSR_RELATIVE_DIR})
-    set(VSR_LIBRARY vsr)
+  if(VSR_LIBRARY AND GLV_LIBRARY AND ALLOGLV_LIBRARY)
     add_subdirectory(allovsr)
+    message("Allosystem: vsr, GLV and alloGLV libraries found. Building allovsr.")
   else()
-    find_package(vsr QUIET)
-    find_package(GLV QUIET)
-    if(VSR_FOUND AND GLV_FOUND)
-      message("Allosystem: vsr and GLV libraries found. Building allovsr.")
-      add_subdirectory(allovsr)
-    endif(VSR_FOUND AND GLV_FOUND)
-  endif()
+    message(FATAL_ERROR "Allosystem: vsr, GLV or alloGLV  NOT found. NOT building allovsr.")
+  endif(VSR_LIBRARY AND GLV_LIBRARY AND ALLOGLV_LIBRARY)
 endif(BUILD_ALLOVSR)
 
 # ----------------------------  Projects
 if(NOT NO_PROJECTS)
-
   # macro to get subdirectories
   MACRO(SUBDIRLIST result curdir)
     FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)

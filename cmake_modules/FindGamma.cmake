@@ -3,7 +3,7 @@
 
 #  GAMMA_FOUND - system has Gamma
 #  GAMMA_INCLUDE_DIRS - the Gamma include directory
-#  GAMMA_LIBRARIES - Link these to use Gamma
+#  GAMMA_LIBRARY - Link these to use Gamma
 
 #  Copyright (C) 2006  Wengo
 
@@ -12,10 +12,10 @@
 #  For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
 
-if (GAMMA_LIBRARIES AND GAMMA_INCLUDE_DIRS)
+if (GAMMA_LIBRARY AND GAMMA_INCLUDE_DIR)
   # in cache already
   set(GAMMA_FOUND TRUE)
-else (GAMMA_LIBRARIES AND GAMMA_INCLUDE_DIRS)
+else (GAMMA_LIBRARY AND GAMMA_INCLUDE_DIR)
 
   find_path(GAMMA_INCLUDE_DIR
     NAMES
@@ -52,21 +52,13 @@ else (GAMMA_LIBRARIES AND GAMMA_INCLUDE_DIRS)
       /sw/lib)
   endif()
 
-
-  set(GAMMA_INCLUDE_DIRS
-	${GAMMA_INCLUDE_DIR}
-  )
-  set(GAMMA_LIBRARIES
-	${GAMMA_LIBRARY}
-  )
-
-  if (GAMMA_INCLUDE_DIRS AND GAMMA_LIBRARIES)
+  if (GAMMA_INCLUDE_DIR AND GAMMA_LIBRARY)
 	set(GAMMA_FOUND TRUE)
-  endif (GAMMA_INCLUDE_DIRS AND GAMMA_LIBRARIES)
+  endif (GAMMA_INCLUDE_DIR AND GAMMA_LIBRARY)
 
   if (GAMMA_FOUND)
 	if (NOT Gamma_FIND_QUIETLY)
-	  message(STATUS "Found Gamma: ${GAMMA_LIBRARIES}")
+	  message(STATUS "Found Gamma: ${GAMMA_LIBRARY}")
 	endif (NOT Gamma_FIND_QUIETLY)
   else (GAMMA_FOUND)
 	if (Gamma_FIND_REQUIRED)
@@ -77,4 +69,4 @@ else (GAMMA_LIBRARIES AND GAMMA_INCLUDE_DIRS)
   # show the GAMMA_INCLUDE_DIRS and GAMMA_LIBRARIES variables only in the advanced view
   # mark_as_advanced(GAMMA_INCLUDE_DIRS GAMMA_LIBRARIES)
 
-endif (GAMMA_LIBRARIES AND GAMMA_INCLUDE_DIRS)
+endif (GAMMA_LIBRARY AND GAMMA_INCLUDE_DIR)
