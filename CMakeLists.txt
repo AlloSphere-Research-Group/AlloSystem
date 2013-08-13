@@ -8,10 +8,10 @@ set(ALLOSYSTEM_BUILD 1) # Bulding all of allosystem (do not change this manually
 # default build set
 set(BUILD_GAMMA 0 CACHE STRING "Build external Gamma")
 set(BUILD_GLV 0 CACHE STRING "Build external GLV")
-set(BUILD_ALLOGLV 1 CACHE STRING "Build AlloGLV")
+set(BUILD_ALLOGLV 0 CACHE STRING "Build AlloGLV")
 set(BUILD_ALLOUTIL 1 CACHE STRING "Build alloutil")
-set(BUILD_ALLOVSR 0 CACHE STRING "Build allovsr")
 set(BUILD_VSR 1 CACHE STRING "Build vsr (only if allovsr is being built)")
+set(BUILD_ALLOVSR 0 CACHE STRING "Build allovsr")
 
 # External dependencies (Gamma, GLV and vsr)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
