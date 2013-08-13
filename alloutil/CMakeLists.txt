@@ -24,9 +24,18 @@ set_target_properties(alloutil
 
 find_package(Lua51 REQUIRED)
 
-if(NOT ALLOSYSTEM_BUILD)
+GET_DIRECTORY_PROPERTY(ALLOSYSTEM_BUILD DIRECTORY ${CMAKE_SOURCE_DIR}
+  DEFINITION ALLOSYSTEM_BUILD)
+
+if(ALLOSYSTEM_BUILD)
+  message("Allosystem build")
+  get_target_property(ALLOCORE_LIBRARY allocore ALLOCORE_LIBRARY)
+  get_target_property(ALLOCORE_INCLUDE_DIR allocore ALLOCORE_INCLUDE_DIR)
+  message (STATUS "allocore_location for alloutil == ${ALLOCORE_LIBRARY}")
+else(ALLOSYSTEM_BUILD)
   find_package(Allocore REQUIRED)
-endif(NOT ALLOSYSTEM_BUILD)
+endif(ALLOSYSTEM_BUILD)
+
 
 include_directories(${LUA_INCLUDE_DIR} ${ALLOCORE_INCLUDE_DIR})
 set(ALLOUTIL_LINK_LIBRARIES ${LUA_LIBRARIES} ${ALLOCORE_LIBRARY})

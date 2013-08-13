@@ -16,25 +16,29 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../cmake_modules")
 
-if(NOT ALLOSYSTEM_BUILD)
-  find_package(Allocore REQUIRED)
-  find_package(GLV REQUIRED)
-  find_package(Portaudio REQUIRED)
-  find_package(LibSndFile REQUIRED)
-endif(NOT ALLOSYSTEM_BUILD)
+if(ALLOSYSTEM_BUILD)
+  get_target_property(ALLOCORE_LIBRARY allocore ALLOCORE_LIBRARY)
+  get_target_property(ALLOCORE_INCLUDE_DIR allocore ALLOCORE_INCLUDE_DIR)
+  set(GLV_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../GLV)
+  get_property(glv_location TARGET GLV PROPERTY LOCATION)
+  set(GLV_LIBRARY ${glv_location})
+  message (STATUS "glv_location for alloGLV == ${glv_location}")
+else()
+  find_package(Allocore REQUIRED QUIET)
+  find_package(GLV REQUIRED QUIET)
+endif(ALLOSYSTEM_BUILD)
 
-message (STATUS "allocore_location for alloGLV == ${ALLOCORE_LIBRARY}")
+message (STATUS "allocore_location for alloGLV == ${allocore_location}")
 
-include_directories(${ALLOCORE_INCLUDE_DIR})
-include_directories(${GLV_INCLUDE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${ALLOCORE_INCLUDE_DIR}
+  ${GLV_INCLUDE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries(alloGLV ${ALLOCORE_LIBRARIES} ${GLV_LIBRARY})
 set_target_properties(alloGLV 
   PROPERTIES 
   ALLOGLV_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
   ALLOGLV_LIBRARY alloGLV)
-
 
 #if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 ## Needed by portaudio
