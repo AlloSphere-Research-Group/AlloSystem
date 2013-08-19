@@ -808,15 +808,15 @@ msys
 \backslash
 1.0
 \family default
- will be mounted as root directory 
+ will be mounted as both the root directory 
 \family typewriter
 /
 \family default
  and as 
 \family typewriter
-/usr
+/usr/
 \family default
-/.
+.
  The first time you run MSYS it will create a 
 \family typewriter
 home
@@ -1153,27 +1153,32 @@ $ make alloutil
 
 \end_inset
 
-To check if the system is installed successfully you can build an example
- by navigating to the 
-\family typewriter
-~/code/allosystem/allocore
-\family default
- folder and then running the following command:
-\end_layout
-
-\begin_layout Standard
+To check if the system was installed successfully you can build an example
+ by first running
 \begin_inset listings
 inline false
 status open
 
 \begin_layout Plain Layout
 
-$ make examples/av/simpleApp.cpp
+$ make gatherexamples
 \end_layout
 
 \end_inset
 
-If a ball with oscillating color shows up, then your system is configured
+and then
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ make examples/allocore/av/simpleApp.cpp
+\end_layout
+
+\end_inset
+
+If a sphere with an oscillating color shows up, then your system is configured
  correctly.
 \end_layout
 
