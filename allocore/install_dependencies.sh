@@ -16,12 +16,12 @@ if [ `which apt-get 2>/dev/null` ]; then
 
 	# If assimp2 is installed, then prompt to remove it
 	if [ "$ASSIMP_V" == "2.0.863+dfsg-2" ]; then
-		echo assimp version $ASSIMP_V detected.
-		echo It is recommended that you remove this version to avoid configuration problems with AlloCore.
+		echo "assimp version" $ASSIMP_V "detected."
+		echo "It is recommended that you remove this version to avoid configuration problems with AlloCore."
 		echo -n "Would you like to remove it [Y/n]? "
 		read ANS
 		if [ "$ANS" == "Y" ]; then
-			echo Removing assimp $ASSIMP_V ...
+			echo "Removing assimp" $ASSIMP_V
 			sudo apt-get remove libassimp-dev=$ASSIMP_V
 		fi
 	fi
@@ -31,7 +31,7 @@ if [ `which apt-get 2>/dev/null` ]; then
 	assimp3_available=$(dpkg --compare-versions ${available_assimp_version} ge 3);
 
 	if [ $assimp3_available ]; then
-		echo sudo apt-get install libassimp-dev
+		sudo apt-get install libassimp-dev
 	# Otherwise build assimp3 from source and install.
 	else
 		sudo apt-get install cmake
@@ -43,7 +43,7 @@ if [ `which apt-get 2>/dev/null` ]; then
 			make
 			sudo make install
 		popd
-		#rm -rf $PKG
+		rm -rf $PKG
 		rm $PKG.zip
 	fi 
 
