@@ -155,19 +155,27 @@ elif [ `uname | grep MINGW` ]; then
 			rm $PKG.zip
 		fi
 
+		# Remove assimp2 if found
+		if [ -e $DESTDIR/include/assimp/assimp.h ]; then
+			echo "Found AssImp2. This will be removed to update to AssImp3..."
+			rm -rf $DESTDIR/include/assimp
+			rm $DESTDIR/bin/Assimp32.dll
+			rm $DESTDIR/lib/assimp.lib
+		fi
+
 		LIBFILES=($DESTDIR/lib/assimp*)
 		if [ -e ${LIBFILES[0]} ]; then
 			echo "Found AssImp"
 		else
-			PKG=assimp--2.0.863-sdk
-			wget http://downloads.sourceforge.net/project/assimp/assimp-2.0/$PKG.zip
+			PKG=assimp--3.0.1270-full
+			wget http://sourceforge.net/projects/assimp/files/assimp-3.0/$PKG.zip
 			unzip -q $PKG.zip
-			install -d $DESTDIR/include/assimp/Compiler/
-			cp -r $PKG/include/* $DESTDIR/include/assimp/
+			rm $PKG.zip
+			mv assimp* $PKG
+			cp -r $PKG/include/* $DESTDIR/include/
 			cp $PKG/bin/assimp_release-dll_win32/Assimp32.dll $DESTDIR/bin/
 			cp $PKG/lib/assimp_release-dll_win32/assimp.lib $DESTDIR/lib/
 			rm -rf $PKG
-			rm $PKG.zip
 		fi
 
 		LIBFILES=($DESTDIR/lib/libglew32*)
