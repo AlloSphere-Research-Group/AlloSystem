@@ -10,13 +10,13 @@ include(CustomLibPaths.cmake)
 # default build set
 set(BUILD_GAMMA 0 CACHE STRING "Build external Gamma")
 set(BUILD_GLV 0 CACHE STRING "Build external GLV")
-set(BUILD_ALLOGLV 1 CACHE STRING "Build AlloGLV")
+set(BUILD_ALLOGLV 0 CACHE STRING "Build AlloGLV")
 set(BUILD_ALLOUTIL 1 CACHE STRING "Build alloutil")
-set(BUILD_ALLOVSR 0 CACHE STRING "Build allovsr")
 set(BUILD_VSR 1 CACHE STRING "Build vsr (only if allovsr is being built)")
+set(BUILD_ALLOVSR 0 CACHE STRING "Build allovsr")
 
 # External dependencies (Gamma, GLV and vsr)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake_modules")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
 
 # check for Gamma and build ---------------------------------
 if(BUILD_GAMMA)
@@ -82,7 +82,7 @@ if(BUILD_ALLOUTIL)
   get_target_property(ALLOUTIL_LIBRARY alloutil LOCATION)
   get_target_property(ALLOUTIL_INCLUDE_DIR alloutil ALLOUTIL_INCLUDE_DIR)
 else()
-  find_package(Alloutil)
+  find_package(Alloutil QUIET)
 endif(BUILD_ALLOUTIL)
 
 # alloGLV ---------------------------------------
@@ -105,7 +105,7 @@ if(BUILD_ALLOGLV)
     get_target_property(ALLOGLV_LIBRARY alloGLV LOCATION)
     get_target_property(ALLOGLV_INCLUDE_DIR alloGLV ALLOGLV_INCLUDE_DIR)
 else()
-  find_package(alloGLV)
+  find_package(AlloGLV QUIET)
 endif(BUILD_ALLOGLV)
 
 # allovsr ----------------------------------
