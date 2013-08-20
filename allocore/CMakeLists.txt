@@ -91,7 +91,6 @@ find_package(FreeImage REQUIRED QUIET)
 find_package(Freetype REQUIRED QUIET)
 find_package(GLEW REQUIRED QUIET)
 find_package(GLUT REQUIRED QUIET)
-find_package(LibSndFile REQUIRED QUIET)
 find_package(OpenGL REQUIRED QUIET)
 
 if(NOT ALLOSYSTEM_BUILD)

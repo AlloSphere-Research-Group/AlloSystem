@@ -5,6 +5,8 @@ set(CMAKE_BUILD_TYPE Release) # Build release by default
 
 set(ALLOSYSTEM_BUILD 1) # Bulding all of allosystem (do not change this manually)
 
+include(CustomLibPaths.cmake)
+
 # default build set
 set(BUILD_GAMMA 0 CACHE STRING "Build external Gamma")
 set(BUILD_GLV 0 CACHE STRING "Build external GLV")
