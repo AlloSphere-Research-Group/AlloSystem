@@ -90,8 +90,10 @@ find_package(Assimp REQUIRED QUIET)
 find_package(FreeImage REQUIRED QUIET)
 find_package(Freetype REQUIRED QUIET)
 find_package(GLEW REQUIRED QUIET)
-find_package(GLUT REQUIRED QUIET)
+find_package(GLUT REQUIRED)
 find_package(OpenGL REQUIRED QUIET)
+
+message("  ---  ${GLUT_LIBRARY}")
 
 if(NOT ALLOSYSTEM_BUILD)
   find_package(Gamma)
@@ -168,6 +170,10 @@ set(ALLOCORE_LINK_LIBRARIES ${ALLOCORE_LINK_LIBRARIES}
   ${LINUX_LIBS}
   ${WINDOWS_LIBS})
 
+set_target_properties(allocore 
+  PROPERTIES 
+  ALLOCORE_LINK_LIBRARIES "${ALLOCORE_LINK_LIBRARIES}"
+  )
 target_link_libraries(allocore ${ALLOCORE_LINK_LIBRARIES})
 
 

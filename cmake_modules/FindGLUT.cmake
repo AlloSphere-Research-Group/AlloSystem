@@ -20,12 +20,17 @@
 # (To distributed this file outside of CMake, substitute the full
 #  License text for the above reference.)
 
+include(LibFindMacros)
+
 if ((NOT GLUT_INCLUDE_DIR) AND (NOT GLUT_LIBRARY))
+  libfind_pkg_check_modules(GLUT_PKGCONF glut)
+
   IF (WIN32)
     FIND_PATH( GLUT_INCLUDE_DIR NAMES GL/glut.h 
-      PATHS  ${GLUT_ROOT_PATH}/include )
+      PATHS  ${GLUT_PKGCONF_INCLUDE_DIRS} ${GLUT_ROOT_PATH}/include )
     FIND_LIBRARY( GLUT_glut_LIBRARY NAMES glut glut32
       PATHS
+      ${GLUT_PKGCONF_LIBRARY_DIRS}
       ${OPENGL_LIBRARY_DIR}
       ${GLUT_ROOT_PATH}/Release
       )
@@ -40,9 +45,13 @@ if ((NOT GLUT_INCLUDE_DIR) AND (NOT GLUT_LIBRARY))
       SET(GLUT_glut_LIBRARY "-framework GLUT" CACHE STRING "GLUT library for OSX") 
       SET(GLUT_cocoa_LIBRARY "-framework Cocoa" CACHE STRING "Cocoa framework for OSX")
     ELSE (APPLE)
-      
+      message("glut   	${GLUT_PKGCONF_INCLUDE_DIRS}")
+      if (NOT GLUT_PKGCONF_INCLUDE_DIRS)
+	libfind_pkg_check_modules(GLUT_PKGCONF freeglut3)
+      endif(NOT GLUT_PKGCONF_INCLUDE_DIRS)
       FIND_PATH( GLUT_INCLUDE_DIR GL/glut.h
-	/usr/include/GL
+	${GLUT_PKGCONF_INCLUDE_DIRS}
+	/usr/include
 	/usr/openwin/share/include
 	/usr/openwin/include
 	/opt/graphics/OpenGL/include
@@ -50,7 +59,9 @@ if ((NOT GLUT_INCLUDE_DIR) AND (NOT GLUT_LIBRARY))
 	)
       
       FIND_LIBRARY( GLUT_glut_LIBRARY glut
+	${GLUT_PKGCONF_LIBRARY_DIRS}
 	/usr/openwin/lib
+	/usr/lib
 	)
       
       #    FIND_LIBRARY( GLUT_Xi_LIBRARY Xi

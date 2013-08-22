@@ -40,6 +40,12 @@ set_target_properties(alloGLV
   ALLOGLV_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
   ALLOGLV_LIBRARY alloGLV)
 
+set_target_properties(alloGLV 
+  PROPERTIES 
+  ALLOGLV_LINK_LIBRARIES "${ALLOGLV_LINK_LIBRARIES}"
+  )
+
+
 #if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 ## Needed by portaudio
 #   find_library(AUDIOUNIT_FM AudioUnit)

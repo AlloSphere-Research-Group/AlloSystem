@@ -38,6 +38,13 @@ endif(ALLOSYSTEM_BUILD)
 
 include_directories(${LUA_INCLUDE_DIR} ${ALLOCORE_INCLUDE_DIR})
 set(ALLOUTIL_LINK_LIBRARIES ${LUA_LIBRARIES} ${ALLOCORE_LIBRARY})
+
+
+set_target_properties(alloutil 
+  PROPERTIES 
+  ALLOUTIL_LINK_LIBRARIES "${ALLOUTIL_LINK_LIBRARIES}"
+  )
+
 target_link_libraries(alloutil ${ALLOUTIL_LINK_LIBRARIES})
 
 set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)

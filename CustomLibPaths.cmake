@@ -36,5 +36,4 @@ else()
   #set(PORTAUDIO_INCLUDE_DIR "${LIB_PREFIX}/include")
   #set(PORTAUDIO_LIBRARY "${LIB_PREFIX}/lib/portaudio.lib")
 
-
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
