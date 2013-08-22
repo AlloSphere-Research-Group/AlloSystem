@@ -41,57 +41,61 @@
 # wants explicit full paths and this trickery doesn't work too well.
 # I'm going to attempt to cut out the middleman and hope 
 # everything still works.
-FIND_PATH(FREETYPE_INCLUDE_DIR_ft2build ft2build.h 
-  HINTS
-  $ENV{FREETYPE_DIR}
-  PATH_SUFFIXES include
-  PATHS
-  /usr/local/Cellar/freetype/2.4.10/include
-  /usr/local/X11R6/include
-  /usr/local/X11/include
-  /usr/X11/include
-  /sw/include
-  /opt/local/include
-  /usr/freeware/include
-)
 
-FIND_PATH(FREETYPE_INCLUDE_DIR_freetype2 freetype/config/ftheader.h 
-  HINTS
-  $ENV{FREETYPE_DIR}/include/freetype2
-  PATHS
-  /usr/local/Cellar/freetype/2.4.10/include/freetype2
-  /usr/local/X11R6/include
-  /usr/local/X11/include
-  /usr/X11/include
-  /sw/include
-  /opt/local/include
-  /usr/freeware/include
-  PATH_SUFFIXES freetype2
-)
+if((NOT FREETYPE_LIBRARY) AND (NOT FREETYPE_INCLUDE_DIR))
+  FIND_PATH(FREETYPE_INCLUDE_DIR_ft2build ft2build.h 
+    HINTS
+    $ENV{FREETYPE_DIR}
+    PATH_SUFFIXES include
+    PATHS
+    /usr/local/Cellar/freetype/2.4.10/include
+    /usr/local/X11R6/include
+    /usr/local/X11/include
+    /usr/X11/include
+    /sw/include
+    /opt/local/include
+    /usr/freeware/include
+    )
 
-FIND_LIBRARY(FREETYPE_LIBRARY
-  NAMES freetype libfreetype freetype219
-  HINTS
-  $ENV{FREETYPE_DIR}
-  PATH_SUFFIXES lib64 lib
-  PATHS
-  /usr/local/X11R6
-  /usr/local/X11
-  /usr/X11
-  /sw
-  /usr/freeware
-)
+  FIND_PATH(FREETYPE_INCLUDE_DIR_freetype2 freetype/config/ftheader.h 
+    HINTS
+    $ENV{FREETYPE_DIR}/include/freetype2
+    PATHS
+    /usr/local/Cellar/freetype/2.4.10/include/freetype2
+    /usr/local/X11R6/include
+    /usr/local/X11/include
+    /usr/X11/include
+    /sw/include
+    /opt/local/include
+    /usr/freeware/include
+    PATH_SUFFIXES freetype2
+    )
 
-# set the user variables
-IF(FREETYPE_INCLUDE_DIR_ft2build AND FREETYPE_INCLUDE_DIR_freetype2)
-  SET(FREETYPE_INCLUDE_DIRS "${FREETYPE_INCLUDE_DIR_ft2build};${FREETYPE_INCLUDE_DIR_freetype2}")
-ENDIF(FREETYPE_INCLUDE_DIR_ft2build AND FREETYPE_INCLUDE_DIR_freetype2)
-SET(FREETYPE_LIBRARIES "${FREETYPE_LIBRARY}")
+  FIND_LIBRARY(FREETYPE_LIBRARY
+    NAMES freetype libfreetype freetype219
+    HINTS
+    $ENV{FREETYPE_DIR}
+    PATH_SUFFIXES lib64 lib
+    PATHS
+    /usr/local/X11R6
+    /usr/local/X11
+    /usr/X11
+    /sw
+    /usr/freeware
+    )
 
-# handle the QUIETLY and REQUIRED arguments and set FREETYPE_FOUND to TRUE if 
-# all listed variables are TRUE
-INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(Freetype  DEFAULT_MSG  FREETYPE_LIBRARY  FREETYPE_INCLUDE_DIRS)
+  # set the user variables
+  IF(FREETYPE_INCLUDE_DIR_ft2build AND FREETYPE_INCLUDE_DIR_freetype2)
+    SET(FREETYPE_INCLUDE_DIRS "${FREETYPE_INCLUDE_DIR_ft2build};${FREETYPE_INCLUDE_DIR_freetype2}")
+  ENDIF(FREETYPE_INCLUDE_DIR_ft2build AND FREETYPE_INCLUDE_DIR_freetype2)
+  SET(FREETYPE_LIBRARIES "${FREETYPE_LIBRARY}")
+
+  # handle the QUIETLY and REQUIRED arguments and set FREETYPE_FOUND to TRUE if 
+  # all listed variables are TRUE
+  INCLUDE(FindPackageHandleStandardArgs)
+  FIND_PACKAGE_HANDLE_STANDARD_ARGS(Freetype  DEFAULT_MSG  FREETYPE_LIBRARY  FREETYPE_INCLUDE_DIRS)
 
 
-MARK_AS_ADVANCED(FREETYPE_LIBRARY FREETYPE_INCLUDE_DIR_freetype2 FREETYPE_INCLUDE_DIR_ft2build)
+  MARK_AS_ADVANCED(FREETYPE_LIBRARY FREETYPE_INCLUDE_DIR_freetype2 FREETYPE_INCLUDE_DIR_ft2build)
+endif((NOT FREETYPE_LIBRARY) AND (NOT FREETYPE_INCLUDE_DIR))
+
