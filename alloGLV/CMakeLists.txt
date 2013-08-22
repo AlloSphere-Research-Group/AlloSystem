@@ -17,7 +17,7 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../cmake_modules")
 
 if(ALLOSYSTEM_BUILD)
-  get_target_property(ALLOCORE_LIBRARY allocore ALLOCORE_LIBRARY)
+  get_target_property(ALLOCORE_LIBRARY allocore LOCATION)
   get_target_property(ALLOCORE_INCLUDE_DIR allocore ALLOCORE_INCLUDE_DIR)
   set(GLV_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../GLV)
   get_property(glv_location TARGET GLV PROPERTY LOCATION)

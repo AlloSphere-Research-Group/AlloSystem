@@ -28,10 +28,9 @@ GET_DIRECTORY_PROPERTY(ALLOSYSTEM_BUILD DIRECTORY ${CMAKE_SOURCE_DIR}
   DEFINITION ALLOSYSTEM_BUILD)
 
 if(ALLOSYSTEM_BUILD)
-  message("Allosystem build")
-  get_target_property(ALLOCORE_LIBRARY allocore ALLOCORE_LIBRARY)
+  #message("Allosystem build")
+  get_target_property(ALLOCORE_LIBRARY allocore LOCATION)
   get_target_property(ALLOCORE_INCLUDE_DIR allocore ALLOCORE_INCLUDE_DIR)
-  message (STATUS "allocore_location for alloutil == ${ALLOCORE_LIBRARY}")
 else(ALLOSYSTEM_BUILD)
   find_package(Allocore REQUIRED)
 endif(ALLOSYSTEM_BUILD)
