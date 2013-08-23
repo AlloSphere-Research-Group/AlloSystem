@@ -27,6 +27,12 @@ void Keyboard::meta (bool state){mModifiers[4] = state;}
 void Keyboard::shift(bool state){mModifiers[0] = state;}
 void Keyboard::setKey(int k, bool v){ mKeycode=k; mDown=v; }
 
+void Keyboard::print() const {
+	fprintf(stderr,
+		"key=%3d (%c), alt=%i, ctrl=%i, meta=%i, shift=%i, caps=%i\n",
+		key(),key(), alt(), ctrl(), meta(), shift(), caps()
+	);
+}
 
 
 Mouse::Mouse(): mX(0), mY(0), mButton(LEFT){

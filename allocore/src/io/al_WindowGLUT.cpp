@@ -215,6 +215,8 @@ public:
 	// incoming GLUT keys need to be remapped in certain cases...
 	static unsigned int remapKey(unsigned int key, bool special){
 
+		//printf("GLUT i: %3d %c\n", key, key);
+
 		if(special){
 
 			#define CS(k) case GLUT_KEY_##k: key = Keyboard::k; break;
@@ -230,8 +232,6 @@ public:
 			#undef CS
 		}
 		else{
-
-			//printf("GLUT i: %3d %c\n", key, key);
 
 			#define MAP(i,o) case i: key=o; break
 
@@ -261,7 +261,7 @@ public:
 				//BackSpace	=8
 				//Tab		=9
 				//Return	=13
-				//Escape	=27glutPostRedisplay();
+				//Escape	=27
 
 				if(key <= 26){ key += 96; }
 
@@ -288,9 +288,9 @@ public:
 			else if(127 == key){ key = 8; }
 
 			#endif
-
-			//printf("GLUT o: %3d %c\n", key, key);
 		}
+
+		//printf("GLUT o: %3d %c\n", key, key);
 
 		return key;
 	}
