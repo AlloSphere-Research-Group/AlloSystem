@@ -61,14 +61,25 @@ if(NOT NO_EXAMPLES)
   if(GAMMA_FOUND)
     include_directories(${GAMMA_INCLUDE_DIR})
     file(GLOB ALLOGLV_EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/*.cpp)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin/examples/)
     foreach(example ${ALLOGLV_EXAMPLE_FILES})
       get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
-      add_executable(alloGLV_${EXAMPLE_NAME} ${example})
-      target_link_libraries(alloGLV_${EXAMPLE_NAME} allocore ${ALLOCORE_LINK_LIBRARIES} ${GLV_LIBRARY} alloGLV)
+      if (ALLOSYSTEM_BUILD)
+	set(EXAMPLE_TARGET alloGLV_examples_${EXAMPLE_NAME})
+      else(ALLOSYSTEM_BUILD)
+	set(EXAMPLE_TARGET examples_${EXAMPLE_NAME})
+      endif(ALLOSYSTEM_BUILD)
+      add_executable(${EXAMPLE_TARGET} ${example})
+      target_link_libraries("${EXAMPLE_TARGET}" allocore ${ALLOCORE_LINK_LIBRARIES} ${GLV_LIBRARY} alloGLV)
       if (apple)
         find_library(AUDIOUNIT_FM AudioUnit)
-        target_link_libraries(alloGLV_${EXAMPLE_NAME} ${AUDIOUNIT_FM})
+        target_link_libraries(${EXAMPLE_TARGET} ${AUDIOUNIT_FM})
       endif()
+      add_custom_target("${EXAMPLE_TARGET}_run"
+	COMMAND "${EXAMPLE_TARGET}"
+	DEPENDS "${EXAMPLE_TARGET}"
+	WORKING_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+	SOURCES ${example})
     endforeach(example)
   else()
     message("Gamma not found. not building alloGLV examples.")

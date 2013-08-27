@@ -95,11 +95,22 @@ if(NOT NO_EXAMPLES)
     include_directories(${GAMMA_INCLUDE_DIRS} ${GLV_INCLUDE_DIRS})
 
     file(GLOB EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/*.cpp)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin/examples/)
     foreach(example ${EXAMPLE_FILES})
       get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
-      add_executable(allovsr_${EXAMPLE_NAME} ${example})
-      add_dependencies(allovsr_${EXAMPLE_NAME} GLV vsr alloGLV)
-      target_link_libraries(allovsr_${EXAMPLE_NAME} ${ALLOVSR_LINK_LIBRARIES} ${ALLOCORE_LINK_LIBRARIES})
+      if (ALLOSYSTEM_BUILD)
+	set(EXAMPLE_TARGET allovsr_examples_${EXAMPLE_NAME})
+      else(ALLOSYSTEM_BUILD)
+	set(EXAMPLE_TARGET examples_${EXAMPLE_NAME})
+      endif(ALLOSYSTEM_BUILD)
+      add_executable(${EXAMPLE_TARGET} ${example})
+      target_link_libraries("${EXAMPLE_TARGET}" ${ALLOVSR_LINK_LIBRARIES} ${ALLOCORE_LINK_LIBRARIES})
+      add_dependencies("${EXAMPLE_TARGET}" allocore alloGLV vsr)
+      add_custom_target("${EXAMPLE_TARGET}_run"
+	COMMAND "${EXAMPLE_TARGET}"
+	DEPENDS "${EXAMPLE_TARGET}"
+	WORKING_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+	SOURCES ${example})
     endforeach(example)
   endif(NOT GAMMA_LIBRARY)
 endif(NOT NO_EXAMPLES)

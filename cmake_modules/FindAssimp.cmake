@@ -10,6 +10,10 @@ include(LibFindMacros)
 
 # Dependencies
 #libfind_package(LO Magick)
+if(USE_ASSIMP_V3)
+    add_definitions(-DUSE_ASSIMP3)
+endif()
+
 if((NOT ASSIMP_INCLUDE_DIR) AND (NOT ASSIMP_LIBRARY)) 
   # Use pkg-config to get hints about paths
   libfind_pkg_check_modules(ASSIMP_PKGCONF libassimp)
@@ -33,6 +37,7 @@ if((NOT ASSIMP_INCLUDE_DIR) AND (NOT ASSIMP_LIBRARY))
   if (ASSIMP3_INCLUDE_DIR)
     message("Assimp 3 found")
     set(ASSIMP_INCLUDE_DIR ${ASSIMP3_INCLUDE_DIR})
+    set(USE_ASSIMP_V3 1 CACHE STRING "Use assimp v3")
     add_definitions(-DUSE_ASSIMP3)
   endif(ASSIMP3_INCLUDE_DIR)
 
