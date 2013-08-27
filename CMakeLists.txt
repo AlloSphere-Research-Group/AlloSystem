@@ -153,19 +153,30 @@ if(NOT NO_PROJECTS)
     foreach(project_src ${PROJECT_FILES})
       get_filename_component(PROJECT_NAME ${project_src} NAME_WE) # Get name w/o extension
       set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/projects/${dir})
-      add_executable(${PROJECT_NAME} ${project_src})
-      message("Building project: projects_${PROJECT_NAME}")
+
+      if ("${dir}" STREQUAL ".")
+	set(PROJECT_TARGET projects_${PROJECT_NAME})
+      else()
+	set(PROJECT_TARGET projects_${dir}_${PROJECT_NAME})
+      endif()
+      add_executable(${PROJECT_TARGET} ${project_src})
+      message("Building project: ${PROJECT_TARGET}")
       include_directories(${CMAKE_CURRENT_SOURCE_DIR}/allocore/
         ${CMAKE_CURRENT_SOURCE_DIR}/alloutil/
         ${CMAKE_CURRENT_SOURCE_DIR}/alloGLV/
         ${CMAKE_CURRENT_SOURCE_DIR}/allovsr/
         ${GAMMA_INCLUDE_DIRs} )
       #    message("Gamma : ${GAMMA_INCLUDE_DIRs}")
-      target_link_libraries(${PROJECT_NAME} allocore alloutil alloGLV ${GAMMA_LIBRARIES}
+      target_link_libraries(${PROJECT_TARGET} allocore alloutil alloGLV ${GAMMA_LIBRARIES}
         ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOGLV_LINK_LIBRARIES})
       list(REMOVE_ITEM PROJECT_RES_FILES ${project_src})
-      add_custom_target("projects_${PROJECT_NAME}" DEPENDS ${PROJECT_NAME} COMMAND "${CMAKE_SOURCE_DIR}/build/projects/${dir}/${PROJECT_NAME}")
-      #    add_custom_command(TARGET "projects_${PROJE${PROJECT_NAME}CT_NAME}" POST_BUILD COMMAND ${CMAKE_SOURCE_DIR}/build/projects/${dir}/${PROJECT_NAME})
+      add_custom_target("${PROJECT_TARGET}_run"
+	COMMAND "${PROJECT_TARGET}"
+	DEPENDS "${PROJECT_TARGET}"
+	WORKING_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+	SOURCES ${project_src}
+	COMMENT "Running: ${PROJECT_TARGET}")
+
     endforeach(project_src)
 
     foreach(FILENAME ${PROJECT_RES_FILES})
