@@ -183,6 +183,10 @@ if(NOT NO_EXAMPLES)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin/examples/${dir})
     file(GLOB EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/${dir}/*.cpp)
     foreach(example ${EXAMPLE_FILES})
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/examples/${dir}/flags.txt)
+      file(READ ${CMAKE_CURRENT_SOURCE_DIR}/examples/${dir}/flags.txt EXTRA_COMPILER_FLAGS)
+      message("WARNING: Using additional flags from /examples/${dir}/flags.txt: " ${EXTRA_COMPILER_FLAGS})
+    endif()
       get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
       if (ALLOSYSTEM_BUILD)
 	set(EXAMPLE_TARGET allocore_examples_${dir}_${EXAMPLE_NAME})
@@ -200,7 +204,8 @@ if(NOT NO_EXAMPLES)
 	COMMAND "${EXAMPLE_TARGET}"
 	DEPENDS "${EXAMPLE_TARGET}"
 	WORKING_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-	SOURCES ${example})
+	SOURCES ${example}
+	COMMENT "Running: ${EXAMPLE_TARGET}")
     endforeach(example)
   endforeach(dir)
 
