@@ -100,7 +100,7 @@ public:
 	void meta (bool state);		///< Set meta key state
 	void shift(bool state);		///< Set shift key state
 
-	void print() const;			///< Print keyboard state to stdout
+	void print() const;			///< Print keyboard state
 
 protected:
 	friend class WindowImpl;

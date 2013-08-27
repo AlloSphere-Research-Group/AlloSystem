@@ -9,18 +9,50 @@ if [ `which apt-get 2>/dev/null` ]; then
 	sudo apt-get install libglew-dev freeglut3-dev 
 	sudo apt-get install libavahi-client-dev	# for protocol/al_ZeroConf
 	sudo apt-get install libudev-dev libusb-1.0-0-dev # for io/al_HID
-	sudo apt-get install libassimp-dev=2.0.863+dfsg-2 libfreeimage-dev libfreetype6-dev
+	sudo apt-get install libfreeimage-dev libfreetype6-dev
+
+	# Get version of installed assimp
+	ASSIMP_V=$(apt-cache policy libassimp-dev | grep Installed | cut -f2 -d: | sed -e 's/[ ]*//')
+
+	# If assimp2 is installed, then prompt to remove it
+	if [ "$ASSIMP_V" == "2.0.863+dfsg-2" ]; then
+		echo "assimp version" $ASSIMP_V "detected."
+		echo "It is recommended that you remove this version to avoid configuration problems with AlloCore."
+		echo -n "Would you like to remove it [Y/n]? "
+		read ANS
+		if [ "$ANS" == "Y" ]; then
+			echo "Removing assimp" $ASSIMP_V
+			sudo apt-get remove libassimp-dev=$ASSIMP_V
+		fi
+	fi
+
+	# Ensure that assimp3 headers are being installed.
+	available_assimp_version=$(apt-cache madison libassimp-dev | head -1 | cut -f2 -d\|)
+	assimp3_available=$(dpkg --compare-versions ${available_assimp_version} ge 3);
+
+	if [ $assimp3_available ]; then
+		sudo apt-get install libassimp-dev
+	# Otherwise build assimp3 from source and install.
+	else
+		sudo apt-get install cmake
+		PKG=assimp--3.0.1270-source-only
+		wget http://sourceforge.net/projects/assimp/files/assimp-3.0/$PKG.zip
+		unzip -q $PKG.zip
+		pushd $PKG
+			cmake -DENABLE_BOOST_WORKAROUND=ON .
+			make
+			sudo make install
+		popd
+		rm -rf $PKG
+		rm $PKG.zip
+	fi 
 
 elif [ `which port 2>/dev/null` ]; then
 	echo "Found MacPorts"
 	sudo port selfupdate
 	sudo port install portaudio libsndfile +universal
 	sudo port install glew +universal
-
-	# Since we only support v.2, we need to use an old Portfile
-	#sudo port install assimp
-	pushd `find . -name assimp2 -type d`; sudo port install; popd
-
+	sudo port install assimp +universal
 	sudo port install freeimage +universal
 	sudo port install freetype +universal
 
@@ -123,19 +155,27 @@ elif [ `uname | grep MINGW` ]; then
 			rm $PKG.zip
 		fi
 
+		# Remove assimp2 if found
+		if [ -e $DESTDIR/include/assimp/assimp.h ]; then
+			echo "Found AssImp2. This will be removed to update to AssImp3..."
+			rm -rf $DESTDIR/include/assimp
+			rm $DESTDIR/bin/Assimp32.dll
+			rm $DESTDIR/lib/assimp.lib
+		fi
+
 		LIBFILES=($DESTDIR/lib/assimp*)
 		if [ -e ${LIBFILES[0]} ]; then
 			echo "Found AssImp"
 		else
-			PKG=assimp--2.0.863-sdk
-			wget http://downloads.sourceforge.net/project/assimp/assimp-2.0/$PKG.zip
+			PKG=assimp--3.0.1270-full
+			wget http://sourceforge.net/projects/assimp/files/assimp-3.0/$PKG.zip
 			unzip -q $PKG.zip
-			install -d $DESTDIR/include/assimp/Compiler/
-			cp -r $PKG/include/* $DESTDIR/include/assimp/
+			rm $PKG.zip
+			mv assimp* $PKG
+			cp -r $PKG/include/* $DESTDIR/include/
 			cp $PKG/bin/assimp_release-dll_win32/Assimp32.dll $DESTDIR/bin/
 			cp $PKG/lib/assimp_release-dll_win32/assimp.lib $DESTDIR/lib/
 			rm -rf $PKG
-			rm $PKG.zip
 		fi
 
 		LIBFILES=($DESTDIR/lib/libglew32*)
