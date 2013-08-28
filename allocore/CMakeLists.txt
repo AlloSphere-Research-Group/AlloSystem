@@ -174,6 +174,11 @@ set_target_properties(allocore
   )
 target_link_libraries(allocore ${ALLOCORE_LINK_LIBRARIES})
 
+# Doxygen documentation target
+add_custom_target("doc"
+	COMMAND "doxygen" "Doxyfile"
+	WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/doc"
+	COMMENT "Generate doxygen documentation")
 
 #--------------------------------------------------------------------------
 # Examples
