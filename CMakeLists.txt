@@ -8,12 +8,23 @@ set(ALLOSYSTEM_BUILD 1) # Bulding all of allosystem (do not change this manually
 include(CustomLibPaths.cmake)
 
 # default build set
+set(BUILD_EVERYTHING 0 CACHE STRING "Build everything")
+
 set(BUILD_GAMMA 0 CACHE STRING "Build external Gamma")
-set(BUILD_GLV 0 CACHE STRING "Build external GLV")
+set(BUILD_GLV 0 CACHE STRING "Build external GLV. Implies building alloGLV.")
 set(BUILD_ALLOGLV 0 CACHE STRING "Build AlloGLV")
 set(BUILD_ALLOUTIL 1 CACHE STRING "Build alloutil")
-set(BUILD_VSR 1 CACHE STRING "Build vsr (only if allovsr is being built)")
+set(BUILD_VSR 0 CACHE STRING "Build vsr. Implies building vsr.")
 set(BUILD_ALLOVSR 0 CACHE STRING "Build allovsr")
+
+if(BUILD_EVERYTHING)
+  set(BUILD_GAMMA 1)
+  set(BUILD_GLV 1)
+  set(BUILD_ALLOGLV 1)
+  set(BUILD_ALLOUTIL 1)
+  set(BUILD_VSR 1)
+  set(BUILD_ALLOVSR 1)
+endif(BUILD_EVERYTHING)
 
 # External dependencies (Gamma, GLV and vsr)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
@@ -89,7 +100,7 @@ else()
 endif(BUILD_ALLOUTIL)
 
 # alloGLV ---------------------------------------
-if(BUILD_ALLOGLV)
+if(BUILD_ALLOGLV OR BUILD_GLV)
   if(BUILDING_GLV)
     message("Allosystem: GLV sources found. Building GLV and alloGLV.")
     add_subdirectory(alloGLV)
@@ -110,17 +121,17 @@ if(BUILD_ALLOGLV)
     get_target_property(ALLOGLV_LINK_LIBRARIES alloGLV ALLOGLV_LINK_LIBRARIES)
 else()
   find_package(AlloGLV QUIET)
-endif(BUILD_ALLOGLV)
+endif(BUILD_ALLOGLV OR BUILD_GLV)
 
 # allovsr ----------------------------------
-if(BUILD_ALLOVSR)
+if(BUILD_ALLOVSR OR BUILD_VSR)
   if(VSR_LIBRARY AND GLV_LIBRARY AND ALLOGLV_LIBRARY)
     add_subdirectory(allovsr)
     message("Allosystem: vsr, GLV and alloGLV libraries found. Building allovsr.")
   else()
     message(FATAL_ERROR "Allosystem: vsr, GLV or alloGLV  NOT found. NOT building allovsr.")
   endif(VSR_LIBRARY AND GLV_LIBRARY AND ALLOGLV_LIBRARY)
-endif(BUILD_ALLOVSR)
+endif(BUILD_ALLOVSR OR BUILD_VSR)
 
 # ----------------------------  Examples
 # macro to get subdirectories
