@@ -124,7 +124,6 @@ if(NOT NO_EXAMPLES)
       endif(ALLOSYSTEM_BUILD)
       add_executable(${EXAMPLE_TARGET} ${example})
       target_link_libraries("${EXAMPLE_TARGET}" alloutil ${ALLOUTIL_LINK_LIBRARIES} ${ALLOCORE_LINK_LIBRARIES})
-      message("${EXAMPLE_TARGET}_run")
       add_custom_target("${EXAMPLE_TARGET}_run"
 	COMMAND "${EXAMPLE_TARGET}"
 	DEPENDS "${EXAMPLE_TARGET}"
