@@ -47,8 +47,11 @@ Allosystem depends on:
  * GLEW
  * GLUT
  * Libsndfile
- * GLV
- * vsr
+ 
+ Optionally on:
+ * luajit (for alloutil)
+ * GLV (for alloGLV)
+ * vsr (for allovsr)
 
 You may not need all these dependencies if you plan to build only part of Allosystem.
 
@@ -63,7 +66,7 @@ From the AlloSystem/ root directory, cd into a module directory and run the scri
 This will download and install all the AlloCore dependencies using apt-get, MacPorts or homebrew.
 
 
-2.2 Building Allosystem (Makefiles on all systems)
+2.2 Building Allosystem (Using Make on Linux, OS X and MSYS on Windows)
 ----------------------------------------
 
 You need to use cmake to configure the build for your system. You can build Allocore like this: 
@@ -85,6 +88,21 @@ To produce a debug build:
 	./distclean
 	cmake . -DCMAKE_BUILD_TYPE=Debug
 	make
+	
+To enable a full build including alloGLV and allovsr, put the GLV and vsr sources next to the AlloSystem sources, and inside the AlloSystem folder do:
+
+    cmake . -DBUILD_EVERYTHING=1
+	
+This will build GLV, vsr and all the allo modules if the rest of the dependencies are present.
+
+Other useful configuration variables are:
+
+    BUILD_ALLOGLV=1/0
+    BUILD_ALLOUTIL=1/0
+    BUILD_ALLOVSR=1/0
+    BUILD_GAMMA=1/0
+    BUILD_VSR=1/0
+    BUILD_GLV=1/0
 
 2.3 Building Allosystem (XCode project)
 ----------------------------------------
@@ -102,7 +120,18 @@ You will be able to run examples and debug from Xcode
 
 Coming soon...
 
-2.4 Installing Allosystem
+3. Running examples and projects
+---
+
+Allosystem offers an easy way to try out examples and build simple projects without having to write makefiles or configure IDE projects. Any .cpp file placed within the examples folder (of AlloSystem and the submodules) will be built into an application with a line like:
+
+    ./buildandrun.sh allocore/examples/graphics/shaderSprites.cpp 
+
+This will also build any required dependencies and run cmake if needed.
+
+Note that you will have to run cmake if you want to use alloGLV or allovsr, as they are not part of the default build.
+
+4. Installing Allosystem
 ----------------------------------------
 
 Using cmake configured for Makefiles, you will be able to install all of Allosystem with headers by doing:
