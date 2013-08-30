@@ -1,7 +1,7 @@
 require 'formula'
 
 class Allosystem < Formula
-  head 'https://github.com/mantaraya36/AlloSystem.git', :tag => 'homebrew_testing6'
+  head 'https://github.com/AlloSphere-Research-Group/AlloSystem', :tag => 'cmake1'
 
   depends_on 'cmake' => :build
 	depends_on 'assimp'
