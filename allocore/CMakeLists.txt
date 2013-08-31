@@ -117,10 +117,11 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 # ---- Linux ------
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  set(EXAMPLE_LINUX_LIBS asound pthread)
+  set(EXAMPLE_LINUX_LIBS asound)
   add_definitions(-DAL_LINUX)
 
-  set(LINUX_LIBS ${LINUX_LIBS} avahi-common avahi-client)
+  find_package(Threads)
+  set(LINUX_LIBS ${LINUX_LIBS} avahi-common avahi-client ${CMAKE_THREAD_LIBS_INIT})
   # For HID
   find_package(Udev REQUIRED QUIET)
   include_directories(${UDEV_INCLUDE_DIR})
