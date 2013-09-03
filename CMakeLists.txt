@@ -47,7 +47,7 @@ endif(BUILD_GAMMA)
 
 # check for GLV and build ---------------------------------
 if(BUILD_GLV)
-  set(GLV_RELATIVE_DIR ${CMAKE_SOURCE_DIR}/../GLV)
+  set(GLV_RELATIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../GLV)
   if(EXISTS "${GLV_RELATIVE_DIR}" AND IS_DIRECTORY "${GLV_RELATIVE_DIR}")
     message("Allosystem: GLV sources found. Building GLV.")
     set(BUILDING_GLV 1)
@@ -63,7 +63,7 @@ endif(BUILD_GLV)
 
 # check for vsr and build ----------------------------
 if(BUILD_VSR AND BUILD_ALLOVSR)
-  set(VSR_RELATIVE_DIR ${CMAKE_SOURCE_DIR}/../vsr)
+  set(VSR_RELATIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../vsr)
   if((EXISTS "${VSR_RELATIVE_DIR}" AND IS_DIRECTORY "${VSR_RELATIVE_DIR}"))
     set(BUILDING_VSR 1)
     add_subdirectory(${VSR_RELATIVE_DIR} ${VSR_RELATIVE_DIR}/Allosystem-build)
