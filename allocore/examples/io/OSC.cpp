@@ -137,6 +137,14 @@ int main(){
 		osc::Send s(port, addr);
 		osc::Recv r(port);
 
+                if (!r.opened()) {
+                  printf("Failed to open socket on UDP port %d for OSC receipt.\n", port);
+                  printf("Probably another program is already listening on that port; I quit.\n");
+                  exit(1);
+                }
+
+
+
 		// Assign a handler to the receiver
 		r.handler(handler);
 
