@@ -19,7 +19,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(alloutil ${ALLOUTIL_SRC})
 set_target_properties(alloutil 
   PROPERTIES 
-  ALLOUTIL_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
+  ALLOUTIL_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" "${LUA_INCLUDE_DIR}")
   )
 
 find_package(Lua51 REQUIRED)
