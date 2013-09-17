@@ -144,6 +144,10 @@ You can specify a different install path by doing (to install in /opt/local):
 	cmake -DCMAKE_INSTALL_PREFIX:PATH=/opt/local .
 	sudo make install
 
+You can uninstall with:
+
+	xargs rm < install_manifest.txt
+
 License
 ======
 
