@@ -46,7 +46,6 @@
 
 namespace al{
 
-
 /// Utilities for parsing MIDI bytes
 class MIDIByte{
 public:
@@ -114,6 +113,7 @@ public:
 	/// Convert pitch wheel message bytes into a 14-bit value in [0, 16384)
 	static unsigned short convertPitchWheel(unsigned char byte2, unsigned char byte3);
 };
+
 
 
 /// MIDI error reporting
@@ -337,6 +337,19 @@ class MIDIIn : public MIDI
   void initialize( const std::string& clientName );
   MIDIInData inputData_;
 
+};
+
+
+/// Handles receipt of MIDI messages
+class MIDIMessageHandler{
+public:
+	virtual ~MIDIMessageHandler(){}
+
+	/// Called when a MIDI message is received
+	virtual void onMIDIMessage(double timeStamp, const std::vector<unsigned char>& message) = 0;
+
+	/// Bind handler to a MIDI input
+	void bindTo(MIDIIn& midiIn);
 };
 
 
