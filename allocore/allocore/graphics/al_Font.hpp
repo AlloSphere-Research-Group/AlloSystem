@@ -58,29 +58,38 @@ namespace al{
 class Font {
 public:
 	
+	/// Metrics of a single font character
 	struct FontCharacter{
 		FontCharacter() : width(10), y_offset(0) {}
 		int width;
 		int y_offset;
 	};
 
-	Font(std::string filename, int font_size=10, bool anti_aliased=true);
+
+	/// \param[in] filename		path to font file
+	/// \param[in] fontSize		size of font
+	/// \param[in] antialias	whether to apply antialiasing
+	Font(std::string filename, int fontSize=10, bool antialias=true);
+
 	~Font();
 
-	// Get metrics of a particular character (idx 0..255)
-	const FontCharacter & character(int idx) { return mChars[idx & 255]; }
 
-	// returns the width of a text string in pixels
+	/// Get metrics of a particular character (idx 0..255)
+	const FontCharacter& character(int idx) { return mChars[idx & 255]; }
+
+	/// Returns the width of a text string, in pixels
 	float width(std::string text);
+	
+	/// Returns the width of a character, in pixels
 	float width(unsigned char c) { return mChars[int(c)].width; }
 
-	// returns the "above-line" height of the font in pixels
+	/// Returns the "above-line" height of the font, in pixels
 	float ascender();
 	
-	// returns the "below-line" height of the font in pixels
+	/// Returns the "below-line" height of the font, in pixels
 	float descender();
 
-	// returns the total height of the font in pixels
+	/// Returns the total height of the font, in pixels
 	float size() const { return mFontSize; }
 	
 	
@@ -93,7 +102,7 @@ public:
 		Example usage:
 		<pre>		
 			Mesh mesh;
-			font.write("allocore", mesh);
+			font.write(mesh, "allocore");
 		
 			font.texture().bind();
 			gl.draw(mesh);
@@ -160,4 +169,3 @@ inline float Font :: width(std::string text) {
 } // al::
 
 #endif	/* include guard */
-
