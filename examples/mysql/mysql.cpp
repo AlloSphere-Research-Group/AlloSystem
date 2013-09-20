@@ -47,12 +47,17 @@ struct MySQL : App {
 
   virtual void onDraw(Graphics& g, const Viewpoint& v) {
     static Font font("../../examples/mysql/Inconsolata.otf", 72);
+    // make a nice gray background like we're using Processing
     g.clearColor(0.1, 0.1, 0.1, 1);
+
+    // These OpenGL modes are to make fonts work well
     g.clear(Graphics::COLOR_BUFFER_BIT);
     g.depthMask(false);
     g.depthTesting(false);
     g.blending(true);
     g.blendModeAdd();
+
+    // Now we can render text
     for (size_t row = 0; row < result.num_rows(); ++row) {
       g.pushMatrix();
         g.rotate((float)row / result.num_rows() * 360 + time, 1, 0, 0);
