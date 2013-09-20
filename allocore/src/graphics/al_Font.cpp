@@ -78,7 +78,7 @@ inline bool initialize_font() {
 struct Font::Impl {
 public:
 
-	static Impl * create(Font& font, std::string filename) {
+	static Impl * create(Font& font, const std::string& filename) {
 		if (!initialize_font()) return 0;
 		
 		FT_Face face;
@@ -184,7 +184,7 @@ protected:
 
 
 
-Font :: Font(std::string filename, int font_size, bool anti_aliased)
+Font :: Font(const std::string& filename, int font_size, bool anti_aliased)
 :	mFontSize(font_size),
 	mAntiAliased(anti_aliased),
 //	mTex(g, 192, 192, Graphics::LUMINANCE, Graphics::UCHAR)
@@ -201,12 +201,12 @@ Font :: ~Font() {
 }
 
 // returns the "above-line" height of the font in pixels
-float Font :: ascender() { return mImpl->ascender(); }
+float Font :: ascender() const { return mImpl->ascender(); }
 
 // returns the "below-line" height of the font in pixels
-float Font :: descender() { return mImpl->descender(); }
+float Font :: descender() const { return mImpl->descender(); }
 
-void Font :: write(Mesh& mesh, std::string text) {
+void Font :: write(Mesh& mesh, const std::string& text) {
 	
 	mesh.reset();
 	mesh.primitive(Graphics::QUADS);
