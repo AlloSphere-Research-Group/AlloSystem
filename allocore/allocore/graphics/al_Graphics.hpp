@@ -400,7 +400,7 @@ public:
 	void scale(const Vec<3,T>& v){ scale(v[0],v[1],v[2]); }
 
 	/// Translate current matrix
-	void translate(double x, double y, double z=1.);
+	void translate(double x, double y, double z=0.);
 
 	/// Translate current matrix
 	template <class T>
