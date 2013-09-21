@@ -60,8 +60,9 @@ public:
 	
 	/// Metrics of a single font character
 	struct FontCharacter{
-		FontCharacter() : width(10), y_offset(0) {}
+		FontCharacter() : width(10), x_offset(0), y_offset(0) {}
 		int width;
+		int x_offset;
 		int y_offset;
 	};
 

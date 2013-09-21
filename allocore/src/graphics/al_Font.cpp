@@ -136,9 +136,9 @@ protected:
 		const int padding_y = 1;
 		const int glyph_width = font.mFontSize+2*padding_x;
 		const int glyph_height = font.mFontSize+2*padding_y;
-			
+
 		for(int i=0; i < ASCII_SIZE; i++) {
-			
+
 			// load glyph:
 			int glyph_index = FT_Get_Char_Index(mFace, i);
 			if(font.mAntiAliased) {
@@ -149,21 +149,23 @@ protected:
 				FT_Load_Glyph(mFace, glyph_index, FT_LOAD_MONOCHROME);
 				FT_Render_Glyph(mFace->glyph, FT_RENDER_MODE_MONO);
 			}
-			
+
 			// store metrics:
 			font.mChars[i].width = mFace->glyph->advance.x/PIX_TO_EM;
+			font.mChars[i].x_offset = mFace->glyph->bitmap_left;
 			font.mChars[i].y_offset = mFace->glyph->bitmap_top;
-			
+
+			//printf("%c: %d\n", i, mFace->glyph->bitmap_left);
 			//printf("char %i %c %i %i\n", i, i, font.mChars[i].width, font.mChars[i].y_offset);
-			
+
 			// calculate texture pointer offset:
 			int xidx = i % GLYPHS_PER_ROW;
 			int yidx = (int)((float)i/(float)GLYPHS_PER_ROW);
 			int offset = (padding_y + yidx*glyph_height)*rowstride + 
 						 (padding_x + xidx*glyph_width );
-			
+
 			unsigned char * image = (unsigned char *)(optr + offset);
-				
+
 			// write glyph bitmap into texture:
 			FT_Bitmap *bitmap = &mFace->glyph->bitmap;
 			//if(font.mAntiAliased) {
@@ -234,7 +236,7 @@ void Font :: write(Mesh& mesh, const std::string& text) {
 		float tc_x1	= tc_x0+tcdim;
 		float tc_y1	= tc_y0+tcdim;
 		
-		float v_x0  = pos[0];
+		float v_x0  = pos[0] + c.x_offset;
 		float v_x1	= v_x0+cdim;
 		float v_y0	= margin+yy-pos[1];
 		float v_y1	= yy-csz-pos[1];
