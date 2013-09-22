@@ -436,9 +436,9 @@ public:
 	/// @param[in] eyePos	eye position
 	static const Matrix4 lookAt(const Vec<3,T>& ur, const Vec<3,T>& uu, const Vec<3,T>& uf, const Vec<3,T>& eyePos) {
 		return Matrix4(
-			 ur[0], ur[1], ur[2], -(ux.dot(eyePos)),
-			 uu[0], uu[1], uu[2], -(uy.dot(eyePos)),
-			 uf[0], uf[1], uf[2], -(uz.dot(eyePos)),
+			 ur[0], ur[1], ur[2], -(ur.dot(eyePos)),
+			 uu[0], uu[1], uu[2], -(uu.dot(eyePos)),
+			 uf[0], uf[1], uf[2], -(uf.dot(eyePos)),
 			0, 0, 0, 1
 		);
 	}
