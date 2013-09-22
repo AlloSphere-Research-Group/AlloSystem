@@ -1,6 +1,12 @@
 #include <math.h>
 #include "allocore/graphics/al_Shapes.hpp"
 
+/*
+Platonic solids code derived from:
+Bourke, P. (1993). "Platonic Solids (Regular polytopes in 3D)", 
+Accessed from http://paulbourke.net/geometry/platonic/.
+*/
+
 namespace al{
 
 const double phi = (1 + sqrt(5))/2; // the golden ratio
