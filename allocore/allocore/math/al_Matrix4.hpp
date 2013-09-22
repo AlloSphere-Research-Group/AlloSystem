@@ -52,6 +52,9 @@ namespace al {
 
 template<class T> class Matrix4;
 
+typedef Matrix4<double>	Matrix4d;	///< Double-precision 4-by-4 matrix
+typedef Matrix4<float>	Matrix4f;	///< Single-precision 4-by-4 matrix
+
 
 /// 4x4 Matrix (Homogenous Transform)
 template<typename T=double>
@@ -59,6 +62,7 @@ class Matrix4 : public Mat<4, T> {
 public:
 	typedef Mat<4, T> Base;	
 
+	/// Default constructor creates an identity matrix
 	Matrix4()
 	: Base(
 		1, 0, 0, 0, 
@@ -111,24 +115,32 @@ public:
 		)
 	{}
 	
+	/// @param[in] src		C-array to copy values from
 	Matrix4(const T * src)
 	:	Base(src)
 	{}
 	
-	Matrix4(const Base & src)
+	/// @param[in] src		matrix to copy values from
+	Matrix4(const Mat<4,T>& src)
 	:	Base(src)
 	{}
 	
-	Matrix4& set(const Base & src) { Base::set(src.elems()); return *this; }
 	
+	/// Set values from another matrix
+	Matrix4& set(const Mat<4,T>& src) { Base::set(src.elems()); return *this; }
+	
+	/// Get a quaternion representation
 	Quat<T>& toQuat() {
 		Quat<T> q;
 		q.fromMatrix(Base::elems);
 		return q;
 	}
+	
+	/// Set from quaternion
 	Matrix4& fromQuat(Quat<T>& q) { q.toMatrix(Base::elems()); return *this; }
 	Matrix4& fromQuatTransposed(Quat<T>& q) { q.toMatrixTransposed(Base::elems()); return *this; }
-		
+
+
 	static const Matrix4 identity() {
 		return Matrix4(
 			1,	0,	0,	0, 
@@ -219,19 +231,8 @@ public:
 		
 		return m;
 	}
-	
-	static const Matrix4 shearYZ(T y, T z) {
-		return Matrix4(	1,	0,	0,	0,
-						y,	1,	0,	0,
-						z,	0,	1,	0,
-						0,	0,	0,	1	);
-	}
-	static const Matrix4 shearZX(T z, T x) {
-		return Matrix4(	1,	x,	0,	0,
-						0,	1,	0,	0,
-						0,	z,	1,	0,
-						0,	0,	0,	1	);
-	}
+
+	/// Get a shear transformation matrix on the xy plane
 	static const Matrix4 shearXY(T x, T y) {
 		return Matrix4(	1,	0,	x,	0,
 						0,	1,	y,	0,
@@ -239,6 +240,24 @@ public:
 						0,	0,	0,	1	);
 	}
 
+	/// Get a shear transformation matrix on the yz plane
+	static const Matrix4 shearYZ(T y, T z) {
+		return Matrix4(	1,	0,	0,	0,
+						y,	1,	0,	0,
+						z,	0,	1,	0,
+						0,	0,	0,	1	);
+	}
+
+	/// Get a shear transformation matrix on the zx plane
+	static const Matrix4 shearZX(T z, T x) {
+		return Matrix4(	1,	x,	0,	0,
+						0,	1,	0,	0,
+						0,	z,	1,	0,
+						0,	0,	0,	1	);
+	}
+	
+
+	/// Get a perspective projection matrix
 
 	/// @param[in] l	distance from center of near plane to left edge
 	/// @param[in] r	distance from center of near plane to right edge
@@ -257,7 +276,13 @@ public:
 						0,		0,		-D2/D,		-fn2/D,
 						0,		0,		-1,			0 );
 	}
+
+	/// Get a perspective projection matrix
 	
+	/// @param[in] fovy		field of view angle, in degrees, in the y direction
+	/// @param[in] aspect	aspect ratio
+	/// @param[in] near		distance from eye to near plane
+	/// @param[in] far		distance from eye to far plane
 	static const Matrix4 perspective(T fovy, T aspect, T near, T far) {
 		float f = 1/tan(fovy*M_DEG2RAD/2.);
 		const T D = far-near;	const T D2 = far+near;
@@ -269,7 +294,7 @@ public:
 		);
 	}
 	
-	/// Calculate perspective projection for near plane and eye coordinates
+	/// Calculate perspective projection from near plane and eye coordinates
 	
 	/// (nearBL, nearBR, nearTL, eye) all share the same coordinate system
 	/// (nearBR,nearBL) and (nearTL,nearBL) should form a right angle
@@ -317,13 +342,17 @@ public:
 		return perspective(l, r, b, t, near, far);
 	}
 	
-	// for stereographics:
+	/// Get a left-eye perspective projection matrix (for stereographics)
 	static const Matrix4 perspectiveLeft(T fovy, T aspect, T near, T far, T eyeSep, T focal) {
 		return perspectiveOffAxis(fovy, aspect, near, far,-0.5*eyeSep, focal);
 	}
+	
+	/// Get a right-eye perspective projection matrix (for stereographics)
 	static const Matrix4 perspectiveRight(T fovy, T aspect, T near, T far, T eyeSep, T focal) {
 		return perspectiveOffAxis(fovy, aspect, near, far, 0.5*eyeSep, focal);
 	}
+	
+	/// Get an off-axis perspective projection matrix (for stereographics)
 	static const Matrix4 perspectiveOffAxis(T fovy, T aspect, T near, T far, T xShift, T focal) {
 		T top = near * tan(fovy*M_DEG2RAD*0.5);	// height of view at distance = near
 		T bottom = -top;
@@ -332,6 +361,16 @@ public:
 		T right = aspect*top + shift;
 		return perspective(left, right, bottom, top, near, far);
 	}
+	
+	/// Get an off-axis perspective projection matrix (for stereographics)
+
+	/// @param[in] fovy		field of view angle, in degrees, in the y direction
+	/// @param[in] aspect	aspect ratio
+	/// @param[in] near		near clipping plane coordinate
+	/// @param[in] far		far clipping plane coordinate
+	/// @param[in] xShift	amount to shift off x-axis
+	/// @param[in] yShift	amount to shift off y-axis
+	/// @param[in] focal	focal length
 	static const Matrix4 perspectiveOffAxis(T fovy, T aspect, T near, T far, T xShift, T yShift, T focal) {
 		float tanfovy = tan(fovy*M_DEG2RAD/2.);
 		T t = near * tanfovy;	// height of view at distance = near
@@ -361,6 +400,14 @@ public:
 						0,		0,		-D/fn2,	D2/fn2	);
 	}
 	
+	/// Get an orthographic projection matrix
+	
+	/// @param[in] l	coordinate of left clipping plane
+	/// @param[in] r	coordinate of right clipping plane
+	/// @param[in] b	coordinate of bottom clipping plane
+	/// @param[in] t	coordinate of top clipping plane
+	/// @param[in] n	coordinate of near clipping plane
+	/// @param[in] f	coordinate of far clipping plane
 	static const Matrix4 ortho(T l, T r, T b, T t, T n, T f) {
 		const T W = r-l;	const T W2 = r+l;
 		const T H = t-b;	const T H2 = t+b;
@@ -381,25 +428,26 @@ public:
 						0,		0,		0,		1	);
 	}
 
-
-	/*
-	How does lookAt work?
-	http://pyopengl.sourceforge.net/documentation/manual/gluLookAt.3G.html
-	http://www.opengl.org/wiki/GluLookAt_code
-	*/
+	/// Get a viewing matrix based on an eye reference frame
 	
-	/// @param[in] ux	
-	///
-	///
-	static const Matrix4 lookAt(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& eyePos) {
+	/// @param[in] ur		eye right unit direction vector
+	/// @param[in] uu		eye up unit direction vector
+	/// @param[in] uf		eye forward unit direction vector
+	/// @param[in] eyePos	eye position
+	static const Matrix4 lookAt(const Vec<3,T>& ur, const Vec<3,T>& uu, const Vec<3,T>& uf, const Vec<3,T>& eyePos) {
 		return Matrix4(
-			 ux[0], ux[1], ux[2], -(ux.dot(eyePos)),
-			 uy[0], uy[1], uy[2], -(uy.dot(eyePos)),
-			 uz[0], uz[1], uz[2], -(uz.dot(eyePos)),
+			 ur[0], ur[1], ur[2], -(ux.dot(eyePos)),
+			 uu[0], uu[1], uu[2], -(uy.dot(eyePos)),
+			 uf[0], uf[1], uf[2], -(uz.dot(eyePos)),
 			0, 0, 0, 1
 		);
 	}
+
+	/// Get a viewing matrix based on look-at parameters
 	
+	/// @param[in] eyePos	eye position
+	/// @param[in] at		point being looked at
+	/// @param[in] up		up vector
 	static const Matrix4 lookAt(const Vec<3,T>& eyePos, const Vec<3,T>& at, const Vec<3,T>& up) {
 		Vec<3,T> z = (at - eyePos).normalize();	
 		Vec<3,T> y = up; y.normalize();
@@ -423,13 +471,17 @@ public:
 //		return lookAt(x, y, z, eye);
 //	}	
 	
-	// for stereographics:
+	/// Get a left-eye viewing matrix
 	static const Matrix4 lookAtLeft(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& pos, double eyeSep) {
 		return lookAtOffAxis(ux,uy,uz, pos,-0.5*eyeSep);
 	}
+	
+	/// Get a right-eye viewing matrix
 	static const Matrix4 lookAtRight(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& pos, double eyeSep) {
 		return lookAtOffAxis(ux,uy,uz, pos, 0.5*eyeSep);
 	}
+	
+	/// Get an off-axis viewing matrix
 	static const Matrix4 lookAtOffAxis(const Vec<3,T>& ux, const Vec<3,T>& uy, const Vec<3,T>& uz, const Vec<3,T>& pos, double eyeShift){
 		return lookAt(ux, uy, uz, pos + (ux * -eyeShift));
 	}
@@ -456,7 +508,8 @@ public:
 		fprintf(out, "%f, %f, %f, %f }",	m[3], m[7], m[11], m[15]);
 	}
 	
-	static const Matrix4 inverse(const Base& m) {
+	/// Get the inverse of a matrix
+	static const Matrix4 inverse(const Mat<4,T>& m) {
 		double determinant =
 			m[12]*m[9]*m[6]*m[3] - m[8]*m[13]*m[6]*m[3] - m[12]*m[5]*m[10]*m[3] + m[4]*m[13]*m[10]*m[3]+
 			m[8]*m[5]*m[14]*m[3] - m[4]*m[9]*m[14]*m[3] - m[12]*m[9]*m[2]*m[7] + m[8]*m[13]*m[2]*m[7]+
@@ -485,9 +538,6 @@ public:
 		) * (1./determinant);
 	}
 };
-
-typedef Matrix4<double>	Matrix4d;	///< Double-precision 4-by-4 matrix
-typedef Matrix4<float>	Matrix4f;	///< Single-precision 4-by-4 matrix
 
 
 
