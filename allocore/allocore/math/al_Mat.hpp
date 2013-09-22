@@ -283,6 +283,10 @@ public:
 
 	/// Set all elements to value
 	Mat& set(const T& v){ IT(size()){ (*this)[i]=v; } return *this; }
+
+	/// Set elements from another matrix
+	template <class U>
+	Mat& set(const Mat<N,T>& v){ return set(v.elems()); }
 	
 	/// Set elements in column-major order from C array
 	template <class U>
