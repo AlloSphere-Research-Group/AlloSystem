@@ -428,6 +428,22 @@ public:
 						0,		0,		0,		1	);
 	}
 
+	/// Get a two-dimensional orthographic projection matrix
+	
+	/// This is identical to ortho with -1, 1 for the near, far distances.
+	/// @param[in] l	coordinate of left clipping plane
+	/// @param[in] r	coordinate of right clipping plane
+	/// @param[in] b	coordinate of bottom clipping plane
+	/// @param[in] t	coordinate of top clipping plane
+	static const Matrix4 ortho2D(T l, T r, T b, T t) {
+		const T W = r-l;	const T W2 = r+l;
+		const T H = t-b;	const T H2 = t+b;
+		return Matrix4(	2/W,	0,		0,		-W2/W,
+						0,		2/H,	0,		-H2/H,
+						0,		0,		-1,		0,
+						0,		0,		0,		1	);
+	}
+
 	/// Get a viewing matrix based on an eye reference frame
 	
 	/// @param[in] ur		eye right unit direction vector
