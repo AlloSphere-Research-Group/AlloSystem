@@ -130,10 +130,8 @@ public:
 	Matrix4& set(const Mat<4,T>& src) { Base::set(src.elems()); return *this; }
 	
 	/// Get a quaternion representation
-	Quat<T>& toQuat() {
-		Quat<T> q;
-		q.fromMatrix(Base::elems);
-		return q;
+	Quat<T> toQuat() const {
+		return Quat<T>().fromMatrix(Base::elems());
 	}
 	
 	/// Set from quaternion
