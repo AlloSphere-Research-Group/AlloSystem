@@ -513,15 +513,7 @@ public:
 		Mat<4,T>::multiply(r, *this, v);
 		return r;
 	}
-	
-	const Matrix4& print(FILE * out = stderr) const {
-		const Mat<4,T>& m = *this;
-		fprintf(out, "{ %f, %f, %f, %f,\n",	m[0], m[4], m[8], m[12]);
-		fprintf(out, "%f, %f, %f, %f,\n",	m[1], m[5], m[9], m[13]);
-		fprintf(out, "%f, %f, %f, %f,\n",	m[2], m[6], m[10], m[14]);
-		fprintf(out, "%f, %f, %f, %f }",	m[3], m[7], m[11], m[15]);
-		return *this;
-	}
+
 	
 	/// Get the inverse of a matrix
 	static Matrix4 inverse(const Mat<4,T>& m) {

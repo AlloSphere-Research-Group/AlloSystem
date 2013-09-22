@@ -286,7 +286,7 @@ public:
 
 	/// Set elements from another matrix
 	template <class U>
-	Mat& set(const Mat<N,T>& v){ return set(v.elems()); }
+	Mat& set(const Mat<N,U>& v){ return set(v.elems()); }
 	
 	/// Set elements in column-major order from C array
 	template <class U>
@@ -454,6 +454,9 @@ public:
 		return *this;
 	}
 
+
+	/// Print to file (stream)
+	void print(FILE * file = stderr) const;
 };
 
 
@@ -540,14 +543,18 @@ bool invert(Mat<3,T>& m){
 	return false;
 }
 
-/// Print
-template <int N, class T> 
-static void print(const Mat<N,T>& m) {
+
+
+template <int N, class T>
+void Mat<N,T>::print(FILE * file) const {
 	for(int R=0; R<N; ++R){
+		fprintf(file, "%c", " {"[R==0]);
 		for(int C=0; C<N; ++C){
-			printf("% 6.3g ", double(m(R,C)));
-		}	printf("\n");
-	}	printf("\n");
+			fprintf(file, "% 6.3g%s",
+				double((*this)(R,C)), (R!=N-1)||(C!=N-1) ? ", " : "}");
+		}
+		fprintf(file, "\n");
+	}
 }
 
 #undef IT
