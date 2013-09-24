@@ -21,8 +21,8 @@ else (GAMMA_LIBRARY AND GAMMA_INCLUDE_DIR)
     NAMES
           Gamma/Gamma.h
     PATHS
-        ${CMAKE_SOURCE_DIR}/../../Gamma
         ${CMAKE_SOURCE_DIR}/../Gamma
+        ${CMAKE_SOURCE_DIR}/../../Gamma
       /usr/include
       /usr/local/include
       /opt/local/include
@@ -34,8 +34,8 @@ else (GAMMA_LIBRARY AND GAMMA_INCLUDE_DIR)
 	  Gamma
 	  libGamma
     PATHS
-	${CMAKE_SOURCE_DIR}/../../Gamma/build/lib
         ${CMAKE_SOURCE_DIR}/../Gamma/build/lib
+	${CMAKE_SOURCE_DIR}/../../Gamma/build/lib
       /usr/lib
       /opt/local/lib
       /usr/local/lib
