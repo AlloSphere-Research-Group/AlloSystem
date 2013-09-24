@@ -31,7 +31,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake_mo
 
 # check for Gamma and build ---------------------------------
 if(BUILD_GAMMA)
-  set(GAMMA_RELATIVE_DIR ${CMAKE_SOURCE_DIR}/../Gamma)
+  set(GAMMA_RELATIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../Gamma)
   if(EXISTS "${GAMMA_RELATIVE_DIR}" AND IS_DIRECTORY "${GAMMA_RELATIVE_DIR}")
     message("Allosystem: GAMMA sources found. Building Gamma.")
     set(BUILDING_GAMMA 1)
