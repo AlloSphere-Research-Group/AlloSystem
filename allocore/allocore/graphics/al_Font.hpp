@@ -164,7 +164,6 @@ inline float Font :: width(const std::string& text) const {
 	for (unsigned i=0; i < text.size(); i++) {
 		total += mChars[ (int)text[i] ].width;
 	}
-	total += mChars[*--text.end()].x_offset;
 	return total;
 }
 
