@@ -33,6 +33,7 @@ struct MyApp : App {
       exit(-1);
     }
 
+    // Here we copy the pixels from the image to the texture
     texture.allocate(image.array());
 
     // Don't bother trying to print the image or the image's array directly

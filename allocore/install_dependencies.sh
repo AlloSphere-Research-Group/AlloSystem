@@ -88,7 +88,7 @@ elif [ `uname | grep MINGW` ]; then
 			tar -xzf $PKG.tar.gz
 			pushd $PKG
 				./configure --prefix=$DESTDIR
-				make install -j3
+				make install
 			popd
 			rm -rf $PKG
 			rm $PKG.tar.gz
@@ -104,7 +104,7 @@ elif [ `uname | grep MINGW` ]; then
 			mv portaudio $PKG
 			pushd $PKG
 				./configure --prefix=$DESTDIR
-				make install -j3
+				make install
 			popd
 			rm -rf $PKG
 			rm $PKG.tgz
@@ -198,7 +198,7 @@ elif [ `uname | grep MINGW` ]; then
 			wget http://downloads.sourceforge.net/project/glew/glew/1.9.0/$PKG.zip
 			unzip -q $PKG.zip
 			pushd $PKG
-				make install GLEW_DEST=/usr/local/ -j3
+				make install GLEW_DEST=/usr/local/
 			popd
 			rm -rf $PKG
 			rm $PKG.zip

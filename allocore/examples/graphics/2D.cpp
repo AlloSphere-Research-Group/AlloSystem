@@ -2,7 +2,8 @@
 Allocore Example: 2D drawing
 
 Description:
-This demonstrates how to do 2D drawing.
+This demonstrates how to do 2D drawing by setting up an orthographic projection
+matrix.
 
 Author:
 Lance Putnam, 2/2012 (putnam.lance at gmail dot com)
@@ -34,15 +35,15 @@ public:
 
 	virtual void onDraw(Graphics& g, const Viewpoint& v){
 		
-		// Start with a new projection matrix
-		g.pushMatrix(g.PROJECTION);
-		g.loadIdentity();
+		// Switch to the projection matrix
+		g.pushMatrix(Graphics::PROJECTION);
 
 		// Set up 2D orthographic projection coordinates
 		// The args are left, right, bottom, top
-		gluOrtho2D(-1,1,-1,1);
+		g.loadMatrix(Matrix4f::ortho2D(-1,1, -1,1));
 
-		g.pushMatrix(g.MODELVIEW);
+		// Switch to the modelview matrix
+		g.pushMatrix(Graphics::MODELVIEW);
 		g.loadIdentity();
 
 			g.draw(verts);
@@ -50,8 +51,10 @@ public:
 		g.popMatrix();
 
 		// Don't forget to restore original projection matrix
-		g.popMatrix(g.PROJECTION);
+		g.popMatrix(Graphics::PROJECTION);
 	}
 };
 
-int main(){ MyApp().start(); }
+int main(){
+	MyApp().start();
+}

@@ -58,29 +58,39 @@ namespace al{
 class Font {
 public:
 	
+	/// Metrics of a single font character
 	struct FontCharacter{
-		FontCharacter() : width(10), y_offset(0) {}
+		FontCharacter() : width(10), x_offset(0), y_offset(0) {}
 		int width;
+		int x_offset;
 		int y_offset;
 	};
 
-	Font(std::string filename, int font_size=10, bool anti_aliased=true);
+
+	/// \param[in] filename		path to font file
+	/// \param[in] fontSize		size of font
+	/// \param[in] antialias	whether to apply antialiasing
+	Font(const std::string& filename, int fontSize=10, bool antialias=true);
+
 	~Font();
 
-	// Get metrics of a particular character (idx 0..255)
-	const FontCharacter & character(int idx) { return mChars[idx & 255]; }
 
-	// returns the width of a text string in pixels
-	float width(std::string text);
-	float width(unsigned char c) { return mChars[int(c)].width; }
+	/// Get metrics of a particular character (idx 0..255)
+	const FontCharacter& character(int idx) const { return mChars[idx & 255]; }
 
-	// returns the "above-line" height of the font in pixels
-	float ascender();
+	/// Returns the width of a text string, in pixels
+	float width(const std::string& text) const;
 	
-	// returns the "below-line" height of the font in pixels
-	float descender();
+	/// Returns the width of a character, in pixels
+	float width(unsigned char c) const { return mChars[int(c)].width; }
 
-	// returns the total height of the font in pixels
+	/// Returns the "above-line" height of the font, in pixels
+	float ascender() const;
+	
+	/// Returns the "below-line" height of the font, in pixels
+	float descender() const;
+
+	/// Returns the total height of the font, in pixels
 	float size() const { return mFontSize; }
 	
 	
@@ -93,7 +103,7 @@ public:
 		Example usage:
 		<pre>		
 			Mesh mesh;
-			font.write("allocore", mesh);
+			font.write(mesh, "allocore");
 		
 			font.texture().bind();
 			gl.draw(mesh);
@@ -101,13 +111,13 @@ public:
 		</pre>
 		
 	*/
-	void write(Mesh& mesh, std::string text);
+	void write(Mesh& mesh, const std::string& text);
 	
 	/*
 		Renders using an internal mesh (reset for each render() call)
 		For rendering large volumes of text, use write() instead.
 	*/
-	void render(Graphics& g, std::string text);
+	void render(Graphics& g, const std::string& text);
 	void renderf(Graphics& g, const char * fmt, ...);
 	
 	// TODO:
@@ -142,14 +152,14 @@ inline void Font :: renderf(Graphics& g, const char * fmt, ...) {
 	render(g, line);
 }
 
-inline void Font :: render(Graphics& g, std::string text) {
+inline void Font :: render(Graphics& g, const std::string& text) {
 	write(mMesh, text);
 	mTex.bind(0);
 	g.draw(mMesh);
 	mTex.unbind(0);
 }
 
-inline float Font :: width(std::string text) {
+inline float Font :: width(const std::string& text) const {
 	float total = 0.f;
 	for (unsigned i=0; i < text.size(); i++) {
 		total += mChars[ (int)text[i] ].width;
@@ -160,4 +170,3 @@ inline float Font :: width(std::string text) {
 } // al::
 
 #endif	/* include guard */
-

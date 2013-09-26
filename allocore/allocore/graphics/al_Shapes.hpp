@@ -46,21 +46,34 @@
 
 namespace al{
 
-// Platonic solids
-
 /// Add tetrahedron as triangle vertices and indices
+
+/// @param[in,out]	m		mesh to add vertices and indices to
+/// \returns number of vertices added
 int addTetrahedron(Mesh& m);
 
 /// Add cube as triangle vertices and indices
+
+/// @param[in,out]	m		mesh to add vertices and indices to
+/// \returns number of vertices added
 int addCube(Mesh& m, bool withNormalsAndTexcoords = false, float radius=M_SQRT_1_3);
 
 /// Add octahedron as triangle vertices and indices
+
+/// @param[in,out]	m		mesh to add vertices and indices to
+/// \returns number of vertices added
 int addOctahedron(Mesh& m);
 
 /// Add dodecahedron as triangle vertices and indices
+
+/// @param[in,out]	m		mesh to add vertices and indices to
+/// \returns number of vertices added
 int addDodecahedron(Mesh& m);
 
 /// Add icosahedron as triangle vertices and indices
+
+/// @param[in,out]	m		mesh to add vertices and indices to
+/// \returns number of vertices added
 int addIcosahedron(Mesh& m);
 
 
@@ -74,16 +87,30 @@ int addIcosahedron(Mesh& m);
 /// @param[in]		radius	radius of sphere
 /// @param[in]		slices	number of slices around z axis
 /// @param[in]		stacks	number of stacks on xy plane
+/// \returns number of vertices added
 int addSphere(Mesh& m, double radius=1, int slices=16, int stacks=16);
 int addSphereWithTexcoords(Mesh& m, double radius=1, int bands=16 );
 
 
 /// Add wireframe box as line vertices and indices
+
+/// @param[in,out]	m		mesh to add vertices and indices to
+/// @param[in]		width	total width (along x)
+/// @param[in]		height	total height (along y)
+/// @param[in]		depth	total depth (along z)
+/// \returns number of vertices added
 int addWireBox(Mesh& m, float width, float height, float depth);
 inline int addWireBox(Mesh& m, float size=1){ return addWireBox(m,size,size,size); }
 
 
-/// Add a tessellated rectangular surface; render with triangle strip
+/// Add a tessellated rectangular surface as triangle strip vertices and indices
+
+/// @param[in,out]	m		mesh to add vertices and indices to
+/// @param[in]		dimX	number of vertices along x
+/// @param[in]		dimY	number of vertices along y
+/// @param[in]		width	total width (along x)
+/// @param[in]		height	total height (along y)
+/// \returns number of vertices added
 int addSurface(Mesh& m, int dimX, int dimY, float width=2, float height=2);
 
 

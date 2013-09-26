@@ -62,6 +62,19 @@ unsigned short MIDIByte::convertPitchWheel(unsigned char byte2, unsigned char by
 	return (r<<7) | byte2;
 }
 
+
+void MIDIMessageHandler::bindTo(MIDIIn& midiIn){
+	struct F{
+		static void callback(double timeStamp, std::vector<unsigned char> *message, void *userData){
+			MIDIMessageHandler& h = *static_cast<MIDIMessageHandler *>(userData);
+			h.onMIDIMessage(timeStamp, *message);
+		}
+	};
+	midiIn.setCallback(F::callback, this);
+}
+
+
+
 /*
 DO NOT MODIFY BELOW THIS POINT!!!
 Below is the RtMidi implementation code verbatim (w/o RtMidi.h header include). 
