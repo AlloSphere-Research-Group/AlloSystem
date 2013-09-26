@@ -156,6 +156,8 @@ if(NOT NO_EXAMPLES)
     if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/examples/${dir}/flags.txt)
       file(READ ${CMAKE_CURRENT_SOURCE_DIR}/examples/${dir}/flags.txt EXTRA_COMPILER_FLAGS)
       message("WARNING: Using additional flags from examples/${dir}/flags.txt: " ${EXTRA_COMPILER_FLAGS})
+    else()
+      set(EXTRA_COMPILER_FLAGS "")
     endif()
 
     # Get a list of all files, later remove all .cpp and .h and you're left with the resources to copy
@@ -171,6 +173,7 @@ if(NOT NO_EXAMPLES)
 	set(EXAMPLE_TARGET examples_${dir}_${EXAMPLE_NAME})
       endif()
       add_executable(${EXAMPLE_TARGET} EXCLUDE_FROM_ALL ${example_src})
+      target_compile_definitions(${EXAMPLE_TARGET} "${EXTRA_COMPILER_FLAGS}")
       message("Adding target for example: ${example_src}")
       include_directories(${CMAKE_CURRENT_SOURCE_DIR}/allocore/
         ${CMAKE_CURRENT_SOURCE_DIR}/alloutil/
@@ -214,6 +217,8 @@ if(NOT NO_PROJECTS)
     if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/projects/${dir}/flags.txt)
       file(READ ${CMAKE_CURRENT_SOURCE_DIR}/projects/${dir}/flags.txt EXTRA_COMPILER_FLAGS)
       message("WARNING: Using additional flags from /projects/${dir}/flags.txt: " ${EXTRA_COMPILER_FLAGS})
+    else()
+      set(EXTRA_COMPILER_FLAGS "")
     endif()
 
     # Get a list of all files, later remove all .cpp and .h and you're left with the resources to copy
@@ -228,8 +233,9 @@ if(NOT NO_PROJECTS)
       else()
 	set(PROJECT_TARGET projects_${dir}_${PROJECT_NAME})
       endif()
-      add_executable(${PROJECT_TARGET} EXCLUDE_FROM_ALL ${project_src})
       message("Adding target for project: ${project_src}")
+      add_executable(${PROJECT_TARGET} EXCLUDE_FROM_ALL ${project_src})
+      target_compile_definitions(${PROJECT_TARGET} "${EXTRA_COMPILER_FLAGS}")
       include_directories(${CMAKE_CURRENT_SOURCE_DIR}/allocore/
         ${CMAKE_CURRENT_SOURCE_DIR}/alloutil/
         ${CMAKE_CURRENT_SOURCE_DIR}/alloGLV/
