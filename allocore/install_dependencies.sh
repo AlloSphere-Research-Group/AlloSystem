@@ -10,6 +10,7 @@ if [ `which apt-get 2>/dev/null` ]; then
 	sudo apt-get install libavahi-client-dev	# for protocol/al_ZeroConf
 	sudo apt-get install libudev-dev libusb-1.0-0-dev # for io/al_HID
 	sudo apt-get install libfreeimage-dev libfreetype6-dev
+	sudo apt-get install libxi-dev libxmu-dev
 
 	# Get version of installed assimp
 	ASSIMP_V=$(apt-cache policy libassimp-dev | grep Installed | cut -f2 -d: | sed -e 's/[ ]*//')
