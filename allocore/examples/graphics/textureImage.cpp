@@ -24,7 +24,7 @@ struct MyApp : App {
 
     // Load a .jpg file
     //
-    char *filename = "../../share/images/tiny.jpg";
+    const char *filename = "../../share/images/tiny.jpg";
 
     if (image.load(filename)) {
       printf("Read image from %s\n", filename);
@@ -33,6 +33,7 @@ struct MyApp : App {
       exit(-1);
     }
 
+    // Here we copy the pixels from the image to the texture
     texture.allocate(image.array());
 
     // Don't bother trying to print the image or the image's array directly
