@@ -48,15 +48,9 @@ if [ `which apt-get 2>/dev/null` ]; then
 		rm $PKG.zip
 	fi 
 
-elif [ `which port 2>/dev/null` ]; then
-	echo "Found MacPorts"
-	sudo port selfupdate
-	sudo port install portaudio libsndfile +universal
-	sudo port install glew +universal
-	sudo port install assimp +universal
-	sudo port install freeimage +universal
-	sudo port install freetype +universal
-
+# It's important to check for Homebrew before MacPorts,
+# because for unfortunate souls with both installed, 
+# Homebrew is much nicer about not clobbering as it installs
 elif [ `which brew 2>/dev/null` ]; then
 	echo "Found Homebrew"
 	sudo brew update
@@ -65,6 +59,15 @@ elif [ `which brew 2>/dev/null` ]; then
 	brew install assimp
 	brew install freeimage
 	brew install freetype
+
+elif [ `which port 2>/dev/null` ]; then
+	echo "Found MacPorts"
+	sudo port selfupdate
+	sudo port install portaudio libsndfile +universal
+	sudo port install glew +universal
+	sudo port install assimp +universal
+	sudo port install freeimage +universal
+	sudo port install freetype +universal
 
 elif [ `uname | grep MINGW` ]; then
 	echo "Found MinGW / MSYS"
