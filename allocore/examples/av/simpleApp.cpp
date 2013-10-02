@@ -17,13 +17,18 @@ controls assigned automatically. These are:
 	'c'				move down
 	'q'				roll counter-clockwise
 	'z'				roll clockwise
+	's'				stop moving
 	'`'				reset navigation to (0,0,0) pointing along the z axis
 	left arrow		turn left
 	right arrow		turn right
 	up arrow		turn up
-	down arrow		turn down	
+	down arrow		turn down
+
 	escape			toggle fullscreen
 	tab				toggle stereographic rendering
+	ctrl-q			quit
+	ctrl-h			hide window
+	ctrl-m			minimize window
 
 	Mouse
 	drag left		turn left
