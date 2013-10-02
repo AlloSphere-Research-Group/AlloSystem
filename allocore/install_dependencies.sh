@@ -10,6 +10,7 @@ if [ `which apt-get 2>/dev/null` ]; then
 	sudo apt-get install libavahi-client-dev	# for protocol/al_ZeroConf
 	sudo apt-get install libudev-dev libusb-1.0-0-dev # for io/al_HID
 	sudo apt-get install libfreeimage-dev libfreetype6-dev
+	sudo apt-get install libxi-dev libxmu-dev
 
 	# Get version of installed assimp
 	ASSIMP_V=$(apt-cache policy libassimp-dev | grep Installed | cut -f2 -d: | sed -e 's/[ ]*//')
@@ -47,15 +48,9 @@ if [ `which apt-get 2>/dev/null` ]; then
 		rm $PKG.zip
 	fi 
 
-elif [ `which port 2>/dev/null` ]; then
-	echo "Found MacPorts"
-	sudo port selfupdate
-	sudo port install portaudio libsndfile +universal
-	sudo port install glew +universal
-	sudo port install assimp +universal
-	sudo port install freeimage +universal
-	sudo port install freetype +universal
-
+# It's important to check for Homebrew before MacPorts,
+# because for unfortunate souls with both installed, 
+# Homebrew is much nicer about not clobbering as it installs
 elif [ `which brew 2>/dev/null` ]; then
 	echo "Found Homebrew"
 	sudo brew update
@@ -64,6 +59,15 @@ elif [ `which brew 2>/dev/null` ]; then
 	brew install assimp
 	brew install freeimage
 	brew install freetype
+
+elif [ `which port 2>/dev/null` ]; then
+	echo "Found MacPorts"
+	sudo port selfupdate
+	sudo port install portaudio libsndfile +universal
+	sudo port install glew +universal
+	sudo port install assimp +universal
+	sudo port install freeimage +universal
+	sudo port install freetype +universal
 
 elif [ `uname | grep MINGW` ]; then
 	echo "Found MinGW / MSYS"
