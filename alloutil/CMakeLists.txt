@@ -23,7 +23,19 @@ set_target_properties(alloutil
   ALLOUTIL_INCLUDE_DIR "${ALLOUTIL_DIRS}"
   )
 
-find_package(Lua51 REQUIRED)
+find_package(LuaJIT)
+
+if(LUAJIT_FOUND)
+  set(LUA_INCLUDE_DIR ${LUAJIT_INCLUDE_DIR})
+  set(LUA_LIBRARIES ${LUAJIT_LIBRARIES})
+  set(LUA_FOUND 1)
+else()
+  find_package(Lua51)
+endif(LUAJIT_FOUND)
+
+if(LUA_FOUND)
+  message(FATAL "Lua or LuaJIT required to build Allocore. Neither found!")
+endif(LUA_FOUND)
 
 GET_DIRECTORY_PROPERTY(ALLOSYSTEM_BUILD DIRECTORY ${CMAKE_SOURCE_DIR}
   DEFINITION ALLOSYSTEM_BUILD)
