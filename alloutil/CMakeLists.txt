@@ -34,7 +34,7 @@ else()
 endif(LUAJIT_FOUND)
 
 if(LUA_FOUND)
-  message(FATAL "Lua or LuaJIT required to build Allocore. Neither found!")
+  message(FATAL "Lua 5.1 or LuaJIT required to build Allocore. Neither found!")
 endif(LUA_FOUND)
 
 GET_DIRECTORY_PROPERTY(ALLOSYSTEM_BUILD DIRECTORY ${CMAKE_SOURCE_DIR}
