@@ -86,6 +86,9 @@ public:
 	};
 
 
+	/// Construct an unsized Texture
+	Texture();
+
 	/// Construct a 2D Texture object
 
 	/// @param[in] width		width, in pixels
@@ -94,11 +97,10 @@ public:
 	/// @param[in] type			data type of pixel data
 	/// @param[in] clientAlloc	allocate data on the client
 	Texture(
-		unsigned width=512, unsigned height=512,
+		unsigned width, unsigned height,
 		Graphics::Format format=Graphics::RGBA, Graphics::DataType type=Graphics::UBYTE,
 		bool clientAlloc=true
 	);
-	
 
 	/// Construct a 3D Texture object
 
@@ -115,12 +117,13 @@ public:
 	);
 	
 
-	/// Construct a Texture object from an Array header:
+	/// Construct a Texture object from an Array header
 	Texture(AlloArrayHeader& header);
 	
-	void configure(AlloArrayHeader& header);
-	
 	virtual ~Texture();
+
+
+	void configure(AlloArrayHeader& header);
 
 	Format format() const { return mFormat; }
 	int texelFormat() const { return mTexelFormat; }
