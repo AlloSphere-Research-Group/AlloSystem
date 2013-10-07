@@ -144,7 +144,7 @@ void Scene::verbose(bool b) {
 
 Scene * Scene :: import(const std::string& path, ImportPreset preset) {
 	initLogStream();
-	int flags;
+	int flags=0;
 	switch (preset) {
 		case FAST:
 			flags = aiProcessPreset_TargetRealtime_Fast;
