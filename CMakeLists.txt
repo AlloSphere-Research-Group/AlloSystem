@@ -84,14 +84,9 @@ get_target_property(ALLOCORE_LINK_LIBRARIES allocore ALLOCORE_LINK_LIBRARIES)
 
 # Alloutil ----------------------------------
 if(BUILD_ALLOUTIL)
-  find_package(Lua51 QUIET) # check for Lua to build alloutil
-  if(LUA51_FOUND)
-    message("Allosystem: LUA found. Building alloutil.")
-    add_subdirectory(alloutil)
-    add_dependencies(alloutil allocore)
-  else()
-    message(FATAL_ERROR "Allosystem: LUA NOT found. NOT Building alloutil.")
-  endif(LUA51_FOUND)
+  message("Allosystem: LUA found. Building alloutil.")
+  add_subdirectory(alloutil)
+  add_dependencies(alloutil allocore)
   get_target_property(ALLOUTIL_LIBRARY alloutil LOCATION)
   get_target_property(ALLOUTIL_INCLUDE_DIR alloutil ALLOUTIL_INCLUDE_DIR)
   get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil ALLOUTIL_LINK_LIBRARIES)

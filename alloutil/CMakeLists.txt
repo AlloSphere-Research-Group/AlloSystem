@@ -33,9 +33,9 @@ else()
   find_package(Lua51)
 endif(LUAJIT_FOUND)
 
-if(LUA_FOUND)
+if(NOT LUA_FOUND)
   message(FATAL "Lua 5.1 or LuaJIT required to build Allocore. Neither found!")
-endif(LUA_FOUND)
+endif(NOT LUA_FOUND)
 
 GET_DIRECTORY_PROPERTY(ALLOSYSTEM_BUILD DIRECTORY ${CMAKE_SOURCE_DIR}
   DEFINITION ALLOSYSTEM_BUILD)
