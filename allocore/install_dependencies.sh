@@ -4,6 +4,7 @@
 if [ `which apt-get 2>/dev/null` ]; then
 	echo "Found apt-get"
 	sudo apt-get update
+	sudo apt-get install build-essential
 	sudo apt-get install libapr1-dev libaprutil1-dev
 	sudo apt-get install portaudio19-dev libsndfile1-dev
 	sudo apt-get install libglew-dev freeglut3-dev 
