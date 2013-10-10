@@ -1,17 +1,20 @@
 
 
-FILENAME=`echo $1 |cut -d'.' -f1 | sed -e "s|/|_|g"`
-TARGET=${FILENAME}_run
 ALLOVSR_BUILD=0
-
 if [[ $FILENAME == allovsr* ]]
     then
     ALLOVSR_BUILD=1
 fi
+# Change default flags if there's need:
+DEFAULT_FLAGS="-DBUILD_ALLOGLV=0 -DBUILD_GLV=0 -DBUILD_ALLOVSR=$ALLOVSR_BUILD" 
+
+# Users shouldn't need to change anything below
+FILENAME=`echo $1 |cut -d'.' -f1 | sed -e "s|/|_|g"`
+TARGET=${FILENAME}_run
 
 if [ ! -f Makefile ]; then
     ./distclean
-    cmake . -DBUILD_ALLOGLV=1 -DBUILD_GLV=1 -DBUILD_ALLOVSR=$ALLOVSR_BUILD &> cmake_output.txt
+    cmake .  ${DEFAULT_FLAGS} &> cmake_output.txt
     if [ $? != 0 ]; then
 	cat cmake_output.txt
 	exit 1
@@ -32,7 +35,7 @@ if [ $? != "0" ]
 		;;
 	
 	*) echo "Can't find target --------------- Running CMAKE again"
-	    cmake . -DBUILD_ALLOGLV=1 -DBUILD_GLV=1  -DBUILD_ALLOVSR=$ALLOVSR_BUILD &> cmake_output.txt
+	    cmake .  ${DEFAULT_FLAGS} &> cmake_output.txt
 	    if [ $? != 0 ]; then
 		cat cmake_output.txt
 		exit 1
