@@ -138,7 +138,8 @@ public:
 	
 	/// @param[in] m		projective transform matrix
 	/// @param[in] begin	beginning index of vertices
-	/// @param[in] end		ending index of vertices, negative amount specify distance from one past last element
+	/// @param[in] end		ending index of vertices, negative amounts specify 
+	///						distance from one past last element
 	template <class T>
 	Mesh& transform(const Mat<4,T>& m, int begin=0, int end=-1);
 
@@ -148,9 +149,10 @@ public:
 	/// Generates normals for a set of vertices
 	
 	/// This method will generate a normal for each vertex in the buffer
-	/// assuming the drawing primitive is a triangle. Face normals are generated
-	/// if no indices are present, and averaged vertex normals are generated
-	/// if indices are present. This will replace any normals currently in use.
+	/// assuming the drawing primitive is either triangles or a triangle strip.
+	/// Averaged vertex normals are generated if indices are present and, for
+	/// triangles only, face normals are generated if no indices are present.
+	/// This will replace any normals currently in use.
 	///
 	/// @param[in] normalize	whether to normalize normals
 	void generateNormals(bool normalize=true, bool equalWeightPerFace=false);
