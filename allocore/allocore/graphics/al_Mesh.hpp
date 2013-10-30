@@ -50,6 +50,9 @@
 #include "allocore/types/al_Buffer.hpp"
 #include "allocore/types/al_Color.hpp"
 
+// Needed for the static set of all meshes.
+#include <set>
+
 namespace al{
 
 /// Stores buffers related to rendering graphical objects
@@ -78,7 +81,10 @@ public:
 	
 
 	/// @param[in] primitive	renderer-dependent primitive number
-	Mesh(int primitive=0): mPrimitive(primitive){}
+	Mesh(int primitive=0): mPrimitive(primitive){
+		// Insert pointer to the current mesh into the static.
+		getAll().insert(this);
+	}
 	
 	Mesh(const Mesh& cpy) : 
 		mVertices(cpy.mVertices),
@@ -88,9 +94,14 @@ public:
 		mTexCoord2s(cpy.mTexCoord2s),
 		mTexCoord3s(cpy.mTexCoord3s),
 		mIndices(cpy.mIndices),
-		mPrimitive(cpy.mPrimitive)
-		{}
+		mPrimitive(cpy.mPrimitive){
+			getAll().insert(this);
+	}
 
+	~Mesh(){
+		// Remove pointer to the current mesh from the static set.
+		getAll().erase(this);
+	}
 
 	/// Get corners of bounding box of vertices
 	
@@ -320,6 +331,12 @@ public:
 
 	/// Print information about Mesh
 	void print(FILE * dst = stderr) const;
+	
+	/// Returns a reference to the set of all pointers to initialized meshes.
+	static std::set<Mesh*>& getAll(){
+		static std::set<Mesh*> temp;
+		return temp;
+	}
 
 protected:
 
