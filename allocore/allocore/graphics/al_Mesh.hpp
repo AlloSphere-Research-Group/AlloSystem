@@ -338,6 +338,10 @@ public:
 		return temp;
 	}
 
+	/// Dumps the mesh to a Wavefront .obj file.
+	/// @param[out] filename		The name of the .obj and .mtl files to create.
+	bool dump(std::string filename);
+
 protected:
 
 	// Only populated (size>0) buffers will be used

@@ -4,6 +4,10 @@
 #include <vector>
 #include <fstream>
 
+// For dumping mesh to a file.
+#include <fstream>
+#include <iostream>
+
 #include "allocore/system/al_Config.h"
 #include "allocore/system/al_Printing.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
@@ -706,6 +710,57 @@ void Mesh::print(FILE * dst) const {
 	if(texCoord2s().size())	fprintf(dst, "%8d TexCoord2s\n", texCoord2s().size());
 	if(texCoord3s().size())	fprintf(dst, "%8d TexCoord3s\n", texCoord3s().size());
 	if(indices().size())	fprintf(dst, "%8d Indices\n", indices().size());
+}
+
+
+bool Mesh::dump(std::string filename = "export"){
+	// Create indices if there are the vertices for it.
+	if (this->vertices().size() == 0){
+		return false;
+	}
+	
+	this->compress();
+
+	// Open files.
+	std::ofstream objfile, mtlfile;
+	objfile.open((filename + ".obj").c_str());
+	mtlfile.open((filename + ".mtl").c_str());
+
+	// Instructs .obj file to use .mtl file.
+	objfile << "mtllib " + filename + ".mtl" << "\n" << "\n";
+
+  // Print vertices section. Starts with 'v' and separated by spaces.
+  for (int i = 0; i < this->vertices().size(); ++i){
+    float x = this->vertices()[i][0];
+    float y = this->vertices()[i][1];
+    float z = this->vertices()[i][2];
+
+    objfile << "v " << x << " " << y << " " << z << "\n";
+  }
+
+  // Print faces section. Starts with 'f' and separated by spaces.
+  for (int i = 0; i < this->indices().size(); i+=3){
+  	int one = this->indices()[i] + 1;
+  	int two = this->indices()[i+1] + 1;
+  	int three = this->indices()[i+2] + 1;
+
+  	double r = (this->colors()[one].r + this->colors()[two].r + this->colors()[three].r) / 3.f;
+  	double g = (this->colors()[one].g + this->colors()[two].g + this->colors()[three].g) / 3.f;
+  	double b = (this->colors()[one].b + this->colors()[two].b + this->colors()[three].b) / 3.f;
+
+  	objfile << "usemtl " << i << "\n";
+  	objfile << "f " << one << " " << two << " " << three << "\n";
+
+  	mtlfile << "newmtl " << i << "\n";
+  	mtlfile << "Ka " << r << " " << g << " " << b << "\n";
+  	mtlfile << "Kd " << r << " " << g << " " << b << "\n";
+  }
+
+  // Close files.
+	objfile.close();
+	mtlfile.close();
+
+	return true;
 }
 
 } // al::
