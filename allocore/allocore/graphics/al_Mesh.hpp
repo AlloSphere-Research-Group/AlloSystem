@@ -52,6 +52,7 @@
 
 // Needed for the static set of all meshes.
 #include <set>
+#include <sstream>
 
 namespace al{
 
@@ -82,7 +83,7 @@ public:
 
 	/// @param[in] primitive	renderer-dependent primitive number
 	Mesh(int primitive=0): mPrimitive(primitive){
-		// Insert pointer to the current mesh into the static.
+		// Insert pointer to the current mesh into the static set.
 		getAll().insert(this);
 	}
 	
@@ -341,6 +342,26 @@ public:
 	/// Dumps the mesh to a Wavefront .obj file.
 	/// @param[out] filename		The name of the .obj and .mtl files to create.
 	bool dump(std::string filename);
+
+	/// Dump each mesh to a unique file.
+	/// @param[out] filename		The name of the .obj and .mtl files to create.
+	static bool dumpAll(std::string filename = "export"){
+		bool all_dumped = true;
+		std::stringstream ss;
+
+		for (std::set<Mesh*>::iterator it = Mesh::getAll().begin(); it != Mesh::getAll().end(); ++it){
+			// Append the mesh's position to its name.
+			ss << filename << "_" << distance(Mesh::getAll().begin(),it);
+			bool result = (*it)->dump(ss.str());
+			// Clear the string stream for the next filename.
+			ss.str("");
+
+			if (!result)
+				all_dumped = false;
+		}
+
+		return all_dumped;
+	}
 
 protected:
 
