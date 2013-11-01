@@ -277,11 +277,11 @@ public:
 	}
 
 
-	/// Get number of faces (assumes triangles or quads)
+//	/// Get number of faces (assumes triangles or quads)
 //	int numFaces() const { return mIndices.size() / ( ( mPrimitive == Graphics::TRIANGLES ) ? 3 : 4 ); }
-	/// Get indices as triangles
+//	/// Get indices as triangles
 //	TriFace& indexAsTri(){ return (TriFace*) indices(); }
-	/// Get indices as quads
+//	/// Get indices as quads
 //	QuadFace& indexAsQuad(){ return (QuadFace*) indices(); }
 
 	Vertices& vertices(){ return mVertices; }
