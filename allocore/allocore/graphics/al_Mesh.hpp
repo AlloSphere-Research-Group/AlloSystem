@@ -340,19 +340,22 @@ public:
 	}
 
 	/// Dumps the mesh to a Wavefront .obj file.
+	/// Hardcoded for TRIANGLE primitive.
 	/// @param[out] filename		The name of the .obj and .mtl files to create.
-	bool dump(std::string filename);
+	/// @param[in]  format		  Dump to .ply (default) or .obj .
+	bool dump(std::string format = "ply", std::string filename = "export");
 
 	/// Dump each mesh to a unique file.
 	/// @param[out] filename		The name of the .obj and .mtl files to create.
-	static bool dumpAll(std::string filename = "export"){
+	/// @param[in]  format		  Dump to .ply (default) or .obj .
+	static bool dumpAll(std::string format = "ply", std::string filename = "export"){
 		bool all_dumped = true;
 		std::stringstream ss;
 
 		for (std::set<Mesh*>::iterator it = Mesh::getAll().begin(); it != Mesh::getAll().end(); ++it){
 			// Append the mesh's position to its name.
 			ss << filename << "_" << distance(Mesh::getAll().begin(),it);
-			bool result = (*it)->dump(ss.str());
+			bool result = (*it)->dump(format, ss.str());
 			// Clear the string stream for the next filename.
 			ss.str("");
 
@@ -362,7 +365,6 @@ public:
 
 		return all_dumped;
 	}
-
 protected:
 
 	// Only populated (size>0) buffers will be used
@@ -375,6 +377,10 @@ protected:
 	Indices mIndices;
 	
 	int mPrimitive;
+
+private:
+	bool dumpObj(Mesh* mesh_ptr, std::ofstream& plyfile, std::string filename);
+	bool dumpPly(Mesh* mesh_ptr, std::ofstream& plyfile, std::string filename);
 };
 
 
