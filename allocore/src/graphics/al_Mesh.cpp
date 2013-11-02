@@ -586,4 +586,16 @@ Mesh& Mesh::scale(float x, float y, float z){
 	return *this;
 }
 
+
+void Mesh::print(FILE * dst) const {
+	fprintf(dst, "Mesh %p (prim = %d) has:\n", this, mPrimitive);
+	if(vertices().size())	fprintf(dst, "%8d Vertices\n", vertices().size());
+	if(colors().size())		fprintf(dst, "%8d Colors\n", colors().size());
+	if(coloris().size())	fprintf(dst, "%8d Coloris\n", coloris().size());
+	if(normals().size())	fprintf(dst, "%8d Normals\n", normals().size());
+	if(texCoord2s().size())	fprintf(dst, "%8d TexCoord2s\n", texCoord2s().size());
+	if(texCoord3s().size())	fprintf(dst, "%8d TexCoord3s\n", texCoord3s().size());
+	if(indices().size())	fprintf(dst, "%8d Indices\n", indices().size());
+}
+
 } // al::

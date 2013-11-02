@@ -44,6 +44,7 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
+#include <stdio.h>
 #include "allocore/math/al_Vec.hpp"
 #include "allocore/math/al_Matrix4.hpp"
 #include "allocore/types/al_Buffer.hpp"
@@ -291,7 +292,10 @@ public:
 	TexCoord2s& texCoord2s(){ return mTexCoord2s; }
 	TexCoord3s& texCoord3s(){ return mTexCoord3s; }
 	Indices& indices(){ return mIndices; }
-	
+
+	/// Print information about Mesh
+	void print(FILE * dst = stderr) const;
+
 protected:
 
 	// Only populated (size>0) buffers will be used
