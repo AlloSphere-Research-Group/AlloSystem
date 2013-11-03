@@ -417,20 +417,6 @@ int addSurface(Mesh& m, int Nx, int Ny, float width, float height){
 	// Note: the start and end points of each row are duplicated to create
 	// degenerate triangles.
 	for(int j=0; j<Ny-1; ++j){
-		for(int i=0; i<Nx; ++i){
-			int idx = j*Nx + i + Nv;
-			m.index(idx+Nx);
-			m.index(idx);
-		}
-		if(j != (Ny-2)){
-			int idx = m.indices().last();
-			m.index(idx);
-			m.index(idx+1+Nx);
-		}
-	}
-
-	// The old way creates 2 extra degenerate triangles at the start and end.
-	/*for(int j=0; j<Ny-1; ++j){
 		m.index(j*Nx + Nv);
 		for(int i=0; i<Nx; ++i){
 			int idx = j*Nx + i + Nv;
@@ -439,7 +425,7 @@ int addSurface(Mesh& m, int Nx, int Ny, float width, float height){
 		}
 		int idx = m.indices().last();
 		m.index(idx);
-	}*/
+	}
 
 	return Nx*Ny;
 }
