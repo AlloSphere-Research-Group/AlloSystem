@@ -476,7 +476,7 @@ void dumpNode(aiNode * x, std::string indent) {
 	}
 }
 		
-void Scene :: dump() const {
+void Scene :: print() const {
 	printf("==================================================\n");
 	printf("Scene\n");
 	
