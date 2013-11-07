@@ -252,8 +252,13 @@ if(NOT NO_PROJECTS)
         ${CMAKE_CURRENT_SOURCE_DIR}/allovsr/
         ${GAMMA_INCLUDE_DIRs} )
       #    message("Gamma : ${GAMMA_INCLUDE_DIRs}")
-      target_link_libraries(${PROJECT_TARGET} allocore alloutil alloGLV ${GAMMA_LIBRARIES}
-        ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOGLV_LINK_LIBRARIES})
+      target_link_libraries(${PROJECT_TARGET}
+	${ALLOCORE_LIBRARY} ${ALLOUTIL_LIBRARY} ${GAMMA_LIBRARIES}
+        ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LINK_LIBRARIES})
+      if (ALLOGLV_LIBRARY)
+	add_dependencies(${EXAMPLE_TARGET} alloGLV)
+	target_link_libraries(${EXAMPLE_TARGET} {ALLOGLV_LIBRARY} ${ALLOGLV_LINK_LIBRARIES})
+      endif(ALLOGLV_LIBRARY)
       list(REMOVE_ITEM PROJECT_RES_FILES ${project_src})
       add_custom_target("${PROJECT_TARGET}_run"
 	COMMAND "${PROJECT_TARGET}"
