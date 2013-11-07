@@ -169,7 +169,7 @@ if(NOT NO_EXAMPLES)
       endif()
       add_executable(${EXAMPLE_TARGET} EXCLUDE_FROM_ALL ${example_src})
       set_target_properties(${EXAMPLE_TARGET} PROPERTIES
-	COMPILE_DEFINITIONS "${EXTRA_COMPILER_FLAGS}")
+	COMPILE_FLAGS "${EXTRA_COMPILER_FLAGS}")
       message("Adding target for example: ${example_src}")
       include_directories(${CMAKE_CURRENT_SOURCE_DIR}/allocore/
         ${CMAKE_CURRENT_SOURCE_DIR}/alloutil/
@@ -232,7 +232,7 @@ if(NOT NO_PROJECTS)
       message("Adding target for project: ${project_src}")
       add_executable(${PROJECT_TARGET} EXCLUDE_FROM_ALL ${project_src})
       set_target_properties(${EXAMPLE_TARGET} PROPERTIES
-	COMPILE_DEFINITIONS "${EXTRA_COMPILER_FLAGS}")
+	COMPILE_FLAGS "${EXTRA_COMPILER_FLAGS}")
       include_directories(${CMAKE_CURRENT_SOURCE_DIR}/allocore/
         ${CMAKE_CURRENT_SOURCE_DIR}/alloutil/
         ${CMAKE_CURRENT_SOURCE_DIR}/alloGLV/

@@ -204,6 +204,8 @@ if(NOT NO_EXAMPLES)
 	set(EXAMPLE_TARGET examples_${dir}_${EXAMPLE_NAME})
       endif(ALLOSYSTEM_BUILD)
       add_executable(${EXAMPLE_TARGET} ${example})
+      set_target_properties(${EXAMPLE_TARGET} PROPERTIES
+	COMPILE_FLAGS "${EXTRA_COMPILER_FLAGS}")
       target_link_libraries("${EXAMPLE_TARGET}" allocore ${ALLOCORE_LINK_LIBRARIES})
       if (apple)
 	find_library(AUDIOUNIT_FM AudioUnit)
