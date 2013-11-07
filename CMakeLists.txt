@@ -150,7 +150,8 @@ if(NOT NO_EXAMPLES)
     file(GLOB EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/${dir}/*.cpp)
     if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/examples/${dir}/flags.txt)
       file(READ ${CMAKE_CURRENT_SOURCE_DIR}/examples/${dir}/flags.txt EXTRA_COMPILER_FLAGS)
-      message("WARNING: Using additional flags from examples/${dir}/flags.txt: " ${EXTRA_COMPILER_FLAGS})
+      message("NOTE: Using additional flags from examples/${dir}/flags.txt: " ${EXTRA_COMPILER_FLAGS})
+      STRING(REGEX REPLACE "(\r?\n)+$" "" EXTRA_COMPILER_FLAGS "${EXTRA_COMPILER_FLAGS}")
     else()
       set(EXTRA_COMPILER_FLAGS "")
     endif()
@@ -169,7 +170,13 @@ if(NOT NO_EXAMPLES)
       endif()
       add_executable(${EXAMPLE_TARGET} EXCLUDE_FROM_ALL ${example_src})
       set_target_properties(${EXAMPLE_TARGET} PROPERTIES
-	COMPILE_FLAGS "${EXTRA_COMPILER_FLAGS}")
+       	COMPILE_FLAGS "${EXTRA_COMPILER_FLAGS}")
+      if (EXTRA_COMPILER_FLAGS)
+# This is the right way, but it crashes cmake... Bug has been fixed by cmake devs but not released as of this writing...
+	#set_source_files_properties(${example_src}
+        #  PROPERTIES COMPILE_FLAGS "-I/usr/include/mysql")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_COMPILER_FLAGS}")
+      endif(EXTRA_COMPILER_FLAGS)
       message("Adding target for example: ${example_src}")
       include_directories(${CMAKE_CURRENT_SOURCE_DIR}/allocore/
         ${CMAKE_CURRENT_SOURCE_DIR}/alloutil/
@@ -177,8 +184,14 @@ if(NOT NO_EXAMPLES)
         ${CMAKE_CURRENT_SOURCE_DIR}/allovsr/
         ${GAMMA_INCLUDE_DIRs} )
       #    message("Gamma : ${GAMMA_INCLUDE_DIRs}")
-      target_link_libraries(${EXAMPLE_TARGET} allocore alloutil alloGLV ${GAMMA_LIBRARIES}
+      add_dependencies(${EXAMPLE_TARGET} allocore alloutil)
+      target_link_libraries(${EXAMPLE_TARGET}
+	${ALLOCORE_LIBRARY} ${ALLOUTIL_LIBRARY} ${GAMMA_LIBRARIES}
         ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOGLV_LINK_LIBRARIES})
+      if (ALLOGLV_LIBRARY)
+	add_dependencies(${EXAMPLE_TARGET} alloGLV)
+	target_link_libraries(${EXAMPLE_TARGET} {ALLOGLV_LIBRARY} ${ALLOGLV_LINK_LIBRARIES})
+      endif(ALLOGLV_LIBRARY)
       list(REMOVE_ITEM EXAMPLE_RES_FILES ${example_src})
       add_custom_target("${EXAMPLE_TARGET}_run"
 	COMMAND "${EXAMPLE_TARGET}"
