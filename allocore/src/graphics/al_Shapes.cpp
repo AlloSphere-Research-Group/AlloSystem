@@ -426,6 +426,7 @@ int addSurface(Mesh& m, int Nx, int Ny, float width, float height){
 		int idx = m.indices().last();
 		m.index(idx);
 	}
+
 	return Nx*Ny;
 }
 

@@ -4,13 +4,31 @@
 
 namespace al{
 
+Texture::Texture()
+: 	mTarget(TEXTURE_2D),
+	mFormat(Graphics::RGBA),
+	mTexelFormat(0),
+	mType(Graphics::UBYTE),
+	mWrapS(CLAMP_TO_EDGE),
+	mWrapT(CLAMP_TO_EDGE),
+	mWrapR(CLAMP_TO_EDGE),
+	mFilterMin(LINEAR),
+	mFilterMag(LINEAR),
+	mWidth(0),
+	mHeight(0),
+	mDepth(0),
+	mUnpack(1),
+	mParamsUpdated(true),
+	mPixelsUpdated(true),
+	mOwnsData(false)
+{}
+
 Texture :: Texture(
 	unsigned width, unsigned height,
 	Graphics::Format format, Graphics::DataType type,
 	bool alloc
 )
-:	GPUObject(),
-	mTarget(TEXTURE_2D),
+:	mTarget(TEXTURE_2D),
 	mFormat(format),
 	mTexelFormat(0),
 	mType(type),
@@ -25,7 +43,7 @@ Texture :: Texture(
 	mUnpack(1),
 	mParamsUpdated(true),
 	mPixelsUpdated(true),
-	mOwnsData(0) 
+	mOwnsData(false) 
 {
 	if(alloc) allocate();
 }
@@ -35,8 +53,7 @@ Texture :: Texture(
 	Graphics::Format format, Graphics::DataType type,
 	bool alloc
 )
-:	GPUObject(),
-	mTarget(TEXTURE_3D),
+:	mTarget(TEXTURE_3D),
 	mFormat(format),
 	mTexelFormat(0),
 	mType(type),
@@ -51,14 +68,13 @@ Texture :: Texture(
 	mUnpack(1),
 	mParamsUpdated(true),
 	mPixelsUpdated(true),
-	mOwnsData(0) 
+	mOwnsData(false) 
 {
 	if(alloc) allocate();
 }
 
 Texture :: Texture(AlloArrayHeader& header) 
-:	GPUObject(),
-	mTexelFormat(0),
+:	mTexelFormat(0),
 	mWrapS(CLAMP_TO_EDGE),
 	mWrapT(CLAMP_TO_EDGE),
 	mWrapR(CLAMP_TO_EDGE),
@@ -67,7 +83,7 @@ Texture :: Texture(AlloArrayHeader& header)
 	mUnpack(1),
 	mParamsUpdated(true),
 	mPixelsUpdated(true),
-	mOwnsData(0) 
+	mOwnsData(false) 
 {
 	configure(header);
 	mArray.dataCalloc();

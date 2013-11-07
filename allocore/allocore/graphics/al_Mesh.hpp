@@ -44,6 +44,7 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
+#include <stdio.h>
 #include "allocore/math/al_Vec.hpp"
 #include "allocore/math/al_Matrix4.hpp"
 #include "allocore/types/al_Buffer.hpp"
@@ -138,7 +139,8 @@ public:
 	
 	/// @param[in] m		projective transform matrix
 	/// @param[in] begin	beginning index of vertices
-	/// @param[in] end		ending index of vertices, negative amount specify distance from one past last element
+	/// @param[in] end		ending index of vertices, negative amounts specify 
+	///						distance from one past last element
 	template <class T>
 	Mesh& transform(const Mat<4,T>& m, int begin=0, int end=-1);
 
@@ -148,9 +150,10 @@ public:
 	/// Generates normals for a set of vertices
 	
 	/// This method will generate a normal for each vertex in the buffer
-	/// assuming the drawing primitive is a triangle. Face normals are generated
-	/// if no indices are present, and averaged vertex normals are generated
-	/// if indices are present. This will replace any normals currently in use.
+	/// assuming the drawing primitive is either triangles or a triangle strip.
+	/// Averaged vertex normals are generated if indices are present and, for
+	/// triangles only, face normals are generated if no indices are present.
+	/// This will replace any normals currently in use.
 	///
 	/// @param[in] normalize	whether to normalize normals
 	void generateNormals(bool normalize=true, bool equalWeightPerFace=false);
@@ -275,11 +278,11 @@ public:
 	}
 
 
-	/// Get number of faces (assumes triangles or quads)
+//	/// Get number of faces (assumes triangles or quads)
 //	int numFaces() const { return mIndices.size() / ( ( mPrimitive == Graphics::TRIANGLES ) ? 3 : 4 ); }
-	/// Get indices as triangles
+//	/// Get indices as triangles
 //	TriFace& indexAsTri(){ return (TriFace*) indices(); }
-	/// Get indices as quads
+//	/// Get indices as quads
 //	QuadFace& indexAsQuad(){ return (QuadFace*) indices(); }
 
 	Vertices& vertices(){ return mVertices; }
@@ -289,7 +292,10 @@ public:
 	TexCoord2s& texCoord2s(){ return mTexCoord2s; }
 	TexCoord3s& texCoord3s(){ return mTexCoord3s; }
 	Indices& indices(){ return mIndices; }
-	
+
+	/// Print information about Mesh
+	void print(FILE * dst = stderr) const;
+
 protected:
 
 	// Only populated (size>0) buffers will be used

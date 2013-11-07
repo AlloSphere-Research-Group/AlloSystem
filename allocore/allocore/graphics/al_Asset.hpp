@@ -77,31 +77,35 @@
 	
 */
 
+#include <string>
 #include "allocore/graphics/al_Graphics.hpp"
 #include "allocore/types/al_Color.hpp"
 
-#include <string>
-
 namespace al{
 
+/// A collection of related meshes, textures, and materials for a 3D scene
 class Scene {
 public:
+
+	/// Import flags
 	enum ImportPreset {
 		FAST,
 		QUALITY,
 		MAX_QUALITY
 	};
-	
+
+	/// Scene node
 	struct Node {
 		class Impl;
-		
+
 		Node();
 		~Node();
-	
+
 		std::string name() const;
 		Impl * mImpl;
 	};
-	
+
+	/// Scene material
 	struct Material {
 		struct TextureProperty {
 			bool useTexture;
@@ -109,61 +113,76 @@ public:
 			
 			TextureProperty() : useTexture(false) {}
 		};
-		
+
 		Material();
-		
+
 		std::string name;
-		
+
 		// standard OpenGL properties:
 		int two_sided, wireframe;
 		Color diffuse, ambient, specular, emissive;
 		float shininess;
-		
+
 		// other properites:
 		int shading_model, blend_func;
 		float shininess_strength, opacity, reflectivity, refracti, bump_scaling;
 		Color transparent, reflective;
 		TextureProperty diffusemap, ambientmap, specularmap, opacitymap, emissivemap, shininessmap, lightmap, normalmap, heightmap, displacementmap, reflectionmap; 
 		std::string background;	
-		
 	};
-	
-	static Scene * import(const std::string& path, ImportPreset preset = MAX_QUALITY);
+
+
 	~Scene();
-	
-	/// return number of meshes in scene
+
+
+	/// Import an asset
+	static Scene * import(const std::string& path, ImportPreset preset = MAX_QUALITY);
+
+
+	/// Return number of meshes in scene
 	unsigned int meshes() const;
-	/// read a mesh from the Scene:
+
+	/// Read a mesh from the Scene
 	void mesh(unsigned int i, Mesh& mesh) const;
-	/// alternative read a mesh from the Scene:
-	void meshAlt(unsigned int i, Mesh& mesh) const;	
-	// read all meshes:
+
+	/// Alternative read a mesh from the Scene
+	void meshAlt(unsigned int i, Mesh& mesh) const;
+
+	/// Read all meshes
 	void meshAll(Mesh& dst) const { for (unsigned i=0; i<meshes(); i++) mesh(i, dst); }
-	/// get the material index for a given mesh:
+
+	/// Get the material index for a given mesh
 	unsigned int meshMaterial(unsigned int i) const;
-	/// get the name of a given mesh
+
+	/// Get the name of a given mesh
 	std::string meshName(unsigned int i) const;
 	
-	/// return number of materials in scene
+	/// Return number of materials in scene
 	unsigned int materials() const;
-	/// read a material from the scene
+
+	/// Read a material from the scene
 	const Material& material(unsigned int i) const;
 	
-	/// return number of materials in scene
+	/// Return number of materials in scene
 	unsigned int textures() const;
 	
-	/// return number of nodes in scene
+	/// Return number of nodes in scene
 	unsigned int nodes() const;
-	/// read a node in the scene:
+
+	/// Read a node in the scene:
 	Node& node(unsigned int i) const;
 	
-	/// get scene extents
+	/// Get scene extents
+	
+	/// @param[out] min		3-vector of minimum coordinates
+	/// @param[out] max		3-vector of maximum coordinates
 	void getBounds(Vec3f& min, Vec3f& max) const;
 	
-	/// print out information about the Scene
-	void dump() const;
+	/// Print out information about the Scene
+	void print() const;
+	void dump() const {print();}
 	
-	/// toggle verbose mode
+	/// Toggle verbose mode
 	static void verbose(bool b);
 	
 protected:
