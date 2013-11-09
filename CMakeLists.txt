@@ -84,7 +84,7 @@ get_target_property(ALLOCORE_LINK_LIBRARIES allocore ALLOCORE_LINK_LIBRARIES)
 
 # Alloutil ----------------------------------
 if(BUILD_ALLOUTIL)
-  message("Allosystem: LUA found. Building alloutil.")
+  message("Allosystem: Building alloutil.")
   add_subdirectory(alloutil)
   add_dependencies(alloutil allocore)
   get_target_property(ALLOUTIL_LIBRARY alloutil LOCATION)
@@ -169,8 +169,17 @@ if(NOT NO_EXAMPLES)
 	set(EXAMPLE_TARGET examples_${dir}_${EXAMPLE_NAME})
       endif()
       add_executable(${EXAMPLE_TARGET} EXCLUDE_FROM_ALL ${example_src})
-      set_target_properties(${EXAMPLE_TARGET} PROPERTIES
-       	COMPILE_FLAGS "${EXTRA_COMPILER_FLAGS}")
+
+      if(APPLE)
+	set_target_properties(${EXAMPLE_TARGET} PROPERTIES
+	  COMPILE_FLAGS "${EXTRA_COMPILER_FLAGS} -pagezero_size 10000 -image_base 100000000")
+	#Seems that this is not working... So use brute force...
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pagezero_size 10000 -image_base 100000000")
+      else()
+	set_target_properties(${EXAMPLE_TARGET} PROPERTIES
+       	  COMPILE_FLAGS "${EXTRA_COMPILER_FLAGS}")
+	#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pagezero_size 10000 -image_base 100000000")
+      endif(APPLE)
       if (EXTRA_COMPILER_FLAGS)
 # This is the right way, but it crashes cmake... Bug has been fixed by cmake devs but not released as of this writing...
 	#set_source_files_properties(${example_src}
@@ -253,8 +262,13 @@ if(NOT NO_PROJECTS)
         ${GAMMA_INCLUDE_DIRs} )
       #    message("Gamma : ${GAMMA_INCLUDE_DIRs}")
       target_link_libraries(${PROJECT_TARGET}
-	${ALLOCORE_LIBRARY} ${ALLOUTIL_LIBRARY} ${GAMMA_LIBRARIES}
+	${ALLOCORE_LIBRARY} ${ALLOUTIL_LIBRARY} ${GAMMA_LIBRARIE}S
         ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LINK_LIBRARIES})
+      if(APPLE)
+	set_target_properties(${PROJECT_TARGET} PROPERTIES
+	  COMPILE_FLAGS "-pagezero_size 10000 -image_base 100000000")
+      endif(APPLE)
+
       if (ALLOGLV_LIBRARY)
 	add_dependencies(${EXAMPLE_TARGET} alloGLV)
 	target_link_libraries(${EXAMPLE_TARGET} {ALLOGLV_LIBRARY} ${ALLOGLV_LINK_LIBRARIES})
