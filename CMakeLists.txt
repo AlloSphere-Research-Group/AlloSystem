@@ -170,16 +170,11 @@ if(NOT NO_EXAMPLES)
       endif()
       add_executable(${EXAMPLE_TARGET} EXCLUDE_FROM_ALL ${example_src})
 
-      if(APPLE)
+      if(APPLE AND BUILD_ALLOUTIL)
+	#These are needed for Luajit on OS X 64-bit binaries
 	set_target_properties(${EXAMPLE_TARGET} PROPERTIES
-	  COMPILE_FLAGS "${EXTRA_COMPILER_FLAGS} -pagezero_size 10000 -image_base 100000000")
-	#Seems that this is not working... So use brute force...
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pagezero_size 10000 -image_base 100000000")
-      else()
-	set_target_properties(${EXAMPLE_TARGET} PROPERTIES
-       	  COMPILE_FLAGS "${EXTRA_COMPILER_FLAGS}")
-	#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pagezero_size 10000 -image_base 100000000")
-      endif(APPLE)
+	  LINK_FLAGS "-pagezero_size 10000 -image_base 100000000")
+      endif()
       if (EXTRA_COMPILER_FLAGS)
 # This is the right way, but it crashes cmake... Bug has been fixed by cmake devs but not released as of this writing...
 	#set_source_files_properties(${example_src}

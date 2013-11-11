@@ -137,6 +137,16 @@ if(NOT NO_EXAMPLES)
       endif(ALLOSYSTEM_BUILD)
       add_executable(${EXAMPLE_TARGET} ${example})
       target_link_libraries("${EXAMPLE_TARGET}" alloutil ${ALLOUTIL_LINK_LIBRARIES} ${ALLOCORE_LINK_LIBRARIES})
+      if(APPLE)
+	set_target_properties(${EXAMPLE_TARGET} PROPERTIES
+	  LINK_FLAGS "-pagezero_size 10000 -image_base 100000000")
+      endif()
+      if (EXTRA_COMPILER_FLAGS)
+# This is the right way, but it crashes cmake... Bug has been fixed by cmake devs but not released as of this writing...
+	#set_source_files_properties(${example_src}
+        #  PROPERTIES COMPILE_FLAGS "-I/usr/include/mysql")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_COMPILER_FLAGS}")
+      endif(EXTRA_COMPILER_FLAGS)
       add_custom_target("${EXAMPLE_TARGET}_run"
 	COMMAND "${EXAMPLE_TARGET}"
 	DEPENDS "${EXAMPLE_TARGET}"
