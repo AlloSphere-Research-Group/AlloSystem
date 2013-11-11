@@ -18,8 +18,8 @@ IMAGE_BINDING	= FreeImage
 AUTORUN_TESTS	= 1
 STRICT_WARNINGS = 1
 
-LIB_DIRS	= /usr/lib/
-INC_DIRS	= /usr/include/ 
+LIB_DIRS	=
+INC_DIRS	=
 
 #-------------------------------------------------------------------------
 # Default variables
