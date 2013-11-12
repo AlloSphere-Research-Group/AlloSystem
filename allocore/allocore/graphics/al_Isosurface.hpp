@@ -64,15 +64,11 @@
 #include <ciso646> // http://marshall.calepin.co/c-and-xcode-46.html
 
 #include "allocore/system/al_Config.h"
-#ifdef AL_WINDOWS
-	#include <tr1/unordered_map>
-	//#include <unordered_map>
+
+#ifdef _LIBCPP_VERSION
+	#include <unordered_map>
 #else
-	#ifdef _LIBCPP_VERSION
-		#include <unordered_map>
-	#else
-		#include <tr1/unordered_map>
-	#endif
+	#include <tr1/unordered_map>
 #endif
 #include <map>
 #include <vector>
@@ -247,17 +243,11 @@ protected:
 	//	size_t operator()(int v) const { return v*2654435761UL; }
 	};
 
-	//#ifdef AL_WINDOWS
-	//typedef std::unordered_map<int, int, IsosurfaceHashInt> EdgeToVertex;
-	//#else
 	#ifdef _LIBCPP_VERSION
 	typedef std::unordered_map<int, int, IsosurfaceHashInt> EdgeToVertex;
 	#else
 	typedef std::tr1::unordered_map<int, int, IsosurfaceHashInt> EdgeToVertex;
 	#endif
-	//#endif
-//	typedef std::tr1::unordered_map<int, VertexData, IsosurfaceHashInt> EdgeToVertex;
-//	typedef std::hash_map<int, VertexData, IsosurfaceHashInt> EdgeToVertex;
 //	typedef std::map<int, VertexData> EdgeToVertex;
 
 	EdgeToVertex mEdgeToVertex;					// map from edge ID to vertex
