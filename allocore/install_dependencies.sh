@@ -53,7 +53,7 @@ if [ `which apt-get 2>/dev/null` ]; then
 # Homebrew is much nicer about not clobbering as it installs
 elif [ `which brew 2>/dev/null` ]; then
 	echo "Found Homebrew"
-	sudo brew update
+	brew update
 	brew install portaudio libsndfile
 	brew install glew
 	brew install assimp
