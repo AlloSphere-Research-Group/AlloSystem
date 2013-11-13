@@ -54,8 +54,8 @@ framexleftmargin=1em,
 \pdf_bookmarksopen false
 \pdf_bookmarksopenlevel 1
 \pdf_breaklinks false
-\pdf_pdfborder false
-\pdf_colorlinks false
+\pdf_pdfborder true
+\pdf_colorlinks true
 \pdf_backref false
 \pdf_pdfusetitle true
 \papersize default
@@ -79,7 +79,7 @@ framexleftmargin=1em,
 \rightmargin 1in
 \bottommargin 1in
 \secnumdepth 3
-\tocdepth 3
+\tocdepth 2
 \paragraph_separation indent
 \paragraph_indentation default
 \quotes_language english
@@ -156,17 +156,17 @@ Linux Ubuntu
 \end_layout
 
 \begin_layout Itemize
-Mac OS X 10.5.x (Leopard), 10.6.x (Snow Leopard), 10.7.x (Lion), 10.8.x (Mountain
+Mac OS X 10.5.x (Leopard) / 10.6.x (Snow Leopard) / 10.7.x (Lion) / 10.8.x (Mountain
  Lion)
 \end_layout
 
 \begin_layout Itemize
-Windows 7
+Windows 7 / 8
 \end_layout
 
 \begin_layout Standard
-For Windows users, it is highly recommended to install Linux Ubuntu.
- This can be done easily and safely using 
+For Windows users, Linux Ubuntu can be installed easily and safely using
+ 
 \begin_inset CommandInset href
 LatexCommand href
 name "Wubi"
@@ -221,10 +221,6 @@ $ sudo apt-get install make g++
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
 When that finishes, proceed to 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -239,7 +235,7 @@ reference "sec:Install-AlloSystem"
 Mac OS X
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsubsection
 Before Beginning
 \end_layout
 
@@ -254,7 +250,7 @@ Before beginning to install the development tools, it is crucial that you
  Repeat this update process until there are no more updates.
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsubsection
 Get Apple Development Tools
 \end_layout
 
@@ -271,7 +267,11 @@ http://developer.apple.com/programs/register
 \end_inset
 
 .
- Click the `Sign In' button to login or create a new account.
+ Click the `Sign
+\begin_inset space ~
+\end_inset
+
+In' button to login or create a new account.
 \end_layout
 
 \begin_layout Standard
@@ -535,7 +535,7 @@ g++
 .
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsubsection
 Install Package Manager
 \end_layout
 
@@ -562,7 +562,7 @@ http://www.macports.org/install.php
 Windows and MinGW/MSYS
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsubsection
 Install Code Editor
 \end_layout
 
@@ -575,15 +575,31 @@ You will need to install an editor that recognizes and syntax colorizes
  Notepad++ is preferred as it starts up much more quickly.
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsubsection
 Install MinGW and MSYS
 \end_layout
 
 \begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+Download and run the latest version of the MinGW
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
 MinGW is an emulation of the GCC compiler suite.
- MSYS provides a Unix-like CLI and commands (bash, make, grep, etc.).
- Download and run the latest version of the MinGW installer mingw-get-inst-xxxxx
-xxx.exe from 
+\end_layout
+
+\end_inset
+
+ installer 
+\family typewriter
+mingw-get-inst-xxxxxxxx.exe
+\family default
+.
+ The installer can be found by first going to 
 \begin_inset Flex URL
 status open
 
@@ -594,9 +610,16 @@ http://sourceforge.net/projects/mingw/files/Installer/mingw-get-inst/
 
 \end_inset
 
-.
- Be careful when installing not to install MinGW in a path containing spaces,
- such as 
+ and then clicking the directory 
+\family typewriter
+mingw-get-inst-xxxxxxxx
+\family default
+ where 
+\family typewriter
+xxxxxxxx 
+\family default
+is the latest version (usually the one at the top).
+ Be careful not to install MinGW in a path containing spaces, such as 
 \family typewriter
 C:
 \backslash
@@ -633,11 +656,125 @@ C++ Compiler
 
 \begin_layout Itemize
 MSYS Basic System
+\begin_inset Foot
+status open
+
+\begin_layout Plain Layout
+MSYS provides a Unix-like CLI and commands (bash, make, grep, etc.).
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+Finish the MinGW installer.
+ 
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
-Finish the MinGW installer.
+The simplest way to install MinGW/MSYS is to use the automated GUI installer.
+ Download this from
+\end_layout
+
+\begin_layout Standard
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://sourceforge.net/projects/mingw/files/latest/download
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+After the download completes, run the installer.
+ When the MinGW Installation Manager (or mingw-get GUI) window pops up (Fig.
  
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:MinGW-Installation-Manager"
+
+\end_inset
+
+), select 'Basic Setup' in the left pane and then select the following packages
+ to 'Mark for Installation':
+\end_layout
+
+\begin_layout Itemize
+mingw32-base
+\end_layout
+
+\begin_layout Itemize
+mingw32-gcc-g++
+\end_layout
+
+\begin_layout Itemize
+msys-base
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename fig/mingw-getGUI.png
+	lyxscale 50
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+MinGW Installation Manager
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:MinGW-Installation-Manager"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Then run the menu item Installation -> Apply Changes.
+ Click 'Apply' in the little Schedule of Pending Actions window that pops
+ up.
+ After all the packages download and install, you can close the MinGW Installati
+on Manager window.
 \end_layout
 
 \begin_layout Standard
@@ -763,7 +900,7 @@ wget
 
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsubsection
 Start MSYS
 \end_layout
 
@@ -789,12 +926,39 @@ msys.bat
 \align center
 \begin_inset Graphics
 	filename fig/MSYS.png
-	lyxscale 10
+	lyxscale 50
 	width 75col%
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+At the command prompt, run the command
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ /postinstall/pi.sh
+\end_layout
+
+\end_inset
+
+Answer 'y' to continue the post install and then 'y' again that you have
+ MinGW installed.
+ Next, enter the path where you installed MinGW as you are instructed.
+ When done, restart MSYS.
+ As this point, installation of MinGW/MSYS is complete.
+\end_layout
+
+\begin_layout Subsubsection
+MSYS Tips
 \end_layout
 
 \begin_layout Standard
@@ -983,7 +1147,10 @@ $ mkdir ~/code
 
 \end_inset
 
-Next, download the AlloSystem source code  
+Next, download the AlloSystem source code from
+\end_layout
+
+\begin_layout Standard
 \begin_inset Flex URL
 status open
 
@@ -995,7 +1162,11 @@ https://github.com/AlloSphere-Research-Group/AlloSystem/archive/devel.zip
 \end_inset
 
 .
- Within the 
+ 
+\end_layout
+
+\begin_layout Standard
+Within the 
 \family typewriter
 .zip
 \family default
@@ -1078,7 +1249,8 @@ README.md				alloutil		work
 \end_layout
 
 \begin_layout Standard
-Next, you need to install the necessary dependencies for AlloSystem.
+Next, you need to install the necessary dependencies for the AlloCore module
+ of AlloSystem.
  (Windows users only: you must 
 \emph on
 deactivate all virus checkers and antispyware programs, such as Windows
@@ -1088,8 +1260,7 @@ deactivate all virus checkers and antispyware programs, such as Windows
  These monitoring programs are know to terminate or halt important configuration
  processes that take place in the following steps.
  If you do not disable them, then the libraries will not get installed properly.)
- Install dependencies with the following commands (notice if you are using
- MinGW/MSYS then you don't need the sudo in front of the command):
+ Install dependencies with the following commands:
 \end_layout
 
 \begin_layout Standard
@@ -1104,22 +1275,7 @@ $ cd allocore
 
 \begin_layout Plain Layout
 
-$ sudo ./install_dependencies.sh
-\end_layout
-
-\begin_layout Plain Layout
-
-$ cd ..
-\end_layout
-
-\begin_layout Plain Layout
-
-$ cd alloutil
-\end_layout
-
-\begin_layout Plain Layout
-
-$ sudo ./install_dependencies.sh
+$ ./install_dependencies.sh
 \end_layout
 
 \begin_layout Plain Layout
@@ -1131,9 +1287,9 @@ $ cd ..
 
 If prompted for your password, enter the same password you use to log in
  to the OS.
- Installing all the dependencies may take some time, so please be patient.
+ Installing all the dependencies may take some time, so be patient.
  After dependencies are installed, the next step is to build the AlloCore
- and AlloUtil modules with the following commands:
+ module with the following commands:
 \end_layout
 
 \begin_layout Standard
@@ -1144,11 +1300,6 @@ status open
 \begin_layout Plain Layout
 
 $ make allocore
-\end_layout
-
-\begin_layout Plain Layout
-
-$ make alloutil
 \end_layout
 
 \end_inset
@@ -1460,9 +1611,9 @@ Makefile.user.
 \family typewriter
  ~/code/allosystem/
 \family default
- along
+ along with 
 \family typewriter
- with Makefile.usertemplate.
+Makefile.usertemplate.
 
 \family default
  You can do this from the terminal with the commands
@@ -1504,10 +1655,6 @@ status open
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
 to
 \end_layout
 
@@ -1736,6 +1883,202 @@ RUN_SRC_DIRS += myutils/
 Troubleshooting
 \end_layout
 
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+It Doesn't Work!
+\end_layout
+
+\begin_layout Plain Layout
+The installation process involves many steps and if there is an error in
+ an earlier step, it will effect everything later on.
+ The best thing to do is watch the installation process carefully and note
+ any errors.
+ Some common sources of errors include:
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="3">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="25col%">
+<column alignment="left" valignment="top" width="25col%">
+<column alignment="left" valignment="top" width="50col%">
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Error
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Cause
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Solution
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Missing library header files when running 
+\family typewriter
+make
+\begin_inset space ~
+\end_inset
+
+allocore
+\family default
+ or 
+\family typewriter
+make
+\begin_inset space ~
+\end_inset
+
+alloutil
+\family default
+.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+A library dependency was not installed properly.
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1.
+ Ensure your internet connection is good.
+\end_layout
+
+\begin_layout Plain Layout
+2.
+ Run 
+\family typewriter
+install_dependencies.sh
+\family default
+ under the respective module directory.
+\end_layout
+
+\begin_layout Plain Layout
+3.
+ Check the output of 
+\family typewriter
+install_dependencies.sh 
+\family default
+for any errors.
+\end_layout
+
+\begin_layout Plain Layout
+4.
+ If using OSX/MacPorts and there is an error about Python, delete the directory
+ 
+\family typewriter
+/Applications/MacPorts/Python 2.7/
+\family default
+ and go to step 1.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 CasE SensitiviTy
 \end_layout
@@ -1794,7 +2137,10 @@ make: Nothing to be done for `xxx'.
 \end_layout
 
 \begin_layout Standard
-This means all dependencies of the rule you specified are up-to-date.
+This is related to the target you pass into make.
+ The message can mean either: (1) all dependencies of the target you specified
+ are up-to-date or (2) you specified a file name as a target and there is
+ no rule in the Makefile to handle the target.
 \end_layout
 
 \begin_layout Subsection
