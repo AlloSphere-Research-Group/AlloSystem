@@ -158,7 +158,7 @@ public:
 	void dataFree() { allo_array_free(this); }
 
 	/// Set all data to zero
-	void zero() { if(hasData()) memset(data.ptr, 0, size()); }
+	void zero();
 
 
 	/// Get mutable component using 1-D index
@@ -276,7 +276,7 @@ public:
 	template<typename T, typename TP> void write_interp(const T* val, const Vec<3,TP> p) { write_interp(val, p[0], p[1], p[2]); }
 
 	/// Print array information
-	void print() const;
+	void print(FILE * fp = stdout) const;
 
 
 

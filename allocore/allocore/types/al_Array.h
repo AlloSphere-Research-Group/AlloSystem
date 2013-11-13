@@ -121,7 +121,7 @@ typedef struct {
 	uint32_t dim[ALLO_ARRAY_MAX_DIMS];
 	
 	/* 
-		# of bytes between elements of that dimension
+		The number of bytes between elements of that dimension
 	*/
 	uint32_t stride[ALLO_ARRAY_MAX_DIMS];
 	
@@ -177,9 +177,9 @@ typedef struct AlloArrayWrapper {
 	
 
 /*
-	Return the size for a given type
+	Return the size, in bytes, for a given type
 */
-static inline size_t allo_type_size(const AlloTy ty) {
+static inline size_t allo_type_size(AlloTy ty) {
 	switch(ty) {
 		case AlloUInt8Ty:		return sizeof(uint8_t);	
 		case AlloUInt16Ty:		return sizeof(uint16_t);
@@ -198,7 +198,7 @@ static inline size_t allo_type_size(const AlloTy ty) {
 	}
 }
 
-static inline const char * allo_type_name(const AlloTy ty) {
+static inline const char * allo_type_name(AlloTy ty) {
 	switch(ty) {
 		case AlloUInt8Ty:		return "uint8_t";	
 		case AlloUInt16Ty:		return "uint16_t";
@@ -219,7 +219,7 @@ static inline const char * allo_type_name(const AlloTy ty) {
 
 // useful for converting numeric formats
 // converts any format value into a double from 0..1
-static inline double allo_type_tonumber(const AlloTy ty, const char * ptr) {
+static inline double allo_type_tonumber(AlloTy ty, const char * ptr) {
 	switch(ty) {
 		case AlloUInt8Ty:		return double(((uint8_t *)(ptr))[0])/255.;	// UCHAR_MAX
 		case AlloUInt16Ty:		return double(((uint8_t *)(ptr))[0])/65535.;	
@@ -237,7 +237,7 @@ static inline double allo_type_tonumber(const AlloTy ty, const char * ptr) {
 
 // useful for converting numeric formats
 // converts any format value into a double from 0..1
-static inline void allo_type_fromnumber(const AlloTy ty, double number, char * dst) {
+static inline void allo_type_fromnumber(AlloTy ty, double number, char * dst) {
 	switch(ty) {
 		case AlloUInt8Ty:		*(uint8_t *)(dst) = (uint8_t)(number * 255.); break;
 		case AlloUInt16Ty:		*(uint16_t *)(dst) = (uint16_t)(number * 65535.); break;
@@ -264,22 +264,26 @@ static inline uint32_t allo_array_elements(const AlloArray * arr) {
 	return elements;
 }
 
-/*
-	Returns the total memory footprint, in bytes
-*/
-static inline size_t allo_array_size(const AlloArray * arr) {
-	if(arr->header.dimcount != 0){
-		int idx = arr->header.dimcount-1;
-		return arr->header.stride[idx] * arr->header.dim[idx];
+static inline size_t allo_array_size_from_header(const AlloArrayHeader * h) {
+	if(h->dimcount != 0){
+		int idx = h->dimcount-1;
+		return h->stride[idx] * h->dim[idx];
 	}
 	return 0;
 }
 
 /*
-	Set a array header, e.g. just after allocating
+	Returns the total memory footprint, in bytes
 */
-static inline void allo_array_setheader(AlloArray * arr, const AlloArrayHeader * header) {
-	memcpy(&arr->header, header, sizeof(AlloArrayHeader));
+static inline size_t allo_array_size(const AlloArray * arr) {
+	return allo_array_size_from_header(&arr->header);
+}
+
+/*
+	Set an array header, e.g. just after allocating
+*/
+static inline void allo_array_setheader(AlloArray * dst, const AlloArrayHeader * src) {
+	memcpy(&dst->header, src, sizeof(AlloArrayHeader));
 }
 
 
@@ -323,17 +327,31 @@ static inline void allo_array_setstride(AlloArrayHeader * h, unsigned alignSize)
 	}
 }
 
-static inline int allo_array_equal_headers(AlloArrayHeader *h1, const AlloArrayHeader *h2) {
-	int equiv =	h1->components == h2->components && 
+static inline int allo_array_equal_headers(const AlloArrayHeader * h1, const AlloArrayHeader * h2){
+	/*int equiv =	h1->components == h2->components && 
 				h1->type == h2->type && 
 				h1->dimcount == h2->dimcount;
-					
 	for(int i=0; i < h1->dimcount; i++) {
 		equiv = equiv && h1->dim[i] == h2->dim[i];
 		equiv = equiv && h1->stride[i] == h2->stride[i];
 	}
+	return equiv;*/
 
-	return equiv;
+	if(
+		(h1->components == h2->components) &&
+		(h1->type == h2->type) &&
+		(h1->dimcount == h2->dimcount)
+	){
+		unsigned i;
+		for(i=0; i<h1->dimcount; ++i){
+			if( (h1->dim[i] != h2->dim[i]) || (h1->stride[i] != h2->stride[i]) )
+				return 0;
+		}
+		return 1; // true
+	}
+	else{
+		return 0;
+	}
 }
 
 // Set header attributes to zero
@@ -405,7 +423,7 @@ static inline void allo_array_create2d(
 
 
 /*
-	Adapt a latticle to another size
+	Adapt an array to another size
 */
 static inline void allo_array_adapt(AlloArray * arr, const AlloArrayHeader *h) {
 	if(! allo_array_equal_headers( &(arr->header), h)) {

@@ -62,17 +62,11 @@ Array& Array::operator= (const AlloArray& cpy) {
 }
 
 bool Array::isFormat(const AlloArrayHeader& h2) const {
-	for(int i=0; i<header.dimcount; ++i){
-		if( (header.dim[i] != h2.dim[i]) || (header.stride[i] != h2.stride[i]) )
-			return false;
-	}
-	return (header.components == h2.components)
-		&& (header.type == h2.type)
-		&& (header.dimcount == h2.dimcount);
+	return allo_array_equal_headers(&header, &h2);
 }
 
 void Array::configure(const AlloArrayHeader& h2) {
-	header.type = h2.type;
+	/*header.type = h2.type;
 	header.components = h2.components;
 	header.dimcount = h2.dimcount;
 	for(int i=0; i < ALLO_ARRAY_MAX_DIMS; ++i) {
@@ -81,16 +75,24 @@ void Array::configure(const AlloArrayHeader& h2) {
 			header.stride[i] = h2.stride[i];
 		} else {
 			header.dim[i] = 1;
-			header.stride[i] = h2.stride[i-1];
+			header.stride[i] = h2.stride[i-1]; // Why i-1?
 		}
-	}
+	}*/
+
+	allo_array_setheader(this, &h2);
 }
 
 void Array::format(const AlloArrayHeader& h2) {
 	if(!isFormat(h2)) {
-		dataFree();
-		configure(h2);
-		dataCalloc();
+		if(size() != allo_array_size_from_header(&h2)){
+			dataFree();
+			configure(h2);
+			dataCalloc();
+		}
+		else{
+			configure(h2);
+			zero();
+		}
 	}
 }
 
@@ -107,10 +109,29 @@ void Array::formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, int numD
 	format(hh);
 }
 
-void Array::print() const {
-	printf("Array %p type %s components %d %d-D: ( ", this, allo_type_name(type()), components(), dimcount());
+void Array::zero(){
+	if(hasData())
+		memset(data.ptr, 0, size());
+}
+
+void Array::print(FILE * fp) const {
+	/*printf("Array %p type %s components %d %d-D: ( ", this, allo_type_name(type()), components(), dimcount());
 	for (int i=0; i<dimcount(); i++) printf("%d(stride %d) ", dim(i), stride(i));
-	printf(") %d bytes, data: %p)\n", int(size()), data.ptr);
+	printf(") %d bytes, data: %p)\n", int(size()), data.ptr);*/
+	int Ndim = dimcount();
+	fprintf(fp,"Array %p:\n", this);
+	fprintf(fp,"    comps: %d %s\n", components(), allo_type_name(type()));
+	fprintf(fp,"     dims: %dD, (", Ndim);
+	for(int i=0; i<Ndim; i++){
+		fprintf(fp,"%u%s", dim(i), (i!=(Ndim-1)) ? ", " : "");
+	}
+	fprintf(fp,")\n");
+	fprintf(fp,"  strides: (");
+	for(int i=0; i<Ndim; i++){
+		fprintf(fp,"%u%s", stride(i), (i!=(Ndim-1)) ? ", " : "");
+	}
+	fprintf(fp,")\n");
+	fprintf(fp,"     data: %p, %u bytes\n", data.ptr, (unsigned)size());
 }
 
 } // al::
