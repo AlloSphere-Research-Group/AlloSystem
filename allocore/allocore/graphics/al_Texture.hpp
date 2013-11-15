@@ -235,16 +235,12 @@ protected:
 	Wrap mWrapS, mWrapT, mWrapR;	
 	Filter mFilterMin, mFilterMag;
 	unsigned mWidth, mHeight, mDepth;
-	int mUnpack;
-	
-	// redundant; use mArray.data.ptr instead:
-	//void * mPixels;				// pointer to client-side pixel data (0 if none)
+	int mUnpack;				// byte alignment of rows of client-side pixels
+
 	Array mArray;				// Array representation of client-side pixel data
-//	void * mBuffer;				// internally allocated pixel buffer
 	bool mParamsUpdated;
 	bool mPixelsUpdated;
 	bool mOwnsData;
-	
 
 	virtual void onCreate();
 	virtual void onDestroy();
@@ -267,6 +263,10 @@ protected:
 		if(v!=var){ var=v; flag=true; } 
 		return *this; 
 	}
+	
+	
+	// This sets the pixel format/array from another Array header
+	void setPixelsFrom(const AlloArrayHeader& hdr, bool reallocate);
 
 public:
 	Texture& updatePixels(); /// \deprecated use dirty() instead

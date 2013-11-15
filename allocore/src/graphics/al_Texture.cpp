@@ -105,8 +105,9 @@ void Texture::onDestroy(){
 	glDeleteTextures(1, (GLuint *)&mID);
 }
 
-void Texture :: configure(AlloArrayHeader& header) {
-	switch (header.dimcount) {
+
+void Texture::setPixelsFrom(const AlloArrayHeader& hdr, bool reallocate){
+	switch(hdr.dimcount){
 		case 1: target(TEXTURE_1D); break;
 		case 2: target(TEXTURE_2D); break;
 		case 3: target(TEXTURE_3D); break;
@@ -115,23 +116,30 @@ void Texture :: configure(AlloArrayHeader& header) {
 			return;
 	}
 	
-	switch (header.dimcount) {
-		case 3:	depth(header.dim[2]);
-		case 2:	height(header.dim[1]);
-		case 1:	width(header.dim[0]); break;
-	}
-
-	switch (header.components) {
-		case 1:	format(Graphics::LUMINANCE); break; // alpha or luminance?
-		case 2:	format(Graphics::LUMINANCE_ALPHA); break;
-		case 3:	format(Graphics::RGB); break;
-		case 4:	format(Graphics::RGBA); break;
+	switch(hdr.dimcount){
+		case 3:	 depth(hdr.dim[2]);
+		case 2:	height(hdr.dim[1]);
+		case 1:	 width(hdr.dim[0]); break;
 		default:
-			AL_WARN("invalid array component count for texture");
+			AL_WARN("texture array must have 1, 2 or 3 dimensions");
 			return;
 	}
-	
-	switch (header.type) {
+
+	// Set pixel format only if number of components differs.
+	// No need to change semantics of data.
+	if(Graphics::numComponents(mFormat) != hdr.components){
+		switch(hdr.components){
+			case 1:	format(Graphics::LUMINANCE); break; // alpha or luminance?
+			case 2:	format(Graphics::LUMINANCE_ALPHA); break;
+			case 3:	format(Graphics::RGB); break;
+			case 4:	format(Graphics::RGBA); break;
+			default:
+				AL_WARN("invalid array component count for texture");
+				return;
+		}
+	}
+
+	switch(hdr.type){
 		case AlloUInt8Ty:	type(Graphics::UBYTE); break; 
 		case AlloSInt8Ty:	type(Graphics::BYTE); break; 
 		case AlloUInt16Ty:	type(Graphics::SHORT); break; 
@@ -145,10 +153,21 @@ void Texture :: configure(AlloArrayHeader& header) {
 			return;
 	}
 	
-	// reconfigure internal array to match:
-	mArray.configure(header);
+	if(reallocate){
+		// Reformat internal array to match input header
+		// Array::format will (re)allocate memory, if necessary
+		mArray.format(hdr);
+	}
+	else{
+		// Reconfigure internal array header to match (no memory allocations)
+		mArray.configure(hdr);
+	}
 	
-	mParamsUpdated = true; 
+	//mParamsUpdated = true; // Needed? We are only updating pixels here...
+}
+
+void Texture :: configure(AlloArrayHeader& hdr) {
+	setPixelsFrom(hdr, false);
 }
 
 void Texture :: bind(int unit) {
@@ -229,6 +248,16 @@ void Texture :: resetArray(unsigned align) {
 	
 	// reconfigure the internal array according to the current settings:
 	switch (mTarget) {
+		case TEXTURE_2D:
+		default:
+			mArray.header.type = Graphics::toAlloTy(mType);
+			mArray.header.components = Graphics::numComponents(mFormat);
+			mArray.header.dimcount = 2;
+			mArray.header.dim[0] = mWidth;
+			mArray.header.dim[1] = mHeight;
+			mArray.deriveStride(mArray.header, align);
+			break;
+
 		case TEXTURE_1D:
 			mArray.header.type = Graphics::toAlloTy(mType);
 			mArray.header.components = Graphics::numComponents(mFormat);
@@ -244,16 +273,6 @@ void Texture :: resetArray(unsigned align) {
 			mArray.header.dim[0] = mWidth;
 			mArray.header.dim[1] = mHeight;
 			mArray.header.dim[3] = mDepth;
-			mArray.deriveStride(mArray.header, align);
-			break;
-			
-		case TEXTURE_2D:
-		default:
-			mArray.header.type = Graphics::toAlloTy(mType);
-			mArray.header.components = Graphics::numComponents(mFormat);
-			mArray.header.dimcount = 2;
-			mArray.header.dim[0] = mWidth;
-			mArray.header.dim[1] = mHeight;
 			mArray.deriveStride(mArray.header, align);
 			break;
 	}
@@ -276,53 +295,19 @@ void Texture :: allocate(const Array& src, bool reconfigure) {
 	if (reconfigure) {
 		
 		//printf("allocating & reconfiguring %p from\n", this); src.print();
-		
-		// reconfigure texture from array:
-		switch (src.dimcount()) {
-			case 1: target(TEXTURE_1D); break;
-			case 2: target(TEXTURE_2D); break;
-			case 3: target(TEXTURE_3D); break;
-			default:
-				AL_WARN("invalid array dimensions for texture");
-				return;
-		}
-		
-		// reconfigure size:
-		switch (src.dimcount()) {
-			case 3:	depth(src.depth());
-			case 2:	height(src.height());
-			case 1:	width(src.width()); break;
-			default:
-				AL_WARN("texture array must have 1, 2 or 3 dimenions");
-				return;
-		}
-		
-		// reconfigure components 
-		// (only if necessary - no need to lose e.g. 
-		// mFormat = DEPTH_COMPONENT if we are only changing size)
-		if (Graphics::numComponents(mFormat) != src.components()) {
-			switch (src.components()) {
-				case 1:	
-					format(Graphics::LUMINANCE); break; // alpha or luminance?
-				case 2:	
-					format(Graphics::LUMINANCE_ALPHA); break;
-				case 3:	
-					format(Graphics::RGB); break;
-				case 4:	
-					format(Graphics::RGBA); break;
-				default:
-					AL_WARN("invalid array component count for texture");
-					return;
-			}
-		}
-		
-		mArray.format(src);
-		
-		
+		setPixelsFrom(src.header, true);
+
 		//printf("allocating & reconfigured %p\n", this); mArray.print();
 		
 		// re-allocate array:
 		allocate(src.alignment());
+		/*
+		FIXME: Texture::allocate does this:
+		mArray.dataFree();
+		resetArray(align);
+		mArray.dataCalloc();
+		mPixelsUpdated = true;
+		*/
 		
 		//printf("allocated & reconfigured %p\n", this);
 		//mArray.print();
@@ -388,53 +373,10 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 //	} 
 	
 	if (reconfigure) {
-		// reconfigure texture from array
-		switch (src.dimcount()) {
-			case 1: target(TEXTURE_1D); break;
-			case 2: target(TEXTURE_2D); break;
-			case 3: target(TEXTURE_3D); break;
-			default:
-				AL_WARN("invalid array dimensions for texture");
-				return;
-		}
-		
-		switch (src.dimcount()) {
-			case 3:	depth(src.depth());
-			case 2:	height(src.height());
-			case 1:	width(src.width()); break;
-		}
-
-		switch (src.components()) {
-			case 1:	format(Graphics::LUMINANCE); break; // alpha or luminance?
-			case 2:	format(Graphics::LUMINANCE_ALPHA); break;
-			case 3:	format(Graphics::RGB); break;
-			case 4:	format(Graphics::RGBA); break;
-			default:
-				AL_WARN("invalid array component count for texture");
-				return;
-		}
-		
-		switch (src.type()) {
-			case AlloUInt8Ty:	type(Graphics::UBYTE); break; 
-			case AlloSInt8Ty:	type(Graphics::BYTE); break; 
-			case AlloUInt16Ty:	type(Graphics::SHORT); break; 
-			case AlloSInt16Ty:	type(Graphics::USHORT); break; 
-			case AlloUInt32Ty:	type(Graphics::INT); break; 
-			case AlloSInt32Ty:	type(Graphics::UINT); break; 
-			case AlloFloat32Ty:	type(Graphics::FLOAT); break; 
-			case AlloFloat64Ty:	type(Graphics::DOUBLE); break; 
-			default:
-				AL_WARN("invalid array type for texture");
-				return;
-		}
-		
-		// reformat internal array to match:
-		if (!mArray.isFormat(src)) mArray.format(src);
-		
+		setPixelsFrom(src.header, true);
 		//printf("configured to target=%X(%dD), type=%X(%X), format=%X, align=(%d)\n", mTarget, src.dimcount(), type(), src.type(), mFormat, src.alignment());
 	} 
 	else {
-		
 		if (src.width() != width()) {
 			AL_WARN("submit failed: source array width does not match");
 			return;
@@ -551,22 +493,6 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 		case Graphics::BGRA:	intFmt = 4; break;
 		default:				intFmt = format();
 		}
-		
-		/*if(	format() == Graphics::RED ||
-			format() == Graphics::GREEN ||
-			format() == Graphics::BLUE
-		){
-			intFmt = 1;
-		}
-		else if(format() == Graphics::BGR){
-			intFmt = 3;
-		}
-		else if(format() == Graphics::BGRA){
-			intFmt = 4;
-		}
-		else{
-			intFmt = format();
-		}*/
 	}
 
 	switch(mTarget){
