@@ -543,18 +543,30 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 	// there is no corresponding texel format, just hand in the number of
 	// components.
 	else{
-		if(	format() == Graphics::RED ||
+		switch(format()){
+		case Graphics::RED:
+		case Graphics::GREEN:
+		case Graphics::BLUE:	intFmt = 1; break;
+		case Graphics::BGR:		intFmt = 3; break;
+		case Graphics::BGRA:	intFmt = 4; break;
+		default:				intFmt = format();
+		}
+		
+		/*if(	format() == Graphics::RED ||
 			format() == Graphics::GREEN ||
 			format() == Graphics::BLUE
 		){
 			intFmt = 1;
+		}
+		else if(format() == Graphics::BGR){
+			intFmt = 3;
 		}
 		else if(format() == Graphics::BGRA){
 			intFmt = 4;
 		}
 		else{
 			intFmt = format();
-		}	
+		}*/
 	}
 
 	switch(mTarget){

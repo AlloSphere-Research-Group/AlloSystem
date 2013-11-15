@@ -178,6 +178,7 @@ public:
 		BLUE					= GL_BLUE,					/**< */
 		ALPHA					= GL_ALPHA,					/**< */
 		RGB						= GL_RGB,					/**< */
+		BGR						= GL_BGR,					/**< */
 		RGBA					= GL_RGBA,					/**< */
 		BGRA					= GL_BGRA					/**< */
 	};
