@@ -15,9 +15,10 @@ Graphics::~Graphics() {}
 
 int Graphics::numComponents(Format v){
 	switch(v){
-		case BGRA:
-		case RGBA:				return 4;
-		case RGB:				return 3;
+		case RGBA:
+		case BGRA:				return 4;
+		case RGB:
+		case BGR:				return 3;
 		case LUMINANCE_ALPHA:	return 2;
 		case DEPTH_COMPONENT:
 		case LUMINANCE:
