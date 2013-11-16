@@ -137,14 +137,15 @@ public:
 	Filter filterMin() const { return mFilterMin; }
 	Filter filterMag() const { return mFilterMag; }
 	
-	/// Return number of components per pixel
+	/// Get number of components per pixel
 	unsigned numComponents() const { return Graphics::numComponents(format()); }
 
-	/// Return total number of elements (components x width x height x depth)
+	/// Get total number of elements (components x width x height x depth)
 	unsigned numElems() const {
 		return numPixels() * numComponents();
 	}
 	
+	/// Get total number of pixels
 	unsigned numPixels() const {
 		return width() * (height()?height():1) * (depth()?depth():1);
 	}
@@ -182,11 +183,14 @@ public:
 		Graphics& g, const Color& color = Color(1),
 		double w=2, double h=2, double x=-1, double y=-1);
 
-	/// return reference to the internal CPU-side cache
+	/// Get mutable reference to the internal pixel data
 	/// DO NOT MODIFY THE LAYOUT OR DIMENSIONS OF THIS ARRAY
 	Array& array() { return mArray; }
 
-	/// Get raw pointer to client-side pixel data
+	/// Get read-only reference to internal pixel data
+	const Array& array() const { return mArray; }
+
+	/// Get raw pointer to internal pixel data
 	template<class T> T * data(){ return (T*)(data()); }
 	char * data(){ return array().data.ptr; }
 
@@ -235,12 +239,10 @@ protected:
 	Wrap mWrapS, mWrapT, mWrapR;	
 	Filter mFilterMin, mFilterMag;
 	unsigned mWidth, mHeight, mDepth;
-	int mUnpack;				// byte alignment of rows of client-side pixels
 
 	Array mArray;				// Array representation of client-side pixel data
-	bool mParamsUpdated;
-	bool mPixelsUpdated;
-	bool mOwnsData;
+	bool mParamsUpdated;		// flags change in texture params (wrap, filter)
+	bool mPixelsUpdated;		// flags change in pixel params or data
 
 	virtual void onCreate();
 	virtual void onDestroy();
@@ -254,7 +256,7 @@ protected:
 	// send any pending pixels updates to GPU or do immediately if forced
 	void sendPixels(bool force=true);
 
-	/// determines target (e.g. GL_TEXTURE_2D) from the dimensions
+	// determines target (e.g. GL_TEXTURE_2D) from the dimensions
 	void determineTarget();
 
 	// Pattern for setting a variable that when changed sets a notification flag
@@ -263,9 +265,8 @@ protected:
 		if(v!=var){ var=v; flag=true; } 
 		return *this; 
 	}
-	
-	
-	// This sets the pixel format/array from another Array header
+
+	// sets the pixel format/array from another Array header
 	void setPixelsFrom(const AlloArrayHeader& hdr, bool reallocate);
 
 public:

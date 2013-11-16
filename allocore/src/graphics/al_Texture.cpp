@@ -17,10 +17,8 @@ Texture::Texture()
 	mWidth(0),
 	mHeight(0),
 	mDepth(0),
-	mUnpack(1),
 	mParamsUpdated(true),
-	mPixelsUpdated(true),
-	mOwnsData(false)
+	mPixelsUpdated(true)
 {}
 
 Texture :: Texture(
@@ -40,10 +38,8 @@ Texture :: Texture(
 	mWidth(width),
 	mHeight(height),
 	mDepth(0),
-	mUnpack(1),
 	mParamsUpdated(true),
-	mPixelsUpdated(true),
-	mOwnsData(false) 
+	mPixelsUpdated(true)
 {
 	if(alloc) allocate();
 }
@@ -65,10 +61,8 @@ Texture :: Texture(
 	mWidth(width),
 	mHeight(height),
 	mDepth(depth),
-	mUnpack(1),
 	mParamsUpdated(true),
-	mPixelsUpdated(true),
-	mOwnsData(false) 
+	mPixelsUpdated(true)
 {
 	if(alloc) allocate();
 }
@@ -80,18 +74,16 @@ Texture :: Texture(AlloArrayHeader& header)
 	mWrapR(CLAMP_TO_EDGE),
 	mFilterMin(LINEAR),
 	mFilterMag(LINEAR),
-	mUnpack(1),
 	mParamsUpdated(true),
-	mPixelsUpdated(true),
-	mOwnsData(false) 
+	mPixelsUpdated(true)
 {
-	configure(header);
-	mArray.dataCalloc();
+	setPixelsFrom(header, true);
 }
 
 Texture :: ~Texture() {
-	if (!mOwnsData) mArray.data.ptr = 0;
 }
+
+
 
 void Texture::onCreate(){
 	//printf("Texture onCreate\n");
@@ -104,6 +96,7 @@ void Texture::onCreate(){
 void Texture::onDestroy(){
 	glDeleteTextures(1, (GLuint *)&mID);
 }
+
 
 
 void Texture::setPixelsFrom(const AlloArrayHeader& hdr, bool reallocate){
@@ -153,16 +146,18 @@ void Texture::setPixelsFrom(const AlloArrayHeader& hdr, bool reallocate){
 			return;
 	}
 	
+	// Reconfigure internal array AND resize its memory (if necessary).
 	if(reallocate){
-		// Reformat internal array to match input header
-		// Array::format will (re)allocate memory, if necessary
 		mArray.format(hdr);
 	}
+
+	// Reconfigure internal array WITHOUT resizing its memory.
+	// The reason for not also resizing memory is not clear, but it's included
+	// here for Texture::configure.
 	else{
-		// Reconfigure internal array header to match (no memory allocations)
 		mArray.configure(hdr);
 	}
-	
+
 	//mParamsUpdated = true; // Needed? We are only updating pixels here...
 }
 
@@ -276,10 +271,6 @@ void Texture :: resetArray(unsigned align) {
 			mArray.deriveStride(mArray.header, align);
 			break;
 	}
-	
-	// if using array:
-	uint32_t rowsize = (mArray.stride(1) * Graphics::numBytes(type()) * numComponents());
-	mUnpack = (rowsize % 4 == 0) ? 4 : 1;
 }
 
 
@@ -292,26 +283,28 @@ void Texture :: allocate(unsigned align) {
 
 void Texture :: allocate(const Array& src, bool reconfigure) {
 	
+	// Here we reconfigure the internal Array to match the passed in Array
 	if (reconfigure) {
-		
 		//printf("allocating & reconfiguring %p from\n", this); src.print();
 		setPixelsFrom(src.header, true);
 
 		//printf("allocating & reconfigured %p\n", this); mArray.print();
 		
+		// FIXME:
 		// re-allocate array:
-		allocate(src.alignment());
+		//allocate(src.alignment());
 		/*
-		FIXME: Texture::allocate does this:
-		mArray.dataFree();
-		resetArray(align);
-		mArray.dataCalloc();
-		mPixelsUpdated = true;
+		Texture::allocate does this:
+			mArray.dataFree();
+			resetArray(align);
+			mArray.dataCalloc();
+			mPixelsUpdated = true;
 		*/
-		
+
 		//printf("allocated & reconfigured %p\n", this);
 		//mArray.print();
-		
+	
+	// Here we ???
 	} else {
 		
 		// TODO: read the source into the dst without changing dst layout
@@ -332,7 +325,8 @@ void Texture :: allocate(const Array& src, bool reconfigure) {
 	//src.print();
 	//mArray.print();
 	
-	// copy data:
+	// Perform a deep copy of data:
+	// The Array formats must match for this to make sense!
 	memcpy(mArray.data.ptr, src.data.ptr, src.size());
 	
 	//printf("copied to mArray %p\n", this);
@@ -361,21 +355,21 @@ void Texture::sendParams(bool force){
 void Texture::sendPixels(bool force){
 	if(mPixelsUpdated || force){
 		//printf("%p submitting %p\n", this, mArray.data.ptr);
-		submit(mArray.data.ptr);
+		submit(mArray.data.ptr, mArray.alignment());
 		mPixelsUpdated = false;
 	}
 }
 
 void Texture :: submit(const Array& src, bool reconfigure) {	
-//	if (src.type() != AlloUInt8Ty) {
-//		printf("submit failed: only uint8_t arrays are supported\n");
-//		return;
-//	} 
-	
+
+	// Here we basically do a deep copy of the passed in Array
 	if (reconfigure) {
 		setPixelsFrom(src.header, true);
 		//printf("configured to target=%X(%dD), type=%X(%X), format=%X, align=(%d)\n", mTarget, src.dimcount(), type(), src.type(), mFormat, src.alignment());
-	} 
+	}
+
+	// In this case, we simply do some sanity checks to make sure the passed
+	// in Array is compatible with our currently set texture parameters
 	else {
 		if (src.width() != width()) {
 			AL_WARN("submit failed: source array width does not match");
@@ -400,8 +394,12 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 		}
 	
 		switch (format()) {
-			case Graphics::ALPHA:
 			case Graphics::LUMINANCE:
+			case Graphics::DEPTH_COMPONENT:
+			case Graphics::RED:
+			case Graphics::GREEN:
+			case Graphics::BLUE:
+			case Graphics::ALPHA:
 				if (src.components() != 1) {
 					AL_WARN("submit failed: source array component count does not match (got %d, should be 1)", src.components());
 					return;
@@ -414,19 +412,20 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 				}
 				break;
 			case Graphics::RGB:
+			case Graphics::BGR:
 				if (src.components() != 3) {
 					AL_WARN("submit failed: source array component count does not match (got %d, should be 3)", src.components());
 					return;
 				}
 				break;
 			case Graphics::RGBA:
+			case Graphics::BGRA:
 				if (src.components() != 4) {
 					AL_WARN("submit failed: source array component count does not match (got %d, should be 4)", src.components());
 					return;
 				}
 				break;
-			default:
-				break;
+			default:;
 		}
 	}
 	
@@ -435,43 +434,25 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 
 void Texture :: submit(const void * pixels, uint32_t align) {
 	AL_GRAPHICS_ERROR("(before Texture::submit)", id());
-	validate();
-	
-	determineTarget();	// is this necessary? surely the target is already set!
-	
+
+	// This ensures that the texture is created on the GPU
+	GPUObject::validate();
+
+	//determineTarget();	// is this necessary? surely the target is already set!
+
 	sendParams(false);
-	
+
 	glActiveTexture(GL_TEXTURE0);
-	AL_GRAPHICS_ERROR("Texture::submit (glActiveTexture)", id());
+		AL_GRAPHICS_ERROR("Texture::submit (glActiveTexture)", id());
 	glEnable(target());
-	AL_GRAPHICS_ERROR("Texture::submit (glEnable(texture target))", id());
+		AL_GRAPHICS_ERROR("Texture::submit (glEnable(texture target))", id());
 	glBindTexture(target(), id());
-	AL_GRAPHICS_ERROR("Texture::submit (glBindTexture)", id());
-	
-	// set glPixelStore according to layout:
-	glPixelStorei(GL_UNPACK_ALIGNMENT, mUnpack);
-	AL_GRAPHICS_ERROR("Texture::submit (glPixelStorei set)", id());
-	
-	// void glTexImage3D(
-	//		GLenum target, GLint level, GLenum internalformat,
-	//		GLsizei width, GLsizei height, GLsizei depth, 
-	//		GLint border, GLenum format, GLenum type, const GLvoid *pixels
-	// );
-	
-//	// internal format is important
-//	// TODO: complete the derivation, probably do it elsewhere...
-//	if(type() == Graphics::FLOAT || type() == Graphics::DOUBLE){
-//		switch(numComponents()){
-//			case 1: intFmt = GL_LUMINANCE32F_ARB; break;
-//			case 2: intFmt = GL_LUMINANCE_ALPHA32F_ARB; break;
-//			case 3: intFmt = GL_RGB32F_ARB; break;
-//			case 4: intFmt = GL_RGBA32F_ARB; break;
-//			default:;
-//		}
-//	} else {
-//		// the old way - let the GPU decide:
-//		intFmt = numComponents();
-//	}
+		AL_GRAPHICS_ERROR("Texture::submit (glBindTexture)", id());
+
+	// tell GPU the row alignment of the pixels we are sending
+	glPixelStorei(GL_UNPACK_ALIGNMENT, align);
+		AL_GRAPHICS_ERROR("Texture::submit (glPixelStorei set)", id());
+
 
 	int intFmt;
 
@@ -479,22 +460,27 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 	if(mTexelFormat){
 		intFmt = mTexelFormat;
 	}
-	
+
 	// Derive internal texel format from texture data format.
 	// By default, we can just use the texture data format. In cases where
 	// there is no corresponding texel format, just hand in the number of
 	// components.
 	else{
 		switch(format()){
+		default:				intFmt = format(); break;
 		case Graphics::RED:
 		case Graphics::GREEN:
 		case Graphics::BLUE:	intFmt = 1; break;
 		case Graphics::BGR:		intFmt = 3; break;
 		case Graphics::BGRA:	intFmt = 4; break;
-		default:				intFmt = format();
 		}
 	}
 
+	/*void glTexImage3D(
+		GLenum target, GLint level, GLenum internalformat,
+		GLsizei width, GLsizei height, GLsizei depth, 
+		GLint border, GLenum format, GLenum type, const GLvoid *pixels
+	);*/
 	switch(mTarget){
 		case GL_TEXTURE_1D:
 			glTexImage1D(mTarget, 0, intFmt, width(), 0, format(), type(), pixels);
@@ -512,7 +498,7 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 	
 	// set alignment back to default
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-	AL_GRAPHICS_ERROR("Texture::submit (glPixelStorei unset)", id());
+		AL_GRAPHICS_ERROR("Texture::submit (glPixelStorei unset)", id());
 	
 //		// OpenGL may have changed the internal format to one it supports:
 //		GLint format;
@@ -526,7 +512,7 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 	
 	glDisable(target());
 	glBindTexture(target(), 0);
-	AL_GRAPHICS_ERROR("Texture::submit (glBindTexture 0)", id());
+		AL_GRAPHICS_ERROR("Texture::submit (glBindTexture 0)", id());
 }
 
 
@@ -538,45 +524,45 @@ void Texture :: print() {
 	
 	switch (mTarget) {
 		case TEXTURE_1D: 
-			target = "GL_TEXTURE_1D"; 
+			target = "TEXTURE_1D";
 			printf("Texture target=%s, %d(%d), ", target, width(), mArray.width());
 			break;
 		case TEXTURE_2D: 
-			target = "GL_TEXTURE_2D";
+			target = "TEXTURE_2D";
 			printf("Texture target=%s, %dx%d(%dx%d), ", target, width(), height(), mArray.width(), mArray.height()); 
 			break;
 		case TEXTURE_3D: 
-			target = "GL_TEXTURE_3D"; 
+			target = "TEXTURE_3D";
 			printf("Texture target=%s, %dx%dx%d(%dx%dx%d), ", target, width(), height(), depth(), mArray.width(), mArray.height(), mArray.depth());
 			break;
 		default:;
 	}
 	switch (mFormat) {
-		case Graphics::DEPTH_COMPONENT: format="GL_DEPTH_COMPONENT"; break;
-		case Graphics::LUMINANCE: format="GL_LUMINANCE"; break;
-		case Graphics::LUMINANCE_ALPHA: format="GL_LUMINANCE_ALPHA"; break;
-		case Graphics::RED: format="GL_RED"; break;
-		case Graphics::GREEN: format="GL_GREEN"; break;
-		case Graphics::BLUE: format="GL_BLUE"; break;
-		case Graphics::ALPHA: format="GL_ALPHA"; break;
-		case Graphics::RGB: format="GL_RGB"; break;
-		case Graphics::RGBA: format="GL_RGBA"; break;
-		case Graphics::BGRA: format="GL_BGRA"; break;		
+		case Graphics::DEPTH_COMPONENT: format="DEPTH_COMPONENT"; break;
+		case Graphics::LUMINANCE: format="LUMINANCE"; break;
+		case Graphics::LUMINANCE_ALPHA: format="LUMINANCE_ALPHA"; break;
+		case Graphics::RED: format="RED"; break;
+		case Graphics::GREEN: format="GREEN"; break;
+		case Graphics::BLUE: format="BLUE"; break;
+		case Graphics::ALPHA: format="ALPHA"; break;
+		case Graphics::RGB: format="RGB"; break;
+		case Graphics::RGBA: format="RGBA"; break;
+		case Graphics::BGRA: format="BGRA"; break;
 		default:;
 	}	
 	switch (mType) {
-		case GL_BYTE: type = "GL_BYTE"; break;
-		case GL_UNSIGNED_BYTE: type = "GL_UNSIGNED_BYTE"; break;
-		case GL_SHORT: type = "GL_SHORT"; break;
-		case GL_UNSIGNED_SHORT: type = "GL_UNSIGNED_SHORT"; break;
-		case GL_INT: type = "GL_INT"; break;
-		case GL_UNSIGNED_INT: type = "GL_UNSIGNED_INT"; break;
-		case GL_FLOAT: type = "GL_FLOAT"; break;
-		case GL_DOUBLE: type = "GL_DOUBLE"; break;
+		case GL_BYTE: type = "BYTE"; break;
+		case GL_UNSIGNED_BYTE: type = "UNSIGNED_BYTE"; break;
+		case GL_SHORT: type = "SHORT"; break;
+		case GL_UNSIGNED_SHORT: type = "UNSIGNED_SHORT"; break;
+		case GL_INT: type = "INT"; break;
+		case GL_UNSIGNED_INT: type = "UNSIGNED_INT"; break;
+		case GL_FLOAT: type = "FLOAT"; break;
+		case GL_DOUBLE: type = "DOUBLE"; break;
 		default:;
 	}
 	
-	printf("type=%s(%s), format=%s(%d), unpack=%d(align=%d))\n", type, allo_type_name(mArray.type()), format, mArray.components(), mUnpack, mArray.alignment());
+	printf("type=%s(%s), format=%s(%d), unpack=%d)\n", type, allo_type_name(mArray.type()), format, mArray.components(), mArray.alignment());
 	//mArray.print();
 }
 
