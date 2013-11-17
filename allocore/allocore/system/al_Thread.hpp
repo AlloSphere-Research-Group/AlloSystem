@@ -87,6 +87,9 @@ public:
 	/// @param[in] userData		user data passed to C function
 	Thread(void * (*cFunc)(void * userData), void * userData);
 
+	/// Copy constructor
+	Thread(const Thread& other);
+
 	~Thread();
 
 	
@@ -113,13 +116,16 @@ public:
 	///	terminated.  A \e true return value signifies successful termination. 
 	///	A \e false return value indicates a problem with the wait call.
 	bool join();
-	
+
 	/// Return pointer to current OS thread object
 	
 	/// E.g., if using pthreads internally, will return the pthread_t.
 	///
 	static void * current();
 
+	// Stuff for assignment
+	friend void swap(Thread& a, Thread& b);
+	Thread& operator= (Thread other);
 protected:
 	class Impl;
 	Impl * mImpl;
