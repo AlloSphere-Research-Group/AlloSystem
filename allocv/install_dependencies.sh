@@ -11,7 +11,7 @@ if [ `which apt-get` ]; then
 elif [ `which port` ]; then
 	echo "Found MacPorts"
 	sudo port selfupdate 
-	sudo port install opencv
+	sudo port install pkgconfig opencv
 
 # OSX / Homebrew
 elif [ `which brew` ]; then
@@ -19,7 +19,7 @@ elif [ `which brew` ]; then
 	echo "Error: Installation procedure is not yet implemented"
 	exit
 	#brew update
-	#brew install ?
+	#brew install pkgconfig
 
 # Windows / MinGW
 elif [ `uname | grep MINGW` ]; then
