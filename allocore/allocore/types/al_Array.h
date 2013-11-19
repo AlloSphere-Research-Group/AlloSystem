@@ -47,8 +47,6 @@
 
 #include "allocore/system/al_Config.h"
 #include <limits.h> /* ULONG_MAX */
-#include <string.h>
-#include <stdlib.h>
 
 
 /*
@@ -63,7 +61,7 @@ extern "C" {
 
 
 #pragma mark AlloTy
-/*
+/**
 	Unique identifiers for principal types 
 		(inspired by SDIF; higher bits represent semantics, lower bits represent size)
 		(unlike SDIF, assumption is little-endian; and 'byte' is represented as AlloUInt8Ty) 
@@ -96,41 +94,56 @@ enum {
 	AlloPointer64Ty		= 0x2F08
 };
 
+
 typedef uint16_t AlloTy;
-	
-	
+
+
+/** Return the size, in bytes, for a given type
+*/
 static size_t allo_type_size(const AlloTy ty);
 
-static const char * allo_type_name(const AlloTy ty);
+/** Return a human-readable string for a given type
+*/
+const char * allo_type_name(const AlloTy ty);
 
-typedef struct {
+/** Converts any format value into a double in [0, 1].
+	Useful for converting numeric formats.
+*/
+static double allo_type_tonumber(AlloTy ty, const char * ptr);
+
+/** Converts a double in [0, 1] to a specified AlloTy.
+	Useful for converting numeric formats.
+*/
+static void allo_type_fromnumber(AlloTy ty, double number, char * dst);
+
+
+/** Description a dynamically-typed, multidimensional array */
+typedef struct AlloArrayHeader {
 	
-	/* The type of data stored (see enums above) */
+	/** The type of data stored (see enums above) */
 	AlloTy type;
 	
-	/*
+	/**
 		The number of values per cell
 		Aka components, planecount, parts, rank, order...
 	*/
 	uint8_t components;
 	
-	/* The number of dimensions (actually should not be > ALLO_ARRAY_MAX_DIMS!) */
+	/** The number of dimensions (actually should not be > ALLO_ARRAY_MAX_DIMS!) */
 	uint8_t dimcount;
 	
-	/* The size of each dimension */
+	/** The size of each dimension */
 	uint32_t dim[ALLO_ARRAY_MAX_DIMS];
 	
-	/* 
-		The number of bytes between elements of that dimension
-	*/
+	/** The number of bytes between elements of that dimension */
 	uint32_t stride[ALLO_ARRAY_MAX_DIMS];
 	
 } AlloArrayHeader;
 	
 	
-
-typedef struct {
-	/*
+/** Dynamically-typed, multidimensional array */
+typedef struct AlloArray {
+	/**
 		The data encapsulated.
 		First member of the struct to permit easy dereferencing without pointer adjustment.
 		Anonymous union with 64-bit padding for portability
@@ -142,27 +155,136 @@ typedef struct {
 		uint64_t pad;
 	} data;
 	
-	/*
-		The description of this data
-	*/
+	/** The description of this data */
 	AlloArrayHeader header;
 		
 } AlloArray;
 
-/*
-	An extended array (wrapper)
+
+/** Returns the number of elements (cells) in an array
+*/
+static uint32_t allo_array_elements(const AlloArray * arr);
+
+/** Returns the total memory footprint, in bytes, based on the array header
+*/
+static size_t allo_array_size_from_header(const AlloArrayHeader * h);
+
+/** Returns the total memory footprint, in bytes
+*/
+static size_t allo_array_size(const AlloArray * arr);
+
+
+/** Set an array header, e.g. just after allocating
+*/
+void allo_array_setheader(AlloArray * dst, const AlloArrayHeader * src);
+
+
+/** Set dimension attributes without modifying memory
+*/
+void allo_array_setdim1d(AlloArrayHeader * h, uint32_t nx);
+
+/** Set dimension attributes without modifying memory
+*/
+void allo_array_setdim2d(AlloArrayHeader * h, uint32_t nx, uint32_t ny);
+
+/** Set stride factors based on a specific byte alignment
+*/
+void allo_array_setstride(AlloArrayHeader * h, unsigned alignSize);
+
+
+/** Checks if headers are equivalent.
+
+@return 1 if they are equivalent, otherwise 0.
+*/
+int allo_array_equal_headers(const AlloArrayHeader * h1, const AlloArrayHeader * h2);
+
+
+/** Allocate new memory based on current size in header
+*/
+void allo_array_allocate(AlloArray * arr);
+
+/** Create a new array based on a header
+*/
+void allo_array_create(AlloArray * arr, const AlloArrayHeader *h);
+	
+/** Create a new 1D array
+*/
+void allo_array_create1d(
+	AlloArray * arr, 
+	uint8_t components, 
+	AlloTy type, 
+	uint32_t dimx, 
+	size_t align
+);
+
+/** Create a new 2D array
+*/
+void allo_array_create2d(
+	AlloArray * arr, 
+	uint8_t components, 
+	AlloTy type, 
+	uint32_t dimx, 
+	uint32_t dimy, 
+	size_t align
+);
+
+/** Adapt an array to another size
+*/
+void allo_array_adapt(AlloArray * arr, const AlloArrayHeader *h);
+
+/** Adapt an array to 2D
+*/
+void allo_array_adapt2d(
+	AlloArray * arr, 
+	uint8_t components, 
+	AlloTy type, 
+	uint32_t dimx, 
+	uint32_t dimy, 
+	size_t align
+);
+
+/** Set header attributes to zero
+*/
+void allo_array_header_clear(AlloArrayHeader *h);
+
+/** Set all attributes, including header, to zero
+*/
+void allo_array_clear(AlloArray * arr);
+
+/** Free memory
+*/
+void allo_array_free(AlloArray * arr);
+
+/** Free memory and zero attributes
+*/
+void allo_array_destroy(AlloArray * arr);
+
+/** Copy a array into another array
+*/
+void allo_array_copy(AlloArray *dst, AlloArray *src);
+
+
+
+/* An extended array (wrapper)
 */
 typedef struct AlloArrayWrapper {
 
 	AlloArray array;
 	
-	/*
-		The reference count:
-	*/
+	/* The reference count */
 	int refs;
 	
 } AlloArrayWrapper;
-	
+
+AlloArrayWrapper * allo_array_wrapper_new();
+
+void allo_array_wrapper_free(AlloArrayWrapper *w);
+
+void allo_array_wrapper_setup(AlloArrayWrapper *wrap);
+
+void allo_array_wrapper_retain(AlloArrayWrapper *wrap);
+
+void allo_array_wrapper_release(AlloArrayWrapper *wrap);
 	
 
 	
@@ -172,13 +294,7 @@ typedef struct AlloArrayWrapper {
  *
  */
 #pragma mark -------------------------------------
-	
-	
-	
 
-/*!
-	Return the size, in bytes, for a given type
-*/
 static inline size_t allo_type_size(AlloTy ty) {
 	switch(ty) {
 		case AlloUInt8Ty:		return sizeof(uint8_t);	
@@ -198,72 +314,39 @@ static inline size_t allo_type_size(AlloTy ty) {
 	}
 }
 
-/*!
-	Return a human-readable string for a given type
-*/
-static inline const char * allo_type_name(AlloTy ty) {
-	switch(ty) {
-		case AlloUInt8Ty:		return "uint8_t";	
-		case AlloUInt16Ty:		return "uint16_t";
-		case AlloUInt32Ty:		return "uint32_t";
-		case AlloUInt64Ty:		return "uint64_t";
-		case AlloSInt8Ty:		return "int8_t";
-		case AlloSInt16Ty:		return "int16_t";
-		case AlloSInt32Ty:		return "int32_t";
-		case AlloSInt64Ty:		return "int64_t";
-		case AlloFloat32Ty:		return "float";
-		case AlloFloat64Ty:		return "double";
-		case AlloArrayTy:		return "AlloArray";
-		case AlloPointer32Ty:	return "int32_t";
-		case AlloPointer64Ty:	return "int64_t";
-		default:				return 0;
-	}
-} 
-
-/*!
-	Converts any format value into a double in [0, 1].
-	Useful for converting numeric formats.
-*/
 static inline double allo_type_tonumber(AlloTy ty, const char * ptr) {
 	switch(ty) {
-		case AlloUInt8Ty:		return double(((uint8_t *)(ptr))[0])/255.;	/* UCHAR_MAX */
-		case AlloUInt16Ty:		return double(((uint8_t *)(ptr))[0])/65535.;	
-		case AlloUInt32Ty:		return double(((uint8_t *)(ptr))[0])/double(0xffffffff);	
-		case AlloUInt64Ty:		return double(((uint8_t *)(ptr))[0])/double(ULONG_MAX);
-		case AlloSInt8Ty:		return 0.5+double(((uint8_t *)(ptr))[0])/255.;	/* UCHAR_MAX */
-		case AlloSInt16Ty:		return 0.5+double(((uint8_t *)(ptr))[0])/65535.;	
-		case AlloSInt32Ty:		return 0.5+double(((uint8_t *)(ptr))[0])/double(0xffffffff);	
-		case AlloSInt64Ty:		return 0.5+double(((uint8_t *)(ptr))[0])/double(ULONG_MAX);
-		case AlloFloat32Ty:		return double(((float *)(ptr))[0]);
-		case AlloFloat64Ty:		return double(((double *)(ptr))[0]);
+		case AlloUInt8Ty:		return (double)(((uint8_t *)ptr)[0])/255.;	/* UCHAR_MAX */
+		case AlloUInt16Ty:		return (double)(((uint8_t *)ptr)[0])/65535.;	
+		case AlloUInt32Ty:		return (double)(((uint8_t *)ptr)[0])/(double)0xffffffff;	
+		case AlloUInt64Ty:		return (double)(((uint8_t *)ptr)[0])/(double)ULONG_MAX;
+		case AlloSInt8Ty:		return 0.5+(double)(((uint8_t *)ptr)[0])/255.;	/* UCHAR_MAX */
+		case AlloSInt16Ty:		return 0.5+(double)(((uint8_t *)ptr)[0])/65535.;	
+		case AlloSInt32Ty:		return 0.5+(double)(((uint8_t *)ptr)[0])/(double)0xffffffff;	
+		case AlloSInt64Ty:		return 0.5+(double)(((uint8_t *)ptr)[0])/(double)ULONG_MAX;
+		case AlloFloat32Ty:		return (double)(((float *)ptr)[0]);
+		case AlloFloat64Ty:		return ((double *)ptr)[0];
 		default:				return 0;
 	}
 }
 
-/*!
-	Converts a double in [0, 1] to a specified AlloTy.
-	Useful for converting numeric formats.
-*/
 static inline void allo_type_fromnumber(AlloTy ty, double number, char * dst) {
 	switch(ty) {
-		case AlloUInt8Ty:		*(uint8_t *)(dst) = (uint8_t)(number * 255.); break;
-		case AlloUInt16Ty:		*(uint16_t *)(dst) = (uint16_t)(number * 65535.); break;
-		case AlloUInt32Ty:		*(uint32_t *)(dst) = (uint32_t)(number * double(0xffffffff)); break;
-		case AlloUInt64Ty:		*(uint64_t *)(dst) = (uint64_t)(number * double(ULONG_MAX)); break;
+		case AlloUInt8Ty:		*((uint8_t *)dst) = (uint8_t)(number * 255.); break;
+		case AlloUInt16Ty:		*((uint16_t *)dst) = (uint16_t)(number * 65535.); break;
+		case AlloUInt32Ty:		*((uint32_t *)dst) = (uint32_t)(number * (double)(0xffffffff)); break;
+		case AlloUInt64Ty:		*((uint64_t *)dst) = (uint64_t)(number * (double)(ULONG_MAX)); break;
 		
-		case AlloSInt8Ty:		*(int8_t *)(dst) = (int8_t)((number-0.5) * 255.); break;
-		case AlloSInt16Ty:		*(int16_t *)(dst) = (int16_t)((number-0.5) * 65535.); break;
-		case AlloSInt32Ty:		*(int32_t *)(dst) = (int32_t)((number-0.5) * double(0xffffffff)); break;
-		case AlloSInt64Ty:		*(int64_t *)(dst) = (int64_t)((number-0.5) * double(ULONG_MAX)); break;
-		case AlloFloat32Ty:		*(float *)(dst) = (float)number; break;
-		case AlloFloat64Ty:		*(double *)(dst) = number; break;
+		case AlloSInt8Ty:		*((int8_t *)dst) = (int8_t)((number-0.5) * 255.); break;
+		case AlloSInt16Ty:		*((int16_t *)dst) = (int16_t)((number-0.5) * 65535.); break;
+		case AlloSInt32Ty:		*((int32_t *)dst) = (int32_t)((number-0.5) * (double)(0xffffffff)); break;
+		case AlloSInt64Ty:		*((int64_t *)dst) = (int64_t)((number-0.5) * (double)(ULONG_MAX)); break;
+		case AlloFloat32Ty:		*((float *)dst) = (float)number; break;
+		case AlloFloat64Ty:		*((double *)dst) = number; break;
 		default:				*dst = 0;
 	}
 }
 
-/*!
-	Return the number of elements (cells) in a array
-*/
 static inline uint32_t allo_array_elements(const AlloArray * arr) {
 	uint32_t i, elements = 1;
 	for (i=0; i<arr->header.dimcount; i++) 
@@ -271,9 +354,6 @@ static inline uint32_t allo_array_elements(const AlloArray * arr) {
 	return elements;
 }
 
-/*!
-	Returns the total memory footprint, in bytes, based on the array header
-*/
 static inline size_t allo_array_size_from_header(const AlloArrayHeader * h) {
 	if(h->dimcount != 0){
 		int idx = h->dimcount-1;
@@ -282,226 +362,10 @@ static inline size_t allo_array_size_from_header(const AlloArrayHeader * h) {
 	return 0;
 }
 
-/*!
-	Returns the total memory footprint, in bytes
-*/
 static inline size_t allo_array_size(const AlloArray * arr) {
 	return allo_array_size_from_header(&arr->header);
 }
 
-/*!
-	Set an array header, e.g. just after allocating
-*/
-static inline void allo_array_setheader(AlloArray * dst, const AlloArrayHeader * src) {
-	memcpy(&dst->header, src, sizeof(AlloArrayHeader));
-}
-
-
-/*!
-	Set dimension attributes without modifying memory
-*/
-static inline void allo_array_setdim1d(AlloArrayHeader * h, uint32_t nx){
-	h->dimcount	= 1;
-	h->dim[0]	= nx;
-}
-
-/*!
-	Set dimension attributes without modifying memory
-*/
-static inline void allo_array_setdim2d(AlloArrayHeader * h, uint32_t nx, uint32_t ny){
-	h->dimcount	= 2;
-	h->dim[0]	= nx;
-	h->dim[1]	= ny;
-}
-
-
-/*!
-	Set stride factors based on a specific byte alignment
-*/
-static inline void allo_array_setstride(AlloArrayHeader * h, unsigned alignSize){
-	unsigned typeSize = allo_type_size(h->type);
-	unsigned numDims = h->dimcount;
-	h->stride[0] = h->components * typeSize;
-	
-	if(numDims>1){
-		h->stride[1] = h->stride[0] * h->dim[0]; /* compute ideal row stride amount */
-
-		/* Pad rows to make multiple of alignment */
-		if(alignSize > 1){
-			unsigned remain = h->stride[1] % alignSize;		/* compute pad bytes */
-			if(remain){ h->stride[1] += alignSize - remain;}/* add pad bytes (if any) */
-		}
-
-		unsigned i=2;
-		for(; i<numDims; ++i){ h->stride[i] = h->stride[i-1] * h->dim[i-1]; }
-	}
-}
-
-/*!
-	Returns 1 if headers are equivalent, otherwise 0
-*/
-static inline int allo_array_equal_headers(const AlloArrayHeader * h1, const AlloArrayHeader * h2){
-	if(
-		(h1->components == h2->components) &&
-		(h1->type == h2->type) &&
-		(h1->dimcount == h2->dimcount)
-	){
-		unsigned i;
-		for(i=0; i<h1->dimcount; ++i){
-			if( (h1->dim[i] != h2->dim[i]) || (h1->stride[i] != h2->stride[i]) )
-				return 0;
-		}
-		return 1; /* == true */
-	}
-	else{
-		return 0;
-	}
-}
-
-/*!
-	Set header attributes to zero
-*/
-static inline void allo_array_header_clear(AlloArrayHeader *h) {
-	memset(h, 0, sizeof(AlloArrayHeader));
-}
-
-/*!
-	Set all attributes, including header, to zero
-*/
-static inline void allo_array_clear(AlloArray * arr) {
-	allo_array_header_clear( &(arr->header) );
-	arr->data.ptr = NULL;
-}
-
-/*!
-	Free memory
-*/
-static inline void allo_array_free(AlloArray * arr) {
-	if (NULL != arr->data.ptr) free(arr->data.ptr);
-	arr->data.ptr = NULL;
-}
-
-/*!
-	Free memory and zero attributes
-*/
-static inline void allo_array_destroy(AlloArray * arr) {
-	if (NULL != arr->data.ptr) {
-		allo_array_free(arr);
-		allo_array_clear(arr);
-	}
-}
-
-static inline void allo_array_allocate(AlloArray * arr) {
-	arr->data.ptr = (char *)calloc(1, allo_array_size(arr));
-}
-
-/*!
-	Create a new array based on a header
-*/
-static inline void allo_array_create(AlloArray * arr, const AlloArrayHeader *h) {
-	allo_array_destroy(arr);
-	allo_array_setheader(arr, h);
-	allo_array_allocate(arr);
-}
-	
-/*!
-	Create a new 1D array
-*/
-static inline void allo_array_create1d(
-	AlloArray * arr, 
-	uint8_t components, 
-	AlloTy type, 
-	uint32_t dimx, 
-	size_t align
-) {
-	AlloArrayHeader header;
-	header.type = type;
-	header.components = components;
-	allo_array_setdim1d(&header, dimx);
-	allo_array_setstride(&header, align);
-	allo_array_create(arr, &header);
-}
-
-/*!
-	Create a new 2D array
-*/
-static inline void allo_array_create2d(
-	AlloArray * arr, 
-	uint8_t components, 
-	AlloTy type, 
-	uint32_t dimx, 
-	uint32_t dimy, 
-	size_t align
-) {
-	AlloArrayHeader header;
-	header.type = type;
-	header.components = components;
-	allo_array_setdim2d(&header, dimx, dimy);
-	allo_array_setstride(&header, align);
-	allo_array_create(arr, &header);
-}
-
-
-/*!
-	Adapt an array to another size
-*/
-static inline void allo_array_adapt(AlloArray * arr, const AlloArrayHeader *h) {
-	if(! allo_array_equal_headers( &(arr->header), h)) {
-		allo_array_create(arr, h);
-	}
-}
-
-static inline void allo_array_adapt2d(
-	AlloArray * arr, 
-	uint8_t components, 
-	AlloTy type, 
-	uint32_t dimx, 
-	uint32_t dimy, 
-	size_t align
-) {
-	AlloArrayHeader header;
-	header.type = type;
-	header.components = components;
-	allo_array_setdim2d(&header, dimx, dimy);
-	allo_array_setstride(&header, align);
-	allo_array_adapt(arr, &header);
-}
-
-/*!
-	Copy a array into another array
-*/
-static inline void allo_array_copy(AlloArray *dst, AlloArray *src){
-	allo_array_adapt(dst, &(src->header));
-	memcpy(dst->data.ptr, src->data.ptr, allo_array_size(src));
-}
-
-
-
-static inline AlloArrayWrapper * allo_array_wrapper_new() {
-	return (AlloArrayWrapper *)malloc(sizeof(AlloArrayWrapper));
-}
-
-static inline void allo_array_wrapper_free(AlloArrayWrapper *w) {
-	free(w);
-}
-
-static inline void allo_array_wrapper_setup(AlloArrayWrapper *wrap) {
-	allo_array_clear( &(wrap->array) );
-	wrap->refs = 0;
-}
-
-static inline void allo_array_wrapper_retain(AlloArrayWrapper *wrap) {
-	wrap->refs++;
-}
-
-static inline void allo_array_wrapper_release(AlloArrayWrapper *wrap) {
-	wrap->refs--;
-	if(wrap->refs <= 0) {
-		allo_array_destroy(&(wrap->array));
-		wrap->refs = 0;
-		allo_array_wrapper_free(wrap);
-	}
-}
 
 /* Multidimensional terminology:
 	# Dimensions	0			1			2			3			4
