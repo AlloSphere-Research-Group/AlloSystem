@@ -149,7 +149,8 @@ public:
 		FOG						= GL_FOG,					/**< Apply fog effect */
 		LIGHTING				= GL_LIGHTING,				/**< Use lighting */
 		SCISSOR_TEST			= GL_SCISSOR_TEST,			/**< Crop fragments according to scissor region */
-		CULL_FACE				= GL_CULL_FACE				/**< Cull faces */
+		CULL_FACE				= GL_CULL_FACE,				/**< Cull faces */
+		RESCALE_NORMAL			= GL_RESCALE_NORMAL			/**< Rescale normals to counteract an isotropic modelview scaling */
 	};
 
 	enum DataType {
