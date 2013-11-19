@@ -19,7 +19,9 @@ help:
 	@echo "    all .............. build all modules found in this directory"
 	@echo "    allocore ......... build allocore"
 	@echo "    alloutil ......... build allocore utilities extension"
+	@echo "    allocv ........... build allocore/OpenCV binding"
 	@echo "    alloGLV .......... build allocore/GLV binding"
+	@echo "    allonect ......... build allocore/freenect binding"
 	@echo "    allovsr .......... build allocore/vsr binding"
 	@echo "    Gamma ............ build Gamma external"
 	@echo "    GLV .............. build GLV external"
@@ -39,14 +41,17 @@ allocore: FORCE
 alloutil: FORCE allocore
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR) linkfile
 
-allonect: FORCE allocore alloutil
-	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR)
+allocv: FORCE allocore
+	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR) linkfile
 
 Gamma GLV: FORCE
 	@$(MAKE) --no-print-directory -C ../$@ install DESTDIR=$(CURDIR)/$(BUILD_DIR) linkfile
 
 alloGLV: FORCE allocore GLV
 	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR) linkfile
+
+allonect: FORCE allocore alloutil
+	@$(MAKE) --no-print-directory -C $@ install DESTDIR=../$(BUILD_DIR)
 
 #Default Installs Precompiled Header -- set to 0 to avoid this copy
 INSTALL_VSR_PCH = 1
