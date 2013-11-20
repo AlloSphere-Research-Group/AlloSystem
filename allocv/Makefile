@@ -22,9 +22,17 @@ CPPFLAGS	+= -I../$(BUILD_DIR)include
 LDFLAGS		+= -L../$(BUILD_DIR)lib
 
 # Define flags for external dependencies
-LINK_CPPFLAGS 	+= `pkg-config --cflags opencv`
+
 LINK_CXXFLAGS	+= -Wno-non-virtual-dtor -Wno-overloaded-virtual
+
+ifeq ($(PLATFORM), windows)
+LINK_CPPFLAGS 	+=
+LIBS_OPENCV		= calib3d contrib core features2d flann gpu highgui imgproc legacy ml nonfree objdetect photo stitching superres video videostab
+LINK_LDFLAGS	+= $(addsuffix 246, $(addprefix -lopencv_, $(LIBS_OPENCV)))
+else
+LINK_CPPFLAGS 	+= `pkg-config --cflags opencv`
 LINK_LDFLAGS	+= `pkg-config --libs opencv`
+endif
 
 include ../Makefile.rules
 
