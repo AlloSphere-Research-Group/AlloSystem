@@ -286,24 +286,41 @@ public:
 	void shadeModel(ShadeModel m);
 
 
-	/// Set blending mode
+	/// Set blend mode
 	void blendMode(BlendFunc src, BlendFunc dst, BlendEq eq=FUNC_ADD);
 
-	/// Set blending mode to additive
+	/// Set blend mode to additive (symmetric additive lighten)
 	void blendModeAdd(){ blendMode(SRC_ALPHA, ONE, FUNC_ADD); }
 	
-	/// Set blending mode to transparent
+	/// Set blend mode to subtractive (symmetric additive darken)
+	void blendModeSub(){ blendMode(SRC_ALPHA, ONE, FUNC_REVERSE_SUBTRACT); }
+
+	/// Set blend mode to screen (symmetric multiplicative lighten)
+	void blendModeScreen(){ blendMode(ONE, ONE_MINUS_SRC_COLOR, FUNC_ADD); }
+
+	/// Set blend mode to multiplicative (symmetric multiplicative darken)
+	void blendModeMul(){ blendMode(DST_COLOR, ZERO, FUNC_ADD); }
+
+	/// Set blend mode to transparent (asymmetric)
 	void blendModeTrans(){ blendMode(SRC_ALPHA, ONE_MINUS_SRC_ALPHA, FUNC_ADD); }
 
+	/// Set states for additive blending
+	void blendAdd(){ depthMask(false); blending(true); blendModeAdd(); }
+
+	/// Set states for subtractive blending
+	void blendSub(){ depthMask(false); blending(true); blendModeSub(); }
+
+	/// Set states for screen blending
+	void blendScreen(){ depthMask(false); blending(true); blendModeScreen(); }
+
+	/// Set states for multiplicative blending
+	void blendMul(){ depthMask(false); blending(true); blendModeMul(); }
+
 	/// Set states for transparent blending
-	
-	/// This will disable depth testing, enable blending, and set the blend mode.
-	///
-	void blendTrans(){
-		disable(DEPTH_TEST);
-		enable(BLEND);
-		blendModeTrans();
-	}
+	void blendTrans(){ depthMask(false); blending(true); blendModeTrans(); }
+
+	/// Turn blending states off (opaque rendering)
+	void blendOff(){ depthMask(true); blending(false); }
 
 
 	/// Clear frame buffer(s)
