@@ -118,6 +118,9 @@ public:
 	template <class T>
 	void normal(T& y1, T& y2);
 
+	/// Returns argument with sign randomly flipped
+	float sign(float x=1.f);
+
 	/// Returns true with a probability of 0.5
 	bool prob(){ return mRNG()&0x80000000; }
 
@@ -288,6 +291,9 @@ inline bool prob(){ return global().prob(); }
 /// Returns true with probability p
 inline bool prob(float p){ return global().prob(p); }
 
+/// Returns argument with sign randomly flipped
+inline float sign(float x=1.f){ return global().sign(x); }
+
 /// Returns uniform random in [0, 1)
 inline float uniform(){ return global().uniform(); }
 
@@ -377,6 +383,12 @@ template <class T> void Random<RNG>::normal(T& y1, T& y2){
 	y2 = T(x2 * w);
 }
 
+template <class RNG>
+float Random<RNG>::sign(float x){
+	union {float f; uint32_t i;} u = {x};
+	u.i |= mRNG() & 0x80000000;
+	return u.f;
+}
 
 // Fisher-Yates shuffle
 template <class RNG>
