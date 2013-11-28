@@ -160,6 +160,9 @@ public:
 		USHORT					= GL_UNSIGNED_SHORT,		/**< */
 		INT						= GL_INT,					/**< */
 		UINT					= GL_UNSIGNED_INT,			/**< */
+		BYTES_2					= GL_2_BYTES,				/**< */
+		BYTES_3					= GL_3_BYTES,				/**< */
+		BYTES_4					= GL_4_BYTES,				/**< */
 		FLOAT					= GL_FLOAT,					/**< */
 		DOUBLE					= GL_DOUBLE					/**< */
 	};
@@ -511,7 +514,11 @@ public:
 	
 	/// Returns number of bytes for given data type
 	static int numBytes(DataType v);
-	
+
+	/// Get DataType associated with a basic C type
+	template<typename Type>
+	static DataType toDataType();
+
 	/// Returns AlloTy type for a given GL data type:
 	static AlloTy toAlloTy(DataType v);
 

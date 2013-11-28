@@ -33,14 +33,57 @@ int Graphics::numComponents(Format v){
 int Graphics::numBytes(DataType v){
 	#define CS(a,b) case a: return sizeof(b); 
 	switch(v){
-		CS(BYTE, char)
-		CS(UBYTE, unsigned char)
-		CS(INT, int)
-		CS(UINT, unsigned int)
-		CS(FLOAT, float)
+		CS(BYTE, GLbyte)
+		CS(UBYTE, GLubyte)
+		CS(SHORT, GLshort)
+		CS(USHORT, GLushort)
+		CS(INT, GLint)
+		CS(UINT, GLuint)
+		CS(BYTES_2, char[2])
+		CS(BYTES_3, char[3])
+		CS(BYTES_4, char[4])
+		CS(FLOAT, GLfloat)
+		CS(DOUBLE, GLdouble)
 		default: return 0;
 	};
 	#undef CS
+}
+
+template<> Graphics::DataType Graphics::toDataType<char>(){ return BYTE; }
+template<> Graphics::DataType Graphics::toDataType<unsigned char>(){ return UBYTE; }
+template<> Graphics::DataType Graphics::toDataType<short>(){ return SHORT; }
+template<> Graphics::DataType Graphics::toDataType<unsigned short>(){ return USHORT; }
+template<> Graphics::DataType Graphics::toDataType<int>(){ return INT; }
+template<> Graphics::DataType Graphics::toDataType<unsigned int>(){ return UINT; }
+template<> Graphics::DataType Graphics::toDataType<float>(){ return FLOAT; }
+template<> Graphics::DataType Graphics::toDataType<double>(){ return DOUBLE; }
+
+Graphics::DataType Graphics::toDataType(AlloTy v){
+	switch(v){
+		case AlloFloat32Ty: return FLOAT;
+		case AlloFloat64Ty: return DOUBLE;
+		case AlloSInt8Ty:	return BYTE;
+		case AlloUInt8Ty:	return UBYTE;
+		case AlloSInt16Ty:	return SHORT;
+		case AlloUInt16Ty:	return USHORT;
+		case AlloSInt32Ty:	return INT;
+		case AlloUInt32Ty:	return UINT;
+		default:			return BYTE;
+	}
+}
+
+AlloTy Graphics :: toAlloTy(Graphics::DataType v) {
+	switch (v) {
+		case BYTE:		return AlloSInt8Ty;
+		case UBYTE:		return AlloUInt8Ty;
+		case SHORT:		return AlloSInt16Ty;
+		case USHORT:	return AlloUInt16Ty;
+		case INT:		return AlloSInt32Ty;
+		case UINT:		return AlloUInt32Ty;
+		case FLOAT:		return AlloFloat32Ty;
+		case DOUBLE:	return AlloFloat64Ty;
+		default:		return AlloVoidTy;
+	}
 }
 
 const char * Graphics::errorString(bool verbose){
@@ -75,45 +118,6 @@ bool Graphics::error(const char * msg, int ID){
 	return false;
 }
 
-Graphics::DataType Graphics::toDataType(AlloTy v){
-	switch(v){
-		case AlloFloat32Ty: return FLOAT;
-		case AlloFloat64Ty: return DOUBLE;
-		case AlloSInt8Ty:	return BYTE;
-		case AlloUInt8Ty:	return UBYTE;
-		case AlloSInt16Ty:	return SHORT;
-		case AlloUInt16Ty:	return USHORT;
-		case AlloSInt32Ty:	return INT;
-		case AlloUInt32Ty:	return UINT;
-		default:			return BYTE;
-	}
-}
-
-enum DataType {
-		BYTE					= GL_BYTE,
-		UBYTE					= GL_UNSIGNED_BYTE,
-		SHORT					= GL_SHORT,
-		USHORT					= GL_UNSIGNED_SHORT,
-		INT						= GL_INT,
-		UINT					= GL_UNSIGNED_INT,
-		FLOAT					= GL_FLOAT,
-		DOUBLE					= GL_DOUBLE
-	};
-
-
-AlloTy Graphics :: toAlloTy(Graphics::DataType v) {
-	switch (v) {
-		case BYTE:		return AlloSInt8Ty;
-		case UBYTE:		return AlloUInt8Ty;
-		case SHORT:		return AlloSInt16Ty;
-		case USHORT:	return AlloUInt16Ty;
-		case INT:		return AlloSInt32Ty;
-		case UINT:		return AlloUInt32Ty;
-		case FLOAT:		return AlloFloat32Ty;
-		case DOUBLE:	return AlloFloat64Ty;
-		default:		return AlloVoidTy;
-	}
-}
 
 void Graphics::antialiasing(AntiAliasMode v){
 	glHint(GL_POINT_SMOOTH_HINT, v);
