@@ -225,9 +225,9 @@ public:
 
 	/// Compute wet/dry mix stereo output from dry mono input
 	
-	/// @param[inout] inout1		the input sample and wet/dry output 1
-	/// @param[  out]   out2		wet/dry output 2
-	/// @param[in   ] wetAmt		wet mix amount
+	/// @param[in,out] inout1		the input sample and wet/dry output 1
+	/// @param[   out]   out2		wet/dry output 2
+	/// @param[in    ] wetAmt		wet mix amount
 	/// \returns dry input sample
 	T mix(T& inout1, T& out2, T wetAmt){
 		T s = inout1;

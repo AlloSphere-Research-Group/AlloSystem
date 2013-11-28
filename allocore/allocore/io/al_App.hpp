@@ -185,12 +185,12 @@ public:
 
 	/// Initialize audio
 
-	/// @param[in] sampleRate		Sampling rate.  Unsupported values will use default rate of device.
+	/// @param[in] sampleRate		Sample rate.  Unsupported values will use default rate of device.
 	/// @param[in] blockSize		Number of sample frames to process per callback
 	/// @param[in] outputChannels	Number of output channels to open or -1 for all
 	/// @param[in] inputChannels	Number of input channels to open or -1 for all
 	void initAudio(
-		double audioRate=44100, int blockSize=128,
+		double sampleRate=44100, int blockSize=128,
 		int outputChannels=-1, int inputChannels=-1	
 	);
 	
@@ -201,6 +201,7 @@ public:
 	/// @param[in] title			Window title
 	/// @param[in] fps				Frames/second
 	/// @param[in] mode				Window display mode
+	/// @param[in] flags			Additional flags (unused)
 	ViewpointWindow * initWindow(
 		const Window::Dim& dims = Window::Dim(800,600),
 		const std::string title="",

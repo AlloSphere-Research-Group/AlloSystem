@@ -70,12 +70,14 @@ identifier.
 class BufferObject : public GPUObject {
 public:
 
+	/// Buffer access mode
 	enum AccessMode{
 		READ_ONLY				= GL_READ_ONLY,
 		WRITE_ONLY				= GL_WRITE_ONLY, 
 		READ_WRITE				= GL_READ_WRITE
 	};
 
+	/// Array type
 	enum ArrayType{
 		VERTEX_ARRAY			= GL_VERTEX_ARRAY,
 		NORMAL_ARRAY			= GL_NORMAL_ARRAY,
@@ -85,6 +87,7 @@ public:
 		EDGE_FLAG_ARRAY			= GL_EDGE_FLAG_ARRAY
 	};
 
+	/// Buffer type
 	enum BufferType{
 		ARRAY_BUFFER			= GL_ARRAY_BUFFER,
 		ELEMENT_ARRAY_BUFFER	= GL_ELEMENT_ARRAY_BUFFER,

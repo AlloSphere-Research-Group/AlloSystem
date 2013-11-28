@@ -62,9 +62,11 @@ struct CThreadFunction : public ThreadFunction{
 	/// Prototype of thread execution function
 	typedef void * (*CFunc)(void * userData);
 	
-	/// @param[in] func		thread execution function
-	/// @param[in] user		user data passed into thread execution function
-	CThreadFunction(CFunc func_=0, void * user_=0): func(func_), user(user_){}
+	/// @param[in] threadFunc	thread execution function
+	/// @param[in] userData		user data passed into thread execution function
+	CThreadFunction(CFunc threadFunc=0, void * userData=0)
+	:	func(threadFunc), user(userData)
+	{}
 	
 	void operator()(){ func(user); }
 

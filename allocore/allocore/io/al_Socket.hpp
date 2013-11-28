@@ -86,7 +86,7 @@ public:
 protected:
 	Socket();
 
-	/// @sender: true if Socket will send
+	// @sender: true if Socket will send
 	Socket(uint16_t port, const char * address, al_sec timeout, bool sender);
 
 	virtual ~Socket();

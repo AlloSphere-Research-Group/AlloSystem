@@ -310,8 +310,8 @@ public:
 
 	/// Returns a nearby vector along some dimension
 	
-	/// \tparam 	Dimension	The dimension along which to get a nearby vector
-	/// \param[in]	ds			The amount to shift along specified dimension
+	/// @tparam 	Dimension	The dimension along which to get a nearby vector
+	/// @param[in]	shift		The amount to shift along specified dimension
 	template<int Dimension>
 	Vec by(T shift) const {
 		Vec res(*this);
@@ -480,11 +480,11 @@ inline T angle(const Vec<N,T>& a, const Vec<N,T>& b){
 	return std::acos(cosAng);
 }
 
-/*! Centroid of a triangle defined by three points
-	@param p1	Point1
-	@param p2	Point2
-	@param p3	Point3
-	@ret c		Centroid
+/*! Compute centroid of a triangle defined by three points
+	@param[out] c	Centroid
+	@param[ in] p1	Point 1
+	@param[ in] p2	Point 2
+	@param[ in] p3	Point 3
 */
 template <int N, class T>
 inline void centroid3(Vec<N,T>& c, const Vec<N,T>& p1, const Vec<N,T>& p2, const Vec<N,T>& p3){
@@ -499,10 +499,10 @@ inline T dist(const Vec<N,T>& a, const Vec<N,U>& b){
 }
 
 /*! Get the normal to a triangle defined by three points
-	@param p1	Point1
-	@param p2	Point2
-	@param p3	Point3
-	@ret n		Normal
+	@param[out] n	Normal
+	@param[ in] p1	Point 1
+	@param[ in] p2	Point 2
+	@param[ in] p3	Point 3
 */
 template <class T>
 inline void normal(Vec<3,T>& n, const Vec<3,T>& p1, const Vec<3,T>& p2, const Vec<3,T>& p3){
