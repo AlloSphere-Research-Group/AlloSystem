@@ -79,14 +79,14 @@ struct NavInputControl : public InputEventHandler {
 			case Keyboard::DOWN:	nav().spinR(-a); return false;
 			case Keyboard::RIGHT:	nav().spinU(-a); return false;
 			case Keyboard::LEFT:	nav().spinU( a); return false;
-			case 'q':				nav().spinF( a); return false;
-			case 'z':				nav().spinF(-a); return false;
-			case 'a':				nav().moveR(-v); return false;
-			case 'd':				nav().moveR( v); return false;
-			case 'e':				nav().moveU( v); return false;
-			case 'c':				nav().moveU(-v); return false;
-			case 'x':				nav().moveF(-v); return false;
-			case 'w':				nav().moveF( v); return false;
+			case 'q': case 'Q':		nav().spinF( a); return false;
+			case 'z': case 'Z':		nav().spinF(-a); return false;
+			case 'a': case 'A':		nav().moveR(-v); return false;
+			case 'd': case 'D':		nav().moveR( v); return false;
+			case 'e': case 'E':		nav().moveU( v); return false;
+			case 'c': case 'C':		nav().moveU(-v); return false;
+			case 'x': case 'X':		nav().moveF(-v); return false;
+			case 'w': case 'W':		nav().moveF( v); return false;
 			default:;
 		}
 		return true;
@@ -97,14 +97,14 @@ struct NavInputControl : public InputEventHandler {
 			case Keyboard::DOWN:	nav().spinR(0); return false;
 			case Keyboard::RIGHT:
 			case Keyboard::LEFT:	nav().spinU(0); return false;
-			case 'q':
-			case 'z':				nav().spinF(0); return false;
-			case 'a':
-			case 'd':				nav().moveR(0); return false;
-			case 'e':
-			case 'c':				nav().moveU(0); return false;
-			case 'x':
-			case 'w':				nav().moveF(0); return false;
+			case 'q': case 'Q':
+			case 'z': case 'Z':		nav().spinF(0); return false;
+			case 'a': case 'A':
+			case 'd': case 'D':		nav().moveR(0); return false;
+			case 'e': case 'E':
+			case 'c': case 'C':		nav().moveU(0); return false;
+			case 'x': case 'X':
+			case 'w': case 'W':		nav().moveF(0); return false;
 			default:;
 		}
 		return true;
