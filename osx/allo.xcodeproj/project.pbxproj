@@ -40,6 +40,8 @@
 		164626EF1793F1ED00E84F48 /* serial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = serial.h; sourceTree = "<group>"; };
 		165C2E18162AE6C900E1BC69 /* al_Array.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Array.cpp; sourceTree = "<group>"; };
 		168D480A183B92F200D00338 /* al_Array_C.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = al_Array_C.c; sourceTree = "<group>"; };
+		168D493318536C6B00D00338 /* al_PeriodicThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_PeriodicThread.cpp; sourceTree = "<group>"; };
+		168D493418536C8300D00338 /* al_PeriodicThread.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_PeriodicThread.hpp; sourceTree = "<group>"; };
 		360BCBC115BB6D70008921E9 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		360BCBC315BB6D70008921E9 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = /System/Library/Frameworks/GLUT.framework; sourceTree = "<absolute>"; };
 		360BCBC515BB6D70008921E9 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
@@ -577,6 +579,7 @@
 				3618821415B936340009AD7E /* al_Info.hpp */,
 				3618821515B936340009AD7E /* al_MainLoop.hpp */,
 				3618821615B936340009AD7E /* al_Memory.hpp */,
+				168D493418536C8300D00338 /* al_PeriodicThread.hpp */,
 				3618821715B936340009AD7E /* al_Printing.hpp */,
 				3618821815B936340009AD7E /* al_Thread.hpp */,
 				3618821915B936340009AD7E /* al_Time.h */,
@@ -946,6 +949,7 @@
 				3618834115B936340009AD7E /* al_MainLoop.cpp */,
 				3618834215B936340009AD7E /* al_MainLoopOSX.mm */,
 				3618834315B936340009AD7E /* al_Memory.cpp */,
+				168D493318536C6B00D00338 /* al_PeriodicThread.cpp */,
 				3618834415B936340009AD7E /* al_Printing.cpp */,
 				3618834515B936340009AD7E /* al_ThreadNative.cpp */,
 				3618834615B936340009AD7E /* al_Time.cpp */,
