@@ -55,9 +55,10 @@ if((NOT FREETYPE_LIBRARY) OR (NOT FREETYPE_INCLUDE_DIR))
     /sw/include
     /opt/local/include
     /usr/freeware/include
+    PATH_SUFFIXES freetype freetype2
     )
 
-  FIND_PATH(FREETYPE_INCLUDE_DIR_freetype2 freetype/config/ftheader.h 
+  FIND_PATH(FREETYPE_INCLUDE_DIR_freetype2 config/ftheader.h 
     HINTS
     $ENV{FREETYPE_DIR}/include/freetype2
     PATHS
@@ -68,7 +69,7 @@ if((NOT FREETYPE_LIBRARY) OR (NOT FREETYPE_INCLUDE_DIR))
     /sw/include
     /opt/local/include
     /usr/freeware/include
-    PATH_SUFFIXES freetype2
+    PATH_SUFFIXES freetype freetype2
     )
 
   FIND_LIBRARY(FREETYPE_LIBRARY
