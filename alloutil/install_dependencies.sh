@@ -14,7 +14,7 @@ if [ `which apt-get` ]; then
 elif [ `which port` ]; then
 	echo "Found MacPorts"
 	sudo port selfupdate 
-	sudo port install lua
+	sudo port install luajit
 
 elif [ `which brew` ]; then
 	echo "Found Homebrew"
