@@ -95,19 +95,13 @@ public:
 	uint8_t components() const { return header.components; }	///< Get number of components
 	uint8_t dimcount() const { return header.dimcount; }		///< Get number of dimensions
 	uint32_t dim(int i=0) const { return header.dim[i]; }		///< Get size of dimension
-	unsigned width() const { return header.dim[0]; }			///< Get size of first dimension
-	unsigned height() const { return header.dim[1]; }			///< Get size of second dimension
-	unsigned depth() const { return header.dim[2]; }			///< Get size of third dimension
-	uint32_t stride(int i=0) const { return header.stride[i]; }	///< Get stride of dimension, in elements
+	unsigned width() const { return dim(0); }					///< Get size of first dimension
+	unsigned height() const { return dim(1); }					///< Get size of second dimension
+	unsigned depth() const { return dim(2); }					///< Get size of third dimension
+	uint32_t stride(int i=0) const { return header.stride[i]; }	///< Get stride of dimension, in bytes
 
-	/// Return the packing alignment (1, 2, 4 or 8 byte)
-	uint32_t alignment() const {
-		uint32_t i = stride(1);	// row stride
-		if (i % 2 > 0) return 1;
-		if (i % 4 > 0) return 2;
-		if (i % 8 > 0) return 4;
-		return 8;
-	}
+	/// Returns the maximum possible byte alignment of the rows (1, 2, 4 or 8 byte)
+	uint32_t alignment() const;
 
 	/// Returns the total memory footprint, in bytes
 	size_t size() const { return allo_array_size(this); }
@@ -286,8 +280,8 @@ public:
 	///
 	template<typename T> static AlloTy type();
 
-	///	Derive the appropriate stride values for a given alignment
-	static void deriveStride(AlloArrayHeader& h, size_t alignSize);
+	///	Derive the appropriate stride values for a given row alignment
+	static void deriveStride(AlloArrayHeader& h, size_t rowAlignSize);
 
 protected:
 	void formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, int numDims, size_t align);
