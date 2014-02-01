@@ -27,6 +27,7 @@ help:
 	@echo "    GLV .............. build GLV external"
 	@echo "    vsr .............. build vsr external [use with optional INSTALL_VSR_PCH flag set to 1 or 0]"
 	@echo "    clean ............ clean all modules found in this directory"
+	@echo “    docs ............. open API documentation
 	@echo "    gatherexamples ... create examples/ directory with symlinks to module examples"
 
 
@@ -78,6 +79,35 @@ gatherexamples:
 			cd ..;\
 		fi;\
 	done
+
+
+# Create/view API documentation
+DOC_INDEX_FILE := doc/www/doxy/html/index.html
+$(DOC_INDEX_FILE): doc/Doxyfile allocore/allocore/*
+	@if [ `which doxygen` ]; then \
+		cd doc && doxygen Doxyfile && cd ..;\
+	elif [ `which /Applications/Doxygen.app/Contents/Resources/doxygen` ]; then \
+		cd doc && /Applications/Doxygen.app/Contents/Resources/doxygen Doxyfile && cd ..;\
+	else \
+		echo "Error: doxygen not found.";\
+		echo "doxygen is required to create the documentation.";\
+		printf "Please install it using ";\
+		if [ `which apt-get` ]; then printf "\"sudo apt-get install doxygen\"";\
+		elif [ `which port` ]; then printf "\"sudo port install doxygen\"";\
+		elif [ `which brew` ]; then printf "\"brew install doxygen\"";\
+		else printf "a package manager, e.g., apt-get (Linux), MacPorts or Homebrew (Mac OSX),";\
+		fi;\
+		printf " and try again. You can also create the documentation manually \
+by downloading doxygen from www.doxygen.org and running it on the file $<.\n";\
+		exit 127;\
+	fi
+
+docs: $(DOC_INDEX_FILE)
+ifeq ($(PLATFORM), linux)
+	@xdg-open $< &
+else ifeq ($(PLATFORM), macosx)
+	@open $<
+endif
 
 
 # This attempts to determine what modules have been built by looking in the 
