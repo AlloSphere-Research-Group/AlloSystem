@@ -18,7 +18,7 @@ Texture::Texture()
 	mHeight(0),
 	mDepth(0),
 	mParamsUpdated(true),
-	mPixelsUpdated(true)
+	mPixelsUpdated(true), mArrayDirty(false)
 {}
 
 Texture :: Texture(
@@ -39,7 +39,7 @@ Texture :: Texture(
 	mHeight(height),
 	mDepth(0),
 	mParamsUpdated(true),
-	mPixelsUpdated(true)
+	mPixelsUpdated(true), mArrayDirty(false)
 {
 	if(alloc) allocate();
 }
@@ -62,7 +62,7 @@ Texture :: Texture(
 	mHeight(height),
 	mDepth(depth),
 	mParamsUpdated(true),
-	mPixelsUpdated(true)
+	mPixelsUpdated(true), mArrayDirty(false)
 {
 	if(alloc) allocate();
 }
@@ -75,7 +75,7 @@ Texture :: Texture(AlloArrayHeader& header)
 	mFilterMin(LINEAR),
 	mFilterMag(LINEAR),
 	mParamsUpdated(true),
-	mPixelsUpdated(true)
+	mPixelsUpdated(true), mArrayDirty(false)
 {
 	setPixelsFrom(header, true);
 }
@@ -152,8 +152,6 @@ void Texture::setPixelsFrom(const AlloArrayHeader& hdr, bool reallocate){
 	}
 
 	// Reconfigure internal array WITHOUT resizing its memory.
-	// The reason for not also resizing memory is not clear, but it's included
-	// here for Texture::configure.
 	else{
 		mArray.configure(hdr);
 	}
@@ -166,24 +164,37 @@ void Texture :: configure(AlloArrayHeader& hdr) {
 }
 
 void Texture :: bind(int unit) {
-	// ensure it is created:
 	AL_GRAPHICS_ERROR("(before Texture::bind)", id());
+	
+	// ensure texture is created
 	validate();
-	//AL_GRAPHICS_ERROR("validate binding texture", id());
+		//AL_GRAPHICS_ERROR("validate binding texture", id());
+
+	// If someone requested a mutable reference to the internal array, we will
+	// assume we need to sync the texture attributes with the array.
+	if(mArrayDirty){
+		// ensure texture attributes match internal array
+		setPixelsFrom(mArray.header, false);
+		// force texture to be submitted since the pixel data could have been 
+		// tampered with
+		dirty();
+		mArrayDirty = false;
+	}
+
 	sendParams(false);
-	//AL_GRAPHICS_ERROR("sendparams binding texture", id());
+		//AL_GRAPHICS_ERROR("sendparams binding texture", id());
 	sendPixels(false);
-	//AL_GRAPHICS_ERROR("sendpixels binding texture", id());
+		//AL_GRAPHICS_ERROR("sendpixels binding texture", id());
 	
 	// multitexturing:
 	glActiveTexture(GL_TEXTURE0 + unit);
-	//AL_GRAPHICS_ERROR("active texture binding texture", id());
+		//AL_GRAPHICS_ERROR("active texture binding texture", id());
 
-	// bind:
+	// finally, do the actual binding
 	glEnable(target());
-	//AL_GRAPHICS_ERROR("enable target binding texture", id());
+		//AL_GRAPHICS_ERROR("enable target binding texture", id());
 	glBindTexture(target(), id());
-	AL_GRAPHICS_ERROR("binding texture", id());
+		AL_GRAPHICS_ERROR("binding texture", id());
 }
 
 void Texture :: unbind(int unit) {		
@@ -198,43 +209,6 @@ void Texture :: determineTarget(){
 	else if(0 == mDepth)	mTarget = TEXTURE_2D;
 	else					mTarget = TEXTURE_3D;
 	//invalidate(); // FIXME: mPixelsUpdated flag now triggers update
-}
-
-void Texture :: quad(Graphics& gl, double w, double h, double x0, double y0){	
-	//Graphics::error(id(), "prebind quad texture");
-	bind();	
-	Mesh& m = gl.mesh();
-	m.reset();
-	//Graphics::error(id(), "reset mesh quad texture");
-	m.primitive(gl.TRIANGLE_STRIP);
-		m.texCoord	( 0, 0);
-		m.vertex	(x0, y0, 0);
-		m.texCoord	( 1, 0);
-		m.vertex	(x0+w, y0, 0);
-		m.texCoord	( 0, 1);
-		m.vertex	(x0, y0+h, 0);
-		m.texCoord	( 1, 1);
-		m.vertex	(x0+w, y0+h, 0);
-	//Graphics::error(id(), "set mesh quad texture");
-	gl.draw(m);
-	//Graphics::error(id(), "draw mesh quad texture");
-	unbind();
-}
-
-void Texture::quadViewport(
-	Graphics& g, const Color& color,
-	double w, double h, double x, double y
-){
-	g.pushMatrix(g.PROJECTION);
-	g.loadIdentity();
-	g.pushMatrix(g.MODELVIEW);
-	g.loadIdentity();
-	g.depthMask(0); // write only to color buffer
-		g.color(color);
-		quad(g, w,h, x,y);
-	g.depthMask(1);	
-	g.popMatrix(g.PROJECTION);
-	g.popMatrix(g.MODELVIEW);
 }
 
 void Texture :: resetArray(unsigned align) {
@@ -438,8 +412,6 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 	// This ensures that the texture is created on the GPU
 	GPUObject::validate();
 
-	//determineTarget();	// is this necessary? surely the target is already set!
-
 	sendParams(false);
 
 	glActiveTexture(GL_TEXTURE0);
@@ -452,7 +424,6 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 	// tell GPU the row alignment of the pixels we are sending
 	glPixelStorei(GL_UNPACK_ALIGNMENT, align);
 		AL_GRAPHICS_ERROR("Texture::submit (glPixelStorei set)", id());
-
 
 	int intFmt;
 
@@ -514,6 +485,46 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 	glBindTexture(target(), 0);
 		AL_GRAPHICS_ERROR("Texture::submit (glBindTexture 0)", id());
 }
+
+
+
+void Texture :: quad(Graphics& gl, double w, double h, double x0, double y0){	
+	//Graphics::error(id(), "prebind quad texture");
+	bind();	
+	Mesh& m = gl.mesh();
+	m.reset();
+	//Graphics::error(id(), "reset mesh quad texture");
+	m.primitive(gl.TRIANGLE_STRIP);
+		m.texCoord	( 0, 0);
+		m.vertex	(x0, y0, 0);
+		m.texCoord	( 1, 0);
+		m.vertex	(x0+w, y0, 0);
+		m.texCoord	( 0, 1);
+		m.vertex	(x0, y0+h, 0);
+		m.texCoord	( 1, 1);
+		m.vertex	(x0+w, y0+h, 0);
+	//Graphics::error(id(), "set mesh quad texture");
+	gl.draw(m);
+	//Graphics::error(id(), "draw mesh quad texture");
+	unbind();
+}
+
+void Texture::quadViewport(
+	Graphics& g, const Color& color,
+	double w, double h, double x, double y
+){
+	g.pushMatrix(g.PROJECTION);
+	g.loadIdentity();
+	g.pushMatrix(g.MODELVIEW);
+	g.loadIdentity();
+	g.depthMask(0); // write only to color buffer
+		g.color(color);
+		quad(g, w,h, x,y);
+	g.depthMask(1);	
+	g.popMatrix(g.PROJECTION);
+	g.popMatrix(g.MODELVIEW);
+}
+
 
 
 void Texture :: print() {

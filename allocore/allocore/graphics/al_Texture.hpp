@@ -185,14 +185,17 @@ public:
 
 	/// Get mutable reference to the internal pixel data
 	/// DO NOT MODIFY THE LAYOUT OR DIMENSIONS OF THIS ARRAY
-	Array& array() { return mArray; }
+	Array& array() { mArrayDirty=true; return mArray; }
 
 	/// Get read-only reference to internal pixel data
 	const Array& array() const { return mArray; }
 
 	/// Get raw pointer to internal pixel data
 	template<class T> T * data(){ return (T*)(data()); }
-	char * data(){ return array().data.ptr; }
+	char * data(){ mArrayDirty=true; return array().data.ptr; }
+
+	template<class T> const T * data() const { return (const T*)(data()); }
+	const char * data() const { return array().data.ptr; }
 
 	/// Flags resubmission of pixel data upon next bind
 	
@@ -243,6 +246,7 @@ protected:
 	Array mArray;				// Array representation of client-side pixel data
 	bool mParamsUpdated;		// flags change in texture params (wrap, filter)
 	bool mPixelsUpdated;		// flags change in pixel params or data
+	bool mArrayDirty;
 
 	virtual void onCreate();
 	virtual void onDestroy();
