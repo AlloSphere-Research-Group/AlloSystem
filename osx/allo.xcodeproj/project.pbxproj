@@ -23,9 +23,6 @@
 /* Begin PBXFileReference section */
 		1606F2AE173514EB00E24228 /* al_Serial.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Serial.hpp; sourceTree = "<group>"; };
 		161B6CBD17144B0800750A16 /* al_File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_File.cpp; sourceTree = "<group>"; };
-		161B6CBE17144B4C00750A16 /* serial.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = serial.cc; sourceTree = "<group>"; };
-		161B6CBF17144B4C00750A16 /* serial_unix.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = serial_unix.cc; sourceTree = "<group>"; };
-		161B6CC017144B4C00750A16 /* serial_win.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = serial_win.cc; sourceTree = "<group>"; };
 		161B6CC117144B4C00750A16 /* al_Serial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Serial.cpp; sourceTree = "<group>"; };
 		164626E11793F14200E84F48 /* al_HID.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_HID.hpp; sourceTree = "<group>"; };
 		164626E21793F1C600E84F48 /* al_HID.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_HID.cpp; sourceTree = "<group>"; };
@@ -34,11 +31,8 @@
 		164626E61793F1DE00E84F48 /* hid_windows.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hid_windows.c; sourceTree = "<group>"; };
 		164626E71793F1DE00E84F48 /* hidapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hidapi.h; sourceTree = "<group>"; };
 		164626E81793F1DE00E84F48 /* hidapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hidapi.c; sourceTree = "<group>"; };
-		164626EC1793F1ED00E84F48 /* serial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = serial.h; sourceTree = "<group>"; };
-		164626ED1793F1ED00E84F48 /* unix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unix.h; sourceTree = "<group>"; };
-		164626EE1793F1ED00E84F48 /* win.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = win.h; sourceTree = "<group>"; };
-		164626EF1793F1ED00E84F48 /* serial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = serial.h; sourceTree = "<group>"; };
 		165C2E18162AE6C900E1BC69 /* al_Array.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Array.cpp; sourceTree = "<group>"; };
+		1666317D189E8C4D00367CF8 /* serial */ = {isa = PBXFileReference; lastKnownFileType = folder; path = serial; sourceTree = "<group>"; };
 		168D480A183B92F200D00338 /* al_Array_C.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = al_Array_C.c; sourceTree = "<group>"; };
 		168D493318536C6B00D00338 /* al_PeriodicThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_PeriodicThread.cpp; sourceTree = "<group>"; };
 		168D493418536C8300D00338 /* al_PeriodicThread.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_PeriodicThread.hpp; sourceTree = "<group>"; };
@@ -375,33 +369,6 @@
 				164626E71793F1DE00E84F48 /* hidapi.h */,
 			);
 			path = hidapi;
-			sourceTree = "<group>";
-		};
-		164626E91793F1ED00E84F48 /* serial */ = {
-			isa = PBXGroup;
-			children = (
-				164626EA1793F1ED00E84F48 /* impl */,
-				164626EF1793F1ED00E84F48 /* serial.h */,
-			);
-			path = serial;
-			sourceTree = "<group>";
-		};
-		164626EA1793F1ED00E84F48 /* impl */ = {
-			isa = PBXGroup;
-			children = (
-				164626EB1793F1ED00E84F48 /* serial */,
-				164626ED1793F1ED00E84F48 /* unix.h */,
-				164626EE1793F1ED00E84F48 /* win.h */,
-			);
-			path = impl;
-			sourceTree = "<group>";
-		};
-		164626EB1793F1ED00E84F48 /* serial */ = {
-			isa = PBXGroup;
-			children = (
-				164626EC1793F1ED00E84F48 /* serial.h */,
-			);
-			path = serial;
 			sourceTree = "<group>";
 		};
 		16E8BCEC1618731900DAE543 /* Libraries */ = {
@@ -797,10 +764,7 @@
 				164626E81793F1DE00E84F48 /* hidapi.c */,
 				361882FD15B936340009AD7E /* al_MIDI.cpp */,
 				161B6CC117144B4C00750A16 /* al_Serial.cpp */,
-				161B6CBE17144B4C00750A16 /* serial.cc */,
-				161B6CBF17144B4C00750A16 /* serial_unix.cc */,
-				161B6CC017144B4C00750A16 /* serial_win.cc */,
-				164626E91793F1ED00E84F48 /* serial */,
+				1666317D189E8C4D00367CF8 /* serial */,
 				361882FE15B936340009AD7E /* al_SocketAPR.cpp */,
 				361882FF15B936340009AD7E /* al_Window.cpp */,
 				3618830015B936340009AD7E /* al_WindowGLUT.cpp */,
@@ -1183,6 +1147,8 @@
 /* Begin PBXProject section */
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+			};
 			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "allo" */;
 			compatibilityVersion = "Xcode 3.0";
 			developmentRegion = English;
