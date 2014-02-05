@@ -274,7 +274,8 @@ Open the App Store application and search for ``xcode''.
 After Xcode installation completes, run Xcode (agreeing to the Xcode license
  agreement).
  The last step is to install the command-line tools.
- To do this, open the Terminal application, and execute the command
+ If you have OSX 10.9 or above, open the Terminal application, and execute
+ the command
 \end_layout
 
 \begin_layout Standard
@@ -290,6 +291,13 @@ xcode-select --install
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+If you have OSX 10.8 or below, you must install the command-line tools from
+ inside of Xcode.
+ This is accessible from the menu item Xcode -> Preferences...
+ -> Downloads.
 \end_layout
 
 \begin_layout Standard
