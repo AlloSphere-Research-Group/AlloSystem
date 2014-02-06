@@ -72,6 +72,23 @@ if((NOT FREETYPE_LIBRARY) OR (NOT FREETYPE_INCLUDE_DIR))
     PATH_SUFFIXES freetype freetype2
     )
 
+  IF(NOT FREETYPE_INCLUDE_DIR_freetype2)
+  FIND_PATH(FREETYPE_INCLUDE_DIR_freetype2 freetype/config/ftheader.h
+    HINTS
+    $ENV{FREETYPE_DIR}/include/freetype2
+    PATHS
+    /usr/local/Cellar/freetype/2.4.10/include/freetype2
+∑    /usr/local/X11R6/include
+    /usr/local/X11/include
+    /usr/X11/include
+    /usr/include/freetype2
+    /sw/include
+    /opt/local/include
+    /usr/freeware/include
+    PATH_SUFFIXES freetype freetype2
+    )
+  ENDIF(NOT FREETYPE_INCLUDE_DIR_freetype2)
+
   FIND_LIBRARY(FREETYPE_LIBRARY
     NAMES freetype libfreetype freetype219
     HINTS
