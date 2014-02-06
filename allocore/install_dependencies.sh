@@ -117,11 +117,12 @@ elif [ `uname | grep MINGW` ]; then
 		if [ -e ${LIBFILES[0]} ]; then
 			echo "Found APR"
 		else
-			# http://www.apachelounge.com/download/win32/binaries/httpd-2.4.7-win32.zip
-			# http://www.apachelounge.com/download/VC11/binaries/httpd-2.4.7-win32-VC11.zip
+			#http://www.apachelounge.com/download/win32/binaries/httpd-2.4.7-win32.zip
+			#http://www.apachelounge.com/download/VC11/binaries/httpd-2.4.7-win32-VC11.zip
 			PKG=apr-1.3.6-iconv-1.2.1-util-1.3.8-win32-x86-msvcrt60
-			# wget http://mirrors.rackhosting.com/apache/apr/binaries/win32/$PKG.zip
-			wget http://www.powertech.no/apache/dist/apr/binaries/win32/$PKG.zip
+			#wget http://mirrors.rackhosting.com/apache/apr/binaries/win32/$PKG.zip
+			#wget http://www.powertech.no/apache/dist/apr/binaries/win32/$PKG.zip
+			wget http://archive.apache.org/dist/apr/binaries/win32/$PKG.zip
 			unzip -q $PKG.zip
 			mv apr-dist $PKG
 			cp $PKG/bin/libapr-1.dll		$DESTDIR/bin/
