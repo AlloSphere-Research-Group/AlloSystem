@@ -190,6 +190,8 @@ Get Development Tools
 \begin_layout Standard
 The first step is to obtain the development tools necessary to compile and
  run AlloSystem programs.
+ It is imperative that you maintain a good internet connection throughout
+ the installation process as many packages need to be downloaded.
  Skip to the platform you are using and follow the instructions there.
 \end_layout
 
@@ -990,6 +992,18 @@ msys.bat
 \end_layout
 
 \begin_layout Standard
+If your user name (the text before the @ symbol) has spaces in it, then
+ see section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:MinGW/MSYS:-Spaces-in-user-name"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
 At the command prompt, run the command
 \end_layout
 
@@ -1007,7 +1021,12 @@ $ /postinstall/pi.sh
 
 Answer 'y' to continue the post install and then 'y' again that you have
  MinGW installed.
- Next, enter the path where you installed MinGW as you are instructed.
+ Next, enter the path where you installed MinGW as you are instructed; this
+ will likely be 
+\family typewriter
+C:/MinGW
+\family default
+ (note the direction of the slash!).
  When done, restart MSYS.
  At this point, installation of MinGW/MSYS is complete.
 \end_layout
@@ -2287,6 +2306,13 @@ http://cygwin.com/faq/faq.html#faq.using.bloda
 
 \begin_layout Subsection
 MinGW/MSYS: Spaces in User Name
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:MinGW/MSYS:-Spaces-in-user-name"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
