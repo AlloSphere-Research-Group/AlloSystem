@@ -97,8 +97,8 @@ public:
 	/// Get quaternion component
 	const Quatd& quat() const { return mQuat; }
 
-	double x() const { return mVec[0]; }
-	double y() const { return mVec[1]; }
+	double x() const { return mVec[1]; }
+	double y() const { return mVec[0]; }
 	double z() const { return mVec[2]; }
 
 	/// Convert to 4-by-4 projection space matrix
@@ -272,6 +272,9 @@ public:
 		mSmooth(nav.smooth()), mVelScale(nav.mVelScale)
 	{	updateDirectionVectors(); }
 
+    
+    
+    /////////These are the get functions
 	/// Get smoothing amount
 	double smooth() const { return mSmooth; }
 
@@ -284,16 +287,22 @@ public:
 	/// Get forward unit vector
 	const Vec3d& uf() const { return mUF; }
 	
-	/// Get linear and angular velocities as a Pose
+    /// Get linear and angular velocities as a Pose
 	Pose vel() const {
-		return Pose(mMove1, Quatd().fromEuler(mSpin1[1], mSpin1[0], mSpin1[2]));
+		return Pose(mMove1, Quatd().fromEuler(mSpin1[0], mSpin1[1], mSpin1[2]));/////changed not to swap
 	}
 	
-	double velScale() const { return mVelScale; }
+    double velScale() const { return mVelScale; }
 
-	/// Set smoothing amount [0,1)
+    /// Set smoothing amount [0,1)
 	Nav& smooth(double v){ mSmooth=v; return *this; }
 	
+    
+    
+    
+    
+    
+    
 	void view(double azimuth, double elevation, double bank) {
 		view(Quatd().fromEuler(azimuth, elevation, bank));
 	}
@@ -302,6 +311,10 @@ public:
 		updateDirectionVectors();
 	}
 	
+    
+    
+    
+    
 	void turn(const Quatd& v) {
 		v.toEuler(mSpin1);
 	}
@@ -327,31 +340,40 @@ public:
 		nudge(target * amt);
 	}
 
+    
+    
+    
+    
+    
+    
 	/// Set linear velocity
-	void move(double dr, double du, double df) { moveR(dr); moveU(du); moveF(df); }
-	void move(Vec3d dp) { moveR(dp[0]); moveU(dp[1]); moveF(dp[2]); }
-	void moveR(double v){ mMove0[0] = v; }
-	void moveU(double v){ mMove0[1] = v; }
+	void move(double du, double dr, double df) { moveR(dr); moveU(du); moveF(df); }
+	void move(Vec3d dp) { moveR(dp[1]); moveU(dp[0]); moveF(dp[2]); }
+	void moveR(double v){ mMove0[1] = v; }/////
+	void moveU(double v){ mMove0[0] = v; }/////
 	void moveF(double v){ mMove0[2] = v; }
 	Vec3d& move() { return mMove0; }
 
 	/// Accelerate
 	void nudge(double ddr, double ddu, double ddf) { nudgeR(ddr); nudgeU(ddu); nudgeF(ddf); }
-	void nudge(Vec3d dp) { nudgeR(dp[0]); nudgeU(dp[1]); nudgeF(dp[2]); }
-	void nudgeR(double amount) { mNudge[0] += amount; }
-	void nudgeU(double amount) { mNudge[1] += amount; }
+	void nudge(Vec3d dp) { nudgeR(dp[1]); nudgeU(dp[0]); nudgeF(dp[2]); }
+	void nudgeR(double amount) { mNudge[1] += amount; }////
+	void nudgeU(double amount) { mNudge[0] += amount; }/////
 	void nudgeF(double amount) { mNudge[2] += amount; }
 
+    
+    
+    
 	/// Set all angular velocity values from azimuth, elevation, and bank differentials, in radians
 	void spin(double da, double de, double db){ spinR(de); spinU(da); spinF(db); }
+    
+    /// Set angular velocity around up vector, in radians
+    void spinU(double v){ mSpin0[0] = v; }
 
 	/// Set angular velocity around right vector, in radians
-	void spinR(double v){ mSpin0[0] = v; }
-	
-	/// Set angular velocity around up vector, in radians
-	void spinU(double v){ mSpin0[1] = v; }
-	
-	/// Set angular velocity around forward vector, in radians
+	void spinR(double v){ mSpin0[1] = v; }
+
+    /// Set angular velocity around forward vector, in radians
 	void spinF(double v){ mSpin0[2] = v; }
 	
 	/// Set angular velocity directly:
@@ -359,8 +381,8 @@ public:
 
 	/// Turn by a single increment for one step, in radians
 	void turn(double a, double e, double b){ turnR(e); turnU(a); turnF(b); }
-	void turnR(double v){ mTurn[0] = v; }
-	void turnU(double v){ mTurn[1] = v; }
+    void turnU(double v){ mTurn[0] = v; }//********
+	void turnR(double v){ mTurn[1] = v; }//********
 	void turnF(double v){ mTurn[2] = v; }
 
 	/// Stop moving and spinning
@@ -389,13 +411,19 @@ public:
 	/// Update coordinate frame basis vectors based on internal quaternion
 	void updateDirectionVectors(){ 
 		quat().normalize();
-		directionVectors(mUR, mUU, mUF); 
+		directionVectors(mUU, mUR, mUF);
 	}
 	
 	void set(const Pose& v){
 		Pose::set(v);
 		updateDirectionVectors();
 	}
+    
+    void setus(Vec3f u, Vec3f r , Vec3f f){
+        mUR = r;
+        mUU = u;
+        mUF = f;
+    }
 	
 	void set(const Nav& v){
 		Pose::set(v);
@@ -428,7 +456,7 @@ public:
 
 		// accumulate position:
 		for(int i=0; i<pos().size(); ++i){
-			pos()[i] += mMove1.dot(Vec3d(ur()[i], uu()[i], uf()[i]));
+			pos()[i] += mMove1.dot(Vec3d(uu()[i], ur()[i], uf()[i]));
 		}
 	}
 

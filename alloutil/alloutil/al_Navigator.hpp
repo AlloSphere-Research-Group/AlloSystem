@@ -125,10 +125,10 @@ public:
 	// set stored local frame velocity:
 	void move(const Vec3d& v) { mRelVel.set(v); }
 	void moveR(double amt) {
-		mRelVel[0] = amt;
+		mRelVel[1] = amt;
 	}
 	void moveU(double amt) {
-		mRelVel[1] = amt;
+		mRelVel[0] = amt;
 	}
 	void moveF(double amt) {
 		mRelVel[2] = amt;
@@ -137,10 +137,10 @@ public:
 	// set instantaneous local frame velocity:
 	void push(const Vec3d& v) { mRelVelI.set(v); }
 	void pushR(double amt) {
-		mRelVelI[0] = amt;
+		mRelVelI[1] = amt;
 	}
 	void pushU(double amt) {
-		mRelVelI[1] = amt;
+		mRelVelI[0] = amt;
 	}
 	void pushF(double amt) {
 		mRelVelI[2] = amt;

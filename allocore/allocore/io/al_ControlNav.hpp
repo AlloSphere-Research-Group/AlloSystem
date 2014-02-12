@@ -75,16 +75,16 @@ struct NavInputControl : public InputEventHandler {
 		switch(k.key()){
 			case '`':				nav().halt().home(); return false;
 			case 's':				nav().halt(); return false;
-			case Keyboard::UP:		nav().spinR( a); return false;
-			case Keyboard::DOWN:	nav().spinR(-a); return false;
-			case Keyboard::RIGHT:	nav().spinU(-a); return false;
-			case Keyboard::LEFT:	nav().spinU( a); return false;
+			case Keyboard::UP:		nav().spinU( a); return false;
+			case Keyboard::DOWN:	nav().spinU(-a); return false;
+			case Keyboard::RIGHT:	nav().spinR(-a); return false;
+			case Keyboard::LEFT:	nav().spinR( a); return false;
 			case 'q':				nav().spinF( a); return false;
 			case 'z':				nav().spinF(-a); return false;
-			case 'a':				nav().moveR(-v); return false;
-			case 'd':				nav().moveR( v); return false;
-			case 'e':				nav().moveU( v); return false;
-			case 'c':				nav().moveU(-v); return false;
+			case 'a':				nav().moveU(-v); return false;
+			case 'd':				nav().moveU( v); return false;
+			case 'e':				nav().moveR( v); return false;
+			case 'c':				nav().moveR(-v); return false;
 			case 'x':				nav().moveF(-v); return false;
 			case 'w':				nav().moveF( v); return false;
 			default:;
@@ -94,15 +94,15 @@ struct NavInputControl : public InputEventHandler {
 	virtual bool onKeyUp(const Keyboard& k) {
 		switch (k.key()) {
 			case Keyboard::UP:
-			case Keyboard::DOWN:	nav().spinR(0); return false;
+			case Keyboard::DOWN:	nav().spinU(0); return false;
 			case Keyboard::RIGHT:
-			case Keyboard::LEFT:	nav().spinU(0); return false;
+			case Keyboard::LEFT:	nav().spinR(0); return false;
 			case 'q':
 			case 'z':				nav().spinF(0); return false;
 			case 'a':
-			case 'd':				nav().moveR(0); return false;
+			case 'd':				nav().moveU(0); return false;
 			case 'e':
-			case 'c':				nav().moveU(0); return false;
+			case 'c':				nav().moveR(0); return false;
 			case 'x':
 			case 'w':				nav().moveF(0); return false;
 			default:;
@@ -112,8 +112,8 @@ struct NavInputControl : public InputEventHandler {
 
 	virtual bool onMouseDrag(const Mouse& m){
 		if(m.left()){
-			nav().turnU(-m.dx() * 0.2 * M_DEG2RAD);
-			nav().turnR(-m.dy() * 0.2 * M_DEG2RAD);
+			nav().turnR(-m.dx() * 0.2 * M_DEG2RAD);
+			nav().turnU(-m.dy() * 0.2 * M_DEG2RAD);
 		}
 		else if(m.right()){
 			nav().turnF( m.dx() * 0.2 * M_DEG2RAD);
@@ -157,16 +157,16 @@ struct NavInputControlCosm : public NavInputControl {
 		
 		switch(k.key()){
 			case '`':				nav().halt().home(); return false;
-			case 'w':				nav().spinR( a); return false;
-			case 'x':				nav().spinR(-a); return false;
-			case Keyboard::RIGHT:	nav().spinU( -a); return false;
-			case Keyboard::LEFT:	nav().spinU( a); return false;
+			case 'w':				nav().spinU( a); return false;
+			case 'x':				nav().spinU(-a); return false;
+			case Keyboard::RIGHT:	nav().spinR( -a); return false;
+			case Keyboard::LEFT:	nav().spinR( a); return false;
 			case 'a':				nav().spinF( a); return false;
 			case 'd':				nav().spinF(-a); return false;
-			case ',':				nav().moveR(-v); return false;
-			case '.':				nav().moveR( v); return false;
-			case '\'':				nav().moveU( v); return false;
-			case '/':				nav().moveU(-v); return false;
+			case ',':				nav().moveU(-v); return false;
+			case '.':				nav().moveU( v); return false;
+			case '\'':				nav().moveR( v); return false;
+			case '/':				nav().moveR(-v); return false;
 			case Keyboard::UP:		nav().moveF( v); return false;
 			case Keyboard::DOWN:	nav().moveF(-v); return false;
 			default:;
@@ -177,15 +177,15 @@ struct NavInputControlCosm : public NavInputControl {
 	virtual bool onKeyUp(const Keyboard& k) {
 		switch (k.key()) {
 			case 'w':
-			case 'x':				nav().spinR(0); return false;
+			case 'x':				nav().spinU(0); return false;
 			case Keyboard::RIGHT:
-			case Keyboard::LEFT:	nav().spinU(0); return false;
+			case Keyboard::LEFT:	nav().spinR(0); return false;
 			case 'a':
 			case 'd':				nav().spinF(0); return false;
 			case ',':
-			case '.':				nav().moveR(0); return false;
+			case '.':				nav().moveU(0); return false;
 			case '\'':
-			case '/':				nav().moveU(0); return false;
+			case '/':				nav().moveR(0); return false;
 			case Keyboard::UP:
 			case Keyboard::DOWN:	nav().moveF(0); return false;
 			default:;
