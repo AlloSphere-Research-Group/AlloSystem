@@ -74,7 +74,7 @@ public:
 	};
 
 
-	///
+	/// Default constructor creates an identity quaternion
 	Quat(const T& w = T(1), const T& x = T(0), const T& y = T(0), const T& z = T(0))
 	:	w(w), x(x), y(y), z(z){}
 
@@ -83,11 +83,22 @@ public:
 	Quat(const Quat<U>& v)
 	:	w(v.w), x(v.x), y(v.y), z(v.z){}
 	
-	/// Constructor of 'pure' quaternion
-	template <class U>
-	Quat(const Vec<3,U>& v)
-	:	w(T(0)), x(v[0]), y(v[1]), z(v[2]){} 
+	/// Construct 'pure imaginary' quaternion
 
+	/// @param[in] xyz		vector to set x,y,z components from; w is set to 0
+	///
+	template <class U>
+	Quat(const Vec<3,U>& xyz)
+	:	w(T(0)), x(xyz[0]), y(xyz[1]), z(xyz[2]){}
+
+
+	/// Construct quaternion from real and imaginary parts
+
+	/// @param[in] w		real part (w)
+	/// @param[in] xyz		vector to set imaginary (x,y,z) components from
+	template <class U>
+	Quat(const T& w, const Vec<3,U>& xyz)
+	:	w(w), x(xyz[0]), y(xyz[1]), z(xyz[2]){}
 
 
 	// Factories
@@ -177,6 +188,9 @@ public:
 	/// Get magnitude squared
 	T magSqr() const { return dot(*this); }
 
+	/// Return quaternion raised to a power
+	Quat pow(T v) const;
+
 	/// Returns multiplicative inverse
 	Quat recip() const { return conj()/magSqr(); }
 
@@ -228,7 +242,7 @@ public:
 	}
 
 	/// Set as versor rotated by Euler angles, in radians
-	Quat& fromEuler(const Vec<3,T>& aed) { return fromEuler(aed[0], aed[1], aed[2]); }
+	Quat& fromEuler(const Vec<3,T>& aeb) { return fromEuler(aeb[0], aeb[1], aeb[2]); }
 	Quat& fromEuler(const T& az, const T& el, const T& ba);
 	
 	/// Set as versor from column-major 4-by-4 projective space transformation matrix
@@ -263,10 +277,10 @@ public:
 	void toEuler(T& az, T& el, T& ba) const;
 
 	/// Convert to Euler angle vector (azimuth, elevation, bank), in radians
-	void toEuler(T * e) const { toEuler(e[0],e[1],e[2]); }
+	void toEuler(T * aeb) const { toEuler(aeb[0], aeb[1], aeb[2]); }
 
 	/// Convert to Euler angle vector (azimuth, elevation, bank), in radians
-	void toEuler(Vec<3,T> & v) const { toEuler(v[0],v[1],v[2]); }
+	void toEuler(Vec<3,T>& aeb) const { toEuler(aeb[0], aeb[1], aeb[2]); }
 
 	/// Get local x unit vector (1,0,0) in absolute coordinates
 	void toVectorX(T& ax, T& ay, T& az) const;
@@ -300,7 +314,7 @@ public:
 	void towardPoint(const Vec<3,T>& pos, const Quat<T>& q, const Vec<3,T>& v, float amt);
 		
 	/// utility for debug printing:
-	void print(FILE * out = stdout) const { fprintf(out, "Quat(%f, %f, %f, %f)\n", w, x, y, z); }
+	void print(FILE * out = stdout) const;
 
 
 	static T accuracyMax(){ return 1.000001; }
@@ -352,12 +366,22 @@ inline Quat<T> Quat<T> :: reverseMultiply(const Quat<T> & q) const {
 }
 
 template<typename T>
+Quat<T> Quat<T> :: pow(T v) const {
+	T m = mag();
+	T theta = ::acos(w / m);
+	Vec<3,T> imag = Vec<3,T>(x,y,z) / (m * ::sin(theta));
+	imag *= ::sin(v*theta);
+	return Quat(::cos(v*theta), imag) * ::pow(m,v);
+}
+
+
+template<typename T>
 inline Quat<T>& Quat<T> :: fromAxisAngle(const T& angle, const Vec<3,T>& axis) {
 	return fromAxisAngle(angle, axis[0],axis[1],axis[2]);
 }
 
 template<typename T>
-inline Quat<T>& Quat<T> :: fromAxisAngle(const T& angle, const T& ux, const T& uy, const T& uz) {
+Quat<T>& Quat<T> :: fromAxisAngle(const T& angle, const T& ux, const T& uy, const T& uz) {
 	T t2 = angle * T(0.5);
 	T sinft2 = sin(t2);	
 	w = cos(t2);
@@ -368,18 +392,23 @@ inline Quat<T>& Quat<T> :: fromAxisAngle(const T& angle, const T& ux, const T& u
 }
 
 template<typename T>
-inline Quat<T>& Quat<T>::fromEuler(const T& az, const T& el, const T& ba){
-	//http://vered.rose.utoronto.ca/people/david_dir/GEMS/GEMS.html
-	//Converting from Euler angles to a quaternion is slightly more tricky, as the order of operations
-	//must be correct. Since you can convert the Euler angles to three independent quaternions by
-	//setting the arbitrary axis to the coordinate axes, you can then multiply the three quaternions
-	//together to obtain the final quaternion.
+Quat<T>& Quat<T>::fromEuler(const T& az, const T& el, const T& ba){
+	/*http://vered.rose.utoronto.ca/people/david_dir/GEMS/GEMS.html
+	Converting from Euler angles to a quaternion is slightly more tricky, as the
+	order of operations must be correct. Since you can convert the Euler angles
+	to three independent quaternions by setting the arbitrary axis to the
+	coordinate axes, you can then multiply the three quaternions together to
+	obtain the final quaternion.
 
-	//So if you have three Euler angles (a, b, c), then you can form three independent quaternions
-	//Qx = [ cos(a/2), (sin(a/2), 0, 0)]
-    //Qy = [ cos(b/2), (0, sin(b/2), 0)]
-    //Qz = [ cos(c/2), (0, 0, sin(c/2))]
-	//And the final quaternion is obtained by Qx * Qy * Qz.
+	So if you have three Euler angles (a, e, b), then you can form three
+	independent quaternions
+
+		Qx = [ cos(e/2), (sin(e/2), 0, 0)]
+		Qy = [ cos(a/2), (0, sin(a/2), 0)]
+		Qz = [ cos(b/2), (0, 0, sin(b/2))]
+
+	and the final quaternion, using YXZ ordering, is obtained by (Qy * Qx) * Qz.
+	*/
 
 	T c1 = cos(az * T(0.5));
 	T c2 = cos(el * T(0.5));
@@ -388,6 +417,25 @@ inline Quat<T>& Quat<T>::fromEuler(const T& az, const T& el, const T& ba){
 	T s2 = sin(el * T(0.5));
 	T s3 = sin(ba * T(0.5));
 
+/*
+	(w,x,y,z) (a,b,c,d)
+	w*a - x*b - y*c - z*d,
+	w*b + x*a + y*d - z*c,
+	w*c + y*a + z*b - x*d,
+	w*d + z*a + x*c - y*b
+
+	(c1, 0,s1,0) (c2, s2,0,0)
+	c1*c2 - 0 - 0 - 0
+	c1*s2 + 0 + 0 + 0
+	0 + s1*c2 + 0 + 0
+	0 + 0 + 0 - s1*s2
+
+	(tw, tx, ty, tz) (c3, 0,0,s3)
+	tw*c3 - 0 - 0 - tz*s3
+	0 + tx*c3 + ty*s3 + 0
+	0 + ty*c3 + 0 - tx*s3
+	tw*s3 + tz*c3 + 0 - 0
+*/
 	// equiv Q1 = Qy * Qx; // since many terms are zero
 	T tw = c1*c2;
 	T tx = c1*s2;
@@ -399,12 +447,13 @@ inline Quat<T>& Quat<T>::fromEuler(const T& az, const T& el, const T& ba){
 	x = tx*c3 + ty*s3;
 	y = ty*c3 - tx*s3;
 	z = tw*s3 + tz*c3;
+
 	//return normalize();
 	return *this;
 }
 
 template<typename T>
-inline Quat<T>& Quat<T> :: fromMatrix(const T * m) {
+Quat<T>& Quat<T> :: fromMatrix(const T * m) {
 	T trace = m[0]+m[5]+m[10];
 	w = sqrt(1. + trace)*0.5;
 
@@ -440,7 +489,7 @@ inline Quat<T>& Quat<T> :: fromMatrix(const T * m) {
 }
 
 template<typename T>
-inline Quat<T>& Quat<T> :: fromMatrixTransposed(const T * m) {
+Quat<T>& Quat<T> :: fromMatrixTransposed(const T * m) {
 	T trace = m[0]+m[5]+m[10];
 	w = sqrt(1. + trace)*0.5;
 
@@ -476,7 +525,7 @@ inline Quat<T>& Quat<T> :: fromMatrixTransposed(const T * m) {
 }
 
 template<typename T>
-inline void Quat<T> :: toAxisAngle(T& aa, T& ax, T& ay, T& az) const {
+void Quat<T> :: toAxisAngle(T& aa, T& ax, T& ay, T& az) const {
 	T unit = w*w;
 	if(unit < accuracyMin()){ // |cos x| must always be less than or equal to 1!
 		T invSinAngle = 1./sqrt(1. - unit); // = 1/sqrt(1 - cos^2(theta/2))
@@ -508,6 +557,7 @@ inline void Quat<T> :: toAxisAngle(T& aa, T& ax, T& ay, T& az) const {
 template<typename T>
 inline void Quat<T> :: toEuler(T& az, T& el, T& ba) const {
 	// http://www.mathworks.com/access/helpdesk/help/toolbox/aeroblks/quaternionstoeulerangles.html
+	// FIXME: gives imprecise results
 	T sqw = w*w;
 	T sqx = x*x;
 	T sqy = y*y;
@@ -518,7 +568,7 @@ inline void Quat<T> :: toEuler(T& az, T& el, T& ba) const {
 }
 
 template<typename T>
-inline void Quat<T>::toCoordinateFrame(Vec<3,T>& ux, Vec<3,T>& uy, Vec<3,T>& uz) const {
+void Quat<T>::toCoordinateFrame(Vec<3,T>& ux, Vec<3,T>& uy, Vec<3,T>& uz) const {
 	static const T _2 = T(2);
 	static const T _1 = T(1);
 	T	_2w=_2*w, _2x=_2*x, _2y=_2*y;
@@ -556,7 +606,7 @@ LHCS
 */
 
 template<typename T>
-inline void Quat<T> :: toMatrix(T * m) const {
+void Quat<T> :: toMatrix(T * m) const {
 	Vec<3,T> ux,uy,uz;
 	toCoordinateFrame(ux,uy,uz);
 
@@ -568,7 +618,7 @@ inline void Quat<T> :: toMatrix(T * m) const {
 
 // Note: same as toMatrix, but with matrix indices transposed
 template<typename T>
-inline void Quat<T> :: toMatrixTransposed(T * m) const {
+void Quat<T> :: toMatrixTransposed(T * m) const {
 	Vec<3,T> ux,uy,uz;
 	toCoordinateFrame(ux,uy,uz);
 
@@ -758,17 +808,20 @@ void Quat<T> :: slerpBuffer(const Quat& input, const Quat& target, Quat<T> * buf
 
 template<typename T> 
 Quat<T> Quat<T> :: getRotationTo(const Vec<3, T>& src, const Vec<3, T>& dst) {
-	Quat<T> q;
-	Vec<3, T> v0(src);
-	Vec<3, T> v1(dst);
+	// a . b = |a| |b| cos t
+	// Since |a| = |b| = 1, then
+	// a . b = cos t
+	T d = src.dot(dst);
 	
-	T d = v0.dot(v1);
+	// vectors are the same
 	if (d >= 1.) {
-		// vectors are the same
-		return q;
+		return Quat<T>::identity();
 	}
+
+	Quat<T> q;
+
+	// vectors are nearly opposing
 	if (d < -0.999999999) {
-		// vectors are nearly opposing
 		// pick an axis to rotate around
 		Vec<3, T> axis = cross(Vec<3, T>(0, 1, 0), src);
 		// if colinear, pick another:
@@ -777,14 +830,25 @@ Quat<T> Quat<T> :: getRotationTo(const Vec<3, T>& src, const Vec<3, T>& dst) {
 		}
 		//axis.normalize();
 		q.fromAxisAngle(M_PI, axis);
-	} else {
+	}
+	else {
+		/* Derive quaternion from a rotation axis and angle.
+
+		The code used here is an optimization of fromAxisAngle:
+			T t2 = angle * T(0.5);
+			T sinft2 = sin(t2);
+			w = cos(t2);
+			x = ux * sinft2;
+			y = uy * sinft2;
+			z = uz * sinft2;
+		*/
 		T s = sqrt((d+1.)*2);
 		T invs = 1./s;
-		Vec<3, T> c = cross(v0, v1);
+		Vec<3, T> c = cross(src, dst);
+		q.w = s * 0.5;
 		q.x = c[0] * invs;
 		q.y = c[1] * invs;
 		q.z = c[2] * invs;
-		q.w = s * 0.5;
 	}
 	return q.normalize();
 }
@@ -854,6 +918,11 @@ Quat<T> Quat<T> :: rotor(const Vec<3,T>& v1, const Vec<3,T>& v2) {
 	Quat<T> q(cos(theta), bivec[0], bivec[1], bivec[2]);
 
 	return q;
+}
+
+template<typename T>
+void Quat<T>::print(FILE * out) const {
+	fprintf(out, "Quat(% f, % f, % f, % f)\n", w, x, y, z);
 }
 
 } // namespace
