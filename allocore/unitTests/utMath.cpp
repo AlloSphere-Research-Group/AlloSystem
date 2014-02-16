@@ -2,7 +2,9 @@
 #include "utAllocore.h"
 
 template <class T>
-inline bool eq(T x, T y, T eps=0.000001){ return abs(x-y) < eps; }
+inline bool eq(T x, T y, T eps=0.000001){
+	return abs(x-y) < eps;
+}
 
 template <class T>
 inline bool eq(const T* x, const T* y, int n, T eps=0.0000001){
@@ -13,10 +15,14 @@ inline bool eq(const T* x, const T* y, int n, T eps=0.0000001){
 }
 
 template <class T>
-inline bool eq(const Quat<T>& a, const Quat<T>& b){ return eq(&a[0], &b[0], 4); }
+inline bool eq(const Quat<T>& a, const Quat<T>& b, T eps=0.000001){
+	return eq(&a[0], &b[0], 4, eps);
+}
 
 template <int N, class T>
-inline bool eq(const Vec<N,T>& a, const Vec<N,T>& b){ return eq(&a[0], &b[0], N); }
+inline bool eq(const Vec<N,T>& a, const Vec<N,T>& b, T eps=0.000001){
+	return eq(&a[0], &b[0], N, eps);
+}
 
 
 int utMath(){
@@ -286,7 +292,12 @@ int utMath(){
 		struct printQuat{
 			void operator()(const Quatd& v){ printf("%g %g %g %g\n", v[0], v[1], v[2], v[3]); }
 		};
-	
+
+		// Test factory functions
+		assert(Quatd::identity() == Quatd(1,0,0,0));
+
+
+		// Test basic mathematical operations
 		Quatd q(0,0,0,0);
 
 		assert(q == Quatd(0,0,0,0));
@@ -297,15 +308,16 @@ int utMath(){
 		assert(q != Quatd(1,0,0,1));
 		
 		q.set(1,2,4,10);
-		
+
+		assert(-q == Quatd(-1,-2,-4,-10));
 		assert(q.conj()	== Quatd(q.w, -q.x, -q.y, -q.z));
 		assert(q.dot(q) == 121);
-		assert(q.identity() == Quatd(1,0,0,0));
 		assert(q.mag() == 11);
 		assert(q.magSqr() == 121);
 		assert(eq(q.sgn(), Quatd(1./11, 2./11, 4./11, 10./11)));
-		
-		// test rotation of vectors by quaternion
+
+
+		// Test rotation of vectors by quaternion
 		q.fromAxisAngle(M_2PI/4, 1,0,0);
 		assert(eq(q, Quatd(sqrt(2)/2, sqrt(2)/2,0,0)));
 		{
@@ -332,10 +344,12 @@ int utMath(){
 			assert(eq(v, Vec3d(0,1,0)));
 		}
 
+		// Test fromAxis* consistency
 		assert(q.fromAxisAngle(M_2PI/8, 1,0,0) == Quatd().fromAxisX(M_2PI/8));
 		assert(q.fromAxisAngle(M_2PI/8, 0,1,0) == Quatd().fromAxisY(M_2PI/8));
 		assert(q.fromAxisAngle(M_2PI/8, 0,0,1) == Quatd().fromAxisZ(M_2PI/8));
 
+		// Test AxisAngle<->Quat conversion
 		{
 			q.fromEuler(M_2PI/7, M_2PI/8, M_2PI/9);		// set to something non-trival...
 			double angle, ax,ay,az;
@@ -344,19 +358,36 @@ int utMath(){
 			assert(q == b || q == b.conj());
 		}
 
+		// Test consistency between conversions from Euler angles and axes
 		assert(
 			q.fromEuler(M_2PI/8,M_2PI/8,M_2PI/8) 
-			== ((Quatd().fromAxisY(M_2PI/8) * Quatd().fromAxisX(M_2PI/8)) * Quatd().fromAxisZ(M_2PI/8))
+			==
+			((Quatd().fromAxisY(M_2PI/8) * Quatd().fromAxisX(M_2PI/8)) * Quatd().fromAxisZ(M_2PI/8))
 		);
-
+		
+		// Test roundtrip Euler/quat conversion
 		{
-			q.fromEuler(M_2PI/7, M_2PI/8, M_2PI/9);		// set to something non-trival...
-			double az, el, ba;
-			q.toEuler(az, el, ba);
-			Quatd b = q.fromEuler(az, el, ba);
-			assert(q == b || q == b.conj());
+			float eps = 0.00001;
+			int N = 16;
+			for(int k=0; k<N; ++k){
+			for(int j=0; j<N; ++j){
+			for(int i=0; i<N; ++i){
+				float kludge = 0.1;
+				float az = (float(k)/N-0.5) * 2*M_PI + kludge;
+				float el = (float(j)/N-0.5) * 2*M_PI + kludge;
+				float ba = (float(i)/N-0.5) * 2*M_PI + kludge;
+				
+				Quatf a,b;
+				a.fromEuler(az, el, ba);
+				a.toEuler(az, el, ba);
+				b.fromEuler(az, el, ba);
+				//a.print(); b.print(); printf("\n");
+
+				assert(eq(a, b, eps) || eq(a, -b, eps));
+			}}}
 		}
 
+		// Test roundtrip matrix/quat conversions
 		{
 			double mat4[16];
 			Quatd b;
@@ -370,7 +401,7 @@ int utMath(){
 		}
 		
 		
-		// test quaternion to component coordinate frame
+		// Test Quat to component coordinate frame
 		{
 			Quatd q;
 			

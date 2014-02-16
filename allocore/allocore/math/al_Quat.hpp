@@ -241,8 +241,10 @@ public:
 		return set(cos(t2), T(0), T(0), sin(t2));
 	}
 
-	/// Set as versor rotated by Euler angles, in radians
+	/// Set as versor rotated by YXZ Euler angles, in radians
 	Quat& fromEuler(const Vec<3,T>& aeb) { return fromEuler(aeb[0], aeb[1], aeb[2]); }
+
+	/// Set as versor rotated by YXZ Euler angles, in radians
 	Quat& fromEuler(const T& az, const T& el, const T& ba);
 	
 	/// Set as versor from column-major 4-by-4 projective space transformation matrix
@@ -273,13 +275,13 @@ public:
 		toAxisAngle(angle, axis[0], axis[1], axis[2]);
 	}
 
-	/// Convert to Euler angles (azimuth, elevation, bank), in radians
+	/// Convert to YXZ Euler angles (azimuth, elevation, bank), in radians
 	void toEuler(T& az, T& el, T& ba) const;
 
-	/// Convert to Euler angle vector (azimuth, elevation, bank), in radians
+	/// Convert to YXZ Euler angle vector (azimuth, elevation, bank), in radians
 	void toEuler(T * aeb) const { toEuler(aeb[0], aeb[1], aeb[2]); }
 
-	/// Convert to Euler angle vector (azimuth, elevation, bank), in radians
+	/// Convert to YXZ Euler angle vector (azimuth, elevation, bank), in radians
 	void toEuler(Vec<3,T>& aeb) const { toEuler(aeb[0], aeb[1], aeb[2]); }
 
 	/// Get local x unit vector (1,0,0) in absolute coordinates
@@ -526,7 +528,7 @@ Quat<T>& Quat<T> :: fromMatrixTransposed(const T * m) {
 
 template<typename T>
 void Quat<T> :: toAxisAngle(T& aa, T& ax, T& ay, T& az) const {
-	T unit = w*w;
+	T unit = w*w; // cos^2(theta/2)
 	if(unit < accuracyMin()){ // |cos x| must always be less than or equal to 1!
 		T invSinAngle = 1./sqrt(1. - unit); // = 1/sqrt(1 - cos^2(theta/2))
 
@@ -556,8 +558,43 @@ void Quat<T> :: toAxisAngle(T& aa, T& ax, T& ay, T& az) const {
 
 template<typename T>
 inline void Quat<T> :: toEuler(T& az, T& el, T& ba) const {
+	/* Adapted from M. Baker:
+	http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/Quaternions.pdf
+	To make these equations work, 'e' had to be flipped in sign. */
+
+	//T a=w, b=x, c=y, d=z, e= 1;	// XYZ
+	//T a=w, b=x, c=z, d=y, e=-1;	// XZY
+	//T a=w, b=y, c=z, d=x, e= 1;	// YZX
+	T a=w, b=y, c=x, d=z, e=-1;	// YXZ
+	//T a=w, b=z, c=x, d=y, e= 1;	// ZXY
+	//T a=w, b=z, c=y, d=x, e=-1;	// ZYX
+
+	// Here we test if our second rotation will result in gimbal lock
+	T test = a*c + e * b*d;
+	if(test > 0.49999){ // singularity at north pole
+		az = atan2(b, a);
+		el = M_PI/2;
+		ba = 0;
+		return;
+	}
+	if(test < -0.49999){ // singularity at south pole
+		az = atan2(b, a);
+		el = -M_PI/2;
+		ba = 0;
+		return;
+	}
+
+	T bsq = b*b;
+	T csq = c*c;
+	T dsq = d*d;
+
+	az = ::atan2(2*(a*b - e * c*d), 1 - 2*(bsq + csq));
+	el =  ::asin(2*test);
+	ba = ::atan2(2*(a*d - e * b*c), 1 - 2*(csq + dsq));
+
+	// This version gives imprecise results:
 	// http://www.mathworks.com/access/helpdesk/help/toolbox/aeroblks/quaternionstoeulerangles.html
-	// FIXME: gives imprecise results
+	/*
 	T sqw = w*w;
 	T sqx = x*x;
 	T sqy = y*y;
@@ -565,6 +602,7 @@ inline void Quat<T> :: toEuler(T& az, T& el, T& ba) const {
 	az = asin (-2.0 * (x*z - w*y));
 	el = atan2( 2.0 * (y*z + w*x), (sqw - sqx - sqy + sqz));
 	ba = atan2( 2.0 * (x*y + w*z), (sqw + sqx - sqy - sqz));
+	//*/
 }
 
 template<typename T>
