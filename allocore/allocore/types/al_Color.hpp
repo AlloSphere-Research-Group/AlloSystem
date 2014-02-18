@@ -36,21 +36,32 @@
 
 
 	File description:
-	RGBA and HSV color classes
+	RGBA, HSV, XYZ, Lab, HCLab, Luv, and HCLuv color classes
+
+	Color conversion code for XYZ, Lab, HCLab, Luv, HCLuv was adapted from psuedo-code and formulas found at
+	http://www.easyrgb.com/ and http://brucelindbloom.com/
+	
+	Note that converting from RGB/HSV to Lab/Luv and back will result in SLIGHTLY different values 
+
 
 	File author(s):
 	Lance Putnam, 2010, putnam.lance@gmail.com
+	Owen Campbell, 2013, owen.campbell@gmail.com
 */
 
 #include "allocore/system/al_Config.h"
 
 namespace al{
 
-struct RGB;
-struct HSV;
-struct Color;
-struct Colori;
-
+  struct RGB;
+  struct HSV;
+  struct Color;
+  struct Colori;
+  struct XYZ;
+  struct Lab;
+  struct HCLab;
+  struct Luv;
+  struct HCLuv;
 
 /// Color represented by red, green, blue, and alpha components
 struct Color{
@@ -92,6 +103,26 @@ struct Color{
 	Color(const RGB& rgb, float a=1.f)
 	:	a(a)
 	{	*this = rgb; }
+
+	/// @param[in] xyz			XYZ color to convert from
+	Color(const XYZ& xyz)
+	{	*this = xyz; }
+
+	/// @param[in] lab			Lab color to convert from
+	Color(const Lab& lab)
+	{	*this = lab; }
+
+	/// @param[in] hclab			HCLab color to convert from
+	Color(const HCLab& hclab)
+	{	*this = hclab; }
+
+	/// @param[in] luv			Luv color to convert from
+	Color(const Luv& luv)
+	{	*this = luv; }
+
+	/// @param[in] hcluv			HCLuv color to convert from
+	Color(const HCLuv& hcluv)
+	{	*this = hcluv; }
 
 
 	/// Set color component at index with no bounds checking
@@ -139,6 +170,21 @@ struct Color{
 
 	/// Set RGB components from RGB
 	Color& operator= (const RGB& v);
+
+        /// Set RGB components from XYZ
+        Color& operator= (const XYZ& v);
+
+        /// Set RGB components from Lab
+        Color& operator= (const Lab& v);
+
+        /// Set RGB components from HCLab
+        Color& operator= (const HCLab& v);
+
+        /// Set RGB components from Luv
+        Color& operator= (const Luv& v);
+
+        /// Set RGB components from HCLuv
+        Color& operator= (const HCLuv& v);
 
 	/// Return true if all components are equal, false otherwise
 	bool operator ==(const Color& v) const { return v.r==r && v.g==g && v.b==b && v.a==a; }
@@ -240,6 +286,27 @@ struct Colori {
 	:	a(a)
 	{	*this = rgb; }
 
+	/// @param[in] xyz			XYZ color to convert from
+	Colori(const XYZ& xyz)
+	{	*this = xyz; }
+
+	/// @param[in] lab			Lab color to convert from
+	Colori(const Lab& lab)
+	{	*this = lab; }
+
+	/// @param[in] hclab			HCLab color to convert from
+	Colori(const HCLab& hclab)
+	{	*this = hclab; }
+
+	/// @param[in] luv			Luv color to convert from
+	Colori(const Luv& luv)
+	{	*this = luv; }
+
+	/// @param[in] hcluv			HCLuv color to convert from
+	Colori(const HCLuv& hcluv)
+	{	*this = hcluv; }
+
+
 	/// Set color component at index with no bounds checking
 	uint8_t& operator[](int i){ return components[i]; }
 
@@ -255,6 +322,21 @@ struct Colori {
 
 	/// Set RGB components from RGB
 	Colori& operator= (const RGB& v);
+
+        /// Set RGB components from XYZ
+        Color& operator= (const XYZ& v);
+
+        /// Set RGB components from Lab
+        Color& operator= (const Lab& v);
+
+        /// Set RGB components from HCLab
+        Color& operator= (const HCLab& v);
+
+        /// Set RGB components from Luv
+        Color& operator= (const Luv& v);
+
+        /// Set RGB components from HCLuv
+        Color& operator= (const HCLuv& v);
 
 	/// Set RGB components
 	Colori& set(uint8_t re, uint8_t gr, uint8_t bl){
@@ -303,6 +385,27 @@ struct HSV{
 	/// @param[in] v	RGB color to convert from
 	HSV(const RGB& v){ *this = v; }
 
+	/// @param[in] xyz			XYZ color to convert from
+	HSV(const XYZ& xyz)
+	{	*this = xyz; }
+
+	/// @param[in] lab			Lab color to convert from
+	HSV(const Lab& lab)
+	{	*this = lab; }
+
+	/// @param[in] hclab			HCLab color to convert from
+	HSV(const HCLab& hclab)
+	{	*this = hclab; }
+
+	/// @param[in] luv			Luv color to convert from
+	HSV(const Luv& luv)
+	{	*this = luv; }
+
+	/// @param[in] hcluv			HCLuv color to convert from
+	HSV(const HCLuv& hcluv)
+	{	*this = hcluv; }
+
+
 	/// @param[in] hsv	3-vector of HSV components
 	template<class T>
 	HSV(T * hsv): h(hsv[0]), s(hsv[1]), v(hsv[2]){}
@@ -323,6 +426,21 @@ struct HSV{
 
 	/// Set from RGB color
 	HSV& operator= (const RGB& v);
+
+	/// Set from XYZ color
+	HSV& operator= (const XYZ& v);
+
+	/// Set from Lab color
+	HSV& operator= (const Lab& v);
+
+	/// Set from HCLab color
+	HSV& operator= (const HCLab& v);
+
+	/// Set from Luv color
+	HSV& operator= (const Luv& v);
+
+	/// Set from HCLuv color
+	HSV& operator= (const HCLuv& v);
 
 	/// Get new HSV with value component multiplied by a scalar
 	HSV  operator* (float a) const { return HSV(*this)*=a; }
@@ -379,6 +497,25 @@ struct RGB{
 	RGB(const HSV& hsv)
 	{	*this = hsv; }
 
+	/// @param[in] xyz			XYZ value
+	RGB(const XYZ& xyz)
+	{	*this = xyz; }
+
+	/// @param[in] lab			Lab value
+	RGB(const Lab& lab)
+	{	*this = lab; }
+
+	/// @param[in] hclab			HCLab value
+	RGB(const HCLab& hclab)
+	{	*this = hclab; }
+
+	/// @param[in] luv			Luv value
+	RGB(const Luv& luv)
+	{	*this = luv; }
+
+	/// @param[in] hcluv			HCLuv value
+	RGB(const HCLuv& hcluv)
+	{	*this = hcluv; }
 
 	/// Set color component at index with no bounds checking
 	float& operator[](int i){ return components[i]; }
@@ -414,6 +551,20 @@ struct RGB{
 	/// Set RGB components from Color
 	RGB& operator= (const Color& v){ return set(v.rgb()); }
 
+  	/// Set RGB components from XYZ
+	RGB& operator= (const XYZ& v);
+
+  	/// Set RGB components from Lab
+	RGB& operator= (const Lab& v);
+
+	/// Set RGB components from HCLab
+	RGB& operator= (const HCLab& v);
+
+	/// Set RGB components from Luv
+	RGB& operator= (const Luv& v);
+
+	/// Set RGB components from HCLuv
+	RGB& operator= (const HCLuv& v);
 
 	/// Return true if all components are equal, false otherwise
 	bool operator ==(const RGB& v) const { return v.r==r && v.g==g && v.b==b; }
@@ -504,5 +655,672 @@ inline Colori& Colori::operator= (const RGB& v){
 inline HSV operator * (float s, const HSV& c){ return  c*s; }
 
 } // al::
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//begin xyz
+
+struct XYZ{
+  union{
+    struct{
+      float x;			///< red component in [0, 1]
+      float y;			///< green component in [0, 1]
+      float z;			///< blue component in [0, 1]
+    };
+    float components[3];	///< XYZ component vector
+  };
+
+  /// @param[in] x	CIE X
+  /// @param[in] y	CIE Y
+  /// @param[in] z	CIE Z
+  XYZ(float x=0, float y=1, float z=1): x(x), y(y), z(z){}
+
+  /// @param[in] v	RGB color to convert from
+  XYZ(const Color& v){ *this = v; }
+
+  /// @param[in] v	RGB color to convert from
+  XYZ(const Colori& v){ *this = v; }
+
+  /// @param[in] v	RGB color to convert from
+  XYZ(const RGB& v){ *this = v; }
+
+  /// @param[in] v	HSV color to convert from
+  XYZ(const HSV& v){ *this = v; }
+
+  /// @param[in] xyz	3-vector of XYZ components
+  template<class T>
+  XYZ(T * xyz): x(xyz[0]), y(xyz[1]), z(xyz[2]){}
+
+
+  /// Set color component at index with no bounds checking
+  float& operator[](int i){ return components[i]; }
+
+  /// Get color component at index with no bounds checking
+  const float& operator[](int i) const { return components[i]; }
+
+
+  /// Set from RGBA color
+  XYZ& operator= (const Color& v){ return *this = v.rgb(); }
+
+  /// Set from RGBA color
+  XYZ& operator= (const Colori& v){ return *this = Color(v); }
+
+  /// Set from RGB color
+  XYZ& operator= (const RGB& v){
+    //using sRGB and reference white D65 
+    Mat3f transformMatrix(0.4124f,  0.3576f,  0.1805f,
+			  0.2126f, 0.7152f, 0.0722f,
+			  0.0193f,  0.1192f,  0.9505f);
+    float R = v.r, G = v.g, B = v.b;
+    //convert vanilla RGB values to be linear with respect to energy
+    R = (float)(R <= 0.04045)?R / 12.92:pow(((R + 0.055) / 1.055), 2.4);
+    G = (float)(G <= 0.04045)?G / 12.92:pow(((G + 0.055) / 1.055), 2.4);
+    B = (float)(B <= 0.04045)?B / 12.92:pow(((B + 0.055) / 1.055), 2.4);
+    
+    //convert rgb to CIE XYZ
+    Vec3f rgb(R, G, B);
+    Vec3f xyz = transformMatrix * rgb;
+    x = xyz[0]; y = xyz[1]; z = xyz[2];
+
+    //cout << "XYZ from RGB: {" << x << ", " << y << ", " << z << "}" << endl;
+    return *this;
+  };
+
+  /// Set from HSV color
+  XYZ& operator= (const HSV& v){
+    return *this = RGB(v);
+  }
+};
+
+//end xyz
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//begin lab
+
+/// Color represented by L* (lightness), a*, b*
+struct Lab{
+  union{
+    struct{
+      float l; ///< Lightness component in [0, 100]
+      float a; ///< red-green axis (red is positive, green is negative)
+               ///  range in [-85.9293, 97.9631] (8-bit rgb gamut)
+      float b; ///< yellow-blue axis (yellow is positive, blue is negative)
+               ///  range in [-107.544, 94.2025]
+      //range determined empirically using
+      //16million RGB color image from http://brucelindbloom.com
+      ///Note: color is neutral gray when  a and b are both 0
+    };
+    float components[3];	///< Lab component vector
+  };
+
+
+  /// @param[in] l	Lightness
+  /// @param[in] a	a
+  /// @param[in] b	b
+  Lab(float l=1, float a=1, float b=1): l(l), a(a), b(b){}
+
+  /// @param[in] v	RGB color to convert from
+  Lab(const Color& v){ *this = v; }
+
+  /// @param[in] v	RGB color to convert from
+  Lab(const Colori& v){ *this = v; }
+
+  /// @param[in] v	RGB color to convert from
+  Lab(const RGB& v){ *this = v; }
+
+  /// @param[in] v	HSV color to convert from
+  Lab(const HSV& v){ *this = v; }
+
+  /// @param[in] v	XYZ color to convert from
+  Lab(const XYZ& v){ *this = v; }
+
+  /// @param[in] hsv	3-vector of Lab components
+  template<class T>
+  Lab(T * Lab): l(Lab[0]), a(Lab[1]), b(Lab[2]){}
+
+
+  /// Set color component at index with no bounds checking
+  float& operator[](int i){ return components[i]; }
+
+  /// Get color component at index with no bounds checking
+  const float& operator[](int i) const { return components[i]; }
+
+
+  /// Set from RGBA color
+  Lab& operator= (const Color& v){ return *this = v.rgb(); }
+
+  /// Set from RGBA color
+  Lab& operator= (const Colori& v){ return *this = Color(v); }
+
+  /// Set from XYZ color
+  Lab& operator= (const XYZ& v){
+    float fx, fy, fz, xr, yr, zr;
+    float epsilon = (216.0f / 24389.0f), kappa  = (24389.0f / 27.0f);
+    // using reference white D65
+    float Xn = 0.95047f, Yn = 1.0f, Zn = 1.08883f;
+    
+    // convert XYZ to Lab
+    xr = v.x / Xn; yr = v.y / Yn; zr = v.z / Zn;
+    fx = (float)(xr > epsilon)?pow(xr, 1.0/3.0):((kappa * xr + 16.0) / 116.0);
+    fy = (float)(yr > epsilon)?pow(yr, 1.0/3.0):((kappa * yr + 16.0) / 116.0);
+    fz = (float)(zr > epsilon)?pow(zr, 1.0/3.0):((kappa * zr + 16.0) / 116.0);
+
+    l = 116.0f * fy - 16.0f;
+    a = 500.0f * (fx - fy);
+    b = 200.0f * (fy - fz);
+    //cout << "Lab: {" << l << ", " << a << ", " << b << "}" << endl;    
+    return *this;
+  }
+
+  /// Set from RGB color
+  Lab& operator= (const RGB& v){
+    return *this = XYZ(v);
+  }
+
+  /// Set from HSV color
+  Lab& operator= (const HSV& v){
+    return *this = XYZ(v);
+  }
+
+  /// Get new Lab with value component multiplied by a scalar
+  Lab  operator* (float a) const { return Lab(*this)*=a; }
+
+  /// Multiply lightness component by a scalar
+  Lab& operator*=(float a){ l*=a; return *this; }
+  
+  };
+
+//end lab
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//begin hclab
+
+/// Color represented by hue, chroma, luminance(ab)
+struct HCLab{
+
+  union{
+    struct{
+      //ranges normalized to 8-bit RGB gamut using
+      //16million RGB color image from http://brucelindbloom.com
+      float h; ///< hue component in [0, 1]
+      float c; ///< chroma component
+               ///  range in [0, 1]
+      float l; ///< luminance(ab) component
+               ///  range in [0, 1]
+    };
+    float components[3];	///< HCLab component vector
+  };
+
+
+  /// @param[in] h	hue
+  /// @param[in] c	chroma
+  /// @param[in] l	luminance(ab)
+  HCLab(float h=1, float c=1, float l=1): h(h), c(c), l(l){}
+
+  /// @param[in] v	RGB color to convert from
+  HCLab(const Color& v){ *this = v; }
+
+  /// @param[in] v	RGB color to convert from
+  HCLab(const Colori& v){ *this = v; }
+
+  /// @param[in] v	RGB color to convert from
+  HCLab(const RGB& v){ *this = v; }
+
+  /// @param[in] v	HSV color to convert from
+  HCLab(const HSV& v){ *this = v; }
+
+  /// @param[in] v	XYZ color to convert from
+  HCLab(const XYZ& v){ *this = v; }
+
+  /// @param[in] v	Lab color to convert from
+  HCLab(const Lab& v){ *this = v; }\
+
+  /// @param[in] hcl	3-vector of HCLab components
+  template<class T>
+  HCLab(T * HCLab): h(HCLab[0]), c(HCLab[1]), l(HCLab[2]){}
+
+
+  /// Set color component at index with no bounds checking
+  float& operator[](int i){ return components[i]; }
+
+  /// Get color component at index with no bounds checking
+  const float& operator[](int i) const { return components[i]; }
+
+
+  /// Set from RGBA color
+  HCLab& operator= (const Color& v){ return *this = v.rgb(); }
+
+  /// Set from RGBA color
+  HCLab& operator= (const Colori& v){ return *this = Color(v); }
+
+  /// Set from RGB color
+  HCLab& operator= (const RGB& v){
+    return *this = Lab(v);
+  }
+
+  /// Set from HSV color
+  HCLab& operator= (const HSV& v){
+    return *this = Lab(v);
+  }
+
+  /// Set from XYZ color
+  HCLab& operator= (const XYZ& v){
+    return *this = Lab(v);
+  }
+
+  /// Set from Lab color
+  HCLab& operator= (const Lab& v){
+    static const float TAU = 2 * M_PI;
+    float L = v.l, a = v.a, b = v.b;
+    //calculate hue angle from 0 to 1
+    h = (atan2(b, a) + M_PI) / TAU;
+    //cout << "HCLab hue: " << h << endl;
+    //wrap hue angle
+    if(h < 0.f) h += 1.f;
+    if(h >= 1.f) h -= 1.f;
+
+    c = sqrt(a * a + b * b) / 133.419f; //range determined empirically using
+                                        //16million RGB color image from http://brucelindbloom.com
+    l = L / 100.0f;    
+    //cout << "HCLab: {" << h << ", " << c << ", " << l << "}" << endl;    
+    return *this;
+  }
+
+  /// Get new HCLab with value component multiplied by a scalar
+  HCLab  operator* (float a) const { return HCLab(*this)*=a; }
+
+  /// Multiply luminance component by a scalar
+  HCLab& operator*=(float a){ l*=a; return *this; }
+
+  /// Rotate hue in interval [0, 1)
+  HCLab& rotateHue(float dh){ h += dh; return wrapHue(); }
+
+  /// Wrap hue value into valid interval [0, 1)
+  HCLab& wrapHue(){
+    if(h>1){ h -= int(h); }
+    else if(h<0){ h -= int(h)-1; }
+    return *this;
+  }
+
+  };
+
+
+
+XYZ Lab_to_XYZ(const Lab& v){
+  float l, a, b, X, Y, Z, fx, fy, fz, xr, yr, zr;
+  float epsilon = (216.0f / 24389.0f), kappa  = (24389.0f / 27.0f);
+  // using reference white D65
+  float Xn = 0.95047f, Yn = 1.0f, Zn = 1.08883f;
+    
+  l = v.l; a = v.a; b = v.b;
+
+  fy = (l + 16) / 116;
+  fx = (a / 500) + fy;
+  fz = fy - (b / 200);
+    
+  xr = (float)(pow(fx, 3.0) > epsilon)?pow(fx, 3.0):((116.0f * fx - 16.0f) / kappa);
+  yr = (float)(l > epsilon * kappa)?pow((l + 16.0f) / 116.0f, 3.0):l / kappa;
+  zr = (float)(pow(fz, 3.0) > epsilon)?pow(fz, 3.0):((116.0f * fz - 16.0f) / kappa);
+
+  X = xr * Xn; 
+  Y = yr * Yn;
+  Z = zr * Zn;
+
+  //cout << "XYZ from Lab: {" << X << ", " << Y << ", " << Z << "}" << endl;
+  return XYZ(X, Y, Z);
+}
+
+RGB XYZ_to_RGB(const XYZ& v){
+  //using sRGB and reference white D65 
+  Mat3f transformMatrix(3.2405f, -1.5371f, -0.4985f,
+			-0.9693f,  1.8760f,  0.0416f,
+			0.0556f, -0.2040f,  1.0572f);
+  float X = v.x, Y = v.y, Z = v.z;
+
+  //convert XYZ to rgb (linear with respect to energy)
+  Vec3f xyz(X, Y, Z);
+  Vec3f rgb = transformMatrix * xyz;
+  float r = rgb[0], g = rgb[1], b = rgb[2], R, G, B;
+
+  //convert linear RGB values to vanilla RGB
+  R = (float)(r <= 0.0031308)?r * 12.92:pow(r, 1.0 / 2.4) * 1.055  - 0.055;
+  G = (float)(g <= 0.0031308)?g * 12.92:pow(g, 1.0 / 2.4) * 1.055  - 0.055;
+  B = (float)(b <= 0.0031308)?b * 12.92:pow(b, 1.0 / 2.4) * 1.055  - 0.055;
+  //clamp RGB values to [0, 1]
+  if(R > 1.f) R = 1.f;
+  else if(R < 0.f) R = 0.f;
+  if(G > 1.f) G = 1.f;
+  else if(G < 0.f) G = 0.f;
+  if(B > 1.f) B = 1.f;
+  else if(B < 0.f) B = 0.f;
+
+  //cout << "RGB from XYZ: {" << R << ", " << G << ", " << B << "}" << endl;
+  return RGB(R, G, B);
+}
+
+RGB Lab_to_RGB(const Lab& v){
+  /*RGB rgb(XYZ_to_RGB(Lab_to_XYZ(v)));
+  cout << "RGB from Lab: {" << rgb.r << ", " << rgb.g << ", " << rgb.b << "}" << endl;
+  return rgb;*/
+  return XYZ_to_RGB(Lab_to_XYZ(v));
+}
+
+HSV Lab_to_HSV(const Lab& v){
+  /*HSV hsv(XYZ_to_RGB(Lab_to_XYZ(v)));
+  cout << "HSV from Lab: {" << hsv.h << ", " << hsv.s << ", " << hsv.v << "}" << endl;
+  return hsv;*/
+  return HSV(XYZ_to_RGB(Lab_to_XYZ(v)));
+}
+
+Lab HCLab_to_Lab(const HCLab& v){
+  float L, a, b;
+  L = v.l * 100.0f;
+  static const float TAU = 2 * M_PI;
+  a = (v.c * 133.419f) * cos((v.h * TAU) - M_PI);
+  b = (v.c * 133.419f) * sin((v.h * TAU) - M_PI);
+  //cout << "Lab from HCLab: {" << L << ", " << a << ", " << b << "}" << endl;
+  return Lab(L, a, b);
+}
+
+RGB HCLab_to_RGB(const HCLab& v){
+  /*RGB rgb(Lab_to_RGB(HCLab_to_Lab(v)));
+  cout << "RGB from HCLab: {" << rgb.r << ", " << rgb.g << ", " << rgb.b << "}" << endl;
+  return rgb;*/
+  return Lab_to_RGB(HCLab_to_Lab(v));
+}
+
+HSV HCLab_to_HSV(const HCLab& v){
+  /*HSV hsv(Lab_to_RGB(HCLab_to_Lab(v)));
+  cout << "HSV from HCLab: {" << hsv.h << ", " << hsv.s << ", " << hsv.v << "}" << endl;
+  return hsv;*/
+  return HSV(Lab_to_RGB(HCLab_to_Lab(v)));
+}
+
+
+//end lab
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//begin luv
+
+
+/// Color represented by L* (lightness), u*, v*
+struct Luv{
+  union{
+    struct{
+      float l; ///< Lightness component in [0, 100]
+      float u; ///< red-green axis (red is positive, green is negative)
+               ///  range in [-82.7886, 174.378] (8-bit rgb gamut)
+      float v; ///< yellow-blue axis (yellow is positive, blue is negative)
+               ///  range in [-133.556, 107.025]
+      //range determined empirically using
+      //16million RGB color image from http://brucelindbloom.com
+      ///Note: color is neutral gray when  a and b are both 0
+    };
+    float components[3];	///< Luv component vector
+  };
+
+
+  /// @param[in] l	Lightness
+  /// @param[in] u	u
+  /// @param[in] v	v
+  Luv(float l=1, float u=1, float v=1): l(l), u(u), v(v){}
+
+  /// @param[in] w	RGB color to convert from
+  Luv(const Color& w){ *this = w; }
+
+  /// @param[in] w	RGB color to convert from
+  Luv(const Colori& w){ *this = w; }
+
+  /// @param[in] w	RGB color to convert from
+  Luv(const RGB& w){ *this = w; }
+
+  /// @param[in] w	HSV color to convert from
+  Luv(const HSV& v){ *this = v; }
+
+  /// @param[in] w	XYZ color to convert from
+  Luv(const XYZ& v){ *this = v; }
+
+  /// @param[in] hsv	3-vector of Luv components
+  template<class T>
+  Luv(T * Luv): l(Luv[0]), u(Luv[1]), v(Luv[2]){}
+
+
+  /// Set color component at index with no bounds checking
+  float& operator[](int i){ return components[i]; }
+
+  /// Get color component at index with no bounds checking
+  const float& operator[](int i) const { return components[i]; }
+
+
+  /// Set from RGBA color
+  Luv& operator= (const Color& w){ return *this = w.rgb(); }
+
+  /// Set from RGBA color
+  Luv& operator= (const Colori& w){ return *this = Color(w); }
+
+  /// Set from XYZ color
+  Luv& operator= (const XYZ& w){
+    float up, vp, ur, yr, vr, x, y, z;
+    float epsilon = (216.0f / 24389.0f), kappa  = (24389.0f / 27.0f);
+    // using reference white D65
+    float Xn = 0.95047f, Yn = 1.0f, Zn = 1.08883f;
+    x = w.x; y = w.y; z = w.z;
+
+    // convert XYZ to Luv
+    ur = (4 * Xn) / (Xn + 15 * Yn + 3 * Zn); 
+    yr = w.y / Yn; 
+    vr = (9 * Yn) / (Xn + 15 * Yn + 3 * Zn);
+    
+    up = (4 * x) / (x + 15 * y + 3 * z);
+    vp = (9 * y) / (x + 15 * y + 3 * z);
+
+    l = (float)(yr > epsilon)?116.0f * pow(yr, 1.0/3.0) - 16.0f:kappa * yr;
+    u = 13.0f * l * (up - ur);
+    v = 13.0f * l * (vp - vr);
+    //cout << "Luv: {" << l << ", " << u << ", " << v << "}" << endl;    
+    return *this;
+  }
+
+  /// Set from RGB color
+  Luv& operator= (const RGB& w){
+    return *this = XYZ(w);
+  }
+
+  /// Set from HSV color
+  Luv& operator= (const HSV& w){
+    return *this = XYZ(w);
+  }
+
+  /// Get new Luv with value component multiplied by a scalar
+  Luv  operator* (float a) const { return Luv(*this)*=a; }
+
+  /// Multiply lightness component by a scalar
+  Luv& operator*=(float a){ l*=a; return *this; }
+  
+  };
+
+
+//end luv
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//begin hcluv
+
+/// Color represented by hue, chroma, luminance(uv)
+struct HCLuv{
+
+  union{
+    struct{
+      //ranges normalized to 8-bit RGB gamut using
+      //16million RGB color image from http://brucelindbloom.com
+      float h; ///< hue component in [0, 1]
+      float c; ///< chroma component
+               ///  range in [0, 1]
+      float l; ///< luminance(uv) component
+               ///  range in [0, 1]
+    };
+    float components[3];	///< HCLuv component vector
+  };
+
+
+  /// @param[in] h	hue
+  /// @param[in] c	chroma
+  /// @param[in] l	luminance(uv)
+  HCLuv(float h=1, float c=1, float l=1): h(h), c(c), l(l){}
+
+  /// @param[in] w	RGB color to convert from
+  HCLuv(const Color& w){ *this = w; }
+
+  /// @param[in] w	RGB color to convert from
+  HCLuv(const Colori& w){ *this = w; }
+
+  /// @param[in] w	RGB color to convert from
+  HCLuv(const RGB& w){ *this = w; }
+
+  /// @param[in] w	HSV color to convert from
+  HCLuv(const HSV& w){ *this = w; }
+
+  /// @param[in] v	XYZ color to convert from
+  HCLuv(const XYZ& w){ *this = w; }
+
+  /// @param[in] w	Luv color to convert from
+  HCLuv(const Luv& w){ *this = w; }
+
+  /// @param[in] hcl	3-vector of HCLuv components
+  template<class T>
+  HCLuv(T * HCLuv): h(HCLuv[0]), c(HCLuv[1]), l(HCLuv[2]){}
+
+
+  /// Set color component at index with no bounds checking
+  float& operator[](int i){ return components[i]; }
+
+  /// Get color component at index with no bounds checking
+  const float& operator[](int i) const { return components[i]; }
+
+
+  /// Set from RGBA color
+  HCLuv& operator= (const Color& w){ return *this = w.rgb(); }
+
+  /// Set from RGBA color
+  HCLuv& operator= (const Colori& w){ return *this = Color(w); }
+
+  /// Set from RGB color
+  HCLuv& operator= (const RGB& w){
+    return *this = Luv(w);
+  }
+
+  /// Set from HSV color
+  HCLuv& operator= (const HSV& w){
+    return *this = Luv(w);
+  }
+
+  /// Set from XYZ color
+  HCLuv& operator= (const XYZ& w){
+    return *this = Luv(w);
+  }
+
+  /// Set from Luv color
+  HCLuv& operator= (const Luv& w){
+    static const float TAU = 2 * M_PI;
+    float L = w.l, u = w.u, v = w.v;
+    //calculate hue angle from 0 to 1
+    h = (atan2(v, u) + M_PI) / TAU;
+    //wrap hue angle
+    if(h < 0.f) h += 1.f;
+    if(h >= 1.f) h -= 1.f;
+
+    c = sqrt(u * u + v * v) / 178.387f; //range determined empirically using
+                                        //16million RGB color image from http://brucelindbloom.com
+    l = L / 100.0f;    
+    //cout << "HCLuv: {" << h << ", " << c << ", " << l << "}" << endl;    
+    return *this;
+  }
+
+  /// Get new HCLuv with value component multiplied by a scalar
+  HCLuv  operator* (float a) const { return HCLuv(*this)*=a; }
+
+  /// Multiply luminance component by a scalar
+  HCLuv& operator*=(float a){ l*=a; return *this; }
+
+  /// Rotate hue in interval [0, 1)
+  HCLuv& rotateHue(float dh){ h += dh; return wrapHue(); }
+
+  /// Wrap hue value into valid interval [0, 1)
+  HCLuv& wrapHue(){
+    if(h>1){ h -= int(h); }
+    else if(h<0){ h -= int(h)-1; }
+    return *this;
+  }
+
+  };
+
+
+
+XYZ Luv_to_XYZ(const Luv& w){
+  float l, u, v, X, Y, Z, a, b, c, d, ur, vr;
+  float epsilon = (216.0f / 24389.0f), kappa  = (24389.0f / 27.0f);
+  // using reference white D65
+  float Xn = 0.95047f, Yn = 1.0f, Zn = 1.08883f;
+  l = w.l; u = w.u; v = w.v;
+
+  ur = (4 * Xn) / (Xn + 15 * Yn + 3 * Zn);
+  vr = (9 * Yn) / (Xn + 15 * Yn + 3 * Zn);
+
+  c = (-1.0f / 3.0f);
+  a = -c * (((52.0f * l) / (u + 13.0f * l * ur)) - 1.0f);
+
+  Y =  (float)(l > epsilon * kappa)?pow((l + 16.0) / 116.0, 3.0):l / kappa;
+  
+  b = -5.0f * Y;
+  d = Y * (((39.0f * l) / (v + 13.0f * l * vr)) - 5.0f);
+
+  X = (d - b) / (a - c);
+  Z = X * a + b;
+
+  //cout << "XYZ from Luv: {" << X << ", " << Y << ", " << Z << "}" << endl;
+  return XYZ(X, Y, Z);
+}
+
+RGB Luv_to_RGB(const Luv& w){
+  /*RGB rgb(XYZ_to_RGB(Luv_to_XYZ(w)));
+  cout << "RGB from Luv: {" << rgb.r << ", " << rgb.g << ", " << rgb.b << "}" << endl;
+  return rgb;*/
+  return XYZ_to_RGB(Luv_to_XYZ(w));
+}
+
+HSV Luv_to_HSV(const Luv& w){
+  /*HSV hsv(XYZ_to_RGB(Luv_to_XYZ(w)));
+  cout << "HSV from Luv: {" << hsv.h << ", " << hsv.s << ", " << hsv.v << "}" << endl;
+  return hsv;*/
+  return HSV(XYZ_to_RGB(Luv_to_XYZ(w)));
+}
+
+Luv HCLuv_to_Luv(const HCLuv& w){
+  float L, u, v;
+  L = w.l * 100.0f;
+  static const float TAU = 2 * M_PI;
+  u = (w.c * 178.387f) * cos((w.h * TAU) - M_PI);
+  v = (w.c * 178.387f) * sin((w.h * TAU) - M_PI);
+  //cout << "Luv from HCLuv: {" << L << ", " << u << ", " << v << "}" << endl;
+  return Luv(L, u, v);
+}
+
+RGB HCLuv_to_RGB(const HCLuv& w){
+  /*RGB rgb(Luv_to_RGB(HCLuv_to_Luv(w)));
+  cout << "RGB from HCLuv: {" << rgb.r << ", " << rgb.g << ", " << rgb.b << "}" << endl;
+  return rgb;*/
+  return Luv_to_RGB(HCLuv_to_Luv(w));
+}
+
+HSV HCLuv_to_HSV(const HCLuv& w){
+  /*HSV hsv(Luv_to_RGB(HCLuv_to_Luv(w)));
+  cout << "HSV from HCLuv: {" << hsv.h << ", " << hsv.s << ", " << hsv.v << "}" << endl;
+  return hsv;*/
+  return Luv_to_RGB(HCLuv_to_Luv(w));
+}
+
+//end hcluv
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
 
 #endif
