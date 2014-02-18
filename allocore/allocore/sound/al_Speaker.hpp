@@ -77,16 +77,23 @@ struct Speaker {
 		return *this;
 	}
 	
+    Vec3d vec(){
+		double cosel = cos(elevation);
+		double x = sin(toRad(azimuth)) * cosel * radius;
+		double y = cos(toRad(azimuth)) * cosel * radius;
+		double z = sin(toRad(elevation)) * radius;
+		return Vec3d(x,y,z);
+	}
+    
 	static double toRad(double d){ return d*2.*M_PI/180.; }
 };
 
-
+typedef std::vector<Speaker> Speakers;
 
 /// Base class for a configuration of multiple speakers
 class SpeakerLayout{
 public:
-	typedef std::vector<Speaker> Speakers;
-
+	
 	SpeakerLayout(){}
 
 	int numSpeakers() const { return speakers().size(); }
@@ -94,6 +101,8 @@ public:
 	const Speakers& speakers() const { return mSpeakers; }
 	Speakers& speakers(){ return mSpeakers; }
 
+    /// azimuth is anti-clockwise; both azimuth and elevation are in degrees
+    
 //	Speaker addSpeaker(float azimuth, float elevation, float distance, int deviceChannel){
 //		Speaker s;
 //		s.azimuth = azimuth;
@@ -112,7 +121,8 @@ public:
 	
 
 protected:
-	friend class Listener;
+	friend class Spatializer;
+    friend class AmbisonicsSpatializer;
 	Speakers mSpeakers;
 };
 

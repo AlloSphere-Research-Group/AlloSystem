@@ -192,7 +192,7 @@ float AmbiDecode::flavorWeights[4][5][5] = {
 
 AmbiDecode::AmbiDecode(int dim, int order, int numSpeakers, int flav)
 	: AmbiBase(dim, order),
-	mNumSpeakers(0), mDecodeMatrix(0), mSpeakers(0)
+	mNumSpeakers(0), mDecodeMatrix(0)
 {
 	resizeArrays(channels(), numSpeakers);
 	flavor(flav);
@@ -200,7 +200,7 @@ AmbiDecode::AmbiDecode(int dim, int order, int numSpeakers, int flav)
 
 AmbiDecode::~AmbiDecode(){
 	delete[] mDecodeMatrix;
-	delete[] mSpeakers;
+	//delete[] mSpeakers; // listener now owns speakers and will delete them
 }
 
 void AmbiDecode::decode(float * dec, const float * ambi, int numDecFrames) const {
@@ -208,18 +208,19 @@ void AmbiDecode::decode(float * dec, const float * ambi, int numDecFrames) const
 	// iterate speakers
 	for(int s=0; s<numSpeakers(); ++s){
 		// skip zero-amp speakers:
-		if (mSpeakers[s].gain != 0.) {
-			float * out = dec + mSpeakers[s].deviceChannel * numDecFrames;
+		if ((*mSpeakers)[s].gain != 0.) {
+			float * out = dec + (*mSpeakers)[s].deviceChannel * numDecFrames;
 			
 			// iterate ambi channels
 			for(int c=0; c<channels(); ++c){
 				const float * in = ambi + c * numDecFrames;
 				float w = decodeWeight(s, c);
-				for(int i=0; i<numDecFrames; ++i) out[i] += in[i] * w;		
+				for(int i=0; i<numDecFrames; ++i) out[i] += in[i] * w;
 			}	
 		}
 	}
 }
+
 
 void AmbiDecode::flavor(int type){
 	if(type < 4){
@@ -241,10 +242,10 @@ void AmbiDecode::setSpeakerRadians(int index, int deviceChannel, float az, float
 		numSpeakers(index);	// grow adaptively
 	}
 	
-	mSpeakers[index].azimuth = az;
-	mSpeakers[index].elevation = el;
-	mSpeakers[index].deviceChannel = deviceChannel;
-	mSpeakers[index].gain = amp;
+	(*mSpeakers)[index].azimuth = az;
+	(*mSpeakers)[index].elevation = el;
+	(*mSpeakers)[index].deviceChannel = deviceChannel;
+	(*mSpeakers)[index].gain = amp;
 
 	// update encoding weights
 	encodeWeightsFuMa(mDecodeMatrix + index * channels(), mDim, mOrder, az, el);
@@ -304,7 +305,8 @@ void AmbiDecode::resizeArrays(int numChannels, int numSpeakers){
 		// resize number of speakers (?)
 		if(numSpeakers != mNumSpeakers){
 			mNumSpeakers = numSpeakers;
-			resize(mSpeakers, numSpeakers);
+			
+            //resize(mSpeakers, numSpeakers);
 		}
 
 //		// recompute decode matrix weights

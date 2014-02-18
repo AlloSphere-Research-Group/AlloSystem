@@ -41,6 +41,7 @@
 	File author(s):
 	Lance Putnam, 2010, putnam.lance@gmail.com
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
+    Ryan McGee, 2012, ryanmichaelmcgee@gmail.com
 */
 
 #include <math.h>
@@ -51,7 +52,7 @@
 #include "allocore/math/al_Interpolation.hpp"
 #include "allocore/math/al_Vec.hpp"
 #include "allocore/spatial/al_Pose.hpp"
-#include "allocore/sound/al_Ambisonics.hpp"
+#include "allocore/io/al_AudioIO.hpp"
 #include "allocore/sound/al_Speaker.hpp"
 #include "allocore/sound/al_Reverb.hpp"
 
@@ -92,10 +93,44 @@ namespace al{
 */
 
 
-/// Audio scene listener object
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+class Listener;
+class SoundSource;
+class Spatializer {
+public:
+    Spatializer(){};
+    virtual ~Spatializer(){};
+    virtual void numFrames(int v){ };
+    virtual void compile(Listener& l){};
+    virtual void prepare(AudioIOData& io){};
+    virtual void perform(
+                         AudioIOData& io,
+                         SoundSource& src,
+                         Vec3d& relpos,
+                         const int& numFrames,
+                         int& frameIndex,
+                         float& sample) = 0;
+    
+    virtual void finalize(AudioIOData& io){};
+    
+    virtual void setSpeakerLayout(SpeakerLayout& sl){
+        mSpeakers.clear();
+		unsigned numSpeakers = sl.mSpeakers.size();
+		for(unsigned i=0;i<numSpeakers;++i){
+			mSpeakers.push_back(sl.mSpeakers[i]);
+		}
+    }
+    
+    int numSpeakers() const { return mSpeakers.size(); }
+    
+protected:
+    Speakers mSpeakers;
+    
+};
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
 
-/// 
-///
 class Listener {
 public:
 
@@ -105,54 +140,37 @@ public:
 
 	/// Get current pose
 	const Pose& pose() const { return mPose; }
-
-
-	int numSpeakers() const { return mDecoder.numSpeakers(); }
-
-	Listener& numSpeakers(int num){
-		mDecoder.numSpeakers(num); return *this;
+    
+    void compile(){
+		isCompiled = true;
+		mSpatializer->compile(*(this));
 	}
-
-	/// azimuth is anti-clockwise; both azimuth and elevation are in degrees
-	Listener& speakerPos(int speakerNum, int deviceChannel, double az, double el=0, double amp=1.){
-		mDecoder.setSpeaker(speakerNum, deviceChannel, az, el, amp);
-		return *this;
-	}
-
-	float * ambiChans(unsigned channel=0) { return &mAmbiDomainChannels[channel * mNumFrames]; }
-	
-
-	
+    
 protected:
 	friend class AudioScene;
+    friend class AmbisonicsSpatializer;
 	
-	Listener(int dim, int order, int numspeakers, int flavor, int numFrames_) 
-	:	mDecoder(dim, order, numspeakers, flavor) 
+    
+    Listener(int numFrames_, SpeakerLayout& sl, Spatializer *spatializer)
+	:	mSpatializer(spatializer), isCompiled(false)
 	{
 		numFrames(numFrames_);
+        mSpatializer->setSpeakerLayout(sl);
 	}
 	
 	void numFrames(unsigned v){
-		mNumFrames = v;
 		if(mQuatHistory.size() != v) mQuatHistory.resize(v);
-		if(mAmbiDomainChannels.size() != (mDecoder.channels() * v)){
-			mAmbiDomainChannels.resize(mDecoder.channels() * v);
-		}
+        mSpatializer->numFrames(v);
 	}
 
-	// move to specialized ambi panner...
-	AmbiDecode mDecoder;	
-	std::vector<float> mAmbiDomainChannels;
-
+    Spatializer *mSpatializer;
+    
+    bool isCompiled;
+    
 	std::vector<Quatd> mQuatHistory;		// buffer of interpolated orientations
 	ShiftBuffer<4, Vec3d> mPosHistory;		// position in previous blocks
 	Quatd mQuatPrev;						// orientation in previous block
 	Pose mPose;								// current position
-	unsigned mNumFrames;
-
-	void zeroAmbi(){
-		memset(ambiChans(), 0, mAmbiDomainChannels.size()*sizeof(ambiChans()[0]));
-	}
 };
 
 
@@ -293,24 +311,18 @@ protected:
 };	
 
 
-
 class AudioScene {
 public:
 
 	typedef std::vector<Listener *> Listeners;
 	typedef std::list<SoundSource *> Sources;
 
-
-	AudioScene(int dim, int order, int numFrames) 
-	:	mEncoder(dim, order), mNumFrames(numFrames), mSpeedOfSound(343)
+    AudioScene(int numFrames)
+	:   mNumFrames(numFrames), mSpeedOfSound(343)
 	{}
 
-
-	int dim() const { return mEncoder.dim(); }
-	int order() const { return mEncoder.order(); }
-
 	Listeners& listeners(){ return mListeners; }
-	const Listeners& listeners() const { return mListeners; }
+    const Listeners& listeners() const { return mListeners; }
 
 	Sources& source(){ return mSources; }
 	const Sources& source() const { return mSources; }
@@ -327,8 +339,9 @@ public:
 		}
 	}
 
-	Listener * createListener(int numspeakers) {
-		Listener * l = new Listener(dim(), order(), numspeakers, 1, mNumFrames);
+    Listener * createListener(SpeakerLayout& sl, Spatializer* spatializer) {
+		Listener * l = new Listener(mNumFrames,sl,spatializer);
+        l->compile();
 		mListeners.push_back(l);
 		return l;
 	}
@@ -341,14 +354,20 @@ public:
 		mSources.remove(&src);
 	}
 
+    /*
 	/// encode sources (per listener)
 	void encode(const int& numFrames, double sampleRate) {
-		//printf("__________________\n");
+     */
+    //added Ryan McGee 11/15/2012
+    // Changed "encode" method to render since we want this to be generic and not just Ambi.
+    /// render sources (per listener)
+    void render(AudioIOData& io) {
 	
+        const int numFrames = io.framesPerBuffer();
+        double sampleRate = io.framesPerSecond();
+        
 		double distanceToSample = sampleRate / mSpeedOfSound;
-		//distanceToSample = 16;
-	
-		
+
 		//const double invClipRange = mFarClip - mNearClip;
 		
 		// update source history data:
@@ -363,13 +382,14 @@ public:
 		for(unsigned il=0; il<mListeners.size(); ++il){
 			Listener& l = *mListeners[il];
 			
+			Spatializer* spatializer = l.mSpatializer;
+			spatializer->prepare(io);
+            
 			// update listener history data:
 			Quatd qnew = l.pose().quat();
 			Quatd::slerpBuffer(l.mQuatPrev, qnew, &l.mQuatHistory[0], numFrames);
 			l.mQuatPrev = qnew;
 			l.mPosHistory(l.pose().vec());
-			
-			l.zeroAmbi(); // zero out existing ambi samples
 
 			// iterate through all sound sources
 			for(Sources::iterator it = mSources.begin(); it != mSources.end(); ++it){
@@ -436,15 +456,17 @@ public:
 
 						idx += (numFrames-i);
 						
-						
-						double gain = src.attenuation(distance);
-						
-						//if (i==0) printf("in range, gain %f\n", gain);
-						
+						// added Ryan McGee 11/25/2012
+                        //Do not attenuate here! ???
+						//double gain = src.attenuation(distance);
+						double gain = 1;
+                        
 						float s = src.readSample(idx) * gain;
-						//printf("%g\n", s);
-						//printf("%g\n", idx);
-						
+                        
+						spatializer->perform(io,src,relpos, numFrames, i, s);
+                        
+                        //moved all this to perform in ambisonics class....
+						/*
 						// compute azimuth & elevation of relative position in
 						//  current listener's coordinate frame:
 						Vec3d urel(relpos);
@@ -465,6 +487,9 @@ public:
 						//mEncoder.direction(-rf, -rr, ru);
 						mEncoder.direction(-direction[2], -direction[0], direction[1]);
 						mEncoder.encode(l.ambiChans(), numFrames, i, s);
+                        
+                        // end move to amisonics
+                        */
 					}
 
 //					double x = distance - mFarClip;
@@ -498,10 +523,14 @@ public:
 				
 				//void encode(double ** ambiChans, const XYZ * pos, const double * input, numFrames)
 				//mEncoder.encode<Vec3d>(ambiChans, mSource);
-			}
-		}
-		//printf("%f\n", mListeners[0]->ambiChans()[0]);
-	}
+                
+			} //end for each source
+            
+            spatializer->finalize(io);
+            
+		} // end for each listener
+		
+	} //end render
 	
 	// between encode & decode, can apply optional processing to ambi domain signals (e.g. reverb)
 
@@ -510,42 +539,24 @@ public:
 	
 	/// @param[out] outs		1D array of output (non-interleaved)
 	/// @param[in ] numFrames	number of frames per channel buffer
+    
+    
+    //moved this to ambisonics class
+    /*
 	void render(float * outs, const int& numFrames) const {
 		for(unsigned il=0; il<mListeners.size(); ++il){
 			Listener& l = *mListeners[il];
 			l.mDecoder.decode(outs, l.ambiChans(), numFrames);
 		}
 	}
-	
-	/// Copy the encoded channels directly to the output channels:
-	
-	/// @param[out] outs		1D array of output (non-interleaved)
-	/// @param[in ] numOuts		number of channels in the outs array
-	/// @param[in ] numFrames	number of frames per channel buffer
-	void copyAmbiChannels(float * outs, const int& numOuts, const int& numFrames) const {
-		unsigned limit = al::min(numOuts, mEncoder.channels());
-		unsigned frames = al::min(numFrames, mNumFrames);
-		
-		// for each listener
-		for(unsigned il=0; il<mListeners.size(); ++il){
-			Listener& l = *mListeners[il];
-			// for each channel:
-			for (unsigned c=0; c<limit; c++) {
-				// copy the ambi channel into the output channel:
-				float * out = outs + c;
-				float * in = l.ambiChans(c);
-				for (unsigned i=0; i<frames; i++) {
-					*out++ += *in++;
-				}
-			}
-		}
-	}
+     */
 
 protected:
 
 	Listeners mListeners;
 	Sources mSources;
-	AmbiEncode mEncoder;
+
+    
 	int mNumFrames;			// audio frames per block
 	double mSpeedOfSound;	// distance per second
 	

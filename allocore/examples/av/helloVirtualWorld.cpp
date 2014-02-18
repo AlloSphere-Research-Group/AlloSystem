@@ -12,6 +12,8 @@ stereographic rendering
 */
 
 #include "allocore/al_Allocore.hpp"
+#include "allocore/sound/al_Ambisonics.hpp"
+
 using namespace al;
 
 struct Agent : public SoundSource, public Nav, public Drawable{
@@ -129,16 +131,24 @@ AmbiDecode::Speaker speakers[numSpeakers] = {
 	Speaker(22-1,-1.5*botAz, botEl),
 };
 #else
-AudioScene scene(2, 1, AUDIO_BLOCK_SIZE);
+//AudioScene scene(2, 1, AUDIO_BLOCK_SIZE);
+AudioScene scene(AUDIO_BLOCK_SIZE);
 const int numSpeakers = 2;
 Speaker speakers[] = {
 	Speaker(0,  45,0),
 	Speaker(1, -45,0),
 };
+
+AmbisonicsSpatializer *ambisonics;
+
+SpeakerLayout speakerLayout;
+
 #endif
 
 
 void audioCB(AudioIOData& io){
+    
+
 	int numFrames = io.framesPerBuffer();
 
 	for(unsigned i=0; i<agents.size(); ++i){
@@ -148,10 +158,14 @@ void audioCB(AudioIOData& io){
 	}
 
 	navMaster.step(0.5);
+     
+     
 	listener->pose(navMaster);
 
-	scene.encode(numFrames, io.framesPerSecond());
-	scene.render(&io.out(0,0), numFrames);
+	//scene.encode(numFrames, io.framesPerSecond());
+	//scene.render(&io.out(0,0), numFrames);
+    io.frame(0);
+    scene.render(io);
 	
 	//printf("%g\n", io.out(0,0));
 }
@@ -197,8 +211,15 @@ struct MyWindow : public Window, public Drawable{
 
 int main (int argc, char * argv[]){
 
-	listener = scene.createListener(2);
+    ambisonics = new AmbisonicsSpatializer(2, 1, numSpeakers);
+    
+    speakerLayout.addSpeaker(speakers[0]);
+    speakerLayout.addSpeaker(speakers[1]);
+    
+	listener = scene.createListener(speakerLayout, ambisonics);
 
+    
+    /*
 	listener->numSpeakers(numSpeakers);
 	for(int i=0; i<numSpeakers; ++i){
 		listener->speakerPos(
@@ -208,6 +229,7 @@ int main (int argc, char * argv[]){
 			speakers[i].elevation
 		);
 	}
+     */
 	
 	for(unsigned i=0; i<agents.size(); ++i) scene.addSource(agents[i]);
 
