@@ -360,9 +360,10 @@ int utMath(){
 
 		// Test consistency between conversions from Euler angles and axes
 		assert(
-			q.fromEuler(M_2PI/8,M_2PI/8,M_2PI/8) 
-			==
-			((Quatd().fromAxisY(M_2PI/8) * Quatd().fromAxisX(M_2PI/8)) * Quatd().fromAxisZ(M_2PI/8))
+			eq(
+			q.fromEuler(M_2PI/8,M_2PI/8,M_2PI/8),
+			(Quatd().fromAxisY(M_2PI/8) * Quatd().fromAxisX(M_2PI/8)) * Quatd().fromAxisZ(M_2PI/8)
+			)
 		);
 		
 		// Test roundtrip Euler/quat conversion
