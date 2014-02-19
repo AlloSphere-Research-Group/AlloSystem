@@ -50,7 +50,8 @@
 */
 
 #include "allocore/system/al_Config.h"
-
+#include "allocore/math/al_Mat.hpp"
+#include <cmath>
 namespace al{
 
   struct RGB;
@@ -103,14 +104,14 @@ struct Color{
 	Color(const RGB& rgb, float a=1.f)
 	:	a(a)
 	{	*this = rgb; }
-  /*
+  
 	/// @param[in] xyz			XYZ color to convert from
 	Color(const XYZ& xyz)
-	{	*this = xyz; }
+  {	*this = xyz; }
 
 	/// @param[in] lab			Lab color to convert from
 	Color(const Lab& lab)
-	{	*this = lab; }
+  {	*this = lab; }
 
 	/// @param[in] hclab			HCLab color to convert from
 	Color(const HCLab& hclab)
@@ -124,7 +125,7 @@ struct Color{
 	Color(const HCLuv& hcluv)
 	{	*this = hcluv; }
 
-  */
+  
 	/// Set color component at index with no bounds checking
 	float& operator[](int i){ return components[i]; }
 
@@ -170,7 +171,7 @@ struct Color{
 
 	/// Set RGB components from RGB
 	Color& operator= (const RGB& v);
-  /*
+  
         /// Set RGB components from XYZ
         Color& operator= (const XYZ& v);
 
@@ -185,7 +186,7 @@ struct Color{
 
         /// Set RGB components from HCLuv
         Color& operator= (const HCLuv& v);
-  */
+  
 	/// Return true if all components are equal, false otherwise
 	bool operator ==(const Color& v) const { return v.r==r && v.g==g && v.b==b && v.a==a; }
 
@@ -286,7 +287,7 @@ struct Colori {
 	:	a(a)
 	{	*this = rgb; }
 
-  /*
+  
 	/// @param[in] xyz			XYZ color to convert from
 	Colori(const XYZ& xyz)
 	{	*this = xyz; }
@@ -306,7 +307,6 @@ struct Colori {
 	/// @param[in] hcluv			HCLuv color to convert from
 	Colori(const HCLuv& hcluv)
 	{	*this = hcluv; }
-*/
 
 	/// Set color component at index with no bounds checking
 	uint8_t& operator[](int i){ return components[i]; }
@@ -324,7 +324,7 @@ struct Colori {
 	/// Set RGB components from RGB
 	Colori& operator= (const RGB& v);
 
-  /*
+  
         /// Set RGB components from XYZ
         Color& operator= (const XYZ& v);
 
@@ -339,7 +339,7 @@ struct Colori {
 
         /// Set RGB components from HCLuv
         Color& operator= (const HCLuv& v);
-  */
+  
 	/// Set RGB components
 	Colori& set(uint8_t re, uint8_t gr, uint8_t bl){
 		r=re; g=gr; b=bl; return *this; }
@@ -386,7 +386,7 @@ struct HSV{
 
 	/// @param[in] v	RGB color to convert from
 	HSV(const RGB& v){ *this = v; }
-  /*
+  
 	/// @param[in] xyz			XYZ color to convert from
 	HSV(const XYZ& xyz)
 	{	*this = xyz; }
@@ -406,7 +406,7 @@ struct HSV{
 	/// @param[in] hcluv			HCLuv color to convert from
 	HSV(const HCLuv& hcluv)
 	{	*this = hcluv; }
-  */
+  
 
 	/// @param[in] hsv	3-vector of HSV components
 	template<class T>
@@ -428,7 +428,7 @@ struct HSV{
 
 	/// Set from RGB color
 	HSV& operator= (const RGB& v);
-
+  
 	/// Set from XYZ color
 	HSV& operator= (const XYZ& v);
 
@@ -443,7 +443,7 @@ struct HSV{
 
 	/// Set from HCLuv color
 	HSV& operator= (const HCLuv& v);
-
+  
 	/// Get new HSV with value component multiplied by a scalar
 	HSV  operator* (float a) const { return HSV(*this)*=a; }
 
@@ -498,15 +498,15 @@ struct RGB{
 	/// @param[in] hsv			HSV value
 	RGB(const HSV& hsv)
 	{	*this = hsv; }
-  /*
+  
 	/// @param[in] xyz			XYZ value
 	RGB(const XYZ& xyz)
 	{	*this = xyz; }
-
+  
 	/// @param[in] lab			Lab value
 	RGB(const Lab& lab)
 	{	*this = lab; }
-
+  
 	/// @param[in] hclab			HCLab value
 	RGB(const HCLab& hclab)
 	{	*this = hclab; }
@@ -518,7 +518,7 @@ struct RGB{
 	/// @param[in] hcluv			HCLuv value
 	RGB(const HCLuv& hcluv)
 	{	*this = hcluv; }
-  */
+  
 	/// Set color component at index with no bounds checking
 	float& operator[](int i){ return components[i]; }
 
@@ -552,13 +552,13 @@ struct RGB{
 
 	/// Set RGB components from Color
 	RGB& operator= (const Color& v){ return set(v.rgb()); }
-  /*
+  
   	/// Set RGB components from XYZ
 	RGB& operator= (const XYZ& v);
-
+  
   	/// Set RGB components from Lab
 	RGB& operator= (const Lab& v);
-
+  
 	/// Set RGB components from HCLab
 	RGB& operator= (const HCLab& v);
 
@@ -567,7 +567,7 @@ struct RGB{
 
 	/// Set RGB components from HCLuv
 	RGB& operator= (const HCLuv& v);
-  */
+  
 	/// Return true if all components are equal, false otherwise
 	bool operator ==(const RGB& v) const { return v.r==r && v.g==g && v.b==b; }
 
@@ -649,6 +649,12 @@ struct XYZ{
   /// @param[in] v	HSV color to convert from
   XYZ(const HSV& v){ *this = v; }
 
+  /// @param[in] v	Lab color to convert from
+  XYZ(const Lab& v){ *this = v; }
+
+  /// @param[in] v	Luv color to convert from
+  XYZ(const Luv& v){ *this = v; }
+
   /// @param[in] xyz	3-vector of XYZ components
   template<class T>
   XYZ(T * xyz): x(xyz[0]), y(xyz[1]), z(xyz[2]){}
@@ -668,36 +674,27 @@ struct XYZ{
   XYZ& operator= (const Colori& v){ return *this = Color(v); }
 
   /// Set from RGB color
-  XYZ& operator= (const RGB& v){
-    //using sRGB and reference white D65 
-    Mat3f transformMatrix(0.4124f,  0.3576f,  0.1805f,
-			  0.2126f, 0.7152f, 0.0722f,
-			  0.0193f,  0.1192f,  0.9505f);
-    float R = v.r, G = v.g, B = v.b;
-    //convert vanilla RGB values to be linear with respect to energy
-    R = (float)(R <= 0.04045)?R / 12.92:pow(((R + 0.055) / 1.055), 2.4);
-    G = (float)(G <= 0.04045)?G / 12.92:pow(((G + 0.055) / 1.055), 2.4);
-    B = (float)(B <= 0.04045)?B / 12.92:pow(((B + 0.055) / 1.055), 2.4);
-    
-    //convert rgb to CIE XYZ
-    Vec3f rgb(R, G, B);
-    Vec3f xyz = transformMatrix * rgb;
-    x = xyz[0]; y = xyz[1]; z = xyz[2];
-
-    //cout << "XYZ from RGB: {" << x << ", " << y << ", " << z << "}" << endl;
-    return *this;
-  };
+  XYZ& operator= (const RGB& v);
 
   /// Set from HSV color
   XYZ& operator= (const HSV& v){
     return *this = RGB(v);
   }
+
+  /// Set from Lab color
+  XYZ& operator= (const Lab& v);
+
+  /// Set from Luv color
+  XYZ& operator= (const Luv& v);
+
 };
+
 
 //end xyz
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 //begin lab
+
 
 /// Color represented by L* (lightness), a*, b*
 struct Lab{
@@ -736,6 +733,9 @@ struct Lab{
   /// @param[in] v	XYZ color to convert from
   Lab(const XYZ& v){ *this = v; }
 
+  /// @param[in] v	HCLab color to convert from
+  Lab(const HCLab& v){ *this = v; }
+
   /// @param[in] hsv	3-vector of Lab components
   template<class T>
   Lab(T * Lab): l(Lab[0]), a(Lab[1]), b(Lab[2]){}
@@ -755,24 +755,7 @@ struct Lab{
   Lab& operator= (const Colori& v){ return *this = Color(v); }
 
   /// Set from XYZ color
-  Lab& operator= (const XYZ& v){
-    float fx, fy, fz, xr, yr, zr;
-    float epsilon = (216.0f / 24389.0f), kappa  = (24389.0f / 27.0f);
-    // using reference white D65
-    float Xn = 0.95047f, Yn = 1.0f, Zn = 1.08883f;
-    
-    // convert XYZ to Lab
-    xr = v.x / Xn; yr = v.y / Yn; zr = v.z / Zn;
-    fx = (float)(xr > epsilon)?pow(xr, 1.0/3.0):((kappa * xr + 16.0) / 116.0);
-    fy = (float)(yr > epsilon)?pow(yr, 1.0/3.0):((kappa * yr + 16.0) / 116.0);
-    fz = (float)(zr > epsilon)?pow(zr, 1.0/3.0):((kappa * zr + 16.0) / 116.0);
-
-    l = 116.0f * fy - 16.0f;
-    a = 500.0f * (fx - fy);
-    b = 200.0f * (fy - fz);
-    //cout << "Lab: {" << l << ", " << a << ", " << b << "}" << endl;    
-    return *this;
-  }
+  Lab& operator= (const XYZ& v);
 
   /// Set from RGB color
   Lab& operator= (const RGB& v){
@@ -783,6 +766,8 @@ struct Lab{
   Lab& operator= (const HSV& v){
     return *this = XYZ(v);
   }
+
+  Lab& operator=(const HCLab& v);
 
   /// Get new Lab with value component multiplied by a scalar
   Lab  operator* (float a) const { return Lab(*this)*=a; }
@@ -871,22 +856,7 @@ struct HCLab{
   }
 
   /// Set from Lab color
-  HCLab& operator= (const Lab& v){
-    static const float TAU = 2 * M_PI;
-    float L = v.l, a = v.a, b = v.b;
-    //calculate hue angle from 0 to 1
-    h = (atan2(b, a) + M_PI) / TAU;
-    //cout << "HCLab hue: " << h << endl;
-    //wrap hue angle
-    if(h < 0.f) h += 1.f;
-    if(h >= 1.f) h -= 1.f;
-
-    c = sqrt(a * a + b * b) / 133.419f; //range determined empirically using
-                                        //16million RGB color image from http://brucelindbloom.com
-    l = L / 100.0f;    
-    //cout << "HCLab: {" << h << ", " << c << ", " << l << "}" << endl;    
-    return *this;
-  }
+  HCLab& operator= (const Lab& v);
 
   /// Get new HCLab with value component multiplied by a scalar
   HCLab  operator* (float a) const { return HCLab(*this)*=a; }
@@ -904,12 +874,12 @@ struct HCLab{
     return *this;
   }
 
-  };
+};
 
 
 
 
-//end lab
+//end hclab
 //////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 //begin luv
@@ -952,6 +922,9 @@ struct Luv{
   /// @param[in] w	XYZ color to convert from
   Luv(const XYZ& v){ *this = v; }
 
+  /// @param[in] w	HCLuv color to convert from
+  Luv(const HCLuv& v){ *this = v; }
+
   /// @param[in] hsv	3-vector of Luv components
   template<class T>
   Luv(T * Luv): l(Luv[0]), u(Luv[1]), v(Luv[2]){}
@@ -971,27 +944,10 @@ struct Luv{
   Luv& operator= (const Colori& w){ return *this = Color(w); }
 
   /// Set from XYZ color
-  Luv& operator= (const XYZ& w){
-    float up, vp, ur, yr, vr, x, y, z;
-    float epsilon = (216.0f / 24389.0f), kappa  = (24389.0f / 27.0f);
-    // using reference white D65
-    float Xn = 0.95047f, Yn = 1.0f, Zn = 1.08883f;
-    x = w.x; y = w.y; z = w.z;
+  Luv& operator= (const XYZ& w);
 
-    // convert XYZ to Luv
-    ur = (4 * Xn) / (Xn + 15 * Yn + 3 * Zn); 
-    yr = w.y / Yn; 
-    vr = (9 * Yn) / (Xn + 15 * Yn + 3 * Zn);
-    
-    up = (4 * x) / (x + 15 * y + 3 * z);
-    vp = (9 * y) / (x + 15 * y + 3 * z);
-
-    l = (float)(yr > epsilon)?116.0f * pow(yr, 1.0/3.0) - 16.0f:kappa * yr;
-    u = 13.0f * l * (up - ur);
-    v = 13.0f * l * (vp - vr);
-    //cout << "Luv: {" << l << ", " << u << ", " << v << "}" << endl;    
-    return *this;
-  }
+  /// Set from HCLuv color
+  Luv& operator= (const HCLuv& w);
 
   /// Set from RGB color
   Luv& operator= (const RGB& w){
@@ -1009,7 +965,7 @@ struct Luv{
   /// Multiply lightness component by a scalar
   Luv& operator*=(float a){ l*=a; return *this; }
   
-  };
+};
 
 
 //end luv
@@ -1091,21 +1047,7 @@ struct HCLuv{
   }
 
   /// Set from Luv color
-  HCLuv& operator= (const Luv& w){
-    static const float TAU = 2 * M_PI;
-    float L = w.l, u = w.u, v = w.v;
-    //calculate hue angle from 0 to 1
-    h = (atan2(v, u) + M_PI) / TAU;
-    //wrap hue angle
-    if(h < 0.f) h += 1.f;
-    if(h >= 1.f) h -= 1.f;
-
-    c = sqrt(u * u + v * v) / 178.387f; //range determined empirically using
-                                        //16million RGB color image from http://brucelindbloom.com
-    l = L / 100.0f;    
-    //cout << "HCLuv: {" << h << ", " << c << ", " << l << "}" << endl;    
-    return *this;
-  }
+  HCLuv& operator= (const Luv& w);
 
   /// Get new HCLuv with value component multiplied by a scalar
   HCLuv  operator* (float a) const { return HCLuv(*this)*=a; }
@@ -1129,164 +1071,6 @@ struct HCLuv{
 //////////////////////////////////////////////////////////////////////////////////////////
 
 
-//move these~~~~~~~~~~~~~~~~
-XYZ Lab_to_XYZ(const Lab& v){
-  float l, a, b, X, Y, Z, fx, fy, fz, xr, yr, zr;
-  float epsilon = (216.0f / 24389.0f), kappa  = (24389.0f / 27.0f);
-  // using reference white D65
-  float Xn = 0.95047f, Yn = 1.0f, Zn = 1.08883f;
-    
-  l = v.l; a = v.a; b = v.b;
-
-  fy = (l + 16) / 116;
-  fx = (a / 500) + fy;
-  fz = fy - (b / 200);
-    
-  xr = (float)(pow(fx, 3.0) > epsilon)?pow(fx, 3.0):((116.0f * fx - 16.0f) / kappa);
-  yr = (float)(l > epsilon * kappa)?pow((l + 16.0f) / 116.0f, 3.0):l / kappa;
-  zr = (float)(pow(fz, 3.0) > epsilon)?pow(fz, 3.0):((116.0f * fz - 16.0f) / kappa);
-
-  X = xr * Xn; 
-  Y = yr * Yn;
-  Z = zr * Zn;
-
-  //cout << "XYZ from Lab: {" << X << ", " << Y << ", " << Z << "}" << endl;
-  return XYZ(X, Y, Z);
-}
-
-
-RGB XYZ_to_RGB(const XYZ& v){
-  //using sRGB and reference white D65 
-  Mat3f transformMatrix(3.2405f, -1.5371f, -0.4985f,
-			-0.9693f,  1.8760f,  0.0416f,
-			0.0556f, -0.2040f,  1.0572f);
-  float X = v.x, Y = v.y, Z = v.z;
-
-  //convert XYZ to rgb (linear with respect to energy)
-  Vec3f xyz(X, Y, Z);
-  Vec3f rgb = transformMatrix * xyz;
-  float r = rgb[0], g = rgb[1], b = rgb[2], R, G, B;
-
-  //convert linear RGB values to vanilla RGB
-  R = (float)(r <= 0.0031308)?r * 12.92:pow(r, 1.0 / 2.4) * 1.055  - 0.055;
-  G = (float)(g <= 0.0031308)?g * 12.92:pow(g, 1.0 / 2.4) * 1.055  - 0.055;
-  B = (float)(b <= 0.0031308)?b * 12.92:pow(b, 1.0 / 2.4) * 1.055  - 0.055;
-  //clamp RGB values to [0, 1]
-  if(R > 1.f) R = 1.f;
-  else if(R < 0.f) R = 0.f;
-  if(G > 1.f) G = 1.f;
-  else if(G < 0.f) G = 0.f;
-  if(B > 1.f) B = 1.f;
-  else if(B < 0.f) B = 0.f;
-
-  //cout << "RGB from XYZ: {" << R << ", " << G << ", " << B << "}" << endl;
-  return RGB(R, G, B);
-}
-
-RGB Lab_to_RGB(const Lab& v){
-  /*RGB rgb(XYZ_to_RGB(Lab_to_XYZ(v)));
-  cout << "RGB from Lab: {" << rgb.r << ", " << rgb.g << ", " << rgb.b << "}" << endl;
-  return rgb;*/
-  return XYZ_to_RGB(Lab_to_XYZ(v));
-}
-
-HSV Lab_to_HSV(const Lab& v){
-  /*HSV hsv(XYZ_to_RGB(Lab_to_XYZ(v)));
-  cout << "HSV from Lab: {" << hsv.h << ", " << hsv.s << ", " << hsv.v << "}" << endl;
-  return hsv;*/
-  return HSV(XYZ_to_RGB(Lab_to_XYZ(v)));
-}
-
-Lab HCLab_to_Lab(const HCLab& v){
-  float L, a, b;
-  L = v.l * 100.0f;
-  static const float TAU = 2 * M_PI;
-  a = (v.c * 133.419f) * cos((v.h * TAU) - M_PI);
-  b = (v.c * 133.419f) * sin((v.h * TAU) - M_PI);
-  //cout << "Lab from HCLab: {" << L << ", " << a << ", " << b << "}" << endl;
-  return Lab(L, a, b);
-}
-
-RGB HCLab_to_RGB(const HCLab& v){
-  /*RGB rgb(Lab_to_RGB(HCLab_to_Lab(v)));
-  cout << "RGB from HCLab: {" << rgb.r << ", " << rgb.g << ", " << rgb.b << "}" << endl;
-  return rgb;*/
-  return Lab_to_RGB(HCLab_to_Lab(v));
-}
-
-HSV HCLab_to_HSV(const HCLab& v){
-  /*HSV hsv(Lab_to_RGB(HCLab_to_Lab(v)));
-  cout << "HSV from HCLab: {" << hsv.h << ", " << hsv.s << ", " << hsv.v << "}" << endl;
-  return hsv;*/
-  return HSV(Lab_to_RGB(HCLab_to_Lab(v)));
-}
-
-
-
-
-XYZ Luv_to_XYZ(const Luv& w){
-  float l, u, v, X, Y, Z, a, b, c, d, ur, vr;
-  float epsilon = (216.0f / 24389.0f), kappa  = (24389.0f / 27.0f);
-  // using reference white D65
-  float Xn = 0.95047f, Yn = 1.0f, Zn = 1.08883f;
-  l = w.l; u = w.u; v = w.v;
-
-  ur = (4 * Xn) / (Xn + 15 * Yn + 3 * Zn);
-  vr = (9 * Yn) / (Xn + 15 * Yn + 3 * Zn);
-
-  c = (-1.0f / 3.0f);
-  a = -c * (((52.0f * l) / (u + 13.0f * l * ur)) - 1.0f);
-
-  Y =  (float)(l > epsilon * kappa)?pow((l + 16.0) / 116.0, 3.0):l / kappa;
-  
-  b = -5.0f * Y;
-  d = Y * (((39.0f * l) / (v + 13.0f * l * vr)) - 5.0f);
-
-  X = (d - b) / (a - c);
-  Z = X * a + b;
-
-  //cout << "XYZ from Luv: {" << X << ", " << Y << ", " << Z << "}" << endl;
-  return XYZ(X, Y, Z);
-}
-
-RGB Luv_to_RGB(const Luv& w){
-  /*RGB rgb(XYZ_to_RGB(Luv_to_XYZ(w)));
-  cout << "RGB from Luv: {" << rgb.r << ", " << rgb.g << ", " << rgb.b << "}" << endl;
-  return rgb;*/
-  return XYZ_to_RGB(Luv_to_XYZ(w));
-}
-
-HSV Luv_to_HSV(const Luv& w){
-  /*HSV hsv(XYZ_to_RGB(Luv_to_XYZ(w)));
-  cout << "HSV from Luv: {" << hsv.h << ", " << hsv.s << ", " << hsv.v << "}" << endl;
-  return hsv;*/
-  return HSV(XYZ_to_RGB(Luv_to_XYZ(w)));
-}
-
-Luv HCLuv_to_Luv(const HCLuv& w){
-  float L, u, v;
-  L = w.l * 100.0f;
-  static const float TAU = 2 * M_PI;
-  u = (w.c * 178.387f) * cos((w.h * TAU) - M_PI);
-  v = (w.c * 178.387f) * sin((w.h * TAU) - M_PI);
-  //cout << "Luv from HCLuv: {" << L << ", " << u << ", " << v << "}" << endl;
-  return Luv(L, u, v);
-}
-
-RGB HCLuv_to_RGB(const HCLuv& w){
-  /*RGB rgb(Luv_to_RGB(HCLuv_to_Luv(w)));
-  cout << "RGB from HCLuv: {" << rgb.r << ", " << rgb.g << ", " << rgb.b << "}" << endl;
-  return rgb;*/
-  return Luv_to_RGB(HCLuv_to_Luv(w));
-}
-
-HSV HCLuv_to_HSV(const HCLuv& w){
-  /*HSV hsv(Luv_to_RGB(HCLuv_to_Luv(w)));
-  cout << "HSV from HCLuv: {" << hsv.h << ", " << hsv.s << ", " << hsv.v << "}" << endl;
-  return hsv;*/
-  return Luv_to_RGB(HCLuv_to_Luv(w));
-}
-  //~~~~~~~~~~~~~~~~~~~
 
 
 // Implementation --------------------------------------------------------------
@@ -1324,8 +1108,6 @@ inline Colori& Colori::operator= (const RGB& v){
 
 
 inline HSV operator * (float s, const HSV& c){ return  c*s; }
-
-
 
 
 } // al::
