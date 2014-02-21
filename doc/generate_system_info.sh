@@ -1,3 +1,4 @@
+#!/bin/sh
 echo > bug_report_system_info.txt
 system_profiler SPSoftwareDataType >> bug_report_system_info.txt
 echo "----------------------------" >> bug_report_system_info.txt

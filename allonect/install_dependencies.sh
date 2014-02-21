@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 if [ `which apt-get` ]; then
 	echo "Found apt-get"

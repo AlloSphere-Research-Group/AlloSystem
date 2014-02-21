@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # AlloUtil dependencies install script
 
 ROOT=`pwd`
