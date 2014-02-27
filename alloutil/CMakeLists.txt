@@ -124,6 +124,12 @@ if(NOT NO_EXAMPLES)
       ${LINUX_LIBS}
       ${EXAMPLE_LINUX_LIBS})
 
+    #This was necessary for export
+    set_target_properties(alloutil 
+      PROPERTIES 
+      ALLOCORE_LINK_LIBRARIES "${ALLOCORE_LINK_LIBRARIES}"
+    )
+
     include_directories(${GAMMA_INCLUDE_DIR})
 
     file(GLOB EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/*.cpp)

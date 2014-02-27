@@ -42,6 +42,10 @@
 # I'm going to attempt to cut out the middleman and hope 
 # everything still works.
 
+MESSAGE("FREETYPE BEFORE CMAKE_MODULE" ${FREETYPE_INCLUDE_DIR_ft2build})
+MESSAGE("FREETYPE2 BEFORE CMAKE_MODULE" ${FREETYPE_INCLUDE_DIR_freetype2})
+
+
 if((NOT FREETYPE_LIBRARY) OR (NOT FREETYPE_INCLUDE_DIR))
   FIND_PATH(FREETYPE_INCLUDE_DIR_ft2build ft2build.h 
     HINTS
@@ -58,7 +62,7 @@ if((NOT FREETYPE_LIBRARY) OR (NOT FREETYPE_INCLUDE_DIR))
     PATH_SUFFIXES freetype freetype2
     )
 
-  FIND_PATH(FREETYPE_INCLUDE_DIR_freetype2 config/ftheader.h 
+  FIND_PATH(FREETYPE_INCLUDE_DIR_freetype2 freetype/config/ftheader.h 
     HINTS
     $ENV{FREETYPE_DIR}/include/freetype2
     PATHS
@@ -69,7 +73,7 @@ if((NOT FREETYPE_LIBRARY) OR (NOT FREETYPE_INCLUDE_DIR))
     /sw/include
     /opt/local/include
     /usr/freeware/include
-    PATH_SUFFIXES freetype freetype2
+    PATH_SUFFIXES freetype2
     )
 
   FIND_LIBRARY(FREETYPE_LIBRARY
@@ -86,6 +90,11 @@ if((NOT FREETYPE_LIBRARY) OR (NOT FREETYPE_INCLUDE_DIR))
     )
 
   # set the user variables
+  #IF(NOT FREETYPE_INCLUDE_DIR_ft2build) 
+  MESSAGE("FREETYPE AFTER CMAKE_MODULE" ${FREETYPE_INCLUDE_DIR_ft2build})
+  MESSAGE("FREETYPE AFTER CMAKE_MODULE" ${FREETYPE_INCLUDE_DIR_freetype2})
+
+  #ENDIF(NOT FREETYPE_INCLUDE_DIR_ft2build) 
   IF(FREETYPE_INCLUDE_DIR_ft2build AND FREETYPE_INCLUDE_DIR_freetype2)
     SET(FREETYPE_INCLUDE_DIRS "${FREETYPE_INCLUDE_DIR_ft2build};${FREETYPE_INCLUDE_DIR_freetype2}")
   ENDIF(FREETYPE_INCLUDE_DIR_ft2build AND FREETYPE_INCLUDE_DIR_freetype2)

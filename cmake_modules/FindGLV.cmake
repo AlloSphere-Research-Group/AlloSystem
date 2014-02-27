@@ -20,12 +20,14 @@ find_path(GLV_INCLUDE_DIR
   PATHS ${GLV_PKGCONF_INCLUDE_DIRS} ./GLV ../GLV ../../GLV /usr/include /usr/local/include /opt/local/include
 )
 
+message("GLV INCLUDE DIR: " ${GLV_INCLUDE_DIR})
 # Finally the library itself
 find_library(GLV_LIBRARY
   NAMES GLV
   PATHS ${GLV_PKGCONF_LIBRARY_DIRS} ./GLV/build/lib ../GLV/build/lib ../../GLV/build/lib /usr/lib /usr/local/lib /opt/local/lib
 )
 
+message("GLV LIBRARY: " ${GLV_LIBRARY})
 #/usr/include/assimp
 #/usr/local/include
 #/opt/local/include/assimp
