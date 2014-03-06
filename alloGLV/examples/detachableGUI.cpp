@@ -1,5 +1,5 @@
 /*
-Allocore Example: Detachable GUI
+AlloGLV Example: Detachable GUI
 
 Description:
 This demonstrates how to create a window with a detachable GUI.

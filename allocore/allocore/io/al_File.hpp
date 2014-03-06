@@ -75,6 +75,8 @@ class FilePath;
 /// File information
 class FileInfo{
 public:
+
+	/// File types
 	enum Type{
 		NOFILE,				/**< No file type determined */
 		REG,				/**< Regular file */
@@ -121,10 +123,19 @@ public:
 	~File();
 
 
-	void close();	///< Close file
-	bool open();	///< Open file with specified i/o mode
+	/// Close file
+	void close();
 
+	/// Open file with specified i/o mode
+	bool open();
+
+	/// Set i/o mode
+	
+	/// @param[in] v	A string indicating the i/o mode.
+	///
 	File& mode(const std::string& v){ mMode=v; return *this; }
+
+	/// Set path of file
 	File& path(const std::string& v){ mPath=v; return *this; }
 
 	/// Write string to file
@@ -229,7 +240,7 @@ public:
 
 	/// Search for file or directory back from current directory
 
-	/// @param[inout] rootPath	The input should contain the path to search
+	/// @param[in,out] rootPath	The input should contain the path to search
 	///							relative to. If the input is empty, then "./" is
 	///							assumed. If a match is made, then the output is
 	///							a string that can be prefixed to 'matchPath' to 

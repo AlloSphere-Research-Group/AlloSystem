@@ -1,12 +1,14 @@
 #include "allocore/system/al_Config.h"
+
+// Note: this is a renamed version of the library header serial/serial.h
 #include "allocore/io/al_Serial.hpp"
 
 //using namespace al;
 
-#include "serial.cc"
+#include "serial/serial.cc"
 
 #ifdef AL_WINDOWS
-	#include "serial_win.cc"
+	#include "serial/win.cc"
 #else
-	#include "serial_unix.cc"
+	#include "serial/unix.cc"
 #endif

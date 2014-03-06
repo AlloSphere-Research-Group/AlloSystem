@@ -125,6 +125,7 @@ struct SphereCoord {
 	
 	/// @param[in] theta	longitudinal angle (angle from +x towards +y)
 	/// @param[in] phi		latitudinal angle (angle from +z axis)
+	/// @param[in] radius	radius
 	SphereCoord& fromAngle(const T& theta, const T& phi, const T& radius =T(1)){
 		t.fromPolar(theta);
 		p.fromPolar(radius, phi);

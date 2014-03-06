@@ -1,5 +1,5 @@
 /*!
- * \file serial/impl/unix.h
+ * \file serial/impl/windows.h
  * \author  William Woodall <wjwwood@gmail.com>
  * \author  John Harrison <ash@greaterthaninfinity.com>
  * \version 0.1
@@ -30,21 +30,23 @@
  *
  * \section DESCRIPTION
  *
- * This provides a unix based pimpl for the Serial class. This implementation is
- * based off termios.h and uses select for multiplexing the IO ports.
+ * This provides a windows implementation of the Serial class interface.
  *
  */
 
-#ifndef SERIAL_IMPL_UNIX_H
-#define SERIAL_IMPL_UNIX_H
+#if defined(_WIN32)
+
+#ifndef SERIAL_IMPL_WINDOWS_H
+#define SERIAL_IMPL_WINDOWS_H
 
 #include "serial/serial.h"
 
-#include <pthread.h>
+#include "windows.h"
 
 namespace serial {
 
 using std::string;
+using std::wstring;
 using std::invalid_argument;
 
 using serial::SerialException;
@@ -173,14 +175,12 @@ protected:
   void reconfigurePort ();
 
 private:
-  string port_;               // Path to the file descriptor
-  int fd_;                    // The current file descriptor
+  wstring port_;               // Path to the file descriptor
+  HANDLE fd_;
 
   bool is_open_;
-  bool xonxoff_;
-  bool rtscts_;
 
-  Timeout timeout_;         // Timeout for read operations
+  Timeout timeout_;           // Timeout for read operations
   unsigned long baudrate_;    // Baudrate
 
   parity_t parity_;           // Parity
@@ -189,11 +189,13 @@ private:
   flowcontrol_t flowcontrol_; // Flow Control
 
   // Mutex used to lock the read functions
-  pthread_mutex_t read_mutex;
+  HANDLE read_mutex;
   // Mutex used to lock the write functions
-  pthread_mutex_t write_mutex;
+  HANDLE write_mutex;
 };
 
 }
 
-#endif // SERIAL_IMPL_UNIX_H
+#endif // SERIAL_IMPL_WINDOWS_H
+
+#endif // if defined(_WIN32)

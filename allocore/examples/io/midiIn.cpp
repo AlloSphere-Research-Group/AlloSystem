@@ -76,7 +76,7 @@ int main(){
 	MIDIIn midiIn;
 	
 	// Check available ports vs. specified
-	unsigned portToOpen = 1;
+	unsigned portToOpen = 0;
 	unsigned numPorts = midiIn.getPortCount();
 
 	if(portToOpen >= numPorts){

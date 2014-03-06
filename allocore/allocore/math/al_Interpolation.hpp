@@ -184,7 +184,7 @@ inline Tv trilinear(
 
 /// Trilinear interpolation between values on corners of a hexahedron
 
-/// @param[in] frac		array-indexable 3-vector of fractions along x, y, and z
+/// @param[in] f		3 element array of fractions along x, y, and z
 ///
 template <class Tf3, class Tv>
 inline Tv trilinear(

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <algorithm> // for std::swap
 #include "allocore/system/al_Config.h"
 #include "allocore/system/al_Thread.hpp"
 
@@ -20,14 +21,14 @@ namespace al {
 struct Thread::Impl{
 	Impl()
 	:	mHandle(0)
-	{
+	{ //printf("Thread::Impl(): %p\n", this);
 		pthread_attr_init(&mAttr);
 		
 		// threads are not required to be joinable by default, so make it so
 		pthread_attr_setdetachstate(&mAttr, PTHREAD_CREATE_JOINABLE);
 	}
 
-	~Impl(){
+	~Impl(){ //printf("Thread::~Impl(): %p\n", this);
 		pthread_attr_destroy(&mAttr);
 	}
 
@@ -149,19 +150,24 @@ struct Thread::Impl{
 
 
 Thread::Thread()
-:	mImpl(new Impl()), mJoinOnDestroy(false)
+:	mImpl(new Impl), mJoinOnDestroy(false)
 {}
 
 Thread::Thread(ThreadFunction& func)
-:	mImpl(new Impl()), mJoinOnDestroy(false)
+:	mImpl(new Impl), mJoinOnDestroy(false)
 {
 	start(func);
 }
 
 Thread::Thread(void * (*cThreadFunc)(void * userData), void * userData)
-:	mImpl(new Impl()), mJoinOnDestroy(false)
+:	mImpl(new Impl), mJoinOnDestroy(false)
 {
 	start(cThreadFunc, userData);
+}
+
+Thread::Thread(const Thread& other)
+:	mImpl(new Impl), mCFunc(other.mCFunc), mJoinOnDestroy(other.mJoinOnDestroy)
+{
 }
 
 Thread::~Thread(){
@@ -169,6 +175,34 @@ Thread::~Thread(){
 	delete mImpl;
 }
 
+
+void swap(Thread& a, Thread& b){
+	using std::swap;
+	swap(a.mImpl, b.mImpl);
+	swap(a.mCFunc, b.mCFunc);
+	swap(a.mJoinOnDestroy, b.mJoinOnDestroy);
+}
+
+Thread& Thread::operator= (Thread other){
+	swap(*this, other);
+	return *this;
+}
+
+/*Thread& Thread::operator= (const Thread& other){
+//printf("Thread::operator=\n");
+	if(this != &other){
+		//join();
+		// delete Impl only if we are sure we are the owner
+		if(mImpl != other.mImpl) delete mImpl;
+		
+		// always construct a new Impl
+		mImpl = new Impl;
+
+		mCFunc = other.mCFunc;
+		mJoinOnDestroy = other.mJoinOnDestroy;
+	}
+	return *this;
+}*/
 
 Thread& Thread::priority(int v){
 	mImpl->priority(v);

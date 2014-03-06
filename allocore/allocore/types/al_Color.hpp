@@ -228,13 +228,13 @@ struct Colori {
 	/// @param[in] c			RGBA color to convert from
 	Colori(const Color& c){ *this = c; }
 
-	/// @param[in] hsv			HSV value
+	/// @param[in] hsv			HSV color
 	/// @param[in] a			alpha component
 	Colori(const HSV& hsv, uint8_t a=255)
 	:	a(a)
 	{	*this = hsv; }
 
-	/// @param[in] hsv			HSV value
+	/// @param[in] rgb			RGB color
 	/// @param[in] a			alpha component
 	Colori(const RGB& rgb, uint8_t a=255)
 	:	a(a)

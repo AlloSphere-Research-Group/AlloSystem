@@ -106,13 +106,33 @@ inline int addWireBox(Mesh& m, float size=1){ return addWireBox(m,size,size,size
 /// Add a tessellated rectangular surface as triangle strip vertices and indices
 
 /// @param[in,out]	m		mesh to add vertices and indices to
-/// @param[in]		dimX	number of vertices along x
-/// @param[in]		dimY	number of vertices along y
+/// @param[in]		Nx		number of vertices along x
+/// @param[in]		Ny		number of vertices along y
 /// @param[in]		width	total width (along x)
 /// @param[in]		height	total height (along y)
 /// \returns number of vertices added
-int addSurface(Mesh& m, int dimX, int dimY, float width=2, float height=2);
+int addSurface(Mesh& m, int Nx, int Ny, float width=2, float height=2);
 
+
+/// Add a tessellated rectangular surface with connected edges
+
+/// This adds a rectangular surface whose edges are connected. The resulting
+/// surface is suitable for warping into cylindrical or toroidal shapes.
+/// Given D as the width or height, the interval of position values along a
+/// particular dimension is closed-opened, [-D/2, D/2), if that dimension loops
+/// or closed, [-D/2, D/2], if that dimension does not loop.
+/// The drawing primitive is assumed to be a triangle strip.
+///
+/// @param[in,out]	m	mesh to add vertices and indices to
+/// @param[in] Nx		number of vertices along x
+/// @param[in] Ny		number of vertices along y
+/// @param[in] loopMode	1: connect edges perpendicular to x (cylindrical),
+///						2: connect edges perpendicular to x and y (toroidal)
+/// @param[in] width	total width (along x)
+/// @param[in] height	total height (along y)
+///
+/// \returns number of vertices added
+int addSurfaceLoop(Mesh& m, int Nx, int Ny, int loopMode, float width=2, float height=2);
 
 } // al::
 

@@ -9,7 +9,7 @@ int utFile() {
 	//assert(File::exists("." DELIM)); // fails under win32
 
 	assert(File::isDirectory("."));
-	assert(File::isDirectory(".." DELIM));
+	assert(File::isDirectory(".." ));
 	assert(!File::isDirectory(".." DELIM ".." DELIM "Makefile"));
 
 	assert(

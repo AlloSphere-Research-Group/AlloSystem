@@ -105,9 +105,10 @@ public:
 	}
 
 	/// Calculate required fovy to produce a specific fovx
-	/// @param[fovx] field-of-view in X axis to recreate
-	/// @param[aspect] aspect ratio of viewport
-	/// @return field-of-view in Y axis, usable by Lens.fovy() 
+
+	/// @param[in] fovx		field-of-view in X axis to recreate
+	/// @param[in] aspect	aspect ratio of viewport
+	/// @return field-of-view in Y axis, usable by Lens::fovy() 
 	static double getFovyForFovX(double fovx, double aspect) {
 		double farW = tan(0.5*fovx*M_DEG2RAD);
 		return 2.*M_RAD2DEG*atan(farW/aspect);

@@ -1,8 +1,8 @@
 /*
-Allocore Example: Simple GUI
+AlloGLV Example: Simple GUI
 
 Description:
-The example demonstrates how to add a GUI (using GLV) to your application.
+The example demonstrates how to add a GLV GUI to an al::Window.
 
 Author:
 Lance Putnam, 4/25/2011
@@ -42,5 +42,4 @@ int main(){
 	win.create(Window::Dim(600,400), "Simple GUI");
 
 	MainLoop::start();
-	return 0;
 }

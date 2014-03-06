@@ -431,4 +431,39 @@ int addSurface(Mesh& m, int Nx, int Ny, float width, float height){
 }
 
 
+int addSurfaceLoop(Mesh& m, int Nx, int Ny, int loopMode, float width, float height){
+
+	int Nv = m.vertices().size();
+
+	// Number of cells along y
+	int My = loopMode==1 ? Ny - 1 : Ny;
+
+	// Generate positions
+	for(int j=0; j<Ny; ++j){ float y=(float(j)/My - 0.5f) * height;
+		for(int i=0; i<Nx; ++i){ float x=(float(i)/Nx - 0.5f) * width;
+			m.vertex(x, y);
+		}
+	}
+
+	// Generate indices
+	// The first and last indices are duplicated to create degenerate triangles.
+	m.index(Nv);
+
+	for(int j=0; j<My; ++j){
+		int j1 = j*Nx + Nv;
+		int j2 = ((j+1)%Ny)*Nx + Nv;
+		for(int i=0; i<Nx; ++i){
+			m.index(j1 + i);
+			m.index(j2 + i);
+		}
+		m.index(j1);
+		m.index(j2);
+	}
+
+	m.index(m.indices().last());
+
+	return Nx*Ny;
+}
+
+
 }
