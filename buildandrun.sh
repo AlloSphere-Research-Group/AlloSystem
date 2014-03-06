@@ -1,4 +1,4 @@
-
+#! /bin/sh
 
 ALLOVSR_BUILD=0
 if [[ $FILENAME == allovsr* ]]
