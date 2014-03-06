@@ -47,6 +47,7 @@ set(ALLOCORE_SRC src/graphics/al_Asset.cpp
   src/system/al_Time.cpp
   src/system/al_Watcher.cpp
   src/types/al_Array.cpp
+  src/types/al_Array_C.c
   src/types/al_Color.cpp
   src/types/al_MsgQueue.cpp)
 
