@@ -125,20 +125,22 @@ Coming soon...
 
 Allosystem offers an easy way to try out examples and build simple projects without having to write makefiles or configure IDE projects. Any .cpp file placed within the examples folder (of AlloSystem and the submodules) will be built into an application with a line like:
 
-    ./buildandrun.sh allocore/examples/graphics/shaderSprites.cpp 
+    ./run.sh allocore/examples/graphics/shaderSprites.cpp 
 
 This will also build any required dependencies and run cmake if needed.
 
-Note that you will have to run cmake if you want to use alloGLV or allovsr, as they are not part of the default build.
+Note that you will have to run cmake first (as decribed above) if you want to use alloGLV or allovsr, as they are not part of the default build.
 
 4. Installing Allosystem
 ----------------------------------------
+
+You can install the AlloSystem libraries and headers, which will allow CMake AlloSystem projects to use it instead of having to include all the AlloSystem sources in your project.
 
 Using cmake configured for Makefiles, you will be able to install all of Allosystem with headers by doing:
 
 	sudo make install
 
-You can specify a different install path by doing (to install in /opt/local):
+You can specify a different install path by doing (e.g. to install in /opt/local):
 
 	./distclean
 	cmake -DCMAKE_INSTALL_PREFIX:PATH=/opt/local .
