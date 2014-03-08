@@ -53,7 +53,7 @@ else()
 endif(TARGET Gamma)
 
 if(TARGET GLV)
-  set(GLV_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/GLV/GLV)
+  set(GLV_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/GLV)
   get_target_property(GLV_LIBRARY GLV LOCATION)
   add_dependencies(${APP_NAME} GLV)
 else()
