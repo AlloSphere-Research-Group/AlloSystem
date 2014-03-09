@@ -25,6 +25,7 @@ endif(APPLE)
 
 if(EXISTS "${SOURCE_DIR}/flags.txt")
   file(READ "${SOURCE_DIR}/flags.txt" EXTRA_COMPILER_FLAGS)
+  STRING(REGEX REPLACE "[\r\n]" " " EXTRA_COMPILER_FLAGS "${EXTRA_COMPILER_FLAGS}")
   set_target_properties(${APP_NAME} PROPERTIES
     COMPILE_FLAGS "${EXTRA_COMPILER_FLAGS}")
   message("WARNING: Using additional flags from ${SOURCE_DIR}/flags.txt: ${EXTRA_COMPILER_FLAGS}")
