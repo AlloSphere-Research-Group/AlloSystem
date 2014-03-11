@@ -121,6 +121,9 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set(EXAMPLE_LINUX_LIBS asound)
   add_definitions(-DAL_LINUX)
 
+  # For clock_gettime, etc.
+  set(LINUX_LIBS ${LINUX_LIBS} rt)
+
   find_package(Threads)
   set(LINUX_LIBS ${LINUX_LIBS} avahi-common avahi-client ${CMAKE_THREAD_LIBS_INIT})
   # For HID
@@ -193,6 +196,7 @@ if(NOT NO_EXAMPLES)
     if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/examples/${dir}/flags.txt)
       file(READ ${CMAKE_CURRENT_SOURCE_DIR}/examples/${dir}/flags.txt EXTRA_COMPILER_FLAGS)
       message("WARNING: Using additional flags from /examples/${dir}/flags.txt: " ${EXTRA_COMPILER_FLAGS})
+      STRING(REGEX REPLACE "[\r\n]" " " EXTRA_COMPILER_FLAGS "${EXTRA_COMPILER_FLAGS}")
     endif()
       get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
       if (ALLOSYSTEM_BUILD)
