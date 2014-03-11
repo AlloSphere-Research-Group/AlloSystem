@@ -69,6 +69,8 @@ This will download and install all the AlloCore dependencies using apt-get, MacP
 2.2 Building Allosystem (Using Make on Linux, OS X and MSYS on Windows)
 ----------------------------------------
 
+*Note:* You can skip this section if you are just planning on running applications and projects. See section 3 below.
+
 You need to use cmake to configure the build for your system. You can build Allocore like this: 
 
 	./distclean
@@ -123,13 +125,13 @@ Coming soon...
 3. Running examples and projects
 ---
 
-Allosystem offers an easy way to try out examples and build simple projects without having to write makefiles or configure IDE projects. Any .cpp file placed within the examples folder (of AlloSystem and the submodules) will be built into an application with a line like:
+Allosystem offers an easy way to try out examples and build simple projects without having to write makefiles or configure IDE projects. Any .cpp file placed within the AlloSystem sources can be built into an application with a line like:
 
     ./run.sh allocore/examples/graphics/shaderSprites.cpp 
 
 This will also build any required dependencies and run cmake if needed.
 
-Note that you will have to run cmake first (as decribed above) if you want to use alloGLV or allovsr, as they are not part of the default build.
+You can also pass a directory, and all the source files in that directory will be built into a single application.
 
 4. Installing Allosystem
 ----------------------------------------
