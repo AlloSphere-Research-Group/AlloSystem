@@ -34,6 +34,8 @@ The build folder (typically ./build/) is organized using a Unix-style hierarchy 
 2. Compilation Instructions
 ========================================
 
+*Note:* You can skip this section if you are just planning on running applications and projects. See section 3 below.
+
 2.1 Installing Dependencies
 ----------------------------------------
 
@@ -68,8 +70,6 @@ This will download and install all the AlloCore dependencies using apt-get, MacP
 
 2.2 Building Allosystem (Using Make on Linux, OS X and MSYS on Windows)
 ----------------------------------------
-
-*Note:* You can skip this section if you are just planning on running applications and projects. See section 3 below.
 
 You need to use cmake to configure the build for your system. You can build Allocore like this: 
 
