@@ -42,45 +42,45 @@ add_dependencies(${APP_NAME} allocore)
 
 message("Using allocore headers from: ${ALLOCORE_INCLUDE_DIR}")
 
-if(TARGET Gamma)
+if(BUILDING_GAMMA)
   set(GAMMA_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/Gamma)
   get_target_property(GAMMA_LIBRARY Gamma LOCATION)
   add_dependencies(${APP_NAME} Gamma)
 else()
-  if(NOT GAMMA_LIBRARY)
+  if(NOT GAMMA_FOUND)
     set(GAMMA_LIBRARY "")
     set(GAMMA_INCLUDE_DIR "")
     message("Not building GAMMA and no usable GAMMA binary found. Not linking application to GAMMA")
-  endif(NOT GAMMA_LIBRARY)  
-endif(TARGET Gamma)
+  endif(NOT GAMMA_FOUND)  
+endif(BUILDING_GAMMA)
 
-if(TARGET GLV)
+if(BUILDING_GLV)
   set(GLV_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/GLV)
   get_target_property(GLV_LIBRARY GLV LOCATION)
   add_dependencies(${APP_NAME} GLV)
 else()
-  if(NOT GLV_LIBRARY)
+  if(NOT GLV_FOUND)
     set(GLV_LIBRARY "")
     set(GLV_INCLUDE_DIR "")
     message("Not building GLV and no usable GLV binary found. Not linking application to GLV")
-  endif(NOT GLV_LIBRARY)  
-endif(TARGET GLV)
+  endif(NOT GLV_FOUND)  
+endif(BUILDING_GLV)
 
-if(TARGET VSR)
-  if(TARGET ALLOVSR)
+if(BUILDING_VSR)
+  if(BUILDING_ALLOVSR)
     set(VSR_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/vsr)
     set_target_properties(vsr PROPERTIES GLV_INCLUDE_DIR "${GLV_RELATIVE_DIR}"
-      GLV_LIBRARY "${GLV_LIBRARY}")
+      GLV_LIBRARIES "${GLV_LIBRARIES}")
     get_target_property(VSR_LIBRARY vsr LOCATION)
   add_dependencies(${APP_NAME} vsr)
-  endif(TARGET ALLOVSR)
+  endif(BUILDING_ALLOVSR)
 else()
-  if(NOT VSR_LIBRARY)
+  if(NOT VSR_FOUND)
     set(VSR_LIBRARY "")
     set(VSR_INCLUDE_DIR "")
     message("Not building VSR and no usable VSR binary found. Not linking application to VSR")
-  endif(NOT VSR_LIBRARY) 
-endif(TARGET VSR)
+  endif(NOT VSR_FOUND) 
+endif(BUILDING_VSR)
 
 if(TARGET alloutil)
   get_target_property(ALLOUTIL_LIBRARY alloutil LOCATION)
@@ -88,11 +88,11 @@ if(TARGET alloutil)
   get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil ALLOUTIL_LINK_LIBRARIES)
   add_dependencies(${APP_NAME} alloutil)
 else()
-  if(NOT ALLOUTIL_LIBRARY)
+  if(NOT ALLOUTIL_FOUND)
     set(ALLOUTIL_LIBRARY "")
     set(ALLOUTIL_INCLUDE_DIR "")
     message("Not building ALLOUTIL and no usable ALLOUTIL binary found. Not linking application to ALLOUTIL")
-  endif(NOT ALLOUTIL_LIBRARY) 
+  endif(NOT ALLOUTIL_FOUND) 
 endif(TARGET alloutil)
 
 if(TARGET alloGLV)
@@ -101,11 +101,11 @@ if(TARGET alloGLV)
   get_target_property(ALLOGLV_LINK_LIBRARIES alloGLV ALLOGLV_LINK_LIBRARIES)
   add_dependencies(${APP_NAME} alloGLV)
 else()
-  if(NOT ALLOGLV_LIBRARY)
+  if(NOT ALLOGLV_FOUND)
     set(ALLOGLV_LIBRARY "")
     set(ALLOGLV_INCLUDE_DIR "")
     message("Not building alloGLV and no usable alloGLV binary found. Not linking application to alloGLV")
-  endif(NOT ALLOGLV_LIBRARY) 
+  endif(NOT ALLOGLV_FOUND) 
 endif(TARGET alloGLV)
 
 
@@ -116,6 +116,7 @@ endif(TARGET alloGLV)
 include_directories(${ALLOCORE_INCLUDE_DIR}
   ${ALLOUTIL_INCLUDE_DIR}
   ${ALLOGLV_INCLUDE_DIR}
+  ${GLV_INCLUDE_DIR}
   ${ALLOVSR_INCLUDE_DIR}
   ${GAMMA_INCLUDE_DIR} )
 #    message("Gamma : ${GAMMA_INCLUDE_DIRs}")
@@ -123,7 +124,7 @@ target_link_libraries(${APP_NAME}
   ${ALLOCORE_LIBRARY} 
   ${ALLOUTIL_LIBRARY} 
   ${ALLOGLV_LIBRARY}
-  ${GAMMA_LIBRARY} ${GLV_LIBRARY} ${VSR_LIBRARY}
+  ${GAMMA_LIBRARY} ${GLV_LIBRARIES} ${VSR_LIBRARY}
   ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOGLV_LINK_LIBRARIES})
 #list(REMOVE_ITEM PROJECT_RES_FILES ${ALLOPROJECT_APP_SRC})
 add_custom_target("${APP_NAME}_run"
