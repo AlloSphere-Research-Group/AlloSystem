@@ -49,8 +49,8 @@ namespace al{
 	Error handling utility
 */
 static apr_status_t check_apr(apr_status_t err) {
-	char errstr[1024];
 	if (err != APR_SUCCESS) {
+		char errstr[256];
 		apr_strerror(err, errstr, sizeof(errstr));
 		fprintf(stderr, "%s\n", errstr);
 	}
