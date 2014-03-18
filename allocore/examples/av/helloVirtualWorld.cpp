@@ -103,25 +103,15 @@ struct Agent : public SoundSource, public Nav, public Drawable{
 };
 
 
+#define AUDIO_BLOCK_SIZE 256
+
+//AudioScene scene(2, 1, AUDIO_BLOCK_SIZE);
+AudioScene scene(AUDIO_BLOCK_SIZE);
 Listener * listener;
 Nav navMaster(Vec3d(0,0,-4), 0.95);
 std::vector<Agent> agents(1);
 Stereographic stereo;
-#define AUDIO_BLOCK_SIZE 256
 
-
-//AudioScene scene(2, 1, AUDIO_BLOCK_SIZE);
-AudioScene scene(AUDIO_BLOCK_SIZE);
-const int numSpeakers = 2;
-Speaker speakers[] = {
-	Speaker(0,  45,0),
-	Speaker(1, -45,0),
-};
-
-AmbisonicsSpatializer *ambisonics;
-Dbap *dbap;
-
-SpeakerLayout speakerLayout;
 
 void audioCB(AudioIOData& io){
     
@@ -186,30 +176,28 @@ struct MyWindow : public Window, public Drawable{
 };
 
 
-int main (int argc, char * argv[]){
-
-    ambisonics = new AmbisonicsSpatializer(2, 1, numSpeakers);
-    //dbap = new Dbap();
-    
+int main (int argc, char * argv[])
+{
+    // Set speaker layout
+    const int numSpeakers = 2;
+    Speaker speakers[] = {
+        Speaker(0,  45,0),
+        Speaker(1, -45,0),
+    };
+    SpeakerLayout speakerLayout;
     speakerLayout.addSpeaker(speakers[0]);
     speakerLayout.addSpeaker(speakers[1]);
-    
+
+    // Create spatializer
+    AmbisonicsSpatializer *ambisonics = new AmbisonicsSpatializer(2, 1, numSpeakers);
+//    Dbap *dbap;
+//    dbap = new Dbap();
+
+	// Create listener to render audio
 	listener = scene.createListener(speakerLayout, ambisonics);
     //listener = scene.createListener(speakerLayout, dbap);
-
-    
-    /*
-	listener->numSpeakers(numSpeakers);
-	for(int i=0; i<numSpeakers; ++i){
-		listener->speakerPos(
-			i,
-			speakers[i].deviceChannel,
-			speakers[i].azimuth,
-			speakers[i].elevation
-		);
-	}
-     */
 	
+	// Now do some visuals
 	for(unsigned i=0; i<agents.size(); ++i) scene.addSource(agents[i]);
 
 	MyWindow windows[6];
