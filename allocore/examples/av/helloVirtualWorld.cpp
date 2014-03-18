@@ -125,9 +125,6 @@ SpeakerLayout speakerLayout;
 
 void audioCB(AudioIOData& io){
     
-
-	int numFrames = io.framesPerBuffer();
-
 	for(unsigned i=0; i<agents.size(); ++i){
 		io.frame(0);
 		agents[i].onUpdateNav();
@@ -135,7 +132,6 @@ void audioCB(AudioIOData& io){
 	}
 
 	navMaster.step(0.5);
-     
      
 	listener->pose(navMaster);
 
@@ -188,11 +184,13 @@ struct MyWindow : public Window, public Drawable{
 
 int main (int argc, char * argv[]){
 
-    ambisonics = new AmbisonicsSpatializer(2, 1, numSpeakers);
+    ambisonics = new AmbisonicsSpatializer(2, 1, numSpeakers); //TODO replace numSpeakers with speaker layout
     //dbap = new Dbap();
     
     speakerLayout.addSpeaker(speakers[0]);
     speakerLayout.addSpeaker(speakers[1]);
+    
+    //TODO spatializer should take speaker layout in constructor - listener doest need it
     
 	listener = scene.createListener(speakerLayout, ambisonics);
     //listener = scene.createListener(speakerLayout, dbap);
