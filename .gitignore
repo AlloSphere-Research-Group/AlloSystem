@@ -1,4 +1,7 @@
 build/
+examples/allo*
+osx/allo.build/
+Makefile.user
 xcuserdata
 doxygen_objdb_*
 .DS_Store

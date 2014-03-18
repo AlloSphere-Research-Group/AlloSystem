@@ -155,7 +155,10 @@ public:
 	/// triangles only, face normals are generated if no indices are present.
 	/// This will replace any normals currently in use.
 	///
-	/// @param[in] normalize	whether to normalize normals
+	/// @param[in] normalize			whether to normalize normals
+	/// @param[in] equalWeightPerFace	whether to use an equal weighting of
+	///									face normals rather than a weighting
+	///									based on face areas
 	void generateNormals(bool normalize=true, bool equalWeightPerFace=false);
 	
 	/// Invert direction of normals

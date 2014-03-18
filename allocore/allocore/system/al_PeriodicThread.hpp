@@ -1,7 +1,7 @@
-#ifndef INCLUDE_AL_OPENCV_HPP
-#define INCLUDE_AL_OPENCV_HPP
+#ifndef INCLUDE_AL_PERIODIC_THREAD_HPP
+#define INCLUDE_AL_PERIODIC_THREAD_HPP
 
-/*	AlloSystem --
+/*	Allocore --
 	Multimedia / virtual environment application class library
 	
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
@@ -36,48 +36,59 @@
 
 
 	File description:
-	al::Array <-> OpenCV Mat conversion
+	Thread that calls a function periodically
 
 	File author(s):
-	Graham Wakefield, 2010, grrrwaaa@gmail.com
 	Lance Putnam, 2013, putnam.lance@gmail.com
 */
 
-#include <opencv2/opencv.hpp>
-#include "allocore/types/al_Array.hpp"
+#include "allocore/system/al_Thread.hpp"
+#include "allocore/system/al_Time.hpp"
 
 namespace al{
 
-/// Create an Array from an OpenCV Mat
+/// Thread that calls a function periodically
 
-/// @param[in] arr			Destination array
-/// @param[in] mat			Source OpenCV matrix
-/// @param[in] copyPolicy	Policy on copying data:
-///							 1 = copy data with same row order (default),
-///							-1 = copy data with rows flipped.
-/// @param[in] rowByteAlign	row byte alignment (1, 2, 4, or 8)
-void fromCV(Array& arr, const cv::Mat& mat, int copyPolicy=1, int rowByteAlign=1);
+/// The sleep time is dynamically adjusted based on the time taken by the 
+/// user-supplied thread function. This prevents drift that would occur in a 
+/// more simplistic implementation using a fixed sleep interval.
+class PeriodicThread : public Thread{
+public:
 
-/// Fill in an Array header from an OpenCV Mat
+	/// @param[in] periodSec	calling period in seconds
+	PeriodicThread(double periodSec=1);
 
-/// @param[in] hdr			Destination array header
-/// @param[in] mat			Source OpenCV matrix
-/// @param[in] rowByteAlign	row byte alignment (1, 2, 4, or 8)
-void fromCV(AlloArrayHeader& hdr, const cv::Mat& mat, int rowByteAlign=1);
+	/// Copy constructor
+	PeriodicThread(const PeriodicThread& other);
 
 
-// Sets the AlloTy and components fields in an AlloArrayHeader
-void fromCV(AlloArrayHeader& hdr, int CV_TYPE);
+	/// Set period, in seconds
+	PeriodicThread& period(double sec);
+
+	/// Get period, in seconds
+	double period() const;
+
+	/// Start calling the supplied function periodically
+	void start(ThreadFunction& func);
+	
+	/// Stop the thread
+	void stop();
 
 
-/// Converts an AlloTy type and component count into an OpenCV type flag:
-int toCV(AlloTy type, uint8_t components);
+	// Stuff for assignment
+	friend void swap(PeriodicThread& a, PeriodicThread& b);
+	PeriodicThread& operator= (PeriodicThread other);
 
-/// Creates a cv::Mat which directly uses an Array's data (no copying)
+private:
+	static void * sPeriodicFunc(void * userData);
+	void go();
 
-/// This implies that no memory management will be performed by OpenCV.
-/// To copy the data (to persist beyond the Array), call clone() on the result.
-inline CvMat toCV(const Array& arr);
+	al_nsec mPeriod;
+	al_nsec mTimeCurr, mTimePrev;	// time measurements between frames
+	al_nsec mWait;					// actual time to sleep between frames
+	ThreadFunction * mUserFunc;
+	bool mRun;
+};
 
 } // al::
 

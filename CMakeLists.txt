@@ -33,12 +33,21 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake_mo
 if(BUILD_GAMMA)
   set(GAMMA_RELATIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../Gamma)
   if(EXISTS "${GAMMA_RELATIVE_DIR}" AND IS_DIRECTORY "${GAMMA_RELATIVE_DIR}")
-    message("Allosystem: GAMMA sources found. Building Gamma.")
-    set(BUILDING_GAMMA 1)
-    add_subdirectory(${GAMMA_RELATIVE_DIR} ${GAMMA_RELATIVE_DIR}/AlloSystem-build)
-    set(GAMMA_INCLUDE_DIR ${GAMMA_RELATIVE_DIR})
-    get_target_property(GAMMA_LIBRARY Gamma LOCATION)
+    if (EXISTS "${GAMMA_RELATIVE_DIR}/CMakeLists.txt")
+      message("Allosystem: GAMMA sources with CMakeLists found. Building Gamma.")
+      set(BUILDING_GAMMA 1)
+      add_subdirectory(${GAMMA_RELATIVE_DIR} ${GAMMA_RELATIVE_DIR}/AlloSystem-build)
+      set(GAMMA_INCLUDE_DIR ${GAMMA_RELATIVE_DIR})
+      get_target_property(GAMMA_LIBRARY Gamma LOCATION)
     else()
+      execute_process(COMMAND make WORKING_DIRECTORY "${GAMMA_RELATIVE_DIR}"
+        RESULT_VARIABLE make_result)
+      if (NOT make_result EQUAL 0)
+	message(FATAL_ERROR "Allosystem: Gamma make failed. Can't build Gamma. Try setting BUILD_GLV to 0.")
+      endif(NOT make_result EQUAL 0)
+      find_package(Gamma)
+    endif()
+  else()
     message(FATAL_ERROR "Allosystem: Gamma sources NOT found. Can't build Gamma.")
   endif()
 else()
@@ -49,11 +58,20 @@ endif(BUILD_GAMMA)
 if(BUILD_GLV)
   set(GLV_RELATIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../GLV)
   if(EXISTS "${GLV_RELATIVE_DIR}" AND IS_DIRECTORY "${GLV_RELATIVE_DIR}")
-    message("Allosystem: GLV sources found. Building GLV.")
-    set(BUILDING_GLV 1)
-    add_subdirectory(${GLV_RELATIVE_DIR} ${GLV_RELATIVE_DIR}/AlloSystem-build)
-    set(GLV_INCLUDE_DIR ${GLV_RELATIVE_DIR})
-    get_target_property(GLV_LIBRARY GLV LOCATION)
+    if (EXISTS "${GLV_RELATIVE_DIR}/CMakeLists.txt")
+      message("Allosystem: GLV sources with CMakeLists.txt found. Building GLV.")
+      set(BUILDING_GLV 1)
+      add_subdirectory(${GLV_RELATIVE_DIR} ${GLV_RELATIVE_DIR}/AlloSystem-build)
+      set(GLV_INCLUDE_DIR ${GLV_RELATIVE_DIR})
+      get_target_property(GLV_LIBRARY GLV LOCATION)
+    else()
+      execute_process(COMMAND make WORKING_DIRECTORY "${GLV_RELATIVE_DIR}"
+        RESULT_VARIABLE make_result)
+      if (NOT make_result EQUAL 0)
+	message(FATAL_ERROR "Allosystem: GLV make failed. Can't build GLV. Try setting BUILD_GLV to 0.")
+      endif(NOT make_result EQUAL 0)
+      find_package(GLV) # To find built GLV
+    endif()
   else()
     message(FATAL_ERROR "Allosystem: GLV sources NOT found. Can't build GLV.")
   endif()
@@ -128,6 +146,12 @@ if(BUILD_ALLOVSR OR BUILD_VSR)
   endif(VSR_LIBRARY AND GLV_LIBRARY AND ALLOGLV_LIBRARY)
 endif(BUILD_ALLOVSR OR BUILD_VSR)
 
+# Run from path
+if((BUILD_DIR) OR (BUILD_APP_FILE))
+  include(cmake_modules/CMakeRunTargets.cmake)
+  set(NO_EXAMPLES 1)
+endif((BUILD_DIR) OR (BUILD_APP_FILE))
+
 # ----------------------------  Examples
 # macro to get subdirectories
 MACRO(SUBDIRLIST result curdir)
@@ -151,7 +175,7 @@ if(NOT NO_EXAMPLES)
     if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/examples/${dir}/flags.txt)
       file(READ ${CMAKE_CURRENT_SOURCE_DIR}/examples/${dir}/flags.txt EXTRA_COMPILER_FLAGS)
       message("NOTE: Using additional flags from examples/${dir}/flags.txt: " ${EXTRA_COMPILER_FLAGS})
-      STRING(REGEX REPLACE "(\r?\n)+$" "" EXTRA_COMPILER_FLAGS "${EXTRA_COMPILER_FLAGS}")
+      STRING(REGEX REPLACE "[\r\n]" " " EXTRA_COMPILER_FLAGS "${EXTRA_COMPILER_FLAGS}")
     else()
       set(EXTRA_COMPILER_FLAGS "")
     endif()
@@ -220,72 +244,72 @@ endif(NOT NO_EXAMPLES)
 
 
 # ----------------------------  Projects
-if(NOT NO_PROJECTS)
-  find_library(Gamma REQUIRED QUIET)
-  subdirlist(PROJECT_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/projects)
-  #include root projects directory
-  list(APPEND PROJECT_DIRS ".")
-  foreach(dir ${PROJECT_DIRS})
-    file(GLOB PROJECT_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} projects/${dir}/*.cpp)
-    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/projects/${dir}/flags.txt)
-      file(READ ${CMAKE_CURRENT_SOURCE_DIR}/projects/${dir}/flags.txt EXTRA_COMPILER_FLAGS)
-      message("WARNING: Using additional flags from /projects/${dir}/flags.txt: " ${EXTRA_COMPILER_FLAGS})
-    else()
-      set(EXTRA_COMPILER_FLAGS "")
-    endif()
+# if(NOT NO_PROJECTS)
+#   find_library(Gamma REQUIRED QUIET)
+#   subdirlist(PROJECT_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/projects)
+#   #include root projects directory
+#   list(APPEND PROJECT_DIRS ".")
+#   foreach(dir ${PROJECT_DIRS})
+#     file(GLOB PROJECT_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} projects/${dir}/*.cpp)
+#     if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/projects/${dir}/flags.txt)
+#       file(READ ${CMAKE_CURRENT_SOURCE_DIR}/projects/${dir}/flags.txt EXTRA_COMPILER_FLAGS)
+#       message("WARNING: Using additional flags from /projects/${dir}/flags.txt: " ${EXTRA_COMPILER_FLAGS})
+#     else()
+#       set(EXTRA_COMPILER_FLAGS "")
+#     endif()
 
-    # Get a list of all files, later remove all .cpp and .h and you're left with the resources to copy
-    file(GLOB PROJECT_RES_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} projects/${dir}/*)
+#     # Get a list of all files, later remove all .cpp and .h and you're left with the resources to copy
+#     file(GLOB PROJECT_RES_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} projects/${dir}/*)
 
-    foreach(project_src ${PROJECT_FILES})
-      get_filename_component(PROJECT_NAME ${project_src} NAME_WE) # Get name w/o extension
-      set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/projects/${dir})
+#     foreach(project_src ${PROJECT_FILES})
+#       get_filename_component(PROJECT_NAME ${project_src} NAME_WE) # Get name w/o extension
+#       set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/projects/${dir})
 
-      if ("${dir}" STREQUAL ".")
-	set(PROJECT_TARGET projects_${PROJECT_NAME})
-      else()
-	set(PROJECT_TARGET projects_${dir}_${PROJECT_NAME})
-      endif()
-      message("Adding target for project: ${project_src}")
-      add_executable(${PROJECT_TARGET} EXCLUDE_FROM_ALL ${project_src})
-      set_target_properties(${EXAMPLE_TARGET} PROPERTIES
-	COMPILE_FLAGS "${EXTRA_COMPILER_FLAGS}")
-      include_directories(${CMAKE_CURRENT_SOURCE_DIR}/allocore/
-        ${CMAKE_CURRENT_SOURCE_DIR}/alloutil/
-        ${CMAKE_CURRENT_SOURCE_DIR}/alloGLV/
-        ${CMAKE_CURRENT_SOURCE_DIR}/allovsr/
-        ${GAMMA_INCLUDE_DIRs} )
-      #    message("Gamma : ${GAMMA_INCLUDE_DIRs}")
-      target_link_libraries(${PROJECT_TARGET}
-	${ALLOCORE_LIBRARY} ${ALLOUTIL_LIBRARY} ${GAMMA_LIBRARIE}S
-        ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LINK_LIBRARIES})
-      if(APPLE)
-	set_target_properties(${PROJECT_TARGET} PROPERTIES
-	  COMPILE_FLAGS "-pagezero_size 10000 -image_base 100000000")
-      endif(APPLE)
+#       if ("${dir}" STREQUAL ".")
+# 	set(PROJECT_TARGET projects_${PROJECT_NAME})
+#       else()
+# 	set(PROJECT_TARGET projects_${dir}_${PROJECT_NAME})
+#       endif()
+#       message("Adding target for project: ${project_src}")
+#       add_executable(${PROJECT_TARGET} EXCLUDE_FROM_ALL ${project_src})
+#       set_target_properties(${EXAMPLE_TARGET} PROPERTIES
+# 	COMPILE_FLAGS "${EXTRA_COMPILER_FLAGS}")
+#       include_directories(${CMAKE_CURRENT_SOURCE_DIR}/allocore/
+#         ${CMAKE_CURRENT_SOURCE_DIR}/alloutil/
+#         ${CMAKE_CURRENT_SOURCE_DIR}/alloGLV/
+#         ${CMAKE_CURRENT_SOURCE_DIR}/allovsr/
+#         ${GAMMA_INCLUDE_DIRs} )
+#       #    message("Gamma : ${GAMMA_INCLUDE_DIRs}")
+#       target_link_libraries(${PROJECT_TARGET}
+# 	${ALLOCORE_LIBRARY} ${ALLOUTIL_LIBRARY} ${GAMMA_LIBRARIE}S
+#         ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LINK_LIBRARIES})
+#       if(APPLE)
+# 	set_target_properties(${PROJECT_TARGET} PROPERTIES
+# 	  COMPILE_FLAGS "-pagezero_size 10000 -image_base 100000000")
+#       endif(APPLE)
 
-      if (ALLOGLV_LIBRARY)
-	add_dependencies(${EXAMPLE_TARGET} alloGLV)
-	target_link_libraries(${EXAMPLE_TARGET} {ALLOGLV_LIBRARY} ${ALLOGLV_LINK_LIBRARIES})
-      endif(ALLOGLV_LIBRARY)
-      list(REMOVE_ITEM PROJECT_RES_FILES ${project_src})
-      add_custom_target("${PROJECT_TARGET}_run"
-	COMMAND "${PROJECT_TARGET}"
-	DEPENDS "${PROJECT_TARGET}"
-	WORKING_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-	SOURCES ${project_src}
-	COMMENT "Running: ${PROJECT_TARGET}")
+#       if (ALLOGLV_LIBRARY)
+# 	add_dependencies(${EXAMPLE_TARGET} alloGLV)
+# 	target_link_libraries(${EXAMPLE_TARGET} {ALLOGLV_LIBRARY} ${ALLOGLV_LINK_LIBRARIES})
+#       endif(ALLOGLV_LIBRARY)
+#       list(REMOVE_ITEM PROJECT_RES_FILES ${project_src})
+#       add_custom_target("${PROJECT_TARGET}_run"
+# 	COMMAND "${PROJECT_TARGET}"
+# 	DEPENDS "${PROJECT_TARGET}"
+# 	WORKING_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+# 	SOURCES ${project_src}
+# 	COMMENT "Running: ${PROJECT_TARGET}")
 
-    endforeach(project_src)
+#     endforeach(project_src)
 
-    foreach(FILENAME ${PROJECT_RES_FILES})
-      set(SRC "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}")
-      set(DST "${CMAKE_SOURCE_DIR}/build/${FILENAME}")
-      if(NOT (IS_DIRECTORY ${SRC}))
-	configure_file(${SRC} ${DST} COPY_ONLY)
-	message("Copying: " ${SRC})
-      endif(NOT (IS_DIRECTORY ${SRC}))
-    endforeach(FILENAME)
-  endforeach(dir)
+#     foreach(FILENAME ${PROJECT_RES_FILES})
+#       set(SRC "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}")
+#       set(DST "${CMAKE_SOURCE_DIR}/build/${FILENAME}")
+#       if(NOT (IS_DIRECTORY ${SRC}))
+# 	configure_file(${SRC} ${DST} COPY_ONLY)
+# 	message("Copying: " ${SRC})
+#       endif(NOT (IS_DIRECTORY ${SRC}))
+#     endforeach(FILENAME)
+#   endforeach(dir)
 
-endif(NOT NO_PROJECTS)
+# endif(NOT NO_PROJECTS)

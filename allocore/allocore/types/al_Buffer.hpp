@@ -157,8 +157,8 @@ public:
 
 	/// Insert new elements after each existing element
 	
-	/// @param[in] n	Expansion factor; new size is n times old size
-	/// @param[in] dup	If true, new elements are duplicates of existing elements.
+	/// @tparam n		Expansion factor; new size is n times old size
+	/// @tparam dup		If true, new elements are duplicates of existing elements.
 	///					If false, new elements are default constructed.
 	template <int n, bool dup>
 	void expand(){

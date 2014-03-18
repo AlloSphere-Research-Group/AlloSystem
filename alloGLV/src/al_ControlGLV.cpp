@@ -26,6 +26,12 @@ bool GLVInputControl::keyToGLV(const al::Keyboard& k, bool down){
 	return glv().propagateEvent();
 }
 
+bool GLVInputControl::motionToGLV(const al::Mouse& m, glv::Event::t e){
+	glv::space_t x = m.x(), y = m.y(), relx = x, rely = y;
+	glv().setMouseMotion(relx, rely, e);
+	glv().setMousePos((int)x, (int)y, relx, rely);
+	return glv().propagateEvent();
+}
 
 
 bool GLVWindowControl::onCreate(){
@@ -45,7 +51,24 @@ bool GLVWindowControl::onResize(int dw, int dh){
 	return true;
 }
 
+bool GLVWindowControl::onFrame(){
+	glv().drawGLV(glv().w, glv().h, window().spfActual());
+	//glv().preamble(glv().w, glv().h);
+	//glv().drawWidgets(glv().w, glv().h, window().spf());
+	return true;
+}
 
+
+GLVBinding::GLVBinding()
+:	mWindowCtrl(*this), mInputCtrl(*this)
+{
+	glv::GLV::disable(glv::DrawBack);
+}
+
+void GLVBinding::bindTo(Window& win){
+	win.prepend(mInputCtrl);
+	win.append(mWindowCtrl);
+}
 
 
 GLVDetachable::GLVDetachable()
@@ -159,6 +182,25 @@ GLVDetachable& GLVDetachable::parentWindow(Window& v){
 		}
 	}
 	return *this;
+}
+
+
+
+
+const glv::Data& PoseModel::getData(glv::Data& d) const {
+	d.resize(glv::Data::FLOAT, 7);
+	d.assignFromArray(pose.pos().elems(), 3);
+	d.assignFromArray(&pose.quat()[0], 4, 1, 3);
+	/*double a[4];
+	pose.quat().toAxisAngle(a[0], a[1],a[2],a[3]);
+	d.assignFromArray(a, 4, 1, 3);*/
+	return d;
+}
+
+void PoseModel::setData(const glv::Data& d){
+	pose.pos(d.at<float>(0), d.at<float>(1), d.at<float>(2));
+	pose.quat().set(d.at<float>(3), d.at<float>(4), d.at<float>(5), d.at<float>(6));
+	//pose.quat().fromAxisAngle(d.at<float>(3), d.at<float>(4), d.at<float>(5), d.at<float>(6));
 }
 
 } // al::

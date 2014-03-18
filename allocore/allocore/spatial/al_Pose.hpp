@@ -120,6 +120,16 @@ public:
 	/// Get the azimuth, elevation & distance from this to another point
 	void toAED(const Vec3d& to, double& azimuth, double& elevation, double& distance) const;
 
+
+	/// Get world space X unit vector
+	Vec3d ux() const { return quat().toVectorX(); }
+
+	/// Get world space Y unit vector
+	Vec3d uy() const { return quat().toVectorY(); }
+
+	/// Get world space Z unit vector
+	Vec3d uz() const { return quat().toVectorZ(); }
+
 	/// Get world space unit vectors
 	template <class T>
 	void unitVectors(Vec<3,T>& ux, Vec<3,T>& uy, Vec<3,T>& uz) const {	
@@ -128,20 +138,12 @@ public:
 		quat().toVectorZ(uz);	
 	}
 
+
 	/// Get local right, up, and forward unit vectors
 	template <class T>
 	void directionVectors(Vec<3,T>& ur, Vec<3,T>& uu, Vec<3,T>& uf) const {
 		unitVectors(ur, uu, uf);
 		uf = -uf;
-	}
-	
-	/// Get a linear-interpolated Pose between this and another
-	// (useful ingredient for smooth animations, estimations, etc.)
-	Pose lerp(Pose& target, double amt) const {
-		Pose r(*this);
-		r.pos().lerp(target.pos(), amt);
-		r.quat().slerpTo(target.quat(), amt);
-		return r;
 	}
 	
 	/// Get right unit vector
@@ -152,23 +154,27 @@ public:
 
 	/// Get forward unit vector (negative of Z)
 	Vec3d uf() const { return -uz(); }
-	
-	/// Get X unit vector
-	Vec3d ux() const { return quat().toVectorX(); }
 
-	/// Get Y unit vector
-	Vec3d uy() const { return quat().toVectorY(); }
 
-	/// Get Z unit vector
-	Vec3d uz() const { return quat().toVectorZ(); }
+	/// Get a linear-interpolated Pose between this and another
+	// (useful ingredient for smooth animations, estimations, etc.)
+	Pose lerp(Pose& target, double amt) const {
+		Pose r(*this);
+		r.pos().lerp(target.pos(), amt);
+		r.quat().slerpTo(target.quat(), amt);
+		return r;
+	}
 
 
 	// Setters
 
+	/// Get position
 	Vec3d& pos(){ return mVec; }
 	Vec3d& vec(){ return mVec; }
-	Quatd& quat(){ return mQuat; }
 	
+	/// Get quaternion representing orientation
+	Quatd& quat(){ return mQuat; }
+
 	/// Copy all attributes from another Pose
 	Pose& set(Pose& src){
 		mVec = src.pos(); mQuat = src.quat(); return *this; }
@@ -255,8 +261,9 @@ protected:
 
 ///	A mobile coordinate frame
 
-///	A Pose that knows how to accumulate velocities
-/// Smooth navigation with adjustable linear and angular velocity
+///	This represents a Pose combined with smooth angular and positional
+/// velocities. The smoothing is done using a one-pole low-pass filter which
+/// produces an exponential ease-out type of transition.
 class Nav : public Pose {
 public:
 
@@ -272,6 +279,7 @@ public:
 		mSmooth(nav.smooth()), mVelScale(nav.mVelScale)
 	{	updateDirectionVectors(); }
 
+
 	/// Get smoothing amount
 	double smooth() const { return mSmooth; }
 
@@ -284,12 +292,13 @@ public:
 	/// Get forward unit vector
 	const Vec3d& uf() const { return mUF; }
 	
-	/// Get linear and angular velocities as a Pose
+	/// Get current linear and angular velocities as a Pose
 	Pose vel() const {
-		return Pose(mMove1, Quatd().fromEuler(mSpin1[1], mSpin1[0], mSpin1[2]));
+		return Pose(mMove1, Quatd().fromEuler(mSpin1));
 	}
 	
 	double velScale() const { return mVelScale; }
+
 
 	/// Set smoothing amount [0,1)
 	Nav& smooth(double v){ mSmooth=v; return *this; }
@@ -302,21 +311,35 @@ public:
 		updateDirectionVectors();
 	}
 	
-	void turn(const Quatd& v) {
-		v.toEuler(mSpin1);
-	}
-	
-	/// turn to face a given world-coordinate point 
-	void faceToward(const Vec3d& p, double amt=1.) {
-		Vec3d rotEuler;
+	/// Turn to face a given world-coordinate point
+	void faceToward(const Vec3d& p, double amt=1.){
+		// TODO: promote this method to Pose?
 		Vec3d target(p - pos());
 		target.normalize();
 		Quatd rot = Quatd::getRotationTo(uf(), target);
+
+		// We must pre-multiply the Pose quaternion with our rotation since
+		// it was computed in world space.
+		if(amt == 1.)	quat() = rot * quat();
+		else			quat() = rot.pow(amt) * quat();
+		updateDirectionVectors();
+
+		/* // Apply rotation using Euler angles (can behave erraticly)
+		Vec3d aeb1, aeb2;
+		quat().toEuler(aeb1);
+		(rot * quat()).toEuler(aeb2);
+		Vec3d rotEuler = aeb2 - aeb1;
+		//for(int i=0; i<3; ++i){ // minimize angles
+		//	double& r = rotEuler[i];
+		//	if(r > M_PI) r -= 2*M_PI;
+		//	else if(r < -M_PI) r += 2*M_PI;
+		//}
 		rot.toEuler(rotEuler);
 		mTurn.set(rotEuler * amt);
+		//*/
 	}
 	
-	/// move toward a given world-coordinate point 
+	/// Move toward a given world-coordinate point
 	void nudgeToward(const Vec3d& p, double amt=1.) {
 		Vec3d rotEuler;
 		Vec3d target(p - pos());
@@ -342,26 +365,38 @@ public:
 	void nudgeU(double amount) { mNudge[1] += amount; }
 	void nudgeF(double amount) { mNudge[2] += amount; }
 
+
 	/// Set all angular velocity values from azimuth, elevation, and bank differentials, in radians
 	void spin(double da, double de, double db){ spinR(de); spinU(da); spinF(db); }
 
-	/// Set angular velocity around right vector, in radians
-	void spinR(double v){ mSpin0[0] = v; }
+	/// Set angular velocity from a unit quaternion (versor)
+	void spin(const Quatd& v) { v.toEuler(mSpin1); }
+
+	/// Set angular velocity around right vector (elevation), in radians
+	void spinR(double v){ mSpin0[1] = v; }
 	
-	/// Set angular velocity around up vector, in radians
-	void spinU(double v){ mSpin0[1] = v; }
+	/// Set angular velocity around up vector (azimuth), in radians
+	void spinU(double v){ mSpin0[0] = v; }
 	
-	/// Set angular velocity around forward vector, in radians
+	/// Set angular velocity around forward vector (bank), in radians
 	void spinF(double v){ mSpin0[2] = v; }
 	
-	/// Set angular velocity directly:
-	Vec3d& spin() { return mSpin0; }
+	/// Set angular velocity directly
+	Vec3d& spin(){ return mSpin0; }
+
 
 	/// Turn by a single increment for one step, in radians
-	void turn(double a, double e, double b){ turnR(e); turnU(a); turnF(b); }
-	void turnR(double v){ mTurn[0] = v; }
-	void turnU(double v){ mTurn[1] = v; }
+	void turn(double az, double el, double ba){ turnR(el); turnU(az); turnF(ba); }
+
+	/// Turn by a single increment, in radians, around the right vector (elevation)
+	void turnR(double v){ mTurn[1] = v;	}
+
+	/// Turn by a single increment, in radians, around the up vector (azimuth)
+	void turnU(double v){ mTurn[0] = v; }
+
+	/// Turn by a single increment, in radians, around the forward vector (bank)
 	void turnF(double v){ mTurn[2] = v; }
+
 
 	/// Stop moving and spinning
 	Nav& halt(){ 
@@ -413,20 +448,20 @@ public:
 	
 		double amt = 1.-smooth();	// TODO: adjust for dt
 
-		//Vec3d angVel = mSpin0 + mTurn;
-
-		// low-pass filter velocities
+		// Low-pass filter velocities
 		mMove1.lerp(mMove0*dt + mNudge, amt);
-		mSpin1.lerp(mSpin0*dt + mTurn, amt);
+		mSpin1.lerp(mSpin0*dt + mTurn , amt);
 
-		// turn and nudge are a one-shot increments, so clear each frame
+		// Turn and nudge are a one-shot increments, so clear each step
 		mTurn.set(0);
 		mNudge.set(0);
 
+		// Update orientation from smoothed orientation differential
+		// Note that vel() returns a smoothed Pose diff from mMove1 and mSpin1.
 		mQuat *= vel().quat();
 		updateDirectionVectors();
 
-		// accumulate position:
+		// Move according to smoothed position differential (mMove1)
 		for(int i=0; i<pos().size(); ++i){
 			pos()[i] += mMove1.dot(Vec3d(ur()[i], uu()[i], uf()[i]));
 		}
@@ -435,8 +470,8 @@ public:
 protected:
 	Vec3d mMove0, mMove1;	// linear velocities (raw, smoothed)
 	Vec3d mSpin0, mSpin1;	// angular velocities (raw, smoothed)
-	Vec3d mTurn;
-	Vec3d mNudge;			//  
+	Vec3d mTurn;			// orientation increment for one step
+	Vec3d mNudge;			// position increment for one step
 	Vec3d mUR, mUU, mUF;	// basis vectors of local coordinate frame
 	double mSmooth;
 	double mVelScale;		// velocity scaling factor

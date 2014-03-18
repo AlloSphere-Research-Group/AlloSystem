@@ -62,9 +62,11 @@ struct CThreadFunction : public ThreadFunction{
 	/// Prototype of thread execution function
 	typedef void * (*CFunc)(void * userData);
 	
-	/// @param[in] func		thread execution function
-	/// @param[in] user		user data passed into thread execution function
-	CThreadFunction(CFunc func_=0, void * user_=0): func(func_), user(user_){}
+	/// @param[in] threadFunc	thread execution function
+	/// @param[in] userData		user data passed into thread execution function
+	CThreadFunction(CFunc threadFunc=0, void * userData=0)
+	:	func(threadFunc), user(userData)
+	{}
 	
 	void operator()(){ func(user); }
 
@@ -86,6 +88,9 @@ public:
 	/// @param[in] cFunc		thread C function
 	/// @param[in] userData		user data passed to C function
 	Thread(void * (*cFunc)(void * userData), void * userData);
+
+	/// Copy constructor
+	Thread(const Thread& other);
 
 	~Thread();
 
@@ -113,13 +118,16 @@ public:
 	///	terminated.  A \e true return value signifies successful termination. 
 	///	A \e false return value indicates a problem with the wait call.
 	bool join();
-	
+
 	/// Return pointer to current OS thread object
 	
 	/// E.g., if using pthreads internally, will return the pthread_t.
 	///
 	static void * current();
 
+	// Stuff for assignment
+	friend void swap(Thread& a, Thread& b);
+	Thread& operator= (Thread other);
 protected:
 	class Impl;
 	Impl * mImpl;

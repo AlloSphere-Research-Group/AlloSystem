@@ -70,12 +70,14 @@ identifier.
 class BufferObject : public GPUObject {
 public:
 
+	/// Buffer access mode
 	enum AccessMode{
 		READ_ONLY				= GL_READ_ONLY,
 		WRITE_ONLY				= GL_WRITE_ONLY, 
 		READ_WRITE				= GL_READ_WRITE
 	};
 
+	/// Array type
 	enum ArrayType{
 		VERTEX_ARRAY			= GL_VERTEX_ARRAY,
 		NORMAL_ARRAY			= GL_NORMAL_ARRAY,
@@ -85,6 +87,7 @@ public:
 		EDGE_FLAG_ARRAY			= GL_EDGE_FLAG_ARRAY
 	};
 
+	/// Buffer type
 	enum BufferType{
 		ARRAY_BUFFER			= GL_ARRAY_BUFFER,
 		ELEMENT_ARRAY_BUFFER	= GL_ELEMENT_ARRAY_BUFFER,
@@ -112,30 +115,14 @@ public:
 //		DYNAMIC_COPY	= GL_DYNAMIC_COPY
 	};
 
-	enum DataType{
-		BYTE			= GL_BYTE,
-		UNSIGNED_BYTE	= GL_UNSIGNED_BYTE,
-		SHORT			= GL_SHORT,
-		UNSIGNED_SHORT	= GL_UNSIGNED_SHORT,
-		INT				= GL_INT,
-		UNSIGNED_INT	= GL_UNSIGNED_INT,
-		FLOAT			= GL_FLOAT,
-		BYTES_2			= GL_2_BYTES,                  
-		BYTES_3			= GL_3_BYTES,
-		BYTES_4			= GL_4_BYTES,
-		DOUBLE			= GL_DOUBLE,
-		UNKNOWN
-	};
-
-	template<class T> DataType asDataType();	///< Get DataType associated with built in type
-	int numBytes(DataType type);				///< Get size of DataType, in bytes
 
 	BufferObject(BufferType bufType, BufferUsage bufUsage)
 	:	mMapMode(READ_WRITE), mType(bufType), mUsage(bufUsage),
-		mDataType(UNKNOWN), mNumComps(0), mNumElems(0), mData(0)
+		mDataType(Graphics::FLOAT), mNumComps(0), mNumElems(0), mData(0)
 	{}
 	
 	virtual ~BufferObject(){ destroy(); }
+
 
 	void bufferType(BufferType v){ mType=v; }
 	void mapMode(AccessMode v){ mMapMode=v; }
@@ -166,7 +153,7 @@ public:
 	/// After using the pointer, call unmap() as soon as possible
 	template <class T>
 	bool map(T *& buf){
-		if(asDataType<T>() == mDataType){
+		if(Graphics::toDataType<T>() == mDataType){
 			void * r = map();
 			if(r){ buf=(T *)r; return true; }
 		}
@@ -179,7 +166,7 @@ public:
 #endif
 
 	/// Set buffer data store and copy over client data
-	void data(const void * src, DataType dataType, int numElems, int numComps=1){
+	void data(const void * src, Graphics::DataType dataType, int numElems, int numComps=1){
 		mData = (void *)src;
 		mDataType = dataType;
 		mNumElems = numElems;
@@ -190,18 +177,18 @@ public:
 	/// Set buffer data store and copy over client data
 	template <class T>
 	void data(const T * src, int numElems, int numComps=1){
-		data(src, asDataType<T>(), numElems, numComps);
+		data(src, Graphics::toDataType<T>(), numElems, numComps);
 	}
 	
 	/// Set buffer data store without copying client data
-	void data(DataType dataType, int numElems, int numComps=1){
+	void data(Graphics::DataType dataType, int numElems, int numComps=1){
 		data(0, dataType, numElems, numComps);
 	}
 
 	/// Set buffer data store using cached values
 	void data(){
 		bind();
-		glBufferData(mType, numBytes(mDataType)*mNumElems*mNumComps, mData, mUsage);
+		glBufferData(mType, Graphics::numBytes(mDataType)*mNumElems*mNumComps, mData, mUsage);
 		unbind();
 	}
 
@@ -210,7 +197,7 @@ protected:
 	AccessMode mMapMode;
 	BufferType mType;
 	BufferUsage mUsage;
-	DataType mDataType;
+	Graphics::DataType mDataType;
 	int mNumComps;
 	int mNumElems;
 	void * mData;
@@ -309,33 +296,6 @@ protected:
 	EBO mEBO;
 };
 */
-
-
-template<class T> inline BufferObject::DataType BufferObject::asDataType(){ return UNKNOWN; }
-template<> inline BufferObject::DataType BufferObject::asDataType<char>(){ return BYTE; }
-template<> inline BufferObject::DataType BufferObject::asDataType<unsigned char>(){ return UNSIGNED_BYTE; }
-template<> inline BufferObject::DataType BufferObject::asDataType<short>(){ return SHORT; }
-template<> inline BufferObject::DataType BufferObject::asDataType<unsigned short>(){ return UNSIGNED_SHORT; }
-template<> inline BufferObject::DataType BufferObject::asDataType<int>(){ return INT; }
-template<> inline BufferObject::DataType BufferObject::asDataType<unsigned int>(){ return UNSIGNED_INT; }
-template<> inline BufferObject::DataType BufferObject::asDataType<float>(){ return FLOAT; }
-template<> inline BufferObject::DataType BufferObject::asDataType<double>(){ return DOUBLE; }
-
-inline int BufferObject::numBytes(BufferObject::DataType type){
-	#define CS(a,b) case a: return sizeof(b); 
-	switch(type){
-		CS(BYTE, char)
-		CS(UNSIGNED_BYTE, unsigned char)
-		CS(SHORT, short)
-		CS(UNSIGNED_SHORT, unsigned short)
-		CS(INT, int)
-		CS(UNSIGNED_INT, unsigned int)
-		CS(FLOAT, float)
-		CS(DOUBLE, double)
-		default: return 0;
-	};
-	#undef CS
-}
 
 } // al::
 #endif
