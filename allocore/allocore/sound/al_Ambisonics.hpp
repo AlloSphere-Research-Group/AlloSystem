@@ -343,6 +343,11 @@ class AmbisonicsSpatializer : public Spatializer {
     
 public:
     
+    //TODO doxygen / licensing
+    //TODO merge prepare into perform (and eliminate need for prepare in Spatializer class)
+    //TODO add parameter in constructor to output encoded or decoded channels from perform?
+    //TODO no need for finalize if we have the encoded or decoded switch
+    
     AmbisonicsSpatializer(int dim, int order, int numspeakers = 2, int flavor=1)
     : mDecoder(dim, order, numspeakers, flavor), mEncoder(dim,order) {};
     
@@ -393,11 +398,7 @@ public:
     
     void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample){
         
-    //virtual void perform(SoundSource& src, Listener& l, const int& listenerIndex, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample){
-        
-        //moved from old ambisonics based audio scene's encode method...
-         // compute azimuth & elevation of relative position in
-         //  current listener's coordinate frame:
+         // compute azimuth & elevation of relative position in current listener's coordinate frame:
          Vec3d urel(relpos);
          urel.normalize();	// unit vector in axis listener->source
          // project into listener's coordinate frame:

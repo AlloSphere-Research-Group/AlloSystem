@@ -35,9 +35,10 @@ public:
 			vec+=vecSpkr;
 
 			double dist = vec.mag();
-
-			double gain = sample/dist;
-			io.out(spkr.deviceChannel,frameIndex) += gain * 0.1;
+            if(dist < 1) dist = 1;
+            
+			double gain = sample/(dist*dist);
+			io.out(spkr.deviceChannel,frameIndex) += gain;
 		}
 	}
 	

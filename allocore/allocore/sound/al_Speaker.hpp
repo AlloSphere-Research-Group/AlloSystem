@@ -73,7 +73,7 @@ struct Speaker {
 		float cosel = cos(elr);
 		xyz[0] = sin(azr) * cosel * radius;
 		xyz[1] = cos(azr) * cosel * radius;
-		xyz[2] =         sin(elr) * radius;
+		xyz[2] = sin(elr) * radius;
 		return *this;
 	}
 	

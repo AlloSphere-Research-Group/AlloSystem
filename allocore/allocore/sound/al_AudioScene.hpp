@@ -354,13 +354,6 @@ public:
 		mSources.remove(&src);
 	}
 
-    /*
-	/// encode sources (per listener)
-	void encode(const int& numFrames, double sampleRate) {
-     */
-    //added Ryan McGee 11/15/2012
-    // Changed "encode" method to render since we want this to be generic and not just Ambi.
-    /// render sources (per listener)
     void render(AudioIOData& io) {
 	
         const int numFrames = io.framesPerBuffer();
@@ -446,8 +439,6 @@ public:
 					double idx = distance * distanceToSample;
 					//if (i==0) printf("%g\n", distance);
 					
-					
-
 					int idx0 = idx;
 					
 					// are we within range?
@@ -465,31 +456,6 @@ public:
                         
 						spatializer->perform(io,src,relpos, numFrames, i, s);
                         
-                        //moved all this to perform in ambisonics class....
-						/*
-						// compute azimuth & elevation of relative position in
-						//  current listener's coordinate frame:
-						Vec3d urel(relpos);
-						urel.normalize();	// unit vector in axis listener->source
-						// project into listener's coordinate frame:
-//						Vec3d axis;			
-//						l.mQuatHistory[i].toVectorX(axis);
-//						double rr = urel.dot(axis);	
-//						l.mQuatHistory[i].toVectorY(axis);
-//						double ru = urel.dot(axis);
-//						l.mQuatHistory[i].toVectorZ(axis);
-//						double rf = urel.dot(axis);
-						
-						// cheaper:
-						Vec3d direction = l.mQuatHistory[i].rotateTransposed(urel);
-
-						//mEncoder.direction(azimuth, elevation);
-						//mEncoder.direction(-rf, -rr, ru);
-						mEncoder.direction(-direction[2], -direction[0], direction[1]);
-						mEncoder.encode(l.ambiChans(), numFrames, i, s);
-                        
-                        // end move to amisonics
-                        */
 					}
 
 //					double x = distance - mFarClip;
@@ -520,9 +486,6 @@ public:
 //					
 //					} // otherwise, it's too far away for the doppler.... (culled)
 				}
-				
-				//void encode(double ** ambiChans, const XYZ * pos, const double * input, numFrames)
-				//mEncoder.encode<Vec3d>(ambiChans, mSource);
                 
 			} //end for each source
             
@@ -531,25 +494,7 @@ public:
 		} // end for each listener
 		
 	} //end render
-	
-	// between encode & decode, can apply optional processing to ambi domain signals (e.g. reverb)
 
-
-	/// Decode sources (per listener) to output channels
-	
-	/// @param[out] outs		1D array of output (non-interleaved)
-	/// @param[in ] numFrames	number of frames per channel buffer
-    
-    
-    //moved this to ambisonics class
-    /*
-	void render(float * outs, const int& numFrames) const {
-		for(unsigned il=0; il<mListeners.size(); ++il){
-			Listener& l = *mListeners[il];
-			l.mDecoder.decode(outs, l.ambiChans(), numFrames);
-		}
-	}
-     */
 
 protected:
 

@@ -47,8 +47,16 @@ struct Agent : public SoundSource, public Nav, public Drawable{
 	virtual void onUpdateNav(){
 		smooth(0.9);
 		
-		spin(M_2PI/360, M_2PI/397, 0);
-		moveF(0.04);
+		//*
+        spin(M_2PI/360, M_2PI/397, 0);
+        moveF(0.04);
+        //*/
+        
+        /*
+        spin(M_2PI/1.1, 0, 0);
+		moveF(1);
+        //*/
+        
 		step();
 		
 		SoundSource::pose(*this);
@@ -101,36 +109,7 @@ std::vector<Agent> agents(1);
 Stereographic stereo;
 #define AUDIO_BLOCK_SIZE 256
 
-#ifdef ALLOSPHERE
-AudioScene scene(3, 3, AUDIO_BLOCK_SIZE);
-const int numSpeakers = 16;
-const double topAz = 90;
-const double topEl = 45;
-const double midAz = (360./8);
-const double midEl = 0;
-const double botAz = 90;
-const double botEl =-45;
-AmbiDecode::Speaker speakers[numSpeakers] = {
-	Speaker( 3-1, 0.5*midAz, midEl),
-	Speaker( 6-1, 1.5*midAz, midEl),
-	Speaker(17-1, 2.5*midAz, midEl),
-	Speaker(18-1, 3.5*midAz, midEl),
-	Speaker( 4-1,-0.5*midAz, midEl),
-	Speaker( 5-1,-1.5*midAz, midEl),
-	Speaker(20-1,-2.5*midAz, midEl),
-	Speaker(19-1,-3.5*midAz, midEl),
-	
-	Speaker( 7-1, 0.5*topAz, topEl),
-	Speaker( 9-1, 1.5*topAz, topEl),
-	Speaker( 8-1,-0.5*topAz, topEl),
-	Speaker(21-1,-1.5*topAz, topEl),
 
-	Speaker(24-1, 0.5*botAz, botEl),
-	Speaker(23-1, 1.5*botAz, botEl),
-	Speaker(10-1,-0.5*botAz, botEl),
-	Speaker(22-1,-1.5*botAz, botEl),
-};
-#else
 //AudioScene scene(2, 1, AUDIO_BLOCK_SIZE);
 AudioScene scene(AUDIO_BLOCK_SIZE);
 const int numSpeakers = 2;
@@ -140,11 +119,9 @@ Speaker speakers[] = {
 };
 
 AmbisonicsSpatializer *ambisonics;
+Dbap *dbap;
 
 SpeakerLayout speakerLayout;
-
-#endif
-
 
 void audioCB(AudioIOData& io){
     
@@ -212,11 +189,13 @@ struct MyWindow : public Window, public Drawable{
 int main (int argc, char * argv[]){
 
     ambisonics = new AmbisonicsSpatializer(2, 1, numSpeakers);
+    //dbap = new Dbap();
     
     speakerLayout.addSpeaker(speakers[0]);
     speakerLayout.addSpeaker(speakers[1]);
     
 	listener = scene.createListener(speakerLayout, ambisonics);
+    //listener = scene.createListener(speakerLayout, dbap);
 
     
     /*
