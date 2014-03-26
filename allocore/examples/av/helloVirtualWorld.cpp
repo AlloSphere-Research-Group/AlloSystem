@@ -54,7 +54,7 @@ struct Agent : public SoundSource, public Nav, public Drawable{
         
         /*
         spin(M_2PI/1.1, 0, 0);
-		moveF(1);
+		moveF(40);
         //*/
         
 		step();
@@ -188,6 +188,8 @@ int main (int argc, char * argv[])
     AmbisonicsSpatializer *ambisonics = new AmbisonicsSpatializer(2, 1, numSpeakers);
 //    Dbap *dbap;
 //    dbap = new Dbap();
+    
+    //TODO switch between spatializers with key command
 
 	// Create listener to render audio
 	listener = scene.createListener(speakerLayout, ambisonics);

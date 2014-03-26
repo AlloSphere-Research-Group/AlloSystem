@@ -209,7 +209,7 @@ class AmbiEncode : public AmbiBase{
 public:
 
 	AmbiEncode(int dim, int order) : AmbiBase(dim, order) {}
-
+    
 //	/// Encode input sample and set decoder frame.
 //	void encode   (const AmbiDecode &dec, float input);
 //	
@@ -342,11 +342,6 @@ inline void AmbiBase::resize(T *& a, int n){
 class AmbisonicsSpatializer : public Spatializer {
     
 public:
-    
-    //TODO doxygen / licensing
-    //TODO merge prepare into perform (and eliminate need for prepare in Spatializer class)
-    //TODO add parameter in constructor to output encoded or decoded channels from perform?
-    //TODO no need for finalize if we have the encoded or decoded switch
     
     AmbisonicsSpatializer(int dim, int order, int numspeakers = 2, int flavor=1)
     : mDecoder(dim, order, numspeakers, flavor), mEncoder(dim,order) {};

@@ -191,7 +191,7 @@ protected:
 class SoundSource {
 public:
 	SoundSource(double rollOff=1, double near=1, double range=32, double ampFar=0.0, int bufSize=5000)
-	:	mSound(bufSize), mRollOff(rollOff), mNearClip(near), mClipRange(range), mAmpFar(ampFar)
+	:	mSound(bufSize), mRollOff(rollOff), mNearClip(near), mClipRange(range), mAmpFar(ampFar), useAtten(true), useDoppler(true)
 	{
 		// initialize the position history to be VERY FAR AWAY so that we don't deafen ourselves... 
 		mPosHistory(Vec3d(1000, 1000, 1000));
@@ -227,6 +227,8 @@ public:
 	/// Returns attentuation factor based on distance to listener
 	double attenuation(double distance) const {
 	
+        if(!useAtten) return 1.0;
+        
 		if (distance<mNearClip) {
 			return 1;
 		} else if (distance>(mNearClip+mClipRange)) {
@@ -258,11 +260,17 @@ public:
 
 	}
 
+    //audioscene will always try to perform distance attenuation and doppler, but it may not have effect unless its enabled for the source
+    void enableAttenuation(bool enable) { useAtten = enable; }
+    
+    void enableDoppler(bool enable) { useDoppler = enable; }
+    
 	/// Get size of delay in samples
 	int delaySize() const { return mSound.size(); }
 
 	/// Convert delay, in seconds, to an index
 	double delayToIndex(double delay, double sampleRate) const {
+        if(!useDoppler) return 0;
 		return delay*sampleRate;
 	}
 
@@ -308,6 +316,8 @@ protected:
 	
 	double mRollOff;
 	double mNearClip, mClipRange, mAmpFar;
+    
+    bool useAtten, useDoppler;
 };	
 
 
@@ -353,7 +363,7 @@ public:
 	void removeSource(SoundSource& src) {
 		mSources.remove(&src);
 	}
-
+    
     void render(AudioIOData& io) {
 	
         const int numFrames = io.framesPerBuffer();
@@ -392,7 +402,10 @@ public:
 				// varies per source, 
 				// since each source has its own buffersize and far clip
 				// (not physically accurate of course)
-				distanceToSample = (src.maxIndex()-numFrames)/src.farClip();
+                if(src.useDoppler)
+                    distanceToSample = (src.maxIndex()-numFrames)/src.farClip();
+                else
+                    distanceToSample = 0;
 				
 				// iterate time samples
 				for(int i=0; i<numFrames; ++i){
@@ -400,39 +413,16 @@ public:
 					// compute interpolated source position relative to listener
 					// TODO: this tends to warble when moving fast
 					double alpha = double(i)/numFrames;
-					
-					// note: cubic(src-listener) 
-					// is equivalent to cubic(src) - cubic(listener)
-//					Vec3d relpos = ipl::cubic(
-//						alpha, 
-//						src.mPosHistory[3]-l.mPosHistory[3], 
-//						src.mPosHistory[2]-l.mPosHistory[2], 
-//						src.mPosHistory[1]-l.mPosHistory[1], 
-//						src.mPosHistory[0]-l.mPosHistory[0]
-//					);
-					
-					// sounds rough!
-//					Vec3d relpos = ipl::linear(
-//						alpha, 
-//						src.mPosHistory[1]-l.mPosHistory[1], 
-//						src.mPosHistory[0]-l.mPosHistory[0]
-//					);
 
-//					// moving average:
-//					// cheaper & slightly less warbly than cubic, 
-//					// less glitchy than linear
+					// moving average:
+					// cheaper & slightly less warbly than cubic,
+					// less glitchy than linear
 					Vec3d relpos = (
 						(src.mPosHistory[3]-l.mPosHistory[3])*(1.-alpha) + 
 						(src.mPosHistory[2]-l.mPosHistory[2]) + 
 						(src.mPosHistory[1]-l.mPosHistory[1]) + 
 						(src.mPosHistory[0]-l.mPosHistory[0])*(alpha)
 					)/3.0;
-
-
-					//Vec3d relpos = src.mPosHistory[0]-l.mPosHistory[0];
-
-					//printf("%g %g %g\n", l.pos()[0], l.pos()[1], l.pos()[2]);
-					//printf("%g %g %g\n", src.pos()[0], src.pos()[1], src.pos()[2]);
 
 					double distance = relpos.mag();
 					
@@ -447,10 +437,7 @@ public:
 
 						idx += (numFrames-i);
 						
-						// added Ryan McGee 11/25/2012
-                        //Do not attenuate here! ???
-						//double gain = src.attenuation(distance);
-						double gain = 1;
+						double gain = src.attenuation(distance);
                         
 						float s = src.readSample(idx) * gain;
                         
