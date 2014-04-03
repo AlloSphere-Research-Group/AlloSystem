@@ -1,43 +1,4 @@
 /*
-	What would a basic socket class need?
-	
-	binding methods for UDP and TCP are very different
-	receive-only or send-only or duplex?
-*/
-/*
-Nomenclature:
-Server side:
-bind		Assigns a socket an address, i.e. a specified local port number and IP 
-			address.
-	
-listen		After a socket has been associated with an address, listen 
-			prepares it for incoming connections.
-
-accept		Accepts a received incoming attempt to create a new TCP connection 
-			from the remote client, and creates a new socket associated with the
-			socket address pair of this connection.
-
-Client side:
-connect		Assigns a free local port number to a socket. In case of a TCP 
-			socket, it causes an attempt to establish a new TCP connection.
-
-Domain:
-PF_INET			network protocol IPv4
-PF_INET6		IPv6
-PF_UNIX			local socket (using a file)
-
-Type:
-SOCK_STREAM		(reliable stream-oriented service or Stream Sockets)
-SOCK_DGRAM		(datagram service or Datagram Sockets)
-SOCK_SEQPACKET	(reliable sequenced packet service)
-SOCK_RAW		(raw protocols atop the network layer)
-
-Protocol:
-IPPROTO_TCP
-IPPROTO_SCTP
-IPPROTO_UDP
-IPPROTO_DCCP
-
 TCP:
 (PF_INET, PF_INET6), (SOCK_STREAM), (IPPROTO_TCP)
 TCP Server:
@@ -47,6 +8,16 @@ TCP Server:
 4) Accepting incoming connections, via a call to accept()
 5) Communicate with remote host, which can be done through, e.g., send()
 6) Close each socket that was opened, once it is no longer needed, using close()
+
+From http://stackoverflow.com/questions/6189831/whats-the-purpose-of-using-sendto-recvfrom-instead-of-connect-send-recv-with-ud:
+
+It is important to understand that TCP is "Connection Oriented" and UDP is "Connection-less" protocol:
+
+TCP: You need to connect first prior to sending/receiving data to/from a remote host.
+UDP: No connection is required. You can send/receive data to/from any host.
+Therefore, you will need to use sendto() on UDP socket in order to specify the destination. Similarly, you would want to use recvfrom() to know where the UDP data was received from.
+
+You can actually use connect() on UDP socket as an option. In that case, you can use send()/recv() on the UDP socket to send data to the address specified with the connect() and to receive data only from the address. (The connect() on UDP socket merely sets the default peer address and you can call connect() on UDP socket as many times as you want, and the connect() on UDP socket, of course, does not perform any handshake for connection.)
 */
 
 #include <cstring>
@@ -69,17 +40,16 @@ namespace al{
 struct Socket::Impl : public ImplAPR {
 
 	Impl()
-	:	ImplAPR(), mPort(0), mAddress(""), mSockAddr(0), mSock(0), mSender(false)
+	:	mPort(0), mAddress(""), mSockAddr(0), mSock(0), mTimeout(-1), mType(0)
 	{}
 
-	Impl(uint16_t port, const char * address, al_sec timeout_, bool sender)
-	:	ImplAPR(), mPort(port), mAddress(address), mSockAddr(0), mSock(0), mSender(sender)
+	Impl(uint16_t port, const char * address, al_sec timeout_, int type)
+	:	mPort(port), mAddress(address), mSockAddr(0), mSock(0), mTimeout(-1), mType(0)
 	{
-//		// opens the socket also:
-//		timeout(timeout_);
-	  if (! open(port, address, timeout_, sender)) {
-	    printf("Warning: Socket::Impl failed to open port %d / address \"%s\"\n", port, address);
-	  }
+		// opens the socket also:
+		if (! open(port, address, timeout_, type)) {
+			AL_WARN("Socket::Impl failed to open port %d / address \"%s\"\n", port, address);
+		}
 	}
 
 	void close(){
@@ -96,55 +66,169 @@ struct Socket::Impl : public ImplAPR {
 			return false;\
 		}
 
-	bool open(uint16_t port, std::string address, al_sec timeout, bool sender){
+	bool open(uint16_t port, std::string address, al_sec timeoutSec, int type){
 		close();
 
-		/* @see http://dev.ariel-networks.com/apr/apr-tutorial/html/apr-tutorial-13.html */
-
 		mPort = port;
-		mSender = sender;
 		mAddress = address;
+		mType = type;
+		
+		int sockProto = type & 127;
+		switch(sockProto){
+		case TCP:  sockProto = APR_PROTO_TCP; break;
+		case UDP:  sockProto = APR_PROTO_UDP; break;
+		case SCTP: sockProto = APR_PROTO_SCTP; break;
+		default:;
+		}
+		
+		int sockType = type & (127<<8);
+		switch(sockType){
+		case STREAM: sockType = SOCK_STREAM; break;
+		case DGRAM:  sockType = SOCK_DGRAM; break;
+		case 0: // unspecified; choose sensible default, if possible
+			switch(sockProto){
+			case TCP:  sockType = SOCK_STREAM; break;
+			case UDP:
+			case SCTP: sockType = SOCK_DGRAM; break;
+			default:;
+			}
+		}
+		
+		int sockFamily = type & (127<<16);
+		switch(sockFamily){
+		case 0: // unspecified
+		case INET:  sockFamily = APR_INET; break;
+		case INET6: sockFamily = APR_INET6; break;
+		default:;
+		}
+
+		/*
+		The APR setup procedure is as follows:
+		Client:
+			apr_sockaddr_info_get
+			apr_socket_create
+
+			apr_socket_opt_set		| Set timeout for connect
+			apr_socket_timeout_set	|
+
+			apr_socket_connect
+
+			apr_socket_opt_set		| Set timeout for send/recv
+			apr_socket_timeout_set	|
+			
+		Server:
+			apr_sockaddr_info_get
+			apr_socket_create
+			
+			apr_socket_opt_set		| Set timeout for send/recv
+			apr_socket_timeout_set	|
+			
+			apr_socket_bind			| These are always non-blocking calls
+			apr_socket_listen		|
+
+		@see http://dev.ariel-networks.com/apr/apr-tutorial/html/apr-tutorial-13.html
+		*/
 
 		BAILONFAIL(
-			apr_sockaddr_info_get(&mSockAddr, mAddress[0] ? mAddress.c_str() : 0, APR_INET, mPort, 0, mPool)
+			apr_sockaddr_info_get(
+				&mSockAddr,
+				mAddress[0] ? mAddress.c_str() : NULL, sockFamily, mPort, 0, mPool
+			)
 		);
 
-		BAILONFAIL(apr_socket_create(&mSock, mSockAddr->family, SOCK_DGRAM, APR_PROTO_UDP, mPool));
-
-		if(mSock){
-			// Assign address to socket. If TCP, establish new connection.
-			if(mSender){	BAILONFAIL(apr_socket_connect(mSock, mSockAddr)); }
-			else{			BAILONFAIL(apr_socket_bind(mSock, mSockAddr)); }
-
-			// Set timeout behavior
-			if(timeout == 0){
-				// non-blocking:			APR_SO_NONBLOCK==1(on),  then timeout=0
-				BAILONFAIL(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 1));
-				BAILONFAIL(apr_socket_timeout_set(mSock, 0));
-			}
-			else if(timeout > 0){
-				// blocking-with-timeout:	APR_SO_NONBLOCK==0(off), then timeout>0
-				BAILONFAIL(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 0));
-				BAILONFAIL(apr_socket_timeout_set(mSock, (apr_interval_time_t)(timeout * 1.0e6)));
-
-			}
-			else{
-				// blocking-forever:		APR_SO_NONBLOCK==0(off), then timeout<0
-				BAILONFAIL(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 0));
-				BAILONFAIL(apr_socket_timeout_set(mSock, -1));
-			}
-			
-			mTimeout = timeout;
-		} else {
-		  printf("Warning: inside Socket::Impl::open(), mSock is zero!!!\n");
-		}
-			 
+		BAILONFAIL(
+			apr_socket_create(&mSock, mSockAddr->family, sockType, sockProto, mPool)
+		);
+		
+		// Set timeout
+		timeout(timeoutSec);
+		
 		return true;
 	}
+	
+	bool reopen(){
+		return open(mPort, mAddress, mTimeout, mType);
+	}
+	
+	bool bind(){ // for server-side
+		if(opened()){
+			apr_status_t res = check_apr(apr_socket_bind(mSock, mSockAddr));
+			return APR_SUCCESS == res;
+		}
+		return false;
+	}
+	
+	bool connect(){ // for client-side
+		if(opened()){
+			// The timeout works differently for a blocking-with-timeout connect
+			if(mTimeout > 0){
+				check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 1));
+				check_apr(apr_socket_timeout_set(mSock, apr_interval_time_t(mTimeout * 1.0e6)));
+			}
 
-	// note that setting timeout will close and re-open the socket:
+			apr_status_t res = check_apr(apr_socket_connect(mSock, mSockAddr));
+
+			// Set timeout back to what it was if blocking-with-timeout
+			if(mTimeout > 0){
+				timeout(mTimeout);
+			}
+
+			return APR_SUCCESS == res;
+		}
+		return false;
+	}
+
 	void timeout(al_sec v){
-		open(mPort, mAddress, v, mSender);
+		mTimeout = v;
+	
+		// Note: these timeouts apply only for send/recv and accept
+		// Non-blocking:
+		if(mTimeout == 0){
+			check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 1));
+			check_apr(apr_socket_timeout_set(mSock, 0));
+		}
+
+		// Blocking-with-timeout:
+		else if(mTimeout > 0){
+			#ifdef AL_WINDOWS
+				check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 0));
+			#else
+				check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 1));
+			#endif
+			check_apr(apr_socket_timeout_set(mSock, apr_interval_time_t(mTimeout * 1.0e6)));
+		}
+
+		// Blocking-forever:
+		else{
+			check_apr(apr_socket_opt_set(mSock, APR_SO_NONBLOCK, 0));
+			check_apr(apr_socket_timeout_set(mSock, -1));
+		}
+	}
+
+	bool listen(){
+		/* APR_SO_REUSEADDR is useful for a socket listening process.
+		It specifies that the "The rules used in validating addresses supplied 
+		to bind should allow reuse of local addresses." */
+		apr_socket_opt_set(mSock, APR_SO_REUSEADDR, 1);
+		apr_status_t res = apr_socket_listen(mSock, SOMAXCONN);
+		if(APR_SUCCESS != res){
+			//AL_WARN("Failed to listen on socket");
+			return false;
+		}
+		return true;
+	}
+	
+	bool accept(Socket::Impl * newSock){
+		newSock->close();
+		// TODO: timeout for accept
+		apr_status_t res = apr_socket_accept(&newSock->mSock, mSock, mPool);
+		if(APR_SUCCESS != res){
+			//AL_WARN("Failed to accept socket");
+			return false;
+		}
+		// Inherit timeout from parent
+		newSock->timeout(mTimeout);
+		return true;
 	}
 	
 	bool opened() const { return 0!=mSock; }
@@ -154,26 +238,21 @@ struct Socket::Impl : public ImplAPR {
 	apr_sockaddr_t * mSockAddr;
 	apr_socket_t * mSock;
 	al_sec mTimeout;
-	bool mSender;
+	int mType;
 };
 
 
 
 Socket::Socket()
-:	mImpl(0)
-{
-	mImpl = new Impl;
-	if (mImpl == 0) {
-	  printf("Socket::Socket():  mImpl is zero!!!\n");
-	}
-}
+:	mImpl(new Impl)
+{}
 
-Socket::Socket(uint16_t port, const char * address, al_sec timeout, bool sender)
+Socket::Socket(uint16_t port, const char * address, al_sec timeout, int type)
 : mImpl(0)
 {
-	mImpl = new Impl(port, address, timeout, sender);
+	mImpl = new Impl(port, address, timeout, type);
 	if (mImpl == 0) {
-          printf("Socket::Socket(uint16_t port, const char * address, al_sec timeout, bool sender):  mImpl is zero!!!\n");
+		AL_WARN("Socket::Socket(uint16_t, const char *, al_sec, bool): mImpl is zero!!!\n");
 	}
 
 }
@@ -191,16 +270,21 @@ uint16_t Socket::port() const { return mImpl->mPort; }
 
 al_sec Socket::timeout() const { return mImpl->mTimeout; }
 
+bool Socket::bind(){ return mImpl->bind(); }
+
+bool Socket::connect(){ return mImpl->connect(); }
 
 void Socket::close(){ mImpl->close(); }
 
-bool Socket::open(uint16_t port, const char * address, al_sec timeout, bool sender){
-	return mImpl->open(port, address, timeout, sender);
+bool Socket::open(uint16_t port, const char * address, al_sec timeout, int type){
+	return
+		mImpl->open(port, address, timeout, type)
+		&& onOpen();
 }
 
-
-
-void Socket::timeout(al_sec v){ mImpl->timeout(v); }
+void Socket::timeout(al_sec v){
+	mImpl->timeout(v);
+}
 
 size_t Socket::recv(char * buffer, size_t maxlen) {
 	apr_size_t len = maxlen;
@@ -248,6 +332,25 @@ std::string Socket::hostName(){
 	check_apr(apr_gethostname(buf, sizeof(buf), apr.pool()));
 	//printf("host %s\n", buf);
 	return buf;
+}
+
+
+bool Socket::listen(){
+	return mImpl->listen();
+}
+
+bool Socket::accept(Socket& sock){
+	return mImpl->accept(sock.mImpl);
+}
+
+
+bool SocketClient::onOpen(){
+	return connect();
+}
+
+
+bool SocketServer::onOpen(){
+	return bind();
 }
 
 } // al::
