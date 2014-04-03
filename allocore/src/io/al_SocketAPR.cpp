@@ -98,7 +98,13 @@ struct Socket::Impl : public ImplAPR {
 		switch(sockFamily){
 		case 0: // unspecified
 		case INET:  sockFamily = APR_INET; break;
-		case INET6: sockFamily = APR_INET6; break;
+		case INET6:
+		#ifdef APR_INET6
+			sockFamily = APR_INET6; break;
+		#else
+			AL_WARN("Socket::INET6 not supported on this platform.");
+			return false;
+		#endif
 		default:;
 		}
 
