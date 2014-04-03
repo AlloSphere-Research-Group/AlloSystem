@@ -21,9 +21,9 @@ public:
 	Font font3;
 
 	MyApp()
-	:	font1("../../share/fonts/VeraMoIt.ttf", 20),
-		font2("../../share/fonts/VeraMoBd.ttf", 14),
-		font3("../../share/fonts/VeraMono.ttf", 10)
+	:	font1("allocore/share/fonts/VeraMoIt.ttf", 20),
+		font2("allocore/share/fonts/VeraMoBd.ttf", 14),
+		font3("allocore/share/fonts/VeraMono.ttf", 10)
 	{
 		nav().pos(0,0,4);
 		initWindow(Window::Dim(400,200));

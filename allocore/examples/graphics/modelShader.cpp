@@ -153,7 +153,7 @@ MyWindow win1;
 
 int main (int argc, char * const argv[]) {
 	searchpaths.addAppPaths(argc, argv);
-	searchpaths.addSearchPath(searchpaths.appPath() + "../../share");
+	searchpaths.addSearchPath(searchpaths.appPath() + "../../allocore/share");
 	searchpaths.print();
 	
 	// load in a "scene"
