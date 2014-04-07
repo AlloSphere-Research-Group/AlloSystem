@@ -150,14 +150,14 @@ public:
 		return width() * (height()?height():1) * (depth()?depth():1);
 	}
 
-	Texture& format(Format v){ return update(v, mFormat, mPixelsUpdated); }
-	Texture& texelFormat(int v){ return update(v, mTexelFormat, mPixelsUpdated); }
-	Texture& target(Target v){ return update(v, mTarget, mPixelsUpdated); }
-	Texture& type(DataType v){ return update(v, mType, mPixelsUpdated); }
+	Texture& format(Format v){ return update(v, mFormat, mShapeUpdated); }
+	Texture& texelFormat(int v){ return update(v, mTexelFormat, mShapeUpdated); }
+	Texture& target(Target v){ return update(v, mTarget, mShapeUpdated); }
+	Texture& type(DataType v){ return update(v, mType, mShapeUpdated); }
 
-	Texture& width (unsigned v){ return update(v, mWidth, mPixelsUpdated); }
-	Texture& height(unsigned v){ return update(v, mHeight,mPixelsUpdated); }
-	Texture& depth (unsigned v){ return update(v, mDepth ,mPixelsUpdated); }
+	Texture& width (unsigned v){ return update(v, mWidth, mShapeUpdated); }
+	Texture& height(unsigned v){ return update(v, mHeight,mShapeUpdated); }
+	Texture& depth (unsigned v){ return update(v, mDepth ,mShapeUpdated); }
 
 	Texture& resize(unsigned w){ return width(w); }
 	Texture& resize(unsigned w, unsigned h){ return width(w).height(h); }
@@ -244,8 +244,9 @@ protected:
 	unsigned mWidth, mHeight, mDepth;
 
 	Array mArray;				// Array representation of client-side pixel data
-	bool mParamsUpdated;		// flags change in texture params (wrap, filter)
-	bool mPixelsUpdated;		// flags change in pixel params or data
+	bool mParamsUpdated;		// Flags change in texture params (wrap, filter)
+	bool mPixelsUpdated;		// Flags change in pixel data
+	bool mShapeUpdated;			// Flags change in size, format, type, etc.
 	bool mArrayDirty;
 
 	virtual void onCreate();
