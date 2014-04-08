@@ -13,7 +13,7 @@ set(BUILD_EVERYTHING 0 CACHE STRING "Build everything")
 set(BUILD_GAMMA 0 CACHE STRING "Build external Gamma")
 set(BUILD_GLV 0 CACHE STRING "Build external GLV. Implies building alloGLV.")
 set(BUILD_ALLOGLV 0 CACHE STRING "Build AlloGLV")
-set(BUILD_ALLOUTIL 1 CACHE STRING "Build alloutil")
+set(BUILD_ALLOUTIL 0 CACHE STRING "Build alloutil")
 set(BUILD_VSR 0 CACHE STRING "Build vsr. Implies building vsr.")
 set(BUILD_ALLOVSR 0 CACHE STRING "Build allovsr")
 
