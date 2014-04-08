@@ -304,6 +304,20 @@ public:
 	TexCoord3s& texCoord3s(){ return mTexCoord3s; }
 	Indices& indices(){ return mIndices; }
 
+
+	/// Export mesh to an STL file
+
+	/// STL (STereoLithography) is a file format used widely for
+	/// rapid prototyping. It contains only surface geometry (vertices and
+	/// normals) as a list of triangular facets.
+	/// This implementation saves an ASCII (as opposed to binary) STL file.
+	///
+	/// @param[in] filePath		path of file to save to
+	/// @param[in] solidName	solid name defined within the STL file (optional)
+	/// \returns true on successful export, otherwise false
+	bool exportSTL(const char * filePath, const char * solidName = "") const;
+
+
 	/// Print information about Mesh
 	void print(FILE * dst = stderr) const;
 
