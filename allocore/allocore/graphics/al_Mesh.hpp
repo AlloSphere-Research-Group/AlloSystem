@@ -248,6 +248,10 @@ public:
 	/// Append normal to normal buffer
 	void normal(const Normal& v) { normals().append(v); }
 
+	/// Append normal to normal buffer
+	template <class T>
+	void normal(const Vec<2,T>& v, float z=0){ normal(v[0], v[1], z); }
+
 
 	/// Append texture coordinate to 2D texture coordinate buffer
 	void texCoord(float u, float v){ texCoord(TexCoord2(u,v)); }
@@ -267,6 +271,10 @@ public:
 	
 	/// Append vertex to vertex buffer
 	void vertex(const Vertex& v){ vertices().append(v); }
+	
+	/// Append vertex to vertex buffer
+	template <class T>
+	void vertex(const Vec<2,T>& v, float z=0){ vertex(v[0], v[1], z); }
 
 	/// Append vertices to vertex buffer
 	template <class T>
