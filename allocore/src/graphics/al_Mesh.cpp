@@ -2,6 +2,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <fstream>
 
 #include "allocore/system/al_Config.h"
 #include "allocore/system/al_Printing.hpp"
@@ -586,6 +587,113 @@ Mesh& Mesh::scale(float x, float y, float z){
 	return *this;
 }
 
+
+// Convert indexed triangle strip to triangles
+// TODO: this may be handy as a public method
+static void toTriangles(Mesh& m){
+	int prim = m.primitive();
+
+	if(Graphics::TRIANGLE_STRIP == prim){
+		
+		m.primitive(Graphics::TRIANGLES);
+		int Ni = m.indices().size();
+		//int Nn = m.normals().size();
+		
+		if(Ni){
+			int Ntri = Ni - 2;
+			m.indices().size(Ntri * 3);
+
+			for(int i=(Ni-2)-1, j=(Ntri*3-2)-1; i>=0; i--, j-=3){
+				int i1, i2, i3;
+				
+				// Odd numbered triangles must have orientation flipped
+				if(i & 1){
+					i1 = i+2;
+					i2 = i+1;
+					i3 = i;
+				}
+				else{
+					i1 = i;
+					i2 = i+1;
+					i3 = i+2;
+				}
+				Mesh::Index idx1 = m.indices()[i1];
+				Mesh::Index idx2 = m.indices()[i2];
+				Mesh::Index idx3 = m.indices()[i3];
+				m.indices()[j  ] = idx1;
+				m.indices()[j+1] = idx2;
+				m.indices()[j+2] = idx3;
+			}
+
+			// remove degenerate triangles (modifies indices only)
+			{
+			Ni = m.indices().size();
+			int j=0;
+			for(int i=0; i<Ni; i+=3){
+				Mesh::Index i1 = m.indices()[i];
+				Mesh::Index i2 = m.indices()[i+1];
+				Mesh::Index i3 = m.indices()[i+2];
+				m.indices()[j  ] = i1;
+				m.indices()[j+1] = i2;
+				m.indices()[j+2] = i3;
+				if(i1 != i2 && i2 != i3 && i3 != i1){
+					j+=3;
+				}
+			}
+			m.indices().size(j);}
+		}
+		
+		// non-indexed not supported yet...
+		else{
+		
+		}
+	}
+}
+
+bool Mesh::exportSTL(const char * path, const char * name) const {
+	int prim = primitive();
+
+	if(Graphics::TRIANGLES != prim && Graphics::TRIANGLE_STRIP != prim){
+		AL_WARN("Unsupported primitive type. Must be either triangles or triangle strip.");
+		return false;
+	}
+
+	// Create a copy since we must convert to non-indexed triangles
+	Mesh m(*this);
+
+	// Convert mesh to non-indexed triangles
+	if(prim == Graphics::TRIANGLE_STRIP){
+		toTriangles(m);
+	}
+	m.decompress();
+	m.generateNormals();
+
+	// STL vertices must be in positive octant
+	Vec3f vmin, vmax;
+	m.getBounds(vmin, vmax);
+
+	std::ofstream file(path);
+	if(file.fail()) return false;
+	file.flags(std::ios::scientific);
+	
+	file << "solid " << name << "\n";
+	for(int i=0; i<m.vertices().size(); i+=3){
+		file << "facet normal";
+		for(int j=0; j<3; j++) file << " " << m.normals()[i][j];
+		file << "\n";
+		file << "outer loop\n";
+		for(int j=0; j<3; ++j){
+			file << "vertex";
+			for(int k=0; k<3; k++) file << " " << m.vertices()[i+j][k] - vmin[k];
+			file << "\n";
+		}
+		file << "endloop\n";
+		file << "endfacet\n";
+	}
+	file << "endsolid " << name;
+
+	return true;
+}
 
 void Mesh::print(FILE * dst) const {
 	fprintf(dst, "Mesh %p (prim = %d) has:\n", this, mPrimitive);
