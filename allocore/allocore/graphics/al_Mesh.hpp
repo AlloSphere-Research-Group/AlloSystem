@@ -248,6 +248,10 @@ public:
 	/// Append normal to normal buffer
 	void normal(const Normal& v) { normals().append(v); }
 
+	/// Append normal to normal buffer
+	template <class T>
+	void normal(const Vec<2,T>& v, float z=0){ normal(v[0], v[1], z); }
+
 
 	/// Append texture coordinate to 2D texture coordinate buffer
 	void texCoord(float u, float v){ texCoord(TexCoord2(u,v)); }
@@ -267,6 +271,10 @@ public:
 	
 	/// Append vertex to vertex buffer
 	void vertex(const Vertex& v){ vertices().append(v); }
+	
+	/// Append vertex to vertex buffer
+	template <class T>
+	void vertex(const Vec<2,T>& v, float z=0){ vertex(v[0], v[1], z); }
 
 	/// Append vertices to vertex buffer
 	template <class T>
@@ -295,6 +303,20 @@ public:
 	TexCoord2s& texCoord2s(){ return mTexCoord2s; }
 	TexCoord3s& texCoord3s(){ return mTexCoord3s; }
 	Indices& indices(){ return mIndices; }
+
+
+	/// Export mesh to an STL file
+
+	/// STL (STereoLithography) is a file format used widely for
+	/// rapid prototyping. It contains only surface geometry (vertices and
+	/// normals) as a list of triangular facets.
+	/// This implementation saves an ASCII (as opposed to binary) STL file.
+	///
+	/// @param[in] filePath		path of file to save to
+	/// @param[in] solidName	solid name defined within the STL file (optional)
+	/// \returns true on successful export, otherwise false
+	bool exportSTL(const char * filePath, const char * solidName = "") const;
+
 
 	/// Print information about Mesh
 	void print(FILE * dst = stderr) const;

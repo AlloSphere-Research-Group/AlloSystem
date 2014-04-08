@@ -235,7 +235,7 @@ public:
 
 
 /// Socket for sending OSC packets
-class Send : public SocketSend, public Packet{
+class Send : public SocketClient, public Packet{
 public:
 	Send(){}
 
@@ -304,7 +304,7 @@ public:
 
 /// Supports explicit polling or implicit background thread polling
 ///
-class Recv : public SocketRecv{
+class Recv : public SocketServer{
 public:
 	Recv();
 

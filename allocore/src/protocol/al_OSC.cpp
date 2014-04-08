@@ -345,11 +345,11 @@ void PacketHandler::parse(const char *packet, int size, TimeTag timeTag){
 
 
 Send::Send(uint16_t port, const char * address, al_sec timeout)
-:	SocketSend(port, address, timeout)
+:	SocketClient(port, address, timeout, Socket::UDP)
 {}
 
 int Send::send(){
-	//int r = SocketSend::send(Packet::data(), Packet::size());
+	//int r = Socket::send(Packet::data(), Packet::size());
 	int r = send(*this);
 	OSCTRY("Packet::endMessage", Packet::clear();)
 	return r;
@@ -357,7 +357,7 @@ int Send::send(){
 
 int Send::send(const Packet& p){
 	int r = 0;
-	OSCTRY("Packet::endMessage", r = SocketSend::send(p.data(), p.size());)
+	OSCTRY("Packet::endMessage", r = Socket::send(p.data(), p.size());)
 	return r;
 }
 
@@ -373,14 +373,15 @@ static void * recvThreadFunc(void * user){
 }
 
 Recv::Recv()
-:	SocketRecv(), mHandler(0), mBuffer(1024), mBackground(false)
+:	mHandler(0), mBuffer(1024), mBackground(false)
 {
   // printf("Entering Recv::Recv()\n");
 }
 
 
 Recv::Recv(uint16_t port, const char * address, al_sec timeout)
-:	SocketRecv(port, address, timeout), mHandler(0), mBuffer(1024), mBackground(false)
+:	SocketServer(port, address, timeout, Socket::UDP),
+	mHandler(0), mBuffer(1024), mBackground(false)
 {
   // printf("Entering Recv::Recv(port=%d, addr=%s)\n", port, address);
 }
@@ -399,7 +400,7 @@ int Recv::recv(){
 	*/
 
 	OSCTRY("Packet::endMessage", 
-		r = SocketRecv::recv(&mBuffer[0], mBuffer.size());
+		r = Socket::recv(&mBuffer[0], mBuffer.size());
 		if(r && mHandler){
 #ifdef VERBOSE                  
 		  printf("Recv:recv() Received %d bytes; parsing...\n", r);
