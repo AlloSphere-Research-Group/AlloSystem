@@ -31,6 +31,7 @@ if(LUAJIT_FOUND)
   set(LUA_FOUND 1)
 else()
   find_package(Lua51)
+  set(LUA_FOUND 1)
 endif(LUAJIT_FOUND)
 
 if(NOT LUA_FOUND)
