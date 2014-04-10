@@ -167,7 +167,7 @@ MACRO(SUBDIRLIST result curdir)
   SET(${result} ${dirlist})
 ENDMACRO()
 
-if(NOT NO_EXAMPLES)
+if(BUILD_EXAMPLES)
   find_library(Gamma REQUIRED QUIET)
   subdirlist(EXAMPLE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/examples)
   #include root projects directory
@@ -242,7 +242,7 @@ if(NOT NO_EXAMPLES)
     endforeach(FILENAME)
   endforeach(dir)
 
-endif(NOT NO_EXAMPLES)
+endif(BUILD_EXAMPLES)
 
 
 # ----------------------------  Projects
