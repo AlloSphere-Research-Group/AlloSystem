@@ -12,6 +12,8 @@ namespace al{
 class Dbap : public Spatializer{
 public:
 	
+    Dbap(SpeakerLayout &sl) : Spatializer(sl) {}
+    
 	void dump() {
 		printf("Using DBAP Panning- need to add panner info for dump function\n");
 	}

@@ -246,8 +246,8 @@ public:
 	}	
 
 	
-	Vbap()
-	:mCachedTripletIndex(0),is3D(true)
+	Vbap(SpeakerLayout &sl)
+	: Spatializer(sl), mCachedTripletIndex(0),is3D(true)
 	{}
 	
 	void compile(Listener& listener){

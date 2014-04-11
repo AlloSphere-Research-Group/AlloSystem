@@ -343,8 +343,10 @@ class AmbisonicsSpatializer : public Spatializer {
     
 public:
     
-    AmbisonicsSpatializer(int dim, int order, int numspeakers = 2, int flavor=1)
-    : mDecoder(dim, order, numspeakers, flavor), mEncoder(dim,order) {};
+    AmbisonicsSpatializer(SpeakerLayout &sl, int dim, int order, int flavor=1)
+    : Spatializer(sl), mDecoder(dim, order, sl.numSpeakers(), flavor), mEncoder(dim,order) {
+        setSpeakerLayout(sl);
+    };
     
     void zeroAmbi(){
         memset(ambiChans(), 0, mAmbiDomainChannels.size()*sizeof(ambiChans()[0]));

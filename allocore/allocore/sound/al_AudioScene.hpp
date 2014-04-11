@@ -97,13 +97,26 @@ namespace al{
 /////////////////////////////////////////////////////
 class Listener;
 class SoundSource;
+    
+/// Abstract class for all spatializers: Ambisonics, DBAP, VBAP, etc.
 class Spatializer {
 public:
-    Spatializer(){};
+    Spatializer(SpeakerLayout& sl){
+        unsigned numSpeakers = sl.mSpeakers.size();
+		for(unsigned i=0;i<numSpeakers;++i){
+			mSpeakers.push_back(sl.mSpeakers[i]);
+		}
+    };
     virtual ~Spatializer(){};
     virtual void numFrames(int v){ };
+    
+    /// perform any necessary updates when the listener or speaker layout changes, ex. new speaker triplets for VBAP
     virtual void compile(Listener& l){};
+    
+    /// called once per listener, before sources are rendered. ex. zero ambisonics coefficients
     virtual void prepare(AudioIOData& io){};
+    
+    /// render each source
     virtual void perform(
                          AudioIOData& io,
                          SoundSource& src,
@@ -112,15 +125,8 @@ public:
                          int& frameIndex,
                          float& sample) = 0;
     
+    /// called once per listener, after sources are rendered. ex. ambisonics decode
     virtual void finalize(AudioIOData& io){};
-    
-    virtual void setSpeakerLayout(SpeakerLayout& sl){
-        mSpeakers.clear();
-		unsigned numSpeakers = sl.mSpeakers.size();
-		for(unsigned i=0;i<numSpeakers;++i){
-			mSpeakers.push_back(sl.mSpeakers[i]);
-		}
-    }
     
     int numSpeakers() const { return mSpeakers.size(); }
     
@@ -149,13 +155,11 @@ public:
 protected:
 	friend class AudioScene;
     friend class AmbisonicsSpatializer;
-	
     
-    Listener(int numFrames_, SpeakerLayout& sl, Spatializer *spatializer)
+    Listener(int numFrames_, Spatializer *spatializer)
 	:	mSpatializer(spatializer), isCompiled(false)
 	{
 		numFrames(numFrames_);
-        mSpatializer->setSpeakerLayout(sl);
 	}
 	
 	void numFrames(unsigned v){
@@ -348,9 +352,9 @@ public:
 			mNumFrames = v;
 		}
 	}
-
-    Listener * createListener(SpeakerLayout& sl, Spatializer* spatializer) {
-		Listener * l = new Listener(mNumFrames,sl,spatializer);
+    
+    Listener * createListener(Spatializer* spatializer) {
+		Listener * l = new Listener(mNumFrames, spatializer);
         l->compile();
 		mListeners.push_back(l);
 		return l;
