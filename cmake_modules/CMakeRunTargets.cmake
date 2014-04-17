@@ -16,7 +16,7 @@ endif(BUILD_DIR)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/build/bin)
 
-add_executable(${APP_NAME} EXCLUDE_FROM_ALL "${ALLOPROJECT_APP_SRC}")
+add_executable(${APP_NAME} EXCLUDE_FROM_ALL ${ALLOPROJECT_APP_SRC})
 if(APPLE)
   set_target_properties(${APP_NAME} PROPERTIES
     LINK_FLAGS "-pagezero_size 10000 -image_base 100000000")
