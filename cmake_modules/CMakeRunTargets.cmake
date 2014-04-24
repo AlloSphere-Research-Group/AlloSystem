@@ -85,13 +85,13 @@ endif(BUILDING_VSR)
 
 if(TARGET alloutil)
   get_target_property(ALLOUTIL_LIBRARY alloutil LOCATION)
-  get_target_property(ALLOUTIL_INCLUDE_DIR alloutil ALLOUTIL_INCLUDE_DIR)
+  get_target_property(ALLOUTIL_DEP_INCLUDE_DIR alloutil ALLOUTIL_DEP_INCLUDE_DIR)
   get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil ALLOUTIL_LINK_LIBRARIES)
   add_dependencies(${APP_NAME} alloutil)
 else()
   if(NOT ALLOUTIL_FOUND)
     set(ALLOUTIL_LIBRARY "")
-    set(ALLOUTIL_INCLUDE_DIR "")
+    set(ALLOUTIL_DEP_INCLUDE_DIR "")
     message("Not building ALLOUTIL and no usable ALLOUTIL binary found. Not linking application to ALLOUTIL")
   endif(NOT ALLOUTIL_FOUND) 
 endif(TARGET alloutil)
@@ -114,8 +114,8 @@ endif(TARGET alloGLV)
 
 #file(GLOB ALLOPROJECT_APP_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${BUILD_APP_DIR}/*.*)
 
-include_directories(${ALLOCORE_INCLUDE_DIR}
-  ${ALLOUTIL_INCLUDE_DIR}
+include_directories(${ALLOCORE_DEP_INCLUDE_DIRS}
+  ${ALLOUTIL_DEP_INCLUDE_DIR}
   ${ALLOGLV_INCLUDE_DIR}
   ${GLV_INCLUDE_DIR}
   ${ALLOVSR_INCLUDE_DIR}

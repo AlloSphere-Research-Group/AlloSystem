@@ -18,7 +18,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../cmake_modules
 
 if(ALLOSYSTEM_BUILD)
   get_target_property(ALLOCORE_LIBRARY allocore LOCATION)
-  get_target_property(ALLOCORE_INCLUDE_DIR allocore ALLOCORE_INCLUDE_DIR)
+  get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore ALLOCORE_DEP_INCLUDE_DIRS)
   if(BUILDING_GLV)
     set(GLV_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../GLV)
     get_target_property(glv_location GLV LOCATION)
@@ -32,7 +32,7 @@ endif(ALLOSYSTEM_BUILD)
 
 message (STATUS "allocore_location for alloGLV == ${allocore_location}")
 
-include_directories(${ALLOCORE_INCLUDE_DIR}
+include_directories(${ALLOCORE_DEP_INCLUDE_DIRS}
   ${GLV_INCLUDE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR})
 

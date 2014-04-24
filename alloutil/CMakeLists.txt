@@ -17,11 +17,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../cmake
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_library(alloutil ${ALLOUTIL_SRC})
-set(ALLOUTIL_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${LUA_INCLUDE_DIR})
-set_target_properties(alloutil 
-  PROPERTIES 
-  ALLOUTIL_INCLUDE_DIR "${ALLOUTIL_DIRS}"
-  )
 
 find_package(LuaJIT)
 
@@ -46,21 +41,25 @@ GET_DIRECTORY_PROPERTY(ALLOSYSTEM_BUILD DIRECTORY ${CMAKE_SOURCE_DIR}
 if(ALLOSYSTEM_BUILD)
   #message("Allosystem build")
   get_target_property(ALLOCORE_LIBRARY allocore LOCATION)
-  get_target_property(ALLOCORE_INCLUDE_DIR allocore ALLOCORE_INCLUDE_DIR)
+  get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore ALLOCORE_DEP_INCLUDE_DIRS)
 else(ALLOSYSTEM_BUILD)
   find_package(Allocore REQUIRED)
 endif(ALLOSYSTEM_BUILD)
 
-
-include_directories(${LUA_INCLUDE_DIR} ${ALLOCORE_INCLUDE_DIR})
 set(ALLOUTIL_LINK_LIBRARIES ${LUA_LIBRARIES} ${ALLOCORE_LIBRARY})
 
+set(ALLOUTIL_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${LUA_INCLUDE_DIR} ${ALLOCORE_DEP_INCLUDE_DIRS})
 
+set_target_properties(alloutil
+  PROPERTIES
+  ALLOUTIL_DEP_INCLUDE_DIR "${ALLOUTIL_DIRS}"
+  )
 set_target_properties(alloutil 
   PROPERTIES 
   ALLOUTIL_LINK_LIBRARIES "${ALLOUTIL_LINK_LIBRARIES}"
   )
 
+include_directories(${ALLOUTIL_DIRS})
 target_link_libraries(alloutil ${ALLOUTIL_LINK_LIBRARIES})
 
 set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)
