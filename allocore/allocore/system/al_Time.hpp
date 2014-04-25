@@ -80,7 +80,7 @@ private:
 ///		but which might be subject to drift, latency and jitter.
 ///	A curve mapping logical to real time can be drawn over an event period 
 ///		by interpolating between t0 and t1
-///	@see http://www.kokkinizita.net/papers/usingdll.pdf
+///	@see http://kokkinizita.linuxaudio.org/papers/usingdll.pdf
 class DelayLockedLoop {
 public:
 	
