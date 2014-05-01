@@ -59,7 +59,8 @@
 
 // Define some standard C99 functions that Windows is too stubborn to support.
 #if defined(AL_WINDOWS)
-	#define nextafterf(x,y)	_nextafterf(x,y)
+	//#define nextafterf(x,y)	_nextafterf(x,y)
+	float nextafterf(float x, float y);
 	#define nextafter(x,y)	_nextafter(x,y)
 	#define nextafterl(x,y)	_nextafter(x,y)
 #endif
@@ -662,9 +663,59 @@ TEM inline T mean(const T& v1, const T& v2){ return (v1 + v2) * T(0.5); }
 TEM inline T min(const T& v1, const T& v2){ return v1<v2?v1:v2; }
 TEM inline T min(const T& v1, const T& v2, const T& v3){ return al::min(al::min(v1,v2),v3); }
 
+#if defined(AL_WINDOWS)
+/*
+ * s_nextafterf.c -- float version of s_nextafter.c.
+ * Conversion to float by Ian Lance Taylor, Cygnus Support, ian@cygnus.com.
+ * ====================================================
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
+ * ====================================================
+ */
+inline float nextafterf(float x, float y){
+	union{ float f; int32_t i; } ux, uy;
+	ux.f=x;
+	uy.f=y;
+	int32_t hx=ux.i;
+	int32_t hy=uy.i;
+	int32_t ix=ux.i&0x7fffffff;	/* |x| */
+	int32_t iy=uy.i&0x7fffffff;	/* |y| */
+	if((ix>0x7f800000)||(iy>0x7f800000)) return x+y; /* x or y are nan */
+	if(x==y) return y;			/* x=y, return y */
+	if(ix==0){					/* x == 0 */
+		ux.i=(hy&0x80000000)|1;	/* return +-minsubnormal */
+		x = ux.f;
+		float t = x*x;
+		return t==x ? t : x;	/* raise underflow flag */
+	}
+	if(hx>=0) {					/* x > 0 */
+		if(hx>hy)	--hx;		/* x > y, x -= ulp */
+		else		++hx;		/* x < y, x += ulp */
+	} else {					/* x < 0 */
+		if(hy>=0||hx>hy)--hx;	/* x < y, x -= ulp */
+		else			++hx;	/* x > y, x += ulp */
+	}
+	hy = hx&0x7f800000;
+	if(hy>=0x7f800000) return x+x;	/* overflow  */
+	if(hy <0x00800000){			/* underflow */
+		float t = x*x;
+		if(t!=x){				/* raise underflow flag */
+			ux.i = hx;
+			return ux.f;
+		}
+	}
+	ux.i = hx;
+	return ux.f;
+}
+#endif
+
 TEM inline T nextAfter(const T& x, const T& y){ return x<y ? x+1 : x-1; }
-//template<> inline float nextAfter(const float& x, const float& y){ return nextafterf(x,y); }
-template<> inline float nextAfter(const float& x, const float& y){ return x > y ? x - FLT_EPSILON : x + FLT_EPSILON; }
+template<> inline float nextAfter(const float& x, const float& y){ return nextafterf(x,y); }
+//template<> inline float nextAfter(const float& x, const float& y){ return x > y ? x - FLT_EPSILON : x + FLT_EPSILON; }
 template<> inline double nextAfter(const double& x, const double& y){ return nextafter(x,y); }
 template<> inline long double nextAfter(const long double& x, const long double& y){ return nextafterl(x,y); }
 
