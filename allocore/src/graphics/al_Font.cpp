@@ -14,9 +14,9 @@
 #elif defined(__linux__)
 
 	#include <ft2build.h>
-	#include <freetype/freetype.h>
-	#include <freetype/ftoutln.h>
-	#include <freetype/ftglyph.h>
+	#include FT_FREETYPE_H
+	#include FT_OUTLINE_H
+	#include FT_GLYPH_H
 
 #elif defined WIN32
 
