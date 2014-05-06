@@ -59,55 +59,12 @@ HSV& HSV::operator= (const RGB& c){
 }
 
 //OGC additions:
-//Color operators
-Color& Color::operator=(const XYZ& v){
-  return *this = RGB(v);
-}
-
-Color& Color::operator=(const Lab& v){
-  return *this = RGB(v);
-}
-
-Color& Color::operator=(const HCLab& v){
-  return *this = RGB(v);
-}
-
-Color& Color::operator=(const Luv& v){
-  return *this = RGB(v);
-}
-
-Color& Color::operator=(const HCLuv& v){
-  return *this = RGB(v);
-}
-
-//Colori operators
-Colori& Colori::operator=(const XYZ& v){
-  return *this = RGB(v);
-}
-
-Colori& Colori::operator=(const Lab& v){
-  return *this = RGB(v);
-}
-
-Colori& Colori::operator=(const HCLab& v){
-  return *this = RGB(v);
-}
-
-Colori& Colori::operator=(const Luv& v){
-  return *this = RGB(v);
-}
-
-Colori& Colori::operator=(const HCLuv& v){
-  return *this = RGB(v);
-}
-
-
 //RGB operators
 RGB& RGB::operator= (const XYZ& v){
   //using sRGB and reference white D65 
-  Mat3f transformMatrix(3.2405f, -1.5371f, -0.4985f,
-			-0.9693f,  1.8760f,  0.0416f,
-			0.0556f, -0.2040f,  1.0572f);
+  Mat3f transformMatrix( 3.2405f, -1.5371f, -0.4985f,
+			 -0.9693f,  1.8760f,  0.0416f,
+			 0.0556f, -0.2040f,  1.0572f);
   float X = v.x, Y = v.y, Z = v.z;
 
   //convert XYZ to rgb (linear with respect to energy)
@@ -130,44 +87,6 @@ RGB& RGB::operator= (const XYZ& v){
   //cout << "RGB from XYZ: {" << r << ", " << g << ", " << b << "}" << endl;
   return *this;
 }
-
-RGB& RGB::operator=(const Lab& v){
-  return *this = XYZ(v);
-}
-
-RGB& RGB::operator=(const HCLab& v){
-  return *this = Lab(v);
-}
-
-RGB& RGB::operator=(const Luv& v){
-  return *this = XYZ(v);
-}
-
-RGB& RGB::operator=(const HCLuv& v){
-  return *this = Luv(v);
-}
-
-//HSV operators
-HSV& HSV::operator=(const XYZ& v){
-  return *this = RGB(v);
-}
-
-HSV& HSV::operator=(const Lab& v){
-  return *this = XYZ(v);
-}
-
-HSV& HSV::operator=(const HCLab& v){
-  return *this = Lab(v);
-}
-
-HSV& HSV::operator=(const Luv& v){
-  return *this = XYZ(v);
-}
-
-HSV& HSV::operator=(const HCLuv& v){
-  return *this = Luv(v);
-}
-
 
 //XYZ operators
 XYZ& XYZ::operator= (const RGB& v){
@@ -335,6 +254,91 @@ HCLuv& HCLuv::operator= (const Luv& w){
   //cout << "HCLuv: {" << h << ", " << c << ", " << l << "}" << endl;    
   return *this;
 }
+
+
+
+
+  //RGB operators
+  RGB& RGB::operator=(const Lab& v){
+    return *this = XYZ(v);
+  }
+
+  RGB& RGB::operator=(const HCLab& v){
+    return *this = Lab(v);
+  }
+
+  RGB& RGB::operator=(const Luv& v){
+    return *this = XYZ(v);
+  }
+
+  RGB& RGB::operator=(const HCLuv& v){
+    return *this = Luv(v);
+  }
+
+  //HSV operators
+  HSV& HSV::operator=(const XYZ& v){
+    return *this = RGB(v);
+  }
+
+  HSV& HSV::operator=(const Lab& v){
+    return *this = XYZ(v);
+  }
+
+  HSV& HSV::operator=(const HCLab& v){
+    return *this = Lab(v);
+  }
+
+  HSV& HSV::operator=(const Luv& v){
+    return *this = XYZ(v);
+  }
+
+  HSV& HSV::operator=(const HCLuv& v){
+    return *this = Luv(v);
+  }
+
+
+  //Color operators
+  Color& Color::operator=(const XYZ& v){
+    return *this = RGB(v)
+      }
+
+  Color& Color::operator=(const Lab& v){
+    return *this = RGB(v)
+      }
+
+  Color& Color::operator=(const HCLab& v){
+    return *this = RGB(v)
+      }
+
+  Color& Color::operator=(const Luv& v){
+    return *this = RGB(v)
+      }
+
+  Color& Color::operator=(const HCLuv& v){
+    return *this = RGB(v)
+      }
+
+  //Colori operators
+  Colori& Colori::operator=(const XYZ& v){
+    return *this = RGB(v)
+      }
+
+  Colori& Colori::operator=(const Lab& v){
+    return *this = RGB(v)
+      }
+
+  Colori& Colori::operator=(const HCLab& v){
+    return *this = RGB(v)
+      }
+
+  Colori& Colori::operator=(const Luv& v){
+    return *this = RGB(v)
+      }
+
+  Colori& Colori::operator=(const HCLuv& v){
+    return *this = RGB(v)
+      }
+
 
 
 } // al::
