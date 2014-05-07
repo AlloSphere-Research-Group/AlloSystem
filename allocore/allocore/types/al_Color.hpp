@@ -1,507 +1,1134 @@
 #ifndef INCLUDE_AL_COLOR_HPP
 #define INCLUDE_AL_COLOR_HPP
 
-/*	Allocore --
-	Multimedia / virtual environment application class library
+/*Allocore --
+  Multimedia / virtual environment application class library
 
-	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
-	Copyright (C) 2012. The Regents of the University of California.
-	All rights reserved.
+  Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
+  Copyright (C) 2012. The Regents of the University of California.
+  All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
-	modification, are permitted provided that the following conditions are met:
+  Redistribution and use in source and binary forms, with or without 
+  modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
-		this list of conditions and the following disclaimer.
+  Redistributions of source code must retain the above copyright notice, 
+  this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
-		documentation and/or other materials provided with the distribution.
+  Redistributions in binary form must reproduce the above copyright 
+  notice, this list of conditions and the following disclaimer in the 
+  documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
-		this software without specific prior written permission.
+  Neither the name of the University of California nor the names of its 
+  contributors may be used to endorse or promote products derived from 
+  this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
-	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
-	POSSIBILITY OF SUCH DAMAGE.
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+  POSSIBILITY OF SUCH DAMAGE.
 
 
-	File description:
-	RGBA and HSV color classes
+  File description:
+  RGBA, HSV, XYZ, Lab, HCLab, Luv, and HCLuv color classes
 
-	File author(s):
-	Lance Putnam, 2010, putnam.lance@gmail.com
+  Color conversion code for XYZ, Lab, HCLab, Luv, HCLuv was adapted from psuedo-code and formulas found at
+  http://www.easyrgb.com/ and http://brucelindbloom.com/
+  
+  Note that converting from RGB/HSV to Lab/Luv and back will result in SLIGHTLY different values 
+
+
+  File author(s):
+  Lance Putnam, 2010, putnam.lance@gmail.com
+  Owen Campbell, 2013, owen.campbell@gmail.com
 */
 
 #include "allocore/system/al_Config.h"
+#include "allocore/math/al_Mat.hpp"
+#include <cmath>
 
 namespace al{
 
-struct RGB;
-struct HSV;
-struct Color;
-struct Colori;
-
-
-/// Color represented by red, green, blue, and alpha components
-struct Color{
-
-	union{
-		struct{
-			float r;			///< Red component in [0, 1]
-			float g;			///< Green component in [0, 1]
-			float b;			///< Blue component in [0, 1]
-			float a;			///< Alpha component in [0, 1]
-		};
-		float components[4];	///< RGBA component vector
-	};
-
-
-	/// @param[in] r			red component
-	/// @param[in] g			green component
-	/// @param[in] b			blue component
-	/// @param[in] a			alpha component
-	Color(float r, float g, float b, float a=1.f)
-	:	r(r), g(g), b(b), a(a){}
-
-	/// @param[in] gray			red/green/blue components
-	/// @param[in] a			alpha component
-	Color(float gray=1.f, float a=1.f)
-	:	r(gray), g(gray), b(gray), a(a){}
-
-	/// @param[in] c	RGBA color to convert from
-	Color(const Colori& c){ *this = c; }
-
-	/// @param[in] hsv			HSV value
-	/// @param[in] a			alpha component
-	Color(const HSV& hsv, float a=1.f)
-	:	a(a)
-	{	*this = hsv; }
-
-	/// @param[in] rgb			RGB value
-	/// @param[in] a			alpha component
-	Color(const RGB& rgb, float a=1.f)
-	:	a(a)
-	{	*this = rgb; }
-
-
-	/// Set color component at index with no bounds checking
-	float& operator[](int i){ return components[i]; }
-
-	/// Get color component at index with no bounds checking
-	const float& operator[](int i) const { return components[i]; }
-
-	RGB& rgb(){ return *(RGB*)(components); }
-	const RGB& rgb() const { return *(const RGB*)(components); }
-
-
-	/// Set RGB from another color and alpha from argument
-	Color& set(const Color& c, float al){ a=al; return set(c.r,c.g,c.b); }
-
-	/// Set RGBA components
-	Color& set(float re, float gr, float bl, float al){ a=al; return set(re,gr,bl); }
-
-	/// Set RGB components
-	Color& set(float re, float gr, float bl){ r=re; g=gr; b=bl; return *this; }
-
-	/// Set from gray value
-	Color& set(float v){ return set(v,v,v); }
-
-	/// Set from gray value and alpha
-	Color& set(float v, float al){ return set(v,v,v,a); }
-
-	/// Set from an array of RGBA components
-	template <class T>
-	Color& set(const T* rgba){ return set(rgba[0],rgba[1],rgba[2],rgba[3]); }
-
-	/// Set components from tightly packed RGBA array
-	template <class Array4>
-	Color& operator= (const Array4& v){ return set(v[0], v[1], v[2], v[3]); }
-
-	/// Set from gray value
-	Color& operator= (float v){ return set(v); }
-	Color& operator= (double v){ return set(v); }
-
-	/// Set components from integer color
-	Color& operator= (const Colori& v);
-
-	/// Set RGB components from HSV
-	Color& operator= (const HSV& v);
-
-	/// Set RGB components from RGB
-	Color& operator= (const RGB& v);
-
-	/// Return true if all components are equal, false otherwise
-	bool operator ==(const Color& v) const { return v.r==r && v.g==g && v.b==b && v.a==a; }
-
-	/// Return true if components are not equal, false otherwise
-	bool operator !=(const Color& v) const { return !(*this == v); }
-
-	Color& operator+= (const Color& v){ return set(r+v.r, g+v.g, b+v.b, a+v.a); }
-	Color& operator-= (const Color& v){ return set(r-v.r, g-v.g, b-v.b, a-v.a); }
-	Color& operator*= (const Color& v){ return set(r*v.r, g*v.g, b*v.b, a*v.a); }
-	Color& operator/= (const Color& v){ return set(r/v.r, g/v.g, b/v.b, a/v.a); }
-	Color& operator+= (float v){ return set(r+v, g+v, b+v, a+v); }
-	Color& operator-= (float v){ return set(r-v, g-v, b-v, a-v); }
-	Color& operator*= (float v){ return set(r*v, g*v, b*v, a*v); }
-	Color& operator/= (float v){ return set(r/v, g/v, b/v, a/v); }
-
-	Color operator- () const { return Color(-r,-g,-b,-a); }
-	Color operator+ (const Color& v) const { return Color(*this)+=v; }
-	Color operator- (const Color& v) const { return Color(*this)-=v; }
-	Color operator* (const Color& v) const { return Color(*this)*=v; }
-	Color operator/ (const Color& v) const { return Color(*this)/=v; }
-	Color operator+ (float v) const { return Color(*this)+=v; }
-	Color operator- (float v) const { return Color(*this)-=v; }
-	Color operator* (float v) const { return Color(*this)*=v; }
-	Color operator/ (float v) const { return Color(*this)/=v; }
-
-	/// Clamp all components into [0,1] range
-	Color& clamp(){
-		for(int i=0; i<4; ++i){
-			float& v = components[i];
-			v<0.f ? v=0.f : (v>1.f ? v=1.f : 0);
-		}
-		return *this;
-	}
-
-	/// Returns inverted color
-	Color inverse() const { return Color(*this).invert(); }
-
-	/// Invert RGB components
-	Color& invert();
-
-	/// Returns luminance value
-	float luminance() const;
-
-	/// Returns self linearly mixed with another color (0 = none)
-	Color mix(const Color& c, float amt=0.5f) const {
-		return (c-*this)*amt + *this;
-	}
-
-private:
-	float tof(uint8_t v){ return float(v)/255.f; }
-};
-
-
-
-/// Color represented by red, green, blue, and alpha components packed into 32-bit integer
-
-/// The component accessor methods operate exclusively with integer types. To
-/// convert to and from floating point values in the interval [0, 1], use the
-/// overloaded assignment (=) operators.
-struct Colori {
-	
-	union{
-		struct{
-			uint8_t r;			///< Red component in [0, 255]
-			uint8_t g;			///< Green component in [0, 255]
-			uint8_t b;			///< Blue component in [0, 255]
-			uint8_t a;			///< Alpha component in [0, 255]
-		};
-		uint8_t components[4];	///< RGBA component vector
-		uint32_t rgba;			///< RGBA components packed into 32-bit integer
-	};
-
-
-	/// @param[in] r			red component
-	/// @param[in] g			green component
-	/// @param[in] b			blue component
-	/// @param[in] a			alpha component
-	Colori(uint8_t r, uint8_t g, uint8_t b, uint8_t a=255)
-	:	r(r), g(g), b(b), a(a){}
-
-	/// @param[in] gray			red/green/blue components
-	/// @param[in] a			alpha component
-	Colori(uint8_t gray=255, uint8_t a=255)
-	:	r(gray), g(gray), b(gray), a(a){}
-
-	/// @param[in] c			RGBA color to convert from
-	Colori(const Color& c){ *this = c; }
-
-	/// @param[in] hsv			HSV color
-	/// @param[in] a			alpha component
-	Colori(const HSV& hsv, uint8_t a=255)
-	:	a(a)
-	{	*this = hsv; }
-
-	/// @param[in] rgb			RGB color
-	/// @param[in] a			alpha component
-	Colori(const RGB& rgb, uint8_t a=255)
-	:	a(a)
-	{	*this = rgb; }
-
-	/// Set color component at index with no bounds checking
-	uint8_t& operator[](int i){ return components[i]; }
-
-	/// Get color component at index with no bounds checking
-	const uint8_t& operator[](int i) const { return components[i]; }
-
-	/// Set from floating-point color
-	Colori& operator= (const Color& v){
-		return set(toi(v.r), toi(v.g), toi(v.b), toi(v.a)); }
-
-	/// Set RGB components from HSV
-	Colori& operator= (const HSV& v);
-
-	/// Set RGB components from RGB
-	Colori& operator= (const RGB& v);
-
-	/// Set RGB components
-	Colori& set(uint8_t re, uint8_t gr, uint8_t bl){
-		r=re; g=gr; b=bl; return *this; }
-
-	/// Set RGBA components
-	Colori& set(uint8_t re, uint8_t gr, uint8_t bl, uint8_t al){
-		a=al; return set(re,gr,bl); }
-
-	/// Set from gray value
-	Colori& set(uint8_t v){ return set(v,v,v); }
-
-	/// Set from gray value and alpha
-	Colori& set(uint8_t v, uint8_t al){ return set(v,al); }
-
-private:
-	uint8_t toi(float v){ return uint8_t(v*255.f); }
-};
-
-
-
-/// Color represented by hue, saturation, and value
-struct HSV{
-
-	union{
-		struct{
-			float h;			///< Hue component in [0, 1]
-			float s;			///< Saturation component in [0, 1]
-			float v;			///< Value component in [0, 1]
-		};
-		float components[3];	///< HSV component vector
-	};
-
-
-	/// @param[in] h	hue
-	/// @param[in] s	saturation
-	/// @param[in] v	value
-	HSV(float h=0, float s=1, float v=1): h(h), s(s), v(v){}
-
-	/// @param[in] v	RGB color to convert from
-	HSV(const Color& v){ *this = v; }
-
-	/// @param[in] v	RGB color to convert from
-	HSV(const Colori& v){ *this = v; }
-
-	/// @param[in] v	RGB color to convert from
-	HSV(const RGB& v){ *this = v; }
-
-	/// @param[in] hsv	3-vector of HSV components
-	template<class T>
-	HSV(T * hsv): h(hsv[0]), s(hsv[1]), v(hsv[2]){}
-
-
-	/// Set color component at index with no bounds checking
-	float& operator[](int i){ return components[i]; }
-
-	/// Get color component at index with no bounds checking
-	const float& operator[](int i) const { return components[i]; }
-
-
-	/// Set from RGBA color
-	HSV& operator= (const Color& v){ return *this = v.rgb(); }
-
-	/// Set from RGBA color
-	HSV& operator= (const Colori& v){ return *this = Color(v); }
-
-	/// Set from RGB color
-	HSV& operator= (const RGB& v);
-
-	/// Get new HSV with value component multiplied by a scalar
-	HSV  operator* (float a) const { return HSV(*this)*=a; }
-
-	/// Multiply value component by a scalar
-	HSV& operator*=(float a){ v*=a; return *this; }
-
-
-	/// Rotate hue in interval [0, 1)
-	HSV& rotateHue(float dh){ h += dh; return wrapHue(); }
-
-	/// Wrap hue value into valid interval [0, 1)
-	HSV& wrapHue(){
-		if(h>1){ h -= int(h); }
-		else if(h<0){ h -= int(h)-1; }
-		return *this;
-	}
-};
-
-
-
-/// Color represented by red, green, and blue components
-
-/// This offers an alternative to the Color class where the alpha component
-/// is not required for computation.
-#ifdef RGB	/* Windows related fix */
+  struct RGB;
+  struct HSV;
+  struct Color;
+  struct Colori;
+
+  //ogc
+  struct XYZ;
+  struct Lab;
+  struct HCLab;
+  struct Luv;
+  struct HCLuv;
+
+  /// Color represented by red, green, blue, and alpha components
+  struct Color{
+
+    union{
+      struct{
+	float r;///< Red component in [0, 1]
+	float g;///< Green component in [0, 1]
+	float b;///< Blue component in [0, 1]
+	float a;///< Alpha component in [0, 1]
+      };
+      float components[4];///< RGBA component vector
+    };
+
+
+    /// @param[in] r                   red component
+    /// @param[in] g                   green component
+    /// @param[in] b                   blue component
+    /// @param[in] a                   alpha component
+    Color(float r, float g, float b, float a=1.f)
+      :r(r), g(g), b(b), a(a){}
+
+    /// @param[in] gray                red/green/blue components
+    /// @param[in] a                   alpha component
+    Color(float gray=1.f, float a=1.f)
+      :r(gray), g(gray), b(gray), a(a){}
+
+    /// @param[in] c                   RGBA color to convert from
+    Color(const Colori& c){ *this = c; }
+
+    /// @param[in] hsv                 HSV value
+    /// @param[in] a                   alpha component
+    Color(const HSV& hsv, float a=1.f)
+      :a(a)
+    {*this = hsv; }
+
+    /// @param[in] rgb                 RGB value
+    /// @param[in] a                   alpha component
+    Color(const RGB& rgb, float a=1.f)
+      :a(a)
+    {*this = rgb; }
+  
+    /// @param[in] xyz                 XYZ color to convert from
+    Color(const XYZ& xyz, float a =1.f) 
+      : a(a)
+    {*this = xyz; }
+
+    /// @param[in] lab                 Lab color to convert from
+    Color(const Lab& lab, float a =1.f) 
+      : a(a)
+    {*this = lab; }
+
+    /// @param[in] hclab               HCLab color to convert from
+    Color(const HCLab& hclab, float a =1.f) 
+      : a(a)
+    {*this = hclab; }
+
+    /// @param[in] luv                 Luv color to convert from
+    Color(const Luv& luv, float a =1.f) 
+      : a(a)
+    {*this = luv; }
+
+    /// @param[in] hcluv               HCLuv color to convert from
+    Color(const HCLuv& hcluv, float a =1.f) 
+      : a(a)
+    {*this = hcluv; }
+
+  
+    /// Set color component at index with no bounds checking
+    float& operator[](int i){ return components[i]; }
+
+    /// Get color component at index with no bounds checking
+    const float& operator[](int i) const { return components[i]; }
+
+    RGB& rgb(){ return *(RGB*)(components); }
+    const RGB& rgb() const { return *(const RGB*)(components); }
+
+
+    /// Set RGB from another color and alpha from argument
+    Color& set(const Color& c, float al){ a=al; return set(c.r,c.g,c.b); }
+
+    /// Set RGBA components
+    Color& set(float re, float gr, float bl, float al){ a=al; return set(re,gr,bl); }
+
+    /// Set RGB components
+    Color& set(float re, float gr, float bl){ r=re; g=gr; b=bl; return *this; }
+
+    /// Set from gray value
+    Color& set(float v){ return set(v,v,v); }
+
+    /// Set from gray value and alpha
+    Color& set(float v, float al){ return set(v,v,v,a); }
+
+    /// Set from an array of RGBA components
+    template <class T>
+    Color& set(const T* rgba){ return set(rgba[0],rgba[1],rgba[2],rgba[3]); }
+
+    /// Set components from tightly packed RGBA array
+    template <class Array4>
+    Color& operator= (const Array4& v){ return set(v[0], v[1], v[2], v[3]); }
+
+    /// Set from gray value
+    Color& operator= (float v){ return set(v); }
+    Color& operator= (double v){ return set(v); }
+
+    /// Set components from integer color
+    Color& operator= (const Colori& v);
+
+    /// Set RGB components from HSV
+    Color& operator= (const HSV& v);
+
+    /// Set RGB components from RGB
+    Color& operator= (const RGB& v);
+  
+    /// Set RGB components from XYZ
+    Color& operator= (const XYZ& v);
+
+    /// Set RGB components from Lab
+    Color& operator= (const Lab& v);
+
+    /// Set RGB components from HCLab
+    Color& operator= (const HCLab& v);
+
+    /// Set RGB components from Luv
+    Color& operator= (const Luv& v);
+
+    /// Set RGB components from HCLuv
+    Color& operator= (const HCLuv& v);
+  
+    /// Return true if all components are equal, false otherwise
+    bool operator ==(const Color& v) const { return v.r==r && v.g==g && v.b==b && v.a==a; }
+
+    /// Return true if components are not equal, false otherwise
+    bool operator !=(const Color& v) const { return !(*this == v); }
+
+    Color& operator+= (const Color& v){ return set(r+v.r, g+v.g, b+v.b, a+v.a); }
+    Color& operator-= (const Color& v){ return set(r-v.r, g-v.g, b-v.b, a-v.a); }
+    Color& operator*= (const Color& v){ return set(r*v.r, g*v.g, b*v.b, a*v.a); }
+    Color& operator/= (const Color& v){ return set(r/v.r, g/v.g, b/v.b, a/v.a); }
+    Color& operator+= (float v){ return set(r+v, g+v, b+v, a+v); }
+    Color& operator-= (float v){ return set(r-v, g-v, b-v, a-v); }
+    Color& operator*= (float v){ return set(r*v, g*v, b*v, a*v); }
+    Color& operator/= (float v){ return set(r/v, g/v, b/v, a/v); }
+
+    Color operator- () const { return Color(-r,-g,-b,-a); }
+    Color operator+ (const Color& v) const { return Color(*this)+=v; }
+    Color operator- (const Color& v) const { return Color(*this)-=v; }
+    Color operator* (const Color& v) const { return Color(*this)*=v; }
+    Color operator/ (const Color& v) const { return Color(*this)/=v; }
+    Color operator+ (float v) const { return Color(*this)+=v; }
+    Color operator- (float v) const { return Color(*this)-=v; }
+    Color operator* (float v) const { return Color(*this)*=v; }
+    Color operator/ (float v) const { return Color(*this)/=v; }
+
+    /// Clamp all components into [0,1] range
+    Color& clamp(){
+      for(int i=0; i<4; ++i){
+	float& v = components[i];
+	v<0.f ? v=0.f : (v>1.f ? v=1.f : 0);
+      }
+      return *this;
+    }
+
+    /// Returns inverted color
+    Color inverse() const { return Color(*this).invert(); }
+
+    /// Invert RGB components
+    Color& invert();
+
+    /// Returns luminance value
+    float luminance() const;
+
+    /// Returns self linearly mixed with another color (0 = none)
+    Color mix(const Color& c, float amt=0.5f) const {
+      return (c-*this)*amt + *this;
+    }
+
+  private:
+    float tof(uint8_t v){ return float(v)/255.f; }
+  };
+
+
+
+  /// Color represented by red, green, blue, and alpha components packed into 32-bit integer
+
+  /// The component accessor methods operate exclusively with integer types. To
+  /// convert to and from floating point values in the interval [0, 1], use the
+  /// overloaded assignment (=) operators.
+  struct Colori {
+    
+    union{
+      struct{
+	uint8_t r;///< Red component in [0, 255]
+	uint8_t g;///< Green component in [0, 255]
+	uint8_t b;///< Blue component in [0, 255]
+	uint8_t a;///< Alpha component in [0, 255]
+      };
+      uint8_t components[4];///< RGBA component vector
+      uint32_t rgba;///< RGBA components packed into 32-bit integer
+    };
+
+
+    /// @param[in] r                              red component
+    /// @param[in] g                              green component
+    /// @param[in] b                              blue component
+    /// @param[in] a                              alpha component
+    Colori(uint8_t r, uint8_t g, uint8_t b, uint8_t a=255)
+      :r(r), g(g), b(b), a(a){}
+
+    /// @param[in] gray                           red/green/blue components
+    /// @param[in] a                              alpha component
+    Colori(uint8_t gray=255, uint8_t a=255)
+      :r(gray), g(gray), b(gray), a(a){}
+
+    /// @param[in] c                              RGBA color to convert from
+    Colori(const Color& c){ *this = c; }
+
+    /// @param[in] hsv                            HSV value
+    /// @param[in] a                              alpha component
+    Colori(const HSV& hsv, uint8_t a=255)
+      :a(a)
+    {*this = hsv; }
+
+    /// @param[in] hsv                            HSV value
+    /// @param[in] a                              alpha component
+    Colori(const RGB& rgb, uint8_t a=255)
+      :a(a)
+    {*this = rgb; }
+
+  
+    /// @param[in] xyz                            XYZ color to convert from
+    /// @param[in] a                              alpha component
+    Colori(const XYZ& xyz, float a =1.f)
+      : a(a)
+    {*this = xyz; }
+
+    /// @param[in] lab                            Lab color to convert from
+    /// @param[in] a                              alpha component
+    Colori(const Lab& lab, float a =1.f) 
+      : a(a)
+    {*this = lab; }
+
+    /// @param[in] hclab                          HCLab color to convert from
+    /// @param[in] a                              alpha component
+    Colori(const HCLab& hclab, float a =1.f)
+      : a(a)
+    {*this = hclab; }
+
+    /// @param[in] luv                            Luv color to convert from
+    /// @param[in] a                              alpha component
+    Colori(const Luv& luv, float a =1.f) 
+      : a(a)
+    {*this = luv; }
+
+    /// @param[in] hcluvHCLuv color to convert from
+    /// @param[in] a                              alpha component
+    Colori(const HCLuv& hcluv, float a =1.f) 
+      : a(a)
+    {*this = hcluv; }
+
+    /// Set color component at index with no bounds checking
+    uint8_t& operator[](int i){ return components[i]; }
+
+    /// Get color component at index with no bounds checking
+    const uint8_t& operator[](int i) const { return components[i]; }
+
+    /// Set from floating-point color
+    Colori& operator= (const Color& v){
+      return set(toi(v.r), toi(v.g), toi(v.b), toi(v.a)); }
+
+    /// Set RGB components from HSV
+    Colori& operator= (const HSV& v);
+
+    /// Set RGB components from RGB
+    Colori& operator= (const RGB& v);
+
+  
+    /// Set RGB components from XYZ
+    Colori& operator= (const XYZ& v);
+
+    /// Set RGB components from Lab
+    Colori& operator= (const Lab& v);
+
+    /// Set RGB components from HCLab
+    Colori& operator= (const HCLab& v);
+
+    /// Set RGB components from Luv
+    Colori& operator= (const Luv& v);
+
+    /// Set RGB components from HCLuv
+    Colori& operator= (const HCLuv& v);
+  
+    /// Set RGB components
+    Colori& set(uint8_t re, uint8_t gr, uint8_t bl){
+      r=re; g=gr; b=bl; return *this; }
+
+    /// Set RGBA components
+    Colori& set(uint8_t re, uint8_t gr, uint8_t bl, uint8_t al){
+      a=al; return set(re,gr,bl); }
+
+    /// Set from gray value
+    Colori& set(uint8_t v){ return set(v,v,v); }
+
+    /// Set from gray value and alpha
+    Colori& set(uint8_t v, uint8_t al){ return set(v,al); }
+
+  private:
+    uint8_t toi(float v){ return uint8_t(v*255.f); }
+  };
+
+
+
+  /// Color represented by hue, saturation, and value
+  struct HSV{
+
+    union{
+      struct{
+	float h;///< Hue component in [0, 1]
+	float s;///< Saturation component in [0, 1]
+	float v;///< Value component in [0, 1]
+      };
+      float components[3];///< HSV component vector
+    };
+
+
+    /// @param[in] h                                  hue
+    /// @param[in] s                                  saturation
+    /// @param[in] v                                  value
+    HSV(float h=0, float s=1, float v=1): h(h), s(s), v(v){}
+
+    /// @param[in] v                                  RGB color to convert from
+    HSV(const Color& v){ *this = v; }
+
+    /// @param[in] v                                  RGB color to convert from
+    HSV(const Colori& v){ *this = v; }
+
+    /// @param[in] v                                  RGB color to convert from
+    HSV(const RGB& v){ *this = v; }
+  
+    /// @param[in] xyz                                XYZ color to convert from
+    HSV(const XYZ& xyz)
+    {*this = xyz; }
+
+    /// @param[in] lab                                Lab color to convert from
+    HSV(const Lab& lab)
+    {*this = lab; }
+
+    /// @param[in] hclab                              HCLab color to convert from
+    HSV(const HCLab& hclab)
+    {*this = hclab; }
+
+    /// @param[in] luv                                Luv color to convert from
+    HSV(const Luv& luv)
+    {*this = luv; }
+
+    /// @param[in] hcluv                              HCLuv color to convert from
+    HSV(const HCLuv& hcluv)
+    {*this = hcluv; }
+  
+
+    /// @param[in] hsv                                3-vector of HSV components
+    template<class T>
+    HSV(T * hsv): h(hsv[0]), s(hsv[1]), v(hsv[2]){}
+
+
+    /// Set color component at index with no bounds checking
+    float& operator[](int i){ return components[i]; }
+
+    /// Get color component at index with no bounds checking
+    const float& operator[](int i) const { return components[i]; }
+
+
+    /// Set from RGBA color
+    HSV& operator= (const Color& v){ return *this = v.rgb(); }
+
+    /// Set from RGBA color
+    HSV& operator= (const Colori& v){ return *this = Color(v); }
+
+    /// Set from RGB color
+    HSV& operator= (const RGB& v);
+  
+    /// Set from XYZ color
+    HSV& operator= (const XYZ& v);
+
+    /// Set from Lab color
+    HSV& operator= (const Lab& v);
+
+    /// Set from HCLab color
+    HSV& operator= (const HCLab& v);
+
+    /// Set from Luv color
+    HSV& operator= (const Luv& v);
+
+    /// Set from HCLuv color
+    HSV& operator= (const HCLuv& v);
+  
+    /// Get new HSV with value component multiplied by a scalar
+    HSV  operator* (float a) const { return HSV(*this)*=a; }
+
+    /// Multiply value component by a scalar
+    HSV& operator*=(float a){ v*=a; return *this; }
+
+
+    /// Rotate hue in interval [0, 1)
+    HSV& rotateHue(float dh){ h += dh; return wrapHue(); }
+
+    /// Wrap hue value into valid interval [0, 1)
+    HSV& wrapHue(){
+      if(h>1){ h -= int(h); }
+      else if(h<0){ h -= int(h)-1; }
+      return *this;
+    }
+  };
+
+
+
+  /// Color represented by red, green, and blue components
+
+  /// This offers an alternative to the Color class where the alpha component
+  /// is not required for computation.
+#ifdef RGB/* Windows related fix */
 #undef RGB
 #endif
-struct RGB{
-	union{
-		struct{
-			float r;			///< Red component in [0, 1]
-			float g;			///< Green component in [0, 1]
-			float b;			///< Blue component in [0, 1]
-		};
-		float components[3];	///< RGB component vector
-	};
+  struct RGB{
+    union{
+      struct{
+	float r;///< Red component in [0, 1]
+	float g;///< Green component in [0, 1]
+	float b;///< Blue component in [0, 1]
+      };
+      float components[3];///< RGB component vector
+    };
 
 
-	/// @param[in] r		red component
-	/// @param[in] g		green component
-	/// @param[in] b		blue component
-	RGB(float r, float g, float b)
-	:	r(r), g(g), b(b){}
+    /// @param[in] r                         red component
+    /// @param[in] g                         green component
+    /// @param[in] b                         blue component
+    RGB(float r, float g, float b)
+      :r(r), g(g), b(b){}
 
-	/// @param[in] gray		red/green/blue components
-	RGB(float gray=1.f)
-	:	r(gray), g(gray), b(gray){}
+    /// @param[in] gray                      red/green/blue components
+    RGB(float gray=1.f)
+      :r(gray), g(gray), b(gray){}
 
-	/// @param[in] v		RGB color to convert from
-	RGB(const Color& v){ *this = v; }
+    /// @param[in] v                         RGB color to convert from
+    RGB(const Color& v){ *this = v; }
 
-	/// @param[in] hsv			HSV value
-	RGB(const HSV& hsv)
-	{	*this = hsv; }
+    /// @param[in] hsv                       HSV value
+    RGB(const HSV& hsv)
+    {*this = hsv; }
+  
+    /// @param[in] xyz                       XYZ value
+    RGB(const XYZ& xyz)
+    {*this = xyz; }
+  
+    /// @param[in] lab                       Lab value
+    RGB(const Lab& lab)
+    {*this = lab; }
+  
+    /// @param[in] hclab                     HCLab value
+    RGB(const HCLab& hclab)
+    {*this = hclab; }
 
+    /// @param[in] luv                       Luv value
+    RGB(const Luv& luv)
+    {*this = luv; }
 
-	/// Set color component at index with no bounds checking
-	float& operator[](int i){ return components[i]; }
+    /// @param[in] hcluv                     HCLuv value
+    RGB(const HCLuv& hcluv)
+    {*this = hcluv; }
+  
+    /// Set color component at index with no bounds checking
+    float& operator[](int i){ return components[i]; }
 
-	/// Get color component at index with no bounds checking
-	const float& operator[](int i) const { return components[i]; }
-
-
-	/// Set from another RGB
-	RGB& set(const RGB& v){ return set(v.r,v.g,v.b); }
-
-	/// Set from RGB components
-	RGB& set(float re, float gr, float bl){ r=re; g=gr; b=bl; return *this; }
-
-	/// Set from gray value
-	RGB& set(float v){ return set(v,v,v); }
-
-	/// Set from an array of RGB components
-	template <class T>
-	RGB& set(const T* rgb){ return set(rgb[0],rgb[1],rgb[2]); }
-
-	/// Set components from tightly packed RGB array
-	template <class Array3>
-	RGB& operator= (const Array3& v){ return set(v[0],v[1],v[2]); }
-
-	/// Set from gray value
-	RGB& operator= (float v){ return set(v); }
-	RGB& operator= (double v){ return set(v); }
-
-	/// Set RGB components from HSV
-	RGB& operator= (const HSV& v);
-
-	/// Set RGB components from Color
-	RGB& operator= (const Color& v){ return set(v.rgb()); }
+    /// Get color component at index with no bounds checking
+    const float& operator[](int i) const { return components[i]; }
 
 
-	/// Return true if all components are equal, false otherwise
-	bool operator ==(const RGB& v) const { return v.r==r && v.g==g && v.b==b; }
+    /// Set from another RGB
+    RGB& set(const RGB& v){ return set(v.r,v.g,v.b); }
 
-	/// Return true if components are not equal, false otherwise
-	bool operator !=(const RGB& v) const { return !(*this == v); }
+    /// Set from RGB components
+    RGB& set(float re, float gr, float bl){ r=re; g=gr; b=bl; return *this; }
 
-	RGB& operator+= (const RGB& v){ return set(r+v.r, g+v.g, b+v.b); }
-	RGB& operator-= (const RGB& v){ return set(r-v.r, g-v.g, b-v.b); }
-	RGB& operator*= (const RGB& v){ return set(r*v.r, g*v.g, b*v.b); }
-	RGB& operator/= (const RGB& v){ return set(r/v.r, g/v.g, b/v.b); }
-	RGB& operator+= (float v){ return set(r+v, g+v, b+v); }
-	RGB& operator-= (float v){ return set(r-v, g-v, b-v); }
-	RGB& operator*= (float v){ return set(r*v, g*v, b*v); }
-	RGB& operator/= (float v){ return set(r/v, g/v, b/v); }
+    /// Set from gray value
+    RGB& set(float v){ return set(v,v,v); }
 
-	RGB operator- () const { return RGB(-r,-g,-b); }
-	RGB operator+ (const RGB& v) const { return RGB(*this)+=v; }
-	RGB operator- (const RGB& v) const { return RGB(*this)-=v; }
-	RGB operator* (const RGB& v) const { return RGB(*this)*=v; }
-	RGB operator/ (const RGB& v) const { return RGB(*this)/=v; }
-	RGB operator+ (float v) const { return RGB(*this)+=v; }
-	RGB operator- (float v) const { return RGB(*this)-=v; }
-	RGB operator* (float v) const { return RGB(*this)*=v; }
-	RGB operator/ (float v) const { return RGB(*this)/=v; }
+    /// Set from an array of RGB components
+    template <class T>
+    RGB& set(const T* rgb){ return set(rgb[0],rgb[1],rgb[2]); }
 
+    /// Set components from tightly packed RGB array
+    template <class Array3>
+    RGB& operator= (const Array3& v){ return set(v[0],v[1],v[2]); }
 
-	/// Clamp all components into [0,1] range
-	RGB& clamp(){
-		for(int i=0; i<3; ++i){
-			float& v = components[i];
-			v<0.f ? v=0.f : (v>1.f ? v=1.f : 0);
-		}
-		return *this;
-	}
+    /// Set from gray value
+    RGB& operator= (float v){ return set(v); }
+    RGB& operator= (double v){ return set(v); }
 
-	/// Returns inverted color
-	RGB inverse() const { return RGB(*this).invert(); }
+    /// Set RGB components from HSV
+    RGB& operator= (const HSV& v);
 
-	/// Invert RGB components
-	RGB& invert(){ return set(1.f-r, 1.f-g, 1.f-b); }
+    /// Set RGB components from Color
+    RGB& operator= (const Color& v){ return set(v.rgb()); }
+  
+    /// Set RGB components from XYZ
+    RGB& operator= (const XYZ& v);
+  
+    /// Set RGB components from Lab
+    RGB& operator= (const Lab& v);
+  
+    /// Set RGB components from HCLab
+    RGB& operator= (const HCLab& v);
 
-	/// Returns luminance value
-	float luminance() const { return r*0.3f + g*0.59f + b*0.11f; }
+    /// Set RGB components from Luv
+    RGB& operator= (const Luv& v);
 
-	/// Returns self linearly mixed with another color (0 = none)
-	RGB mix(const RGB& v, float amt=0.5f) const {
-		return (v-*this)*amt + *this;
-	}
-};
+    /// Set RGB components from HCLuv
+    RGB& operator= (const HCLuv& v);
+  
+    /// Return true if all components are equal, false otherwise
+    bool operator ==(const RGB& v) const { return v.r==r && v.g==g && v.b==b; }
 
+    /// Return true if components are not equal, false otherwise
+    bool operator !=(const RGB& v) const { return !(*this == v); }
 
+    RGB& operator+= (const RGB& v){ return set(r+v.r, g+v.g, b+v.b); }
+    RGB& operator-= (const RGB& v){ return set(r-v.r, g-v.g, b-v.b); }
+    RGB& operator*= (const RGB& v){ return set(r*v.r, g*v.g, b*v.b); }
+    RGB& operator/= (const RGB& v){ return set(r/v.r, g/v.g, b/v.b); }
+    RGB& operator+= (float v){ return set(r+v, g+v, b+v); }
+    RGB& operator-= (float v){ return set(r-v, g-v, b-v); }
+    RGB& operator*= (float v){ return set(r*v, g*v, b*v); }
+    RGB& operator/= (float v){ return set(r/v, g/v, b/v); }
 
-// Implementation --------------------------------------------------------------
-
-inline RGB operator + (float s, const RGB& c){ return  c+s; }
-inline RGB operator - (float s, const RGB& c){ return -c+s; }
-inline RGB operator * (float s, const RGB& c){ return  c*s; }
-inline RGB operator / (float s, const RGB& c){ return RGB(s/c.r, s/c.g, s/c.b); }
-
-
-
-inline Color operator + (float s, const Color& c){ return  c+s; }
-inline Color operator - (float s, const Color& c){ return -c+s; }
-inline Color operator * (float s, const Color& c){ return  c*s; }
-inline Color operator / (float s, const Color& c){ return Color(s/c.r, s/c.g, s/c.b, s/c.a); }
-
-inline Color& Color::operator= (const Colori& v){
-	r=tof(v.r); g=tof(v.g); b=tof(v.b); a=tof(v.a); return *this; }
-
-inline Color& Color::operator= (const HSV& v){ rgb()=v; return *this; }
-inline Color& Color::operator= (const RGB& v){ rgb()=v; return *this; }
-
-inline Color& Color::invert(){ rgb().invert(); return *this; }
-
-inline float Color::luminance() const { return rgb().luminance(); }
+    RGB operator- () const { return RGB(-r,-g,-b); }
+    RGB operator+ (const RGB& v) const { return RGB(*this)+=v; }
+    RGB operator- (const RGB& v) const { return RGB(*this)-=v; }
+    RGB operator* (const RGB& v) const { return RGB(*this)*=v; }
+    RGB operator/ (const RGB& v) const { return RGB(*this)/=v; }
+    RGB operator+ (float v) const { return RGB(*this)+=v; }
+    RGB operator- (float v) const { return RGB(*this)-=v; }
+    RGB operator* (float v) const { return RGB(*this)*=v; }
+    RGB operator/ (float v) const { return RGB(*this)/=v; }
 
 
-inline Colori& Colori::operator= (const HSV& v){
-	return *this = RGB(v);
-}
+    /// Clamp all components into [0,1] range
+    RGB& clamp(){
+      for(int i=0; i<3; ++i){
+	float& v = components[i];
+	v<0.f ? v=0.f : (v>1.f ? v=1.f : 0);
+      }
+      return *this;
+    }
 
-inline Colori& Colori::operator= (const RGB& v){
-	return set(toi(v.r), toi(v.g), toi(v.b), 255);
-}
+    /// Returns inverted color
+    RGB inverse() const { return RGB(*this).invert(); }
+
+    /// Invert RGB components
+    RGB& invert(){ return set(1.f-r, 1.f-g, 1.f-b); }
+
+    /// Returns luminance value
+    float luminance() const { return r*0.3f + g*0.59f + b*0.11f; }
+
+    /// Returns self linearly mixed with another color (0 = none)
+    RGB mix(const RGB& v, float amt=0.5f) const {
+      return (v-*this)*amt + *this;
+    }
+  };
+
+  //////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////
+  //begin xyz
+
+  struct XYZ{
+    union{
+      struct{
+	float x;///< red component in [0, 1]
+	float y;///< green component in [0, 1]
+	float z;///< blue component in [0, 1]
+      };
+      float components[3];///< XYZ component vector
+    };
+
+    /// @param[in] x                                   CIE X
+    /// @param[in] y                                   CIE Y
+    /// @param[in] z                                   CIE Z
+    XYZ(float x=0, float y=1, float z=1): x(x), y(y), z(z){}
+
+    /// @param[in] v                                   RGB color to convert from
+    XYZ(const Color& v){ *this = v; }
+
+    /// @param[in] v                                   RGB color to convert from
+    XYZ(const Colori& v){ *this = v; }
+
+    /// @param[in] v                                   RGB color to convert from
+    XYZ(const RGB& v){ *this = v; }
+
+    /// @param[in] v                                   HSV color to convert from
+    XYZ(const HSV& v){ *this = v; }
+
+    /// @param[in] v                                   Lab color to convert from
+    XYZ(const Lab& v){ *this = v; }
+
+    /// @param[in] v                                   Luv color to convert from
+    XYZ(const Luv& v){ *this = v; }
+
+    /// @param[in] xyz                                 3-vector of XYZ components
+    template<class T>
+    XYZ(T * xyz): x(xyz[0]), y(xyz[1]), z(xyz[2]){}
 
 
-inline HSV operator * (float s, const HSV& c){ return  c*s; }
+    /// Set color component at index with no bounds checking
+    float& operator[](int i){ return components[i]; }
+
+    /// Get color component at index with no bounds checking
+    const float& operator[](int i) const { return components[i]; }
+
+
+    /// Set from RGBA color
+    XYZ& operator= (const Color& v){ return *this = v.rgb(); }
+
+    /// Set from RGBA color
+    XYZ& operator= (const Colori& v){ return *this = Color(v); }
+
+    /// Set from RGB color
+    XYZ& operator= (const RGB& v);
+
+    /// Set from HSV color
+    XYZ& operator= (const HSV& v){
+      return *this = RGB(v);
+    }
+
+    /// Set from Lab color
+    XYZ& operator= (const Lab& v);
+
+    /// Set from Luv color
+    XYZ& operator= (const Luv& v);
+
+  };
+
+
+  //end xyz
+  //////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////
+  //begin lab
+
+
+  /// Color represented by L* (lightness), a*, b*
+  struct Lab{
+    union{
+      struct{
+	float l; ///< Lightness component in [0, 100]
+	float a; ///< red-green axis (red is positive, green is negative)
+	///  range in [-85.9293, 97.9631] (8-bit rgb gamut)
+	float b; ///< yellow-blue axis (yellow is positive, blue is negative)
+	///  range in [-107.544, 94.2025]
+	//range determined empirically using
+	//16million RGB color image from http://brucelindbloom.com
+	///Note: color is neutral gray when  a and b are both 0
+      };
+      float components[3];///< Lab component vector
+    };
+
+
+    /// @param[in] l                                  Lightness
+    /// @param[in] a                                  a
+    /// @param[in] b                                  b
+    Lab(float l=1, float a=1, float b=1): l(l), a(a), b(b){}
+
+    /// @param[in] v                                  RGB color to convert from
+    Lab(const Color& v){ *this = v; }
+
+    /// @param[in] v                                  RGB color to convert from
+    Lab(const Colori& v){ *this = v; }
+
+    /// @param[in] v                                  RGB color to convert from
+    Lab(const RGB& v){ *this = v; }
+
+    /// @param[in] v                                  HSV color to convert from
+    Lab(const HSV& v){ *this = v; }
+
+    /// @param[in] v                                  XYZ color to convert from
+    Lab(const XYZ& v){ *this = v; }
+
+    /// @param[in] v                                  HCLab color to convert from
+    Lab(const HCLab& v){ *this = v; }
+
+    /// @param[in] hsv                                3-vector of Lab components
+    template<class T>
+    Lab(T * Lab): l(Lab[0]), a(Lab[1]), b(Lab[2]){}
+
+
+    /// Set color component at index with no bounds checking
+    float& operator[](int i){ return components[i]; }
+
+    /// Get color component at index with no bounds checking
+    const float& operator[](int i) const { return components[i]; }
+
+
+    /// Set from RGBA color
+    Lab& operator= (const Color& v){ return *this = v.rgb(); }
+
+    /// Set from RGBA color
+    Lab& operator= (const Colori& v){ return *this = Color(v); }
+
+    /// Set from XYZ color
+    Lab& operator= (const XYZ& v);
+
+    /// Set from RGB color
+    Lab& operator= (const RGB& v){
+      return *this = XYZ(v);
+    }
+
+    /// Set from HSV color
+    Lab& operator= (const HSV& v){
+      return *this = XYZ(v);
+    }
+
+    Lab& operator=(const HCLab& v);
+
+    /// Get new Lab with value component multiplied by a scalar
+    Lab  operator* (float c) const { return Lab(*this)*=c; }
+
+    /// Multiply lightness component by a scalar
+    Lab& operator*=(float c){ l*=c; return *this; }
+  
+  };
+
+  //end lab
+  //////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////
+  //begin hclab
+
+  /// Color represented by hue, chroma, luminance(ab)
+  struct HCLab{
+
+    union{
+      struct{
+	//ranges normalized to 8-bit RGB gamut using
+	//16million RGB color image from http://brucelindbloom.com
+	float h; ///< hue component in [0, 1]
+	float c; ///< chroma component
+	///  range in [0, 1]
+	float l; ///< luminance(ab) component
+	///  range in [0, 1]
+      };
+      float components[3];///< HCLab component vector
+    };
+
+
+    /// @param[in] h                                  hue
+    /// @param[in] c                                  chroma
+    /// @param[in] l                                  luminance(ab)
+    HCLab(float h=1, float c=1, float l=1): h(h), c(c), l(l){}
+
+    /// @param[in] v                                  RGB color to convert from
+    HCLab(const Color& v){ *this = v; }
+
+    /// @param[in] v                                  RGB color to convert from
+    HCLab(const Colori& v){ *this = v; }
+
+    /// @param[in] v                                  RGB color to convert from
+    HCLab(const RGB& v){ *this = v; }
+
+    /// @param[in] v                                  HSV color to convert from
+    HCLab(const HSV& v){ *this = v; }
+
+    /// @param[in] v                                  XYZ color to convert from
+    HCLab(const XYZ& v){ *this = v; }
+
+    /// @param[in] v                                  Lab color to convert from
+    HCLab(const Lab& v){ *this = v; }\
+
+    /// @param[in] hcl                                3-vector of HCLab components
+    template<class T>
+    HCLab(T * HCLab): h(HCLab[0]), c(HCLab[1]), l(HCLab[2]){}
+
+
+    /// Set color component at index with no bounds checking
+    float& operator[](int i){ return components[i]; }
+
+    /// Get color component at index with no bounds checking
+    const float& operator[](int i) const { return components[i]; }
+
+
+    /// Set from RGBA color
+    HCLab& operator= (const Color& v){ return *this = v.rgb(); }
+
+    /// Set from RGBA color
+    HCLab& operator= (const Colori& v){ return *this = Color(v); }
+
+    /// Set from RGB color
+    HCLab& operator= (const RGB& v){
+      return *this = Lab(v);
+    }
+
+    /// Set from HSV color
+    HCLab& operator= (const HSV& v){
+      return *this = Lab(v);
+    }
+
+    /// Set from XYZ color
+    HCLab& operator= (const XYZ& v){
+      return *this = Lab(v);
+    }
+
+    /// Set from Lab color
+    HCLab& operator= (const Lab& v);
+
+    /// Get new HCLab with value component multiplied by a scalar
+    HCLab  operator* (float a) const { return HCLab(*this)*=a; }
+
+    /// Multiply luminance component by a scalar
+    HCLab& operator*=(float a){ l*=a; return *this; }
+
+    /// Rotate hue in interval [0, 1)
+    HCLab& rotateHue(float dh){ h += dh; return wrapHue(); }
+
+    /// Wrap hue value into valid interval [0, 1)
+    HCLab& wrapHue(){
+      if(h>1){ h -= int(h); }
+      else if(h<0){ h -= int(h)-1; }
+      return *this;
+    }
+
+  };
+
+
+
+
+  //end hclab
+  //////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////
+  //begin luv
+
+
+  /// Color represented by L* (lightness), u*, v*
+  struct Luv{
+    union{
+      struct{
+	float l; ///< Lightness component in [0, 100]
+	float u; ///< red-green axis (red is positive, green is negative)
+	///  range in [-82.7886, 174.378] (8-bit rgb gamut)
+	float v; ///< yellow-blue axis (yellow is positive, blue is negative)
+	///  range in [-133.556, 107.025]
+	//range determined empirically using
+	//16million RGB color image from http://brucelindbloom.com
+	///Note: color is neutral gray when  a and b are both 0
+      };
+      float components[3];///< Luv component vector
+    };
+
+
+    /// @param[in] l                                  Lightness
+    /// @param[in] u                                  u
+    /// @param[in] v                                  v
+    Luv(float l=1, float u=1, float v=1): l(l), u(u), v(v){}
+
+    /// @param[in] w                                  RGB color to convert from
+    Luv(const Color& w){ *this = w; }
+
+    /// @param[in] w                                  RGB color to convert from
+    Luv(const Colori& w){ *this = w; }
+
+    /// @param[in] w                                  RGB color to convert from
+    Luv(const RGB& w){ *this = w; }
+
+    /// @param[in] w                                  HSV color to convert from
+    Luv(const HSV& w){ *this = w; }
+
+    /// @param[in] w                                  XYZ color to convert from
+    Luv(const XYZ& w){ *this = w; }
+
+    /// @param[in] w                                  HCLuv color to convert from
+    Luv(const HCLuv& w){ *this = w; }
+
+    /// @param[in] hsv                                3-vector of Luv components
+    template<class T>
+    Luv(T * Luv): l(Luv[0]), u(Luv[1]), v(Luv[2]){}
+
+
+    /// Set color component at index with no bounds checking
+    float& operator[](int i){ return components[i]; }
+
+    /// Get color component at index with no bounds checking
+    const float& operator[](int i) const { return components[i]; }
+
+
+    /// Set from RGBA color
+    Luv& operator= (const Color& w){ return *this = w.rgb(); }
+
+    /// Set from RGBA color
+    Luv& operator= (const Colori& w){ return *this = Color(w); }
+
+    /// Set from XYZ color
+    Luv& operator= (const XYZ& w);
+
+    /// Set from HCLuv color
+    Luv& operator= (const HCLuv& w);
+
+    /// Set from RGB color
+    Luv& operator= (const RGB& w){
+      return *this = XYZ(w);
+    }
+
+    /// Set from HSV color
+    Luv& operator= (const HSV& w){
+      return *this = XYZ(w);
+    }
+
+    /// Get new Luv with value component multiplied by a scalar
+    Luv  operator* (float a) const { return Luv(*this)*=a; }
+
+    /// Multiply lightness component by a scalar
+    Luv& operator*=(float a){ l*=a; return *this; }
+  
+  };
+
+
+  //end luv
+  //////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////
+  //begin hcluv
+
+  /// Color represented by hue, chroma, luminance(uv)
+  struct HCLuv{
+
+    union{
+      struct{
+	//ranges normalized to 8-bit RGB gamut using
+	//16million RGB color image from http://brucelindbloom.com
+	float h; ///< hue component in [0, 1]
+	float c; ///< chroma component
+	///  range in [0, 1]
+	float l; ///< luminance(uv) component
+	///  range in [0, 1]
+      };
+      float components[3];///< HCLuv component vector
+    };
+
+
+    /// @param[in] h                                  hue
+    /// @param[in] c                                  chroma
+    /// @param[in] l                                  luminance(uv)
+    HCLuv(float h=1, float c=1, float l=1): h(h), c(c), l(l){}
+
+    /// @param[in] w                                  RGB color to convert from
+    HCLuv(const Color& w){ *this = w; }
+
+    /// @param[in] w                                  RGB color to convert from
+    HCLuv(const Colori& w){ *this = w; }
+
+    /// @param[in] w                                  RGB color to convert from
+    HCLuv(const RGB& w){ *this = w; }
+
+    /// @param[in] w                                  HSV color to convert from
+    HCLuv(const HSV& w){ *this = w; }
+
+    /// @param[in] v                                  XYZ color to convert from
+    HCLuv(const XYZ& w){ *this = w; }
+
+    /// @param[in] w                                  Luv color to convert from
+    HCLuv(const Luv& w){ *this = w; }
+
+    /// @param[in] hcl                                3-vector of HCLuv components
+    template<class T>
+    HCLuv(T * HCLuv): h(HCLuv[0]), c(HCLuv[1]), l(HCLuv[2]){}
+
+
+    /// Set color component at index with no bounds checking
+    float& operator[](int i){ return components[i]; }
+
+    /// Get color component at index with no bounds checking
+    const float& operator[](int i) const { return components[i]; }
+
+
+    /// Set from RGBA color
+    HCLuv& operator= (const Color& w){ return *this = w.rgb(); }
+
+    /// Set from RGBA color
+    HCLuv& operator= (const Colori& w){ return *this = Color(w); }
+
+    /// Set from RGB color
+    HCLuv& operator= (const RGB& w){
+      return *this = Luv(w);
+    }
+
+    /// Set from HSV color
+    HCLuv& operator= (const HSV& w){
+      return *this = Luv(w);
+    }
+
+    /// Set from XYZ color
+    HCLuv& operator= (const XYZ& w){
+      return *this = Luv(w);
+    }
+
+    /// Set from Luv color
+    HCLuv& operator= (const Luv& w);/*{
+      return *this = w;
+      }*/
+
+    /// Get new HCLuv with value component multiplied by a scalar
+    HCLuv  operator* (float a) const { return HCLuv(*this)*=a; }
+
+    /// Multiply luminance component by a scalar
+    HCLuv& operator*=(float a){ l*=a; return *this; }
+
+    /// Rotate hue in interval [0, 1)
+    HCLuv& rotateHue(float dh){ h += dh; return wrapHue(); }
+
+    /// Wrap hue value into valid interval [0, 1)
+    HCLuv& wrapHue(){
+      if(h>1){ h -= int(h); }
+      else if(h<0){ h -= int(h)-1; }
+      return *this;
+    }
+
+  };
+  //end hcluv
+  //////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+  // Implementation --------------------------------------------------------------
+
+  inline RGB operator + (float s, const RGB& c){ return  c+s; }
+  inline RGB operator - (float s, const RGB& c){ return -c+s; }
+  inline RGB operator * (float s, const RGB& c){ return  c*s; }
+  inline RGB operator / (float s, const RGB& c){ return RGB(s/c.r, s/c.g, s/c.b); }
+
+
+
+  inline Color operator + (float s, const Color& c){ return  c+s; }
+  inline Color operator - (float s, const Color& c){ return -c+s; }
+  inline Color operator * (float s, const Color& c){ return  c*s; }
+  inline Color operator / (float s, const Color& c){ return Color(s/c.r, s/c.g, s/c.b, s/c.a); }
+
+  inline Color& Color::operator= (const Colori& v){
+    r=tof(v.r); g=tof(v.g); b=tof(v.b); a=tof(v.a); return *this; }
+
+  inline Color& Color::operator= (const HSV& v){ rgb()=v; return *this; }
+  inline Color& Color::operator= (const RGB& v){ rgb()=v; return *this; }
+
+  inline Color& Color::invert(){ rgb().invert(); return *this; }
+
+  inline float Color::luminance() const { return rgb().luminance(); }
+
+
+  inline Colori& Colori::operator= (const HSV& v){
+    return *this = RGB(v);
+  }
+
+  inline Colori& Colori::operator= (const RGB& v){
+    return set(toi(v.r), toi(v.g), toi(v.b), 255);
+  }
+
+
+  inline HSV operator * (float s, const HSV& c){ return  c*s; }
+
 
 } // al::
 
