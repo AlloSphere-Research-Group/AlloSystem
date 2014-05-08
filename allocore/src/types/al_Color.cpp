@@ -1,4 +1,6 @@
 #include "allocore/types/al_Color.hpp"
+#include "allocore/math/al_Mat.hpp"
+#include <cmath>
 
 namespace al{
 
@@ -46,7 +48,7 @@ namespace al{
       float hl;
       if     (r == max)hl =       (g - b)/rng;// between yellow & magenta
       else if(g == max)hl = 2.f + (b - r)/rng;// between cyan & yellow
-      elsehl = 4.f + (r - g)/rng;// between magenta & cyan
+      else hl = 4.f + (r - g)/rng;// between magenta & cyan
 
       if(hl < 0.f) hl += 6.f;
 
@@ -299,44 +301,44 @@ namespace al{
 
   //Color operators
   Color& Color::operator=(const XYZ& v){
-    return *this = RGB(v)
+    return *this = RGB(v);
       }
 
   Color& Color::operator=(const Lab& v){
-    return *this = RGB(v)
+    return *this = RGB(v);
       }
 
   Color& Color::operator=(const HCLab& v){
-    return *this = RGB(v)
+    return *this = RGB(v);
       }
 
   Color& Color::operator=(const Luv& v){
-    return *this = RGB(v)
+    return *this = RGB(v);
       }
 
   Color& Color::operator=(const HCLuv& v){
-    return *this = RGB(v)
+    return *this = RGB(v);
       }
 
   //Colori operators
   Colori& Colori::operator=(const XYZ& v){
-    return *this = RGB(v)
+    return *this = RGB(v);
       }
 
   Colori& Colori::operator=(const Lab& v){
-    return *this = RGB(v)
+    return *this = RGB(v);
       }
 
   Colori& Colori::operator=(const HCLab& v){
-    return *this = RGB(v)
+    return *this = RGB(v);
       }
 
   Colori& Colori::operator=(const Luv& v){
-    return *this = RGB(v)
+    return *this = RGB(v);
       }
 
   Colori& Colori::operator=(const HCLuv& v){
-    return *this = RGB(v)
+    return *this = RGB(v);
       }
 
 

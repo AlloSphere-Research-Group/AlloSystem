@@ -50,8 +50,6 @@
 */
 
 #include "allocore/system/al_Config.h"
-#include "allocore/math/al_Mat.hpp"
-#include <cmath>
 
 namespace al{
 
