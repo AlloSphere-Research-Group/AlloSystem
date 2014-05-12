@@ -60,6 +60,9 @@ void frenet(const V3& p2, const V3& p1, const V3& p0, V3& t, V3& n, V3& b);
 
 /// Frenet frame generator
 
+/// This class generates a sequence of Frenet frames given a corresponding
+/// sequence of discrete points along a curve. A Frenet frame is computed from
+/// a run of three consecutive points and corresponds to the middle point.
 /// A Frenet frame is an orthonormal reference frame describing the local 
 /// tangent (T), normal (N), and binormal (B) unit vectors of a curve. The frame
 /// is based on a right-handed coordinate system so that T = N x B, N = B x T, 
