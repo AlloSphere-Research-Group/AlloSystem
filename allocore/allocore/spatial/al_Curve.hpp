@@ -78,7 +78,7 @@ struct Frenet{
 
 	/// @param[in] p2	two points back
 	/// @param[in] p1	one point back
-	Frenet(const Vec3& p2=Vec3(0,0,0), const Vec3& p1=Vec3(0,0,0)){
+	Frenet(const Vec3& p2=Vec3(0,-0.01,0), const Vec3& p1=Vec3(0,0,0)){
 		init(p2,p1);
 	}
 
