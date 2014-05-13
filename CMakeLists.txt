@@ -1,7 +1,10 @@
 project( AlloSystem )
 cmake_minimum_required(VERSION 2.8)
 
-set(CMAKE_BUILD_TYPE Release) # Build release by default
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(DEBUG_SUFFIX "_debug")
+  message("====== Building Debug version")
+endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 set(ALLOSYSTEM_BUILD 1) # Bulding all of allosystem (do not change this manually)
 
@@ -98,18 +101,18 @@ endif(BUILD_VSR AND BUILD_ALLOVSR)
 
 # Allocore --------------------------------
 add_subdirectory(allocore)
-get_target_property(ALLOCORE_LIBRARY allocore LOCATION)
-get_target_property(ALLOCORE_INCLUDE_DIR allocore ALLOCORE_INCLUDE_DIR)
-get_target_property(ALLOCORE_LINK_LIBRARIES allocore ALLOCORE_LINK_LIBRARIES)
+get_target_property(ALLOCORE_LIBRARY "allocore${DEBUG_SUFFIX}" LOCATION)
+get_target_property(ALLOCORE_INCLUDE_DIR "allocore${DEBUG_SUFFIX}" ALLOCORE_INCLUDE_DIR)
+get_target_property(ALLOCORE_LINK_LIBRARIES "allocore${DEBUG_SUFFIX}" ALLOCORE_LINK_LIBRARIES)
 
 # Alloutil ----------------------------------
 if(BUILD_ALLOUTIL)
   message("Allosystem: Building alloutil.")
   add_subdirectory(alloutil)
-  add_dependencies(alloutil allocore)
-  get_target_property(ALLOUTIL_LIBRARY alloutil LOCATION)
-  get_target_property(ALLOUTIL_INCLUDE_DIR alloutil ALLOUTIL_INCLUDE_DIR)
-  get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil ALLOUTIL_LINK_LIBRARIES)
+  add_dependencies(alloutil${DEBUG_SUFFIX} allocore${DEBUG_SUFFIX})
+  get_target_property(ALLOUTIL_LIBRARY alloutil${DEBUG_SUFFIX} LOCATION)
+  get_target_property(ALLOUTIL_INCLUDE_DIR alloutil${DEBUG_SUFFIX} ALLOUTIL_INCLUDE_DIR)
+  get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil${DEBUG_SUFFIX} ALLOUTIL_LINK_LIBRARIES)
 else()
   find_package(Alloutil QUIET)
 endif(BUILD_ALLOUTIL)

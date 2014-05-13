@@ -7,7 +7,9 @@ set(CMAKE_BUILD_TYPE Release)
 aux_source_directory(src ALLOGLV_SRC)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-add_library(alloGLV ${ALLOGLV_SRC})
+
+set(ALLOGLV_LIB "alloGLV${DEBUG_SUFFIX}")
+add_library(${ALLOGLV_LIB} ${ALLOGLV_SRC})
 
 set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
@@ -17,8 +19,8 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../cmake_modules")
 
 if(ALLOSYSTEM_BUILD)
-  get_target_property(ALLOCORE_LIBRARY allocore LOCATION)
-  get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore ALLOCORE_DEP_INCLUDE_DIRS)
+  get_target_property(ALLOCORE_LIBRARY "allocore${DEBUG_SUFFIX}" LOCATION)
+  get_target_property(ALLOCORE_DEP_INCLUDE_DIRS "allocore${DEBUG_SUFFIX}" ALLOCORE_INCLUDE_DIR)
   if(BUILDING_GLV)
     set(GLV_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../GLV)
     get_target_property(glv_location GLV LOCATION)
@@ -30,21 +32,21 @@ else()
   find_package(GLV REQUIRED QUIET)
 endif(ALLOSYSTEM_BUILD)
 
-message (STATUS "allocore_location for alloGLV == ${allocore_location}")
+message (STATUS "allocore for alloGLV == ${ALLOCORE_LIBRARY}")
 
 include_directories(${ALLOCORE_DEP_INCLUDE_DIRS}
   ${GLV_INCLUDE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_link_libraries(alloGLV ${ALLOCORE_LIBRARIES} ${GLV_LIBRARY})
-set_target_properties(alloGLV 
+target_link_libraries(${ALLOGLV_LIB} ${ALLOCORE_LIBRARIES} ${GLV_LIBRARY})
+set_target_properties(${ALLOGLV_LIB}
   PROPERTIES 
   ALLOGLV_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
-  ALLOGLV_LIBRARY alloGLV)
+  ALLOGLV_LIBRARY ${ALLOGLV_LIB})
 
-set_target_properties(alloGLV 
+set_target_properties(${ALLOGLV_LIB}
   PROPERTIES 
-  ALLOGLV_LINK_LIBRARIES "${ALLOGLV_LINK_LIBRARIES}"
+  ALLOGLV_LINK_LIBRARIES "${GLV_LIBRARY}"
   )
 
 
@@ -72,7 +74,7 @@ if(NOT NO_EXAMPLES)
 	set(EXAMPLE_TARGET examples_${EXAMPLE_NAME})
       endif(ALLOSYSTEM_BUILD)
       add_executable(${EXAMPLE_TARGET} ${example})
-      target_link_libraries("${EXAMPLE_TARGET}" allocore ${ALLOCORE_LINK_LIBRARIES} ${GLV_LIBRARY} alloGLV)
+      target_link_libraries("${EXAMPLE_TARGET}" "allocore${DEBUG_SUFFIX}" ${ALLOCORE_LINK_LIBRARIES} ${GLV_LIBRARY} ${ALLOGLV_LIB})
       if (apple)
         find_library(AUDIOUNIT_FM AudioUnit)
         target_link_libraries(${EXAMPLE_TARGET} ${AUDIOUNIT_FM})
@@ -90,4 +92,4 @@ if(NOT NO_EXAMPLES)
 endif(NOT NO_EXAMPLES)
 
 install(DIRECTORY alloGLV/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include/alloGLV)
-install(TARGETS alloGLV DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install(TARGETS ${ALLOGLV_LIB} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
