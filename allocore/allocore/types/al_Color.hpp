@@ -36,9 +36,10 @@
  
  
  File description:
- RGBA, HSV, XYZ, Lab, HCLab, Luv, and HCLuv color classes
+ RGBA, HSV, CIEXYZ, Lab, HCLab, Luv, and HCLuv color classes
  
- Color conversion code for XYZ, Lab, HCLab, Luv, HCLuv was adapted from psuedo-code and formulas found at http://www.easyrgb.com/ and http://brucelindbloom.com/
+ Color conversion code for CIEXYZ, Lab, HCLab, Luv, HCLuv was adapted from 
+ psuedo-code and formulas found at http://www.easyrgb.com/ and http://brucelindbloom.com/
  
  File author(s):
  Lance Putnam, 2010, putnam.lance@gmail.com
@@ -55,7 +56,7 @@ namespace al{
     struct Colori;
     
     //ogc
-    struct XYZ;
+    struct CIEXYZ;
     struct Lab;
     struct HCLab;
     struct Luv;
@@ -102,9 +103,9 @@ namespace al{
         :	a(a)
         {	*this = rgb; }
         
-        /// @param[in] xyz          XYZ value
+        /// @param[in] xyz          CIEXYZ value
         /// @param[in] a			alpha component
-        Color(const XYZ& xyz, float a =1.f)
+        Color(const CIEXYZ& xyz, float a =1.f)
         :   a(a)
         {   *this = xyz; }
         
@@ -178,8 +179,8 @@ namespace al{
         /// Set RGB components from RGB
         Color& operator= (const RGB& v);
         
-        /// Set RGB components from XYZ
-        Color& operator= (const XYZ& v);
+        /// Set RGB components from CIEXYZ
+        Color& operator= (const CIEXYZ& v);
         
         /// Set RGB components from Lab
         Color& operator= (const Lab& v);
@@ -293,9 +294,9 @@ namespace al{
         :	a(a)
         {	*this = rgb; }
         
-        /// @param[in] xyz          XYZ color
+        /// @param[in] xyz          CIEXYZ color
         /// @param[in] a            alpha component
-        Colori(const XYZ& xyz, float a =1.f)
+        Colori(const CIEXYZ& xyz, float a =1.f)
         :   a(a)
         {   *this = xyz; }
         
@@ -339,8 +340,8 @@ namespace al{
         /// Set RGB components from RGB
         Colori& operator= (const RGB& v);
         
-        /// Set RGB components from XYZ
-        Colori& operator= (const XYZ& v);
+        /// Set RGB components from CIEXYZ
+        Colori& operator= (const CIEXYZ& v);
         
         /// Set RGB components from Lab
         Colori& operator= (const Lab& v);
@@ -401,8 +402,8 @@ namespace al{
         /// @param[in] v	RGB color to convert from
         HSV(const RGB& v){ *this = v; }
         
-        /// @param[in] xyz      XYZ color to convert from
-        HSV(const XYZ& xyz){ *this = xyz; }
+        /// @param[in] xyz      CIEXYZ color to convert from
+        HSV(const CIEXYZ& xyz){ *this = xyz; }
         
         /// @param[in] lab      Lab color to convert from
         HSV(const Lab& lab){ *this = lab; }
@@ -437,8 +438,8 @@ namespace al{
         /// Set from RGB color
         HSV& operator= (const RGB& v);
         
-        /// Set from XYZ color
-        HSV& operator= (const XYZ& v);
+        /// Set from CIEXYZ color
+        HSV& operator= (const CIEXYZ& v);
         
         /// Set from Lab color
         HSV& operator= (const Lab& v);
@@ -507,8 +508,8 @@ namespace al{
         RGB(const HSV& hsv)
         {	*this = hsv; }
         
-        /// @param[in] xyz          XYZ value
-        RGB(const XYZ& xyz)
+        /// @param[in] xyz          CIEXYZ value
+        RGB(const CIEXYZ& xyz)
         {   *this = xyz; }
         
         /// @param[in] lab          Lab value
@@ -561,8 +562,8 @@ namespace al{
         /// Set RGB components from Color
         RGB& operator= (const Color& v){ return set(v.rgb()); }
         
-        /// Set RGB components from XYZ
-        RGB& operator= (const XYZ& v);
+        /// Set RGB components from CIEXYZ
+        RGB& operator= (const CIEXYZ& v);
         
         /// Set RGB components from Lab
         RGB& operator= (const Lab& v);
@@ -626,42 +627,42 @@ namespace al{
         }
     };
     
-    struct XYZ{
+    struct CIEXYZ{
         union{
             struct{
                 float x;///         < red component in [0, 1]
                 float y;///         < green component in [0, 1]
                 float z;///         < blue component in [0, 1]
             };
-            float components[3];///< XYZ component vector
+            float components[3];///< CIEXYZ component vector
         };
         
         /// @param[in] x            CIE X
         /// @param[in] y            CIE Y
         /// @param[in] z            CIE Z
-        XYZ(float x=0, float y=1, float z=1): x(x), y(y), z(z){}
+        CIEXYZ(float x=0, float y=1, float z=1): x(x), y(y), z(z){}
         
         /// @param[in] v            RGB color to convert from
-        XYZ(const Color& v){ *this = v; }
+        CIEXYZ(const Color& v){ *this = v; }
         
         /// @param[in] v            RGB color to convert from
-        XYZ(const Colori& v){ *this = v; }
+        CIEXYZ(const Colori& v){ *this = v; }
         
         /// @param[in] v            RGB color to convert from
-        XYZ(const RGB& v){ *this = v; }
+        CIEXYZ(const RGB& v){ *this = v; }
         
         /// @param[in] v            HSV color to convert from
-        XYZ(const HSV& v){ *this = v; }
+        CIEXYZ(const HSV& v){ *this = v; }
         
         /// @param[in] v            Lab color to convert from
-        XYZ(const Lab& v){ *this = v; }
+        CIEXYZ(const Lab& v){ *this = v; }
         
         /// @param[in] v            Luv color to convert from
-        XYZ(const Luv& v){ *this = v; }
+        CIEXYZ(const Luv& v){ *this = v; }
         
-        /// @param[in] xyz          3-vector of XYZ components
+        /// @param[in] xyz          3-vector of CIEXYZ components
         template<class T>
-        XYZ(T * xyz): x(xyz[0]), y(xyz[1]), z(xyz[2]){}
+        CIEXYZ(T * xyz): x(xyz[0]), y(xyz[1]), z(xyz[2]){}
         
         
         /// Set color component at index with no bounds checking
@@ -672,24 +673,22 @@ namespace al{
         
         
         /// Set from RGBA color
-        XYZ& operator= (const Color& v){ return *this = v.rgb(); }
+        CIEXYZ& operator= (const Color& v){ return *this = v.rgb(); }
         
         /// Set from RGBA color
-        XYZ& operator= (const Colori& v){ return *this = Color(v); }
+        CIEXYZ& operator= (const Colori& v){ return *this = Color(v); }
         
         /// Set from RGB color
-        XYZ& operator= (const RGB& v);
+        CIEXYZ& operator= (const RGB& v);
         
         /// Set from HSV color
-        XYZ& operator= (const HSV& v){
-            return *this = RGB(v);
-        }
+        CIEXYZ& operator= (const HSV& v){ return *this = RGB(v); }
         
         /// Set from Lab color
-        XYZ& operator= (const Lab& v);
+        CIEXYZ& operator= (const Lab& v);
         
         /// Set from Luv color
-        XYZ& operator= (const Luv& v);
+        CIEXYZ& operator= (const Luv& v);
     };
     
     /// Color represented by L* (lightness), a*, b*
@@ -726,8 +725,8 @@ namespace al{
         /// @param[in] v            HSV color to convert from
         Lab(const HSV& v){ *this = v; }
         
-        /// @param[in] v            XYZ color to convert from
-        Lab(const XYZ& v){ *this = v; }
+        /// @param[in] v            CIEXYZ color to convert from
+        Lab(const CIEXYZ& v){ *this = v; }
         
         /// @param[in] v            HCLab color to convert from
         Lab(const HCLab& v){ *this = v; }
@@ -750,18 +749,14 @@ namespace al{
         /// Set from RGBA color
         Lab& operator= (const Colori& v){ return *this = Color(v); }
         
-        /// Set from XYZ color
-        Lab& operator= (const XYZ& v);
+        /// Set from CIEXYZ color
+        Lab& operator= (const CIEXYZ& v);
         
         /// Set from RGB color
-        Lab& operator= (const RGB& v){
-            return *this = XYZ(v);
-        }
+        Lab& operator= (const RGB& v){ return *this = CIEXYZ(v); }
         
         /// Set from HSV color
-        Lab& operator= (const HSV& v){
-            return *this = XYZ(v);
-        }
+        Lab& operator= (const HSV& v){ return *this = CIEXYZ(v); }
         
         Lab& operator=(const HCLab& v);
         
@@ -804,8 +799,8 @@ namespace al{
         /// @param[in] v            HSV color to convert from
         HCLab(const HSV& v){ *this = v; }
         
-        /// @param[in] v            XYZ color to convert from
-        HCLab(const XYZ& v){ *this = v; }
+        /// @param[in] v            CIEXYZ color to convert from
+        HCLab(const CIEXYZ& v){ *this = v; }
         
         /// @param[in] v            Lab color to convert from
         HCLab(const Lab& v){ *this = v; }\
@@ -834,8 +829,8 @@ namespace al{
         /// Set from HSV color
         HCLab& operator= (const HSV& v){ return *this = Lab(v); }
         
-        /// Set from XYZ color
-        HCLab& operator= (const XYZ& v){ return *this = Lab(v); }
+        /// Set from CIEXYZ color
+        HCLab& operator= (const CIEXYZ& v){ return *this = Lab(v); }
         
         /// Set from Lab color
         HCLab& operator= (const Lab& v);
@@ -891,8 +886,8 @@ namespace al{
         /// @param[in] w            HSV color to convert from
         Luv(const HSV& w){ *this = w; }
         
-        /// @param[in] w            XYZ color to convert from
-        Luv(const XYZ& w){ *this = w; }
+        /// @param[in] w            CIEXYZ color to convert from
+        Luv(const CIEXYZ& w){ *this = w; }
         
         /// @param[in] w            HCLuv color to convert from
         Luv(const HCLuv& w){ *this = w; }
@@ -915,17 +910,17 @@ namespace al{
         /// Set from RGBA color
         Luv& operator= (const Colori& w){ return *this = Color(w); }
         
-        /// Set from XYZ color
-        Luv& operator= (const XYZ& w);
+        /// Set from CIEXYZ color
+        Luv& operator= (const CIEXYZ& w);
         
         /// Set from HCLuv color
         Luv& operator= (const HCLuv& w);
         
         /// Set from RGB color
-        Luv& operator= (const RGB& w){ return *this = XYZ(w); }
+        Luv& operator= (const RGB& w){ return *this = CIEXYZ(w); }
         
         /// Set from HSV color
-        Luv& operator= (const HSV& w){ return *this = XYZ(w); }
+        Luv& operator= (const HSV& w){ return *this = CIEXYZ(w); }
         
         /// Get new Luv with value component multiplied by a scalar
         Luv  operator* (float a) const { return Luv(*this)*=a; }
@@ -968,8 +963,8 @@ namespace al{
         /// @param[in] w            HSV color to convert from
         HCLuv(const HSV& w){ *this = w; }
         
-        /// @param[in] v            XYZ color to convert from
-        HCLuv(const XYZ& w){ *this = w; }
+        /// @param[in] v            CIEXYZ color to convert from
+        HCLuv(const CIEXYZ& w){ *this = w; }
         
         /// @param[in] w            Luv color to convert from
         HCLuv(const Luv& w){ *this = w; }
@@ -997,8 +992,8 @@ namespace al{
         /// Set from HSV color
         HCLuv& operator= (const HSV& w){ return *this = Luv(w); }
         
-        /// Set from XYZ color
-        HCLuv& operator= (const XYZ& w){ return *this = Luv(w); }
+        /// Set from CIEXYZ color
+        HCLuv& operator= (const CIEXYZ& w){ return *this = Luv(w); }
         
         /// Set from Luv color
         HCLuv& operator= (const Luv& w);

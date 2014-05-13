@@ -1,6 +1,6 @@
 #include "allocore/types/al_Color.hpp"
 #include "allocore/math/al_Mat.hpp"
-#include "allocore/types/al_Color.hpp"
+#include <cmath>
 
 namespace al{
     
@@ -62,14 +62,14 @@ namespace al{
     
     //OGC additions:
     //RGB operators
-    RGB& RGB::operator= (const XYZ& v){
+    RGB& RGB::operator= (const CIEXYZ& v){
         //using sRGB and reference white D65
         static const Mat3f transformMatrix( 3.2405f, -1.5371f, -0.4985f,
                                            -0.9693f,  1.8760f,  0.0416f,
                                            0.0556f, -0.2040f,  1.0572f);
         float X = v.x, Y = v.y, Z = v.z;
         
-        //convert XYZ to rgb (linear with respect to energy)
+        //convert CIEXYZ to rgb (linear with respect to energy)
         Vec3f xyz(X, Y, Z);
         Vec3f rgb = transformMatrix * xyz;
         float rl = rgb[0], gl = rgb[1], bl = rgb[2];
@@ -86,12 +86,12 @@ namespace al{
         if(b > 1.f) b = 1.f;
         else if(b < 0.f) b = 0.f;
         
-        //cout << "RGB from XYZ: {" << r << ", " << g << ", " << b << "}" << endl;
+        //cout << "RGB from CIEXYZ: {" << r << ", " << g << ", " << b << "}" << endl;
         return *this;
     }
     
-    //XYZ operators
-    XYZ& XYZ::operator= (const RGB& v){
+    //CIEXYZ operators
+    CIEXYZ& CIEXYZ::operator= (const RGB& v){
         //using sRGB and reference white D65
         static const Mat3f transformMatrix(0.4124f,  0.3576f,  0.1805f,
                                            0.2126f, 0.7152f, 0.0722f,
@@ -102,17 +102,17 @@ namespace al{
         G = (float)(G <= 0.04045)?G / 12.92:pow(((G + 0.055) / 1.055), 2.4);
         B = (float)(B <= 0.04045)?B / 12.92:pow(((B + 0.055) / 1.055), 2.4);
         
-        //convert rgb to CIE XYZ
+        //convert rgb to CIEXYZ
         Vec3f rgb(R, G, B);
         Vec3f xyz = transformMatrix * rgb;
         x = xyz[0]; y = xyz[1]; z = xyz[2];
         
-        //cout << "XYZ from RGB: {" << x << ", " << y << ", " << z << "}" << endl;
+        //cout << "CIEXYZ from RGB: {" << x << ", " << y << ", " << z << "}" << endl;
         return *this;
     };
     
     
-    XYZ& XYZ::operator=(const Lab& v){
+    CIEXYZ& CIEXYZ::operator=(const Lab& v){
         float l, a, b, fx, fy, fz, xr, yr, zr;
         float epsilon = (216.0f / 24389.0f), kappa  = (24389.0f / 27.0f);
         // using reference white D65
@@ -132,11 +132,11 @@ namespace al{
         y = yr * Yn;
         z = zr * Zn;
         
-        //cout << "XYZ from Lab: {" << x << ", " << y << ", " << z << "}" << endl;
+        //cout << "CIEXYZ from Lab: {" << x << ", " << y << ", " << z << "}" << endl;
         return *this;
     }
     
-    XYZ& XYZ::operator=(const Luv& w){
+    CIEXYZ& CIEXYZ::operator=(const Luv& w){
         float l, u, v, a, b, c, d, ur, vr;
         float epsilon = (216.0f / 24389.0f), kappa  = (24389.0f / 27.0f);
         // using reference white D65
@@ -157,18 +157,18 @@ namespace al{
         x = (d - b) / (a - c);
         z = x * a + b;
         
-        //cout << "XYZ from Luv: {" << x << ", " << y << ", " << z << "}" << endl;
+        //cout << "CIEXYZ from Luv: {" << x << ", " << y << ", " << z << "}" << endl;
         return *this;
     }
     
     //Lab operators
-    Lab& Lab::operator= (const XYZ& v){
+    Lab& Lab::operator= (const CIEXYZ& v){
         float fx, fy, fz, xr, yr, zr;
         float epsilon = (216.0f / 24389.0f), kappa  = (24389.0f / 27.0f);
         // using reference white D65
         float Xn = 0.95047f, Yn = 1.0f, Zn = 1.08883f;
         
-        // convert XYZ to Lab
+        // convert CIEXYZ to Lab
         xr = v.x / Xn; yr = v.y / Yn; zr = v.z / Zn;
         fx = (float)(xr > epsilon)?pow(xr, 1.0/3.0):((kappa * xr + 16.0) / 116.0);
         fy = (float)(yr > epsilon)?pow(yr, 1.0/3.0):((kappa * yr + 16.0) / 116.0);
@@ -209,14 +209,14 @@ namespace al{
     }
     
     //Luv operators
-    Luv& Luv::operator= (const XYZ& w){
+    Luv& Luv::operator= (const CIEXYZ& w){
         float up, vp, ur, yr, vr, x, y, z;
         float epsilon = (216.0f / 24389.0f), kappa  = (24389.0f / 27.0f);
         // using reference white D65
         float Xn = 0.95047f, Yn = 1.0f, Zn = 1.08883f;
         x = w.x; y = w.y; z = w.z;
         
-        // convert XYZ to Luv
+        // convert CIEXYZ to Luv
         ur = (4 * Xn) / (Xn + 15 * Yn + 3 * Zn);
         yr = w.y / Yn;
         vr = (9 * Yn) / (Xn + 15 * Yn + 3 * Zn);
@@ -262,7 +262,7 @@ namespace al{
     
     //RGB operators
     RGB& RGB::operator=(const Lab& v){
-        return *this = XYZ(v);
+        return *this = CIEXYZ(v);
     }
     
     RGB& RGB::operator=(const HCLab& v){
@@ -270,7 +270,7 @@ namespace al{
     }
     
     RGB& RGB::operator=(const Luv& v){
-        return *this = XYZ(v);
+        return *this = CIEXYZ(v);
     }
     
     RGB& RGB::operator=(const HCLuv& v){
@@ -278,12 +278,12 @@ namespace al{
     }
     
     //HSV operators
-    HSV& HSV::operator=(const XYZ& v){
+    HSV& HSV::operator=(const CIEXYZ& v){
         return *this = RGB(v);
     }
     
     HSV& HSV::operator=(const Lab& v){
-        return *this = XYZ(v);
+        return *this = CIEXYZ(v);
     }
     
     HSV& HSV::operator=(const HCLab& v){
@@ -291,7 +291,7 @@ namespace al{
     }
     
     HSV& HSV::operator=(const Luv& v){
-        return *this = XYZ(v);
+        return *this = CIEXYZ(v);
     }
     
     HSV& HSV::operator=(const HCLuv& v){
@@ -300,7 +300,7 @@ namespace al{
     
     
     //Color operators
-    Color& Color::operator=(const XYZ& v){
+    Color& Color::operator=(const CIEXYZ& v){
         return *this = RGB(v);
     }
     
@@ -321,7 +321,7 @@ namespace al{
     }
     
     //Colori operators
-    Colori& Colori::operator=(const XYZ& v){
+    Colori& Colori::operator=(const CIEXYZ& v){
         return *this = RGB(v);
     }
     
