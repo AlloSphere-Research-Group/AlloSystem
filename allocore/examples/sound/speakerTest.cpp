@@ -40,9 +40,9 @@ void audioCB(AudioIOData& io)
 
 int main (int argc, char * argv[])
 {
-    const int numSpeakers = 2;
+    const int numSpeakers = 60;
     double sr = 44100;
-    double durSecs = 1; // duration of each burst
+    double durSecs = 0.4; // duration of each burst
 
     userdata_t ud;
     ud.gain = 0.01;
@@ -50,10 +50,12 @@ int main (int argc, char * argv[])
     ud.numSamps = (int)(sr *durSecs);
     ud.curOutput = 0;
 
+    AudioDevice::printAll();
+
     AudioIO audioIO(AUDIO_BLOCK_SIZE, sr, audioCB, &ud, numSpeakers, 0);
-	audioIO.start();
+    audioIO.start();
 
     MainLoop::start();
 
-	return 0;
+    return 0;
 }

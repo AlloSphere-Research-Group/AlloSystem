@@ -12,7 +12,6 @@ stereographic rendering
 */
 
 #include "allocore/al_Allocore.hpp"
-#include "allocore/sound/al_Ambisonics.hpp"
 #include <Gamma/SoundFile.h>
 #include <iostream>
 #include <vector>
@@ -23,10 +22,18 @@ using namespace std;
 #define AUDIO_BLOCK_SIZE 512
 
 typedef struct {
-    AmbisonicsSpatializer *spatializer;
+	float *values;
+	int counter;
+	int numblocks;
+} meters_t;
+
+typedef struct {
     gam::SoundFile sfs[4];
     float read_buffer[AUDIO_BLOCK_SIZE];
     vector<int> outputMap;
+    meters_t meters;
+    float gain;
+    int done;
 } userdata_t;
 
 
@@ -35,15 +42,41 @@ void audioCB(AudioIOData& io)
     userdata_t * ud = (userdata_t *) io.user();
 	int numFrames = io.framesPerBuffer();
 
+	int framesRead;
     for (int i = 0; i < 4; i++) {
-        int framesRead = ud->sfs[i].read(ud->read_buffer, numFrames);
+        framesRead = ud->sfs[i].read(ud->read_buffer, numFrames);
         for (int j = 0; j < framesRead; j++) {
-            io.out(ud->outputMap[i], j) += ud->read_buffer[j];
+            io.out(ud->outputMap[i], j) += (ud->read_buffer[j] * ud->gain);
         }
     }
+    float *curvalue = ud->meters.values;
+    for (int i = 0; i < io.channelsOut(); i++) {
+        for (int j = 0; j < numFrames; j++) {
+    		if (*curvalue < io.out(i, j)) {
+    			*curvalue = io.out(i, j);
+    		}
+    	}
+    	curvalue++;
+    }
+    if (++(ud->meters.counter) == ud->meters.numblocks) {
+    	for (int i = 0; i < io.channelsOut(); i++) {
+    		int db = (int) (20.0*log10(ud->meters.values[i]));
+    	
+    		if (db < -120) {
+    			std::cout << "-- ";
+    		} else {
+    			std::cout << db << " ";
+    		}
+    	}
+    	std::cout << std::endl;
+    	ud->meters.counter = 0;
+    }
+	if (framesRead == 0) {
+		ud->done = 1;
+	}
 }
 
-#define STEREO
+//#define STEREO
 
 int main (int argc, char * argv[])
 {
@@ -57,7 +90,7 @@ int main (int argc, char * argv[])
     };
 #else
     const int numSpeakers = 54;
-    Speaker speakers[numSpeakers] = {
+    Speaker speakers[] = {
         Speaker(1-1, 77.660913, 41.000000),
         Speaker(2-1, 45.088015, 41.000000),
         Speaker(3-1, 14.797289, 41.000000),
@@ -119,48 +152,63 @@ int main (int argc, char * argv[])
     for (int i = 0; i< numSpeakers; i++) {
         speakerLayout.addSpeaker(speakers[i]);
     }
+    
+    float sr = 44100;
 
     userdata_t ud;
-    // Create spatializer
-//    ud.spatializer = new AmbisonicsSpatializer(speakerLayout, 2, 1);
-//    ud.spatializer->numSpeakers(numSpeakers);
-//    ud.spatializer->numFrames(AUDIO_BLOCK_SIZE);
-
+    ud.gain = 0.5;
+    ud.done = 0;
+    ud.meters.counter = 0;
+    ud.meters.numblocks = 1.0 * sr/AUDIO_BLOCK_SIZE;
+    ud.meters.values = (float *) calloc(60, sizeof(float));
+    
+	std::string path = "/Users/create/code/spatial_andres/";
+//	std::string path = "/home/andres/Music/";
 
     std::vector<std::string> filenames;
-    filenames.push_back("/home/andres/Music/Chowning/Turenas-MM/Turenas-MM-LF.aif");
-    filenames.push_back("/home/andres/Music/Chowning/Turenas-MM/Turenas-MM-RF.aif");
-    filenames.push_back("/home/andres/Music/Chowning/Turenas-MM/Turenas-MM-LR.aif");
-    filenames.push_back("/home/andres/Music/Chowning/Turenas-MM/Turenas-MM-RR.aif");
+    filenames.push_back(path + "Chowning/Turenas-MM/Turenas-MM-LF.aif");
+    filenames.push_back(path + "Chowning/Turenas-MM/Turenas-MM-RF.aif");
+    filenames.push_back(path + "Chowning/Turenas-MM/Turenas-MM-LR.aif");
+    filenames.push_back(path + "Chowning/Turenas-MM/Turenas-MM-RR.aif");
+//    filenames.push_back(path + "Chowning/Stria/Stria-FL.aiff");
+//    filenames.push_back(path + "Chowning/Stria/Stria-FR.aiff");
+//    filenames.push_back(path + "Chowning/Stria/Stria-RL.aiff");
+//    filenames.push_back(path + "Chowning/Stria/Stria-RR.aiff");
 
     ud.outputMap.resize(filenames.size());
-    ud.outputMap[0] = 1;
-    ud.outputMap[1] = 1;
-    ud.outputMap[2] = 1;
-    ud.outputMap[3] = 1;
+//  ud.outputMap[0] = 2 -1;
+//    ud.outputMap[1] = 53 -1;
+//    ud.outputMap[2] = 59 -1;
+//    ud.outputMap[3] = 8 -1;
+//    ud.outputMap[0] = 21 -1;
+//    ud.outputMap[1] = 27 -1;
+//    ud.outputMap[2] = 42 -1;
+//    ud.outputMap[3] = 36 -1;
+    ud.outputMap[0] = 2 -1;
+    ud.outputMap[1] = 53 -1;
+    ud.outputMap[2] = 59 -1;
+    ud.outputMap[3] = 8 -1;
 
     for (int i = 0; i < filenames.size(); i++) {
-//        ud.sfs[i] = new gam::SoundFile;
 
         ud.sfs[i].path(filenames[i]);
         if (!ud.sfs[i].openRead()) {
-            std::cout << " Can't open file " << std::endl;
+            std::cout << " Can't open file: " << filenames[i] << std::endl;
             return -1;
         } else {
             std::cout << "Playing file: " << filenames[i] << std::endl;
         }
+        // TODO check sampling rate;
     }
+    
 //    Dbap *dbap;
 //    dbap = new Dbap();
 
-	// Create listener to render audio
-//	listener = scene.createListener(speakerLayout, ambisonics);
-    //listener = scene.createListener(speakerLayout, dbap);
-	
-
-    AudioIO audioIO(AUDIO_BLOCK_SIZE, 44100, audioCB, &ud, numSpeakers, numSpeakers);
+    AudioIO audioIO(AUDIO_BLOCK_SIZE, sr, audioCB, &ud, 60, 0);
 	audioIO.start();
 
-	MainLoop::start();
+	while (!ud.done) {
+		sleep(0);
+	}
 	return 0;
 }
