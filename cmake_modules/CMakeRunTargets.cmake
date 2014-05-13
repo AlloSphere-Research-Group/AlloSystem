@@ -37,11 +37,11 @@ message("From sources: ${ALLOPROJECT_APP_SRC}")
 
 # Dependencies (check if targets exist and set variables)
 get_target_property(ALLOCORE_LIBRARY allocore${DEBUG_SUFFIX} LOCATION)
-get_target_property(ALLOCORE_INCLUDE_DIR allocore${DEBUG_SUFFIX} ALLOCORE_INCLUDE_DIR)
+get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore${DEBUG_SUFFIX} ALLOCORE_DEP_INCLUDE_DIRS)
 get_target_property(ALLOCORE_LINK_LIBRARIES allocore${DEBUG_SUFFIX} ALLOCORE_LINK_LIBRARIES)
 add_dependencies(${APP_NAME} allocore${DEBUG_SUFFIX})
 
-message("Using allocore headers from: ${ALLOCORE_INCLUDE_DIR}")
+message("Using allocore headers from: ${ALLOCORE_DEP_INCLUDE_DIRS}")
 
 if(BUILDING_GAMMA)
   set(GAMMA_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/Gamma)
@@ -85,7 +85,7 @@ endif(BUILDING_VSR)
 
 if(TARGET alloutil${DEBUG_SUFFIX})
   get_target_property(ALLOUTIL_LIBRARY alloutil${DEBUG_SUFFIX} LOCATION)
-  get_target_property(ALLOUTIL_DEP_INCLUDE_DIR alloutil${DEBUG_SUFFIX} ALLOUTIL_INCLUDE_DIR)
+  get_target_property(ALLOUTIL_DEP_INCLUDE_DIR alloutil${DEBUG_SUFFIX} ALLOUTIL_DEP_INCLUDE_DIR)
   get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil${DEBUG_SUFFIX} ALLOUTIL_LINK_LIBRARIES)
   add_dependencies(${APP_NAME} alloutil${DEBUG_SUFFIX})
 else()
@@ -107,7 +107,7 @@ else()
     set(ALLOGLV_INCLUDE_DIR "")
     message("Not building alloGLV and no usable alloGLV binary found. Not linking application to alloGLV")
   endif(NOT ALLOGLV_FOUND) 
-endif(TARGET alloGLV)
+endif(TARGET alloGLV${DEBUG_SUFFIX})
 
 
 # TODO copy resources to build directory

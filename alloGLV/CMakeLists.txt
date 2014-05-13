@@ -20,7 +20,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/../cmake_modules
 
 if(ALLOSYSTEM_BUILD)
   get_target_property(ALLOCORE_LIBRARY "allocore${DEBUG_SUFFIX}" LOCATION)
-  get_target_property(ALLOCORE_DEP_INCLUDE_DIRS "allocore${DEBUG_SUFFIX}" ALLOCORE_INCLUDE_DIR)
+  get_target_property(ALLOCORE_DEP_INCLUDE_DIRS "allocore${DEBUG_SUFFIX}" ALLOCORE_DEP_INCLUDE_DIRS)
   if(BUILDING_GLV)
     set(GLV_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../GLV)
     get_target_property(glv_location GLV LOCATION)

@@ -19,13 +19,13 @@ endif(NOT ALLOSYSTEM_BUILD)
 
 message (STATUS "vsr headers for allovsr == ${VSR_INCLUDE_DIR}")
 message (STATUS "vsr lib for allovsr == ${VSR_LIBRARY}")
-message (STATUS "allocore headers for allovsr == ${ALLOCORE_INCLUDE_DIR}")
+message (STATUS "allocore headers for allovsr == ${ALLOCORE_DEP_INCLUDE_DIR}")
 message (STATUS "allocore lib for allovsr == ${ALLOCORE_LIBRARY}")
 message (STATUS "alloGLV headers for allovsr == ${ALLOGLV_INCLUDE_DIR}")
 message (STATUS "alloGLV lib for allovsr == ${ALLOGLV_LIBRARY}")
 
 # --- configure
-include_directories(${ALLOCORE_INCLUDE_DIR} ${ALLOGLV_INCLUDE_DIR} ${VSR_INCLUDE_DIR})
+include_directories(${ALLOCORE_DEP_INCLUDE_DIR} ${ALLOGLV_INCLUDE_DIR} ${VSR_INCLUDE_DIR})
 set(ALLOVSR_LINK_LIBRARIES ${ALLOCORE_LIBRARY} ${ALLOGLV_LIBRARY} ${VSR_LIBRARY} ${GLV_LIBRARY})
 
 set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)

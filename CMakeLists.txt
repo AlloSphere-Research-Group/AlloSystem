@@ -102,7 +102,7 @@ endif(BUILD_VSR AND BUILD_ALLOVSR)
 # Allocore --------------------------------
 add_subdirectory(allocore)
 get_target_property(ALLOCORE_LIBRARY "allocore${DEBUG_SUFFIX}" LOCATION)
-get_target_property(ALLOCORE_INCLUDE_DIR "allocore${DEBUG_SUFFIX}" ALLOCORE_INCLUDE_DIR)
+get_target_property(ALLOCORE_DEP_INCLUDE_DIR "allocore${DEBUG_SUFFIX}" ALLOCORE_DEP_INCLUDE_DIR)
 get_target_property(ALLOCORE_LINK_LIBRARIES "allocore${DEBUG_SUFFIX}" ALLOCORE_LINK_LIBRARIES)
 
 # Alloutil ----------------------------------
@@ -111,7 +111,7 @@ if(BUILD_ALLOUTIL)
   add_subdirectory(alloutil)
   add_dependencies(alloutil${DEBUG_SUFFIX} allocore${DEBUG_SUFFIX})
   get_target_property(ALLOUTIL_LIBRARY alloutil${DEBUG_SUFFIX} LOCATION)
-  get_target_property(ALLOUTIL_INCLUDE_DIR alloutil${DEBUG_SUFFIX} ALLOUTIL_INCLUDE_DIR)
+  get_target_property(ALLOUTIL_DEP_INCLUDE_DIR alloutil${DEBUG_SUFFIX} ALLOUTIL_DEP_INCLUDE_DIR)
   get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil${DEBUG_SUFFIX} ALLOUTIL_LINK_LIBRARIES)
 else()
   find_package(Alloutil QUIET)

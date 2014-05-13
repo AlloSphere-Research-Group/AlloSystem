@@ -155,7 +155,7 @@ set(ALLOCORE_DEP_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
 
 include_directories(${ALLOCORE_DEP_INCLUDE_DIRS})
 
-set_target_properties(allocore
+set_target_properties(${ALLOCORE_LIB}
   PROPERTIES
   ALLOCORE_DEP_INCLUDE_DIRS "${ALLOCORE_DEP_INCLUDE_DIRS}"
   )
