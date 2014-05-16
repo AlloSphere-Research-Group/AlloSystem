@@ -136,7 +136,7 @@ endif()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   add_definitions(-DAL_WINDOWS)
   # For HID
-  set(WINDOWS_LIBS windows setupapi)
+  #set(WINDOWS_LIBS windows setupapi) # Commented out for mingw build
 endif()
 
 # Include directories
