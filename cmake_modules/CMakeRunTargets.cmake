@@ -138,7 +138,7 @@ add_custom_target("${APP_NAME}_run"
   option(RUN_IN_DEBUGGER 0) # For next run
 else()
 add_custom_target("${APP_NAME}_run"
-  COMMAND "gdb" "-ex" "run" "${EXECUTABLE_OUTPUT_PATH}/${APP_NAME}"
+  COMMAND "${ALLOSYSTEM_DEBUGGER}" "-ex" "run" "${EXECUTABLE_OUTPUT_PATH}/${APP_NAME}"
   DEPENDS "${APP_NAME}"
   WORKING_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}"
   SOURCES ${ALLOPROJECT_APP_SRC}

@@ -7,6 +7,8 @@ BUILD_GLV=0
 BUILD_VSR=0
 BUILD_GAMMA=0
 
+DEBUGGER=gdb
+
 # ------------------------------------------------
 # You shouldn't need to touch the stuff below
 
@@ -37,5 +39,5 @@ else
   exit 1
 fi
 
-cmake . ${CMAKE_FLAGS} ${TARGET_FLAG} -DNO_EXAMPLES=1 -DRUN_IN_DEBUGGER=1 -DCMAKE_BUILD_TYPE=Debug
+cmake . ${CMAKE_FLAGS} ${TARGET_FLAG} -DNO_EXAMPLES=1 -DRUN_IN_DEBUGGER=1 -DALLOSYSTEM_DEBUGGER=${DEBUGGER} -DCMAKE_BUILD_TYPE=Debug
 make $TARGET -j4 $*
