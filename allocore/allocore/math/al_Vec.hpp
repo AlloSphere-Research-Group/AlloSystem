@@ -474,7 +474,7 @@ inline Vec<3,T> cross(const Vec<3,T>& a, const Vec<3,T>& b){
 /// Returns angle, in interval [0, pi], between two vectors
 template <int N, class T>
 inline T angle(const Vec<N,T>& a, const Vec<N,T>& b){
-	T cosAng = a.normalized().dot(b.normalized());
+	T cosAng = a.dot(b) / sqrt(a.magSqr()*b.magSqr());
 	if(cosAng >= T( 1)){ return T(0); }		else
 	if(cosAng <= T(-1)){ return T(M_PI); }
 	return std::acos(cosAng);
