@@ -198,31 +198,49 @@ public:
 		capture(drawable, lens, pose);
 		draw(lens, pose, vp);
 
+    // why do we have to do all this in OmniStereo? why here?
+    // because OmniApp's onDraw is just a capture; the output
+    // frame buffer is not bound there, but it is here. quick
+    // and dirty is best on this one-time exploration.
+    // -- ky
+    //
+
     // take a snapshot of the viewport
     //
     GLubyte rgb[int(vp.w) * int(vp.h) * 3];
     glReadPixels(0, 0, vp.w, vp.h, GL_RGB, GL_UNSIGNED_BYTE, rgb);
 
+    static const char* name[] = {"dummy", "blue", "green", "cyan", "red", "pink", "yellow"};
+
+    // count unique colors found in the snapshot
+    //
     map<unsigned, unsigned> colorCount;
     for (int i = 0; i < int(vp.w) * int(vp.h) * 3; i += 3) {
+
+      // cube map rasterization and/or shading/lighting adds noise
+      // clean up and encode colors
+      //
       unsigned c = (rgb[i] > 127) * 4 + (rgb[i + 1] > 127) * 2 + (rgb[i + 2] > 127);
+
+      // ignore white and black
+      //
       if ((c == 0) || (c == 7))
         continue;
-      //unsigned c = (rgb[i] << 16) | (rgb[i + 1] << 8) | rgb[i + 2];
+
+      // use a map to count unique colors
+      //
       if (colorCount.find(c) == colorCount.end())
         colorCount[c] = 1;
       else
         colorCount[c]++;
     }
-    cout << colorCount.size() << " colors found" << endl;
-    for (std::map<unsigned, unsigned>::iterator it = colorCount.begin(); it != colorCount.end(); ++it) {
-      std::cout << it->first << " => " << it->second
-          << " ("
-          << unsigned(((it->first) >> 16) & 0xFF) << ", "
-          << unsigned(((it->first) >> 8) & 0xFF) << ", "
-          << unsigned(((it->first) >> 0) & 0xFF) << ")"
-        << '\n';
-    }
+
+    // log how many colors are seen and which ones
+    //
+    cout << "i see " << colorCount.size() << " colors: ";
+    for (std::map<unsigned, unsigned>::iterator it = colorCount.begin(); it != colorCount.end(); ++it)
+      std::cout << name[it->first] << " ";
+    cout << endl;
 	}
 	
 	// render front-view only (bypass FBO)

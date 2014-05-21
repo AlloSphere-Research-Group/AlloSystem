@@ -7,19 +7,18 @@ using namespace std;
 
 struct MyApp : OmniApp {
   Mesh mesh;
-  GLubyte* rgb;
 
   Mesh m0, m1, m2, m3, m4, m5;
 
   MyApp() {
     omni().configure(OmniStereo::NOBLEND);
 
-    Color    red(1, 0, 0);
-    Color  green(0, 1, 0);
-    Color   blue(0, 0, 1);
-    Color yellow(1, 1, 0);
-    Color   cyan(0, 1, 1);
-    Color   pink(1, 0, 1);
+    Color    red(1, 0, 0); // 4
+    Color  green(0, 1, 0); // 2
+    Color   blue(0, 0, 1); // 1
+    Color yellow(1, 1, 0); // 6
+    Color   cyan(0, 1, 1); // 3
+    Color   pink(1, 0, 1); // 5
 
     m0.primitive(Graphics::TRIANGLE_STRIP);
     addSurface(m0, 2, 2);
@@ -75,17 +74,16 @@ struct MyApp : OmniApp {
     // 3 GL_TEXTURE_CUBE_MAP_NEGATIVE_Y (1, 1, 0) yellow
     // 4 GL_TEXTURE_CUBE_MAP_POSITIVE_Z (0, 1, 1) cyan?
     // 5 GL_TEXTURE_CUBE_MAP_NEGATIVE_Z (1, 0, 1) pink?
-
-    rgb = new GLubyte[3 * 2000 * 1600];
   }
-  // omni_face
 
   virtual std::string vertexCode() {
     return AL_STRINGIFY(
-      varying vec4 vy_CubeMapFaceColor;
+      varying vec4 vy_CubeMapFaceColor; // for cube map colors
       varying vec4 color;
       varying vec3 normal, lightDir, eyeVec;
       void main() {
+        // use omni_face flag to decide cube map colors
+        //
         vy_CubeMapFaceColor =
           (omni_face == 0) ? vec4(1, 0, 0, 1) :
           (omni_face == 1) ? vec4(0, 1, 0, 1) :
@@ -93,6 +91,7 @@ struct MyApp : OmniApp {
           (omni_face == 3) ? vec4(1, 1, 0, 1) :
           (omni_face == 4) ? vec4(0, 1, 1, 1) :
           vec4(1, 0, 1, 1);
+
         color = gl_Color;
         vec4 vertex = gl_ModelViewMatrix * gl_Vertex;
         normal = gl_NormalMatrix * gl_Normal;
@@ -107,7 +106,7 @@ struct MyApp : OmniApp {
 
   virtual std::string fragmentCode() {
     return AL_STRINGIFY(
-      varying vec4 vy_CubeMapFaceColor;
+      varying vec4 vy_CubeMapFaceColor; // for cube map colors
       uniform float lighting;
       uniform float texture;
       uniform sampler2D texture0;
@@ -132,6 +131,10 @@ struct MyApp : OmniApp {
         vec3 R = reflect(-L, N);
         float spec = pow(max(dot(R, E), 0.0), 0.9 + 1e-20);
         final_color += gl_LightSource[0].specular * spec;
+
+
+        // choose color to use: normal or special cube map colors
+        //
         gl_FragColor = mix(colorMixed, final_color, vy_CubeMapFaceColor * 0.0);
         //gl_FragColor = vy_CubeMapFaceColor;
       }
@@ -141,6 +144,9 @@ struct MyApp : OmniApp {
   virtual ~MyApp() {}
 
   virtual void onDraw(Graphics& g) {
+
+    // draw a 6-colored cube aligned with our cube map
+    //
 
     g.pushMatrix(); // x+
       g.rotate(-90, 0, 1, 0);
@@ -171,30 +177,16 @@ struct MyApp : OmniApp {
 
       g.draw(m5);
     g.popMatrix();
-
-
-//    // take a snapshot of the viewport
-//    //
-//    glReadPixels(0, 0, width(), height(), GL_RGB, GL_UNSIGNED_BYTE, rgb);
-//
-//    map<unsigned, unsigned> colorCount;
-//    cout << width() * height() * 3 << endl;
-//    for (int i = 0; i < width() * height() * 3; i += 3) {
-//      unsigned c = (rgb[i] << 16) | (rgb[i + 1] << 8) | rgb[i + 2];
-//      if (colorCount.find(c) == colorCount.end())
-//        colorCount[c] = 1;
-//      else
-//        colorCount[c]++;
-//    }
-//    cout << colorCount.size() << " colors found" << endl;
-//    for (std::map<unsigned, unsigned>::iterator it = colorCount.begin(); it != colorCount.end(); ++it)
-//      std::cout << it->first << " => " << it->second << '\n';
-    // count the number of colors seen
-    //
   }
 
   virtual void onAnimate(al_sec dt) {
+
+    // limit nav to orientation only
+    //
     nav().pos(0, 0, 0);
+
+    // log our orientation
+    //
     nav().quat().print();
   }
 };
