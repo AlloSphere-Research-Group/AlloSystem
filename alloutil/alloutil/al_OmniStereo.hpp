@@ -1,6 +1,9 @@
 #ifndef AL_OMNISTEREO_H
 #define AL_OMNISTEREO_H
 
+#include <map>
+#include <iostream>
+using namespace std;
 
 #include "allocore/graphics/al_Lens.hpp"
 #include "allocore/graphics/al_Shader.hpp"
@@ -194,6 +197,32 @@ public:
 	void onFrame(OmniStereo::Drawable& drawable, const Lens& lens, const Pose& pose, const Viewport& vp) {
 		capture(drawable, lens, pose);
 		draw(lens, pose, vp);
+
+    // take a snapshot of the viewport
+    //
+    GLubyte rgb[int(vp.w) * int(vp.h) * 3];
+    glReadPixels(0, 0, vp.w, vp.h, GL_RGB, GL_UNSIGNED_BYTE, rgb);
+
+    map<unsigned, unsigned> colorCount;
+    for (int i = 0; i < int(vp.w) * int(vp.h) * 3; i += 3) {
+      unsigned c = (rgb[i] > 127) * 4 + (rgb[i + 1] > 127) * 2 + (rgb[i + 2] > 127);
+      if ((c == 0) || (c == 7))
+        continue;
+      //unsigned c = (rgb[i] << 16) | (rgb[i + 1] << 8) | rgb[i + 2];
+      if (colorCount.find(c) == colorCount.end())
+        colorCount[c] = 1;
+      else
+        colorCount[c]++;
+    }
+    cout << colorCount.size() << " colors found" << endl;
+    for (std::map<unsigned, unsigned>::iterator it = colorCount.begin(); it != colorCount.end(); ++it) {
+      std::cout << it->first << " => " << it->second
+          << " ("
+          << unsigned(((it->first) >> 16) & 0xFF) << ", "
+          << unsigned(((it->first) >> 8) & 0xFF) << ", "
+          << unsigned(((it->first) >> 0) & 0xFF) << ")"
+        << '\n';
+    }
 	}
 	
 	// render front-view only (bypass FBO)
