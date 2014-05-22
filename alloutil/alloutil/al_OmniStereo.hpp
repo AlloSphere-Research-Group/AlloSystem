@@ -207,14 +207,21 @@ public:
 
     // take a snapshot of the viewport
     //
-    GLubyte rgb[int(vp.w) * int(vp.h) * 3];
+    static GLubyte rgb[3 * 3840 * 1200 + 1000]; 
     glReadPixels(0, 0, vp.w, vp.h, GL_RGB, GL_UNSIGNED_BYTE, rgb);
 
-    static const char* name[] = {"dummy", "blue", "green", "cyan", "red", "pink", "yellow"};
+    // 0 GL_TEXTURE_CUBE_MAP_POSITIVE_X (1, 0, 0) red
+    // 1 GL_TEXTURE_CUBE_MAP_NEGATIVE_X (0, 1, 0) green
+    // 2 GL_TEXTURE_CUBE_MAP_POSITIVE_Y (0, 0, 1) blue
+    // 3 GL_TEXTURE_CUBE_MAP_NEGATIVE_Y (1, 1, 0) yellow
+    // 4 GL_TEXTURE_CUBE_MAP_POSITIVE_Z (0, 1, 1) cyan?
+    // 5 GL_TEXTURE_CUBE_MAP_NEGATIVE_Z (1, 0, 1) pink?
+    static const char* name[] = {"dummy", "+y/blue", "-x/green", "+z/cyan", "+x/red", "-z/pink", "-y/yellow"};
 
     // count unique colors found in the snapshot
     //
     map<unsigned, unsigned> colorCount;
+
     for (int i = 0; i < int(vp.w) * int(vp.h) * 3; i += 3) {
 
       // cube map rasterization and/or shading/lighting adds noise
