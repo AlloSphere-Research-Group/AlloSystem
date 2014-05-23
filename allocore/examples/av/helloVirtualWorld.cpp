@@ -100,6 +100,7 @@ AudioScene scene(AUDIO_BLOCK_SIZE);
 Listener * listener;
 Nav navMaster(Vec3d(0,0,-4), 0.95);
 std::vector<Agent> agents(1);
+int currentAgent = 0;
 Stereographic stereo;
 
 

@@ -194,7 +194,7 @@ protected:
 */
 class SoundSource {
 public:
-	SoundSource(double rollOff=1, double near=1, double range=32, double ampFar=0.0, int bufSize=5000)
+	SoundSource(double rollOff=1, double near=1, double range=50, double ampFar=0.0, int bufSize=15000)
 	:	mSound(bufSize), mRollOff(rollOff), mNearClip(near), mClipRange(range), mAmpFar(ampFar), useAtten(true), useDoppler(true)
 	{
 		// initialize the position history to be VERY FAR AWAY so that we don't deafen ourselves... 
@@ -295,7 +295,12 @@ public:
 		float a = mSound.read(index0);
 		float b = mSound.read(index0+1);
 		float frac = index - index0;
-		return ipl::linear(frac, a, b);
+		//return a; //no interp
+        return ipl::linear(frac, a, b);
+        
+//        float a0 = mSound.read(index0 - 1);
+//        float b1 = mSound.read(index0 + 2);
+//        return ipl::cubic(frac, a0, a, b, b1);
 	}
 
 	/// Set far clipping distance
@@ -332,7 +337,7 @@ public:
 	typedef std::list<SoundSource *> Sources;
 
     AudioScene(int numFrames)
-	:   mNumFrames(numFrames), mSpeedOfSound(343)
+	:   mNumFrames(numFrames), mSpeedOfSound(344)
 	{}
 
 	Listeners& listeners(){ return mListeners; }
@@ -407,7 +412,7 @@ public:
 				// since each source has its own buffersize and far clip
 				// (not physically accurate of course)
                 if(src.useDoppler)
-                    distanceToSample = (src.maxIndex()-numFrames)/src.farClip();
+                    distanceToSample = distanceToSample;//(src.maxIndex()-numFrames)/src.farClip();
                 else
                     distanceToSample = 0;
 				
@@ -430,8 +435,10 @@ public:
 
 					double distance = relpos.mag();
 					
+                    //printf("distance = %f\n", distance);
+                    
 					double idx = distance * distanceToSample;
-					//if (i==0) printf("%g\n", distance);
+					//if (i==0) printf("idx %g\n", idx);
 					
 					int idx0 = idx;
 					
