@@ -3,6 +3,7 @@
 if(BUILD_DIR)
   file(GLOB ALLOPROJECT_APP_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${BUILD_APP_DIR}/*.cpp)
   string(REPLACE "/" "_" APP_NAME ${BUILD_APP_DIR})
+  string(REGEX REPLACE "_+$" "" APP_NAME "${APP_NAME}")
   set(SOURCE_DIR ${BUILD_APP_DIR})
 else()
   set(ALLOPROJECT_APP_SRC ${BUILD_APP_FILE})
@@ -16,7 +17,7 @@ endif(BUILD_DIR)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/build/bin)
 
-add_executable(${APP_NAME} EXCLUDE_FROM_ALL "${ALLOPROJECT_APP_SRC}")
+add_executable(${APP_NAME} EXCLUDE_FROM_ALL ${ALLOPROJECT_APP_SRC})
 if(APPLE)
   set_target_properties(${APP_NAME} PROPERTIES
     LINK_FLAGS "-pagezero_size 10000 -image_base 100000000")
@@ -35,12 +36,12 @@ message("Target: ${APP_NAME}")
 message("From sources: ${ALLOPROJECT_APP_SRC}")
 
 # Dependencies (check if targets exist and set variables)
-get_target_property(ALLOCORE_LIBRARY allocore LOCATION)
-get_target_property(ALLOCORE_INCLUDE_DIR allocore ALLOCORE_INCLUDE_DIR)
-get_target_property(ALLOCORE_LINK_LIBRARIES allocore ALLOCORE_LINK_LIBRARIES)
-add_dependencies(${APP_NAME} allocore) 
+get_target_property(ALLOCORE_LIBRARY allocore${DEBUG_SUFFIX} LOCATION)
+get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore${DEBUG_SUFFIX} ALLOCORE_DEP_INCLUDE_DIRS)
+get_target_property(ALLOCORE_LINK_LIBRARIES allocore${DEBUG_SUFFIX} ALLOCORE_LINK_LIBRARIES)
+add_dependencies(${APP_NAME} allocore${DEBUG_SUFFIX})
 
-message("Using allocore headers from: ${ALLOCORE_INCLUDE_DIR}")
+message("Using allocore headers from: ${ALLOCORE_DEP_INCLUDE_DIRS}")
 
 if(BUILDING_GAMMA)
   set(GAMMA_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/Gamma)
@@ -82,39 +83,39 @@ else()
   endif(NOT VSR_FOUND) 
 endif(BUILDING_VSR)
 
-if(TARGET alloutil)
-  get_target_property(ALLOUTIL_LIBRARY alloutil LOCATION)
-  get_target_property(ALLOUTIL_INCLUDE_DIR alloutil ALLOUTIL_INCLUDE_DIR)
-  get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil ALLOUTIL_LINK_LIBRARIES)
-  add_dependencies(${APP_NAME} alloutil)
+if(TARGET alloutil${DEBUG_SUFFIX})
+  get_target_property(ALLOUTIL_LIBRARY alloutil${DEBUG_SUFFIX} LOCATION)
+  get_target_property(ALLOUTIL_DEP_INCLUDE_DIR alloutil${DEBUG_SUFFIX} ALLOUTIL_DEP_INCLUDE_DIR)
+  get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil${DEBUG_SUFFIX} ALLOUTIL_LINK_LIBRARIES)
+  add_dependencies(${APP_NAME} alloutil${DEBUG_SUFFIX})
 else()
   if(NOT ALLOUTIL_FOUND)
     set(ALLOUTIL_LIBRARY "")
-    set(ALLOUTIL_INCLUDE_DIR "")
+    set(ALLOUTIL_DEP_INCLUDE_DIR "")
     message("Not building ALLOUTIL and no usable ALLOUTIL binary found. Not linking application to ALLOUTIL")
   endif(NOT ALLOUTIL_FOUND) 
-endif(TARGET alloutil)
+endif(TARGET alloutil${DEBUG_SUFFIX})
 
-if(TARGET alloGLV)
-  get_target_property(ALLOGLV_LIBRARY alloGLV LOCATION)
-  get_target_property(ALLOGLV_INCLUDE_DIR alloGLV ALLOGLV_INCLUDE_DIR)
-  get_target_property(ALLOGLV_LINK_LIBRARIES alloGLV ALLOGLV_LINK_LIBRARIES)
-  add_dependencies(${APP_NAME} alloGLV)
+if(TARGET alloGLV${DEBUG_SUFFIX})
+  get_target_property(ALLOGLV_LIBRARY alloGLV${DEBUG_SUFFIX} LOCATION)
+  get_target_property(ALLOGLV_INCLUDE_DIR alloGLV${DEBUG_SUFFIX} ALLOGLV_INCLUDE_DIR)
+  get_target_property(ALLOGLV_LINK_LIBRARIES "alloGLV${DEBUG_SUFFIX}" ALLOGLV_LINK_LIBRARIES)
+  add_dependencies(${APP_NAME} alloGLV${DEBUG_SUFFIX})
 else()
   if(NOT ALLOGLV_FOUND)
     set(ALLOGLV_LIBRARY "")
     set(ALLOGLV_INCLUDE_DIR "")
     message("Not building alloGLV and no usable alloGLV binary found. Not linking application to alloGLV")
   endif(NOT ALLOGLV_FOUND) 
-endif(TARGET alloGLV)
+endif(TARGET alloGLV${DEBUG_SUFFIX})
 
 
 # TODO copy resources to build directory
 
 #file(GLOB ALLOPROJECT_APP_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${BUILD_APP_DIR}/*.*)
 
-include_directories(${ALLOCORE_INCLUDE_DIR}
-  ${ALLOUTIL_INCLUDE_DIR}
+include_directories(${ALLOCORE_DEP_INCLUDE_DIRS}
+  ${ALLOUTIL_DEP_INCLUDE_DIR}
   ${ALLOGLV_INCLUDE_DIR}
   ${GLV_INCLUDE_DIR}
   ${ALLOVSR_INCLUDE_DIR}
@@ -127,9 +128,20 @@ target_link_libraries(${APP_NAME}
   ${GAMMA_LIBRARY} ${GLV_LIBRARIES} ${VSR_LIBRARY}
   ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOGLV_LINK_LIBRARIES})
 #list(REMOVE_ITEM PROJECT_RES_FILES ${ALLOPROJECT_APP_SRC})
+if(NOT RUN_IN_DEBUGGER)
 add_custom_target("${APP_NAME}_run"
   COMMAND "${APP_NAME}"
   DEPENDS "${APP_NAME}"
-  WORKING_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+  WORKING_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}"
   SOURCES ${ALLOPROJECT_APP_SRC}
   COMMENT "Running: ${APP_NAME}")
+  option(RUN_IN_DEBUGGER 0) # For next run
+else()
+add_custom_target("${APP_NAME}_run"
+  COMMAND "${ALLOSYSTEM_DEBUGGER}" "-ex" "run" "${EXECUTABLE_OUTPUT_PATH}/${APP_NAME}"
+  DEPENDS "${APP_NAME}"
+  WORKING_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}"
+  SOURCES ${ALLOPROJECT_APP_SRC}
+  COMMENT "Running: ${APP_NAME}")
+
+endif(NOT RUN_IN_DEBUGGER)

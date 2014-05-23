@@ -16,12 +16,8 @@ set(ALLOUTIL_SRC
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_library(alloutil ${ALLOUTIL_SRC})
-set(ALLOUTIL_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${LUA_INCLUDE_DIR})
-set_target_properties(alloutil 
-  PROPERTIES 
-  ALLOUTIL_INCLUDE_DIR "${ALLOUTIL_DIRS}"
-  )
+set(ALLOUTIL_LIB "alloutil${DEBUG_SUFFIX}")
+add_library(${ALLOUTIL_LIB} ${ALLOUTIL_SRC})
 
 find_package(LuaJIT)
 
@@ -31,10 +27,13 @@ if(LUAJIT_FOUND)
   set(LUA_FOUND 1)
 else()
   find_package(Lua51)
+  if (LUA_LIBRARY)
+    set(LUA_FOUND 1)
+  endif(LUA_LIBRARY)
 endif(LUAJIT_FOUND)
 
 if(NOT LUA_FOUND)
-  message(FATAL "Lua 5.1 or LuaJIT required to build Allocore. Neither found!")
+  message(FATAL_ERROR "Lua 5.1 or LuaJIT required to build Allocore. Neither found!")
 endif(NOT LUA_FOUND)
 
 GET_DIRECTORY_PROPERTY(ALLOSYSTEM_BUILD DIRECTORY ${CMAKE_SOURCE_DIR}
@@ -42,23 +41,28 @@ GET_DIRECTORY_PROPERTY(ALLOSYSTEM_BUILD DIRECTORY ${CMAKE_SOURCE_DIR}
 
 if(ALLOSYSTEM_BUILD)
   #message("Allosystem build")
-  get_target_property(ALLOCORE_LIBRARY allocore LOCATION)
-  get_target_property(ALLOCORE_INCLUDE_DIR allocore ALLOCORE_INCLUDE_DIR)
+  get_target_property(ALLOCORE_LIBRARY allocore${DEBUG_SUFFIX} LOCATION)
+  get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore${DEBUG_SUFFIX} ALLOCORE_DEP_INCLUDE_DIRS)
+
 else(ALLOSYSTEM_BUILD)
   find_package(Allocore REQUIRED)
 endif(ALLOSYSTEM_BUILD)
 
-
-include_directories(${LUA_INCLUDE_DIR} ${ALLOCORE_INCLUDE_DIR})
 set(ALLOUTIL_LINK_LIBRARIES ${LUA_LIBRARIES} ${ALLOCORE_LIBRARY})
 
+set(ALLOUTIL_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${LUA_INCLUDE_DIR} ${ALLOCORE_DEP_INCLUDE_DIRS})
 
-set_target_properties(alloutil 
+set_target_properties(${ALLOUTIL_LIB}
+  PROPERTIES
+  ALLOUTIL_DEP_INCLUDE_DIR "${ALLOUTIL_DIRS}"
+  )
+set_target_properties(${ALLOUTIL_LIB}
   PROPERTIES 
   ALLOUTIL_LINK_LIBRARIES "${ALLOUTIL_LINK_LIBRARIES}"
   )
 
-target_link_libraries(alloutil ${ALLOUTIL_LINK_LIBRARIES})
+include_directories(${ALLOUTIL_DIRS})
+target_link_libraries(${ALLOUTIL_LIB} ${ALLOUTIL_LINK_LIBRARIES})
 
 set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
@@ -136,7 +140,7 @@ if(NOT NO_EXAMPLES)
 	set(EXAMPLE_TARGET examples_${EXAMPLE_NAME})
       endif(ALLOSYSTEM_BUILD)
       add_executable(${EXAMPLE_TARGET} ${example})
-      target_link_libraries("${EXAMPLE_TARGET}" alloutil ${ALLOUTIL_LINK_LIBRARIES} ${ALLOCORE_LINK_LIBRARIES})
+      target_link_libraries("${EXAMPLE_TARGET}" ${ALLOUTIL_LIB} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOCORE_LINK_LIBRARIES})
       if(APPLE)
 	set_target_properties(${EXAMPLE_TARGET} PROPERTIES
 	  LINK_FLAGS "-pagezero_size 10000 -image_base 100000000")
@@ -159,6 +163,6 @@ endif(NOT NO_EXAMPLES)
 
 # installation
 install(DIRECTORY alloutil/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include/alloutil)
-install(TARGETS alloutil DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install(TARGETS ${ALLOUTIL_LIB} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 
 

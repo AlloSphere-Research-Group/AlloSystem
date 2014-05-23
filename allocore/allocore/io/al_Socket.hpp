@@ -49,10 +49,48 @@
 
 namespace al{
 
+class SocketStream;
 
-/// Base class for network socket
+
+/// A network socket
 class Socket{
 public:
+
+	/// Bit masks for specifying a transmission protocol
+	enum{
+		// IPv4/v6 protocols
+		TCP		=   6,	/**< Transmission Control Protocol */
+		UDP		=  17,	/**< User Datagram Protocol */
+		SCTP	= 132,	/**< Stream Control Transmission Protocol */
+
+		// Transmission types
+		STREAM	= 1<<8,	/**< Connection-based, reliable byte stream */
+		DGRAM	= 2<<8,	/**< Datagram; connectionless, unreliable fixed-length messages */
+		
+		// Families
+		INET	= 1<<16, /**< IPv4 Internet protocols */
+		INET6	= 2<<16  /**< IPv6 Internet protocols */
+	};
+
+
+	/// Create uninitialized socket
+	Socket();
+
+	/// @param[in] port		Port number (valid range is 0-65535)
+	/// @param[in] address	IP address
+	/// @param[in] timeout	< 0 is block forever, 0 is no blocking, > 0 is block with timeout
+	/// @param[in] type		Protocol type
+	Socket(uint16_t port, const char * address, al_sec timeout, int type);
+
+	virtual ~Socket();
+
+
+	/// Get name of current host
+	static std::string hostName();
+	
+	/// IP address of current host
+	static std::string hostIP();
+
 
 	/// Returns whether socket is open
 	bool opened() const;
@@ -67,80 +105,33 @@ public:
 	al_sec timeout() const;
 
 
+	/// Open socket (reopening if currently open)
+	bool open(uint16_t port, const char * address, al_sec timeout, int type);
+
 	/// Close the socket
 	void close();
 
-	/// Set timeout. < 0: block forever; = 0: no blocking; > 0 block with timeout
+	/// Bind current (local) address to socket. Called on a server socket.
+	bool bind();
 
-	/// Note that setting timeout will close and re-open the socket.
+	/// Connect socket to current (remote) address.
+	
+	/// Called on a client socket. In case of a TCP socket, this causes an
+	/// attempt to establish a new TCP connection.
+	bool connect();
+
+
+	/// Set socket timeout
+
+	/// This timeout applies to send/recv, accept, and connect calls.
 	///
-	void timeout(al_sec v);
+	/// @param[in] t	Timeout in seconds.
+	///					If t > 0, the socket blocks with timeout t.
+	///					If t = 0, the socket never blocks.
+	///					If t < 0, the socket blocks forever.
+	/// Note that setting the timeout will close and re-open the socket.
+	void timeout(al_sec t);
 
-
-	/// Get name of current host
-	static std::string hostName();
-	
-	/// IP address of current host
-	static std::string hostIP();
-
-protected:
-	Socket();
-
-	// @sender: true if Socket will send
-	Socket(uint16_t port, const char * address, al_sec timeout, bool sender);
-
-	virtual ~Socket();
-
-	bool open(uint16_t port, const char * address, al_sec timeout, bool sender);
-	size_t recv(char * buffer, size_t maxlen);
-	size_t send(const char * buffer, size_t len);
-
-private:
-	class Impl; Impl * mImpl;
-};
-
-
-
-/// Socket for sending data over a network
-class SocketSend : public Socket {
-public:
-	SocketSend(){}
-
-	/// @param[in] port		Port number (valid range is 0-65535)
-	/// @param[in] address	IP address
-	/// @param[in] timeout	< 0: block forever; = 0: no blocking; > 0 block with timeout
-	SocketSend(uint16_t port, const char * address = "localhost", al_sec timeout=0)
-	:	Socket(port, address, timeout, true)
-	{}
-
-	/// Open socket closing and reopening if currently open
-	bool open(uint16_t port, const char * address, al_sec timeout=0){
-		return Socket::open(port, address, timeout, true);
-	}
-
-	/// Send data over a network
-	
-	/// @param[in] buffer	The buffer of data to send
-	/// @param[in] len		The length, in bytes, of the buffer
-	size_t send(const char * buffer, size_t len){ return Socket::send(buffer, len); }
-};
-
-/// Socket for receiving data over a network
-class SocketRecv : public Socket {
-public:
-	SocketRecv(){}
-
-	/// @param[in] port		Port number (valid range is 0-65535)
-	/// @param[in] address	IP address. If empty, will bind all network interfaces to socket.
-	/// @param[in] timeout	< 0: block forever; = 0: no blocking; > 0 block with timeout
-	SocketRecv(uint16_t port, const char * address = "", al_sec timeout=0)
-	:	Socket(port, address, timeout, false)
-	{}
-
-	/// Open socket closing and reopening if currently open
-	bool open(uint16_t port, const char * address = "", al_sec timeout=0){
-		return Socket::open(port, address, timeout, false);
-	}
 
 	/// Read data from a network
 
@@ -150,8 +141,100 @@ public:
 	//
 	/// Note: to ensure receipt of all messages in the queue, use 
 	/// while(recv()){}
-	size_t recv(char * buffer, size_t maxlen){ return Socket::recv(buffer, maxlen); }
+	size_t recv(char * buffer, size_t maxlen);
+
+	/// Send data over a network
+	
+	/// @param[in] buffer	The buffer of data to send
+	/// @param[in] len		The length, in bytes, of the buffer
+	/// \returns bytes sent
+	size_t send(const char * buffer, size_t len);
+
+
+	/// Listen for incoming connections from remote clients
+	
+	/// After a socket has been associated with an address, listen prepares it
+	/// for incoming connections. This is only relevent for server sockets using
+	/// stream-oriented connections, such as TCP.
+	bool listen();
+
+	/// Check for an incoming socket connection
+	
+	/// Accepts a received incoming attempt to create a new TCP connection 
+	/// from the remote client, and creates a new socket associated with the
+	/// socket address pair of this connection.
+	bool accept(Socket& sock);
+
+protected:
+	// Called after a successful call to open
+	virtual bool onOpen(){ return true; }
+
+private:
+	class Impl; Impl * mImpl;
 };
+
+
+/// Client socket
+
+/// A client socket connects to a remote address to which it sends data to
+/// (e.g., a request to a server) and possibly receives data from
+/// (e.g., a response from a server).
+class SocketClient : public Socket {
+public:
+
+	SocketClient(){}
+
+	/// @param[in] port		Remote port number (valid range is 0-65535)
+	/// @param[in] address	Remote IP address
+	/// @param[in] timeout	< 0 is block forever, 0 is no blocking, > 0 is block with timeout
+	/// @param[in] type		Protocol type
+	SocketClient(
+		uint16_t port, const char * address = "localhost",
+		al_sec timeout = 0, int type = UDP|DGRAM
+	)
+	:	Socket(port, address, timeout, type)
+	{
+		SocketClient::onOpen();
+	}
+
+protected:
+	virtual bool onOpen();
+};
+
+
+/// Server socket
+
+/// A server socket typically waits and listens for incoming socket connections.
+/// After accepting an incoming connection, data is received and possibly sent
+/// through the accepted socket.
+class SocketServer : public Socket {
+public:
+
+	SocketServer(){}
+
+	/// @param[in] port		Local port number (valid range is 0-65535)
+	/// @param[in] address	Local IP address. If empty, will bind all network interfaces to socket.
+	/// @param[in] timeout	< 0 is block forever, 0 is no blocking, > 0 is block with timeout
+	/// @param[in] type		Protocol type
+	SocketServer(
+		uint16_t port, const char * address = "",
+		al_sec timeout = 0, int type = UDP|DGRAM
+	)
+	:	Socket(port, address, timeout, type)
+	{
+		SocketServer::onOpen();
+	}
+
+protected:
+	virtual bool onOpen();
+};
+
+
+/// \deprecated Use SocketClient
+typedef SocketClient SocketSend;
+
+/// \deprecated Use SocketServer
+typedef SocketServer SocketRecv;
 
 
 } // al::

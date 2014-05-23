@@ -63,12 +63,10 @@ endif()
 file(GLOB ALLOCORE_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} allocore/*/*.hpp)
 #file(GLOB ALLOCORE_HEADER_DIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} allocore/*)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-add_library(allocore ${ALLOCORE_SRC} ${ALLOCORE_HEADERS})
 
-set_target_properties(allocore 
-  PROPERTIES 
-  ALLOCORE_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
-  )
+set(ALLOCORE_LIB "allocore${DEBUG_SUFFIX}")
+add_library(${ALLOCORE_LIB} ${ALLOCORE_SRC} ${ALLOCORE_HEADERS})
+
 set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 
@@ -138,11 +136,12 @@ endif()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   add_definitions(-DAL_WINDOWS)
   # For HID
-  set(WINDOWS_LIBS windows setupapi)
+  #set(WINDOWS_LIBS windows setupapi) # Commented out for mingw build
 endif()
 
 # Include directories
-set(ALLOCORE_INCLUDE_DIRS ${APR_INCLUDE_DIR}
+set(ALLOCORE_DEP_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
+  ${APR_INCLUDE_DIR}
   ${ASSIMP_INCLUDE_DIR}
   ${FREEIMAGE_INCLUDE_DIR}
   ${FREETYPE_INCLUDE_DIRS}
@@ -154,7 +153,12 @@ set(ALLOCORE_INCLUDE_DIRS ${APR_INCLUDE_DIR}
   ${PORTAUDIO_INCLUDE_DIRS}
   ${SNDFILE_INCLUDE_DIRS})
 
-include_directories(${ALLOCORE_INCLUDE_DIRS})
+include_directories(${ALLOCORE_DEP_INCLUDE_DIRS})
+
+set_target_properties(${ALLOCORE_LIB}
+  PROPERTIES
+  ALLOCORE_DEP_INCLUDE_DIRS "${ALLOCORE_DEP_INCLUDE_DIRS}"
+  )
 
 # Link libraries
 set(ALLOCORE_LINK_LIBRARIES ${ALLOCORE_LINK_LIBRARIES}
@@ -173,11 +177,11 @@ set(ALLOCORE_LINK_LIBRARIES ${ALLOCORE_LINK_LIBRARIES}
   ${LINUX_LIBS}
   ${WINDOWS_LIBS})
 
-set_target_properties(allocore 
+set_target_properties(${ALLOCORE_LIB}
   PROPERTIES 
   ALLOCORE_LINK_LIBRARIES "${ALLOCORE_LINK_LIBRARIES}"
   )
-target_link_libraries(allocore ${ALLOCORE_LINK_LIBRARIES})
+target_link_libraries(${ALLOCORE_LIB} ${ALLOCORE_LINK_LIBRARIES})
 
 # Doxygen documentation target
 add_custom_target("doc"
@@ -211,7 +215,7 @@ if(NOT NO_EXAMPLES)
       add_executable(${EXAMPLE_TARGET} ${example})
       set_target_properties(${EXAMPLE_TARGET} PROPERTIES
 	COMPILE_FLAGS "${EXTRA_COMPILER_FLAGS}")
-      target_link_libraries("${EXAMPLE_TARGET}" allocore ${ALLOCORE_LINK_LIBRARIES})
+      target_link_libraries("${EXAMPLE_TARGET}" ${ALLOCORE_LIB} ${ALLOCORE_LINK_LIBRARIES})
       if (apple)
 	find_library(AUDIOUNIT_FM AudioUnit)
         target_link_libraries("${EXAMPLE_TARGET}" ${AUDIOUNIT_FM})
@@ -247,4 +251,4 @@ endif(NOT NO_EXAMPLES)
 
 # installation
 install(DIRECTORY allocore/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include/allocore)
-install(TARGETS allocore DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install(TARGETS ${ALLOCORE_LIB} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
