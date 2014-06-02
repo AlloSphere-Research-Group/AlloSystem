@@ -393,7 +393,32 @@ public:
         zeroAmbi();
     }
     
-    //void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample){
+    /// Per sample processing
+    void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample)
+    {
+        // compute azimuth & elevation of relative position in current listener's coordinate frame:
+        Vec3d urel(relpos);
+        urel.normalize();	// unit vector in axis listener->source
+        // project into listener's coordinate frame:
+        //						Vec3d axis;
+        //						l.mQuatHistory[i].toVectorX(axis);
+        //						double rr = urel.dot(axis);
+        //						l.mQuatHistory[i].toVectorY(axis);
+        //						double ru = urel.dot(axis);
+        //						l.mQuatHistory[i].toVectorZ(axis);
+        //						double rf = urel.dot(axis);
+        
+        // cheaper:
+        Vec3d direction = mListener->mQuatHistory[frameIndex].rotateTransposed(urel);
+        
+        //mEncoder.direction(azimuth, elevation);
+        //mEncoder.direction(-rf, -rr, ru);
+        mEncoder.direction(-direction[2], -direction[0], direction[1]);
+        mEncoder.encode(ambiChans(), numFrames, frameIndex, sample);
+        
+    }
+    
+    /// Per buffer processing
     void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples){
         
          // compute azimuth & elevation of relative position in current listener's coordinate frame:

@@ -116,14 +116,16 @@ public:
     /// called once per listener, before sources are rendered. ex. zero ambisonics coefficients
     virtual void prepare(AudioIOData& io){};
     
-    /// render each source
-//    virtual void perform(
-//                         AudioIOData& io,
-//                         SoundSource& src,
-//                         Vec3d& relpos,
-//                         const int& numFrames,
-//                         int& frameIndex,
-//                         float& sample) = 0;
+    /// render each source per sample
+    virtual void perform(
+                         AudioIOData& io,
+                         SoundSource& src,
+                         Vec3d& relpos,
+                         const int& numFrames,
+                         int& frameIndex,
+                         float& sample) = 0;
+    
+    //render each source per buffer
     virtual void perform(
                          AudioIOData& io,
                          SoundSource& src,
@@ -343,7 +345,7 @@ public:
 	typedef std::list<SoundSource *> Sources;
 
     AudioScene(int numFrames)
-	:   mNumFrames(numFrames), mSpeedOfSound(344)
+	:   mNumFrames(numFrames), mSpeedOfSound(344), perSampleProcessing(false)
 	{}
 
 	Listeners& listeners(){ return mListeners; }
@@ -378,6 +380,11 @@ public:
 	void removeSource(SoundSource& src) {
 		mSources.remove(&src);
 	}
+    
+    void usePerSampleProcessing(bool shouldUsePerSampleProcessing)
+    {
+        perSampleProcessing = shouldUsePerSampleProcessing;
+    }
     
     void render(AudioIOData& io) {
 	
@@ -422,66 +429,72 @@ public:
                 else
                     distanceToSample = 0;
 				
-                /*//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                //!! Original, inefficient, per sample processing, should possibily move this interpolation into the spatializers
-                //!! Should interpolate disance as well
-                
-				// iterate time samples
-				for(int i=0; i<numFrames; ++i){
-					
-					// compute interpolated source position relative to listener
-					// TODO: this tends to warble when moving fast
-					double alpha = double(i)/numFrames;
-
-					// moving average:
-					// cheaper & slightly less warbly than cubic,
-					// less glitchy than linear
-					Vec3d relpos = (
-						(src.mPosHistory[3]-l.mPosHistory[3])*(1.-alpha) + 
-						(src.mPosHistory[2]-l.mPosHistory[2]) + 
-						(src.mPosHistory[1]-l.mPosHistory[1]) + 
-						(src.mPosHistory[0]-l.mPosHistory[0])*(alpha)
-					)/3.0;
-
-					double distance = relpos.mag();
-					
-                    //printf("distance = %f\n", distance);
-                    
-					double idx = distance * distanceToSample;
-					//if (i==0) printf("idx %g\n", idx);
-					
-					int idx0 = idx;
-					
-					// are we within range?
-					if(idx0 <= src.maxIndex()-numFrames){
-					//if (distance < src.farClip()) {
-
-						idx += (numFrames-i);
-						
-						double gain = src.attenuation(distance);
-                        
-						float s = src.readSample(idx) * gain;
-                        
-						spatializer->perform(io,src,relpos, numFrames, i, s);
-                        
-                    } // end if in range
-
-				} //end for each frame
-                //!! END old per frame processing
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//*/
-                
-                Vec3d relpos = src.pose().pos();
-                double distance = relpos.mag();
-                double gain = src.attenuation(distance);
-                
-                float samples[numFrames];
-                for(int i = 0; i < numFrames; i++)
+                if(perSampleProcessing)
                 {
-                    double readIndex = distance * distanceToSample;
-                    readIndex += (numFrames-i);
-                    samples[i] = gain*src.readSample(readIndex);
+                    //*//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    //!! Original, inefficient, per sample processing, should possibily move this interpolation into the spatializers
+                    //!! Should interpolate disance as well
+                    
+                    // iterate time samples
+                    for(int i=0; i<numFrames; ++i){
+                        
+                        // compute interpolated source position relative to listener
+                        // TODO: this tends to warble when moving fast
+                        double alpha = double(i)/numFrames;
+
+                        // moving average:
+                        // cheaper & slightly less warbly than cubic,
+                        // less glitchy than linear
+                        Vec3d relpos = (
+                            (src.mPosHistory[3]-l.mPosHistory[3])*(1.-alpha) + 
+                            (src.mPosHistory[2]-l.mPosHistory[2]) + 
+                            (src.mPosHistory[1]-l.mPosHistory[1]) + 
+                            (src.mPosHistory[0]-l.mPosHistory[0])*(alpha)
+                        )/3.0;
+
+                        double distance = relpos.mag();
+                        
+                        //printf("distance = %f\n", distance);
+                        
+                        double idx = distance * distanceToSample;
+                        //if (i==0) printf("idx %g\n", idx);
+                        
+                        int idx0 = idx;
+                        
+                        // are we within range?
+                        if(idx0 <= src.maxIndex()-numFrames){
+                        //if (distance < src.farClip()) {
+
+                            idx += (numFrames-i);
+                            
+                            double gain = src.attenuation(distance);
+                            
+                            float s = src.readSample(idx) * gain;
+                            
+                            spatializer->perform(io,src,relpos, numFrames, i, s);
+                            
+                        } // end if in range
+
+                    } //end for each frame
+                    //!! END old per frame processing
+                    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//*/
+                } //end per sample processing
+                
+                else //standard, more efficient, per buffer processing
+                {                
+                    Vec3d relpos = src.pose().pos();
+                    double distance = relpos.mag();
+                    double gain = src.attenuation(distance);
+                    
+                    float samples[numFrames];
+                    for(int i = 0; i < numFrames; i++)
+                    {
+                        double readIndex = distance * distanceToSample;
+                        readIndex += (numFrames-i);
+                        samples[i] = gain*src.readSample(readIndex);
+                    }
+                    spatializer->perform(io, src, relpos, numFrames, samples);
                 }
-                spatializer->perform(io, src, relpos, numFrames, samples);
                 
                 
 			} //end for each source
@@ -497,7 +510,8 @@ protected:
 
 	Listeners mListeners;
 	Sources mSources;
-
+    
+    bool perSampleProcessing;
     
 	int mNumFrames;			// audio frames per block
 	double mSpeedOfSound;	// distance per second

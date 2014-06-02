@@ -34,7 +34,26 @@ public:
 			
 	}
 	
-	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples){
+    ///Per Sample Processing
+    void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample)
+    {
+        
+		for (unsigned i = 0; i < numSpeakers; ++i)
+        {
+            Vec3d vec = relpos.normalized();
+            vec -= speakerVecs[i];
+			float dist = vec.mag() / 2.f; // [0, 1]
+			//float dist = std::sqrt( (vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]) ) / 2.f; // [0, 1]
+            dist = powf(dist, DBAP_SPREAD);
+            float gain = 1.f / (1.f + DBAP_MAX_DIST*dist);
+            
+            io.out(deviceChannels[i],frameIndex) += gain*sample;
+		}
+	}
+    
+    /// Per Buffer Processing
+	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples)
+    {
         
 		for (unsigned i = 0; i < numSpeakers; ++i)
         {
