@@ -390,26 +390,21 @@ public:
 	
         const int numFrames = io.framesPerBuffer();
         double sampleRate = io.framesPerSecond();
-        
 		double distanceToSample = sampleRate / mSpeedOfSound;
 
-		//const double invClipRange = mFarClip - mNearClip;
-		
 		// update source history data:
 		for(Sources::iterator it = mSources.begin(); it != mSources.end(); it++) {
 			SoundSource& src = *(*it);
 			src.mPosHistory(src.pose().pos());
 		}
-	
-		//printf("%d, %d\n", (int)mListeners.size(), (int)mSources.size());
-	
+		
 		// iterate through all listeners adding contribution from all sources
 		for(unsigned il=0; il<mListeners.size(); ++il){
 			Listener& l = *mListeners[il];
 			
 			Spatializer* spatializer = l.mSpatializer;
 			spatializer->prepare(io);
-            
+
 			// update listener history data:
 			Quatd qnew = l.pose().quat();
 			Quatd::slerpBuffer(l.mQuatPrev, qnew, &l.mQuatHistory[0], numFrames);
@@ -433,7 +428,7 @@ public:
                 {
                     //*//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     //!! Original, inefficient, per sample processing, should possibily move this interpolation into the spatializers
-                    //!! Should interpolate disance as well
+                    //!! Should interpolate distance as well
                     
                     // iterate time samples
                     for(int i=0; i<numFrames; ++i){
@@ -479,7 +474,7 @@ public:
                     //!! END old per frame processing
                     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//*/
                 } //end per sample processing
-                
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 else //standard, more efficient, per buffer processing
                 {                
                     Vec3d relpos = src.pose().pos();
