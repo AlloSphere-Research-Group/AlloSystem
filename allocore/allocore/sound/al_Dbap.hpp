@@ -7,7 +7,8 @@
 
 namespace al{
 	
-
+#define DBAP_MAX_DIST 100
+#define DBAP_SPREAD 3 // > 1 adds width, < 1 narrows
 
 class Dbap : public Spatializer{
 public:
@@ -25,22 +26,20 @@ public:
 	
 	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample){
         
-		for (unsigned i = 0; i < mSpeakers.size(); ++i){
+		for (unsigned i = 0; i < mSpeakers.size(); ++i)
+        {
 			Speaker spkr = mSpeakers[i];
-			Vec3d vec = Vec3d(relpos);
-			//printf("(%f,%f,%f)\n",vec[0],vec[1],vec[2]);
-			
+            Vec3d vec = Vec3d(relpos);
+            vec.normalize();
 			Vec3d vecSpkr = spkr.vec();
-			Quatd srcRot = mListener->pose().quat();
-			vecSpkr = srcRot.rotate(vecSpkr);
-
-			vec+=vecSpkr;
-
-			double dist = vec.mag();
-            if(dist < 1) dist = 1;
+            vecSpkr.normalize();
             
-			double gain = sample/(dist*dist);
-			io.out(spkr.deviceChannel,frameIndex) += gain;
+            vec -= vecSpkr;
+			float dist = vec.mag() / 2.f;
+            dist = powf(dist, DBAP_SPREAD);
+            float gain = 1.f / (1.f + DBAP_MAX_DIST*dist);
+            
+			io.out(spkr.deviceChannel,frameIndex) += gain*sample;
 		}
 	}
 	

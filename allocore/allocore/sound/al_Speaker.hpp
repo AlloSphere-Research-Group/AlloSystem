@@ -78,14 +78,18 @@ struct Speaker {
 	}
 	
     Vec3d vec(){
-		double cosel = cos(elevation);
-		double x = sin(toRad(azimuth)) * cosel * radius;
-		double y = cos(toRad(azimuth)) * cosel * radius;
-		double z = sin(toRad(elevation)) * radius;
+		double cosel = cos(toRad(elevation));
+//		double x = sin(toRad(azimuth)) * cosel * radius;
+//		double y = cos(toRad(azimuth)) * cosel * radius;
+//		double z = sin(toRad(elevation)) * radius;
+        //Ryan: the standard conversions assume +z is up, these are correct for allocore
+        double x = sin(toRad(azimuth)) * cosel * radius;
+		double y = sin(toRad(elevation)) * radius;
+        double z = -1*cos(toRad(azimuth)) * cosel * radius;
 		return Vec3d(x,y,z);
 	}
     
-	static double toRad(double d){ return d*2.*M_PI/180.; }
+	static double toRad(double d){ return d*M_PI/180.; }
 };
 
 typedef std::vector<Speaker> Speakers;
