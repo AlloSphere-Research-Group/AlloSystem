@@ -6,14 +6,15 @@
 //#include "allocore/spatial/al_CoordinateFrame.hpp"
 
 namespace al{
-	
+
+#define DBAP_MAX_NUM_SPEAKERS 192
 #define DBAP_MAX_DIST 100
 #define DBAP_SPREAD 3 // > 1 adds width, < 1 narrows
 
 class Dbap : public Spatializer{
 public:
 	
-    Dbap(SpeakerLayout &sl) : Spatializer(sl){}
+    Dbap(SpeakerLayout &sl) : Spatializer(sl), numSpeakers(0){}
     
 	void dump() {
 		printf("Using DBAP Panning- need to add panner info for dump function\n");
@@ -21,31 +22,39 @@ public:
 		
 	void compile(Listener& listener){
 		mListener = &listener;
+		numSpeakers = mSpeakers.size();
+		printf("DBAP Compiled with %d speakers\n", numSpeakers);
 		
+		for(int i = 0; i < numSpeakers; i++)
+		{
+			speakerVecs[i] = mSpeakers[i].vec();
+			speakerVecs[i].normalize();
+			deviceChannels[i] = mSpeakers[i].deviceChannel;
+		}
+			
 	}
 	
 	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample){
         
-		for (unsigned i = 0; i < mSpeakers.size(); ++i)
+		for (unsigned i = 0; i < numSpeakers; ++i)
         {
-			Speaker spkr = mSpeakers[i];
-            Vec3d vec = Vec3d(relpos);
-            vec.normalize();
-			Vec3d vecSpkr = spkr.vec();
-            vecSpkr.normalize();
-            
-            vec -= vecSpkr;
-			float dist = vec.mag() / 2.f;
-            dist = powf(dist, DBAP_SPREAD);
-            float gain = 1.f / (1.f + DBAP_MAX_DIST*dist);
-            
-			io.out(spkr.deviceChannel,frameIndex) += gain*sample;
+            Vec3d vec = relpos.normalized();
+            vec -= speakerVecs[i];
+			//float dist = vec.mag() / 2.f; // [0, 1]
+			//float dist = std::sqrt( (vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2]) ) / 2.f; // [0, 1]
+            //dist = powf(dist, DBAP_SPREAD);
+            float gain = 0.2; //1.f / (1.f + DBAP_MAX_DIST*dist);
+
+			io.out(deviceChannels[i],frameIndex) += gain*sample;
 		}
 	}
 	
 	
 private:
 	Listener* mListener;
+	Vec3f speakerVecs[DBAP_MAX_NUM_SPEAKERS];
+	int deviceChannels[DBAP_MAX_NUM_SPEAKERS];
+	int numSpeakers;
 };
 	
 	
