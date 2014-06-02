@@ -117,13 +117,19 @@ public:
     virtual void prepare(AudioIOData& io){};
     
     /// render each source
+//    virtual void perform(
+//                         AudioIOData& io,
+//                         SoundSource& src,
+//                         Vec3d& relpos,
+//                         const int& numFrames,
+//                         int& frameIndex,
+//                         float& sample) = 0;
     virtual void perform(
                          AudioIOData& io,
                          SoundSource& src,
                          Vec3d& relpos,
                          const int& numFrames,
-                         int& frameIndex,
-                         float& sample) = 0;
+                         float *samples)= 0;
     
     /// called once per listener, after sources are rendered. ex. ambisonics decode
     virtual void finalize(AudioIOData& io){};
@@ -401,7 +407,7 @@ public:
 			Quatd qnew = l.pose().quat();
 			Quatd::slerpBuffer(l.mQuatPrev, qnew, &l.mQuatHistory[0], numFrames);
 			l.mQuatPrev = qnew;
-			l.mPosHistory(l.pose().vec());
+			l.mPosHistory(l.pose().pos());
 
 			// iterate through all sound sources
 			for(Sources::iterator it = mSources.begin(); it != mSources.end(); ++it){
@@ -416,6 +422,10 @@ public:
                 else
                     distanceToSample = 0;
 				
+                /*//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                //!! Original, inefficient, per sample processing, should possibily move this interpolation into the spatializers
+                //!! Should interpolate disance as well
+                
 				// iterate time samples
 				for(int i=0; i<numFrames; ++i){
 					
@@ -454,36 +464,25 @@ public:
                         
 						spatializer->perform(io,src,relpos, numFrames, i, s);
                         
-					}
+                    } // end if in range
 
-//					double x = distance - mFarClip;
-
-//					if (x >= 0. || index < src.maxIndex()) {
-//						
-//						//double amp = 1;
-//						// TODO: amplitude rolloff
-//						if (distance > mNearClip) {
-//							
-////							// 
-////							amp = 
-////							
-////							const double c = 
-////							const double f = mFarClip;
-////							
-////							double denom = cf + f - x;
-////							
-////							// smooth to zero at farcilp:
-////							amp *= (1 - (cx) / (cf - f + x));
-//						}
-//					
-//						// TODO: transform relpos by listener's perspective
-//						// to derive x,y,z in listener's coordinate frame (or az/el/dist)
-//						Quatd q = l.mQuatHistory[i];
-//						//...
-//						
-//					
-//					} // otherwise, it's too far away for the doppler.... (culled)
-				}
+				} //end for each frame
+                //!! END old per frame processing
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//*/
+                
+                Vec3d relpos = src.pose().pos();
+                double distance = relpos.mag();
+                double gain = src.attenuation(distance);
+                
+                float samples[numFrames];
+                for(int i = 0; i < numFrames; i++)
+                {
+                    double readIndex = distance * distanceToSample;
+                    readIndex += (numFrames-i);
+                    samples[i] = gain*src.readSample(readIndex);
+                }
+                spatializer->perform(io, src, relpos, numFrames, samples);
+                
                 
 			} //end for each source
             
