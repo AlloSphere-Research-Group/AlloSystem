@@ -140,7 +140,7 @@ inline OmniApp::OmniApp(std::string name, bool slave)
 
   if (!bSlave) {
     Window::append(mNavControl);
-    initAudio();
+    //initAudio(); //Ryan McGee: hack for broadcast app
 
     oscRecv().bufferSize(32000);
     oscRecv().handler(*this);

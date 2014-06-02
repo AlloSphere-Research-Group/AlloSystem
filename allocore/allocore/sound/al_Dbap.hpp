@@ -12,7 +12,7 @@ namespace al{
 class Dbap : public Spatializer{
 public:
 	
-    Dbap(SpeakerLayout &sl) : Spatializer(sl) {}
+    Dbap(SpeakerLayout &sl) : Spatializer(sl){}
     
 	void dump() {
 		printf("Using DBAP Panning- need to add panner info for dump function\n");
@@ -20,12 +20,12 @@ public:
 		
 	void compile(Listener& listener){
 		mListener = &listener;
-		numSpeakers = mSpeakers.size();
+		
 	}
 	
 	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample){
         
-		for (unsigned i = 0; i < numSpeakers; ++i){
+		for (unsigned i = 0; i < mSpeakers.size(); ++i){
 			Speaker spkr = mSpeakers[i];
 			Vec3d vec = Vec3d(relpos);
 			//printf("(%f,%f,%f)\n",vec[0],vec[1],vec[2]);
@@ -47,7 +47,6 @@ public:
 	
 private:
 	Listener* mListener;
-	unsigned numSpeakers;
 };
 	
 	
