@@ -59,12 +59,24 @@ public:
 			float dist = vec.mag() / 2.f; // [0, 1]
             dist = powf(dist, DBAP_SPREAD);
             float gain = 1.f / (1.f + DBAP_MAX_DIST*dist);
-
+			
+			float *buf = io.outBuffer(deviceChannels[i]);
+			float *samps = samples;
             for(int j = 0; j < numFrames; j++)
-                io.out(deviceChannels[i],j) += gain*samples[j];
+				*buf++ += gain* *samps++;
 		}
 	}
 	
+	
+	//    for(int c = 0; c < io.channelsOut(); c++)
+	//    {
+	//        float *buf = io.outBuffer(c);
+	//        float *subbuf = subBuffer;
+	//        for(int i = 0; i < io.framesPerBuffer(); i++)
+	//        {
+	//			*buf++ = MASTER_GAIN* *subbuf++;
+	//        }
+	//    }
 	
 private:
 	Listener* mListener;
