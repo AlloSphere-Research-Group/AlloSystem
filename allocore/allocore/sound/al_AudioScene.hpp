@@ -412,7 +412,7 @@ public:
 			l.mPosHistory(l.pose().pos());
 
 			// iterate through all sound sources
-            printf("audio scene has %d sound sources!!!\n", mSources.size());
+            //printf("audio scene has %d sound sources!!!\n", mSources.size());
 			for(Sources::iterator it = mSources.begin(); it != mSources.end(); ++it){
 				SoundSource& src = *(*it);
 				
