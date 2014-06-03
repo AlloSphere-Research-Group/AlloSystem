@@ -60,8 +60,11 @@ public:
             dist = powf(dist, DBAP_SPREAD);
             float gain = 1.f / (1.f + DBAP_MAX_DIST*dist);
 
+            float *buf = io.outBuffer(deviceChannels[i]);
+            float *samps = samples;
             for(int j = 0; j < numFrames; j++)
-                io.out(deviceChannels[i],j) += gain*samples[j];
+                *buf++ += gain* *samps++;
+                //io.out(deviceChannels[i],j) += gain*samples[j];
 		}
 	}
 	
