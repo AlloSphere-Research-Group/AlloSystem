@@ -99,6 +99,7 @@ class Listener;
 class SoundSource;
     
 /// Abstract class for all spatializers: Ambisonics, DBAP, VBAP, etc.
+class Dbap;
 class Spatializer {
 public:
     Spatializer(SpeakerLayout& sl){
@@ -326,6 +327,7 @@ public:
 
 protected:
 	friend class AudioScene;
+    friend class Dbap;
 	
 	RingBuffer<float> mSound;			// spherical wave around position
 	Pose mPose;							// current position/orientation
@@ -478,18 +480,35 @@ public:
                 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 else //standard, more efficient, per buffer processing
                 {                
-                    Vec3d relpos = src.pose().pos();
-                    double distance = relpos.mag();
-                    double gain = src.attenuation(distance);
+                    //Vec3d relpos = src.pose().pos();
+                    //double distance = relpos.mag();
+                    //double gain = src.attenuation(distance);
                     
                     float samples[numFrames];
                     for(int i = 0; i < numFrames; i++)
                     {
+                        double alpha = double(i)/numFrames;
+                        
+                        // moving average:
+                        // cheaper & slightly less warbly than cubic,
+                        // less glitchy than linear
+                        Vec3d relpos = (
+                                        (src.mPosHistory[3]-l.mPosHistory[3])*(1.-alpha) +
+                                        (src.mPosHistory[2]-l.mPosHistory[2]) +
+                                        (src.mPosHistory[1]-l.mPosHistory[1]) +
+                                        (src.mPosHistory[0]-l.mPosHistory[0])*(alpha)
+                                        )/3.0;
+                        
+                        double distance = relpos.mag();
+                        double gain = src.attenuation(distance);
+                        
                         double readIndex = distance * distanceToSample;
                         readIndex += (numFrames-i);
                         samples[i] = gain*src.readSample(readIndex);
                     }
-                    spatializer->perform(io, src, relpos, numFrames, samples);
+                    //spatializer->perform(io, src, relpos, numFrames, samples);
+                    Vec3d rp;
+                    spatializer->perform(io, src, rp, numFrames, samples);
                 }
                 
                 
