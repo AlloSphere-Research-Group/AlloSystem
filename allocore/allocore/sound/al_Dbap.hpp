@@ -39,25 +39,7 @@ public:
     {
 		for (unsigned i = 0; i < numSpeakers; ++i)
         {
-            double alpha = double(i)/numFrames;
-            
-            // moving average:
-            // cheaper & slightly less warbly than cubic,
-            // less glitchy than linear
-//            Vec3d relposI = (
-//                            (src.mPosHistory[3]-l.mPosHistory[3])*(1.-alpha) +
-//                            (src.mPosHistory[2]-l.mPosHistory[2]) +
-//                            (src.mPosHistory[1]-l.mPosHistory[1]) +
-//                            (src.mPosHistory[0]-l.mPosHistory[0])*(alpha)
-//                            )/3.0;
-            Vec3d relposI = (
-                             (src.mPosHistory[3])*(1.-alpha) +
-                             (src.mPosHistory[2]) +
-                             (src.mPosHistory[1]) +
-                             (src.mPosHistory[0])*(alpha)
-                             )/3.0;
-            
-            Vec3d vec = relposI.normalized();
+            Vec3d vec = relpos.normalized();
             vec -= speakerVecs[i];
 			float dist = vec.mag() / 2.f; // [0, 1]
             dist = powf(dist, DBAP_SPREAD);
@@ -72,16 +54,18 @@ public:
     {
 		for (unsigned i = 0; i < numSpeakers; ++i)
         {
-            Vec3d vec = relpos.normalized();
-            vec -= speakerVecs[i];
-			float dist = vec.mag() / 2.f; // [0, 1]
-            dist = powf(dist, DBAP_SPREAD);
-            float gain = 1.f / (1.f + DBAP_MAX_DIST*dist);
-			
 			float *buf = io.outBuffer(deviceChannels[i]);
 			float *samps = samples;
             for(int j = 0; j < numFrames; j++)
+            {                
+                Vec3d vec = relpos.normalized();
+                vec -= speakerVecs[i];
+                float dist = vec.mag() / 2.f; // [0, 1]
+                dist = powf(dist, DBAP_SPREAD);
+                float gain = 1.f / (1.f + DBAP_MAX_DIST*dist);
+            
 				*buf++ += gain* *samps++;
+            }
 		}
 	}
 	
