@@ -54,18 +54,16 @@ public:
     {
 		for (unsigned i = 0; i < numSpeakers; ++i)
         {
-			float *buf = io.outBuffer(deviceChannels[i]);
+            Vec3d vec = relpos.normalized();
+            vec -= speakerVecs[i];
+            float dist = vec.mag() / 2.f; // [0, 1]
+            dist = powf(dist, DBAP_SPREAD);
+            float gain = 1.f / (1.f + DBAP_MAX_DIST*dist);
+            
+            float *buf = io.outBuffer(deviceChannels[i]);
 			float *samps = samples;
             for(int j = 0; j < numFrames; j++)
-            {                
-                Vec3d vec = relpos.normalized();
-                vec -= speakerVecs[i];
-                float dist = vec.mag() / 2.f; // [0, 1]
-                dist = powf(dist, DBAP_SPREAD);
-                float gain = 1.f / (1.f + DBAP_MAX_DIST*dist);
-            
 				*buf++ += gain* *samps++;
-            }
 		}
 	}
 	
