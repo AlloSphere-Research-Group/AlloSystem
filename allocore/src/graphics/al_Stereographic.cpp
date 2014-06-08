@@ -253,9 +253,11 @@ void Stereographic :: drawActive(Graphics& gl, const Lens& lens, const Pose& pos
 	glEnable(GL_SCISSOR_TEST);
 	sendViewport(gl, vp);
 
+	// Right eye
+	mEyeNumber = 0;
 	glDrawBuffer(GL_BACK_RIGHT);
 	if(clear) sendClear(gl);
-	
+
 	if (omni()) {
 	
 		int wx = vp.l;
@@ -297,7 +299,8 @@ void Stereographic :: drawActive(Graphics& gl, const Lens& lens, const Pose& pos
 		pushDrawPop(gl,draw);
 	}
 	
-	
+	// Left eye
+	mEyeNumber = 1;
 	glDrawBuffer(GL_BACK_LEFT);
 	if(clear) sendClear(gl);
 	
@@ -466,6 +469,7 @@ void Stereographic :: drawLeft(Graphics& gl, const Lens& lens, const Pose& pose,
 	glEnable(GL_SCISSOR_TEST);
 	sendViewport(gl, vp);
 	
+	mEyeNumber = 1;
 	// glDrawBuffer(GL_BACK); //<< this breaks usage within FBO.
 	if(clear) sendClear(gl);
 	
@@ -527,6 +531,7 @@ void Stereographic :: drawRight(Graphics& gl, const Lens& lens, const Pose& pose
 	glEnable(GL_SCISSOR_TEST);
 	sendViewport(gl, vp);
 
+	mEyeNumber = 0;
 	// glDrawBuffer(GL_BACK); //<< this breaks usage within FBO.
 	if(clear) sendClear(gl);
 	
