@@ -75,7 +75,9 @@ public:
 
 
 	Stereographic() 
-	:	mMode(ANAGLYPH), mAnaglyphMode(RED_CYAN), mClearColor(Color(0)), mSlices(24), mOmniFov(360),
+	:	mMode(ANAGLYPH), mAnaglyphMode(RED_CYAN), mClearColor(Color(0)),
+		mSlices(24), mOmniFov(360),
+		mEyeNumber(0),
 		mStereo(false), mOmni(false)
 	{}
 
@@ -143,6 +145,13 @@ public:
 	/// Get anaglyph mode
 	AnaglyphMode anaglyphMode() const { return mAnaglyphMode; }
 
+	/// Get current eye number
+
+	/// This returns the current eye number where 0 and 1 are the right and left
+	/// eyes, respectively. The return value is defined only when the mode is
+	/// ACTIVE, LEFT_EYE, or RIGHT_EYE.
+	unsigned eyeNumber() const { return mEyeNumber; }
+
 	/// Get whether omni mode is on
 	bool omni() const { return mOmni; }
 	
@@ -169,6 +178,7 @@ protected:
 	double mOmniFov;	// field of view of omnigraphics	
 	Matrix4d mProjection, mModelView;
 	Vec3d mEye;
+	unsigned mEyeNumber;
 	Viewport mVP;
 	bool mStereo;
 	bool mOmni;
