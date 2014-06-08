@@ -94,15 +94,25 @@ public:
 	/// @param[in] clear	whether to clear the color/depth buffers
 	/// @param[in] pixelaspect	additional aspect multipler (for non-square pixels)
 	void draw			(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
-	
-	// So many different ways to draw :-)
+
+	/// Draw mono
 	void drawMono		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+
+	/// Draw active stereo
 	void drawActive		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+
+	/// Draw anaglyph stereo
 	void drawAnaglyph	(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+
+	/// Draw dual (side-by-side, left-right) stereo
 	void drawDual		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+
+	/// Draw left eye only
 	void drawLeft		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
+
+	/// Draw right eye only
 	void drawRight		(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear=true, double pixelaspect=1.);
-	
+
 	/// Draw blue line for active stereo sync (for those projectors that need it)
 
 	/// Add this call at the end of rendering just before the swap buffers call.
@@ -145,31 +155,37 @@ public:
 	/// Get anaglyph mode
 	AnaglyphMode anaglyphMode() const { return mAnaglyphMode; }
 
-	/// Get current eye number
-
-	/// This returns the current eye number where 0 and 1 are the right and left
-	/// eyes, respectively. The return value is defined only when the mode is
-	/// ACTIVE, LEFT_EYE, or RIGHT_EYE.
+	/// Get current eye number (0 == right, 1 == left)
 	unsigned eyeNumber() const { return mEyeNumber; }
 
 	/// Get whether omni mode is on
 	bool omni() const { return mOmni; }
-	
+
 	/// Get current omni fov:
 	double omniFov() { return mOmniFov; }
-	
+
 	// These accessors will be valid only during the Drawable's onDraw() event
 	// they can be useful to simulate the OpenGL pipeline transforms
 	//	e.g. Matrix4d::multiply(Vec4d eyespace, stereo.modelView(), Vec4d objectspace); 
 	//	e.g. Matrix4d::multiply(Vec4d clipspace, stereo.projection(), Vec4d eyespace);
 	//	e.g. Matrix4d::multiply(Vec4d clipspace, stereo.modelViewProjection(), Vec4d objectspace);
-	// to convert in the opposite direction, use Matrix4::inverse(). 
+	// to convert in the opposite direction, use Matrix4::inverse().
+
+	/// Get current modelview matrix
 	const Matrix4d& modelView() const { return mModelView; }
+
+	/// Get current projection matrix
 	const Matrix4d& projection() const { return mProjection; }
+
+	/// Get product of current projection and modelview matrices
 	Matrix4d modelViewProjection() const { return mProjection * mModelView; }
+
+	/// Get current eye position
 	const Vec3d& eye() const { return mEye; }
+
+	/// Get current viewport
 	const Viewport& viewport() const { return mVP; }
-	
+
 protected:
 	StereoMode mMode;
 	AnaglyphMode mAnaglyphMode;
@@ -186,6 +202,8 @@ protected:
 	void pushDrawPop(Graphics& gl, Drawable& draw);
 	void sendViewport(Graphics& gl, const Viewport& vp);
 	void sendClear(Graphics& gl);
+
+	void drawEye(StereoMode eye, Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect);
 };
 
 } // al::
