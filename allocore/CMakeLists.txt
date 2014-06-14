@@ -4,7 +4,8 @@ project (Allocore)
 message("==== Configuring allocore.")
 
 # Allocore Library
-set(ALLOCORE_SRC src/graphics/al_Asset.cpp
+set(ALLOCORE_SRC ${ALLOCORE_SRC}
+  src/graphics/al_Asset.cpp
   src/graphics/al_FBO.cpp
   src/graphics/al_GPUObject.cpp
   src/graphics/al_Graphics.cpp
@@ -17,7 +18,6 @@ set(ALLOCORE_SRC src/graphics/al_Asset.cpp
   src/graphics/al_Shapes.cpp
   src/graphics/al_Stereographic.cpp
   src/graphics/al_Texture.cpp
-  src/graphics/al_Font.cpp
   src/io/al_App.cpp
   src/io/al_AudioIO.cpp
   src/io/al_File.cpp
@@ -51,7 +51,6 @@ set(ALLOCORE_SRC src/graphics/al_Asset.cpp
   src/types/al_Color.cpp
   src/types/al_MsgQueue.cpp)
 
-
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set(ALLOCORE_SRC ${ALLOCORE_SRC}
     src/system/al_MainLoopOSX.mm
@@ -63,9 +62,6 @@ endif()
 file(GLOB ALLOCORE_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} allocore/*/*.hpp)
 #file(GLOB ALLOCORE_HEADER_DIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} allocore/*)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
-set(ALLOCORE_LIB "allocore${DEBUG_SUFFIX}")
-add_library(${ALLOCORE_LIB} ${ALLOCORE_SRC} ${ALLOCORE_HEADERS})
 
 set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
@@ -87,7 +83,6 @@ find_package(LibSndFile REQUIRED QUIET)
 find_package(APR REQUIRED QUIET)
 find_package(Assimp REQUIRED QUIET)
 find_package(FreeImage REQUIRED QUIET)
-find_package(Freetype REQUIRED)
 find_package(GLEW REQUIRED QUIET)
 find_package(GLUT REQUIRED QUIET)
 find_package(OpenGL REQUIRED QUIET)
@@ -144,7 +139,6 @@ set(ALLOCORE_DEP_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
   ${APR_INCLUDE_DIR}
   ${ASSIMP_INCLUDE_DIR}
   ${FREEIMAGE_INCLUDE_DIR}
-  ${FREETYPE_INCLUDE_DIRS}
   ${GLEW_INCLUDE_DIR}
   ${GLUT_INCLUDE_DIR}
   ${LIBSNDFILE_INCLUDE_DIR}
@@ -155,17 +149,11 @@ set(ALLOCORE_DEP_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
 
 include_directories(${ALLOCORE_DEP_INCLUDE_DIRS})
 
-set_target_properties(${ALLOCORE_LIB}
-  PROPERTIES
-  ALLOCORE_DEP_INCLUDE_DIRS "${ALLOCORE_DEP_INCLUDE_DIRS}"
-  )
-
 # Link libraries
 set(ALLOCORE_LINK_LIBRARIES ${ALLOCORE_LINK_LIBRARIES}
   ${APR_LIBRARY}
   ${ASSIMP_LIBRARY}
   ${FREEIMAGE_LIBRARY}
-  ${FREETYPE_LIBRARY}
   ${GLEW_LIBRARY}
   ${GLUT_LIBRARY}
   ${LIBSNDFILE_LIBRARY}
@@ -177,11 +165,23 @@ set(ALLOCORE_LINK_LIBRARIES ${ALLOCORE_LINK_LIBRARIES}
   ${LINUX_LIBS}
   ${WINDOWS_LIBS})
 
+# modules --------------------------------
+include(modules/font_module.cmake)
+
+# allocore library -----------------------
+set(ALLOCORE_LIB "allocore${DEBUG_SUFFIX}")
+add_library(${ALLOCORE_LIB} ${ALLOCORE_SRC} ${ALLOCORE_HEADERS})
+
+set_target_properties(${ALLOCORE_LIB}
+  PROPERTIES
+  ALLOCORE_DEP_INCLUDE_DIRS "${ALLOCORE_DEP_INCLUDE_DIRS}"
+  )
 set_target_properties(${ALLOCORE_LIB}
   PROPERTIES 
   ALLOCORE_LINK_LIBRARIES "${ALLOCORE_LINK_LIBRARIES}"
   )
 target_link_libraries(${ALLOCORE_LIB} ${ALLOCORE_LINK_LIBRARIES})
+
 
 # Doxygen documentation target
 add_custom_target("doc"
