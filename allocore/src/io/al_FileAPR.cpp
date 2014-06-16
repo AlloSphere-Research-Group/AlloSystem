@@ -9,8 +9,10 @@
 
 #include "../private/al_ImplAPR.h"
 #ifdef AL_LINUX
+	#include "apr-1.0/apr_file_io.h"
 	#include "apr-1.0/apr_file_info.h"
 #else
+	#include "apr-1/apr_file_io.h"
 	#include "apr-1/apr_file_info.h"
 #endif
 
@@ -116,10 +118,10 @@ struct Dir::Impl : public ImplAPR{
 	}
 	
 	bool close(){
-		//if(dir != NULL){
+		if(dir != NULL){
 			return APR_SUCCESS == check_apr(apr_dir_close(dir));
-		//}
-		//return false;
+		}
+		return false;
 	}
 
 	bool read(FileInfo& entryInfo){
@@ -138,7 +140,25 @@ struct Dir::Impl : public ImplAPR{
 	bool rewind(){
 		return APR_SUCCESS == check_apr(apr_dir_rewind(dir));
 	}
+
+	bool make(const std::string& path, int perms, bool recursive){
+
+	 	apr_fileperms_t apr_perms = APR_FPROT_UREAD | APR_FPROT_UWRITE | APR_FPROT_UEXECUTE;
+
+		if(recursive){
+			return APR_SUCCESS == check_apr(apr_dir_make_recursive(path.c_str(), apr_perms, mPool));
+		}
+		else {
+			return APR_SUCCESS == check_apr(apr_dir_make(path.c_str(), apr_perms, mPool));
+		}
+	}
+
+	bool remove(const std::string& path){
+		return APR_SUCCESS == check_apr(apr_dir_remove(path.c_str(), mPool));
+	}
+
 };
+
 
 
 Dir::Dir()
@@ -157,6 +177,14 @@ bool Dir::open(const std::string& dirPath){ return mImpl->open(dirPath); }
 bool Dir::close(){ return mImpl->close(); }
 bool Dir::rewind(){ return mImpl->rewind(); }
 bool Dir::read(){ return mImpl->read(mEntry); }
+
+bool Dir::make(const std::string& path, bool recursive){
+	return Impl().make(path, -1, recursive);
+}
+
+bool Dir::remove(const std::string& path){
+	return Impl().remove(path);
+}
 
 /*
 struct TestDir{
