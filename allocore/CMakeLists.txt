@@ -5,11 +5,9 @@ message("==== Configuring allocore.")
 
 # Allocore Library
 set(ALLOCORE_SRC ${ALLOCORE_SRC}
-  src/graphics/al_Asset.cpp
   src/graphics/al_FBO.cpp
   src/graphics/al_GPUObject.cpp
   src/graphics/al_Graphics.cpp
-  src/graphics/al_Image.cpp
   src/graphics/al_Isosurface.cpp
   src/graphics/al_Lens.cpp
   src/graphics/al_Light.cpp
@@ -19,12 +17,9 @@ set(ALLOCORE_SRC ${ALLOCORE_SRC}
   src/graphics/al_Stereographic.cpp
   src/graphics/al_Texture.cpp
   src/io/al_App.cpp
-  src/io/al_AudioIO.cpp
   src/io/al_File.cpp
   src/io/al_MIDI.cpp
   src/io/al_Window.cpp
-  src/io/al_FileAPR.cpp
-  src/io/al_SocketAPR.cpp
   src/io/al_WindowGLUT.cpp
   src/io/al_HID.cpp
   src/io/al_Serial.cpp
@@ -34,7 +29,6 @@ set(ALLOCORE_SRC ${ALLOCORE_SRC}
   src/protocol/oscpack/osc/OscReceivedElements.cpp
   src/protocol/oscpack/osc/OscTypes.cpp
   src/protocol/al_OSC.cpp
-  src/protocol/al_XML.cpp
   src/protocol/al_Serialize.cpp
   src/protocol/al_Zeroconf.cpp
   src/sound/al_Ambisonics.cpp
@@ -44,7 +38,6 @@ set(ALLOCORE_SRC ${ALLOCORE_SRC}
   src/system/al_MainLoop.cpp
   src/system/al_Printing.cpp
   src/system/al_ThreadNative.cpp
-  src/system/al_Time.cpp
   src/system/al_Watcher.cpp
   src/types/al_Array.cpp
   src/types/al_Array_C.c
@@ -52,7 +45,7 @@ set(ALLOCORE_SRC ${ALLOCORE_SRC}
   src/types/al_MsgQueue.cpp)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  set(ALLOCORE_SRC ${ALLOCORE_SRC}
+  list(APPEND ALLOCORE_SRC
     src/system/al_MainLoopOSX.mm
     src/system/al_InfoOSX.mm
     src/protocol/al_Zeroconf_OSX.mm)
@@ -66,6 +59,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 
+# for liblo
 include(TestBigEndian)
 test_big_endian(TEST_ENDIAN)
 if (TEST_ENDIAN MATCHES 0)
@@ -77,32 +71,15 @@ endif()
 # Dependencies
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules")
 
-
-find_package(Portaudio REQUIRED QUIET)
-find_package(LibSndFile REQUIRED QUIET)
-find_package(APR REQUIRED QUIET)
-find_package(Assimp REQUIRED QUIET)
-find_package(FreeImage REQUIRED QUIET)
 find_package(GLEW REQUIRED QUIET)
 find_package(GLUT REQUIRED QUIET)
 find_package(OpenGL REQUIRED QUIET)
-
-if(NOT ALLOSYSTEM_BUILD)
-  find_package(Gamma)
-endif(NOT ALLOSYSTEM_BUILD)
 
 # System dependent libs
 # ---- OS X ----
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   add_definitions(-DAL_OSX)
-  # Needed by portaudio
-  find_library(AUDIOUNIT_FM AudioUnit)
-  find_library(COREAUDIO_FM CoreAudio)
-  find_library(COREMIDI_FM CoreMidi)
-  find_library(CORESERVICES_FM CoreServices)
-  find_library(AUDIOTOOLBOX_FM AudioToolbox)
-  set(MAC_LIBS ${MAC_LIBS} ${AUDIOUNIT_FM} ${COREAUDIO_FM} ${COREMIDI_FM} ${CORESERVICES_FM} ${AUDIOTOOLBOX_FM})
-  # Needed by HID
+    # Needed by HID
   find_library(IOKIT_FM IOKit)
   find_library(COREFOUNDATION_FM CoreFoundation)
   set(MAC_LIBS ${MAC_LIBS} ${IOKIT_FM} ${COREFOUNDATION_FM})
@@ -111,18 +88,17 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 # ---- Linux ------
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  set(EXAMPLE_LINUX_LIBS asound)
   add_definitions(-DAL_LINUX)
 
   # For clock_gettime, etc.
   set(LINUX_LIBS ${LINUX_LIBS} rt)
 
-  find_package(Threads)
+  find_package(Threads QUIET)
   set(LINUX_LIBS ${LINUX_LIBS} avahi-common avahi-client ${CMAKE_THREAD_LIBS_INIT})
   # For HID
-  find_package(Udev REQUIRED QUIET)
+  find_package(Udev QUIET)
   include_directories(${UDEV_INCLUDE_DIR})
-  find_package(Libusb REQUIRED QUIET)
+  find_package(Libusb QUIET)
   set(LINUX_LIBS ${LINUX_LIBS} ${LIBUSB_1_LIBRARY} ${UDEV_LIBRARY})
   #message("libudev lib = ${UDEV_LIBRARY}")
 endif()
@@ -136,35 +112,26 @@ endif()
 
 # Include directories
 set(ALLOCORE_DEP_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
-  ${APR_INCLUDE_DIR}
-  ${ASSIMP_INCLUDE_DIR}
-  ${FREEIMAGE_INCLUDE_DIR}
   ${GLEW_INCLUDE_DIR}
   ${GLUT_INCLUDE_DIR}
-  ${LIBSNDFILE_INCLUDE_DIR}
-  ${OPENGL_INCLUDE_DIR}
-  ${PORTAUDIO_INCLUDE_DIR}
-  ${PORTAUDIO_INCLUDE_DIRS}
-  ${SNDFILE_INCLUDE_DIRS})
+  ${OPENGL_INCLUDE_DIR})
 
 # Link libraries
 set(ALLOCORE_LINK_LIBRARIES ${ALLOCORE_LINK_LIBRARIES}
-  ${APR_LIBRARY}
-  ${ASSIMP_LIBRARY}
-  ${FREEIMAGE_LIBRARY}
   ${GLEW_LIBRARY}
   ${GLUT_LIBRARY}
-  ${LIBSNDFILE_LIBRARY}
   ${OPENGL_LIBRARY}
-  ${PORTAUDIO_LIBRARY}
-  ${PORTAUDIO_LIBRARIES}
-  ${SNDFILE_LIBRARIES}
   ${MAC_LIBS}
   ${LINUX_LIBS}
   ${WINDOWS_LIBS})
 
-# modules --------------------------------
+# optional dependendencies ----------------------------
 include(modules/font_module.cmake)
+include(modules/assimp_module.cmake)
+include(modules/freeimage_module.cmake)
+include(modules/apr_module.cmake)
+include(modules/portaudio_module.cmake)
+include(modules/libsndfile_module.cmake)
 
 # allocore library -----------------------
 set(ALLOCORE_LIB "allocore${DEBUG_SUFFIX}")
@@ -180,7 +147,6 @@ set_target_properties(${ALLOCORE_LIB}
   )
 include_directories(${ALLOCORE_DEP_INCLUDE_DIRS})
 target_link_libraries(${ALLOCORE_LIB} ${ALLOCORE_LINK_LIBRARIES})
-
 
 # Doxygen documentation target
 add_custom_target("doc"
@@ -219,7 +185,7 @@ if(NOT NO_EXAMPLES)
 	find_library(AUDIOUNIT_FM AudioUnit)
         target_link_libraries("${EXAMPLE_TARGET}" ${AUDIOUNIT_FM})
       endif()
-      target_link_libraries("${EXAMPLE_TARGET}" ${EXAMPLE_LINUX_LIBS})
+      target_link_libraries("${EXAMPLE_TARGET}" ${LINUX_LIBS})
       add_custom_target("${EXAMPLE_TARGET}_run"
 	COMMAND "${EXAMPLE_TARGET}"
 	DEPENDS "${EXAMPLE_TARGET}"
@@ -228,6 +194,10 @@ if(NOT NO_EXAMPLES)
 	COMMENT "Running: ${EXAMPLE_TARGET}")
     endforeach(example)
   endforeach(dir)
+
+  if(NOT ALLOSYSTEM_BUILD)
+    find_package(Gamma)
+  endif(NOT ALLOSYSTEM_BUILD)
 
   if (GAMMA_FOUND OR GAMMA_LIBRARY)
     include_directories(${GAMMA_INCLUDE_DIR})
@@ -240,7 +210,7 @@ if(NOT NO_EXAMPLES)
         find_library(AUDIOUNIT_FM AudioUnit)
         target_link_libraries(allocore_sound_${EXAMPLE_NAME} ${AUDIOUNIT_FM})
       endif()
-      target_link_libraries(allocore_sound_${EXAMPLE_NAME} ${EXAMPLE_LINUX_LIBS} ${GAMMA_LIBRARIES})
+      target_link_libraries(allocore_sound_${EXAMPLE_NAME} ${LINUX_LIBS} ${GAMMA_LIBRARIES})
     endforeach(example)
   else()
     message("Gamma not found. Not building allocore sound examples.")
