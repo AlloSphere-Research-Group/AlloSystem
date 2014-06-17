@@ -52,14 +52,14 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 endif()
 
-file(GLOB ALLOCORE_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} allocore/*/*.hpp)
-#file(GLOB ALLOCORE_HEADER_DIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} allocore/*)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+# Dependencies --------------------------------------------
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules")
 
-set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
+find_package(GLEW REQUIRED QUIET)
+find_package(GLUT REQUIRED QUIET)
+find_package(OpenGL REQUIRED QUIET)
 
-# for liblo
+# for oscpack (oscpack sources are included with AlloSystem)
 include(TestBigEndian)
 test_big_endian(TEST_ENDIAN)
 if (TEST_ENDIAN MATCHES 0)
@@ -68,13 +68,6 @@ else()
   add_definitions(-DOSC_HOST_BIG_ENDIAN)
 endif()
 
-# Dependencies
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules")
-
-find_package(GLEW REQUIRED QUIET)
-find_package(GLUT REQUIRED QUIET)
-find_package(OpenGL REQUIRED QUIET)
-
 # System dependent libs
 # ---- OS X ----
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -82,24 +75,24 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     # Needed by HID
   find_library(IOKIT_FM IOKit)
   find_library(COREFOUNDATION_FM CoreFoundation)
-  set(MAC_LIBS ${MAC_LIBS} ${IOKIT_FM} ${COREFOUNDATION_FM})
+  list(APPEND ALLOCORE_LINK_LIBRARIES ${IOKIT_FM} ${COREFOUNDATION_FM})
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-
 
 # ---- Linux ------
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   add_definitions(-DAL_LINUX)
 
   # For clock_gettime, etc.
-  set(LINUX_LIBS ${LINUX_LIBS} rt)
+  list(APPEND ALLOCORE_LINK_LIBRARIES rt)
 
+  # For zeroconf
   find_package(Threads QUIET)
-  set(LINUX_LIBS ${LINUX_LIBS} avahi-common avahi-client ${CMAKE_THREAD_LIBS_INIT})
+  list(APPEND ALLOCORE_LINK_LIBRARIES avahi-common avahi-client ${CMAKE_THREAD_LIBS_INIT})
   # For HID
   find_package(Udev QUIET)
   include_directories(${UDEV_INCLUDE_DIR})
   find_package(Libusb QUIET)
-  set(LINUX_LIBS ${LINUX_LIBS} ${LIBUSB_1_LIBRARY} ${UDEV_LIBRARY})
+  list(APPEND ALLOCORE_LINK_LIBRARIES ${LIBUSB_1_LIBRARY} ${UDEV_LIBRARY})
   #message("libudev lib = ${UDEV_LIBRARY}")
 endif()
 
@@ -107,7 +100,7 @@ endif()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   add_definitions(-DAL_WINDOWS)
   # For HID
-  #set(WINDOWS_LIBS windows setupapi) # Commented out for mingw build
+  #list(APPEND ALLOCORE_LINK_LIBRARIES windows setupapi) # Commented out for mingw buildmaybe required for msvs?
 endif()
 
 # Include directories
@@ -120,10 +113,7 @@ set(ALLOCORE_DEP_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
 set(ALLOCORE_LINK_LIBRARIES ${ALLOCORE_LINK_LIBRARIES}
   ${GLEW_LIBRARY}
   ${GLUT_LIBRARY}
-  ${OPENGL_LIBRARY}
-  ${MAC_LIBS}
-  ${LINUX_LIBS}
-  ${WINDOWS_LIBS})
+  ${OPENGL_LIBRARY})
 
 # optional dependendencies ----------------------------
 include(modules/font_module.cmake)
@@ -135,8 +125,15 @@ include(modules/libsndfile_module.cmake)
 
 # allocore library -----------------------
 set(ALLOCORE_LIB "allocore${DEBUG_SUFFIX}")
+
+set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
+
+# Add headers to the list of source file so they appear in generated projects.
+file(GLOB ALLOCORE_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} allocore/*/*.hpp)
 add_library(${ALLOCORE_LIB} ${ALLOCORE_SRC} ${ALLOCORE_HEADERS})
 
+# Export include directories and libraries for use when building AlloSystem or AlloProject
 set_target_properties(${ALLOCORE_LIB}
   PROPERTIES
   ALLOCORE_DEP_INCLUDE_DIRS "${ALLOCORE_DEP_INCLUDE_DIRS}"
@@ -145,6 +142,7 @@ set_target_properties(${ALLOCORE_LIB}
   PROPERTIES 
   ALLOCORE_LINK_LIBRARIES "${ALLOCORE_LINK_LIBRARIES}"
   )
+
 include_directories(${ALLOCORE_DEP_INCLUDE_DIRS})
 target_link_libraries(${ALLOCORE_LIB} ${ALLOCORE_LINK_LIBRARIES})
 
@@ -155,7 +153,7 @@ add_custom_target("doc"
 	COMMENT "Generate doxygen documentation")
 
 #--------------------------------------------------------------------------
-# Examples
+# Examples targets
 if(NOT NO_EXAMPLES)
   set(EXAMPLE_DIRS av graphics io math simulation spatial system)
   foreach(dir ${EXAMPLE_DIRS})
@@ -185,7 +183,7 @@ if(NOT NO_EXAMPLES)
 	find_library(AUDIOUNIT_FM AudioUnit)
         target_link_libraries("${EXAMPLE_TARGET}" ${AUDIOUNIT_FM})
       endif()
-      target_link_libraries("${EXAMPLE_TARGET}" ${LINUX_LIBS})
+      target_link_libraries("${EXAMPLE_TARGET}")
       add_custom_target("${EXAMPLE_TARGET}_run"
 	COMMAND "${EXAMPLE_TARGET}"
 	DEPENDS "${EXAMPLE_TARGET}"
@@ -205,12 +203,12 @@ if(NOT NO_EXAMPLES)
     foreach(example ${EXAMPLE_FILES})
       get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
       add_executable(allocore_sound_${EXAMPLE_NAME} ${example})
-      target_link_libraries(allocore_sound_${EXAMPLE_NAME} allocore ${ALLOCORE_LINK_LIBRARIES})
+      target_link_libraries(allocore_sound_${EXAMPLE_NAME} ${ALLOCORE_LIB} ${ALLOCORE_LINK_LIBRARIES})
        if (apple)
         find_library(AUDIOUNIT_FM AudioUnit)
         target_link_libraries(allocore_sound_${EXAMPLE_NAME} ${AUDIOUNIT_FM})
       endif()
-      target_link_libraries(allocore_sound_${EXAMPLE_NAME} ${LINUX_LIBS} ${GAMMA_LIBRARIES})
+      target_link_libraries(allocore_sound_${EXAMPLE_NAME} ${GAMMA_LIBRARIES})
     endforeach(example)
   else()
     message("Gamma not found. Not building allocore sound examples.")

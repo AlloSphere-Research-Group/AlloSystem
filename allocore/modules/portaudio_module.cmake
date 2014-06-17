@@ -10,14 +10,14 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   find_library(COREMIDI_FM CoreMidi)
   find_library(CORESERVICES_FM CoreServices)
   find_library(AUDIOTOOLBOX_FM AudioToolbox)
-  list(APPEND MAC_LIBS
+  list(APPEND ALLOCORE_LINK_LIBRARIES
     ${AUDIOUNIT_FM} ${COREAUDIO_FM} ${COREMIDI_FM} ${CORESERVICES_FM}
     ${AUDIOTOOLBOX_FM})
 
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  list(APPEND LINUX_LIBS asound)
+  list(APPEND ALLOCORE_LINK_LIBRARIES asound)
 endif()
 
 list(APPEND ALLOCORE_SRC
