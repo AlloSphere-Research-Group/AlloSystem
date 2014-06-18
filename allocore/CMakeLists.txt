@@ -154,7 +154,7 @@ add_custom_target("doc"
 
 #--------------------------------------------------------------------------
 # Examples targets
-if(NOT NO_EXAMPLES)
+if(BUILD_EXAMPLES)
   set(EXAMPLE_DIRS av graphics io math simulation spatial system)
   foreach(dir ${EXAMPLE_DIRS})
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin/examples/${dir})
@@ -162,20 +162,16 @@ if(NOT NO_EXAMPLES)
     foreach(example ${EXAMPLE_FILES})
     if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/examples/${dir}/flags.txt)
       file(READ ${CMAKE_CURRENT_SOURCE_DIR}/examples/${dir}/flags.txt EXTRA_COMPILER_FLAGS)
-      message("WARNING: Using additional flags from /examples/${dir}/flags.txt: " ${EXTRA_COMPILER_FLAGS})
+      message("NOTE: Using additional flags from /examples/${dir}/flags.txt: " ${EXTRA_COMPILER_FLAGS})
       STRING(REGEX REPLACE "[\r\n]" " " EXTRA_COMPILER_FLAGS "${EXTRA_COMPILER_FLAGS}")
     endif()
-      get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
-      if (ALLOSYSTEM_BUILD)
-	if ("${dir}" STREQUAL ".")
-	  set(EXAMPLE_TARGET allocore_examples_${EXAMPLE_NAME})
-	else()
-	  set(EXAMPLE_TARGET allocore_examples_${dir}_${EXAMPLE_NAME})
-	endif()
-      else(ALLOSYSTEM_BUILD)
-	set(EXAMPLE_TARGET examples_${dir}_${EXAMPLE_NAME})
-      endif(ALLOSYSTEM_BUILD)
-      add_executable(${EXAMPLE_TARGET} ${example})
+    get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
+    if("${dir}" STREQUAL ".")
+      set(EXAMPLE_TARGET allocore_examples_${EXAMPLE_NAME})
+    else()
+      set(EXAMPLE_TARGET allocore_examples_${dir}_${EXAMPLE_NAME})
+    endif()
+      add_executable(${EXAMPLE_TARGET} EXCLUDE_FROM_ALL ${example})
       set_target_properties(${EXAMPLE_TARGET} PROPERTIES
 	COMPILE_FLAGS "${EXTRA_COMPILER_FLAGS}")
       target_link_libraries("${EXAMPLE_TARGET}" ${ALLOCORE_LIB} ${ALLOCORE_LINK_LIBRARIES})
@@ -193,9 +189,9 @@ if(NOT NO_EXAMPLES)
     endforeach(example)
   endforeach(dir)
 
-  if(NOT ALLOSYSTEM_BUILD)
+  if(NOT TARGET Gamma)
     find_package(Gamma)
-  endif(NOT ALLOSYSTEM_BUILD)
+  endif(NOT TARGET Gamma)
 
   if (GAMMA_FOUND OR GAMMA_LIBRARY)
     include_directories(${GAMMA_INCLUDE_DIR})
@@ -213,7 +209,7 @@ if(NOT NO_EXAMPLES)
   else()
     message("Gamma not found. Not building allocore sound examples.")
   endif(GAMMA_FOUND OR GAMMA_LIBRARY)
-endif(NOT NO_EXAMPLES)
+endif(BUILD_EXAMPLES)
 
 
 # installation

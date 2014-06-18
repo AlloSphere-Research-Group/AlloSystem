@@ -2,9 +2,6 @@ cmake_minimum_required (VERSION 2.8)
 project (Alloutil)
 
 message("==== Configuring alloutil.")
-set(CMAKE_BUILD_TYPE Release)
-
-set(ALLOUTIL_BUILD_EXAMPLES 1)
 
 set(ALLOUTIL_SRC
   src/al_FileWatcher.cpp
@@ -13,12 +10,7 @@ set(ALLOUTIL_SRC
   src/al_WarpBlend.cpp
   )
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules")
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
-set(ALLOUTIL_LIB "alloutil${DEBUG_SUFFIX}")
-add_library(${ALLOUTIL_LIB} ${ALLOUTIL_SRC})
-
+# Dependencies ------------------------------
 find_package(LuaJIT)
 
 if(LUAJIT_FOUND)
@@ -33,25 +25,23 @@ else()
 endif(LUAJIT_FOUND)
 
 if(NOT LUA_FOUND)
-  message(FATAL_ERROR "Lua 5.1 or LuaJIT required to build Allocore. Neither found!")
+  message("Lua 5.1 or LuaJIT required to build AlloUtil. Neither found!")
+  return()
 endif(NOT LUA_FOUND)
 
-GET_DIRECTORY_PROPERTY(ALLOSYSTEM_BUILD DIRECTORY ${CMAKE_SOURCE_DIR}
-  DEFINITION ALLOSYSTEM_BUILD)
+get_target_property(ALLOCORE_LIBRARY allocore${DEBUG_SUFFIX} LOCATION)
+get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore${DEBUG_SUFFIX} ALLOCORE_DEP_INCLUDE_DIRS)
+get_target_property(ALLOCORE_LINK_LIBRARIES allocore${DEBUG_SUFFIX} ALLOCORE_LINK_LIBRARIES)
 
-if(TARGET allocore${DEBUG_SUFFIX})
-  #message("Allosystem build")
-  get_target_property(ALLOCORE_LIBRARY allocore${DEBUG_SUFFIX} LOCATION)
-  get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore${DEBUG_SUFFIX} ALLOCORE_DEP_INCLUDE_DIRS)
+# Build library ----------------------------------
 
-else(TARGET allocore${DEBUG_SUFFIX})
-  find_package(Allocore REQUIRED)
-endif(TARGET allocore${DEBUG_SUFFIX})
+set(ALLOUTIL_LIB "alloutil${DEBUG_SUFFIX}")
+add_library(${ALLOUTIL_LIB} ${ALLOUTIL_SRC})
 
 set(ALLOUTIL_LINK_LIBRARIES ${LUA_LIBRARIES} ${ALLOCORE_LIBRARY})
-
 set(ALLOUTIL_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${LUA_INCLUDE_DIR} ${ALLOCORE_DEP_INCLUDE_DIRS})
 
+# export properties for AlloSystem
 set_target_properties(${ALLOUTIL_LIB}
   PROPERTIES
   ALLOUTIL_DEP_INCLUDE_DIR "${ALLOUTIL_DIRS}"
@@ -64,69 +54,23 @@ set_target_properties(${ALLOUTIL_LIB}
 include_directories(${ALLOUTIL_DIRS})
 target_link_libraries(${ALLOUTIL_LIB} ${ALLOUTIL_LINK_LIBRARIES})
 
+add_dependencies(${ALLOUTIL_LIB} allocore${DEBUG_SUFFIX})
+
 set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 
-message (STATUS "allocore_location for alloutil == ${ALLOCORE_LIBRARY}")
+#message (STATUS "allocore_location for alloutil == ${ALLOCORE_LIBRARY}")
 
-# Examples
-if(NOT NO_EXAMPLES)
-    find_package(APR REQUIRED QUIET)
-    find_package(Assimp REQUIRED QUIET)
-    find_package(FreeImage REQUIRED QUIET)
-    find_package(Freetype REQUIRED QUIET)
-    find_package(GLEW REQUIRED QUIET)
-    find_package(GLUT REQUIRED QUIET)
+# Build Examples ------------------------------------------------------
+if(BUILD_EXAMPLES)
     find_package(LibSndFile REQUIRED QUIET)
-    find_package(OpenGL REQUIRED QUIET)
-    find_package(Portaudio REQUIRED QUIET)
-  if(NOT ALLOSYSTEM_BUILD)
+  if(NOT TARGET Gamma)
     find_package(Gamma QUIET)
-  endif(NOT ALLOSYSTEM_BUILD)
+  endif(NOT TARGET Gamma)
   
   if(NOT (GAMMA_FOUND OR GAMMA_LIBRARY))
     message("Alloutil: Gamma not found. Not building examples." )
   else()
-
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-      # Needed by portaudio
-      add_definitions(-DAL_OSX)
-      find_library(AUDIOUNIT_FM AudioUnit)
-      find_library(COREAUDIO_FM CoreAudio)
-      find_library(COREMIDI_FM CoreMidi)
-      find_library(CORESERVICES_FM CoreServices)
-      find_library(AUDIOTOOLBOX_FM AudioToolbox)
-      set(PA_FRAMEWORKS ${AUDIOUNIT_FM} ${COREAUDIO_FM} ${COREMIDI_FM} ${CORESERVICES_FM} ${AUDIOTOOLBOX_FM})
-    endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-
-      set(EXAMPLE_LINUX_LIBS asound pthread)
-
-      add_definitions(-DAL_LINUX)
-      set(ALLOCORE_LINK_LIBRARIES ${ALLOCORE_LIBRARIES} avahi-common avahi-client)
-    endif()
-
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-      add_definitions(-DAL_WINDOWS)
-    endif()
-
-    set(ALLOCORE_LINK_LIBRARIES ${ALLOCORE_LINK_LIBRARIES}
-      ${APR_LIBRARY}
-      ${ASSIMP_LIBRARY}
-      ${FREEIMAGE_LIBRARY}
-      ${FREETYPE_LIBRARY}
-      ${GLEW_LIBRARY}
-      ${GLUT_LIBRARY}
-      ${LIBSNDFILE_LIBRARY}
-      ${OPENGL_LIBRARY}
-      ${PORTAUDIO_LIBRARY}
-      ${PORTAUDIO_LIBRARIES}
-      ${GAMMA_LIBRARY}
-      ${SNDFILE_LIBRARIES}
-      ${PA_FRAMEWORKS}
-      ${LINUX_LIBS}
-      ${EXAMPLE_LINUX_LIBS})
 
     include_directories(${GAMMA_INCLUDE_DIR})
 
@@ -134,13 +78,10 @@ if(NOT NO_EXAMPLES)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin/examples/)
     foreach(example ${EXAMPLE_FILES})
       get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
-      if (ALLOSYSTEM_BUILD)
-	set(EXAMPLE_TARGET alloutil_examples_${EXAMPLE_NAME})
-      else(ALLOSYSTEM_BUILD)
-	set(EXAMPLE_TARGET examples_${EXAMPLE_NAME})
-      endif(ALLOSYSTEM_BUILD)
+      set(EXAMPLE_TARGET alloutil_examples_${EXAMPLE_NAME})
       add_executable(${EXAMPLE_TARGET} ${example})
-      target_link_libraries("${EXAMPLE_TARGET}" ${ALLOUTIL_LIB} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOCORE_LINK_LIBRARIES})
+      add_dependencies(${EXAMPLE_TARGET} ${ALLOCORE_LIBRARY})
+      target_link_libraries("${EXAMPLE_TARGET}" ${ALLOUTIL_LIB} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOCORE_LINK_LIBRARIES} ${GAMMA_LIBRARY} ${SNDFILE_LIBRARIES})
       if(APPLE)
 	set_target_properties(${EXAMPLE_TARGET} PROPERTIES
 	  LINK_FLAGS "-pagezero_size 10000 -image_base 100000000")
@@ -158,11 +99,8 @@ if(NOT NO_EXAMPLES)
 	SOURCES ${example})
     endforeach(example)
   endif(NOT (GAMMA_FOUND OR GAMMA_LIBRARY))
-endif(NOT NO_EXAMPLES)
-
+endif(BUILD_EXAMPLES)
 
 # installation
 install(DIRECTORY alloutil/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include/alloutil)
 install(TARGETS ${ALLOUTIL_LIB} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
-
-
