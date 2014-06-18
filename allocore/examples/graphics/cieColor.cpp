@@ -37,13 +37,13 @@ COLOR_TYPE TYPE = HCLAB;
 class MyApp : public App{
 public:
 
-  int numRows = 4, numCols = 4;
+  int numRows, numCols;
 
   Mesh verts;
   //rnd::Random<rnd::MulLinCon> rng;
   rnd::Random<rnd::LinCon> rng;
   //rnd::Random<rnd::Tausworthe> rng;
-  bool updateScene = true;
+  bool updateScene;
 
   void printInstructions(){    
     // print controls to terminal
@@ -75,7 +75,8 @@ public:
   }
 		
 
-  MyApp(){
+  MyApp():
+  numRows(4), numCols(4), updateScene(true) {
     verts.primitive(Graphics::QUADS);
     initWindow();
     printInstructions();
