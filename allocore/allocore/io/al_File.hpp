@@ -324,6 +324,13 @@ public:
 	/// Go back to first entry in directory
 	bool rewind();
 
+
+	/// Make a directory
+	static bool make(const std::string& path, bool recursive=true);
+
+	/// Remove a directory
+	static bool remove(const std::string& path);
+
 private:
 	class Impl; Impl * mImpl;
 	FileInfo mEntry;

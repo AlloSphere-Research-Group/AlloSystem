@@ -103,6 +103,9 @@ int utFile() {
 
 
 	{
+		assert(Dir::make("utFileTestDir"));
+		assert(Dir::remove("utFileTestDir"));
+
 		// For now, just make sure this compiles and doesn't crash. :)
 		Dir dir;
 		if(dir.open("/")){
@@ -114,7 +117,6 @@ int utFile() {
 			}
 		}
 	}
-
 	
 	{
 		// TODO:

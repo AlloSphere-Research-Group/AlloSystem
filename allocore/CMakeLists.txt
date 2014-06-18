@@ -30,7 +30,6 @@ set(ALLOCORE_SRC ${ALLOCORE_SRC}
   src/protocol/oscpack/osc/OscTypes.cpp
   src/protocol/al_OSC.cpp
   src/protocol/al_Serialize.cpp
-  src/protocol/al_Zeroconf.cpp
   src/sound/al_Ambisonics.cpp
   src/spatial/al_HashSpace.cpp
   src/spatial/al_Pose.cpp
@@ -50,10 +49,13 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     src/system/al_InfoOSX.mm
     src/protocol/al_Zeroconf_OSX.mm)
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  set(ALLOCORE_SRC ${ALLOCORE_SRC} src/protocol/al_Zeroconf.cpp)
+endif()
+
 endif()
 
 # Dependencies --------------------------------------------
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules")
 
 find_package(GLEW REQUIRED QUIET)
 find_package(GLUT REQUIRED QUIET)
