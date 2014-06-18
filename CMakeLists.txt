@@ -8,7 +8,7 @@ endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 set(ALLOSYSTEM_BUILD 1) # Bulding all of allosystem (do not change this manually)
 
-include(CustomLibPaths.cmake)
+include(CustomLibPaths.cmake)  # Windows path setter
 
 # default build set
 set(BUILD_EVERYTHING 0 CACHE STRING "Build everything")

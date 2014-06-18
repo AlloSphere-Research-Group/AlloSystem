@@ -36,7 +36,6 @@ set(ALLOCORE_SRC src/graphics/al_Asset.cpp
   src/protocol/al_OSC.cpp
   src/protocol/al_XML.cpp
   src/protocol/al_Serialize.cpp
-  src/protocol/al_Zeroconf.cpp
   src/sound/al_Ambisonics.cpp
   src/spatial/al_HashSpace.cpp
   src/spatial/al_Pose.cpp
@@ -59,6 +58,11 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     src/protocol/al_Zeroconf_OSX.mm)
 
 endif()
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  set(ALLOCORE_SRC ${ALLOCORE_SRC} src/protocol/al_Zeroconf.cpp)
+endif()
+
 
 file(GLOB ALLOCORE_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} allocore/*/*.hpp)
 #file(GLOB ALLOCORE_HEADER_DIRS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} allocore/*)
