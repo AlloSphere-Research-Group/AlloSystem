@@ -6,78 +6,32 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   message("====== Building Debug version")
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
+set(BUILD_GAMMA 1 CACHE STRING "Try to build external Gamma")
+set(BUILD_GLV 1 CACHE STRING "Try to build external GLV.")
+set(BUILD_VSR 1 CACHE STRING "Try to build vsr.")
+set(BUILD_EXAMPLES 0 CACHE STRING "Build AlloSystem examples.")
+
 # Windows custom paths
 include(cmake_modules/CustomLibPaths.cmake)
-
-set(BUILD_GAMMA 1 CACHE STRING "Build external Gamma")
-set(BUILD_GLV 1 CACHE STRING "Build external GLV. Implies building alloGLV.")
-set(BUILD_VSR 1 CACHE STRING "Build vsr. Implies building vsr.")
-set(BUILD_EXAMPLES 0 CACHE STRING "Build AlloSystem examples.")
 
 # External dependencies (Gamma, GLV and vsr)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
 
+include(cmake_modules/make_dep.cmake)
+
 # check for Gamma and build ---------------------------------
 if(BUILD_GAMMA)
-  set(GAMMA_RELATIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../Gamma)
-  if(EXISTS "${GAMMA_RELATIVE_DIR}" AND IS_DIRECTORY "${GAMMA_RELATIVE_DIR}")
-    if (EXISTS "${GAMMA_RELATIVE_DIR}/CMakeLists.txt")
-      message("Allosystem: GAMMA sources with CMakeLists found. Building Gamma.")
-      set(BUILDING_GAMMA 1)
-      add_subdirectory(${GAMMA_RELATIVE_DIR} ${GAMMA_RELATIVE_DIR}/AlloSystem-build)
-      set(GAMMA_INCLUDE_DIR ${GAMMA_RELATIVE_DIR})
-      get_target_property(GAMMA_LIBRARY Gamma LOCATION)
-    else()
-      execute_process(COMMAND make WORKING_DIRECTORY "${GAMMA_RELATIVE_DIR}"
-        RESULT_VARIABLE make_result)
-      if (NOT make_result EQUAL 0)
-        message("Allosystem: Gamma make failed. Can't build Gamma.")
-      else()
-        find_package(Gamma)
-      endif(NOT make_result EQUAL 0)
-    endif()
-  else()
-    message("Allosystem: Gamma sources NOT found. Can't build Gamma.")
-  endif()
+    make_dep(Gamma)
 endif(BUILD_GAMMA)
 
 # check for GLV and build ---------------------------------
 if(BUILD_GLV)
-  set(GLV_RELATIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../GLV)
-  if(EXISTS "${GLV_RELATIVE_DIR}" AND IS_DIRECTORY "${GLV_RELATIVE_DIR}")
-    if (EXISTS "${GLV_RELATIVE_DIR}/CMakeLists.txt")
-      message("Allosystem: GLV sources with CMakeLists.txt found. Building GLV.")
-      set(BUILDING_GLV 1)
-      add_subdirectory(${GLV_RELATIVE_DIR} ${GLV_RELATIVE_DIR}/AlloSystem-build)
-      set(GLV_INCLUDE_DIR ${GLV_RELATIVE_DIR})
-      get_target_property(GLV_LIBRARY GLV LOCATION)
-    else()
-      execute_process(COMMAND make WORKING_DIRECTORY "${GLV_RELATIVE_DIR}"
-        RESULT_VARIABLE make_result)
-      if (NOT make_result EQUAL 0)
-        message("Allosystem: GLV make failed. Can't build GLV.")
-      else()
-        find_package(GLV) # To find built GLV
-      endif(NOT make_result EQUAL 0)
-    endif()
-  else()
-    message("Allosystem: GLV sources NOT found. Can't build GLV.")
-  endif()
+    make_dep(GLV)
 endif(BUILD_GLV)
 
 # check for vsr and build ----------------------------
 if(BUILD_VSR)
-  set(VSR_RELATIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../vsr)
-  if((EXISTS "${VSR_RELATIVE_DIR}" AND IS_DIRECTORY "${VSR_RELATIVE_DIR}"))
-    set(BUILDING_VSR 1)
-    add_subdirectory(${VSR_RELATIVE_DIR} ${VSR_RELATIVE_DIR}/Allosystem-build)
-    set_target_properties(vsr PROPERTIES GLV_INCLUDE_DIR "${GLV_RELATIVE_DIR}"
-      GLV_LIBRARY "${GLV_LIBRARY}")
-    set(VSR_INCLUDE_DIR ${VSR_RELATIVE_DIR})
-    get_target_property(VSR_LIBRARY vsr LOCATION)
-  else()
-    message("Allosystem: vsr sources NOT found. Can't build vsr.")
-  endif()
+    make_dep(vsr)
 endif(BUILD_VSR)
 
 # Allocore --------------------------------
@@ -85,6 +39,9 @@ add_subdirectory(allocore)
 get_target_property(ALLOCORE_LIBRARY "allocore${DEBUG_SUFFIX}" LOCATION)
 get_target_property(ALLOCORE_DEP_INCLUDE_DIR "allocore${DEBUG_SUFFIX}" ALLOCORE_DEP_INCLUDE_DIR)
 get_target_property(ALLOCORE_LINK_LIBRARIES "allocore${DEBUG_SUFFIX}" ALLOCORE_LINK_LIBRARIES)
+if(BUILDING_Gamma)
+  add_dependencies("allocore${DEBUG_SUFFIX}" Gamma)
+endif(BUILDING_Gamma)
 
 # Alloutil ----------------------------------
 add_subdirectory(alloutil)
@@ -99,7 +56,7 @@ get_target_property(ALLOGLV_LIBRARY alloGLV${DEBUG_SUFFIX} LOCATION)
 get_target_property(ALLOGLV_INCLUDE_DIR alloGLV${DEBUG_SUFFIX} ALLOGLV_INCLUDE_DIR)
 get_target_property(ALLOGLV_LINK_LIBRARIES alloGLV${DEBUG_SUFFIX} ALLOGLV_LINK_LIBRARIES)
 if(BUILDING_GLV)
-    add_dependencies(alloGLV GLV)
+    add_dependencies(alloGLV${DEBUG_SUFFIX} GLV)
 endif(BUILDING_GLV)
 
 # allovsr ----------------------------------
