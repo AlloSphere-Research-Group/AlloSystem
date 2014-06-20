@@ -25,7 +25,9 @@ static int initializedFreeImage = 0;
 
 class FreeImageImpl : public Image::Impl {
 public:
-	FreeImageImpl() : mImage(NULL) {
+	FreeImageImpl()
+	:	mImage(NULL)
+	{
 		if (!initializedFreeImage) {
 			FreeImage_Initialise();
 			initializedFreeImage = 1;
@@ -195,7 +197,7 @@ public:
 		return true;
 	}
 	
-	virtual bool save(const std::string& filename, const Array& lat) {
+	virtual bool save(const std::string& filename, const Array& lat, int compressFlags) {
 	
 		// check existing image type
 		FREE_IMAGE_FORMAT type = FreeImage_GetFIFFromFilename(filename.c_str());
@@ -309,9 +311,29 @@ public:
 			AL_WARN("image could not be understood");
 			return false;
 		}
-		
-		
-		return FreeImage_Save(type, mImage, filename.c_str(), 0);
+
+		int flags;
+		int compressAmt = compressFlags & 127;
+
+		switch(type){
+		case FIF_JPEG: // default: JPEG_QUALITYGOOD|JPEG_SUBSAMPLING_420
+			if(compressAmt <= 25) flags = JPEG_QUALITYSUPERB;
+			else if(compressAmt <= 50) flags = JPEG_QUALITYGOOD;
+			else if(compressAmt <= 75) flags = JPEG_QUALITYAVERAGE;
+			else flags = JPEG_QUALITYBAD;
+			break;
+
+		case FIF_PNG: // default: PNG_Z_DEFAULT_COMPRESSION (= 6)
+			compressAmt = (compressAmt + 5) / 10;
+			if(compressAmt != 0) flags = compressAmt>=9 ? 9 : compressAmt;
+			else flags = PNG_Z_NO_COMPRESSION;
+			break;
+
+		default:
+			flags = 0;
+		}
+
+		return FreeImage_Save(type, mImage, filename.c_str(), flags);
 	}
 	
 	void getDim(int &w, int &h) {
@@ -355,11 +377,11 @@ protected:
 };
 
 Image :: Image() 
-: mImpl(0), mLoaded(false)
+: mImpl(0), mCompression(50), mLoaded(false)
 {}
 
 Image :: Image(const std::string& filename) 
-: mImpl(0), mFilename(filename), mLoaded(false) {
+: mImpl(0), mFilename(filename), mCompression(50), mLoaded(false) {
 	load(filename);
 }
 
@@ -384,7 +406,7 @@ bool Image :: save(const std::string& filename) {
 //	// detect by file extension & redirect to appropriate implementation here:
 //	if (mImpl) delete mImpl;
 //	mImpl = new FreeImageImpl();
-	mLoaded = mImpl->save(filename, mArray);
+	mLoaded = mImpl->save(filename, mArray, mCompression);
 	if (mLoaded) mFilename = filename;
 	return mLoaded;
 }
