@@ -59,6 +59,13 @@ if(BUILDING_GLV)
     add_dependencies(alloGLV${DEBUG_SUFFIX} GLV)
 endif(BUILDING_GLV)
 
+# alloaudio ----------------------------------
+add_subdirectory(alloaudio)
+#get_target_property(ALLOAUDIO_LIBRARY alloaudio${DEBUG_SUFFIX} LOCATION)
+#get_target_property(ALLOAUDIO_DEP_INCLUDE_DIR alloaudio${DEBUG_SUFFIX} ALLOAUDIO_DEP_INCLUDE_DIR)
+#get_target_property(ALLOAUDIO_LINK_LIBRARIES alloaudio${DEBUG_SUFFIX} ALLOAUDIO_LINK_LIBRARIES)
+
+
 # allovsr ----------------------------------
 add_subdirectory(allovsr)
 if(BUILDING_VSR)
