@@ -10,11 +10,6 @@ set(ALLOCORE_SRC ${ALLOCORE_SRC}
   src/io/al_HID.cpp
   src/io/al_Serial.cpp
   src/io/hidapi.c
-  src/protocol/oscpack/osc/OscOutboundPacketStream.cpp
-  src/protocol/oscpack/osc/OscPrintReceivedElements.cpp
-  src/protocol/oscpack/osc/OscReceivedElements.cpp
-  src/protocol/oscpack/osc/OscTypes.cpp
-  src/protocol/al_OSC.cpp
   src/protocol/al_Serialize.cpp
   src/sound/al_Ambisonics.cpp
   src/spatial/al_HashSpace.cpp
@@ -43,14 +38,6 @@ endif()
 # Dependencies --------------------------------------------
 set(ALLOCORE_DEP_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
 
-# for oscpack (oscpack sources are included with AlloSystem)
-include(TestBigEndian)
-test_big_endian(TEST_ENDIAN)
-if (TEST_ENDIAN MATCHES 0)
-  add_definitions(-DOSC_HOST_LITTLE_ENDIAN)
-else()
-  add_definitions(-DOSC_HOST_BIG_ENDIAN)
-endif()
 
 # System dependent libs
 # ---- OS X ----
@@ -93,6 +80,7 @@ include(modules/freeimage_module.cmake)
 include(modules/apr_module.cmake)
 include(modules/portaudio_module.cmake)
 include(modules/libsndfile_module.cmake)
+include(modules/osc_module.cmake)
 
 # allocore library -----------------------
 set(ALLOCORE_LIB "allocore${DEBUG_SUFFIX}")
