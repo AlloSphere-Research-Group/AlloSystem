@@ -304,7 +304,7 @@ protected:
 	malloc_func mMalloc;
 	free_func mFree;
 	
-	void growPool();
+	void growPool(int size);
 	void recycle(Msg * m);
 };
 

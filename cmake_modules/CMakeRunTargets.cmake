@@ -18,6 +18,7 @@ endif(BUILD_DIR)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/build/bin)
 
 add_executable(${APP_NAME} EXCLUDE_FROM_ALL ${ALLOPROJECT_APP_SRC})
+
 if(APPLE)
   set_target_properties(${APP_NAME} PROPERTIES
     LINK_FLAGS "-pagezero_size 10000 -image_base 100000000")
@@ -43,8 +44,7 @@ add_dependencies(${APP_NAME} allocore${DEBUG_SUFFIX})
 
 message("Using allocore headers from: ${ALLOCORE_DEP_INCLUDE_DIRS}")
 
-if(BUILDING_GAMMA)
-  set(GAMMA_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/Gamma)
+if(BUILDING_Gamma)
   get_target_property(GAMMA_LIBRARY Gamma LOCATION)
   add_dependencies(${APP_NAME} Gamma)
 else()
@@ -53,10 +53,9 @@ else()
     set(GAMMA_INCLUDE_DIR "")
     message("Not building GAMMA and no usable GAMMA binary found. Not linking application to GAMMA")
   endif(NOT GAMMA_FOUND)  
-endif(BUILDING_GAMMA)
+endif(BUILDING_Gamma)
 
 if(BUILDING_GLV)
-  set(GLV_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/GLV)
   get_target_property(GLV_LIBRARY GLV LOCATION)
   add_dependencies(${APP_NAME} GLV)
 else()
@@ -67,26 +66,10 @@ else()
   endif(NOT GLV_FOUND)  
 endif(BUILDING_GLV)
 
-if(BUILDING_VSR)
-  if(BUILDING_ALLOVSR)
-    set(VSR_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/vsr)
-    set_target_properties(vsr PROPERTIES GLV_INCLUDE_DIR "${GLV_RELATIVE_DIR}"
-      GLV_LIBRARIES "${GLV_LIBRARIES}")
-    get_target_property(VSR_LIBRARY vsr LOCATION)
-  add_dependencies(${APP_NAME} vsr)
-  endif(BUILDING_ALLOVSR)
-else()
-  if(NOT VSR_FOUND)
-    set(VSR_LIBRARY "")
-    set(VSR_INCLUDE_DIR "")
-    message("Not building VSR and no usable VSR binary found. Not linking application to VSR")
-  endif(NOT VSR_FOUND) 
-endif(BUILDING_VSR)
-
 if(TARGET alloutil${DEBUG_SUFFIX})
   get_target_property(ALLOUTIL_LIBRARY alloutil${DEBUG_SUFFIX} LOCATION)
-  get_target_property(ALLOUTIL_DEP_INCLUDE_DIR alloutil${DEBUG_SUFFIX} ALLOUTIL_DEP_INCLUDE_DIR)
-  get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil${DEBUG_SUFFIX} ALLOUTIL_LINK_LIBRARIES)
+#  get_target_property(ALLOUTIL_DEP_INCLUDE_DIR alloutil${DEBUG_SUFFIX} ALLOUTIL_DEP_INCLUDE_DIR)
+#  get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil${DEBUG_SUFFIX} ALLOUTIL_LINK_LIBRARIES)
   add_dependencies(${APP_NAME} alloutil${DEBUG_SUFFIX})
 else()
   if(NOT ALLOUTIL_FOUND)
@@ -122,10 +105,10 @@ include_directories(${ALLOCORE_DEP_INCLUDE_DIRS}
   ${GAMMA_INCLUDE_DIR} )
 #    message("Gamma : ${GAMMA_INCLUDE_DIRs}")
 target_link_libraries(${APP_NAME}
-  ${ALLOCORE_LIBRARY} 
-  ${ALLOUTIL_LIBRARY} 
+  ${ALLOCORE_LIBRARY}
+  ${ALLOUTIL_LIBRARY}
   ${ALLOGLV_LIBRARY}
-  ${GAMMA_LIBRARY} ${GLV_LIBRARIES} ${VSR_LIBRARY}
+  ${GAMMA_LIBRARY} ${GLV_LIBRARIES}
   ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOGLV_LINK_LIBRARIES})
 #list(REMOVE_ITEM PROJECT_RES_FILES ${ALLOPROJECT_APP_SRC})
 if(NOT RUN_IN_DEBUGGER)

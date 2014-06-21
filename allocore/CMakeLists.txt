@@ -5,38 +5,17 @@ message("==== Configuring allocore.")
 
 # Allocore Library
 set(ALLOCORE_SRC ${ALLOCORE_SRC}
-  src/graphics/al_FBO.cpp
-  src/graphics/al_GPUObject.cpp
-  src/graphics/al_Graphics.cpp
-  src/graphics/al_Isosurface.cpp
-  src/graphics/al_Lens.cpp
-  src/graphics/al_Light.cpp
-  src/graphics/al_Mesh.cpp
-  src/graphics/al_Shader.cpp
-  src/graphics/al_Shapes.cpp
-  src/graphics/al_Stereographic.cpp
-  src/graphics/al_Texture.cpp
-  src/io/al_App.cpp
   src/io/al_File.cpp
   src/io/al_MIDI.cpp
-  src/io/al_Window.cpp
-  src/io/al_WindowGLUT.cpp
   src/io/al_HID.cpp
   src/io/al_Serial.cpp
   src/io/hidapi.c
-  src/protocol/oscpack/osc/OscOutboundPacketStream.cpp
-  src/protocol/oscpack/osc/OscPrintReceivedElements.cpp
-  src/protocol/oscpack/osc/OscReceivedElements.cpp
-  src/protocol/oscpack/osc/OscTypes.cpp
-  src/protocol/al_OSC.cpp
   src/protocol/al_Serialize.cpp
   src/sound/al_Ambisonics.cpp
   src/spatial/al_HashSpace.cpp
   src/spatial/al_Pose.cpp
   src/system/al_Info.cpp
-  src/system/al_MainLoop.cpp
   src/system/al_Printing.cpp
-  src/system/al_ThreadNative.cpp
   src/system/al_Watcher.cpp
   src/types/al_Array.cpp
   src/types/al_Array_C.c
@@ -45,30 +24,28 @@ set(ALLOCORE_SRC ${ALLOCORE_SRC}
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   list(APPEND ALLOCORE_SRC
-    src/system/al_MainLoopOSX.mm
     src/system/al_InfoOSX.mm
-    src/protocol/al_Zeroconf_OSX.mm)
-
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  set(ALLOCORE_SRC ${ALLOCORE_SRC} src/protocol/al_Zeroconf.cpp)
+)
 endif()
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  find_package(Threads QUIET)
+  if(CMAKE_THREAD_LIBS_INIT)
+  list(APPEND ALLOCORE_SRC
+    src/system/al_ThreadNative.cpp
+)
+  else()
+    message("NOT building native thread Library (pthreads not found).")
+  endif()
+else()
+# Windows and OS X come with threading libraries installed.
+  list(APPEND ALLOCORE_SRC
+    src/system/al_ThreadNative.cpp
+)
 endif()
 
 # Dependencies --------------------------------------------
-
-find_package(GLEW REQUIRED QUIET)
-find_package(GLUT REQUIRED QUIET)
-find_package(OpenGL REQUIRED QUIET)
-
-# for oscpack (oscpack sources are included with AlloSystem)
-include(TestBigEndian)
-test_big_endian(TEST_ENDIAN)
-if (TEST_ENDIAN MATCHES 0)
-  add_definitions(-DOSC_HOST_LITTLE_ENDIAN)
-else()
-  add_definitions(-DOSC_HOST_BIG_ENDIAN)
-endif()
+set(ALLOCORE_DEP_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
 
 # System dependent libs
 # ---- OS X ----
@@ -87,9 +64,6 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # For clock_gettime, etc.
   list(APPEND ALLOCORE_LINK_LIBRARIES rt)
 
-  # For zeroconf
-  find_package(Threads QUIET)
-  list(APPEND ALLOCORE_LINK_LIBRARIES avahi-common avahi-client ${CMAKE_THREAD_LIBS_INIT})
   # For HID
   find_package(Udev QUIET)
   include_directories(${UDEV_INCLUDE_DIR})
@@ -105,25 +79,17 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   #list(APPEND ALLOCORE_LINK_LIBRARIES windows setupapi) # Commented out for mingw buildmaybe required for msvs?
 endif()
 
-# Include directories
-set(ALLOCORE_DEP_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
-  ${GLEW_INCLUDE_DIR}
-  ${GLUT_INCLUDE_DIR}
-  ${OPENGL_INCLUDE_DIR})
-
-# Link libraries
-set(ALLOCORE_LINK_LIBRARIES ${ALLOCORE_LINK_LIBRARIES}
-  ${GLEW_LIBRARY}
-  ${GLUT_LIBRARY}
-  ${OPENGL_LIBRARY})
-
 # optional dependendencies ----------------------------
+include(modules/gl_module.cmake)
+include(modules/glut_module.cmake)
 include(modules/font_module.cmake)
 include(modules/assimp_module.cmake)
 include(modules/freeimage_module.cmake)
 include(modules/apr_module.cmake)
 include(modules/portaudio_module.cmake)
 include(modules/libsndfile_module.cmake)
+include(modules/osc_module.cmake)
+include(modules/zeroconf_module.cmake)
 
 # allocore library -----------------------
 set(ALLOCORE_LIB "allocore${DEBUG_SUFFIX}")
