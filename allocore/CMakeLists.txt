@@ -5,22 +5,8 @@ message("==== Configuring allocore.")
 
 # Allocore Library
 set(ALLOCORE_SRC ${ALLOCORE_SRC}
-  src/graphics/al_FBO.cpp
-  src/graphics/al_GPUObject.cpp
-  src/graphics/al_Graphics.cpp
-  src/graphics/al_Isosurface.cpp
-  src/graphics/al_Lens.cpp
-  src/graphics/al_Light.cpp
-  src/graphics/al_Mesh.cpp
-  src/graphics/al_Shader.cpp
-  src/graphics/al_Shapes.cpp
-  src/graphics/al_Stereographic.cpp
-  src/graphics/al_Texture.cpp
-  src/io/al_App.cpp
   src/io/al_File.cpp
   src/io/al_MIDI.cpp
-  src/io/al_Window.cpp
-  src/io/al_WindowGLUT.cpp
   src/io/al_HID.cpp
   src/io/al_Serial.cpp
   src/io/hidapi.c
@@ -34,7 +20,6 @@ set(ALLOCORE_SRC ${ALLOCORE_SRC}
   src/spatial/al_HashSpace.cpp
   src/spatial/al_Pose.cpp
   src/system/al_Info.cpp
-  src/system/al_MainLoop.cpp
   src/system/al_Printing.cpp
   src/system/al_ThreadNative.cpp
   src/system/al_Watcher.cpp
@@ -56,10 +41,7 @@ endif()
 endif()
 
 # Dependencies --------------------------------------------
-
-find_package(GLEW REQUIRED QUIET)
-find_package(GLUT REQUIRED QUIET)
-find_package(OpenGL REQUIRED QUIET)
+set(ALLOCORE_DEP_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
 
 # for oscpack (oscpack sources are included with AlloSystem)
 include(TestBigEndian)
@@ -87,9 +69,6 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # For clock_gettime, etc.
   list(APPEND ALLOCORE_LINK_LIBRARIES rt)
 
-  # For zeroconf
-  find_package(Threads QUIET)
-  list(APPEND ALLOCORE_LINK_LIBRARIES avahi-common avahi-client ${CMAKE_THREAD_LIBS_INIT})
   # For HID
   find_package(Udev QUIET)
   include_directories(${UDEV_INCLUDE_DIR})
@@ -105,19 +84,9 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   #list(APPEND ALLOCORE_LINK_LIBRARIES windows setupapi) # Commented out for mingw buildmaybe required for msvs?
 endif()
 
-# Include directories
-set(ALLOCORE_DEP_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
-  ${GLEW_INCLUDE_DIR}
-  ${GLUT_INCLUDE_DIR}
-  ${OPENGL_INCLUDE_DIR})
-
-# Link libraries
-set(ALLOCORE_LINK_LIBRARIES ${ALLOCORE_LINK_LIBRARIES}
-  ${GLEW_LIBRARY}
-  ${GLUT_LIBRARY}
-  ${OPENGL_LIBRARY})
-
 # optional dependendencies ----------------------------
+include(modules/gl_module.cmake)
+include(modules/glut_module.cmake)
 include(modules/font_module.cmake)
 include(modules/assimp_module.cmake)
 include(modules/freeimage_module.cmake)
