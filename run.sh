@@ -1,16 +1,11 @@
 #!/bin/bash
 
-# Change this to suit your needs
-BUILD_ALLOUTIL=1
-BUILD_ALLOGLV=0
-BUILD_GLV=0
-BUILD_VSR=0
-BUILD_GAMMA=0
+
 
 # ------------------------------------------------
 # You shouldn't need to touch the stuff below
 
-CMAKE_FLAGS="-DBUILD_ALLOUTIL=${BUILD_ALLOUTIL} -DBUILD_ALLOGLV=${BUILD_ALLOGLV} -DBUILD_GLV=${BUILD_GLV} -DBUILD_VSR=${BUILD_VSR} -DBUILD_GAMMA=${BUILD_GAMMA}"
+CMAKE_FLAGS=""
 
 if [ $# == 0 ]
 then
@@ -39,5 +34,5 @@ else
   exit 1
 fi
 
-cmake . ${CMAKE_FLAGS} ${TARGET_FLAG} -DNO_EXAMPLES=1 -DRUN_IN_DEBUGGER=0 -DCMAKE_BUILD_TYPE=Release
+cmake . ${TARGET_FLAG} -DNO_EXAMPLES=1 -DRUN_IN_DEBUGGER=0 -DCMAKE_BUILD_TYPE=Release
 make $TARGET -j4 $*
