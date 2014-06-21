@@ -16,7 +16,6 @@ set(ALLOCORE_SRC ${ALLOCORE_SRC}
   src/spatial/al_Pose.cpp
   src/system/al_Info.cpp
   src/system/al_Printing.cpp
-  src/system/al_ThreadNative.cpp
   src/system/al_Watcher.cpp
   src/types/al_Array.cpp
   src/types/al_Array_C.c
@@ -25,19 +24,28 @@ set(ALLOCORE_SRC ${ALLOCORE_SRC}
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   list(APPEND ALLOCORE_SRC
-    src/system/al_MainLoopOSX.mm
     src/system/al_InfoOSX.mm
-    src/protocol/al_Zeroconf_OSX.mm)
-
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  set(ALLOCORE_SRC ${ALLOCORE_SRC} src/protocol/al_Zeroconf.cpp)
+)
 endif()
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  find_package(Threads QUIET)
+  if(CMAKE_THREAD_LIBS_INIT)
+  list(APPEND ALLOCORE_SRC
+    src/system/al_ThreadNative.cpp
+)
+  else()
+    message("NOT building native thread Library (pthreads not found).")
+  endif()
+else()
+# Windows and OS X come with threading libraries installed.
+  list(APPEND ALLOCORE_SRC
+    src/system/al_ThreadNative.cpp
+)
 endif()
 
 # Dependencies --------------------------------------------
 set(ALLOCORE_DEP_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
-
 
 # System dependent libs
 # ---- OS X ----
@@ -81,6 +89,7 @@ include(modules/apr_module.cmake)
 include(modules/portaudio_module.cmake)
 include(modules/libsndfile_module.cmake)
 include(modules/osc_module.cmake)
+include(modules/zeroconf_module.cmake)
 
 # allocore library -----------------------
 set(ALLOCORE_LIB "allocore${DEBUG_SUFFIX}")

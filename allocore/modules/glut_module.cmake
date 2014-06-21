@@ -8,6 +8,12 @@ list(APPEND ALLOCORE_SRC
   src/system/al_MainLoop.cpp
   src/io/al_WindowGLUT.cpp)
 
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  list(APPEND ALLOCORE_SRC
+    src/system/al_MainLoopOSX.mm
+)
+endif()
+
 list(APPEND ALLOCORE_DEP_INCLUDE_DIRS
   ${GLUT_INCLUDE_DIR})
 
