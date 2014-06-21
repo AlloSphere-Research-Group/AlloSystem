@@ -133,6 +133,12 @@ This will also build any required dependencies and run cmake if needed.
 
 You can also pass a directory, and all the source files in that directory will be built into a single application.
 
+You can make a debug build of the libraries and the application by running:
+
+    ./debug.sh allocore/examples/graphics/shaderSprites.cpp 
+
+This will run the file in the debugger, so if the application crashes, it will drop you to the debugger shell. If you need to specify a particular debugger instead of the default gdb, adjust the debug.sh script.
+
 4. Installing Allosystem
 ----------------------------------------
 
