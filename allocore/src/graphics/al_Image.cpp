@@ -197,6 +197,30 @@ public:
 		return true;
 	}
 	
+
+	void resize(int w, int h, int bpp){
+		if(NULL != mImage){ // already allocated image?
+			int oldw = FreeImage_GetWidth(mImage);
+			int oldh = FreeImage_GetHeight(mImage);
+			int oldbpp = FreeImage_GetBPP(mImage);
+			// re-allocate only if dimensions have changed
+			if(oldw != w || oldh != h || oldbpp != bpp){
+				destroy();
+				resize(w,h,bpp);
+			}
+		}
+		else{
+			/*
+			FreeImage_AllocateT(FREE_IMAGE_TYPE type, int width, int height, int bpp);
+			bpp		Bit depth of the new Bitmap. Supported pixel depth: 
+					1-, 4-, 8-, 16-, 24-, 32-bit per pixel for standard bitmap
+			*/
+			//printf("FreeImage_AllocateT(%d, %d, %d)\n", w,h,bpp);
+			mImage = FreeImage_AllocateT(FIT_BITMAP, w, h, bpp);
+		}
+	}
+
+
 	virtual bool save(const std::string& filename, const Array& lat, int compressFlags) {
 	
 		// check existing image type
@@ -210,26 +234,29 @@ public:
 			AL_WARN("image format not supported: %s", filename.c_str());
 			return false;
 		}
-		
-		destroy();
-		
-		
-		const AlloArrayHeader& header = lat.header;
-		int w = header.dim[0];
-		int h = (header.dimcount > 1) ? header.dim[1] : 1;
-		Image::Format format = Image::getFormat(header.components);
 
+		const AlloArrayHeader& header = lat.header;
+		unsigned w = header.dim[0];
+		unsigned h = (header.dimcount > 1) ? header.dim[1] : 1;
+		Image::Format format = Image::getFormat(header.components);
+		int bpp = header.stride[0]*8;
+
+		resize(w,h,bpp);
+
+		/* Note that according to the FreeImage documentation, the byte ordering
+		of the pixels returned from FreeImage_GetScanLine are not portable.
+		This means we cannot simply do a memcpy of each scan line, but must
+		rather copy the RGB(A) components one pixel at a time.
+		*/
 		switch(format) {
 			case Image::RGB: {
 				switch(header.type) {
 
-					case AlloUInt8Ty: {
-						int bpp = header.stride[0]; 
-						mImage = FreeImage_AllocateT(FIT_BITMAP, w, h, bpp*8);
+					case AlloUInt8Ty: { //printf("FreeImageImpl: save uint8/RGB\n");
 						char *bp = (char *)(lat.data.ptr);
 						int rowstride = header.stride[1]; 
 
-						for(unsigned j = 0; j < header.dim[1]; ++j) {
+						for(unsigned j = 0; j < h; ++j) {
 							
 							// copy Array row to image buffer
 							/*memcpy(
@@ -238,21 +265,19 @@ public:
 								w*3
 							);*/
 
-							RGBTRIPLE *pix = (RGBTRIPLE *)FreeImage_GetScanLine(mImage, j);
-							Image::RGBPix<uint8_t> *o_pix = (Image::RGBPix<uint8_t> *)(bp + j*rowstride);
-							for(unsigned i=0; i < header.dim[0]; ++i) {
-								pix->rgbtRed = o_pix->r;
-								pix->rgbtGreen = o_pix->g;
-								pix->rgbtBlue = o_pix->b;
-								++pix;
-								++o_pix;
+							RGBTRIPLE * dst = (RGBTRIPLE *)FreeImage_GetScanLine(mImage, j);
+							const Image::RGBPix<uint8_t> * src = (const Image::RGBPix<uint8_t> *)(bp + j*rowstride);
+							for(unsigned i=0; i < w; ++i) {
+								dst[i].rgbtRed  = src[i].r;
+								dst[i].rgbtGreen= src[i].g;
+								dst[i].rgbtBlue = src[i].b;
 							}
 						}
 					}
 					break;
 
 					default:
-						AL_WARN("input matrix type not supported");
+						AL_WARN("input Array component type not supported");
 						break;
 				}
 			}
@@ -262,15 +287,11 @@ public:
 				
 				switch(header.type) {
 
-					case AlloUInt8Ty: {
-	
-						int bpp = header.stride[0]; 
-						mImage = FreeImage_AllocateT(FIT_BITMAP, w, h, bpp*8);
-						
+					case AlloUInt8Ty: {						
 						char *bp = (char *)(lat.data.ptr);
 						int rowstride = header.stride[1]; 
 						
-						for(unsigned j = 0; j < header.dim[1]; ++j) {
+						for(unsigned j = 0; j < h; ++j) {
 
 							// copy Array row to image buffer
 							/*memcpy(
@@ -279,29 +300,27 @@ public:
 								w*4
 							);*/
 							
-							RGBQUAD *pix = (RGBQUAD *)FreeImage_GetScanLine(mImage, j);
-							Image::RGBAPix<uint8_t> *o_pix = (Image::RGBAPix<uint8_t> *)(bp + j*rowstride);
-							for(unsigned i=0; i < header.dim[0]; ++i) {
-								pix->rgbRed = o_pix->r;
-								pix->rgbGreen = o_pix->g;
-								pix->rgbBlue = o_pix->b;
-								pix->rgbReserved = o_pix->a;
-								++pix;
-								++o_pix;
+							RGBQUAD * dst = (RGBQUAD *)FreeImage_GetScanLine(mImage, j);
+							const Image::RGBAPix<uint8_t> * src = (const Image::RGBAPix<uint8_t> *)(bp + j*rowstride);
+							for(unsigned i=0; i < w; ++i) {
+								dst[i].rgbRed     = src[i].r;
+								dst[i].rgbGreen   = src[i].g;
+								dst[i].rgbBlue    = src[i].b;
+								dst[i].rgbReserved= src[i].a;
 							}
 						}
 					}
 					break;
 
 					default:
-						AL_WARN("input matrix type not supported");
+						AL_WARN("input Array component type not supported");
 						return false;
 				}
 			}
 			break;
 
 			default: {
-				AL_WARN("input matrix format not supported");
+				AL_WARN("input Array component format not supported");
 				return false;
 			}
 		}
