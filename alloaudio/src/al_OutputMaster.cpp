@@ -1,5 +1,8 @@
 
+#include <iostream>
+
 #include "alloaudio/al_OutputMaster.hpp"
+#include "allocore/system/al_Time.hpp"
 
 #include "src/butter.c"
 
@@ -7,29 +10,47 @@
 
 using namespace al;
 
-
-
-OutputMaster::OutputMaster(int num_chnls, double sampleRate):
-	m_meterBuffer(1024), m_framesPerSec(sampleRate)
+OutputMaster::OutputMaster(int num_chnls, double sampleRate, const char *address, int port,
+						   const char *sendAddress, int sendPort, al_sec msg_timeout):
+	m_meterBuffer(1024 * sizeof(float)), m_framesPerSec(sampleRate),
+	osc::Recv(port, address, msg_timeout),
+	m_sendAddress(sendAddress), m_sendPort(sendPort)
 {
 	pthread_mutex_init(&m_paramMutex, NULL);
-
+	pthread_mutex_init(&m_meterMutex, NULL);
+	pthread_cond_init(&m_meterCond, NULL);
 	allocateChannels(num_chnls);
-
 	initializeData();
+
+	if (port < 0) {
+		std::cout << "OutputMaster: Not using OSC." << std::endl;
+	} else {
+		msghandler.outputmaster = this;
+		if (!opened()) {
+			std::cout << "Failed to open socket on UDP port " << port << " for OSC receipt." << std::endl;
+			std::cout << "Probably another program is already listening on that port." << std::endl;
+		} else {
+			handler(OutputMaster::msghandler);
+			timeout(0.1); // set receiver to block with timeout
+			start();
+		}
+	}
+	if (m_sendPort > 0 && strlen(sendAddress) > 1) {
+		m_meterThread.start(OutputMaster::meterThreadFunc, (void *) this);
+	}
 }
 
 // FIXME fix leaks  and issues when changing channel numbers (due to C pointers)
 
 OutputMaster::~OutputMaster()
 {
-	/* FIXME close ports and deallocate filters before clearing memory */
 	for (int i = 0; i < m_numChnls; i++) {
 		butter_free(m_lopass1[i]);
 		butter_free(m_lopass2[i]);
 		butter_free(m_hipass1[i]);
 		butter_free(m_hipass2[i]);
 	}
+	stop();
 	//    free(filters); //FIR filters
 }
 
@@ -52,7 +73,7 @@ void OutputMaster::setFilters(double **irs, int filter_len)
 }
 
 // FIXME adjust parameter passing model. Should only block when passing the filter irs
-void OutputMaster::setGlobalGain(double gain)
+void OutputMaster::setMasterGain(double gain)
 {
 	pthread_mutex_lock(&m_paramMutex);
 	m_masterGain = gain;
@@ -213,16 +234,16 @@ void OutputMaster::processBlock(AudioIOData &io)
 			//            firfilter_next(pp->filters[chan],in_buf, filt_out, nframes, gain);
 			//            for (i = 0; i < nframes; i++) {
 			//                *out = filt_out[i];
-			//                if (pp->clipper_on && *out > gain) {
-			//                    *out = gain;
+			//                if (pp->clipper_on && *out > master_gain) {
+			//                    *out = master_gain;
 			//                }
 			//                out++;
 			//            }
 		} else { /* No DRC filters, just apply gain */
 			for (i = 0; i < nframes; i++) {
 				*out = in_buf[i] * gain;
-				if (m_clipperOn && *out > gain) {
-					*out = gain;
+				if (m_clipperOn && *out > master_gain) {
+					*out = master_gain;
 				}
 				out++;
 			}
@@ -254,6 +275,7 @@ void OutputMaster::processBlock(AudioIOData &io)
 			m_meterBuffer.write( (char *) m_meters.data(), sizeof(float) * m_numChnls);
 			memset(m_meters.data(), 0, sizeof(float) * m_numChnls);
 			m_meterCounter = 0; // A little jitter but efficient
+			pthread_cond_signal(&m_meterCond);
 		}
 	}
 }
@@ -269,7 +291,7 @@ int OutputMaster::chanIsSubwoofer(int index)
 
 void OutputMaster::initializeData()
 {
-	m_masterGain = 1.0;
+	m_masterGain = 0.0;
 	m_muteAll = false;
 	m_clipperOn = true;
 	m_filtersActive = false;
@@ -295,7 +317,7 @@ void OutputMaster::allocateChannels(int numChnls)
 	swIndex[1] =  swIndex[2] = swIndex[3] = -1;
 
 	for (int i = 0; i < numChnls; i++) {
-		m_gains[i] = 0.2;
+		m_gains[i] = 1.0;
 		m_meters[i] = 0;
 		m_lopass1[i] = butter_create(m_framesPerSec, BUTTER_LP);
 		m_lopass2[i] = butter_create(m_framesPerSec, BUTTER_LP);
@@ -304,4 +326,101 @@ void OutputMaster::allocateChannels(int numChnls)
 
 	}
 	m_numChnls = numChnls;
+}
+
+void *OutputMaster::meterThreadFunc(void *arg) {
+	int chanindex = 0;
+	OutputMaster *om = static_cast<OutputMaster *>(arg);
+	float meter_levels[om->m_numChnls];
+
+	al::osc::Send s(om->m_sendPort, om->m_sendAddress.c_str());
+	while(om->m_runMeterThread) {
+		pthread_mutex_lock(&om->m_meterMutex);
+		pthread_cond_wait(&om->m_meterCond, &om->m_meterMutex);
+		int bytes_read = om->m_meterBuffer.read((char *) meter_levels, om->m_numChnls * sizeof(float));
+		if (bytes_read) {
+			if (bytes_read !=  om->m_numChnls * sizeof(float)) {
+				std::cerr << "Alloaudio: Warning. Meter values underrun." << std::endl;
+			}
+			for (int i = 0; i < bytes_read/sizeof(float); i++) {
+				//            char addr[64];
+				//            sprintf(addr,"/Alloaudio/meter%i", i);
+				//            lo_send(t, "/Alloaudio/meter", "if", i, meter_levels[i]);
+				//            lo_send(t, "/Alloaudio/meterdb", "if", i, 20.0 * log10(meter_levels[i]));
+				//            lo_send(t, addr, "f", 20.0 * log10(meter_levels[i]));
+				//            lo_send(t, addr, "f", meter_levels[i]);
+
+				s.send("/Alloaudio/meterdb", chanindex++,
+					   (float) (20.0 * log10(meter_levels[i])));
+				if (chanindex == om->m_numChnls) {
+					chanindex = 0;
+				}
+			}
+		}
+		pthread_mutex_unlock(&om->m_meterMutex);
+	}
+	return NULL;
+}
+
+// FIXME: Make this thread safe!
+void OutputMaster::OSCHandler::onMessage(osc::Message &m)
+{
+	if (m.addressPattern() == "/Alloaudio/gain") {
+		if (m.typeTags() == "if") {
+			int chan;
+			float gain;
+			m >> chan >> gain;
+			outputmaster->setGain(chan, gain);
+		} else {
+			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/gain message: "
+					  << m.typeTags() << std::endl;
+		}
+	} else if (m.addressPattern() == "/Alloaudio/global_gain") {
+		if (m.typeTags() == "f") {
+			float gain;
+			m >> gain;
+			outputmaster->setMasterGain(gain);
+		} else {
+			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/global_gain message: "
+					  << m.typeTags() << std::endl;
+		}
+	} else if (m.addressPattern() == "/Alloaudio/clipper_on") {
+		if (m.typeTags() == "i") {
+			int clipper_on;
+			m >> clipper_on;
+			outputmaster->setClipperOn(clipper_on != 0);
+		} else {
+			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/clipper_on: "
+					  << m.typeTags() << std::endl;
+		}
+	} else if (m.addressPattern() == "/Alloaudio/mute_all") {
+		if (m.typeTags() == "i") {
+			int mute_all;
+			m >> mute_all;
+			outputmaster->setMuteAll(mute_all != 0);
+		} else {
+			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/mute_all: "
+					  << m.typeTags() << std::endl;
+		}
+	} else if (m.addressPattern() == "/Alloaudio/meter_on") {
+		if (m.typeTags() == "i") {
+			int on;
+			m >> on;
+			outputmaster->setMeterOn(on != 0);
+		} else {
+			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/meter_update_freq: "
+					 << m.typeTags() << std::endl;
+		}
+	} else if (m.addressPattern() == "/Alloaudio/meter_update_freq") {
+		if (m.typeTags() == "f") {
+			float freq;
+			m >> freq;
+			outputmaster->setMeterUpdateFreq(freq);
+		} else {
+			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/meter_update_freq: "
+					 << m.typeTags() << std::endl;
+		}
+	} else {
+		std::cout << "Alloaudio: Unrecognized address pattern: " << m.addressPattern() << std::endl;
+	}
 }

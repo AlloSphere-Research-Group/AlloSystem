@@ -14,6 +14,15 @@ get_target_property(ALLOCORE_LIBRARY allocore${DEBUG_SUFFIX} LOCATION)
 get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore${DEBUG_SUFFIX} ALLOCORE_DEP_INCLUDE_DIRS)
 get_target_property(ALLOCORE_LINK_LIBRARIES allocore${DEBUG_SUFFIX} ALLOCORE_LINK_LIBRARIES)
 
+# FIXME check if this works on Windows, as pthreads are currently specifically required
+find_package(Threads QUIET)
+if(CMAKE_THREAD_LIBS_INIT)
+
+else()
+message("phtreads not found. Not building Alloaudio.")
+return()
+
+endif()
 # Build library ----------------------------------
 
 set(ALLOAUDIO_LIB "alloaudio${DEBUG_SUFFIX}")

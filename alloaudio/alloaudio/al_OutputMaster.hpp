@@ -46,9 +46,14 @@
 
 #include <vector>
 
+#include <pthread.h>
+
 #include "allocore/io/al_AudioIO.hpp"
 #include "allocore/types/al_SingleRWRingBuffer.hpp"
 #include "allocore/types/al_MsgQueue.hpp"
+#include "allocore/protocol/al_OSC.hpp"
+#include "allocore/system/al_Thread.hpp"
+
 
 typedef struct BUTTER_ BUTTER;
 
@@ -77,30 +82,82 @@ typedef enum {
     PARAMETER_COUNT,
 } parameter_t;
 
-class OutputMaster
+class OutputMaster : public osc::Recv
 {
-public:
-    OutputMaster(int num_chnls, double sampleRate);
+    public:
+    OutputMaster(int num_chnls, double sampleRate,
+                 const char * address = "", int inport = 19375,
+                 const char * sendAddress = "localhost", int sendPort = -1,
+                 al_sec msg_timeout = 0);
     ~OutputMaster();
 
     void setFilters(double **irs, int filter_len);
-    void setGlobalGain(double gain);
+
+    /** Set master output gain. This gain is applied after individual channel gains, and
+     * determines the value at which signals are clipped if the clipper is set with
+     * setClipperOn()
+     */
+    void setMasterGain(double gain);
+
+    /** Set the channel gain for channel channelIndex. Note that channel indeces count
+     *  from 0
+     */
     void setGain(int channelIndex, double gain);
-    void setMuteAll(bool m_muteAll);
-    void setClipperOn(bool m_clipperOn);
+
+    /** Mute the system if muteAll is true. When unmuted, all gains will return to their
+     * previous state.
+     */
+    void setMuteAll(bool muteAll);
+
+    /** If clipperOn is true, the output signal for a channel is clipped if it is greater
+     * than the global gain set with setGlobalGain(). If false, there is no clipping.
+     * It is recommended that for systems with large numbers of channels you set this to
+     * to avoid loud surprises.
+     */
+    void setClipperOn(bool clipperOn);
+
     void setRoomCompensationOn(bool on);
+
+    /** Set the frequency at which peak meter data is updated. During the update period,
+     * a single value (maximum sample peak) is stored, and will only be avialable once
+     * the period is completed, as this is passed to the non-audio context through a
+     * lock-free ring buffer.
+     */
     void setMeterUpdateFreq(double freq);
 
-    /* set frequency to 0 to skip bass management cross-over filters, but still have signals added to subwoofers.
-       set to -1 skip bass_management completely */
+    /** Set bass management cross-over frequency. The signal from all channels will be run
+     * through a pair of linear-phase cross-over filters, and the signal from the low pass
+     * filters is sent to the subwoofers specified using setSwIndeces().
+    */
     void setBassManagementFreq(double frequency);
+
     void setBassManagementMode(bass_mgmt_mode_t mode);
+
+    /** Specify which channel indeces are subwoofers for the purpose of bass management.
+     * Currently a maximum of 4 subwoofers are supported.
+     */
     void setSwIndeces(int i1, int i2, int i3, int i4);
+
+    /** Enable peak metering. If set to false, no meter values will be sent out via OSC,
+     * and no values will be provided by getMeterValues()
+     */
     void setMeterOn(bool meterOn);
 
+    /** Fill the values array with the peak meter values. Note that because the values
+     * are stored in a ringbuffer, this function cannot be used together with OSC meters
+     * as the OSC thread will empty the values before they are read here.
+     *
+     * @return returns the number of meter values read.
+     */
     int getMeterValues(float *values);
+
+    /** Get the number of channels processed by this OutputMaster object */
     int getNumChnls();
 
+    /** Process a block of audio data. The io object should come from a previous process,
+     * like an Ambisonics or VBAP panner, as processBlock() processes the output buffer in
+     * the io object in place.
+     */
     void processBlock(AudioIOData &io);
 
 private:
@@ -125,6 +182,13 @@ private:
     std::vector<float> m_meters;
     SingleRWRingBuffer m_meterBuffer;
     int m_meterCounter; /* count samples for level updates */
+    std::string m_sendAddress;
+    int m_sendPort;
+    int m_runMeterThread;
+    al::Thread m_meterThread;
+    pthread_mutex_t m_meterMutex;
+    pthread_cond_t m_meterCond;
+
 
     /* DRC (output) filters */
 //    FIRFILTER **filters;
@@ -140,6 +204,12 @@ private:
     int chanIsSubwoofer(int index);
     void initializeData();
     void allocateChannels(int numChnls);
+    static void *meterThreadFunc(void *arg);
+
+    struct OSCHandler : public osc::PacketHandler{
+        OutputMaster *outputmaster;
+        void onMessage(osc::Message& m);
+    } msghandler;
 };
 
 } // al::
