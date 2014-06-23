@@ -363,19 +363,43 @@ public:
 
 		int flags;
 		int compressAmt = compressFlags & 127;
+		int quality = 100-(compressAmt<=100?compressAmt:100);
 
 		switch(fileType){
+
+		case FIF_BMP:
+			flags = compressAmt >= 50 ? BMP_SAVE_RLE : BMP_DEFAULT;
+			break;
+
+		case FIF_EXR:
+			flags = compressAmt >= 50 ? EXR_DEFAULT : EXR_NONE;
+			break;
+
 		case FIF_JPEG: // default: JPEG_QUALITYGOOD|JPEG_SUBSAMPLING_420
-			if(compressAmt <= 25) flags = JPEG_QUALITYSUPERB;
+			/*if(compressAmt <= 25) flags = JPEG_QUALITYSUPERB;
 			else if(compressAmt <= 50) flags = JPEG_QUALITYGOOD;
 			else if(compressAmt <= 75) flags = JPEG_QUALITYAVERAGE;
-			else flags = JPEG_QUALITYBAD;
+			else flags = JPEG_QUALITYBAD;*/
+			flags = quality;
+			break;
+
+		case FIF_J2K:
+		case FIF_JP2:
+			flags = int(double(quality)*5.11 + 1); // convert [0,100] -> [1,512]
 			break;
 
 		case FIF_PNG: // default: PNG_Z_DEFAULT_COMPRESSION (= 6)
 			compressAmt = (compressAmt + 5) / 10;
 			if(compressAmt != 0) flags = compressAmt>=9 ? 9 : compressAmt;
 			else flags = PNG_Z_NO_COMPRESSION;
+			break;
+
+		case FIF_TIFF:
+			flags = compressAmt >= 50 ? TIFF_DEFAULT : TIFF_NONE;
+			break;
+
+		case FIF_TARGA:
+			flags = compressAmt >= 50 ? TARGA_SAVE_RLE : TARGA_DEFAULT;
 			break;
 
 		default:
