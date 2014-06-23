@@ -54,7 +54,7 @@ void MsgQueue :: recycle(Msg * m) {
 
 /* schedule a new message */
 void MsgQueue :: sched(al_sec at, msg_func func, char * data, size_t size) {
-	assert(!mPool);
+	assert(mPool);
 	// get a message-holder from the pool:
 	Msg * m = mPool;
 	mPool= m->next;
