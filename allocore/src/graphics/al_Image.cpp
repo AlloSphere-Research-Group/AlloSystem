@@ -221,21 +221,21 @@ public:
 	}
 
 
-	virtual bool save(const std::string& filename, const Array& lat, int compressFlags) {
+	virtual bool save(const std::string& filename, const Array& arr, int compressFlags) {
 	
 		// check existing image type
-		FREE_IMAGE_FORMAT type = FreeImage_GetFIFFromFilename(filename.c_str());
+		FREE_IMAGE_FORMAT fileType = FreeImage_GetFIFFromFilename(filename.c_str());
 		
-		if(type == FIF_UNKNOWN) {
+		if(fileType == FIF_UNKNOWN) {
 			AL_WARN("image format not recognized: %s", filename.c_str());
 			return false;
 		}
-		if(!FreeImage_FIFSupportsWriting(type)) {
+		if(!FreeImage_FIFSupportsWriting(fileType)) {
 			AL_WARN("image format not supported: %s", filename.c_str());
 			return false;
 		}
 
-		const AlloArrayHeader& header = lat.header;
+		const AlloArrayHeader& header = arr.header;
 		unsigned w = header.dim[0];
 		unsigned h = (header.dimcount > 1) ? header.dim[1] : 1;
 		Image::Format format = Image::getFormat(header.components);
@@ -243,28 +243,72 @@ public:
 
 		resize(w,h,bpp);
 
-		/* Note that according to the FreeImage documentation, the byte ordering
-		of the pixels returned from FreeImage_GetScanLine are not portable.
-		This means we cannot simply do a memcpy of each scan line, but must
-		rather copy the RGB(A) components one pixel at a time.
-		*/
+		if (mImage == NULL) {
+			AL_WARN("image could not be understood");
+			return false;
+		}
+
+		const int rowstride = header.stride[1];
+
+		//printf("w=%d, h=%d, bpp=%d, stride=%d\n", w,h,bpp,rowstride);
+
 		switch(format) {
+
+			case Image::LUMINANCE:
+				switch(header.type) {
+
+					case AlloUInt8Ty: {
+						char *bp = (char *)(arr.data.ptr);
+						for(unsigned j = 0; j < h; ++j) {
+							memcpy(
+								FreeImage_GetScanLine(mImage, j),
+								bp + j*rowstride,
+								w
+							);
+						}
+					}
+					break;
+
+					default:
+						AL_WARN("input Array component type not supported");
+						return false;
+				}
+			break;
+
+			// TODO: must save as RGBA
+			/*case Image::LUMALPHA:
+				switch(header.type) {
+
+					case AlloUInt8Ty: {
+						char *bp = (char *)(arr.data.ptr);
+						for(unsigned j = 0; j < h; ++j) {
+							memcpy(
+								FreeImage_GetScanLine(mImage, j),
+								bp + j*rowstride,
+								w*2
+							);
+						}
+					}
+					break;
+
+					default:
+						AL_WARN("input Array component type not supported");
+						return false;
+				}
+			break;*/
+
+			/* According to the FreeImage documentation ("Pixel access functions"): 
+			"When accessing to individual color components of a 24- or 32-bit 
+			DIB, you should always use FreeImage macros or RGBTRIPLE / RGBQUAD
+			structures in order to write OS independent code.
+			*/
 			case Image::RGB: {
 				switch(header.type) {
 
 					case AlloUInt8Ty: { //printf("FreeImageImpl: save uint8/RGB\n");
-						char *bp = (char *)(lat.data.ptr);
-						int rowstride = header.stride[1]; 
+						char *bp = (char *)(arr.data.ptr);
 
 						for(unsigned j = 0; j < h; ++j) {
-							
-							// copy Array row to image buffer
-							/*memcpy(
-								FreeImage_GetScanLine(mImage, j),
-								bp + j*rowstride,
-								w*3
-							);*/
-
 							RGBTRIPLE * dst = (RGBTRIPLE *)FreeImage_GetScanLine(mImage, j);
 							const Image::RGBPix<uint8_t> * src = (const Image::RGBPix<uint8_t> *)(bp + j*rowstride);
 							for(unsigned i=0; i < w; ++i) {
@@ -278,7 +322,7 @@ public:
 
 					default:
 						AL_WARN("input Array component type not supported");
-						break;
+						return false;
 				}
 			}
 			break;
@@ -288,18 +332,9 @@ public:
 				switch(header.type) {
 
 					case AlloUInt8Ty: {						
-						char *bp = (char *)(lat.data.ptr);
-						int rowstride = header.stride[1]; 
+						char *bp = (char *)(arr.data.ptr);
 						
 						for(unsigned j = 0; j < h; ++j) {
-
-							// copy Array row to image buffer
-							/*memcpy(
-								FreeImage_GetScanLine(mImage, j),
-								bp + j*rowstride,
-								w*4
-							);*/
-							
 							RGBQUAD * dst = (RGBQUAD *)FreeImage_GetScanLine(mImage, j);
 							const Image::RGBAPix<uint8_t> * src = (const Image::RGBAPix<uint8_t> *)(bp + j*rowstride);
 							for(unsigned i=0; i < w; ++i) {
@@ -324,17 +359,12 @@ public:
 				return false;
 			}
 		}
-		
-		
-		if (mImage == NULL) {
-			AL_WARN("image could not be understood");
-			return false;
-		}
+
 
 		int flags;
 		int compressAmt = compressFlags & 127;
 
-		switch(type){
+		switch(fileType){
 		case FIF_JPEG: // default: JPEG_QUALITYGOOD|JPEG_SUBSAMPLING_420
 			if(compressAmt <= 25) flags = JPEG_QUALITYSUPERB;
 			else if(compressAmt <= 50) flags = JPEG_QUALITYGOOD;
@@ -352,9 +382,10 @@ public:
 			flags = 0;
 		}
 
-		return FreeImage_Save(type, mImage, filename.c_str(), flags);
+		return FreeImage_Save(fileType, mImage, filename.c_str(), flags);
 	}
-	
+
+
 	void getDim(int &w, int &h) {
 		if(mImage) {
 			w = FreeImage_GetWidth(mImage);
@@ -364,13 +395,13 @@ public:
 			w = h = 0;
 		}
 	}
-	
+
 	int getPlanes() const {
 		AlloTy type = getDataType();
 		BITMAPINFOHEADER * hdr = FreeImage_GetInfoHeader(mImage);
 		return (hdr->biBitCount)/(8*allo_type_size(type));
 	}
-	
+
 	AlloTy getDataType() const {
 		FREE_IMAGE_TYPE type = FreeImage_GetImageType(mImage);
 		switch(type) {
