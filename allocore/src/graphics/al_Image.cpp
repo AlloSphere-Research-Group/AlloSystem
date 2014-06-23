@@ -197,63 +197,132 @@ public:
 		return true;
 	}
 	
-	virtual bool save(const std::string& filename, const Array& lat, int compressFlags) {
+
+	void resize(int w, int h, int bpp){
+		if(NULL != mImage){ // already allocated image?
+			int oldw = FreeImage_GetWidth(mImage);
+			int oldh = FreeImage_GetHeight(mImage);
+			int oldbpp = FreeImage_GetBPP(mImage);
+			// re-allocate only if dimensions have changed
+			if(oldw != w || oldh != h || oldbpp != bpp){
+				destroy();
+				resize(w,h,bpp);
+			}
+		}
+		else{
+			/*
+			FreeImage_AllocateT(FREE_IMAGE_TYPE type, int width, int height, int bpp);
+			bpp		Bit depth of the new Bitmap. Supported pixel depth: 
+					1-, 4-, 8-, 16-, 24-, 32-bit per pixel for standard bitmap
+			*/
+			//printf("FreeImage_AllocateT(%d, %d, %d)\n", w,h,bpp);
+			mImage = FreeImage_AllocateT(FIT_BITMAP, w, h, bpp);
+		}
+	}
+
+
+	virtual bool save(const std::string& filename, const Array& arr, int compressFlags) {
 	
 		// check existing image type
-		FREE_IMAGE_FORMAT type = FreeImage_GetFIFFromFilename(filename.c_str());
+		FREE_IMAGE_FORMAT fileType = FreeImage_GetFIFFromFilename(filename.c_str());
 		
-		if(type == FIF_UNKNOWN) {
+		if(fileType == FIF_UNKNOWN) {
 			AL_WARN("image format not recognized: %s", filename.c_str());
 			return false;
 		}
-		if(!FreeImage_FIFSupportsWriting(type)) {
+		if(!FreeImage_FIFSupportsWriting(fileType)) {
 			AL_WARN("image format not supported: %s", filename.c_str());
 			return false;
 		}
-		
-		destroy();
-		
-		
-		const AlloArrayHeader& header = lat.header;
-		int w = header.dim[0];
-		int h = (header.dimcount > 1) ? header.dim[1] : 1;
+
+		const AlloArrayHeader& header = arr.header;
+		unsigned w = header.dim[0];
+		unsigned h = (header.dimcount > 1) ? header.dim[1] : 1;
 		Image::Format format = Image::getFormat(header.components);
+		int bpp = header.stride[0]*8;
+
+		resize(w,h,bpp);
+
+		if (mImage == NULL) {
+			AL_WARN("image could not be understood");
+			return false;
+		}
+
+		const int rowstride = header.stride[1];
+
+		//printf("w=%d, h=%d, bpp=%d, stride=%d\n", w,h,bpp,rowstride);
 
 		switch(format) {
-			case Image::RGB: {
+
+			case Image::LUMINANCE:
 				switch(header.type) {
 
 					case AlloUInt8Ty: {
-						int bpp = header.stride[0]; 
-						mImage = FreeImage_AllocateT(FIT_BITMAP, w, h, bpp*8);
-						char *bp = (char *)(lat.data.ptr);
-						int rowstride = header.stride[1]; 
-
-						for(unsigned j = 0; j < header.dim[1]; ++j) {
-							
-							// copy Array row to image buffer
-							/*memcpy(
+						char *bp = (char *)(arr.data.ptr);
+						for(unsigned j = 0; j < h; ++j) {
+							memcpy(
 								FreeImage_GetScanLine(mImage, j),
 								bp + j*rowstride,
-								w*3
-							);*/
+								w
+							);
+						}
+					}
+					break;
 
-							RGBTRIPLE *pix = (RGBTRIPLE *)FreeImage_GetScanLine(mImage, j);
-							Image::RGBPix<uint8_t> *o_pix = (Image::RGBPix<uint8_t> *)(bp + j*rowstride);
-							for(unsigned i=0; i < header.dim[0]; ++i) {
-								pix->rgbtRed = o_pix->r;
-								pix->rgbtGreen = o_pix->g;
-								pix->rgbtBlue = o_pix->b;
-								++pix;
-								++o_pix;
+					default:
+						AL_WARN("input Array component type not supported");
+						return false;
+				}
+			break;
+
+			// TODO: must save as RGBA
+			/*case Image::LUMALPHA:
+				switch(header.type) {
+
+					case AlloUInt8Ty: {
+						char *bp = (char *)(arr.data.ptr);
+						for(unsigned j = 0; j < h; ++j) {
+							memcpy(
+								FreeImage_GetScanLine(mImage, j),
+								bp + j*rowstride,
+								w*2
+							);
+						}
+					}
+					break;
+
+					default:
+						AL_WARN("input Array component type not supported");
+						return false;
+				}
+			break;*/
+
+			/* According to the FreeImage documentation ("Pixel access functions"): 
+			"When accessing to individual color components of a 24- or 32-bit 
+			DIB, you should always use FreeImage macros or RGBTRIPLE / RGBQUAD
+			structures in order to write OS independent code.
+			*/
+			case Image::RGB: {
+				switch(header.type) {
+
+					case AlloUInt8Ty: { //printf("FreeImageImpl: save uint8/RGB\n");
+						char *bp = (char *)(arr.data.ptr);
+
+						for(unsigned j = 0; j < h; ++j) {
+							RGBTRIPLE * dst = (RGBTRIPLE *)FreeImage_GetScanLine(mImage, j);
+							const Image::RGBPix<uint8_t> * src = (const Image::RGBPix<uint8_t> *)(bp + j*rowstride);
+							for(unsigned i=0; i < w; ++i) {
+								dst[i].rgbtRed  = src[i].r;
+								dst[i].rgbtGreen= src[i].g;
+								dst[i].rgbtBlue = src[i].b;
 							}
 						}
 					}
 					break;
 
 					default:
-						AL_WARN("input matrix type not supported");
-						break;
+						AL_WARN("input Array component type not supported");
+						return false;
 				}
 			}
 			break;
@@ -262,65 +331,61 @@ public:
 				
 				switch(header.type) {
 
-					case AlloUInt8Ty: {
-	
-						int bpp = header.stride[0]; 
-						mImage = FreeImage_AllocateT(FIT_BITMAP, w, h, bpp*8);
+					case AlloUInt8Ty: {						
+						char *bp = (char *)(arr.data.ptr);
 						
-						char *bp = (char *)(lat.data.ptr);
-						int rowstride = header.stride[1]; 
-						
-						for(unsigned j = 0; j < header.dim[1]; ++j) {
-
-							// copy Array row to image buffer
-							/*memcpy(
-								FreeImage_GetScanLine(mImage, j),
-								bp + j*rowstride,
-								w*4
-							);*/
-							
-							RGBQUAD *pix = (RGBQUAD *)FreeImage_GetScanLine(mImage, j);
-							Image::RGBAPix<uint8_t> *o_pix = (Image::RGBAPix<uint8_t> *)(bp + j*rowstride);
-							for(unsigned i=0; i < header.dim[0]; ++i) {
-								pix->rgbRed = o_pix->r;
-								pix->rgbGreen = o_pix->g;
-								pix->rgbBlue = o_pix->b;
-								pix->rgbReserved = o_pix->a;
-								++pix;
-								++o_pix;
+						for(unsigned j = 0; j < h; ++j) {
+							RGBQUAD * dst = (RGBQUAD *)FreeImage_GetScanLine(mImage, j);
+							const Image::RGBAPix<uint8_t> * src = (const Image::RGBAPix<uint8_t> *)(bp + j*rowstride);
+							for(unsigned i=0; i < w; ++i) {
+								dst[i].rgbRed     = src[i].r;
+								dst[i].rgbGreen   = src[i].g;
+								dst[i].rgbBlue    = src[i].b;
+								dst[i].rgbReserved= src[i].a;
 							}
 						}
 					}
 					break;
 
 					default:
-						AL_WARN("input matrix type not supported");
+						AL_WARN("input Array component type not supported");
 						return false;
 				}
 			}
 			break;
 
 			default: {
-				AL_WARN("input matrix format not supported");
+				AL_WARN("input Array component format not supported");
 				return false;
 			}
 		}
-		
-		
-		if (mImage == NULL) {
-			AL_WARN("image could not be understood");
-			return false;
-		}
+
 
 		int flags;
 		int compressAmt = compressFlags & 127;
+		int quality = 100-(compressAmt<=100?compressAmt:100);
 
-		switch(type){
+		switch(fileType){
+
+		case FIF_BMP:
+			flags = compressAmt >= 50 ? BMP_SAVE_RLE : BMP_DEFAULT;
+			break;
+
+		case FIF_EXR:
+			flags = compressAmt >= 50 ? EXR_DEFAULT : EXR_NONE;
+			break;
+
 		case FIF_JPEG: // default: JPEG_QUALITYGOOD|JPEG_SUBSAMPLING_420
-			if(compressAmt <= 25) flags = JPEG_QUALITYSUPERB;
+			/*if(compressAmt <= 25) flags = JPEG_QUALITYSUPERB;
 			else if(compressAmt <= 50) flags = JPEG_QUALITYGOOD;
 			else if(compressAmt <= 75) flags = JPEG_QUALITYAVERAGE;
-			else flags = JPEG_QUALITYBAD;
+			else flags = JPEG_QUALITYBAD;*/
+			flags = quality;
+			break;
+
+		case FIF_J2K:
+		case FIF_JP2:
+			flags = int(double(quality)*5.11 + 1); // convert [0,100] -> [1,512]
 			break;
 
 		case FIF_PNG: // default: PNG_Z_DEFAULT_COMPRESSION (= 6)
@@ -329,13 +394,22 @@ public:
 			else flags = PNG_Z_NO_COMPRESSION;
 			break;
 
+		case FIF_TIFF:
+			flags = compressAmt >= 50 ? TIFF_DEFAULT : TIFF_NONE;
+			break;
+
+		case FIF_TARGA:
+			flags = compressAmt >= 50 ? TARGA_SAVE_RLE : TARGA_DEFAULT;
+			break;
+
 		default:
 			flags = 0;
 		}
 
-		return FreeImage_Save(type, mImage, filename.c_str(), flags);
+		return FreeImage_Save(fileType, mImage, filename.c_str(), flags);
 	}
-	
+
+
 	void getDim(int &w, int &h) {
 		if(mImage) {
 			w = FreeImage_GetWidth(mImage);
@@ -345,13 +419,13 @@ public:
 			w = h = 0;
 		}
 	}
-	
+
 	int getPlanes() const {
 		AlloTy type = getDataType();
 		BITMAPINFOHEADER * hdr = FreeImage_GetInfoHeader(mImage);
 		return (hdr->biBitCount)/(8*allo_type_size(type));
 	}
-	
+
 	AlloTy getDataType() const {
 		FREE_IMAGE_TYPE type = FreeImage_GetImageType(mImage);
 		switch(type) {
