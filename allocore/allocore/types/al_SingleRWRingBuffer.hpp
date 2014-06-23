@@ -42,48 +42,49 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
+#include <cstring>
+
 #include "allocore/system/pstdint.h"
 
 namespace al {
 
+/** Lock free single-reader-single-writer ring buffer.
+ * Can be used to stream data safely between two threads, one being
+ * a reader, one a writer. There is no locking in this ring buffer,
+ * so it is ideal to pass data to and from a high priority thread
+ * like an audio thread.
+ */
 class SingleRWRingBuffer {
 public:
 
-	/*
-		Allocate ringbuffer. 
-		Actual size rounded up to next power of 2.
-	*/
+    /** Allocate ringbuffer.
+        Actual size rounded up to next power of 2. */
 	SingleRWRingBuffer(size_t sz=256);
 	
 	~SingleRWRingBuffer();
 
-	/* 
-		The number of bytes available for writing.  
+    /** The number of bytes available for writing.
 	*/
 	size_t writeSpace() const;
 	
 	
-	/* 
-		The number of bytes available for reading.  
+    /** The number of bytes available for reading.
 	*/
 	size_t readSpace() const;
 
 	
-	/* 
-		Copy sz bytes into the ringbuffer
-		Returns bytes actually copied
+    /** Copy sz bytes from src into the ringbuffer.
+        Returns bytes actually copied.
 	*/
 	size_t write(const char * src, size_t sz);
 	
-	/* 
-		Read data and advance the read pointer
+    /** Read sz bytes of data from the ring buffer and advance the read pointer.
 		Returns bytes actually copied
 	*/
 	size_t read(char * dst, size_t sz);
 	
-	/* 
-		Read data without advancing the read pointer
-		Returns bytes actually copied
+    /** Read data without advancing the read pointer
+        Returns bytes actually copied
 	*/
 	size_t peek(char * dst, size_t sz);
 
@@ -105,10 +106,6 @@ inline uint32_t next_power_of_two(uint32_t v){
 	return v+1;
 }
 
-/*
-	Allocate ringbuffer. 
-	Actual size rounded up to next power of 2.
-*/
 inline SingleRWRingBuffer :: SingleRWRingBuffer(size_t sz) 
 :	mSize(next_power_of_two(sz)),
 	mWrap(mSize-1),
@@ -122,9 +119,6 @@ inline SingleRWRingBuffer :: ~SingleRWRingBuffer() {
 	delete[] mData;
 }
 
-/* 
-	The number of bytes available for writing.  
-*/
 inline size_t SingleRWRingBuffer :: writeSpace() const {
 	const size_t r = mRead;
 	const size_t w = mWrite;
@@ -132,21 +126,12 @@ inline size_t SingleRWRingBuffer :: writeSpace() const {
 	return ((mSize + (r - w)) & mWrap) - 1;	
 }
 
-
-/* 
-	The number of bytes available for reading.  
-*/
 inline size_t SingleRWRingBuffer :: readSpace() const {
 	const size_t r = mRead;
 	const size_t w = mWrite;
 	return (mSize + (w - r)) & mWrap;
 }
 
-
-/* 
-	Copy sz bytes into the ringbuffer
-	Returns bytes actually copied
-*/
 inline size_t SingleRWRingBuffer :: write(const char * src, size_t sz) {
 	size_t space = writeSpace();
 	sz = sz > space ? space : sz; 
@@ -168,10 +153,6 @@ inline size_t SingleRWRingBuffer :: write(const char * src, size_t sz) {
 	return sz;
 }
 
-/* 
-	Read data and advance the read pointer
-	Returns bytes actually copied
-*/
 inline size_t SingleRWRingBuffer :: read(char * dst, size_t sz) {
 	size_t space = readSpace();
 	sz = sz > space ? space : sz; 
@@ -193,10 +174,6 @@ inline size_t SingleRWRingBuffer :: read(char * dst, size_t sz) {
 	return sz;
 }
 
-/* 
-	Read data without advancing the read pointer
-	Returns bytes actually copied
-*/
 inline size_t SingleRWRingBuffer :: peek(char * dst, size_t sz) {
 	size_t space = readSpace();
 	sz = sz > space ? space : sz; 
