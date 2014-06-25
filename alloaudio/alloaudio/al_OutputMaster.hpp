@@ -82,9 +82,25 @@ typedef enum {
     PARAMETER_COUNT,
 } parameter_t;
 
+
+/** Control of audio output. This class is designed to be used as the last class in the
+ * audio callback, after any synthesis and spatialization.
+ *
+ * It can be controlled by OSC over UDP.
+ */
 class OutputMaster : public osc::Recv
 {
     public:
+    /**
+     * @brief OutputMaster
+     * @param num_chnls number of channels that will be processed by the OutputMaster object
+     * @param sampleRate the audio sampling rate
+     * @param address the IP address to bind for receiving messages. For local address use "localhost"
+     * @param inport The port number for input
+     * @param sendAddress The IP address to which messages will be sent
+     * @param sendPort The port to which messages will be sent
+     * @param msg_timeout Time out for the socket listener (see documentation for al::osc::Recv)
+     */
     OutputMaster(int num_chnls, double sampleRate,
                  const char * address = "", int inport = 19375,
                  const char * sendAddress = "localhost", int sendPort = -1,
