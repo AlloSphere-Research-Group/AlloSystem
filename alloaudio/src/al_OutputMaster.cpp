@@ -12,6 +12,7 @@ using namespace al;
 
 OutputMaster::OutputMaster(int num_chnls, double sampleRate, const char *address, int port,
 						   const char *sendAddress, int sendPort, al_sec msg_timeout):
+	m_numChnls(num_chnls),
 	m_meterBuffer(1024 * sizeof(float)), m_framesPerSec(sampleRate),
 	osc::Recv(port, address, msg_timeout),
 	m_sendAddress(sendAddress), m_sendPort(sendPort)
@@ -19,7 +20,7 @@ OutputMaster::OutputMaster(int num_chnls, double sampleRate, const char *address
 	pthread_mutex_init(&m_paramMutex, NULL);
 	pthread_mutex_init(&m_meterMutex, NULL);
 	pthread_cond_init(&m_meterCond, NULL);
-	allocateChannels(num_chnls);
+	allocateChannels(m_numChnls);
 	initializeData();
 
 	if (port < 0) {
@@ -36,11 +37,10 @@ OutputMaster::OutputMaster(int num_chnls, double sampleRate, const char *address
 		}
 	}
 	if (m_sendPort > 0 && strlen(sendAddress) > 1) {
+		m_runMeterThread = 1;
 		m_meterThread.start(OutputMaster::meterThreadFunc, (void *) this);
 	}
 }
-
-// FIXME fix leaks  and issues when changing channel numbers (due to C pointers)
 
 OutputMaster::~OutputMaster()
 {
@@ -50,7 +50,10 @@ OutputMaster::~OutputMaster()
 		butter_free(m_hipass1[i]);
 		butter_free(m_hipass2[i]);
 	}
-	stop();
+	stop(); /* Stops OSC listener */
+	m_runMeterThread = 0;
+	pthread_cond_signal(&m_meterCond);
+	m_meterThread.join();
 	//    free(filters); //FIR filters
 }
 
@@ -89,7 +92,6 @@ void OutputMaster::setGain(int channelIndex, double gain)
 		//        printf("Alloaudio error: set_gain() for invalid channel %i", channelIndex);
 	}
 	pthread_mutex_unlock(&m_paramMutex);
-
 }
 
 void OutputMaster::setMuteAll(bool muteAll)
@@ -323,9 +325,7 @@ void OutputMaster::allocateChannels(int numChnls)
 		m_lopass2[i] = butter_create(m_framesPerSec, BUTTER_LP);
 		m_hipass1[i] = butter_create(m_framesPerSec, BUTTER_HP);
 		m_hipass2[i] = butter_create(m_framesPerSec, BUTTER_HP);
-
 	}
-	m_numChnls = numChnls;
 }
 
 void *OutputMaster::meterThreadFunc(void *arg) {
@@ -349,7 +349,6 @@ void *OutputMaster::meterThreadFunc(void *arg) {
 				//            lo_send(t, "/Alloaudio/meterdb", "if", i, 20.0 * log10(meter_levels[i]));
 				//            lo_send(t, addr, "f", 20.0 * log10(meter_levels[i]));
 				//            lo_send(t, addr, "f", meter_levels[i]);
-
 				s.send("/Alloaudio/meterdb", chanindex++,
 					   (float) (20.0 * log10(meter_levels[i])));
 				if (chanindex == om->m_numChnls) {

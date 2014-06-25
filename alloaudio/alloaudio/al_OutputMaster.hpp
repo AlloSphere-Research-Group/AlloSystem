@@ -177,7 +177,7 @@ class OutputMaster : public osc::Recv
     void processBlock(AudioIOData &io);
 
 private:
-    int m_numChnls;
+    const int m_numChnls;
 
     /* parameters */
     std::vector<double> m_gains;
@@ -188,7 +188,7 @@ private:
     bool m_meterOn;
     int m_meterUpdateSamples; /* number of samples between level updates */
 
-    bass_mgmt_mode_t m_BassManagementMode; /* -1 no management, 0 SW routing without filters, >0 cross-over freq. in Hz. */
+    bass_mgmt_mode_t m_BassManagementMode;
     int swIndex[4]; /* support for 4 SW max */
 
     MsgQueue m_parameterQueue;
@@ -205,7 +205,6 @@ private:
     pthread_mutex_t m_meterMutex;
     pthread_cond_t m_meterCond;
 
-
     /* DRC (output) filters */
 //    FIRFILTER **filters;
 
@@ -214,9 +213,6 @@ private:
 
     double m_framesPerSec; // Sample rate
 
-    void setParameter(al_sec time, parameter_t param, double value);
-    void setParameter(al_sec time, parameter_t param, bool value);
-    void setParameter(al_sec time, parameter_t param, int value1, double value2);
     int chanIsSubwoofer(int index);
     void initializeData();
     void allocateChannels(int numChnls);
