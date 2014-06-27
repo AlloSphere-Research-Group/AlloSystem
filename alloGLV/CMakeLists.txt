@@ -5,9 +5,6 @@ message("==== Configuring alloGLV")
 
 aux_source_directory(src ALLOGLV_SRC)
 
-set(ALLOGLV_LIB "alloGLV${DEBUG_SUFFIX}")
-add_library(${ALLOGLV_LIB} ${ALLOGLV_SRC})
-
 set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 
@@ -33,6 +30,9 @@ endif()
 include_directories(${ALLOCORE_DEP_INCLUDE_DIRS}
   ${GLV_INCLUDE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR})
+
+set(ALLOGLV_LIB "alloGLV${DEBUG_SUFFIX}")
+add_library(${ALLOGLV_LIB} ${ALLOGLV_SRC})
 
 target_link_libraries(${ALLOGLV_LIB} ${ALLOCORE_LIBRARIES} ${GLV_LIBRARY})
 set_target_properties(${ALLOGLV_LIB}
