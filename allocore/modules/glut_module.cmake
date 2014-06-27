@@ -20,6 +20,11 @@ list(APPEND ALLOCORE_DEP_INCLUDE_DIRS
 list(APPEND ALLOCORE_LINK_LIBRARIES
   ${GLUT_LIBRARY})
 
+if((${CMAKE_SYSTEM_NAME} MATCHES "Darwin") AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
+    # Avoids lots of compiler warnings for GLUT
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
+endif()
+
 else()
 message("NOT Building GLUT module.")
 endif(GLUT_LIBRARY)
