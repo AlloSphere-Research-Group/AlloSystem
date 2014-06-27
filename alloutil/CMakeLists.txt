@@ -82,7 +82,7 @@ if(BUILD_EXAMPLES)
       add_executable(${EXAMPLE_TARGET} ${example})
       add_dependencies(${EXAMPLE_TARGET} ${ALLOCORE_LIBRARY})
       target_link_libraries("${EXAMPLE_TARGET}" ${ALLOUTIL_LIB} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOCORE_LINK_LIBRARIES} ${GAMMA_LIBRARY} ${SNDFILE_LIBRARIES})
-      if(APPLE)
+      if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set_target_properties(${EXAMPLE_TARGET} PROPERTIES
 	  LINK_FLAGS "-pagezero_size 10000 -image_base 100000000")
       endif()

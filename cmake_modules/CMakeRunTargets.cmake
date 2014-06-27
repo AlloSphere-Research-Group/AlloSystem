@@ -19,11 +19,10 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/build/bin)
 
 add_executable(${APP_NAME} EXCLUDE_FROM_ALL ${ALLOPROJECT_APP_SRC})
 
-if(APPLE)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set_target_properties(${APP_NAME} PROPERTIES
     LINK_FLAGS "-pagezero_size 10000 -image_base 100000000")
-endif(APPLE)
-
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 if(EXISTS "${SOURCE_DIR}/flags.txt")
   file(READ "${SOURCE_DIR}/flags.txt" EXTRA_COMPILER_FLAGS)
