@@ -1,11 +1,7 @@
 #!/bin/bash
 
-
-
 # ------------------------------------------------
 # You shouldn't need to touch the stuff below
-
-CMAKE_FLAGS=""
 
 if [ $# == 0 ]
 then
@@ -34,5 +30,5 @@ else
   exit 1
 fi
 
-cmake . ${TARGET_FLAG} -DNO_EXAMPLES=1 -DRUN_IN_DEBUGGER=0 -DCMAKE_BUILD_TYPE=Release
+cmake . ${TARGET_FLAG} -DRUN_IN_DEBUGGER=0 -DCMAKE_BUILD_TYPE=Release
 make $TARGET -j4 $*
