@@ -19,11 +19,10 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/build/bin)
 
 add_executable(${APP_NAME} EXCLUDE_FROM_ALL ${ALLOPROJECT_APP_SRC})
 
-if(APPLE)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set_target_properties(${APP_NAME} PROPERTIES
     LINK_FLAGS "-pagezero_size 10000 -image_base 100000000")
-endif(APPLE)
-
+endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 if(EXISTS "${SOURCE_DIR}/flags.txt")
   file(READ "${SOURCE_DIR}/flags.txt" EXTRA_COMPILER_FLAGS)
@@ -45,8 +44,10 @@ add_dependencies(${APP_NAME} allocore${DEBUG_SUFFIX})
 message("Using allocore headers from: ${ALLOCORE_DEP_INCLUDE_DIRS}")
 
 if(BUILDING_Gamma)
-  get_target_property(GAMMA_LIBRARY Gamma LOCATION)
-  add_dependencies(${APP_NAME} Gamma)
+    get_target_property(GAMMA_LIBRARY Gamma LOCATION)
+    add_dependencies(${APP_NAME} Gamma)
+    target_link_libraries(${APP_NAME} ${GAMMA_LIBRARY})
+    include_directories(${GAMMA_INCLUDE_DIR})
 else()
   if(NOT GAMMA_FOUND)
     set(GAMMA_LIBRARY "")
@@ -56,8 +57,10 @@ else()
 endif(BUILDING_Gamma)
 
 if(BUILDING_GLV)
-  get_target_property(GLV_LIBRARY GLV LOCATION)
-  add_dependencies(${APP_NAME} GLV)
+    get_target_property(GLV_LIBRARY GLV LOCATION)
+    add_dependencies(${APP_NAME} GLV)
+    target_link_libraries(${APP_NAME} ${GLV_LIBRARY})
+    include_directories(${GLV_INCLUDE_DIR})
 else()
   if(NOT GLV_FOUND)
     set(GLV_LIBRARY "")
@@ -67,10 +70,12 @@ else()
 endif(BUILDING_GLV)
 
 if(TARGET alloutil${DEBUG_SUFFIX})
-  get_target_property(ALLOUTIL_LIBRARY alloutil${DEBUG_SUFFIX} LOCATION)
-#  get_target_property(ALLOUTIL_DEP_INCLUDE_DIR alloutil${DEBUG_SUFFIX} ALLOUTIL_DEP_INCLUDE_DIR)
-#  get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil${DEBUG_SUFFIX} ALLOUTIL_LINK_LIBRARIES)
-  add_dependencies(${APP_NAME} alloutil${DEBUG_SUFFIX})
+    get_target_property(ALLOUTIL_LIBRARY alloutil${DEBUG_SUFFIX} LOCATION)
+    get_target_property(ALLOUTIL_DEP_INCLUDE_DIR alloutil${DEBUG_SUFFIX} ALLOUTIL_DEP_INCLUDE_DIR)
+    get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil${DEBUG_SUFFIX} ALLOUTIL_LINK_LIBRARIES)
+    add_dependencies(${APP_NAME} alloutil${DEBUG_SUFFIX})
+    target_link_libraries(${APP_NAME} ${ALLOUTIL_LIBRARY} ${ALLOUTIL_LINK_LIBRARIES})
+    include_directories(${ALLOUTIL_DEP_INCLUDE_DIR})
 else()
   if(NOT ALLOUTIL_FOUND)
     set(ALLOUTIL_LIBRARY "")
@@ -80,10 +85,12 @@ else()
 endif(TARGET alloutil${DEBUG_SUFFIX})
 
 if(TARGET alloGLV${DEBUG_SUFFIX})
-  get_target_property(ALLOGLV_LIBRARY alloGLV${DEBUG_SUFFIX} LOCATION)
-  get_target_property(ALLOGLV_INCLUDE_DIR alloGLV${DEBUG_SUFFIX} ALLOGLV_INCLUDE_DIR)
-  get_target_property(ALLOGLV_LINK_LIBRARIES "alloGLV${DEBUG_SUFFIX}" ALLOGLV_LINK_LIBRARIES)
-  add_dependencies(${APP_NAME} alloGLV${DEBUG_SUFFIX})
+    get_target_property(ALLOGLV_LIBRARY alloGLV${DEBUG_SUFFIX} LOCATION)
+    get_target_property(ALLOGLV_INCLUDE_DIR alloGLV${DEBUG_SUFFIX} ALLOGLV_INCLUDE_DIR)
+    get_target_property(ALLOGLV_LINK_LIBRARIES "alloGLV${DEBUG_SUFFIX}" ALLOGLV_LINK_LIBRARIES)
+    add_dependencies(${APP_NAME} alloGLV${DEBUG_SUFFIX})
+    target_link_libraries(${APP_NAME} ${ALLOGLV_LIBRARY} ${ALLOGLV_LINK_LIBRARIES})
+    include_directories(${ALLOGLV_INCLUDE_DIR})
 else()
   if(NOT ALLOGLV_FOUND)
     set(ALLOGLV_LIBRARY "")
@@ -97,19 +104,11 @@ endif(TARGET alloGLV${DEBUG_SUFFIX})
 
 #file(GLOB ALLOPROJECT_APP_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${BUILD_APP_DIR}/*.*)
 
-include_directories(${ALLOCORE_DEP_INCLUDE_DIRS}
-  ${ALLOUTIL_DEP_INCLUDE_DIR}
-  ${ALLOGLV_INCLUDE_DIR}
-  ${GLV_INCLUDE_DIR}
-  ${ALLOVSR_INCLUDE_DIR}
-  ${GAMMA_INCLUDE_DIR} )
+include_directories(${ALLOCORE_DEP_INCLUDE_DIRS})
 #    message("Gamma : ${GAMMA_INCLUDE_DIRs}")
 target_link_libraries(${APP_NAME}
   ${ALLOCORE_LIBRARY}
-  ${ALLOUTIL_LIBRARY}
-  ${ALLOGLV_LIBRARY}
-  ${GAMMA_LIBRARY} ${GLV_LIBRARIES}
-  ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOGLV_LINK_LIBRARIES})
+  ${ALLOCORE_LINK_LIBRARIES})
 #list(REMOVE_ITEM PROJECT_RES_FILES ${ALLOPROJECT_APP_SRC})
 if(NOT RUN_IN_DEBUGGER)
 add_custom_target("${APP_NAME}_run"

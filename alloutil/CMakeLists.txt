@@ -41,16 +41,6 @@ add_library(${ALLOUTIL_LIB} ${ALLOUTIL_SRC})
 set(ALLOUTIL_LINK_LIBRARIES ${LUA_LIBRARIES} ${ALLOCORE_LIBRARY})
 set(ALLOUTIL_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${LUA_INCLUDE_DIR} ${ALLOCORE_DEP_INCLUDE_DIRS})
 
-# export properties for AlloSystem
-set_target_properties(${ALLOUTIL_LIB}
-  PROPERTIES
-  ALLOUTIL_DEP_INCLUDE_DIR "${ALLOUTIL_DIRS}"
-  )
-set_target_properties(${ALLOUTIL_LIB}
-  PROPERTIES 
-  ALLOUTIL_LINK_LIBRARIES "${ALLOUTIL_LINK_LIBRARIES}"
-  )
-
 include_directories(${ALLOUTIL_DIRS})
 target_link_libraries(${ALLOUTIL_LIB} ${ALLOUTIL_LINK_LIBRARIES})
 
@@ -61,6 +51,16 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 
 #message (STATUS "allocore_location for alloutil == ${ALLOCORE_LIBRARY}")
 
+# export properties for AlloSystem
+set_target_properties(${ALLOUTIL_LIB}
+  PROPERTIES
+  ALLOUTIL_DEP_INCLUDE_DIR "${ALLOUTIL_DIRS}"
+  )
+set_target_properties(${ALLOUTIL_LIB}
+  PROPERTIES
+  ALLOUTIL_LINK_LIBRARIES "${ALLOUTIL_LINK_LIBRARIES}"
+  )
+
 # Build Examples ------------------------------------------------------
 if(BUILD_EXAMPLES)
     find_package(LibSndFile REQUIRED QUIET)
@@ -68,7 +68,7 @@ if(BUILD_EXAMPLES)
     find_package(Gamma QUIET)
   endif(NOT TARGET Gamma)
   
-  if(NOT (GAMMA_FOUND OR GAMMA_LIBRARY))
+  if(NOT (GAMMA_FOUND OR Gamma_LIBRARY))
     message("Alloutil: Gamma not found. Not building examples." )
   else()
 
@@ -82,7 +82,7 @@ if(BUILD_EXAMPLES)
       add_executable(${EXAMPLE_TARGET} ${example})
       add_dependencies(${EXAMPLE_TARGET} ${ALLOCORE_LIBRARY})
       target_link_libraries("${EXAMPLE_TARGET}" ${ALLOUTIL_LIB} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOCORE_LINK_LIBRARIES} ${GAMMA_LIBRARY} ${SNDFILE_LIBRARIES})
-      if(APPLE)
+      if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set_target_properties(${EXAMPLE_TARGET} PROPERTIES
 	  LINK_FLAGS "-pagezero_size 10000 -image_base 100000000")
       endif()
