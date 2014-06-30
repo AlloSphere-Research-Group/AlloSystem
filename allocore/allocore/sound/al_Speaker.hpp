@@ -105,18 +105,6 @@ public:
 	const Speakers& speakers() const { return mSpeakers; }
 	Speakers& speakers(){ return mSpeakers; }
 
-    /// azimuth is anti-clockwise; both azimuth and elevation are in degrees
-    
-//	Speaker addSpeaker(float azimuth, float elevation, float distance, int deviceChannel){
-//		Speaker s;
-//		s.azimuth = azimuth;
-//		s.elevation = elevation;
-//		s.distance = distance;
-//		s.deviceChannel = deviceChannel;
-//		addSpeaker(s);
-//		return s;
-//	}
-
 	SpeakerLayout& addSpeaker(const Speaker& spkr){
 		mSpeakers.push_back(spkr);
 		return *this;

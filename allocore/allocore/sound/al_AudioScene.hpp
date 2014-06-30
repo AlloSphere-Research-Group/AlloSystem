@@ -156,6 +156,7 @@ public:
 	/// Get current pose
 	const Pose& pose() const { return mPose; }
     
+    /// Perform any necessary updates when the listener or speaker layout changes, ex. new speaker triplets for VBAP
     void compile(){
 		isCompiled = true;
 		mSpatializer->compile(*(this));
@@ -166,8 +167,7 @@ protected:
     friend class AmbisonicsSpatializer;
     
     Listener(int numFrames_, Spatializer *spatializer)
-	:	mSpatializer(spatializer), isCompiled(false)
-	{
+	:	mSpatializer(spatializer), isCompiled(false){
 		numFrames(numFrames_);
 	}
 	
@@ -188,8 +188,7 @@ protected:
 
 
 /*
-	Attenuation policy is different per source
-		(because a bee has a different attenuation characteristic than an aeroplane)
+	Attenuation policy is different per source (because a bee has a different attenuation characteristic than an aeroplane)
 		
 	Nearclip is the point at which amplitude reaches 1 (and remains at 1 within nearclip)
 	(Nearclip+ClipRange) is the point at which amplitude reaches its mimumum (zero by default)
@@ -198,14 +197,12 @@ protected:
 	Internal buffer needs to be long enough for the most distant sound:
 		samples = sampleRate * (nearClip+clipRange)/speedOfSound
 	Probably want to add to this the current buffersize plus 1.
-	
-	
 */
 class SoundSource {
 public:
-	SoundSource(double rollOff=1, double near=1, double range=50, double ampFar=0.0, int bufSize=15000)
+	SoundSource(double rollOff=1.0, double near=1, double range=100, double ampFar=0.0, int bufSize=15000)
 	:	mSound(bufSize), mRollOff(rollOff), mNearClip(near), mClipRange(range), mAmpFar(ampFar), useAtten(true), useDoppler(true)
-	{
+    {
 		// initialize the position history to be VERY FAR AWAY so that we don't deafen ourselves... 
 		mPosHistory(Vec3d(1000, 1000, 1000));
 		mPosHistory(Vec3d(1000, 1000, 1000));
@@ -226,7 +223,6 @@ public:
 	/// Get current pose
 	const Pose& pose() const { return mPose; }
 
-
 	/// Get far clipping distance
 	double farClip() const { return mNearClip+mClipRange; }
 	double ampFar() const { return mAmpFar; }
@@ -242,11 +238,13 @@ public:
 	
         if(!useAtten) return 1.0;
         
-		if (distance<mNearClip) {
-			return 1;
-		} else if (distance>(mNearClip+mClipRange)) {
+		if (distance < mNearClip) {
+			return 1.0;
+		}
+        else if (distance > (mNearClip+mClipRange)) {
 			return mAmpFar;
-		} else {
+		}
+        else {
 			// normalized distance (0..1)
 			double dN = (distance-mNearClip) / (mClipRange);
 		
@@ -256,26 +254,18 @@ public:
 			// alternative curve (hydrogen bond):
 			//curve = ((d + C) / (d*d + d + C))^2;	// e.g. C=2
 			// alternative curve (skewed sigmoid):
+            // alternative methods using rollOff
+            
 			double curve = 1-tanh(M_PI * dN*dN);
-			
 			return mAmpFar + curve*(1.-mAmpFar);
 		}
 
-//		double d = distance;
-//		if(d < nearClip()){ d=nearClip(); }
-//		else if(d > farClip()){ d=farClip(); }
-//
-//		// inverse
-//		return nearClip() / (nearClip() + rollOff() * (d - nearClip()));
-//		
-////		// exponential
-////		return pow(d / nearClip(), -rollOff());
-
 	}
 
-    //audioscene will always try to perform distance attenuation and doppler, but it may not have effect unless its enabled for the source
+    /// Enable/disable distance-based gain attenuation
     void enableAttenuation(bool enable) { useAtten = enable; }
     
+    /// Enable/disable Doppler shift
     void enableDoppler(bool enable) { useDoppler = enable; }
     
 	/// Get size of delay in samples
@@ -296,7 +286,6 @@ public:
 	int maxIndex() const { return delaySize()-2; }
 
 	/// Read sample from delay-line using linear interpolation
-	
 	/// The index specifies how many samples ago by which to read back from
 	/// the buffer. The index must be less than or equal to bufferSize()-2.
 	float readSample(double index) const {
@@ -304,16 +293,13 @@ public:
 		float a = mSound.read(index0);
 		float b = mSound.read(index0+1);
 		float frac = index - index0;
-		//return a; //no interp
         return ipl::linear(frac, a, b);
-        
-//        float a0 = mSound.read(index0 - 1);
-//        float b1 = mSound.read(index0 + 2);
-//        return ipl::cubic(frac, a0, a, b, b1);
 	}
 
 	/// Set far clipping distance
 	void farClip(double v){ mClipRange=(v-mNearClip); }
+    
+    /// Set far clipping amplitude (minimum amplitude)
 	void ampFar(double v){ mAmpFar=v; }
 
 	/// Set near clipping distance	
@@ -355,7 +341,6 @@ public:
 
 	Sources& source(){ return mSources; }
 	const Sources& source() const { return mSources; }
-
 	
 	void numFrames(int v){
 		if(mNumFrames != v){
@@ -368,6 +353,7 @@ public:
 		}
 	}
     
+    /// Create a new listener for this scene using the given spatializer
     Listener * createListener(Spatializer* spatializer) {
 		Listener * l = new Listener(mNumFrames, spatializer);
         l->compile();
@@ -383,8 +369,10 @@ public:
 		mSources.remove(&src);
 	}
     
-    void usePerSampleProcessing(bool shouldUsePerSampleProcessing)
-    {
+    /// Per sample processing is off by default.
+    /// Per sample processing is useful for smoother doppler and gain interpolation for high-speed sources
+    /// but uses much more CPU.
+    void usePerSampleProcessing(bool shouldUsePerSampleProcessing){
         perSampleProcessing = shouldUsePerSampleProcessing;
     }
     
@@ -427,12 +415,8 @@ public:
                 else
                     distanceToSample = 0;
 				
-                if(perSampleProcessing)
+                if(perSampleProcessing) //Original, inefficient, per sample processing
                 {
-                    //*//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    //!! Original, inefficient, per sample processing, should possibily move this interpolation into the spatializers
-                    //!! Should interpolate distance as well
-                    
                     // iterate time samples
                     for(int i=0; i<numFrames; ++i){
                         
@@ -474,11 +458,9 @@ public:
                         } // end if in range
 
                     } //end for each frame
-                    //!! END old per frame processing
-                    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//*/
                 } //end per sample processing
                 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                else //standard, more efficient, per buffer processing
+                else //more efficient, per buffer processing
                 {                
                     Vec3d relpos = src.pose().pos();
                     double distance = relpos.mag();
@@ -513,33 +495,6 @@ protected:
     
 	int mNumFrames;			// audio frames per block
 	double mSpeedOfSound;	// distance per second
-	
-	// how slowly amplitude decays away from mNearClip. 
-	// 1-> 50% at farclip, 10 -> 10% at farclip, 100 -> 1% at farclip, 1000 -> 0.1%  
-	// (if mKneeSmoothness is near zero; as d increases, amplitude at farclip increases slightly
-	//double mRollOff;	
-	
-	// how much the curve approximates 1/(1+x)
-	// 0 -> (1/1+x), 1 -> (1+1)/(x^2+x+1); typical might be 0.2 - 100 
-	// (increasing mRollOff allows us to increase mKneeSmoothness)
-	double mKneeSmoothness;
-	
-	// how sharply amplitude curves to zero near mFarClip.
-	// 0 -> no fadeout, 1 is already quite a strong fadeout, default 0.01
-	double mFarFadeOut;		
-	
-	// approx to (1/(1+x)):
-	// x = distance-mNearClip
-	// f = mFarClip-mNearClip
-	// n = x/f (normalized distance)
-	// g = mRollOff
-	// d = mKneeSmoothness
-	// h = gn
-	// y = (h+d)/(h^2+h+d)
-	
-	// rolloff scalar:
-	// c = mFarFadeOut
-	// y *= 1-(cn)/(c+1+n)
 };
 
 
@@ -619,8 +574,6 @@ struct AmbiSource{
 		}		
 	}
 */
-
-
 
 
 } // al::

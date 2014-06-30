@@ -65,17 +65,11 @@ public:
 				*buf++ += gain* *samps++;
 		}
 	}
-	
-	
-	//    for(int c = 0; c < io.channelsOut(); c++)
-	//    {
-	//        float *buf = io.outBuffer(c);
-	//        float *subbuf = subBuffer;
-	//        for(int i = 0; i < io.framesPerBuffer(); i++)
-	//        {
-	//			*buf++ = MASTER_GAIN* *subbuf++;
-	//        }
-	//    }
+    
+    /// Spread is an exponent determining the ampltude spread to nearby speakers.
+    /// Values below 1.0 will widen the sound field to more speakers.
+    /// Values greater than 1 will focus the sound field to fewer speakers.
+    void setSpread(float _spread) { spread = _spread; }
 	
 private:
 	Listener* mListener;
@@ -86,7 +80,6 @@ private:
 };
 	
 	
-
 } // al::
 
 #endif
