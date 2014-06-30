@@ -2,8 +2,6 @@ set(BUILD_ZEROCONF 1)
 
 
 if(BUILD_ZEROCONF)
-message("Building Zerconf module.")
-
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   list(APPEND ALLOCORE_SRC
