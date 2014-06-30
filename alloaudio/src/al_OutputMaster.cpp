@@ -17,7 +17,6 @@ OutputMaster::OutputMaster(int num_chnls, double sampleRate, const char *address
 	osc::Recv(port, address, msg_timeout),
 	m_sendAddress(sendAddress), m_sendPort(sendPort)
 {
-	pthread_mutex_init(&m_paramMutex, NULL);
 	pthread_mutex_init(&m_meterMutex, NULL);
 	pthread_cond_init(&m_meterCond, NULL);
 	allocateChannels(m_numChnls);
@@ -75,46 +74,34 @@ void OutputMaster::setFilters(double **irs, int filter_len)
 	//    filtersActive = true;
 }
 
-// FIXME adjust parameter passing model. Should only block when passing the filter irs
 void OutputMaster::setMasterGain(double gain)
 {
-	pthread_mutex_lock(&m_paramMutex);
 	m_masterGain = gain;
-	pthread_mutex_unlock(&m_paramMutex);
 }
 
 void OutputMaster::setGain(int channelIndex, double gain)
 {
-	pthread_mutex_lock(&m_paramMutex);
 	if (channelIndex >= 0 && channelIndex < m_numChnls) {
 		m_gains[channelIndex] = gain;
 	} else {
 		//        printf("Alloaudio error: set_gain() for invalid channel %i", channelIndex);
 	}
-	pthread_mutex_unlock(&m_paramMutex);
 }
 
 void OutputMaster::setMuteAll(bool muteAll)
 {
-	pthread_mutex_lock(&m_paramMutex);
 	m_muteAll = muteAll;
-	pthread_mutex_unlock(&m_paramMutex);
 
 }
 
 void OutputMaster::setClipperOn(bool clipperOn)
 {
-	pthread_mutex_lock(&m_paramMutex);
 	m_clipperOn = clipperOn;
-	pthread_mutex_unlock(&m_paramMutex);
 }
 
 void OutputMaster::setRoomCompensationOn(bool on)
 {
-	pthread_mutex_lock(&m_paramMutex);
 	m_filtersActive = on;
-	pthread_mutex_unlock(&m_paramMutex);
-
 }
 
 void OutputMaster::setMeterUpdateFreq(double freq)
@@ -126,40 +113,31 @@ void OutputMaster::setBassManagementFreq(double frequency)
 {
 	int i;
 	if (frequency > 0) {
-		pthread_mutex_lock(&m_paramMutex);
 		for (i = 0; i < m_numChnls; i++) {
 			butter_set_fc(m_lopass1[i], frequency);
 			butter_set_fc(m_lopass2[i], frequency);
 			butter_set_fc(m_hipass1[i], frequency);
 			butter_set_fc(m_hipass2[i], frequency);
 		}
-		pthread_mutex_unlock(&m_paramMutex);
 	}
 }
 
 void OutputMaster::setBassManagementMode(bass_mgmt_mode_t mode)
 {
-	pthread_mutex_lock(&m_paramMutex);
 	m_BassManagementMode = mode;
-	pthread_mutex_unlock(&m_paramMutex);
 }
 
 void OutputMaster::setSwIndeces(int i1, int i2, int i3, int i4)
 {
-	pthread_mutex_lock(&m_paramMutex);
 	swIndex[0] = i1;
 	swIndex[1] = i1;
 	swIndex[2] = i1;
 	swIndex[3] = i1;
-	pthread_mutex_unlock(&m_paramMutex);
 }
 
 void OutputMaster::setMeterOn(bool meterOn)
 {
-	pthread_mutex_lock(&m_paramMutex);
 	m_meterOn = meterOn;
-	pthread_mutex_unlock(&m_paramMutex);
-
 }
 
 int OutputMaster::getMeterValues(float *values)
@@ -182,6 +160,7 @@ void OutputMaster::processBlock(AudioIOData &io)
 	double in_buf[nframes];
 	double master_gain;
 
+	m_parameterQueue.update(0);
 	master_gain = m_masterGain * (m_muteAll ? 0.0 : 1.0);
 	memset(bass_buf, 0, nframes * sizeof(double));
 	for (chan = 0; chan < m_numChnls; chan++) {
@@ -282,6 +261,36 @@ void OutputMaster::processBlock(AudioIOData &io)
 	}
 }
 
+void OutputMaster::setGainTimestamped(al_sec until, int channelIndex, double gain)
+{
+	setGain(channelIndex, gain);
+}
+
+void OutputMaster::setMasterGainTimestamped(al_sec until, double gain)
+{
+	setMasterGain(gain);
+}
+
+void OutputMaster::setClipperOnTimestamped(al_sec until, bool on)
+{
+	setClipperOn(on);
+}
+
+void OutputMaster::setMuteAllTimestamped(al_sec until, bool on)
+{
+	setMuteAll(on);
+}
+
+void OutputMaster::setMeterOnTimestamped(al_sec until, bool on)
+{
+	setMeterOn(on);
+}
+
+void OutputMaster::setMeterupdateFreqTimestamped(al_sec until, double freq)
+{
+	setMeterUpdateFreq(freq);
+}
+
 int OutputMaster::chanIsSubwoofer(int index)
 {
 	int i;
@@ -361,7 +370,6 @@ void *OutputMaster::meterThreadFunc(void *arg) {
 	return NULL;
 }
 
-// FIXME: Make this thread safe!
 void OutputMaster::OSCHandler::onMessage(osc::Message &m)
 {
 	if (m.addressPattern() == "/Alloaudio/gain") {
@@ -369,7 +377,10 @@ void OutputMaster::OSCHandler::onMessage(osc::Message &m)
 			int chan;
 			float gain;
 			m >> chan >> gain;
-			outputmaster->setGain(chan, gain);
+			outputmaster->m_parameterQueue.send(outputmaster->m_parameterQueue.now(),
+												outputmaster,
+												&OutputMaster::setGainTimestamped,
+												chan, (double) gain);
 		} else {
 			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/gain message: "
 					  << m.typeTags() << std::endl;
@@ -378,7 +389,10 @@ void OutputMaster::OSCHandler::onMessage(osc::Message &m)
 		if (m.typeTags() == "f") {
 			float gain;
 			m >> gain;
-			outputmaster->setMasterGain(gain);
+			outputmaster->m_parameterQueue.send(outputmaster->m_parameterQueue.now(),
+												outputmaster,
+												&OutputMaster::setMasterGainTimestamped,
+												(double) gain);
 		} else {
 			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/global_gain message: "
 					  << m.typeTags() << std::endl;
@@ -387,7 +401,10 @@ void OutputMaster::OSCHandler::onMessage(osc::Message &m)
 		if (m.typeTags() == "i") {
 			int clipper_on;
 			m >> clipper_on;
-			outputmaster->setClipperOn(clipper_on != 0);
+			outputmaster->m_parameterQueue.send(outputmaster->m_parameterQueue.now(),
+												outputmaster,
+												&OutputMaster::setClipperOnTimestamped,
+												(bool) clipper_on != 0);
 		} else {
 			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/clipper_on: "
 					  << m.typeTags() << std::endl;
@@ -396,7 +413,9 @@ void OutputMaster::OSCHandler::onMessage(osc::Message &m)
 		if (m.typeTags() == "i") {
 			int mute_all;
 			m >> mute_all;
-			outputmaster->setMuteAll(mute_all != 0);
+			outputmaster->m_parameterQueue.send(outputmaster->m_parameterQueue.now(),
+												outputmaster, &OutputMaster::setMuteAllTimestamped,
+												(bool) mute_all != 0);
 		} else {
 			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/mute_all: "
 					  << m.typeTags() << std::endl;
@@ -405,7 +424,9 @@ void OutputMaster::OSCHandler::onMessage(osc::Message &m)
 		if (m.typeTags() == "i") {
 			int on;
 			m >> on;
-			outputmaster->setMeterOn(on != 0);
+			outputmaster->m_parameterQueue.send(outputmaster->m_parameterQueue.now(),
+												outputmaster, &OutputMaster::setMeterOnTimestamped,
+												(bool) on != 0);
 		} else {
 			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/meter_update_freq: "
 					 << m.typeTags() << std::endl;
@@ -414,7 +435,9 @@ void OutputMaster::OSCHandler::onMessage(osc::Message &m)
 		if (m.typeTags() == "f") {
 			float freq;
 			m >> freq;
-			outputmaster->setMeterUpdateFreq(freq);
+			outputmaster->m_parameterQueue.send(outputmaster->m_parameterQueue.now(),
+												outputmaster, &OutputMaster::setMeterupdateFreqTimestamped,
+												(double) freq);
 		} else {
 			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/meter_update_freq: "
 					 << m.typeTags() << std::endl;

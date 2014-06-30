@@ -176,6 +176,14 @@ class OutputMaster : public osc::Recv
      */
     void processBlock(AudioIOData &io);
 
+    void setGainTimestamped(al_sec until,
+                              int channelIndex, double gain);
+    void setMasterGainTimestamped(al_sec until, double gain);
+    void setClipperOnTimestamped(al_sec until, bool on);
+    void setMuteAllTimestamped(al_sec until, bool on);
+    void setMeterOnTimestamped(al_sec until, bool on);
+    void setMeterupdateFreqTimestamped(al_sec until, double freq);
+
 private:
     const int m_numChnls;
 
@@ -192,7 +200,6 @@ private:
     int swIndex[4]; /* support for 4 SW max */
 
     MsgQueue m_parameterQueue;
-    pthread_mutex_t m_paramMutex;
 
     /* output data */
     std::vector<float> m_meters;
