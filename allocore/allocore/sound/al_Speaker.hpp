@@ -78,6 +78,9 @@ struct Speaker {
 	}
 	
     Vec3d vec(){
+        
+        //TODO doxygen style commenting on coordinates like ambisonics
+        
 		double cosel = cos(toRad(elevation));
 //		double x = sin(toRad(azimuth)) * cosel * radius;
 //		double y = cos(toRad(azimuth)) * cosel * radius;

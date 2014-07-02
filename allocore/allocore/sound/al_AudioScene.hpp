@@ -236,6 +236,8 @@ public:
 	/// Returns attentuation factor based on distance to listener
 	double attenuation(double distance) const {
 	
+        //TODO make enum for curves, make virtual
+        
         if(!useAtten) return 1.0;
         
 		if (distance < mNearClip) {

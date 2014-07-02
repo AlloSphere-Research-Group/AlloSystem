@@ -458,11 +458,6 @@ public:
     
     }
     
-    void dump()
-    {
-        
-    }
-    
 private:
     AmbiDecode mDecoder;
     AmbiEncode mEncoder;
