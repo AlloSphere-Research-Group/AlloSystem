@@ -107,8 +107,6 @@ class OutputMaster : public osc::Recv
                  al_sec msg_timeout = 0);
     ~OutputMaster();
 
-    void setFilters(double **irs, int filter_len);
-
     /** Set master output gain. This gain is applied after individual channel gains, and
      * determines the value at which signals are clipped if the clipper is set with
      * setClipperOn()
@@ -131,8 +129,6 @@ class OutputMaster : public osc::Recv
      * to avoid loud surprises.
      */
     void setClipperOn(bool clipperOn);
-
-    void setRoomCompensationOn(bool on);
 
     /** Set the frequency at which peak meter data is updated. During the update period,
      * a single value (maximum sample peak) is stored, and will only be avialable once
@@ -177,7 +173,7 @@ class OutputMaster : public osc::Recv
     void processBlock(AudioIOData &io);
 
     void setGainTimestamped(al_sec until,
-                              int channelIndex, double gain);
+                            int channelIndex, double gain);
     void setMasterGainTimestamped(al_sec until, double gain);
     void setClipperOnTimestamped(al_sec until, bool on);
     void setMuteAllTimestamped(al_sec until, bool on);
@@ -192,7 +188,6 @@ private:
     bool m_muteAll; // 0=no 1=yes
     double m_masterGain;
     bool m_clipperOn;
-    bool m_filtersActive;
     bool m_meterOn;
     int m_meterUpdateSamples; /* number of samples between level updates */
 
@@ -211,9 +206,6 @@ private:
     al::Thread m_meterThread;
     pthread_mutex_t m_meterMutex;
     pthread_cond_t m_meterCond;
-
-    /* DRC (output) filters */
-//    FIRFILTER **filters;
 
     /* bass management filters */
     std::vector<BUTTER *> m_lopass1, m_lopass2, m_hipass1, m_hipass2;

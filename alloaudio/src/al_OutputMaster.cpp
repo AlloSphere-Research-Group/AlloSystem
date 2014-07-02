@@ -53,26 +53,8 @@ OutputMaster::~OutputMaster()
 	m_runMeterThread = 0;
 	pthread_cond_signal(&m_meterCond);
 	m_meterThread.join();
-	//    free(filters); //FIR filters
 }
 
-void OutputMaster::setFilters(double **irs, int filter_len)
-{
-	if (!irs) { /* if NULL, leave filtering off */
-		m_filtersActive = false;
-		return;
-	}
-	for (int i = 0; i < m_numChnls; i++) {
-		//        FIRFILTER *new_filter = firfilter_create(irs[i], filter_len);
-		//        FIRFILTER *old_filter = pp->filters[i];
-		//        pp->filters[i] = new_filter;
-		//        if (old_filter) {
-		//            firfilter_free(old_filter);
-		//        }
-	}
-
-	//    filtersActive = true;
-}
 
 void OutputMaster::setMasterGain(double gain)
 {
@@ -91,17 +73,11 @@ void OutputMaster::setGain(int channelIndex, double gain)
 void OutputMaster::setMuteAll(bool muteAll)
 {
 	m_muteAll = muteAll;
-
 }
 
 void OutputMaster::setClipperOn(bool clipperOn)
 {
 	m_clipperOn = clipperOn;
-}
-
-void OutputMaster::setRoomCompensationOn(bool on)
-{
-	m_filtersActive = on;
 }
 
 void OutputMaster::setMeterUpdateFreq(double freq)
@@ -210,24 +186,12 @@ void OutputMaster::processBlock(AudioIOData &io)
 		for (i = 0; i < nframes; i++) { /* accumulate SW signal */
 			*buf++ += filt_low[i];
 		}
-		if (m_filtersActive
-				&& m_BassManagementMode == BASSMODE_NONE && !chanIsSubwoofer(chan)) { /* apply DRC filters */
-			//            firfilter_next(pp->filters[chan],in_buf, filt_out, nframes, gain);
-			//            for (i = 0; i < nframes; i++) {
-			//                *out = filt_out[i];
-			//                if (pp->clipper_on && *out > master_gain) {
-			//                    *out = master_gain;
-			//                }
-			//                out++;
-			//            }
-		} else { /* No DRC filters, just apply gain */
-			for (i = 0; i < nframes; i++) {
-				*out = in_buf[i] * gain;
-				if (m_clipperOn && *out > master_gain) {
-					*out = master_gain;
-				}
-				out++;
+		for (i = 0; i < nframes; i++) {
+			*out = in_buf[i] * gain;
+			if (m_clipperOn && *out > master_gain) {
+				*out = master_gain;
 			}
+			out++;
 		}
 	}
 	if (m_BassManagementMode != BASSMODE_NONE) {
@@ -305,7 +269,6 @@ void OutputMaster::initializeData()
 	m_masterGain = 0.0;
 	m_muteAll = false;
 	m_clipperOn = true;
-	m_filtersActive = false;
 
 	m_meterCounter = 0;
 	m_meterOn = false;
@@ -319,7 +282,6 @@ void OutputMaster::allocateChannels(int numChnls)
 {
 	m_gains.resize(numChnls);
 	m_meters.resize(numChnls);
-	//    filters = (FIRFILTER **) calloc(numChnls, sizeof(FIRFILTER *));
 	m_lopass1.resize(numChnls);
 	m_lopass2.resize(numChnls);
 	m_hipass1.resize(numChnls);
