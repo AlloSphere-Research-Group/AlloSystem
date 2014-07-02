@@ -102,7 +102,7 @@ set(TEST_ARGS "")
 if(CUNIT_LIBRARY)
     ENABLE_TESTING()
 
-    add_executable(alloaudioTests tests/alloaudioTests.cpp)
+    add_executable(alloaudioTests unitTests/alloaudioTests.cpp)
     target_link_libraries(alloaudioTests ${ALLOAUDIO_LIB} ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${CUNIT_LIBRARY})
     add_test(NAME alloaudioTests
             COMMAND $<TARGET_FILE:alloaudioTests> ${TEST_ARGS})
