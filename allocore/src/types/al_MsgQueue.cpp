@@ -9,10 +9,10 @@ namespace al{
 
 MsgQueue :: MsgQueue(int size, malloc_func mfunc, free_func ffunc) 
 :	mHead(NULL), mTail(NULL), mPool(NULL),
-	mLen(0), mChunkSize(size), mNow(0), 
+	mLen(0), mNow(0),
 	mMalloc(mfunc ? mfunc : malloc), mFree(ffunc ? ffunc : free)
 {
-	growPool();
+	growPool(size);
 }
 
 MsgQueue :: ~MsgQueue() {
@@ -24,14 +24,13 @@ MsgQueue :: ~MsgQueue() {
 	}
 	while (mPool) {
 		m = mPool->next;
-		mFree(m);
+		mFree(mPool);
 		mPool = m;
 	}
 }
 
-void MsgQueue :: growPool() {
+void MsgQueue :: growPool(int size) {
 	assert(!mPool); // LJP
-	int size = mChunkSize;
 	mPool = (Msg *)mMalloc(sizeof(Msg));
 	Msg * m = mPool;
 	while (size--) {
@@ -55,9 +54,8 @@ void MsgQueue :: recycle(Msg * m) {
 
 /* schedule a new message */
 void MsgQueue :: sched(al_sec at, msg_func func, char * data, size_t size) {
-
+	assert(mPool);
 	// get a message-holder from the pool:
-	if (mPool == NULL) growPool();
 	Msg * m = mPool;
 	mPool= m->next;
 	

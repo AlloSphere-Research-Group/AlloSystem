@@ -135,6 +135,16 @@ public:
 	unsigned height() const { return array().height(); }
 
 
+	/// Get compression flags for saving
+	int compression() const { return mCompression; }
+
+	/// Set compression flags for saving
+
+	/// The flags consist of a bitwise-or of the level of compression in [0,100]
+	/// and other flags which may be specific to the image format.
+	Image& compression(int flags){ mCompression=flags; return *this; }
+
+
 	/// Write a pixel to an Image
 
 	/// Warning: doesn't check that Pix has matching type/component count
@@ -151,8 +161,9 @@ public:
 	/// @param[in] nx			number of pixels along the x dimension
 	/// @param[in] ny			number of pixels along the y dimension
 	/// @param[in] fmt			pixel format
+	/// @param[in] compressionFlags level of compression in [0,100] and other flags
 	template <class T>
-	static bool write(const std::string& filePath, const T * pixels, int nx, int ny, Format fmt);
+	static bool write(const std::string& filePath, const T * pixels, int nx, int ny, Format fmt, int compressFlags=50);
 
 	/// Read a pixel from an Image
 
@@ -185,13 +196,14 @@ public:
 	public:
 		virtual ~Impl() {};
 		virtual bool load(const std::string& filename, Array& lat) = 0;
-		virtual bool save(const std::string& filename, const Array& lat) = 0;
+		virtual bool save(const std::string& filename, const Array& lat, int compressFlags) = 0;
 	};
 
 protected:
 	Array mArray;			// pixel data
 	Impl * mImpl;			// library implementation
 	std::string mFilename;
+	int mCompression;
 	bool mLoaded;			// true after image data is loaded
 };
 
@@ -211,7 +223,9 @@ inline int Image::components(Format v){
 }
 
 template <class T>
-bool Image::write(const std::string& filePath, const T * pixels, int nx, int ny, Format fmt){
+bool Image::write(
+	const std::string& filePath, const T * pixels, int nx, int ny, Format fmt, int compress
+){
 	Image img;
 	Array& a = img.array();
 	a.data.ptr			= (char *)const_cast<T *>(pixels);
@@ -219,6 +233,7 @@ bool Image::write(const std::string& filePath, const T * pixels, int nx, int ny,
 	a.header.components	= Image::components(fmt);
 	allo_array_setdim2d(&a.header, nx, ny);
 	allo_array_setstride(&a.header, 1);
+	img.compression(compress);
 	bool res = img.save(filePath);
 	a.data.ptr = NULL; // prevent ~Array from deleting data
 	return res;

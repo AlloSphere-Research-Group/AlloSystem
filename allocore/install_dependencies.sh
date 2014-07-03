@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/bin/sh
+
 # AlloCore dependencies install script
 
 if [ `which apt-get 2>/dev/null` ]; then
