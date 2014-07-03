@@ -289,6 +289,14 @@ inline void swapBytesN<2>(void * word){
 }
 
 template<>
+inline void swapBytesN<3>(void * word){
+	uint8_t * v = (uint8_t *)word;
+	v[0] ^= v[2];
+	v[2] ^= v[0];
+	v[0] ^= v[2];
+}
+
+template<>
 inline void swapBytesN<4>(void * word){
 	uint32_t& v = *(uint32_t *)word;
 	v	= ((v >> 24))
