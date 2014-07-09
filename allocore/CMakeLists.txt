@@ -148,15 +148,16 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 add_library(${ALLOCORE_LIB} ${ALLOCORE_SRC} ${ALLOCORE_HEADERS})
 
 # Copy headers to build directory
-add_custom_target(copy_headers)
-foreach(header ${ALLOCORE_HEADERS})
-    add_custom_command(TARGET copy_headers PRE_BUILD
-                      COMMAND ${CMAKE_COMMAND} -E
+if(NOT IS_DIRECTORY "${CMAKE_SOURCE_DIR}/build/include/")
+    message("Copying headers to: ${CMAKE_SOURCE_DIR}/build/include/")
+    foreach(header ${ALLOCORE_HEADERS})
+        execute_process(COMMAND ${CMAKE_COMMAND} -E
                         copy ${header} ${CMAKE_SOURCE_DIR}/build/include/${header}
-                      WORKING_DIRECTORY  ${CMAKE_CURRENT_SOURCE_DIR})
-#    message("Copying header: ${header}")
-endforeach()
-add_dependencies(${ALLOCORE_LIB} copy_headers)
+                        WORKING_DIRECTORY  ${CMAKE_CURRENT_SOURCE_DIR})
+    endforeach()
+else()
+    message("Not copying headers. If dependencies have changed, please run the ./distclean script.")
+endif()
 
 # Export include directories and libraries for use when building AlloSystem or AlloProject
 set_target_properties(${ALLOCORE_LIB}
