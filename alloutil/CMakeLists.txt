@@ -29,6 +29,13 @@ if(NOT LUA_FOUND)
   return()
 endif(NOT LUA_FOUND)
 
+find_path(ALLOCORE_HEADER allocore/graphics/al_Image.hpp ${CMAKE_SOURCE_DIR}/build/include)
+
+if(NOT ALLOCORE_HEADER)
+    message("Allocore not built with freeimage support. Can't build Alloutil.")
+    return()
+endif(NOT ALLOCORE_HEADER)
+
 get_target_property(ALLOCORE_LIBRARY allocore${DEBUG_SUFFIX} LOCATION)
 get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore${DEBUG_SUFFIX} ALLOCORE_DEP_INCLUDE_DIRS)
 get_target_property(ALLOCORE_LINK_LIBRARIES allocore${DEBUG_SUFFIX} ALLOCORE_LINK_LIBRARIES)

@@ -21,7 +21,17 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif()
 
 list(APPEND ALLOCORE_SRC
-  src/io/al_AudioIO.cpp
+      src/io/al_AudioIO.cpp
+      src/sound/al_Ambisonics.cpp
+)
+
+list(APPEND ALLOCORE_HEADERS
+    allocore/io/al_AudioIO.hpp
+    allocore/sound/al_Ambisonics.hpp
+    allocore/sound/al_AudioScene.hpp
+    allocore/sound/al_Crossover.hpp
+    allocore/sound/al_Reverb.hpp
+    allocore/sound/al_Speaker.hpp
 )
 
 list(APPEND ALLOCORE_DEP_INCLUDE_DIRS
