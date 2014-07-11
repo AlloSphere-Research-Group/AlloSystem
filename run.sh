@@ -20,7 +20,13 @@ fi
 
 FILENAME=$(basename "$1")
 DIRNAME=$(dirname "$1")
-FILENAME="${DIRNAME//./_}_${FILENAME%.*}"
+
+if [ ${DIRNAME} == "." ]
+then
+  FILENAME="${FILENAME%.*}"
+else
+  FILENAME="${DIRNAME//./_}_${FILENAME%.*}"
+fi
 
 #echo FILENAME: ${FILENAME}
 TARGET=${FILENAME//\//_}_run
@@ -40,4 +46,4 @@ else
 fi
 
 cmake . ${CMAKE_FLAGS} ${TARGET_FLAG} -DNO_EXAMPLES=1 -DRUN_IN_DEBUGGER=0 -DCMAKE_BUILD_TYPE=Release
-make $TARGET -j4 $*
+make $TARGET -j7 $*

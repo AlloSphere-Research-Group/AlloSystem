@@ -1,6 +1,7 @@
 
 
 if(BUILD_DIR)
+  string(REGEX REPLACE "/+$" "" BUILD_APP_DIR "${BUILD_APP_DIR}") # remove trailing slash
   file(GLOB ALLOPROJECT_APP_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${BUILD_APP_DIR}/*.cpp)
   string(REPLACE "/" "_" APP_NAME ${BUILD_APP_DIR})
   string(REGEX REPLACE "_+$" "" APP_NAME "${APP_NAME}")
