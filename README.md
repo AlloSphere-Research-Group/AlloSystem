@@ -49,7 +49,7 @@ Allosystem depends on:
  * GLEW
  * GLUT
  * Libsndfile
- 
+
  Optionally on:
  * luajit (for alloutil)
  * GLV (for alloGLV)
@@ -71,7 +71,7 @@ This will download and install all the AlloCore dependencies using apt-get, MacP
 2.2 Building Allosystem (Using Make on Linux, OS X and MSYS on Windows)
 ----------------------------------------
 
-You need to use cmake to configure the build for your system. You can build Allocore like this: 
+You need to use cmake to configure the build for your system. You can build Allocore like this:
 
 	./distclean
 	cmake .
@@ -90,11 +90,11 @@ To produce a debug build:
 	./distclean
 	cmake . -DCMAKE_BUILD_TYPE=Debug
 	make
-	
+
 To enable a full build including alloGLV and allovsr, put the GLV and vsr sources next to the AlloSystem sources, and inside the AlloSystem folder do:
 
     cmake . -DBUILD_EVERYTHING=1
-	
+
 This will build GLV, vsr and all the allo modules if the rest of the dependencies are present.
 
 Other useful configuration variables are:
@@ -127,7 +127,7 @@ Coming soon...
 
 Allosystem offers an easy way to try out examples and build simple projects without having to write makefiles or configure IDE projects. Any .cpp file placed within the AlloSystem sources can be built into an application with a line like:
 
-    ./run.sh allocore/examples/graphics/shaderSprites.cpp 
+    ./run.sh allocore/examples/graphics/shaderSprites.cpp
 
 This will also build any required dependencies and run cmake if needed.
 
@@ -135,7 +135,7 @@ You can also pass a directory, and all the source files in that directory will b
 
 You can make a debug build of the libraries and the application by running:
 
-    ./debug.sh allocore/examples/graphics/shaderSprites.cpp 
+    ./debug.sh allocore/examples/graphics/shaderSprites.cpp
 
 This will run the file in the debugger, so if the application crashes, it will drop you to the debugger shell. If you need to specify a particular debugger instead of the default gdb, adjust the debug.sh script.
 
@@ -161,35 +161,4 @@ You can uninstall with:
 License
 ======
 
-Copyright (C) 2009-2013. AlloSphere Research Group, Media Arts & Technology, UCSB.
-
-Copyright (C) 2009-2013. The Regents of the University of California.
-
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-Redistributions of source code must retain the above copyright notice,
-this list of conditions and the following disclaimer.
-
-Redistributions in binary form must reproduce the above copyright
-notice, this list of conditions and the following disclaimer in the
-documentation and/or other materials provided with the distribution.
-
-Neither the name of the University of California nor the names of its
-contributors may be used to endorse or promote products derived from
-this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-POSSIBILITY OF SUCH DAMAGE.
-
+This project is licensed under the terms of the 3-clause BSD license.
