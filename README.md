@@ -34,6 +34,7 @@ The build folder (typically ./build/) is organized using a Unix-style hierarchy 
 2. Compilation Instructions
 ========================================
 
+*Note:* You can skip this section if you are just planning on running applications and projects. See section 3 below.
 
 2.1 Installing Dependencies
 ----------------------------------------
@@ -64,6 +65,8 @@ This will download and install all the AlloCore dependencies using apt-get, MacP
 
 2.2 Building AlloSystem libraries (Using Make on Linux, OS X and MSYS on Windows)
 ----------------------------------------
+
+You need to use cmake to configure the build for your system. You can build Allocore like this:
 
 An alternative to building the AlloSystem libraries is using the application building and running facilties provided by the *run.sh* and *debug.sh* scripts, see below.
 
@@ -108,7 +111,7 @@ Coming soon...
 
 Allosystem offers an easy way to try out examples and build simple projects without having to write makefiles or configure IDE projects. Any .cpp file placed within the AlloSystem sources can be built into an application with a line like:
 
-    ./run.sh allocore/examples/graphics/shaderSprites.cpp 
+    ./run.sh allocore/examples/graphics/shaderSprites.cpp
 
 This will also build any required dependencies and run cmake if needed.
 
@@ -116,7 +119,7 @@ You can also pass a directory instead of a filename, and all the source files in
 
 You can make a debug build of the libraries and the application by running:
 
-    ./debug.sh allocore/examples/graphics/shaderSprites.cpp 
+    ./debug.sh allocore/examples/graphics/shaderSprites.cpp
 
 This will run the file in the debugger, so if the application crashes, it will drop you to the debugger shell. If you need to specify a particular debugger instead of the default gdb, adjust the *debug.sh* script.
 
@@ -141,6 +144,7 @@ You can uninstall with:
 
 License
 ======
+This project is licensed under the terms of the 3-clause BSD license.
 
 Copyright (C) 2009-2014. AlloSphere Research Group, Media Arts & Technology, UCSB.
 
