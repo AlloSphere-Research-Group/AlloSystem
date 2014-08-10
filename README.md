@@ -38,10 +38,9 @@ The build folder (typically ./build/) is organized using a Unix-style hierarchy 
 
 2.1 Installing Dependencies
 ----------------------------------------
+The only mandatory dependency for AlloSystem is Cmake, which is the build system used.
 
-Allosystem depends on:
-
- * Cmake
+Other optional dependencies are:
  * APR
  * Assimp (v.2 or v.3 supported)
  * Freeimage
@@ -49,29 +48,29 @@ Allosystem depends on:
  * GLEW
  * GLUT
  * Libsndfile
-
- Optionally on:
  * luajit (for alloutil)
  * GLV (for alloGLV)
  * vsr (for allovsr)
 
-You may not need all these dependencies if you plan to build only part of Allosystem.
+You may not need all these dependencies if you plan to build only part of Allosystem. The build system will try to find the dependencies available and build as much functionality as possible. However, if some dependencies are not available in your system, you won't have all functionality available and building some examples or existing code that uses it will fail.
 
-Some of the examples also depend on Gamma. If you don't have Gamma you will need to disable building the examples. See below.
-
-From the AlloSystem/ root directory, cd into a module directory and run the script install_dependencies.sh. For example, to install AlloCore dependencies, you would run these commands from AlloSystem/:
+AlloSystem provides cross-platform scripts to simplify downloading dpendencies. From the AlloSystem/ root directory, cd into a module directory and run the script install_dependencies.sh. For example, to install AlloCore dependencies, you would run these commands from AlloSystem/:
 
 	$ cd allocore
 	$ ./install_dependencies.sh
 	$ cd ..
 
-This will download and install all the AlloCore dependencies using apt-get, MacPorts or homebrew.
+This will download and install all the AlloCore dependencies using apt-get, MacPorts, homebrew or will try to get the sources and build the dependencies.
 
 
-2.2 Building Allosystem (Using Make on Linux, OS X and MSYS on Windows)
+2.2 Building AlloSystem libraries (Using Make on Linux, OS X and MSYS on Windows)
 ----------------------------------------
 
 You need to use cmake to configure the build for your system. You can build Allocore like this:
+
+An alternative to building the AlloSystem libraries is using the application building and running facilties provided by the *run.sh* and *debug.sh* scripts, see below.
+
+To build the AlloSystem libraries, you need to use cmake to configure the build for your system. You can build Allocore like this:
 
 	./distclean
 	cmake .
@@ -79,10 +78,10 @@ You need to use cmake to configure the build for your system. You can build Allo
 
 This will build all Allosystem libraries in the build/lib folder and the examples in the build/bin folder.
 
-If you want to build wihtout examples:
+If you want to build without examples:
 
 	./distclean
-	cmake . -DNO_EXAMPLES=1
+        cmake . -DBUILD_EXAMPLES=0
 	make
 
 To produce a debug build:
@@ -91,29 +90,14 @@ To produce a debug build:
 	cmake . -DCMAKE_BUILD_TYPE=Debug
 	make
 
-To enable a full build including alloGLV and allovsr, put the GLV and vsr sources next to the AlloSystem sources, and inside the AlloSystem folder do:
-
-    cmake . -DBUILD_EVERYTHING=1
-
-This will build GLV, vsr and all the allo modules if the rest of the dependencies are present.
-
-Other useful configuration variables are:
-
-    BUILD_ALLOGLV=1/0
-    BUILD_ALLOUTIL=1/0
-    BUILD_ALLOVSR=1/0
-    BUILD_GAMMA=1/0
-    BUILD_VSR=1/0
-    BUILD_GLV=1/0
-
-2.3 Building Allosystem (XCode project)
+2.3 Building AlloSystem (XCode project)
 ----------------------------------------
 
 Do:
 
 	./distclean
 	cmake . -GXcode
-	open Allosystem.xcodeprj
+        open AlloSystem.xcodeprj
 
 You will be able to run examples and debug from Xcode
 
@@ -123,7 +107,7 @@ You will be able to run examples and debug from Xcode
 Coming soon...
 
 3. Running examples and projects
----
+------
 
 Allosystem offers an easy way to try out examples and build simple projects without having to write makefiles or configure IDE projects. Any .cpp file placed within the AlloSystem sources can be built into an application with a line like:
 
@@ -131,13 +115,13 @@ Allosystem offers an easy way to try out examples and build simple projects with
 
 This will also build any required dependencies and run cmake if needed.
 
-You can also pass a directory, and all the source files in that directory will be built into a single application.
+You can also pass a directory instead of a filename, and all the source files in that directory will be built into a single application (you must ensure that one and only one of those files has a *main()* function).
 
 You can make a debug build of the libraries and the application by running:
 
     ./debug.sh allocore/examples/graphics/shaderSprites.cpp
 
-This will run the file in the debugger, so if the application crashes, it will drop you to the debugger shell. If you need to specify a particular debugger instead of the default gdb, adjust the debug.sh script.
+This will run the file in the debugger, so if the application crashes, it will drop you to the debugger shell. If you need to specify a particular debugger instead of the default gdb, adjust the *debug.sh* script.
 
 4. Installing Allosystem
 ----------------------------------------
@@ -160,5 +144,37 @@ You can uninstall with:
 
 License
 ======
-
 This project is licensed under the terms of the 3-clause BSD license.
+
+Copyright (C) 2009-2014. AlloSphere Research Group, Media Arts & Technology, UCSB.
+
+Copyright (C) 2009-2014. The Regents of the University of California.
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+
+Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+Neither the name of the University of California nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
