@@ -20,6 +20,10 @@ list(APPEND ALLOCORE_SRC
   src/protocol/oscpack/osc/OscTypes.cpp
   src/protocol/al_OSC.cpp)
 
+list(APPEND ALLOCORE_HEADERS
+    allocore/protocol/al_OSC.hpp
+)
+
 #list(APPEND ALLOCORE_DEP_INCLUDE_DIRS
 #  ${GLUT_INCLUDE_DIR})
 

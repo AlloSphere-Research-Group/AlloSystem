@@ -2,13 +2,14 @@ set(BUILD_ZEROCONF 1)
 
 
 if(BUILD_ZEROCONF)
-message("Building Zerconf module.")
-
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   list(APPEND ALLOCORE_SRC
     src/protocol/al_Zeroconf_OSX.mm)
-    message("Building Zeroconf module.")
+    message("Building OS X Zeroconf module.")
+
+    list(APPEND ALLOCORE_HEADERS
+        allocore/protocol/al_Zeroconf.hpp)
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -19,7 +20,9 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   list(APPEND ALLOCORE_LINK_LIBRARIES ${AVAHI_COMMON_LIBRARY} ${AVAHI_CLIENT_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
   list(APPEND ALLOCORE_SRC
     src/protocol/al_Zeroconf.cpp)
-  message("Building Zeroconf module.")
+  message("Building Linux Zeroconf module.")
+    list(APPEND ALLOCORE_HEADERS
+        allocore/protocol/al_Zeroconf.hpp)
   else()
     message("NOT Building Zeroconf module. Pthreads, avahi-common and avahi-client required.")
   endif()

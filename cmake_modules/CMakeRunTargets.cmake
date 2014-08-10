@@ -17,6 +17,7 @@ endif(BUILD_DIR)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/build/bin)
 
+
 add_executable(${APP_NAME} EXCLUDE_FROM_ALL ${ALLOPROJECT_APP_SRC})
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -41,7 +42,7 @@ get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore${DEBUG_SUFFIX} ALLOCORE_D
 get_target_property(ALLOCORE_LINK_LIBRARIES allocore${DEBUG_SUFFIX} ALLOCORE_LINK_LIBRARIES)
 add_dependencies(${APP_NAME} allocore${DEBUG_SUFFIX})
 
-message("Using allocore headers from: ${ALLOCORE_DEP_INCLUDE_DIRS}")
+#message("Using allocore headers from: ${ALLOCORE_DEP_INCLUDE_DIRS}")
 
 if(BUILDING_Gamma)
     get_target_property(GAMMA_LIBRARY Gamma LOCATION)
@@ -100,16 +101,17 @@ else()
 endif(TARGET alloGLV${DEBUG_SUFFIX})
 
 
+include_directories(${ALLOCORE_DEP_INCLUDE_DIRS})
+
 # TODO copy resources to build directory
 
-#file(GLOB ALLOPROJECT_APP_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${BUILD_APP_DIR}/*.*)
-
-include_directories(${ALLOCORE_DEP_INCLUDE_DIRS})
 #    message("Gamma : ${GAMMA_INCLUDE_DIRs}")
 target_link_libraries(${APP_NAME}
   ${ALLOCORE_LIBRARY}
   ${ALLOCORE_LINK_LIBRARIES})
+
 #list(REMOVE_ITEM PROJECT_RES_FILES ${ALLOPROJECT_APP_SRC})
+
 if(NOT RUN_IN_DEBUGGER)
 add_custom_target("${APP_NAME}_run"
   COMMAND "${APP_NAME}"

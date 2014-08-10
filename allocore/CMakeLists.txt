@@ -4,14 +4,12 @@ project (Allocore)
 message("==== Configuring allocore.")
 
 # Allocore Library
-set(ALLOCORE_SRC ${ALLOCORE_SRC}
-  src/io/al_File.cpp
+list(APPEND ALLOCORE_SRC
   src/io/al_MIDI.cpp
   src/io/al_HID.cpp
   src/io/al_Serial.cpp
   src/io/hidapi.c
   src/protocol/al_Serialize.cpp
-  src/sound/al_Ambisonics.cpp
   src/spatial/al_HashSpace.cpp
   src/spatial/al_Pose.cpp
   src/system/al_Info.cpp
@@ -21,6 +19,51 @@ set(ALLOCORE_SRC ${ALLOCORE_SRC}
   src/types/al_Array_C.c
   src/types/al_Color.cpp
   src/types/al_MsgQueue.cpp)
+
+list(APPEND ALLOCORE_HEADERS
+    allocore/al_Allocore.hpp
+    allocore/graphics/al_Mesh.hpp
+    allocore/graphics/al_Shapes.hpp
+    allocore/io/al_HID.hpp
+    allocore/io/al_MIDI.hpp
+    allocore/io/al_Serial.hpp
+    allocore/math/al_Analysis.hpp
+    allocore/math/al_Complex.hpp
+    allocore/math/al_Constants.hpp
+    allocore/math/al_Frustum.hpp
+    allocore/math/al_Functions.hpp
+    allocore/math/al_Interpolation.hpp
+    allocore/math/al_Interval.hpp
+    allocore/math/al_Mat.hpp
+    allocore/math/al_Matrix4.hpp
+    allocore/math/al_Plane.hpp
+    allocore/math/al_Quat.hpp
+    allocore/math/al_Random.hpp
+    allocore/math/al_Spherical.hpp
+    allocore/math/al_Vec.hpp
+    allocore/protocol/al_Serialize.h
+    allocore/protocol/al_Serialize.hpp
+    allocore/spatial/al_Curve.hpp
+    allocore/spatial/al_DistAtten.hpp
+    allocore/spatial/al_HashSpace.hpp
+    allocore/spatial/al_Pose.hpp
+    allocore/system/al_Config.h
+    allocore/system/al_Info.hpp
+    allocore/system/al_MainLoop.hpp
+    allocore/system/al_PeriodicThread.hpp
+    allocore/system/al_Printing.hpp
+    allocore/system/al_Thread.hpp
+    allocore/system/al_Watcher.hpp
+    allocore/system/pstdint.h
+    allocore/types/al_Array.h
+    allocore/types/al_Array.hpp
+    allocore/types/al_Buffer.hpp
+    allocore/types/al_Color.hpp
+    allocore/types/al_Conversion.hpp
+    allocore/types/al_MsgQueue.hpp
+    allocore/types/al_MsgTube.hpp
+    allocore/types/al_SingleRWRingBuffer.hpp
+)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   list(APPEND ALLOCORE_SRC
@@ -45,7 +88,7 @@ else()
 endif()
 
 # Dependencies --------------------------------------------
-set(ALLOCORE_DEP_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
+set(ALLOCORE_DEP_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/build/include)
 
 # System dependent libs
 # ---- OS X ----
@@ -82,24 +125,37 @@ endif()
 # optional dependendencies ----------------------------
 include(modules/gl_module.cmake)
 include(modules/glut_module.cmake)
+# Font (freetype), freeimage and assimp modules depend on the gl module
 include(modules/font_module.cmake)
-include(modules/assimp_module.cmake)
 include(modules/freeimage_module.cmake)
+include(modules/assimp_module.cmake)
+
 include(modules/apr_module.cmake)
 include(modules/portaudio_module.cmake)
 include(modules/libsndfile_module.cmake)
+
 include(modules/osc_module.cmake)
 include(modules/zeroconf_module.cmake)
 
 # allocore library -----------------------
+
 set(ALLOCORE_LIB "allocore${DEBUG_SUFFIX}")
 
 set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 
 # Add headers to the list of source file so they appear in generated projects.
-file(GLOB ALLOCORE_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} allocore/*/*.hpp)
 add_library(${ALLOCORE_LIB} ${ALLOCORE_SRC} ${ALLOCORE_HEADERS})
+
+# Copy headers to build directory (only if directory does not exist)
+
+foreach(header ${ALLOCORE_HEADERS})
+    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/build/include/${header}")
+        execute_process(COMMAND ${CMAKE_COMMAND} -E
+                        copy ${header} ${CMAKE_SOURCE_DIR}/build/include/${header}
+                        WORKING_DIRECTORY  ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+endforeach()
 
 # Export include directories and libraries for use when building AlloSystem or AlloProject
 set_target_properties(${ALLOCORE_LIB}
@@ -113,6 +169,7 @@ set_target_properties(${ALLOCORE_LIB}
 
 include_directories(${ALLOCORE_DEP_INCLUDE_DIRS})
 target_link_libraries(${ALLOCORE_LIB} ${ALLOCORE_LINK_LIBRARIES})
+
 
 # Doxygen documentation target
 add_custom_target("doc"
@@ -179,7 +236,6 @@ if(BUILD_EXAMPLES)
   endif(GAMMA_FOUND OR GAMMA_LIBRARY)
 endif(BUILD_EXAMPLES)
 
-
 # installation
-install(DIRECTORY allocore/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include/allocore)
+install(FILES ${ALLOCORE_HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/)
 install(TARGETS ${ALLOCORE_LIB} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
