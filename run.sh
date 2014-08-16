@@ -36,5 +36,5 @@ else
   exit 1
 fi
 
-cmake . ${TARGET_FLAG} -DRUN_IN_DEBUGGER=0 -DCMAKE_BUILD_TYPE=Release
+cmake . ${TARGET_FLAG} -DRUN_IN_DEBUGGER=0 -DCMAKE_BUILD_TYPE=Release -Wno-dev
 make $TARGET -j7 $*
