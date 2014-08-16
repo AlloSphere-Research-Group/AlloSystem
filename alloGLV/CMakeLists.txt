@@ -13,6 +13,13 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 get_target_property(ALLOCORE_LIBRARY allocore${DEBUG_SUFFIX} LOCATION)
 get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore${DEBUG_SUFFIX} ALLOCORE_DEP_INCLUDE_DIRS)
 
+find_package(APR QUIET)
+
+if(NOT (APR_LIBRARY AND APR_INCLUDE_DIR))
+    message(WARNING "APR not available, not building alloGLV")
+    return()
+endif()
+
 if(BUILDING_GLV)
     set(GLV_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../GLV)
     get_target_property(glv_location GLV LOCATION)

@@ -44,16 +44,17 @@
 #include <math.h>
 #include <string>
 #include <vector>
-#include "allocore/al_Allocore.hpp"
+//#include "allocore/al_Allocore.hpp"
 
-/*#include "allocore/io/al_AudioIO.hpp"
+#include "allocore/io/al_AudioIO.hpp"
 #include "allocore/sound/al_AudioScene.hpp"
 #include "allocore/types/al_Color.hpp"
 #include "allocore/graphics/al_Lens.hpp"
 #include "allocore/graphics/al_Stereographic.hpp"
 #include "allocore/io/al_Window.hpp"
+#include "allocore/io/al_ControlNav.hpp"
 #include "allocore/protocol/al_OSC.hpp"
-#include "allocore/io/al_ControlNav.hpp"*/
+#include "allocore/system/al_MainLoop.hpp"
 
 namespace al{
 
