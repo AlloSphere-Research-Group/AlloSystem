@@ -1,7 +1,7 @@
 
 find_package(GLUT QUIET)
 
-if(GLUT_LIBRARY)
+if(GLUT_LIBRARY AND GLUT_INCLUDE_DIR)
 message("Building GLUT module.")
 
 list(APPEND ALLOCORE_SRC

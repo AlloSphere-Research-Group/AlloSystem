@@ -1,7 +1,7 @@
 
 find_package(Portaudio QUIET)
 
-if(PORTAUDIO_LIBRARY)
+if(PORTAUDIO_LIBRARY AND PORTAUDIO_INCLUDE_DIR)
 message("Building Portaudio module.")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")

@@ -1,7 +1,7 @@
 
 find_package(LibSndFile QUIET)
 
-if(SNDFILE_LIBRARIES)
+if(SNDFILE_LIBRARIES AND SNDFILE_INCLUDE_DIRS)
 message("Building libsndfile module.")
 
 #list(APPEND ALLOCORE_SRC

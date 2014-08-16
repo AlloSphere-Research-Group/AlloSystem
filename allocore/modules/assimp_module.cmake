@@ -4,7 +4,7 @@ if(GLUT_LIBRARY AND OPENGL_LIBRARY)
 
 find_package(Assimp QUIET)
 
-if(ASSIMP_LIBRARY)
+if(ASSIMP_LIBRARY AND ASSIMP_INCLUDE_DIR)
 message("Building assimp module.")
 
 list(APPEND ALLOCORE_SRC

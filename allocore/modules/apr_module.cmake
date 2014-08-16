@@ -1,7 +1,7 @@
 
 find_package(APR QUIET)
 
-if(APR_LIBRARY)
+if(APR_LIBRARY AND APR_INCLUDE_DIR)
 message("Building APR module.")
 
 list(APPEND ALLOCORE_SRC

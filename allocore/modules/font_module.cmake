@@ -4,7 +4,7 @@ if(GLUT_LIBRARY AND OPENGL_LIBRARY)
 
 find_package(Freetype QUIET)
 
-if(FREETYPE_LIBRARY)
+if(FREETYPE_LIBRARY AND FREETYPE_INCLUDE_DIRS)
 message("Building font module.")
 
 list(APPEND ALLOCORE_SRC
