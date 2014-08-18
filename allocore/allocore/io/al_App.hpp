@@ -53,7 +53,7 @@
 #include "allocore/graphics/al_Stereographic.hpp"
 #include "allocore/io/al_Window.hpp"
 #include "allocore/io/al_ControlNav.hpp"
-#include "allocore/protocol/al_OSC.hpp"
+//#include "allocore/protocol/al_OSC.hpp"
 #include "allocore/system/al_MainLoop.hpp"
 
 namespace al{
