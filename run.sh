@@ -3,6 +3,11 @@
 # ------------------------------------------------
 # You shouldn't need to touch the stuff below
 
+# Get the number of processors on OS X, linux, and (to-do) Windows.
+NPROC=$(grep --count ^processor /proc/cpuinfo 2>/dev/null || sysctl -n hw.ncpu || 2)
+# Save one core for the gui.
+PROC_FLAG=$((NPROC - 1))
+
 if [ $# = 0 ]
 then
     echo Aborting: You must provide a source filename or a directory
@@ -38,4 +43,4 @@ else
 fi
 
 cmake . "$TARGET_FLAG" "$DBUILD_FLAG" -DRUN_IN_DEBUGGER=0 -DCMAKE_BUILD_TYPE=Release -Wno-dev
-make "$TARGET" -j7 "$*"
+make "$TARGET" -j"$PROC_FLAG" "$*"

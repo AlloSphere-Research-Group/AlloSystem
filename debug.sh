@@ -5,6 +5,11 @@ DEBUGGER=gdb
 # ------------------------------------------------
 # You shouldn't need to touch the stuff below
 
+# Get the number of processors on OS X, linux, and (to-do) Windows.
+NPROC=$(grep --count ^processor /proc/cpuinfo 2>/dev/null || sysctl -n hw.ncpu || 2)
+# Save one core for the gui.
+PROC_FLAG=$((NPROC - 1))
+
 if [ $# = 0 ]
 then
     echo Aborting: You must provide a source filename or a directory
@@ -33,4 +38,4 @@ else
 fi
 
 cmake . "$CMAKE_FLAGS" "$TARGET_FLAG" "$DBUILD_FLAG" -DRUN_IN_DEBUGGER=1 -DALLOSYSTEM_DEBUGGER=${DEBUGGER} -DCMAKE_BUILD_TYPE=Debug
-make "$TARGET" -j4 "$*"
+make "$TARGET" -j"$PROC_FLAG" "$*"
