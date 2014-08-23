@@ -29,12 +29,12 @@ if((NOT ASSIMP_INCLUDE_DIR) AND (NOT ASSIMP_LIBRARY))
     PATHS ${ASSIMP_PKGCONF_INCLUDE_DIRS} /usr/include /usr/local/include /opt/local/include
     )
 
-  if (ASSIMP2_INCLUDE_DIR)
+  if(ASSIMP2_INCLUDE_DIR)
     message("Assimp 2 found")
     set(ASSIMP_INCLUDE_DIR ${ASSIMP2_INCLUDE_DIR})
   endif(ASSIMP2_INCLUDE_DIR)
 
-  if (ASSIMP3_INCLUDE_DIR)
+  if(ASSIMP3_INCLUDE_DIR)
     message("Assimp 3 found")
     set(ASSIMP_INCLUDE_DIR ${ASSIMP3_INCLUDE_DIR})
     set(USE_ASSIMP_V3 1 CACHE STRING "Use assimp v3")
@@ -54,8 +54,8 @@ if((NOT ASSIMP_INCLUDE_DIR) AND (NOT ASSIMP_LIBRARY))
 
   # Set the include dir variables and the libraries and let libfind_process do the rest.
   # NOTE: Singular variables for this library, plural for libraries this this lib depends on.
-  set(ASSIMP_PROCESS_INCLUDES ASSIMP_INCLUDE_DIR)
-  set(ASSIMP_PROCESS_LIBS ASSIMP_LIBRARY)
+  set(ASSIMP_PROCESS_INCLUDES ${ASSIMP_INCLUDE_DIR})
+  set(ASSIMP_PROCESS_LIBS ${ASSIMP_LIBRARY})
   libfind_process(ASSIMP)
 
 endif((NOT ASSIMP_INCLUDE_DIR) AND (NOT ASSIMP_LIBRARY)) 

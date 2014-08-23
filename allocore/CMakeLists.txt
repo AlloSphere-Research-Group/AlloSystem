@@ -49,7 +49,6 @@ list(APPEND ALLOCORE_HEADERS
     allocore/spatial/al_Pose.hpp
     allocore/system/al_Config.h
     allocore/system/al_Info.hpp
-    allocore/system/al_MainLoop.hpp
     allocore/system/al_PeriodicThread.hpp
     allocore/system/al_Printing.hpp
     allocore/system/al_Thread.hpp
@@ -64,6 +63,8 @@ list(APPEND ALLOCORE_HEADERS
     allocore/types/al_MsgTube.hpp
     allocore/types/al_SingleRWRingBuffer.hpp
 )
+
+set(ALLOCORE_DUMMY_HEADERS "")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   list(APPEND ALLOCORE_SRC
@@ -147,10 +148,21 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 # Add headers to the list of source file so they appear in generated projects.
 add_library(${ALLOCORE_LIB} ${ALLOCORE_SRC} ${ALLOCORE_HEADERS})
 
-# Copy headers to build directory (only if directory does not exist)
+# Write dummy headers
 
+foreach(HEADER_INFO ${ALLOCORE_DUMMY_HEADERS})
+    string(REPLACE "::::" ";" HEADER_PARTS ${HEADER_INFO})
+    list(GET HEADER_PARTS 0 header) # First element is header
+    list(GET HEADER_PARTS 1 dependency) # Second element is dependency
+
+    set(DUMMY_HEADER_TEXT "#error \"ERROR: Header not supported. Dependency '${dependency}' not met.\"\n")
+    file(WRITE "${CMAKE_SOURCE_DIR}/build/include/${header}" ${DUMMY_HEADER_TEXT})
+    message("Writing dummy HEADER_INFO: ${header} --- ${dependency} --- ${HEADER_PARTS}")
+endforeach()
+
+# Copy headers to build directory (only if directory does not exist)
 foreach(header ${ALLOCORE_HEADERS})
-    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/build/include/${header}")
+    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/build/include/${header}") # Don't copy if exists, otherwise the copy forces a full rebuild.
         execute_process(COMMAND ${CMAKE_COMMAND} -E
                         copy ${header} ${CMAKE_SOURCE_DIR}/build/include/${header}
                         WORKING_DIRECTORY  ${CMAKE_CURRENT_SOURCE_DIR})

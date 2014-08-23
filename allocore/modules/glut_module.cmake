@@ -1,12 +1,18 @@
 
 find_package(GLUT QUIET)
 
+set(GLUT_HEADERS
+    allocore/system/al_MainLoop.hpp
+)
+
 if(GLUT_LIBRARY AND GLUT_INCLUDE_DIR)
 message("Building GLUT module.")
 
 list(APPEND ALLOCORE_SRC
   src/system/al_MainLoop.cpp
   src/io/al_WindowGLUT.cpp)
+
+list(APPEND ALLOCORE_HEADERS ${GLUT_HEADERS})
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   list(APPEND ALLOCORE_SRC
@@ -26,5 +32,10 @@ if((${CMAKE_SYSTEM_NAME} MATCHES "Darwin") AND (CMAKE_BUILD_TYPE STREQUAL "Relea
 endif()
 
 else()
-message("NOT Building GLUT module.")
+    message("NOT Building GLUT module.")
+
+    foreach(header ${GLUT_HEADERS})
+        list(APPEND GLUT_DUMMY_HEADER_INFO "${header}::::GLUT")
+    endforeach()
+    list(APPEND ALLOCORE_DUMMY_HEADERS ${GLUT_DUMMY_HEADER_INFO})
 endif(GLUT_LIBRARY)

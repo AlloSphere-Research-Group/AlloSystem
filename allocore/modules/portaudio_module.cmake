@@ -1,6 +1,15 @@
 
 find_package(Portaudio QUIET)
 
+set(PORTAUDIO_HEADERS
+    allocore/io/al_AudioIO.hpp
+    allocore/sound/al_Ambisonics.hpp
+    allocore/sound/al_AudioScene.hpp
+    allocore/sound/al_Crossover.hpp
+    allocore/sound/al_Reverb.hpp
+    allocore/sound/al_Speaker.hpp
+)
+
 if(PORTAUDIO_LIBRARY AND PORTAUDIO_INCLUDE_DIR)
 message("Building Portaudio module.")
 
@@ -25,14 +34,7 @@ list(APPEND ALLOCORE_SRC
       src/sound/al_Ambisonics.cpp
 )
 
-list(APPEND ALLOCORE_HEADERS
-    allocore/io/al_AudioIO.hpp
-    allocore/sound/al_Ambisonics.hpp
-    allocore/sound/al_AudioScene.hpp
-    allocore/sound/al_Crossover.hpp
-    allocore/sound/al_Reverb.hpp
-    allocore/sound/al_Speaker.hpp
-)
+list(APPEND ALLOCORE_HEADERS ${PORTAUDIO_HEADERS})
 
 list(APPEND ALLOCORE_DEP_INCLUDE_DIRS
   ${PORTAUDIO_INCLUDE_DIR}
@@ -43,5 +45,10 @@ list(APPEND ALLOCORE_LINK_LIBRARIES
   ${PORTAUDIO_LIBRARIES})
 
 else()
-message("NOT Building Portaudio module.")
+    message("NOT Building Portaudio module.")
+    foreach(header ${PORTAUDIO_HEADERS})
+        list(APPEND PORTAUDIO_DUMMY_HEADER_INFO "${header}::::Portaudio")
+    endforeach()
+    list(APPEND ALLOCORE_DUMMY_HEADERS ${PORTAUDIO_DUMMY_HEADER_INFO})
+
 endif(PORTAUDIO_LIBRARY)
