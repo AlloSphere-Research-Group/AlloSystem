@@ -694,7 +694,7 @@ public:
 	*/
 	static void usr_attr_mt(
 		lua_State *L, 
-		luaL_reg *methods, 
+		luaL_reg *methods,
 		luaL_reg *getters = NULL, 
 		luaL_reg *setters = NULL
 	);
@@ -964,7 +964,7 @@ template <typename T> const char * Glue<T> :: mt_name(lua_State * L) {
 template <typename T> void Glue<T>::usr_attr_mt(
 	lua_State *L, 
 	luaL_reg *methods, 
-	luaL_reg *getters, 
+	luaL_reg *getters,
 	luaL_reg *setters
 ) {
 	for(int i=0; methods[i].name; i++) {

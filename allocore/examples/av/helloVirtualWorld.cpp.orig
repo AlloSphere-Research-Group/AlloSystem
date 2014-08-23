@@ -32,6 +32,7 @@ struct Agent : public SoundSource, public Nav, public Drawable{
 			//float s = rnd::uniform(); // make noise, just to hear something
 			float s = sin(oscPhase * M_2PI);
 			//float s = al::rnd::uniformS();
+			
 			//s *= (oscEnv*=0.999);
 			
 			if(oscEnv < 0.00001){ oscEnv=1; oscPhase=0; }
@@ -46,8 +47,15 @@ struct Agent : public SoundSource, public Nav, public Drawable{
 	virtual void onUpdateNav(){
 		smooth(0.9);
 		
+		//*
         spin(M_2PI/360, M_2PI/397, 0);
         moveF(0.04);
+        //*/
+        
+        /*
+        spin(M_2PI/1.1, 0, 0);
+		moveF(1);
+        //*/
         
 		step();
 		
@@ -94,13 +102,14 @@ struct Agent : public SoundSource, public Nav, public Drawable{
 	double oscPhase, oscEnv;
 };
 
+
 #define AUDIO_BLOCK_SIZE 256
 
+//AudioScene scene(2, 1, AUDIO_BLOCK_SIZE);
 AudioScene scene(AUDIO_BLOCK_SIZE);
 Listener * listener;
 Nav navMaster(Vec3d(0,0,-4), 0.95);
 std::vector<Agent> agents(1);
-int currentAgent = 0;
 Stereographic stereo;
 
 
@@ -115,8 +124,13 @@ void audioCB(AudioIOData& io){
 	navMaster.step(0.5);
      
 	listener->pose(navMaster);
+
+	//scene.encode(numFrames, io.framesPerSecond());
+	//scene.render(&io.out(0,0), numFrames);
     io.frame(0);
     scene.render(io);
+	
+	//printf("%g\n", io.out(0,0));
 }
 
 
@@ -130,6 +144,8 @@ struct MyWindow : public Window, public Drawable{
 
 		Viewport vp(dimensions().w, dimensions().h);
 		stereo.draw(gl, cam, pose, vp, *this);
+
+//		printf("pos %f %f %f\n", navMaster.pos()[0], navMaster.pos()[1], navMaster.pos()[2]);		
 		
 		return true;
 	}
@@ -156,6 +172,18 @@ struct MyWindow : public Window, public Drawable{
 };
 
 
+<<<<<<< HEAD
+int main (int argc, char * argv[]){
+
+    ambisonics = new AmbisonicsSpatializer(2, 1, numSpeakers); //TODO replace numSpeakers with speaker layout
+    //dbap = new Dbap();
+    
+    speakerLayout.addSpeaker(speakers[0]);
+    speakerLayout.addSpeaker(speakers[1]);
+    
+    //TODO spatializer should take speaker layout in constructor - listener doest need it
+    
+=======
 int main (int argc, char * argv[])
 {
     // Set speaker layout
@@ -169,12 +197,14 @@ int main (int argc, char * argv[])
     speakerLayout.addSpeaker(speakers[1]);
 
     // Create spatializer
-    AmbisonicsSpatializer *ambisonics = new AmbisonicsSpatializer(speakerLayout, 2, 1);
-    //Dbap *dbap = new Dbap(speakerLayout);
+    AmbisonicsSpatializer *ambisonics = new AmbisonicsSpatializer(2, 1, numSpeakers);
+//    Dbap *dbap;
+//    dbap = new Dbap();
 
 	// Create listener to render audio
-	listener = scene.createListener(ambisonics);
-    //listener = scene.createListener(dbap);
+>>>>>>> 881210a845063a71c782cb7f21e4056558c04ee3
+	listener = scene.createListener(speakerLayout, ambisonics);
+    //listener = scene.createListener(speakerLayout, dbap);
 	
 	// Now do some visuals
 	for(unsigned i=0; i<agents.size(); ++i) scene.addSource(agents[i]);

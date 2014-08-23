@@ -175,6 +175,7 @@ public:
 						return fmt;
 				}
 		}
+        return fmt;
 	}
 
 };

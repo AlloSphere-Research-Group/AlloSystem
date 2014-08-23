@@ -46,7 +46,7 @@ ViewpointWindow& ViewpointWindow::add(Viewpoint& v){
 App::App()
 :	mName(""),
 	mNavControl(mNav),
-	mClockAnimate(0), mClockNav(0)
+	mClockAnimate(0), mClockNav(0), mOSCRecv(8000)
 {
 }
 
