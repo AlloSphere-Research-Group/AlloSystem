@@ -104,7 +104,7 @@ void FileWatcher::autoPoll(al_sec t) {
 		if (gPollPeriod == 0.) {
 			gPollPeriod = t;
 			// start the task:
-			autopoll(MainLoop::now());
+			autopoll(Main::get().now());
 		} else {
 			gPollPeriod = t;
 		}
