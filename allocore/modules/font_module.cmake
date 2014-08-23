@@ -23,7 +23,7 @@ list(APPEND ALLOCORE_LINK_LIBRARIES
 
 else()
     message("NOT Building font module. OpenGL, GLEW or GLUT not available.")
-    foreach(header FREETYPE_HEADERS)
+    foreach(header ${FREETYPE_HEADERS})
         list(APPEND FREETYPE_DUMMY_HEADER_INFO "${header}::::Freetype")
     endforeach()
     list(APPEND ALLOCORE_DUMMY_HEADERS ${FREETYPE_DUMMY_HEADER_INFO})
@@ -32,7 +32,7 @@ endif(GLUT_LIBRARY AND OPENGL_LIBRARY)
 else()
     message("NOT Building font module. Freetype not found.")
 
-    foreach(header FREETYPE_HEADERS)
+    foreach(header ${FREETYPE_HEADERS})
         list(APPEND FREETYPE_DUMMY_HEADER_INFO "${header}::::Freetype")
     endforeach()
     list(APPEND ALLOCORE_DUMMY_HEADERS ${FREETYPE_DUMMY_HEADER_INFO})
