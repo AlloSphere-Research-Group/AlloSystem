@@ -148,6 +148,15 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 # Add headers to the list of source file so they appear in generated projects.
 add_library(${ALLOCORE_LIB} ${ALLOCORE_SRC} ${ALLOCORE_HEADERS})
 
+# Copy headers to build directory (only if directory does not exist)
+foreach(header ${ALLOCORE_HEADERS})
+    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/build/include/${header}") # Don't copy if exists, otherwise the copy forces a full rebuild.
+        execute_process(COMMAND ${CMAKE_COMMAND} -E
+                        copy ${header} ${CMAKE_SOURCE_DIR}/build/include/${header}
+                        WORKING_DIRECTORY  ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+endforeach()
+
 # Write dummy headers
 
 foreach(HEADER_INFO ${ALLOCORE_DUMMY_HEADERS})
@@ -158,15 +167,7 @@ foreach(HEADER_INFO ${ALLOCORE_DUMMY_HEADERS})
     set(DUMMY_HEADER_TEXT "#error \"ERROR: Header not supported. Dependency '${dependency}' not met.\"\n")
     file(WRITE "${CMAKE_SOURCE_DIR}/build/include/${header}" ${DUMMY_HEADER_TEXT})
     message("Writing dummy HEADER_INFO: ${header} --- ${dependency} --- ${HEADER_PARTS}")
-endforeach()
-
-# Copy headers to build directory (only if directory does not exist)
-foreach(header ${ALLOCORE_HEADERS})
-    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/build/include/${header}") # Don't copy if exists, otherwise the copy forces a full rebuild.
-        execute_process(COMMAND ${CMAKE_COMMAND} -E
-                        copy ${header} ${CMAKE_SOURCE_DIR}/build/include/${header}
-                        WORKING_DIRECTORY  ${CMAKE_CURRENT_SOURCE_DIR})
-    endif()
+    list(APPEND ALLOCORE_HEADERS "${CMAKE_SOURCE_DIR}/build/include/${header}")
 endforeach()
 
 # Export include directories and libraries for use when building AlloSystem or AlloProject
