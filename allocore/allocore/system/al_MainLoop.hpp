@@ -159,14 +159,14 @@ namespace MainLoop {
 	inline Main& get() { return Main::get(); }
 	inline void start() { return Main::get().start(); }
 	inline void stop() { return Main::get().stop(); }
-//	inline al_sec now() { return Main::get().now(); }
-//	inline al_sec realtime() { return Main::get().realtime(); }
+	inline al_sec now() { return Main::get().now(); }
+	inline al_sec realtime() { return Main::get().realtime(); }
 	inline MsgQueue& queue() { return Main::get().queue(); }
-//	inline void interval(al_sec v) { Main::get().interval(v); }
-//	inline al_sec interval() { return Main::get().interval(); }
-//	inline al_sec intervalActual() { return Main::get().intervalActual(); }
+	inline void interval(al_sec v) { Main::get().interval(v); }
+	inline al_sec interval() { return Main::get().interval(); }
+	inline al_sec intervalActual() { return Main::get().intervalActual(); }
 	inline double cpu() { return Main::get().cpu(); }
-//	inline al_sec T0() { return Main::get().T0(); }
+	inline al_sec T0() { return Main::get().T0(); }
 	inline bool isRunning(){ return Main::get().isRunning(); }
 };
 
