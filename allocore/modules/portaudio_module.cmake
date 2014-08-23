@@ -6,8 +6,11 @@ set(PORTAUDIO_HEADERS
     allocore/sound/al_Ambisonics.hpp
     allocore/sound/al_AudioScene.hpp
     allocore/sound/al_Crossover.hpp
+    allocore/sound/al_Dbap.hpp
     allocore/sound/al_Reverb.hpp
     allocore/sound/al_Speaker.hpp
+    allocore/sound/al_Vbap.hpp
+
 )
 
 if(PORTAUDIO_LIBRARY AND PORTAUDIO_INCLUDE_DIR)

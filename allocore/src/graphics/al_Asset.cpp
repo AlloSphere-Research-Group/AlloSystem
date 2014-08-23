@@ -1,9 +1,5 @@
 #include "allocore/graphics/al_Asset.hpp"
-
-
 #include "allocore/graphics/al_Graphics.hpp"
-
-#define USE_ASSIMP3
 
 #ifdef USE_ASSIMP3
 
