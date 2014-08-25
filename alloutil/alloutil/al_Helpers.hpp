@@ -43,8 +43,8 @@ inline void AudioRenderer::initAudio(double audioRate, int audioBlockSize) {
 }
 
 inline void AudioRenderer::initAudio(std::string devicename, double audioRate,
-                                 int audioBlockSize, int audioInputs,
-                                 int audioOutputs) {
+                                     int audioBlockSize, int audioInputs,
+                                     int audioOutputs) {
   AudioDevice indev(devicename, AudioDevice::INPUT);
   AudioDevice outdev(devicename, AudioDevice::OUTPUT);
   indev.print();
@@ -73,7 +73,9 @@ inline AudioRenderer::AudioRenderer() { initAudio(); }
 
 // GRAPHICS //
 
-class GraphicsRenderer : public Window, public FPS, public OmniStereo::Drawable {
+class GraphicsRenderer : public Window,
+                         public FPS,
+                         public OmniStereo::Drawable {
  public:
   GraphicsRenderer();
   virtual ~GraphicsRenderer();
@@ -102,10 +104,15 @@ class GraphicsRenderer : public Window, public FPS, public OmniStereo::Drawable 
 
   OmniStereo& omni() { return mOmni; }
 
+  const Nav& nav() const { return mNav; }
+  Nav& nav() { return mNav; }
+
   const std::string& hostName() const { return mHostName; }
 
   bool omniEnable() const { return bOmniEnable; }
   void omniEnable(bool b) { bOmniEnable = b; }
+
+  osc::Send& oscSend() { return mOSCSend; }
 
  protected:
   OmniStereo mOmni;
@@ -113,6 +120,7 @@ class GraphicsRenderer : public Window, public FPS, public OmniStereo::Drawable 
   Lens mLens;
   Graphics mGraphics;
 
+  osc::Send mOSCSend;
   Pose pose;
 
   ShaderProgram mShader;
@@ -120,9 +128,13 @@ class GraphicsRenderer : public Window, public FPS, public OmniStereo::Drawable 
   std::string mHostName;
 
   bool bOmniEnable;
+
+  Nav mNav;
+  NavInputControl mNavControl;
+  StandardWindowKeyControls mStdControls;
 };
 
-// RENDERER //
+// GRAPHICS RENDERER //
 
 inline void GraphicsRenderer::start() {
   if (mOmni.activeStereo()) {
@@ -140,19 +152,20 @@ inline void GraphicsRenderer::start() {
 }
 
 inline GraphicsRenderer::~GraphicsRenderer() {}
-inline GraphicsRenderer::GraphicsRenderer() {
+inline GraphicsRenderer::GraphicsRenderer()
+    : mNavControl(mNav), mOSCSend(PORT_FROM_DEVICE_SERVER) {
+
   bOmniEnable = true;
   mHostName = Socket::hostName();
 
   lens().near(0.01).far(40).eyeSep(0.03);
+  nav().smooth(0.8);
 
   initWindow();
   initOmni();
 
-  // later, we may want to forward window controls via osc to the device server
-  // or directly to the simulator.
-  // XXX Window::append(mStdControls);
-  // XXX Window::append(mNavControl);
+  Window::append(mStdControls);
+  Window::append(mNavControl);
 }
 
 inline void GraphicsRenderer::initOmni(std::string path) {
@@ -163,8 +176,8 @@ inline void GraphicsRenderer::initOmni(std::string path) {
 }
 
 inline void GraphicsRenderer::initWindow(const Window::Dim& dims,
-                                     const std::string title, double fps,
-                                     Window::DisplayMode mode) {
+                                         const std::string title, double fps,
+                                         Window::DisplayMode mode) {
   Window::dimensions(dims);
   Window::title(title);
   Window::fps(fps);
@@ -191,6 +204,14 @@ inline bool GraphicsRenderer::onCreate() {
 
 inline bool GraphicsRenderer::onFrame() {
   FPS::onFrame();
+
+  // if running on a laptop?
+  //
+  nav().step();
+  Vec3d v = nav().pos();
+  Quatd q = nav().quat();
+  oscSend().send("/pose", v.x, v.y, v.z, q.x, q.y, q.z, q.w);
+  // nav().print();
 
   onAnimate(dt);
 
@@ -257,21 +278,37 @@ inline std::string GraphicsRenderer::fragmentCode() {
 
 // SIMULATOR //
 
-// XXX - will go in simulator
-// while (oscRecv().recv()) {}
-// nav().step();
-
-class Simulator : public osc::PacketHandler {
+class DeviceServerCollector : public osc::PacketHandler, public Main::Handler {
  public:
-  Simulator(std::string name = "omniapp");
-  virtual ~Simulator();
+  DeviceServerCollector(std::string name = "omniapp");
+  virtual ~DeviceServerCollector();
   void start();
+
+  virtual void init() {}
+  virtual void update(double dt) {}
+  virtual void onTick() {
+    static bool firstTime = true;
+    if (firstTime) {
+      firstTime = false;
+      init();
+    }
+    while (oscRecv().recv()) {
+    }
+    if (false /* connected to device server */) nav().step();
+    static al_sec lastTime;
+    static al_sec time;
+    lastTime = time;
+    time = Main::get().now();
+    update(time - lastTime);
+  }
+
+  virtual void onExit() {}
 
   const Nav& nav() const { return mNav; }
   Nav& nav() { return mNav; }
 
   const std::string& name() const { return mName; }
-  Simulator& name(const std::string& v) {
+  DeviceServerCollector& name(const std::string& v) {
     mName = v;
     return *this;
   }
@@ -291,20 +328,20 @@ class Simulator : public osc::PacketHandler {
 
   Nav mNav;
   NavInputControl mNavControl;
-  // StandardWindowKeyControls mStdControls;
+  StandardWindowKeyControls mStdControls;
 
   double mNavSpeed, mNavTurnSpeed;
 };
 
-inline void Simulator::sendHandshake() {
+inline void DeviceServerCollector::sendHandshake() {
   oscSend().send("/handshake", name(), oscRecv().port());
 }
 
-inline void Simulator::sendDisconnect() {
+inline void DeviceServerCollector::sendDisconnect() {
   oscSend().send("/disconnectApplication", name());
 }
 
-inline void Simulator::onMessage(osc::Message& m) {
+inline void DeviceServerCollector::onMessage(osc::Message& m) {
   float x;
   if (m.addressPattern() == "/mx") {
     m >> x;
@@ -335,17 +372,31 @@ inline void Simulator::onMessage(osc::Message& m) {
 
   } else if (m.addressPattern() == "/halt") {
     nav().halt();
+  } else if (m.addressPattern() == "/pose") {
+    Vec3d v;
+    Quatd q;
+    m >> v.x;
+    m >> v.y;
+    m >> v.z;
+    m >> q.x;
+    m >> q.y;
+    m >> q.z;
+    m >> q.w;
+    nav().pos(v);
+    nav().quat(q);
   }
 }
 
-inline void Simulator::start() {
+inline void DeviceServerCollector::start() {
   if (oscSend().opened()) sendHandshake();
-  Main::get().start();
+  Main::get().interval(0.0166666666).add(*this).start();
+  // Main::get().add(*this);  // call onTick and onExit
+  // Main::get().start();
 }
 
-inline Simulator::~Simulator() { sendDisconnect(); }
+inline DeviceServerCollector::~DeviceServerCollector() { sendDisconnect(); }
 
-inline Simulator::Simulator(std::string name)
+inline DeviceServerCollector::DeviceServerCollector(std::string name)
     : mOSCRecv(PORT_FROM_DEVICE_SERVER),
       mNavControl(mNav),
       mOSCSend(PORT_TO_DEVICE_SERVER, DEVICE_SERVER_IP_ADDRESS) {

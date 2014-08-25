@@ -15,10 +15,11 @@ struct MyApp : OmniApp {
     mesh.generateNormals();
     light.ambient(Color(0.4, 0.4, 0.4, 1.0));
     light.pos(5, 5, 5);
+    initAudio();
   }
 
   virtual ~MyApp() {}
-  
+
   virtual void onDraw(Graphics& g) {
     light();
     // say how much lighting you want
@@ -27,8 +28,9 @@ struct MyApp : OmniApp {
   }
 
   virtual void onAnimate(al_sec dt) {
-    //light.pos(nav().pos());
-    //std::cout << dt << std::endl;
+    // light.pos(nav().pos());
+    pose = nav();
+    // std::cout << dt << std::endl;
   }
 
   virtual void onSound(AudioIOData& io) {
@@ -41,12 +43,10 @@ struct MyApp : OmniApp {
     OmniApp::onMessage(m);
   }
 
-  virtual bool onKeyDown(const Keyboard& k){
-    return true;
-  }
+  virtual bool onKeyDown(const Keyboard& k) { return true; }
 };
 
-int main(int argc, char * argv[]) {
+int main(int argc, char* argv[]) {
   MyApp().start();
   return 0;
 }
