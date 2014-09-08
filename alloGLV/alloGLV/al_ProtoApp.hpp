@@ -78,9 +78,13 @@ public:
 	/// Set the directory for application resources
 	ProtoApp& resourceDir(const std::string& dir, bool searchBack=true);
 
-	GLVDetachable& gui(){ return mGUI; }
+	/// Get resource directory
+	const std::string& resourceDir() const { return mResourceDir; }
+
+	/// Get parameter panel GUI element
 	glv::ParamPanel& paramPanel(){ return mParamPanel; }
 
+	/// Add a parameter to GUI
 	ProtoApp& addParam(
 		glv::View& v, const std::string& label="", bool nameViewFromLabel=true
 	){
@@ -88,11 +92,13 @@ public:
 		return *this;
 	}
 
+	/// Add a parameter to GUI
 	ProtoApp& addParam(
 		glv::View * v, const std::string& label="", bool nameViewFromLabel=true
 	){
 		return addParam(*v,label,nameViewFromLabel);
 	}
+
 
 	double gainFactor() const { float v=cnGain.getValue(); return v*v; }
 	double scaleFactor() const { return ::pow(2., cnScale.getValue()); }
