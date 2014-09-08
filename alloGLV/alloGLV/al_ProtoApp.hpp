@@ -81,6 +81,9 @@ public:
 	/// Get resource directory
 	const std::string& resourceDir() const { return mResourceDir; }
 
+	/// Get GUI
+	GLVDetachable& gui(){ return mGUI; }
+
 	/// Get parameter panel GUI element
 	glv::ParamPanel& paramPanel(){ return mParamPanel; }
 
