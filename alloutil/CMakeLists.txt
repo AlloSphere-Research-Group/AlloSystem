@@ -8,6 +8,7 @@ set(ALLOUTIL_SRC
   src/al_OmniStereo.cpp
   src/al_ResourceManager.cpp
   src/al_WarpBlend.cpp
+  src/al_RayStereo.cpp
   )
 
 # Dependencies ------------------------------
