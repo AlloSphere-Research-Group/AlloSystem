@@ -25,7 +25,6 @@ struct MyApp : public RayApp {
     shaderProgram.uniform("eyesep", lens().eyeSep());
     shaderProgram.uniform("pos", nav().pos());
     shaderProgram.uniform("quat", nav().quat());
-    shaderProgram.uniform("time", FPS::now());
   }
   
   std::string vertexCode() {
@@ -47,15 +46,8 @@ struct MyApp : public RayApp {
     uniform vec4 quat;
     uniform vec3 pos;
     uniform float eyesep;
-    uniform float time;
     varying vec2 T;
-    
-    float accuracy = 1e-3;
-    float stepsize = 0.02;
-    float maxval = 10.0;
-    float normalEps = 1e-5;
-    float m_2pi = 6.28318530718;
-    
+        
     // q must be a normalized quaternion
     vec3 quat_rotate(in vec4 q, in vec3 v) {
       // return quat_mul(quat_mul(q, vec4(v, 0)), quat_conj(q)).xyz;
@@ -73,86 +65,40 @@ struct MyApp : public RayApp {
                   );
     }
     
-    float evalAt(vec3 at) {
-      // A torus. To be used with ray marching.
-      // See http://www.freigeist.cc/gallery.html .
-      float R = 1.0;
-      float r = 0.5;
-      
-      R *= R;
-      r *= r;
-      
-      float t = dot(at, at) + R - r;
-      
-      return t * t - 4.0 * R * dot(at.xy, at.xy);
-    }
-    
     bool findIntersection(in vec3 orig, in vec3 dir, inout vec3 hitpoint, inout vec3 normal) {
-      // Raymarching with fixed initial step size and final bisection.
-      // The object has to define evalAt().
-      float cstep = stepsize;
-      float alpha = cstep;
+      // orig, dir is normalized
+      vec3 sphere_center = vec3(0,0,0);
+      float sphere_radius = 1.0;
       
-      vec3 at = orig + alpha * dir;
-      float val = evalAt(at);
-      bool sit = (val < 0.0);
+      float B,C,D,t;
       
-      alpha += cstep;
+      vec3 new_orig = orig - sphere_center;
       
-      bool sitStart = sit;
+      B = dot(dir, new_orig);
+      C = dot(new_orig, new_orig) - sphere_radius * sphere_radius;
       
-      while (alpha < maxval)
-      {
-        at = orig + alpha * dir;
-        val = evalAt(at);
-        sit = (val < 0.0);
-        
-        // Situation changed, start bisection.
-        if (sit != sitStart)
-        {
-          float a1 = alpha - stepsize;
-          
-          while (cstep > accuracy)
-          {
-            cstep *= 0.5;
-            alpha = a1 + cstep;
-            
-            at = orig + alpha * dir;
-            val = evalAt(at);
-            sit = (val < 0.0);
-            
-            if (sit == sitStart)
-              a1 = alpha;
-          }
-          
-          hitpoint = at;
-          
-          // "Finite difference thing". :)
-          normal.x = evalAt(at + vec3(normalEps, 0, 0));
-          normal.y = evalAt(at + vec3(0, normalEps, 0));
-          normal.z = evalAt(at + vec3(0, 0, normalEps));
-          normal -= val;
-          normal = normalize(normal);
-          
-          return true;
-        }
-        
-        alpha += cstep;
+      D = B*B - C;
+      
+      if (D < 0.0) return false;
+      
+      D = sqrt(D);
+      t = -B - D;
+      if (t < 0.0) {
+        t = -B + D;
+        if (t < 0.0) return false;
       }
       
-      return false;
+      hitpoint = orig + dir * t;
+      normal = normalize(hitpoint - sphere_center);
+      return true;
     }
     
     void main(){
-      vec3 light1 = pos + vec3(0.2 * sin(m_2pi * time + 0.3),
-                               0.3 * sin(m_2pi * time),
-                               0.5 * cos(m_2pi * time + 0.6));//pos + vec3(0.0, 0.5, 1.0);
-      vec3 light2 = pos + vec3(1.0, 0.0, 0.0);
-      vec3 color1 = vec3(1.0, 1.0, 1.0);
-      vec3 color2 = vec3(0.3 + 0.1 * sin(m_2pi * time),
-                         0.3 + 0.1 * sin(m_2pi * time + 1.0),
-                         1.0);
-      vec3 ambient = vec3(0.3, 0.3, 0.3);
+      // lighting:
+      vec3 color = vec3(0, 0, 0);
+      vec3 light_pos = vec3(3, 1, 5);
+      vec3 material_color = vec3(0.3, 0.3, 1.0);
+      vec3 ambient_color = vec3(0.1, 0.1, 0.1);
       
       // pixel location (calibration space):
       vec3 v = normalize(texture2D(pixelMap, T).rgb);
@@ -167,38 +113,23 @@ struct MyApp : public RayApp {
       vec3 rdx = cross(normalize(rd), up);
       
       //vec3 rdx = projection_on_plane(rd, up);
-      vec3 eye = rdx * eyesep;// * 0.02;
+      vec3 eye = rdx * eyesep;
       
       // ray origin (world space)
       vec3 ro = pos + eye;
       
-      // initial eye-ray to find object intersection:
-      float mindt = 0.01;	// how close to a surface we can get
-      float mint = mindt;
-      float maxt = 50.;
-      float t=mint;
-      float h = maxt;
-      
       // find object intersection:
-      vec3 p = ro + mint*rd;
+      vec3 p = ro;
       vec3 normal;
-      if(!findIntersection(ro, rd, p, normal)) {
-        t = maxt;
-      }
       
-      // lighting:
-      vec3 color = vec3(0, 0, 0);
-      
-      if (t<maxt) {
+      if(findIntersection(ro, rd, p, normal)) {
         // compute ray to light source:
-        vec3 ldir1 = normalize(light1 - p);
-        vec3 ldir2 = normalize(light2 - p);
+        vec3 light_dir = normalize(light_pos - p);
         
         // abs for bidirectional surfaces
-        float ln1 = max(0.,dot(ldir1, normal));
-        float ln2 = max(0.,dot(ldir2, normal));
+        float light_normal = max(0.,dot(light_dir, normal));
         
-        color = ambient + color1 * ln1 + color2 * ln2;
+        color = ambient_color + material_color * light_normal;
       }
       
       color *= texture2D(alphaMap, T).rgb;
