@@ -405,8 +405,6 @@ RayStereo& RayStereo::loadConfig(std::string configpath, std::string configname)
 				// load from file
 				mProjections[i].readWarp(configpath + "/" + lua_tostring(L, -1));
 			} else {
-        fovy = M_PI / 2.;
-        aspect = 2.;
         mProjections[i].warp().array().fill(fillRect);
         mProjections[i].warp().dirty();
       }
