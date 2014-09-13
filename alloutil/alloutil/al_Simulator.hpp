@@ -4,8 +4,8 @@
 #include "allocore/al_Allocore.hpp"
 #include "allocore/protocol/al_OSC.hpp"
 
-#define PORT_TO_DEVICE_SERVER (12000)
-#define PORT_FROM_DEVICE_SERVER (PORT_TO_DEVICE_SERVER + 1)
+#define DEVICE_SERVER_PORT (12000)
+#define DEVICE_SERVER_PORT_CONNECTION_US (DEVICE_SERVER_PORT + 1)
 #define DEVICE_SERVER_IP_ADDRESS "BOSSANOVA"
 
 namespace al {
@@ -48,6 +48,7 @@ class Simulator : public osc::PacketHandler, public Main::Handler {
   osc::Recv mOSCRecv;
   osc::Send mOSCSend;
   std::string mName;
+  bool useLocalNav;
 
   Nav mNav;
   NavInputControl mNavControl;
@@ -66,10 +67,9 @@ inline void Simulator::onTick() {
   while (oscRecv().recv()) {
   }
 
-  if (false /* connected to device server */) nav().step();
-
   lastTime = time;
   time = Main::get().realtime();
+  if (!useLocalNav) nav().step(time - lastTime);
   step(time - lastTime);
 }
 
@@ -84,37 +84,35 @@ inline void Simulator::sendDisconnect() {
 }
 
 inline void Simulator::onMessage(osc::Message& m) {
+
   float x;
   if (m.addressPattern() == "/mx") {
     m >> x;
     nav().moveR(-x * mNavSpeed);
-
   } else if (m.addressPattern() == "/my") {
     m >> x;
     nav().moveU(x * mNavSpeed);
-
   } else if (m.addressPattern() == "/mz") {
     m >> x;
     nav().moveF(x * mNavSpeed);
-
   } else if (m.addressPattern() == "/tx") {
     m >> x;
     nav().spinR(x * -mNavTurnSpeed);
-
   } else if (m.addressPattern() == "/ty") {
     m >> x;
     nav().spinU(x * mNavTurnSpeed);
-
   } else if (m.addressPattern() == "/tz") {
     m >> x;
     nav().spinF(x * -mNavTurnSpeed);
-
   } else if (m.addressPattern() == "/home") {
     nav().home();
-
   } else if (m.addressPattern() == "/halt") {
     nav().halt();
-  } else if (m.addressPattern() == "/pose") {
+  } else {
+  }
+
+  if (m.addressPattern() == "/pose") {
+    useLocalNav = true;
     Vec3d v;
     Quatd q;
     m >> v.x;
@@ -139,9 +137,10 @@ inline void Simulator::stop() { Main::get().stop(); }
 inline Simulator::~Simulator() { sendDisconnect(); }
 
 inline Simulator::Simulator(std::string name)
-    : mOSCRecv(PORT_FROM_DEVICE_SERVER),
+    : mOSCRecv(DEVICE_SERVER_PORT_CONNECTION_US),
       mNavControl(mNav),
-      mOSCSend(PORT_TO_DEVICE_SERVER, DEVICE_SERVER_IP_ADDRESS) {
+      mOSCSend(DEVICE_SERVER_PORT, DEVICE_SERVER_IP_ADDRESS),
+      useLocalNav(false) {
   mName = name;
   oscRecv().bufferSize(32000);
   oscRecv().handler(*this);
