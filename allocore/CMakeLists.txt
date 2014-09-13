@@ -39,6 +39,7 @@ list(APPEND ALLOCORE_HEADERS
     allocore/math/al_Plane.hpp
     allocore/math/al_Quat.hpp
     allocore/math/al_Random.hpp
+    allocore/math/al_Ray.hpp
     allocore/math/al_Spherical.hpp
     allocore/math/al_Vec.hpp
     allocore/protocol/al_Serialize.h
