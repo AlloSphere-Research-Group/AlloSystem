@@ -57,6 +57,7 @@ public:
 
 	Vec<3,T> o,d;		// origin and direction of ray
 
+	Ray(){};
 	Ray(Vec<3,T> origin, Vec<3,T> direction){
 		o.set(origin);
 		d.set(direction.normalize());
@@ -66,6 +67,9 @@ public:
 	Vec<3,T> operator()(T t){
 		return o + d*t;
 	}
+
+	Vec<3,T>& origin(){ return o; }
+	Vec<3,T>& dir(){ return d; }
 
 	// intersect sphere
 	T intersectSphere( Vec<3,T> cen, T radius ){
