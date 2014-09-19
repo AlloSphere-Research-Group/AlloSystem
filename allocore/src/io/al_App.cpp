@@ -193,6 +193,38 @@ bool App::usingAudio() const {
 	return audioIO().callback == AppAudioCB;
 }
 
+/// Convert a normalized screen space position to world space
+ // each component of input vector should be normalized from -1. to 1.
+template<class T>
+Vec<3,T> App::unproject(Vec<3,T> screenPos){    
+  Matrix4<T> invprojview = Matrix4<T>::inverse(stereo().modelViewProjection());
+  Vec<4,T> worldPos4 = invprojview.transform(screenPos);
+  return worldPos4.sub<3>(0) / worldPos4.w;
+}
+
+/// Get a pick ray from screen space coordinates
+ // i.e. use mouse xy
+Rayd App::ray(int screenX, int screenY){
+  Rayd r;
+
+  Vec3d screenPos;
+  screenPos.x = (screenX*1. / window().width()) * 2. - 1.;
+  screenPos.y = ((window().height() - screenY)*1. / window().height()) * 2. - 1.;
+  screenPos.z = -1.;
+  
+  Matrix4d invprojview = Matrix4d::inverse(stereo().modelViewProjection());
+  
+  Vec4d worldPos4 = invprojview.transform(screenPos);
+  r.origin().set( worldPos4.sub<3>(0) / worldPos4.w ); 
+
+  screenPos.z = 1.;
+  worldPos4 = invprojview.transform(screenPos);
+
+  r.dir().set( worldPos4.sub<3>(0) / worldPos4.w ); 
+  r.dir() -= r.origin();
+  r.dir().normalize(); 
+  return r;
+}
 
 
 bool App::SceneWindowHandler::onFrame(){
