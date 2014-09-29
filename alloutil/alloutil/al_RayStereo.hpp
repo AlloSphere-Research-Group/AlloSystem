@@ -92,7 +92,6 @@ public:
   RayStereo& generateConfig(BlendMode bm);
   
   void initShader(ShaderProgram& shaderProgram);
-  void recompile_shader(std::string vUser, std::string fUser);
   
   RayStereo& mode(StereoMode m);
   StereoMode mode() { return mMode; }
