@@ -63,6 +63,7 @@ namespace al {
     ShaderProgram& shader() { return mShader; }
     void loadShaderString();
     void loadShaderFile(std::string vPath, std::string fPath);
+    void recompileShaderFile(std::string vFile, std::string fFile);
     
     virtual void sendUniforms(ShaderProgram& shaderProgram);
     
@@ -266,6 +267,39 @@ namespace al {
     mFrag.source(frag_file.readAll(), Shader::FRAGMENT);
     
     bShaderFile = true;
+  }
+  
+  inline void RayApp::recompileShaderFile(std::string vFile, std::string fFile) {
+    File vert_file(vFile, "r", true);
+    File frag_file(fFile, "r", true);
+    
+    printf("Reading Vertex Shader: %s\n", vert_file.path().c_str());
+    printf("Reading Fragment Shader: %s\n", frag_file.path().c_str());
+    
+    if(!vert_file.opened() || !frag_file.opened()){
+      AL_WARN("Cannot open shader files.");
+      exit(EXIT_FAILURE);
+    }
+    
+    mShader.detach(mVert);
+    mShader.detach(mFrag);
+    
+    mVert.source(vert_file.readAll(), Shader::VERTEX);
+    mFrag.source(frag_file.readAll(), Shader::FRAGMENT);
+    
+    bShaderFile = true;
+    
+    mVert.compile();
+    mVert.printLog();
+    mFrag.compile();
+    mFrag.printLog();
+    
+    mShader.attach(mVert);
+    mShader.attach(mFrag);
+    mShader.link(false); // do not validate yet
+    mShader.listParams();
+    
+    mOmni.initShader(mShader);
   }
   
   // basic uniforms used in the shader. override it on user code
