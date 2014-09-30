@@ -52,11 +52,11 @@ namespace al {
 struct NavInputControl : public InputEventHandler {
 
 	NavInputControl(const NavInputControl& v)
-	:	mNav(v.mNav), mVScale(v.vscale()), mTScale(v.tscale())
+	:	mNav(v.mNav), mVScale(v.vscale()), mTScale(v.tscale()), mUseMouse(true)
 	{}
 
 	NavInputControl(Nav& nav, double vscale = 0.125, double tscale = 2.)
-	:	mNav(&nav), mVScale(vscale), mTScale(tscale)
+	:	mNav(&nav), mVScale(vscale), mTScale(tscale), mUseMouse(true)
 	{}
 
 	virtual ~NavInputControl(){}
@@ -111,6 +111,8 @@ struct NavInputControl : public InputEventHandler {
 	}
 
 	virtual bool onMouseDrag(const Mouse& m){
+		if(!mUseMouse) return true;
+
 		if(m.left()){
 			nav().turnU(-m.dx() * 0.2 * M_DEG2RAD);
 			nav().turnR(-m.dy() * 0.2 * M_DEG2RAD);
@@ -132,9 +134,12 @@ struct NavInputControl : public InputEventHandler {
 	double tscale() const { return mTScale; }
 	NavInputControl& tscale(double v) { mTScale=v; return *this; }
 
+	void useMouse(bool use){ mUseMouse = use; }
+
 protected:
 	Nav * mNav;
 	double mVScale, mTScale;
+	bool mUseMouse;
 };
 
 

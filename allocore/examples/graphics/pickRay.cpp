@@ -43,8 +43,8 @@ struct PickRayDemo : App {
 
     initWindow();
 
-    // remove nav control to disable looking on drag
-    window().remove(navControl());
+    // disabel nav control mouse drag to look
+    navControl().useMouse(false);
 
   }
 
