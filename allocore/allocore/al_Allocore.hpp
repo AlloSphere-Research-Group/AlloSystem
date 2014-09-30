@@ -67,6 +67,7 @@
 #include "allocore/math/al_Plane.hpp"
 #include "allocore/math/al_Quat.hpp"
 #include "allocore/math/al_Random.hpp"
+#include "allocore/math/al_Ray.hpp"
 #include "allocore/math/al_Spherical.hpp"
 #include "allocore/math/al_Vec.hpp"
 #include "allocore/protocol/al_OSC.hpp"

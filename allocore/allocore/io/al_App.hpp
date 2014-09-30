@@ -321,6 +321,10 @@ public:
 	/// Returns true if using audio
 	bool usingAudio() const;
 
+	/// Get a pick ray from screen space coordinates
+	 // i.e. use mouse xy
+	Rayd getPickRay(const ViewpointWindow& w, int screenX, int screenY);
+
 private:
 
 	typedef std::vector<Viewpoint *> Viewpoints;
