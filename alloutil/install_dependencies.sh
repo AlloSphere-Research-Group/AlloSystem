@@ -14,12 +14,12 @@ echo "Installing for ${PLATFORM} from ${ROOT}"
 if binary_exists 'apt-get'; then
 	echo 'Found apt-get'
 	sudo apt-get update
-	sudo apt-get install liblua5.1-dev
+	sudo apt-get install libluajit-5.1-dev
 
 elif binary_exists "brew"; then
 	echo 'Found Homebrew'
 	brew update
-	brew install lua
+	brew install luajit
 
 elif binary_exists "port"; then
 	echo 'Found MacPorts'
