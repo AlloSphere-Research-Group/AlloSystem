@@ -69,7 +69,7 @@ public:
 	}
 
 	Vec<3,T>& origin(){ return o; }
-	Vec<3,T>& dir(){ return d; }
+	Vec<3,T>& direction(){ return d; }
 
 	// intersect sphere
 	T intersectSphere( Vec<3,T> cen, T radius ){

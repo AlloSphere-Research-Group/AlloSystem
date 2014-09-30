@@ -322,14 +322,9 @@ public:
 	/// Returns true if using audio
 	bool usingAudio() const;
 
-	/// Convert a normalized screen space position to world space
-	 // each component of input vector should be normalized from -1. to 1.
-	template<class T>
-	Vec<3,T> unproject(Vec<3,T> screenPos);
-
 	/// Get a pick ray from screen space coordinates
 	 // i.e. use mouse xy
-	Rayd ray(int screenX, int screenY);
+	Rayd getPickRay(const ViewpointWindow& w, int screenX, int screenY);
 
 private:
 

@@ -65,7 +65,7 @@ struct PickRayDemo : App {
 
   virtual void onMouseMove(const ViewpointWindow& w, const Mouse& m){
     // make a ray from mouse location
-    Rayd r = ray(m.x(),m.y());
+    Rayd r = getPickRay(w, m.x(), m.y());
 
     // intersect ray with each sphere in scene
     for(int i=0; i<N; i++){
@@ -76,7 +76,7 @@ struct PickRayDemo : App {
     }
   }
   virtual void onMouseDown(const ViewpointWindow& w, const Mouse& m){
-    Rayd r = ray(m.x(),m.y());
+    Rayd r = getPickRay(w, m.x(), m.y());
 
     for(int i=0; i<N; i++){
       float t = r.intersectSphere(pos[i], 0.5f);
@@ -90,7 +90,7 @@ struct PickRayDemo : App {
     }
   }
   virtual void onMouseDrag(const ViewpointWindow& w, const Mouse& m){
-    Rayd r = ray(m.x(),m.y());
+    Rayd r = getPickRay(w, m.x(), m.y());
 
     for(int i=0; i<N; i++){
       // if sphere previously selected move sphere
