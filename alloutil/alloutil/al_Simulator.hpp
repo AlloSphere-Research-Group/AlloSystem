@@ -51,6 +51,7 @@ class Simulator : public osc::PacketHandler, public Main::Handler {
   bool useLocalNav;
 
   Nav mNav;
+  Pose pose;
   NavInputControl mNavControl;
   StandardWindowKeyControls mStdControls;
 
@@ -69,7 +70,7 @@ inline void Simulator::onTick() {
 
   lastTime = time;
   time = Main::get().realtime();
-  if (!useLocalNav) nav().step(time - lastTime);
+  nav().step(time - lastTime);
   step(time - lastTime);
 }
 
@@ -112,18 +113,13 @@ inline void Simulator::onMessage(osc::Message& m) {
   }
 
   if (m.addressPattern() == "/pose") {
-    useLocalNav = true;
-    Vec3d v;
-    Quatd q;
-    m >> v.x;
-    m >> v.y;
-    m >> v.z;
-    m >> q.x;
-    m >> q.y;
-    m >> q.z;
-    m >> q.w;
-    nav().pos(v);
-    nav().quat(q);
+    m >> pose.pos().x;
+    m >> pose.pos().y;
+    m >> pose.pos().z;
+    m >> pose.quat().x;
+    m >> pose.quat().y;
+    m >> pose.quat().z;
+    m >> pose.quat().w;
   }
 }
 
