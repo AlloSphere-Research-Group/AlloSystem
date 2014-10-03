@@ -26,6 +26,7 @@ include(cmake_modules/make_dep.cmake)
 # check for Gamma and build ---------------------------------
 if(BUILD_GAMMA)
     make_dep(Gamma)
+    set(GAMMA_LIBRARY ${Gamma_LIBRARY})
 endif(BUILD_GAMMA)
 
 # check for GLV and build ---------------------------------
@@ -78,7 +79,8 @@ endif(BUILDING_VSR)
 
 # Run from path (Used in run.sh script)
 if((BUILD_DIR) OR (BUILD_APP_FILE))
-  include(cmake_modules/CMakeRunTargets.cmake)
+    include(cmake_modules/CMakeRunTargets.cmake)
+    set(BUILD_EXAMPLES 0)
 endif((BUILD_DIR) OR (BUILD_APP_FILE))
 
 # ----------------------------  Examples

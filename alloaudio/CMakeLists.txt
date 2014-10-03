@@ -3,6 +3,17 @@ project (Alloaudio)
 
 message("==== Configuring alloaudio.")
 
+
+find_package(LibSndFile REQUIRED QUIET)
+if(NOT TARGET Gamma)
+    find_package(Gamma QUIET)
+endif(NOT TARGET Gamma)
+
+if(NOT (GAMMA_FOUND OR GAMMA_LIBRARY))
+    message("Alloaudio: Gamma not found. Not building Alloaudio." )
+    return()
+endif(NOT (GAMMA_FOUND OR GAMMA_LIBRARY))
+
 set(ALLOAUDIO_SRC
   src/al_OutputMaster.cpp
 #  src/al_Decorrelation.cpp
@@ -53,15 +64,6 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 
 # Build Examples ------------------------------------------------------
 if(BUILD_EXAMPLES)
-    find_package(LibSndFile REQUIRED QUIET)
-  if(NOT TARGET Gamma)
-    find_package(Gamma QUIET)
-  endif(NOT TARGET Gamma)
-  
-  if(NOT (GAMMA_FOUND OR GAMMA_LIBRARY))
-    message("Alloaudio: Gamma not found. Not building examples." )
-  else()
-
     include_directories(${GAMMA_INCLUDE_DIR})
 
     file(GLOB EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/*.cpp)
@@ -88,7 +90,6 @@ if(BUILD_EXAMPLES)
 	WORKING_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
 	SOURCES ${example})
     endforeach(example)
-  endif(NOT (GAMMA_FOUND OR GAMMA_LIBRARY))
 endif(BUILD_EXAMPLES)
 
 # installation
