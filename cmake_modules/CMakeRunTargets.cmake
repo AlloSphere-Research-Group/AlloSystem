@@ -1,7 +1,7 @@
 # Basic checks
-if(NOT (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})) # use only if cmake was run from the root directory
-    message(FATAL_ERROR "Error: The run script must be called from the source root directory." )
-endif(NOT (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR}))
+#if(NOT (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})) # use only if cmake was run from the root directory
+#    message(FATAL_ERROR "Error: The run script must be called from the source root directory." )
+#endif(NOT (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR}))
 
 string(REGEX MATCH ".*\\*.*" match "${CMAKE_CURRENT_SOURCE_DIR}")
 IF(NOT ${match} STREQUAL "")

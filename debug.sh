@@ -25,12 +25,12 @@ TARGET=$(echo "${DIRNAME}_${FILENAME}_run" | sed 's/\./_/g' | sed 's/\//_/g')
 
 # Had to separate out DBUILD_FLAG to ensure correct globbing in the cmake line.
 if [ -f "$1" ]; then
-  TARGET_FLAG="-DBUILD_APP_FILE=$1"
-  DBUILD_FLAG="-DBUILD_DIR=0"
+  TARGET_FLAG="-DALLOSYSTEM_BUILD_APP_FILE=$1"
+  DBUILD_FLAG="-DALLOSYSTEM_BUILD_DIR=0"
   echo RUN SCRIPT: Building file "$1"
 elif [ -d "$1" ]; then
-  TARGET_FLAG="-DBUILD_APP_DIR=$1"
-  DBUILD_FLAG="-DBUILD_DIR=1"
+  TARGET_FLAG="-DALLOSYSTEM_BUILD_APP_DIR=$1"
+  DBUILD_FLAG="-DALLOSYSTEM_BUILD_DIR=1"
   echo RUN SCRIPT: Building all files in dir "$1"
 else
   echo Aborting: "$1" is neither a file nor directory

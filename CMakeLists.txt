@@ -78,10 +78,12 @@ if(BUILDING_VSR)
 endif(BUILDING_VSR)
 
 # Run from path (Used in run.sh script)
-if((BUILD_DIR) OR (BUILD_APP_FILE))
-    include(cmake_modules/CMakeRunTargets.cmake)
+if((ALLOSYSTEM_BUILD_DIR) OR (ALLOSYSTEM_BUILD_APP_FILE))
+    set(BUILD_DIR ${ALLOSYSTEM_BUILD_DIR})
+    set(BUILD_APP_FILE ${ALLOSYSTEM_BUILD_APP_FILE})
+    include("${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/CMakeRunTargets.cmake")
     set(BUILD_EXAMPLES 0)
-endif((BUILD_DIR) OR (BUILD_APP_FILE))
+endif((ALLOSYSTEM_BUILD_DIR) OR (ALLOSYSTEM_BUILD_APP_FILE))
 
 # ----------------------------  Examples
 # macro to get subdirectories
