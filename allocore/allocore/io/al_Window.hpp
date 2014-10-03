@@ -338,8 +338,8 @@ public:
 	bool vsync() const { return mVSync; }		///< Get whether v-sync is enabled
 	bool asap() const { return mASAP; }			///< Get whether window is rendering as fast as possible
 
-	int height() const { return dimensions().h; }
-	int width() const { return dimensions().w; }
+	int height() const { return dimensions().h; } ///< Get window height, in pixels
+	int width() const { return dimensions().w; } ///< Get window width, in pixels
 
 	Window& cursor(Cursor v);					///< Set cursor type
 	Window& cursorHide(bool v);					///< Set cursor hiding

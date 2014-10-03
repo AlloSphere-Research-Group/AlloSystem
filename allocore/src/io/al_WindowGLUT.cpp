@@ -628,6 +628,12 @@ bool Window::create(
 	// that the requested window width and height get properly stored.
 	WindowImpl::cbReshape(dim.w, dim.h);
 
+	// Set fullscreen according to mFullScreen member
+	{	bool fs = fullScreen();
+		mImpl->mFullScreen = false;
+		fullScreen(fs);
+	}
+
 	mImpl->scheduleDraw();
 
 	return true;
@@ -709,6 +715,12 @@ Window& Window::fps(double v){
 }
 
 Window& Window::fullScreen(bool v){
+
+	// If no window yet, then just set member
+	if(!created()){
+		mImpl->mFullScreen = v;
+		return *this;
+	}
 
 	// exit full screen
 	if(mImpl->mFullScreen && !v){
