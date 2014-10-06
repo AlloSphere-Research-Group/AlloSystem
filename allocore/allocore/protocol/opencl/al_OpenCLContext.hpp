@@ -20,16 +20,16 @@ public:
 	OpenCLContext(cl_context context=0)
 	:	mContext(context)
 	{}
-	
+
 	~OpenCLContext() {
 		destroy();
 	}
-	
+
 	cl_context get_context() const {return mContext;}
 	void create(const OpenCLDevice &dev);
 	void create(const vector<OpenCLDevice> &devs);
 	void destroy();
-	
+
 	void attach_resource(OpenCLResource<OpenCLContext> *resource);
 	void detach_resource(OpenCLResource<OpenCLContext> *resource);
 

@@ -9,9 +9,9 @@ static Lens lens;
 Nav nav;
 
 struct MyWindow : Window, public Drawable{
-	
-	bool onKeyDown(const Keyboard& k){	
-		
+
+	bool onKeyDown(const Keyboard& k){
+
 		switch(k.key()){
 			case '-': lens.eyeSep(lens.eyeSep() - 0.01); break;
 			case '+': lens.eyeSep(lens.eyeSep() + 0.01); break;
@@ -36,7 +36,7 @@ struct MyWindow : Window, public Drawable{
 	void onDraw(Graphics& gl){
 		gl.fog(lens.far(), lens.far()/2, stereo.clearColor());
 		gl.depthTesting(1);
-		gl.draw(mesh);	
+		gl.draw(mesh);
 	}
 };
 
@@ -52,7 +52,7 @@ int main(){
 	stereo.stereo(true);
 	stereo.mode(Stereographic::ACTIVE);
 
-	
+
 	// set up mesh:
 	mesh.primitive(Graphics::TRIANGLES);
 	double tri_size = 2;
@@ -67,7 +67,7 @@ int main(){
 			mesh.vertex(x+rnd::uniformS(tri_size), y+rnd::uniformS(tri_size), z+rnd::uniformS(tri_size));
 		}
 	}
-	
+
 	win.create(Window::Dim(100, 0, 640, 480), "Stereographic Example", 60, Window::DEFAULT_BUF | Window::STEREO_BUF);
 
 	//win.create(Window::Dim(100, 0, 640, 480), "Stereographic Example", 60);

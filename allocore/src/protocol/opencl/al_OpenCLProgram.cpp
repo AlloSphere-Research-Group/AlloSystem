@@ -20,11 +20,11 @@ void OpenCLProgram :: create(OpenCLContext &ctx, const char *source) {
 		NULL,
 		&res
 	);
-	
+
 	if(opencl_error(res, "clCreateProgramWithSource error creating program")) {
 		return;
 	}
-	
+
 	mProgram = program;
 	ctx.attach_resource(this);
 }
@@ -38,7 +38,7 @@ void OpenCLProgram :: build(const vector<OpenCLDevice> &devs) {
 	cl_device_id devices[MAX_DEVICES];
 	for(int i=0; i < MIN(MAX_DEVICES, ndevices); i++) {
 		devices[i] = devs[i].get_device();
-		
+
 		if(!devs[i].get_available()) {
 			char msg[256];
 			sprintf(msg, "OpenCL Device %s is not available", devs[i].get_name().c_str());
@@ -46,7 +46,7 @@ void OpenCLProgram :: build(const vector<OpenCLDevice> &devs) {
 			return;
 		}
 	}
-	
+
 	cl_int res = clBuildProgram(
 		mProgram,
 		ndevices,
@@ -55,7 +55,7 @@ void OpenCLProgram :: build(const vector<OpenCLDevice> &devs) {
 		NULL,
 		NULL
 	);
-	
+
 	if(opencl_error(res, "clBuildProgram error building program")) {
 		/*  INSTEAD OF CALLBACKS:
 		clGetProgramBuildInfo(
@@ -69,7 +69,7 @@ void OpenCLProgram :: build(const vector<OpenCLDevice> &devs) {
 		*/
 		return;
 	}
-	
+
 	return;
 }
 
@@ -81,10 +81,10 @@ void OpenCLProgram :: destroy() {
 			(*it)->detach();
 			it = mResources.begin();
 		}
-	
+
 		cl_int res = clReleaseProgram(mProgram);
 		mProgram = 0;
-		
+
 		opencl_error(res, "clReleaseProgram error releasing program");
 	}
 }
@@ -104,7 +104,7 @@ void OpenCLProgram :: detach_resource(OpenCLResource<OpenCLProgram> *resource) {
 		}
 	}
 }
-	
-	
+
+
 }	// cl::
 }	// al::

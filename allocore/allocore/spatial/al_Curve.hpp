@@ -3,35 +3,35 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -63,9 +63,9 @@ void frenet(const V3& p2, const V3& p1, const V3& p0, V3& t, V3& n, V3& b);
 /// This class generates a sequence of Frenet frames given a corresponding
 /// sequence of discrete points along a curve. A Frenet frame is computed from
 /// a run of three consecutive points and corresponds to the middle point.
-/// A Frenet frame is an orthonormal reference frame describing the local 
+/// A Frenet frame is an orthonormal reference frame describing the local
 /// tangent (T), normal (N), and binormal (B) unit vectors of a curve. The frame
-/// is based on a right-handed coordinate system so that T = N x B, N = B x T, 
+/// is based on a right-handed coordinate system so that T = N x B, N = B x T,
 /// and B = T x N.
 /// \tparam Vec3	3-vector type
 template <class Vec3>
@@ -99,9 +99,9 @@ struct Frenet{
 	void operator()(const Vec3& p0){ next<1,1,1,1>(p0); }
 
 	/// Compute Frenet frame one point back from input point
-	
+
 	/// For best results, avoid runs of 3 or more colinear points and 2 or more
-	/// duplicate points. Colinear points result in ambiguous normal and 
+	/// duplicate points. Colinear points result in ambiguous normal and
 	/// binormal vectors. Duplicated points make the first derivative undefined.
 	/// Both of these situations are guaranteed to wreak numerical havok.
 	template<bool NormalizeT, bool NormalizeN, bool NormalizeB, bool ComputeN>
@@ -131,7 +131,7 @@ struct Frenet{
 			N = cross(B, T);
 			if(NormalizeN) N.normalize();
 		}
-		
+
 		if(NormalizeB) B.normalize();
 	}
 
@@ -168,7 +168,7 @@ inline void frenet(const V2& d1, V2& t, V2& n){
 }
 
 template <class V3>
-inline void frenet(const V3& d1, const V3& d2, V3& t, V3& n, V3& b){	
+inline void frenet(const V3& d1, const V3& d2, V3& t, V3& n, V3& b){
 	b = cross(d2, d1);
 	n = cross(d1, b);
 	t = d1;
@@ -178,7 +178,7 @@ inline void frenet(const V3& d1, const V3& d2, V3& t, V3& n, V3& b){
 }
 
 template <class V3>
-inline void frenet(const V3& p2, const V3& p1, const V3& p0, V3& t, V3& n, V3& b){	
+inline void frenet(const V3& p2, const V3& p1, const V3& p0, V3& t, V3& n, V3& b){
 	V3 d1 = (p0 - p2);			// 1st (central) difference (scaled by 2)
 	V3 d2 = (p0 - p1*2. + p2);	// 2nd difference
 	frenet(d1,d2, t,n,b);

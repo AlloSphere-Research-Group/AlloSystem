@@ -36,14 +36,14 @@
 
 namespace osc{
 
-class OscPacketListener : public PacketListener{ 
+class OscPacketListener : public PacketListener{
 protected:
-    virtual void ProcessBundle( const osc::ReceivedBundle& b, 
+    virtual void ProcessBundle( const osc::ReceivedBundle& b,
 				const IpEndpointName& remoteEndpoint )
     {
         // ignore bundle time tag for now
 
-        for( ReceivedBundle::const_iterator i = b.ElementsBegin(); 
+        for( ReceivedBundle::const_iterator i = b.ElementsBegin();
 				i != b.ElementsEnd(); ++i ){
             if( i->IsBundle() )
                 ProcessBundle( ReceivedBundle(*i), remoteEndpoint );
@@ -52,11 +52,11 @@ protected:
         }
     }
 
-    virtual void ProcessMessage( const osc::ReceivedMessage& m, 
+    virtual void ProcessMessage( const osc::ReceivedMessage& m,
 				const IpEndpointName& remoteEndpoint ) = 0;
-    
+
 public:
-	virtual void ProcessPacket( const char *data, int size, 
+	virtual void ProcessPacket( const char *data, int size,
 			const IpEndpointName& remoteEndpoint )
     {
         osc::ReceivedPacket p( data, size );

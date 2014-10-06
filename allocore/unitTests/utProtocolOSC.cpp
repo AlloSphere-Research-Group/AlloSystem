@@ -6,7 +6,7 @@ struct PacketData{
 	float f;
 	double d;
 	char c;
-	
+
 	void clear(){ i=0; f=0; d=0; c=0; }
 	bool valid() const { return 0x12345678==i && 1==f && 1==d && 1==c; }
 	void print() const { printf("%x %g %g %d\n", i, f, d, c); }
@@ -42,9 +42,9 @@ int utProtocolOSC(){
 		p.addMessage("/test",
 			1, 1.f, 1.0, '1',
 			str, std::string(str), Blob(str, strlen(str)));
-	
+
 		Message m(p.data(), p.size());
-		
+
 			assert(m.addressPattern() == "/test");
 			assert(m.typeTags() == "ifdcssb");
 
@@ -79,18 +79,18 @@ int utProtocolOSC(){
 		p.endBundle();
 		p.addMessage("/message13", (int)0x56789abc);
 	p.endBundle();
-	
+
 	assert(p.isBundle());
 	assert(!p.isMessage());
 
-	
+
 	PacketData data;
 	{
 		struct OSCHandler : public osc::PacketHandler{
 			void onMessage(osc::Message& m){
-			
+
 //				m.print();
-			
+
 				assert(m.typeTags() == "sifdcb");
 				assert(m.addressPattern() == "/test");
 
@@ -125,7 +125,7 @@ int utProtocolOSC(){
 			s.endMessage();
 			s.endBundle();
 			s.send();
-			
+
 			al_sleep(0.01);
 		}
 	}

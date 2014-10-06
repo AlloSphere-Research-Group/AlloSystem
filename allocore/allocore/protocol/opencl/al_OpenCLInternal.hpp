@@ -43,14 +43,14 @@ template<> size_t * opencl_param(char *param_value);
 template<class T>
 class OpenCLResource {
 public:
-	OpenCLResource() 
+	OpenCLResource()
 	:	mOwner(0)
 	{}
 	virtual ~OpenCLResource() {
 		destroy();
 		detach();
 	}
-	
+
 	T * get_owner() {return mOwner;}
 	void attach(T *owner) {mOwner = owner;}
 	void detach() {
@@ -60,7 +60,7 @@ public:
 		}
 	}
 	virtual void destroy() {};
-	
+
 protected:
 	T *mOwner;
 };

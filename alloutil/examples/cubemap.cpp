@@ -24,21 +24,21 @@ unsigned drawMode = 1;
 
 struct MyWindow : Window, public Drawable{
 
-	bool onKeyDown(const Keyboard& k){	
+	bool onKeyDown(const Keyboard& k){
 		return true;
 	}
 
 	bool onFrame(){
 		nav.step();
-		
+
 		// capture the scene:
 		cubeFBO.capture(gl, lens, nav, *this);
 
-		// now use the captured texture:		
+		// now use the captured texture:
 		gl.viewport(0, 0, width(), height());
 		gl.clearColor(0.2, 0.2, 0.2, 0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		
+
 		// first, draw it as a cylindrical map in the background:
 		// ortho for 2D, ranging from 0..1 in each axis:
 		gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
@@ -47,43 +47,43 @@ struct MyWindow : Window, public Drawable{
 		gl.lighting(false);
 		gl.blending(false);
 		cubeFBO.drawMap(gl);
-					
-					
+
+
 		// second, use it to texture a rotating object:
 		gl.projection(Matrix4d::perspective(70, width()/(double)height(), lens.near(), lens.far()));
 		gl.modelView(Matrix4d::lookAt(Vec3d(0, 0, 4), Vec3d(0, 0, 2), Vec3d(0, 1, 0)));
-		
+
 		// rotate over time:
 		gl.rotate(MainLoop::now()*30., 0.707, 0.707, 0.);
-		
+
 		gl.lighting(false);
 		gl.blending(false);
 		gl.depthTesting(true);
-		
+
 		// use cubemap texture
 		cubeFBO.bind();
-		
+
 		// generate texture coordinates from the object:
 		GLenum map = GL_OBJECT_LINEAR;
 		//GLenum map = GL_REFLECTION_MAP;
 		//GLenum map = GL_NORMAL_MAP;
 		//GLenum map = GL_EYE_LINEAR;
-		//GLenum map = GL_SPHERE_MAP;		
-		glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, map); 
-		glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, map); 
-		glTexGeni(GL_R, GL_TEXTURE_GEN_MODE, map); 
-		glEnable(GL_TEXTURE_GEN_S); 
-		glEnable(GL_TEXTURE_GEN_T); 
+		//GLenum map = GL_SPHERE_MAP;
+		glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, map);
+		glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, map);
+		glTexGeni(GL_R, GL_TEXTURE_GEN_MODE, map);
+		glEnable(GL_TEXTURE_GEN_S);
+		glEnable(GL_TEXTURE_GEN_T);
 		glEnable(GL_TEXTURE_GEN_R);
-		
+
 		gl.draw(cube);
-		
-		glDisable(GL_TEXTURE_GEN_S); 
-		glDisable(GL_TEXTURE_GEN_T); 
+
+		glDisable(GL_TEXTURE_GEN_S);
+		glDisable(GL_TEXTURE_GEN_T);
 		glDisable(GL_TEXTURE_GEN_R);
-		
+
 		cubeFBO.unbind();
-		
+
 		return true;
 	}
 
@@ -91,7 +91,7 @@ struct MyWindow : Window, public Drawable{
 		gl.fog(lens.far(), lens.far()/2, cubeFBO.clearColor());
 		gl.depthTesting(1);
 		gl.draw(grid);
-		gl.draw(mesh);	
+		gl.draw(mesh);
 	}
 };
 
@@ -100,10 +100,10 @@ MyWindow win;
 int main(){
 
 	double world_radius = 50;
-	
+
 	nav.smooth(0.8);
 	lens.near(1).far(world_radius);
-	
+
 	// set up mesh:
 	mesh.primitive(Graphics::TRIANGLES);
 	double tri_size = 2;
@@ -117,7 +117,7 @@ int main(){
 			mesh.vertex(x+rnd::uniformS(tri_size), y+rnd::uniformS(tri_size), z+rnd::uniformS(tri_size));
 		}
 	}
-	
+
 	// set up grid:
 	grid.primitive(Graphics::LINES);
 	double stepsize = 1./2;
@@ -137,19 +137,19 @@ int main(){
 		grid.vertex(-1, y, z);
 	}}
 	grid.scale(world_radius);
-	
+
 	// set up cube:
 	cube.color(1,1,1,1);
 	cube.primitive(Graphics::TRIANGLES);
 	addCube(cube);
 	cube.generateNormals();
-	
+
 	win.create(Window::Dim(100, 0, 640, 480), "Cube Map FBO Example", 60);
 	win.displayMode(win.displayMode() | Window::STEREO_BUF);
 	win.add(new StandardWindowKeyControls);
 	win.add(new NavInputControl(nav));
 
 	MainLoop::start();
-	
+
     return 0;
 }

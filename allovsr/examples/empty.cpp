@@ -40,26 +40,26 @@ if(!bSet){ bSet = true;
 struct MyApp : public al::VsrApp {
 
 
-    MyApp() : al::VsrApp() { 
-    
+    MyApp() : al::VsrApp() {
+
         stereo.stereo(true);
         stereo.mode( Stereographic::DUAL );
-    
+
     }
 
     virtual void onDraw(Graphics& gl){
-    
+
         //Model Transform
-        Rot t = Gen::aa( scene().model.rot() ); 
+        Rot t = Gen::aa( scene().model.rot() );
         GL::rotate( t.w() );
-    
+
         //YOUR CODE HERE
         Frame f; DRAW(f);
         //if (stereo.omni()) printf("omni");
         //if (stereo.mode() == Stereographic::DUAL ) printf("dual\n");
     }
-    
-    
+
+
 };
 
 MyApp app;
@@ -67,9 +67,9 @@ MyApp app;
 int main(int argc, const char * argv[]){
 
     app.create(Window::Dim(800, 600), "Allovsr Example: Robot Arm");
-	
+
     MainLoop::start();
-    
+
 	return 0;
 
 }

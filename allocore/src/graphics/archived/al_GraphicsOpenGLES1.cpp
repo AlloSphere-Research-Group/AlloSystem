@@ -1,6 +1,6 @@
 #if defined(__IPHONE_2_0)
 	#define AL_GRAPHICS_USE_OPENGLES1
-	
+
 	#import <OpenGLES/ES1/gl.h>
 	#import <OpenGLES/ES1/glext.h>
 #endif
@@ -40,7 +40,7 @@ static void gl_vertex(Graphics * g, double x, double y, double z) {
 static void gl_draw(const GraphicsData& v){
 	int Nv = v.vertices().size();
 	if(0 == Nv) return;
-	
+
 	int Nc = v.colors().size();
 	int Nn = v.normals().size();
 	int Nt2= v.texCoord2s().size();
@@ -55,18 +55,18 @@ static void gl_draw(const GraphicsData& v){
 		glEnableClientState(GL_NORMAL_ARRAY);
 		glNormalPointer(GL_FLOAT, 0, &v.normals()[0]);
 	}
-	
+
 	if(Nc){
 		glEnableClientState(GL_COLOR_ARRAY);
-		glColorPointer(4, GL_FLOAT, 0, &v.colors()[0]);			
+		glColorPointer(4, GL_FLOAT, 0, &v.colors()[0]);
 	}
-	
+
 	if(Nt2 || Nt3){
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		if(Nt2) glTexCoordPointer(2, GL_FLOAT, 0, &v.texCoord2s()[0]);
 		if(Nt3) glTexCoordPointer(3, GL_FLOAT, 0, &v.texCoord3s()[0]);
 	}
-	
+
 	// Send the package over...
 	if(Ni){
 		//unsigned vs=0, ve=Nv;	// range of vertex indices to prefetch
@@ -100,9 +100,9 @@ bool setBackendOpenGLES1(Graphics * g) {
 	g->s_vertex = gl_vertex;
 	g->s_normal = gl_normal;
 	g->s_color = gl_color;
-	
+
 	g->s_draw = gl_draw;
-	
+
 	#define SET_GL_ENUM(x) g->x = GL_##x
 	SET_GL_ENUM(POINTS);
 	SET_GL_ENUM(LINES);
@@ -114,12 +114,12 @@ bool setBackendOpenGLES1(Graphics * g) {
 	g->QUADS = 0;
 	g->QUAD_STRIP = 0;
 	g->POLYGON = 0;
-	
+
 	SET_GL_ENUM(COLOR_BUFFER_BIT);
 	SET_GL_ENUM(DEPTH_BUFFER_BIT);
-	
+
 //	g->mMode = GL_POINTS;
-	
+
 	printf("using GraphicsBackend::OpenGLES1\n");
 	g->mBackend = GraphicsBackend::OpenGLES1;
 	return true;

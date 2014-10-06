@@ -13,7 +13,7 @@
 		bmp, chead, cut, dcx, dds, doom, doomFlat, exif, gif, hdr, ico, jasc_pal, jpg,
 		lbm, lif, mdl, pcd, pcx, pic, pix, png, pnm, psd, psp, pxr, raw, sgi, tgo, tif,
 		wal, xpm
-		
+
 	FreeImage is used under the FreeImage Public License (FIPL) v1.0
 	See the /licenses folder in the source tree, or
 	http://freeimage.sourceforge.net/freeimage-license.txt
@@ -36,7 +36,7 @@ public:
 	virtual ~FreeImageImpl() {
 		destroy();
 	}
-	
+
 	virtual bool load(const std::string& filename, Array &lat) {
 		FREE_IMAGE_FORMAT type = FreeImage_GetFIFFromFilename(filename.c_str());
 		if(type == FIF_UNKNOWN) {
@@ -47,14 +47,14 @@ public:
 			AL_WARN("image format not supported: %s", filename.c_str());
 			return false;
 		}
-		
+
 		destroy();
 		mImage = FreeImage_Load(type, filename.c_str(), 0);
 		if (mImage == NULL) {
 			AL_WARN("image failed to load: %s", filename.c_str());
 			return false;
 		}
-		
+
 		FREE_IMAGE_COLOR_TYPE colorType = FreeImage_GetColorType(mImage);
 		switch(colorType) {
 			case FIC_MINISBLACK:
@@ -91,7 +91,7 @@ public:
 
 		// flip vertical for OpenGL:
 		//FreeImage_FlipVertical(mImage);
-		
+
 		//Freeimage is not tightly packed, so we use
 		//a custom method instead of one of the Matrix
 		//utility methods
@@ -100,7 +100,7 @@ public:
 		int w, h;
 		getDim(w, h);
 		lat.format(planes, ty, w, h);
-		
+
 		Image::Format format = Image::getFormat(planes);
 		switch(format) {
 			case Image::LUMINANCE: {
@@ -113,7 +113,7 @@ public:
 				}
 			}
 			break;
-			
+
 			case Image::RGB: {
 				switch(lat.header.type) {
 					case AlloUInt8Ty: {
@@ -146,13 +146,13 @@ public:
 					}
 					break;
 
-					default: 
+					default:
 					break;
 
 				}
 			}
 			break;
-			
+
 			case Image::RGBA: {
 				switch(lat.header.type) {
 					case AlloUInt8Ty: {
@@ -188,15 +188,15 @@ public:
 				}
 			}
 			break;
-			
-			default: 
+
+			default:
 				AL_WARN("image data not understood");
 				destroy();
 				return false;
 		}
 		return true;
 	}
-	
+
 
 	void resize(int w, int h, int bpp){
 		if(NULL != mImage){ // already allocated image?
@@ -212,7 +212,7 @@ public:
 		else{
 			/*
 			FreeImage_AllocateT(FREE_IMAGE_TYPE type, int width, int height, int bpp);
-			bpp		Bit depth of the new Bitmap. Supported pixel depth: 
+			bpp		Bit depth of the new Bitmap. Supported pixel depth:
 					1-, 4-, 8-, 16-, 24-, 32-bit per pixel for standard bitmap
 			*/
 			//printf("FreeImage_AllocateT(%d, %d, %d)\n", w,h,bpp);
@@ -222,10 +222,10 @@ public:
 
 
 	virtual bool save(const std::string& filename, const Array& arr, int compressFlags) {
-	
+
 		// check existing image type
 		FREE_IMAGE_FORMAT fileType = FreeImage_GetFIFFromFilename(filename.c_str());
-		
+
 		if(fileType == FIF_UNKNOWN) {
 			AL_WARN("image format not recognized: %s", filename.c_str());
 			return false;
@@ -297,8 +297,8 @@ public:
 				}
 			break;*/
 
-			/* According to the FreeImage documentation ("Pixel access functions"): 
-			"When accessing to individual color components of a 24- or 32-bit 
+			/* According to the FreeImage documentation ("Pixel access functions"):
+			"When accessing to individual color components of a 24- or 32-bit
 			DIB, you should always use FreeImage macros or RGBTRIPLE / RGBQUAD
 			structures in order to write OS independent code.
 			*/
@@ -328,12 +328,12 @@ public:
 			break;
 
 			case Image::RGBA: {
-				
+
 				switch(header.type) {
 
-					case AlloUInt8Ty: {						
+					case AlloUInt8Ty: {
 						char *bp = (char *)(arr.data.ptr);
-						
+
 						for(unsigned j = 0; j < h; ++j) {
 							RGBQUAD * dst = (RGBQUAD *)FreeImage_GetScanLine(mImage, j);
 							const Image::RGBAPix<uint8_t> * src = (const Image::RGBAPix<uint8_t> *)(bp + j*rowstride);
@@ -446,15 +446,15 @@ protected:
 		if (mImage) FreeImage_Unload(mImage);
 		mImage = NULL;
 	}
-	
+
 	FIBITMAP		*mImage;
 };
 
-Image :: Image() 
+Image :: Image()
 : mImpl(0), mCompression(50), mLoaded(false)
 {}
 
-Image :: Image(const std::string& filename) 
+Image :: Image(const std::string& filename)
 : mImpl(0), mFilename(filename), mCompression(50), mLoaded(false) {
 	load(filename);
 }
@@ -462,10 +462,10 @@ Image :: Image(const std::string& filename)
 Image :: ~Image() {
 	if (mImpl) delete mImpl;
 }
-	
+
 bool Image :: load(const std::string& filename) {
 	if (!mImpl) mImpl = new FreeImageImpl();
-//	// TODO: if we add other image formats/libraries, 
+//	// TODO: if we add other image formats/libraries,
 //	// detect by file extension & redirect to appropriate implementation here:
 //	if (mImpl) delete mImpl;
 //	mImpl = new FreeImageImpl();
@@ -476,7 +476,7 @@ bool Image :: load(const std::string& filename) {
 
 bool Image :: save(const std::string& filename) {
 	if (!mImpl) mImpl = new FreeImageImpl();
-//	// TODO: if we add other image formats/libraries, 
+//	// TODO: if we add other image formats/libraries,
 //	// detect by file extension & redirect to appropriate implementation here:
 //	if (mImpl) delete mImpl;
 //	mImpl = new FreeImageImpl();
@@ -485,7 +485,7 @@ bool Image :: save(const std::string& filename) {
 	return mLoaded;
 }
 
-Image::Format Image::format() const {	
+Image::Format Image::format() const {
 	return getFormat(array().components());
 }
 

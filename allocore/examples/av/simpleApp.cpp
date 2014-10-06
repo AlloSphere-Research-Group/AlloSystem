@@ -42,7 +42,7 @@ For the camera, the coordinate conventions are:
 	+x is right
 	-y is down
 	+y is up
-	-z is forward 
+	-z is forward
 	+z is backward
 
 Author:
@@ -72,7 +72,7 @@ public:
 		// Initialize a single window; anything in App::onDraw will be rendered
 		// Arguments: position/dimensions, title, frames/second
 		initWindow(Window::Dim(0,0, 600,400), "Untitled", 40);
-		
+
 		// Uncomment this to disable the default navigation keyboard/mouse controls
 		//window().remove(navControl());
 
@@ -87,16 +87,16 @@ public:
 
 	// This is the audio callback
 	virtual void onSound(AudioIOData& io){
-	
+
 		// Things here occur at block rate...
-	
+
 		// This is the sample loop
 		while(io()){
 			//float in = io.in(0);
-			
+
 			float out1 = 0;
 			float out2 = 0;
-			
+
 			io.out(0) = out1;
 			io.out(1) = out2;
 		}
@@ -119,18 +119,18 @@ public:
 	// and eye (for stereoscopic). Typically, this is where you instruct the
 	// GPU to render something.
 	virtual void onDraw(Graphics& g, const Viewpoint& v){
-		
+
 		// Note: we don't need to do all the normal graphics setup as this
 		// is handled by the App's stereographic object. We can just draw
 		// our geometry immediately!
-		
+
 		// Graphics has a Mesh for temporary use
 		Mesh& m = g.mesh();
-		
+
 		// We must clear the Mesh each frame because we are regenerating its
 		// vertices each frame.
 		m.reset();
-		
+
 		// Set drawing primitive of Mesh
 		m.primitive(g.TRIANGLES);
 
@@ -150,7 +150,7 @@ public:
 
 	// This is called whenever a key is pressed.
 	virtual void onKeyDown(const ViewpointWindow& w, const Keyboard& k){
-	
+
 		// Use a switch to do something when a particular key is pressed
 		switch(k.key()){
 
@@ -160,7 +160,7 @@ public:
 		case 'n': printf("Pressed n.\n"); break;
 		case '.': printf("Pressed period.\n"); break;
 		case ' ': printf("Pressed space bar.\n"); break;
-		
+
 		// For non-printable keys, we have to use the enums described in the
 		// Keyboard class:
 		case Keyboard::RETURN: printf("Pressed return.\n"); break;
@@ -177,7 +177,7 @@ public:
 		case Mouse::MIDDLE: printf("Pressed middle mouse button.\n"); break;
 		}
 	}
-	
+
 	// This is called whenever the mouse is dragged.
 	virtual void onMouseDrag(const ViewpointWindow& w, const Mouse& m){
 		// Get mouse coordinates, in pixels, relative to top-left corner of window
@@ -185,7 +185,7 @@ public:
 		int y = m.y();
 		printf("Mouse dragged: %3d, %3d\n", x,y);
 	}
-	
+
 	// *****************************************************
 	// NOTE: check the App class for more callback functions
 };

@@ -7,7 +7,7 @@ namespace cl {
 void OpenCLCommandQueue :: create(OpenCLContext &ctx, const OpenCLDevice &dev, bool ordered, bool profiling) {
 	destroy();
 	detach();
-	
+
 	cl_command_queue_properties properties = 0;
 	if(profiling) {
 		properties |= CL_QUEUE_PROFILING_ENABLE;
@@ -20,7 +20,7 @@ void OpenCLCommandQueue :: create(OpenCLContext &ctx, const OpenCLDevice &dev, b
 			opencl_error(USER_OPENCL_ERROR, "Device doesn't support out of order execution ... disabling");
 		}
 	}
-	
+
 	cl_int res = CL_SUCCESS;
 	cl_command_queue command_queue = clCreateCommandQueue(
 		ctx.get_context(),
@@ -28,11 +28,11 @@ void OpenCLCommandQueue :: create(OpenCLContext &ctx, const OpenCLDevice &dev, b
 		properties,
 		&res
 	);
-	
+
 	if(opencl_error(res, "clCreateCommandQueue error creating command queue")) {
 		return;
 	}
-	
+
 	mCommandQueue = command_queue;
 	ctx.attach_resource(this);
 }
@@ -50,7 +50,7 @@ OpenCLEvent OpenCLCommandQueue :: enqueue_kernel(const OpenCLKernel &ker, cl_uin
 		NULL,
 		&event
 	);
-	
+
 	if(opencl_error(res, "clEnqueueNDRangeKernel error enqueuing kernel event")) {
 		return OpenCLEvent();
 	}
@@ -69,7 +69,7 @@ void OpenCLCommandQueue :: destroy() {
 	if(mCommandQueue) {
 		cl_int res = clReleaseCommandQueue(mCommandQueue);
 		mCommandQueue = 0;
-		
+
 		opencl_error(res, "clReleaseCommandQueue error releasing command queue");
 	}
 }

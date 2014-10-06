@@ -2,6 +2,6 @@ properties = {
   defaultImplementation = "audio.lua"
 }
 
-functionalities = {                                                                                          
+functionalities = {
 	{ name = "value",  	destination = "/value",   min = -1, max = 1 },
-}                             
+}

@@ -67,7 +67,7 @@ int countNodes(const aiNode * n) {
 class Scene::Node::Impl {
 public:
 	Impl(const aiNode * node) : node(node) {}
-	
+
 	const aiNode * node;
 };
 
@@ -78,11 +78,11 @@ public:
 		nodes.resize(countNodes(scene->mRootNode));
 		addNode(scene->mRootNode, 0);
 	}
-	
+
 	~Impl() {
 		aiReleaseImport(scene);
 	}
-	
+
 	int addNode(const aiNode * n, int idx) {
 		nodes[idx].mImpl = new Scene::Node::Impl(n);
 		nodeMap[n] = idx;
@@ -91,24 +91,24 @@ public:
 		}
 		return idx;
 	}
-	
+
 	const aiScene * scene;
-	
+
 	std::map<const aiNode *, int> nodeMap;
 	std::vector<Node> nodes;
 };
 
 
-Scene::Material :: Material() 
-:	shading_model(0), 
-	two_sided(0), 
-	wireframe(0), 
-	blend_func(0), 
-	shininess(0.25), 
-	shininess_strength(1), 
-	opacity(1), 
-	reflectivity(0), 
-	refracti(0), 
+Scene::Material :: Material()
+:	shading_model(0),
+	two_sided(0),
+	wireframe(0),
+	blend_func(0),
+	shininess(0.25),
+	shininess_strength(1),
+	opacity(1),
+	reflectivity(0),
+	refracti(0),
 	bump_scaling(1),
 	diffuse(0.6),
 	ambient(0),
@@ -159,16 +159,16 @@ Scene * Scene :: import(const std::string& path, ImportPreset preset) {
 }
 
 Scene :: Scene(Impl * impl) : mImpl(impl) {
-	
+
 	mMaterials.resize(materials());
 	for (unsigned int i=0; i<materials(); i++) {
 		Scene::Material& m = mMaterials[i];
 		unsigned int max;
-		
+
 		// import materials:
 		aiMaterial* mat = mImpl->scene->mMaterials[i];
 		aiString szPath;
-		
+
 		max = 4;
 		aiGetMaterialFloatArray(mat, AI_MATKEY_COLOR_DIFFUSE, m.diffuse.components, &max);
 		aiGetMaterialFloatArray(mat, AI_MATKEY_COLOR_AMBIENT, m.ambient.components, &max);
@@ -182,35 +182,35 @@ Scene :: Scene(Impl * impl) : mImpl(impl) {
 		aiGetMaterialFloat(mat, AI_MATKEY_REFLECTIVITY, &m.reflectivity);
 		aiGetMaterialFloat(mat, AI_MATKEY_REFRACTI, &m.refracti);
 		aiGetMaterialFloat(mat, AI_MATKEY_BUMPSCALING, &m.bump_scaling);
-		
+
 		aiGetMaterialInteger(mat, AI_MATKEY_TWOSIDED, &m.two_sided);
 		aiGetMaterialInteger(mat, AI_MATKEY_SHADING_MODEL, &m.shading_model);
 		aiGetMaterialInteger(mat, AI_MATKEY_ENABLE_WIREFRAME, &m.wireframe);
 		aiGetMaterialInteger(mat, AI_MATKEY_BLEND_FUNC, &m.blend_func);
-		
+
 		aiGetMaterialString(mat, AI_MATKEY_NAME, &szPath);
 		m.name = std::string(szPath.data);
-		
+
 		aiGetMaterialString(mat, AI_MATKEY_GLOBAL_BACKGROUND_IMAGE, &szPath);
 		m.background = std::string(szPath.data);
-		
+
 		if(AI_SUCCESS == aiGetMaterialString(mat, AI_MATKEY_TEXTURE_DIFFUSE(0), &szPath)) {
 			m.diffusemap.useTexture = true;
 			m.diffusemap.texture = std::string(szPath.data);
-		} 
+		}
 		if(AI_SUCCESS == aiGetMaterialString(mat, AI_MATKEY_TEXTURE_AMBIENT(0), &szPath)) {
 			m.ambientmap.useTexture = true;
 			m.ambientmap.texture = std::string(szPath.data);
-		} 
+		}
 		if(AI_SUCCESS == aiGetMaterialString(mat, AI_MATKEY_TEXTURE_SPECULAR(0), &szPath)) {
 			m.specularmap.useTexture = true;
 			m.specularmap.texture = std::string(szPath.data);
-		} 
+		}
 		if(AI_SUCCESS == aiGetMaterialString(mat, AI_MATKEY_TEXTURE_OPACITY(0), &szPath)) {
 			m.opacitymap.useTexture = true;
 			m.opacitymap.texture = std::string(szPath.data);
-		} 
-		
+		}
+
 		if(AI_SUCCESS == aiGetMaterialString(mat, AI_MATKEY_TEXTURE_EMISSIVE(0), &szPath)) {
 			m.emissivemap.useTexture = true;
 			m.emissivemap.texture = std::string(szPath.data);
@@ -255,11 +255,11 @@ void Scene :: mesh(unsigned int i, Mesh& mesh) const {
 		aiMesh * amesh = mImpl->scene->mMeshes[i];
 		if (amesh) {
 			//mesh.reset();
-			
+
 			bool hasnormals = amesh->mNormals != NULL;
 			bool hascolors = amesh->mColors[0] != NULL;
 			bool hastexcoords = amesh->mTextureCoords[0] != NULL;
-			
+
 			const struct aiFace* face = &amesh->mFaces[0];
 			Graphics::Primitive prim;
 			switch(face->mNumIndices) {
@@ -286,7 +286,7 @@ void Scene :: mesh(unsigned int i, Mesh& mesh) const {
 					mesh.vertex(vec3FromAIVector3D(amesh->mVertices[index]));
 				}
 			}
-			
+
 			// mesh.compress();
 		}
 	}
@@ -297,11 +297,11 @@ void Scene :: meshAlt(unsigned int i, Mesh& mesh) const {
 		aiMesh * amesh = mImpl->scene->mMeshes[i];
 		if (amesh) {
 			//mesh.reset();
-						
+
 			bool hasnormals = amesh->mNormals != NULL;
 			bool hascolors = amesh->mColors[0] != NULL;
 			bool hastexcoords = amesh->mTextureCoords[0] != NULL;
-			
+
 			const struct aiFace* face = &amesh->mFaces[0];
 			Graphics::Primitive prim;
 			switch(face->mNumIndices) {
@@ -311,7 +311,7 @@ void Scene :: meshAlt(unsigned int i, Mesh& mesh) const {
 				default: prim = Graphics::POLYGON; break;
 			}
 			mesh.primitive(prim);
-	
+
 			//read vertices, normals, colors, texcoord
 			for (unsigned int index = 0; index < amesh->mNumVertices; ++index){
 				if(hascolors) {
@@ -323,19 +323,19 @@ void Scene :: meshAlt(unsigned int i, Mesh& mesh) const {
 				if(hastexcoords) {
 					mesh.texCoord(vec2FromAIVector3D(amesh->mTextureCoords[0][index]));
 				}
-				mesh.vertex(vec3FromAIVector3D(amesh->mVertices[index]));			
+				mesh.vertex(vec3FromAIVector3D(amesh->mVertices[index]));
 			}
 
 			//read faces as indices
 			for (unsigned int t = 0; t < amesh->mNumFaces; ++t) {
 				const struct aiFace* tface = &amesh->mFaces[t];
 				for(i = 0; i < tface->mNumIndices; i++) {
-					
+
 					mesh.index( tface -> mIndices[i] );
-					//printf("face idx %d\n", tface -> mIndices[i] ); 
+					//printf("face idx %d\n", tface -> mIndices[i] );
 				}
 			}
-			
+
 			// mesh.compress();
 		}
 	}
@@ -417,7 +417,7 @@ void get_bounding_box_for_node(const aiScene * scene, const struct aiNode* nd, V
 	}
 	*trafo = prev;
 }
-		
+
 void Scene :: getBounds(Vec3f& min, Vec3f& max) const {
 #ifdef USE_ASSIMP3
     aiMatrix4x4 trafo;
@@ -440,11 +440,11 @@ void dumpNode(aiNode * x, std::string indent) {
 		dumpNode(x->mChildren[i], indent + "\t");
 	}
 }
-		
+
 void Scene :: print() const {
 	printf("==================================================\n");
 	printf("Scene\n");
-	
+
 	printf("%d Meshes\n", meshes());
 	for (unsigned int i=0; i<mImpl->scene->mNumMeshes; i++) {
 		aiMesh * x = mImpl->scene->mMeshes[i];
@@ -452,7 +452,7 @@ void Scene :: print() const {
 		printf("\t\t%d vertices, %d faces; material: %d; normals?%d colors?%d texcoords?%d\n", x->mNumVertices, x->mNumFaces, x->mMaterialIndex, x->HasNormals(), x->HasVertexColors(0), x->HasTextureCoords(0));
 		//printf("\t\tcolors: %d, normals %d, texcoords %d\n", x->mColors[0][0] != NULL, x->mNormals[0] != NULL, x->mTextureCoords[0][0] != NULL);
 	}
-	
+
 	printf("%d Materials\n", materials());
 	for (unsigned int i=0; i<mImpl->scene->mNumMaterials; i++) {
 		aiMaterial * x = mImpl->scene->mMaterials[i];
@@ -482,21 +482,21 @@ void Scene :: print() const {
 					break;
 			}
 			printf("\n");
-			
+
 		}
 	}
-	
+
 	printf("%d Textures\n", textures());
 	for (unsigned int i=0; i<mImpl->scene->mNumTextures; i++) {
 		aiTexture * x = mImpl->scene->mTextures[i];
 		printf("\t%d: %dx%d\n", i, x->mWidth, x->mHeight);
 	}
-	
+
 	printf("%d Nodes\n", nodes());
 	dumpNode(mImpl->scene->mRootNode, "");
-	
+
 	printf("==================================================\n");
 }
-		
-		
-		
+
+
+

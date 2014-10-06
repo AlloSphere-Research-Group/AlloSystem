@@ -31,7 +31,7 @@ int Graphics::numComponents(Format v){
 }
 
 int Graphics::numBytes(DataType v){
-	#define CS(a,b) case a: return sizeof(b); 
+	#define CS(a,b) case a: return sizeof(b);
 	switch(v){
 		CS(BYTE, GLbyte)
 		CS(UBYTE, GLubyte)
@@ -137,7 +137,7 @@ void Graphics::antialiasing(AntiAliasMode v){
 
 void Graphics::fog(float end, float start, const Color& c){
 	glEnable(GL_FOG);
-	glFogi(GL_FOG_MODE, GL_LINEAR); 
+	glFogi(GL_FOG_MODE, GL_LINEAR);
 	glFogf(GL_FOG_START, start); glFogf(GL_FOG_END, end);
 	float fogColor[4] = {c.r, c.g, c.b, c.a};
 	glFogfv(GL_FOG_COLOR, fogColor);
@@ -176,7 +176,7 @@ void Graphics::vertex(double x, double y, double z) {
 		// make sure all buffers are the same size if > 0
 		mMesh.vertex(x, y, z);
 		mMesh.equalizeBuffers();
-	}	
+	}
 }
 
 void Graphics::texCoord(double u, double v) {
@@ -237,7 +237,7 @@ void Graphics::draw(const Mesh& v, int count, int begin){
 	const int Nn = v.normals().size();
 	const int Nt2= v.texCoord2s().size();
 	const int Nt3= v.texCoord3s().size();
-	
+
 	//printf("client %d, GPU %d\n", clientSide, gpuSide);
 	//printf("Nv %i Nc %i Nn %i Nt2 %i Nt3 %i Ni %i\n", Nv, Nc, Nn, Nt2, Nt3, Ni);
 
@@ -249,7 +249,7 @@ void Graphics::draw(const Mesh& v, int count, int begin){
 		glEnableClientState(GL_NORMAL_ARRAY);
 		glNormalPointer(GL_FLOAT, 0, &v.normals()[0]);
 	}
-	
+
 	if(Nc >= Nv){
 		glEnableClientState(GL_COLOR_ARRAY);
 		glColorPointer(4, GL_FLOAT, 0, &v.colors()[0]);
@@ -257,7 +257,7 @@ void Graphics::draw(const Mesh& v, int count, int begin){
 	else if(Nci >= Nv){
 		glEnableClientState(GL_COLOR_ARRAY);
 		glColorPointer(4, GL_UNSIGNED_BYTE, 0, &v.coloris()[0]);
-		//printf("using integer colors\n");	
+		//printf("using integer colors\n");
 	}
 	else if(0 == Nc && 0 == Nci){
 		// just use whatever the last glColor() call used!
@@ -269,7 +269,7 @@ void Graphics::draw(const Mesh& v, int count, int begin){
 		else
 			glColor3ubv(v.coloris()[0].components);
 	}
-	
+
 	if(Nt2 || Nt3){
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		if(Nt2 >= Nv) glTexCoordPointer(2, GL_FLOAT, 0, &v.texCoord2s()[0]);
@@ -279,15 +279,15 @@ void Graphics::draw(const Mesh& v, int count, int begin){
 	// Draw
 	if(Ni){
 		glDrawElements(
-			((Graphics::Primitive)v.primitive()), 
+			((Graphics::Primitive)v.primitive()),
 			count, // number of indexed elements to render
-			GL_UNSIGNED_INT, 
+			GL_UNSIGNED_INT,
 			&v.indices()[begin]
 		);
 	}
 	else{
 		glDrawArrays(
-			((Graphics::Primitive)v.primitive()), 
+			((Graphics::Primitive)v.primitive()),
 			begin,
 			count
 		);

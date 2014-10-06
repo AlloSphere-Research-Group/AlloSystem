@@ -15,14 +15,14 @@ uniform float offset; 	// e.g. 0.01 or -0.01 for right/left eye
 // and generates a projection matrix
 ///////////////////////////////////////////////////////////////
 mat4 modelview, projection;
-vec4 stereographic(vec4 vertex) 
+vec4 stereographic(vec4 vertex)
 {
 	float PI = 3.141;
 	float PI_OVER_360 = PI / 360.;
 
 	// derive position/unit vectors from the current modelview:
 	mat4 modelview = gl_ModelViewMatrix;
-	
+
 	vec3 ux, uy, uz, pos;
 	ux = vec3(modelview[0][0], modelview[0][1], modelview[0][2]);
 	uy = vec3(modelview[1][0], modelview[1][1], modelview[1][2]);
@@ -31,8 +31,8 @@ vec4 stereographic(vec4 vertex)
 
 	// shift eye position for off-axis stereo:
 	vec3 eyepos = pos - ux*offset;
-	modelview[3][0] = eyepos.x; 
-	modelview[3][1] = eyepos.y; 
+	modelview[3][0] = eyepos.x;
+	modelview[3][1] = eyepos.y;
 	modelview[3][2] = eyepos.z;
 
 	// equiv. glFrustum; off-axis stereo:
@@ -41,11 +41,11 @@ vec4 stereographic(vec4 vertex)
 	float bottom = -top;
 	float left = -aspect*top + shift;
 	float right = aspect*top + shift;
-	float W = right-left;	
+	float W = right-left;
 	float W2 = right+left;
-	float H = top-bottom;	
+	float H = top-bottom;
 	float H2 = top+bottom;
-	float D = zfar-znear;	
+	float D = zfar-znear;
 	float D2 = zfar+znear;
 	float n2 = znear*2.;
 	float fn2 = zfar*n2;
@@ -55,7 +55,7 @@ vec4 stereographic(vec4 vertex)
 		W2/W, H2/H, -D2/D, -1.,
 		0., 0., -fn2/D, 0.
 	);
-	
+
 	return projection * modelview * vertex;
 }
 

@@ -65,7 +65,7 @@ struct MyApp : App {
     // The array itself also has a print method:
     //
     cout << "Array.print: "  << endl << "   ";
-    array.print();    
+    array.print();
 
 
     // Code below assumes this type is 8-bit unsigned integer, so this line
@@ -100,7 +100,7 @@ struct MyApp : App {
       }
     }
   }
-  
+
   virtual void onAnimate(double dt) {}
 
   virtual void onDraw(Graphics& g, const Viewpoint& v) {

@@ -74,7 +74,7 @@ if(BUILD_EXAMPLES)
   if(NOT TARGET Gamma)
     find_package(Gamma QUIET)
   endif(NOT TARGET Gamma)
-  
+
   if(NOT (GAMMA_FOUND OR Gamma_LIBRARY))
     message("Alloutil: Gamma not found. Not building examples." )
   else()

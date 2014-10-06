@@ -16,17 +16,17 @@ struct MyWindow : Window{
 
 	MyWindow(){
 		phase = 0.5;
-		
+
 		surface.primitive(Graphics::TRIANGLE_STRIP);
 		surface.color(1,1,1);
-		
+
 		const int Nx=30, Ny=30;
 		for(int j=0; j<Ny; ++j){ float y=float(j)/(Ny-1);
 		for(int i=0; i<Nx; ++i){ float x=float(i)/(Nx-1);
 			surface.vertex(x*4-2, y*4-2);
 			surface.normal(0,0,1);
 		}}
-		
+
 		for(int j=0; j<Ny-1; ++j){
 			for(int i=0; i<Nx  ; ++i){
 				int idx = j*Nx + i;
@@ -44,7 +44,7 @@ struct MyWindow : Window{
 		gl.clearColor(0,0,0,0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.viewport(0,0, width(), height());
-		
+
 		gl.matrixMode(gl.PROJECTION);
 		gl.loadMatrix(Matrix4d::perspective(45, aspect(), 0.1, 100));
 
@@ -59,7 +59,7 @@ struct MyWindow : Window{
 		float x = cos(7*phase*2*M_PI);
 		float y = sin(11*phase*2*M_PI);
 		float z = cos(phase*2*M_PI)*0.5 + 0.5;
-		
+
 		light.pos(x,y,z);
 		light.diffuse(Color(1,0,0));
 

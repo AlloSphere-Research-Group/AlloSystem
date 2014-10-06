@@ -14,22 +14,22 @@
 namespace al {
 
 struct XML::Impl : public ImplAPR {
-	apr_xml_parser * parser;	
+	apr_xml_parser * parser;
 	apr_xml_doc * doc;
-	
+
 	Impl(const std::string src) : ImplAPR(), parser(NULL), doc(NULL) {
 		parser = apr_xml_parser_create(mPool);
 		check_apr(apr_xml_parser_feed(parser, src.c_str(), src.size()));
 		check_apr(apr_xml_parser_done(parser, &doc));
-		
+
 		apr_xml_elem *root;
 		root = doc->root;
 		printf("root-element; name = %s, text = %s\n", root->name, root->first_cdata.first->text);
 		//traverse_xml_tree(root, mp);
 	}
-	
+
 	virtual ~Impl() {
-		
+
 	}
 };
 

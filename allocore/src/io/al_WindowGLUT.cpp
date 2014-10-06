@@ -345,7 +345,7 @@ public:
 				case GLUT_RIGHT_BUTTON:		btn = Mouse::RIGHT; break;
 				default:					btn = Mouse::EXTRA;		// unrecognized button
 			}
-			
+
 			// update modifiers here for shift-mouse etc.
 			WindowImpl::setModifiers(win->mKeyboard);
 
@@ -414,7 +414,7 @@ public:
 		}
 	}
 
-	// This is triggered upon a call to glutPostRedisplay or implicitly as the 
+	// This is triggered upon a call to glutPostRedisplay or implicitly as the
 	// result of window damage reported by the window system.
 	static void cbDisplay(){
 		//printf("GLUT display for window %d\n", glutGetWindow());
@@ -461,7 +461,7 @@ private:
 					impl->mSPFActual = timeNow - impl->mFrameTime;
 					impl->mFrameTime = timeNow;
 				}
-				
+
 				// this calls the window's onFrame()
 				win->implOnFrame();
 
@@ -478,7 +478,7 @@ private:
 						if (rt > projected) next = rt;	// next = MAX(rt,projected)
 					}
 					M.queue().send(next, scheduleDrawStatic, winID);
-					
+
 					// frame-rate calculation:
 					al_sec per = 1./(next - t);
 					impl->mAvg += 0.3 * (per - impl->mAvg);
@@ -726,7 +726,7 @@ Window& Window::fullScreen(bool v){
 	if(mImpl->mFullScreen && !v){
 		#ifdef AL_LINUX
 			callHandlersOnDestroy();
-			// Must manually set dims since exiting game mode does NOT 
+			// Must manually set dims since exiting game mode does NOT
 			// automatically call GLUT reshape callback.
 			mImpl->mDimPrev = mImpl->dimensionsGLUT();
 			mImpl->gameMode(false);

@@ -30,7 +30,7 @@ void main(){
 );
 
 // point sprite geometry shader
-const char * gPointSprite = 
+const char * gPointSprite =
 "#version 120\n"
 "#extension GL_EXT_geometry_shader4 : enable\n"
 AL_STRINGIFY(
@@ -40,7 +40,7 @@ void main(){
 	vec3 axis1 = vec3(	gl_ModelViewMatrix[0][0],
 						gl_ModelViewMatrix[1][0],
 						gl_ModelViewMatrix[2][0]) * spriteRadius;
-						
+
 	vec3 axis2 = vec3(	gl_ModelViewMatrix[0][1],
 						gl_ModelViewMatrix[1][1],
 						gl_ModelViewMatrix[2][1]) * spriteRadius;
@@ -92,7 +92,7 @@ void main(){
 		EndPrimitive();
 	}
 
-//	EndPrimitive();	
+//	EndPrimitive();
 	gl_Position = gl_PositionIn[0];
 }
 );
@@ -118,13 +118,13 @@ struct MyWindow : Window{
 		int Ny = tex.height();
 		//float * texBuf = tex.data<float>();
 		float * texBuf = new float[tex.numElems()];
-		
+
 		for(int j=0; j<Ny; ++j){ float y = float(j)/(Ny-1)*2-1;
 		for(int i=0; i<Nx; ++i){ float x = float(i)/(Nx-1)*2-1;
 			float m = 1-al::clip(x*x + y*y);
 			texBuf[j*Nx + i] = m*=m*=m;
 		}}
-		
+
 		tex.submit(texBuf);
 		delete[] texBuf;
 
@@ -143,7 +143,7 @@ struct MyWindow : Window{
 
 		shaderF.source(fPointSprite, Shader::FRAGMENT).compile().printLog();
 		shaderP.attach(shaderF);
-		
+
 		shaderG.source(gPointSprite, Shader::GEOMETRY).compile().printLog();
 		shaderP.setGeometryInputPrimitive(gl.POINTS);
 		shaderP.setGeometryOutputPrimitive(gl.TRIANGLE_STRIP);
@@ -162,7 +162,7 @@ struct MyWindow : Window{
 		gl.matrixMode(gl.PROJECTION);
 		gl.loadMatrix(Matrix4d::perspective(45, aspect(), 0.1, 100));
 		gl.matrixMode(gl.MODELVIEW);
-		
+
 		angle += 0.001;
 		Matrix4d mvmat = Matrix4d::lookAt(Vec3d(0,0,-3), Vec3d(0,0,0), Vec3d(0,1,0));
 		mvmat.Mat4d::rotate(angle*10, 2,0).Mat4d::rotate(angle*7, 0,1);

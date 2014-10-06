@@ -18,7 +18,7 @@ using namespace vsr;
 #define PRESET \
     static bool bSet = 0;\
     if (!bSet) { \
-        bSet = 1; 
+        bSet = 1;
 
 #define ENDSET }
 
@@ -26,7 +26,7 @@ struct MyApp : OmniApp {
   Light light;
 
   MyApp() {
-  
+
     mOmni.mode( OmniStereo::DUAL ).stereo(true);
 
      //   omniEnable( false );
@@ -39,17 +39,17 @@ struct MyApp : OmniApp {
 //      mesh.color(Color(HSV(f, 1 - f, 1), 1));
 //    }
 //    mesh.generateNormals();
-//    
+//
 //    light.ambient(Color(0.4, 0.4, 0.4, 1.0));
 //    light.pos(5, 5, 5);
-  
+
   }
 
   virtual ~MyApp() {
-    
-  
+
+
   }
-  
+
   virtual void onDraw(Graphics& g) {
     light();
     // say how much lighting you want

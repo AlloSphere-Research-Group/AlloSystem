@@ -8,35 +8,35 @@
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
 	File description:
-	This includes various commonly used mathematical functions that are not 
+	This includes various commonly used mathematical functions that are not
 	included in the standard C/C++ math libraries.
 
 	File author(s):
@@ -97,7 +97,7 @@ template<class T> T atan2Fast(const T& y, const T& x);
 
 /// Returns number of bits set to 1.
 
-/// From "Bit Twiddling Hacks", 
+/// From "Bit Twiddling Hacks",
 /// http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
 uint32_t bitsSet(uint32_t v);
 
@@ -172,7 +172,7 @@ template<class T> T gaussian(const T& v);
 /// Return greatest common divisor of two arguments
 template<class T> T gcd(const T& x, const T& y);
 
-/// The Gudermannian function 
+/// The Gudermannian function
 /// relates circular and hyperbolic functions without using complex numbers.
 /// @see http://en.wikipedia.org/wiki/Gudermannian_function
 template<class T> T gudermannian(const T& x);
@@ -303,7 +303,7 @@ template<class T> T sumOfSquares(T n);
 
 /// Returns number of trailing zeros in 32-bit int
 
-/// This implements an algorithm from the paper 
+/// This implements an algorithm from the paper
 /// "Using de Bruijn Sequences to Index 1 in a Computer Word"
 /// by Charles E. Leiserson, Harald Prokof, and Keith H. Randall.
 uint32_t trailingZeroes(uint32_t v);
@@ -344,7 +344,7 @@ template<class T> T wrapOnce(const T& value, const T& hi=T(1));
 template<class T> T wrapOnce(const T& value, const T& hi, const T& lo);
 
 /// Returns value wrapped in [-pi, pi)
-template<class T> T wrapPhase(const T& radians);			
+template<class T> T wrapPhase(const T& radians);
 
 /// Like wrapPhase(), but only wraps once
 template<class T> T wrapPhaseOnce(const T& radians);
@@ -364,14 +364,14 @@ namespace{
 
 	inline uint32_t deBruijn(uint32_t v){
 		static const uint32_t deBruijnBitPosition[32] = {
-			 0, 1,28, 2,29,14,24, 3,30,22,20,15,25,17, 4, 8, 
+			 0, 1,28, 2,29,14,24, 3,30,22,20,15,25,17, 4, 8,
 			31,27,13,23,21,19,16, 7,26,12,18, 6,11, 5,10, 9
 		};
 		return deBruijnBitPosition[(uint32_t(v * 0x077CB531UL)) >> 27];
 	}
-	
+
 	const uint32_t mFactorial12u[13] = {
-		1, 1, 2, 6, 24, 120, 720, 5040, 40320, 
+		1, 1, 2, 6, 24, 120, 720, 5040, 40320,
 		362880, 3628800, 39916800, 479001600
 	};
 
@@ -427,10 +427,10 @@ inline bool aeq(double a, double b, int maxULP){
 TEM inline T atLeast(const T& v, const T& e){	return (v >= T(0)) ? max(v, e) : min(v, -e); }
 
 TEM T atan2Fast(const T& y, const T& x){
-	
+
 	T r, angle;
 	T ay = al::abs(y) + T(1e-10);      // kludge to prevent 0/0 condition
-	
+
 	if(x < T(0)){
 		r = (x + ay) / (ay - x);
 		angle = T(M_3PI_4);
@@ -439,7 +439,7 @@ TEM T atan2Fast(const T& y, const T& x){
 		r = (x - ay) / (x + ay);
 		angle = T(M_PI_4);
 	}
-	
+
 	angle += (T(0.1963)*r*r - T(0.9817))*r;
 	return y < T(0) ? -angle : angle;
 }
@@ -487,7 +487,7 @@ TEM inline T erf(const T& x) {
 	const T x2 = x*x;
 	const T ax2 = a * x2;
 	return sign(x)*sqrt(T(1) - exp(-x2*(T(4./M_PI) + ax2)/(T(1)+ax2)));
-}	
+}
 
 inline uint32_t factorial(uint32_t v){ return mFactorial12u[v]; }
 
@@ -538,15 +538,15 @@ TEM T gudermannian(const T& x) {
 
 TEM T laguerreL(int n, int k, T x){
 //	T res = 1, bin = 1;
-//	
+//
 //	for(int i=n; i>=1; --i){
 //		bin = bin * (k+i) / (n + 1 - i);
 //		res = bin - x * res / i;
 //	}
 //	return res;
-	
+
 	if(n <0) return T(0);
-	
+
 	T L1= 0, R = 1;
 	for(int i=1; i<=n; ++i){
 		T L0 = L1;
@@ -563,14 +563,14 @@ TEM T legendreP(int l, int m, T ct, T st){
 
 	switch(l){
 		case 0: return 1.;
-		
+
 		case 1:
 			switch(m){
 				case 0: return ct;
 				case 1: return -st;
 				default:return 0.;
 			}
-		
+
 		case 2:
 			switch(m){
 				case 0: return -0.5 + 1.5*ct*ct;
@@ -587,7 +587,7 @@ TEM T legendreP(int l, int m, T ct, T st){
 				case 3: return -15.*st*st*st;
 				default:return 0.;
 			}
-		
+
 		case 4:
 			switch(m){
 				case 0: ct*=ct; return 0.375 + ct*(-3.75 + 4.375*ct);
@@ -608,8 +608,8 @@ TEM T legendreP(int l, int m, T ct, T st){
 
 	// compute P_l^m(x) by the recurrence relation
 	//		(l-m)P_l^m(x) = x(2l-1)P_{l-1}^m(x) - (l+m-1)P_{l-2}^m(x)
-	// with 
-	//		P_m^m(x) = (-1)^m (2m-1)!! (1-x)^{m/2}, 
+	// with
+	//		P_m^m(x) = (-1)^m (2m-1)!! (1-x)^{m/2},
 	//		P_{m+1}^m(x) = x(2m+1) P_m^m(x).
 
 	T P = 0;				// the result
@@ -618,7 +618,7 @@ TEM T legendreP(int l, int m, T ct, T st){
 
 	for(int i=1; i<=M; ++i)
 		y1 *= -((i<<1) - 1) * st;
-	
+
 	if(l==M) P = y1;
 
 	else{
@@ -637,8 +637,8 @@ TEM T legendreP(int l, int m, T ct, T st){
 		}
 	}
 
-//	// In the case that m<0, 
-//	// compute P_n^{-|m|}(x) by the formula 
+//	// In the case that m<0,
+//	// compute P_n^{-|m|}(x) by the formula
 //	//		P_l^{-|m|}(x) = (-1)^{|m|}((l-|m|)!/(l+|m|)!)^{1/2} P_l^{|m|}(x).
 //	// NOTE: when l and |m| are large, we risk numerical underflow...
 //	if(m<0){
@@ -809,21 +809,21 @@ TEM inline bool within3(const T& v1, const T& v2, const T& v3, const T& lo, cons
 // TODO: fuse the following two functions
 TEM inline T wrap(const T& v, const T& hi, const T& lo){
 	if(lo == hi) return lo;
-	
+
 	T R = v;
 	T diff = hi - lo;
 
-	if(R >= hi){		
+	if(R >= hi){
 		R -= diff;
 		if(R >= hi) R -= diff * uint32_t((R - lo)/diff);
 	}
 	else if(R < lo){
 		R += diff;
 
-		// If value is very slightly less than 'lo', then less significant 
+		// If value is very slightly less than 'lo', then less significant
 		// digits might get truncated by adding a larger number.
 		if(R==diff) return al::nextAfter(R, lo);
-		
+
 		if(R < lo) R += diff * uint32_t(((lo - R)/diff) + 1);
 		if(R==diff) return lo;
 	}
@@ -832,11 +832,11 @@ TEM inline T wrap(const T& v, const T& hi, const T& lo){
 
 TEM inline T wrap(const T& v, long& numWraps, const T& hi, const T& lo){
 	if(lo == hi){ numWraps = 0xFFFFFFFF; return lo; }
-	
+
 	T R = v;
 	T diff = hi - lo;
 	numWraps = 0;
-	
+
 	if(R >= hi){
 		R -= diff;
 		if(R >= hi){

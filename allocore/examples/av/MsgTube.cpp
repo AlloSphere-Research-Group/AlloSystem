@@ -7,7 +7,7 @@ Demonstration of MsgTube
 Not a terribly convincing demonstration, since it could be achieved using
 shared memory in this case, but a convincing demonstration would be too complex.
 
-MsgTube might be partly unnecessary with C++0x lambda object thingies... 
+MsgTube might be partly unnecessary with C++0x lambda object thingies...
 
 Author:
 Graham Wakefield, 2011
@@ -18,9 +18,9 @@ Graham Wakefield, 2011
 
 
 using namespace al;
-	
+
 struct MyWindow : public Window, public AudioCallback {
-    
+
     MyWindow()
 	{
 		x = 10;
@@ -28,11 +28,11 @@ struct MyWindow : public Window, public AudioCallback {
 		phase = 0;
 		setfreq(0, this, x, y);
 	}
-	
+
 	virtual ~MyWindow() {}
-    
+
 	bool onFrame(){
-		
+
 		// go ortho:
         gl.viewport(0, 0, width(), height());
 		gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
@@ -44,58 +44,58 @@ struct MyWindow : public Window, public AudioCallback {
 			gl.vertex(0, 0, 0);
 			gl.vertex(x, y, 0);
 		gl.end();
-		
+
 		return true;
 	}
-	
+
 	// send messages in response to mouse events:
-	virtual bool onMouseDown(const Mouse& m){ 
+	virtual bool onMouseDown(const Mouse& m){
 		// cache for rendering
 		x = m.x(); y = m.y();
 		// send to audio thread:
 		audio_inbox.send(setfreq, this, x / width(), 1. - y/height());
 		return true;
 	}
-	virtual bool onMouseDrag(const Mouse& m){ 
+	virtual bool onMouseDrag(const Mouse& m){
 		// cache for rendering
 		x = m.x(); y = m.y();
 		// send to audio thread:
 		audio_inbox.send(setfreq, this, x / width(), 1. - y/height());
 		return true;
 	}
-	virtual bool onMouseUp(const Mouse& m){ 
+	virtual bool onMouseUp(const Mouse& m){
 		// cache for rendering
 		x = m.x(); y = m.y();
 		// send to audio thread:
 		audio_inbox.send(setfreq, this, x / width(), 1. - y/height());
 		return true;
 	}
-	
+
 	// a message to send:
 	static void setfreq(al_sec t, MyWindow * self, double x, double y) {
 		self->freq = y * 4400;
 	}
-    
-	
+
+
 	virtual void onAudioCB(al::AudioIOData& io) {
 		// get next clock time:
 		al_sec until = audio_inbox.now + io.secondsPerBuffer();
-		
+
 		// receive (execute) any new messages:
 		audio_inbox.executeUntil(until);
-		
+
 		// synthesize sound
 		double rps = freq * M_2PI / io.framesPerSecond();
 		while (io()) {
 			phase += rps;
 			io.out(0) = sin(phase);
 		}
-		
+
 		// update clock for new incoming messages:
 		audio_inbox.now = until;
 	}
-	
-	// properties for audio thread synthesis 
+
+	// properties for audio thread synthesis
 	double freq, phase;
 	// properties for graphical rendering
 	double x, y;
@@ -108,9 +108,9 @@ struct MyWindow : public Window, public AudioCallback {
 AudioIO audio;
 MyWindow win1;
 
-int main(){    
+int main(){
     win1.create(Window::Dim(800, 600), "Allocore Example: MsgTube");
-	
+
 	audio.append(win1);
 	audio.start();
 

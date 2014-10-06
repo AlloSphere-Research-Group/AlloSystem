@@ -620,7 +620,7 @@ OutboundPacketStream& OutboundPacketStream::operator<<( const Blob& rhs )
     *(--typeTagsCurrent_) = BLOB_TYPE_TAG;
     FromUInt32( argumentCurrent_, rhs.size );
     argumentCurrent_ += 4;
-    
+
     memcpy( argumentCurrent_, rhs.data, rhs.size );
     argumentCurrent_ += rhs.size;
 

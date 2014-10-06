@@ -7,7 +7,7 @@
 #include <vector>
 
 namespace al {
-	
+
 	template<typename T>
 	struct VoxelStack {
 
@@ -101,7 +101,7 @@ namespace al {
 	protected:
 		//std::vector< std::list< T * > > voxels;
 		std::vector<Stack<8> > voxels;
-		
+
 		unsigned mDim, mDim2, mDim3, mDimWrap;
 	};
 

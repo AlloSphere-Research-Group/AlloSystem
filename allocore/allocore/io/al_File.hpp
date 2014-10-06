@@ -3,35 +3,35 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -91,13 +91,13 @@ public:
 
 	/// Set type
 	FileInfo& type(Type v){ mType=v; return *this; }
-	
+
 	/// Get type
 	const Type type() const { return mType; }
 
 	/// Set name
 	FileInfo& name(const std::string& v){ mName=v; return *this; }
-	
+
 	/// Get name
 	const std::string& name() const { return mName; }
 
@@ -130,7 +130,7 @@ public:
 	bool open();
 
 	/// Set i/o mode
-	
+
 	/// @param[in] v	A string indicating the i/o mode.
 	///
 	File& mode(const std::string& v){ mMode=v; return *this; }
@@ -192,7 +192,7 @@ public:
 	static int write(const std::string& path, const std::string& data);
 
 	/// Returns string ensured to having an ending delimiter
-	
+
 	/// The directory string argument is not checked to actually exist in
 	/// the file system.
 	static std::string conformDirectory(const std::string& dir);
@@ -214,7 +214,7 @@ public:
 	static std::string baseName(const std::string& src);
 
 	/// Returns the directory part of path.
-	
+
 	/// The directory part of the path is everything up through (and  including)
 	/// the last slash in it. If the path contains no slash, the directory part
 	/// is the string ‘./’. E.g., /usr/bin/man -> /usr/bin/.
@@ -243,7 +243,7 @@ public:
 	/// @param[in,out] rootPath	The input should contain the path to search
 	///							relative to. If the input is empty, then "./" is
 	///							assumed. If a match is made, then the output is
-	///							a string that can be prefixed to 'matchPath' to 
+	///							a string that can be prefixed to 'matchPath' to
 	///							get the actual location of the match.
 	/// @param[in]  matchPath	File or directory to search for
 	/// @param[in]  maxDepth	Maximum number of directories to search back
@@ -280,7 +280,7 @@ protected:
 	void freeContent();
 	void allocContent(int n);
 	void getSize();
-	
+
 	friend class Dir;
 };
 
@@ -293,7 +293,7 @@ public:
 
 	/// Constructor. This does not attempt to open the directory.
 	Dir();
-	
+
 	/// @param[in] dirToOpen	path to directory to open
 	Dir(const std::string& dirToOpen);
 
@@ -301,19 +301,19 @@ public:
 
 
 	/// Open a directory
-	
+
 	/// @param[in] dirPath	path to directory
 	/// \returns whether the directory was successfully opened
 	bool open(const std::string& dirPath);
-	
+
 	/// Close directory
-	
+
 	/// \returns whether directory was successfully closed
 	///
 	bool close();
 
 	/// Read the next entry in the currently opened directory
-	
+
 	/// No ordering is guaranteed for the entries read.
 	/// \returns whether there is another entry to read
 	bool read();
@@ -354,20 +354,20 @@ public:
 
 	/// Get file name without directory
 	const std::string& file() const { return mFile; }
-	
+
 	/// Get path (directory) of file
 	const std::string& path() const { return mPath; }
 
 	/// Get file with directory
 	std::string filepath() const { return path()+file(); }
-	
+
 	/// Returns whether file part is valid
 	bool valid() const { return file()!=""; }
 
 
 	/// Set file name without directory
 	FilePath& file(const std::string& v) { mFile=v; return *this; }
-	
+
 	/// Set path (directory) of file
 	FilePath& path(const std::string& v) { mPath=v; return *this; }
 
@@ -384,7 +384,7 @@ public:
 	typedef std::pair<std::string, bool> searchpath;
 	typedef std::list<searchpath> searchpathlist;
 	typedef std::list<searchpath>::iterator iterator;
-	
+
 	SearchPaths(){}
 	SearchPaths(const std::string& file);
 	SearchPaths(int argc, char * const argv[], bool recursive=true);
@@ -407,13 +407,13 @@ public:
 	void addAppPaths(bool recursive = true);
 
 	const std::string& appPath() const { return mAppPath; }
-	
+
 	void print() const;
-	
+
 	iterator begin() { return mSearchPaths.begin(); }
 	iterator end() { return mSearchPaths.end(); }
 
-protected:	
+protected:
 	std::list<searchpath> mSearchPaths;
 	std::string mAppPath;
 };

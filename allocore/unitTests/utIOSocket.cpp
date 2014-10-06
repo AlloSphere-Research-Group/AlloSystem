@@ -19,7 +19,7 @@ int utIOSocket(){
 
 	assert(c.port() == port);
 
-	// Make receiver block forever until a packet is received. 
+	// Make receiver block forever until a packet is received.
 	// All packets should be received.
 	s.timeout(-1);
 

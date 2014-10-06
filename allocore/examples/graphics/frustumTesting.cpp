@@ -5,7 +5,7 @@ using namespace al;
 class MyApp : public App{
 public:
 
-	virtual void onDraw(Graphics& g, const Viewpoint& v){		
+	virtual void onDraw(Graphics& g, const Viewpoint& v){
 		Frustumd fr;
 		v.lens().frustum(fr, v.worldTransform(), v.viewport().aspect());
 
@@ -13,7 +13,7 @@ public:
 //		printf("ftl: %g %g %g\n", fr.ftl[0], fr.ftl[1], fr.ftl[2]);
 
 		Mesh& m = g.mesh();
-		
+
 		m.reset();
 		m.primitive(g.LINES);
 		m.vertex(-1,-1, -11);
@@ -21,7 +21,7 @@ public:
 
 		for(int i=0; i<m.vertices().size(); ++i){
 			int r = fr.testPoint(m.vertices()[i]);
-			
+
 			m.color(HSV(r ? 0.3 : 0));
 		}
 

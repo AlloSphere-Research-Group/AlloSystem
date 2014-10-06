@@ -14,7 +14,7 @@ if(USE_ASSIMP_V3)
     add_definitions(-DUSE_ASSIMP3)
 endif()
 
-if((NOT ASSIMP_INCLUDE_DIR) AND (NOT ASSIMP_LIBRARY)) 
+if((NOT ASSIMP_INCLUDE_DIR) AND (NOT ASSIMP_LIBRARY))
   # Use pkg-config to get hints about paths
   libfind_pkg_check_modules(ASSIMP_PKGCONF libassimp)
 
@@ -58,5 +58,5 @@ if((NOT ASSIMP_INCLUDE_DIR) AND (NOT ASSIMP_LIBRARY))
   set(ASSIMP_PROCESS_LIBS ${ASSIMP_LIBRARY})
   libfind_process(ASSIMP)
 
-endif((NOT ASSIMP_INCLUDE_DIR) AND (NOT ASSIMP_LIBRARY)) 
+endif((NOT ASSIMP_INCLUDE_DIR) AND (NOT ASSIMP_LIBRARY))
 

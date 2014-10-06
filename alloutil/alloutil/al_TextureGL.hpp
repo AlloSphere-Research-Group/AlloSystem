@@ -3,35 +3,35 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -56,10 +56,10 @@ namespace al {
 
 
 /*!
-	A simple wrapper around OpenGL Textures, 
+	A simple wrapper around OpenGL Textures,
 	using al::Array as a CPU-side interface for configuring & submitting
-	
-	TODO: lift out common features of TextureGL and CubeMapTexture into a 
+
+	TODO: lift out common features of TextureGL and CubeMapTexture into a
 	generic superclass ?
 */
 class TextureGL : public GPUObject {
@@ -83,25 +83,25 @@ public:
 	{
 		determineTarget();
 	}
-	
+
 	virtual ~TextureGL() {}
-	
+
 	uint32_t width() const { return mWidth; }
 	uint32_t height() const { return mHeight; }
 	uint32_t depth() const { return mDepth; }
-	
-	// format should be one of 
+
+	// format should be one of
 	// GL_ALPHA, GL_RGB, GL_RGBA, GL_LUMINANCE, or GL_LUMINANCE_ALPHA
 	TextureGL& format(GLenum format=GL_RGBA) {
 		mInternalFormat = format;
 		invalidate();
 		return *this;
 	}
-	
+
 	TextureGL& width(uint32_t v) { mWidth = v; determineTarget(); return *this; }
 	TextureGL& height(uint32_t v) { mHeight = v; determineTarget(); return *this; }
 	TextureGL& depth(uint32_t v) { mDepth = v; determineTarget(); return *this; }
-	
+
 	// e.g. GL_CLAMP, GL_CLAMP_TO_EDGE, GL_REPEAT
 	TextureGL& wrap(GLint mode) {
 		mWrapS = mWrapT = mWrapR = mode;
@@ -121,14 +121,14 @@ public:
 		invalidate();
 		return *this;
 	}
-	
+
 	virtual void onCreate() {
 		if (mID == 0) {
 			//printf("TextureGL onCreate\n");
-		
+
 			glGenTextures(1, (GLuint *)&mID);
 			glBindTexture(mTarget, id());
-			
+
 			// TODO: which options?
 			glTexParameterf(mTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexParameterf(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
@@ -141,7 +141,7 @@ public:
 			Graphics::error("creating texture");
 		}
 	}
-	
+
 	virtual void onDestroy() {
 		if (mID) {
 			glDeleteTextures(1, (GLuint *)&mID);
@@ -152,25 +152,25 @@ public:
 	void bind(int unit = 0) {
 		// ensure it is created:
 		validate();
-		
+
 		// multitexturing:
 		glActiveTextureARB( GL_TEXTURE0_ARB+unit );
-		
+
 		// bind:
 		glEnable(mTarget);
 		glBindTexture(mTarget, id());
-		
+
 		Graphics::error("binding texturegl");
 	}
-	
-	void unbind(int unit = 0) {		
+
+	void unbind(int unit = 0) {
 		// multitexturing:
 		glActiveTextureARB( GL_TEXTURE0_ARB+unit );
-		
+
 		glBindTexture(mTarget, 0);
 		glDisable(mTarget);
 	}
-	
+
 	void quad(Graphics& gl, double w=1, double h=1, double x0=0, double y0=0) {
 		bind();
 		gl.pushMatrix();
@@ -189,15 +189,15 @@ public:
 		gl.popMatrix();
 		unbind();
 	}
-	
+
 	// submit manually
 	// only safe while OpenGL context exists
-	void submit(const Array& src, bool reconfigure=false) {	
+	void submit(const Array& src, bool reconfigure=false) {
 		if (src.type() != AlloUInt8Ty) {
 			printf("submit failed: only uint8_t arrays are supported\n");
 			return;
-		} 
-		
+		}
+
 		if (reconfigure) {
 			// reconfigure texture from array
 			switch (src.dimcount()) {
@@ -214,7 +214,7 @@ public:
 					printf("invalid array dimensions for texture\n");
 					return;
 			}
-			
+
 			switch (src.dimcount()) {
 				case 3:
 					mDepth = src.depth();
@@ -224,7 +224,7 @@ public:
 					mWidth = src.width();
 					break;
 			}
-			
+
 			switch (src.components()) {
 				case 1:
 					mInternalFormat = GL_LUMINANCE;
@@ -243,9 +243,9 @@ public:
 					printf("invalid array component count for texture\n");
 					return;
 			}
-			
+
 			//printf("configured to %dD=%X, format %X, align %d\n", src.dimcount(), mTarget, mInternalFormat, src.alignment());
-		} 
+		}
 		else {
 			if (src.width() != width()) {
 				printf("submit failed: source array width does not match\n");
@@ -259,7 +259,7 @@ public:
 				printf("submit failed: source array depth does not match\n");
 				return;
 			}
-		
+
 			switch (mInternalFormat) {
 				case GL_ALPHA:
 				case GL_LUMINANCE:
@@ -290,24 +290,24 @@ public:
 					break;
 			}
 		}
-		
+
 		submit(src.data.ptr, src.alignment());
 	}
-	
+
 	// submit manually
 	// supports the modes valid in GLES 1.0
 	virtual void submit(void * pixels=NULL, uint32_t align=4) {
-		
+
 		validate();
-		
+
 		glBindTexture(mTarget, id());
-		
+
 		// set glPixelStore according to the array layout:
 		//glPixelStorei(GL_UNPACK_ALIGNMENT, align);
-		
+
 		switch (mTarget) {
-			case GL_TEXTURE_1D:				
-				glTexImage1D(mTarget, 
+			case GL_TEXTURE_1D:
+				glTexImage1D(mTarget,
 					0,	// GLint level
 					mInternalFormat,
 					width(),
@@ -316,8 +316,8 @@ public:
 					GL_UNSIGNED_BYTE,
 					pixels);
 				break;
-			case GL_TEXTURE_2D:				
-				glTexImage2D(mTarget, 
+			case GL_TEXTURE_2D:
+				glTexImage2D(mTarget,
 					0,	// GLint level
 					mInternalFormat,
 					width(),
@@ -328,7 +328,7 @@ public:
 					pixels);
 				break;
 			case GL_TEXTURE_3D:
-				glTexImage3D(mTarget, 
+				glTexImage3D(mTarget,
 					0,	// GLint level
 					mInternalFormat,
 					width(),
@@ -343,12 +343,12 @@ public:
 				printf("texture target not supported yet\n");
 				break;
 		}
-		
+
 		// set alignment back to default
 		//glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-		
+
 		Graphics::error("submitting texture");
-		
+
 //		// OpenGL may have changed the internal format to one it supports:
 //		GLint format;
 //		glGetTexLevelParameteriv(mTarget, 0, GL_TEXTURE_INTERNAL_FORMAT, &format);
@@ -358,12 +358,12 @@ public:
 //		}
 
 		//printf("submitted texture data %p\n", pixels);
-		
+
 		glBindTexture(mTarget, 0);
 	}
-	
-	
-	
+
+
+
 protected:
 
 	void determineTarget() {
@@ -388,7 +388,7 @@ protected:
 				return GL_RGBA;
 		}
 	}
-	
+
 	GLenum typeFromArray(const Array& src) {
 		switch(src.header.type) {
 			case AlloSInt8Ty:		return GL_BYTE;
@@ -403,7 +403,7 @@ protected:
 				return GL_UNSIGNED_BYTE;
 		}
 	}
-	
+
 	GLenum targetFromArray(const Array& src) {
 		switch(src.header.dimcount) {
 			case 1:		return GL_TEXTURE_1D;
@@ -423,38 +423,38 @@ protected:
 ////		mAlignment = src.alignment();
 ////		printf("reconfigure from array %x %x %x \n", mInternalFormat, mType, mTarget);
 //	}
-//	
+//
 //	void submit() {
 //		GLvoid * ptr = (GLvoid *)data();
 //		glPixelStorei(GL_UNPACK_ALIGNMENT, mAlignment);
-//		
+//
 //		printf("texture submit id %i target %X level %i components %i dim %ix%i format %X type %X ptr %p alignment %i\n", id(), mTarget, mLevel, mArray.header.components, width(), height(), mFormat, mType, ptr, mAlignment);
 //		printf("glTexImage2D target %X level %i components %i dim %ix%i format %X type %X ptr %p alignment %i\n", GL_TEXTURE_2D, 0, 3, 600, 600, GL_RGB, GL_UNSIGNED_BYTE, ptr, 4);
 //
 //		switch(mTarget) {
 //			case GL_TEXTURE_1D:
 //				glTexImage1D(
-//					mTarget, mLevel, mArray.header.components, 
-//					width(), mBorder, 
+//					mTarget, mLevel, mArray.header.components,
+//					width(), mBorder,
 //					mFormat, mType, ptr
 //				);
 //				break;
 //			case GL_TEXTURE_2D:
 //			//case GL_TEXTURE_RECTANGLE_ARB:
 ////				glTexSubImage2D (
-////					mTarget, mLevel, 
-////					0, 0, width(), height(), 
+////					mTarget, mLevel,
+////					0, 0, width(), height(),
 ////					mFormat, mType, ptr);
 //				glTexImage2D(
-//					mTarget, mLevel, mArray.header.components, 
-//					width(), height(), mBorder, 
+//					mTarget, mLevel, mArray.header.components,
+//					width(), height(), mBorder,
 //					mFormat, mType, ptr
 //				);
 //				break;
 //			case GL_TEXTURE_3D:
 //				glTexImage3D(
-//					mTarget, mLevel, mArray.header.components, 
-//					width(), height(), depth(), mBorder, 
+//					mTarget, mLevel, mArray.header.components,
+//					width(), height(), depth(), mBorder,
 //					mFormat, mType, ptr
 //				);
 //				break;
@@ -463,10 +463,10 @@ protected:
 //				printf("target not yet handled\n");
 //				break;
 //		}
-//		mSubmit = false;	
-//		
+//		mSubmit = false;
+//
 //		GraphicsGL::gl_error("submitting texture");
-//		
+//
 //		// OpenGL may have changed the internal format to one it supports:
 //		GLint format;
 //		glGetTexLevelParameteriv(mTarget, 0, GL_TEXTURE_INTERNAL_FORMAT, &format);
@@ -477,31 +477,31 @@ protected:
 //
 //
 //	}
-	
+
 	GLint mTarget;			// GL_TEXTURE_1D, GL_TEXTURE_2D, etc.
 	GLint mInternalFormat;	// GL_RGBA, GL_ALPHA etc.
 	GLint mWrapS, mWrapT, mWrapR;
-	
+
 //	GLint mType;
 //	GLint mLevel;
 //	GLint mBorder;
 //	GLint mAlignment;
-	
+
 	GLsizei mWidth, mHeight, mDepth;
-	
+
 	bool mSubmit;
 };
 
 class CubeMapTexture : public GPUObject {
 public:
 	// same order as OpenGL
-	enum Faces { 
-		POSITIVE_X, NEGATIVE_X, 
-		POSITIVE_Y, NEGATIVE_Y, 
-		POSITIVE_Z, NEGATIVE_Z 
+	enum Faces {
+		POSITIVE_X, NEGATIVE_X,
+		POSITIVE_Y, NEGATIVE_Y,
+		POSITIVE_Z, NEGATIVE_Z
 	};
 
-	CubeMapTexture(int resolution=1024) 
+	CubeMapTexture(int resolution=1024)
 	:	GPUObject(),
 		mResolution(resolution),
 		mTarget(GL_TEXTURE_CUBE_MAP)
@@ -520,11 +520,11 @@ public:
 			}
 		}
 	}
-	
+
 	virtual ~CubeMapTexture() {}
-	
+
 	virtual void onCreate() {
-		
+
 		// create cubemap texture:
 		glGenTextures(1, (GLuint *)&mID);
 		glBindTexture(mTarget, mID);
@@ -538,7 +538,7 @@ public:
 		// no mipmapping:
 		//glTexParameteri(mTarget, GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
 		//glTexParameterf(mTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		
+
 		// Domagoj also has:
 		glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
 		glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
@@ -549,41 +549,41 @@ public:
 		glTexGenfv( GL_S, GL_OBJECT_PLANE, X );
 		glTexGenfv( GL_T, GL_OBJECT_PLANE, Y );
 		glTexGenfv( GL_R, GL_OBJECT_PLANE, Z );
-	
+
 		submit();
-		
+
 		// clean up:
 		glBindTexture(mTarget, 0);
 		Graphics::error("creating cubemap texture");
-	
+
 		//printf("created CubeMapTexture %dx%d\n", mResolution, mResolution);
 	}
-	
+
 	virtual void onDestroy() {
 		glDeleteTextures(1, (GLuint *)&mID);
 	}
-	
+
 	void bind(int unit = 0) {
 		// ensure it is created:
 		validate();
-		
+
 		// multitexturing:
 		glActiveTextureARB( GL_TEXTURE0_ARB+unit );
-		
+
 		glEnable(mTarget);
 		glBindTexture(mTarget, id());
 	}
-	
+
 	void unbind(int unit = 0) {
 		// multitexturing:
 		glActiveTextureARB( GL_TEXTURE0_ARB+unit );
-		
+
 		glBindTexture(mTarget, 0);
 		glDisable(mTarget);
-	}	
-	
+	}
+
 	unsigned resolution() const { return mResolution; }
-	
+
 	// useful for debugging
 	// draws full cubemap in a cylindrical projection
 	void drawMap(Graphics& gl, double x0=0., double y0=0., double x1=1., double y1=1.) {
@@ -612,7 +612,7 @@ protected:
 		mMapMesh.texCoord	( v );
 		mMapMesh.vertex	( x, y, 0);
 	}
-	
+
 	void submit() {
 		// RGBA8 Cubemap texture, 24 bit depth texture, mResolution x mResolution
 		// NULL means reserve texture memory, but texels are undefined
@@ -620,10 +620,10 @@ protected:
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+i, 0, GL_RGBA8, mResolution, mResolution, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
 		}
 	}
-	
+
 	unsigned mResolution;
 	Mesh mMapMesh;
-	
+
 	GLenum mTarget;
 };
 

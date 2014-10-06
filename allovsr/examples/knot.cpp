@@ -36,32 +36,32 @@ using namespace vsr;
 #define PRESET \
     static bool bSet = 0;\
     if (!bSet) { \
-        bSet = 1; 
+        bSet = 1;
 
 
 void knot(al::VsrApp& app){
 
     // 3-Sphere
-    
+
     HopfFiber hf;
 
     // Gamma
 //    static gam::LFO<> ramp(1);  GfxSync::master() << ramp;
 //    double tramp = .5 + ramp.up2();
 
-    
+
     /////////
     /* GUI */
     /////////
-    
+
     static double m,n,amt,iter;
     static double theta, phi, gamma; //ANGLES of POLES and INITIAL CIRCLE
     static double ntrace, traceamt, bandres;
     static bool bReset, bCirFlow, bDrawCirStrip, bDrawStrip, bDrawSrc;
-    
+
 	//stereo controls
 	static double eyesep, fovy;
-    
+
     PRESET
         app.glv.gui(m,"m",0,10)(n,"n",0,10)(amt,"amt",-10,10)(iter,"iter",1,1000);
         app.glv.gui(theta,"theta",0,100)(phi,"phi",0,100);//(gamma);
@@ -71,7 +71,7 @@ void knot(al::VsrApp& app){
         m = 1; n = 5; amt = .005; iter = 1000; ntrace = 10; traceamt = .1;
 	eyesep = .2; fovy = 45;
     }
-    
+
 	app.lens.eyeSep(eyesep*-1); app.lens.fovy(fovy);
 
     /////////////////////////////////
@@ -79,12 +79,12 @@ void knot(al::VsrApp& app){
     /////////////////////////////////
 
     //HOPF LINKS at Poles (orthogonal)
-    
+
     static double th = 0; th += theta;
     static double ph = 0; ph += phi;
-    
+
     vector<Cir> cp = hf.poles(-1 + fmod(th,1) * 2,  fabs( sin(ph) ) );
-    
+
 //    vector<Cir> cp;
 //    Cir cone = hf.fiber(0,-.5);
 //    Cir ctwo = hf.fiber(0, .5);
@@ -92,7 +92,7 @@ void knot(al::VsrApp& app){
 //    cp.push_back( cone); cp.push_back(ctwo);
     //A Point Pair "Boost" Generator . . .
     PointPair tp = cp[0].dual() * PI/m + cp[1].dual() * PI/n;
-    
+
     //A Boost
     Bst bst = Gen::bst( tp*amt ) ;
     //Another Boost
@@ -100,11 +100,11 @@ void knot(al::VsrApp& app){
 
 
     //POINTS ALONG KNOT
-    
+
     //A Point you can Touch
-    static Point pt = PT(1,0,0); 
-    app.interface.touch(pt); 
-    
+    static Point pt = PT(1,0,0);
+    app.interface.touch(pt);
+
     //dp/dt
     vector<Pnt> vp;
     Point np = pt;
@@ -112,7 +112,7 @@ void knot(al::VsrApp& app){
         np = Ro::loc( np.sp( bst ) );           //Extracts Location Each time with Ro::loc
         vp.push_back(np);
     }
-    
+
     //CIRCLES ALONG THE KNOT
 
     //A Circle at point
@@ -126,35 +126,35 @@ void knot(al::VsrApp& app){
         ncirp = ncirp.sp( Gen::bst( tp*amt ) ); // Does not Extract Location (so is not stable)
         cirp.push_back(ncirp);
     }
-    
+
     //////////////////////
     // FLOW //////////////
-    //////////////////////    
-    
+    //////////////////////
+
     //Generate Random points, Random Circles
-    
+
     static vector<Pnt> rp;  //  Points Flow
     static vector<Cir> scp; //  Circle Flow
     static vector<Pnt> bp;  //  Band of Points Flow
-    
+
     if (bReset){
-    
+
         rp.clear(); scp.clear(); bp.clear();
-        Rand::Seed(10); 
+        Rand::Seed(10);
         for (int i = 0; i < iter; ++i){
-        
+
             //Random Point
             double x = Rand::Num(-1,1);
             double y = Rand::Num(-.5,.5);
             double z = Rand::Num(-1,1);
             Pnt p = Vector(x,y,z).null();
             rp.push_back( p );
-            
+
             //Random Circle
             Biv biv( Rand::Num(), Rand::Num(), Rand::Num());
             Cir tcir = Ro::cir(p, biv.unit(), .1);
             scp.push_back( tcir );
-            
+
             for (int j = 0; j < bandres; ++j){
                 double t = 1.0 * j/bandres;
                 bp.push_back( Ro::pnt_cir( tcir, t * PI) );
@@ -166,7 +166,7 @@ void knot(al::VsrApp& app){
     //////////////////////
     // Draw Flow    //////
     //////////////////////
-    
+
     //Modular Flow of Points
     for (int i = 0; i < rp.size(); ++i){
         double t = 1.0 * i/rp.size();
@@ -179,8 +179,8 @@ void knot(al::VsrApp& app){
         }
     }
 
-    //Switch Circular or Band of Points 
-    
+    //Switch Circular or Band of Points
+
     if (bCirFlow){
         //Modular Flow of Circles
         for (int i = 0; i < scp.size(); ++i){
@@ -206,30 +206,30 @@ void knot(al::VsrApp& app){
             }
         }
     }
-    
+
     if (bDrawSrc){
         //Draw the Point
         DRAW3(pt,1,0,0);
         //Draw Polar Circles (Hopf Links)
         DRAW(cp[0]); DRAW(cp[1]);
     }
-    
+
     if (bDrawStrip){
         //DRAW the Knot Strip
         glBegin(GL_LINE_STRIP);
             for (int i = 0; i < vp.size(); ++i){
                 GL::vertex(vp[i].w());
-            }   
+            }
         glEnd();
     }
-    
+
     if (bDrawCirStrip){
         //DRAW the Circle Knot Strip
         for (int i = 0; i < cirp.size(); ++i){
             DRAW3( cirp[i],0,1,0 );
         }
     }
-    
+
 }
 
 
@@ -237,27 +237,27 @@ void knot(al::VsrApp& app){
 class MyApp : public al::VsrApp {
 
     public:
-    
-    MyApp() : al::VsrApp() { 
-        
+
+    MyApp() : al::VsrApp() {
+
         glv.gui.colors().back.set(.3,.3,.3);
-        
+
         if (ALLOSPHERE){
             stereo.stereo(true);
             stereo.mode( Stereographic::ACTIVE );
-    
+
             lens.fovy(45);
-            lens.eyeSep(lens.eyeSepAuto() *-1); 
+            lens.eyeSep(lens.eyeSepAuto() *-1);
 
         }
     }
 
     virtual void onDraw(Graphics& gl){
-        
+
         //Model Transform
-        Rot t = Gen::aa( scene().model.rot() ); 
+        Rot t = Gen::aa( scene().model.rot() );
         GL::rotate( t.w() );
-        
+
         knot(*this);
     }
 
@@ -271,9 +271,9 @@ int main(int argc, const char * argv[]){
 
     app.create(Window::Dim(800, 600), "Hopf Fibration and Knots", 60, DM);
     //app.lens.eyeSep( app.lens.eyeSepAuto() );
-    //cout << app.lens.eyeSep() << endl;	  
+    //cout << app.lens.eyeSep() << endl;
     MainLoop::start();
-    
+
 	return 0;
 
 }

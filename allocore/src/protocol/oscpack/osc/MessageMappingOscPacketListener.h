@@ -57,7 +57,7 @@ protected:
         if( i != functions_.end() )
             (dynamic_cast<T*>(this)->*(i->second))( m, remoteEndpoint );
     }
-    
+
 private:
     struct cstr_compare{
         bool operator()( const char *lhs, const char *rhs ) const

@@ -1,8 +1,8 @@
 # Locate Lua library
 # This module defines
-#  LUAJIT_FOUND, if false, do not try to link to Lua 
+#  LUAJIT_FOUND, if false, do not try to link to Lua
 #  LUAJIT_LIBRARIES
-#  LUAJIT_INCLUDE_DIR, where to find lua.h 
+#  LUAJIT_INCLUDE_DIR, where to find lua.h
 #
 # Note that the expected include convention is
 #  #include "lua.h"
@@ -60,7 +60,7 @@ FIND_PATH(LUAJIT_INCLUDE_DIR lua.h
   /opt
 )
 
-FIND_LIBRARY(LUAJIT_LIBRARY 
+FIND_LIBRARY(LUAJIT_LIBRARY
   NAMES luajit-51 luajit-5.1 luajit
   HINTS
   $ENV{LUAJIT_DIR}
@@ -88,7 +88,7 @@ IF(LUAJIT_LIBRARY)
 ENDIF(LUAJIT_LIBRARY)
 
 INCLUDE(FindPackageHandleStandardArgs)
-# handle the QUIETLY and REQUIRED arguments and set LUAJIT_FOUND to TRUE if 
+# handle the QUIETLY and REQUIRED arguments and set LUAJIT_FOUND to TRUE if
 # all listed variables are TRUE
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(LuaJIT  DEFAULT_MSG  LUAJIT_LIBRARIES LUAJIT_INCLUDE_DIR)
 

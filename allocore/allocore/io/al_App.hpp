@@ -2,35 +2,35 @@
 #define INCLUDE_AL_APP_HPP
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -79,7 +79,7 @@ public:
 	float stretchY() const { return mStretchY; }
 
 	/// Set anchoring factors relative to bottom-left corner of window
-	
+
 	/// @param[in] ax	anchor factor relative to left edge of window, in [0,1]
 	/// @param[in] ay	anchor factor relative to bottom edge of window, in [0,1]
 	Viewpoint& anchor(float ax, float ay){
@@ -87,7 +87,7 @@ public:
 	}
 
 	/// Set stretch factors relative to bottom-left corner of window
-	
+
 	/// @param[in] sx	stretch factor relative to left edge of window, in [0,1]
 	/// @param[in] sy	stretch factor relative to bottom edge of window, in [0,1]
 	Viewpoint& stretch(float sx, float sy){
@@ -99,7 +99,7 @@ public:
 
 	const Lens& lens() const { return *mLens; }
 	Viewpoint& lens(Lens& v){ mLens=&v; return *this; }
-	
+
 	const Color& clearColor() const { return *mClearColor; }
 	Viewpoint& clearColor(Color& v){ mClearColor=&v; return *this; }
 
@@ -110,9 +110,9 @@ public:
 	const Pose& transform() const { return mTransform; }
 	Pose& transform(){ return mTransform; }
 	Viewpoint& transform(const Pose& v){ mTransform=v; return *this; }
-	
+
 	Pose worldTransform() const { return mParentTransform ? (*mParentTransform) * transform() : transform(); }
-	
+
 	const Viewport& viewport() const { return mViewport; }
 	Viewport& viewport(){ return mViewport; }
 
@@ -139,7 +139,7 @@ public:
 	ViewpointWindow(){
 		init();
 	}
-	
+
 	/// @param[in] dims		window dimensions
 	/// @param[in] title	window title
 	/// @param[in] fps		frames/second
@@ -157,7 +157,7 @@ public:
 	/// Get the list of viewpoints
 	Viewpoints& viewpoints(){ return mViewpoints; }
 	const Viewpoints& viewpoints() const { return mViewpoints; }
-	
+
 	/// Add a new viewpoint to the window
 	ViewpointWindow& add(Viewpoint& v);
 
@@ -192,10 +192,10 @@ public:
 	/// @param[in] inputChannels	Number of input channels to open or -1 for all
 	void initAudio(
 		double sampleRate=44100, int blockSize=128,
-		int outputChannels=-1, int inputChannels=-1	
+		int outputChannels=-1, int inputChannels=-1
 	);
-	
-	
+
+
 	/// Initialize a new window
 
 	/// @param[in] dims				Window dimensions
@@ -227,32 +227,32 @@ public:
 
 	/// Drawing callback (in world coordinates)
 
-	/// This will be called from the main graphics renderer. Since it may be 
+	/// This will be called from the main graphics renderer. Since it may be
 	/// called multiple times, no state updates should be made in it.
 	virtual void onDraw(Graphics& g, const Viewpoint& v){}
 
 	/// Called when a keyboard key is pressed
 	virtual void onKeyDown(const ViewpointWindow& w, const Keyboard& k){}
-	
+
 	/// Called when a keyboard key is released
 	virtual void onKeyUp(const ViewpointWindow& w, const Keyboard& k){}
 
 	/// Called when a mouse button is pressed
 	virtual void onMouseDown(const ViewpointWindow& w, const Mouse& m){}
-	
+
 	/// Called when a mouse button is released
 	virtual void onMouseUp(const ViewpointWindow& w, const Mouse& m){}
-	
+
 	/// Called when the mouse moves while a button is down
 	virtual void onMouseDrag(const ViewpointWindow& w, const Mouse& m){}
-	
+
 	/// Called when the mouse moves
 	virtual void onMouseMove(const ViewpointWindow& w, const Mouse& m){}
 
 
 	/// Called upon creation of a window
 	virtual void onCreate(const ViewpointWindow& win){}
-	
+
 	/// Called upon destruction of a window
 	virtual void onDestroy(const ViewpointWindow& win){}
 
@@ -293,7 +293,7 @@ public:
 
 	const Windows&		windows() const { return mWindows; }
 	Windows&			windows(){ return mWindows; }
-	
+
 	const ViewpointWindow& window(int i=0) const { return *(windows()[i]); }
 	ViewpointWindow& window(int i=0){ return *(windows()[i]); }
 
@@ -304,7 +304,7 @@ public:
 	App&				clockNav(void * v){ mClockNav=v; return *this; }
 
 	/// Add a window to the world
-	
+
 	/// @param[in] win			The window to add
 	///
 	App& add(ViewpointWindow& win);
@@ -313,7 +313,7 @@ public:
 	void sendHandshake(){
 		oscSend().send("/handshake", name(), oscRecv().port());
 	}
-	
+
 	void sendDisconnect(){
 		oscSend().send("/disconnectApplication", name());
 	}
@@ -338,7 +338,7 @@ private:
 	Lens mLens;
 	Stereographic mStereo;
 	Graphics mGraphics;
-	
+
 	// sound
 	AudioIO mAudioIO;
 	//AudioScene mAudioScene;
@@ -347,7 +347,7 @@ private:
 	// spatial
 	Nav mNav;
 	Nav mNavDraw;	// this version remains invariant throughout all drawing
-	
+
 	// control
 	NavInputControl mNavControl;
 	osc::Recv mOSCRecv;
@@ -363,7 +363,7 @@ private:
 		App& app;
 
 		SceneWindowHandler(ViewpointWindow& w, App& a): win(w), app(a){}
-	
+
 		virtual bool onCreate(){
 			app.onCreate(win);
 			return true;
@@ -378,10 +378,10 @@ private:
 			app.onResize(win, dw,dh);
 			return true;
 		}
-	
+
 		virtual bool onFrame();
 	};
-	
+
 	struct SceneInputHandler : public InputEventHandler{
 		ViewpointWindow& win;
 		App& app;
@@ -402,10 +402,10 @@ private:
 		virtual bool onMouseDrag(const Mouse& m){ app.onMouseDrag(win,m); return true;}
 		virtual bool onMouseMove(const Mouse& m){ app.onMouseMove(win,m); return true;}
 	};
-	
+
 //	struct SceneInputHandler : public StandardWindowKeyControls{
 //		SceneInputHandler(App& a): app(a){}
-//		
+//
 //		virtual bool onKeyDown(const Keyboard& k){
 //			if(!StandardWindowKeyControls::onKeyDown(k)) return false;
 //			switch(k.key()){

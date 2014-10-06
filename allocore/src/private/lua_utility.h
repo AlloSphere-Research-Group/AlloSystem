@@ -3,13 +3,13 @@
  */
 
 /*
-	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
+	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS).
 	All Rights Reserved.
 
 	Permission to use, copy, modify, distribute, and distribute modified versions
 	of this software and its documentation without fee and without a signed
 	licensing agreement, is hereby granted, provided that the above copyright
-	notice, the list of contributors, this paragraph and the following two paragraphs 
+	notice, the list of contributors, this paragraph and the following two paragraphs
 	appear in all copies, modifications, and distributions.
 
 	IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
@@ -43,7 +43,7 @@ extern "C" {
 	#include "lauxlib.h"
 }
 
-#define printf_gcdebug(...) 
+#define printf_gcdebug(...)
 #ifndef printf_gcdebug
 	#define printf_gcdebug(...) printf("DEBUG __gc: "); printf(__VA_ARGS__)
 #endif
@@ -294,7 +294,7 @@ inline int pcall(lua_State * L, int nargs) {
 	}
 	int top = lua_gettop(L);
 	int res = lerror(L, lua_pcall(L, nargs, LUA_MULTRET, -nargs-2));
-	int nres = lua_gettop(L) - top; 
+	int nres = lua_gettop(L) - top;
 //	int nres = lua_gettop(L) - top + nargs + 1;
 	lua_remove(L, -(nres+nargs+2)); // remove debug function from stack
 	return res;
@@ -470,8 +470,8 @@ static void clear_table(lua_State * L, int idx) {
 	lua_pop(L, 1);				// table
 }
 
-/* 
-	(shallow) copy fields from one table to another 
+/*
+	(shallow) copy fields from one table to another
 	Could be used e.g. to exend a metatable with another
 */
 static void copy_fields(lua_State * L, int srcidx, int dstidx) {
@@ -630,7 +630,7 @@ static int gc_sentinel_value(lua_State *L, int idx) {
 		lua_insert(L, -2);
 		lua_pop(L, 1);
 	}
-	
+
 	return 1;
 }
 

@@ -22,21 +22,21 @@ rnd::Random<> rng;
 VCR vcr;
 
 struct App : Window {
-	
-	App() 
-	:	audio(256, 44100, audioCB, this, 2, 2) 
+
+	App()
+	:	audio(256, 44100, audioCB, this, 2, 2)
 	{
 		image.format(3, AlloUInt8Ty, 2048, 2048);
-		
+
 		append(*new StandardWindowKeyControls);
 		create(Window::Dim(100, 0, 400,300), "App", 30);
-		
+
 		audio.start();
 	}
 
 	static void filler(uint8_t * c, double normx, double normy) {
 		int frame = vcr.frame();
-	
+
 		c[0] = normx * frame * 255.;
 		c[1] = normy * frame * 255.;
 		c[2] = rng.uniform() * 255.;
@@ -45,16 +45,16 @@ struct App : Window {
 	bool onFrame(){
 		// for now just fill image with random data.
 		image.fill(filler);
-		
+
 		printf("frame %d\n", vcr.frame());
-		
+
 		// write:
 		vcr.image(image);
 
 		return true;
 	}
-	
-	bool onKeyDown(const Keyboard& k){	
+
+	bool onKeyDown(const Keyboard& k){
 		switch (k.key()) {
 			case 's':
 				vcr.start(&audio);
@@ -65,8 +65,8 @@ struct App : Window {
 			default:
 				break;
 		}
-		
-		return 1; 
+
+		return 1;
 	}
 
 	static void audioCB(AudioIOData& io){
@@ -79,7 +79,7 @@ struct App : Window {
 			io.out(1) = s1;
 		}
 	}
-	
+
 	AudioIO audio;
 	Array image;
 	float phase;
@@ -90,8 +90,8 @@ int main(){
     char cwd[1024];
     getcwd(cwd, sizeof(cwd));
     vcr.setPath(cwd);
-    
-	
+
+
 	MainLoop::start();
 	return 0;
 }

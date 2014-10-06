@@ -36,43 +36,43 @@ SoundSource src;
 
 // 6) Create an audio callback function for the source and scene
 void audioCB(AudioIOData& io){
-	
+
 	int numFrames = io.framesPerBuffer();
-	
+
 	for(int i=0; i<numFrames; i++){
 		//Write each sample to the source
 		//(this just writes random noise for testing)
 		src.writeSample(rnd::uniform(1.,-1.));
 	}
-	
+
 	//render this scene buffer (renders as many frames as specified at initialization)
 	scene.render(io);
-	
+
 }
 
 int main (int argc, char * argv[]){
-	
+
 	// 7) Initialize the listener(s) with their individual speaker layout and panner
 	listener = scene.createListener(speakerLayout,panner);
-	
+
 	// 8) Add the sound source to the scene
 	scene.addSource(src);
-	
+
 	// 9) update the listener's speaker layout and panner
 	//    call this to dynamically change a listener's speaker layout and panner
 	// maybe rename this to update() ?
 	listener->compile();
-	
+
 	// Output's relevant panner info (ex. number of triplets found for VBAP)
 	panner->dump();//Check VBAP
-	
+
 	// 10) Create an audio IO for the audio scene
 	//     Last 3 arguemnts are for user data, #out chans, and # in chans
 	AudioIO audioIO(NUM_FRAMES, 44100, audioCB, NULL, 2, 0);
-	
+
 	// Start the IO!
 	audioIO.start();
-	
+
 	// run until the user hits any key
 	getchar();
 

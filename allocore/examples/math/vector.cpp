@@ -16,21 +16,21 @@ int main(){
 	// Lesson 1: Declarations
 	// =============================================================================================
 	{
-	/*	
+	/*
 	Vec is a template class with two template parameters:
-	1) N, the number of dimensions and 2) T, the element type. 	
-	Here are some example declarations:	
+	1) N, the number of dimensions and 2) T, the element type.
+	Here are some example declarations:
 	*/
 		Vec<3,float> vec3f;		// 3-vector of floats
 		Vec<2,int> vec2i;		// 2-vector of ints
 		Vec<11,double> vec11d;	// 11-vector of doubles (!)
 		Vec<1,float> vec1f;		// 1-vector (scalar) with a float
 		Vec<0,float> vec0f;		// even 0-vectors are allowed, for completeness
-		
+
 	/*
 	For convience, some common types are predefined:
 	*/
-	//	2-vector     3-vector     4-vector	   
+	//	2-vector     3-vector     4-vector
 		{ Vec2f v; } { Vec3f v; } { Vec4f v; } // float
 		{ Vec2d v; } { Vec3d v; } { Vec4d v; } // double
 		{ Vec2i v; } { Vec3i v; } { Vec4i v; } // int
@@ -48,10 +48,10 @@ int main(){
 		Vec3f b(1,2,3);			// Initialize to {1, 2, 3}
 		Vec2f c(4,5);			// Initialize to {4, 5}
 		Vec4f d(6,7,8,9);		// Initializing with scalars works up to 4-vectors
-	
+
 		Vec2d e(c);				// Initialize from vector to {4, 5}
 		Vec3f f(c, 6);			// Initialize from vector and scalar to {4, 5, 6}
-	
+
 	/*
 	Vec can be initialized from C-arrays:
 	*/
@@ -62,7 +62,7 @@ int main(){
 	Sizes can be different, but the C-array must be longer. Only the first n elements are copied.
 	*/
 		float arr3[] = {3,4,5};
-		Vec2f i(arr3);		
+		Vec2f i(arr3);
 	/*
 	It is also possible to specify a stride amount through the C-array
 	*/
@@ -108,10 +108,10 @@ int main(){
 		a.set(1,2,3);			// Sets 'a' to {1, 2, 3}
 		b.set(1);				// Sets 'b' to {1, 1, 1}
 		a.set(b);				// Sets 'a' to {1, 1, 1}
-		
+
 		Vec2f c(9,1);
 		a.set(c, 3);			// Sets 'a' to {9, 1, 3}
-		
+
 		float arr[] = {1,7,2,8,3,9};
 		a.set(arr);				// Sets 'a' to {1, 7, 2}
 		a.set(arr,2);			// Sets 'a' to {1, 2, 3} by using a stride of 2
@@ -126,7 +126,7 @@ int main(){
 		a.sub<3>(1);			// Returns 3-vector {5, 0, 2}
 	}
 	/*
-	It is also possible to "swizzle", that is, obtain a new vector comprised of arbitrary elements 
+	It is also possible to "swizzle", that is, obtain a new vector comprised of arbitrary elements
 	from a particular vector:
 	*/
 	{	Vec3f a(9,3,7);
@@ -134,7 +134,7 @@ int main(){
 		a.get(2,1,0);			// Returns {7, 3, 9}
 		a.get(1,0);				// Returns {3, 9}
 	}
-	
+
 
 
 	// Lesson 4: Arithmetic
@@ -173,7 +173,7 @@ int main(){
 	{	Vec3f a(2,6,4);
 		Vec3f b(2,2,2);
 		Vec3f c(2,6,4);
-		
+
 		a == b;					// Returns 'false'
 		a == c;					// Returns 'true'
 		a != b;					// Returns 'true'
@@ -186,15 +186,15 @@ int main(){
 	// =============================================================================================
 	/**/
 	{	Vec2f v(3,4);
-		
+
 		v.mag();				// Returns 5, the magnitude of the vector
 		v.magSqr();				// Returns 25, the magnitude squared
-		
+
 		v.normalize();			// Sets magnitude to 1 without changing the direction.
 								// Equivalent to a = a / a.mag()
-								
+
 		v.normalize(0.5);		// Sets magnitude to 0.5 without changing the direction
-		
+
 		v.normalized();			// Returns closest vector on unit sphere
 
 		Vec3f A( 1, 2, 3);
@@ -204,11 +204,11 @@ int main(){
 
 		A.product();			// Returns 6 (= 1*2*3), the product of all elements
 		B.sum();				// Returns 1 (= 3+-2+0), the sum of all elements
-		
+
 		cross(A, B);			// Returns cross product A x B (3-vectors only)
 		angle(A, B);			// Returns angle, in radians, between A and B
 		dist(A, B);				// Returns Euclidean distance between A and B; same as (A-B).mag()
-		
+
 		min(A, B);				// Returns {1,-2, 0}, minimum elements between A and B
 		max(A, B);				// Returns {3, 2, 3}, maximum elements between A and B
 	}

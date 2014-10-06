@@ -30,7 +30,7 @@ struct MyWindow : public Window, public Drawable{
 		mtrl.ambient(Color(0.1,0,0));
 		mtrl.diffuse(Color(0.7,0,0));
 		mtrl.specular(HSV(0.1,1,0.7));
-		mtrl();		
+		mtrl();
 		light();
 
 		iso.level(0);
@@ -57,10 +57,10 @@ struct MyWindow : public Window, public Drawable{
 			for(int k=0; k<N; ++k){ double z = double(k)/N * 4*M_PI;
 			for(int j=0; j<N; ++j){ double y = double(j)/N * 4*M_PI;
 			for(int i=0; i<N; ++i){ double x = double(i)/N * 4*M_PI;
-				
-				volData[k*N*N + j*N + i] 
-					= cos(x * cos(phase*7)) 
-					+ cos(y * cos(phase*8)) 
+
+				volData[k*N*N + j*N + i]
+					= cos(x * cos(phase*7))
+					+ cos(y * cos(phase*8))
 					+ cos(z * cos(phase*9));
 			}}}
 		}
@@ -78,7 +78,7 @@ struct MyWindow : public Window, public Drawable{
 };
 
 MyWindow win;
-	
+
 int main(){
 	iso.primitive(Graphics::TRIANGLES);
 

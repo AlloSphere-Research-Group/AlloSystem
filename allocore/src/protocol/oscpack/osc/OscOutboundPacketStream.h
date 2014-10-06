@@ -87,7 +87,7 @@ public:
 
     OutboundPacketStream& operator<<( const BundleInitiator& rhs );
     OutboundPacketStream& operator<<( const BundleTerminator& rhs );
-    
+
     OutboundPacketStream& operator<<( const BeginMessage& rhs );
     OutboundPacketStream& operator<<( const MessageTerminator& rhs );
 

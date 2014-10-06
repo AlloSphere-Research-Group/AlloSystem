@@ -8,30 +8,30 @@
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -80,9 +80,9 @@ public:
 	/// Get point in frustum corresponding to fraction along edges
 	template <class U>
 	Vec<3,T> getPoint(const Vec<3,U>& frac) const {
-		return 
+		return
 		lerp(frac[2],
-			lerp(frac[1], 
+			lerp(frac[1],
 				lerp(frac[0], corner(0,0,0), corner(1,0,0)),
 				lerp(frac[0], corner(0,1,0), corner(1,1,0))
 			),
@@ -101,10 +101,10 @@ public:
 
 	/// Test whether point is in frustum
 	int testPoint(const Vec<3,T>& p) const;
-	
+
 	/// Test whether sphere is in frustum
 	int testSphere(const Vec<3,T>& center, float radius) const;
-	
+
 	/// Test whether axis-aligned box is in frustum
 
 	/// This will always tell you if the box is in or intersects the frustum.
@@ -121,7 +121,7 @@ public:
 
 
 	/// Compute planes based on frustum corners (planes face to inside)
-	
+
 	///	The plane normals are computed assuming a right-hand coordinate system.
 	///
 	void computePlanes();
@@ -146,7 +146,7 @@ void Frustum<T>::boundingBox(Vec<3,V>& xyz, Vec<3,V>& dim) const {
 		vmin = min(vmin, v);
 		vmax = max(vmax, v);
 	}
-	
+
 	xyz = vmin;
 	dim = vmax - vmin;
 }
@@ -187,17 +187,17 @@ int Frustum<T>::testBox(const Vec<3,T>& xyz, const Vec<3,T>& dim) const {
 		const Vec3d& plNrm = pl[i].normal();
 
 /*
-		The positive vertex is the vertex from the box that is further along 
+		The positive vertex is the vertex from the box that is further along
 		the normal's direction. The negative vertex is the opposite vertex.
 
-		If the p-vertex is on the wrong side of the plane, the box can be 
-		immediately rejected, as it falls completely outside the frustum. On the 
-		other hand, if the p-vertex is on the right side of the plane, then 
-		testing the whereabouts of the n-vertex tells if the box is totally on 
+		If the p-vertex is on the wrong side of the plane, the box can be
+		immediately rejected, as it falls completely outside the frustum. On the
+		other hand, if the p-vertex is on the right side of the plane, then
+		testing the whereabouts of the n-vertex tells if the box is totally on
 		the right side of the plane, or if the box intersects the plane.
-*/		
+*/
 		// Is positive vertex outside?
-		Vec<3,T> vp = xyz;		
+		Vec<3,T> vp = xyz;
 		if(plNrm[0] > 0) vp[0] += dim[0];
 		if(plNrm[1] > 0) vp[1] += dim[1];
 		if(plNrm[2] > 0) vp[2] += dim[2];
