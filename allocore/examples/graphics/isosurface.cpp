@@ -80,8 +80,6 @@ struct MyWindow : public Window, public Drawable{
 MyWindow win;
 	
 int main(){
-	iso.primitive(Graphics::TRIANGLES);
-
 	win.create(Window::Dim(800,600), "Isosurface Example", 140);
 	win.add(new StandardWindowKeyControls);
 	win.add(new NavInputControl(nav));
