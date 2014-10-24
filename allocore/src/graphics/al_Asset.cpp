@@ -1,6 +1,10 @@
 #include "allocore/graphics/al_Asset.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
 
+#ifndef USE_ASSIMP3
+#define USE_ASSIMP3
+#endif
+
 #ifdef USE_ASSIMP3
 
 #include "assimp/Importer.hpp"
