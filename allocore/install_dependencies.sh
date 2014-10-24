@@ -81,9 +81,26 @@ elif binary_exists "port"; then
 	sudo port selfupdate
 	sudo port install portaudio libsndfile +universal
 	sudo port install glew +universal
-	sudo port install assimp +universal
 	sudo port install freeimage +universal
 	sudo port install freetype +universal
+
+	#sudo port install assimp +universal
+
+	# Install assimp manually without boost (and its party of dependencies) to
+	# cut down dramatically on install time.
+	sudo port install cmake
+	DIR="$PWD"
+	cd /tmp
+	PKG=assimp-3.1.1
+	curl -LO http://downloads.sourceforge.net/project/assimp/assimp-3.1/${PKG}_no_test_models.zip
+	unzip -q ${PKG}*.zip
+	cd ${PKG}
+		cmake -DENABLE_BOOST_WORKAROUND=ON .
+		make
+		sudo make install
+	rm -rf /tmp/${PKG}
+	rm /tmp/${PKG}*.zip
+	cd "$DIR"
 
 elif uname | grep "MINGW"; then
 	echo 'Found MinGW / MSYS'
