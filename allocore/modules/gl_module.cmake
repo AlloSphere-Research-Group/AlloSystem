@@ -22,7 +22,7 @@ set(GL_HEADERS
 )
 
 if(GLEW_LIBRARY AND OPENGL_LIBRARY)
-message("Building OpenGL module (OpenGL + GLEW).")
+message(STATUS "Building OpenGL module (OpenGL + GLEW).")
 
 list(APPEND ALLOCORE_SRC
   src/graphics/al_Graphics.cpp

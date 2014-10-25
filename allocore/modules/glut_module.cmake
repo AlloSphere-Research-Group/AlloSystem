@@ -6,7 +6,7 @@ set(GLUT_HEADERS
 )
 
 if(GLUT_LIBRARY AND GLUT_INCLUDE_DIR)
-message("Building GLUT module.")
+message(STATUS "Building GLUT module.")
 
 list(APPEND ALLOCORE_SRC
   src/system/al_MainLoop.cpp

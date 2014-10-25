@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8)
 project (Allovsr)
 
-message("==== Configuring allovsr")
+message(STATUS "==== Configuring allovsr")
 
 #if(NOT ALLOSYSTEM_BUILD)
 #  find_package(Allocore REQUIRED QUIET)

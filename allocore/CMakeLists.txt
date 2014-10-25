@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8)
 project (Allocore)
 
-message("==== Configuring allocore.")
+message(STATUS "==== Configuring allocore.")
 
 # Allocore Library
 list(APPEND ALLOCORE_SRC
@@ -167,7 +167,7 @@ foreach(HEADER_INFO ${ALLOCORE_DUMMY_HEADERS})
 
     set(DUMMY_HEADER_TEXT "#error \"ERROR: Header not supported. Dependency '${dependency}' not met.\"\n")
     file(WRITE "${CMAKE_SOURCE_DIR}/build/include/${header}" ${DUMMY_HEADER_TEXT})
-    message("Writing dummy HEADER_INFO: ${header} --- ${dependency} --- ${HEADER_PARTS}")
+    message("Writing dummy header: ${header} ---- Unmet dependency: ${dependency}")
     list(APPEND ALLOCORE_HEADERS "${CMAKE_SOURCE_DIR}/build/include/${header}")
 endforeach()
 
@@ -201,7 +201,7 @@ if(BUILD_EXAMPLES)
     foreach(example ${EXAMPLE_FILES})
     if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/examples/${dir}/flags.txt)
       file(READ ${CMAKE_CURRENT_SOURCE_DIR}/examples/${dir}/flags.txt EXTRA_COMPILER_FLAGS)
-      message("NOTE: Using additional flags from /examples/${dir}/flags.txt: " ${EXTRA_COMPILER_FLAGS})
+      message(STATUS "NOTE: Using additional flags from /examples/${dir}/flags.txt: " ${EXTRA_COMPILER_FLAGS})
       STRING(REGEX REPLACE "[\r\n]" " " EXTRA_COMPILER_FLAGS "${EXTRA_COMPILER_FLAGS}")
     endif()
     get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension

@@ -8,7 +8,7 @@ set(FREETYPE_HEADERS
 if(FREETYPE_LIBRARY AND FREETYPE_INCLUDE_DIRS)
 # Depends on Glew and oepnGl, module must be included prior to this one
 if(GLUT_LIBRARY AND OPENGL_LIBRARY)
-message("Building font module.")
+message(STATUS "Building font module.")
 
 list(APPEND ALLOCORE_SRC
   src/graphics/al_Font.cpp)

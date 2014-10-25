@@ -42,5 +42,6 @@ else
   exit 1
 fi
 
-cmake . "$TARGET_FLAG" "$DBUILD_FLAG" -DRUN_IN_DEBUGGER=0 -DCMAKE_BUILD_TYPE=Release -Wno-dev
+cmake . "$TARGET_FLAG" "$DBUILD_FLAG" -DRUN_IN_DEBUGGER=0 -DCMAKE_BUILD_TYPE=Release -Wno-dev > cmake_log.txt
 make "$TARGET" -j "$PROC_FLAG" "$*"
+

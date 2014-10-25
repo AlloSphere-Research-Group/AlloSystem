@@ -39,11 +39,11 @@ if(EXISTS "${SOURCE_DIR}/flags.txt")
   STRING(REGEX REPLACE "[\r\n]" " " EXTRA_COMPILER_FLAGS "${EXTRA_COMPILER_FLAGS}")
   set_target_properties(${APP_NAME} PROPERTIES
     COMPILE_FLAGS "${EXTRA_COMPILER_FLAGS}")
-  message("NOTE: Using additional flags from ${SOURCE_DIR}/flags.txt: ${EXTRA_COMPILER_FLAGS}")
+  message(STATUS "NOTE: Using additional flags from ${SOURCE_DIR}/flags.txt: ${EXTRA_COMPILER_FLAGS}")
 endif()
 
-message("Target: ${APP_NAME}")
-message("From sources: ${ALLOPROJECT_APP_SRC}")
+message(STATUS "Target: ${APP_NAME}")
+message(STATUS "From sources: ${ALLOPROJECT_APP_SRC}")
 
 # Dependencies (check if targets exist and set variables)
 get_target_property(ALLOCORE_LIBRARY allocore${DEBUG_SUFFIX} LOCATION)

@@ -8,7 +8,7 @@ set(FREEIMAGE_HEADERS
 if(FREEIMAGE_LIBRARY AND FREEIMAGE_INCLUDE_PATH)
 # Depends on Glew and oepnGl, module must be included prior to this one
 if(GLUT_LIBRARY AND OPENGL_LIBRARY)
-message("Building freeimage module.")
+message(STATUS "Building freeimage module.")
 
 list(APPEND ALLOCORE_SRC
     src/graphics/al_Image.cpp)

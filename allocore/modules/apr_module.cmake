@@ -11,7 +11,7 @@ set(APR_HEADERS
 )
 
 if(APR_LIBRARY AND APR_INCLUDE_DIR)
-message("Building APR module.")
+message(STATUS "Building APR module.")
 
 list(APPEND ALLOCORE_SRC
     src/io/al_File.cpp

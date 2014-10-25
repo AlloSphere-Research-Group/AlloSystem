@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8)
 project (Alloutil)
 
-message("==== Configuring alloutil.")
+message(STATUS "==== Configuring alloutil")
 
 set(ALLOUTIL_SRC
   src/al_FileWatcher.cpp

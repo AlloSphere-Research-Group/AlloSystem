@@ -2,7 +2,7 @@ set(BUILD_OSC 1)
 
 
 if(BUILD_OSC)
-message("Building OSC module.")
+message(STATUS "Building OSC module.")
 
 set(OSC_HEADERS
     allocore/protocol/al_OSC.hpp
