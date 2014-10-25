@@ -151,11 +151,9 @@ add_library(${ALLOCORE_LIB} ${ALLOCORE_SRC} ${ALLOCORE_HEADERS})
 
 # Copy headers to build directory (only if directory does not exist)
 foreach(header ${ALLOCORE_HEADERS})
-    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/build/include/${header}") # Don't copy if exists, otherwise the copy forces a full rebuild.
-        execute_process(COMMAND ${CMAKE_COMMAND} -E
-                        copy ${header} ${CMAKE_SOURCE_DIR}/build/include/${header}
-                        WORKING_DIRECTORY  ${CMAKE_CURRENT_SOURCE_DIR})
-    endif()
+    execute_process(COMMAND ${CMAKE_COMMAND} -E
+                    copy_if_different ${header} ${CMAKE_SOURCE_DIR}/build/include/${header}
+                    WORKING_DIRECTORY  ${CMAKE_CURRENT_SOURCE_DIR})
 endforeach()
 
 # Write dummy headers
