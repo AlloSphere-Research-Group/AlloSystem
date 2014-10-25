@@ -218,7 +218,8 @@ public:
 			T& a = (*this)(i,j);
 			T& b = (*this)(j,i);
 			T c = a; a = b;	b = c;	// swap elements
-		}} return *this;
+		}}
+		return *this;
 	}
 
 	/// Get a submatrix
@@ -229,6 +230,7 @@ public:
 		for(int i=0; i<M; ++i){
 			res(j,i) = (*this)(j+row, i+col);
 		}}
+		return res;
 	}
 
 	/// Return matrix punned as a vector
