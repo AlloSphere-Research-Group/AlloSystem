@@ -321,17 +321,18 @@ void Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 		}
 		else if(primitive() == Graphics::TRIANGLE_STRIP){
 			for(unsigned i=0; i<Ni-2; ++i){
-				Index i1 = indices()[i  ];
-				Index i2 = indices()[i+1];
-				Index i3 = indices()[i+2];
+
+				// Flip every other normal due to change in winding direction
+				unsigned odd = i & 1;
+
+				Index i1 = indices()[i];
+				Index i2 = indices()[i+1+odd];
+				Index i3 = indices()[i+2-odd];
 
 				Vertex vn = F::calcNormal(
 					vertices()[i1], vertices()[i2], vertices()[i3],
 					equalWeightPerFace
 				);
-
-				// Flip every other normal due to change in winding direction
-				if(i & 1) vn.negate();
 
 				normals()[i1] += vn;
 				normals()[i2] += vn;
@@ -371,13 +372,14 @@ void Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 			for(unsigned i=0; i<Nv; ++i) normals()[i].set(0,0,0);
 
 			for(unsigned i=0; i<Nv-2; ++i){
-				Vertex vn = F::calcNormal(
-					vertices()[i], vertices()[i+1], vertices()[i+2],
-					equalWeightPerFace
-				);
 
 				// Flip every other normal due to change in winding direction
-				if(i & 1) vn.negate();
+				unsigned odd = i & 1;
+
+				Vertex vn = F::calcNormal(
+					vertices()[i], vertices()[i+1+odd], vertices()[i+2-odd],
+					equalWeightPerFace
+				);
 
 				normals()[i  ] += vn;
 				normals()[i+1] += vn;
