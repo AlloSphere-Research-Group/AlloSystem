@@ -77,7 +77,7 @@
 #include <map>
 #include <vector>
 #include "allocore/types/al_Buffer.hpp"
-#include "allocore/graphics/al_Graphics.hpp"
+#include "allocore/graphics/al_Mesh.hpp"
 
 namespace al{
 
