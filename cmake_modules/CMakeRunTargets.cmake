@@ -11,23 +11,23 @@ ENDIF()
 if(BUILD_DIR)
   string(REGEX REPLACE "/+$" "" BUILD_APP_DIR "${BUILD_APP_DIR}") # remove trailing slash
   file(GLOB ALLOPROJECT_APP_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${BUILD_APP_DIR}/*.cpp)
-  string(REPLACE "/" "_" APP_NAME ${BUILD_APP_DIR})
+  string(REPLACE "/" "_" APP_NAME "${BUILD_APP_DIR}")
   string(REGEX REPLACE "_+$" "" APP_NAME "${APP_NAME}")
-  set(SOURCE_DIR ${BUILD_APP_DIR})
+  set(SOURCE_DIR "${BUILD_APP_DIR}")
 else()
-  set(ALLOPROJECT_APP_SRC ${BUILD_APP_FILE})
-  string(REPLACE "/" "_" APP_NAME ${BUILD_APP_FILE})
-  get_filename_component(APP_NAME ${APP_NAME} NAME)
+  set(ALLOPROJECT_APP_SRC "${BUILD_APP_FILE}")
+  string(REPLACE "/" "_" APP_NAME "${BUILD_APP_FILE}")
+  get_filename_component(APP_NAME "${APP_NAME}" NAME)
   STRING(REGEX REPLACE "\\.[^.]*\$" "" APP_NAME "${APP_NAME}")
-  string(REPLACE "." "_" APP_NAME ${APP_NAME})
+  string(REPLACE "." "_" APP_NAME "${APP_NAME}")
 #  get_filename_component(APP_NAME ${APP_NAME} NAME_WE) # Get name w/o extension (extension is anything after first dot!)
-  get_filename_component(SOURCE_DIR ${BUILD_APP_FILE} PATH)
+  get_filename_component(SOURCE_DIR "${BUILD_APP_FILE}" PATH)
 endif(BUILD_DIR)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/build/bin)
 
 
-add_executable(${APP_NAME} EXCLUDE_FROM_ALL ${ALLOPROJECT_APP_SRC})
+add_executable("${APP_NAME}" EXCLUDE_FROM_ALL "${ALLOPROJECT_APP_SRC}")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set_target_properties(${APP_NAME} PROPERTIES
@@ -49,7 +49,7 @@ message(STATUS "From sources: ${ALLOPROJECT_APP_SRC}")
 get_target_property(ALLOCORE_LIBRARY allocore${DEBUG_SUFFIX} LOCATION)
 get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore${DEBUG_SUFFIX} ALLOCORE_DEP_INCLUDE_DIRS)
 get_target_property(ALLOCORE_LINK_LIBRARIES allocore${DEBUG_SUFFIX} ALLOCORE_LINK_LIBRARIES)
-add_dependencies(${APP_NAME} allocore${DEBUG_SUFFIX})
+add_dependencies("${APP_NAME}" allocore${DEBUG_SUFFIX})
 
 #message("Using allocore headers from: ${ALLOCORE_DEP_INCLUDE_DIRS}")
 
@@ -83,8 +83,8 @@ if(TARGET alloutil${DEBUG_SUFFIX})
     get_target_property(ALLOUTIL_LIBRARY alloutil${DEBUG_SUFFIX} LOCATION)
     get_target_property(ALLOUTIL_DEP_INCLUDE_DIR alloutil${DEBUG_SUFFIX} ALLOUTIL_DEP_INCLUDE_DIR)
     get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil${DEBUG_SUFFIX} ALLOUTIL_LINK_LIBRARIES)
-    add_dependencies(${APP_NAME} alloutil${DEBUG_SUFFIX})
-    target_link_libraries(${APP_NAME} ${ALLOUTIL_LIBRARY} ${ALLOUTIL_LINK_LIBRARIES})
+    add_dependencies("${APP_NAME}" alloutil${DEBUG_SUFFIX})
+    target_link_libraries("${APP_NAME}" ${ALLOUTIL_LIBRARY} ${ALLOUTIL_LINK_LIBRARIES})
     include_directories(${ALLOUTIL_DEP_INCLUDE_DIR})
 else()
   if(NOT ALLOUTIL_FOUND)
@@ -98,8 +98,8 @@ if(TARGET alloGLV${DEBUG_SUFFIX})
     get_target_property(ALLOGLV_LIBRARY alloGLV${DEBUG_SUFFIX} LOCATION)
     get_target_property(ALLOGLV_INCLUDE_DIR alloGLV${DEBUG_SUFFIX} ALLOGLV_INCLUDE_DIR)
     get_target_property(ALLOGLV_LINK_LIBRARIES "alloGLV${DEBUG_SUFFIX}" ALLOGLV_LINK_LIBRARIES)
-    add_dependencies(${APP_NAME} alloGLV${DEBUG_SUFFIX})
-    target_link_libraries(${APP_NAME} ${ALLOGLV_LIBRARY} ${ALLOGLV_LINK_LIBRARIES})
+    add_dependencies("${APP_NAME}" alloGLV${DEBUG_SUFFIX})
+    target_link_libraries("${APP_NAME}" ${ALLOGLV_LIBRARY} ${ALLOGLV_LINK_LIBRARIES})
     include_directories(${ALLOGLV_INCLUDE_DIR})
 else()
   if(NOT ALLOGLV_FOUND)
@@ -115,7 +115,7 @@ include_directories(${ALLOCORE_DEP_INCLUDE_DIRS})
 # TODO copy resources to build directory
 
 #    message("Gamma : ${GAMMA_INCLUDE_DIRs}")
-target_link_libraries(${APP_NAME}
+target_link_libraries("${APP_NAME}"
   ${ALLOCORE_LIBRARY}
   ${ALLOCORE_LINK_LIBRARIES})
 
