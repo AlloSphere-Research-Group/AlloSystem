@@ -90,7 +90,7 @@ inline void OmniStereoGraphicsRenderer::start() {
 inline OmniStereoGraphicsRenderer::~OmniStereoGraphicsRenderer() {}
 
 inline OmniStereoGraphicsRenderer::OmniStereoGraphicsRenderer()
-    : mNavControl(mNav), mOSCSend(DEVICE_SERVER_PORT_CONNECTION_US) {
+    : mNavControl(mNav), mOSCSend(12001) {
 
   bOmniEnable = true;
   mHostName = Socket::hostName();
