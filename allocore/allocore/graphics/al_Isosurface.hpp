@@ -77,7 +77,7 @@
 #include <map>
 #include <vector>
 #include "allocore/types/al_Buffer.hpp"
-#include "allocore/graphics/al_Graphics.hpp"
+#include "allocore/graphics/al_Mesh.hpp"
 
 namespace al{
 
@@ -223,10 +223,6 @@ public:
 	void generate(const T * scalarField, int n, float cellLength){
 		generate(scalarField, n,n,n, cellLength,cellLength,cellLength);
 	}
-	
-	/// A variation that shifts & wraps all the cells by integer amounts
-	template <class T>
-	void generate_shifted(const T * scalarField, const int sx, const int sy, const int sz);
 
 	void vertexAction(VertexAction& a){ mVertexAction = &a; }
 
@@ -334,58 +330,6 @@ void Isosurface::generate(const T * vals){
 	
 	end();
 }
-
-// generate but shift & wrap the cubes by an integer amount:
-template <class T>
-void Isosurface::generate_shifted(const T * vals, const int sx, const int sy, const int sz){
-	inBox(true);
-	begin();
-	
-	
-
-	int Nx = mNF[0];
-	int Nxy = Nx*mNF[1];
-
-	// iterate through cubes (not field points)
-	//for(int z=0; z < mNF[2]-1; ++z){
-	// support transparency (assumes higher indices are farther away)
-	for(int z=mNF[2]-2; z>=0; --z){	
-		int z0 = z   *Nxy;
-		int z1 =(z+1)*Nxy;
-		for(int y=0; y < mNF[1]-1; ++y){
-			int y0 = y   *Nx;
-			int y1 =(y+1)*Nx;
-			
-			int z0y0 = z0+y0;
-			int z0y1 = z0+y1;
-			int z1y0 = z1+y0;
-			int z1y1 = z1+y1;
-
-			int z0y0_1 = z0y0+1;
-			int z0y1_1 = z0y1+1;
-			int z1y0_1 = z1y0+1;
-			int z1y1_1 = z1y1+1;
-			
-			for(int x=0; x < mNF[0]-1; ++x){
-
-				float v8[] = {
-					vals[z0y0 + x], vals[z0y0_1 + x],
-					vals[z0y1 + x], vals[z0y1_1 + x],
-					vals[z1y0 + x], vals[z1y0_1 + x],
-					vals[z1y1 + x], vals[z1y1_1 + x]
-				};
-
-				int i3[] = {x, y, z};
-
-				addCell(i3,	v8);
-			}
-		}
-	}
-	
-	end();
-}
-
-
 
 } // al::
 
