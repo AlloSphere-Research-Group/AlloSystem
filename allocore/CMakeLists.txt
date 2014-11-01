@@ -13,12 +13,14 @@ list(APPEND ALLOCORE_SRC
   src/spatial/al_HashSpace.cpp
   src/spatial/al_Pose.cpp
   src/system/al_Info.cpp
+  src/system/al_PeriodicThread.cpp
   src/system/al_Printing.cpp
   src/system/al_Watcher.cpp
   src/types/al_Array.cpp
   src/types/al_Array_C.c
   src/types/al_Color.cpp
-  src/types/al_MsgQueue.cpp)
+  src/types/al_MsgQueue.cpp
+)
 
 list(APPEND ALLOCORE_HEADERS
     allocore/al_Allocore.hpp
