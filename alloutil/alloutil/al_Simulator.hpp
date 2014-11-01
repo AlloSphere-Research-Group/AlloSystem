@@ -4,15 +4,13 @@
 #include "allocore/al_Allocore.hpp"
 #include "allocore/protocol/al_OSC.hpp"
 
-#define DEVICE_SERVER_PORT (12000)
-#define DEVICE_SERVER_PORT_CONNECTION_US (DEVICE_SERVER_PORT + 1)
-#define DEVICE_SERVER_IP_ADDRESS "BOSSANOVA"
-
 namespace al {
 
 class Simulator : public osc::PacketHandler, public Main::Handler {
  public:
-  Simulator(std::string name = "omniapp");
+  Simulator(const char* deviceServerAddress = "127.0.0.1", int port = 12001,
+            int deviceServerPort = 12000);
+
   virtual ~Simulator();
 
   virtual void start();
@@ -28,27 +26,19 @@ class Simulator : public osc::PacketHandler, public Main::Handler {
   const Nav& nav() const { return mNav; }
   Nav& nav() { return mNav; }
 
-  const std::string& name() const { return mName; }
-  Simulator& name(const std::string& v) {
-    mName = v;
-    return *this;
-  }
+  virtual const char* name();
+  virtual const char* deviceServerConfig();
 
   osc::Recv& oscRecv() { return mOSCRecv; }
   osc::Send& oscSend() { return mOSCSend; }
 
   virtual void onMessage(osc::Message& m);
 
-  void sendHandshake();
-  void sendDisconnect();
-
  protected:
   bool started;
   double time, lastTime;
   osc::Recv mOSCRecv;
   osc::Send mOSCSend;
-  std::string mName;
-  bool useLocalNav;
 
   Nav mNav;
   Pose pose;
@@ -75,14 +65,6 @@ inline void Simulator::onTick() {
 }
 
 inline void Simulator::onExit() { exit(); }
-
-inline void Simulator::sendHandshake() {
-  oscSend().send("/handshake", name(), oscRecv().port());
-}
-
-inline void Simulator::sendDisconnect() {
-  oscSend().send("/disconnectApplication", name());
-}
 
 inline void Simulator::onMessage(osc::Message& m) {
 
@@ -124,26 +106,55 @@ inline void Simulator::onMessage(osc::Message& m) {
 }
 
 inline void Simulator::start() {
-  if (oscSend().opened()) sendHandshake();
+  if (oscSend().opened())
+    oscSend().send("/interface/applicationManager/createApplicationWithText",
+                   deviceServerConfig());
   Main::get().interval(1 / 60.0).add(*this).start();
 }
 
 inline void Simulator::stop() { Main::get().stop(); }
 
-inline Simulator::~Simulator() { sendDisconnect(); }
+inline Simulator::~Simulator() {
+  oscSend().send("/interface/disconnectApplication", name());
+}
 
-inline Simulator::Simulator(std::string name)
-    : mOSCRecv(DEVICE_SERVER_PORT_CONNECTION_US),
+Simulator::Simulator(const char* deviceServerAddress, int port,
+                     int deviceServerPort)
+    : mOSCRecv(port),
       mNavControl(mNav),
-      mOSCSend(DEVICE_SERVER_PORT, DEVICE_SERVER_IP_ADDRESS),
-      useLocalNav(false) {
-  mName = name;
+      mOSCSend(deviceServerPort, deviceServerAddress) {
+
   oscRecv().bufferSize(32000);
   oscRecv().handler(*this);
-  sendHandshake();
   mNavSpeed = 1;
   mNavTurnSpeed = 0.02;
   nav().smooth(0.8);
+}
+
+inline const char* Simulator::name() { return "default_no_name"; }
+
+inline const char* Simulator::deviceServerConfig() {
+  return R"(
+      app = {
+        name : 'default_no_name',
+        receivers :[ {type : 'OSC', port : 12001}, ],
+        inputs: {
+          mx: {min: 0, max: 0.1, },
+          my: {min: 0, max: 0.1, },
+          mz: {min: 0, max: 0.1, },
+          tx: {min: 0, max: 1, },
+          ty: {min: 0, max: 1, },
+          tz: {min: 0, max: 1, },
+          home: {min: 0, max: 1, },
+          halt: {min: 0, max: 1, },
+        },
+        mappings: [
+          { input: { io:'keypress', name:'`' }, output:{ io:'blob', name:'home' } },
+          { input: { io:'keypress', name:'w' }, output:{ io:'blob', name:'mx'}, },
+        ]
+
+      }
+  )";
 }
 
 }  // al::
