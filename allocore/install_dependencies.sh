@@ -78,12 +78,12 @@ elif binary_exists "brew"; then
 elif binary_exists "port"; then
 	echo 'Found MacPorts'
 	sudo port selfupdate
-	sudo port install portaudio libsndfile +universal
-	sudo port install glew +universal
-	sudo port install freeimage +universal
-	sudo port install freetype +universal
+	sudo port install portaudio libsndfile
+	sudo port install glew
+	sudo port install freeimage
+	sudo port install freetype
 
-	#sudo port install assimp +universal
+	#sudo port install assimp
 
 	# Install assimp manually without boost (and its party of dependencies) to
 	# cut down dramatically on install time.
