@@ -79,12 +79,12 @@ elif binary_exists "brew"; then
 elif binary_exists "port"; then
 	echo 'Found MacPorts'
 	sudo port selfupdate
-	sudo port install portaudio libsndfile +universal
-	sudo port install glew +universal
-	sudo port install freeimage +universal
-	sudo port install freetype +universal
+	sudo port install portaudio libsndfile
+	sudo port install glew
+	sudo port install freeimage
+	sudo port install freetype
 
-	#sudo port install assimp +universal
+	#sudo port install assimp
 
 	# Install assimp manually without boost (and its party of dependencies) to
 	# cut down dramatically on install time.
@@ -273,19 +273,10 @@ elif uname | grep "MINGW"; then
 		if files_exist "${DESTDIR}/lib/glut32*"; then
 			echo 'Found GLUT'
 		else
-			# This site always seems to be down...
-			#PKG=glut-3.7.6-bin
-			#wget http://user.xmission.com/~nate/glut/$PKG.zip
-			#unzip -q $PKG.zip
-			#install -d $DESTDIR/include/GL/
-			#cp $PKG/glut.h $DESTDIR/include/GL/
-			#cp $PKG/glut32.dll $DESTDIR/bin/
-			#cp $PKG/glut32.lib $DESTDIR/lib/
-
 			PKG=glutdlls37beta
 			DIR="$PWD"
 			cd /tmp
-				wget "http://www.opengl.org/resources/libraries/glut/${PKG}.zip"
+				wget --no-check-certificate "https://www.opengl.org/resources/libraries/glut/${PKG}.zip"
 				unzip -q "${PKG}.zip" -d "$PKG"
 				install -d "${DESTDIR}/include/GL/"
 				cp "${PKG}/glut.h" "${DESTDIR}/include/GL/"
