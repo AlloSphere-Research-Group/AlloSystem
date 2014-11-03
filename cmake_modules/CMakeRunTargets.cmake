@@ -9,11 +9,11 @@ IF(NOT ${match} STREQUAL "")
 ENDIF()
 
 if(BUILD_DIR)
-  string(REGEX REPLACE "/+$" "" BUILD_APP_DIR "${BUILD_APP_DIR}") # remove trailing slash
-  file(GLOB ALLOPROJECT_APP_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${BUILD_APP_DIR}/*.cpp)
-  string(REPLACE "/" "_" APP_NAME "${BUILD_APP_DIR}")
+  string(REGEX REPLACE "/+$" "" ALLOSYSTEM_BUILD_APP_DIR "${ALLOSYSTEM_BUILD_APP_DIR}") # remove trailing slash
+  file(GLOB ALLOPROJECT_APP_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${ALLOSYSTEM_BUILD_APP_DIR}/*.cpp)
+  string(REPLACE "/" "_" APP_NAME "${ALLOSYSTEM_BUILD_APP_DIR}")
   string(REGEX REPLACE "_+$" "" APP_NAME "${APP_NAME}")
-  set(SOURCE_DIR "${BUILD_APP_DIR}")
+  set(SOURCE_DIR "${ALLOSYSTEM_BUILD_APP_DIR}")
 else()
   set(ALLOPROJECT_APP_SRC "${BUILD_APP_FILE}")
   string(REPLACE "/" "_" APP_NAME "${BUILD_APP_FILE}")
@@ -30,7 +30,7 @@ if(EXISTS "${SOURCE_DIR}/flags.cmake")
     include("${SOURCE_DIR}/flags.cmake")
 endif()
 
-add_executable("${APP_NAME}" EXCLUDE_FROM_ALL "${ALLOPROJECT_APP_SRC}")
+add_executable("${APP_NAME}" EXCLUDE_FROM_ALL ${ALLOPROJECT_APP_SRC})
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set_target_properties(${APP_NAME} PROPERTIES
