@@ -50,7 +50,6 @@ Other optional dependencies are:
  * Libsndfile
  * luajit (for alloutil)
  * GLV (for alloGLV)
- * vsr (for allovsr)
 
 You may not need all these dependencies if you plan to build only part of Allosystem. The build system will try to find the dependencies available and build as much functionality as possible. However, if some dependencies are not available in your system, you won't have all functionality available and building some examples or existing code that uses it will fail.
 

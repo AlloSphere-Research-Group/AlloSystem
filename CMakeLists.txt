@@ -12,32 +12,24 @@ endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 set(BUILD_GAMMA 1 CACHE STRING "Try to build external Gamma")
 set(BUILD_GLV 1 CACHE STRING "Try to build external GLV.")
-set(BUILD_VSR 1 CACHE STRING "Try to build vsr.")
 set(BUILD_EXAMPLES 0 CACHE STRING "Build AlloSystem examples.")
 
 # Windows custom paths
 include(cmake_modules/CustomLibPaths.cmake)
 
-# External dependencies (Gamma, GLV and vsr)
+# External dependencies (Gamma and GLV)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
 
 include(cmake_modules/make_dep.cmake)
 
-# check for Gamma and build ---------------------------------
 if(BUILD_GAMMA)
     make_dep(Gamma)
     set(GAMMA_LIBRARY ${Gamma_LIBRARY})
 endif(BUILD_GAMMA)
 
-# check for GLV and build ---------------------------------
 if(BUILD_GLV)
     make_dep(GLV)
 endif(BUILD_GLV)
-
-# check for vsr and build ----------------------------
-if(BUILD_VSR)
-    make_dep(vsr)
-endif(BUILD_VSR)
 
 # Allocore --------------------------------
 add_subdirectory(allocore)
@@ -69,13 +61,6 @@ add_subdirectory(alloaudio)
 #get_target_property(ALLOAUDIO_LIBRARY alloaudio${DEBUG_SUFFIX} LOCATION)
 #get_target_property(ALLOAUDIO_DEP_INCLUDE_DIR alloaudio${DEBUG_SUFFIX} ALLOAUDIO_DEP_INCLUDE_DIR)
 #get_target_property(ALLOAUDIO_LINK_LIBRARIES alloaudio${DEBUG_SUFFIX} ALLOAUDIO_LINK_LIBRARIES)
-
-
-# allovsr ----------------------------------
-add_subdirectory(allovsr)
-if(BUILDING_VSR)
-  add_dependencies(allovsr vsr)
-endif(BUILDING_VSR)
 
 # Run from path (Used in run.sh script)
 if((ALLOSYSTEM_BUILD_DIR) OR (ALLOSYSTEM_BUILD_APP_FILE))
@@ -139,7 +124,7 @@ if(BUILD_EXAMPLES)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_COMPILER_FLAGS}")
       endif(EXTRA_COMPILER_FLAGS)
       #message("Adding target for example: ${example_src}")
-      include_directories(${ALLOCORE_INCLUDE_DIR} ${ALLOUTIL_INCLUDE_DIR} ${ALLOGLV_INCLUDE_DIR} ${ALLOVSR_INCLUDE_DIR}
+      include_directories(${ALLOCORE_INCLUDE_DIR} ${ALLOUTIL_INCLUDE_DIR} ${ALLOGLV_INCLUDE_DIR}
         ${GAMMA_INCLUDE_DIRS} )
       #    message("Gamma : ${GAMMA_INCLUDE_DIRs}")
       add_dependencies(${EXAMPLE_TARGET} "allocore${DEBUG_SUFFIX}" "alloutil${DEBUG_SUFFIX}")
