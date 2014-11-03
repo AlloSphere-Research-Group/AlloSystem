@@ -3,11 +3,6 @@
 #    message(FATAL_ERROR "Error: The run script must be called from the source root directory." )
 #endif(NOT (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR}))
 
-
-if(EXISTS "${SOURCE_DIR}/flags.cmake")
-    include("${SOURCE_DIR}/flags.cmake")
-endif()
-
 string(REGEX MATCH ".*\\*.*" match "${CMAKE_CURRENT_SOURCE_DIR}")
 IF(NOT ${match} STREQUAL "")
   message(FATAL_ERROR "Error: Please remove '*' from path!" ) # This avoids issues with the run script
@@ -31,6 +26,9 @@ endif(BUILD_DIR)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/build/bin)
 
+if(EXISTS "${SOURCE_DIR}/flags.cmake")
+    include("${SOURCE_DIR}/flags.cmake")
+endif()
 
 add_executable("${APP_NAME}" EXCLUDE_FROM_ALL "${ALLOPROJECT_APP_SRC}")
 
