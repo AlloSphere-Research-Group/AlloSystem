@@ -12,6 +12,8 @@ stereographic rendering
 */
 
 #include "allocore/al_Allocore.hpp"
+#include "allocore/sound/al_Ambisonics.hpp"
+
 using namespace al;
 
 struct Agent : public SoundSource, public Nav, public Drawable{
@@ -30,7 +32,6 @@ struct Agent : public SoundSource, public Nav, public Drawable{
 			//float s = rnd::uniform(); // make noise, just to hear something
 			float s = sin(oscPhase * M_2PI);
 			//float s = al::rnd::uniformS();
-			
 			//s *= (oscEnv*=0.999);
 			
 			if(oscEnv < 0.00001){ oscEnv=1; oscPhase=0; }
@@ -45,8 +46,9 @@ struct Agent : public SoundSource, public Nav, public Drawable{
 	virtual void onUpdateNav(){
 		smooth(0.9);
 		
-		spin(M_2PI/360, M_2PI/397, 0);
-		moveF(0.04);
+        spin(M_2PI/360, M_2PI/397, 0);
+        moveF(0.04);
+        
 		step();
 		
 		SoundSource::pose(*this);
@@ -92,55 +94,18 @@ struct Agent : public SoundSource, public Nav, public Drawable{
 	double oscPhase, oscEnv;
 };
 
+#define AUDIO_BLOCK_SIZE 256
 
+AudioScene scene(AUDIO_BLOCK_SIZE);
 Listener * listener;
 Nav navMaster(Vec3d(0,0,-4), 0.95);
 std::vector<Agent> agents(1);
+int currentAgent = 0;
 Stereographic stereo;
-#define AUDIO_BLOCK_SIZE 256
-
-#ifdef ALLOSPHERE
-AudioScene scene(3, 3, AUDIO_BLOCK_SIZE);
-const int numSpeakers = 16;
-const double topAz = 90;
-const double topEl = 45;
-const double midAz = (360./8);
-const double midEl = 0;
-const double botAz = 90;
-const double botEl =-45;
-AmbiDecode::Speaker speakers[numSpeakers] = {
-	Speaker( 3-1, 0.5*midAz, midEl),
-	Speaker( 6-1, 1.5*midAz, midEl),
-	Speaker(17-1, 2.5*midAz, midEl),
-	Speaker(18-1, 3.5*midAz, midEl),
-	Speaker( 4-1,-0.5*midAz, midEl),
-	Speaker( 5-1,-1.5*midAz, midEl),
-	Speaker(20-1,-2.5*midAz, midEl),
-	Speaker(19-1,-3.5*midAz, midEl),
-	
-	Speaker( 7-1, 0.5*topAz, topEl),
-	Speaker( 9-1, 1.5*topAz, topEl),
-	Speaker( 8-1,-0.5*topAz, topEl),
-	Speaker(21-1,-1.5*topAz, topEl),
-
-	Speaker(24-1, 0.5*botAz, botEl),
-	Speaker(23-1, 1.5*botAz, botEl),
-	Speaker(10-1,-0.5*botAz, botEl),
-	Speaker(22-1,-1.5*botAz, botEl),
-};
-#else
-AudioScene scene(2, 1, AUDIO_BLOCK_SIZE);
-const int numSpeakers = 2;
-Speaker speakers[] = {
-	Speaker(0,  45,0),
-	Speaker(1, -45,0),
-};
-#endif
 
 
 void audioCB(AudioIOData& io){
-	int numFrames = io.framesPerBuffer();
-
+    
 	for(unsigned i=0; i<agents.size(); ++i){
 		io.frame(0);
 		agents[i].onUpdateNav();
@@ -148,12 +113,10 @@ void audioCB(AudioIOData& io){
 	}
 
 	navMaster.step(0.5);
+     
 	listener->pose(navMaster);
-
-	scene.encode(numFrames, io.framesPerSecond());
-	scene.render(&io.out(0,0), numFrames);
-	
-	//printf("%g\n", io.out(0,0));
+    io.frame(0);
+    scene.render(io);
 }
 
 
@@ -167,8 +130,6 @@ struct MyWindow : public Window, public Drawable{
 
 		Viewport vp(dimensions().w, dimensions().h);
 		stereo.draw(gl, cam, pose, vp, *this);
-
-//		printf("pos %f %f %f\n", navMaster.pos()[0], navMaster.pos()[1], navMaster.pos()[2]);		
 		
 		return true;
 	}
@@ -195,20 +156,27 @@ struct MyWindow : public Window, public Drawable{
 };
 
 
-int main (int argc, char * argv[]){
+int main (int argc, char * argv[])
+{
+    // Set speaker layout
+    const int numSpeakers = 2;
+    Speaker speakers[] = {
+        Speaker(0,  45,0),
+        Speaker(1, -45,0),
+    };
+    SpeakerLayout speakerLayout;
+    speakerLayout.addSpeaker(speakers[0]);
+    speakerLayout.addSpeaker(speakers[1]);
 
-	listener = scene.createListener(2);
+    // Create spatializer
+    AmbisonicsSpatializer *ambisonics = new AmbisonicsSpatializer(speakerLayout, 2, 1);
+    //Dbap *dbap = new Dbap(speakerLayout);
 
-	listener->numSpeakers(numSpeakers);
-	for(int i=0; i<numSpeakers; ++i){
-		listener->speakerPos(
-			i,
-			speakers[i].deviceChannel,
-			speakers[i].azimuth,
-			speakers[i].elevation
-		);
-	}
+	// Create listener to render audio
+	listener = scene.createListener(ambisonics);
+    //listener = scene.createListener(dbap);
 	
+	// Now do some visuals
 	for(unsigned i=0; i<agents.size(); ++i) scene.addSource(agents[i]);
 
 	MyWindow windows[6];

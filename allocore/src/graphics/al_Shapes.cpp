@@ -412,6 +412,7 @@ int addSurface(Mesh& m, int Nx, int Ny, float width, float height){
 	for(int j=0; j<Ny; ++j){ float y=(float(j)/(Ny-1) - 0.5f) * height;
 	for(int i=0; i<Nx; ++i){ float x=(float(i)/(Nx-1) - 0.5f) * width;
 		m.vertex(x, y);
+		m.texCoord(float(i)/(Nx-1), float(j)/(Ny-1));
 	}}
 
 	// Note: the start and end points of each row are duplicated to create

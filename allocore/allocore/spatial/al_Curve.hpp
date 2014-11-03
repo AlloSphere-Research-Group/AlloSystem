@@ -96,7 +96,7 @@ struct Frenet{
 
 
 	/// Compute Frenet frame one point back from input point
-	void operator()(const Vec3& p0){ next<1,1,1,1>(p0); }
+	void operator()(const Vec3& p0){ next<1,1,1,1,1>(p0); }
 
 	/// Compute Frenet frame one point back from input point
 	
@@ -104,7 +104,7 @@ struct Frenet{
 	/// duplicate points. Colinear points result in ambiguous normal and 
 	/// binormal vectors. Duplicated points make the first derivative undefined.
 	/// Both of these situations are guaranteed to wreak numerical havok.
-	template<bool NormalizeT, bool NormalizeN, bool NormalizeB, bool ComputeN>
+	template<bool NormalizeT, bool NormalizeN, bool NormalizeB, bool ComputeN, bool ComputeB>
 	void next(const Vec3& p0){
 
 		mdb = mdf;			// bwd diff is previous fwd diff
@@ -124,8 +124,10 @@ struct Frenet{
 			return;
 		}*/
 
-		B = cross(mdb, mdf);
-		//B = cross(T, mdf - mdb); // formally, we use 2nd difference
+		if(ComputeB || ComputeN){
+			B = cross(mdb, mdf);
+			//B = cross(T, mdf - mdb); // formally, we use 2nd difference
+		}
 
 		if(ComputeN){
 			N = cross(B, T);

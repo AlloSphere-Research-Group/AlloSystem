@@ -218,10 +218,11 @@ public:
 			T& a = (*this)(i,j);
 			T& b = (*this)(j,i);
 			T c = a; a = b;	b = c;	// swap elements
-		}} return *this;
+		}}
+		return *this;
 	}
 
-	/// Get a submatrix
+	/// Get an MxM submatrix
 	template <int M>
 	Mat<M,T> sub(int row=0, int col=0) const {
 		Mat<M,T> res(MAT_NO_INIT);
@@ -229,6 +230,20 @@ public:
 		for(int i=0; i<M; ++i){
 			res(j,i) = (*this)(j+row, i+col);
 		}}
+		return res;
+	}
+
+	/// Returns a submatrix by removing one row and column
+	Mat<N-1,T> submatrix(int row, int col) const {
+		Mat<N-1,T> res(MAT_NO_INIT);
+		for(int j=0,js=0; j<N-1; ++j, ++js){
+			js += int(js==row);
+			for(int i=0, is=0; i<N-1; ++i, ++is){
+				is += int(is==col);
+				res(j,i) = (*this)(js,is);
+			}
+		}
+		return res;
 	}
 
 	/// Return matrix punned as a vector
@@ -377,8 +392,30 @@ public:
 	//--------------------------------------------------------------------------
 	// Linear Operations
 
+
+	/// Get cofactor
+	T cofactor(int row, int col) const {
+		T minor = determinant(submatrix(row,col));
+		T cofactors[] = {minor, -minor};
+		// cofactor sign: + if row+col even, - otherwise
+		int sign = (row^col) & 1;
+		return cofactors[sign];
+	}
+
+	/// Get cofactor matrix
+	Mat<N,T> cofactorMatrix() const {
+		Mat<N,T> res(MAT_NO_INIT);
+		for(int r=0; r<N; ++r){
+			for(int c=0; c<N; ++c){
+				res(r,c) = cofactor(r,c);
+			}
+		}
+		return res;
+	}
+
 	/// Get trace (sum of diagonal elements)
 	T trace() const { return diagonal().sum(); }
+
 
 	// Affine transformations
 
@@ -488,25 +525,19 @@ inline Vec<N,T> operator* (const Vec<N,T>& vRow, const Mat<N,T>& m){
 }
 
 
-// TODO: Determinants of higher order matrices:
-//			For small N, find recursively using determinants of minors
-//			For large N, find using Gaussian elimination
-//				(product of diagonal terms in row echelon form)
-//				We need a rowEchelon() method for Mat (should indicate what rows were swapped, if any)
-
-/// Get determinant of 1-by-1 matrix
+/// Get determinant
 template <class T>
 T determinant(const Mat<1,T>& m){
 	return m(0,0);
 }
 
-/// Get determinant of 2-by-2 matrix
+/// Get determinant
 template <class T>
 T determinant(const Mat<2,T>& m){
 	return m(0,0)*m(1,1) - m(0,1)*m(1,0);
 }
 
-/// Get determinant of 3-by-3 matrix
+/// Get determinant
 template <class T>
 T determinant(const Mat<3,T>& m){
 	return
@@ -515,10 +546,34 @@ T determinant(const Mat<3,T>& m){
 		m(0,2)*(m(1,0)*m(2,1) - m(1,1)*m(2,0));
 }
 
+/// Get determinant
 
-/// TODO: general Mat inversion, need general determinant first
+/// This computes the determinant using cofactor (or Laplace) expansion.
+/// The algorithm operates by recursively computing determinants of submatrices.
+template<int N, class T>
+T determinant(const Mat<N,T>& m){
+	T res = 0;
+	for(int i=0; i<N; ++i){
+		T entry = m(0,i);
+		if(entry != T(0)){
+			res += entry * m.cofactor(0,i);
+		}
+	}
+	return res;
+}
 
-/// Invert 2-by-2 matrix, returns whether matrix was able to be inverted
+/// Invert matrix, returns whether matrix was able to be inverted
+template <class T>
+bool invert(Mat<1,T>& m){
+	T det = determinant(m);
+	if(det != 0){
+		m(0,0) /= det;
+		return true;
+	}
+	return false;
+}
+
+/// Invert matrix, returns whether matrix was able to be inverted
 template <class T>
 bool invert(Mat<2,T>& m){
 	T det = determinant(m);
@@ -532,18 +587,30 @@ bool invert(Mat<2,T>& m){
 	return false;
 }
 
-/// Invert 3-by-3 matrix, returns whether matrix was able to be inverted
-template <class T>
-bool invert(Mat<3,T>& m){
-	T det = determinant(m);
-	if(det != 0){
-		m.transpose() /= det;
+/// Invert matrix, returns whether matrix was able to be inverted
+template<int N, class T>
+bool invert(Mat<N,T>& m){
+	// Get cofactor matrix, C
+	Mat<N,T> C = m.cofactorMatrix();
+
+	// Compute determinant
+	T det = T(0);
+	for(int i=0; i<N; ++i){
+		det += m(0,i) * C(0,i);
+	}
+
+	// Divide adjugate matrix, C^T, by determinant
+	if(det != T(0)){
+		m = (C.transpose() *= T(1)/det);
 		return true;
 	}
+
 	return false;
 }
 
 
+//----------------------------
+// Member function definitions
 
 template <int N, class T>
 void Mat<N,T>::print(FILE * file) const {

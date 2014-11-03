@@ -1,43 +1,47 @@
-#!/bin/bash
-
-# Change this to suit your needs
-BUILD_ALLOUTIL=1
-BUILD_ALLOGLV=0
-BUILD_GLV=0
-BUILD_VSR=0
-BUILD_GAMMA=0
+#!/bin/sh
 
 # ------------------------------------------------
 # You shouldn't need to touch the stuff below
 
-CMAKE_FLAGS="-DBUILD_ALLOUTIL=${BUILD_ALLOUTIL} -DBUILD_ALLOGLV=${BUILD_ALLOGLV} -DBUILD_GLV=${BUILD_GLV} -DBUILD_VSR=${BUILD_VSR} -DBUILD_GAMMA=${BUILD_GAMMA}"
+# Get the number of processors on OS X, linux, and (to-do) Windows.
+NPROC=$(grep --count ^processor /proc/cpuinfo 2>/dev/null || sysctl -n hw.ncpu || 2)
+# Save one core for the gui.
+PROC_FLAG=$((NPROC - 1))
 
-if [ $# == 0 ]
+if [ $# = 0 ]
 then
     echo Aborting: You must provide a source filename or a directory
     exit 1
 fi
 
-FILENAME=$(basename "$1")
+# Remove file extension.
+FILENAME=$(basename "$1" | sed 's/\.[^.]*$//')
 DIRNAME=$(dirname "$1")
-FILENAME="${DIRNAME//./_}_${FILENAME%.*}"
+
+# Replace all forward slashes with underscores.
+TARGET=$(echo "${DIRNAME}_${FILENAME}_run" | sed 's/\//_/g')
+
+if [ "$DIRNAME" != "." ]; then
+  # Replace all periods with underscores.
+  TARGET=$(echo "${TARGET}" | sed 's/\./_/g')
+fi
 
 #echo FILENAME: ${FILENAME}
-TARGET=${FILENAME//\//_}_run
 #echo TARGET: ${TARGET}
 
-if [ -f $1 ]
-then
-  TARGET_FLAG="-DBUILD_APP_FILE=$1 -DBUILD_DIR=0"
-  echo RUN SCRIPT: Building file $1
-elif [ -d $1 ]
-then
-  TARGET_FLAG="-DBUILD_APP_DIR=$1 -DBUILD_DIR=1"
-  echo RUN SCRIPT: Building all files in dir $1
+if [ -f "$1" ]; then
+  TARGET_FLAG="-DALLOSYSTEM_BUILD_APP_FILE=$1"
+  DBUILD_FLAG="-DALLOSYSTEM_BUILD_DIR=0"
+  echo RUN SCRIPT: Building file "$1"
+elif [ -d "$1" ]; then
+  TARGET_FLAG="-DALLOSYSTEM_BUILD_APP_DIR=$1"
+  DBUILD_FLAG="-DALLOSYSTEM_BUILD_DIR=1"
+  echo RUN SCRIPT: Building all files in dir "$1"
 else
-  echo Aborting: $1 is neither a file nor directory
+  echo Aborting: "$1" is neither a file nor directory
   exit 1
 fi
 
-cmake . ${CMAKE_FLAGS} ${TARGET_FLAG} -DNO_EXAMPLES=1 -DRUN_IN_DEBUGGER=0 -DCMAKE_BUILD_TYPE=Release
-make $TARGET -j4 $*
+cmake . "$TARGET_FLAG" "$DBUILD_FLAG" -DRUN_IN_DEBUGGER=0 -DCMAKE_BUILD_TYPE=Release -Wno-dev > cmake_log.txt
+make "$TARGET" -j "$PROC_FLAG" "$*"
+

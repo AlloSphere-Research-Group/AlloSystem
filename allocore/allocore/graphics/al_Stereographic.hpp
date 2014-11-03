@@ -186,6 +186,13 @@ public:
 	/// Get current viewport
 	const Viewport& viewport() const { return mVP; }
 
+	/// Convert a normalized screen space position to world space
+	 // each component of input vector should be normalized from -1. to 1.
+	// template<class T>
+	Vec3d unproject(Vec3d screenPos);
+
+
+
 protected:
 	StereoMode mMode;
 	AnaglyphMode mAnaglyphMode;

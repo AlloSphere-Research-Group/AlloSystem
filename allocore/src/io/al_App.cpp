@@ -46,7 +46,7 @@ ViewpointWindow& ViewpointWindow::add(Viewpoint& v){
 App::App()
 :	mName(""),
 	mNavControl(mNav),
-	mClockAnimate(0), mClockNav(0)
+	mClockAnimate(0), mClockNav(0), mOSCRecv(8000)
 {
 }
 
@@ -193,6 +193,25 @@ bool App::usingAudio() const {
 	return audioIO().callback == AppAudioCB;
 }
 
+
+/// Get a pick ray from screen space coordinates
+ // i.e. use mouse xy
+Rayd App::getPickRay(const ViewpointWindow& w, int screenX, int screenY){
+  Rayd r;
+  Vec3d screenPos;
+  screenPos.x = (screenX*1. / w.width()) * 2. - 1.;
+  screenPos.y = ((w.height() - screenY)*1. / w.height()) * 2. - 1.;
+  screenPos.z = -1.;
+  Vec3d worldPos = stereo().unproject(screenPos);
+  r.origin().set(worldPos);
+
+  screenPos.z = 1.;
+  worldPos = stereo().unproject(screenPos);
+  r.direction().set( worldPos ); 
+  r.direction() -= r.origin();
+  r.direction().normalize(); 
+  return r;
+}
 
 
 bool App::SceneWindowHandler::onFrame(){

@@ -1,4 +1,4 @@
-#include "protocol/al_Graphics.hpp"
+#include "graphics/al_Graphics.hpp"
 #include "graphics/al_Config.h"
 
 // OpenGL platform-dependent includes

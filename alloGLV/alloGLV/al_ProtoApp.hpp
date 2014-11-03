@@ -44,6 +44,7 @@
 #include <math.h>
 #include <string>
 #include "allocore/io/al_App.hpp"
+#include "allocore/io/al_File.hpp"
 #include "alloGLV/al_ControlGLV.hpp"
 
 #include "GLV/glv.h"

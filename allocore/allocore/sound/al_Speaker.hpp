@@ -73,36 +73,40 @@ struct Speaker {
 		float cosel = cos(elr);
 		xyz[0] = sin(azr) * cosel * radius;
 		xyz[1] = cos(azr) * cosel * radius;
-		xyz[2] =         sin(elr) * radius;
+		xyz[2] = sin(elr) * radius;
 		return *this;
 	}
 	
-	static double toRad(double d){ return d*2.*M_PI/180.; }
+    Vec3d vec(){
+        
+        //TODO doxygen style commenting on coordinates like ambisonics
+        
+		double cosel = cos(toRad(elevation));
+//		double x = sin(toRad(azimuth)) * cosel * radius;
+//		double y = cos(toRad(azimuth)) * cosel * radius;
+//		double z = sin(toRad(elevation)) * radius;
+        //Ryan: the standard conversions assume +z is up, these are correct for allocore
+        double x = sin(toRad(azimuth)) * cosel * radius;
+		double y = sin(toRad(elevation)) * radius;
+        double z = -1*cos(toRad(azimuth)) * cosel * radius;
+		return Vec3d(x,y,z);
+	}
+    
+	static double toRad(double d){ return d*M_PI/180.; }
 };
 
-
+typedef std::vector<Speaker> Speakers;
 
 /// Base class for a configuration of multiple speakers
 class SpeakerLayout{
 public:
-	typedef std::vector<Speaker> Speakers;
-
+	
 	SpeakerLayout(){}
 
 	int numSpeakers() const { return speakers().size(); }
 
 	const Speakers& speakers() const { return mSpeakers; }
 	Speakers& speakers(){ return mSpeakers; }
-
-//	Speaker addSpeaker(float azimuth, float elevation, float distance, int deviceChannel){
-//		Speaker s;
-//		s.azimuth = azimuth;
-//		s.elevation = elevation;
-//		s.distance = distance;
-//		s.deviceChannel = deviceChannel;
-//		addSpeaker(s);
-//		return s;
-//	}
 
 	SpeakerLayout& addSpeaker(const Speaker& spkr){
 		mSpeakers.push_back(spkr);
@@ -112,7 +116,8 @@ public:
 	
 
 protected:
-	friend class Listener;
+	friend class Spatializer;
+    friend class AmbisonicsSpatializer;
 	Speakers mSpeakers;
 };
 

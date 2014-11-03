@@ -149,7 +149,10 @@ STRIP_FROM_PATH        = /Applications/
 # definition is used. Otherwise one should specify the include paths that 
 # are normally passed to the compiler using the -I flag.
 
-STRIP_FROM_INC_PATH    = /home/andres/Documents/src/Allostuff/AlloSystem-github/allocore
+STRIP_FROM_INC_PATH    = /home/andres/Documents/src/Allostuff/AlloSystem-github/allocore \
+                         /home/andres/Documents/src/Allostuff/AlloSystem-github/alloaudio \
+                         /home/andres/Documents/src/Allostuff/AlloSystem-github/alloutil \
+                         /home/andres/Documents/src/Allostuff/AlloSystem-github/alloGLV
 
 # If the SHORT_NAMES tag is set to YES, doxygen will generate much shorter 
 # (but less readable) file names. This can be useful if your file system 
@@ -678,7 +681,11 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = ../allocore/allocore \
-                         ../allocore/src
+                         ../allocore/src \
+                         ../alloaudio/alloaudio \
+                         ../alloutil/alloutil \
+                         ../alloGLV/alloGLV \
+                         ../alloaudio/src
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 

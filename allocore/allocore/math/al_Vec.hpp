@@ -453,7 +453,7 @@ inline Vec<N1+N2, T1> concat(const Vec<N1,T1>& a, const Vec<N2,T2>& b){
 /// Get a subvector
 template <int M, int N, class T>
 inline Vec<M,T> sub(const Vec<N,T>& v, int begin=0){
-	return v.sub<M>(begin);
+	return v.template sub<M>(begin);
 }
 
 /// Sets r to cross product, a x b
@@ -470,6 +470,43 @@ template <class T>
 inline Vec<3,T> cross(const Vec<3,T>& a, const Vec<3,T>& b){
 	Vec<3,T> r;	cross(r,a,b); return r;
 }
+
+/// Rotate a vector around a normal vector
+
+/// @param[in,out]	vec		The vector to rotate
+/// @param[in]		normal	A normal perpendicular to the plane of rotation
+/// @param[in]		cosAng	Cosine of the rotation angle
+/// @param[in]		sinAng	Sine of the rotation angle
+template <class T>
+void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double cosAng, double sinAng){
+	T c = cosAng;
+	T s = sinAng;
+
+	T c12 = normal[0]*normal[1]*(T(1)-c);
+	T c23 = normal[1]*normal[2]*(T(1)-c);
+	T c31 = normal[2]*normal[0]*(T(1)-c);
+	T c11 = normal[0]*normal[0]*(T(1)-c);
+	T c22 = normal[1]*normal[1]*(T(1)-c);
+	T c33 = normal[2]*normal[2]*(T(1)-c);
+
+	vec.set(
+		Vec<3,T>(c11 + c, c12 - s*normal[2], c31 + s*normal[1]).dot(vec),
+		Vec<3,T>(c12 + s*normal[2], c22 + c, c23 - s*normal[0]).dot(vec),
+		Vec<3,T>(c31 - s*normal[1], c23 + s*normal[0], c33 + c).dot(vec)
+	);
+}
+
+/// Rotate a vector around a normal vector
+
+/// @param[in,out]	vec			The vector to rotate
+/// @param[in]		normal		A normal perpendicular to the plane of rotation
+/// @param[in]		angle		The rotation angle, in radians
+template <class T>
+void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double ang){
+	rotate(vec, normal, cos(ang), sin(ang));
+}
+
+
 
 /// Returns angle, in interval [0, pi], between two vectors
 template <int N, class T>
