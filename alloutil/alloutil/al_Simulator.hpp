@@ -41,7 +41,6 @@ class Simulator : public osc::PacketHandler, public Main::Handler {
   osc::Send mOSCSend;
 
   Nav mNav;
-  Pose pose;
   NavInputControl mNavControl;
   StandardWindowKeyControls mStdControls;
 
@@ -94,7 +93,11 @@ inline void Simulator::onMessage(osc::Message& m) {
   } else {
   }
 
+  // This allows the graphics renderer (or whatever) to overwrite navigation
+  // data, so you can navigate from the graphics window when using a laptop.
+  //
   if (m.addressPattern() == "/pose") {
+    Pose pose;
     m >> pose.pos().x;
     m >> pose.pos().y;
     m >> pose.pos().z;
@@ -102,6 +105,8 @@ inline void Simulator::onMessage(osc::Message& m) {
     m >> pose.quat().y;
     m >> pose.quat().z;
     m >> pose.quat().w;
+    //pose.print();
+    nav().set(pose);
   }
 }
 
