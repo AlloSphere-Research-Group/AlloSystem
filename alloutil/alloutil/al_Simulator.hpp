@@ -34,6 +34,22 @@ class Simulator : public osc::PacketHandler, public Main::Handler {
 
   virtual void onMessage(osc::Message& m);
 
+  static bool gr01(){
+    char hostname[256];
+    gethostname(hostname, 256);
+    return !strncmp(hostname,"gr01",256);
+  }
+
+  static const char* defaultBroadcastIP(){
+    if(gr01()) return "192.168.10.255";
+    else return "127.0.0.1";
+  }
+
+  static const char* defaultInterfaceServerIP(){
+    if(gr01()) return "interface.local"; //mac mini hostname on 1g network
+    else return "127.0.0.1";
+  }
+
  protected:
   bool started;
   double time, lastTime;
@@ -131,6 +147,7 @@ Simulator::Simulator(const char* deviceServerAddress, int port,
 
   oscRecv().bufferSize(32000);
   oscRecv().handler(*this);
+
   mNavSpeed = 1;
   mNavTurnSpeed = 0.02;
   nav().smooth(0.8);
