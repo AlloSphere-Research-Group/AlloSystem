@@ -46,7 +46,7 @@ class Simulator : public osc::PacketHandler, public Main::Handler {
   }
 
   static const char* defaultInterfaceServerIP(){
-    if(gr01()) return "interface.local"; //mac mini hostname on 1g network
+    if(gr01()) return "192.168.0.74"; //interface mac mini
     else return "127.0.0.1";
   }
 
