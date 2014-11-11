@@ -56,6 +56,8 @@ else
   echo Aborting: "$1" is neither a file nor directory.
   exit 1
 fi
+# Don't pass target as Make flag.
+shift
 
 if [ -n "$debugger" ]; then
   cmake . "$TARGET_FLAG" "$DBUILD_FLAG" -DRUN_IN_DEBUGGER=1 "-DALLOSYSTEM_DEBUGGER=${debugger}" -DCMAKE_BUILD_TYPE=Debug > cmake_log.txt
