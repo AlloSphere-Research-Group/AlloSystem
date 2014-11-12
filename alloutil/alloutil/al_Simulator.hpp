@@ -145,6 +145,8 @@ Simulator::Simulator(const char* deviceServerAddress, int port,
       mNavControl(mNav),
       mOSCSend(deviceServerPort, deviceServerAddress) {
 
+  started = false;
+
   oscRecv().bufferSize(32000);
   oscRecv().handler(*this);
 
