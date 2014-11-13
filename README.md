@@ -79,11 +79,15 @@ The AlloCore Make system permits one to build and automatically run source files
 	
 	make examples/mymain.cpp
 
-and will be linked against Allocore and its dependencies. If you are having trouble using tab autocompletion after the 'make' command, then it is likely that a completion rule has been defined elsewhere for make. You can disable this by adding to the bottom of your ~/.bashrc file
+and will be linked against Allocore and its dependencies. If you just want to build an executable without running it, then include AUTORUN=0 with the make command.
+
+Note: If you are having trouble using tab autocompletion after the 'make' command, then it is likely that a completion rule has been defined elsewhere for make. You can disable this by adding to the bottom of your ~/.bashrc file
 
 	complete -r make
 
-which will restore the default autocompletion using the file system. If you just want to build and executable without running it, then include AUTORUN=0 with the make command.
+which will restore the default autocompletion using the file system. If that still doesn't work, then you can try the command
+
+	sudo mv /usr/share/bash-completion/completions/make /usr/share/bash-completion/completions/make_disabled
 
 
 3.2 User-defined Options
