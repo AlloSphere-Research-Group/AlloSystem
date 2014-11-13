@@ -15,17 +15,21 @@ if binary_exists 'apt-get'; then
 	echo 'Found apt-get'
 	sudo apt-get update
 	sudo apt-get install libluajit-5.1-dev
+	sudo apt-get install libjsoncpp-dev
 
 elif binary_exists "brew"; then
 	echo 'Found Homebrew'
 	brew update
 	brew install luajit
+	brew install jsoncpp
 
 elif binary_exists "port"; then
 	echo 'Found MacPorts'
 	sudo port selfupdate
 	sudo port install luajit
+	sudo port install jsoncpp
 
+# TODO: Install jsoncpp.
 elif uname | grep "MINGW"; then
 	echo 'Found MinGW / MSYS'
 	if ! binary_exists "wget"; then
