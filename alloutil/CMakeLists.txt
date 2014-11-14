@@ -32,7 +32,7 @@ endif(NOT LUA_FOUND)
 find_package(Jsoncpp)
 
 if(NOT Jsoncpp_FOUND)
-  message("Jsoncpp required to build AlloUtil. Neither found!")
+  message("Jsoncpp required to build AlloUtil. Not found!")
   return()
 endif(NOT Jsoncpp_FOUND)
 
