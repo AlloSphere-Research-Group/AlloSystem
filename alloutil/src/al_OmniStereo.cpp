@@ -1,5 +1,3 @@
-
-#include "allocore/io/al_Socket.hpp" // for hostname
 #include <fstream> // Loads configuration.
 #include "json/json.h" // Parse configuration.
 
