@@ -1,28 +1,30 @@
 cmake_minimum_required (VERSION 2.8)
-project (Alloutil)
+project (Alloaux)
 
-message(STATUS "==== Configuring alloutil")
+message(STATUS "==== Configuring alloaux")
 
-set(ALLOUTIL_SRC
-  src/al_FileWatcher.cpp
-  src/al_OmniStereo.cpp
-  src/al_WarpBlend.cpp
+set(ALLOAUX_SRC
+  src/al_ResourceManager.cpp
   )
 
 # Dependencies ------------------------------
-find_package(Jsoncpp)
+find_package(LuaJIT)
 
-if(NOT Jsoncpp_FOUND)
-  message("Jsoncpp required to build AlloUtil. Not found!")
+if(LUAJIT_FOUND)
+  set(LUA_INCLUDE_DIR ${LUAJIT_INCLUDE_DIR})
+  set(LUA_LIBRARIES ${LUAJIT_LIBRARIES})
+  set(LUA_FOUND 1)
+else()
+  find_package(Lua51)
+  if (LUA_LIBRARY)
+    set(LUA_FOUND 1)
+  endif(LUA_LIBRARY)
+endif(LUAJIT_FOUND)
+
+if(NOT LUA_FOUND)
+  message("Lua 5.1 or LuaJIT required to build AlloAux. Neither found!")
   return()
-endif(NOT Jsoncpp_FOUND)
-
-find_path(ALLOCORE_HEADER allocore/graphics/al_Image.hpp ${CMAKE_SOURCE_DIR}/build/include)
-
-if(NOT ALLOCORE_HEADER)
-    message("Allocore not built with freeimage support. Can't build Alloutil.")
-    return()
-endif(NOT ALLOCORE_HEADER)
+endif(NOT LUA_FOUND)
 
 get_target_property(ALLOCORE_LIBRARY allocore${DEBUG_SUFFIX} LOCATION)
 get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore${DEBUG_SUFFIX} ALLOCORE_DEP_INCLUDE_DIRS)
@@ -30,30 +32,30 @@ get_target_property(ALLOCORE_LINK_LIBRARIES allocore${DEBUG_SUFFIX} ALLOCORE_LIN
 
 # Build library ----------------------------------
 
-set(ALLOUTIL_LIB "alloutil${DEBUG_SUFFIX}")
-add_library(${ALLOUTIL_LIB} ${ALLOUTIL_SRC})
+set(ALLOAUX_LIB "alloaux${DEBUG_SUFFIX}")
+add_library(${ALLOAUX_LIB} ${ALLOAUX_SRC})
 
-set(ALLOUTIL_LINK_LIBRARIES ${Jsoncpp_LIBRARIES} ${ALLOCORE_LIBRARY})
-set(ALLOUTIL_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${Jsoncpp_INCLUDE_DIRS} ${ALLOCORE_DEP_INCLUDE_DIRS})
+set(ALLOAUX_LINK_LIBRARIES ${LUA_LIBRARIES} ${ALLOCORE_LIBRARY})
+set(ALLOAUX_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${LUA_INCLUDE_DIR} ${ALLOCORE_DEP_INCLUDE_DIRS})
 
-include_directories(${ALLOUTIL_DIRS})
-target_link_libraries(${ALLOUTIL_LIB} ${ALLOUTIL_LINK_LIBRARIES})
+include_directories(${ALLOAUX_DIRS})
+target_link_libraries(${ALLOAUX_LIB} ${ALLOAUX_LINK_LIBRARIES})
 
-add_dependencies(${ALLOUTIL_LIB} allocore${DEBUG_SUFFIX})
+add_dependencies(${ALLOAUX_LIB} allocore${DEBUG_SUFFIX})
 
 set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 
-#message (STATUS "allocore_location for alloutil == ${ALLOCORE_LIBRARY}")
+#message (STATUS "allocore_location for alloaux == ${ALLOCORE_LIBRARY}")
 
 # export properties for AlloSystem
-set_target_properties(${ALLOUTIL_LIB}
+set_target_properties(${ALLOAUX_LIB}
   PROPERTIES
-  ALLOUTIL_DEP_INCLUDE_DIR "${ALLOUTIL_DIRS}"
+  ALLOAUX_DEP_INCLUDE_DIR "${ALLOAUX_DIRS}"
   )
-set_target_properties(${ALLOUTIL_LIB}
+set_target_properties(${ALLOAUX_LIB}
   PROPERTIES
-  ALLOUTIL_LINK_LIBRARIES "${ALLOUTIL_LINK_LIBRARIES}"
+  ALLOAUX_LINK_LIBRARIES "${ALLOAUX_LINK_LIBRARIES}"
   )
 
 # Build Examples ------------------------------------------------------
@@ -64,7 +66,7 @@ if(BUILD_EXAMPLES)
   endif(NOT TARGET Gamma)
 
   if(NOT (GAMMA_FOUND OR Gamma_LIBRARY))
-    message("Alloutil: Gamma not found. Not building examples." )
+    message("Alloaux: Gamma not found. Not building examples." )
   else()
 
     include_directories(${GAMMA_INCLUDE_DIR})
@@ -73,10 +75,10 @@ if(BUILD_EXAMPLES)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin/examples/)
     foreach(example ${EXAMPLE_FILES})
       get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
-      set(EXAMPLE_TARGET alloutil_examples_${EXAMPLE_NAME})
+      set(EXAMPLE_TARGET alloaux_examples_${EXAMPLE_NAME})
       add_executable(${EXAMPLE_TARGET} ${example})
       add_dependencies(${EXAMPLE_TARGET} ${ALLOCORE_LIBRARY})
-      target_link_libraries("${EXAMPLE_TARGET}" ${ALLOUTIL_LIB} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOCORE_LINK_LIBRARIES} ${GAMMA_LIBRARY} ${SNDFILE_LIBRARIES})
+      target_link_libraries("${EXAMPLE_TARGET}" ${ALLOAUX_LIB} ${ALLOAUX_LINK_LIBRARIES} ${ALLOCORE_LINK_LIBRARIES} ${GAMMA_LIBRARY} ${SNDFILE_LIBRARIES})
       if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set_target_properties(${EXAMPLE_TARGET} PROPERTIES
 	  LINK_FLAGS "-pagezero_size 10000 -image_base 100000000")
@@ -97,5 +99,5 @@ if(BUILD_EXAMPLES)
 endif(BUILD_EXAMPLES)
 
 # installation
-install(DIRECTORY alloutil/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include/alloutil)
-install(TARGETS ${ALLOUTIL_LIB} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install(DIRECTORY alloaux/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include/alloaux)
+install(TARGETS ${ALLOAUX_LIB} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)

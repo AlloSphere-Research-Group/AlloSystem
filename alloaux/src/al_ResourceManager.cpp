@@ -1,5 +1,5 @@
 #include "allocore/system/al_Printing.hpp"
-#include "alloutil/al_ResourceManager.hpp"
+#include "alloaux/al_ResourceManager.hpp"
 
 using namespace al;
 

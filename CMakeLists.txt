@@ -46,8 +46,13 @@ get_target_property(ALLOUTIL_LIBRARY alloutil${DEBUG_SUFFIX} LOCATION)
 get_target_property(ALLOUTIL_DEP_INCLUDE_DIR alloutil${DEBUG_SUFFIX} ALLOUTIL_DEP_INCLUDE_DIR)
 get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil${DEBUG_SUFFIX} ALLOUTIL_LINK_LIBRARIES)
 
-# alloGLV ---------------------------------------
+# Alloaux ----------------------------------
+add_subdirectory(alloaux)
+get_target_property(ALLOAUX_LIBRARY alloaux${DEBUG_SUFFIX} LOCATION)
+get_target_property(ALLOAUX_DEP_INCLUDE_DIR alloaux${DEBUG_SUFFIX} ALLOAUX_DEP_INCLUDE_DIR)
+get_target_property(ALLOAUX_LINK_LIBRARIES alloaux${DEBUG_SUFFIX} ALLOAUX_LINK_LIBRARIES)
 
+# alloGLV ---------------------------------------
 add_subdirectory(alloGLV)
 get_target_property(ALLOGLV_LIBRARY alloGLV${DEBUG_SUFFIX} LOCATION)
 get_target_property(ALLOGLV_INCLUDE_DIR alloGLV${DEBUG_SUFFIX} ALLOGLV_INCLUDE_DIR)
@@ -124,13 +129,13 @@ if(BUILD_EXAMPLES)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_COMPILER_FLAGS}")
       endif(EXTRA_COMPILER_FLAGS)
       #message("Adding target for example: ${example_src}")
-      include_directories(${ALLOCORE_INCLUDE_DIR} ${ALLOUTIL_INCLUDE_DIR} ${ALLOGLV_INCLUDE_DIR}
+      include_directories(${ALLOCORE_INCLUDE_DIR} ${ALLOUTIL_INCLUDE_DIR} ${ALLOAUX_INCLUDE_DIR} ${ALLOGLV_INCLUDE_DIR}
         ${GAMMA_INCLUDE_DIRS} )
       #    message("Gamma : ${GAMMA_INCLUDE_DIRs}")
-      add_dependencies(${EXAMPLE_TARGET} "allocore${DEBUG_SUFFIX}" "alloutil${DEBUG_SUFFIX}")
+      add_dependencies(${EXAMPLE_TARGET} "allocore${DEBUG_SUFFIX}" "alloutil${DEBUG_SUFFIX}" "alloaux${DEBUG_SUFFIX}")
       target_link_libraries(${EXAMPLE_TARGET}
-	${ALLOCORE_LIBRARY} ${ALLOUTIL_LIBRARY} ${GAMMA_LIBRARIES}
-        ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOGLV_LINK_LIBRARIES})
+	${ALLOCORE_LIBRARY} ${ALLOUTIL_LIBRARY} ${ALLOAUX_LIBRARY} ${GAMMA_LIBRARIES}
+        ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOAUX_LINK_LIBRARIES} ${ALLOGLV_LINK_LIBRARIES})
       if(ALLOGLV_LIBRARY)
         add_dependencies(${EXAMPLE_TARGET} ${ALLOGLV_LIBRARY})
         target_link_libraries(${EXAMPLE_TARGET} ${ALLOGLV_LIBRARY} ${ALLOGLV_LINK_LIBRARIES})
