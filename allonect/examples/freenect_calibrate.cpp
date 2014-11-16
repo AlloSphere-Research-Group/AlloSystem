@@ -11,7 +11,7 @@ Graham Wakefield, 2011
 
 #include "allocore/al_Allocore.hpp"
 #include "allonect/al_Freenect.hpp"
-#include "alloutil/al_Lua.hpp"
+#include "alloaux/al_Lua.hpp"
 
 using namespace al;
 
