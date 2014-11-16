@@ -1,0 +1,8 @@
+# alloaux dependencies.
+
+alloaux_apt="libluajit-5.1-dev"
+
+alloaux_brew="luajit"
+alloaux_port="luajit"
+
+alloaux_pacman="mingw-w64-${arch}-luajit-git"

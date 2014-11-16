@@ -43,8 +43,13 @@ get_target_property(ALLOUTIL_LIBRARY alloutil${DEBUG_SUFFIX} LOCATION)
 get_target_property(ALLOUTIL_DEP_INCLUDE_DIR alloutil${DEBUG_SUFFIX} ALLOUTIL_DEP_INCLUDE_DIR)
 get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil${DEBUG_SUFFIX} ALLOUTIL_LINK_LIBRARIES)
 
-# alloGLV ---------------------------------------
+# Alloaux ----------------------------------
+add_subdirectory(alloaux)
+get_target_property(ALLOAUX_LIBRARY alloaux${DEBUG_SUFFIX} LOCATION)
+get_target_property(ALLOAUX_DEP_INCLUDE_DIR alloaux${DEBUG_SUFFIX} ALLOAUX_DEP_INCLUDE_DIR)
+get_target_property(ALLOAUX_LINK_LIBRARIES alloaux${DEBUG_SUFFIX} ALLOAUX_LINK_LIBRARIES)
 
+# alloGLV ---------------------------------------
 add_subdirectory(alloGLV)
 get_target_property(ALLOGLV_LIBRARY alloGLV${DEBUG_SUFFIX} LOCATION)
 get_target_property(ALLOGLV_INCLUDE_DIR alloGLV${DEBUG_SUFFIX} ALLOGLV_INCLUDE_DIR)
@@ -54,7 +59,6 @@ if(BUILDING_GLV)
 endif(BUILDING_GLV)
 
 # allocv ---------------------------------------
-
 add_subdirectory(allocv)
 get_target_property(ALLOCV_LIBRARY allocv${DEBUG_SUFFIX} LOCATION)
 get_target_property(ALLOCV_INCLUDE_DIR allocv${DEBUG_SUFFIX} ALLOCV_INCLUDE_DIR)
@@ -110,31 +114,31 @@ if(BUILD_EXAMPLES)
       set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin/examples/${dir})
 
       if ("${dir}" STREQUAL ".")
-	set(EXAMPLE_TARGET examples_${EXAMPLE_NAME})
+  set(EXAMPLE_TARGET examples_${EXAMPLE_NAME})
       else()
-	set(EXAMPLE_TARGET examples_${dir}_${EXAMPLE_NAME})
+  set(EXAMPLE_TARGET examples_${dir}_${EXAMPLE_NAME})
       endif()
       add_executable(${EXAMPLE_TARGET} ${example_src})
 
       if(APPLE)
-	#These are needed for Luajit on OS X 64-bit binaries
-	set_target_properties(${EXAMPLE_TARGET} PROPERTIES
-	  LINK_FLAGS "-pagezero_size 10000 -image_base 100000000")
+  #These are needed for Luajit on OS X 64-bit binaries
+  set_target_properties(${EXAMPLE_TARGET} PROPERTIES
+    LINK_FLAGS "-pagezero_size 10000 -image_base 100000000")
       endif()
       if (EXTRA_COMPILER_FLAGS)
 # This is the right way, but it crashes cmake... Bug has been fixed by cmake devs but not released as of this writing...
-	#set_source_files_properties(${example_src}
+  #set_source_files_properties(${example_src}
         #  PROPERTIES COMPILE_FLAGS "-I/usr/include/mysql")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_COMPILER_FLAGS}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_COMPILER_FLAGS}")
       endif(EXTRA_COMPILER_FLAGS)
       #message("Adding target for example: ${example_src}")
-      include_directories(${ALLOCORE_INCLUDE_DIR} ${ALLOUTIL_INCLUDE_DIR} ${ALLOGLV_INCLUDE_DIR}
+      include_directories(${ALLOCORE_INCLUDE_DIR} ${ALLOUTIL_INCLUDE_DIR} ${ALLOAUX_INCLUDE_DIR} ${ALLOGLV_INCLUDE_DIR}
         ${GLV_INCLUDE_DIRS} ${GAMMA_INCLUDE_DIRS} ${ALLOAUDIO_INCLUDE_DIR} )
       #    message("Gamma : ${GAMMA_INCLUDE_DIRs}")
-      add_dependencies(${EXAMPLE_TARGET} "allocore${DEBUG_SUFFIX}" "alloutil${DEBUG_SUFFIX}")
+      add_dependencies(${EXAMPLE_TARGET} "allocore${DEBUG_SUFFIX}" "alloutil${DEBUG_SUFFIX}" "alloaux${DEBUG_SUFFIX}")
       target_link_libraries(${EXAMPLE_TARGET}
-        ${ALLOCORE_LIBRARY} ${ALLOUTIL_LIBRARY} ${GAMMA_LIBRARIES} ${ALLOAUDIO_LIBRARY}
-        ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOGLV_LINK_LIBRARIES}
+        ${ALLOCORE_LIBRARY} ${ALLOUTIL_LIBRARY} ${ALLOAUX_LIBRARY} ${GAMMA_LIBRARIES} ${ALLOAUDIO_LIBRARY}
+        ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOAUX_LINK_LIBRARIES} ${ALLOGLV_LINK_LIBRARIES}
         ${ALLOAUDIO_LINK_LIBRARIES})
       if(ALLOGLV_LIBRARY)
         add_dependencies(${EXAMPLE_TARGET} ${ALLOGLV_LIBRARY})
@@ -142,11 +146,11 @@ if(BUILD_EXAMPLES)
       endif(ALLOGLV_LIBRARY)
       list(REMOVE_ITEM EXAMPLE_RES_FILES ${example_src})
       add_custom_target("${EXAMPLE_TARGET}_run"
-	COMMAND "${EXAMPLE_TARGET}"
-	DEPENDS "${EXAMPLE_TARGET}"
-	WORKING_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-	SOURCES ${example_src}
-	COMMENT "Running: ${EXAMPLE_TARGET}")
+  COMMAND "${EXAMPLE_TARGET}"
+  DEPENDS "${EXAMPLE_TARGET}"
+  WORKING_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+  SOURCES ${example_src}
+  COMMENT "Running: ${EXAMPLE_TARGET}")
 
     endforeach(example_src)
 
@@ -154,7 +158,7 @@ if(BUILD_EXAMPLES)
       set(SRC "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}")
       set(DST "${CMAKE_SOURCE_DIR}/build/${FILENAME}")
       if(NOT (IS_DIRECTORY ${SRC}))
-	configure_file(${SRC} ${DST} COPY_ONLY)
+  configure_file(${SRC} ${DST} COPY_ONLY)
         message(STATUS "Copying: " ${SRC})
       endif(NOT (IS_DIRECTORY ${SRC}))
     endforeach(FILENAME)

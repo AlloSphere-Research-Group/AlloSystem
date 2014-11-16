@@ -47,7 +47,7 @@
 #include "allocore/io/al_File.hpp"
 #include "allocore/system/al_Watcher.hpp"
 #include "allocore/graphics/al_Shader.hpp"
-#include "alloutil/al_Lua.hpp"
+#include "alloaux/al_Lua.hpp"
 
 #include <map>
 #include <set>
