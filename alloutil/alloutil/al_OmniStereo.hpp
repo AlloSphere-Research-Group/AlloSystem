@@ -24,6 +24,10 @@ class OmniStereo {
         // callback
         uniform float omni_eye;
 
+        // @omni_radius: the radius of the allosphere in OpenGL units.
+        //  This will be infinity for the original layout (we default to 1e10).
+        uniform float omni_radius;
+
         // @omni_face: the GL_TEXTURE_CUBE_MAP face being rendered.
         //  For a typical forward-facing view, this should == 5.
         //  Pass this uniform to the shader in the OmniStereoDrawable
@@ -41,14 +45,19 @@ class OmniStereo {
         //  Typically gl_Position = omni_render(gl_ModelViewMatrix *
         // gl_Vertex);
         vec4 omni_render(in vec4 vertex) {
-          // unit direction vector:
+          float l = length(vertex.xz);
           vec3 vn = normalize(vertex.xyz);
-          // omni-stereo effect (in eyespace XZ plane)
-          // cross-product with up vector also ensures stereo fades out at Y
-          // poles
-          // v.xyz -= omni_eye * cross(vn, vec3(0, 1, 0));
-          // simplified:
-          vertex.xz += vec2(omni_eye * vn.z, omni_eye * -vn.x);
+          // Precise formula.
+          float displacement = omni_eye *
+            (omni_radius * omni_radius -
+               sqrt(l * l * omni_radius * omni_radius +
+                    omni_eye * omni_eye * (omni_radius * omni_radius - l * l))) /
+            (omni_radius * omni_radius - omni_eye * omni_eye);
+          // Approximation, safe if omni_radius / omni_eye is very large, which is true for the allosphere.
+          // float displacement = omni_eye * (1.0 - l / omni_radius);
+          // Displace vertex.
+          vertex.xz += vec2(displacement * vn.z, displacement * -vn.x);
+
           // convert eye-space into cubemap-space:
           // GL_TEXTURE_CUBE_MAP_POSITIVE_X
           if (omni_face == 0) {
@@ -257,6 +266,9 @@ class OmniStereo {
   // the current eye parallax
   // (positive for right eye, negative for left, zero for mono):
   float eye() const { return mEyeParallax; }
+  // the radius of the sphere in OpenGL units, default to 1e10, when we can ignore the effect.
+  float sphereRadius() const { return mSphereRadius; }
+  float sphereRadius(float value) { return mSphereRadius = value; }
 
   // create GPU resources:
   void onCreate();
@@ -307,6 +319,7 @@ class OmniStereo {
 
   // these become shader uniforms:
   int mFace;
+  float mSphereRadius; // The radius of the sphere in OpenGL units.
   float mEyeParallax, mNear, mFar;
 
   unsigned mResolution;
@@ -326,6 +339,7 @@ inline void OmniStereo::uniforms(ShaderProgram& program) const {
   program.uniform("omni_eye", mEyeParallax);
   program.uniform("omni_near", mNear);
   program.uniform("omni_far", mFar);
+  program.uniform("omni_radius", mSphereRadius);
   gl.error("sending OmniStereo uniforms");
 }
 
