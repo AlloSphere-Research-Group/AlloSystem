@@ -10,11 +10,32 @@ binary_exists(){
 files_exist(){
 	ls -u "$@" >/dev/null 2>&1;
 }
+
+# Builds without requiring boost.
+build_and_install_assimp(){
+	DIR="$PWD"
+	cd /tmp
+		PKG="assimp-3.1.1"
+		curl -LO "http://downloads.sourceforge.net/project/assimp/assimp-3.1/${PKG}_no_test_models.zip"
+		unzip -q "${PKG}*.zip"
+		cd "$PKG"
+			cmake -DENABLE_BOOST_WORKAROUND=ON .
+			make
+			sudo make install
+		cd ..
+
+		# Cleanup.
+		rm -rf /tmp/${PKG}
+		rm /tmp/${PKG}*.zip
+	cd "$DIR"
+}
 # End helper functions.
 
 if binary_exists "apt-get"; then
 	echo 'Found apt-get'
 	sudo apt-get update
+	sudo apt-get install build-essential
+	sudo apt-get install cmake
 	sudo apt-get install libapr1-dev libaprutil1-dev
 	sudo apt-get install portaudio19-dev libsndfile1-dev
 	sudo apt-get install libglew-dev freeglut3-dev
@@ -24,82 +45,45 @@ if binary_exists "apt-get"; then
 	sudo apt-get install libxi-dev libxmu-dev
 
 	# Get version of installed assimp
-	ASSIMP_V=$(apt-cache policy libassimp-dev | grep Installed | cut -f2 -d: | sed -e 's/[ ]*//')
+	ASSIMP_VERSION=$(apt-cache policy libassimp-dev | grep Installed | cut -f2 -d: | sed -e 's/[ ]*//')
 
 	# If assimp2 is installed, then prompt to remove it.
-	if dpkg --compare-versions "$ASSIMP_V" lt 3; then
-		echo "assimp version ${ASSIMP_V} detected."
+	if dpkg --compare-versions "$ASSIMP_VERSION" lt 3; then
+		echo "assimp version ${ASSIMP_VERSION} detected."
 		echo 'It is recommended that you remove this version to avoid configuration problems with AlloCore.'
-		# Use printf because 'echo -n' is not standardized.
 		printf 'Would you like to remove it [Y/n]?'
 		read ANS
 		if [ "$ANS" = 'Y' ] || [ "$ANS" = 'y' ]; then
-			echo "Removing assimp ${ASSIMP_V}"
-			sudo apt-get remove "libassimp-dev=${ASSIMP_V}"
+			echo "Removing assimp ${ASSIMP_VERSION}"
+			sudo apt-get remove "libassimp-dev=${ASSIMP_VERSION}"
 		fi
 	fi
 
-	# Ensure that assimp3 headers are being installed.
-	available_assimp_version=$(apt-cache madison libassimp-dev | head -1 | cut -f2 -d\|)
-
-	if dpkg --compare-versions "$available_assimp_version" ge 3; then
-		sudo apt-get install libassimp-dev
-	# Otherwise build assimp3 from source and install.
-	else
-		sudo apt-get install cmake
-		PKG=assimp--3.0.1270-source-only
-		DIR="$PWD"
-		cd /tmp
-			wget "http://sourceforge.net/projects/assimp/files/assimp-3.0/${PKG}.zip"
-			unzip -q "${PKG}.zip"
-			cd "$PKG"
-				cmake -DENABLE_BOOST_WORKAROUND=ON .
-				make
-				sudo make install
-			cd ..
-
-			# Cleanup.
-			rm -rf "$PKG"
-			rm "${PKG}.zip"
-		cd "$DIR"
-	fi
+	build_and_install_assimp
 
 # It's important to check for Homebrew before MacPorts,
 # because Homebrew is the most used among the AlloTeam.
 elif binary_exists "brew"; then
 	echo 'Found Homebrew'
 	brew update
+	brew install cmake
 	brew install portaudio libsndfile
 	brew install glew
-	brew install assimp
 	brew install freeimage
 	brew install freetype
+
+	build_and_install_assimp
 
 elif binary_exists "port"; then
 	echo 'Found MacPorts'
 	sudo port selfupdate
+	sudo port install cmake
 	sudo port install portaudio libsndfile
 	sudo port install glew
 	sudo port install freeimage
 	sudo port install freetype
 
-	#sudo port install assimp
-
-	# Install assimp manually without boost (and its party of dependencies) to
-	# cut down dramatically on install time.
-	sudo port install cmake
-	DIR="$PWD"
-	cd /tmp
-	PKG=assimp-3.1.1
-	curl -LO http://downloads.sourceforge.net/project/assimp/assimp-3.1/${PKG}_no_test_models.zip
-	unzip -q ${PKG}*.zip
-	cd ${PKG}
-		cmake -DENABLE_BOOST_WORKAROUND=ON .
-		make
-		sudo make install
-	rm -rf /tmp/${PKG}
-	rm /tmp/${PKG}*.zip
-	cd "$DIR"
+	build_and_install_assimp
 
 elif uname | grep "MINGW"; then
 	echo 'Found MinGW / MSYS'
