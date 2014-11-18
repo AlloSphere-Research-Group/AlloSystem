@@ -38,7 +38,7 @@ class AudioRenderer {
 inline void AudioRenderer::initAudio(double audioRate, int audioBlockSize) {
   
   if(bossa) initAudio("AF12 x5b", audioRate, audioBlockSize, 60, 60);
-  else if(audio) initAudio("ECHOX5", audioRate, audioBlockSize, 60, 60);
+  else if(audio) initAudio("ECHO X5", audioRate, audioBlockSize, 60, 60);
   else{
     mAudioIO.callback = AppAudioCB;
     mAudioIO.user(this);
@@ -98,8 +98,8 @@ inline AudioRenderer::AudioRenderer() {
   char hostname[256];
   gethostname(hostname, 256);
   bossa = !strncmp(hostname,"bossanova",256);
-  audio = !strncmp(hostname,"audio",256);
-  // std::cout << "AudioRenderer at host: " << hostname << std::endl;
+  audio = !strncmp(hostname,"audio.10g",256);
+  std::cout << "AudioRenderer at host: " << hostname << std::endl;
   initAudio();
 }
 
