@@ -537,6 +537,31 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 	submit(src.data.ptr, src.alignment());
 }
 
+void Texture::copyFrameBuffer(
+	int w, int h, int fbx, int fby, int texx, int texy, int texz
+){
+	if(w < 0){
+		w += 1 + width();
+	}
+	if(h < 0){
+		h += 1 + height();
+	}
+
+	bind();
+	switch(target()){
+	case TEXTURE_1D:
+		glCopyTexSubImage1D(GL_TEXTURE_1D, 0, texx, fbx,fby, w);
+		break;
+	case TEXTURE_2D:
+		glCopyTexSubImage2D(GL_TEXTURE_2D, 0, texx,texy, fbx,fby, w, h);
+		break;
+	case TEXTURE_3D:
+		glCopyTexSubImage3D(GL_TEXTURE_3D, 0, texx,texy,texz, fbx,fby, w, h);
+		break;
+	}
+	unbind();
+}
+
 Texture& Texture::generateMipmap(){
 	bind();
 	glGenerateMipmapEXT(target());
