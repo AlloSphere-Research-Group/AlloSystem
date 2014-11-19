@@ -88,9 +88,13 @@ Texture :: ~Texture() {
 void Texture::onCreate(){
 	//printf("Texture onCreate\n");
 	glGenTextures(1, (GLuint *)&mID);
+
+	glBindTexture(target(), id());
+	sendShape();	
 	sendParams();
-	mShapeUpdated = true; // ensure a glTexImage call
 	sendPixels();
+	glBindTexture(target(), 0);
+	
 	AL_GRAPHICS_ERROR("creating texture", id());
 }
 	
@@ -167,9 +171,22 @@ void Texture :: configure(AlloArrayHeader& hdr) {
 void Texture :: bind(int unit) {
 	AL_GRAPHICS_ERROR("(before Texture::bind)", id());
 	
-	// ensure texture is created
+	// Ensure texture is created
 	validate();
 		//AL_GRAPHICS_ERROR("validate binding texture", id());
+	
+	// Specify multitexturing
+	glActiveTexture(GL_TEXTURE0 + unit);
+		//AL_GRAPHICS_ERROR("active texture binding texture", id());
+
+	// Do the actual binding
+	glEnable(target());
+		//AL_GRAPHICS_ERROR("enable target binding texture", id());
+	glBindTexture(target(), id());
+		AL_GRAPHICS_ERROR("binding texture", id());
+
+
+	// Synchronize client texture state with GPU
 
 	// If someone requested a mutable reference to the internal array, we will
 	// assume we need to sync the texture attributes with the array.
@@ -182,20 +199,12 @@ void Texture :: bind(int unit) {
 		mArrayDirty = false;
 	}
 
+	sendShape(false);
+
 	sendParams(false);
 		//AL_GRAPHICS_ERROR("sendparams binding texture", id());
 	sendPixels(false);
 		//AL_GRAPHICS_ERROR("sendpixels binding texture", id());
-	
-	// multitexturing:
-	glActiveTexture(GL_TEXTURE0 + unit);
-		//AL_GRAPHICS_ERROR("active texture binding texture", id());
-
-	// finally, do the actual binding
-	glEnable(target());
-		//AL_GRAPHICS_ERROR("enable target binding texture", id());
-	glBindTexture(target(), id());
-		AL_GRAPHICS_ERROR("binding texture", id());
 }
 
 void Texture :: unbind(int unit) {		
@@ -313,7 +322,6 @@ void Texture :: deallocate() {
 
 void Texture::sendParams(bool force){
 	if(mParamsUpdated || force){
-		glBindTexture(target(), id());
 		glTexParameterf(target(), GL_TEXTURE_MAG_FILTER, filterMag());
 		glTexParameterf(target(), GL_TEXTURE_MIN_FILTER, filterMin());
 		glTexParameterf(target(), GL_TEXTURE_WRAP_S, mWrapS);
@@ -322,16 +330,101 @@ void Texture::sendParams(bool force){
 		if (filterMin() != LINEAR && filterMin() != NEAREST) {
 			glTexParameteri(target(), GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
 		}
-		glBindTexture(target(), 0);
 		mParamsUpdated = false;
+	}
+}
+
+void Texture::sendPixels(const void * pixels, unsigned align){
+	// Note: pixels cannot be NULL for TexSubImage
+	if(pixels){
+
+		// Tell GPU the row alignment of the pixels we are sending
+		glPixelStorei(GL_UNPACK_ALIGNMENT, align);
+			AL_GRAPHICS_ERROR("Texture::sendPixels (glPixelStorei set)", id());
+
+		switch(target()){
+
+			/*void glTexSubImage3D(
+				GLenum target, GLint level,
+				GLint xoffset, GLint yoffset, GLint zoffset,
+				GLsizei width, GLsizei height, GLsizei depth,
+				GLenum format, GLenum type,
+				const GLvoid *pixels
+			);*/
+
+			case GL_TEXTURE_1D:
+				glTexSubImage1D(target(), 0, 0, width(), format(), type(), pixels);
+				break;
+			case GL_TEXTURE_2D:
+				glTexSubImage2D(target(), 0, 0,0, width(), height(), format(), type(), pixels);
+				break;
+			case GL_TEXTURE_3D:
+				glTexSubImage3D(target(), 0, 0,0,0, width(), height(), depth(), format(), type(), pixels);
+				break;
+			default:
+				AL_WARN("invalid texture target %d", target());
+		}
+		AL_GRAPHICS_ERROR("Texture::sendPixels (glTexSubImage)", id());
+
+		// Set alignment back to default
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+			AL_GRAPHICS_ERROR("Texture::sendPixels (glPixelStorei unset)", id());
 	}
 }
 
 void Texture::sendPixels(bool force){
 	if(mPixelsUpdated || force){
 		//printf("%p submitting %p\n", this, mArray.data.ptr);
-		submit(mArray.data.ptr, mArray.alignment());
+		//submit(mArray.data.ptr, mArray.alignment());
+		sendPixels(mArray.data.ptr, mArray.alignment());
 		mPixelsUpdated = false;
+	}
+}
+
+void Texture::sendShape(bool force){
+	if(mShapeUpdated || force){
+
+		// Determine texel format (on GPU)
+		int intFmt;
+
+		// Use specified texel format, if defined
+		if(mTexelFormat){
+			intFmt = mTexelFormat;
+		}
+
+		// Derive internal texel format from texture data format.
+		// By default, we can just use the texture data format. In cases where
+		// there is no corresponding texel format, just hand in the number of
+		// components.
+		else{
+			switch(format()){
+			default:				intFmt = format(); break;
+			case Graphics::RED:
+			case Graphics::GREEN:
+			case Graphics::BLUE:	intFmt = 1; break;
+			case Graphics::BGR:		intFmt = 3; break;
+			case Graphics::BGRA:	intFmt = 4; break;
+			}
+		}
+
+		//printf("Texture::sendShape calling glTexImage\n");
+		switch(target()){
+		/*void glTexImage3D(
+			GLenum target, GLint level, GLenum internalformat,
+			GLsizei width, GLsizei height, GLsizei depth, 
+			GLint border, GLenum format, GLenum type, const GLvoid *pixels);*/
+		case GL_TEXTURE_1D:
+			glTexImage1D(target(), 0, intFmt, width(), 0, format(), type(), NULL);
+			break;
+		case GL_TEXTURE_2D:
+			glTexImage2D(target(), 0, intFmt, width(), height(), 0, format(), type(), NULL);
+			break;
+		case GL_TEXTURE_3D:
+			glTexImage3D(target(), 0, intFmt, width(), height(), depth(), 0, format(), type(), NULL);
+			break;
+		default:;
+		}
+		mShapeUpdated = false;
 	}
 }
 
@@ -342,117 +435,33 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 	// This ensures that the texture is created on the GPU
 	GPUObject::validate();
 
-
-	sendParams(false);
-
-
 	glActiveTexture(GL_TEXTURE0);
 		AL_GRAPHICS_ERROR("Texture::submit (glActiveTexture)", id());
-
-	// Enable texturing
-	glEnable(target());
-		AL_GRAPHICS_ERROR("Texture::submit (glEnable(texture target))", id());
 
 	glBindTexture(target(), id());
 		AL_GRAPHICS_ERROR("Texture::submit (glBindTexture)", id());
 
-	// Tell GPU the row alignment of the pixels we are sending
-	glPixelStorei(GL_UNPACK_ALIGNMENT, align);
-		AL_GRAPHICS_ERROR("Texture::submit (glPixelStorei set)", id());
+	// Sync client state with GPU
+	sendShape(false);
+	sendParams(false);
 
-
-	// Determine texel format on GPU
-	int intFmt;
-
-	// Use specified texel format, if defined
-	if(mTexelFormat){
-		intFmt = mTexelFormat;
-	}
-
-	// Derive internal texel format from texture data format.
-	// By default, we can just use the texture data format. In cases where
-	// there is no corresponding texel format, just hand in the number of
-	// components.
-	else{
-		switch(format()){
-		default:				intFmt = format(); break;
-		case Graphics::RED:
-		case Graphics::GREEN:
-		case Graphics::BLUE:	intFmt = 1; break;
-		case Graphics::BGR:		intFmt = 3; break;
-		case Graphics::BGRA:	intFmt = 4; break;
-		}
-	}
-
-
-	// If the texture shape has changed, then resize on GPU
-	/*void glTexImage3D(
-		GLenum target, GLint level, GLenum internalformat,
-		GLsizei width, GLsizei height, GLsizei depth, 
-		GLint border, GLenum format, GLenum type, const GLvoid *pixels
-	);*/
-	if(mShapeUpdated){
-		switch(mTarget){
-		case GL_TEXTURE_1D:
-			glTexImage1D(mTarget, 0, intFmt, width(), 0, format(), type(), pixels);
-			break;
-		case GL_TEXTURE_2D:
-			glTexImage2D(mTarget, 0, intFmt, width(), height(), 0, format(), type(), pixels);
-			break;
-		case GL_TEXTURE_3D:
-			glTexImage3D(mTarget, 0, intFmt, width(), height(), depth(), 0, format(), type(), pixels);
-			break;
-		default:;
-		}
-		AL_GRAPHICS_ERROR("Texture::submit (glTexImage)", id());
-		mShapeUpdated = false;
-	}
-
-	// If the shape has not changed, then just send the pixels to the GPU
-	/*void glTexSubImage2D(
-		GLenum target, GLint level,
-		GLint xoffset, GLint yoffset, GLint zoffset,
-		GLsizei width, GLsizei height, GLsizei depth,
-		GLenum format, GLenum type,
-		const GLvoid *pixels
-	);*/
-	else if(pixels){ // Note: pixels cannot be NULL for TexSubImage
-		switch(mTarget){
-			case GL_TEXTURE_1D:
-				glTexSubImage1D(mTarget, 0, 0, width(), format(), type(), pixels);
-				break;
-			case GL_TEXTURE_2D:
-				glTexSubImage2D(mTarget, 0, 0,0, width(), height(), format(), type(), pixels);
-				break;
-			case GL_TEXTURE_3D:
-				glTexSubImage3D(mTarget, 0, 0,0,0, width(), height(), depth(), format(), type(), pixels);
-				break;
-			default:
-				AL_WARN("invalid texture target %d", mTarget);
-		}
-		AL_GRAPHICS_ERROR("Texture::submit (glTexSubImage)", id());
-	}
+	// Calls glTexSubImage
+	sendPixels(pixels, align);
 	
-	// Set alignment back to default
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-		AL_GRAPHICS_ERROR("Texture::submit (glPixelStorei unset)", id());
-	
-//		// OpenGL may have changed the internal format to one it supports:
-//		GLint format;
-//		glGetTexLevelParameteriv(mTarget, 0, GL_TEXTURE_INTERNAL_FORMAT, &format);
-//		if (format != mInternalFormat) {
-//			printf("converted from %X to %X format\n", mInternalFormat, format);
-//			mInternalFormat = format;
-//		}
+	/* OpenGL may have changed the internal format to one it supports:
+	GLint format;
+	glGetTexLevelParameteriv(mTarget, 0, GL_TEXTURE_INTERNAL_FORMAT, &format);
+	if (format != mInternalFormat) {
+		printf("converted from %X to %X format\n", mInternalFormat, format);
+		mInternalFormat = format;
+	}
+	//*/
 
 	//printf("submitted texture data %p\n", pixels);
 	
 	// Unbind texture
 	glBindTexture(target(), 0);
 		AL_GRAPHICS_ERROR("Texture::submit (glBindTexture 0)", id());
-
-	// Disable texturing
-	glDisable(target());
 }
 
 
@@ -528,6 +537,12 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 	submit(src.data.ptr, src.alignment());
 }
 
+Texture& Texture::generateMipmap(){
+	bind();
+	glGenerateMipmapEXT(target());
+	unbind();
+	return *this;
+}
 
 void Texture :: quad(Graphics& gl, double w, double h, double x0, double y0){	
 	//Graphics::error(id(), "prebind quad texture");

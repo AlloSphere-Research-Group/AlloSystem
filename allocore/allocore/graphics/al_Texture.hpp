@@ -210,23 +210,26 @@ public:
 	/// it will attempt to derive size & layout from the array
 	void submit(const Array& src, bool reconfigure=false);
 		
-	/// Resize texture data on GPU and copy over pixels
+	/// Copy client pixels to GPU texels
 
 	/// NOTE: the graphics context (e.g. Window) must have been created
 	/// If pixels is NULL, then the only effect is to resize the texture
 	/// remotely.
 	void submit(const void * pixels, uint32_t align=4);
 	
-	/// NOTE: only valid when the graphics context is valid:
-	Texture& generateMipmap() { bind(); glGenerateMipmapEXT(target()); unbind(); return *this; }
+	/// Generate mipmaps
 
-	/// Allocate the internal Array for a CPU-side cache, copying from src
+	/// NOTE: only valid when the graphics context is valid:
+	///
+	Texture& generateMipmap();
+
+	/// Allocate the internal Array for a client-side cache, copying from src
 	void allocate(const Array& src, bool reconfigure=true);
 
-	/// Allocate memory for a CPU copy (reconfigures the internal array)
+	/// Allocate memory for a client-side copy (reconfigures the internal array)
 	void allocate(unsigned align=1);
 	
-	/// Deallocate internal memory
+	/// Deallocate any allocated client-side memory
 	void deallocate();
 	
 	/// debug printing
@@ -260,6 +263,10 @@ protected:
 	
 	// send any pending pixels updates to GPU or do immediately if forced
 	void sendPixels(bool force=true);
+	void sendPixels(const void * pixels, unsigned align);
+
+	// send any pending shape updates to GPU or do immediately if forced
+	void sendShape(bool force=true);
 
 	// determines target (e.g. GL_TEXTURE_2D) from the dimensions
 	void determineTarget();
