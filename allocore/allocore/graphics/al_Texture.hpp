@@ -217,6 +217,21 @@ public:
 	/// remotely.
 	void submit(const void * pixels, uint32_t align=4);
 	
+	/// Copy pixels from current frame buffer to texture texels
+
+	/// @param[in] w		width of region to copy; w<0 uses w + 1 + texture.width
+	/// @param[in] h		height of region to copy; h<0 uses h + 1 + texture.height
+	/// @param[in] fbx		pixel offset from left edge of frame buffer
+	/// @param[in] fby		pixel offset from bottom edge of frame buffer
+	/// @param[in] texx		texel offset in x direction
+	/// @param[in] texy		texel offset in y direction (2D/3D only)
+	/// @param[in] texz		texel offset in z direction (3D only)
+	void copyFrameBuffer(
+		int w=-1, int h=-1,
+		int fbx=0, int fby=0,
+		int texx=0, int texy=0, int texz=0
+	);
+
 	/// Generate mipmaps
 
 	/// NOTE: only valid when the graphics context is valid:
