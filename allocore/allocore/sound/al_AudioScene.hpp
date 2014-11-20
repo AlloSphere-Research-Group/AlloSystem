@@ -464,7 +464,7 @@ public:
                 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 else //more efficient, per buffer processing
                 {                
-                    Vec3d relpos = src.pose().pos();
+                    Vec3d relpos = src.pose().pos() - l.pose().pos();
                     double distance = relpos.mag();
                     double gain = src.attenuation(distance);
                     
