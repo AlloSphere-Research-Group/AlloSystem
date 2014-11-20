@@ -15,6 +15,7 @@ class InterfaceServerClient : public osc::PacketHandler {
 
   virtual const char* name();
   virtual const char* deviceServerConfig();
+  const char* basicConfig();
 
   virtual void onMessage(osc::Message& m);
 
@@ -24,24 +25,55 @@ class InterfaceServerClient : public osc::PacketHandler {
   osc::Recv& oscRecv() { return mOSCRecv; }
   osc::Send& oscSend() { return mOSCSend; }
 
-  static const char* getDefaultDevice
 
  protected:
   osc::Recv mOSCRecv;
   osc::Send mOSCSend;
+  Nav mNav;
+  double mNavSpeed, mNavTurnSpeed;
+
 };
 
 inline void InterfaceServerClient::onMessage(osc::Message& m) {
   std::cout << "Received: " << m.addressPattern() << std::endl;
+
+  float x;
+  if (m.addressPattern() == "/mx") {
+    m >> x;
+    mNav.moveR(x * mNavSpeed);
+  } else if (m.addressPattern() == "/my") {
+    m >> x;
+    mNav.moveU(x * mNavSpeed);
+  } else if (m.addressPattern() == "/mz") {
+    m >> x;
+    mNav.moveF(x * mNavSpeed);
+  } else if (m.addressPattern() == "/tx") {
+    m >> x;
+    mNav.spinR(x * -mNavTurnSpeed);
+  } else if (m.addressPattern() == "/ty") {
+    m >> x;
+    mNav.spinU(x * mNavTurnSpeed);
+  } else if (m.addressPattern() == "/tz") {
+    m >> x;
+    mNav.spinF(x * -mNavTurnSpeed);
+  } else if (m.addressPattern() == "/home") {
+    mNav.home();
+  } else if (m.addressPattern() == "/halt") {
+    mNav.halt();
+  } else {
+  }
 }
 
 inline void InterfaceServerClient::connect() {
   if (oscSend().opened())
     oscSend().send("/interface/applicationManager/createApplicationWithText",
+                   basicConfig());
+    oscSend().send("/interface/applicationManager/createApplicationWithText",
                    deviceServerConfig());
 }
 
 inline void InterfaceServerClient::disconnect() {
+  oscSend().send("/interface/disconnectApplication", "app");
   oscSend().send("/interface/disconnectApplication", name());
 }
 
@@ -56,14 +88,33 @@ InterfaceServerClient::InterfaceServerClient(const char* deviceServerAddress, in
 
   oscRecv().bufferSize(32000);
   oscRecv().handler(*this);
+
+  mNavSpeed = 1;
+  mNavTurnSpeed = 0.02;
+  mNav.smooth(0.8);
 }
 
-inline const char* InterfaceServerClient::name() { return "default_no_name"; }
+inline const char* InterfaceServerClient::name() { return "default"; }
 
 inline const char* InterfaceServerClient::deviceServerConfig() {
   return R"(
       app = {
-        name : 'default_no_name',
+        name : 'default',
+        receivers :[ {type : 'OSC', port : 12001}, ],
+        inputs: {
+          test: {min: 0, max: 1},
+        },
+        mappings: [
+          { input: { io:'keypress', name:' ' }, output:{ io:'default', name:'test' } },
+        ]
+      }
+  )";
+}
+
+inline const char* InterfaceServerClient::basicConfig() {
+  return R"(
+      app = {
+        name : 'app',
         receivers :[ {type : 'OSC', port : 12001}, ],
         inputs: {
           mx: {min: 0, max: 0.1, },
@@ -76,8 +127,8 @@ inline const char* InterfaceServerClient::deviceServerConfig() {
           halt: {min: 0, max: 1, },
         },
         mappings: [
-          { input: { io:'keypress', name:'`' }, output:{ io:'blob', name:'home' } },
-          { input: { io:'keypress', name:'w' }, output:{ io:'blob', name:'mx'}, },
+          { input: { io:'keypress', name:'`' }, output:{ io:'app', name:'home' } },
+          { input: { io:'keypress', name:'w' }, output:{ io:'app', name:'mx'}, },
         ]
 
       }
