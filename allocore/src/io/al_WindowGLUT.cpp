@@ -59,7 +59,7 @@ public:
 		mFullScreen = false;
 		mCursorHide = false;
 		mScheduled = false;
-		mFrameTime = Main::get().realtime();
+		mFrameTime = al_time();
 		mSPFActual = 0;
 	}
 
@@ -440,6 +440,7 @@ public:
 			mScheduled = true;
 			//printf("window id: %d\n", id());
 			Main::get().queue().send(0, scheduleDrawStatic, id());
+			//scheduleDrawStaticGLUT(id());
 		}
 	}
 
@@ -448,45 +449,52 @@ private:
 
 	// schedule draws of a specific window
 	static void scheduleDrawStatic(al_sec t, int winID) {
-		Main& M = Main::get();
+		/* Note: This function used to use the Main scheduler queue, however,
+		the Main scheduler uses a fixed-interval polling mechanism with too
+		course of a timing granularity to obtain a precise enough frame rate
+		for smooth animation. Instead, we call glutTimerFunc directly using an 
+		estimated delta time. */
+		scheduleDrawStaticGLUT(winID);
+	}
+
+	static void scheduleDrawStaticGLUT(int winID){
+
 		WindowImpl *impl = getWindowImpl(winID);
+
 		// If there is a valid implementation, then draw and schedule next draw...
 		if(impl){
 			Window * win = impl->mWindow;
 			if(win){
-				//al_sec prert = MainLoop::realtime();	// what time it really is now (before render)
 
-				{	// compute actual frame interval
-					al_sec timeNow = M.realtime();
-					impl->mSPFActual = timeNow - impl->mFrameTime;
-					impl->mFrameTime = timeNow;
-				}
-				
-				// this calls the window's onFrame()
+				// Compute actual frame interval
+				al_sec timeNow = al_time();
+				impl->mSPFActual = timeNow - impl->mFrameTime;
+				impl->mFrameTime = timeNow;
+
+				// This calls the window's onFrame()
 				win->implOnFrame();
 
-				if(win->fps() > 0) {
-					al_sec next;
-					al_sec rt = M.realtime();	// what time it really is now (after render)
-					if (win->asap()) {
-						next = rt;
-					} else {
-						//al_sec dt = rt - prert;
-						al_sec projected = t+1.0/win->fps();	// what time next render should be
-						// calculate time of next frame; if it has already passed, do it immediately:
-						next = projected;
-						if (rt > projected) next = rt;	// next = MAX(rt,projected)
+				if(win->fps() > 0){
+					unsigned wait_msec = 0;
+					if(!win->asap()){
+						// Determine wait time from absolute frame number
+						double frameNum = al_time() * win->fps();
+						double frameFrac = frameNum - (unsigned long long)(frameNum);
+						wait_msec = unsigned((1.-frameFrac)/win->fps()*1000. + 0.5);
 					}
-					M.queue().send(next, scheduleDrawStatic, winID);
+
+					glutTimerFunc(wait_msec, scheduleDrawStaticGLUT, winID);
 					
-					// frame-rate calculation:
-					al_sec per = 1./(next - t);
+					// Average frame-rate calculation:
+					al_sec per = 1./impl->mSPFActual;
 					impl->mAvg += 0.3 * (per - impl->mAvg);
 
-				} else {
+				}
+				else {
 					impl->mScheduled = false;
 				}
-			} else {
+			}
+			else {
 				//printf("no window\n");
 				impl->mScheduled = false;
 			}
@@ -794,6 +802,7 @@ Window& Window::title(const std::string& v){
 	return *this;
 }
 
+// See: https://www.opengl.org/wiki/Swap_Interval
 Window& Window::vsync(bool v){
 	if(makeCurrent()){
 		mVSync = v;
