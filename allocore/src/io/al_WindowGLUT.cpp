@@ -475,20 +475,33 @@ private:
 				win->implOnFrame();
 
 				if(win->fps() > 0){
-					unsigned wait_msec = 0;
+
+					unsigned waitMsec = 0;
+
 					if(!win->asap()){
-						// Determine wait time from absolute frame number
-						double frameNum = al_time() * win->fps();
-						double frameFrac = frameNum - (unsigned long long)(frameNum);
-						wait_msec = unsigned((1.-frameFrac)/win->fps()*1000. + 0.5);
+						double FPS = win->fps();
+
+						// Get pre-render frame number
+						double framePre = timeNow * FPS;
+
+						// Get post-render frame number
+						double framePost = al_time() * FPS;
+
+						// Did rendering take less time than frame interval?
+						// This check is necessary for non-quantized reduction of frame rate.
+						if((framePost - framePre) < 1.){
+							double waitFrames = framePost - (unsigned long long)(framePost+0.5);
+							waitFrames = 1.-waitFrames;
+							waitMsec = unsigned(waitFrames/FPS*1000. + 0.5);
+							//printf("num=%llu, frac=%g, %u, (dt=%g)\n", (unsigned long long)frameNum, waitFrames, wait_msec, impl->mSPFActual);
+						}
 					}
 
-					glutTimerFunc(wait_msec, scheduleDrawStaticGLUT, winID);
-					
+					glutTimerFunc(waitMsec, scheduleDrawStaticGLUT, winID);
+
 					// Average frame-rate calculation:
 					al_sec per = 1./impl->mSPFActual;
 					impl->mAvg += 0.3 * (per - impl->mAvg);
-
 				}
 				else {
 					impl->mScheduled = false;
