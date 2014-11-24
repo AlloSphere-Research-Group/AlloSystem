@@ -52,9 +52,8 @@
 
 namespace al{
 
-/**
-	A simple wrapper around OpenGL Texture
-*/
+
+/// A simple wrapper around an OpenGL Texture
 class Texture : public GPUObject {
 public:
 
@@ -125,21 +124,36 @@ public:
 
 	void configure(AlloArrayHeader& header);
 
+	/// Get pixel (color) format
 	Format format() const { return mFormat; }
+
+	/// Get texel (color) format
 	int texelFormat() const { return mTexelFormat; }
+
+	/// Get target type (e.g., TEXTURE_2D)
 	Target target() const { return mTarget; }
+
+	/// Get pixel component data type
 	DataType type() const { return mType; }	
 
+	/// Get width, in pixels
 	unsigned width() const { return mWidth; }
+
+	/// Get height, in pixels
 	unsigned height() const { return mHeight; }
+
+	/// Get depth, in pixels
 	unsigned depth() const { return mDepth; }
 
 	/// Whether the dimensions, format, or type have changed
 	bool shapeUpdated() const { return mShapeUpdated; }
 
+	/// Get minification filter type
 	Filter filterMin() const { return mFilterMin; }
+
+	/// Get magnification filter type
 	Filter filterMag() const { return mFilterMag; }
-	
+
 	/// Get number of components per pixel
 	unsigned numComponents() const { return Graphics::numComponents(format()); }
 
@@ -147,30 +161,58 @@ public:
 	unsigned numElems() const {
 		return numPixels() * numComponents();
 	}
-	
+
 	/// Get total number of pixels
 	unsigned numPixels() const {
 		return width() * (height()?height():1) * (depth()?depth():1);
 	}
 
+
+	/// Set pixel (color) format
 	Texture& format(Format v){ return update(v, mFormat, mShapeUpdated); }
+
+	/// Set texel (color) format
 	Texture& texelFormat(int v){ return update(v, mTexelFormat, mShapeUpdated); }
+
+	/// Set target type (e.g., TEXTURE_2D)
 	Texture& target(Target v){ return update(v, mTarget, mShapeUpdated); }
+
+	/// Set pixel component data type
 	Texture& type(DataType v){ return update(v, mType, mShapeUpdated); }
 
+	/// Set width, in pixels
 	Texture& width (unsigned v){ return update(v, mWidth, mShapeUpdated); }
+
+	/// Set height, in pixels
 	Texture& height(unsigned v){ return update(v, mHeight,mShapeUpdated); }
+
+	/// Set depth, in pixels
 	Texture& depth (unsigned v){ return update(v, mDepth ,mShapeUpdated); }
 
+	/// Resize 1D texture
 	Texture& resize(unsigned w){ return width(w); }
+
+	/// Resize 2D texture
 	Texture& resize(unsigned w, unsigned h){ return width(w).height(h); }
+
+	/// Resize 3D texture
 	Texture& resize(unsigned w, unsigned h, unsigned d){ return width(w).height(h).depth(d); }
 
+	/// Set minification filter type
 	Texture& filterMin(Filter v){ return update(v, mFilterMin, mParamsUpdated); }
+
+	/// Set magnification filter type
 	Texture& filterMag(Filter v){ return update(v, mFilterMag, mParamsUpdated); }
+
+	/// Set wrapping mode for all dimensions
 	Texture& wrap(Wrap v){ return wrap(v,v,v); }
+
+	/// Set 2D wrapping modes
 	Texture& wrap(Wrap S, Wrap T){ return wrap(S,T,mWrapR); }
+
+	/// Set 3D wrapping modes
 	Texture& wrap(Wrap S, Wrap T, Wrap R);
+
 
 	/// Bind the texture (to a multitexture unit)
 	void bind(int unit = 0);
@@ -237,7 +279,7 @@ public:
 
 	/// Generate mipmaps
 
-	/// NOTE: only valid when the graphics context is valid:
+	/// NOTE: This is only valid when the graphics context is valid.
 	///
 	Texture& generateMipmap();
 
@@ -250,12 +292,12 @@ public:
 	/// Deallocate any allocated client-side memory
 	void deallocate();
 	
-	/// debug printing
+	/// Print information about texture
 	void print();
 
 protected:
-//	int mLevel;	// TODO: on a rainy day...
-//	int mBorder;
+	//int mLevel;	// TODO: on a rainy day...
+	//int mBorder;
 	Target mTarget;				// TEXTURE_1D, TEXTURE_2D, etc. 
 	Format mFormat;				// RGBA, ALPHA, etc.
 	int mTexelFormat;			// default is 0 = auto
