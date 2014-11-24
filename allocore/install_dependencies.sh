@@ -59,7 +59,15 @@ if binary_exists "apt-get"; then
 		fi
 	fi
 
-	build_and_install_assimp
+	# Ensure that assimp3 headers are being installed.
+	available_assimp_version=$(apt-cache madison libassimp-dev | head -1 | cut -f2 -d\|)
+
+	if dpkg --compare-versions "$available_assimp_version" ge 3; then
+		sudo apt-get install libassimp-dev
+	# Otherwise build assimp3 from source and install.
+	else
+		build_and_install_assimp
+	fi
 
 # It's important to check for Homebrew before MacPorts,
 # because Homebrew is the most used among the AlloTeam.
