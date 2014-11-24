@@ -79,7 +79,7 @@ elif binary_exists "brew"; then
 	brew install glew
 	brew install freeimage
 	brew install freetype
-	brew install assimp --no-boost
+	brew install assimp --without-boost
 
 elif binary_exists "port"; then
 	echo 'Found MacPorts'
