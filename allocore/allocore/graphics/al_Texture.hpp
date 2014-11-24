@@ -134,6 +134,9 @@ public:
 	unsigned height() const { return mHeight; }
 	unsigned depth() const { return mDepth; }
 
+	/// Whether the dimensions, format, or type have changed
+	bool shapeUpdated() const { return mShapeUpdated; }
+
 	Filter filterMin() const { return mFilterMin; }
 	Filter filterMag() const { return mFilterMag; }
 	
