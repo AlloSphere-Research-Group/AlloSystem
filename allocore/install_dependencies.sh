@@ -45,17 +45,17 @@ if binary_exists "apt-get"; then
 	sudo apt-get install libxi-dev libxmu-dev
 
 	# Get version of installed assimp
-	ASSIMP_VERSION=$(apt-cache policy libassimp-dev | grep Installed | cut -f2 -d: | sed -e 's/[ ]*//')
+	assimp_version=$(apt-cache policy libassimp-dev | grep Installed | cut -f2 -d: | sed -e 's/[ ]*//')
 
 	# If assimp2 is installed, then prompt to remove it.
-	if dpkg --compare-versions "$ASSIMP_VERSION" lt 3; then
-		echo "assimp version ${ASSIMP_VERSION} detected."
+	if dpkg --compare-versions "$assimp_version" lt 3; then
+		echo "assimp version ${assimp_version} detected."
 		echo 'It is recommended that you remove this version to avoid configuration problems with AlloCore.'
 		printf 'Would you like to remove it [Y/n]?'
 		read ANS
 		if [ "$ANS" = 'Y' ] || [ "$ANS" = 'y' ]; then
-			echo "Removing assimp ${ASSIMP_VERSION}"
-			sudo apt-get remove "libassimp-dev=${ASSIMP_VERSION}"
+			echo "Removing assimp ${assimp_version}"
+			sudo apt-get remove "libassimp-dev=${assimp_version}"
 		fi
 	fi
 
