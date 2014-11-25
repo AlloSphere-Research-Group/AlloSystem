@@ -79,7 +79,15 @@ elif binary_exists "brew"; then
 	brew install glew
 	brew install freeimage
 	brew install freetype
-	brew install assimp --without-boost
+
+	# Use precompiled library if on Mountain Lion or higher.
+	osx_version="$(sw_vers -productVersion | cut -d . -f 2)"
+	if [ "$osx_version" -ge 8 ]; then
+		brew install assimp
+	# Otherwise build with boost workaround.
+	else
+		brew install assimp --without-boost
+	fi
 
 elif binary_exists "port"; then
 	echo 'Found MacPorts'
