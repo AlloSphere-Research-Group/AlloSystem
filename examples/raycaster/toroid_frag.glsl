@@ -128,6 +128,11 @@ void main(){
   // ray origin (world space)
   vec3 ro = pos + eye;
   
+  // calculate new ray direction for positive parallax
+  v -= eye;
+  rd = quat_rotate(quat, v);
+  rd = normalize(rd);
+  
   // initial eye-ray to find object intersection:
   float mindt = 0.01;	// how close to a surface we can get
   float mint = mindt;

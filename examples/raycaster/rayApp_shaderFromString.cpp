@@ -113,10 +113,15 @@ struct MyApp : public RayApp {
       vec3 rdx = cross(normalize(rd), up);
       
       //vec3 rdx = projection_on_plane(rd, up);
-      vec3 eye = rdx * eyesep;
+      vec3 eye = rdx * eyesep * 10.0;
       
       // ray origin (world space)
       vec3 ro = pos + eye;
+      
+      // calculate new ray direction for positive parallax
+      v -= eye;
+      rd = quat_rotate(quat, v);
+      rd = normalize(rd);
       
       // find object intersection:
       vec3 p = ro;
