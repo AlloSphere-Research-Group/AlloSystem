@@ -309,7 +309,7 @@ namespace al {
   inline bool RayApp::onFrame() {
     FPS::onFrame();
     
-    if(frame % 30 == 0) {
+    if(frame % 60 == 0) {
       printf("FPS: %03.6f\n", FPS::fps());
       //      nav().print();
     }
