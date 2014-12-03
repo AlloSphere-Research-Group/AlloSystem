@@ -242,7 +242,8 @@ public:
 	/// @param[in] port		Port number (valid range is 0-65535)
 	/// @param[in] address	IP address
 	/// @param[in] timeout	< 0: block forever; = 0: no blocking; > 0 block with timeout
-	Send(uint16_t port, const char * address = "localhost", al_sec timeout=0);
+	/// @param[in] size 	Packet buffer size
+	Send(uint16_t port, const char * address = "localhost", al_sec timeout=0, int size=1024);
 
 	/// Send and clear current packet contents
 	int send();

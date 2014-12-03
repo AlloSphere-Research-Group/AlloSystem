@@ -344,8 +344,9 @@ void PacketHandler::parse(const char *packet, int size, TimeTag timeTag){
 
 
 
-Send::Send(uint16_t port, const char * address, al_sec timeout)
-:	SocketClient(port, address, timeout, Socket::UDP)
+Send::Send(uint16_t port, const char * address, al_sec timeout, int size)
+:	SocketClient(port, address, timeout, Socket::UDP),
+	Packet(size)
 {}
 
 int Send::send(){
