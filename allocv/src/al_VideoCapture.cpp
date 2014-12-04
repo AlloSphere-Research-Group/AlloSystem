@@ -169,12 +169,16 @@ double VideoCapture::posFrames() const {
 	return get(CV_CAP_PROP_POS_FRAMES);
 }
 
-void VideoCapture::loop(double minFrame, double maxFrame){
+bool VideoCapture::loop(double minFrame, double maxFrame){
 	double Nf = numFrames();
 	if(maxFrame < 0) maxFrame += Nf + 1.;
 	else if(maxFrame > Nf) maxFrame = Nf;
 	double pos = posFrames();
-	if(pos >= maxFrame) posFrames(minFrame);
+	if(pos >= maxFrame){
+		posFrames(minFrame);
+		return true;
+	}
+	return false;
 }
 
 bool VideoCapture::isFile() const {

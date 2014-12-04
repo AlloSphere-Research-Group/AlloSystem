@@ -162,7 +162,10 @@ public:
 	double posFrames() const;
 
 	/// Loop current position between endpoints (files only)
-	void loop(double minFrame=0, double maxFrame=-1);
+	
+	/// \returns true if the video looped, otherwise false.
+	///
+	bool loop(double minFrame=0, double maxFrame=-1);
 
 	/// Get whether "capture" is a file
 	bool isFile() const;
