@@ -16,8 +16,17 @@ endif(NOT (GAMMA_FOUND OR GAMMA_LIBRARY))
 
 set(ALLOAUDIO_SRC
   src/al_OutputMaster.cpp
+  src/al_Convolver.cpp
+  src/zita-convolver-3.1.0/libs/zita-convolver.cc
 #  src/al_Decorrelation.cpp
   )
+
+set(ALLOAUDIO_HEADERS
+  alloaudio/al_OutputMaster.hpp
+  alloaudio/al_Convolver.hpp
+  src/zita-convolver-3.1.0/libs/zita-convolver.h
+)
+
 
 # Dependencies ------------------------------
 
@@ -34,12 +43,15 @@ message("phtreads not found. Not building Alloaudio.")
 return()
 
 endif()
+
+set(FFTW_LIBRARY fftw3f)
+
 # Build library ----------------------------------
 
 set(ALLOAUDIO_LIB "alloaudio${DEBUG_SUFFIX}")
-add_library(${ALLOAUDIO_LIB} ${ALLOAUDIO_SRC})
+add_library(${ALLOAUDIO_LIB} ${ALLOAUDIO_SRC} ${ALLOAUDIO_HEADERS})
 
-set(ALLOAUDIO_LINK_LIBRARIES ${ALLOCORE_LIBRARY})
+set(ALLOAUDIO_LINK_LIBRARIES ${ALLOCORE_LIBRARY} ${FFTW_LIBRARY})
 set(ALLOAUDIO_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
 
 # export properties for AlloSystem
@@ -52,7 +64,8 @@ set_target_properties(${ALLOAUDIO_LIB}
   ALLOAUDIO_LINK_LIBRARIES "${ALLOAUDIO_LINK_LIBRARIES}"
   )
 
-include_directories(${ALLOAUDIO_DIRS} ${ALLOCORE_DEP_INCLUDE_DIRS})
+include_directories(${ALLOAUDIO_DIRS} ${ALLOCORE_DEP_INCLUDE_DIRS}
+       ${CMAKE_CURRENT_SOURCE_DIR}/src/zita-convolver-3.1.0/libs/)
 target_link_libraries(${ALLOAUDIO_LIB} ${ALLOAUDIO_LINK_LIBRARIES})
 
 add_dependencies(${ALLOAUDIO_LIB} allocore${DEBUG_SUFFIX})
@@ -107,4 +120,9 @@ if(CUNIT_LIBRARY)
     target_link_libraries(alloaudioTests ${ALLOAUDIO_LIB} ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${CUNIT_LIBRARY})
     add_test(NAME alloaudioTests
             COMMAND $<TARGET_FILE:alloaudioTests> ${TEST_ARGS})
+
+    add_executable(convolverTests unitTests/convolverTests.cpp)
+    target_link_libraries(convolverTests ${ALLOAUDIO_LIB} ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${CUNIT_LIBRARY})
+    add_test(NAME convolverTests
+            COMMAND $<TARGET_FILE:convolverTests> ${TEST_ARGS})
 endif(CUNIT_LIBRARY)
