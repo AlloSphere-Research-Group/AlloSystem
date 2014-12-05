@@ -47,10 +47,11 @@
 
 namespace al{
 
-/// Video capture
+/// Video capture from files or cameras
 
 /// This is basically a direct wrapper around cv::VideoCapture.
-///
+/// Note that frame numbering follows 0-based indexing. That is, for a video
+/// file having N frames, the frame numbers are in [0, N-1].
 class VideoCapture{
 public:
 
@@ -66,14 +67,16 @@ public:
 
 	/// Open a video file
 
+	/// @param[in] filename	Path to video file (e.g., video.avi) or
+	///						image sequence (e.g., img_%02d.jpg, which will read
+	///						samples img_00.jpg, img_01.jpg, img_02.jpg, ...).
 	/// \returns true on success.
-	///
 	bool open(const std::string& filename);
 
-	/// Open a video input device
+	/// Open a video input device (i.e., camera)
 
+	/// @param[in] device	Enumeration number of video device
 	/// \returns true on success.
-	///
     bool open(int device);
 
 
@@ -158,13 +161,26 @@ public:
 	/// Get four-character codec code as string
 	std::string fourccString() const;
 
+	/// Get position in msec (files only)
+	double posMsec() const;
+
+	/// Get position as fraction, in [0,1], of total duration (files only)
+	double posFrac() const;
+
 	/// Get position in frames
 	double posFrames() const;
 
 	/// Loop current position between endpoints (files only)
 	
-	/// \returns true if the video looped, otherwise false.
+	/// @param[in] minFrame		The minimum endpoint
+	/// @param[in] maxFrame		The maximum endpoint;
+	///							if < 0, then use numFrames + maxFrame + 1
+	/// \returns true if the video looped, false otherwise.
 	///
+	/// Note: OpenCV can be very fussy about reading frames near the end of the
+	/// file. Therefore, small negative values for maxFrame will not always work
+	/// as expected. A more reliable strategy is to use the return value of
+	/// retrieve* or read calls to determine whether to loop.
 	bool loop(double minFrame=0, double maxFrame=-1);
 
 	/// Get whether "capture" is a file

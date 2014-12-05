@@ -103,7 +103,8 @@ VideoCapture& VideoCapture::posFrames(double frame){
 }
 
 VideoCapture& VideoCapture::posFrac(double frac){
-	set(CV_CAP_PROP_POS_AVI_RATIO, frac);
+	//set(CV_CAP_PROP_POS_AVI_RATIO, frac); // broken for many file types
+	posFrames(frac*numFrames());
 	return *this;
 }
 
@@ -165,8 +166,17 @@ std::string VideoCapture::fourccString() const {
 	return std::string(x.c, 4);
 }
 
+double VideoCapture::posMsec() const {
+	return get(CV_CAP_PROP_POS_MSEC);
+}
+
 double VideoCapture::posFrames() const {
 	return get(CV_CAP_PROP_POS_FRAMES);
+}
+
+double VideoCapture::posFrac() const {
+	//return get(CV_CAP_PROP_POS_AVI_RATIO); // broken for many file types
+	return double(posFrames())/numFrames();
 }
 
 bool VideoCapture::loop(double minFrame, double maxFrame){
