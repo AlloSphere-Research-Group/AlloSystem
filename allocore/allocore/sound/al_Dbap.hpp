@@ -36,10 +36,17 @@ public:
     ///Per Sample Processing
     void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample)
     {
+        //Is the normalize function working correctly??? normalizing 0, 0, 0 is returning 1, 0, 0
+        Vec3d zeroVec(0, 0, 0);
+        Vec3d normalVec;
+        if(relpos == zeroVec)
+            normalVec = zeroVec;
+        else
+            normalVec = relpos.normalized();
+            
 		for (unsigned i = 0; i < numSpeakers; ++i)
         {
-            Vec3d vec = relpos.normalized();
-            vec -= speakerVecs[i];
+            Vec3d vec = normalVec - speakerVecs[i];
 			float dist = vec.mag() / 2.f; // [0, 1]
             dist = powf(dist, spread);
             float gain = 1.f / (1.f + DBAP_MAX_DIST*dist);
