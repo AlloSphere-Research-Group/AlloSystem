@@ -247,19 +247,21 @@ public:
 			return mAmpFar;
 		}
         else {
-			// normalized distance (0..1)
-			double dN = (distance-mNearClip) / (mClipRange);
-		
-			// different possible policies for amplitude attenuation
-			// amplitude curve (max/cosm):
-			//curve = (1.-dN)*(1.-dN);	
-			// alternative curve (hydrogen bond):
-			//curve = ((d + C) / (d*d + d + C))^2;	// e.g. C=2
-			// alternative curve (skewed sigmoid):
-            // alternative methods using rollOff
             
-			double curve = 1-tanh(M_PI * dN*dN);
-			return mAmpFar + curve*(1.-mAmpFar);
+            return mAmpFar + 1.0/distance;
+//			// normalized distance (0..1)
+//			double dN = (distance-mNearClip) / (mClipRange);
+//		
+//			// different possible policies for amplitude attenuation
+//			// amplitude curve (max/cosm):
+//			//curve = (1.-dN)*(1.-dN);	
+//			// alternative curve (hydrogen bond):
+//			//curve = ((d + C) / (d*d + d + C))^2;	// e.g. C=2
+//			// alternative curve (skewed sigmoid):
+//            // alternative methods using rollOff
+//            
+//			double curve = 1-tanh(M_PI * dN*dN);
+//			return mAmpFar + curve*(1.-mAmpFar);
 		}
 
 	}
@@ -384,6 +386,7 @@ public:
         double sampleRate = io.framesPerSecond();
 		double distanceToSample = sampleRate / mSpeedOfSound;
 
+        // BUFFERFIX?
 		// update source history data:
 		for(Sources::iterator it = mSources.begin(); it != mSources.end(); it++) {
 			SoundSource& src = *(*it);
