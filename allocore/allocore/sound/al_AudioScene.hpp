@@ -201,7 +201,7 @@ protected:
 class SoundSource {
 public:
 	SoundSource(double rollOff=1.0, double near=1, double range=100, double ampFar=0.0, int bufSize=15000)
-	:	mSound(bufSize), mRollOff(rollOff), mNearClip(near), mClipRange(range), mAmpFar(ampFar), useAtten(true), useDoppler(true)
+	:	mSound(bufSize), mRollOff(rollOff), mNearClip(near), mClipRange(range), mAmpFar(ampFar), useAtten(true), useDoppler(true), perSampleProcessing(false)
     {
 		// initialize the position history to be VERY FAR AWAY so that we don't deafen ourselves... 
 		mPosHistory(Vec3d(1000, 1000, 1000));
@@ -314,6 +314,11 @@ public:
 
 	/// Write sample to internal delay-line
 	void writeSample(const double& v){ mSound.write(v); }
+    
+    /// Optional onProcessSample so sample rate processing of sound sources can be used in AudioScene
+    virtual void onProcessSample(AudioIOData& io){}
+    void usePerSampleProcessing(bool _usePerSampleProcessing) { perSampleProcessing = _usePerSampleProcessing;}
+    bool isUsingPerSampleProcessing() { return perSampleProcessing; }
 
 protected:
 	friend class AudioScene;
@@ -326,7 +331,7 @@ protected:
 	double mRollOff;
 	double mNearClip, mClipRange, mAmpFar;
     
-    bool useAtten, useDoppler;
+    bool useAtten, useDoppler, perSampleProcessing;
 };	
 
 
@@ -385,13 +390,6 @@ public:
         const int numFrames = io.framesPerBuffer();
         double sampleRate = io.framesPerSecond();
 		double distanceToSample = sampleRate / mSpeedOfSound;
-
-        // BUFFERFIX?
-		// update source history data:
-		for(Sources::iterator it = mSources.begin(); it != mSources.end(); it++) {
-			SoundSource& src = *(*it);
-			src.mPosHistory(src.pose().pos());
-		}
 		
 		// iterate through all listeners adding contribution from all sources
 		for(unsigned il=0; il<mListeners.size(); ++il){
@@ -425,6 +423,14 @@ public:
                     // iterate time samples
                     for(int i=0; i<numFrames; ++i){
                         
+                        // per sample source processing and update source history (only for the first listener)
+                        if(il == 0)
+                        {
+                            src.mPosHistory(src.pose().pos());
+                            if(src.isUsingPerSampleProcessing())
+                                src.onProcessSample(io);
+                        }
+                    
                         // compute interpolated source position relative to listener
                         // TODO: this tends to warble when moving fast
                         double alpha = double(i)/numFrames;
@@ -452,7 +458,8 @@ public:
                         if(idx0 <= src.maxIndex()-numFrames){
                         //if (distance < src.farClip()) {
 
-                            idx += (numFrames-i);
+                            if(!src.isUsingPerSampleProcessing())
+                                idx += (numFrames-i);
                             
                             double gain = src.attenuation(distance);
                             
@@ -466,7 +473,11 @@ public:
                 } //end per sample processing
                 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 else //more efficient, per buffer processing
-                {                
+                {
+                    //update source history data (only for the first listener)
+                    if(il == 0)
+                        src.mPosHistory(src.pose().pos());
+                    
                     Vec3d relpos = src.pose().pos() - l.pose().pos();
                     double distance = relpos.mag();
                     double gain = src.attenuation(distance);
