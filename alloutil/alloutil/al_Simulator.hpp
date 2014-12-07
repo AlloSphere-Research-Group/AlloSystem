@@ -27,10 +27,7 @@ class Simulator : public InterfaceServerClient, public Main::Handler {
   const Nav& nav() const { return mNav; }
   Nav& nav() { return mNav; }
 
-  virtual const char* name();
-  virtual const char* deviceServerConfig();
-
-  virtual void onMessage(osc::Message& m);
+  // virtual void onMessage(osc::Message& m);
 
   static bool sim(){
     char hostname[256];
@@ -52,7 +49,7 @@ class Simulator : public InterfaceServerClient, public Main::Handler {
   bool started;
   double time, lastTime;
 
-  // Nav mNav;
+  Nav mNav;
   // NavInputControl mNavControl;
   // StandardWindowKeyControls mStdControls;
   // double mNavSpeed, mNavTurnSpeed;
@@ -76,39 +73,39 @@ inline void Simulator::onTick() {
 
 inline void Simulator::onExit() { exit(); }
 
-inline void Simulator::onMessage(osc::Message& m) {
+// inline void Simulator::onMessage(osc::Message& m) {
 
-  // This allows the graphics renderer (or whatever) to overwrite navigation
-  // data, so you can navigate from the graphics window when using a laptop.
-  //
-  cout << "Simulator receive: " << m.addressPattern() << endl;
-  if (m.addressPattern() == "/pose") {
-    Pose pose;
-    m >> pose.pos().x;
-    m >> pose.pos().y;
-    m >> pose.pos().z;
-    m >> pose.quat().x;
-    m >> pose.quat().y;
-    m >> pose.quat().z;
-    m >> pose.quat().w;
-    //pose.print();
-    nav().set(pose);
-  }
+//   // This allows the graphics renderer (or whatever) to overwrite navigation
+//   // data, so you can navigate from the graphics window when using a laptop.
+//   //
+//   // cout << "Simulator receive: " << m.addressPattern() << endl;
+//   // if (m.addressPattern() == "/pose") {
+//   //   Pose pose;
+//   //   m >> pose.pos().x;
+//   //   m >> pose.pos().y;
+//   //   m >> pose.pos().z;
+//   //   m >> pose.quat().x;
+//   //   m >> pose.quat().y;
+//   //   m >> pose.quat().z;
+//   //   m >> pose.quat().w;
+//   //   //pose.print();
+//   //   nav().set(pose);
+//   // }
 
-  InterfaceServerClient::onMessage(m);
+//   InterfaceServerClient::onMessage(m);
 
-  nav().print();
-}
+//   // nav().print();
+// }
 
 inline void Simulator::start() {
   InterfaceServerClient::connect();
   Main::get().interval(1 / 60.0).add(*this).start();
 }
 
-inline void Simulator::stop() { Main::get().stop(); }
+inline void Simulator::stop() { cout << "Simulator stopped." <<endl; Main::get().stop(); }
 
 inline Simulator::~Simulator() {
-  // InterfaceServerClient::disconnect();
+  InterfaceServerClient::disconnect();
   // oscSend().send("/interface/disconnectApplication", name());
 }
 
@@ -118,36 +115,10 @@ Simulator::Simulator(const char* deviceServerAddress, int port,
       InterfaceServerClient(deviceServerAddress,port,deviceServerPort) {
 
   started = false;
-  // mNavSpeed = 1;
-  // mNavTurnSpeed = 0.02;
-  // nav().smooth(0.8);
+  nav().smooth(0.8);
+  InterfaceServerClient::nav(nav());
 }
 
-inline const char* Simulator::name() { return "simulator"; }
-
-inline const char* Simulator::deviceServerConfig() {
-  return R"(
-      app = {
-        name : 'simulator',
-        receivers :[ {type : 'OSC', port : 12001}, ],
-        inputs: {
-          mx: {min: 0, max: 0.1 },
-          my: {min: 0, max: 0.1 },
-          mz: {min: 0, max: 0.1 },
-          tx: {min: 0, max: 1 },
-          ty: {min: 0, max: 1 },
-          tz: {min: 0, max: 1 },
-          home: {min: 0, max: 1 },
-          halt: {min: 0, max: 1 },
-        },
-        mappings: [
-          { input: { io:'keypress', name:'`' }, output:{ io:'simulator', name:'home' } },
-          { input: { io:'keypress', name:'w' }, output:{ io:'simulator', name:'mx'} },
-        ]
-
-      }
-  )";
-}
 
 }  // al::
 

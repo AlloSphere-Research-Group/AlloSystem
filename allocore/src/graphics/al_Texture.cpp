@@ -90,6 +90,7 @@ void Texture::onCreate(){
 	glGenTextures(1, (GLuint *)&mID);
 
 	glBindTexture(target(), id());
+	syncWithArray();
 	sendShape();	
 	sendParams();
 	sendPixels();
@@ -185,19 +186,9 @@ void Texture :: bind(int unit) {
 	glBindTexture(target(), id());
 		AL_GRAPHICS_ERROR("binding texture", id());
 
+	syncWithArray();
 
 	// Synchronize client texture state with GPU
-
-	// If someone requested a mutable reference to the internal array, we will
-	// assume we need to sync the texture attributes with the array.
-	if(mArrayDirty){
-		// ensure texture attributes match internal array
-		setPixelsFrom(mArray.header, false);
-		// force texture to be submitted since the pixel data could have been 
-		// tampered with
-		dirty();
-		mArrayDirty = false;
-	}
 
 	sendShape(false);
 
@@ -257,6 +248,18 @@ void Texture :: resetArray(unsigned align) {
 	}
 }
 
+void Texture::syncWithArray(){
+	// If someone requested a mutable reference to the internal array, we will
+	// assume we need to sync the texture attributes with the array.
+	if(mArrayDirty){
+		// ensure texture attributes match internal array
+		setPixelsFrom(mArray.header, false);
+		// force texture to be submitted since the pixel data could have been 
+		// tampered with
+		dirty();
+		mArrayDirty = false;
+	}
+}
 
 void Texture :: allocate(unsigned align) {
 	deallocate();
@@ -335,6 +338,7 @@ void Texture::sendParams(bool force){
 }
 
 void Texture::sendPixels(const void * pixels, unsigned align){
+	//printf("Texture::sendPixels:"); print();
 	// Note: pixels cannot be NULL for TexSubImage
 	if(pixels){
 
@@ -424,6 +428,7 @@ void Texture::sendShape(bool force){
 			break;
 		default:;
 		}
+		AL_GRAPHICS_ERROR("Texture::sendShape (glTexImage)", id());
 		mShapeUpdated = false;
 	}
 }
@@ -639,18 +644,19 @@ void Texture :: print() {
 		case Graphics::ALPHA: format="ALPHA"; break;
 		case Graphics::RGB: format="RGB"; break;
 		case Graphics::RGBA: format="RGBA"; break;
+		case Graphics::BGR: format="BGR"; break;
 		case Graphics::BGRA: format="BGRA"; break;
 		default:;
 	}	
 	switch (mType) {
-		case GL_BYTE: type = "BYTE"; break;
-		case GL_UNSIGNED_BYTE: type = "UNSIGNED_BYTE"; break;
-		case GL_SHORT: type = "SHORT"; break;
-		case GL_UNSIGNED_SHORT: type = "UNSIGNED_SHORT"; break;
-		case GL_INT: type = "INT"; break;
-		case GL_UNSIGNED_INT: type = "UNSIGNED_INT"; break;
-		case GL_FLOAT: type = "FLOAT"; break;
-		case GL_DOUBLE: type = "DOUBLE"; break;
+		case Graphics::BYTE: type = "BYTE"; break;
+		case Graphics::UBYTE: type = "UBYTE"; break;
+		case Graphics::SHORT: type = "SHORT"; break;
+		case Graphics::USHORT: type = "USHORT"; break;
+		case Graphics::INT: type = "INT"; break;
+		case Graphics::UINT: type = "UINT"; break;
+		case Graphics::FLOAT: type = "FLOAT"; break;
+		case Graphics::DOUBLE: type = "DOUBLE"; break;
 		default:;
 	}
 	

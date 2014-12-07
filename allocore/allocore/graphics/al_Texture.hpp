@@ -318,6 +318,8 @@ protected:
 	// ensures that the internal Array format matches the texture format
 	void resetArray(unsigned align);
 
+	void syncWithArray();
+
 	// send any pending parameter updates to GPU or do immediately if forced
 	void sendParams(bool force=true);
 	

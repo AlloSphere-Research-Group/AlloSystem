@@ -62,6 +62,18 @@ public:
 	PeriodicThread(const PeriodicThread& other);
 
 
+	/// Set autocorrection factor
+
+	/// This parameter is used to compensate for occasional iterations that take 
+	/// longer than the expected iteration period. Smaller values mean the
+	/// timing corrections will be spread over a larger number of iterations.
+	/// If all iterations take longer than the period, then no autocorrection
+	/// measures will be able to make up for the lost time.
+	///
+	/// @param[in] factor	Maximum fraction of one period, in [0,1], to try to
+	///						make up each iteration if behind on timing.
+	PeriodicThread& autocorrect(float factor);
+
 	/// Set period, in seconds
 	PeriodicThread& period(double sec);
 
@@ -86,6 +98,8 @@ private:
 	al_nsec mPeriod;
 	al_nsec mTimeCurr, mTimePrev;	// time measurements between frames
 	al_nsec mWait;					// actual time to sleep between frames
+	al_nsec mTimeBehind;
+	float mAutocorrect;
 	ThreadFunction * mUserFunc;
 	bool mRun;
 };
