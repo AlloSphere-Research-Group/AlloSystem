@@ -112,6 +112,22 @@ else()
   endif(NOT ALLOGLV_FOUND) 
 endif(TARGET alloGLV${DEBUG_SUFFIX})
 
+if(TARGET alloaudio${DEBUG_SUFFIX})
+    get_target_property(ALLOAUDIO_LIBRARY alloaudio${DEBUG_SUFFIX} LOCATION)
+    get_target_property(ALLOAUDIO_INCLUDE_DIR alloaudio${DEBUG_SUFFIX} ALLOAUDIO_INCLUDE_DIR)
+    get_target_property(ALLOAUDIO_LINK_LIBRARIES "alloaudio${DEBUG_SUFFIX}" ALLOAUDIO_LINK_LIBRARIES)
+    add_dependencies("${APP_NAME}" alloaudio${DEBUG_SUFFIX})
+    target_link_libraries("${APP_NAME}" ${ALLOAUDIO_LIBRARY} ${ALLOAUDIO_LINK_LIBRARIES})
+    include_directories(${ALLOAUDIO_INCLUDE_DIR})
+else()
+  if(NOT ALLOAUDIO_FOUND)
+    set(ALLOAUDIO_LIBRARY "")
+    set(ALLOAUDIO_INCLUDE_DIR "")
+    message("Not building alloaudio and no usable alloaudio binary found. Not linking application to alloauadio")
+  endif(NOT ALLOAUDIO_FOUND)
+endif(TARGET alloaudio${DEBUG_SUFFIX})
+
+
 
 include_directories(${ALLOCORE_DEP_INCLUDE_DIRS})
 
