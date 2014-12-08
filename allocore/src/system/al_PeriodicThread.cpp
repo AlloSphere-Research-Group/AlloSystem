@@ -4,14 +4,17 @@
 namespace al{
 
 PeriodicThread::PeriodicThread(double periodSec)
+:	mAutocorrect(0.1)
 {
 	period(periodSec);
 }
 
-PeriodicThread::PeriodicThread(const PeriodicThread& other)
-:	Thread(other), mPeriod(other.mPeriod), mTimeCurr(other.mTimeCurr),
-	mTimePrev(other.mTimePrev), mWait(other.mWait), mUserFunc(other.mUserFunc),
-	mRun(other.mRun)
+PeriodicThread::PeriodicThread(const PeriodicThread& o)
+:	Thread(o), mPeriod(o.mPeriod), mTimeCurr(o.mTimeCurr),
+	mTimePrev(o.mTimePrev), mWait(o.mWait), mTimeBehind(o.mTimeBehind),
+	mAutocorrect(o.mAutocorrect),
+	mUserFunc(o.mUserFunc),
+	mRun(o.mRun)
 {}
 
 
@@ -21,9 +24,19 @@ void * PeriodicThread::sPeriodicFunc(void * userData){
 	return NULL;
 }
 
-PeriodicThread& PeriodicThread::period(double sec){ mPeriod=sec * 1e9; return *this; }
+PeriodicThread& PeriodicThread::autocorrect(float factor){
+	mAutocorrect=factor;
+	return *this;
+}
 
-double PeriodicThread::period() const { return mPeriod * 1e-9; }
+PeriodicThread& PeriodicThread::period(double sec){
+	mPeriod=sec * 1e9;
+	return *this;
+}
+
+double PeriodicThread::period() const {
+	return mPeriod * 1e-9;
+}
 
 void PeriodicThread::start(ThreadFunction& func){
 	mUserFunc = &func;
@@ -55,14 +68,17 @@ PeriodicThread& PeriodicThread::operator= (PeriodicThread other){
 }
 
 void PeriodicThread::go(){
+	// Note: times are al_nsec (long long int)
 	mTimeCurr = al_time_nsec();
 	mWait = 0;
+	mTimeBehind = 0;
 	while(mRun){
 		(*mUserFunc)();
 
 		mTimePrev = mTimeCurr + mWait;
 		mTimeCurr = al_time_nsec();
 		al_nsec dt = mTimeCurr - mTimePrev;
+		// dt -> t_curr - (t_prev + wait)
 
 		// The wait amount is the ideal period minus the actual amount
 		// of time spent processing between iterations
@@ -73,9 +89,23 @@ void PeriodicThread::go(){
 
 		// This means we are behind, so don't wait
 		else{
-			//mTimeBehind += dt - mPeriod;
 			mWait = 0;
+			mTimeBehind += dt - mPeriod;
 		}
+
+		if(mTimeBehind > 0){
+			al_nsec comp = mPeriod*mAutocorrect;
+			if(mTimeBehind < comp){
+				comp = mTimeBehind;
+				mTimeBehind = 0;
+			}
+			else{
+				mTimeBehind -= comp;
+			}
+
+			mWait -= comp;
+		}
+
 		//printf("period=%g, dt=%g, wait=%g\n", mPeriod, dt, mWait);
 	}
 }

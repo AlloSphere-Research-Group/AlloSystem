@@ -70,7 +70,7 @@ public:
 	};
 
 	/// @param[in] phs		phase, in radians
-	Polar(const T& phs): m(1.), p(phs){}
+	Polar(const T& phs=T(0)): m(T(1)), p(phs){}
 	
 	/// @param[in] mag		magnitude
 	/// @param[in] phs		phase, in radians
@@ -99,7 +99,7 @@ public:
 	
 	Complex(const Complex& v): r(v.r), i(v.i){}
 	Complex(const Polar<T>& v){ *this = v; }
-	Complex(const T& r=T(1), const T& i=T(0)): r(r), i(i){}
+	Complex(const T& r=T(0), const T& i=T(0)): r(r), i(i){}
 	Complex(const T& m, const T& p, int fromPolar){ (*this) = Polar<T>(m,p); }
 
 	
