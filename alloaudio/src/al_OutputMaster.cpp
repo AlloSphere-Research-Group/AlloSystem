@@ -326,14 +326,17 @@ void *OutputMaster::meterThreadFunc(void *arg) {
 				std::cerr << "Alloaudio: Warning. Meter values underrun." << std::endl;
 			}
 			for (int i = 0; i < bytes_read/sizeof(float); i++) {
-				//            char addr[64];
-				//            sprintf(addr,"/Alloaudio/meter%i", i);
+			  std::stringstream addr;
+			  addr << "/Alloaudio/meterdb/" <<  chanindex + 1;
 				//            lo_send(t, "/Alloaudio/meter", "if", i, meter_levels[i]);
 				//            lo_send(t, "/Alloaudio/meterdb", "if", i, 20.0 * log10(meter_levels[i]));
 				//            lo_send(t, addr, "f", 20.0 * log10(meter_levels[i]));
 				//            lo_send(t, addr, "f", meter_levels[i]);
-				s.send("/Alloaudio/meterdb", chanindex++,
-					   (float) (20.0 * log10(meter_levels[i])));
+			  s.send(addr.str(),
+				 (float) (20.0 * log10(meter_levels[i])));
+			  s.send("/Alloaudio/meterdb", chanindex,
+				 (float) (20.0 * log10(meter_levels[i])));
+			  chanindex++;
 				if (chanindex == om->m_numChnls) {
 					chanindex = 0;
 				}
@@ -379,6 +382,13 @@ void OutputMaster::OSCHandler::onMessage(osc::Message &m)
 												outputmaster,
 												&OutputMaster::setClipperOnTimestamped,
 												(bool) clipper_on != 0);
+		} else if (m.typeTags() == "f") {
+			float clipper_on;
+			m >> clipper_on;
+			outputmaster->m_parameterQueue.send(outputmaster->m_parameterQueue.now(),
+												outputmaster,
+												&OutputMaster::setClipperOnTimestamped,
+												(bool) clipper_on != 0);
 		} else {
 			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/clipper_on: "
 					  << m.typeTags() << std::endl;
@@ -390,6 +400,12 @@ void OutputMaster::OSCHandler::onMessage(osc::Message &m)
 			outputmaster->m_parameterQueue.send(outputmaster->m_parameterQueue.now(),
 												outputmaster, &OutputMaster::setMuteAllTimestamped,
 												(bool) mute_all != 0);
+		} else if (m.typeTags() == "f") {
+			float mute_all;
+			m >> mute_all;
+			outputmaster->m_parameterQueue.send(outputmaster->m_parameterQueue.now(),
+												outputmaster, &OutputMaster::setMuteAllTimestamped,
+												(bool) mute_all != 0);
 		} else {
 			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/mute_all: "
 					  << m.typeTags() << std::endl;
@@ -397,6 +413,12 @@ void OutputMaster::OSCHandler::onMessage(osc::Message &m)
 	} else if (m.addressPattern() == "/Alloaudio/meter_on") {
 		if (m.typeTags() == "i") {
 			int on;
+			m >> on;
+			outputmaster->m_parameterQueue.send(outputmaster->m_parameterQueue.now(),
+												outputmaster, &OutputMaster::setMeterOnTimestamped,
+												(bool) on != 0);
+		} else if (m.typeTags() == "f") {
+			float on;
 			m >> on;
 			outputmaster->m_parameterQueue.send(outputmaster->m_parameterQueue.now(),
 												outputmaster, &OutputMaster::setMeterOnTimestamped,
@@ -423,7 +445,13 @@ void OutputMaster::OSCHandler::onMessage(osc::Message &m)
 			outputmaster->m_parameterQueue.send(outputmaster->m_parameterQueue.now(),
 												outputmaster, &OutputMaster::setBassManagementModeTimestamped,
 												(int) mode);
-		} else {
+		} else if (m.typeTags() == "f") {
+			float mode;
+			m >> mode;
+			outputmaster->m_parameterQueue.send(outputmaster->m_parameterQueue.now(),
+												outputmaster, &OutputMaster::setBassManagementModeTimestamped,
+												(int) mode);
+		} else{
 			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/bass_management_mode: "
 					 << m.typeTags() << std::endl;
 		}
