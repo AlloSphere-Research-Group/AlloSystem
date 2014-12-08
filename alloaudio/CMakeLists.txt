@@ -66,7 +66,7 @@ set_target_properties(${ALLOAUDIO_LIB}
 
 include_directories(${ALLOAUDIO_DIRS} ${ALLOCORE_DEP_INCLUDE_DIRS}
        ${CMAKE_CURRENT_SOURCE_DIR}/src/zita-convolver-3.1.0/libs/)
-target_link_libraries(${ALLOAUDIO_LIB} ${ALLOAUDIO_LINK_LIBRARIES})
+target_link_libraries(${ALLOAUDIO_LIBRARY} ${ALLOAUDIO_LINK_LIBRARIES})
 
 add_dependencies(${ALLOAUDIO_LIB} allocore${DEBUG_SUFFIX})
 
@@ -122,7 +122,7 @@ if(CUNIT_LIBRARY)
             COMMAND $<TARGET_FILE:alloaudioTests> ${TEST_ARGS})
 
     add_executable(convolverTests unitTests/convolverTests.cpp)
-    target_link_libraries(convolverTests ${ALLOAUDIO_LIB} ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${CUNIT_LIBRARY})
+    target_link_libraries(convolverTests ${ALLOAUDIO_LIBRARY} ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${CUNIT_LIBRARY})
     add_test(NAME convolverTests
             COMMAND $<TARGET_FILE:convolverTests> ${TEST_ARGS})
 endif(CUNIT_LIBRARY)
