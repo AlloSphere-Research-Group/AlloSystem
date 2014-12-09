@@ -20,7 +20,7 @@ public:
     {
         nav().pos(0,0,4);
         initWindow();
-	initAudio(sampleRate, 512, num_chnls, num_chnls);
+		initAudio(sampleRate, 512, num_chnls, num_chnls);
     }
 
     // Audio callback
@@ -45,7 +45,7 @@ public:
             io.out(2) = out1*0.4;
             io.out(3) = out2*0.4;
         }
-	outMaster.processBlock(io);
+		outMaster.processBlock(io);
     }
 
 

@@ -48,18 +48,18 @@ set(FFTW_LIBRARY fftw3f)
 
 # Build library ----------------------------------
 
-set(ALLOAUDIO_LIB "alloaudio${DEBUG_SUFFIX}")
-add_library(${ALLOAUDIO_LIB} ${ALLOAUDIO_SRC} ${ALLOAUDIO_HEADERS})
+set(ALLOAUDIO_LIBRARY "alloaudio${DEBUG_SUFFIX}")
+add_library(${ALLOAUDIO_LIBRARY} ${ALLOAUDIO_SRC} ${ALLOAUDIO_HEADERS})
 
 set(ALLOAUDIO_LINK_LIBRARIES ${ALLOCORE_LIBRARY} ${FFTW_LIBRARY})
 set(ALLOAUDIO_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
 
 # export properties for AlloSystem
-set_target_properties(${ALLOAUDIO_LIB}
+set_target_properties(${ALLOAUDIO_LIBRARY}
   PROPERTIES
-  ALLOAUDIO_DEP_INCLUDE_DIR "${ALLOAUDIO_DIRS}"
+  ALLOAUDIO_INCLUDE_DIR "${ALLOAUDIO_DIRS}"
   )
-set_target_properties(${ALLOAUDIO_LIB}
+set_target_properties(${ALLOAUDIO_LIBRARY}
   PROPERTIES 
   ALLOAUDIO_LINK_LIBRARIES "${ALLOAUDIO_LINK_LIBRARIES}"
   )
@@ -68,7 +68,7 @@ include_directories(${ALLOAUDIO_DIRS} ${ALLOCORE_DEP_INCLUDE_DIRS}
        ${CMAKE_CURRENT_SOURCE_DIR}/src/zita-convolver-3.1.0/libs/)
 target_link_libraries(${ALLOAUDIO_LIBRARY} ${ALLOAUDIO_LINK_LIBRARIES})
 
-add_dependencies(${ALLOAUDIO_LIB} allocore${DEBUG_SUFFIX})
+add_dependencies(${ALLOAUDIO_LIBRARY} allocore${DEBUG_SUFFIX})
 
 set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
@@ -85,8 +85,8 @@ if(BUILD_EXAMPLES)
       get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
       set(EXAMPLE_TARGET alloaudio_examples_${EXAMPLE_NAME})
       add_executable(${EXAMPLE_TARGET} ${example})
-#      add_dependencies(${EXAMPLE_TARGET} ${ALLOAUDIO_LIB})
-      target_link_libraries("${EXAMPLE_TARGET}" ${ALLOAUDIO_LIB} ${ALLOAUDIO_LINK_LIBRARIES})
+#      add_dependencies(${EXAMPLE_TARGET} ${ALLOAUDIO_LIBRARY})
+      target_link_libraries("${EXAMPLE_TARGET}" ${ALLOAUDIO_LIBRARY} ${ALLOAUDIO_LINK_LIBRARIES})
       if(APPLE)
 	set_target_properties(${EXAMPLE_TARGET} PROPERTIES
 	  LINK_FLAGS "-pagezero_size 10000 -image_base 100000000")
@@ -107,7 +107,7 @@ endif(BUILD_EXAMPLES)
 
 # installation
 install(DIRECTORY alloaudio/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include/alloaudio)
-install(TARGETS ${ALLOAUDIO_LIB} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install(TARGETS ${ALLOAUDIO_LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 
 # Tests that depend on cunit
 find_library(CUNIT_LIBRARY cunit)
@@ -117,7 +117,7 @@ if(CUNIT_LIBRARY)
     ENABLE_TESTING()
 
     add_executable(alloaudioTests unitTests/alloaudioTests.cpp)
-    target_link_libraries(alloaudioTests ${ALLOAUDIO_LIB} ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${CUNIT_LIBRARY})
+    target_link_libraries(alloaudioTests ${ALLOAUDIO_LIBRARY} ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${CUNIT_LIBRARY})
     add_test(NAME alloaudioTests
             COMMAND $<TARGET_FILE:alloaudioTests> ${TEST_ARGS})
 
