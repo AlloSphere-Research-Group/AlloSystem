@@ -30,11 +30,11 @@ class InterfaceServerClient : public osc::PacketHandler {
 
   // default nav and lens, be sure to set these
   // if using a different nav / lens
-  Lens& lens() { return *mLens; }
-  void lens(Lens& l){ mLens=&l; }
+  // Lens& lens() { return *mLens; }
+  void setLens(Lens& l){ mLens=&l; }
 
-  Nav& nav() { return *mNav; }
-  void nav(Nav& n){ mNav=&n; }
+  // Nav& nav() { return *mNav; }
+  void setNav(Nav& n){ mNav=&n; }
 
  protected:
   osc::Recv mOSCRecv;
@@ -58,44 +58,44 @@ inline void InterfaceServerClient::onMessage(osc::Message& m) {
     m >> pose.quat().y;
     m >> pose.quat().z;
     m >> pose.quat().w;
-    nav().set(pose);
+    (*mNav).set(pose);
   } else if (m.addressPattern() == "/mx") {
     m >> x;
-    nav().moveR(x * mNavSpeed);
+    (*mNav).moveR(x * mNavSpeed);
   } else if (m.addressPattern() == "/my") {
     m >> x;
-    nav().moveU(x * mNavSpeed);
+    (*mNav).moveU(x * mNavSpeed);
   } else if (m.addressPattern() == "/mz") {
     m >> x;
-    nav().moveF(x * -mNavSpeed);
+    (*mNav).moveF(x * -mNavSpeed);
   } else if (m.addressPattern() == "/tx") {
     m >> x;
-    nav().spinR(x * -mNavTurnSpeed);
+    (*mNav).spinR(x * -mNavTurnSpeed);
   } else if (m.addressPattern() == "/ty") {
     m >> x;
-    nav().spinU(x * -mNavTurnSpeed);
+    (*mNav).spinU(x * -mNavTurnSpeed);
   } else if (m.addressPattern() == "/tz") {
     m >> x;
-    nav().spinF(x * -mNavTurnSpeed);
+    (*mNav).spinF(x * -mNavTurnSpeed);
   } else if (m.addressPattern() == "/home") {
-    nav().home();
+    (*mNav).home();
   } else if (m.addressPattern() == "/halt") {
-    nav().halt();
+    (*mNav).halt();
   } else if (m.addressPattern() == "/eyeSep") {
     m >> x;
-    lens().eyeSep(x);
+    (*mLens).eyeSep(x);
   } else if (m.addressPattern() == "/near") {
     m >> x;
-    lens().near(x);
+    (*mLens).near(x);
   } else if (m.addressPattern() == "/far") {
     m >> x;
-    lens().far(x);
+    (*mLens).far(x);
   } else if (m.addressPattern() == "/focalLength") {
     m >> x;
-    lens().focalLength(x);
+    (*mLens).focalLength(x);
   } else {
   }
-  nav().print();
+  (*mNav).print();
 }
 
 InterfaceServerClient::InterfaceServerClient(const char* deviceServerAddress, int port,
@@ -110,12 +110,12 @@ InterfaceServerClient::InterfaceServerClient(const char* deviceServerAddress, in
   mNavTurnSpeed = 0.02;
   mNav = new Nav();
   mLens = new Lens();
-  nav().smooth(0.8);
-  lens().near(0.1);
-  lens().far(100);
-  lens().focalLength(6.0);
-  // lens().eyeSep(0.03);
-  lens().eyeSepAuto();
+  (*mNav).smooth(0.8);
+  (*mLens).near(0.1);
+  (*mLens).far(100);
+  (*mLens).focalLength(6.0);
+  // (*mLens).eyeSep(0.03);
+  (*mLens).eyeSepAuto();
 }
 
 inline InterfaceServerClient::~InterfaceServerClient() {
@@ -141,7 +141,7 @@ inline const char* InterfaceServerClient::interfaceServerConfig() {
   return R"(
       app = {
         name : 'app',
-        receivers :[ {type : 'OSC', port : 12001}, ],
+        transports :[ {type : 'osc', port : 12001}, ],
         inputs: {
           test: {min: 0, max: 1},
         },
@@ -161,7 +161,7 @@ inline const char* InterfaceServerClient::defaultConfig() {
       }
       app = {
         name : 'default',
-        receivers :[ {type : 'OSC', port : 12001}, ],
+        transports :[ {type : 'osc', port : 12001}, ],
         inputs: {
           mx: {min: -1, max: 1, },
           my: {min: -1, max: 1, },

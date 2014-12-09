@@ -27,6 +27,9 @@ class Simulator : public InterfaceServerClient, public Main::Handler {
   const Nav& nav() const { return mNav; }
   Nav& nav() { return mNav; }
 
+  const Lens& lens() const { return mLens; }
+  Lens& lens() { return mLens; }
+
   // virtual void onMessage(osc::Message& m);
 
   static bool sim(){
@@ -50,6 +53,7 @@ class Simulator : public InterfaceServerClient, public Main::Handler {
   double time, lastTime;
 
   Nav mNav;
+  Lens mLens;
   // NavInputControl mNavControl;
   // StandardWindowKeyControls mStdControls;
   // double mNavSpeed, mNavTurnSpeed;
@@ -116,7 +120,8 @@ Simulator::Simulator(const char* deviceServerAddress, int port,
 
   started = false;
   nav().smooth(0.8);
-  InterfaceServerClient::nav(nav());
+  InterfaceServerClient::setNav(nav());
+  InterfaceServerClient::setLens(lens());
 }
 
 
