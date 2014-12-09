@@ -123,11 +123,12 @@ inline InterfaceServerClient::~InterfaceServerClient() {
 }
 
 inline void InterfaceServerClient::connect() {
-  if (oscSend().opened())
+  if (oscSend().opened()){
     oscSend().send("/interface/applicationManager/createApplicationWithText",
                    defaultConfig());
     oscSend().send("/interface/applicationManager/createApplicationWithText",
                    interfaceServerConfig());
+  }
 }
 
 inline void InterfaceServerClient::disconnect() {
@@ -146,7 +147,7 @@ inline const char* InterfaceServerClient::interfaceServerConfig() {
           test: {min: 0, max: 1},
         },
         mappings: [
-          { input: { io:'keypress', name:' ' }, output:{ io:'app', name:'test' } },
+          { input: { io:'keyboard', name:' ' }, output:{ io:'app', name:'test' } },
         ]
       }
   )";
@@ -177,14 +178,14 @@ inline const char* InterfaceServerClient::defaultConfig() {
           focalLength: {min: 0, max:1 },
         },
         mappings: [
-          { input: { io:'keypress', name:'q' }, output:{ io:'default', name:'home'}, expression:function(v){console.log(v)} },
-          { input: { io:'keypress', name:'w' }, output:{ io:'default', name:'mz'}, },
-          { input: { io:'keypress', name:'a' }, output:{ io:'default', name:'mx'}, expression:function(v){return -v;} },
-          { input: { io:'keypress', name:'s' }, output:{ io:'default', name:'halt'}, },
-          { input: { io:'keypress', name:'x' }, output:{ io:'default', name:'mz'}, expression:function(v){return -v;} },
-          { input: { io:'keypress', name:'d' }, output:{ io:'default', name:'mx'}, },
-          { input: { io:'keypress', name:'i' }, output:{ io:'default', name:'eyeSep'}, expression:function(v){ eye += 0.01; console.log('eyesep: ',eye)} },
-          { input: { io:'keypress', name:'k' }, output:{ io:'default', name:'eyeSep'}, expression:function(v){ eye -= 0.01; console.log('eyesep: ',eye)} },
+          { input: { io:'keyboard', name:'q' }, output:{ io:'default', name:'home'}, expression:function(v){console.log(v)} },
+          { input: { io:'keyboard', name:'w' }, output:{ io:'default', name:'mz'}, },
+          { input: { io:'keyboard', name:'a' }, output:{ io:'default', name:'mx'}, expression:function(v){return -v;} },
+          { input: { io:'keyboard', name:'s' }, output:{ io:'default', name:'halt'}, },
+          { input: { io:'keyboard', name:'x' }, output:{ io:'default', name:'mz'}, expression:function(v){return -v;} },
+          { input: { io:'keyboard', name:'d' }, output:{ io:'default', name:'mx'}, },
+          { input: { io:'keyboard', name:'i' }, output:{ io:'default', name:'eyeSep'}, expression:function(v){ eye += 0.01; console.log('eyesep: ',eye)} },
+          { input: { io:'keyboard', name:'k' }, output:{ io:'default', name:'eyeSep'}, expression:function(v){ eye -= 0.01; console.log('eyesep: ',eye)} },
 
           { input: { io:'Logitech RumblePad 2 USB #1', name:'leftX' }, output:{ io:'default', name:'mx'}, expression:dd },
           { input: { io:'Logitech RumblePad 2 USB #1', name:'leftY' }, output:{ io:'default', name:'mz'}, expression:dd },
