@@ -138,10 +138,9 @@ else()
   if(NOT ALLOCV_FOUND)
     set(ALLOCV_LIBRARY "")
     set(ALLOCV_INCLUDE_DIR "")
-    message("Not building allocvand no usable allocv binary found. Not linking application to allocv")
+    message("Not building allocv and no usable allocv binary found. Not linking application to allocv")
   endif(NOT ALLOCV_FOUND)
 endif(TARGET allocv${DEBUG_SUFFIX})
-
 
 include_directories(${ALLOCORE_DEP_INCLUDE_DIRS})
 
