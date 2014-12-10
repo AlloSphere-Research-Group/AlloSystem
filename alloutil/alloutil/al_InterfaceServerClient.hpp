@@ -184,8 +184,8 @@ inline const char* InterfaceServerClient::defaultConfig() {
           { input: { io:'keyboard', name:'s' }, output:{ io:'default', name:'halt'}, },
           { input: { io:'keyboard', name:'x' }, output:{ io:'default', name:'mz'}, expression:function(v){return -v;} },
           { input: { io:'keyboard', name:'d' }, output:{ io:'default', name:'mx'}, },
-          { input: { io:'keyboard', name:'i' }, output:{ io:'default', name:'eyeSep'}, expression:function(v){ eye += 0.01; console.log('eyesep: ',eye)} },
-          { input: { io:'keyboard', name:'k' }, output:{ io:'default', name:'eyeSep'}, expression:function(v){ eye -= 0.01; console.log('eyesep: ',eye)} },
+          { input: { io:'keyboard', name:'i' }, output:{ io:'default', name:'eyeSep'}, expression:function(v){ eye += 0.01; console.log('eyesep: ',eye); return eye; } },
+          { input: { io:'keyboard', name:'k' }, output:{ io:'default', name:'eyeSep'}, expression:function(v){ eye -= 0.01; console.log('eyesep: ',eye); return eye; } },
 
           { input: { io:'Logitech RumblePad 2 USB #1', name:'leftX' }, output:{ io:'default', name:'mx'}, expression:dd },
           { input: { io:'Logitech RumblePad 2 USB #1', name:'leftY' }, output:{ io:'default', name:'mz'}, expression:dd },

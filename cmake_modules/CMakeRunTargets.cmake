@@ -26,11 +26,11 @@ endif(BUILD_DIR)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/build/bin)
 
+add_executable("${APP_NAME}" EXCLUDE_FROM_ALL ${ALLOPROJECT_APP_SRC})
+
 if(EXISTS "${SOURCE_DIR}/flags.cmake")
     include("${SOURCE_DIR}/flags.cmake")
 endif()
-
-add_executable("${APP_NAME}" EXCLUDE_FROM_ALL ${ALLOPROJECT_APP_SRC})
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set_target_properties(${APP_NAME} PROPERTIES
@@ -127,7 +127,20 @@ else()
   endif(NOT ALLOAUDIO_FOUND)
 endif(TARGET alloaudio${DEBUG_SUFFIX})
 
-
+if(TARGET allocv${DEBUG_SUFFIX})
+    get_target_property(ALLOCV_LIBRARY allocv${DEBUG_SUFFIX} LOCATION)
+    get_target_property(ALLOCV_INCLUDE_DIR allocv${DEBUG_SUFFIX} ALLOCV_INCLUDE_DIR)
+    get_target_property(ALLOCV_LINK_LIBRARIES "allocv${DEBUG_SUFFIX}" ALLOCV_LINK_LIBRARIES)
+    add_dependencies("${APP_NAME}" allocv${DEBUG_SUFFIX})
+    target_link_libraries("${APP_NAME}" ${ALLOCV_LIBRARY} ${ALLOCV_LINK_LIBRARIES})
+    include_directories(${ALLOCV_INCLUDE_DIR})
+else()
+  if(NOT ALLOCV_FOUND)
+    set(ALLOCV_LIBRARY "")
+    set(ALLOCV_INCLUDE_DIR "")
+    message("Not building allocv and no usable allocv binary found. Not linking application to allocv")
+  endif(NOT ALLOCV_FOUND)
+endif(TARGET allocv${DEBUG_SUFFIX})
 
 include_directories(${ALLOCORE_DEP_INCLUDE_DIRS})
 

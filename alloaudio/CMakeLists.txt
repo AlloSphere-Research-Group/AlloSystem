@@ -39,7 +39,7 @@ find_package(Threads QUIET)
 if(CMAKE_THREAD_LIBS_INIT)
 
 else()
-message("phtreads not found. Not building Alloaudio.")
+  message("phtreads not found. Not building Alloaudio.")
 return()
 
 endif()

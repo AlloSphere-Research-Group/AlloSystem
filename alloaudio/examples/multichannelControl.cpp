@@ -3,9 +3,12 @@ Based on Allocore Example: Audio To Graphics by Lance Putnam
 
 */
 
+#include <iostream>
+
 #include "allocore/io/al_App.hpp"
 #include "alloaudio/al_OutputMaster.hpp"
 
+using namespace std;
 using namespace al;
 
 class MyApp : public App{
@@ -66,5 +69,7 @@ int main(){
 	int inport = 3002;
 	const char * sendAddress = "localhost";
 	int sendPort = 3003;
+	cout << "Listening to \"" << address << "\" on port " << inport << endl;
+	cout << "Sending to \"" << sendAddress << "\" on port " << sendPort << endl;
 	MyApp(num_chnls, sampleRate, address, inport, sendAddress, sendPort).start();
 }

@@ -41,7 +41,7 @@ include_directories(${ALLOCORE_DEP_INCLUDE_DIRS}
 set(ALLOGLV_LIB "alloGLV${DEBUG_SUFFIX}")
 add_library(${ALLOGLV_LIB} ${ALLOGLV_SRC})
 
-target_link_libraries(${ALLOGLV_LIB} ${ALLOCORE_LIBRARIES} ${GLV_LIBRARY})
+target_link_libraries(${ALLOGLV_LIB} ${ALLOCORE_LIBRARY} ${GLV_LIBRARY})
 set_target_properties(${ALLOGLV_LIB}
   PROPERTIES 
   ALLOGLV_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
