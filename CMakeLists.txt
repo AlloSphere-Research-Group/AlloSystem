@@ -77,6 +77,8 @@ if((ALLOSYSTEM_BUILD_DIR) OR (ALLOSYSTEM_BUILD_APP_FILE))
     set(BUILD_EXAMPLES 0)
 endif((ALLOSYSTEM_BUILD_DIR) OR (ALLOSYSTEM_BUILD_APP_FILE))
 
+ENABLE_TESTING() # Must be here to have tests for the subprojects
+
 # ----------------------------  Examples
 # macro to get subdirectories
 MACRO(SUBDIRLIST result curdir)
