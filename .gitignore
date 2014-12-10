@@ -1,11 +1,13 @@
 build/
 examples/allo*
-osx/allo.build/
+
+CMakeCache.txt
 CMakeFiles
-*/CMakeFiles
+Makefile
+cmake_install.cmake
+cmake_log.txt
 
 Makefile.user
-CMakeCache.txt
 xcuserdata
 doxygen_objdb_*
 .DS_Store
