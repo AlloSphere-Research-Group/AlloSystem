@@ -33,9 +33,10 @@ int Convolver::configure(al::AudioIO &io, vector<float *> IRs,
     }
     m_Convproc = new Convproc;
     // TODO configure Convproc
+	return 0;
 }
 
-int Convolver::processBlock(al::AudioIO io)
+int Convolver::processBlock(al::AudioIO &io)
 {
     int framesBuffer = io.framesPerBuffer();
 
@@ -57,4 +58,5 @@ int Convolver::processBlock(al::AudioIO io)
         memset(io.outBuffer(*it), 0, framesBuffer * sizeof(float));
     }
 
+	return 0;
 }

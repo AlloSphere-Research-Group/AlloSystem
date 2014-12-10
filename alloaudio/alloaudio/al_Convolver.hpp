@@ -55,7 +55,7 @@ public:
 	 * @param io
 	 * @return
 	 */
-	int processBlock(al::AudioIO io);
+	int processBlock(AudioIO &io);
 
 private:
 	vector<int> m_activeChannels;

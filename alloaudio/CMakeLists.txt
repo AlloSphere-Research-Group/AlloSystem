@@ -116,7 +116,6 @@ find_library(CUNIT_LIBRARY cunit)
 set(TEST_ARGS "")
 
 if(CUNIT_LIBRARY)
-    ENABLE_TESTING()
 
     add_executable(alloaudioTests unitTests/alloaudioTests.cpp)
     target_link_libraries(alloaudioTests ${ALLOAUDIO_LIBRARY} ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${CUNIT_LIBRARY})
