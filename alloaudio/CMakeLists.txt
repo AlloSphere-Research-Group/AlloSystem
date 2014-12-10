@@ -27,7 +27,6 @@ set(ALLOAUDIO_HEADERS
   src/zita-convolver-3.1.0/libs/zita-convolver.h
 )
 
-
 # Dependencies ------------------------------
 
 get_target_property(ALLOCORE_LIBRARY allocore${DEBUG_SUFFIX} LOCATION)
@@ -35,6 +34,7 @@ get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore${DEBUG_SUFFIX} ALLOCORE_D
 get_target_property(ALLOCORE_LINK_LIBRARIES allocore${DEBUG_SUFFIX} ALLOCORE_LINK_LIBRARIES)
 
 # FIXME check if this works on Windows, as pthreads are currently specifically required
+if($CMAKE_SYSTEM_NAME} MATCHES "Linux")
 find_package(Threads QUIET)
 if(CMAKE_THREAD_LIBS_INIT)
 
@@ -43,6 +43,8 @@ else()
 return()
 
 endif()
+endif($CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
 
 set(FFTW_LIBRARY fftw3f)
 

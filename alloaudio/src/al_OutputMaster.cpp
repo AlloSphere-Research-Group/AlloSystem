@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <sstream>
 
 #include "alloaudio/al_OutputMaster.hpp"
 #include "allocore/system/al_Time.hpp"
