@@ -44,7 +44,7 @@ public:
 	 */
 	int configure(al::AudioIO &io,
 				  vector<float *> IRs,
-				  vector<int> inputs = vector<int>(),
+				  int input = -1,
 				  bool inputsAreBuses = false,
 				  vector<int> disabledChannels = vector<int>(),
 				  unsigned int maxsize = 0,
@@ -60,7 +60,7 @@ public:
 private:
 	vector<int> m_activeChannels;
 	vector<int> m_disabledChannels;
-	vector<int> m_inputs;
+	int m_input;
 	bool m_inputsAreBuses;
 	Convproc *m_Convproc;
 };

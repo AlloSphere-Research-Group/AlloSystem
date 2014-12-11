@@ -52,11 +52,7 @@ void test_basic(void)
 	io.bus(0, 2) = 0.0;
 	io.bus(0, 3) = 0.0;
 
-	vector<int> inputs;
-
-	inputs.push_back(0);
-
-	conv.configure(io, IRs, inputs, true);
+	conv.configure(io, IRs, 0, true);
 	conv.processBlock(io);
 
 	for(int i = 0; i < 4; i++) {
@@ -81,7 +77,7 @@ void test_disabled_channels(void)
 
 
 	unsigned int maxsize, minpartition, maxpartition;
-	conv.configure(io, IRs, vector<int>(), true, disabledOuts, maxsize, minpartition, maxpartition);
+	conv.configure(io, IRs, -1, true, disabledOuts, maxsize, minpartition, maxpartition);
 	conv.processBlock(io);
 }
 

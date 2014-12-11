@@ -14,11 +14,12 @@ Convolver::Convolver() :
 }
 
 int Convolver::configure(al::AudioIO &io, vector<float *> IRs,
-                         vector<int> inputs, bool inputsAreBuses,
+                         int input, bool inputsAreBuses,
                          vector<int> disabledChannels, unsigned int maxsize,
                          unsigned int minpartition, unsigned int maxpartition)
 {
-    m_inputs = inputs;
+    //TODO check to make sure number of inputs matches buses/io inputs
+    m_input = input;
     m_inputsAreBuses = inputsAreBuses;
     m_disabledChannels = disabledChannels;
     for (int i = 0; i < io.channels(true); i++) {
@@ -33,7 +34,14 @@ int Convolver::configure(al::AudioIO &io, vector<float *> IRs,
     }
     m_Convproc = new Convproc;
     // TODO configure Convproc
-	return 0;
+    int bufferSize = io.framesPerBuffer();
+    if(m_input < 0){//many to many
+        m_Convproc->configure(io.channels(false), io.channels(true)-disabledChannels.size(), bufferSize, bufferSize, bufferSize, bufferSize);
+    }
+    else{//one to many
+        m_Convproc->configure(1, io.channels(true)-disabledChannels.size(), bufferSize, bufferSize, bufferSize, bufferSize);
+    }
+    return 0;
 }
 
 int Convolver::processBlock(al::AudioIO &io)
@@ -41,18 +49,50 @@ int Convolver::processBlock(al::AudioIO &io)
     int framesBuffer = io.framesPerBuffer();
 
     // TODO Output from disabled channels is set to 0.
-    for(vector<int>::iterator it = m_activeChannels.begin();
-        it != m_activeChannels.end(); ++it) {
-        const float *inbuf;
-        if (m_inputs.size() == 0) {
-            inbuf = io.inBuffer(*it);
-        } else {
-             // TODO implement the one to many case
+    // many to many
+    if(m_input < 0){
+        for(vector<int>::iterator it = m_activeChannels.begin();
+            it != m_activeChannels.end(); ++it) {
+            const float *inbuf;
+            if (m_input < 0) {
+                if (m_inputsAreBuses){
+                    inbuf = io.busBuffer(*it);
+                }
+                else{
+                    inbuf = io.inBuffer(*it);
+                }
+            } else {
+                 // TODO implement the one to many case
+                if (m_inputsAreBuses){
+                    inbuf = io.busBuffer(m_input);
+                }
+                else{
+                    inbuf = io.inBuffer(m_input);
+                }
+
+            }
+            memcpy(m_Convproc->inpdata(*it), inbuf, sizeof(float) * framesBuffer);
+
+            float *outbuf = io.outBuffer(*it);
+            // TODO process Convproc
         }
-        float *outbuf = io.outBuffer(*it);
-        // TODO process Convproc
+    }
+    else{
+        //one to many
+        // TODO Output from disabled channels is set to 0.
+        const float *inbuf;
+        if (m_inputsAreBuses){
+            inbuf = io.busBuffer(m_input);
+        }
+        else{
+            inbuf = io.inBuffer(m_input);
+        }
+        //for(vector<int>::iterator it = m_activeChannels.begin();
+        //    it != m_activeChannels.end(); ++it) {
+        memcpy(m_Convproc->inpdata(0), inbuf, sizeof(float) * framesBuffer);
     }
 
+    m_Convproc->process(true);
     for(vector<int>::iterator it = m_disabledChannels.begin();
         it != m_disabledChannels.end(); ++it) {
         memset(io.outBuffer(*it), 0, framesBuffer * sizeof(float));
