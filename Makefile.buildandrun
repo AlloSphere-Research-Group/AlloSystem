@@ -3,7 +3,7 @@
 RUN_DIRS	+= examples/ work/
 
 VPATH += $(RUN_SRC_DIRS)
-RUN_CPPFLAGS := $(addprefix -I, $(RUN_SRC_DIRS)) -I$(BUILD_DIR)include
+RUN_CPPFLAGS := $(addprefix -I, $(RUN_SRC_DIRS))
 
 RUN_SRCS	 = $(wildcard $(addsuffix /*.cpp, $(RUN_SRC_DIRS)))
 RUN_SRCS	+= $(wildcard $(addsuffix /*.cc, $(RUN_SRC_DIRS)))
@@ -45,4 +45,3 @@ $(EXEC_TARGETS): FORCE $(ALL_BUILD_DIRS) $(LIB_PATH) runobjs
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./$(*F)
 endif
-

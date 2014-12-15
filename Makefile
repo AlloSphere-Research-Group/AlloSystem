@@ -127,9 +127,10 @@ ifneq ($(shell ls $(BUILD_DIR)/lib/ 2> /dev/null | grep GLV),)
 endif
 
 -include $(addsuffix /Makefile.link, $(BUILT_MODULES))
+
 LDFLAGS += -L$(BUILD_DIR)/lib/
+CPPFLAGS += -I$(BUILD_DIR)/include/
 
 include Makefile.rules
 
 include Makefile.buildandrun
-
