@@ -45,8 +45,10 @@ return()
 endif()
 endif($CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
+find_library(FFTW_LIBRARY
+     NAMES fftw3f)
 
-set(FFTW_LIBRARY fftw3f)
+message("Using fftw3: ${FFTW_LIBRARY}")
 
 # Build library ----------------------------------
 
