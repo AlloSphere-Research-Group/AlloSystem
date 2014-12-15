@@ -43,7 +43,7 @@
 */
 
 #include "allocore/graphics/al_Graphics.hpp"
-#include "alloutil/al_OpenGL.hpp"
+#include "allocore/graphics/al_OpenGL.hpp"
 
 /*
  Dealing with Framebuffers in OpenGL can be tricky. This object tries to make it easier.
