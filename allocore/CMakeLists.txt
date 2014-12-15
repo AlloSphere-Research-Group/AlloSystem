@@ -250,6 +250,10 @@ if(BUILD_EXAMPLES)
   endif(GAMMA_FOUND OR GAMMA_LIBRARY)
 endif(BUILD_EXAMPLES)
 
+# Unit tests
+
+add_subdirectory(unitTests)
+
 # installation
 install(FILES ${ALLOCORE_HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/)
 install(TARGETS ${ALLOCORE_LIB} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
