@@ -128,6 +128,8 @@ endif
 
 -include $(addsuffix /Makefile.link, $(BUILT_MODULES))
 LDFLAGS += -L$(BUILD_DIR)/lib/
-include Makefile.buildandrun
 
 include Makefile.rules
+
+include Makefile.buildandrun
+

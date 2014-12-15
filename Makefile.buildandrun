@@ -3,8 +3,7 @@
 RUN_DIRS	+= examples/ work/
 
 VPATH += $(RUN_SRC_DIRS)
-CPPFLAGS := -I$(BUILD_DIR)/include/ $(CPPFLAGS)
-CPPFLAGS := $(addprefix -I, $(RUN_SRC_DIRS)) $(CPPFLAGS)
+RUN_CPPFLAGS := $(addprefix -I, $(RUN_SRC_DIRS)) -I$(BUILD_DIR)include
 
 RUN_SRCS	 = $(wildcard $(addsuffix /*.cpp, $(RUN_SRC_DIRS)))
 RUN_SRCS	+= $(wildcard $(addsuffix /*.cc, $(RUN_SRC_DIRS)))
@@ -41,8 +40,8 @@ endif
 $(EXEC_TARGETS): MY_FLAGS = $(shell test -e $(@D)/flags.txt && cat $(@D)/flags.txt)
 $(EXEC_TARGETS): MY_FLAGS += -DRUN_MAIN_SOURCE_PATH="\"$(dir $(shell pwd)/$@)\""
 #$(EXEC_TARGETS): MY_FLAGS += -l$(LIB_NAME)
-$(EXEC_TARGETS): FORCE $(BIN_DIR) $(OBJ_DIR) $(ALL_BUILD_DIRS) $(LIB_PATH) runobjs
-	$(CXX) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(subst $$(PROJECT_DIR),$(@D)/,$(MY_FLAGS))
+$(EXEC_TARGETS): FORCE $(ALL_BUILD_DIRS) $(LIB_PATH) runobjs
+	$(CXX) $(RUN_CPPFLAGS) $(CXXFLAGS) -o $(BIN_DIR)$(*F) $@ $(RUN_OBJS) $(LINK_LIBS_FLAGS) $(LINK_LIBS_PATH) $(LDFLAGS) $(subst $$(PROJECT_DIR),$(@D)/,$(MY_FLAGS))
 ifneq ($(AUTORUN), 0)
 	@cd $(BIN_DIR) && ./$(*F)
 endif
