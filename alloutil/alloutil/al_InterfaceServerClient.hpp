@@ -23,6 +23,7 @@ class InterfaceServerClient : public osc::PacketHandler {
   virtual void onMessage(osc::Message& m);
 
   void connect();
+  void handshake();
   void disconnect();
 
   osc::Recv& oscRecv() { return mOSCRecv; }
@@ -128,6 +129,13 @@ inline void InterfaceServerClient::connect() {
                    defaultConfig());
     oscSend().send("/interface/applicationManager/createApplicationWithText",
                    interfaceServerConfig());
+  }
+}
+
+inline void InterfaceServerClient::handshake() {
+  if (oscSend().opened()){
+    oscSend().send("/interface/handshake",
+                   name());
   }
 }
 
