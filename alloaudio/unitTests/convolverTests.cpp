@@ -5,6 +5,7 @@
 
 #include "alloaudio/al_Convolver.hpp"
 #include "allocore/io/al_AudioIO.hpp"
+#define IR_SIZE 1024
 
 using namespace std;
 
@@ -21,10 +22,14 @@ int clean_suite1(void)
 void test_class(void)
 {
 	al::Convolver conv;
-	al::AudioIO io(4, 44100.0);
+	al::AudioIO io(16, 44100.0);
 
-	float IR1[] = {1.0f, 0.0f, 0.0f, 0.5f};
-	float IR2[] = {0.0f, 1.0f, 0.25f, 0.0f};
+    float IR1[IR_SIZE];
+    memset(IR1, 0, sizeof(float));
+    IR1[0] = 1.0f;IR1[3] = 0.5f;
+    float IR2[IR_SIZE];
+    memset(IR2, 0, sizeof(float));
+    IR1[1] = 1.0f;IR1[2] = 0.25f;
 	vector<float *> IRs;
 	IRs.push_back(IR1);
 	IRs.push_back(IR2);
@@ -39,11 +44,15 @@ void test_class(void)
 void test_basic(void)
 {
 	al::Convolver conv;
-	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2);
+	al::AudioIO io(16, 44100.0, NULL, NULL, 2, 2);
 	io.channelsBus(1);
 
-	float IR1[] = {1.0f, 0.0f, 0.0f, 0.5f};
-	float IR2[] = {0.0f, 1.0f, 0.25f, 0.0f};
+    float IR1[IR_SIZE];
+    memset(IR1, 0, sizeof(float));
+    IR1[0] = 1.0f;IR1[3] = 0.5f;
+    float IR2[IR_SIZE];
+    memset(IR2, 0, sizeof(float));
+    IR1[1] = 1.0f;IR1[2] = 0.25f;
 	vector<float *> IRs;
 	IRs.push_back(IR1);
 	IRs.push_back(IR2);
@@ -55,7 +64,7 @@ void test_basic(void)
 	conv.configure(io, IRs, 0, true);
 	conv.processBlock(io);
 
-	for(int i = 0; i < 4; i++) {
+	for(int i = 0; i < 16; i++) {
 		CU_ASSERT(io.out(0, i) == IR1[i]);
 		CU_ASSERT(io.out(1, i) == IR2[i]);
 	}
@@ -65,10 +74,14 @@ void test_basic(void)
 void test_disabled_channels(void)
 {
 	al::Convolver conv;
-	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2);
+	al::AudioIO io(16, 44100.0, NULL, NULL, 2, 2);
 
-	float IR1[] = {1.0f, 0.0f, 0.0f, 0.5f};
-	float IR2[] = {0.0f, 1.0f, 0.25f, 0.0f};
+    float IR1[IR_SIZE];
+    memset(IR1, 0, sizeof(float));
+    IR1[0] = 1.0f;IR1[3] = 0.5f;
+    float IR2[IR_SIZE];
+    memset(IR2, 0, sizeof(float));
+    IR1[1] = 1.0f;IR1[2] = 0.25f;
 	vector<float *> IRs;
 	IRs.push_back(IR1);
 	IRs.push_back(IR2);
@@ -76,7 +89,7 @@ void test_disabled_channels(void)
 	vector<int> disabledOuts;
 
 
-	unsigned int maxsize, minpartition, maxpartition;
+	unsigned int maxsize = 2048, minpartition = 64, maxpartition = IR_SIZE;
 	conv.configure(io, IRs, -1, true, disabledOuts, maxsize, minpartition, maxpartition);
 	conv.processBlock(io);
 }

@@ -48,8 +48,8 @@ public:
 				  bool inputsAreBuses = false,
 				  vector<int> disabledChannels = vector<int>(),
 				  unsigned int maxsize = 0,
-				  unsigned int minpartition = 0,
-				  unsigned int maxpartition = 0);
+                  unsigned int minpartition = 64,
+                  unsigned int maxpartition = 8192);
 	/**
 	 * @brief processBlock
 	 * @param io

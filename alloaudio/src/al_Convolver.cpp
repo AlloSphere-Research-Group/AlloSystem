@@ -3,7 +3,7 @@
 #include <zita-convolver.h>
 
 #include <string.h>
-
+#include <assert.h>
 #include "alloaudio/al_Convolver.hpp"
 
 using namespace al;
@@ -18,6 +18,9 @@ int Convolver::configure(al::AudioIO &io, vector<float *> IRs,
                          vector<int> disabledChannels, unsigned int maxsize,
                          unsigned int minpartition, unsigned int maxpartition)
 {
+    assert(minpartition>=64);
+    assert(maxpartition<=8192);
+    //assert()
     //TODO check to make sure number of inputs matches buses/io inputs
     m_input = input;
     m_inputsAreBuses = inputsAreBuses;
@@ -34,12 +37,15 @@ int Convolver::configure(al::AudioIO &io, vector<float *> IRs,
     }
     m_Convproc = new Convproc;
     // TODO configure Convproc
-    int bufferSize = io.framesPerBuffer();
+    int bufferSize = io.framesPerBuffer(), configResult;
     if(m_input < 0){//many to many
-        m_Convproc->configure(io.channels(false), io.channels(true)-disabledChannels.size(), bufferSize, bufferSize, bufferSize, bufferSize);
+        configResult = m_Convproc->configure(io.channels(false), io.channels(true)-disabledChannels.size(), maxsize, bufferSize, minpartition, maxpartition);
     }
     else{//one to many
-        m_Convproc->configure(1, io.channels(true)-disabledChannels.size(), bufferSize, bufferSize, bufferSize, bufferSize);
+        configResult = m_Convproc->configure(1, io.channels(true)-disabledChannels.size(), maxsize, bufferSize, minpartition, maxpartition);
+    }
+    if(configResult != 0){
+        std::cout << "Config failed" << std::endl;
     }
     return 0;
 }
@@ -89,6 +95,7 @@ int Convolver::processBlock(al::AudioIO &io)
         }
         //for(vector<int>::iterator it = m_activeChannels.begin();
         //    it != m_activeChannels.end(); ++it) {
+        float * inpdata = m_Convproc->inpdata(0);
         memcpy(m_Convproc->inpdata(0), inbuf, sizeof(float) * framesBuffer);
     }
 
