@@ -3,35 +3,35 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -52,62 +52,62 @@ namespace al {
 
 // run libfreenect on a backtround thread to reduce CPU load:
 class Freenect : public Thread, public ThreadFunction {
-public:		
+public:
 
-	static void depth_cb(freenect_device *dev, void *depth, uint32_t timestamp);	
-	static void video_cb(freenect_device *dev, void *video, uint32_t timestamp);	
+	static void depth_cb(freenect_device *dev, void *depth, uint32_t timestamp);
+	static void video_cb(freenect_device *dev, void *video, uint32_t timestamp);
 	static bool check(const char * what, int code);
 
 	class Callback {
 	public:
-		
+
 		Callback(int idx=0);
 		virtual ~Callback();
-		
+
 		// Warning: these will be called from a background thread:
 		virtual void onVideo(Texture& raw, uint32_t timestamp) {}
 		virtual void onDepth(Texture& raw, uint32_t timestamp) {}
-		
-		
+
+
 		static Vec3f depthToEye(int x, int y, uint16_t d);
 		static double rawDepthToMeters(uint16_t raw);
-		
+
 		void reconfigure();
-		
-				
-		
+
+
+
 		bool startVideo();
 		bool stopVideo();
 		bool startDepth();
 		bool stopDepth();
-		
+
 		// returns tilt in radians
 		double tilt();
 		void tilt(double radians);
-		
+
 		Texture depth, video;
-		
+
 	protected:
 		freenect_device * dev;
 	};
-	
+
 	// ThreadFunction:
 	virtual void operator()();
-	
+
 	static Freenect& get();
-	
+
 	static void stop();
 
 	virtual ~Freenect();
-	
+
 private:
 	Freenect();
-	
+
 	Freenect * singleton;
 	freenect_context * ctx;
 	bool active;
-};	
-	
+};
+
 inline bool Freenect::check(const char * what, int code) {
 	if (code < 0) {
 		AL_WARN("Error (%s): %d", what, code);
@@ -120,15 +120,15 @@ inline Freenect::Callback::Callback(int idx) {
 	dev = 0;
 	Freenect& self = get();
 	if (check("open", freenect_open_device(self.ctx, &dev, idx))) {
-		freenect_set_user(dev, this); 
+		freenect_set_user(dev, this);
 		reconfigure();
 	}
 }
 
-inline Freenect::Callback::~Callback() { 
-	if (dev) freenect_set_user(dev, 0); 
+inline Freenect::Callback::~Callback() {
+	if (dev) freenect_set_user(dev, 0);
 }
-		
+
 inline double Freenect::Callback::rawDepthToMeters(uint16_t raw) {
 	static const double k1 = 1.1863;
 	static const double k2 = 1./2842.5;
@@ -152,10 +152,10 @@ inline Vec3f Freenect::Callback::depthToEye(int x, int y, uint16_t d) {
 				 meters
 				);
 }
-		
+
 inline void Freenect::Callback::reconfigure() {
 	AlloArrayHeader header;
-	
+
 	const freenect_frame_mode dmode = freenect_get_current_depth_mode(dev);
 	header.type = AlloUInt16Ty;
 	header.components = 1;
@@ -166,7 +166,7 @@ inline void Freenect::Callback::reconfigure() {
 	header.stride[1] = header.stride[0] * dmode.width;
 	depth.configure(header);
 	depth.array().dataCalloc();
-	
+
 	const freenect_frame_mode vmode = freenect_get_current_video_mode(dev);
 	header.type = AlloUInt8Ty;
 	header.components = 3;
@@ -178,30 +178,30 @@ inline void Freenect::Callback::reconfigure() {
 	video.configure(header);
 	video.array().dataCalloc();
 }
-		
-inline bool Freenect::Callback::startVideo() { 
+
+inline bool Freenect::Callback::startVideo() {
 	if (dev) {
 		freenect_set_video_callback(dev, video_cb);
-		return check("start_video", freenect_start_video(dev)); 
-	} 
+		return check("start_video", freenect_start_video(dev));
+	}
 	return false;
 }
-inline bool Freenect::Callback::stopVideo() { 
+inline bool Freenect::Callback::stopVideo() {
 	if (dev) {
 		return check("stop_video", freenect_stop_video(dev));
 	}
 	return false;
 }
-inline bool Freenect::Callback::startDepth() { 
+inline bool Freenect::Callback::startDepth() {
 	if (dev) {
 		freenect_set_depth_callback(dev, depth_cb);
-		return check("start_depth", freenect_start_depth(dev)); 
+		return check("start_depth", freenect_start_depth(dev));
 	}
 	return false;
 }
-inline bool Freenect::Callback::stopDepth() { 
+inline bool Freenect::Callback::stopDepth() {
 	if (dev) {
-		return check("stop_depth", freenect_stop_depth(dev)); 
+		return check("stop_depth", freenect_stop_depth(dev));
 	}
 	return false;
 }
@@ -224,7 +224,7 @@ inline double Freenect::Callback::tilt() {
 inline void Freenect::Callback::tilt(double radians) {
 	freenect_set_tilt_degs(dev, radians * M_RAD2DEG);
 }
-	
+
 // ThreadFunction:
 inline void Freenect::operator()() {
 	// listen for messages on main thread:
@@ -257,14 +257,14 @@ inline Freenect::Freenect() : Thread() {
 		AL_WARN("Error: failed to initialize libfreenect");
 		exit(0);
 	}
-	
+
 	int numdevs = freenect_num_devices(ctx);
 	printf("%d devices\n", numdevs);
-	
+
 	active = true;
 	Thread::start(*this);
 }
-	
+
 }
 
 #endif

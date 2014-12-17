@@ -453,7 +453,7 @@ void OBJReader :: readMTL(std::string path, std::string name)
 	printf("%d materials\n", nummaterials);
 
 	// dump materials:
-	
+
 	MtlIterator iter = materialsBegin();
 	while (iter != materialsEnd()) {
 		//printf("material %s\n", iter->first.data());
@@ -465,7 +465,7 @@ void OBJReader :: readMTL(std::string path, std::string name)
 		//printf("map a: %s s: %s d: %s\n", m.ambientMap.data(), m.specularMap.data(), m.diffuseMap.data());
 		iter++;
 	}
-	
+
 
     fclose(file);
 }

@@ -8,10 +8,10 @@ void main()
 	vec3 n;
 	vec4 color = gl_Color;
 	float factor;
-	
+
 	n = normalize(normal);
 	intensity = dot(lightDir, n);
-	
+
 	if (intensity > 0.9) {
 		color *= vec4(1.0,1.0,1.0,1.0);
 	} else if (intensity > 0.5) {

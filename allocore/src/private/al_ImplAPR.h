@@ -6,13 +6,13 @@
  */
 
 /*
-	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
+	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS).
 	All Rights Reserved.
 
 	Permission to use, copy, modify, distribute, and distribute modified versions
 	of this software and its documentation without fee and without a signed
 	licensing agreement, is hereby granted, provided that the above copyright
-	notice, the list of contributors, this paragraph and the following two paragraphs 
+	notice, the list of contributors, this paragraph and the following two paragraphs
 	appear in all copies, modifications, and distributions.
 
 	IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
@@ -78,14 +78,14 @@ public:
 	ImplAPR() {
 		initialize_apr();
 		check_apr(apr_pool_create(&mPool, NULL));
-	}	
+	}
 
 	~ImplAPR() {
 		apr_pool_destroy(mPool);
 	}
-	
-	apr_pool_t * pool() { return mPool; } 
-	
+
+	apr_pool_t * pool() { return mPool; }
+
 protected:
 	apr_pool_t * mPool;
 };

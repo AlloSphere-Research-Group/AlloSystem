@@ -29,7 +29,7 @@ elif binary_exists "brew"; then
 elif binary_exists "port"; then
 	echo 'Found MacPorts'
 	sudo port selfupdate
-	sudo port install pkgconfig 
+	sudo port install pkgconfig
 	sudo port install opencv +openni
 
 # Windows / MinGW

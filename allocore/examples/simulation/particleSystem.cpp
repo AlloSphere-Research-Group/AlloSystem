@@ -44,25 +44,25 @@ struct Emitter {
 
 		for(int i=0; i<M; ++i){
 			Particle& p = particles[tap];
-			
+
 			// fountain
 			if(rnd::prob(0.95)){
 				p.vel.set(rnd::uniform(-0.1, -0.05), rnd::uniform(0.12, 0.14), rnd::uniform(0.01));
 				p.acc.set(0, -0.002, 0);
-				
+
 			// spray
 			} else {
 				p.vel.set(rnd::uniformS(0.01), rnd::uniformS(0.01), rnd::uniformS(0.01));
 				p.acc.set(0, 0, 0);
 			}
 			p.pos.set(4,-2,0);
-			
+
 
 			p.age = 0;
 			++tap; if(tap>=N) tap=0;
 		}
 	}
-	
+
 	int size(){ return N; }
 
 	Particle particles[N];
@@ -78,7 +78,7 @@ struct MyWindow : Window{
 	bool onFrame(){
 
 		em1.update<40>();
-		
+
 		Color back(0);
 
 		gl.clearColor(back);
@@ -95,7 +95,7 @@ struct MyWindow : Window{
 		gl.depthTesting(false);
 		gl.blending(true);
 		gl.blendModeAdd();
-		
+
 		gl.antialiasing(gl.NICEST);
 		gl.pointSize(6);
 
@@ -103,7 +103,7 @@ struct MyWindow : Window{
 
 		m.reset();
 		m.primitive(gl.POINTS);
-		
+
 		for(int i=0; i<em1.size(); ++i){
 			Particle& p = em1.particles[i];
 			float age = float(p.age) / em1.size();
@@ -112,7 +112,7 @@ struct MyWindow : Window{
 			rnd::Random<> rng;
 			m.color(Color(HSV(0.6, rng.uniform(), 1-age), 0.4));
 		}
-		
+
 		gl.draw(m);
 		return true;
 	}

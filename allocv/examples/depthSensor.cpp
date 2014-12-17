@@ -2,7 +2,7 @@
 AlloCV Example: Depth Sensor
 
 Description:
-This is an example of how to get frames from an OpenNI-supported depth sensor 
+This is an example of how to get frames from an OpenNI-supported depth sensor
 such as a Kinect or XtionPRO.
 
 More information:
@@ -33,10 +33,10 @@ public:
 
 		// Attach video to VideoCaptureHandler so onVideo gets called
 		attach(vid);
-		
+
 		// Start video playback
 		startVideo();
-		
+
 		nav().pos(0,0,4);
 		initWindow();
 	}

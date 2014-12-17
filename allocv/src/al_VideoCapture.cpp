@@ -18,13 +18,13 @@ public:
 
 	// Grabs the next frame from video file or capturing device.
     CV_WRAP virtual bool grab();
-	
+
 	// Decodes and returns the grabbed video frame.
     CV_WRAP virtual bool retrieve(CV_OUT Mat& image, int channel=0);
-	
+
 	// Alias of read()
     virtual VideoCapture& operator >> (CV_OUT Mat& image);
-	
+
 	// Grabs, decodes and returns the next video frame.
     CV_WRAP virtual bool read(CV_OUT Mat& image);
 

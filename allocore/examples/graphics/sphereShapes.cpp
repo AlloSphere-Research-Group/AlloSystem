@@ -13,14 +13,14 @@ Lance Putnam, 4/27/2011
 using namespace al;
 
 struct MyWindow : public Window, public Drawable {
-    
+
     MyWindow()
 	:	angle(0), wireframe(false), vertexLight(true)
-	{		
+	{
 		add(new StandardWindowKeyControls);
 		cam.fovy(45);
 	}
-    
+
 	bool onFrame(){
 
 		angle += 0.0007; if(angle > M_2PI) angle -= M_2PI;
@@ -30,10 +30,10 @@ struct MyWindow : public Window, public Drawable {
 		const int N = 8;
 		for(int ix=3; ix<3+N; ++ix){
 		for(int iy=2; iy<2+N; ++iy){
-		
+
 			float px = float(ix-3)/(N-1) * 2 - 1;
 			float py = float(iy-2)/(N-1) * 2 - 1;
-		
+
 			int Nv = addSphere(shapes,1./N, ix,iy);
 
 			Mat4f xfm;
@@ -59,19 +59,19 @@ struct MyWindow : public Window, public Drawable {
 
 		return true;
 	}
-    
+
 	virtual void onDraw(Graphics& gl){
 		gl.enable(gl.COLOR_MATERIAL);
 		light.pos(4,4,1)();
 		gl.draw(shapes);
 	}
-	
+
 	virtual bool onKeyDown(const Keyboard& k){
 				if(k.key('f')) wireframe  ^=true;
 		else	if(k.key('l')) vertexLight^=true;
 		return true;
 	}
-    
+
     Graphics gl;
 	Camera cam;
 	Stereographic stereo;

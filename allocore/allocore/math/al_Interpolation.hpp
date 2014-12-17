@@ -8,30 +8,30 @@
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -188,7 +188,7 @@ inline Tv trilinear(
 ///
 template <class Tf3, class Tv>
 inline Tv trilinear(
-	const Tf3& f, 
+	const Tf3& f,
 	const Tv& xyz, const Tv& Xyz,
 	const Tv& xYz, const Tv& XYz,
 	const Tv& xyZ, const Tv& XyZ,
@@ -244,27 +244,27 @@ Tv casteljau(const Tf& f, const Tv& a, const Tv& b, const Tv& c, const Tv& d){
 
 template <class Tf, class Tv>
 inline void cardinalSpline(Tv * w, const Tv * x, const Tf& f, double b){
-	
+
 	//c = (1-b);		// tension
 	b *= (x[2]-x[1]);	// make domain [t[1], t[2]]
-	
+
 	// evaluate the Hermite basis functions
 	Tf h00 = (1 + 2*f)*(f-1)*(f-1);
 	Tf h10 = f*(f-1)*(f-1);
 	Tf h01 = f*f*(3-2*f);
 	Tf h11 = f*f*(f-1);
-	
+
 	/*
 	The general cubic Hermite spline is
 		p(f) = h00 * p0 + h10 * m0 + h01 * p1 + h11 * m1
 
 	For a cardinal spline, the tangent at point k is
 		m[k] = (1-c) * (p[k+1] - p[k-1]) / (x[k+1] - x[k-1])
-		
+
 	To get the weights for each point, we plug the tangents into the general
 	spline equation and factor out the p[k].
 	*/
-	
+
 	w[0] = (    - b*h10/(x[2]-x[0]));
 	w[1] = (h00 - b*h11/(x[3]-x[1]));
 	w[2] = (h01 + b*h10/(x[2]-x[0]));
@@ -272,13 +272,13 @@ inline void cardinalSpline(Tv * w, const Tv * x, const Tf& f, double b){
 }
 
 template <class Tf, class Tv>
-inline Tv cubic(Tf f, const Tv& w, const Tv& x, const Tv& y, const Tv& z){	
+inline Tv cubic(Tf f, const Tv& w, const Tv& x, const Tv& y, const Tv& z){
 //	Tv c3 = (x - y)*(Tf)1.5 + (z - w)*(Tf)0.5;
 //	Tv c2 = w - x*(Tf)2.5 + y*(Tf)2. - z*(Tf)0.5;
 //	Tv c1 = (y - w)*(Tf)0.5;
 //	return ((c3 * f + c2) * f + c1) * f + x;
 
-	// -w + 3x - 3y + z	
+	// -w + 3x - 3y + z
 	// 2w - 5x + 4y - z
 	// c2 = w - 2x + y - c3
 
@@ -286,10 +286,10 @@ inline Tv cubic(Tf f, const Tv& w, const Tv& x, const Tv& y, const Tv& z){
 //	Tv c2 = w - x*(Tf)2 + y - c3;
 //	Tv c1 = y - w;
 //	return (((c3 * f + c2) * f + c1)) * f * (Tf)0.5 + x;
-	
+
 //	Tv c3 = (x - y)*(Tf)1.5 + (z - w)*(Tf)0.5;
 //	Tv c2 = (y + w)*(Tf)0.5 - x - c3;
-//	Tv c1 = (y - w)*(Tf)0.5;	
+//	Tv c1 = (y - w)*(Tf)0.5;
 //	return ((c3 * f + c2) * f + c1) * f + x;
 
 	Tv c1 = (y - w)*Tf(0.5);
@@ -332,11 +332,11 @@ inline Tv hermite(Tp f,
 	//Tv m1 = ((y-x)*(1+bias) + (z-y)*(1-bias))*tension;
 	Tv m0 = ((x*Tv(2) - w - y)*bias + y - w)*tension;
 	Tv m1 = ((y*Tv(2) - x - z)*bias + z - x)*tension;
-	
+
 //	x - w + x b - w b + y - x - y b + x b
 //	-w + 2x b - w b + y - y b
-//	b(2x - w - y) + y - w			
-//	
+//	b(2x - w - y) + y - w
+//
 //	y - x + y b - x b + z - y - z b + y b
 //	-x + 2y b - x b + z - z b
 //	b(2y - x - z) + z - x
@@ -356,7 +356,7 @@ inline Tv hermite(Tp f,
 template <class T> void lagrange(T * a, T delay, int order){
 	for(int i=0; i<=order; ++i){
 		T coef = T(1);
-		T i_f = T(i); 
+		T i_f = T(i);
 		for(int j=0; j<=order; ++j){
 			if(j != i){
 				T j_f = (T)j;

@@ -17,7 +17,7 @@ int utThread() {
 	//UT_PRINTF("system: thread\n");
 
 	// POSIX-style
-	{	
+	{
 		int x=0;
 		Thread t(threadFunc, &x);
 		t.join();
@@ -37,7 +37,7 @@ int utThread() {
 	{
 		int x=0;
 		MyThreadFunc f(x);
-		
+
 		Thread * t2 = new Thread;
 		t2->joinOnDestroy(false);
 		{

@@ -24,9 +24,9 @@ public:
 		initWindow();
 		window().displayMode(window().displayMode() | Window::MULTISAMPLE);
 	}
-	
+
 	virtual void onAnimate(double dt){
-	
+
 		for(int i=0; i<4; ++i){
 			Vec3f p;
 			rnd::ball<3>(p.elems());
@@ -39,15 +39,15 @@ public:
 			p += A.newest();
 			A.write(p);
 		}
-		
+
 		vert.primitive(Graphics::LINE_STRIP);
 		vert.reset();
 		for(int i=0; i<A.fill(); ++i){
 			float f = float(i)/A.size();
 			vert.vertex(A.read(i));
-			
+
 			Vec3f dr = A.read(i+1) - A.read(i-1);
-			
+
 			vert.color(HSV((1-f)*0.2, al::clip(dr.mag()*4 + 0.2), 1-f));
 		}
 	}

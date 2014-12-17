@@ -66,7 +66,7 @@ struct MyApp : OmniApp {
         eyeVec = normalize(-V);
         lightDir = normalize(vec3(gl_LightSource[0].position.xyz - V));
         gl_TexCoord[0] = gl_MultiTexCoord0;
-        gl_Position = omni_render(vertex); 
+        gl_Position = omni_render(vertex);
 
 /*!*/   float z = gl_Position.z;
 /*!*/   fogFactor = (z - gl_Fog.start) * gl_Fog.scale;

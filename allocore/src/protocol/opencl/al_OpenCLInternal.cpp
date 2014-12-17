@@ -64,7 +64,7 @@ const char * opencl_error_name(cl_int err) {
 
 bool opencl_error(cl_int err, const char *msg) {
 	if(err == CL_SUCCESS) return false;
-	else {	
+	else {
 		fprintf(ERROR_FILE, "OpenCL Error %s: %s\n", opencl_error_name(err), msg);
 		return true;
 	}

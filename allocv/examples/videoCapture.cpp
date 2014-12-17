@@ -21,10 +21,10 @@ public:
 	Texture texture;
 
 	MyApp(){
-		
+
 		// Open first enumerated video device
 		//vid.open(0);
-		
+
 		// Open a file for playback
 		vid.open(RUN_MAIN_SOURCE_PATH "beetle.mp4");
 
@@ -48,10 +48,10 @@ public:
 
 		// Attach video to VideoCaptureHandler so onVideo gets called
 		attach(vid);
-		
+
 		// Start video playback
 		startVideo();
-		
+
 		nav().pos(0,0,4);
 		initWindow();
 	}
@@ -61,13 +61,13 @@ public:
 
 		// Copy video frame into texture; functions returns true on success
 		if(vidcap.retrieveFlip(texture.array())){
-			
+
 			// Tell texture to use BGR format (typical for OpenCV video)
 			texture.format(Graphics::BGR);
 
 			// Loop video (files only!)
 			vidcap.loop();
-		
+
 			// Loop video between min/max frames (files only!)
 			//vidcap.loop(50, 60);
 		}

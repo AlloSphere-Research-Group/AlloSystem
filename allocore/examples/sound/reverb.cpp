@@ -33,7 +33,7 @@ int main(){
 	reverb.bandwidth(0.9);		// Low-pass amount on input, in [0,1]
 	reverb.damping(0.5);		// High-frequency damping, in [0,1]
 	reverb.decay(0.8);			// Tail decay factor, in [0,1]
-	
+
 	// Diffusion amounts
 	// Values near 0.7 are recommended. Moving further away from 0.7 will lead
 	// to more distinct echoes.
@@ -41,6 +41,6 @@ int main(){
 
 	AudioIO audioIO(256, 44100, audioCB, 0, 2, 1);
 	audioIO.start();
-	
+
 	printf("\nPress 'enter' to quit...\n"); getchar();
 }

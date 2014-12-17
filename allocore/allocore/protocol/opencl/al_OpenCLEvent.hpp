@@ -12,7 +12,7 @@ namespace al {
 namespace cl {
 
 class OpenCLEvent {
-public:	
+public:
 	OpenCLEvent(cl_event event=0)
 	:	mEvent(event)
 	{}

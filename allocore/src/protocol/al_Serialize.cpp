@@ -15,7 +15,7 @@ Serializer& Serializer::operator<< (const std::string& v){
 }
 
 const std::vector<char>& Serializer::buf() const { return mBuf; }
-	
+
 
 
 Deserializer::Deserializer(const std::vector<char>& b): mStart(0), mBuf(b){}

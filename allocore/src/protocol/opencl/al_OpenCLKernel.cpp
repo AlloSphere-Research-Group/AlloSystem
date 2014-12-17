@@ -10,11 +10,11 @@ OpenCLKernel * OpenCLKernel :: create(OpenCLProgram &prog, const char *name) {
 		name,
 		&res
 	);
-	
+
 	if(opencl_error(res, "clCreateKernel error creating kernel")) {
 		return NULL;
 	}
-	
+
 	OpenCLKernel *ker = new OpenCLKernel(kernel);
 	prog.attach_resource(ker);
 	return ker;
@@ -33,7 +33,7 @@ void OpenCLKernel :: create(OpenCLProgram &prog, vector<OpenCLKernel *> &kers) {
 	if(opencl_error(res, "clCreateKernelsInProgram error creating kernels")) {
 		return;
 	}
-	
+
 	for(int i=0; i < num_kernels; i++) {
 		OpenCLKernel *ker = new OpenCLKernel(kernels[i]);
 		prog.attach_resource(ker);
@@ -63,7 +63,7 @@ void OpenCLKernel :: destroy() {
 	if(mKernel) {
 		cl_int res = clReleaseKernel(mKernel);
 		mKernel = 0;
-		
+
 		opencl_error(res, "clReleaseKernel error releasing kernel");
 	}
 }

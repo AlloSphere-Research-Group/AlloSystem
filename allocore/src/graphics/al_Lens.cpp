@@ -4,10 +4,10 @@
 namespace al{
 
 Lens :: Lens(
-	double fovy_, 
-	double nearClip, 
-	double farClip, 
-	double focalLength, 
+	double fovy_,
+	double nearClip,
+	double farClip,
+	double focalLength,
 	double eyeSep
 )
 :	mNear(nearClip),
@@ -43,8 +43,8 @@ void Lens::frustum(Frustumd& f, const Pose& p, double aspect) const {//, bool is
 
 	double nw = nh * aspect;
 	double fw = fh * aspect;
-	
-//	// This effectively creates a union between the near/far planes of the 
+
+//	// This effectively creates a union between the near/far planes of the
 //	// left and right eyes. The offsets are computed by using the law
 //	// of similar triangles.
 //	if(isStereo){
@@ -73,10 +73,10 @@ void Lens::frustum(Frustumd& f, const Pose& p, double aspect) const {//, bool is
 //}
 
 //Lens :: Lens(
-//	double fovy, 
-//	double nearClip, 
-//	double farClip, 
-//	double focalLength, 
+//	double fovy,
+//	double nearClip,
+//	double farClip,
+//	double focalLength,
 //	double eyeSep,
 //	double aspectRatio
 //)
@@ -94,12 +94,12 @@ void Lens::frustum(Frustumd& f, const Pose& p, double aspect) const {//, bool is
 
 //Matrix4d Lens::modelViewMatrix(Eye e) {
 //	switch(e) {
-//		case RIGHT: 
+//		case RIGHT:
 //			return Matrix4d::lookAtOffAxis(ur(), uu(), uf(), pos(), mEyeSep);
-//		case LEFT: 
+//		case LEFT:
 //			return Matrix4d::lookAtOffAxis(ur(), uu(), uf(), pos(), -mEyeSep);
 //		case MONO:
-//		default: 
+//		default:
 //			return Matrix4d::lookAt(ur(), uu(), uf(), pos());
 //	}
 //}
@@ -109,9 +109,9 @@ void Lens::frustum(Frustumd& f, const Pose& p, double aspect) const {//, bool is
 //		mEyeSep = mFocalLength/30.;
 //	}
 //	switch(e) {
-//		case RIGHT: 
+//		case RIGHT:
 //			return Matrix4d::perspectiveOffAxis(mFovy, mAspectRatio, mNear, mFar, mEyeSep, mFocalLength);
-//		case LEFT: 
+//		case LEFT:
 //			return Matrix4d::perspectiveOffAxis(mFovy, mAspectRatio, mNear, mFar, -mEyeSep, mFocalLength);
 //		case MONO:
 //		default:
@@ -133,25 +133,25 @@ void Lens::frustum(Frustumd& f, const Pose& p, double aspect) const {//, bool is
 ////	double far		 = mCamera->far();
 ////	double focal	 = mCamera->focalLength();
 ////	double IOD		 = mEyeSep * focal/30.0;		// half of inter-ocular distance
-////	
+////
 ////	const Vec3d& pos = mCamera->vec();
 ////	const Vec3d& ux  = mCamera->ux();
 ////	const Vec3d& uy  = mCamera->uy();
 ////	const Vec3d& uz  = mCamera->uz();
-////	
+////
 ////	const Vec3d eye  = pos + (ux * IOD * 0.5);
 ////	const Vec3d at   = eye + (uz * focal);
-////				
+////
 ////	// Also, update the frustum:
 ////	const Vec3d& nc = eye - uz * mCamera->near();	// why negative?
 ////	const Vec3d& fc = eye - uz * mCamera->far();
 ////
-////	
-////	f.nh = near * tanFOV;			
-////	f.nw = f.nh * mAspect;			
-////	f.fh = far  * tanFOV;	
+////
+////	f.nh = near * tanFOV;
+////	f.nw = f.nh * mAspect;
+////	f.fh = far  * tanFOV;
 ////	f.fw = f.fh * mAspect;
-////	
+////
 ////	f.ntl = nc + uy * f.nh - ux * f.nw;
 ////	f.ntr = nc + uy * f.nh + ux * f.nw;
 ////	f.nbl = nc - uy * f.nh - ux * f.nw;
@@ -161,14 +161,14 @@ void Lens::frustum(Frustumd& f, const Pose& p, double aspect) const {//, bool is
 ////	f.ftr = fc + uy * f.fh + ux * f.fw;
 ////	f.fbl = fc - uy * f.fh - ux * f.fw;
 ////	f.fbr = fc - uy * f.fh + ux * f.fw;
-////	
+////
 ////	f.pl[Frustumd::TOP].set3Points(	f.ntr,	f.ntl,	f.ftl);
 ////	f.pl[Frustumd::BOTTOM].set3Points(f.nbl,	f.nbr,	f.fbr);
 ////	f.pl[Frustumd::LEFT].set3Points(	f.ntl,	f.nbl,	f.fbl);
 ////	f.pl[Frustumd::RIGHT].set3Points(	f.nbr,	f.ntr,	f.fbr);
 ////	f.pl[Frustumd::NEARP].set3Points(	f.ntl,	f.ntr,	f.nbr);
 ////	f.pl[Frustumd::FARP].set3Points(	f.ftr,	f.ftl,	f.fbl);
-//	
+//
 //	return f;
 //}
 

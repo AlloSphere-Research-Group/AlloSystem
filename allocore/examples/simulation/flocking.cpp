@@ -10,12 +10,12 @@ algorithm [1] consists of three main interactions between flockmates ("boids"):
 	3) Flock centering (of nearby flockmates)
 
 Here, we implement 1) and 2) only. Another change from the reference source is
-the use of Gaussian functions rather than inverse-squared functions for 
+the use of Gaussian functions rather than inverse-squared functions for
 calculating the "nearness" of flockmates. This is done primarily to avoid
 infinities, but also to give smoother motions. Lastly, we give each boid a
 random walk motion which helps both dissolve and redirect the flocks.
 
-[1] Reynolds, C. W. (1987). Flocks, herds, and schools: A distributed behavioral 
+[1] Reynolds, C. W. (1987). Flocks, herds, and schools: A distributed behavioral
     model. Computer Graphics, 21(4):25–34.
 
 Author:
@@ -56,7 +56,7 @@ public:
 		box.vertex(-1, 1);
 		nav().pos(0,0,4);
 		initWindow(Window::Dim(600,400), "", 40);
-		
+
 		resetBoids();
 	}
 
@@ -77,7 +77,7 @@ public:
 
 				Vec2f ds = boids[i].pos - boids[j].pos;
 				float dist = ds.mag();
-				
+
 				// Collision avoidance
 				float pushRadius = 0.05;
 				float pushStrength = 1;
@@ -138,12 +138,12 @@ public:
 
 			tails.vertex(boids[i].pos);
 			tails.vertex(boids[i].pos - boids[i].vel.normalized(0.07));
-			
+
 			tails.color(heads.colors()[i]);
-			tails.color(RGB(0.5));			
+			tails.color(RGB(0.5));
 		}
 	}
-	
+
 	void onDraw(Graphics& g, const Viewpoint& v){
 		g.nicest();
 		g.stroke(8);

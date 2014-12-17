@@ -22,7 +22,7 @@ using namespace al;
 
 
 const char * MIDIByte::messageTypeString(unsigned char statusByte){
-	switch(statusByte & MESSAGE_MASK){		
+	switch(statusByte & MESSAGE_MASK){
 	case NOTE_OFF:			return "NOTE_OFF";
 	case NOTE_ON:			return "NOTE_ON";
 	case CONTROL_CHANGE:	return "CONTROL_CHANGE";
@@ -79,7 +79,7 @@ void MIDIMessageHandler::bindTo(MIDIIn& midiIn){
 
 /*
 DO NOT MODIFY BELOW THIS POINT!!!
-Below is the RtMidi implementation code verbatim (w/o RtMidi.h header include). 
+Below is the RtMidi implementation code verbatim (w/o RtMidi.h header include).
 */
 
 /**********************************************************************/
@@ -239,7 +239,7 @@ RtMidiOut :: RtMidiOut( const std::string clientName ) : RtMidi()
 //*********************************************************************//
 
 // API information found at:
-//   - http://developer.apple.com/audio/pdf/coreaudio.pdf 
+//   - http://developer.apple.com/audio/pdf/coreaudio.pdf
 
 #if defined(__MACOSX_CORE__)
 
@@ -448,7 +448,7 @@ void RtMidiIn :: openPort( unsigned int portNumber, const std::string portName )
 
   MIDIPortRef port;
   CoreMidiData *data = static_cast<CoreMidiData *> (apiData_);
-  OSStatus result = MIDIInputPortCreate( data->client, 
+  OSStatus result = MIDIInputPortCreate( data->client,
                                          CFStringCreateWithCString( NULL, portName.c_str(), kCFStringEncodingASCII ),
                                          midiInputCallback, (void *)&inputData_, &port );
   if ( result != noErr ) {
@@ -645,7 +645,7 @@ static CFStringRef ConnectedEndpointName( MIDIEndpointRef endpoint )
   if ( anyStrings )
     return result;
 
-  // Here, either the endpoint had no connections, or we failed to obtain names 
+  // Here, either the endpoint had no connections, or we failed to obtain names
   return EndpointName( endpoint, false );
 }
 
@@ -703,7 +703,7 @@ std::string RtMidiOut :: getPortName( unsigned int portNumber )
   nameRef = ConnectedEndpointName(portRef);
   CFStringGetCString( nameRef, name, sizeof(name), 0);
   CFRelease( nameRef );
-  
+
   return stringName = name;
 }
 
@@ -747,7 +747,7 @@ void RtMidiOut :: openPort( unsigned int portNumber, const std::string portName 
 
   MIDIPortRef port;
   CoreMidiData *data = static_cast<CoreMidiData *> (apiData_);
-  OSStatus result = MIDIOutputPortCreate( data->client, 
+  OSStatus result = MIDIOutputPortCreate( data->client,
                                           CFStringCreateWithCString( NULL, portName.c_str(), kCFStringEncodingASCII ),
                                           &port );
   if ( result != noErr ) {
@@ -831,7 +831,7 @@ void RtMidiOut :: sendMessage( std::vector<unsigned char> *message )
   // messages.  Otherwise, we use a single CoreMidi MIDIPacket.
   unsigned int nBytes = message->size();
   if ( nBytes == 0 ) {
-    errorString_ = "RtMidiOut::sendMessage: no data in message argument!";      
+    errorString_ = "RtMidiOut::sendMessage: no data in message argument!";
     error( RtError::WARNING );
     return;
   }
@@ -879,7 +879,7 @@ void RtMidiOut :: sendMessage( std::vector<unsigned char> *message )
   MIDIPacket *packet = MIDIPacketListInit( &packetList );
   packet = MIDIPacketListAdd( &packetList, sizeof(packetList), packet, timeStamp, nBytes, (const Byte *) &message->at( 0 ) );
   if ( !packet ) {
-    errorString_ = "RtMidiOut::sendMessage: could not allocate packet list";      
+    errorString_ = "RtMidiOut::sendMessage: could not allocate packet list";
     error( RtError::DRIVER_ERROR );
   }
 
@@ -1222,12 +1222,12 @@ void RtMidiIn :: openPort( unsigned int portNumber, const std::string portName )
     snd_seq_port_info_set_midi_channels(pinfo, 16);
 #ifndef AVOID_TIMESTAMPING
     snd_seq_port_info_set_timestamping(pinfo, 1);
-    snd_seq_port_info_set_timestamp_real(pinfo, 1);    
+    snd_seq_port_info_set_timestamp_real(pinfo, 1);
     snd_seq_port_info_set_timestamp_queue(pinfo, data->queue_id);
 #endif
     snd_seq_port_info_set_name(pinfo,  portName.c_str() );
     data->vport = snd_seq_create_port(data->seq, pinfo);
-  
+
     if ( data->vport < 0 ) {
       errorString_ = "RtMidiIn::openPort: ALSA error creating input port.";
       error( RtError::DRIVER_ERROR );
@@ -1287,7 +1287,7 @@ void RtMidiIn :: openVirtualPort( std::string portName )
     snd_seq_port_info_set_midi_channels(pinfo, 16);
 #ifndef AVOID_TIMESTAMPING
     snd_seq_port_info_set_timestamping(pinfo, 1);
-    snd_seq_port_info_set_timestamp_real(pinfo, 1);    
+    snd_seq_port_info_set_timestamp_real(pinfo, 1);
     snd_seq_port_info_set_timestamp_queue(pinfo, data->queue_id);
 #endif
     snd_seq_port_info_set_name(pinfo, portName.c_str());
@@ -2055,7 +2055,7 @@ struct WinMidiData {
 //*********************************************************************//
 
 static void CALLBACK midiInputCallback( HMIDIIN hmin,
-                                        UINT inputStatus, 
+                                        UINT inputStatus,
                                         DWORD_PTR instancePtr,
                                         DWORD_PTR midiMessage,
                                         DWORD timestamp )
@@ -2103,8 +2103,8 @@ static void CALLBACK midiInputCallback( HMIDIIN hmin,
     for ( int i=0; i<nBytes; ++i ) apiData->message.bytes.push_back( *ptr++ );
   }
   else { // Sysex message ( MIM_LONGDATA or MIM_LONGERROR )
-    MIDIHDR *sysex = ( MIDIHDR *) midiMessage; 
-    if ( !( data->ignoreFlags & 0x01 ) && inputStatus != MIM_LONGERROR ) {  
+    MIDIHDR *sysex = ( MIDIHDR *) midiMessage;
+    if ( !( data->ignoreFlags & 0x01 ) && inputStatus != MIM_LONGERROR ) {
       // Sysex message and we're not ignoring it
       for ( int i=0; i<(int)sysex->dwBytesRecorded; ++i )
         apiData->message.bytes.push_back( sysex->lpData[i] );
@@ -2442,7 +2442,7 @@ void RtMidiOut :: sendMessage( std::vector<unsigned char> *message )
     sysex.lpData = (LPSTR) buffer;
     sysex.dwBufferLength = nBytes;
     sysex.dwFlags = 0;
-    result = midiOutPrepareHeader( data->outHandle,  &sysex, sizeof(MIDIHDR) ); 
+    result = midiOutPrepareHeader( data->outHandle,  &sysex, sizeof(MIDIHDR) );
     if ( result != MMSYSERR_NOERROR ) {
       free( buffer );
       errorString_ = "RtMidiOut::sendMessage: error preparing sysex header.";

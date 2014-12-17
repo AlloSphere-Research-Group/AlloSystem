@@ -34,7 +34,7 @@ int main (int argc, char * const argv[]) {
 	RUNTEST(Thread);
 
 	RUNTEST(GraphicsMesh);
-	
+
 	// This test should always be run last since it calls exit()
 	printf("IOWindow\n");
 	utIOWindowGL();

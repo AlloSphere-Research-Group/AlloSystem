@@ -345,7 +345,7 @@ public:
 				case GLUT_RIGHT_BUTTON:		btn = Mouse::RIGHT; break;
 				default:					btn = Mouse::EXTRA;		// unrecognized button
 			}
-			
+
 			// update modifiers here for shift-mouse etc.
 			WindowImpl::setModifiers(win->mKeyboard);
 
@@ -414,7 +414,7 @@ public:
 		}
 	}
 
-	// This is triggered upon a call to glutPostRedisplay or implicitly as the 
+	// This is triggered upon a call to glutPostRedisplay or implicitly as the
 	// result of window damage reported by the window system.
 	static void cbDisplay(){
 		//printf("GLUT display for window %d\n", glutGetWindow());
@@ -452,7 +452,7 @@ private:
 		/* Note: This function used to use the Main scheduler queue, however,
 		the Main scheduler uses a fixed-interval polling mechanism with too
 		course of a timing granularity to obtain a precise enough frame rate
-		for smooth animation. Instead, we call glutTimerFunc directly using an 
+		for smooth animation. Instead, we call glutTimerFunc directly using an
 		estimated delta time. */
 		scheduleDrawStaticGLUT(winID);
 	}
@@ -747,7 +747,7 @@ Window& Window::fullScreen(bool v){
 	if(mImpl->mFullScreen && !v){
 		#ifdef AL_LINUX
 			callHandlersOnDestroy();
-			// Must manually set dims since exiting game mode does NOT 
+			// Must manually set dims since exiting game mode does NOT
 			// automatically call GLUT reshape callback.
 			mImpl->mDimPrev = mImpl->dimensionsGLUT();
 			mImpl->gameMode(false);

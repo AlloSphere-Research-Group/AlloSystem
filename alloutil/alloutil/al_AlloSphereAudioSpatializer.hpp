@@ -36,7 +36,7 @@ class AlloSphereAudioSpatializer {
 };
 
 inline void AlloSphereAudioSpatializer::initAudio(double audioRate, int audioBlockSize) {
-  
+
   if(bossa) initAudio("AF12 x5b", audioRate, audioBlockSize, 60, 60);
   else if(audio) initAudio("ECHO X5", audioRate, audioBlockSize, 60, 60);
   else{

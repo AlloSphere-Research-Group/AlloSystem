@@ -66,7 +66,7 @@ struct MyWindow : Window{
 		shaderV.source(vLight, Shader::VERTEX).compile();
 		shaderF.source(fLight, Shader::FRAGMENT).compile();
 		shaderP.attach(shaderV).attach(shaderF).link();
-		
+
 		shaderV.printLog();
 		shaderF.printLog();
 		shaderP.printLog();

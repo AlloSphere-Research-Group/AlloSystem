@@ -8,30 +8,30 @@
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -54,11 +54,11 @@ namespace al{
 
 #ifndef UINT32_C
 #define UINT32_C(v) v ## UL
-#endif 
+#endif
 
 #ifndef UINT64_C
 #define UINT64_C(v) v ## ULL
-#endif 
+#endif
 
 #define CONST_(N, vf, vd)\
 	template <class T> struct N;\
@@ -94,7 +94,7 @@ template<> struct Twiddle<double>{
 /// Convert decimal integer to ascii base-36 character
 char base10To36(int dec10);
 
-/// Convert ascii base-36 character to decimal integer 
+/// Convert ascii base-36 character to decimal integer
 int base36To10(char ascii36);
 
 /// Convert a string of 1s and 0s to an integer.
@@ -236,8 +236,8 @@ inline uint32_t bitsToUInt(const char * string){
 /// Sets argument to zero if subnormal
 inline float blockSubnormal(float v){
 	const uint32_t i = punFU(v);
-	const uint32_t frac = i & MaskFrac<float>(); 
-	const uint32_t expo = i & MaskExpo<float>(); 
+	const uint32_t frac = i & MaskFrac<float>();
+	const uint32_t expo = i & MaskExpo<float>();
 	if(expo == 0 && frac != 0) v = 0.f;
 	return v;
 }
@@ -245,8 +245,8 @@ inline float blockSubnormal(float v){
 /// Sets argument to zero if subnormal
 inline double blockSubnormal(double v){
 	const uint64_t i = punFU(v);
-	const uint64_t frac = i & MaskFrac<double>(); 
-	const uint64_t expo = i & MaskExpo<double>(); 
+	const uint64_t frac = i & MaskFrac<double>();
+	const uint64_t expo = i & MaskExpo<double>();
 	if(expo == 0 && frac != 0) v = 0.;
 	return v;
 }
@@ -266,7 +266,7 @@ inline float floatMantissa(float v){
 	return punUF(frac) - 1.f;
 }
 
-inline float fraction(uint32_t bits, uint32_t phase){	
+inline float fraction(uint32_t bits, uint32_t phase){
 	phase = phase << bits >> 9 | Expo1<float>();
 	return punUF(phase) - 1.f;
 }
@@ -388,9 +388,9 @@ inline uint32_t unitToUInt2(float v){
 //	return ((normalU & (~ULONG_MAX | 0xffffffUL)) | 0x800000UL) >> rbs;
 ////	return (((normalU | 0x800000UL) << 8UL) & (~ULONG_MAX | 0xffffffffUL)) >> rbs;
 
-//Her00	
-//float y = v + 1.f; 
-//return ((unsigned long&)v) & 0x7FFFFF;      // last 23 bits 
+//Her00
+//float y = v + 1.f;
+//return ((unsigned long&)v) & 0x7FFFFF;      // last 23 bits
 }
 
 inline uint8_t unitToUInt8(float u){
