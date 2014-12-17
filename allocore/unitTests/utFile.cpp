@@ -13,11 +13,11 @@ int utFile() {
 	assert(!File::isDirectory(".." DELIM ".." DELIM "Makefile"));
 
 	assert(
-		File::conformDirectory("test") 
+		File::conformDirectory("test")
 		== "test" DELIM
 	);
 	assert(
-		File::conformDirectory("test" DELIM) 
+		File::conformDirectory("test" DELIM)
 		== "test" DELIM
 	);
 
@@ -39,14 +39,14 @@ int utFile() {
 	// simple file/directory searching
 	{
 		std::string dir;
-		
+
 		// Search for file (that exists and probably will not be moved...)
 		std::string find = "Makefile";
-		
+
 		bool r = File::searchBack(dir, find);
 		assert(r);
 		assert(File::exists(dir + find));
-		
+
 		find = ".." DELIM + find;	// check for a file with path
 		r = File::searchBack(dir, find);
 		assert(r);
@@ -70,7 +70,7 @@ int utFile() {
 		assert(
 			f.write(text, strlen(text))
 		);
-		
+
 		assert(f.size() == (int)strlen(text));
 
 		f.close();
@@ -81,18 +81,18 @@ int utFile() {
 		// read data
 		f.mode("r").open();
 		assert(f.opened());
-		
+
 		const char * read = f.readAll();
 
 		assert(f.size() == (int)strlen(text));
-		
+
 		for(int i=0; i<f.size(); ++i){
 			assert(read[i] == text[i]);
 //			printf("%c", read[i]);
 		}
-		
+
 		f.close();
-		
+
 		f.path(
 			"thisdirectroydoesnotexist" DELIM
 			"neitherdoesthisone" DELIM
@@ -117,20 +117,20 @@ int utFile() {
 			}
 		}
 	}
-	
+
 	{
 		// TODO:
 		SearchPaths sp;
 		//printf("%s\n", sp.appPath().c_str());
 	}
-	
+
 	{
 		// TODO:
 		FilePath fp("file.txt", "path");
 
 		//printf("%s\n", fp.filepath().c_str());
 	}
-	
+
 	#undef DELIM
 	return 0;
 }

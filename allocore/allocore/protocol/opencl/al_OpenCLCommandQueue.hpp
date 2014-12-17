@@ -19,14 +19,14 @@ namespace cl {
 class OpenCLMemoryBuffer;
 
 class OpenCLCommandQueue : public OpenCLResource<OpenCLContext> {
-public:	
+public:
 	OpenCLCommandQueue(cl_command_queue command_queue=0)
 	:	mCommandQueue(command_queue)
 	{}
 
 
 	virtual ~OpenCLCommandQueue() {}
-	
+
 	cl_command_queue get_command_queue() const {return mCommandQueue;}
 	void create(OpenCLContext &ctx, const OpenCLDevice &dev, bool ordered=true, bool profiling=false);
 	OpenCLEvent enqueue_kernel(const OpenCLKernel &ker, cl_uint ndim, size_t *global, size_t *local);

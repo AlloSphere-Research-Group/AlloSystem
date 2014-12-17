@@ -20,10 +20,10 @@ public:
 	Texture texture[2];
 
 	MyApp(){
-		
+
 		// Open first enumerated video device
 		vid[0].open(0);
-		
+
 		// Open a file for playback
 		vid[1].open(RUN_MAIN_SOURCE_PATH "beetle.mp4");
 
@@ -32,14 +32,14 @@ public:
 
 		// Set number of video streams
 		numVideoStreams(2);
-		
+
 		// Attach both video captures
 		attach(vid[0], 0);
 		attach(vid[1], 1);
-		
+
 		// Start video threads
 		startVideo();
-		
+
 		nav().pos(0,0,4);
 		initWindow();
 	}
@@ -48,10 +48,10 @@ public:
 	void onVideo(VideoCapture& vidcap, int streamIdx){
 
 		if(vidcap.retrieveFlip(texture[streamIdx].array())){
-		
+
 			// Tell texture to use BGR format (typical for OpenCV video)
 			texture[streamIdx].format(Graphics::BGR);
-			
+
 			// Loop video
 			vidcap.loop();
 		}

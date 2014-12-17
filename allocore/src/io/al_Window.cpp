@@ -170,7 +170,7 @@ Window& Window::insert(WindowEventHandler& v, int i){
 	if(std::find(H.begin(), H.end(), &v) == H.end()){
 		v.removeFromWindow();
 		H.insert(H.begin()+i, &(v.window(this)));
-		
+
 		// notify new handler of changes if the window already is created
 		// otherwise, the window will call the proper handlers when created
 		if(created()){
@@ -218,7 +218,7 @@ Window& Window::remove(WindowEventHandler& v){
 
 		//printf("removed window event handler (%p) from window (%p)\n", &v, this);
 		//assert(std::find(H.begin(), H.end(), &v) == H.end());
-		
+
 		if(started()){
 			v.onResize(-width(), -height());
 			//printf("WindowEventHandler %p onResize(%d, %d)\n", &v, width(), height());

@@ -42,22 +42,22 @@ struct MyWindow : Window{
 		int Nx = tex.width();
 		int Ny = tex.height();
 		float * texBuf = new float[tex.numElems()];
-		
+
 		for(int j=0; j<Ny; ++j){ float y = float(j)/(Ny-1)*2-1;
 		for(int i=0; i<Nx; ++i){ float x = float(i)/(Nx-1)*2-1;
 
 			float m = 1 - al::clip(hypot(x,y));
 			float a = al::wrap(atan2(y,x)/M_2PI);
-			
+
 			Color col = HSV(a,1,m);
-			
+
 			int idx = j*Nx + i;
 			texBuf[idx*4 + 0] = col.r;
 			texBuf[idx*4 + 1] = col.g;
 			texBuf[idx*4 + 2] = col.b;
 			texBuf[idx*4 + 3] = col.a;
 		}}
-		
+
 		tex.submit(texBuf);
 		delete[] texBuf;
 

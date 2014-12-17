@@ -39,9 +39,9 @@ public:
 
     IpEndpointName()
 		: address( ANY_ADDRESS ), port( ANY_PORT ) {}
-    IpEndpointName( int port_ ) 
+    IpEndpointName( int port_ )
 		: address( ANY_ADDRESS ), port( port_ ) {}
-    IpEndpointName( unsigned long ipAddress_, int port_ ) 
+    IpEndpointName( unsigned long ipAddress_, int port_ )
 		: address( ipAddress_ ), port( port_ ) {}
     IpEndpointName( const char *addressName, int port_=ANY_PORT )
 		: address( GetHostByName( addressName ) )
@@ -64,7 +64,7 @@ public:
 };
 
 inline bool operator==( const IpEndpointName& lhs, const IpEndpointName& rhs )
-{	
+{
 	return (lhs.address == rhs.address && lhs.port == rhs.port );
 }
 

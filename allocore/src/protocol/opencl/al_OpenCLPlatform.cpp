@@ -12,21 +12,21 @@ void OpenCLPlatform :: get_platforms(vector<OpenCLPlatform> &plats) {
 		platforms,
 		&num_platforms
 	);
-	
+
 	if(opencl_error(res, "clGetPlatformIDs error querying platforms")) {
 		return;
 	}
-	
-	
+
+
 	if(num_platforms <= 0) {
 		opencl_error(USER_OPENCL_ERROR, "clGetPlatformIDs no OpenCL platforms detected");
 		return;
 	}
-	
-	
+
+
 	// clear out any previous platforms
 	plats.clear();
-	
+
 	static cl_platform_info param_names[] = {
 		CL_PLATFORM_VENDOR,
 		CL_PLATFORM_NAME,
@@ -34,11 +34,11 @@ void OpenCLPlatform :: get_platforms(vector<OpenCLPlatform> &plats) {
 		CL_PLATFORM_PROFILE,
 		CL_PLATFORM_EXTENSIONS
 	};
-	
+
 	int n_param_names = sizeof(param_names)/sizeof(cl_platform_info);
 	for(int j=0; j < num_platforms; j++) {
 		OpenCLPlatform plat(platforms[j]);
-		
+
 		for(int i=0; i < n_param_names; i++) {
 			char param_value[PLATFORM_PARAM_SIZE];
 			size_t param_value_size_ret = 0;
@@ -49,37 +49,37 @@ void OpenCLPlatform :: get_platforms(vector<OpenCLPlatform> &plats) {
 				param_value,
 				&param_value_size_ret
 			);
-			
+
 			if(opencl_error(res, "clGetPlatformInfo getting platform information")) {
 				return;
 			}
-		
+
 			switch(param_names[i]) {
 				case CL_PLATFORM_VENDOR:
 					plat.set_vendor(opencl_param<string>(param_value));
 					break;
-					
+
 				case CL_PLATFORM_NAME:
 					plat.set_name(opencl_param<string>(param_value));
 					break;
-					
+
 				case CL_PLATFORM_VERSION:
 					plat.set_version(opencl_param<string>(param_value));
 					break;
-					
+
 				case CL_PLATFORM_PROFILE:
 					plat.set_profile(opencl_param<Profile>(param_value));
 					break;
-				
+
 				case CL_PLATFORM_EXTENSIONS:
 					plat.set_extension(opencl_param<string>(param_value));
 					break;
-					
+
 				default:
 					break;
 			}
 		}
-		
+
 		plats.push_back(plat);
 	}
 }

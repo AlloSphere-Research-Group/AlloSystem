@@ -28,12 +28,12 @@ public:
 	Vec2f position;
 
 	MyApp(){
-	
+
 		sphere.primitive(Graphics::LINE_STRIP);
 		addSphere(sphere);
 		sphere.color(Color(1));
 		scaling = 1;
-	
+
 		nav().pos().set(0,0,4);
 		initWindow();
 
@@ -45,7 +45,7 @@ public:
 
 		layout.arrangement(">p");
 
-		slider.setValue(0.5);	
+		slider.setValue(0.5);
 		layout << slider;
 		layout << new glv::Label("scale");
 
@@ -66,7 +66,7 @@ public:
 		scaling = slider.getValue();
 
 		sphere.colors()[0] = HSV(colorPicker.getValue().components);
-		
+
 		position.set(slider2d.getValue(0), slider2d.getValue(1));
 	}
 

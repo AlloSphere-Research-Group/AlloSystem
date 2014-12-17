@@ -26,7 +26,7 @@ int main(){
 	MyWindow win;
 	GLVDetachable gui;
 	glv::Table layout("><");
-	
+
 	// Create some random widgets for testing
 	glv::Button btn;
 	glv::Sliders sld(glv::Rect(100,10*4), 1,4);
@@ -44,9 +44,9 @@ int main(){
 		<< sld2<< new glv::Label("param 3")
 	;
 
-	gui << layout;	
+	gui << layout;
 	layout.arrange();
-	
+
 	// We must assign a parent window to the GUI
 	gui.parentWindow(win);
 

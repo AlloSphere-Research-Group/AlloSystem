@@ -8,30 +8,30 @@
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -64,62 +64,62 @@ public:
 		L = lua_open();
 		luaL_openlibs(L);
 	}
-	
+
 	Lua(lua_State * L) : L(L), mOwner(false) {}
 
 	///! destructor calls
 	~Lua() {
 		close();
 	}
-	
+
 	void close();
-	
+
 	///! wrap an existing pointer (closes current if owned)
 	void set(lua_State * L1);
-	
+
 
 	///! allow the Lua object to be used in place of a lua_State *
 	operator lua_State *() { return L; }
 	operator const lua_State *() { return L; }
-	
+
 	///! push a value onto the Lua stack:
 	template<typename T>
 	Lua& push(T v);
 	///! push nil onto the Lua stack:
 	Lua& push() { lua_pushnil(L); return *this; }
-	
+
 	///! get value from Lua stack:
 	///! indices from 1 .. top()
 	///! negative indices count backwards from -1 == top()
 	template<typename T>
 	T to(int idx=-1);
-	
+
 //	template<typename T>
 //	T checkto(int idx=-1) {
 //		if (!is<T>(idx)
 //			luaL_error(L, "unexpected type (index %d)", idx);
 //		return to<T>(idx);
 //	}
-	
-	///! expects a table on the stack; 
+
+	///! expects a table on the stack;
 	/// fills this table into v
 	template<typename T>
 	bool to_vec_t(T * v, int n, int idx=-1);
-	
+
 	///! get number of items on the stack:
 	int top() { return lua_gettop(L); }
-	
+
 	///! remove N elements from top of stack:
 	Lua& pop(int n=1) { lua_pop(L, n); return *this; }
-	
+
 	///! set value to be a named global
 	template<typename T>
 	Lua& setglobal(const std::string& name, T value);
-	
+
 	///! set stack top value to be a named global
 	/// pops value from stack
 	Lua& setglobal(const std::string& name);
-	
+
 	///! pushes named global (or nil)
 	Lua& getglobal(const std::string& name);
 
@@ -128,7 +128,7 @@ public:
 	/// catches errors and prints a traceback to stdout
 	/// returns 0 if no errors
 	int pcall(int n=0, const std::string& errname="Lua");
-	
+
 	///! call function with N args
 	/// function should be at stack index (top - n)
 	/// catches errors and prints a traceback to stdout
@@ -139,7 +139,7 @@ public:
 	/// catches errors and prints to stdout
 	/// returns 0 if no errors
 	int dostring(const std::string& code, int nargs=0);
-	
+
 	///! runs a chunk of binary bytecode
 	int dobuffer(const char * buffer, size_t size, const char * name);
 
@@ -147,17 +147,17 @@ public:
 	/// catches errors and prints to stdout
 	/// returns 0 if no errors
 	int dofile(const std::string& path, int nargs=0);
-	
+
 	///! loads code from a file & leaves as a function on the stack
 	/// catches errors and prints to stdout
 	/// returns 0 if no errors
 	int loadfile(const std::string& path);
-	
+
 	///! preloads a C module into the Lua package registry
 	Lua& preloadlib(const std::string& name, lua_CFunction func);
-	
+
 	Lua& dump(const std::string& msg="Lua");
-	
+
 	template<typename T, int (T::*M)(lua_State *)>
 	struct Bind {
 		static int method(lua_State * L) {
@@ -167,7 +167,7 @@ public:
 			return 0;
 		}
 	};
-	
+
 	template <typename T>
 	Lua& pushmethod(T * self, int (T::*M)(lua_State *)) {
 		lua_pushlightuserdata(L, self);
@@ -176,7 +176,7 @@ public:
 		// test it:
 		return *this;
 	}
-	
+
 	int lerror(int err, const std::string& errname="Lua");
 
 protected:
@@ -225,7 +225,7 @@ template<> inline int64_t Lua::to(int idx) { return lua_tointeger(L, idx); }
 template<> inline bool Lua::to(int idx) { return lua_toboolean(L, idx); }
 template<> inline void * Lua::to(int idx) { return lua_touserdata(L, idx); }
 
-template<typename T> 
+template<typename T>
 inline bool Lua::to_vec_t(T * v, int n, int idx) {
 	if(lua_istable(L, idx)) {
 		int len = MIN(n, (int)lua_objlen(L, idx));
@@ -245,7 +245,7 @@ inline Lua& Lua::setglobal(const std::string& name) { lua_setglobal(L, name.c_st
 
 template<typename T>
 inline Lua& Lua::setglobal(const std::string& name, T value) {
-	return push(value).setglobal(name); 
+	return push(value).setglobal(name);
 }
 
 inline Lua& Lua::getglobal(const std::string& name) {
@@ -260,7 +260,7 @@ inline int Lua::lerror(int err, const std::string& errname) {
 	return err;
 }
 
-inline int Lua::resume(int nargs) {	
+inline int Lua::resume(int nargs) {
 	int result = lua_resume(L, nargs);
 	switch (result) {
 		case 0:
@@ -366,17 +366,17 @@ inline Lua& Lua::dump(const std::string& msg) {
 	template annotation class to bind C++ types to Lua (via boxed pointer)
 		(AKA Type Traits)
 	includes (single-)inheritance and many helper functions
-	
+
 	NB: Glue does not preserve identity between userdata and their objects.
-		That is, pushing pointer x twice results in two distinct userdata.	
+		That is, pushing pointer x twice results in two distinct userdata.
 		For this reason, the default behavior for __gc is to take no action.
-		The usr_push and usr_gc methods can be used to trigger reqeust/release 
+		The usr_push and usr_gc methods can be used to trigger reqeust/release
 			behaviors for reference-counting, if desired.
 		The usr_eq method can be used to query identity of objects in Lua.
-		
-		
+
+
 	Example usage (for a class Foo defined below):
-	
+
 	class Base;
 	class Foo : public Base {
 	public:
@@ -385,26 +385,26 @@ inline Lua& Lua::dump(const std::string& msg) {
 		int x;
 		int refs;
 	}
-	
+
 	// Creating the binding requires a stage of definitions, followed by a registration call.
-	
-	
+
+
 	// Definition
-	
+
 	// Required: define the binding name. It should be unique to the class.
 	template<> const char * Glue<Foo>::usr_name() { return "Foo"; }
-	
+
 	// Optional: constructor. Defines the body of the lua_CFunction create() in Foo's metatable.
-	template<> Foo * Glue<Foo>::usr_new(lua_State * L) { 
+	template<> Foo * Glue<Foo>::usr_new(lua_State * L) {
 		int x = lua_checknumber(L, 1);
-		return new Foo(x); 
+		return new Foo(x);
 	}
-	
-	
-	
-	
+
+
+
+
 	// Optional: methods
-	// Methods can be added to the Foo binding using usr_mt. 
+	// Methods can be added to the Foo binding using usr_mt.
 	// First define methods as standard lua_CFunctions, using Glue<Foo>::checkto etc,
 	// then define their names in the metatable using usr_mt:
 	static int lua_foo_double(lua_State * L) {
@@ -417,21 +417,21 @@ inline Lua& Lua::dump(const std::string& msg) {
 		lua_pushcfunction(L, lua_foo_double); lua_setfield(L, -2, "double");
 		// etc. for each method
 	}
-	
-	
-	
+
+
+
 	// Optional: additional type-checking
-	// Glue<> by default will check for a matching metatable and valid pointer 
-	// on any call of Glue<Foo>::to()  or Glue<Foo>::checkto. 
-	// Additional tests can be added with usr_to. 
+	// Glue<> by default will check for a matching metatable and valid pointer
+	// on any call of Glue<Foo>::to()  or Glue<Foo>::checkto.
+	// Additional tests can be added with usr_to.
 	// The Lua userdata is at stack position idx.
 	template<> Foo * Glue<Foo>::usr_to(lua_State * L, Foo * u, int idx) {
 		// e.g. require that Foo->x is > 0
 		return u->x > 0 ? u : NULL;
 	}
-	
+
 	// Optional: Type co-ercion.
-	// If Glue::checkto<Foo> or Glue::to<Foo> is called on a Lua stack value that is not a valid Foo, 
+	// If Glue::checkto<Foo> or Glue::to<Foo> is called on a Lua stack value that is not a valid Foo,
 	// this function (if defined) may be called to co-erce the value in question into a Foo.
 	// return NULL to signal failure to co-erce type, or a valid Foo pointer if coercion is possible.
 	template<> Foo * Glue<Foo>::usr_reinterpret(lua_State * L, int idx) {
@@ -441,18 +441,18 @@ inline Lua& Lua::dump(const std::string& msg) {
 		}
 		return NULL;
 	}
-	
+
 	// Optional: tostring() handler
-	// by default, Glue reports objecst as something like "Foo: 0x23238". 
+	// by default, Glue reports objecst as something like "Foo: 0x23238".
 	// this behavior can be overridden for more useful reporting:
 	template<> int Glue<Foo>::usr_tostring(lua_State * L, Foo * u) {
 		lua_pushfstring(L, "Foo(%d)", u->x);
-		return 1; 
+		return 1;
 	}
-	
-	
+
+
 	// Optional: Reference-counting, garbage collection etc.
-	// by default, Glue<> does not delete userdata when garbage collected. 
+	// by default, Glue<> does not delete userdata when garbage collected.
 	// to enable this, define usr_gc as follows:
 	template<> Glue<Foo>::usr_gc(lua_State * L, Foo * u) {
 		delete u;
@@ -465,30 +465,30 @@ inline Lua& Lua::dump(const std::string& msg) {
 	template<> void Glue<Foo>::usr_gc(lua_State * L, Foo * u) {
 		if (--u->refs <= 0) delete u;
 	}
-	
-	
-	// Optional: Inheritance. The Foo binding can inherit the metatable of Base. 
-	// WARNING: the Base metatable should be defined () before the Foo metatable 
+
+
+	// Optional: Inheritance. The Foo binding can inherit the metatable of Base.
+	// WARNING: the Base metatable should be defined () before the Foo metatable
 	// (call Glue::define<Base>() before Glue::define<Foo>()).
 	template<> const char * Glue<Foo>::usr_supername() { return Glue<Base>::usr_name(); }
-	
-	
+
+
 	// Optional: Equality
 	// Glue by default will test equality on the pointers in the userdata.
 	// This behavior can be overridden with usr_eq.
-	// however, note that the test will not made for super/base classes. 
+	// however, note that the test will not made for super/base classes.
 	template<> bool Glue<Foo> :: usr_eq(lua_State * L, Foo * a, Foo * b) {
 		// e.g. test on contents, rather than pointer:
 		return a.x == b.x;
 	}
-	
+
 	// Optional: Property Access
-	// It's possible to distinguish between methods and properties, making a userdata 
-	// look more like a table.  Methods are typically actions and properties are 
+	// It's possible to distinguish between methods and properties, making a userdata
+	// look more like a table.  Methods are typically actions and properties are
 	// typically state values.  For example:
 	// object:draw() v. object.radius = 1.2 or local radius = object.radius
 	// Properties can defined as read-only, write-only, or read-write.
-	
+
 	// registering the methods and properties:
 	template<> void Glue<Object>::usr_mt(lua_State * L) {
 		static luaL_reg methods[] = {
@@ -507,7 +507,7 @@ inline Lua& Lua::dump(const std::string& msg) {
 		};
 		Glue<Foo>::usr_attr_mt(L, methods, getters, setters);
 	}
-	
+
 	// __index meta-method
 	template<> bool Glue<Object>::usr_has_index() { return true;}
 
@@ -515,7 +515,7 @@ inline Lua& Lua::dump(const std::string& msg) {
 		Glue<Object>::usr_attr_index(L, u);
 	}
 
-	
+
 	// __newindex meta-method
 	template<> void Glue<Object>::usr_newindex(lua_State * L, Object * u) {
 		Glue<Object>::usr_attr_newindex(L, u);
@@ -523,105 +523,105 @@ inline Lua& Lua::dump(const std::string& msg) {
 
 	// attaching the necessary env table to the userdata
 	template<> void Glue<Object> :: usr_push(lua_State * L, Object * u) {
-		Glue<Object>::usr_attr_push(L);	
+		Glue<Object>::usr_attr_push(L);
 	}
-	
-	
+
+
 	// Registration
-	
+
 	// typically in the luaopen_x function of a module; after luaL_register(...)
 	// the module is at stack index -1
 	// first call Glue::define() for each bound class (in order of base class to sub class)
 	// then call either register_table for a module.Foo table, or register_ctor for module.Foo function,
 	// or simply call define() to register the type-binding without exposing a public user API in the module
-	
+
 	// Option 1: This will register the constructor as function Foo in the table at index -1
 	Glue<Foo>::define(L);
 	Glue<Foo>::register_ctor(L);
-	
+
 	// Option 2: This will register the metatable as table Foo in the table at index -1
 	Glue<Foo>::define(L);
 	Glue<Foo>::register_table(L);
-	
+
 	// Option 3: This will define the type, but not publish a constructor or metatable to the user:
 	template<> void Glue<Foo>::define(L);
-	
+
 */
 
 template <typename T>
 class Glue {
 public:
-	/*	
+	/*
 		required hook to define metatable name
 	*/
 	static const char * usr_name();
-	/*	
+	/*
 		optional hook to define metatable superclass name
 	*/
 	static const char * usr_supername();
-	
-	/*	
+
+	/*
 		optional hook to define a create function (default returns NULL)
 		arguments at stack indices 1+
 	*/
 	static T * usr_new(lua_State * L);
-	
-	/*	
-		optional hook to specify __gc method (default is no action) 
-		NB: multiple calls to push() the same object will result in an equal 
-			number of calls to gc() the same object (i.e. some form of reference 
+
+	/*
+		optional hook to specify __gc method (default is no action)
+		NB: multiple calls to push() the same object will result in an equal
+			number of calls to gc() the same object (i.e. some form of reference
 			counting may be appropriate)
 	*/
 	static void usr_gc(lua_State * L, T * u);
-	
-	/*	
-		optional hook to apply additional behavior when pushing a T into Lua 
+
+	/*
+		optional hook to apply additional behavior when pushing a T into Lua
 			(e.g. reference count increment, create userdata environment, etc.)
 		userdata is at stack index -1
 	*/
 	static void usr_push(lua_State * L, T * u);
-	
-	
+
+
 	/*
-		optional hook to signal the use of usr_index.  If defined, 
-		the __index metamethod will us usr_index instead of directly 
+		optional hook to signal the use of usr_index.  If defined,
+		the __index metamethod will us usr_index instead of directly
 		using the metatable
 	*/
-	static bool usr_has_index();	
-	
-	/*	
-		optional hook to specify __index method (default is to use the metatable) 
+	static bool usr_has_index();
+
+	/*
+		optional hook to specify __index method (default is to use the metatable)
 		key will be at stack index 2
 		(userdata itself is at index 1)
-		
+
 		NOTE: usr_has_index() must return true if this is used
 	*/
 	static void usr_index(lua_State * L, T * u);
-	
-	/*	
-		optional hook to specify __newindex method (default is to signal an error) 
+
+	/*
+		optional hook to specify __newindex method (default is to signal an error)
 		key will be at stack index 2, value will be at stack index 3
 		(userdata itself is at index 1)
 	*/
 	static void usr_newindex(lua_State * L, T * u);
-	
-	/*	
-		optional hook to specify __eq method 
+
+	/*
+		optional hook to specify __eq method
 			(default tests equality of pointers a and b)
 		NB: Will only apply for objects of the same T (not superclasses)
-			The Lua manual states that the __eq metamethod "only is selected 
-			when both objects being compared have the same type and the same 
+			The Lua manual states that the __eq metamethod "only is selected
+			when both objects being compared have the same type and the same
 			metamethod for the selected operation."
 	*/
 	static bool usr_eq(lua_State * L, T * a, T * b);
-	
-	/*	
-		optional hook to convert non-userdata value at stack index idx to a T 
+
+	/*
+		optional hook to convert non-userdata value at stack index idx to a T
 		e.g. convert a number into a T object...
 	*/
 	static T * usr_reinterpret(lua_State * L, int idx);
-	
-	/*	
+
+	/*
 		optional extra hook when retrieving a T from Lua (invoked by Glue::to(), Glue::checkto() etc.)
 		this is an opportunity to insert extra conditions on verifying the userdata as of valid type
 			(e.g. checking for a magic number within u)
@@ -629,51 +629,51 @@ public:
 		(Lua userdata is at stack index idx)
 	*/
 	static T * usr_to(lua_State * L, T * u, int idx);
-	
-	/*	
-		optional hook to override the default __tostring method 
+
+	/*
+		optional hook to override the default __tostring method
 	*/
 	static int usr_tostring(lua_State * L, T * u);
-	
-	/*	
+
+	/*
 		optional hook to add additional fields to metatable
 		metatable is at stack index -1
 	*/
 	static void usr_mt(lua_State * L);
 
-	/*	create the metatable 
-		if superclass != NULL, metatable will inherit from the superclass metatable 
+	/*	create the metatable
+		if superclass != NULL, metatable will inherit from the superclass metatable
 			(which must already be published)
 		call this e.g. in luaopen_xxx
 	*/
 	static void define(lua_State * L);
-	
+
 	/*	register either
-			the constructor function (create; usr_new must be defined) 
-			or the metatable itself 
+			the constructor function (create; usr_new must be defined)
+			or the metatable itself
 		to the table at stack index -1, under the name usr_name
 		call this e.g. in luaopen_xxx
 	*/
 	static void register_ctor(lua_State * L);
 	static void register_table(lua_State * L);
-	
+
 	/*
 		make the metatable callable with __call
 	*/
 	static void register_class(lua_State * L);
-	
+
 	/*
 		Register the metatable as a module with name libname.
-		This puts the metatable in package.loaded[libname] and leaves 
+		This puts the metatable in package.loaded[libname] and leaves
 		the table on the top of the stack.
 	*/
 	static void register_module(lua_State * L, const char *libname);
-	
+
 	/*	Install additional methods to metatable via a luaL_Reg array */
 	static void usr_lib(lua_State * L, const luaL_Reg * lib);
-	
-	/*	
-		push a T pointer to the Lua space (also calls usr_push if defined) 
+
+	/*
+		push a T pointer to the Lua space (also calls usr_push if defined)
 		NB: pushing the same object will create a new userdatum for each push
 	*/
 	static int push(lua_State * L, T * u);
@@ -685,57 +685,57 @@ public:
 	static int create(lua_State * L);
 	/*	zero the pointer in the userdata */
 	static void erase(lua_State * L, int idx);
-	
-	
+
+
 	/*
-		Intended for use in a custom usr_mt function for registering userdata 
-		functions that operate like table fields as opposed to function calls.  
+		Intended for use in a custom usr_mt function for registering userdata
+		functions that operate like table fields as opposed to function calls.
 		Additionally adds functionality for per-userdata custom fields with __newindex.
 	*/
 	static void usr_attr_mt(
-		lua_State *L, 
+		lua_State *L,
 		luaL_reg *methods,
-		luaL_reg *getters = NULL, 
+		luaL_reg *getters = NULL,
 		luaL_reg *setters = NULL
 	);
 
 	/*
-		Intended for use in a custom usr_push.  It adds an environment table to the 
-		userdata where per-userdata custom fields are stored.  An environment table is 
+		Intended for use in a custom usr_push.  It adds an environment table to the
+		userdata where per-userdata custom fields are stored.  An environment table is
 		required if usr_attr_index and usr_attr_newindex are also used.
 	*/
 	static void usr_attr_push(lua_State * L);
 
 	/*
-		Intended for use in usr_index.  First checks the enviroment table and then the 
+		Intended for use in usr_index.  First checks the enviroment table and then the
 		metatable.
 	*/
 	static int usr_attr_index(lua_State *L);
 
 	/*
-		Intended for use in usr_newindex.  First checks the metatable and then uses the 
+		Intended for use in usr_newindex.  First checks the metatable and then uses the
 		environment table.
 	*/
 	static int usr_attr_newindex(lua_State *L);
-	
+
 	/*
-		For userdata with attributes, prototype constructors (table constructors) can 
-		be used to automatically set settable attributes.  This function checks to see 
+		For userdata with attributes, prototype constructors (table constructors) can
+		be used to automatically set settable attributes.  This function checks to see
 		if the argument passed to usr_new is a prototype argument.
 	*/
 	static bool usr_attr_is_prototype(lua_State *L, int idx=1);
-	
+
 	/*
-		Uses a prototype constructor to set a userdata's attributes.  Intended to be used 
+		Uses a prototype constructor to set a userdata's attributes.  Intended to be used
 		in usr_attr_push where index 1 is the prototype table and index -1 is the userdata.
 		usr_attr_prototype will call usr_attr_is_prototype to check if it can be used.
 	*/
 	static int usr_attr_prototype(lua_State *L);
-	
-	
+
+
 	/*
-		Utility functions for mapping pointers to userdata values.  Used most often in callback 
-		situations when you need to go from a pointer to the actual userdata value in Lua 
+		Utility functions for mapping pointers to userdata values.  Used most often in callback
+		situations when you need to go from a pointer to the actual userdata value in Lua
 		and don't want to create a totally new userdata.
 	*/
 	static int usr_set_reference_map(lua_State *L, T *u);
@@ -786,9 +786,9 @@ template <typename T> void Glue<T> :: usr_index(lua_State * L, T * u) {
 template <typename T> void Glue<T> :: usr_newindex(lua_State * L, T * u) {
 	luaL_error(L, "cannot assign keys/values to %s", Glue<T>::usr_name());
 }
-template <typename T> int Glue<T> :: usr_tostring(lua_State * L, T * u) { 
-	lua_pushfstring(L, "%s: %p", Glue<T>::usr_name(), u); 
-	return 1; 
+template <typename T> int Glue<T> :: usr_tostring(lua_State * L, T * u) {
+	lua_pushfstring(L, "%s: %p", Glue<T>::usr_name(), u);
+	return 1;
 }
 template <typename T> bool Glue<T> :: usr_eq(lua_State * L, T * a, T * b) {
 	return a == b;
@@ -804,13 +804,13 @@ template <typename T> int Glue<T> :: push(lua_State * L, T * u) {
 	luaL_getmetatable(L, mt_name(L));
 	lua_setmetatable(L, -2);
 	udata->ptr = u;
-	usr_push(L, u);	
+	usr_push(L, u);
 	return 1;
 }
 
 template <typename T> int Glue<T> :: create(lua_State * L) {
 	T * u = usr_new(L);
-	if (!u) 
+	if (!u)
 		luaL_error(L, "Error creating %s", usr_name());
 	push(L, u);
 	return 1;
@@ -872,13 +872,13 @@ template <typename T> void Glue<T> :: define(lua_State * L) {
 
 	int u_mt = lua_gettop(L);
 	usr_mt(L);
-	
+
 	if (usr_supername() != NULL) {
 		const char * supername = lua_pushfstring(L, "meta_%s", usr_supername()); lua_pop(L, 1);
 		luaL_getmetatable(L, supername);
 		lua_setmetatable(L, -2);
 	}
-	
+
 	lua_settop(L, u_mt-1);
 }
 
@@ -912,36 +912,36 @@ template <typename T> void Glue<T> :: register_module(lua_State * L, const char 
 			luaL_getmetatable(L, mt_name(L));
 			lua_setfield(L, -2, libname);
 	lua_pop(L, 2);
-	
+
 	luaL_getmetatable(L, mt_name(L));
 }
 
 
-template <typename T> int Glue<T> :: gc(lua_State * L) { 
-	T * u = to(L, 1); 
-	if (u) { 
-		Glue<T>::usr_gc(L, u); 
+template <typename T> int Glue<T> :: gc(lua_State * L) {
+	T * u = to(L, 1);
+	if (u) {
+		Glue<T>::usr_gc(L, u);
 		// is this really necessary?
 		lua_pushnil(L);
 		lua_setmetatable(L, 1);
-	} 
-	return 0; 
+	}
+	return 0;
 }
 
-template <typename T> int Glue<T> :: index(lua_State * L) { 
-	T * u = to(L, 1); 
-	if (u) { 
-		Glue<T>::usr_index(L, u); 
-	} 
-	return 1; 
+template <typename T> int Glue<T> :: index(lua_State * L) {
+	T * u = to(L, 1);
+	if (u) {
+		Glue<T>::usr_index(L, u);
+	}
+	return 1;
 }
 
 template <typename T> int Glue<T> :: newindex(lua_State * L) {
-	T * u = to(L, 1); 
-	if (u) { 
-		Glue<T>::usr_newindex(L, u); 
-	} 
-	return 0; 
+	T * u = to(L, 1);
+	if (u) {
+		Glue<T>::usr_newindex(L, u);
+	}
+	return 0;
 }
 template <typename T> int Glue<T> :: eq(lua_State * L) {
 	T * a = to(L, 1);
@@ -962,8 +962,8 @@ template <typename T> const char * Glue<T> :: mt_name(lua_State * L) {
 }
 
 template <typename T> void Glue<T>::usr_attr_mt(
-	lua_State *L, 
-	luaL_reg *methods, 
+	lua_State *L,
+	luaL_reg *methods,
 	luaL_reg *getters,
 	luaL_reg *setters
 ) {
@@ -971,7 +971,7 @@ template <typename T> void Glue<T>::usr_attr_mt(
 		lua_pushcfunction(L, methods[i].func);
 		lua_setfield(L, -2, methods[i].name);
 	}
-	
+
 	lua_newtable(L);
 	if(getters) {
 		for(int i=0; getters[i].name; i++) {
@@ -980,7 +980,7 @@ template <typename T> void Glue<T>::usr_attr_mt(
 		}
 	}
 	lua_setfield(L, -2, "__getters");
-	
+
 
 	lua_newtable(L);
 	if(setters) {
@@ -1003,7 +1003,7 @@ template <typename T> int Glue<T>::usr_attr_index(lua_State *L) {
 	lua_pushvalue(L, 2);
 	lua_rawget(L, -2);
 	if(lua_isnil(L, -1)) {
-		lua_pop(L, 1);	// bad result; but leave metatable there... 
+		lua_pop(L, 1);	// bad result; but leave metatable there...
 		// next try __getters:
 		lua_pushstring(L, "__getters");
 		lua_rawget(L, -2);
@@ -1027,7 +1027,7 @@ template <typename T> int Glue<T>::usr_attr_index(lua_State *L) {
 		}
 	}
 	return 1;
-	
+
 //	lua_getfenv(L, 1);
 //	lua_pushvalue(L, 2);
 //	lua_rawget(L, -2);
@@ -1038,15 +1038,15 @@ template <typename T> int Glue<T>::usr_attr_index(lua_State *L) {
 //
 //		lua_pushvalue(L, 2);
 //		lua_rawget(L, -2);
-//		
+//
 //		if(lua_isnil(L, -1)) {
 //			lua_pop(L, 1);
 //			lua_pushstring(L, "__getters");
 //			lua_rawget(L, -2);
-//			
+//
 //			lua_pushvalue(L, 2);
 //			lua_rawget(L, -2);
-//			
+//
 //			if(lua_type(L, -1) == LUA_TFUNCTION) {
 //				lua_pushvalue(L, 1);
 //				int err = lua_pcall(L, 1, 1, 0);
@@ -1061,7 +1061,7 @@ template <typename T> int Glue<T>::usr_attr_index(lua_State *L) {
 //			}
 //		}
 //	}
-//	
+//
 //	return 1;
 }
 
@@ -1103,11 +1103,11 @@ template <typename T> int Glue<T>::usr_attr_newindex(lua_State *L) {
 //	lua_rawget(L, -2);
 //		lua_pushvalue(L, 2);
 //		lua_rawget(L, -2);
-//		
+//
 //	if(lua_type(L, -1) == LUA_TFUNCTION) {
 //		lua_pushvalue(L, 1);
 //		lua_pushvalue(L, 3);
-//		
+//
 //		int err = lua_pcall(L, 2, 0, 0);
 //		if(err) {
 //			luaL_error(L, "error indexing %s.%s: %s\n",
@@ -1120,7 +1120,7 @@ template <typename T> int Glue<T>::usr_attr_newindex(lua_State *L) {
 //	}
 //	else {
 //		lua_pop(L, 3);
-//		
+//
 //		lua_getfenv(L, 1);
 //		lua_pushvalue(L, 2);
 //		lua_pushvalue(L, 3);
@@ -1176,13 +1176,13 @@ template <typename T> int Glue<T>::usr_set_reference_map(lua_State *L, T *u) {
 	if(lua_isnil(L, -1)) {
 		lua_pop(L, 1);
 		lua_newtable(L);
-		
+
 		// make weak values
 		lua_newtable(L);
 		lua_pushstring(L, "v");
 		lua_setfield(L, -2, "__mode");
 		lua_setmetatable(L, -2);
-		
+
 		lua_setfield(L, -2, USERDATA_REF_MAP_FIELD);
 		lua_getfield(L, -1, USERDATA_REF_MAP_FIELD);
 	}

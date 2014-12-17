@@ -19,59 +19,59 @@ static const char * predistortVS = AL_STRINGIFY(
 	uniform vec3 sphere_center;
 	uniform float sphere_radius;
 	uniform float x_scale, y_scale, x_shift, y_shift;
-	
+
 	varying vec3 C; // for debugging
-	
+
 	vec4 warp(in vec3 vertex, in vec3 projector_position, in vec3 x_unit, in vec3 y_unit, in vec3 z_unit, in float aspect, in float near, in float far) {
-	
+
 		// translate the vertex into sphere-space:
 		vec3 vertex_in_sphere = vertex - sphere_center;
-		
+
 		// translate the projector into sphere-space:
 		vec3 projector_in_sphere = projector_position - sphere_center;
-		
+
 		// depth based on the eye-space length:
 		float distance = length(vertex_in_sphere);
-		
+
 		// find intersection point with sphere surface:
 		vec3 surface_intersection = sphere_radius * vertex_in_sphere / distance;
-	
+
 		// translate & rotate this into the projector's coordinate frame
 		// this will be used to determine the XY position
 		mat3 rotmat = mat3(
-			x_unit.x, 	y_unit.x, 	z_unit.x, 
+			x_unit.x, 	y_unit.x, 	z_unit.x,
 			x_unit.y, 	y_unit.y, 	z_unit.y,
 			x_unit.z, 	y_unit.z, 	z_unit.z
 		);
 		vec3 vertex_in_projector = rotmat * (surface_intersection - projector_in_sphere);
-		
+
 		// do perspective division on this vertex
 		// according to the distance from the projector:
 		vec2 uv = vertex_in_projector.xy / vertex_in_projector.z;
-		
+
 		// take into account the field of view:
 		uv.x *= x_scale;
 		uv.y *= y_scale;
-		
+
 		// adjust for projector lens shift
 		uv.x -= x_shift;
 		uv.y -= y_shift;
-		
+
 		uv.y *= -1.; // GL is upside down
-		
+
 		// reverse the XY position for points behind
 		uv.xy *= sign(vertex_in_projector.z);
-	
+
 		// depth value should relate to the length of vertex_in_sphere
 		// but sign of depth depends on whether the vertex is in front or behind the projection plane
 		float depth = -distance * sign(vertex_in_projector.z);
-		
+
 		// scale z to the near/far planes for depth-testing / clipping
 		// perspective-style depth (divided by -depth for the perspective)
-		float z = ((2./depth)*far*near + far+near)/(far-near); 
-		
+		float z = ((2./depth)*far*near + far+near)/(far-near);
+
 		// assign to output
-		return vec4(uv, z, 1);		
+		return vec4(uv, z, 1);
 	}
 
 	void main() {
@@ -81,20 +81,20 @@ static const char * predistortVS = AL_STRINGIFY(
 
 		// apply warp:
 		vec4 warped = warp(vertex.xyz, projector_position, x_unit, y_unit, normal_unit, aspect, near, far);
-		
+
 		gl_Position = warped;
-		
-		
+
+
 		// debug coloring
 		C = gl_Color.rgb; //abs(gl_Vertex.xyz / 8.);
 	}
 );
 static const char * predistortFS = AL_STRINGIFY(
 	varying vec3 C; // for debugging
-	
+
 	void main(){
 		gl_FragColor = vec4(C, 1);
-	}	
+	}
 );
 
 // this shader is just to show the geometry map:
@@ -195,10 +195,10 @@ static const char * demoFS = AL_STRINGIFY(
 	uniform vec4 quat;
 	varying vec2 texcoord0;
 	uniform float eyesep;
-	
+
 	float pi = 3.141592653589793;
 	float piover2 = 1.570796326794897;
-	
+
 	// q must be a normalized quaternion
 	vec3 quat_rotate(in vec4 q, in vec3 v) {
 		// return quat_mul(quat_mul(q, vec4(v, 0)), quat_conj(q)).xyz;
@@ -233,12 +233,12 @@ static const char * demoFS = AL_STRINGIFY(
 			p.w*q.z + p.z*q.w + p.x*q.y - p.y*q.x   // z
 		);
 	}
-	
+
 	// pn is the normal to the plane
 	vec3 projection_on_plane(vec3 v, vec3 pn) {
 		return v - dot(v, pn) * pn;
 	}
-	
+
 	// SIGNED DISTANCE ESTIMATION FUNCTIONS //
 
 	// for distance ops, the transforms are inverted:
@@ -260,7 +260,7 @@ static const char * demoFS = AL_STRINGIFY(
 		float s = sin(theta);
 		return vec3(p.x*c - p.z*s, p.y, p.x*s + p.z*c);
 	}
-	
+
 //	// twist
 //	vec3 opTwist( vec3 p ) {
 //		float c = cos(twparam1); //*p.y);
@@ -313,24 +313,24 @@ static const char * demoFS = AL_STRINGIFY(
 	float udBox( vec3 p, vec3 b ) {
 	  return length(max(abs(p)-b, 0.0));
 	}
-	
+
 	float sdTorus( vec3 p, vec2 t ){
 		vec2 q = vec2(length(p.xz)-t.x,p.y);
 		return length(q)-t.y;
 	}
-	
+
 	float length8(vec3 p) {
 		return pow(pow(p.x,8.) + pow(p.y,8.) + pow(p.z,8.),1./8.);
 	}
 	float length8(vec2 p) {
 		return pow(pow(p.x,8.) + pow(p.y,8.),1./8.);
 	}
-	
+
 	float sdTorus88( vec3 p, vec2 t ) {
 		vec2 q = vec2(length8(p.xz)-t.x,p.y);
 		return length8(q)-t.y;
 	}
-	
+
 	// hexagoanal prism
 	float udHexPrism( vec3 p, vec2 h )
 	{
@@ -358,7 +358,7 @@ static const char * demoFS = AL_STRINGIFY(
 		for( float t=mint; t < maxt; ) {
 			float h = map(ro + rd*t);
 			// keep looking:
-			t += h * 0.5; 
+			t += h * 0.5;
 			// blurry penumbra:
 			res = min( res, k*h/t );
 			if( h<mindt ) {
@@ -368,8 +368,8 @@ static const char * demoFS = AL_STRINGIFY(
 		}
 		return res;
 	}
-	
-	void main(){	
+
+	void main(){
 		vec3 light1 = pos + vec3(1, 2, 3);
 		vec3 light2 = pos + vec3(2, -3, 1);
 		vec3 color1 = vec3(0.3, 0.7, 0.6);
@@ -382,31 +382,31 @@ static const char * demoFS = AL_STRINGIFY(
 		vec3 nv = quat_rotate(centerquat, normalize(v-centerpos));
 		// ray direction (world space);
 		vec3 rd = quat_rotate(quat, nv);
-		
-		// stereo offset: 
+
+		// stereo offset:
 		// should reduce to zero as the nv becomes close to (0, 1, 0)
 		// take the vector of nv in the XZ plane
 		// and rotate it 90' around Y:
 		vec3 up = vec3(0, 1, 0);
-		
+
 		vec3 rdx = cross(normalize(rd), up);
-		
+
 		//vec3 rdx = projection_on_plane(rd, up);
 		vec3 eye = rdx * eyesep * 0.02;
-		
+
 		// ray origin (world space)
 		vec3 ro = pos + eye;
-		
+
 		// initial eye-ray to find object intersection:
 		float mindt = 0.01;	// how close to a surface we can get
 		float mint = mindt;
 		float maxt = 50.;
 		float t=mint;
 		float h = maxt;
-		
+
 		// find object intersection:
 		vec3 p = ro + mint*rd;
-		
+
 		int steps = 0;
 		int maxsteps = 50;
 		for (t; t<maxt;) {
@@ -425,17 +425,17 @@ static const char * demoFS = AL_STRINGIFY(
 			// Normals computed by central differences on the distance field at the shading point (gradient approximation).
 			// larger eps leads to softer edges
 			float eps = 0.01;
-			vec3 grad = vec3( 
+			vec3 grad = vec3(
 				map(p+vec3(eps,0,0)) - map(p-vec3(eps,0,0)),
 				map(p+vec3(0,eps,0)) - map(p-vec3(0,eps,0)),
-				map(p+vec3(0, 0, eps)) - map(p-vec3(0,0,eps))  
+				map(p+vec3(0, 0, eps)) - map(p-vec3(0,0,eps))
 			);
 			vec3 normal = normalize(grad);
-			
+
 			// compute ray to light source:
 			vec3 ldir1 = normalize(light1 - p);
 			vec3 ldir2 = normalize(light2 - p);
-			
+
 			// abs for bidirectional surfaces
 			float ln1 = max(0.,dot(ldir1, normal));
 			float ln2 = max(0.,dot(ldir2, normal));
@@ -447,16 +447,16 @@ static const char * demoFS = AL_STRINGIFY(
 			float smint = 0.001;
 			float nudge = 0.01;
 			float smaxt = maxt;
-			
+
 			color = ambient
-					+ color1 * ln1 //* shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k) 
+					+ color1 * ln1 //* shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k)
 					+ color2 * ln2 //* shadow(p+normal*smint, ldir2, smint, smaxt, mindt, k)
 					;
-	
+
 			//color = 	ambient +
-			//		color1 * ln1 + 
+			//		color1 * ln1 +
 			//		color2 * ln2;
-			
+
 			/*
 			// Ambient Occlusion:
 			// sample 5 neighbors in direction of normal
@@ -472,9 +472,9 @@ static const char * demoFS = AL_STRINGIFY(
 			}
 			ao = 1. - aok * ao;
 			color *= ao;
-			*/		
-			
-		
+			*/
+
+
 			// fog:
 			float tnorm = t/maxt;
 			float fog = 1. - tnorm*tnorm;
@@ -482,8 +482,8 @@ static const char * demoFS = AL_STRINGIFY(
 		}
 
 		float a = texture2D(alphaMap, texcoord0).r;
-		
-		gl_FragColor = vec4(color, 1) * a; 
+
+		gl_FragColor = vec4(color, 1) * a;
 	}
 );
 
@@ -493,7 +493,7 @@ static const char * warpVS = AL_STRINGIFY(
 	//varying vec2 texcoord0;
 	void main(){
 		//texcoord0 = vec2(gl_MultiTexCoord0);
-		gl_TexCoord[0]=gl_MultiTexCoord0; 
+		gl_TexCoord[0]=gl_MultiTexCoord0;
 		vec4 vertex = gl_Vertex;
 		gl_Position = gl_ModelViewProjectionMatrix * vertex;
 	}
@@ -506,12 +506,12 @@ static const char * warpFS = AL_STRINGIFY(
 	float pi = 3.141592653589793;
 	void main(){
 		vec2 texcoord0 = gl_TexCoord[0].st;
-		
+
 		vec2 g = texture2D(geometryMap, texcoord0).xw;
 		//g.y = 1.-g.y;
 		// x = g.x;, y = g.w
 		//g.xy += 0.5*(cos((texcoord0 + 1.) * pi) + 1.);
-		
+
 		//g = g*0.0001 + texcoord0;
 
 		vec4 s = texture2D(scene, g);
@@ -535,36 +535,36 @@ void WarpnBlend::Projector::print() {
 	printf("%f = screen_radius\n", screen_radius);
 	printf("%f = x_pixel\n", x_pixel);
 	printf("%f = y_pixel\n", y_pixel);
-}	
+}
 
 void WarpnBlend::Projector::init() {
 
 	screen_radius = screen_center.mag();
 	screen_center_unit = screen_center / screen_radius;
-	
+
 	Vec3f v = sphere_center + screen_center - projector_position;
 	float screen_perpendicular_dist = normal_unit.dot(v);
 	Vec3f compensated_center = (v) / screen_perpendicular_dist + projector_position;
-	
+
 	// calculate uv parameters
 	float x_dist = x_vec.mag();
 	x_unit = x_vec / x_dist;
 	x_pixel = x_dist / width;
 	x_offset = x_unit.dot(compensated_center - projector_position);
-	
+
 	float y_dist = y_vec.mag();
 	y_unit = y_vec / y_dist;
 	y_pixel = y_dist / height;
 	y_offset = y_unit.dot(compensated_center - projector_position);
-}	
+}
 
 WarpnBlend::WarpnBlend() {
 	loaded = false;
 	imgpath = "./img/";
 	printf("created WarpnBlend %s\n", imgpath.c_str());
-	
+
 	pixelMesh.primitive(gl.POINTS);
-	
+
 	testscene.primitive(gl.LINES);
 	float step = 0.02;
 	for (int x=0; x<=1; x++) { //x+=step) {
@@ -574,12 +574,12 @@ WarpnBlend::WarpnBlend() {
 		testscene.vertex(x, y, z);
 		testscene.color(x, y, z+step);
 		testscene.vertex(x, y, z+step);
-		
+
 		testscene.color(y, z, x);
 		testscene.vertex(y, z, x);
 		testscene.color(y, z+step, x);
 		testscene.vertex(y, z+step, x);
-		
+
 		testscene.color(z, x, y);
 		testscene.vertex(z, x, y);
 		testscene.color(z+step, x, y);
@@ -593,75 +593,75 @@ void WarpnBlend::onCreate() {
 	geomV.source(geomVS, Shader::VERTEX).compile();
 	geomF.source(geomFS, Shader::FRAGMENT).compile();
 	geomP.attach(geomV).attach(geomF).link();
-	
+
 	geomV.printLog();
 	geomF.printLog();
 	geomP.printLog();
-	
+
 	geomV3D.source(geomVS3D, Shader::VERTEX).compile();
 	geomF3D.source(geomFS3D, Shader::FRAGMENT).compile();
 	geomP3D.attach(geomV3D).attach(geomF3D).link();
-	
+
 	geomV3D.printLog();
 	geomF3D.printLog();
 	geomP3D.printLog();
-	
+
 	geomVI3D.source(geomVSI3D, Shader::VERTEX).compile();
 	geomFI3D.source(geomFSI3D, Shader::FRAGMENT).compile();
 	geomPI3D.attach(geomVI3D).attach(geomFI3D).link();
-	
+
 	geomVI3D.printLog();
 	geomFI3D.printLog();
 	geomPI3D.printLog();
-	
+
 	alphaV.source(alphaVS, Shader::VERTEX).compile();
 	alphaF.source(alphaFS, Shader::FRAGMENT).compile();
 	alphaP.attach(alphaV).attach(alphaF).link();
-	
+
 	alphaV.printLog();
 	alphaF.printLog();
 	alphaP.printLog();
-	
+
 	demoV.source(demoVS, Shader::VERTEX).compile();
 	demoF.source(demoFS, Shader::FRAGMENT).compile();
 	demoP.attach(demoV).attach(demoF).link();
-	
+
 	demoV.printLog();
 	demoF.printLog();
 	demoP.printLog();
-	
+
 	warpV.source(warpVS, Shader::VERTEX).compile();
 	warpF.source(warpFS, Shader::FRAGMENT).compile();
 	warpP.attach(warpV).attach(warpF).link();
-	
+
 	warpV.printLog();
 	warpF.printLog();
 	warpP.printLog();
-	
+
 	predistortV.source(predistortVS, Shader::VERTEX).compile();
 	predistortF.source(predistortFS, Shader::FRAGMENT).compile();
 	predistortP.attach(predistortV).attach(predistortF).link();
-	
+
 	predistortV.printLog();
 	predistortF.printLog();
 	predistortP.printLog();
-	
+
 	geometryMap.filterMin(Texture::LINEAR_MIPMAP_LINEAR);
 	geometryMap.filterMag(Texture::LINEAR);
 	geometryMap.texelFormat(GL_LUMINANCE_ALPHA32F_ARB);
 	geometryMap.dirty();
-	
+
 	pixelMap.filterMin(Texture::LINEAR_MIPMAP_LINEAR);
 	pixelMap.filterMag(Texture::LINEAR);
 	pixelMap.texelFormat(GL_RGB32F_ARB);
 	pixelMap.dirty();
-	
+
 //	inversePixelMap.filterMin(Texture::LINEAR_MIPMAP_LINEAR);
 //	inversePixelMap.filterMag(Texture::LINEAR);
 //	inversePixelMap.texelFormat(GL_RGB32F_ARB);
 //	inversePixelMap.wrap(Texture::REPEAT);
 //	inversePixelMap.dirty();
-	
+
 	alphaMap.filterMin(Texture::LINEAR_MIPMAP_LINEAR);
 	alphaMap.filterMag(Texture::LINEAR);
 	alphaMap.dirty();
@@ -709,13 +709,13 @@ void WarpnBlend::drawWarp3D() {
 void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect, double uvscalar, bool blend) {
 	if (!loaded) return;
 	Graphics gl;
-	
-	
+
+
 	//gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
 	gl.projection(Matrix4d::perspective(72, aspect, 0.1, 100));
 	gl.modelView(Matrix4d::lookAt(pose.pos(), pose.pos() + pose.uf(), pose.uy()));
-	
-	
+
+
 	predistortP.begin();
 	predistortP.uniform("projector_position", projector.projector_position);
 	//predistortP.uniform("projector_position", Vec3f(0.5, 0.5, 0.5));
@@ -733,30 +733,30 @@ void WarpnBlend::drawPreDistortDemo(const Pose& pose, float aspect, double uvsca
 	predistortP.uniform("sphere_center", projector.sphere_center);
 	predistortP.uniform("sphere_radius", projector.screen_radius);
 	//predistortP.uniform("alphaMap", 1);
-	
+
 	//alphaMap.bind(1);
-	
+
 	// draw some stuff:
 	gl.draw(testscene);
-	
+
 	//alphaMap.unbind(1);
-	
+
 	predistortP.end();
-	
+
 	if (blend) {
 		gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
 		gl.modelView(Matrix4d::identity());
-		
+
 		// now draw the blend mask:
 		gl.blending(true);
 		gl.blendMode(Graphics::SRC_ALPHA, Graphics::ONE_MINUS_SRC_ALPHA, Graphics::FUNC_ADD);
 		gl.depthTesting(false);
 		gl.depthMask(false);
-		
+
 		alphaP.begin();
 		alphaMap.quad(gl);
 		alphaP.end();
-		
+
 		gl.blending(false);
 		gl.depthTesting(true);
 		gl.depthMask(true);
@@ -780,7 +780,7 @@ void WarpnBlend::drawDemo(const Pose& pose, double eyesep) {
 	demoP.begin();
 	demoP.uniform("pixelMap", 0);
 	demoP.uniform("alphaMap", 1);
-	demoP.uniform("pos", pose.pos()); 
+	demoP.uniform("pos", pose.pos());
 	demoP.uniform("eyesep", eyesep);
 	demoP.uniform("quat", pose.quat());
 	demoP.uniform("centerpos", center.pos());
@@ -801,14 +801,14 @@ void WarpnBlend::drawBlend() {
 void alphademo(uint8_t * value, double normx, double normy) {
 	//*value = 255.;
 	// fade out at edges:
-	*value = 255. * al::min(1., 10.*(0.5 - fabs(normx-0.5))) * al::min(1., 10.*(0.5 - fabs(normy-0.5))); 
+	*value = 255. * al::min(1., 10.*(0.5 - fabs(normx-0.5))) * al::min(1., 10.*(0.5 - fabs(normy-0.5)));
 }
 
 void pixeldemo(float * value, double normx, double normy) {
 	// spherical map:
 	float az = M_2_PI * (normx - 0.5);
 	float el = M_PI * (normy - 0.5);
-	
+
 	// is this the right axis convention?
 	value[0] = sin(el)*cos(az);
 	value[1] = cos(el)*sin(az);
@@ -836,7 +836,7 @@ void WarpnBlend::readNone() {
 //	alphaMap.array().setall(1.f);
 //	alphaMap.dirty();
 //	alphaMap.print();
-//	
+//
 //	// generate a map3D:
 //	pixelMap.resize(64, 64);
 //	pixelMap.target(Texture::TEXTURE_2D);
@@ -846,7 +846,7 @@ void WarpnBlend::readNone() {
 //	pixelMap.allocate(4);
 //	pixelMap.array().fill(pixeldemo);
 //	pixelMap.dirty();
-//	
+//
 //	printf("loaded warpnblend defaults\n");
 }
 
@@ -863,7 +863,7 @@ void WarpnBlend::readID(std::string id) {
 
 void WarpnBlend::readBlend(std::string path) {
 	printf("blend:\n");
-	
+
 	Image img(path);
 	img.array().print();
 	alphaMap.allocate(img.array(), true);
@@ -876,32 +876,32 @@ void WarpnBlend::read3D(std::string path) {
 		printf("failed to open file %s\n", path.c_str());
 		exit(-1);
 	}
-	
+
 	int32_t dim[2];
 	f.read((void *)dim, sizeof(int32_t), 2);
 	printf("reading map %s: %dx%d; ", path.c_str(), dim[0], dim[1]);
-	
+
 	int32_t w = dim[1];
 	int32_t h = dim[0]/3;
 	int32_t elems = w*h;
 	//printf("array %dx%d = %d\n", w, h, elems);
-	
-	int r = 0;	
-	
+
+	int r = 0;
+
 	float * t = (float *)malloc(sizeof(float) * elems);
 	r = f.read((void *)t, sizeof(float), elems);
 	//printf("read %d elements (array size %d)\n", r, elems);
-	
+
 	float * u = (float *)malloc(sizeof(float) * elems);
 	r = f.read((void *)u, sizeof(float), elems);
 	//printf("read %d elements (array size %d)\n", r, elems);
-	
+
 	float * v = (float *)malloc(sizeof(float) * elems);
 	r = f.read((void *)v, sizeof(float), elems);
 	//printf("read %d elements (array size %d)\n", r, elems);
-	
+
 	f.close();
-	
+
 	pixelMap.resize(w, h);
 	pixelMap.target(Texture::TEXTURE_2D);
 	pixelMap.format(Graphics::RGB);
@@ -911,7 +911,7 @@ void WarpnBlend::read3D(std::string path) {
 	pixelMap.print();
 	//pixelMap.array().print();
 	Array& arr = pixelMap.array();
-	
+
 //	inversePixelMap.resize(w, h);
 //	inversePixelMap.target(Texture::TEXTURE_2D);
 //	inversePixelMap.format(Graphics::RGBA);
@@ -925,45 +925,45 @@ void WarpnBlend::read3D(std::string path) {
 
 	int total = 0;
 	float sum = 0;
-	
+
 	for (int y=0; y<h; y++) {
 		for (int x=0; x<w; x++) {
 			// Y axis appears to be inverted
 			int32_t y1 = (h-y-1);
 			// input data is row-major format
-			int32_t idx = y1*w+x;	
-		
+			int32_t idx = y1*w+x;
+
 			float * cell = arr.cell<float>(x, y);
 			// coordinate system change:
 			cell[0] = t[idx];//*0.5+0.5;
 			cell[1] = u[idx];//*0.5+0.5;
 			cell[2] = v[idx];//*0.5+0.5;
-			
+
 			Vec3f n(cell[0], cell[1], cell[2]);
 			float mag = n.mag();
 			sum += mag;
 			total++;
-			
+
 			/*
 			Vec3f n(cell[0], cell[1], cell[2]);
 			// TODO: subtract from center & rotate first...
 			n = n.normalize();
-			
+
 			// convert to polar:
 			float d = sqrt(n.x*n.x + n.y*n.y + n.z*n.z);
 			float a = atan2(n.z, n.x);	// -pi..pi
 			float e = acos(n.y/d);	// 0..pi
-			
+
 			if (d >= 0.) {
-				
+
 				// normalize azimuth/elevation to texture dimensions:
 				int x1 = w * fmod(a + M_2PI, M_2PI) / M_2PI; //((a/M_PI)+0.5) * w;
 				int y1 = (e/M_PI) * h;
-				
+
 				if (x == w/2) {
 					//printf("%d, %d: ", x, y); n.print(); printf("-> %d %d (%f %f %f)\n", x1, y1, a, e, d);
 				}
-				
+
 				if (x1 >= 0 && x1 < w && y1 >= 0 && y1 < h) {
 					// TODO: use a blending splat instead:
 					float * cellinv = arrinv.cell<float>(x1, y1);
@@ -976,10 +976,10 @@ void WarpnBlend::read3D(std::string path) {
 			*/
 		}
 	}
-	
+
 	float avg = sum / total;
 	printf("average radius %f\n", avg);
-	
+
 	// also write this data into a mesh:
 	arr = pixelMap.array();
 	for (unsigned y=0; y<arr.height(); y++) {
@@ -989,7 +989,7 @@ void WarpnBlend::read3D(std::string path) {
 		pixelMesh.color(x/float(arr.width()), y/float(arr.height()), 0.);
 		pixelMesh.texCoord(x/float(arr.width()), y/float(arr.height()));
 	}}
-	
+
 	free(t);
 	free(u);
 	free(v);
@@ -1001,13 +1001,13 @@ void WarpnBlend::readProj(std::string path) {
 		printf("failed to open Projector configuration file %s\n", path.c_str());
 		return;
 	}
-	
+
 	f.read((void *)&projector, sizeof(Projector), 1);
 	f.close();
-	
+
 	projector.init();
 	projector.print();
-	
+
 }
 
 void WarpnBlend::readWarp(std::string path) {
@@ -1016,28 +1016,28 @@ void WarpnBlend::readWarp(std::string path) {
 		printf("failed to open file %s\n", path.c_str());
 		exit(-1);
 	}
-	
+
 	int32_t dim[2];
 	f.read((void *)dim, sizeof(int32_t), 2);
 	printf("reading map %dx%d; ", dim[0], dim[1]);
-	
+
 	int32_t w = dim[1];
 	int32_t h = dim[0]/2;
 	int32_t elems = w*h;
 	//printf("array %dx%d = %d\n", w, h, elems);
-	
-	int r = 0;	
-	
+
+	int r = 0;
+
 	float * u = (float *)malloc(sizeof(float) * elems);
 	r = f.read((void *)u, sizeof(float), elems);
 	//printf("read %d elements (array size %d)\n", r, elems);
-	
+
 	float * v = (float *)malloc(sizeof(float) * elems);
 	r = f.read((void *)v, sizeof(float), elems);
 	//printf("read %d elements (array size %d)\n", r, elems);
 
 	f.close();
-	
+
 	geometryMap.resize(w, h);
 	geometryMap.target(Texture::TEXTURE_2D);
 	geometryMap.format(Graphics::LUMINANCE_ALPHA);
@@ -1047,18 +1047,18 @@ void WarpnBlend::readWarp(std::string path) {
 	geometryMap.print();
 	//geometryMap.array().print();
 	Array& arr = geometryMap.array();
-	
+
 	float c0, c1;
-	
+
 	for (int y=0; y<h; y++) {
 		for (int x=0; x<w; x++) {
 			int32_t idx = y*w+x;	// row-major format
-		
+
 			float * cell = arr.cell<float>(x, y);
 			cell[0] = u[idx]*0.5+0.5;
 			cell[1] = v[idx]*0.5+0.5;
-			
-			
+
+
 			if (y == h/2) {
 				//printf("x %d y %d: u %f v %f\n", x, y, cell[0]-c0, cell[1]-c1);
 				c0 = cell[0];
@@ -1066,7 +1066,7 @@ void WarpnBlend::readWarp(std::string path) {
 			}
 		}
 	}
-	
+
 	free(u);
 	free(v);
 }
@@ -1077,25 +1077,25 @@ void WarpnBlend::readModelView(std::string path){
 		printf("failed to open file %s\n", path.c_str());
 		exit(-1);
 	}
-	
+
 	const char * src = f.readAll();
 	//printf("mv %s\n", src);
 	f.close();
-	
+
 	float p[16];
-	sscanf(src, "%f,%f,%f,%f\n%f,%f,%f,%f\n%f,%f,%f,%f\n%f,%f,%f,%f", 
+	sscanf(src, "%f,%f,%f,%f\n%f,%f,%f,%f\n%f,%f,%f,%f\n%f,%f,%f,%f",
 		&p[0], &p[4], &p[8], &p[12],
 		&p[1], &p[5], &p[9], &p[13],
 		&p[2], &p[6], &p[10], &p[14],
 		&p[3], &p[7], &p[11], &p[15]);
-		
+
 	for (int i=0; i<16; i++) {
 		modelView[i] = p[i];
 	}
 	//printf("modelView = ");
 	//modelView.print(stdout);
 	//printf("\n");
-	
+
 }
 void WarpnBlend::readPerspective(std::string path, double near, double far){
 	File f(path, "r");
@@ -1103,34 +1103,34 @@ void WarpnBlend::readPerspective(std::string path, double near, double far){
 		printf("failed to open file %s\n", path.c_str());
 		exit(-1);
 	}
-	
+
 	const char * src = f.readAll();
 	//printf("mv %s\n", src);
 	f.close();
-	
+
 	float p[16];
-	sscanf(src, "%f,%f,%f,%f\n%f,%f,%f,%f\n%f,%f,%f,%f\n%f,%f,%f,%f", 
+	sscanf(src, "%f,%f,%f,%f\n%f,%f,%f,%f\n%f,%f,%f,%f\n%f,%f,%f,%f",
 		&p[0], &p[4], &p[8], &p[12],
 		&p[1], &p[5], &p[9], &p[13],
 		&p[2], &p[6], &p[10], &p[14],
 		&p[3], &p[7], &p[11], &p[15]);
-		
+
 	for (int i=0; i<16; i++) {
 		perspective[i] = p[i];
 	}
-	
+
 	// override near/far:
-	const double D = far-near;	
+	const double D = far-near;
 	const double D2 = far+near;
 	const double fn2 = far*near*2;
 	perspective[10] = -D2/D;
 	perspective[14] = -fn2/D;
-	
+
 	//printf("Perspective = ");
 	//perspective.print(stdout);
 	//printf("\n");
 }
-	
+
 void WarpnBlend::rotate(const Matrix4d& r) {
 	modelView = modelView * r;
 }

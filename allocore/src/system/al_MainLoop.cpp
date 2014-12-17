@@ -72,7 +72,7 @@ static void mainGLUTExitFunc(){
 	Main::get().exit();
 }
 
-static void mainGLUTTimerFunc(int id) { 
+static void mainGLUTTimerFunc(int id) {
 	Main& M = Main::get();
 	M.tick();
 	if (M.isRunning()) {
@@ -90,11 +90,11 @@ Main::Handler :: ~Handler() {
 
 ////////////////////////////////////////////////////////////////
 
-Main::Main() 
-:	mT0(al_time()), mT1(0), 
-	mInterval(0.01), 
+Main::Main()
+:	mT0(al_time()), mT1(0),
+	mInterval(0.01),
 	mIntervalActual(0.01),
-	mLogicalTime(0), 
+	mLogicalTime(0),
 	mCPU(0),
 	mDriver(Main::SLEEP),
 	mActive(false)
@@ -108,25 +108,25 @@ Main::Main()
 
 Main::~Main() {
 	Main::exit();
-}	
+}
 
 void Main::tick() {
 	al_sec t1 = al_time();
 	mLogicalTime = t1 - mT0;
-	
+
 	mIntervalActual = t1 - mT1;
 	mT1 = t1;
-	
+
 	// trigger any scheduled functions:
 	mQueue.update(mLogicalTime);
-	
-	// call tick handlers... 
-	std::vector<Handler *>::iterator it = mHandlers.begin(); 
+
+	// call tick handlers...
+	std::vector<Handler *>::iterator it = mHandlers.begin();
 	while(it != mHandlers.end()){
-		(*it)->onTick(); 
-		++it; 
+		(*it)->onTick();
+		++it;
 	}
-	
+
 	// measure CPU usage:
 	al_sec t2 = al_time();
 	al_sec used = (t2-t1)/interval();
@@ -168,12 +168,12 @@ void Main::start() {
 
 				default:
 					// sleep version for non-GLUT:
-					tick();				
+					tick();
 					al_sleep(interval());
 					break;
 			}
 		}
-		
+
 		// if we got here, then the mainloop was started, and then stopped:
 		// trigger exit handlers:
 		Main::exit();
@@ -183,7 +183,7 @@ void Main::start() {
 void Main::stop() {
 	if (mActive) {
 		mActive = false;
-		
+
 		if (mDriver == GLUT) {
 			// GLUT can't be stopped; the only option is a hard exit. Yeah, it sucks that bad.
 			::exit(0); // Note: this will call our function registered with atexit()
@@ -192,11 +192,11 @@ void Main::stop() {
 }
 
 void Main::exit() {
-	// call exit handlers... 
-	std::vector<Handler *>::iterator it = mHandlers.begin(); 
+	// call exit handlers...
+	std::vector<Handler *>::iterator it = mHandlers.begin();
 	while(it != mHandlers.end()){
-		(*it)->onExit(); 
-		++it; 
+		(*it)->onExit();
+		++it;
 	}
 }
 

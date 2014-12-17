@@ -111,16 +111,16 @@ void AudioDevice::print() const{
 	if(!valid()){ printf("Invalid device\n"); return; }
 
 	printf("[%2d] %s, ", id(), name());
-	
+
 	int chans = channelsInMax();
 	if(chans > 0) printf("%2i in, ", chans);
 	chans = channelsOutMax();
 	if(chans > 0) printf("%2i out, ", chans);
 
 	printf("%.0f Hz\n", defaultSampleRate());
-	
+
 //	PaSampleFormat sampleFormats = info->nativeSampleFormats;
-//	
+//
 //	printf("[ ");
 //	if(0 != sampleFormats & paFloat32)		printf("f32 ");
 //	if(0 != sampleFormats & paInt32)		printf("i32 ");
@@ -129,7 +129,7 @@ void AudioDevice::print() const{
 //	if(0 != sampleFormats & paInt8)			printf("i8 ");
 //	if(0 != sampleFormats & paUInt8)		printf("ui8 ");
 //	printf("], ");
-	
+
 //	if(info->numSampleRates != -1){
 //		printf("[");
 //		for(int i=0; i<info->numSampleRates; i++){
@@ -167,7 +167,7 @@ struct AudioIOData::Impl{
 
 	bool supportsFPS(double fps) const {
 		const PaStreamParameters * pi = mInParams.channelCount  == 0 ? 0 : &mInParams;
-		const PaStreamParameters * po = mOutParams.channelCount == 0 ? 0 : &mOutParams;	
+		const PaStreamParameters * po = mOutParams.channelCount == 0 ? 0 : &mOutParams;
 		mErrNum = Pa_IsFormatSupported(pi, po, fps);
 		printError("AudioIO::Impl::supportsFPS");
 		return paFormatIsSupported == mErrNum;
@@ -256,7 +256,7 @@ AudioIO::AudioIO(
 	this->framesPerSecond(framesPerSec);
 }
 
-		
+
 AudioIO::~AudioIO(){
 	close();
 }
@@ -267,12 +267,12 @@ void AudioIO::init(){
 	// Choose default devices for now...
 	deviceIn(AudioDevice::defaultInput());
 	deviceOut(AudioDevice::defaultOutput());
-	
+
 //	inDevice(defaultInDevice());
 //	outDevice(defaultOutDevice());
-//	
+//
 //	// Setup input stream parameters
-//	const PaDeviceInfo * dInfo = Pa_GetDeviceInfo(mInParams.device);	
+//	const PaDeviceInfo * dInfo = Pa_GetDeviceInfo(mInParams.device);
 //	if(dInfo) mInParams.suggestedLatency = dInfo->defaultLowInputLatency; // for RT
 //	mInParams.sampleFormat = paFloat32;// | paNonInterleaved;
 //	//mInParams.sampleFormat = paInt16;
@@ -310,7 +310,7 @@ void AudioIO::deviceIn(const AudioDevice& v){
 //		printf("deviceIn: %s, %d\n", v.name(), v.id());
 		mInDevice = v;
 		mImpl->inDevice(v.id());
-		const PaDeviceInfo * dInfo = Pa_GetDeviceInfo(mImpl->mInParams.device);	
+		const PaDeviceInfo * dInfo = Pa_GetDeviceInfo(mImpl->mInParams.device);
 		if(dInfo) mImpl->mInParams.suggestedLatency = dInfo->defaultLowInputLatency; // for RT
 		mImpl->mInParams.sampleFormat = paFloat32;// | paNonInterleaved;
 		//mInParams.sampleFormat = paInt16;
@@ -360,7 +360,7 @@ void AudioIO::channels(int num, bool forOutput){
 	}
 
 	PaStreamParameters * params = forOutput ? &mImpl->mOutParams : &mImpl->mInParams;
-	
+
 	if(num == 0){
 		//params->device = paNoDevice;
 		params->channelCount = 0;
@@ -376,16 +376,16 @@ void AudioIO::channels(int num, bool forOutput){
 
 
 	// compute number of channels to give PortAudio
-	int maxChans = 
+	int maxChans =
 		(int)(forOutput ? info->maxOutputChannels : info->maxInputChannels);
-	
+
 	// -1 means open all channels
 	if(num == -1){
 		num = maxChans;
 	}
-	
+
 	int currentNum = channels(forOutput);
-	
+
 	if(num != currentNum){
 		params->channelCount = min(num, maxChans);
 		forOutput ? mNumO = num : mNumI = num;
@@ -403,10 +403,10 @@ bool AudioIO::open(){
 	i.mErrNum = paNoError;
 
 	if(!(i.mIsOpen || i.mIsRunning)){
-		
+
 		PaStreamParameters * inParams = &i.mInParams;
 		PaStreamParameters * outParams = &i.mOutParams;
-		
+
 		// Must pass in 0s for input- or output-only streams.
 		// Stream will not be opened if no device or channel count is zero
 		if((paNoDevice ==  inParams->device) || (0 ==  inParams->channelCount)) inParams  = 0;
@@ -450,7 +450,7 @@ int paCallback(
 		deinterleave(const_cast<float *>(&io.in(0,0)),  paI, io.framesPerBuffer(), io.channelsInDevice() );
 		//deinterleave(&io.out(0,0), paO, io.framesPerBuffer(), io.channelsOutDevice());
 	}
-	
+
 	if(io.autoZeroOut()) io.zeroOut();
 
 
@@ -459,19 +459,19 @@ int paCallback(
 
 	// apply smoothly-ramped gain to all output channels
 	if(io.usingGain()){
-	
+
 		float dgain = (io.mGain-io.mGainPrev) / io.framesPerBuffer();
-	
+
 		for(int j=0; j<io.channelsOutDevice(); ++j){
 			float * out = io.outBuffer(j);
 			float gain = io.mGainPrev;
-			
+
 			for(int i=0; i<io.framesPerBuffer(); ++i){
 				out[i] *= gain;
 				gain += dgain;
 			}
 		}
-		
+
 		io.mGainPrev = io.mGain;
 	}
 
@@ -483,13 +483,13 @@ int paCallback(
 			if(s != s) s = 0.f; // portable isnan; only nans do not equal themselves
 		}
 	}
-	
+
 	if(io.clipOut()){
 		for(int i=0; i<io.framesPerBuffer()*io.channelsOutDevice(); ++i){
 			float& s = (&io.out(0,0))[i];
 			if		(s<-1.f) s =-1.f;
 			else if	(s> 1.f) s = 1.f;
-		}		
+		}
 	}
 
 	if(bDeinterleave){
@@ -509,7 +509,7 @@ void AudioIO::resizeBuffer(bool forOutput){
 	float *& buffer = forOutput ? mBufO : mBufI;
 	int& chans      = forOutput ? mNumO : mNumI;
 
-	if(chans > 0){			
+	if(chans > 0){
 		int n = resize(buffer, chans * mFramesPerBuffer);
 		if(0 == n) chans = 0;
 	}
@@ -580,14 +580,14 @@ void AudioIO::print(){
 
 
 //void AudioIO::processAudio(){ frame(0); if(callback) callback(*this); }
-void AudioIO::processAudio(){ 
-	frame(0); 
-	if(callback) callback(*this); 
-	
-	std::vector<AudioCallback *>::iterator iter = mAudioCallbacks.begin(); 
+void AudioIO::processAudio(){
+	frame(0);
+	if(callback) callback(*this);
+
+	std::vector<AudioCallback *>::iterator iter = mAudioCallbacks.begin();
 	while(iter != mAudioCallbacks.end()){
-		frame(0); 
-		(*iter++)->onAudioCB(*this); 
+		frame(0);
+		(*iter++)->onAudioCB(*this);
 	}
 }
 

@@ -3,35 +3,35 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -56,15 +56,15 @@ namespace al {
 ///	A local coordinate frame
 
 ///	A Pose is a combined position (3-vector) and orientation (quaternion).
-/// Local coordinate bases are referred to as r, u, and f which stand for 
+/// Local coordinate bases are referred to as r, u, and f which stand for
 /// right, up, and forward, respectively.
 class Pose {
 public:
-	/// Construct from a 
+	/// Construct from a
 	Pose(const Vec3d& v=Vec3d(0), const Quatd& q=Quatd::identity())
 	:	mVec(v), mQuat(q)
 	{}
-	
+
 	Pose(const Pose& p) { set(p); }
 
 	operator Vec3d() { return pos(); }
@@ -90,7 +90,7 @@ public:
 
 	/// Get "position" vector
 	const Vec3d& pos() const { return mVec; }
-	
+
 	/// Get vector component
 	const Vec3d& vec() const { return mVec; }
 
@@ -132,10 +132,10 @@ public:
 
 	/// Get world space unit vectors
 	template <class T>
-	void unitVectors(Vec<3,T>& ux, Vec<3,T>& uy, Vec<3,T>& uz) const {	
+	void unitVectors(Vec<3,T>& ux, Vec<3,T>& uy, Vec<3,T>& uz) const {
 		quat().toVectorX(ux);
 		quat().toVectorY(uy);
-		quat().toVectorZ(uz);	
+		quat().toVectorZ(uz);
 	}
 
 
@@ -145,7 +145,7 @@ public:
 		unitVectors(ur, uu, uf);
 		uf = -uf;
 	}
-	
+
 	/// Get right unit vector
 	Vec3d ur() const { return ux(); }
 
@@ -171,7 +171,7 @@ public:
 	/// Get position
 	Vec3d& pos(){ return mVec; }
 	Vec3d& vec(){ return mVec; }
-	
+
 	/// Get quaternion representing orientation
 	Quatd& quat(){ return mQuat; }
 
@@ -182,7 +182,7 @@ public:
 	/// Set position
 	template <class T>
 	Pose& pos(const Vec<3,T>& v){ return vec(v); }
-	
+
 	/// Set position from individual components
 	Pose& pos(double x, double y, double z) { return vec(Vec3d(x,y,z)); }
 
@@ -199,7 +199,7 @@ public:
 
 	/// Set to identity transform
 	Pose& setIdentity(){ quat().setIdentity(); vec().set(0); return *this; }
-	
+
 	/// Print to standard output
 	void print() const { printf("Vec3d(%f, %f, %f);\nQuatd(%f, %f, %f, %f);\n",
 		mVec[0], mVec[1], mVec[2], mQuat[0], mQuat[1], mQuat[2], mQuat[3]); }
@@ -216,28 +216,28 @@ protected:
 /// with a curvature determined by psmooth and qsmooth
 class SmoothPose : public Pose {
 public:
-	SmoothPose(const Pose& init=Pose(), double psmooth=0.9, double qsmooth=0.9) 
+	SmoothPose(const Pose& init=Pose(), double psmooth=0.9, double qsmooth=0.9)
 	:	Pose(init), mTarget(init), mPF(psmooth), mQF(qsmooth) {}
-	
+
 	// step toward the target:
 	SmoothPose& operator()() {
 		pos().lerp(mTarget.pos(), 1.-mPF);
 		quat().slerpTo(mTarget.quat(), 1.-mQF);
 		return *this;
 	}
-	
+
 	// set and update:
 	SmoothPose& operator()(const Pose& p) {
 		target(p);
 		return (*this)();
 	}
-	
+
 	// set the target to smoothly interpolate to:
 	Pose& target() { return mTarget; }
 	void target(const Pose& p) { mTarget.set(p); }
 	void target(const Vec3d& p) { mTarget.pos().set(p); }
-	void target(const Quatd& p) { mTarget.quat().set(p); } 
-	
+	void target(const Quatd& p) { mTarget.quat().set(p); }
+
 	// set immediately (without smoothing):
 	void jump(Pose& p) {
 		target(p);
@@ -270,12 +270,12 @@ public:
 	Nav(const Vec3d &position = Vec3d(0), double smooth=0)
 	:	Pose(position), mSmooth(smooth), mVelScale(1)
 	{	updateDirectionVectors(); }
-	
+
 	Nav(const Nav& nav)
-	:	Pose(nav.pos(), nav.quat() ), 
+	:	Pose(nav.pos(), nav.quat() ),
 		mMove0(nav.mMove0), mMove1(nav.mMove1),	// linear velocities (raw, smoothed)
 		mSpin0(nav.mSpin0), mSpin1(nav.mSpin1),	// angular velocities (raw, smoothed)
-		mTurn(nav.mTurn), mNudge(nav.mNudge),			//  
+		mTurn(nav.mTurn), mNudge(nav.mNudge),			//
 		mSmooth(nav.smooth()), mVelScale(nav.mVelScale)
 	{	updateDirectionVectors(); }
 
@@ -285,24 +285,24 @@ public:
 
 	/// Get right unit vector
 	const Vec3d& ur() const { return mUR; }
-	
+
 	/// Get up unit vector
 	const Vec3d& uu() const { return mUU; }
-	
+
 	/// Get forward unit vector
 	const Vec3d& uf() const { return mUF; }
-	
+
 	/// Get current linear and angular velocities as a Pose
 	Pose vel() const {
 		return Pose(mMove1, Quatd().fromEuler(mSpin1));
 	}
-	
+
 	double velScale() const { return mVelScale; }
 
 
 	/// Set smoothing amount [0,1)
 	Nav& smooth(double v){ mSmooth=v; return *this; }
-	
+
 	void view(double azimuth, double elevation, double bank) {
 		view(Quatd().fromEuler(azimuth, elevation, bank));
 	}
@@ -310,7 +310,7 @@ public:
 		quat(v);
 		updateDirectionVectors();
 	}
-	
+
 	/// Turn to face a given world-coordinate point
 	void faceToward(const Vec3d& p, double amt=1.){
 		// TODO: promote this method to Pose?
@@ -338,7 +338,7 @@ public:
 		mTurn.set(rotEuler * amt);
 		//*/
 	}
-	
+
 	/// Move toward a given world-coordinate point
 	void nudgeToward(const Vec3d& p, double amt=1.) {
 		Vec3d rotEuler;
@@ -374,13 +374,13 @@ public:
 
 	/// Set angular velocity around right vector (elevation), in radians
 	void spinR(double v){ mSpin0[1] = v; }
-	
+
 	/// Set angular velocity around up vector (azimuth), in radians
 	void spinU(double v){ mSpin0[0] = v; }
-	
+
 	/// Set angular velocity around forward vector (bank), in radians
 	void spinF(double v){ mSpin0[2] = v; }
-	
+
 	/// Set angular velocity directly
 	Vec3d& spin(){ return mSpin0; }
 
@@ -399,22 +399,22 @@ public:
 
 
 	/// Stop moving and spinning
-	Nav& halt(){ 
-		mMove0.set(0); 
-		mMove1.set(0); 
-		mSpin0.set(0); 
-		mSpin1.set(0); 
+	Nav& halt(){
+		mMove0.set(0);
+		mMove1.set(0);
+		mSpin0.set(0);
+		mSpin1.set(0);
 		mTurn.set(0);
 		mNudge.set(0);
 		updateDirectionVectors();
-		return *this; 
+		return *this;
 	}
 
 	/// Go to origin, reset orientation
-	Nav& home(){ 
+	Nav& home(){
 		quat().identity();
 		view(0, 0, 0);
-		turn(0, 0, 0); 
+		turn(0, 0, 0);
 		spin(0, 0, 0);
 		vec().set(0);
 		updateDirectionVectors();
@@ -422,16 +422,16 @@ public:
 	}
 
 	/// Update coordinate frame basis vectors based on internal quaternion
-	void updateDirectionVectors(){ 
+	void updateDirectionVectors(){
 		quat().normalize();
-		directionVectors(mUR, mUU, mUF); 
+		directionVectors(mUR, mUU, mUF);
 	}
-	
+
 	void set(const Pose& v){
 		Pose::set(v);
 		updateDirectionVectors();
 	}
-	
+
 	void set(const Nav& v){
 		Pose::set(v);
 		mMove0 = v.mMove0; mMove1 = v.mMove1;
@@ -441,11 +441,11 @@ public:
 		mSmooth = v.mSmooth;
 		updateDirectionVectors();
 	}
-	
+
 	/// Accumulate pose based on velocity
 	void step(double dt=1){
 		mVelScale = dt;
-	
+
 		double amt = 1.-smooth();	// TODO: adjust for dt
 
 		// Low-pass filter velocities

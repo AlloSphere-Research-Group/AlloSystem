@@ -11,11 +11,11 @@ typedef std::vector<FileWatcher *> WatcherList;
 struct WatchedFile {
 	WatchedFile() : mModified(-std::numeric_limits<double>::max()) {}
 	WatchedFile(const WatchedFile& cpy) : mModified(cpy.mModified) {}
-	
+
 	void add(FileWatcher * watcher) {
 		mWatchers.push_back(watcher);
 	}
-	
+
 	void remove(FileWatcher * watcher) {
 		WatcherList::iterator iter = mWatchers.begin();
 		while (iter != mWatchers.end()) {
@@ -26,8 +26,8 @@ struct WatchedFile {
 			}
 		}
 	}
-	
-	void test(FileWatcher * w) {	
+
+	void test(FileWatcher * w) {
 		if (File::exists(mPath)) {
 			File f(mPath, "r", false);
 			al_sec mod = f.modified();
@@ -36,7 +36,7 @@ struct WatchedFile {
 				WatcherList::iterator iter = mWatchers.begin();
 				while (iter != mWatchers.end()) {
 					FileWatcher * fw = *iter++;
-					if (w == fw) 
+					if (w == fw)
 						w->onFileWatch(f);
 				}
 				f.close();
@@ -44,8 +44,8 @@ struct WatchedFile {
 			}
 		}
 	}
-	
-	void test() {	
+
+	void test() {
 		if (File::exists(mPath)) {
 			File f(mPath, "r", false);
 			al_sec mod = f.modified();
@@ -54,8 +54,8 @@ struct WatchedFile {
 			}
 		}
 	}
-	
-	void notify(File& f) {		
+
+	void notify(File& f) {
 		f.open();
 		WatcherList::iterator iter = mWatchers.begin();
 		while (iter != mWatchers.end()) {
@@ -64,7 +64,7 @@ struct WatchedFile {
 		f.close();
 		mModified = f.modified();
 	}
-	
+
 	std::string mPath;
 	al_sec mModified;
 	WatcherList mWatchers;
@@ -116,7 +116,7 @@ void FileWatcher::autoPoll(al_sec t) {
 
 
 
-FileWatcher::~FileWatcher(){ 
+FileWatcher::~FileWatcher(){
 	// check each file:
 	WatcherMap::iterator it = gWatchedFiles.begin();
 	while (it != gWatchedFiles.end()) {
@@ -130,7 +130,7 @@ void FileWatcher::watch(std::string filepath, bool immediate) {
 	WatchedFile& wf = gWatchedFiles[filepath];
 	wf.mPath = filepath;
 	wf.add(this);
-	if (immediate) wf.test(); 
+	if (immediate) wf.test();
 }
 
 
@@ -144,7 +144,7 @@ void FileWatcher::watch(std::string filepath, bool immediate) {
 //		: mPath(path), mHandler(handler), mModified(0) {}
 //		WatchedFile(const WatchedFile& cpy)
 //		: mPath(cpy.mPath), mHandler(cpy.mHandler), mModified(cpy.mModified) {}
-//		
+//
 //		void operator()() {
 //			File f(mPath, "r", false);
 //			if (File::exists(mPath)) {
@@ -157,7 +157,7 @@ void FileWatcher::watch(std::string filepath, bool immediate) {
 //				}
 //			}
 //		}
-//		
+//
 //		std::string mPath;
 //		al_sec mModified;
 //		FileWatcher * mHandler;
@@ -169,17 +169,17 @@ void FileWatcher::watch(std::string filepath, bool immediate) {
 //		static FileWatcherManager singleton;
 //		return singleton;
 //	}
-//	
-//	FileWatcherManager() 
+//
+//	FileWatcherManager()
 //	:	mPeriod(1.),
 //		mActive(false)
 //	{
 //		// start polling:
 //		poll(MainLoop::now());
 //	}
-//	
+//
 //	~FileWatcherManager() {}
-//	
+//
 //	/// add a file to watch:
 //	/// this may overwrite an existing handler.
 //	/// param[in] immediate: triggers the handler immediately if the file exists
@@ -198,7 +198,7 @@ void FileWatcher::watch(std::string filepath, bool immediate) {
 //		}
 //		return *this;
 //	}
-//	
+//
 //	/// stop watching a file:
 //	FileWatcherManager& unwatch(FileWatcher * handler) {
 //		// one watcher may handle several files:
@@ -209,7 +209,7 @@ void FileWatcher::watch(std::string filepath, bool immediate) {
 //		}
 //		return *this;
 //	}
-//	
+//
 //	/// set/get polling period:
 //	FileWatcherManager& period(al_sec p) {
 //		p = fabs(p);
@@ -218,7 +218,7 @@ void FileWatcher::watch(std::string filepath, bool immediate) {
 //		return *this;
 //	}
 //	al_sec period() { return mPeriod; }
-//	
+//
 //	// scheduler task function
 //	void poll(al_sec t) {
 //		WatcherMap::iterator iter = mHandlers.begin();
@@ -228,7 +228,7 @@ void FileWatcher::watch(std::string filepath, bool immediate) {
 //		}
 //		MainLoop::queue().send(t+mPeriod, this, &FileWatcherManager::poll);
 //	}
-//	
+//
 //	WatcherMap mHandlers;
 //	al_sec mPeriod;
 //	bool mActive;

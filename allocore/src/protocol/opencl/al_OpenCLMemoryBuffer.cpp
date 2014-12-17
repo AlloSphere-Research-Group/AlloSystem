@@ -8,9 +8,9 @@ namespace cl {
 void OpenCLMemoryBuffer :: create(OpenCLContext &ctx, cl_mem_flags usage, size_t size, void *ptr) {
 	destroy();
 	detach();
-	
+
 	usage = check_memory_flags(usage, ptr);
-	
+
 	cl_int res = CL_SUCCESS;
 	cl_mem mem = clCreateBuffer(
 		ctx.get_context(),
@@ -19,11 +19,11 @@ void OpenCLMemoryBuffer :: create(OpenCLContext &ctx, cl_mem_flags usage, size_t
 		ptr,
 		&res
 	);
-	
+
 	if(opencl_error(res, "clCreateBuffer error creating buffer")) {
 		return;
 	}
-	
+
 	mMem = mem;
 	ctx.attach_resource(this);
 }
@@ -31,9 +31,9 @@ void OpenCLMemoryBuffer :: create(OpenCLContext &ctx, cl_mem_flags usage, size_t
 void OpenCLMemoryBuffer :: create(OpenCLContext &ctx, cl_mem_flags usage, AlloArray *array) {
 	destroy();
 	detach();
-	
+
 	usage = check_memory_flags(usage, array->data.ptr);
-	
+
 	cl_int res = CL_SUCCESS;
 	cl_mem mem = clCreateBuffer(
 		ctx.get_context(),
@@ -42,11 +42,11 @@ void OpenCLMemoryBuffer :: create(OpenCLContext &ctx, cl_mem_flags usage, AlloAr
 		array->data.ptr,
 		&res
 	);
-	
+
 	if(opencl_error(res, "clCreateBuffer error creating buffer")) {
 		return;
 	}
-	
+
 	mMem = mem;
 	ctx.attach_resource(this);
 }
@@ -55,16 +55,16 @@ void OpenCLMemoryBuffer :: destroy() {
 	if(mMem) {
 		cl_int res = clReleaseMemObject(mMem);
 		mMem = 0;
-		
+
 		opencl_error(res, "clReleaseMemObject error releasing memory");
 	}
 }
 
 OpenCLEvent OpenCLMemoryBuffer :: enqueue_read(
-	OpenCLCommandQueue &queue, 
-	bool block, 
-	size_t offset, 
-	size_t size, 
+	OpenCLCommandQueue &queue,
+	bool block,
+	size_t offset,
+	size_t size,
 	void *ptr
 ) {
 	cl_event event = 0;
@@ -79,18 +79,18 @@ OpenCLEvent OpenCLMemoryBuffer :: enqueue_read(
 		NULL,
 		&event
 	);
-	
+
 	if(opencl_error(res, "clEnqueueReadBuffer error enqueuing read event")) {
 		return OpenCLEvent();
 	}
-	
+
 	return OpenCLEvent(event);
 }
 
 OpenCLEvent OpenCLMemoryBuffer :: enqueue_read(
-	OpenCLCommandQueue &queue, 
-	bool block, 
-	size_t offset, 
+	OpenCLCommandQueue &queue,
+	bool block,
+	size_t offset,
 	AlloArray *array
 ) {
 	cl_event event = 0;
@@ -105,11 +105,11 @@ OpenCLEvent OpenCLMemoryBuffer :: enqueue_read(
 		NULL,
 		&event
 	);
-	
+
 	if(opencl_error(res, "clEnqueueReadBuffer error enqueuing read event")) {
 		return OpenCLEvent();
 	}
-	
+
 	return OpenCLEvent(event);
 }
 
@@ -124,9 +124,9 @@ cl_mem_flags OpenCLMemoryBuffer :: check_memory_flags(cl_mem_flags usage, void *
 	if(GET_FLAG(CL_MEM_ALLOC_HOST_PTR, usage) && GET_FLAG(CL_MEM_USE_HOST_PTR, usage)) {
 		opencl_error(USER_OPENCL_ERROR, "OpenCLMemoryBuffer::create CL_MEM_ALLOC_HOST_PTR | CL_MEM_USE_HOST_PTR are mutually exclusive");
 	}
-	
+
 	usage |= (ptr ? CL_MEM_USE_HOST_PTR : 0);
-	
+
 	return usage;
 }
 

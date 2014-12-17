@@ -1,13 +1,13 @@
 //
 // Title: List of sexes from a public human genome database
-// 
+//
 // Author: Karl Yerkes, 2012-10-30
 //
 // Description: This example queries a public MySQL database for a list of
 // 'sexes', then visualizes the results. It should serve as an example of how
 // to use an external c++ library (mysql++) with an AlloSystem project. It also
 // shows how to use al::Font.
-// 
+//
 
 #include "allocore/io/al_App.hpp"
 #include "allocore/graphics/al_Font.hpp"
