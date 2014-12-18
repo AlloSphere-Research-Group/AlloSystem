@@ -6,6 +6,7 @@
 #include "alloaudio/al_Convolver.hpp"
 #include "allocore/io/al_AudioIO.hpp"
 #define IR_SIZE 1024
+#define BLOCK_SIZE 16 //min 16, max 8192
 
 using namespace std;
 
@@ -22,7 +23,7 @@ int clean_suite1(void)
 void test_class(void)
 {
 	al::Convolver conv;
-	al::AudioIO io(16, 44100.0);
+	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2);
 
     float IR1[IR_SIZE];
     memset(IR1, 0, sizeof(float));
@@ -44,8 +45,8 @@ void test_class(void)
 void test_basic(void)
 {
 	al::Convolver conv;
-	al::AudioIO io(16, 44100.0, NULL, NULL, 2, 2);
-	io.channelsBus(1);
+	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2);
+	io.channelsBus(2);
 
     float IR1[IR_SIZE];
     memset(IR1, 0, sizeof(float));
@@ -56,15 +57,15 @@ void test_basic(void)
 	vector<float *> IRs;
 	IRs.push_back(IR1);
 	IRs.push_back(IR2);
-	io.bus(0, 0) = 1.0;
-	io.bus(0, 1) = 0.0;
-	io.bus(0, 2) = 0.0;
-	io.bus(0, 3) = 0.0;
-
-	conv.configure(io, IRs, 0, true);
+    float * busBuffer = io.busBuffer(0);
+    memset(busBuffer, 0, sizeof(float));
+    busBuffer[0] = 1.0f;
+	
+    unsigned int maxsize = 2048, minpartition = 64, maxpartition = IR_SIZE;
+    conv.configure(io, IRs, 0, true, vector<int>(), maxsize, minpartition, maxpartition);
 	conv.processBlock(io);
 
-	for(int i = 0; i < 16; i++) {
+	for(int i = 0; i < BLOCK_SIZE; i++) {
 		CU_ASSERT(io.out(0, i) == IR1[i]);
 		CU_ASSERT(io.out(1, i) == IR2[i]);
 	}
@@ -74,7 +75,7 @@ void test_basic(void)
 void test_disabled_channels(void)
 {
 	al::Convolver conv;
-	al::AudioIO io(16, 44100.0, NULL, NULL, 2, 2);
+	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2);
 
     float IR1[IR_SIZE];
     memset(IR1, 0, sizeof(float));
@@ -88,11 +89,42 @@ void test_disabled_channels(void)
 
 	vector<int> disabledOuts;
 
-
+    int nOutputs = io.channels(true);
 	unsigned int maxsize = 2048, minpartition = 64, maxpartition = IR_SIZE;
 	conv.configure(io, IRs, -1, true, disabledOuts, maxsize, minpartition, maxpartition);
 	conv.processBlock(io);
+    
+    std::vector<int>::iterator it;
+    for(int i = 0; i < nOutputs; i++) {
+        it = find (disabledOuts.begin(), disabledOuts.end(), i);
+        if (it != disabledOuts.end()){
+            CU_ASSERT(io.out(0, i) == 0.0f);
+            CU_ASSERT(io.out(1, i) == 0.0f);
+        }
+    }
 }
+
+/*void test_vector_mode(void)
+{
+    al::Convolver conv;
+    al::AudioIO io(BLOCK_SIZE, 44100.0);
+    
+    float IR1[IR_SIZE];
+    memset(IR1, 0, sizeof(float));
+    IR1[0] = 1.0f;IR1[3] = 0.5f;
+    float IR2[IR_SIZE];
+    memset(IR2, 0, sizeof(float));
+    IR1[1] = 1.0f;IR1[2] = 0.25f;
+    vector<float *> IRs;
+    IRs.push_back(IR1);
+    IRs.push_back(IR2);
+    
+    unsigned int maxsize = 2048, minpartition = 64, maxpartition = IR_SIZE;
+    int ret = conv.configure(io, IRs, -1, true, disabledOuts, maxsize, minpartition, maxpartition, 1);
+    CU_ASSERT(ret == 0);
+    ret = conv.processBlock(io);
+    CU_ASSERT(ret == 0);
+}*/
 
 
 int main()

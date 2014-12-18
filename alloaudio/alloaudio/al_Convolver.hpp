@@ -44,12 +44,12 @@ public:
 	 */
 	int configure(al::AudioIO &io,
 				  vector<float *> IRs,
-				  int input = -1,
+				  int inputChannel = -1,
 				  bool inputsAreBuses = false,
 				  vector<int> disabledChannels = vector<int>(),
 				  unsigned int maxsize = 0,
                   unsigned int minpartition = 64,
-                  unsigned int maxpartition = 8192);
+                  unsigned int maxpartition = 8192, unsigned int options=0);
 	/**
 	 * @brief processBlock
 	 * @param io
@@ -60,7 +60,7 @@ public:
 private:
 	vector<int> m_activeChannels;
 	vector<int> m_disabledChannels;
-	int m_input;
+	int m_inputChannel;
 	bool m_inputsAreBuses;
 	Convproc *m_Convproc;
 };
