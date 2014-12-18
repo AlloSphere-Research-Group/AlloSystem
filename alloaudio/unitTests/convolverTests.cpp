@@ -33,9 +33,12 @@ void test_class(void)
     IR1[1] = 1.0f;IR1[2] = 0.25f;
 	vector<float *> IRs;
 	IRs.push_back(IR1);
-	IRs.push_back(IR2);
+    IRs.push_back(IR2);
+    vector<int> IRLengths;
+    IRLengths.push_back(IR_SIZE);
+    IRLengths.push_back(IR_SIZE);
 
-	int ret = conv.configure(io, IRs);
+	int ret = conv.configure(io, IRs, IRLengths);
 	CU_ASSERT(ret == 0);
 	ret = conv.processBlock(io);
 	CU_ASSERT(ret == 0);
@@ -56,13 +59,17 @@ void test_basic(void)
     IR1[1] = 1.0f;IR1[2] = 0.25f;
 	vector<float *> IRs;
 	IRs.push_back(IR1);
-	IRs.push_back(IR2);
+    IRs.push_back(IR2);
+    vector<int> IRLengths;
+    IRLengths.push_back(IR_SIZE);
+    IRLengths.push_back(IR_SIZE);
+    
     float * busBuffer = io.busBuffer(0);
     memset(busBuffer, 0, sizeof(float));
     busBuffer[0] = 1.0f;
 	
     unsigned int maxsize = 2048, minpartition = 64, maxpartition = IR_SIZE;
-    conv.configure(io, IRs, 0, true, vector<int>(), maxsize, minpartition, maxpartition);
+    conv.configure(io, IRs, IRLengths, 0, true, vector<int>(), maxsize, minpartition, maxpartition);
 	conv.processBlock(io);
 
 	for(int i = 0; i < BLOCK_SIZE; i++) {
@@ -86,12 +93,15 @@ void test_disabled_channels(void)
 	vector<float *> IRs;
 	IRs.push_back(IR1);
 	IRs.push_back(IR2);
+    vector<int> IRLengths;
+    IRLengths.push_back(IR_SIZE);
+    IRLengths.push_back(IR_SIZE);
 
 	vector<int> disabledOuts;
 
     int nOutputs = io.channels(true);
 	unsigned int maxsize = 2048, minpartition = 64, maxpartition = IR_SIZE;
-	conv.configure(io, IRs, -1, true, disabledOuts, maxsize, minpartition, maxpartition);
+	conv.configure(io, IRs, IRLengths, -1, true, disabledOuts, maxsize, minpartition, maxpartition);
 	conv.processBlock(io);
     
     std::vector<int>::iterator it;
@@ -117,10 +127,13 @@ void test_disabled_channels(void)
     IR1[1] = 1.0f;IR1[2] = 0.25f;
     vector<float *> IRs;
     IRs.push_back(IR1);
-    IRs.push_back(IR2);
-    
+ IRs.push_back(IR2);
+ vector<int> IRLengths;
+ IRLengths.push_back(IR_SIZE);
+ IRLengths.push_back(IR_SIZE);
+ 
     unsigned int maxsize = 2048, minpartition = 64, maxpartition = IR_SIZE;
-    int ret = conv.configure(io, IRs, -1, true, disabledOuts, maxsize, minpartition, maxpartition, 1);
+    int ret = conv.configure(io, IRs, IRLenghts, -1, true, disabledOuts, maxsize, minpartition, maxpartition, 1);
     CU_ASSERT(ret == 0);
     ret = conv.processBlock(io);
     CU_ASSERT(ret == 0);

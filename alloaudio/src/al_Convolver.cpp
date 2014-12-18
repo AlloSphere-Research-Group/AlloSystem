@@ -13,11 +13,13 @@ Convolver::Convolver() :
 {
 }
 
-int Convolver::configure(al::AudioIO &io, vector<float *> IRs,
+int Convolver::configure(al::AudioIO &io, vector<float *> IRs, vector<int> IRLengths,
                          int inputChannel, bool inputsAreBuses,
                          vector<int> disabledChannels, unsigned int maxsize,
                          unsigned int minpartition, unsigned int maxpartition, unsigned int options)
 {
+    int bufferSize = io.framesPerBuffer(), nActiveOutputs = io.channels(true) - disabledChannels.size(), nActiveInputs,configResult;
+    assert((IRs.size() == IRLengths.size()) && IRs.size() == nActiveOutputs);
     assert(minpartition>=64);
     assert(maxpartition<=8192);
     //TODO check to make sure number of inputs matches buses/io inputs
@@ -36,16 +38,24 @@ int Convolver::configure(al::AudioIO &io, vector<float *> IRs,
     }
     m_Convproc = new Convproc;
     m_Convproc->set_options(options);
-    int bufferSize = io.framesPerBuffer(), nActiveOutputs = io.channels(true) - disabledChannels.size(), nActiveInputs,configResult;
     if(m_inputChannel < 0){//many to many
-        nActiveInputs = io.channels(false);    }
+        nActiveInputs = io.channels(false);
+        assert(nActiveInputs == nActiveOutputs);
+        for(int i = 0; i < nActiveOutputs; i++){
+            m_Convproc->impdata_create(i, i, minpartition, IRs[i], 0, IRLengths[i]);
+        }
+    }
     else{//one to many
         nActiveInputs = 1;
+        for(int i = 0; i < nActiveOutputs; i++){
+            m_Convproc->impdata_create(0, i, minpartition, IRs[i], 0, IRLengths[i]);
+        }
     }
     configResult = m_Convproc->configure(nActiveInputs, nActiveOutputs, maxsize, bufferSize, minpartition, maxpartition);
     if(configResult != 0){
         std::cout << "Config failed" << std::endl;
     }
+    m_Convproc->start_process(0, 0);
     return 0;
 }
 
@@ -55,16 +65,18 @@ int Convolver::processBlock(al::AudioIO &io)
     //fill the input buffers
     if(m_inputChannel < 0){
         // many to many
+        int i = 0;
         for(vector<int>::iterator it = m_activeChannels.begin();
-            it != m_activeChannels.end(); ++it) {
+            it != m_activeChannels.end(); ++it, ++i) {
             const float *inbuf;
+            float *dest = m_Convproc->inpdata(i);
             if (m_inputsAreBuses){
-                inbuf = io.busBuffer(m_activeChannels[*it]);
+                inbuf = io.busBuffer(*it);
             }
             else{
-                inbuf = io.inBuffer(m_activeChannels[*it]);
+                inbuf = io.inBuffer(*it);
             }
-            std::copy(inbuf[0], inbuf[blockSize+1]), m_Convproc->inpdata(*it));
+            memcpy(dest, inbuf, sizeof(float) * blockSize);
         }
     }
     else{
@@ -86,10 +98,11 @@ int Convolver::processBlock(al::AudioIO &io)
     //process
     int ret = m_Convproc->process();
     //fill the output buffers
+    int i = 0;
     for(vector<int>::iterator it = m_activeChannels.begin();
-        it != m_activeChannels.end(); ++it) {
-        float *outbuf = io.outBuffer(m_activeChannels[*it]);
-        memcpy(m_Convproc->outdata(*it), outbuf, sizeof(float) * blockSize);
+        it != m_activeChannels.end(); ++it, ++i) {
+        float *outbuf = io.outBuffer(*it);
+        memcpy(outbuf, m_Convproc->outdata(i), sizeof(float) * blockSize);
     }
         
     //clear output for disabled channels
