@@ -49,14 +49,14 @@ void test_basic(void)
 {
 	al::Convolver conv;
 	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2);
-	io.channelsBus(2);
+    io.channelsBus(2);
 
     float IR1[IR_SIZE];
     memset(IR1, 0, sizeof(float));
     IR1[0] = 1.0f;IR1[3] = 0.5f;
     float IR2[IR_SIZE];
     memset(IR2, 0, sizeof(float));
-    IR1[1] = 1.0f;IR1[2] = 0.25f;
+    IR2[1] = 1.0f;IR2[2] = 0.25f;
 	vector<float *> IRs;
 	IRs.push_back(IR1);
     IRs.push_back(IR2);
@@ -64,9 +64,12 @@ void test_basic(void)
     IRLengths.push_back(IR_SIZE);
     IRLengths.push_back(IR_SIZE);
     
-    float * busBuffer = io.busBuffer(0);
-    memset(busBuffer, 0, sizeof(float));
-    busBuffer[0] = 1.0f;
+    float * busBuffer1 = io.busBuffer(0);
+    memset(busBuffer1, 0, sizeof(float) * BLOCK_SIZE);
+    busBuffer1[0] = 1.0f;
+    float * busBuffer2 = io.busBuffer(1);
+    memset(busBuffer2, 0, sizeof(float) * BLOCK_SIZE);
+    busBuffer2[0] = 1.0f;
 	
     unsigned int maxsize = 2048, minpartition = 64, maxpartition = IR_SIZE;
     conv.configure(io, IRs, IRLengths, 0, true, vector<int>(), maxsize, minpartition, maxpartition);
