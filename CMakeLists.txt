@@ -134,7 +134,7 @@ if(BUILD_EXAMPLES)
       endif(EXTRA_COMPILER_FLAGS)
       #message("Adding target for example: ${example_src}")
       include_directories(${ALLOCORE_INCLUDE_DIR} ${ALLOUTIL_INCLUDE_DIR} ${ALLOGLV_INCLUDE_DIR}
-        ${GAMMA_INCLUDE_DIRS} ${ALLOAUDIO_INCLUDE_DIR} )
+        ${GLV_INCLUDE_DIRS} ${GAMMA_INCLUDE_DIRS} ${ALLOAUDIO_INCLUDE_DIR} )
       #    message("Gamma : ${GAMMA_INCLUDE_DIRs}")
       add_dependencies(${EXAMPLE_TARGET} "allocore${DEBUG_SUFFIX}" "alloutil${DEBUG_SUFFIX}")
       target_link_libraries(${EXAMPLE_TARGET}
