@@ -70,14 +70,14 @@ void test_basic(void)
     float * busBuffer2 = io.busBuffer(1);
     memset(busBuffer2, 0, sizeof(float) * BLOCK_SIZE);
     busBuffer2[0] = 1.0f;
-	
+    
     unsigned int maxsize = 2048, minpartition = 64, maxpartition = IR_SIZE;
     conv.configure(io, IRs, IRLengths, 0, true, vector<int>(), maxsize, minpartition, maxpartition);
 	conv.processBlock(io);
 
 	for(int i = 0; i < BLOCK_SIZE; i++) {
-		CU_ASSERT(io.out(0, i) == IR1[i]);
-		CU_ASSERT(io.out(1, i) == IR2[i]);
+        CU_ASSERT(io.out(0, i) == IR1[i]);
+        CU_ASSERT(io.out(1, i) == IR2[i]);
 	}
 }
 
