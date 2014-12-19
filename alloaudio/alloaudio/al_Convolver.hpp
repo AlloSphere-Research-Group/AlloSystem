@@ -2,9 +2,9 @@
 #define AL_CONVOLVER_H
 
 #include <vector>
-
 #include "allocore/io/al_AudioIO.hpp"
 
+#define MAXSIZE 0x00100000
 class Convproc;
 
 namespace al {
@@ -43,14 +43,12 @@ public:
 	 * @return
 	 */
 	int configure(al::AudioIO &io,
-				  vector<float *> IRs,
-                  vector<int> IRLengths,
+				  float *IR,
+                  int IRlength,
 				  int inputChannel = -1,
 				  bool inputsAreBuses = false,
 				  vector<int> disabledChannels = vector<int>(),
-				  unsigned int maxsize = 0,
-                  unsigned int minpartition = 64,
-                  unsigned int maxpartition = 8192, unsigned int options=0);
+				  unsigned int basePartitionSize=64, unsigned int options=0);
 	/**
 	 * @brief processBlock
 	 * @param io

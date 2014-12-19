@@ -34,15 +34,16 @@ void test_class(void)
     IR1[0] = 1.0f;IR1[3] = 0.5f;
     float IR2[IR_SIZE];
     memset(IR2, 0, sizeof(float));
-    IR1[1] = 1.0f;IR1[2] = 0.25f;
-	vector<float *> IRs;
-	IRs.push_back(IR1);
-    IRs.push_back(IR2);
-    vector<int> IRLengths;
-    IRLengths.push_back(IR_SIZE);
-    IRLengths.push_back(IR_SIZE);
+    IR2[1] = 1.0f;IR2[2] = 0.25f;
+    float IRinterleaved[IR_SIZE * 2];
+    memset(IRinterleaved, 0, sizeof(float) * IR_SIZE * 2);
+    for(int i = 0; i < IR_SIZE; ++i){
+        IRinterleaved[i * 2] = IR1[i];
+        IRinterleaved[(i * 2) + 1] = IR2[i];
+    }
+    int IRlength = IR_SIZE * 2;
 
-	int ret = conv.configure(io, IRs, IRLengths);
+	int ret = conv.configure(io, IRinterleaved, IRlength);
 	CU_ASSERT(ret == 0);
 	ret = conv.processBlock(io);
 	CU_ASSERT(ret == 0);
@@ -63,12 +64,13 @@ void test_basic(void)
     memset(IR2, 0, sizeof(float)*IR_SIZE);
     //IR2[1] = 2.0f;//IR2[2] = 0.25f;
     IR2[1] = 1.0f;IR2[2] = 0.25f;
-	vector<float *> IRs;
-	IRs.push_back(IR1);
-    IRs.push_back(IR2);
-    vector<int> IRLengths;
-    IRLengths.push_back(IR_SIZE);
-    IRLengths.push_back(IR_SIZE);
+    float IRinterleaved[IR_SIZE * 2];
+    memset(IRinterleaved, 0, sizeof(float) * IR_SIZE * 2);
+    for(int i = 0; i < IR_SIZE; ++i){
+        IRinterleaved[i * 2] = IR1[i];
+        IRinterleaved[(i * 2) + 1] = IR2[i];
+    }
+    int IRlength = IR_SIZE * 2;
     
     float * busBuffer1 = io.busBuffer(0);
     memset(busBuffer1, 0, sizeof(float) * BLOCK_SIZE);
@@ -78,15 +80,16 @@ void test_basic(void)
     busBuffer2[0] = 1.0f;
 
     
-	unsigned int maxsize = 2048, minpartition = BLOCK_SIZE, maxpartition = BLOCK_SIZE;
-    conv.configure(io, IRs, IRLengths, 0, true, vector<int>(), maxsize, minpartition, maxpartition);
+	unsigned int basePartitionSize = BLOCK_SIZE, options = 1;
+    options = 1; //FFTW MEASURE
+    conv.configure(io, IRinterleaved, IRlength, -1, true, vector<int>(), basePartitionSize, options);
 	conv.processBlock(io);
     std::cout << endl;
 	for(int i = 0; i < BLOCK_SIZE; i++) {
         std::cout << "Y1: " << io.out(0, i) << ", H1: " << IR1[i] << std::endl;
 		std::cout << "Y2: " << io.out(1, i) << ", H2: " << IR2[i] << std::endl;
-        CU_ASSERT(io.out(0, i) == IR1[i]);
-        CU_ASSERT(io.out(1, i) == IR2[i]);
+        CU_ASSERT(fabs(io.out(0, i) - IR1[i]) < 1e-06f);
+        CU_ASSERT(fabs(io.out(1, i) - IR2[i]) < 1e-06f);
 	}
 }
 
@@ -101,19 +104,20 @@ void test_disabled_channels(void)
     IR1[0] = 1.0f;IR1[3] = 0.5f;
     float IR2[IR_SIZE];
     memset(IR2, 0, sizeof(float));
-    IR1[1] = 1.0f;IR1[2] = 0.25f;
-	vector<float *> IRs;
-	IRs.push_back(IR1);
-	IRs.push_back(IR2);
-    vector<int> IRLengths;
-    IRLengths.push_back(IR_SIZE);
-    IRLengths.push_back(IR_SIZE);
+    IR2[1] = 1.0f;IR2[2] = 0.25f;
+    float IRinterleaved[IR_SIZE * 2];
+    memset(IRinterleaved, 0, sizeof(float) * IR_SIZE * 2);
+    for(int i = 0; i < IR_SIZE; ++i){
+        IRinterleaved[i * 2] = IR1[i];
+        IRinterleaved[(i * 2) + 1] = IR2[i];
+    }
+    int IRlength = IR_SIZE * 2;
 
 	vector<int> disabledOuts;
 
     int nOutputs = io.channels(true);
-	unsigned int maxsize = 2048, minpartition = 64, maxpartition = IR_SIZE;
-	conv.configure(io, IRs, IRLengths, -1, true, disabledOuts, maxsize, minpartition, maxpartition);
+	unsigned int basePartitionSize = BLOCK_SIZE, options = 1;
+	conv.configure(io, IRinterleaved, IRlength, -1, true, disabledOuts, basePartitionSize, options);
 	conv.processBlock(io);
     
     std::vector<int>::iterator it;
