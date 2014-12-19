@@ -43,8 +43,8 @@ public:
 	 * @return
 	 */
 	int configure(al::AudioIO &io,
-				  float *IR,
-                  int IRlength,
+				  vector<float *>IRs,
+                  vector<int> IRlengths,
 				  int inputChannel = -1,
 				  bool inputsAreBuses = false,
 				  vector<int> disabledChannels = vector<int>(),
@@ -55,6 +55,8 @@ public:
 	 * @return
 	 */
 	int processBlock(AudioIO &io);
+    
+    int shutdown(void);
 
 private:
 	vector<int> m_activeChannels;

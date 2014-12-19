@@ -29,24 +29,25 @@ void test_class(void)
 	al::Convolver conv;
 	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2);
 
+    //create dummy IRs
     float IR1[IR_SIZE];
-    memset(IR1, 0, sizeof(float));
+    memset(IR1, 0, sizeof(float)*IR_SIZE);
     IR1[0] = 1.0f;IR1[3] = 0.5f;
     float IR2[IR_SIZE];
-    memset(IR2, 0, sizeof(float));
+    memset(IR2, 0, sizeof(float)*IR_SIZE);
     IR2[1] = 1.0f;IR2[2] = 0.25f;
-    float IRinterleaved[IR_SIZE * 2];
-    memset(IRinterleaved, 0, sizeof(float) * IR_SIZE * 2);
-    for(int i = 0; i < IR_SIZE; ++i){
-        IRinterleaved[i * 2] = IR1[i];
-        IRinterleaved[(i * 2) + 1] = IR2[i];
-    }
-    int IRlength = IR_SIZE * 2;
-
-	int ret = conv.configure(io, IRinterleaved, IRlength);
-	CU_ASSERT(ret == 0);
+    vector<float *> IRs;
+    IRs.push_back(IR1);
+    IRs.push_back(IR2);
+    vector<int> IRlengths;
+    IRlengths.push_back(IR_SIZE);
+    IRlengths.push_back(IR_SIZE);
+    
+	int ret = conv.configure(io, IRs, IRlengths);
+    CU_ASSERT(ret == 0);
 	ret = conv.processBlock(io);
 	CU_ASSERT(ret == 0);
+    conv.shutdown();
 }
 
 
@@ -56,41 +57,81 @@ void test_basic(void)
 	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2);
     io.channelsBus(2);
 
+    //create dummy IRs
     float IR1[IR_SIZE];
     memset(IR1, 0, sizeof(float)*IR_SIZE);
-    //IR1[0] = 2.0f;//IR1[3] = 0.5f;
     IR1[0] = 1.0f;IR1[3] = 0.5f;
     float IR2[IR_SIZE];
     memset(IR2, 0, sizeof(float)*IR_SIZE);
-    //IR2[1] = 2.0f;//IR2[2] = 0.25f;
     IR2[1] = 1.0f;IR2[2] = 0.25f;
-    float IRinterleaved[IR_SIZE * 2];
-    memset(IRinterleaved, 0, sizeof(float) * IR_SIZE * 2);
-    for(int i = 0; i < IR_SIZE; ++i){
-        IRinterleaved[i * 2] = IR1[i];
-        IRinterleaved[(i * 2) + 1] = IR2[i];
-    }
-    int IRlength = IR_SIZE * 2;
+    vector<float *> IRs;
+    IRs.push_back(IR1);
+    IRs.push_back(IR2);
+    vector<int> IRlengths;
+    IRlengths.push_back(IR_SIZE);
+    IRlengths.push_back(IR_SIZE);
     
+    //create dummy input buffers
     float * busBuffer1 = io.busBuffer(0);
     memset(busBuffer1, 0, sizeof(float) * BLOCK_SIZE);
     busBuffer1[0] = 1.0f;
     float * busBuffer2 = io.busBuffer(1);
     memset(busBuffer2, 0, sizeof(float) * BLOCK_SIZE);
     busBuffer2[0] = 1.0f;
-
     
 	unsigned int basePartitionSize = BLOCK_SIZE, options = 1;
     options = 1; //FFTW MEASURE
-    conv.configure(io, IRinterleaved, IRlength, -1, true, vector<int>(), basePartitionSize, options);
+    //many to many mode
+    conv.configure(io, IRs, IRlengths, -1, true, vector<int>(), basePartitionSize, options);
 	conv.processBlock(io);
     std::cout << endl;
 	for(int i = 0; i < BLOCK_SIZE; i++) {
-        std::cout << "Y1: " << io.out(0, i) << ", H1: " << IR1[i] << std::endl;
-		std::cout << "Y2: " << io.out(1, i) << ", H2: " << IR2[i] << std::endl;
-        CU_ASSERT(fabs(io.out(0, i) - IR1[i]) < 1e-06f);
-        CU_ASSERT(fabs(io.out(1, i) - IR2[i]) < 1e-06f);
+        //std::cout << "Y1: " << io.out(0, i) << ", H1: " << IR1[i] << std::endl;
+        //std::cout << "Y2: " << io.out(1, i) << ", H2: " << IR2[i] << std::endl;
+        CU_ASSERT(fabs(io.out(0, i) - IR1[i]) < 1e-07f);
+        CU_ASSERT(fabs(io.out(1, i) - IR2[i]) < 1e-07f);
 	}
+    conv.shutdown();
+}
+
+void test_one_to_many(void)
+{
+    al::Convolver conv;
+    al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 1, 2);
+    io.channelsBus(1);
+    
+    //create dummy IRs
+    float IR1[IR_SIZE];
+    memset(IR1, 0, sizeof(float)*IR_SIZE);
+    IR1[0] = 1.0f;IR1[3] = 0.5f;
+    float IR2[IR_SIZE];
+    memset(IR2, 0, sizeof(float)*IR_SIZE);
+    IR2[1] = 1.0f;IR2[2] = 0.25f;
+    vector<float *> IRs;
+    IRs.push_back(IR1);
+    IRs.push_back(IR2);
+    vector<int> IRlengths;
+    IRlengths.push_back(IR_SIZE);
+    IRlengths.push_back(IR_SIZE);
+    
+    //create dummy input buffers
+    float * busBuffer1 = io.busBuffer(0);
+    memset(busBuffer1, 0, sizeof(float) * BLOCK_SIZE);
+    busBuffer1[0] = 1.0f;
+    
+    unsigned int basePartitionSize = BLOCK_SIZE, options = 1;
+    options = 1; //FFTW MEASURE
+                 //many to many mode
+    conv.configure(io, IRs, IRlengths, 0, true, vector<int>(), basePartitionSize, options);
+    conv.processBlock(io);
+    std::cout << endl;
+    for(int i = 0; i < BLOCK_SIZE; i++) {
+        //std::cout << "Y1: " << io.out(0, i) << ", H1: " << IR1[i] << std::endl;
+        //std::cout << "Y2: " << io.out(1, i) << ", H2: " << IR2[i] << std::endl;
+        CU_ASSERT(fabs(io.out(0, i) - IR1[i]) < 1e-07f);
+        CU_ASSERT(fabs(io.out(1, i) - IR2[i]) < 1e-07f);
+    }
+    conv.shutdown();
 }
 
 
@@ -99,25 +140,25 @@ void test_disabled_channels(void)
 	al::Convolver conv;
 	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2);
 
+    //create dummy IRs
     float IR1[IR_SIZE];
-    memset(IR1, 0, sizeof(float));
+    memset(IR1, 0, sizeof(float)*IR_SIZE);
     IR1[0] = 1.0f;IR1[3] = 0.5f;
     float IR2[IR_SIZE];
-    memset(IR2, 0, sizeof(float));
+    memset(IR2, 0, sizeof(float)*IR_SIZE);
     IR2[1] = 1.0f;IR2[2] = 0.25f;
-    float IRinterleaved[IR_SIZE * 2];
-    memset(IRinterleaved, 0, sizeof(float) * IR_SIZE * 2);
-    for(int i = 0; i < IR_SIZE; ++i){
-        IRinterleaved[i * 2] = IR1[i];
-        IRinterleaved[(i * 2) + 1] = IR2[i];
-    }
-    int IRlength = IR_SIZE * 2;
+    vector<float *> IRs;
+    IRs.push_back(IR1);
+    IRs.push_back(IR2);
+    vector<int> IRlengths;
+    IRlengths.push_back(IR_SIZE);
+    IRlengths.push_back(IR_SIZE);
 
 	vector<int> disabledOuts;
 
     int nOutputs = io.channels(true);
 	unsigned int basePartitionSize = BLOCK_SIZE, options = 1;
-	conv.configure(io, IRinterleaved, IRlength, -1, true, disabledOuts, basePartitionSize, options);
+    conv.configure(io, IRs, IRlengths, -1, true, disabledOuts, basePartitionSize, options);
 	conv.processBlock(io);
     
     std::vector<int>::iterator it;
@@ -128,6 +169,7 @@ void test_disabled_channels(void)
             CU_ASSERT(io.out(1, i) == 0.0f);
         }
     }
+    conv.shutdown();
 }
 
 /*void test_vector_mode(void)
