@@ -51,7 +51,7 @@ void test_class(void)
 }
 
 
-void test_basic(void)
+void test_many_to_many(void)
 {
 	al::Convolver conv;
 	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2);
@@ -97,7 +97,8 @@ void test_basic(void)
 void test_one_to_many(void)
 {
     al::Convolver conv;
-    al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 1, 2);
+    al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 1);
+
     io.channelsBus(1);
     
     //create dummy IRs
@@ -215,7 +216,8 @@ int main()
 
     /* add the tests to the suite */
 	if ( (NULL == CU_add_test(pSuite, "Test Class", test_class))
-		 ||  (NULL == CU_add_test(pSuite, "Test Basic Convolution", test_basic))
+		 ||  (NULL == CU_add_test(pSuite, "Test Many to Many Convolution", test_many_to_many))
+         ||  (NULL == CU_add_test(pSuite, "Test One to Many Convolution", test_one_to_many))
 		 ||  (NULL == CU_add_test(pSuite, "Test Disabled Channels", test_disabled_channels))
          )
     {

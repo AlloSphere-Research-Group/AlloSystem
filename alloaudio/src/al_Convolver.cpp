@@ -73,7 +73,7 @@ int Convolver::configure(al::AudioIO &io, vector<float *> IRs, vector<int> IRlen
     }
     else{//one to many
         for(int i = 0; i < nActiveOutputs; i++){
-            m_Convproc->impdata_create(m_inputChannel, i, 1, IRs[i], 0, IRlengths[i]);
+            m_Convproc->impdata_create(0, i, 1, IRs[i], 0, IRlengths[i]);
         }
     }
     m_Convproc->start_process(0, 0);
