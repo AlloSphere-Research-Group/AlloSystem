@@ -29,6 +29,8 @@
 #define ZITA_CONVOLVER_MAJOR_VERSION 3
 #define ZITA_CONVOLVER_MINOR_VERSION 1
 
+#define ENABLE_VECTOR_MODE 1
+
 
 extern int zita_convolver_major_version (void);
 extern int zita_convolver_minor_version (void);

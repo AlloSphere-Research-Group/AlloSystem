@@ -5,6 +5,8 @@
 #include "allocore/io/al_AudioIO.hpp"
 
 #define MAXSIZE 0x00100000
+
+
 class Convproc;
 
 namespace al {

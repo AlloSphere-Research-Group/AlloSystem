@@ -122,7 +122,7 @@ void test_one_to_many(void)
     
     unsigned int basePartitionSize = BLOCK_SIZE, options = 1;
     options = 1; //FFTW MEASURE
-                 //many to many mode
+    //one to many mode
     conv.configure(io, IRs, IRlengths, 0, true, vector<int>(), basePartitionSize, options);
     conv.processBlock(io);
     std::cout << endl;
@@ -158,7 +158,7 @@ void test_disabled_channels(void)
 	vector<int> disabledOuts;
 
     int nOutputs = io.channels(true);
-	unsigned int basePartitionSize = BLOCK_SIZE, options = 1;
+	unsigned int basePartitionSize = BLOCK_SIZE, options = 0;
     conv.configure(io, IRs, IRlengths, -1, true, disabledOuts, basePartitionSize, options);
 	conv.processBlock(io);
     
@@ -173,30 +173,47 @@ void test_disabled_channels(void)
     conv.shutdown();
 }
 
-/*void test_vector_mode(void)
+void test_vector_mode(void)
 {
     al::Convolver conv;
-    al::AudioIO io(BLOCK_SIZE, 44100.0);
+    al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2);
+    io.channelsBus(2);
     
+    //create dummy IRs
     float IR1[IR_SIZE];
-    memset(IR1, 0, sizeof(float));
+    memset(IR1, 0, sizeof(float)*IR_SIZE);
     IR1[0] = 1.0f;IR1[3] = 0.5f;
     float IR2[IR_SIZE];
-    memset(IR2, 0, sizeof(float));
-    IR1[1] = 1.0f;IR1[2] = 0.25f;
+    memset(IR2, 0, sizeof(float)*IR_SIZE);
+    IR2[1] = 1.0f;IR2[2] = 0.25f;
     vector<float *> IRs;
     IRs.push_back(IR1);
- IRs.push_back(IR2);
- vector<int> IRLengths;
- IRLengths.push_back(IR_SIZE);
- IRLengths.push_back(IR_SIZE);
- 
-    unsigned int maxsize = 2048, minpartition = 64, maxpartition = IR_SIZE;
-    int ret = conv.configure(io, IRs, IRLenghts, -1, true, disabledOuts, maxsize, minpartition, maxpartition, 1);
-    CU_ASSERT(ret == 0);
-    ret = conv.processBlock(io);
-    CU_ASSERT(ret == 0);
-}*/
+    IRs.push_back(IR2);
+    vector<int> IRlengths;
+    IRlengths.push_back(IR_SIZE);
+    IRlengths.push_back(IR_SIZE);
+    
+    //create dummy input buffers
+    float * busBuffer1 = io.busBuffer(0);
+    memset(busBuffer1, 0, sizeof(float) * BLOCK_SIZE);
+    busBuffer1[0] = 1.0f;
+    float * busBuffer2 = io.busBuffer(1);
+    memset(busBuffer2, 0, sizeof(float) * BLOCK_SIZE);
+    busBuffer2[0] = 1.0f;
+    
+    unsigned int basePartitionSize = BLOCK_SIZE, options = 1;
+    options |= 2; //vector mode
+    conv.configure(io, IRs, IRlengths, -1, true, vector<int>(), basePartitionSize, options);
+    conv.processBlock(io);
+    std::cout << endl;
+    for(int i = 0; i < BLOCK_SIZE; i++) {
+        //std::cout << "Y1: " << io.out(0, i) << ", H1: " << IR1[i] << std::endl;
+        //std::cout << "Y2: " << io.out(1, i) << ", H2: " << IR2[i] << std::endl;
+        CU_ASSERT(fabs(io.out(0, i) - IR1[i]) < 1e-07f);
+        CU_ASSERT(fabs(io.out(1, i) - IR2[i]) < 1e-07f);
+    }
+    conv.shutdown();
+}
 
 
 int main()
@@ -215,10 +232,11 @@ int main()
     }
 
     /* add the tests to the suite */
-	if ( (NULL == CU_add_test(pSuite, "Test Class", test_class))
-		 ||  (NULL == CU_add_test(pSuite, "Test Many to Many Convolution", test_many_to_many))
-         ||  (NULL == CU_add_test(pSuite, "Test One to Many Convolution", test_one_to_many))
-		 ||  (NULL == CU_add_test(pSuite, "Test Disabled Channels", test_disabled_channels))
+    if ( (NULL == CU_add_test(pSuite, "Test Class", test_class))
+            ||  (NULL == CU_add_test(pSuite, "Test Many to Many Convolution", test_many_to_many))
+            ||  (NULL == CU_add_test(pSuite, "Test One to Many Convolution", test_one_to_many))
+            ||  (NULL == CU_add_test(pSuite, "Test Disabled Channels", test_disabled_channels))
+            ||  (NULL == CU_add_test(pSuite, "Test Vector Mode (many to many)", test_vector_mode))
          )
     {
         CU_cleanup_registry();
