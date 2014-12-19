@@ -1,6 +1,8 @@
 
 #include <stdio.h>
 #include <vector>
+#include "math.h"
+#include <iostream>
 #include <CUnit/Basic.h>
 
 #include "alloaudio/al_Convolver.hpp"
@@ -52,10 +54,12 @@ void test_basic(void)
     io.channelsBus(2);
 
     float IR1[IR_SIZE];
-    memset(IR1, 0, sizeof(float));
+    memset(IR1, 0, sizeof(float)*IR_SIZE);
+    //IR1[0] = 2.0f;//IR1[3] = 0.5f;
     IR1[0] = 1.0f;IR1[3] = 0.5f;
     float IR2[IR_SIZE];
-    memset(IR2, 0, sizeof(float));
+    memset(IR2, 0, sizeof(float)*IR_SIZE);
+    //IR2[1] = 2.0f;//IR2[2] = 0.25f;
     IR2[1] = 1.0f;IR2[2] = 0.25f;
 	vector<float *> IRs;
 	IRs.push_back(IR1);
@@ -71,11 +75,14 @@ void test_basic(void)
     memset(busBuffer2, 0, sizeof(float) * BLOCK_SIZE);
     busBuffer2[0] = 1.0f;
     
+    
     unsigned int maxsize = 2048, minpartition = 64, maxpartition = IR_SIZE;
     conv.configure(io, IRs, IRLengths, 0, true, vector<int>(), maxsize, minpartition, maxpartition);
 	conv.processBlock(io);
-
+    std::cout << endl;
 	for(int i = 0; i < BLOCK_SIZE; i++) {
+        std::cout << "Y1: " << io.out(0, i) << ", H1: " << IR1[i] << std::endl;
+        std::cout << "Y2: " << io.out(0, i) << ", H2: " << IR2[i] << std::endl;
         CU_ASSERT(io.out(0, i) == IR1[i]);
         CU_ASSERT(io.out(1, i) == IR2[i]);
 	}

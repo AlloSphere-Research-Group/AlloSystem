@@ -95,8 +95,9 @@ int Convolver::processBlock(al::AudioIO &io)
         }*/
         memcpy(m_Convproc->inpdata(0), inbuf, sizeof(float) * blockSize);
     }
+    
     //process
-    int ret = m_Convproc->process();
+    int ret = m_Convproc->process(true);
     //fill the output buffers
     int i = 0;
     for(vector<int>::iterator it = m_activeChannels.begin();
@@ -109,7 +110,7 @@ int Convolver::processBlock(al::AudioIO &io)
     m_Convproc->process(true);
     for(vector<int>::iterator it = m_disabledChannels.begin();
         it != m_disabledChannels.end(); ++it) {
-        memset(io.outBuffer(*it), 0, blockSize * sizeof(float));
+        memset(io.outBuffer(*it), 0, sizeof(float) * blockSize);
     }
 
 	return ret;
