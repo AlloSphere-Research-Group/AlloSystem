@@ -42,6 +42,8 @@ int Convolver::configure(al::AudioIO &io, vector<float *> IRs, vector<int> IRLen
         nActiveInputs = io.channels(false);
         assert(nActiveInputs == nActiveOutputs);
         for(int i = 0; i < nActiveOutputs; i++){
+            cout << "alConfigure:" << io.busBuffer(0)[0] << endl;
+            cout << "alConfigure:" << io.busBuffer(1)[0] << endl;
             m_Convproc->impdata_create(i, i, minpartition, IRs[i], 0, IRLengths[i]);
         }
     }
@@ -76,6 +78,7 @@ int Convolver::processBlock(al::AudioIO &io)
             else{
                 inbuf = io.inBuffer(*it);
             }
+            cout << "inbuf " << *it << ": " << inbuf[0] << endl;
             memcpy(dest, inbuf, sizeof(float) * blockSize);
         }
     }
