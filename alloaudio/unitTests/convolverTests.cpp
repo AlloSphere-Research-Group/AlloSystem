@@ -10,7 +10,7 @@
 #include "alloaudio/al_Convolver.hpp"
 #include "allocore/io/al_AudioIO.hpp"
 #define IR_SIZE 1024
-#define BLOCK_SIZE 16 //min 16, max 8192
+#define BLOCK_SIZE 64 //min 64, max 8192
 
 using namespace std;
 
@@ -76,15 +76,15 @@ void test_basic(void)
     float * busBuffer2 = io.busBuffer(1);
     memset(busBuffer2, 0, sizeof(float) * BLOCK_SIZE);
     busBuffer2[0] = 1.0f;
+
     
-    
-    unsigned int maxsize = 2048, minpartition = 64, maxpartition = IR_SIZE;
+	unsigned int maxsize = 2048, minpartition = BLOCK_SIZE, maxpartition = BLOCK_SIZE;
     conv.configure(io, IRs, IRLengths, 0, true, vector<int>(), maxsize, minpartition, maxpartition);
 	conv.processBlock(io);
     std::cout << endl;
 	for(int i = 0; i < BLOCK_SIZE; i++) {
         std::cout << "Y1: " << io.out(0, i) << ", H1: " << IR1[i] << std::endl;
-        std::cout << "Y2: " << io.out(0, i) << ", H2: " << IR2[i] << std::endl;
+		std::cout << "Y2: " << io.out(1, i) << ", H2: " << IR2[i] << std::endl;
         CU_ASSERT(io.out(0, i) == IR1[i]);
         CU_ASSERT(io.out(1, i) == IR2[i]);
 	}
