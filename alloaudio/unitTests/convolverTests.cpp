@@ -1,8 +1,10 @@
 
-#include <stdio.h>
+#include <cstdio>
+#include <cmath>
 #include <vector>
-#include "math.h"
 #include <iostream>
+#include <algorithm>
+
 #include <CUnit/Basic.h>
 
 #include "alloaudio/al_Convolver.hpp"
