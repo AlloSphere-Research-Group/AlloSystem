@@ -19,7 +19,6 @@ int Convolver::configure(al::AudioIO &io, vector<float *> IRs, int IRlength,
 {
     int bufferSize = io.framesPerBuffer(), nActiveOutputs = io.channels(true) - disabledChannels.size(),
     nActiveInputs, configResult;
-    //TODO check to make sure number of inputs matches buses/io inputs
     m_inputChannel = inputChannel;
     m_inputsAreBuses = inputsAreBuses;
     m_disabledChannels = disabledChannels;
@@ -42,7 +41,6 @@ int Convolver::configure(al::AudioIO &io, vector<float *> IRs, int IRlength,
     else{//one to many
         assert(io.channels(false) >= 1);
         nActiveInputs = 1;
-        //nActiveInputs = nActiveOutputs;
     }
     assert(basePartitionSize >= Convproc::MINPART);
     assert(basePartitionSize <= Convproc::MAXPART);
@@ -59,7 +57,6 @@ int Convolver::configure(al::AudioIO &io, vector<float *> IRs, int IRlength,
         std::cout << "Config failed" << std::endl;
     }
     //create IRs
-    //IRframes = IRlength/nActiveOutputs;
     if(m_inputChannel < 0){//many to many
         for(int i = 0; i < nActiveOutputs; i++){
             m_Convproc->impdata_create(i, i, 1, IRs[i], 0, IRlength);
@@ -92,7 +89,6 @@ int Convolver::processBlock(al::AudioIO &io)
             else{
                 inbuf = io.inBuffer(*it);
             }
-            //cout << "inbuf " << *it << ": " << inbuf[0] << endl;
             memcpy(dest, inbuf, sizeof(float) * blockSize);
         }
     }
@@ -110,6 +106,7 @@ int Convolver::processBlock(al::AudioIO &io)
     
     //process
     int ret = m_Convproc->process(false);
+    
     //fill the output buffers
     int i = 0;
     for(vector<int>::iterator it = m_activeChannels.begin();

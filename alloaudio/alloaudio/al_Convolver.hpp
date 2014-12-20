@@ -22,7 +22,12 @@ using namespace std;
 // - DRC : many to many each with different IR
 // - Synthesized source:
 
-
+    /**
+     * @brief Convolver Realtime multichannel convolution class.
+     *
+     * Built on zita convolver, which implements a realtime multithreaded multichannel convolution algorithm using non-uniform partitioning.
+     *
+     */
 class Convolver
 {
 
@@ -30,19 +35,17 @@ public:
     Convolver();
 
 	/**
-	 * @brief configure
+	 * @brief Sets up convolver. Must be called prior to processing.
 	 *
-	 * Output from disabled channels is set to 0.
+	 * Checks for valid parameters, initializes convolver and impulse responses. Output from disabled channels is set to 0.
 	 *
-	 * @param io
-	 * @param IRs
-	 * @param inputs
-	 * @param inputsAreBuses
-	 * @param disabledChannels
-	 * @param maxsize
-	 * @param minpartition
-	 * @param maxpartition
-	 * @return
+	 * @param[in, out] io The AudioIO object.
+	 * @param[in] IRs The deinterleaved IR channels.
+	 * @param[in] inputChannel Specifies input channel for one to many mode, otherwise set to -1 for many to many.
+	 * @param[in] inputsAreBuses Set to True if you wish to use AudioIO's busses as input. This must be specified on AudioIO by calling io.channelsBus as well.
+	 * @param[in] disabledChannels Contains list of all channels which should not be processed.
+	 * @param[in] basePartitionSize Should be set to audio callback size to minimize latency. Cannot be less than 64 samples.
+	 * @return Returns 0 upon success
 	 */
 	int configure(al::AudioIO &io,
 				  vector<float *>IRs,
@@ -52,12 +55,16 @@ public:
 				  vector<int> disabledChannels = vector<int>(),
 				  unsigned int basePartitionSize=64, unsigned int options=0);
 	/**
-	 * @brief processBlock
-	 * @param io
-	 * @return
+	 * @brief Handles all io for the convolution
+	 * @param[in,out] io The AudioIO object from which audio data will be read from and written to.
+	 * @return Returns 0 upon success.
 	 */
 	int processBlock(AudioIO &io);
     
+    /**
+     * @brief Stops processing audio and tears down convolver object.
+     * @return Returns 0 upon success.
+     */
     int shutdown(void);
 
 private:
