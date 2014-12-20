@@ -13,7 +13,7 @@ Convolver::Convolver() :
 {
 }
 
-int Convolver::configure(al::AudioIO &io, vector<float *> IRs, vector<int> IRlengths,
+int Convolver::configure(al::AudioIO &io, vector<float *> IRs, int IRlength,
                          int inputChannel, bool inputsAreBuses,
                          vector<int> disabledChannels, unsigned int basePartitionSize, unsigned int options)
 {
@@ -31,14 +31,8 @@ int Convolver::configure(al::AudioIO &io, vector<float *> IRs, vector<int> IRlen
     }
     assert(bufferSize >= Convproc::MINQUANT);
     assert(bufferSize <= Convproc::MAXQUANT);
-    int maxIRlength = 0, minIRlength = MAXSIZE;
-    for(vector<int>::iterator it = IRlengths.begin();
-        it != IRlengths.end(); ++it){
-        maxIRlength = (*it > maxIRlength)?*it:maxIRlength;
-        minIRlength = (*it < minIRlength)?*it:minIRlength;
-    }
-    assert(maxIRlength <= MAXSIZE);
-    assert(minIRlength >= Convproc::MINPART);
+    assert(IRlength <= MAXSIZE);
+    assert(IRlength >= Convproc::MINPART);
     assert(nActiveOutputs > 0);
     assert(nActiveOutputs <= Convproc::MAXOUT);
     if(m_inputChannel < 0){//many to many
@@ -60,7 +54,7 @@ int Convolver::configure(al::AudioIO &io, vector<float *> IRs, vector<int> IRlen
     m_Convproc->set_options(options);
     m_Convproc->set_density(0.0f);
     configResult = m_Convproc->configure(nActiveInputs, nActiveOutputs,
-                                         maxIRlength, bufferSize, basePartitionSize, (maxIRlength/2 < Convproc::MAXPART)?maxIRlength/2:Convproc::MAXPART);
+                                         IRlength, bufferSize, basePartitionSize, (IRlength/2 < Convproc::MAXPART)?IRlength/2:Convproc::MAXPART);
     if(configResult != 0){
         std::cout << "Config failed" << std::endl;
     }
@@ -68,12 +62,12 @@ int Convolver::configure(al::AudioIO &io, vector<float *> IRs, vector<int> IRlen
     //IRframes = IRlength/nActiveOutputs;
     if(m_inputChannel < 0){//many to many
         for(int i = 0; i < nActiveOutputs; i++){
-            m_Convproc->impdata_create(i, i, 1, IRs[i], 0, IRlengths[i]);
+            m_Convproc->impdata_create(i, i, 1, IRs[i], 0, IRlength);
         }
     }
     else{//one to many
         for(int i = 0; i < nActiveOutputs; i++){
-            m_Convproc->impdata_create(0, i, 1, IRs[i], 0, IRlengths[i]);
+            m_Convproc->impdata_create(0, i, 1, IRs[i], 0, IRlength);
         }
     }
     m_Convproc->start_process(0, 0);

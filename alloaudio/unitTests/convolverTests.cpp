@@ -39,11 +39,9 @@ void test_class(void)
     vector<float *> IRs;
     IRs.push_back(IR1);
     IRs.push_back(IR2);
-    vector<int> IRlengths;
-    IRlengths.push_back(IR_SIZE);
-    IRlengths.push_back(IR_SIZE);
+    int IRlength = IR_SIZE;
     
-	int ret = conv.configure(io, IRs, IRlengths);
+	int ret = conv.configure(io, IRs, IRlength);
     CU_ASSERT(ret == 0);
 	ret = conv.processBlock(io);
 	CU_ASSERT(ret == 0);
@@ -67,9 +65,7 @@ void test_many_to_many(void)
     vector<float *> IRs;
     IRs.push_back(IR1);
     IRs.push_back(IR2);
-    vector<int> IRlengths;
-    IRlengths.push_back(IR_SIZE);
-    IRlengths.push_back(IR_SIZE);
+    int IRlength = IR_SIZE;
     
     //create dummy input buffers
     float * busBuffer1 = io.busBuffer(0);
@@ -82,7 +78,7 @@ void test_many_to_many(void)
 	unsigned int basePartitionSize = BLOCK_SIZE, options = 1;
     options = 1; //FFTW MEASURE
     //many to many mode
-    conv.configure(io, IRs, IRlengths, -1, true, vector<int>(), basePartitionSize, options);
+    conv.configure(io, IRs, IRlength, -1, true, vector<int>(), basePartitionSize, options);
 	conv.processBlock(io);
     std::cout << endl;
 	for(int i = 0; i < BLOCK_SIZE; i++) {
@@ -111,9 +107,7 @@ void test_one_to_many(void)
     vector<float *> IRs;
     IRs.push_back(IR1);
     IRs.push_back(IR2);
-    vector<int> IRlengths;
-    IRlengths.push_back(IR_SIZE);
-    IRlengths.push_back(IR_SIZE);
+    int IRlength = IR_SIZE;
     
     //create dummy input buffers
     float * busBuffer1 = io.busBuffer(0);
@@ -123,7 +117,7 @@ void test_one_to_many(void)
     unsigned int basePartitionSize = BLOCK_SIZE, options = 1;
     options = 1; //FFTW MEASURE
     //one to many mode
-    conv.configure(io, IRs, IRlengths, 0, true, vector<int>(), basePartitionSize, options);
+    conv.configure(io, IRs, IRlength, 0, true, vector<int>(), basePartitionSize, options);
     conv.processBlock(io);
     std::cout << endl;
     for(int i = 0; i < BLOCK_SIZE; i++) {
@@ -151,15 +145,13 @@ void test_disabled_channels(void)
     vector<float *> IRs;
     IRs.push_back(IR1);
     IRs.push_back(IR2);
-    vector<int> IRlengths;
-    IRlengths.push_back(IR_SIZE);
-    IRlengths.push_back(IR_SIZE);
+    int IRlength = IR_SIZE;
 
 	vector<int> disabledOuts;
 
     int nOutputs = io.channels(true);
 	unsigned int basePartitionSize = BLOCK_SIZE, options = 0;
-    conv.configure(io, IRs, IRlengths, -1, true, disabledOuts, basePartitionSize, options);
+    conv.configure(io, IRs, IRlength, -1, true, disabledOuts, basePartitionSize, options);
 	conv.processBlock(io);
     
     std::vector<int>::iterator it;
@@ -189,9 +181,7 @@ void test_vector_mode(void)
     vector<float *> IRs;
     IRs.push_back(IR1);
     IRs.push_back(IR2);
-    vector<int> IRlengths;
-    IRlengths.push_back(IR_SIZE);
-    IRlengths.push_back(IR_SIZE);
+    int IRlength = IR_SIZE;
     
     //create dummy input buffers
     float * busBuffer1 = io.busBuffer(0);
@@ -203,7 +193,7 @@ void test_vector_mode(void)
     
     unsigned int basePartitionSize = BLOCK_SIZE, options = 1;
     options |= 2; //vector mode
-    conv.configure(io, IRs, IRlengths, -1, true, vector<int>(), basePartitionSize, options);
+    conv.configure(io, IRs, IRlength, -1, true, vector<int>(), basePartitionSize, options);
     conv.processBlock(io);
     std::cout << endl;
     for(int i = 0; i < BLOCK_SIZE; i++) {

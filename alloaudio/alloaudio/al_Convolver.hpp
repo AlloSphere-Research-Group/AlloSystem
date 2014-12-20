@@ -46,7 +46,7 @@ public:
 	 */
 	int configure(al::AudioIO &io,
 				  vector<float *>IRs,
-                  vector<int> IRlengths,
+                  int IRlength,
 				  int inputChannel = -1,
 				  bool inputsAreBuses = false,
 				  vector<int> disabledChannels = vector<int>(),
