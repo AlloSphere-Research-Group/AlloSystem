@@ -68,7 +68,7 @@ public:
     // Audio callback
     void onSound(AudioIOData& io){
 
-
+        conv->processBlock(io);
 		outMaster.processBlock(io);
     }
 
@@ -84,7 +84,7 @@ public:
 
 
 int main(){
-	int num_chnls = 4;
+	int num_chnls = 2;
 	double sampleRate = 44100;
 	const char * address = "localhost";
 	int inport = 3002;
