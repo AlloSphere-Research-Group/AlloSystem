@@ -51,7 +51,10 @@ public:
             dist = powf(dist, spread);
             float gain = 1.f / (1.f + DBAP_MAX_DIST*dist);
             
-            io.out(deviceChannels[i],frameIndex) += gain*sample;
+            if(enabled)
+                io.out(deviceChannels[i],frameIndex) += gain*sample;
+            else
+                io.out(deviceChannels[i],frameIndex) += sample;
 		}
 	}
     

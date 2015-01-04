@@ -102,7 +102,10 @@ class SoundSource;
 class Dbap;
 class Spatializer {
 public:
-    Spatializer(SpeakerLayout& sl){
+    Spatializer(SpeakerLayout& sl)
+    :
+    enabled(true)
+    {
         unsigned numSpeakers = sl.mSpeakers.size();
 		for(unsigned i=0;i<numSpeakers;++i){
 			mSpeakers.push_back(sl.mSpeakers[i]);
@@ -139,8 +142,11 @@ public:
     
     int numSpeakers() const { return mSpeakers.size(); }
     
+    void setEnabled(bool _enable) {enabled = _enable;}
+    
 protected:
     Speakers mSpeakers;
+    bool enabled;
     
 };
 /////////////////////////////////////////////////////
