@@ -224,11 +224,11 @@ struct Color{
 	Color operator* (float v) const { return Color(*this)*=v; }
 	Color operator/ (float v) const { return Color(*this)/=v; }
 
-	/// Clamp all components into [0,1] range
-	Color& clamp(){
+	/// Clamp all components into [0,max] range
+	Color& clamp(float max=1.f){
 		for(int i=0; i<4; ++i){
 			float& v = components[i];
-			v<0.f ? v=0.f : (v>1.f ? v=1.f : 0);
+			v<0.f ? v=0.f : (v>max ? v=max : 0);
 		}
 		return *this;
 	}
@@ -614,11 +614,11 @@ struct RGB{
 	RGB operator/ (float v) const { return RGB(*this)/=v; }
 
 
-	/// Clamp all components into [0,1] range
-	RGB& clamp(){
+	/// Clamp all components into [0,max] range
+	RGB& clamp(float max=1.f){
 		for(int i=0; i<3; ++i){
 			float& v = components[i];
-			v<0.f ? v=0.f : (v>1.f ? v=1.f : 0);
+			v<0.f ? v=0.f : (v>max ? v=max : 0);
 		}
 		return *this;
 	}
