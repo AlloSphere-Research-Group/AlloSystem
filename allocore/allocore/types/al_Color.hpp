@@ -82,6 +82,11 @@ struct Color{
 	Color(float r, float g, float b, float a=1.f)
 	:	r(r), g(g), b(b), a(a){}
 
+	/// @param[in] rgba			4-vector of RGBA components
+	template<class T>
+	Color(const T * rgba)
+	:	r(rgba[0]), g(rgba[1]), b(rgba[2]), a(rgba[3]){}
+
 	/// @param[in] gray			red/green/blue components
 	/// @param[in] a			alpha component
 	Color(float gray=1.f, float a=1.f)
@@ -131,6 +136,7 @@ struct Color{
 	Color(const HCLuv& hcluv, float a =1.f)
 	:	a(a)
 	{	*this = hcluv; }
+
 
 	/// Set color component at index with no bounds checking
 	float& operator[](int i){ return components[i]; }
@@ -273,6 +279,10 @@ struct Colori {
 	Colori(uint8_t r, uint8_t g, uint8_t b, uint8_t a=255)
 	:	r(r), g(g), b(b), a(a){}
 
+	/// @param[in] rgba			4-vector of RGBA components
+	template<class T>
+	Colori(const T * rgba): r(rgba[0]), g(rgba[1]), b(rgba[2]), a(rgba[3]){}
+
 	/// @param[in] gray			red/green/blue components
 	/// @param[in] a			alpha component
 	Colori(uint8_t gray=255, uint8_t a=255)
@@ -387,38 +397,40 @@ struct HSV{
 	};
 
 
-	/// @param[in] h	hue
-	/// @param[in] s	saturation
-	/// @param[in] v	value
-	HSV(float h=0, float s=1, float v=1): h(h), s(s), v(v){}
+	/// @param[in] h			hue
+	/// @param[in] s			saturation
+	/// @param[in] v			value
+	HSV(float h=0, float s=1, float v=1)
+	:	h(h), s(s), v(v){}
 
-	/// @param[in] v	RGB color to convert from
+	/// @param[in] hsv			3-vector of HSV components
+	template<class T>
+	HSV(const T * hsv)
+	:	h(hsv[0]), s(hsv[1]), v(hsv[2]){}
+
+	/// @param[in] v			RGB color to convert from
 	HSV(const Color& v){ *this = v; }
 
-	/// @param[in] v	RGB color to convert from
+	/// @param[in] v			RGB color to convert from
 	HSV(const Colori& v){ *this = v; }
 
-	/// @param[in] v	RGB color to convert from
+	/// @param[in] v			RGB color to convert from
 	HSV(const RGB& v){ *this = v; }
 
-	/// @param[in] xyz	  CIEXYZ color to convert from
+	/// @param[in] xyz			CIEXYZ color to convert from
 	HSV(const CIEXYZ& xyz){ *this = xyz; }
 
-	/// @param[in] lab	  Lab color to convert from
+	/// @param[in] lab			Lab color to convert from
 	HSV(const Lab& lab){ *this = lab; }
 
-	/// @param[in] hclab	HCLab color to convert from
+	/// @param[in] hclab		HCLab color to convert from
 	HSV(const HCLab& hclab){ *this = hclab; }
 
-	/// @param[in] luv	  Luv color to convert from
+	/// @param[in] luv			Luv color to convert from
 	HSV(const Luv& luv){ *this = luv; }
 
-	/// @param[in] hcluv	HCLuv color to convert from
+	/// @param[in] hcluv		HCLuv color to convert from
 	HSV(const HCLuv& hcluv){ *this = hcluv; }
-
-	/// @param[in] hsv	3-vector of HSV components
-	template<class T>
-	HSV(T * hsv): h(hsv[0]), s(hsv[1]), v(hsv[2]){}
 
 
 	/// Set color component at index with no bounds checking
@@ -490,42 +502,42 @@ struct RGB{
 	};
 
 
-	/// @param[in] r		red component
-	/// @param[in] g		green component
-	/// @param[in] b		blue component
+	/// @param[in] r			red component
+	/// @param[in] g			green component
+	/// @param[in] b			blue component
 	RGB(float r, float g, float b)
 	:	r(r), g(g), b(b){}
 
-	/// @param[in] gray		red/green/blue components
+	/// @param[in] rgb			3-vector of RGB components
+	template<class T>
+	RGB(const T * rgb)
+	:	r(rgb[0]), g(rgb[1]), b(rgb[2]){}
+
+	/// @param[in] gray			red/green/blue components
 	RGB(float gray=1.f)
 	:	r(gray), g(gray), b(gray){}
 
-	/// @param[in] v		RGB color to convert from
+	/// @param[in] v			RGB color to convert from
 	RGB(const Color& v){ *this = v; }
 
 	/// @param[in] hsv			HSV value
-	RGB(const HSV& hsv)
-	{	*this = hsv; }
+	RGB(const HSV& hsv){ *this = hsv; }
 
 	/// @param[in] xyz			CIEXYZ value
-	RGB(const CIEXYZ& xyz)
-	{	*this = xyz; }
+	RGB(const CIEXYZ& xyz){ *this = xyz; }
 
 	/// @param[in] lab			Lab value
-	RGB(const Lab& lab)
-	{	*this = lab; }
+	RGB(const Lab& lab){ *this = lab; }
 
 	/// @param[in] hclab		HCLab value
-	RGB(const HCLab& hclab)
-	{	*this = hclab; }
+	RGB(const HCLab& hclab){ *this = hclab; }
 
 	/// @param[in] luv			Luv value
-	RGB(const Luv& luv)
-	{	*this = luv; }
+	RGB(const Luv& luv){ *this = luv; }
 
 	/// @param[in] hcluv		HCLuv value
-	RGB(const HCLuv& hcluv)
-	{	*this = hcluv; }
+	RGB(const HCLuv& hcluv){ *this = hcluv; }
+
 
 	/// Set color component at index with no bounds checking
 	float& operator[](int i){ return components[i]; }
@@ -626,6 +638,8 @@ struct RGB{
 	}
 };
 
+
+
 struct CIEXYZ{
 	union{
 		struct{
@@ -640,6 +654,10 @@ struct CIEXYZ{
 	/// @param[in] y			CIE Y
 	/// @param[in] z			CIE Z
 	CIEXYZ(float x=0, float y=1, float z=1): x(x), y(y), z(z){}
+
+	/// @param[in] xyz			3-vector of CIEXYZ components
+	template<class T>
+	CIEXYZ(const T * xyz): x(xyz[0]), y(xyz[1]), z(xyz[2]){}
 
 	/// @param[in] v			RGB color to convert from
 	CIEXYZ(const Color& v){ *this = v; }
@@ -658,10 +676,6 @@ struct CIEXYZ{
 
 	/// @param[in] v			Luv color to convert from
 	CIEXYZ(const Luv& v){ *this = v; }
-
-	/// @param[in] xyz			3-vector of CIEXYZ components
-	template<class T>
-	CIEXYZ(T * xyz): x(xyz[0]), y(xyz[1]), z(xyz[2]){}
 
 
 	/// Set color component at index with no bounds checking
@@ -690,6 +704,8 @@ struct CIEXYZ{
 	CIEXYZ& operator= (const Luv& v);
 };
 
+
+
 /// Color represented by L* (lightness), a*, b*
 struct Lab{
 	union{
@@ -712,6 +728,10 @@ struct Lab{
 	/// @param[in] b			b
 	Lab(float l=1, float a=1, float b=1): l(l), a(a), b(b){}
 
+	/// @param[in] hsv			3-vector of Lab components
+	template<class T>
+	Lab(const T * Lab): l(Lab[0]), a(Lab[1]), b(Lab[2]){}
+
 	/// @param[in] v			RGB color to convert from
 	Lab(const Color& v){ *this = v; }
 
@@ -730,9 +750,7 @@ struct Lab{
 	/// @param[in] v			HCLab color to convert from
 	Lab(const HCLab& v){ *this = v; }
 
-	/// @param[in] hsv			3-vector of Lab components
-	template<class T>
-	Lab(T * Lab): l(Lab[0]), a(Lab[1]), b(Lab[2]){}
+
 
 
 	/// Set color component at index with no bounds checking
@@ -766,6 +784,8 @@ struct Lab{
 	Lab& operator*=(float c){ l*=c; return *this; }
 };
 
+
+
 /// Color represented by hue, chroma, luminance(ab)
 struct HCLab{
 	union{
@@ -786,6 +806,10 @@ struct HCLab{
 	/// @param[in] l			luminance(ab)
 	HCLab(float h=1, float c=1, float l=1): h(h), c(c), l(l){}
 
+	/// @param[in] hcl			3-vector of HCLab components
+	template<class T>
+	HCLab(const T * HCLab): h(HCLab[0]), c(HCLab[1]), l(HCLab[2]){}
+
 	/// @param[in] v			RGB color to convert from
 	HCLab(const Color& v){ *this = v; }
 
@@ -802,11 +826,7 @@ struct HCLab{
 	HCLab(const CIEXYZ& v){ *this = v; }
 
 	/// @param[in] v			Lab color to convert from
-	HCLab(const Lab& v){ *this = v; }\
-
-	/// @param[in] hcl			3-vector of HCLab components
-	template<class T>
-	HCLab(T * HCLab): h(HCLab[0]), c(HCLab[1]), l(HCLab[2]){}
+	HCLab(const Lab& v){ *this = v; }
 
 
 	/// Set color component at index with no bounds checking
@@ -851,6 +871,8 @@ struct HCLab{
 	}
 };
 
+
+
 /// Color represented by L* (lightness), u*, v*
 struct Luv{
 	union{
@@ -873,6 +895,10 @@ struct Luv{
 	/// @param[in] v			v
 	Luv(float l=1, float u=1, float v=1): l(l), u(u), v(v){}
 
+	/// @param[in] hsv			3-vector of Luv components
+	template<class T>
+	Luv(const T * Luv): l(Luv[0]), u(Luv[1]), v(Luv[2]){}
+
 	/// @param[in] w			RGB color to convert from
 	Luv(const Color& w){ *this = w; }
 
@@ -890,10 +916,6 @@ struct Luv{
 
 	/// @param[in] w			HCLuv color to convert from
 	Luv(const HCLuv& w){ *this = w; }
-
-	/// @param[in] hsv			3-vector of Luv components
-	template<class T>
-	Luv(T * Luv): l(Luv[0]), u(Luv[1]), v(Luv[2]){}
 
 
 	/// Set color component at index with no bounds checking
@@ -928,6 +950,8 @@ struct Luv{
 	Luv& operator*=(float a){ l*=a; return *this; }
 };
 
+
+
 /// Color represented by hue, chroma, luminance(uv)
 struct HCLuv{
 
@@ -950,6 +974,10 @@ struct HCLuv{
 	/// @param[in] l			luminance(uv)
 	HCLuv(float h=1, float c=1, float l=1): h(h), c(c), l(l){}
 
+	/// @param[in] hcl			3-vector of HCLuv components
+	template<class T>
+	HCLuv(const T * HCLuv): h(HCLuv[0]), c(HCLuv[1]), l(HCLuv[2]){}
+
 	/// @param[in] w			RGB color to convert from
 	HCLuv(const Color& w){ *this = w; }
 
@@ -967,10 +995,6 @@ struct HCLuv{
 
 	/// @param[in] w			Luv color to convert from
 	HCLuv(const Luv& w){ *this = w; }
-
-	/// @param[in] hcl			3-vector of HCLuv components
-	template<class T>
-	HCLuv(T * HCLuv): h(HCLuv[0]), c(HCLuv[1]), l(HCLuv[2]){}
 
 
 	/// Set color component at index with no bounds checking
