@@ -192,6 +192,7 @@ public:
 private:
 	double mFPS;
 	double mRate;
+	double mBadFrame;
 	bool mIsFile;
 };
 

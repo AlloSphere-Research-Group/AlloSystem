@@ -41,7 +41,7 @@ namespace al{
 
 
 VideoCapture::VideoCapture()
-:	mFPS(1.), mRate(1.), mIsFile(false)
+:	mFPS(1.), mRate(1.), mBadFrame(-1), mIsFile(false)
 {}
 
 
@@ -69,7 +69,27 @@ void VideoCapture::release(){
 }
 
 bool VideoCapture::grab(){
-	return cvVideoCapture.grab();
+	bool didGrab = cvVideoCapture.grab();
+
+	// Attempt to advance past bad frames in video files
+	if(isFile()){
+		if(!didGrab){
+			if(mBadFrame == -1){ // last frame wasn't bad
+				mBadFrame = posFrames()+1;
+			}
+			printf("VideoCapture::grab: bad frame %g\n", mBadFrame);
+
+			if(mBadFrame < numFrames()){
+				posFrames(mBadFrame);
+				++mBadFrame;
+			}
+		}
+		else{
+			mBadFrame = -1;
+		}
+	}
+
+	return didGrab;
 }
 
 bool VideoCapture::retrieve(Array& dst, int channel, int copyPolicy){
