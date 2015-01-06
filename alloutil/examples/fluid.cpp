@@ -18,7 +18,7 @@ using namespace al;
 // create a fluid on a 32x32x32 grid:
 Fluid3D<float> fluid(32);
 
-// create an intensity field (on a 32x32x32 grid) 
+// create an intensity field (on a 32x32x32 grid)
 // to be driven around:
 Field3D<float> intensities(3, 32);
 
@@ -32,12 +32,12 @@ Shader shaderV, shaderF;
 rnd::Random<> rng;
 
 static const char * srcV = AL_STRINGIFY(
-uniform sampler3D velocityTex; 
-uniform sampler3D intensityTex; 
+uniform sampler3D velocityTex;
+uniform sampler3D intensityTex;
 varying vec3 velocity;
 varying vec3 intensity;
 void main(){
-	vec3 xyz = gl_Vertex.xyz / 32.; 
+	vec3 xyz = gl_Vertex.xyz / 32.;
 	velocity = texture3D(velocityTex, xyz).rgb;
 	// Array components = 2 defaults to GL_LUMINANCE_ALPHA:
 	intensity = texture3D(intensityTex, xyz).rgb;
@@ -69,11 +69,11 @@ void main() {
 struct MyWindow : public Window {
 
 	bool onCreate(){
-	
+
 		// reconfigure textures based on arrays:
 		intensityTex.submit(intensities.front(), true);
 		velocityTex.submit(fluid.velocities.front(), true);
-		
+
 		// shader method:
 		shaderV.source(srcV, Shader::VERTEX).compile();
 		shaderF.source(srcF, Shader::FRAGMENT).compile();
@@ -89,31 +89,31 @@ struct MyWindow : public Window {
 		for (int y=0; y<32; y++) {
 		for (int z=0; z<32; z++) {
 			// render 2 vertices at the same location
-			// using texcoord as an attribute to distinguish 
+			// using texcoord as an attribute to distinguish
 			// 'start' and 'end' vertices
 			mesh.texCoord(0, 0);
 			mesh.vertex(x, y, z);
-			mesh.texCoord(0, 1);	
+			mesh.texCoord(0, 1);
 			mesh.vertex(x, y, z);
-			mesh.texCoord(1, 0);	
-			mesh.vertex(x, y, z);	
+			mesh.texCoord(1, 0);
+			mesh.vertex(x, y, z);
 		}}}
-		
+
 		return true;
 	}
-	
+
 	bool onFrame(){
 		gl.clearColor(0,0,0,0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.viewport(0,0, width(), height());
-		
+
 		gl.matrixMode(gl.PROJECTION);
 		gl.loadMatrix(Matrix4d::perspective(45, aspect(), 0.1, 100));
 
 		gl.matrixMode(gl.MODELVIEW);
 		gl.loadMatrix(Matrix4d::lookAt(Vec3d(16, 16, 64), Vec3d(16, 16, 16), Vec3d(0,1,0)));
-		
-		
+
+
 //		// add some forces:
 //		float t = MainLoop::now() * 0.25;
 //		float r = 20;
@@ -122,7 +122,7 @@ struct MyWindow : public Window {
 //		fluid.addVelocity(Vec3f(16, 16, 20), Vec3f(0, -r*cos(t*3), -r*sin(t*3)));
 
 
-		
+
 		// add some intensities:
 		float v = 4;
 		intensities.add(Vec3f(12, 20, 16), Vec3f(v, 0, 0).elems());
@@ -130,18 +130,18 @@ struct MyWindow : public Window {
 		intensities.add(Vec3f(16, 16, 12), Vec3f(0, 0, v).elems());
 
 		float g;
-		
-			
-			
+
+
+
 			g = 2;
 			fluid.addGradient(Vec3f(16, 17, 16), g);
 			g = -2;
 			fluid.addGradient(Vec3f(16, 16, 16), g);
-		
+
 		// run a fluid step:
 		fluid.update();
-		
-		
+
+
 //		// VELOCITIES:
 //		// add a bit of random noise:
 //		fluid.velocities.adduniformS(rng, fluid.selfbackgroundnoise);
@@ -151,19 +151,19 @@ struct MyWindow : public Window {
 //		// zero velocities at boundaries:
 //		fluid.boundary();
 //		// (diffused data now in velocities.front())
-//		// stabilize: 
+//		// stabilize:
 //		fluid.project();
 ////			// prepare new gradient data:
 ////			fluid.velocities.calculateGradientMagnitude(fluid.gradient.front());
-////			
+////
 ////			// diffuse it (swaps):
 ////			fluid.gradient.diffuse(0.5, fluid.passes/2);
 ////			//fluid.gradient.back().zero();
-////			
-////			
+////
+////
 ////			// subtract from current velocities:
 ////			fluid.velocities.subtractGradientMagnitude(fluid.gradient.front());
-//		
+//
 //		// (projected data now in velocities.front())
 //		// advect velocities:
 //		fluid.velocities.advect(fluid.velocities.back(), fluid.selfadvection);
@@ -176,28 +176,28 @@ struct MyWindow : public Window {
 //		fluid.velocities.scale(fluid.selfdecay);
 //		// zero velocities at boundaries:
 //		fluid.boundary();
-		
-		
+
+
 		// diffuse the intensities:
 		intensities.diffuse();
-		
+
 		// use the fluid to advect the intensities:
 		intensities.advect(fluid.velocities.front(), 3.);
-		
+
 		// some decay
 		intensities.scale(0.999);
-		
+
 		// update texture data:
 		intensityTex.submit(intensities.front());
 		velocityTex.submit(fluid.velocities.front());
-		
+
 		// draw it:
 		gl.blending(true);
 		gl.blendModeAdd();
 		gl.lineWidth(0.5);
-		
+
 		gl.polygonMode(gl.LINE);
-		
+
 		shaderP.begin();
 		shaderP.uniform("velocityTex", 0);
 		shaderP.uniform("intensityTex", 1);

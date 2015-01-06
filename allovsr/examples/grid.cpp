@@ -42,26 +42,26 @@ if(!bSet){ bSet = true;
 struct MyApp : public al::VsrApp {
 
 
-    MyApp() : al::VsrApp() { 
-    
+    MyApp() : al::VsrApp() {
+
         // stereo.stereo(true);
         // stereo.mode( Stereographic::DUAL );
-    
+
     }
 
     virtual void onDraw(Graphics& gl){
-    
+
         //Model Transform
-        Rot t = Gen::aa( scene().model.rot() ); 
+        Rot t = Gen::aa( scene().model.rot() );
         GL::rotate( t.w() );
-    
+
         //YOUR CODE HERE
 
 		static Field<Pnt> f(20,20,12)
-		
+
     }
-    
-    
+
+
 };
 
 MyApp app;
@@ -70,9 +70,9 @@ int main(int argc, const char * argv[]){
 
     app.create(Window::Dim(800, 600), "Allovsr Example: Robot Arm");
 //    app.create(Window::Dim(800, 600), "Allovsr Example: Robot Arm",60, Window::DEFAULT_BUF | Window::STEREO_BUF);
-	
+
     MainLoop::start();
-    
+
 	return 0;
 
 }

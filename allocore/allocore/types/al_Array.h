@@ -1,41 +1,41 @@
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
 	File description:
 	AlloArray is a multidimensional array.
 	It is a pointer to data followed by meta-data to describe its type and layout.
-	
+
 	File author(s):
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 	Wesley Smith, 2010, wesley.hoke@gmail.com
@@ -62,33 +62,33 @@ extern "C" {
 
 #pragma mark AlloTy
 /**
-	Unique identifiers for principal types 
+	Unique identifiers for principal types
 		(inspired by SDIF; higher bits represent semantics, lower bits represent size)
-		(unlike SDIF, assumption is little-endian; and 'byte' is represented as AlloUInt8Ty) 
+		(unlike SDIF, assumption is little-endian; and 'byte' is represented as AlloUInt8Ty)
 */
-enum {	
+enum {
 	/* type with no size */
 	AlloVoidTy			= 0x0000,
-	
+
 	/* floating point numbers */
 	AlloFloat32Ty		= 0x0004,
 	AlloFloat64Ty		= 0x0008,
-	
+
 	/* signed integers */
-	AlloSInt8Ty			= 0x0101, 
+	AlloSInt8Ty			= 0x0101,
 	AlloSInt16Ty		= 0x0102,
 	AlloSInt32Ty		= 0x0104,
 	AlloSInt64Ty		= 0x0108,
-	
+
 	/* unsigned integers */
 	AlloUInt8Ty			= 0x0201,
 	AlloUInt16Ty		= 0x0202,
 	AlloUInt32Ty		= 0x0204,
 	AlloUInt64Ty		= 0x0208,
-	
+
 	/* structural types */
 	AlloArrayTy			= 0x1A2C,	/* 2C == 44 bytes, sizeof AlloArray */
-	
+
 	/* pointer types */
 	AlloPointer32Ty		= 0x2F04,
 	AlloPointer64Ty		= 0x2F08
@@ -119,28 +119,28 @@ static void allo_type_fromnumber(AlloTy ty, double number, char * dst);
 
 /** Description a dynamically-typed, multidimensional array */
 typedef struct AlloArrayHeader {
-	
+
 	/** The type of data stored (see enums above) */
 	AlloTy type;
-	
+
 	/**
 		The number of values per cell
 		Aka components, planecount, parts, rank, order...
 	*/
 	uint8_t components;
-	
+
 	/** The number of dimensions (actually should not be > ALLO_ARRAY_MAX_DIMS!) */
 	uint8_t dimcount;
-	
+
 	/** The size of each dimension */
 	uint32_t dim[ALLO_ARRAY_MAX_DIMS];
-	
+
 	/** The number of bytes between elements of that dimension */
 	uint32_t stride[ALLO_ARRAY_MAX_DIMS];
-	
+
 } AlloArrayHeader;
-	
-	
+
+
 /** Dynamically-typed, multidimensional array */
 typedef struct AlloArray {
 	/**
@@ -154,10 +154,10 @@ typedef struct AlloArray {
 		char * ptr;
 		uint64_t pad;
 	} data;
-	
+
 	/** The description of this data */
 	AlloArrayHeader header;
-		
+
 } AlloArray;
 
 
@@ -206,25 +206,25 @@ void allo_array_allocate(AlloArray * arr);
 /** Create a new array based on a header
 */
 void allo_array_create(AlloArray * arr, const AlloArrayHeader *h);
-	
+
 /** Create a new 1D array
 */
 void allo_array_create1d(
-	AlloArray * arr, 
-	uint8_t components, 
-	AlloTy type, 
-	uint32_t dimx, 
+	AlloArray * arr,
+	uint8_t components,
+	AlloTy type,
+	uint32_t dimx,
 	size_t align
 );
 
 /** Create a new 2D array
 */
 void allo_array_create2d(
-	AlloArray * arr, 
-	uint8_t components, 
-	AlloTy type, 
-	uint32_t dimx, 
-	uint32_t dimy, 
+	AlloArray * arr,
+	uint8_t components,
+	AlloTy type,
+	uint32_t dimx,
+	uint32_t dimy,
 	size_t align
 );
 
@@ -235,11 +235,11 @@ void allo_array_adapt(AlloArray * arr, const AlloArrayHeader *h);
 /** Adapt an array to 2D
 */
 void allo_array_adapt2d(
-	AlloArray * arr, 
-	uint8_t components, 
-	AlloTy type, 
-	uint32_t dimx, 
-	uint32_t dimy, 
+	AlloArray * arr,
+	uint8_t components,
+	AlloTy type,
+	uint32_t dimx,
+	uint32_t dimy,
 	size_t align
 );
 
@@ -270,10 +270,10 @@ void allo_array_copy(AlloArray *dst, AlloArray *src);
 typedef struct AlloArrayWrapper {
 
 	AlloArray array;
-	
+
 	/* The reference count */
 	int refs;
-	
+
 } AlloArrayWrapper;
 
 AlloArrayWrapper * allo_array_wrapper_new();
@@ -285,9 +285,9 @@ void allo_array_wrapper_setup(AlloArrayWrapper *wrap);
 void allo_array_wrapper_retain(AlloArrayWrapper *wrap);
 
 void allo_array_wrapper_release(AlloArrayWrapper *wrap);
-	
 
-	
+
+
 /*
  *
  ********* INLINE IMPLEMENTATION BELOW ***********
@@ -297,7 +297,7 @@ void allo_array_wrapper_release(AlloArrayWrapper *wrap);
 
 static inline size_t allo_type_size(AlloTy ty) {
 	switch(ty) {
-		case AlloUInt8Ty:		return sizeof(uint8_t);	
+		case AlloUInt8Ty:		return sizeof(uint8_t);
 		case AlloUInt16Ty:		return sizeof(uint16_t);
 		case AlloUInt32Ty:		return sizeof(uint32_t);
 		case AlloUInt64Ty:		return sizeof(uint64_t);
@@ -317,12 +317,12 @@ static inline size_t allo_type_size(AlloTy ty) {
 static inline double allo_type_tonumber(AlloTy ty, const char * ptr) {
 	switch(ty) {
 		case AlloUInt8Ty:		return (double)(((uint8_t *)ptr)[0])/255.;	/* UCHAR_MAX */
-		case AlloUInt16Ty:		return (double)(((uint8_t *)ptr)[0])/65535.;	
-		case AlloUInt32Ty:		return (double)(((uint8_t *)ptr)[0])/(double)0xffffffff;	
+		case AlloUInt16Ty:		return (double)(((uint8_t *)ptr)[0])/65535.;
+		case AlloUInt32Ty:		return (double)(((uint8_t *)ptr)[0])/(double)0xffffffff;
 		case AlloUInt64Ty:		return (double)(((uint8_t *)ptr)[0])/(double)ULONG_MAX;
 		case AlloSInt8Ty:		return 0.5+(double)(((uint8_t *)ptr)[0])/255.;	/* UCHAR_MAX */
-		case AlloSInt16Ty:		return 0.5+(double)(((uint8_t *)ptr)[0])/65535.;	
-		case AlloSInt32Ty:		return 0.5+(double)(((uint8_t *)ptr)[0])/(double)0xffffffff;	
+		case AlloSInt16Ty:		return 0.5+(double)(((uint8_t *)ptr)[0])/65535.;
+		case AlloSInt32Ty:		return 0.5+(double)(((uint8_t *)ptr)[0])/(double)0xffffffff;
 		case AlloSInt64Ty:		return 0.5+(double)(((uint8_t *)ptr)[0])/(double)ULONG_MAX;
 		case AlloFloat32Ty:		return (double)(((float *)ptr)[0]);
 		case AlloFloat64Ty:		return ((double *)ptr)[0];
@@ -336,7 +336,7 @@ static inline void allo_type_fromnumber(AlloTy ty, double number, char * dst) {
 		case AlloUInt16Ty:		*((uint16_t *)dst) = (uint16_t)(number * 65535.); break;
 		case AlloUInt32Ty:		*((uint32_t *)dst) = (uint32_t)(number * (double)(0xffffffff)); break;
 		case AlloUInt64Ty:		*((uint64_t *)dst) = (uint64_t)(number * (double)(ULONG_MAX)); break;
-		
+
 		case AlloSInt8Ty:		*((int8_t *)dst) = (int8_t)((number-0.5) * 255.); break;
 		case AlloSInt16Ty:		*((int16_t *)dst) = (int16_t)((number-0.5) * 65535.); break;
 		case AlloSInt32Ty:		*((int32_t *)dst) = (int32_t)((number-0.5) * (double)(0xffffffff)); break;
@@ -349,7 +349,7 @@ static inline void allo_type_fromnumber(AlloTy ty, double number, char * dst) {
 
 static inline uint32_t allo_array_elements(const AlloArray * arr) {
 	uint32_t i, elements = 1;
-	for (i=0; i<arr->header.dimcount; i++) 
+	for (i=0; i<arr->header.dimcount; i++)
 		elements *= arr->header.dim[i];
 	return elements;
 }
@@ -371,7 +371,7 @@ static inline size_t allo_array_size(const AlloArray * arr) {
 	# Dimensions	0			1			2			3			4
 	----------------------------------------------------------------------------
 	Index						row			column		pillar		file
-	Tensor						scalar		vector		matrix		
+	Tensor						scalar		vector		matrix
 	Sound						sample		time		channel		pattern
 	Polytope		point		line		polygon		polyhedron	polychoron
 	n-cube			point		line		square		cube		tesseract

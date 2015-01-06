@@ -20,16 +20,16 @@ protected:
 	:	mKernel(kernel)
 	{}
 
-public:	
+public:
 	virtual ~OpenCLKernel() {
 		destroy();
 	}
-	
+
 	static OpenCLKernel * create(OpenCLProgram &prog, const char *name);
 	static void create(OpenCLProgram &prog, vector<OpenCLKernel *> &kers);
-	
+
 	cl_kernel get_kernel() const {return mKernel;}
-	
+
 	template<typename T>
 	void set_argument(int idx, T *arg) {
 		set_argument(idx, sizeof(T), (void *)arg);

@@ -36,7 +36,7 @@ namespace osc{
 
 class Exception : public std::exception {
     const char *what_;
-    
+
 public:
     Exception() throw() {}
     Exception( const Exception& src ) throw()

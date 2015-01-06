@@ -18,7 +18,7 @@ struct MyApp : OmniApp {
   }
 
   virtual ~MyApp() {}
-  
+
   virtual void onDraw(Graphics& g) {
     light();
     // say how much lighting you want

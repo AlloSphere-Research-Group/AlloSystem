@@ -14,7 +14,7 @@
     NSMutableArray *services;
 	BOOL isConnected;
 	NSRunLoop *loop;
-	
+
 	al::zero::Client * master;
 }
 
@@ -31,7 +31,7 @@
 	if ((self = [super init])){
 		master = ptr;
 		services = [NSMutableArray new];
-				
+
 		isConnected = NO;
 
 		NSDictionary * dict = [NSDictionary	 dictionaryWithObjectsAndKeys:domain, @"domain", type, @"type", nil];
@@ -46,7 +46,7 @@
     browser = [NSNetServiceBrowser new];
     browser.delegate = self;
     [browser searchForServicesOfType:[dict objectForKey:@"type"] inDomain:[dict objectForKey:@"domain"]];
-    
+
     [[NSRunLoop currentRunLoop] run];
 }
 
@@ -104,7 +104,7 @@
 	//NSLog(service.domain);
     //self.isConnected = YES;
     //self.connectedService = service;
-	
+
 	[self performSelectorOnMainThread:@selector(resolvedService:) withObject:service waitUntilDone:NO];
 }
 
@@ -113,16 +113,16 @@
 
 	NSString *name = nil;
 	int port;
-	
+
 	for(NSData *d in [service addresses]) {
 		struct sockaddr_in *socketAddress  = (struct sockaddr_in *) [d bytes];
 		name = [service name];
 		socketAddress = (struct sockaddr_in *)[d bytes];
-		
+
 		char * ipaddress = inet_ntoa(socketAddress->sin_addr);
 		if(strcmp(ipaddress, "0.0.0.0") == 0) continue;
-		
-		port = ntohs(socketAddress->sin_port); // ntohs converts from network byte order to host byte order 
+
+		port = ntohs(socketAddress->sin_port); // ntohs converts from network byte order to host byte order
 
 		master->onServiceResolved([name UTF8String], [[service hostName] UTF8String], port, ipaddress);
 	}
@@ -141,10 +141,10 @@
 - (id)initWithDomain:(NSString *)domain type:(NSString *)type name:(NSString *)name port:(int)port
 {
 	if ((self = [super init])){
-		netService = [[NSNetService alloc] 
-			initWithDomain:(domain) 
-			type:(type) 
-			name:(name) 
+		netService = [[NSNetService alloc]
+			initWithDomain:(domain)
+			type:(type)
+			name:(name)
 			port:(port)
 		];
 		netService.delegate = self;
@@ -155,7 +155,7 @@
 
 -(void)dealloc {
     [netService stop];
-    [netService release]; 
+    [netService release];
     netService = nil;
     [super dealloc];
 }
@@ -167,7 +167,7 @@
 - (void)netServiceWillPublish:(NSNetService *)sender {
 	//NSLog(@"Will publish: %@", sender);
 }
-- (void)netServiceWillResolve:(NSNetService *)sender { 
+- (void)netServiceWillResolve:(NSNetService *)sender {
 	//NSLog(@"Will resolve: %@", sender);
 }
 - (void)netServiceDidResolveAddress:(NSNetService *)sender {
@@ -195,7 +195,7 @@ namespace zero {
 
 class Client::Impl : public ImplBase {
 public:
-	
+
 	Impl(Client * master, const std::string& domain, const std::string& type) : ImplBase(), master(master) {
 		NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 		delegate = [[ClientDelegate alloc]
@@ -206,7 +206,7 @@ public:
 		[pool release];
 	}
 	virtual ~Impl() {
-		[delegate release]; 
+		[delegate release];
 		delegate = nil;
 	}
 
@@ -218,35 +218,35 @@ public:
 
 class Service::Impl : public ImplBase {
 public:
-	Impl(Service * master, const std::string& name, const std::string& host, uint16_t port, const std::string& type, const std::string& domain) 
+	Impl(Service * master, const std::string& name, const std::string& host, uint16_t port, const std::string& type, const std::string& domain)
 	:	ImplBase(), name(name), host(host), type(type), domain(domain), port(port), master(master) {
 		NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-		delegate = [[ServerDelegate alloc] 
-			initWithDomain:CPP_STRING_TO_NSSTRING(domain) 
-			type:CPP_STRING_TO_NSSTRING(type) 
-			name:CPP_STRING_TO_NSSTRING(name) 
+		delegate = [[ServerDelegate alloc]
+			initWithDomain:CPP_STRING_TO_NSSTRING(domain)
+			type:CPP_STRING_TO_NSSTRING(type)
+			name:CPP_STRING_TO_NSSTRING(name)
 			port:(port)
 		];
 		[pool release];
 	}
-	
+
 	virtual ~Impl() {
-		[delegate release]; 
+		[delegate release];
 		delegate = nil;
 	}
 
 	void poll(al_sec timeout) {}
-	
+
 	std::string name, host, type, domain;
 	uint16_t port;
 	Service * master;
-	
+
 	ServerDelegate * delegate;
 };
 
 #pragma mark public interface
 
-Client::Client(const std::string& type, const std::string& domain) 
+Client::Client(const std::string& type, const std::string& domain)
 :	type(type), domain(domain) {
 	mImpl = new Impl(this, domain, type);
 }

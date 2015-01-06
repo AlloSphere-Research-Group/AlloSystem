@@ -106,36 +106,36 @@ int main (int argc, const char * argv[]) {
 	strcpy(clangpath, cwd);
 	strcat(clangpath, "/../../dev/osx/lib/llvm/clang/1.1/include");
 	printf("including path %s\n", clangpath);
-	
-	
+
+
 
 	al::Compiler C;
 	C.options.user_includes.push_back(allopath);
 	C.options.system_includes.push_back(clangpath);
 	vfptr f;
-	
-	
+
+
 	bool ok = C.compile(code);
 	al::JIT * jit = C.jit();
 	f = (vfptr)jit->getfunctionptr("main");
-	
-	
+
+
 	printf("compiled? %d (f=%p) \n", ok, f);
 	if (f) {
 		f(0, 0);
 	}
 	C.compile(src);
 	al::JIT * jit2 = C.jit();
-	
+
 	f = (vfptr)jit2->getfunctionptr("z00");
 	f(0, 0);
-	
-//	audio.print();	
+
+//	audio.print();
 //	printf("open %d\n", audio.open());
 //	printf("start %d\n", audio.start());
-//	al_sleep(2);							
+//	al_sleep(2);
 //	audio.printError();
-	
+
 	return 0;
 }
 

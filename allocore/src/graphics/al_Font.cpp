@@ -7,7 +7,7 @@
 	#include FT_FREETYPE_H
 	#include FT_OUTLINE_H
 	#include FT_GLYPH_H
-	
+
 	#define FONT_OSX 1
 	#define FONT_SYSTEM_FONTS 1
 
@@ -50,7 +50,7 @@ struct FontCharacter{
 	:	width(10),
 		y_offset(0)
 	{}
-	
+
 	~FontCharacter() {}
 
 	int width;
@@ -80,7 +80,7 @@ public:
 
 	static Impl * create(Font& font, const std::string& filename) {
 		if (!initialize_font()) return 0;
-		
+
 		FT_Face face;
 		FT_Error err = FT_New_Face(front_freetype_library, filename.c_str(), 0, &face);
 		if(err) {
@@ -92,28 +92,28 @@ public:
 			FT_Done_Face(face);
 			return 0;
 		}
-		
+
 		return new Impl(font, face);
 	}
-	
+
 	virtual ~Impl() {
 		FT_Done_Face(mFace);
 	}
-	
+
 	// returns the "above-line" height of the font in pixels
-	float ascender() { 
-		return mFace->size->metrics.ascender/PIX_TO_EM; 
+	float ascender() {
+		return mFace->size->metrics.ascender/PIX_TO_EM;
 	}
-	
+
 	// returns the "below-line" height of the font in pixels
-	float descender() { 
-		return mFace->size->metrics.descender/PIX_TO_EM; 
+	float descender() {
+		return mFace->size->metrics.descender/PIX_TO_EM;
 	}
-	
+
 	unsigned textureWidth(unsigned fontSize) {
 		return (fontSize+2)*GLYPHS_PER_ROW;
 	}
-	
+
 	unsigned textureHeight(unsigned fontSize) {
 		return (fontSize+2)*(ASCII_SIZE/GLYPHS_PER_ROW);
 	}
@@ -121,15 +121,15 @@ public:
 protected:
 
 	// factory pattern; use Impl::create()
-	Impl(Font& font, FT_Face face) 
+	Impl(Font& font, FT_Face face)
 	:	mFace(face)
 	{
 		font.mTex.width(textureWidth(font.mFontSize));
 		font.mTex.height(textureHeight(font.mFontSize));
 		font.mTex.allocate();
-		
+
 		Array& arr = font.mTex.array();
-		
+
 		const int rowstride = arr.header.stride[1];
 		char * optr = arr.data.ptr;
 		const int padding_x = 1;
@@ -161,7 +161,7 @@ protected:
 			// calculate texture pointer offset:
 			int xidx = i % GLYPHS_PER_ROW;
 			int yidx = (int)((float)i/(float)GLYPHS_PER_ROW);
-			int offset = (padding_y + yidx*glyph_height)*rowstride + 
+			int offset = (padding_y + yidx*glyph_height)*rowstride +
 						 (padding_x + xidx*glyph_width );
 
 			unsigned char * image = (unsigned char *)(optr + offset);
@@ -178,7 +178,7 @@ protected:
 				}
 			//}
 		}
-	
+
 	}
 
 	FT_Face mFace;
@@ -209,7 +209,7 @@ float Font :: ascender() const { return mImpl->ascender(); }
 float Font :: descender() const { return mImpl->descender(); }
 
 void Font :: write(Mesh& mesh, const std::string& text) {
-	
+
 	mesh.reset();
 	mesh.primitive(Graphics::QUADS);
 
@@ -219,41 +219,41 @@ void Font :: write(Mesh& mesh, const std::string& text) {
 	float cdim = csz+margin;
 	float tdim = cdim*GLYPHS_PER_ROW;
 	float tcdim = ((float)cdim)/((float)tdim);
-	
+
 	float pos[] = {0., 0.};
-	
+
 	for(int i=0; i < nchars; i++) {
 		int idx = text[i];
 		const FontCharacter &c = mChars[idx];
 		/*int margin = 1;*/
-		
+
 		int xidx = idx % GLYPHS_PER_ROW;
 		int yidx = idx / GLYPHS_PER_ROW;
 		float yy = c.y_offset;
-		
+
 		float tc_x0	= ((float)(xidx))*tcdim;
 		float tc_y0	= ((float)(yidx))*tcdim;
 		float tc_x1	= tc_x0+tcdim;
 		float tc_y1	= tc_y0+tcdim;
-		
+
 		float v_x0  = pos[0] + c.x_offset;
 		float v_x1	= v_x0+cdim;
 		float v_y0	= margin+yy-pos[1];
 		float v_y1	= yy-csz-pos[1];
-		
+
 		// draw character quad:
 		mesh.texCoord(	tc_x0,	tc_y0);
 		mesh.vertex(	v_x0,	v_y0,	0);
-		
+
 		mesh.texCoord(	tc_x1,	tc_y0);
 		mesh.vertex(	v_x1,	v_y0,	0);
-		
+
 		mesh.texCoord(	tc_x1,	tc_y1);
 		mesh.vertex(	v_x1,	v_y1,	0);
-		
+
 		mesh.texCoord(	tc_x0,	tc_y1);
 		mesh.vertex(	v_x0,	v_y1,	0);
-		
+
 		pos[0] += (float)c.width;
 	}
 }

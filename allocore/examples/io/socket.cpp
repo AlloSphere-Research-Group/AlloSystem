@@ -26,35 +26,35 @@ int main(){
 
 		SocketClient client;
 		SocketServer server;
-		
+
 		/* Open a client socket for sending data.
-		
+
 		The arguments are port number, IP address, timeout, and protocol.
 		We set the timeout to 0 so that the socket does not block.
 		*/
 		client.open(port, addr, 0, Socket::UDP);
 
 		/* Open a server socket for receiving data.
-		
+
 		The arguments are port number, IP address, timeout, and protocol.
 		Here, the IP address is "" which designates that we will receive data
-		from any address on the specified port. The timeout is set to -1 to make 
+		from any address on the specified port. The timeout is set to -1 to make
 		the socket block when a call to recv is made.
 		*/
 		server.open(port, "", -1, Socket::UDP);
 
 		/* Send data
-		
+
 		Here we send our data out over the client socket. The return value of
 		send is the number of bytes sent.
 		*/
 		int bytesSent = client.send(data, sizeof data);
 		printf("UDP client sent %d bytes.\n", bytesSent);
-		
-		
+
+
 		// Receive data
 		char buf[128] = {0};
-		
+
 		// Typically, a server will loop to check for incoming packets
 		while(1){
 			/* Here is where we actually check to see if there is any incoming
@@ -63,7 +63,7 @@ int main(){
 			bytes received.
 			*/
 			int bytesRecv = server.recv(buf, sizeof buf);
-			
+
 			if(bytesRecv){
 				printf("UDP server received %d bytes:\n%s\n\n", bytesRecv, buf);
 				break;
@@ -83,11 +83,11 @@ int main(){
 		std::string req = "HEAD / HTTP/1.0\r\n\r\n";
 		// This requests the default page
 		//std::string req = "GET / HTTP/1.0\r\n\r\n";
-		
+
 		// Here we send the request out
 		int bytesSent = client.send(req.c_str(), req.size());
 		printf("TCP client sent %d bytes:\n%s", bytesSent, req.c_str());
-		
+
 		// Now, we go into a busy loop checking for a response from the server
 		while(1){
 			char buf[512] = {0};

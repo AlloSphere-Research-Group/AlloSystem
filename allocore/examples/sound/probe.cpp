@@ -43,7 +43,7 @@ void audioCB(AudioIOData& io){
 		}
 		count++;
 	}
-}	
+}
 
 
 int main (int argc, char * argv[]){
@@ -56,15 +56,15 @@ int main (int argc, char * argv[]){
 	gains.resize(channels);
 	unmute();
 	dev.print();
-	
 
-	AudioIO audioIO; 
+
+	AudioIO audioIO;
 	audioIO.deviceIn(AudioDevice::defaultInput());
 	audioIO.deviceOut(AudioDevice::defaultOutput());
 	audioIO.callback = audioCB;
 	audioIO.start();
-	
-	printf("\nPress + and - (and return) to adjust volume\nPress a number (and return) to solo the channel\nPress 'space' (and return) to hear all channels\nPress 'q' (and return) to quit...\n"); 
+
+	printf("\nPress + and - (and return) to adjust volume\nPress a number (and return) to solo the channel\nPress 'space' (and return) to hear all channels\nPress 'q' (and return) to quit...\n");
 	while (true) {
 		char c = getchar();
 		switch(c) {
@@ -97,7 +97,7 @@ int main (int argc, char * argv[]){
 				printf("char %d\n", (int)c);
 				break;
 		}
-		
+
 	}
 	return 0;
 }

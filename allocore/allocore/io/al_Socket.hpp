@@ -3,35 +3,35 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -66,7 +66,7 @@ public:
 		// Transmission types
 		STREAM	= 1<<8,	/**< Connection-based, reliable byte stream */
 		DGRAM	= 2<<8,	/**< Datagram; connectionless, unreliable fixed-length messages */
-		
+
 		// Families
 		INET	= 1<<16, /**< IPv4 Internet protocols */
 		INET6	= 2<<16  /**< IPv6 Internet protocols */
@@ -87,7 +87,7 @@ public:
 
 	/// Get name of current host
 	static std::string hostName();
-	
+
 	/// IP address of current host
 	static std::string hostIP();
 
@@ -115,7 +115,7 @@ public:
 	bool bind();
 
 	/// Connect socket to current (remote) address.
-	
+
 	/// Called on a client socket. In case of a TCP socket, this causes an
 	/// attempt to establish a new TCP connection.
 	bool connect();
@@ -139,12 +139,12 @@ public:
 	/// @param[in] maxlen	The maximum length, in bytes, of data to copy
 	/// \returns bytes read
 	//
-	/// Note: to ensure receipt of all messages in the queue, use 
+	/// Note: to ensure receipt of all messages in the queue, use
 	/// while(recv()){}
 	size_t recv(char * buffer, size_t maxlen);
 
 	/// Send data over a network
-	
+
 	/// @param[in] buffer	The buffer of data to send
 	/// @param[in] len		The length, in bytes, of the buffer
 	/// \returns bytes sent
@@ -152,15 +152,15 @@ public:
 
 
 	/// Listen for incoming connections from remote clients
-	
+
 	/// After a socket has been associated with an address, listen prepares it
 	/// for incoming connections. This is only relevent for server sockets using
 	/// stream-oriented connections, such as TCP.
 	bool listen();
 
 	/// Check for an incoming socket connection
-	
-	/// Accepts a received incoming attempt to create a new TCP connection 
+
+	/// Accepts a received incoming attempt to create a new TCP connection
 	/// from the remote client, and creates a new socket associated with the
 	/// socket address pair of this connection.
 	bool accept(Socket& sock);

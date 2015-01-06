@@ -72,14 +72,14 @@ void GLVBinding::bindTo(Window& win){
 
 
 GLVDetachable::GLVDetachable()
-:	glv::GLV(0,0), 
+:	glv::GLV(0,0),
 	mParentWindow(NULL), mInputControl(*this), mWindowControl(*this)
 {
 	init();
 }
 
 GLVDetachable::GLVDetachable(Window& parent)
-:	glv::GLV(0,0), 
+:	glv::GLV(0,0),
 	mInputControl(*this), mWindowControl(*this)
 {
 	parentWindow(parent);

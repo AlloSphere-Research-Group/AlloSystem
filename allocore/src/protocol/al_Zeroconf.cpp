@@ -69,7 +69,7 @@ public:
 	static void client_callback(AvahiClient *client, AvahiClientState state, void * userdata) {
 		assert(client);
 		//Subclass * self = (Subclass *)userdata;
-		
+
 		switch (state) {
 		    case AVAHI_CLIENT_S_RUNNING:
 		        /* The server has startup successfully and registered its host
@@ -107,10 +107,10 @@ public:
 
 class Client::Impl : public ImplBase<Client::Impl> {
 public:
-	
+
 	Impl(Client * master) : browser(0), master(master) {
 		start();
-		if (client) {	
+		if (client) {
 			/* Create the service browser */
 			if (!(browser = avahi_service_browser_new(client, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, master->type.c_str(), master->domain.c_str(), (AvahiLookupFlags)0, browse_callback, this))) {
 				AL_WARN("Zeroconf: Failed to create service browser: %s", avahi_strerror(avahi_client_errno(client)));
@@ -165,7 +165,7 @@ public:
 
 		    case AVAHI_BROWSER_ALL_FOR_NOW:
 		    case AVAHI_BROWSER_CACHE_EXHAUSTED:
-				// TODO: what do these mean?		        
+				// TODO: what do these mean?
 				//AL_WARN("Zeroconf: %s", event == AVAHI_BROWSER_CACHE_EXHAUSTED ? "CACHE_EXHAUSTED" : "ALL_FOR_NOW");
 		        break;
 		}
@@ -238,7 +238,7 @@ public:
 
 class Service::Impl : public ImplBase<Service::Impl> {
 public:
-	Impl(Service * master, const std::string& name, const std::string& host, uint16_t port, const std::string& type, const std::string& domain) 
+	Impl(Service * master, const std::string& name, const std::string& host, uint16_t port, const std::string& type, const std::string& domain)
 :	name(name), host(host), type(type), domain(domain), port(port), group(0), master(master) {
 		start();
 	}
@@ -257,14 +257,14 @@ public:
 		// create an entry group:
 		if (avahi_entry_group_is_empty(self->group)) {
 			printf("Zeroconf: Adding service '%s'\n", self->name.c_str());
-		
+
 			// add a service to the group:
 			if ((ret = avahi_entry_group_add_service(self->group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, (AvahiPublishFlags)0, self->name.c_str(), self->type.c_str(), self->domain.c_str(), NULL, self->port, NULL)) < 0) {
 				AL_WARN("add group error %d - %d", ret, AVAHI_ERR_COLLISION);
 
 			    if (ret == AVAHI_ERR_COLLISION) {
 			        AL_WARN("Zeroconf: name collision");
-					
+
 					// A service name collision with a local service happened. Let's pick a new name
 					self->name = avahi_alternative_service_name(self->name.c_str());;
 
@@ -279,7 +279,7 @@ public:
 			    return;
 			}
 
-			// Tell the server to register the service 
+			// Tell the server to register the service
 			if ((ret = avahi_entry_group_commit(self->group)) < 0) {
 			    AL_WARN("Zeroconf: Failed to commit entry group: %s", avahi_strerror(ret));
 			    return;
@@ -346,7 +346,7 @@ public:
 	Service * master;
 };
 
-Client::Client(const std::string& type, const std::string& domain) 
+Client::Client(const std::string& type, const std::string& domain)
 :	type(type), domain(domain) {
 	mImpl = new Impl(this);
 }

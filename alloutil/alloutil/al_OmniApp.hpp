@@ -24,24 +24,24 @@ public:
 	virtual ~OmniApp();
 
 	void start();
-	
+
 	virtual void onDraw(Graphics& gl) {}
 	virtual void onAnimate(al_sec dt) {}
 	virtual void onSound(AudioIOData& io) {}
 	virtual void onMessage(osc::Message& m);
-	
+
 	const AudioIO&		audioIO() const { return mAudioIO; }
 	AudioIO&			audioIO(){ return mAudioIO; }
-	
+
 	const Lens&			lens() const { return mLens; }
 	Lens&				lens() { return mLens; }
 
 	const Graphics&		graphics() const { return mGraphics; }
 	Graphics&			graphics(){ return mGraphics; }
-	
+
 	const Nav&			nav() const { return mNav; }
 	Nav&				nav(){ return mNav; }
-	
+
 	ShaderProgram&		shader() { return mShader; }
 
 	const std::string&	name() const { return mName; }
@@ -49,38 +49,38 @@ public:
 
 	osc::Recv&			oscRecv(){ return mOSCRecv; }
 	osc::Send&			oscSend(){ return mOSCSend; }
-	
+
 	OmniStereo&			omni() { return mOmni; }
-	
+
 	const std::string&	hostName() const { return mHostName; }
-	
+
 	bool				omniEnable() const { return bOmniEnable; }
 	void				omniEnable(bool b) { bOmniEnable = b; }
-	
+
 	void initWindow(
 		const Window::Dim& dims = Window::Dim(800, 400),
 		const std::string title = "OmniApp",
 		double fps = 60,
 		Window::DisplayMode mode = Window::DEFAULT_BUF);
-			
+
 	void initAudio(
 		double audioRate=44100, int audioBlockSize=256
 	);
-	
+
 	void initAudio(
-		std::string devicename, 
+		std::string devicename,
     double audioRate, int audioBlockSize,
 		int audioInputs, int audioOutputs
 	);
 	void initOmni(std::string path = "");
-	
+
 	void sendHandshake();
 	void sendDisconnect();
-	
+
 	virtual bool onCreate();
 	virtual bool onFrame();
 	virtual void onDrawOmni(OmniStereo& omni);
-	
+
 	virtual std::string	vertexCode();
 	virtual std::string	fragmentCode();
 
@@ -88,26 +88,26 @@ protected:
 
 	AudioIO mAudioIO;
 	OmniStereo mOmni;
-	
+
 	Lens mLens;
 	Graphics mGraphics;
-	
+
 	ShaderProgram mShader;
-	
+
 	// control
 	Nav mNav;
 	NavInputControl mNavControl;
 	StandardWindowKeyControls mStdControls;
 	osc::Recv mOSCRecv;
 	osc::Send mOSCSend;
-	
+
 	std::string mName;
 	std::string mHostName;
-	
+
 	double mNavSpeed, mNavTurnSpeed;
-	
+
 	bool bOmniEnable, bSlave;
-	
+
 	static void AppAudioCB(AudioIOData& io);
 };
 
@@ -119,25 +119,25 @@ inline OmniApp::OmniApp(std::string name, bool slave)
 	mOSCRecv(PORT_FROM_DEVICE_SERVER),
 	mOSCSend(PORT_TO_DEVICE_SERVER, DEVICE_SERVER_IP_ADDRESS),
 	bSlave(slave)
-{	
+{
 	bOmniEnable = true;
 	mHostName = Socket::hostName();
 	mName = name;
-	
+
 	mNavSpeed = 1;
 	mNavTurnSpeed = 0.02;
-	
+
 	lens().near(0.01).far(40).eyeSep(0.03);
 	nav().smooth(0.8);
-	
+
 	Window::append(mStdControls);
 	initWindow();
 	initOmni();
-	
+
 	if (!bSlave) {
-		Window::append(mNavControl);					
+		Window::append(mNavControl);
 		initAudio();
-	
+
 		oscRecv().bufferSize(32000);
 		oscRecv().handler(*this);
 		sendHandshake();
@@ -174,7 +174,7 @@ inline void OmniApp::initAudio(
 	mAudioIO.framesPerBuffer(audioBlockSize);
 }
 
-inline void OmniApp::initAudio( 
+inline void OmniApp::initAudio(
 	std::string devicename,
 	double audioRate, int audioBlockSize,
 	int audioInputs, int audioOutputs
@@ -202,25 +202,25 @@ inline void OmniApp::start() {
 	if (mOmni.activeStereo()) {
 		Window::displayMode(Window::displayMode() | Window::STEREO_BUF);
 	}
-	
+
 	create();
-	
+
 	if (mOmni.fullScreen()) {
 		fullScreen(true);
 		cursorHide(true);
 	}
-	
-	if (!bSlave) { 
+
+	if (!bSlave) {
 		if(oscSend().opened()) sendHandshake();
 		mAudioIO.start();
 	}
-	
+
 	Main::get().start();
 }
 
 inline bool OmniApp::onCreate() {
 	mOmni.onCreate();
-	
+
 	Shader vert, frag;
 	vert.source(OmniStereo::glsl() + vertexCode(), Shader::VERTEX).compile();
 	vert.printLog();
@@ -232,7 +232,7 @@ inline bool OmniApp::onCreate() {
 	mShader.uniform("lighting", 1.0);
 	mShader.uniform("texture", 0.0);
 	mShader.end();
-	
+
 	return true;
 }
 
@@ -240,13 +240,13 @@ inline bool OmniApp::onFrame() {
 	FPS::onFrame();
 
 	while(oscRecv().recv()) {}
-	
+
 	nav().step();
-	
+
 	onAnimate(dt);
-	
+
 	Viewport vp(width(), height());
-	
+
 	if (bOmniEnable) {
 		mOmni.onFrame(*this, lens(), nav(), vp);
 	} else {
@@ -257,12 +257,12 @@ inline bool OmniApp::onFrame() {
 
 inline void OmniApp::onDrawOmni(OmniStereo& omni) {
 	graphics().error("start onDraw");
-	
+
 	mShader.begin();
 	mOmni.uniforms(mShader);
-	
+
 	onDraw(graphics());
-	
+
 	mShader.end();
 }
 
@@ -294,10 +294,10 @@ inline void OmniApp::onMessage(osc::Message& m) {
 
 	} else if (m.addressPattern() == "/home") {
 		nav().home();
-		
+
 	} else if (m.addressPattern() == "/halt") {
 		nav().halt();
-		
+
 	}
 }
 
@@ -314,7 +314,7 @@ inline std::string	OmniApp::vertexCode() {
 			eyeVec = normalize(-V);
 			lightDir = normalize(vec3(gl_LightSource[0].position.xyz - V));
 			gl_TexCoord[0] = gl_MultiTexCoord0;
-			gl_Position = omni_render(vertex); 
+			gl_Position = omni_render(vertex);
 		}
 	);
 }
@@ -327,7 +327,7 @@ inline std::string OmniApp::fragmentCode() {
 		varying vec4 color;
 		varying vec3 normal, lightDir, eyeVec;
     	void main() {
-    		
+
     		vec4 colorMixed;
     		if( texture > 0.0){
     			vec4 textureColor = texture2D(texture0, gl_TexCoord[0].st);

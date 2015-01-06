@@ -1,7 +1,7 @@
 /*
 Description:
-This is a very stripped down App subclass that can be used as a starting 
-template for projects. This is NOT an example of how to use the App class. 
+This is a very stripped down App subclass that can be used as a starting
+template for projects. This is NOT an example of how to use the App class.
 See allocore/examples/io/simpleApp.cpp for an overview of the App class.
 
 Author:

@@ -2,7 +2,7 @@
 What is our "Hello world!" app?
 
 An agent orbits around the origin emitting the audio line input. The camera
-view can be switched between a freely navigable keyboard/mouse controlled mode 
+view can be switched between a freely navigable keyboard/mouse controlled mode
 and a sphere follow mode.
 
 Requirements:
@@ -30,28 +30,28 @@ struct Agent : public SoundSource, public Nav, public Drawable{
 			//float s = rnd::uniform(); // make noise, just to hear something
 			float s = sin(oscPhase * M_2PI);
 			//float s = al::rnd::uniformS();
-			
+
 			//s *= (oscEnv*=0.999);
-			
+
 			if(oscEnv < 0.00001){ oscEnv=1; oscPhase=0; }
-			
+
 			//float s = phase * 2 - 1;
 			oscPhase += 440./io.framesPerSecond();
 			if(oscPhase >= 1) oscPhase -= 1;
 			writeSample(s*0.2);
 		}
 	}
-	
+
 	virtual void onUpdateNav(){
 		smooth(0.9);
-		
+
 		spin(M_2PI/360, M_2PI/397, 0);
 		moveF(0.04);
 		step();
-		
+
 		SoundSource::pose(*this);
 	}
-	
+
 	virtual void onDraw(Graphics& g){
 		g.pushMatrix();
 			g.scale(10);
@@ -64,31 +64,31 @@ struct Agent : public SoundSource, public Nav, public Drawable{
 			g.multMatrix(directionMatrix());
 			g.begin(g.TRIANGLES);
 				float ds = 0.5;
-				
+
 				g.color(1,1,1);
 				g.vertex(    0, 0, ds*2);
 				g.color(1,1,0);
 				g.vertex( ds/2, 0,-ds);
 				g.color(1,0,1);
 				g.vertex(-ds/2, 0,-ds);
-				
+
 				g.color(1,1,1);
 				g.vertex(    0, 0, ds*2);
 				g.color(0,1,1);
 				g.vertex( 0, ds/2,-ds);
 				g.color(1,0,1);
 				g.vertex(-ds/2, 0,-ds);
-				
+
 				g.color(1,1,1);
 				g.vertex(    0, 0, ds*2);
 				g.color(1,1,0);
 				g.vertex( ds/2, 0,-ds);
 				g.color(0,1,1);
 				g.vertex( 0, ds/2, -ds);
-			g.end();		
+			g.end();
 		g.popMatrix();
 	}
-	
+
 	double oscPhase, oscEnv;
 };
 
@@ -117,7 +117,7 @@ AmbiDecode::Speaker speakers[numSpeakers] = {
 	Speaker( 5-1,-1.5*midAz, midEl),
 	Speaker(20-1,-2.5*midAz, midEl),
 	Speaker(19-1,-3.5*midAz, midEl),
-	
+
 	Speaker( 7-1, 0.5*topAz, topEl),
 	Speaker( 9-1, 1.5*topAz, topEl),
 	Speaker( 8-1,-0.5*topAz, topEl),
@@ -152,13 +152,13 @@ void audioCB(AudioIOData& io){
 
 	scene.encode(numFrames, io.framesPerSecond());
 	scene.render(&io.out(0,0), numFrames);
-	
+
 	//printf("%g\n", io.out(0,0));
 }
 
 
 struct MyWindow : public Window, public Drawable{
-	
+
 	MyWindow() {}
 
 	bool onFrame(){
@@ -168,20 +168,20 @@ struct MyWindow : public Window, public Drawable{
 		Viewport vp(dimensions().w, dimensions().h);
 		stereo.draw(gl, cam, pose, vp, *this);
 
-//		printf("pos %f %f %f\n", navMaster.pos()[0], navMaster.pos()[1], navMaster.pos()[2]);		
-		
+//		printf("pos %f %f %f\n", navMaster.pos()[0], navMaster.pos()[1], navMaster.pos()[2]);
+
 		return true;
 	}
-	
+
 	bool onKeyDown(const Keyboard& k) {
-		
+
 		if (k.key() == Keyboard::TAB) {
 			stereo.stereo(!stereo.stereo());
 		}
-		
+
 		return true;
 	}
-	
+
 	virtual void onDraw(Graphics& g){
 
 		for(unsigned i=0; i<agents.size(); ++i){
@@ -208,7 +208,7 @@ int main (int argc, char * argv[]){
 			speakers[i].elevation
 		);
 	}
-	
+
 	for(unsigned i=0; i<agents.size(); ++i) scene.addSource(agents[i]);
 
 	MyWindow windows[6];
@@ -227,7 +227,7 @@ int main (int argc, char * argv[]){
 		windows[i].transform.quat().fromAxisAngle(M_PI/2 - i*M_PI/2, Vec3d(0, 1, 0));
 		windows[i].cam.fovy(90);
 	}
-	
+
 	// top/bottom windows
 	for(int i=4; i<6; ++i){
 		windows[i].append(*new StandardWindowKeyControls);

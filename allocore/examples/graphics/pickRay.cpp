@@ -59,7 +59,7 @@ struct PickRayDemo : App {
       else if(hover[i]) g.color(0,1,1);
       else g.color(1,1,1);
       g.draw(m);
-      g.popMatrix();      
+      g.popMatrix();
     }
   }
 

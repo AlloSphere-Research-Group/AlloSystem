@@ -39,7 +39,7 @@ public:
 	virtual void onDraw(Graphics& g, const Viewpoint& v){
 		light.dir(1,1,1);
 		light();
-		
+
 		// call our display list multiple times
 		for(int k=0; k<10; ++k){
 		for(int j=0; j<10; ++j){

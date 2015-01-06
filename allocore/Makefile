@@ -70,7 +70,7 @@ endif
 #-------------------------------------------------------------------------
 # Finalize compilation flags
 #-------------------------------------------------------------------------
-INC_DIRS += $(INC_DIR) 
+INC_DIRS += $(INC_DIR)
 
 #INC_DIRS += $(DEV_DIR)include/
 #LIB_DIRS += $(DEV_DIR)lib/

@@ -34,7 +34,7 @@ public:
 	string get_version() const {return mVersion;}
 	Profile get_profile() const {return mProfile;}
 	string get_extensions() const {return mExtensions;}
-	
+
 	const vector<OpenCLDevice> & get_devices();
 
 	OpenCLDevice * default_device();
@@ -47,7 +47,7 @@ protected:
 		mPlatform = platform;
 		mDevices.clear();
 	}
-	
+
 	void set_vendor(const string &vendor) {mVendor.assign(vendor);}
 	void set_name(const string &name) {mName.assign(name);}
 	void set_version(const string &version) {mVersion.assign(version);}
@@ -56,16 +56,16 @@ protected:
 
 
 protected:
-	
+
 	cl_platform_id mPlatform;
 	string mVendor;
 	string mName;
 	string mVersion;	// <space><major_version.minor_version><space><platform-specific information>
 	Profile mProfile;
 	string mExtensions;
-	
+
 	vector<OpenCLDevice> mDevices;
-	
+
 };
 
 }	// cl::

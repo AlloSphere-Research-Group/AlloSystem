@@ -1,6 +1,6 @@
 ####### ALLOVSR MAKEFILE ###########
 
-title: 
+title:
 	@echo
 	@echo
 	@echo /////////////////////////////////////////////////////////////////////////////
@@ -9,11 +9,11 @@ LIB_NAME = allovsr
 STRICT_WARNINGS = 0
 include ../Makefile.common
 
-#LINK TO GRAPHICS LIBRARIES FLAG (GLV, OpenGL, GLUT) 
+#LINK TO GRAPHICS LIBRARIES FLAG (GLV, OpenGL, GLUT)
 # run make GFX=0 vsr to make versor without built-in graphics capabilities (just data and operations)
 GFX = 1
 
-#Locations of Libariesmake 
+#Locations of Libariesmake
 LIB_DIR		= ../build/lib/
 #Locations of Source and Header Files in AlloSystem
 INC_DIR		= ../build/include/
@@ -44,7 +44,7 @@ IPATH = $(PCH_DIR) \
 
 HPATH = $(addprefix -I, $(IPATH))
 
-CPPFLAGS	+= $(LINK_CPPFLAGS) 
+CPPFLAGS	+= $(LINK_CPPFLAGS)
 #LDFLAGS		+= $(LINK_LDFLAGS)
 
 CFLAGS		:= $(CPPFLAGS) $(CFLAGS)

@@ -101,24 +101,24 @@ void ProtoApp::init(
 	// setup model manager
 	if(!App::name().empty()){
 		glv::ModelManager& MM = mGUI.modelManager();
-		
+
 		//
 		std::string idName = App::name();
 		toIdentifier(idName);
-		
+
 		MM.name(idName + "Presets");
 		MM.fileDir(mResourceDir);
-		
+
 		mGUI.refreshModels();
 		MM.add("pose", *new PoseModel(nav()));
-		
+
 		paramPanel().presetControl()
 			.modelManager(MM)
 			.loadFile()
 		;
 	}
 }
-	
+
 ProtoApp& ProtoApp::resourceDir(const std::string& dir, bool searchBack){
 
 	std::string modDir = dir;
@@ -130,11 +130,11 @@ ProtoApp& ProtoApp::resourceDir(const std::string& dir, bool searchBack){
 		}
 	}
 	mResourceDir = modDir;
-	
+
 	if(mResourceDir[mResourceDir.size()-1] != AL_FILE_DELIMITER){
 		mResourceDir += AL_FILE_DELIMITER_STR;
 	}
-	
+
 	return *this;
 }
 

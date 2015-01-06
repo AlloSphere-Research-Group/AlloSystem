@@ -55,7 +55,7 @@ public:
 
 	// Constants for checking the first message byte
 	// http://www.midi.org/techspecs/midimessages.php
-	static const unsigned char 
+	static const unsigned char
 		CHANNEL_MASK	= BITS_(0,0,0,0, 1,1,1,1), ///< Channel message status byte channel mask
 		MESSAGE_MASK	= BITS_(1,1,1,1, 0,0,0,0), ///< Message status byte type mask
 
@@ -76,14 +76,14 @@ public:
 		 SOSTENUTO_ON	= 0x42, ///< Sostenuto on/off control number
 		 SOFT_PEDAL		= 0x43, ///< Soft pedal control number
 		 LEGATO_ON		= 0x44, ///< Legato on/off control number
-		 
+
 		PROGRAM_CHANGE	= BITS_(1,1,0,0, 0,0,0,0), ///< Program change channel message type
 		PRESSURE_POLY	= BITS_(1,0,1,0, 0,0,0,0), ///< Polyphonic pressure (aftertouch) channel message type
 		PRESSURE_CHAN	= BITS_(1,1,0,1, 0,0,0,0), ///< Channel pressure (aftertouch) channel message type
 		PITCH_WHEEL		= BITS_(1,1,1,0, 0,0,0,0), ///< Pitch wheel channel message type
 
 		SYSTEM_MSG		= BITS_(1,1,1,1, 0,0,0,0), ///< System message type
-		
+
 		SYS_EX			= BITS_(1,1,1,1, 0,0,0,0), ///< System exclusive system message type
 		SYS_EX_END		= BITS_(1,1,1,1, 0,1,1,1), ///< End of system exclusive system message type
 		TIME_CODE		= BITS_(1,1,1,1, 0,0,0,1), ///< Time code system message type
@@ -109,7 +109,7 @@ public:
 
 	/// Get string with control type from control number
 	static const char * controlNumberString(unsigned char controlNumber);
-	
+
 	/// Convert pitch wheel message bytes into a 14-bit value in [0, 16384)
 	static unsigned short convertPitchWheel(unsigned char byte2, unsigned char byte3);
 };
@@ -137,7 +137,7 @@ class MIDIError : public std::exception
 
   //! The constructor.
   MIDIError( const std::string& message, Type type = MIDIError::UNSPECIFIED ) throw() : message_(message), type_(type) {}
- 
+
   //! The destructor.
   virtual ~MIDIError( void ) throw() {}
 
@@ -301,8 +301,8 @@ class MIDIIn : public MIDI
 
   // A MIDI structure used internally by the class to store incoming
   // messages.  Each message represents one and only one MIDI message.
-  struct MIDIMessage { 
-    std::vector<unsigned char> bytes; 
+  struct MIDIMessage {
+    std::vector<unsigned char> bytes;
     double timeStamp;
 
     // Default constructor.

@@ -3,7 +3,7 @@
 typedef double data_t;
 
 int utTypes(){
-	
+
 
 	// Array
 	{	// test the basic C functionality
@@ -15,7 +15,7 @@ int utTypes(){
 		const int stride1 = stride0*size0;
 
 		data_t data[comps*size0*size1];
-	
+
 		AlloArrayHeader hdr;
 		hdr.type = AlloFloat64Ty;
 		hdr.components = comps;
@@ -24,16 +24,16 @@ int utTypes(){
 		hdr.dim[1] = size1;
 		hdr.stride[0] = stride0;
 		hdr.stride[1] = stride1;
-		
+
 		AlloArray lat;
 		lat.data.ptr = (char *)&data;
-		
+
 		allo_array_setheader(&lat, &hdr);
 
 		assert(allo_array_elements(&lat) == size0*size1);
 		assert(allo_array_size(&lat) == sizeof(data));
 	}
-	
+
 	{
 		AlloArrayHeader hdr;
 		hdr.type = AlloSInt8Ty;
@@ -43,17 +43,17 @@ int utTypes(){
 
 		// 2D test
 		hdr.dimcount = 2;
-		
+
 		allo_array_setstride(&hdr, 1);
 		assert(hdr.stride[0] == 1);
 		assert(hdr.stride[1] == 7);
 
 		allo_array_setstride(&hdr, 4);
 		assert(hdr.stride[1] == 8);
-		
+
 		allo_array_setstride(&hdr, 8);
 		assert(hdr.stride[1] == 8);
-		
+
 		// 3D test
 		hdr.dimcount = 3;
 		allo_array_setstride(&hdr, 4);
@@ -61,14 +61,14 @@ int utTypes(){
 	}
 
 	{	// Basic Array usage
-		
+
 		// TODO: move this to an example
 //		// a 1D array of float-pairs (e.g. interleaved audio buffer)
 //		Array buf(2, AlloFloat32Ty, 64);
 //
-//		// a 2D array of char[4] data (e.g. ARGB image matrix with color values as 0-255) 
+//		// a 2D array of char[4] data (e.g. ARGB image matrix with color values as 0-255)
 //		Array img(4, AlloUInt8Ty, 720, 480);
-//		
+//
 //		// a 3D array of float triplets (e.g. vector field)
 //		Array field(3, Array::type<float>(), 16, 16, 16);
 
@@ -111,13 +111,13 @@ int utTypes(){
 
 			{	// Memory allocation
 				Array a;
-				
+
 				a.formatAligned(Nc, AlloFloat32Ty, N, 1);
 				assert((int)a.size() == Nc*N*4);
 				assert(a.hasData());
 				assert(a.isType(AlloFloat32Ty));
 				assert(a.isType<float>());
-				
+
 				a.formatAligned(Nc, AlloSInt8Ty, N, N, 1);
 				assert((int)a.size() == Nc*N*N*1);
 				assert(a.hasData());
@@ -134,13 +134,13 @@ int utTypes(){
 			{	// 1-D element access
 				Array a(Nc, AlloSInt8Ty, N);
 				for(int i=0,t=0; i<N; ++i){
-				
+
 					int8_t x[Nc] = {int8_t(i), int8_t(i+1), int8_t(i+2)};
 					int8_t y[Nc] = {-1,-1,-1};
 					a.write(x, i);
 					a.read(y, i);
 					for(int c=0; c<Nc; ++c) assert(y[c] == x[c]);
-				
+
 					for(int c=0; c<Nc; ++c){
 						a.elem<int8_t>(c,i) = t+1;
 						assert(a.elem<int8_t>(c,i) == int8_t(t+1));
@@ -153,13 +153,13 @@ int utTypes(){
 				Array a(Nc, AlloSInt8Ty, N,N);
 				for(int j=0,t=0; j<N; ++j){
 				for(int i=0; i<N; ++i){
-				
+
 					int8_t x[Nc] = {int8_t(j), int8_t(j+1), int8_t(j+2)};
 					int8_t y[Nc] = {-1,-1,-1};
 					a.write(x, i,j);
 					a.read(y, i,j);
 					for(int c=0; c<Nc; ++c) assert(y[c] == x[c]);
-				
+
 					for(int c=0; c<Nc; ++c){
 						a.elem<int8_t>(c,i,j) = t+1;
 						assert(a.elem<int8_t>(c,i,j) == int8_t(t+1));
@@ -173,13 +173,13 @@ int utTypes(){
 				for(int k=0,t=0; k<N; ++k){
 				for(int j=0; j<N; ++j){
 				for(int i=0; i<N; ++i){
-				
+
 					int8_t x[Nc] = {int8_t(k), int8_t(k+1), int8_t(k+2)};
 					int8_t y[Nc] = {-1,-1,-1};
 					a.write(x, i,j,k);
 					a.read(y, i,j,k);
 					for(int c=0; c<Nc; ++c) assert(y[c] == x[c]);
-				
+
 					for(int c=0; c<Nc; ++c){
 						a.elem<int8_t>(c,i,j,k) = t+1;
 						assert(a.elem<int8_t>(c,i,j,k) == int8_t(t+1));
@@ -188,7 +188,7 @@ int utTypes(){
 				}}}
 			}
 
-		}	// end size loop		
+		}	// end size loop
 	}
 
 
@@ -197,18 +197,18 @@ int utTypes(){
 		assert(a.size() == 0);
 		assert(a.capacity() == 2);
 		//assert(a.fill() == 0);
-		
+
 		a.append(1);
 		assert(a[0] == 1);
 		assert(a.size() == 1);
 		assert(a.last() == 1);
-		
+
 		a.append(2);
 		a.append(3);
 		assert(a.size() == 3);
 		assert(a.capacity() == 4);
 		assert(a.last() == 3);
-		
+
 		a.reset();
 		assert(a.size() == 0);
 		assert(a.capacity() == 4);
@@ -222,7 +222,7 @@ int utTypes(){
 		{
 			Buffer<int> b(4);
 			for(int i=0; i<b.size(); ++i) b[i] = i+4;
-			
+
 			a.size(4);
 			for(int i=0; i<a.size(); ++i) a[i] = i;
 
@@ -249,7 +249,7 @@ int utTypes(){
 			}
 		}
 	}
-	
+
 	{
 		RingBuffer<int> a;
 
@@ -260,22 +260,22 @@ int utTypes(){
 		a.write(1);
 		a.write(2);
 		//assert(a.fill() == 2);
-		
+
 		a.write(3);
 		a.write(4);
-		
+
 		assert(a.pos() == 3);
-		
+
 		assert(a[0] == 1);
 		assert(a[1] == 2);
 		assert(a[2] == 3);
 		assert(a[3] == 4);
-		
+
 		assert(a.read(0) == 4);
 		assert(a.read(1) == 3);
 		assert(a.read(2) == 2);
 		assert(a.read(3) == 1);
-		
+
 		//assert(a.fill() == 4);
 		a.write(5);
 		//assert(a.fill() == 4);

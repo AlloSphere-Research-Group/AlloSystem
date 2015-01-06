@@ -21,7 +21,7 @@ namespace al {
     using vsr::Ro;
 //    using al::Pose;
 //    using al::Quatd;
-    
+
     Quatd Rot2Quat(const Rot& r){
         return Quatd(r[0], -r[3], r[2], r[1]);
     }
@@ -37,9 +37,9 @@ namespace al {
     vsr::Vec V2V(const al::Vec3d& v){
         return vsr::Vec(v[0], v[1], v[2]);
     }
-    
+
     Pose Frame2Pose(const Frame& f){
-        return Pose( V2V( f.vec() ) , Rot2Quat( f.rot() ) );    
+        return Pose( V2V( f.vec() ) , Rot2Quat( f.rot() ) );
     }
 
     Frame Pose2Frame(const Pose& p){

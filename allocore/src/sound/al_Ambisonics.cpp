@@ -35,7 +35,7 @@ static const double c40_11		= 40./11.;
 //// pos is direction cosines (unit vector) of speaker
 //// @see http://www.ai.sri.com/ajh/ambisonics/speaker_matrix.m
 //void speaker_matrix(double k, int dim, Vec3d pos, double * weights) {
-//	
+//
 //}
 
 // AmbiBase
@@ -65,40 +65,40 @@ int AmbiBase::channelsToUniformOrder(int channels){
 
 void AmbiBase::encodeWeightsFuMa(float * ws, int dim, int order, float x, float y, float z){
 	*ws++ = c1_sqrt2;								// W = 1/sqrt(2)
-	
+
 	if(order > 0){
 		float x2 = x * x;
 		float y2 = y * y;
-		
-		*ws++ = x;									// X = cos(A)cos(E)	
+
+		*ws++ = x;									// X = cos(A)cos(E)
 		*ws++ = y;									// Y = sin(A)cos(E)
-		
+
 		if(order > 1){
 			x2 = x*x;
 			y2 = y*y;
-			
+
 			*ws++ = x2 - y2;						// U = cos(2A)cos2(E) = xx-yy
 			*ws++ = 2.f * x * y;					// V = sin(2A)cos2(E) = 2xy
-			
+
 			if(order > 2){
 				*ws++ = x * (x2 - 3.f * y2);		// P = cos(3A)cos3(E) = X(X2-3Y2)
 				*ws++ = y * (y2 - 3.f * x2);		// Q = sin(3A)cos3(E) = Y(3X2-Y2)
 			}
 		}
-		
+
 		if(dim == 3){
 			*ws++ = z;								// Z = sin(E)
-			
+
 			if(order > 1){
 				float z2 = z*z;
-		
+
 				*ws++ = 2.f * z * x;				// S = cos(A)sin(2E) = 2zx
 				*ws++ = 2.f * z * y;				// T = sin(A)sin(2E) = 2yz
 				*ws++ = (1.5f * z2) - 0.5f;			// R = 1.5sin2(E)-0.5 = 1.5zz-0.5
-				
+
 				if(order > 2){
 					float pre = c40_11 * z2 - c8_11;
-					
+
 					*ws++ = z * (x2-y2) * 0.5f;		// N = cos(2A)sin(E)cos2(E) = Z(X2-Y2)/2
 					*ws++ = x * y * z;				// O = sin(2A)sin(E)cos2(E) = XYZ
 					*ws++ = pre * x;				// L = 8cos(A)cos(E)(5sin2(E) - 1)/11 = 8X(5Z2-1)/11
@@ -129,7 +129,7 @@ void AmbiBase::encodeWeightsFuMa16(float * ws, float x, float y, float z){
 	float pre = c40_11 * z2 - c8_11;
 
 	ws[ 0] = c1_sqrt2;					// W channel, shouldn't it be already defined?
-	ws[ 1] = x;							// X = cos(A)cos(E)	
+	ws[ 1] = x;							// X = cos(A)cos(E)
 	ws[ 2] = y;							// Y = sin(A)cos(E)
 	ws[ 3] = z;							// Z = sin(E)
 	ws[ 4] = x2 - y2;					// U = cos(2A)cos2(E) = xx-yy
@@ -180,7 +180,7 @@ float AmbiDecode::flavorWeights[4][5][5] = {
 		{0,		0.333,	0.5,	0.6,	0.667},	// n = 1, M = 0, 1, 2, 3, 4
 		{0,		0,		0.1,	0.2,	0.286},	// n = 2, M = 0, 1, 2, 3, 4
 		{0,		0,		0,		0.029,	0.071},	// n = 3, M = 0, 1, 2, 3, 4
-		{0,		0,		0,		0,		0.008}	// n = 4, M = 0, 1, 2, 3, 4	
+		{0,		0,		0,		0,		0.008}	// n = 4, M = 0, 1, 2, 3, 4
 	},{	// max-rE
 		{1,		1,		1,		1,		1    },	// n = 0, M = 0, 1, 2, 3, 4
 		{0,		0.577,	0.775,	0.861,	0.906},	// n = 1, M = 0, 1, 2, 3, 4
@@ -204,19 +204,19 @@ AmbiDecode::~AmbiDecode(){
 }
 
 void AmbiDecode::decode(float * dec, const float * ambi, int numDecFrames) const {
-		
+
 	// iterate speakers
 	for(int s=0; s<numSpeakers(); ++s){
 		// skip zero-amp speakers:
 		if (mSpeakers[s].gain != 0.) {
 			float * out = dec + mSpeakers[s].deviceChannel * numDecFrames;
-			
+
 			// iterate ambi channels
 			for(int c=0; c<channels(); ++c){
 				const float * in = ambi + c * numDecFrames;
 				float w = decodeWeight(s, c);
-				for(int i=0; i<numDecFrames; ++i) out[i] += in[i] * w;		
-			}	
+				for(int i=0; i<numDecFrames; ++i) out[i] += in[i] * w;
+			}
 		}
 	}
 }
@@ -227,7 +227,7 @@ void AmbiDecode::flavor(int type){
 		const int No = sizeof(mWOrder)/sizeof(mWOrder[0]);
 		for(int i=0; i<No; ++i) mWOrder[i] = flavorWeights[flavor()][i][order()];
 		updateChanWeights();
-	} 
+	}
 }
 
 void AmbiDecode::numSpeakers(int num){
@@ -237,10 +237,10 @@ void AmbiDecode::numSpeakers(int num){
 //void AmbiDecode::zero(){ memset(mFrame, 0, channels()*sizeof(float)); }
 
 void AmbiDecode::setSpeakerRadians(int index, int deviceChannel, float az, float el, float amp){
-	if(index >= numSpeakers()){		
+	if(index >= numSpeakers()){
 		numSpeakers(index);	// grow adaptively
 	}
-	
+
 	mSpeakers[index].azimuth = az;
 	mSpeakers[index].elevation = el;
 	mSpeakers[index].deviceChannel = deviceChannel;
@@ -250,7 +250,7 @@ void AmbiDecode::setSpeakerRadians(int index, int deviceChannel, float az, float
 	encodeWeightsFuMa(mDecodeMatrix + index * channels(), mDim, mOrder, az, el);
 	for (int i=0; i<channels(); i++) {
 		mDecodeMatrix[index * channels() + i] *= amp;
-	} 
+	}
 }
 
 void AmbiDecode::setSpeaker(int index, int deviceChannel, float az, float el, float amp){
@@ -259,8 +259,8 @@ void AmbiDecode::setSpeaker(int index, int deviceChannel, float az, float el, fl
 
 void AmbiDecode::updateChanWeights(){
 	float * wc = mWeights;
-	*wc++ = mWOrder[0];	
-	
+	*wc++ = mWOrder[0];
+
 	if(mOrder > 0){
 		*wc++ = mWOrder[1];				// X
 		*wc++ = mWOrder[1];				// Y
@@ -272,7 +272,7 @@ void AmbiDecode::updateChanWeights(){
 				*wc++ = mWOrder[3];		// Q
 			}
 		}
-		
+
 		if(3 == mDim){
 			*wc++ = mWOrder[1];			// Z
 			if (mOrder > 1) {

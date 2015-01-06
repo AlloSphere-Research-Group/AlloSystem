@@ -64,7 +64,7 @@ void GPUContext::makeDefaultContext(){
 	const int myID = contextID();
 	const int dfID = defaultContextID();
 	//printf("%d %d\n", myID, dfID);
-	
+
 //	Contexts::iterator it = getContexts().begin();
 //	while(it != getContexts().end()){
 //		printf("%d\n", it->first);
@@ -74,16 +74,16 @@ void GPUContext::makeDefaultContext(){
 	if(myID != dfID){
 		Contexts& C = getContexts();
 		Contexts::iterator it = C.find(dfID);
-		
+
 		// If someone else is already default, then swap IDs with them
 		if(it != C.end()){
 
 			// TODO: do we need to migrate existing GPUObjects?
 //			ContextMap& id2Objs = getContextMap();
-//			
+//
 //			ResourceSet dfObjs(id2Objs[dfID]);
 //			ResourceSet myObjs(id2Objs[myID]);
-//			
+//
 //			// swap context IDs of existing GPU objects
 //			{
 //				//ResourceSet objs = id2Objs[dfID];
@@ -100,7 +100,7 @@ void GPUContext::makeDefaultContext(){
 //					(*i)->contextRegister(dfID);
 //				}
 //			}
-			
+
 			it->second->mContextID = myID;
 			C[myID] = it->second;
 		}
@@ -136,7 +136,7 @@ void GPUObject :: contextRegister(int ctx) {
 void GPUObject :: contextUnregister() {
 	ContextMap& contexts = getContextMap();
 	ResourceMap& resources = getResourceMap();
-	
+
 	ResourceMap::iterator rit = resources.find(this);
 	if(rit != resources.end()) {
 		ContextMap::iterator it = contexts.find( rit->second );

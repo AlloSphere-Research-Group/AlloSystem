@@ -56,19 +56,19 @@
 From msdn:
 DWORD timeGetTime(void);
 
-	The timeGetTime function retrieves the system time, in milliseconds. 
+	The timeGetTime function retrieves the system time, in milliseconds.
 	The system time is the time elapsed since Windows was started.
 
 	(A DWORD is a 32-bit unsigned integer)
 
-	The default precision of the timeGetTime function can be five milliseconds or 
-	more, depending on the machine. You can use the timeBeginPeriod and 
-	timeEndPeriod functions to increase the precision of timeGetTime. If you do so, 
-	the minimum difference between successive values returned by timeGetTime can be 
-	as large as the minimum period value set using timeBeginPeriod and 
-	timeEndPeriod. Use the QueryPerformanceCounter and QueryPerformanceFrequency 
+	The default precision of the timeGetTime function can be five milliseconds or
+	more, depending on the machine. You can use the timeBeginPeriod and
+	timeEndPeriod functions to increase the precision of timeGetTime. If you do so,
+	the minimum difference between successive values returned by timeGetTime can be
+	as large as the minimum period value set using timeBeginPeriod and
+	timeEndPeriod. Use the QueryPerformanceCounter and QueryPerformanceFrequency
 	functions to measure short time intervals at a high resolution,
-	
+
 VOID WINAPI Sleep(
   __in  DWORD dwMilliseconds
 );
@@ -98,8 +98,8 @@ VOID WINAPI Sleep(
 
 //struct timeval{
 //	long int tv_sec;	/*	number of whole seconds of elapsed time. */
-//	long int tv_usec;	/*	This is the rest of the elapsed time 
-//							(a fraction of a second), represented as the number 
+//	long int tv_usec;	/*	This is the rest of the elapsed time
+//							(a fraction of a second), represented as the number
 //							of microseconds. It is always less than one million.
 //						*/
 //}

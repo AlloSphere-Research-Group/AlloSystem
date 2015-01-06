@@ -17,10 +17,10 @@ int main(){
 	// Lesson 1: Declarations
 	// =========================================================================
 	{
-	/*	
+	/*
 	Vec is a template class with two template parameters:
-	1) N, the number of dimensions and 2) T, the element type. 	
-	Here are some example declarations:	
+	1) N, the number of dimensions and 2) T, the element type.
+	Here are some example declarations:
 	*/
 		Vec<3,float> vec3f;		// 3-vector of floats
 		Vec<2,int> vec2i;		// 2-vector of ints
@@ -31,7 +31,7 @@ int main(){
 	/*
 	For convience, some common types are predefined:
 	*/
-	//	2-vector     3-vector     4-vector	   
+	//	2-vector     3-vector     4-vector
 		{ Vec2f v; } { Vec3f v; } { Vec4f v; } // float
 		{ Vec2d v; } { Vec3d v; } { Vec4d v; } // double
 		{ Vec2i v; } { Vec3i v; } { Vec4i v; } // int
@@ -49,7 +49,7 @@ int main(){
 		Vec3f b(1,2,3);			// Initialize to {1, 2, 3}
 		Vec2f c(4,5);			// Initialize to {4, 5}
 		Vec4f d(6,7,8,9);		// Init'ing with scalars works up to 4-vectors
-	
+
 		Vec2d e(c);				// Initialize from vector to {4, 5}
 		Vec3f f(c, 6);			// Initialize from vector and scalar to {4,5,6}
 
@@ -60,11 +60,11 @@ int main(){
 		Vec2f g(arr2);			// Initialize from C-array, sizes match
 		Vec2i h(arr2);			// The C-array and vector can be different types
 	/*
-	Sizes can be different, but the C-array must be longer. Only the first 
+	Sizes can be different, but the C-array must be longer. Only the first
 	n elements are copied.
 	*/
 		float arr3[] = {3,4,5};
-		Vec2f i(arr3);		
+		Vec2f i(arr3);
 	/*
 	It is also possible to specify a stride amount through the C-array
 	*/
@@ -91,8 +91,8 @@ int main(){
 		a[2];					// Access element 2
 	}
 	/*
-	For 1-, 2-, 3-, and 4-vectors, it is possible to use symbolic names. The 
-	symbols 'x', 'y', 'z', and 'w' are used to access elements 0, 1, 2, and 3, 
+	For 1-, 2-, 3-, and 4-vectors, it is possible to use symbolic names. The
+	symbols 'x', 'y', 'z', and 'w' are used to access elements 0, 1, 2, and 3,
 	respectively. E.g.:
 	*/
 	{	Vec2f b(1,2);

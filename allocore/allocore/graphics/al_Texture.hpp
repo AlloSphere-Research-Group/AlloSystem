@@ -3,41 +3,41 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
 	File description:
 	Helper object for Graphics Textures
-	
+
 	File author(s):
 	Wesley Smith, 2010, wesley.hoke@gmail.com
 	Lance Putnam, 2010, putnam.lance@gmail.com
@@ -114,11 +114,11 @@ public:
 		Graphics::Format format=Graphics::RGBA, Graphics::DataType type=Graphics::UBYTE,
 		bool clientAlloc=true
 	);
-	
+
 
 	/// Construct a Texture object from an Array header
 	Texture(AlloArrayHeader& header);
-	
+
 	virtual ~Texture();
 
 
@@ -134,7 +134,7 @@ public:
 	Target target() const { return mTarget; }
 
 	/// Get pixel component data type
-	DataType type() const { return mType; }	
+	DataType type() const { return mType; }
 
 	/// Get width, in pixels
 	unsigned width() const { return mWidth; }
@@ -216,10 +216,10 @@ public:
 
 	/// Bind the texture (to a multitexture unit)
 	void bind(int unit = 0);
-	
+
 	/// Unbind the texture (from a multitexture unit)
 	void unbind(int unit = 0);
-	
+
 	/// Render the texture onto a quad on the XY plane
 	void quad(Graphics& gl, double w=1, double h=1, double x=0, double y=0);
 
@@ -243,7 +243,7 @@ public:
 	const char * data() const { return array().data.ptr; }
 
 	/// Flags resubmission of pixel data upon next bind
-	
+
 	/// Calling this ensures that pixels get submitted on the next bind().
 	///
 	Texture& dirty(){ mPixelsUpdated=true; return *this; }
@@ -251,17 +251,17 @@ public:
 	/// Submit the texture using an Array as source
 
 	/// NOTE: the graphics context (e.g. Window) must have been created
-	/// if reconfigure is true, 
+	/// if reconfigure is true,
 	/// it will attempt to derive size & layout from the array
 	void submit(const Array& src, bool reconfigure=false);
-		
+
 	/// Copy client pixels to GPU texels
 
 	/// NOTE: the graphics context (e.g. Window) must have been created
 	/// If pixels is NULL, then the only effect is to resize the texture
 	/// remotely.
 	void submit(const void * pixels, uint32_t align=4);
-	
+
 	/// Copy pixels from current frame buffer to texture texels
 
 	/// @param[in] w		width of region to copy; w<0 uses w + 1 + texture.width
@@ -288,21 +288,21 @@ public:
 
 	/// Allocate memory for a client-side copy (reconfigures the internal array)
 	void allocate(unsigned align=1);
-	
+
 	/// Deallocate any allocated client-side memory
 	void deallocate();
-	
+
 	/// Print information about texture
 	void print();
 
 protected:
 	//int mLevel;	// TODO: on a rainy day...
 	//int mBorder;
-	Target mTarget;				// TEXTURE_1D, TEXTURE_2D, etc. 
+	Target mTarget;				// TEXTURE_1D, TEXTURE_2D, etc.
 	Format mFormat;				// RGBA, ALPHA, etc.
 	int mTexelFormat;			// default is 0 = auto
 	DataType mType;				// UBYTE, FLOAT, etc.
-	Wrap mWrapS, mWrapT, mWrapR;	
+	Wrap mWrapS, mWrapT, mWrapR;
 	Filter mFilterMin, mFilterMag;
 	unsigned mWidth, mHeight, mDepth;
 
@@ -314,7 +314,7 @@ protected:
 
 	virtual void onCreate();
 	virtual void onDestroy();
-	
+
 	// ensures that the internal Array format matches the texture format
 	void resetArray(unsigned align);
 
@@ -322,7 +322,7 @@ protected:
 
 	// send any pending parameter updates to GPU or do immediately if forced
 	void sendParams(bool force=true);
-	
+
 	// send any pending pixels updates to GPU or do immediately if forced
 	void sendPixels(bool force=true);
 	void sendPixels(const void * pixels, unsigned align);
@@ -336,8 +336,8 @@ protected:
 	// Pattern for setting a variable that when changed sets a notification flag
 	template<class T>
 	Texture& update(const T& v, T& var, bool& flag){
-		if(v!=var){ var=v; flag=true; } 
-		return *this; 
+		if(v!=var){ var=v; flag=true; }
+		return *this;
 	}
 
 	// sets the pixel format/array from another Array header
