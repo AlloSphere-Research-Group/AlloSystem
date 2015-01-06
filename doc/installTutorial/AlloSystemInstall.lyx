@@ -1,5 +1,5 @@
-#LyX 2.0 created this file. For more info see http://www.lyx.org/
-\lyxformat 413
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
 \begin_document
 \begin_header
 \textclass article
@@ -33,13 +33,13 @@ framexleftmargin=1em,
 \font_roman default
 \font_sans default
 \font_typewriter default
+\font_math auto
 \font_default_family sfdefault
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
-
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -60,15 +60,24 @@ framexleftmargin=1em,
 \pdf_pdfusetitle true
 \papersize default
 \use_geometry true
-\use_amsmath 1
-\use_esint 1
-\use_mhchem 1
-\use_mathdots 1
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 0
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 0
+\use_package mhchem 1
+\use_package stackrel 0
+\use_package stmaryrd 0
+\use_package undertilde 0
 \cite_engine basic
+\cite_engine_type default
+\biblio_style plain
 \use_bibtopic false
 \use_indices false
 \paperorientation portrait
 \suppress_date false
+\justification true
 \use_refstyle 1
 \index Index
 \shortcut idx
@@ -156,8 +165,8 @@ Linux Ubuntu
 \end_layout
 
 \begin_layout Itemize
-Mac OS X 10.5.x (Leopard) / 10.6.x (Snow Leopard) / 10.7.x (Lion) / 10.8.x (Mountain
- Lion) / 10.9.x (Mavericks)
+Mac OS X 10.5 (Leopard) / 10.6 (Snow Leopard) / 10.7 (Lion) / 10.8 (Mountain
+ Lion) / 10.9 (Mavericks) / 10.10 (Yosemite)
 \end_layout
 
 \begin_layout Itemize
@@ -165,6 +174,10 @@ Windows 7 / 8
 \end_layout
 
 \begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
 For Windows users, Linux Ubuntu can be installed easily and safely using
  
 \begin_inset CommandInset href
@@ -175,6 +188,10 @@ target "http://www.ubuntu.com/download/desktop/windows-installer"
 \end_inset
 
 .
+\end_layout
+
+\end_inset
+
  If you choose to use operating systems or tools other than those recommended
  in this tutorial, then 
 \emph on
@@ -247,7 +264,7 @@ Before beginning to install the development tools, it is crucial that you
  If you don't, the installation of Xcode may fail with an ``unknown error''.
  (This is a known issue with OS X 10.6.x Snow Leopard and Xcode 3.2.6.) Do system
  updates by clicking the Apple symbol in the upper-left corner of the screen
- and then selecting ``Software Update...''.
+ and then selecting ``App Store...'' or ``Software Update...''.
  Let the updater finish its course which may require restarting.
  Repeat this update process until there are no more updates.
 \end_layout
@@ -410,9 +427,9 @@ status open
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="2">
-<features booktabs="true" tabularvalignment="middle">
+<features rotate="0" booktabs="true" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
-<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top">
 <row>
 <cell alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -525,7 +542,7 @@ Xcode 4.4.1, Command Line Tools (OS X Mountain Lion) - August 2012
 \end_layout
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 What tools to install for which version of OS X
@@ -799,7 +816,7 @@ status open
 \end_layout
 
 \begin_layout Plain Layout
-\begin_inset Caption
+\begin_inset Caption Standard
 
 \begin_layout Plain Layout
 MinGW Installation Manager
@@ -1849,7 +1866,16 @@ If your projects need to link to libraries that are not already used by
 Makefile.user
 \family default
  file.
- For example,
+ For example, to link to the FFTW and Magick++ libraries that were installed
+ into 
+\family typewriter
+/usr/local/
+\family default
+, we would set up 
+\family typewriter
+Makefile.user
+\family default
+ as follows:
 \end_layout
 
 \begin_layout Standard
@@ -1868,12 +1894,12 @@ status open
 
 \begin_layout Plain Layout
 
-# Append directories to be searched for include files
+# Append directories to be searched for library include files
 \end_layout
 
 \begin_layout Plain Layout
 
-CPPFLAGS += -I/usr/include/
+CPPFLAGS += -I/usr/local/include/
 \end_layout
 
 \begin_layout Plain Layout
@@ -1882,12 +1908,12 @@ CPPFLAGS += -I/usr/include/
 
 \begin_layout Plain Layout
 
-# Append directories to be searched for library files
+# Append directories to be searched for library object files
 \end_layout
 
 \begin_layout Plain Layout
 
-LDFLAGS += -L/usr/lib/
+LDFLAGS += -L/usr/local/lib/
 \end_layout
 
 \begin_layout Plain Layout
@@ -1906,6 +1932,45 @@ LDFLAGS += -lfftw3f -lMagick++
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+Here, 
+\family typewriter
+CPPFLAGS
+\family default
+ is a string of C/C++ preprocessor flags and 
+\family typewriter
+LDFLAGS
+\family default
+ is a string of linker flags.
+ The flag 
+\family typewriter
+-I
+\family default
+ adds a search path for the 
+\family typewriter
+#include
+\family default
+ preprocessor directive used when compiling code.
+ The flag 
+\family typewriter
+-L
+\family default
+ adds a library search path for the linker, and 
+\family typewriter
+-l
+\family default
+ (lowercase letter l) tells the linker which libraries to link to (omitting
+ the starting 
+\family typewriter
+lib
+\family default
+ and ending extension from the library object file name).
+\end_layout
+
+\begin_layout Standard
 If you would only like local linking, that is, linking to libraries for
  only one project, then place all the project's source files along with
  a file 
@@ -1996,7 +2061,7 @@ The installation process involves many steps and if there is an error in
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="3">
-<features tabularvalignment="middle">
+<features rotate="0" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="25col%">
 <column alignment="left" valignment="top" width="25col%">
 <column alignment="left" valignment="top" width="50col%">
@@ -2269,6 +2334,31 @@ reference "sub:Custom-Project-Directories"
 \end_layout
 
 \begin_layout Subsection
+Bash Script (.sh file) Does Not Execute (Properly)
+\end_layout
+
+\begin_layout Standard
+If you have problems trying to execute a Bash script (
+\family typewriter
+.
+\family default
+sh file), then it is possible that its file mode is incorrect.
+ Make the script executable by running 
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ chmod u+x <filename>.sh
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
 MinGW/MSYS: Freezes When Running 
 \family typewriter
 configure
@@ -2412,23 +2502,51 @@ http://www.blackviper.com/windows-services/application-experience/
 \end_layout
 
 \begin_layout Subsection
-Bash Script (.sh file) Does Not Execute (Properly)
+OS X: Problems After Upgrading OS
 \end_layout
 
 \begin_layout Standard
-If you have problems trying to execute a Bash script (
+The most common issue after upgrading OS X is that the standard library
+ headers (e.g., 
 \family typewriter
-.
+math.h
 \family default
-sh file), then it is possible that its file mode is incorrect.
- Make the script executable by running 
+, 
+\family typewriter
+stdio.h
+\family default
+) are not found when compiling code.
+ Here, the problem can likely be traced to an incorrect system path in 
+\family typewriter
+Makefile.common
+\family default
+.
+ You will want to ensure that the compiler flag 
+\family typewriter
+-isysroot
+\family default
+ is set to the latest SDK found in 
+\family typewriter
+/Applications/XCode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDK
+s/
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+One should also ensure that the latest version of Xcode is installed from
+ the App Store and, afterwards, that the latest command-line tools are installed
+ by executing the following from the command-line
+\end_layout
+
+\begin_layout Standard
 \begin_inset listings
 inline false
 status open
 
 \begin_layout Plain Layout
 
-$ chmod u+x <filename>.sh
+$ xcode-select --install 
 \end_layout
 
 \end_inset
@@ -2436,14 +2554,20 @@ $ chmod u+x <filename>.sh
 
 \end_layout
 
+\begin_layout Standard
+If you are using the MacPorts package manager, you will also need to reinstall
+ the latest version of MacPorts for your OS version.
+\end_layout
+
 \begin_layout Subsection
-'<cmath> not found' When Compiling Sources
+OS X: '<cmath> not found' When Compiling Sources
 \end_layout
 
 \begin_layout Standard
 This occurs for users with OSX 10.7 and above who have installed Xcode 4.4.1
  and above.
- The cause is that Xcode is not found by the build system.
+ The cause is that the standard libraries packaged with Xcode are not found
+ by the build system.
  To fix the problem, ensure that Xcode.app is placed in 
 \family typewriter
 /Applications
@@ -2473,7 +2597,7 @@ $ open /Applications
 \end_layout
 
 \begin_layout Subsection
-Problems With Multiple Versions of Xcode
+OS X: Problems With Multiple Versions of Xcode
 \end_layout
 
 \begin_layout Standard
