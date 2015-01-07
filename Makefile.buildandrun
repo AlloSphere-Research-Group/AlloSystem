@@ -32,7 +32,7 @@ runobjs: $(RUN_OBJS)
 %.hpp:
 
 # FIXME: this rule should only work for .cpp and .c
-EXEC_TARGETS = $(addsuffix %.cpp, $(RUN_DIRS)) $(addsuffix %.c, $(RUN_DIRS))
+EXEC_TARGETS = $(addsuffix %.cpp, $(RUN_DIRS)) $(addsuffix %.c, $(RUN_DIRS)) $(addsuffix %.mm, $(RUN_DIRS))
 ifeq ($(PLATFORM), linux)
 	LINK_LIBS_FLAGS += $(addprefix -l :, $(notdir $(LINK_LIBS_PATH)))
 endif
