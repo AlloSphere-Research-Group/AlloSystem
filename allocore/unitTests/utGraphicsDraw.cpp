@@ -1,17 +1,17 @@
 #include "utAllocore.h"
 
 static Graphics gl;
- 
+
 struct MyWindow2 : Window{
 
 	bool onFrame(){
-		
+
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.viewport(0,0, dimensions().w, dimensions().h);
 		gl.loadIdentity();
-		
+
 		data.reset();
-	
+
 		// test vertices and colors
 		int N=19;
 		for(int i=0; i<=N; ++i){
@@ -32,7 +32,7 @@ struct MyWindow2 : Window{
 
 		return true;
 	}
-	
+
 	Mesh data;
 };
 

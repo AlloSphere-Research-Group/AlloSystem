@@ -447,13 +447,13 @@ void ReceivedMessageArgumentIterator::Advance()
 {
     if( !value_.typeTag_ )
         return;
-        
+
     switch( *value_.typeTag_++ ){
         case '\0':
             // don't advance past end
             --value_.typeTag_;
             break;
-            
+
         case TRUE_TYPE_TAG:
         case FALSE_TYPE_TAG:
         case NIL_TYPE_TAG:
@@ -463,7 +463,7 @@ void ReceivedMessageArgumentIterator::Advance()
             break;
 
         case INT32_TYPE_TAG:
-        case FLOAT_TYPE_TAG: 					
+        case FLOAT_TYPE_TAG:
         case CHAR_TYPE_TAG:
         case RGBA_COLOR_TYPE_TAG:
         case MIDI_MESSAGE_TYPE_TAG:
@@ -474,17 +474,17 @@ void ReceivedMessageArgumentIterator::Advance()
         case INT64_TYPE_TAG:
         case TIME_TAG_TYPE_TAG:
         case DOUBLE_TYPE_TAG:
-				
+
             value_.argument_ += 8;
             break;
 
-        case STRING_TYPE_TAG: 
+        case STRING_TYPE_TAG:
         case SYMBOL_TYPE_TAG:
 
             // we use the unsafe function FindStr4End(char*) here because all of
             // the arguments have already been validated in
             // ReceivedMessage::Init() below.
-            
+
             value_.argument_ = FindStr4End( value_.argument_ );
             break;
 
@@ -499,7 +499,7 @@ void ReceivedMessageArgumentIterator::Advance()
             // don't advance
             --value_.typeTag_;
             break;
-            
+
 
         //    not handled:
         //    [ Indicates the beginning of an array. The tags following are for
@@ -557,7 +557,7 @@ void ReceivedMessage::Init( const char *message, unsigned long size )
         typeTagsBegin_ = 0;
         typeTagsEnd_ = 0;
         arguments_ = 0;
-            
+
     }else{
         if( *typeTagsBegin_ != ',' )
             throw MalformedMessageException( "type tags not present" );
@@ -570,17 +570,17 @@ void ReceivedMessage::Init( const char *message, unsigned long size )
 
         }else{
             // check that all arguments are present and well formed
-                
+
             arguments_ = FindStr4End( typeTagsBegin_, end );
             if( arguments_ == 0 ){
                 throw MalformedMessageException( "type tags were not terminated before end of message" );
             }
 
             ++typeTagsBegin_; // advance past initial ','
-            
+
             const char *typeTag = typeTagsBegin_;
             const char *argument = arguments_;
-                        
+
             do{
                 switch( *typeTag ){
                     case TRUE_TYPE_TAG:
@@ -615,9 +615,9 @@ void ReceivedMessage::Init( const char *message, unsigned long size )
                             throw MalformedMessageException( "arguments exceed message size" );
                         break;
 
-                    case STRING_TYPE_TAG: 
+                    case STRING_TYPE_TAG:
                     case SYMBOL_TYPE_TAG:
-                    
+
                         if( argument == end )
                             throw MalformedMessageException( "arguments exceed message size" );
                         argument = FindStr4End( argument, end );
@@ -629,14 +629,14 @@ void ReceivedMessage::Init( const char *message, unsigned long size )
                         {
                             if( argument + 4 > end )
                                 MalformedMessageException( "arguments exceed message size" );
-                                
+
                             uint32 blobSize = ToUInt32( argument );
                             argument = argument + 4 + RoundUp4( (unsigned long)blobSize );
                             if( argument > end )
                                 MalformedMessageException( "arguments exceed message size" );
                         }
                         break;
-                        
+
                     default:
                         throw MalformedMessageException( "unknown type tag" );
 
@@ -684,14 +684,14 @@ void ReceivedBundle::Init( const char *bundle, unsigned long size )
         || bundle[5] != 'l'
         || bundle[6] != 'e'
         || bundle[7] != '\0' )
-            throw MalformedBundleException( "bad bundle address pattern" );    
+            throw MalformedBundleException( "bad bundle address pattern" );
 
     end_ = bundle + size;
 
     timeTag_ = bundle + 8;
 
     const char *p = timeTag_ + 8;
-        
+
     while( p < end_ ){
         if( p + 4 > end_ )
             throw MalformedBundleException( "packet too short for elementSize" );

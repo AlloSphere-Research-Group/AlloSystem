@@ -72,7 +72,7 @@ struct Socket::Impl : public ImplAPR {
 		mPort = port;
 		mAddress = address;
 		mType = type;
-		
+
 		int sockProto = type & 127;
 		switch(sockProto){
 		case TCP:  sockProto = APR_PROTO_TCP; break;
@@ -80,7 +80,7 @@ struct Socket::Impl : public ImplAPR {
 		case SCTP: sockProto = APR_PROTO_SCTP; break;
 		default:;
 		}
-		
+
 		int sockType = type & (127<<8);
 		switch(sockType){
 		case STREAM: sockType = SOCK_STREAM; break;
@@ -93,7 +93,7 @@ struct Socket::Impl : public ImplAPR {
 			default:;
 			}
 		}
-		
+
 		int sockFamily = type & (127<<16);
 		switch(sockFamily){
 		case 0: // unspecified
@@ -121,14 +121,14 @@ struct Socket::Impl : public ImplAPR {
 
 			apr_socket_opt_set		| Set timeout for send/recv
 			apr_socket_timeout_set	|
-			
+
 		Server:
 			apr_sockaddr_info_get
 			apr_socket_create
-			
+
 			apr_socket_opt_set		| Set timeout for send/recv
 			apr_socket_timeout_set	|
-			
+
 			apr_socket_bind			| These are always non-blocking calls
 			apr_socket_listen		|
 
@@ -145,17 +145,17 @@ struct Socket::Impl : public ImplAPR {
 		BAILONFAIL(
 			apr_socket_create(&mSock, mSockAddr->family, sockType, sockProto, mPool)
 		);
-		
+
 		// Set timeout
 		timeout(timeoutSec);
-		
+
 		return true;
 	}
-	
+
 	bool reopen(){
 		return open(mPort, mAddress, mTimeout, mType);
 	}
-	
+
 	bool bind(){ // for server-side
 		if(opened()){
 			apr_status_t res = check_apr(apr_socket_bind(mSock, mSockAddr));
@@ -163,7 +163,7 @@ struct Socket::Impl : public ImplAPR {
 		}
 		return false;
 	}
-	
+
 	bool connect(){ // for client-side
 		if(opened()){
 			// The timeout works differently for a blocking-with-timeout connect
@@ -186,7 +186,7 @@ struct Socket::Impl : public ImplAPR {
 
 	void timeout(al_sec v){
 		mTimeout = v;
-	
+
 		// Note: these timeouts apply only for send/recv and accept
 		// Non-blocking:
 		if(mTimeout == 0){
@@ -213,7 +213,7 @@ struct Socket::Impl : public ImplAPR {
 
 	bool listen(){
 		/* APR_SO_REUSEADDR is useful for a socket listening process.
-		It specifies that the "The rules used in validating addresses supplied 
+		It specifies that the "The rules used in validating addresses supplied
 		to bind should allow reuse of local addresses." */
 		apr_socket_opt_set(mSock, APR_SO_REUSEADDR, 1);
 		apr_status_t res = apr_socket_listen(mSock, SOMAXCONN);
@@ -223,7 +223,7 @@ struct Socket::Impl : public ImplAPR {
 		}
 		return true;
 	}
-	
+
 	bool accept(Socket::Impl * newSock){
 		newSock->close();
 		// TODO: timeout for accept
@@ -236,7 +236,7 @@ struct Socket::Impl : public ImplAPR {
 		newSock->timeout(mTimeout);
 		return true;
 	}
-	
+
 	bool opened() const { return 0!=mSock; }
 
 	uint16_t mPort;
@@ -300,7 +300,7 @@ size_t Socket::recv(char * buffer, size_t maxlen) {
 	apr_status_t r = apr_socket_recv(mImpl->mSock, buffer, &len);
 
 	// printf("apr_socket_recv returned\n");
-	
+
 	// only error check if not error# 35: Resource temporarily unavailable
 	if(len){ check_apr(r); }
 	return len;

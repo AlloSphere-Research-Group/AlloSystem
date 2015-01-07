@@ -6,7 +6,7 @@ using namespace al;
 // resolution can be 1 to 10; the dim is 2^resolution i.e. 2..1024
 // (the limit is 10 so that the hash can fit inside a uint32_t integer)
 // default 5 implies 32 units per side
-HashSpace :: HashSpace(uint32_t resolution, uint32_t numObjects) 
+HashSpace :: HashSpace(uint32_t resolution, uint32_t numObjects)
 :	mShift(al::clip(resolution, uint32_t(10), uint32_t(1))),
 	mShift2(mShift+mShift),
 	mDim(1<<mShift),
@@ -18,25 +18,25 @@ HashSpace :: HashSpace(uint32_t resolution, uint32_t numObjects)
 {
 	//printf("shift %d shift2 %d dim %d dim3 %d wrap %d wrap3 %d\n",
 //		mShift, mShift2, mDim, mDim3, mWrap, mWrap3);
-//	
+//
 	mMaxD2 = distanceSquared(mWrap, mWrap, mWrap);
-	
+
 	// half-dim, because of toroidal wrapping
 	mMaxHalfD2 = distanceSquared(mDimHalf, mDimHalf, mDimHalf);
-	
+
 	mVoxels.resize(mDim3);
 	mVoxelIndicesToDistance.resize(mDim3);
 	mObjects.resize(numObjects);
 	for (unsigned i=0; i<mObjects.size(); i++) {
 		mObjects[i].id = i;
 	}
-	
+
 	// each voxel has a particular distance from the origin.
 	// this can be used to create a reverse lookup table
 	// where each distance shell contains a list of voxels
-	// because of the tight packing, 
+	// because of the tight packing,
 	// this can be used to wrap on the entire voxel table
-	// so e.g. a query can simply walk the lists... 
+	// so e.g. a query can simply walk the lists...
 	// it must handle +/- mDimHalf for a toroidal space
 	std::vector<std::vector<uint32_t> > shells;
 	shells.resize(mMaxHalfD2+1);
@@ -46,7 +46,7 @@ HashSpace :: HashSpace(uint32_t resolution, uint32_t numObjects)
 			for(int z=-mDimHalf; z < mDimHalf; z++) {
 				// each voxel lives at a given distance from the origin:
 				//double d = distanceSquared(x+0.5, y+0.5, z+0.5);
-				double d = distanceSquared(x, y, z); 
+				double d = distanceSquared(x, y, z);
 				//double d = distanceSquared(x-0.5, y-0.5, z-0.5);
 				//printf("%04d %04d %04d -> %8d\n", x, y, z, d);
 				// if this is within the valid query radius:
@@ -63,7 +63,7 @@ HashSpace :: HashSpace(uint32_t resolution, uint32_t numObjects)
 			}
 		}
 	}
-	
+
 	// now pack the shell indices into a sorted list
 	// and store in a secondary list the offsets per distance
 	for (unsigned d=0; d<mMaxHalfD2; d++) {
@@ -80,7 +80,7 @@ HashSpace :: HashSpace(uint32_t resolution, uint32_t numObjects)
 	}
 	// store last shell:
 	mDistanceToVoxelIndices[mMaxHalfD2] = mVoxelIndices.size();
-	
+
 //	// dump the lists:
 //	uint32_t offset = hash(0, 1, 0);
 //	printf("offset %d\n", offset);

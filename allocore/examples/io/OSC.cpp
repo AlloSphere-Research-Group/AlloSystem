@@ -22,7 +22,7 @@ struct PacketData{
 	float f;
 	double d;
 	char c;
-	
+
 	void clear(){ i=0; f=0; d=0; c=0; }
 	bool valid() const { return 123456==i && 1==f && 1==d && 1==c; }
 	void print() const { printf("%x %g %g %d\n", i, f, d, c); }
@@ -69,7 +69,7 @@ int main(){
 			p.endBundle();
 			p.addMessage("/message13", (int)0x56789abc);
 		p.endBundle();
-		
+
 		assert(p.isBundle());
 		assert(!p.isMessage());
 
@@ -79,9 +79,9 @@ int main(){
 
 	// -------------------------------------------------------------------------
 	// Sending packets
-	{		
+	{
 		osc::Send s(port, addr);
-		
+
 		// A simple way to send a message
 		s.send("/foo", 1, 2.3, "four");
 
@@ -89,7 +89,7 @@ int main(){
 		osc::TimeTag timeNow = 0;
 		osc::TimeTag dt = 1;
 
-		s.beginBundle(timeNow);		
+		s.beginBundle(timeNow);
 			s.addMessage("/message11", 12345678, 1.f, 1., "hello world!");
 			s.addMessage("/message12", 23456789);
 			s.beginBundle(timeNow + dt);
@@ -100,7 +100,7 @@ int main(){
 			s.endBundle();
 			s.addMessage("/message13", 56789);
 		s.endBundle();
-		
+
 		s.send();
 
 		// If sending data infrequently, we can just use a temporary object
@@ -113,9 +113,9 @@ int main(){
 	{
 		struct OSCHandler : public osc::PacketHandler{
 			void onMessage(osc::Message& m){
-			
+
 				m.print();
-			
+
 				assert(m.typeTags() == "sifdcb");
 				assert(m.addressPattern() == "/test");
 
@@ -181,7 +181,7 @@ int main(){
 //			s.endMessage();
 //			s.endBundle();
 //			s.send();
-//			
+//
 //			while(r.recv()){}
 //		}
 
@@ -201,6 +201,6 @@ TODO: example code previous in header file
 
 	// or, launch an automatic background thread
 	r.timeout(1);	// ensure waiting period is greater than 0
-	r.start(); 
+	r.start();
 
 */

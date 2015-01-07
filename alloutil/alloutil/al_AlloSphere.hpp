@@ -13,7 +13,7 @@ class AlloSphereModel : public GPUObject
 {
 public:
 
-	AlloSphereModel(float size = 1.0, int slices = 32, int stacks = 32) 
+	AlloSphereModel(float size = 1.0, int slices = 32, int stacks = 32)
 	: GPUObject(), mSize(size), mSlices(slices), mStacks(stacks)
 	{
 		if( mStacks % 2 != 0) {
@@ -22,12 +22,12 @@ public:
 	}
 
 	virtual ~AlloSphereModel() {}
-	
+
 	virtual void onCreate() {
 		if (mVboSolid ==0) initSolid();
 		if (mVboWireframe ==0) initWireframe();
 	}
-	
+
 	virtual void onDestroy() {
 		glDeleteBuffers(1, &mVboSolid);
 		glDeleteBuffers(1, &mVboWireframe);

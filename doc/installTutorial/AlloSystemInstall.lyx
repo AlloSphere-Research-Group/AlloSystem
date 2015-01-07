@@ -127,11 +127,11 @@ Introduction
 This tutorial explains how to install AlloSystem under Linux Ubuntu, Mac
  OS X, and Windows.
  The main means of operating AlloSystem is through a Unix-like shell and
- GNU tools 
+ GNU tools
 \family typewriter
 GCC
 \family default
- and 
+ and
 \family typewriter
 make
 \family default
@@ -166,7 +166,7 @@ Windows 7 / 8
 
 \begin_layout Standard
 For Windows users, Linux Ubuntu can be installed easily and safely using
- 
+
 \begin_inset CommandInset href
 LatexCommand href
 name "Wubi"
@@ -176,7 +176,7 @@ target "http://www.ubuntu.com/download/desktop/windows-installer"
 
 .
  If you choose to use operating systems or tools other than those recommended
- in this tutorial, then 
+ in this tutorial, then
 \emph on
 you are on your own
 \emph default
@@ -200,11 +200,11 @@ Linux Ubuntu
 \end_layout
 
 \begin_layout Standard
-Ensure that both 
+Ensure that both
 \family typewriter
 make
 \family default
- and 
+ and
 \family typewriter
 g++
 \family default
@@ -223,7 +223,7 @@ $ sudo apt-get install make g++
 
 \end_inset
 
-When that finishes, proceed to 
+When that finishes, proceed to
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Install-AlloSystem"
@@ -307,7 +307,7 @@ If you have OSX 10.8 or below, you must install the command-line tools from
 status open
 
 \begin_layout Plain Layout
-To get the Apple development tools, start by going to 
+To get the Apple development tools, start by going to
 \begin_inset Flex URL
 status open
 
@@ -372,7 +372,7 @@ Scroll down and click 'View all downloads'.
 
 \begin_layout Plain Layout
 This takes you to a search page.
- 
+
 \end_layout
 
 \begin_layout Plain Layout
@@ -388,7 +388,7 @@ This takes you to a search page.
 \end_layout
 
 \begin_layout Plain Layout
-Enter `Xcode' into the search bar and get the latest version of Xcode 
+Enter `Xcode' into the search bar and get the latest version of Xcode
 \emph on
 and
 \emph default
@@ -489,7 +489,7 @@ Xcode 3.2.6 and iOS SDK 4.3
 \begin_layout Plain Layout
 Xcode 4.4.1,
 \series bold
- 
+
 \series default
 Command Line Tools (OS X Lion) - August 2012
 \end_layout
@@ -570,17 +570,17 @@ After downloading the disk images (
 .pkg
 \family default
 ) file inside the mounted drive to run the installer.
- If you downloaded Xcode 4.4.1, then drag-n-drop the Xcode icon into the 
+ If you downloaded Xcode 4.4.1, then drag-n-drop the Xcode icon into the
 \family typewriter
 /Applications
 \family default
  folder and then run the Command Line Tools installer.
  When installation is complete, you will have both an editor and all the
- command-line tools we will be using such as 
+ command-line tools we will be using such as
 \family typewriter
 make
 \family default
- and 
+ and
 \family typewriter
 g++
 \family default
@@ -599,7 +599,7 @@ Install Package Manager
 \begin_layout Standard
 We will use MacPorts, a package management tool for OS X, to install AlloSystem
  dependencies.
- Download and install the latest version from 
+ Download and install the latest version from
 \begin_inset Flex URL
 status collapsed
 
@@ -651,12 +651,12 @@ MinGW is an emulation of the GCC compiler suite.
 
 \end_inset
 
- installer 
+ installer
 \family typewriter
 mingw-get-inst-xxxxxxxx.exe
 \family default
 .
- The installer can be found by first going to 
+ The installer can be found by first going to
 \begin_inset Flex URL
 status open
 
@@ -667,16 +667,16 @@ http://sourceforge.net/projects/mingw/files/Installer/mingw-get-inst/
 
 \end_inset
 
- and then clicking the directory 
+ and then clicking the directory
 \family typewriter
 mingw-get-inst-xxxxxxxx
 \family default
- where 
+ where
 \family typewriter
-xxxxxxxx 
+xxxxxxxx
 \family default
 is the latest version (usually the one at the top).
- Be careful not to install MinGW in a path containing spaces, such as 
+ Be careful not to install MinGW in a path containing spaces, such as
 \family typewriter
 C:
 \backslash
@@ -685,7 +685,7 @@ Program Files (x86)
 MinGW
 \family default
 , as this will cause a lot of problems later on.
- The rest of the tutorial assumes 
+ The rest of the tutorial assumes
 \family typewriter
 C:
 \backslash
@@ -693,7 +693,7 @@ MinGW
 \family default
  is the install directory.
  If you choose another install directory just replace any following instances
- of 
+ of
 \family typewriter
 C:
 \backslash
@@ -727,7 +727,7 @@ MSYS provides a Unix-like CLI and commands (bash, make, grep, etc.).
 
 \begin_layout Plain Layout
 Finish the MinGW installer.
- 
+
 \end_layout
 
 \end_inset
@@ -757,7 +757,7 @@ http://sourceforge.net/projects/mingw/files/latest/download
 \begin_layout Standard
 After the download completes, run the installer.
  When the MinGW Installation Manager (or mingw-get GUI) window pops up (Fig.
- 
+
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:MinGW-Installation-Manager"
@@ -837,7 +837,7 @@ on Manager window.
 \begin_layout Standard
 Next, bring up a DOS prompt.
  Do this by clicking the Windows button in the lower-left corner, typing
- 
+
 \family typewriter
 cmd.exe
 \family default
@@ -882,7 +882,7 @@ This will install additional programs for MSYS that we will need later to
 status open
 
 \begin_layout Plain Layout
-Next, you need to add 
+Next, you need to add
 \family typewriter
 C:
 \backslash
@@ -897,11 +897,11 @@ bin
  On the new window that pops up, scroll down the list in the ``System variables'
 ' panel until you see the PATH variable.
  Click on PATH and then click the ``Edit...'' button.
- Add a 
+ Add a
 \family typewriter
 ;
 \family default
- between the last path in the variable and the path you are adding, 
+ between the last path in the variable and the path you are adding,
 \family typewriter
 C:
 \backslash
@@ -917,7 +917,7 @@ bin
 \begin_layout Plain Layout
 Next, you need to bring up a DOS prompt.
  Do this by clicking the Windows button in the lower-left corner, typing
- 
+
 \family typewriter
 cmd.exe
 \family default
@@ -963,7 +963,7 @@ Start MSYS
 
 \begin_layout Standard
 Open a new MSYS shell (not to be confused with a DOS shell!) by launching
- MSYS from the Start menu or desktop or by running 
+ MSYS from the Start menu or desktop or by running
 \family typewriter
 C:
 \backslash
@@ -993,7 +993,7 @@ msys.bat
 
 \begin_layout Standard
 If your user name (the text before the @ symbol) has spaces in it, then
- see section 
+ see section
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:MinGW/MSYS:-Spaces-in-user-name"
@@ -1022,7 +1022,7 @@ $ /postinstall/pi.sh
 Answer 'y' to continue the post install and then 'y' again that you have
  MinGW installed.
  Next, enter the path where you installed MinGW as you are instructed; this
- will likely be 
+ will likely be
 \family typewriter
 C:/MinGW
 \family default
@@ -1036,7 +1036,7 @@ MSYS Tips
 \end_layout
 
 \begin_layout Standard
-By default, the MSYS directory 
+By default, the MSYS directory
 \family typewriter
 C:
 \backslash
@@ -1046,20 +1046,20 @@ msys
 \backslash
 1.0
 \family default
- will be mounted as both the root directory 
+ will be mounted as both the root directory
 \family typewriter
 /
 \family default
- and as 
+ and as
 \family typewriter
 /usr/
 \family default
 .
- The first time you run MSYS it will create a 
+ The first time you run MSYS it will create a
 \family typewriter
 home
 \family default
- directory in 
+ directory in
 \family typewriter
 C:
 \backslash
@@ -1070,11 +1070,11 @@ msys
 1.0
 \family default
 .
- The 
+ The
 \family typewriter
 ~
 \family default
- (user home) directory will be something like 
+ (user home) directory will be something like
 \family typewriter
 C:
 \backslash
@@ -1089,24 +1089,24 @@ home
 <username>
 \family default
 .
- Traditional Windows drives, like 
+ Traditional Windows drives, like
 \family typewriter
 C:
 \family default
- and 
+ and
 \family typewriter
 D:
 \family default
-, can be accessed as 
+, can be accessed as
 \family typewriter
 /c
 \family default
- or 
+ or
 \family typewriter
 /d
 \family default
 , respectively.
- Use the 
+ Use the
 \family typewriter
 mount
 \family default
@@ -1153,7 +1153,7 @@ $ git config --global color.ui true
 \end_layout
 
 \begin_layout Plain Layout
-$ git config --global user.name 
+$ git config --global user.name
 \begin_inset Quotes eld
 \end_inset
 
@@ -1165,7 +1165,7 @@ username
 \end_layout
 
 \begin_layout Plain Layout
-$ git config --global user.email 
+$ git config --global user.email
 \begin_inset Quotes eld
 \end_inset
 
@@ -1206,7 +1206,7 @@ https://github.com/AlloSphere-Research-Group/AlloSystem/archive/stable13feb.zip
 \end_layout
 
 \begin_layout Standard
-First, create a new directory 
+First, create a new directory
 \family typewriter
 ~/code/
 \family default
@@ -1238,29 +1238,29 @@ https://github.com/AlloSphere-Research-Group/AlloSystem/archive/devel.zip
 \end_inset
 
 .
- 
+
 \end_layout
 
 \begin_layout Standard
-Within the 
+Within the
 \family typewriter
 .zip
 \family default
- file should be another directory named something like 
+ file should be another directory named something like
 \family typewriter
 AlloSystem-xxx
 \family default
 .
- You should move this directory to the directory 
+ You should move this directory to the directory
 \family typewriter
 ~/code/
 \family default
  you just made.
- After the directory 
+ After the directory
 \family typewriter
 AlloSystem-xxx
 \family default
- is moved, rename it to 
+ is moved, rename it to
 \family typewriter
 allosystem
 \family default
@@ -1316,12 +1316,12 @@ Makefile.buildandrun	allocore		doc
 
 \begin_layout Plain Layout
 
-Makefile.common			allocv			linux 
+Makefile.common			allocv			linux
 \end_layout
 
 \begin_layout Plain Layout
 
-Makefile.rules			allonect		osx 
+Makefile.rules			allonect		osx
 \end_layout
 
 \begin_layout Plain Layout
@@ -1337,7 +1337,7 @@ README.md				alloutil		work
 \begin_layout Standard
 Next, you need to install the necessary dependencies for the AlloCore module
  of AlloSystem.
- (Windows users only: you must 
+ (Windows users only: you must
 \emph on
 deactivate all virus checkers and antispyware programs, such as Windows
  Defender
@@ -1347,7 +1347,7 @@ deactivate all virus checkers and antispyware programs, such as Windows
  processes that take place in the following steps.
  If you do not disable them, then you may experience lockups and/or the
  libraries will not get installed properly.
- See also 
+ See also
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:MinGW/MSYS Freezes"
@@ -1443,21 +1443,21 @@ While AlloSystem is intended to be used mainly as a library, it does provide
 
 \begin_layout Standard
 By default, there are two directories recognized by the AlloSystem build-and-run
- facility: 
+ facility:
 \family typewriter
 examples/
 \family default
- and 
+ and
 \family typewriter
 work/
 \family default
 .
- The directory 
+ The directory
 \family typewriter
 examples/
 \family default
  contains example source code for libraries.
- The directory 
+ The directory
 \family typewriter
 work/
 \family default
@@ -1467,11 +1467,11 @@ work/
 \family typewriter
 .cpp
 \family default
-) files having a 
+) files having a
 \family typewriter
 main()
 \family default
- function in the 
+ function in the
 \family typewriter
 work/
 \family default
@@ -1491,22 +1491,22 @@ $ make work/myfile.cpp
 
 \end_inset
 
-Remember, you must be in 
+Remember, you must be in
 \family typewriter
 ~/code/allosystem/
 \family default
- when running the 
+ when running the
 \family typewriter
 make
 \family default
  command.
- The executable binary is placed in 
+ The executable binary is placed in
 \family typewriter
 build/bin/
 \family default
  and has the same name as the source file.
  If you would only like to build the application, without also running it,
- then you can append 
+ then you can append
 \family typewriter
 AUTORUN=0
 \family default
@@ -1534,7 +1534,7 @@ The following instructions are only required if you would like to use graphical
  user interface (GUI) or sound synthesis components in conjunction with
  AlloSystem.
  We use GLV as the GUI toolkit and Gamma as the sound synthesis library.
- Download the source code of each at 
+ Download the source code of each at
 \begin_inset Flex URL
 status open
 
@@ -1545,7 +1545,7 @@ https://github.com/AlloSphere-Research-Group/GLV/archive/master.zip
 
 \end_inset
 
- and 
+ and
 \begin_inset Flex URL
 status open
 
@@ -1557,16 +1557,16 @@ https://github.com/LancePutnam/Gamma/archive/devel.zip
 \end_inset
 
 .
- Unzip them within the directory 
+ Unzip them within the directory
 \family typewriter
 ~/code
 \family default
  (alongside where you installed AlloSystem).
- Rename the GLV and Gamma directories to 
+ Rename the GLV and Gamma directories to
 \family typewriter
 GLV
 \family default
- and 
+ and
 \family typewriter
 Gamma
 \family default
@@ -1664,39 +1664,39 @@ name "sub:Custom-Project-Directories"
 \begin_layout Standard
 It is possible to configure AlloSystem to use your own custom project directory
  for its build-and-run facility.
- We will call this your 
+ We will call this your
 \emph on
 user directory
 \emph default
- and refer to it in this document generically as 
+ and refer to it in this document generically as
 \family typewriter
 <userdir>
 \family default
  from this point onward.
  The actual name of the user directory can be anything you choose as long
- as it is a valid path, e.g., 
+ as it is a valid path, e.g.,
 \family typewriter
 myprojects
 \family default
-, 
+,
 \family typewriter
 mycode
 \family default
- or your initials, such as 
+ or your initials, such as
 \family typewriter
 ljp
 \family default
 .
- Start by creating the directory 
+ Start by creating the directory
 \family typewriter
 ~/code/allosystem/<userdir>
 \family default
 /.
- Next, make a copy of the file 
+ Next, make a copy of the file
 \family typewriter
 Makefile.usertemplate
 \family default
- and name it 
+ and name it
 \family typewriter
 Makefile.user.
  Makefile.user
@@ -1705,7 +1705,7 @@ Makefile.user.
 \family typewriter
  ~/code/allosystem/
 \family default
- along with 
+ along with
 \family typewriter
 Makefile.usertemplate.
 
@@ -1730,7 +1730,7 @@ $ cp Makefile.usertemplate Makefile.user
 
 \end_inset
 
-Now, open 
+Now, open
 \family typewriter
 Makefile.user
 \family default
@@ -1765,28 +1765,28 @@ RUN_DIRS += <userdir>/
 \end_inset
 
 using the same directory name you created in the previous step.
- Notice the 
+ Notice the
 \family typewriter
 #
 \family default
  (comment symbol) is removed.
- Also, do not forget the trailing slash after 
+ Also, do not forget the trailing slash after
 \family typewriter
 <userdir>
 \family default
 .
- Relative paths in 
+ Relative paths in
 \family typewriter
 RUN_DIRS
 \family default
- are relative to the the 
+ are relative to the the
 \family typewriter
 allosystem/
 \family default
  directory.
  At this point, AlloSystem will recognize your user directory as a valid
  build-and-run directory.
- You can add as many user directories as you like to 
+ You can add as many user directories as you like to
 \family typewriter
 RUN_DIRS
 \family default
@@ -1796,7 +1796,7 @@ RUN_DIRS
 \begin_layout Standard
 While it is possible to have as many user build-and-run directories, sometimes
  it is convenient to be able to build and run sources from other directories
- without always having to add them to the 
+ without always having to add them to the
 \family typewriter
 RUN_DIRS
 \family default
@@ -1822,11 +1822,11 @@ $ ln -s sourcedir/ <userdir>/targetdir
 
 \end_inset
 
-This creates a symbolic link to 
+This creates a symbolic link to
 \family typewriter
 sourcedir/
 \family default
- that is treated like the directory 
+ that is treated like the directory
 \family typewriter
 <userdir>/targetdir/
 \family default
@@ -1844,7 +1844,7 @@ If your projects need to link to libraries that are not already used by
  link to specified libraries, or locally, where only a specific project
  links to specified libraries.
  To set up global linking, simply add the linker flags to your existing
- 
+
 \family typewriter
 Makefile.user
 \family default
@@ -1908,17 +1908,17 @@ LDFLAGS += -lfftw3f -lMagick++
 
 If you would only like local linking, that is, linking to libraries for
  only one project, then place all the project's source files along with
- a file 
+ a file
 \family typewriter
 flags.txt
 \family default
  in a subdirectory of one of your user directories.
- Then, in 
+ Then, in
 \family typewriter
 flags.txt
 \family default
 , add all the necessary linker flags in the same way as done above with
- 
+
 \family typewriter
 Makefile.user
 \family default
@@ -1934,17 +1934,17 @@ There comes a time when you would like many separate projects to reuse your
  own custom code, akin to using a library.
  For example, you may have several utility functions or classes that you
  would like all projects to have access to.
- Let's say you have the two files 
+ Let's say you have the two files
 \family typewriter
 myutils.h
 \family default
- and 
+ and
 \family typewriter
 myutils.cpp
 \family default
  that contain your custom functions and classes.
  At this point, all that is necessary is to place these files in some directory,
- say 
+ say
 \family typewriter
 ~/code/allosystem/myutils/
 \family default
@@ -2034,7 +2034,7 @@ Solution
 \begin_inset Text
 
 \begin_layout Plain Layout
-Missing library header files when running 
+Missing library header files when running
 \family typewriter
 make
 \begin_inset space ~
@@ -2042,7 +2042,7 @@ make
 
 allocore
 \family default
- or 
+ or
 \family typewriter
 make
 \begin_inset space ~
@@ -2074,7 +2074,7 @@ A library dependency was not installed properly.
 
 \begin_layout Plain Layout
 2.
- Run 
+ Run
 \family typewriter
 install_dependencies.sh
 \family default
@@ -2083,9 +2083,9 @@ install_dependencies.sh
 
 \begin_layout Plain Layout
 3.
- Check the output of 
+ Check the output of
 \family typewriter
-install_dependencies.sh 
+install_dependencies.sh
 \family default
 for any errors.
 \end_layout
@@ -2093,7 +2093,7 @@ for any errors.
 \begin_layout Plain Layout
 4.
  If using OSX/MacPorts and there is an error about Python, delete the directory
- 
+
 \family typewriter
 /Applications/MacPorts/Python 2.7/
 \family default
@@ -2194,13 +2194,13 @@ The character '
 \family default
 ' designates the home directory of the current user.
  This is usually where you start out when you first open a terminal.
- The exact location of 
+ The exact location of
 \family typewriter
 ~
 \family default
  varies by platform.
  If you want to know exactly where it is, enter the following in the terminal
- 
+
 \begin_inset listings
 inline false
 status open
@@ -2244,7 +2244,7 @@ make: *** No rule to make target `xxx'.
 
 \begin_layout Standard
 The Makefile does not contain the rule you specified.
- The rule is the thing you are specifying after typing 
+ The rule is the thing you are specifying after typing
 \family typewriter
 make
 \family default
@@ -2254,7 +2254,7 @@ make
  A common cause is that you are in the wrong directory.
  Always use tab autocompletion to ensure that you have file paths correct.
  Another cause is that you are trying to build and run a source file that
- is not in 
+ is not in
 \family typewriter
 work/
 \family default
@@ -2269,11 +2269,11 @@ reference "sub:Custom-Project-Directories"
 \end_layout
 
 \begin_layout Subsection
-MinGW/MSYS: Freezes When Running 
+MinGW/MSYS: Freezes When Running
 \family typewriter
 configure
 \family default
- or 
+ or
 \family typewriter
 make
 \family default
@@ -2290,7 +2290,7 @@ name "sub:MinGW/MSYS Freezes"
 \begin_layout Standard
 It's possible another application (e.g., anti-virus or anti-spyware) is interferin
 g with MinGW's emulation of the Unix fork command.
- See this related Cygwin issue: 
+ See this related Cygwin issue:
 \begin_inset Flex URL
 status collapsed
 
@@ -2320,19 +2320,19 @@ MSYS simply does not like user names with spaces in them.
  If your user name contains spaces, then it will create problems with many
  of the build tools.
  To solve the problem, you must change your user name in MSYS.
- Add the line 
+ Add the line
 \begin_inset listings
 inline false
 status open
 
 \begin_layout Plain Layout
 
-set USERNAME=<myname> 
+set USERNAME=<myname>
 \end_layout
 
 \end_inset
 
-to the beginning of 
+to the beginning of
 \family typewriter
 C:
 \backslash
@@ -2344,7 +2344,7 @@ msys
 \backslash
 msys.bat
 \family default
- where 
+ where
 \family typewriter
 <myname>
 \family default
@@ -2366,13 +2366,13 @@ If you see a message `Permission denied', it is possible that the Windows
 
 \begin_layout Standard
 To configure group policies, click the Start button and in the search bar
- type: 
+ type:
 \family typewriter
 gpedit.msc
 \family default
 .
  Click this file to start the Local Group Policy Editor.
- Next, navigate to 
+ Next, navigate to
 \family typewriter
 Local Computer Policy -> Computer Configuration -> Administrative Templates
  -> Windows Components -> Application Compatibility
@@ -2381,15 +2381,15 @@ Local Computer Policy -> Computer Configuration -> Administrative Templates
 \end_layout
 
 \begin_layout Itemize
-Select Turn Off Application Compatibility Engine 
+Select Turn Off Application Compatibility Engine
 \end_layout
 
 \begin_layout Itemize
-Select Enabled under the Settings tab 
+Select Enabled under the Settings tab
 \end_layout
 
 \begin_layout Itemize
-Select Turn off Program Compatibility Assistant 
+Select Turn off Program Compatibility Assistant
 \end_layout
 
 \begin_layout Itemize
@@ -2397,7 +2397,7 @@ Select Enabled under the Settings tab
 \end_layout
 
 \begin_layout Standard
-See 
+See
 \begin_inset Flex URL
 status open
 
@@ -2421,7 +2421,7 @@ If you have problems trying to execute a Bash script (
 .
 \family default
 sh file), then it is possible that its file mode is incorrect.
- Make the script executable by running 
+ Make the script executable by running
 \begin_inset listings
 inline false
 status open
@@ -2444,20 +2444,20 @@ $ chmod u+x <filename>.sh
 This occurs for users with OSX 10.7 and above who have installed Xcode 4.4.1
  and above.
  The cause is that Xcode is not found by the build system.
- To fix the problem, ensure that Xcode.app is placed in 
+ To fix the problem, ensure that Xcode.app is placed in
 \family typewriter
 /Applications
 \family default
- and not 
+ and not
 \family typewriter
 ~/Applications
 \family default
  or some other folder.
- If you cannot navigate to 
+ If you cannot navigate to
 \family typewriter
 /Applications
 \family default
- from Finder, then open a Terminal and type 
+ from Finder, then open a Terminal and type
 \begin_inset listings
 inline false
 status open
@@ -2498,7 +2498,7 @@ $ sudo /Developer/Library/uninstall-devtools --mode=all
 \end_layout
 
 \begin_layout Standard
-Typically, you will want to remove old versions 
+Typically, you will want to remove old versions
 \emph on
 before
 \emph default
@@ -2519,12 +2519,12 @@ $ sudo xcode-select -switch [path to Xcode]
 
 \end_inset
 
-where the path after 
+where the path after
 \family typewriter
 -switch
 \family default
  is the version of Xcode you want to use, e.g.
- 
+
 \family typewriter
 /Applications/Xcode.app/
 \family default

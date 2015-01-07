@@ -50,18 +50,18 @@ static void gl_draw(){
 //		glEnableVertexAttribArray(ATTRIB_NORMAL);
 //		glVertexAttribPointer(ATTRIB_NORMAL, 3, GL_FLOAT, 0, 0, &v.normals()[0]);
 //	}
-//	
+//
 //	if(Nc){
 //		glEnableVertexAttribArray(ATTRIB_COLOR);
 //		glVertexAttribPointer(ATTRIB_COLOR, 4, GL_FLOAT, 0, 0, &v.colors()[0]);
 //	}
-//	
+//
 //	if(Nt2 || Nt3){
 //		glEnableVertexAttribArray(ATTRIB_TEXCOORD);
 //		if(Nt2)	glVertexAttribPointer(ATTRIB_TEXCOORD, 2, GL_FLOAT, 0, 0, &v.texCoord2s()[0]);
 //		else	glVertexAttribPointer(ATTRIB_TEXCOORD, 3, GL_FLOAT, 0, 0, &v.texCoord3s()[0]);
 //	}
-//	
+//
 //	// Send the package over...
 //	if(Ni){
 //		glDrawElements(v.primitive(), ie-is, GL_UNSIGNED_INT, &v.indices()[is]);
@@ -74,7 +74,7 @@ static void gl_draw(){
 
 
 bool setBackendOpenGLES2(Graphics * g) {
-	
+
 	// check hardware support:
 	// e.g. version OpenGL ES-CM 1.1
 	char name[20];
@@ -95,9 +95,9 @@ bool setBackendOpenGLES2(Graphics * g) {
 	g->s_vertex = gl_vertex;
 	g->s_normal = gl_normal;
 	g->s_color = gl_color;
-	
+
 	g->s_draw = gl_draw;
-	
+
 	#define SET_GL_ENUM(x) g->x = GL_##x
 	SET_GL_ENUM(POINTS);
 	SET_GL_ENUM(LINES);
@@ -112,9 +112,9 @@ bool setBackendOpenGLES2(Graphics * g) {
 
 	SET_GL_ENUM(COLOR_BUFFER_BIT);
 	SET_GL_ENUM(DEPTH_BUFFER_BIT);
-	
+
 //	g->mMode = GL_POINTS;
-	
+
 	printf("using GraphicsBackend::OpenGLES2\n");
 	g->mBackend = GraphicsBackend::OpenGLES2;
 	return true;

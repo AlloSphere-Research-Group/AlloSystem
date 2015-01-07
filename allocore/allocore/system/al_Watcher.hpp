@@ -3,15 +3,15 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
-	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS). 
+	Copyright (C) 2006-2008. The Regents of the University of California (REGENTS).
 	All Rights Reserved.
 
 	Permission to use, copy, modify, distribute, and distribute modified versions
 	of this software and its documentation without fee and without a signed
 	licensing agreement, is hereby granted, provided that the above copyright
-	notice, the list of contributors, this paragraph and the following two paragraphs 
+	notice, the list of contributors, this paragraph and the following two paragraphs
 	appear in all copies, modifications, and distributions.
 
 	IN NO EVENT SHALL REGENTS BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
@@ -30,7 +30,7 @@
 	Utility for registering & recieving notifications
 
 	File author(s):
-	Graham Wakefield, 2011, grrrwaaa@gmail.com	
+	Graham Wakefield, 2011, grrrwaaa@gmail.com
 */
 
 #include <string>
@@ -48,7 +48,7 @@ public:
 
 	/// get notifications from a named resource
 	void watch(std::string resourcename);
-	
+
 	/// stop notifications from a named resource
 	void unwatch(std::string resourcename);
 	/// stop all notifications
@@ -56,7 +56,7 @@ public:
 
 	/// the notification handler:
 	virtual void onEvent(std::string resourcename, std::string eventname) {}
-	
+
 	/// trigger a notification for a named resource
 	static void notify(std::string resourcename, std::string eventname);
 };

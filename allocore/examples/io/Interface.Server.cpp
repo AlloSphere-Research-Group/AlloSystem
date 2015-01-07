@@ -1,10 +1,10 @@
-/* 
+/*
 Author: Charlie Roberts - charlie[AT]charlie[HYPHEN]roberts[DOT]com
 
 This is a demo integrating Allocore with Interface.Server ( https://github.com/charlieroberts/interface.server.2 )
 
 To setup and run Interface.Server:
- 
+
 1. If not already installed, download and install node.js (nodejs.org)
 2. Clone the Interface.Server repo (linked above)
 3. cd into the interface.server rpo
@@ -29,16 +29,16 @@ using namespace al;
 #define APPLICATION_NAME "simple"
 
 int main(){
-	
+
 	osc::Send s( INTERFACE_SERVER_RECEIVE_PORT, INTERFACE_SERVER_IP_ADDRESS );
 	osc::Recv r( OSC_RECEIVE_PORT, "" );
-	
+
 	// setup a receive handler and start it running before we connect to the Interface.Server
 	{
 		struct OSCHandler : public osc::PacketHandler{
 			void onMessage(osc::Message& m){
 				m.print();
-                
+
                 // the message we'll receive consists of a single float
                 float v;
                 m >> v;
@@ -46,25 +46,25 @@ int main(){
                 printf("v = %f\n", v);
 			}
 		} handler;
-	
+
 		r.timeout(1);
 		r.handler(handler);
 		r.start();	// make sure timeout > 0
 	}
-	
-	/* 
+
+	/*
 	* /handshake message tells Interface.Server to load a specific application description, located in a folder named 'applications'
     * found in the Interface.Server repo. In this case we use the application "simple", which is the most basic example that
     * comes with the Interface.Server repo.
 	*/
-	
+
 	s.send("/interface/handshake", APPLICATION_NAME );
 
 	printf("press return to quit the application and disconnect from Interface.Server.\n");
 	getchar();
-	
+
 	// make sure your application discconnects from the Device Server when it exits
 	s.send("/interface/disconnectApplication", APPLICATION_NAME );
-	
+
 	return 0;
 }

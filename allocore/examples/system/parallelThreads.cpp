@@ -3,8 +3,8 @@ Allocore Example: Parallel thread computation
 
 Description:
 This example shows how to spawn multiple threads to perform a calculation-
-computing the mean of an array. The task is broken into individual work units 
-that compute the sum of a unique sub-interval of the entire array. When the 
+computing the mean of an array. The task is broken into individual work units
+that compute the sum of a unique sub-interval of the entire array. When the
 individual workers are done, their results are combined into the final result.
 
 Author:
@@ -43,29 +43,29 @@ int main(){
 	}
 
 	Threads<Func> threads(Nthreads);
-	
+
 	// Setup worker thread summation intervals
 	for(int i=0; i<Nthreads; ++i){
 		threads.getInterval(threads.function(i).ival, i, N);
 		threads.function(i).data = data;
 	}
-	
+
 	// Compute in parallel
 	// By default, the threads join the main thread when finished
 	threads.start();
-	
+
 	// Combine worker results
 	double sumPll = 0;
 	for(int i=0; i<Nthreads; ++i){
 		sumPll += threads.function(i).sum;
 	}
-	
+
 	// Compute serially for verification
 	double sumSer = 0;
 	for(unsigned i=0; i<N; ++i){
 		sumSer += data[i];
 	}
-	
+
 	printf("Correct : %g\n", sumSer/N);
 	printf("Computed: %g\n", sumPll/N);
 }

@@ -5,7 +5,7 @@ Description:
 This implements a discretized version of the wave equation:
 
 	u(r, t+1) = 2u(r,t) - u(r,t-1) + v^2 [u(r+1, t) - 2u(r,t) + u(r-1,t)]
-	
+
 where
 
 	u	is the wave equation,
@@ -68,7 +68,7 @@ public:
 		// Add some random droplets
 		for(int k=0; k<3; ++k){
 			if(rnd::prob(0.01)){
-				
+
 				// Add a Gaussian-shaped droplet
 				int ix = rnd::uniform(Nx-8)+4;
 				int iy = rnd::uniform(Ny-8)+4;
@@ -104,7 +104,7 @@ public:
 
 			// Compute next value of wave equation at (i,j)
 			float val = 2*vc - vp + velocity*((vl - 2*vc + vr) + (vd - 2*vc + vu));
-			
+
 			// Store in previous value since we don't need it again
 			wave[indexAt(i,j,zprev)] = val * decay;
 

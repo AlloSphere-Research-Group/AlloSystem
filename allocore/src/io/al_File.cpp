@@ -205,7 +205,7 @@ SearchPaths::SearchPaths(int argc, char * const argv[], bool recursive){
 	addAppPaths(argc,argv,recursive);
 }
 
-SearchPaths::SearchPaths(const SearchPaths& cpy) 
+SearchPaths::SearchPaths(const SearchPaths& cpy)
 :	mSearchPaths(cpy.mSearchPaths),
 	mAppPath(cpy.mAppPath)
 {}
@@ -220,14 +220,14 @@ void SearchPaths::addAppPaths(int argc, const char ** argv, bool recursive) {
 	addAppPaths(recursive);
 	if (argc > 0) {
 		addAppPaths(File::directory(argv[0]), recursive);
-	} 
+	}
 }
 
 void SearchPaths::addAppPaths(int argc, char * const argv[], bool recursive) {
 	addAppPaths(recursive);
 	if (argc > 0) {
 		addAppPaths(File::directory(argv[0]), recursive);
-	} 
+	}
 }
 
 void SearchPaths::addAppPaths(bool recursive) {

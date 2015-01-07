@@ -8,12 +8,12 @@
 namespace al{
 
 void printPlot(float value, uint32_t width, bool spaces, const char * point){
-	bool clipped = false;	
+	bool clipped = false;
 	if(value < -1.f){ value=-1.f; clipped=true; }
 	else if(value > 1.f){ value=1.f; clipped=true; }
-	
+
 	const char * pt = clipped ? "+" : point;
-	
+
 	value = (value + 1.f) * 0.5f * (float)(width);
 	value += value>=0 ? 0.5 : -0.5;
 	uint32_t pos = uint32_t(value);
@@ -33,8 +33,8 @@ void printPlot(float value, uint32_t width, bool spaces, const char * point){
 		for(; i<pos; ++i) printf("-");
 		printf("%s", pt);
 	}
-	
-	end: 
+
+	end:
 	if(spaces) for(; i<width; ++i) printf(" ");
 }
 

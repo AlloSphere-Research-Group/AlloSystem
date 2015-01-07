@@ -8,7 +8,7 @@ void RBO::onCreate(){ GLuint i; glGenRenderbuffersEXT(1,&i); mID=i; }
 void RBO::onDestroy(){ GLuint i=id(); glDeleteRenderbuffersEXT(1,&i); }
 
 bool RBO::resize(unsigned w, unsigned h){
-	begin(); 
+	begin();
 	bool r = resize(format(), w, h);
 	end();
 	return r;
@@ -50,7 +50,7 @@ FBO& FBO::attachTexture2D(unsigned texID, Attachment att, int level){
 
 FBO& FBO::detachTexture2D(Attachment att, int level){
 	attachTexture2D(0,att,level);
-	return *this;		
+	return *this;
 }
 
 GLenum FBO::status(){
@@ -78,13 +78,13 @@ const char * FBO::statusString(GLenum stat){
 }
 
 // static functions
-void FBO::bind(unsigned fboID){ 
+void FBO::bind(unsigned fboID){
 	AL_GRAPHICS_ERROR("(before FBO::bind)", fboID);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboID); 
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboID);
 	AL_GRAPHICS_ERROR("binding FBO", fboID);
 }
 
-void FBO::end(){ 		
+void FBO::end(){
 	AL_GRAPHICS_ERROR("(before FBO::end)",-1);
 	bind(0);
 	AL_GRAPHICS_ERROR("unbinding FBO",-1);

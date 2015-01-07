@@ -6,7 +6,7 @@ namespace al{
 /// Convert a normalized screen space position to world space
  // each component of input vector should be normalized from -1. to 1.
 // template<class T>
-Vec3d Stereographic::unproject(Vec3d screenPos){    
+Vec3d Stereographic::unproject(Vec3d screenPos){
   Matrix4d invprojview = Matrix4d::inverse(this->modelViewProjection());
   Vec4d worldPos4 = invprojview.transform(screenPos);
   return worldPos4.sub<3>(0) / worldPos4.w;
@@ -50,7 +50,7 @@ void Stereographic :: draw(Graphics& gl, const Lens& lens, const Pose& pose, con
 	}
 }
 
-void Stereographic :: drawMono(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect) 
+void Stereographic :: drawMono(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
 	double near = lens.near();
 	double far = lens.far();
@@ -62,37 +62,37 @@ void Stereographic :: drawMono(Graphics& gl, const Lens& lens, const Pose& pose,
 
 	// glDrawBuffer(GL_BACK);	// << breaks usage under FBO
 	if(clear) sendClear(gl);
-	
+
 	mEye = pos;
-	
+
 	if (omni()) {
 		int wx = vp.l;
 		double fovx = mOmniFov;
 		for (unsigned i=0; i<mSlices; i++) {
 			// angle at center of slice:
 			double angle = fovx * (0.5-((i+0.5)/(double)(mSlices)));
-			
+
 			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
-			double aspect = vp1.aspect() * pixelaspect; 
-			double fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect); 
-			
+			double aspect = vp1.aspect() * pixelaspect;
+			double fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect);
+
 			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
 			Vec3d ux = q.toVectorX();
 			Vec3d uy = q.toVectorY();
 			Vec3d uz = q.toVectorZ();
-			
+
 			mProjection = Matrix4d::perspective(fovy, aspect, near, far);
 			mModelView = Matrix4d::lookAt(ux, uy, uz, mEye);
-			
+
 			sendViewport(gl, vp1);
 			if(clear) sendClear(gl);
-			
+
 			pushDrawPop(gl,draw);
-			
+
 			wx = wx1;
 		}
-		
+
 	} else {
 		double fovy = lens.fovy();
 		double aspect = vp.aspect() * pixelaspect;
@@ -115,7 +115,7 @@ appropriate draw buffer. Thus, to draw the right eye:
 	glDrawBuffer(GL_BACK_RIGHT);
 
 	drawOffAxis(RIGHT_EYE, gl, lens, pose, vp, draw, clear, pixelaspect);
-	
+
 	glDrawBuffer(GL_BACK);
 	glDisable(GL_SCISSOR_TEST);
 */
@@ -152,8 +152,8 @@ void Stereographic::drawEye(StereoMode eye, Graphics& gl, const Lens& lens, cons
 			// Position of right edge of slice (exclusive)
 			int wx1 = vp.l + vp.w * (i+1)/(double)mSlices;
 			Viewport vp1(wx, vp.b, wx1-wx, vp.h);
-			double aspect = vp1.aspect() * pixelaspect; 
-			double fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect); 
+			double aspect = vp1.aspect() * pixelaspect;
+			double fovy = Lens::getFovyForFovX(fovx * (vp1.w)/(double)vp.w, aspect);
 
 			Quatd q = pose.quat() * Quatd().fromAxisAngle(M_DEG2RAD * angle, 0, 1, 0);
 			Vec3d ux = q.toVectorX();
@@ -181,7 +181,7 @@ void Stereographic::drawEye(StereoMode eye, Graphics& gl, const Lens& lens, cons
 
 			wx = wx1;
 		}
-		
+
 	} else {
 		double fovy = lens.fovy();
 		double aspect = vp.aspect() * pixelaspect;
@@ -216,7 +216,7 @@ void Stereographic::drawEye(StereoMode eye, Graphics& gl, const Lens& lens, cons
 }
 
 
-void Stereographic :: drawAnaglyph(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect) 
+void Stereographic :: drawAnaglyph(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
 	glEnable(GL_SCISSOR_TEST);
 
@@ -263,7 +263,7 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Lens& lens, const Pose& p
 
 
 
-void Stereographic :: drawActive(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect) 
+void Stereographic :: drawActive(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
 	glEnable(GL_SCISSOR_TEST);
 
@@ -278,7 +278,7 @@ void Stereographic :: drawActive(Graphics& gl, const Lens& lens, const Pose& pos
 }
 
 
-void Stereographic :: drawLeft(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect) 
+void Stereographic :: drawLeft(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
 	glEnable(GL_SCISSOR_TEST);
 
@@ -287,7 +287,7 @@ void Stereographic :: drawLeft(Graphics& gl, const Lens& lens, const Pose& pose,
 	glDisable(GL_SCISSOR_TEST);
 }
 
-void Stereographic :: drawRight(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect) 
+void Stereographic :: drawRight(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
 	glEnable(GL_SCISSOR_TEST);
 
@@ -297,10 +297,10 @@ void Stereographic :: drawRight(Graphics& gl, const Lens& lens, const Pose& pose
 }
 
 
-void Stereographic :: drawDual(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect) 
+void Stereographic :: drawDual(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
 	glEnable(GL_SCISSOR_TEST);
-	
+
 	// Clear the whole viewport in one go (not once for each half)
 	if(clear){
 		sendViewport(gl, vp);
@@ -321,7 +321,7 @@ void Stereographic :: drawDual(Graphics& gl, const Lens& lens, const Pose& pose,
 
 /// blue line sync for active stereo
 /// @see http://local.wasp.uwa.edu.au/~pbourke/miscellaneous/stereographics/stereorender/GLUTStereo/glutStereo.cpp
-void Stereographic :: drawBlueLine(double window_width, double window_height) 
+void Stereographic :: drawBlueLine(double window_width, double window_height)
 {
 	GLint i;
 	unsigned long buffer;
@@ -390,7 +390,7 @@ void Stereographic :: drawBlueLine(double window_width, double window_height)
 		glMatrixMode(matrixMode);
 
 		glViewport(vp[0], vp[1], vp[2], vp[3]);
-	}	
+	}
 	glPopAttrib();
 
 	glDrawBuffer(GL_BACK);

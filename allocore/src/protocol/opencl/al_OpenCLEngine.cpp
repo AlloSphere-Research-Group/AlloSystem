@@ -11,14 +11,14 @@ OpenCLEngine :: ~OpenCLEngine() {
 		mDeviceQueues.erase(it);
 		delete queue;
 	}
-	
+
 	while(! mPrograms.empty()) {
 		map<string, OpenCLProgram *>::iterator it = mPrograms.begin();
 		OpenCLProgram *program = it->second;
 		mPrograms.erase(it);
 		delete program;
 	}
-	
+
 	mContext.destroy();
 }
 
@@ -28,7 +28,7 @@ OpenCLDevice * OpenCLEngine :: default_device() {
 			return NULL;
 		}
 	}
-	
+
 	return mPlatforms.front().default_device();
 }
 
@@ -38,7 +38,7 @@ OpenCLDevice * OpenCLEngine :: cpu_device() {
 			return NULL;
 		}
 	}
-	
+
 	return mPlatforms.front().cpu_device();
 }
 
@@ -48,7 +48,7 @@ OpenCLDevice * OpenCLEngine :: gpu_device() {
 			return NULL;
 		}
 	}
-	
+
 	return mPlatforms.front().gpu_device();
 }
 
@@ -58,7 +58,7 @@ void OpenCLEngine :: compile_source(const char *name, const char *source) {
 			return;
 		}
 	}
-	
+
 	map<string, OpenCLProgram *>::iterator it = mPrograms.find(string(name));
 	if(it != mPrograms.end()) {
 		OpenCLProgram *old_program = it->second;
@@ -82,7 +82,7 @@ OpenCLKernel * OpenCLEngine :: get_kernel(const char *name, const char *kernel_n
 	if(it == mPrograms.end()) {
 		return NULL;
 	}
-	
+
 	OpenCLProgram *program = it->second;
 	if(kernel_name) {
 		return OpenCLKernel::create(*program, kernel_name);
@@ -104,10 +104,10 @@ OpenCLKernel * OpenCLEngine :: get_kernel(const char *name, const char *kernel_n
 }
 
 OpenCLEvent OpenCLEngine :: enqueue_kernel(
-	const OpenCLDevice &dev, 
-	const OpenCLKernel *ker, 
-	cl_uint ndim, 
-	size_t *global, 
+	const OpenCLDevice &dev,
+	const OpenCLKernel *ker,
+	cl_uint ndim,
+	size_t *global,
 	size_t *local
 )
 {
@@ -121,11 +121,11 @@ OpenCLEvent OpenCLEngine :: enqueue_kernel(
 }
 
 OpenCLEvent OpenCLEngine :: enqueue_read(
-	const OpenCLDevice &dev, 
-	OpenCLMemoryBuffer *mem, 
-	bool block, 
-	size_t offset, 
-	size_t size, 
+	const OpenCLDevice &dev,
+	OpenCLMemoryBuffer *mem,
+	bool block,
+	size_t offset,
+	size_t size,
 	void *ptr
 )
 {
@@ -144,7 +144,7 @@ OpenCLMemoryBuffer * OpenCLEngine :: create_memory_buffer(cl_mem_flags usage, si
 			return NULL;
 		}
 	}
-	
+
 	OpenCLMemoryBuffer *mem = new OpenCLMemoryBuffer();
 	mem->create(mContext, usage, size, ptr);
 	return mem;
@@ -155,11 +155,11 @@ bool OpenCLEngine :: create_context() {
 	if(mPlatforms.size() <= 0) {
 		return false;
 	}
-	
+
 	OpenCLPlatform &platform = mPlatforms.front();
 	const vector<OpenCLDevice> &devices =  platform.get_devices();
 	mContext.create(devices);
-	
+
 	return mContext.get_context() != 0;
 }
 
@@ -169,7 +169,7 @@ OpenCLCommandQueue * OpenCLEngine :: queue_for_device(const OpenCLDevice &dev) {
 			return NULL;
 		}
 	}
-	
+
 
 	map<cl_device_id, OpenCLCommandQueue *>::iterator it =	mDeviceQueues.find(dev.get_device());
 	OpenCLCommandQueue *queue = NULL;
@@ -180,7 +180,7 @@ OpenCLCommandQueue * OpenCLEngine :: queue_for_device(const OpenCLDevice &dev) {
 			delete queue;
 			return NULL;
 		}
-		
+
 		mDeviceQueues.insert(
 			std::pair<cl_device_id, OpenCLCommandQueue *>(
 				dev.get_device(),
@@ -191,7 +191,7 @@ OpenCLCommandQueue * OpenCLEngine :: queue_for_device(const OpenCLDevice &dev) {
 	else {
 		queue = it->second;
 	}
-	
+
 	return queue;
 }
 

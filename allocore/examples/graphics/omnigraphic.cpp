@@ -12,13 +12,13 @@ Graham Wakefield 2011
 #include "allocore/graphics/al_Shader.hpp"
 
 std::string omniVS = AL_STRINGIFY(
-	
+
 	// distort the scene per-vertex:
 	uniform float fovy, aspect, near, far;
 	uniform float omniFov, eyeSep, focal;
 	uniform int omni;
 	varying vec4 color;
-	
+
 	float M_DEG2RAD = 0.017453292519943;
 	float M_1_PI = 0.31830988618379;
 
@@ -34,35 +34,35 @@ std::string omniVS = AL_STRINGIFY(
 		float w = -v.z;
 		return vec4(x, y, z, w);
 	}
-	
+
 	// omnigraphic:
 	vec4 omnigraphic(in vec3 v, in float omniFov, in float aspect, in float near, in float far) {
 		float f = 2./(omniFov * M_DEG2RAD);
 		float azimuth = atan(v.x, -v.z);
 		float elevation = atan(v.y, length(v.xz));
 		float d = length(v.xyz) * sign(v.z);
-		
+
 		float x = f * azimuth;
 		float y = f * elevation * aspect;
-		
+
 		// depth ortho-style:
 		float z = (-2.*d - far+near) / (far-near);
 		float w = 1.;	// no perspective effect
 		return vec4(x, y, z, w);
 	}
-	
+
 	vec4 omnigraphic2(in vec3 v, in float omniFov, in float aspect, in float near, in float far, in float eyeSep, in float focal) {
 		float f = 2./(omniFov * M_DEG2RAD);
 		float azimuth = atan(v.x, -v.z);
 		float elevation = atan(v.y, length(v.xz));
 		float d = length(v.xyz) * sign(v.z);
-		
+
 		// stereo rotation depends on depth:
 		azimuth += eyeSep; // * M_1_PI * (d/focal);
-		
+
 		float x = f * azimuth;
 		float y = f * elevation * aspect;
-		
+
 		// depth ortho-style:
 		float z = (-2.*d - far+near) / (far-near);
 		float w = 1.;	// no perspective effect
@@ -70,29 +70,29 @@ std::string omniVS = AL_STRINGIFY(
 	}
 
 	void main(void) {
-	
+
 		// convert object to view space:
 		vec4 vertex = gl_ModelViewMatrix * gl_Vertex;
-		
+
 		// but bypass the gl_ProjectionMatrix
 		if (omni > 0) {
 			vertex = omnigraphic2(vertex.xyz, omniFov, aspect, near, far, eyeSep, focal);
 		} else {
 			vertex = perspective(vertex.xyz, fovy, aspect, near, far);
-		}	
-		
+		}
+
 		gl_Position = vertex;
-		
+
 		color = gl_Color;
-		
+
 	}
 );
 
 std::string omniFS = AL_STRINGIFY(
 	// just a typical fragment shader:
-	
+
 	varying vec4 color;
-	
+
 	void main(void) {
 		gl_FragColor = color;
 	}
@@ -110,29 +110,29 @@ bool useShader = false;
 
 /*
 	Omnigraphic mode splits up the window into vertical slices (viewports)
-	Each viewport has a slightly rotated view of the scene, such that the 
+	Each viewport has a slightly rotated view of the scene, such that the
 	borders match up and create a seamless panoramic view.
 	In effect, it presents a cylindrical map.
 	With stereographics, it creates omnistereo (where stereoscopy is continuous
 	around the cylinder)
-	
+
 	However it can be expensive, as each slice is a full scene render.
-	
+
 	Perhaps a similar effect can be achieved with a shader?:
-	
-		According to the polar angle of a vertex, displace it with a modified 
+
+		According to the polar angle of a vertex, displace it with a modified
 		version of the ModelViewProjection matrix (instead of e.g. fttransform())
-	
-		The modelview/projection matrices can be calculated in the same way as 
+
+		The modelview/projection matrices can be calculated in the same way as
 		the Stereographic class (perspectiveLeft/Right, lookatLeft/Right)
-	
+
 	The advantage would be full spherical omnistereo, and hopefully cheaper.
 */
 
 struct MyWindow : Window, public Drawable{
-	
-	bool onKeyDown(const Keyboard& k){	
-		
+
+	bool onKeyDown(const Keyboard& k){
+
 		switch(k.key()){
 			case 'o': stereo.omni(!stereo.omni()); return false;
 			case 's': useShader = !useShader; return false;
@@ -145,18 +145,18 @@ struct MyWindow : Window, public Drawable{
 			default: return true;
 		}
 	}
-	
+
 	bool onCreate(){
 		Shader omniV(omniVS, Shader::VERTEX);
 		Shader omniF(omniFS, Shader::FRAGMENT);
 		omniV.compile();
 		omniF.compile();
 		omniP.attach(omniV).attach(omniF).link();
-		
+
 		omniV.printLog();
 		omniF.printLog();
 		omniP.printLog();
-		
+
 		stereo.clearColor(Color(1, 1, 1, 1));
 		return true;
 	}
@@ -165,7 +165,7 @@ struct MyWindow : Window, public Drawable{
 		nav.step();
 		if (useShader) {
 			if (stereo.stereo()) {
-				
+
 				Viewport vp(width(), height());
 				gl.viewport(vp);
 				gl.clearColor(stereo.clearColor());
@@ -173,9 +173,9 @@ struct MyWindow : Window, public Drawable{
 				gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
 				gl.depthTesting(1);
 				gl.modelView(Matrix4d::lookAt(nav.ux(), nav.uy(), nav.uz(), nav.pos()));
-				
+
 				glColorMask(GL_TRUE, GL_FALSE,GL_FALSE,GL_TRUE);
-				
+
 				omniP.begin();
 				omniP.uniform("fovy", lens.fovy());
 				omniP.uniform("omniFov", stereo.omniFov());
@@ -188,10 +188,10 @@ struct MyWindow : Window, public Drawable{
 				gl.draw(grid);
 				gl.draw(mesh);
 				omniP.end();
-				
+
 				glColorMask(GL_FALSE,GL_TRUE, GL_TRUE, GL_TRUE);
 				gl.clear(Graphics::DEPTH_BUFFER_BIT);
-				
+
 				omniP.begin();
 				omniP.uniform("fovy", lens.fovy());
 				omniP.uniform("omniFov", stereo.omniFov());
@@ -204,12 +204,12 @@ struct MyWindow : Window, public Drawable{
 				gl.draw(grid);
 				gl.draw(mesh);
 				omniP.end();
-				
+
 				glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
-				
+
 			} else {
 				// MONO:
-				
+
 				Viewport vp(width(), height());
 				gl.viewport(vp);
 				gl.clearColor(stereo.clearColor());
@@ -231,7 +231,7 @@ struct MyWindow : Window, public Drawable{
 				gl.draw(mesh);
 				omniP.end();
 			}
-			
+
 		} else {
 			stereo.draw(gl, lens, nav, Viewport(width(), height()), *this);
 		}
@@ -242,9 +242,9 @@ struct MyWindow : Window, public Drawable{
 		gl.fog(lens.far(), lens.far()/2, stereo.clearColor());
 		gl.depthTesting(1);
 		gl.draw(grid);
-		gl.draw(mesh);	
+		gl.draw(mesh);
 	}
-	
+
 	ShaderProgram omniP;
 };
 
@@ -260,7 +260,7 @@ int main(){
 	stereo.omni(true, 24, 120);
 	stereo.stereo(false);
 	stereo.mode(Stereographic::ANAGLYPH);
-	
+
 	// set up mesh:
 	mesh.primitive(Graphics::TRIANGLES);
 	double tri_size = 2;
@@ -275,7 +275,7 @@ int main(){
 			mesh.vertex(x+rnd::uniformS(tri_size), y+rnd::uniformS(tri_size), z+rnd::uniformS(tri_size));
 		}
 	}
-	
+
 	grid.primitive(Graphics::LINES);
 	grid.color(0, 0, 0);
 	double stepsize = 1./2;
@@ -299,9 +299,9 @@ int main(){
 		grid.vertex(t+tsize, y, z);
 	}}}
 	grid.scale(world_radius);
-	
+
 	win.create(Window::Dim(100, 0, 640, 480), "Omnigraphic Example", 60);
-	
+
 	win.displayMode(win.displayMode() | Window::STEREO_BUF);
 
 	win.append(*new StandardWindowKeyControls);

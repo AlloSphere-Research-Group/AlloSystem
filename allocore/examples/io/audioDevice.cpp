@@ -28,9 +28,9 @@ void audioCB(AudioIOData& io){
 
 	// loop through the number of samples in the block
 	while(io()){
-		
+
 		float s = io.in(0);		// get the line-in or microphone sample
-		
+
 		io.out(0) = s * ampL;	// set left and right output channel samples
 		io.out(1) = s * ampR;
 	}
@@ -52,14 +52,14 @@ int main(){
 
 	// Create an audio i/o object using default input and output devices
 	AudioIO io(blockSize, sampleRate, audioCB, &user, outputChannels, inputChannels);
-	
+
 	// Start the audio stream; this launches a new thread
 	io.start();
-	
+
 	// Print some information about the i/o streams
 	printf("Audio stream info:\n");
 	io.print();
-	
+
 	printf("\nPress 'enter' to quit...\n"); getchar();
 	return 0;
 }

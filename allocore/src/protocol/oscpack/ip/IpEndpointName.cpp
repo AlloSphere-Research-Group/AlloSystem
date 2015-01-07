@@ -77,5 +77,5 @@ void IpEndpointName::AddressAndPortAsString( char *s ) const
 				(int)(address & 0xFF),
 				(int)port );
 		}
-	}	
+	}
 }
