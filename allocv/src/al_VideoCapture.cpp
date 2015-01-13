@@ -92,14 +92,22 @@ bool VideoCapture::grab(){
 	return didGrab;
 }
 
-bool VideoCapture::retrieve(Array& dst, int channel, int copyPolicy){
-	bool res = cvVideoCapture.retrieve(cvFrame, channel);
+bool VideoCapture::retrieve(cv::Mat& dst, int chan){
+	return cvVideoCapture.retrieve(dst, chan);
+}
+
+bool VideoCapture::retrieve(int chan){
+	return cvVideoCapture.retrieve(cvFrame, chan);
+}
+
+bool VideoCapture::retrieve(Array& dst, int chan, int copyPolicy){
+	bool res = retrieve(chan);
 	fromCV(dst, cvFrame, copyPolicy);
 	return res;
 }
 
-bool VideoCapture::retrieveFlip(Array& dst, int channel){
-	return retrieve(dst, channel, -1);
+bool VideoCapture::retrieveFlip(Array& dst, int chan){
+	return retrieve(dst, chan, -1);
 }
 
 bool VideoCapture::read(Array& dst, int copyPolicy){
