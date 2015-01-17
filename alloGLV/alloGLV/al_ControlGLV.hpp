@@ -109,7 +109,7 @@ public:
 
 	virtual bool onCreate();
 	virtual bool onDestroy();
-	virtual bool onResize(int dw, int dh);
+	virtual bool onResize(int w, int h);
 	//virtual bool onVisibility(bool v){ return true; }
 
 	virtual bool onFrame();

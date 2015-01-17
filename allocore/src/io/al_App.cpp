@@ -4,26 +4,21 @@
 namespace al{
 //______________________________________________________________________________
 
-void Viewpoint::onParentResize(int dw, int dh){
-	mViewport.l += dw * anchorX();
-	mViewport.b += dh * anchorY();
-	mViewport.w += dw * stretchX();
-	mViewport.h += dh * stretchY();
+void Viewpoint::onParentResize(int w, int h){
+	mViewport.l = w * anchorX();
+	mViewport.b = h * anchorY();
+	mViewport.w = w * stretchX();
+	mViewport.h = h * stretchY();
 }
 
 //______________________________________________________________________________
 
-bool ViewpointWindow::onResize(int dw, int dh){
+bool ViewpointWindow::onResize(int w, int h){
 	//printf("ViewpointWindow onResize: %d %d\n", dw, dh);
 	Viewpoints::iterator iv = mViewpoints.begin();
 
 	while(iv != mViewpoints.end()){
-		/*Viewpoint& vp = **iv;
-		vp.viewport().l += dw * vp.anchorX();
-		vp.viewport().b += dh * vp.anchorY();
-		vp.viewport().w += dw * vp.stretchX();
-		vp.viewport().h += dh * vp.stretchY();*/
-		(*iv)->onParentResize(dw, dh);
+		(*iv)->onParentResize(w, h);
 		++iv;
 		//printf("%g %g %g %g\n", vp.viewport().l, vp.viewport().b, vp.viewport().w, vp.viewport().h);
 	}
@@ -46,7 +41,7 @@ ViewpointWindow& ViewpointWindow::add(Viewpoint& v){
 App::App()
 :	mName(""),
 	mNavControl(mNav),
-	mClockAnimate(0), mClockNav(0), mOSCRecv(8000)
+	mClockAnimate(0), mClockNav(0)
 {
 }
 
