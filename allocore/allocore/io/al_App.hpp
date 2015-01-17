@@ -117,7 +117,7 @@ public:
 	Viewport& viewport(){ return mViewport; }
 
 	/// Call to update viewport using stretch/anchor amounts when parent dimensions change
-	void onParentResize(int dw, int dh);
+	void onParentResize(int w, int h);
 
 private:
 	Viewport mViewport;				// screen display region
@@ -257,7 +257,7 @@ public:
 	virtual void onDestroy(const ViewpointWindow& win){}
 
 	/// Called upon resize of a window
-	virtual void onResize(const ViewpointWindow& win, int dw, int dh){}
+	virtual void onResize(const ViewpointWindow& win, int w, int h){}
 
 
 

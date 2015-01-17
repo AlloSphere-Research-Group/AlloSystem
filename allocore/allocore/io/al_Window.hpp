@@ -320,33 +320,33 @@ public:
 	const Keyboard& keyboard() const { return mKeyboard; }	///< Get current keyboard state
 	const Mouse& mouse() const { return mMouse; }			///< Get current mouse state
 
-	double aspect() const { return dimensions().aspect(); }	///< Get aspect ratio (width divided by height)
-	bool created() const;						///< Whether window has been created providing a valid graphics context
-	Cursor cursor() const;						///< Get current cursor type
-	bool cursorHide() const;					///< Whether the cursor is hidden
-	Dim dimensions() const;						///< Get current dimensions of window
-	DisplayMode displayMode() const;			///< Get current display mode
-	bool enabled(DisplayMode v) const;			///< Get whether display mode flag is set
-	bool fullScreen() const;					///< Get whether window is in fullscreen
-	double fps() const;							///< Returns frames/second (requested)
-	double fpsActual() const { return 1./spfActual(); }	///< Returns frames/second (actual)
-	double fpsAvg() const;						///< Returns frames/second (running average)
-	double spf() const { return 1./fps(); }		///< Returns seconds/frame (requested)
-	double spfActual() const;					///< Returns seconds/frame (actual)
-	const std::string& title() const;			///< Get title of window
-	bool visible() const;						///< Get whether window is visible
-	bool vsync() const { return mVSync; }		///< Get whether v-sync is enabled
-	bool asap() const { return mASAP; }			///< Get whether window is rendering as fast as possible
+	double aspect() const;				///< Get aspect ratio (width divided by height)
+	bool created() const;				///< Whether window has been created providing a valid graphics context
+	Cursor cursor() const;				///< Get current cursor type
+	bool cursorHide() const;			///< Whether the cursor is hidden
+	Dim dimensions() const;				///< Get current dimensions of window
+	DisplayMode displayMode() const;	///< Get current display mode
+	bool enabled(DisplayMode v) const;	///< Get whether display mode flag is set
+	bool fullScreen() const;			///< Get whether window is in fullscreen
+	double fps() const;					///< Returns frames/second (requested)
+	double fpsActual() const;			///< Returns frames/second (actual)
+	double fpsAvg() const;				///< Returns frames/second (running average)
+	double spf() const;					///< Returns seconds/frame (requested)
+	double spfActual() const;			///< Returns seconds/frame (actual)
+	const std::string& title() const;	///< Get title of window
+	bool visible() const;				///< Get whether window is visible
+	bool vsync() const;					///< Get whether v-sync is enabled
+	bool asap() const;					///< Get whether window is rendering as fast as possible
 
-	int height() const { return dimensions().h; } ///< Get window height, in pixels
-	int width() const { return dimensions().w; } ///< Get window width, in pixels
+	int height() const { return mDim.h; } ///< Get window height, in pixels
+	int width() const { return mDim.w; } ///< Get window width, in pixels
 
-	Window& cursor(Cursor v);					///< Set cursor type
-	Window& cursorHide(bool v);					///< Set cursor hiding
-	Window& cursorHideToggle();					///< Toggle cursor hiding
-	Window& dimensions(const Dim& v);			///< Set dimensions
-	Window& displayMode(DisplayMode v);			///< Set display mode; will recreate window if different from current
-	Window& fps(double v);						///< Set frames/second
+	Window& cursor(Cursor v);			///< Set cursor type
+	Window& cursorHide(bool v);			///< Set cursor hiding
+	Window& cursorHideToggle();			///< Toggle cursor hiding
+	Window& dimensions(const Dim& v);	///< Set dimensions
+	Window& displayMode(DisplayMode v);	///< Set display mode; will recreate window if different from current
+	Window& fps(double v);				///< Set frames/second
 
 	/// Set fullscreen mode
 
@@ -354,13 +354,13 @@ public:
 	/// if posssible, without changing the display resolution.
 	Window& fullScreen(bool on);
 
-	Window& fullScreenToggle();					///< Toggle fullscreen
-	Window& hide();								///< Hide window (if showing)
-	Window& iconify();							///< Iconify window
-	Window& show();								///< Show window (if hidden)
-	Window& title(const std::string& v);		///< Set title
-	Window& vsync(bool v);						///< Set whether to sync the frame rate to the monitor's refresh rate
-	Window& asap(bool v){ mASAP=v; return *this; }	///< Set whether window renders as fast as possible
+	Window& fullScreenToggle();			///< Toggle fullscreen
+	Window& hide();						///< Hide window (if showing)
+	Window& iconify();					///< Iconify window
+	Window& show();						///< Show window (if hidden)
+	Window& title(const std::string& v); ///< Set title
+	Window& vsync(bool v);				///< Set whether to sync the frame rate to the monitor's refresh rate
+	Window& asap(bool v);				///< Set whether window renders as fast as possible
 
 
 	const InputEventHandlers& inputEventHandlers() const {
@@ -401,14 +401,6 @@ public:
 	Window& remove(WindowEventHandler& v);
 
 
-	/// DEPRECATED, do not use!
-	Window& add(InputEventHandler * v){ return append(*v); }
-	Window& add(WindowEventHandler * v){ return append(*v); }
-	Window& prepend(InputEventHandler * v){ return prepend(*v); }
-	Window& prepend(WindowEventHandler * v){ return prepend(*v); }
-	Window& remove(InputEventHandler * v){ return remove(*v); }
-	Window& remove(WindowEventHandler * v){ return remove(*v); }
-
 	/// Destroy all created windows
 	static void destroyAll();
 
@@ -416,8 +408,7 @@ public:
 	static void stopLoop();
 	static bool started();
 
-	// DEPRECATED:
-	double avgFps() const { return fpsAvg(); }
+	void updateFrameTime();
 
 protected:
 	friend class WindowImpl;
@@ -427,17 +418,33 @@ protected:
 	Mouse mMouse;
 	InputEventHandlers mInputEventHandlers;
 	WindowEventHandlers mWindowEventHandlers;
+	Dim mDim;
 	DisplayMode mDisplayMode;
+	std::string mTitle;
+	Cursor mCursor;
+	double mFPS; // requested FPS
+	double mFPSAvg; // average of actual FPS
+	double mFrameTime;
+	double mDeltaTime;
 	bool mASAP;
+	bool mCursorHide;
+	bool mFullScreen;
+	bool mVisible;
 	bool mVSync;
 
-	// defined in pimpl-specific file
+	// Must be defined in pimpl-specific file
 	void implCtor();
 	void implDtor();
+	bool implCreate();
 	void implDestroy();
-	void implOnFrame(); // Calls onFrame() and swaps buffers
+	void implSetCursor();
+	void implSetCursorHide();
+	void implSetDimensions();
+	void implSetFPS();
+	void implSetFullScreen();
+	void implSetTitle();
+	void implSetVSync();
 
-	bool makeCurrent() const;
 	Window& insert(InputEventHandler& v, int i);
 	Window& insert(WindowEventHandler& v, int i);
 
@@ -450,12 +457,12 @@ protected:
 		}\
 	}
 
-	void callHandlersOnMouseDown(const Mouse& m){ CALL(onMouseDown(m)); }
-	void callHandlersOnMouseDrag(const Mouse& m){ CALL(onMouseDrag(m)); }
-	void callHandlersOnMouseMove(const Mouse& m){ CALL(onMouseMove(m)); }
-	void callHandlersOnMouseUp(const Mouse& m){ CALL(onMouseUp(m)); }
-	void callHandlersOnKeyDown(const Keyboard& k){ CALL(onKeyDown(k)); }
-	void callHandlersOnKeyUp(const Keyboard& k){ CALL(onKeyUp(k)); }
+	void callHandlersOnMouseDown(){ CALL(onMouseDown(mMouse)); }
+	void callHandlersOnMouseDrag(){ CALL(onMouseDrag(mMouse)); }
+	void callHandlersOnMouseMove(){ CALL(onMouseMove(mMouse)); }
+	void callHandlersOnMouseUp(){ CALL(onMouseUp(mMouse)); }
+	void callHandlersOnKeyDown(){ CALL(onKeyDown(mKeyboard)); }
+	void callHandlersOnKeyUp(){ CALL(onKeyUp(mKeyboard)); }
 	#undef CALL
 
 	#define CALL(e)	{\
@@ -476,7 +483,19 @@ protected:
 	void callHandlersOnResize(int w, int h){ CALL(onResize(w, h)); }
 	void callHandlersOnVisibility(bool v){ CALL(onVisibility(v)); }
 	#undef CALL
+
+public:
+	// DEPRECATED, do not use!
+	Window& add(InputEventHandler * v){ return append(*v); }
+	Window& add(WindowEventHandler * v){ return append(*v); }
+	Window& prepend(InputEventHandler * v){ return prepend(*v); }
+	Window& prepend(WindowEventHandler * v){ return prepend(*v); }
+	Window& remove(InputEventHandler * v){ return remove(*v); }
+	Window& remove(WindowEventHandler * v){ return remove(*v); }
+	double avgFps() const { return fpsAvg(); }
 };
+
+
 
 inline Window::DisplayMode
 operator| (const Window::DisplayMode& a, const Window::DisplayMode& b){ return Window::DisplayMode(+a | +b); }

@@ -22,7 +22,7 @@ struct MyWindow : Window {
 
 	bool onCreate(){ 					printTitle(); printf("onCreate\n"); return 1; }
 	bool onDestroy(){					printTitle(); printf("onDestroy\n"); return 1; }
-	bool onResize(int dw, int dh){		printTitle(); printf("onResize     %d, %d\n", dw, dh); return 1; }
+	bool onResize(int w, int h){		printTitle(); printf("onResize     %d, %d\n", w, h); return 1; }
 	bool onVisibility(bool v){			printTitle(); printf("onVisibility %s\n", v?"true":"false"); return 1; }
 
 	bool onKeyDown(const Keyboard& k){	printTitle(); printf("onKeyDown    "); printKey(); return 1; }
