@@ -142,6 +142,15 @@ public:
 	/// Set an OpenCV video property
 	bool set(int cvCapProp, double val);
 
+	/// Set width in pixels
+	VideoCapture& width(double pixels);
+
+	/// Set height in pixels
+	VideoCapture& height(double pixels);
+
+	/// Set width and height in pixels
+	VideoCapture& resize(double width, double height);
+
 	/// Set position in msec (files only)
 	VideoCapture& posMsec(double msec);
 

@@ -120,6 +120,20 @@ bool VideoCapture::set(int cvCapProp, double val){
 	return cvVideoCapture.set(cvCapProp,val);
 }
 
+VideoCapture& VideoCapture::width(double pixels){
+	set(CV_CAP_PROP_FRAME_WIDTH, pixels);
+	return *this;
+}
+
+VideoCapture& VideoCapture::height(double pixels){
+	set(CV_CAP_PROP_FRAME_HEIGHT, pixels);
+	return *this;
+}
+
+VideoCapture& VideoCapture::resize(double w, double h){
+	return width(w).height(h);
+}
+
 VideoCapture& VideoCapture::posMsec(double msec){
 	set(CV_CAP_PROP_POS_MSEC, msec);
 	return *this;
