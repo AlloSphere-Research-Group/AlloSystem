@@ -4,7 +4,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#include "allocore/system/al_mainloop.hpp"
+#include "allocore/system/al_MainLoop.hpp"
 
 
 /*
@@ -67,6 +67,10 @@
 static OSClock * gClock;
 
 
+extern "C" void al_main_native_init() {
+	// Creates the shared application instance (NSApp) if not created
+	[NSApplication sharedApplication];
+}
 
 extern "C" void al_main_native_attach(al_sec interval) {
 	if (!gClock) {
@@ -75,7 +79,22 @@ extern "C" void al_main_native_attach(al_sec interval) {
 }
 
 extern "C" void al_main_native_enter(al_sec interval) {
-	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+
+	// This will attach a periodic timer to the main loop
+	al_main_native_attach(interval);
+
+	// Start main event loop and periodic timers
+	[NSApp run];
+	//printf("returning from al_main_native_enter\n");
+	return;
+
+
+	// The old way of running the main loop---
+	// This required ticking the main loop manually which turns out to be much
+	// more costly than using a periodic timer (gClock) and letting [NSApp run]
+	// dispatch events.
+
+	/*NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 	// create a new runloop if it doesn't exist:
 	NSRunLoop * runloop = [NSRunLoop currentRunLoop];
 
@@ -83,12 +102,27 @@ extern "C" void al_main_native_enter(al_sec interval) {
 	al_main_native_attach(interval);
 
 	// main loop:
-    while (main.isRunning() && [runloop runMode: NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:main.interval()]]) { /*printf(".");*/ }
+    while (main.isRunning() && [runloop runMode: NSDefaultRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:main.interval()]])
+	{
+		//printf(".");
+		// Perform non-blocking event poll since we are preempting the normal
+		// event loop from running with a call to [NSApp run]. This is necessary
+		// for windows to get mouse/keyboard events. Note that this may not be an
+		// ideal solution as we will be constantly polling for events.
+		// See: http://stackoverflow.com/questions/6732400/cocoa-integrate-nsapplication-into-an-existing-c-mainloop?rq=1
+		NSEvent * event;
+		while(nil != (event = [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:nil inMode:NSDefaultRunLoopMode dequeue:YES])){
+			//printf("MainLoop event: %2d at %.2f\n", (int)[event type], (double)[event timestamp]);
+			[NSApp sendEvent: event];
+		}
+	}
 
 	// done
 	[pool release];
-	[gClock dealloc];
+	[gClock dealloc];*/
 }
 
-extern "C" void al_main_native_init() {
+extern "C" void al_main_native_stop(){
+	[gClock dealloc]; // this will stop the timer
+	[NSApp stop:nil]; // exits run loop after last event is processed
 }
