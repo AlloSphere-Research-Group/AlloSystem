@@ -17,7 +17,7 @@
 	NSTimer * renderTimer;
 	NSTrackingArea * trackingArea;
 }
-- (void) create:(NSRect)dims title:(NSString *)title fps:(float)fps pixelFormat:(NSOpenGLPixelFormat *)format;
+- (void) create:(NSRect)dims title:(NSString *)title pixelFormat:(NSOpenGLPixelFormat *)format;
 - (void) startRenderTimer:(float)fps;
 - (void) drawRect: (NSRect)bounds;
 - (BOOL) acceptsFirstMouse: (NSEvent *)event;
@@ -157,6 +157,9 @@ bool Window::implCreate(){
 	// Set main loop to native mode
 	Main::get().driver(Main::NATIVE);
 
+	// Make new windows take focus when popping up
+	[NSApp activateIgnoringOtherApps:YES];
+
 	// https://developer.apple.com/library/mac///documentation/Cocoa/Reference/ApplicationKit/Classes/NSOpenGLPixelFormat_Class/index.html#//apple_ref/c/tdef/NSOpenGLPixelFormatAttribute
 	NSOpenGLPixelFormatAttribute attribs[20];
 
@@ -192,15 +195,19 @@ bool Window::implCreate(){
 	[mImpl->mCocoaWin
 		create: NSMakeRect(mDim.l, mDim.t, w, h)
 		title: [NSString stringWithUTF8String:mTitle.c_str()]
-		fps: mFPS
 		pixelFormat: format
 	];
-
-	[NSApp activateIgnoringOtherApps:YES];
 
 	mImpl->mCreated = true;
 
 	callHandlersOnCreate();
+
+	// Move window to front of the screen list and make it show
+	[mImpl->mCocoaWin->win makeKeyAndOrderFront:nil];
+	[mImpl->mCocoaWin->win makeMainWindow];
+
+	// Start rendering
+	[mImpl->mCocoaWin startRenderTimer:mFPS];
 
 	return true;
 }
@@ -296,7 +303,7 @@ Window& Window::show(){
 	return self;
 }
 
-- (void) create:(NSRect)dims title:(NSString *)title fps:(float)fps pixelFormat:(NSOpenGLPixelFormat *)format
+- (void) create:(NSRect)dims title:(NSString *)title pixelFormat:(NSOpenGLPixelFormat *)format
 {
 	self.frame = NSMakeRect(0,0, dims.size.width, dims.size.height);
 
@@ -341,12 +348,6 @@ Window& Window::show(){
 
 	// Make (NSWindowDelegate) respond to close, occlusion messages, etc.
 	[win setDelegate:self];
-
-	// Move window to front of the screen list and make it show
-	[win makeKeyAndOrderFront:nil];
-	[win makeMainWindow];
-
-	[self startRenderTimer:fps];
 }
 
 // NSApplicationDelegate
