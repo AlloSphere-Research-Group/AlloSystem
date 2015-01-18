@@ -50,31 +50,37 @@ namespace al{
 
 /// Render buffer object
 
-/// Render buffer objects contain a single image of a renderable internal
-/// format, namely depth and stencil. They are used for offscreen rendering.
+/// Render buffer objects are used for offscreen rendering. They are a single
+/// image of a renderable internal format, such as color, depth, or stencil.
 class RBO : public GPUObject{
 public:
 
-	///
+	/// @param[in] format	internal format of buffer
 	RBO(Graphics::Format format = Graphics::DEPTH_COMPONENT);
 
 	/// Get internal pixel format
-	Graphics::Format format() const { return mFormat; }
+	Graphics::Format format() const;
 
 	/// Set internal pixel format
-	RBO& format(Graphics::Format v){ mFormat=v; return *this; }
+	RBO& format(Graphics::Format v);
 
-	void bind(){ validate(); bind(id()); }
-	void begin(){ bind(); }
-	static void end() { bind(0); }
+	/// Bind object
+	void bind();
+
+	/// Unbind object
+	void unbind();
 
 	/// Set dimensions, in pixels
 
+	/// @param[in] width	width, in pixels
+	/// @param[in] height	height, in pixels
 	/// \returns whether the resize was successful
-	///
 	bool resize(unsigned width, unsigned height);
 
+
+	/// Get maximum buffer size
 	static unsigned maxSize();
+
 	static void bind(unsigned id);
 	static bool resize(Graphics::Format format, unsigned width, unsigned height);
 
@@ -83,6 +89,12 @@ protected:
 
 	virtual void onCreate();
 	virtual void onDestroy();
+
+public:
+	/// \deprecated
+	void begin(){ bind(); }
+	/// \deprecated
+	static void end(){ bind(0); }
 };
 
 
@@ -130,25 +142,30 @@ public:
 	/// Detach texture at a specified attachment point and mipmap level
 	FBO& detachTexture2D(Attachment attach, int level=0);
 
-	/// Start rendering to attached objects
-	void begin(){ validate(); bind(id()); }
+	/// Bind object (start rendering to attached objects)
+	void bind();
 
-	/// Stop rendering to attached objects
-	static void end();
+	/// Unbind object
+	void unbind();
 
+	/// Get status of frame buffer object
 	GLenum status();
 	const char * statusString();
 	const char * statusString(GLenum stat);
-
 
 	static void bind(unsigned fboID);
 	static void renderBuffer(unsigned rboID, Attachment attach);
 	static void texture2D(unsigned texID, Attachment attach=COLOR_ATTACHMENT0, int level=0);
 
 protected:
-
 	virtual void onCreate();
 	virtual void onDestroy();
+
+public:
+	/// \deprecated
+	void begin(){ bind(); }
+	/// \deprecated
+	static void end();
 };
 
 } // al::
