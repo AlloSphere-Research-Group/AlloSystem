@@ -325,11 +325,11 @@ void Texture :: deallocate() {
 
 void Texture::sendParams(bool force){
 	if(mParamsUpdated || force){
-		glTexParameterf(target(), GL_TEXTURE_MAG_FILTER, filterMag());
-		glTexParameterf(target(), GL_TEXTURE_MIN_FILTER, filterMin());
-		glTexParameterf(target(), GL_TEXTURE_WRAP_S, mWrapS);
-		glTexParameterf(target(), GL_TEXTURE_WRAP_T, mWrapT);
-		glTexParameterf(target(), GL_TEXTURE_WRAP_R, mWrapR);
+		glTexParameteri(target(), GL_TEXTURE_MAG_FILTER, filterMag());
+		glTexParameteri(target(), GL_TEXTURE_MIN_FILTER, filterMin());
+		glTexParameteri(target(), GL_TEXTURE_WRAP_S, mWrapS);
+		glTexParameteri(target(), GL_TEXTURE_WRAP_T, mWrapT);
+		glTexParameteri(target(), GL_TEXTURE_WRAP_R, mWrapR);
 		if (filterMin() != LINEAR && filterMin() != NEAREST) {
 			glTexParameteri(target(), GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
 		}
