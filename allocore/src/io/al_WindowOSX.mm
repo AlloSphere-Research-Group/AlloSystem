@@ -55,6 +55,13 @@ public:
 
 	// friend of a friend functions :)
 
+	void onCreate(){
+		if(!mCreated){
+			mCreated = true;
+			mAlloWin->callHandlersOnCreate();
+		}
+	}
+
 	void onDestroy(){
 		//mAlloWin->destroy();
 		/* Equivalent to:
@@ -64,7 +71,8 @@ public:
 		}
 		*/
 
-		if(mAlloWin->created()){
+		if(mCreated){
+			mCreated = false;
 			mAlloWin->callHandlersOnDestroy();
 		}
 	}
@@ -197,10 +205,6 @@ bool Window::implCreate(){
 		title: [NSString stringWithUTF8String:mTitle.c_str()]
 		pixelFormat: format
 	];
-
-	mImpl->mCreated = true;
-
-	callHandlersOnCreate();
 
 	// Move window to front of the screen list and make it show
 	[mImpl->mCocoaWin->win makeKeyAndOrderFront:nil];
@@ -360,7 +364,6 @@ Window& Window::show(){
 - (void) windowWillClose: (NSNotification *)n
 {
 	alloImpl->onDestroy();
-	alloImpl->mCreated = false;
 
 	unsigned numWins = [[NSApp windows] count];
 
@@ -453,6 +456,8 @@ Window& Window::show(){
 /* This method is called only once after the OpenGL context is made the current context. Subclasses that implement this method can use it to configure the Open GL state in preparation for drawing. */
 - (void) prepareOpenGL
 {
+	//printf("Window: prepareOpenGL\n");
+	alloImpl->onCreate();
 }
 
 -(void) startRenderTimer:(float)fps
