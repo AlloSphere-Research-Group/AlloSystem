@@ -241,6 +241,12 @@ public:
 	/// Turn blending on/off
 	void blending(bool b);
 
+	/// Turn color mask RGBA components on/off
+	void colorMask(bool r, bool g, bool b, bool a);
+
+	/// Turn color mask on/off (all RGBA components)
+	void colorMask(bool b);
+
 	/// Turn the depth mask on/off
 	void depthMask(bool b);
 
@@ -562,6 +568,15 @@ inline void Graphics::capability(Capability cap, bool v){
 }
 
 inline void Graphics::blending(bool b){ capability(BLEND, b); }
+inline void Graphics::colorMask(bool r, bool g, bool b, bool a){
+	glColorMask(
+		r?GL_TRUE:GL_FALSE,
+		g?GL_TRUE:GL_FALSE,
+		b?GL_TRUE:GL_FALSE,
+		a?GL_TRUE:GL_FALSE
+	);
+}
+inline void Graphics::colorMask(bool b){ colorMask(b,b,b,b); }
 inline void Graphics::depthMask(bool b){ glDepthMask(b?GL_TRUE:GL_FALSE); }
 inline void Graphics::depthTesting(bool b){ capability(DEPTH_TEST, b); }
 inline void Graphics::lighting(bool b){ capability(LIGHTING, b); }
