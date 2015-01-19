@@ -198,6 +198,9 @@ public:
 	/// Resize 3D texture
 	Texture& resize(unsigned w, unsigned h, unsigned d){ return width(w).height(h).depth(d); }
 
+	/// Set minification and magnification filter types
+	Texture& filter(Filter v){ return filterMin(v).filterMag(v); }
+
 	/// Set minification filter type
 	Texture& filterMin(Filter v){ return update(v, mFilterMin, mParamsUpdated); }
 
