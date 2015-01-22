@@ -141,6 +141,13 @@ public:
 	/// Returns number of elements
 	static int size(){ return N; }
 
+	/// Get reference to self as another type
+	template <class V>
+	V& as(){ return *(V *)(elems()); }
+
+	template <class V>
+	const V& as() const { return *(const V *)(elems()); }
+
 	/// Get read-only pointer to elements
 	const T * elems() const { return &x; }
 
