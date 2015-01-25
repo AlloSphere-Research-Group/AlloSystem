@@ -40,8 +40,8 @@ void midiCallback(double deltaTime, std::vector<unsigned char> *msg, void *userD
 				printf("Note %u, Vel %u", msg->at(1), msg->at(2));
 				break;
 
-			case MIDIByte::PITCH_WHEEL:
-				printf("Value %u", MIDIByte::convertPitchWheel(msg->at(1), msg->at(2)));
+			case MIDIByte::PITCH_BEND:
+				printf("Value %u", MIDIByte::convertPitchBend(msg->at(1), msg->at(2)));
 				break;
 
 			// Control messages need to be parsed again...
