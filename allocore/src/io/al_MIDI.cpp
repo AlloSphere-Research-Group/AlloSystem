@@ -23,8 +23,10 @@ using namespace al;
 #define RtMidiInData	MIDIInData
 
 
+namespace al{
 double noteToHz(double noteNumber){
 	return ::pow(2., (noteNumber - 69.)/12.) * 440.;
+}
 }
 
 const char * MIDIByte::messageTypeString(unsigned char statusByte){
