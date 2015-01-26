@@ -135,8 +135,8 @@ Introduction
 \begin_layout Standard
 This tutorial explains how to install AlloSystem under Linux Ubuntu, Mac
  OS X, and Windows.
- The main means of operating AlloSystem is through a Unix-like shell and
- GNU tools 
+ The simplest way of working with AlloSystem is through the command-line
+ interface with tools like 
 \family typewriter
 GCC
 \family default
@@ -145,11 +145,26 @@ GCC
 make
 \family default
 .
- The first part of the tutorial explains how to set up a Unix environment
- and install the necessary tools.
+ The first part of the tutorial explains how to install the necessary developmen
+t tools for compiling code.
  The second part describes how to install AlloSystem.
  The last part explains how to compile and run custom applications using
  AlloSystem.
+\end_layout
+
+\begin_layout Standard
+Read the instructions in each section very carefully since skipping an installat
+ion step which likely cause things to fail during later steps.
+ Also, during each installation step, be sure to carefully monitor any output
+ for errors.
+ If an error does arise, you can refer to 
+\begin_inset CommandInset ref
+LatexCommand nameref
+reference "sec:Troubleshooting"
+
+\end_inset
+
+ to find solutions to common problems.
 \end_layout
 
 \begin_layout Subsection
@@ -242,7 +257,7 @@ $ sudo apt-get install make g++
 
 When that finishes, proceed to 
 \begin_inset CommandInset ref
-LatexCommand ref
+LatexCommand nameref
 reference "sec:Install-AlloSystem"
 
 \end_inset
@@ -614,8 +629,8 @@ Install Package Manager
 \end_layout
 
 \begin_layout Standard
-We will use MacPorts, a package management tool for OS X, to install AlloSystem
- dependencies.
+MacPorts is a package management tool for OS X which can be used to install
+ AlloSystem dependencies.
  Download and install the latest version from 
 \begin_inset Flex URL
 status collapsed
@@ -753,11 +768,10 @@ Finish the MinGW installer.
 \end_layout
 
 \begin_layout Standard
-The simplest way to install MinGW/MSYS is to use the automated GUI installer.
- Download this from
-\end_layout
-
-\begin_layout Standard
+Together, MinGW and MSYS provide an assortment of development tools and
+ a Unix-like command-line shell for Windows.
+ The simplest way to install MinGW/MSYS is to use the automated GUI installer
+ downloaded from 
 \begin_inset Flex URL
 status collapsed
 
@@ -768,7 +782,7 @@ http://sourceforge.net/projects/mingw/files/latest/download
 
 \end_inset
 
-
+.
 \end_layout
 
 \begin_layout Standard
@@ -845,8 +859,7 @@ name "fig:MinGW-Installation-Manager"
 
 \begin_layout Standard
 Then run the menu item Installation -> Apply Changes.
- Click 'Apply' in the little Schedule of Pending Actions window that pops
- up.
+ Click 'Apply' in the `Schedule of Pending Actions' window that pops up.
  After all the packages download and install, you can close the MinGW Installati
 on Manager window.
 \end_layout
@@ -2040,6 +2053,13 @@ RUN_SRC_DIRS += myutils/
 
 \begin_layout Section
 Troubleshooting
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Troubleshooting"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -2253,7 +2273,7 @@ I Can't Find The '~' Directory!
 \end_layout
 
 \begin_layout Standard
-The character '
+The tilde character '
 \family typewriter
 ~
 \family default
@@ -2438,7 +2458,7 @@ msys.bat
 \family typewriter
 <myname>
 \family default
- does not have spaces.
+ is a new user name that does not contain spaces.
 \end_layout
 
 \begin_layout Subsection
