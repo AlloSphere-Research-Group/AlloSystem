@@ -111,137 +111,138 @@ elif uname | grep "MINGW"; then
 	else
 		DESTDIR=/usr/local/
 		#DESTDIR=local/
-		install -d "${DESTDIR}/bin/" "${DESTDIR}/include/" "${DESTDIR}/lib/"
+		install -d $DESTDIR/bin/ $DESTDIR/include/ $DESTDIR/lib/
 
-		if files_exist "$DESTDIR/lib/libsndfile*"; then
+		if files_exist $DESTDIR/lib/libsndfile*; then
 			echo 'Found libsndfile'
 		else
 			PKG=libsndfile-1.0.25
-			DIR="$PWD"
+			DIR=$PWD
 			cd /tmp
-				wget "http://www.mega-nerd.com/libsndfile/files/${PKG}.tar.gz"
-				tar -xzf "${PKG}.tar.gz"
-				cd "$PKG"
-					./configure "--prefix=${DESTDIR}"
+				wget http://www.mega-nerd.com/libsndfile/files/$PKG.tar.gz
+				tar -xzf $PKG.tar.gz
+				cd $PKG
+					./configure --prefix=$DESTDIR
 					make install
 				cd ..
 
 				# Cleanup.
-				rm -rf "$PKG"
-				rm "${PKG}.zip"
-			cd "$DIR"
+				rm -rf $PKG
+				rm $PKG.*
+			cd $DIR
 		fi
 
-		if files_exist "$DESTDIR/lib/libportaudio*"; then
+		if files_exist $DESTDIR/lib/libportaudio*; then
 			echo 'Found PortAudio'
 		else
 			PKG=pa_stable_v19_20111121
-			DIR="$PWD"
+			DIR=$PWD
 			cd /tmp
-				wget "http://www.portaudio.com/archives/${PKG}.tgz"
-				tar -xzf "${PKG}.tgz"
-				mv portaudio "$PKG"
-				cd "$PKG"
-					./configure "--prefix=${DESTDIR}"
+				wget http://www.portaudio.com/archives/$PKG.tgz
+				tar -xzf $PKG.tgz
+				mv portaudio $PKG
+				cd $PKG
+					./configure --prefix=$DESTDIR
 					make install
 				cd ..
 
 				# Cleanup.
-				rm -rf "$PKG"
-				rm "${PKG}.zip"
-			cd "$DIR"
+				rm -rf $PKG
+				rm $PKG.*
+			cd $DIR
 		fi
 
-		if files_exist "$DESTDIR/lib/libapr*"; then
+		if files_exist $DESTDIR/lib/libapr*; then
 			echo 'Found APR'
 		else
 			#http://www.apachelounge.com/download/win32/binaries/httpd-2.4.7-win32.zip
 			#http://www.apachelounge.com/download/VC11/binaries/httpd-2.4.7-win32-VC11.zip
 			PKG=apr-1.3.6-iconv-1.2.1-util-1.3.8-win32-x86-msvcrt60
-			DIR="$PWD"
+			DIR=$PWD
 			cd /tmp
 				#wget http://mirrors.rackhosting.com/apache/apr/binaries/win32/$PKG.zip
 				#wget http://www.powertech.no/apache/dist/apr/binaries/win32/$PKG.zip
-				wget "http://archive.apache.org/dist/apr/binaries/win32/${PKG}.zip"
-				unzip -q "${PKG}.zip"
+				wget http://archive.apache.org/dist/apr/binaries/win32/$PKG.zip
+				unzip -q $PKG
 				mv apr-dist "$PKG"
-				cp "${PKG}/bin/libapr-1.dll"		"${DESTDIR}/bin/"
-				cp "${PKG}/bin/libaprutil-1.dll"	"${DESTDIR}/bin/"
-				cp "${PKG}/lib/libapr-1.lib"		"${DESTDIR}/lib/libapr-1.dll.a"
-				cp "${PKG}/lib/libaprutil-1.lib"	"${DESTDIR}/lib/libaprutil-1.dll.a"
-				install -d "${DESTDIR}/include/apr-1/"
-				cp -r "${PKG}/include/*"			"${DESTDIR}/include/apr-1/"
+				cp $PKG/bin/libapr-1.dll		$DESTDIR/bin/
+				#cp $PKG/bin/libaprutil-1.dll	$DESTDIR/bin/
+				cp $PKG/lib/libapr-1.lib		$DESTDIR/lib/libapr-1.dll.a
+				#cp $PKG/lib/libaprutil-1.lib	$DESTDIR/lib/libaprutil-1.dll.a
+				install -d $DESTDIR/include/apr-1/
+				cp -r $PKG/include/*			$DESTDIR/include/apr-1/
 
 				# Cleanup.
-				rm -rf "$PKG"
-				rm $PKG.zip
-			cd "$DIR"
+				rm -rf $PKG
+				rm $PKG.*
+			cd $DIR
 		fi
 
-		if files_exist "$DESTDIR/lib/*freetype*"; then
+		if files_exist $DESTDIR/lib/*freetype*; then
 			echo 'Found FreeType'
 		else
 			PKG=freetype-dev_2.4.2-1_win32
 			DIR=$PWD
 			cd /tmp
-				wget "http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/${PKG}.zip"
-				unzip -q "${PKG}.zip" -d "$PKG"
-				cp "${PKG}/lib/*" "${DESTDIR}/lib/"
-				cp -r "${PKG}/include/*" "${DESTDIR}/include/"
+				wget http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/$PKG.zip
+				unzip -q $PKG -d $PKG
+				cp $PKG/lib/* $DESTDIR/lib/
+				cp -r $PKG/include/* $DESTDIR/include/
 
 				# Cleanup.
-				rm -rf "$PKG"
-				rm "${PKG}.zip"
-			cd "$DIR"
+				rm -rf $PKG
+				rm $PKG.*
+			cd $DIR
 		fi
 
-		if files_exist "${DESTDIR}/lib/FreeImage*"; then
+		if files_exist $DESTDIR/lib/FreeImage*; then
 			echo 'Found FreeImage'
 		else
 			PKG=FreeImage3153Win32
-			DIR="$PWD"
+			DIR=$PWD
 			cd /tmp
 				wget http://downloads.sourceforge.net/freeimage/$PKG.zip
-				unzip -q "${PKG}.zip"
+				unzip -q $PKG
 				mv FreeImage $PKG
-				cp "${PKG}/Dist/FreeImage.dll" "${DESTDIR}/bin/"
-				cp "${PKG}/Dist/FreeImage.lib" "${DESTDIR}/lib/"
-				cp "${PKG}/Dist/FreeImage.h" "${DESTDIR}/include/"
+				cp $PKG/Dist/FreeImage.dll $DESTDIR/bin/
+				cp $PKG/Dist/FreeImage.lib $DESTDIR/lib/
+				cp $PKG/Dist/FreeImage.h $DESTDIR/include/
 
 				# Cleanup.
-				rm -rf "$PKG"
-				rm "${PKG}.zip"
-			cd "$DIR"
+				rm -rf $PKG
+				rm $PKG.*
+			cd $DIR
 		fi
 
 		# Remove assimp2 if found
-		if [ -e "${DESTDIR}/include/assimp/assimp.h" ]; then
+		if [ -e $DESTDIR/include/assimp/assimp.h ]; then
 			echo 'Found AssImp2. This will be removed to update to AssImp3...'
-			rm -rf "${DESTDIR}/include/assimp"
-			rm "${DESTDIR}/bin/Assimp32.dll"
-			rm "${DESTDIR}/lib/assimp.lib"
+			rm -rf $DESTDIR/include/assimp
+			rm $DESTDIR/bin/Assimp32.dll
+			rm $DESTDIR/lib/assimp.lib
 		fi
 
-		if files_exist "${DESTDIR}/lib/assimp*"; then
+		if files_exist $DESTDIR/lib/assimp*; then
 			echo 'Found AssImp'
 		else
 			PKG=assimp--3.0.1270-full
-			DIR="$PWD"
+			DIR=$PWD
 			cd /tmp
-				wget http://sourceforge.net/projects/assimp/files/assimp-3.0/$PKG.zip
-				unzip -q "${PKG}.zip"
-				mv assimp* "$PKG"
-				cp -r "${PKG}/include/*" "${DESTDIR}/include/"
-				cp "${PKG}/bin/assimp_release-dll_win32/Assimp32.dll" "${DESTDIR}/bin/"
-				cp "${PKG}/lib/assimp_release-dll_win32/assimp.lib" "${DESTDIR}/lib/"
+				wget -nc http://sourceforge.net/projects/assimp/files/assimp-3.0/$PKG.zip
+				unzip -q $PKG
+
+				mv assimp--3.0.1270-sdk $PKG
+				cp -r $PKG/include/* $DESTDIR/include/
+				cp $PKG/bin/assimp_release-dll_win32/Assimp32.dll $DESTDIR/bin/
+				cp $PKG/lib/assimp_release-dll_win32/assimp.lib $DESTDIR/lib/
 
 				# Cleanup.
-				rm -rf "${PKG}"
-				rm "${PKG}.zip"
-			cd "$DIR"
+				rm -rf $PKG
+				rm $PKG.*
+			cd $DIR
 		fi
 
-		if files_exist "${DESTDIR}/lib/libglew32*"; then
+		if files_exist $DESTDIR/lib/libglew32*; then
 			echo 'Found GLEW'
 		else
 			# These MSVC binaries don't work with MinGW/Msys :(
@@ -254,37 +255,37 @@ elif uname | grep "MINGW"; then
 			#cp -r $PKG/include/* $DESTDIR/include/
 
 			PKG=glew-1.9.0
-			DIR="$PWD"
+			DIR=$PWD
 			cd /tmp
 				wget http://downloads.sourceforge.net/project/glew/glew/1.9.0/$PKG.zip
-				unzip -q "${PKG}.zip"
-				cd "$PKG"
-					make install GLEW_DEST=/usr/local/
+				unzip -q $PKG
+				cd $PKG
+					make install GLEW_DEST=$DESTDIR
 				cd ..
 
 				# Cleanup.
-				rm -rf "$PKG"
-				rm "${PKG}.zip"
-			cd "$DIR"
+				rm -rf $PKG
+				rm $PKG.*
+			cd $DIR
 		fi
 
-		if files_exist "${DESTDIR}/lib/glut32*"; then
+		if files_exist $DESTDIR/lib/glut32*; then
 			echo 'Found GLUT'
 		else
 			PKG=glutdlls37beta
-			DIR="$PWD"
+			DIR=$PWD
 			cd /tmp
-				wget --no-check-certificate "https://www.opengl.org/resources/libraries/glut/${PKG}.zip"
-				unzip -q "${PKG}.zip" -d "$PKG"
-				install -d "${DESTDIR}/include/GL/"
-				cp "${PKG}/glut.h" "${DESTDIR}/include/GL/"
-				cp "${PKG}/glut32.dll" "${DESTDIR}/bin/"
-				cp "${PKG}/glut32.lib" "${DESTDIR}/lib/"
+				wget --no-check-certificate https://www.opengl.org/resources/libraries/glut/$PKG.zip
+				unzip -q $PKG -d $PKG
+				install -d $DESTDIR/include/GL/
+				cp $PKG/glut.h $DESTDIR/include/GL/
+				cp $PKG/glut32.dll $DESTDIR/bin/
+				cp $PKG/glut32.lib $DESTDIR/lib/
 
 				# Cleanup.
-				rm -rf "$PKG"
-				rm "${PKG}.zip"
-			cd "$DIR"
+				rm -rf $PKG
+				rm $PKG.*
+			cd $DIR
 		fi
 	fi
 
