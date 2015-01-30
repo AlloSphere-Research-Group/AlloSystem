@@ -121,9 +121,13 @@ elif uname | grep "MINGW"; then
 			cd /tmp
 				wget http://www.mega-nerd.com/libsndfile/files/$PKG.tar.gz
 				tar -xzf $PKG.tar.gz
+
 				cd $PKG
 					./configure --prefix=$DESTDIR
-					make install
+					# make from src/ to avoid building tests and other gunk
+					cd src
+						make install
+					cd ..
 				cd ..
 
 				# Cleanup.
