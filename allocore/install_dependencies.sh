@@ -198,7 +198,7 @@ elif uname | grep "MINGW"; then
 		if files_exist $DESTDIR/lib/FreeImage*; then
 			echo 'Found FreeImage'
 		else
-			PKG=FreeImage3153Win32
+			PKG=FreeImage3160Win32
 			DIR=$PWD
 			cd /tmp
 				wget http://downloads.sourceforge.net/freeimage/$PKG.zip
