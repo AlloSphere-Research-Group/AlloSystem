@@ -166,9 +166,9 @@ elif uname | grep "MINGW"; then
 				unzip -q $PKG
 				mv apr-dist "$PKG"
 				cp $PKG/bin/libapr-1.dll		$DESTDIR/bin/
-				#cp $PKG/bin/libaprutil-1.dll	$DESTDIR/bin/
+				cp $PKG/bin/libaprutil-1.dll	$DESTDIR/bin/
 				cp $PKG/lib/libapr-1.lib		$DESTDIR/lib/libapr-1.dll.a
-				#cp $PKG/lib/libaprutil-1.lib	$DESTDIR/lib/libaprutil-1.dll.a
+				cp $PKG/lib/libaprutil-1.lib	$DESTDIR/lib/libaprutil-1.dll.a
 				install -d $DESTDIR/include/apr-1/
 				cp -r $PKG/include/*			$DESTDIR/include/apr-1/
 
