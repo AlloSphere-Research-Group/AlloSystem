@@ -226,15 +226,23 @@ elif uname | grep "MINGW"; then
 			echo 'Found AssImp'
 		else
 			PKG=assimp--3.0.1270-full
+			#PKG=assimp-3.1.1-win-binaries
 			DIR=$PWD
 			cd /tmp
-				wget -nc http://sourceforge.net/projects/assimp/files/assimp-3.0/$PKG.zip
+				wget -nc http://downloads.sourceforge.net/project/assimp/assimp-3.0/$PKG.zip
+				#wget -nc http://downloads.sourceforge.net/project/assimp/assimp-3.1/$PKG.zip
 				unzip -q $PKG
 
+				# 3.0.1270
 				mv assimp--3.0.1270-sdk $PKG
 				cp -r $PKG/include/* $DESTDIR/include/
 				cp $PKG/bin/assimp_release-dll_win32/Assimp32.dll $DESTDIR/bin/
 				cp $PKG/lib/assimp_release-dll_win32/assimp.lib $DESTDIR/lib/
+
+				# 3.1.1
+				#cp -r $PKG/include/* $DESTDIR/include/
+				#cp $PKG/bin32/assimp.dll $DESTDIR/bin/
+				#cp $PKG/lib32/assimp.lib $DESTDIR/lib/
 
 				# Cleanup.
 				rm -rf $PKG
