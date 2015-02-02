@@ -41,9 +41,13 @@ namespace al{
 
 
 VideoCapture::VideoCapture()
-:	mFPS(1.), mRate(1.), mBadFrame(-1), mIsFile(false)
+:	mFPS(1.), mRate(1.), mBadFrame(-1), mIsFile(false), mValid(true)
 {}
 
+VideoCapture::~VideoCapture(){
+	mValid = false;
+	cvVideoCapture.release();
+}
 
 bool VideoCapture::open(const std::string& filename){
 	if(cvVideoCapture.open(filename)){
@@ -253,9 +257,14 @@ VideoCaptureHandler::VideoThreadFunction::VideoThreadFunction()
 : 	videoCapture(NULL), handler(NULL), streamIdx(-1)
 {}
 
+VideoCaptureHandler::VideoThreadFunction::~VideoThreadFunction()
+{
+	videoCapture = NULL;
+}
+
 void VideoCaptureHandler::VideoThreadFunction::operator()(){
 //printf("VideoThreadFunc called\n");
-	if(NULL!=videoCapture){
+	if(NULL != videoCapture && videoCapture->mValid && videoCapture->cvVideoCapture.isOpened()){
 		if(videoCapture->grab()){
 			handler->onVideo(*videoCapture, streamIdx);
 			double fps = videoCapture->fps() * videoCapture->rate();
@@ -264,6 +273,10 @@ void VideoCaptureHandler::VideoThreadFunction::operator()(){
 	}
 }
 
+
+VideoCaptureHandler::WorkThread::~WorkThread(){
+	stop();
+}
 
 void VideoCaptureHandler::WorkThread::start(){
 	//printf("WorkThread::start(): %p %p\n", func.videoCapture, func.handler);

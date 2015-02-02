@@ -64,6 +64,7 @@ public:
 
 	VideoCapture();
 
+	~VideoCapture();
 
 	/// Open a video file
 
@@ -229,10 +230,12 @@ public:
 	void print(FILE * fp = stdout);
 
 private:
+	friend class VideoCaptureHandler;
 	double mFPS;
 	double mRate;
 	double mBadFrame;
 	bool mIsFile;
+	bool mValid;
 };
 
 
@@ -242,6 +245,7 @@ public:
 
 	struct VideoThreadFunction : public al::ThreadFunction{
 		VideoThreadFunction();
+		~VideoThreadFunction();
 		void operator()();
 		al::VideoCapture * videoCapture;
 		VideoCaptureHandler * handler;
@@ -249,6 +253,7 @@ public:
 	};
 
 	struct WorkThread{
+		~WorkThread();
 		PeriodicThread thread;
 		VideoThreadFunction func;
 		void start();
