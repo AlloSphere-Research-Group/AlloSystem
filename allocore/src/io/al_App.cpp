@@ -47,8 +47,6 @@ App::App()
 
 
 App::~App(){
-	mAudioIO.close(); // FIXME: can happen after accessed data is freed
-
 	// delete factory objects
 	for(unsigned i=0; i<mFacWindows.size(); ++i){
 		delete mFacWindows[i];
@@ -169,17 +167,41 @@ void App::start(){
 //		}
 //	}
 
-	if(windows().size()){
+	/* Add a handler to close i/o when Main exits.
+	This is done to ensure members of derived classes are not accessed by i/o 
+	threads after they have been destructed! We must stop all i/o before any
+	destructors are called.
+	*/
+	struct AppMainHandler : Main::Handler{
+		App& app;
+		AppMainHandler(App& a): app(a){}
 
+		void onExit(){
+			//printf("App exiting\n");
+			app.audioIO().close();
+
+			for(unsigned i=0; i<app.mFacWindows.size(); ++i){
+				app.mFacWindows[i]->destroy();
+			}
+		}
+	} appMainHandler(*this);
+
+	Main::get().add(appMainHandler);
+
+
+	if(windows().size()){
 		// create the windows
 		for(unsigned i=0; i<windows().size(); ++i){
 			windows()[i]->create();
 		}
 
+		// start the main loop
 		Main::get().start();
 	}
 	else{
 		printf("\nPress 'enter' to quit...\n"); getchar();
+		// ensure exit handler gets called
+		Main::get().exit();
 	}
 }
 
