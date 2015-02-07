@@ -33,6 +33,7 @@ public:
 			
 	}
 	
+#if !ALLOCORE_NO_PORTAUDIO
     ///Per Sample Processing
     void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample)
     {
@@ -75,6 +76,66 @@ public:
 				*buf++ += gain* *samps++;
 		}
 	}
+    
+#else
+    
+    ///Per Sample Processing
+    void perform(float** outputBuffers, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample)
+    {
+        //Is the normalize function working correctly??? normalizing 0, 0, 0 is returning 1, 0, 0
+        Vec3d zeroVec(0, 0, 0);
+        Vec3d normalVec;
+        if(relpos == zeroVec)
+            normalVec = zeroVec;
+        else
+            normalVec = relpos.normalized();
+        
+		for (unsigned i = 0; i < numSpeakers; ++i)
+        {
+            Vec3d vec = normalVec - speakerVecs[i];
+			float dist = vec.mag() / 2.f; // [0, 1]
+            dist = powf(dist, spread);
+            float gain = 1.f / (1.f + DBAP_MAX_DIST*dist);
+            
+            float *buf = outputBuffers[deviceChannels[i]];
+            
+//            for(int j = 0; j < numFrames*1; j++)
+//            {
+//                outputBuffer[j] = 0.2f*(float)(rand()%10000)/10000.f;
+//            }
+            
+            if(enabled)
+                //io.out(deviceChannels[i],frameIndex) += gain*sample;
+                buf[frameIndex] += gain*sample;
+            else
+                //io.out(deviceChannels[i],frameIndex) += sample;
+                buf[frameIndex] += sample;
+		}
+	}
+    
+
+    
+    /// Per Buffer Processing
+	void perform(float** outputBuffers, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples)
+    {
+		for (unsigned i = 0; i < numSpeakers; ++i)
+        {
+            Vec3d vec = relpos.normalized();
+            vec -= speakerVecs[i];
+            float dist = vec.mag() / 2.f; // [0, 1]
+            dist = powf(dist, spread);
+            float gain = 1.f / (1.f + DBAP_MAX_DIST*dist);
+            
+            //float *buf = io.outBuffer(deviceChannels[i]);
+            float *buf = outputBuffers[deviceChannels[i]];
+            
+			float *samps = samples;
+            for(int j = 0; j < numFrames; j++)
+				*buf++ += gain* *samps++;
+		}
+	}
+    
+#endif
     
     /// Spread is an exponent determining the ampltude spread to nearby speakers.
     /// Values below 1.0 will widen the sound field to more speakers.

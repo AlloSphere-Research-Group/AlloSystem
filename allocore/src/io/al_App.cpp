@@ -5,41 +5,43 @@ namespace al{
 //______________________________________________________________________________
 
 void Viewpoint::onParentResize(int dw, int dh){
-	mViewport.l += dw * anchorX();
-	mViewport.b += dh * anchorY();
-	mViewport.w += dw * stretchX();
-	mViewport.h += dh * stretchY();
+    mViewport.l += dw * anchorX();
+    mViewport.b += dh * anchorY();
+    mViewport.w += dw * stretchX();
+    mViewport.h += dh * stretchY();
 }
 
 //______________________________________________________________________________
 
 bool ViewpointWindow::onResize(int dw, int dh){
-	//printf("ViewpointWindow onResize: %d %d\n", dw, dh);
-	Viewpoints::iterator iv = mViewpoints.begin();
-	
-	while(iv != mViewpoints.end()){
-		/*Viewpoint& vp = **iv;
-		vp.viewport().l += dw * vp.anchorX();
-		vp.viewport().b += dh * vp.anchorY();
-		vp.viewport().w += dw * vp.stretchX();
-		vp.viewport().h += dh * vp.stretchY();*/
-		(*iv)->onParentResize(dw, dh);
-		++iv;
-		//printf("%g %g %g %g\n", vp.viewport().l, vp.viewport().b, vp.viewport().w, vp.viewport().h);
-	}
-	return true;
+    //printf("ViewpointWindow onResize: %d %d\n", dw, dh);
+    Viewpoints::iterator iv = mViewpoints.begin();
+    
+    while(iv != mViewpoints.end()){
+        /*Viewpoint& vp = **iv;
+         vp.viewport().l += dw * vp.anchorX();
+         vp.viewport().b += dh * vp.anchorY();
+         vp.viewport().w += dw * vp.stretchX();
+         vp.viewport().h += dh * vp.stretchY();*/
+        (*iv)->onParentResize(dw, dh);
+        ++iv;
+        //printf("%g %g %g %g\n", vp.viewport().l, vp.viewport().b, vp.viewport().w, vp.viewport().h);
+    }
+    return true;
 }
 
 ViewpointWindow& ViewpointWindow::add(Viewpoint& v){
-	mViewpoints.push_back(&v);
-	
-	// If the window is already created, then we need to manually update the 
-	// Viewpoint. Otherwise, this happens through ViewpointWindow::onResize().
-	if(created()){
-		v.onParentResize(width(), height());
-	}
-	return *this;
+    mViewpoints.push_back(&v);
+    
+    // If the window is already created, then we need to manually update the
+    // Viewpoint. Otherwise, this happens through ViewpointWindow::onResize().
+    if(created()){
+        v.onParentResize(width(), height());
+    }
+    return *this;
 }
+
+
 
 //______________________________________________________________________________
 

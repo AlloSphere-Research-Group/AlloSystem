@@ -55,7 +55,6 @@ static void interleave(T * dst, const T * src, int numFrames, int numChannels){
 	}
 }
 
-
 //==============================================================================
 AudioDevice::AudioDevice(int deviceNum)
 :	mID(-1), mImpl(0)

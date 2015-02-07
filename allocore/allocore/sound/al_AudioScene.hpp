@@ -118,8 +118,9 @@ public:
     virtual void compile(Listener& l){};
     
     /// called once per listener, before sources are rendered. ex. zero ambisonics coefficients
-    virtual void prepare(AudioIOData& io){};
+    virtual void prepare(){};
     
+    #if !ALLOCORE_NO_PORTAUDIO
     /// render each source per sample
     virtual void perform(
                          AudioIOData& io,
@@ -136,9 +137,27 @@ public:
                          Vec3d& relpos,
                          const int& numFrames,
                          float *samples)= 0;
+    #else
+    /// render each source per sample
+    virtual void perform(
+                         float** outputBuffers,
+                         SoundSource& src,
+                         Vec3d& relpos,
+                         const int& numFrames,
+                         int& frameIndex,
+                         float& sample) = 0;
+    
+    //render each source per buffer
+    virtual void perform(
+                         float** outputBuffers,
+                         SoundSource& src,
+                         Vec3d& relpos,
+                         const int& numFrames,
+                         float *samples)= 0;
+    #endif
     
     /// called once per listener, after sources are rendered. ex. ambisonics decode
-    virtual void finalize(AudioIOData& io){};
+    virtual void finalize(float **outs, const int numFrames){};
     
     int numSpeakers() const { return mSpeakers.size(); }
     
@@ -168,6 +187,13 @@ public:
 		mSpatializer->compile(*(this));
 	}
     
+    std::vector<Quatd> mQuatHistory;		// buffer of interpolated orientations
+	ShiftBuffer<4, Vec3d> mPosHistory;		// position in previous blocks
+	Quatd mQuatPrev;						// orientation in previous block
+	Pose mPose;								// current position
+    
+    Spatializer *mSpatializer;
+    
 protected:
 	friend class AudioScene;
     friend class AmbisonicsSpatializer;
@@ -182,14 +208,10 @@ protected:
         mSpatializer->numFrames(v);
 	}
 
-    Spatializer *mSpatializer;
+    
     
     bool isCompiled;
-    
-	std::vector<Quatd> mQuatHistory;		// buffer of interpolated orientations
-	ShiftBuffer<4, Vec3d> mPosHistory;		// position in previous blocks
-	Quatd mQuatPrev;						// orientation in previous block
-	Pose mPose;								// current position
+
 };
 
 
@@ -322,17 +344,19 @@ public:
 	void writeSample(const double& v){ mSound.write(v); }
     
     /// Optional onProcessSample so sample rate processing of sound sources can be used in AudioScene
-    virtual void onProcessSample(AudioIOData& io){}
+    virtual void onProcessSample(){}//AudioIOData& io){}
     void usePerSampleProcessing(bool _usePerSampleProcessing) { perSampleProcessing = _usePerSampleProcessing;}
     bool isUsingPerSampleProcessing() { return perSampleProcessing; }
+    
+    bool isUsingDoppler(){return useDoppler;}
 
+    RingBuffer<float> mSound;			// spherical wave around position
+	Pose mPose;							// current position/orientation
+	ShiftBuffer<4, Vec3d> mPosHistory;	// previous positions
+    
 protected:
 	friend class AudioScene;
     friend class Dbap;
-	
-	RingBuffer<float> mSound;			// spherical wave around position
-	Pose mPose;							// current position/orientation
-	ShiftBuffer<4, Vec3d> mPosHistory;	// previous positions
 	
 	double mRollOff;
 	double mNearClip, mClipRange, mAmpFar;
@@ -391,10 +415,19 @@ public:
         perSampleProcessing = shouldUsePerSampleProcessing;
     }
     
+#if !ALLOCORE_NO_PORTAUDIO
     void render(AudioIOData& io) {
-	
         const int numFrames = io.framesPerBuffer();
         double sampleRate = io.framesPerSecond();
+        float *outputBuffers = io.outBuffer();
+        render(outputBuffers, numFrames, sampleRate);
+    }
+#endif
+    
+    void render(float **outputBuffers, const int numFrames, double sampleRate) {
+        
+//        const int numFrames = io.framesPerBuffer();
+//        double sampleRate = io.framesPerSecond();
 		double distanceToSample = sampleRate / mSpeedOfSound;
 		
 		// iterate through all listeners adding contribution from all sources
@@ -402,7 +435,7 @@ public:
 			Listener& l = *mListeners[il];
 			
 			Spatializer* spatializer = l.mSpatializer;
-			spatializer->prepare(io);
+			spatializer->prepare();
 
 			// update listener history data:
 			Quatd qnew = l.pose().quat();
@@ -434,7 +467,7 @@ public:
                         {
                             src.mPosHistory(src.pose().pos());
                             if(src.isUsingPerSampleProcessing())
-                                src.onProcessSample(io);
+                                src.onProcessSample();
                         }
                     
                         // compute interpolated source position relative to listener
@@ -471,7 +504,7 @@ public:
                             
                             float s = src.readSample(idx) * gain;
                             
-                            spatializer->perform(io,src,relpos, numFrames, i, s);
+                            spatializer->perform(outputBuffers, src,relpos, numFrames, i, s);
                             
                         } // end if in range
 
@@ -495,13 +528,13 @@ public:
                         readIndex += (numFrames-i);
                         samples[i] = gain*src.readSample(readIndex);
                     }
-                    spatializer->perform(io, src, relpos, numFrames, samples);
+                    spatializer->perform(outputBuffers, src, relpos, numFrames, samples);
                 }
                 
                 
 			} //end for each source
             
-            spatializer->finalize(io);
+            spatializer->finalize(outputBuffers, numFrames);
             
 		} // end for each listener
 		

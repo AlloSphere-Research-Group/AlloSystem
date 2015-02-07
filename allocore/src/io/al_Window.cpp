@@ -244,6 +244,6 @@ void Window::stopLoop(){
 	Window::destroyAll();
 	Main::get().stop();
 }
-
+    
 
 } // al::

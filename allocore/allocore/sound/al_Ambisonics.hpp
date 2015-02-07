@@ -447,12 +447,12 @@ public:
     }
     
     
-    void finalize(AudioIOData& io){
+    void finalize(float *outs, const int numFrames){
         
         //previously done in render method of audioscene
         
-        float *outs = &io.out(0,0);//io.outBuffer();
-        int numFrames = io.framesPerBuffer();
+        //float *outs = &io.out(0,0);//io.outBuffer();
+        //int numFrames = io.framesPerBuffer();
         
         mDecoder.decode(outs, ambiChans(), numFrames);
     

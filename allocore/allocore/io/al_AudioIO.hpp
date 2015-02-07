@@ -172,7 +172,8 @@ public:
 	int channelsBus() const;			///< Get number of allocated bus channels
 	int channelsInDevice() const;		///< Get number of channels opened on input device
 	int channelsOutDevice() const;		///< Get number of channels opened on output device
-	int framesPerBuffer() const;		///< Get frames/buffer of audio I/O stream
+    int framesPerBuffer() const;        ///< Get frames/buffer of audio I/O stream
+    
 	double framesPerSecond() const;		///< Get frames/second of audio I/O streams
 	double fps() const { return framesPerSecond(); }
 	double secondsPerBuffer() const;	///< Get seconds/buffer of audio I/O stream
