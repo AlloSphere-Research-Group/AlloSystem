@@ -26,9 +26,10 @@ public:
 			// Bind ourself to the MIDIIn
 			MIDIMessageHandler::bindTo(midiIn);
 
-			// Open the first device found
-			midiIn.openPort(0);
-			printf("Opened port to %s\n", midiIn.getPortName(0).c_str());
+			// Open the last device found
+			int port = midiIn.getPortCount()-1;
+			midiIn.openPort(port);
+			printf("Opened port to %s\n", midiIn.getPortName(port).c_str());
 		}
 		else{
 			printf("Error: No MIDI devices found.\n");
