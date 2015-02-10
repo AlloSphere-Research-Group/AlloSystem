@@ -34,15 +34,15 @@ build_and_install_assimp(){
 if binary_exists "apt-get"; then
 	echo 'Found apt-get'
 	sudo apt-get update
-	sudo apt-get install build-essential
-	sudo apt-get install cmake
-	sudo apt-get install libapr1-dev libaprutil1-dev
-	sudo apt-get install portaudio19-dev libsndfile1-dev
-	sudo apt-get install libglew-dev freeglut3-dev
-	sudo apt-get install libavahi-client-dev	# for protocol/al_ZeroConf
-	sudo apt-get install libudev-dev libusb-1.0-0-dev # for io/al_HID
-	sudo apt-get install libfreeimage-dev libfreetype6-dev
-	sudo apt-get install libxi-dev libxmu-dev
+	sudo apt-get install build-essential \
+						 cmake \
+						 libapr1-dev libaprutil1-dev \
+						 portaudio19-dev libsndfile1-dev \
+						 libglew-dev freeglut3-dev \
+						 libavahi-client-dev \
+						 libudev-dev libusb-1.0-0-dev \
+						 libfreeimage-dev libfreetype6-dev \
+						 libxi-dev libxmu-dev
 
 	# Get version of installed assimp
 	assimp_version=$(apt-cache policy libassimp-dev | grep Installed | cut -f2 -d: | sed -e 's/[ ]*//')
@@ -74,11 +74,11 @@ if binary_exists "apt-get"; then
 elif binary_exists "brew"; then
 	echo 'Found Homebrew'
 	brew update
-	brew install cmake
-	brew install portaudio libsndfile
-	brew install glew
-	brew install freeimage
-	brew install freetype
+	brew install cmake \
+				 portaudio libsndfile \
+				 glew \
+				 freeimage \
+				 freetype
 
 	# Use precompiled library if on Mountain Lion or higher.
 	osx_version="$(sw_vers -productVersion | cut -d . -f 2)"
@@ -92,11 +92,11 @@ elif binary_exists "brew"; then
 elif binary_exists "port"; then
 	echo 'Found MacPorts'
 	sudo port selfupdate
-	sudo port install cmake
-	sudo port install portaudio libsndfile
-	sudo port install glew
-	sudo port install freeimage
-	sudo port install freetype
+	sudo port install cmake \
+					  portaudio libsndfile \
+					  glew \
+					  freeimage \
+					  freetype
 
 	build_and_install_assimp
 
