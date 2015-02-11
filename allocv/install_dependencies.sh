@@ -20,10 +20,9 @@ if binary_exists "apt-get"; then
 # OSX / Homebrew
 elif binary_exists "brew"; then
 	echo 'Found Homebrew'
-	echo 'Error: Installation procedure is not yet implemented'
-	exit
-	#brew update
-	#brew install pkgconfig
+	brew update
+	brew install pkg-config
+	brew install homebrew/science/opencv --with-openni
 
 # OSX / MacPorts
 elif binary_exists "port"; then
