@@ -23,10 +23,6 @@ rm -rf build/ CMakeCache.txt CMakeFiles/ cmake_install.cmake Makefile build.ninj
 cd ..
 
 # Remove build files from external libraries.
-cd ../GLV
-rm -rf AlloSystem-build
-cd ../AlloSystem
+rm -rf ../GLV/AlloSystem-build
 
-cd ../Gamma
-rm -rf AlloSystem-build
-cd ../AlloSystem
+rm -rf ../Gamma/AlloSystem-build
