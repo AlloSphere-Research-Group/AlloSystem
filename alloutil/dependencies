@@ -1,0 +1,8 @@
+# alloutil dependencies.
+
+alloutil_apt="libluajit-5.1-dev"
+
+alloutil_brew="luajit"
+alloutil_port="luajit"
+
+alloutil_pacman="mingw-w64-${arch}-luajit-git"
