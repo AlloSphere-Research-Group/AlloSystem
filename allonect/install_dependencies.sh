@@ -15,12 +15,7 @@ if binary_exists "apt-get"; then
 
 elif binary_exists "brew"; then
 	echo 'Found Homebrew'
-	DIR="$PWD"
-	cd /usr/local/Library/Formula
-		curl --insecure -O "https://raw.github.com/OpenKinect/libfreenect/master/platform/osx/homebrew/libfreenect.rb"
-		curl --insecure -O "https://raw.github.com/OpenKinect/libfreenect/master/platform/osx/homebrew/libusb-freenect.rb"
-		brew install libfreenect
-	cd "$DIR"
+	brew install libfreenect
 
 elif binary_exists "port"; then
 	echo 'Tell us if a port appears in MacPorts'
