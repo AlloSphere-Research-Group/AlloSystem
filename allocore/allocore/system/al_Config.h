@@ -55,9 +55,15 @@
 
 #if defined(WIN32) || defined(__WINDOWS_MM__) || defined(WIN64)
 	#define AL_WINDOWS 1
-	#define WIN32_LEAN_AND_MEAN
-	#define VC_EXTRALEAN
-	#include <windows.h>
+
+	// Experimentally not include all of windows.h .
+	// #define WIN32_LEAN_AND_MEAN
+	// #define VC_EXTRALEAN
+	// #include <windows.h>
+
+	#include <windef.h>
+	#include <mmsystem.h>
+	#include <winsock2.h>
 
 	// undefine macros of common words
 	#ifdef DELETE
