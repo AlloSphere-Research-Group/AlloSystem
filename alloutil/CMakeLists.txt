@@ -29,6 +29,13 @@ if(NOT LUA_FOUND)
   return()
 endif(NOT LUA_FOUND)
 
+find_package(Jsoncpp)
+
+if(NOT Jsoncpp_FOUND)
+  message("Jsoncpp required to build AlloUtil. Not found!")
+  return()
+endif(NOT Jsoncpp_FOUND)
+
 find_path(ALLOCORE_HEADER allocore/graphics/al_Image.hpp ${CMAKE_SOURCE_DIR}/build/include)
 
 if(NOT ALLOCORE_HEADER)
@@ -45,8 +52,8 @@ get_target_property(ALLOCORE_LINK_LIBRARIES allocore${DEBUG_SUFFIX} ALLOCORE_LIN
 set(ALLOUTIL_LIB "alloutil${DEBUG_SUFFIX}")
 add_library(${ALLOUTIL_LIB} ${ALLOUTIL_SRC})
 
-set(ALLOUTIL_LINK_LIBRARIES ${LUA_LIBRARIES} ${ALLOCORE_LIBRARY})
-set(ALLOUTIL_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${LUA_INCLUDE_DIR} ${ALLOCORE_DEP_INCLUDE_DIRS})
+set(ALLOUTIL_LINK_LIBRARIES ${LUA_LIBRARIES} ${Jsoncpp_LIBRARIES} ${ALLOCORE_LIBRARY})
+set(ALLOUTIL_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${LUA_INCLUDE_DIR} ${Jsoncpp_INCLUDE_DIRS} ${ALLOCORE_DEP_INCLUDE_DIRS})
 
 include_directories(${ALLOUTIL_DIRS})
 target_link_libraries(${ALLOUTIL_LIB} ${ALLOUTIL_LINK_LIBRARIES})

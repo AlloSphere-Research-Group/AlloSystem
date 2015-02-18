@@ -1,0 +1,8 @@
+# allocv dependencies.
+
+allocv_apt="libopencv-dev"
+
+allocv_brew="homebrew/science/opencv --with-openni"
+allocv_port="opencv +openni"
+
+allocv_pacman="mingw-w64-${arch}-opencv"
