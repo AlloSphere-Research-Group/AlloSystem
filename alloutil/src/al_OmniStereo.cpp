@@ -1,5 +1,4 @@
 
-#include "allocore/io/al_Socket.hpp" // for hostname
 #include "alloutil/al_Lua.hpp" // for hostname
 #include "allocore/graphics/al_Image.hpp"
 #include "allocore/graphics/al_Shader.hpp"
