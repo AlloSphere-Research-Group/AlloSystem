@@ -22,12 +22,12 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake_mo
 
 include(cmake_modules/make_dep.cmake)
 
-if(BUILD_GAMMA)
+if(BUILD_GAMMA AND NOT GAMMA_LIBRARY)
     make_dep(Gamma)
     set(GAMMA_LIBRARY ${Gamma_LIBRARY})
 endif(BUILD_GAMMA)
 
-if(BUILD_GLV)
+if(BUILD_GLV AND NOT GLV_LIBRARY)
     make_dep(GLV)
 endif(BUILD_GLV)
 
