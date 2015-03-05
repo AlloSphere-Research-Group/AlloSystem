@@ -26,6 +26,7 @@ list(APPEND ALLOCORE_HEADERS
     allocore/al_Allocore.hpp
     allocore/graphics/al_Mesh.hpp
     allocore/graphics/al_Shapes.hpp
+    allocore/graphics/al_Image.hpp
     allocore/io/al_HID.hpp
     allocore/io/al_MIDI.hpp
     allocore/io/al_Serial.hpp
@@ -184,6 +185,7 @@ set_target_properties(${ALLOCORE_LIB}
 include_directories(${ALLOCORE_DEP_INCLUDE_DIRS})
 target_link_libraries(${ALLOCORE_LIB} ${ALLOCORE_LINK_LIBRARIES})
 
+message(${ALLOCORE_DEP_INCLUDE_DIRS})
 
 # Doxygen documentation target
 add_custom_target("doc"
