@@ -26,7 +26,7 @@ else
 fi
 
 
-ALLO_DIR=$PWD/test
+ALLO_DIR=$PWD
 
 cd /tmp
 	PKG=makefile-build
