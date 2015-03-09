@@ -26,7 +26,7 @@ else
 fi
 
 
-ALLO_DIR=$PWD
+ALLO_DIR=$PWD/test
 
 cd /tmp
 	PKG=makefile-build
@@ -42,7 +42,7 @@ cd /tmp
 
 cd $ALLO_DIR
 	if [ -d build/lib ]; then
-		BUILT_MODULES=`ls build/lib/ | sed 's/\.a//g; s/lib//g'`
+		BUILT_MODULES=`ls build/lib/ | sed 's/^/ /; s/ lib/ /g; s/\.a//g'`
 		echo "Making" $BUILT_MODULES
 		make $BUILT_MODULES
 	fi
