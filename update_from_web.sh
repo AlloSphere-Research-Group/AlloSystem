@@ -37,15 +37,16 @@ cd /tmp
 	echo "Decompressing $PKG_DIR.zip"
 	$UNZIP $PKG
 
-	echo "Updating existing source"
-	cp -ruv $PKG_DIR/* $ALLO_DIR
+	echo "Updating existing files"
+	cp -R $PKG_DIR/* $ALLO_DIR
 
 cd $ALLO_DIR
-	BUILT_MODULES=`ls build/lib/ | sed 's/\.a//g; s/lib//g'`
-	echo "Making" $BUILT_MODULES
-	make $BUILT_MODULES
+	if [ -d build/lib ]; then
+		BUILT_MODULES=`ls build/lib/ | sed 's/\.a//g; s/lib//g'`
+		echo "Making" $BUILT_MODULES
+		make $BUILT_MODULES
+	fi
 
 cd /tmp
 	rm -rf $PKG_DIR/
 	rm $PKG.*
-
