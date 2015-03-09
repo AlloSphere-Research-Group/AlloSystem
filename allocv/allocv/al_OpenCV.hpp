@@ -77,7 +77,7 @@ int toCV(AlloTy type, uint8_t components);
 
 /// This implies that no memory management will be performed by OpenCV.
 /// To copy the data (to persist beyond the Array), call clone() on the result.
-inline CvMat toCV(const Array& arr);
+cv::Mat toCV(const Array& arr);
 
 } // al::
 
