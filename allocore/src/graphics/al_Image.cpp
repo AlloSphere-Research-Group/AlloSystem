@@ -485,6 +485,25 @@ bool Image :: save(const std::string& filename) {
 	return mLoaded;
 }
 
+/*static*/ bool Image::save(
+	const std::string& filePath, const Array& src, int compress
+){
+	/*return save(
+		filePath,
+		src.data.ptr, src.width(), src.height(), getFormat(src.components()),
+		compress
+	);*/
+
+	Image img;
+	Array& a = img.array();
+	a.configure(src.header); // copy over header information
+	a.data.ptr = src.data.ptr;
+	img.compression(compress);
+	bool res = img.save(filePath);
+	a.data.ptr = NULL; // prevent ~Array from deleting data
+	return res;
+}
+
 Image::Format Image::format() const {
 	return getFormat(array().components());
 }
