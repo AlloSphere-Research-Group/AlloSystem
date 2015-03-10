@@ -8,7 +8,7 @@
 #include "alloutil/al_RayStereo.hpp"
 
 #define PORT_TO_DEVICE_SERVER (12000)
-#define PORT_FROM_DEVICE_SERVER (PORT_TO_DEVICE_SERVER+1)
+#define PORT_FROM_DEVICE_SERVER (8082)//(PORT_TO_DEVICE_SERVER+1)
 #define DEVICE_SERVER_IP_ADDRESS "BOSSANOVA"
 
 namespace al {
