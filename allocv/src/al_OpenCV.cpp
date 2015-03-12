@@ -179,7 +179,7 @@ cv::Mat toCV(const Array& arr) {
 //	);
 
 	int type = toCV(arr.header.type, arr.header.components);
-	return cv::Mat(arr.dim(1), arr.dim(0), type, (uchar *)arr.data.ptr);
+	return cv::Mat(arr.dim(1), arr.dim(0), type, (uchar *)arr.data.ptr, arr.stride(1));
 }
 
 } // al::
