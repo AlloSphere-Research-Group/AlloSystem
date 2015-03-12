@@ -74,20 +74,15 @@ bool Array::isFormat(const AlloArrayHeader& h2) const {
 }
 
 void Array::configure(const AlloArrayHeader& h2) {
-	/*header.type = h2.type;
-	header.components = h2.components;
-	header.dimcount = h2.dimcount;
-	for(int i=0; i < ALLO_ARRAY_MAX_DIMS; ++i) {
-		if (i < header.dimcount) {
-			header.dim[i] = h2.dim[i];
-			header.stride[i] = h2.stride[i];
-		} else {
-			header.dim[i] = 1;
-			header.stride[i] = h2.stride[i-1]; // Why i-1?
-		}
-	}*/
-
 	allo_array_setheader(this, &h2);
+}
+
+void Array::dataCalloc() { allo_array_allocate(this); }
+
+void Array::dataFree() { allo_array_free(this); }
+
+void Array::deriveStride(AlloArrayHeader& h, size_t alignSize) {
+	allo_array_setstride(&h, alignSize);
 }
 
 void Array::format(const AlloArrayHeader& h2) {
@@ -102,6 +97,33 @@ void Array::format(const AlloArrayHeader& h2) {
 			zero();
 		}
 	}
+}
+
+void Array::format(int comps, AlloTy ty, uint32_t dimx) {
+	formatAligned(comps, ty, dimx, AL_ARRAY_DEFAULT_ALIGNMENT);
+}
+
+void Array::format(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy) {
+	formatAligned(comps, ty, dimx, dimy, AL_ARRAY_DEFAULT_ALIGNMENT);
+}
+
+void Array::format(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz) {
+	formatAligned(comps, ty, dimx, dimy, dimz, AL_ARRAY_DEFAULT_ALIGNMENT);
+}
+
+void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, size_t align) {
+	uint32_t dims[] = {dimx};
+	formatAlignedGeneral(comps, ty, dims,1, align);
+}
+
+void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, size_t align) {
+	uint32_t dims[] = {dimx,dimy};
+	formatAlignedGeneral(comps, ty, dims,2, align);
+}
+
+void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, size_t align) {
+	uint32_t dims[] = {dimx,dimy,dimz};
+	formatAlignedGeneral(comps, ty, dims,3, align);
 }
 
 void Array::formatAlignedGeneral(int comps, AlloTy ty, uint32_t * dims, int numDims, size_t align) {
