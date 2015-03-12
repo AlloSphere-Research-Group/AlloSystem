@@ -37,7 +37,7 @@ public:
 		destroy();
 	}
 
-	virtual bool load(const std::string& filename, Array &lat) {
+	virtual bool load(const std::string& filename, Array &arr) {
 		FREE_IMAGE_FORMAT type = FreeImage_GetFIFFromFilename(filename.c_str());
 		if(type == FIF_UNKNOWN) {
 			AL_WARN("image format not recognized: %s", filename.c_str());
@@ -99,14 +99,14 @@ public:
 		AlloTy ty = getDataType();
 		int w, h;
 		getDim(w, h);
-		lat.format(planes, ty, w, h);
+		arr.format(planes, ty, w, h);
 
 		Image::Format format = Image::getFormat(planes);
 		switch(format) {
 			case Image::LUMINANCE: {
-				char *o_pix = (char *)(lat.data.ptr);
-				int rowstride = lat.header.stride[1];
-				for(unsigned j = 0; j < lat.header.dim[1]; ++j) {
+				char *o_pix = (char *)(arr.data.ptr);
+				int rowstride = arr.stride(1);
+				for(unsigned j = 0; j < arr.dim(1); ++j) {
 					char *pix = (char *)FreeImage_GetScanLine(mImage, j);
 					memcpy(o_pix, pix, rowstride);
 					o_pix += rowstride;
@@ -115,30 +115,28 @@ public:
 			break;
 
 			case Image::RGB: {
-				switch(lat.header.type) {
+				switch(arr.type()) {
 					case AlloUInt8Ty: {
-						char *bp = (char *)(lat.data.ptr);
-						int rowstride = lat.header.stride[1];
+						char *bp = (char *)(arr.data.ptr);
+						int rowstride = arr.stride(1);
 
-						for(unsigned j = 0; j < lat.header.dim[1]; ++j) {
+						for(unsigned j = 0; j < arr.dim(1); ++j) {
 							RGBTRIPLE * pix = (RGBTRIPLE *)FreeImage_GetScanLine(mImage, j);
 							Image::RGBPix<uint8_t> *o_pix = (Image::RGBPix<uint8_t> *)(bp + j*rowstride);
-							for(unsigned i=0; i < lat.header.dim[0]; ++i) {
-								o_pix->r = pix->rgbtRed;
-								o_pix->g = pix->rgbtGreen;
-								o_pix->b = pix->rgbtBlue;
-								++pix;
-								++o_pix;
+							for(unsigned i=0; i < arr.dim(0); ++i) {
+								o_pix[i].r = pix[i].rgbtRed;
+								o_pix[i].g = pix[i].rgbtGreen;
+								o_pix[i].b = pix[i].rgbtBlue;
 							}
 						}
 					}
 					break;
 
 					case AlloFloat32Ty: {
-						char *o_pix = (char *)(lat.data.ptr);
-						int rowstride = lat.header.stride[1];
+						char *o_pix = (char *)(arr.data.ptr);
+						int rowstride = arr.stride(1);
 
-						for(unsigned j = 0; j < lat.header.dim[1]; ++j) {
+						for(unsigned j = 0; j < arr.dim(1); ++j) {
 							char *pix = (char *)FreeImage_GetScanLine(mImage, j);
 							memcpy(o_pix, pix, rowstride);
 							o_pix += rowstride;
@@ -154,29 +152,27 @@ public:
 			break;
 
 			case Image::RGBA: {
-				switch(lat.header.type) {
+				switch(arr.type()) {
 					case AlloUInt8Ty: {
-						char *bp = (char *)(lat.data.ptr);
-						int rowstride = lat.header.stride[1];
-						for(unsigned j = 0; j < lat.header.dim[1]; ++j) {
+						char *bp = (char *)(arr.data.ptr);
+						int rowstride = arr.stride(1);
+						for(unsigned j = 0; j < arr.dim(1); ++j) {
 							RGBQUAD *pix = (RGBQUAD *)FreeImage_GetScanLine(mImage, j);
 							Image::RGBAPix<uint8_t> *o_pix = (Image::RGBAPix<uint8_t> *)(bp + j*rowstride);
-							for(unsigned i=0; i < lat.header.dim[0]; ++i) {
-								o_pix->r = pix->rgbRed;
-								o_pix->g = pix->rgbGreen;
-								o_pix->b = pix->rgbBlue;
-								o_pix->a = pix->rgbReserved;
-								++pix;
-								++o_pix;
+							for(unsigned i=0; i < arr.dim(0); ++i) {
+								o_pix[i].r = pix[i].rgbRed;
+								o_pix[i].g = pix[i].rgbGreen;
+								o_pix[i].b = pix[i].rgbBlue;
+								o_pix[i].a = pix[i].rgbReserved;
 							}
 						}
 					}
 					break;
 
 					case AlloFloat32Ty: {
-						char *o_pix = (char *)(lat.data.ptr);
-						int rowstride = lat.header.stride[1];
-						for(unsigned j = 0; j < lat.header.dim[1]; ++j) {
+						char *o_pix = (char *)(arr.data.ptr);
+						int rowstride = arr.stride(1);
+						for(unsigned j = 0; j < arr.dim(1); ++j) {
 							char *pix = (char *)FreeImage_GetScanLine(mImage, j);
 							memcpy(o_pix, pix, rowstride);
 							o_pix += rowstride;
@@ -235,11 +231,10 @@ public:
 			return false;
 		}
 
-		const AlloArrayHeader& header = arr.header;
-		unsigned w = header.dim[0];
-		unsigned h = (header.dimcount > 1) ? header.dim[1] : 1;
-		Image::Format format = Image::getFormat(header.components);
-		int bpp = header.stride[0]*8;
+		unsigned w = arr.dim(0);
+		unsigned h = (arr.dimcount() > 1) ? arr.dim(1) : 1;
+		Image::Format format = Image::getFormat(arr.components());
+		int bpp = arr.stride(0)*8; // bits/pixel
 
 		resize(w,h,bpp);
 
@@ -248,14 +243,14 @@ public:
 			return false;
 		}
 
-		const int rowstride = header.stride[1];
+		const int rowstride = arr.stride(1);
 
 		//printf("w=%d, h=%d, bpp=%d, stride=%d\n", w,h,bpp,rowstride);
 
 		switch(format) {
 
 			case Image::LUMINANCE:
-				switch(header.type) {
+				switch(arr.type()) {
 
 					case AlloUInt8Ty: {
 						char *bp = (char *)(arr.data.ptr);
@@ -303,7 +298,7 @@ public:
 			structures in order to write OS independent code.
 			*/
 			case Image::RGB: {
-				switch(header.type) {
+				switch(arr.type()) {
 
 					case AlloUInt8Ty: { //printf("FreeImageImpl: save uint8/RGB\n");
 						char *bp = (char *)(arr.data.ptr);
@@ -329,7 +324,7 @@ public:
 
 			case Image::RGBA: {
 
-				switch(header.type) {
+				switch(arr.type()) {
 
 					case AlloUInt8Ty: {
 						char *bp = (char *)(arr.data.ptr);
