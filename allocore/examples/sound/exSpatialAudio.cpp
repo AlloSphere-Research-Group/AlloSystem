@@ -1,11 +1,8 @@
 /*
  *  exSpatialAudio.cpp
  *  How to set up a simple spatial audio scene in allocore
- *  Or, how to build a spatializer in 10 steps
- *
- *  Created by Ryan McGee on 4/20/11.
- *  Allocore Code Sprint 20th of April 2011
- *
+ *  Created by Ryan McGee on 4/20/2011. Allocore Code Sprint 20th of April 2011
+ *  Updated 3/21/2015
  */
 
 #include "allocore/al_Allocore.hpp"
@@ -17,24 +14,24 @@ using namespace al;
 
 #define NUM_FRAMES (256)
 
-// 1) Create a panner: DBAP, VBAP, or HOA
-Dbap* panner = new Dbap();
-//Vbap* panner = new Vbap();
-//AmbisonicsSpatializer* panner = new AmbisonicsSpatializer(2, 1);  // dimension and order
-
-// 2) Create an audio scene with single arguement for frames per buffer
-AudioScene scene(NUM_FRAMES);
-
-// 3) Create listener(s)
-Listener * listener;
-
-// 4) Create Speaker Layout
+// Create Speaker Layout
 SpeakerLayout speakerLayout = HeadsetSpeakerLayout();
 
-// 5) Create a Sound Source
+// Create a spatializer: DBAP, VBAP, or HOA
+//Dbap* spat = new Dbap(speakerLayout);
+//Vbap* spat = new Vbap();
+AmbisonicsSpatializer *spat = new AmbisonicsSpatializer(speakerLayout, 2, 1); //HOA DIMENSION AND ORDER
+
+// Create an audio scene with single arguement for frames per buffer
+AudioScene scene(NUM_FRAMES);
+
+// Create listener(s)
+Listener * listener;
+
+// Create a Sound Source
 SoundSource src;
 
-// 6) Create an audio callback function for the source and scene
+// Create an audio callback function for the source and scene
 void audioCB(AudioIOData& io){
 	
 	int numFrames = io.framesPerBuffer();
@@ -42,7 +39,7 @@ void audioCB(AudioIOData& io){
 	for(int i=0; i<numFrames; i++){
 		//Write each sample to the source
 		//(this just writes random noise for testing)
-		src.writeSample(rnd::uniform(1.,-1.));
+		src.writeSample(0.1*rnd::uniform(1.,-1.));
 	}
 	
 	//render this scene buffer (renders as many frames as specified at initialization)
@@ -52,22 +49,22 @@ void audioCB(AudioIOData& io){
 
 int main (int argc, char * argv[]){
 	
-	// 7) Initialize the listener(s) with their individual speaker layout and panner
-	listener = scene.createListener(speakerLayout,panner);
+	// Initialize the listener(s) with their individual speaker layout and panner
+	listener = scene.createListener(spat);
 	
-	// 8) Add the sound source to the scene
+	// Add the sound source to the scene
 	scene.addSource(src);
 	
-	// 9) update the listener's speaker layout and panner
-	//    call this to dynamically change a listener's speaker layout and panner
+	// update the listener's speaker layout and panner
+	// call this to dynamically change a listener's speaker layout and panner
 	// maybe rename this to update() ?
 	listener->compile();
 	
 	// Output's relevant panner info (ex. number of triplets found for VBAP)
-	panner->dump();//Check VBAP
+	//panner->dump();
 	
-	// 10) Create an audio IO for the audio scene
-	//     Last 3 arguemnts are for user data, #out chans, and # in chans
+	// Create an audio IO for the audio scene
+	//  Last 3 arguemnts are for user data, #out chans, and # in chans
 	AudioIO audioIO(NUM_FRAMES, 44100, audioCB, NULL, 2, 0);
 	
 	// Start the IO!

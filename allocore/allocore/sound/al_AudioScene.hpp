@@ -41,7 +41,7 @@
 	File author(s):
 	Lance Putnam, 2010, putnam.lance@gmail.com
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
-    Ryan McGee, 2012, ryanmichaelmcgee@gmail.com
+    Ryan McGee, 2012-2015, ryanmichaelmcgee@gmail.com
 */
 
 #include <math.h>
@@ -102,10 +102,7 @@ class SoundSource;
 class Dbap;
 class Spatializer {
 public:
-    Spatializer(SpeakerLayout& sl)
-    :
-    enabled(true)
-    {
+    Spatializer(SpeakerLayout& sl) : enabled(true){
         unsigned numSpeakers = sl.mSpeakers.size();
 		for(unsigned i=0;i<numSpeakers;++i){
 			mSpeakers.push_back(sl.mSpeakers[i]);
@@ -120,7 +117,7 @@ public:
     /// called once per listener, before sources are rendered. ex. zero ambisonics coefficients
     virtual void prepare(){};
     
-    #if !ALLOCORE_NO_PORTAUDIO
+    #if !ALLOCORE_NO_PORTAUDIO //if using AudioIOData and Allocore's PortAudio wrapper for an audio callback (standard AlloCore app)
     /// render each source per sample
     virtual void perform(
                          AudioIOData& io,
@@ -137,7 +134,11 @@ public:
                          Vec3d& relpos,
                          const int& numFrames,
                          float *samples)= 0;
-    #else
+    
+    /// called once per listener, after sources are rendered. ex. ambisonics decode
+    virtual void finalize(AudioIOData &io){};
+    
+    #else //if using another API's callback (JUCE, for example)
     /// render each source per sample
     virtual void perform(
                          float** outputBuffers,
@@ -154,10 +155,10 @@ public:
                          Vec3d& relpos,
                          const int& numFrames,
                          float *samples)= 0;
-    #endif
     
     /// called once per listener, after sources are rendered. ex. ambisonics decode
     virtual void finalize(float **outs, const int numFrames){};
+    #endif
     
     int numSpeakers() const { return mSpeakers.size(); }
     
@@ -208,10 +209,7 @@ protected:
         mSpatializer->numFrames(v);
 	}
 
-    
-    
     bool isCompiled;
-
 };
 
 
@@ -228,9 +226,15 @@ protected:
 */
 class SoundSource {
 public:
-	SoundSource(double rollOff=1.0, double near=1, double range=100, double ampFar=0.0, int bufSize=15000)
-	:	mSound(bufSize), mRollOff(rollOff), mNearClip(near), mClipRange(range), mAmpFar(ampFar), useAtten(true), useDoppler(true), perSampleProcessing(false)
-    {
+    
+    enum EAttenuationType {
+        eAttenOneOverD,
+        eAttenOneOverD2
+    };
+    
+	SoundSource(double rollOff=1.0, double near=1, double range=100, double ampFar=0.0, int bufSize=50000)
+	:	mSound(bufSize), mRollOff(rollOff), mNearClip(near), mClipRange(range), mAmpFar(ampFar), useAtten(true), useDoppler(true), perSampleProcessing(false),
+        attenuationType(eAttenOneOverD) {
 		// initialize the position history to be VERY FAR AWAY so that we don't deafen ourselves... 
 		mPosHistory(Vec3d(1000, 1000, 1000));
 		mPosHistory(Vec3d(1000, 1000, 1000));
@@ -260,6 +264,9 @@ public:
 
 	/// Get roll off factor
 	double rollOff() const { return mRollOff; }
+    
+    /// Set attenuation type (1/D or 1/D2)
+    void setAttenuationType(EAttenuationType atten){ attenuationType = atten;}
 
 	/// Returns attentuation factor based on distance to listener
 	double attenuation(double distance) const {
@@ -268,15 +275,16 @@ public:
         
         if(!useAtten) return 1.0;
         
-		if (distance < mNearClip) {
+		if (distance < mNearClip)
 			return 1.0;
-		}
-        else if (distance > (mNearClip+mClipRange)) {
+        else if (distance > (mNearClip+mClipRange))
 			return mAmpFar;
-		}
         else {
+            if(attenuationType == eAttenOneOverD)
+                return mAmpFar + 1.0/distance;
+            else if(attenuationType == eAttenOneOverD2)
+                return mAmpFar + 1.0/(distance*distance);
             
-            return mAmpFar + 1.0/distance;
 //			// normalized distance (0..1)
 //			double dN = (distance-mNearClip) / (mClipRange);
 //		
@@ -291,7 +299,7 @@ public:
 //			double curve = 1-tanh(M_PI * dN*dN);
 //			return mAmpFar + curve*(1.-mAmpFar);
 		}
-
+        return 1.0;
 	}
 
     /// Enable/disable distance-based gain attenuation
@@ -344,7 +352,7 @@ public:
 	void writeSample(const double& v){ mSound.write(v); }
     
     /// Optional onProcessSample so sample rate processing of sound sources can be used in AudioScene
-    virtual void onProcessSample(){}//AudioIOData& io){}
+    virtual void onProcessSample(int frame){}//AudioIOData& io){}
     void usePerSampleProcessing(bool _usePerSampleProcessing) { perSampleProcessing = _usePerSampleProcessing;}
     bool isUsingPerSampleProcessing() { return perSampleProcessing; }
     
@@ -362,6 +370,8 @@ protected:
 	double mNearClip, mClipRange, mAmpFar;
     
     bool useAtten, useDoppler, perSampleProcessing;
+    
+    EAttenuationType attenuationType;
 };	
 
 
@@ -409,7 +419,7 @@ public:
 	}
     
     /// Per sample processing is off by default.
-    /// Per sample processing is useful for smoother doppler and gain interpolation for high-speed sources
+    /// Per sample processing is useful for smoother doppler and gain interpolation for high-speed sources,
     /// but uses much more CPU.
     void usePerSampleProcessing(bool shouldUsePerSampleProcessing){
         perSampleProcessing = shouldUsePerSampleProcessing;
@@ -419,15 +429,10 @@ public:
     void render(AudioIOData& io) {
         const int numFrames = io.framesPerBuffer();
         double sampleRate = io.framesPerSecond();
-        float *outputBuffers = io.outBuffer();
-        render(outputBuffers, numFrames, sampleRate);
-    }
+#else
+    void render(float **outputBuffers, const int numFrames, double sampleRate) {
 #endif
     
-    void render(float **outputBuffers, const int numFrames, double sampleRate) {
-        
-//        const int numFrames = io.framesPerBuffer();
-//        double sampleRate = io.framesPerSecond();
 		double distanceToSample = sampleRate / mSpeedOfSound;
 		
 		// iterate through all listeners adding contribution from all sources
@@ -444,7 +449,6 @@ public:
 			l.mPosHistory(l.pose().pos());
 
 			// iterate through all sound sources
-            //printf("audio scene has %d sound sources!!!\n", mSources.size());
 			for(Sources::iterator it = mSources.begin(); it != mSources.end(); ++it){
 				SoundSource& src = *(*it);
 				
@@ -463,11 +467,10 @@ public:
                     for(int i=0; i<numFrames; ++i){
                         
                         // per sample source processing and update source history (only for the first listener)
-                        if(il == 0)
-                        {
+                        if(il == 0){
                             src.mPosHistory(src.pose().pos());
                             if(src.isUsingPerSampleProcessing())
-                                src.onProcessSample();
+                                src.onProcessSample(i);
                         }
                     
                         // compute interpolated source position relative to listener
@@ -486,15 +489,10 @@ public:
 
                         double distance = relpos.mag();
                         
-                        //printf("distance = %f\n", distance);
-                        
                         double idx = distance * distanceToSample;
-                        //if (i==0) printf("idx %g\n", idx);
-                        
-                        int idx0 = idx;
                         
                         // are we within range?
-                        if(idx0 <= src.maxIndex()-numFrames){
+                        if(idx <= src.maxIndex()-numFrames){
                         //if (distance < src.farClip()) {
 
                             if(!src.isUsingPerSampleProcessing())
@@ -504,7 +502,11 @@ public:
                             
                             float s = src.readSample(idx) * gain;
                             
+                            #if !ALLOCORE_NO_PORTAUDIO
+                            spatializer->perform(io, src,relpos, numFrames, i, s);
+                            #else
                             spatializer->perform(outputBuffers, src,relpos, numFrames, i, s);
+                            #endif
                             
                         } // end if in range
 
@@ -528,13 +530,21 @@ public:
                         readIndex += (numFrames-i);
                         samples[i] = gain*src.readSample(readIndex);
                     }
+                    #if !ALLOCORE_NO_PORTAUDIO
+                    spatializer->perform(io, src,relpos, numFrames, samples);
+                    #else
                     spatializer->perform(outputBuffers, src, relpos, numFrames, samples);
+                    #endif
                 }
                 
                 
 			} //end for each source
             
+            #if !ALLOCORE_NO_PORTAUDIO
+            spatializer->finalize(io);
+            #else
             spatializer->finalize(outputBuffers, numFrames);
+            #endif
             
 		} // end for each listener
 		
@@ -546,10 +556,10 @@ protected:
 	Listeners mListeners;
 	Sources mSources;
     
-    bool perSampleProcessing;
-    
 	int mNumFrames;			// audio frames per block
 	double mSpeedOfSound;	// distance per second
+    
+    bool perSampleProcessing;
 };
 
 

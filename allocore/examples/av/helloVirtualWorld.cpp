@@ -170,15 +170,13 @@ int main (int argc, char * argv[])
 
     // Create spatializer
     AmbisonicsSpatializer *ambisonics = new AmbisonicsSpatializer(speakerLayout, 2, 1);
-    //Dbap *dbap = new Dbap(speakerLayout);
-
+    
 	// Create listener to render audio
 	listener = scene.createListener(ambisonics);
-    //listener = scene.createListener(dbap);
 	
 	// Now do some visuals
 	for(unsigned i=0; i<agents.size(); ++i) scene.addSource(agents[i]);
-
+    
 	MyWindow windows[6];
 
 	windows[0].create(Window::Dim(  0, 300, 200,200), "Left");

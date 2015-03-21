@@ -389,7 +389,7 @@ public:
         
     }
     
-    void prepare(AudioIOData& io){
+    void prepare(){
         zeroAmbi();
     }
     
@@ -446,17 +446,25 @@ public:
 
     }
     
-    
-    void finalize(float *outs, const int numFrames){
+    #if !ALLOCORE_NO_PORTAUDIO
+    void finalize(AudioIOData &io){ //float *outs, const int numFrames){
         
         //previously done in render method of audioscene
         
-        //float *outs = &io.out(0,0);//io.outBuffer();
-        //int numFrames = io.framesPerBuffer();
+        float *outs = &io.out(0,0);//io.outBuffer();
+        int numFrames = io.framesPerBuffer();
         
         mDecoder.decode(outs, ambiChans(), numFrames);
     
     }
+    #else
+    void finalize(float *outs, const int numFrames){
+        
+        //TODO
+        mDecoder.decode(outs, ambiChans(), numFrames);
+        
+    }
+    #endif
     
 private:
     AmbiDecode mDecoder;
