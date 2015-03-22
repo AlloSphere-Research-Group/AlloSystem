@@ -28,7 +28,7 @@ struct MyWindow : Window{
 		gl.clearColor(0,0,0,0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.viewport(0,0, width(), height());
-		
+
 		gl.matrixMode(gl.PROJECTION);
 		gl.loadMatrix(Matrix4d::perspective(45, aspect(), 0.1, 100));
 
@@ -37,7 +37,7 @@ struct MyWindow : Window{
 
 		gl.depthTesting(1);
 		gl.blending(0);
-	
+
 		material();
 		light();
 
@@ -52,7 +52,7 @@ struct MyWindow : Window{
 
 		return true;
 	}
-	
+
 	double angle;
 };
 
@@ -64,13 +64,13 @@ int main(){
 		int Nv = rnd::prob(0.5)
 					? (rnd::prob(0.5) ? addCube(shapes) : addDodecahedron(shapes))
 					: addIcosahedron(shapes);
-		
+
 		Mat4f xfm;
 		xfm.setIdentity();
 		xfm.scale(Vec3f(rnd::uniform(1.,0.1), rnd::uniform(1.,0.1), rnd::uniform(1.,0.1)));
 		xfm.translate(Vec3f(rnd::uniformS(8.), rnd::uniformS(8.), rnd::uniformS(8.)));
 		//xfm.rotate(rnd::uniform(), rnd::uniform(), rnd::uniform());
-		
+
 		shapes.transform(xfm, shapes.vertices().size()-Nv);
 
 		for(int i=0; i<Nv; ++i){

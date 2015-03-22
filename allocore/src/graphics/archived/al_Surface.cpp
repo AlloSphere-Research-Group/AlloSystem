@@ -36,7 +36,7 @@ void Surface::enter() {
 		if(! created()) {
 			create();
 		}
-	
+
 		mBackend->surfaceBind(this);
 		mBackend->surfaceEnter(this);
 	}

@@ -18,21 +18,21 @@ public:
 	Impl()
 	:	mHandle(NULL), mTimeout(0)
 	{}
-	
+
 	~Impl(){
 		close();
 	}
 
-	/*	
-	"I'm not sure the actual criteria which determines whether shared mode is 
-	required. Keyboards and mice cannot be opened at all in Windows using the 
+	/*
+	"I'm not sure the actual criteria which determines whether shared mode is
+	required. Keyboards and mice cannot be opened at all in Windows using the
 	HID interface, and thus can't be opened using HIDAPI.
 
-	On Linux, it depends on the implementation you use. For Linux/hidraw, 
-	devices can be opened multiple times. On Linux/libusb, they can only be 
+	On Linux, it depends on the implementation you use. For Linux/hidraw,
+	devices can be opened multiple times. On Linux/libusb, they can only be
 	opened once. Actually, opening it a second time will steal the device from
 	the first instance. On mac, it allows multiple opens."
-	
+
 		signal11, https://github.com/signal11/hidapi/issues/23
 	*/
 	bool open(unsigned short vid, unsigned short pid, const wchar_t *ser){
@@ -67,14 +67,14 @@ public:
 	}
 
 	int read(unsigned char * data, size_t length){
-		if(mTimeout == 0){		
+		if(mTimeout == 0){
 			return hid_read(mHandle, data, length);
 		}
 		else{
 			return hid_read_timeout(mHandle, data, length, mTimeout);
 		}
 	}
-	
+
 	bool opened() const {
 		return NULL != mHandle; }
 
@@ -87,7 +87,7 @@ public:
 		}\
 		return L""
 
-	std::wstring manufacturer() const {		
+	std::wstring manufacturer() const {
 		RETURN_STRING(hid_get_manufacturer_string);
 	}
 
@@ -98,13 +98,13 @@ public:
 	std::wstring serialNumber() const {
 		RETURN_STRING(hid_get_serial_number_string);
 	}
-	
+
 	#undef RETURN_STRING
 
 	static void print(hid_device_info& d){
 		printf("Product:            %ls\n", d.product_string);
 		printf("Manufacturer:       %ls\n", d.manufacturer_string);
-		printf("Vendor, product ID: %#.4x, %#.4x\n", d.vendor_id, d.product_id);		
+		printf("Vendor, product ID: %#.4x, %#.4x\n", d.vendor_id, d.product_id);
 		printf("Serial number:      %ls\n", d.serial_number);
 		printf("Path:               %s\n", d.path);
 		//#ifndef AL_LINUX
@@ -115,7 +115,7 @@ public:
 	static void printDevices(unsigned short vID, unsigned short pID){
 		struct hid_device_info * begin = hid_enumerate(vID, pID);
 		struct hid_device_info * d = begin;
-		
+
 		if(NULL != begin){
 			while(NULL != d){
 				print(*d);

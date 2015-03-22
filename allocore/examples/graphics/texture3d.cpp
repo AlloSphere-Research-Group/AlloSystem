@@ -38,14 +38,14 @@ int gRenderMode = 0;
 static const char * vLight = AL_STRINGIFY(
 varying vec3 texcoord0;
 void main(){
-	texcoord0 = gl_Vertex.xyz / 32.; 
+	texcoord0 = gl_Vertex.xyz / 32.;
 	//texcoord0 = vec3(gl_MultiTexCoord0);
 	gl_Position = ftransform();
 }
 );
 
 static const char * fLight = AL_STRINGIFY(
-uniform sampler3D tex; 
+uniform sampler3D tex;
 varying vec3 texcoord0;
 void main() {
 	vec4 color = texture3D(tex, texcoord0);
@@ -67,7 +67,7 @@ void arrayfiller(float * values, double normx, double normy, double normz) {
 
 struct MyWindow : public Window {
 
-	bool onKeyDown(const Keyboard& k){	 	
+	bool onKeyDown(const Keyboard& k){
 		switch (k.key()) {
 			case ' ': gRenderMode = (gRenderMode+1)%3; break;
 		}
@@ -75,13 +75,13 @@ struct MyWindow : public Window {
 	}
 
 	bool onCreate(){
-	
+
 		// fill array:
 		data.fill(arrayfiller);
-		
+
 		// reconfigure texture based on array:
 		tex.submit(data, true);
-		
+
 		// shader method:
 		shaderV.source(vLight, Shader::VERTEX).compile();
 		shaderF.source(fLight, Shader::FRAGMENT).compile();
@@ -99,27 +99,27 @@ struct MyWindow : public Window {
 			mesh.texCoord(x/32., y/32., z/32.);
 			mesh.vertex(x, y, z);
 		}}}
-		
+
 		return true;
 	}
-	
+
 	bool onFrame(){
 		gl.clearColor(0,0,0,0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.viewport(0,0, width(), height());
-		
+
 		gl.matrixMode(gl.PROJECTION);
 		gl.loadMatrix(Matrix4d::perspective(45, aspect(), 0.1, 100));
 
 		gl.matrixMode(gl.MODELVIEW);
 		gl.loadMatrix(Matrix4d::lookAt(Vec3d(16, 16, 48), Vec3d(16, 16, 16), Vec3d(0,1,0)));
-		
+
 		// update data:
 		data.fill(arrayfiller);
-		
+
 		// how to resubmit data (if it is changing):
 		tex.submit(data);
-		
+
 		gl.pointSize(gRenderMode+0.5);
 		switch (gRenderMode) {
 			case 0:

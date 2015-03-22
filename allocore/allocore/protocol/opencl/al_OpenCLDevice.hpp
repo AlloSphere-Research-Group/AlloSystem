@@ -54,7 +54,7 @@ protected:
 public:
 
 	~OpenCLDevice() {}
-	
+
 	bool has_extension(const char *ext);
 
 	static void get_devices(const OpenCLPlatform &plat, vector<OpenCLDevice> &devs);
@@ -95,7 +95,7 @@ public:
 	cl_device_local_mem_type get_local_mem_type() const {return mLocalMemType;}
 	size_t get_profiling_timer_resolution() const {return mProfilingTimerResolution;}
 	cl_uint get_max_clock_frequency() const {return mMaxClockFrequency;}
-	
+
 protected:
 
 	void set_device(cl_device_id v) {mDevice = v;}
@@ -138,7 +138,7 @@ protected:
 	void set_local_mem_type(cl_device_local_mem_type v) {mLocalMemType = v;}
 	void set_profiling_timer_resolution(size_t v) {mProfilingTimerResolution = v;}
 	void set_max_clock_frequency(cl_uint v) {mMaxClockFrequency = v;}
-	
+
 protected:
 	cl_device_id mDevice;
 	string mPlatform;
@@ -151,18 +151,18 @@ protected:
 	cl_device_type mDeviceType;
 	Profile mProfile;
 	cl_bool mAvailable;
-	
+
 	//	capabilities
 	cl_device_exec_capabilities mExecCapability;
 	cl_command_queue_properties mQueueProperties;
-	
+
 	// key properties
 	cl_bool mCompilerAvailable;
 	cl_bool mEndianLittle;
-	
+
 	// misc. properties
 	cl_bool mErrorCorrectionSupport;
-	
+
 	// compute environment constants
 	cl_uint mMaxComputeUnits;
 	cl_uint mMaxConstantArgs;
@@ -175,8 +175,8 @@ protected:
 	cl_uint mMaxWorkItemDimensions;
 	size_t mMaxWorkItemSizes[3];
 	cl_uint mMaxWriteImageArgs;
-	
-	
+
+
 	// numerics
 	/*
 	CL_DEVICE_SINGLE_FP_CONFIG:
@@ -188,13 +188,13 @@ protected:
 	CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT:
 	CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE:
 	*/
-	
+
 	// alignment
 	/*
 	CL_DEVICE_MEM_BASE_ADDR_ALIGN:
 	CL_DEVICE_MIN_DATA_TYPE_ALIGN_SIZE:
 	*/
-	
+
 	// memory
 	cl_uint mDeviceAddressBits;
 	cl_ulong mGlobalMemCacheSize;
@@ -203,8 +203,8 @@ protected:
 	cl_ulong mGlobalMemSize;
 	cl_ulong mLocalMemSize;
 	cl_device_local_mem_type mLocalMemType;
-	
-	
+
+
 	// images
 /*	CL_DEVICE_IMAGE_SUPPORT:
 	CL_DEVICE_IMAGE2D_MAX_HEIGHT:
@@ -212,8 +212,8 @@ protected:
 	CL_DEVICE_IMAGE3D_MAX_DEPTH:
 	CL_DEVICE_IMAGE3D_MAX_HEIGHT:
 	CL_DEVICE_IMAGE3D_MAX_WIDTH:
-*/	
-	
+*/
+
 	// timing
 	size_t mProfilingTimerResolution;
 	cl_uint mMaxClockFrequency;

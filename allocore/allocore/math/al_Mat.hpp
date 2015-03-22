@@ -8,30 +8,30 @@
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -87,7 +87,7 @@ public:
 
 	/// @param[in] arr	one dimensional array in column-major
 	Mat(const T * arr){ set(arr); }
-	
+
 	/// @param[in] src	matrix with same dimension, but possibly different type
 	template <class U>
 	Mat(const Mat<N,U>& src){ set(src.elems()); }
@@ -163,7 +163,7 @@ public:
 		m(N-1,N-1) = T(1);
 		return m;
 	}
-	
+
 	/// Get a translation transform matrix
 	template <class V>
 	static Mat translation(const Vec<N-1,V>& v){
@@ -186,19 +186,19 @@ public:
 
 	/// Get read-only pointer to elements
 	const T* elems() const { return mElems; }
-	
+
 	/// Get read-write pointer to elements
 	T* elems(){ return mElems; }
 
 	/// Set element at index with no bounds checking
 	T& operator[](int i){ return elems()[i];}
-	
+
 	/// Get element at index with no bounds checking
 	const T& operator[](int i) const { return elems()[i]; }
 
 	/// Set element at row i, column j
 	T& operator()(int i, int j){ return (*this)[j*N+i]; }
-	
+
 	/// Get element at row i, column j
 	const T& operator()(int i, int j) const { return (*this)[j*N+i]; }
 
@@ -207,7 +207,7 @@ public:
 
 	/// Return row i as vector
 	Vec<N,T> row(int i) const { return Vec<N,T>(elems()+i, N); }
-	
+
 	/// Return diagonal
 	Vec<N,T> diagonal() const { return Vec<N,T>(elems(), N+1); }
 
@@ -271,7 +271,7 @@ public:
 	Mat operator / (const T& v) const { return Mat(*this) /= v; }
 
 	/// Computes matrix product r = a * b
-	
+
 	/// Returns reference to result
 	///
 	static Mat& multiply(Mat& r, const Mat& a, const Mat& b){
@@ -283,7 +283,7 @@ public:
 		}
 		return r;
 	}
-	
+
 	/// Computes product of matrix multiplied by column vector, r = m * vCol
 	static Vec<N,T>& multiply(Vec<N,T>& r, const Mat& m, const Vec<N,T>& vCol){
 		IT(N){ r[i] = m.row(i).dot(vCol); }
@@ -302,13 +302,13 @@ public:
 	/// Set elements from another matrix
 	template <class U>
 	Mat& set(const Mat<N,U>& v){ return set(v.elems()); }
-	
+
 	/// Set elements in column-major order from C array
 	template <class U>
 	Mat& set(const U * arr){ IT(size()){ (*this)[i]=arr[i]; } return *this; }
 
 	/// Set elements in column-major order from C array
-	
+
 	/// @param[in] arr			1D array from which to copy (stride=1)
 	/// @param[in] numElements	number of elements to copy
 	/// @param[in] matOffset	index offset into matrix
@@ -318,7 +318,7 @@ public:
 		IT(numElements){ (*this)[i*matStride+matOffset]=arr[i]; } return *this;
 	}
 
-	/// Set 2-by-2 (sub)matrix from arguments	
+	/// Set 2-by-2 (sub)matrix from arguments
 	Mat& set(
 		const T& r1c1, const T& r1c2,
 		const T& r2c1, const T& r2c2,
@@ -328,7 +328,7 @@ public:
 		setCol2(r1c2, r2c2, col+1,row); return *this;
 	}
 
-	/// Set 3-by-3 (sub)matrix from arguments	
+	/// Set 3-by-3 (sub)matrix from arguments
 	Mat& set(
 		const T& r1c1, const T& r1c2, const T& r1c3,
 		const T& r2c1, const T& r2c2, const T& r2c3,
@@ -339,7 +339,7 @@ public:
 		setCol3(r1c2, r2c2, r3c2, col+1,row);
 		setCol3(r1c3, r2c3, r3c3, col+2,row); return *this;
 	}
-	
+
 	/// Set 4-by-4 (sub)matrix from arguments
 	Mat& set(
 		const T& r1c1, const T& r1c2, const T& r1c3, const T& r1c4,
@@ -347,7 +347,7 @@ public:
 		const T& r3c1, const T& r3c2, const T& r3c3, const T& r3c4,
 		const T& r4c1, const T& r4c2, const T& r4c3, const T& r4c4,
 		int row=0, int col=0
-	){		
+	){
 		setCol4(r1c1, r2c1, r3c1, r4c1, col  ,row);
 		setCol4(r1c2, r2c2, r3c2, r4c2, col+1,row);
 		setCol4(r1c3, r2c3, r3c3, r4c3, col+2,row);
@@ -367,7 +367,7 @@ public:
 		(*this)(row+2, col) = v3; return *this;
 	}
 
-	/// Set a (sub)column	
+	/// Set a (sub)column
 	Mat& setCol4(const T& v1, const T& v2, const T& v3, const T& v4, int col=0, int row=0){
 		(*this)(row,   col) = v1;
 		(*this)(row+1, col) = v2;
@@ -451,7 +451,7 @@ public:
 		}
 		return *this;
 	}
-	
+
 	/// Rotate transformation matrix on a global plane (A' = RA)
 	Mat& rotateGlobal(double angle, int dim1, int dim2){
 		return rotateGlobal<N-1>(angle,dim1,dim2); }

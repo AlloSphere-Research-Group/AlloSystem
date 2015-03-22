@@ -63,7 +63,7 @@ public:
     void AttachPeriodicTimerListener( int periodMilliseconds, TimerListener *listener );
 	void AttachPeriodicTimerListener(
             int initialDelayMilliseconds, int periodMilliseconds, TimerListener *listener );
-    void DetachPeriodicTimerListener( TimerListener *listener );  
+    void DetachPeriodicTimerListener( TimerListener *listener );
 
     void Run();      // loop and block processing messages indefinitely
 	void RunUntilSigInt();
@@ -75,9 +75,9 @@ public:
 class UdpSocket{
     class Implementation;
     Implementation *impl_;
-    
+
 	friend class SocketReceiveMultiplexer::Implementation;
-    
+
 public:
 
 	// ctor throws std::runtime_error if there's a problem
@@ -97,7 +97,7 @@ public:
 
 	// Connect to a remote endpoint which is used as the target
 	// for calls to Send()
-	void Connect( const IpEndpointName& remoteEndpoint );	
+	void Connect( const IpEndpointName& remoteEndpoint );
 	void Send( const char *data, int size );
     void SendTo( const IpEndpointName& remoteEndpoint, const char *data, int size );
 

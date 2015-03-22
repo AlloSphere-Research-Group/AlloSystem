@@ -3,35 +3,35 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -82,13 +82,13 @@ struct Viewport {
 	/// @param[in] w	width
 	/// @param[in] h	height
 	Viewport(float w=800, float h=600): l(0), b(0), w(w), h(h) {}
-	
+
 	/// @param[in] l	left edge coordinate
 	/// @param[in] b	bottom edge coordinate
 	/// @param[in] w	width
 	/// @param[in] h	height
 	Viewport(float l, float b, float w, float h): l(l), b(b), w(w), h(h) {}
-	
+
 	///
 	Viewport(const Viewport& cpy): l(cpy.l), b(cpy.b), w(cpy.w), h(cpy.h) {}
 
@@ -133,7 +133,7 @@ public:
 		ONE						= GL_ONE,					/**< */
 		SRC_ALPHA_SATURATE		= GL_SRC_ALPHA_SATURATE		/**< */
 	};
-	
+
 	enum BlendEq {
 		FUNC_ADD				= GL_FUNC_ADD,				/**< Source + destination */
 		FUNC_SUBTRACT			= GL_FUNC_SUBTRACT,			/**< Source - destination */
@@ -217,7 +217,7 @@ public:
 	};
 
 
-	
+
 	Graphics();
 	virtual ~Graphics();
 
@@ -228,34 +228,40 @@ public:
 
 
 	// Capabilities
-	
+
 	/// Enable a capability
 	void enable(Capability v){ glEnable(v); }
-	
+
 	/// Disable a capability
 	void disable(Capability v){ glDisable(v); }
-	
+
 	/// Set a capability
 	void capability(Capability cap, bool value);
-	
+
 	/// Turn blending on/off
 	void blending(bool b);
-	
+
+	/// Turn color mask RGBA components on/off
+	void colorMask(bool r, bool g, bool b, bool a);
+
+	/// Turn color mask on/off (all RGBA components)
+	void colorMask(bool b);
+
 	/// Turn the depth mask on/off
 	void depthMask(bool b);
-	
+
 	/// Turn depth testing on/off
 	void depthTesting(bool b);
-	
+
 	/// Turn lighting on/off
 	void lighting(bool b);
-	
+
 	/// Turn scissor testing on/off
 	void scissorTest(bool b);
-	
+
 	/// Turn face culling on/off
 	void cullFace(bool b);
-	
+
 	/// Turn face culling on/off and set the culled face
 	void cullFace(bool b, Face face);
 
@@ -265,7 +271,7 @@ public:
 
 	/// Set antialiasing to nicest
 	void nicest(){ antialiasing(NICEST); }
-	
+
 	/// Set antialiasing to fastest
 	void fastest(){ antialiasing(FASTEST); }
 
@@ -284,7 +290,7 @@ public:
 
 	/// Set polygon drawing mode
 	void polygonMode(PolygonMode m, Face f=FRONT_AND_BACK);
-	
+
 	/// Set shading model
 	void shadeModel(ShadeModel m);
 
@@ -294,7 +300,7 @@ public:
 
 	/// Set blend mode to additive (symmetric additive lighten)
 	void blendModeAdd(){ blendMode(SRC_ALPHA, ONE, FUNC_ADD); }
-	
+
 	/// Set blend mode to subtractive (symmetric additive darken)
 	void blendModeSub(){ blendMode(SRC_ALPHA, ONE, FUNC_REVERSE_SUBTRACT); }
 
@@ -328,16 +334,16 @@ public:
 
 	/// Clear frame buffer(s)
 	void clear(AttributeBit bits);
-	
+
 	/// Set clear color
 	void clearColor(float r, float g, float b, float a);
-	
+
 	/// Set clear color
 	void clearColor(const Color& color);
 
 
 	/// Set linear fog parameters
-	
+
 	/// \param[in] end		distance from viewer to fog end
 	/// \param[in] start	distance from viewer to fog start
 	/// \param[in] col		fog color
@@ -348,7 +354,7 @@ public:
 
 	/// Set viewport
 	void viewport(int left, int bottom, int width, int height);
-	
+
 	/// Set viewport
 	void viewport(const Viewport& v){ viewport(v.l,v.b,v.w,v.h); }
 
@@ -358,7 +364,7 @@ public:
 
 	/// Set current matrix
 	void matrixMode(MatrixMode mode);
-	
+
 	/// Push current matrix stack
 	void pushMatrix();
 
@@ -373,11 +379,11 @@ public:
 
 	/// Set current matrix to identity
 	void loadIdentity();
-	
+
 	/// Set current matrix
 	void loadMatrix(const Matrix4d &m);
 	void loadMatrix(const Matrix4f &m);
-	
+
 	/// Multiply current matrix
 	void multMatrix(const Matrix4d &m);
 	void multMatrix(const Matrix4f &m);
@@ -385,7 +391,7 @@ public:
 	/// Set modelview matrix
 	void modelView(const Matrix4d& m){ matrixMode(MODELVIEW); loadMatrix(m); }
 	void modelView(const Matrix4f& m){ matrixMode(MODELVIEW); loadMatrix(m); }
-	
+
 	/// Set projection matrix
 	void projection(const Matrix4d& m){ matrixMode(PROJECTION); loadMatrix(m); }
 	void projection(const Matrix4f& m){ matrixMode(PROJECTION); loadMatrix(m); }
@@ -393,7 +399,7 @@ public:
 
 
 	/// Rotate current matrix
-	
+
 	/// \param[in] angle	angle, in degrees
 	/// \param[in] x		x component of rotation axis
 	/// \param[in] y		y component of rotation axis
@@ -402,9 +408,9 @@ public:
 
 	/// Rotate current matrix
 	void rotate(const Quatd& q);
-	
+
 	/// Rotate current matrix
-	
+
 	/// \param[in] angle	angle, in degrees
 	/// \param[in] axis		rotation axis
 	template <class T>
@@ -416,7 +422,7 @@ public:
 
 	/// Scale current matrix along each dimension
 	void scale(double x, double y, double z=1.);
-	
+
 	/// Scale current matrix along each dimension
 	template <class T>
 	void scale(const Vec<3,T>& v){ scale(v[0],v[1],v[2]); }
@@ -433,7 +439,7 @@ public:
 
 	/// Begin "immediate" mode drawing
 	void begin(Primitive v);
-	
+
 	/// End "immediate" mode
 	void end();
 
@@ -449,7 +455,7 @@ public:
 	template<class T>
 	void vertex(const Vec<3,T>& v){ vertex(v[0],v[1],v[2]); }
 
-	
+
 	/// Add texture coordinate (immediate mode)
 	void texCoord(double u, double v);
 
@@ -479,17 +485,17 @@ public:
 	void color(const Vec4f& v) { color(v[0], v[1], v[2], v[3]); }
 
 	/// Draw vertex data
-	
+
 	/// This draws a range of vertices from a mesh. If the mesh contains
 	/// vertex indices, then the range corresponds to the vertex indices array.
-	/// Negative count or index amounts are relative to one plus the maximum 
+	/// Negative count or index amounts are relative to one plus the maximum
 	/// possible value.
 	///
 	/// @param[in] m		Vertex data to draw
 	/// @param[in] count	Number of vertices or indices to draw
 	/// @param[in] begin	Begin index of vertices or indices to draw (inclusive)
 	void draw(const Mesh& m, int count=-1, int begin=0);
-	
+
 	/// Draw internal vertex data
 	void draw(){ draw(mMesh); }
 
@@ -511,7 +517,7 @@ public:
 
 	/// Returns number of components for given color type
 	static int numComponents(Format v);
-	
+
 	/// Returns number of bytes for given data type
 	static int numBytes(DataType v);
 
@@ -546,7 +552,7 @@ public:
 };
 
 
-// ============== INLINE ============== 
+// ============== INLINE ==============
 
 inline void Graphics::clear(AttributeBit bits){ glClear(bits); }
 inline void Graphics::clearColor(float r, float g, float b, float a){ glClearColor(r, g, b, a); }
@@ -562,6 +568,15 @@ inline void Graphics::capability(Capability cap, bool v){
 }
 
 inline void Graphics::blending(bool b){ capability(BLEND, b); }
+inline void Graphics::colorMask(bool r, bool g, bool b, bool a){
+	glColorMask(
+		r?GL_TRUE:GL_FALSE,
+		g?GL_TRUE:GL_FALSE,
+		b?GL_TRUE:GL_FALSE,
+		a?GL_TRUE:GL_FALSE
+	);
+}
+inline void Graphics::colorMask(bool b){ colorMask(b,b,b,b); }
 inline void Graphics::depthMask(bool b){ glDepthMask(b?GL_TRUE:GL_FALSE); }
 inline void Graphics::depthTesting(bool b){ capability(DEPTH_TEST, b); }
 inline void Graphics::lighting(bool b){ capability(LIGHTING, b); }

@@ -109,7 +109,7 @@ static void DetectX86FamilyModel(unsigned EAX, unsigned *o_Family, unsigned *o_M
         // Examine extended model ID if family ID is 6 or F.
         Model += ((EAX >> 16) & 0xf) << 4; // Bits 16 - 19
     }
-    
+
     *o_Family = Family;
     *o_Model = Model;
 }
@@ -117,11 +117,11 @@ static void DetectX86FamilyModel(unsigned EAX, unsigned *o_Family, unsigned *o_M
 bool is_sandy_bridge() {
     unsigned EAX = 0, EBX = 0, ECX = 0, EDX = 0;
     if(!GetX86CpuIDAndInfo(0x1, &EAX, &EBX, &ECX, &EDX)) return false;
-    
+
     unsigned Family = 0;
     unsigned Model  = 0;
     DetectX86FamilyModel(EAX, &Family, &Model);
-    
+
     return Family == 6 && Model == 42;
 }
 

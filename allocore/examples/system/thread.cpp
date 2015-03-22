@@ -13,7 +13,7 @@ Lance Putnam, 10/2012
 using namespace al;
 
 
-// We subclass ThreadFunction to define both the data and execution function of 
+// We subclass ThreadFunction to define both the data and execution function of
 // the thread.
 struct MyThreadFunction : public ThreadFunction{
 	int i; // We'll use this integer to identify the thread
@@ -32,16 +32,16 @@ int main(){
 	// First, we will show very simple use of a single thread.
 	Thread thread;
 	MyThreadFunction function1(1);
-	
+
 	// Start execution of the thread.
 	// The program will continue immediately after starting the thread.
 	thread.start(function1);
-	
+
 	// Join the thread with the main thread.
-	// When we call join on a thread, the main program will wait until that 
+	// When we call join on a thread, the main program will wait until that
 	// thread is finished.
 	thread.join();
-	
+
 	// We can reuse threads, possibly with other functions, as long as they are
 	// not running.
 	MyThreadFunction function2(2);
@@ -61,10 +61,10 @@ int main(){
 	for(int i=0; i<N; ++i){
 		functions[i].i = i+10;
 	}
-	
-	// Start all the threads. 
-	// The threads will execute in parallel in an indeterminate order. Run the 
-	// example multiple times to observe how the print statements get 
+
+	// Start all the threads.
+	// The threads will execute in parallel in an indeterminate order. Run the
+	// example multiple times to observe how the print statements get
 	// interleaved in a seemingly random way.
 	printf("Starting multiple threads from the main thread.\n");
 	for(int i=0; i<N; ++i){

@@ -8,30 +8,30 @@
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -115,14 +115,14 @@ struct SphereCoord {
 
 	/// Get radius
 	T radius() const { return p.mag(); }
-	
+
 	/// Returns Cartesian coordinate
 	Vec<3,T> toCart() const{
 		return Vec<3,T>(t.r*p.i, t.i*p.i, p.r);
 	}
-	
+
 	/// Set from two angles, in radians, and radius
-	
+
 	/// @param[in] theta	longitudinal angle (angle from +x towards +y)
 	/// @param[in] phi		latitudinal angle (angle from +z axis)
 	/// @param[in] radius	radius
@@ -150,7 +150,7 @@ struct SphereCoord {
 /// Spherical harmonics are solutions to Laplace's differential equation on the
 /// surface of a 2-sphere. The solutions are complex functions parameterized by
 /// two integers, l and m, and two angles defining an orientation in space.
-/// The l number determines the number of nodal lines (circles with zero 
+/// The l number determines the number of nodal lines (circles with zero
 /// magnitude) and m determines the number of latitudinal nodal lines
 /// (geodesics intersecting the z axis). When |m| = l, the harmonics are "beach
 /// ball"-like (sectoral) and when m = 0, the harmonics are "target"-like
@@ -176,15 +176,15 @@ public:
 	}
 
 	template <class T>
-	static Complex<T> expim(int m, const Complex<T>& ctheta){		
+	static Complex<T> expim(int m, const Complex<T>& ctheta){
 		Complex<T> res = al::powN(ctheta, al::abs(m));
 		if(m < 0) res.i = -res.i;
 		return res;
 	}
-	
+
 	/// Get normalization coefficient
 	static double coef(int l, int m){ return l<=L_MAX ? coefTab(l,m) : coefCalc(l,m); }
-	
+
 	/// Get normalization coefficient (tabulated)
 	static const double& coefTab(int l, int m){ return LUT(l,m); }
 
@@ -207,7 +207,7 @@ private:
 		if(make){
 			make=false;
 			for(int l=0; l<=L_MAX; ++l){
-				for(int m=-L_MAX; m<=L_MAX; ++m){					
+				for(int m=-L_MAX; m<=L_MAX; ++m){
 					double c=0;
 					 // m must be in [-l,l]
 					if(al::abs(m) <= l)	c = coefCalc(l,m);
@@ -244,7 +244,7 @@ void cartToSpherical(T& x, T& y, T& z){
 	T r = sqrt(x*x + y*y + z*z);
 	T t = atan2(y, x);
 	z = acos(z/r);
-	y = t;	
+	y = t;
 	x = r;
 }
 
@@ -252,7 +252,7 @@ template <class T>
 inline void cartToSpherical(T * vec3){ cartToSpherical(vec3[0], vec3[1], vec3[2]); }
 
 template <int N, class T>
-inline Vec<N-1,T> sterProj(const Vec<N,T>& v){	
+inline Vec<N-1,T> sterProj(const Vec<N,T>& v){
 	return sub<N-1>(v) * (T(1)/v[N-1]);
 }
 

@@ -6,7 +6,7 @@
 using namespace al;
 
 typedef std::set<Watcher *> Watchers;
-typedef std::map<std::string, Watchers> WatchersMap;	
+typedef std::map<std::string, Watchers> WatchersMap;
 
 /// singleton notification center:
 static WatchersMap gWatchers;

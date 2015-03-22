@@ -3,35 +3,35 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -68,7 +68,7 @@ public:
 
 	/// @param[in] deviceNum	Device enumeration number
 	AudioDevice(int deviceNum);
-	
+
 	/// @param[in] nameKeyword	Keyword to search for in device name
 	/// @param[in] stream		Whether to search for input and/or output devices
 	AudioDevice(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT));
@@ -81,10 +81,10 @@ public:
 	int channelsInMax() const;				///< Get maximum number of input channels supported
 	int channelsOutMax() const;				///< Get maximum number of output channels supported
 	double defaultSampleRate() const;		///< Get default sample rate
-	
+
 	bool hasInput() const;					///< Returns whether device has input
 	bool hasOutput() const;					///< Returns whether device has output
-	
+
 	void print() const;						///< Prints info about specific i/o device to stdout
 
 	static AudioDevice defaultInput();		///< Get system's default input device
@@ -107,7 +107,7 @@ inline AudioDevice::StreamMode operator| (const AudioDevice::StreamMode& a, cons
 
 /// Audio data to be sent to callback
 
-/// Audio buffers are guaranteed to be stored in a contiguous non-interleaved 
+/// Audio buffers are guaranteed to be stored in a contiguous non-interleaved
 /// format, i.e., frames are tightly packed per channel.
 class AudioIOData {
 public:
@@ -119,7 +119,7 @@ public:
 
 	/// Iterate frame counter, returning true while more frames
 	bool operator()() const { return (++mFrame)<framesPerBuffer(); }
-		
+
 	/// Get current frame number
 	int frame() const { return mFrame; }
 
@@ -149,13 +149,13 @@ public:
 
 	/// Get non-interleaved output buffer on specified channel
 	float * outBuffer(int chan=0) const { return &out(chan,0); }
-	
+
 	/// Add value to current output sample on specified channel
 	void sum(float v, int chan) const { out(chan)+=v; }
-	
+
 	/// Add value to current output sample on specified channels
 	void sum(float v, int ch1, int ch2) const { sum(v, ch1); sum(v,ch2); }
-	
+
 	/// Get sample from temporary buffer at specified frame
 	float& temp(int frame) const;
 
@@ -238,9 +238,9 @@ public:
 	using AudioIOData::framesPerSecond;
 
 	audioCallback callback;						///< User specified callback function.
-	
+
 	/// Add an AudioCallback handler (internal callback is always called first)
-	AudioIO& append(AudioCallback& v);		
+	AudioIO& append(AudioCallback& v);
 	AudioIO& prepend(AudioCallback& v);
 
 	/// Remove all input event handlers matching argument
@@ -252,7 +252,7 @@ public:
 	double cpu() const;							///< Returns current CPU usage of audio thread
 	bool supportsFPS(double fps) const;			///< Return true if fps supported, otherwise false
 	bool zeroNANs() const;						///< Returns whether to zero NANs in output buffer going to DAC
-	
+
 	void processAudio();						///< Call callback manually
 	bool open();								///< Opens audio device.
 	bool close();								///< Closes audio device. Will stop active IO.
@@ -262,8 +262,8 @@ public:
 	void autoZeroOut(bool v){ mAutoZeroOut=v; }
 
 	/// Sets number of effective channels on input or output device depending on 'forOutput' flag.
-	
-	/// An effective channel is either a real device channel or virtual channel 
+
+	/// An effective channel is either a real device channel or virtual channel
 	/// depending on how many channels the device supports. Passing in -1 for
 	/// the number of channels opens all available channels.
 	void channels(int num, bool forOutput);
@@ -272,7 +272,7 @@ public:
 	void channelsOut(int n){channels(n,true);}	///< Set number of output channels
 	void channelsBus(int num);					///< Set number of bus channels
 	void clipOut(bool v){ mClipOut=v; }			///< Set whether to clip output between -1 and 1
-	void device(const AudioDevice& v);			///< Set input/output device (must be duplex)	
+	void device(const AudioDevice& v);			///< Set input/output device (must be duplex)
 	void deviceIn(const AudioDevice& v);		///< Set input device
 	void deviceOut(const AudioDevice& v);		///< Set output device
 	void framesPerSecond(double v);				///< Set number of frames per second

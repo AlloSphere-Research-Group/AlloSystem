@@ -14,20 +14,17 @@ set(BUILD_GAMMA 1 CACHE STRING "Try to build external Gamma")
 set(BUILD_GLV 1 CACHE STRING "Try to build external GLV.")
 set(BUILD_EXAMPLES 0 CACHE STRING "Build AlloSystem examples.")
 
-# Windows custom paths
-include(cmake_modules/CustomLibPaths.cmake)
-
 # External dependencies (Gamma and GLV)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
 
 include(cmake_modules/make_dep.cmake)
 
-if(BUILD_GAMMA)
+if(BUILD_GAMMA AND NOT GAMMA_LIBRARY)
     make_dep(Gamma)
     set(GAMMA_LIBRARY ${Gamma_LIBRARY})
 endif(BUILD_GAMMA)
 
-if(BUILD_GLV)
+if(BUILD_GLV AND NOT GLV_LIBRARY)
     make_dep(GLV)
 endif(BUILD_GLV)
 
@@ -56,11 +53,18 @@ if(BUILDING_GLV)
     add_dependencies(alloGLV${DEBUG_SUFFIX} GLV)
 endif(BUILDING_GLV)
 
+# allocv ---------------------------------------
+
+add_subdirectory(allocv)
+get_target_property(ALLOCV_LIBRARY allocv${DEBUG_SUFFIX} LOCATION)
+get_target_property(ALLOCV_INCLUDE_DIR allocv${DEBUG_SUFFIX} ALLOCV_INCLUDE_DIR)
+get_target_property(ALLOCV_LINK_LIBRARIES allocv${DEBUG_SUFFIX} ALLOCV_LINK_LIBRARIES)
+
 # alloaudio ----------------------------------
 add_subdirectory(alloaudio)
-#get_target_property(ALLOAUDIO_LIBRARY alloaudio${DEBUG_SUFFIX} LOCATION)
-#get_target_property(ALLOAUDIO_DEP_INCLUDE_DIR alloaudio${DEBUG_SUFFIX} ALLOAUDIO_DEP_INCLUDE_DIR)
-#get_target_property(ALLOAUDIO_LINK_LIBRARIES alloaudio${DEBUG_SUFFIX} ALLOAUDIO_LINK_LIBRARIES)
+get_target_property(ALLOAUDIO_LIBRARY alloaudio${DEBUG_SUFFIX} LOCATION)
+get_target_property(ALLOAUDIO_INCLUDE_DIR alloaudio${DEBUG_SUFFIX} ALLOAUDIO_INCLUDE_DIR)
+get_target_property(ALLOAUDIO_LINK_LIBRARIES alloaudio${DEBUG_SUFFIX} ALLOAUDIO_LINK_LIBRARIES)
 
 # Run from path (Used in run.sh script)
 if((ALLOSYSTEM_BUILD_DIR) OR (ALLOSYSTEM_BUILD_APP_FILE))
@@ -125,12 +129,13 @@ if(BUILD_EXAMPLES)
       endif(EXTRA_COMPILER_FLAGS)
       #message("Adding target for example: ${example_src}")
       include_directories(${ALLOCORE_INCLUDE_DIR} ${ALLOUTIL_INCLUDE_DIR} ${ALLOGLV_INCLUDE_DIR}
-        ${GAMMA_INCLUDE_DIRS} )
+        ${GLV_INCLUDE_DIRS} ${GAMMA_INCLUDE_DIRS} ${ALLOAUDIO_INCLUDE_DIR} )
       #    message("Gamma : ${GAMMA_INCLUDE_DIRs}")
       add_dependencies(${EXAMPLE_TARGET} "allocore${DEBUG_SUFFIX}" "alloutil${DEBUG_SUFFIX}")
       target_link_libraries(${EXAMPLE_TARGET}
-	${ALLOCORE_LIBRARY} ${ALLOUTIL_LIBRARY} ${GAMMA_LIBRARIES}
-        ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOGLV_LINK_LIBRARIES})
+        ${ALLOCORE_LIBRARY} ${ALLOUTIL_LIBRARY} ${GAMMA_LIBRARIES} ${ALLOAUDIO_LIBRARY}
+        ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOGLV_LINK_LIBRARIES}
+        ${ALLOAUDIO_LINK_LIBRARIES})
       if(ALLOGLV_LIBRARY)
         add_dependencies(${EXAMPLE_TARGET} ${ALLOGLV_LIBRARY})
         target_link_libraries(${EXAMPLE_TARGET} ${ALLOGLV_LIBRARY} ${ALLOGLV_LINK_LIBRARIES})

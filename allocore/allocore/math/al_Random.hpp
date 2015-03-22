@@ -8,30 +8,30 @@
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -91,7 +91,7 @@ public:
 	/// Returns uniform random in [0, hi)
 	template <class T>
 	T uniform(const T& hi){ return hi*uniform(); }
-	
+
 	/// Returns uniform random in [lo, hi)
 	template <class T>
 	T uniform(const T& hi, const T& lo){ return T((hi-lo)*uniform()) + lo; }
@@ -104,12 +104,15 @@ public:
 	T uniformS(const T& lim){ return lim*uniformS(); }
 
 	/// Returns point within a unit ball
-	
+
 	/// To get a random point on a sphere, simply normalize the result.
 	/// \tparam		N		dimensions of ball
 	/// @param[in]	point	an array of size N
 	template <int N, class T>
 	void ball(T * point);
+
+	template <template<int,class> class VecType, int N, class T>
+	void ball(VecType<N,T>& point){ ball<N>(&point[0]); }
 
 	/// Returns standard normal variate
 	float normal(){ float r; normal(r,r); return r; }
@@ -144,10 +147,10 @@ protected:
 /// Linear congruential uniform pseudo-random number generator.
 
 ///	This generator is very fast requiring only a single integer multiply and add
-/// per iteration.  However, the least significant bits of the numbers are less 
-/// random; the most extreme case being the LSB which at best flips between 
+/// per iteration.  However, the least significant bits of the numbers are less
+/// random; the most extreme case being the LSB which at best flips between
 /// 0 and 1. This generator also exhibits poor dimensional distribution,
-/// therefore it is best to have a different generator for each dimension, 
+/// therefore it is best to have a different generator for each dimension,
 /// rather than sharing one.
 class LinCon {
 public:
@@ -172,7 +175,7 @@ public:
 	void seed(uint32_t v){ mVal=v; }
 
 	/// Change the type of equation used.
-	
+
 	/// 0 - Knuth, Numerical Recipes in C\n
 	/// 1 - BCPL
 	void type(int v){
@@ -194,8 +197,8 @@ private:
 
 ///	This generator is faster than LinCon requiring only a single integer
 /// multiply per iteration. However, the downside is that it produces lower
-/// quality (less "random") results than LinCon. Because of this, it is really 
-/// not appropriate for simulations, but due to its speed it is very useful for 
+/// quality (less "random") results than LinCon. Because of this, it is really
+/// not appropriate for simulations, but due to its speed it is very useful for
 /// synthesizing noise for audio and graphics.
 class MulLinCon{
 public:
@@ -204,7 +207,7 @@ public:
 		seed(al::rnd::seed());
 		type(0);
 	}
-	
+
 	/// @param[in] seed	Initial seed value
 	MulLinCon(uint32_t seed)
 	:	mVal(seed)
@@ -225,7 +228,7 @@ public:
 	///
 	void type(int v){
 		switch(v){
-		default: 
+		default:
 		case 0: mMul = 69069; break;
 		}
 	}
@@ -241,8 +244,8 @@ private:
 
 /// This generator produces highly random numbers, but is more expensive than
 /// than a linear congruential RNG.
-/// It is based on the paper 
-/// P. L'Ecuyer, "Maximally Equidistributed Combined Tausworthe Generators", 
+/// It is based on the paper
+/// P. L'Ecuyer, "Maximally Equidistributed Combined Tausworthe Generators",
 /// Mathematics of Computation, 65, 213 (1996), 203--213.
 /// http://www.iro.umontreal.ca/~lecuyer/papers.html
 class Tausworthe{
@@ -253,7 +256,7 @@ public:
 
 	/// @param[in] seed		Initial seed value
 	Tausworthe(uint32_t seed);
-	
+
 
 	/// Generate next uniform random integer in [0, 2^32)
 	uint32_t operator()();
@@ -280,6 +283,9 @@ inline Random<>& global(){ static Random<> r; return r; }
 /// @param[in]	point	an array of size N
 template <int N, class T>
 inline void ball(T * point){ global().ball<N>(point); }
+
+template <template<int,class> class VecType, int N, class T>
+inline void ball(VecType<N,T>& point){ ball<N>(&point[0]); }
 
 /// Returns standard normal variate
 inline float normal(){ return global().normal(); }
@@ -361,8 +367,8 @@ void Random<RNG>::ball(T * point){
 }
 
 // Box-Muller transform
-//		Box, G. and Muller, M. A note on the generation of normal deviates. 
-//		Ann. Math. Slat. 28, (1958). 
+//		Box, G. and Muller, M. A note on the generation of normal deviates.
+//		Ann. Math. Slat. 28, (1958).
 //
 // http://en.wikipedia.org/wiki/Box–Muller_transform
 template <class RNG>

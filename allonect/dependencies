@@ -1,0 +1,14 @@
+# allonect dependencies.
+
+allonect_apt="libfreenect-dev"
+
+allonect_brew="libfreenect"
+# allonect_port=""
+allonect_port_callback(){
+  echo 'Please alert us if a freenect port appears in MacPorts.'
+}
+
+# allonect_pacman=""
+allonect_pacman_callback(){
+  echo 'Please alert us if a freenect port appears in MSYS2 pacman.'
+}

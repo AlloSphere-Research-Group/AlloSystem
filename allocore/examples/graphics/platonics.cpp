@@ -28,7 +28,7 @@ struct MyWindow : Window{
 		gl.clearColor(0,0,0,0);
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		gl.viewport(0,0, width(), height());
-		
+
 		gl.matrixMode(gl.PROJECTION);
 		gl.loadMatrix(Matrix4d::perspective(45, aspect(), 0.1, 100));
 
@@ -37,7 +37,7 @@ struct MyWindow : Window{
 
 		gl.depthTesting(1);
 		gl.blending(0);
-	
+
 		material();
 		light();
 
@@ -45,7 +45,7 @@ struct MyWindow : Window{
 		angle2 += M_PI/3;
 		float angPos = 2*M_PI/5;
 		float R = 3;
-		
+
 		for(int i=0; i<5; ++i){
 			gl.pushMatrix(gl.MODELVIEW);
 				gl.translate(R*cos(i*angPos), R*sin(i*angPos), 0);
@@ -57,7 +57,7 @@ struct MyWindow : Window{
 
 		return true;
 	}
-	
+
 	double angle1, angle2;
 };
 

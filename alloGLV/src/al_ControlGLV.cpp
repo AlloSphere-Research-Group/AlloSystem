@@ -44,9 +44,9 @@ bool GLVWindowControl::onDestroy(){
 	return true;
 }
 
-bool GLVWindowControl::onResize(int dw, int dh){
-	glv().extent(glv().width() + dw, glv().height() + dh);
-	//printf("GLVWindowControl onResize: %d %d %f %f\n", dw, dh, glv().width(), glv().height());
+bool GLVWindowControl::onResize(int w, int h){
+	glv().extent(w, h);
+	//printf("GLVWindowControl onResize: %d %d %f %f\n", w, h, glv().width(), glv().height());
 	glv().broadcastEvent(glv::Event::WindowResize);
 	return true;
 }
@@ -72,14 +72,14 @@ void GLVBinding::bindTo(Window& win){
 
 
 GLVDetachable::GLVDetachable()
-:	glv::GLV(0,0), 
+:	glv::GLV(0,0),
 	mParentWindow(NULL), mInputControl(*this), mWindowControl(*this)
 {
 	init();
 }
 
 GLVDetachable::GLVDetachable(Window& parent)
-:	glv::GLV(0,0), 
+:	glv::GLV(0,0),
 	mInputControl(*this), mWindowControl(*this)
 {
 	parentWindow(parent);

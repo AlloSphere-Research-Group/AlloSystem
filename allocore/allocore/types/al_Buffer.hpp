@@ -3,35 +3,35 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -50,7 +50,7 @@ namespace al{
 /// Buffer
 
 /// This buffer automatically expands itself as new elements are added.
-/// Additionally, its logical size can be reduced without triggering memory 
+/// Additionally, its logical size can be reduced without triggering memory
 /// deallocations.
 template <class T, class Alloc=std::allocator<T> >
 class Buffer : protected Alloc{
@@ -79,7 +79,7 @@ public:
 
 	/// Get element at index
 	T& operator[](int i){ return mElems[i]; }
-	
+
 	/// Get element at index (read-only)
 	const T& operator[](int i) const { return mElems[i]; }
 
@@ -98,19 +98,19 @@ public:
 	void reset(){ mSize=0; }
 
 	/// Resize buffer
-	
-	/// This will set both the size and capacity of the buffer to the requested 
-	/// size. If the number is smaller than the current size the buffer is 
+
+	/// This will set both the size and capacity of the buffer to the requested
+	/// size. If the number is smaller than the current size the buffer is
 	/// truncated, otherwise the buffer is extended and new elements are
 	/// default-constructed.
 	void resize(int n){
 		mElems.resize(n);
 		setSize(n);
 	}
-	
+
 	/// Set size of buffer
-	
-	/// If the requested size is larger than the current capacity, then the 
+
+	/// If the requested size is larger than the current capacity, then the
 	/// buffer will be resized.
 	void size(int n){
 		if(capacity() < n) resize(n);
@@ -119,7 +119,7 @@ public:
 
 	/// Appends element to end of buffer growing its size if necessary
 	void append(const T& v, double growFactor=2){
-	
+
 		// Grow array if too small
 		if(size() >= capacity()){
 			// Copy argument since it may be an element in current memory range
@@ -134,10 +134,10 @@ public:
 		++mSize;
 	}
 	/// synonym for append():
-	void push_back(const T& v, double growFactor=2) { append(v, growFactor); }	
+	void push_back(const T& v, double growFactor=2) { append(v, growFactor); }
 
 	/// Append elements of another Buffer
-	
+
 	/// Note: not safe to apply this to itself
 	///
 	void append(const Buffer<T>& src){
@@ -150,13 +150,13 @@ public:
 		size(size() + len);
 		std::copy(src, src + len, mElems.begin() + oldsize);
 	}
-	
+
 	/// Repeat last element
 	void repeatLast(){ append(last()); }
 
 
 	/// Insert new elements after each existing element
-	
+
 	/// @tparam n		Expansion factor; new size is n times old size
 	/// @tparam dup		If true, new elements are duplicates of existing elements.
 	///					If false, new elements are default constructed.
@@ -190,7 +190,7 @@ public:
 
 	/// Default constructor; does not allocate memory
 	RingBuffer(): mPos(-1), mFill(0){}
-	
+
 	/// @param[in] size		number of elements
 	/// @param[in] v		value to initialize elements to
 	explicit RingBuffer(unsigned size, const T& v=T())
@@ -202,7 +202,7 @@ public:
 
 	/// Get number of elements
 	int size() const { return mElems.size(); }
-	
+
 	/// Get absolute index of most recently written element
 	int pos() const { return mPos; }
 
@@ -212,17 +212,17 @@ public:
 
 	/// Get element at absolute index
 	T& operator[](int i){ return mElems[i]; }
-	
+
 	/// Get element at absolute index (read-only)
 	const T& operator[](int i) const { return mElems[i]; }
 
 
 	/// Obtain next element in buffer
-	
+
 	/// This method returns a reference to the next available element in the
 	/// buffer. This is an alternative to calling write() that does not require
-	/// constructing a new object, but instead returns the oldest element in 
-	/// the buffer. The returned reference should be assumed to be in an unknown 
+	/// constructing a new object, but instead returns the oldest element in
+	/// the buffer. The returned reference should be assumed to be in an unknown
 	/// state, thus should be initialized properly.
 	T& next(){
 		if(mFill < size()) ++mFill;
@@ -242,7 +242,7 @@ public:
 	const T& read(int i) const { return readFrom(pos(), i); }
 
 	/// Get reference to older element relative to some newer element (read-only)
-	
+
 	/// @param[in] from		absolute index the read is relative to
 	/// @param[in] dist		distance into past relative to 'from' of the returned element
 	const T& readFrom(int from, int dist) const {
@@ -263,7 +263,7 @@ public:
 	}
 
 	/// Resize buffer
-	
+
 	/// @param[in] n	number of elements
 	/// @param[in] v	initialization value of newly allocated elements
 	void resize(int n, const T& v=T()){
@@ -304,13 +304,13 @@ public:
 
 	/// Get pointer to elements (read-only)
 	const T * elems() const { return &mElems[0]; }
-	
+
 	/// Get pointer to elements
 	T * elems(){ return &mElems[0]; }
 
 	/// Get reference to element at index
 	T& operator[](int i){ return mElems[i];}
-	
+
 	/// Get reference to element at index (read-only)
 	const T& operator[](int i) const { return mElems[i]; }
 

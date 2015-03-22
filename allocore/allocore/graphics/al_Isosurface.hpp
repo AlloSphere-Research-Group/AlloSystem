@@ -3,61 +3,61 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 	File author(s):
 	Lance Putnam, 2010, putnam.lance@gmail.com
 
-	This file incorporates work covered by the following copyright(s) and  
-	permission notice(s):  
+	This file incorporates work covered by the following copyright(s) and
+	permission notice(s):
 
 		Author: Raghavendra Chandrashekara
 		Email: rc99@doc.ic.ac.uk, rchandrashekara@hotmail.com
 		Last Modified: 5/8/2000
 
-		This work incorporates work covered by the following copyright and  
+		This work incorporates work covered by the following copyright and
 		permission notice:
 
-			Marching Cubes Example Program 
+			Marching Cubes Example Program
 			by Cory Bloyd (corysama@yahoo.com)
-			
+
 			A simple, portable and complete implementation of the Marching Cubes
 			and Marching Tetrahedrons algorithms in a single source file.
-			There are many ways that this code could be made faster, but the 
+			There are many ways that this code could be made faster, but the
 			intent is for the code to be easy to understand.
-			
+
 			For a description of the algorithm go to
 			http://astronomy.swin.edu.au/pbourke/modelling/polygonise/
-			
+
 			This code is public domain.
 */
 
@@ -91,11 +91,11 @@ public:
 		Vec3i corners[2];	// edge corners as offsets from cell coordinates
 		float x, y, z;		// vertex position
 		float mu;			// fraction along edge of vertex
-		
+
 		/// Returns position of edge vertices
 		Vec3i edgePos(int i) const { return pos + corners[i]; }
 	};
-	
+
 	struct EdgeTriangle {
 		int edgeIDs[3];
 	};
@@ -104,11 +104,11 @@ public:
 		virtual ~VertexAction(){}
 		virtual void operator()(const Isosurface::EdgeVertex& v, Isosurface& s) = 0;
 	};
-	
+
 	struct NoVertexAction : public VertexAction{
 		virtual void operator()(const EdgeVertex& v, Isosurface& s){}
 	};
-	
+
 	static NoVertexAction noVertexAction;
 
 
@@ -128,7 +128,7 @@ public:
 	bool validSurface() const { return mValidSurface; }
 
 	/// Gets the length, width, and height of the isosurface volume
-	
+
 	/// \returns true upon success and false if the surface is not valid
 	///
 	bool volumeLengths(double& volLengthX, double& volLengthY, double& volLengthZ) const;
@@ -171,7 +171,7 @@ public:
 
 	/// Begin cell-at-a-time mode
 	void begin();
-	
+
 	/// End cell-at-a-time mode
 	void end();
 
@@ -180,7 +180,7 @@ public:
 
 
 	/// Add a cell from a scalar field
-	
+
 	/// This should be called in between calls to begin() and end().
 	///
 	template <class T>
@@ -207,9 +207,9 @@ public:
 
 
 	/// Generate isosurface from scalar field
-	
+
 	/// The total number of elements in the field is expected to be nX*nY*nZ.
-	/// The field elements are located at the corners of the cuboidal cells used 
+	/// The field elements are located at the corners of the cuboidal cells used
 	/// to generate the surface. Thus, the surface is evaluated on a total of
 	/// (nX-1)*(nY-1)*(nZ-1) cells.
 	template <class T>
@@ -231,14 +231,14 @@ public:
 	/// Set whether isosurface is assumed to fit snugly within a box
 
 	/// Setting this to true will speed up extraction when the isosurface
-	/// is mostly dense and box shaped, i.e., a rectangular cuboid. If the 
+	/// is mostly dense and box shaped, i.e., a rectangular cuboid. If the
 	/// isosurface is to be computed on sparse or irregularly shaped grid, then
 	/// it is recommended to set this to false to save memory.
 	Isosurface& inBox(bool v);
 
 protected:
 
-	struct IsosurfaceHashInt{ 
+	struct IsosurfaceHashInt{
 		size_t operator()(int v) const { return v; }
 	//	size_t operator()(int v) const { return v*2654435761UL; }
 	};
@@ -258,7 +258,7 @@ protected:
 
 	EdgeToVertex mEdgeToVertex;					// map from edge ID to vertex
 	al::Buffer<EdgeTriangle> mEdgeTriangles;	// surface triangles in terms of edge IDs
-	
+
 	std::vector<int> mEdgeToVertexArray;
 //	al::Buffer<int> mTempEdges;
 
@@ -271,10 +271,10 @@ protected:
 	bool mComputeNormals;		// whether to compute normals
 	bool mNormalize;			// whether to normalize normals
 	bool mInBox;
-	
+
 	EdgeVertex calcIntersection(int nX, int nY, int nZ, int nEdgeNo, const float * vals) const;
 	void addEdgeVertex(int x, int y, int z, int cellID, int edge, const float * vals);
-	
+
 	void compressTriangles();
 };
 
@@ -295,13 +295,13 @@ void Isosurface::generate(const T * vals){
 	// iterate through cubes (not field points)
 	//for(int z=0; z < mNF[2]-1; ++z){
 	// support transparency (assumes higher indices are farther away)
-	for(int z=mNF[2]-2; z>=0; --z){	
+	for(int z=mNF[2]-2; z>=0; --z){
 		int z0 = z   *Nxy;
 		int z1 =(z+1)*Nxy;
 		for(int y=0; y < mNF[1]-1; ++y){
 			int y0 = y   *Nx;
 			int y1 =(y+1)*Nx;
-			
+
 			int z0y0 = z0+y0;
 			int z0y1 = z0+y1;
 			int z1y0 = z1+y0;
@@ -311,7 +311,7 @@ void Isosurface::generate(const T * vals){
 			int z0y1_1 = z0y1+1;
 			int z1y0_1 = z1y0+1;
 			int z1y1_1 = z1y1+1;
-			
+
 			for(int x=0; x < mNF[0]-1; ++x){
 
 				float v8[] = {
@@ -327,7 +327,7 @@ void Isosurface::generate(const T * vals){
 			}
 		}
 	}
-	
+
 	end();
 }
 

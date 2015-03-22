@@ -2,15 +2,33 @@
 #include <stdio.h>
 namespace al{
 
-RBO::RBO(Graphics::Format format): mFormat(format){}
+RBO::RBO(Graphics::Format format)
+:	mFormat(format)
+{}
 
-void RBO::onCreate(){ GLuint i; glGenRenderbuffersEXT(1,&i); mID=i; }
-void RBO::onDestroy(){ GLuint i=id(); glDeleteRenderbuffersEXT(1,&i); }
+void RBO::onCreate(){
+	GLuint i;
+	glGenRenderbuffersEXT(1,&i);
+	mID=i;
+}
+
+void RBO::onDestroy(){
+	GLuint i=id();
+	glDeleteRenderbuffersEXT(1,&i);
+}
+
+Graphics::Format RBO::format() const { return mFormat; }
+
+RBO& RBO::format(Graphics::Format v){ mFormat=v; return *this; }
+
+void RBO::bind(){ validate(); bind(id()); }
+
+void RBO::unbind(){ bind(0); }
 
 bool RBO::resize(unsigned w, unsigned h){
-	begin(); 
+	bind();
 	bool r = resize(format(), w, h);
-	end();
+	unbind();
 	return r;
 }
 
@@ -33,25 +51,46 @@ bool RBO::resize(Graphics::Format format, unsigned w, unsigned h){
 
 
 
-void FBO::onCreate(){ GLuint i; glGenFramebuffersEXT(1,&i); mID=i; }
-void FBO::onDestroy(){ GLuint i=id(); glDeleteFramebuffersEXT(1,&i); }
+void FBO::onCreate(){
+	GLuint i;
+	glGenFramebuffersEXT(1,&i);
+	mID=i;
+}
+
+void FBO::onDestroy(){
+	GLuint i=id();
+	glDeleteFramebuffersEXT(1,&i);
+}
 
 FBO& FBO::attachRBO(const RBO& rbo, Attachment att){
-	begin(); renderBuffer(rbo.id(), att); end(); return *this;
+	bind();
+	renderBuffer(rbo.id(), att);
+	unbind();
+	return *this;
 }
 
 FBO& FBO::detachRBO(Attachment att){
-	begin(); renderBuffer(0, att); end(); return *this;
+	bind();
+	renderBuffer(0, att);
+	unbind();
+	return *this;
 }
 
 FBO& FBO::attachTexture2D(unsigned texID, Attachment att, int level){
-	begin(); texture2D(texID, att, level); end(); return *this;
+	bind();
+	texture2D(texID, att, level);
+	unbind();
+	return *this;
 }
 
 FBO& FBO::detachTexture2D(Attachment att, int level){
 	attachTexture2D(0,att,level);
-	return *this;		
+	return *this;
 }
+
+void FBO::bind(){ validate(); bind(id()); }
+
+void FBO::unbind(){ bind(0); }
 
 GLenum FBO::status(){
 	begin();
@@ -78,25 +117,19 @@ const char * FBO::statusString(GLenum stat){
 }
 
 // static functions
-void FBO::bind(unsigned fboID){ 
+void FBO::bind(unsigned fboID){
 	AL_GRAPHICS_ERROR("(before FBO::bind)", fboID);
-	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboID); 
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboID);
 	AL_GRAPHICS_ERROR("binding FBO", fboID);
 }
 
-void FBO::end(){ 		
+void FBO::end(){
 	AL_GRAPHICS_ERROR("(before FBO::end)",-1);
 	bind(0);
 	AL_GRAPHICS_ERROR("unbinding FBO",-1);
 }
 
 void FBO::renderBuffer(unsigned rboID, Attachment att){
-//	GLenum a=0;
-//	switch(f){
-//		case Graphics::DEPTH_COMPONENT: a=GL_DEPTH_ATTACHMENT_EXT; break;
-//		default:;
-//	}
-//	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, a, GL_RENDERBUFFER_EXT, rboID);
 	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, att, GL_RENDERBUFFER_EXT, rboID);
 }
 

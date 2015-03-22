@@ -3,35 +3,35 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -67,7 +67,7 @@ public:
 
 	/// Non-printable keys
 	enum Key{
-		
+
 		// Standard ASCII non-printable characters
 		ENTER		=3,		/**< */
 		BACKSPACE	=8,		/**< */
@@ -75,14 +75,14 @@ public:
 		RETURN		=13,	/**< */
 		ESCAPE		=27,	/**< */
 		DELETE		=127,	/**< */
-			
+
 		// Non-standard, but common keys
-		F1=256, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, 
+		F1=256, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
 		INSERT, LEFT, UP, RIGHT, DOWN, PAGE_DOWN, PAGE_UP, END, HOME
 	};
 
 	Keyboard();
-	
+
 	int key() const;			///< Returns character or code of last key event
 	int keyAsNumber() const;	///< Returns decimal number correlating to key code
 	bool alt() const;			///< Whether an alt key is down
@@ -108,7 +108,7 @@ protected:
 	int	mKeycode;		// last key event key number
 	bool mDown;			// last key event state (pressed or released)
 	bool mModifiers[5];	// Modifier key state array (shift, alt, ctrl, caps, meta)
-	
+
 	void setKey(int k, bool v);
 };
 
@@ -122,9 +122,9 @@ public:
 		RIGHT	= 2,			/**< Right button */
 		EXTRA	= 3				/**< Start of any extra buttons */
 	};
-	
+
 	Mouse();
-	
+
 	int x() const;				///< Get x position relative to top-left corner of window, in pixels
 	int y() const;				///< Get x position relative to top-left corner of window, in pixels
 	int dx() const;				///< Get change in x position, in pixels
@@ -136,7 +136,7 @@ public:
 	bool left() const;			///< Get whether left button is down
 	bool middle() const;		///< Get whether middle button is down
 	bool right() const;			///< Get whether right button is down
-	
+
 protected:
 	friend class WindowImpl;
 
@@ -146,7 +146,7 @@ protected:
 	int mBX[AL_MOUSE_MAX_BUTTONS];	// button down xs
 	int mBY[AL_MOUSE_MAX_BUTTONS];	// button down ys
 	bool mB[AL_MOUSE_MAX_BUTTONS];	// button states
-	
+
 	void button(int b, bool v);
 	void position(int x, int y);
 };
@@ -165,20 +165,20 @@ public:
 
 	/// Called when a keyboard key is pressed
 	virtual bool onKeyDown(const Keyboard& k){return true;}
-	
+
 	/// Called when a keyboard key is released
 	virtual bool onKeyUp(const Keyboard& k){return true;}
 
 
 	/// Called when a mouse button is pressed
 	virtual bool onMouseDown(const Mouse& m){return true;}
-	
+
 	/// Called when the mouse moves while a button is down
 	virtual bool onMouseDrag(const Mouse& m){return true;}
-	
+
 	/// Called when the mouse moves
 	virtual bool onMouseMove(const Mouse& m){return true;}
-	
+
 	/// Called when a mouse button is released
 	virtual bool onMouseUp(const Mouse& m){return true;}
 
@@ -210,16 +210,16 @@ public:
 
 	/// Called after window is created with valid OpenGL context
 	virtual bool onCreate(){ return true; }
-	
+
 	/// Called before the window and its OpenGL context are destroyed
 	virtual bool onDestroy(){ return true; }
-	
+
 	/// Called every frame
 	virtual bool onFrame(){ return true; }
-	
+
 	/// Called whenever window dimensions change
 	virtual bool onResize(int dw, int dh){ return true; }
-	
+
 	/// Called when window changes from hidden to shown and vice versa
 	virtual bool onVisibility(bool v){ return true; }
 
@@ -279,7 +279,7 @@ public:
 		Dim(int w_, int h_): l(0), t(0), w(w_), h(h_){}
 		Dim(int l_, int t_, int w_, int h_): l(l_), t(t_), w(w_), h(h_){}
 		void set(int l_, int t_, int w_, int h_){l=l_;t=t_;w=w_;h=h_;}
-		
+
 		float aspect() const { return (w!=0 && h!=0) ? double(w)/h : 1; }
 		void print() const {printf("Dim: %4d x %4d @ (%4d, %4d)\n", w,h, l,t); }
 	};
@@ -290,7 +290,7 @@ public:
 
 
 	/// Create window and its associated graphics context using current settings
-	
+
 	/// This will create a new window only if the the window has not already
 	/// been created.
 	/// \returns whether a valid window is created
@@ -313,54 +313,54 @@ public:
 		double fps=40,
 		DisplayMode mode = DEFAULT_BUF
 	);
-	
+
 	/// Destroy current window and its associated graphics context
 	void destroy();
 
 	const Keyboard& keyboard() const { return mKeyboard; }	///< Get current keyboard state
 	const Mouse& mouse() const { return mMouse; }			///< Get current mouse state
 
-	double aspect() const { return dimensions().aspect(); }	///< Get aspect ratio (width divided by height)
-	bool created() const;						///< Whether window has been created providing a valid graphics context
-	Cursor cursor() const;						///< Get current cursor type	
-	bool cursorHide() const;					///< Whether the cursor is hidden
-	Dim dimensions() const;						///< Get current dimensions of window
-	DisplayMode displayMode() const;			///< Get current display mode	
-	bool enabled(DisplayMode v) const;			///< Get whether display mode flag is set
-	bool fullScreen() const;					///< Get whether window is in fullscreen
-	double fps() const;							///< Returns frames/second (requested)
-	double fpsActual() const { return 1./spfActual(); }	///< Returns frames/second (actual)
-	double fpsAvg() const;						///< Returns frames/second (running average)						
-	double spf() const { return 1./fps(); }		///< Returns seconds/frame (requested)
-	double spfActual() const;					///< Returns seconds/frame (actual)
-	const std::string& title() const;			///< Get title of window
-	bool visible() const;						///< Get whether window is visible
-	bool vsync() const { return mVSync; }		///< Get whether v-sync is enabled
-	bool asap() const { return mASAP; }			///< Get whether window is rendering as fast as possible
+	double aspect() const;				///< Get aspect ratio (width divided by height)
+	bool created() const;				///< Whether window has been created providing a valid graphics context
+	Cursor cursor() const;				///< Get current cursor type
+	bool cursorHide() const;			///< Whether the cursor is hidden
+	Dim dimensions() const;				///< Get current dimensions of window
+	DisplayMode displayMode() const;	///< Get current display mode
+	bool enabled(DisplayMode v) const;	///< Get whether display mode flag is set
+	bool fullScreen() const;			///< Get whether window is in fullscreen
+	double fps() const;					///< Returns frames/second (requested)
+	double fpsActual() const;			///< Returns frames/second (actual)
+	double fpsAvg() const;				///< Returns frames/second (running average)
+	double spf() const;					///< Returns seconds/frame (requested)
+	double spfActual() const;			///< Returns seconds/frame (actual)
+	const std::string& title() const;	///< Get title of window
+	bool visible() const;				///< Get whether window is visible
+	bool vsync() const;					///< Get whether v-sync is enabled
+	bool asap() const;					///< Get whether window is rendering as fast as possible
 
-	int height() const { return dimensions().h; } ///< Get window height, in pixels
-	int width() const { return dimensions().w; } ///< Get window width, in pixels
+	int height() const { return mDim.h; } ///< Get window height, in pixels
+	int width() const { return mDim.w; } ///< Get window width, in pixels
 
-	Window& cursor(Cursor v);					///< Set cursor type
-	Window& cursorHide(bool v);					///< Set cursor hiding
-	Window& cursorHideToggle();					///< Toggle cursor hiding
-	Window& dimensions(const Dim& v);			///< Set dimensions
-	Window& displayMode(DisplayMode v);			///< Set display mode; will recreate window if different from current
-	Window& fps(double v);						///< Set frames/second
-	
+	Window& cursor(Cursor v);			///< Set cursor type
+	Window& cursorHide(bool v);			///< Set cursor hiding
+	Window& cursorHideToggle();			///< Toggle cursor hiding
+	Window& dimensions(const Dim& v);	///< Set dimensions
+	Window& displayMode(DisplayMode v);	///< Set display mode; will recreate window if different from current
+	Window& fps(double v);				///< Set frames/second
+
 	/// Set fullscreen mode
-	
+
 	/// This will make the window go fullscreen without borders and,
 	/// if posssible, without changing the display resolution.
 	Window& fullScreen(bool on);
 
-	Window& fullScreenToggle();					///< Toggle fullscreen
-	Window& hide();								///< Hide window (if showing)
-	Window& iconify();							///< Iconify window
-	Window& show();								///< Show window (if hidden)
-	Window& title(const std::string& v);		///< Set title
-	Window& vsync(bool v);						///< Set whether to sync the frame rate to the monitor's refresh rate 
-	Window& asap(bool v){ mASAP=v; return *this; }	///< Set whether window renders as fast as possible
+	Window& fullScreenToggle();			///< Toggle fullscreen
+	Window& hide();						///< Hide window (if showing)
+	Window& iconify();					///< Iconify window
+	Window& show();						///< Show window (if hidden)
+	Window& title(const std::string& v); ///< Set title
+	Window& vsync(bool v);				///< Set whether to sync the frame rate to the monitor's refresh rate
+	Window& asap(bool v);				///< Set whether window renders as fast as possible
 
 
 	const InputEventHandlers& inputEventHandlers() const {
@@ -371,13 +371,13 @@ public:
 
 
 	/// Append handler to input event handler list
-	
+
 	/// The order of handlers in the list matches their calling order.
 	///
 	Window& append(InputEventHandler& v);
 
 	/// Append handler to window event handler list
-	
+
 	/// The order of handlers in the list matches their calling order.
 	///
 	Window& append(WindowEventHandler& v);
@@ -401,14 +401,6 @@ public:
 	Window& remove(WindowEventHandler& v);
 
 
-	/// DEPRECATED, do not use!
-	Window& add(InputEventHandler * v){ return append(*v); }
-	Window& add(WindowEventHandler * v){ return append(*v); }
-	Window& prepend(InputEventHandler * v){ return prepend(*v); }
-	Window& prepend(WindowEventHandler * v){ return prepend(*v); }
-	Window& remove(InputEventHandler * v){ return remove(*v); }
-	Window& remove(WindowEventHandler * v){ return remove(*v); }
-
 	/// Destroy all created windows
 	static void destroyAll();
 
@@ -416,8 +408,7 @@ public:
 	static void stopLoop();
 	static bool started();
 
-	// DEPRECATED:
-	double avgFps() const { return fpsAvg(); }
+	void updateFrameTime();
 
 protected:
 	friend class WindowImpl;
@@ -427,19 +418,35 @@ protected:
 	Mouse mMouse;
 	InputEventHandlers mInputEventHandlers;
 	WindowEventHandlers mWindowEventHandlers;
+	Dim mDim;
 	DisplayMode mDisplayMode;
+	std::string mTitle;
+	Cursor mCursor;
+	double mFPS; // requested FPS
+	double mFPSAvg; // average of actual FPS
+	double mFrameTime;
+	double mDeltaTime;
 	bool mASAP;
+	bool mCursorHide;
+	bool mFullScreen;
+	bool mVisible;
 	bool mVSync;
 
-	// defined in pimpl-specific file
+	// Must be defined in pimpl-specific file
 	void implCtor();
 	void implDtor();
+	bool implCreate();
 	void implDestroy();
-	void implOnFrame(); // Calls onFrame() and swaps buffers
+	void implSetCursor();
+	void implSetCursorHide();
+	void implSetDimensions();
+	void implSetFPS();
+	void implSetFullScreen();
+	void implSetTitle();
+	void implSetVSync();
 
-	bool makeCurrent() const;
 	Window& insert(InputEventHandler& v, int i);
-	Window& insert(WindowEventHandler& v, int i);		
+	Window& insert(WindowEventHandler& v, int i);
 
 	#define CALL(e)	{\
 		InputEventHandlers::iterator it = mInputEventHandlers.begin(); \
@@ -449,15 +456,15 @@ protected:
 			++it; \
 		}\
 	}
-	
-	void callHandlersOnMouseDown(const Mouse& m){ CALL(onMouseDown(m)); }
-	void callHandlersOnMouseDrag(const Mouse& m){ CALL(onMouseDrag(m)); }
-	void callHandlersOnMouseMove(const Mouse& m){ CALL(onMouseMove(m)); }
-	void callHandlersOnMouseUp(const Mouse& m){ CALL(onMouseUp(m)); }
-	void callHandlersOnKeyDown(const Keyboard& k){ CALL(onKeyDown(k)); }
-	void callHandlersOnKeyUp(const Keyboard& k){ CALL(onKeyUp(k)); }
+
+	void callHandlersOnMouseDown(){ CALL(onMouseDown(mMouse)); }
+	void callHandlersOnMouseDrag(){ CALL(onMouseDrag(mMouse)); }
+	void callHandlersOnMouseMove(){ CALL(onMouseMove(mMouse)); }
+	void callHandlersOnMouseUp(){ CALL(onMouseUp(mMouse)); }
+	void callHandlersOnKeyDown(){ CALL(onKeyDown(mKeyboard)); }
+	void callHandlersOnKeyUp(){ CALL(onKeyUp(mKeyboard)); }
 	#undef CALL
-	
+
 	#define CALL(e)	{\
 		WindowEventHandlers::iterator it = mWindowEventHandlers.begin(); \
 		bool active = true; \
@@ -466,17 +473,29 @@ protected:
 			++it; \
 		}\
 	}
-	
+
 	void callHandlersOnFrame() { CALL(onFrame()); }
 	void callHandlersOnCreate(){ CALL(onCreate()); }
 	void callHandlersOnDestroy(){
-		CALL(onDestroy()); 
-		contextDestroy(); 
-	}				
-	void callHandlersOnResize(int w, int h){ CALL(onResize(w, h)); }	
+		CALL(onDestroy());
+		contextDestroy();
+	}
+	void callHandlersOnResize(int w, int h){ CALL(onResize(w, h)); }
 	void callHandlersOnVisibility(bool v){ CALL(onVisibility(v)); }
 	#undef CALL
+
+public:
+	// DEPRECATED, do not use!
+	Window& add(InputEventHandler * v){ return append(*v); }
+	Window& add(WindowEventHandler * v){ return append(*v); }
+	Window& prepend(InputEventHandler * v){ return prepend(*v); }
+	Window& prepend(WindowEventHandler * v){ return prepend(*v); }
+	Window& remove(InputEventHandler * v){ return remove(*v); }
+	Window& remove(WindowEventHandler * v){ return remove(*v); }
+	double avgFps() const { return fpsAvg(); }
 };
+
+
 
 inline Window::DisplayMode
 operator| (const Window::DisplayMode& a, const Window::DisplayMode& b){ return Window::DisplayMode(+a | +b); }

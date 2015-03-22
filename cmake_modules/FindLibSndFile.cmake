@@ -37,6 +37,11 @@
 #  For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 #
 
+include(LibFindMacros)
+
+# Use pkg-config to get hints about paths
+libfind_pkg_check_modules(LIBSNDFILE_PKGCONF libsndfile)
+
 if (SNDFILE_LIBRARIES AND SNDFILE_INCLUDE_DIRS)
   # in cache already
   set(SNDFILE_FOUND TRUE)
@@ -46,10 +51,12 @@ else (SNDFILE_LIBRARIES AND SNDFILE_INCLUDE_DIRS)
     NAMES
       sndfile.h
     PATHS
+      ${LIBSNDFILE_PKGCONF_INCLUDE_DIRS}
       /usr/include
       /usr/local/include
       /opt/local/include
       /sw/include
+      /mingw64/include
   )
 
   find_library(SNDFILE_LIBRARY
@@ -57,10 +64,12 @@ else (SNDFILE_LIBRARIES AND SNDFILE_INCLUDE_DIRS)
       sndfile
       libsndfile
     PATHS
+      ${LIBSNDFILE_PKGCONF_LIBRARY_DIRS}
       /usr/lib
       /usr/local/lib
       /opt/local/lib
       /sw/lib
+      /mingw64/lib/
   )
 
   set(SNDFILE_INCLUDE_DIRS

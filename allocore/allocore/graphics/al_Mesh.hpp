@@ -3,35 +3,35 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -75,12 +75,12 @@ public:
 	typedef Buffer<TexCoord2>	TexCoord2s;
 	typedef Buffer<TexCoord3>	TexCoord3s;
 	typedef Buffer<Index>		Indices;
-	
+
 
 	/// @param[in] primitive	renderer-dependent primitive number
 	Mesh(int primitive=0): mPrimitive(primitive){}
-	
-	Mesh(const Mesh& cpy) : 
+
+	Mesh(const Mesh& cpy) :
 		mVertices(cpy.mVertices),
 		mNormals(cpy.mNormals),
 		mColors(cpy.mColors),
@@ -93,7 +93,7 @@ public:
 
 
 	/// Get corners of bounding box of vertices
-	
+
 	/// @param[out] min		minimum corner of bounding box
 	/// @param[out] max		maximum corner of bounding box
 	void getBounds(Vec3f& min, Vec3f& max) const;
@@ -108,11 +108,11 @@ public:
 	void decompress();
 
 	/// Extend buffers to match number of vertices
-	
+
 	/// This will resize all populated buffers to match the size of the vertex
 	/// buffer. Buffers are extended by copying their last element.
 	void equalizeBuffers();
-	
+
 	/// Append buffers from another mesh:
 	void merge(const Mesh& src);
 
@@ -131,15 +131,15 @@ public:
 
 	/// Translate all vertices
 	Mesh& translate(float x, float y, float z);
-	
+
 	template <class T>
 	Mesh& translate(const Vec<3,T>& v){ return translate(v[0],v[1],v[2]); }
-	
+
 	/// Transform vertices by projective transform matrix
-	
+
 	/// @param[in] m		projective transform matrix
 	/// @param[in] begin	beginning index of vertices
-	/// @param[in] end		ending index of vertices, negative amounts specify 
+	/// @param[in] end		ending index of vertices, negative amounts specify
 	///						distance from one past last element
 	template <class T>
 	Mesh& transform(const Mat<4,T>& m, int begin=0, int end=-1);
@@ -148,7 +148,7 @@ public:
 	void compress();
 
 	/// Generates normals for a set of vertices
-	
+
 	/// This method will generate a normal for each vertex in the buffer
 	/// assuming the drawing primitive is either triangles or a triangle strip.
 	/// Averaged vertex normals are generated if indices are present and, for
@@ -160,20 +160,20 @@ public:
 	///									face normals rather than a weighting
 	///									based on face areas
 	void generateNormals(bool normalize=true, bool equalWeightPerFace=false);
-	
+
 	/// Invert direction of normals
 	void invertNormals();
-	
+
 	/// Creates a mesh filled with lines for each normal of the source
-	
+
 	/// @param[out] mesh		normal lines
 	/// @param[in]  length		length of normals
-	/// @param[in]  perFace		whether normals line should be generated per 
+	/// @param[in]  perFace		whether normals line should be generated per
 	///							face rather than per vertex
 	void createNormalsMesh(Mesh& mesh, float length=0.1, bool perFace=false);
 
 	/// Ribbonize curve
-	
+
 	/// This creates a two-dimensional ribbon from a one-dimensional space curve.
 	/// The result is to be rendered with a triangle strip.
 	/// @param[in] width			Width of ribbon
@@ -190,7 +190,7 @@ public:
 	/// @param[in] widths			Array specifying width of ribbon at each point along curve
 	/// @param[in] widthsStride		Stride factor of width array
 	/// @param[in] faceBinormal		If true, surface faces binormal vector of curve.
-	///								If false, surface faces normal vector of curve.	
+	///								If false, surface faces normal vector of curve.
 	void ribbonize(float * widths, int widthsStride=1, bool faceBinormal=false);
 
 
@@ -206,14 +206,14 @@ public:
 
 	/// Set geometric primitive
 	Mesh& primitive(int prim){ mPrimitive=prim; return *this; }
-	
+
 	/// Repeat last vertex element(s)
 	Mesh& repeatLast();
 
 	/// Append index to index buffer
 	void index(unsigned int i){ indices().append(i); }
 
-	/// Append indices to index buffer	
+	/// Append indices to index buffer
 	template <class Tindex>
 	void index(const Tindex * buf, int size, Tindex indexOffset=0){
 		for(int i=0; i<size; ++i) index((Index)(buf[i] + indexOffset)); }
@@ -233,7 +233,7 @@ public:
 
 	/// Append color to color buffer
 	void color(float r, float g, float b, float a=1){ color(Color(r,g,b,a)); }
-	
+
 	/// Append color to color buffer
 	template <class T>
 	void color(const Vec<4,T>& v) { color(v[0], v[1], v[2], v[3]); }
@@ -244,7 +244,7 @@ public:
 
 	/// Append normal to normal buffer
 	void normal(float x, float y, float z=0){ normal(Normal(x,y,z)); }
-	
+
 	/// Append normal to normal buffer
 	void normal(const Normal& v) { normals().append(v); }
 
@@ -255,23 +255,23 @@ public:
 
 	/// Append texture coordinate to 2D texture coordinate buffer
 	void texCoord(float u, float v){ texCoord(TexCoord2(u,v)); }
-	
+
 	/// Append texture coordinate to 2D texture coordinate buffer
 	void texCoord(const TexCoord2& v){ texCoord2s().append(v); }
 
 	/// Append texture coordinate to 3D texture coordinate buffer
 	void texCoord(float u, float v, float w){ texCoord(TexCoord3(u,v,w)); }
-	
+
 	/// Append texture coordinate to 3D texture coordinate buffer
 	void texCoord(const TexCoord3& v){ texCoord3s().append(v); }
 
 
 	/// Append vertex to vertex buffer
 	void vertex(float x, float y, float z=0){ vertex(Vertex(x,y,z)); }
-	
+
 	/// Append vertex to vertex buffer
 	void vertex(const Vertex& v){ vertices().append(v); }
-	
+
 	/// Append vertex to vertex buffer
 	template <class T>
 	void vertex(const Vec<2,T>& v, float z=0){ vertex(v[0], v[1], z); }
@@ -331,7 +331,7 @@ protected:
 	TexCoord2s mTexCoord2s;
 	TexCoord3s mTexCoord3s;
 	Indices mIndices;
-	
+
 	int mPrimitive;
 };
 

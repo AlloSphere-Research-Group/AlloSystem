@@ -36,7 +36,7 @@ FileInfo::Type fromAPRFileType(int aprEnum){
 struct File::Impl : public ImplAPR {
 public:
 	mutable apr_finfo_t finfo;
-	
+
 	Impl() : ImplAPR() {}
 	virtual ~Impl() {}
 
@@ -47,12 +47,12 @@ public:
 
 
 File::File(const std::string& path, const std::string& mode, bool open_)
-:	mImpl(new Impl()), 
+:	mImpl(new Impl()),
 	mPath(path), mMode(mode), mContent(0), mSizeBytes(0), mFP(0)
 {	if(open_) open(); }
 
 File::File(const FilePath& path, const std::string& mode, bool open_)
-:	mImpl(new Impl()), 
+:	mImpl(new Impl()),
 	mPath(path.filepath()), mMode(mode), mContent(0), mSizeBytes(0), mFP(0)
 {	if(open_) open(); }
 
@@ -101,22 +101,22 @@ size_t File :: storage() const {
 struct Dir::Impl : public ImplAPR{
 	apr_finfo_t finfo;
 	apr_dir_t * dir;
-	
+
 	Impl(): dir(NULL){}
 
 	Impl(const std::string& dirName): dir(NULL){
 		open(dirName);
 	}
-	
+
 	virtual ~Impl(){
 		close();
 	}
-	
+
 	bool open(const std::string& dirName){
-		return APR_SUCCESS == 
+		return APR_SUCCESS ==
 			check_apr(apr_dir_open(&dir, dirName.c_str(), mPool));
 	}
-	
+
 	bool close(){
 		if(dir != NULL){
 			return APR_SUCCESS == check_apr(apr_dir_close(dir));
@@ -127,7 +127,7 @@ struct Dir::Impl : public ImplAPR{
 	bool read(FileInfo& entryInfo){
 		// Calling check_apr frequently prints out "No such file or directory"
 		// messages, so disabling for now...
-		if(APR_SUCCESS == 
+		if(APR_SUCCESS ==
 			/*check_apr*/(apr_dir_read(&finfo, APR_FINFO_TYPE | APR_FINFO_NAME, dir)))
 		{
 			entryInfo.type(fromAPRFileType(finfo.filetype));
@@ -210,18 +210,18 @@ public:
 	apr_dir_t * dir;
 	apr_finfo_t dirent;
 	std::string dirname;
-	
+
 	Path(const std::string& dirname) : ImplAPR(), dir(NULL), dirname(dirname) {
 		if (APR_SUCCESS != check_apr(apr_dir_open(&dir, dirname.c_str(), mPool))) {
 			//printf("dir %p\n", dir);
 			dir=NULL;
 		}
 	}
-	
+
 	virtual ~Path() {
 		if (dir != NULL) check_apr(apr_dir_close(dir));
 	}
-	
+
 	bool find(const std::string& name, FilePath& result, bool recursive=true) {
 		bool found = false;
 		if (dir && APR_SUCCESS == check_apr(apr_dir_open(&dir, dirname.c_str(), mPool))) {

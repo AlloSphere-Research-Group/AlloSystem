@@ -88,7 +88,10 @@ void WindowEventHandler::removeFromWindow(){
 
 
 Window::Window()
-:	mDisplayMode(DEFAULT_BUF), mASAP(false), mVSync(true)
+:	mDim(0,0,0,0), mDisplayMode(DEFAULT_BUF), mCursor(POINTER),
+	mFPSAvg(0), mFrameTime(0), mDeltaTime(0),
+	mASAP(false), mCursorHide(false), mFullScreen(false),
+	mVisible(false), mVSync(true)
 {
 	implCtor(); // must call first!
 	dimensions(Dim(800,600));
@@ -102,6 +105,24 @@ Window::~Window(){
 	implDtor();
 }
 
+bool Window::create(
+	const Dim& dim, const std::string& title, double fps, DisplayMode mode
+){
+	if(!created()){
+		mDim = dim;
+		mTitle = title;
+		mFPS = fps;
+		mDisplayMode = mode;
+		mFrameTime = al_time();
+
+		if(implCreate()){
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void Window::destroy(){
 	if(created()){
 		callHandlersOnDestroy();
@@ -109,51 +130,167 @@ void Window::destroy(){
 	}
 }
 
-//void Window::init(){
-//	// Window has its own built-in handlers (which may be overridden in subclasses)
-//	// they are added explicitly here so that the order of handlers can be user controled
-//	append(inputEventHandler());
-//	append(windowEventHandler());
-//	mDisplayMode = DEFAULT_BUF;
-//	mASAP = false;
-//}
+bool Window::asap() const {
+	return mASAP;
+}
+
+Window& Window::asap(bool v){
+	mASAP=v;
+	return *this;
+}
+
+double Window::aspect() const {
+	return dimensions().aspect();
+}
 
 Window& Window::cursorHideToggle(){
 	cursorHide(!cursorHide());
 	return *this;
 }
 
-Window::DisplayMode Window::displayMode() const { return mDisplayMode; }
+Window::Cursor Window::cursor() const {
+	return mCursor;
+}
+
+Window& Window::cursor(Cursor v){
+	mCursor = v;
+	if(created()) implSetCursor();
+	return *this;
+}
+
+bool Window::cursorHide() const {
+	return mCursorHide;
+}
+
+Window& Window::cursorHide(bool v){
+	mCursorHide = v;
+	if(created()) implSetCursorHide();
+	return *this;
+}
+
+Window::Dim Window::dimensions() const {
+	return mDim;
+}
+
+Window& Window::dimensions(const Dim& v){
+	mDim = v;
+	if(created()) implSetDimensions();
+	return *this;
+}
+
+Window::DisplayMode Window::displayMode() const {
+	return mDisplayMode;
+}
 
 Window& Window::displayMode(DisplayMode v){
-	if(created()){
-		const Cursor cursor_ = cursor();
-		const bool cursorHide_ = cursorHide();
-		const Dim dim_ = dimensions();
-		const bool fullScreen_ = fullScreen();
-		const double fps_ = fps();
-		const std::string& title_ = title();
+	if(mDisplayMode != v){
+		if(created()){
+			const Cursor cursor_ = cursor();
+			const bool cursorHide_ = cursorHide();
+			const Dim dim_ = dimensions();
+			const bool fullScreen_ = fullScreen();
+			const double fps_ = fps();
+			const std::string& title_ = title();
 
-		destroy();
-		create(dim_, title_, fps_, v);
-		cursor(cursor_);
-		cursorHide(cursorHide_);
-		fullScreen(fullScreen_);
-	}
-	else{
-		mDisplayMode = v;
+			destroy();
+			create(dim_, title_, fps_, v);
+			cursor(cursor_);
+			cursorHide(cursorHide_);
+			fullScreen(fullScreen_);
+		}
+		else{
+			mDisplayMode = v;
+		}
 	}
 	return *this;
 }
 
-bool Window::enabled(DisplayMode v) const { return mDisplayMode & v; }
+double Window::fps() const {
+	return mFPS;
+}
+
+Window& Window::fps(double v){
+	if(v != mFPS && v > 0){
+		mFPS = v;
+		if(created()) implSetFPS();
+	}
+	return *this;
+}
+
+double Window::fpsActual() const {
+	return 1./spfActual();
+}
+
+double Window::fpsAvg() const {
+	return mFPSAvg;
+}
+
+bool Window::fullScreen() const {
+	return mFullScreen;
+}
+
+Window& Window::fullScreen(bool v){
+	if(v != mFullScreen){
+		mFullScreen = v;
+		if(created()) implSetFullScreen();
+	}
+	return *this;
+}
 
 Window& Window::fullScreenToggle(){
 	fullScreen(!fullScreen());
 	return *this;
 }
 
+const std::string& Window::title() const {
+	return mTitle;
+}
+
+Window& Window::title(const std::string& v){
+	mTitle = v;
+	if(created()) implSetTitle();
+	return *this;
+}
+
+double Window::spf() const {
+	return 1./fps();
+}
+
+double Window::spfActual() const {
+	return mDeltaTime;
+}
+
 //double Window::spfActual() const { return Main::get().intervalActual(); }
+
+bool Window::visible() const {
+	return mVisible;
+}
+
+bool Window::vsync() const {
+	return mVSync;
+}
+
+Window& Window::vsync(bool v){
+	mVSync = v;
+	if(created()) implSetVSync();
+	return *this;
+}
+
+
+bool Window::enabled(DisplayMode v) const {
+	return mDisplayMode & v;
+}
+
+
+void Window::updateFrameTime(){
+	double timeNow = al_time();
+	mDeltaTime = timeNow - mFrameTime;
+	mFrameTime = timeNow;
+
+	// Average frame-rate calculation:
+	double fpsCurr = 1./mDeltaTime;
+	mFPSAvg += 0.3 * (fpsCurr - mFPSAvg);
+}
 
 
 Window& Window::insert(InputEventHandler& v, int i){
@@ -170,7 +307,7 @@ Window& Window::insert(WindowEventHandler& v, int i){
 	if(std::find(H.begin(), H.end(), &v) == H.end()){
 		v.removeFromWindow();
 		H.insert(H.begin()+i, &(v.window(this)));
-		
+
 		// notify new handler of changes if the window already is created
 		// otherwise, the window will call the proper handlers when created
 		if(created()){
@@ -218,7 +355,7 @@ Window& Window::remove(WindowEventHandler& v){
 
 		//printf("removed window event handler (%p) from window (%p)\n", &v, this);
 		//assert(std::find(H.begin(), H.end(), &v) == H.end());
-		
+
 		if(started()){
 			v.onResize(-width(), -height());
 			//printf("WindowEventHandler %p onResize(%d, %d)\n", &v, width(), height());

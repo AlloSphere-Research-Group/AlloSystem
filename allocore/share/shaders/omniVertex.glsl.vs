@@ -29,7 +29,7 @@ float PI_OVER_360 = PI / 360.;
 
 	Maybe that is the way to simply bypass projection matrix altogether.
 
-	Try cylindrical first. The output clip coordinate 
+	Try cylindrical first. The output clip coordinate
 */
 
 void main()
@@ -52,7 +52,7 @@ void main()
 	ux = vec3(modelview[0][0], modelview[0][1], modelview[0][2]);
 	uy = vec3(modelview[1][0], modelview[1][1], modelview[1][2]);
 	uz = vec3(modelview[2][0], modelview[2][1], modelview[2][2]);
-*/	
+*/
 	// weird coordinate transform for ShaderBuilder:
 	ux = vec3(-modelview[0][0], modelview[0][2], modelview[0][1]);
 	uy = vec3(-modelview[1][0], modelview[1][2], modelview[1][1]);
@@ -73,12 +73,12 @@ void main()
 	float rot = 2.*PI * (osc-0.5);
 
 	// rotate the model to face it:
-	float C = cos(rot); 
+	float C = cos(rot);
 	float S = sin(rot);
-	modelview = mat4(	
-		C,  0,  -S, 0, 
-		0,  1,  0,  0, 
-		S,  0,  C,  0, 
+	modelview = mat4(
+		C,  0,  -S, 0,
+		0,  1,  0,  0,
+		S,  0,  C,  0,
 		0,  0,  0,  1
 	) * modelview;
 
@@ -89,11 +89,11 @@ void main()
 	float bottom = -top;
 	float left = -aspect*top;// + shift;
 	float right = aspect*top;// + shift;
-	float W = right-left;	
+	float W = right-left;
 	float W2 = right+left;
-	float H = top-bottom;	
+	float H = top-bottom;
 	float H2 = top+bottom;
-	float D = zfar-znear;	
+	float D = zfar-znear;
 	float D2 = zfar+znear;
 	float n2 = znear*2.;
 	float fn2 = zfar*n2;
@@ -107,13 +107,13 @@ void main()
 /*
 	vec4 clip = projection * ecVertex;
 	vec4 eye3 = ecVertex / ecVertex.w;
-	
+
 	float radius = 50.0;  // fisheye hemisphere radius
 	vec4 pn = eye3;
 	float d = length(pn);
 	pn = normalize(pn);
-	d = d / radius;	    
-	float u = atan(pn.y,pn.x);  
+	d = d / radius;
+	float u = atan(pn.y,pn.x);
 	float v = 2.0 * acos(-pn.z) / 3.141529265358979;
 
 		// change polar to cartesian coordinates on circle (with depth)
@@ -124,18 +124,18 @@ void main()
 */
 /*
 	// equiv. glOrtho:
-	projection = mat4(	
+	projection = mat4(
 		2./W,	0,		0,		-W2/W,
 		0,		2./H,	0,		-H2/H,
 		0,		0,		-2./D,	-D2/D,
-		0,		0,		0,		1.	
+		0,		0,		0,		1.
 	);
 
-	projection = mat4(	
+	projection = mat4(
 		2./W,	0,		0,		0,
 		0,		2./H,	0,		0,
 		0,		0,		-2./D,	0,
-		-W2/W,	-H2/H,	-D2/D,	1.	
+		-W2/W,	-H2/H,	-D2/D,	1.
 	);
 */
 	//projection = gl_ProjectionMatrix;
@@ -147,40 +147,40 @@ void main()
 	vec4 ecv = modelview * vertex;
 
 	// get polar coordinates:
-	float azimuth = atan(ecv.x, -ecv.z); 
+	float azimuth = atan(ecv.x, -ecv.z);
 	float elevation = atan(ecv.y, length(ecv.xz));
 
 	// standard perspective projection:
 	//gl_Position = projection * modelview * vertex;
-	gl_Position.x = ecv.x*n2/W;	
-	gl_Position.y = ecv.y*n2/H;	
+	gl_Position.x = ecv.x*n2/W;
+	gl_Position.y = ecv.y*n2/H;
 	gl_Position.z = ecv.z*-D2/D + ecv.w*-fn2/D;
 	gl_Position.w = ecv.z*-1.;
 /*
 	// ortho projection:
-	gl_Position.x = ecv.x*2./W;	
-	gl_Position.y = ecv.y*2./H;	
+	gl_Position.x = ecv.x*2./W;
+	gl_Position.y = ecv.y*2./H;
 	gl_Position.z = ecv.z*-2./D;
 	gl_Position.w = ecv.x*-W2/W + ecv.y*-H2/H + ecv.z*-1. + ecv.w;
-*/	
+*/
 	float ofovx = fov * PI/180.;
 	float ofovy = ofovx;
-	
+
 	// map azimuth/elevation to the XY clipspace
-	gl_Position.x = azimuth/PI; 
-	gl_Position.y = elevation/PI; 
-	
+	gl_Position.x = azimuth/PI;
+	gl_Position.y = elevation/PI;
+
 	// map (adjusted) depth z to clip space:
 	gl_Position.z = (length(ecv)-znear)/(zfar-znear);
 	gl_Position.w = 1.;
-	
+
 /*
-	
+
 */
-	/* 
-		idea: convert entire world space (ecv coordinate) 
+	/*
+		idea: convert entire world space (ecv coordinate)
 		into a space that fits into the frustum
-		
+
 		try cylindrical space first:
 		move x,z coordinates into a cylindrical section.
 
@@ -201,14 +201,14 @@ void main()
 	ecv.z = rxz*sin(a);
 */
 /*
-	float rxy = length( ecv.xy ); 
-	if( rxy != 0.0 ) { 
+	float rxy = length( ecv.xy );
+	if( rxy != 0.0 ) {
        	float phi = atan( rxy, -pos.z );
        	float lens_radius = sin(phi);//phi / (PI/2.);
- 
-      	ecv.xy *= ( lens_radius / rxy ); 
-	} 
-*/	
+
+      	ecv.xy *= ( lens_radius / rxy );
+	}
+*/
 
 	//gl_Position = gl_ProjectionMatrix * ecv;
 	//gl_Position = vec4(ecv.x, osc, 0., ecv.w); //modelview * vertex;

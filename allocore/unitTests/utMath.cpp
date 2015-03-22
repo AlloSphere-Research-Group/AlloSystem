@@ -11,7 +11,7 @@ inline bool eq(const T* x, const T* y, int n, T eps=0.0000001){
 	for(int i=0; i<n; ++i){
 		if(!eq(x[i], y[i], eps)) return false;
 	}
-	return true; 
+	return true;
 }
 
 template <class T>
@@ -63,15 +63,15 @@ int utMath(){
 
 		char c1[] = {4,4,4,4};
 		a.set(c1);				assert(a == 4);
-		
+
 		char c2[] = {1,0,1,0,1,0,1,0};
 		a.set(c2,2);			assert(a == 1);
-		
+
 		a.zero();
 		a.set(Vec<N-1,int>(1,2,3), 4);
 								assert(a[0] == 1 && a[1] == 2 && a[2] == 3 && a[3] == 4);
 		}
-		
+
 		a.zero();				assert(a == 0);
 
 		a = 1;					assert(a == 1);
@@ -84,7 +84,7 @@ int utMath(){
 		a += b;					assert(a == 3);
 		a -= 3;					assert(a == 0);
 		a += 3;					assert(a == 3);
-		
+
 		a *= b;					assert(a == 9);
 		a /= b;					assert(a == 3);
 		a *= 3;					assert(a == 9);
@@ -116,14 +116,14 @@ int utMath(){
 		assert(b.magSqr() == N);
 		assert(a.norm1() == N);
 		assert(a.norm2() == sqrt(N));
-			
+
 		a.set(1).negate();		assert(a == -1);
 		a.set(1).normalize();	assert(a == 1./sqrt(N));
 		assert(a == b.set(10).normalized());
-		
+
 		b = a = 1;
 		assert(concat(a,b) == 1);
-		
+
 		// conversion
 		{
 		a = 0;
@@ -135,7 +135,7 @@ int utMath(){
 		assert(a.get(0,1) == Vec2d(0,1));
 		assert(a.get(2,2) == Vec2d(2,2));
 		assert(a.get(2,1,0) == Vec3d(2,1,0));
-		
+
 		{
 		for(int i=0; i<a.size(); ++i) a[i]=i;
 
@@ -143,35 +143,35 @@ int utMath(){
 		t = a.sub<2>();			assert(t[0] == 0 && t[1] == 1);
 		t = a.sub<2>(2);		assert(t[0] == 2 && t[1] == 3);
 		}
-		
+
 		assert(eq(angle(Vec3d(1,0,0), Vec3d(1, 0, 0)), 0.));
 		assert(eq(angle(Vec3d(1,0,0), Vec3d(0, 1, 0)), M_PI_2));
 		assert(eq(angle(Vec3d(1,0,0), Vec3d(0,-1, 0)), M_PI_2));
-		
+
 		{
 		Vec3d r;
 		centroid3(r, Vec3d(1,0,0), Vec3d(0,1,0), Vec3d(0,0,1));
 		assert(eq(r, Vec3d(1/3.)));
-		
+
 		normal(r, Vec3d(1,0,0), Vec3d(0,1,0), Vec3d(-1,0,0));
 		assert(eq(r, Vec3d(0,0,1)));
-		
+
 		Vec3d pos(1,2,3);
 		Vec3d to(4,5,6);
 		Vec3d rel = to - pos;
-		
+
 		assert(rel[0]==3 && rel[1]==3 && rel[2]==3);
-		
+
 		}
-		
+
 		a = 0;
 		b = 1;
 		assert(min(a,b) == 0);
 		assert(max(a,b) == 1);
-		
+
 	}
-	
-	
+
+
 	// Vec3
 	{
 		Vec3d a, b, c;
@@ -185,31 +185,31 @@ int utMath(){
 		a = b;
 			assert(a == b);
 	}
-	
-	
+
+
 	// Mat
 	{
 		Mat3d a;//, b;
-		
+
 		//a(0,1) = a(1,0);
 		#define CHECK(m, a,b,c, d,e,f, g,h,i)\
 		assert(m(0,0)==a); assert(m(0,1)==b); assert(m(0,2)==c);\
 		assert(m(1,0)==d); assert(m(1,1)==e); assert(m(1,2)==f);\
 		assert(m(2,0)==g); assert(m(2,1)==h); assert(m(2,2)==i)
-		
+
 		a.setIdentity();	CHECK(a, 1,0,0, 0,1,0, 0,0,1);
 		a.set(0);
 		a = a.identity();	CHECK(a, 1,0,0, 0,1,0, 0,0,1);
 
 
-		
+
 		assert(a.trace() == 3);
-		
+
 		a += 2;		CHECK(a, 3,2,2, 2,3,2, 2,2,3);
 		a -= 1;		CHECK(a, 2,1,1, 1,2,1, 1,1,2);
 		a *= 2;		CHECK(a, 4,2,2, 2,4,2, 2,2,4);
 		a /= 2;		CHECK(a, 2,1,1, 1,2,1, 1,1,2);
-		
+
 		a.setIdentity();
 		a = a+2;	CHECK(a, 3,2,2, 2,3,2, 2,2,3);
 		a = a-1;	CHECK(a, 2,1,1, 1,2,1, 1,1,2);
@@ -301,12 +301,12 @@ int utMath(){
 		Quatd q(0,0,0,0);
 
 		assert(q == Quatd(0,0,0,0));
-		
+
 		q.setIdentity();
-		
+
 		assert(q == Quatd(1,0,0,0));
 		assert(q != Quatd(1,0,0,1));
-		
+
 		q.set(1,2,4,10);
 
 		assert(-q == Quatd(-1,-2,-4,-10));
@@ -331,7 +331,7 @@ int utMath(){
 		assert(eq(q, Quatd(sqrt(2)/2, 0,sqrt(2)/2,0)));
 		{
 			Vec3d v(0,0,1);
-			v = q.rotate(v);			
+			v = q.rotate(v);
 			//printf("%g %g %g\n", v[0], v[1], v[2]);
 			assert(eq(v, Vec3d(1,0,0)));
 		}
@@ -339,7 +339,7 @@ int utMath(){
 		q.fromAxisAngle(M_2PI/4, 0,0,1);
 		{
 			Vec3d v(1,0,0);
-			v = q.rotate(v);			
+			v = q.rotate(v);
 			//printf("%g %g %g\n", v[0], v[1], v[2]);
 			assert(eq(v, Vec3d(0,1,0)));
 		}
@@ -365,7 +365,7 @@ int utMath(){
 			(Quatd().fromAxisY(M_2PI/8) * Quatd().fromAxisX(M_2PI/8)) * Quatd().fromAxisZ(M_2PI/8)
 			)
 		);
-		
+
 		// Test roundtrip Euler/quat conversion
 		{
 			float eps = 0.00001;
@@ -377,7 +377,7 @@ int utMath(){
 				float az = (float(k)/N-0.5) * 2*M_PI + kludge;
 				float el = (float(j)/N-0.5) * 2*M_PI + kludge;
 				float ba = (float(i)/N-0.5) * 2*M_PI + kludge;
-				
+
 				Quatf a,b;
 				a.fromEuler(az, el, ba);
 				a.toEuler(az, el, ba);
@@ -400,15 +400,15 @@ int utMath(){
 			b = q.fromMatrixTransposed(mat4);
 			assert(q == b || q == b.conj());
 		}
-		
-		
+
+
 		// Test Quat to component coordinate frame
 		{
 			Quatd q;
-			
+
 			Vec3d vx, vy, vz;
 
-			q.fromAxisAngle(M_2PI/4, 1,0,0);			
+			q.fromAxisAngle(M_2PI/4, 1,0,0);
 			q.toVectorX(vx);
 			q.toVectorY(vy);
 			q.toVectorZ(vz);
@@ -416,7 +416,7 @@ int utMath(){
 			assert(eq(vy, Vec3d(0, 0,1)));
 			assert(eq(vz, Vec3d(0,-1,0)));
 
-			q.fromAxisAngle(M_2PI/4, 0,1,0);			
+			q.fromAxisAngle(M_2PI/4, 0,1,0);
 			q.toVectorX(vx);
 			q.toVectorY(vy);
 			q.toVectorZ(vz);
@@ -424,7 +424,7 @@ int utMath(){
 			assert(eq(vy, Vec3d(0,1, 0)));
 			assert(eq(vz, Vec3d(1,0, 0)));
 
-			q.fromAxisAngle(M_2PI/4, 0,0,1);			
+			q.fromAxisAngle(M_2PI/4, 0,0,1);
 			q.toVectorX(vx);
 			q.toVectorY(vy);
 			q.toVectorZ(vz);
@@ -432,8 +432,8 @@ int utMath(){
 			assert(eq(vy, Vec3d(-1,0,0)));
 			assert(eq(vz, Vec3d(0,0,1)));
 		}
-		
-		
+
+
 
 //		int smps = 100;
 //		Quatd q1 = Quatd::fromAxisAngle(10, .707, .707, 0);
@@ -457,7 +457,7 @@ int utMath(){
 	#define T(x) assert(al::abs(x) == (x<0?-x:x));
 	T(0.) T(1.) T(-1.)
 	T(0) T(1) T(-1)
-	#undef T	
+	#undef T
 
 	#define T(x,y, r) assert(al::atLeast(x,y) == r);
 	T(0.,1., 1.) T(+0.1,1., 1.) T(-0.1,1., -1.)
@@ -488,7 +488,7 @@ int utMath(){
 	#define T(x, y) assert(al::clipS(x) == y);
 	T(0., 0.) T(0.5, 0.5) T(1., 1.) T(1.2, 1.) T(-0.5, -0.5) T(-1., -1) T(-1.2, -1.)
 	#undef T
-	
+
 	#define T(x,r) assert(al::even(x) == r);
 	T(0,true) T(1,false) T(-2,true)
 	#undef T
@@ -499,7 +499,7 @@ int utMath(){
 	T(9, 9*8*7*6*5*4*3*2*1) T(10, 10*9*8*7*6*5*4*3*2*1) T(11, 11*10*9*8*7*6*5*4*3*2*1)
 	T(12, 12*11*10*9*8*7*6*5*4*3*2*1)
 	#undef T
-	
+
 	for(int i=0; i<=12; ++i){
 		assert(
 			al::aeq(al::factorialSqrt(i), sqrt(al::factorial(i)))
@@ -520,7 +520,7 @@ int utMath(){
 	T(0., 0.) T(0.5, 0.5) T(1., 1.) T(1.2, 0.8) T(-0.2, 0.2)
 	T(2.2, 0.2) T(3.2, 0.8) T(4.2, 0.2) T(5.2, 0.8)
 	#undef T
-	
+
 	#define T(x,y,r) assert(al::gcd(x,y) == r);
 	T(7,7,7) T(7,4,1) T(8,4,4)
 	#undef T
@@ -544,7 +544,7 @@ int utMath(){
 	#define T(x,y,z,r) assert(al::max(x,y,z)==r);
 	T(0,0,0, 0) T(0,1,2, 2) T(1,2,0, 2) T(2,1,0, 2)
 	#undef T
-	
+
 	assert(al::mean(-1., 1.) == 0.);
 
 	#define T(x,y,r) assert(al::min(x,y)==r);
@@ -578,7 +578,7 @@ int utMath(){
 	#define T(x) assert(al::pow5(x) == x*x*x*x*x);
 	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
 	#undef T
-	
+
 	#define T(x) assert(al::pow6(x) == x*x*x*x*x*x);
 	T(0) T(1) T(2) T(3) T(-1) T(-2) T(-3)
 	#undef T
@@ -598,11 +598,11 @@ int utMath(){
 //	#define T(x,r) assert(al::powerOf2(x) == r);
 //	T(0, false) T(1, true) T(2, true) T(3, false) T(4, true)
 //	#undef T
-	
+
 	#define T(x,y,r) assert(al::remainder(x,y) == r);
 	T(7,7,0) T(7,1,0) T(7,4,3) T(7,3,1) T(14,3,2)
 	#undef T
-	
+
 	#define T(x,y) assert(al::round(x) == y);
 	T(0.f, 0.f) T(0.2f, 0.f) T(0.8f, 1.f) T(-0.2f, 0.f) T(-0.8f,-1.f) T(0.5f, 0.f) T(-0.5f, 0.f)
 	T(0.0, 0.0) T(0.20, 0.0) T(0.80, 1.0) T(-0.20, 0.0) T(-0.80,-1.0) T(0.50, 0.0) T(-0.50, 0.0)
@@ -664,7 +664,7 @@ int utMath(){
 	// Special Functions
 	{
 		struct F{
-		
+
 			// Pl,-m(x) = (-1)^m (l-m)! / (l+m)! Pl,m(x)
 			static double testLegendreP(int l, int m, double x){
 				switch(l){
@@ -710,7 +710,7 @@ int utMath(){
 				}
 			}
 		};
-		
+
 
 		const int M = 2000;	// granularity of domain
 
@@ -727,7 +727,7 @@ int utMath(){
 				assert(false);
 			}
 		}}}
-		
+
 		// test laguerre
 		for(int n=0; n<=3; ++n){
 		for(int i=0; i<M; ++i){
@@ -738,8 +738,8 @@ int utMath(){
 			if(!(al::abs(a - b)<1e-10)){
 				printf("\nL(%d, %g) = %.16g (actual = %.16g)\n", n, x, a,b);
 				assert(false);
-			}		
-		}}		
+			}
+		}}
 
 		// TODO: spherical harmonics
 //		for(int l=0; l<=SphericalHarmonic::L_MAX; ++l){
@@ -751,7 +751,7 @@ int utMath(){
 //
 //		for(int j=0; j<M; ++j){	double ph = double(j)/M * M_PI;
 //		for(int i=0; i<M; ++i){ double th = double(i)/M * M_2PI;
-//			
+//
 //		}}
 	}
 
@@ -759,7 +759,7 @@ int utMath(){
 	// Interval
 	{
 		Interval<double> i(0,1);
-		
+
 		assert(i.min()==0 && i.max()==1);
 
 		i.min(2);
@@ -767,30 +767,30 @@ int utMath(){
 
 		i.max(0);
 		assert(i.min()==0 && i.max()==1);
-		
+
 		i.endpoints(-1,1);
 		assert(i.min()==-1 && i.max()==1);
-		
+
 		assert(i.center()	==0);
 		assert(i.diameter()	==2);
 		assert(i.radius()	==1);
-		
+
 		assert(i.proper());
-		
+
 		i.endpoints(0,0);
 		assert(i.degenerate());
-		
+
 		i.centerDiameter(1, 4);
 		assert(i.center()	==1);
 		assert(i.diameter()	==4);
 		assert(i.min()==-1 && i.max()==3);
-		
+
 		i.center(2);
 		assert(i.min()==0 && i.max()==4);
-		
+
 		i.diameter(6);
 		assert(i.min()==-1 && i.max()==5);
-		
+
 		i.endpoints(-1, 1);
 		assert(i.toUnit(0) == 0.5);
 
@@ -804,7 +804,7 @@ int utMath(){
 	// Random
 	{
 		using namespace al::rnd;
-		
+
 		// Ensure uniqueness of sequences
 		assert(seed() != seed());
 
@@ -818,7 +818,7 @@ int utMath(){
 			assert(a() != a()); // successive values are unique
 		}
 
-		{	Tausworthe a,b;			
+		{	Tausworthe a,b;
 			assert(a() != b()); // sequences are unique
 			assert(a() != a()); // successive values are unique
 		}
@@ -837,7 +837,7 @@ int utMath(){
 		//for(int i=0; i<32; ++i) printf("% g ", r.uniformS());
 		//for(int i=0; i<32; ++i) printf("%d ", r.prob(0.1));
 		//for(int i=0; i<128; ++i) printf("% g\n", r.gaussian());
-		
+
 		int arr[] = {0,1,2,3,4,5,6,7};
 		r.shuffle(arr, 8);
 		//for(int i=0; i<8; ++i) printf("%d\n", arr[i]);
@@ -863,8 +863,8 @@ int utMath(){
 			}
 		}
 	}
-	
-	
+
+
 	{
 		al::Plane<double> p;
 		p.fromNormalAndPoint(Vec3d(1,0,0), Vec3d(1,1,1));
@@ -874,7 +874,7 @@ int utMath(){
 		assert(p.distance(Vec3d(0,0,1)) == -1);
 		assert(p.distance(Vec3d(2,0,0)) ==  1);
 	}
-	
+
 	{
 		Frustumd f;
 		f.fbl = Vec3d(-1,-1,-1);
@@ -889,16 +889,16 @@ int utMath(){
 
 //		Plane<double>& p = f.pl[Frustumd::LEFT];
 //		printf("%g %g %g\n", p.normal()[0], p.normal()[1], p.normal()[2]);
-//		
+//
 //		Vec3d nrm = cross(f.fbl-f.nbl, f.ntl-f.nbl);
 //		printf("%g %g %g\n", nrm[0], nrm[1], nrm[2]);
-//		
+//
 //		printf("%g %g %g\n", (f.fbl-f.nbl)[0], (f.fbl-f.nbl)[1], (f.fbl-f.nbl)[2]);
 //		printf("%g %g %g\n", (f.ntl-f.nbl)[0], (f.ntl-f.nbl)[1], (f.ntl-f.nbl)[2]);
 
 		assert(f.testPoint(Vec3d(0,0,0)) == Frustumd::INSIDE);
 		assert(f.testPoint(Vec3d(2,1,1)) == Frustumd::OUTSIDE);
-		
+
 		assert(f.testSphere(Vec3d(0,0,0), 0.9) == Frustumd::INSIDE);
 		assert(f.testSphere(Vec3d(0,0,0), 1.1) == Frustumd::INTERSECT);
 		assert(f.testSphere(Vec3d(2,2,2), 0.5) == Frustumd::OUTSIDE);

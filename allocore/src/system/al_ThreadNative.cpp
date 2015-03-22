@@ -23,7 +23,7 @@ struct Thread::Impl{
 	:	mHandle(0)
 	{ //printf("Thread::Impl(): %p\n", this);
 		pthread_attr_init(&mAttr);
-		
+
 		// threads are not required to be joinable by default, so make it so
 		pthread_attr_setdetachstate(&mAttr, PTHREAD_CREATE_JOINABLE);
 	}
@@ -61,7 +61,7 @@ struct Thread::Impl{
 			param.sched_priority = 0;
 			//pthread_setschedparam(mHandle, SCHED_OTHER, &param);
 			pthread_attr_setschedpolicy(&mAttr, SCHED_OTHER);
-			pthread_attr_setschedparam(&mAttr, &param);		
+			pthread_attr_setschedparam(&mAttr, &param);
 		}
 	}
 
@@ -122,7 +122,7 @@ struct Thread::Impl{
 		}
 		return false;
 	}
-	
+
 	// TODO: Threadx priority
 	void priority(int v){
 	}
@@ -194,7 +194,7 @@ Thread& Thread::operator= (Thread other){
 		//join();
 		// delete Impl only if we are sure we are the owner
 		if(mImpl != other.mImpl) delete mImpl;
-		
+
 		// always construct a new Impl
 		mImpl = new Impl;
 

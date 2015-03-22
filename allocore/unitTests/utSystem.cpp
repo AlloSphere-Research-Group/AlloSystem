@@ -4,7 +4,7 @@ template <class T>
 bool aboutEqual(T v, T to, T r){ return v<(to+r) && v>(to-r); }
 
 int utSystem(){
-	
+
 	// Timing
 //	UT_PRINTF("system: timing\n");
 	{
@@ -15,7 +15,7 @@ int utSystem(){
 
 		assert(al_time_ns2s * 1e9 == 1);
 		assert(al_time_s2ns * 1 == 1e9);
-		
+
 		al_nsec t, dt;
 		al_sec now, dts;
 
@@ -41,7 +41,7 @@ int utSystem(){
 		assert(aboutEqual(dts, sleeps, slops));
 
 		Timer tm;
-		
+
 		tm.start();
 		al_sleep_nsec(sleepns);
 		tm.stop();

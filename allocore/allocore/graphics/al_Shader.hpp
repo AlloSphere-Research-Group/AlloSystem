@@ -3,35 +3,35 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -73,8 +73,8 @@ protected:
 
 /// Shader object
 
-/// A shader object represents your source code. You are able to pass your 
-/// source code to a shader object and compile the shader object. 
+/// A shader object represents your source code. You are able to pass your
+/// source code to a shader object and compile the shader object.
 class Shader : public ShaderBase{
 public:
 
@@ -85,8 +85,8 @@ public:
 	};
 
 	Shader(const std::string& source="", Shader::Type type=FRAGMENT);
-	
-	/// This will automatically delete the shader object when it is no longer 
+
+	/// This will automatically delete the shader object when it is no longer
 	/// attached to any program object.
 	virtual ~Shader(){ destroy(); }
 
@@ -94,7 +94,7 @@ public:
 	Shader& source(const std::string& v, Shader::Type type);
 	Shader& compile();
 	bool compiled() const;
-	
+
 	Shader::Type type() const { return mType; }
 
 private:
@@ -106,14 +106,14 @@ private:
 	virtual void getLog(char * buf) const;
 
 	virtual void onCreate();
-	virtual void onDestroy();	
+	virtual void onDestroy();
 };
 
 
 
 /// Shader program object
 
-/// A program object represents a useable part of render pipeline. 
+/// A program object represents a useable part of render pipeline.
 /// It links one or more shader units into a single program object.
 class ShaderProgram : public ShaderBase{
 public:
@@ -162,41 +162,41 @@ public:
 	:	mInPrim(Graphics::TRIANGLES), mOutPrim(Graphics::TRIANGLES), mOutVertices(3),
 		mActive(true)
 	{}
-	
+
 	/// Any attached shaders will automatically be detached, but not deleted.
 	virtual ~ShaderProgram(){ destroy(); }
-	
+
 	/// input Shader s will be compiled if necessary:
 	ShaderProgram& attach(Shader& s);
 	const ShaderProgram& detach(const Shader& s) const;
-	
+
 	// These parameters must be set before attaching geometry shaders
 	void setGeometryInputPrimitive(Graphics::Primitive prim){ mInPrim = prim; }
 	void setGeometryOutputPrimitive(Graphics::Primitive prim){ mOutPrim = prim; }
 	void setGeometryOutputVertices(unsigned int i){ mOutVertices = i; }
 
-	// If dovalidate == true, immediately calls validate() 
+	// If dovalidate == true, immediately calls validate()
 	// you might not want to do this if you need to set uniforms before validating
 	// e.g. when using different texture sampler types in the same shader
 	const ShaderProgram& link(bool doValidate=true) const;
 
 	// check if compilation/linking was successful (prints an error on failure)
 	const ShaderProgram& validate_linker() const;
-	
+
 	const ShaderProgram& use();
 
 	/// Get whether program is active
 	bool active() const { return mActive; }
 
 	/// Set whether program is active
-	ShaderProgram& active(bool v){ mActive=v; return *this; }	
+	ShaderProgram& active(bool v){ mActive=v; return *this; }
 
 	/// Toggle active state
 	ShaderProgram& toggleActive(){ mActive^=true; return *this; }
 
 	/// Begin use of shader program
 	bool begin();
-	
+
 	/// End use of shader program
 	void end() const;
 
@@ -210,16 +210,16 @@ public:
 	const ShaderProgram& uniform(const char * name, float v0, float v1) const;
 	const ShaderProgram& uniform(const char * name, float v0, float v1, float v2) const;
 	const ShaderProgram& uniform(const char * name, float v0, float v1, float v2, float v3) const;
-	
-	
+
+
 	const ShaderProgram& uniform(int location, int v0) const;
 	const ShaderProgram& uniform(int location, float v0) const;
 	const ShaderProgram& uniform(int location, double v0) const { return uniform(location, (float)v0); }
 	const ShaderProgram& uniform(int location, float v0, float v1) const;
 	const ShaderProgram& uniform(int location, float v0, float v1, float v2) const;
 	const ShaderProgram& uniform(int location, float v0, float v1, float v2, float v3) const;
-	
-	
+
+
 	template <typename T>
 	const ShaderProgram& uniform(const char * name, const Vec<2,T>& v) const {
 		return uniform(name, v.x, v.y);
@@ -277,7 +277,7 @@ public:
 	const ShaderProgram& attribute2(int location, const double * v) const;
 	const ShaderProgram& attribute3(int location, const double * v) const;
 	const ShaderProgram& attribute4(int location, const double * v) const;
-	
+
 	template<typename T>
 	const ShaderProgram& attribute(int location, const Vec<2,T>& v) const {
 		return attribute(location, v.x, v.y);
@@ -295,7 +295,7 @@ public:
 		// note wxyz => xyzw for GLSL vec4:
 		return attribute(location, q.x, q.y, q.z, q.w);
 	}
-	
+
 	int uniform(const char * name) const;
 	int attribute(const char * name) const;
 
@@ -305,7 +305,7 @@ protected:
 	Graphics::Primitive mInPrim, mOutPrim;	// IO primitives for geometry shaders
 	unsigned int mOutVertices;
 	bool mActive;
-	
+
 	virtual void get(int pname, void * params) const;
 	virtual void getLog(char * buf) const;
 

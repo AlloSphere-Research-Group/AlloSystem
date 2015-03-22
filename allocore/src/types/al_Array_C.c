@@ -8,7 +8,7 @@ extern "C" {
 
 const char * allo_type_name(AlloTy ty){
 	switch(ty) {
-		case AlloUInt8Ty:		return "uint8_t";	
+		case AlloUInt8Ty:		return "uint8_t";
 		case AlloUInt16Ty:		return "uint16_t";
 		case AlloUInt32Ty:		return "uint32_t";
 		case AlloUInt64Ty:		return "uint64_t";
@@ -62,7 +62,7 @@ void allo_array_setstride(AlloArrayHeader * h, unsigned alignSize){
 	unsigned typeSize = allo_type_size(h->type);
 	unsigned numDims = h->dimcount;
 	h->stride[0] = h->components * typeSize;
-	
+
 	if(numDims>1){
 		h->stride[1] = h->stride[0] * h->dim[0]; /* compute ideal row stride amount */
 
@@ -107,12 +107,12 @@ void allo_array_create(AlloArray * arr, const AlloArrayHeader *h) {
 	allo_array_setheader(arr, h);
 	allo_array_allocate(arr);
 }
-	
+
 void allo_array_create1d(
-	AlloArray * arr, 
-	uint8_t components, 
-	AlloTy type, 
-	uint32_t dimx, 
+	AlloArray * arr,
+	uint8_t components,
+	AlloTy type,
+	uint32_t dimx,
 	size_t align
 ) {
 	AlloArrayHeader header;
@@ -124,11 +124,11 @@ void allo_array_create1d(
 }
 
 void allo_array_create2d(
-	AlloArray * arr, 
-	uint8_t components, 
-	AlloTy type, 
-	uint32_t dimx, 
-	uint32_t dimy, 
+	AlloArray * arr,
+	uint8_t components,
+	AlloTy type,
+	uint32_t dimx,
+	uint32_t dimy,
 	size_t align
 ) {
 	AlloArrayHeader header;
@@ -146,11 +146,11 @@ void allo_array_adapt(AlloArray * arr, const AlloArrayHeader *h) {
 }
 
 void allo_array_adapt2d(
-	AlloArray * arr, 
-	uint8_t components, 
-	AlloTy type, 
-	uint32_t dimx, 
-	uint32_t dimy, 
+	AlloArray * arr,
+	uint8_t components,
+	AlloTy type,
+	uint32_t dimx,
+	uint32_t dimy,
 	size_t align
 ) {
 	AlloArrayHeader header;

@@ -3,35 +3,35 @@
 
 /*	AlloSystem --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -64,6 +64,7 @@ public:
 
 	VideoCapture();
 
+	~VideoCapture();
 
 	/// Open a video file
 
@@ -85,32 +86,71 @@ public:
 
 
 	/// Grabs the next frame from video file or capturing device
-	
+
 	/// \returns true on success.
 	///
 	bool grab();
 
 	/// Decodes and returns the grabbed video frame
 
-	/// \returns false if no frame has been grabbed (camera has been 
+	/// @param[in] dst			the array to copy the frame into
+	/// @param[in] chan			the video channel to retrieve
+	/// @param[in] copyPolicy	Policy on copying data:
+	///							 1 = copy data with same row order (default),
+	///							-1 = copy data with rows flipped.
+	///
+	/// \returns false if no frame has been grabbed (camera has been
 	/// disconnected, or there are no more frames in video file).
-	bool retrieve(Array& dst, int channel=0, int copyPolicy=1);
+	bool retrieve(Array& dst, int chan=0, int copyPolicy=1);
+
+	/// Decodes and returns the grabbed video frame
+
+	/// @param[in] dst			the array to copy the frame into
+	/// @param[in] chan			the video channel to retrieve
+	///
+	/// \returns false if no frame has been grabbed (camera has been
+	/// disconnected, or there are no more frames in video file).
+	bool retrieve(cv::Mat& dst, int chan=0);
+
+	/// Decodes the grabbed video frame into cv::Mat member
+
+	/// @param[in] chan			the video channel to retrieve
+	///
+	/// \returns false if no frame has been grabbed (camera has been
+	/// disconnected, or there are no more frames in video file).
+	bool retrieve(int chan=0);
 
 	/// Decodes and returns the grabbed video frame flipped vertically
 
-	/// \returns false if no frame has been grabbed (camera has been 
+	/// @param[in] dst			the array to copy the frame into
+	/// @param[in] chan			the video channel to retrieve
+	///
+	/// \returns false if no frame has been grabbed (camera has been
 	/// disconnected, or there are no more frames in video file).
-	bool retrieveFlip(Array& dst, int channel=0);
+	bool retrieveFlip(Array& dst, int chan=0);
 
 	/// Grabs, decodes and returns the next video frame
-	
-	/// \returns true on success.
+
+	/// @param[in] dst			the array to copy the frame into
+	/// @param[in] copyPolicy	Policy on copying data:
+	///							 1 = copy data with same row order (default),
+	///							-1 = copy data with rows flipped.
 	///
+	/// \returns true on success.
 	bool read(Array& dst, int copyPolicy=1);
 
 
 	/// Set an OpenCV video property
 	bool set(int cvCapProp, double val);
+
+	/// Set width in pixels
+	VideoCapture& width(double pixels);
+
+	/// Set height in pixels
+	VideoCapture& height(double pixels);
+
+	/// Set width and height in pixels
+	VideoCapture& resize(double width, double height);
 
 	/// Set position in msec (files only)
 	VideoCapture& posMsec(double msec);
@@ -148,7 +188,7 @@ public:
 
 	/// Get height, in pixels
 	double height() const;
-	
+
 	/// Get aspect ratio (width/height)
 	double aspect() const;
 
@@ -171,7 +211,7 @@ public:
 	double posFrames() const;
 
 	/// Loop current position between endpoints (files only)
-	
+
 	/// @param[in] minFrame		The minimum endpoint
 	/// @param[in] maxFrame		The maximum endpoint;
 	///							if < 0, then use numFrames + maxFrame + 1
@@ -190,9 +230,12 @@ public:
 	void print(FILE * fp = stdout);
 
 private:
+	friend class VideoCaptureHandler;
 	double mFPS;
 	double mRate;
+	double mBadFrame;
 	bool mIsFile;
+	bool mValid;
 };
 
 
@@ -202,13 +245,15 @@ public:
 
 	struct VideoThreadFunction : public al::ThreadFunction{
 		VideoThreadFunction();
+		~VideoThreadFunction();
 		void operator()();
 		al::VideoCapture * videoCapture;
 		VideoCaptureHandler * handler;
 		int streamIdx;
 	};
-	
+
 	struct WorkThread{
+		~WorkThread();
 		PeriodicThread thread;
 		VideoThreadFunction func;
 		void start();
@@ -243,7 +288,7 @@ public:
 
 	/// Start the video thread(s)
 	void startVideo();
-	
+
 	/// Stop the video thread(s)
 	void stopVideo();
 

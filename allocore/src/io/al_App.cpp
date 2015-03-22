@@ -4,58 +4,49 @@
 namespace al{
 //______________________________________________________________________________
 
-void Viewpoint::onParentResize(int dw, int dh){
-    mViewport.l += dw * anchorX();
-    mViewport.b += dh * anchorY();
-    mViewport.w += dw * stretchX();
-    mViewport.h += dh * stretchY();
+void Viewpoint::onParentResize(int w, int h){
+	mViewport.l = w * anchorX();
+	mViewport.b = h * anchorY();
+	mViewport.w = w * stretchX();
+	mViewport.h = h * stretchY();
 }
 
 //______________________________________________________________________________
 
-bool ViewpointWindow::onResize(int dw, int dh){
-    //printf("ViewpointWindow onResize: %d %d\n", dw, dh);
-    Viewpoints::iterator iv = mViewpoints.begin();
-    
-    while(iv != mViewpoints.end()){
-        /*Viewpoint& vp = **iv;
-         vp.viewport().l += dw * vp.anchorX();
-         vp.viewport().b += dh * vp.anchorY();
-         vp.viewport().w += dw * vp.stretchX();
-         vp.viewport().h += dh * vp.stretchY();*/
-        (*iv)->onParentResize(dw, dh);
-        ++iv;
-        //printf("%g %g %g %g\n", vp.viewport().l, vp.viewport().b, vp.viewport().w, vp.viewport().h);
-    }
-    return true;
+bool ViewpointWindow::onResize(int w, int h){
+	//printf("ViewpointWindow onResize: %d %d\n", dw, dh);
+	Viewpoints::iterator iv = mViewpoints.begin();
+
+	while(iv != mViewpoints.end()){
+		(*iv)->onParentResize(w, h);
+		++iv;
+		//printf("%g %g %g %g\n", vp.viewport().l, vp.viewport().b, vp.viewport().w, vp.viewport().h);
+	}
+	return true;
 }
 
 ViewpointWindow& ViewpointWindow::add(Viewpoint& v){
-    mViewpoints.push_back(&v);
-    
-    // If the window is already created, then we need to manually update the
-    // Viewpoint. Otherwise, this happens through ViewpointWindow::onResize().
-    if(created()){
-        v.onParentResize(width(), height());
-    }
-    return *this;
+	mViewpoints.push_back(&v);
+
+	// If the window is already created, then we need to manually update the
+	// Viewpoint. Otherwise, this happens through ViewpointWindow::onResize().
+	if(created()){
+		v.onParentResize(width(), height());
+	}
+	return *this;
 }
-
-
 
 //______________________________________________________________________________
 
 App::App()
 :	mName(""),
 	mNavControl(mNav),
-	mClockAnimate(0), mClockNav(0), mOSCRecv(8000)
+	mClockAnimate(0), mClockNav(0)
 {
 }
 
 
 App::~App(){
-	mAudioIO.close(); // FIXME: can happen after accessed data is freed
-	
 	// delete factory objects
 	for(unsigned i=0; i<mFacWindows.size(); ++i){
 		delete mFacWindows[i];
@@ -63,7 +54,7 @@ App::~App(){
 	for(unsigned i=0; i<mFacViewpoints.size(); ++i){
 		delete mFacViewpoints[i];
 	}
-	
+
 	if(name()!="" && oscSend().opened()) sendDisconnect();
 }
 
@@ -71,7 +62,7 @@ App::~App(){
 static void AppAudioCB(AudioIOData& io){
 	App& app = io.user<App>();
 	//int numFrames = io.framesPerBuffer();
-	
+
 	//w.mNavMaster.velScale(4);
 	//w.mNavMaster.step(io.secondsPerBuffer());
 	if(app.clockNav() == &app.audioIO()){
@@ -79,11 +70,11 @@ static void AppAudioCB(AudioIOData& io){
 		app.nav().step(1./4);
 	}
 	//app.mListeners[0]->pose(app.nav());
-	
+
 	if(app.clockAnimate() == &app.audioIO()){
 		app.onAnimate(io.secondsPerBuffer());
 	}
-	
+
 	io.frame(0);
 	app.onSound(app.audioIO());
 
@@ -126,14 +117,14 @@ ViewpointWindow * App::initWindow(
 	win->displayMode(mode);
 
 	mFacViewpoints.push_back(new Viewpoint);
-	
+
 	int last = mFacViewpoints.size()-1;
 	{
 		Viewpoint& vp = *mFacViewpoints[last];
 		vp.parentTransform(nav());
 		win->add(vp);
 	}
-	
+
 	mFacWindows.push_back(win);
 	add(*win);
 	return win;
@@ -176,17 +167,41 @@ void App::start(){
 //		}
 //	}
 
-	if(windows().size()){
+	/* Add a handler to close i/o when Main exits.
+	This is done to ensure members of derived classes are not accessed by i/o 
+	threads after they have been destructed! We must stop all i/o before any
+	destructors are called.
+	*/
+	struct AppMainHandler : Main::Handler{
+		App& app;
+		AppMainHandler(App& a): app(a){}
 
+		void onExit(){
+			//printf("App exiting\n");
+			app.audioIO().close();
+
+			for(unsigned i=0; i<app.mFacWindows.size(); ++i){
+				app.mFacWindows[i]->destroy();
+			}
+		}
+	} appMainHandler(*this);
+
+	Main::get().add(appMainHandler);
+
+
+	if(windows().size()){
 		// create the windows
 		for(unsigned i=0; i<windows().size(); ++i){
 			windows()[i]->create();
 		}
-	
+
+		// start the main loop
 		Main::get().start();
 	}
 	else{
 		printf("\nPress 'enter' to quit...\n"); getchar();
+		// ensure exit handler gets called
+		Main::get().exit();
 	}
 }
 
@@ -209,9 +224,9 @@ Rayd App::getPickRay(const ViewpointWindow& w, int screenX, int screenY){
 
   screenPos.z = 1.;
   worldPos = stereo().unproject(screenPos);
-  r.direction().set( worldPos ); 
+  r.direction().set( worldPos );
   r.direction() -= r.origin();
-  r.direction().normalize(); 
+  r.direction().normalize();
   return r;
 }
 
@@ -249,7 +264,7 @@ bool App::SceneWindowHandler::onFrame(){
 
 	for(; iv != win.viewpoints().end(); ++iv){
 		Viewpoint& vp = *(*iv);
-		
+
 		// if no camera, set to default scene camera
 		if(!vp.hasLens()) vp.lens(app.lens());
 		const Lens& lens = vp.lens();

@@ -26,31 +26,31 @@ public:
 	{}
 
 	~OpenCLEngine();
-	
+
 	OpenCLDevice * default_device();
 	OpenCLDevice * cpu_device();
 	OpenCLDevice * gpu_device();
-	
+
 	void compile_source(const char *name, const char *source);
 	OpenCLKernel * get_kernel(const char *name, const char *kernel_name=NULL);
 
 	OpenCLEvent enqueue_kernel(
-		const OpenCLDevice &dev, 
-		const OpenCLKernel *ker, 
-		cl_uint ndim, 
-		size_t *global, 
+		const OpenCLDevice &dev,
+		const OpenCLKernel *ker,
+		cl_uint ndim,
+		size_t *global,
 		size_t *local
 	);
-	
+
 	OpenCLEvent enqueue_read(
-		const OpenCLDevice &dev, 
-		OpenCLMemoryBuffer *mem, 
-		bool block, 
-		size_t offset, 
-		size_t size, 
+		const OpenCLDevice &dev,
+		OpenCLMemoryBuffer *mem,
+		bool block,
+		size_t offset,
+		size_t size,
 		void *ptr
 	);
-	
+
 	OpenCLMemoryBuffer * create_memory_buffer(cl_mem_flags usage, size_t size, void *ptr);
 
 protected:

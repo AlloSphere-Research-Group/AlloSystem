@@ -16,7 +16,7 @@ int main(){
 
 	// Our thread function object
 	struct Func : ThreadFunction{
-	
+
 		// Our thread function will just print the current time
 		void operator()(){
 			// Current minute in milliseconds

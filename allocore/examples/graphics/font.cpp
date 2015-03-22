@@ -30,7 +30,7 @@ public:
 	}
 
 	virtual void onAnimate(double dt){}
-	
+
 	virtual void onDraw(Graphics& g, const Viewpoint& v){
 
 		// Before rendering text, we must turn on blending

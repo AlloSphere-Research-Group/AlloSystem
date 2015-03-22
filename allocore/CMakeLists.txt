@@ -26,6 +26,7 @@ list(APPEND ALLOCORE_HEADERS
     allocore/al_Allocore.hpp
     allocore/graphics/al_Mesh.hpp
     allocore/graphics/al_Shapes.hpp
+    allocore/graphics/al_Image.hpp
     allocore/io/al_HID.hpp
     allocore/io/al_MIDI.hpp
     allocore/io/al_Serial.hpp
@@ -177,13 +178,14 @@ set_target_properties(${ALLOCORE_LIB}
   ALLOCORE_DEP_INCLUDE_DIRS "${ALLOCORE_DEP_INCLUDE_DIRS}"
   )
 set_target_properties(${ALLOCORE_LIB}
-  PROPERTIES 
+  PROPERTIES
   ALLOCORE_LINK_LIBRARIES "${ALLOCORE_LINK_LIBRARIES}"
   )
 
 include_directories(${ALLOCORE_DEP_INCLUDE_DIRS})
 target_link_libraries(${ALLOCORE_LIB} ${ALLOCORE_LINK_LIBRARIES})
 
+message(${ALLOCORE_DEP_INCLUDE_DIRS})
 
 # Doxygen documentation target
 add_custom_target("doc"
@@ -249,6 +251,10 @@ if(BUILD_EXAMPLES)
     message("Gamma not found. Not building allocore sound examples.")
   endif(GAMMA_FOUND OR GAMMA_LIBRARY)
 endif(BUILD_EXAMPLES)
+
+# Unit tests
+
+add_subdirectory(unitTests)
 
 # installation
 install(FILES ${ALLOCORE_HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/)

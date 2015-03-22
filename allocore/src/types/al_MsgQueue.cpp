@@ -7,7 +7,7 @@
 
 namespace al{
 
-MsgQueue :: MsgQueue(int size, malloc_func mfunc, free_func ffunc) 
+MsgQueue :: MsgQueue(int size, malloc_func mfunc, free_func ffunc)
 :	mHead(NULL), mTail(NULL), mPool(NULL),
 	mLen(0), mNow(0),
 	mMalloc(mfunc ? mfunc : malloc), mFree(ffunc ? ffunc : free)
@@ -58,7 +58,7 @@ void MsgQueue :: sched(al_sec at, msg_func func, char * data, size_t size) {
 	// get a message-holder from the pool:
 	Msg * m = mPool;
 	mPool= m->next;
-	
+
 	// prepare Msg:
 	m->next = NULL;
 	m->t = at;
@@ -72,9 +72,9 @@ void MsgQueue :: sched(al_sec at, msg_func func, char * data, size_t size) {
 	} else {
 		memcpy(m->mArgs, data, size);
 	}
-	
+
 	// insert into queue
-	
+
 	// empty queue? set as new head and tail:
 	if (mHead == NULL) {
 		mHead = m;
@@ -82,7 +82,7 @@ void MsgQueue :: sched(al_sec at, msg_func func, char * data, size_t size) {
 		mLen = 1;
 		return;
 	}
-	
+
 	// prepend case? insert as new head:
 	if (at < mHead->t) {
 		m->next = mHead;
@@ -90,7 +90,7 @@ void MsgQueue :: sched(al_sec at, msg_func func, char * data, size_t size) {
 		mLen++;
 		return;
 	}
-	
+
 	// append case? add as new tail:
 	if (at >= mTail->t) {
 		mTail->next = m;
@@ -98,11 +98,11 @@ void MsgQueue :: sched(al_sec at, msg_func func, char * data, size_t size) {
 		mLen++;
 		return;
 	}
-	
+
 	// else: insert somewhere between head and tail:
 	Msg * p = mHead;
 	Msg * n = p->next;
-	// compare with <= so that events with same timestamp will be in order of insertion 
+	// compare with <= so that events with same timestamp will be in order of insertion
 	while (n && n->t <= at) {
 		p = n;
 		n = n->next;
@@ -114,20 +114,20 @@ void MsgQueue :: sched(al_sec at, msg_func func, char * data, size_t size) {
 
 void MsgQueue :: update(al_sec until, bool defer) {
 	Msg * m = mHead;
-	while (m && m->t <= until) { 
+	while (m && m->t <= until) {
 		mHead = m->next;
-		
+
 //		if (defer && m->retry > 0.) {
 //			m->msg.t = x->now + m->retry;
 //			al_pq_sched_msg(x, m);
-//		} else {	
+//		} else {
 
 		// only call if it has data associated:
 		//if (m->args) {
-			mNow = AL_MAX(mNow, m->t); 
+			mNow = AL_MAX(mNow, m->t);
 			(m->func)(mNow, m->args());
 		//}
-		
+
 		recycle(m);
 		m = mHead;
 	}
