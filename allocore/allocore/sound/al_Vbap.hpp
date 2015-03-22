@@ -90,7 +90,7 @@ public:
 
 	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample);
 
-	void dump();
+	void print();
 
 private:
 	std::vector<SpeakerTriple> mTriplets;

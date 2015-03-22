@@ -123,8 +123,6 @@ public:
 	}
 
 protected:
-	//friend class Spatializer;
-    //friend class AmbisonicsSpatializer;
 	Speakers mSpeakers;
 };
 

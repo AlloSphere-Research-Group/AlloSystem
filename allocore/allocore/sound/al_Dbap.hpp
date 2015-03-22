@@ -71,7 +71,7 @@ public:
 	/// Values greater than 1 will focus the sound field to fewer speakers.
 	void setSpread(float spread) { mSpread = spread; }
 
-	void dump();
+	void print();
 
 private:
 	Listener * mListener;

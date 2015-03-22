@@ -37,8 +37,8 @@ void Dbap::perform(
 	}
 }
 
-void Dbap::dump() {
-	printf("Using DBAP Panning- need to add panner info for dump function\n");
+void Dbap::print() {
+	printf("Using DBAP Panning- need to add panner info for print function\n");
 }
 
 } // al::

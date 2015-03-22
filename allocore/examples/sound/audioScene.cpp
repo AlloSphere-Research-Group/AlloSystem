@@ -84,8 +84,8 @@ int main (int argc, char * argv[]){
 	// maybe rename this to update() ?
 	listener->compile();
 
-	// Output's relevant panner info (ex. number of triplets found for VBAP)
-	panner->dump();
+	// Print out relevant panner info (ex. number of triplets found for VBAP)
+	panner->print();
 
 	// 10) Create an audio IO for the audio scene
 	//     Last 3 arguments are for user data, # out chans, and # in chans

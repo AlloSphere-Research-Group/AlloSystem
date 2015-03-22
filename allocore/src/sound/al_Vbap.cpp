@@ -220,7 +220,7 @@ void Vbap::compile(Listener& listener){
 		findSpeakerPairs(mSpeakers);
 	}
 
-	dump();
+	print();
 
 	if (mNumTriplets == 0 ){
 		printf("No SpeakerSets found. Check mode setting or speaker layout.\n");
@@ -278,7 +278,7 @@ void Vbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& 
 	}
 }
 
-void Vbap::dump() {
+void Vbap::print() {
 	printf("Number of Triplets: %d\n",mNumTriplets);
 	for (unsigned i = 0; i < mNumTriplets; i++) {
 		printf("Triple #%d: %d,%d,%d \n",i,mTriplets[i].s1,mTriplets[i].s2,mTriplets[i].s3);
