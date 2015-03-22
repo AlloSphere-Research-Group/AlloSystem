@@ -232,7 +232,7 @@ public:
         eAttenOneOverD2
     };
     
-	SoundSource(double rollOff=1.0, double near=1, double range=100, double ampFar=0.0, int bufSize=50000)
+	SoundSource(double rollOff=1, double near=1, double range=100, double ampFar=0, int bufSize=50000)
 	:	mSound(bufSize), mRollOff(rollOff), mNearClip(near), mClipRange(range), mAmpFar(ampFar), useAtten(true), useDoppler(true), perSampleProcessing(false),
         attenuationType(eAttenOneOverD) {
 		// initialize the position history to be VERY FAR AWAY so that we don't deafen ourselves... 
@@ -334,6 +334,9 @@ public:
 		float b = mSound.read(index0+1);
 		float frac = index - index0;
         return ipl::linear(frac, a, b);
+//        float a0 = mSound.read(index0-1);
+//        float b1 = mSound.read(index0+2);
+//        return ipl::cubic(frac, a0, a, b, b1);
 	}
 
 	/// Set far clipping distance
@@ -457,7 +460,7 @@ public:
 				// since each source has its own buffersize and far clip
 				// (not physically accurate of course)
                 if(src.useDoppler)
-                    distanceToSample = distanceToSample;//(src.maxIndex()-numFrames)/src.farClip();
+                    distanceToSample = distanceToSample; //(src.maxIndex()-numFrames)/src.farClip();
                 else
                     distanceToSample = 0;
 				
