@@ -45,9 +45,12 @@ void Listener::compile(){
 
 
 
-SoundSource::SoundSource(double rollOff, double near, double range, double ampFar, int bufSize)
-:	mSound(bufSize), mRollOff(rollOff), mNearClip(near), mClipRange(range),
-	mAmpFar(ampFar), mUseAtten(true), mUseDoppler(true)
+SoundSource::SoundSource(
+	double nearClip, double farClip, AttenuationLaw law,
+	double farBias, int delaySize
+)
+:	DistAtten<double>(nearClip, farClip, law, farBias),
+	mSound(delaySize), mUseAtten(true), mUseDoppler(true)
 {
 	// initialize the position history to be VERY FAR AWAY so that we don't deafen ourselves...
 	for(int i=0; i<mPosHistory.size(); ++i){
@@ -166,28 +169,23 @@ void AudioScene::render(AudioIOData& io){
                         (src.posHistory()[0]-l.posHistory()[0])*(alpha)
                     )/3.0;
 
-                    double distance = relpos.mag();
+					// Get distance in world-space units
+                    double dist = relpos.mag();
 
-                    //printf("distance = %f\n", distance);
+					// Compute how many samples ago to read from buffer
+					// Start with time delay due to speed of sound
+                    double samplesAgo = dist * distanceToSample;
 
-                    double idx = distance * distanceToSample;
-                    //if (i==0) printf("idx %g\n", idx);
+					// Add on time delay (in samples)
+					samplesAgo += (numFrames-i);
 
-                    int idx0 = idx;
-
-                    // are we within range?
-                    if(idx0 <= src.maxIndex()-numFrames){
-                    //if (distance < src.farClip()) {
-
-                        idx += (numFrames-i);
-
-                        double gain = src.attenuation(distance);
-
-                        float s = src.readSample(idx) * gain;
-
-                        spatializer->perform(io,src,relpos, numFrames, i, s);
-
-                    } // end if in range
+					// Is our delay line big enough?
+					if(samplesAgo <= src.maxIndex()){
+					//if(dist < src.farClip()){
+						double gain = src.attenuation(dist);
+						float s = src.readSample(samplesAgo) * gain;
+						spatializer->perform(io,src,relpos, numFrames, i, s);
+					}
 
                 } //end for each frame
             } //end per sample processing

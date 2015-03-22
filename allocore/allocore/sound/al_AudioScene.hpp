@@ -51,6 +51,7 @@
 #include "allocore/types/al_Buffer.hpp"
 #include "allocore/math/al_Interpolation.hpp"
 #include "allocore/math/al_Vec.hpp"
+#include "allocore/spatial/al_DistAtten.hpp"
 #include "allocore/spatial/al_Pose.hpp"
 #include "allocore/io/al_AudioIO.hpp"
 #include "allocore/sound/al_Speaker.hpp"
@@ -201,30 +202,20 @@ protected:
 
 /// The attenuation policy may be different per source, i.e., because a bee has
 /// a different attenuation characteristic than an airplane.
-class SoundSource : public AudioSceneObject {
+class SoundSource : public AudioSceneObject, public DistAtten<double> {
 public:
 
-	/// @param[in] rollOff
-	/// @param[in] near			Distance below which amplitude is clamped to 1
-	/// @param[in] range		(near + range) is the distance at which 
-	///							amplitude reaches its mimumum (zero by default)
-	/// @param[in] ampFar		Amplitude at far clip (the minimum amplitude)
+	/// @param[in] nearClip		Distance below which amplitude is clamped to 1
+	/// @param[in] farClip		Distance above which amplitude reaches its mimumum
+	/// @param[in] law			Attenuation law
+	/// @param[in] farBias		Amplitude at far clip (the minimum amplitude)
 	/// @param[in] delaySize	Size of internal delay line. This should be
 	///							large enough for the most distant sound:
 	///							samples = sampleRate * (near + range)/speedOfSound
 	SoundSource(
-		double rollOff=1.0, double near=1, double range=100, double ampFar=0.0, int delaySize=15000
+		double nearClip=1, double farClip=100, AttenuationLaw law = ATTEN_INVERSE,
+		double farBias=0, int delaySize=15000
 	);
-
-	/// Get far clipping distance
-	double farClip() const { return mNearClip + mClipRange; }
-	double ampFar() const { return mAmpFar; }
-
-	/// Get near clipping distance
-	double nearClip() const { return mNearClip; }
-
-	/// Get roll off factor
-	double rollOff() const { return mRollOff; }
 
 	/// Returns whether distance-based attenuation is enabled
     bool useAttenuation() const { return mUseAtten; }
@@ -234,32 +225,7 @@ public:
 
 	/// Returns attentuation factor based on distance to listener
 	double attenuation(double distance) const {
-
-        //TODO make enum for curves, make virtual
-
-        if(!mUseAtten) return 1.0;
-
-		if (distance < mNearClip) {
-			return 1.0;
-		}
-        else if (distance > (mNearClip + mClipRange)) {
-			return mAmpFar;
-		}
-        else {
-			// normalized distance (0..1)
-			double dN = (distance-mNearClip) / (mClipRange);
-
-			// different possible policies for amplitude attenuation
-			// amplitude curve (max/cosm):
-			//curve = (1.-dN)*(1.-dN);
-			// alternative curve (hydrogen bond):
-			//curve = ((d + C) / (d*d + d + C))^2;	// e.g. C=2
-			// alternative curve (skewed sigmoid):
-            // alternative methods using rollOff
-
-			double curve = 1 - tanh(M_PI * dN*dN);
-			return mAmpFar + curve*(1.-mAmpFar);
-		}
+		return mUseAtten ? DistAtten<double>::attenuation(distance) : 1.0;
 	}
 
 	/// Get size of delay in samples
@@ -290,19 +256,6 @@ public:
         return ipl::linear(frac, a, b);
 	}
 
-
-	/// Set far clipping distance
-	void farClip(double v){ mClipRange=(v-mNearClip); }
-
-    /// Set far clipping amplitude (minimum amplitude)
-	void ampFar(double v){ mAmpFar=v; }
-
-	/// Set near clipping distance
-	void nearClip(double v){ mNearClip=v; }
-
-	/// Set roll off amount
-	void rollOff(double v){ mRollOff=v; }
-
     /// Enable/disable distance-based gain attenuation
     void useAttenuation(bool enable){ mUseAtten = enable; }
 
@@ -310,7 +263,7 @@ public:
     void useDoppler(bool enable){ mUseDoppler = enable; }
 
 	/// Write sample to internal delay-line
-	void writeSample(const double& v){ mSound.write(v); }
+	void writeSample(float v){ mSound.write(v); }
 
 
 	// calculate the buffersize needed for given samplerate, speed of sound & distance traveled (e.g. nearClip+clipRange).
@@ -318,9 +271,7 @@ public:
 	static int bufferSize(double samplerate, double speedOfSound, double distance);
 
 protected:
-	RingBuffer<float> mSound;			// spherical wave around position
-	double mRollOff;
-	double mNearClip, mClipRange, mAmpFar;
+	RingBuffer<float> mSound;		// spherical wave around position
 	bool mUseAtten, mUseDoppler;
 };
 
