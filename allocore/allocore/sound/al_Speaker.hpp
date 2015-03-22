@@ -48,7 +48,8 @@
 namespace al{
 
 /// Spatial definition of a speaker in a listening space
-struct Speaker {
+class Speaker {
+public:
 
 	unsigned int deviceChannel;	///< Index in the output device channels array
 	float gain;					///< Gain of speaker
@@ -65,6 +66,7 @@ struct Speaker {
 	:	deviceChannel(deviceChan), gain(gain), azimuth(az), elevation(el), radius(radius)
 	{}
 
+	/// Set position from Cartesian coordinate
 	template <class T>
 	Speaker& posCart(T * xyz){
 		using namespace std;
@@ -77,7 +79,8 @@ struct Speaker {
 		return *this;
 	}
 
-    Vec3d vec(){
+	/// Get position as Cartesian coordinate
+    Vec3d vec() const {
 
         //TODO doxygen style commenting on coordinates like ambisonics
 
@@ -95,29 +98,33 @@ struct Speaker {
 	static double toRad(double d){ return d*M_PI/180.; }
 };
 
+
+
+/// A set of speakers
 typedef std::vector<Speaker> Speakers;
+
+
 
 /// Base class for a configuration of multiple speakers
 class SpeakerLayout{
 public:
 
-	SpeakerLayout(){}
-
+	/// Get number of speakers
 	int numSpeakers() const { return speakers().size(); }
 
-	const Speakers& speakers() const { return mSpeakers; }
+	/// Get speaker array
 	Speakers& speakers(){ return mSpeakers; }
+	const Speakers& speakers() const { return mSpeakers; }
 
+	/// Add speaker
 	SpeakerLayout& addSpeaker(const Speaker& spkr){
 		mSpeakers.push_back(spkr);
 		return *this;
 	}
 
-
-
 protected:
-	friend class Spatializer;
-    friend class AmbisonicsSpatializer;
+	//friend class Spatializer;
+    //friend class AmbisonicsSpatializer;
 	Speakers mSpeakers;
 };
 
@@ -125,8 +132,8 @@ protected:
 
 /// Generic layout of N speakers spaced equidistantly in a ring
 template <int N>
-struct SpeakerRingLayout : public SpeakerLayout{
-
+class SpeakerRingLayout : public SpeakerLayout{
+public:
 	/// @param[in] deviceChannelStart	starting index of device channel
 	/// @param[in] phase				starting phase of first speaker, in degrees
 	/// @param[in] radius				radius of all speakers
@@ -140,7 +147,8 @@ struct SpeakerRingLayout : public SpeakerLayout{
 };
 
 /// Headset speaker layout
-struct HeadsetSpeakerLayout : public SpeakerRingLayout<2>{
+class HeadsetSpeakerLayout : public SpeakerRingLayout<2>{
+public:
 	HeadsetSpeakerLayout(int deviceChannelStart=0, float radius=1.f, float gain=1.f)
 	:	SpeakerRingLayout<2>(deviceChannelStart, 90, radius, gain)
 	{}

@@ -105,16 +105,25 @@ public:
 
 	virtual ~AmbiBase();
 
+	/// Get number dimensions
 	int dim() const { return mDim; }
+
+	/// Get order
 	int order() const { return mOrder; }
+
+	/// Get Ambisonic channel weights
 	const float * weights() const { return mWeights; }
 
 	/// Returns total number of Ambisonic domain channels
 	int channels() const { return mChannels; }
 
-	void order(int order);		///< Set the order.
+	/// Set the order
+	void order(int order);
 
-	virtual void onChannelsChange(){}	///< Called whenever the number of Ambisonic channels changes.
+
+	/// Called whenever the number of Ambisonic channels changes
+	virtual void onChannelsChange(){}
+
 
 	static int channelsToUniformOrder(int channels);
 
@@ -145,14 +154,19 @@ protected:
 };
 
 
+
 /// Higher Order Ambisonic Decoding class
 class AmbiDecode : public AmbiBase{
 public:
 
+	/// @param[in] dim			number of spatial dimensions (2 or 3)
+	/// @param[in] order		highest spherical harmonic order
+	/// @param[in] numSpeakers	number of speakers
+	/// @param[in] flavor		decoding algorithm
 	AmbiDecode(int dim, int order, int numSpeakers, int flavor=1);
+
 	virtual ~AmbiDecode();
 
-	virtual void onChannelsChange();
 
 	/// @param[out] dec				output time domain buffers (non-interleaved)
 	/// @param[in ] enc				input Ambisonic domain buffers (non-interleaved)
@@ -163,14 +177,23 @@ public:
 		return mWeights[channel] * mDecodeMatrix[speaker * channels() + channel];
 	}
 
-	int flavor() const { return mFlavor; };				///< Returns decode flavor
-	int numSpeakers() const { return mNumSpeakers; };	///< Returns number of speakers
+	/// Returns decode flavor
+	int flavor() const { return mFlavor; }
+
+	/// Returns number of speakers
+	int numSpeakers() const { return mNumSpeakers; }
 
 	void print(FILE * fp = stdout, const char * append = "\n") const;
 
+
+	/// Set decoding algorithm
 	void flavor(int type);
-	void numSpeakers(int num);		///< Set number of speakers.  Positions are zeroed upon resize.
+
+	/// Set number of speakers. Positions are zeroed upon resize.
+	void numSpeakers(int num);
+
 	void setSpeakerRadians(int index, int deviceChannel, float azimuth, float elevation, float amp=1.f);
+
 	void setSpeaker(int index, int deviceChannel, float azimuth, float elevation=0, float amp=1.f);
 	//void zero();					///< Zeroes out internal ambisonic frame.
 
@@ -179,18 +202,18 @@ public:
 //	float * azimuths();				///< Returns pointer to speaker azimuths.
 //	float * elevations();			///< Returns pointer to speaker elevations.
 //	float * frame() const;			///< Returns pointer to ambisonic channel frame used by decode(int)
+
+	/// Get speaker
 	Speaker& speaker(int num) { return (*mSpeakers)[num]; }
 
+	virtual void onChannelsChange();
+
 protected:
-
-
 	int mNumSpeakers;
 	int mFlavor;				// decode flavor
-
 	float * mDecodeMatrix;		// deccoding matrix for each ambi channel & speaker
 								// cols are channels and rows are speakers
 	float mWOrder[5];			// weights for each order
-
     Speakers* mSpeakers;
     //float * mPositions;		// speakers' azimuths + elevations
 	//float * mFrame;			// an ambisonic channel frame used for decode(int)
@@ -204,10 +227,13 @@ protected:
 };
 
 
+
 /// Higher Order Ambisonic encoding class
 class AmbiEncode : public AmbiBase{
 public:
 
+	/// @param[in] dim			number of spatial dimensions (2 or 3)
+	/// @param[in] order		highest spherical harmonic order
 	AmbiEncode(int dim, int order) : AmbiBase(dim, order) {}
 
 //	/// Encode input sample and set decoder frame.
@@ -222,52 +248,16 @@ public:
 	/// @param[in ] numFrames	number of frames in time buffer
 	/// @param[in ] timeIndex	index at which to encode time sample
 	/// @param[in ] timeSample	value of time sample
-	void encode(float * ambiChans, int numFrames, int timeIndex, float timeSample) const {
+	void encode(float * ambiChans, int numFrames, int timeIndex, float timeSample) const;
 
-		// "Iterate" through spherical harmonics using Duff's device.
-		// This requires only a simple jump per time sample.
-		#define CS(c) case c: ambiChans[c*numFrames+timeIndex] += weights()[c] * timeSample;
-		int ch = channels()-1;
-		switch(ch){
-			CS(15) CS(14) CS(13) CS(12) CS(11) CS(10) CS( 9) CS( 8)
-			CS( 7) CS( 6) CS( 5) CS( 4) CS( 3) CS( 2) CS( 1) CS( 0)
-			default:;
-		}
-		#undef CS
-	}
+	/// Encode a buffer of samples
 
-	/// (x,y,z unit vector in the listener's coordinate frame)
+	/// @param[in] ambiChans	Ambisonic domain channels (non-interleaved)
+	/// @param[in] dir			unit vector in the listener's coordinate frame)
+	/// @param[in] input		time-domain sample buffer to encode
+	/// @param[in] numFrames	number of frames to encode
 	template <class XYZ>
-	void encode(float * ambiChans, const XYZ * dir, const float * input, int numFrames){
-
-		// TODO: how can we efficiently encode a moving source?
-
-		// Changing the position recomputes ALL the spherical harmonic weights.
-		// Ideally we only want to change the position for each time sample.
-		// However, for our loops to be most efficient, we want the inner loop
-		// to process over time since it will have around 64-512 iterations
-		// while the spatial loop will have at most 16 iterations.
-
-//		// outer-space, inner-time
-//		for(int c=0; c<channels(); ++c){
-//			float * ambi = ambiChans[c];
-//			//T
-//
-//			for(int i=0; i<numFrames; ++i){
-//				position(pos[i][0], pos[i][1], pos[i][2]);
-//				ambi[i] += weights()[c] * input[i];
-//			}
-//		}
-
-		// outer-time, inner-space
-		for(int i=0; i<numFrames; ++i){
-			direction(dir[i][0], dir[i][1], dir[i][2]);
-			encode(ambiChans, numFrames, i, input[i]);
-//			for(int c=0; c<channels(); ++c){
-//				ambiChans[c][i] += weights()[c] * input[i];
-//			}
-		}
-	}
+	void encode(float * ambiChans, const XYZ * dir, const float * input, int numFrames);
 
 	/// Set spherical direction of source to be encoded
 	void direction(float az, float el);
@@ -277,6 +267,42 @@ public:
 	void direction(float x, float y, float z);
 };
 
+
+/// Ambisonic coder
+class AmbisonicsSpatializer : public Spatializer {
+public:
+
+    AmbisonicsSpatializer(SpeakerLayout &sl, int dim, int order, int flavor=1);
+
+    void zeroAmbi();
+
+    float * ambiChans(unsigned channel=0);
+
+    void compile(Listener& l);
+
+    void numFrames(int v);
+
+    void numSpeakers(int num);
+
+    void setSpeakerLayout(const SpeakerLayout& sl);
+
+    void prepare(AudioIOData& io);
+
+    /// Per sample processing
+    void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample);
+
+    /// Per buffer processing
+    void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples);
+
+    void finalize(AudioIOData& io);
+
+private:
+    AmbiDecode mDecoder;
+    AmbiEncode mEncoder;
+	std::vector<float> mAmbiDomainChannels;
+    Listener* mListener;
+    int mNumFrames;
+};
 
 
 
@@ -293,24 +319,12 @@ inline int AmbiBase::orderToChannels(int dim, int order){
 inline int AmbiBase::orderToChannelsH(int orderH){ return (orderH << 1) + 1; }
 inline int AmbiBase::orderToChannelsV(int orderV){ return orderV * orderV; }
 
-
-// AmbiEncode
-//inline void AmbiEncode::encode(const AmbiDecode &dec, float input){
-//	for(int c=0; c<dec.channels(); ++c) dec.frame()[c] = weights()[c] * input;
-//}
-//
-//inline void AmbiEncode::encodeAdd(const AmbiDecode &dec, float input){
-//	for(int c=0; c<dec.channels(); ++c) dec.frame()[c] += weights()[c] * input;
-//}
-
-inline void AmbiEncode::direction(float az, float el){
-	AmbiBase::encodeWeightsFuMa(mWeights, mDim, mOrder, az, el);
+template<typename T>
+void AmbiBase::resize(T *& a, int n){
+	delete[] a;
+	a = new T[n];
+	memset(a, 0, n*sizeof(T));
 }
-
-inline void AmbiEncode::direction(float x, float y, float z){
-	AmbiBase::encodeWeightsFuMa(mWeights, mDim, mOrder, x,y,z);
-}
-
 
 
 // AmbiDecode
@@ -331,140 +345,99 @@ inline float AmbiDecode::decode(float * encFrame, int encNumChannels, int speake
 //inline float * AmbiDecode::elevations(){ return mPositions + mNumSpeakers; }
 //inline float * AmbiDecode::frame() const { return mFrame; }
 
-template<typename T>
-inline void AmbiBase::resize(T *& a, int n){
-	delete[] a;
-	a = new T[n];
-	memset(a, 0, n*sizeof(T));
+
+
+// AmbiEncode
+//inline void AmbiEncode::encode(const AmbiDecode &dec, float input){
+//	for(int c=0; c<dec.channels(); ++c) dec.frame()[c] = weights()[c] * input;
+//}
+//
+//inline void AmbiEncode::encodeAdd(const AmbiDecode &dec, float input){
+//	for(int c=0; c<dec.channels(); ++c) dec.frame()[c] += weights()[c] * input;
+//}
+
+inline void AmbiEncode::direction(float az, float el){
+	AmbiBase::encodeWeightsFuMa(mWeights, mDim, mOrder, az, el);
+}
+
+inline void AmbiEncode::direction(float x, float y, float z){
+	AmbiBase::encodeWeightsFuMa(mWeights, mDim, mOrder, x,y,z);
+}
+
+inline void AmbiEncode::encode(float * ambiChans, int numFrames, int timeIndex, float timeSample) const {
+
+	// "Iterate" through spherical harmonics using Duff's device.
+	// This requires only a simple jump per time sample.
+	#define CS(c) case c: ambiChans[c*numFrames+timeIndex] += weights()[c] * timeSample;
+	int ch = channels()-1;
+	switch(ch){
+		CS(15) CS(14) CS(13) CS(12) CS(11) CS(10) CS( 9) CS( 8)
+		CS( 7) CS( 6) CS( 5) CS( 4) CS( 3) CS( 2) CS( 1) CS( 0)
+		default:;
+	}
+	#undef CS
+}
+
+template <class XYZ>
+void AmbiEncode::encode(float * ambiChans, const XYZ * dir, const float * input, int numFrames){
+
+	// TODO: how can we efficiently encode a moving source?
+
+	// Changing the position recomputes ALL the spherical harmonic weights.
+	// Ideally we only want to change the position for each time sample.
+	// However, for our loops to be most efficient, we want the inner loop
+	// to process over time since it will have around 64-512 iterations
+	// while the spatial loop will have at most 16 iterations.
+
+	/* outer-space, inner-time
+	for(int c=0; c<channels(); ++c){
+		float * ambi = ambiChans[c];
+		//T
+		for(int i=0; i<numFrames; ++i){
+			position(pos[i][0], pos[i][1], pos[i][2]);
+			ambi[i] += weights()[c] * input[i];
+		}
+	}*/
+
+	// outer-time, inner-space
+	for(int i=0; i<numFrames; ++i){
+		direction(dir[i][0], dir[i][1], dir[i][2]);
+		encode(ambiChans, numFrames, i, input[i]);
+		/*for(int c=0; c<channels(); ++c){
+			ambiChans[c][i] += weights()[c] * input[i];
+		}*/
+	}
 }
 
 
-class AmbisonicsSpatializer : public Spatializer {
+inline float * AmbisonicsSpatializer::ambiChans(unsigned channel) {
+	return &mAmbiDomainChannels[channel * mNumFrames];
+}
 
-public:
+inline void AmbisonicsSpatializer::perform(
+	AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample
+){
+    // compute azimuth & elevation of relative position in current listener's coordinate frame:
+    Vec3d urel(relpos);
+    urel.normalize();	// unit vector in axis listener->source
+    // project into listener's coordinate frame:
+    //						Vec3d axis;
+    //						l.mQuatHistory[i].toVectorX(axis);
+    //						double rr = urel.dot(axis);
+    //						l.mQuatHistory[i].toVectorY(axis);
+    //						double ru = urel.dot(axis);
+    //						l.mQuatHistory[i].toVectorZ(axis);
+    //						double rf = urel.dot(axis);
 
-    AmbisonicsSpatializer(SpeakerLayout &sl, int dim, int order, int flavor=1)
-    : Spatializer(sl), mDecoder(dim, order, sl.numSpeakers(), flavor), mEncoder(dim,order) {
-        setSpeakerLayout(sl);
-    };
+    // cheaper:
+    Vec3d direction = mListener->quatHistory()[frameIndex].rotateTransposed(urel);
 
-    void zeroAmbi(){
-        memset(ambiChans(), 0, mAmbiDomainChannels.size()*sizeof(ambiChans()[0]));
-    }
+    //mEncoder.direction(azimuth, elevation);
+    //mEncoder.direction(-rf, -rr, ru);
+    mEncoder.direction(-direction[2], -direction[0], direction[1]);
+    mEncoder.encode(ambiChans(), numFrames, frameIndex, sample);
+}
 
-    float * ambiChans(unsigned channel=0) { return &mAmbiDomainChannels[channel * mNumFrames]; }
-
-    void compile(Listener& l){
-        mListener = &l;
-    }
-
-    void numFrames(int v){
-        mNumFrames = v;
-
-        if(mAmbiDomainChannels.size() != (unsigned long)(mDecoder.channels() * v)){
-			mAmbiDomainChannels.resize(mDecoder.channels() * v);
-		}
-    }
-
-    void numSpeakers(int num){
-        mDecoder.numSpeakers(num);
-    }
-
-    void setSpeakerLayout(SpeakerLayout& sl)
-    {
-        mDecoder.setSpeakers(&mSpeakers);
-
-        mSpeakers.clear();
-		unsigned numSpeakers = sl.mSpeakers.size();
-		for(unsigned i=0;i<numSpeakers;++i){
-			mSpeakers.push_back(sl.mSpeakers[i]);
-
-            mDecoder.setSpeakerRadians(i,
-                                       mSpeakers[i].deviceChannel,
-                                       mSpeakers[i].azimuth,
-                                       mSpeakers[i].elevation,
-                                       mSpeakers[i].gain);
-		}
-
-
-    }
-
-    void prepare(AudioIOData& io){
-        zeroAmbi();
-    }
-
-    /// Per sample processing
-    void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample)
-    {
-        // compute azimuth & elevation of relative position in current listener's coordinate frame:
-        Vec3d urel(relpos);
-        urel.normalize();	// unit vector in axis listener->source
-        // project into listener's coordinate frame:
-        //						Vec3d axis;
-        //						l.mQuatHistory[i].toVectorX(axis);
-        //						double rr = urel.dot(axis);
-        //						l.mQuatHistory[i].toVectorY(axis);
-        //						double ru = urel.dot(axis);
-        //						l.mQuatHistory[i].toVectorZ(axis);
-        //						double rf = urel.dot(axis);
-
-        // cheaper:
-        Vec3d direction = mListener->mQuatHistory[frameIndex].rotateTransposed(urel);
-
-        //mEncoder.direction(azimuth, elevation);
-        //mEncoder.direction(-rf, -rr, ru);
-        mEncoder.direction(-direction[2], -direction[0], direction[1]);
-        mEncoder.encode(ambiChans(), numFrames, frameIndex, sample);
-
-    }
-
-    /// Per buffer processing
-    void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples){
-
-         // compute azimuth & elevation of relative position in current listener's coordinate frame:
-         Vec3d urel(relpos);
-         urel.normalize();	// unit vector in axis listener->source
-         // project into listener's coordinate frame:
-         //						Vec3d axis;
-         //						l.mQuatHistory[i].toVectorX(axis);
-         //						double rr = urel.dot(axis);
-         //						l.mQuatHistory[i].toVectorY(axis);
-         //						double ru = urel.dot(axis);
-         //						l.mQuatHistory[i].toVectorZ(axis);
-         //						double rf = urel.dot(axis);
-
-        for(int i = 0; i < numFrames; i++)
-        {
-            // cheaper:
-            Vec3d direction = mListener->mQuatHistory[i].rotateTransposed(urel);
-
-            //mEncoder.direction(azimuth, elevation);
-            //mEncoder.direction(-rf, -rr, ru);
-            mEncoder.direction(-direction[2], -direction[0], direction[1]);
-            mEncoder.encode(ambiChans(), numFrames, i, samples[i]);
-        }
-
-    }
-
-
-    void finalize(AudioIOData& io){
-
-        //previously done in render method of audioscene
-
-        float *outs = &io.out(0,0);//io.outBuffer();
-        int numFrames = io.framesPerBuffer();
-
-        mDecoder.decode(outs, ambiChans(), numFrames);
-
-    }
-
-private:
-    AmbiDecode mDecoder;
-    AmbiEncode mEncoder;
-	std::vector<float> mAmbiDomainChannels;
-    Listener* mListener;
-    int mNumFrames;
-};
 
 } // al::
 #endif

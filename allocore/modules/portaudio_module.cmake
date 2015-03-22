@@ -33,8 +33,11 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif()
 
 list(APPEND ALLOCORE_SRC
-      src/io/al_AudioIO.cpp
-      src/sound/al_Ambisonics.cpp
+    src/io/al_AudioIO.cpp
+	src/sound/al_AudioScene.cpp
+    src/sound/al_Ambisonics.cpp
+    src/sound/al_Dbap.cpp
+    src/sound/al_Vbap.cpp
 )
 
 list(APPEND ALLOCORE_HEADERS ${PORTAUDIO_HEADERS})
