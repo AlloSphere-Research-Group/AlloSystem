@@ -77,7 +77,7 @@ Texture :: Texture(AlloArrayHeader& header)
 	mParamsUpdated(true), mShapeUpdated(true),
 	mPixelsUpdated(true), mArrayDirty(false)
 {
-	setPixelsFrom(header, true);
+	shapeFrom(header, true /*reallocate*/);
 }
 
 Texture :: ~Texture() {
@@ -90,7 +90,7 @@ void Texture::onCreate(){
 	glGenTextures(1, (GLuint *)&mID);
 
 	glBindTexture(target(), id());
-	syncWithArray();
+	shapeFromArray();
 	sendShape();
 	sendParams();
 	sendPixels();
@@ -105,7 +105,7 @@ void Texture::onDestroy(){
 
 
 
-void Texture::setPixelsFrom(const AlloArrayHeader& hdr, bool reallocate){
+void Texture::shapeFrom(const AlloArrayHeader& hdr, bool realloc){
 	switch(hdr.dimcount){
 		case 1: target(TEXTURE_1D); break;
 		case 2: target(TEXTURE_2D); break;
@@ -153,7 +153,7 @@ void Texture::setPixelsFrom(const AlloArrayHeader& hdr, bool reallocate){
 	}
 
 	// Reconfigure internal array AND resize its memory (if necessary).
-	if(reallocate){
+	if(realloc){
 		mArray.format(hdr);
 	}
 
@@ -161,12 +161,19 @@ void Texture::setPixelsFrom(const AlloArrayHeader& hdr, bool reallocate){
 	else{
 		mArray.configure(hdr);
 	}
-
-	//mParamsUpdated = true; // Needed? We are only updating pixels here...
 }
 
-void Texture :: configure(AlloArrayHeader& hdr) {
-	setPixelsFrom(hdr, false);
+void Texture::shapeFromArray(){
+	// If someone requested a mutable reference to the internal array, we will
+	// assume we need to sync the texture attributes with the array.
+	if(mArrayDirty){
+		// ensure texture attributes match internal array
+		shapeFrom(mArray.header, false);
+		// force texture to be submitted since the pixel data could have been
+		// tampered with
+		dirty(); // mPixelsUpdated=true;
+		mArrayDirty = false;
+	}
 }
 
 void Texture :: bind(int unit) {
@@ -186,7 +193,7 @@ void Texture :: bind(int unit) {
 	glBindTexture(target(), id());
 		AL_GRAPHICS_ERROR("binding texture", id());
 
-	syncWithArray();
+	shapeFromArray();
 
 	// Synchronize client texture state with GPU
 
@@ -248,19 +255,6 @@ void Texture :: resetArray(unsigned align) {
 	}
 }
 
-void Texture::syncWithArray(){
-	// If someone requested a mutable reference to the internal array, we will
-	// assume we need to sync the texture attributes with the array.
-	if(mArrayDirty){
-		// ensure texture attributes match internal array
-		setPixelsFrom(mArray.header, false);
-		// force texture to be submitted since the pixel data could have been
-		// tampered with
-		dirty();
-		mArrayDirty = false;
-	}
-}
-
 void Texture :: allocate(unsigned align) {
 	deallocate();
 	resetArray(align);
@@ -273,7 +267,7 @@ void Texture :: allocate(const Array& src, bool reconfigure) {
 	// Here we reconfigure the internal Array to match the passed in Array
 	if (reconfigure) {
 		//printf("allocating & reconfiguring %p from\n", this); src.print();
-		setPixelsFrom(src.header, true);
+		shapeFrom(src.header, true /*reallocate*/);
 
 		//printf("allocating & reconfigured %p\n", this); mArray.print();
 
@@ -474,7 +468,7 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 
 	// Here we basically do a deep copy of the passed in Array
 	if (reconfigure) {
-		setPixelsFrom(src.header, true);
+		shapeFrom(src.header, true /*reallocate*/);
 		//printf("configured to target=%X(%dD), type=%X(%X), format=%X, align=(%d)\n", mTarget, src.dimcount(), type(), src.type(), mFormat, src.alignment());
 	}
 
@@ -664,6 +658,11 @@ void Texture :: print() {
 	//mArray.print();
 }
 
+
+void Texture :: configure(AlloArrayHeader& hdr) {
+	AL_WARN_ONCE("Texture::configure() deprecated, use Texture::shapeFrom()");
+	shapeFrom(hdr, false);
+}
 
 Texture& Texture::updatePixels(){
 	AL_WARN_ONCE("Texture::updatePixels() deprecated, use Texture::dirty()");
