@@ -99,7 +99,6 @@ class Listener;
 class SoundSource;
     
 /// Abstract class for all spatializers: Ambisonics, DBAP, VBAP, etc.
-class Dbap;
 class Spatializer {
 public:
     Spatializer(SpeakerLayout& sl) : enabled(true){
@@ -520,7 +519,10 @@ public:
                 {
                     //update source history data (only for the first listener)
                     if(il == 0)
+                    {
                         src.mPosHistory(src.pose().pos());
+                        // TODO ? src.onProcessBuffer(numFrames);
+                    }
                     
                     Vec3d relpos = src.pose().pos() - l.pose().pos();
                     double distance = relpos.mag();

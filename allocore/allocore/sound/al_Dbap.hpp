@@ -28,6 +28,8 @@ public:
 		{
 			speakerVecs[i] = mSpeakers[i].vec();
 			speakerVecs[i].normalize();
+            if(numSpeakers == 2) //psuedo-stereo panning hack
+                speakerVecs[i].x /= 6;
 			deviceChannels[i] = mSpeakers[i].deviceChannel;
 		}
 			
