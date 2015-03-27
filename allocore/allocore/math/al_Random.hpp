@@ -111,8 +111,13 @@ public:
 	template <int N, class T>
 	void ball(T * point);
 
+	/// Returns point within a unit ball
 	template <template<int,class> class VecType, int N, class T>
 	void ball(VecType<N,T>& point){ ball<N>(&point[0]); }
+
+	/// Returns point within a unit ball
+	template <class VecType>
+	VecType ball(){ VecType v; ball(v); return v; }
 
 	/// Returns standard normal variate
 	float normal(){ float r; normal(r,r); return r; }
@@ -284,8 +289,13 @@ inline Random<>& global(){ static Random<> r; return r; }
 template <int N, class T>
 inline void ball(T * point){ global().ball<N>(point); }
 
+/// Returns point within a unit ball
 template <template<int,class> class VecType, int N, class T>
 inline void ball(VecType<N,T>& point){ ball<N>(&point[0]); }
+
+/// Returns point within a unit ball
+template <class VecType>
+inline VecType ball(){ VecType v; ball(v); return v; }
 
 /// Returns standard normal variate
 inline float normal(){ return global().normal(); }
