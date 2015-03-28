@@ -380,7 +380,7 @@ protected:
 class AudioScene {
 public:
 
-	typedef std::vector<Listener *> Listeners;
+    typedef std::vector<Listener *> Listeners;
 	typedef std::list<SoundSource *> Sources;
 
     AudioScene(int numFrames)
@@ -407,11 +407,16 @@ public:
     /// Create a new listener for this scene using the given spatializer
     Listener * createListener(Spatializer* spatializer) {
 		Listener * l = new Listener(mNumFrames, spatializer);
+        //l->pose(Pose(Vec3f(0, 0, 0.1))); //TODO why the click at 0, 0, 0?
         l->compile();
 		mListeners.push_back(l);
 		return l;
 	}
 	
+    void removeListeners(){
+        mListeners.clear();
+    }
+    
 	void addSource(SoundSource& src) {
 		mSources.push_back(&src);
 	}
@@ -434,9 +439,13 @@ public:
 #else
     void render(float **outputBuffers, const int numFrames, double sampleRate) {
 #endif
-    
-		double distanceToSample = sampleRate / mSpeedOfSound;
-		
+        
+        // scalar factor to convert distances into delayline indices
+        // varies per source,
+        // since each source has its own buffersize and far clip
+        // (not physically accurate of course)
+        double distanceToSample = sampleRate / mSpeedOfSound;
+        
 		// iterate through all listeners adding contribution from all sources
 		for(unsigned il=0; il<mListeners.size(); ++il){
 			Listener& l = *mListeners[il];
@@ -453,15 +462,6 @@ public:
 			// iterate through all sound sources
 			for(Sources::iterator it = mSources.begin(); it != mSources.end(); ++it){
 				SoundSource& src = *(*it);
-				
-				// scalar factor to convert distances into delayline indices
-				// varies per source, 
-				// since each source has its own buffersize and far clip
-				// (not physically accurate of course)
-                if(src.useDoppler)
-                    distanceToSample = distanceToSample; //(src.maxIndex()-numFrames)/src.farClip();
-                else
-                    distanceToSample = 0;
 				
                 if(perSampleProcessing) //Original, inefficient, per sample processing
                 {
@@ -489,7 +489,20 @@ public:
                             (src.mPosHistory[0]-l.mPosHistory[0])*(alpha)
                         )/3.0;
 
-                        double distance = relpos.mag();
+                        //double distance = relpos.mag();
+                        
+                        double distance = src.mPosHistory[0].mag();
+                        double prevDistance = src.mPosHistory[1].mag();
+                        
+                        //physically accurate doppler
+                        double sourceVel = (distance - prevDistance)*sampleRate; //positive when moving away, negative moving toward
+                        if(sourceVel > mSpeedOfSound) sourceVel = mSpeedOfSound;
+                        else if(sourceVel < (1-mSpeedOfSound)) sourceVel = 1 - mSpeedOfSound;
+                        
+                        if(src.useDoppler)
+                            distanceToSample = sampleRate / (mSpeedOfSound + sourceVel);
+                        else
+                            distanceToSample = 0;
                         
                         double idx = distance * distanceToSample;
                         
