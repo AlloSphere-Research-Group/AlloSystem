@@ -11,7 +11,8 @@ Lance Putnam, Nov. 2013
 #include "allocore/io/al_App.hpp"
 using namespace al;
 
-struct MyApp : App{
+class MyApp : public App{
+public:
 
 	Texture tex;
 

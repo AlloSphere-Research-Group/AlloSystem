@@ -1,5 +1,6 @@
 #include <math.h>
 #include "allocore/graphics/al_Shapes.hpp"
+#include "allocore/graphics/al_Graphics.hpp"
 
 /*
 Platonic solids code derived from:
@@ -11,26 +12,10 @@ namespace al{
 
 const double phi = (1 + sqrt(5))/2; // the golden ratio
 
-int addTetrahedron(Mesh& m){
-	static const float l = sqrt(1./3);
-	static const float vertices[] = {
-		 l, l, l,
-		-l, l,-l,
-		 l,-l,-l,
-		-l,-l, l
-	};
-
-	static const int indices[] = {0,2,1, 0,1,3, 1,2,3, 2,0,3};
-
-	int Nv = sizeof(vertices)/sizeof(*vertices)/3;
-
-	m.vertex(vertices, Nv);
-	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
-
-	return Nv;
-}
 
 int addCube(Mesh& m, bool withNormalsAndTexcoords, float l){
+
+	m.primitive(Graphics::TRIANGLES);
 
 	// This generates a cube with face-oriented normals and unit texture
 	// coordinates per face. It should be rendered using a quad primitive.
@@ -87,9 +72,8 @@ int addCube(Mesh& m, bool withNormalsAndTexcoords, float l){
 		m.vertex(-l,-l,-l);
 
 		return 6*4;
-	} else {
-
-
+	}
+	else{
 		/*
 				0	1
 
@@ -120,32 +104,38 @@ int addCube(Mesh& m, bool withNormalsAndTexcoords, float l){
 
 		m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
 
-//		if(withNormalsAndTexcoords){
-//			m.normal();
-//		}
-
 		return Nv;
-
-//		static const float vertices[] = {
-//			-l, l,-l,	 l, l,-l,	// 0  1
-//			-l,-l,-l,	 l,-l,-l,	// 2  3
-//			-l, l, l,	 l, l, l,	// 4  5
-//			-l,-l, l,	 l,-l, l,	// 6  7
-//		};
-//
-//		static const int indices[] = {
-//			6,5,4, 6,7,5, 7,1,5, 7,3,1,
-//			3,0,1, 3,2,0, 2,4,0, 2,6,4,
-//			4,1,0, 4,5,1, 2,3,6, 3,7,6
-//		};
-//		int Nv = sizeof(vertices)/sizeof(*vertices)/3;
-//		m.vertex(vertices, Nv);
-//		m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
-//		return Nv;
 	}
 }
 
+
+int addTetrahedron(Mesh& m){
+
+	m.primitive(Graphics::TRIANGLES);
+
+	static const float l = sqrt(1./3);
+	static const float vertices[] = {
+		 l, l, l,
+		-l, l,-l,
+		 l,-l,-l,
+		-l,-l, l
+	};
+
+	static const int indices[] = {0,2,1, 0,1,3, 1,2,3, 2,0,3};
+
+	int Nv = sizeof(vertices)/sizeof(*vertices)/3;
+
+	m.vertex(vertices, Nv);
+	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
+
+	return Nv;
+}
+
+
 int addOctahedron(Mesh& m){
+
+	m.primitive(Graphics::TRIANGLES);
+
 	static const float vertices[] = {
 		 1,0,0, 0, 1,0, 0,0, 1,	// 0 1 2
 		-1,0,0, 0,-1,0, 0,0,-1	// 3 4 5
@@ -164,9 +154,11 @@ int addOctahedron(Mesh& m){
 	return Nv;
 }
 
-// Data taken from "Platonic Solids (Regular Polytopes In 3D)"
-// http://local.wasp.uwa.edu.au/~pbourke/geometry/platonic/
+
 int addDodecahedron(Mesh& m){
+
+	m.primitive(Graphics::TRIANGLES);
+
 	static const float a = 1.6 * 0.5;
 	static const float b = 1.6 / (2 * phi);
 	static const float vertices[] = {
@@ -193,6 +185,9 @@ int addDodecahedron(Mesh& m){
 }
 
 int addIcosahedron(Mesh& m){
+
+	m.primitive(Graphics::TRIANGLES);
+
 //	float b = 1. / phi;
 //	float c = 2. - phi;
 //	float vertices[] = {
@@ -268,8 +263,9 @@ int addIcosahedron(Mesh& m){
 // Stacks are circles cut perpendicular to the z axis while slices are circles
 // cut through the z axis.
 // The top is (0,0,radius) and the bottom is (0,0,-radius).
-
 int addSphere(Mesh& m, double radius, int slices, int stacks){
+
+	m.primitive(Graphics::TRIANGLES);
 
 	struct CSin{
 		CSin(double frq, double radius=1.)
@@ -335,8 +331,10 @@ int addSphere(Mesh& m, double radius, int slices, int stacks){
 	return m.vertices().size()-Nv;
 }
 
-// create sphere with texture coordinates and normals
+
 int addSphereWithTexcoords(Mesh& m, double radius, int bands ){
+
+	m.primitive(Graphics::TRIANGLES);
 
 	double r = radius;
 
@@ -382,6 +380,8 @@ int addSphereWithTexcoords(Mesh& m, double radius, int bands ){
 
 int addWireBox(Mesh& m, float w, float h, float d){
 
+	m.primitive(Graphics::LINES);
+
 	int Nv = m.vertices().size();
 
 	/*		6 7
@@ -402,11 +402,15 @@ int addWireBox(Mesh& m, float w, float h, float d){
 	};
 
 	m.index(I, sizeof(I)/sizeof(*I), Nv);
+
 	return m.vertices().size() - Nv;
 }
 
 
 int addSurface(Mesh& m, int Nx, int Ny, float width, float height){
+
+	m.primitive(Graphics::TRIANGLE_STRIP);
+
 	int Nv = m.vertices().size();
 
 	for(int j=0; j<Ny; ++j){ float y=(float(j)/(Ny-1) - 0.5f) * height;
@@ -433,6 +437,8 @@ int addSurface(Mesh& m, int Nx, int Ny, float width, float height){
 
 
 int addSurfaceLoop(Mesh& m, int Nx, int Ny, int loopMode, float width, float height){
+
+	m.primitive(Graphics::TRIANGLE_STRIP);
 
 	int Nv = m.vertices().size();
 

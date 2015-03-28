@@ -47,7 +47,6 @@ public:
 		for(int i=0; i<Nx*Ny*2; ++i) wave[i] = 0;
 
 		// Add a tessellated plane
-		mesh.primitive(Graphics::TRIANGLE_STRIP);
 		addSurface(mesh, Nx,Ny);
 		mesh.color(HSV(0.6, 0.2, 0.9));
 

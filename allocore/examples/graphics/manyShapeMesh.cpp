@@ -79,10 +79,8 @@ int main(){
 		}
 	}
 
-	shapes.primitive(Graphics::TRIANGLES);
 	shapes.decompress();
 	shapes.generateNormals();
-
 
 	win1.add(new StandardWindowKeyControls);
 

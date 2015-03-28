@@ -30,7 +30,6 @@ struct PickRayDemo : App {
     nav().pos(0, 0, 10);
     light.pos(0, 0, 10);
     addSphere(m, 0.5);
-    m.primitive(Graphics::TRIANGLES);
     m.generateNormals();
 
     for(int i=0; i<N; i++){
