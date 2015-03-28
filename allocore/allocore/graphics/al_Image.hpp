@@ -247,7 +247,9 @@ bool Image::save(
 	allo_array_setdim2d(&a.header, nx, ny);
 	allo_array_setstride(&a.header, 1);
 
-	return save(filePath, a, compress);
+	bool res = save(filePath, a, compress);
+	a.data.ptr = NULL; // prevent ~Array from deleting data
+	return res;
 }
 
 

@@ -39,9 +39,9 @@
 	Helper object for Graphics Textures
 
 	File author(s):
-	Wesley Smith, 2010, wesley.hoke@gmail.com
-	Lance Putnam, 2010, putnam.lance@gmail.com
+	Lance Putnam, 2015, putnam.lance@gmail.com
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
+	Wesley Smith, 2010, wesley.hoke@gmail.com
 */
 
 #include "allocore/system/al_Printing.hpp"
@@ -97,7 +97,8 @@ public:
 	/// @param[in] clientAlloc	allocate data on the client
 	Texture(
 		unsigned width, unsigned height,
-		Graphics::Format format=Graphics::RGBA, Graphics::DataType type=Graphics::UBYTE,
+		Graphics::Format format=Graphics::RGBA,
+		Graphics::DataType type=Graphics::UBYTE,
 		bool clientAlloc=true
 	);
 
@@ -111,10 +112,10 @@ public:
 	/// @param[in] clientAlloc	allocate data on the client
 	Texture(
 		unsigned width, unsigned height, unsigned depth,
-		Graphics::Format format=Graphics::RGBA, Graphics::DataType type=Graphics::UBYTE,
+		Graphics::Format format=Graphics::RGBA,
+		Graphics::DataType type=Graphics::UBYTE,
 		bool clientAlloc=true
 	);
-
 
 	/// Construct a Texture object from an Array header
 	Texture(AlloArrayHeader& header);
@@ -122,7 +123,19 @@ public:
 	virtual ~Texture();
 
 
-	void configure(AlloArrayHeader& header);
+	/// Set shape (size, format, type, etc.) from array header
+
+	/// @param[in] hdr		Array header from which to match shape
+	/// @param[in] realloc	If true, then the texture's internal memory will
+	///						be reallocated as necessary.
+	void shapeFrom(const AlloArrayHeader& hdr, bool realloc=false);
+
+	/// Set shape (size, format, type, etc.) from internal array
+
+	/// This call can be used to ensure that the tetxure shape matches the
+	/// internal array.
+	void shapeFromArray();
+
 
 	/// Get pixel (color) format
 	Format format() const { return mFormat; }
@@ -251,11 +264,11 @@ public:
 	///
 	Texture& dirty(){ mPixelsUpdated=true; return *this; }
 
-	/// Submit the texture using an Array as source
+	/// Submit the texture to GPU using an Array as source
 
-	/// NOTE: the graphics context (e.g. Window) must have been created
-	/// if reconfigure is true,
-	/// it will attempt to derive size & layout from the array
+	/// NOTE: the graphics context (e.g. Window) must have been created.
+	/// If reconfigure is true, it will attempt to derive size & layout from the
+	/// array.
 	void submit(const Array& src, bool reconfigure=false);
 
 	/// Copy client pixels to GPU texels
@@ -321,8 +334,6 @@ protected:
 	// ensures that the internal Array format matches the texture format
 	void resetArray(unsigned align);
 
-	void syncWithArray();
-
 	// send any pending parameter updates to GPU or do immediately if forced
 	void sendParams(bool force=true);
 
@@ -343,12 +354,10 @@ protected:
 		return *this;
 	}
 
-	// sets the pixel format/array from another Array header
-	void setPixelsFrom(const AlloArrayHeader& hdr, bool reallocate);
-
 public:
 	Texture& updatePixels(); /// \deprecated use dirty() instead
 	void submit(); /// \deprecated use dirty() instead
+	void configure(AlloArrayHeader& header); /// \deprecated use shapeFrom() instead
 };
 
 
