@@ -26,7 +26,6 @@ struct MyWindow : public Window, public Drawable {
 		angle += 0.0007; if(angle > M_2PI) angle -= M_2PI;
 
 		shapes.reset();
-		shapes.primitive(gl.TRIANGLES);
 		const int N = 8;
 		for(int ix=3; ix<3+N; ++ix){
 		for(int iy=2; iy<2+N; ++iy){

@@ -68,8 +68,6 @@ int main(){
 	{
 		int Nv = addTetrahedron(solids[0]);
 
-		solids[0].primitive(Graphics::TRIANGLES);
-
 		for(int i=0; i<Nv; ++i){
 			float f = float(i)/Nv;
 			solids[0].color(HSV(f*0.2+0.4,1,1));
@@ -82,8 +80,6 @@ int main(){
 	{
 		int Nv = addCube(solids[1]);
 
-		solids[1].primitive(Graphics::TRIANGLES);
-
 		for(int i=0; i<Nv; ++i){
 			float f = float(i)/Nv;
 			solids[1].color(HSV(f*0.1+0.2,1,1));
@@ -95,7 +91,6 @@ int main(){
 
 	{
 		int Nv = addOctahedron(solids[2]);
-		solids[2].primitive(Graphics::TRIANGLES);
 
 		for(int i=0; i<Nv; ++i){
 			float f = float(i)/Nv;
@@ -108,7 +103,6 @@ int main(){
 
 	{
 		int Nv = addDodecahedron(solids[3]);
-		solids[3].primitive(Graphics::TRIANGLES);
 
 		for(int i=0; i<Nv; ++i){
 			float f = float(i)/Nv;
@@ -121,7 +115,6 @@ int main(){
 
 	{
 		int Nv = addIcosahedron(solids[4]);
-		solids[4].primitive(Graphics::TRIANGLES);
 
 		for(int i=0; i<Nv; ++i){
 			float f = float(i)/Nv;
