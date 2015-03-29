@@ -28,14 +28,14 @@ public:
 		initWindow();
 	}
 
-	virtual void onCreate(const ViewpointWindow& win){
+	void onCreate(const ViewpointWindow& win){
 		// Compile the display list
 		dlist.begin();
 		graphics().draw(verts);
 		dlist.end();
 	}
 
-	virtual void onDraw(Graphics& g, const Viewpoint& v){
+	void onDraw(Graphics& g){
 		light.dir(1,1,1);
 		light();
 
@@ -51,4 +51,6 @@ public:
 	}
 };
 
-int main(){ MyApp().start(); }
+int main(){
+	MyApp().start();
+}

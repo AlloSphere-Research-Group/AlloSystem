@@ -5,14 +5,14 @@ Description:
 Example of per-vertex exponential fog with variable curvature.
 
 Author(s):
-Lance Putnam, 9/2011, putnam.lance@gmail.com
+Lance Putnam, Sept. 2011
 */
 
 #include "allocore/al_Allocore.hpp"
 #include "allocore/graphics/al_Shader.hpp"
-
 using namespace al;
 
+// Fog vertex shader
 static const char * fogVert = AL_STRINGIFY(
 	/* 'fogCurve' determines the distribution of fog between the near and far planes.
 	Positive values give more dense fog while negative values give less dense
@@ -36,6 +36,7 @@ static const char * fogVert = AL_STRINGIFY(
 	}
 );
 
+// Fog fragment shader
 static const char * fogFrag = AL_STRINGIFY(
 	varying float fogFactor;
 
@@ -44,82 +45,71 @@ static const char * fogFrag = AL_STRINGIFY(
 	}
 );
 
-struct MyWindow : Window{
+class MyApp : public App {
+public:
 
-	ShaderProgram shaderP;
 	Shader shaderV, shaderF;
+	ShaderProgram shaderP;
 	Mesh geom;
-	Graphics gl;
 	float phase;
-	float nearClip, farClip;
 
+	MyApp(){
+		phase = 0;
+		background(HSV(0.1, 0.5, 1));
+		lens().near(0.1).far(20);
 
-	MyWindow()
-	:	phase(0), nearClip(0.1), farClip(20)
-	{}
+		// Create some geometry
+		geom.color(RGB(0));
+		Mat4f xfm;
 
+		for(int i=0; i<200; ++i){
+			xfm.setIdentity();
+			xfm.scale(Vec3f(0.05, 0.05, 1));
 
-	bool onCreate(){
-		shaderV.source(fogVert, Shader::VERTEX).compile();
-		shaderF.source(fogFrag, Shader::FRAGMENT).compile();
+			Vec3f t(
+				rnd::uniformS(4.),
+				rnd::uniformS(4.),
+				rnd::uniform(-lens().far(), -lens().near())
+			);
+			xfm.translate(t);
+
+			int Nv = addWireBox(geom);
+			geom.transform(xfm, geom.vertices().size()-Nv);
+		}
+
+		initWindow();
+	}
+
+	void onCreate(const ViewpointWindow& win){
+		shaderV.source(fogVert, Shader::VERTEX);
+		shaderF.source(fogFrag, Shader::FRAGMENT);
 		shaderP.attach(shaderF).attach(shaderV);
 		shaderP.link();
 
 		shaderV.printLog();
 		shaderF.printLog();
 		shaderP.printLog();
-
-		geom.primitive(gl.TRIANGLES);
-		geom.color(Color(0));
-		Mat4f xfm;
-
-		for(int i=0; i<200; ++i){
-			xfm.setIdentity();
-			xfm.scale(Vec3f(0.1, 0.1, 1));
-			xfm.translate(Vec3f(rnd::uniformS(4.), rnd::uniformS(4.), rnd::uniform(farClip, nearClip)));
-
-			int Nv = addCube(geom);
-			geom.transform(xfm, geom.vertices().size()-Nv);
-		}
-
-		return true;
 	}
 
 
-	bool onFrame(){
-
-		// Update model
+	void onAnimate(double dt){
 		phase += 0.00017; if(phase>=1) --phase;
+	}
 
-		// The fog color and background color will typically be the same
-		Color fogCol(HSV(0.1, 0.5, 1));
+	void onDraw(Graphics& g){
 
-		// Set up scene
-		gl.depthTesting(true);
-		gl.clearColor(fogCol);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-		gl.viewport(0,0, width(), height());
-		gl.matrixMode(gl.PROJECTION);
-		gl.loadMatrix(Matrix4d::perspective(45, aspect(), nearClip, farClip));
-		gl.matrixMode(gl.MODELVIEW);
-		gl.loadMatrix(Matrix4d::lookAt(Vec3d(0,0,-3), Vec3d(0,0,0), Vec3d(0,1,0)));
+		// Activate fog;
+		// the fog and background color will typically be the same.
+		g.fog(lens().far(), lens().near()+2, background());
 
 		// Render
 		shaderP.begin();
-			shaderP.uniform("fogCurve", 4*sin(8*phase*6.2832));
-			gl.fog(farClip, nearClip+2, fogCol);
-			gl.draw(geom);
+			shaderP.uniform("fogCurve", 4*cos(8*phase*6.2832));
+			g.draw(geom);
 		shaderP.end();
-
-		return true;
 	}
 };
 
-
 int main(){
-	MyWindow w;
-	w.add(new StandardWindowKeyControls);
-	w.create(Window::Dim(800, 600));
-	MainLoop::start();
+	MyApp().start();
 }

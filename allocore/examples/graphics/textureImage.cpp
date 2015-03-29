@@ -13,7 +13,8 @@ smooth.  This is because interpolation is done on the GPU.
 using namespace al;
 using namespace std;
 
-struct MyApp : App {
+class MyApp : public App {
+public:
 
   // Image and Texture handle reading and displaying image files.
   //
@@ -100,11 +101,8 @@ struct MyApp : App {
       }
     }
   }
-  
-  virtual void onAnimate(double dt) {}
 
-  virtual void onDraw(Graphics& g, const Viewpoint& v) {
-    g.clear(g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT);
+  void onDraw(Graphics& g) {
 
     g.pushMatrix();
 

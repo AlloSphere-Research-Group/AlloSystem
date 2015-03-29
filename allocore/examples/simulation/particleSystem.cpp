@@ -12,8 +12,6 @@ Lance Putnam, 4/25/2011
 #include "allocore/al_Allocore.hpp"
 using namespace al;
 
-Graphics gl;
-
 struct Particle{
 
 	Particle(): age(0){}
@@ -70,60 +68,40 @@ struct Emitter {
 };
 
 
-Emitter<8000> em1;
+class MyApp : public App {
+public:
 
+	Emitter<8000> em1;
+	Mesh mesh;
 
-struct MyWindow : Window{
+	MyApp(){
+		nav().pos(0,0,16);
+		initWindow();
+	}
 
-	bool onFrame(){
-
+	void onAnimate(double dt){
 		em1.update<40>();
 
-		Color back(0);
-
-		gl.clearColor(back);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-		gl.viewport(0,0, width(), height());
-
-		gl.matrixMode(gl.PROJECTION);
-		gl.loadMatrix(Matrix4d::perspective(45, aspect(), 0.1, 100));
-
-		gl.matrixMode(gl.MODELVIEW);
-		gl.loadMatrix(Matrix4d::lookAt(Vec3d(0,0,10), Vec3d(0,0,0), Vec3d(0,1,0)));
-
-		gl.depthTesting(false);
-		gl.blending(true);
-		gl.blendModeAdd();
-
-		gl.antialiasing(gl.NICEST);
-		gl.pointSize(6);
-
-		Mesh& m = gl.mesh();
-
-		m.reset();
-		m.primitive(gl.POINTS);
+		mesh.reset();
+		mesh.primitive(Graphics::POINTS);
 
 		for(int i=0; i<em1.size(); ++i){
 			Particle& p = em1.particles[i];
 			float age = float(p.age) / em1.size();
 
-			m.vertex(p.pos);
-			rnd::Random<> rng;
-			m.color(Color(HSV(0.6, rng.uniform(), 1-age), 0.4));
+			mesh.vertex(p.pos);
+			mesh.color(Color(HSV(0.6, rnd::uniform(), 1-age), 0.4));
 		}
+	}
 
-		gl.draw(m);
-		return true;
+	void onDraw(Graphics& g){
+		g.blendAdd();
+		g.nicest();
+		g.pointSize(6);
+		g.draw(mesh);
 	}
 };
 
-MyWindow win1;
-
 int main(){
-	win1.add(new StandardWindowKeyControls);
-	win1.create(Window::Dim(800, 600));
-
-	MainLoop::start();
-	return 0;
+	MyApp().start();
 }

@@ -83,7 +83,7 @@ public:
 		}
 	}
 
-	void onDraw(Graphics& g, const Viewpoint& v){
+	void onDraw(Graphics& g){
 		g.draw(curve);
 	}
 };
