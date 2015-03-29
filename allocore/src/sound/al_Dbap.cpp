@@ -2,8 +2,8 @@
 
 namespace al{
 
-Dbap::Dbap(const SpeakerLayout &sl, float spread)
-:	Spatializer(sl), mNumSpeakers(0), mSpread(spread)
+Dbap::Dbap(const SpeakerLayout &sl, float focus)
+:	Spatializer(sl), mNumSpeakers(0), mFocus(focus)
 {}
 
 void Dbap::compile(Listener& listener){
@@ -14,21 +14,19 @@ void Dbap::compile(Listener& listener){
 	for(int i = 0; i < mNumSpeakers; i++)
 	{
 		mSpeakerVecs[i] = mSpeakers[i].vec();
-		mSpeakerVecs[i].normalize();
 		mDeviceChannels[i] = mSpeakers[i].deviceChannel;
 	}
 }
 
-void Dbap::perform(
-	AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples
-){
+#if !ALLOCORE_GENERIC_AUDIOSCENE
+    
+void Dbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples){
 	for (unsigned k = 0; k < mNumSpeakers; ++k)
 	{
-		Vec3d vec = relpos.normalized();
-		vec -= mSpeakerVecs[k];
-		float dist = vec.mag() / 2.f; // [0, 1]
-		dist = powf(dist, mSpread);
-		float gain = 1.f / (1.f + DBAP_MAX_DIST*dist);
+        Vec3d vec = relpos - mSpeakerVecs[k];
+        float dist = vec.mag();
+		float gain = 1.f / (1.f + dist);
+        gain = powf(gain, mFocus);
 
 		float * out = io.outBuffer(mDeviceChannels[k]);
 		for(int i = 0; i < numFrames; ++i){
@@ -36,6 +34,56 @@ void Dbap::perform(
 		}
 	}
 }
+    
+void Dbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample)
+{
+    for (unsigned i = 0; i < mNumSpeakers; ++i)
+    {
+        Vec3d vec = relpos - mSpeakerVecs[i];
+        float dist = vec.mag();
+        float gain = 1.f / (1.f + dist);
+        gain = powf(gain, mFocus);
+        
+        io.out(mDeviceChannels[i], frameIndex) += gain*sample;
+    }
+}
+    
+#else
+void Dbap::perform(float** outputBuffers, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample){
+    
+    for (unsigned i = 0; i < mNumSpeakers; ++i){
+        
+        Vec3d vec = relpos - mSpeakerVecs[i];
+        float dist = vec.mag();
+        float gain = 1.f / (1.f + dist);
+        gain = powf(gain, mFocus);
+        
+        float *buf = outputBuffers[mDeviceChannels[i]];
+        buf[frameIndex] += gain*sample;
+
+    }
+}
+    
+    
+    
+/// Per Buffer Processing
+void Dbap::perform(float** outputBuffers, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples)
+    {
+        for (unsigned i = 0; i < mNumSpeakers; ++i)
+        {
+            Vec3d vec = relpos - mSpeakerVecs[i];
+            float dist = vec.mag();
+            float gain = 1.f / (1.f + dist);
+            gain = powf(gain, mFocus);
+            
+            float *buf = outputBuffers[mDeviceChannels[i]];
+            
+            float *samps = samples;
+            for(int j = 0; j < numFrames; j++)
+                *buf++ += gain* *samps++;
+        }
+    }
+#endif
 
 void Dbap::print() {
 	printf("Using DBAP Panning- need to add panner info for print function\n");

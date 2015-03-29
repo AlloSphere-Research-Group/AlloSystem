@@ -102,8 +102,9 @@ public:
 	virtual void compile(Listener& l){};
 
 	/// Called once per listener, before sources are rendered. ex. zero ambisonics coefficients
-	virtual void prepare(AudioIOData& io){};
+	virtual void prepare(){};
 
+#if !ALLOCORE_GENERIC_AUDIOSCENE
 	/// Render each source per sample
 	virtual void perform(
 		AudioIOData& io,
@@ -122,18 +123,46 @@ public:
 		const int& numFrames,
 		float *samples
 	) = 0;
-
-	/// Called once per listener, after sources are rendered. ex. ambisonics decode
-	virtual void finalize(AudioIOData& io){};
+    
+    /// Called once per listener, after sources are rendered. ex. ambisonics decode
+    virtual void finalize(AudioIOData& io){};
+    
+#else
+    /// Render each source per sample
+    virtual void perform(
+                         float** outputBuffers,
+                         SoundSource& src,
+                         Vec3d& relpos,
+                         const int& numFrames,
+                         int& frameIndex,
+                         float& sample
+                         ) = 0;
+    
+    /// Render each source per buffer
+    virtual void perform(
+                         float** outputBuffers,
+                         SoundSource& src,
+                         Vec3d& relpos,
+                         const int& numFrames,
+                         float *samples
+                         ) = 0;
+    
+    /// called once per listener, after sources are rendered. ex. ambisonics decode
+    virtual void finalize(float **outs, const int numFrames){};
+#endif
 
 	/// Print out information about spatializer
 	virtual void print(){};
 
 	/// Get number of speakers
 	int numSpeakers() const { return mSpeakers.size(); }
+    
+    /// Enable Spatializaion(true by default)
+    void setEnabled(bool _enable) {mEnabled = _enable;}
 
 protected:
 	Speakers mSpeakers;
+    bool mEnabled;
 };
 
 
@@ -213,8 +242,8 @@ public:
 	///							large enough for the most distant sound:
 	///							samples = sampleRate * (near + range)/speedOfSound
 	SoundSource(
-		double nearClip=1, double farClip=100, AttenuationLaw law = ATTEN_INVERSE,
-		double farBias=0, int delaySize=15000
+		double nearClip=1, double farClip=344, AttenuationLaw law = ATTEN_INVERSE,
+		double farBias=0, int delaySize=50000
 	);
 
 	/// Returns whether distance-based attenuation is enabled
@@ -265,6 +294,16 @@ public:
 	/// Write sample to internal delay-line
 	void writeSample(float v){ mSound.write(v); }
 
+    /// optional onProcessSample for sample rate processing of sound sources
+    virtual void onProcessSample(int frame){}
+    
+    /// Returns whether the source is using per sample processing (AudioScene::render will call this source's onProcessSample)
+    bool usePerSampleProcessing() const { return mUsePerSampleProcessing; }
+    
+    /// Enable per sample processing
+    void usePerSampleProcessing(bool shouldUsePerSampleProcessing){
+        mUsePerSampleProcessing = shouldUsePerSampleProcessing;
+    }
 
 	// calculate the buffersize needed for given samplerate, speed of sound & distance traveled (e.g. nearClip+clipRange).
 	// probably want to add io.samplesPerBuffer() to this for safety.
@@ -273,6 +312,7 @@ public:
 protected:
 	RingBuffer<float> mSound;		// spherical wave around position
 	bool mUseAtten, mUseDoppler;
+    bool mUsePerSampleProcessing;
 };
 
 
@@ -293,7 +333,7 @@ public:
 
 	~AudioScene();
 
-
+    
 	/// Get listeners
 	Listeners& listeners(){ return mListeners; }
     const Listeners& listeners() const { return mListeners; }
@@ -315,9 +355,14 @@ public:
 
 	/// Remove a sound source from scene
 	void removeSource(SoundSource& src);
-
-	/// Perform rendering
+    
+#if !ALLOCORE_GENERIC_AUDIOSCENE
+    /// Perform rendering
     void render(AudioIOData& io);
+#else
+    /// Perform rendering
+    void render(float **outputBuffers, const int numFrames, const double sampleRate);
+#endif
 
 
     /// Set per sample processing (off by default)

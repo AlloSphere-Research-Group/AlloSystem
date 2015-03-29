@@ -34,7 +34,7 @@ public:
             printf("Stereo Panner Requires exactly 2 speakers, no panning will occur!\n", numSpeakers);
 	}
 	
-#if !ALLOCORE_NO_PORTAUDIO
+#if !ALLOCORE_GENERIC_AUDIOSCENE
 
     
 #else
@@ -42,7 +42,7 @@ public:
     ///Per Sample Processing
     void perform(float** outputBuffers, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample)
     {
-        if(numSpeakers == 2 && enabled)
+        if(numSpeakers == 2 && mEnabled)
         {
             float *bufL = outputBuffers[deviceChannels[0]];
             float *bufR = outputBuffers[deviceChannels[1]];
@@ -79,7 +79,7 @@ public:
     /// Per Buffer Processing
 	void perform(float** outputBuffers, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples)
     {
-        if(numSpeakers == 2 && enabled)
+        if(numSpeakers == 2 && mEnabled)
         {
             float *bufL = outputBuffers[deviceChannels[0]];
             float *bufR = outputBuffers[deviceChannels[1]];

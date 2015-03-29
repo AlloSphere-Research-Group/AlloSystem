@@ -2,7 +2,7 @@
 
 namespace al{
 
-Spatializer::Spatializer(const SpeakerLayout& sl){
+    Spatializer::Spatializer(const SpeakerLayout& sl) : mEnabled(true){
 	unsigned numSpeakers = sl.speakers().size();
 	for(unsigned i=0;i<numSpeakers;++i){
 		mSpeakers.push_back(sl.speakers()[i]);
@@ -116,22 +116,21 @@ Listener * AudioScene::createListener(Spatializer* spatializer){
 	The actual buffersize sets the effective doppler far-clip; beyond this it always uses max-delay size (no doppler)
 	The head-size sets the effective doppler near-clip.
 */
-void AudioScene::render(AudioIOData& io){
+    
+#if !ALLOCORE_GENERIC_AUDIOSCENE
+void AudioScene::render(AudioIOData& io) {
     const int numFrames = io.framesPerBuffer();
     double sampleRate = io.framesPerSecond();
-	double distanceToSample = sampleRate / mSpeedOfSound;
-
-	// update source history data:
-	for(Sources::iterator it = mSources.begin(); it != mSources.end(); it++) {
-		(*it)->updateHistory();
-	}
-
+#else
+void AudioScene::render(float **outputBuffers, const int numFrames, const double sampleRate) {
+#endif
+    
 	// iterate through all listeners adding contribution from all sources
 	for(unsigned il=0; il<mListeners.size(); ++il){
 		Listener& l = *mListeners[il];
 
 		Spatializer* spatializer = l.mSpatializer;
-		spatializer->prepare(io);
+		spatializer->prepare();
 
 		// update listener history data:
 		l.updateHistory(numFrames);
@@ -145,16 +144,22 @@ void AudioScene::render(AudioIOData& io){
 			// varies per source,
 			// since each source has its own buffersize and far clip
 			// (not physically accurate of course)
+            double distanceToSample = 0;
             if(src.useDoppler())
-                distanceToSample = distanceToSample;//(src.maxIndex()-numFrames)/src.farClip();
-            else
-                distanceToSample = 0;
+                distanceToSample = sampleRate / mSpeedOfSound;
 
             if(mPerSampleProcessing) //Original, inefficient, per sample processing
             {
                 // iterate time samples
                 for(int i=0; i<numFrames; ++i){
 
+                    // per sample source processing and update source history (only for the first listener)
+                    if(il == 0){
+                        src.updateHistory();
+                        if(src.usePerSampleProcessing())
+                            src.onProcessSample(i);
+                    }
+                    
                     // compute interpolated source position relative to listener
                     // TODO: this tends to warble when moving fast
                     double alpha = double(i)/numFrames;
@@ -176,15 +181,19 @@ void AudioScene::render(AudioIOData& io){
 					// Start with time delay due to speed of sound
                     double samplesAgo = dist * distanceToSample;
 
-					// Add on time delay (in samples)
-					samplesAgo += (numFrames-i);
+					// Add on time delay (in samples) - only needed if the source is rendered per buffer
+                    if(!src.usePerSampleProcessing())
+                        samplesAgo += (numFrames-i);
 
 					// Is our delay line big enough?
 					if(samplesAgo <= src.maxIndex()){
-					//if(dist < src.farClip()){
 						double gain = src.attenuation(dist);
 						float s = src.readSample(samplesAgo) * gain;
-						spatializer->perform(io,src,relpos, numFrames, i, s);
+#if !ALLOCORE_GENERIC_AUDIOSCENE
+                        spatializer->perform(io, src,relpos, numFrames, i, s);
+#else
+                        spatializer->perform(outputBuffers, src,relpos, numFrames, i, s);
+#endif
 					}
 
                 } //end for each frame
@@ -192,6 +201,9 @@ void AudioScene::render(AudioIOData& io){
         
 			else //more efficient, per buffer processing
             {
+                if(il == 0) //update src history (only for the first listener)
+                    src.updateHistory();
+                
                 Vec3d relpos = src.pose().pos() - l.pose().pos();
                 double distance = relpos.mag();
                 double gain = src.attenuation(distance);
@@ -202,12 +214,21 @@ void AudioScene::render(AudioIOData& io){
                     readIndex += (numFrames-i);
                     mBuffer[i] = gain * src.readSample(readIndex);
                 }
-                spatializer->perform(io, src, relpos, numFrames, &mBuffer[0]);
+                
+#if !ALLOCORE_GENERIC_AUDIOSCENE
+                spatializer->perform(io, src,relpos, numFrames, &mBuffer[0]);
+#else
+                spatializer->perform(outputBuffers, src, relpos, numFrames, &mBuffer[0]);
+#endif
             }
 
 		} //end for each source
 
+#if !ALLOCORE_GENERIC_AUDIOSCENE
         spatializer->finalize(io);
+#else
+        spatializer->finalize(outputBuffers, numFrames);
+#endif
 
 	} // end for each listener
 }
