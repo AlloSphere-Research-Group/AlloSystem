@@ -16,18 +16,20 @@ public:
 
 	Texture tex;
 
-	MyApp()
-		// arguments: width, height, pixel format, pixel data type
-	:	tex(63,63, Graphics::RGB, Graphics::UBYTE)
+	MyApp():
+		// Construct texture
+		// Arguments: width, height, pixel format, pixel data type
+		// Note that when we construct a texture in this way, the default
+		// policy is to allocate a client-side buffer to hold the pixels.
+		tex(64,64, Graphics::RGBA, Graphics::UBYTE)
 	{
 		// The default magnification filter is linear
 		//tex.filterMag(Texture::NEAREST);
 
-		// Allocate memory for the pixels
-		tex.allocate();
-
-		// Get a pointer to the pixel buffer
-		unsigned char * texBuf = tex.data<unsigned char>();
+		// Get a pointer to the (client-side) pixel buffer.
+		// When we make a read access to the pixels, they are flagged as dirty
+		// and get sent to the GPU the next time the texture bound.
+		unsigned char * pixels = tex.data<unsigned char>();
 
 		// Loop through the pixels to generate an image
 		int Nx = tex.width();
@@ -42,15 +44,11 @@ public:
 
 			int idx = j*Nx + i;
 			int stride = tex.numComponents();
-			texBuf[idx*stride + 0] = col.r * 255.;
-			texBuf[idx*stride + 1] = col.g * 255.;
-			texBuf[idx*stride + 2] = col.b * 255.;
-			//texBuf[idx*4 + 3] = col.a;
+			pixels[idx*stride + 0] = col.r * 255.;
+			pixels[idx*stride + 1] = col.g * 255.;
+			pixels[idx*stride + 2] = col.b * 255.;
+			pixels[idx*stride + 3] = col.a;
 		}}
-
-		// We must indicate when the pixels have been updated to ensure they get
-		// (re)submitted to the GPU.
-		tex.dirty();
 
 		nav().pos().set(0,0,4);
 		initWindow();
@@ -76,6 +74,7 @@ public:
 		m.texCoord(1,1);
 		m.texCoord(1,0);
 
+		// We must tell the GPU to use the texture when rendering primitives
 		tex.bind();
 			g.draw(m);
 		tex.unbind();

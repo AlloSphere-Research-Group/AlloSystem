@@ -155,7 +155,7 @@ t tools for compiling code.
 \begin_layout Standard
 Read the instructions in each section very carefully since skipping an installat
 ion step which likely cause things to fail during later steps.
- Also, during each installation step, be sure to carefully monitor any output
+ During each installation step, be sure to carefully monitor any output
  for errors.
  If an error does arise, you can refer to 
 \begin_inset CommandInset ref
@@ -165,6 +165,8 @@ reference "sec:Troubleshooting"
 \end_inset
 
  to find solutions to common problems.
+ In addition, be careful when copy and pasting commands from this document
+ as it can introduce extra spaces leading to malformed paths, etc.
 \end_layout
 
 \begin_layout Subsection
@@ -865,9 +867,8 @@ on Manager window.
 \end_layout
 
 \begin_layout Standard
-Next, bring up a DOS prompt.
- Do this by clicking the Windows button in the lower-left corner, typing
- 
+Next, bring up a DOS prompt by clicking the Windows button in the lower-left
+ corner, typing 
 \family typewriter
 cmd.exe
 \family default
@@ -1278,7 +1279,7 @@ Within the
 \family default
  file should be another directory named something like 
 \family typewriter
-AlloSystem-xxx
+AlloSystem-makefile-build
 \family default
 .
  You should move this directory to the directory 
@@ -1288,7 +1289,7 @@ AlloSystem-xxx
  you just made.
  After the directory 
 \family typewriter
-AlloSystem-xxx
+AlloSystem-makefile-build
 \family default
  is moved, rename it to 
 \family typewriter
@@ -1413,7 +1414,11 @@ If prompted for your password, enter the same password you use to log in
  to the OS.
  Installing all the dependencies may take some time, so be patient.
  After dependencies are installed, the next step is to build the AlloCore
- module with the following commands:
+ module with the following commands (make sure you are in the 
+\family typewriter
+allosystem/
+\family default
+ directory):
 \end_layout
 
 \begin_layout Standard
@@ -1448,12 +1453,12 @@ status open
 
 \begin_layout Plain Layout
 
-$ make examples/allocore/av/simpleApp.cpp
+$ make examples/allocore/io/appSimple.cpp
 \end_layout
 
 \end_inset
 
-If a sphere with an oscillating color shows up, then your system is configured
+If you see a window with animated graphics, then your system is configured
  correctly.
 \end_layout
 
@@ -2430,19 +2435,7 @@ MSYS simply does not like user names with spaces in them.
  If your user name contains spaces, then it will create problems with many
  of the build tools.
  To solve the problem, you must change your user name in MSYS.
- Add the line 
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-set USERNAME=<myname> 
-\end_layout
-
-\end_inset
-
-to the beginning of 
+ Add to the beginning of 
 \family typewriter
 C:
 \backslash
@@ -2454,11 +2447,29 @@ msys
 \backslash
 msys.bat
 \family default
- where 
+ a line having the format 
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+set USERNAME=<myname>
+\end_layout
+
+\end_inset
+
+where 
 \family typewriter
 <myname>
 \family default
- is a new user name that does not contain spaces.
+ is replaced with a new user name, such as your initials, all in lower-case
+ that does not contain spaces or other punctuation.
+ Open a new terminal by running 
+\family typewriter
+msys.bat
+\family default
+ for the changes to take effect.
 \end_layout
 
 \begin_layout Subsection

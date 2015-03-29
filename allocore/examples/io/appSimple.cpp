@@ -46,7 +46,7 @@ For the camera, the coordinate conventions are:
 	+z is backward
 
 Author:
-Lance Putnam, 6/2011, putnam.lance@gmail.com
+Lance Putnam, June 2011
 */
 
 #include "allocore/io/al_App.hpp"
@@ -57,10 +57,14 @@ using namespace al;
 class MyApp : public App{
 public:
 
+	Mesh mesh;
 	double phase;
 
 	// This constructor is where we initialize the application
 	MyApp(): phase(0){
+
+		// Add a unit sphere to the mesh
+		addSphere(mesh);
 
 		// Configure the camera lens
 		lens().near(0.1).far(25).fovy(45);
@@ -71,13 +75,15 @@ public:
 
 		// Initialize a single window; anything in App::onDraw will be rendered
 		// Arguments: position/dimensions, title, frames/second
-		initWindow(Window::Dim(0,0, 600,400), "Untitled", 40);
+		initWindow(Window::Dim(0,0, 600,400), "Simple App", 40);
 
-		// Uncomment this to disable the default navigation keyboard/mouse controls
+		// This disables the default navigation keyboard/mouse controls;
+		// leaving this enabled may cause some of the user input callbacks to
+		// not trigger, such as onMouseDrag.
 		//window().remove(navControl());
 
-		// Set background color
-		//stereo().clearColor(HSV(0,0,1));
+		// Set background color (default is black)
+		background(HSV(0.5, 1, 0.5));
 
 		// Initialize audio so that App::onSound is called
 		// Arguments: sample rate (Hz), block size, output channels, input channels
@@ -86,7 +92,7 @@ public:
 
 
 	// This is the audio callback
-	virtual void onSound(AudioIOData& io){
+	void onSound(AudioIOData& io){
 
 		// Things here occur at block rate...
 
@@ -106,10 +112,11 @@ public:
 	// This is the application's (graphical) model update.
 	// This is called once for each frame of graphics. Typically, you will
 	// update your application's geometry, physics, etc. here.
-	virtual void onAnimate(double dt){
-		// The phase will ramp from 0 to 1 over 1 second. We will use it to
-		// animate the color of a sphere.
-		phase += dt;
+	void onAnimate(double dt){
+		// The phase will ramp from 0 to 1 over 10 seconds. We will use it to
+		// animate the sphere.
+		double period = 10;
+		phase += dt / period;
 		if(phase >= 1.) phase -= 1.;
 	}
 
@@ -118,38 +125,22 @@ public:
 	// This is called one or more times per frame, for each window, viewport,
 	// and eye (for stereoscopic). Typically, this is where you instruct the
 	// GPU to render something.
-	virtual void onDraw(Graphics& g, const Viewpoint& v){
+	void onDraw(Graphics& g){
 
 		// Note: we don't need to do all the normal graphics setup as this
-		// is handled by the App's stereographic object. We can just draw
-		// our geometry immediately!
+		// is handled by the App's stereographic object (App::stereo()).
+		// We can just draw our geometry immediately!
 
-		// Graphics has a Mesh for temporary use
-		Mesh& m = g.mesh();
-
-		// We must clear the Mesh each frame because we are regenerating its
-		// vertices each frame.
-		m.reset();
-
-		// Set drawing primitive of Mesh
-		m.primitive(g.TRIANGLES);
-
-		// Add new vertices to the Mesh in the shape of a sphere.
-		// The return value is the number of vertices added.
-		int N = addSphere(m, 1, 32, 32);
-
-		// We add new colors for each vertex generated in the call above.
-		for(int i=0; i<N; ++i){
-			m.color(HSV(0.1, 0.5, al::fold(phase + i*0.5/N, 0.5)+0.5));
-		}
-
-		// Finally, command Graphics to draw the Mesh
-		g.draw(m);
+		g.polygonMode(Graphics::LINE); // wireframe mode
+		g.pushMatrix();
+		g.rotate(phase*360, 0,1,0);
+		g.draw(mesh);
+		g.popMatrix();
 	}
 
 
 	// This is called whenever a key is pressed.
-	virtual void onKeyDown(const ViewpointWindow& w, const Keyboard& k){
+	void onKeyDown(const Keyboard& k){
 
 		// Use a switch to do something when a particular key is pressed
 		switch(k.key()){
@@ -170,7 +161,7 @@ public:
 	}
 
 	// This is called whenever a mouse button is pressed.
-	virtual void onMouseDown(const ViewpointWindow& w, const Mouse& m){
+	void onMouseDown(const Mouse& m){
 		switch(m.button()){
 		case Mouse::LEFT: printf("Pressed left mouse button.\n"); break;
 		case Mouse::RIGHT: printf("Pressed right mouse button.\n"); break;
@@ -179,7 +170,7 @@ public:
 	}
 
 	// This is called whenever the mouse is dragged.
-	virtual void onMouseDrag(const ViewpointWindow& w, const Mouse& m){
+	void onMouseDrag(const Mouse& m){
 		// Get mouse coordinates, in pixels, relative to top-left corner of window
 		int x = m.x();
 		int y = m.y();
@@ -192,5 +183,6 @@ public:
 
 
 int main(){
+	// All we do in main is create the app and start it!
 	MyApp().start();
 }

@@ -15,6 +15,7 @@ using namespace al;
 class MyApp : public App{
 public:
 
+	// A Viewpoint combines a position/orientation in world space and a viewport
 	Viewpoint vpFront, vpBack;
 	Mesh mesh;
 
@@ -51,7 +52,7 @@ public:
 		window().add(vpFront).add(vpBack);
 	}
 
-	virtual void onDraw(Graphics& g, const Viewpoint& v){
+	void onDraw(Graphics& g){
 		g.draw(mesh);
 	}
 };

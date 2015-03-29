@@ -60,7 +60,7 @@ public:
 		return (y*Nx + x)*2 + z; // may give slightly faster accessing
 	}
 
-	virtual void onAnimate(double dt){
+	void onAnimate(double dt){
 
 		int zprev = 1-zcurr;
 
@@ -116,7 +116,7 @@ public:
 		zcurr = zprev;
 	}
 
-	virtual void onDraw(Graphics& g, const Viewpoint& v){
+	void onDraw(Graphics& g){
 		mtrl.specular(RGB(1));
 		mtrl.shininess(30);
 		mtrl();
