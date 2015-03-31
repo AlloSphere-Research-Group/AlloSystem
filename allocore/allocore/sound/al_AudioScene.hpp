@@ -377,11 +377,11 @@ public:
     void render(float **outputBuffers, const int numFrames, const double sampleRate);
 #endif
 
-
-    /// Set per sample processing (off by default)
+    /// Set per sample processing (true by default)
 
     /// Per sample processing is useful for smoother doppler and gain 
     /// interpolation for high-speed sources, but uses much more CPU.
+    //  Turn off to reduce CPU for large number of sources and/or Doppler shift not required
     void usePerSampleProcessing(bool shouldUsePerSampleProcessing){
         mPerSampleProcessing = shouldUsePerSampleProcessing;
     }
