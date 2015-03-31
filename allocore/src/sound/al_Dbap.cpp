@@ -23,10 +23,14 @@ void Dbap::compile(Listener& listener){
 void Dbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples){
 	for (unsigned k = 0; k < mNumSpeakers; ++k)
 	{
-        Vec3d vec = relpos - mSpeakerVecs[k];
-        float dist = vec.mag();
-		float gain = 1.f / (1.f + dist);
-        gain = powf(gain, mFocus);
+        float gain = 1.f;
+        if(mEnabled)
+        {
+            Vec3d vec = relpos - mSpeakerVecs[k];
+            float dist = vec.mag();
+            gain = 1.f / (1.f + dist);
+            gain = powf(gain, mFocus);
+        }
 
 		float * out = io.outBuffer(mDeviceChannels[k]);
 		for(int i = 0; i < numFrames; ++i){
@@ -39,10 +43,14 @@ void Dbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& 
 {
     for (unsigned i = 0; i < mNumSpeakers; ++i)
     {
-        Vec3d vec = relpos - mSpeakerVecs[i];
-        float dist = vec.mag();
-        float gain = 1.f / (1.f + dist);
-        gain = powf(gain, mFocus);
+        float gain = 1.f;
+        if(mEnabled)
+        {
+            Vec3d vec = relpos - mSpeakerVecs[i];
+            float dist = vec.mag();
+            gain = 1.f / (1.f + dist);
+            gain = powf(gain, mFocus);
+        }
         
         io.out(mDeviceChannels[i], frameIndex) += gain*sample;
     }
@@ -53,11 +61,14 @@ void Dbap::perform(float** outputBuffers, SoundSource& src, Vec3d& relpos, const
     
     for (unsigned i = 0; i < mNumSpeakers; ++i){
         
-        Vec3d vec = relpos - mSpeakerVecs[i];
-        float dist = vec.mag();
-        float gain = 1.f / (1.f + dist);
-        gain = powf(gain, mFocus);
-        
+        float gain = 1.f;
+        if(mEnabled)
+        {
+            Vec3d vec = relpos - mSpeakerVecs[i];
+            float dist = vec.mag();
+            gain = 1.f / (1.f + dist);
+            gain = powf(gain, mFocus);
+        }
         float *buf = outputBuffers[mDeviceChannels[i]];
         buf[frameIndex] += gain*sample;
 
@@ -71,10 +82,14 @@ void Dbap::perform(float** outputBuffers, SoundSource& src, Vec3d& relpos, const
     {
         for (unsigned i = 0; i < mNumSpeakers; ++i)
         {
-            Vec3d vec = relpos - mSpeakerVecs[i];
-            float dist = vec.mag();
-            float gain = 1.f / (1.f + dist);
-            gain = powf(gain, mFocus);
+            float gain = 1.f;
+            if(mEnabled)
+            {
+                Vec3d vec = relpos - mSpeakerVecs[i];
+                float dist = vec.mag();
+                gain = 1.f / (1.f + dist);
+                gain = powf(gain, mFocus);
+            }
             
             float *buf = outputBuffers[mDeviceChannels[i]];
             

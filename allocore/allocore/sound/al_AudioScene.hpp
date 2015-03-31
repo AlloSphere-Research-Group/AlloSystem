@@ -228,12 +228,19 @@ protected:
 
 
 /// A sound source
+    
+/// Doppler Types
+enum DopplerType{
+    DOPPLER_NONE=0,			/**< Do not use Doppler Shift */
+    DOPPLER_SYMMETRICAL,	/**< Symmetrical Frequency Shift (not physically accurate) */
+    DOPPLER_PHYSICAL			/**< Physically Accurate Doppler Shift. Requires per sample processingfor AudioScene and SoundSource. */
+};
 
 /// The attenuation policy may be different per source, i.e., because a bee has
 /// a different attenuation characteristic than an airplane.
 class SoundSource : public AudioSceneObject, public DistAtten<double> {
 public:
-
+    
 	/// @param[in] nearClip		Distance below which amplitude is clamped to 1
 	/// @param[in] farClip		Distance above which amplitude reaches its mimumum
 	/// @param[in] law			Attenuation law
@@ -242,15 +249,15 @@ public:
 	///							large enough for the most distant sound:
 	///							samples = sampleRate * (near + range)/speedOfSound
 	SoundSource(
-		double nearClip=1, double farClip=344, AttenuationLaw law = ATTEN_INVERSE,
-		double farBias=0, int delaySize=50000
+		double nearClip=0.1, double farClip=20, AttenuationLaw law = ATTEN_INVERSE, DopplerType dopplerType = DOPPLER_SYMMETRICAL,
+		double farBias=0, int delaySize=100000
 	);
 
 	/// Returns whether distance-based attenuation is enabled
     bool useAttenuation() const { return mUseAtten; }
-
-	/// Returns whether Doppler is enabled
-    bool useDoppler() const { return mUseDoppler; }
+    
+    /// Returns Doppler Type
+    DopplerType dopplerType() const { return mDopplerType; }
 
 	/// Returns attentuation factor based on distance to listener
 	double attenuation(double distance) const {
@@ -262,7 +269,7 @@ public:
 
 	/// Convert delay, in seconds, to an index
 	double delayToIndex(double delay, double sampleRate) const {
-        if(!mUseDoppler) return 0;
+        if(mDopplerType == DOPPLER_NONE) return 0;
 		return delay*sampleRate;
 	}
 
@@ -282,14 +289,19 @@ public:
 		float a = mSound.read(index0);
 		float b = mSound.read(index0+1);
 		float frac = index - index0;
-        return ipl::linear(frac, a, b);
+        //return ipl::linear(frac, a, b);
+        
+        float a0 = mSound.read(index0-1);
+        float b1 = mSound.read(index0+2);
+        return ipl::cubic(frac, a0, a, b, b1);
+        
 	}
 
     /// Enable/disable distance-based gain attenuation
     void useAttenuation(bool enable){ mUseAtten = enable; }
-
-    /// Enable/disable Doppler shift
-    void useDoppler(bool enable){ mUseDoppler = enable; }
+    
+    /// Set Doppler Type
+    void dopplerType(DopplerType type){ mDopplerType = type; }
 
 	/// Write sample to internal delay-line
 	void writeSample(float v){ mSound.write(v); }
@@ -311,7 +323,8 @@ public:
 
 protected:
 	RingBuffer<float> mSound;		// spherical wave around position
-	bool mUseAtten, mUseDoppler;
+	bool mUseAtten;
+    DopplerType mDopplerType;
     bool mUsePerSampleProcessing;
 };
 

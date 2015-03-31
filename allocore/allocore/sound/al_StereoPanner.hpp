@@ -22,13 +22,6 @@ public:
         if(numSpeakers == 2)
         {
             printf("Stereo Panner Compiled with %d speakers\n", numSpeakers);
-            
-            for(int i = 0; i < numSpeakers; i++)
-            {
-                speakerVecs[i] = mSpeakers[i].vec();
-                speakerVecs[i].normalize();
-                deviceChannels[i] = mSpeakers[i].deviceChannel;
-            }
         }
         else
             printf("Stereo Panner Requires exactly 2 speakers, no panning will occur!\n", numSpeakers);
@@ -36,6 +29,48 @@ public:
 	
 #if !ALLOCORE_GENERIC_AUDIOSCENE
 
+    ///Per Sample Processing
+    void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample)
+    {
+        if(numSpeakers == 2 && mEnabled)
+        {
+            float gainL, gainR;
+            equalPowerPan(relpos.x, gainL, gainR);
+            
+            io.out(0, frameIndex) = gainL*sample;
+            io.out(1, frameIndex) = gainR*sample;
+        }
+        else // dont pan
+        {
+            for(int i = 0; i < numSpeakers; i++)
+                io.out(i, frameIndex) = sample;
+        }
+        
+    }
+    
+    /// Per Buffer Processing
+    void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples)
+    {
+        if(numSpeakers == 2 && mEnabled)
+        {
+            float *bufL = io.outBuffer(0);
+            float *bufR = io.outBuffer(1);
+            
+            float gainL, gainR;
+            equalPowerPan(relpos.x, gainL, gainR);
+            
+            for(int i = 0; i < numFrames; i++)
+            {
+                bufL[i] = gainL*samples[i];
+                bufR[i] = gainR*samples[i];
+            }
+        }
+        else // dont pan
+        {
+            for(int i = 0; i < numSpeakers; i++)
+                memcpy(io.outBuffer(i), samples, sizeof(float)*numFrames);
+        }
+    }
     
 #else
     
@@ -44,32 +79,20 @@ public:
     {
         if(numSpeakers == 2 && mEnabled)
         {
-            float *bufL = outputBuffers[deviceChannels[0]];
-            float *bufR = outputBuffers[deviceChannels[1]];
+            float *bufL = outputBuffers[0];
+            float *bufR = outputBuffers[1];
             
-            //Is the normalize function working correctly??? normalizing 0, 0, 0 is returning 1, 0, 0
-            Vec3d zeroVec(0, 0, 0);
-            Vec3d normalVec;
-            if(relpos == zeroVec)
-                normalVec = zeroVec;
-            else
-                normalVec = relpos.normalized();
-           
-            float panVal = (normalVec.x + 1) /2.f; //[0, 1], L to R
-            
-            float gainL = cos((M_PI/2)*panVal);
-            float gainR = sin((M_PI/2)*panVal);
+            float gainL, gainR;
+            equalPowerPan(relpos.x, gainL, gainR);
             
             bufL[frameIndex] = gainL*sample;
             bufR[frameIndex] = gainR*sample;
-            
-            
         }
         else // dont pan
         {
             for(int i = 0; i < numSpeakers; i++)
             {
-                float *buf = outputBuffers[deviceChannels[i]];
+                float *buf = outputBuffers[i];
                 buf[frameIndex] = sample;
             }
         }
@@ -81,41 +104,23 @@ public:
     {
         if(numSpeakers == 2 && mEnabled)
         {
-            float *bufL = outputBuffers[deviceChannels[0]];
-            float *bufR = outputBuffers[deviceChannels[1]];
+            float *bufL = outputBuffers[0];
+            float *bufR = outputBuffers[1];
             
-            //Is the normalize function working correctly??? normalizing 0, 0, 0 is returning 1, 0, 0
-            Vec3d zeroVec(0, 0, 0);
-            Vec3d normalVec;
-            if(relpos == zeroVec)
-                normalVec = zeroVec;
-            else
-                normalVec = relpos.normalized();
-            
-            float panVal = (normalVec.x + 1) /2.f; //[0, 1], L to R
-            
-            float gainL = cos((M_PI/2)*panVal);
-            float gainR = sin((M_PI/2)*panVal);
+            float gainL, gainR;
+            equalPowerPan(relpos.x, gainL, gainR);
             
             for(int i = 0; i < numFrames; i++)
             {
                 bufL[i] = gainL*samples[i];
                 bufR[i] = gainR*samples[i];
             }
-            
         }
         else // dont pan
         {
             for(int i = 0; i < numSpeakers; i++)
-            {
-                float *buf = outputBuffers[deviceChannels[i]];
-                for(int j = 0; j < numFrames; j++)
-                {
-                    buf[j] = samples[i];
-                }
-            }
+                memcpy(outputBuffers[i], samples, sizeof(float)*numFrames);
         }
-
 	}
     
 #endif
@@ -123,9 +128,19 @@ public:
 	
 private:
 	Listener* mListener;
-	Vec3f speakerVecs[DBAP_MAX_NUM_SPEAKERS];
-	int deviceChannels[DBAP_MAX_NUM_SPEAKERS];
 	int numSpeakers;
+    
+    void equalPowerPan(float xPos, float &gainL, float &gainR)
+    {
+        if(xPos > 1) xPos = 1;
+        else if(xPos < -1) xPos = -1;
+        
+        float panVal = (xPos + 1) /2.f; //[0, 1], L to R
+        
+        gainL = cos((M_PI/2)*panVal);
+        gainR = sin((M_PI/2)*panVal);
+    }
+    
 };
 	
 	

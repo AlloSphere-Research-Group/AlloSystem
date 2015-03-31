@@ -46,11 +46,11 @@ void Listener::compile(){
 
 
 SoundSource::SoundSource(
-	double nearClip, double farClip, AttenuationLaw law,
+	double nearClip, double farClip, AttenuationLaw law, DopplerType dopplerType,
 	double farBias, int delaySize
 )
 :	DistAtten<double>(nearClip, farClip, law, farBias),
-	mSound(delaySize), mUseAtten(true), mUseDoppler(true)
+	mSound(delaySize), mUseAtten(true), mDopplerType(dopplerType)
 {
 	// initialize the position history to be VERY FAR AWAY so that we don't deafen ourselves...
 	for(int i=0; i<mPosHistory.size(); ++i){
@@ -66,7 +66,7 @@ int SoundSource::bufferSize(double samplerate, double speedOfSound, double dista
 
 
 AudioScene::AudioScene(int numFrames_)
-:   mSpeedOfSound(344), mPerSampleProcessing(false)
+:   mSpeedOfSound(340), mPerSampleProcessing(false)
 {
 	numFrames(numFrames_);
 }
@@ -136,51 +136,66 @@ void AudioScene::render(float **outputBuffers, const int numFrames, const double
 		l.updateHistory(numFrames);
 
 		// iterate through all sound sources
-        //printf("audio scene has %d sound sources!!!\n", mSources.size());
 		for(Sources::iterator it = mSources.begin(); it != mSources.end(); ++it){
 			SoundSource& src = *(*it);
 
 			// scalar factor to convert distances into delayline indices
-			// varies per source,
-			// since each source has its own buffersize and far clip
-			// (not physically accurate of course)
             double distanceToSample = 0;
-            if(src.useDoppler())
+            if(src.dopplerType() == DOPPLER_SYMMETRICAL)
                 distanceToSample = sampleRate / mSpeedOfSound;
 
-            if(mPerSampleProcessing) //Original, inefficient, per sample processing
+            if(mPerSampleProcessing) //audioscene per sample processing
             {
                 // iterate time samples
                 for(int i=0; i<numFrames; ++i){
 
-                    // per sample source processing and update source history (only for the first listener)
-                    if(il == 0){
+                    Vec3d relpos;
+                    
+                    if(il == 0) //only for the first listener ... TODO?
+                    {
                         src.updateHistory();
-                        if(src.usePerSampleProcessing())
+                        
+                        if(src.usePerSampleProcessing()) //audiosource per sample processing
+                        {
                             src.onProcessSample(i);
+                            relpos = src.posHistory()[0] - l.posHistory()[0];
+                            
+                            if(src.dopplerType() == DOPPLER_PHYSICAL)
+                            {
+                                double currentDist = relpos.mag();
+                                double prevDistance = (src.posHistory()[1] - l.posHistory()[0]).mag();
+                                double sourceVel = (currentDist - prevDistance)*sampleRate; //positive when moving away, negative moving toward
+
+                                if(sourceVel == -mSpeedOfSound) sourceVel -= 0.001; //prevent divide by 0 / inf freq
+                                
+                                distanceToSample = fabs(sampleRate / (mSpeedOfSound + sourceVel));
+                            }
+                        }
+                        else
+                        {
+                            // compute interpolated source position relative to listener
+                            // TODO: this tends to warble when moving fast
+                            double alpha = double(i)/numFrames;
+                            
+                            // moving average:
+                            // cheaper & slightly less warbly than cubic,
+                            // less glitchy than linear
+                            relpos = (
+                                    (src.posHistory()[3]-l.posHistory()[3])*(1.-alpha) +
+                                    (src.posHistory()[2]-l.posHistory()[2]) +
+                                    (src.posHistory()[1]-l.posHistory()[1]) +
+                                    (src.posHistory()[0]-l.posHistory()[0])*(alpha)
+                                    )/3.0;
+                        }
                     }
                     
-                    // compute interpolated source position relative to listener
-                    // TODO: this tends to warble when moving fast
-                    double alpha = double(i)/numFrames;
-
-                    // moving average:
-                    // cheaper & slightly less warbly than cubic,
-                    // less glitchy than linear
-                    Vec3d relpos = (
-                        (src.posHistory()[3]-l.posHistory()[3])*(1.-alpha) +
-                        (src.posHistory()[2]-l.posHistory()[2]) +
-                        (src.posHistory()[1]-l.posHistory()[1]) +
-                        (src.posHistory()[0]-l.posHistory()[0])*(alpha)
-                    )/3.0;
-
-					// Get distance in world-space units
+                    //Compute distance in world-space units
                     double dist = relpos.mag();
 
 					// Compute how many samples ago to read from buffer
 					// Start with time delay due to speed of sound
                     double samplesAgo = dist * distanceToSample;
-
+                    
 					// Add on time delay (in samples) - only needed if the source is rendered per buffer
                     if(!src.usePerSampleProcessing())
                         samplesAgo += (numFrames-i);

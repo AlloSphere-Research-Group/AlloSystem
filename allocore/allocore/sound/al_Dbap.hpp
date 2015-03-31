@@ -54,7 +54,7 @@ public:
 
 	/// @param[in] sl		A speaker layout
 	/// @param[in] focus	Amplitude focus to nearby speakers
-	Dbap(const SpeakerLayout &sl, float focus = 5.f);
+	Dbap(const SpeakerLayout &sl, float focus = 1.f);
 
 	void compile(Listener& listener);
 

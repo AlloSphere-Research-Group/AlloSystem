@@ -21,10 +21,11 @@ using namespace al;
 // 1) Create a speaker layout
 SpeakerLayout speakerLayout = HeadsetSpeakerLayout();
 
-// 2) Create a panner: DBAP, VBAP, or Ambisonics
-Dbap* panner = new Dbap(speakerLayout);
+// 2) Create a panner: DBAP, VBAP, Ambisonics, or Stereo
+//Dbap* panner = new Dbap(speakerLayout);
 //Vbap* panner = new Vbap(speakerLayout);
 //AmbisonicsSpatializer* panner = new AmbisonicsSpatializer(speakerLayout, 2, 1);  // dimension and order
+StereoPanner *panner = new StereoPanner(speakerLayout);
 
 // 3) Create an audio scene with single argument for frames per buffer
 AudioScene scene(BLOCK_SIZE);
