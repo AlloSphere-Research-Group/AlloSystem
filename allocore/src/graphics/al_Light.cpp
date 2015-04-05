@@ -4,9 +4,9 @@
 namespace al{
 
 Material::Material(Graphics::Face f)
-:	mAmbient(0.2),		// Do not change these initial values. (Yes, that means
-	mDiffuse(0.8),		// you!) They are the default OpenGL values.
-	mEmission(0),		// See http://www.khronos.org/opengles/sdk/1.1/docs/man/glMaterial.xml
+:	mAmbient(0.2),		// These are the default OpenGL values. Do not change!
+	mDiffuse(0.8),		// See http://www.khronos.org/opengles/sdk/1.1/docs/man/glMaterial.xml
+	mEmission(0),
 	mSpecular(0),		// Specular is 0 to ensure linear lighting (no popping).
 	mShine(5.),
 	mFace(f),
@@ -37,44 +37,66 @@ Material& Material::specular(const Color& v){ mSpecular=v; return *this; }
 Material& Material::shininess(float v){ mShine=v; return *this; }
 Material& Material::face(Graphics::Face f){ mFace=f; return *this; }
 
-static bool * lightPool(){
-	static bool x[8] = {0};
-	return x;
-}
 
-static int lightID(int i){
-	static int x[]={GL_LIGHT0,GL_LIGHT1,GL_LIGHT2,GL_LIGHT3,GL_LIGHT4,GL_LIGHT5,GL_LIGHT6,GL_LIGHT7};
-	return x[i];
-}
 
-static int nextID(){
-	for(int i=0; i<8; ++i){
-		if(!lightPool()[i]){
-			lightPool()[i]=true;
-			return i;
-		}
+// This is used to manage GL light IDs
+struct LightPool{
+	static const int Nlights = 8;
+	bool mIDs[Nlights];
+
+	LightPool(){
+		for(int i=0; i<Nlights; ++i) mIDs[i] = false;
 	}
-	return 7;
-}
 
-static void freeID(int i){ lightPool()[i]=false; }
+	static int glLightID(int i){
+
+		// To simplify cases where materials are not used explicitly (e.g., only
+		// mesh colors are used), we enable color material once.
+		static bool calledColorMaterial = false;
+		if(!calledColorMaterial){
+			calledColorMaterial = true;
+			glEnable(GL_COLOR_MATERIAL);
+			glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+		}
+		static int x[Nlights] =
+			{GL_LIGHT0,GL_LIGHT1,GL_LIGHT2,GL_LIGHT3,GL_LIGHT4,GL_LIGHT5,GL_LIGHT6,GL_LIGHT7};
+		return x[i];
+	}
+
+	int nextID(){
+		for(int i=0; i<Nlights; ++i){
+			if(!mIDs[i]){
+				mIDs[i] = true;
+				//printf("LightPool::nextID returning %d\n", i);
+				return i;
+			}
+		}
+		return Nlights-1;
+	}
+
+	void freeID(int i){
+		mIDs[i] = false;
+	}
+};
+
+static LightPool lightPool;
 
 
 // NOTE: all defaults match the OpenGL defaults for LIGHT0
 Light::Light(float x, float y, float z)
-:	mID(nextID()), mAmbient(0), mDiffuse(1), mSpecular(1)
+:	mID(lightPool.nextID()), mAmbient(0), mDiffuse(1), mSpecular(1)
 {
 	pos(x,y,z);
 	attenuation(1,0,0);
 }
 
 Light::~Light(){
-	freeID(mID);
+	lightPool.freeID(mID);
 }
 
 void Light::operator()() const {
 	glEnable(GL_LIGHTING);
-	int glID = lightID(mID);
+	int glID = lightPool.glLightID(mID);
 	glLightfv(glID, GL_AMBIENT,		mAmbient.components);
 	glLightfv(glID, GL_DIFFUSE,		mDiffuse.components);
 	glLightfv(glID, GL_SPECULAR,	mSpecular.components);
@@ -96,7 +118,7 @@ Light& Light::diffuse(const Color& v){ mDiffuse=v; return *this; }
 Light& Light::specular(const Color& v){ mSpecular=v; return *this; }
 
 Light& Light::spot(float xDir, float yDir, float zDir, float cutoff, float expo){
-	int glID = lightID(mID);
+	int glID = lightPool.glLightID(mID);
 	float direction[] = {xDir, yDir, yDir};
 	glLightfv(glID, GL_SPOT_DIRECTION, direction);
 	glLightf (glID, GL_SPOT_CUTOFF, cutoff);
