@@ -22,6 +22,7 @@
 
 /* Begin PBXFileReference section */
 		1606F2AE173514EB00E24228 /* al_Serial.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Serial.hpp; sourceTree = "<group>"; };
+		160784F01ACB2A46002CC173 /* al_WindowOSX.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = al_WindowOSX.mm; sourceTree = "<group>"; };
 		161B6CBD17144B0800750A16 /* al_File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_File.cpp; sourceTree = "<group>"; };
 		161B6CC117144B4C00750A16 /* al_Serial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Serial.cpp; sourceTree = "<group>"; };
 		164626E11793F14200E84F48 /* al_HID.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_HID.hpp; sourceTree = "<group>"; };
@@ -768,6 +769,7 @@
 				361882FE15B936340009AD7E /* al_SocketAPR.cpp */,
 				361882FF15B936340009AD7E /* al_Window.cpp */,
 				3618830015B936340009AD7E /* al_WindowGLUT.cpp */,
+				160784F01ACB2A46002CC173 /* al_WindowOSX.mm */,
 				3618830115B936340009AD7E /* Makefile.config */,
 			);
 			path = io;
