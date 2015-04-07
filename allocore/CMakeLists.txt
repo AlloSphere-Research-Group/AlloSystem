@@ -66,6 +66,7 @@ list(APPEND ALLOCORE_HEADERS
     allocore/types/al_MsgQueue.hpp
     allocore/types/al_MsgTube.hpp
     allocore/types/al_SingleRWRingBuffer.hpp
+    allocore/types/al_Voxels.hpp
 )
 
 set(ALLOCORE_DUMMY_HEADERS "")
