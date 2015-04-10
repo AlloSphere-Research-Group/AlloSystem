@@ -68,7 +68,16 @@ struct SceneWindowHandler : public WindowEventHandler{
 
 	SceneWindowHandler(ViewpointWindow& w, App& a): win(w), app(a){}
 
-	bool onCreate(){ app.onCreate(win); return true; }
+	bool onCreate(){
+
+		// Enable color material to simplify cases where materials are not used 
+		// explicitly (e.g., only mesh colors are used).
+		glEnable(GL_COLOR_MATERIAL);
+		glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+
+		app.onCreate(win);
+		return true;
+	}
 	bool onDestroy(){ app.onDestroy(win); return true; }
 	bool onResize(int dw, int dh){ app.onResize(win, dw,dh); return true; }
 

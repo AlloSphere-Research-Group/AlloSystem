@@ -49,15 +49,6 @@ struct LightPool{
 	}
 
 	static int glLightID(int i){
-
-		// To simplify cases where materials are not used explicitly (e.g., only
-		// mesh colors are used), we enable color material once.
-		static bool calledColorMaterial = false;
-		if(!calledColorMaterial){
-			calledColorMaterial = true;
-			glEnable(GL_COLOR_MATERIAL);
-			glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-		}
 		static int x[Nlights] =
 			{GL_LIGHT0,GL_LIGHT1,GL_LIGHT2,GL_LIGHT3,GL_LIGHT4,GL_LIGHT5,GL_LIGHT6,GL_LIGHT7};
 		return x[i];
