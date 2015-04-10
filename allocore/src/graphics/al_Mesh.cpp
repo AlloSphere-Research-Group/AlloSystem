@@ -28,7 +28,7 @@ void Mesh::decompress(){
 		#define DECOMPRESS(buf, Type)\
 		{\
 			int N = buf.size();\
-			if(N){\
+			if(N > 1){\
 				std::vector<Type> old(N);\
 				std::copy(&buf[0], (&buf[0]) + N, old.begin());\
 				buf.size(Ni);\
