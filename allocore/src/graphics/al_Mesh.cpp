@@ -37,7 +37,7 @@ void Mesh::decompress(){
 		}
 		DECOMPRESS(vertices(), Vertex)
 		DECOMPRESS(colors(), Color)
-		DECOMPRESS(coloris(), Color)
+		DECOMPRESS(coloris(), Colori)
 		DECOMPRESS(normals(), Normal)
 		DECOMPRESS(texCoord2s(), TexCoord2)
 		DECOMPRESS(texCoord3s(), TexCoord3)
