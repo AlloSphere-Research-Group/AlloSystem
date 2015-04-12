@@ -159,35 +159,6 @@ int addDodecahedron(Mesh& m){
 
 	m.primitive(Graphics::TRIANGLES);
 
-	static const float a = 1.6 * 0.5;
-	static const float b = 1.6 / (2 * phi);
-	static const float vertices[] = {
-		 0, b,-a,	 b, a, 0,	-b, a, 0,	//  0  1  2
-		 0, b, a,	 0,-b, a,	-a, 0, b,	//  3  4  5
-		 a, 0, b,	 0,-b,-a,	 a, 0,-b,	//  6  7  8
-		-a, 0,-b,	 b,-a, 0,	-b,-a, 0	//  9 10 11
-	};
-
-	static const int indices[] = {
-		 1, 0, 2,	 2, 3, 1,	 4, 3, 5,	 6, 3, 4,
-		 7, 0, 8,	 9, 0, 7,	10, 4,11,	11, 7,10,
-		 5, 2, 9,	 9,11, 5,	 8, 1, 6,	 6,10, 8,
-		 5, 3, 2,	 1, 3, 6,	 2, 0, 9,	 8, 0, 1,
-		 9, 7,11,	10, 7, 8,	11, 4, 5,	 6, 4,10
-	};
-
-	int Nv = sizeof(vertices)/sizeof(*vertices)/3;
-
-	m.vertex(vertices, Nv);
-	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
-
-	return Nv;
-}
-
-int addIcosahedron(Mesh& m){
-
-	m.primitive(Graphics::TRIANGLES);
-
 //	float b = 1. / phi;
 //	float c = 2. - phi;
 //	float vertices[] = {
@@ -241,14 +212,48 @@ int addIcosahedron(Mesh& m){
 	};
 
 	static const int indices[] = {
-		18, 2, 1,	11,18, 1,	14,11, 1,	 7,13, 1,	17, 7, 1,
-		 2,17, 1,	19, 4, 3,	 8,19, 3,	15, 8, 3,	12,16, 3,
-		 0,12, 3,	 4, 0, 3,	 6,15, 3,	 5, 6, 3,	16, 5, 3,
-		 5,14, 1,	 6, 5, 1,	13, 6, 1,	 9,17, 2,	10, 9, 2,
-		18,10, 2,	10, 0, 4,	 9,10, 4,	19, 9, 4,	19, 8, 7,
-		 9,19, 7,	17, 9, 7,	 8,15, 6,	 7, 8, 6,	13, 7, 6,
-		11,14, 5,	12,11, 5,	16,12, 5,	12, 0,10,	11,12,10,
-		18,11,10
+		18, 2, 1,	11,18, 1,	14,11, 1,
+		 7,13, 1,	17, 7, 1,	 2,17, 1,
+		19, 4, 3,	 8,19, 3,	15, 8, 3,
+		12,16, 3,	 0,12, 3,	 4, 0, 3,
+		 6,15, 3,	 5, 6, 3,	16, 5, 3,
+		 5,14, 1,	 6, 5, 1,	13, 6, 1,
+		 9,17, 2,	10, 9, 2,	18,10, 2,
+		10, 0, 4,	 9,10, 4,	19, 9, 4,
+		19, 8, 7,	 9,19, 7,	17, 9, 7,
+		 8,15, 6,	 7, 8, 6,	13, 7, 6,
+		11,14, 5,	12,11, 5,	16,12, 5,
+		12, 0,10,	11,12,10,	18,11,10
+	};
+
+	int Nv = sizeof(vertices)/sizeof(*vertices)/3;
+
+	m.vertex(vertices, Nv);
+	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
+
+	return Nv;
+}
+
+
+int addIcosahedron(Mesh& m){
+
+	m.primitive(Graphics::TRIANGLES);
+
+	static const float a = 1.6 * 0.5;
+	static const float b = 1.6 / (2 * phi);
+	static const float vertices[] = {
+		 0, b,-a,	 b, a, 0,	-b, a, 0,	//  0  1  2
+		 0, b, a,	 0,-b, a,	-a, 0, b,	//  3  4  5
+		 a, 0, b,	 0,-b,-a,	 a, 0,-b,	//  6  7  8
+		-a, 0,-b,	 b,-a, 0,	-b,-a, 0	//  9 10 11
+	};
+
+	static const int indices[] = {
+		 1, 0, 2,	 2, 3, 1,	 4, 3, 5,	 6, 3, 4,
+		 7, 0, 8,	 9, 0, 7,	10, 4,11,	11, 7,10,
+		 5, 2, 9,	 9,11, 5,	 8, 1, 6,	 6,10, 8,
+		 5, 3, 2,	 1, 3, 6,	 2, 0, 9,	 8, 0, 1,
+		 9, 7,11,	10, 7, 8,	11, 4, 5,	 6, 4,10
 	};
 
 	int Nv = sizeof(vertices)/sizeof(*vertices)/3;
