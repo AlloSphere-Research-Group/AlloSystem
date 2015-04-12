@@ -239,8 +239,10 @@ int addIcosahedron(Mesh& m){
 
 	m.primitive(Graphics::TRIANGLES);
 
-	static const float a = 1.6 * 0.5;
-	static const float b = 1.6 / (2 * phi);
+	static const float a = (0.5) / 0.587785;
+	static const float b = (1. / (2 * phi)) / 0.587785;
+	//printf("%f\n", sqrt(a*a + b*b));
+
 	static const float vertices[] = {
 		 0, b,-a,	 b, a, 0,	-b, a, 0,	//  0  1  2
 		 0, b, a,	 0,-b, a,	-a, 0, b,	//  3  4  5
