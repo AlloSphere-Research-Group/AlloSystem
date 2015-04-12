@@ -28,7 +28,7 @@ void Mesh::decompress(){
 		#define DECOMPRESS(buf, Type)\
 		{\
 			int N = buf.size();\
-			if(N){\
+			if(N > 1){\
 				std::vector<Type> old(N);\
 				std::copy(&buf[0], (&buf[0]) + N, old.begin());\
 				buf.size(Ni);\
@@ -37,7 +37,7 @@ void Mesh::decompress(){
 		}
 		DECOMPRESS(vertices(), Vertex)
 		DECOMPRESS(colors(), Color)
-		DECOMPRESS(coloris(), Color)
+		DECOMPRESS(coloris(), Colori)
 		DECOMPRESS(normals(), Normal)
 		DECOMPRESS(texCoord2s(), TexCoord2)
 		DECOMPRESS(texCoord3s(), TexCoord3)
