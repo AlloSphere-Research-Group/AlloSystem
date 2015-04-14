@@ -137,8 +137,8 @@ private:
         
         float panVal = (xPos + 1) /2.f; //[0, 1], L to R
         
-        gainL = cos((M_PI/2)*panVal);
-        gainR = sin((M_PI/2)*panVal);
+        gainL = M_PI*cos((M_PI/2)*panVal);
+        gainR = M_PI*sin((M_PI/2)*panVal);
     }
     
 };
