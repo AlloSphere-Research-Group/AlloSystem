@@ -706,6 +706,16 @@ void Mesh::print(FILE * dst) const {
 	if(texCoord2s().size())	fprintf(dst, "%8d TexCoord2s\n", texCoord2s().size());
 	if(texCoord3s().size())	fprintf(dst, "%8d TexCoord3s\n", texCoord3s().size());
 	if(indices().size())	fprintf(dst, "%8d Indices\n", indices().size());
+
+	unsigned bytes	= vertices().size()*sizeof(Vertex)
+					+ colors().size()*sizeof(Color)
+					+ coloris().size()*sizeof(Colori)
+					+ normals().size()*sizeof(Normal)
+					+ texCoord2s().size()*sizeof(TexCoord2)
+					+ texCoord3s().size()*sizeof(TexCoord3)
+					+ indices().size()*sizeof(Index)
+					;
+	fprintf(dst, "%8d bytes (%.1f kB)\n", bytes, double(bytes)/1000);
 }
 
 } // al::
