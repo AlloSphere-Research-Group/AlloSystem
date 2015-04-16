@@ -123,7 +123,7 @@ elif uname | grep "MINGW"; then
 				tar -xzf $PKG.tar.gz
 
 				cd $PKG
-					./configure --prefix=$DESTDIR
+					./configure --prefix=$DESTDIR --disable-external-libs
 					# make from src/ to avoid building tests and other gunk
 					cd src
 						make install
