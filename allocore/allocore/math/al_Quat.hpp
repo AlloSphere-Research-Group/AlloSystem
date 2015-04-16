@@ -3,35 +3,35 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -82,7 +82,7 @@ public:
 	template <class U>
 	Quat(const Quat<U>& v)
 	:	w(v.w), x(v.x), y(v.y), z(v.z){}
-	
+
 	/// Construct 'pure imaginary' quaternion
 
 	/// @param[in] xyz		vector to set x,y,z components from; w is set to 0
@@ -107,9 +107,9 @@ public:
 
 	/// NOTE: both arguments must be UNIT VECTORS (normalized)
 	/// rotation occurs around the axis created by the cross product of src and dst
-	/// if the vectors are nearly opposing, the Y axis is used instead 
+	/// if the vectors are nearly opposing, the Y axis is used instead
 	/// if the Y axis isn't suitable, the Z axis is used instead
-	/// 
+	///
 	/// a typical use case: rotate object A to face object B:
 	/// Vec3d src = Vec3d(A.quat().toVectorZ()).normalize();
 	/// Vec3d dst = Vec3d(B.pos() - A.pos()).normalize();
@@ -121,7 +121,7 @@ public:
 	static Quat identity(){ return Quat(1,0,0,0); }
 
 	/// Get rotor from two unit vectors
-	
+
 	/// Alternatively expressed as Q = (1+gp(v1, v2))/sqrt(2*(1+dot(b, a))).
 	///
 	static Quat rotor(const Vec<3,T>& v1, const Vec<3,T>& v2);
@@ -246,7 +246,7 @@ public:
 
 	/// Set as versor rotated by YXZ Euler angles, in radians
 	Quat& fromEuler(const T& az, const T& el, const T& ba);
-	
+
 	/// Set as versor from column-major 4-by-4 projective space transformation matrix
 	Quat& fromMatrix(const T * matrix);
 
@@ -302,7 +302,7 @@ public:
 	/// Rotate vector
 	/// NOTE: quaternion should be normalized for accurate results.
 	Vec<3,T> rotate(const Vec<3,T>& v) const;
-	
+
 	/// This is rotation by the quaternion's conjugate
 	Vec<3,T> rotateTransposed(const Vec<3,T>& v) const;
 
@@ -314,7 +314,7 @@ public:
 
 	/// Get the quaternion from a given point and quaterion toward another point
 	void towardPoint(const Vec<3,T>& pos, const Quat<T>& q, const Vec<3,T>& v, float amt);
-		
+
 	/// utility for debug printing:
 	void print(FILE * out = stdout) const;
 
@@ -367,13 +367,29 @@ inline Quat<T> Quat<T> :: reverseMultiply(const Quat<T> & q) const {
 	return q * (*this);
 }
 
+namespace{
+	// Values determined with help from:
+	// http://babbage.cs.qc.cuny.edu/IEEE-754.old/Decimal.html
+	template<class T> T justUnder1();
+	template<> float  justUnder1(){ return 0.9999999f; }
+	template<> double justUnder1(){ return 0.999999999999999; }
+}
+
 template<typename T>
-Quat<T> Quat<T> :: pow(T v) const {
+Quat<T> Quat<T> :: pow(T expo) const {
 	T m = mag();
-	T theta = ::acos(w / m);
+	T w_m = w / m;
+
+	// Is q/|q| close to (±1,0,0,0)?
+	// If so, then quaternion cannot be "rotated", so just scale w component.
+	if(w_m > justUnder1<T>() || w_m < -justUnder1<T>()){
+		return Quat<T>((w>=T(0)?T(1):T(-1)) * ::pow(m, expo), 0, 0, 0);
+	}
+
+	T theta = ::acos(w_m);
 	Vec<3,T> imag = Vec<3,T>(x,y,z) / (m * ::sin(theta));
-	imag *= ::sin(v*theta);
-	return Quat(::cos(v*theta), imag) * ::pow(m,v);
+	imag *= ::sin(expo*theta);
+	return Quat(::cos(expo*theta), imag) * ::pow(m, expo);
 }
 
 
@@ -385,7 +401,7 @@ inline Quat<T>& Quat<T> :: fromAxisAngle(const T& angle, const Vec<3,T>& axis) {
 template<typename T>
 Quat<T>& Quat<T> :: fromAxisAngle(const T& angle, const T& ux, const T& uy, const T& uz) {
 	T t2 = angle * T(0.5);
-	T sinft2 = sin(t2);	
+	T sinft2 = sin(t2);
 	w = cos(t2);
 	x = ux * sinft2;
 	y = uy * sinft2;
@@ -629,17 +645,17 @@ void Quat<T>::toCoordinateFrame(Vec<3,T>& ux, Vec<3,T>& uy, Vec<3,T>& uz) const 
 /*
 Quat to matrix:
 RHCS
-	[ 1 - 2y - 2z    2xy + 2wz      2xz - 2wy	] 
-	[											] 
-	[ 2xy - 2wz      1 - 2x - 2z    2yz + 2wx	] 
-	[											] 
+	[ 1 - 2y - 2z    2xy + 2wz      2xz - 2wy	]
+	[											]
+	[ 2xy - 2wz      1 - 2x - 2z    2yz + 2wx	]
+	[											]
 	[ 2xz + 2wy      2yz - 2wx      1 - 2x - 2y	]
 
-LHCS              
-	[ 1 - 2y - 2z    2xy - 2wz      2xz + 2wy	] 
-	[											] 
-	[ 2xy + 2wz      1 - 2x - 2z    2yz - 2wx	] 
-	[											] 
+LHCS
+	[ 1 - 2y - 2z    2xy - 2wz      2xz + 2wy	]
+	[											]
+	[ 2xy + 2wz      1 - 2x - 2z    2yz - 2wx	]
+	[											]
 	[ 2xz - 2wy      2yz + 2wx      1 - 2x - 2y	]
 */
 
@@ -688,9 +704,9 @@ inline void Quat<T> :: toVectorZ(T& ax, T& ay, T& az) const {
 }
 
 /*
-	Rotating a vector is simple:	
+	Rotating a vector is simple:
 	v1 = q * qv * q^-1
-	Where v is a 'pure quaternion' derived from the vector, i.e. w = 0. 	
+	Where v is a 'pure quaternion' derived from the vector, i.e. w = 0.
 */
 template<typename T>
 inline Vec<3,T> Quat<T> :: rotate(const Vec<3,T>& v) const {
@@ -723,13 +739,13 @@ inline Vec<3,T> Quat<T> :: rotateTransposed(const Vec<3,T>& v) const {
 template<typename T>
 Quat<T> Quat<T> :: slerp(const Quat& input, const Quat& target, T amt){
 	Quat<T> result;
-	
+
 	if (amt==T(0)) {
 		return input;
 	} else if (amt==T(1)) {
 		return target;
 	}
-	
+
 	int bflip = 0;
 	T dot_prod = input.dot(target);
 	T a, b;
@@ -844,13 +860,13 @@ void Quat<T> :: slerpBuffer(const Quat& input, const Quat& target, Quat<T> * buf
 	}
 }
 
-template<typename T> 
+template<typename T>
 Quat<T> Quat<T> :: getRotationTo(const Vec<3, T>& src, const Vec<3, T>& dst) {
 	// a . b = |a| |b| cos t
 	// Since |a| = |b| = 1, then
 	// a . b = cos t
 	T d = src.dot(dst);
-	
+
 	// vectors are the same
 	if (d >= 1.) {
 		return Quat<T>::identity();
@@ -899,7 +915,7 @@ void Quat<T> :: towardPoint(const Vec<3,T>& pos, const Quat<T>& q, const Vec<3,T
 	Vec<3,T> diff, axis;
 	diff = v-pos;
 	diff.normalize();
-	
+
 	if(amt < 0) {
 		diff = diff*-1.;
 	}

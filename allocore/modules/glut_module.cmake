@@ -6,7 +6,7 @@ set(GLUT_HEADERS
 )
 
 if(GLUT_LIBRARY AND GLUT_INCLUDE_DIR)
-message("Building GLUT module.")
+message(STATUS "Building GLUT module.")
 
 list(APPEND ALLOCORE_SRC
   src/system/al_MainLoop.cpp
@@ -38,4 +38,4 @@ else()
         list(APPEND GLUT_DUMMY_HEADER_INFO "${header}::::GLUT")
     endforeach()
     list(APPEND ALLOCORE_DUMMY_HEADERS ${GLUT_DUMMY_HEADER_INFO})
-endif(GLUT_LIBRARY)
+endif(GLUT_LIBRARY AND GLUT_INCLUDE_DIR)

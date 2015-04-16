@@ -86,8 +86,8 @@ class OmniApp : public Window,
   // From 0 to 1, a shader uniform parameter.  You can set this in the
   // constructor of your App subclass and it will take effect in
   // onCreate() when the shader is created.
-  float lightingAmount; 
-					
+  float lightingAmount;
+
  protected:
   AudioIO mAudioIO;
   OmniStereo mOmni;
@@ -133,7 +133,7 @@ inline OmniApp::OmniApp(std::string name, bool slave)
   nav().smooth(0.8);
 
   lightingAmount = 1.0;  // default
-		  
+
   Window::append(mStdControls);
   initWindow();
   initOmni();

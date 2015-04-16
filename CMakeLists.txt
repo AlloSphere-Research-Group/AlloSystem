@@ -3,40 +3,36 @@ cmake_minimum_required(VERSION 2.8)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(DEBUG_SUFFIX "_debug")
-  message("====== Building Debug version")
+  message(STATUS "====== Building Debug version")
   if((CMAKE_COMPILER_IS_GNUCC) OR (CMAKE_COMPILER_IS_GNUXX))
     message("Using gcc debug flags")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb")
   endif((CMAKE_COMPILER_IS_GNUCC) OR (CMAKE_COMPILER_IS_GNUXX))
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
-set(BUILD_GAMMA 1 CACHE STRING "Try to build external Gamma")
-set(BUILD_GLV 1 CACHE STRING "Try to build external GLV.")
-set(BUILD_VSR 1 CACHE STRING "Try to build vsr.")
+if(NOT DEFINED BUILD_GAMMA)
+  set(BUILD_GAMMA 1 CACHE STRING "Try to build external Gamma")
+endif(NOT DEFINED BUILD_GAMMA)
+
+if(NOT DEFINED BUILD_GLV)
+  set(BUILD_GLV 1 CACHE STRING "Try to build external GLV.")
+endif(NOT DEFINED BUILD_GLV)
+
 set(BUILD_EXAMPLES 0 CACHE STRING "Build AlloSystem examples.")
 
-# Windows custom paths
-include(cmake_modules/CustomLibPaths.cmake)
-
-# External dependencies (Gamma, GLV and vsr)
+# External dependencies (Gamma and GLV)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
 
 include(cmake_modules/make_dep.cmake)
 
-# check for Gamma and build ---------------------------------
-if(BUILD_GAMMA)
+if(BUILD_GAMMA AND NOT GAMMA_LIBRARY)
     make_dep(Gamma)
-endif(BUILD_GAMMA)
+    set(GAMMA_LIBRARY ${Gamma_LIBRARY})
+endif(BUILD_GAMMA AND NOT GAMMA_LIBRARY)
 
-# check for GLV and build ---------------------------------
-if(BUILD_GLV)
+if(BUILD_GLV AND NOT GLV_LIBRARY)
     make_dep(GLV)
-endif(BUILD_GLV)
-
-# check for vsr and build ----------------------------
-if(BUILD_VSR)
-    make_dep(vsr)
-endif(BUILD_VSR)
+endif(BUILD_GLV AND NOT GLV_LIBRARY)
 
 # Allocore --------------------------------
 add_subdirectory(allocore)
@@ -63,23 +59,26 @@ if(BUILDING_GLV)
     add_dependencies(alloGLV${DEBUG_SUFFIX} GLV)
 endif(BUILDING_GLV)
 
+# allocv ---------------------------------------
+
+add_subdirectory(allocv)
+get_target_property(ALLOCV_LIBRARY allocv${DEBUG_SUFFIX} LOCATION)
+get_target_property(ALLOCV_INCLUDE_DIR allocv${DEBUG_SUFFIX} ALLOCV_INCLUDE_DIR)
+get_target_property(ALLOCV_LINK_LIBRARIES allocv${DEBUG_SUFFIX} ALLOCV_LINK_LIBRARIES)
+
 # alloaudio ----------------------------------
 add_subdirectory(alloaudio)
-#get_target_property(ALLOAUDIO_LIBRARY alloaudio${DEBUG_SUFFIX} LOCATION)
-#get_target_property(ALLOAUDIO_DEP_INCLUDE_DIR alloaudio${DEBUG_SUFFIX} ALLOAUDIO_DEP_INCLUDE_DIR)
-#get_target_property(ALLOAUDIO_LINK_LIBRARIES alloaudio${DEBUG_SUFFIX} ALLOAUDIO_LINK_LIBRARIES)
-
-
-# allovsr ----------------------------------
-add_subdirectory(allovsr)
-if(BUILDING_VSR)
-  add_dependencies(allovsr vsr)
-endif(BUILDING_VSR)
+get_target_property(ALLOAUDIO_LIBRARY alloaudio${DEBUG_SUFFIX} LOCATION)
+get_target_property(ALLOAUDIO_INCLUDE_DIR alloaudio${DEBUG_SUFFIX} ALLOAUDIO_INCLUDE_DIR)
+get_target_property(ALLOAUDIO_LINK_LIBRARIES alloaudio${DEBUG_SUFFIX} ALLOAUDIO_LINK_LIBRARIES)
 
 # Run from path (Used in run.sh script)
-if((BUILD_DIR) OR (BUILD_APP_FILE))
-  include(cmake_modules/CMakeRunTargets.cmake)
-endif((BUILD_DIR) OR (BUILD_APP_FILE))
+if((ALLOSYSTEM_BUILD_DIR) OR (ALLOSYSTEM_BUILD_APP_FILE))
+    set(BUILD_DIR ${ALLOSYSTEM_BUILD_DIR})
+    set(BUILD_APP_FILE ${ALLOSYSTEM_BUILD_APP_FILE})
+    include("${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/CMakeRunTargets.cmake")
+    set(BUILD_EXAMPLES 0)
+endif((ALLOSYSTEM_BUILD_DIR) OR (ALLOSYSTEM_BUILD_APP_FILE))
 
 # ----------------------------  Examples
 # macro to get subdirectories
@@ -135,13 +134,14 @@ if(BUILD_EXAMPLES)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_COMPILER_FLAGS}")
       endif(EXTRA_COMPILER_FLAGS)
       #message("Adding target for example: ${example_src}")
-      include_directories(${ALLOCORE_INCLUDE_DIR} ${ALLOUTIL_INCLUDE_DIR} ${ALLOGLV_INCLUDE_DIR} ${ALLOVSR_INCLUDE_DIR}
-        ${GAMMA_INCLUDE_DIRS} )
+      include_directories(${ALLOCORE_INCLUDE_DIR} ${ALLOUTIL_INCLUDE_DIR} ${ALLOGLV_INCLUDE_DIR}
+        ${GLV_INCLUDE_DIRS} ${GAMMA_INCLUDE_DIRS} ${ALLOAUDIO_INCLUDE_DIR} )
       #    message("Gamma : ${GAMMA_INCLUDE_DIRs}")
       add_dependencies(${EXAMPLE_TARGET} "allocore${DEBUG_SUFFIX}" "alloutil${DEBUG_SUFFIX}")
       target_link_libraries(${EXAMPLE_TARGET}
-	${ALLOCORE_LIBRARY} ${ALLOUTIL_LIBRARY} ${GAMMA_LIBRARIES}
-        ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOGLV_LINK_LIBRARIES})
+        ${ALLOCORE_LIBRARY} ${ALLOUTIL_LIBRARY} ${GAMMA_LIBRARIES} ${ALLOAUDIO_LIBRARY}
+        ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LINK_LIBRARIES} ${ALLOGLV_LINK_LIBRARIES}
+        ${ALLOAUDIO_LINK_LIBRARIES})
       if(ALLOGLV_LIBRARY)
         add_dependencies(${EXAMPLE_TARGET} ${ALLOGLV_LIBRARY})
         target_link_libraries(${EXAMPLE_TARGET} ${ALLOGLV_LIBRARY} ${ALLOGLV_LINK_LIBRARIES})
@@ -161,7 +161,7 @@ if(BUILD_EXAMPLES)
       set(DST "${CMAKE_SOURCE_DIR}/build/${FILENAME}")
       if(NOT (IS_DIRECTORY ${SRC}))
 	configure_file(${SRC} ${DST} COPY_ONLY)
-	message("Copying: " ${SRC})
+        message(STATUS "Copying: " ${SRC})
       endif(NOT (IS_DIRECTORY ${SRC}))
     endforeach(FILENAME)
   endforeach(dir)

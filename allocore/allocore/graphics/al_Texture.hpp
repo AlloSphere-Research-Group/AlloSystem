@@ -3,45 +3,45 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
 	File description:
 	Helper object for Graphics Textures
-	
+
 	File author(s):
-	Wesley Smith, 2010, wesley.hoke@gmail.com
-	Lance Putnam, 2010, putnam.lance@gmail.com
+	Lance Putnam, 2015, putnam.lance@gmail.com
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
+	Wesley Smith, 2010, wesley.hoke@gmail.com
 */
 
 #include "allocore/system/al_Printing.hpp"
@@ -52,9 +52,8 @@
 
 namespace al{
 
-/**
-	A simple wrapper around OpenGL Texture
-*/
+
+/// A simple wrapper around an OpenGL Texture
 class Texture : public GPUObject {
 public:
 
@@ -98,7 +97,8 @@ public:
 	/// @param[in] clientAlloc	allocate data on the client
 	Texture(
 		unsigned width, unsigned height,
-		Graphics::Format format=Graphics::RGBA, Graphics::DataType type=Graphics::UBYTE,
+		Graphics::Format format=Graphics::RGBA,
+		Graphics::DataType type=Graphics::UBYTE,
 		bool clientAlloc=true
 	);
 
@@ -112,31 +112,61 @@ public:
 	/// @param[in] clientAlloc	allocate data on the client
 	Texture(
 		unsigned width, unsigned height, unsigned depth,
-		Graphics::Format format=Graphics::RGBA, Graphics::DataType type=Graphics::UBYTE,
+		Graphics::Format format=Graphics::RGBA,
+		Graphics::DataType type=Graphics::UBYTE,
 		bool clientAlloc=true
 	);
-	
 
 	/// Construct a Texture object from an Array header
 	Texture(AlloArrayHeader& header);
-	
+
 	virtual ~Texture();
 
 
-	void configure(AlloArrayHeader& header);
+	/// Set shape (size, format, type, etc.) from array header
 
+	/// @param[in] hdr		Array header from which to match shape
+	/// @param[in] realloc	If true, then the texture's internal memory will
+	///						be reallocated as necessary.
+	void shapeFrom(const AlloArrayHeader& hdr, bool realloc=false);
+
+	/// Set shape (size, format, type, etc.) from internal array
+
+	/// This call can be used to ensure that the tetxure shape matches the
+	/// internal array.
+	void shapeFromArray();
+
+
+	/// Get pixel (color) format
 	Format format() const { return mFormat; }
-	int texelFormat() const { return mTexelFormat; }
-	Target target() const { return mTarget; }
-	DataType type() const { return mType; }	
 
+	/// Get texel (color) format
+	int texelFormat() const { return mTexelFormat; }
+
+	/// Get target type (e.g., TEXTURE_2D)
+	Target target() const { return mTarget; }
+
+	/// Get pixel component data type
+	DataType type() const { return mType; }
+
+	/// Get width, in pixels
 	unsigned width() const { return mWidth; }
+
+	/// Get height, in pixels
 	unsigned height() const { return mHeight; }
+
+	/// Get depth, in pixels
 	unsigned depth() const { return mDepth; }
 
+	/// Whether the dimensions, format, or type have changed
+	bool shapeUpdated() const { return mShapeUpdated; }
+
+	/// Get minification filter type
 	Filter filterMin() const { return mFilterMin; }
+
+	/// Get magnification filter type
 	Filter filterMag() const { return mFilterMag; }
-	
+
 	/// Get number of components per pixel
 	unsigned numComponents() const { return Graphics::numComponents(format()); }
 
@@ -144,37 +174,68 @@ public:
 	unsigned numElems() const {
 		return numPixels() * numComponents();
 	}
-	
+
 	/// Get total number of pixels
 	unsigned numPixels() const {
 		return width() * (height()?height():1) * (depth()?depth():1);
 	}
 
+
+	/// Set pixel (color) format
 	Texture& format(Format v){ return update(v, mFormat, mShapeUpdated); }
+
+	/// Set texel (color) format
 	Texture& texelFormat(int v){ return update(v, mTexelFormat, mShapeUpdated); }
+
+	/// Set target type (e.g., TEXTURE_2D)
 	Texture& target(Target v){ return update(v, mTarget, mShapeUpdated); }
+
+	/// Set pixel component data type
 	Texture& type(DataType v){ return update(v, mType, mShapeUpdated); }
 
+	/// Set width, in pixels
 	Texture& width (unsigned v){ return update(v, mWidth, mShapeUpdated); }
+
+	/// Set height, in pixels
 	Texture& height(unsigned v){ return update(v, mHeight,mShapeUpdated); }
+
+	/// Set depth, in pixels
 	Texture& depth (unsigned v){ return update(v, mDepth ,mShapeUpdated); }
 
+	/// Resize 1D texture
 	Texture& resize(unsigned w){ return width(w); }
+
+	/// Resize 2D texture
 	Texture& resize(unsigned w, unsigned h){ return width(w).height(h); }
+
+	/// Resize 3D texture
 	Texture& resize(unsigned w, unsigned h, unsigned d){ return width(w).height(h).depth(d); }
 
+	/// Set minification and magnification filter types
+	Texture& filter(Filter v){ return filterMin(v).filterMag(v); }
+
+	/// Set minification filter type
 	Texture& filterMin(Filter v){ return update(v, mFilterMin, mParamsUpdated); }
+
+	/// Set magnification filter type
 	Texture& filterMag(Filter v){ return update(v, mFilterMag, mParamsUpdated); }
+
+	/// Set wrapping mode for all dimensions
 	Texture& wrap(Wrap v){ return wrap(v,v,v); }
+
+	/// Set 2D wrapping modes
 	Texture& wrap(Wrap S, Wrap T){ return wrap(S,T,mWrapR); }
+
+	/// Set 3D wrapping modes
 	Texture& wrap(Wrap S, Wrap T, Wrap R);
+
 
 	/// Bind the texture (to a multitexture unit)
 	void bind(int unit = 0);
-	
+
 	/// Unbind the texture (from a multitexture unit)
 	void unbind(int unit = 0);
-	
+
 	/// Render the texture onto a quad on the XY plane
 	void quad(Graphics& gl, double w=1, double h=1, double x=0, double y=0);
 
@@ -198,48 +259,66 @@ public:
 	const char * data() const { return array().data.ptr; }
 
 	/// Flags resubmission of pixel data upon next bind
-	
+
 	/// Calling this ensures that pixels get submitted on the next bind().
 	///
 	Texture& dirty(){ mPixelsUpdated=true; return *this; }
 
-	/// Submit the texture using an Array as source
+	/// Submit the texture to GPU using an Array as source
 
-	/// NOTE: the graphics context (e.g. Window) must have been created
-	/// if reconfigure is true, 
-	/// it will attempt to derive size & layout from the array
+	/// NOTE: the graphics context (e.g. Window) must have been created.
+	/// If reconfigure is true, it will attempt to derive size & layout from the
+	/// array.
 	void submit(const Array& src, bool reconfigure=false);
-		
-	/// Resize texture data on GPU and copy over pixels
+
+	/// Copy client pixels to GPU texels
 
 	/// NOTE: the graphics context (e.g. Window) must have been created
 	/// If pixels is NULL, then the only effect is to resize the texture
 	/// remotely.
 	void submit(const void * pixels, uint32_t align=4);
-	
-	/// NOTE: only valid when the graphics context is valid:
-	Texture& generateMipmap() { bind(); glGenerateMipmapEXT(target()); unbind(); return *this; }
 
-	/// Allocate the internal Array for a CPU-side cache, copying from src
+	/// Copy pixels from current frame buffer to texture texels
+
+	/// @param[in] w		width of region to copy; w<0 uses w + 1 + texture.width
+	/// @param[in] h		height of region to copy; h<0 uses h + 1 + texture.height
+	/// @param[in] fbx		pixel offset from left edge of frame buffer
+	/// @param[in] fby		pixel offset from bottom edge of frame buffer
+	/// @param[in] texx		texel offset in x direction
+	/// @param[in] texy		texel offset in y direction (2D/3D only)
+	/// @param[in] texz		texel offset in z direction (3D only)
+	void copyFrameBuffer(
+		int w=-1, int h=-1,
+		int fbx=0, int fby=0,
+		int texx=0, int texy=0, int texz=0
+	);
+
+	/// Generate mipmaps
+
+	/// NOTE: This is only valid when the graphics context is valid.
+	///
+	Texture& generateMipmap();
+
+	/// Allocate the internal Array for a client-side cache, copying from src
 	void allocate(const Array& src, bool reconfigure=true);
 
-	/// Allocate memory for a CPU copy (reconfigures the internal array)
+	/// Allocate memory for a client-side copy (reconfigures the internal array)
 	void allocate(unsigned align=1);
-	
-	/// Deallocate internal memory
+
+	/// Deallocate any allocated client-side memory
 	void deallocate();
-	
-	/// debug printing
+
+	/// Print information about texture
 	void print();
 
 protected:
-//	int mLevel;	// TODO: on a rainy day...
-//	int mBorder;
-	Target mTarget;				// TEXTURE_1D, TEXTURE_2D, etc. 
+	//int mLevel;	// TODO: on a rainy day...
+	//int mBorder;
+	Target mTarget;				// TEXTURE_1D, TEXTURE_2D, etc.
 	Format mFormat;				// RGBA, ALPHA, etc.
 	int mTexelFormat;			// default is 0 = auto
 	DataType mType;				// UBYTE, FLOAT, etc.
-	Wrap mWrapS, mWrapT, mWrapR;	
+	Wrap mWrapS, mWrapT, mWrapR;
 	Filter mFilterMin, mFilterMag;
 	unsigned mWidth, mHeight, mDepth;
 
@@ -251,15 +330,19 @@ protected:
 
 	virtual void onCreate();
 	virtual void onDestroy();
-	
+
 	// ensures that the internal Array format matches the texture format
 	void resetArray(unsigned align);
 
 	// send any pending parameter updates to GPU or do immediately if forced
 	void sendParams(bool force=true);
-	
+
 	// send any pending pixels updates to GPU or do immediately if forced
 	void sendPixels(bool force=true);
+	void sendPixels(const void * pixels, unsigned align);
+
+	// send any pending shape updates to GPU or do immediately if forced
+	void sendShape(bool force=true);
 
 	// determines target (e.g. GL_TEXTURE_2D) from the dimensions
 	void determineTarget();
@@ -267,16 +350,14 @@ protected:
 	// Pattern for setting a variable that when changed sets a notification flag
 	template<class T>
 	Texture& update(const T& v, T& var, bool& flag){
-		if(v!=var){ var=v; flag=true; } 
-		return *this; 
+		if(v!=var){ var=v; flag=true; }
+		return *this;
 	}
-
-	// sets the pixel format/array from another Array header
-	void setPixelsFrom(const AlloArrayHeader& hdr, bool reallocate);
 
 public:
 	Texture& updatePixels(); /// \deprecated use dirty() instead
 	void submit(); /// \deprecated use dirty() instead
+	void configure(AlloArrayHeader& header); /// \deprecated use shapeFrom() instead
 };
 
 

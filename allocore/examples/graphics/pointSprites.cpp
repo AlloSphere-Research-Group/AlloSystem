@@ -6,24 +6,28 @@ This demonstrates OpenGL's built-in point sprite capability. A point sprite
 is simply a screen-aligned textured square.
 
 Author:
-Lance Putnam, 2/25/2011 (putnam.lance at gmail dot com)
+Lance Putnam, Feb. 2011
 */
 
 #include "allocore/al_Allocore.hpp"
-
 using namespace al;
 
-Graphics gl;
-Texture tex(16,16, Graphics::LUMINANCE, Graphics::FLOAT);
+class MyApp : public App{
+public:
 
-struct MyWindow : Window{
+	float angle;
+	Mesh data;
+	Texture spriteTex;
 
-	bool onCreate(){
+	MyApp()
+	:	spriteTex(16,16, Graphics::LUMINANCE, Graphics::FLOAT)
+	{
+		angle = 0;
 
 		// Generate a grid of points
 		const int N = 12;
-		data.primitive(gl.POINTS);
-	
+		data.primitive(Graphics::POINTS);
+
 		for(int k=0; k<N; ++k){ float z = float(k)/(N-1)*2-1;
 		for(int j=0; j<N; ++j){ float y = float(j)/(N-1)*2-1;
 		for(int i=0; i<N; ++i){ float x = float(i)/(N-1)*2-1;
@@ -31,61 +35,49 @@ struct MyWindow : Window{
 			data.color(x*0.1+0.1, y*0.1+0.1, z*0.1+0.1, 1);
 		}}}
 
-		int Nx = tex.width();
-		int Ny = tex.height();
-		float * texBuf = new float[tex.numElems()];
-		
+		// Create a Gaussian "bump" function to use for the sprite
+		int Nx = spriteTex.width();
+		int Ny = spriteTex.height();
+		float * pixels = spriteTex.data<float>();
+
 		for(int j=0; j<Ny; ++j){ float y = float(j)/(Ny-1)*2-1;
 		for(int i=0; i<Nx; ++i){ float x = float(i)/(Nx-1)*2-1;
-			float m = 1 - al::clip(hypot(x,y));
-			texBuf[j*Nx + i] = m;
+			float m = exp(-3*(x*x + y*y));
+			pixels[j*Nx + i] = m;
 		}}
-		
-		tex.submit(texBuf);
-		delete[] texBuf;
 
-		return true;
+		nav().pos(0,0,6);
+		initWindow();
 	}
 
-	bool onFrame(){
-		gl.clearColor(0,0,0,0);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		gl.viewport(0,0, width(), height());
-		gl.matrixMode(gl.PROJECTION);
-		gl.loadMatrix(Matrix4d::perspective(45, aspect(), 0.1, 100));
-		gl.matrixMode(gl.MODELVIEW);
-		gl.loadMatrix(Matrix4d::lookAt(Vec3d(0,0,-4), Vec3d(0,0,0), Vec3d(0,1,0)));
+	void onAnimate(double dt){
+		angle += 0.1;
+		if(angle>360) angle -= 360;
+	}
 
-		gl.depthTesting(false);
-		gl.blending(true);
-		gl.blendModeAdd();
+	void onDraw(Graphics& g){
 
-		angle += 0.1; if(angle>360) angle -= 360;
-
+		// Tell GPU to render a screen-aligned textured quad at each vertex
 		glEnable(GL_POINT_SPRITE);
 		glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-		gl.pointSize(40);
 
-		tex.bind();
-			gl.rotate(angle*7, 0,1,0);
-			gl.rotate(angle*3, 0,0,1);
-			gl.draw(data);
-		tex.unbind();
-		
+		// Setting the point size sets the sprite size
+		g.pointSize(40);
+
+		// Enable blending to hide texture edges
+		g.blendAdd();
+
+		// We must bind our sprite texture before drawing the points
+		spriteTex.bind();
+			g.rotate(angle*7, 0,1,0);
+			g.rotate(angle*3, 0,0,1);
+			g.draw(data);
+		spriteTex.unbind();
+
 		glDisable(GL_POINT_SPRITE);
-
-		return true;
 	}
-	
-	float angle;
-	Mesh data;
 };
 
-MyWindow win;
-
 int main(){
-	win.add(new StandardWindowKeyControls);
-	win.create();
-	MainLoop::start();
-	return 0;
+	MyApp().start();
 }

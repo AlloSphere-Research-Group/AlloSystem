@@ -3,39 +3,39 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 	File description:
-	Objects for reading, writing, sending, and receiving 
+	Objects for reading, writing, sending, and receiving
 	OSC (Open Sound Control) packets.
 
 	File author(s):
@@ -66,10 +66,10 @@ struct Blob{
 
 /// Time tag
 
-/// Time tags are represented by a 64 bit fixed point number. The first 
+/// Time tags are represented by a 64 bit fixed point number. The first
 /// 32 bits specify the number of seconds since midnight on January 1, 1900,
-/// and the last 32 bits specify fractional parts of a second to a precision 
-/// of about 200 picoseconds. This is the representation used by Internet 
+/// and the last 32 bits specify fractional parts of a second to a precision
+/// of about 200 picoseconds. This is the representation used by Internet
 /// NTP timestamps.The time tag value consisting of 63 zero bits followed by
 /// a one in the least signifigant bit is a special case meaning "immediately."
 typedef unsigned long long TimeTag;
@@ -83,7 +83,7 @@ public:
 	Packet(int size=1024);
 
 	/// @param[in] contents		buffer to copy packet data from
-	/// @param[in] size			size, in bytes, of the packet buffer	
+	/// @param[in] size			size, in bytes, of the packet buffer
 	Packet(const char * contents, int size);
 
 	~Packet();
@@ -91,25 +91,25 @@ public:
 	const char * data() const;		///< Get raw packet data
     bool isMessage() const;			///< Whether packet is a message
     bool isBundle() const;			///< Whether packet is a bundle
-	
+
 	/// Pretty-print raw packet bytes
 	void printRaw() const;
-	
+
 	/// Get number of bytes of current packet data
 	int size() const;
 
 	/// Begin a new bundle
 	Packet& beginBundle(TimeTag timeTag=1);
-	
+
 	/// End bundle
 	Packet& endBundle();
 
 	/// Start a new message
 	Packet& beginMessage(const std::string& addressPattern);
-	
+
 	/// End message
 	Packet& endMessage();
-	
+
 	/// Add zero argument message
 	Packet& addMessage(const std::string& addr){
 		beginMessage(addr); return endMessage();
@@ -189,7 +189,7 @@ public:
 	void print() const;
 
 	/// Get time tag
-	
+
 	/// If the message is contained within a bundle, it will inherit the
 	/// time tag of the bundle, otherwise the time tag will be 1 (immediate).
 	const TimeTag& timeTag() const { return mTimeTag; }
@@ -242,14 +242,15 @@ public:
 	/// @param[in] port		Port number (valid range is 0-65535)
 	/// @param[in] address	IP address
 	/// @param[in] timeout	< 0: block forever; = 0: no blocking; > 0 block with timeout
-	Send(uint16_t port, const char * address = "localhost", al_sec timeout=0);
+	/// @param[in] size 	Packet buffer size
+	Send(uint16_t port, const char * address = "localhost", al_sec timeout=0, int size=1024);
 
 	/// Send and clear current packet contents
 	int send();
 
 	/// Send a packet
 	int send(const Packet& p);
-	
+
 	/// Send zero argument message immediately
 	int send(const std::string& addr){
 		addMessage(addr); return send();
@@ -260,7 +261,7 @@ public:
 	int send(const std::string& addr, const A& a){
 		addMessage(addr, a); return send();
 	}
-	
+
 	/// Send two argument message immediately
 	template <class A, class B>
 	int send(const std::string& addr, const A& a, const B& b){
@@ -312,12 +313,12 @@ public:
 	/// @param[in] address	IP address. If empty, will bind all network interfaces to socket.
 	/// @param[in] timeout	< 0: block forever; = 0: no blocking; > 0 block with timeout
 	Recv(uint16_t port, const char * address = "", al_sec timeout=0);
-	
+
 	virtual ~Recv() { stop(); }
 
 	/// Whether background polling is activated
 	bool background() const { return mBackground; }
-	
+
 	/// Get current received packet data
 	const char * data() const { return &mBuffer[0]; }
 
@@ -331,13 +332,13 @@ public:
 	/// returns bytes read
 	/// note: use while(recv()){} to ensure queue is fully flushed.
 	int recv();
-	
-	/// Begin a background thread to poll the socket. 
-	
+
+	/// Begin a background thread to poll the socket.
+
 	/// The socket timeout controls the polling period.
 	/// Returns whether the thread was started successfully.
 	bool start();
-	
+
 	/// Stop the background polling
 	void stop();
 
@@ -351,6 +352,6 @@ protected:
 
 } // osc::
 } // al::
-	
+
 #endif
-	
+

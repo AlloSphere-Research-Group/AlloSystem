@@ -6,7 +6,7 @@
 #include "allocore/protocol/al_OSC.hpp"
 #include "alloutil/al_FPS.hpp"
 #include "alloutil/al_OmniStereo.hpp"
-#include "alloutil/al_Simulator.hpp" // for PORT_TO_DEVICE_SERVER
+#include "alloutil/al_Simulator.hpp"  // DEVICE_SERVER_PORT_CONNECTION_US
 
 namespace al {
 
@@ -90,7 +90,7 @@ inline void OmniStereoGraphicsRenderer::start() {
 inline OmniStereoGraphicsRenderer::~OmniStereoGraphicsRenderer() {}
 
 inline OmniStereoGraphicsRenderer::OmniStereoGraphicsRenderer()
-    : mNavControl(mNav), mOSCSend(PORT_FROM_DEVICE_SERVER) {
+    : mNavControl(mNav), mOSCSend(12001) {
 
   bOmniEnable = true;
   mHostName = Socket::hostName();

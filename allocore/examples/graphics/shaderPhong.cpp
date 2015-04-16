@@ -66,7 +66,7 @@ struct MyWindow : Window{
 		shaderV.source(vLight, Shader::VERTEX).compile();
 		shaderF.source(fLight, Shader::FRAGMENT).compile();
 		shaderP.attach(shaderV).attach(shaderF).link();
-		
+
 		shaderV.printLog();
 		shaderF.printLog();
 		shaderP.printLog();
@@ -99,11 +99,15 @@ struct MyWindow : Window{
 		mesh.transform(xfm);
 		mesh.generateNormals();
 
+		// Set lighting properties
+		material.specular(RGB(0.2));
+		material.shininess(16);
+		material();
+		light.dir(1,1,-1);
+		light();
+
 		// Render
 		shaderP.begin();
-			light.dir(1,1,1);
-			material();
-			light();
 			gl.draw(mesh);
 		shaderP.end();
 

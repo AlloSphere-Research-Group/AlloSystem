@@ -42,18 +42,18 @@ GLenum gl_antialias_mode(Graphics::AntiAliasMode v) {
 }
 
 GLenum gl_blend_func(Graphics::BlendFunc v) {
-	switch(v){	
-		CS(SRC_COLOR) 
+	switch(v){
+		CS(SRC_COLOR)
 		CS(ONE_MINUS_SRC_COLOR)
-		CS(DST_COLOR) 
+		CS(DST_COLOR)
 		CS(ONE_MINUS_DST_COLOR)
-		CS(SRC_ALPHA) 
+		CS(SRC_ALPHA)
 		CS(ONE_MINUS_SRC_ALPHA)
 		CS(DST_ALPHA)
-		CS(ONE_MINUS_DST_ALPHA)	
-		CS(ZERO) 
-		CS(ONE) 
-		CS(SRC_ALPHA_SATURATE)		
+		CS(ONE_MINUS_DST_ALPHA)
+		CS(ZERO)
+		CS(ONE)
+		CS(SRC_ALPHA_SATURATE)
 		default: return GL_SRC_ALPHA;
 	}
 }
@@ -189,7 +189,7 @@ void GraphicsBackendOpenGL::lineWidth(double v) {
 
 // Frame
 void GraphicsBackendOpenGL::clear(int attribMask) {
-	int bits = 
+	int bits =
 		(attribMask & Graphics::COLOR_BUFFER_BIT ? GL_COLOR_BUFFER_BIT : 0) |
 		(attribMask & Graphics::DEPTH_BUFFER_BIT ? GL_DEPTH_BUFFER_BIT : 0) |
 		(attribMask & Graphics::ENABLE_BIT ? GL_ENABLE_BIT : 0) |
@@ -226,12 +226,12 @@ GLenum GraphicsBackendOpenGL::type_for_array_type(AlloTy type) {
 		case AlloSInt8Ty:	return GL_BYTE;
 		case AlloSInt16Ty:	return GL_SHORT;
 		case AlloSInt32Ty:	return GL_INT;
-		
+
 		case AlloUInt8Ty:	return GL_UNSIGNED_BYTE;
 		case AlloUInt16Ty:	return GL_UNSIGNED_SHORT;
 		case AlloUInt32Ty:	return GL_UNSIGNED_INT;
 	}
-	
+
 	return GL_BYTE;
 }
 
@@ -255,7 +255,7 @@ Texture::Target check_target(GraphicsBackendOpenGL *backend, Texture::Target tar
 			else return mTarget;
 			*/
 			return Texture::TEXTURE_3D;
-		
+
 		case Texture::TEXTURE_1D:
 		case Texture::TEXTURE_2D:
 		default:
@@ -270,7 +270,7 @@ GLenum target_from_texture_target(GraphicsBackendOpenGL *backend, Texture::Targe
 		case Texture::TEXTURE_RECT:	return GL_TEXTURE_RECTANGLE_ARB;
 		case Texture::TEXTURE_3D:	return GL_TEXTURE_3D;
 	}
-	
+
 	return GL_TEXTURE_2D;
 }
 
@@ -282,14 +282,14 @@ void clamp_texture_dimensions(GraphicsBackendOpenGL *backend, Texture::Target ta
 			mWidth = (mWidth > sz) ? sz : mWidth;
 			mHeight = (mHeight > sz) ? sz : mHeight;
 		} break;
-		
+
 		case GL_TEXTURE_3D: {
 			int sz = Glob::extensions().max3DTextureSize();
 			mWidth = (mWidth > sz) ? sz : mWidth;
 			mHeight = (mHeight > sz) ? sz : mHeight;
 			mDepth = (mDepth > sz) ? sz : mDepth;
 		} break;
-		
+
 		default: {
 			int sz = Glob::extensions().maxTextureSize();
 			mWidth = (mWidth > sz) ? sz : mWidth;
@@ -320,7 +320,7 @@ GLenum wrap_from_texture_wrap(GraphicsBackendOpenGL *backend, Texture::Target ta
 			default:;
 		}
 	}
-	
+
 	return GL_CLAMP_TO_BORDER;
 }
 
@@ -333,7 +333,7 @@ GLenum filter_from_texture_filter(GraphicsBackendOpenGL *backend, Texture::Filte
 		case Texture::NEAREST_MIPMAP_LINEAR:	return GL_NEAREST_MIPMAP_LINEAR;
 		case Texture::LINEAR_MIPMAP_LINEAR:		return GL_LINEAR_MIPMAP_LINEAR;
 	}
-	
+
 	return GL_LINEAR;
 }
 
@@ -347,7 +347,7 @@ GLenum format_from_texture_format(GraphicsBackendOpenGL *backend, Texture::Forma
 		case Texture::RGBA: return GL_RGBA;
 		case Texture::BGRA: return GL_RGBA;
 	}
-	
+
 	return GL_RGBA;
 }
 
@@ -358,7 +358,7 @@ GLenum type_from_texture_type(GraphicsBackendOpenGL *backend, Texture::Type type
 		case Texture::UINT:		return GL_UNSIGNED_INT;
 		case Texture::FLOAT32:	return GL_FLOAT;
 	}
-	
+
 	return GL_UNSIGNED_BYTE;
 }
 
@@ -385,7 +385,7 @@ GLenum internal_format_from_format(GraphicsBackendOpenGL *backend, Texture::Form
 			case Texture::BGRA: return GL_RGBA;
 		}
 	}
-	
+
 	return GL_RGBA;
 }
 
@@ -393,15 +393,15 @@ GLenum internal_format_from_format(GraphicsBackendOpenGL *backend, Texture::Form
 void GraphicsBackendOpenGL::textureCreate(Texture *tex) {
 //	MuroError err = MURO_ERROR_NONE;
 	GLuint texid = 0;
-	
+
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glGenTextures(1, &texid);
-	
+
 //	if(texid <= 0) return err;
 	if(texid <= 0) return;
-	
+
 	tex->id((int)texid);
-	
+
 
 	// get the OpenGL texture target
 	tex->target(
@@ -411,17 +411,17 @@ void GraphicsBackendOpenGL::textureCreate(Texture *tex) {
 		this,
 		tex->target()
 	);
-	
+
 
 	glBindTexture(gltarget, texid);
-	
+
 
 	// check for valid dimensions
 	int w, h, d;
 	tex->getDimensions(w, h, d);
 	clamp_texture_dimensions(this, tex->target(), w, h, d);
 
-	
+
 	// set the texcoord wrapping
 	GLenum glwrap = wrap_from_texture_wrap(
 		this,
@@ -437,7 +437,7 @@ void GraphicsBackendOpenGL::textureCreate(Texture *tex) {
 		glTexParameteri(gltarget, GL_TEXTURE_WRAP_T, glwrap);
 		glTexParameteri(gltarget, GL_TEXTURE_WRAP_R, glwrap);
 	}
-	
+
 	if(gltarget == GL_TEXTURE_3D) {
 		glTexParameteri(gltarget, GL_TEXTURE_WRAP_R, glwrap);
 
@@ -446,7 +446,7 @@ void GraphicsBackendOpenGL::textureCreate(Texture *tex) {
 		#endif
 	}
 
-	
+
 	// set the filters and border color
 	GLenum glmagfilter = filter_from_texture_filter(this, tex->magFilter());
 	GLenum glminfilter = filter_from_texture_filter(this, tex->minFilter());
@@ -458,12 +458,12 @@ void GraphicsBackendOpenGL::textureCreate(Texture *tex) {
 	GLenum glformat = format_from_texture_format(this, tex->format());
 	GLenum gltype = type_from_texture_type(this, tex->type());
 	GLenum iformat = internal_format_from_format(this, tex->format(), tex->type());
-	
+
 	switch(gltarget) {
 		case GL_TEXTURE_1D:
 			glTexImage1D(gltarget, 0, iformat, w, 0, glformat, gltype, NULL);
 			break;
-			
+
 		case GL_TEXTURE_2D:
 		case GL_TEXTURE_RECTANGLE_ARB:
 			glTexImage2D(gltarget, 0, iformat, w, h, 0, glformat, gltype, NULL);
@@ -478,7 +478,7 @@ void GraphicsBackendOpenGL::textureCreate(Texture *tex) {
 
 	glBindTexture(gltarget, 0);
 	glDisable(gltarget);
-	
+
 	//	mRebuild = false;
 	//	mUpdate = false;
 
@@ -506,7 +506,7 @@ void GraphicsBackendOpenGL::textureBind(Texture *tex, int unit) {
 
 
 	GLenum gltarget = target_from_texture_target(
-		this, 
+		this,
 		tex->target()
 	);
 	glEnable(gltarget);
@@ -515,7 +515,7 @@ void GraphicsBackendOpenGL::textureBind(Texture *tex, int unit) {
 
 void GraphicsBackendOpenGL::textureUnbind(Texture *tex, int unit) {
 	GLenum gltarget = target_from_texture_target(
-		this, 
+		this,
 		tex->target()
 	);
 	glBindTexture(gltarget, 0);
@@ -550,48 +550,48 @@ void GraphicsBackendOpenGL::textureSubmit(Texture *tex) {
 	GLvoid *data = (GLvoid *)tex->getData();
 	if(data) {
 		GLenum gltarget = target_from_texture_target(
-			this, 
+			this,
 			tex->target()
 		);
 		GLenum glformat = format_from_texture_format(this, tex->format());
 		GLenum gltype = type_from_texture_type(this, tex->type());
-		
-		
+
+
 		int alignment = tex->getRowStride() % 4;
 		if(alignment == 0) {
 			alignment = 4;
 		}
 		glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
-		
+
 		switch(gltarget) {
 			case GL_TEXTURE_1D:
 				glTexSubImage1D(
-					gltarget, 
-					0, 0, 
-					tex->width(), 
-					glformat, 
-					gltype, 
+					gltarget,
+					0, 0,
+					tex->width(),
+					glformat,
+					gltype,
 					data
 				);
 				break;
 			case GL_TEXTURE_2D:
 			case GL_TEXTURE_RECTANGLE_ARB:
 				glTexSubImage2D(
-					gltarget, 
-					0, 0, 0, 
-					tex->width(), tex->height(), 
-					glformat, 
-					gltype, 
+					gltarget,
+					0, 0, 0,
+					tex->width(), tex->height(),
+					glformat,
+					gltype,
 					data
 				);
 				break;
 			case GL_TEXTURE_3D:
 				glTexSubImage3D(
-					gltarget, 
-					0, 0, 0, 0, 
-					tex->width(), tex->height(), tex->depth(), 
-					glformat, 
-					gltype, 
+					gltarget,
+					0, 0, 0, 0,
+					tex->width(), tex->height(), tex->depth(),
+					glformat,
+					gltype,
 					data
 				);
 				break;
@@ -611,56 +611,56 @@ GLenum check_fbo_status(Surface *surface) {
 	switch(status) {
 		case GL_FRAMEBUFFER_COMPLETE_EXT:
 			break;
-			
+
 		case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
 			printf("framebuffer GL_FRAMEBUFFER_UNSUPPORTED_EXT\n");
 			/* you gotta choose different formats */
 			break;
-			
+
 		case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
 			printf("framebuffer INCOMPLETE_ATTACHMENT\n");
 			break;
-		
+
 		case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
 			printf("framebuffer FRAMEBUFFER_MISSING_ATTACHMENT\n");
 			break;
-		
+
 		case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
 			printf("framebuffer FRAMEBUFFER_DIMENSIONS\n");
 			break;
-		
+
 		case 0x8CD8: //GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT:
 			printf("framebuffer INCOMPLETE_DUPLICATE_ATTACHMENT\n");
 			break;
-			
+
 		case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
 			printf("framebuffer INCOMPLETE_FORMATS\n");
 			break;
-			
+
 		case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
 			printf("framebuffer INCOMPLETE_DRAW_BUFFER\n");
 			break;
-			
+
 		case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
 			printf("framebuffer INCOMPLETE_READ_BUFFER\n");
 			break;
-			
+
 		case GL_FRAMEBUFFER_BINDING_EXT:
 			printf("framebuffer BINDING_EXT\n");
 			break;
-			
+
 		case 0x8CDE: // GL_FRAMEBUFFER_STATUS_ERROR_EXT:
 			printf("framebuffer STATUS_ERROR\n");
 			break;
-			
+
 		default:
 			/* programming error; will fail on all hardware */
 			//exit(0);
 			break;
 	}
-	
+
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, (GLuint)fboid);
-	
+
 	return status;
 }
 
@@ -673,31 +673,31 @@ void GraphicsBackendOpenGL::surfaceAttachTexture(Surface *surface, Texture *tex)
 	// in case there's already an FBO bound, we want it rebound after this operation
 	GLint fbo_id;
 	glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT, &fbo_id);
-	
+
 	// attach the texture to the surface
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, surface->id());
 	tex->bind(0);
 		glFramebufferTexture2DEXT(
-			GL_FRAMEBUFFER_EXT, 
-			GL_COLOR_ATTACHMENT0_EXT, 
+			GL_FRAMEBUFFER_EXT,
+			GL_COLOR_ATTACHMENT0_EXT,
 			target_from_texture_target(
-				this, 
+				this,
 				tex->target()
-			), 
-			tex->id(), 
+			),
+			tex->id(),
 			0
 		);
 	tex->unbind(0);
-	
+
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, (GLuint)fbo_id);
 }
 
 void GraphicsBackendOpenGL::surfaceAttachDepthbuffer(Surface *surface) {
 	int width = surface->width();
 	int height = surface->height();
-	
+
 	SurfaceData *surface_data = (SurfaceData *)surface->surfaceData();
-	
+
 	// generate a new renderbuffer
 	GLuint depth_id = 0;
 	glGenRenderbuffersEXT(1, &depth_id);
@@ -709,10 +709,10 @@ void GraphicsBackendOpenGL::surfaceAttachDepthbuffer(Surface *surface) {
 	// in case there's already an FBO bound, we want it rebound after this operation
 	GLint fbo_id = 0;
 	glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT, &fbo_id);
-	
+
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, surface->id());
 	glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depth_id);
-	
+
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, (GLuint)fbo_id);
 }
 
@@ -720,14 +720,14 @@ void GraphicsBackendOpenGL::surfaceCreate(Surface *surface) {
 	GLuint fbo_id = 0;
 	glGenFramebuffersEXT(1, &fbo_id);
 	surface->id(fbo_id);
-	
+
 	surfaceAttachTexture(surface, surface->texture());
 
 	// attach depth buffer
 	surfaceAttachDepthbuffer(surface);
-	
+
 	// see if we're FBO complete
-	check_fbo_status(surface);	
+	check_fbo_status(surface);
 }
 
 void GraphicsBackendOpenGL::surfaceDestroy(Surface *surface) {
@@ -735,7 +735,7 @@ void GraphicsBackendOpenGL::surfaceDestroy(Surface *surface) {
 		GLuint fbo_id = (GLuint)surface->id();
 		glDeleteFramebuffersEXT(1, &fbo_id);
 		surface->id(0);
-		
+
 		SurfaceData *surface_data = (SurfaceData *)surface->surfaceData();
 		surface_data->depth_id = 0;
 	}
@@ -744,18 +744,18 @@ void GraphicsBackendOpenGL::surfaceDestroy(Surface *surface) {
 void GraphicsBackendOpenGL::surfaceBind(Surface *surface) {
 	glPushAttrib(GL_VIEWPORT_BIT);
 	glDisable(GL_SCISSOR_TEST);
-	
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_TEXTURE_RECTANGLE_ARB);
-	
+
 	/*
 	GLint fboid;
 	glGetIntegerv(GL_FRAMEBUFFER_BINDING_EXT, &fboid);
 	mPrevfboid = (GLuint)fboid;
 	*/
-	
+
 	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, surface->id());
 }
 
@@ -766,21 +766,21 @@ void GraphicsBackendOpenGL::surfaceUnbind(Surface *surface) {
 
 void GraphicsBackendOpenGL :: surfaceEnter(Surface *surface) {
 	glViewport(0, 0, surface->width(), surface->height());
-	
+
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
-	
+
 	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();	
-	
+	glPushMatrix();
+
 	if(surface->autoClear()) {
 		Color &c = surface->clearColor();
 		glClearColor(c.r, c.g, c.b, c.a);
 		glClearDepth(surface->clearDepth());
-		
+
 		glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
+
 		/*
 		for(int i=0; i < mNumAttachments; i++) {
 			glDrawBuffer(bufferAttachPoint(i));
@@ -802,7 +802,7 @@ void GraphicsBackendOpenGL::draw(const GraphicsData& v) {
 
 	int Nv = v.vertices().size();
 	if(0 == Nv) return;
-	
+
 	int Nc = v.colors().size();
 	int Nn = v.normals().size();
 	int Nt2= v.texCoord2s().size();
@@ -817,10 +817,10 @@ void GraphicsBackendOpenGL::draw(const GraphicsData& v) {
 		glEnableClientState(GL_NORMAL_ARRAY);
 		glNormalPointer(GL_FLOAT, 0, &v.normals()[0]);
 	}
-	
+
 	if(Nc >= Nv){
 		glEnableClientState(GL_COLOR_ARRAY);
-		glColorPointer(4, GL_FLOAT, 0, &v.colors()[0]);			
+		glColorPointer(4, GL_FLOAT, 0, &v.colors()[0]);
 	}
 	else if(0 == Nc){
 		// no; just use whatever the last glColor() call used!
@@ -829,14 +829,14 @@ void GraphicsBackendOpenGL::draw(const GraphicsData& v) {
 	else{
 		glColor4f(v.colors()[0][0], v.colors()[0][1], v.colors()[0][2], v.colors()[0][3]);
 	}
-	
+
 	if(Nt2 || Nt3){
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		if(Nt2 >= Nv) glTexCoordPointer(2, GL_FLOAT, 0, &v.texCoord2s()[0]);
 		if(Nt3 >= Nv) glTexCoordPointer(3, GL_FLOAT, 0, &v.texCoord3s()[0]);
 	}
-	
-	
+
+
 	if(Ni){
 		//unsigned vs=0, ve=Nv;	// range of vertex indices to prefetch
 								// NOTE:	if this range exceeds the number of vertices,
@@ -845,16 +845,16 @@ void GraphicsBackendOpenGL::draw(const GraphicsData& v) {
 
 //		glDrawRangeElements(v.primitive(), vs, ve, ie-is, GL_UNSIGNED_INT, &v.indices()[is]);
 		glDrawElements(
-			gl_primitive((Graphics::Primitive)v.primitive()), 
-			ie-is, 
-			GL_UNSIGNED_INT, 
+			gl_primitive((Graphics::Primitive)v.primitive()),
+			ie-is,
+			GL_UNSIGNED_INT,
 			&v.indices()[is]
 		);
 	}
 	else{
 		glDrawArrays(
-			gl_primitive((Graphics::Primitive)v.primitive()), 
-			0, 
+			gl_primitive((Graphics::Primitive)v.primitive()),
+			0,
 			v.vertices().size()
 		);
 	}

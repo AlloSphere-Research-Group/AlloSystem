@@ -3,41 +3,41 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
 	File description:
 	Loads and saves images
-	
+
 	File author(s):
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
@@ -50,14 +50,14 @@ namespace al{
 /*!
 	\class Image
 
-	Loads and saves images.  
-	
+	Loads and saves images.
+
 	Default implementation uses the FreeImage library. Supported formats include:
 
 		bmp, chead, cut, dcx, dds, doom, doomFlat, exif, gif, hdr, ico, jasc_pal, jpg,
 		lbm, lif, mdl, pcd, pcx, pic, pix, png, pnm, psd, psp, pxr, raw, sgi, tgo, tif,
 		wal, xpm
-		
+
 	FreeImage is used under the FreeImage Public License (FIPL) v1.0
 	See the /licenses folder in the source tree, or
 	http://freeimage.sourceforge.net/freeimage-license.txt
@@ -74,7 +74,7 @@ public:
 		RGBA,			//!< rgba (4-plane)
 		UNKNOWN_FORMAT
 	};
-	
+
 	template<typename T>
 	struct RGBPix { T r, g, b; };
 
@@ -84,26 +84,51 @@ public:
 
 	Image();
 
-	/// @param[in] filename		file name of image; loaded automatically
-	Image(const std::string& filename);
+	/// @param[in] filePath		Image file to load
+	Image(const std::string& filePath);
 
 	~Image();
 
 
-	/// Load image with file name. Image type determined by file extension.
+	/// Load image from disk
 
-        // return true for success or print error message and return false
-	bool load(const std::string& filename);
-	
-	/// Save image with file name. Image type determined by file extension. 
+	/// @param[in] filePath		File to load. Image type determined by file 
+	///							extension.
+    /// \returns true for success or print error message and return false
+	bool load(const std::string& filePath);
 
-        // return true for success or print error message and return false
-	bool save(const std::string& filename);
-	
+	/// Save image to disk
+
+	/// @param[in] filePath		File to save. Image type determined by file 
+	///							extension.
+    /// \returns true for success or print error message and return false
+	bool save(const std::string& filePath);
+
+	/// Save pixel data to disk
+
+	/// @param[in] filePath		File to save. Image type determined by file 
+	///							extension.
+	/// @param[in] src			source array containing pixel data
+	/// @param[in] compressFlags level of compression in [0,100] and other flags
+	static bool save(const std::string& filePath, const Array& src, int compressFlags=50);
+
+	/// Save pixel data to disk
+
+	/// @param[in] filePath		File to save. Image type determined by file 
+	///							extension.
+	/// @param[in] pixels		pixel data
+	/// @param[in] nx			number of pixels along the x dimension
+	/// @param[in] ny			number of pixels along the y dimension
+	/// @param[in] fmt			pixel format
+	/// @param[in] compressFlags level of compression in [0,100] and other flags
+	template <class T>
+	static bool save(const std::string& filePath, const T * pixels, int nx, int ny, Format fmt, int compressFlags=50);
+
+
 	/// File path to image
 	const std::string& filepath() const { return mFilename; }
-	
-	/// Whether an image was loaded from file
+
+	/// Whether image was loaded from file
 	bool loaded() const { return mLoaded; }
 
 
@@ -130,7 +155,7 @@ public:
 
 	/// Get width, in pixels
 	unsigned width() const { return array().width(); }
-	
+
 	/// Get height, in pixels
 	unsigned height() const { return array().height(); }
 
@@ -151,19 +176,8 @@ public:
 	/// Warning: no bounds checking performed on x and y
 	template<typename Pix>
 	void write(const Pix& pix, unsigned x, unsigned y) {
-		array().write(&pix.r, x, y); 
+		array().write(&pix.r, x, y);
 	}
-
-	/// Quick image writing function
-	
-	/// @param[in] filePath		file path
-	/// @param[in] pixels		pixel data
-	/// @param[in] nx			number of pixels along the x dimension
-	/// @param[in] ny			number of pixels along the y dimension
-	/// @param[in] fmt			pixel format
-	/// @param[in] compressionFlags level of compression in [0,100] and other flags
-	template <class T>
-	static bool write(const std::string& filePath, const T * pixels, int nx, int ny, Format fmt, int compressFlags=50);
 
 	/// Read a pixel from an Image
 
@@ -171,11 +185,11 @@ public:
 	/// Warning: no bounds checking performed on x and y
 	template<typename Pix>
 	void read(Pix& pix, unsigned x, unsigned y) const {
-		array().read(&pix.r, x, y); 
+		array().read(&pix.r, x, y);
 	}
 
 	/// Resize internal pixel buffer. Erases any existing data.
-	
+
 	/// @param[in] dimX		number of pixels in x direction
 	/// @param[in] dimY		number of pixels in y direction
 	/// @param[in] format	pixel color format
@@ -189,7 +203,7 @@ public:
 
 	/// Get number of components per pixel element
 	static int components(Format v);
-	
+
 	static Format getFormat(int planes);
 
 	class Impl {
@@ -223,18 +237,17 @@ inline int Image::components(Format v){
 }
 
 template <class T>
-bool Image::write(
+bool Image::save(
 	const std::string& filePath, const T * pixels, int nx, int ny, Format fmt, int compress
 ){
-	Image img;
-	Array& a = img.array();
+	Array a;
 	a.data.ptr			= (char *)const_cast<T *>(pixels);
 	a.header.type		= Array::type<T>();
 	a.header.components	= Image::components(fmt);
 	allo_array_setdim2d(&a.header, nx, ny);
 	allo_array_setstride(&a.header, 1);
-	img.compression(compress);
-	bool res = img.save(filePath);
+
+	bool res = save(filePath, a, compress);
 	a.data.ptr = NULL; // prevent ~Array from deleting data
 	return res;
 }

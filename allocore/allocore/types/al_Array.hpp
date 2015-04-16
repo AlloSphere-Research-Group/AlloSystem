@@ -5,30 +5,30 @@
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -90,7 +90,7 @@ public:
 
 	/// Verify elements are a particular type
 	bool isType(AlloTy ty) const { return header.type == ty; }
-	template<typename T> bool isType() { return isType(type<T>()); }
+	template<typename T> bool isType() const { return isType(type<T>()); }
 
 	uint8_t components() const { return header.components; }	///< Get number of components
 	uint8_t dimcount() const { return header.dimcount; }		///< Get number of dimensions
@@ -105,10 +105,10 @@ public:
 
 	/// Returns the total memory footprint, in bytes
 	size_t size() const { return allo_array_size(this); }
-	
+
 	/// Returns number of cells in the Array:
 	unsigned cells() const { return allo_array_elements(this); }
-	
+
 	/// Change the format without de/re/allocating:
 	void configure(const AlloArrayHeader& h2);
 
@@ -144,12 +144,13 @@ public:
 	bool hasData() const { return NULL != data.ptr; }
 
 	/// Allocate memory for the given header.
+
 	/// Warning: does not check if memory was already allocated;
 	/// Call dataFree() first if you know it will be safe to do so.
-	void dataCalloc() { allo_array_allocate(this); }
+	void dataCalloc();
 
 	/// Free memory and set data.ptr to NULL
-	void dataFree() { allo_array_free(this); }
+	void dataFree();
 
 	/// Set all data to zero
 	void zero();
@@ -179,12 +180,32 @@ public:
 	template <class T> const T& elem(size_t ic, size_t ix, size_t iy, size_t iz) const{
 		return cell<T>(ix,iy,iz)[ic]; }
 
+  /*  
+      Some operator overloading attempts by Matt, not fully tested or necessarily well conceived:
+
+
+/// Operator() to look like Matlab's 3D array indexing.   Always returns the first component; best
+        /// for one-component arrays.
+  template <class T> T& operator ()(size_t ix, size_t iy, size_t iz) {return elem<T>(1,ix,iy,iz);}
+
+        /// Operator() to look like Matlab's 2D array indexing.   Always returns the first component; best
+        /// for one-component arrays.
+  template <class T> T& operator ()(size_t ix, size_t iy) {return elem<T>(1,ix,iy);}
+
+        /// Operator() to look like Matlab's 1D array indexing.   Always returns the first component; best
+        /// for one-component arrays.
+  template <class T> T& operator ()(size_t ix) {return elem<T>(1,ix);}
+
+        /// Operator[] to look like 1D array indexing.   Always returns the first component; best
+        /// for one-component arrays.
+  template <class T> T& operator [](size_t ix) {return elem<T>(1,ix);}
+  */
 
 	/// Fill with the same cell value throughout
 	template<typename T> void set1d(T * cell);
 	template<typename T> void set2d(T * cell);
 	template<typename T> void set3d(T * cell);
-	
+
 	template<typename T> void setall(T value);
 
 	/// Use a pure C function to fill an array with data
@@ -201,7 +222,7 @@ public:
 
 	template<typename T, typename TP> T * cell(T* val, const Vec<2,TP> p) const { return cell(val, p[0], p[1]); }
 	template<typename T, typename TP> T * cell(T* val, const Vec<3,TP> p) const { return cell(val, p[0], p[1], p[2]); }
-	
+
 	/// Return a particular cell casted to a typed reference (no bounds checking)
 	template<typename T>
 	T& as(int x) { return *cell<T>(x); }
@@ -249,7 +270,7 @@ public:
 
 	template<typename T, typename TP> void write(const T* val, const Vec<2,TP> p) { write(val, p[0], p[1]); }
 	template<typename T, typename TP> void write(const T* val, const Vec<3,TP> p) { write(val, p[0], p[1], p[2]); }
-	
+
 	/// Write plane values from val array into array (wraps periodically at bounds)
 	template<typename T> void write_wrap(const T* val, int x);
 	template<typename T> void write_wrap(const T* val, int x, int y);
@@ -314,19 +335,12 @@ protected:
 
 
 
-
-
-
-
-
-
 /*
  *
  ********* INLINE IMPLEMENTATION BELOW ***********
  *
  */
 #pragma mark --------------------------------------
-
 
 /*
 	Type traits by partial specialization:
@@ -348,33 +362,6 @@ template<> inline AlloTy Array::type<void *>(){
 		case 8: return AlloPointer64Ty;
 	}
 	return 0;
-}
-
-inline void Array::deriveStride(AlloArrayHeader& h, size_t alignSize) {
-	allo_array_setstride(&h, alignSize);
-}
-
-inline void Array::format(int comps, AlloTy ty, uint32_t dimx) {
-	formatAligned(comps, ty, dimx, AL_ARRAY_DEFAULT_ALIGNMENT);
-}
-inline void Array::format(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy) {
-	formatAligned(comps, ty, dimx, dimy, AL_ARRAY_DEFAULT_ALIGNMENT);
-}
-inline void Array::format(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz) {
-	formatAligned(comps, ty, dimx, dimy, dimz, AL_ARRAY_DEFAULT_ALIGNMENT);
-}
-
-inline void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, size_t align) {
-	uint32_t dims[] = {dimx};
-	formatAlignedGeneral(comps, ty, dims,1, align);
-}
-inline void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, size_t align) {
-	uint32_t dims[] = {dimx,dimy};
-	formatAlignedGeneral(comps, ty, dims,2, align);
-}
-inline void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, size_t align) {
-	uint32_t dims[] = {dimx,dimy,dimz};
-	formatAlignedGeneral(comps, ty, dims,3, align);
 }
 
 template<typename T> inline T * Array::cell(size_t x) const {
@@ -751,7 +738,7 @@ template<typename T> void Array::setall(T value) {
 		default:
 			break;
 	}
-	
+
 }
 
 template<typename T> void Array::set1d(T * cell) {

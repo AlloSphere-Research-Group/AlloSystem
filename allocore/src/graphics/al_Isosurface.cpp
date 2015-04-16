@@ -1,10 +1,11 @@
 #include <math.h>
 #include "allocore/graphics/al_Isosurface.hpp"
+#include "allocore/graphics/al_Graphics.hpp"
 
 namespace al{
 
 /*
-	 6 --------  7 
+	 6 --------  7
 	 /|       /|
     / |      / |
  2 |--------|3 |
@@ -13,7 +14,7 @@ namespace al{
    |/       | /
  0 |--------|1
 
- 
+
   +y    +z
   |   /
   | /
@@ -46,11 +47,11 @@ static const short sEdgeTable[256] = {
 0xca0,0xda9,0xea3,0xfaa,0x8a6,0x9af,0xaa5,0xbac,0x4ac,0x5a5,0x6af,0x7a6,0xaa ,0x1a3,0x2a9,0x3a0,
 0xd30,0xc39,0xf33,0xe3a,0x936,0x83f,0xb35,0xa3c,0x53c,0x435,0x73f,0x636,0x13a,0x33 ,0x339,0x230,
 0xe90,0xf99,0xc93,0xd9a,0xa96,0xb9f,0x895,0x99c,0x69c,0x795,0x49f,0x596,0x29a,0x393,0x99 ,0x190,
-0xf00,0xe09,0xd03,0xc0a,0xb06,0xa0f,0x905,0x80c,0x70c,0x605,0x50f,0x406,0x30a,0x203,0x109,0x0   
+0xf00,0xe09,0xd03,0xc0a,0xb06,0xa0f,0x905,0x80c,0x70c,0x605,0x50f,0x406,0x30a,0x203,0x109,0x0
 };
 
 // The first index is an 8-bit mask of box vertices inside isosurface.
-// The second index is an array of triangle indices making up the isosurface 
+// The second index is an array of triangle indices making up the isosurface
 // according to the first index. The first element of the array is its size and
 // the following elements are the indices of the triangle in term of edge ID.
 static const char sTriTable[256][16] = {
@@ -316,7 +317,7 @@ static const char sTriTable[256][16] = {
 //		printf("{");
 //		int numTri=0;
 //		for(int i=0; sTriTable[j][i] != -1; i+=3) ++numTri;
-//		
+//
 //		printf("%2d", numTri*3);
 //		for(int i=0; i<15; ++i){
 //			printf(",%d", sTriTable[j][i]);
@@ -353,18 +354,18 @@ Cube-by-cube pass:
 
 	3. Use surface type to obtain triangle indices (in terms of edge ID)
 		a. Compute edge ID as combination of vertex ID and edge number
-	
+
 
 Compression pass:
 
 	1. For each edge in edge-to-vertex map:
 		a. Add edge vertex position to vertex buffer
 		b. Assign index in vertex buffer to vertex.index
-	
+
 	2. For each triangle:
 		a. Look up vertex position in edge-to-vertex map
 		b. Append vertex.index to index buffer
-		
+
 	3. Generate per-vertex normals
 
 */
@@ -388,7 +389,7 @@ void Isosurface::addCell(const int * cellIdx3, const float * vals){
 	// Create a triangulation of the isosurface in this cell
 	const int edgeCode = sEdgeTable[idx];
 	if(edgeCode){
-	
+
 		int cID = cellID(ix,iy,iz);
 
 		// Compute interpolated vertices on edges of box
@@ -410,7 +411,7 @@ void Isosurface::addCell(const int * cellIdx3, const float * vals){
 		// Add up to 5 triangles (15 vertices) representing surface through cell
 		// Each triangle consists of 3 vertex indices stored in mEdgeToVertex
 		for(int i=1; i <= sTriTable[idx][0]; i+=3){
-			// Add 3 edge indices of triangle		
+			// Add 3 edge indices of triangle
 			index(edgeID(cID, sTriTable[idx][i  ]));
 			index(edgeID(cID, sTriTable[idx][i+1]));
 			index(edgeID(cID, sTriTable[idx][i+2]));
@@ -439,9 +440,9 @@ void Isosurface::addEdgeVertex(int ix, int iy, int iz, int cellID, int edgeNo, c
 			(*mVertexAction)(ev, *this);
 		}
 	}
-	else{	
+	else{
 		EdgeToVertex::iterator it = mEdgeToVertex.find(eIdx);
-		
+
 		// If this edge vertex has not been computed yet, then compute it
 		if(mEdgeToVertex.end() == it){
 			EdgeVertex ev = calcIntersection(ix,iy,iz, edgeNo, vals);
@@ -466,7 +467,7 @@ void Isosurface::addEdgeVertex(int ix, int iy, int iz, int cellID, int edgeNo, c
 };
 
 
-Isosurface::EdgeVertex 
+Isosurface::EdgeVertex
 Isosurface::calcIntersection(int ix, int iy, int iz, int edgeNo, const float * vals) const{
 
 	// Positions of cube vertices
@@ -498,7 +499,7 @@ Isosurface::calcIntersection(int ix, int iy, int iz, int edgeNo, const float * v
 
 	// Interpolate between two grid points to produce the point at which
 	// the isosurface intersects an edge.
-	
+
 	// 'mu' is the fraction along the edge where the vertex lies
 	float mu = float((level() - val1)/(val2 - val1));
 
@@ -527,6 +528,7 @@ void Isosurface::begin(){
 
 void Isosurface::end(){
 	compressTriangles();
+	primitive(Graphics::TRIANGLES); // must be set for proper normal generation
 	if(mComputeNormals) generateNormals(mNormalize);
 	mValidSurface = true;
 }
@@ -597,7 +599,7 @@ Isosurface& Isosurface::fieldDims(int nx, int ny, int nz){
 
 	mEdgeIDOffsets[ 7] = ex + 3*mNF[0]*mNF[1];
 	mEdgeIDOffsets[ 4] = ey + 3*mNF[0]*mNF[1];
-	
+
 	mEdgeIDOffsets[10] = ez + 3*(1 + mNF[0]                );
 	mEdgeIDOffsets[ 5] = ex + 3*(    mNF[0] + mNF[0]*mNF[1]);
 	mEdgeIDOffsets[ 6] = ey + 3*(1          + mNF[0]*mNF[1]);

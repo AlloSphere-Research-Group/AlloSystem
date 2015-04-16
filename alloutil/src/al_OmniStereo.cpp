@@ -1,6 +1,7 @@
+#include <fstream> // Loads configuration.
+#include "json/json.h" // Parses configuration.
+#include <iostream>
 
-#include "allocore/io/al_Socket.hpp" // for hostname
-#include "alloutil/al_Lua.hpp" // for hostname
 #include "allocore/graphics/al_Image.hpp"
 #include "allocore/graphics/al_Shader.hpp"
 #include "allocore/io/al_File.hpp"
@@ -8,7 +9,8 @@
 
 using namespace al;
 
-static Lua L;
+static Json::Value config;
+static std::string errors;
 
 
 static float fovy = M_PI;
@@ -16,7 +18,7 @@ static float aspect = 2.;
 
 static void fillFishEye(float * value, double normx, double normy) {
 	Vec3f& out = *(Vec3f *)value;
-	
+
 	// move (0,0) to center of texture:
 	float sx = normx - 0.5;
 	float sy = normy - 0.5;
@@ -24,71 +26,71 @@ static void fillFishEye(float * value, double normx, double normy) {
 	float az = fovy * aspect * sx;
 	// elevation covers 180':
 	float el = fovy * sy;
-	
+
 	float sel = sin(el);
 	float cel = cos(el);
 	float saz = sin(az);
 	float caz = cos(az);
-	
+
 	// assumes standard OpenGL coordinate frame
 	// -Z forward, Y up, X right
 	out.x =  cel*saz;
 	out.y =  sel;
 	out.z = -cel*caz;
 	out.normalize();
-	
-	value[3] = 1.;	
+
+	value[3] = 1.;
 }
 
 static void fillCylinder(float * value, double normx, double normy) {
 	Vec3f& out = *(Vec3f *)value;
-	
+
 	// move (0,0) to center of texture:
 	float sx = normx - 0.5;
 	float sy = normy - 0.5;
-	
+
 	float y1 = sy * fovy * 2.;
 	float y0 = 1. - fabs(y1);
-	
+
 	// azimuth covers full 360':
 	float az = fovy * M_PI * aspect * sx;
 	float saz = sin(az);
 	float caz = cos(az);
-	
+
 	// assumes standard OpenGL coordinate frame
 	// -Z forward, Y up, X right
 	out.x =  y0*saz;
 	out.y =  y1;
 	out.z = -y0*caz;
 	out.normalize();
-	
-	value[3] = 1.;	
+
+	value[3] = 1.;
 }
 
 static void fillRect(float * value, double normx, double normy) {
 	Vec3f& out = *(Vec3f *)value;
-	
+
 	// move (0,0) to center of texture:
 	float sx = normx - 0.5;
 	float sy = normy - 0.5;
-	
+
 	float f = 1./tan(fovy * 0.5);
-	
+
 	// assumes standard OpenGL coordinate frame
 	// -Z forward, Y up, X right
 	out.x =  f * sx * aspect;
 	out.y =  f * sy;
 	out.z = -1.;
 	out.normalize();
-	
-	value[3] = 1.;	
+
+	value[3] = 1.;
 }
 
 static void softEdge(uint8_t * value, double normx, double normy) {
 	static const double mult = 20;
-	
+
 	// fade out at edges:
-	value[0] = 255. * sin(M_PI_2 * al::min(1., mult*(0.5 - fabs(normx-0.5)))) * sin(M_PI_2 * al::min(1., mult*(0.5 - fabs(normy-0.5)))); 
+	value[0] = 255. * sin(M_PI_2 * al::min(1., mult*(0.5 - fabs(normx-0.5)))) * sin(M_PI_2 * al::min(1., mult*(0.5 - fabs(normy-0.5))));
 }
 
 #pragma mark GLSL
@@ -106,32 +108,32 @@ static const char * fCube = AL_STRINGIFY(
 	uniform sampler2D pixelMap;
 	uniform sampler2D alphaMap;
 	uniform samplerCube cubeMap;
-	
+
 	varying vec2 T;
-	
+
 	void main (void){
 		// ray location (calibration space):
 		vec3 v = normalize(texture2D(pixelMap, T).rgb);
-		
+
 		// index into cubemap:
 		vec3 rgb = textureCube(cubeMap, v).rgb * texture2D(alphaMap, T).rgb;
-		
+
 		gl_FragColor = vec4(rgb, 1.);
 	}
 );
 
 #pragma mark Sphere GLSL
-static const char * fSphere = AL_STRINGIFY(	
+static const char * fSphere = AL_STRINGIFY(
 	uniform sampler2D pixelMap;
 	uniform sampler2D alphaMap;
-	uniform sampler2D sphereMap;	
+	uniform sampler2D sphereMap;
 	// navigation:
 	//uniform vec3 pos;
-	uniform vec4 quat;	
+	uniform vec4 quat;
 	varying vec2 T;
-	
+
 	float one_over_pi = 0.318309886183791;
-	
+
 	// q must be a normalized quaternion
 	vec3 quat_rotate(in vec4 q, in vec3 v) {
 		// return quat_mul(quat_mul(q, vec4(v, 0)), quat_conj(q)).xyz;
@@ -148,11 +150,11 @@ static const char * fSphere = AL_STRINGIFY(
 			-p.w*q.z + p.z*q.w - p.x*q.y + p.y*q.x   // z
 		);
 	}
-	
+
 	void main (void){
 		// ray location (calibration space):
 		vec3 v = normalize(texture2D(pixelMap, T).rgb);
-		
+
 		// ray direction (world space);
 		vec3 rd = quat_rotate(quat, v);
 
@@ -161,7 +163,7 @@ static const char * fSphere = AL_STRINGIFY(
 		float azimuth = atan(-rd.x, -rd.z) * one_over_pi;
 		azimuth = (1. - azimuth)*0.5;	// scale from -1,1 to 1,0
 		vec2 sphereT = vec2(azimuth, elevation);
-		
+
 		// read maps:
 		vec3 rgb = texture2D(sphereMap, sphereT).rgb * texture2D(alphaMap, T).rgb;
 		gl_FragColor = vec4(rgb, 1.);
@@ -190,7 +192,7 @@ static const char * fDemo = AL_STRINGIFY(
 	uniform vec3 pos;
 	uniform float eyesep;
 	varying vec2 T;
-	
+
 	// q must be a normalized quaternion
 	vec3 quat_rotate(in vec4 q, in vec3 v) {
 		// return quat_mul(quat_mul(q, vec4(v, 0)), quat_conj(q)).xyz;
@@ -218,7 +220,7 @@ static const char * fDemo = AL_STRINGIFY(
 	float udBox( vec3 p, vec3 b ) {
 	  return length(max(abs(p)-b, 0.0));
 	}
-	
+
 	// MAIN SCENE //
 	float map(vec3 p) {
 		vec3 pr1 = opRepeat(p, vec3(5, 4, 3));
@@ -232,7 +234,7 @@ static const char * fDemo = AL_STRINGIFY(
 		for( float t=mint; t < maxt; ) {
 			float h = map(ro + rd*t);
 			// keep looking:
-			t += h * 0.5; 
+			t += h * 0.5;
 			// blurry penumbra:
 			res = min( res, k*h/t );
 			if( h<mindt ) {
@@ -242,8 +244,8 @@ static const char * fDemo = AL_STRINGIFY(
 		}
 		return res;
 	}
-	
-	void main(){	
+
+	void main(){
 		vec3 light1 = pos + vec3(1, 2, 3);
 		vec3 light2 = pos + vec3(2, -3, 1);
 		vec3 color1 = vec3(0.3, 0.7, 0.6);
@@ -254,30 +256,30 @@ static const char * fDemo = AL_STRINGIFY(
 		vec3 v = normalize(texture2D(pixelMap, T).rgb);
 		// ray direction (world space);
 		vec3 rd = quat_rotate(quat, v);
-		
-		// stereo offset: 
+
+		// stereo offset:
 		// should reduce to zero as the nv becomes close to (0, 1, 0)
 		// take the vector of nv in the XZ plane
 		// and rotate it 90' around Y:
 		vec3 up = vec3(0, 1, 0);
 		vec3 rdx = cross(normalize(rd), up);
-		
+
 		//vec3 rdx = projection_on_plane(rd, up);
 		vec3 eye = rdx * eyesep * 0.02;
-		
+
 		// ray origin (world space)
 		vec3 ro = pos + eye;
-		
+
 		// initial eye-ray to find object intersection:
 		float mindt = 0.01;	// how close to a surface we can get
 		float mint = mindt;
 		float maxt = 50.;
 		float t=mint;
 		float h = maxt;
-		
+
 		// find object intersection:
 		vec3 p = ro + mint*rd;
-		
+
 		int steps = 0;
 		int maxsteps = 50;
 		for (t; t<maxt;) {
@@ -296,17 +298,17 @@ static const char * fDemo = AL_STRINGIFY(
 			// Normals computed by central differences on the distance field at the shading point (gradient approximation).
 			// larger eps leads to softer edges
 			float eps = 0.01;
-			vec3 grad = vec3( 
+			vec3 grad = vec3(
 				map(p+vec3(eps,0,0)) - map(p-vec3(eps,0,0)),
 				map(p+vec3(0,eps,0)) - map(p-vec3(0,eps,0)),
-				map(p+vec3(0, 0, eps)) - map(p-vec3(0,0,eps))  
+				map(p+vec3(0, 0, eps)) - map(p-vec3(0,0,eps))
 			);
 			vec3 normal = normalize(grad);
-			
+
 			// compute ray to light source:
 			vec3 ldir1 = normalize(light1 - p);
 			vec3 ldir2 = normalize(light2 - p);
-			
+
 			// abs for bidirectional surfaces
 			float ln1 = max(0.,dot(ldir1, normal));
 			float ln2 = max(0.,dot(ldir2, normal));
@@ -318,16 +320,16 @@ static const char * fDemo = AL_STRINGIFY(
 			float smint = 0.001;
 			float nudge = 0.01;
 			float smaxt = maxt;
-			
+
 			color = ambient
-					+ color1 * ln1 //* shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k) 
+					+ color1 * ln1 //* shadow(p+normal*nudge, ldir1, smint, smaxt, mindt, k)
 					+ color2 * ln2 //* shadow(p+normal*smint, ldir2, smint, smaxt, mindt, k)
 					;
-	
+
 			//color = 	ambient +
-			//		color1 * ln1 + 
+			//		color1 * ln1 +
 			//		color2 * ln2;
-			
+
 			/*
 			// Ambient Occlusion:
 			// sample 5 neighbors in direction of normal
@@ -343,9 +345,9 @@ static const char * fDemo = AL_STRINGIFY(
 			}
 			ao = 1. - aok * ao;
 			color *= ao;
-			*/		
-			
-		
+			*/
+
+
 			// fog:
 			float tnorm = t/maxt;
 			float fog = 1. - tnorm*tnorm;
@@ -353,8 +355,8 @@ static const char * fDemo = AL_STRINGIFY(
 		}
 
 		color *= texture2D(alphaMap, T).rgb;
-		
-		gl_FragColor = vec4(color, 1); 
+
+		gl_FragColor = vec4(color, 1);
 	}
 );
 
@@ -362,7 +364,7 @@ static const char * fDemo = AL_STRINGIFY(
 
 OmniStereo::Projection::Projection()
 :	mViewport(0, 0, 1, 1) {
-	
+
 	// allocate blend map:
 	mBlend.resize(128, 128)
 		.target(Texture::TEXTURE_2D)
@@ -370,7 +372,7 @@ OmniStereo::Projection::Projection()
 		.type(Graphics::UBYTE)
 		.filterMin(Texture::LINEAR)
 		.allocate();
-		
+
 
 	// allocate warp map:
 	mWarp.resize(256, 256)
@@ -379,7 +381,7 @@ OmniStereo::Projection::Projection()
 		.type(Graphics::FLOAT)
 		.filterMin(Texture::LINEAR)
 		.allocate();
-		
+
 	t = u = v = 0;
 }
 
@@ -388,14 +390,14 @@ void OmniStereo::Projection::onCreate() {
 	mWarp.filterMag(Texture::LINEAR);
 	mWarp.texelFormat(GL_RGB32F_ARB);
 	mWarp.dirty();
-	
+
 	mBlend.filterMin(Texture::LINEAR_MIPMAP_LINEAR);
 	mBlend.filterMag(Texture::LINEAR);
 	mBlend.dirty();
 }
 
 void OmniStereo::Projection::registrationPosition(const Vec3d& pos) {
-	
+
 }
 
 void OmniStereo::Projection::readParameters(std::string path, bool verbose) {
@@ -404,12 +406,12 @@ void OmniStereo::Projection::readParameters(std::string path, bool verbose) {
 		printf("failed to open Projector configuration file %s\n", path.c_str());
 		return;
 	}
-	
+
 	f.read((void *)(&params), sizeof(OmniStereo::Projection::Parameters), 1);
 	f.close();
-	
+
 	initParameters(verbose);
-	
+
 	printf("read %s\n", path.c_str());
 }
 
@@ -418,18 +420,18 @@ void OmniStereo::Projection::initParameters(bool verbose) {
 	Vec3f v = params.screen_center - params.projector_position;
 	float screen_perpendicular_dist = params.normal_unit.dot(v);
 	Vec3f compensated_center = (v) / screen_perpendicular_dist + params.projector_position;
-	
+
 	// calculate uv parameters
 	float x_dist = params.x_vec.mag();
 	x_unit = params.x_vec / x_dist;
 	x_pixel = x_dist / params.width;
 	x_offset = x_unit.dot(compensated_center - params.projector_position);
-	
+
 	float y_dist = params.y_vec.mag();
 	y_unit = params.y_vec / y_dist;
 	y_pixel = y_dist / params.height;
 	y_offset = y_unit.dot(compensated_center - params.projector_position);
-	
+
 //	if (verbose) {
 //		printf("Projector %d width %d height %d\n", (int)params.projnum, (int)params.width, (int)params.height);
 //		params.projector_position.print(); printf(" = projector_position\n");
@@ -458,43 +460,43 @@ void OmniStereo::Projection::readWarp(std::string path) {
 		printf("failed to open file %s\n", path.c_str());
 		exit(-1);
 	}
-	
+
 	if (t) free(t);
 	if (u) free(u);
 	if (v) free(v);
-	
+
 	int32_t dim[2];
 	f.read((void *)dim, sizeof(int32_t), 2);
-	
+
 	int32_t w = dim[1];
 	int32_t h = dim[0]/3;
-	
+
 	printf("warp dim %dx%d\n", w, h);
-	
+
 	int32_t elems = w*h;
 	t = (float *)malloc(sizeof(float) * elems);
 	u = (float *)malloc(sizeof(float) * elems);
 	v = (float *)malloc(sizeof(float) * elems);
-	
-	int r = 0;	
+
+	int r = 0;
 	r = f.read((void *)t, sizeof(float), elems);
 	r = f.read((void *)u, sizeof(float), elems);
 	r = f.read((void *)v, sizeof(float), elems);
 	f.close();
-	
+
 	mWarp.resize(w, h)
 		.target(Texture::TEXTURE_2D)
 		.format(Graphics::RGBA)
 		.type(Graphics::FLOAT)
 		.filterMin(Texture::LINEAR)
 		.allocate();
-		
+
 	updatedWarp();
-	
+
 	printf("read %s\n", path.c_str());
 }
 
-void OmniStereo::Projection::updatedWarp() {	
+void OmniStereo::Projection::updatedWarp() {
 	Array& arr = mWarp.array();
 	int w = arr.width();
 	int h = arr.height();
@@ -503,11 +505,11 @@ void OmniStereo::Projection::updatedWarp() {
 			// Y axis appears to be inverted
 			int32_t y1 = (h-y-1);
 			// input data is row-major format
-			int32_t idx = y1*w+x;	
-		
+			int32_t idx = y1*w+x;
+
 			float * cell = arr.cell<float>(x, y);
 			Vec3f& out = *(Vec3f *)cell;
-			
+
 //			// coordinate system change?
 //			out.x = v[idx];
 //			out.y = u[idx];
@@ -517,36 +519,37 @@ void OmniStereo::Projection::updatedWarp() {
 			out.x = t[idx];
 			out.y = u[idx];
 			out.z = v[idx];
-			
+
 			// TODO:
 			// out -= mRegistration.pos();
 			// // & unrotate by mRegistration.quat()
 			// do not normalize; instead capsule fit
-			
+
 			// normalize here so the shaders don't have to
 			//out.normalize();
-			
+
 			// fourth element is currently unused:
 			cell[3] = 1.;
-			
+
 			if (y == 32 && x == 32) {
-				printf("example: %f %f %f -> %f %f %f\n", 
+				printf("example: %f %f %f -> %f %f %f\n",
 					t[idx], u[idx], v[idx],
 					cell[0], cell[1], cell[2]);
 			}
 		}
 	}
-	
+
 	mWarp.dirty();
-	
+
 	printf("updated Warp\n");
-}	
+}
 
 #pragma mark OmniStereo
 
 OmniStereo::OmniStereo(unsigned resolution, bool useMipMaps)
 :	mFace(5),
 	mEyeParallax(0),
+	mSphereRadius(1e10),
 	mNear(0.1),
 	mFar(100),
 	mResolution(resolution),
@@ -560,7 +563,7 @@ OmniStereo::OmniStereo(unsigned resolution, bool useMipMaps)
 {
 	mFbo = mRbo = 0;
 	mTex[0] = mTex[1] = 0;
-	
+
 	mQuad.reset();
 	mQuad.primitive(gl.TRIANGLE_STRIP);
 	mQuad.texCoord	( 0, 0);
@@ -571,19 +574,19 @@ OmniStereo::OmniStereo(unsigned resolution, bool useMipMaps)
 	mQuad.vertex	( 0, 1, 0);
 	mQuad.texCoord	( 1, 1);
 	mQuad.vertex	( 1, 1, 0);
-	
+
 	mClearColor.set(0.);
-	
+
 	configure(FISHEYE).configure(SOFTEDGE);
 }
 
 OmniStereo& OmniStereo::resolution(unsigned r) {
 	mResolution = r;
-	// force GPU reallocation:	
+	// force GPU reallocation:
 	mFbo = mRbo = 0;
 	mTex[0] = mTex[1] = 0;
 	return *this;
-	
+
 }
 
 OmniStereo& OmniStereo::configure(WarpMode wm, float a, float f) {
@@ -621,7 +624,7 @@ OmniStereo& OmniStereo::configure(BlendMode bm) {
 			p.blend().dirty();
 			break;
 		default:
-			// default blend of 1:	
+			// default blend of 1:
 			uint8_t white = 255;
 			p.blend().array().set2d(&white);
 			p.blend().dirty();
@@ -631,159 +634,111 @@ OmniStereo& OmniStereo::configure(BlendMode bm) {
 }
 
 OmniStereo& OmniStereo::configure(std::string configpath, std::string configname) {
- 
-    if (configpath == "") {
-        FILE *pipe = popen("echo ~", "r");
-        if (pipe) {
-          char c;
-          while((c = getc(pipe)) != EOF) {
-        if (c == '\r' || c == '\n')
-              break;
-        configpath += c;
-          }
-          pclose(pipe);
-        }
-        configpath += "/calibration-current/";
-      }
+	if (configpath == "") {
+		#ifdef AL_WINDOWS
+		// Calibration files should be kept at the root of the C: drive on Windows.
+		configpath = "C:";
+		#else
+		// A bit of C trickery to get the absolute path of the home directory on *nix systems.
+	  FILE *pipe = popen("echo ~", "r");
+	  if (pipe) {
+	    char c;
+	    while((c = getc(pipe)) != EOF) {
+	  		if (c == '\r' || c == '\n')
+	      	break;
+	  		configpath += c;
+	    }
+	    pclose(pipe);
+	  }
+	  #endif
 
-
-	if (L.dofile(configpath + "/" + configname + ".lua", 0)) return *this;
-	
-	L.getglobal("projections");
-	if (!lua_istable(L, -1)) {
-		printf("config file %s has no projections\n", configpath.c_str());
-		return *this;
+	  configpath += "/calibration-current";
 	}
-	int projections = L.top();
-	
-	// set active stereo
-	lua_getfield(L, projections, "active");
-	if (lua_toboolean(L, -1)) {
+	std::string config_file_name = configpath + "/" + configname + ".json";
+
+	static std::ifstream config_file(config_file_name.c_str(), std::ifstream::binary | std::ifstream::in);
+	  config_file >> config;
+	config_file.close();
+
+        if ( config.empty() ){
+          std::cout  << "Failed to parse configuration." << std::endl;
+          std::cout << errors << std::endl;
+          std::cout << "Using default configuration." << std::endl;
+          return *this;
+        } else {
+          std::cout << "Parsed configuration file." << std::endl;
+        }
+
+	if ( config["active"].asBool() ) {
 		mMode = ACTIVE;
 	}
-	L.pop(); //active
-	
-	// set fullscreen by default mode?
-	lua_getfield(L, projections, "fullscreen");
-	if (lua_toboolean(L, -1)) {
+
+	if ( config["fullscreen"].asBool() ) {
 		mFullScreen = true;
 	}
-	L.pop(); // fullscreen
-	
-	// set resolution?
-	lua_getfield(L, projections, "resolution");
-	if (lua_isnumber(L, -1)) {
-		resolution(lua_tonumber(L, -1));
-	}
-	L.pop(); // resolution
-	
-	mNumProjections = lua_objlen(L, projections);
-	printf("found %d viewports\n", mNumProjections);
-	
-	for (unsigned i=0; i<mNumProjections; i++) {
-		L.push(i+1);
-		lua_gettable(L, projections);
-		int projection = L.top();
-		//L.dump("config");
-		
-		lua_getfield(L, projection, "viewport");
-		if (lua_istable(L, -1)) {
-			int viewport = L.top();
-			lua_getfield(L, viewport, "l");
-			mProjections[i].viewport().l = L.to<float>(-1);
-			L.pop();
-			
-			lua_getfield(L, viewport, "b");
-			mProjections[i].viewport().b = L.to<float>(-1);
-			L.pop();
-			
-			lua_getfield(L, viewport, "w");
-			mProjections[i].viewport().w = L.to<float>(-1);
-			L.pop();
-			
-			lua_getfield(L, viewport, "h");
-			mProjections[i].viewport().h = L.to<float>(-1);
-			L.pop();
-			
-		}
-		L.pop(); // viewport
-		
-		lua_getfield(L, projection, "warp");
-		if (lua_istable(L, -1)) {
-			int warp = L.top();
-			
-			lua_getfield(L, warp, "width");
-			if (lua_isnumber(L, -1)) {
-				mProjections[i].warpwidth = lua_tonumber(L, -1);
-			}
-			L.pop();
-			
-			lua_getfield(L, warp, "height");
-			if (lua_isnumber(L, -1)) {
-				mProjections[i].warpheight = lua_tonumber(L, -1);
-			}
-			L.pop();
-			
-			lua_getfield(L, warp, "file");
-			if (lua_isstring(L, -1)) {
-				// load from file
-				mProjections[i].readWarp(configpath + "/" + lua_tostring(L, -1));
-			}
-			L.pop();
-		}
-		L.pop(); // warp
-		
-		lua_getfield(L, projection, "blend");
-		if (lua_istable(L, -1)) {
-			int blend = L.top();
-			lua_getfield(L, blend, "file");
-			if (lua_isstring(L, -1)) {
-				// load from file
-				mProjections[i].readBlend(configpath + "/" + lua_tostring(L, -1));
-			} else {
-				// TODO: generate blend...
-			}
-			L.pop();
-		}
-		L.pop(); // blend
-		
-		lua_getfield(L, projection, "params");
-		if (lua_istable(L, -1)) {
-			int params = L.top();
-			lua_getfield(L, params, "file");
-			if (lua_isstring(L, -1)) {
-				// load from file
-				mProjections[i].readParameters(configpath + "/" + lua_tostring(L, -1)); //, true);
-			} 
-			L.pop();
-		}
-		L.pop(); // params
-		
-		lua_getfield(L, projection, "position");
-		if (lua_istable(L, -1)) {
-			int position = L.top();
-			lua_rawgeti(L, position, 1);
-			mProjections[i].position.x = L.to<double>(-1);
-			L.pop();
-			lua_rawgeti(L, position, 2);
-			mProjections[i].position.y = L.to<double>(-1);
-			L.pop();
-			lua_rawgeti(L, position, 3);
-			mProjections[i].position.z = L.to<double>(-1);
-			L.pop();			
-		}
-		L.pop(); // position
 
-		
-		L.pop(); // projector
+	if ( config["resolution"].isUInt() ) {
+		resolution(config["resolution"].asUInt());
 	}
-	
-	L.pop(); // the projections table
+
+	mNumProjections = config["projections"].size();
+	printf("Found %d viewports.\n", mNumProjections);
+
+	for (unsigned i=0; i<mNumProjections; i++) {
+		Json::Value& projection = config["projections"][i];
+		Projection& mprojection = mProjections[i];
+
+		Json::Value& viewport = projection["viewport"];
+			if ( ! viewport.isNull() ) {
+				mprojection.viewport().l = viewport["l"].asFloat();
+				mprojection.viewport().b = viewport["b"].asFloat();
+				mprojection.viewport().w = viewport["w"].asFloat();
+				mprojection.viewport().h = viewport["h"].asFloat();
+			}
+
+		Json::Value& warp = projection["warp"];
+			if ( ! warp.isNull() ) {
+				if ( warp["width"].isInt() ) {
+					mprojection.warpwidth = warp["width"].asInt();
+				}
+
+				if ( warp["height"].isInt() ) {
+					mprojection.warpheight = warp["height"].asInt();
+				}
+
+				if ( warp["file"].isString() ) {
+					mprojection.readWarp( configpath + "/" + warp["file"].asString() );
+				}
+			}
+
+		Json::Value& blend = projection["blend"];
+			if ( ! blend.isNull() ) {
+				if ( blend["file"].isString() ) {
+					mprojection.readBlend( configpath + "/" + blend["file"].asString() );
+				} else {
+					// TODO: generate blend...
+				}
+			}
+
+		// Deprecated.
+		// Json::Value& params = projection["params"];
+		// 	if ( ! params.isNull() ) {
+		// 		if ( params["file"].isString() ) {
+		// 			mprojection.readParameters( configpath + "/" + params["file"].asString() );
+		// 		}
+		// 	}
+
+		Json::Value& position = projection["position"];
+			mprojection.position.x = position[0].asDouble();
+			mprojection.position.y = position[1].asDouble();
+			mprojection.position.z = position[2].asDouble();
+	}
+
 	return *this;
 }
 
 void OmniStereo::onCreate() {
-	
+
 	// force allocation of warp/blend textures:
 	for (unsigned i=0; i<4; i++) {
 		mProjections[i].onCreate();
@@ -854,23 +809,23 @@ void OmniStereo::onCreate() {
 	demoF.printLog();
 	mDemoProgram.printLog();
 	Graphics::error("cube program onCreate");
-	
+
 	// create cubemap textures:
 	glGenTextures(2, mTex);
 	for (int i=0; i<2; i++) {
 		// create cubemap texture:
 		glBindTexture(GL_TEXTURE_CUBE_MAP, mTex[i]);
-		
+
 		// each cube face should clamp at texture edges:
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-		
+
 		// filtering
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		
-		// TODO: verify? 
+
+		// TODO: verify?
 		// Domagoj also has:
 		glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
 		glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
@@ -886,35 +841,35 @@ void OmniStereo::onCreate() {
 		// NULL means reserve texture memory, but texels are undefined
 		for (int f=0; f<6; f++) {
 			glTexImage2D(
-				GL_TEXTURE_CUBE_MAP_POSITIVE_X+f, 
-				0, GL_RGBA8, 
-				mResolution, mResolution, 
-				0, GL_BGRA, GL_UNSIGNED_BYTE, 
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X+f,
+				0, GL_RGBA8,
+				mResolution, mResolution,
+				0, GL_BGRA, GL_UNSIGNED_BYTE,
 				NULL);
 		}
-		
+
 		// clean up:
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 		Graphics::error("creating cubemap texture");
 	}
-	
+
 	// one FBO to rule them all...
 	glGenFramebuffers(1, &mFbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, mFbo);
 	//Attach one of the faces of the Cubemap texture to this FBO
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X, mTex[0], 0);
-	
+
 	glGenRenderbuffers(1, &mRbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, mRbo);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mResolution, mResolution);
 	// Attach depth buffer to FBO
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRbo);
-	
+
 	// ...and in the darkness bind them:
 	for (mFace=0; mFace<6; mFace++) {
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+mFace, GL_TEXTURE_CUBE_MAP_POSITIVE_X+mFace, mTex[0], 0);
 	}
-	
+
 	//Does the GPU support current FBO configuration?
 	GLenum status;
 	status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -922,11 +877,11 @@ void OmniStereo::onCreate() {
 		printf("GPU does not support required FBO configuration\n");
 		exit(0);
 	}
-	
+
 	// cleanup:
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	
+
 	Graphics::error("OmniStereo onCreate");
 }
 
@@ -935,7 +890,7 @@ void OmniStereo::onDestroy() {
 
 	glDeleteTextures(2, mTex);
 	mTex[0] = mTex[1] = 0;
-	
+
 	glDeleteRenderbuffers(1, &mRbo);
 	glDeleteFramebuffers(1, &mFbo);
 	mRbo = mFbo = 0;
@@ -944,76 +899,76 @@ void OmniStereo::onDestroy() {
 void OmniStereo::capture(OmniStereo::Drawable& drawable, const Lens& lens, const Pose& pose) {
 	if (mCubeProgram.id() == 0) onCreate();
 	gl.error("OmniStereo capture begin");
-	
+
 	Vec3d pos = pose.pos();
-	Vec3d ux, uy, uz; 
+	Vec3d ux, uy, uz;
 	pose.unitVectors(ux, uy, uz);
 	mModelView = Matrix4d::lookAt(ux, uy, uz, pos);
-	
+
 	mNear = lens.near();
 	mFar = lens.far();
 	const double eyeSep = mStereo ? lens.eyeSep() : 0.;
-	
+
 	gl.projection(Matrix4d::identity());
-	
+
 	// apply camera transform:
 	gl.pushMatrix(gl.MODELVIEW);
 	gl.loadMatrix(mModelView);
 	glPushAttrib(GL_ALL_ATTRIB_BITS);
 	glBindFramebuffer(GL_FRAMEBUFFER, mFbo);
 	gl.viewport(0, 0, mResolution, mResolution);
-	
+
 	for (int i=0; i<(mStereo+1); i++) {
 		mEyeParallax = eyeSep * (i-0.5);
 		for (mFace=0; mFace<6; mFace++) {
-			
+
 			glDrawBuffer(GL_COLOR_ATTACHMENT0 + mFace);
 			glFramebufferTexture2D(
-				GL_FRAMEBUFFER, 
-				GL_COLOR_ATTACHMENT0 + mFace, 
-				GL_TEXTURE_CUBE_MAP_POSITIVE_X + mFace, 
+				GL_FRAMEBUFFER,
+				GL_COLOR_ATTACHMENT0 + mFace,
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X + mFace,
 				mTex[i], 0);
-			
+
 			gl.clearColor(mClearColor);
 			gl.depthTesting(1);
 			gl.depthMask(1);
 			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-			drawable.onDrawOmni(*this);		
+			drawable.onDrawOmni(*this);
 		}
 	}
-	
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glPopAttrib();
 	gl.popMatrix(gl.MODELVIEW);
 	gl.error("OmniStereo capture end");
-	
+
 	// FBOs don't generate mipmaps by default; do it here:
 	if (mMipmap) {
 		glActiveTexture(GL_TEXTURE0);
 		glEnable(GL_TEXTURE_CUBE_MAP);
-		
+
 		glBindTexture(GL_TEXTURE_CUBE_MAP, mTex[0]);
 		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 		gl.error("generating mipmap");
-		
+
 		if (mStereo) {
 			glBindTexture(GL_TEXTURE_CUBE_MAP, mTex[1]);
 			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 			gl.error("generating mipmap");
 		}
-		
+
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 		glDisable(GL_TEXTURE_CUBE_MAP);
 	}
 	gl.error("OmniStereo FBO mipmap end");
-}	
+}
 
 void OmniStereo::onFrameFront(OmniStereo::Drawable& drawable, const Lens& lens, const Pose& pose, const Viewport& vp) {
 	mFrame++;
 	if (mCubeProgram.id() == 0) onCreate();
-	
+
 	gl.error("OmniStereo onFrameFront begin");
-	
+
 	for (int i=0; i<numProjections(); i++) {
 		Projection& p = projection(i);
 		Viewport& v = p.viewport();
@@ -1024,33 +979,33 @@ void OmniStereo::onFrameFront(OmniStereo::Drawable& drawable, const Lens& lens, 
 			v.h * vp.h
 		);
 		gl.viewport(viewport);
-		
+
 		gl.projection(Matrix4d::perspective(lens.fovy(), viewport.w / (float)viewport.h, lens.near(), lens.far()));
-		
+
 		mFace = 5; // draw negative z
-		
+
 		{
 			Vec3d pos = pose.pos();
-			Vec3d ux, uy, uz; 
+			Vec3d ux, uy, uz;
 			pose.unitVectors(ux, uy, uz);
 			mModelView = Matrix4d::lookAt(-ux, -uy, uz, pos);
-			
+
 			mNear = lens.near();
 			mFar = lens.far();
 			//const double eyeSep = mStereo ? lens.eyeSep() : 0.;
-			
+
 			// apply camera transform:
 			gl.modelView(mModelView);
 			gl.clearColor(mClearColor);
 			gl.depthTesting(1);
 			gl.depthMask(1);
 			gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-			
-			drawable.onDrawOmni(*this);	
+
+			drawable.onDrawOmni(*this);
 		}
 	}
 	gl.error("OmniStereo onFrameFront end");
-}	
+}
 
 void OmniStereo::drawEye(const Pose& pose, double eye) {
 	if (eye > 0.) {
@@ -1066,9 +1021,9 @@ void OmniStereo::drawEye(const Pose& pose, double eye) {
 void OmniStereo::draw(const Lens& lens, const Pose& pose, const Viewport& vp) {
 	mFrame++;
 	if (mCubeProgram.id() == 0) onCreate();
-	
+
 	gl.error("OmniStereo draw begin");
-	
+
 	gl.viewport(vp);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	for (int i=0; i<numProjections(); i++) {
@@ -1084,25 +1039,25 @@ void OmniStereo::draw(const Lens& lens, const Pose& pose, const Viewport& vp) {
 		gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
 		p.blend().bind(2);
 		p.warp().bind(1);
-	
+
 		gl.error("OmniStereo cube draw begin");
-		
+
 		mCubeProgram.begin();
 		glActiveTexture(GL_TEXTURE0);
-		glEnable(GL_TEXTURE_CUBE_MAP);	
-		
+		glEnable(GL_TEXTURE_CUBE_MAP);
+
 		gl.error("OmniStereo cube drawStereo begin");
-		
-		drawStereo<&OmniStereo::drawEye>(lens, pose, viewport);		
-		
+
+		drawStereo<&OmniStereo::drawEye>(lens, pose, viewport);
+
 		gl.error("OmniStereo cube drawStereo end");
-		
+
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 		glDisable(GL_TEXTURE_CUBE_MAP);
-		
+
 		mCubeProgram.end();
 		gl.error("OmniStereo cube draw end");
-		
+
 		p.blend().unbind(2);
 		p.warp().unbind(1);
 	}
@@ -1116,7 +1071,7 @@ void OmniStereo::drawQuadEye(const Pose& pose, double eye) {
 void OmniStereo::drawSphereMap(Texture& map, const Lens& lens, const Pose& pose, const Viewport& vp) {
 	mFrame++;
 	if (mCubeProgram.id() == 0) onCreate();
-	
+
 	gl.viewport(vp);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	for (int i=0; i<numProjections(); i++) {
@@ -1132,16 +1087,16 @@ void OmniStereo::drawSphereMap(Texture& map, const Lens& lens, const Pose& pose,
 		gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
 		p.blend().bind(2);
 		p.warp().bind(1);
-		
+
 		map.bind(0);
 		mSphereProgram.begin();
 		mSphereProgram.uniform("quat", pose.quat());
-		
+
 		drawQuad();
-			
+
 		mSphereProgram.end();
 		map.unbind(0);
-		
+
 		p.blend().unbind(2);
 		p.warp().unbind(1);
 	}
@@ -1149,7 +1104,7 @@ void OmniStereo::drawSphereMap(Texture& map, const Lens& lens, const Pose& pose,
 
 void OmniStereo::drawDemoEye(const Pose& pose, double eye) {
 	mDemoProgram.uniform("eyesep", eye);
-	mDemoProgram.uniform("pos", pose.pos()); 
+	mDemoProgram.uniform("pos", pose.pos());
 	mDemoProgram.uniform("quat", pose.quat());
 	gl.draw(mQuad);
 }
@@ -1157,7 +1112,7 @@ void OmniStereo::drawDemoEye(const Pose& pose, double eye) {
 void OmniStereo::drawDemo(const Lens& lens, const Pose& pose, const Viewport& vp) {
 	mFrame++;
 	if (mCubeProgram.id() == 0) onCreate();
-	
+
 	gl.viewport(vp);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	for (int i=0; i<numProjections(); i++) {
@@ -1173,13 +1128,13 @@ void OmniStereo::drawDemo(const Lens& lens, const Pose& pose, const Viewport& vp
 		gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
 		p.blend().bind(2);
 		p.warp().bind(1);
-		
+
 		mDemoProgram.begin();
-		
-		drawStereo<&OmniStereo::drawDemoEye>(lens, pose, viewport);	
-		
+
+		drawStereo<&OmniStereo::drawDemoEye>(lens, pose, viewport);
+
 		mDemoProgram.end();
-		
+
 		p.blend().unbind(2);
 		p.warp().unbind(1);
 	}
@@ -1188,7 +1143,7 @@ void OmniStereo::drawDemo(const Lens& lens, const Pose& pose, const Viewport& vp
 void OmniStereo::drawWarp(const Viewport& vp) {
 	mFrame++;
 	if (mCubeProgram.id() == 0) onCreate();
-	
+
 	gl.viewport(vp);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	for (int i=0; i<numProjections(); i++) {
@@ -1204,13 +1159,13 @@ void OmniStereo::drawWarp(const Viewport& vp) {
 		gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
 		p.blend().bind(2);
 		p.warp().bind(1);
-		
+
 		mWarpProgram.begin();
-		
+
 		drawQuad();
-		
+
 		mWarpProgram.end();
-		
+
 		p.blend().unbind(2);
 		p.warp().unbind(1);
 	}
@@ -1219,7 +1174,7 @@ void OmniStereo::drawWarp(const Viewport& vp) {
 void OmniStereo::drawBlend(const Viewport& vp) {
 	mFrame++;
 	if (mCubeProgram.id() == 0) onCreate();
-	
+
 	gl.viewport(vp);
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	for (int i=0; i<numProjections(); i++) {
@@ -1233,14 +1188,14 @@ void OmniStereo::drawBlend(const Viewport& vp) {
 		);
 		gl.viewport(viewport);
 		gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
-		
+
 		gl.projection(Matrix4d::ortho(0, 1, 0, 1, -1, 1));
 		gl.modelView(Matrix4d::identity());
-		
+
 		p.blend().bind(0);
-		
+
 		drawQuad();
-		
+
 		p.blend().unbind(0);
 	}
 }
@@ -1250,17 +1205,17 @@ void OmniStereo::drawQuad() {
 		case ACTIVE:
 			glDrawBuffer(GL_BACK_RIGHT);
 			gl.draw(mQuad);
-			
+
 			glDrawBuffer(GL_BACK_LEFT);
 			gl.draw(mQuad);
-			
+
 			glDrawBuffer(GL_BACK);
 			break;
-		
+
 		case DUAL:
 			// TODO:
 			break;
-		
+
 		default:
 			gl.draw(mQuad);
 			break;

@@ -8,30 +8,30 @@
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -48,7 +48,8 @@
 namespace al{
 
 /// Spatial definition of a speaker in a listening space
-struct Speaker {
+class Speaker {
+public:
 
 	unsigned int deviceChannel;	///< Index in the output device channels array
 	float gain;					///< Gain of speaker
@@ -65,6 +66,7 @@ struct Speaker {
 	:	deviceChannel(deviceChan), gain(gain), azimuth(az), elevation(el), radius(radius)
 	{}
 
+	/// Set position from Cartesian coordinate
 	template <class T>
 	Speaker& posCart(T * xyz){
 		using namespace std;
@@ -76,11 +78,12 @@ struct Speaker {
 		xyz[2] = sin(elr) * radius;
 		return *this;
 	}
-	
-    Vec3d vec(){
-        
+
+	/// Get position as Cartesian coordinate
+    Vec3d vec() const {
+
         //TODO doxygen style commenting on coordinates like ambisonics
-        
+
 		double cosel = cos(toRad(elevation));
 //		double x = sin(toRad(azimuth)) * cosel * radius;
 //		double y = cos(toRad(azimuth)) * cosel * radius;
@@ -91,33 +94,35 @@ struct Speaker {
         double z = -1*cos(toRad(azimuth)) * cosel * radius;
 		return Vec3d(x,y,z);
 	}
-    
+
 	static double toRad(double d){ return d*M_PI/180.; }
 };
 
+
+
+/// A set of speakers
 typedef std::vector<Speaker> Speakers;
+
+
 
 /// Base class for a configuration of multiple speakers
 class SpeakerLayout{
 public:
-	
-	SpeakerLayout(){}
 
+	/// Get number of speakers
 	int numSpeakers() const { return speakers().size(); }
 
-	const Speakers& speakers() const { return mSpeakers; }
+	/// Get speaker array
 	Speakers& speakers(){ return mSpeakers; }
+	const Speakers& speakers() const { return mSpeakers; }
 
+	/// Add speaker
 	SpeakerLayout& addSpeaker(const Speaker& spkr){
 		mSpeakers.push_back(spkr);
 		return *this;
 	}
 
-	
-
 protected:
-	friend class Spatializer;
-    friend class AmbisonicsSpatializer;
 	Speakers mSpeakers;
 };
 
@@ -125,8 +130,8 @@ protected:
 
 /// Generic layout of N speakers spaced equidistantly in a ring
 template <int N>
-struct SpeakerRingLayout : public SpeakerLayout{
-
+class SpeakerRingLayout : public SpeakerLayout{
+public:
 	/// @param[in] deviceChannelStart	starting index of device channel
 	/// @param[in] phase				starting phase of first speaker, in degrees
 	/// @param[in] radius				radius of all speakers
@@ -140,7 +145,8 @@ struct SpeakerRingLayout : public SpeakerLayout{
 };
 
 /// Headset speaker layout
-struct HeadsetSpeakerLayout : public SpeakerRingLayout<2>{
+class HeadsetSpeakerLayout : public SpeakerRingLayout<2>{
+public:
 	HeadsetSpeakerLayout(int deviceChannelStart=0, float radius=1.f, float gain=1.f)
 	:	SpeakerRingLayout<2>(deviceChannelStart, 90, radius, gain)
 	{}

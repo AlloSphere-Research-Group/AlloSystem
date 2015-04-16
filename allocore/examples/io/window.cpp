@@ -22,17 +22,17 @@ struct MyWindow : Window {
 
 	bool onCreate(){ 					printTitle(); printf("onCreate\n"); return 1; }
 	bool onDestroy(){					printTitle(); printf("onDestroy\n"); return 1; }
-	bool onResize(int dw, int dh){		printTitle(); printf("onResize     %d, %d\n", dw, dh); return 1; }
+	bool onResize(int w, int h){		printTitle(); printf("onResize     %d, %d\n", w, h); return 1; }
 	bool onVisibility(bool v){			printTitle(); printf("onVisibility %s\n", v?"true":"false"); return 1; }
-	
+
 	bool onKeyDown(const Keyboard& k){	printTitle(); printf("onKeyDown    "); printKey(); return 1; }
 	bool onKeyUp(const Keyboard& k){	printTitle(); printf("onKeyUp      "); printKey(); return 1;}
-	
+
 	bool onMouseDown(const Mouse& m){	printTitle(); printf("onMouseDown  "); printMouse(); return 1;}
 	bool onMouseUp(const Mouse& m){		printTitle(); printf("onMouseUp    "); printMouse(); return 1;}
 	bool onMouseDrag(const Mouse& m){	printTitle(); printf("onMouseDrag  "); printMouse(); return 1;}
 	//bool onMouseMove(const Mouse& m){	printTitle(); printf("onMouseMove  "); printMouse(); return 1;}
-	
+
 	void printMouse(){
 		const Mouse& m = mouse();
 		printf("x:%4d y:%4d b:%d,%d\n", m.x(), m.y(), m.button(), m.down());
@@ -51,10 +51,10 @@ int main(){
 
 	// Construct window; note this does not actually create it
 	MyWindow win;
-	
+
 	// Add some standard key controls for fullscreen, quitting, etc.
 	win.append(*new StandardWindowKeyControls);
-	
+
 	// This creates the window
 	win.create(
 		Window::Dim(100, 0, 400,300),	// dimensions, in pixels

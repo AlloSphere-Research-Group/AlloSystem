@@ -23,11 +23,11 @@ extern "C" {
 // cl_khr_fp64
 #define CL_DEVICE_DOUBLE_FP_CONFIG          0x1032
 
-// cl_khr_byte_addressable_store 
-// cl_khr_global_int32_base_atomics 
-// cl_khr_global_int32_extended_atomics  
-// cl_khr_local_int32_base_atomics 
-// cl_khr_local_int32_extended_atomics 
+// cl_khr_byte_addressable_store
+// cl_khr_global_int32_base_atomics
+// cl_khr_global_int32_extended_atomics
+// cl_khr_local_int32_base_atomics
+// cl_khr_local_int32_extended_atomics
 
 // cl_khr_gl_sharing
 /*
@@ -44,7 +44,7 @@ typedef cl_int (CLAPIENTRY * PFNCLGETGLCONTEXTINFOKHRPROC) (
 #define CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE        0x10000000
 #define CL_CGL_DEVICE_FOR_CURRENT_VIRTUAL_SCREEN_APPLE 		0x10000002
 #define CL_CGL_DEVICES_FOR_SUPPORTED_VIRTUAL_SCREENS_APPLE	0x10000003
-#define CL_INVALID_GL_CONTEXT_APPLE                         -1000      
+#define CL_INVALID_GL_CONTEXT_APPLE                         -1000
 
 //cl_int clGetGLContextInfoAPPLE (
 typedef cl_int (CLAPIENTRY * PFNCLGETGLCONTEXTINFOAPPLEPROC) (
@@ -57,11 +57,11 @@ typedef cl_int (CLAPIENTRY * PFNCLGETGLCONTEXTINFOAPPLEPROC) (
 );
 
 
-// cl_APPLE_SetMemObjectDestructor 
+// cl_APPLE_SetMemObjectDestructor
 //cl_int clSetMemObjectDestructorAPPLE(
 typedef cl_int (CLAPIENTRY * PFNCLSETMEMOBJECTDESTRUCTORAPPLEPROC) (
-	cl_mem /* memobj */, 
-	void (* /*pfn_notify*/)( cl_mem /* memobj */, void* /*user_data*/), 
+	cl_mem /* memobj */,
+	void (* /*pfn_notify*/)( cl_mem /* memobj */, void* /*user_data*/),
 	void * /*user_data */
 );
 
@@ -69,26 +69,26 @@ typedef cl_int (CLAPIENTRY * PFNCLSETMEMOBJECTDESTRUCTORAPPLEPROC) (
 // cl_APPLE_ContextLoggingFunctions
 //void clLogMessagesToSystemLogAPPLE(
 typedef void (CLAPIENTRY * PFNCLLOGMESSAGESTOSYSTEMLOGAPPLE) (
-	const char * /* errstr */, 
-	const void * /* private_info */, 
-	size_t       /* cb */, 
+	const char * /* errstr */,
+	const void * /* private_info */,
+	size_t       /* cb */,
 	void *       /* user_data */
 );
 
 
 //void clLogMessagesToStdoutAPPLE(
 typedef void (CLAPIENTRY * PFNCLLOGMESSAGESTOSTDOUTAPPLE) (
-	const char * /* errstr */, 
-	const void * /* private_info */, 
-	size_t       /* cb */, 
+	const char * /* errstr */,
+	const void * /* private_info */,
+	size_t       /* cb */,
 	void *       /* user_data */
 );
 
 //void clLogMessagesToStderrAPPLE(
 typedef void (CLAPIENTRY * PFNCLLOGMESSAGESTOSTDERRAPPLE) (
-	const char * /* errstr */, 
-	const void * /* private_info */, 
-	size_t       /* cb */, 
+	const char * /* errstr */,
+	const void * /* private_info */,
+	size_t       /* cb */,
 	void *       /* user_data */
 );
 

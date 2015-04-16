@@ -15,18 +15,16 @@ Modified by Lance Putnam, 4/25/2011
 using namespace al;
 
 struct MyWindow : public Window, public Drawable {
-    
+
     MyWindow()
 	:	nav(Vec3d(0,0,-2), 0.8)
 	{
 		cam.fovy(90);	// set field of view angle
-		
+
 		add(new StandardWindowKeyControls);
 		add(new NavInputControl(nav));
 
 		// create some shapes to draw
-		shapes.primitive(gl.TRIANGLES);
-		
 		for(int j=0; j<1000; ++j){
 			int Nv = addCube(shapes);
 
@@ -42,13 +40,13 @@ struct MyWindow : public Window, public Drawable {
 			}
 		}
 	}
-    
+
 	bool onFrame(){
 
         nav.step();
 
 		gl.depthTesting(true);
-		
+
 		Viewport vpfront(0, height()/2, width(), height()/2);
 		Viewport vpback(0, 0, width(), height()/2);
 		Pose posefront(nav);
@@ -60,11 +58,11 @@ struct MyWindow : public Window, public Drawable {
 
 		return true;
 	}
-    
-	virtual void onDraw(Graphics& gl){		
+
+	virtual void onDraw(Graphics& gl){
 		gl.draw(shapes);
 	}
-	
+
 	virtual bool onKeyDown(const Keyboard& k){
 		switch(k.key()){
 			case 'f': cam.fovy(cam.fovy()-5); break;
@@ -73,7 +71,7 @@ struct MyWindow : public Window, public Drawable {
 		}
 		return true;
 	}
-    
+
     Graphics gl;
 	Camera cam;
 	Nav nav;
@@ -82,9 +80,9 @@ struct MyWindow : public Window, public Drawable {
 };
 
 MyWindow win1;
-	
+
 int main(){
-    
+
     win1.create(Window::Dim(800, 600), "Allocore Example: Camera");
 
 	MainLoop::start();

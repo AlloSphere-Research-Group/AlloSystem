@@ -15,18 +15,16 @@ Modified by Lance Putnam, 4/25/2011
 using namespace al;
 
 struct MyWindow : public Window, public Drawable {
-    
+
     MyWindow()
 	:	nav(Vec3d(0,0,-2), 0.8)
 	{
 		lens.fovy(90);	// set field of view angle
-		
+
 		add(new StandardWindowKeyControls);
 		add(new NavInputControl(nav));
 
 		// create some shapes to draw
-		shapes.primitive(gl.TRIANGLES);
-		
 		for(int j=0; j<1000; ++j){
 			int Nv = addCube(shapes);
 
@@ -53,11 +51,11 @@ struct MyWindow : public Window, public Drawable {
 
 		return true;
 	}
-    
-	virtual void onDraw(Graphics& gl){		
+
+	virtual void onDraw(Graphics& gl){
 		gl.draw(shapes);
 	}
-	
+
 	virtual bool onKeyDown(const Keyboard& k){
 		switch(k.key()){
 			case 'f': lens.fovy(lens.fovy()-5); break;
@@ -66,7 +64,7 @@ struct MyWindow : public Window, public Drawable {
 		}
 		return true;
 	}
-    
+
     Graphics gl;
 	Lens lens;
 	Nav nav;
@@ -76,7 +74,7 @@ struct MyWindow : public Window, public Drawable {
 
 MyWindow win;
 
-int main(){    
+int main(){
     win.create(Window::Dim(800, 600), "Allocore Example: Camera");
 
 	MainLoop::start();

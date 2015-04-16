@@ -24,12 +24,12 @@ void OpenCLContext :: create(const vector<OpenCLDevice> &devs) {
 		opencl_error(USER_OPENCL_ERROR, "No OpenCL devices to create context with");
 		return;
 	}
-	
+
 	cl_device_id devices[MAX_DEVICES];
 	cl_int res = CL_SUCCESS;
 	for(int i=0; i < AL_MIN(MAX_DEVICES, ndevices); i++) {
 		devices[i] = devs[i].get_device();
-		
+
 		if(!devs[i].get_available()) {
 			char msg[256];
 			sprintf(msg, "OpenCL Device %s is not available", devs[i].get_name().c_str());
@@ -37,7 +37,7 @@ void OpenCLContext :: create(const vector<OpenCLDevice> &devs) {
 			return;
 		}
 	}
-	
+
 	cl_context context = clCreateContext(
 		0,	// platform to use (only one for now)
 		ndevices,
@@ -46,11 +46,11 @@ void OpenCLContext :: create(const vector<OpenCLDevice> &devs) {
 		(void *)this,
 		&res
 	);
-	
+
 	if(opencl_error(res, "clCreateContext error creating context")) {
 		return;
 	}
-	
+
 	mContext = context;
 	mDevices = devs;
 }
@@ -63,11 +63,11 @@ void OpenCLContext :: destroy() {
 			(*it)->detach();
 			it = mResources.begin();
 		}
-	
+
 		cl_int res = clReleaseContext(mContext);
 		mContext = 0;
 		mDevices.clear();
-		
+
 		opencl_error(res, "clReleaseContext error releasing context");
 	}
 }

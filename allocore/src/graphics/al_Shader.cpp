@@ -58,7 +58,7 @@ void glDetachShader(GLuint program, GLuint shader);
 Shader::Shader(const std::string& source, Shader::Type type)
 :	mSource(source), mType(type){}
 
-Shader& Shader::compile(){ 
+Shader& Shader::compile(){
 	AL_GRAPHICS_ERROR("(before Shader::compile)", id());
 	validate(); // triggers a call to onCreate, if not created
 	AL_GRAPHICS_ERROR("Shader::compile", id());
@@ -79,13 +79,15 @@ void Shader::get(int pname, void * params) const { glGetShaderiv(id(), pname, (G
 void Shader::onCreate(){
 	AL_GRAPHICS_ERROR("(before Shader::onCreate)", id());
 	mID = glCreateShader(gl_shader_type(mType));
-//printf("Create shader %lu\n",id());
-	if(0==id()) AL_WARN("Error creating shader object");
+	//printf("Create shader %lu\n",id());
+	if(0 == id()){
+		AL_WARN("Error creating shader object");
+		return;
+	}
 	AL_GRAPHICS_ERROR("glCreateShader", id());
-	//mHandle = glCreateShaderObjectARB(gl_shader_type(mType));
-	//mID = (long)handle();
+
 	if(mSource[0]){
-		sendSource(); 
+		sendSource();
 		AL_GRAPHICS_ERROR("Shader::sendSource", id());
 		glCompileShader(id());
 		AL_GRAPHICS_ERROR("glCompileShader", id());
@@ -116,7 +118,7 @@ Shader& Shader::source(const std::string& v){
 Shader& Shader::source(const std::string& src, Shader::Type type){
 	mType=type; return source(src);
 }
-	
+
 
 static ShaderProgram::Type param_type_from_gltype(GLenum gltype) {
 	switch(gltype) {
@@ -154,7 +156,7 @@ ShaderProgram& ShaderProgram::attach(Shader& s){
 	validate();
 	s.compile();
 	glAttachObjectARB((GLhandleARB)id(), (GLhandleARB)s.id());
-	//glAttachShader(id(), s.id()); 
+	//glAttachShader(id(), s.id());
 
 	// TODO: check for geometry shader extensions
 //#ifdef GL_EXT_geometry_shader4
@@ -169,54 +171,54 @@ ShaderProgram& ShaderProgram::attach(Shader& s){
 		glProgramParameteriEXT(id(),GL_GEOMETRY_OUTPUT_TYPE_EXT, mOutPrim);
 		glProgramParameteriEXT(id(),GL_GEOMETRY_VERTICES_OUT_EXT,mOutVertices);
 	}
-	
-	return *this; 
+
+	return *this;
 }
-const ShaderProgram& ShaderProgram::detach(const Shader& s) const { 
-	glDetachShader(id(), s.id()); 
+const ShaderProgram& ShaderProgram::detach(const Shader& s) const {
+	glDetachShader(id(), s.id());
 	//glDetachObjectARB((GLhandleARB)handle(), (GLhandleARB)s.handle());
-	return *this; 
+	return *this;
 }
-const ShaderProgram& ShaderProgram::link(bool dovalidate) const { 
-	glLinkProgram(id()); 
+const ShaderProgram& ShaderProgram::link(bool dovalidate) const {
+	glLinkProgram(id());
 	if (dovalidate) validate_linker();
-	return *this; 
+	return *this;
 }
 
-const ShaderProgram& ShaderProgram::validate_linker() const { 
+const ShaderProgram& ShaderProgram::validate_linker() const {
 	int isValid;
 	glValidateProgram(id());
 	glGetProgramiv(id(), GL_VALIDATE_STATUS, &isValid);
 	if (!isValid) {
 		AL_GRAPHICS_ERROR("ShaderProgram::link", id());
 	}
-	return *this; 
+	return *this;
 }
 
-void ShaderProgram::onCreate(){ 
+void ShaderProgram::onCreate(){
 	//mHandle = glCreateProgramObjectARB();
 	//mID = (long)handle();
-	mID = glCreateProgram(); 
+	mID = glCreateProgram();
 }
-void ShaderProgram::onDestroy(){ 
-	glDeleteProgram(id()); 
-	//glDeleteObjectARB((GLhandleARB)handle()); 
+void ShaderProgram::onDestroy(){
+	glDeleteProgram(id());
+	//glDeleteObjectARB((GLhandleARB)handle());
 }
 
 void ShaderProgram::use(unsigned programID){
 	glUseProgram(programID);
 }
 
-const ShaderProgram& ShaderProgram::use(){ 
+const ShaderProgram& ShaderProgram::use(){
 	//if(active()){
 		validate();
-		use(id()); 
+		use(id());
 	//}
 	//glUseProgramObjectARB((GLhandleARB)handle());
-	return *this; 
+	return *this;
 }
 
-bool ShaderProgram::begin(){ 
+bool ShaderProgram::begin(){
 	if(active()){
 		use();
 		return true;
@@ -224,15 +226,15 @@ bool ShaderProgram::begin(){
 	return false;
 }
 
-void ShaderProgram::end() const { 
-	if(active()) glUseProgram(0); 
+void ShaderProgram::end() const {
+	if(active()) glUseProgram(0);
 	//glUseProgramObjectARB(0);
 }
 
-bool ShaderProgram::linked() const { 
-	GLint v; 
-	get(GL_LINK_STATUS, &v); 
-	return (v == GL_TRUE); 
+bool ShaderProgram::linked() const {
+	GLint v;
+	get(GL_LINK_STATUS, &v);
+	return (v == GL_TRUE);
 }
 // GLint v; glGetProgramiv(id(), GL_LINK_STATUS, &v); return v; }
 
@@ -271,13 +273,13 @@ const ShaderProgram& ShaderProgram::uniform(int location, float v0) const{
 	glUniform1f(location, v0);	return *this;
 }
 const ShaderProgram& ShaderProgram::uniform(int location, float v0, float v1) const{
-	glUniform2f(location, v0,v1); return *this;	
+	glUniform2f(location, v0,v1); return *this;
 }
 const ShaderProgram& ShaderProgram::uniform(int location, float v0, float v1, float v2) const{
-	glUniform3f(location, v0,v1,v2); return *this;	
+	glUniform3f(location, v0,v1,v2); return *this;
 }
 const ShaderProgram& ShaderProgram::uniform(int location, float v0, float v1, float v2, float v3) const{
-	glUniform4f(location, v0,v1,v2,v3); return *this;	
+	glUniform4f(location, v0,v1,v2,v3); return *this;
 }
 
 const ShaderProgram& ShaderProgram::uniformMatrix3(const char * name, const float * v, bool transpose) const{
@@ -291,13 +293,13 @@ const ShaderProgram& ShaderProgram::attribute(int location, float v0) const{
 	glVertexAttrib1f(location, v0);	return *this;
 }
 const ShaderProgram& ShaderProgram::attribute(int location, float v0, float v1) const{
-	glVertexAttrib2f(location, v0,v1); return *this;	
+	glVertexAttrib2f(location, v0,v1); return *this;
 }
 const ShaderProgram& ShaderProgram::attribute(int location, float v0, float v1, float v2) const{
-	glVertexAttrib3f(location, v0,v1,v2); return *this;	
+	glVertexAttrib3f(location, v0,v1,v2); return *this;
 }
 const ShaderProgram& ShaderProgram::attribute(int location, float v0, float v1, float v2, float v3) const{
-	glVertexAttrib4f(location, v0,v1,v2,v3); return *this;	
+	glVertexAttrib4f(location, v0,v1,v2,v3); return *this;
 }
 
 const ShaderProgram& ShaderProgram::attribute(const char * name, float v0) const{
@@ -337,24 +339,24 @@ const ShaderProgram& ShaderProgram::attribute4(int location, const double * v) c
 	glVertexAttrib4dv(location, v); return *this;
 }
 
-int ShaderProgram::uniform(const char * name) const { 
+int ShaderProgram::uniform(const char * name) const {
 	//GLint loc = glGetUniformLocationARB((GLhandleARB)handle(), name);
 	GLint loc = glGetUniformLocation(id(), name);
 	if (loc == -1)
 		AL_WARN_ONCE("No such uniform named \"%s\"", name);
-	return loc; 
+	return loc;
 }
 
-int ShaderProgram::attribute(const char * name) const { 
+int ShaderProgram::attribute(const char * name) const {
 	//GLint loc = glGetAttribLocationARB((GLhandleARB)handle(), name);
 	GLint loc = glGetAttribLocation(id(), name);
 	if (loc == -1)
         AL_WARN_ONCE("No such attribute named \"%s\"", name);
-	return loc;  
+	return loc;
 }
 
-void ShaderProgram::get(int pname, void * params) const { 
-	glGetProgramiv(id(), pname, (GLint *)params); 
+void ShaderProgram::get(int pname, void * params) const {
+	glGetProgramiv(id(), pname, (GLint *)params);
 }
 
 void ShaderProgram::listParams() const {
@@ -364,7 +366,7 @@ void ShaderProgram::listParams() const {
 
 	glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numActiveUniforms);
 	glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &numActiveAttributes);
-	
+
 	printf("ShaderProgram::listParams()\n");
 
 	for(int j=0; j < numActiveUniforms; j++)
@@ -386,7 +388,7 @@ void ShaderProgram::listParams() const {
 		if(name[ strlen(name)-3 ] == '[' && name[ strlen(name)-1 ] == ']') {
 			name[ strlen(name)-3 ] = '\0';
 		}
-		
+
 		printf("uniform %d(%s): type %d size %d length %d\n",
 			j, name, param_type_from_gltype(gltype), size, length);
 
@@ -422,7 +424,7 @@ void ShaderProgram::listParams() const {
 							&size,
 							&gltype,
 							name);
-							
+
 		printf("attribute %d(%s): type %d size %d length %d\n",
 			j, name, param_type_from_gltype(gltype), size, length);
 

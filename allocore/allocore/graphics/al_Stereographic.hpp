@@ -3,35 +3,35 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -62,7 +62,7 @@ public:
 		LEFT_EYE,		/**< Left eye only */
 		RIGHT_EYE		/**< Right eye only */
 	};
-	
+
 	/// Anaglyph mode
 	enum AnaglyphMode {
 		RED_BLUE = 0,	/**< */
@@ -74,7 +74,7 @@ public:
 	};
 
 
-	Stereographic() 
+	Stereographic()
 	:	mMode(ANAGLYPH), mAnaglyphMode(RED_CYAN), mClearColor(Color(0)),
 		mSlices(24), mOmniFov(360),
 		mEyeNumber(0),
@@ -85,7 +85,7 @@ public:
 
 
 	/// Draw the scene according to the stored stereographic mode
-	
+
 	/// @param[in] gl		graphics interface
 	/// @param[in] lens		local viewing frustum
 	/// @param[in] pose		viewer position and orientation
@@ -166,7 +166,7 @@ public:
 
 	// These accessors will be valid only during the Drawable's onDraw() event
 	// they can be useful to simulate the OpenGL pipeline transforms
-	//	e.g. Matrix4d::multiply(Vec4d eyespace, stereo.modelView(), Vec4d objectspace); 
+	//	e.g. Matrix4d::multiply(Vec4d eyespace, stereo.modelView(), Vec4d objectspace);
 	//	e.g. Matrix4d::multiply(Vec4d clipspace, stereo.projection(), Vec4d eyespace);
 	//	e.g. Matrix4d::multiply(Vec4d clipspace, stereo.modelViewProjection(), Vec4d objectspace);
 	// to convert in the opposite direction, use Matrix4::inverse().
@@ -186,12 +186,19 @@ public:
 	/// Get current viewport
 	const Viewport& viewport() const { return mVP; }
 
+	/// Convert a normalized screen space position to world space
+	 // each component of input vector should be normalized from -1. to 1.
+	// template<class T>
+	Vec3d unproject(Vec3d screenPos);
+
+
+
 protected:
 	StereoMode mMode;
 	AnaglyphMode mAnaglyphMode;
 	Color mClearColor;
 	unsigned mSlices;	// number of omni slices
-	double mOmniFov;	// field of view of omnigraphics	
+	double mOmniFov;	// field of view of omnigraphics
 	Matrix4d mProjection, mModelView;
 	Vec3d mEye;
 	unsigned mEyeNumber;

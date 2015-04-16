@@ -46,6 +46,12 @@
 
 namespace al{
 
+class MIDIIn;
+
+/// Convert note number to Hz value
+double noteToHz(double noteNumber);
+
+
 /// Utilities for parsing MIDI bytes
 class MIDIByte{
 public:
@@ -55,7 +61,7 @@ public:
 
 	// Constants for checking the first message byte
 	// http://www.midi.org/techspecs/midimessages.php
-	static const unsigned char 
+	static const unsigned char
 		CHANNEL_MASK	= BITS_(0,0,0,0, 1,1,1,1), ///< Channel message status byte channel mask
 		MESSAGE_MASK	= BITS_(1,1,1,1, 0,0,0,0), ///< Message status byte type mask
 
@@ -76,14 +82,14 @@ public:
 		 SOSTENUTO_ON	= 0x42, ///< Sostenuto on/off control number
 		 SOFT_PEDAL		= 0x43, ///< Soft pedal control number
 		 LEGATO_ON		= 0x44, ///< Legato on/off control number
-		 
+
 		PROGRAM_CHANGE	= BITS_(1,1,0,0, 0,0,0,0), ///< Program change channel message type
 		PRESSURE_POLY	= BITS_(1,0,1,0, 0,0,0,0), ///< Polyphonic pressure (aftertouch) channel message type
 		PRESSURE_CHAN	= BITS_(1,1,0,1, 0,0,0,0), ///< Channel pressure (aftertouch) channel message type
-		PITCH_WHEEL		= BITS_(1,1,1,0, 0,0,0,0), ///< Pitch wheel channel message type
+		PITCH_BEND		= BITS_(1,1,1,0, 0,0,0,0), ///< Pitch bend channel message type
 
 		SYSTEM_MSG		= BITS_(1,1,1,1, 0,0,0,0), ///< System message type
-		
+
 		SYS_EX			= BITS_(1,1,1,1, 0,0,0,0), ///< System exclusive system message type
 		SYS_EX_END		= BITS_(1,1,1,1, 0,1,1,1), ///< End of system exclusive system message type
 		TIME_CODE		= BITS_(1,1,1,1, 0,0,0,1), ///< Time code system message type
@@ -95,7 +101,7 @@ public:
 		SEQ_CONTINUE	= BITS_(1,1,1,1, 1,0,1,1), ///< Continue sequence system message type
 		SEQ_STOP		= BITS_(1,1,1,1, 1,1,0,0), ///< Stop sequence system message type
 		ACTIVE_SENSING	= BITS_(1,1,1,1, 1,1,1,0), ///< Active sensing system message type
-		RESET			= BITS_(1,1,1,1, 1,1,1,1) ///< Reset all receivers system message type
+		RESET			= BITS_(1,1,1,1, 1,1,1,1)  ///< Reset all receivers system message type
 	;
 	#undef BITS_
 
@@ -109,10 +115,97 @@ public:
 
 	/// Get string with control type from control number
 	static const char * controlNumberString(unsigned char controlNumber);
-	
-	/// Convert pitch wheel message bytes into a 14-bit value in [0, 16384)
-	static unsigned short convertPitchWheel(unsigned char byte2, unsigned char byte3);
+
+	/// Convert pitch bend message bytes into a 14-bit value in [0, 16384)
+	static unsigned short convertPitchBend(unsigned char byte2, unsigned char byte3);
 };
+
+
+/// MIDI message
+class MIDIMessage {
+public:
+	unsigned char bytes[3];
+
+	MIDIMessage(double timeStamp, unsigned port,
+		unsigned char b1, unsigned char b2=0, unsigned char b3=0,
+		unsigned char * data = NULL
+	);
+
+	/// Get the MIDI device port
+	unsigned port() const { return mPort; }
+
+	/// Get time stamp of message
+	double timeStamp() const { return mTimeStamp; }
+
+
+	/// Get the status byte
+	unsigned char status() const { return bytes[0]; }
+
+	/// Returns whether this is a channel (versus system) message
+	bool isChannelMessage() const { return MIDIByte::isChannelMessage(status()); }
+
+	/// Get the channel number (0-15)
+	unsigned char channel() const { return bytes[0] & MIDIByte::CHANNEL_MASK; }
+
+	/// Get the message type (see MIDIByte)
+	unsigned char type() const { return bytes[0] & MIDIByte::MESSAGE_MASK; }
+
+
+	/// Get note number (type must be NOTE_ON or NOTE_OFF)
+	unsigned char noteNumber() const { return bytes[1]; }
+
+	/// Get mapped note velocity (type must be NOTE_ON or NOTE_OFF)
+	double velocity(double mul = 1./127.) const { return bytes[2]*mul; }
+
+	/// Get mapped pitch bend amount in [-1,1] (type must be PITCH_BEND)
+	double pitchBend() const {
+		int v = int(MIDIByte::convertPitchBend(bytes[1], bytes[2]));
+		v += 1 - bool(v); // clip interval to [1, 16383]
+		return double(v - 8192) / 8191.;
+	}
+
+	/// Get controller number (type must be CONTROL_CHANGE)
+	unsigned char controlNumber() const { return bytes[1]; }
+
+	/// Get mapped controller value (type must be CONTROL_CHANGE)
+	double controlValue(double mul = 1./127.) const { return bytes[2]*mul; }
+
+
+	/// Get sysex message data
+	unsigned char * data() const { return mData; }
+
+
+	/// Print general information about message
+	void print() const;
+
+protected:
+	double mTimeStamp;
+	unsigned mPort;
+	unsigned char * mData;
+};
+
+
+/// Handles receipt of MIDI messages
+class MIDIMessageHandler{
+public:
+	virtual ~MIDIMessageHandler(){}
+
+	/// Called when a MIDI message is received
+	virtual void onMIDIMessage(const MIDIMessage& m) = 0;
+
+	/// Bind handler to a MIDI input
+	void bindTo(MIDIIn& midiIn, unsigned port=0);
+
+protected:
+	struct Binding{
+		MIDIIn * midiIn;
+		MIDIMessageHandler * handler;
+		unsigned port;
+	};
+
+	std::vector<Binding> mBindings;
+};
+
 
 
 
@@ -137,7 +230,7 @@ class MIDIError : public std::exception
 
   //! The constructor.
   MIDIError( const std::string& message, Type type = MIDIError::UNSPECIFIED ) throw() : message_(message), type_(type) {}
- 
+
   //! The destructor.
   virtual ~MIDIError( void ) throw() {}
 
@@ -301,8 +394,8 @@ class MIDIIn : public MIDI
 
   // A MIDI structure used internally by the class to store incoming
   // messages.  Each message represents one and only one MIDI message.
-  struct MIDIMessage { 
-    std::vector<unsigned char> bytes; 
+  struct MIDIMessage {
+    std::vector<unsigned char> bytes;
     double timeStamp;
 
     // Default constructor.
@@ -340,17 +433,8 @@ class MIDIIn : public MIDI
 };
 
 
-/// Handles receipt of MIDI messages
-class MIDIMessageHandler{
-public:
-	virtual ~MIDIMessageHandler(){}
 
-	/// Called when a MIDI message is received
-	virtual void onMIDIMessage(double timeStamp, const std::vector<unsigned char>& message) = 0;
 
-	/// Bind handler to a MIDI input
-	void bindTo(MIDIIn& midiIn);
-};
 
 
 

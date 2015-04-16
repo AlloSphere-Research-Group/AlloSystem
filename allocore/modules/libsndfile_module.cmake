@@ -2,7 +2,7 @@
 find_package(LibSndFile QUIET)
 
 if(SNDFILE_LIBRARIES AND SNDFILE_INCLUDE_DIRS)
-message("Building libsndfile module.")
+message(STATUS "Building libsndfile module.")
 
 #list(APPEND ALLOCORE_SRC
 #  src/graphics/al_Image.cpp)
@@ -17,4 +17,4 @@ list(APPEND ALLOCORE_LINK_LIBRARIES
 
 else()
 message("NOT Building libsndfile module.")
-endif(SNDFILE_LIBRARIES)
+endif(SNDFILE_LIBRARIES AND SNDFILE_INCLUDE_DIRS)

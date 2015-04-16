@@ -179,6 +179,8 @@ class OutputMaster : public osc::Recv
     void setMuteAllTimestamped(al_sec until, bool on);
     void setMeterOnTimestamped(al_sec until, bool on);
     void setMeterupdateFreqTimestamped(al_sec until, double freq);
+    void setBassManagementFreqTimestamped(al_sec until, double freq);
+    void setBassManagementModeTimestamped(al_sec until, int mode);
 
 private:
     const int m_numChnls;

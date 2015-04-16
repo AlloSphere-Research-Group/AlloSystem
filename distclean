@@ -1,19 +1,24 @@
 #!/bin/sh
 
-rm -rf build/ CMakeCache.txt CMakeFiles/ cmake_install.cmake Makefile build.ninja rules.ninja AlloSystem.xcodeproj AlloSystem.build CMakeScripts
+# Since we were using the same line anyways...
+cleaner="rm -rf build/ CMakeCache.txt CMakeFiles/ cmake_install.cmake Makefile build.ninja rules.ninja AlloSystem.xcodeproj AlloSystem.build CMakeScripts"
 
-cd allocore
-rm -rf build/ CMakeCache.txt CMakeFiles/ cmake_install.cmake Makefile build.ninja rules.ninja AlloSystem.xcodeproj AlloSystem.build CMakeScripts
-cd ..
+# Run in root directory.
+eval "$cleaner"
 
-cd alloGLV
-rm -rf build/ CMakeCache.txt CMakeFiles/ cmake_install.cmake Makefile build.ninja rules.ninja AlloSystem.xcodeproj AlloSystem.build CMakeScripts
-cd ..
+# Run in almost all first level subdirectories.
+for d in */ ; do
+  # Except allonect, which still uses a Makefile.
+  if [ "$d" = "allonect/" ]; then
+    break 
+  else
+    cd "$d"
+      eval "$cleaner"
+    cd ..
+  fi
+done
 
-cd alloutil
-rm -rf build/ CMakeCache.txt CMakeFiles/ cmake_install.cmake Makefile build.ninja rules.ninja AlloSystem.xcodeproj AlloSystem.build CMakeScripts
-cd ..
+# Remove build files from our inter-operating libraries.
+rm -rf ../GLV/AlloSystem-build
 
-cd allovsr
-rm -rf build/ CMakeCache.txt CMakeFiles/ cmake_install.cmake Makefile build.ninja rules.ninja AlloSystem.xcodeproj AlloSystem.build CMakeScripts
-cd ..
+rm -rf ../Gamma/AlloSystem-build

@@ -21,33 +21,33 @@ public:
 	OpenCLMemoryBuffer(cl_mem mem=0)
 	:	mMem(mem)
 	{}
-	
+
 	virtual ~OpenCLMemoryBuffer() {}
-	
+
 	cl_mem get_memory() const {return mMem;}
 	void create(OpenCLContext &ctx, cl_mem_flags usage, size_t size, void *ptr);
 	virtual void create(
-		OpenCLContext &ctx, 
-		cl_mem_flags usage, 
+		OpenCLContext &ctx,
+		cl_mem_flags usage,
 		AlloArray *array
 	);
 	void destroy();
-	
+
 	virtual OpenCLEvent enqueue_read(
-		OpenCLCommandQueue &queue, 
-		bool block, 
-		size_t offset, 
-		size_t size, 
+		OpenCLCommandQueue &queue,
+		bool block,
+		size_t offset,
+		size_t size,
 		void *ptr
 	);
-	
+
 	virtual OpenCLEvent enqueue_read(
-		OpenCLCommandQueue &queue, 
-		bool block, 
-		size_t offset, 
+		OpenCLCommandQueue &queue,
+		bool block,
+		size_t offset,
 		AlloArray *array
 	);
-	
+
 	static cl_mem_flags check_memory_flags(cl_mem_flags usage, void *ptr);
 
 protected:

@@ -11,18 +11,33 @@
 
 # APR first.
 
-FIND_PATH(APR_INCLUDE_DIR apr.h
-/usr/local/include/apr-1
-/usr/local/include/apr-1.0
-/usr/include/apr-1
-/usr/include/apr-1.0
+include(LibFindMacros)
+
+libfind_pkg_check_modules(APR_PKGCONF libapr)
+
+find_path(APR_INCLUDE_DIR
+  NAMES
+    apr.h
+  PATHS
+    ${APR_PKGCONF_INCLUDE_DIRS}
+    /usr/local/include
+    /usr/include
+    /mingw64/include
+  PATH_SUFFIXES
+    apr-1
+    apr-1.0
 )
 
 SET(APR_NAMES ${APR_NAMES} apr-1)
 FIND_LIBRARY(APR_LIBRARY
-  NAMES ${APR_NAMES}
-  PATHS /usr/lib /usr/local/lib
-  )
+  NAMES
+    apr-1
+  PATHS
+    ${APR_PKGCONF_LIBRARY_DIRS}
+    /usr/lib
+    /usr/local/lib
+    /mingw64/lib
+)
 
 IF (APR_LIBRARY AND APR_INCLUDE_DIR)
     SET(APR_LIBRARIES ${APR_LIBRARY})
@@ -49,21 +64,33 @@ GET_FILENAME_COMPONENT (NATIVE_APR_LIB_PATH ${APR_LIBRARY} PATH)
 MARK_AS_ADVANCED(
   APR_LIBRARY
   APR_INCLUDE_DIR
-  )
+)
 
 # Next, APRUTIL.
 
-FIND_PATH(APRUTIL_INCLUDE_DIR apu.h
-/usr/local/include/apr-1
-/usr/local/include/apr-1.0
-/usr/include/apr-1
-/usr/include/apr-1.0
+libfind_pkg_check_modules(APRUTIL_PKGCONF libaprutil)
+
+find_path(APRUTIL_INCLUDE_DIR
+  NAMES
+    apu.h
+  DIRECTORY
+    ${APRUTIL_PKGCONF_INCLUDE_DIRS}
+    /usr/local/include
+    /usr/include
+    /mingw64/include
+  PATH_SUFFIXES
+    apr-1
+    apr-1.0
 )
 
-SET(APRUTIL_NAMES ${APRUTIL_NAMES} aprutil-1)
 FIND_LIBRARY(APRUTIL_LIBRARY
-  NAMES ${APRUTIL_NAMES}
-  PATHS /usr/lib /usr/local/lib
+  NAMES
+    aprutil-1
+  PATHS
+    ${APRUTIL_PKGCONF_LIBRARY_DIRS}
+    /usr/lib
+    /usr/local/lib
+    /mingw64/lib
   )
 
 IF (APRUTIL_LIBRARY AND APRUTIL_INCLUDE_DIR)
@@ -91,4 +118,4 @@ GET_FILENAME_COMPONENT (NATIVE_APRUTIL_LIB_PATH ${APRUTIL_LIBRARY} PATH)
 MARK_AS_ADVANCED(
   APRUTIL_LIBRARY
   APRUTIL_INCLUDE_DIR
-  )
+)

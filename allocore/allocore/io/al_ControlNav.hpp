@@ -3,35 +3,35 @@
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
-	
+
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -52,16 +52,16 @@ namespace al {
 struct NavInputControl : public InputEventHandler {
 
 	NavInputControl(const NavInputControl& v)
-	:	mNav(v.mNav), mVScale(v.vscale()), mTScale(v.tscale())
+	:	mNav(v.mNav), mVScale(v.vscale()), mTScale(v.tscale()), mUseMouse(true)
 	{}
 
 	NavInputControl(Nav& nav, double vscale = 0.125, double tscale = 2.)
-	:	mNav(&nav), mVScale(vscale), mTScale(tscale)
+	:	mNav(&nav), mVScale(vscale), mTScale(tscale), mUseMouse(true)
 	{}
 
 	virtual ~NavInputControl(){}
 
-	virtual bool onKeyDown(const Keyboard& k){	 	
+	virtual bool onKeyDown(const Keyboard& k){
 
 		if(k.ctrl()) return true;
 
@@ -111,6 +111,8 @@ struct NavInputControl : public InputEventHandler {
 	}
 
 	virtual bool onMouseDrag(const Mouse& m){
+		if(!mUseMouse) return true;
+
 		if(m.left()){
 			nav().turnU(-m.dx() * 0.2 * M_DEG2RAD);
 			nav().turnR(-m.dy() * 0.2 * M_DEG2RAD);
@@ -125,16 +127,19 @@ struct NavInputControl : public InputEventHandler {
 	Nav& nav(){ return *mNav; }
 	const Nav& nav() const { return *mNav; }
 	NavInputControl& nav(Nav& v){ mNav=&v; return *this; }
-	
+
 	double vscale() const { return mVScale; }
 	NavInputControl& vscale(double v) { mVScale=v; return *this; }
-	
+
 	double tscale() const { return mTScale; }
 	NavInputControl& tscale(double v) { mTScale=v; return *this; }
+
+	void useMouse(bool use){ mUseMouse = use; }
 
 protected:
 	Nav * mNav;
 	double mVScale, mTScale;
+	bool mUseMouse;
 };
 
 
@@ -143,18 +148,18 @@ struct NavInputControlCosm : public NavInputControl {
 	NavInputControlCosm(Nav& nav, double vscale = 0.125, double tscale = 2.): NavInputControl(nav, vscale, tscale){}
 	virtual ~NavInputControlCosm() {}
 
-	virtual bool onKeyDown(const Keyboard& k){	 	
+	virtual bool onKeyDown(const Keyboard& k){
 
 		double vs = nav().velScale();
 		double a = mTScale * vs * M_DEG2RAD;	// rotational speed: degrees per update
 		double v = mVScale * vs;				// speed: units per update
-		
+
 		if(k.ctrl()) v *= 0.1;
 		if(k.alt()) v *= 10;
-		
+
 		if(k.ctrl()) a *= 0.1;
 		if(k.alt()) a *= 10;
-		
+
 		switch(k.key()){
 			case '`':				nav().halt().home(); return false;
 			case 'w':				nav().spinR( a); return false;
@@ -192,7 +197,7 @@ struct NavInputControlCosm : public NavInputControl {
 		}
 		return true;
 	}
-	
+
 	virtual bool onMouseDrag(const Mouse& m){ return true; }
 };
 

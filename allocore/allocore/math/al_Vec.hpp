@@ -8,30 +8,30 @@
 	Copyright (C) 2012. The Regents of the University of California.
 	All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without 
+	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
-		Redistributions of source code must retain the above copyright notice, 
+		Redistributions of source code must retain the above copyright notice,
 		this list of conditions and the following disclaimer.
 
-		Redistributions in binary form must reproduce the above copyright 
-		notice, this list of conditions and the following disclaimer in the 
+		Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
 		documentation and/or other materials provided with the distribution.
 
-		Neither the name of the University of California nor the names of its 
-		contributors may be used to endorse or promote products derived from 
+		Neither the name of the University of California nor the names of its
+		contributors may be used to endorse or promote products derived from
 		this software without specific prior written permission.
 
-	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+	AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+	ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
 	LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+	CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
 
@@ -76,7 +76,7 @@ template<class T> T VecElems<0,T>::x=0;
 
 template<class T> struct VecElems<1,T>{ T x; };
 template<class T> struct VecElems<2,T>{ T x,y; };
-template<class T> struct VecElems<3,T>{ 
+template<class T> struct VecElems<3,T>{
 	T x,y,z;
 
 	/// Returns cross product of this x b
@@ -98,21 +98,21 @@ class Vec : public VecElems<N,T>{
 public:
 	using VecElems<N,T>::x;
 
-	typedef T value_type; 
+	typedef T value_type;
 
 
 	/// @param[in] v		value to initialize all elements to
 	Vec(const T& v=T()){ set(v); }
-	
+
 	/// @param[in] v1		value to initialize first element
 	/// @param[in] v2		value to initialize second element
 	Vec(const T& v1, const T& v2){ set(v1, v2); }
-	
+
 	/// @param[in] v1		value to initialize first element
 	/// @param[in] v2		value to initialize second element
 	/// @param[in] v3		value to initialize third element
 	Vec(const T& v1, const T& v2, const T& v3){ set(v1, v2, v3); }
-	
+
 	/// @param[in] v1		value to initialize first element
 	/// @param[in] v2		value to initialize second element
 	/// @param[in] v3		value to initialize third element
@@ -141,6 +141,13 @@ public:
 	/// Returns number of elements
 	static int size(){ return N; }
 
+	/// Get reference to self as another type
+	template <class V>
+	V& as(){ return *(V *)(elems()); }
+
+	template <class V>
+	const V& as() const { return *(const V *)(elems()); }
+
 	/// Get read-only pointer to elements
 	const T * elems() const { return &x; }
 
@@ -149,19 +156,19 @@ public:
 
 	/// Set element at index with no bounds checking
 	T& operator[](int i){ return elems()[i];}
-	
+
 	/// Get element at index with no bounds checking
 	const T& operator[](int i) const { return elems()[i]; }
 
 	/// Return true if objects are element-wise equal, false otherwise
 	bool operator ==(const Vec& v) const { IT(N){ if((*this)[i] != v[i]) return false; } return true; }
-	
+
 	/// Return true if all elements are equal to value, false otherwise
 	bool operator ==(const T& v) const { IT(N){ if((*this)[i] != v   ) return false; } return true; }
 
 	/// Return true if objects are not element-wise equal, false otherwise
 	bool operator !=(const Vec& v) const { return !(*this == v); }
-	
+
 	/// Return true if all elements are not equal to value, false otherwise
 	bool operator !=(const T& v) const { return !(*this == v); }
 
@@ -187,7 +194,7 @@ public:
 
 	//--------------------------------------------------------------------------
 	// Basic Arithmetic Operations
-	
+
 	Vec& operator  =(const Vec& v){ return set(v); }
 	Vec& operator  =(const   T& v){ return set(v); }
 	Vec& operator +=(const Vec& v){ IT(N) (*this)[i] += v[i]; return *this; }
@@ -230,7 +237,7 @@ public:
 		IT(N){ (*this)[i] = T(v[i]); }
 		return *this;
 	}
-	
+
 	/// Set elements from strided raw C-pointer
 	template <class T2>
 	Vec& set(const T2 * v, int stride){
@@ -255,7 +262,7 @@ public:
 		return set(v1,v2,v3,v4,v5,v1); }
 
 	/// Set first 6 elements
-	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6){		
+	Vec& set(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6){
 		switch(N){
 		default:(*this)[5] = v6;
 		case 5: (*this)[4] = v5;
@@ -270,7 +277,7 @@ public:
 	/// Set all elements to zero
 	Vec& zero(){ return set(T(0)); }
 
-	
+
 	/// Clip to range:
 	/// NOTE argument order (max,min)
 	Vec& clip(T max=T(1), T min=T(0)) {
@@ -281,7 +288,7 @@ public:
 		IT(N) (*this)[i] = al::clip((*this)[i], max[i], min[i]);
 		return *this;
 	}
-	
+
 	/// Wrap in range:
 	/// NOTE argument order (max,min)
 	Vec& wrap(T max=T(1), T min=T(0)) {
@@ -292,7 +299,7 @@ public:
 		IT(N) (*this)[i] = al::wrap((*this)[i], max[i], min[i]);
 		return *this;
 	}
-	
+
 	/// Fold in range:
 	/// NOTE argument order (max,min)
 	Vec& fold(T max=T(1), T min=T(0)) {
@@ -309,7 +316,7 @@ public:
 	// Linear Operations
 
 	/// Returns a nearby vector along some dimension
-	
+
 	/// @tparam 	Dimension	The dimension along which to get a nearby vector
 	/// @param[in]	shift		The amount to shift along specified dimension
 	template<int Dimension>
@@ -334,27 +341,27 @@ public:
 		for(int i=1; i<N; ++i){ r += (*this)[i] * v[i]; }
 		return r;
 	}
-	
+
 	/// Returns magnitude
 	T mag() const { return std::sqrt(magSqr()); }
-	
+
 	/// Returns magnitude squared
 	T magSqr() const { return dot(*this); }
-	
+
 	/// Returns p-norm of elements
-	
-	/// The p-norm is pth root of the sum of the absolute value of the elements 
+
+	/// The p-norm is pth root of the sum of the absolute value of the elements
 	/// raised to the pth power, (sum |x_n|^p) ^ (1/p).
 	T norm(const T& p) const {
 		using namespace std;
 		T r = pow(abs((*this)[0]), p);
 		for(int i=1; i<N; ++i){ r += pow(abs((*this)[i]), p); }
-		return pow(r, T(1)/p);		
+		return pow(r, T(1)/p);
 	}
 
 	/// Return 1-norm of elements
 	T norm1() const { return sumAbs(); }
-	
+
 	/// Return 2-norm of elements
 	T norm2() const { return mag(); }
 
@@ -390,11 +397,11 @@ public:
 		IT(N){ (*this)[i] = -(*this)[i]; } return *this; }
 
 	/// Set magnitude to one without changing direction
-	
+
 	/// @param[in] scale	amount to scale magnitude
 	///
 	Vec& normalize(T scale=T(1));
-	
+
 	/// Return closest vector lying on unit sphere
 
 	/// @param[in] scale	amount to scale magnitude of result
@@ -407,9 +414,9 @@ public:
 		return (*this) - (T(2) * dot(normal) * normal);
 	}
 
-	
+
 	/// debug printing
-	void print(FILE * out=stdout) const;	
+	void print(FILE * out=stdout) const;
 };
 
 
@@ -453,7 +460,7 @@ inline Vec<N1+N2, T1> concat(const Vec<N1,T1>& a, const Vec<N2,T2>& b){
 /// Get a subvector
 template <int M, int N, class T>
 inline Vec<M,T> sub(const Vec<N,T>& v, int begin=0){
-	return v.sub<M>(begin);
+	return v.template sub<M>(begin);
 }
 
 /// Sets r to cross product, a x b
@@ -470,6 +477,43 @@ template <class T>
 inline Vec<3,T> cross(const Vec<3,T>& a, const Vec<3,T>& b){
 	Vec<3,T> r;	cross(r,a,b); return r;
 }
+
+/// Rotate a vector around a normal vector
+
+/// @param[in,out]	vec		The vector to rotate
+/// @param[in]		normal	A normal perpendicular to the plane of rotation
+/// @param[in]		cosAng	Cosine of the rotation angle
+/// @param[in]		sinAng	Sine of the rotation angle
+template <class T>
+void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double cosAng, double sinAng){
+	T c = cosAng;
+	T s = sinAng;
+
+	T c12 = normal[0]*normal[1]*(T(1)-c);
+	T c23 = normal[1]*normal[2]*(T(1)-c);
+	T c31 = normal[2]*normal[0]*(T(1)-c);
+	T c11 = normal[0]*normal[0]*(T(1)-c);
+	T c22 = normal[1]*normal[1]*(T(1)-c);
+	T c33 = normal[2]*normal[2]*(T(1)-c);
+
+	vec.set(
+		Vec<3,T>(c11 + c, c12 - s*normal[2], c31 + s*normal[1]).dot(vec),
+		Vec<3,T>(c12 + s*normal[2], c22 + c, c23 - s*normal[0]).dot(vec),
+		Vec<3,T>(c31 - s*normal[1], c23 + s*normal[0], c33 + c).dot(vec)
+	);
+}
+
+/// Rotate a vector around a normal vector
+
+/// @param[in,out]	vec			The vector to rotate
+/// @param[in]		normal		A normal perpendicular to the plane of rotation
+/// @param[in]		angle		The rotation angle, in radians
+template <class T>
+void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double ang){
+	rotate(vec, normal, cos(ang), sin(ang));
+}
+
+
 
 /// Returns angle, in interval [0, pi], between two vectors
 template <int N, class T>
@@ -506,7 +550,7 @@ inline T dist(const Vec<N,T>& a, const Vec<N,U>& b){
 */
 template <class T>
 inline void normal(Vec<3,T>& n, const Vec<3,T>& p1, const Vec<3,T>& p2, const Vec<3,T>& p3){
-	cross(n, p2-p1, p3-p1);	
+	cross(n, p2-p1, p3-p1);
 	n.normalize();
 }
 
@@ -520,7 +564,7 @@ inline Vec<N,T> min(const Vec<N,T>& a, const Vec<N,T>& b){
 
 /// Returns vector containing element-wise maximum between two vectors
 template <int N, class T>
-inline Vec<N,T> max(const Vec<N,T>& a, const Vec<N,T>& b){	
+inline Vec<N,T> max(const Vec<N,T>& a, const Vec<N,T>& b){
 	Vec<N,T> r;
 	IT(N){ r[i] = a[i] < b[i] ? b[i] : a[i]; }
 	return r;
@@ -560,7 +604,7 @@ void Vec<N,T>::print(FILE * out) const {
 	fprintf(out, "{");
 	if(size()){
 		fprintf(out, "%g", (double)((*this)[0]));
-		for (int i=1; i<N; ++i) 
+		for (int i=1; i<N; ++i)
 			fprintf(out, ", %g", (double)((*this)[i]));
 	}
 	fprintf(out, "}");

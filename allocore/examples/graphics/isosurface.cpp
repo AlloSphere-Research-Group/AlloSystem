@@ -1,89 +1,87 @@
+/*
+Allocore Example: Isosurface
+
+Description:
+This demonstrates how to render a scalar field as an isosurface.
+
+Author:
+Lance Putnam, March 2015
+*/
+
 #include "allocore/al_Allocore.hpp"
 #include "allocore/graphics/al_Isosurface.hpp"
-#include "allocore/io/al_ControlNav.hpp"
-
 using namespace al;
 
-Graphics gl;
-Light light;
-Material mtrl;
-Lens lens;
-Nav nav(Vec3d(0,0,5));
-Stereographic stereo;
+class MyApp : public App {
+public:
 
-const int N = 32;
-float volData[N*N*N];
-Isosurface iso;
-double phase=0;
-bool evolve = true;
-bool wireframe = false;
+	static const int N = 32;
+	float volData[N*N*N];
+	Isosurface iso;
+	double phase;
+	bool evolve;
+	bool wireframe;
 
+	Light light;
+	Material mtrl;
 
-struct MyWindow : public Window, public Drawable{
+	MyApp(){
+		phase = 0;
+		evolve = true;
+		wireframe = false;
 
-	void onDraw(Graphics& gl){
-		gl.depthTesting(1);
-
-		light.dir(1,1,1);
-		light.ambient(Color(1));
-		mtrl.useColorMaterial(false);
-		mtrl.ambient(Color(0.1,0,0));
-		mtrl.diffuse(Color(0.7,0,0));
-		mtrl.specular(HSV(0.1,1,0.7));
-		mtrl();		
-		light();
-
-		iso.level(0);
-		iso.generate(volData, N, 1./N);
-
-		if(wireframe)	gl.polygonMode(gl.LINE);
-		else			gl.polygonMode(gl.FILL);
-
-		gl.pushMatrix(gl.MODELVIEW);
-			glEnable(GL_RESCALE_NORMAL);
-			gl.translate(-1,-1,-1);
-			gl.scale(2);
-			gl.draw(iso);
-		gl.popMatrix();
+		nav().pos(0,0,5);
+		initWindow(Window::Dim(800,600), "Isosurface Example");
 	}
 
-	bool onFrame(){
-		nav.smooth(0.8);
-		nav.step(1.);
-		stereo.draw(gl, lens, nav, Viewport(width(), height()), *this);
+	void onAnimate(double dt){
 
 		if(evolve){
 			if((phase += 0.0002) > 2*M_PI) phase -= 2*M_PI;
 			for(int k=0; k<N; ++k){ double z = double(k)/N * 4*M_PI;
 			for(int j=0; j<N; ++j){ double y = double(j)/N * 4*M_PI;
 			for(int i=0; i<N; ++i){ double x = double(i)/N * 4*M_PI;
-				
-				volData[k*N*N + j*N + i] 
-					= cos(x * cos(phase*7)) 
-					+ cos(y * cos(phase*8)) 
+
+				volData[k*N*N + j*N + i]
+					= cos(x * cos(phase*7))
+					+ cos(y * cos(phase*8))
 					+ cos(z * cos(phase*9));
 			}}}
-		}
 
-		return true;
+			iso.level(0);
+			iso.generate(volData, N, 1./N);
+		}
 	}
 
-	virtual bool onKeyDown(const Keyboard& k){
+	void onDraw(Graphics& g){
+
+		light.dir(1,1,1);
+		light.ambient(RGB(1));
+		mtrl.useColorMaterial(false);
+		mtrl.ambient(HSV(0.7, 1, 0.1));
+		mtrl.diffuse(HSV(0.3, 1, 0.7));
+		mtrl.specular(HSV(0.1, 1, 0.7));
+		mtrl();
+		light();
+
+		g.polygonMode(wireframe ? Graphics::LINE : Graphics::FILL);
+
+		g.pushMatrix();
+			glEnable(GL_RESCALE_NORMAL);
+			g.translate(-1,-1,-1);
+			g.scale(2);
+			g.draw(iso);
+		g.popMatrix();
+	}
+
+	void onKeyDown(const Keyboard& k){
 		switch(k.key()){
-		case 'f': wireframe^=1; return false;
-		case ' ': evolve^=1; return false;
+		case 'f': wireframe^=1; break;
+		case ' ': evolve^=1; break;
 		}
-		return true;
 	}
 };
 
-MyWindow win;
-	
 int main(){
-	iso.primitive(Graphics::TRIANGLES);
-
-	win.create(Window::Dim(800,600), "Isosurface Example", 140);
-	win.add(new StandardWindowKeyControls);
-	win.add(new NavInputControl(nav));
-	Window::startLoop();
+	MyApp().start();
 }

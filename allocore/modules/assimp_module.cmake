@@ -10,7 +10,7 @@ if(ASSIMP_LIBRARY)
     # Depends on Glew and OpenGl, OpenGL module must be included prior to this one
     if(GLUT_LIBRARY AND OPENGL_LIBRARY)
 
-        message("Building assimp module.")
+        message(STATUS "Building assimp module.")
 
         list(APPEND ALLOCORE_SRC
           src/graphics/al_Asset.cpp)

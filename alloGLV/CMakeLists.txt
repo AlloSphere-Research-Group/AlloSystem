@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8)
 project (alloGLV)
 
-message("==== Configuring alloGLV")
+message(STATUS "==== Configuring alloGLV")
 
 aux_source_directory(src ALLOGLV_SRC)
 
@@ -41,14 +41,14 @@ include_directories(${ALLOCORE_DEP_INCLUDE_DIRS}
 set(ALLOGLV_LIB "alloGLV${DEBUG_SUFFIX}")
 add_library(${ALLOGLV_LIB} ${ALLOGLV_SRC})
 
-target_link_libraries(${ALLOGLV_LIB} ${ALLOCORE_LIBRARIES} ${GLV_LIBRARY})
+target_link_libraries(${ALLOGLV_LIB} ${ALLOCORE_LIBRARY} ${GLV_LIBRARY})
 set_target_properties(${ALLOGLV_LIB}
-  PROPERTIES 
+  PROPERTIES
   ALLOGLV_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
   ALLOGLV_LIBRARY ${ALLOGLV_LIB})
 
 set_target_properties(${ALLOGLV_LIB}
-  PROPERTIES 
+  PROPERTIES
   ALLOGLV_LINK_LIBRARIES "${GLV_LIBRARY}"
   )
 

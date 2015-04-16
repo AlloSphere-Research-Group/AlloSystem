@@ -1,0 +1,104 @@
+# allocore dependencies.
+
+allocore_apt="\
+             build-essential \
+             cmake \
+             libapr1-dev libaprutil1-dev \
+             portaudio19-dev libsndfile1-dev \
+             libglew-dev freeglut3-dev \
+             libavahi-client-dev \
+             libudev-dev libusb-1.0-0-dev \
+             libfreeimage-dev libfreetype6-dev \
+             libxi-dev libxmu-dev \
+             "
+allocore_apt_callback(){
+  # Get version of installed assimp.
+  assimp_version=$(apt-cache policy libassimp-dev | grep Installed | cut -f2 -d: | sed -e 's/[ ]*//')
+
+  # If assimp2 is installed, then prompt to remove it.
+  if dpkg --compare-versions "$assimp_version" lt 3; then
+    echo "assimp version ${assimp_version} detected."
+    echo 'It is recommended that you remove this version to avoid configuration problems with AlloCore.'
+    printf 'Would you like to remove it [Y/n]?'
+    read ANS
+    if [ "$ANS" = 'Y' ] || [ "$ANS" = 'y' ]; then
+      echo "Removing assimp ${assimp_version}"
+      sudo apt-get remove "libassimp-dev=${assimp_version}"
+    fi
+  fi
+
+  # Ensure that assimp3 headers are being installed.
+  available_assimp_version=$(apt-cache madison libassimp-dev | head -1 | cut -f2 -d\|)
+
+  if dpkg --compare-versions "$available_assimp_version" ge 3; then
+    sudo apt-get install libassimp-dev
+  # Otherwise build assimp3 from source and install.
+  else
+    build_and_install_assimp
+  fi
+}
+
+
+allocore_brew="\
+              cmake \
+              portaudio libsndfile \
+              glew \
+              libusb \
+              freeimage \
+              freetype \
+              "
+allocore_brew_callback(){
+  # Use precompiled library if on Mountain Lion or higher.
+  osx_version="$(sw_vers -productVersion | cut -d . -f 2)"
+  if [ "$osx_version" -ge 8 ]; then
+    brew install assimp
+  # Otherwise build with boost workaround.
+  else
+    brew install assimp --without-boost
+  fi
+}
+
+allocore_port="\
+              cmake \
+              portaudio libsndfile \
+              glew \
+              freeimage \
+              freetype \
+              "
+allocore_port_callback(){
+  build_and_install_assimp
+}
+
+
+allocore_pacman="\
+                mingw-w64-${arch}-cmake \
+                mingw-w64-${arch}-portaudio \
+                mingw-w64-${arch}-libsndfile \
+                mingw-w64-${arch}-glew \
+                mingw-w64-${arch}-freeglut \
+                mingw-w64-${arch}-libusb \
+                mingw-w64-${arch}-FreeImage \
+                mingw-w64-${arch}-freetype \
+                mingw-w64-${arch}-assimp \
+                "
+
+#---
+
+# Builds without requiring boost.
+build_and_install_assimp(){
+  DIR="$PWD"
+  cd /tmp
+    PKG="assimp-3.1.1"
+    curl -LO "http://downloads.sourceforge.net/project/assimp/assimp-3.1/${PKG}_no_test_models.zip"
+    unzip -q "${PKG}*.zip"
+    cd "$PKG"
+      cmake -DENABLE_BOOST_WORKAROUND=ON .
+      make
+      sudo make install
+    cd ..
+
+    # Cleanup.
+    rm -rf /tmp/${PKG}
+    rm /tmp/${PKG}*.zip
+  cd "$DIR"
+}

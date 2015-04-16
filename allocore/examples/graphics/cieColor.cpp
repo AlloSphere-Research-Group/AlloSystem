@@ -45,7 +45,7 @@ public:
   //rnd::Random<rnd::Tausworthe> rng;
   bool updateScene;
 
-  void printInstructions(){    
+  void printInstructions(){
     // print controls to terminal
     //
     cout << "***********************************************************" << endl
@@ -73,7 +73,7 @@ public:
          << "***********************************************************" << endl
          << "***********************************************************" << endl;
   }
-		
+
 
   MyApp():
   numRows(4), numCols(4), updateScene(true) {
@@ -99,7 +99,7 @@ public:
     else if(k.key() == '<' || k.key() == ',' || k.key () == '>' || k.key () == '.'){
       numCols += (k.key() == '<' || k.key() == ',')?-1:1;
       if(numCols < 1)  numCols = 1;
-      if(numCols > 10) numCols = 10;      
+      if(numCols > 10) numCols = 10;
     }
     //change color space
     else if(k.key() == 'b' || k.key() == 'v'){
@@ -109,7 +109,7 @@ public:
       updateScene = false;
     }
   }
-  
+
 
   virtual void onDraw(Graphics& g, const Viewpoint& v){
     if(updateScene){
@@ -151,7 +151,7 @@ public:
 	  //(only one will be used for modes 1 - 3)
 	  variedParam1 = (float)j/(numRows*2);
 	  variedParam2 = (float)i/(numCols*2);
-	      
+
 	  //choose gradient type based on current mode
 	  switch(MODE){
 	  case VARYING_HUE:
@@ -198,7 +198,7 @@ public:
       updateScene = false;
       //print instructions again for convenience
       printInstructions();
-    }		
+    }
     // Switch to the projection matrix
     g.pushMatrix(Graphics::PROJECTION);
 

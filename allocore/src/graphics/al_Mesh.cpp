@@ -28,7 +28,7 @@ void Mesh::decompress(){
 		#define DECOMPRESS(buf, Type)\
 		{\
 			int N = buf.size();\
-			if(N){\
+			if(N > 1){\
 				std::vector<Type> old(N);\
 				std::copy(&buf[0], (&buf[0]) + N, old.begin());\
 				buf.size(Ni);\
@@ -37,12 +37,12 @@ void Mesh::decompress(){
 		}
 		DECOMPRESS(vertices(), Vertex)
 		DECOMPRESS(colors(), Color)
-		DECOMPRESS(coloris(), Color)
+		DECOMPRESS(coloris(), Colori)
 		DECOMPRESS(normals(), Normal)
 		DECOMPRESS(texCoord2s(), TexCoord2)
 		DECOMPRESS(texCoord3s(), TexCoord3)
 		#undef DECOMPRESS
-		
+
 		indices().reset();
 	}
 }
@@ -108,11 +108,11 @@ void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace){
 		static void initMesh(Mesh& m, int n){
 			m.vertices().size(n*2);
 			m.reset();
-			m.primitive(Graphics::LINES);		
+			m.primitive(Graphics::LINES);
 		}
 	};
 
-	if (perFace) {	
+	if (perFace) {
 		// compute vertex based normals
 		if(indices().size()){
 
@@ -127,24 +127,24 @@ void Mesh::createNormalsMesh(Mesh& mesh, float length, bool perFace){
 				const Vertex& v1 = vertices()[i1];
 				const Vertex& v2 = vertices()[i2];
 				const Vertex& v3 = vertices()[i3];
-				
+
 				// get mean:
 				const Vertex mean = (v1 + v2 + v3)/3.f;
-				
+
 				// get face normal:
 				Vertex facenormal = cross(v2-v1, v3-v1);
 				facenormal.normalize();
-				
+
 				mesh.vertex(mean);
 				mesh.vertex(mean + (facenormal*length));
 			}
 		} else {
 			AL_WARN_ONCE("createNormalsMesh only valid for indexed meshes");
-		} 
+		}
 	} else {
 		int Ni = al::min(vertices().size(), normals().size());
 		F::initMesh(mesh, Ni*2);
-		
+
 		for(int i=0; i<Ni; ++i){
 			const Vertex& v = vertices()[i];
 			mesh.vertex(v);
@@ -170,7 +170,7 @@ void Mesh::compress() {
 		AL_WARN_ONCE("cannot compress Mesh with no vertices");
 		return;
 	}
-	
+
 	int Nc = colors().size();
 	int Nci = coloris().size();
 	int Nn = normals().size();
@@ -182,26 +182,26 @@ void Mesh::compress() {
 	typedef std::map<float, Zmap> Ymap;
 	typedef std::map<float, Ymap> Xmap;
 	Xmap xmap;
-	
+
 	// copy current values:
 	Mesh old(*this);
-	
+
 	// walk backward through the vertex list
 	// create a ID for each one
 	for (int i=vertices().size()-1; i>=0; i--) {
 		Vertex& v = vertices()[i];
 		xmap[v.x][v.y][v.z] = i;
 	}
-	
+
 	// map of old vertex index to new vertex index:
 	typedef std::map<int, int> Imap;
 	Imap imap;
-	
-	
+
+
 	// reset current mesh:
 	reset();
-	
-	// walk forward, inserting if 
+
+	// walk forward, inserting if
 	for (int i=0; i<old.vertices().size(); i++) {
 		Vertex& v = old.vertices()[i];
 		int idx = xmap[v.x][v.y][v.z];
@@ -321,17 +321,18 @@ void Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 		}
 		else if(primitive() == Graphics::TRIANGLE_STRIP){
 			for(unsigned i=0; i<Ni-2; ++i){
-				Index i1 = indices()[i  ];
-				Index i2 = indices()[i+1];
-				Index i3 = indices()[i+2];
+
+				// Flip every other normal due to change in winding direction
+				unsigned odd = i & 1;
+
+				Index i1 = indices()[i];
+				Index i2 = indices()[i+1+odd];
+				Index i3 = indices()[i+2-odd];
 
 				Vertex vn = F::calcNormal(
 					vertices()[i1], vertices()[i2], vertices()[i3],
 					equalWeightPerFace
 				);
-
-				// Flip every other normal due to change in winding direction
-				if(i & 1) vn.negate();
 
 				normals()[i1] += vn;
 				normals()[i2] += vn;
@@ -371,13 +372,14 @@ void Mesh::generateNormals(bool normalize, bool equalWeightPerFace) {
 			for(unsigned i=0; i<Nv; ++i) normals()[i].set(0,0,0);
 
 			for(unsigned i=0; i<Nv-2; ++i){
-				Vertex vn = F::calcNormal(
-					vertices()[i], vertices()[i+1], vertices()[i+2],
-					equalWeightPerFace
-				);
 
 				// Flip every other normal due to change in winding direction
-				if(i & 1) vn.negate();
+				unsigned odd = i & 1;
+
+				Vertex vn = F::calcNormal(
+					vertices()[i], vertices()[i+1+odd], vertices()[i+2-odd],
+					equalWeightPerFace
+				);
 
 				normals()[i  ] += vn;
 				normals()[i+1] += vn;
@@ -445,10 +447,10 @@ void Mesh::ribbonize(float * widths, int widthsStride, bool faceBinormal){
 	const Vertex bN = ff[ib] * widths[(N-1)*widthsStride];
 
 	// Store last vertex since it will be overwritten eventually
-	const Vertex last = mVertices[N-1]; 
-	
+	const Vertex last = mVertices[N-1];
+
 	// Go backwards through vertices since we are processing in place
-	for(int i=N-2; i>=1; --i){		
+	for(int i=N-2; i>=1; --i){
 		int i0 = i-1;
 		int i1 = i;
 		int i2 = i+1;
@@ -461,7 +463,7 @@ void Mesh::ribbonize(float * widths, int widthsStride, bool faceBinormal){
 
 		// Scale binormal by ribbon width
 		ff[ib] *= widths[i1*widthsStride];
-		
+
 		int i12 = i1<<1;
 		// v1 is ref, so we must write in reverse to properly handle i=0
 		mVertices[i12+1] = v1+ff[ib];
@@ -470,7 +472,7 @@ void Mesh::ribbonize(float * widths, int widthsStride, bool faceBinormal){
 		mNormals [i12  ].set(ff[in][0], ff[in][1], ff[in][2]);
 		mNormals [i12+1] = mNormals[i12];
 	}
-	
+
 	// Ribbonize first and last vertices
 	mVertices[1] = mVertices[0] + b1;
 	mVertices[0] = mVertices[0] - b1;
@@ -513,13 +515,13 @@ void Mesh::merge(const Mesh& src){
 		// Add source indices offset by my number of vertices
 		index(src.indices().elems(), src.indices().size(), (unsigned int)Nv);
 	}
-	
+
 	// Source doesn't have indices, but I do
 	else if(indices().size()){
 		int Nv = vertices().size();
 		for(int i=Nv; i<Nv+src.vertices().size(); ++i) index(i);
 	}
-	
+
 	// From here, the game is indice invariant
 
 	//equalizeBuffers(); << TODO: must do this if we are using indices.
@@ -556,17 +558,17 @@ void Mesh::unitize(bool proportional) {
 	getBounds(min, max);
 	// span of each axis:
 	Vertex span = max-min;	// positive only
-	// center of each axis:	
+	// center of each axis:
 	Vertex mid = min + (span * 0.5);
 	// axis scalar:
 	Vertex scale(2./span.x, 2./span.y, 2./span.z);	// positive only
-	
+
 	// adjust to use scale of largest axis:
 	if (proportional) {
 		float s = al::min(scale.x, al::min(scale.y, scale.z));
 		scale.x = scale.y = scale.z = s;
 	}
-	
+
 	for (int v=0; v<mVertices.size(); v++) {
 		Vertex& vt = mVertices[v];
 		vt = (vt-mid)*scale;
@@ -594,18 +596,18 @@ static void toTriangles(Mesh& m){
 	int prim = m.primitive();
 
 	if(Graphics::TRIANGLE_STRIP == prim){
-		
+
 		m.primitive(Graphics::TRIANGLES);
 		int Ni = m.indices().size();
 		//int Nn = m.normals().size();
-		
+
 		if(Ni){
 			int Ntri = Ni - 2;
 			m.indices().size(Ntri * 3);
 
 			for(int i=(Ni-2)-1, j=(Ntri*3-2)-1; i>=0; i--, j-=3){
 				int i1, i2, i3;
-				
+
 				// Odd numbered triangles must have orientation flipped
 				if(i & 1){
 					i1 = i+2;
@@ -642,10 +644,10 @@ static void toTriangles(Mesh& m){
 			}
 			m.indices().size(j);}
 		}
-		
+
 		// non-indexed not supported yet...
 		else{
-		
+
 		}
 	}
 }
@@ -675,7 +677,7 @@ bool Mesh::exportSTL(const char * path, const char * name) const {
 	std::ofstream file(path);
 	if(file.fail()) return false;
 	file.flags(std::ios::scientific);
-	
+
 	file << "solid " << name << "\n";
 	for(int i=0; i<m.vertices().size(); i+=3){
 		file << "facet normal";
@@ -704,6 +706,16 @@ void Mesh::print(FILE * dst) const {
 	if(texCoord2s().size())	fprintf(dst, "%8d TexCoord2s\n", texCoord2s().size());
 	if(texCoord3s().size())	fprintf(dst, "%8d TexCoord3s\n", texCoord3s().size());
 	if(indices().size())	fprintf(dst, "%8d Indices\n", indices().size());
+
+	unsigned bytes	= vertices().size()*sizeof(Vertex)
+					+ colors().size()*sizeof(Color)
+					+ coloris().size()*sizeof(Colori)
+					+ normals().size()*sizeof(Normal)
+					+ texCoord2s().size()*sizeof(TexCoord2)
+					+ texCoord3s().size()*sizeof(TexCoord3)
+					+ indices().size()*sizeof(Index)
+					;
+	fprintf(dst, "%8d bytes (%.1f kB)\n", bytes, double(bytes)/1000);
 }
 
 } // al::

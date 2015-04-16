@@ -64,7 +64,7 @@ void GPUContext::makeDefaultContext(){
 	const int myID = contextID();
 	const int dfID = defaultContextID();
 	//printf("%d %d\n", myID, dfID);
-	
+
 //	Contexts::iterator it = getContexts().begin();
 //	while(it != getContexts().end()){
 //		printf("%d\n", it->first);
@@ -74,16 +74,16 @@ void GPUContext::makeDefaultContext(){
 	if(myID != dfID){
 		Contexts& C = getContexts();
 		Contexts::iterator it = C.find(dfID);
-		
+
 		// If someone else is already default, then swap IDs with them
 		if(it != C.end()){
 
 			// TODO: do we need to migrate existing GPUObjects?
 //			ContextMap& id2Objs = getContextMap();
-//			
+//
 //			ResourceSet dfObjs(id2Objs[dfID]);
 //			ResourceSet myObjs(id2Objs[myID]);
-//			
+//
 //			// swap context IDs of existing GPU objects
 //			{
 //				//ResourceSet objs = id2Objs[dfID];
@@ -100,7 +100,7 @@ void GPUContext::makeDefaultContext(){
 //					(*i)->contextRegister(dfID);
 //				}
 //			}
-			
+
 			it->second->mContextID = myID;
 			C[myID] = it->second;
 		}
@@ -125,6 +125,45 @@ void GPUContext :: contextDestroy() { //printf("GPUContext::contextDestroy %d\n"
 
 
 
+
+GPUObject::GPUObject(int ctx)
+:	mID(0), mResubmit(false)
+{	contextRegister(ctx); }
+
+GPUObject::GPUObject(GPUContext& ctx)
+:	mID(0), mResubmit(false)
+{	contextRegister(ctx.contextID()); }
+
+GPUObject::~GPUObject(){
+	contextUnregister();
+}
+
+void GPUObject::validate(){
+	if(mResubmit){
+		destroy();
+		mResubmit=false;
+	}
+	if(!created()) create();
+}
+
+void GPUObject::invalidate(){
+	mResubmit = true;
+}
+
+bool GPUObject::created() const {
+	return id() != 0;
+}
+
+void GPUObject::create(){
+	if(created()){ destroy(); }
+	onCreate();
+}
+
+void GPUObject::destroy(){
+	if(created()) onDestroy();
+	mID=0;
+}
+
 void GPUObject :: contextRegister(int ctx) {
 	contextUnregister();
 	ContextMap& contexts = getContextMap();
@@ -136,7 +175,7 @@ void GPUObject :: contextRegister(int ctx) {
 void GPUObject :: contextUnregister() {
 	ContextMap& contexts = getContextMap();
 	ResourceMap& resources = getResourceMap();
-	
+
 	ResourceMap::iterator rit = resources.find(this);
 	if(rit != resources.end()) {
 		ContextMap::iterator it = contexts.find( rit->second );

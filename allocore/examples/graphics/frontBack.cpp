@@ -1,56 +1,63 @@
 /*
-Allocore Example: Front and back views 
+Allocore Example: Front and back views
 
 Description:
-This example demonstrates how to render both front and back views from
-a single navigation point.
+This example demonstrates how to render both front and back views from a single
+navigation point.
 
 Author:
-Lance Putnam, 8/29/2011
+Lance Putnam, March 2015
 */
 
 #include "allocore/io/al_App.hpp"
-
 using namespace al;
 
 class MyApp : public App{
 public:
 
-	virtual void onDraw(Graphics& g, const Viewpoint& v){
-		Mesh& m = g.mesh();
-		
-		m.reset();
-		m.primitive(g.LINES);
-		
+	// A Viewpoint combines a position/orientation in world space and a viewport
+	Viewpoint vpFront, vpBack;
+	Mesh mesh;
+
+	MyApp(){
+
+		// Create some geometry to render
 		for(int j=0; j<4; ++j){
-			int Nv = addSphere(m, (j+1)*2, 20, 20);
+			int Nv = addSphere(mesh, (j+1)*2, 20, 20);
 			for(int i=0; i<Nv; ++i){
 				float v = float(i)/Nv;
-				m.color(HSV(0.2*v, 1-v*0.5, 1));
+				mesh.color(HSV(0.2*v, 1-v*0.5, 1));
 			}
 		}
-		g.draw(m);
+		mesh.primitive(Graphics::LINES);
+
+		// Setup screen stretching/anchoring behavior of viewpoints
+		vpFront.stretch(1, 0.5).anchor(0, 0.5);
+		vpBack .stretch(1, 0.5).anchor(0, 0.0);
+
+		// Set parent transform of viewpoints to default Nav object
+		vpFront.parentTransform(nav());
+		vpBack .parentTransform(nav());
+
+		// Rotate back viewpoint 180 deg around up vector
+		vpBack.transform().quat().fromAxisAngle(M_PI, 0,1,0);
+
+		// Initialize a window
+		initWindow();
+
+		// Clear default viewpoint from window
+		window().viewpoints().clear();
+
+		// Add our custom viewpoints to window
+		window().add(vpFront).add(vpBack);
+	}
+
+	void onDraw(Graphics& g){
+		g.draw(mesh);
 	}
 };
 
-MyApp app;
-Viewpoint vpF, vpB;
-ViewpointWindow win(Window::Dim(800,600));
-
 int main(){
-
-	// Configure the front and back viewpoints
-	vpF.parentTransform(app.nav());
-	vpB.parentTransform(app.nav());
-
-	vpF.stretch(1, 0.5).anchor(0, 0.5);
-	vpB.stretch(1, 0.5).anchor(0, 0.0);
-	vpB.transform().quat().fromAxisAngle(M_PI, 0,1,0);
-	
-	win.add(vpF).add(vpB);
-	app.add(win);
-
-	app.start();
-	return 0;
+	MyApp().start();
 }
 

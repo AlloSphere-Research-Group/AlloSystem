@@ -6,7 +6,7 @@ This example shows how to load fonts and render text at various locations
 in the window.
 
 Author:
-Lance Putnam, 9/2013
+Lance Putnam, Sept. 2013
 */
 
 #include "allocore/io/al_App.hpp"
@@ -25,28 +25,22 @@ public:
 		font2("../../share/fonts/VeraMoBd.ttf", 14),
 		font3("../../share/fonts/VeraMono.ttf", 10)
 	{
-		nav().pos(0,0,4);
 		initWindow(Window::Dim(400,200));
 	}
 
-	virtual void onAnimate(double dt){}
-	
-	virtual void onDraw(Graphics& g, const Viewpoint& v){
-
-		// Before rendering text, we must turn on blending
-		g.depthTesting(true);
-		g.depthMask(false);
-		g.blending(true);
-		g.blendModeAdd();
+	void onDraw(Graphics& g, const Viewpoint& v){
 
 		// Get the viewport dimensions, in pixels, for positioning the text
 		float W = v.viewport().w;
 		float H = v.viewport().h;
 
-		// Next, we need to setup our matrices for 2D pixel space
+		// Setup our matrices for 2D pixel space
 		g.pushMatrix(Graphics::PROJECTION);
 		g.loadMatrix(Matrix4f::ortho2D(0, W, 0, H));
 		g.pushMatrix(Graphics::MODELVIEW);
+
+		// Before rendering text, we must turn on blending
+		g.blendAdd();
 
 		// Render text in the top-left corner
 		g.loadIdentity();
@@ -68,8 +62,11 @@ public:
 		g.currentColor(0,1,1,1);
 		font2.render(g, str);
 
+		// Turn off blending
+		g.blendOff();
+
 		g.popMatrix();
-		g.popMatrix(g.PROJECTION);
+		g.popMatrix(Graphics::PROJECTION);
 	}
 };
 

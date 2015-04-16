@@ -16,9 +16,9 @@ extern "C" {
 
 using namespace al;
 
-Freenect& Freenect::get() { 
+Freenect& Freenect::get() {
 	static Freenect singleton;
-	return singleton; 
+	return singleton;
 }
 
 void Freenect::depth_cb(freenect_device *dev, void *depth, uint32_t timestamp) {
@@ -26,7 +26,7 @@ void Freenect::depth_cb(freenect_device *dev, void *depth, uint32_t timestamp) {
 	if (cb) {
 		cb->depth.array().data.ptr = (char *)depth;
 		cb->depth.dirty();
-		cb->onDepth(cb->depth, timestamp); 
+		cb->onDepth(cb->depth, timestamp);
 	}
 }
 
