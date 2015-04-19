@@ -10,7 +10,7 @@ eval "$cleaner"
 for d in */ ; do
   # Except allonect, which still uses a Makefile.
   if [ "$d" = "allonect/" ]; then
-    break 
+    continue 
   else
     cd "$d"
       eval "$cleaner"
