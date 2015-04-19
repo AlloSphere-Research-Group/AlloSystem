@@ -1,21 +1,27 @@
 #!/bin/sh
 
 # Since we were using the same line anyways...
-cleaner="rm -rf build/ CMakeCache.txt CMakeFiles/ cmake_install.cmake Makefile build.ninja rules.ninja AlloSystem.xcodeproj AlloSystem.build CMakeScripts"
+cleaner="rm -rf build/ CMakeCache.txt CMakeFiles/ cmake_install.cmake Makefile build.ninja rules.ninja AlloSystem.xcodeproj AlloSystem.build CMakeScripts cmake_log.txt"
 
 # Run in root directory.
 eval "$cleaner"
 
 # Run in almost all first level subdirectories.
+# And allocore/unitTests.
 for d in */ ; do
   # Except allonect, which still uses a Makefile.
   if [ "$d" = "allonect/" ]; then
-    continue 
-  else
-    cd "$d"
+    continue
+  elif [ "$d" = "allocore/" ]; then
+    # The only second level directory to clean.
+    cd "${d}/unitTests"
       eval "$cleaner"
-    cd ..
+    cd ../..
   fi
+
+  cd "$d"
+    eval "$cleaner"
+  cd ..
 done
 
 # Remove build files from our inter-operating libraries.
