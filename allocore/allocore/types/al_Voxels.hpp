@@ -72,7 +72,11 @@ const std::string UnitsName(UnitsTy t) {
     } else if (t == MILLIMETERS) {
       return "mm";
     } else {
-      return "(m*10^" + std::to_string(t) + ")";
+      std::string s = "";
+      s += t;
+      return "(m*10^" + s + ")";
+      // The C++11 way:
+      //      return "(m*10^" + std::to_string(t) + ")";
     }
 }
 
