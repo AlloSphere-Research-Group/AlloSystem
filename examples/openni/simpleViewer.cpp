@@ -63,6 +63,7 @@ public:
     // Uncomment this to disable the default navigation keyboard/mouse controls
     //window().remove(navControl());
 
+
     // initialize OpenNI Context and image generators
     XnStatus nRetVal = XN_STATUS_OK;
 
@@ -94,6 +95,7 @@ public:
     tex.resize(nTexMapX,nTexMapY);
     tex.allocate();
 
+    // pointer to texture pixel data 
     pTexMap = tex.data<XnRGB24Pixel>();
 
     printHelp();
@@ -112,16 +114,6 @@ public:
     image.GetMetaData(imageMD);
 
     const XnDepthPixel* pDepth = depthMD.Data();
-
-    // // Copied from SimpleViewer
-    // // Clear the OpenGL buffers
-    // glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // // Setup the OpenGL viewpoint
-    // glMatrixMode(GL_PROJECTION);
-    // glPushMatrix();
-    // glLoadIdentity();
-    // glOrtho(0, GL_WIN_SIZE_X, GL_WIN_SIZE_Y, 0, -1.0, 1.0);
 
     // Calculate the accumulative histogram (the yellow display...)
     xnOSMemSet(pDepthHist, 0, nZRes*sizeof(float));
@@ -202,18 +194,8 @@ public:
       }
     }
 
+    // mark our texture as dirty so it will be updated on gpu
     tex.dirty();
-    // // Create the OpenGL texture map
-    // glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, nTexMapX, nTexMapY, 0, GL_RGB, GL_UNSIGNED_BYTE, pTexMap);
-
-
-    // int nXRes = depthMD.FullXRes();
-    // int nYRes = depthMD.FullYRes();
-
-
   }
 
 
