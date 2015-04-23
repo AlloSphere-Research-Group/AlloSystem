@@ -1,5 +1,9 @@
 /*
+OpenNI SimpleViewer example ported to AlloSystem
 
+Reads depth and RGB data from a supported depth sensor (i.e. Kinect, primeSense)
+
+Tim Wood 2015
 */
 
 #include "allocore/io/al_App.hpp"
@@ -23,14 +27,13 @@
 #define DEFAULT_DISPLAY_MODE  DISPLAY_MODE_DEPTH
 
 using namespace al;
-
 using namespace xn;
+
 
 class OpenniApp : public App{
 public:
 
   Texture tex;
-  // Texture depthTex;
 
   float* pDepthHist;
   XnRGB24Pixel* pTexMap = NULL;
@@ -229,13 +232,10 @@ public:
   }
 
 
-  // This is called whenever a key is pressed.
   virtual void onKeyDown(const ViewpointWindow& w, const Keyboard& k){
   
-    // Use a switch to do something when a particular key is pressed
     switch(k.key()){
 
-    // For printable keys, we just use its character symbol:
     case '1':
       nViewState = DISPLAY_MODE_OVERLAY;
       depth.GetAlternativeViewPointCap().SetViewPoint(image);
