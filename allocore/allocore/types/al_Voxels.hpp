@@ -32,13 +32,30 @@
 	POSSIBILITY OF SUCH DAMAGE.
 
 
-        File description:                                                                                                  
-        Volume of voxels with physical size                                                                                
-                                                                                                                           
-        Voxels are basically just 3D AlloArrays with some size info                                                        
-                                                                                                                           
-        File author(s):                                                                                                    
-        Matt Wright, 2015, matt@create.ucsb.edu                                                                            
+        File description:
+        Volume of voxels with physical size
+
+        Voxels are basically just 3D AlloArrays with some size info
+
+        File author(s):
+        Matt Wright, 2015, matt@create.ucsb.edu
+
+        Terminology suggestions for differentiating the number of
+        pixels in each dimension (an integer) versus the physical
+        length scale of a pixel in each dimension (e.g., a number of
+        nanometers):
+
+        dimx
+        xnumcells
+        xcellwidth
+        xcellcount
+        xcellsize
+        xcount
+        numx
+        nx
+
+        Vec3f voxelsize
+
 */
 
 #ifndef INCLUDE_ALLO_VOXELS_HPP
