@@ -59,7 +59,7 @@
 */
 
 #ifndef INCLUDE_ALLO_VOXELS_HPP
-#define INCLUDE_ALLO_VOXELS_HPP 1
+#define INCLUDE_ALLO_VOXELS_HPP
 
 //#include <stdlib.h>
 #include <string>
@@ -79,23 +79,6 @@ typedef float UnitsTy;
 #define METERS 0
 #define KILOMETERS 3
 
-const std::string UnitsName(UnitsTy t) {
-    if (t == ANGSTROMS) {
-      return "angstroms";
-    } else if (t == NANOMETERS) {
-      return "nm";
-    } else if (t == MICROMETERS) {
-      return "µm";
-    } else if (t == MILLIMETERS) {
-      return "mm";
-    } else {
-      std::string s = "";
-      s += t;
-      return "(m*10^" + s + ")";
-      // The C++11 way:
-      //      return "(m*10^" + std::to_string(t) + ")";
-    }
-}
 
 /// OBJECT-oriented interface to AlloArray
 class Voxels : public Array {
@@ -104,26 +87,33 @@ public:
   /// Construct dimx x dimy x dimz voxel grid giving 3D size of each voxel cuboid with units
   Voxels(AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, float sizex, float sizey, float sizez, UnitsTy units) :
        Array(1, ty, dimx, dimy, dimz) {
-    m_sizex = sizex;
-    m_sizey = sizey;
-    m_sizez = sizez;
-    m_units = units;
+    init(sizex, sizey, sizez, units);
   }
 
 
   /// Construct dimx x dimy x dimz voxel grid giving 3D size of each voxel cuboid in meters
-  Voxels(AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, float sizex, float sizey, float sizez) {
-    Voxels(ty, dimx, dimy, dimz, sizex, sizey, sizez, METERS);
+  Voxels(AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, float sizex, float sizey, float sizez) :
+      Array(1, ty, dimx, dimy, dimz) {
+    init(sizex, sizey, sizez, METERS);
   }
 
   /// Construct dimx x dimy x dimz voxel grid giving dimension of each voxel cube with units
-  Voxels(AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, float voxelsize, UnitsTy units) {
-    Voxels(ty, dimx, dimy, dimz, voxelsize, voxelsize, voxelsize, units);
+  Voxels(AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, float voxelsize, UnitsTy units) :
+      Array(1, ty, dimx, dimy, dimz) {
+    init(voxelsize, voxelsize, voxelsize, units);
   }
 
   /// Construct dimx x dimy x dimz voxel grid with every voxel 1m x 1m x 1m
-  Voxels(AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz) {
-    Voxels(ty, dimx, dimy, dimz, 1, 1, 1, METERS);
+  Voxels(AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz) :
+      Array(1, ty, dimx, dimy, dimz) {
+    init(1, 1, 1, METERS);
+  }
+  
+  void init(float sizex, float sizey, float sizez, UnitsTy units) {
+    m_sizex = sizex;
+    m_sizey = sizey;
+    m_sizez = sizez;
+    m_units = units;
   }
 
   float sizex() { return m_sizex;}
@@ -145,6 +135,24 @@ public:
   std::string unitsname() {
     return UnitsName(m_units);
   }
+  
+  const std::string UnitsName(UnitsTy t) {
+    if (t == ANGSTROMS) {
+      return "angstroms";
+    } else if (t == NANOMETERS) {
+      return "nm";
+    } else if (t == MICROMETERS) {
+      return "µm";
+    } else if (t == MILLIMETERS) {
+      return "mm";
+    } else {
+      return "(m*10^" + std::to_string(t) + ")";
+    }
+  }
+  
+  bool writeToFile(std::string filename);
+  
+  bool loadFromFile(std::string filename);
 
   ~Voxels() {
   }
