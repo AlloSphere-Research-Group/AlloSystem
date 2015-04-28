@@ -7,8 +7,8 @@
 #include "alloutil/al_FPS.hpp"
 #include "alloutil/al_RayStereo.hpp"
 
-#define PORT_TO_DEVICE_SERVER (12000)
-#define PORT_FROM_DEVICE_SERVER (4111)//(PORT_TO_DEVICE_SERVER+1)
+#define PORT_TO_DEVICE_SERVER (4110)
+#define PORT_FROM_DEVICE_SERVER (PORT_TO_DEVICE_SERVER+1)
 #define DEVICE_SERVER_IP_ADDRESS "BOSSANOVA"
 
 namespace al {
@@ -27,6 +27,8 @@ namespace al {
     virtual void onAnimate(al_sec dt) {}
     virtual void onSound(AudioIOData& io) {}
     virtual void onMessage(osc::Message& m);
+    
+    virtual void initParams();
     
     void initWindow(const Window::Dim& dims = Window::Dim(800, 600),
                     const std::string title = "RayApp",
@@ -233,6 +235,9 @@ namespace al {
     mShader.attach(mVert);
     mShader.attach(mFrag);
     mShader.link(false); // do not validate yet
+    
+    initParams();
+    
     mShader.listParams();
     
     mOmni.initShader(mShader);
@@ -300,6 +305,10 @@ namespace al {
     mShader.listParams();
     
     mOmni.initShader(mShader);
+  }
+  
+  // for initializing parameters before compiling shader
+  inline void RayApp::initParams() {
   }
   
   // basic uniforms used in the shader. override it on user code

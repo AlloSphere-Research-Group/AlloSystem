@@ -20,6 +20,7 @@ list(APPEND ALLOCORE_SRC
   src/types/al_Array_C.c
   src/types/al_Color.cpp
   src/types/al_MsgQueue.cpp
+  src/types/al_Voxels.cpp
 )
 
 list(APPEND ALLOCORE_HEADERS
