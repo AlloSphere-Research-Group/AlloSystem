@@ -79,8 +79,8 @@ int getdir(string dir, vector<string> &files) {
 int main(int argc, char *argv[]) {
 
   // Parse args...
-  if (argc != 2) {
-    cout << "You suck.  Give a directory."  << endl;
+  if (argc != 3) {
+    cout << "You suck.  Give a directory and output filename"  << endl;
     exit(-3);
   }
 
@@ -118,6 +118,8 @@ int main(int argc, char *argv[]) {
 
   // For now assume 8-bit with 1 nm cube voxels
   Voxels v(AlloUInt8Ty, nx, ny, nz, 1., 1., 1., NANOMETERS);
+  
+  v.print();
 
   // Iterate through entire directory
   int slice = 0;
@@ -143,14 +145,14 @@ int main(int argc, char *argv[]) {
 
     // Access the read-in image data
     Array& array(RGBImage.array());
-      
+    
     // For now assume 8-bit RGBA
     Image::RGBAPix<uint8_t> pixel;
 
     // Copy it out pixel-by-pixel:
     for (size_t row = 0; row < array.height(); ++row) {
       for (size_t col = 0; col < array.width(); ++col) {
-        array.read(&pixel, row, col);
+        array.read(&pixel, col, row);
 
         // For now we'll take only the red and put it in the single component; that's lame.
         v.elem<char>(1, col, row, slice) = (char) pixel.r;
@@ -160,16 +162,18 @@ int main(int argc, char *argv[]) {
   // v is ready
 
 
-  // Since we don't yet have file I/O for Voxels, we'll write the data to disk in this ridiculous way:
-  const char *outputFile = "VolumeData.raw";
-  FILE *fp=fopen(outputFile, "w");
-  if (fp == NULL) {
-    cout << "error " << errno << " opening " << outputFile << " for writing " << endl;
-    exit(-5);
-  }
-
-  char * data =  v.cell<char>(0);
-
-  fwrite(data, sizeof(char), nx * ny * nz, fp);
-  fclose(fp);
+  // how to write raw data without using default voxel file IO system
+  //  const char *outputFile = "VolumeData.raw";
+  //  FILE *fp=fopen(outputFile, "w");
+  //  if (fp == NULL) {
+  //    cout << "error " << errno << " opening " << outputFile << " for writing " << endl;
+  //    exit(-5);
+  //  }
+  //
+  //  char * data =  v.cell<char>(0);
+  //
+  //  fwrite(data, sizeof(char), nx * ny * nz, fp);
+  //  fclose(fp);
+  
+  v.writeToFile(argv[2]);
 }
