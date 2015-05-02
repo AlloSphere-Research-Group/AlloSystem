@@ -657,17 +657,22 @@ OmniStereo& OmniStereo::configure(std::string configpath, std::string configname
 	std::string config_file_name = configpath + "/" + configname + ".json";
 
 	static std::ifstream config_file(config_file_name.c_str(), std::ifstream::binary | std::ifstream::in);
-	  config_file >> config;
-	config_file.close();
+	if (config_file.fail()){
+		std::cout  << "Failed to find configuration file." << std::endl;
+		return *this;
+	} else {
+		config_file >> config;
+		config_file.close();
+	}
 
-        if ( config.empty() ){
-          std::cout  << "Failed to parse configuration." << std::endl;
-          std::cout << errors << std::endl;
-          std::cout << "Using default configuration." << std::endl;
-          return *this;
-        } else {
-          std::cout << "Parsed configuration file." << std::endl;
-        }
+  if ( config.empty() ){
+    std::cout  << "Failed to parse configuration file." << std::endl;
+    std::cout << errors << std::endl;
+    std::cout << "Using default configuration file." << std::endl;
+    return *this;
+  } else {
+    std::cout << "Parsed configuration file." << std::endl;
+  }
 
 	if ( config["active"].asBool() ) {
 		mMode = ACTIVE;
