@@ -15,7 +15,7 @@ namespace al {
   
   class RayApp : public Window, public osc::PacketHandler, public FPS {
   public:
-    RayApp(std::string name = "rayapp", bool slave=false);
+    RayApp(std::string name = "rayapp", bool slave=false, unsigned int recvPort=PORT_FROM_DEVICE_SERVER);
     virtual ~RayApp();
     
     void start();
@@ -116,9 +116,9 @@ namespace al {
   
   // INLINE IMPLEMENTATION //
   
-  inline RayApp::RayApp(std::string name, bool slave)
+  inline RayApp::RayApp(std::string name, bool slave, unsigned int recvPort)
   :	mNavControl(mNav),
-	mOSCRecv(PORT_FROM_DEVICE_SERVER),
+	mOSCRecv(recvPort),
 	mOSCSend(PORT_TO_DEVICE_SERVER, DEVICE_SERVER_IP_ADDRESS),
 	bSlave(slave),
   mOmni(2048)
