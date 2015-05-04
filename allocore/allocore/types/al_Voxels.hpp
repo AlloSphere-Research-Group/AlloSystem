@@ -120,35 +120,35 @@ public:
   float sizey() { return m_sizey;}
   float sizez() { return m_sizez;}
 
-  std::string sizexname() {
-    return std::to_string(m_sizex) + " " + UnitsName(m_units);
-  }
-
-  std::string sizeyname() {
-    return std::to_string(m_sizey) + " " + UnitsName(m_units);
-  }
-
-  std::string sizezname() {
-    return std::to_string(m_sizez) + " " + UnitsName(m_units);
-  }
-
-  std::string unitsname() {
-    return UnitsName(m_units);
-  }
-  
-  const std::string UnitsName(UnitsTy t) {
-    if (t == ANGSTROMS) {
-      return "angstroms";
-    } else if (t == NANOMETERS) {
-      return "nm";
-    } else if (t == MICROMETERS) {
-      return "µm";
-    } else if (t == MILLIMETERS) {
-      return "mm";
-    } else {
-      return "(m*10^" + std::to_string(t) + ")";
-    }
-  }
+//  std::string sizexname() {
+//    return std::to_string(m_sizex) + " " + UnitsName(m_units);
+//  }
+//
+//  std::string sizeyname() {
+//    return std::to_string(m_sizey) + " " + UnitsName(m_units);
+//  }
+//
+//  std::string sizezname() {
+//    return std::to_string(m_sizez) + " " + UnitsName(m_units);
+//  }
+//
+//  std::string unitsname() {
+//    return UnitsName(m_units);
+//  }
+//  
+//  const std::string UnitsName(UnitsTy t) {
+//    if (t == ANGSTROMS) {
+//      return "angstroms";
+//    } else if (t == NANOMETERS) {
+//      return "nm";
+//    } else if (t == MICROMETERS) {
+//      return "µm";
+//    } else if (t == MILLIMETERS) {
+//      return "mm";
+//    } else {
+//      return "(m*10^" + std::to_string(t) + ")";
+//    }
+//  }
   
   bool writeToFile(std::string filename);
   
