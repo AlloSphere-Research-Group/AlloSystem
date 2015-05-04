@@ -91,8 +91,6 @@ public:
   RayStereo& generateConfig(WarpMode wm, float aspect=2., float fovy=M_PI);
   RayStereo& generateConfig(BlendMode bm);
   
-  void initShader(ShaderProgram& shaderProgram);
-  
   RayStereo& mode(StereoMode m);
   StereoMode mode() { return mMode; }
   

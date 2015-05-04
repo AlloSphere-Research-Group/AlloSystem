@@ -509,17 +509,6 @@ void RayStereo::onDestroy() {
 	mRbo = mFbo = 0;
 }
 
-void RayStereo::initShader(ShaderProgram& shaderProgram) {
-  // set uniforms before validating to prevent validation error
-	shaderProgram.begin();
-  shaderProgram.uniform("alphaMap", 2);
-  shaderProgram.uniform("pixelMap", 1);
-	shaderProgram.end();
-	shaderProgram.validate();
-	shaderProgram.printLog();
-	Graphics::error("shader program initialization failed");
-}
-
 inline void RayStereo::drawQuad(const ShaderProgram& shaderProgram, const double eye) {
 	shaderProgram.uniform("eyesep", eye);
   gl.draw(mQuad);

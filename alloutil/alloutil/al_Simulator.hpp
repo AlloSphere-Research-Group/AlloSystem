@@ -5,7 +5,8 @@
 #include "allocore/protocol/al_OSC.hpp"
 #include "alloutil/al_InterfaceServerClient.hpp"
 
-namespace al {
+using namespace std;
+using namespace al;
 
 class Simulator : public InterfaceServerClient, public Main::Handler {
  public:
@@ -123,8 +124,5 @@ Simulator::Simulator(const char* deviceServerAddress, int port,
   InterfaceServerClient::setNav(nav());
   InterfaceServerClient::setLens(lens());
 }
-
-
-}  // al::
 
 #endif

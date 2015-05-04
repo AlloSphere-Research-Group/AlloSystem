@@ -8,6 +8,10 @@
 #include "alloutil/al_Simulator.hpp" // for PORT_TO_DEVICE_SERVER
 #include "alloutil/al_RayStereo.hpp"
 
+#define PORT_TO_DEVICE_SERVER (12000)
+#define PORT_FROM_DEVICE_SERVER (PORT_TO_DEVICE_SERVER+1)
+#define DEVICE_SERVER_IP_ADDRESS "BOSSANOVA"
+
 namespace al {
   
   class RayCastingGraphicsRenderer : public Window, public FPS {
@@ -24,6 +28,8 @@ namespace al {
     virtual bool onFrame();
     virtual void onDraw(Graphics& gl) {}
     virtual void onAnimate(al_sec dt) {}
+    
+    virtual void initShaderParams();
     
     void initWindow(const Window::Dim& dims = Window::Dim(800, 600),
                     const std::string title = "RayCastingGraphicsRenderer",
@@ -46,8 +52,11 @@ namespace al {
     void omniEnable(bool b) { bOmniEnable = b; }
     
     ShaderProgram& shader() { return mShader; }
+    
     void loadShaderString();
+    void loadShaderString(std::string vSrc, std::string fSrc);
     void loadShaderFile(std::string vPath, std::string fPath);
+    void recompileShaderFile(std::string vFile, std::string fFile);
     
     virtual void sendUniforms(ShaderProgram& shaderProgram);
     
@@ -81,7 +90,7 @@ namespace al {
     osc::Send mOSCSend;
     std::string mHostName;
     
-    bool bOmniEnable, bShaderFile;
+    bool bOmniEnable, bShaderExists;
   };
   
   
@@ -93,7 +102,7 @@ namespace al {
 	mOmni(2048)
   {
     bOmniEnable = true;
-    bShaderFile = false;
+    bShaderExists = false;
     mHostName = Socket::hostName();
     
     // default for omniapp: lens().near(0.01).far(40).eyeSep(0.03);
@@ -144,7 +153,7 @@ namespace al {
   inline bool RayCastingGraphicsRenderer::onCreate() {
     mOmni.onCreate();
     
-    if (!bShaderFile) {
+    if (!bShaderExists) {
       printf("No shader file specified. Reading from vertexCode()/fragmentCode().\n");
       loadShaderString();
     }
@@ -157,9 +166,21 @@ namespace al {
     mShader.attach(mVert);
     mShader.attach(mFrag);
     mShader.link(false); // do not validate yet
+    
+    // set uniforms before validating to prevent validation error
     mShader.listParams();
     
-    mOmni.initShader(mShader);
+    initShaderParams(); // initialize custom texture or non-default uniforms here
+    
+    mShader.begin();
+    mShader.uniform("alphaMap", 2);
+    mShader.uniform("pixelMap", 1);
+    mShader.end();
+    
+    mShader.validate();
+    mShader.printLog();
+    
+    Graphics::error("shader program initialization failed");
     
     return true;
   }
@@ -173,6 +194,15 @@ namespace al {
   inline void RayCastingGraphicsRenderer::loadShaderString() {
     mVert.source(vertexCode(), Shader::VERTEX);
     mFrag.source(fragmentCode(), Shader::FRAGMENT);
+    
+    bShaderExists = true;
+  }
+  
+  inline void RayCastingGraphicsRenderer::loadShaderString(std::string vSrc, std::string fSrc) {
+    mVert.source(vSrc, Shader::VERTEX);
+    mFrag.source(fSrc, Shader::FRAGMENT);
+    
+    bShaderExists = true;
   }
   
   inline void RayCastingGraphicsRenderer::loadShaderFile(std::string vFile, std::string fFile) {
@@ -190,17 +220,65 @@ namespace al {
     mVert.source(vert_file.readAll(), Shader::VERTEX);
     mFrag.source(frag_file.readAll(), Shader::FRAGMENT);
     
-    bShaderFile = true;
+    bShaderExists = true;
   }
   
-  // override it on user code
+  inline void RayCastingGraphicsRenderer::recompileShaderFile(std::string vFile, std::string fFile) {
+    File vert_file(vFile, "r", true);
+    File frag_file(fFile, "r", true);
+    
+    printf("Reading Vertex Shader: %s\n", vert_file.path().c_str());
+    printf("Reading Fragment Shader: %s\n", frag_file.path().c_str());
+    
+    if(!vert_file.opened() || !frag_file.opened()){
+      AL_WARN("Cannot open shader files.");
+      exit(EXIT_FAILURE);
+    }
+    
+    mShader.detach(mVert);
+    mShader.detach(mFrag);
+    
+    mVert.source(vert_file.readAll(), Shader::VERTEX);
+    mFrag.source(frag_file.readAll(), Shader::FRAGMENT);
+    
+    bShaderExists = true;
+    
+    mVert.compile();
+    mVert.printLog();
+    mFrag.compile();
+    mFrag.printLog();
+    
+    mShader.attach(mVert);
+    mShader.attach(mFrag);
+    mShader.link(false); // do not validate yet
+                         // set uniforms before validating to prevent validation error
+    mShader.listParams();
+    
+    initShaderParams(); // initialize custom texture or non-default uniforms here
+    
+    mShader.begin();
+    mShader.uniform("alphaMap", 2);
+    mShader.uniform("pixelMap", 1);
+    mShader.end();
+    
+    mShader.validate();
+    mShader.printLog();
+    
+    Graphics::error("shader program initialization failed");
+  }
+  
+  // for initializing parameters before compiling shader
+  inline void RayCastingGraphicsRenderer::initShaderParams() {
+  }
+  
+  // basic uniforms used in the shader. override it on user code
   inline void RayCastingGraphicsRenderer::sendUniforms(ShaderProgram& shaderProgram) {
   }
   
   inline bool RayCastingGraphicsRenderer::onFrame() {
     FPS::onFrame();
     
-    if(frame % 30 == 0) {
+    if(frame % 60 == 0) {
       printf("FPS: %03.6f\n", FPS::fps());
 //      nav().print();
     }
@@ -210,9 +288,9 @@ namespace al {
     nav().step();
     
     // TODO: what if it shouldn't send anything
-    Vec3d v = nav().pos();
-    Quatd q = nav().quat();
-    oscSend().send("/pose", v.x, v.y, v.z, q.x, q.y, q.z, q.w);
+//    Vec3d v = nav().pos();
+//    Quatd q = nav().quat();
+//    oscSend().send("/pose", v.x, v.y, v.z, q.x, q.y, q.z, q.w);
     
     onAnimate(dt);
     

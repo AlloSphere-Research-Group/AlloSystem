@@ -7,7 +7,7 @@
 #include "alloutil/al_FPS.hpp"
 #include "alloutil/al_RayStereo.hpp"
 
-#define PORT_TO_DEVICE_SERVER (4110)
+#define PORT_TO_DEVICE_SERVER (12000)
 #define PORT_FROM_DEVICE_SERVER (PORT_TO_DEVICE_SERVER+1)
 #define DEVICE_SERVER_IP_ADDRESS "BOSSANOVA"
 
@@ -28,7 +28,7 @@ namespace al {
     virtual void onSound(AudioIOData& io) {}
     virtual void onMessage(osc::Message& m);
     
-    virtual void initParams();
+    virtual void initShaderParams();
     
     void initWindow(const Window::Dim& dims = Window::Dim(800, 600),
                     const std::string title = "RayApp",
@@ -63,7 +63,9 @@ namespace al {
     void omniEnable(bool b) { bOmniEnable = b; }
     
     ShaderProgram& shader() { return mShader; }
+    
     void loadShaderString();
+    void loadShaderString(std::string vSrc, std::string fSrc);
     void loadShaderFile(std::string vPath, std::string fPath);
     void recompileShaderFile(std::string vFile, std::string fFile);
     
@@ -106,7 +108,7 @@ namespace al {
     std::string mName;
     std::string mHostName;
     
-    bool bOmniEnable, bSlave, bShaderFile;
+    bool bOmniEnable, bSlave, bShaderExists;
     
     static void AppAudioCB(AudioIOData& io);
   };
@@ -122,7 +124,7 @@ namespace al {
   mOmni(2048)
   {
     bOmniEnable = true;
-    bShaderFile = false;
+    bShaderExists = false;
     mHostName = Socket::hostName();
     mName = name;
     
@@ -222,7 +224,7 @@ namespace al {
     
     mOmni.onCreate();
     
-    if (!bShaderFile) {
+    if (!bShaderExists) {
       printf("No shader file specified. Reading from vertexCode()/fragmentCode().\n");
       loadShaderString();
     }
@@ -236,11 +238,20 @@ namespace al {
     mShader.attach(mFrag);
     mShader.link(false); // do not validate yet
     
-    initParams();
-    
+    // set uniforms before validating to prevent validation error
     mShader.listParams();
     
-    mOmni.initShader(mShader);
+    initShaderParams(); // initialize custom texture or non-default uniforms here
+    
+    mShader.begin();
+    mShader.uniform("alphaMap", 2);
+    mShader.uniform("pixelMap", 1);
+    mShader.end();
+    
+    mShader.validate();
+    mShader.printLog();
+    
+    Graphics::error("shader program initialization failed");
     
     return true;
   }
@@ -254,6 +265,15 @@ namespace al {
   inline void RayApp::loadShaderString() {
     mVert.source(vertexCode(), Shader::VERTEX);
     mFrag.source(fragmentCode(), Shader::FRAGMENT);
+    
+    bShaderExists = true;
+  }
+  
+  inline void RayApp::loadShaderString(std::string vSrc, std::string fSrc) {
+    mVert.source(vSrc, Shader::VERTEX);
+    mFrag.source(fSrc, Shader::FRAGMENT);
+    
+    bShaderExists = true;
   }
   
   inline void RayApp::loadShaderFile(std::string vFile, std::string fFile) {
@@ -271,7 +291,7 @@ namespace al {
     mVert.source(vert_file.readAll(), Shader::VERTEX);
     mFrag.source(frag_file.readAll(), Shader::FRAGMENT);
     
-    bShaderFile = true;
+    bShaderExists = true;
   }
   
   inline void RayApp::recompileShaderFile(std::string vFile, std::string fFile) {
@@ -292,7 +312,7 @@ namespace al {
     mVert.source(vert_file.readAll(), Shader::VERTEX);
     mFrag.source(frag_file.readAll(), Shader::FRAGMENT);
     
-    bShaderFile = true;
+    bShaderExists = true;
     
     mVert.compile();
     mVert.printLog();
@@ -302,13 +322,24 @@ namespace al {
     mShader.attach(mVert);
     mShader.attach(mFrag);
     mShader.link(false); // do not validate yet
+                         // set uniforms before validating to prevent validation error
     mShader.listParams();
     
-    mOmni.initShader(mShader);
+    initShaderParams(); // initialize custom texture or non-default uniforms here
+    
+    mShader.begin();
+    mShader.uniform("alphaMap", 2);
+    mShader.uniform("pixelMap", 1);
+    mShader.end();
+    
+    mShader.validate();
+    mShader.printLog();
+    
+    Graphics::error("shader program initialization failed");
   }
   
   // for initializing parameters before compiling shader
-  inline void RayApp::initParams() {
+  inline void RayApp::initShaderParams() {
   }
   
   // basic uniforms used in the shader. override it on user code
