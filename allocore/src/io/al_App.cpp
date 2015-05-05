@@ -4,6 +4,12 @@
 namespace al{
 //______________________________________________________________________________
 
+Frustumd Viewpoint::frustum() const {
+	Frustumd fr;
+	lens().frustum(fr, worldTransform(), viewport().aspect());
+	return fr;
+}
+
 void Viewpoint::onParentResize(int w, int h){
 	mViewport.l = w * anchorX();
 	mViewport.b = h * anchorY();

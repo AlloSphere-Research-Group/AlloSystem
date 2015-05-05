@@ -116,6 +116,8 @@ public:
 	const Viewport& viewport() const { return mViewport; }
 	Viewport& viewport(){ return mViewport; }
 
+	Frustumd frustum() const;
+
 	/// Call to update viewport using stretch/anchor amounts when parent dimensions change
 	void onParentResize(int w, int h);
 
