@@ -56,9 +56,10 @@
 #include "allocore/io/al_AudioIO.hpp"
 #include "allocore/sound/al_Speaker.hpp"
 #include "allocore/sound/al_Reverb.hpp"
+#include "allocore/sound/al_Biquad.h"
 
 namespace al{
-
+    
 /*!
 	A note on coordinate conventions
 
@@ -320,7 +321,9 @@ public:
 	// calculate the buffersize needed for given samplerate, speed of sound & distance traveled (e.g. nearClip+clipRange).
 	// probably want to add io.samplesPerBuffer() to this for safety.
 	static int bufferSize(double samplerate, double speedOfSound, double distance);
-
+    
+    BiQuad presenceFilter; //used for presence filtering and spatial modulation BW control
+    
 protected:
 	RingBuffer<float> mSound;		// spherical wave around position
 	bool mUseAtten;

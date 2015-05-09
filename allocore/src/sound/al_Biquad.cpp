@@ -16,7 +16,10 @@ BiQuad::BiQuad(BIQUADTYPE _type, float _sampleRate)
 mType(_type),
 mSampleRate(_sampleRate)
 {
-    set(BIQUAD_LPF, 0, mSampleRate/2-1);
+    mBD.x1 = mBD.x2 = 0;
+    mBD.y1 = mBD.y2 = 0;
+    
+    set(mSampleRate/2-1, 1.9, 0);
 }
 
 BiQuad::~BiQuad()
@@ -26,6 +29,10 @@ BiQuad::~BiQuad()
 
 void BiQuad::set(float freq, float bandwidth, float dbGain)
 {
+    //TODO all the way to fs/2, range
+    if(freq > 10000) freq = 10000;
+    if(freq <= 100) freq = 100;
+    
     float A, omega, sn, cs, alpha, beta;
     float a0, a1, a2, b0, b1, b2;
     
@@ -104,11 +111,6 @@ void BiQuad::set(float freq, float bandwidth, float dbGain)
     mBD.a2 = b2 /a0;
     mBD.a3 = a1 /a0;
     mBD.a4 = a2 /a0;
-    
-    /* zero initial samples */
-    mBD.x1 = mBD.x2 = 0;
-    mBD.y1 = mBD.y2 = 0;
-    
 }
 
 void BiQuad::processBuffer(float *buffer, int count)
@@ -116,12 +118,12 @@ void BiQuad::processBuffer(float *buffer, int count)
     for (int i=0; i<count; i++)
     {
         float sample = buffer[i];
-        sample = filter(sample);
+        sample = (*this)(sample);
         buffer[i] = sample;
     }
 }
 
-float BiQuad::filter(float sample)
+float BiQuad::operator()(float sample)
 {
     float result;
     
@@ -169,4 +171,15 @@ void BiQuadNX::processBuffer(float *buffer, int count)
 {
     for(int i = 0; i < numFilters; i++)
         mFilters[i].processBuffer(buffer, count);
+}
+
+float BiQuadNX::operator()(float sample)
+{
+    float result = sample;
+    //for(int i = numFilters-1; i >= 0; i--)
+    for(int i = 0; i < numFilters; i++)
+    {
+        result = mFilters[i](result);
+    }
+    return result;
 }

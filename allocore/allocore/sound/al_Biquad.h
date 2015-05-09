@@ -36,12 +36,12 @@ public:
     void set(float freq, float bandwidth = 1.9, float dbGain = 0);
     void setSampleRate(float _rate){mSampleRate = _rate;}
     void processBuffer(float *buffer, int count);
+    float operator()(float sample);
     
 private:
     BIQUADTYPE mType;
     BiquadData mBD;
     float mSampleRate;
-    float filter(float sample);
 };
 
 // Cascaded Biquad to acheive steeper filters
@@ -52,14 +52,14 @@ public:
     BiQuadNX(int _numFilters = 4, BIQUADTYPE _type = BIQUAD_LPF, float _sampleRate = 44100);
     ~BiQuadNX();
     
-    void set(float freq, float bandwidth = 1.9, float dbGain = 0);
+    void set(float freq, float bandwidth = 1.6, float dbGain = 0);
     void setSampleRate(float _rate);
     void processBuffer(float *buffer, int count);
+    float operator()(float sample);
     
 private:
     int numFilters;
     BiQuad *mFilters;
-    float filter(float sample);
 };
 
 }

@@ -56,6 +56,8 @@ SoundSource::SoundSource(
 	for(int i=0; i<mPosHistory.size(); ++i){
 		mPosHistory(Vec3d(1000, 0, 0));
 	}
+    
+    presenceFilter.set(1000);
 }
 
 /*static*/
@@ -138,7 +140,7 @@ void AudioScene::render(float **outputBuffers, const int numFrames, const double
 		// iterate through all sound sources
 		for(Sources::iterator it = mSources.begin(); it != mSources.end(); ++it){
 			SoundSource& src = *(*it);
-
+            
 			// scalar factor to convert distances into delayline indices
             double distanceToSample = 0;
             if(src.dopplerType() == DOPPLER_SYMMETRICAL)
@@ -204,6 +206,7 @@ void AudioScene::render(float **outputBuffers, const int numFrames, const double
 					if(samplesAgo <= src.maxIndex()){
 						double gain = src.attenuation(dist);
 						float s = src.readSample(samplesAgo) * gain;
+                        s = src.presenceFilter(s);
                         #if !ALLOCORE_GENERIC_AUDIOSCENE
                         spatializer->perform(io, src,relpos, numFrames, i, s);
                         #else
