@@ -38,13 +38,17 @@ public:
     void processBuffer(float *buffer, int count);
     double operator()(double sample);
     
+    void enable(bool on) {enabled = on;}
+    
 private:
     BIQUADTYPE mType;
     BiquadData mBD;
     double mSampleRate;
+    bool enabled;
 };
 
 // Cascaded Biquad to acheive steeper filters
+// Default params of numFilters = 8 and bandwidth = 0.26 work well for an anti-aliasing LPF filter @ 19k
 class BiQuadNX
 {
 public:
@@ -52,10 +56,11 @@ public:
     BiQuadNX(int _numFilters = 8, BIQUADTYPE _type = BIQUAD_LPF, double _sampleRate = 44100);
     ~BiQuadNX();
     
-    void set(double freq, double bandwidth = 1.2, double dbGain = 0);
+    void set(double freq, double bandwidth = 0.26, double dbGain = 0);
     void setSampleRate(double _rate);
     void processBuffer(float *buffer, int count);
     double operator()(double sample);
+    void enable(bool on);
     
 private:
     int numFilters;

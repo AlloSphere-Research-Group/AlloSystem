@@ -14,7 +14,8 @@ using namespace al;
 BiQuad::BiQuad(BIQUADTYPE _type, double _sampleRate)
 :
 mType(_type),
-mSampleRate(_sampleRate)
+mSampleRate(_sampleRate),
+enabled(true)
 {
     mBD.x1 = mBD.x2 = 0;
     mBD.y1 = mBD.y2 = 0;
@@ -30,15 +31,15 @@ BiQuad::~BiQuad()
 void BiQuad::set(double freq, double bandwidth, double dbGain)
 {
     //TODO all the way to fs/2, range
-    if(freq > 10000) freq = 10000;
-    if(freq <= 100) freq = 100;
+    if(freq > 20000) freq = 20000;
+    if(freq <= 20) freq = 20;
     
     double A, omega, sn, cs, alpha, beta;
     double a0, a1, a2, b0, b1, b2;
     
-    /* setup variables */
+    // setup variables
     A = pow(10, dbGain /40);
-    omega = 2 * M_PI * freq /mSampleRate;
+    omega = 2 * M_PI * freq / (1*mSampleRate); //1X or 2X oversampled
     sn = sin(omega);
     cs = cos(omega);
     alpha = sn * sinh(M_LN2 /2 * bandwidth * omega /sn);
@@ -105,7 +106,6 @@ void BiQuad::set(double freq, double bandwidth, double dbGain)
             return;
     }
     
-    /* precompute the coefficients */
     mBD.a0 = b0 /a0;
     mBD.a1 = b1 /a0;
     mBD.a2 = b2 /a0;
@@ -126,18 +126,32 @@ void BiQuad::processBuffer(float *buffer, int count)
 double BiQuad::operator()(double sample)
 {
     double result;
+
+    if(!enabled) return sample;
     
-    /* compute result */
-    result = mBD.a0 * sample + mBD.a1 * mBD.x1 + mBD.a2 * mBD.x2 -
-    mBD.a3 * mBD.y1 - mBD.a4 * mBD.y2;
+    // compute result
+    result = mBD.a0 * sample + mBD.a1 * mBD.x1 + mBD.a2 * mBD.x2 - mBD.a3 * mBD.y1 - mBD.a4 * mBD.y2;
     
-    /* shift x1 to x2, sample to x1 */
-    mBD.x2 = mBD.x1;
-    mBD.x1 = sample;
-    
-    /* shift y1 to y2, result to y1 */
+    // shift y1 to y2, result to y1
     mBD.y2 = mBD.y1;
     mBD.y1 = result;
+    
+    // shift x1 to x2, sample to x1
+    mBD.x2 = mBD.x1;
+    mBD.x1 = sample;
+ 
+    //2X oversampling attempt... also need to double sampleRate for coefficient computation in set() method
+//    sample = 0;
+//    
+//    result = mBD.a0 * sample + mBD.a1 * mBD.x1 + mBD.a2 * mBD.x2 - mBD.a3 * mBD.y1 - mBD.a4 * mBD.y2; 
+//    
+//    // shift y1 to y2, result to y1
+//    mBD.y2 = mBD.y1;
+//    mBD.y1 = result;
+//    
+//    // shift x1 to x2, sample to x1
+//    mBD.x2 = mBD.x1;
+//    mBD.x1 = sample;
     
     return result;
 }
@@ -182,4 +196,10 @@ double BiQuadNX::operator()(double sample)
         result = mFilters[i](result);
     }
     return result;
+}
+
+void BiQuadNX::enable(bool on)
+{
+    for(int i = 0; i < numFilters; i++)
+        mFilters[i].enable(on);
 }
