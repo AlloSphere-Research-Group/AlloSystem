@@ -322,7 +322,7 @@ public:
 	// probably want to add io.samplesPerBuffer() to this for safety.
 	static int bufferSize(double samplerate, double speedOfSound, double distance);
     
-    BiQuad presenceFilter; //used for presence filtering and spatial modulation BW control
+    BiQuadNX presenceFilter; //used for presence filtering and spatial modulation BW control
     
 protected:
 	RingBuffer<float> mSound;		// spherical wave around position

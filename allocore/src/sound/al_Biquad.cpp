@@ -11,7 +11,7 @@
 
 using namespace al;
 
-BiQuad::BiQuad(BIQUADTYPE _type, float _sampleRate)
+BiQuad::BiQuad(BIQUADTYPE _type, double _sampleRate)
 :
 mType(_type),
 mSampleRate(_sampleRate)
@@ -19,7 +19,7 @@ mSampleRate(_sampleRate)
     mBD.x1 = mBD.x2 = 0;
     mBD.y1 = mBD.y2 = 0;
     
-    set(mSampleRate/2-1, 1.9, 0);
+    set(10000, 1.9, 0);
 }
 
 BiQuad::~BiQuad()
@@ -27,14 +27,14 @@ BiQuad::~BiQuad()
     
 }
 
-void BiQuad::set(float freq, float bandwidth, float dbGain)
+void BiQuad::set(double freq, double bandwidth, double dbGain)
 {
     //TODO all the way to fs/2, range
     if(freq > 10000) freq = 10000;
     if(freq <= 100) freq = 100;
     
-    float A, omega, sn, cs, alpha, beta;
-    float a0, a1, a2, b0, b1, b2;
+    double A, omega, sn, cs, alpha, beta;
+    double a0, a1, a2, b0, b1, b2;
     
     /* setup variables */
     A = pow(10, dbGain /40);
@@ -117,15 +117,15 @@ void BiQuad::processBuffer(float *buffer, int count)
 {
     for (int i=0; i<count; i++)
     {
-        float sample = buffer[i];
+        double sample = buffer[i];
         sample = (*this)(sample);
         buffer[i] = sample;
     }
 }
 
-float BiQuad::operator()(float sample)
+double BiQuad::operator()(double sample)
 {
-    float result;
+    double result;
     
     /* compute result */
     result = mBD.a0 * sample + mBD.a1 * mBD.x1 + mBD.a2 * mBD.x2 -
@@ -144,7 +144,7 @@ float BiQuad::operator()(float sample)
 
 ////////////////////////////////////////////////////////////////////////////
 
-BiQuadNX::BiQuadNX(int _numFilters, BIQUADTYPE _type, float _sampleRate)
+BiQuadNX::BiQuadNX(int _numFilters, BIQUADTYPE _type, double _sampleRate)
 :
 numFilters(_numFilters)
 {
@@ -157,12 +157,12 @@ BiQuadNX::~BiQuadNX()
     free(mFilters);
 }
 
-void BiQuadNX::set(float freq, float bandwidth, float dbGain)
+void BiQuadNX::set(double freq, double bandwidth, double dbGain)
 {
     for(int i = 0; i < numFilters; i++)
         mFilters[i].set(freq, bandwidth, dbGain);
 }
-void BiQuadNX::setSampleRate(float _rate)
+void BiQuadNX::setSampleRate(double _rate)
 {
     for(int i = 0; i < numFilters; i++)
         mFilters[i].setSampleRate(_rate);
@@ -173,9 +173,9 @@ void BiQuadNX::processBuffer(float *buffer, int count)
         mFilters[i].processBuffer(buffer, count);
 }
 
-float BiQuadNX::operator()(float sample)
+double BiQuadNX::operator()(double sample)
 {
-    float result = sample;
+    double result = sample;
     //for(int i = numFilters-1; i >= 0; i--)
     for(int i = 0; i < numFilters; i++)
     {

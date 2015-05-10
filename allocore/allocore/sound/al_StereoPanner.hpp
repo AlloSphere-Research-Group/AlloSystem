@@ -93,7 +93,7 @@ public:
             for(int i = 0; i < numSpeakers; i++)
             {
                 float *buf = outputBuffers[i];
-                buf[frameIndex] = sample;
+                buf[frameIndex] = 0.5*sample;
             }
         }
         
@@ -137,8 +137,8 @@ private:
         
         float panVal = (xPos + 1) /2.f; //[0, 1], L to R
         
-        gainL = M_PI*cos((M_PI/2)*panVal);
-        gainR = M_PI*sin((M_PI/2)*panVal);
+        gainL = cos((M_PI/2)*panVal);
+        gainR = sin((M_PI/2)*panVal);
     }
     
 };

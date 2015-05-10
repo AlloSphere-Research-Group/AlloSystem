@@ -10,8 +10,8 @@ namespace al
     
 /* this holds the data required to update samples thru a filter */
 typedef struct {
-    float a0, a1, a2, a3, a4;
-    float x1, x2, y1, y2;
+    double a0, a1, a2, a3, a4;
+    double x1, x2, y1, y2;
 }
 BiquadData;
 
@@ -30,18 +30,18 @@ class BiQuad
 {
 public:
     
-    BiQuad(BIQUADTYPE _type = BIQUAD_LPF, float _sampleRate = 44100);
+    BiQuad(BIQUADTYPE _type = BIQUAD_LPF, double _sampleRate = 44100);
     ~BiQuad();
     
-    void set(float freq, float bandwidth = 1.9, float dbGain = 0);
-    void setSampleRate(float _rate){mSampleRate = _rate;}
+    void set(double freq, double bandwidth = 1.9, double dbGain = 0);
+    void setSampleRate(double _rate){mSampleRate = _rate;}
     void processBuffer(float *buffer, int count);
-    float operator()(float sample);
+    double operator()(double sample);
     
 private:
     BIQUADTYPE mType;
     BiquadData mBD;
-    float mSampleRate;
+    double mSampleRate;
 };
 
 // Cascaded Biquad to acheive steeper filters
@@ -49,13 +49,13 @@ class BiQuadNX
 {
 public:
     
-    BiQuadNX(int _numFilters = 4, BIQUADTYPE _type = BIQUAD_LPF, float _sampleRate = 44100);
+    BiQuadNX(int _numFilters = 8, BIQUADTYPE _type = BIQUAD_LPF, double _sampleRate = 44100);
     ~BiQuadNX();
     
-    void set(float freq, float bandwidth = 1.6, float dbGain = 0);
-    void setSampleRate(float _rate);
+    void set(double freq, double bandwidth = 1.2, double dbGain = 0);
+    void setSampleRate(double _rate);
     void processBuffer(float *buffer, int count);
-    float operator()(float sample);
+    double operator()(double sample);
     
 private:
     int numFilters;

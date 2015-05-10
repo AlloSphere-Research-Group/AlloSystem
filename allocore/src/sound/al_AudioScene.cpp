@@ -57,7 +57,7 @@ SoundSource::SoundSource(
 		mPosHistory(Vec3d(1000, 0, 0));
 	}
     
-    presenceFilter.set(1000);
+    presenceFilter.set(2700);
 }
 
 /*static*/
@@ -206,7 +206,7 @@ void AudioScene::render(float **outputBuffers, const int numFrames, const double
 					if(samplesAgo <= src.maxIndex()){
 						double gain = src.attenuation(dist);
 						float s = src.readSample(samplesAgo) * gain;
-                        s = src.presenceFilter(s);
+                        //s = src.presenceFilter(s); //TODO: causing stopband ripple here, why?
                         #if !ALLOCORE_GENERIC_AUDIOSCENE
                         spatializer->perform(io, src,relpos, numFrames, i, s);
                         #else
