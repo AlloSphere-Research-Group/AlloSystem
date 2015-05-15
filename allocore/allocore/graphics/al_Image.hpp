@@ -170,6 +170,24 @@ public:
 	Image& compression(int flags){ mCompression=flags; return *this; }
 
 
+	/// Get read-only reference to a pixel
+
+	/// Warning: doesn't check that Pix has matching type/component count.
+	/// Warning: no bounds checking performed on x and y.
+	template<typename Pix>
+	const Pix& at(unsigned x, unsigned y) const {
+		return *array().cell<Pix>(x, y);
+	}
+
+	/// Get mutable reference to a pixel
+
+	/// Warning: doesn't check that Pix has matching type/component count.
+	/// Warning: no bounds checking performed on x and y.
+	template<typename Pix>
+	Pix& at(unsigned x, unsigned y){
+		return *array().cell<Pix>(x, y);
+	}
+
 	/// Write a pixel to an Image
 
 	/// Warning: doesn't check that Pix has matching type/component count
