@@ -9,6 +9,12 @@
 
 #ifdef AL_WINDOWS
 	#include "serial/win.cc"
+	#include "serial/list_ports_win.cc"
+#elif defined AL_OSX
+	#include "serial/unix.cc"
+	#include "serial/list_ports_osx.cc"
 #else
 	#include "serial/unix.cc"
+	#include "serial/list_ports_linux.cc"
 #endif
+

@@ -55,7 +55,7 @@ using serial::IOException;
 
 class MillisecondTimer {
 public:
-  MillisecondTimer(const uint32_t millis);
+  MillisecondTimer(const uint32_t millis);         
   int64_t remaining();
 
 private:
@@ -85,6 +85,12 @@ public:
 
   size_t
   available ();
+
+  bool
+  waitReadable (uint32_t timeout);
+
+  void
+  waitByteTimes (size_t count);
 
   size_t
   read (uint8_t *buf, size_t size = 1);
@@ -193,8 +199,9 @@ private:
   bool xonxoff_;
   bool rtscts_;
 
-  Timeout timeout_;         // Timeout for read operations
+  Timeout timeout_;           // Timeout for read operations
   unsigned long baudrate_;    // Baudrate
+  uint32_t byte_time_ns_;     // Nanoseconds to transmit/receive a single byte
 
   parity_t parity_;           // Parity
   bytesize_t bytesize_;       // Size of the bytes
