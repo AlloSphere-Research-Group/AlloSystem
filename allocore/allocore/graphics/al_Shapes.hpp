@@ -110,8 +110,13 @@ inline int addWireBox(Mesh& m, float size=1){ return addWireBox(m,size,size,size
 /// @param[in]		Ny		number of vertices along y
 /// @param[in]		width	total width (along x)
 /// @param[in]		height	total height (along y)
+/// @param[in]		x		position of center along x
+/// @param[in]		y		position of center along y
 /// \returns number of vertices added
-int addSurface(Mesh& m, int Nx, int Ny, float width=2, float height=2);
+int addSurface(
+	Mesh& m, int Nx, int Ny,
+	double width=2, double height=2, double x=0, double y=0
+);
 
 
 /// Add a tessellated rectangular surface with connected edges
@@ -130,9 +135,14 @@ int addSurface(Mesh& m, int Nx, int Ny, float width=2, float height=2);
 ///						2: connect edges perpendicular to x and y (toroidal)
 /// @param[in] width	total width (along x)
 /// @param[in] height	total height (along y)
+/// @param[in] x		position of center along x
+/// @param[in] y		position of center along y
 ///
 /// \returns number of vertices added
-int addSurfaceLoop(Mesh& m, int Nx, int Ny, int loopMode, float width=2, float height=2);
+int addSurfaceLoop(
+	Mesh& m, int Nx, int Ny, int loopMode,
+	double width=2, double height=2, double x=0, double y=0
+);
 
 } // al::
 

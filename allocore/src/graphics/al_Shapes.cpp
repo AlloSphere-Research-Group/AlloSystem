@@ -414,17 +414,28 @@ int addWireBox(Mesh& m, float w, float h, float d){
 }
 
 
-int addSurface(Mesh& m, int Nx, int Ny, float width, float height){
-
+int addSurface(
+	Mesh& m, int Nx, int Ny,
+	double width, double height, double x, double y
+){
 	m.primitive(Graphics::TRIANGLE_STRIP);
 
 	int Nv = m.vertices().size();
 
-	for(int j=0; j<Ny; ++j){ float y=(float(j)/(Ny-1) - 0.5f) * height;
-	for(int i=0; i<Nx; ++i){ float x=(float(i)/(Nx-1) - 0.5f) * width;
-		m.vertex(x, y);
-		m.texCoord(float(i)/(Nx-1), float(j)/(Ny-1));
-	}}
+	double du = width/(Nx-1);
+	double dv = height/(Ny-1);
+
+	// Generate positions
+	double v = y - height*0.5;
+	for(int j=0; j<Ny; ++j){
+		double u = x - width*0.5;
+		for(int i=0; i<Nx; ++i){
+			m.vertex(u, v);
+			//m.texCoord(float(i)/(Nx-1), float(j)/(Ny-1)); //TODO: make Mesh method
+			u += du;
+		}
+		v += dv;
+	}
 
 	// Note: the start and end points of each row are duplicated to create
 	// degenerate triangles.
@@ -443,8 +454,10 @@ int addSurface(Mesh& m, int Nx, int Ny, float width, float height){
 }
 
 
-int addSurfaceLoop(Mesh& m, int Nx, int Ny, int loopMode, float width, float height){
-
+int addSurfaceLoop(
+	Mesh& m, int Nx, int Ny, int loopMode,
+	double width, double height, double x, double y
+){
 	m.primitive(Graphics::TRIANGLE_STRIP);
 
 	int Nv = m.vertices().size();
@@ -452,11 +465,18 @@ int addSurfaceLoop(Mesh& m, int Nx, int Ny, int loopMode, float width, float hei
 	// Number of cells along y
 	int My = loopMode==1 ? Ny - 1 : Ny;
 
+	double du = width/(Nx-1);
+	double dv = height/(My-1);
+
 	// Generate positions
-	for(int j=0; j<Ny; ++j){ float y=(float(j)/My - 0.5f) * height;
-		for(int i=0; i<Nx; ++i){ float x=(float(i)/Nx - 0.5f) * width;
-			m.vertex(x, y);
+	double v = y - height*0.5;
+	for(int j=0; j<Ny; ++j){
+		double u = x - width*0.5;
+		for(int i=0; i<Nx; ++i){
+			m.vertex(u, v);
+			u += du;
 		}
+		v += dv;
 	}
 
 	// Generate indices
