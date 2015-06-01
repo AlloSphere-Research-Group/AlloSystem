@@ -103,7 +103,7 @@ inline AudioDevice::StreamMode operator| (const AudioDevice::StreamMode& a, cons
 	return static_cast<AudioDevice::StreamMode>(+a|+b);
 }
 
-
+class AudioBackend;
 
 /// Audio data to be sent to callback
 
@@ -188,7 +188,7 @@ public:
 	bool usingGain() const { return mGain != 1.f || mGainPrev != 1.f; }
 
 protected:
-	class Impl; Impl * mImpl;
+	AudioBackend * mImpl;
 	void * mUser;					// User specified data
 	mutable int mFrame;
 	int mFramesPerBuffer;
