@@ -54,9 +54,8 @@ class AudioIOData;
 /// Audio callback type
 typedef void (* audioCallback)(AudioIOData& io);
 
-
 /// Audio device abstraction
-class AudioDevice{
+class AudioDeviceInfo{
 public:
 
 	/// Stream mode
@@ -65,45 +64,108 @@ public:
 		OUTPUT	= 2		/**< Output stream */
 	};
 
+	/// @param[in] deviceNum	Device enumeration number
+	AudioDeviceInfo(int deviceNum) {}
+	
+	/// @param[in] nameKeyword	Keyword to search for in device name
+	/// @param[in] stream		Whether to search for input and/or output devices
+	AudioDeviceInfo(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT)) {}
+
+//	~AudioDeviceInfo() = 0;
+
+	virtual bool valid() const = 0;	///< Returns whether device is valid
+	virtual int id() const = 0;			///< Get device unique ID
+	virtual const char * name() const = 0;				///< Get device name
+	virtual int channelsInMax() const = 0;				///< Get maximum number of input channels supported
+	virtual int channelsOutMax() const = 0;				///< Get maximum number of output channels supported
+	virtual double defaultSampleRate() const = 0;		///< Get default sample rate
+	
+	virtual bool hasInput() const = 0;					///< Returns whether device has input
+	virtual bool hasOutput() const = 0;					///< Returns whether device has output
+	
+	virtual void print() const = 0;						///< Prints info about specific i/o device to stdout
+
+protected:
+
+};
+
+inline AudioDeviceInfo::StreamMode operator| (const AudioDeviceInfo::StreamMode& a, const AudioDeviceInfo::StreamMode& b){
+	return static_cast<AudioDeviceInfo::StreamMode>(+a|+b);
+}
+
+class AudioDevice: public AudioDeviceInfo {
+public:
 
 	/// @param[in] deviceNum	Device enumeration number
 	AudioDevice(int deviceNum);
-	
+
 	/// @param[in] nameKeyword	Keyword to search for in device name
 	/// @param[in] stream		Whether to search for input and/or output devices
 	AudioDevice(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT));
 
-	~AudioDevice();
+//	~AudioDevice();
 
-	bool valid() const { return 0!=mImpl; }	///< Returns whether device is valid
-	int id() const { return mID; }			///< Get device unique ID
-	const char * name() const;				///< Get device name
-	int channelsInMax() const;				///< Get maximum number of input channels supported
-	int channelsOutMax() const;				///< Get maximum number of output channels supported
-	double defaultSampleRate() const;		///< Get default sample rate
-	
-	bool hasInput() const;					///< Returns whether device has input
-	bool hasOutput() const;					///< Returns whether device has output
-	
-	void print() const;						///< Prints info about specific i/o device to stdout
+	virtual bool valid() const { return 0!=mImpl; }	///< Returns whether device is valid
+	virtual int id() const { return mID; }			///< Get device unique ID
+	virtual const char * name() const;				///< Get device name
+	virtual int channelsInMax() const;				///< Get maximum number of input channels supported
+	virtual int channelsOutMax() const;				///< Get maximum number of output channels supported
+	virtual double defaultSampleRate() const;		///< Get default sample rate
 
+	virtual bool hasInput() const;					///< Returns whether device has input
+	virtual bool hasOutput() const;					///< Returns whether device has output
+
+	virtual void print() const;						///< Prints info about specific i/o device to stdout
+
+	// TODO: these should be removed from here and moved to AudioBackend
 	static AudioDevice defaultInput();		///< Get system's default input device
 	static AudioDevice defaultOutput();		///< Get system's default output device
 	static int numDevices();				///< Returns number of audio i/o devices available
 	static void printAll();					///< Prints info about all available i/o devices to stdout
 
-private:
+protected:
 	void setImpl(int deviceNum);
 	static void initDevices();
 	int mID;
 	const void * mImpl;
 };
 
-inline AudioDevice::StreamMode operator| (const AudioDevice::StreamMode& a, const AudioDevice::StreamMode& b){
-	return static_cast<AudioDevice::StreamMode>(+a|+b);
-}
+class AudioBackend{
+public:
+	AudioBackend(): mIsOpen(false), mIsRunning(false){}
 
-class AudioBackend;
+	virtual bool isOpen() const = 0;
+	virtual bool isRunning() const = 0;
+	virtual bool error() const = 0;
+
+	virtual void printError(const char * text = "") const = 0;
+	virtual void printInfo() const = 0;
+
+	virtual bool supportsFPS(double fps) const = 0;
+
+	virtual void inDevice(int index) = 0;
+	virtual void outDevice(int index) = 0;
+
+	virtual int channels(int num, bool forOutput) = 0;
+
+	virtual int inDeviceChans() = 0;
+	virtual int outDeviceChans() = 0;
+	virtual void setInDeviceChans(int num) = 0;
+	virtual void setOutDeviceChans(int num) = 0;
+
+	virtual double time() = 0;
+
+	virtual bool open(int framesPerSecond, int framesPerBuffer, void *userdata) = 0;
+	virtual bool close() = 0;
+
+	virtual bool start(int framesPerSecond, int framesPerBuffer, void *userdata) = 0;
+	virtual bool stop() = 0;
+	virtual double cpu() = 0;
+
+protected:
+	bool mIsOpen;						// An audio device is open
+	bool mIsRunning;					// An audio stream is running
+};
 
 /// Audio data to be sent to callback
 
@@ -112,10 +174,14 @@ class AudioBackend;
 class AudioIOData {
 public:
 	/// Constructor
-	AudioIOData(void * user);
+	AudioIOData(void * user, int backend = PortAudio);
 
 	virtual ~AudioIOData();
 
+	enum Backend{
+		PortAudio,
+		Dummy
+	};
 
 	/// Iterate frame counter, returning true while more frames
 	bool operator()() const { return (++mFrame)<framesPerBuffer(); }
@@ -224,10 +290,11 @@ public:
 	/// @param[in] inChans			Number of input channels to open
 	/// If the number of input or output channels is greater than the device
 	/// supports, virtual buffers will be created.
-	AudioIO(
-		int framesPerBuf=64, double framesPerSec=44100.0,
-		void (* callback)(AudioIOData &) = 0, void * userData = 0,
-		int outChans = 2, int inChans = 0 );
+	AudioIO(int framesPerBuf=64, double framesPerSec=44100.0,
+			void (* callback)(AudioIOData &) = 0, void * userData = 0,
+			int outChans = 2, int inChans = 0,
+			int backend = PortAudio
+			);
 
 	virtual ~AudioIO();
 
