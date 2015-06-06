@@ -65,28 +65,38 @@ public:
 	};
 
 	/// @param[in] deviceNum	Device enumeration number
-	AudioDeviceInfo(int deviceNum) {}
+	AudioDeviceInfo(int deviceNum) : mID(-1){}
 	
 	/// @param[in] nameKeyword	Keyword to search for in device name
 	/// @param[in] stream		Whether to search for input and/or output devices
-	AudioDeviceInfo(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT)) {}
+	AudioDeviceInfo(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT)) : mID(-1) {}
 
 //	~AudioDeviceInfo() = 0;
 
-	virtual bool valid() const = 0;	///< Returns whether device is valid
-	virtual int id() const = 0;			///< Get device unique ID
-	virtual const char * name() const = 0;				///< Get device name
-	virtual int channelsInMax() const = 0;				///< Get maximum number of input channels supported
-	virtual int channelsOutMax() const = 0;				///< Get maximum number of output channels supported
-	virtual double defaultSampleRate() const = 0;		///< Get default sample rate
+	virtual bool valid() const;						///< Returns whether device is valid
+	virtual int id() const;							///< Get device unique ID
+	virtual const char * name() const;				///< Get device name
+	virtual int channelsInMax() const;				///< Get maximum number of input channels supported
+	virtual int channelsOutMax() const;				///< Get maximum number of output channels supported
+	virtual double defaultSampleRate() const;		///< Get default sample rate
+
+	virtual void setID(int iD);						///< Sets unique ID
+	virtual void setName(char *name);				///< Sets device name
+	virtual void setChannelsInMax(int num);			///< Sets maximum number of Input channels supported
+	virtual void setChannelsOutMax(int num);		///< Sets maximum number of Output channels supported
+	virtual void setDefaultSampleRate(double rate);	///< Sets default sample rate
+
+	virtual bool hasInput() const = 0;				///< Returns whether device has input
+	virtual bool hasOutput() const = 0;				///< Returns whether device has output
 	
-	virtual bool hasInput() const = 0;					///< Returns whether device has input
-	virtual bool hasOutput() const = 0;					///< Returns whether device has output
-	
-	virtual void print() const = 0;						///< Prints info about specific i/o device to stdout
+	virtual void print() const = 0;					///< Prints info about specific i/o device to stdout
 
 protected:
-
+	int mID;
+	char mName[128];
+	int mChannelsInMax;
+	int mChannelsOutMax;
+	double mDefaultSampleRate;
 };
 
 inline AudioDeviceInfo::StreamMode operator| (const AudioDeviceInfo::StreamMode& a, const AudioDeviceInfo::StreamMode& b){
@@ -103,15 +113,7 @@ public:
 	/// @param[in] stream		Whether to search for input and/or output devices
 	AudioDevice(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT));
 
-//	~AudioDevice();
-
-	virtual bool valid() const { return 0!=mImpl; }	///< Returns whether device is valid
-	virtual int id() const { return mID; }			///< Get device unique ID
-	virtual const char * name() const;				///< Get device name
-	virtual int channelsInMax() const;				///< Get maximum number of input channels supported
-	virtual int channelsOutMax() const;				///< Get maximum number of output channels supported
-	virtual double defaultSampleRate() const;		///< Get default sample rate
-
+	virtual bool valid() const;
 	virtual bool hasInput() const;					///< Returns whether device has input
 	virtual bool hasOutput() const;					///< Returns whether device has output
 
@@ -126,7 +128,6 @@ public:
 protected:
 	void setImpl(int deviceNum);
 	static void initDevices();
-	int mID;
 	const void * mImpl;
 };
 
@@ -236,8 +237,6 @@ public:
 	int channelsIn () const;			///< Get effective number of input channels
 	int channelsOut() const;			///< Get effective number of output channels
 	int channelsBus() const;			///< Get number of allocated bus channels
-	int channelsInDevice() const;		///< Get number of channels opened on input device
-	int channelsOutDevice() const;		///< Get number of channels opened on output device
 	int framesPerBuffer() const;		///< Get frames/buffer of audio I/O stream
 	double framesPerSecond() const;		///< Get frames/second of audio I/O streams
 	double fps() const { return framesPerSecond(); }
@@ -288,11 +287,14 @@ public:
 	/// @param[in] userData			Pointer to user data accessible within callback (optional)
 	/// @param[in] outChans			Number of output channels to open
 	/// @param[in] inChans			Number of input channels to open
+	/// @param[in] devNum			ID of the device to open. -1 Uses default device.
+	/// @param[in] backend			Audio backend to use
 	/// If the number of input or output channels is greater than the device
 	/// supports, virtual buffers will be created.
 	AudioIO(int framesPerBuf=64, double framesPerSec=44100.0,
 			void (* callback)(AudioIOData &) = 0, void * userData = 0,
 			int outChans = 2, int inChans = 0,
+			int devNum = -1,
 			int backend = PortAudio
 			);
 
@@ -336,6 +338,8 @@ public:
 
 	void channelsIn(int n){channels(n,false);}	///< Set number of input channels
 	void channelsOut(int n){channels(n,true);}	///< Set number of output channels
+	int channelsInDevice() const;				///< Get number of channels opened on input device
+	int channelsOutDevice() const;				///< Get number of channels opened on output device
 	void channelsBus(int num);					///< Set number of bus channels
 	void clipOut(bool v){ mClipOut=v; }			///< Set whether to clip output between -1 and 1
 	void device(const AudioDevice& v);			///< Set input/output device (must be duplex)	
