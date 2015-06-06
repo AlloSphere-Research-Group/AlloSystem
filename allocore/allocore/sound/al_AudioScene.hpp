@@ -56,7 +56,7 @@
 #include "allocore/io/al_AudioIO.hpp"
 #include "allocore/sound/al_Speaker.hpp"
 #include "allocore/sound/al_Reverb.hpp"
-#include "allocore/sound/al_Biquad.h"
+#include "allocore/sound/al_Biquad.hpp"
 
 namespace al{
     

@@ -24,7 +24,7 @@ public:
             printf("Stereo Panner Compiled with %d speakers\n", numSpeakers);
         }
         else
-            printf("Stereo Panner Requires exactly 2 speakers, no panning will occur!\n", numSpeakers);
+			printf("Stereo Panner Requires exactly 2 speakers (%i used), no panning will occur!\n", numSpeakers);
 	}
 	
 #if !ALLOCORE_GENERIC_AUDIOSCENE

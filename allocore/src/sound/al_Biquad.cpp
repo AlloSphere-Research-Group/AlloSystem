@@ -5,7 +5,7 @@
 //  Created by Ryan McGee on 5/8/15.
 //
 //
-#include "al_Biquad.h"
+#include "allocore/sound/al_Biquad.hpp"
 #include <stdlib.h>
 #include <cmath>
 
