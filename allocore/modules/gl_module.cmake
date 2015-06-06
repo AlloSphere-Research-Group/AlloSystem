@@ -18,6 +18,7 @@ set(GL_HEADERS
     allocore/graphics/al_Texture.hpp
     allocore/io/al_App.hpp
     allocore/io/al_ControlNav.hpp
+    allocore/io/al_RenderToDisk.hpp
     allocore/io/al_Window.hpp
 )
 
@@ -37,6 +38,7 @@ list(APPEND ALLOCORE_SRC
   src/graphics/al_Stereographic.cpp
   src/graphics/al_Texture.cpp
   src/io/al_App.cpp
+  src/io/al_RenderToDisk.cpp
   src/io/al_Window.cpp)
 
 # TODO empty  allocore/graphics/al_Slab.hpp, remove?

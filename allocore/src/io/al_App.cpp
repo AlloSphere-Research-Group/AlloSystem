@@ -4,6 +4,12 @@
 namespace al{
 //______________________________________________________________________________
 
+Frustumd Viewpoint::frustum() const {
+	Frustumd fr;
+	lens().frustum(fr, worldTransform(), viewport().aspect());
+	return fr;
+}
+
 void Viewpoint::onParentResize(int w, int h){
 	mViewport.l = w * anchorX();
 	mViewport.b = h * anchorY();
@@ -38,12 +44,114 @@ ViewpointWindow& ViewpointWindow::add(Viewpoint& v){
 
 //______________________________________________________________________________
 
+struct SceneInputHandler : public InputEventHandler{
+	ViewpointWindow& win;
+	App& app;
+
+	SceneInputHandler(ViewpointWindow& w, App& a): win(w), app(a){}
+
+	bool onKeyDown(const Keyboard& k){
+		app.onKeyDown(win, k);
+		switch(k.key()){
+			case Keyboard::TAB:
+				app.stereo().stereo(!app.stereo().stereo());
+				return false;
+			default:;
+		}
+		return true;
+	}
+	bool onKeyUp(const Keyboard& k){ app.onKeyUp(win,k); return true;}
+	bool onMouseDown(const Mouse& m){ app.onMouseDown(win,m); return true;}
+	bool onMouseUp(const Mouse& m){ app.onMouseUp(win,m); return true;}
+	bool onMouseDrag(const Mouse& m){ app.onMouseDrag(win,m); return true;}
+	bool onMouseMove(const Mouse& m){ app.onMouseMove(win,m); return true;}
+};
+
+// attached to each ViewpointWindow
+struct SceneWindowHandler : public WindowEventHandler{
+	ViewpointWindow& win;
+	App& app;
+
+	SceneWindowHandler(ViewpointWindow& w, App& a): win(w), app(a){}
+
+	bool onCreate(){
+
+		// Enable color material to simplify cases where materials are not used 
+		// explicitly (e.g., only mesh colors are used).
+		glEnable(GL_COLOR_MATERIAL);
+		glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+
+		app.onCreate(win);
+		return true;
+	}
+	bool onDestroy(){ app.onDestroy(win); return true; }
+	bool onResize(int dw, int dh){ app.onResize(win, dw,dh); return true; }
+
+	virtual bool onFrame();
+};
+
+bool SceneWindowHandler::onFrame(){
+
+	if(app.clockNav() == &win){
+		app.nav().smooth(0.8);
+		app.nav().step();
+	}
+
+	app.navDraw() = app.nav();
+	app.navDraw().quat().normalize();
+
+	if(app.clockAnimate() == &win){
+		app.onAnimate(win.spfActual());
+	}
+
+	Graphics& g = app.graphics();
+	g.depthTesting(true);
+
+	struct DrawFunc : public Drawable {
+		App& app;
+		Viewpoint& vp;
+
+		DrawFunc(App& a, Viewpoint& v)
+		:	app(a), vp(v){}
+
+		void onDraw(Graphics& g){
+			g.pushMatrix(g.MODELVIEW);
+			app.onDraw(g,vp);
+			g.popMatrix(g.MODELVIEW);
+		}
+	};
+
+	ViewpointWindow::Viewpoints::const_iterator iv = win.viewpoints().begin();
+
+	// Draw scene for each viewpoint (pose + viewport)
+	for(; iv != win.viewpoints().end(); ++iv){
+		Viewpoint& vp = *(*iv);
+
+		// if no camera, set to default scene camera
+		if(!vp.hasLens()) vp.lens(app.lens());
+		const Lens& lens = vp.lens();
+
+		Color defaultClearColor = app.stereo().clearColor();
+		if(!vp.hasClearColor()){
+			vp.clearColor(const_cast<Color&>(app.stereo().clearColor()));
+		}
+		else{
+			app.stereo().clearColor(vp.clearColor());
+		}
+
+		DrawFunc drawFunc(app, vp);
+		app.stereo().draw(g, lens, vp.worldTransform(), vp.viewport(), drawFunc);
+		app.stereo().clearColor(defaultClearColor);
+	}
+	return true;
+}
+
+
 App::App()
 :	mName(""),
 	mNavControl(mNav),
 	mClockAnimate(0), mClockNav(0)
-{
-}
+{}
 
 
 App::~App(){
@@ -132,6 +240,7 @@ ViewpointWindow * App::initWindow(
 
 
 App& App::add(ViewpointWindow& win){
+
 	win.append(mNavControl);
 	win.append(*new SceneWindowHandler(win, *this));
 	win.append(*new SceneInputHandler(win, *this));
@@ -206,6 +315,14 @@ void App::start(){
 }
 
 
+void App::sendHandshake(){
+	oscSend().send("/handshake", name(), oscRecv().port());
+}
+
+void App::sendDisconnect(){
+	oscSend().send("/disconnectApplication", name());
+}
+
 bool App::usingAudio() const {
 	return audioIO().callback == AppAudioCB;
 }
@@ -229,61 +346,6 @@ Rayd App::getPickRay(const ViewpointWindow& w, int screenX, int screenY){
   r.direction().normalize();
   return r;
 }
-
-
-bool App::SceneWindowHandler::onFrame(){
-
-	if(app.clockNav() == &win){
-		app.nav().smooth(0.8);
-		app.nav().step();
-	}
-
-	app.navDraw() = app.nav();
-	app.navDraw().quat().normalize();
-
-	if(app.clockAnimate() == &win){
-		app.onAnimate(win.spfActual());
-	}
-
-	Graphics& g = app.graphics();
-	g.depthTesting(true);
-
-	struct DrawFunc : public Drawable {
-		App& app;
-		Viewpoint& vp;
-		DrawFunc(App& a, Viewpoint& v)
-			:	app(a), vp(v){}
-		virtual void onDraw(Graphics& g){
-			g.pushMatrix(g.MODELVIEW);
-			app.onDraw(g,vp);
-			g.popMatrix(g.MODELVIEW);
-		}
-	};
-
-	ViewpointWindow::Viewpoints::const_iterator iv = win.viewpoints().begin();
-
-	for(; iv != win.viewpoints().end(); ++iv){
-		Viewpoint& vp = *(*iv);
-
-		// if no camera, set to default scene camera
-		if(!vp.hasLens()) vp.lens(app.lens());
-		const Lens& lens = vp.lens();
-
-		Color defaultClearColor = app.stereo().clearColor();
-		if(!vp.hasClearColor()){
-			vp.clearColor(const_cast<Color&>(app.stereo().clearColor()));
-		}
-		else{
-			app.stereo().clearColor(vp.clearColor());
-		}
-
-		DrawFunc drawFunc(app, vp);
-		app.stereo().draw(g, lens, vp.worldTransform(), vp.viewport(), drawFunc);
-		app.stereo().clearColor(defaultClearColor);
-	}
-	return true;
-}
-
 
 
 //class Clocked{

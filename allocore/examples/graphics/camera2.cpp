@@ -25,8 +25,6 @@ struct MyWindow : public Window, public Drawable {
 		add(new NavInputControl(nav));
 
 		// create some shapes to draw
-		shapes.primitive(gl.TRIANGLES);
-
 		for(int j=0; j<1000; ++j){
 			int Nv = addCube(shapes);
 

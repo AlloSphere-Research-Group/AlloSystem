@@ -144,7 +144,7 @@ public:
 		}
 	}
 
-	void onDraw(Graphics& g, const Viewpoint& v){
+	void onDraw(Graphics& g){
 		g.nicest();
 		g.stroke(8);
 		g.draw(heads);
@@ -154,7 +154,7 @@ public:
 		g.draw(box);
 	}
 
-	void onKeyDown(const ViewpointWindow& w, const Keyboard& k){
+	void onKeyDown(const Keyboard& k){
 		switch(k.key()){
 		case 'r': resetBoids(); break;
 		}

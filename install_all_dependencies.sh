@@ -29,25 +29,30 @@ is_callback(){
   type "$1" 2>/dev/null | grep -i 'function' >/dev/null 2>&1;
 }
 
+# package_manager: used to pick correct dependency lists and callbacks.
 
 if binary_exists 'apt-get'; then
   package_manager='apt'
-  installer="sudo apt-get update && sudo apt-get install"
+  sudo apt-get update
+  installer="sudo apt-get install"
 
 # Homebrew is the preferred Mac package manager of the AlloTeam.
 elif binary_exists 'brew'; then
   package_manager='brew'
-  installer="brew update && brew install"
+  brew update
+  installer="brew install"
 elif binary_exists 'port'; then
-	package_manager='port'
-  installer="sudo port selfupdate && sudo port install"
+  package_manager='port'
+  sudo port selfupdate
+  installer="sudo port install"
 
 # Only MSYS2 is supported on Windows due to the presence of a package manager.
 elif uname | grep 'MINGW' > /dev/null 2>&1; then
-	if binary_exists 'pacman'; then
-		package_manager='pacman'
+  if binary_exists 'pacman'; then
+    package_manager='pacman'
     arch="$(uname -m)"
-    installer='pacman -Syy'
+    pacman -Syy
+    installer='pacman -S'
   fi
 else
 	echo 'Error: No suitable package manager found.'

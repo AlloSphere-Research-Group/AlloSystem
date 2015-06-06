@@ -25,7 +25,7 @@ public:
 		window().displayMode(window().displayMode() | Window::MULTISAMPLE);
 	}
 
-	virtual void onAnimate(double dt){
+	void onAnimate(double dt){
 
 		for(int i=0; i<4; ++i){
 			Vec3f p;
@@ -52,7 +52,7 @@ public:
 		}
 	}
 
-	virtual void onDraw(Graphics& g, const Viewpoint& v){
+	void onDraw(Graphics& g){
 		g.draw(vert);
 	}
 };

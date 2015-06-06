@@ -1,0 +1,8 @@
+# openni dependencies.
+
+# brew note: may need to tap homebrew/science
+
+openni_brew="openni \
+            sensor-kinect \
+            nite"
+            

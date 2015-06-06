@@ -28,7 +28,7 @@ void Mesh::decompress(){
 		#define DECOMPRESS(buf, Type)\
 		{\
 			int N = buf.size();\
-			if(N){\
+			if(N > 1){\
 				std::vector<Type> old(N);\
 				std::copy(&buf[0], (&buf[0]) + N, old.begin());\
 				buf.size(Ni);\
@@ -37,7 +37,7 @@ void Mesh::decompress(){
 		}
 		DECOMPRESS(vertices(), Vertex)
 		DECOMPRESS(colors(), Color)
-		DECOMPRESS(coloris(), Color)
+		DECOMPRESS(coloris(), Colori)
 		DECOMPRESS(normals(), Normal)
 		DECOMPRESS(texCoord2s(), TexCoord2)
 		DECOMPRESS(texCoord3s(), TexCoord3)
@@ -706,6 +706,16 @@ void Mesh::print(FILE * dst) const {
 	if(texCoord2s().size())	fprintf(dst, "%8d TexCoord2s\n", texCoord2s().size());
 	if(texCoord3s().size())	fprintf(dst, "%8d TexCoord3s\n", texCoord3s().size());
 	if(indices().size())	fprintf(dst, "%8d Indices\n", indices().size());
+
+	unsigned bytes	= vertices().size()*sizeof(Vertex)
+					+ colors().size()*sizeof(Color)
+					+ coloris().size()*sizeof(Colori)
+					+ normals().size()*sizeof(Normal)
+					+ texCoord2s().size()*sizeof(TexCoord2)
+					+ texCoord3s().size()*sizeof(TexCoord3)
+					+ indices().size()*sizeof(Index)
+					;
+	fprintf(dst, "%8d bytes (%.1f kB)\n", bytes, double(bytes)/1000);
 }
 
 } // al::

@@ -10,8 +10,14 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   endif((CMAKE_COMPILER_IS_GNUCC) OR (CMAKE_COMPILER_IS_GNUXX))
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
-set(BUILD_GAMMA 1 CACHE STRING "Try to build external Gamma")
-set(BUILD_GLV 1 CACHE STRING "Try to build external GLV.")
+if(NOT DEFINED BUILD_GAMMA)
+  set(BUILD_GAMMA 1 CACHE STRING "Try to build external Gamma")
+endif(NOT DEFINED BUILD_GAMMA)
+
+if(NOT DEFINED BUILD_GLV)
+  set(BUILD_GLV 1 CACHE STRING "Try to build external GLV.")
+endif(NOT DEFINED BUILD_GLV)
+
 set(BUILD_EXAMPLES 0 CACHE STRING "Build AlloSystem examples.")
 
 # External dependencies (Gamma and GLV)
@@ -22,11 +28,11 @@ include(cmake_modules/make_dep.cmake)
 if(BUILD_GAMMA AND NOT GAMMA_LIBRARY)
     make_dep(Gamma)
     set(GAMMA_LIBRARY ${Gamma_LIBRARY})
-endif(BUILD_GAMMA)
+endif(BUILD_GAMMA AND NOT GAMMA_LIBRARY)
 
 if(BUILD_GLV AND NOT GLV_LIBRARY)
     make_dep(GLV)
-endif(BUILD_GLV)
+endif(BUILD_GLV AND NOT GLV_LIBRARY)
 
 # Allocore --------------------------------
 add_subdirectory(allocore)
