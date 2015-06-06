@@ -1,8 +1,8 @@
 #include <algorithm>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>		/* memset() */
-#include <math.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>		/* memset() */
+#include <cmath>
 #include <cassert>
 
 #include "portaudio.h"
@@ -473,20 +473,12 @@ void AudioDevice::printAll(){
 
 // -----------------------------------------------------
 
-AudioIOData::AudioIOData(void * userData, int backend)
-:	mUser(userData),
+AudioIOData::AudioIOData(void * userData)
+:	mImpl(NULL), mUser(userData),
 	mFramesPerBuffer(0), mFramesPerSecond(0),
 	mBufI(0), mBufO(0), mBufB(0), mBufT(0), mNumI(0), mNumO(0), mNumB(0),
 	mGain(1), mGainPrev(1)
 {
-	switch(backend) {
-	case PortAudio:
-		mImpl = new PortAudioBackend;
-		break;
-	case Dummy:
-		mImpl = new DummyAudioBackend;
-		break;
-	}
 }
 
 AudioIOData::~AudioIOData(){
@@ -494,7 +486,6 @@ AudioIOData::~AudioIOData(){
 	deleteBuf(mBufO);
 	deleteBuf(mBufB);
 	deleteBuf(mBufT);
-	delete mImpl;
 }
 
 void AudioIOData::zeroBus(){ zero(mBufB, framesPerBuffer() * mNumB); }
@@ -505,7 +496,10 @@ int AudioIOData::channelsOut() const { return mNumO; }
 int AudioIOData::channelsBus() const { return mNumB; }
 
 double AudioIOData::framesPerSecond() const { return mFramesPerSecond; }
-double AudioIOData::time() const { return mImpl->time(); }
+double AudioIOData::time() const {
+	assert(mImpl);
+	return mImpl->time();
+}
 double AudioIOData::time(int frame) const { return (double)frame / framesPerSecond() + time(); }
 int AudioIOData::framesPerBuffer() const { return mFramesPerBuffer; }
 double AudioIOData::secondsPerBuffer() const { return (double)framesPerBuffer() / framesPerSecond(); }
@@ -514,13 +508,21 @@ double AudioIOData::secondsPerBuffer() const { return (double)framesPerBuffer() 
 //==============================================================================
 
 AudioIO::AudioIO(int framesPerBuf, double framesPerSec, void (* callbackA)(AudioIOData &), void * userData,
-	int outChansA, int inChansA, int backend)
+	int outChansA, int inChansA, int numOutputChannels, int numInputChannels, int backend)
 :	AudioIOData(userData),
 	callback(callbackA),
 	mInDevice(AudioDevice::defaultInput()), mOutDevice(AudioDevice::defaultOutput()),
 	mZeroNANs(true), mClipOut(true), mAutoZeroOut(true)
 {
-	init();
+	switch(backend) {
+	case PortAudio:
+		mImpl = new PortAudioBackend;
+		break;
+	case Dummy:
+		mImpl = new DummyAudioBackend;
+		break;
+	}
+	init(numOutputChannels, numInputChannels);
 	this->framesPerBuffer(framesPerBuf);
 	channels(inChansA, false);
 	channels(outChansA, true);
@@ -530,18 +532,24 @@ AudioIO::AudioIO(int framesPerBuf, double framesPerSec, void (* callbackA)(Audio
 
 AudioIO::~AudioIO(){
 	close();
+	delete mImpl;
 }
 
 
-void AudioIO::init(){
+void AudioIO::init(int outChannels, int inChannels){
 
 	// Choose default devices for now...
-	deviceIn(AudioDevice::defaultInput());
-	deviceOut(AudioDevice::defaultOutput());
+	if (inChannels < 0) {
+		deviceIn(AudioDevice::defaultInput());
+	} else {
+		deviceIn(inChannels);
+	}
+	if (outChannels < 0) {
+		deviceOut(AudioDevice::defaultOutput());
+	} else {
+		deviceOut(outChannels);
+	}
 
-//	inDevice(defaultInDevice());
-//	outDevice(defaultOutDevice());
-//
 //	// Setup input stream parameters
 //	const PaDeviceInfo * dInfo = Pa_GetDeviceInfo(mInParams.device);
 //	if(dInfo) mInParams.suggestedLatency = dInfo->defaultLowInputLatency; // for RT

@@ -175,7 +175,7 @@ protected:
 class AudioIOData {
 public:
 	/// Constructor
-	AudioIOData(void * user, int backend = PortAudio);
+	AudioIOData(void * user);
 
 	virtual ~AudioIOData();
 
@@ -294,7 +294,7 @@ public:
 	AudioIO(int framesPerBuf=64, double framesPerSec=44100.0,
 			void (* callback)(AudioIOData &) = 0, void * userData = 0,
 			int outChans = 2, int inChans = 0,
-			int devNum = -1,
+			int numOutChannels = -1, int numInChannels = -1,
 			int backend = PortAudio
 			);
 
@@ -360,7 +360,7 @@ private:
 	bool mAutoZeroOut;		// whether to automatically zero output buffers each block
 	std::vector<AudioCallback *> mAudioCallbacks;
 
-	void init();			//
+	void init(int outChannels, int inChannels);			//
 	void reopen();			// reopen stream (restarts stream if needed)
 	void resizeBuffer(bool forOutput);
 };
