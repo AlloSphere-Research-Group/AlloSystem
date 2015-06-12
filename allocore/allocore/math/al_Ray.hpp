@@ -96,7 +96,7 @@ public:
 		return intersectSphere(cen,radius) > 0.;
 	}
 
-	bool intersectsBox(Vec<3,T> cen, Vec<3,T> scl, float t0=0f, float t1 = 9e9){
+	bool intersectsBox(Vec<3,T> cen, Vec<3,T> scl, float t0=0.f, float t1 = 9e9){
 		// courtesy of http://www.cs.utah.edu/~awilliam/box/
 	  float tmin, tmax, tymin, tymax, tzmin, tzmax;
 
