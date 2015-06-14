@@ -184,10 +184,11 @@ bool Window::implCreate(){
 	if(mDisplayMode & STENCIL_BUF){	attribs[i++] = NSOpenGLPFAStencilSize;
 									attribs[i++] = 8; }
 	if(mDisplayMode & MULTISAMPLE){	attribs[i++] = NSOpenGLPFAMultisample;
+									//attribs[i++] = NSOpenGLPFASupersample; // appears identical to NSOpenGLPFAMultisample
 									attribs[i++] = NSOpenGLPFASampleBuffers;
 									attribs[i++] = 1;
 									attribs[i++] = NSOpenGLPFASamples;
-									attribs[i++] = 4;
+									attribs[i++] = 4; // Note: GLUT seems to use 2 here
 									attribs[i++] = NSOpenGLPFASampleAlpha; }
 	attribs[i] = 0;
 
@@ -416,6 +417,8 @@ Window& Window::show(){
 
 - (void) fullScreen:(BOOL)whether
 {
+	// Fullscreen animation is rather annoying, so maybe look into other methods?
+	// http://cocoadev.com/ImplementingFullScreen
 	[win toggleFullScreen:nil];
 
 	//printf("fullscreen %d\n", (([win styleMask] & NSFullScreenWindowMask) == NSFullScreenWindowMask));
