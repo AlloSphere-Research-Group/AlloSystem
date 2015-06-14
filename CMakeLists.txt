@@ -27,11 +27,13 @@ include(cmake_modules/make_dep.cmake)
 
 if(BUILD_GAMMA AND NOT GAMMA_LIBRARY)
     make_dep(Gamma)
-    set(GAMMA_LIBRARY ${Gamma_LIBRARY})
+#    set(GAMMA_LIBRARY ${Gamma_LIBRARY})
 endif(BUILD_GAMMA AND NOT GAMMA_LIBRARY)
 
 if(BUILD_GLV AND NOT GLV_LIBRARY)
     make_dep(GLV)
+	message(STATUS "Using GLV from: ${GLV_LIBRARY}.")
+	message(STATUS "GLV headers: ${GLV_INCLUDE_DIR}.")
 endif(BUILD_GLV AND NOT GLV_LIBRARY)
 
 # Allocore --------------------------------
@@ -39,9 +41,9 @@ add_subdirectory(allocore)
 get_target_property(ALLOCORE_LIBRARY "allocore${DEBUG_SUFFIX}" LOCATION)
 get_target_property(ALLOCORE_DEP_INCLUDE_DIR "allocore${DEBUG_SUFFIX}" ALLOCORE_DEP_INCLUDE_DIR)
 get_target_property(ALLOCORE_LINK_LIBRARIES "allocore${DEBUG_SUFFIX}" ALLOCORE_LINK_LIBRARIES)
-if(BUILDING_Gamma)
+if(BUILDING_GAMMA)
   add_dependencies("allocore${DEBUG_SUFFIX}" Gamma)
-endif(BUILDING_Gamma)
+endif(BUILDING_GAMMA)
 
 # Alloutil ----------------------------------
 add_subdirectory(alloutil)
