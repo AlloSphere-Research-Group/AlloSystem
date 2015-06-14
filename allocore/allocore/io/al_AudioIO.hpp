@@ -54,9 +54,8 @@ class AudioIOData;
 /// Audio callback type
 typedef void (* audioCallback)(AudioIOData& io);
 
-
 /// Audio device abstraction
-class AudioDevice{
+class AudioDeviceInfo{
 public:
 
 	/// Stream mode
@@ -65,45 +64,109 @@ public:
 		OUTPUT	= 2		/**< Output stream */
 	};
 
+	/// @param[in] deviceNum	Device enumeration number
+	AudioDeviceInfo(int deviceNum) : mID(deviceNum){}
+	
+//	/// @param[in] nameKeyword	Keyword to search for in device name
+//	/// @param[in] stream		Whether to search for input and/or output devices
+//	AudioDeviceInfo(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT)) : mID(-1) {}
+
+//	~AudioDeviceInfo() = 0;
+
+	virtual bool valid() const;						///< Returns whether device is valid
+	virtual int id() const;							///< Get device unique ID
+	virtual const char * name() const;				///< Get device name
+	virtual int channelsInMax() const;				///< Get maximum number of input channels supported
+	virtual int channelsOutMax() const;				///< Get maximum number of output channels supported
+	virtual double defaultSampleRate() const;		///< Get default sample rate
+
+	virtual void setID(int iD);						///< Sets unique ID
+	virtual void setName(char *name);				///< Sets device name
+	virtual void setChannelsInMax(int num);			///< Sets maximum number of Input channels supported
+	virtual void setChannelsOutMax(int num);		///< Sets maximum number of Output channels supported
+	virtual void setDefaultSampleRate(double rate);	///< Sets default sample rate
+
+	virtual bool hasInput() const = 0;				///< Returns whether device has input
+	virtual bool hasOutput() const = 0;				///< Returns whether device has output
+	
+	virtual void print() const = 0;					///< Prints info about specific i/o device to stdout
+
+protected:
+	int mID;
+	char mName[128];
+	int mChannelsInMax;
+	int mChannelsOutMax;
+	double mDefaultSampleRate;
+};
+
+inline AudioDeviceInfo::StreamMode operator| (const AudioDeviceInfo::StreamMode& a, const AudioDeviceInfo::StreamMode& b){
+	return static_cast<AudioDeviceInfo::StreamMode>(+a|+b);
+}
+
+class AudioDevice: public AudioDeviceInfo {
+public:
 
 	/// @param[in] deviceNum	Device enumeration number
-	AudioDevice(int deviceNum);
+	AudioDevice(int deviceNum = -1 );
 
 	/// @param[in] nameKeyword	Keyword to search for in device name
 	/// @param[in] stream		Whether to search for input and/or output devices
 	AudioDevice(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT));
 
-	~AudioDevice();
+	virtual bool valid() const;
+	virtual bool hasInput() const;					///< Returns whether device has input
+	virtual bool hasOutput() const;					///< Returns whether device has output
 
-	bool valid() const { return 0!=mImpl; }	///< Returns whether device is valid
-	int id() const { return mID; }			///< Get device unique ID
-	const char * name() const;				///< Get device name
-	int channelsInMax() const;				///< Get maximum number of input channels supported
-	int channelsOutMax() const;				///< Get maximum number of output channels supported
-	double defaultSampleRate() const;		///< Get default sample rate
+	virtual void print() const;						///< Prints info about specific i/o device to stdout
 
-	bool hasInput() const;					///< Returns whether device has input
-	bool hasOutput() const;					///< Returns whether device has output
-
-	void print() const;						///< Prints info about specific i/o device to stdout
-
+	// TODO: these should be removed from here and moved to AudioBackend
 	static AudioDevice defaultInput();		///< Get system's default input device
 	static AudioDevice defaultOutput();		///< Get system's default output device
 	static int numDevices();				///< Returns number of audio i/o devices available
 	static void printAll();					///< Prints info about all available i/o devices to stdout
 
-private:
+protected:
 	void setImpl(int deviceNum);
 	static void initDevices();
-	int mID;
 	const void * mImpl;
 };
 
-inline AudioDevice::StreamMode operator| (const AudioDevice::StreamMode& a, const AudioDevice::StreamMode& b){
-	return static_cast<AudioDevice::StreamMode>(+a|+b);
-}
+class AudioBackend{
+public:
+	AudioBackend(): mIsOpen(false), mIsRunning(false){}
 
+	virtual bool isOpen() const = 0;
+	virtual bool isRunning() const = 0;
+	virtual bool error() const = 0;
 
+	virtual void printError(const char * text = "") const = 0;
+	virtual void printInfo() const = 0;
+
+	virtual bool supportsFPS(double fps) const = 0;
+
+	virtual void inDevice(int index) = 0;
+	virtual void outDevice(int index) = 0;
+
+	virtual int channels(int num, bool forOutput) = 0;
+
+	virtual int inDeviceChans() = 0;
+	virtual int outDeviceChans() = 0;
+	virtual void setInDeviceChans(int num) = 0;
+	virtual void setOutDeviceChans(int num) = 0;
+
+	virtual double time() = 0;
+
+	virtual bool open(int framesPerSecond, int framesPerBuffer, void *userdata) = 0;
+	virtual bool close() = 0;
+
+	virtual bool start(int framesPerSecond, int framesPerBuffer, void *userdata) = 0;
+	virtual bool stop() = 0;
+	virtual double cpu() = 0;
+
+protected:
+	bool mIsOpen;						// An audio device is open
+	bool mIsRunning;					// An audio stream is running
+};
 
 /// Audio data to be sent to callback
 
@@ -116,6 +179,10 @@ public:
 
 	virtual ~AudioIOData();
 
+	enum Backend{
+		PortAudio,
+		Dummy
+	};
 
 	/// Iterate frame counter, returning true while more frames
 	bool operator()() const { return (++mFrame)<framesPerBuffer(); }
@@ -170,8 +237,6 @@ public:
 	int channelsIn () const;			///< Get effective number of input channels
 	int channelsOut() const;			///< Get effective number of output channels
 	int channelsBus() const;			///< Get number of allocated bus channels
-	int channelsInDevice() const;		///< Get number of channels opened on input device
-	int channelsOutDevice() const;		///< Get number of channels opened on output device
 	int framesPerBuffer() const;		///< Get frames/buffer of audio I/O stream
 	double framesPerSecond() const;		///< Get frames/second of audio I/O streams
 	double fps() const { return framesPerSecond(); }
@@ -188,7 +253,7 @@ public:
 	bool usingGain() const { return mGain != 1.f || mGainPrev != 1.f; }
 
 protected:
-	class Impl; Impl * mImpl;
+	AudioBackend * mImpl;
 	void * mUser;					// User specified data
 	mutable int mFrame;
 	int mFramesPerBuffer;
@@ -222,12 +287,15 @@ public:
 	/// @param[in] userData			Pointer to user data accessible within callback (optional)
 	/// @param[in] outChans			Number of output channels to open
 	/// @param[in] inChans			Number of input channels to open
+	/// @param[in] devNum			ID of the device to open. -1 Uses default device.
+	/// @param[in] backend			Audio backend to use
 	/// If the number of input or output channels is greater than the device
 	/// supports, virtual buffers will be created.
-	AudioIO(
-		int framesPerBuf=64, double framesPerSec=44100.0,
-		void (* callback)(AudioIOData &) = 0, void * userData = 0,
-		int outChans = 2, int inChans = 0 );
+	AudioIO(int framesPerBuf=64, double framesPerSec=44100.0,
+			void (* callback)(AudioIOData &) = 0, void * userData = 0,
+			int outChans = 2, int inChans = 0,
+			int backend = PortAudio
+			);
 
 	virtual ~AudioIO();
 
@@ -269,6 +337,8 @@ public:
 
 	void channelsIn(int n){channels(n,false);}	///< Set number of input channels
 	void channelsOut(int n){channels(n,true);}	///< Set number of output channels
+	int channelsInDevice() const;				///< Get number of channels opened on input device
+	int channelsOutDevice() const;				///< Get number of channels opened on output device
 	void channelsBus(int num);					///< Set number of bus channels
 	void clipOut(bool v){ mClipOut=v; }			///< Set whether to clip output between -1 and 1
 	void device(const AudioDevice& v);			///< Set input/output device (must be duplex)
@@ -289,7 +359,7 @@ private:
 	bool mAutoZeroOut;		// whether to automatically zero output buffers each block
 	std::vector<AudioCallback *> mAudioCallbacks;
 
-	void init();			//
+	void init(int outChannels, int inChannels);			//
 	void reopen();			// reopen stream (restarts stream if needed)
 	void resizeBuffer(bool forOutput);
 };
