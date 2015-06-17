@@ -30,14 +30,9 @@ The build folder (typically `./build/`) is organized using a Unix-style hierarch
 	lib/			- Libraries
 
 
+2. Installing Dependencies
+==========================
 
-2. Compilation Instructions
-========================================
-
-*Note:* You can skip this section if you are just planning on running applications and projects. See section 3 below.
-
-2.1 Installing Dependencies
-----------------------------------------
 The only mandatory dependency for AlloSystem is CMake, which is the build system used.
 
 Other optional dependencies are:
@@ -61,8 +56,32 @@ AlloSystem provides cross-platform scripts to simplify downloading dependencies.
 
 This will download and install all of the AlloCore dependencies using APT, MacPorts, Homebrew, or building from source.
 
+3. Running examples and projects
+=======================
 
-2.2 Building AlloSystem libraries (Using Make on Linux and OS X, and MSYS on Windows)
+AlloSystem offers an easy way to try out examples and build simple projects without having to write makefiles or configure IDE projects. Any .cpp file placed within the AlloSystem sources can be built into an application with a line like:
+
+	./run.sh allocore/examples/graphics/shaderSprites.cpp
+
+This will also build any required dependencies and run CMake if needed.
+
+You can also pass a directory instead of a filename, and all the source files in that directory will be built into a single application (you must ensure that one and only one of those files has a *main()* function).
+
+You can make a debug build of the libraries and the application by running:
+
+	./run.sh -d allocore/examples/graphics/shaderSprites.cpp
+
+This will run the file in the debugger, so if the application crashes, it will drop you to the debugger shell. If you need to specify a particular debugger instead of the default `gdb`, adjust the *run.sh* script.
+
+A complete tutorial of AlloSystem can be found at [AlloSystem User Guide](http://mantaraya36.gitbooks.io/allosystem-user-guide/content/)
+
+
+4. Compilation Instructions
+========================================
+Compilation is done automatically when using the run script, but if you need AlloSystem as a library you can use these methods.
+
+
+4.1 Building AlloSystem libraries (Using Make on Linux and OS X, and MSYS on Windows)
 ----------------------------------------
 
 You need to use CMake to configure the build for your system. You can build AlloCore like this:
@@ -89,7 +108,7 @@ To produce a debug build:
 	cmake . -DCMAKE_BUILD_TYPE=Debug
 	make
 
-2.3 Building AlloSystem (XCode project)
+4.2 Building AlloSystem (XCode project)
 ----------------------------------------
 
 Do:
@@ -100,30 +119,13 @@ Do:
 
 You will be able to run examples and debug from Xcode
 
-2.4 Building Allosystem (Visual Studio project)
+4.3 Building Allosystem (Visual Studio project)
 ----------------------------------------
 
 Coming soon...
 
-3. Running examples and projects
-------
-
-AlloSystem offers an easy way to try out examples and build simple projects without having to write makefiles or configure IDE projects. Any .cpp file placed within the AlloSystem sources can be built into an application with a line like:
-
-    ./run.sh allocore/examples/graphics/shaderSprites.cpp
-
-This will also build any required dependencies and run CMake if needed.
-
-You can also pass a directory instead of a filename, and all the source files in that directory will be built into a single application (you must ensure that one and only one of those files has a *main()* function).
-
-You can make a debug build of the libraries and the application by running:
-
-    ./run.sh -d allocore/examples/graphics/shaderSprites.cpp
-
-This will run the file in the debugger, so if the application crashes, it will drop you to the debugger shell. If you need to specify a particular debugger instead of the default `gdb`, adjust the *run.sh* script.
-
-4. Installing Allosystem
-----------------------------------------
+5. Installing Allosystem
+========================
 
 You can install the AlloSystem libraries and headers, which will allow CMake AlloSystem projects to use it instead of having to include all the AlloSystem sources in your project.
 
@@ -145,9 +147,9 @@ License
 ======
 This project is licensed under the terms of the 3-clause BSD license.
 
-Copyright (C) 2009-2014. AlloSphere Research Group, Media Arts & Technology, UCSB.
+Copyright (C) 2009-2015. AlloSphere Research Group, Media Arts & Technology, UCSB.
 
-Copyright (C) 2009-2014. The Regents of the University of California.
+Copyright (C) 2009-2015. The Regents of the University of California.
 
 All rights reserved.
 
