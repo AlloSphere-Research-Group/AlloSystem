@@ -7,14 +7,12 @@ Developed by:
 University of California, Santa Barbara
 
 
-1. About
-========================================
+##1. About
 
 AlloSystem is a cross-platform suite of C++ components for building interactive multimedia tools and applications. It is organized into separate "allo" modules that can be compiled and linked to on a per need basis. The most important module, AlloCore, comprises core components that most other modules depend on, such as math utilities, system information, audio IO, and OpenGL-based windowing.
 
 
-1.1 Directory Structure
-----------------------------------------
+###1.1 Directory Structure
 
 AlloSystem modules are located in subdirectories beginning with "allo". Each module has the general directory layout:
 
@@ -27,11 +25,11 @@ AlloSystem modules are located in subdirectories beginning with "allo". Each mod
 The build folder (typically `./build/`) is organized using a Unix-style hierarchy as follows:
 
 	bin/			- Binary executables
+	include/		- Library header files
 	lib/			- Libraries
 
 
-2. Installing Dependencies
-==========================
+##2. Installing Dependencies
 
 The only mandatory dependency for AlloSystem is CMake, which is the build system used.
 
@@ -56,8 +54,7 @@ AlloSystem provides cross-platform scripts to simplify downloading dependencies.
 
 This will download and install all of the AlloCore dependencies using APT, MacPorts, Homebrew, or building from source.
 
-3. Running examples and projects
-=======================
+##3. Running examples and projects
 
 AlloSystem offers an easy way to try out examples and build simple projects without having to write makefiles or configure IDE projects. Any .cpp file placed within the AlloSystem sources can be built into an application with a line like:
 
@@ -73,16 +70,48 @@ You can make a debug build of the libraries and the application by running:
 
 This will run the file in the debugger, so if the application crashes, it will drop you to the debugger shell. If you need to specify a particular debugger instead of the default `gdb`, adjust the *run.sh* script.
 
+To build all files in a directory into a single application, just provide the directory to the run script:
+
+	./run.sh -d project/many_files_in_this_folder
+
+If you just want to build an executable without running it, then include the -n flag:
+
+	./run.sh -n allocore/examples/graphics/shaderSprites.cpp
+
+###3.1 Application dependencies and build flags
+
+If a file called *flags.cmake* is found in the source directory for the run script, the CMake commands found in it will be passed to the CMake build system. This enables writing any kind of build instructions and commands that are specific to the files on that folder, and can be used to specify the required information for additional dependencies like library paths and names, include directories. A *flags.txt* file that adds support for an additional library will look like: 
+
+	include_directories(/path/to/headers)
+	target_link_libraries("${APP_NAME}" libname)
+
+It can also be used to do platform specific actions, for example for setting compiler flags:
+
+	if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-deprecated-declarations")
+	else()
+	  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -stdlib=libc++ -Wno-deprecated-declarations")
+	endif()
+
+
+###3.2 Additional tips
+Note: If you are having trouble using tab autocompletion after the 'make' command, then it is likely that a completion rule has been defined elsewhere for make. You can disable this by adding to the bottom of your ~/.bashrc file
+
+	complete -r make
+
+which will restore the default autocompletion using the file system. If that still doesn't work, then you can try the command
+
+	sudo mv /usr/share/bash-completion/completions/make /usr/share/bash-completion/completions/make_disabled
+	
 A complete tutorial of AlloSystem can be found at [AlloSystem User Guide](http://mantaraya36.gitbooks.io/allosystem-user-guide/content/)
 
 
-4. Compilation Instructions
-========================================
+##4. Compilation Instructions
+
 Compilation is done automatically when using the run script, but if you need AlloSystem as a library you can use these methods.
 
 
-4.1 Building AlloSystem libraries (Using Make on Linux and OS X, and MSYS on Windows)
-----------------------------------------
+###4.1 Building AlloSystem libraries (Using Make on Linux and OS X, and MSYS on Windows)
 
 You need to use CMake to configure the build for your system. You can build AlloCore like this:
 
@@ -96,6 +125,24 @@ To build the AlloSystem libraries, you need to use CMake to configure the build 
 
 This will build all AlloSystem libraries in the `./build/lib` folder and the examples in the `./build/bin` folder.
 
+
+###4.2 Building AlloSystem (XCode project)
+
+Do:
+
+	./distclean
+	cmake . -GXcode
+	open AlloSystem.xcodeprj
+
+You will be able to run examples and debug from Xcode
+
+###4.3 Building Allosystem (Visual Studio project)
+
+Coming soon...
+
+
+###4.4 Various CMake Options
+
 If you want to build without examples:
 
 	./distclean
@@ -108,24 +155,18 @@ To produce a debug build:
 	cmake . -DCMAKE_BUILD_TYPE=Debug
 	make
 
-4.2 Building AlloSystem (XCode project)
-----------------------------------------
+The CMake build system for AlloSystem is setup to build everything it finds y default. When hard dependencies for a particular module are not met, the module will not be built. When optional dependencies are not found, the module will be built without support for that particular functionality. This will be reported in the console text, and if the functionality is used, this might result in a "header not found" error or a linker error.
 
-Do:
+You can also optionally force or disable building of external modules setting the following variables:
 
-	./distclean
-	cmake . -GXcode
-	open AlloSystem.xcodeprj
+* BUILD_GAMMA
+* BUILD_GLV
 
-You will be able to run examples and debug from Xcode
+like:
 
-4.3 Building Allosystem (Visual Studio project)
-----------------------------------------
+	cmake . -DBUILD_GAMMA=0
 
-Coming soon...
-
-5. Installing Allosystem
-========================
+##5. Installing Allosystem
 
 You can install the AlloSystem libraries and headers, which will allow CMake AlloSystem projects to use it instead of having to include all the AlloSystem sources in your project.
 
@@ -143,8 +184,8 @@ You can uninstall with:
 
 	xargs rm < install_manifest.txt
 
-License
-======
+##License
+
 This project is licensed under the terms of the 3-clause BSD license.
 
 Copyright (C) 2009-2015. AlloSphere Research Group, Media Arts & Technology, UCSB.
