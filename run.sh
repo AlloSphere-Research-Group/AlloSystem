@@ -11,13 +11,18 @@ fi
 # ------------------------------------------------
 # You shouldn't need to touch the stuff below.
 
+AUTORUN=1
+
 # Runs the program through the specified debugger if -d is passed.
 OPTIND=1
-while getopts "d" opt; do
+while getopts ":d:n" opt; do
     case "$opt" in
     d)  debugger="$DEBUGGER"
         shift
         ;;
+	n)  AUTORUN=0
+		shift
+		;;
     esac
 done
 
@@ -36,7 +41,11 @@ FILENAME=$(basename "$1" | sed 's/\.[^.]*$//')
 DIRNAME=$(dirname "$1")
 
 # Replace all forward slashes with underscores.
+if [ "$AUTORUN" = 0 ]; then
+TARGET=$(echo "${DIRNAME}_${FILENAME}" | sed 's/\//_/g')
+else
 TARGET=$(echo "${DIRNAME}_${FILENAME}_run" | sed 's/\//_/g')
+fi
 
 if [ "$DIRNAME" != "." ]; then
   # Replace all periods with underscores.
