@@ -95,7 +95,7 @@ else()
 endif()
 
 # Dependencies --------------------------------------------
-set(ALLOCORE_DEP_INCLUDE_DIRS ${CMAKE_SOURCE_DIR}/build/include)
+set(ALLOCORE_DEP_INCLUDE_DIRS ${BUILD_ROOT_DIR}/build/include)
 
 # System dependent libs
 # ---- OS X ----
@@ -148,17 +148,17 @@ include(modules/zeroconf_module.cmake)
 
 set(ALLOCORE_LIB "allocore${DEBUG_SUFFIX}")
 
-set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
+set(LIBRARY_OUTPUT_PATH ${BUILD_ROOT_DIR}/build/lib)
+set(EXECUTABLE_OUTPUT_PATH ${BUILD_ROOT_DIR}/build/bin)
 
 # Add headers to the list of source file so they appear in generated projects.
 add_library(${ALLOCORE_LIB} ${ALLOCORE_SRC} ${ALLOCORE_HEADERS})
 
-# Copy headers to build directory (only if directory does not exist)
+# Copy headers to build directory (only if header has changed)
 foreach(header ${ALLOCORE_HEADERS})
     execute_process(COMMAND ${CMAKE_COMMAND} -E
-                    copy_if_different ${header} ${CMAKE_SOURCE_DIR}/build/include/${header}
-                    WORKING_DIRECTORY  ${CMAKE_CURRENT_SOURCE_DIR})
+					copy_if_different "${header}" "${BUILD_ROOT_DIR}/build/include/${header}"
+					WORKING_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}")
 endforeach()
 
 # Write dummy headers
@@ -169,9 +169,9 @@ foreach(HEADER_INFO ${ALLOCORE_DUMMY_HEADERS})
     list(GET HEADER_PARTS 1 dependency) # Second element is dependency
 
     set(DUMMY_HEADER_TEXT "#error \"ERROR: Header not supported. Dependency '${dependency}' not met.\"\n")
-    file(WRITE "${CMAKE_SOURCE_DIR}/build/include/${header}" ${DUMMY_HEADER_TEXT})
+	file(WRITE "${BUILD_ROOT_DIR}/build/include/${header}" ${DUMMY_HEADER_TEXT})
     message("Writing dummy header: ${header} ---- Unmet dependency: ${dependency}")
-    list(APPEND ALLOCORE_HEADERS "${CMAKE_SOURCE_DIR}/build/include/${header}")
+	list(APPEND ALLOCORE_HEADERS "${BUILD_ROOT_DIR}/build/include/${header}")
 endforeach()
 
 # Export include directories and libraries for use when building AlloSystem or AlloProject
@@ -200,7 +200,7 @@ add_custom_target("doc"
 if(BUILD_EXAMPLES)
   set(EXAMPLE_DIRS av graphics io math simulation spatial system)
   foreach(dir ${EXAMPLE_DIRS})
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin/examples/${dir})
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_ROOT_DIR}/build/bin/examples/${dir})
     file(GLOB EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/${dir}/*.cpp)
     foreach(example ${EXAMPLE_FILES})
     if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/examples/${dir}/flags.txt)

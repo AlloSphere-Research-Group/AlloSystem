@@ -16,6 +16,7 @@ endif(NOT (GAMMA_FOUND OR GAMMA_LIBRARY))
 
 set(ALLOAUDIO_SRC
   src/al_OutputMaster.cpp
+  src/butter.c
 #  src/al_Decorrelation.cpp
   )
 
@@ -36,11 +37,12 @@ return()
 endif()
 # Build library ----------------------------------
 
+file(GLOB ALLOAUDIO_INSTALL_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} alloaudio/*.h*)
 set(ALLOAUDIO_LIBRARY "alloaudio${DEBUG_SUFFIX}")
-add_library(${ALLOAUDIO_LIBRARY} ${ALLOAUDIO_SRC} ${ALLOAUDIO_HEADERS})
+add_library(${ALLOAUDIO_LIBRARY} ${ALLOAUDIO_SRC} ${ALLOAUDIO_INSTALL_HEADERS})
 
 set(ALLOAUDIO_LINK_LIBRARIES ${ALLOCORE_LIBRARY})
-set(ALLOAUDIO_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
+set(ALLOAUDIO_DIRS ${BUILD_ROOT_DIR}/build/include)
 
 # export properties for AlloSystem
 set_target_properties(${ALLOAUDIO_LIBRARY}
@@ -57,8 +59,15 @@ target_link_libraries(${ALLOAUDIO_LIBRARY} ${ALLOAUDIO_LINK_LIBRARIES})
 
 add_dependencies(${ALLOAUDIO_LIBRARY} allocore${DEBUG_SUFFIX})
 
-set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
+set(LIBRARY_OUTPUT_PATH ${BUILD_ROOT_DIR}/build/lib)
+set(EXECUTABLE_OUTPUT_PATH ${BUILD_ROOT_DIR}/build/bin)
+
+# Copy headers to build directory (only if header has changed)
+foreach(header ${ALLOAUDIO_INSTALL_HEADERS})
+	execute_process(COMMAND ${CMAKE_COMMAND} -E
+					copy_if_different "${header}" "${BUILD_ROOT_DIR}/build/include/${header}"
+					WORKING_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}")
+endforeach()
 
 #message (STATUS "allocore_location for alloaudio == ${ALLOCORE_LIBRARY}")
 
@@ -67,7 +76,7 @@ if(BUILD_EXAMPLES)
     include_directories(${GAMMA_INCLUDE_DIR})
 
     file(GLOB EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/*.cpp)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin/examples/)
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_ROOT_DIR}/build/bin/examples/)
     foreach(example ${EXAMPLE_FILES})
       get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
       set(EXAMPLE_TARGET alloaudio_examples_${EXAMPLE_NAME})
@@ -93,8 +102,8 @@ if(BUILD_EXAMPLES)
 endif(BUILD_EXAMPLES)
 
 # installation
-install(DIRECTORY alloaudio/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include/alloaudio)
-install(TARGETS ${ALLOAUDIO_LIBRARY} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install(FILES ${ALLOAUDIO_INSTALL_HEADERS} DESTINATION "${CMAKE_INSTALL_PREFIX}/include")
+install(TARGETS ${ALLOAUDIO_LIBRARY} DESTINATION "${CMAKE_INSTALL_PREFIX}/lib")
 
 # Tests that depend on cunit
 find_library(CUNIT_LIBRARY cunit)

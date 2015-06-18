@@ -9,7 +9,8 @@ get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore${DEBUG_SUFFIX} ALLOCORE_D
 get_target_property(ALLOCORE_LINK_LIBRARIES allocore${DEBUG_SUFFIX} ALLOCORE_LINK_LIBRARIES)
 
 add_executable(allocoreTests unitTests.cpp ${TEST_SRC_LIST})
-include_directories(${CMAKE_SOURCE_DIR}/build/include/)
+include_directories("${BUILD_ROOT_DIR}/build/include/")
 target_link_libraries(allocoreTests ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES})
+add_dependencies(allocoreTests allocore${DEBUG_SUFFIX})
 add_test(NAME allocoreTests
          COMMAND $<TARGET_FILE:allocoreTests> ${TEST_ARGS})

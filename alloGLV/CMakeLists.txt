@@ -5,8 +5,8 @@ message(STATUS "==== Configuring alloGLV")
 
 aux_source_directory(src ALLOGLV_SRC)
 
-set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
+set(LIBRARY_OUTPUT_PATH "${BUILD_ROOT_DIR}/build/lib")
+set(EXECUTABLE_OUTPUT_PATH "${BUILD_ROOT_DIR}/build/bin")
 
 # Dependencies
 
@@ -21,7 +21,7 @@ if(NOT (APR_LIBRARY AND APR_INCLUDE_DIR))
 endif()
 
 if(BUILDING_GLV)
-    set(GLV_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../GLV)
+	set(GLV_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../GLV")
     get_target_property(glv_location GLV LOCATION)
     get_target_property(GLV_LIBRARY GLV GLV_LIBRARY)
     set(GLV_LIBRARY ${glv_location})
@@ -44,7 +44,7 @@ add_library(${ALLOGLV_LIB} ${ALLOGLV_SRC})
 target_link_libraries(${ALLOGLV_LIB} ${ALLOCORE_LIBRARY} ${GLV_LIBRARY})
 set_target_properties(${ALLOGLV_LIB}
   PROPERTIES
-  ALLOGLV_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
+  ALLOGLV_INCLUDE_DIR "${BUILD_ROOT_DIR}/build/include"
   ALLOGLV_LIBRARY ${ALLOGLV_LIB})
 
 set_target_properties(${ALLOGLV_LIB}
@@ -52,13 +52,21 @@ set_target_properties(${ALLOGLV_LIB}
   ALLOGLV_LINK_LIBRARIES "${GLV_LIBRARY}"
   )
 
+# Copy headers to build directory (only if header has changed)
+file(GLOB ALLOGLV_INSTALL_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} alloGLV/*.h*)
+foreach(header ${ALLOGLV_INSTALL_HEADERS})
+	execute_process(COMMAND ${CMAKE_COMMAND} -E
+					copy_if_different "${header}" "${BUILD_ROOT_DIR}/build/include/${header}"
+					WORKING_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}")
+endforeach()
+
 # Examples
 if(BUILD_EXAMPLES)
   find_package(Gamma QUIET)
   if(GAMMA_FOUND)
     include_directories(${GAMMA_INCLUDE_DIR})
     file(GLOB ALLOGLV_EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/*.cpp)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin/examples/)
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_ROOT_DIR}/build/bin/examples/)
     foreach(example ${ALLOGLV_EXAMPLE_FILES})
       get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
       set(EXAMPLE_TARGET alloGLV_examples_${EXAMPLE_NAME})
@@ -80,5 +88,6 @@ if(BUILD_EXAMPLES)
 
 endif(BUILD_EXAMPLES)
 
-install(DIRECTORY alloGLV/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include/alloGLV)
-install(TARGETS ${ALLOGLV_LIB} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+# Installation
+install(FILES ${ALLOGLV_INSTALL_HEADERS} DESTINATION "${CMAKE_INSTALL_PREFIX}/include")
+install(TARGETS ${ALLOGLV_LIB} DESTINATION "${CMAKE_INSTALL_PREFIX}/lib")
