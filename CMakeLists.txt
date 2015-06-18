@@ -1,6 +1,10 @@
 project( AlloSystem )
 cmake_minimum_required(VERSION 2.8)
 
+if(NOT DEFINED BUILD_ROOT_DIR)
+  set(BUILD_ROOT_DIR "${CMAKE_SOURCE_DIR}")
+endif(NOT DEFINED BUILD_ROOT_DIR)
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(DEBUG_SUFFIX "_debug")
   message(STATUS "====== Building Debug version")
@@ -23,7 +27,7 @@ set(BUILD_EXAMPLES 0 CACHE STRING "Build AlloSystem examples.")
 # External dependencies (Gamma and GLV)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
 
-include(cmake_modules/make_dep.cmake)
+include(cmake_modules/make_dep.cmake) # Functions to build some dependencies like Gamma and GLV
 
 if(BUILD_GAMMA AND NOT GAMMA_LIBRARY)
     make_dep(Gamma)
@@ -52,7 +56,6 @@ get_target_property(ALLOUTIL_DEP_INCLUDE_DIR alloutil${DEBUG_SUFFIX} ALLOUTIL_DE
 get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil${DEBUG_SUFFIX} ALLOUTIL_LINK_LIBRARIES)
 
 # alloGLV ---------------------------------------
-
 add_subdirectory(alloGLV)
 get_target_property(ALLOGLV_LIBRARY alloGLV${DEBUG_SUFFIX} LOCATION)
 get_target_property(ALLOGLV_INCLUDE_DIR alloGLV${DEBUG_SUFFIX} ALLOGLV_INCLUDE_DIR)
@@ -115,7 +118,7 @@ if(BUILD_EXAMPLES)
 
     foreach(example_src ${EXAMPLE_FILES})
       get_filename_component(EXAMPLE_NAME ${example_src} NAME_WE) # Get name w/o extension
-      set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin/examples/${dir})
+	  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${BUILD_ROOT_DIR}/build/bin/examples/${dir}")
 
       if ("${dir}" STREQUAL ".")
 	set(EXAMPLE_TARGET examples_${EXAMPLE_NAME})
@@ -158,9 +161,10 @@ if(BUILD_EXAMPLES)
 
     endforeach(example_src)
 
-    foreach(FILENAME ${EXAMPLE_RES_FILES})
+# TODO: solve asset copying
+	foreach(FILENAME ${EXAMPLE_RES_FILES})
       set(SRC "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}")
-      set(DST "${CMAKE_SOURCE_DIR}/build/${FILENAME}")
+	  set(DST "${BUILD_ROOT_DIR}/build/${FILENAME}")
       if(NOT (IS_DIRECTORY ${SRC}))
 	configure_file(${SRC} ${DST} COPY_ONLY)
         message(STATUS "Copying: " ${SRC})
