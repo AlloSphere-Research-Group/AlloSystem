@@ -16,7 +16,7 @@ endif(NOT (GAMMA_FOUND OR GAMMA_LIBRARY))
 
 set(ALLOAUDIO_SRC
   src/al_OutputMaster.cpp
-  src/butter.c
+  src/butter.cpp
 #  src/al_Decorrelation.cpp
   )
 
@@ -111,9 +111,10 @@ set(TEST_ARGS "")
 
 if(CUNIT_LIBRARY)
     ENABLE_TESTING()
-
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_ROOT_DIR}/build/bin/examples/)
     add_executable(alloaudioTests unitTests/alloaudioTests.cpp)
-    target_link_libraries(alloaudioTests ${ALLOAUDIO_LIBRARY} ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${CUNIT_LIBRARY})
+	target_link_libraries(alloaudioTests ${ALLOCORE_LIBRARY} ${ALLOAUDIO_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${CUNIT_LIBRARY})
+    add_dependencies(alloaudioTests ${ALLOCORE_LIBRARY})
     add_test(NAME alloaudioTests
             COMMAND $<TARGET_FILE:alloaudioTests> ${TEST_ARGS})
 endif(CUNIT_LIBRARY)
