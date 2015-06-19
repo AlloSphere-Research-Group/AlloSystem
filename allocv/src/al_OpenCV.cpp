@@ -116,6 +116,23 @@ int toCV(AlloTy type, uint8_t components){
 				case 4:	return CV_64FC4;
 			}
 			break;
+		case AlloUInt8Ty:
+			switch(components) {
+				case 1: return CV_8UC1;
+				case 2: return CV_8UC2;
+				case 3: return CV_8UC3;
+				case 4: return CV_8UC4;
+			}
+			break;
+		case AlloUInt16Ty:
+			switch(components) {
+				case 1: return CV_16UC1;
+				case 2: return CV_16UC2;
+				case 3: return CV_16UC3;
+				case 4: return CV_16UC4;
+			}
+			break;
+		//case AlloUInt32Ty: // no support for 32-bit unsigned ints
 		case AlloSInt8Ty:
 			switch(components) {
 				case 1:	return CV_8SC1;
@@ -140,22 +157,12 @@ int toCV(AlloTy type, uint8_t components){
 				case 4: return CV_32SC4;
 			}
 			break;
-		case AlloUInt16Ty:
-			switch(components) {
-				case 1: return CV_16UC1;
-				case 2: return CV_16UC2;
-				case 3: return CV_16UC3;
-				case 4: return CV_16UC4;
-			}
-			break;
-		default:
-			// unhandled type:
-			return 0;
+		default:; // unhandled type
 	}
 	return 0;
 }
 
-CvMat toCV(const Array& arr) {
+cv::Mat toCV(const Array& arr) {
 	// This for OpenCV2:
 //	size_t steps[ALLO_ARRAY_MAX_DIMS];
 //	int sizes[ALLO_ARRAY_MAX_DIMS];
@@ -172,7 +179,7 @@ CvMat toCV(const Array& arr) {
 //	);
 
 	int type = toCV(arr.header.type, arr.header.components);
-	return cvMat(arr.dim(1), arr.dim(0), type, (uchar *)arr.data.ptr);
+	return cv::Mat(arr.dim(1), arr.dim(0), type, (uchar *)arr.data.ptr, arr.stride(1));
 }
 
 } // al::

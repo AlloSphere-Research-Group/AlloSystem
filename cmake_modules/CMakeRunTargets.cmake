@@ -56,7 +56,7 @@ add_dependencies("${APP_NAME}" allocore${DEBUG_SUFFIX})
 
 #message("Using allocore headers from: ${ALLOCORE_DEP_INCLUDE_DIRS}")
 
-if(BUILDING_Gamma)
+if(BUILDING_GAMMA)
     get_target_property(GAMMA_LIBRARY Gamma LOCATION)
     add_dependencies(${APP_NAME} Gamma)
     target_link_libraries(${APP_NAME} ${GAMMA_LIBRARY})
@@ -69,7 +69,7 @@ else()
   endif(NOT GAMMA_FOUND)
   target_link_libraries(${APP_NAME} ${GAMMA_LIBRARY})
   include_directories(${GAMMA_INCLUDE_DIR})
-endif(BUILDING_Gamma)
+endif(BUILDING_GAMMA)
 
 if(BUILDING_GLV)
     get_target_property(GLV_LIBRARY GLV LOCATION)

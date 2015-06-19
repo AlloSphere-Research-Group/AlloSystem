@@ -64,6 +64,7 @@ public:
 
 	VideoCapture();
 
+	~VideoCapture();
 
 	/// Open a video file
 
@@ -92,25 +93,64 @@ public:
 
 	/// Decodes and returns the grabbed video frame
 
+	/// @param[in] dst			the array to copy the frame into
+	/// @param[in] chan			the video channel to retrieve
+	/// @param[in] copyPolicy	Policy on copying data:
+	///							 1 = copy data with same row order (default),
+	///							-1 = copy data with rows flipped.
+	///
 	/// \returns false if no frame has been grabbed (camera has been
 	/// disconnected, or there are no more frames in video file).
-	bool retrieve(Array& dst, int channel=0, int copyPolicy=1);
+	bool retrieve(Array& dst, int chan=0, int copyPolicy=1);
+
+	/// Decodes and returns the grabbed video frame
+
+	/// @param[in] dst			the array to copy the frame into
+	/// @param[in] chan			the video channel to retrieve
+	///
+	/// \returns false if no frame has been grabbed (camera has been
+	/// disconnected, or there are no more frames in video file).
+	bool retrieve(cv::Mat& dst, int chan=0);
+
+	/// Decodes the grabbed video frame into cv::Mat member
+
+	/// @param[in] chan			the video channel to retrieve
+	///
+	/// \returns false if no frame has been grabbed (camera has been
+	/// disconnected, or there are no more frames in video file).
+	bool retrieve(int chan=0);
 
 	/// Decodes and returns the grabbed video frame flipped vertically
 
+	/// @param[in] dst			the array to copy the frame into
+	/// @param[in] chan			the video channel to retrieve
+	///
 	/// \returns false if no frame has been grabbed (camera has been
 	/// disconnected, or there are no more frames in video file).
-	bool retrieveFlip(Array& dst, int channel=0);
+	bool retrieveFlip(Array& dst, int chan=0);
 
 	/// Grabs, decodes and returns the next video frame
 
-	/// \returns true on success.
+	/// @param[in] dst			the array to copy the frame into
+	/// @param[in] copyPolicy	Policy on copying data:
+	///							 1 = copy data with same row order (default),
+	///							-1 = copy data with rows flipped.
 	///
+	/// \returns true on success.
 	bool read(Array& dst, int copyPolicy=1);
 
 
 	/// Set an OpenCV video property
 	bool set(int cvCapProp, double val);
+
+	/// Set width in pixels
+	VideoCapture& width(double pixels);
+
+	/// Set height in pixels
+	VideoCapture& height(double pixels);
+
+	/// Set width and height in pixels
+	VideoCapture& resize(double width, double height);
 
 	/// Set position in msec (files only)
 	VideoCapture& posMsec(double msec);
@@ -190,10 +230,12 @@ public:
 	void print(FILE * fp = stdout);
 
 private:
+	friend class VideoCaptureHandler;
 	double mFPS;
 	double mRate;
 	double mBadFrame;
 	bool mIsFile;
+	bool mValid;
 };
 
 
@@ -203,6 +245,7 @@ public:
 
 	struct VideoThreadFunction : public al::ThreadFunction{
 		VideoThreadFunction();
+		~VideoThreadFunction();
 		void operator()();
 		al::VideoCapture * videoCapture;
 		VideoCaptureHandler * handler;
@@ -210,6 +253,7 @@ public:
 	};
 
 	struct WorkThread{
+		~WorkThread();
 		PeriodicThread thread;
 		VideoThreadFunction func;
 		void start();

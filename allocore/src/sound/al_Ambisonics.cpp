@@ -329,6 +329,95 @@ void AmbiDecode::print(FILE * fp, const char * append) const {
 //	fprintf(fp, "s:%3d%s", mNumSpeakers, append);
 }
 
+
+AmbisonicsSpatializer::AmbisonicsSpatializer(
+	SpeakerLayout &sl, int dim, int order, int flavor
+)
+:	Spatializer(sl), mDecoder(dim, order, sl.numSpeakers(), flavor), mEncoder(dim,order)
+{
+    setSpeakerLayout(sl);
+};
+
+void AmbisonicsSpatializer::zeroAmbi(){
+    memset(ambiChans(), 0, mAmbiDomainChannels.size()*sizeof(ambiChans()[0]));
+}
+
+void AmbisonicsSpatializer::compile(Listener& l){
+    mListener = &l;
+}
+
+void AmbisonicsSpatializer::numFrames(int v){
+    mNumFrames = v;
+
+    if(mAmbiDomainChannels.size() != (unsigned long)(mDecoder.channels() * v)){
+		mAmbiDomainChannels.resize(mDecoder.channels() * v);
+	}
+}
+
+void AmbisonicsSpatializer::numSpeakers(int num){
+    mDecoder.numSpeakers(num);
+}
+
+void AmbisonicsSpatializer::setSpeakerLayout(const SpeakerLayout& sl){
+	mDecoder.setSpeakers(&mSpeakers);
+
+	mSpeakers.clear();
+	unsigned numSpeakers = sl.speakers().size();
+	for(unsigned i=0;i<numSpeakers;++i){
+		mSpeakers.push_back(sl.speakers()[i]);
+
+        mDecoder.setSpeakerRadians(
+			i,
+			mSpeakers[i].deviceChannel,
+			mSpeakers[i].azimuth,
+			mSpeakers[i].elevation,
+			mSpeakers[i].gain
+		);
+	}
+}
+
+void AmbisonicsSpatializer::prepare(AudioIOData& io){
+    zeroAmbi();
+}
+
+void AmbisonicsSpatializer::perform(
+	AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples
+){
+	// compute azimuth & elevation of relative position in current listener's coordinate frame:
+	Vec3d urel(relpos);
+	urel.normalize();	// unit vector in axis listener->source
+
+	/* project into listener's coordinate frame:
+	Vec3d axis;
+	l.mQuatHistory[i].toVectorX(axis);
+	double rr = urel.dot(axis);
+	l.mQuatHistory[i].toVectorY(axis);
+	double ru = urel.dot(axis);
+	l.mQuatHistory[i].toVectorZ(axis);
+	double rf = urel.dot(axis);
+	//*/
+
+	for(int i = 0; i < numFrames; i++){
+		// cheaper:
+		Vec3d direction = mListener->quatHistory()[i].rotateTransposed(urel);
+
+		//mEncoder.direction(azimuth, elevation);
+		//mEncoder.direction(-rf, -rr, ru);
+		mEncoder.direction(-direction[2], -direction[0], direction[1]);
+		mEncoder.encode(ambiChans(), numFrames, i, samples[i]);
+	}
+}
+
+
+void AmbisonicsSpatializer::finalize(AudioIOData& io){
+	//previously done in render method of audioscene
+
+	float *outs = &io.out(0,0);//io.outBuffer();
+	int numFrames = io.framesPerBuffer();
+
+	mDecoder.decode(outs, ambiChans(), numFrames);
+}
+
 } // al::
 
 #undef WRAP

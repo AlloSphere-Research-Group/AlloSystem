@@ -42,7 +42,6 @@
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 */
 
-#include "allocore/system/al_Config.h"
 #include "allocore/system/al_Time.h"
 #include "allocore/types/al_MsgQueue.hpp"
 #include <vector>
@@ -64,7 +63,8 @@ public:
 	enum Driver {
 		SLEEP = 0,
 		GLUT,
-		NATIVE
+		NATIVE,
+		NUM_DRIVERS
 	};
 
 	/// mainloop is a singleton; this is how to access it:
@@ -128,10 +128,7 @@ public:
 	// typically not called by user code
 	// but e.g. creating a GLUT window will switch to GLUT mode
 	// or creating a Native window will switch to NATIVE mode
-	Main& driver(Driver v) {
-		if (mDriver != GLUT) mDriver = v;
-		return *this;
-	}
+	Main& driver(Driver v);
 
 private:
 	// private constructor for singleton pattern
@@ -152,6 +149,7 @@ private:
 	std::vector<Handler *> mHandlers;
 
 	bool mActive;
+	bool mInited[NUM_DRIVERS];
 };
 
 // deprecated; for backwards compatibility only

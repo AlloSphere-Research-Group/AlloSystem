@@ -116,8 +116,10 @@ public:
 	const Viewport& viewport() const { return mViewport; }
 	Viewport& viewport(){ return mViewport; }
 
+	Frustumd frustum() const;
+
 	/// Call to update viewport using stretch/anchor amounts when parent dimensions change
-	void onParentResize(int dw, int dh);
+	void onParentResize(int w, int h);
 
 private:
 	Viewport mViewport;				// screen display region
@@ -174,11 +176,10 @@ private:
 
 /// Application helper class
 class App {
-//: public WindowEventHandler, public InputEventHandler {
 public:
 
-	typedef std::vector<Listener *>			Listeners;
-	typedef std::vector<ViewpointWindow *>	Windows;
+	typedef std::vector<Listener *> Listeners;
+	typedef std::vector<ViewpointWindow *> Windows;
 
 	App();
 	virtual ~App();
@@ -229,25 +230,32 @@ public:
 
 	/// This will be called from the main graphics renderer. Since it may be
 	/// called multiple times, no state updates should be made in it.
-	virtual void onDraw(Graphics& g, const Viewpoint& v){}
+	virtual void onDraw(Graphics& g, const Viewpoint& v){ onDraw(g); }
+	virtual void onDraw(Graphics& g){}
 
 	/// Called when a keyboard key is pressed
-	virtual void onKeyDown(const ViewpointWindow& w, const Keyboard& k){}
+	virtual void onKeyDown(const ViewpointWindow& w, const Keyboard& k){ onKeyDown(k); }
+	virtual void onKeyDown(const Keyboard& k){}
 
 	/// Called when a keyboard key is released
-	virtual void onKeyUp(const ViewpointWindow& w, const Keyboard& k){}
+	virtual void onKeyUp(const ViewpointWindow& w, const Keyboard& k){ onKeyUp(k); }
+	virtual void onKeyUp(const Keyboard& k){}
 
 	/// Called when a mouse button is pressed
-	virtual void onMouseDown(const ViewpointWindow& w, const Mouse& m){}
+	virtual void onMouseDown(const ViewpointWindow& w, const Mouse& m){ onMouseDown(m); }
+	virtual void onMouseDown(const Mouse& m){}
 
 	/// Called when a mouse button is released
-	virtual void onMouseUp(const ViewpointWindow& w, const Mouse& m){}
+	virtual void onMouseUp(const ViewpointWindow& w, const Mouse& m){ onMouseUp(m); }
+	virtual void onMouseUp(const Mouse& m){}
 
 	/// Called when the mouse moves while a button is down
-	virtual void onMouseDrag(const ViewpointWindow& w, const Mouse& m){}
+	virtual void onMouseDrag(const ViewpointWindow& w, const Mouse& m){ onMouseDrag(m); }
+	virtual void onMouseDrag(const Mouse& m){}
 
 	/// Called when the mouse moves
-	virtual void onMouseMove(const ViewpointWindow& w, const Mouse& m){}
+	virtual void onMouseMove(const ViewpointWindow& w, const Mouse& m){ onMouseMove(m); }
+	virtual void onMouseMove(const Mouse& m){}
 
 
 	/// Called upon creation of a window
@@ -257,66 +265,81 @@ public:
 	virtual void onDestroy(const ViewpointWindow& win){}
 
 	/// Called upon resize of a window
-	virtual void onResize(const ViewpointWindow& win, int dw, int dh){}
+	virtual void onResize(const ViewpointWindow& win, int w, int h){}
 
 
+	/// Set application name
+	App& name(const std::string& v){ mName=v; return *this; }
 
-	const AudioIO&		audioIO() const { return mAudioIO; }
-	AudioIO&			audioIO(){ return mAudioIO; }
+	/// Get application name
+	const std::string&	name() const { return mName; }
+
+
+	/// Get navigation pose (position/orientation)
+	Nav& nav(){ return mNav; }
+	const Nav& nav() const { return mNav; }
+
+	/// Get navigation pose (position/orientation) used while drawing
+	const Nav& navDraw() const { return mNavDraw; }
+	Nav& navDraw(){ return mNavDraw; }
+
+	/// Get navigation keyboard/mouse controller
+	const NavInputControl& navControl() const { return mNavControl; }
+	NavInputControl& navControl(){ return mNavControl; }
+
+
+	/// Get audio i/o object
+	AudioIO& audioIO(){ return mAudioIO; }
+	const AudioIO& audioIO() const { return mAudioIO; }
 
 	//const AudioScene&	audioScene() const { return mAudioScene; }
 	//AudioScene&			audioScene(){ return mAudioScene; }
 
-	const Lens&			lens() const { return mLens; }
-	Lens&				lens(){ return mLens; }
 
-	const Graphics&		graphics() const { return mGraphics; }
-	Graphics&			graphics(){ return mGraphics; }
+	/// Get the array of windows
+	Windows& windows(){ return mWindows; }
+	const Windows& windows() const { return mWindows; }
 
-	const std::string&	name() const { return mName; }
-	App&				name(const std::string& v){ mName=v; return *this; }
-
-	const Nav&			nav() const { return mNav; }
-	Nav&				nav(){ return mNav; }
-
-	const Nav&			navDraw() const { return mNavDraw; }
-	Nav&				navDraw(){ return mNavDraw; }
-
-	const NavInputControl& navControl() const { return mNavControl; }
-	NavInputControl&	navControl(){ return mNavControl; }
-
-	osc::Recv&			oscRecv(){ return mOSCRecv; }
-	osc::Send&			oscSend(){ return mOSCSend; }
-
-	const Stereographic& stereo() const { return mStereo; }
-	Stereographic&		stereo(){ return mStereo; }
-
-	const Windows&		windows() const { return mWindows; }
-	Windows&			windows(){ return mWindows; }
-
-	const ViewpointWindow& window(int i=0) const { return *(windows()[i]); }
+	/// Get a window by index
 	ViewpointWindow& window(int i=0){ return *(windows()[i]); }
+	const ViewpointWindow& window(int i=0) const { return *(windows()[i]); }
 
-	const void *		clockAnimate() const { return mClockAnimate; }
-	App&				clockAnimate(void * v){ mClockAnimate=v; return *this; }
+	/// Get graphics renderer
+	Graphics& graphics(){ return mGraphics; }
+	const Graphics& graphics() const { return mGraphics; }
 
-	const void *		clockNav() const { return mClockNav; }
-	App&				clockNav(void * v){ mClockNav=v; return *this; }
+	/// Get 3D rendering state
+	Stereographic& stereo(){ return mStereo; }
+	const Stereographic& stereo() const { return mStereo; }
+
+	/// Get (camera) lens
+	Lens& lens(){ return mLens; }
+	const Lens& lens() const { return mLens; }
+
+	/// Get background color
+	const Color& background() const { return stereo().clearColor(); }
+
+	/// Set background color
+	App& background(const Color& c){ stereo().clearColor(c); return *this; }
+
+
+
+	osc::Recv& oscRecv(){ return mOSCRecv; }
+	osc::Send& oscSend(){ return mOSCSend; }
+	void sendHandshake();
+	void sendDisconnect();
+
+	App& clockAnimate(void * v){ mClockAnimate=v; return *this; }
+	const void * clockAnimate() const { return mClockAnimate; }
+
+	App& clockNav(void * v){ mClockNav=v; return *this; }
+	const void * clockNav() const { return mClockNav; }
 
 	/// Add a window to the world
 
 	/// @param[in] win			The window to add
 	///
 	App& add(ViewpointWindow& win);
-
-
-	void sendHandshake(){
-		oscSend().send("/handshake", name(), oscRecv().port());
-	}
-
-	void sendDisconnect(){
-		oscSend().send("/disconnectApplication", name());
-	}
 
 
 	/// Returns true if using audio
@@ -356,68 +379,6 @@ private:
 	std::string mName;
 	void * mClockAnimate;
 	void * mClockNav;
-
-	// attached to each ViewpointWindow
-	struct SceneWindowHandler : public WindowEventHandler{
-		ViewpointWindow& win;
-		App& app;
-
-		SceneWindowHandler(ViewpointWindow& w, App& a): win(w), app(a){}
-
-		virtual bool onCreate(){
-			app.onCreate(win);
-			return true;
-		}
-
-		virtual bool onDestroy(){
-			app.onDestroy(win);
-			return true;
-		}
-
-		virtual bool onResize(int dw, int dh){
-			app.onResize(win, dw,dh);
-			return true;
-		}
-
-		virtual bool onFrame();
-	};
-
-	struct SceneInputHandler : public InputEventHandler{
-		ViewpointWindow& win;
-		App& app;
-
-		SceneInputHandler(ViewpointWindow& w, App& a): win(w), app(a){}
-
-		virtual bool onKeyDown(const Keyboard& k){
-			app.onKeyDown(win, k);
-			switch(k.key()){
-				case Keyboard::TAB: app.stereo().stereo(!app.stereo().stereo()); return false;
-				default:;
-			}
-			return true;
-		}
-		virtual bool onKeyUp(const Keyboard& k){ app.onKeyUp(win,k); return true;}
-		virtual bool onMouseDown(const Mouse& m){ app.onMouseDown(win,m); return true;}
-		virtual bool onMouseUp(const Mouse& m){ app.onMouseUp(win,m); return true;}
-		virtual bool onMouseDrag(const Mouse& m){ app.onMouseDrag(win,m); return true;}
-		virtual bool onMouseMove(const Mouse& m){ app.onMouseMove(win,m); return true;}
-	};
-
-//	struct SceneInputHandler : public StandardWindowKeyControls{
-//		SceneInputHandler(App& a): app(a){}
-//
-//		virtual bool onKeyDown(const Keyboard& k){
-//			if(!StandardWindowKeyControls::onKeyDown(k)) return false;
-//			switch(k.key()){
-//				case Keyboard::TAB: app.stereo().stereo(!app.stereo().stereo()); return false;
-//				default:;
-//			}
-//			return true;
-//		}
-//
-//		App& app;
-//	};
-
 };
 
 } // al::

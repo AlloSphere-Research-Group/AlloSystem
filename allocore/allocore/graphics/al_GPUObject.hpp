@@ -93,64 +93,59 @@ protected:
 class GPUObject{
 public:
 
-	GPUObject(int ctx = GPUContext::defaultContextID())
-	:	mID(0), bResubmit(false)
-	{	contextRegister(ctx); }
+	/// @param[in] ctx	a GPU context ID to attach to
+	GPUObject(int ctx = GPUContext::defaultContextID());
 
-	GPUObject(GPUContext& ctx)
-	:	mID(0), bResubmit(false)
-	{	contextRegister(ctx.contextID()); }
+	/// @param[in] ctx	a GPU context to attach to
+	GPUObject(GPUContext& ctx);
 
-	virtual ~GPUObject(){ contextUnregister(); }
+	virtual ~GPUObject();
 
 
-	/// register with a context
-	/// will unregister any existing context registration
-	void contextRegister(int ctx=0);
-
-	/// ensure that the GPUObject is ready to use
-	/// typically placed before any rendering implementation
-	void validate() {
-		if (bResubmit) { destroy(); bResubmit=false; }
-		if (!created()) create();
-	}
-
-	/// Triggers re-creation of object safely
-	void invalidate() {
-		bResubmit = true;
-	}
-
-	bool created() const { return id()!=0; }
+	/// Returns whether object has been created
+	bool created() const;
 
 	/// Creates object on GPU
-	void create(){
-		if(created()){ destroy(); }
-		onCreate();
-	}
+	void create();
 
 	/// Destroys object on GPU
-	void destroy(){
-		if(created()) onDestroy();
-		mID=0;
-	}
+	void destroy();
 
 	/// Returns the assigned object id
 	unsigned long id() const { return mID; }
-	void id(unsigned long v) {mID = v;}
+
+	void id(unsigned long v){ mID = v; }
+
+
+	/// Register with a context
+
+	/// This will unregister any existing context registration.
+	///
+	void contextRegister(int ctx=0);
+
+	/// Ensure that the GPUObject is ready to use
+
+	/// This is typically placed before any rendering implementation.
+	/// If the object has been invalidated, the object will be destroyed and
+	/// then created again. Otherwise, the object will simply be created if not
+	/// already created.
+	void validate();
+
+	/// Triggers re-creation of object safely
+	void invalidate();
 
 protected:
-
-	// remove from the context:
-	void contextUnregister();
-
 	unsigned long mID;
-	bool bResubmit;
+	bool mResubmit;
 
 	/// Called when currently assigned context is created
 	virtual void onCreate() = 0;
 
 	/// Called when currently assigned context is destroyed
 	virtual void onDestroy() = 0;
+
+	// remove from the context:
+	void contextUnregister();
 };
 
 } // ::al

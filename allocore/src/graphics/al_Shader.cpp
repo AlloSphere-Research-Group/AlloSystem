@@ -79,11 +79,13 @@ void Shader::get(int pname, void * params) const { glGetShaderiv(id(), pname, (G
 void Shader::onCreate(){
 	AL_GRAPHICS_ERROR("(before Shader::onCreate)", id());
 	mID = glCreateShader(gl_shader_type(mType));
-//printf("Create shader %lu\n",id());
-	if(0==id()) AL_WARN("Error creating shader object");
+	//printf("Create shader %lu\n",id());
+	if(0 == id()){
+		AL_WARN("Error creating shader object");
+		return;
+	}
 	AL_GRAPHICS_ERROR("glCreateShader", id());
-	//mHandle = glCreateShaderObjectARB(gl_shader_type(mType));
-	//mID = (long)handle();
+
 	if(mSource[0]){
 		sendSource();
 		AL_GRAPHICS_ERROR("Shader::sendSource", id());

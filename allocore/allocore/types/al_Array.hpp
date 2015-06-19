@@ -90,7 +90,7 @@ public:
 
 	/// Verify elements are a particular type
 	bool isType(AlloTy ty) const { return header.type == ty; }
-	template<typename T> bool isType() { return isType(type<T>()); }
+	template<typename T> bool isType() const { return isType(type<T>()); }
 
 	uint8_t components() const { return header.components; }	///< Get number of components
 	uint8_t dimcount() const { return header.dimcount; }		///< Get number of dimensions
@@ -144,12 +144,13 @@ public:
 	bool hasData() const { return NULL != data.ptr; }
 
 	/// Allocate memory for the given header.
+
 	/// Warning: does not check if memory was already allocated;
 	/// Call dataFree() first if you know it will be safe to do so.
-	void dataCalloc() { allo_array_allocate(this); }
+	void dataCalloc();
 
 	/// Free memory and set data.ptr to NULL
-	void dataFree() { allo_array_free(this); }
+	void dataFree();
 
 	/// Set all data to zero
 	void zero();
@@ -179,6 +180,26 @@ public:
 	template <class T> const T& elem(size_t ic, size_t ix, size_t iy, size_t iz) const{
 		return cell<T>(ix,iy,iz)[ic]; }
 
+  /*  
+      Some operator overloading attempts by Matt, not fully tested or necessarily well conceived:
+
+
+/// Operator() to look like Matlab's 3D array indexing.   Always returns the first component; best
+        /// for one-component arrays.
+  template <class T> T& operator ()(size_t ix, size_t iy, size_t iz) {return elem<T>(1,ix,iy,iz);}
+
+        /// Operator() to look like Matlab's 2D array indexing.   Always returns the first component; best
+        /// for one-component arrays.
+  template <class T> T& operator ()(size_t ix, size_t iy) {return elem<T>(1,ix,iy);}
+
+        /// Operator() to look like Matlab's 1D array indexing.   Always returns the first component; best
+        /// for one-component arrays.
+  template <class T> T& operator ()(size_t ix) {return elem<T>(1,ix);}
+
+        /// Operator[] to look like 1D array indexing.   Always returns the first component; best
+        /// for one-component arrays.
+  template <class T> T& operator [](size_t ix) {return elem<T>(1,ix);}
+  */
 
 	/// Fill with the same cell value throughout
 	template<typename T> void set1d(T * cell);
@@ -314,19 +335,12 @@ protected:
 
 
 
-
-
-
-
-
-
 /*
  *
  ********* INLINE IMPLEMENTATION BELOW ***********
  *
  */
 #pragma mark --------------------------------------
-
 
 /*
 	Type traits by partial specialization:
@@ -348,33 +362,6 @@ template<> inline AlloTy Array::type<void *>(){
 		case 8: return AlloPointer64Ty;
 	}
 	return 0;
-}
-
-inline void Array::deriveStride(AlloArrayHeader& h, size_t alignSize) {
-	allo_array_setstride(&h, alignSize);
-}
-
-inline void Array::format(int comps, AlloTy ty, uint32_t dimx) {
-	formatAligned(comps, ty, dimx, AL_ARRAY_DEFAULT_ALIGNMENT);
-}
-inline void Array::format(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy) {
-	formatAligned(comps, ty, dimx, dimy, AL_ARRAY_DEFAULT_ALIGNMENT);
-}
-inline void Array::format(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz) {
-	formatAligned(comps, ty, dimx, dimy, dimz, AL_ARRAY_DEFAULT_ALIGNMENT);
-}
-
-inline void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, size_t align) {
-	uint32_t dims[] = {dimx};
-	formatAlignedGeneral(comps, ty, dims,1, align);
-}
-inline void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, size_t align) {
-	uint32_t dims[] = {dimx,dimy};
-	formatAlignedGeneral(comps, ty, dims,2, align);
-}
-inline void Array::formatAligned(int comps, AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, size_t align) {
-	uint32_t dims[] = {dimx,dimy,dimz};
-	formatAlignedGeneral(comps, ty, dims,3, align);
 }
 
 template<typename T> inline T * Array::cell(size_t x) const {

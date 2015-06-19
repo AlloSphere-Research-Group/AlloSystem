@@ -41,9 +41,13 @@ namespace al{
 
 
 VideoCapture::VideoCapture()
-:	mFPS(1.), mRate(1.), mBadFrame(-1), mIsFile(false)
+:	mFPS(1.), mRate(1.), mBadFrame(-1), mIsFile(false), mValid(true)
 {}
 
+VideoCapture::~VideoCapture(){
+	mValid = false;
+	cvVideoCapture.release();
+}
 
 bool VideoCapture::open(const std::string& filename){
 	if(cvVideoCapture.open(filename)){
@@ -92,14 +96,22 @@ bool VideoCapture::grab(){
 	return didGrab;
 }
 
-bool VideoCapture::retrieve(Array& dst, int channel, int copyPolicy){
-	bool res = cvVideoCapture.retrieve(cvFrame, channel);
+bool VideoCapture::retrieve(cv::Mat& dst, int chan){
+	return cvVideoCapture.retrieve(dst, chan);
+}
+
+bool VideoCapture::retrieve(int chan){
+	return cvVideoCapture.retrieve(cvFrame, chan);
+}
+
+bool VideoCapture::retrieve(Array& dst, int chan, int copyPolicy){
+	bool res = retrieve(chan);
 	fromCV(dst, cvFrame, copyPolicy);
 	return res;
 }
 
-bool VideoCapture::retrieveFlip(Array& dst, int channel){
-	return retrieve(dst, channel, -1);
+bool VideoCapture::retrieveFlip(Array& dst, int chan){
+	return retrieve(dst, chan, -1);
 }
 
 bool VideoCapture::read(Array& dst, int copyPolicy){
@@ -110,6 +122,20 @@ bool VideoCapture::read(Array& dst, int copyPolicy){
 
 bool VideoCapture::set(int cvCapProp, double val){
 	return cvVideoCapture.set(cvCapProp,val);
+}
+
+VideoCapture& VideoCapture::width(double pixels){
+	set(CV_CAP_PROP_FRAME_WIDTH, pixels);
+	return *this;
+}
+
+VideoCapture& VideoCapture::height(double pixels){
+	set(CV_CAP_PROP_FRAME_HEIGHT, pixels);
+	return *this;
+}
+
+VideoCapture& VideoCapture::resize(double w, double h){
+	return width(w).height(h);
 }
 
 VideoCapture& VideoCapture::posMsec(double msec){
@@ -231,9 +257,14 @@ VideoCaptureHandler::VideoThreadFunction::VideoThreadFunction()
 : 	videoCapture(NULL), handler(NULL), streamIdx(-1)
 {}
 
+VideoCaptureHandler::VideoThreadFunction::~VideoThreadFunction()
+{
+	videoCapture = NULL;
+}
+
 void VideoCaptureHandler::VideoThreadFunction::operator()(){
 //printf("VideoThreadFunc called\n");
-	if(NULL!=videoCapture){
+	if(NULL != videoCapture && videoCapture->mValid && videoCapture->cvVideoCapture.isOpened()){
 		if(videoCapture->grab()){
 			handler->onVideo(*videoCapture, streamIdx);
 			double fps = videoCapture->fps() * videoCapture->rate();
@@ -242,6 +273,10 @@ void VideoCaptureHandler::VideoThreadFunction::operator()(){
 	}
 }
 
+
+VideoCaptureHandler::WorkThread::~WorkThread(){
+	stop();
+}
 
 void VideoCaptureHandler::WorkThread::start(){
 	//printf("WorkThread::start(): %p %p\n", func.videoCapture, func.handler);

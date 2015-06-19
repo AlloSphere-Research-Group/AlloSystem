@@ -26,9 +26,10 @@ public:
 			// Bind ourself to the MIDIIn
 			MIDIMessageHandler::bindTo(midiIn);
 
-			// Open the first device found
-			midiIn.openPort(0);
-			printf("Opened port to %s\n", midiIn.getPortName(0).c_str());
+			// Open the last device found
+			int port = midiIn.getPortCount()-1;
+			midiIn.openPort(port);
+			printf("Opened port to %s\n", midiIn.getPortName(port).c_str());
 		}
 		else{
 			printf("Error: No MIDI devices found.\n");
@@ -36,54 +37,53 @@ public:
 	}
 
 	// This gets called whenever a MIDI message is received on the port
-	void onMIDIMessage(double time, const std::vector<unsigned char>& msg){
+	void onMIDIMessage(const MIDIMessage& m){
 
-		// The first byte is the status byte indicating the message type
-		unsigned char status = msg[0];
+		printf("%s: ", MIDIByte::messageTypeString(m.status()));
 
-		printf("%s: ", MIDIByte::messageTypeString(status));
+		// Here we demonstrate how to parse common channel messages
+		switch(m.type()){
+		case MIDIByte::NOTE_ON:
+			printf("Note %u, Vel %f", m.noteNumber(), m.velocity());
+			break;
 
-		// Check if we received a channel message
-		if(MIDIByte::isChannelMessage(status)){
-			unsigned char type = status & MIDIByte::MESSAGE_MASK;
-			unsigned char chan = status & MIDIByte::CHANNEL_MASK;
+		case MIDIByte::NOTE_OFF:
+			printf("Note %u, Vel %f", m.noteNumber(), m.velocity());
+			break;
 
-			// Here we demonstrate how to parse to common channel messages
-			switch(type){
-			case MIDIByte::NOTE_ON:
-				printf("Note %u, Vel %u", msg[1], msg[2]);
+		case MIDIByte::PITCH_BEND:
+			printf("Value %f", m.pitchBend());
+			break;
+
+		// Control messages need to be parsed again...
+		case MIDIByte::CONTROL_CHANGE:
+			printf("%s ", MIDIByte::controlNumberString(m.controlNumber()));
+			switch(m.controlNumber()){
+			case MIDIByte::MODULATION:
+				printf("%f", m.controlValue());
 				break;
 
-			case MIDIByte::NOTE_OFF:
-				printf("Note %u, Vel %u", msg[1], msg[2]);
+			case MIDIByte::EXPRESSION:
+				printf("%f", m.controlValue());
 				break;
-
-			case MIDIByte::PITCH_WHEEL:
-				printf("Value %u", MIDIByte::convertPitchWheel(msg[1], msg[2]));
-				break;
-
-			// Control messages need to be parsed again...
-			case MIDIByte::CONTROL_CHANGE:
-				printf("%s ", MIDIByte::controlNumberString(msg[1]));
-				switch(msg[1]){
-				case MIDIByte::MODULATION:
-					printf("%u", msg[2]);
-					break;
-				}
-				break;
-			default:;
 			}
-
-			printf(" (MIDI chan %u)", chan + 1);
+			break;
+		default:;
 		}
+
+		// If it's a channel message, print out channel number
+		if(m.isChannelMessage()){
+			printf(" (MIDI chan %u)", m.channel() + 1);
+		}
+
 		printf("\n");
 
 		// Print the raw byte values and time stamp
 		printf("\tBytes = ");
-		for(unsigned i=0; i<msg.size(); ++i){
-			printf("%3u ", (int)msg[i]);
+		for(unsigned i=0; i<3; ++i){
+			printf("%3u ", (int)m.bytes[i]);
 		}
-		printf(", time = %g\n", time);
+		printf(", time = %g\n", m.timeStamp());
 	}
 };
 

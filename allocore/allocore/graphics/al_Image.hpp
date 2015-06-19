@@ -84,26 +84,51 @@ public:
 
 	Image();
 
-	/// @param[in] filename		file name of image; loaded automatically
-	Image(const std::string& filename);
+	/// @param[in] filePath		Image file to load
+	Image(const std::string& filePath);
 
 	~Image();
 
 
-	/// Load image with file name. Image type determined by file extension.
+	/// Load image from disk
 
-        // return true for success or print error message and return false
-	bool load(const std::string& filename);
+	/// @param[in] filePath		File to load. Image type determined by file 
+	///							extension.
+    /// \returns true for success or print error message and return false
+	bool load(const std::string& filePath);
 
-	/// Save image with file name. Image type determined by file extension.
+	/// Save image to disk
 
-        // return true for success or print error message and return false
-	bool save(const std::string& filename);
+	/// @param[in] filePath		File to save. Image type determined by file 
+	///							extension.
+    /// \returns true for success or print error message and return false
+	bool save(const std::string& filePath);
+
+	/// Save pixel data to disk
+
+	/// @param[in] filePath		File to save. Image type determined by file 
+	///							extension.
+	/// @param[in] src			source array containing pixel data
+	/// @param[in] compressFlags level of compression in [0,100] and other flags
+	static bool save(const std::string& filePath, const Array& src, int compressFlags=50);
+
+	/// Save pixel data to disk
+
+	/// @param[in] filePath		File to save. Image type determined by file 
+	///							extension.
+	/// @param[in] pixels		pixel data
+	/// @param[in] nx			number of pixels along the x dimension
+	/// @param[in] ny			number of pixels along the y dimension
+	/// @param[in] fmt			pixel format
+	/// @param[in] compressFlags level of compression in [0,100] and other flags
+	template <class T>
+	static bool save(const std::string& filePath, const T * pixels, int nx, int ny, Format fmt, int compressFlags=50);
+
 
 	/// File path to image
 	const std::string& filepath() const { return mFilename; }
 
-	/// Whether an image was loaded from file
+	/// Whether image was loaded from file
 	bool loaded() const { return mLoaded; }
 
 
@@ -145,6 +170,24 @@ public:
 	Image& compression(int flags){ mCompression=flags; return *this; }
 
 
+	/// Get read-only reference to a pixel
+
+	/// Warning: doesn't check that Pix has matching type/component count.
+	/// Warning: no bounds checking performed on x and y.
+	template<typename Pix>
+	const Pix& at(unsigned x, unsigned y) const {
+		return *array().cell<Pix>(x, y);
+	}
+
+	/// Get mutable reference to a pixel
+
+	/// Warning: doesn't check that Pix has matching type/component count.
+	/// Warning: no bounds checking performed on x and y.
+	template<typename Pix>
+	Pix& at(unsigned x, unsigned y){
+		return *array().cell<Pix>(x, y);
+	}
+
 	/// Write a pixel to an Image
 
 	/// Warning: doesn't check that Pix has matching type/component count
@@ -153,17 +196,6 @@ public:
 	void write(const Pix& pix, unsigned x, unsigned y) {
 		array().write(&pix.r, x, y);
 	}
-
-	/// Quick image writing function
-
-	/// @param[in] filePath		file path
-	/// @param[in] pixels		pixel data
-	/// @param[in] nx			number of pixels along the x dimension
-	/// @param[in] ny			number of pixels along the y dimension
-	/// @param[in] fmt			pixel format
-	/// @param[in] compressionFlags level of compression in [0,100] and other flags
-	template <class T>
-	static bool write(const std::string& filePath, const T * pixels, int nx, int ny, Format fmt, int compressFlags=50);
 
 	/// Read a pixel from an Image
 
@@ -223,18 +255,17 @@ inline int Image::components(Format v){
 }
 
 template <class T>
-bool Image::write(
+bool Image::save(
 	const std::string& filePath, const T * pixels, int nx, int ny, Format fmt, int compress
 ){
-	Image img;
-	Array& a = img.array();
+	Array a;
 	a.data.ptr			= (char *)const_cast<T *>(pixels);
 	a.header.type		= Array::type<T>();
 	a.header.components	= Image::components(fmt);
 	allo_array_setdim2d(&a.header, nx, ny);
 	allo_array_setstride(&a.header, 1);
-	img.compression(compress);
-	bool res = img.save(filePath);
+
+	bool res = save(filePath, a, compress);
 	a.data.ptr = NULL; // prevent ~Array from deleting data
 	return res;
 }

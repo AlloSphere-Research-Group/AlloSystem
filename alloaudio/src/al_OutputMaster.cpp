@@ -5,7 +5,7 @@
 #include "alloaudio/al_OutputMaster.hpp"
 #include "allocore/system/al_Time.hpp"
 
-#include "src/butter.c"
+#include "alloaudio/butter.h"
 
 //#include "firfilter.h"
 

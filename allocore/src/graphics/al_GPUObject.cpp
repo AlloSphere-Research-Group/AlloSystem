@@ -125,6 +125,45 @@ void GPUContext :: contextDestroy() { //printf("GPUContext::contextDestroy %d\n"
 
 
 
+
+GPUObject::GPUObject(int ctx)
+:	mID(0), mResubmit(false)
+{	contextRegister(ctx); }
+
+GPUObject::GPUObject(GPUContext& ctx)
+:	mID(0), mResubmit(false)
+{	contextRegister(ctx.contextID()); }
+
+GPUObject::~GPUObject(){
+	contextUnregister();
+}
+
+void GPUObject::validate(){
+	if(mResubmit){
+		destroy();
+		mResubmit=false;
+	}
+	if(!created()) create();
+}
+
+void GPUObject::invalidate(){
+	mResubmit = true;
+}
+
+bool GPUObject::created() const {
+	return id() != 0;
+}
+
+void GPUObject::create(){
+	if(created()){ destroy(); }
+	onCreate();
+}
+
+void GPUObject::destroy(){
+	if(created()) onDestroy();
+	mID=0;
+}
+
 void GPUObject :: contextRegister(int ctx) {
 	contextUnregister();
 	ContextMap& contexts = getContextMap();

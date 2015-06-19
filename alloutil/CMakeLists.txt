@@ -8,6 +8,7 @@ set(ALLOUTIL_SRC
   src/al_OmniStereo.cpp
   src/al_ResourceManager.cpp
   src/al_WarpBlend.cpp
+  src/al_RayStereo.cpp
   )
 
 # Dependencies ------------------------------
@@ -29,7 +30,14 @@ if(NOT LUA_FOUND)
   return()
 endif(NOT LUA_FOUND)
 
-find_path(ALLOCORE_HEADER allocore/graphics/al_Image.hpp ${CMAKE_SOURCE_DIR}/build/include)
+find_package(Jsoncpp)
+
+if(NOT Jsoncpp_FOUND)
+  message("Jsoncpp required to build AlloUtil. Not found!")
+  return()
+endif(NOT Jsoncpp_FOUND)
+
+find_path(ALLOCORE_HEADER allocore/graphics/al_Image.hpp ${BUILD_ROOT_DIR}/build/include)
 
 if(NOT ALLOCORE_HEADER)
     message("Allocore not built with freeimage support. Can't build Alloutil.")
@@ -45,16 +53,16 @@ get_target_property(ALLOCORE_LINK_LIBRARIES allocore${DEBUG_SUFFIX} ALLOCORE_LIN
 set(ALLOUTIL_LIB "alloutil${DEBUG_SUFFIX}")
 add_library(${ALLOUTIL_LIB} ${ALLOUTIL_SRC})
 
-set(ALLOUTIL_LINK_LIBRARIES ${LUA_LIBRARIES} ${ALLOCORE_LIBRARY})
-set(ALLOUTIL_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${LUA_INCLUDE_DIR} ${ALLOCORE_DEP_INCLUDE_DIRS})
+set(ALLOUTIL_LINK_LIBRARIES ${LUA_LIBRARIES} ${Jsoncpp_LIBRARIES} ${ALLOCORE_LIBRARY})
+set(ALLOUTIL_DIRS "${BUILD_ROOT_DIR}/build/include" ${LUA_INCLUDE_DIR} ${Jsoncpp_INCLUDE_DIRS} ${ALLOCORE_DEP_INCLUDE_DIRS})
 
 include_directories(${ALLOUTIL_DIRS})
 target_link_libraries(${ALLOUTIL_LIB} ${ALLOUTIL_LINK_LIBRARIES})
 
 add_dependencies(${ALLOUTIL_LIB} allocore${DEBUG_SUFFIX})
 
-set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
+set(LIBRARY_OUTPUT_PATH "${BUILD_ROOT_DIR}/build/lib")
+set(EXECUTABLE_OUTPUT_PATH "${BUILD_ROOT_DIR}/build/bin")
 
 #message (STATUS "allocore_location for alloutil == ${ALLOCORE_LIBRARY}")
 
@@ -68,6 +76,14 @@ set_target_properties(${ALLOUTIL_LIB}
   ALLOUTIL_LINK_LIBRARIES "${ALLOUTIL_LINK_LIBRARIES}"
   )
 
+# Copy headers to build directory (only if header has changed)
+file(GLOB ALLOUTIL_INSTALL_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} alloutil/*.h*)
+foreach(header ${ALLOUTIL_INSTALL_HEADERS})
+	execute_process(COMMAND ${CMAKE_COMMAND} -E
+					copy_if_different "${header}" "${BUILD_ROOT_DIR}/build/include/${header}"
+					WORKING_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}")
+endforeach()
+
 # Build Examples ------------------------------------------------------
 if(BUILD_EXAMPLES)
     find_package(LibSndFile REQUIRED QUIET)
@@ -75,14 +91,14 @@ if(BUILD_EXAMPLES)
     find_package(Gamma QUIET)
   endif(NOT TARGET Gamma)
 
-  if(NOT (GAMMA_FOUND OR Gamma_LIBRARY))
+  if(NOT (GAMMA_FOUND OR GAMMA_LIBRARY))
     message("Alloutil: Gamma not found. Not building examples." )
   else()
 
     include_directories(${GAMMA_INCLUDE_DIR})
 
     file(GLOB EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/*.cpp)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin/examples/)
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_ROOT_DIR}/build/bin/examples/)
     foreach(example ${EXAMPLE_FILES})
       get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
       set(EXAMPLE_TARGET alloutil_examples_${EXAMPLE_NAME})
@@ -109,5 +125,5 @@ if(BUILD_EXAMPLES)
 endif(BUILD_EXAMPLES)
 
 # installation
-install(DIRECTORY alloutil/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include/alloutil)
-install(TARGETS ${ALLOUTIL_LIB} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install(FILES ${ALLOUTIL_INSTALL_HEADERS} DESTINATION "${CMAKE_INSTALL_PREFIX}/include")
+install(TARGETS ${ALLOUTIL_LIB} DESTINATION "${CMAKE_INSTALL_PREFIX}/lib")

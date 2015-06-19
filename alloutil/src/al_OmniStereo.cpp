@@ -1,6 +1,7 @@
+#include <fstream> // Loads configuration.
+#include "json/json.h" // Parses configuration.
+#include <iostream>
 
-#include "allocore/io/al_Socket.hpp" // for hostname
-#include "alloutil/al_Lua.hpp" // for hostname
 #include "allocore/graphics/al_Image.hpp"
 #include "allocore/graphics/al_Shader.hpp"
 #include "allocore/io/al_File.hpp"
@@ -8,7 +9,8 @@
 
 using namespace al;
 
-static Lua L;
+static Json::Value config;
+static std::string errors;
 
 
 static float fovy = M_PI;
@@ -632,154 +634,111 @@ OmniStereo& OmniStereo::configure(BlendMode bm) {
 }
 
 OmniStereo& OmniStereo::configure(std::string configpath, std::string configname) {
+	if (configpath == "") {
+		#ifdef AL_WINDOWS
+		// Calibration files should be kept at the root of the C: drive on Windows.
+		configpath = "C:";
+		#else
+		// A bit of C trickery to get the absolute path of the home directory on *nix systems.
+	  FILE *pipe = popen("echo ~", "r");
+	  if (pipe) {
+	    char c;
+	    while((c = getc(pipe)) != EOF) {
+	  		if (c == '\r' || c == '\n')
+	      	break;
+	  		configpath += c;
+	    }
+	    pclose(pipe);
+	  }
+	  #endif
 
-    if (configpath == "") {
-        FILE *pipe = popen("echo ~", "r");
-        if (pipe) {
-          char c;
-          while((c = getc(pipe)) != EOF) {
-        if (c == '\r' || c == '\n')
-              break;
-        configpath += c;
-          }
-          pclose(pipe);
-        }
-        configpath += "/calibration-current/";
-      }
-
-
-	if (L.dofile(configpath + "/" + configname + ".lua", 0)) return *this;
-
-	L.getglobal("projections");
-	if (!lua_istable(L, -1)) {
-		printf("config file %s has no projections\n", configpath.c_str());
-		return *this;
+	  configpath += "/calibration-current";
 	}
-	int projections = L.top();
+	std::string config_file_name = configpath + "/" + configname + ".json";
 
-	// set active stereo
-	lua_getfield(L, projections, "active");
-	if (lua_toboolean(L, -1)) {
+	static std::ifstream config_file(config_file_name.c_str(), std::ifstream::binary | std::ifstream::in);
+	if (config_file.fail()){
+		std::cout  << "Failed to find configuration file." << std::endl;
+		return *this;
+	} else {
+		config_file >> config;
+		config_file.close();
+	}
+
+  if ( config.empty() ){
+    std::cout  << "Failed to parse configuration file." << std::endl;
+    std::cout << errors << std::endl;
+    std::cout << "Using default configuration file." << std::endl;
+    return *this;
+  } else {
+    std::cout << "Parsed configuration file." << std::endl;
+  }
+
+	if ( config["active"].asBool() ) {
 		mMode = ACTIVE;
 	}
-	L.pop(); //active
 
-	// set fullscreen by default mode?
-	lua_getfield(L, projections, "fullscreen");
-	if (lua_toboolean(L, -1)) {
+	if ( config["fullscreen"].asBool() ) {
 		mFullScreen = true;
 	}
-	L.pop(); // fullscreen
 
-	// set resolution?
-	lua_getfield(L, projections, "resolution");
-	if (lua_isnumber(L, -1)) {
-		resolution(lua_tonumber(L, -1));
+	if ( config["resolution"].isUInt() ) {
+		resolution(config["resolution"].asUInt());
 	}
-	L.pop(); // resolution
 
-	mNumProjections = lua_objlen(L, projections);
-	printf("found %d viewports\n", mNumProjections);
+	mNumProjections = config["projections"].size();
+	printf("Found %d viewports.\n", mNumProjections);
 
 	for (unsigned i=0; i<mNumProjections; i++) {
-		L.push(i+1);
-		lua_gettable(L, projections);
-		int projection = L.top();
-		//L.dump("config");
+		Json::Value& projection = config["projections"][i];
+		Projection& mprojection = mProjections[i];
 
-		lua_getfield(L, projection, "viewport");
-		if (lua_istable(L, -1)) {
-			int viewport = L.top();
-			lua_getfield(L, viewport, "l");
-			mProjections[i].viewport().l = L.to<float>(-1);
-			L.pop();
-
-			lua_getfield(L, viewport, "b");
-			mProjections[i].viewport().b = L.to<float>(-1);
-			L.pop();
-
-			lua_getfield(L, viewport, "w");
-			mProjections[i].viewport().w = L.to<float>(-1);
-			L.pop();
-
-			lua_getfield(L, viewport, "h");
-			mProjections[i].viewport().h = L.to<float>(-1);
-			L.pop();
-
-		}
-		L.pop(); // viewport
-
-		lua_getfield(L, projection, "warp");
-		if (lua_istable(L, -1)) {
-			int warp = L.top();
-
-			lua_getfield(L, warp, "width");
-			if (lua_isnumber(L, -1)) {
-				mProjections[i].warpwidth = lua_tonumber(L, -1);
+		Json::Value& viewport = projection["viewport"];
+			if ( ! viewport.isNull() ) {
+				mprojection.viewport().l = viewport["l"].asFloat();
+				mprojection.viewport().b = viewport["b"].asFloat();
+				mprojection.viewport().w = viewport["w"].asFloat();
+				mprojection.viewport().h = viewport["h"].asFloat();
 			}
-			L.pop();
 
-			lua_getfield(L, warp, "height");
-			if (lua_isnumber(L, -1)) {
-				mProjections[i].warpheight = lua_tonumber(L, -1);
+		Json::Value& warp = projection["warp"];
+			if ( ! warp.isNull() ) {
+				if ( warp["width"].isInt() ) {
+					mprojection.warpwidth = warp["width"].asInt();
+				}
+
+				if ( warp["height"].isInt() ) {
+					mprojection.warpheight = warp["height"].asInt();
+				}
+
+				if ( warp["file"].isString() ) {
+					mprojection.readWarp( configpath + "/" + warp["file"].asString() );
+				}
 			}
-			L.pop();
 
-			lua_getfield(L, warp, "file");
-			if (lua_isstring(L, -1)) {
-				// load from file
-				mProjections[i].readWarp(configpath + "/" + lua_tostring(L, -1));
+		Json::Value& blend = projection["blend"];
+			if ( ! blend.isNull() ) {
+				if ( blend["file"].isString() ) {
+					mprojection.readBlend( configpath + "/" + blend["file"].asString() );
+				} else {
+					// TODO: generate blend...
+				}
 			}
-			L.pop();
-		}
-		L.pop(); // warp
 
-		lua_getfield(L, projection, "blend");
-		if (lua_istable(L, -1)) {
-			int blend = L.top();
-			lua_getfield(L, blend, "file");
-			if (lua_isstring(L, -1)) {
-				// load from file
-				mProjections[i].readBlend(configpath + "/" + lua_tostring(L, -1));
-			} else {
-				// TODO: generate blend...
-			}
-			L.pop();
-		}
-		L.pop(); // blend
+		// Deprecated.
+		// Json::Value& params = projection["params"];
+		// 	if ( ! params.isNull() ) {
+		// 		if ( params["file"].isString() ) {
+		// 			mprojection.readParameters( configpath + "/" + params["file"].asString() );
+		// 		}
+		// 	}
 
-		lua_getfield(L, projection, "params");
-		if (lua_istable(L, -1)) {
-			int params = L.top();
-			lua_getfield(L, params, "file");
-			if (lua_isstring(L, -1)) {
-				// load from file
-				mProjections[i].readParameters(configpath + "/" + lua_tostring(L, -1)); //, true);
-			}
-			L.pop();
-		}
-		L.pop(); // params
-
-		lua_getfield(L, projection, "position");
-		if (lua_istable(L, -1)) {
-			int position = L.top();
-			lua_rawgeti(L, position, 1);
-			mProjections[i].position.x = L.to<double>(-1);
-			L.pop();
-			lua_rawgeti(L, position, 2);
-			mProjections[i].position.y = L.to<double>(-1);
-			L.pop();
-			lua_rawgeti(L, position, 3);
-			mProjections[i].position.z = L.to<double>(-1);
-			L.pop();
-		}
-		L.pop(); // position
-
-
-		L.pop(); // projector
+		Json::Value& position = projection["position"];
+			mprojection.position.x = position[0].asDouble();
+			mprojection.position.y = position[1].asDouble();
+			mprojection.position.z = position[2].asDouble();
 	}
 
-	L.pop(); // the projections table
 	return *this;
 }
 

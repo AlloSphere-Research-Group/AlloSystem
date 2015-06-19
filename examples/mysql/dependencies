@@ -1,0 +1,25 @@
+# mysql dependencies.
+
+# TODO: Update for cmake workflow.
+
+mysql_apt="libmysql++-dev"
+mysql_apt_callback(){
+  MYSQL_DIR=$( cd "$( dirname "$0" )" && pwd )
+  echo '-I/usr/include/mysql -lmysqlpp' > "${MYSQL_DIR}/flags.txt"
+}
+
+mysql_brew="mysql++"
+mysql_brew_callback(){
+  MYSQL_DIR=$( cd "$( dirname "$0" )" && pwd )
+  echo '-L/usr/local/lib -I/usr/local/include -lmysqlpp' > "${MYSQL_DIR}/flags.txt"
+}
+mysql_port="mysqlxx +universal"
+mysql_port_callback(){
+  MYSQL_DIR=$( cd "$( dirname "$0" )" && pwd )
+  echo '-L/opt/local/lib -I/opt/local/include -lmysqlpp' > "${MYSQL_DIR}/flags.txt"
+}
+
+# mysql_pacman=""
+mysql_pacman_callback(){
+  echo 'Please alert us if a mysql++ port appears in MSYS2 pacman.'
+}
