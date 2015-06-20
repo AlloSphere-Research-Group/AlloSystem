@@ -382,17 +382,22 @@ void AudioDeviceInfo::setDefaultSampleRate(double rate) { mDefaultSampleRate = r
 AudioDevice::AudioDevice(int deviceNum)
 :    AudioDeviceInfo(deviceNum), mImpl(0)
 {
+	if (deviceNum < 0) {
+		deviceNum = PortAudioBackend::defaultOutput().id();
+	}
 	setImpl(deviceNum);
-	strncpy(mName, ((const PaDeviceInfo*)mImpl)->name, 127);
-	mName[127] = '\0';
-	mChannelsInMax = ((const PaDeviceInfo*)mImpl)->maxInputChannels;
-	mChannelsOutMax = ((const PaDeviceInfo*)mImpl)->maxOutputChannels;
-	mDefaultSampleRate = ((const PaDeviceInfo*)mImpl)->defaultSampleRate;
-	mID = deviceNum;
+	if (deviceNum >= 0) {
+		strncpy(mName, ((const PaDeviceInfo*)mImpl)->name, 127);
+		mName[127] = '\0';
+		mChannelsInMax = ((const PaDeviceInfo*)mImpl)->maxInputChannels;
+		mChannelsOutMax = ((const PaDeviceInfo*)mImpl)->maxOutputChannels;
+		mDefaultSampleRate = ((const PaDeviceInfo*)mImpl)->defaultSampleRate;
+		mID = deviceNum;
+	}
 }
 
 AudioDevice::AudioDevice(const std::string& nameKeyword, StreamMode stream)
-:	AudioDeviceInfo(nameKeyword, stream), mImpl(0)
+:	AudioDeviceInfo(0), mImpl(0)
 {
 	for(int i=0; i<numDevices(); ++i){
 		AudioDevice d(i);
@@ -508,21 +513,22 @@ double AudioIOData::secondsPerBuffer() const { return (double)framesPerBuffer() 
 //==============================================================================
 
 AudioIO::AudioIO(int framesPerBuf, double framesPerSec, void (* callbackA)(AudioIOData &), void * userData,
-	int outChansA, int inChansA, int numOutputChannels, int numInputChannels, int backend)
+	int outChansA, int inChansA, int backend)
 :	AudioIOData(userData),
 	callback(callbackA),
-	mInDevice(AudioDevice::defaultInput()), mOutDevice(AudioDevice::defaultOutput()),
 	mZeroNANs(true), mClipOut(true), mAutoZeroOut(true)
 {
 	switch(backend) {
-	case PortAudio:
+	case PORTAUDIO:
 		mImpl = new PortAudioBackend;
+		mInDevice = AudioDevice::defaultInput();
+		mOutDevice = AudioDevice::defaultOutput();
 		break;
-	case Dummy:
+	case DUMMY:
 		mImpl = new DummyAudioBackend;
 		break;
 	}
-	init(numOutputChannels, numInputChannels);
+	init(outChansA, inChansA);
 	this->framesPerBuffer(framesPerBuf);
 	channels(inChansA, false);
 	channels(outChansA, true);
@@ -537,18 +543,9 @@ AudioIO::~AudioIO(){
 
 
 void AudioIO::init(int outChannels, int inChannels){
-
 	// Choose default devices for now...
-	if (inChannels < 0) {
-		deviceIn(AudioDevice::defaultInput());
-	} else {
-		deviceIn(inChannels);
-	}
-	if (outChannels < 0) {
-		deviceOut(AudioDevice::defaultOutput());
-	} else {
-		deviceOut(outChannels);
-	}
+	deviceIn(AudioDevice::defaultInput());
+	deviceOut(AudioDevice::defaultOutput());
 
 //	// Setup input stream parameters
 //	const PaDeviceInfo * dInfo = Pa_GetDeviceInfo(mInParams.device);
@@ -625,7 +622,6 @@ void AudioIO::channelsBus(int num){
 
 
 void AudioIO::channels(int num, bool forOutput){
-
 	num = mImpl->channels(num, forOutput);
 	int currentNum = channels(forOutput);
 

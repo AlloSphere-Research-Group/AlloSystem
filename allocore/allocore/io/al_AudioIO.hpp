@@ -65,11 +65,11 @@ public:
 	};
 
 	/// @param[in] deviceNum	Device enumeration number
-	AudioDeviceInfo(int deviceNum) : mID(-1){}
+	AudioDeviceInfo(int deviceNum) : mID(deviceNum){}
 
-	/// @param[in] nameKeyword	Keyword to search for in device name
-	/// @param[in] stream		Whether to search for input and/or output devices
-	AudioDeviceInfo(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT)) : mID(-1) {}
+//	/// @param[in] nameKeyword	Keyword to search for in device name
+//	/// @param[in] stream		Whether to search for input and/or output devices
+//	AudioDeviceInfo(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT)) : mID(-1) {}
 
 //	~AudioDeviceInfo() = 0;
 
@@ -107,7 +107,7 @@ class AudioDevice: public AudioDeviceInfo {
 public:
 
 	/// @param[in] deviceNum	Device enumeration number
-	AudioDevice(int deviceNum);
+	AudioDevice(int deviceNum = -1 );
 
 	/// @param[in] nameKeyword	Keyword to search for in device name
 	/// @param[in] stream		Whether to search for input and/or output devices
@@ -180,8 +180,8 @@ public:
 	virtual ~AudioIOData();
 
 	enum Backend{
-		PortAudio,
-		Dummy
+		PORTAUDIO,
+		DUMMY
 	};
 
 	/// Iterate frame counter, returning true while more frames
@@ -294,8 +294,7 @@ public:
 	AudioIO(int framesPerBuf=64, double framesPerSec=44100.0,
 			void (* callback)(AudioIOData &) = 0, void * userData = 0,
 			int outChans = 2, int inChans = 0,
-			int numOutChannels = -1, int numInChannels = -1,
-			int backend = PortAudio
+			int backend = PORTAUDIO
 			);
 
 	virtual ~AudioIO();
