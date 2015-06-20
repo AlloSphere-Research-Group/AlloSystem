@@ -519,12 +519,12 @@ AudioIO::AudioIO(int framesPerBuf, double framesPerSec, void (* callbackA)(Audio
 	mZeroNANs(true), mClipOut(true), mAutoZeroOut(true)
 {
 	switch(backend) {
-	case PortAudio:
+	case PORTAUDIO:
 		mImpl = new PortAudioBackend;
 		mInDevice = AudioDevice::defaultInput();
 		mOutDevice = AudioDevice::defaultOutput();
 		break;
-	case Dummy:
+	case DUMMY:
 		mImpl = new DummyAudioBackend;
 		break;
 	}
