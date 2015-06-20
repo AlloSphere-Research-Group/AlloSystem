@@ -40,6 +40,7 @@ if binary_exists "apt-get"; then
 						 portaudio19-dev libsndfile1-dev \
 						 libglew-dev freeglut3-dev \
 						 libavahi-client-dev \
+						 libbluetooth-dev \
 						 libudev-dev libusb-1.0-0-dev \
 						 libfreeimage-dev libfreetype6-dev \
 						 libxi-dev libxmu-dev
@@ -181,6 +182,11 @@ elif uname | grep "MINGW"; then
 				rm $PKG.*
 			cd $DIR
 		fi
+
+		# Windows Bluetooth lib is disguised as control panel item (!?).
+		# We just make a local copy to avoid disturbing Windows...
+		cp /c/Windows/System32/bthprops.cpl $DESTDIR/bin/bthprops.dll
+		cp win32/*.h $DESTDIR/include/
 
 		if files_exist $DESTDIR/lib/*freetype*; then
 			echo 'Found FreeType'
