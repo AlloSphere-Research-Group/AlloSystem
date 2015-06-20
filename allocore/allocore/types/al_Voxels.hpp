@@ -84,6 +84,10 @@ typedef float UnitsTy;
 /// OBJECT-oriented interface to AlloArray
 class Voxels : public Array {
 public:
+  Voxels() :
+      Array() {
+    init(1,1,1, METERS);
+  }
 
   /// Construct dimx x dimy x dimz voxel grid giving 3D size of each voxel cuboid with units
   Voxels(AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, float sizex, float sizey, float sizez, UnitsTy units) :
@@ -168,6 +172,8 @@ public:
   bool writeToFile(std::string filename);
   
   bool loadFromFile(std::string filename);
+  
+  void print(FILE * fp = stdout);
 
   ~Voxels() {
   }
