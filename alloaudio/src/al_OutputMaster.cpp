@@ -267,6 +267,26 @@ void OutputMaster::setBassManagementModeTimestamped(al_sec until, int mode)
 {
 	setBassManagementMode((bass_mgmt_mode_t) mode);
 }
+std::string OutputMaster::addressPrefix() const
+{
+	return m_addressPrefix;
+}
+
+void OutputMaster::setAddressPrefix(const std::string &addressPrefix)
+{
+	m_addressPrefix = addressPrefix;
+}
+
+bool OutputMaster::meterAddrHasChannel() const
+{
+	return m_meterAddrHasChannel;
+}
+
+void OutputMaster::setMeterAddrHasChannel(bool meterAddrHasChannel)
+{
+	m_meterAddrHasChannel = meterAddrHasChannel;
+}
+
 
 int OutputMaster::chanIsSubwoofer(int index)
 {
@@ -282,9 +302,10 @@ void OutputMaster::initializeData()
 	m_masterGain = 0.0;
 	m_muteAll = false;
 	m_clipperOn = true;
-
+	m_addressPrefix = "/Alloaudio";
 	m_meterCounter = 0;
 	m_meterOn = false;
+	m_meterAddrHasChannel = false;
 
 	setBassManagementMode(BASSMODE_NONE);
 	setBassManagementFreq(150);
@@ -327,17 +348,17 @@ void *OutputMaster::meterThreadFunc(void *arg) {
 				std::cerr << "Alloaudio: Warning. Meter values underrun." << std::endl;
 			}
 			for (int i = 0; i < bytes_read/sizeof(float); i++) {
-				std::stringstream addr;
-				addr << "/Alloaudio/meterdb/" <<  chanindex + 1;
-				//            lo_send(t, "/Alloaudio/meter", "if", i, meter_levels[i]);
-				//            lo_send(t, "/Alloaudio/meterdb", "if", i, 20.0 * log10(meter_levels[i]));
-				//            lo_send(t, addr, "f", 20.0 * log10(meter_levels[i]));
-				//            lo_send(t, addr, "f", meter_levels[i]);
-			  s.send(addr.str(),
-				 (float) (20.0 * log10(meter_levels[i])));
-			  s.send("/Alloaudio/meterdb", chanindex,
-				 (float) (20.0 * log10(meter_levels[i])));
-			  chanindex++;
+				if (om->m_meterAddrHasChannel) {
+					std::stringstream addr;
+					addr << om->m_addressPrefix << "/meterdb/" <<  chanindex + 1;
+					s.send(addr.str(),
+						   (float) (20.0 * log10(meter_levels[i])));
+				} else {
+					s.send(om->m_addressPrefix + "/meterdb", chanindex,
+						   (float) (20.0 * log10(meter_levels[i])));
+				}
+
+				chanindex++;
 				if (chanindex == om->m_numChnls) {
 					chanindex = 0;
 				}
@@ -350,7 +371,7 @@ void *OutputMaster::meterThreadFunc(void *arg) {
 
 void OutputMaster::OSCHandler::onMessage(osc::Message &m)
 {
-	if (m.addressPattern() == "/Alloaudio/gain") {
+	if (m.addressPattern() == outputmaster->m_addressPrefix + "/gain") {
 		if (m.typeTags() == "if") {
 			int chan;
 			float gain;
@@ -360,10 +381,10 @@ void OutputMaster::OSCHandler::onMessage(osc::Message &m)
 												&OutputMaster::setGainTimestamped,
 												chan, (double) gain);
 		} else {
-			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/gain message: "
+			std::cerr << "Alloaudio: Wrong type tags for " << outputmaster->m_addressPrefix << "/gain message: "
 					  << m.typeTags() << std::endl;
 		}
-	} else if (m.addressPattern() == "/Alloaudio/global_gain") {
+	} else if (m.addressPattern() == outputmaster->m_addressPrefix + "/global_gain") {
 		if (m.typeTags() == "f") {
 			float gain;
 			m >> gain;
@@ -372,10 +393,10 @@ void OutputMaster::OSCHandler::onMessage(osc::Message &m)
 												&OutputMaster::setMasterGainTimestamped,
 												(double) gain);
 		} else {
-			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/global_gain message: "
+			std::cerr << "Alloaudio: Wrong type tags for " + outputmaster->m_addressPrefix + "/global_gain message: "
 					  << m.typeTags() << std::endl;
 		}
-	} else if (m.addressPattern() == "/Alloaudio/clipper_on") {
+	} else if (m.addressPattern() == outputmaster->m_addressPrefix + "/clipper_on") {
 		if (m.typeTags() == "i") {
 			int clipper_on;
 			m >> clipper_on;
@@ -391,10 +412,10 @@ void OutputMaster::OSCHandler::onMessage(osc::Message &m)
 												&OutputMaster::setClipperOnTimestamped,
 												(bool) clipper_on != 0);
 		} else {
-			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/clipper_on: "
+			std::cerr << "Alloaudio: Wrong type tags for " + outputmaster->m_addressPrefix + "/clipper_on: "
 					  << m.typeTags() << std::endl;
 		}
-	} else if (m.addressPattern() == "/Alloaudio/mute_all") {
+	} else if (m.addressPattern() == outputmaster->m_addressPrefix + "/mute_all") {
 		if (m.typeTags() == "i") {
 			int mute_all;
 			m >> mute_all;
@@ -408,10 +429,10 @@ void OutputMaster::OSCHandler::onMessage(osc::Message &m)
 												outputmaster, &OutputMaster::setMuteAllTimestamped,
 												(bool) mute_all != 0);
 		} else {
-			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/mute_all: "
+			std::cerr << "Alloaudio: Wrong type tags for " + outputmaster->m_addressPrefix + "/mute_all: "
 					  << m.typeTags() << std::endl;
 		}
-	} else if (m.addressPattern() == "/Alloaudio/meter_on") {
+	} else if (m.addressPattern() == outputmaster->m_addressPrefix + "/meter_on") {
 		if (m.typeTags() == "i") {
 			int on;
 			m >> on;
@@ -425,10 +446,10 @@ void OutputMaster::OSCHandler::onMessage(osc::Message &m)
 												outputmaster, &OutputMaster::setMeterOnTimestamped,
 												(bool) on != 0);
 		} else {
-			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/meter_update_freq: "
+			std::cerr << "Alloaudio: Wrong type tags for " + outputmaster->m_addressPrefix + "/meter_update_freq: "
 					 << m.typeTags() << std::endl;
 		}
-	} else if (m.addressPattern() == "/Alloaudio/meter_update_freq") {
+	} else if (m.addressPattern() == outputmaster->m_addressPrefix + "/meter_update_freq") {
 		if (m.typeTags() == "f") {
 			float freq;
 			m >> freq;
@@ -436,10 +457,10 @@ void OutputMaster::OSCHandler::onMessage(osc::Message &m)
 												outputmaster, &OutputMaster::setMeterupdateFreqTimestamped,
 												(double) freq);
 		} else {
-			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/meter_update_freq: "
+			std::cerr << "Alloaudio: Wrong type tags for " + outputmaster->m_addressPrefix + "/meter_update_freq: "
 					 << m.typeTags() << std::endl;
 		}
-	} else if (m.addressPattern() == "/Alloaudio/bass_management_mode") {
+	} else if (m.addressPattern() == outputmaster->m_addressPrefix + "/bass_management_mode") {
 		if (m.typeTags() == "i") {
 			int mode;
 			m >> mode;
@@ -453,10 +474,10 @@ void OutputMaster::OSCHandler::onMessage(osc::Message &m)
 												outputmaster, &OutputMaster::setBassManagementModeTimestamped,
 												(int) mode);
 		} else{
-			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/bass_management_mode: "
+			std::cerr << "Alloaudio: Wrong type tags for " + outputmaster->m_addressPrefix + "//bass_management_mode: "
 					 << m.typeTags() << std::endl;
 		}
-	} else if (m.addressPattern() == "/Alloaudio/bass_management_freq") {
+	} else if (m.addressPattern() == outputmaster->m_addressPrefix + "/bass_management_freq") {
 		if (m.typeTags() == "f") {
 			float freq;
 			m >> freq;
@@ -464,7 +485,7 @@ void OutputMaster::OSCHandler::onMessage(osc::Message &m)
 												outputmaster, &OutputMaster::setBassManagementFreqTimestamped,
 												(double) freq);
 		} else {
-			std::cerr << "Alloaudio: Wrong type tags for /Alloaudio/bass_management_freq: "
+			std::cerr << "Alloaudio: Wrong type tags for " + outputmaster->m_addressPrefix + "/bass_management_freq: "
 					 << m.typeTags() << std::endl;
 		}
 	} else {

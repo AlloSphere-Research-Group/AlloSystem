@@ -180,22 +180,36 @@ void test_osc_gain(void)
 }
 
 float meterValues[2] = {1.0f, 1.0f};
+float meterValues2[2] = {1.0f, 1.0f};
 struct OSCHandler : public al::osc::PacketHandler{
 	void onMessage(al::osc::Message& m){
 		std::string addressPattern = m.addressPattern();
-		std::string patternPrefix = "/Alloaudio/meterdb/";
-		CU_ASSERT(addressPattern.find(patternPrefix) == 0);
-		CU_ASSERT(m.typeTags().size() == 1);
-		CU_ASSERT(m.typeTags().at(0) == 'f');
-		std::stringstream convert(addressPattern.substr(patternPrefix.length()));
-		int index = 0;
-		if ( !(convert >> index) ) {
-			index = -1;
+		if(m.typeTags().size() == 1) {
+			std::string patternPrefix = "/Alloaudio/meterdb/";
+			CU_ASSERT(addressPattern.find(patternPrefix) == 0);
+			CU_ASSERT(m.typeTags() == "f");
+			std::stringstream convert(addressPattern.substr(patternPrefix.length()));
+			int index = 0;
+			if ( !(convert >> index) ) {
+				index = -1;
+			}
+			CU_ASSERT(index >=0);
+			float dbvalue;
+			m >> dbvalue;
+			meterValues[index - 1] = powf(10.0, dbvalue/20.0);
+			meterValues2[index - 1] = 0.0;
+		} else {
+			CU_ASSERT(addressPattern == "/Alloaudio/meterdb")
+			CU_ASSERT(m.typeTags().size() == 2);
+			CU_ASSERT(m.typeTags() == "if");
+			int index;
+			m >> index;
+			CU_ASSERT(index >=0);
+			float dbvalue;
+			m >> dbvalue;
+			meterValues[index] = 0.0;
+			meterValues2[index] = powf(10.0, dbvalue/20.0);
 		}
-		CU_ASSERT(index >=0);
-		float dbvalue;
-		m >> dbvalue;
-		meterValues[index - 1] = powf(10.0, dbvalue/20.0);
 	}
 } handler;
 
@@ -226,9 +240,25 @@ void test_osc_meters()
 	outmaster.processBlock(io);
 	al_sleep_nsec(1000000); // Wait for messages to arrive
 	r.stop();
+	CU_ASSERT_DOUBLE_EQUAL(meterValues[0], 0.0, 0.000001);
+	CU_ASSERT_DOUBLE_EQUAL(meterValues[1], 0.0, 0.000001);
+	CU_ASSERT_DOUBLE_EQUAL(meterValues2[0], 0.5, 0.000001);
+	CU_ASSERT_DOUBLE_EQUAL(meterValues2[1], 0.75, 0.000001);
 
-	CU_ASSERT_DOUBLE_EQUAL(meterValues[0], 0.5, 0.000001);
-	CU_ASSERT_DOUBLE_EQUAL(meterValues[1], 0.75, 0.000001);
+	for (int i = 0; i < 4; i++) {
+		in_0[i] = i/4.0;
+		in_1[i] = 1.0/(i + 2);
+	}
+	outmaster.setMeterAddrHasChannel(true);
+	r.start();
+	outmaster.processBlock(io);
+	al_sleep_nsec(1000000); // Wait for messages to arrive
+	r.stop();
+	CU_ASSERT_DOUBLE_EQUAL(meterValues[0], 0.75, 0.000001);
+	CU_ASSERT_DOUBLE_EQUAL(meterValues[1], 0.5, 0.000001);
+	CU_ASSERT_DOUBLE_EQUAL(meterValues2[0], 0.0, 0.000001);
+	CU_ASSERT_DOUBLE_EQUAL(meterValues2[1], 0.0, 0.000001);
+
 
 }
 
