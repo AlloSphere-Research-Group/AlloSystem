@@ -47,6 +47,8 @@ Other optional dependencies are:
  * Libsndfile
  * luajit (for alloutil)
  * GLV (for alloGLV)
+ * Gamma (For audio examples and alloaudio)
+ * FFTW3 (For alloaudio)
 
 You may not need all these dependencies if you plan to build only part of AlloSystem. The build system will try to find the dependencies available and build as much functionality as possible. However, if some dependencies are not available in your system, you won't have all functionality available and building some examples or existing code that uses it will fail.
 
@@ -57,6 +59,15 @@ AlloSystem provides cross-platform scripts to simplify downloading dependencies.
 	$ cd ..
 
 This will download and install all of the AlloCore dependencies using APT, MacPorts, Homebrew, or building from source.
+
+###2.1 GLV and Gamma
+
+The AlloSystem build system can incorporate the building and linking of GLV and Gamma. GLV provides a set of GL widgets for GUI creation within an OpenGL window and Gamma provides a C++ audio synthesis and DSP library. If they are placed side by side with the AlloSystem sources, they will be found and built by default. You can get these from git with the commands:
+
+```
+git clone git@github.com:AlloSphere-Research-Group/GLV.git
+git clone git@github.com:AlloSphere-Research-Group/Gamma.git
+```
 
 ##3. Running examples and projects
 
