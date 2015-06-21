@@ -183,10 +183,14 @@ elif uname | grep "MINGW"; then
 			cd $DIR
 		fi
 
-		# Windows Bluetooth lib is disguised as control panel item (!?).
-		# We just make a local copy to avoid disturbing Windows...
-		cp /c/Windows/System32/bthprops.cpl $DESTDIR/bin/bthprops.dll
-		cp win32/*.h $DESTDIR/include/
+		if files_exist $DESTDIR/bin/bthprops.dll; then
+			echo 'Found Bluetooth'
+		else
+			# Windows Bluetooth lib is disguised as control panel item (!?).
+			# We just make a local copy to avoid disturbing Windows...
+			cp /c/Windows/System32/bthprops.cpl $DESTDIR/bin/bthprops.dll
+			#cp win32/*.h $DESTDIR/include/
+		fi
 
 		if files_exist $DESTDIR/lib/*freetype*; then
 			echo 'Found FreeType'
