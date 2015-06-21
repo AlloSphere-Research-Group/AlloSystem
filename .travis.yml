@@ -5,7 +5,7 @@ compiler:
 env:
       global:
            - VERBOSE=1
-install: ./install-dependencies.sh
+install: ./install_all_dependencies.sh
 script: cmake . -DCMAKE_BUILD_TYPE=Debug && make && make test
 
 notifications:
