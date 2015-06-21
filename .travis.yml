@@ -1,0 +1,14 @@
+language: cpp
+compiler:
+ - gcc
+ - clang
+env:
+      global:
+           - VERBOSE=1
+install: ./install-dependencies.sh
+script: cmake . -DCMAKE_BUILD_TYPE=Debug && make && make test
+
+notifications:
+      email:
+          recipients:
+              - mantaraya36@gmail.com

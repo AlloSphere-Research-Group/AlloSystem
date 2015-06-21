@@ -6,6 +6,10 @@ Developed by:
 
 University of California, Santa Barbara
 
+<a href="https://scan.coverity.com/projects/5548">
+  <img alt="Coverity Scan Build Status"
+	   src="https://scan.coverity.com/projects/5548/badge.svg"/>
+</a>
 
 ##1. About
 
