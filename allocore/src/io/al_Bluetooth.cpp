@@ -244,7 +244,7 @@ struct al::Bluetooth::Impl{
 #include <ws2bth.h> // must be included after winsock2.h
 //#include "bluetoothWindows/ws2bth.h"
 #pragma comment (lib, "Ws2_32.lib")
-#include "BluetoothAPIs.h" // must be included after ws2bth.h
+#include <BluetoothAPIs.h> // must be included after ws2bth.h
 #pragma comment (lib, "Bthprops.lib")
 /*
 typedef ULONGLONG BTH_ADDR;
