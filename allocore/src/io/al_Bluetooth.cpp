@@ -237,16 +237,14 @@ struct al::Bluetooth::Impl{
 #define WIN32_LEAN_AND_MEAN
 #define VC_EXTRALEAN
 #include <windows.h>
-
 #include <stdlib.h> // For wcstombs
-
 #include <winsock2.h>
 //#define NO_GUID_DEFS
 #include <initguid.h> // makes DEFINE_GUID macro _define_ variables
-#include <ws2bth.h>
+#include <ws2bth.h> // must be included after winsock2.h
+//#include "bluetoothWindows/ws2bth.h"
 #pragma comment (lib, "Ws2_32.lib")
-
-#include "BluetoothAPIs.h"
+#include "BluetoothAPIs.h" // must be included after ws2bth.h
 #pragma comment (lib, "Bthprops.lib")
 /*
 typedef ULONGLONG BTH_ADDR;
