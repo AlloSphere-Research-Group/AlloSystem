@@ -1,6 +1,8 @@
 project( AlloSystem )
 cmake_minimum_required(VERSION 2.8)
 
+ENABLE_TESTING() # Must be here to have tests for the subprojects
+
 if(NOT DEFINED BUILD_ROOT_DIR)
   set(BUILD_ROOT_DIR "${CMAKE_SOURCE_DIR}")
 endif(NOT DEFINED BUILD_ROOT_DIR)
@@ -84,8 +86,6 @@ if((ALLOSYSTEM_BUILD_DIR) OR (ALLOSYSTEM_BUILD_APP_FILE))
     include("${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/CMakeRunTargets.cmake")
     set(BUILD_EXAMPLES 0)
 endif((ALLOSYSTEM_BUILD_DIR) OR (ALLOSYSTEM_BUILD_APP_FILE))
-
-ENABLE_TESTING() # Must be here to have tests for the subprojects
 
 # ----------------------------  Examples
 # macro to get subdirectories

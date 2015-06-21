@@ -127,7 +127,6 @@ find_library(CUNIT_LIBRARY cunit)
 set(TEST_ARGS "")
 
 if(CUNIT_LIBRARY)
-	#ENABLE_TESTING()
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${BUILD_ROOT_DIR}/build/bin")
     add_executable(alloaudioTests unitTests/alloaudioTests.cpp)
     target_link_libraries(alloaudioTests ${ALLOCORE_LIBRARY} ${ALLOAUDIO_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${CUNIT_LIBRARY})
