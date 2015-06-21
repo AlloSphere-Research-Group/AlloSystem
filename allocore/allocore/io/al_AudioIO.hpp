@@ -180,8 +180,8 @@ public:
 	virtual ~AudioIOData();
 
 	enum Backend{
-		PortAudio,
-		Dummy
+		PORTAUDIO,
+		DUMMY
 	};
 
 	/// Iterate frame counter, returning true while more frames
@@ -294,7 +294,7 @@ public:
 	AudioIO(int framesPerBuf=64, double framesPerSec=44100.0,
 			void (* callback)(AudioIOData &) = 0, void * userData = 0,
 			int outChans = 2, int inChans = 0,
-			int backend = PortAudio
+			int backend = PORTAUDIO
 			);
 
 	virtual ~AudioIO();

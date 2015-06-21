@@ -327,8 +327,8 @@ void *OutputMaster::meterThreadFunc(void *arg) {
 				std::cerr << "Alloaudio: Warning. Meter values underrun." << std::endl;
 			}
 			for (int i = 0; i < bytes_read/sizeof(float); i++) {
-			  std::stringstream addr;
-			  addr << "/Alloaudio/meterdb/" <<  chanindex + 1;
+				std::stringstream addr;
+				addr << "/Alloaudio/meterdb/" <<  chanindex + 1;
 				//            lo_send(t, "/Alloaudio/meter", "if", i, meter_levels[i]);
 				//            lo_send(t, "/Alloaudio/meterdb", "if", i, 20.0 * log10(meter_levels[i]));
 				//            lo_send(t, addr, "f", 20.0 * log10(meter_levels[i]));
