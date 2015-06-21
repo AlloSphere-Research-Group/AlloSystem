@@ -1,17 +1,27 @@
 language: cpp
 compiler:
- - gcc
- - clang
+- gcc
+- clang
 env:
-      global:
-           - VERBOSE=1
+  global:
+  - secure: pLHc3hG/hZA41PmRB4jhvsHWTyeBFhcA53p7Cy509TWK2Qw983Xf/sVJfZcwLxax4fgelerVsx88dmAZHnudaxzd+wqx33t2SIyOMgn95pqijxibNCho7tL6oUsFe/+OxMKMhZdWsdvZAWJ6njzvKy9ErLVg8wbHeKh/n5h+1QzOUwa5Gh3923G0t2GvgmSVMqvqeTHjU5dQ6xddts8LyPuth93eRAmVB10syYEGIETWeZ3QU8vupJkCfKD4RIJeFUsEzFdU6iWJsmfFhWGRQl2ZOaDrGexmnrbxMctSVbPC3qG4PUe3Mhot3UsxVsA+zmzDG7hADe17jo6SVAYT8GqllQVVYcGcbCDjURk77DuYDupKeHuNMd+TzjMystKcPlPLCBfQE68L675gOtig05Fb277ReM6WdI4voRcSwagiArMQ8b6+D5PoyHgWtOhSrJEtFfKi7KgyBXHWti+sGkQc1FfgDhrsaXy2J+RvXkuMPt8OtMjp483nO4eeTprCXqEDuh18u8Kkv+BUcuojOXr1SD9Cvc605f4hWbgLSWLSLod5ZT7MbaUWvuTHLbJb//87ULv6VLU9BddO1Jp0JQ4Bcjca2hkFr/hHHIEB1ACrhfDSexK88M6jzumTNQ3cXn+EwJzjQu57uduY5Tv5ii9mAuO4aRNh1cQbcstxWds=
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -y libapr1-dev libaprutil1-dev portaudio19-dev libsndfile1-dev libglew-dev freeglut3-dev libavahi-client-dev libudev-dev libusb-1.0-0-dev libfreeimage-dev libfreetype6-dev libxi-dev libxmu-dev libassimp-dev
-script: cmake . -DCMAKE_BUILD_TYPE=Debug && make && make test
+- sudo apt-get update -qq
+- sudo apt-get install -y libapr1-dev libaprutil1-dev portaudio19-dev libsndfile1-dev
+  libglew-dev freeglut3-dev libavahi-client-dev libudev-dev libusb-1.0-0-dev libfreeimage-dev
+  libfreetype6-dev libxi-dev libxmu-dev libassimp-dev
+script: "./distclean && cmake . -DCMAKE_BUILD_TYPE=Debug && make && make test"
 sudo: required
-
+addons:
+  coverity_scan:
+    project:
+      name: AlloSphere-Research-Group/AlloSystem
+      description: Build submitted via Travis CI
+    notification_email: mantaraya36@gmail.com
+    build_command_prepend: cmake . -DCMAKE_BUILD_TYPE=Debug;make clean
+    build_command: make -j 4
+    branch_pattern: coverity_scan
 notifications:
-      email:
-          recipients:
-              - mantaraya36@gmail.com
+  email:
+    recipients:
+    - mantaraya36@gmail.com
