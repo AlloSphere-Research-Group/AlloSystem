@@ -1,5 +1,7 @@
 
-#include <stdio.h>
+#include <cstdio>
+#include <string>
+#include <sstream>
 //#include <iostream>
 
 #include "alloaudio/al_OutputMaster.hpp"
@@ -177,14 +179,23 @@ void test_osc_gain(void)
 	}
 }
 
-
 float meterValues[2] = {1.0f, 1.0f};
 struct OSCHandler : public al::osc::PacketHandler{
 	void onMessage(al::osc::Message& m){
-		int index;
+		std::string addressPattern = m.addressPattern();
+		std::string patternPrefix = "/Alloaudio/meterdb/";
+		CU_ASSERT(addressPattern.find(patternPrefix) == 0);
+		CU_ASSERT(m.typeTags().size() == 1);
+		CU_ASSERT(m.typeTags().at(0) == 'f');
+		std::stringstream convert(addressPattern.substr(patternPrefix.length()));
+		int index = 0;
+		if ( !(convert >> index) ) {
+			index = -1;
+		}
+		CU_ASSERT(index >=0);
 		float dbvalue;
-		m >> index >> dbvalue;
-		meterValues[index] = powf(10.0, dbvalue/20.0);
+		m >> dbvalue;
+		meterValues[index - 1] = powf(10.0, dbvalue/20.0);
 	}
 } handler;
 
