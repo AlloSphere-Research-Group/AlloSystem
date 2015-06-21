@@ -10,7 +10,7 @@
 
 namespace al{
 
-static inline int min(int x, int y){ return x<y?x:y; }
+static int min(int x, int y){ return x<y?x:y; }
 
 /*
 static void err(const char * msg, const char * src, bool exits){
@@ -33,11 +33,11 @@ static int resize(T *& buf, int n){
 	return n;
 }
 
-/// Utility function to efficiently clear buffer (set all to 0)
+// Utility function to efficiently clear buffer (set all to 0)
 template <class T>
-static inline void zero(T * buf, int n){ memset(buf, 0, n*sizeof(T)); }
+static void zero(T * buf, int n){ memset(buf, 0, n*sizeof(T)); }
 
-/// Utility function to deinterleave samples
+// Utility function to deinterleave samples
 template <class T>
 static void deinterleave(T * dst, const T * src, int numFrames, int numChannels){
 	int numSamples = numFrames * numChannels;
@@ -58,6 +58,15 @@ static void interleave(T * dst, const T * src, int numFrames, int numChannels){
 		}
 	}
 }
+
+
+
+//==============================================================================
+
+AudioBackend::AudioBackend()
+:	mIsOpen(false), mIsRunning(false)
+{}
+
 
 //==============================================================================
 
@@ -117,6 +126,9 @@ protected:
 	int mNumOutChans;
 	int mNumInChans;
 };
+
+
+//==============================================================================
 
 class PortAudioBackend : public AudioBackend{
 public:
@@ -366,6 +378,10 @@ private:
 
 //==============================================================================
 
+AudioDeviceInfo::AudioDeviceInfo(int deviceNum)
+:	mID(deviceNum)
+{}
+
 bool AudioDeviceInfo::valid() const { return true; }
 int AudioDeviceInfo::id() const { return mID; }
 const char * AudioDeviceInfo::name() const { return mName; }
@@ -378,6 +394,9 @@ void AudioDeviceInfo::setID(int iD) { mID = iD;}
 void AudioDeviceInfo::setChannelsInMax(int num) { mChannelsInMax = num;}
 void AudioDeviceInfo::setChannelsOutMax(int num) { mChannelsOutMax = num;}
 void AudioDeviceInfo::setDefaultSampleRate(double rate) { mDefaultSampleRate = rate;}
+
+
+//==============================================================================
 
 AudioDevice::AudioDevice(int deviceNum)
 :    AudioDeviceInfo(deviceNum), mImpl(0)
@@ -412,9 +431,9 @@ AudioDevice::AudioDevice(const std::string& nameKeyword, StreamMode stream)
 	}
 }
 
-bool al::AudioDevice::valid() const
+bool AudioDevice::valid() const
 {
- return 0!=mImpl;
+	return 0!=mImpl;
 }
 
 void AudioDevice::setImpl(int deviceNum){ initDevices(); mImpl = Pa_GetDeviceInfo(deviceNum); mID=deviceNum; }
@@ -476,7 +495,8 @@ void AudioDevice::printAll(){
 	}
 }
 
-// -----------------------------------------------------
+
+//==============================================================================
 
 AudioIOData::AudioIOData(void * userData)
 :	mImpl(NULL), mUser(userData),

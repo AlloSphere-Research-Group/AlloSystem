@@ -54,7 +54,8 @@ class AudioIOData;
 /// Audio callback type
 typedef void (* audioCallback)(AudioIOData& io);
 
-/// Audio device abstraction
+
+/// Audio device information
 class AudioDeviceInfo{
 public:
 
@@ -65,13 +66,13 @@ public:
 	};
 
 	/// @param[in] deviceNum	Device enumeration number
-	AudioDeviceInfo(int deviceNum) : mID(deviceNum){}
-	
+	AudioDeviceInfo(int deviceNum);
+
 //	/// @param[in] nameKeyword	Keyword to search for in device name
 //	/// @param[in] stream		Whether to search for input and/or output devices
 //	AudioDeviceInfo(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT)) : mID(-1) {}
 
-//	~AudioDeviceInfo() = 0;
+	virtual ~AudioDeviceInfo(){}
 
 	virtual bool valid() const;						///< Returns whether device is valid
 	virtual int id() const;							///< Get device unique ID
@@ -103,11 +104,14 @@ inline AudioDeviceInfo::StreamMode operator| (const AudioDeviceInfo::StreamMode&
 	return static_cast<AudioDeviceInfo::StreamMode>(+a|+b);
 }
 
+
+
+/// Audio device
 class AudioDevice: public AudioDeviceInfo {
 public:
 
 	/// @param[in] deviceNum	Device enumeration number
-	AudioDevice(int deviceNum = -1 );
+	AudioDevice(int deviceNum = -1);
 
 	/// @param[in] nameKeyword	Keyword to search for in device name
 	/// @param[in] stream		Whether to search for input and/or output devices
@@ -131,9 +135,14 @@ protected:
 	const void * mImpl;
 };
 
+
+
+/// Abstract audio backend
 class AudioBackend{
 public:
-	AudioBackend(): mIsOpen(false), mIsRunning(false){}
+	AudioBackend();
+
+	virtual ~AudioBackend(){}
 
 	virtual bool isOpen() const = 0;
 	virtual bool isRunning() const = 0;
@@ -167,6 +176,8 @@ protected:
 	bool mIsOpen;						// An audio device is open
 	bool mIsRunning;					// An audio stream is running
 };
+
+
 
 /// Audio data to be sent to callback
 
@@ -273,6 +284,7 @@ public:
 	virtual ~AudioCallback() {}
 	virtual void onAudioCB(AudioIOData& io) = 0;	///< Callback
 };
+
 
 
 /// Audio input/output streaming
