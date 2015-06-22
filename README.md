@@ -2,7 +2,7 @@
 
 Developed by:
 
-[AlloSphere Research Group](http://www.allosphere.ucsb.edu/),
+[AlloSphere Research Group](http://www.allosphere.ucsb.edu/)
 
 University of California, Santa Barbara
 
