@@ -2,6 +2,9 @@ language: cpp
 compiler:
 - gcc
 - clang
+env:
+  global:
+  -  secure: W2AWG49PswwGedc5TrelbtHL2FuzTtFkLMtPQUFhzHDtxkpkCdYGC8K2eUf/rEk9vj6iRXmNgOpM6JNR/3N6oGJpeiSQzzTbbGN/g20lLARn6/Zf5iuSX6L2vPj5MdUy4SvkMGK4sdJBGjPhja/OZRQYWH1IVCUrazdW0R9ZHVe+jZMQ4RcUEWx51qHdPa4xaibpIJCaDKyEC7n+QfsiXnZ+E0qj7trGfbUI5to23wIoV3pbi2RDssWOjgZ3tgNoZ889zchmKGGkd6fIKx8i+x7KV7rRTOYOi4VgCRHVhwQeEO96WUc7HQThev11v3e7lfRDDf3o+zR78tECwGFSVKcwGyOClkqITeIXVKtC+W7Mfvjlo61NSeRy8glG7yKyz+eNUe0pue6V38CGrg8yDebD+NH9BOLGZg+NpQUyolK9YItBxTkffZiXsqsROGuwYN1Y8ekIzrphKbwLypGG+rfPfw7sUlzmoSJtV5knbhVJUXXV1CV2C4qilp8YNk1OEftEgfcfNH6xMxLtORnvOv16dH7PRLc4mrYrHpVN1ZoL70/XFmN+i8GZF2p4IX1e23u8n9twiqoLA6eyX3bI90Bk6z6tlu39XQbUrEiSVXc53SlM0kq+eNTppmD6dpbo2bKq4lXfbKcRloZNR5GC9NXEQixmmQZ4Oh1KBBGMmMU=
 before_install:
 - sudo apt-get update -qq
 - sudo apt-get install -y libapr1-dev libaprutil1-dev portaudio19-dev libsndfile1-dev
@@ -9,6 +12,15 @@ before_install:
   libfreetype6-dev libxi-dev libxmu-dev libassimp-dev
 script: "./distclean && cmake . -DCMAKE_BUILD_TYPE=Debug && make"
 sudo: required
+addons:
+  coverity_scan:
+    project:
+      name: AlloSphere-Research-Group/AlloSystem
+      description: Build submitted via Travis CI
+    notification_email: mantaraya36@gmail.com
+    build_command_prepend: cmake . -DCMAKE_BUILD_TYPE=Debug;make clean
+    build_command: make -j 4
+    branch_pattern: coverity_scan
 notifications:
   email:
     recipients:
