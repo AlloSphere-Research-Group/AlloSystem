@@ -7,7 +7,7 @@ find_program( MEMORYCHECK_COMMAND valgrind )
 set( MEMORYCHECK_COMMAND_OPTIONS "--tool=memcheck --trace-children=yes --leak-check=full" )
 set( MEMORYCHECK_SUPPRESSIONS_FILE "${PROJECT_SOURCE_DIR}/valgrind_suppress.txt" )
 function(add_memcheck_test TEST_NAME)
-add_test("memcheck_${TEST_NAME}" ${MEMORYCHECK_COMMAND} "${BUILD_ROOT_DIR}/build/bin/${TEST_NAME}" ${MEMORYCHECK_COMMAND_OPTIONS} "--suppressions=${MEMORYCHECK_SUPPRESSIONS_FILE}")
+  add_test("memcheck_${TEST_NAME}" ${MEMORYCHECK_COMMAND} "${BUILD_ROOT_DIR}/build/bin/${TEST_NAME}" ${MEMORYCHECK_COMMAND_OPTIONS} "--suppressions=${MEMORYCHECK_SUPPRESSIONS_FILE}")
 endfunction(add_memcheck_test)
 
 # If root directory has not been specified, use default
