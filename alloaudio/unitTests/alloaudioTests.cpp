@@ -32,16 +32,17 @@ void test_class(void)
 
 void test_gains(void)
 {
-	al::OutputMaster outmaster(2, 44100);
+	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
+	CU_ASSERT(io.channelsOut() == 2);
+	CU_ASSERT(io.framesPerSecond() == 44100.0f);
+	al::OutputMaster outmaster(io.channelsOut(), io.framesPerSecond());
 	outmaster.setClipperOn(false);
-//    AudioIO(int framesPerBuf=64, double framesPerSec=44100.0,
-//		void (* callback)(AudioIOData &) = 0, void * userData = 0,
-//		int outChans = 2, int inChans = 0 )
-	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2);
+	io.append(outmaster);
+
     float *in_0 = io.outBuffer(0);
     float *in_1 = io.outBuffer(1);
 
-    outmaster.processBlock(io);
+	io.processAudio();
 
 	float *out_0 = io.outBuffer(0);
 	float *out_1 = io.outBuffer(1);
@@ -56,7 +57,7 @@ void test_gains(void)
 		in_0[i] = 1.0/(i + 1);
 		in_1[i] = i/4.0;
 	}
-	outmaster.processBlock(io);
+	io.processAudio();
 
 	out_0 = io.outBuffer(0);
 	out_1 = io.outBuffer(1);
@@ -68,21 +69,26 @@ void test_gains(void)
 
 void test_meter_values(void)
 {
-    al::OutputMaster outmaster(2, 44100);
+	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
+	CU_ASSERT(io.channelsOut() == 2);
+	CU_ASSERT(io.framesPerSecond() == 44100.0f);
+	al::OutputMaster outmaster(io.channelsOut(), io.framesPerSecond());
+	io.append(outmaster);
+
 	outmaster.setMasterGain(1.0);
     outmaster.setGain(0, 1.0);
     outmaster.setGain(1, 1.0);
     outmaster.setMeterOn(true);
 	outmaster.setClipperOn(false);
 	outmaster.setMeterUpdateFreq(11025); // 4 samples
-	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2);
+
     float *in_0 = io.outBuffer(0);
     float *in_1 = io.outBuffer(1);
     for (int i = 0; i < 4; i++) {
         in_0[i] = 1.0/(i + 2);
         in_1[i] = i/4.0;
     }
-    outmaster.processBlock(io);
+	io.processAudio();
 
     float meterValues[2];
     outmaster.getMeterValues(meterValues);
@@ -93,20 +99,24 @@ void test_meter_values(void)
 
 void test_clipper(void)
 {
-	al::OutputMaster outmaster(2, 44100, "localhost", 9001);
+	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
+	CU_ASSERT(io.channelsOut() == 2);
+	CU_ASSERT(io.framesPerSecond() == 44100.0f);
+	al::OutputMaster outmaster(io.channelsOut(), io.framesPerSecond());
+	io.append(outmaster);
+
 	outmaster.setClipperOn(true);
 	outmaster.setMasterGain(0.5);
 	outmaster.setGain(0, 1.0);
 	outmaster.setGain(1, 1.0);
 
-	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2);
 	float *in_0 = io.outBuffer(0);
 	float *in_1 = io.outBuffer(1);
 	for (int i = 0; i < 4; i++) {
 		in_0[i] = 0.8 * (i + 1);
 		in_1[i] = 0.6 * (i + 1);
 	}
-	outmaster.processBlock(io);
+	io.processAudio();
 
 	float *out_0 = io.outBuffer(0);
 	float *out_1 = io.outBuffer(1);
@@ -121,22 +131,27 @@ void test_clipper(void)
 
 void test_osc_gain(void)
 {
-	al::OutputMaster outmaster(2, 44100, "localhost", 9001);
+	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
+	CU_ASSERT(io.channelsOut() == 2);
+	CU_ASSERT(io.framesPerSecond() == 44100.0f);
+	al::OutputMaster outmaster(io.channelsOut(), io.framesPerSecond(), "localhost", 9001);
+	io.append(outmaster);
 	outmaster.setClipperOn(false);
+
 	al::osc::Send s(9001, "localhost");
 	s.send("/Alloaudio/global_gain", 0.1f);
 	s.send("/Alloaudio/gain", 0, 0.9f);
 	s.send("/Alloaudio/gain", 1, 0.8f);
 	s.send("/Alloaudio/gain", 2, 0.7f); // Should do nothing
 	al_sleep_nsec(100000); // Wait for messages to arrive
-	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2);
+
 	float *in_0 = io.outBuffer(0);
 	float *in_1 = io.outBuffer(1);
 	for (int i = 0; i < 4; i++) {
 		in_0[i] = 0.5 * (i + 1);
 		in_1[i] = 0.4 * (i + 1);
 	}
-	outmaster.processBlock(io);
+	io.processAudio();
 	float *out_0 = io.outBuffer(0);
 	float *out_1 = io.outBuffer(1);
 	for (int i = 0; i < 4; i++) {
@@ -154,7 +169,7 @@ void test_osc_gain(void)
 		in_0[i] = 1.0 * (i + 1);
 		in_1[i] = 1.0 * (i + 1);
 	}
-	outmaster.processBlock(io);
+	io.processAudio();
 	CU_ASSERT_DOUBLE_EQUAL(out_0[0], 0.09, 0.00001);
 	CU_ASSERT_DOUBLE_EQUAL(out_1[0], 0.08, 0.00001);
 	for (int i = 1; i < 4; i++) {
@@ -172,7 +187,7 @@ void test_osc_gain(void)
 		in_0[i] = 1.0 * (i + 1);
 		in_1[i] = 1.0 * (i + 1);
 	}
-	outmaster.processBlock(io);
+	io.processAudio();
 	for (int i = 0; i < 4; i++) {
 		CU_ASSERT_DOUBLE_EQUAL(out_0[i], 0.0, 0.000001);
 		CU_ASSERT_DOUBLE_EQUAL(out_1[i], 0.0, 0.000001);
@@ -215,8 +230,13 @@ struct OSCHandler : public al::osc::PacketHandler{
 
 void test_osc_meters()
 {
-	al::OutputMaster outmaster(2, 44100, "localhost", 9001, "localhost", 9002);
+	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
+	CU_ASSERT(io.channelsOut() == 2);
+	CU_ASSERT(io.framesPerSecond() == 44100.0f);
+	al::OutputMaster outmaster(io.channelsOut(), io.framesPerSecond(), "localhost", 9001, "localhost", 9002);
+	io.append(outmaster);
 	outmaster.setClipperOn(false);
+
 	al::osc::Send s(9001, "localhost");
 	s.send("/Alloaudio/meter_on", 1);
 	s.send("/Alloaudio/meter_update_freq", 11025.0f);
@@ -224,7 +244,6 @@ void test_osc_meters()
 	s.send("/Alloaudio/gain", 0, 1.0f);
 	s.send("/Alloaudio/gain", 1, 1.0f);
 
-	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2);
 	float *in_0 = io.outBuffer(0);
 	float *in_1 = io.outBuffer(1);
 	for (int i = 0; i < 4; i++) {
@@ -237,7 +256,7 @@ void test_osc_meters()
 	r.timeout(0.1);
 	r.start();
 
-	outmaster.processBlock(io);
+	io.processAudio();
 	al_sleep_nsec(1000000); // Wait for messages to arrive
 	r.stop();
 	CU_ASSERT_DOUBLE_EQUAL(meterValues[0], 0.0, 0.000001);
@@ -251,7 +270,7 @@ void test_osc_meters()
 	}
 	outmaster.setMeterAddrHasChannel(true);
 	r.start();
-	outmaster.processBlock(io);
+	io.processAudio();
 	al_sleep_nsec(1000000); // Wait for messages to arrive
 	r.stop();
 	CU_ASSERT_DOUBLE_EQUAL(meterValues[0], 0.75, 0.000001);

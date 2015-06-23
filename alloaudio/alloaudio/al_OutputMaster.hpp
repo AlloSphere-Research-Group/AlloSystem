@@ -88,7 +88,7 @@ typedef enum {
  *
  * It can be controlled by OSC over UDP.
  */
-class OutputMaster : public osc::Recv
+class OutputMaster : public osc::Recv, public al::AudioCallback
 {
     public:
     /**
@@ -166,11 +166,16 @@ class OutputMaster : public osc::Recv
     /** Get the number of channels processed by this OutputMaster object */
     int getNumChnls();
 
-    /** Process a block of audio data. The io object should come from a previous process,
-     * like an Ambisonics or VBAP panner, as processBlock() processes the output buffer in
-     * the io object in place.
+	/** Process a block of audio data. This can be called by itself passing an AudioIOData
+	 * object or the OutputMaster object can be appended to the
+	 * \code
+	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2, 0, al::AudioIO::DUMMY);
+	al::OutputMaster outmaster(io.channelsOut(), io.framesperSecond());
+	io.append(outmaster);
+	 *
+	 * \endcode
      */
-    void processBlock(AudioIOData &io);
+	void onAudioCB(AudioIOData &io);
 
 	/** Sets whether the meter messages are sent as /Alloaudio/meterdb if 0 -6.02
 	 * or /Alloaudio/meterdb/1 -6.02. The latter includes the channel number in the OSC
