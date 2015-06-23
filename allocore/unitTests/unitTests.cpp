@@ -36,7 +36,7 @@ int main (int argc, char * const argv[]) {
 	RUNTEST(GraphicsMesh);
 
 	// This test should always be run last since it calls exit()
-	printf("IOWindow\n");
+	printf("IOWindow .... (calls exit() internally)\n");
 	utIOWindowGL();
 
 

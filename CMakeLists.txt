@@ -1,8 +1,16 @@
 project( AlloSystem )
 cmake_minimum_required(VERSION 2.8)
 
+# For unit testing
 ENABLE_TESTING() # Must be here to have tests for the subprojects
+find_program( MEMORYCHECK_COMMAND valgrind )
+set( MEMORYCHECK_COMMAND_OPTIONS "--tool=memcheck --trace-children=yes --leak-check=full" )
+set( MEMORYCHECK_SUPPRESSIONS_FILE "${PROJECT_SOURCE_DIR}/valgrind_suppress.txt" )
+function(add_memcheck_test TEST_NAME)
+add_test("memcheck_${TEST_NAME}" ${MEMORYCHECK_COMMAND} "${BUILD_ROOT_DIR}/build/bin/${TEST_NAME}" ${MEMORYCHECK_COMMAND_OPTIONS} "--suppressions=${MEMORYCHECK_SUPPRESSIONS_FILE}")
+endfunction(add_memcheck_test)
 
+# If root directory has not been specified, use default
 if(NOT DEFINED BUILD_ROOT_DIR)
   set(BUILD_ROOT_DIR "${CMAKE_SOURCE_DIR}")
 endif(NOT DEFINED BUILD_ROOT_DIR)
@@ -16,6 +24,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   endif((CMAKE_COMPILER_IS_GNUCC) OR (CMAKE_COMPILER_IS_GNUXX))
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
+# Other defaults
 if(NOT DEFINED BUILD_GAMMA)
   set(BUILD_GAMMA 1 CACHE STRING "Try to build external Gamma")
 endif(NOT DEFINED BUILD_GAMMA)
