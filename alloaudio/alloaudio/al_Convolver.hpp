@@ -6,7 +6,7 @@
 
 #define MAXSIZE 0x00100000
 
-
+#ifdef USE_FFTW3
 class Convproc;
 
 namespace al {
@@ -76,5 +76,7 @@ private:
 };
 
 }
+
+#endif // USE_FFTW3
 
 #endif // AL_CONVOLVER_H

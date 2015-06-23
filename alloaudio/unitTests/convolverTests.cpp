@@ -4,8 +4,8 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
-
-#include <CUnit/Basic.h>
+#include <cassert>
+#include <cstring>
 
 #include "alloaudio/al_Convolver.hpp"
 #include "allocore/io/al_AudioIO.hpp"
@@ -14,17 +14,8 @@
 
 using namespace std;
 
-int init_suite1(void)
-{
-    return 0;
-}
 
-int clean_suite1(void)
-{
-    return 0;
-}
-
-void test_class(void)
+void ut_class_construction(void)
 {
 	al::Convolver conv;
 	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2);
@@ -42,14 +33,14 @@ void test_class(void)
     int IRlength = IR_SIZE;
     
 	int ret = conv.configure(io, IRs, IRlength);
-    CU_ASSERT(ret == 0);
+	assert(ret == 0);
 	ret = conv.processBlock(io);
-	CU_ASSERT(ret == 0);
+	assert(ret == 0);
     conv.shutdown();
 }
 
 
-void test_many_to_many(void)
+void ut_many_to_many(void)
 {
 	al::Convolver conv;
 	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2);
@@ -80,17 +71,17 @@ void test_many_to_many(void)
     //many to many mode
     conv.configure(io, IRs, IRlength, -1, true, vector<int>(), basePartitionSize, options);
 	conv.processBlock(io);
-    std::cout << endl;
+
 	for(int i = 0; i < BLOCK_SIZE; i++) {
         //std::cout << "Y1: " << io.out(0, i) << ", H1: " << IR1[i] << std::endl;
         //std::cout << "Y2: " << io.out(1, i) << ", H2: " << IR2[i] << std::endl;
-        CU_ASSERT(fabs(io.out(0, i) - IR1[i]) < 1e-07f);
-        CU_ASSERT(fabs(io.out(1, i) - IR2[i]) < 1e-07f);
+		assert(fabs(io.out(0, i) - IR1[i]) < 1e-07f);
+		assert(fabs(io.out(1, i) - IR2[i]) < 1e-07f);
 	}
     conv.shutdown();
 }
 
-void test_one_to_many(void)
+void ut_one_to_many(void)
 {
     al::Convolver conv;
     al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 1);
@@ -118,19 +109,19 @@ void test_one_to_many(void)
     options = 1; //FFTW MEASURE
     //one to many mode
     conv.configure(io, IRs, IRlength, 0, true, vector<int>(), basePartitionSize, options);
-    conv.processBlock(io);
-    std::cout << endl;
+	conv.processBlock(io);
+
     for(int i = 0; i < BLOCK_SIZE; i++) {
         //std::cout << "Y1: " << io.out(0, i) << ", H1: " << IR1[i] << std::endl;
         //std::cout << "Y2: " << io.out(1, i) << ", H2: " << IR2[i] << std::endl;
-        CU_ASSERT(fabs(io.out(0, i) - IR1[i]) < 1e-07f);
-        CU_ASSERT(fabs(io.out(1, i) - IR2[i]) < 1e-07f);
+		assert(fabs(io.out(0, i) - IR1[i]) < 1e-07f);
+		assert(fabs(io.out(1, i) - IR2[i]) < 1e-07f);
     }
     conv.shutdown();
 }
 
 
-void test_disabled_channels(void)
+void ut_disabled_channels(void)
 {
 	al::Convolver conv;
 	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2);
@@ -158,14 +149,14 @@ void test_disabled_channels(void)
     for(int i = 0; i < nOutputs; i++) {
         it = find (disabledOuts.begin(), disabledOuts.end(), i);
         if (it != disabledOuts.end()){
-            CU_ASSERT(io.out(0, i) == 0.0f);
-            CU_ASSERT(io.out(1, i) == 0.0f);
+			assert(io.out(0, i) == 0.0f);
+			assert(io.out(1, i) == 0.0f);
         }
     }
     conv.shutdown();
 }
 
-void test_vector_mode(void)
+void ut_vector_mode(void)
 {
     al::Convolver conv;
     al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2);
@@ -194,48 +185,28 @@ void test_vector_mode(void)
     unsigned int basePartitionSize = BLOCK_SIZE, options = 1;
     options |= 2; //vector mode
     conv.configure(io, IRs, IRlength, -1, true, vector<int>(), basePartitionSize, options);
-    conv.processBlock(io);
-    std::cout << endl;
+	conv.processBlock(io);
     for(int i = 0; i < BLOCK_SIZE; i++) {
         //std::cout << "Y1: " << io.out(0, i) << ", H1: " << IR1[i] << std::endl;
         //std::cout << "Y2: " << io.out(1, i) << ", H2: " << IR2[i] << std::endl;
-        CU_ASSERT(fabs(io.out(0, i) - IR1[i]) < 1e-07f);
-        CU_ASSERT(fabs(io.out(1, i) - IR2[i]) < 1e-07f);
+		assert(fabs(io.out(0, i) - IR1[i]) < 1e-07f);
+		assert(fabs(io.out(1, i) - IR2[i]) < 1e-07f);
     }
     conv.shutdown();
 }
 
+#define RUNTEST(Name)\
+	printf("%s ", #Name);\
+	ut_##Name();\
+	for(size_t i=0; i<32-strlen(#Name); ++i) printf(".");\
+	printf(" pass\n")
 
 int main()
 {
-    CU_pSuite pSuite = NULL;
-
-    /* initialize the CUnit test registry */
-    if (CUE_SUCCESS != CU_initialize_registry())
-        return CU_get_error();
-
-    /* add a suite to the registry */
-    pSuite = CU_add_suite("alloaudio tests", init_suite1, clean_suite1);
-    if (NULL == pSuite) {
-        CU_cleanup_registry();
-        return CU_get_error();
-    }
-
-    /* add the tests to the suite */
-    if ( (NULL == CU_add_test(pSuite, "Test Class", test_class))
-            ||  (NULL == CU_add_test(pSuite, "Test Many to Many Convolution", test_many_to_many))
-            ||  (NULL == CU_add_test(pSuite, "Test One to Many Convolution", test_one_to_many))
-            ||  (NULL == CU_add_test(pSuite, "Test Disabled Channels", test_disabled_channels))
-            ||  (NULL == CU_add_test(pSuite, "Test Vector Mode (many to many)", test_vector_mode))
-         )
-    {
-        CU_cleanup_registry();
-        return CU_get_error();
-    }
-
-    /* Run all tests using the CUnit Basic interface */
-    CU_basic_set_mode(CU_BRM_VERBOSE);
-    CU_basic_run_tests();
-    CU_cleanup_registry();
-    return CU_get_error();
+	RUNTEST(class_construction);
+	RUNTEST(many_to_many);
+	RUNTEST(one_to_many);
+	RUNTEST(disabled_channels);
+	RUNTEST(vector_mode);
+	return 0;
 }
