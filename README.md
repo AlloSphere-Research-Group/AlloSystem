@@ -214,6 +214,11 @@ make -j7
 make test
 ```
 
+To see verbose output do:
+```
+make test ARGS="-V"
+```
+
 #License
 
 This project is licensed under the terms of the 3-clause BSD license.
