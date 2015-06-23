@@ -204,7 +204,17 @@ You can uninstall with:
 
 	xargs rm < install_manifest.txt
 
-##License
+##Unit tests
+
+AlloSystem uses the CTest facilities from CMake to organize and launch unit testing.
+To run the tests do:
+```
+cmake . -DCMAKE_BUILD_TYPE=Debug
+make -j7
+make test
+```
+
+#License
 
 This project is licensed under the terms of the 3-clause BSD license.
 
