@@ -15,6 +15,11 @@ al_[CamelCase].hpp
 al_[CamelCase].cpp
 
 ___________________________________________________________________________
+Indentation
+___________________________________________________________________________
+Indentation should be done using tabs.
+
+___________________________________________________________________________
 Headers
 ___________________________________________________________________________
 1. All header content should be contained within a preprocessor conditional block to avoid multiple include errors.
