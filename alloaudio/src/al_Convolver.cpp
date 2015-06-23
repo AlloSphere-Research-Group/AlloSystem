@@ -73,7 +73,7 @@ int Convolver::configure(al::AudioIO &io, vector<float *> IRs, int IRlength,
     return 0;
 }
 
-int Convolver::processBlock(al::AudioIO &io)
+void Convolver::onAudioCB(al::AudioIOData &io)
 {
     int blockSize = io.framesPerBuffer();
     
@@ -122,8 +122,6 @@ int Convolver::processBlock(al::AudioIO &io)
         it != m_disabledChannels.end(); ++it) {
         memset(io.outBuffer(*it), 0, sizeof(float) * blockSize);
     }
-
-	return ret;
 }
 
 int Convolver::shutdown(void){
