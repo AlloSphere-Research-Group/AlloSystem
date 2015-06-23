@@ -6,6 +6,8 @@
 #include <assert.h>
 #include "alloaudio/al_Convolver.hpp"
 
+#ifdef USE_FFTW3
+
 using namespace al;
 
 Convolver::Convolver() :
@@ -71,7 +73,7 @@ int Convolver::configure(al::AudioIO &io, vector<float *> IRs, int IRlength,
     return 0;
 }
 
-int Convolver::processBlock(al::AudioIO &io)
+void Convolver::onAudioCB(al::AudioIOData &io)
 {
     int blockSize = io.framesPerBuffer();
     
@@ -120,8 +122,6 @@ int Convolver::processBlock(al::AudioIO &io)
         it != m_disabledChannels.end(); ++it) {
         memset(io.outBuffer(*it), 0, sizeof(float) * blockSize);
     }
-
-	return ret;
 }
 
 int Convolver::shutdown(void){
@@ -133,3 +133,5 @@ int Convolver::shutdown(void){
     }
     return 0;
 }
+
+#endif // USE_FFTW3

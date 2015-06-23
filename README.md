@@ -2,7 +2,7 @@
 
 Developed by:
 
-[AlloSphere Research Group](http://www.allosphere.ucsb.edu/),
+[AlloSphere Research Group](http://www.allosphere.ucsb.edu/)
 
 University of California, Santa Barbara
 
@@ -10,6 +10,7 @@ University of California, Santa Barbara
   <img alt="Coverity Scan Build Status"
 	   src="https://scan.coverity.com/projects/5548/badge.svg"/>
 </a>
+[![Build Status](https://travis-ci.org/AlloSphere-Research-Group/AlloSystem.svg?branch=devel)](https://travis-ci.org/AlloSphere-Research-Group/AlloSystem)
 
 ##1. About
 
@@ -203,7 +204,22 @@ You can uninstall with:
 
 	xargs rm < install_manifest.txt
 
-##License
+##Unit tests
+
+AlloSystem uses the CTest facilities from CMake to organize and launch unit testing.
+To run the tests do:
+```
+cmake . -DCMAKE_BUILD_TYPE=Debug
+make -j7
+make test
+```
+
+To see verbose output do:
+```
+make test ARGS="-V"
+```
+
+#License
 
 This project is licensed under the terms of the 3-clause BSD license.
 

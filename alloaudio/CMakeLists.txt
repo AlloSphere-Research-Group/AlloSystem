@@ -49,7 +49,13 @@ endif($CMAKE_SYSTEM_NAME} MATCHES "Linux")
 find_library(FFTW_LIBRARY
      NAMES fftw3f)
 
-message("Using fftw3: ${FFTW_LIBRARY}")
+if (NOT FFTW_LIBRARY)
+  message(STATUS "Not using fftw3.")
+  set(FFTW_LIBRARY "")
+else()
+  message(STATUS "Using fftw3: ${FFTW_LIBRARY}")
+  add_definitions(-DUSE_FFTW3)
+endif(NOT FFTW_LIBRARY)
 
 # Build library ----------------------------------
 
@@ -134,9 +140,11 @@ if(CUNIT_LIBRARY)
     add_test(NAME alloaudioTests
             COMMAND $<TARGET_FILE:alloaudioTests> ${TEST_ARGS})
 
+  if(NOT FFTW_LIBRARY STREQUAL "")
     add_executable(convolverTests unitTests/convolverTests.cpp)
-    target_link_libraries(convolverTests ${ALLOAUDIO_LIBRARY} ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${CUNIT_LIBRARY} ${FFTW_LIBRARY} )
+	target_link_libraries(convolverTests ${ALLOAUDIO_LIBRARY} ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${FFTW_LIBRARY} )
     add_dependencies(convolverTests ${ALLOCORE_LIBRARY})
     add_test(NAME convolverTests
             COMMAND $<TARGET_FILE:convolverTests> ${TEST_ARGS})
+  endif()
 endif(CUNIT_LIBRARY)

@@ -129,7 +129,7 @@ int OutputMaster::getNumChnls()
 	return m_numChnls;
 }
 
-void OutputMaster::processBlock(AudioIOData &io)
+void OutputMaster::onAudioCB(AudioIOData &io)
 {
 	int i, chan = 0;
 	int nframes = io.framesPerBuffer();

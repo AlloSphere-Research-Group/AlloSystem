@@ -74,8 +74,8 @@ class DummyAudioBackend : public AudioBackend{
 public:
 	DummyAudioBackend(): AudioBackend(), mNumOutChans(64), mNumInChans(64){}
 
-	virtual bool isOpen() const {return true;}
-	virtual bool isRunning() const {return true;}
+	virtual bool isOpen() const {return mIsOpen;}
+	virtual bool isRunning() const {return mIsRunning;}
 	virtual bool error() const {return false;}
 
 	virtual void printError(const char * text = "") const {
@@ -113,13 +113,13 @@ public:
 
 	virtual double time() {return 0.0;}
 
-	virtual bool open(int framesPerSecond, int framesPerBuffer, void *userdata) { return true; }
+	virtual bool open(int framesPerSecond, int framesPerBuffer, void *userdata) { mIsOpen = true; return true; }
 
-	virtual bool close() { return true; }
+	virtual bool close() { mIsOpen = false; return true; }
 
-	virtual bool start(int framesPerSecond, int framesPerBuffer, void *userdata) { return true; }
+	virtual bool start(int framesPerSecond, int framesPerBuffer, void *userdata) { mIsRunning = true; return true; }
 
-	virtual bool stop() {return true;}
+	virtual bool stop() { mIsRunning = false; return true;}
 	virtual double cpu() {return 0.0;}
 
 protected:
@@ -533,7 +533,7 @@ double AudioIOData::secondsPerBuffer() const { return (double)framesPerBuffer() 
 //==============================================================================
 
 AudioIO::AudioIO(int framesPerBuf, double framesPerSec, void (* callbackA)(AudioIOData &), void * userData,
-	int outChansA, int inChansA, int backend)
+	int outChansA, int inChansA, AudioIO::Backend backend)
 :	AudioIOData(userData),
 	callback(callbackA),
 	mZeroNANs(true), mClipOut(true), mAutoZeroOut(true)
@@ -591,6 +591,28 @@ AudioIO& AudioIO::append(AudioCallback& v){
 
 AudioIO& AudioIO::prepend(AudioCallback& v){
 	mAudioCallbacks.insert(mAudioCallbacks.begin(), &v);
+	return *this;
+}
+
+AudioIO& AudioIO::insertBefore(AudioCallback& v){
+	std::vector<AudioCallback *>::iterator pos
+			= std::find(mAudioCallbacks.begin(), mAudioCallbacks.end(), &v);
+	if (pos == mAudioCallbacks.begin()) {
+		prepend(v);
+	} else {
+		mAudioCallbacks.insert(--pos, 1, &v);
+	}
+	return *this;
+}
+
+AudioIO& AudioIO::insertAfter(AudioCallback& v){
+	std::vector<AudioCallback *>::iterator pos
+			= std::find(mAudioCallbacks.begin(), mAudioCallbacks.end(), &v);
+	if (pos == mAudioCallbacks.end()) {
+		append(v);
+	} else {
+		mAudioCallbacks.insert(pos, 1, &v);
+	}
 	return *this;
 }
 

@@ -265,6 +265,7 @@ VideoCaptureHandler::VideoThreadFunction::~VideoThreadFunction()
 void VideoCaptureHandler::VideoThreadFunction::operator()(){
 //printf("VideoThreadFunc called\n");
 	if(NULL != videoCapture && videoCapture->mValid && videoCapture->cvVideoCapture.isOpened()){
+		handler->onPregrab(*videoCapture, streamIdx);
 		if(videoCapture->grab()){
 			handler->onVideo(*videoCapture, streamIdx);
 			double fps = videoCapture->fps() * videoCapture->rate();
