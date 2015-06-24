@@ -161,18 +161,7 @@ foreach(header ${ALLOCORE_HEADERS})
 					WORKING_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}")
 endforeach()
 
-# Write dummy headers
-
-foreach(HEADER_INFO ${ALLOCORE_DUMMY_HEADERS})
-    string(REPLACE "::::" ";" HEADER_PARTS ${HEADER_INFO})
-    list(GET HEADER_PARTS 0 header) # First element is header
-    list(GET HEADER_PARTS 1 dependency) # Second element is dependency
-
-    set(DUMMY_HEADER_TEXT "#error \"ERROR: Header not supported. Dependency '${dependency}' not met.\"\n")
-	file(WRITE "${BUILD_ROOT_DIR}/build/include/${header}" ${DUMMY_HEADER_TEXT})
-    message("Writing dummy header: ${header} ---- Unmet dependency: ${dependency}")
-	list(APPEND ALLOCORE_HEADERS "${BUILD_ROOT_DIR}/build/include/${header}")
-endforeach()
+write_dummy_headers( "${ALLOCORE_DUMMY_HEADERS}" "${ALLOCORE_HEADERS}" )
 
 # Export include directories and libraries for use when building AlloSystem or AlloProject
 set_target_properties(${ALLOCORE_LIB}

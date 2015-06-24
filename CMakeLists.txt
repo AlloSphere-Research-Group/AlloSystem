@@ -6,9 +6,26 @@ ENABLE_TESTING() # Must be here to have tests for the subprojects
 find_program( MEMORYCHECK_COMMAND valgrind )
 set( MEMORYCHECK_COMMAND_OPTIONS "--tool=memcheck --trace-children=yes --leak-check=full" )
 set( MEMORYCHECK_SUPPRESSIONS_FILE "${PROJECT_SOURCE_DIR}/valgrind_suppress.txt" )
+
+# ------ Helper functions
+
 function(add_memcheck_test TEST_NAME)
   add_test("memcheck_${TEST_NAME}" ${MEMORYCHECK_COMMAND} "${BUILD_ROOT_DIR}/build/bin/${TEST_NAME}" ${MEMORYCHECK_COMMAND_OPTIONS} "--suppressions=${MEMORYCHECK_SUPPRESSIONS_FILE}")
 endfunction(add_memcheck_test)
+
+# Write dummy headers
+function(write_dummy_headers DUMMY_HEADERS HEADERS)
+foreach(HEADER_INFO ${DUMMY_HEADERS})
+	string(REPLACE "::::" ";" HEADER_PARTS ${HEADER_INFO})
+	list(GET HEADER_PARTS 0 header) # First element is header
+	list(GET HEADER_PARTS 1 dependency) # Second element is dependency
+
+	set(DUMMY_HEADER_TEXT "#error \"ERROR: Header not supported. Dependency '${dependency}' not met.\"\n")
+	file(WRITE "${BUILD_ROOT_DIR}/build/include/${header}" ${DUMMY_HEADER_TEXT})
+	message("Writing dummy header: ${header} ---- Unmet dependency: ${dependency}")
+	list(APPEND HEADERS "${BUILD_ROOT_DIR}/build/include/${header}")
+endforeach()
+endfunction()
 
 # If root directory has not been specified, use default
 if(NOT DEFINED BUILD_ROOT_DIR)
