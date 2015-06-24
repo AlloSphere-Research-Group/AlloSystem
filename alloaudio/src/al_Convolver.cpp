@@ -6,8 +6,6 @@
 #include <assert.h>
 #include "alloaudio/al_Convolver.hpp"
 
-#ifdef USE_FFTW3
-
 using namespace al;
 
 Convolver::Convolver() :
@@ -134,4 +132,3 @@ int Convolver::shutdown(void){
     return 0;
 }
 
-#endif // USE_FFTW3

@@ -16,15 +16,11 @@ endif(NOT (GAMMA_FOUND OR GAMMA_LIBRARY))
 set(ALLOAUDIO_SRC
   src/al_OutputMaster.cpp
   src/butter.cpp
-  src/al_Convolver.cpp
-  src/zita-convolver-3.1.0/libs/zita-convolver.cc
 #  src/al_Decorrelation.cpp
   )
 
 set(ALLOAUDIO_HEADERS
   alloaudio/al_OutputMaster.hpp
-  alloaudio/al_Convolver.hpp
-  src/zita-convolver-3.1.0/libs/zita-convolver.h
 )
 
 # Dependencies ------------------------------
@@ -37,7 +33,6 @@ get_target_property(ALLOCORE_LINK_LIBRARIES allocore${DEBUG_SUFFIX} ALLOCORE_LIN
 if($CMAKE_SYSTEM_NAME} MATCHES "Linux")
 find_package(Threads QUIET)
 if(CMAKE_THREAD_LIBS_INIT)
-
 else()
   message("phtreads not found. Not building Alloaudio.")
 return()
@@ -53,7 +48,13 @@ if (NOT FFTW_LIBRARY)
   set(FFTW_LIBRARY "")
 else()
   message(STATUS "Using fftw3: ${FFTW_LIBRARY}")
-  add_definitions(-DUSE_FFTW3)
+ list(APPEND ALLOAUDIO_SRC
+  src/al_Convolver.cpp
+  src/zita-convolver-3.1.0/libs/zita-convolver.cc
+)
+ list(APPEND ALLOAUDIO_HEADERS
+  alloaudio/al_Convolver.hpp
+  src/zita-convolver-3.1.0/libs/zita-convolver.h)
 endif(NOT FFTW_LIBRARY)
 
 # Build library ----------------------------------
