@@ -3,7 +3,6 @@ project (Alloaudio)
 
 message(STATUS "==== Configuring alloaudio.")
 
-
 find_package(LibSndFile REQUIRED QUIET)
 if(NOT TARGET Gamma)
     find_package(Gamma QUIET)
@@ -128,27 +127,19 @@ endif(BUILD_EXAMPLES)
 install(FILES ${ALLOAUDIO_INSTALL_HEADERS} DESTINATION "${CMAKE_INSTALL_PREFIX}/include")
 install(TARGETS ${ALLOAUDIO_LIBRARY} DESTINATION "${CMAKE_INSTALL_PREFIX}/lib")
 
-# Tests that depend on cunit
-find_library(CUNIT_LIBRARY cunit)
 set(TEST_ARGS "")
 
-if(CUNIT_LIBRARY)
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${BUILD_ROOT_DIR}/build/bin")
-    add_executable(alloaudioTests unitTests/alloaudioTests.cpp)
-    target_link_libraries(alloaudioTests ${ALLOCORE_LIBRARY} ${ALLOAUDIO_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${CUNIT_LIBRARY})
-	add_dependencies(alloaudioTests ${ALLOAUDIO_LIBRARY})
-    add_test(NAME alloaudioTests
-            COMMAND $<TARGET_FILE:alloaudioTests> ${TEST_ARGS})
-	add_memcheck_test(alloaudioTests)
-	set_tests_properties(alloaudioTests PROPERTIES DEPENDS ${ALLOAUDIO_LIBRARY})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${BUILD_ROOT_DIR}/build/bin")
+add_executable(alloaudioTests unitTests/alloaudioTests.cpp)
+target_link_libraries(alloaudioTests ${ALLOCORE_LIBRARY} ${ALLOAUDIO_LIBRARY} ${ALLOCORE_LINK_LIBRARIES})
+add_test(NAME alloaudioTests
+		 COMMAND $<TARGET_FILE:alloaudioTests> ${TEST_ARGS})
+add_memcheck_test(alloaudioTests)
 
-  if(NOT FFTW_LIBRARY STREQUAL "")
-    add_executable(convolverTests unitTests/convolverTests.cpp)
-	target_link_libraries(convolverTests ${ALLOAUDIO_LIBRARY} ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${FFTW_LIBRARY} )
-	add_dependencies(convolverTests ${ALLOAUDIO_LIBRARY})
-    add_test(NAME convolverTests
-            COMMAND $<TARGET_FILE:convolverTests> ${TEST_ARGS})
-	add_memcheck_test(convolverTests)
-	set_tests_properties(convolverTests PROPERTIES DEPENDS ${ALLOAUDIO_LIBRARY})
-  endif()
-endif(CUNIT_LIBRARY)
+if(NOT FFTW_LIBRARY STREQUAL "")
+  add_executable(convolverTests unitTests/convolverTests.cpp)
+  target_link_libraries(convolverTests ${ALLOAUDIO_LIBRARY} ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${FFTW_LIBRARY} )
+  add_test(NAME convolverTests
+		  COMMAND $<TARGET_FILE:convolverTests> ${TEST_ARGS})
+  add_memcheck_test(convolverTests)
+endif()
