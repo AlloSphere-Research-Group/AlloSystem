@@ -7,7 +7,7 @@ env:
   - secure: L2imx46cCcEQ7/WvNQ6PdRRdJj52j0A3nr8KV+jdvXUJsqA9Je5rc3BTZMqKE3ga9DzKSjbXJEK+iUvr3Y0MVew6YGla3aveVaGn4wGivdmB8I7sCxhjBK+s3lkVc+uhyWa74Qsw3vgMGkaYBK3aFo9kr7V0FL+BAhtV+9NRDnJ867eyEPx5xTpWqLn+oG8wAYMdF5mQwZ7Jc/IzDKa8jyW9rUoLXo1R+OUraIF0AkE33GtXGwbk/TCRuI6R0WFTp92EgDbUj9OwjcYpIIkKsj5bTWSLlEgMotkRiRPdoXyy3BzGKJzRXwfDlJrMXcFSoHPFcETXlGcBqe4HzES6c6lysTb+CjNzdfEtKVWqKPdXZolOpzvTdOBUumE/c6BXkdWm4STZEBPjjxjeenGKTNZXRgLF+5p1BhAF+uIFA+nV7hX6RHpbXvE55G+f9RZnPnLdvAwZq0kXwarithpLEXGcf91eqlAaNC17+pJKKe7EGMhLiJVjNomtCNTc9xzI84pcQUzYY2j3RnO7aSIzJGT8r0/TVW6IIqYrE6hFSqUPKpL6KGfvP4e3JU/XUVxVe8jY8Z38Bocaw7ep2s9gPY8WXLYiq9LIRK3tyPUJA6v4cxKBGY5h690b4QLq4eAAH/ogeAm5bksPBrpJlEv/DcXfUpMAF0Y85M8AEvs98N8=
 before_install:
 - sudo apt-get update -qq
-- sudo apt-get install -y libapr1-dev libaprutil1-dev portaudio19-dev libsndfile1-dev
+- sudo apt-get install -y valgrind libapr1-dev libaprutil1-dev portaudio19-dev libsndfile1-dev
   libglew-dev freeglut3-dev libavahi-client-dev libudev-dev libusb-1.0-0-dev libfreeimage-dev
   libfreetype6-dev libxi-dev libxmu-dev libassimp-dev libluajit-5.1-dev libjsoncpp-dev
 script: "./distclean && cmake . -DCMAKE_BUILD_TYPE=Debug && make"

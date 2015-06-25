@@ -14,3 +14,6 @@ target_link_libraries(allocoreTests ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIE
 add_dependencies(allocoreTests allocore${DEBUG_SUFFIX})
 add_test(NAME allocoreTests
          COMMAND $<TARGET_FILE:allocoreTests> ${TEST_ARGS})
+add_memcheck_test(allocoreTests)
+
+set_tests_properties(allocoreTests PROPERTIES DEPENDS allocore${DEBUG_SUFFIX})

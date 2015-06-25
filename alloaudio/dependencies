@@ -1,0 +1,10 @@
+# allocore dependencies.
+
+allocore_apt="libfftw3-dev"
+
+allocore_brew="fftw"
+
+allocore_port="fftw-3"
+
+allocore_pacman="fftw"
+

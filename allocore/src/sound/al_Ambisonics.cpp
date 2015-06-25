@@ -192,7 +192,7 @@ float AmbiDecode::flavorWeights[4][5][5] = {
 
 AmbiDecode::AmbiDecode(int dim, int order, int numSpeakers, int flav)
 	: AmbiBase(dim, order),
-	mNumSpeakers(0), mDecodeMatrix(0)
+	mNumSpeakers(0), mDecodeMatrix(0), mSpeakers(NULL)
 {
 	resizeArrays(channels(), numSpeakers);
 	flavor(flav);
@@ -333,7 +333,8 @@ void AmbiDecode::print(FILE * fp, const char * append) const {
 AmbisonicsSpatializer::AmbisonicsSpatializer(
 	SpeakerLayout &sl, int dim, int order, int flavor
 )
-:	Spatializer(sl), mDecoder(dim, order, sl.numSpeakers(), flavor), mEncoder(dim,order)
+	:	Spatializer(sl), mDecoder(dim, order, sl.numSpeakers(), flavor), mEncoder(dim,order),
+	  mListener(NULL),  mNumFrames(0)
 {
     setSpeakerLayout(sl);
 };

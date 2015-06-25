@@ -379,7 +379,7 @@ private:
 //==============================================================================
 
 AudioDeviceInfo::AudioDeviceInfo(int deviceNum)
-:	mID(deviceNum)
+:	mID(deviceNum), mChannelsInMax(0), mChannelsOutMax(0), mDefaultSampleRate(0.0)
 {}
 
 bool AudioDeviceInfo::valid() const { return true; }
@@ -499,7 +499,7 @@ void AudioDevice::printAll(){
 //==============================================================================
 
 AudioIOData::AudioIOData(void * userData)
-:	mImpl(NULL), mUser(userData),
+:	mImpl(NULL), mUser(userData), mFrames(0),
 	mFramesPerBuffer(0), mFramesPerSecond(0),
 	mBufI(0), mBufO(0), mBufB(0), mBufT(0), mNumI(0), mNumO(0), mNumB(0),
 	mGain(1), mGainPrev(1)
