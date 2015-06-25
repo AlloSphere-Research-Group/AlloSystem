@@ -499,7 +499,7 @@ void AudioDevice::printAll(){
 //==============================================================================
 
 AudioIOData::AudioIOData(void * userData)
-:	mImpl(NULL), mUser(userData), mFrames(0),
+:	mImpl(NULL), mUser(userData), mFrame(0),
 	mFramesPerBuffer(0), mFramesPerSecond(0),
 	mBufI(0), mBufO(0), mBufB(0), mBufT(0), mNumI(0), mNumO(0), mNumB(0),
 	mGain(1), mGainPrev(1)
