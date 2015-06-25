@@ -57,6 +57,12 @@ For C only:
 For C++ only:
 1. Everything should be defined within the namespace al::.
 
+___________________________________________________________________________
+Naming conventions
+___________________________________________________________________________
+
+* Variable members in classes should be prefixed by 'm'. e.g. mSize.
+
 
 ===========================================================================
 Library Organization
