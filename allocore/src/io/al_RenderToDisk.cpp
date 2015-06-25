@@ -393,7 +393,7 @@ void RenderToDisk::saveImage(unsigned w, unsigned h, unsigned l, unsigned b){
 
 
 RenderToDisk::AudioRing::AudioRing()
-:	mWriteBlock(0), mReadBlock(0)
+:	mChannels(0), mBlockSize(0), mNumBlocks(0), mWriteBlock(0), mReadBlock(0)
 {}
 
 void RenderToDisk::AudioRing::resize(
