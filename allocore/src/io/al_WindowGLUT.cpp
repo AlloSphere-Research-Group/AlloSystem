@@ -595,6 +595,8 @@ bool Window::implCreate(){
 	AL_GRAPHICS_INIT_CONTEXT;
 	vsync(mVSync);
 
+	callHandlersOnCreate();
+
 	// We need to manually call this because GLUT will not call its reshape
 	// callback until the main loop is started. By forcing it here, we ensure
 	// that the requested window width and height get properly stored.
@@ -605,8 +607,6 @@ bool Window::implCreate(){
 		mFullScreen = false;
 		fullScreen(fs);
 	}
-
-	callHandlersOnCreate();
 
 	mImpl->scheduleDraw();
 
