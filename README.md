@@ -55,7 +55,7 @@ You may not need all these dependencies if you plan to build only part of AlloSy
 
 AlloSystem provides cross-platform scripts to simplify downloading dependencies. From the `AlloSystem/` root directory,  run the script `install_all_dependencies.sh`. Provide one or more module names to install dependencies for the specified modules. For example, to install AlloCore dependencies, you would run these commands from `AlloSystem/`:
 
-  $ ./install_dependencies.sh allocore
+  $ ./install_all_dependencies.sh allocore
 
 This will download and install all of the AlloCore dependencies using APT on Linux, Homebrew (or MacPorts) on Mac OS X, or building from source.
 
