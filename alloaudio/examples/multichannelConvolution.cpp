@@ -9,13 +9,14 @@ Based on Allocore Example: Audio To Graphics by Lance Putnam
 #include "alloaudio/al_OutputMaster.hpp"
 #include "alloaudio/al_Convolver.hpp"
 #include "Gamma/SoundFile.h"
-
+#include "string.h"
 
 #define BLOCK_SIZE 64
 
 
 using namespace std;
 using namespace al;
+using namespace gam;
 
 class MyApp : public App{
 public:
@@ -35,9 +36,12 @@ public:
         SoundFile sf(path);
         sf.openRead();
         int numIRChannels = sf.channels(), numFrames = sf.frames();
-        double fSR = sf.frameRate();
-        float * deinterleavedChannels[numIRChannels][numFrames];
-        if(sf.readAllD(deinterleavedChannels) == numFrames){
+        double fs = sf.frameRate();
+        if(sampleRate != fs){
+            cout << "Warning: Application's sampling rate differs from that of impulse response file." << endl;
+        }
+        float deinterleavedChannels[numIRChannels * numFrames];
+        if(sf.readAllD(deinterleavedChannels) != numFrames){
             cout << "Could not read impulse response file" << endl;
         }
         int numActiveChannels;
@@ -53,12 +57,14 @@ public:
                 }
             }
         }
-		initAudio(fSR, BLOCK_SIZE, numActiveChannels, numActiveChannels);//convolver also supports a mode with mono input
+		initAudio(fs, BLOCK_SIZE, numActiveChannels, numActiveChannels);//convolver also supports a mode with mono input
         
         // Setup convolver
         vector<float *> IRchannels;
         for(int i = 0; i< num_chnls; ++i){
-            IRchannels.push_back(*deinterleavedChannels[i]);
+            float channelData[numFrames];
+            memcpy(channelData, &deinterleavedChannels[i * numFrames], sizeof(float) * numFrames);
+            IRchannels.push_back(channelData);
         }
         unsigned int options = 1;//uses FFTW_MEASURE
         //many to many mode
@@ -68,8 +74,8 @@ public:
     // Audio callback
     void onSound(AudioIOData& io){
 
-        conv->processBlock(io);
-		outMaster.processBlock(io);
+        conv.onAudioCB(io);
+		outMaster.onAudioCB(io);
     }
 
 
