@@ -93,28 +93,13 @@ public:
         }
         test.write(IRchannels[0], numFrames);
         test.close();
-        if(!test.openRead()){
-            cout << "Error opening test file" << endl;
-        }
     }
 
     // Audio callback
     void onSound(AudioIOData& io){
 
         conv.onAudioCB(io);
-        //int cbSize = io.framesPerBuffer();
-        //float *out = io.outBuffer(0);
-        //while(io()){
-        //    float inSample = io.in(0);
-        //    io.out(0) = inSample;
-        //    io.out(1) = inSample;
-        //}
-        //if(once){
-        //    cout << "AUDIO CALLBACK!!!!!" << endl;
-        //    once = false;
-        //}
-        //test.read(out, cbSize);
-		outMaster.onAudioCB(io);
+		//outMaster.onAudioCB(io);
     }
 
 
@@ -138,5 +123,4 @@ int main(){
 	cout << "Listening to \"" << address << "\" on port " << inport << endl;
 	cout << "Sending to \"" << sendAddress << "\" on port " << sendPort << endl;
     MyApp(num_chnls, sampleRate, address, inport, sendAddress, sendPort).start();
-    test.close();
 }
