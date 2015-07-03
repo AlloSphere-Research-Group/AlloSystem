@@ -36,11 +36,11 @@ public:
     {
         nav().pos(0,0,4);
         initWindow();
-        // Load IRs
-        //
+        // Load IR
+        // This free IR file obtained from http://www.echothief.com/batcave/
         //
         const char * path = "/Users/ogc/Documents/ucsb/arg/AlloSystem/alloaudio/share/irs/Batcave.wav";
-        //const char * path = "../share/irs/Batcave.wav";
+        //const char * path = "../share/irs/Batcave.wav"; //can't get relative paths to work...ARGH
         SoundFile sf(path);
         if(!sf.openRead()){
             cout << "Error: Could not read impulse response file." << endl;
@@ -97,7 +97,6 @@ public:
 
     // Audio callback
     void onSound(AudioIOData& io){
-
         conv.onAudioCB(io);
 		//outMaster.onAudioCB(io);
     }
