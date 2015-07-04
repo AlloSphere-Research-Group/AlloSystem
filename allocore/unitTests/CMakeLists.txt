@@ -13,7 +13,7 @@ include_directories("${BUILD_ROOT_DIR}/build/include/")
 target_link_libraries(allocoreTests ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES})
 add_dependencies(allocoreTests allocore${DEBUG_SUFFIX})
 if(TRAVIS_BUILD)
-add_definitions(ALLOCORE_TESTS_NO_GUI)
+add_definitions(-DALLOCORE_TESTS_NO_GUI)
 endif(TRAVIS_BUILD)
 add_test(NAME allocoreTests
          COMMAND $<TARGET_FILE:allocoreTests> ${TEST_ARGS})
