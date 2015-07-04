@@ -245,6 +245,7 @@ endif(BUILD_EXAMPLES)
 
 # Unit tests
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${BUILD_ROOT_DIR}/build/bin") # Put back after the change for examples
 add_subdirectory(unitTests)
 
 # installation
