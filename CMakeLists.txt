@@ -105,7 +105,7 @@ get_target_property(ALLOAUDIO_LIBRARY alloaudio${DEBUG_SUFFIX} LOCATION)
 get_target_property(ALLOAUDIO_INCLUDE_DIR alloaudio${DEBUG_SUFFIX} ALLOAUDIO_INCLUDE_DIR)
 get_target_property(ALLOAUDIO_LINK_LIBRARIES alloaudio${DEBUG_SUFFIX} ALLOAUDIO_LINK_LIBRARIES)
 if("alloaudio${DEBUG_SUFFIX}")
-  add_dependencies("alloaudio${DEBUG_SUFFIX}" "allocore${DEBUG_SUFFIX}")
+  add_dependencies("alloaudio${DEBUG_SUFFIX}" "${ALLOCORE_LIBRARY}")
 endif("alloaudio${DEBUG_SUFFIX}")
 
 # Run from path (Used in run.sh script)
@@ -130,7 +130,10 @@ MACRO(SUBDIRLIST result curdir)
 ENDMACRO()
 
 if(BUILD_EXAMPLES)
-  find_library(Gamma REQUIRED QUIET)
+  find_package(Gamma REQUIRED QUIET)
+  find_library(CUTTLEBONE_LIBRARY cuttlebone)
+  find_library(MYSQLPP_LIBRARY mysqlpp)
+  if (CUTTLEBONE_LIBRARY AND MYSQLPP_LIBRARY)
   subdirlist(EXAMPLE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/examples)
   #include root projects directory
   list(APPEND EXAMPLE_DIRS ".")
@@ -202,5 +205,7 @@ if(BUILD_EXAMPLES)
       endif(NOT (IS_DIRECTORY ${SRC}))
     endforeach(FILENAME)
   endforeach(dir)
+
+  endif (CUTTLEBONE_LIBRARY AND MYSQLPP_LIBRARY)
 
 endif(BUILD_EXAMPLES)

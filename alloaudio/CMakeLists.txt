@@ -9,8 +9,8 @@ if(NOT TARGET Gamma)
 endif(NOT TARGET Gamma)
 
 if(NOT (GAMMA_FOUND OR GAMMA_LIBRARY))
-    message("Alloaudio: Gamma not found. Not building Alloaudio." )
-    return()
+	message("Alloaudio: Gamma not found. Not building Alloaudio." )
+	return()
 endif(NOT (GAMMA_FOUND OR GAMMA_LIBRARY))
 
 set(ALLOAUDIO_SRC
@@ -106,7 +106,9 @@ if(BUILD_EXAMPLES)
       set(EXAMPLE_TARGET alloaudio_examples_${EXAMPLE_NAME})
       add_executable(${EXAMPLE_TARGET} ${example})
 #      add_dependencies(${EXAMPLE_TARGET} ${ALLOAUDIO_LIBRARY})
-      target_link_libraries("${EXAMPLE_TARGET}" ${ALLOAUDIO_LIBRARY} ${ALLOAUDIO_LINK_LIBRARIES})
+	  target_link_libraries("${EXAMPLE_TARGET}" ${ALLOCORE_LIBRARY} ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES}
+							 ${GAMMA_LIBRARY} ${GAMMA_LINK_LIBRARIES}
+							 ${ALLOAUDIO_LIBRARY} ${ALLOAUDIO_LINK_LIBRARIES})
       if(APPLE)
 	set_target_properties(${EXAMPLE_TARGET} PROPERTIES
 	  LINK_FLAGS "-pagezero_size 10000 -image_base 100000000")
