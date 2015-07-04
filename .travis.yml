@@ -7,7 +7,7 @@ before_install:
 - sudo apt-get install -y valgrind libapr1-dev libaprutil1-dev portaudio19-dev libsndfile1-dev
   libglew-dev freeglut3-dev libavahi-client-dev libudev-dev libusb-1.0-0-dev libfreeimage-dev
   libfreetype6-dev libxi-dev libxmu-dev libassimp-dev libluajit-5.1-dev libjsoncpp-dev
-script: "./distclean && cmake . -DCMAKE_BUILD_TYPE=Debug && make && make test ARGS=\"-V\""
+script: "./distclean && cmake . -DTRAVIS_BUILD=1 -DBUILD_EXAMPLES=1 -DCMAKE_BUILD_TYPE=Debug && make && make test ARGS=\"-V\""
 sudo: required
 notifications:
   email:
