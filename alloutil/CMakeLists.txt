@@ -98,6 +98,7 @@ if(BUILD_EXAMPLES)
     include_directories(${GAMMA_INCLUDE_DIR})
 
     file(GLOB EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/*.cpp)
+	list(REMOVE_ITEM EXAMPLE_FILES "examples/VCR.cpp") #FIXME put back example when fixed
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_ROOT_DIR}/build/bin/examples/)
     foreach(example ${EXAMPLE_FILES})
       get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
