@@ -21,9 +21,9 @@ rnd::Random<> rng;
 
 VCR vcr;
 
-struct App : Window {
+struct MyApp : Window {
 
-	App()
+	MyApp()
 	:	audio(256, 44100, audioCB, this, 2, 2)
 	{
 		image.format(3, AlloUInt8Ty, 2048, 2048);
@@ -70,7 +70,7 @@ struct App : Window {
 	}
 
 	static void audioCB(AudioIOData& io){
-		App * self = (App *)io.user();
+		MyApp * self = (MyApp *)io.user();
 		while(io()){
 			self->phase += 0.001;
 			float s0 = rng.uniformS() * sin(self->phase);
@@ -86,7 +86,7 @@ struct App : Window {
 };
 
 int main(){
-	App app;
+	MyApp app;
     char cwd[1024];
     getcwd(cwd, sizeof(cwd));
     vcr.setPath(cwd);
