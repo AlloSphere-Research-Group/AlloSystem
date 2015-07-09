@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Since we were using the same line anyways...
-cleaner="rm -rf build/ CMakeCache.txt CMakeFiles/ cmake_install.cmake Makefile build.ninja rules.ninja AlloSystem.xcodeproj AlloSystem.build CMakeScripts cmake_log.txt"
+cleaner="rm -rf build/ CMakeCache.txt CMakeFiles/ cmake_install.cmake CTestTestfile.cmake Makefile build.ninja rules.ninja AlloSystem.xcodeproj AlloSystem.build CMakeScripts cmake_log.txt"
 
 # Run in root directory.
 eval "$cleaner"
