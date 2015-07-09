@@ -144,6 +144,8 @@ int addSurfaceLoop(
 	double width=2, double height=2, double x=0, double y=0
 );
 
+void addCylinder(Mesh& m, double r1, double r2, double height, int vertCount);
+
 } // al::
 
 #endif

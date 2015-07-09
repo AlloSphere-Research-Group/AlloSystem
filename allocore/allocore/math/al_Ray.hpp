@@ -71,6 +71,21 @@ public:
 	Vec<3,T>& origin(){ return o; }
 	Vec<3,T>& direction(){ return d; }
 
+
+	T intersectPlane(Vec<3,T> p0, Vec<3,T> n){
+		T den = n.dot(d);
+		if(den == 0) return -1;
+		return n.dot(p0 - o) / den;
+	}
+
+	T intersectCircle(Vec<3,T> p0, Vec<3,T> n, T r){
+		T den = n.dot(d);
+		if(den == 0) return -1;
+		T t = n.dot(p0 - o) / den;
+		if( ((*this)(t)-p0).mag() <= r) return t;
+		else return -1;
+	}
+
 	// intersect sphere
 	T intersectSphere( Vec<3,T> cen, T radius ){
 		Vec<3,T> o_c = o - cen;
