@@ -180,6 +180,26 @@ public:
 	template <class T> const T& elem(size_t ic, size_t ix, size_t iy, size_t iz) const{
 		return cell<T>(ix,iy,iz)[ic]; }
 
+  /*  
+      Some operator overloading attempts by Matt, not fully tested or necessarily well conceived:
+
+
+/// Operator() to look like Matlab's 3D array indexing.   Always returns the first component; best
+        /// for one-component arrays.
+  template <class T> T& operator ()(size_t ix, size_t iy, size_t iz) {return elem<T>(1,ix,iy,iz);}
+
+        /// Operator() to look like Matlab's 2D array indexing.   Always returns the first component; best
+        /// for one-component arrays.
+  template <class T> T& operator ()(size_t ix, size_t iy) {return elem<T>(1,ix,iy);}
+
+        /// Operator() to look like Matlab's 1D array indexing.   Always returns the first component; best
+        /// for one-component arrays.
+  template <class T> T& operator ()(size_t ix) {return elem<T>(1,ix);}
+
+        /// Operator[] to look like 1D array indexing.   Always returns the first component; best
+        /// for one-component arrays.
+  template <class T> T& operator [](size_t ix) {return elem<T>(1,ix);}
+  */
 
 	/// Fill with the same cell value throughout
 	template<typename T> void set1d(T * cell);

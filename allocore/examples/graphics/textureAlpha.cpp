@@ -58,7 +58,7 @@ public:
 		initWindow();
 	}
 
-	void onDraw(Graphics& g, const Viewpoint& v){
+	void onDraw(Graphics& g){
 		
 		// Draw all scene objects first
 		g.draw(mesh);

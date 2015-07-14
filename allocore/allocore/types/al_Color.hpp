@@ -520,6 +520,9 @@ struct RGB{
 	/// @param[in] v			RGB color to convert from
 	RGB(const Color& v){ *this = v; }
 
+	/// @param[in] v			Colori to convert from
+	RGB(const Colori& v){ *this = v; }
+
 	/// @param[in] hsv			HSV value
 	RGB(const HSV& hsv){ *this = hsv; }
 
@@ -572,6 +575,9 @@ struct RGB{
 
 	/// Set RGB components from Color
 	RGB& operator= (const Color& v){ return set(v.rgb()); }
+
+	/// Set RGB components from Colori
+	RGB& operator= (const Colori& v);
 
 	/// Set RGB components from CIEXYZ
 	RGB& operator= (const CIEXYZ& v);
@@ -1048,6 +1054,9 @@ inline RGB operator - (float s, const RGB& c){ return -c+s; }
 inline RGB operator * (float s, const RGB& c){ return  c*s; }
 inline RGB operator / (float s, const RGB& c){ return RGB(s/c.r, s/c.g, s/c.b); }
 
+inline RGB& RGB::operator= (const Colori& v){
+	return set(float(v.r)/255.f, float(v.g)/255.f, float(v.b)/255.f);
+}
 
 
 inline Color operator + (float s, const Color& c){ return  c+s; }

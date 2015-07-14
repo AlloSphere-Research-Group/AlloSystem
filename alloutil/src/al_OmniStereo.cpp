@@ -9,7 +9,6 @@
 
 using namespace al;
 
-static Json::CharReaderBuilder reader;
 static Json::Value config;
 static std::string errors;
 
@@ -658,15 +657,21 @@ OmniStereo& OmniStereo::configure(std::string configpath, std::string configname
 	std::string config_file_name = configpath + "/" + configname + ".json";
 
 	static std::ifstream config_file(config_file_name.c_str(), std::ifstream::binary | std::ifstream::in);
-	bool parsingSuccessful = Json::parseFromStream(reader, config_file, &config, &errors);
-	config_file.close();
-	if ( !parsingSuccessful ){
-    std::cout  << "Failed to parse configuration." << std::endl;
+	if (config_file.fail()){
+		std::cout  << "Failed to find configuration file." << std::endl;
+		return *this;
+	} else {
+		config_file >> config;
+		config_file.close();
+	}
+
+  if ( config.empty() ){
+    std::cout  << "Failed to parse configuration file." << std::endl;
     std::cout << errors << std::endl;
-    std::cout << "Using default configuration." << std::endl;
+    std::cout << "Using default configuration file." << std::endl;
     return *this;
   } else {
-  	std::cout << "Parsed configuration file." << std::endl;
+    std::cout << "Parsed configuration file." << std::endl;
   }
 
 	if ( config["active"].asBool() ) {

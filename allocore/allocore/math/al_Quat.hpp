@@ -367,13 +367,29 @@ inline Quat<T> Quat<T> :: reverseMultiply(const Quat<T> & q) const {
 	return q * (*this);
 }
 
+namespace{
+	// Values determined with help from:
+	// http://babbage.cs.qc.cuny.edu/IEEE-754.old/Decimal.html
+	template<class T> T justUnder1();
+	template<> float  justUnder1(){ return 0.9999999f; }
+	template<> double justUnder1(){ return 0.999999999999999; }
+}
+
 template<typename T>
-Quat<T> Quat<T> :: pow(T v) const {
+Quat<T> Quat<T> :: pow(T expo) const {
 	T m = mag();
-	T theta = ::acos(w / m);
+	T w_m = w / m;
+
+	// Is q/|q| close to (±1,0,0,0)?
+	// If so, then quaternion cannot be "rotated", so just scale w component.
+	if(w_m > justUnder1<T>() || w_m < -justUnder1<T>()){
+		return Quat<T>((w>=T(0)?T(1):T(-1)) * ::pow(m, expo), 0, 0, 0);
+	}
+
+	T theta = ::acos(w_m);
 	Vec<3,T> imag = Vec<3,T>(x,y,z) / (m * ::sin(theta));
-	imag *= ::sin(v*theta);
-	return Quat(::cos(v*theta), imag) * ::pow(m,v);
+	imag *= ::sin(expo*theta);
+	return Quat(::cos(expo*theta), imag) * ::pow(m, expo);
 }
 
 
