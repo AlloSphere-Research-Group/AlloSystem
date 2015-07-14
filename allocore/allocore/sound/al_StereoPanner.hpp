@@ -132,9 +132,17 @@ private:
     
     void equalPowerPan(float xPos, float &gainL, float &gainR)
     {
+        //*
         if(xPos > 1) xPos = 1;
         else if(xPos < -1) xPos = -1;
-        
+        //*/
+
+        /*/
+        if(xPos > 5) xPos = 5;
+        else if(xPos < -5) xPos = -5;
+        xPos /= 5;
+        //*/
+         
         float panVal = (xPos + 1) /2.f; //[0, 1], L to R
         
         gainL = cos((M_PI/2)*panVal);
