@@ -9,7 +9,7 @@ namespace al{
 
 MsgQueue :: MsgQueue(int size, malloc_func mfunc, free_func ffunc)
 :	mHead(NULL), mTail(NULL), mPool(NULL),
-	mLen(0), mNow(0),
+	mLen(0), mChunkSize(0), mNow(0),
 	mMalloc(mfunc ? mfunc : malloc), mFree(ffunc ? ffunc : free)
 {
 	growPool(size);

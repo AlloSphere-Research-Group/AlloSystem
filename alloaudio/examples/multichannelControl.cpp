@@ -48,7 +48,7 @@ public:
             io.out(2) = out1*0.4;
             io.out(3) = out2*0.4;
         }
-		outMaster.processBlock(io);
+		outMaster.onAudioCB(io);
     }
 
 

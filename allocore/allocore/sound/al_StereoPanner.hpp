@@ -27,7 +27,7 @@ public:
 			printf("Stereo Panner Requires exactly 2 speakers (%i used), no panning will occur!\n", numSpeakers);
 	}
 	
-#if !ALLOCORE_GENERIC_AUDIOSCENE
+//#if !ALLOCORE_GENERIC_AUDIOSCENE
 
     ///Per Sample Processing
     void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample)
@@ -72,58 +72,58 @@ public:
         }
     }
     
-#else
-    
-    ///Per Sample Processing
-    void perform(float** outputBuffers, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample)
-    {
-        if(numSpeakers == 2 && mEnabled)
-        {
-            float *bufL = outputBuffers[0];
-            float *bufR = outputBuffers[1];
-            
-            float gainL, gainR;
-            equalPowerPan(relpos.x, gainL, gainR);
-            
-            bufL[frameIndex] = gainL*sample;
-            bufR[frameIndex] = gainR*sample;
-        }
-        else // dont pan
-        {
-            for(int i = 0; i < numSpeakers; i++)
-            {
-                float *buf = outputBuffers[i];
-                buf[frameIndex] = 0.5*sample;
-            }
-        }
-        
-	}
-    
-    /// Per Buffer Processing
-	void perform(float** outputBuffers, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples)
-    {
-        if(numSpeakers == 2 && mEnabled)
-        {
-            float *bufL = outputBuffers[0];
-            float *bufR = outputBuffers[1];
-            
-            float gainL, gainR;
-            equalPowerPan(relpos.x, gainL, gainR);
-            
-            for(int i = 0; i < numFrames; i++)
-            {
-                bufL[i] = gainL*samples[i];
-                bufR[i] = gainR*samples[i];
-            }
-        }
-        else // dont pan
-        {
-            for(int i = 0; i < numSpeakers; i++)
-                memcpy(outputBuffers[i], samples, sizeof(float)*numFrames);
-        }
-	}
-    
-#endif
+//#else
+//    
+//    ///Per Sample Processing
+//    void perform(float** outputBuffers, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample)
+//    {
+//        if(numSpeakers == 2 && mEnabled)
+//        {
+//            float *bufL = outputBuffers[0];
+//            float *bufR = outputBuffers[1];
+//            
+//            float gainL, gainR;
+//            equalPowerPan(relpos.x, gainL, gainR);
+//            
+//            bufL[frameIndex] = gainL*sample;
+//            bufR[frameIndex] = gainR*sample;
+//        }
+//        else // dont pan
+//        {
+//            for(int i = 0; i < numSpeakers; i++)
+//            {
+//                float *buf = outputBuffers[i];
+//                buf[frameIndex] = 0.5*sample;
+//            }
+//        }
+//        
+//	}
+//    
+//    /// Per Buffer Processing
+//	void perform(float** outputBuffers, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples)
+//    {
+//        if(numSpeakers == 2 && mEnabled)
+//        {
+//            float *bufL = outputBuffers[0];
+//            float *bufR = outputBuffers[1];
+//            
+//            float gainL, gainR;
+//            equalPowerPan(relpos.x, gainL, gainR);
+//            
+//            for(int i = 0; i < numFrames; i++)
+//            {
+//                bufL[i] = gainL*samples[i];
+//                bufR[i] = gainR*samples[i];
+//            }
+//        }
+//        else // dont pan
+//        {
+//            for(int i = 0; i < numSpeakers; i++)
+//                memcpy(outputBuffers[i], samples, sizeof(float)*numFrames);
+//        }
+//	}
+//    
+//#endif
     
 	
 private:

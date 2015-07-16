@@ -500,4 +500,28 @@ int addSurfaceLoop(
 }
 
 
+void addCylinder(Mesh& m, double r1, double r2, double height, int vertCount){
+
+  m.primitive(Graphics::TRIANGLE_STRIP);
+    
+  int indxCount = vertCount+2;
+  double theta = 0.0;
+
+  for (int j=0; j < vertCount; j++){
+    double r = ((j % 2 == 0) ? r1 : r2);
+    double x = cos(theta);
+    double y = sin(theta);
+    float u = ((j % 2 == 0) ? 1.0 : 0.0);
+    float v = j*1.0 / vertCount;
+
+    m.normal(x,y,(r1-r2)/2.0);
+    // m.texCoord(u,v);
+    m.vertex(r*x,r*y,((j % 2 == 0) ? 0.0 : height));
+
+    theta += 2 * M_PI / (vertCount);
+  }
+
+  for(int i=0; i < indxCount; i++) m.index(i % vertCount);
+}
+
 }

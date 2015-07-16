@@ -71,6 +71,21 @@ public:
 	Vec<3,T>& origin(){ return o; }
 	Vec<3,T>& direction(){ return d; }
 
+
+	T intersectPlane(Vec<3,T> p0, Vec<3,T> n){
+		T den = n.dot(d);
+		if(den == 0) return -1;
+		return n.dot(p0 - o) / den;
+	}
+
+	T intersectCircle(Vec<3,T> p0, Vec<3,T> n, T r){
+		T den = n.dot(d);
+		if(den == 0) return -1;
+		T t = n.dot(p0 - o) / den;
+		if( ((*this)(t)-p0).mag() <= r) return t;
+		else return -1;
+	}
+
 	// intersect sphere
 	T intersectSphere( Vec<3,T> cen, T radius ){
 		Vec<3,T> o_c = o - cen;
@@ -94,6 +109,44 @@ public:
 
 	bool intersectsSphere( Vec<3,T> cen, T radius){
 		return intersectSphere(cen,radius) > 0.;
+	}
+
+	bool intersectsBox(Vec<3,T> cen, Vec<3,T> scl, float t0=0.f, float t1 = 9e9){
+		// courtesy of http://www.cs.utah.edu/~awilliam/box/
+	  float tmin, tmax, tymin, tymax, tzmin, tzmax;
+
+	  Vec<3,T> parameters[2];
+	  Vec<3,T> min = cen - scl/2;
+	  Vec<3,T> max = cen + scl/2;
+	  parameters[0] = min;
+	  parameters[1] = max;
+	  
+	  Vec<3,T> inv_direction = 1.0/d;
+	  int sign[3];
+    sign[0] = (inv_direction.x < 0);
+    sign[1] = (inv_direction.y < 0);
+    sign[2] = (inv_direction.z < 0);
+
+	  tmin = (parameters[sign[0]].x - o.x) * inv_direction.x;
+	  tmax = (parameters[1-sign[0]].x - o.x) * inv_direction.x;
+	  tymin = (parameters[sign[1]].y - o.y) * inv_direction.y;
+	  tymax = (parameters[1-sign[1]].y - o.y) * inv_direction.y;
+	  if ( (tmin > tymax) || (tymin > tmax) ) 
+	    return false;
+	  if (tymin > tmin)
+	    tmin = tymin;
+	  if (tymax < tmax)
+	    tmax = tymax;
+	  tzmin = (parameters[sign[2]].z - o.z) * inv_direction.z;
+	  tzmax = (parameters[1-sign[2]].z - o.z) * inv_direction.z;
+	  if ( (tmin > tzmax) || (tzmin > tmax) ) 
+	    return false;
+	  if (tzmin > tmin)
+	    tmin = tzmin;
+	  if (tzmax < tmax)
+	    tmax = tzmax;
+	  return ( (tmin < t1) && (tmax > t0) );
+
 	}
 
 	// intersect cylinder positioned at origin oriented with Z axis

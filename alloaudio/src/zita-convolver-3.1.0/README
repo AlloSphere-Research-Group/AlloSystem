@@ -1,0 +1,160 @@
+**************************
+*  zita-convolver 3.0.1  *
+**************************
+
+
+API changes between 2.x.x and  3.x.x
+------------------------------------
+
+Release 3 will be fully documented, but this could take some time. 
+Until then, the following should enable you to modify your apps so
+they can be compiled and will work well with release 3.
+
+
+1. Version test macro and function.
+
+If your application depends on this version of zita-convolver,
+insert the following two code fragments, normally in your main
+program source file:
+
+-----
+#include <zita-convolver.h>
+
+#if ZITA_CONVOLVER_MAJOR_VERSION != 3
+#error "This programs requires zita-convolver 3.x.x"
+#endif
+-----
+
+This will test for zita-convolver-3.x.x at compile time.
+
+-----
+if (zita_convolver_major_version () != ZITA_CONVOLVER_MAJOR_VERSION)
+{
+    fprintf (stderr, "Zita-convolver version does not match.\n");
+    return 1;
+}
+-----
+
+This will check that the compile time and run time libraries
+are compatible.
+
+One of the problems with release 2 was that almost any change
+would lead to incompatibility with previous versions. The code
+in release 3 has been extensively reworked to ensure that small
+bugfixes and minor changes will not lead to binary or source
+incompatibility.
+
+
+2. Testing run-time flags.
+
+Release 2 had Convproc::flags(), providing information about
+computation threads being late and CPU overload. This function
+is no longer available. Convproc::process(), previously a void
+function, now returns the same information. The calling thread
+should take care of communicating this to any non-realtime context
+that may need it. This may involve some code to logically OR bits
+with provious values, and to clear this accumulated status when
+it is read by e.g. the main event loop. Another way to check for
+CPU overload is to monitor Convproc::state(). 
+
+
+3. Setting options.
+
+The functions set_fftwopt() and set_vectopt() are no longer
+available. They are replaced by set_options() which takes the
+logical OR of some constant as its argument. The possible
+values to be ORed are:
+
+  Convproc::OPT_FFTW_MEASURE
+  Convproc::OPT_VECTOR_MODE
+
+The first one will make the fftw3 library run some test code
+when FFT plans are created. This will improve performance but
+lead to a slow-starting application. The second enables some
+experimental vector code which can improve performance for
+some configurations. Convproc::set_options() must be called
+*before* Convproc::configure(), it will be ignored otherwise.
+
+
+4. The 'density' parameter.
+
+While release 2 used an almost fixed sequence of partition sizes,
+release 3 has some new code to optimize this in function of the
+number of inputs and outputs, the maximum impulse response length,
+and the type of convolution matrix. The 'density' parameter is set
+by calling Convproc::set_density() *before* Convproc::configure(). 
+The value of 'density' should be the fraction of input / output
+combinations that actually will be used. When set to zero (or not
+set at all), the default value will be 1 / min (Ninp, Nout), which
+will work well in many cases, except when you have a dense matrix,
+one in which (almost) all outputs depend on (almost) all inputs.
+For a fully filled matrix 'density' should be set to 1.
+
+
+5. The 'sync' argument to Convproc::process().
+
+Convproc::process() now takes a optional boolean argument 'sync'.
+The default value is 'false'. When set to 'true' it makes the
+process() call wait for data from auxiliary threads instead of
+assuming that these threads have completed their work and that
+the data they should provide is available.
+
+Zita-convolver can be used in three modes:
+
+  A. Batch mode. Use this to compute convolutions of finite
+  lenght in non-realtime mode. No auxiliary threads are used
+  in this mode, and there is no need to check the 'late' flags 
+  returned by Convproc::process(). To run a convolver in batch
+  mode ensure that all three of the 'quantum', 'minpart' and
+  'maxpart' arguments to Convproc::configure() are identical. 
+  Doing this does not exclude real-time operation, it just
+  ensures that all processing will be done in a single thread,
+  that of the caller of process(). The 'sync' argument is
+  ignored in this case.
+
+  B. Real-time mode. The normal way to call process() in a
+  Jack process callback is to set 'sync' to false. In this 
+  case lower-priority threads, if there are any, are assumed
+  to have finished their work in time, process() will not wait
+  for them and will never block.  
+
+  C. Freewheeling mode. When 'sync' is set to true, process()
+  will wait at appropiate times for lower priority threads to
+  have finished. This *must* be done when Jack is running in
+  'freewheeling' mode. In theory you could set 'sync' true in
+  normal Jack mode as well - if all is OK the lower priority
+  threads should be in time.  But it could in theory block
+  the caller for a long time, so this is not recommended.
+
+
+6. The Convproc::start_process() function.
+
+As is version 2.0 this call takes two arguments, a thread
+priority and a thread scheduling class. In 2.0 the second
+defaulted to SCHED_FIFO. In version 3.0 you have to supply
+both arguments. If you are using a Convproc in 'batch mode'
+(see above) just use zero for both. In all other cases, the
+priority and scheduling class values _must_ be those of the
+thread that will be calling Convproc::process(), and the
+scheduling class _must_ be a real-time one (FIFO or RR). 
+If this is not observed things may appear to work but will
+fail sooner or later.
+
+
+7. Cleaning up.
+
+As before, Convproc::stop_process() is used to terminate
+processing, and Convproc::cleanup() will free all internal
+buffers and return a Convproc to its initial state as after
+construction. The destructor calls cleanup() as well.
+Clearly this must not be done before all auxiliary threads
+have terminated. Convproc::cleanup() now checks for this,
+and will eventually block for a short time before proceeding.
+If you want to avoid this, you can explicitly wait in your
+own code, e.g 'while (! C->check_stop()) usleep (100000);',
+or you could use a periodic event calling check_stop() in
+your main loop.
+
+
+
+  

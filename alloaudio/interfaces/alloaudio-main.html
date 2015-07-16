@@ -1,0 +1,49 @@
+<html>
+<head>
+  <script src='interface.js'></script>
+</head>
+<body>
+  <script>
+  panel = new Interface.Panel({ useRelativeSizesAndPositions: true });
+
+  a = new Interface.Slider({
+    bounds:[0,0,0.3,1],
+    isVertical:true,
+    label: "Global Level",
+    target:"OSC", key:'/Alloaudio/global_gain',
+  })
+
+  b = new Interface.Button({
+    bounds:[0.3,0,0.3,0.5],
+    label: "MUTE",
+    target:"OSC", key:'/Alloaudio/mute_all',
+  })
+
+  c = new Interface.Button({
+    bounds:[0.3,0.5,0.3,0.5],
+    label: "DRC",
+    target:"OSC", key:'/Alloaudio/room_compensation_on',
+  })
+
+  d = new Interface.Button({
+    bounds:[0.6,0,0.4,0.5],
+    label: "Clip",
+    target:"OSC", key:'/Alloaudio/clipper_on',
+  })
+
+  e = new Interface.Menu({
+  bounds:[.6,.55,.4,0.3],
+  stroke:"#666",
+  size: 45,
+  options:['None', 'Mixdown', 'Low-pass', 'High-pass', 'Full'],
+    target:"OSC", key:'/Alloaudio/bass_management_mode',
+  });
+
+  panel.add( a, b, c, d, e );
+
+  Interface.OSC.receive = function(address, typetags, parameters) {
+    //window.alert(address + typetags + parameters);
+  }
+  </script>
+</body>
+</html>

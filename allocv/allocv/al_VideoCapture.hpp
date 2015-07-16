@@ -273,6 +273,12 @@ public:
 	/// Called whenever new video frame(s) are ready
 	virtual void onVideo(VideoCapture& vid, int streamIdx) = 0;
 
+	/// Called just before a grab is attempted
+
+	/// Any state handling of VideoCaptures should happen here.
+	///
+	virtual void onPregrab(VideoCapture& vid, int streamIdx){}
+
 
 	/// Set maximum number of handled video capture streams
 	VideoCaptureHandler& numVideoStreams(int num);

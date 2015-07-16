@@ -105,7 +105,7 @@ public:
 	/// Called once per listener, before sources are rendered. ex. zero ambisonics coefficients
 	virtual void prepare(){};
 
-#if !ALLOCORE_GENERIC_AUDIOSCENE
+//#if !ALLOCORE_GENERIC_AUDIOSCENE
 	/// Render each source per sample
 	virtual void perform(
 		AudioIOData& io,
@@ -128,29 +128,29 @@ public:
     /// Called once per listener, after sources are rendered. ex. ambisonics decode
     virtual void finalize(AudioIOData& io){};
     
-#else
-    /// Render each source per sample
-    virtual void perform(
-                         float** outputBuffers,
-                         SoundSource& src,
-                         Vec3d& relpos,
-                         const int& numFrames,
-                         int& frameIndex,
-                         float& sample
-                         ) = 0;
-    
-    /// Render each source per buffer
-    virtual void perform(
-                         float** outputBuffers,
-                         SoundSource& src,
-                         Vec3d& relpos,
-                         const int& numFrames,
-                         float *samples
-                         ) = 0;
-    
-    /// called once per listener, after sources are rendered. ex. ambisonics decode
-    virtual void finalize(float **outs, const int numFrames){};
-#endif
+//#else
+//    /// Render each source per sample
+//    virtual void perform(
+//                         float** outputBuffers,
+//                         SoundSource& src,
+//                         Vec3d& relpos,
+//                         const int& numFrames,
+//                         int& frameIndex,
+//                         float& sample
+//                         ) = 0;
+//    
+//    /// Render each source per buffer
+//    virtual void perform(
+//                         float** outputBuffers,
+//                         SoundSource& src,
+//                         Vec3d& relpos,
+//                         const int& numFrames,
+//                         float *samples
+//                         ) = 0;
+//    
+//    /// called once per listener, after sources are rendered. ex. ambisonics decode
+//    virtual void finalize(float **outs, const int numFrames){};
+//#endif
 
 	/// Print out information about spatializer
 	virtual void print(){};
@@ -372,13 +372,13 @@ public:
 	/// Remove a sound source from scene
 	void removeSource(SoundSource& src);
     
-#if !ALLOCORE_GENERIC_AUDIOSCENE
+//#if !ALLOCORE_GENERIC_AUDIOSCENE
     /// Perform rendering
     void render(AudioIOData& io);
-#else
-    /// Perform rendering
-    void render(float **outputBuffers, const int numFrames, const double sampleRate);
-#endif
+//#else
+//    /// Perform rendering
+//    void render(float **outputBuffers, const int numFrames, const double sampleRate);
+//#endif
 
     /// Set per sample processing (true by default)
 

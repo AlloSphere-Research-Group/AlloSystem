@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
         array.read(&pixel, col, row);
 
         // For now we'll take only the red and put it in the single component; that's lame.
-        v.elem<char>(1, col, row, slice) = (char) pixel.r;
+        v.elem<char>(0, col, row, slice) = (char) pixel.r;
       }
     }
   }

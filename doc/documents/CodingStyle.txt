@@ -15,6 +15,11 @@ al_[CamelCase].hpp
 al_[CamelCase].cpp
 
 ___________________________________________________________________________
+Indentation
+___________________________________________________________________________
+Indentation should be done using tabs.
+
+___________________________________________________________________________
 Headers
 ___________________________________________________________________________
 1. All header content should be contained within a preprocessor conditional block to avoid multiple include errors.
@@ -51,6 +56,12 @@ For C only:
 
 For C++ only:
 1. Everything should be defined within the namespace al::.
+
+___________________________________________________________________________
+Naming conventions
+___________________________________________________________________________
+
+* Variable members in classes should be prefixed by 'm'. e.g. mSize.
 
 
 ===========================================================================

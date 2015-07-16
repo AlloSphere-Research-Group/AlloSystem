@@ -72,6 +72,8 @@ allocore_port_callback(){
 
 allocore_pacman="\
                 mingw-w64-${arch}-cmake \
+                mingw-w64-${arch}-apr \
+                mingw-w64-${arch}-apr-util \
                 mingw-w64-${arch}-portaudio \
                 mingw-w64-${arch}-libsndfile \
                 mingw-w64-${arch}-glew \

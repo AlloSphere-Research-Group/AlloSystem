@@ -68,7 +68,7 @@ int SoundSource::bufferSize(double samplerate, double speedOfSound, double dista
 
 
 AudioScene::AudioScene(int numFrames_)
-:   mSpeedOfSound(340), mPerSampleProcessing(true)
+:   mNumFrames(0), mSpeedOfSound(344), mPerSampleProcessing(false)
 {
 	numFrames(numFrames_);
 }
@@ -119,13 +119,13 @@ Listener * AudioScene::createListener(Spatializer* spatializer){
 	The head-size sets the effective doppler near-clip.
 */
     
-#if !ALLOCORE_GENERIC_AUDIOSCENE
+//#if !ALLOCORE_GENERIC_AUDIOSCENE
 void AudioScene::render(AudioIOData& io) {
     const int numFrames = io.framesPerBuffer();
     double sampleRate = io.framesPerSecond();
-#else
-void AudioScene::render(float **outputBuffers, const int numFrames, const double sampleRate) {
-#endif
+//#else
+//void AudioScene::render(float **outputBuffers, const int numFrames, const double sampleRate) {
+//#endif
     
 	// iterate through all listeners adding contribution from all sources
 	for(unsigned il=0; il<mListeners.size(); ++il){
@@ -207,11 +207,11 @@ void AudioScene::render(float **outputBuffers, const int numFrames, const double
 						double gain = src.attenuation(dist);
 						float s = src.readSample(samplesAgo) * gain;
                         //s = src.presenceFilter(s); //TODO: causing stopband ripple here, why?
-                        #if !ALLOCORE_GENERIC_AUDIOSCENE
+//                        #if !ALLOCORE_GENERIC_AUDIOSCENE
                         spatializer->perform(io, src,relpos, numFrames, i, s);
-                        #else
-                        spatializer->perform(outputBuffers, src,relpos, numFrames, i, s);
-                        #endif
+//                        #else
+//                        spatializer->perform(outputBuffers, src,relpos, numFrames, i, s);
+//                        #endif
 					}
 
                 } //end for each frame
@@ -230,20 +230,20 @@ void AudioScene::render(float **outputBuffers, const int numFrames, const double
                     mBuffer[i] = gain * src.readSample(readIndex);
                 }
                 
-                #if !ALLOCORE_GENERIC_AUDIOSCENE
+//                #if !ALLOCORE_GENERIC_AUDIOSCENE
                 spatializer->perform(io, src,relpos, numFrames, &mBuffer[0]);
-                #else
-                spatializer->perform(outputBuffers, src, relpos, numFrames, &mBuffer[0]);
-                #endif
+//                #else
+//                spatializer->perform(outputBuffers, src, relpos, numFrames, &mBuffer[0]);
+//                #endif
             }
 
 		} //end for each source
 
-#if !ALLOCORE_GENERIC_AUDIOSCENE
+//#if !ALLOCORE_GENERIC_AUDIOSCENE
         spatializer->finalize(io);
-#else
-        spatializer->finalize(outputBuffers, numFrames);
-#endif
+//#else
+//        spatializer->finalize(outputBuffers, numFrames);
+//#endif
 
 	} // end for each listener
 }

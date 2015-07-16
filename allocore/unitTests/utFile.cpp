@@ -47,7 +47,7 @@ int utFile() {
 		assert(r);
 		assert(File::exists(dir + find));
 
-		find = ".." DELIM + find;	// check for a file with path
+		find = "allocore" DELIM + find;	// check for a file with path
 		r = File::searchBack(dir, find);
 		assert(r);
 		assert(File::exists(dir + find));

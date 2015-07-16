@@ -59,20 +59,20 @@ public:
 	void compile(Listener& listener);
 
     
-    #if !ALLOCORE_GENERIC_AUDIOSCENE
+//    #if !ALLOCORE_GENERIC_AUDIOSCENE
 	///Per Sample Processing
 	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample);
 
 	/// Per Buffer Processing
 	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples);
     
-    #else
-    ///Per Sample Processing
-    void perform(float** outputBuffers, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample);
-    
-    /// Per Buffer Processing
-    void perform(float** outputBuffers, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples);
-    #endif
+//    #else
+//    ///Per Sample Processing
+//    void perform(float** outputBuffers, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample);
+//    
+//    /// Per Buffer Processing
+//    void perform(float** outputBuffers, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples);
+//    #endif
 
 	/// focus is an exponent determining the amplitude focus to nearby speakers.
 
