@@ -15,4 +15,4 @@ sudo: required
 notifications:
   email:
     recipients:
-    - mantaraya36@gmail.com
+	- allocore@mat.ucsb.edu

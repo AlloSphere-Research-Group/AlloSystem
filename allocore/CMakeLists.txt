@@ -5,6 +5,7 @@ message(STATUS "==== Configuring allocore.")
 
 # Allocore Library
 list(APPEND ALLOCORE_SRC
+  src/io/al_AudioIOData.cpp
   src/io/al_MIDI.cpp
   src/io/al_HID.cpp
   src/io/al_Serial.cpp
@@ -28,9 +29,10 @@ list(APPEND ALLOCORE_HEADERS
     allocore/graphics/al_Mesh.hpp
     allocore/graphics/al_Shapes.hpp
     allocore/graphics/al_Image.hpp
+	allocore/io/al_AudioIOData.hpp
     allocore/io/al_HID.hpp
     allocore/io/al_MIDI.hpp
-    allocore/io/al_Serial.hpp
+	allocore/io/al_Serial.hpp
     allocore/math/al_Analysis.hpp
     allocore/math/al_Complex.hpp
     allocore/math/al_Constants.hpp
