@@ -5,6 +5,7 @@
    Voxel data import aka slice assembler aka volume reconstructor 
 
    by Matt Wright, April 2015
+   modified by Hannah Wolfe, July 2015
 
    based on tiExporter.cpp from images2raw.cpp by Coby Kaufer
    <cobykaufer@bluejayke.com>, Karl Yerkes <karl.yerkes@gmail.com>,
@@ -21,15 +22,9 @@
 
    - Ignores all but the red channel
 
-   - Ignores "info.txt" file: assumes 1nm cube voxels  rather than reading in the voxel physical
-     size 
-
-   - Ignores "info.txt" file, not verifying the stated number of images or image resolutions.
-
    - Chokes if directory contains anything besides "info.txt" and image files
 
    - Does nothing useful after reading in all this data
-
 
    Usage:
 
