@@ -33,6 +33,10 @@ void arrayfiller(float * values, double normx, double normy, double normz) {
 
 
 int main() {
+
+  //  loading voxel from image collection
+  //  al::Voxels v("../../spherical_harmonic_generator/sample10_a");
+  
   al::Voxels v(AlloFloat32Ty, 32, 32, 32, 0.1234, 0.1234, 8.5, NANOMETERS);
 
 
