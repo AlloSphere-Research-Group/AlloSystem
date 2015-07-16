@@ -10,66 +10,6 @@
 
 namespace al{
 
-static int min(int x, int y){ return x<y?x:y; }
-
-/*
-static void err(const char * msg, const char * src, bool exits){
-	fprintf(stderr, "%s%serror: %s\n", src, src[0]?" ":"", msg);
-	if(exits) exit(EXIT_FAILURE);
-}
-*/
-
-static void warn(const char * msg, const char * src){
-	fprintf(stderr, "%s%swarning: %s\n", src, src[0]?" ":"", msg);
-}
-
-template <class T>
-static void deleteBuf(T *& buf){ delete[] buf; buf=0; }
-
-template <class T>
-static int resize(T *& buf, int n){
-	deleteBuf(buf);
-	buf = new T[n];
-	return n;
-}
-
-// Utility function to efficiently clear buffer (set all to 0)
-template <class T>
-static void zero(T * buf, int n){ memset(buf, 0, n*sizeof(T)); }
-
-// Utility function to deinterleave samples
-template <class T>
-static void deinterleave(T * dst, const T * src, int numFrames, int numChannels){
-	int numSamples = numFrames * numChannels;
-	for(int c=0; c < numChannels; c++){
-		for(int i=c; i < numSamples; i+=numChannels){
-			*dst++ = src[i];
-		}
-	}
-}
-
-/// Utility function to interleave samples
-template <class T>
-static void interleave(T * dst, const T * src, int numFrames, int numChannels){
-	int numSamples = numFrames * numChannels;
-	for(int c=0; c < numChannels; c++){
-		for(int i=c; i < numSamples; i+=numChannels){
-			dst[i] = *src++;
-		}
-	}
-}
-
-
-
-//==============================================================================
-
-AudioBackend::AudioBackend()
-:	mIsOpen(false), mIsRunning(false)
-{}
-
-
-//==============================================================================
-
 class DummyAudioBackend : public AudioBackend{
 public:
 	DummyAudioBackend(): AudioBackend(), mNumOutChans(64), mNumInChans(64){}
@@ -375,27 +315,6 @@ private:
 	mutable PaError mErrNum;			// Most recent error number
 };
 
-
-//==============================================================================
-
-AudioDeviceInfo::AudioDeviceInfo(int deviceNum)
-:	mID(deviceNum), mChannelsInMax(0), mChannelsOutMax(0), mDefaultSampleRate(0.0)
-{}
-
-bool AudioDeviceInfo::valid() const { return true; }
-int AudioDeviceInfo::id() const { return mID; }
-const char * AudioDeviceInfo::name() const { return mName; }
-int AudioDeviceInfo::channelsInMax() const { return mChannelsInMax; }
-int AudioDeviceInfo::channelsOutMax() const { return mChannelsOutMax; }
-double AudioDeviceInfo::defaultSampleRate() const { return mDefaultSampleRate; }
-
-void AudioDeviceInfo::setName(char *name) { strncpy(mName, name, 127); mName[127] = '\0'; }
-void AudioDeviceInfo::setID(int iD) { mID = iD;}
-void AudioDeviceInfo::setChannelsInMax(int num) { mChannelsInMax = num;}
-void AudioDeviceInfo::setChannelsOutMax(int num) { mChannelsOutMax = num;}
-void AudioDeviceInfo::setDefaultSampleRate(double rate) { mDefaultSampleRate = rate;}
-
-
 //==============================================================================
 
 AudioDevice::AudioDevice(int deviceNum)
@@ -494,41 +413,6 @@ void AudioDevice::printAll(){
 		//print(i);
 	}
 }
-
-
-//==============================================================================
-
-AudioIOData::AudioIOData(void * userData)
-:	mImpl(NULL), mUser(userData), mFrame(0),
-	mFramesPerBuffer(0), mFramesPerSecond(0),
-	mBufI(0), mBufO(0), mBufB(0), mBufT(0), mNumI(0), mNumO(0), mNumB(0),
-	mGain(1), mGainPrev(1)
-{
-}
-
-AudioIOData::~AudioIOData(){
-	deleteBuf(mBufI);
-	deleteBuf(mBufO);
-	deleteBuf(mBufB);
-	deleteBuf(mBufT);
-}
-
-void AudioIOData::zeroBus(){ zero(mBufB, framesPerBuffer() * mNumB); }
-void AudioIOData::zeroOut(){ zero(mBufO, channelsOut() * framesPerBuffer()); }
-
-int AudioIOData::channelsIn () const { return mNumI; }
-int AudioIOData::channelsOut() const { return mNumO; }
-int AudioIOData::channelsBus() const { return mNumB; }
-
-double AudioIOData::framesPerSecond() const { return mFramesPerSecond; }
-double AudioIOData::time() const {
-	assert(mImpl);
-	return mImpl->time();
-}
-double AudioIOData::time(int frame) const { return (double)frame / framesPerSecond() + time(); }
-int AudioIOData::framesPerBuffer() const { return mFramesPerBuffer; }
-double AudioIOData::secondsPerBuffer() const { return (double)framesPerBuffer() / framesPerSecond(); }
-
 
 //==============================================================================
 
