@@ -48,7 +48,8 @@
 namespace al{
 
 /// Spatial definition of a speaker in a listening space
-struct Speaker {
+class Speaker {
+public:
 
 	unsigned int deviceChannel;	///< Index in the output device channels array
 	float gain;					///< Gain of speaker
@@ -65,6 +66,7 @@ struct Speaker {
 	:	deviceChannel(deviceChan), gain(gain), azimuth(az), elevation(el), radius(radius)
 	{}
 
+	/// Set position from Cartesian coordinate
 	template <class T>
 	Speaker& posCart(T * xyz){
 		using namespace std;
@@ -73,46 +75,54 @@ struct Speaker {
 		float cosel = cos(elr);
 		xyz[0] = sin(azr) * cosel * radius;
 		xyz[1] = cos(azr) * cosel * radius;
-		xyz[2] =         sin(elr) * radius;
+		xyz[2] = sin(elr) * radius;
 		return *this;
 	}
 
-	static double toRad(double d){ return d*2.*M_PI/180.; }
+	/// Get position as Cartesian coordinate
+    Vec3d vec() const {
+
+        //TODO doxygen style commenting on coordinates like ambisonics
+
+		double cosel = cos(toRad(elevation));
+//		double x = sin(toRad(azimuth)) * cosel * radius;
+//		double y = cos(toRad(azimuth)) * cosel * radius;
+//		double z = sin(toRad(elevation)) * radius;
+        //Ryan: the standard conversions assume +z is up, these are correct for allocore
+        double x = sin(toRad(azimuth)) * cosel * radius;
+		double y = sin(toRad(elevation)) * radius;
+        double z = -1*cos(toRad(azimuth)) * cosel * radius;
+		return Vec3d(x,y,z);
+	}
+
+	static double toRad(double d){ return d*M_PI/180.; }
 };
+
+
+
+/// A set of speakers
+typedef std::vector<Speaker> Speakers;
 
 
 
 /// Base class for a configuration of multiple speakers
 class SpeakerLayout{
 public:
-	typedef std::vector<Speaker> Speakers;
 
-	SpeakerLayout(){}
-
+	/// Get number of speakers
 	int numSpeakers() const { return speakers().size(); }
 
-	const Speakers& speakers() const { return mSpeakers; }
+	/// Get speaker array
 	Speakers& speakers(){ return mSpeakers; }
+	const Speakers& speakers() const { return mSpeakers; }
 
-//	Speaker addSpeaker(float azimuth, float elevation, float distance, int deviceChannel){
-//		Speaker s;
-//		s.azimuth = azimuth;
-//		s.elevation = elevation;
-//		s.distance = distance;
-//		s.deviceChannel = deviceChannel;
-//		addSpeaker(s);
-//		return s;
-//	}
-
+	/// Add speaker
 	SpeakerLayout& addSpeaker(const Speaker& spkr){
 		mSpeakers.push_back(spkr);
 		return *this;
 	}
 
-
-
 protected:
-	friend class Listener;
 	Speakers mSpeakers;
 };
 
@@ -120,8 +130,8 @@ protected:
 
 /// Generic layout of N speakers spaced equidistantly in a ring
 template <int N>
-struct SpeakerRingLayout : public SpeakerLayout{
-
+class SpeakerRingLayout : public SpeakerLayout{
+public:
 	/// @param[in] deviceChannelStart	starting index of device channel
 	/// @param[in] phase				starting phase of first speaker, in degrees
 	/// @param[in] radius				radius of all speakers
@@ -135,7 +145,8 @@ struct SpeakerRingLayout : public SpeakerLayout{
 };
 
 /// Headset speaker layout
-struct HeadsetSpeakerLayout : public SpeakerRingLayout<2>{
+class HeadsetSpeakerLayout : public SpeakerRingLayout<2>{
+public:
 	HeadsetSpeakerLayout(int deviceChannelStart=0, float radius=1.f, float gain=1.f)
 	:	SpeakerRingLayout<2>(deviceChannelStart, 90, radius, gain)
 	{}

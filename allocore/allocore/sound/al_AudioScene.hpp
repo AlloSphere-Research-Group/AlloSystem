@@ -41,6 +41,7 @@
 	File author(s):
 	Lance Putnam, 2010, putnam.lance@gmail.com
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
+    Ryan McGee, 2012, ryanmichaelmcgee@gmail.com
 */
 
 #include <math.h>
@@ -50,13 +51,13 @@
 #include "allocore/types/al_Buffer.hpp"
 #include "allocore/math/al_Interpolation.hpp"
 #include "allocore/math/al_Vec.hpp"
+#include "allocore/spatial/al_DistAtten.hpp"
 #include "allocore/spatial/al_Pose.hpp"
-#include "allocore/sound/al_Ambisonics.hpp"
+#include "allocore/io/al_AudioIO.hpp"
 #include "allocore/sound/al_Speaker.hpp"
 #include "allocore/sound/al_Reverb.hpp"
 
 namespace al{
-
 
 /*!
 	A note on coordinate conventions
@@ -81,163 +82,150 @@ namespace al{
 		 ambi_z =  gl_y;
 */
 
-
-/*
-	So, for large numbers of sources it quickly gets too expensive.
-	Having one delayline per soundsource (for doppler) is itself quite taxing.
-	e.g., at 44100kHz sampling rate, a speed of sound of 343m/s and an audible distance of 50m implies a delay of at least 6428 samples (need to add blocksize to that too).
-	The actual buffersize sets the effective doppler far-clip; beyond this it always uses max-delay size (no doppler)
-	The head-size sets the effective doppler near-clip.
-
-*/
+class Listener;
+class SoundSource;
 
 
-/// Audio scene listener object
+/// Abstract class for all spatializers: Ambisonics, DBAP, VBAP, etc.
+class Spatializer {
+public:
 
-///
-///
-class Listener {
+	/// @param[in] sl	A speaker layout to use
+    Spatializer(const SpeakerLayout& sl);
+
+	virtual ~Spatializer(){};
+
+	//
+	virtual void numFrames(int v){};
+
+	/// Perform any necessary updates when the listener or speaker layout changes, ex. new speaker triplets for VBAP
+	virtual void compile(Listener& l){};
+
+	/// Called once per listener, before sources are rendered. ex. zero ambisonics coefficients
+	virtual void prepare(AudioIOData& io){};
+
+	/// Render each source per sample
+	virtual void perform(
+		AudioIOData& io,
+		SoundSource& src,
+		Vec3d& relpos,
+		const int& numFrames,
+		int& frameIndex,
+		float& sample
+	) = 0;
+
+    /// Render each source per buffer
+    virtual void perform(
+		AudioIOData& io,
+		SoundSource& src,
+		Vec3d& relpos,
+		const int& numFrames,
+		float *samples
+	) = 0;
+
+	/// Called once per listener, after sources are rendered. ex. ambisonics decode
+	virtual void finalize(AudioIOData& io){};
+
+	/// Print out information about spatializer
+	virtual void print(){};
+
+	/// Get number of speakers
+	int numSpeakers() const { return mSpeakers.size(); }
+
+protected:
+	Speakers mSpeakers;
+};
+
+
+
+/// Base class for an object (listener or source) in an audio scene
+
+/// This contains a "pose" to represent the position and orientation of a
+/// scene object and a buffer of previous positions that can be used to
+/// generate smooth, "zipper"-free trajectories at audio rate.
+class AudioSceneObject{
 public:
 
 	/// Set current pose
 	void pose(const Pose& p) { mPose.set(p); }
 	Pose& pose(){ return mPose; }
 
+	/// Set position
+	void pos(double x, double y, double z=0.){ mPose.pos(x,y,z); }
+
+
 	/// Get current pose
 	const Pose& pose() const { return mPose; }
 
+	/// Get current position
+	const Vec3d& pos() const { return mPose.pos(); }
 
-	int numSpeakers() const { return mDecoder.numSpeakers(); }
+	/// Get history of positions
+	const ShiftBuffer<4, Vec3d>& posHistory() const { return mPosHistory; }
 
-	Listener& numSpeakers(int num){
-		mDecoder.numSpeakers(num); return *this;
-	}
+	void updateHistory();
 
-	/// azimuth is anti-clockwise; both azimuth and elevation are in degrees
-	Listener& speakerPos(int speakerNum, int deviceChannel, double az, double el=0, double amp=1.){
-		mDecoder.setSpeaker(speakerNum, deviceChannel, az, el, amp);
-		return *this;
-	}
-
-	float * ambiChans(unsigned channel=0) { return &mAmbiDomainChannels[channel * mNumFrames]; }
+protected:
+	Pose mPose;							// current position/orientation
+	ShiftBuffer<4, Vec3d> mPosHistory;	// previous positions
+};
 
 
+
+/// A listener in an audio space
+class Listener : public AudioSceneObject {
+public:
+
+	/// Get history of orientations
+	const std::vector<Quatd>& quatHistory() const { return mQuatHistory; }
+
+    void compile();
+
+	void updateHistory(int numFrames);
 
 protected:
 	friend class AudioScene;
 
-	Listener(int dim, int order, int numspeakers, int flavor, int numFrames_)
-	:	mDecoder(dim, order, numspeakers, flavor)
-	{
-		numFrames(numFrames_);
-	}
+	Listener(int numFrames, Spatializer *spatializer);
 
-	void numFrames(unsigned v){
-		mNumFrames = v;
-		if(mQuatHistory.size() != v) mQuatHistory.resize(v);
-		if(mAmbiDomainChannels.size() != (mDecoder.channels() * v)){
-			mAmbiDomainChannels.resize(mDecoder.channels() * v);
-		}
-	}
+	void numFrames(unsigned v);
 
-	// move to specialized ambi panner...
-	AmbiDecode mDecoder;
-	std::vector<float> mAmbiDomainChannels;
-
-	std::vector<Quatd> mQuatHistory;		// buffer of interpolated orientations
-	ShiftBuffer<4, Vec3d> mPosHistory;		// position in previous blocks
-	Quatd mQuatPrev;						// orientation in previous block
-	Pose mPose;								// current position
-	unsigned mNumFrames;
-
-	void zeroAmbi(){
-		memset(ambiChans(), 0, mAmbiDomainChannels.size()*sizeof(ambiChans()[0]));
-	}
+	Spatializer * mSpatializer;
+	std::vector<Quatd> mQuatHistory;// buffer of interpolated orientations
+	Quatd mQuatPrev;				// orientation in previous block
+	bool mIsCompiled;
 };
 
 
-/*
-	Attenuation policy is different per source
-		(because a bee has a different attenuation characteristic than an aeroplane)
 
-	Nearclip is the point at which amplitude reaches 1 (and remains at 1 within nearclip)
-	(Nearclip+ClipRange) is the point at which amplitude reaches its mimumum (zero by default)
-	AmpFar is the amplitude at farclip (the minimum amplitude)
+/// A sound source
 
-	Internal buffer needs to be long enough for the most distant sound:
-		samples = sampleRate * (nearClip+clipRange)/speedOfSound
-	Probably want to add to this the current buffersize plus 1.
-
-
-*/
-class SoundSource {
+/// The attenuation policy may be different per source, i.e., because a bee has
+/// a different attenuation characteristic than an airplane.
+class SoundSource : public AudioSceneObject, public DistAtten<double> {
 public:
-	SoundSource(double rollOff=1, double near=1, double range=32, double ampFar=0.0, int bufSize=5000)
-	:	mSound(bufSize), mRollOff(rollOff), mNearClip(near), mClipRange(range), mAmpFar(ampFar)
-	{
-		// initialize the position history to be VERY FAR AWAY so that we don't deafen ourselves...
-		mPosHistory(Vec3d(1000, 1000, 1000));
-		mPosHistory(Vec3d(1000, 1000, 1000));
-		mPosHistory(Vec3d(1000, 1000, 1000));
-		mPosHistory(Vec3d(1000, 1000, 1000));
-	}
 
-	// calculate the buffersize needed for given samplerate, speed of sound & distance traveled (e.g. nearClip+clipRange).
-	// probably want to add io.samplesPerBuffer() to this for safety.
-	static int bufferSize(double samplerate, double speedOfSound, double distance) {
-		return (int)ceil(samplerate * distance / speedOfSound);
-	}
+	/// @param[in] nearClip		Distance below which amplitude is clamped to 1
+	/// @param[in] farClip		Distance above which amplitude reaches its mimumum
+	/// @param[in] law			Attenuation law
+	/// @param[in] farBias		Amplitude at far clip (the minimum amplitude)
+	/// @param[in] delaySize	Size of internal delay line. This should be
+	///							large enough for the most distant sound:
+	///							samples = sampleRate * (near + range)/speedOfSound
+	SoundSource(
+		double nearClip=1, double farClip=100, AttenuationLaw law = ATTEN_INVERSE,
+		double farBias=0, int delaySize=15000
+	);
 
-	/// Set current pose
-	void pose(const Pose& p) { mPose.set(p); }
-	Pose& pose(){ return mPose; }
+	/// Returns whether distance-based attenuation is enabled
+    bool useAttenuation() const { return mUseAtten; }
 
-	/// Get current pose
-	const Pose& pose() const { return mPose; }
-
-
-	/// Get far clipping distance
-	double farClip() const { return mNearClip+mClipRange; }
-	double ampFar() const { return mAmpFar; }
-
-	/// Get near clipping distance
-	double nearClip() const { return mNearClip; }
-
-	/// Get roll off factor
-	double rollOff() const { return mRollOff; }
+	/// Returns whether Doppler is enabled
+    bool useDoppler() const { return mUseDoppler; }
 
 	/// Returns attentuation factor based on distance to listener
 	double attenuation(double distance) const {
-
-		if (distance<mNearClip) {
-			return 1;
-		} else if (distance>(mNearClip+mClipRange)) {
-			return mAmpFar;
-		} else {
-			// normalized distance (0..1)
-			double dN = (distance-mNearClip) / (mClipRange);
-
-			// different possible policies for amplitude attenuation
-			// amplitude curve (max/cosm):
-			//curve = (1.-dN)*(1.-dN);
-			// alternative curve (hydrogen bond):
-			//curve = ((d + C) / (d*d + d + C))^2;	// e.g. C=2
-			// alternative curve (skewed sigmoid):
-			double curve = 1-tanh(M_PI * dN*dN);
-
-			return mAmpFar + curve*(1.-mAmpFar);
-		}
-
-//		double d = distance;
-//		if(d < nearClip()){ d=nearClip(); }
-//		else if(d > farClip()){ d=farClip(); }
-//
-//		// inverse
-//		return nearClip() / (nearClip() + rollOff() * (d - nearClip()));
-//
-////		// exponential
-////		return pow(d / nearClip(), -rollOff());
-
+		return mUseAtten ? DistAtten<double>::attenuation(distance) : 1.0;
 	}
 
 	/// Get size of delay in samples
@@ -245,6 +233,7 @@ public:
 
 	/// Convert delay, in seconds, to an index
 	double delayToIndex(double delay, double sampleRate) const {
+        if(!mUseDoppler) return 0;
 		return delay*sampleRate;
 	}
 
@@ -257,7 +246,6 @@ public:
 	int maxIndex() const { return delaySize()-2; }
 
 	/// Read sample from delay-line using linear interpolation
-
 	/// The index specifies how many samples ago by which to read back from
 	/// the buffer. The index must be less than or equal to bufferSize()-2.
 	float readSample(double index) const {
@@ -265,398 +253,90 @@ public:
 		float a = mSound.read(index0);
 		float b = mSound.read(index0+1);
 		float frac = index - index0;
-		return ipl::linear(frac, a, b);
+        return ipl::linear(frac, a, b);
 	}
 
-	/// Set far clipping distance
-	void farClip(double v){ mClipRange=(v-mNearClip); }
-	void ampFar(double v){ mAmpFar=v; }
+    /// Enable/disable distance-based gain attenuation
+    void useAttenuation(bool enable){ mUseAtten = enable; }
 
-	/// Set near clipping distance
-	void nearClip(double v){ mNearClip=v; }
-
-	/// Set roll off amount
-	void rollOff(double v){ mRollOff=v; }
+    /// Enable/disable Doppler shift
+    void useDoppler(bool enable){ mUseDoppler = enable; }
 
 	/// Write sample to internal delay-line
-	void writeSample(const double& v){ mSound.write(v); }
+	void writeSample(float v){ mSound.write(v); }
+
+
+	// calculate the buffersize needed for given samplerate, speed of sound & distance traveled (e.g. nearClip+clipRange).
+	// probably want to add io.samplesPerBuffer() to this for safety.
+	static int bufferSize(double samplerate, double speedOfSound, double distance);
 
 protected:
-	friend class AudioScene;
-
-	RingBuffer<float> mSound;			// spherical wave around position
-	Pose mPose;							// current position/orientation
-	ShiftBuffer<4, Vec3d> mPosHistory;	// previous positions
-
-	double mRollOff;
-	double mNearClip, mClipRange, mAmpFar;
+	RingBuffer<float> mSound;		// spherical wave around position
+	bool mUseAtten, mUseDoppler;
 };
 
 
 
+/// An audio scene consisting of listeners and sound sources
 class AudioScene {
 public:
 
+	/// A set of listeners
 	typedef std::vector<Listener *> Listeners;
+
+	/// A set of sources
 	typedef std::list<SoundSource *> Sources;
 
 
-	AudioScene(int dim, int order, int numFrames)
-	:	mEncoder(dim, order), mNumFrames(numFrames), mSpeedOfSound(343)
-	{}
+	/// @param[in] numFrames	block size of audio buffers
+    AudioScene(int numFrames);
+
+	~AudioScene();
 
 
-	int dim() const { return mEncoder.dim(); }
-	int order() const { return mEncoder.order(); }
-
+	/// Get listeners
 	Listeners& listeners(){ return mListeners; }
-	const Listeners& listeners() const { return mListeners; }
+    const Listeners& listeners() const { return mListeners; }
 
-	Sources& source(){ return mSources; }
-	const Sources& source() const { return mSources; }
+	/// Get sources
+	Sources& sources(){ return mSources; }
+	const Sources& sources() const { return mSources; }
 
+	void numFrames(int v);
 
-	void numFrames(int v){
-		if(mNumFrames != v){
-			Listeners::iterator it = mListeners.begin();
-			while(it != mListeners.end()){
-				(*it)->numFrames(v);
-				++it;
-			}
-			mNumFrames = v;
-		}
-	}
+    /// Create a new listener for this scene using the given spatializer
 
-	Listener * createListener(int numspeakers) {
-		Listener * l = new Listener(dim(), order(), numspeakers, 1, mNumFrames);
-		mListeners.push_back(l);
-		return l;
-	}
+	/// The returned Listener is allocated internally and will be deleted
+	/// in the AudioScene destructor.
+    Listener * createListener(Spatializer * spatializer);
 
-	void addSource(SoundSource& src) {
-		mSources.push_back(&src);
-	}
+	/// Add a sound source to scene
+	void addSource(SoundSource& src);
 
-	void removeSource(SoundSource& src) {
-		mSources.remove(&src);
-	}
+	/// Remove a sound source from scene
+	void removeSource(SoundSource& src);
 
-	/// encode sources (per listener)
-	void encode(const int& numFrames, double sampleRate) {
-		//printf("__________________\n");
-
-		double distanceToSample = sampleRate / mSpeedOfSound;
-		//distanceToSample = 16;
+	/// Perform rendering
+    void render(AudioIOData& io);
 
 
-		//const double invClipRange = mFarClip - mNearClip;
+    /// Set per sample processing (off by default)
 
-		// update source history data:
-		for(Sources::iterator it = mSources.begin(); it != mSources.end(); it++) {
-			SoundSource& src = *(*it);
-			src.mPosHistory(src.pose().pos());
-		}
-
-		//printf("%d, %d\n", (int)mListeners.size(), (int)mSources.size());
-
-		// iterate through all listeners adding contribution from all sources
-		for(unsigned il=0; il<mListeners.size(); ++il){
-			Listener& l = *mListeners[il];
-
-			// update listener history data:
-			Quatd qnew = l.pose().quat();
-			Quatd::slerpBuffer(l.mQuatPrev, qnew, &l.mQuatHistory[0], numFrames);
-			l.mQuatPrev = qnew;
-			l.mPosHistory(l.pose().vec());
-
-			l.zeroAmbi(); // zero out existing ambi samples
-
-			// iterate through all sound sources
-			for(Sources::iterator it = mSources.begin(); it != mSources.end(); ++it){
-				SoundSource& src = *(*it);
-
-				// scalar factor to convert distances into delayline indices
-				// varies per source,
-				// since each source has its own buffersize and far clip
-				// (not physically accurate of course)
-				distanceToSample = (src.maxIndex()-numFrames)/src.farClip();
-
-				// iterate time samples
-				for(int i=0; i<numFrames; ++i){
-
-					// compute interpolated source position relative to listener
-					// TODO: this tends to warble when moving fast
-					double alpha = double(i)/numFrames;
-
-					// note: cubic(src-listener)
-					// is equivalent to cubic(src) - cubic(listener)
-//					Vec3d relpos = ipl::cubic(
-//						alpha,
-//						src.mPosHistory[3]-l.mPosHistory[3],
-//						src.mPosHistory[2]-l.mPosHistory[2],
-//						src.mPosHistory[1]-l.mPosHistory[1],
-//						src.mPosHistory[0]-l.mPosHistory[0]
-//					);
-
-					// sounds rough!
-//					Vec3d relpos = ipl::linear(
-//						alpha,
-//						src.mPosHistory[1]-l.mPosHistory[1],
-//						src.mPosHistory[0]-l.mPosHistory[0]
-//					);
-
-//					// moving average:
-//					// cheaper & slightly less warbly than cubic,
-//					// less glitchy than linear
-					Vec3d relpos = (
-						(src.mPosHistory[3]-l.mPosHistory[3])*(1.-alpha) +
-						(src.mPosHistory[2]-l.mPosHistory[2]) +
-						(src.mPosHistory[1]-l.mPosHistory[1]) +
-						(src.mPosHistory[0]-l.mPosHistory[0])*(alpha)
-					)/3.0;
-
-
-					//Vec3d relpos = src.mPosHistory[0]-l.mPosHistory[0];
-
-					//printf("%g %g %g\n", l.pos()[0], l.pos()[1], l.pos()[2]);
-					//printf("%g %g %g\n", src.pos()[0], src.pos()[1], src.pos()[2]);
-
-					double distance = relpos.mag();
-
-					double idx = distance * distanceToSample;
-					//if (i==0) printf("%g\n", distance);
-
-
-
-					int idx0 = idx;
-
-					// are we within range?
-					if(idx0 <= src.maxIndex()-numFrames){
-					//if (distance < src.farClip()) {
-
-						idx += (numFrames-i);
-
-
-						double gain = src.attenuation(distance);
-
-						//if (i==0) printf("in range, gain %f\n", gain);
-
-						float s = src.readSample(idx) * gain;
-						//printf("%g\n", s);
-						//printf("%g\n", idx);
-
-						// compute azimuth & elevation of relative position in
-						//  current listener's coordinate frame:
-						Vec3d urel(relpos);
-						urel.normalize();	// unit vector in axis listener->source
-						// project into listener's coordinate frame:
-//						Vec3d axis;
-//						l.mQuatHistory[i].toVectorX(axis);
-//						double rr = urel.dot(axis);
-//						l.mQuatHistory[i].toVectorY(axis);
-//						double ru = urel.dot(axis);
-//						l.mQuatHistory[i].toVectorZ(axis);
-//						double rf = urel.dot(axis);
-
-						// cheaper:
-						Vec3d direction = l.mQuatHistory[i].rotateTransposed(urel);
-
-						//mEncoder.direction(azimuth, elevation);
-						//mEncoder.direction(-rf, -rr, ru);
-						mEncoder.direction(-direction[2], -direction[0], direction[1]);
-						mEncoder.encode(l.ambiChans(), numFrames, i, s);
-					}
-
-//					double x = distance - mFarClip;
-
-//					if (x >= 0. || index < src.maxIndex()) {
-//
-//						//double amp = 1;
-//						// TODO: amplitude rolloff
-//						if (distance > mNearClip) {
-//
-////							//
-////							amp =
-////
-////							const double c =
-////							const double f = mFarClip;
-////
-////							double denom = cf + f - x;
-////
-////							// smooth to zero at farcilp:
-////							amp *= (1 - (cx) / (cf - f + x));
-//						}
-//
-//						// TODO: transform relpos by listener's perspective
-//						// to derive x,y,z in listener's coordinate frame (or az/el/dist)
-//						Quatd q = l.mQuatHistory[i];
-//						//...
-//
-//
-//					} // otherwise, it's too far away for the doppler.... (culled)
-				}
-
-				//void encode(double ** ambiChans, const XYZ * pos, const double * input, numFrames)
-				//mEncoder.encode<Vec3d>(ambiChans, mSource);
-			}
-		}
-		//printf("%f\n", mListeners[0]->ambiChans()[0]);
-	}
-
-	// between encode & decode, can apply optional processing to ambi domain signals (e.g. reverb)
-
-
-	/// Decode sources (per listener) to output channels
-
-	/// @param[out] outs		1D array of output (non-interleaved)
-	/// @param[in ] numFrames	number of frames per channel buffer
-	void render(float * outs, const int& numFrames) const {
-		for(unsigned il=0; il<mListeners.size(); ++il){
-			Listener& l = *mListeners[il];
-			l.mDecoder.decode(outs, l.ambiChans(), numFrames);
-		}
-	}
-
-	/// Copy the encoded channels directly to the output channels:
-
-	/// @param[out] outs		1D array of output (non-interleaved)
-	/// @param[in ] numOuts		number of channels in the outs array
-	/// @param[in ] numFrames	number of frames per channel buffer
-	void copyAmbiChannels(float * outs, const int& numOuts, const int& numFrames) const {
-		unsigned limit = al::min(numOuts, mEncoder.channels());
-		unsigned frames = al::min(numFrames, mNumFrames);
-
-		// for each listener
-		for(unsigned il=0; il<mListeners.size(); ++il){
-			Listener& l = *mListeners[il];
-			// for each channel:
-			for (unsigned c=0; c<limit; c++) {
-				// copy the ambi channel into the output channel:
-				float * out = outs + c;
-				float * in = l.ambiChans(c);
-				for (unsigned i=0; i<frames; i++) {
-					*out++ += *in++;
-				}
-			}
-		}
-	}
+    /// Per sample processing is useful for smoother doppler and gain 
+    /// interpolation for high-speed sources, but uses much more CPU.
+    void usePerSampleProcessing(bool shouldUsePerSampleProcessing){
+        mPerSampleProcessing = shouldUsePerSampleProcessing;
+    }
 
 protected:
-
 	Listeners mListeners;
 	Sources mSources;
-	AmbiEncode mEncoder;
-	int mNumFrames;			// audio frames per block
-	double mSpeedOfSound;	// distance per second
-
-	// how slowly amplitude decays away from mNearClip.
-	// 1-> 50% at farclip, 10 -> 10% at farclip, 100 -> 1% at farclip, 1000 -> 0.1%
-	// (if mKneeSmoothness is near zero; as d increases, amplitude at farclip increases slightly
-	//double mRollOff;
-
-	// how much the curve approximates 1/(1+x)
-	// 0 -> (1/1+x), 1 -> (1+1)/(x^2+x+1); typical might be 0.2 - 100
-	// (increasing mRollOff allows us to increase mKneeSmoothness)
-	double mKneeSmoothness;
-
-	// how sharply amplitude curves to zero near mFarClip.
-	// 0 -> no fadeout, 1 is already quite a strong fadeout, default 0.01
-	double mFarFadeOut;
-
-	// approx to (1/(1+x)):
-	// x = distance-mNearClip
-	// f = mFarClip-mNearClip
-	// n = x/f (normalized distance)
-	// g = mRollOff
-	// d = mKneeSmoothness
-	// h = gn
-	// y = (h+d)/(h^2+h+d)
-
-	// rolloff scalar:
-	// c = mFarFadeOut
-	// y *= 1-(cn)/(c+1+n)
+	int mNumFrames;				// audio frames per block
+	std::vector<float> mBuffer;	// temporary frame buffer
+	double mSpeedOfSound;		// distance per second
+    bool mPerSampleProcessing;
 };
-
-
-
-// From hydrogen bond...
-/*
-struct AmbiSource{
-
-	AmbiSource(uint32_t order, uint32_t dim)
-	:	doppler(0.1), dist(2, 0.001), angH(2), angV(2), enc(order, dim)
-	{}
-
-	void operator()(double * outA, double * inT, int numT, double dopScale=1, double distCoef=2, double ampOffset=0){
-
-		// do distance coding
-		for(int i=0; i<numT; ++i){
-			double dis = dist();				// distance from source
-			double amp = scl::clip(distToAmp(dis, distCoef) - ampOffset, 1.f);	// computing amplitude of sound based on its distance (1/d^2)
-			doppler.delay(dis*dopScale);
-			inT[i] = doppler(inT[i] * amp);
-		}
-
-		enc.position(angH.stored() * M_PI, angV.stored() * M_PI);
-
-		// loop ambi channels
-		for(unsigned int c=0; c<enc.numChannels(); c++) {
-			double * out = outA + numT*c;
-			double w = enc.weights()[c];
-
-			// compute ambi-domain signals
-			for(int i=0; i<numT; ++i) *out++ += inT[i] * w;
-		}
-	}
-
-	// map distance from observer to a sound source to an amplitude value
-	static double distToAmp(double d, double coef=2){
-
-		d = scl::abs(d);	// positive vals only
-
-		// we want amp=1 when distance=0 and a smooth transition across 0, so
-		// we approximate 1/x with a polynomial
-		d = (d + coef) / (d*d + d + coef);	// 2nd order apx
-		return d*d;
-		//return exp(-d);
-	}
-
-	synz::Delay doppler;
-	OnePole<> dist, angH, angV;		// Low-pass filters on source position
-	AmbiEncode<double> enc;
-};
-
-
-	// block rate
-	// (double * outA, double * inT, int numT, double dopScale=1, double distCoef=2, double ampOffset=0)
-	ambiH (io.aux(AMBI_NUM_SOURCES), io.aux(0), io.numFrames(), 1./32);
-	ambiO (io.aux(AMBI_NUM_SOURCES), io.aux(1), io.numFrames(), 1./32, 2, 0.1);
-	ambiZn(io.aux(AMBI_NUM_SOURCES), io.aux(2), io.numFrames(), 1./32, 2, 0.1);
-
-	//---- Ambisonic decoding:
-	static double chanMap[16] = {
-		 2,  3,  4,  5,  6,  7,  8,  9,		// MOTU #1
-		16, 17, 18, 19, 20, 21, 22, 23		// MOTU #2
-	};
-
-	//void decode(T ** dec, const T ** enc, uint32_t numDecFrames);
-
-	// loop speakers
-	for(int s=0; s < 16; ++s){
-		double * out = io.out(chanMap[s]);
-
-		// loop ambi channels
-		for(unsigned int c=0; c<ambiDec.numChannels(); c++){
-			double * in = io.aux(c + AMBI_NUM_SOURCES);
-			double w = ambiDec.decodeWeight(s, c);
-
-			for(unsigned int i=0; i<io.numFrames(); ++i) out[i] += *in++ * w * 8.f;
-		}
-	}
-*/
-
-
-
 
 } // al::
 #endif
+
