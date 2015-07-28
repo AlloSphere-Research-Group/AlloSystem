@@ -483,19 +483,26 @@ private:
 						al_sec timeNow = win->mFrameTime;
 						double FPS = win->fps();
 
-						// Compute pre-render frame number
+						// Pre-render frame number
 						double framePre = timeNow * FPS;
 
-						// Get post-render frame number
-						double framePost = al_time() * FPS;
+						// Next expected frame number
+						double frameNext = (unsigned long long)(framePre + 1.5);
+						// Next expected frame time
+						double timeNext = frameNext / FPS;
+
+						// Post-render frame time
+						double timePost = al_time();
 
 						// Did rendering take less time than frame interval?
-						// This check is necessary for non-quantized reduction of frame rate.
-						if((framePost - framePre) < 1.){
-							double waitFrames = framePost - (unsigned long long)(framePost+0.5);
-							waitFrames = 1.-waitFrames;
-							waitMsec = unsigned(waitFrames/FPS*1000. + 0.5);
-							//printf("num=%llu, frac=%g, %u, (dt=%g)\n", (unsigned long long)frameNum, waitFrames, wait_msec, impl->mSPFActual);
+						// If so, compute wait time...
+						if(timePost < timeNext){
+							double wait = timeNext - timePost;
+							waitMsec = unsigned(wait * 1000. + 0.5);
+							//printf("num=%llu, wait=%5.3f frames, %2u ms, dt=%5.3f, fps=%5.2f (avg=%5.2f)\n", (unsigned long long)(timePost*FPS), wait*FPS, waitMsec, win->mDeltaTime, win->fpsActual(), win->fpsAvg());
+						}
+						else{
+							//printf("dropped frame!\n");
 						}
 					}
 
