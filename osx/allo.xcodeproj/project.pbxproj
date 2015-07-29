@@ -23,6 +23,8 @@
 /* Begin PBXFileReference section */
 		1606F2AE173514EB00E24228 /* al_Serial.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_Serial.hpp; sourceTree = "<group>"; };
 		160784F01ACB2A46002CC173 /* al_WindowOSX.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = al_WindowOSX.mm; sourceTree = "<group>"; };
+		161B6A9D1B697EB400090F9B /* al_AudioIOData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_AudioIOData.cpp; sourceTree = "<group>"; };
+		161B6A9E1B697EC300090F9B /* al_AudioIOData.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = al_AudioIOData.hpp; sourceTree = "<group>"; };
 		161B6CBD17144B0800750A16 /* al_File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_File.cpp; sourceTree = "<group>"; };
 		161B6CC117144B4C00750A16 /* al_Serial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = al_Serial.cpp; sourceTree = "<group>"; };
 		164626E11793F14200E84F48 /* al_HID.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = al_HID.hpp; sourceTree = "<group>"; };
@@ -450,6 +452,7 @@
 			children = (
 				361881DA15B936330009AD7E /* al_App.hpp */,
 				361881DB15B936330009AD7E /* al_AudioIO.hpp */,
+				161B6A9E1B697EC300090F9B /* al_AudioIOData.hpp */,
 				361881DC15B936330009AD7E /* al_ControlNav.hpp */,
 				361881DD15B936330009AD7E /* al_File.hpp */,
 				164626E11793F14200E84F48 /* al_HID.hpp */,
@@ -758,6 +761,7 @@
 			children = (
 				361882FA15B936340009AD7E /* al_App.cpp */,
 				361882FB15B936340009AD7E /* al_AudioIO.cpp */,
+				161B6A9D1B697EB400090F9B /* al_AudioIOData.cpp */,
 				161B6CBD17144B0800750A16 /* al_File.cpp */,
 				361882FC15B936340009AD7E /* al_FileAPR.cpp */,
 				164626E21793F1C600E84F48 /* al_HID.cpp */,
