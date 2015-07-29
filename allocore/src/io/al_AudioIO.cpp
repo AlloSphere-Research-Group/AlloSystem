@@ -321,17 +321,9 @@ AudioDevice::AudioDevice(int deviceNum)
 :    AudioDeviceInfo(deviceNum), mImpl(0)
 {
 	if (deviceNum < 0) {
-		deviceNum = PortAudioBackend::defaultOutput().id();
+		deviceNum = defaultOutput().id();
 	}
 	setImpl(deviceNum);
-	if (deviceNum >= 0) {
-		strncpy(mName, ((const PaDeviceInfo*)mImpl)->name, 127);
-		mName[127] = '\0';
-		mChannelsInMax = ((const PaDeviceInfo*)mImpl)->maxInputChannels;
-		mChannelsOutMax = ((const PaDeviceInfo*)mImpl)->maxOutputChannels;
-		mDefaultSampleRate = ((const PaDeviceInfo*)mImpl)->defaultSampleRate;
-		mID = deviceNum;
-	}
 }
 
 AudioDevice::AudioDevice(const std::string& nameKeyword, StreamMode stream)
@@ -355,7 +347,18 @@ bool AudioDevice::valid() const
 	return 0!=mImpl;
 }
 
-void AudioDevice::setImpl(int deviceNum){ initDevices(); mImpl = Pa_GetDeviceInfo(deviceNum); mID=deviceNum; }
+void AudioDevice::setImpl(int deviceNum){
+	if (deviceNum >= 0) {
+		initDevices();
+		mImpl = Pa_GetDeviceInfo(deviceNum);
+		mID = deviceNum;
+		strncpy(mName, ((const PaDeviceInfo*)mImpl)->name, 127);
+		mName[127] = '\0';
+		mChannelsInMax = ((const PaDeviceInfo*)mImpl)->maxInputChannels;
+		mChannelsOutMax = ((const PaDeviceInfo*)mImpl)->maxOutputChannels;
+		mDefaultSampleRate = ((const PaDeviceInfo*)mImpl)->defaultSampleRate;
+	}
+}
 AudioDevice AudioDevice::defaultInput(){ return PortAudioBackend::defaultInput(); }
 AudioDevice AudioDevice::defaultOutput(){ return PortAudioBackend::defaultOutput(); }
 
