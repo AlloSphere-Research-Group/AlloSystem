@@ -5,6 +5,7 @@ message(STATUS "==== Configuring allocore.")
 
 # Allocore Library
 list(APPEND ALLOCORE_SRC
+  src/io/al_AudioIOData.cpp
   src/io/al_MIDI.cpp
   src/io/al_HID.cpp
   src/io/al_Serial.cpp
@@ -28,9 +29,10 @@ list(APPEND ALLOCORE_HEADERS
     allocore/graphics/al_Mesh.hpp
     allocore/graphics/al_Shapes.hpp
     allocore/graphics/al_Image.hpp
+	allocore/io/al_AudioIOData.hpp
     allocore/io/al_HID.hpp
     allocore/io/al_MIDI.hpp
-    allocore/io/al_Serial.hpp
+	allocore/io/al_Serial.hpp
     allocore/math/al_Analysis.hpp
     allocore/math/al_Complex.hpp
     allocore/math/al_Constants.hpp
@@ -161,18 +163,7 @@ foreach(header ${ALLOCORE_HEADERS})
 					WORKING_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}")
 endforeach()
 
-# Write dummy headers
-
-foreach(HEADER_INFO ${ALLOCORE_DUMMY_HEADERS})
-    string(REPLACE "::::" ";" HEADER_PARTS ${HEADER_INFO})
-    list(GET HEADER_PARTS 0 header) # First element is header
-    list(GET HEADER_PARTS 1 dependency) # Second element is dependency
-
-    set(DUMMY_HEADER_TEXT "#error \"ERROR: Header not supported. Dependency '${dependency}' not met.\"\n")
-	file(WRITE "${BUILD_ROOT_DIR}/build/include/${header}" ${DUMMY_HEADER_TEXT})
-    message("Writing dummy header: ${header} ---- Unmet dependency: ${dependency}")
-	list(APPEND ALLOCORE_HEADERS "${BUILD_ROOT_DIR}/build/include/${header}")
-endforeach()
+write_dummy_headers( "${ALLOCORE_DUMMY_HEADERS}" "${ALLOCORE_HEADERS}" )
 
 # Export include directories and libraries for use when building AlloSystem or AlloProject
 set_target_properties(${ALLOCORE_LIB}
@@ -256,6 +247,7 @@ endif(BUILD_EXAMPLES)
 
 # Unit tests
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${BUILD_ROOT_DIR}/build/bin") # Put back after the change for examples
 add_subdirectory(unitTests)
 
 # installation

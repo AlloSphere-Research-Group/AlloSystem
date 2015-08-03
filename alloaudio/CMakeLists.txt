@@ -3,29 +3,24 @@ project (Alloaudio)
 
 message(STATUS "==== Configuring alloaudio.")
 
-
 find_package(LibSndFile REQUIRED QUIET)
 if(NOT TARGET Gamma)
     find_package(Gamma QUIET)
 endif(NOT TARGET Gamma)
 
 if(NOT (GAMMA_FOUND OR GAMMA_LIBRARY))
-    message("Alloaudio: Gamma not found. Not building Alloaudio." )
-    return()
+	message("Alloaudio: Gamma not found. Not building Alloaudio." )
+	return()
 endif(NOT (GAMMA_FOUND OR GAMMA_LIBRARY))
 
 set(ALLOAUDIO_SRC
   src/al_OutputMaster.cpp
   src/butter.cpp
-  src/al_Convolver.cpp
-  src/zita-convolver-3.1.0/libs/zita-convolver.cc
 #  src/al_Decorrelation.cpp
   )
 
 set(ALLOAUDIO_HEADERS
   alloaudio/al_OutputMaster.hpp
-  alloaudio/al_Convolver.hpp
-  src/zita-convolver-3.1.0/libs/zita-convolver.h
 )
 
 # Dependencies ------------------------------
@@ -38,7 +33,6 @@ get_target_property(ALLOCORE_LINK_LIBRARIES allocore${DEBUG_SUFFIX} ALLOCORE_LIN
 if($CMAKE_SYSTEM_NAME} MATCHES "Linux")
 find_package(Threads QUIET)
 if(CMAKE_THREAD_LIBS_INIT)
-
 else()
   message("phtreads not found. Not building Alloaudio.")
 return()
@@ -49,7 +43,20 @@ endif($CMAKE_SYSTEM_NAME} MATCHES "Linux")
 find_library(FFTW_LIBRARY
      NAMES fftw3f)
 
-message("Using fftw3: ${FFTW_LIBRARY}")
+if (NOT FFTW_LIBRARY)
+  message(STATUS "Not using fftw3.")
+  set(FFTW_LIBRARY "")
+  write_dummy_headers("al_Convolver.hpp::::FFTW" ALLOAUDIO_HEADERS)
+else()
+  message(STATUS "Using fftw3: ${FFTW_LIBRARY}")
+ list(APPEND ALLOAUDIO_SRC
+  src/al_Convolver.cpp
+  src/zita-convolver-3.1.0/libs/zita-convolver.cc
+)
+ list(APPEND ALLOAUDIO_HEADERS
+  alloaudio/al_Convolver.hpp
+  src/zita-convolver-3.1.0/libs/zita-convolver.h)
+endif(NOT FFTW_LIBRARY)
 
 # Build library ----------------------------------
 
@@ -99,7 +106,9 @@ if(BUILD_EXAMPLES)
       set(EXAMPLE_TARGET alloaudio_examples_${EXAMPLE_NAME})
       add_executable(${EXAMPLE_TARGET} ${example})
 #      add_dependencies(${EXAMPLE_TARGET} ${ALLOAUDIO_LIBRARY})
-      target_link_libraries("${EXAMPLE_TARGET}" ${ALLOAUDIO_LIBRARY} ${ALLOAUDIO_LINK_LIBRARIES})
+	  target_link_libraries("${EXAMPLE_TARGET}" ${ALLOCORE_LIBRARY} ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES}
+							 ${GAMMA_LIBRARY} ${GAMMA_LINK_LIBRARIES}
+							 ${ALLOAUDIO_LIBRARY} ${ALLOAUDIO_LINK_LIBRARIES})
       if(APPLE)
 	set_target_properties(${EXAMPLE_TARGET} PROPERTIES
 	  LINK_FLAGS "-pagezero_size 10000 -image_base 100000000")
@@ -122,21 +131,21 @@ endif(BUILD_EXAMPLES)
 install(FILES ${ALLOAUDIO_INSTALL_HEADERS} DESTINATION "${CMAKE_INSTALL_PREFIX}/include")
 install(TARGETS ${ALLOAUDIO_LIBRARY} DESTINATION "${CMAKE_INSTALL_PREFIX}/lib")
 
-# Tests that depend on cunit
-find_library(CUNIT_LIBRARY cunit)
+if(NOT TRAVIS_BUILD)
 set(TEST_ARGS "")
 
-if(CUNIT_LIBRARY)
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${BUILD_ROOT_DIR}/build/bin")
-    add_executable(alloaudioTests unitTests/alloaudioTests.cpp)
-    target_link_libraries(alloaudioTests ${ALLOCORE_LIBRARY} ${ALLOAUDIO_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${CUNIT_LIBRARY})
-    add_dependencies(alloaudioTests ${ALLOCORE_LIBRARY})
-    add_test(NAME alloaudioTests
-            COMMAND $<TARGET_FILE:alloaudioTests> ${TEST_ARGS})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${BUILD_ROOT_DIR}/build/bin")
+add_executable(alloaudioTests unitTests/alloaudioTests.cpp)
+target_link_libraries(alloaudioTests ${ALLOCORE_LIBRARY} ${ALLOAUDIO_LIBRARY} ${ALLOCORE_LINK_LIBRARIES})
+add_test(NAME alloaudioTests
+		 COMMAND $<TARGET_FILE:alloaudioTests> ${TEST_ARGS})
+add_memcheck_test(alloaudioTests)
 
-    add_executable(convolverTests unitTests/convolverTests.cpp)
-    target_link_libraries(convolverTests ${ALLOAUDIO_LIBRARY} ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${CUNIT_LIBRARY} ${FFTW_LIBRARY} )
-    add_dependencies(convolverTests ${ALLOCORE_LIBRARY})
-    add_test(NAME convolverTests
-            COMMAND $<TARGET_FILE:convolverTests> ${TEST_ARGS})
-endif(CUNIT_LIBRARY)
+if(NOT FFTW_LIBRARY STREQUAL "")
+  add_executable(convolverTests unitTests/convolverTests.cpp)
+  target_link_libraries(convolverTests ${ALLOAUDIO_LIBRARY} ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${FFTW_LIBRARY} )
+  add_test(NAME convolverTests
+		  COMMAND $<TARGET_FILE:convolverTests> ${TEST_ARGS})
+  add_memcheck_test(convolverTests)
+endif()
+endif(NOT TRAVIS_BUILD)

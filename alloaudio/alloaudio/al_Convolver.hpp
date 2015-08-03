@@ -6,7 +6,6 @@
 
 #define MAXSIZE 0x00100000
 
-
 class Convproc;
 
 namespace al {
@@ -28,7 +27,7 @@ using namespace std;
      * Built on zita convolver, which implements a realtime multithreaded multichannel convolution algorithm using non-uniform partitioning.
      *
      */
-class Convolver
+class Convolver : public al::AudioCallback
 {
 
 public:
@@ -57,9 +56,8 @@ public:
 	/**
 	 * @brief Handles all io for the convolution
 	 * @param[in,out] io The AudioIO object from which audio data will be read from and written to.
-	 * @return Returns 0 upon success.
 	 */
-	int processBlock(AudioIO &io);
+	virtual void onAudioCB(AudioIOData &io);
     
     /**
      * @brief Stops processing audio and tears down convolver object.

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Modules with dependency files.
-modules="allocore allocv allonect alloutil examples/mysql"
+modules="allocore allocv allonect alloutil examples/mysql alloaudio"
 
 # Override if module are passed in as arguments.
 if [ "$#" -gt 0 ]; then

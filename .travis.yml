@@ -4,12 +4,15 @@ compiler:
 - clang
 before_install:
 - sudo apt-get update -qq
-- sudo apt-get install -y libapr1-dev libaprutil1-dev portaudio19-dev libsndfile1-dev
+- sudo apt-get install -y valgrind libapr1-dev libaprutil1-dev portaudio19-dev libsndfile1-dev
   libglew-dev freeglut3-dev libavahi-client-dev libudev-dev libusb-1.0-0-dev libfreeimage-dev
-  libfreetype6-dev libxi-dev libxmu-dev libassimp-dev
-script: "./distclean && cmake . -DCMAKE_BUILD_TYPE=Debug && make && make test"
+  libfreetype6-dev libxi-dev libxmu-dev libassimp-dev libluajit-5.1-dev libjsoncpp-dev
+- sudo apt-get install -y libfftw3-dev
+- ( git clone -b devel https://github.com/AlloSphere-Research-Group/Gamma /tmp/Gamma && cd /tmp/Gamma && cmake . && sudo make install )
+- ( git clone -b cmake https://github.com/AlloSphere-Research-Group/GLV /tmp/GLV && cd /tmp/GLV && cmake . && sudo make install )
+script: "./distclean && cmake . -DTRAVIS_BUILD=1 -DBUILD_EXAMPLES=1 -DCMAKE_BUILD_TYPE=Debug && make && make test ARGS=\"-V\""
 sudo: required
 notifications:
   email:
     recipients:
-    - mantaraya36@gmail.com
+	- allocore@mat.ucsb.edu

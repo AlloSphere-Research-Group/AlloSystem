@@ -10,72 +10,12 @@
 
 namespace al{
 
-static int min(int x, int y){ return x<y?x:y; }
-
-/*
-static void err(const char * msg, const char * src, bool exits){
-	fprintf(stderr, "%s%serror: %s\n", src, src[0]?" ":"", msg);
-	if(exits) exit(EXIT_FAILURE);
-}
-*/
-
-static void warn(const char * msg, const char * src){
-	fprintf(stderr, "%s%swarning: %s\n", src, src[0]?" ":"", msg);
-}
-
-template <class T>
-static void deleteBuf(T *& buf){ delete[] buf; buf=0; }
-
-template <class T>
-static int resize(T *& buf, int n){
-	deleteBuf(buf);
-	buf = new T[n];
-	return n;
-}
-
-// Utility function to efficiently clear buffer (set all to 0)
-template <class T>
-static void zero(T * buf, int n){ memset(buf, 0, n*sizeof(T)); }
-
-// Utility function to deinterleave samples
-template <class T>
-static void deinterleave(T * dst, const T * src, int numFrames, int numChannels){
-	int numSamples = numFrames * numChannels;
-	for(int c=0; c < numChannels; c++){
-		for(int i=c; i < numSamples; i+=numChannels){
-			*dst++ = src[i];
-		}
-	}
-}
-
-/// Utility function to interleave samples
-template <class T>
-static void interleave(T * dst, const T * src, int numFrames, int numChannels){
-	int numSamples = numFrames * numChannels;
-	for(int c=0; c < numChannels; c++){
-		for(int i=c; i < numSamples; i+=numChannels){
-			dst[i] = *src++;
-		}
-	}
-}
-
-
-
-//==============================================================================
-
-AudioBackend::AudioBackend()
-:	mIsOpen(false), mIsRunning(false)
-{}
-
-
-//==============================================================================
-
 class DummyAudioBackend : public AudioBackend{
 public:
 	DummyAudioBackend(): AudioBackend(), mNumOutChans(64), mNumInChans(64){}
 
-	virtual bool isOpen() const {return true;}
-	virtual bool isRunning() const {return true;}
+	virtual bool isOpen() const {return mIsOpen;}
+	virtual bool isRunning() const {return mIsRunning;}
 	virtual bool error() const {return false;}
 
 	virtual void printError(const char * text = "") const {
@@ -113,13 +53,13 @@ public:
 
 	virtual double time() {return 0.0;}
 
-	virtual bool open(int framesPerSecond, int framesPerBuffer, void *userdata) { return true; }
+	virtual bool open(int framesPerSecond, int framesPerBuffer, void *userdata) { mIsOpen = true; return true; }
 
-	virtual bool close() { return true; }
+	virtual bool close() { mIsOpen = false; return true; }
 
-	virtual bool start(int framesPerSecond, int framesPerBuffer, void *userdata) { return true; }
+	virtual bool start(int framesPerSecond, int framesPerBuffer, void *userdata) { mIsRunning = true; return true; }
 
-	virtual bool stop() {return true;}
+	virtual bool stop() { mIsRunning = false; return true;}
 	virtual double cpu() {return 0.0;}
 
 protected:
@@ -375,44 +315,15 @@ private:
 	mutable PaError mErrNum;			// Most recent error number
 };
 
-
-//==============================================================================
-
-AudioDeviceInfo::AudioDeviceInfo(int deviceNum)
-:	mID(deviceNum)
-{}
-
-bool AudioDeviceInfo::valid() const { return true; }
-int AudioDeviceInfo::id() const { return mID; }
-const char * AudioDeviceInfo::name() const { return mName; }
-int AudioDeviceInfo::channelsInMax() const { return mChannelsInMax; }
-int AudioDeviceInfo::channelsOutMax() const { return mChannelsOutMax; }
-double AudioDeviceInfo::defaultSampleRate() const { return mDefaultSampleRate; }
-
-void AudioDeviceInfo::setName(char *name) { strncpy(mName, name, 127); mName[127] = '\0'; }
-void AudioDeviceInfo::setID(int iD) { mID = iD;}
-void AudioDeviceInfo::setChannelsInMax(int num) { mChannelsInMax = num;}
-void AudioDeviceInfo::setChannelsOutMax(int num) { mChannelsOutMax = num;}
-void AudioDeviceInfo::setDefaultSampleRate(double rate) { mDefaultSampleRate = rate;}
-
-
 //==============================================================================
 
 AudioDevice::AudioDevice(int deviceNum)
 :    AudioDeviceInfo(deviceNum), mImpl(0)
 {
 	if (deviceNum < 0) {
-		deviceNum = PortAudioBackend::defaultOutput().id();
+		deviceNum = defaultOutput().id();
 	}
 	setImpl(deviceNum);
-	if (deviceNum >= 0) {
-		strncpy(mName, ((const PaDeviceInfo*)mImpl)->name, 127);
-		mName[127] = '\0';
-		mChannelsInMax = ((const PaDeviceInfo*)mImpl)->maxInputChannels;
-		mChannelsOutMax = ((const PaDeviceInfo*)mImpl)->maxOutputChannels;
-		mDefaultSampleRate = ((const PaDeviceInfo*)mImpl)->defaultSampleRate;
-		mID = deviceNum;
-	}
 }
 
 AudioDevice::AudioDevice(const std::string& nameKeyword, StreamMode stream)
@@ -436,7 +347,18 @@ bool AudioDevice::valid() const
 	return 0!=mImpl;
 }
 
-void AudioDevice::setImpl(int deviceNum){ initDevices(); mImpl = Pa_GetDeviceInfo(deviceNum); mID=deviceNum; }
+void AudioDevice::setImpl(int deviceNum){
+	if (deviceNum >= 0) {
+		initDevices();
+		mImpl = Pa_GetDeviceInfo(deviceNum);
+		mID = deviceNum;
+		strncpy(mName, ((const PaDeviceInfo*)mImpl)->name, 127);
+		mName[127] = '\0';
+		mChannelsInMax = ((const PaDeviceInfo*)mImpl)->maxInputChannels;
+		mChannelsOutMax = ((const PaDeviceInfo*)mImpl)->maxOutputChannels;
+		mDefaultSampleRate = ((const PaDeviceInfo*)mImpl)->defaultSampleRate;
+	}
+}
 AudioDevice AudioDevice::defaultInput(){ return PortAudioBackend::defaultInput(); }
 AudioDevice AudioDevice::defaultOutput(){ return PortAudioBackend::defaultOutput(); }
 
@@ -495,45 +417,10 @@ void AudioDevice::printAll(){
 	}
 }
 
-
-//==============================================================================
-
-AudioIOData::AudioIOData(void * userData)
-:	mImpl(NULL), mUser(userData),
-	mFramesPerBuffer(0), mFramesPerSecond(0),
-	mBufI(0), mBufO(0), mBufB(0), mBufT(0), mNumI(0), mNumO(0), mNumB(0),
-	mGain(1), mGainPrev(1)
-{
-}
-
-AudioIOData::~AudioIOData(){
-	deleteBuf(mBufI);
-	deleteBuf(mBufO);
-	deleteBuf(mBufB);
-	deleteBuf(mBufT);
-}
-
-void AudioIOData::zeroBus(){ zero(mBufB, framesPerBuffer() * mNumB); }
-void AudioIOData::zeroOut(){ zero(mBufO, channelsOut() * framesPerBuffer()); }
-
-int AudioIOData::channelsIn () const { return mNumI; }
-int AudioIOData::channelsOut() const { return mNumO; }
-int AudioIOData::channelsBus() const { return mNumB; }
-
-double AudioIOData::framesPerSecond() const { return mFramesPerSecond; }
-double AudioIOData::time() const {
-	assert(mImpl);
-	return mImpl->time();
-}
-double AudioIOData::time(int frame) const { return (double)frame / framesPerSecond() + time(); }
-int AudioIOData::framesPerBuffer() const { return mFramesPerBuffer; }
-double AudioIOData::secondsPerBuffer() const { return (double)framesPerBuffer() / framesPerSecond(); }
-
-
 //==============================================================================
 
 AudioIO::AudioIO(int framesPerBuf, double framesPerSec, void (* callbackA)(AudioIOData &), void * userData,
-	int outChansA, int inChansA, int backend)
+	int outChansA, int inChansA, AudioIO::Backend backend)
 :	AudioIOData(userData),
 	callback(callbackA),
 	mZeroNANs(true), mClipOut(true), mAutoZeroOut(true)
@@ -591,6 +478,28 @@ AudioIO& AudioIO::append(AudioCallback& v){
 
 AudioIO& AudioIO::prepend(AudioCallback& v){
 	mAudioCallbacks.insert(mAudioCallbacks.begin(), &v);
+	return *this;
+}
+
+AudioIO& AudioIO::insertBefore(AudioCallback& v){
+	std::vector<AudioCallback *>::iterator pos
+			= std::find(mAudioCallbacks.begin(), mAudioCallbacks.end(), &v);
+	if (pos == mAudioCallbacks.begin()) {
+		prepend(v);
+	} else {
+		mAudioCallbacks.insert(--pos, 1, &v);
+	}
+	return *this;
+}
+
+AudioIO& AudioIO::insertAfter(AudioCallback& v){
+	std::vector<AudioCallback *>::iterator pos
+			= std::find(mAudioCallbacks.begin(), mAudioCallbacks.end(), &v);
+	if (pos == mAudioCallbacks.end()) {
+		append(v);
+	} else {
+		mAudioCallbacks.insert(pos, 1, &v);
+	}
 	return *this;
 }
 
