@@ -22,7 +22,7 @@ void Dbap::compile(Listener& listener){
 void Dbap::perform(
 	AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples
 ){
-	for (unsigned k = 0; k < mNumSpeakers; ++k)
+	for (int k = 0; k < mNumSpeakers; ++k)
 	{
 		Vec3d vec = relpos.normalized();
 		vec -= mSpeakerVecs[k];
