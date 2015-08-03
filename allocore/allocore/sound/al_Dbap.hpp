@@ -85,7 +85,7 @@ private:
 
 inline void Dbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample)
 {
-	for (unsigned i = 0; i < mNumSpeakers; ++i)
+	for (int i = 0; i < mNumSpeakers; ++i)
 	{
 		Vec3d vec = relpos.normalized();
 		vec -= mSpeakerVecs[i];
