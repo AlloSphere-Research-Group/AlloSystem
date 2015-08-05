@@ -117,6 +117,20 @@ public:
 	/// A.quat() = rot * A.quat();
 	static Quat getRotationTo(const Vec<3,T>& usrc, const Vec<3,T>& udst);
 
+
+	// getBillboardRotation 
+	// Similar to getRotationTo, but this function maintains an up vector
+	// Intended for billboarding in omni
+	//
+	// Typical use case for omni billboarding:
+	// Vec3d forward = Vec3d(pose.pos() - src.pos()).normalize();
+	// Quatd rot = Quatd::getBillboardRotation(forward, pose.uu());
+	// g.rotate(rot);
+	//
+	// Code sourced from Unity forum post about this functionality:
+	// http://answers.unity3d.com/questions/467614/what-is-the-source-code-of-quaternionlookrotation.html
+	static Quat getBillboardRotation(const Vec<3,T>& forward, const Vec<3,T>& up);
+
 	/// Returns identity
 	static Quat identity(){ return Quat(1,0,0,0); }
 
@@ -905,6 +919,61 @@ Quat<T> Quat<T> :: getRotationTo(const Vec<3, T>& src, const Vec<3, T>& dst) {
 		q.z = c[2] * invs;
 	}
 	return q.normalize();
+}
+
+
+template<typename T>
+Quat<T> Quat<T> :: getBillboardRotation(const Vec<3, T>& forward, const Vec<3, T>& up) {
+
+  Vec<3, T> vector = forward;
+  Vec<3, T> vector2 = Vec<3, T>(cross(up, vector)).normalize();
+  Vec<3, T> vector3 = cross(vector, vector2);
+  T m00 = vector2.x;
+  T m01 = vector2.y;
+  T m02 = vector2.z;
+  T m10 = vector3.x;
+  T m11 = vector3.y;
+  T m12 = vector3.z;
+  T m20 = vector.x;
+  T m21 = vector.y;
+  T m22 = vector.z;
+
+  T num8 = (m00 + m11) + m22;
+  Quat<T> q;
+  if (num8 > 0){
+    T num = sqrt(num8 + 1);
+    q.w = num * 0.5;
+    num = 0.5 / num;
+    q.x = (m12 - m21) * num;
+    q.y = (m20 - m02) * num;
+    q.z = (m01 - m10) * num;
+    return q;
+  }
+  if ((m00 >= m11) && (m00 >= m22)){
+    T num7 = sqrt(((1 + m00) - m11) - m22);
+    T num4 = 0.5 / num7;
+    q.x = 0.5 * num7;
+    q.y = (m01 + m10) * num4;
+    q.z = (m02 + m20) * num4;
+    q.w = (m12 - m21) * num4;
+    return q;
+  }
+  if (m11 > m22){
+    T num6 = sqrt(((1 + m11) - m00) - m22);
+    T num3 = 0.5 / num6;
+    q.x = (m10+ m01) * num3;
+    q.y = 0.5 * num6;
+    q.z = (m21 + m12) * num3;
+    q.w = (m20 - m02) * num3;
+    return q; 
+  }
+  T num5 = sqrt(((1 + m22) - m00) - m11);
+  T num2 = 0.5 / num5;
+  q.x = (m20 + m02) * num2;
+  q.y = (m21 + m12) * num2;
+  q.z = 0.5 * num5;
+  q.w = (m01 - m10) * num2;
+  return q;
 }
 
 /*!
