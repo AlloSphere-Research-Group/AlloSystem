@@ -111,22 +111,24 @@ public:
 	/// if the Y axis isn't suitable, the Z axis is used instead
 	///
 	/// a typical use case: rotate object A to face object B:
+	/// @code
 	/// Vec3d src = Vec3d(A.quat().toVectorZ()).normalize();
 	/// Vec3d dst = Vec3d(B.pos() - A.pos()).normalize();
 	/// Quatd rot = Quatd::getRotationTo(src, dst);
 	/// A.quat() = rot * A.quat();
+	/// @endcode
 	static Quat getRotationTo(const Vec<3,T>& usrc, const Vec<3,T>& udst);
 
 
-	// getBillboardRotation 
-	// Similar to getRotationTo, but this function maintains an up vector
-	// Intended for billboarding in omni
-	//
-	// Typical use case for omni billboarding:
-	// Vec3d forward = Vec3d(pose.pos() - src.pos()).normalize();
-	// Quatd rot = Quatd::getBillboardRotation(forward, pose.uu());
-	// g.rotate(rot);
-	//
+	/// Similar to getRotationTo, but this function maintains an up vector
+	/// Intended for billboarding in omni
+	///
+	/// Typical use case for omni billboarding:
+	/// @code
+	/// Vec3d forward = Vec3d(pose.pos() - src.pos()).normalize();
+	/// Quatd rot = Quatd::getBillboardRotation(forward, pose.uu());
+	/// g.rotate(rot);
+	/// @endcode
 	// Code sourced from Unity forum post about this functionality:
 	// http://answers.unity3d.com/questions/467614/what-is-the-source-code-of-quaternionlookrotation.html
 	static Quat getBillboardRotation(const Vec<3,T>& forward, const Vec<3,T>& up);
