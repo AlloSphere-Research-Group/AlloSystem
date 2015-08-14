@@ -37,12 +37,8 @@ int main (int argc, char * const argv[]) {
 
 #ifndef ALLOCORE_TESTS_NO_GUI
 	// This test should always be run last since it calls exit()
-<<<<<<< HEAD
-	printf("IOWindow\n");
-=======
 	// This test will not run on headless machines.
 	printf("IOWindow .... (calls exit() internally)\n");
->>>>>>> e1380af... Made travis build not use guis and build examples
 	utIOWindowGL();
 #endif
 
