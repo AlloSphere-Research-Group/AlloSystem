@@ -124,12 +124,7 @@ public:
 
 		if(num == 0){
 			//params->device = paNoDevice;
-	//		params->channelCount = 0;
-			if (forOutput) {
-				mInParams.channelCount = num;
-			} else {
-				mInParams.channelCount = num;
-			}
+			params->channelCount = 0;
 			return num;
 		}
 
