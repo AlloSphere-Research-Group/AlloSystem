@@ -59,7 +59,8 @@ include(cmake_modules/make_dep.cmake) # Functions to build some dependencies lik
 
 if(BUILD_GAMMA AND NOT GAMMA_LIBRARY)
     make_dep(Gamma)
-#    set(GAMMA_LIBRARY ${Gamma_LIBRARY})
+	#set(GAMMA_LIBRARY ${Gamma_LIBRARY})
+	#include_directories(${Gamma_INCLUDE_DIR})
 endif(BUILD_GAMMA AND NOT GAMMA_LIBRARY)
 
 if(BUILD_GLV AND NOT GLV_LIBRARY)
