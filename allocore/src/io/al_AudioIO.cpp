@@ -32,13 +32,12 @@ public:
 	virtual void inDevice(int index) {return;}
 	virtual void outDevice(int index) {return;}
 
-	virtual int channels(int num, bool forOutput) {
+	virtual void channels(int num, bool forOutput) {
 		if (forOutput) {
 			setOutDeviceChans(num);
 		} else {
 			setInDeviceChans(num);
 		}
-		return num;
 	}
 
 	virtual int inDeviceChans() {return mNumInChans;}
@@ -114,10 +113,10 @@ public:
 		mOutParams.hostApiSpecificStreamInfo = NULL;
 	}
 
-	virtual int channels(int num, bool forOutput) {
+	virtual void channels(int num, bool forOutput) {
 		if(isOpen()){
 			warn("the number of channels cannnot be set with the stream open", "AudioIO");
-			return -1;
+			return;
 		}
 
 		PaStreamParameters * params = forOutput ? &mOutParams : &mInParams;
@@ -125,14 +124,14 @@ public:
 		if(num == 0){
 			//params->device = paNoDevice;
 			params->channelCount = 0;
-			return num;
+			return;
 		}
 
 		const PaDeviceInfo * info = Pa_GetDeviceInfo(params->device);
 		if(0 == info){
 			if(forOutput)	warn("attempt to set number of channels on invalid output device", "AudioIO");
 			else			warn("attempt to set number of channels on invalid input device", "AudioIO");
-			return -1;	// this particular device is not open, so return
+			return;	// this particular device is not open, so return
 		}
 
 
@@ -147,7 +146,7 @@ public:
 		num = min(num, maxChans);
 		params->channelCount = num;
 
-		return num;
+		return;
 	}
 
 	virtual int inDeviceChans() { return (int) mInParams.channelCount; }
@@ -546,7 +545,7 @@ void AudioIO::channelsBus(int num){
 
 
 void AudioIO::channels(int num, bool forOutput){
-	num = mImpl->channels(num, forOutput);
+	mImpl->channels(num, forOutput);
 	int currentNum = channels(forOutput);
 
 	if(num != currentNum && num > 0){
