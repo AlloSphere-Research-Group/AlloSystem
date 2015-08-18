@@ -4,23 +4,21 @@ Based on Allocore Example: Audio To Graphics by Lance Putnam
 */
 
 #include <iostream>
+#include <cstring>
 
 #include "allocore/io/al_App.hpp"
 #include "alloaudio/al_OutputMaster.hpp"
 #include "alloaudio/al_Convolver.hpp"
 #include "Gamma/SoundFile.h"
-#include "string.h"
+
 
 #define BLOCK_SIZE 64
 
 
 using namespace std;
 using namespace al;
-using namespace gam;
 
-// A user defined class that can be accessed from the audio callback
-const char * testPath = "/Users/ogc/Documents/ucsb/arg/AlloSystem/alloaudio/examples/test.wav";
-SoundFile test(testPath);
+
 bool once = true;
 
 class MyApp : public App{
@@ -37,11 +35,9 @@ public:
         nav().pos(0,0,4);
         initWindow();
         // Load IRs
-        //
-        //
         const char * path = "/Users/ogc/Documents/ucsb/arg/AlloSystem/alloaudio/share/irs/Batcave.wav";
         //const char * path = "../share/irs/Batcave.wav";
-        SoundFile sf(path);
+        gam::SoundFile sf(path);
         if(!sf.openRead()){
             cout << "Error: Could not read impulse response file." << endl;
         }
@@ -100,23 +96,9 @@ public:
 
     // Audio callback
     void onSound(AudioIOData& io){
-
         conv.onAudioCB(io);
-        //int cbSize = io.framesPerBuffer();
-        //float *out = io.outBuffer(0);
-        //while(io()){
-        //    float inSample = io.in(0);
-        //    io.out(0) = inSample;
-        //    io.out(1) = inSample;
-        //}
-        //if(once){
-        //    cout << "AUDIO CALLBACK!!!!!" << endl;
-        //    once = false;
-        //}
-        //test.read(out, cbSize);
-		outMaster.onAudioCB(io);
+        outMaster.onAudioCB(io);
     }
-
 
     void onAnimate(double dt){
 
