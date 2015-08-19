@@ -13,6 +13,23 @@ namespace al{
 const double phi = (1 + sqrt(5))/2; // the golden ratio
 
 
+// Complex sinusoid used for fast circle generation
+struct CSin{
+	CSin(double freq, double amp=1.)
+	:	r(amp), i(0.), dr(cos(freq)), di(sin(freq)){}
+	void operator()(){
+		double r_ = r*dr - i*di;
+		i = r*di + i*dr;
+		r = r_;
+	}
+	void ampPhase(double amp, double phs){
+		r = amp*cos(phs);
+		i = amp*sin(phs);
+	}
+	double r,i,dr,di;
+};
+
+
 int addCube(Mesh& m, bool withNormalsAndTexcoords, float l){
 
 	m.primitive(Graphics::TRIANGLES);
@@ -274,17 +291,6 @@ int addSphere(Mesh& m, double radius, int slices, int stacks){
 
 	m.primitive(Graphics::TRIANGLES);
 
-	struct CSin{
-		CSin(double frq, double radius=1.)
-		:	r(radius), i(0.), dr(cos(frq)), di(sin(frq)){}
-		void operator()(){
-			double r_ = r*dr - i*di;
-			i = r*di + i*dr;
-			r = r_;
-		}
-		double r,i,dr,di;
-	};
-
 	int Nv = m.vertices().size();
 
 	CSin P( M_PI/stacks); P.r = P.dr*radius; P.i = P.di*radius;
@@ -384,7 +390,6 @@ int addSphereWithTexcoords(Mesh& m, double radius, int bands ){
 }
 
 
-
 int addWireBox(Mesh& m, float w, float h, float d){
 
 	m.primitive(Graphics::LINES);
@@ -411,6 +416,85 @@ int addWireBox(Mesh& m, float w, float h, float d){
 	m.index(I, sizeof(I)/sizeof(*I), Nv);
 
 	return m.vertices().size() - Nv;
+}
+
+
+int addCone(Mesh& m, float radius, const Vec3f& apex, unsigned slices, unsigned cycles){
+
+	m.primitive(Graphics::TRIANGLES);
+
+	unsigned Nv = m.vertices().size();
+
+	// Note: leaving base on xy plane makes it easy to construct a bicone
+	m.vertex(apex);
+
+	CSin csin(cycles * 2*M_PI/slices, radius);
+	for(unsigned i=Nv+1; i<=(Nv+slices); ++i){
+		float x = csin.r;
+		float y = csin.i;
+		csin();
+		m.vertex(x,y);
+		m.index(Nv);
+		m.index(i);
+		m.index(i+1);
+	}
+
+	m.indices().last() = Nv+1;
+
+	return 1 + slices;
+}
+
+
+int addDisc(Mesh& m, float radius, unsigned slices){
+	return addCone(m, 1, Vec3f(0,0,0), slices);
+}
+
+
+int addPrism(Mesh& m, float btmRadius, float topRadius, float height, unsigned slices, float twist){
+
+	m.primitive(Graphics::TRIANGLE_STRIP);
+	unsigned Nv = m.vertices().size();
+	float height_2 = height/2;
+
+	if(twist == 0){
+		CSin csin(2*M_PI/slices);
+		for(unsigned i=0; i<slices; ++i){
+			m.vertex(csin.r*btmRadius, csin.i*btmRadius,  height_2);
+			m.vertex(csin.r*topRadius, csin.i*topRadius, -height_2);
+			csin();
+			m.index(Nv + 2*i);
+			m.index(Nv + 2*i+1);
+		}
+	}
+	else{
+		double frq = 2*M_PI/slices;
+		CSin csinb(frq, btmRadius);
+		CSin csint = csinb;
+		csint.ampPhase(topRadius, twist*frq);
+		for(unsigned i=0; i<slices; ++i){
+			m.vertex(csinb.r, csinb.i,  height_2);
+			csinb();
+			m.vertex(csint.r, csint.i, -height_2);
+			csint();
+			m.index(Nv + 2*i);
+			m.index(Nv + 2*i+1);
+		}
+	}
+
+	m.index(Nv);
+	m.index(Nv+1);
+
+	return 2*slices;
+}
+
+
+int addAnnulus(Mesh& m, float inRadius, float outRadius, unsigned slices, float twist){
+	return addPrism(m, inRadius, outRadius, 0, slices, twist);
+}
+
+
+int addCylinder(Mesh& m, float radius, float height, unsigned slices, float twist){
+	return addPrism(m, radius, radius, height, slices, twist);
 }
 
 
@@ -499,28 +583,25 @@ int addSurfaceLoop(
 }
 
 
-void addCylinder(Mesh& m, double r1, double r2, double height, int vertCount){
+int addTorus(
+	Mesh& m, double minRadius, double majRadius, int Nmin, int Nmaj,
+	double minPhase
+){
+	int beg = m.vertices().size();
+	int Nv = addSurfaceLoop(
+		m, Nmaj, Nmin, 2, 2*M_PI, 2*M_PI, M_PI, M_PI - minPhase*2*M_PI/Nmin
+	);
 
-  m.primitive(Graphics::TRIANGLE_STRIP);
-    
-  int indxCount = vertCount+2;
-  double theta = 0.0;
+	for(int i=beg; i<beg+Nv; ++i){
+		Mesh::Vertex& v = m.vertices()[i];
+		v = Mesh::Vertex(
+			(majRadius + minRadius*::cos(v.y)) * ::cos(v.x),
+			(majRadius + minRadius*::cos(v.y)) * ::sin(v.x),
+			minRadius*::sin(v.y)
+		);
+	}
 
-  for (int j=0; j < vertCount; j++){
-    double r = ((j % 2 == 0) ? r1 : r2);
-    double x = cos(theta);
-    double y = sin(theta);
-    float u = ((j % 2 == 0) ? 1.0 : 0.0);
-    float v = j*1.0 / vertCount;
-
-    m.normal(x,y,(r1-r2)/2.0);
-    // m.texCoord(u,v);
-    m.vertex(r*x,r*y,((j % 2 == 0) ? 0.0 : height));
-
-    theta += 2 * M_PI / (vertCount);
-  }
-
-  for(int i=0; i < indxCount; i++) m.index(i % vertCount);
+	return Nv;
 }
 
 }
