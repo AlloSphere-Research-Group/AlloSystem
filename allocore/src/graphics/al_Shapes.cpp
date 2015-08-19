@@ -464,8 +464,8 @@ int addSurfaceLoop(
 	// Number of cells along y
 	int My = loopMode==1 ? Ny - 1 : Ny;
 
-	double du = width/(Nx-1);
-	double dv = height/(My-1);
+	double du = width/Nx;
+	double dv = height/My;
 
 	// Generate positions
 	double v = y - height*0.5;
