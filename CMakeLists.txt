@@ -50,6 +50,10 @@ if(NOT DEFINED BUILD_GLV)
   set(BUILD_GLV 1 CACHE STRING "Try to build external GLV.")
 endif(NOT DEFINED BUILD_GLV)
 
+if(NOT DEFINED BUILD_CUTTLEBONE)
+  set(BUILD_CUTTLEBONE 1 CACHE STRING "Try to build external Cuttlebone.")
+endif(NOT DEFINED BUILD_CUTTLEBONE)
+
 set(BUILD_EXAMPLES 0 CACHE STRING "Build AlloSystem examples.")
 
 # External dependencies (Gamma and GLV)
@@ -68,6 +72,12 @@ if(BUILD_GLV AND NOT GLV_LIBRARY)
 	message(STATUS "Using GLV from: ${GLV_LIBRARY}.")
 	message(STATUS "GLV headers: ${GLV_INCLUDE_DIR}.")
 endif(BUILD_GLV AND NOT GLV_LIBRARY)
+
+if(NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+  make_dep(cuttlebone)
+	message(STATUS "Using Cuttlebone from: ${CUTTLEBONE_LIBRARY}.")
+	message(STATUS "Cuttlebone headers: ${CUTTLEBONE_INCLUDE_DIR}.")
+endif()
 
 # Allocore --------------------------------
 add_subdirectory(allocore)
@@ -105,9 +115,19 @@ add_subdirectory(alloaudio)
 get_target_property(ALLOAUDIO_LIBRARY alloaudio${DEBUG_SUFFIX} LOCATION)
 get_target_property(ALLOAUDIO_INCLUDE_DIR alloaudio${DEBUG_SUFFIX} ALLOAUDIO_INCLUDE_DIR)
 get_target_property(ALLOAUDIO_LINK_LIBRARIES alloaudio${DEBUG_SUFFIX} ALLOAUDIO_LINK_LIBRARIES)
-if("alloaudio${DEBUG_SUFFIX}")
+if(ALLOAUDIO_LIBRARY)
   add_dependencies("alloaudio${DEBUG_SUFFIX}" "${ALLOCORE_LIBRARY}")
-endif("alloaudio${DEBUG_SUFFIX}")
+endif(ALLOAUDIO_LIBRARY)
+
+# allosphere ----------------------------------
+add_subdirectory(allosphere)
+get_target_property(ALLOSPHERE_LIBRARY allosphere${DEBUG_SUFFIX} LOCATION)
+get_target_property(ALLOSPHERE_INCLUDE_DIR allosphere${DEBUG_SUFFIX} ALLOSPHERE_INCLUDE_DIR)
+get_target_property(ALLOSPHERE_LINK_LIBRARIES allosphere${DEBUG_SUFFIX} ALLOSPHERE_LINK_LIBRARIES)
+if(ALLOSPHERE_LIBRARY)
+  add_dependencies("allosphere${DEBUG_SUFFIX}" "${ALLOCORE_LIBRARY}")
+  set(USE_CPP_11 1) # To trigger usage of C++11 in run script below
+endif(ALLOSPHERE_LIBRARY)
 
 # Run from path (Used in run.sh script)
 if((ALLOSYSTEM_BUILD_DIR) OR (ALLOSYSTEM_BUILD_APP_FILE))
