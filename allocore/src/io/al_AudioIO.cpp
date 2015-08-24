@@ -523,13 +523,20 @@ void AudioIO::channelsBus(int num){
 
 
 void AudioIO::channels(int num, bool forOutput){
+	//printf("Requested %d %s channels\n", num, forOutput?"output":"input");
 	mImpl->channels(num, forOutput);
 	int currentNum = channels(forOutput);
 
-	if(num != currentNum && num > 0){
+	// Open all device channels?
+	if(num == -1){
+		num = channelsOutDevice();
+	}
+
+	if(num != currentNum){
 		forOutput ? mNumO = num : mNumI = num;
 		resizeBuffer(forOutput);
 	}
+	//printf("Set %d %s channels\n", forOutput?mNumO:mNumI, forOutput?"output":"input");
 }
 
 int AudioIO::channelsInDevice() const { return (int)mImpl->inDeviceChans(); }
