@@ -1385,7 +1385,7 @@ reference "sub:MinGW/MSYS Freezes"
 
 \end_inset
 
-.) Install dependencies with the following commands:
+.) Install dependencies with the following command:
 \end_layout
 
 \begin_layout Standard
@@ -1395,17 +1395,7 @@ status open
 
 \begin_layout Plain Layout
 
-$ cd allocore
-\end_layout
-
-\begin_layout Plain Layout
-
 $ ./install_dependencies.sh
-\end_layout
-
-\begin_layout Plain Layout
-
-$ cd ..
 \end_layout
 
 \end_inset
@@ -1414,11 +1404,7 @@ If prompted for your password, enter the same password you use to log in
  to the OS.
  Installing all the dependencies may take some time, so be patient.
  After dependencies are installed, the next step is to build the AlloCore
- module with the following commands (make sure you are in the 
-\family typewriter
-allosystem/
-\family default
- directory):
+ module with the following command:
 \end_layout
 
 \begin_layout Standard
@@ -1433,8 +1419,8 @@ $ make allocore
 
 \end_inset
 
-To check if the system was installed successfully you can build an example
- by first running
+To check if everything installed successfully you can build an example by
+ first running
 \begin_inset listings
 inline false
 status open
@@ -2312,6 +2298,7 @@ $ file ~
 \begin_layout Standard
 This error message is typically the result of misspelling a file or directory
  name or being in the wrong directory.
+ Note many command-line interfaces are also case-sensitive.
  Always use tab autocompletion when typing file/directory names to ensure
  that they exist and are spelled correctly.
 \end_layout
