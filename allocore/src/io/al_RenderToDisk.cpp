@@ -19,8 +19,8 @@ static void serializeToBigEndian(char * out, float in){
 }
 
 
-RenderToDisk::RenderToDisk()
-:	mMode(NON_REAL_TIME), mFrameNumber(0), mElapsedSec(0),
+RenderToDisk::RenderToDisk(Mode m)
+:	mMode(m), mFrameNumber(0), mElapsedSec(0),
 	mGraphicsBuf(-1),
 	mImageExt("png"), mImageCompress(50),
 	mActive(false)
