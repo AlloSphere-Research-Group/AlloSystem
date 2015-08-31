@@ -446,7 +446,7 @@ int addCone(Mesh& m, float radius, const Vec3f& apex, unsigned slices, unsigned 
 
 
 int addDisc(Mesh& m, float radius, unsigned slices){
-	return addCone(m, 1, Vec3f(0,0,0), slices);
+	return addCone(m, radius, Vec3f(0,0,0), slices);
 }
 
 
