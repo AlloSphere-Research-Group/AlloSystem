@@ -63,7 +63,8 @@ public:
 		REAL_TIME		/**< Real-time rendering */
 	};
 
-	RenderToDisk();
+	/// @param[in] mode		rendering mode, /see mode
+	RenderToDisk(Mode mode = REAL_TIME);
 
 	~RenderToDisk();
 
