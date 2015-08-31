@@ -3,19 +3,22 @@
 
 # TODO decide how to bring in bugfixes from the alloproject scripts
 # TODO figure out how to align the Dependency checkboxes!
+# TODO Add xcode project generation for OS X
+# TODO Add Windows support
+# TODO Initialize GIT and make first commit of sources (optionally upload to github?)
 
 import os
 import platform
 import stat
 import urllib2
+import pickle
 from subprocess import Popen, PIPE
 
 import Tkinter as tk
 import tkFileDialog
 
-
 class Project():
-    def __init__(self):
+    def __init__(self, log_func):
         self.use_installed_libs = False
         self.dependencies = {}
         self.dependencies['GLV'] = True
@@ -23,12 +26,17 @@ class Project():
         self.dependencies['Gamma'] = True
         self.dir = ''
         self.project_name = ''
+        self.log_func = log_func
         
     def make_project_folder(self, folder, name):
         fullpath = folder + '/' + name
         if os.path.isdir(fullpath):
             return False
-        os.mkdir(fullpath)
+        if not os.path.exists(fullpath):
+            os.makedirs(fullpath)
+            self.log_func("Creating intermediate directories for project path.\n")
+        else:
+            os.mkdir(fullpath)
         if not os.path.isdir(fullpath):
             return False
         self.dir = folder
@@ -93,7 +101,8 @@ git fat pull
             if line == '' and p.poll() != None:
                 break
         output = '\n'.join(stdout)
-        os.chdir(curpath)  
+        os.chdir(curpath)
+        
         return output
     
 
@@ -101,8 +110,16 @@ class Application(tk.Frame):
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
         self.grid(padx=10, pady=10, ipadx=5, ipady=10)
-        self.project = Project()
+        self.project = Project(self.log)
         self.createWidgets()
+        try:
+            with open('.alloproject', 'rb') as config_file:
+                settings = pickle.load(config_file)
+                config_file.close()
+                self.project_dir.delete(0, tk.END)
+                self.project_dir.insert(0, settings['project_dir'])
+        except:
+            print("Not using config file")
         
     def createWidgets(self):
         self.name_label = tk.Label(self)
@@ -113,7 +130,7 @@ class Application(tk.Frame):
         self.project_name.grid(row=0, column=1)
         
         self.dir_label = tk.Label(self)
-        self.dir_label["text"] = "Project Directory:"
+        self.dir_label["text"] = "Project Root Directory:"
         self.dir_label.grid(row=1, column=0)
         
         self.project_dir = tk.Entry(self, width = 40)
@@ -123,25 +140,44 @@ class Application(tk.Frame):
                                             command=self.select_directory)
         self.project_dir_select.grid(row=1, column=2)
         
+        self.project_dir_help = tk.Button(self, text="?",
+                                            command=self.project_dir_help_box)
+        self.project_dir_help.grid(row=1, column=3)
+        
+        self.lib_frame = tk.Frame(self)
+        self.lib_frame['borderwidth'] = 2
+        self.lib_frame['relief'] = tk.RIDGE
+        self.lib_frame.grid(row=5, column=0)
+
+        self.dir_label = tk.Label(self.lib_frame)
+        self.dir_label["text"] = "Base libraries:"
+        self.dir_label.grid(row=4, column=0)
+
         self.libs_button_value = tk.IntVar()
-        self.use_installed_libs = tk.Radiobutton(self,
+        self.use_installed_libs = tk.Radiobutton(self.lib_frame,
                                                  text='Use installed libs',
                                                  variable=self.libs_button_value,
                                                  value=1,
                                                  command=self.set_libs_status)
         self.use_installed_libs.grid(row=5, column=0)
-        self.get_libs = tk.Radiobutton(self,
-                                       text='Get libs',
+        self.get_libs = tk.Radiobutton(self.lib_frame,
+                                       text='Download library sources',
                                        variable=self.libs_button_value,
                                        value = 0,
                                        command=self.set_libs_status)
         self.get_libs.grid(row=6, column=0)
         
-        self.lib_label = tk.Label(self, text= "Additional libraries:")
+        
+        self.addlib_frame = tk.Frame(self)
+        self.addlib_frame['borderwidth'] = 2
+        self.addlib_frame['relief'] = tk.RIDGE
+        self.addlib_frame.grid(row=5, column=1)
+        
+        self.lib_label = tk.Label(self.addlib_frame, text= "Additional libraries:")
         self.lib_label.grid(row=10, column=0)
         
         self.libs = []  
-        self.glv = tk.Checkbutton(self, text='GLV', anchor=tk.NW, justify=tk.LEFT)
+        self.glv = tk.Checkbutton(self.addlib_frame, text='GLV', anchor=tk.NW, justify=tk.LEFT)
         if self.project.dependencies['GLV']:       
             self.glv.select()
         else:
@@ -149,7 +185,7 @@ class Application(tk.Frame):
         self.glv.grid(row=11, column=0)
         self.libs.append(self.glv)
         
-        self.gamma = tk.Checkbutton(self, text='Gamma', anchor=tk.NW, justify=tk.LEFT)
+        self.gamma = tk.Checkbutton(self.addlib_frame, text='Gamma', anchor=tk.NW, justify=tk.LEFT)
         if self.project.dependencies['Gamma']:       
             self.gamma.select()
         else:
@@ -157,7 +193,7 @@ class Application(tk.Frame):
         self.gamma.grid(row=12, column=0)
         self.libs.append(self.gamma)
         
-        self.cuttlebone = tk.Checkbutton(self, text='Cuttlebone', anchor=tk.NW, justify=tk.LEFT)
+        self.cuttlebone = tk.Checkbutton(self.addlib_frame, text='Cuttlebone', anchor=tk.NW, justify=tk.LEFT)
         if self.project.dependencies['Cuttlebone']:       
             self.cuttlebone.select()
         else:
@@ -221,16 +257,35 @@ class Application(tk.Frame):
             wdw.transient(root)
             wdw.grab_set()
             root.wait_window(wdw)
-            self.console.insert(tk.END, "Couldn't create folder\n")
+            self.console.insert(tk.END, "ABORT: Couldn't create folder. Does it exist? Do you have permissions?\n")
             return
         self.project.make_init_script() 
         self.update_idletasks()
-        self.console.insert(tk.END, 'Running init_project.sh -------\n')
+        self.console.insert(tk.END, 'Running init_project.sh (this might take a while) -------\n')
         self.update_idletasks()
         output = self.project.run_init_script()
         self.console.insert(tk.END, output + '\n')
         self.console.insert(tk.END, 'Project created succesfully.\n')
-
+        settings = {}
+        settings['project_dir'] = folder
+        with open('.alloproject', 'wb') as config_file:
+            pickle.dump(settings, config_file)
+            config_file.close()
+            
+    def log(self, message):
+        self.console.insert(tk.END, message)
+        
+    def project_dir_help_box(self):
+        wdw = tk.Toplevel()
+        #wdw.geometry('+400+400')
+        e = tk.Label(wdw, text="A new folder will be created in this directory.")
+        e.pack(ipadx=50, ipady=10, pady=10)
+        b = tk.Button(wdw, text='OK', command=wdw.destroy)
+        b.pack(ipadx=50, pady=10)
+        wdw.transient(root)
+        wdw.grab_set()
+        root.wait_window(wdw)
+        return
 
 root = tk.Tk()
 root.title('AlloProject')
