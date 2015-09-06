@@ -16,7 +16,7 @@ endif(NOT (GAMMA_FOUND OR GAMMA_LIBRARY))
 set(ALLOAUDIO_SRC
   src/al_OutputMaster.cpp
   src/butter.cpp
-#  src/al_Decorrelation.cpp
+  src/al_Decorrelation.cpp
   )
 
 set(ALLOAUDIO_HEADERS
@@ -64,7 +64,7 @@ file(GLOB ALLOAUDIO_INSTALL_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} alloaud
 set(ALLOAUDIO_LIBRARY "alloaudio${DEBUG_SUFFIX}")
 add_library(${ALLOAUDIO_LIBRARY} ${ALLOAUDIO_SRC} ${ALLOAUDIO_INSTALL_HEADERS})
 
-set(ALLOAUDIO_LINK_LIBRARIES ${ALLOCORE_LIBRARY} ${FFTW_LIBRARY})
+set(ALLOAUDIO_LINK_LIBRARIES ${ALLOCORE_LIBRARY} ${FFTW_LIBRARY} ${GAMMA_LIBRARY})
 set(ALLOAUDIO_DIRS ${BUILD_ROOT_DIR}/build/include)
 
 # export properties for AlloSystem
@@ -147,5 +147,11 @@ if(NOT FFTW_LIBRARY STREQUAL "")
   add_test(NAME convolverTests
 		  COMMAND $<TARGET_FILE:convolverTests> ${TEST_ARGS})
   add_memcheck_test(convolverTests)
+
+  add_executable(decorrelationTests unitTests/decorrelationTests.cpp)
+  target_link_libraries(decorrelationTests ${ALLOAUDIO_LIBRARY} ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${FFTW_LIBRARY} )
+  add_test(NAME decorrelationTests
+		  COMMAND $<TARGET_FILE:decorrelationTests> ${TEST_ARGS})
+  add_memcheck_test(decorrelationTests)
 endif()
 endif(NOT TRAVIS_BUILD)
