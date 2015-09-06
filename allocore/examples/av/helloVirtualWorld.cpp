@@ -21,7 +21,7 @@ struct Agent : public SoundSource, public Nav, public Drawable{
 	Agent()
 	: oscPhase(0), oscEnv(1)
 	{
-		pos(-4, 0, -4);
+		Nav::pos(-4, 0, -4);
 	}
 
 	virtual ~Agent(){}
