@@ -108,6 +108,7 @@ public:
 
 	using AudioIOData::channelsIn;
 	using AudioIOData::channelsOut;
+	using AudioIOData::channelsBus;
 	using AudioIOData::framesPerBuffer;
 	using AudioIOData::framesPerSecond;
 

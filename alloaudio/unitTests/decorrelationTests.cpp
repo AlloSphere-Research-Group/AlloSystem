@@ -26,7 +26,7 @@ void ut_class_test(void)
 						 0.00549774,  0.26477413};
 	for (int i = 0; i < 32; i++) {
 //		std::cout << ir[i] << "..." << expected[i];
-		assert(ir[i] - expected[i] < 0.000001);
+		assert(fabs(ir[i] - expected[i]) < 0.000001);
 	}
 	std::cout << std::endl;
 
@@ -48,7 +48,7 @@ void ut_decorrelation_test(void)
 	al::AudioIO io(64, 44100, 0, 0, 2, 2, al::AudioIO::DUMMY); // Dummy Audio Backend
 	io.channelsBus(1);
 	al::Decorrelation dec(64, 0, 1, 1000);
-	dec.configure(io, 0, true);
+	dec.configure(io, true);
 	io.append(dec);
 	float *input = io.busBuffer(0);
 	for (int i = 0; i < io.framesPerBuffer(); i++) { // Zero out input bus
@@ -69,7 +69,7 @@ void ut_decorrelation_test(void)
 						 0.02946899, -0.16636388, -0.20115566, -0.12191195,  0.08616827,
 						 0.00697796,  0.00775061,  0.06617171,  0.14810011,  0.0442153 ,
 						-0.1437734 , -0.02805416,  0.03769239, -0.00884531, -0.1745563 ,
-						 0.13952994,  0.06541837,  0.05971518}; //,  0.153454};
+						 0.13952994,  0.06541837,  0.05971518}; //,  0.153454}; Last value goes as first value in next buffer
 	for (int i = 0; i < io.framesPerBuffer(); i++) { // Zero out input bus
 //		std::cout << outbuf[i] << " ... "<< expected[i] << std::endl;
 		assert(fabs(expected[i] - outbuf[i]) < 0.000001);
@@ -102,6 +102,66 @@ void ut_decorrelation_test(void)
 
 }
 
+void ut_parallel_test(void)
+{
+	al::AudioIO io(64, 44100, 0, 0, 2, 2, al::AudioIO::DUMMY); // Dummy Audio Backend
+	io.channelsBus(2);
+	al::Decorrelation dec(64, -1, 2, 1000); // -1 for input means "parallel" decorrelation
+	dec.configure(io, true);
+	io.append(dec);
+	float *input0 = io.busBuffer(0);
+	float *input1 = io.busBuffer(1);
+	for (int i = 0; i < io.framesPerBuffer(); i++) { // Zero out input bus
+		input0[i] = 0.0;
+		input1[i] = 0.0;
+	}
+	input0[1] = 1.0;
+	input1[6] = 0.5;
+	io.processAudio();
+	float *outbuf0 = io.outBuffer(0);
+	double expected0[] = {0.0, 0.68639828, -0.21015081,  0.04274105, -0.00369917, -0.06308476,
+						 0.24883819,  0.09921908, -0.02740205,  0.03255728, -0.00742716,
+						-0.00136285, -0.11266077, -0.0909083 ,  0.04217425,  0.07128946,
+						-0.01452214, -0.0008219 ,  0.03799216,  0.073492  , -0.04003114,
+						-0.02366538,  0.07602104,  0.15514681,  0.06790056, -0.0044905 ,
+						-0.10180065,  0.03126825, -0.0241807 ,  0.07766891, -0.11034507,
+						 0.02519892, -0.06023501, -0.03090125,  0.07787655, -0.10905136,
+						 0.09593274, -0.10025149,  0.12081278,  0.08383462,  0.03523137,
+						 0.04325256, -0.0628779 , -0.05428473, -0.03601444,  0.06532053,
+						 0.02946899, -0.16636388, -0.20115566, -0.12191195,  0.08616827,
+						 0.00697796,  0.00775061,  0.06617171,  0.14810011,  0.0442153 ,
+						-0.1437734 , -0.02805416,  0.03769239, -0.00884531, -0.1745563 ,
+						 0.13952994,  0.06541837,  0.05971518};
+	float *outbuf1 = io.outBuffer(1);
+	double expected1[] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+						  3.02517613e-01,  -2.32109087e-02,  -2.75845562e-02,
+						  -1.72113803e-03,   6.15500677e-02,  -8.31670347e-02,
+						   2.53485912e-03,   1.41453866e-02,   2.11676636e-02,
+						  -7.02669420e-02,  -6.11342660e-02,  -2.19013541e-02,
+						   8.36450853e-03,  -2.86811823e-02,   2.41311832e-02,
+						   1.40289639e-02,  -1.64321578e-02,   2.20035355e-02,
+						  -8.60046428e-02,  -5.70519388e-02,  -1.15316252e-02,
+						  -3.09964836e-02,  -6.87335720e-02,   1.35391797e-02,
+						   1.22013584e-02,   1.86896796e-01,   5.38287169e-02,
+						   8.80335253e-03,   3.27757220e-02,  -3.07259532e-02,
+						   1.28735169e-02,   3.81044856e-02,  -1.94928250e-02,
+						  -4.24974614e-02,  -1.03116996e-02,   2.43020933e-02,
+						   5.00501514e-03,  -8.58289249e-03,  -5.35512885e-02,
+						  -7.79530011e-02,   1.60749458e-02,   1.90523462e-02,
+						   7.03027226e-02,   2.41724152e-02,   3.06444587e-02,
+						   4.67967531e-02,   7.50780919e-02,  -1.02105498e-01,
+						   5.91697141e-02,   4.33550584e-02,   9.05510447e-05,
+						  -8.35987327e-03,   6.74582611e-02,  -5.12059053e-02,
+						   7.96678706e-02,  -1.41675646e-03,  -1.52523740e-02,
+						   8.71836196e-02,   1.12006741e-02,   8.95507861e-02,
+						  -5.68845955e-02,   4.47655131e-04,  -1.97239112e-02,
+						   7.46189688e-03};
+	for (int i = 0; i < io.framesPerBuffer(); i++) { // Zero out input bus
+//		std::cout << outbuf1[i] << " ... "<< expected1[i] << std::endl;
+		assert(fabs(expected0[i] - outbuf0[i]) < 0.000001);
+		assert(fabs(expected1[i] - outbuf1[i]) < 0.000001);
+	}
+}
 
 #define RUNTEST(Name)\
 	printf("%s ", #Name);\
@@ -113,6 +173,7 @@ int main()
 {
 	RUNTEST(class_test);
 	RUNTEST(decorrelation_test);
+	RUNTEST(parallel_test);
 
 	return 0;
 }

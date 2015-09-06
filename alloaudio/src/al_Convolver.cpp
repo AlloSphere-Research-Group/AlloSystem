@@ -35,7 +35,11 @@ int Convolver::configure(al::AudioIO &io, vector<float *> IRs, int IRlength,
 	assert(nActiveOutputs > 0);
 	assert(nActiveOutputs <= Convproc::MAXOUT);
 	if(m_inputChannel < 0){//many to many
-		assert(io.channels(false) >= m_activeChannels.size());
+		if (m_inputsAreBuses) {
+			assert(io.channelsBus() >= m_activeChannels.size());
+		} else {
+			assert(io.channels(false) >= m_activeChannels.size());
+		}
 		nActiveInputs = nActiveOutputs;
 	}
 	else{//one to many
