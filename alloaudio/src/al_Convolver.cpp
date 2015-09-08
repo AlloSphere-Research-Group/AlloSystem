@@ -22,6 +22,7 @@ int Convolver::configure(al::AudioIO &io, vector<float *> IRs, int IRlength,
 	m_inputChannel = inputChannel;
 	m_inputsAreBuses = inputsAreBuses;
 	m_disabledChannels = disabledChannels;
+	m_activeChannels.clear();
 	for(int i = 0; i < io.channels(true); i++) {
 		if (std::find(disabledChannels.begin(), disabledChannels.end(), i)
 				== disabledChannels.end()) {

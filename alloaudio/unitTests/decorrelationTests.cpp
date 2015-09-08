@@ -201,6 +201,15 @@ void ut_max_jump_test(void)
 
 }
 
+void ut_deterministic_test(void)
+{
+	al::AudioIO io(64, 44100, 0, 0, 2, 2, al::AudioIO::DUMMY); // Dummy Audio Backend
+	al::Decorrelation dec(32, 0, 8, false);
+	dec.configureDeterministic(io, 1000, 30, 10, 1.0);
+
+	float *ir = dec.getIR(0);
+}
+
 #define RUNTEST(Name)\
 	printf("%s ", #Name);\
 	ut_##Name();\
@@ -213,6 +222,7 @@ int main()
 	RUNTEST(decorrelation_test);
 	RUNTEST(parallel_test);
 	RUNTEST(max_jump_test);
+	RUNTEST(deterministic_test);
 
 	return 0;
 }
