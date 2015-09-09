@@ -254,16 +254,18 @@ public:
 
 
 	/// Append texture coordinate to 2D texture coordinate buffer
-	void texCoord(float u, float v){ texCoord(TexCoord2(u,v)); }
+	void texCoord(float u, float v){ texCoord2s().append(TexCoord2(u,v)); }
 
 	/// Append texture coordinate to 2D texture coordinate buffer
-	void texCoord(const TexCoord2& v){ texCoord2s().append(v); }
+	template <class T>
+	void texCoord(const Vec<2,T>& v){ texCoord(v[0], v[1]); }
 
 	/// Append texture coordinate to 3D texture coordinate buffer
-	void texCoord(float u, float v, float w){ texCoord(TexCoord3(u,v,w)); }
+	void texCoord(float u, float v, float w){ texCoord3s().append(TexCoord3(u,v,w)); }
 
 	/// Append texture coordinate to 3D texture coordinate buffer
-	void texCoord(const TexCoord3& v){ texCoord3s().append(v); }
+	template <class T>
+	void texCoord(const Vec<3,T>& v){ texCoord(v[0], v[1], v[2]); }
 
 
 	/// Append vertex to vertex buffer
