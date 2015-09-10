@@ -16,7 +16,6 @@ endif(NOT (GAMMA_FOUND OR GAMMA_LIBRARY))
 set(ALLOAUDIO_SRC
   src/al_OutputMaster.cpp
   src/butter.cpp
-  src/al_Decorrelation.cpp
   )
 
 set(ALLOAUDIO_HEADERS
@@ -51,10 +50,12 @@ else()
   message(STATUS "Using fftw3: ${FFTW_LIBRARY}")
  list(APPEND ALLOAUDIO_SRC
   src/al_Convolver.cpp
+  src/al_Decorrelation.cpp
   src/zita-convolver-3.1.0/libs/zita-convolver.cc
 )
  list(APPEND ALLOAUDIO_HEADERS
   alloaudio/al_Convolver.hpp
+  alloaudio/al_Decorrelation.hpp
   src/zita-convolver-3.1.0/libs/zita-convolver.h)
 endif(NOT FFTW_LIBRARY)
 
