@@ -46,6 +46,7 @@ if (NOT FFTW_LIBRARY)
   message(STATUS "Not using fftw3.")
   set(FFTW_LIBRARY "")
   write_dummy_headers("al_Convolver.hpp::::FFTW" ALLOAUDIO_HEADERS)
+  write_dummy_headers("al_Decorrelation.hpp::::FFTW" ALLOAUDIO_HEADERS)
 else()
   message(STATUS "Using fftw3: ${FFTW_LIBRARY}")
  list(APPEND ALLOAUDIO_SRC
