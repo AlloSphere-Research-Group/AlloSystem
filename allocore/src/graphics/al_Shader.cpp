@@ -152,6 +152,15 @@ static ShaderProgram::Type param_type_from_gltype(GLenum gltype) {
 	}
 }
 
+ShaderProgram::ShaderProgram()
+:	mInPrim(Graphics::TRIANGLES), mOutPrim(Graphics::TRIANGLES), mOutVertices(3),
+	mActive(true)
+{}
+
+ShaderProgram::~ShaderProgram(){
+	destroy();
+}
+
 ShaderProgram& ShaderProgram::attach(Shader& s){
 	validate();
 	s.compile();
@@ -193,6 +202,37 @@ const ShaderProgram& ShaderProgram::validate_linker() const {
 		AL_GRAPHICS_ERROR("ShaderProgram::link", id());
 	}
 	return *this;
+}
+
+bool ShaderProgram::compile(
+	const std::string& vertSource,
+	const std::string& fragSource,
+	const std::string& geomSource
+){
+	Shader mShaderV, mShaderF, mShaderG;
+	mShaderV.source(vertSource, al::Shader::VERTEX);
+	attach(mShaderV);
+	mShaderF.source(fragSource, al::Shader::FRAGMENT);
+	attach(mShaderF);
+	
+	bool bGeom = geomSource[0];
+	if(bGeom){
+		mShaderG.source(geomSource, al::Shader::GEOMETRY);
+		attach(mShaderG);
+	}
+	link();
+	mShaderV.printLog();
+	mShaderF.printLog();
+	if(bGeom) mShaderG.printLog();
+	printLog();
+
+	// OpenGL.org says to detach shaders after linking:
+	//   https://www.opengl.org/wiki/Shader_Compilation
+	detach(mShaderV);
+	detach(mShaderF);
+	if(bGeom) detach(mShaderG);
+
+	return linked();
 }
 
 void ShaderProgram::onCreate(){
