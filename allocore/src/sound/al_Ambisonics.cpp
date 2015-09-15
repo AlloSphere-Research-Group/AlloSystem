@@ -377,7 +377,7 @@ void AmbisonicsSpatializer::setSpeakerLayout(const SpeakerLayout& sl){
 	}
 }
 
-void AmbisonicsSpatializer::prepare(){
+void AmbisonicsSpatializer::prepare(AudioIOData& io){
     zeroAmbi();
 }
 

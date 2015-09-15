@@ -272,36 +272,36 @@ public:
 class AmbisonicsSpatializer : public Spatializer {
 public:
 
-    AmbisonicsSpatializer(SpeakerLayout &sl, int dim, int order, int flavor=1);
+	AmbisonicsSpatializer(SpeakerLayout &sl, int dim, int order, int flavor=1);
 
-    void zeroAmbi();
+	void zeroAmbi();
 
-    float * ambiChans(unsigned channel=0);
+	float * ambiChans(unsigned channel=0);
 
-    void compile(Listener& l);
+	void compile(Listener& l);
 
-    void numFrames(int v);
+	void numFrames(int v);
 
-    void numSpeakers(int num);
+	void numSpeakers(int num);
 
-    void setSpeakerLayout(const SpeakerLayout& sl);
+	void setSpeakerLayout(const SpeakerLayout& sl);
 
-    void prepare();
+	void prepare(AudioIOData& io);
 
-    /// Per sample processing
-    void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample);
+	/// Per sample processing
+	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample);
 
-    /// Per buffer processing
-    void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples);
+	/// Per buffer processing
+	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples);
 
-    void finalize(AudioIOData& io);
+	void finalize(AudioIOData& io);
 
 private:
-    AmbiDecode mDecoder;
-    AmbiEncode mEncoder;
+	AmbiDecode mDecoder;
+	AmbiEncode mEncoder;
 	std::vector<float> mAmbiDomainChannels;
-    Listener* mListener;
-    int mNumFrames;
+	Listener* mListener;
+	int mNumFrames;
 };
 
 

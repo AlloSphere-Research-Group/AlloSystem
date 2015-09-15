@@ -58,26 +58,16 @@ public:
 
 	void compile(Listener& listener);
 
-    
-    #if !ALLOCORE_GENERIC_AUDIOSCENE
 	///Per Sample Processing
 	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample);
 
 	/// Per Buffer Processing
 	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples);
-    
-    #else
-    ///Per Sample Processing
-    void perform(float** outputBuffers, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample);
-    
-    /// Per Buffer Processing
-    void perform(float** outputBuffers, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples);
-    #endif
 
 	/// focus is an exponent determining the amplitude focus to nearby speakers.
 
-    ///focus is (0, inf) with usable range typically [0.2, 5]. Default is 1.
-    ///A denser speaker layout my benefit from a high focus > 1, and a sparse layout may benefit from focus < 1
+	///focus is (0, inf) with usable range typically [0.2, 5]. Default is 1.
+	///A denser speaker layout my benefit from a high focus > 1, and a sparse layout may benefit from focus < 1
 	void setFocus(float focus) { mFocus = focus; }
 
 	void print();
@@ -87,7 +77,7 @@ private:
 	Vec3f mSpeakerVecs[DBAP_MAX_NUM_SPEAKERS];
 	int mDeviceChannels[DBAP_MAX_NUM_SPEAKERS];
 	int mNumSpeakers;
-    float mFocus;
+	float mFocus;
 };
 
 
