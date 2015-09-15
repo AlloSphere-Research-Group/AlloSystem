@@ -5,8 +5,8 @@ message(STATUS "==== Configuring allocv")
 
 aux_source_directory(src ALLOCV_SRC)
 
-set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/lib)
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
+set(LIBRARY_OUTPUT_PATH "${BUILD_ROOT_DIR}/build/lib")
+set(EXECUTABLE_OUTPUT_PATH "${BUILD_ROOT_DIR}/build/bin")
 
 # Dependencies
 
@@ -22,7 +22,7 @@ endif()
 
 include_directories(${ALLOCORE_DEP_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_SOURCE_DIR})
+  "${BUILD_ROOT_DIR}/build/include")
 
 set(ALLOCV_LIB "allocv${DEBUG_SUFFIX}")
 add_library(${ALLOCV_LIB} ${ALLOCV_SRC})
@@ -31,10 +31,19 @@ target_link_libraries(${ALLOCV_LIB} ${ALLOCORE_LIBRARY} ${OpenCV_LIBS})
 
 set_target_properties(${ALLOCV_LIB}
   PROPERTIES
-  ALLOCV_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}"
+  ALLOCV_INCLUDE_DIR "${BUILD_ROOT_DIR}/build/include"
   ALLOCV_LIBRARY ${ALLOCV_LIB}
   ALLOCV_LINK_LIBRARIES "${OpenCV_LIBS}"
 )
+
+
+# Copy headers to build directory (only if header has changed)
+file(GLOB ALLOCV_INSTALL_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} allocv/*.h*)
+foreach(header ${ALLOCV_INSTALL_HEADERS})
+	execute_process(COMMAND ${CMAKE_COMMAND} -E
+					copy_if_different "${header}" "${BUILD_ROOT_DIR}/build/include/${header}"
+					WORKING_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}")
+endforeach()
 
 # Examples
 #if(BUILD_EXAMPLES)
@@ -64,5 +73,6 @@ set_target_properties(${ALLOCV_LIB}
 
 #endif(BUILD_EXAMPLES)
 
-install(DIRECTORY allocv/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include/allocv)
-install(TARGETS ${ALLOCV_LIB} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+# Installation
+install(FILES ${ALLOCV_INSTALL_HEADERS} DESTINATION "${CMAKE_INSTALL_PREFIX}/include")
+install(TARGETS ${ALLOCV_LIB} DESTINATION "${CMAKE_INSTALL_PREFIX}/lib")

@@ -12,6 +12,7 @@ xcuserdata
 doxygen_objdb_*
 .DS_Store
 .svn
+CTestTestfile.cmake
 
 *~
 *.link

@@ -3,6 +3,8 @@
 #    message(FATAL_ERROR "Error: The run script must be called from the source root directory." )
 #endif(NOT (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR}))
 
+message("Using AlloSystem Run facilties.")
+
 string(REGEX MATCH ".*\\*.*" match "${CMAKE_CURRENT_SOURCE_DIR}")
 IF(NOT ${match} STREQUAL "")
   message(FATAL_ERROR "Error: Please remove '*' from path!" ) # This avoids issues with the run script
@@ -10,12 +12,12 @@ ENDIF()
 
 if(BUILD_DIR)
   string(REGEX REPLACE "/+$" "" ALLOSYSTEM_BUILD_APP_DIR "${ALLOSYSTEM_BUILD_APP_DIR}") # remove trailing slash
-  file(GLOB ALLOPROJECT_APP_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${ALLOSYSTEM_BUILD_APP_DIR}/*.cpp)
+  file(GLOB ALLOSYSTEM_APP_SRC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${ALLOSYSTEM_BUILD_APP_DIR}/*.cpp)
   string(REPLACE "/" "_" APP_NAME "${ALLOSYSTEM_BUILD_APP_DIR}")
   string(REGEX REPLACE "_+$" "" APP_NAME "${APP_NAME}")
   set(SOURCE_DIR "${ALLOSYSTEM_BUILD_APP_DIR}")
 else()
-  set(ALLOPROJECT_APP_SRC "${BUILD_APP_FILE}")
+  set(ALLOSYSTEM_APP_SRC "${BUILD_APP_FILE}")
   string(REPLACE "/" "_" APP_NAME "${BUILD_APP_FILE}")
   get_filename_component(APP_NAME "${APP_NAME}" NAME)
   STRING(REGEX REPLACE "\\.[^.]*\$" "" APP_NAME "${APP_NAME}")
@@ -26,7 +28,7 @@ endif(BUILD_DIR)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/build/bin)
 
-add_executable("${APP_NAME}" EXCLUDE_FROM_ALL ${ALLOPROJECT_APP_SRC})
+add_executable("${APP_NAME}" EXCLUDE_FROM_ALL ${ALLOSYSTEM_APP_SRC})
 
 if(EXISTS "${SOURCE_DIR}/flags.cmake")
     include("${SOURCE_DIR}/flags.cmake")
@@ -46,7 +48,7 @@ if(EXISTS "${SOURCE_DIR}/flags.txt")
 endif()
 
 message(STATUS "Target: ${APP_NAME}")
-message(STATUS "From sources: ${ALLOPROJECT_APP_SRC}")
+message(STATUS "From sources: ${ALLOSYSTEM_APP_SRC}")
 
 # Dependencies (check if targets exist and set variables)
 get_target_property(ALLOCORE_LIBRARY allocore${DEBUG_SUFFIX} LOCATION)
@@ -56,7 +58,7 @@ add_dependencies("${APP_NAME}" allocore${DEBUG_SUFFIX})
 
 #message("Using allocore headers from: ${ALLOCORE_DEP_INCLUDE_DIRS}")
 
-if(BUILDING_Gamma)
+if(BUILDING_GAMMA)
     get_target_property(GAMMA_LIBRARY Gamma LOCATION)
     add_dependencies(${APP_NAME} Gamma)
     target_link_libraries(${APP_NAME} ${GAMMA_LIBRARY})
@@ -69,7 +71,7 @@ else()
   endif(NOT GAMMA_FOUND)
   target_link_libraries(${APP_NAME} ${GAMMA_LIBRARY})
   include_directories(${GAMMA_INCLUDE_DIR})
-endif(BUILDING_Gamma)
+endif(BUILDING_GAMMA)
 
 if(BUILDING_GLV)
     get_target_property(GLV_LIBRARY GLV LOCATION)
@@ -155,22 +157,22 @@ target_link_libraries("${APP_NAME}"
   ${ALLOCORE_LIBRARY}
   ${ALLOCORE_LINK_LIBRARIES})
 
-#list(REMOVE_ITEM PROJECT_RES_FILES ${ALLOPROJECT_APP_SRC})
+#list(REMOVE_ITEM PROJECT_RES_FILES ${ALLOSYSTEM_APP_SRC})
 
 if(NOT RUN_IN_DEBUGGER)
 add_custom_target("${APP_NAME}_run"
   COMMAND "${APP_NAME}"
   DEPENDS "${APP_NAME}"
-  WORKING_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}"
-  SOURCES ${ALLOPROJECT_APP_SRC}
+  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+  SOURCES ${ALLOSYSTEM_APP_SRC}
   COMMENT "Running: ${APP_NAME}")
   option(RUN_IN_DEBUGGER 0) # For next run
 else()
 add_custom_target("${APP_NAME}_run"
   COMMAND "${ALLOSYSTEM_DEBUGGER}" "-ex" "run" "${EXECUTABLE_OUTPUT_PATH}/${APP_NAME}"
   DEPENDS "${APP_NAME}"
-  WORKING_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}"
-  SOURCES ${ALLOPROJECT_APP_SRC}
+  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+  SOURCES ${ALLOSYSTEM_APP_SRC}
   COMMENT "Running: ${APP_NAME}")
 
 endif(NOT RUN_IN_DEBUGGER)

@@ -1,0 +1,43 @@
+<html>
+<head>
+  <script src='interface.js'></script>
+</head>
+<body>
+  <script>
+    panel = new Interface.Panel({ useRelativeSizesAndPositions: true });
+var numchnls = 55;
+var multiSlider;
+d = new Interface.Button({
+    bounds:[0,0.93,1, 0.07],
+    label:'Meter on',
+    target:"OSC", key:'/Alloaudio/meter_on'
+})
+multiSlider = new Interface.MultiSlider({
+    count:numchnls,
+    bounds:[0,0,1, 0.93],
+    min: -60,
+    max: 0,
+    target:"OSC", key:'/Alloaudio/meterdb'
+})
+panel.add( multiSlider, d);
+
+for (var i=0;i<numchnls;i++)
+{
+    var x = i/numchnls;
+    c = new Interface.Label({
+        bounds:[x, 0.9, 1/numchnls, 0.3],
+        value: i + 1,
+        vAlign: 'middle'
+    })
+    panel.add( c );
+}
+Interface.OSC.receive = function(address, typetags, parameters) {
+    window.alert(address + typetags + parameters);
+    if (address === '/Alloaudio/meterdb/') {
+        //window.alert(address + typetags + parameters);
+        c.children[parameters[0]].setValue( parameters[1] );
+    }
+}
+  </script>
+</body>
+</html>

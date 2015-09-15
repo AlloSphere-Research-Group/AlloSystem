@@ -93,8 +93,11 @@ struct SceneWindowHandler : public WindowEventHandler{
 bool SceneWindowHandler::onFrame(){
 
 	if(app.clockNav() == &win){
-		app.nav().smooth(0.8);
-		app.nav().step();
+		double dt = win.spfActual();
+		app.nav().smooth(::pow(0.0001, dt));
+		app.nav().step(dt * 40./*FPS*/);
+		//app.nav().smooth(0.8);
+		//app.nav().step(1.);
 	}
 
 	app.navDraw() = app.nav();

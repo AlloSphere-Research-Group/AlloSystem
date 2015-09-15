@@ -1,10 +1,11 @@
- /*
+/*
 
    sliceassembler
 
    Voxel data import aka slice assembler aka volume reconstructor 
 
    by Matt Wright, April 2015
+   modified by Hannah Wolfe, July 2015
 
    based on tiExporter.cpp from images2raw.cpp by Coby Kaufer
    <cobykaufer@bluejayke.com>, Karl Yerkes <karl.yerkes@gmail.com>,
@@ -21,15 +22,9 @@
 
    - Ignores all but the red channel
 
-   - Ignores "info.txt" file: assumes 1nm cube voxels  rather than reading in the voxel physical
-     size 
-
-   - Ignores "info.txt" file, not verifying the stated number of images or image resolutions.
-
    - Chokes if directory contains anything besides "info.txt" and image files
 
    - Does nothing useful after reading in all this data
-
 
    Usage:
 
@@ -46,6 +41,7 @@
 #include <dirent.h>
 #include <cassert>
 #include <iostream>
+#include <fstream>
 #include "allocore/al_Allocore.hpp"
 #include "allocore/types/al_Voxels.hpp"
 // #include <conio.h>
@@ -68,6 +64,7 @@ int getdir(string dir, vector<string> &files) {
   while((dirp = readdir(dp)) != NULL) {
     char *name = dirp->d_name;
     if (strcmp(name, ".") && strcmp(name, "..") && strcmp(name, "info.txt")) {
+      cout << name << endl;
       files.push_back(dir + "/" + string(name));
     }
   }
@@ -75,17 +72,32 @@ int getdir(string dir, vector<string> &files) {
   return 0;
 }
 
+int parseInfo(string dir, vector<string> &data){
+  string file = dir + "/info.txt";
+  cout << file << endl;
+  ifstream infile(file.c_str());
+  if (!infile.good())
+    return 1; // exit if file not found
 
-int main(int argc, char *argv[]) {
+  string strOneLine;
 
-  // Parse args...
-  if (argc != 3) {
-    cout << "You suck.  Give a directory and output filename"  << endl;
-    exit(-3);
+  while (infile)
+  {
+    getline(infile, strOneLine);
+    if (strOneLine.length() > 0){
+      data.push_back(strOneLine.substr(strOneLine.find(":")+2,strOneLine.length()));
+    }
   }
 
-  string dir(argv[1]);
+  infile.close();
+
+  return 0;
+}
+
+Voxels voxelsFromDirectory (string dir) {
+  
   vector<string> files;
+  vector<string> info;
 
   // Image and Texture handle reading and displaying image files.
   Image RGBImage; // for reading into
@@ -112,18 +124,35 @@ int main(int argc, char *argv[]) {
   int nx = RGBImage.width();
   int ny = RGBImage.height();
   int nz = files.size();
+  float vx = 1.;
+  float vy = 1.;
+  float vz = 1.;
+  float type = NANOMETERS;
 
-  cout << "Judging by " << files[0] << " each image should be " << nx << " by " <<
-    ny << endl;
+  if (parseInfo(dir,info) == 0){
+    if (info.size() == 4){
+      type = atoi(info[0].c_str());
+      vx = atof(info[1].c_str());
+      vy = atof(info[2].c_str());
+      vz = atof(info[3].c_str());
+      cout << "imported values from info.txt: " << type << ", " << vx << ", " << vy << ", " << vz << endl;
+    } else {
+      cout << info.size() << " info.txt doesn't have enough info, using default data" << endl;
+    }
+  } else {
+    cout << "no info.txt, using default data" << endl;
+  }
+
+  cout << "Judging by " << files[0] << " each image should be " << nx << " by " << ny << endl;
 
   // For now assume 8-bit with 1 nm cube voxels
-  Voxels v(AlloUInt8Ty, nx, ny, nz, 1., 1., 1., NANOMETERS);
-  
+  Voxels v(AlloUInt8Ty, nx, ny, nz, vx, vy, vz, type);
+
   v.print();
 
   // Iterate through entire directory
   int slice = 0;
-  for (vector<string>::iterator it = begin (files); it != end (files); ++it, ++slice) {
+  for (vector<string>::iterator it = files.begin(); it != files.end(); ++it, ++slice) {
     string &filename = *it;
 
     if (RGBImage.load(filename)) {
@@ -155,25 +184,28 @@ int main(int argc, char *argv[]) {
         array.read(&pixel, col, row);
 
         // For now we'll take only the red and put it in the single component; that's lame.
-        v.elem<char>(1, col, row, slice) = (char) pixel.r;
+        v.elem<char>(0, col, row, slice) = (char) pixel.r;
       }
     }
   }
   // v is ready
 
-
-  // how to write raw data without using default voxel file IO system
-  //  const char *outputFile = "VolumeData.raw";
-  //  FILE *fp=fopen(outputFile, "w");
-  //  if (fp == NULL) {
-  //    cout << "error " << errno << " opening " << outputFile << " for writing " << endl;
-  //    exit(-5);
-  //  }
-  //
-  //  char * data =  v.cell<char>(0);
-  //
-  //  fwrite(data, sizeof(char), nx * ny * nz, fp);
-  //  fclose(fp);
-  
-  v.writeToFile(argv[2]);
+  return v;
 }
+
+
+int main(int argc, char *argv[]) {
+
+  // Parse args...
+  if (argc != 2) {
+    cout << "You suck.  Give a directory"  << endl;
+    exit(-3);
+  }
+  
+  string dir(argv[1]);
+  Voxels v = voxelsFromDirectory (dir);
+
+  return 0;
+}
+
+

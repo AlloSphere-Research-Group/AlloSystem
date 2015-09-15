@@ -1,6 +1,37 @@
 project( AlloSystem )
 cmake_minimum_required(VERSION 2.8)
 
+# For unit testing
+ENABLE_TESTING() # Must be here to have tests for the subprojects
+find_program( MEMORYCHECK_COMMAND valgrind )
+set( MEMORYCHECK_COMMAND_OPTIONS "--tool=memcheck --trace-children=yes --leak-check=full" )
+set( MEMORYCHECK_SUPPRESSIONS_FILE "${PROJECT_SOURCE_DIR}/valgrind_suppress.txt" )
+
+# ------ Helper functions
+
+function(add_memcheck_test TEST_NAME)
+  add_test("memcheck_${TEST_NAME}" ${MEMORYCHECK_COMMAND} "${BUILD_ROOT_DIR}/build/bin/${TEST_NAME}" ${MEMORYCHECK_COMMAND_OPTIONS} "--suppressions=${MEMORYCHECK_SUPPRESSIONS_FILE}")
+endfunction(add_memcheck_test)
+
+# Write dummy headers
+function(write_dummy_headers DUMMY_HEADERS HEADERS)
+foreach(HEADER_INFO ${DUMMY_HEADERS})
+	string(REPLACE "::::" ";" HEADER_PARTS ${HEADER_INFO})
+	list(GET HEADER_PARTS 0 header) # First element is header
+	list(GET HEADER_PARTS 1 dependency) # Second element is dependency
+
+	set(DUMMY_HEADER_TEXT "#error \"ERROR: Header not supported. Dependency '${dependency}' not met.\"\n")
+	file(WRITE "${BUILD_ROOT_DIR}/build/include/${header}" ${DUMMY_HEADER_TEXT})
+	message("Writing dummy header: ${header} ---- Unmet dependency: ${dependency}")
+	list(APPEND HEADERS "${BUILD_ROOT_DIR}/build/include/${header}")
+endforeach()
+endfunction()
+
+# If root directory has not been specified, use default
+if(NOT DEFINED BUILD_ROOT_DIR)
+  set(BUILD_ROOT_DIR "${CMAKE_SOURCE_DIR}")
+endif(NOT DEFINED BUILD_ROOT_DIR)
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(DEBUG_SUFFIX "_debug")
   message(STATUS "====== Building Debug version")
@@ -10,6 +41,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   endif((CMAKE_COMPILER_IS_GNUCC) OR (CMAKE_COMPILER_IS_GNUXX))
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
+# Other defaults
 if(NOT DEFINED BUILD_GAMMA)
   set(BUILD_GAMMA 1 CACHE STRING "Try to build external Gamma")
 endif(NOT DEFINED BUILD_GAMMA)
@@ -23,15 +55,18 @@ set(BUILD_EXAMPLES 0 CACHE STRING "Build AlloSystem examples.")
 # External dependencies (Gamma and GLV)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
 
-include(cmake_modules/make_dep.cmake)
+include(cmake_modules/make_dep.cmake) # Functions to build some dependencies like Gamma and GLV
 
 if(BUILD_GAMMA AND NOT GAMMA_LIBRARY)
     make_dep(Gamma)
-    set(GAMMA_LIBRARY ${Gamma_LIBRARY})
+	#set(GAMMA_LIBRARY ${Gamma_LIBRARY})
+	#include_directories(${Gamma_INCLUDE_DIR})
 endif(BUILD_GAMMA AND NOT GAMMA_LIBRARY)
 
 if(BUILD_GLV AND NOT GLV_LIBRARY)
     make_dep(GLV)
+	message(STATUS "Using GLV from: ${GLV_LIBRARY}.")
+	message(STATUS "GLV headers: ${GLV_INCLUDE_DIR}.")
 endif(BUILD_GLV AND NOT GLV_LIBRARY)
 
 # Allocore --------------------------------
@@ -39,9 +74,9 @@ add_subdirectory(allocore)
 get_target_property(ALLOCORE_LIBRARY "allocore${DEBUG_SUFFIX}" LOCATION)
 get_target_property(ALLOCORE_DEP_INCLUDE_DIR "allocore${DEBUG_SUFFIX}" ALLOCORE_DEP_INCLUDE_DIR)
 get_target_property(ALLOCORE_LINK_LIBRARIES "allocore${DEBUG_SUFFIX}" ALLOCORE_LINK_LIBRARIES)
-if(BUILDING_Gamma)
+if(BUILDING_GAMMA)
   add_dependencies("allocore${DEBUG_SUFFIX}" Gamma)
-endif(BUILDING_Gamma)
+endif(BUILDING_GAMMA)
 
 # Alloutil ----------------------------------
 add_subdirectory(alloutil)
@@ -50,7 +85,6 @@ get_target_property(ALLOUTIL_DEP_INCLUDE_DIR alloutil${DEBUG_SUFFIX} ALLOUTIL_DE
 get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil${DEBUG_SUFFIX} ALLOUTIL_LINK_LIBRARIES)
 
 # alloGLV ---------------------------------------
-
 add_subdirectory(alloGLV)
 get_target_property(ALLOGLV_LIBRARY alloGLV${DEBUG_SUFFIX} LOCATION)
 get_target_property(ALLOGLV_INCLUDE_DIR alloGLV${DEBUG_SUFFIX} ALLOGLV_INCLUDE_DIR)
@@ -71,6 +105,9 @@ add_subdirectory(alloaudio)
 get_target_property(ALLOAUDIO_LIBRARY alloaudio${DEBUG_SUFFIX} LOCATION)
 get_target_property(ALLOAUDIO_INCLUDE_DIR alloaudio${DEBUG_SUFFIX} ALLOAUDIO_INCLUDE_DIR)
 get_target_property(ALLOAUDIO_LINK_LIBRARIES alloaudio${DEBUG_SUFFIX} ALLOAUDIO_LINK_LIBRARIES)
+if("alloaudio${DEBUG_SUFFIX}")
+  add_dependencies("alloaudio${DEBUG_SUFFIX}" "${ALLOCORE_LIBRARY}")
+endif("alloaudio${DEBUG_SUFFIX}")
 
 # Run from path (Used in run.sh script)
 if((ALLOSYSTEM_BUILD_DIR) OR (ALLOSYSTEM_BUILD_APP_FILE))
@@ -94,7 +131,12 @@ MACRO(SUBDIRLIST result curdir)
 ENDMACRO()
 
 if(BUILD_EXAMPLES)
-  find_library(Gamma REQUIRED QUIET)
+  if (NOT GAMMA_LIBRARY)
+	find_package(Gamma REQUIRED QUIET)
+  endif (NOT GAMMA_LIBRARY)
+  find_library(CUTTLEBONE_LIBRARY cuttlebone)
+  find_library(MYSQLPP_LIBRARY mysqlpp)
+  if (CUTTLEBONE_LIBRARY AND MYSQLPP_LIBRARY)
   subdirlist(EXAMPLE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/examples)
   #include root projects directory
   list(APPEND EXAMPLE_DIRS ".")
@@ -113,7 +155,7 @@ if(BUILD_EXAMPLES)
 
     foreach(example_src ${EXAMPLE_FILES})
       get_filename_component(EXAMPLE_NAME ${example_src} NAME_WE) # Get name w/o extension
-      set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/build/bin/examples/${dir})
+	  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${BUILD_ROOT_DIR}/build/bin/examples/${dir}")
 
       if ("${dir}" STREQUAL ".")
 	set(EXAMPLE_TARGET examples_${EXAMPLE_NAME})
@@ -156,14 +198,17 @@ if(BUILD_EXAMPLES)
 
     endforeach(example_src)
 
-    foreach(FILENAME ${EXAMPLE_RES_FILES})
+# TODO: solve asset copying
+	foreach(FILENAME ${EXAMPLE_RES_FILES})
       set(SRC "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}")
-      set(DST "${CMAKE_SOURCE_DIR}/build/${FILENAME}")
+	  set(DST "${BUILD_ROOT_DIR}/build/${FILENAME}")
       if(NOT (IS_DIRECTORY ${SRC}))
 	configure_file(${SRC} ${DST} COPY_ONLY)
         message(STATUS "Copying: " ${SRC})
       endif(NOT (IS_DIRECTORY ${SRC}))
     endforeach(FILENAME)
   endforeach(dir)
+
+  endif (CUTTLEBONE_LIBRARY AND MYSQLPP_LIBRARY)
 
 endif(BUILD_EXAMPLES)

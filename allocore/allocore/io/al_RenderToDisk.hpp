@@ -63,7 +63,8 @@ public:
 		REAL_TIME		/**< Real-time rendering */
 	};
 
-	RenderToDisk();
+	/// @param[in] mode		rendering mode, /see mode
+	RenderToDisk(Mode mode = REAL_TIME);
 
 	~RenderToDisk();
 
@@ -121,6 +122,18 @@ public:
 	bool toggle(al::AudioIO& aio, al::Window& win, double fps=-1);
 	bool toggle(al::AudioIO& aio);
 	bool toggle(al::Window& win, double fps=-1);
+
+	/// Save a screenshot to disk
+
+	/// This saves an image of the currently active frame buffer to disk.
+	/// @param[in] w	width in pixels
+	/// @param[in] h	height in pixels
+	/// @param[in] l	column of left pixel
+	/// @param[in] b	row of bottom pixel
+	void saveScreenshot(unsigned w, unsigned h, unsigned l=0, unsigned b=0);
+
+	/// Save a screenshot of a window to disk
+	void saveScreenshot(al::Window& win);
 
 private:
 
@@ -184,13 +197,14 @@ private:
 
 	virtual void onAudioCB(AudioIOData& io);
 	virtual bool onFrame();
+	void makePath();
 	bool start(al::AudioIO * aio, al::Window * win, double fps=-1);
 	bool toggle(al::AudioIO * aio, al::Window * win, double fps=-1);
 	void write(); // Write next block of audio and current frame buffer to files
 	void writeAudio(); // Write next block of audio to sound file
 	void writeImage(); // Write current frame buffer to image file
 	void resetPBOQueue();
-	void saveImage(unsigned w, unsigned h, unsigned l=0, unsigned b=0);
+	void saveImage(unsigned w, unsigned h, unsigned l=0, unsigned b=0, bool usePBO=true);
 };
 
 } // al::

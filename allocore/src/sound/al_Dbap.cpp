@@ -3,7 +3,7 @@
 namespace al{
 
 Dbap::Dbap(const SpeakerLayout &sl, float focus)
-:	Spatializer(sl), mNumSpeakers(0), mFocus(focus)
+:	Spatializer(sl), mListener(NULL), mNumSpeakers(0), mFocus(focus)
 {}
 
 void Dbap::compile(Listener& listener){

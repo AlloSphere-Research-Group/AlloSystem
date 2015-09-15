@@ -46,72 +46,157 @@
 
 namespace al{
 
-/// Add tetrahedron as triangle vertices and indices
+/// Add tetrahedron as indexed triangles
 
-/// @param[in,out]	m		mesh to add vertices and indices to
+/// @param[in,out]	m		Mesh to add vertices and indices to
 /// \returns number of vertices added
 int addTetrahedron(Mesh& m);
 
-/// Add cube as triangle vertices and indices
+/// Add cube as indexed triangles
 
-/// @param[in,out]	m		mesh to add vertices and indices to
+/// @param[in,out]	m		Mesh to add vertices and indices to
 /// \returns number of vertices added
 int addCube(Mesh& m, bool withNormalsAndTexcoords = false, float radius=M_SQRT_1_3);
 
 /// Add octahedron as triangle vertices and indices
 
-/// @param[in,out]	m		mesh to add vertices and indices to
+/// @param[in,out]	m		Mesh to add vertices and indices to
 /// \returns number of vertices added
 int addOctahedron(Mesh& m);
 
-/// Add dodecahedron as triangle vertices and indices
+/// Add dodecahedron as indexed triangles
 
-/// @param[in,out]	m		mesh to add vertices and indices to
+/// @param[in,out]	m		Mesh to add vertices and indices to
 /// \returns number of vertices added
 int addDodecahedron(Mesh& m);
 
-/// Add icosahedron as triangle vertices and indices
+/// Add icosahedron as indexed triangles
 
-/// @param[in,out]	m		mesh to add vertices and indices to
+/// @param[in,out]	m		Mesh to add vertices and indices to
 /// \returns number of vertices added
 int addIcosahedron(Mesh& m);
 
 
-/// Add sphere as triangle vertices and indices
+/// Add sphere as indexed triangles
 
 /// Vertices go stack-by-stack, then slice-by-slice. The stacks start at the
 /// north pole (0,0,radius) and end at the south pole (0,0,-radius).
 /// The slices start on the x axis and go counter-clockwise on the xy plane.
 ///
-/// @param[in,out]	m		mesh to add vertices and indices to
-/// @param[in]		radius	radius of sphere
-/// @param[in]		slices	number of slices around z axis
-/// @param[in]		stacks	number of stacks on xy plane
+/// @param[in,out]	m		Mesh to add vertices and indices to
+/// @param[in]		radius	Radius of sphere
+/// @param[in]		slices	Number of slices around z axis
+/// @param[in]		stacks	Number of stacks on xy plane
 /// \returns number of vertices added
 int addSphere(Mesh& m, double radius=1, int slices=16, int stacks=16);
 int addSphereWithTexcoords(Mesh& m, double radius=1, int bands=16 );
 
 
-/// Add wireframe box as line vertices and indices
+/// Add wireframe box as indexed lines
 
-/// @param[in,out]	m		mesh to add vertices and indices to
-/// @param[in]		width	total width (along x)
-/// @param[in]		height	total height (along y)
-/// @param[in]		depth	total depth (along z)
+/// @param[in,out]	m		Mesh to add vertices and indices to
+/// @param[in]		width	Total width (along x)
+/// @param[in]		height	Total height (along y)
+/// @param[in]		depth	Total depth (along z)
 /// \returns number of vertices added
 int addWireBox(Mesh& m, float width, float height, float depth);
 inline int addWireBox(Mesh& m, float size=1){ return addWireBox(m,size,size,size); }
 
 
-/// Add a tessellated rectangular surface as triangle strip vertices and indices
+/// Add a cone/pyramid as indexed triangles
 
-/// @param[in,out]	m		mesh to add vertices and indices to
-/// @param[in]		Nx		number of vertices along x
-/// @param[in]		Ny		number of vertices along y
-/// @param[in]		width	total width (along x)
-/// @param[in]		height	total height (along y)
-/// @param[in]		x		position of center along x
-/// @param[in]		y		position of center along y
+/// Note that the base lies on the xy plane, thus the shape is not "centered"
+/// on the z axis.
+///
+/// @param[in,out] m		Mesh to add vertices and indices to
+/// @param[in] radius		Radius of base (on xy plane)
+/// @param[in] apex			Position of apex
+/// @param[in] slices		Number of points going around base
+/// @param[in] cycles		Number of cycles to go around base
+///							(should be relatively prime to slices)
+/// \returns number of vertices added
+int addCone(
+	Mesh& m, float radius=1, const Vec3f& apex=Vec3f(0,0,2),
+	unsigned slices=16,
+	unsigned cycles=1
+);
+
+
+/// Add a disc/regular polygon as indexed triangles
+
+/// @param[in,out] m		Mesh to add vertices and indices to
+/// @param[in] radius		Radius of disc (on xy plane)
+/// @param[in] slices		Number of points going around base
+/// \returns number of vertices added
+int addDisc(Mesh& m, float radius=1, unsigned slices=16);
+
+
+/// Add a prism as an indexed triangle strip
+
+/// A prism is formed from a triangle strip between two parallel regular
+/// polygons.
+///
+/// @param[in,out] m		Mesh to add vertices and indices to
+/// @param[in] btmRadius	Radius of bottom polygon (on xy plane)
+/// @param[in] topRadius	Radius of top polygon (on xy plane)
+/// @param[in] height		Distance between planes (along z axis)
+/// @param[in] slices		Number of polygon vertices
+/// @param[in] twist		Rotation factor between polygons;
+///							a value of 0.5 produces an antiprism
+/// \returns number of vertices added
+int addPrism(
+	Mesh& m, float btmRadius=1, float topRadius=1, float height=2,
+	unsigned slices=16,
+	float twist=0
+);
+
+
+/// Add an annulus ("little ring") as an indexed triangle strip
+
+/// @param[in,out] m		Mesh to add vertices and indices to
+/// @param[in] inRadius		Radius of inner circle (on xy plane)
+/// @param[in] outRadius	Radius of outer circle (on xy plane)
+/// @param[in] slices		Number of polygon vertices
+/// @param[in] twist		Rotation factor between polygons
+/// \returns number of vertices added
+int addAnnulus(
+	Mesh& m, float inRadius=0.5, float outRadius=1,
+	unsigned slices=16,
+	float twist=0
+);
+
+
+/// Add an open cylinder as an indexed triangle strip
+
+/// To create a cylinder with different radii for the top and bottom, /see
+/// addPrism.
+///
+/// @param[in,out] m		Mesh to add vertices and indices to
+/// @param[in] radius		Radius (on xy plane)
+/// @param[in] height		Height (along z axis)
+/// @param[in] slices		Number of polygon vertices
+/// @param[in] twist		Rotation factor between polygons
+/// \returns number of vertices added
+int addCylinder(
+	Mesh& m, float radius=1, float height=2,
+	unsigned slices=16,
+	float twist=0
+);
+
+
+/// Add a tessellated rectangular surface as an indexed triangle strip
+
+/// This creates a flat, regularly-tesselated surface lying on the xy plane.
+/// This shape can be used as a starting point for more complex meshes such as 
+/// height maps/terrains and texture-mapped spheres and torii.
+///
+/// @param[in,out]	m		Mesh to add vertices and indices to
+/// @param[in]		Nx		Number of vertices along x
+/// @param[in]		Ny		Number of vertices along y
+/// @param[in]		width	Total width (along x)
+/// @param[in]		height	Total height (along y)
+/// @param[in]		x		Position of center along x
+/// @param[in]		y		Position of center along y
 /// \returns number of vertices added
 int addSurface(
 	Mesh& m, int Nx, int Ny,
@@ -128,21 +213,38 @@ int addSurface(
 /// or closed, [-D/2, D/2], if that dimension does not loop.
 /// The drawing primitive is assumed to be a triangle strip.
 ///
-/// @param[in,out]	m	mesh to add vertices and indices to
-/// @param[in] Nx		number of vertices along x
-/// @param[in] Ny		number of vertices along y
+/// @param[in,out] m	Mesh to add vertices and indices to
+/// @param[in] Nx		Number of vertices along x
+/// @param[in] Ny		Number of vertices along y
 /// @param[in] loopMode	1: connect edges perpendicular to x (cylindrical),
 ///						2: connect edges perpendicular to x and y (toroidal)
-/// @param[in] width	total width (along x)
-/// @param[in] height	total height (along y)
-/// @param[in] x		position of center along x
-/// @param[in] y		position of center along y
-///
+/// @param[in] width	Total width (along x)
+/// @param[in] height	Total height (along y)
+/// @param[in] x		Position of center along x
+/// @param[in] y		Position of center along y
 /// \returns number of vertices added
 int addSurfaceLoop(
 	Mesh& m, int Nx, int Ny, int loopMode,
 	double width=2, double height=2, double x=0, double y=0
 );
+
+
+/// Add a torus as an indexed triangle strip
+
+/// If you need a texture-mapped torus, /see addSurface.
+///
+/// @param[in,out] m		Mesh to add vertices and indices to
+/// @param[in] minRadius	Radius of minor ring
+/// @param[in] majRadius	Radius of major ring
+/// @param[in] Nmin			Number of vertices around minor ring
+/// @param[in] Nmaj			Number of vertices around major ring
+/// @param[in] minPhase		Starting phase along minor ring, in [0,1]
+/// \returns number of vertices added
+int addTorus(
+	Mesh& m, double minRadius=0.3, double majRadius=0.7,
+	int Nmin=16, int Nmaj=16, double minPhase=0
+);
+
 
 } // al::
 

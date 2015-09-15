@@ -2,7 +2,7 @@
 
 namespace al{
 
-    Spatializer::Spatializer(const SpeakerLayout& sl) : mEnabled(true){
+Spatializer::Spatializer(const SpeakerLayout& sl){
 	unsigned numSpeakers = sl.speakers().size();
 	for(unsigned i=0;i<numSpeakers;++i){
 		mSpeakers.push_back(sl.speakers()[i]);
@@ -68,7 +68,7 @@ int SoundSource::bufferSize(double samplerate, double speedOfSound, double dista
 
 
 AudioScene::AudioScene(int numFrames_)
-:   mSpeedOfSound(340), mPerSampleProcessing(true)
+:   mNumFrames(0), mSpeedOfSound(340), mPerSampleProcessing(false)
 {
 	numFrames(numFrames_);
 }

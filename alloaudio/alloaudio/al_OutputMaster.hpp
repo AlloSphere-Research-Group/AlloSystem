@@ -88,7 +88,7 @@ typedef enum {
  *
  * It can be controlled by OSC over UDP.
  */
-class OutputMaster : public osc::Recv
+class OutputMaster : public osc::Recv, public al::AudioCallback
 {
     public:
     /**
@@ -166,15 +166,34 @@ class OutputMaster : public osc::Recv
     /** Get the number of channels processed by this OutputMaster object */
     int getNumChnls();
 
-    /** Process a block of audio data. The io object should come from a previous process,
-     * like an Ambisonics or VBAP panner, as processBlock() processes the output buffer in
-     * the io object in place.
+	/** Process a block of audio data. This can be called by itself passing an AudioIOData
+	 * object or the OutputMaster object can be appended to the
+	 * \code
+	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2, 0, al::AudioIO::DUMMY);
+	al::OutputMaster outmaster(io.channelsOut(), io.framesperSecond());
+	io.append(outmaster);
+	 *
+	 * \endcode
      */
-    void processBlock(AudioIOData &io);
+	void onAudioCB(AudioIOData &io);
 
-    void setGainTimestamped(al_sec until,
-                            int channelIndex, double gain);
-    void setMasterGainTimestamped(al_sec until, double gain);
+	/** Sets whether the meter messages are sent as /Alloaudio/meterdb if 0 -6.02
+	 * or /Alloaudio/meterdb/1 -6.02. The latter includes the channel number in the OSC
+	 * address and counts from 1.
+	 */
+	void setMeterAddrHasChannel(bool meterAddrHasChannel);
+	bool meterAddrHasChannel() const;
+
+	/** Sets the prefix for OSC messages. By default "/Alloaudio" is used. The address
+	 * prefix should be given without the trailing '/'.
+	 */
+	void setAddressPrefix(const std::string &addressPrefix);
+	std::string addressPrefix() const;
+
+protected:
+	void setGainTimestamped(al_sec until,
+							int channelIndex, double gain);
+	void setMasterGainTimestamped(al_sec until, double gain);
     void setClipperOnTimestamped(al_sec until, bool on);
     void setMuteAllTimestamped(al_sec until, bool on);
     void setMeterOnTimestamped(al_sec until, bool on);
@@ -183,14 +202,16 @@ class OutputMaster : public osc::Recv
     void setBassManagementModeTimestamped(al_sec until, int mode);
 
 private:
-    const int m_numChnls;
+	const int m_numChnls;
 
-    /* parameters */
-    std::vector<double> m_gains;
-    bool m_muteAll; // 0=no 1=yes
+	/* parameters */
+	std::string m_addressPrefix;
+	std::vector<double> m_gains;
+	bool m_muteAll; // 0=no 1=yes
     double m_masterGain;
     bool m_clipperOn;
-    bool m_meterOn;
+	bool m_meterOn;
+	bool m_meterAddrHasChannel;
     int m_meterUpdateSamples; /* number of samples between level updates */
 
     bass_mgmt_mode_t m_BassManagementMode;

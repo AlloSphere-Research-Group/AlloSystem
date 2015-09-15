@@ -46,17 +46,15 @@
 #include <string>
 #include <vector>
 
+#include "allocore/io/al_AudioIOData.hpp"
+
 namespace al{
-
-class AudioIOData;
-
 
 /// Audio callback type
 typedef void (* audioCallback)(AudioIOData& io);
 
-
-/// Audio device abstraction
-class AudioDevice{
+/// Audio device
+class AudioDevice: public AudioDeviceInfo {
 public:
 
 	/// Stream mode
@@ -67,149 +65,33 @@ public:
 
 
 	/// @param[in] deviceNum	Device enumeration number
-	AudioDevice(int deviceNum);
+	AudioDevice(int deviceNum = -1);
 
 	/// @param[in] nameKeyword	Keyword to search for in device name
 	/// @param[in] stream		Whether to search for input and/or output devices
 	AudioDevice(const std::string& nameKeyword, StreamMode stream = StreamMode(INPUT | OUTPUT));
 
-	~AudioDevice();
+	virtual bool valid() const;
+	virtual bool hasInput() const;					///< Returns whether device has input
+	virtual bool hasOutput() const;					///< Returns whether device has output
 
-	bool valid() const { return 0!=mImpl; }	///< Returns whether device is valid
-	int id() const { return mID; }			///< Get device unique ID
-	const char * name() const;				///< Get device name
-	int channelsInMax() const;				///< Get maximum number of input channels supported
-	int channelsOutMax() const;				///< Get maximum number of output channels supported
-	double defaultSampleRate() const;		///< Get default sample rate
+	virtual void print() const;						///< Prints info about specific i/o device to stdout
 
-	bool hasInput() const;					///< Returns whether device has input
-	bool hasOutput() const;					///< Returns whether device has output
-
-	void print() const;						///< Prints info about specific i/o device to stdout
-
+	// TODO: these should be removed from here and moved to AudioBackend
 	static AudioDevice defaultInput();		///< Get system's default input device
 	static AudioDevice defaultOutput();		///< Get system's default output device
 	static int numDevices();				///< Returns number of audio i/o devices available
 	static void printAll();					///< Prints info about all available i/o devices to stdout
 
-private:
+protected:
 	void setImpl(int deviceNum);
 	static void initDevices();
-	int mID;
 	const void * mImpl;
 };
 
 inline AudioDevice::StreamMode operator| (const AudioDevice::StreamMode& a, const AudioDevice::StreamMode& b){
 	return static_cast<AudioDevice::StreamMode>(+a|+b);
 }
-
-
-
-/// Audio data to be sent to callback
-
-/// Audio buffers are guaranteed to be stored in a contiguous non-interleaved
-/// format, i.e., frames are tightly packed per channel.
-class AudioIOData {
-public:
-	/// Constructor
-	AudioIOData(void * user);
-
-	virtual ~AudioIOData();
-
-
-	/// Iterate frame counter, returning true while more frames
-	bool operator()() const { return (++mFrame)<framesPerBuffer(); }
-
-	/// Get current frame number
-	int frame() const { return mFrame; }
-
-	/// Get bus sample at current frame iteration on specified channel
-	float& bus(int chan) const { return bus(chan, frame()); }
-
-	/// Get bus sample at specified channel and frame
-	float& bus(int chan, int frame) const;
-
-	/// Get non-interleaved bus buffer on specified channel
-	float * busBuffer(int chan=0) const { return &bus(chan,0); }
-
-	/// Get input sample at current frame iteration on specified channel
-	const float& in(int chan) const { return in (chan, frame()); }
-
-	/// Get input sample at specified channel and frame
-	const float& in (int chan, int frame) const;
-
-	/// Get non-interleaved input buffer on specified channel
-	const float * inBuffer(int chan=0) const { return &in(chan,0); }
-
-	/// Get output sample at current frame iteration on specified channel
-	float& out(int chan) const { return out(chan, frame()); }
-
-	/// Get output sample at specified channel and frame
-	float& out(int chan, int frame) const;
-
-	/// Get non-interleaved output buffer on specified channel
-	float * outBuffer(int chan=0) const { return &out(chan,0); }
-
-	/// Add value to current output sample on specified channel
-	void sum(float v, int chan) const { out(chan)+=v; }
-
-	/// Add value to current output sample on specified channels
-	void sum(float v, int ch1, int ch2) const { sum(v, ch1); sum(v,ch2); }
-
-	/// Get sample from temporary buffer at specified frame
-	float& temp(int frame) const;
-
-	/// Get non-interleaved temporary buffer on specified channel
-	float * tempBuffer() const { return &temp(0); }
-
-	void * user() const{ return mUser; } ///< Get pointer to user data
-
-	template<class UserDataType>
-	UserDataType& user() const { return *(static_cast<UserDataType *>(mUser)); }
-
-	int channelsIn () const;			///< Get effective number of input channels
-	int channelsOut() const;			///< Get effective number of output channels
-	int channelsBus() const;			///< Get number of allocated bus channels
-	int channelsInDevice() const;		///< Get number of channels opened on input device
-	int channelsOutDevice() const;		///< Get number of channels opened on output device
-    int framesPerBuffer() const;        ///< Get frames/buffer of audio I/O stream
-    
-	double framesPerSecond() const;		///< Get frames/second of audio I/O streams
-	double fps() const { return framesPerSecond(); }
-	double secondsPerBuffer() const;	///< Get seconds/buffer of audio I/O stream
-	double time() const;				///< Get current stream time in seconds
-	double time(int frame) const;		///< Get current stream time in seconds of frame
-
-	void user(void * v){ mUser=v; }		///< Set user data
-	void frame(int v){ mFrame=v-1; }	///< Set frame count for next iteration
-	void zeroBus();						///< Zeros all the bus buffers
-	void zeroOut();						///< Zeros all the internal output buffers
-
-	AudioIOData& gain(float v){ mGain=v; return *this; }
-	bool usingGain() const { return mGain != 1.f || mGainPrev != 1.f; }
-
-protected:
-	class Impl; Impl * mImpl;
-	void * mUser;					// User specified data
-	mutable int mFrame;
-	int mFramesPerBuffer;
-	double mFramesPerSecond;
-	float *mBufI, *mBufO, *mBufB;	// input, output, and aux buffers
-	float * mBufT;					// temporary one channel buffer
-	int mNumI, mNumO, mNumB;		// input, output, and aux channels
-public:
-	float mGain, mGainPrev;
-};
-
-
-
-/// Interface for objects which can be registered with an audio IO stream
-class AudioCallback {
-public:
-	virtual ~AudioCallback() {}
-	virtual void onAudioCB(AudioIOData& io) = 0;	///< Callback
-};
-
 
 /// Audio input/output streaming
 class AudioIO : public AudioIOData {
@@ -223,17 +105,21 @@ public:
 	/// @param[in] userData			Pointer to user data accessible within callback (optional)
 	/// @param[in] outChans			Number of output channels to open
 	/// @param[in] inChans			Number of input channels to open
+	/// @param[in] devNum			ID of the device to open. -1 Uses default device.
+	/// @param[in] backend			Audio backend to use
 	/// If the number of input or output channels is greater than the device
 	/// supports, virtual buffers will be created.
-	AudioIO(
-		int framesPerBuf=64, double framesPerSec=44100.0,
-		void (* callback)(AudioIOData &) = 0, void * userData = 0,
-		int outChans = 2, int inChans = 0 );
+	AudioIO(int framesPerBuf=64, double framesPerSec=44100.0,
+			void (* callback)(AudioIOData &) = 0, void * userData = 0,
+			int outChans = 2, int inChans = 0,
+			AudioIO::Backend backend = PORTAUDIO
+			);
 
 	virtual ~AudioIO();
 
 	using AudioIOData::channelsIn;
 	using AudioIOData::channelsOut;
+	using AudioIOData::channelsBus;
 	using AudioIOData::framesPerBuffer;
 	using AudioIOData::framesPerSecond;
 
@@ -242,6 +128,8 @@ public:
 	/// Add an AudioCallback handler (internal callback is always called first)
 	AudioIO& append(AudioCallback& v);
 	AudioIO& prepend(AudioCallback& v);
+	AudioIO& insertBefore(AudioCallback& v);
+	AudioIO& insertAfter(AudioCallback& v);
 
 	/// Remove all input event handlers matching argument
 	AudioIO& remove(AudioCallback& v);
@@ -270,6 +158,8 @@ public:
 
 	void channelsIn(int n){channels(n,false);}	///< Set number of input channels
 	void channelsOut(int n){channels(n,true);}	///< Set number of output channels
+	int channelsInDevice() const;				///< Get number of channels opened on input device
+	int channelsOutDevice() const;				///< Get number of channels opened on output device
 	void channelsBus(int num);					///< Set number of bus channels
 	void clipOut(bool v){ mClipOut=v; }			///< Set whether to clip output between -1 and 1
 	void device(const AudioDevice& v);			///< Set input/output device (must be duplex)
@@ -290,20 +180,10 @@ private:
 	bool mAutoZeroOut;		// whether to automatically zero output buffers each block
 	std::vector<AudioCallback *> mAudioCallbacks;
 
-	void init();			//
+	void init(int outChannels, int inChannels);			//
 	void reopen();			// reopen stream (restarts stream if needed)
 	void resizeBuffer(bool forOutput);
 };
-
-
-
-
-
-//==============================================================================
-inline float&       AudioIOData::bus(int c, int f) const { return mBufB[c*framesPerBuffer() + f]; }
-inline const float& AudioIOData::in (int c, int f) const { return mBufI[c*framesPerBuffer() + f]; }
-inline float&       AudioIOData::out(int c, int f) const { return mBufO[c*framesPerBuffer() + f]; }
-inline float&       AudioIOData::temp(int f) const { return mBufT[f]; }
 
 } // al::
 

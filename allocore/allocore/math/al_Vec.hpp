@@ -120,8 +120,8 @@ public:
 	Vec(const T& v1, const T& v2, const T& v3, const T& v4){ set(v1, v2, v3, v4); }
 
 	/// @param[in] v		vector to initialize all elements to
-	template <class T2>
-	Vec(const Vec<N, T2>& v){ set(v); }
+	template <int N2, class T2>
+	Vec(const Vec<N2, T2>& v){ set(v); }
 
 	/// @param[in] v		vector to initialize all elements to
 	/// @param[in] s		value of last element

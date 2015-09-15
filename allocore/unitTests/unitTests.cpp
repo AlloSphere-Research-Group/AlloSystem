@@ -35,17 +35,22 @@ int main (int argc, char * const argv[]) {
 
 	RUNTEST(GraphicsMesh);
 
-	// This test should always be run last since it calls exit()
-	printf("IOWindow\n");
-	utIOWindowGL();
+#ifndef ALLOCORE_TESTS_NO_AUDIO
+	RUNTEST(IOAudioIO);
+#endif
 
+#ifndef ALLOCORE_TESTS_NO_GUI
+	// This test should always be run last since it calls exit()
+	// This test will not run on headless machines.
+	printf("IOWindow .... (calls exit() internally)\n");
+	utIOWindowGL();
+#endif
 
 	// Empirical tests; leave commented
 	// These are tests that require some kind of observation to validate.
 
 //	utAsset();
 //	utGraphicsDraw();
-//	utIOAudioIO();
 
 	return 0;
 }

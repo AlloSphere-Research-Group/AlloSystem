@@ -158,22 +158,20 @@ public:
 	};
 
 
-	ShaderProgram()
-	:	mInPrim(Graphics::TRIANGLES), mOutPrim(Graphics::TRIANGLES), mOutVertices(3),
-		mActive(true)
-	{}
+	ShaderProgram();
 
 	/// Any attached shaders will automatically be detached, but not deleted.
-	virtual ~ShaderProgram(){ destroy(); }
+	virtual ~ShaderProgram();
 
-	/// input Shader s will be compiled if necessary:
+
+	/// Attach shader to program
+
+	/// The input shader will be compiled if necessary.
+	///
 	ShaderProgram& attach(Shader& s);
-	const ShaderProgram& detach(const Shader& s) const;
 
-	// These parameters must be set before attaching geometry shaders
-	void setGeometryInputPrimitive(Graphics::Primitive prim){ mInPrim = prim; }
-	void setGeometryOutputPrimitive(Graphics::Primitive prim){ mOutPrim = prim; }
-	void setGeometryOutputVertices(unsigned int i){ mOutVertices = i; }
+	/// Detach shader from program
+	const ShaderProgram& detach(const Shader& s) const;
 
 	// If dovalidate == true, immediately calls validate()
 	// you might not want to do this if you need to set uniforms before validating
@@ -182,6 +180,14 @@ public:
 
 	// check if compilation/linking was successful (prints an error on failure)
 	const ShaderProgram& validate_linker() const;
+
+	/// Compile and link shader sources
+	bool compile(
+		const std::string& vertSource,
+		const std::string& fragSource,
+		const std::string& geomSource=""
+	);
+
 
 	const ShaderProgram& use();
 
@@ -202,6 +208,12 @@ public:
 
 	/// Returns whether program linked successfully.
 	bool linked() const;
+
+
+	// These parameters must be set before attaching geometry shaders
+	void setGeometryInputPrimitive(Graphics::Primitive prim){ mInPrim = prim; }
+	void setGeometryOutputPrimitive(Graphics::Primitive prim){ mOutPrim = prim; }
+	void setGeometryOutputVertices(unsigned int i){ mOutVertices = i; }
 
 	void listParams() const;
 	const ShaderProgram& uniform(const char * name, int v0) const;

@@ -63,5 +63,10 @@ bool Voxels::writeToFile(std::string filename) {
   
   return true;
 }
+  
+void Voxels::print(FILE * fp) {
+  Array::print(fp);
+  fprintf(fp,"  cell:   %s, %s, %s\n", sizexname().c_str(), sizeyname().c_str(), sizezname().c_str());
+}
 
 }

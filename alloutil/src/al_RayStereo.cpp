@@ -1,5 +1,8 @@
+#include "json/json.h" // Parses configuration
+#include <iostream>
+#include <fstream>
+
 #include "allocore/io/al_Socket.hpp" // for hostname
-#include "alloutil/al_Lua.hpp" // for hostname
 #include "allocore/graphics/al_Image.hpp"
 #include "allocore/graphics/al_Shader.hpp"
 #include "allocore/io/al_File.hpp"
@@ -7,7 +10,8 @@
 
 using namespace al;
 
-static Lua L;
+static Json::Value config;
+static std::string errors;
 
 static float fovy = M_PI;
 static float aspect = 2.;
@@ -317,6 +321,11 @@ RayStereo& RayStereo::generateConfig(BlendMode bm) {
 
 RayStereo& RayStereo::loadConfig(std::string configpath, std::string configname) {
   if (configpath == "") {
+    #ifdef AL_WINDOWS
+    // Calibration files should be kept at the root of the C: drive on Windows.
+    configpath = "C:";
+    #else
+    // A bit of C trickery to get the absolute path of the home directory on *nix systems.
     FILE *pipe = popen("echo ~", "r");
     if (pipe) {
       char c;
@@ -327,114 +336,85 @@ RayStereo& RayStereo::loadConfig(std::string configpath, std::string configname)
       }
       pclose(pipe);
     }
-    configpath += "/calibration-current/";
+    #endif
+    
+    configpath += "/calibration-current";
   }
   
-	if (L.dofile(configpath + "/" + configname + ".lua", 0)) {
-    printf("Config file not found. Generating default config.\n");
+  std::string config_file_name = configpath + "/" + configname + ".json";
+  
+  static std::ifstream config_file(config_file_name.c_str(), std::ifstream::binary | std::ifstream::in);
+  if (config_file.fail()){
+    std::cout  << " Failed to find configuration file: " << configname << ".json" << std::endl;
+    std::cout << " Using default configuration file." << std::endl;
     return *this;
+  } else {
+    config_file >> config;
+    config_file.close();
   }
-  else printf("Reading in config file: %s.lua\n", configname.c_str());
-	
-	L.getglobal("projections");
-	if (!lua_istable(L, -1)) {
-		printf("config file %s has no projections\n", configpath.c_str());
-		return *this;
-	}
-	int projections = L.top();
-	
-	// set active stereo
-	lua_getfield(L, projections, "active");
-	if (lua_toboolean(L, -1)) {
-		mMode = ACTIVE;
+  
+  if ( config.empty() ){
+    std::cout  << " Failed to parse configuration file: " << configname << ".json" << std::endl;
+    std::cout << errors << std::endl;
+    std::cout << " Using default configuration file." << std::endl;
+    return *this;
+  } else {
+    std::cout << " Parsed configuration file: " << configname << ".json" << std::endl;
+  }
+  
+  if ( config["active"].asBool() ) {
+    mMode = ACTIVE;
     mActivePossible = true;
-	}
-	L.pop(); //active
-	
-	// set fullscreen by default mode?
-	lua_getfield(L, projections, "fullscreen");
-	if (lua_toboolean(L, -1)) {
-		mFullScreen = true;
-	}
-	L.pop(); // fullscreen
-	
-	// set resolution?
-	lua_getfield(L, projections, "resolution");
-	if (lua_isnumber(L, -1)) {
-		resolution(lua_tonumber(L, -1));
-	}
-	L.pop(); // resolution
-	
-	mNumProjections = lua_objlen(L, projections);
-	printf("found %d viewports\n", mNumProjections);
-	
-	for (unsigned i=0; i<mNumProjections; i++) {
-		L.push(i+1);
-		lua_gettable(L, projections);
-		int projection = L.top();
-		//L.dump("config");
-		
-		lua_getfield(L, projection, "viewport");
-		if (lua_istable(L, -1)) {
-			int viewport = L.top();
-			lua_getfield(L, viewport, "l");
-			mProjections[i].viewport().l = L.to<float>(-1);
-			L.pop();
-			
-			lua_getfield(L, viewport, "b");
-			mProjections[i].viewport().b = L.to<float>(-1);
-			L.pop();
-			
-			lua_getfield(L, viewport, "w");
-			mProjections[i].viewport().w = L.to<float>(-1);
-			L.pop();
-			
-			lua_getfield(L, viewport, "h");
-			mProjections[i].viewport().h = L.to<float>(-1);
-			L.pop();
-			
-		}
-		L.pop(); // viewport
-		
-		lua_getfield(L, projection, "warp");
-		if (lua_istable(L, -1)) {
-			int warp = L.top();
-			
-			lua_getfield(L, warp, "file");
-			if (lua_isstring(L, -1)) {
-				// load from file
-				mProjections[i].readWarp(configpath + "/" + lua_tostring(L, -1));
-			} else {
-        mProjections[i].warp().array().fill(fillRect);
-        mProjections[i].warp().dirty();
+  }
+  
+  if ( config["fullscreen"].asBool() ) {
+    mFullScreen = true;
+  }
+  
+  if ( config["resolution"].isUInt() ) {
+    resolution(config["resolution"].asUInt());
+  }
+  
+  mNumProjections = config["projections"].size();
+  printf("Found %d viewports.\n", mNumProjections);
+  
+  for (unsigned i=0; i<mNumProjections; i++) {
+    Json::Value& projection = config["projections"][i];
+    Projection& mprojection = mProjections[i];
+    
+    Json::Value& viewport = projection["viewport"];
+    if ( ! viewport.isNull() ) {
+      mprojection.viewport().l = viewport["l"].asFloat();
+      mprojection.viewport().b = viewport["b"].asFloat();
+      mprojection.viewport().w = viewport["w"].asFloat();
+      mprojection.viewport().h = viewport["h"].asFloat();
+    }
+    
+    Json::Value& warp = projection["warp"];
+    if ( ! warp.isNull() ) {
+      if ( warp["file"].isString() ) {
+        mprojection.readWarp( configpath + "/" + warp["file"].asString() );
+      } else {
+        mprojection.warp().array().fill(fillRect);
+        mprojection.warp().dirty();
       }
-			L.pop();
-		}
-		L.pop(); // warp
-		
-		lua_getfield(L, projection, "blend");
-		if (lua_istable(L, -1)) {
-			int blend = L.top();
-			lua_getfield(L, blend, "file");
-			if (lua_isstring(L, -1)) {
-				// load from file
-				mProjections[i].readBlend(configpath + "/" + lua_tostring(L, -1));
-			} else {
-				// default blend of 1:
+    }
+    
+    Json::Value& blend = projection["blend"];
+    if ( ! blend.isNull() ) {
+      if ( blend["file"].isString() ) {
+        mprojection.readBlend( configpath + "/" + blend["file"].asString() );
+      } else {
+        // default blend of 1:
         uint8_t white = 255;
-        mProjections[i].blend().array().set2d(&white);
-        mProjections[i].blend().dirty();
-			}
-			L.pop();
-		}
-		L.pop(); // blend
-		
-		L.pop(); // projector
-	}
-	
-	L.pop(); // the projections table
-	return *this;
-}
+        mprojection.blend().array().set2d(&white);
+        mprojection.blend().dirty();
+      }
+    }
+  }
+  
+  return *this;
+ }
 
 void RayStereo::onCreate() {
 	// force allocation of warp/blend textures:
