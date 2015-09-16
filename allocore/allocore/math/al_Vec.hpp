@@ -336,7 +336,8 @@ public:
 	Vec byz(T shift) const { return by<2>(shift); }
 
 	/// Returns dot (inner) product between vectors
-	T dot(const Vec& v) const {
+	template <class U>
+	T dot(const Vec<N,U>& v) const {
 		T r = (*this)[0] * v[0];
 		for(int i=1; i<N; ++i){ r += (*this)[i] * v[i]; }
 		return r;
