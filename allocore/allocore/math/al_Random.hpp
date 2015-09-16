@@ -229,12 +229,16 @@ public:
 
 	/// Change the type of equation used.
 
-	/// 0 - Marsaglia, Super-Duper\n
-	///
+	/// 0 - L'Ecuyer M8  (optimal generator for <=  8 dimensions)\n
+	/// 1 - L'Ecuyer M16 (optimal generator for <= 16 dimensions)\n
+	/// 2 - L'Ecuyer M32 (optimal generator for <= 32 dimensions)\n
+	/// 3 - Marsaglia, Super-Duper\n
 	void type(int v){
 		switch(v){
-		default:
-		case 0: mMul = 69069; break;
+		default:mMul = 2891336453UL; break; // L'Ecuyer M8
+		case 1: mMul =   29943829UL; break; // L'Ecuyer M16
+		case 2: mMul =   32310901UL; break; // L'Ecuyer M32
+		case 3: mMul =      69069UL; break; // Super-duper
 		}
 	}
 
