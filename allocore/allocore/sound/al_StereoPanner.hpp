@@ -37,13 +37,13 @@ public:
             float gainL, gainR;
             equalPowerPan(relpos.x, gainL, gainR);
             
-            io.out(0, frameIndex) = gainL*sample;
-            io.out(1, frameIndex) = gainR*sample;
+            io.out(0, frameIndex) += gainL*sample;
+            io.out(1, frameIndex) += gainR*sample;
         }
         else // dont pan
         {
             for(int i = 0; i < numSpeakers; i++)
-                io.out(i, frameIndex) = sample;
+                io.out(i, frameIndex) += sample;
         }
         
     }
@@ -53,16 +53,13 @@ public:
     {
         if(numSpeakers == 2 && mEnabled)
         {
-            float *bufL = io.outBuffer(0);
-            float *bufR = io.outBuffer(1);
-            
             float gainL, gainR;
             equalPowerPan(relpos.x, gainL, gainR);
             
             for(int i = 0; i < numFrames; i++)
             {
-                bufL[i] = gainL*samples[i];
-                bufR[i] = gainR*samples[i];
+                io.out(0, i) += gainL*samples[i];
+                io.out(1, i) += gainR*samples[i];
             }
         }
         else // dont pan

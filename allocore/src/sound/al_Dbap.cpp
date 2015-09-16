@@ -20,21 +20,35 @@ void Dbap::compile(Listener& listener){
 
 //#if !ALLOCORE_GENERIC_AUDIOSCENE
     
-void Dbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples){
+void Dbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples)
+{
 	for (unsigned k = 0; k < mNumSpeakers; ++k)
 	{
         float gain = 1.f;
+        float prevGain = 1.f;
         if(mEnabled)
         {
+            float foc = mFocus;
+            
+            foc *= src.mSoundFocus; //0 to 1
+            
             Vec3d vec = relpos - mSpeakerVecs[k];
             float dist = vec.mag();
-            gain = 1.f / (1.f + dist);
-            gain = powf(gain, mFocus);
+            gain = 1.f / powf((1.f + dist), foc);
+            if(mFocus > 1) gain *= foc;
+            
+            Vec3d prevVec = src.posHistory()[1] - mSpeakerVecs[k];
+            float prevDist = dist = prevVec.mag();
+            prevGain = 1.f / powf((1.f + prevDist), foc);
+            if(mFocus > 1) prevGain *= foc;
         }
 
 		float * out = io.outBuffer(mDeviceChannels[k]);
-		for(int i = 0; i < numFrames; ++i){
-			out[i] += gain * samples[i];
+		for(int i = 0; i < numFrames; ++i)
+        {
+            float f = (float)i/(float)(numFrames-1);
+            float g = f*gain + (1.f - f)*prevGain;
+			out[i] += g * samples[i];
 		}
 	}
 }
@@ -46,10 +60,16 @@ void Dbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& 
         float gain = 1.f;
         if(mEnabled)
         {
+            float foc = mFocus;
+            
+            foc *= src.mSoundFocus; //0 to 1
+            
             Vec3d vec = relpos - mSpeakerVecs[i];
             float dist = vec.mag();
-            gain = 1.f / (1.f + dist);
-            gain = powf(gain, mFocus);
+            gain = 1.f / powf((1.f + dist), foc);
+            //gain = 1.f / (1.f + dist);
+            //gain = powf(gain, mFocus);
+            if(mFocus > 1) gain *= foc;
         }
         
         io.out(mDeviceChannels[i], frameIndex) += gain*sample;

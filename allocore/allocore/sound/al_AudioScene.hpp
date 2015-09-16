@@ -324,11 +324,14 @@ public:
     
     BiQuadNX presenceFilter; //used for presence filtering and spatial modulation BW control
     
+    float mSoundFocus; //temp hack for per sound dbap spread...
+    
 protected:
 	RingBuffer<float> mSound;		// spherical wave around position
 	bool mUseAtten;
     DopplerType mDopplerType;
     bool mUsePerSampleProcessing;
+    
 };
 
 
@@ -393,7 +396,8 @@ protected:
 	Listeners mListeners;
 	Sources mSources;
 	int mNumFrames;				// audio frames per block
-	std::vector<float> mBuffer;	// temporary frame buffer
+	//std::vector<float> mBuffer;	// temporary frame buffer
+    float *mBuffer;	// temporary frame buffer
 	double mSpeedOfSound;		// distance per second
     bool mPerSampleProcessing;
 };
