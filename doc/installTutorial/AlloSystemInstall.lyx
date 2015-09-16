@@ -2520,6 +2520,27 @@ http://www.blackviper.com/windows-services/application-experience/
 \end_layout
 
 \begin_layout Subsection
+MinGW/MSYS: '_hypot' was not declared in this scope
+\end_layout
+
+\begin_layout Standard
+If you get this error when compiling, open the file 
+\family typewriter
+C:/MinGW/include/math.h
+\family default
+, go to the line number indicated in the error message and change the function
+ name 
+\family typewriter
+_hypot
+\family default
+ to 
+\family typewriter
+hypot
+\family default
+.
+\end_layout
+
+\begin_layout Subsection
 OS X: Problems After Upgrading OS
 \end_layout
 
