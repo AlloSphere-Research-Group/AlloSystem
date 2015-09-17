@@ -169,10 +169,10 @@ protected:
 			// write glyph bitmap into texture:
 			FT_Bitmap *bitmap = &mFace->glyph->bitmap;
 			//if(font.mAntiAliased) {
-				for(unsigned j=0; j < bitmap->rows; j++) {
+				for(int j=0; j < bitmap->rows; j++) {
 					unsigned char *pix = image + j*rowstride;
 					unsigned char *font_pix = bitmap->buffer + j*bitmap->width;
-					for(unsigned k=0; k < bitmap->width; k++) {
+					for(int k=0; k < bitmap->width; k++) {
 						*pix++ = *font_pix++;
 					}
 				}
