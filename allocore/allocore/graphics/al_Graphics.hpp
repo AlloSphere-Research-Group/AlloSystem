@@ -427,12 +427,20 @@ public:
 	template <class T>
 	void scale(const Vec<3,T>& v){ scale(v[0],v[1],v[2]); }
 
+	/// Scale current matrix along each dimension
+	template <class T>
+	void scale(const Vec<2,T>& v){ scale(v[0],v[1]); }
+
 	/// Translate current matrix
 	void translate(double x, double y, double z=0.);
 
 	/// Translate current matrix
 	template <class T>
 	void translate(const Vec<3,T>& v){ translate(v[0],v[1],v[2]); }
+
+	/// Translate current matrix
+	template <class T>
+	void translate(const Vec<2,T>& v){ translate(v[0],v[1]); }
 
 
 	// Immediate Mode
