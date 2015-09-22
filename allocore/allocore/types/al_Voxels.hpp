@@ -33,9 +33,11 @@
 
 
         File description:
-        Volume of voxels with physical size
+        Voxel Array Class for scientific volumetric data, containing
+        physical metadata
 
-        Voxels are basically just 3D AlloArrays with some size info
+        Base structure utilizes 3D AlloArray class, with support for
+        MRC file format
 
         File author(s):
         Matt Wright, 2015, matt@create.ucsb.edu
@@ -75,28 +77,103 @@
 using namespace al;
 using namespace std;
 
-
-
-
 namespace al {
 
 typedef float UnitsTy;
 
-#define PICOMETERS -12
-#define ANGSTROMS -10
-#define NANOMETERS -9
-#define MICROMETERS -6
-#define MILLIMETERS -3
-#define CENTIMETERS -2
-#define METERS 0
-#define KILOMETERS 3
+enum VoxelUnits {
+  VOX_PICOMETERS = -12,
+  VOX_ANGSTROMS = -10,
+  VOX_NANOMETERS = -9,
+  VOX_MICROMETERS = -6,
+  VOX_MILLIMETERS = -3,
+  VOX_CENTIMETERS = -2,
+  VOX_METERS = 0,
+  VOX_KILOMETERS = 3
+};
+
+enum MRCMode {
+  MRC_IMAGE_SINT8 = 0,    //image : signed 8-bit bytes range -128 to 127
+  MRC_IMAGE_SINT16 = 1,   //image : 16-bit halfwords
+  MRC_IMAGE_FLOAT32 = 2,    //image : 32-bit reals
+  MRC_TRANSFORM_INT16 = 3,  //transform : complex 16-bit integers
+  MRC_TRANSFORM_FLOAT32 = 4,  //transform : complex 32-bit reals
+  MRC_IMAGE_UINT16 = 6        //image : unsigned 16-bit range 0 to 65535
+};
+
+struct MRCHeader {
+  // @see http://bio3d.colorado.edu/imod/doc/mrc_format.txt
+
+  int32_t   nx;         /*  # of Columns                  */
+  int32_t   ny;         /*  # of Rows                     */
+  int32_t   nz;         /*  # of Sections.                */
+  int32_t   mode;       /*  given by #define MRC_MODE...  */
+
+  int32_t   startx;    /*  Starting point of sub image.  */
+  int32_t   starty;
+  int32_t   startz;
+
+  int32_t   mx;         /* Number of rows to read.        */
+  int32_t   my;
+  int32_t   mz;
+
+  float_t   xlen;       /* length of x element in um.     */
+  float_t   ylen;       /* get scale = xlen/nx ...        */
+  float_t   zlen;
+
+  float_t   alpha;      /* cell angles, ignore */
+  float_t   beta;
+  float_t   gamma;
+
+  int32_t   mapx;       /* map coloumn 1=x,2=y,3=z.       */
+  int32_t   mapy;       /* map row     1=x,2=y,3=z.       */
+  int32_t   mapz;       /* map section 1=x,2=y,3=z.       */
+
+  float_t   amin;
+  float_t   amax;
+  float_t   amean;
+
+  int16_t   ispg;       /* image type */
+  int16_t   nsymbt;     /* space group number */
+
+  /* IMOD-SPECIFIC */
+  int32_t   next;
+  int16_t   creatid;  /* Used to be creator id, hvem = 1000, now 0 */
+  char    blank[30];
+  int16_t   nint;
+  int16_t   nreal;
+  int16_t   sub;
+  int16_t   zfac;
+  float_t   min2;
+  float_t   max2;
+  float_t   min3;
+  float_t   max3;
+  int32_t   imodStamp;
+  int32_t   imodFlags;
+  int16_t   idtype;
+  int16_t   lens;
+  int16_t   nd1;     /* Devide by 100 to get float value. */
+  int16_t   nd2;
+  int16_t   vd1;
+  int16_t   vd2;
+  float_t   tiltangles[6];  /* 0,1,2 = original:  3,4,5 = current */
+
+  /* MRC 2000 standard */
+  float_t   origin[3];
+  char    cmap[4];
+  char    machinestamp[4];
+  float_t   rms;
+
+  int32_t nlabl;  // number of labels
+  char  labels[10][80];
+};
 
 /// OBJECT-oriented interface to AlloArray
 class Voxels : public Array {
 public:
   Voxels() :
       Array() {
-    init(1,1,1, METERS);
+    init(1,1,1, VOX_METERS);
   }
 
   /// Construct dimx x dimy x dimz voxel grid giving 3D size of each voxel cuboid with units
@@ -109,7 +186,7 @@ public:
   /// Construct dimx x dimy x dimz voxel grid giving 3D size of each voxel cuboid in meters
   Voxels(AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz, float sizex, float sizey, float sizez) :
       Array(1, ty, dimx, dimy, dimz) {
-    init(sizex, sizey, sizez, METERS);
+    init(sizex, sizey, sizez, VOX_METERS);
   }
 
   /// Construct dimx x dimy x dimz voxel grid giving dimension of each voxel cube with units
@@ -121,7 +198,7 @@ public:
   /// Construct dimx x dimy x dimz voxel grid with every voxel 1m x 1m x 1m
   Voxels(AlloTy ty, uint32_t dimx, uint32_t dimy, uint32_t dimz) :
       Array(1, ty, dimx, dimy, dimz) {
-    init(1, 1, 1, METERS);
+    init(1, 1, 1, VOX_METERS);
   }
 
   int getdir(string dir, vector<string> &files) {
@@ -134,8 +211,8 @@ public:
     while((dirp = readdir(dp)) != NULL) {
       char *name = dirp->d_name;
       if (strcmp(name, ".") && strcmp(name, "..") && strcmp(name, "info.txt")) {
-	cout << name << endl;
-	files.push_back(dir + "/" + string(name));
+      	cout << name << endl;
+      	files.push_back(dir + "/" + string(name));
       }
     }
     closedir(dp);
@@ -156,7 +233,7 @@ public:
     {
       getline(infile, strOneLine);
       if (strOneLine.length() > 0){
-	data.push_back(strOneLine.substr(strOneLine.find(":")+2,strOneLine.length()));
+      	data.push_back(strOneLine.substr(strOneLine.find(":")+2,strOneLine.length()));
       }
     }
 
@@ -226,17 +303,17 @@ public:
     float vx = 1.;
     float vy = 1.;
     float vz = 1.;
-    float type = NANOMETERS;
+    float type = VOX_NANOMETERS;
 
-    if (parseInfo(dir,info) == 0){
-      if (info.size() == 4){
-	type = atoi(info[0].c_str());
-	vx = atof(info[1].c_str());
-	vy = atof(info[2].c_str());
-	vz = atof(info[3].c_str());
-	cout << "imported values from info.txt: " << type << ", " << vx << ", " << vy << ", " << vz << endl;
+    if (parseInfo(dir,info) == 0) {
+      if (info.size() == 4) {
+      	type = atoi(info[0].c_str());
+      	vx = atof(info[1].c_str());
+      	vy = atof(info[2].c_str());
+      	vz = atof(info[3].c_str());
+      	cout << "imported values from info.txt: " << type << ", " << vx << ", " << vy << ", " << vz << endl;
       } else {
-	cout << info.size() << " info.txt doesn't have enough info, using default data" << endl;
+      	cout << info.size() << " info.txt doesn't have enough info, using default data" << endl;
       }
     } else {
       cout << "no info.txt, using default data" << endl;
@@ -255,19 +332,19 @@ public:
       string &filename = *it;
 
       if (RGBImage.load(filename)) {
-	cout << "loaded " << filename << 
-	  " (" << slice+1 << " of " << files.size() << ")" << endl;
+      	cout << "loaded " << filename << 
+      	  " (" << slice+1 << " of " << files.size() << ")" << endl;
       } else {
-	cout << "Failed to read image from " << filename << endl;
-	exit(-4);
+      	cout << "Failed to read image from " << filename << endl;
+      	exit(-4);
       }
 
       // Verify XY resolution
       if (RGBImage.width() != nx || RGBImage.height() != ny) {
-	cout << "Error:  resolution mismatch!" << endl;
-	cout << "   " << files[0] << ": " << nx << " by " << ny << endl;
-	cout << "   " << filename << ": " << RGBImage.width() << " by " << RGBImage.height() << endl;
-	exit(-5);
+      	cout << "Error:  resolution mismatch!" << endl;
+      	cout << "   " << files[0] << ": " << nx << " by " << ny << endl;
+      	cout << "   " << filename << ": " << RGBImage.width() << " by " << RGBImage.height() << endl;
+      	exit(-5);
       }
 	
 
@@ -279,18 +356,15 @@ public:
 
       // Copy it out pixel-by-pixel:
       for (size_t row = 0; row < array.height(); ++row) {
-	for (size_t col = 0; col < array.width(); ++col) {
-	  array.read(&pixel, col, row);
+      	for (size_t col = 0; col < array.width(); ++col) {
+      	  array.read(&pixel, col, row);
 
-	  // For now we'll take only the red and put it in the single component; that's lame.
-	  elem<char>(0, col, row, slice) = (char) pixel.r;
-	}
+      	  // For now we'll take only the red and put it in the single component; that's lame.
+      	  elem<char>(0, col, row, slice) = (char) pixel.r;
+      	}
       }
     }
     // v is ready
-
-   
-
   }
 
   
@@ -333,25 +407,34 @@ public:
   }
   
   const std::string UnitsName(UnitsTy t) {
-    if (t == ANGSTROMS) {
+    if (t == VOX_ANGSTROMS) {
       return "angstroms";
-    } else if (t == NANOMETERS) {
+    } else if (t == VOX_NANOMETERS) {
       return "nm";
-    } else if (t == MICROMETERS) {
+    } else if (t == VOX_MICROMETERS) {
       return "µm";
-    } else if (t == MILLIMETERS) {
+    } else if (t == VOX_MILLIMETERS) {
       return "mm";
     } else {
       std::ostringstream ss;
       ss << "(m*10^" << t << ")";
       return ss.str();
-      //      return "(m*10^" + std::to_string(t) + ")";
     }
   }
+
+  MRCHeader& parseMRC(const char * data);
   
   bool writeToFile(std::string filename);
   
   bool loadFromFile(std::string filename);
+
+  bool loadFromMRC(std::string filename);
+
+  bool loadFromMRC(std::string filename, UnitsTy ty, float len);
+
+  bool loadFromMRC(std::string filename, UnitsTy ty, float lenx, float leny, float lenz);
+
+  bool writeToMRC(std::string filename);
   
   void print(FILE * fp = stdout);
 
@@ -365,6 +448,6 @@ protected:
 
 };
 
-} // ::al::
+} // namespace al
 
 #endif /* INCLUDE_ALLO_VOXELS_HPP */
