@@ -226,7 +226,7 @@ public:
 	}
 
 	// support for building isosurface from al::Voxels class
-	void generate(const Voxels voxels, float glUnitLength) {
+	void generate(const Voxels& voxels, float glUnitLength) {
 		generate((float*)voxels.data.ptr, voxels.dim(0), voxels.dim(1), voxels.dim(2),
 			voxels.getVoxWidth(0)/glUnitLength, voxels.getVoxWidth(1)/glUnitLength, voxels.getVoxWidth(2)/glUnitLength);
 	}
