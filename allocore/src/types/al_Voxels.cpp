@@ -38,22 +38,7 @@ MRCHeader& Voxels::parseMRC(const char * mrcData) {
   }
 
   printf("NX %d NY %d NZ %d\n", mrcHeader.nx, mrcHeader.ny, mrcHeader.nz);
-  printf("mode %d\n", mrcHeader.mode);
-  printf("startX %d startY %d startZ %d\n", mrcHeader.startx, mrcHeader.starty, mrcHeader.startz);
-  printf("intervals X %d intervals Y %d intervals Z %d\n", mrcHeader.mx, mrcHeader.my, mrcHeader.mz);
-  printf("angstroms X %f angstroms Y %f angstroms Z %f\n", mrcHeader.xlen, mrcHeader.ylen, mrcHeader.zlen);
-  printf("axis X %d axis Y %d axis Z %d\n", mrcHeader.mapx, mrcHeader.mapy, mrcHeader.mapz);
-  printf("density min %f max %f mean %f\n", mrcHeader.amin, mrcHeader.amax, mrcHeader.amean);
-  printf("origin %f %f %f\n", mrcHeader.origin[0], mrcHeader.origin[1], mrcHeader.origin[2]);
-  printf("map %s\n", mrcHeader.cmap);
-  printf("machine stamp %s\n", mrcHeader.machinestamp);
-  printf("rms %f\n", mrcHeader.rms);
-  printf("labels %d\n", mrcHeader.nlabl);
-  for (int i=0; i<mrcHeader.nlabl; i++) {
-    //printf("\t%02d: %s\n", i, mrcHeader.labels[i]);
-  }
-
-  const char * start = mrcData + 1024;
+  printf("mode ");
 
   AlloTy ty;
 
@@ -79,6 +64,20 @@ MRCHeader& Voxels::parseMRC(const char * mrcData) {
       printf("MRC mode not supported\n");
       break;
   }
+
+  printf("cell dimensions X %f Y %f Z %f\n", mrcHeader.xlen, mrcHeader.ylen, mrcHeader.zlen);
+  printf("axis X %d axis Y %d axis Z %d\n", mrcHeader.mapx, mrcHeader.mapy, mrcHeader.mapz);
+  printf("density min %f max %f mean %f\n", mrcHeader.amin, mrcHeader.amax, mrcHeader.amean);
+  printf("origin %f %f %f\n", mrcHeader.origin[0], mrcHeader.origin[1], mrcHeader.origin[2]);
+  printf("map %s\n", mrcHeader.cmap);
+  printf("machine stamp %s\n", mrcHeader.machinestamp);
+  printf("rms %f\n", mrcHeader.rms);
+  printf("labels %d\n", mrcHeader.nlabl);
+  for (int i=0; i<mrcHeader.nlabl; i++) {
+    //printf("\t%02d: %s\n", i, mrcHeader.labels[i]);
+  }
+
+  const char * start = mrcData + 1024;
 
   formatAligned(1, ty, mrcHeader.nx, mrcHeader.ny, mrcHeader.nz, 0);
   memcpy(data.ptr, start, size());
@@ -106,6 +105,84 @@ MRCHeader& Voxels::parseMRC(const char * mrcData) {
   return mrcHeader;
 }
 
+bool Voxels::loadFromMRC(std::string filename, bool update) {
+  zero();
+
+  File data_file(filename, "rb", true);
+
+  printf("Reading Data File: %s\n", data_file.path().c_str());
+
+  if(!data_file.opened()) {
+    AL_WARN("Cannot open MRC file");
+    exit(EXIT_FAILURE);
+  }
+
+  MRCHeader header = parseMRC(data_file.readAll());
+
+  data_file.close();
+
+  if (update) {
+    // convert into angstrom
+    header.xlen = m_voxWidth[0] * powf(10.0, m_units + 10);
+    header.ylen = m_voxWidth[1] * powf(10.0, m_units + 10);
+    header.zlen = m_voxWidth[2] * powf(10.0, m_units + 10);
+
+    writeToMRC(filename + "_new", header);
+  } else {
+    m_units = VOX_NANOMETERS; // default to nanometers
+    m_voxWidth[0] = header.xlen * 0.1f;
+    m_voxWidth[1] = header.ylen * 0.1f;
+    m_voxWidth[2] = header.zlen * 0.1f;
+  }
+
+  m_min = header.amin;
+  m_max = header.amax;
+  m_mean = header.amean;
+  m_rms = header.rms;
+
+  return true;
+}
+
+bool Voxels::loadFromMRC(std::string filename, UnitsTy ty, float voxWidth) {
+  m_units = ty;
+  m_voxWidth[0] = voxWidth;
+  m_voxWidth[1] = voxWidth;
+  m_voxWidth[2] = voxWidth;
+
+  loadFromMRC(filename, true);
+
+  return true;
+}
+
+bool Voxels::loadFromMRC(std::string filename, UnitsTy ty, float voxWidthX, float voxWidthY, float voxWidthZ) {
+  m_units = ty;
+  m_voxWidth[0] = voxWidthX;
+  m_voxWidth[1] = voxWidthY;
+  m_voxWidth[2] = voxWidthZ;
+
+  loadFromMRC(filename, true);
+  
+  return true;
+}
+
+bool Voxels::writeToMRC(std::string filename, MRCHeader& header) {
+  File mrc_file(filename, "wb", true);
+  printf("Writing MRC File: %s\n", mrc_file.path().c_str());
+
+  if(!mrc_file.opened()) {
+    AL_WARN("Cannot open MRC file");
+    exit(EXIT_FAILURE);
+  }
+  
+  mrc_file.write(&header, sizeof(MRCHeader), 1);
+
+  mrc_file.write(data.ptr, size(), 1);
+  
+  mrc_file.close();
+  
+  return true;
+}
+
 bool Voxels::loadFromFile(std::string filename) {
   zero();
 
@@ -126,54 +203,13 @@ bool Voxels::loadFromFile(std::string filename) {
   format(h2);
 
   data_file.read(&m_units, sizeof(UnitsTy), 1);
-  data_file.read(&m_sizex, sizeof(float), 1);
-  data_file.read(&m_sizey, sizeof(float), 1);
-  data_file.read(&m_sizez, sizeof(float), 1);
+  data_file.read(&m_voxWidth[0], sizeof(float), 1);
+  data_file.read(&m_voxWidth[1], sizeof(float), 1);
+  data_file.read(&m_voxWidth[2], sizeof(float), 1);
   
   data_file.read(data.ptr, size(), 1);
 
   data_file.close();
-
-  return true;
-}
-
-bool Voxels::loadFromMRC(std::string filename) {
-  zero();
-
-  File data_file(filename, "rb", true);
-
-  printf("Reading Data File: %s\n", data_file.path().c_str());
-
-  if(!data_file.opened()) {
-    AL_WARN("Cannot open MRC file");
-    exit(EXIT_FAILURE);
-  }
-
-  MRCHeader header = parseMRC(data_file.readAll());
-
-  data_file.close();
-
-  return true;
-}
-
-bool Voxels::loadFromMRC(std::string filename, UnitsTy ty, float len) {
-  loadFromMRC(filename);
-
-  m_units = ty;
-  m_sizex = len;
-  m_sizey = len;
-  m_sizez = len;
-
-  return true;
-}
-
-bool Voxels::loadFromMRC(std::string filename, UnitsTy ty, float lenx, float leny, float lenz) {
-  loadFromMRC(filename);
-
-  m_units = ty;
-  m_sizex = lenx;
-  m_sizey = leny;
-  m_sizez = lenz;
 
   return true;
 }
@@ -194,9 +230,9 @@ bool Voxels::writeToFile(std::string filename) {
   voxel_file.write(&header, sizeof(AlloArrayHeader), 1);
 
   voxel_file.write(&m_units, sizeof(UnitsTy), 1);
-  voxel_file.write(&m_sizex, sizeof(float), 1);
-  voxel_file.write(&m_sizey, sizeof(float), 1);
-  voxel_file.write(&m_sizez, sizeof(float), 1);
+  voxel_file.write(&m_voxWidth[0], sizeof(float), 1);
+  voxel_file.write(&m_voxWidth[1], sizeof(float), 1);
+  voxel_file.write(&m_voxWidth[2], sizeof(float), 1);
 
   voxel_file.write(data.ptr, size(), 1);
   
@@ -207,7 +243,7 @@ bool Voxels::writeToFile(std::string filename) {
   
 void Voxels::print(FILE * fp) {
   Array::print(fp);
-  fprintf(fp,"  cell:   %s, %s, %s\n", sizexname().c_str(), sizeyname().c_str(), sizezname().c_str());
+  fprintf(fp,"  cell:   %s, %s, %s\n", printVoxWidth(0).c_str(), printVoxWidth(1).c_str(), printVoxWidth(2).c_str());
 }
 
 }

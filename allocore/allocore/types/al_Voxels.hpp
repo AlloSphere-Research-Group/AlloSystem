@@ -42,23 +42,6 @@
         File author(s):
         Matt Wright, 2015, matt@create.ucsb.edu
         Kon Hyong Kim, 2014, konhyong@gmail.com
-
-        Terminology suggestions for differentiating the number of
-        pixels in each dimension (an integer) versus the physical
-        length scale of a pixel in each dimension (e.g., a number of
-        nanometers):
-
-        dimx
-        xnumcells
-        xcellwidth
-        xcellcount
-        xcellsize
-        xcount
-        numx
-        nx
-
-        Vec3f voxelsize
-
 */
 
 #ifndef INCLUDE_ALLO_VOXELS_HPP
@@ -79,7 +62,7 @@ using namespace std;
 
 namespace al {
 
-typedef float UnitsTy;
+typedef int UnitsTy;
 
 enum VoxelUnits {
   VOX_PICOMETERS = -12,
@@ -109,19 +92,19 @@ struct MRCHeader {
   int32_t   nz;         /*  # of Sections.                */
   int32_t   mode;       /*  given by #define MRC_MODE...  */
 
-  int32_t   startx;    /*  Starting point of sub image.  */
-  int32_t   starty;
-  int32_t   startz;
+  int32_t   nxstart;    /*  Starting point of sub image.  */
+  int32_t   nystart;
+  int32_t   nzstart;
 
-  int32_t   mx;         /* Number of rows to read.        */
+  int32_t   mx;         /* Number of intervals along x,y,z*/
   int32_t   my;
   int32_t   mz;
 
-  float_t   xlen;       /* length of x element in um.     */
-  float_t   ylen;       /* get scale = xlen/nx ...        */
+  float_t   xlen;       /* cell dimensions in angstroms   */
+  float_t   ylen;       /* - MRC2014 standard             */
   float_t   zlen;
 
-  float_t   alpha;      /* cell angles, ignore */
+  float_t   alpha;      /* cell angles                    */
   float_t   beta;
   float_t   gamma;
 
@@ -129,9 +112,9 @@ struct MRCHeader {
   int32_t   mapy;       /* map row     1=x,2=y,3=z.       */
   int32_t   mapz;       /* map section 1=x,2=y,3=z.       */
 
-  float_t   amin;
-  float_t   amax;
-  float_t   amean;
+  float_t   amin;       /* Minimum pixel value            */
+  float_t   amax;       /* Maximum pixel value            */
+  float_t   amean;      /* Mean pixel value            */
 
   int16_t   ispg;       /* image type */
   int16_t   nsymbt;     /* space group number */
@@ -160,9 +143,9 @@ struct MRCHeader {
 
   /* MRC 2000 standard */
   float_t   origin[3];
-  char    cmap[4];
-  char    machinestamp[4];
-  float_t   rms;
+  char    cmap[4];          /* Contains "MAP " for LE, " PAM" for BE */
+  char    machinestamp[4];  /* Little Endian : 68 65 17 17 // Big Endian : 17 17 65 68 */
+  float_t   rms;            /* RMS deviation of densities from mean density */
 
   int32_t nlabl;  // number of labels
   char  labels[10][80];
@@ -368,45 +351,31 @@ public:
   }
 
   
-  void init(float sizex, float sizey, float sizez, UnitsTy units) {
-    m_sizex = sizex;
-    m_sizey = sizey;
-    m_sizez = sizez;
+  void init(float voxWidthX, float voxWidthY, float voxWidthZ, UnitsTy units) {
+    m_voxWidth[0] = voxWidthX;
+    m_voxWidth[1] = voxWidthY;
+    m_voxWidth[2] = voxWidthZ;
     m_units = units;
   }
 
-  float sizex() { return m_sizex;}
-  float sizey() { return m_sizey;}
-  float sizez() { return m_sizez;}
+  float getVoxWidth(unsigned int axis) const { return m_voxWidth[axis]; }
+  void setVoxWidth(unsigned int axis, float voxWidth) { m_voxWidth[axis] = voxWidth; }
 
-  std::string sizexname() {
+  std::string printVoxWidth(unsigned int axis) {
     std::ostringstream ss;
-    ss << m_sizex << " " << UnitsName(m_units);
+    ss << m_voxWidth[axis] << " " << printUnits(m_units);
 
     return ss.str();
-    //    return std::to_string(m_sizex) + " " + UnitsName(m_units);
   }
 
-  std::string sizeyname() {
-    std::ostringstream ss;
-    ss << m_sizey << " " << UnitsName(m_units);
-    return ss.str();
-    //    return std::to_string(m_sizey) + " " + UnitsName(m_units);
-  }
+  UnitsTy getUnits() const { return m_units; }
+  void setUnits(UnitsTy units) { m_units = units; }
 
-  std::string sizezname() {
-    std::ostringstream ss;
-    ss << m_sizez << " " << UnitsName(m_units);
-    return ss.str();
-
-    //    return std::to_string(m_sizez) + " " + UnitsName(m_units);
-  }
-
-  std::string unitsname() {
-    return UnitsName(m_units);
+  std::string printUnits() {
+    return printUnits(m_units);
   }
   
-  const std::string UnitsName(UnitsTy t) {
+  const std::string printUnits(UnitsTy t) {
     if (t == VOX_ANGSTROMS) {
       return "angstroms";
     } else if (t == VOX_NANOMETERS) {
@@ -422,21 +391,32 @@ public:
     }
   }
 
+  // functions to support MRC
   MRCHeader& parseMRC(const char * data);
-  
+
+  bool loadFromMRC(std::string filename, bool update = false);
+
+  bool loadFromMRC(std::string filename, UnitsTy ty, float voxWidth);
+
+  bool loadFromMRC(std::string filename, UnitsTy ty, float voxWidthX, float voxWidthY, float voxWidthZ);
+
+  // mostly for saving partial changes into mrc header.
+  bool writeToMRC(std::string filename, MRCHeader& header);
+
+  // write/read files for voxel class
   bool writeToFile(std::string filename);
   
   bool loadFromFile(std::string filename);
-
-  bool loadFromMRC(std::string filename);
-
-  bool loadFromMRC(std::string filename, UnitsTy ty, float len);
-
-  bool loadFromMRC(std::string filename, UnitsTy ty, float lenx, float leny, float lenz);
-
-  bool writeToMRC(std::string filename);
   
   void print(FILE * fp = stdout);
+
+  float min() const { return m_min; }
+
+  float max() const { return m_max; }
+
+  float mean() const { return m_mean; }
+
+  float rms() const { return m_rms; }
 
   ~Voxels() {
   }
@@ -444,8 +424,8 @@ public:
 protected:
 
   UnitsTy m_units;
-  float m_sizex, m_sizey, m_sizez;
-
+  float m_voxWidth[3];
+  float m_min, m_max, m_mean, m_rms;
 };
 
 } // namespace al

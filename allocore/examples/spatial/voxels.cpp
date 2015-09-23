@@ -44,9 +44,9 @@ int main() {
   v.fill(arrayfiller);
 
 
-  std::cout << "One voxel is " << v.sizexname() << " by " << v.sizeyname() << " by " << 
-    v.sizezname() << " so its volume is " << (v.sizex() * v.sizey() * v.sizez()) <<
-    " cubic " << v.unitsname() << std::endl;
+  std::cout << "One voxel is " << v.printVoxWidth(0) << " by " << v.printVoxWidth(1) << " by " << 
+    v.printVoxWidth(2) << " so its volume is " << (v.getVoxWidth(0) * v.getVoxWidth(1) * v.getVoxWidth(2)) <<
+    " cubic " << v.printUnits() << std::endl;
 
 
   std::cout << "the upper left 12x12 of the 7th plane in Z looks like this: " << std::endl;
