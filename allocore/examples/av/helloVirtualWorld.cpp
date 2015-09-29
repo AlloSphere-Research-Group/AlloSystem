@@ -28,6 +28,7 @@ struct Agent : public SoundSource, public Nav, public Drawable{
 
 	virtual void onProcess(AudioIOData& io){
 		while(io()){
+            
 			//float s = io.in(0);
 			//float s = rnd::uniform(); // make noise, just to hear something
 			float s = sin(oscPhase * M_2PI);
@@ -169,16 +170,15 @@ int main (int argc, char * argv[])
     speakerLayout.addSpeaker(speakers[1]);
 
     // Create spatializer
-    AmbisonicsSpatializer *ambisonics = new AmbisonicsSpatializer(speakerLayout, 2, 1);
-    //Dbap *dbap = new Dbap(speakerLayout);
-
+    AmbisonicsSpatializer *spat = new AmbisonicsSpatializer(speakerLayout, 2, 1);
+    scene.usePerSampleProcessing(true); //per sample processing is less efficient than per buffer (default), but provides higher quality Doppler
+    
 	// Create listener to render audio
-	listener = scene.createListener(ambisonics);
-    //listener = scene.createListener(dbap);
-
+	listener = scene.createListener(spat);
+	
 	// Now do some visuals
 	for(unsigned i=0; i<agents.size(); ++i) scene.addSource(agents[i]);
-
+    
 	MyWindow windows[6];
 
 	windows[0].create(Window::Dim(  0, 300, 200,200), "Left");

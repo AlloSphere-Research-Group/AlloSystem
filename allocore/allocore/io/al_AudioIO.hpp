@@ -57,6 +57,13 @@ typedef void (* audioCallback)(AudioIOData& io);
 class AudioDevice: public AudioDeviceInfo {
 public:
 
+	/// Stream mode
+	enum StreamMode{
+		INPUT	= 1,	/**< Input stream */
+		OUTPUT	= 2		/**< Output stream */
+	};
+
+
 	/// @param[in] deviceNum	Device enumeration number
 	AudioDevice(int deviceNum = -1);
 
@@ -81,6 +88,10 @@ protected:
 	static void initDevices();
 	const void * mImpl;
 };
+
+inline AudioDevice::StreamMode operator| (const AudioDevice::StreamMode& a, const AudioDevice::StreamMode& b){
+	return static_cast<AudioDevice::StreamMode>(+a|+b);
+}
 
 /// Audio input/output streaming
 class AudioIO : public AudioIOData {
