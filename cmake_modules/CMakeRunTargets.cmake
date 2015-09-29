@@ -183,6 +183,4 @@ else()
 		SOURCES ${ALLOSYSTEM_APP_SRC}
 		COMMENT "Running: ${APP_NAME}")
   endif()
-endif()
-
 endif(NOT RUN_IN_DEBUGGER)
