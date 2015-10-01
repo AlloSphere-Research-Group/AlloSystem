@@ -94,6 +94,14 @@ public:
 	float size() const { return mFontSize; }
 
 
+	/// Set alignment of rendered text strings
+
+	/// \param[in] xfrac	Fraction along text width to render at x=0;
+	///						0 is left-aligned, 0.5 is centered, 1 is right-aligned
+	/// \param[in] yfrac	Fraction along text height to render at y=0
+	void align(float xfrac, float yfrac);
+
+
 	/*! Render text geometry
 		Render text into geometry for drawing a string of text using the bitmap
 		returned by ascii_chars.  Render expects the vertex and texcoord buffers
@@ -113,7 +121,7 @@ public:
 	*/
 	void write(Mesh& mesh, const std::string& text);
 
-	/*
+	/*!
 		Renders using an internal mesh (reset for each render() call)
 		For rendering large volumes of text, use write() instead.
 	*/
@@ -127,20 +135,18 @@ public:
 	Texture& texture() { return mTex; }
 
 protected:
-
 	// makes sure that the texture has been filled with data:
 	void ensureTexture(Graphics& g);
 
 	class Impl;
 	Impl * mImpl;
 
+	Texture mTex; //Bitmap of the font's ASCII characters in a 16x16 grid
+	Mesh mMesh;
 	FontCharacter mChars[ASCII_SIZE];
 	unsigned int mFontSize;
+	float mAlign[2];
 	bool mAntiAliased;
-
-	//The a bitmap of the font's ASCII characters in a 16x16 grid
-	Texture mTex;
-	Mesh mMesh;
 };
 
 inline void Font :: renderf(Graphics& g, const char * fmt, ...) {

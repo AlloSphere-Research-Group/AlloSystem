@@ -186,29 +186,31 @@ protected:
 
 
 
-Font :: Font(const std::string& filename, int font_size, bool anti_aliased)
+Font::Font(const std::string& filename, int font_size, bool anti_aliased)
 :	mFontSize(font_size),
 	mAntiAliased(anti_aliased),
-//	mTex(g, 192, 192, Graphics::LUMINANCE, Graphics::UCHAR)
-	mTex(192, 192)
+	mTex(192, 192, Graphics::LUMINANCE, Graphics::UBYTE)
 {
-	mTex.format(Graphics::LUMINANCE).type(Graphics::UBYTE);
+	align(0,0);
 	// TODO: if this fails (mImpl == NULL), fall back to native options (e.g. Cocoa)?
 	mImpl = Impl::create(*this, filename);
 }
 
 
-Font :: ~Font() {
+Font::~Font() {
 	delete mImpl;
 }
 
-// returns the "above-line" height of the font in pixels
-float Font :: ascender() const { return mImpl->ascender(); }
+float Font::ascender() const { return mImpl->ascender(); }
 
-// returns the "below-line" height of the font in pixels
-float Font :: descender() const { return mImpl->descender(); }
+float Font::descender() const { return mImpl->descender(); }
 
-void Font :: write(Mesh& mesh, const std::string& text) {
+void Font::align(float xfrac, float yfrac){
+	mAlign[0] = xfrac;
+	mAlign[1] = yfrac;
+}
+
+void Font::write(Mesh& mesh, const std::string& text) {
 
 	mesh.reset();
 	mesh.primitive(Graphics::QUADS);
@@ -220,7 +222,11 @@ void Font :: write(Mesh& mesh, const std::string& text) {
 	float tdim = cdim*GLYPHS_PER_ROW;
 	float tcdim = ((float)cdim)/((float)tdim);
 
-	float pos[] = {0., 0.};
+	float pos[] = {0., ascender() * mAlign[1]};
+
+	if(mAlign[0] != 0){
+		pos[0] = -width(text) * mAlign[0];
+	}
 
 	for(int i=0; i < nchars; i++) {
 		int idx = text[i];
