@@ -120,22 +120,31 @@ public:
 
 			// load glyph:
 			int glyph_index = FT_Get_Char_Index(mFace, i);
+			FT_GlyphSlot glyph = mFace->glyph;
 			if(antialias) {
 				FT_Load_Glyph(mFace, glyph_index, FT_LOAD_DEFAULT);
-				FT_Render_Glyph(mFace->glyph, FT_RENDER_MODE_NORMAL);
+				FT_Render_Glyph(glyph, FT_RENDER_MODE_NORMAL);
 			}
 			else {
 				FT_Load_Glyph(mFace, glyph_index, FT_LOAD_MONOCHROME);
-				FT_Render_Glyph(mFace->glyph, FT_RENDER_MODE_MONO);
+				FT_Render_Glyph(glyph, FT_RENDER_MODE_MONO);
 			}
 
 			// store metrics:
-			font.mChars[i].width = mFace->glyph->advance.x/PIX_TO_EM;
-			font.mChars[i].x_offset = mFace->glyph->bitmap_left;
-			font.mChars[i].y_offset = mFace->glyph->bitmap_top;
+			font.mChars[i].width = glyph->advance.x/PIX_TO_EM;
+			font.mChars[i].x_offset = glyph->bitmap_left;
+			font.mChars[i].y_offset = glyph->bitmap_top;
 
-			//printf("%c: %d\n", i, mFace->glyph->bitmap_left);
+			/*switch(glyph->format){
+			case FT_GLYPH_FORMAT_BITMAP: printf("FT_GLYPH_FORMAT_BITMAP\n"); break;
+			case FT_GLYPH_FORMAT_OUTLINE: printf("FT_GLYPH_FORMAT_OUTLINE\n"); break;
+			case FT_GLYPH_FORMAT_COMPOSITE: printf("FT_GLYPH_FORMAT_COMPOSITE\n"); break;
+			default:;
+			}*/
+
+			//printf("%c: advance (%d %d), bitmap_left %d\n", (char)i, (int)glyph->advance.x, (int)glyph->advance.y, glyph->bitmap_left);
 			//printf("char %i %c %i %i\n", i, i, font.mChars[i].width, font.mChars[i].y_offset);
+			//printf("bitmap.pitch %d\n", glyph->bitmap.pitch);
 
 			// calculate texture pointer offset:
 			int xidx = i % GLYPHS_PER_ROW;
@@ -146,8 +155,8 @@ public:
 			unsigned char * image = (unsigned char *)(optr + offset);
 
 			// write glyph bitmap into texture:
-			FT_Bitmap *bitmap = &mFace->glyph->bitmap;
-			//if(antialias) {
+			FT_Bitmap *bitmap = &glyph->bitmap;
+			if(antialias) {
 				for(int j=0; j < int(bitmap->rows); j++) {
 					unsigned char *pix = image + j*rowstride;
 					unsigned char *font_pix = bitmap->buffer + j*bitmap->width;
@@ -155,7 +164,19 @@ public:
 						*pix++ = *font_pix++;
 					}
 				}
-			//}
+			}
+			else{
+				// Pixels are 1-bit each in bitmap
+				for(int j=0; j < int(bitmap->rows); j++) {
+					unsigned char *pix = image + j*rowstride;
+					unsigned char *font_pix = bitmap->buffer + j*bitmap->pitch;
+					for(int k=0; k < int(bitmap->width); k++) {
+						int byteIdx = k/8; // byte index in bitmap
+						int bitIdx  = k&7; // bit index in byte
+						*pix++ = ((font_pix[byteIdx] >> (7-bitIdx)) & 1)*255;
+					}
+				}
+			}
 		}
 
 		return true;
