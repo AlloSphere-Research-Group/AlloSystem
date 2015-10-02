@@ -43,8 +43,6 @@
 */
 
 #include <string>
-#include <map>
-#include <stdio.h>
 #include <stdarg.h>
 
 #include "allocore/types/al_Array.hpp"
@@ -67,12 +65,23 @@ public:
 	};
 
 
+	Font();
+
 	/// \param[in] filename		path to font file
 	/// \param[in] fontSize		size of font
 	/// \param[in] antialias	whether to apply antialiasing
 	Font(const std::string& filename, int fontSize=10, bool antialias=true);
 
 	~Font();
+
+
+	/// Load font from file
+
+	/// \param[in] filename		path to font file
+	/// \param[in] fontSize		size of font
+	/// \param[in] antialias	whether to apply antialiasing
+	/// \returns whether font loaded successfully
+	bool load(const std::string& filename, int fontSize=10, bool antialias=true);
 
 
 	/// Get metrics of a particular character (idx 0..255)

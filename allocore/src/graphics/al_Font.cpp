@@ -1,5 +1,4 @@
 #include "allocore/graphics/al_Font.hpp"
-#include <vector>
 
 #if defined (__APPLE__) || defined (OSX)
 
@@ -45,58 +44,28 @@ FT_Library front_freetype_library = 0;
 //
 //#endif
 
-struct FontCharacter{
-	FontCharacter()
-	:	width(10),
-		y_offset(0)
-	{}
+namespace al{
 
-	~FontCharacter() {}
-
-	int width;
-	int y_offset;
-};
-
-using namespace al;
-
-inline bool initialize_font() {
-	static bool initialized = false;
-	if (!initialized) {
-		if(!front_freetype_library) {
-			FT_Error err = FT_Init_FreeType(&front_freetype_library);
-			if(err) {
-				AL_WARN("error initializing FreeType library");
-				return false;
-			}
-		}
-		initialized = true;
-	}
-	return initialized;
-}
-
-#pragma mark Impl
 struct Font::Impl {
 public:
 
-	static Impl * create(Font& font, const std::string& filename) {
-		if (!initialize_font()) return 0;
-
-		FT_Face face;
-		FT_Error err = FT_New_Face(front_freetype_library, filename.c_str(), 0, &face);
-		if(err) {
-			AL_WARN("error loading font face for %s", filename.c_str());
-			return 0;
-		}
-		if(FT_Set_Pixel_Sizes(face, 0, font.mFontSize)) {
-			AL_WARN("error setting font size");
-			FT_Done_Face(face);
-			return 0;
+	static Impl * create(){
+		static bool initialized = false;
+		if (!initialized) {
+			if(!front_freetype_library) {
+				FT_Error err = FT_Init_FreeType(&front_freetype_library);
+				if(err) {
+					AL_WARN("error initializing FreeType library");
+					return 0;
+				}
+			}
+			initialized = true;
 		}
 
-		return new Impl(font, face);
+		return new Impl;
 	}
 
-	virtual ~Impl() {
+	~Impl() {
 		FT_Done_Face(mFace);
 	}
 
@@ -118,14 +87,24 @@ public:
 		return (fontSize+2)*(ASCII_SIZE/GLYPHS_PER_ROW);
 	}
 
-protected:
+	bool load(Font& font, const char * filename, int fontSize, bool antialias){
 
-	// factory pattern; use Impl::create()
-	Impl(Font& font, FT_Face face)
-	:	mFace(face)
-	{
-		font.mTex.width(textureWidth(font.mFontSize));
-		font.mTex.height(textureHeight(font.mFontSize));
+		FT_Face face; // preserve mFace member
+		FT_Error err = FT_New_Face(front_freetype_library, filename, 0, &face);
+		if(err) {
+			AL_WARN("could not load font face %s", filename);
+			return false;
+		}
+		if(FT_Set_Pixel_Sizes(face, 0, fontSize)) {
+			AL_WARN("could not set font size");
+			FT_Done_Face(face);
+			return false;
+		}
+
+		mFace = face;
+
+		font.mTex.width(textureWidth(fontSize));
+		font.mTex.height(textureHeight(fontSize));
 		font.mTex.allocate();
 
 		Array& arr = font.mTex.array();
@@ -134,14 +113,14 @@ protected:
 		char * optr = arr.data.ptr;
 		const int padding_x = 1;
 		const int padding_y = 1;
-		const int glyph_width = font.mFontSize+2*padding_x;
-		const int glyph_height = font.mFontSize+2*padding_y;
+		const int glyph_width = fontSize+2*padding_x;
+		const int glyph_height = fontSize+2*padding_y;
 
 		for(int i=0; i < ASCII_SIZE; i++) {
 
 			// load glyph:
 			int glyph_index = FT_Get_Char_Index(mFace, i);
-			if(font.mAntiAliased) {
+			if(antialias) {
 				FT_Load_Glyph(mFace, glyph_index, FT_LOAD_DEFAULT);
 				FT_Render_Glyph(mFace->glyph, FT_RENDER_MODE_NORMAL);
 			}
@@ -168,37 +147,65 @@ protected:
 
 			// write glyph bitmap into texture:
 			FT_Bitmap *bitmap = &mFace->glyph->bitmap;
-			//if(font.mAntiAliased) {
-				for(int j=0; j < bitmap->rows; j++) {
+			//if(antialias) {
+				for(int j=0; j < int(bitmap->rows); j++) {
 					unsigned char *pix = image + j*rowstride;
 					unsigned char *font_pix = bitmap->buffer + j*bitmap->width;
-					for(int k=0; k < bitmap->width; k++) {
+					for(int k=0; k < int(bitmap->width); k++) {
 						*pix++ = *font_pix++;
 					}
 				}
 			//}
 		}
 
+		return true;
 	}
+
+protected:
+	// factory pattern; use Impl::create()
+	Impl(): mFace(0){}
 
 	FT_Face mFace;
 };
 
 
-
-Font::Font(const std::string& filename, int font_size, bool anti_aliased)
-:	mFontSize(font_size),
-	mAntiAliased(anti_aliased),
-	mTex(192, 192, Graphics::LUMINANCE, Graphics::UBYTE)
+Font::Font()
+:	mFontSize(12),
+	mAntiAliased(true),
+	mTex(0, 0, Graphics::LUMINANCE, Graphics::UBYTE)
 {
 	align(0,0);
 	// TODO: if this fails (mImpl == NULL), fall back to native options (e.g. Cocoa)?
-	mImpl = Impl::create(*this, filename);
+	mImpl = Impl::create();
 }
 
 
+Font::Font(const std::string& filename, int fontSize, bool antialias)
+:	mFontSize(fontSize),
+	mAntiAliased(antialias),
+	mTex(0, 0, Graphics::LUMINANCE, Graphics::UBYTE)
+{
+	align(0,0);
+	// TODO: if this fails (mImpl == NULL), fall back to native options (e.g. Cocoa)?
+	mImpl = Impl::create();
+	if(mImpl){
+		if(!load(filename, fontSize, antialias)){
+			delete mImpl;
+		}
+	}
+}
+
 Font::~Font() {
 	delete mImpl;
+}
+
+bool Font::load(const std::string& filename, int fontSize, bool antialias){
+	if(mImpl->load(*this, filename.c_str(), fontSize, antialias)){
+		mFontSize = fontSize;
+		mAntiAliased = antialias;
+		return true;
+	}
+	return false;
 }
 
 float Font::ascender() const { return mImpl->ascender(); }
@@ -264,3 +271,4 @@ void Font::write(Mesh& mesh, const std::string& text) {
 	}
 }
 
+} // al::
