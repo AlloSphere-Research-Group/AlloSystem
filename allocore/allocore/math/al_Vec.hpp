@@ -393,6 +393,9 @@ public:
 		return input+amt*(target-input);
 	}
 
+	/// Set magnitude (preserving direction)
+	Vec& mag(T v);
+
 	/// Negates all elements
 	Vec& negate(){
 		IT(N){ (*this)[i] = -(*this)[i]; } return *this; }
@@ -576,16 +579,21 @@ inline Vec<N,T> max(const Vec<N,T>& a, const Vec<N,T>& b){
 // Implementation --------------------------------------------------------------
 
 template <int N, class T>
-Vec<N,T>& Vec<N,T>::normalize(T scale){
+Vec<N,T>& Vec<N,T>::mag(T v){
 	T m = mag();
 	if(m > T(1e-20)){
-		(*this) *= (scale/m);
+		(*this) *= (v/m);
 	}
 	else{
 		set(T(0));
-		(*this)[0] = scale;
+		(*this)[0] = v;
 	}
 	return *this;
+}
+
+template <int N, class T>
+Vec<N,T>& Vec<N,T>::normalize(T scale){
+	return mag(scale);
 }
 
 
