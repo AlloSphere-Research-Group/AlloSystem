@@ -54,8 +54,11 @@
 #include <cassert>
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include "allocore/types/al_Array.hpp"
-#include "allocore/al_Allocore.hpp"
+#include "allocore/types/al_Conversion.hpp"
+#include "allocore/io/al_File.hpp"
+#include "allocore/graphics/al_Image.hpp"
 
 using namespace al;
 using namespace std;
