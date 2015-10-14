@@ -34,6 +34,12 @@ if(EXISTS "${SOURCE_DIR}/flags.cmake")
     include("${SOURCE_DIR}/flags.cmake")
 endif()
 
+if(COMPILER_SUPPORTS_CXX11)
+	set_property(TARGET ${APP_NAME} APPEND_STRING PROPERTY COMPILE_FLAGS "-std=c++11 ")
+elseif(COMPILER_SUPPORTS_CXX0X)
+	set_property(TARGET ${APP_NAME} APPEND_STRING PROPERTY COMPILE_FLAGS "-std=c++0x")
+endif()
+
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   set_target_properties(${APP_NAME} PROPERTIES
     LINK_FLAGS "-pagezero_size 10000 -image_base 100000000")
