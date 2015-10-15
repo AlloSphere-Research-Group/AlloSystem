@@ -18,6 +18,13 @@
 
 namespace al {
 
+class OmniApp;
+
+struct OmniControls : InputEventHandler {
+  OmniApp* oa;
+  bool onKeyDown(const Keyboard& k);
+};
+
 class OmniApp : public Window,
                 public osc::PacketHandler,
                 public FPS,
@@ -102,6 +109,7 @@ class OmniApp : public Window,
   Pose pose;
   NavInputControl mNavControl;
   StandardWindowKeyControls mStdControls;
+  OmniControls mOmniControls;
   osc::Recv mOSCRecv;
   osc::Send mOSCSend;
 
@@ -146,6 +154,9 @@ inline OmniApp::OmniApp(std::string name, bool slave)
     oscRecv().handler(*this);
     sendHandshake();
   }
+
+  mOmniControls.oa = this;
+  Window::append(mOmniControls);
 }
 
 inline OmniApp::~OmniApp() {
@@ -346,6 +357,14 @@ inline void OmniApp::AppAudioCB(AudioIOData& io) {
   io.frame(0);
   app.onSound(io);
 }
+
+inline bool OmniControls::onKeyDown(const Keyboard& k){
+  if(k.key() == 'o'){
+    oa->omniEnable(!(oa->omniEnable()));
+  }
+  return true;
+}
+
 }
 
 #endif
