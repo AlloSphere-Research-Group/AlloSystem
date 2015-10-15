@@ -28,19 +28,18 @@ struct MyApp : public RayApp {
   }
   
   std::string vertexCode() {
-    // you can use R"()"; instead of AL_STRINGIFY if using c++11
-    return AL_STRINGIFY(
+    return R"(
     varying vec2 T;
     void main(void) {
       // pass through the texture coordinate (normalized pixel):
       T = vec2(gl_MultiTexCoord0);
       gl_Position = vec4(T*2.-1., 0, 1);
     }
-    );
+    )";
   }
   
   std::string fragmentCode() {
-    return AL_STRINGIFY(
+    return R"(
     uniform sampler2D pixelMap;
     uniform sampler2D alphaMap;
     uniform vec4 quat;
@@ -141,7 +140,7 @@ struct MyApp : public RayApp {
       
       gl_FragColor = vec4(color, 1);
     }
-    );
+    )";
   }
   
   virtual void onMessage(osc::Message& m) {

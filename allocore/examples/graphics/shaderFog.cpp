@@ -13,7 +13,7 @@ Lance Putnam, Sept. 2011
 using namespace al;
 
 // Fog vertex shader
-static const char * fogVert = AL_STRINGIFY(
+static const char * fogVert = R"(
 	/* 'fogCurve' determines the distribution of fog between the near and far planes.
 	Positive values give more dense fog while negative values give less dense
 	fog. A value of	zero results in a linear distribution. */
@@ -34,16 +34,16 @@ static const char * fogVert = AL_STRINGIFY(
 			fogFactor = (1. - exp(-fogCurve*fogFactor))/(1. - exp(-fogCurve));
 		}
 	}
-);
+)";
 
 // Fog fragment shader
-static const char * fogFrag = AL_STRINGIFY(
+static const char * fogFrag = R"(
 	varying float fogFactor;
 
 	void main(){
 		gl_FragColor = mix(gl_Color, gl_Fog.color, fogFactor);
 	}
-);
+)";
 
 class MyApp : public App {
 public:

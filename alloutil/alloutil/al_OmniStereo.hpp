@@ -16,7 +16,7 @@ class OmniStereo {
   // also be sure to call omni.uniforms(shader) in the OmniStereoDrawable
   // callback
   static std::string glsl() {
-    return AL_STRINGIFY(
+    return R"(
         // @omni_eye: the eye parallax distance.
         //  This will be zero for mono, and positive/negative for right/left
         // eyes.
@@ -90,7 +90,7 @@ class OmniStereo {
                                (omni_near - omni_far),
                            -vertex.z);
           return vertex;
-        });
+        })";
   }
 
   ///  Abstract base class for any object that can be rendered via OmniStereo:
