@@ -513,10 +513,9 @@ void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double cosAng, double sinAng)
 /// @param[in]		normal		A normal perpendicular to the plane of rotation
 /// @param[in]		angle		The rotation angle, in radians
 template <class T>
-void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double ang){
-	rotate(vec, normal, cos(ang), sin(ang));
+void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double angle){
+	rotate(vec, normal, cos(angle), sin(angle));
 }
-
 
 
 /// Returns angle, in interval [0, pi], between two vectors
