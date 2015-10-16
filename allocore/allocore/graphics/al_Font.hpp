@@ -53,6 +53,7 @@
 
 namespace al{
 
+/// Interface for loading fonts and rendering text
 class Font {
 public:
 

@@ -61,7 +61,7 @@ class Pose {
 public:
 
 	/// @param[in] pos		Initial position
-	/// @parampin] ori		Initial orientation
+	/// @param[in] ori		Initial orientation
 	Pose(const Vec3d& pos=Vec3d(0), const Quatd& ori=Quatd::identity());
 
 	/// Copy constructor
