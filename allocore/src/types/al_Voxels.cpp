@@ -54,7 +54,7 @@ MRCHeader& Voxels::parseMRC(const char * mrcData) {
       break;
     case MRC_IMAGE_FLOAT32:
       printf("float\n");
-      ty = Array::type<float_t>();
+      ty = Array::type<float>();
       break;
     case MRC_IMAGE_UINT16:
       printf("unsigned int 16\n");
@@ -92,7 +92,7 @@ MRCHeader& Voxels::parseMRC(const char * mrcData) {
         swapBytes((int16_t *)data.ptr, cells());
         break;
       case MRC_IMAGE_FLOAT32:
-        swapBytes((float_t *)data.ptr, cells());
+        swapBytes((float *)data.ptr, cells());
         break;
       case MRC_IMAGE_UINT16:
         swapBytes((uint16_t *)data.ptr, cells());
