@@ -16,7 +16,7 @@ static GUIKeyDownHandler mGUIKeyDownHandler;
 
 
 ProtoApp::ProtoApp()
-:	cnNear(1,3,8,0.01), cnFar(2,2,99,1), cnFOV(3,2,360,0), cnScale(2,4, 20,-20),
+:	cnNear(1,3,8,0.01), cnFar(3,2,999,1), cnFOV(3,2,360,0), cnScale(2,4, 20,-20),
 	cnGain(1,4,4,0)
 {
 	mTopBar.arrangement("<>");
@@ -86,7 +86,6 @@ void ProtoApp::init(
 		//gam::Sync::master().spu(audioIO().fps());
 	}
 
-
 	Window * win = initWindow(dim, title, fps, mode);
 	mGUI.parentWindow(*win);
 
@@ -98,6 +97,11 @@ void ProtoApp::init(
 	mTopBar.arrange();
 	mParamPanel.arrange();
 	mGUITable.arrange();
+
+	// Set GUI controls from app state by default
+	cnNear.setValue(lens().near());
+	cnFar.setValue(lens().far());
+	cnFOV.setValue(lens().fovy());
 
 	// setup model manager
 	if(!App::name().empty()){
