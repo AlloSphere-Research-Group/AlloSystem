@@ -1,3 +1,4 @@
+#include "allocore/io/al_File.hpp"
 #include "alloGLV/al_ProtoApp.hpp"
 
 namespace al{
