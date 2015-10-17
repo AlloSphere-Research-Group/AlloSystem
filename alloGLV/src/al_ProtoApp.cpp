@@ -103,6 +103,21 @@ void ProtoApp::init(
 	cnFar.setValue(lens().far());
 	cnFOV.setValue(lens().fovy());
 
+	// Add notifications to controls;
+	// must do it here to preserve user-specified app state, lens().far() etc.
+	struct F{
+		static void ntGUIUpdate(const glv::Notification& n){
+			ProtoApp& app = *n.receiver<ProtoApp>();
+			app.lens()
+				.near(app.cnNear.getValue())
+				.far(app.cnFar.getValue())
+				.fovy(app.cnFOV.getValue());
+		}
+	};
+	cnNear.attach(F::ntGUIUpdate, glv::Update::Value, this);
+	cnFar.attach(F::ntGUIUpdate, glv::Update::Value, this);
+	cnFOV.attach(F::ntGUIUpdate, glv::Update::Value, this);
+
 	// setup model manager
 	if(!App::name().empty()){
 		glv::ModelManager& MM = mGUI.modelManager();
@@ -163,13 +178,6 @@ double ProtoApp::gainFactor() const {
 
 double ProtoApp::scaleFactor() const {
 	return ::pow(2., cnScale.getValue());
-}
-
-void ProtoApp::onAnimate(double dt){
-	lens()
-		.near(cnNear.getValue())
-		.far(cnFar.getValue())
-		.fovy(cnFOV.getValue());
 }
 
 } // al::
