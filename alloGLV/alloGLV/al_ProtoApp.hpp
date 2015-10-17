@@ -100,13 +100,6 @@ public:
 	double gainFactor() const;
 	double scaleFactor() const;
 
-
-	/// This should still be called via ProtoApp::onAnimate(dt) if overridden
-	virtual void onAnimate(double dt);
-
-//	virtual void onDraw(Graphics& g, const Viewpoint& v){}
-//	virtual void onSound(AudioIOData& io){}
-
 protected:
 	GLVDetachable mGUI;
 	glv::Table mGUITable;
