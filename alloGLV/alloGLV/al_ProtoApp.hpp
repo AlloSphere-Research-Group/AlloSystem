@@ -41,7 +41,6 @@
 	Lance Putnam, 2012, putnam.lance@gmail.com
 */
 
-#include <math.h>
 #include <string>
 #include "allocore/io/al_App.hpp"
 #include "alloGLV/al_ControlGLV.hpp"
@@ -90,30 +89,20 @@ public:
 	/// Add a parameter to GUI
 	ProtoApp& addParam(
 		glv::View& v, const std::string& label="", bool nameViewFromLabel=true
-	){
-		paramPanel().addParam(v,label,nameViewFromLabel);
-		return *this;
-	}
+	);
 
 	/// Add a parameter to GUI
 	ProtoApp& addParam(
 		glv::View * v, const std::string& label="", bool nameViewFromLabel=true
-	){
-		return addParam(*v,label,nameViewFromLabel);
-	}
+	);
 
 
-	double gainFactor() const { float v=cnGain.getValue(); return v*v; }
-	double scaleFactor() const { return ::pow(2., cnScale.getValue()); }
+	double gainFactor() const;
+	double scaleFactor() const;
 
 
 	/// This should still be called via ProtoApp::onAnimate(dt) if overridden
-	virtual void onAnimate(double dt){
-		lens()
-			.near(cnNear.getValue())
-			.far(cnFar.getValue())
-			.fovy(cnFOV.getValue());
-	}
+	virtual void onAnimate(double dt);
 
 //	virtual void onDraw(Graphics& g, const Viewpoint& v){}
 //	virtual void onSound(AudioIOData& io){}

@@ -1,8 +1,8 @@
+#include <math.h>
 #include "allocore/io/al_File.hpp"
 #include "alloGLV/al_ProtoApp.hpp"
 
 namespace al{
-
 
 struct GUIKeyDownHandler : public glv::EventHandler{
 	bool onEvent(glv::View& v, glv::GLV& g){
@@ -137,6 +137,35 @@ ProtoApp& ProtoApp::resourceDir(const std::string& dir, bool searchBack){
 	}
 
 	return *this;
+}
+
+ProtoApp& ProtoApp::addParam(
+	glv::View& v, const std::string& label, bool nameViewFromLabel
+){
+	paramPanel().addParam(v,label,nameViewFromLabel);
+	return *this;
+}
+
+ProtoApp& ProtoApp::addParam(
+	glv::View * v, const std::string& label, bool nameViewFromLabel
+){
+	return addParam(*v,label,nameViewFromLabel);
+}
+
+double ProtoApp::gainFactor() const {
+	float v=cnGain.getValue();
+	return v*v;
+}
+
+double ProtoApp::scaleFactor() const {
+	return ::pow(2., cnScale.getValue());
+}
+
+void ProtoApp::onAnimate(double dt){
+	lens()
+		.near(cnNear.getValue())
+		.far(cnFar.getValue())
+		.fovy(cnFOV.getValue());
 }
 
 } // al::
