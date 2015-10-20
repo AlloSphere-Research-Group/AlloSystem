@@ -51,6 +51,12 @@ namespace al{
 class HID{
 public:
 
+	struct Info{
+		unsigned short vendorID;
+		unsigned short productID;
+		const wchar_t * serialNumber;
+	};
+
 	HID();
 	~HID();
 
@@ -65,6 +71,9 @@ public:
 		unsigned short productID,
 		const wchar_t *serialNumber = NULL
 	);
+
+	/// Open a HID device
+	bool open(const Info& info);
 
 	/// Open a HID device
 
@@ -109,6 +118,10 @@ public:
 	/// Get serial number string
 	std::wstring serialNumber() const;
 
+
+	/// Find HID whose product name matches search term
+	static Info find(const char * searchTerm);
+	static Info find(const wchar_t * searchTerm);
 
 	static void printDevices(unsigned short vendorID=0, unsigned short productID=0);
 
