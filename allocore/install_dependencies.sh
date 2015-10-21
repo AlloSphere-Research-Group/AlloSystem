@@ -41,7 +41,7 @@ if binary_exists "apt-get"; then
 						 libglew-dev freeglut3-dev \
 						 libavahi-client-dev \
 						 libbluetooth-dev \
-						 libudev-dev libusb-1.0-0-dev \
+						 libudev-dev \
 						 libfreeimage-dev libfreetype6-dev \
 						 libxi-dev libxmu-dev
 
