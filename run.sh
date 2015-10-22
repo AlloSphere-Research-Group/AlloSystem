@@ -31,7 +31,7 @@ NPROC=$(grep --count ^processor /proc/cpuinfo 2>/dev/null || sysctl -n hw.ncpu |
 # Save one core for the gui.
 PROC_FLAG=$((NPROC - 1))
 
-if [ "$#" -eq 0 ]; then
+if [ "$#" = 0 ]; then
     echo Aborting: You must provide a source filename or a directory.
     exit 1
 fi
