@@ -31,7 +31,7 @@ ShaderProgram shaderP;
 Shader shaderV, shaderF;
 rnd::Random<> rng;
 
-static const char * srcV = AL_STRINGIFY(
+static const char * srcV = R"(
 uniform sampler3D velocityTex;
 uniform sampler3D intensityTex;
 varying vec3 velocity;
@@ -55,16 +55,16 @@ void main(){
 
 	gl_Position = gl_ModelViewProjectionMatrix * vertex1;
 }
-);
+)";
 
-static const char * srcF = AL_STRINGIFY(
+static const char * srcF = R"(
 varying vec3 velocity;
 varying vec3 intensity;
 void main() {
 	float mag = 0.1+length(velocity);
 	gl_FragColor = vec4(0.1+intensity, mag);
 }
-);
+)";
 
 struct MyWindow : public Window {
 

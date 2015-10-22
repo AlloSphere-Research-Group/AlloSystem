@@ -27,31 +27,31 @@ Shader shaderV, shaderF;
 int gRenderMode = 0;
 
 
-//static const char * vLight = AL_STRINGIFY(
+//static const char * vLight = R"(
 //varying vec3 texcoord0;
 //void main(){
 //	texcoord0 = vec3(gl_MultiTexCoord0);
 //	gl_Position = ftransform();
 //}
-//);
+//)";
 
-static const char * vLight = AL_STRINGIFY(
+static const char * vLight = R"(
 varying vec3 texcoord0;
 void main(){
 	texcoord0 = gl_Vertex.xyz / 32.;
 	//texcoord0 = vec3(gl_MultiTexCoord0);
 	gl_Position = ftransform();
 }
-);
+)";
 
-static const char * fLight = AL_STRINGIFY(
+static const char * fLight = R"(
 uniform sampler3D tex;
 varying vec3 texcoord0;
 void main() {
 	vec4 color = texture3D(tex, texcoord0);
 	gl_FragColor = color;
 }
-);
+)";
 
 // function used to initialize array data:
 void arrayfiller(float * values, double normx, double normy, double normz) {
