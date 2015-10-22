@@ -99,6 +99,14 @@ endif()
 # Dependencies --------------------------------------------
 set(ALLOCORE_DEP_INCLUDE_DIRS ${BUILD_ROOT_DIR}/build/include)
 
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+
+if(NOT (COMPILER_SUPPORTS_CXX11 OR COMPILER_SUPPORTS_CXX0X))
+	message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif()
+
 # System dependent libs
 # ---- OS X ----
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -156,6 +164,12 @@ set(EXECUTABLE_OUTPUT_PATH ${BUILD_ROOT_DIR}/build/bin)
 # Add headers to the list of source file so they appear in generated projects.
 add_library(${ALLOCORE_LIB} ${ALLOCORE_SRC} ${ALLOCORE_HEADERS})
 
+if(COMPILER_SUPPORTS_CXX11)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ")
+elseif(COMPILER_SUPPORTS_CXX0X)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+endif()
+
 # Copy headers to build directory (only if header has changed)
 foreach(header ${ALLOCORE_HEADERS})
     execute_process(COMMAND ${CMAKE_COMMAND} -E
@@ -209,6 +223,11 @@ if(BUILD_EXAMPLES)
       set_target_properties(${EXAMPLE_TARGET} PROPERTIES
 	COMPILE_FLAGS "${EXTRA_COMPILER_FLAGS}")
       target_link_libraries("${EXAMPLE_TARGET}" ${ALLOCORE_LIB} ${ALLOCORE_LINK_LIBRARIES})
+#if(COMPILER_SUPPORTS_CXX11)
+#	set_property(TARGET ${EXAMPLE_TARGET} APPEND_STRING PROPERTY COMPILE_FLAGS "-std=c++11 ")
+#elseif(COMPILER_SUPPORTS_CXX0X)
+#	set_property(TARGET ${EXAMPLE_TARGET} APPEND_STRING PROPERTY COMPILE_FLAGS "-std=c++0x")
+#endif()
       if (apple)
 	find_library(AUDIOUNIT_FM AudioUnit)
         target_link_libraries("${EXAMPLE_TARGET}" ${AUDIOUNIT_FM})
