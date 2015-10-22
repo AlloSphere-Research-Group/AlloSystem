@@ -71,7 +71,7 @@ endif(BUILD_GLV AND NOT GLV_LIBRARY)
 
 # Allocore --------------------------------
 add_subdirectory(allocore)
-get_target_property(ALLOCORE_LIBRARY "allocore${DEBUG_SUFFIX}" LOCATION)
+set(ALLOCORE_LIBRARY "allocore${DEBUG_SUFFIX}")
 get_target_property(ALLOCORE_DEP_INCLUDE_DIR "allocore${DEBUG_SUFFIX}" ALLOCORE_DEP_INCLUDE_DIR)
 get_target_property(ALLOCORE_LINK_LIBRARIES "allocore${DEBUG_SUFFIX}" ALLOCORE_LINK_LIBRARIES)
 if(BUILDING_GAMMA)
@@ -80,13 +80,13 @@ endif(BUILDING_GAMMA)
 
 # Alloutil ----------------------------------
 add_subdirectory(alloutil)
-get_target_property(ALLOUTIL_LIBRARY alloutil${DEBUG_SUFFIX} LOCATION)
+set(ALLOUTIL_LIBRARY "alloutil${DEBUG_SUFFIX}")
 get_target_property(ALLOUTIL_DEP_INCLUDE_DIR alloutil${DEBUG_SUFFIX} ALLOUTIL_DEP_INCLUDE_DIR)
 get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil${DEBUG_SUFFIX} ALLOUTIL_LINK_LIBRARIES)
 
 # alloGLV ---------------------------------------
 add_subdirectory(alloGLV)
-get_target_property(ALLOGLV_LIBRARY alloGLV${DEBUG_SUFFIX} LOCATION)
+set(ALLOGLV_LIBRARY "alloGLV${DEBUG_SUFFIX}")
 get_target_property(ALLOGLV_INCLUDE_DIR alloGLV${DEBUG_SUFFIX} ALLOGLV_INCLUDE_DIR)
 get_target_property(ALLOGLV_LINK_LIBRARIES alloGLV${DEBUG_SUFFIX} ALLOGLV_LINK_LIBRARIES)
 if(BUILDING_GLV)
@@ -96,13 +96,13 @@ endif(BUILDING_GLV)
 # allocv ---------------------------------------
 
 add_subdirectory(allocv)
-get_target_property(ALLOCV_LIBRARY allocv${DEBUG_SUFFIX} LOCATION)
+set(ALLOCV_LIBRARY "allocv${DEBUG_SUFFIX}")
 get_target_property(ALLOCV_INCLUDE_DIR allocv${DEBUG_SUFFIX} ALLOCV_INCLUDE_DIR)
 get_target_property(ALLOCV_LINK_LIBRARIES allocv${DEBUG_SUFFIX} ALLOCV_LINK_LIBRARIES)
 
 # alloaudio ----------------------------------
 add_subdirectory(alloaudio)
-get_target_property(ALLOAUDIO_LIBRARY alloaudio${DEBUG_SUFFIX} LOCATION)
+set(ALLOAUDIO_LIBRARY "alloaudio${DEBUG_SUFFIX}")
 get_target_property(ALLOAUDIO_INCLUDE_DIR alloaudio${DEBUG_SUFFIX} ALLOAUDIO_INCLUDE_DIR)
 get_target_property(ALLOAUDIO_LINK_LIBRARIES alloaudio${DEBUG_SUFFIX} ALLOAUDIO_LINK_LIBRARIES)
 if("alloaudio${DEBUG_SUFFIX}")

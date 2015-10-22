@@ -10,7 +10,7 @@ set(EXECUTABLE_OUTPUT_PATH "${BUILD_ROOT_DIR}/build/bin")
 
 # Dependencies
 
-get_target_property(ALLOCORE_LIBRARY allocore${DEBUG_SUFFIX} LOCATION)
+set(ALLOCORE_LIBRARY "allocore${DEBUG_SUFFIX}")
 get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore${DEBUG_SUFFIX} ALLOCORE_DEP_INCLUDE_DIRS)
 
 find_package(APR QUIET)
@@ -22,7 +22,7 @@ endif()
 
 if(BUILDING_GLV)
 	set(GLV_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../GLV")
-    get_target_property(glv_location GLV LOCATION)
+    set(glv_location GLV)
     get_target_property(GLV_LIBRARY GLV GLV_LIBRARY)
     set(GLV_LIBRARY ${glv_location})
     message (STATUS "glv_location for alloGLV == ${glv_location}")

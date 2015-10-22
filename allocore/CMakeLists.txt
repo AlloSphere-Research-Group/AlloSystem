@@ -243,7 +243,7 @@ if(BUILD_EXAMPLES)
     endforeach(example)
   else()
     message("Gamma not found. Not building allocore sound examples.")
-  endif(GAMMA_FOUND OR GAMMA_LIBRARY)
+  endif(GAMMA_FOUND OR GAMMA_LIBRARY AND NOT TRAVIS_BUILD)
 endif(BUILD_EXAMPLES)
 
 # Unit tests

@@ -24,7 +24,7 @@ set(ALLOAUDIO_HEADERS
 
 # Dependencies ------------------------------
 
-get_target_property(ALLOCORE_LIBRARY allocore${DEBUG_SUFFIX} LOCATION)
+set(ALLOCORE_LIBRARY "allocore${DEBUG_SUFFIX}")
 get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore${DEBUG_SUFFIX} ALLOCORE_DEP_INCLUDE_DIRS)
 get_target_property(ALLOCORE_LINK_LIBRARIES allocore${DEBUG_SUFFIX} ALLOCORE_LINK_LIBRARIES)
 
@@ -100,10 +100,12 @@ endforeach()
 # Build Examples ------------------------------------------------------
 if(BUILD_EXAMPLES)
     include_directories(${GAMMA_INCLUDE_DIR})
+    get_target_property(GAMMA_LIBRARIES Gamma GAMMA_LINK_LIBRARIES)
 
-    file(GLOB EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/*.cpp)
+    file(GLOB EXAMPLE_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "examples/*.cpp")
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_ROOT_DIR}/build/bin/examples/)
     foreach(example ${EXAMPLE_FILES})
+#      message("Building alloaudio example: ${example}")
       get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
       set(EXAMPLE_TARGET alloaudio_examples_${EXAMPLE_NAME})
       add_executable(${EXAMPLE_TARGET} ${example})
