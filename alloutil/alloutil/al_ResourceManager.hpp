@@ -70,8 +70,8 @@ public:
 		FileInfo(const FileInfo& cpy) : path(cpy.path), modified(cpy.modified) {}
 	};
 
-	///! returns NULL if the file cannot be found
-	const char * find(std::string filename);
+	///! returns "" if the file cannot be found
+	std::string find(std::string filename);
 
 	///! adds a file to the file map (assuming it can be found
 	/// with immediate==true also calls read() directly

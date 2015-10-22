@@ -4,14 +4,14 @@
 using namespace al;
 
 
-const char * ResourceManager::find(std::string filename) {
+std::string ResourceManager::find(std::string filename) {
 	FilePath fp = paths.find(filename);
 	std::string result = fp.filepath();
 	if (result == "") {
 		AL_WARN("al::ResourceManager: could not find: %s", filename.c_str());
-		return NULL;
+		return "";
 	} else {
-		return result.c_str();
+		return result;
 	}
 
 }

@@ -48,14 +48,18 @@
 #define INCLUDE_ALLO_VOXELS_HPP
 
 //#include <stdlib.h>
+#include <cmath>
 #include <string>
 #include <sstream>  
 #include <dirent.h>
 #include <cassert>
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include "allocore/types/al_Array.hpp"
-#include "allocore/al_Allocore.hpp"
+#include "allocore/types/al_Conversion.hpp"
+#include "allocore/io/al_File.hpp"
+#include "allocore/graphics/al_Image.hpp"
 
 using namespace al;
 using namespace std;
@@ -100,21 +104,21 @@ struct MRCHeader {
   int32_t   my;
   int32_t   mz;
 
-  float_t   xlen;       /* cell dimensions in angstroms   */
-  float_t   ylen;       /* - MRC2014 standard             */
-  float_t   zlen;
+  float   xlen;       /* cell dimensions in angstroms   */
+  float   ylen;       /* - MRC2014 standard             */
+  float   zlen;
 
-  float_t   alpha;      /* cell angles                    */
-  float_t   beta;
-  float_t   gamma;
+  float   alpha;      /* cell angles                    */
+  float   beta;
+  float   gamma;
 
   int32_t   mapx;       /* map coloumn 1=x,2=y,3=z.       */
   int32_t   mapy;       /* map row     1=x,2=y,3=z.       */
   int32_t   mapz;       /* map section 1=x,2=y,3=z.       */
 
-  float_t   amin;       /* Minimum pixel value            */
-  float_t   amax;       /* Maximum pixel value            */
-  float_t   amean;      /* Mean pixel value            */
+  float   amin;       /* Minimum pixel value            */
+  float   amax;       /* Maximum pixel value            */
+  float   amean;      /* Mean pixel value            */
 
   int16_t   ispg;       /* image type */
   int16_t   nsymbt;     /* space group number */
@@ -127,10 +131,10 @@ struct MRCHeader {
   int16_t   nreal;
   int16_t   sub;
   int16_t   zfac;
-  float_t   min2;
-  float_t   max2;
-  float_t   min3;
-  float_t   max3;
+  float   min2;
+  float   max2;
+  float   min3;
+  float   max3;
   int32_t   imodStamp;
   int32_t   imodFlags;
   int16_t   idtype;
@@ -139,13 +143,13 @@ struct MRCHeader {
   int16_t   nd2;
   int16_t   vd1;
   int16_t   vd2;
-  float_t   tiltangles[6];  /* 0,1,2 = original:  3,4,5 = current */
+  float   tiltangles[6];  /* 0,1,2 = original:  3,4,5 = current */
 
   /* MRC 2000 standard */
-  float_t   origin[3];
+  float   origin[3];
   char    cmap[4];          /* Contains "MAP " for LE, " PAM" for BE */
   char    machinestamp[4];  /* Little Endian : 68 65 17 17 // Big Endian : 17 17 65 68 */
-  float_t   rms;            /* RMS deviation of densities from mean density */
+  float   rms;            /* RMS deviation of densities from mean density */
 
   int32_t nlabl;  // number of labels
   char  labels[10][80];

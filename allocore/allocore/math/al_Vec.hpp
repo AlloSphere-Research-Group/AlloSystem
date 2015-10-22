@@ -393,6 +393,9 @@ public:
 		return input+amt*(target-input);
 	}
 
+	/// Set magnitude (preserving direction)
+	Vec& mag(T v);
+
 	/// Negates all elements
 	Vec& negate(){
 		IT(N){ (*this)[i] = -(*this)[i]; } return *this; }
@@ -510,10 +513,9 @@ void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double cosAng, double sinAng)
 /// @param[in]		normal		A normal perpendicular to the plane of rotation
 /// @param[in]		angle		The rotation angle, in radians
 template <class T>
-void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double ang){
-	rotate(vec, normal, cos(ang), sin(ang));
+void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double angle){
+	rotate(vec, normal, cos(angle), sin(angle));
 }
-
 
 
 /// Returns angle, in interval [0, pi], between two vectors
@@ -576,16 +578,21 @@ inline Vec<N,T> max(const Vec<N,T>& a, const Vec<N,T>& b){
 // Implementation --------------------------------------------------------------
 
 template <int N, class T>
-Vec<N,T>& Vec<N,T>::normalize(T scale){
+Vec<N,T>& Vec<N,T>::mag(T v){
 	T m = mag();
 	if(m > T(1e-20)){
-		(*this) *= (scale/m);
+		(*this) *= (v/m);
 	}
 	else{
 		set(T(0));
-		(*this)[0] = scale;
+		(*this)[0] = v;
 	}
 	return *this;
+}
+
+template <int N, class T>
+Vec<N,T>& Vec<N,T>::normalize(T scale){
+	return mag(scale);
 }
 
 

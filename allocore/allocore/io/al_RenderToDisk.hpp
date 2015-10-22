@@ -58,6 +58,7 @@ namespace al{
 class RenderToDisk : public AudioCallback, public WindowEventHandler{
 public:
 
+	/// Rendering modes
 	enum Mode{
 		NON_REAL_TIME,	/**< Non-real-time rendering */
 		REAL_TIME		/**< Real-time rendering */
