@@ -411,18 +411,18 @@ namespace al {
   }
   
   inline std::string	RayApp::vertexCode() {
-    return AL_STRINGIFY(
+    return R"(
                         varying vec2 T;
                         void main(void) {
                           // pass through the texture coordinate (normalized pixel):
                           T = vec2(gl_MultiTexCoord0);
                           gl_Position = vec4(T*2.-1., 0, 1);
                         }
-                        );
+                        )";
   }
   
   inline std::string RayApp::fragmentCode() {
-    return AL_STRINGIFY(
+    return R"(
                         uniform sampler2D pixelMap;
                         uniform sampler2D alphaMap;
                         uniform vec4 quat;
@@ -506,7 +506,7 @@ namespace al {
                               
                               hitpoint = at;
                               
-                              // "Finite difference thing". :)
+                              // Finite difference thing. :)
                               normal.x = evalAt(at + vec3(normalEps, 0, 0));
                               normal.y = evalAt(at + vec3(0, normalEps, 0));
                               normal.z = evalAt(at + vec3(0, 0, normalEps));
@@ -580,7 +580,7 @@ namespace al {
                           
                           gl_FragColor = vec4(color, 1);
                         }
-                        );
+                        )";
   }
   
   inline void RayApp::AppAudioCB(AudioIOData& io){

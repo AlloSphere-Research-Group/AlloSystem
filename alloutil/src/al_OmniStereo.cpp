@@ -94,17 +94,17 @@ static void softEdge(uint8_t * value, double normx, double normy) {
 }
 
 #pragma mark GLSL
-static const char * vGeneric = AL_STRINGIFY(
+static const char * vGeneric = R"(
 	varying vec2 T;
 	void main(void) {
 		// pass through the texture coordinate (normalized pixel):
 		T = vec2(gl_MultiTexCoord0);
 		gl_Position = vec4(T*2.-1., 0, 1);
 	}
-);
+)";
 
 #pragma mark Cube GLSL
-static const char * fCube = AL_STRINGIFY(
+static const char * fCube = R"(
 	uniform sampler2D pixelMap;
 	uniform sampler2D alphaMap;
 	uniform samplerCube cubeMap;
@@ -120,10 +120,10 @@ static const char * fCube = AL_STRINGIFY(
 
 		gl_FragColor = vec4(rgb, 1.);
 	}
-);
+)";
 
 #pragma mark Sphere GLSL
-static const char * fSphere = AL_STRINGIFY(
+static const char * fSphere = R"(
 	uniform sampler2D pixelMap;
 	uniform sampler2D alphaMap;
 	uniform sampler2D sphereMap;
@@ -168,10 +168,10 @@ static const char * fSphere = AL_STRINGIFY(
 		vec3 rgb = texture2D(sphereMap, sphereT).rgb * texture2D(alphaMap, T).rgb;
 		gl_FragColor = vec4(rgb, 1.);
 	}
-);
+)";
 
 #pragma mark Warp GLSL
-static const char * fWarp = AL_STRINGIFY(
+static const char * fWarp = R"(
 	uniform sampler2D pixelMap;
 	uniform sampler2D alphaMap;
 	varying vec2 T;
@@ -182,10 +182,10 @@ static const char * fWarp = AL_STRINGIFY(
 		v *= texture2D(alphaMap, T).rgb;
 		gl_FragColor = vec4(v, 1.);
 	}
-);
+)";
 
 #pragma mark Demo GLSL
-static const char * fDemo = AL_STRINGIFY(
+static const char * fDemo = R"(
 	uniform sampler2D pixelMap;
 	uniform sampler2D alphaMap;
 	uniform vec4 quat;
@@ -358,7 +358,7 @@ static const char * fDemo = AL_STRINGIFY(
 
 		gl_FragColor = vec4(color, 1);
 	}
-);
+)";
 
 #pragma mark Projection
 

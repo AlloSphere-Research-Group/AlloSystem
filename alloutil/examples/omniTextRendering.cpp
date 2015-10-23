@@ -66,7 +66,7 @@ struct MyApp : OmniApp {
   virtual bool onKeyDown(const Keyboard& k) { return true; }
 
   std::string fragmentCode() {
-    return AL_STRINGIFY(
+    return R"(
       uniform float lighting;
       uniform float texture;
       uniform sampler2D texture0;
@@ -96,7 +96,7 @@ struct MyApp : OmniApp {
         // This sets alpha to 0 for everything but the letter
 /*!*/   if (texture > 0.0) gl_FragColor.a = textureColor.r;
       }
-    );
+    )";
   }
 };
 

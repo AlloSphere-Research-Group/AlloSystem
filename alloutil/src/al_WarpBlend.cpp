@@ -10,7 +10,7 @@ using namespace al;
 Graphics gl;
 
 // this shader performs Kenny's transformation:
-static const char * predistortVS = AL_STRINGIFY(
+static const char * predistortVS = R"(
 
 	uniform vec3 projector_position;						// the projector location
 	uniform vec3 x_unit, y_unit, normal_unit; 	// the projector coordinate frame
@@ -88,25 +88,25 @@ static const char * predistortVS = AL_STRINGIFY(
 		// debug coloring
 		C = gl_Color.rgb; //abs(gl_Vertex.xyz / 8.);
 	}
-);
-static const char * predistortFS = AL_STRINGIFY(
+)";
+static const char * predistortFS = R"(
 	varying vec3 C; // for debugging
 
 	void main(){
 		gl_FragColor = vec4(C, 1);
 	}
-);
+)";
 
 // this shader is just to show the geometry map:
-static const char * alphaVS = AL_STRINGIFY(
+static const char * alphaVS = R"(
 	varying vec2 texcoord0;
 	void main(){
 		texcoord0 = vec2(gl_MultiTexCoord0);
 		vec4 vertex = gl_Vertex;
 		gl_Position = gl_ModelViewProjectionMatrix * vertex;
 	}
-);
-static const char * alphaFS = AL_STRINGIFY(
+)";
+static const char * alphaFS = R"(
 	uniform sampler2D alphaMap;
 	varying vec2 texcoord0;
 	void main(){
@@ -114,18 +114,18 @@ static const char * alphaFS = AL_STRINGIFY(
 		//g.y = 1.-g.y;
 		gl_FragColor = vec4(0, 0, 0, 1.-a);
 	}
-);
+)";
 
 // this shader is just to show the geometry map:
-static const char * geomVS = AL_STRINGIFY(
+static const char * geomVS = R"(
 	varying vec2 texcoord0;
 	void main(){
 		texcoord0 = vec2(gl_MultiTexCoord0);
 		vec4 vertex = gl_Vertex;
 		gl_Position = gl_ModelViewProjectionMatrix * vertex;
 	}
-);
-static const char * geomFS = AL_STRINGIFY(
+)";
+static const char * geomFS = R"(
 	uniform sampler2D geometryMap;
 	varying vec2 texcoord0;
 	void main(){
@@ -133,10 +133,10 @@ static const char * geomFS = AL_STRINGIFY(
 		//g.y = 1.-g.y;
 		gl_FragColor = vec4(g.x, g.y, 0., 1.);
 	}
-);
+)";
 
 // this shader is just to show the 3D geometry map:
-static const char * geomVS3D = AL_STRINGIFY(
+static const char * geomVS3D = R"(
 	varying vec2 texcoord0;
 	void main(){
 		texcoord0 = vec2(gl_MultiTexCoord0);
@@ -144,8 +144,8 @@ static const char * geomVS3D = AL_STRINGIFY(
 		//gl_Position = gl_ModelViewProjectionMatrix * vertex;
 		gl_Position = vec4(texcoord0 * 2.-1., 0., 1.);
 	}
-);
-static const char * geomFS3D = AL_STRINGIFY(
+)";
+static const char * geomFS3D = R"(
 	uniform sampler2D pixelMap, alphaMap;
 	varying vec2 texcoord0;
 	void main(){
@@ -155,10 +155,10 @@ static const char * geomFS3D = AL_STRINGIFY(
 		v = mod(v * 8., 1.) * a;
 		gl_FragColor = vec4(v, 1.);
 	}
-);
+)";
 
 // this shader is just to show the inverse 3D geometry map:
-static const char * geomVSI3D = AL_STRINGIFY(
+static const char * geomVSI3D = R"(
 	varying vec2 texcoord0;
 	void main(){
 		texcoord0 = vec2(gl_MultiTexCoord0);
@@ -166,8 +166,8 @@ static const char * geomVSI3D = AL_STRINGIFY(
 		//gl_Position = gl_ModelViewProjectionMatrix * vertex;
 		gl_Position = vec4(texcoord0 * 2.-1., 0., 1.);
 	}
-);
-static const char * geomFSI3D = AL_STRINGIFY(
+)";
+static const char * geomFSI3D = R"(
 	uniform sampler2D inversePixelMap;
 	varying vec2 texcoord0;
 	void main(){
@@ -176,18 +176,18 @@ static const char * geomFSI3D = AL_STRINGIFY(
 		v = 0.5 * (v + 1.);
 		gl_FragColor = vec4(v, 1.);
 	}
-);
+)";
 
 // this shader is just to show the 3D geometry map in a fancy way
-static const char * demoVS = AL_STRINGIFY(
+static const char * demoVS = R"(
 	varying vec2 texcoord0;
 	void main(){
 		texcoord0 = vec2(gl_MultiTexCoord0);
 		gl_Position = vec4(texcoord0 * 2.-1., 0., 1.);
 		//gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 	}
-);
-static const char * demoFS = AL_STRINGIFY(
+)";
+static const char * demoFS = R"(
 	uniform sampler2D pixelMap, alphaMap;
 	uniform vec3 pos;
 	uniform vec3 centerpos;
@@ -485,11 +485,11 @@ static const char * demoFS = AL_STRINGIFY(
 
 		gl_FragColor = vec4(color, 1) * a;
 	}
-);
+)";
 
 
 // this shader does the warp.
-static const char * warpVS = AL_STRINGIFY(
+static const char * warpVS = R"(
 	//varying vec2 texcoord0;
 	void main(){
 		//texcoord0 = vec2(gl_MultiTexCoord0);
@@ -497,8 +497,8 @@ static const char * warpVS = AL_STRINGIFY(
 		vec4 vertex = gl_Vertex;
 		gl_Position = gl_ModelViewProjectionMatrix * vertex;
 	}
-);
-static const char * warpFS = AL_STRINGIFY(
+)";
+static const char * warpFS = R"(
 	uniform sampler2D scene;
 	uniform sampler2D geometryMap;
 	uniform sampler2D alphaMap;
@@ -520,7 +520,7 @@ static const char * warpFS = AL_STRINGIFY(
 		gl_FragColor = s * a; //(a+0.5);
 		//gl_FragColor = vec4(texcoord0, 0, 1);
 	}
-);
+)";
 
 void WarpnBlend::Projector::print() {
 	printf("Projector %d width %d height %d\n", (int)projnum, (int)width, (int)height);

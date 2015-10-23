@@ -13,27 +13,27 @@ Lance Putnam, 5/27/2011
 using namespace al;
 
 // point sprite vertex shader
-const char * vPointSprite = AL_STRINGIFY(
+const char * vPointSprite = R"(
 uniform float spriteRadius;
 void main(){
 	gl_FrontColor = gl_Color;
 	gl_Position = gl_Vertex;
 }
-);
+)";
 
 // point sprite fragment shader
-const char * fPointSprite = AL_STRINGIFY(
+const char * fPointSprite = R"(
 uniform sampler2D texSampler0;
 void main(){
 	gl_FragColor = texture2D(texSampler0, gl_TexCoord[0].xy) * gl_Color;
 }
-);
+)";
 
 // point sprite geometry shader
 const char * gPointSprite =
 "#version 120\n"
 "#extension GL_EXT_geometry_shader4 : enable\n"
-AL_STRINGIFY(
+R"(
 uniform float spriteRadius;
 void main(){
 	//screen-aligned axes
@@ -95,7 +95,7 @@ void main(){
 //	EndPrimitive();
 	gl_Position = gl_PositionIn[0];
 }
-);
+)";
 
 
 struct MyWindow : Window{
