@@ -891,6 +891,11 @@ TEM inline T wrapPhaseOnce(const T& r){
 	return r;
 }
 
+TEM inline T mapRange(T value, T inlow, T inhigh, T outlow, T outhigh){
+  float tmp = (value - inlow) / (inhigh-inlow);
+  return tmp*(outhigh-outlow) + outlow;
+}
+
 #undef TEM
 } // ::al::
 #endif
