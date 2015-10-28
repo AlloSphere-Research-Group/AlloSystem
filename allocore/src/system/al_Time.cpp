@@ -1,4 +1,5 @@
 #include "allocore/system/al_Time.hpp"
+#include "allocore/math/al_Constants.hpp"
 
 #define al_nsec2sec(ns)		(((al_sec)(ns)) * al_time_ns2s)
 #define al_sec2nsec(s)		((al_nsec)(s * al_time_s2ns))
@@ -6,7 +7,7 @@
 #define AL_TIME_USE_APR 1
 #ifdef AL_TIME_USE_APR
 
-#ifdef AL_LINUX
+#if defined(AL_LINUX) && !defined(AL_WINDOWS)
 	#include "apr-1.0/apr_time.h"
 #else
 	#include "apr-1/apr_time.h"

@@ -9,7 +9,7 @@
 // for these two tasks...
 
 #include "../private/al_ImplAPR.h"
-#ifdef AL_LINUX
+#if defined(AL_LINUX) && !defined(AL_WINDOWS)
 	#include "apr-1.0/apr_file_io.h"
 	#include "apr-1.0/apr_file_info.h"
 #else

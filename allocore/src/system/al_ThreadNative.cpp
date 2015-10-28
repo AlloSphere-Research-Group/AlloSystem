@@ -138,7 +138,8 @@ struct Thread::Impl{
 	unsigned long mHandle;
 //	ThreadFunction mRoutine;
 
-	static unsigned _stdcall cThreadFunc(void * user){
+	static unsigned cThreadFunc(void * user){
+	// static unsigned _stdcall cThreadFunc(void * user){
 		ThreadFunction& tfunc = *((ThreadFunction*)user);
 		tfunc();
 		return 0;
