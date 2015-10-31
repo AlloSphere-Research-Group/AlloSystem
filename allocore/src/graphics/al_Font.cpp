@@ -17,7 +17,7 @@
 	#include FT_OUTLINE_H
 	#include FT_GLYPH_H
 
-#elif defined WIN32
+#elif defined (WIN32) || defined(AL_WINDOWS)
 
 	#include <windows.h>
 	#include <ft2build.h>
@@ -25,6 +25,8 @@
 	#include FT_OUTLINE_H
 	#include FT_GLYPH_H
 
+#else
+	#error "do not know this operating system"
 #endif
 
 extern "C" {

@@ -33,7 +33,7 @@
 // need this to pick up AL_LINUX etc:
 #include "allocore/system/al_Config.h"
 
-#ifdef AL_LINUX
+#if defined(AL_LINUX) && !defined(AL_WINDOWS)
 	#include "apr-1.0/apr_general.h"
 	#include "apr-1.0/apr_errno.h"
 	#include "apr-1.0/apr_pools.h"

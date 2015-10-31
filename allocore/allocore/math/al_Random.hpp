@@ -45,6 +45,7 @@
 
 #include <time.h>							/* req'd for time() */
 #include <cmath>
+#include <random>
 #include "allocore/types/al_Conversion.hpp"	/* req'd for int to float conversion */
 #include "allocore/math/al_Constants.hpp"
 
@@ -56,6 +57,7 @@ namespace rnd{
 class LinCon;
 class MulLinCon;
 class Tausworthe;
+class MersenneTwister;
 template<class RNG> class Random;
 
 
@@ -279,6 +281,29 @@ public:
 private:
 	uint32_t s1, s2, s3, s4;
 	void iterate();
+};
+
+class MersenneTwister {
+public:
+	MersenneTwister() {
+		std::random_device rd;
+    mt.seed(rd());
+	}
+
+	MersenneTwister(uint32_t seed) {
+		mt.seed(seed);
+	}
+
+	uint32_t operator()() {
+		return mt();
+	}
+
+	void seed(uint32_t v) {
+		mt.seed(v);
+	}
+	
+private:
+	std::mt19937 mt;
 };
 
 
