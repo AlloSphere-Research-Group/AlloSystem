@@ -54,7 +54,6 @@
 #define AL_SYSTEM_LIB_VERSION 0.01
 
 #if defined(WIN32) || defined(__WINDOWS_MM__) || defined(WIN64) || defined(AL_WINDOWS)
-	#define AL_WINDOWS 1
 
 	// Experimentally not include all of windows.h .
 	// #define WIN32_LEAN_AND_MEAN
@@ -90,11 +89,9 @@
 	#endif
 
 #elif defined( __APPLE__ ) && defined( __MACH__ )
-	#define AL_OSX 1
 	#define AL_API extern
 
 #else
-	#define AL_LINUX 1
 	#define AL_API extern
 #endif
 

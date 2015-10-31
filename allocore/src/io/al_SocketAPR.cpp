@@ -26,7 +26,7 @@ You can actually use connect() on UDP socket as an option. In that case, you can
 #include "allocore/system/al_Printing.hpp"
 
 #include "../private/al_ImplAPR.h"
-#if defined(AL_LINUX) && !defined(AL_WINDOWS)
+#if defined(AL_LINUX)
 #include "apr-1.0/apr_network_io.h"
 #else
 #include "apr-1/apr_network_io.h"

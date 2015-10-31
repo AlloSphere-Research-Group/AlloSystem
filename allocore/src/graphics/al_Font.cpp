@@ -1,6 +1,6 @@
 #include "allocore/graphics/al_Font.hpp"
 
-#if defined (__APPLE__) || defined (OSX)
+#if defined (AL_OSX)
 
 	#include "ft2build.h"
 	#include FT_FREETYPE_H
@@ -10,14 +10,14 @@
 	#define FONT_OSX 1
 	#define FONT_SYSTEM_FONTS 1
 
-#elif defined(__linux__)
+#elif defined(AL_LINUX)
 
 	#include <ft2build.h>
 	#include FT_FREETYPE_H
 	#include FT_OUTLINE_H
 	#include FT_GLYPH_H
 
-#elif defined (WIN32) || defined(AL_WINDOWS)
+#elif defined(AL_WINDOWS)
 
 	#include <windows.h>
 	#include <ft2build.h>

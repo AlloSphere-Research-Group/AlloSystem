@@ -7,7 +7,7 @@
 #define AL_TIME_USE_APR 1
 #ifdef AL_TIME_USE_APR
 
-#if defined(AL_LINUX) && !defined(AL_WINDOWS)
+#if defined(AL_LINUX)
 	#include "apr-1.0/apr_time.h"
 #else
 	#include "apr-1/apr_time.h"

@@ -57,15 +57,6 @@
 #undef sinc
 #endif
 
-// Define some standard C99 functions that Windows is too stubborn to support.
-// #if defined(AL_WINDOWS)
-// 	#define nextafterf(x,y)	_nextafterf(x,y)
-// 	//float nextafterf(float x, float y);
-// 	#define nextafter(x,y)	_nextafter(x,y)
-// 	#define nextafterl(x,y)	_nextafter(x,y)
-// #endif
-
-
 namespace al {
 
 /// Returns absolute value
