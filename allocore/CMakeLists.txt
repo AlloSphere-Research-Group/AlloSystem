@@ -110,7 +110,6 @@ endif()
 # System dependent libs
 # ---- OS X ----
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  add_definitions(-DAL_OSX)
     # Needed by HID
   find_library(IOKIT_FM IOKit)
   find_library(COREFOUNDATION_FM CoreFoundation)
@@ -119,7 +118,6 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 # ---- Linux ------
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  add_definitions(-DAL_LINUX)
 
   # For clock_gettime, etc.
   list(APPEND ALLOCORE_LINK_LIBRARIES rt)
@@ -130,13 +128,6 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   find_package(Libusb QUIET)
   list(APPEND ALLOCORE_LINK_LIBRARIES ${LIBUSB_1_LIBRARY} ${UDEV_LIBRARY})
   #message("libudev lib = ${UDEV_LIBRARY}")
-endif()
-
-# ---- Windows ----
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-  add_definitions(-DAL_WINDOWS)
-  # For HID
-  #list(APPEND ALLOCORE_LINK_LIBRARIES windows setupapi) # Commented out for mingw buildmaybe required for msvs?
 endif()
 
 # optional dependendencies ----------------------------

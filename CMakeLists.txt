@@ -52,6 +52,16 @@ endif(NOT DEFINED BUILD_GLV)
 
 set(BUILD_EXAMPLES 0 CACHE STRING "Build AlloSystem examples.")
 
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  add_definitions(-DAL_OSX)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  add_definitions(-DAL_LINUX)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+  add_definitions(-DAL_WINDOWS)
+endif()
+
+
 # External dependencies (Gamma and GLV)
 
 include(CheckCXXCompilerFlag)
