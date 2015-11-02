@@ -28,16 +28,16 @@ Mesh mesh;
 ShaderProgram shaderP;
 Shader shaderV, shaderF;
 
-static const char * vField = AL_STRINGIFY(
+static const char * vField = R"(
 varying vec3 texcoord0;
 void main(){
 	texcoord0 = gl_Vertex.xyz / 32.;
 	//texcoord0 = vec3(gl_MultiTexCoord0);
 	gl_Position = ftransform();
 }
-);
+)";
 
-static const char * fField = AL_STRINGIFY(
+static const char * fField = R"(
 uniform sampler3D tex;
 varying vec3 texcoord0;
 void main() {
@@ -46,7 +46,7 @@ void main() {
 	gl_FragColor = vec4(rgb, 0.95);
 	//gl_FragColor = vec4(texcoord0, 1);
 }
-);
+)";
 
 struct MyWindow : public Window {
 

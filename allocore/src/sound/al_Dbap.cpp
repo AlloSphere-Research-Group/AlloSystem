@@ -3,7 +3,7 @@
 namespace al{
 
 Dbap::Dbap(const SpeakerLayout &sl, float focus)
-:	Spatializer(sl), mNumSpeakers(0), mFocus(focus), mListener(NULL)
+	:	Spatializer(sl), mListener(NULL), mNumSpeakers(0), mFocus(focus)
 {}
 
 void Dbap::compile(Listener& listener){
@@ -18,10 +18,7 @@ void Dbap::compile(Listener& listener){
 	}
 }
 
-//#if !ALLOCORE_GENERIC_AUDIOSCENE
-    
-void Dbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples)
-{
+void Dbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples){
 	for (unsigned k = 0; k < mNumSpeakers; ++k)
 	{
         float gain = 1.f;
@@ -52,7 +49,7 @@ void Dbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& 
 		}
 	}
 }
-    
+
 void Dbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample)
 {
     for (unsigned i = 0; i < mNumSpeakers; ++i)

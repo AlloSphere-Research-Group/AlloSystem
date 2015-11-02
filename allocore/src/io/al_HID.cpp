@@ -114,16 +114,39 @@ public:
 
 	static void printDevices(unsigned short vID, unsigned short pID){
 		struct hid_device_info * begin = hid_enumerate(vID, pID);
-		struct hid_device_info * d = begin;
+		struct hid_device_info * dev = begin;
 
 		if(NULL != begin){
-			while(NULL != d){
-				print(*d);
+			while(NULL != dev){
+				print(*dev);
 				printf("\n");
-				d = d->next;
+				dev = dev->next;
 			}
 			hid_free_enumeration(begin);
 		}
+	}
+
+	static HID::Info find(const wchar_t * searchTerm){
+
+		HID::Info info = {0,0,NULL};
+
+		struct hid_device_info * begin = hid_enumerate(0, 0);
+		struct hid_device_info * dev = begin;
+
+		if(NULL != begin){
+			while(NULL != dev){
+				if(NULL != ::wcsstr(dev->product_string, searchTerm)){
+					info.vendorID = dev->vendor_id;
+					info.productID = dev->product_id;
+					info.serialNumber = dev->serial_number;
+					break;
+				}
+				dev = dev->next;
+			}
+			hid_free_enumeration(begin);
+		}
+
+		return info;
 	}
 
 private:
@@ -143,6 +166,10 @@ HID::~HID(){
 
 bool HID::open(unsigned short vid, unsigned short pid, const wchar_t *ser){
 	return mImpl->open(vid, pid, ser);
+}
+
+bool HID::open(const HID::Info& info){
+	return mImpl->open(info.vendorID, info.productID, info.serialNumber);
 }
 
 bool HID::open(const char * path){
@@ -175,6 +202,17 @@ std::wstring HID::product() const {
 
 std::wstring HID::serialNumber() const {
 	return mImpl->serialNumber();
+}
+
+
+HID::Info HID::find(const char * searchTerm){
+	static const int N = 128;
+	wchar_t wsearchTerm[N];
+	mbsrtowcs(wsearchTerm, &searchTerm, N, NULL);
+	return Impl::find(wsearchTerm);
+}
+HID::Info HID::find(const wchar_t * searchTerm){
+	return Impl::find(searchTerm);
 }
 
 void HID::printDevices(unsigned short vID, unsigned short pID){

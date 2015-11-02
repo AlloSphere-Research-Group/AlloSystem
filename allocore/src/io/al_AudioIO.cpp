@@ -32,13 +32,12 @@ public:
 	virtual void inDevice(int index) {return;}
 	virtual void outDevice(int index) {return;}
 
-	virtual int channels(int num, bool forOutput) {
+	virtual void channels(int num, bool forOutput) {
 		if (forOutput) {
 			setOutDeviceChans(num);
 		} else {
 			setInDeviceChans(num);
 		}
-		return num;
 	}
 
 	virtual int inDeviceChans() {return mNumInChans;}
@@ -114,30 +113,25 @@ public:
 		mOutParams.hostApiSpecificStreamInfo = NULL;
 	}
 
-	virtual int channels(int num, bool forOutput) {
+	virtual void channels(int num, bool forOutput) {
 		if(isOpen()){
 			warn("the number of channels cannnot be set with the stream open", "AudioIO");
-			return -1;
+			return;
 		}
 
 		PaStreamParameters * params = forOutput ? &mOutParams : &mInParams;
 
 		if(num == 0){
 			//params->device = paNoDevice;
-	//		params->channelCount = 0;
-			if (forOutput) {
-				mInParams.channelCount = num;
-			} else {
-				mInParams.channelCount = num;
-			}
-			return num;
+			params->channelCount = 0;
+			return;
 		}
 
 		const PaDeviceInfo * info = Pa_GetDeviceInfo(params->device);
 		if(0 == info){
 			if(forOutput)	warn("attempt to set number of channels on invalid output device", "AudioIO");
 			else			warn("attempt to set number of channels on invalid input device", "AudioIO");
-			return -1;	// this particular device is not open, so return
+			return;	// this particular device is not open, so return
 		}
 
 
@@ -152,7 +146,7 @@ public:
 		num = min(num, maxChans);
 		params->channelCount = num;
 
-		return num;
+		return;
 	}
 
 	virtual int inDeviceChans() { return (int) mInParams.channelCount; }
@@ -321,17 +315,9 @@ AudioDevice::AudioDevice(int deviceNum)
 :    AudioDeviceInfo(deviceNum), mImpl(0)
 {
 	if (deviceNum < 0) {
-		deviceNum = PortAudioBackend::defaultOutput().id();
+		deviceNum = defaultOutput().id();
 	}
 	setImpl(deviceNum);
-	if (deviceNum >= 0) {
-		strncpy(mName, ((const PaDeviceInfo*)mImpl)->name, 127);
-		mName[127] = '\0';
-		mChannelsInMax = ((const PaDeviceInfo*)mImpl)->maxInputChannels;
-		mChannelsOutMax = ((const PaDeviceInfo*)mImpl)->maxOutputChannels;
-		mDefaultSampleRate = ((const PaDeviceInfo*)mImpl)->defaultSampleRate;
-		mID = deviceNum;
-	}
 }
 
 AudioDevice::AudioDevice(const std::string& nameKeyword, StreamMode stream)
@@ -355,7 +341,18 @@ bool AudioDevice::valid() const
 	return 0!=mImpl;
 }
 
-void AudioDevice::setImpl(int deviceNum){ initDevices(); mImpl = Pa_GetDeviceInfo(deviceNum); mID=deviceNum; }
+void AudioDevice::setImpl(int deviceNum){
+	if (deviceNum >= 0) {
+		initDevices();
+		mImpl = Pa_GetDeviceInfo(deviceNum);
+		mID = deviceNum;
+		strncpy(mName, ((const PaDeviceInfo*)mImpl)->name, 127);
+		mName[127] = '\0';
+		mChannelsInMax = ((const PaDeviceInfo*)mImpl)->maxInputChannels;
+		mChannelsOutMax = ((const PaDeviceInfo*)mImpl)->maxOutputChannels;
+		mDefaultSampleRate = ((const PaDeviceInfo*)mImpl)->defaultSampleRate;
+	}
+}
 AudioDevice AudioDevice::defaultInput(){ return PortAudioBackend::defaultInput(); }
 AudioDevice AudioDevice::defaultOutput(){ return PortAudioBackend::defaultOutput(); }
 
@@ -548,13 +545,20 @@ void AudioIO::channelsBus(int num){
 
 
 void AudioIO::channels(int num, bool forOutput){
-	num = mImpl->channels(num, forOutput);
+	//printf("Requested %d %s channels\n", num, forOutput?"output":"input");
+	mImpl->channels(num, forOutput);
 	int currentNum = channels(forOutput);
 
-	if(num != currentNum && num > 0){
+	// Open all device channels?
+	if(num == -1){
+		num = channelsOutDevice();
+	}
+
+	if(num != currentNum){
 		forOutput ? mNumO = num : mNumI = num;
 		resizeBuffer(forOutput);
 	}
+	//printf("Set %d %s channels\n", forOutput?mNumO:mNumI, forOutput?"output":"input");
 }
 
 int AudioIO::channelsInDevice() const { return (int)mImpl->inDeviceChans(); }

@@ -29,12 +29,12 @@ typedef struct {
 } meters_t;
 
 typedef struct {
-    AmbisonicsSpatializer *spatializer;
-    gam::SoundFile sf;
-    float read_buffer[AUDIO_BLOCK_SIZE * 4];
-    float gain;
-    int done;
-    meters_t meters;
+	AmbisonicsSpatializer *spatializer;
+	gam::SoundFile sf;
+	float read_buffer[AUDIO_BLOCK_SIZE * 4];
+	float gain;
+	int done;
+	meters_t meters;
 } userdata_t;
 
 
@@ -42,16 +42,16 @@ void audioCB(AudioIOData& io)
 {
     userdata_t * ud = (userdata_t *) io.user();
 	int numFrames = io.framesPerBuffer();
-
+	
 	assert(AUDIO_BLOCK_SIZE == numFrames);
-
-    AmbisonicsSpatializer* spatializer = ud->spatializer;
-    spatializer->prepare(io);
-
-    float * ambiChans = spatializer->ambiChans();
-
-    int framesRead = ud->sf.read(ud->read_buffer, AUDIO_BLOCK_SIZE);
-
+	
+	AmbisonicsSpatializer* spatializer = ud->spatializer;
+	spatializer->prepare(io);
+	
+	float * ambiChans = spatializer->ambiChans();
+	
+	int framesRead = ud->sf.read(ud->read_buffer, AUDIO_BLOCK_SIZE);
+	
 	if (framesRead == 0) {
 		ud->done = 1;
 	}

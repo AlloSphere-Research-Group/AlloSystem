@@ -19,8 +19,8 @@ static void serializeToBigEndian(char * out, float in){
 }
 
 
-RenderToDisk::RenderToDisk()
-:	mMode(NON_REAL_TIME), mFrameNumber(0), mElapsedSec(0),
+RenderToDisk::RenderToDisk(Mode m)
+:	mMode(m), mFrameNumber(0), mElapsedSec(0),
 	mGraphicsBuf(-1),
 	mImageExt("png"), mImageCompress(50),
 	mActive(false)
@@ -101,14 +101,9 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 		return false;
 	}
 
-	// If no path specified, create default with time string
-	if(mPath.empty()){
-		mPath = "./render";
-		mPath += al::toString((unsigned long long)(al::timeNow()*1000) % 31536000000ull);
-	}
+	// Make path on HD
+	makePath();
 
-	// Create ouput directory if it doesn't exist
-	if(!File::exists(mPath)) Dir::make(mPath);
 
 	if(aio){
 		// Open sound file for writing
@@ -239,6 +234,28 @@ void RenderToDisk::stop(){
 	}
 }
 
+
+void RenderToDisk::saveScreenshot(unsigned w, unsigned h, unsigned l, unsigned b){
+	makePath();
+	saveImage(w,h,l,b, /*usePBO=*/false);
+}
+
+void RenderToDisk::saveScreenshot(al::Window& win){
+	saveScreenshot(win.width(), win.height());
+}
+
+
+void RenderToDisk::makePath(){
+	// If no path specified, create default with time string
+	if(mPath.empty()){
+		mPath = "./render";
+		mPath += al::toString((unsigned long long)(al::timeNow()*1000) % 31536000000ull);
+	}
+
+	// Create output directory if it doesn't exist
+	if(!File::exists(mPath)) Dir::make(mPath);
+}
+
 void RenderToDisk::write(){
 	writeImage();
 	writeAudio();
@@ -296,14 +313,13 @@ void RenderToDisk::resetPBOQueue(){
 	mReadPBO = false;
 }
 
-void RenderToDisk::saveImage(unsigned w, unsigned h, unsigned l, unsigned b){
-
+void RenderToDisk::saveImage(
+	unsigned w, unsigned h, unsigned l, unsigned b, bool usePBO
+){
 	unsigned numBytes = w*h*3;
 	if(numBytes > mPixels.size()) mPixels.resize(numBytes);
 
 	unsigned char * pixs = &mPixels[0];
-
-	bool mUsePBO = true;
 
 	// Set read buffer
 	//glReadBuffer(GL_COLOR_ATTACHMENT0); // for FBO
@@ -328,7 +344,7 @@ void RenderToDisk::saveImage(unsigned w, unsigned h, unsigned l, unsigned b){
 	http://www.gamedev.net/topic/575590-real-time-opengl-screen-capture/
 	http://stackoverflow.com/questions/12157646/how-to-render-offscreen-on-opengl
 	*/
-	if(mUsePBO){
+	if(usePBO){
 		if(0 == mPBOs[0]){ // create PBOs
 			glGenBuffers(Npbos, mPBOs);
 			for(int i=0; i<Npbos; ++i){

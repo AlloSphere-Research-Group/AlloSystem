@@ -12,19 +12,19 @@ Lance Putnam, 5/27/2011
 #include "allocore/graphics/al_Shader.hpp"
 using namespace al;
 
-const char * vTexture = AL_STRINGIFY(
+const char * vTexture = R"(
 void main(){
 	gl_TexCoord[0] = gl_MultiTexCoord0;
 	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 }
-);
+)";
 
-const char * fTexture = AL_STRINGIFY(
+const char * fTexture = R"(
 uniform sampler2D texSampler;
 void main(){
 	gl_FragColor = texture2D(texSampler, gl_TexCoord[0].xy);
 }
-);
+)";
 
 
 struct MyWindow : Window{

@@ -16,7 +16,6 @@ endif(NOT (GAMMA_FOUND OR GAMMA_LIBRARY))
 set(ALLOAUDIO_SRC
   src/al_OutputMaster.cpp
   src/butter.cpp
-#  src/al_Decorrelation.cpp
   )
 
 set(ALLOAUDIO_HEADERS
@@ -25,7 +24,7 @@ set(ALLOAUDIO_HEADERS
 
 # Dependencies ------------------------------
 
-get_target_property(ALLOCORE_LIBRARY allocore${DEBUG_SUFFIX} LOCATION)
+set(ALLOCORE_LIBRARY "allocore${DEBUG_SUFFIX}")
 get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore${DEBUG_SUFFIX} ALLOCORE_DEP_INCLUDE_DIRS)
 get_target_property(ALLOCORE_LINK_LIBRARIES allocore${DEBUG_SUFFIX} ALLOCORE_LINK_LIBRARIES)
 
@@ -47,14 +46,17 @@ if (NOT FFTW_LIBRARY)
   message(STATUS "Not using fftw3.")
   set(FFTW_LIBRARY "")
   write_dummy_headers("al_Convolver.hpp::::FFTW" ALLOAUDIO_HEADERS)
+  write_dummy_headers("al_Decorrelation.hpp::::FFTW" ALLOAUDIO_HEADERS)
 else()
   message(STATUS "Using fftw3: ${FFTW_LIBRARY}")
  list(APPEND ALLOAUDIO_SRC
   src/al_Convolver.cpp
+  src/al_Decorrelation.cpp
   src/zita-convolver-3.1.0/libs/zita-convolver.cc
 )
  list(APPEND ALLOAUDIO_HEADERS
   alloaudio/al_Convolver.hpp
+  alloaudio/al_Decorrelation.hpp
   src/zita-convolver-3.1.0/libs/zita-convolver.h)
 endif(NOT FFTW_LIBRARY)
 
@@ -64,7 +66,7 @@ file(GLOB ALLOAUDIO_INSTALL_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} alloaud
 set(ALLOAUDIO_LIBRARY "alloaudio${DEBUG_SUFFIX}")
 add_library(${ALLOAUDIO_LIBRARY} ${ALLOAUDIO_SRC} ${ALLOAUDIO_INSTALL_HEADERS})
 
-set(ALLOAUDIO_LINK_LIBRARIES ${ALLOCORE_LIBRARY} ${FFTW_LIBRARY})
+set(ALLOAUDIO_LINK_LIBRARIES ${ALLOCORE_LIBRARY} ${FFTW_LIBRARY} ${GAMMA_LIBRARY})
 set(ALLOAUDIO_DIRS ${BUILD_ROOT_DIR}/build/include)
 
 # export properties for AlloSystem
@@ -98,10 +100,12 @@ endforeach()
 # Build Examples ------------------------------------------------------
 if(BUILD_EXAMPLES)
     include_directories(${GAMMA_INCLUDE_DIR})
+    get_target_property(GAMMA_LIBRARIES Gamma GAMMA_LINK_LIBRARIES)
 
-    file(GLOB EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/*.cpp)
+    file(GLOB EXAMPLE_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "examples/*.cpp")
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BUILD_ROOT_DIR}/build/bin/examples/)
     foreach(example ${EXAMPLE_FILES})
+#      message("Building alloaudio example: ${example}")
       get_filename_component(EXAMPLE_NAME ${example} NAME_WE) # Get name w/o extension
       set(EXAMPLE_TARGET alloaudio_examples_${EXAMPLE_NAME})
       add_executable(${EXAMPLE_TARGET} ${example})
@@ -147,5 +151,11 @@ if(NOT FFTW_LIBRARY STREQUAL "")
   add_test(NAME convolverTests
 		  COMMAND $<TARGET_FILE:convolverTests> ${TEST_ARGS})
   add_memcheck_test(convolverTests)
+
+  add_executable(decorrelationTests unitTests/decorrelationTests.cpp)
+  target_link_libraries(decorrelationTests ${ALLOAUDIO_LIBRARY} ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${FFTW_LIBRARY} )
+  add_test(NAME decorrelationTests
+		  COMMAND $<TARGET_FILE:decorrelationTests> ${TEST_ARGS})
+  add_memcheck_test(decorrelationTests)
 endif()
 endif(NOT TRAVIS_BUILD)

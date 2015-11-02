@@ -48,6 +48,7 @@ struct al::Bluetooth::Impl{
 	bool recv(std::vector<unsigned char>& buf){
 		unsigned char readbuf[128];
 		int read;
+		int totalRead = 0;
 
 		/* Normally, read and recv block until a message arrives on the socket.
 		We can pass in MSG_DONTWAIT to tell recv to return immediately if there
@@ -61,11 +62,12 @@ struct al::Bluetooth::Impl{
 
 		while((read = ::recv(mSocket, readbuf, sizeof(readbuf), MSG_DONTWAIT)) > 0){
 			//printf("read %d bytes\n", read);
+			totalRead += read;
 			for(int i=0; i<read; ++i){
 				buf.push_back(readbuf[i]);
 			}
 		}
-		return true;
+		return bool(totalRead);
 
 		/*while((read = ::read(mSocket, readbuf, sizeof(readbuf))) != 0){
 			if(read > 0){

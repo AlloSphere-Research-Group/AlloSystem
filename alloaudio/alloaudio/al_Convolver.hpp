@@ -44,6 +44,8 @@ public:
 	 * @param[in] inputsAreBuses Set to True if you wish to use AudioIO's busses as input. This must be specified on AudioIO by calling io.channelsBus as well.
 	 * @param[in] disabledChannels Contains list of all channels which should not be processed.
 	 * @param[in] basePartitionSize Should be set to audio callback size to minimize latency. Cannot be less than 64 samples.
+	 * @param[in] options Options to be passed to zita convolver. Currently supports OPT_FFTW_MEASURE = 1,
+		OPT_VECTOR_MODE  = 2.
 	 * @return Returns 0 upon success
 	 */
 	int configure(al::AudioIO &io,

@@ -57,15 +57,6 @@
 #undef sinc
 #endif
 
-// Define some standard C99 functions that Windows is too stubborn to support.
-#if defined(AL_WINDOWS)
-	#define nextafterf(x,y)	_nextafterf(x,y)
-	//float nextafterf(float x, float y);
-	#define nextafter(x,y)	_nextafter(x,y)
-	#define nextafterl(x,y)	_nextafter(x,y)
-#endif
-
-
 namespace al {
 
 /// Returns absolute value
@@ -889,6 +880,11 @@ TEM inline T wrapPhaseOnce(const T& r){
 	if(r >= T(M_PI))		return r - T(M_2PI);
 	else if(r < T(-M_PI))	return r + T(M_2PI);
 	return r;
+}
+
+TEM inline T mapRange(T value, T inlow, T inhigh, T outlow, T outhigh){
+  float tmp = (value - inlow) / (inhigh-inlow);
+  return tmp*(outhigh-outlow) + outlow;
 }
 
 #undef TEM

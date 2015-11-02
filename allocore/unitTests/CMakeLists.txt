@@ -4,7 +4,8 @@ file(GLOB TEST_SRC_LIST RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "ut*.cpp")
 
 set(TEST_ARGS "")
 
-get_target_property(ALLOCORE_LIBRARY allocore${DEBUG_SUFFIX} LOCATION)
+#get_target_property(ALLOCORE_LIBRARY allocore${DEBUG_SUFFIX} LOCATION)
+set(ALLOCORE_LIBRARY "allocore${DEBUG_SUFFIX}")
 get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore${DEBUG_SUFFIX} ALLOCORE_DEP_INCLUDE_DIRS)
 get_target_property(ALLOCORE_LINK_LIBRARIES allocore${DEBUG_SUFFIX} ALLOCORE_LINK_LIBRARIES)
 
@@ -14,6 +15,7 @@ target_link_libraries(allocoreTests ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIE
 add_dependencies(allocoreTests allocore${DEBUG_SUFFIX})
 if(TRAVIS_BUILD)
 add_definitions(-DALLOCORE_TESTS_NO_GUI)
+add_definitions(-DALLOCORE_TESTS_NO_AUDIO)
 endif(TRAVIS_BUILD)
 add_test(NAME allocoreTests
          COMMAND $<TARGET_FILE:allocoreTests> ${TEST_ARGS})

@@ -41,13 +41,14 @@
 	File author(s):
 	Graham Wakefield, 2010, grrrwaaa@gmail.com
 
-
+  Modification:
+  Kon Hyong Kim, 2015, konhyong@gmail.com
 */
 
 #include "allocore/io/al_File.hpp"
 #include "allocore/system/al_Watcher.hpp"
 #include "allocore/graphics/al_Shader.hpp"
-#include "alloutil/al_Lua.hpp"
+//#include "alloutil/al_Lua.hpp" // removed lua dependency
 
 #include <map>
 #include <set>
@@ -69,8 +70,8 @@ public:
 		FileInfo(const FileInfo& cpy) : path(cpy.path), modified(cpy.modified) {}
 	};
 
-	///! returns NULL if the file cannot be found
-	const char * find(std::string filename);
+	///! returns "" if the file cannot be found
+	std::string find(std::string filename);
 
 	///! adds a file to the file map (assuming it can be found
 	/// with immediate==true also calls read() directly
@@ -194,6 +195,8 @@ protected:
 	bool relink;
 };
 
+/* Deprecated
+ 
 class ManagedLuaFile {
 public:
 	ManagedLuaFile(ResourceManager& rm) : rm(rm) {}
@@ -218,6 +221,8 @@ public:
 	ResourceManager& rm;
 	std::vector<std::string> files;
 };
+ 
+ */
 
 } //al::
 

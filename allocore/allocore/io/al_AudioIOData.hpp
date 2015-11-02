@@ -165,7 +165,7 @@ public:
 	virtual void inDevice(int index) = 0;
 	virtual void outDevice(int index) = 0;
 
-	virtual int channels(int num, bool forOutput) = 0;
+	virtual void channels(int num, bool forOutput) = 0;
 
 	virtual int inDeviceChans() = 0;
 	virtual int outDeviceChans() = 0;

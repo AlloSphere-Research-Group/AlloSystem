@@ -45,6 +45,7 @@
 
 #include <time.h>							/* req'd for time() */
 #include <cmath>
+#include <random>
 #include "allocore/types/al_Conversion.hpp"	/* req'd for int to float conversion */
 #include "allocore/math/al_Constants.hpp"
 
@@ -56,6 +57,7 @@ namespace rnd{
 class LinCon;
 class MulLinCon;
 class Tausworthe;
+class MersenneTwister;
 template<class RNG> class Random;
 
 
@@ -229,12 +231,16 @@ public:
 
 	/// Change the type of equation used.
 
-	/// 0 - Marsaglia, Super-Duper\n
-	///
+	/// 0 - L'Ecuyer M8  (optimal generator for <=  8 dimensions)\n
+	/// 1 - L'Ecuyer M16 (optimal generator for <= 16 dimensions)\n
+	/// 2 - L'Ecuyer M32 (optimal generator for <= 32 dimensions)\n
+	/// 3 - Marsaglia, Super-Duper\n
 	void type(int v){
 		switch(v){
-		default:
-		case 0: mMul = 69069; break;
+		default:mMul = 2891336453UL; break; // L'Ecuyer M8
+		case 1: mMul =   29943829UL; break; // L'Ecuyer M16
+		case 2: mMul =   32310901UL; break; // L'Ecuyer M32
+		case 3: mMul =      69069UL; break; // Super-duper
 		}
 	}
 
@@ -275,6 +281,29 @@ public:
 private:
 	uint32_t s1, s2, s3, s4;
 	void iterate();
+};
+
+class MersenneTwister {
+public:
+	MersenneTwister() {
+		std::random_device rd;
+    mt.seed(rd());
+	}
+
+	MersenneTwister(uint32_t seed) {
+		mt.seed(seed);
+	}
+
+	uint32_t operator()() {
+		return mt();
+	}
+
+	void seed(uint32_t v) {
+		mt.seed(v);
+	}
+	
+private:
+	std::mt19937 mt;
 };
 
 

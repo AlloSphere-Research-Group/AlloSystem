@@ -13,7 +13,7 @@ Lance Putnam, 5/1/2011
 
 using namespace al;
 
-static const char * vLight = AL_STRINGIFY(
+static const char * vLight = R"(
 varying vec3 normal, lightDir, eyeVec;
 void main(){
 	normal = gl_NormalMatrix * gl_Normal;
@@ -22,9 +22,9 @@ void main(){
 	lightDir = normalize(vec3(gl_LightSource[0].position.xyz - V));
 	gl_Position = ftransform();
 }
-);
+)";
 
-static const char * fLight = AL_STRINGIFY(
+static const char * fLight = R"(
 varying vec3 normal, lightDir, eyeVec;
 void main(){
 	vec4 final_color = gl_FrontMaterial.ambient
@@ -46,7 +46,7 @@ void main(){
 	}
 	gl_FragColor = final_color;
 }
-);
+)";
 
 
 

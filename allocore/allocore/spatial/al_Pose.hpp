@@ -61,7 +61,7 @@ class Pose {
 public:
 
 	/// @param[in] pos		Initial position
-	/// @parampin] ori		Initial orientation
+	/// @param[in] ori		Initial orientation
 	Pose(const Vec3d& pos=Vec3d(0), const Quatd& ori=Quatd::identity());
 
 	/// Copy constructor
@@ -87,6 +87,10 @@ public:
 
 	/// Turn to face a given world-coordinate point
 	void faceToward(const Vec3d& p, double amt = 1.);
+
+	/// Turn to face a given world-coordinate point, while maintaining an up vector
+	void faceToward(const Vec3d& point, const Vec3d& up, double amt=1.);
+
 
 
 	/// Get "position" vector
@@ -291,30 +295,46 @@ public:
 	/// Turn to face a given world-coordinate point
 	void faceToward(const Vec3d& p, double amt=1.);
 
+	/// Turn to face a given world-coordinate point, while maintaining an up vector
+	void faceToward(const Vec3d& point, const Vec3d& up, double amt=1.);
+
 	/// Move toward a given world-coordinate point
 	void nudgeToward(const Vec3d& p, double amt=1.);
 
+
 	/// Set linear velocity
-	void move(double dr, double du, double df) { moveR(dr); moveU(du); moveF(df); }
-	void move(Vec3d dp) { moveR(dp[0]); moveU(dp[1]); moveF(dp[2]); }
+	void move(double dr, double du, double df){ moveR(dr); moveU(du); moveF(df); }
+	template <class T>
+	void move(const Vec<3,T>& dp){ move(dp[0],dp[1],dp[2]); }
+
+	/// Set linear velocity along right vector
 	void moveR(double v){ mMove0[0] = v; }
+
+	/// Set linear velocity long up vector
 	void moveU(double v){ mMove0[1] = v; }
+
+	/// Set linear velocity long forward vector
 	void moveF(double v){ mMove0[2] = v; }
-	Vec3d& move() { return mMove0; }
 
-	/// Accelerate
-	void nudge(double ddr, double ddu, double ddf) { nudgeR(ddr); nudgeU(ddu); nudgeF(ddf); }
-	void nudge(Vec3d dp) { nudgeR(dp[0]); nudgeU(dp[1]); nudgeF(dp[2]); }
-	void nudgeR(double amount) { mNudge[0] += amount; }
-	void nudgeU(double amount) { mNudge[1] += amount; }
-	void nudgeF(double amount) { mNudge[2] += amount; }
+	Vec3d& move(){ return mMove0; }
+
+	/// Move by a single increment
+	void nudge(double dr, double du, double df){ nudgeR(dr); nudgeU(du); nudgeF(df); }
+	template <class T>
+	void nudge(const Vec<3,T>& dp){ nudge(dp[0],dp[1],dp[2]); }
+
+	void nudgeR(double amount){ mNudge[0] += amount; }
+	void nudgeU(double amount){ mNudge[1] += amount; }
+	void nudgeF(double amount){ mNudge[2] += amount; }
 
 
-	/// Set all angular velocity values from azimuth, elevation, and bank differentials, in radians
+	/// Set angular velocity from azimuth, elevation, and bank differentials, in radians
 	void spin(double da, double de, double db){ spinR(de); spinU(da); spinF(db); }
+	template <class T>
+	void spin(const Vec<3,T>& daeb){ spin(daeb[0],daeb[1],daeb[2]); }
 
 	/// Set angular velocity from a unit quaternion (versor)
-	void spin(const Quatd& v) { v.toEuler(mSpin1); }
+	void spin(const Quatd& v){ v.toEuler(mSpin1); }
 
 	/// Set angular velocity around right vector (elevation), in radians
 	void spinR(double v){ mSpin0[1] = v; }
@@ -331,6 +351,8 @@ public:
 
 	/// Turn by a single increment for one step, in radians
 	void turn(double az, double el, double ba){ turnR(el); turnU(az); turnF(ba); }
+	template <class T>
+	void turn(const Vec<3,T>& daeb){ turn(daeb[0],daeb[1],daeb[2]); }
 
 	/// Turn by a single increment, in radians, around the right vector (elevation)
 	void turnR(double v){ mTurn[1] = v;	}

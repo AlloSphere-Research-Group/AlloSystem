@@ -187,9 +187,11 @@ public:
 		//printf("a:%d c:%d s:%d\n", k.alt(), k.ctrl(), k.shift());
 	}
 
+	// An invalid key to indicate an error
+	static const int INVALID_KEY = -1;
 
 	// incoming GLUT keys need to be remapped in certain cases...
-	static unsigned int remapKey(unsigned int key, bool special){
+	static int remapKey(int key, bool special){
 
 		//printf("GLUT i: %3d %c\n", key, key);
 
@@ -204,6 +206,10 @@ public:
 				CS(F1) CS(F2) CS(F3) CS(F4)
 				CS(F5) CS(F6) CS(F7) CS(F8)
 				CS(F9) CS(F10)	CS(F11) CS(F12)
+
+				// Sometimes GLUT will pass an unspecified key code to the 
+				// special function. The callee should consider this an error...
+				default: key = INVALID_KEY;
 			}
 			#undef CS
 		}
@@ -295,9 +301,11 @@ public:
 		Window * win = getWindow();
 		if(win){
 			key = remapKey(key, true);
-			win->mKeyboard.setKey(key, true);
-			setModifiers(win->mKeyboard);
-			win->callHandlersOnKeyDown();
+			if(INVALID_KEY != key){
+				win->mKeyboard.setKey(key, true);
+				setModifiers(win->mKeyboard);
+				win->callHandlersOnKeyDown();
+			}
 		}
 	}
 
@@ -305,9 +313,11 @@ public:
 		Window * win = getWindow();
 		if(win){
 			key = remapKey(key, true);
-			win->mKeyboard.setKey(key, false);
-			setModifiers(win->mKeyboard);
-			win->callHandlersOnKeyUp();
+			if(INVALID_KEY != key){
+				win->mKeyboard.setKey(key, false);
+				setModifiers(win->mKeyboard);
+				win->callHandlersOnKeyUp();
+			}
 		}
 	}
 
@@ -483,19 +493,26 @@ private:
 						al_sec timeNow = win->mFrameTime;
 						double FPS = win->fps();
 
-						// Compute pre-render frame number
+						// Pre-render frame number
 						double framePre = timeNow * FPS;
 
-						// Get post-render frame number
-						double framePost = al_time() * FPS;
+						// Next expected frame number
+						double frameNext = (unsigned long long)(framePre + 1.5);
+						// Next expected frame time
+						double timeNext = frameNext / FPS;
+
+						// Post-render frame time
+						double timePost = al_time();
 
 						// Did rendering take less time than frame interval?
-						// This check is necessary for non-quantized reduction of frame rate.
-						if((framePost - framePre) < 1.){
-							double waitFrames = framePost - (unsigned long long)(framePost+0.5);
-							waitFrames = 1.-waitFrames;
-							waitMsec = unsigned(waitFrames/FPS*1000. + 0.5);
-							//printf("num=%llu, frac=%g, %u, (dt=%g)\n", (unsigned long long)frameNum, waitFrames, wait_msec, impl->mSPFActual);
+						// If so, compute wait time...
+						if(timePost < timeNext){
+							double wait = timeNext - timePost;
+							waitMsec = unsigned(wait * 1000. + 0.5);
+							//printf("num=%llu, wait=%5.3f frames, %2u ms, dt=%5.3f, fps=%5.2f (avg=%5.2f)\n", (unsigned long long)(timePost*FPS), wait*FPS, waitMsec, win->mDeltaTime, win->fpsActual(), win->fpsAvg());
+						}
+						else{
+							//printf("dropped frame!\n");
 						}
 					}
 

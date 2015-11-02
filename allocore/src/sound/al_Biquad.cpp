@@ -6,6 +6,7 @@
 //
 //
 #include "allocore/sound/al_Biquad.hpp"
+#include "allocore/math/al_Constants.hpp"
 #include <stdlib.h>
 #include <cmath>
 

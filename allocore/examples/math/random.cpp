@@ -64,6 +64,7 @@ int main(){
 		rnd::Random<rnd::MulLinCon> rng1;
 		rnd::Random<rnd::LinCon> rng2;
 		rnd::Random<rnd::Tausworthe> rng3;
+		rnd::Random<rnd::MersenneTwister> rng4;
 
 		// The default template parameter value is Tausworthe, giving the
 		// highest quality random numbers, so we can declare it more simply:
