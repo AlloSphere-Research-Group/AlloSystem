@@ -308,7 +308,7 @@ public:
 	void writeSample(float v){ mSound.write(v); }
 
     /// optional onProcessSample for sample rate processing of sound sources
-    virtual void onProcessSample(int frame){}
+    virtual void onProcessSample(int frame, int numFrames){}
     
     /// Returns whether the source is using per sample processing (AudioScene::render will call this source's onProcessSample)
     bool usePerSampleProcessing() const { return mUsePerSampleProcessing; }

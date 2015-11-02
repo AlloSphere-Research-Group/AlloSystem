@@ -167,7 +167,7 @@ void AudioScene::render(AudioIOData& io) {
                     if(src.usePerSampleProcessing() && il == 0) //if src is using per sample processing, we can only do this for the first listener (TODO: better design for this)
                     {
                         src.updateHistory();
-                        src.onProcessSample(i);
+                        src.onProcessSample(i, numFrames);
                         
                         relpos = src.posHistory()[0] - l.posHistory()[0];
                             
@@ -238,7 +238,7 @@ void AudioScene::render(AudioIOData& io) {
                 
                 if(il == 0)
                     for(int i = 0; i < numFrames; i++)
-                        src.onProcessSample(i);
+                        src.onProcessSample(i, numFrames);
                 
                 for(int i = 0; i < numFrames; i++)
                 {
