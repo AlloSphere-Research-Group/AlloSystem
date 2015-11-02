@@ -36,6 +36,13 @@ void Pose::faceToward(const Vec3d& point, double amt){
 	//*/
 }
 
+void Pose::faceToward(const Vec3d& point, const Vec3d& up, double amt){
+	Vec3d target(point - pos());
+	target.normalize();
+  Quatd rot = Quatd::getBillboardRotation(-target, up);
+  quat().slerpTo(rot,amt);
+}
+
 Mat4d Pose::matrix() const {
 	Mat4d m;
 	quat().toMatrix(&m[0]);
@@ -127,6 +134,11 @@ void Nav::faceToward(const Vec3d& point, double amt){
 	else			quat() = rot.pow(amt) * quat();*/
 
 	Pose::faceToward(point, amt);
+	updateDirectionVectors();
+}
+
+void Nav::faceToward(const Vec3d& point, const Vec3d& up, double amt){
+	Pose::faceToward(point, up, amt);
 	updateDirectionVectors();
 }
 
