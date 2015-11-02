@@ -1,5 +1,4 @@
 #include <cstring>
-#include <regex>
 #include "allocore/io/al_File.hpp"
 #include "allocore/system/al_Printing.hpp"
 
@@ -244,28 +243,6 @@ public:
 		}
 		return found;
 	}
-
-	int glob(const std::string& regex, FileList& result, bool recursive=true) {
-		std::regex e(regex);
-		if (dir && APR_SUCCESS == check_apr(apr_dir_open(&dir, dirname.c_str(), mPool))) {
-			// iterate over directory:
-			while (APR_SUCCESS == (apr_dir_read(&dirent, APR_FINFO_TYPE|APR_FINFO_NAME, dir))) {
-				//printf("test %s %s\n", dirname.c_str(), dirent.name);
-				if (dirent.filetype == APR_REG && dirent.name && std::regex_match(dirname+dirent.name,e) ) {
-					FilePath res;
-					res.file(dirent.name);
-					res.path(dirname);
-					result.add(res);
-				} else if (recursive && dirent.filetype == APR_DIR && dirent.name && dirent.name[0] != '.') {
-					Path path(dirname + dirent.name + AL_FILE_DELIMITER);
-					path.glob(regex, result, true);
-				}
-			}
-		} else {
-			AL_WARN("couldn't open directory %s", dirname.c_str());
-		}
-		return result.count();
-	}
 };
 
 
@@ -277,18 +254,6 @@ FilePath SearchPaths::find(const std::string& name) {
 	while ((!found) && iter != mSearchPaths.end()) {
 		Path path(iter->first.c_str());
 		found = path.find(name, result, iter->second);
-		iter++;
-	}
-	return result;
-}
-
-// This is the another sour egg that needs APR impl for directory scanning...
-FileList SearchPaths::glob(const std::string& regex) {
-	FileList result;
-	std::list<SearchPaths::searchpath>::iterator iter = mSearchPaths.begin();
-	while (iter != mSearchPaths.end()) {
-		Path path(iter->first.c_str());
-		path.glob(regex, result, iter->second);
 		iter++;
 	}
 	return result;

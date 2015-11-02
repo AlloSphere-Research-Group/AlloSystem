@@ -50,8 +50,6 @@
 #include <stdio.h>
 #include <string>
 #include <list>
-#include <vector>
-#include <algorithm>
 
 #include "allocore/system/al_Config.h"
 
@@ -380,41 +378,6 @@ protected:
 
 
 
-/// Keeps a list of files
-class FileList {
-public:
-	typedef std::vector<FilePath>::iterator iterator;
-
-	FileList():indx(0){}
-
-	/// return currently selected file in list
-	FilePath& operator()(){ return mFiles[indx]; }
-
-	/// find a file in list
-	// FilePath& select(const std::string& filename);
-
-	FilePath& select(int i){ indx=i%count(); return (*this)(); }
-	FilePath& next(){ ++indx %= count(); return (*this)(); }
-	FilePath& prev(){ --indx; if(indx < 0) indx = count()-1; return (*this)(); }
-
-	int count(){ return mFiles.size(); }
-
-	void print() const;
-
-	FilePath& operator[](int i){ return mFiles[i]; }
-	iterator begin() { return mFiles.begin(); }
-	iterator end() { return mFiles.end(); }
-
-	void add(FilePath& fp){ mFiles.push_back(fp); }
-	void sort(bool (*f)(FilePath,FilePath)){ std::sort(begin(),end(),f); }
-
-protected:
-	int indx;
-	std::vector<FilePath> mFiles;
-};
-
-
-
 /// A handy way to manage several possible search paths
 class SearchPaths {
 public:
@@ -429,7 +392,6 @@ public:
 
 	/// find a file in the searchpaths
 	FilePath find(const std::string& filename);
-	FileList glob(const std::string& regex);
 
 	/// add a path to search in; recursive searching is optional
 	void addSearchPath(const std::string& path, bool recursive = true);
@@ -455,6 +417,7 @@ protected:
 	std::list<searchpath> mSearchPaths;
 	std::string mAppPath;
 };
+
 
 } // al::
 
