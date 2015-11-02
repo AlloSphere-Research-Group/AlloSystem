@@ -68,7 +68,7 @@ int SoundSource::bufferSize(double samplerate, double speedOfSound, double dista
 
 
 AudioScene::AudioScene(int numFrames_)
-:   mNumFrames(0), mSpeedOfSound(344), mPerSampleProcessing(false), mBuffer(0)
+:   mNumFrames(0), mSpeedOfSound(340), mPerSampleProcessing(false), mBuffer(0)
 {
 	numFrames(numFrames_);
 }
