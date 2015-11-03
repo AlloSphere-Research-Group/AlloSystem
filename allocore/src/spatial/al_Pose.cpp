@@ -226,6 +226,13 @@ void Nav::step(double dt){
 	for(int i=0; i<pos().size(); ++i){
 		pos()[i] += mMove1.dot(Vec3d(ur()[i], uu()[i], uf()[i]));
 	}
+
+	mPullBack1 = mPullBack1 + (mPullBack0-mPullBack1)*amt;
+
+	mTransformed = *this;
+	if(mPullBack1 > 1e-16){
+		mTransformed.pos() -= uf() * mPullBack1;
+	}
 }
 
 } // al::

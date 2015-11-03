@@ -91,7 +91,7 @@ struct NavInputControl : public InputEventHandler {
 		return true;
 	}
 	virtual bool onKeyUp(const Keyboard& k) {
-		switch (k.key()) {
+		switch(k.key()){
 			case Keyboard::UP:
 			case Keyboard::DOWN:	nav().spinR(0); return false;
 			case Keyboard::RIGHT:
@@ -110,17 +110,19 @@ struct NavInputControl : public InputEventHandler {
 	}
 
 	virtual bool onMouseDrag(const Mouse& m){
-		if(!mUseMouse) return true;
-
-		if(m.left()){
-			nav().turnU(-m.dx() * 0.2 * M_DEG2RAD);
-			nav().turnR(-m.dy() * 0.2 * M_DEG2RAD);
+		if(mUseMouse){
+			if(m.left()){
+				nav().turnU(-m.dx() * 0.2 * M_DEG2RAD);
+				nav().turnR(-m.dy() * 0.2 * M_DEG2RAD);
+				return false;
+			}
+			else if(m.right()){
+				nav().turnF( m.dx() * 0.2 * M_DEG2RAD);
+				nav().pullBack(nav().pullBack() + m.dy()*0.02);
+				return false;
+			}
 		}
-		else if(m.right()){
-			nav().turnF( m.dx() * 0.2 * M_DEG2RAD);
-			//incBehind(m.dy()*0.005);
-		}
-		return false;
+		return true;
 	}
 
 	Nav& nav(){ return *mNav; }

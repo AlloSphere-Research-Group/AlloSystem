@@ -310,7 +310,7 @@ ViewpointWindow * App::initWindow(
 	int last = mFacViewpoints.size()-1;
 	{
 		Viewpoint& vp = *mFacViewpoints[last];
-		vp.parentTransform(nav());
+		vp.parentTransform(nav().transformed());
 		win->add(vp);
 	}
 
