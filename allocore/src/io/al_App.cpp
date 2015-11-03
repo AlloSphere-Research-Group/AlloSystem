@@ -370,9 +370,15 @@ void App::start(){
 			//printf("App exiting\n");
 			app.audioIO().close();
 
+			// Ensures windows get destroyed in case the user does, for example,
+			// a hard exit with exit(0).
 			for(unsigned i=0; i<app.mFacWindows.size(); ++i){
 				app.mFacWindows[i]->destroy();
 			}
+
+			// ctrl-q will destroy all windows before stopping the main loop
+			// so we call onExit last
+			app.onExit();
 		}
 	} appMainHandler(*this);
 

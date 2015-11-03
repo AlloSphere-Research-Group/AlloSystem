@@ -264,6 +264,10 @@ public:
 	virtual void onResize(const ViewpointWindow& win, int w, int h){}
 
 
+	/// Called just before the app exits and before any object destructors
+	virtual void onExit(){}
+
+
 	/// Set application name
 	App& name(const std::string& v){ mName=v; return *this; }
 
