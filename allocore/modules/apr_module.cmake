@@ -4,7 +4,6 @@ find_package(APR QUIET)
 set(APR_HEADERS
     allocore/io/al_File.hpp
     allocore/io/al_Socket.hpp
-    allocore/protocol/al_XML.hpp
     allocore/system/al_Memory.hpp
     allocore/system/al_Time.h
     allocore/system/al_Time.hpp
@@ -17,7 +16,6 @@ list(APPEND ALLOCORE_SRC
     src/io/al_File.cpp
     src/io/al_FileAPR.cpp
     src/io/al_SocketAPR.cpp
-    src/protocol/al_XML.cpp
     src/system/al_Memory.cpp
     src/system/al_Time.cpp)
 
