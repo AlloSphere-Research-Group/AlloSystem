@@ -133,7 +133,7 @@ inline bool OmniStereoGraphicsRenderer::onCreate() {
   mShader.attach(vert).attach(frag).link();
   mShader.printLog();
   mShader.begin();
-  mShader.uniform("lighting", 1.0);
+  mShader.uniform("lighting", 0.0);
   mShader.uniform("texture", 0.0);
   mShader.end();
 
@@ -167,7 +167,9 @@ inline void OmniStereoGraphicsRenderer::onDrawOmni(OmniStereo& omni) {
   graphics().error("start onDraw");
   mShader.begin();
   mOmni.uniforms(mShader);
+  graphics().pushMatrix(graphics().MODELVIEW);
   onDraw(graphics());
+  graphics().popMatrix(graphics().MODELVIEW);
   mShader.end();
 }
 

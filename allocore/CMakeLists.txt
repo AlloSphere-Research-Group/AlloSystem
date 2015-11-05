@@ -6,6 +6,7 @@ message(STATUS "==== Configuring allocore.")
 # Allocore Library
 list(APPEND ALLOCORE_SRC
   src/io/al_AudioIOData.cpp
+  src/io/al_ControlNav.cpp
   src/io/al_MIDI.cpp
   src/io/al_HID.cpp
   src/io/al_Serial.cpp

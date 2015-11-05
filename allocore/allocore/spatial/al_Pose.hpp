@@ -88,6 +88,10 @@ public:
 	/// Turn to face a given world-coordinate point
 	void faceToward(const Vec3d& p, double amt = 1.);
 
+	/// Turn to face a given world-coordinate point, while maintaining an up vector
+	void faceToward(const Vec3d& point, const Vec3d& up, double amt=1.);
+
+
 
 	/// Get "position" vector
 	Vec3d& pos(){ return mVec; }
@@ -291,6 +295,9 @@ public:
 	/// Turn to face a given world-coordinate point
 	void faceToward(const Vec3d& p, double amt=1.);
 
+	/// Turn to face a given world-coordinate point, while maintaining an up vector
+	void faceToward(const Vec3d& point, const Vec3d& up, double amt=1.);
+
 	/// Move toward a given world-coordinate point
 	void nudgeToward(const Vec3d& p, double amt=1.);
 
@@ -376,6 +383,16 @@ public:
 	/// Accumulate pose based on velocity
 	void step(double dt=1);
 
+
+	/// Get pull-back amount
+	double pullBack() const { return mPullBack0; }
+
+	/// Set pull-back amount
+	Nav& pullBack(double v){ mPullBack0 = v>0. ? v : 0.; return *this; }
+
+	/// Get transformed pose
+	Pose& transformed(){ return mTransformed; }
+
 protected:
 	Vec3d mMove0, mMove1;	// linear velocities (raw, smoothed)
 	Vec3d mSpin0, mSpin1;	// angular velocities (raw, smoothed)
@@ -384,6 +401,8 @@ protected:
 	Vec3d mUR, mUU, mUF;	// basis vectors of local coordinate frame
 	double mSmooth;
 	double mVelScale;		// velocity scaling factor
+	double mPullBack0, mPullBack1;
+	Pose mTransformed;
 };
 
 

@@ -49,79 +49,17 @@
 namespace al {
 
 /// Mapping from keyboard and mouse controls to a Nav object
-struct NavInputControl : public InputEventHandler {
+class NavInputControl : public InputEventHandler {
+public:
+	NavInputControl(const NavInputControl& v);
 
-	NavInputControl(const NavInputControl& v)
-	:	mNav(v.mNav), mVScale(v.vscale()), mTScale(v.tscale()), mUseMouse(true)
-	{}
-
-	NavInputControl(Nav& nav, double vscale = 0.125, double tscale = 2.)
-	:	mNav(&nav), mVScale(vscale), mTScale(tscale), mUseMouse(true)
-	{}
+	NavInputControl(Nav& nav, double vscale = 0.125, double tscale = 2.);
 
 	virtual ~NavInputControl(){}
 
-	virtual bool onKeyDown(const Keyboard& k){
-
-		if(k.ctrl()) return true;
-
-		double a = mTScale * M_DEG2RAD;	// rotational speed: rad/sec
-		double v = mVScale;				// speed: world units/sec
-
-		if(k.alt()) v *= 10;
-		if(k.shift()) v *= 0.1;
-
-		switch(k.key()){
-			case '`':				nav().halt().home(); return false;
-			case 's':				nav().halt(); return false;
-			case Keyboard::UP:		nav().spinR( a); return false;
-			case Keyboard::DOWN:	nav().spinR(-a); return false;
-			case Keyboard::RIGHT:	nav().spinU(-a); return false;
-			case Keyboard::LEFT:	nav().spinU( a); return false;
-			case 'q': case 'Q':		nav().spinF( a); return false;
-			case 'z': case 'Z':		nav().spinF(-a); return false;
-			case 'a': case 'A':		nav().moveR(-v); return false;
-			case 'd': case 'D':		nav().moveR( v); return false;
-			case 'e': case 'E':		nav().moveU( v); return false;
-			case 'c': case 'C':		nav().moveU(-v); return false;
-			case 'x': case 'X':		nav().moveF(-v); return false;
-			case 'w': case 'W':		nav().moveF( v); return false;
-			default:;
-		}
-		return true;
-	}
-	virtual bool onKeyUp(const Keyboard& k) {
-		switch (k.key()) {
-			case Keyboard::UP:
-			case Keyboard::DOWN:	nav().spinR(0); return false;
-			case Keyboard::RIGHT:
-			case Keyboard::LEFT:	nav().spinU(0); return false;
-			case 'q': case 'Q':
-			case 'z': case 'Z':		nav().spinF(0); return false;
-			case 'a': case 'A':
-			case 'd': case 'D':		nav().moveR(0); return false;
-			case 'e': case 'E':
-			case 'c': case 'C':		nav().moveU(0); return false;
-			case 'x': case 'X':
-			case 'w': case 'W':		nav().moveF(0); return false;
-			default:;
-		}
-		return true;
-	}
-
-	virtual bool onMouseDrag(const Mouse& m){
-		if(!mUseMouse) return true;
-
-		if(m.left()){
-			nav().turnU(-m.dx() * 0.2 * M_DEG2RAD);
-			nav().turnR(-m.dy() * 0.2 * M_DEG2RAD);
-		}
-		else if(m.right()){
-			nav().turnF( m.dx() * 0.2 * M_DEG2RAD);
-			//incBehind(m.dy()*0.005);
-		}
-		return false;
-	}
+	virtual bool onKeyDown(const Keyboard& k);
+	virtual bool onKeyUp(const Keyboard& k);
+	virtual bool onMouseDrag(const Mouse& m);
 
 	Nav& nav(){ return *mNav; }
 	const Nav& nav() const { return *mNav; }
@@ -142,61 +80,15 @@ protected:
 };
 
 
-struct NavInputControlCosm : public NavInputControl {
+class NavInputControlCosm : public NavInputControl {
+public:
+	NavInputControlCosm(Nav& nav, double vscale = 0.125, double tscale = 2.);
 
-	NavInputControlCosm(Nav& nav, double vscale = 0.125, double tscale = 2.): NavInputControl(nav, vscale, tscale){}
 	virtual ~NavInputControlCosm() {}
 
-	virtual bool onKeyDown(const Keyboard& k){
-
-		double a = mTScale * M_DEG2RAD;	// rotational speed: rad/sec
-		double v = mVScale;				// speed: world units/sec
-
-		if(k.ctrl()) v *= 0.1;
-		if(k.alt()) v *= 10;
-
-		if(k.ctrl()) a *= 0.1;
-		if(k.alt()) a *= 10;
-
-		switch(k.key()){
-			case '`':				nav().halt().home(); return false;
-			case 'w':				nav().spinR( a); return false;
-			case 'x':				nav().spinR(-a); return false;
-			case Keyboard::RIGHT:	nav().spinU( -a); return false;
-			case Keyboard::LEFT:	nav().spinU( a); return false;
-			case 'a':				nav().spinF( a); return false;
-			case 'd':				nav().spinF(-a); return false;
-			case ',':				nav().moveR(-v); return false;
-			case '.':				nav().moveR( v); return false;
-			case '\'':				nav().moveU( v); return false;
-			case '/':				nav().moveU(-v); return false;
-			case Keyboard::UP:		nav().moveF( v); return false;
-			case Keyboard::DOWN:	nav().moveF(-v); return false;
-			default:;
-		}
-		return true;
-	}
-
-	virtual bool onKeyUp(const Keyboard& k) {
-		switch (k.key()) {
-			case 'w':
-			case 'x':				nav().spinR(0); return false;
-			case Keyboard::RIGHT:
-			case Keyboard::LEFT:	nav().spinU(0); return false;
-			case 'a':
-			case 'd':				nav().spinF(0); return false;
-			case ',':
-			case '.':				nav().moveR(0); return false;
-			case '\'':
-			case '/':				nav().moveU(0); return false;
-			case Keyboard::UP:
-			case Keyboard::DOWN:	nav().moveF(0); return false;
-			default:;
-		}
-		return true;
-	}
-
-	virtual bool onMouseDrag(const Mouse& m){ return true; }
+	virtual bool onKeyDown(const Keyboard& k);
+	virtual bool onKeyUp(const Keyboard& k);
+	virtual bool onMouseDrag(const Mouse& m);
 };
 
 } // al::
