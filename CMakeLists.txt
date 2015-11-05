@@ -50,6 +50,10 @@ if(NOT DEFINED BUILD_GLV)
   set(BUILD_GLV 1 CACHE STRING "Try to build external GLV.")
 endif(NOT DEFINED BUILD_GLV)
 
+if(NOT DEFINED BUILD_CUTTLEBONE)
+  set(BUILD_CUTTLEBONE 1 CACHE STRING "Try to build external Cuttlebone.")
+endif(NOT DEFINED BUILD_CUTTLEBONE)
+
 set(BUILD_EXAMPLES 0 CACHE STRING "Build AlloSystem examples.")
 
 
@@ -91,9 +95,11 @@ endif(BUILD_GAMMA AND NOT GAMMA_LIBRARY)
 
 if(BUILD_GLV AND NOT GLV_LIBRARY)
     make_dep(GLV)
-	message(STATUS "Using GLV from: ${GLV_LIBRARY}.")
-	message(STATUS "GLV headers: ${GLV_INCLUDE_DIR}.")
 endif(BUILD_GLV AND NOT GLV_LIBRARY)
+
+if(BUILD_CUTTLEBONE AND NOT CUTTLEBONE_LIBRARY)
+    make_dep(cuttlebone)
+endif(BUILD_CUTTLEBONE AND NOT CUTTLEBONE_LIBRARY)
 
 # Allocore --------------------------------
 add_subdirectory(allocore)
