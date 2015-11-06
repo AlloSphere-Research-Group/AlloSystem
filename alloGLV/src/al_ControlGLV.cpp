@@ -2,6 +2,20 @@
 
 namespace al{
 
+GLVControl::GLVControl(glv::GLV& v)
+:	mGLV(&v)
+{}
+
+GLVControl& GLVControl::glv(glv::GLV& v){
+	mGLV=&v;
+	return *this;
+}
+
+
+GLVInputControl::GLVInputControl(glv::GLV& v)
+:	GLVControl(v)
+{}
+
 bool GLVInputControl::onMouseDown(const Mouse& m){
 	glv::space_t xrel=m.x(), yrel=m.y();
 	glv().setMouseDown(xrel,yrel, m.button(), 0);
@@ -33,6 +47,10 @@ bool GLVInputControl::motionToGLV(const al::Mouse& m, glv::Event::t e){
 	return glv().propagateEvent();
 }
 
+
+GLVWindowControl::GLVWindowControl(glv::GLV& v)
+:	GLVControl(v)
+{}
 
 bool GLVWindowControl::onCreate(){
 	glv().broadcastEvent(glv::Event::WindowCreate);
@@ -185,7 +203,9 @@ GLVDetachable& GLVDetachable::parentWindow(Window& v){
 }
 
 
-
+PoseModel::PoseModel(Pose& p)
+:	pose(p)
+{}
 
 const glv::Data& PoseModel::getData(glv::Data& d) const {
 	d.resize(glv::Data::FLOAT, 7);
