@@ -78,18 +78,9 @@ public:
 
 
 	/// @param[in] primitive	renderer-dependent primitive number
-	Mesh(int primitive=0): mPrimitive(primitive){}
+	Mesh(int primitive=0);
 
-	Mesh(const Mesh& cpy) :
-		mVertices(cpy.mVertices),
-		mNormals(cpy.mNormals),
-		mColors(cpy.mColors),
-		mColoris(cpy.mColoris),
-		mTexCoord2s(cpy.mTexCoord2s),
-		mTexCoord3s(cpy.mTexCoord3s),
-		mIndices(cpy.mIndices),
-		mPrimitive(cpy.mPrimitive)
-		{}
+	Mesh(const Mesh& cpy);
 
 
 	/// Get corners of bounding box of vertices
@@ -103,6 +94,9 @@ public:
 
 
 	// destructive edits to internal vertices:
+
+	/// Generates indices for a set of vertices
+	void compress();
 
 	/// Convert indices (if any) to flat vertex buffers
 	void decompress();
@@ -144,8 +138,6 @@ public:
 	template <class T>
 	Mesh& transform(const Mat<4,T>& m, int begin=0, int end=-1);
 
-	/// Generates indices for a set of vertices
-	void compress();
 
 	/// Generates normals for a set of vertices
 

@@ -3,6 +3,13 @@
 
 namespace al{
 
+Stereographic::Stereographic()
+:	mMode(ANAGLYPH), mAnaglyphMode(RED_CYAN), mClearColor(Color(0)),
+	mSlices(24), mOmniFov(360),
+	mEyeNumber(0),
+	mStereo(false), mOmni(false)
+{}
+
 /// Convert a normalized screen space position to world space
  // each component of input vector should be normalized from -1. to 1.
 // template<class T>

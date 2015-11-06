@@ -11,6 +11,21 @@
 
 namespace al{
 
+Mesh::Mesh(int primitive)
+:	mPrimitive(primitive)
+{}
+
+Mesh::Mesh(const Mesh& cpy)
+:	mVertices(cpy.mVertices),
+	mNormals(cpy.mNormals),
+	mColors(cpy.mColors),
+	mColoris(cpy.mColoris),
+	mTexCoord2s(cpy.mTexCoord2s),
+	mTexCoord3s(cpy.mTexCoord3s),
+	mIndices(cpy.mIndices),
+	mPrimitive(cpy.mPrimitive)
+{}
+
 Mesh& Mesh::reset() {
 	vertices().reset();
 	normals().reset();
