@@ -46,7 +46,7 @@
 
 #include <stdio.h>
 #include "allocore/math/al_Vec.hpp"
-#include "allocore/math/al_Matrix4.hpp"
+#include "allocore/math/al_Mat.hpp"
 #include "allocore/types/al_Buffer.hpp"
 #include "allocore/types/al_Color.hpp"
 
