@@ -30,6 +30,18 @@ struct CSin{
 };
 
 
+// Scale last N vertices
+static void scaleVerts(Mesh& m, float radius, int N){
+	if(radius != 1.f){
+		int Ne = m.vertices().size();
+		int Nb = Ne - N;
+		for(int i=Nb; i<Ne; ++i){
+			m.vertices()[i] *= radius;
+		}
+	}
+}
+
+
 int addCube(Mesh& m, bool withNormalsAndTexcoords, float l){
 
 	m.primitive(Graphics::TRIANGLES);
@@ -126,7 +138,7 @@ int addCube(Mesh& m, bool withNormalsAndTexcoords, float l){
 }
 
 
-int addTetrahedron(Mesh& m){
+int addTetrahedron(Mesh& m, float radius){
 
 	m.primitive(Graphics::TRIANGLES);
 
@@ -145,11 +157,13 @@ int addTetrahedron(Mesh& m){
 	m.vertex(vertices, Nv);
 	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
 
+	scaleVerts(m, radius, Nv);
+
 	return Nv;
 }
 
 
-int addOctahedron(Mesh& m){
+int addOctahedron(Mesh& m, float radius){
 
 	m.primitive(Graphics::TRIANGLES);
 
@@ -168,11 +182,13 @@ int addOctahedron(Mesh& m){
 	m.vertex(vertices, Nv);
 	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
 
+	scaleVerts(m, radius, Nv);
+
 	return Nv;
 }
 
 
-int addDodecahedron(Mesh& m){
+int addDodecahedron(Mesh& m, float radius){
 
 	m.primitive(Graphics::TRIANGLES);
 
@@ -207,11 +223,13 @@ int addDodecahedron(Mesh& m){
 	m.vertex(vertices, Nv);
 	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
 
+	scaleVerts(m, radius, Nv);
+
 	return Nv;
 }
 
 
-int addIcosahedron(Mesh& m){
+int addIcosahedron(Mesh& m, float radius){
 
 	m.primitive(Graphics::TRIANGLES);
 
@@ -238,6 +256,8 @@ int addIcosahedron(Mesh& m){
 
 	m.vertex(vertices, Nv);
 	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
+
+	scaleVerts(m, radius, Nv);
 
 	return Nv;
 }
