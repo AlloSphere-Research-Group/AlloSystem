@@ -176,56 +176,15 @@ int addDodecahedron(Mesh& m){
 
 	m.primitive(Graphics::TRIANGLES);
 
-//	float b = 1. / phi;
-//	float c = 2. - phi;
-//	float vertices[] = {
-//		 c,  0,  1,   -c,  0,  1,   -b,  b,  b,    0,  1,  c,    b,  b,  b,
-//		-c,  0,  1,    c,  0,  1,    b, -b,  b,    0, -1,  c,   -b, -b,  b,
-//		 c,  0, -1,   -c,  0, -1,   -b, -b, -b,    0, -1, -c,    b, -b, -b,
-//		-c,  0, -1,    c,  0, -1,    b,  b, -b,    0,  1, -c,   -b,  b, -b,
-//		 0,  1, -c,    0,  1,  c,    b,  b,  b,    1,  c,  0,    b,  b, -b,
-//		 0,  1,  c,    0,  1, -c,   -b,  b, -b,   -1,  c,  0,   -b,  b,  b,
-//		 0, -1, -c,    0, -1,  c,   -b, -b,  b,   -1, -c,  0,   -b, -b, -b,
-//		 0, -1,  c,    0, -1, -c,    b, -b, -b,    1, -c,  0,    b, -b,  b,
-//		 1,  c,  0,    1, -c,  0,    b, -b,  b,    c,  0,  1,    b,  b,  b,
-//		 1, -c,  0,    1,  c,  0,    b,  b, -b,    c,  0, -1,    b, -b, -b,
-//		-1,  c,  0,   -1, -c,  0,   -b, -b, -b,   -c,  0, -1,   -b,  b, -b,
-//		-1, -c,  0,   -1,  c,  0,   -b,  b,  b,   -c,  0,  1,   -b, -b,  b
-//	};
-//
-//	for(int i=0; i<Nv; i+=5){
-//		Vec3f v1(vertices[3*i+ 0], vertices[3*i+ 1], vertices[3*i+ 2]);
-//		Vec3f v2(vertices[3*i+ 3], vertices[3*i+ 4], vertices[3*i+ 5]);
-//		Vec3f v3(vertices[3*i+ 6], vertices[3*i+ 7], vertices[3*i+ 8]);
-//		Vec3f v4(vertices[3*i+ 9], vertices[3*i+10], vertices[3*i+11]);
-//		Vec3f v5(vertices[3*i+12], vertices[3*i+13], vertices[3*i+14]);
-//
-//		Vec3f vc = (v1+v2+v3+v4+v5)/5;
-//
-//		plato5.vertex(v1);
-//	}
+	static const float b = sqrt(1./3);
+	static const float a = (phi-1)*b;
+	static const float c = sqrt(1-a*a);
 
 	static const float vertices[] = {
-		-0.57735, -0.57735, 0.57735,
-		0.934172,  0.356822, 0,
-		0.934172, -0.356822, 0,
-		-0.934172, 0.356822, 0,
-		-0.934172, -0.356822, 0,
-		0,  0.934172,  0.356822,
-		0,  0.934172,  -0.356822,
-		0.356822,  0,  -0.934172,
-		-0.356822,  0,  -0.934172,
-		0,  -0.934172,  -0.356822,
-		0,  -0.934172,  0.356822,
-		0.356822,  0,  0.934172,
-		-0.356822,  0,  0.934172,
-		0.57735,  0.57735,  -0.57735,
-		0.57735,  0.57735, 0.57735,
-		-0.57735,  0.57735,  -0.57735,
-		-0.57735,  0.57735,  0.57735,
-		0.57735,  -0.57735,  -0.57735,
-		0.57735,  -0.57735,  0.57735,
-		-0.57735,  -0.57735,  -0.57735
+		-b,-b, b,	 c, a, 0,	 c,-a, 0,	-c, a, 0,	-c,-a, 0,
+		 0, c, a,	 0, c,-a,	 a, 0,-c,	-a, 0,-c,	 0,-c,-a,
+		 0,-c, a,	 a, 0, c,	-a, 0, c,	 b, b,-b,	 b, b, b,
+		-b, b,-b,	-b, b, b,	 b,-b,-b,	 b,-b, b,	-b,-b,-b
 	};
 
 	static const int indices[] = {
