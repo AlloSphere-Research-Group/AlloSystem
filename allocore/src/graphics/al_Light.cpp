@@ -17,21 +17,36 @@ void Material::operator()() const {
 
 	GLenum glface = face();
 
+	// Note glColorMaterial and glMaterial components are mutually exclusive;
+	// if GL_COLOR_MATERIAL is enabled, the respective glMaterial components
+	// are ignored and vice-versa.
 	if (useColorMaterial()) {
 		glEnable(GL_COLOR_MATERIAL);	// need to enable for glColor* to work
 		glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	} else {
 		glDisable(GL_COLOR_MATERIAL);	// need to disable for glMaterial* to work
+		glMaterialfv(glface, GL_AMBIENT, mAmbient.components);
+		glMaterialfv(glface, GL_DIFFUSE, mDiffuse.components);
 	}
-	glMaterialfv(glface, GL_AMBIENT,	mAmbient.components);
-	glMaterialfv(glface, GL_DIFFUSE,	mDiffuse.components);
+
 	glMaterialfv(glface, GL_EMISSION,	mEmission.components);
 	glMaterialfv(glface, GL_SPECULAR,	mSpecular.components);
 	glMaterialf (glface, GL_SHININESS,	mShine);
 }
-Material& Material::ambientAndDiffuse(const Color& v){ ambient(v); return diffuse(v); }
-Material& Material::ambient(const Color& v){ mAmbient=v; return *this; }
-Material& Material::diffuse(const Color& v){ mDiffuse=v; return *this; }
+Material& Material::ambientAndDiffuse(const Color& v){
+	ambient(v);
+	return diffuse(v);
+}
+Material& Material::ambient(const Color& v){
+	mAmbient=v;
+	mUseColorMaterial=false; // expected since setting material property
+	return *this;
+}
+Material& Material::diffuse(const Color& v){
+	mDiffuse=v;
+	mUseColorMaterial=false; // expected since setting material property
+	return *this;
+}
 Material& Material::emission(const Color& v){ mEmission=v; return *this; }
 Material& Material::specular(const Color& v){ mSpecular=v; return *this; }
 Material& Material::shininess(float v){ mShine=v; return *this; }
