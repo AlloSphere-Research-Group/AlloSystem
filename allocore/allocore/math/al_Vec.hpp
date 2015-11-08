@@ -418,6 +418,21 @@ public:
 		return (*this) - (T(2) * dot(normal) * normal);
 	}
 
+	/// Rotate vector on a global plane
+
+	/// @param[in] angle	angle of right-handed rotation, in radians
+	/// @param[in] dim1		dimension to rotate from
+	/// @param[in] dim2		dimension to rotate towards
+	Vec& rotate(double angle, int dim1=0, int dim2=1){
+		double a = cos(angle);
+		double b = sin(angle);
+		T t = (*this)[dim1];
+		T u = (*this)[dim2];
+		(*this)[dim1] = t*a - u*b;
+		(*this)[dim2] = t*b + u*a;
+		return *this;
+	}
+
 
 	/// debug printing
 	void print(FILE * out=stdout) const;
