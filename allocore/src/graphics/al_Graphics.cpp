@@ -9,8 +9,11 @@
 
 namespace al{
 
-Graphics::Graphics() : mInImmediateMode(false) {}
-Graphics::~Graphics() {}
+Graphics::Graphics()
+:	mRescaleNormal(0), mInImmediateMode(false)
+{}
+
+Graphics::~Graphics(){}
 
 
 int Graphics::numComponents(Format v){
