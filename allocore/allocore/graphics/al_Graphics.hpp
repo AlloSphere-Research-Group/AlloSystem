@@ -51,9 +51,9 @@
 #include "allocore/types/al_Color.hpp"
 #include "allocore/system/al_Printing.hpp"
 
+#include "allocore/graphics/al_GPUObject.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_OpenGL.hpp"
-
 
 /*!
 	\def AL_GRAPHICS_ERROR(msg, ID)
@@ -104,7 +104,7 @@ struct Viewport {
 
 ///	It also owns a Mesh, to simulate immediate mode (where it draws its own data)
 ///
-class Graphics {
+class Graphics : public GPUObject {
 public:
 
 	enum AntiAliasMode {
@@ -547,6 +547,9 @@ protected:
 	Mesh mMesh;				// used for immediate mode style rendering
 	int mRescaleNormal;
 	bool mInImmediateMode;	// flag for whether or not in immediate mode
+
+	virtual void onCreate(); // GPUObject
+	virtual void onDestroy(); // GPUObject
 };
 
 
