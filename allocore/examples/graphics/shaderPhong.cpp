@@ -2,129 +2,119 @@
 Allocore Example: Phong Lighting Shader
 
 Description:
-This demonstrates the Phong lighting model.
+This demonstrates the Phong lighting model. Phong lighting is computed per-pixel
+and therefore produces smoother results than Gourad (per-vertex) lighting.
 
 Author(s):
-Lance Putnam, 5/1/2011
+Lance Putnam, May 2011
 */
 
-#include "allocore/al_Allocore.hpp"
-#include "allocore/graphics/al_Shader.hpp"
-
+#include "allocore/io/al_App.hpp"
 using namespace al;
 
 static const char * vLight = AL_STRINGIFY(
-varying vec3 normal, lightDir, eyeVec;
+varying vec3 normal, lightDir, eyeDir;
 void main(){
+	// Normal in eye space
 	normal = gl_NormalMatrix * gl_Normal;
-	vec3 V = vec3(gl_ModelViewMatrix * gl_Vertex);
-	eyeVec = normalize(-V);
-	lightDir = normalize(vec3(gl_LightSource[0].position.xyz - V));
-	gl_Position = ftransform();
+
+	// Vertex in eye space
+	vec3 V = (gl_ModelViewMatrix * gl_Vertex).xyz;
+
+	// Unit vector from vertex to eye at (0,0,0)
+	eyeDir = normalize(-V);
+
+	// First compute position of light source by dividing by w
+	lightDir = gl_LightSource[0].position.xyz / (max(gl_LightSource[0].position.w, 1e-16));
+
+	// Direction is unit vector from vertex to light
+	lightDir = normalize(lightDir - V);
+
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 }
 );
 
 static const char * fLight = AL_STRINGIFY(
-varying vec3 normal, lightDir, eyeVec;
+varying vec3 normal, lightDir, eyeDir;
 void main(){
-	vec4 final_color = gl_FrontMaterial.ambient
-		* (gl_FrontLightModelProduct.sceneColor + gl_LightSource[0].ambient);
-	vec3 N = normalize(normal);
+	// Initialize color to sum of ambient components
+	vec4 color = gl_FrontLightModelProduct.sceneColor + gl_FrontLightProduct[0].ambient;
+
+	vec3 N = normalize(normal); // since length will change over fragment
 	vec3 L = lightDir;
+
 	float lambertTerm = dot(N,L);
+
+	// Does the light hit the front of the surface?
 	if(lambertTerm > 0.){
-		final_color += gl_LightSource[0].diffuse
-		               * gl_FrontMaterial.diffuse
-					   * lambertTerm;
-		vec3 E = eyeVec;
-		vec3 R = reflect(-L, N);
-		float spec = pow( max(dot(R, E), 0.),
-		                 gl_FrontMaterial.shininess + 1e-20);
-		final_color += gl_LightSource[0].specular
-		               * gl_FrontMaterial.specular
-					   * spec;
+
+		// Add in diffuse component
+		color += gl_FrontLightProduct[0].diffuse * lambertTerm;
+
+		// Add in specular component
+		float spec = pow( max(dot(reflect(-L, N), eyeDir), 0.),
+		                 0.3*gl_FrontMaterial.shininess + 1e-20);
+		color += gl_FrontLightProduct[0].specular * spec;
 	}
-	gl_FragColor = final_color;
+	gl_FragColor = color;
 }
 );
 
 
-
-struct MyWindow : Window{
-
-	ShaderProgram shaderP;
-	Shader shaderV, shaderF;
-	Mesh mesh;
-	Graphics gl;
+class MyApp : public App {
+public:
+	ShaderProgram shader;
+	Mesh shape;
 	Light light;
 	Material material;
 	double angle;
 
-	MyWindow(): angle(0){}
+	MyApp()
+	:	angle(0)
+	{
+		addTorus(shape);
+		shape.generateNormals();
 
-	bool onCreate(){
-		shaderV.source(vLight, Shader::VERTEX).compile();
-		shaderF.source(fLight, Shader::FRAGMENT).compile();
-		shaderP.attach(shaderV).attach(shaderF).link();
-
-		shaderV.printLog();
-		shaderF.printLog();
-		shaderP.printLog();
-
-		return true;
+		nav().pullBack(4);
+		initWindow();
 	}
 
-	bool onFrame(){
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		gl.viewport(0,0, width(), height());
-		gl.matrixMode(gl.PROJECTION);
-		gl.loadMatrix(Matrix4d::perspective(45, aspect(), 0.1, 100));
-		gl.matrixMode(gl.MODELVIEW);
-		gl.loadMatrix(Matrix4d::lookAt(Vec3d(0,0,-2.5), Vec3d(0,0,0), Vec3d(0,1,0)));
+	void onCreate(const ViewpointWindow& w){
+		shader.compile(vLight, fLight);
+	}
 
-		gl.depthTesting(true);
+	void onAnimate(double dt){
+		angle += dt*10;
+		if(angle >= 360) angle -= 360;
+	}
 
-		// Create a shape
-		mesh.reset();
-		mesh.primitive(gl.TRIANGLES);
-		addSphere(mesh, 1, 16, 16);
-
-		if((angle+=0.003)>=M_2PI) angle-=M_2PI;
-
-		Mat4f xfm;
-		xfm.setIdentity();
-		xfm.rotate(M_PI/2, 0,2).rotate(angle, 1,2).rotate(angle*8, 0,1);
-		xfm.scale(Vec3f(0.5, 0.2, 1));
-
-		mesh.transform(xfm);
-		mesh.generateNormals();
+	void onDraw(Graphics& g){
 
 		// Set lighting properties
-		material.specular(RGB(0.2));
+		material.ambientAndDiffuse(HSV(0,0.8));
+		material.specular(RGB(0.4));
 		material.shininess(16);
 		material();
-		light.dir(1,1,-1);
+		light.dir(1,1,1);
 		light();
 
 		// Render
-		shaderP.begin();
-			gl.draw(mesh);
-		shaderP.end();
-
-		return true;
+		shader.begin();
+			g.pushMatrix();
+			g.rotate(angle  , 1,0,0);
+			g.rotate(angle*8, 0,1,0);
+			g.draw(shape);
+			g.popMatrix();
+		shader.end();
 	}
 
-	virtual bool onKeyDown(const Keyboard& k){
-		if(k.key('s')) shaderP.toggleActive();
-		return true;
+	void onKeyDown(const Keyboard& k){
+		if(k.key('l')) shader.toggleActive();
 	}
 
 };
 
-MyWindow win;
-
 int main(){
-	win.add(new StandardWindowKeyControls);
-	win.create();
-	MainLoop::start();
+	MyApp().start();
 }
+
