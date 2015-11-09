@@ -195,7 +195,7 @@ public:
     }
     while((dirp = readdir(dp)) != NULL) {
       char *name = dirp->d_name;
-      if (strcmp(name, ".") && strcmp(name, "..") && strcmp(name, "info.txt")) {
+      if (strcmp(name, ".") && strcmp(name, "..") && strcmp(name, "info.txt") && strcmp(name, ".DS_Store")) {
       	cout << name << endl;
       	files.push_back(dir + "/" + string(name));
       }
@@ -386,6 +386,8 @@ public:
       return "µm";
     } else if (t == VOX_MILLIMETERS) {
       return "mm";
+    } else if (t == VOX_CENTIMETERS) {
+      return "cm";
     } else {
       std::ostringstream ss;
       ss << "(m*10^" << t << ")";
