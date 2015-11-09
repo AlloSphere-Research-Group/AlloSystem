@@ -6,6 +6,7 @@
 
    by Matt Wright, April 2015
    modified by Hannah Wolfe, July 2015
+   modified by Karl Yerkes, Nov 2015
 
    based on tiExporter.cpp from images2raw.cpp by Coby Kaufer
    <cobykaufer@bluejayke.com>, Karl Yerkes <karl.yerkes@gmail.com>,
@@ -15,7 +16,6 @@
    convention, assemble them all into an al::Array or al::Voxels
    and write the result as one huge fast-to-load raw binary data file.
 
-
    Limitations:
 
    - Images must contain 8-bit RGB pixels
@@ -23,22 +23,6 @@
    - Ignores all but the red channel
 
    - Chokes if directory contains anything besides "info.txt" and image files
-
-   - Does nothing useful after reading in all this data
-
-   Usage:
-
-   You pass in the directory name as the command-line argument, which means that
-   the
-   run.sh script can't invoke the program correctly, so build and run as
-   separate steps:
-
-   ./run.sh  allocore/examples/spatial/sliceassembler.cpp
-   [Ignore error message from invoking program with no command-line arguments]
-
-   ./build/bin/allocore_examples_spatial_sliceassembler
-   ~/repos/spherical_harmonic_generator/example/sample10_a
-
 */
 
 #include <dirent.h>
@@ -202,16 +186,13 @@ Voxels voxelsFromDirectory(string dir) {
 }
 
 struct AlloApp : App {
-  Voxels voxels;
+  Voxels v;
   Isosurface iso;
   AlloApp() {
-    Voxels v = voxelsFromDirectory("handouts/examples/fmri_isosurface/images");
+    v = voxelsFromDirectory("put/path/to/test/files/here");
     iso.level(2);
-    iso.generate(v, 1.0);
+    iso.generate(v, 1.0);  // XXX this crashes with BAD_ACCESS
   }
 };
 
-
-int main() {
-  AlloApp().start();
-}
+int main() { AlloApp().start(); }
