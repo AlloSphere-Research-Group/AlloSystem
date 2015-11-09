@@ -26,7 +26,7 @@ public:
     MyApp()
 	:	angle(0), mx(0.5), my(0.5), wireframe(false), vertexLight(false)
 	{
-		nav().pos(0,0,5.5);
+		nav().pullBack(5.5);
 		initWindow(Window::Dim(600,600), "Shape Gallery");
 	}
 

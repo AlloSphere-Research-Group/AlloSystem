@@ -18,18 +18,14 @@ public:
 	// A Viewpoint combines a position/orientation in world space and a viewport
 	Viewpoint vpFront, vpBack;
 	Mesh mesh;
+	Light light;
 
 	MyApp(){
 
 		// Create some geometry to render
-		for(int j=0; j<4; ++j){
-			int Nv = addSphere(mesh, (j+1)*2, 20, 20);
-			for(int i=0; i<Nv; ++i){
-				float v = float(i)/Nv;
-				mesh.color(HSV(0.2*v, 1-v*0.5, 1));
-			}
-		}
-		mesh.primitive(Graphics::LINES);
+		addSphere(mesh);
+		mesh.color(RGB(1));
+		mesh.generateNormals();
 
 		// Setup screen stretching/anchoring behavior of viewpoints
 		vpFront.stretch(1, 0.5).anchor(0, 0.5);
@@ -53,7 +49,15 @@ public:
 	}
 
 	void onDraw(Graphics& g){
-		g.draw(mesh);
+		light();
+		for(int i=0; i<7; ++i){
+			g.pushMatrix();
+			float frac = float(i)/7;
+			g.translate(4*sin(frac*2*M_PI), 0, 4*cos(frac*2*M_PI));
+			mesh.colors()[0] = HSV(frac,1,1);
+			g.draw(mesh);
+			g.popMatrix();
+		}
 	}
 };
 

@@ -22,7 +22,7 @@ public:
 		// Add wire-frame cube to mesh
 		addWireBox(mesh);
 
-		nav().pos(0,0,4);
+		nav().pullBack(4);
 		initWindow();
 	}
 

@@ -80,7 +80,6 @@ public:
 		g.polygonMode(wireframe ? Graphics::LINE : Graphics::FILL);
 
 		g.pushMatrix();
-			glEnable(GL_RESCALE_NORMAL); // keeps normals unit length
 			g.translate(-1,-1,-1);
 			g.scale(2);
 			g.draw(iso);
