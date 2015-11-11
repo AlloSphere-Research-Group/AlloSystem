@@ -887,6 +887,10 @@ TEM inline T mapRange(T value, T inlow, T inhigh, T outlow, T outhigh){
   return tmp*(outhigh-outlow) + outlow;
 }
 
+TEM inline T lerp(T src, T dest, T amt){
+	return src*(T(1)-amt) + dest*amt;
+}
+
 #undef TEM
 } // ::al::
 #endif
