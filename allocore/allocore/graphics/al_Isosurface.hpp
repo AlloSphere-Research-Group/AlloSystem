@@ -322,10 +322,10 @@ void Isosurface::generate(const T * vals){
 			for(int x=0; x < mNF[0]-1; ++x){
 
 				float v8[] = {
-					vals[z0y0 + x], vals[z0y0_1 + x],
-					vals[z0y1 + x], vals[z0y1_1 + x],
-					vals[z1y0 + x], vals[z1y0_1 + x],
-					vals[z1y1 + x], vals[z1y1_1 + x]
+					float(vals[z0y0 + x]), float(vals[z0y0_1 + x]),
+					float(vals[z0y1 + x]), float(vals[z0y1_1 + x]),
+					float(vals[z1y0 + x]), float(vals[z1y0_1 + x]),
+					float(vals[z1y1 + x]), float(vals[z1y1_1 + x])
 				};
 
 				int i3[] = {x,y,z};
