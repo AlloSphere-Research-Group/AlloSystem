@@ -1,0 +1,10 @@
+# allovtk dependencies.
+
+allovtk_apt="libvtk5-dev"
+
+allovtk_brew="vtk5"
+
+allovtk_port="vtk5"
+
+allovtk_pacman="mingw-w64-vtk"
+

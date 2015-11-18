@@ -141,6 +141,14 @@ if("alloaudio${DEBUG_SUFFIX}")
   add_dependencies("alloaudio${DEBUG_SUFFIX}" "${ALLOCORE_LIBRARY}")
 endif("alloaudio${DEBUG_SUFFIX}")
 
+
+# allovtk ---------------------------------------
+add_subdirectory(allovtk)
+set(ALLOVTK_LIBRARY "allovtk${DEBUG_SUFFIX}")
+get_target_property(ALLOVTK_INCLUDE_DIR allovtk${DEBUG_SUFFIX} ALLOVTK_INCLUDE_DIR)
+get_target_property(ALLOVTK_LINK_LIBRARIES allovtk${DEBUG_SUFFIX} ALLOVTK_LINK_LIBRARIES)
+
+
 # Run from path (Used in run.sh script)
 if((ALLOSYSTEM_BUILD_DIR) OR (ALLOSYSTEM_BUILD_APP_FILE))
     set(BUILD_DIR ${ALLOSYSTEM_BUILD_DIR})
