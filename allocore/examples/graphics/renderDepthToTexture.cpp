@@ -29,7 +29,7 @@ public:
 		texDepth.format(Graphics::DEPTH_COMPONENT);
 		texDepth.type(Graphics::UBYTE);
 		texDepth.resize(w/4, h/4); // render at quarter size
-		texDepth.validate(); // ensure texture gets created/resized on GPU
+		texDepth.submit(); // ensure texture gets configured on GPU
 
 		fbo.bind();
 

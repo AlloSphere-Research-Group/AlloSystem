@@ -38,7 +38,7 @@ public:
 		tex.format(Graphics::RGB);
 		tex.type(Graphics::UBYTE);
 		tex.resize(w,h);
-		tex.validate(); // ensure texture gets created/resized on GPU
+		tex.submit(); // ensure texture gets configured on GPU
 
 		// Configure render buffer object on GPU
 		rbo.resize(w,h);

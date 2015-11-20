@@ -244,8 +244,6 @@ void Graphics::draw(const Mesh& v, int count, int begin){
 	//printf("client %d, GPU %d\n", clientSide, gpuSide);
 	//printf("Nv %i Nc %i Nn %i Nt2 %i Nt3 %i Ni %i\n", Nv, Nc, Nn, Nt2, Nt3, Ni);
 
-	GPUObject::validate(); // ensure GPU resources are created
-
 	// Enable arrays and set pointers...
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, 0, &v.vertices()[0]);
