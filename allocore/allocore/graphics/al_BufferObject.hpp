@@ -105,14 +105,14 @@ public:
 	*/
 	enum BufferUsage{
 		STREAM_DRAW		= GL_STREAM_DRAW,
-//		STREAM_READ		= GL_STREAM_READ,
-//		STREAM_COPY		= GL_STREAM_COPY,
+		//STREAM_READ		= GL_STREAM_READ,
+		//STREAM_COPY		= GL_STREAM_COPY,
 		STATIC_DRAW		= GL_STATIC_DRAW,
-//		STATIC_READ		= GL_STATIC_READ,
-//		STATIC_COPY		= GL_STATIC_COPY,
+		//STATIC_READ		= GL_STATIC_READ,
+		//STATIC_COPY		= GL_STATIC_COPY,
 		DYNAMIC_DRAW	= GL_DYNAMIC_DRAW,
-//		DYNAMIC_READ	= GL_DYNAMIC_READ,
-//		DYNAMIC_COPY	= GL_DYNAMIC_COPY
+		//DYNAMIC_READ	= GL_DYNAMIC_READ,
+		//DYNAMIC_COPY	= GL_DYNAMIC_COPY
 	};
 
 
@@ -125,6 +125,9 @@ public:
 
 
 	void bufferType(BufferType v){ mType=v; }
+
+	void usage(BufferUsage v){ mUsage=v; }
+
 	void mapMode(AccessMode v){ mMapMode=v; }
 
 	void operator()(){
@@ -165,6 +168,15 @@ public:
 	bool unmap(){ return glUnmapBuffer(mType)==GL_TRUE; }
 #endif
 
+	/// Set size, in bytes, of buffer without sending data
+	void resize(int numBytes){
+		mData = NULL;
+		mDataType = Graphics::BYTE;
+		mNumElems = numBytes;
+		mNumComps = 1;
+		data();
+	}
+
 	/// Set buffer data store and copy over client data
 	void data(const void * src, Graphics::DataType dataType, int numElems, int numComps=1){
 		mData = (void *)src;
@@ -192,6 +204,16 @@ public:
 		unbind();
 	}
 
+	/// Set subregion of buffer store
+	template <class T>
+	int subData(const T * src, int numElems, int byteOffset=0){
+		if(numElems){
+			bind();
+			glBufferSubData(mType, byteOffset, numElems*sizeof(T), src);
+			unbind();
+		}
+		return numElems*sizeof(T) + byteOffset;
+	}
 
 protected:
 	AccessMode mMapMode;
@@ -260,7 +282,7 @@ public:
 	:	BufferObject(ELEMENT_ARRAY_BUFFER, usage), mPrim(prim), mStart(0), mEnd(0)
 	{}
 
-	EBO& prim(Graphics::Primitive v){ mPrim=v; return *this; }
+	EBO& primitive(Graphics::Primitive v){ mPrim=v; return *this; }
 	EBO& range(int start, int end){ mStart=start; mEnd=end; return *this; }
 
 protected:
