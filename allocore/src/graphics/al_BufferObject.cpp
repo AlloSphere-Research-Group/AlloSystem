@@ -19,8 +19,6 @@ void BufferObject::bufferType(BufferType v){ mType=v; }
 
 void BufferObject::usage(BufferUsage v){ mUsage=v; }
 
-void BufferObject::mapMode(AccessMode v){ mMapMode=v; }
-
 void BufferObject::operator()(){
 	//data(); onPointerFunc(); unbind();
 	bind(); onPointerFunc();
@@ -40,6 +38,8 @@ void BufferObject::unbind() const {
 }
 
 #ifdef AL_GRAPHICS_USE_OPENGL
+void BufferObject::mapMode(AccessMode v){ mMapMode=v; }
+
 void * BufferObject::map(){
 	bind();
 	return glMapBuffer(mType, mMapMode);
