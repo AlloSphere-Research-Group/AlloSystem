@@ -26,6 +26,7 @@ if(GLEW_LIBRARY AND OPENGL_LIBRARY)
 message(STATUS "Building OpenGL module (OpenGL + GLEW).")
 
 list(APPEND ALLOCORE_SRC
+  src/graphics/al_BufferObject.cpp
   src/graphics/al_Graphics.cpp
   src/graphics/al_FBO.cpp
   src/graphics/al_GPUObject.cpp
