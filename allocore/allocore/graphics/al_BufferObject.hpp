@@ -42,6 +42,7 @@
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
+#include <vector>
 #include "allocore/graphics/al_GPUObject.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
 
@@ -124,6 +125,8 @@ public:
 	virtual ~BufferObject(){ destroy(); }
 
 
+	int size() const { return mNumElems*mNumComps*Graphics::numBytes(mDataType); }
+
 	void bufferType(BufferType v){ mType=v; }
 
 	void usage(BufferUsage v){ mUsage=v; }
@@ -200,7 +203,7 @@ public:
 	/// Set buffer data store using cached values
 	void data(){
 		bind();
-		glBufferData(mType, Graphics::numBytes(mDataType)*mNumElems*mNumComps, mData, mUsage);
+		glBufferData(mType, size(), mData, mUsage);
 		unbind();
 	}
 
@@ -211,6 +214,7 @@ public:
 			bind();
 			glBufferSubData(mType, byteOffset, numElems*sizeof(T), src);
 			unbind();
+			mSubData.push_back(SubData(src, numElems*sizeof(T), byteOffset));
 		}
 		return numElems*sizeof(T) + byteOffset;
 	}
@@ -223,9 +227,32 @@ protected:
 	int mNumComps;
 	int mNumElems;
 	void * mData;
+	struct SubData{
+		SubData(const void * data_=NULL, unsigned size_=0, unsigned offset_=0)
+		:	data(data_), size(size_), offset(offset_){}
+		const void * data;
+		unsigned size;
+		unsigned offset;
+	};
+	std::vector<SubData> mSubData;
 
-	virtual void onCreate(){ glGenBuffers(1, (GLuint*)&mID); }
-	virtual void onDestroy(){ glDeleteBuffers(1, (GLuint*)&mID); }
+	virtual void onCreate(){
+		glGenBuffers(1, (GLuint*)&mID);
+		if(size() > 0){
+			data();
+			if(mSubData.size() > 0){
+				bind();
+				for(unsigned i=0; i<mSubData.size(); ++i){
+					const SubData& sd = mSubData[i];
+					glBufferSubData(mType, sd.offset, sd.size, sd.data);
+				}
+				unbind();
+			}
+		}
+	}
+	virtual void onDestroy(){
+		glDeleteBuffers(1, (GLuint*)&mID);
+	}
 	virtual void onPointerFunc() = 0;
 };
 
