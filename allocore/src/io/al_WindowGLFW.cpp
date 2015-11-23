@@ -314,6 +314,7 @@ bool Window::implCreate(){
 	WindowImpl::registerCBs();
 	WindowImpl::windows()[mImpl->mGLFWwindow] = mImpl;
 
+	AL_GRAPHICS_INIT_CONTEXT; // init glew
 	vsync(mVSync);
 
 	callHandlersOnCreate();
