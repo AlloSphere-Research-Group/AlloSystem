@@ -12,6 +12,8 @@ set(GL_HEADERS
     allocore/graphics/al_Lens.hpp
     allocore/graphics/al_Light.hpp
     allocore/graphics/al_OpenGL.hpp
+    allocore/graphics/al_OpenGLGLFW.hpp
+    allocore/graphics/al_OpenGLGLUT.hpp
     allocore/graphics/al_Shader.hpp
     allocore/graphics/al_Slab.hpp
     allocore/graphics/al_Stereographic.hpp

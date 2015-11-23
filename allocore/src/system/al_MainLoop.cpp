@@ -4,6 +4,7 @@
 
 #include <stdlib.h>		// exit
 #include <algorithm>	// std::find
+#include <iostream>
 
 // native bindings:
 
@@ -29,6 +30,42 @@ extern "C" void al_main_native_stop();
 	extern "C" void al_main_native_stop(){}
 #endif
 
+// --- GLFW --------------------------------------------------------------------
+extern "C" void al_main_glfw_init();
+extern "C" void al_main_glfw_enter();
+extern "C" void al_main_glfw_stop();
+
+#ifdef AL_MAINLOOP_NO_GLFW
+	extern "C" void al_main_glfw_init() { AL_WARN("GLFW not available") };
+	extern "C" void al_main_glfw_enter() {}
+	extern "C" void al_main_glfw_stop() {}
+#else
+	#define GLFW_INCLUDE_GLCOREARB
+	#include <GLFW/glfw3.h>
+
+	extern "C" void al_main_glfw_init() {
+		std::cout << "starting GLFW " << glfwGetVersionString() << std::endl;
+		if (!glfwInit()) std::cout << "ERROR: could not start GLFW3" << std::endl;
+	}
+
+	extern "C" void al_main_glfw_enter() {
+		al::Main& M = al::Main::get();
+
+		while (M.isRunning()) {
+			double prev_sec = glfwGetTime();
+			M.tick();
+			double curr_sec = glfwGetTime();
+
+			double time_left_till_next_frame = prev_sec + M.interval() - curr_sec;
+			if (time_left_till_next_frame > 0) al_sleep(time_left_till_next_frame);
+		}
+	}
+
+	extern "C" void al_main_glfw_stop() {
+		std::cout << "Terminating GLFW" << std::endl;
+		glfwTerminate();
+	}
+#endif
 
 ////////////////////////////////////////////////////////////////
 // GLUT impl:
@@ -139,6 +176,7 @@ Main& Main::driver(Driver v) {
 	//if (mDriver != GLUT) mDriver = v;
 	if(!mInited[v]){
 		switch(v){
+			case GLFW: al_main_glfw_init(); break;
 			case GLUT: al_main_glut_init(); break;
 			case NATIVE: al_main_native_init(); break;
 			default:;
@@ -195,6 +233,7 @@ void Main::start() {
 
 		// Here we enter the main loop which will block until stopped
 		switch (mDriver) {
+			case Main::GLFW: al_main_glfw_enter(); break;
 			case Main::GLUT: al_main_glut_enter(interval()); break;
 			case Main::NATIVE: al_main_native_enter(interval()); break;
 			default:

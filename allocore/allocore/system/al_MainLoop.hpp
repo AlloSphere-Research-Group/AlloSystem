@@ -46,6 +46,10 @@
 #include "allocore/types/al_MsgQueue.hpp"
 #include <vector>
 
+#include "allocore/graphics/al_OpenGLSelect.hpp"
+#ifdef USE_GLFW
+	#define AL_MAINLOOP_NO_GLUT
+#endif
 
 namespace al {
 
@@ -62,6 +66,7 @@ public:
 
 	enum Driver {
 		SLEEP = 0,
+		GLFW,
 		GLUT,
 		NATIVE,
 		NUM_DRIVERS
