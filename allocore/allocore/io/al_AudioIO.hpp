@@ -106,10 +106,6 @@ public:
 
 	virtual ~AudioIO();
 
-	using AudioIOData::channelsIn;
-	using AudioIOData::channelsOut;
-	using AudioIOData::framesPerBuffer;
-	using AudioIOData::framesPerSecond;
 
 	audioCallback callback;						///< User specified callback function.
 
@@ -122,6 +118,8 @@ public:
 
 	bool autoZeroOut() const { return mAutoZeroOut; }
 	int channels(bool forOutput) const;
+	int channelsInDevice() const;				///< Get number of channels opened on input device
+	int channelsOutDevice() const;				///< Get number of channels opened on output device
 	bool clipOut() const { return mClipOut; }	///< Returns clipOut setting
 	double cpu() const;							///< Returns current CPU usage of audio thread
 	bool supportsFPS(double fps) const;			///< Return true if fps supported, otherwise false
@@ -142,10 +140,8 @@ public:
 	/// the number of channels opens all available channels.
 	void channels(int num, bool forOutput);
 
-	void channelsIn(int n){channels(n,false);}	///< Set number of input channels
-	void channelsOut(int n){channels(n,true);}	///< Set number of output channels
-	int channelsInDevice() const;				///< Get number of channels opened on input device
-	int channelsOutDevice() const;				///< Get number of channels opened on output device
+	void channelsIn(int n);						///< Set number of input channels
+	void channelsOut(int n);					///< Set number of output channels
 	void channelsBus(int num);					///< Set number of bus channels
 	void clipOut(bool v){ mClipOut=v; }			///< Set whether to clip output between -1 and 1
 	void device(const AudioDevice& v);			///< Set input/output device (must be duplex)
@@ -155,9 +151,14 @@ public:
 	void framesPerBuffer(int n);				///< Set number of frames per processing buffer
 	void zeroNANs(bool v){ mZeroNANs=v; }		///< Set whether to zero NANs in output buffer going to DAC
 
-	void print();								///< Prints info about current i/o devices to stdout.
+	void print() const;							///< Prints info about current i/o devices to stdout.
 
 	static const char * errorText(int errNum);		// Returns error string.
+
+	using AudioIOData::channelsIn;
+	using AudioIOData::channelsOut;
+	using AudioIOData::framesPerSecond;
+	using AudioIOData::framesPerBuffer;
 
 private:
 	AudioDevice mInDevice, mOutDevice;
