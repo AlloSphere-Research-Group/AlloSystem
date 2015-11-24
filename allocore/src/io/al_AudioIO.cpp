@@ -6,6 +6,7 @@
 #include <cassert>
 
 #include "portaudio.h"
+#include "allocore/system/al_Config.h"
 #include "allocore/io/al_AudioIO.hpp"
 
 namespace al{
@@ -142,6 +143,13 @@ public:
 		// -1 means open all channels
 		if(-1 == num){
 			num = maxChans;
+			#ifdef AL_LINUX
+			/* The default device can report an insane number of max channels, 
+			presumably because it's being remapped through a software mixer;
+			Opening all of them can cause an assertion dump in snd_pcm_area_copy
+			so we limit "all channels" to a reasonable number.*/
+			if(num >= 128) num = 2;
+			#endif
 		}
 		else{
 			num = min(num, maxChans);
