@@ -41,7 +41,7 @@ void audioCB(AudioIOData& io){
 int utIOAudioIO(){
 
 	//AudioDevice::printAll();
-	AudioIO audioIO(256, 44100, audioCB, 0, 1, 1);
+	AudioIO audioIO(256, 44100, audioCB, 0, 1, 1, AudioIOData::PORTAUDIO);
 
 	// Make sure parameters match those passed to constructor
 	audioIO.open();
@@ -62,7 +62,7 @@ int utIOAudioIO(){
 	assert(audioIO.channelsInDevice() == maxChansIn); // opened all hardware channels?
 	assert(audioIO.channelsIn() == (maxChansIn+1)); // got our extra virtual channel?
 
-	audioIO.start();
+//	audioIO.start();
 
 	//printf("\nPress 'enter' to quit...\n"); getchar();
 	return 0;

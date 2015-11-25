@@ -38,7 +38,9 @@ int main (int argc, char * const argv[]) {
 #ifndef ALLOCORE_TESTS_NO_AUDIO
 	RUNTEST(IOAudioIO);
 #endif
-
+	
+	RUNTEST(AudioScene);
+	
 #ifndef ALLOCORE_TESTS_NO_GUI
 	// This test should always be run last since it calls exit()
 	// This test will not run on headless machines.

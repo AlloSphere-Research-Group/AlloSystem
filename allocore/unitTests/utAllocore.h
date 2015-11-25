@@ -16,6 +16,7 @@
 
 using namespace al;
 
+int utAudioScene();
 int utIOAudioIO();
 int utIOSocket();
 int utIOWindowGL();
