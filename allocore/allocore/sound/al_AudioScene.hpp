@@ -178,7 +178,10 @@ protected:
 
 
 
-/// A listener in an audio space
+/// A listener in an audio space. Listener objects are not created by the user
+/// but instantiated using the createListener() function from the AudioScene
+/// class.
+/// A Listener is tied to a spatialization technique when it is created.
 class Listener : public AudioSceneObject {
 public:
 
