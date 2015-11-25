@@ -226,7 +226,7 @@ void AudioScene::render(float **outputBuffers, const int numFrames, const double
                 for(int i = 0; i < numFrames; i++)
                 {
                     double readIndex = distance * distanceToSample;
-                    readIndex += (numFrames-i);
+                    readIndex += (numFrames - i - 1);
                     mBuffer[i] = gain * src.readSample(readIndex);
                 }
                 
