@@ -117,7 +117,6 @@ public:
 
 	virtual ~AudioIO();
 
-
 	audioCallback callback;						///< User specified callback function.
 
 	/// Add an AudioCallback handler (internal callback is always called first)
@@ -170,6 +169,7 @@ public:
 
 	using AudioIOData::channelsIn;
 	using AudioIOData::channelsOut;
+	using AudioIOData::channelsBus;
 	using AudioIOData::framesPerSecond;
 	using AudioIOData::framesPerBuffer;
 
