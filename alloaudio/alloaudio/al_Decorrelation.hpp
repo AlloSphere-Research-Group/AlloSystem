@@ -80,14 +80,14 @@ public:
 	 * @param io The AudioIO object for audio rendering
 	 * @param seed The seed for the random number generator used to calculate random phase. A value of -1 means seed to current time.
 	 * @param maxjump The maximum difference allowed (in radians) in the random phase between adjacent bins. A value of -1 means no limit.
+	 * @param phaseFactor The random phase generated is multiplied by this factor. This will allow a different control of the amount of decorrelation. A phaseFactor of 0.0 will result in no decorrelation as there will be no phase shift, and a phaseFactor of 1.0 will use the unmodified random numbers for the bin's phase
 	 */
-	void configure(al::AudioIO &io, long seed = -1, float maxjump = -1);
+	void configure(al::AudioIO &io, long seed = -1, float maxjump = -1, float phaseFactor = 1.0);
 
 	/**
 	 * @brief Calculates deterministic phase decorrelation IRs
 	 *
 	 * The IRs are generated using the Zotter method
-	 *
 	 *
 	 * @param io
 	 * @param seed
@@ -109,7 +109,7 @@ public:
 private:
 
 	void freeIRs();
-	void generateIRs(long seed = -1, float maxjump = -1.0);
+	void generateIRs(long seed = -1, float maxjump = -1.0, float phaseFactor = 1.0);
 	void generateDeterministicIRs(long seed = -1, float deltaFreq = 30, float maxFreqDev = 10, float maxTau = 1.0);
 
 	vector<float *>mIRs;
