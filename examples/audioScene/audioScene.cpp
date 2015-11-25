@@ -89,10 +89,10 @@ struct MyApp : App {
 
   // Create a panner: DBAP, VBAP, Ambisonics, or Stereo
   //
-  StereoPanner* panner;
+  // StereoPanner* panner;
   // Dbap* panner = new Dbap(speakerLayout);
   // Vbap* panner = new Vbap(speakerLayout);
-  // AmbisonicsSpatializer* panner =
+  AmbisonicsSpatializer* panner;
   //   new AmbisonicsSpatializer(speakerLayout, 2, 1); // dimension and order
 
   // Create listener(s) (at least one)
@@ -107,7 +107,9 @@ struct MyApp : App {
   //
   AudioScene scene;
   MyApp() : scene(BLOCK_SIZE) {
-    panner = new StereoPanner(speakerLayout);
+    // panner = new StereoPanner(speakerLayout);
+    panner =
+        new AmbisonicsSpatializer(speakerLayout, 2, 1);  // dimension and order
 
     // Initialize the listener(s) with their individual speaker layout and
     // panner
