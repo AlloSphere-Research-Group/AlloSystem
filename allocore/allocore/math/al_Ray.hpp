@@ -59,8 +59,12 @@ public:
 
 	Ray(){};
 	Ray(Vec<3,T> origin, Vec<3,T> direction){
+		set(origin,direction);
+	}
+
+	void set(Vec<3,T> origin, Vec<3,T> direction){
 		o.set(origin);
-		d.set(direction.normalize());
+		d.set(direction.normalized());
 	}
 
 	// return point on ray

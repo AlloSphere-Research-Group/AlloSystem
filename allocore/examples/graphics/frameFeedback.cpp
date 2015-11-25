@@ -23,7 +23,9 @@ public:
 	float angle;
 
 	MyApp(){
-	
+
+		angle = 0;
+
 		// Create a colored square
 		shape.primitive(Graphics::LINE_LOOP);
 		const int N = 4;

@@ -9,8 +9,11 @@
 
 namespace al{
 
-Graphics::Graphics() : mInImmediateMode(false) {}
-Graphics::~Graphics() {}
+Graphics::Graphics()
+:	mRescaleNormal(0), mInImmediateMode(false)
+{}
+
+Graphics::~Graphics(){}
 
 
 int Graphics::numComponents(Format v){
@@ -298,6 +301,15 @@ void Graphics::draw(const Mesh& v, int count, int begin){
 	if(Nn)			glDisableClientState(GL_NORMAL_ARRAY);
 	if(Nc || Nci)	glDisableClientState(GL_COLOR_ARRAY);
 	if(Nt2 || Nt3)	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+}
+
+
+void Graphics::onCreate(){
+	GPUObject::mID = 1; // must be non-zero to flag creation
+	mRescaleNormal = 0;
+}
+
+void Graphics::onDestroy(){
 }
 
 } // al::

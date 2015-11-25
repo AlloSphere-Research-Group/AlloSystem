@@ -2,7 +2,9 @@
 Allocore Example: Isosurface
 
 Description:
-This demonstrates how to render a scalar field as an isosurface.
+This demonstrates how to render a scalar field as an isosurface. An isosurface
+is the two-dimensional surface embedded in a three-dimensional scalar field
+where all values are equal to some constant.
 
 Author:
 Lance Putnam, March 2015
@@ -19,18 +21,18 @@ public:
 	float volData[N*N*N];
 	Isosurface iso;
 	double phase;
-	bool evolve;
-	bool wireframe;
+	bool evolve, wireframe;
 
 	Light light;
-	Material mtrl;
+	Material mtrl1, mtrl2;
 
 	MyApp(){
 		phase = 0;
 		evolve = true;
 		wireframe = false;
 
-		nav().pos(0,0,5);
+		nav().pullBack(6);
+		nav().faceToward(Vec3f(-0.5,-1,-1));
 		initWindow(Window::Dim(800,600), "Isosurface Example");
 	}
 
@@ -38,9 +40,9 @@ public:
 
 		if(evolve){
 			if((phase += 0.0002) > 2*M_PI) phase -= 2*M_PI;
-			for(int k=0; k<N; ++k){ double z = double(k)/N * 4*M_PI;
-			for(int j=0; j<N; ++j){ double y = double(j)/N * 4*M_PI;
-			for(int i=0; i<N; ++i){ double x = double(i)/N * 4*M_PI;
+			for(int k=0; k<N; ++k){ double z = double(k)/(N-1) * 6*M_PI;
+			for(int j=0; j<N; ++j){ double y = double(j)/(N-1) * 6*M_PI;
+			for(int i=0; i<N; ++i){ double x = double(i)/(N-1) * 6*M_PI;
 
 				volData[k*N*N + j*N + i]
 					= cos(x * cos(phase*7))
@@ -48,26 +50,36 @@ public:
 					+ cos(z * cos(phase*9));
 			}}}
 
+			// Set the level at which the surface is drawn
 			iso.level(0);
+
+			// Generate surface from volume data
 			iso.generate(volData, N, 1./N);
 		}
 	}
 
 	void onDraw(Graphics& g){
 
-		light.dir(1,1,1);
-		light.ambient(RGB(1));
-		mtrl.useColorMaterial(false);
-		mtrl.ambient(HSV(0.7, 1, 0.1));
-		mtrl.diffuse(HSV(0.3, 1, 0.7));
-		mtrl.specular(HSV(0.1, 1, 0.7));
-		mtrl();
+		// Set colors of front- and back-facing surfaces
+		mtrl1.face(Graphics::FRONT);
+		mtrl1.ambientAndDiffuse(RGB(1));
+		mtrl1.specular(RGB(0.3));
+		mtrl1.shininess(20);
+		mtrl1();
+
+		mtrl2.face(Graphics::BACK);
+		mtrl2.ambientAndDiffuse(HSV(0.6,0.5,0.5));
+		mtrl2();
+
+		// Apply lighting
+		Light::twoSided(true); // light both sides of surface
+		light.pos(1,1,1);
+		light.attenuation(1,0.2);
 		light();
 
 		g.polygonMode(wireframe ? Graphics::LINE : Graphics::FILL);
 
 		g.pushMatrix();
-			glEnable(GL_RESCALE_NORMAL);
 			g.translate(-1,-1,-1);
 			g.scale(2);
 			g.draw(iso);

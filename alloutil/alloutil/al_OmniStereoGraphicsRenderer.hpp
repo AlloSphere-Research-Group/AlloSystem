@@ -146,10 +146,6 @@ inline bool OmniStereoGraphicsRenderer::onFrame() {
   // if running on a laptop?
   //
   nav().step();
-  Vec3d v = nav().pos();
-  Quatd q = nav().quat();
-  oscSend().send("/pose", v.x, v.y, v.z, q.x, q.y, q.z, q.w);
-  // nav().print();
 
   onAnimate(dt);
 

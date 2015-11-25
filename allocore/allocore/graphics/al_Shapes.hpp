@@ -49,32 +49,32 @@ namespace al{
 /// Add tetrahedron as indexed triangles
 
 /// @param[in,out]	m		Mesh to add vertices and indices to
-/// \returns number of vertices added
-int addTetrahedron(Mesh& m);
+/// \returns number of vertices added (4)
+int addTetrahedron(Mesh& m, float radius=1);
 
 /// Add cube as indexed triangles
 
 /// @param[in,out]	m		Mesh to add vertices and indices to
-/// \returns number of vertices added
+/// \returns number of vertices added (8)
 int addCube(Mesh& m, bool withNormalsAndTexcoords = false, float radius=M_SQRT_1_3);
 
 /// Add octahedron as triangle vertices and indices
 
 /// @param[in,out]	m		Mesh to add vertices and indices to
-/// \returns number of vertices added
-int addOctahedron(Mesh& m);
+/// \returns number of vertices added (6)
+int addOctahedron(Mesh& m, float radius=1);
 
 /// Add dodecahedron as indexed triangles
 
 /// @param[in,out]	m		Mesh to add vertices and indices to
-/// \returns number of vertices added
-int addDodecahedron(Mesh& m);
+/// \returns number of vertices added (20)
+int addDodecahedron(Mesh& m, float radius=1);
 
 /// Add icosahedron as indexed triangles
 
 /// @param[in,out]	m		Mesh to add vertices and indices to
-/// \returns number of vertices added
-int addIcosahedron(Mesh& m);
+/// \returns number of vertices added (12)
+int addIcosahedron(Mesh& m, float radius=1);
 
 
 /// Add sphere as indexed triangles

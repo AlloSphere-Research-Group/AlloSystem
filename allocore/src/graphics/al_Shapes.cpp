@@ -30,6 +30,18 @@ struct CSin{
 };
 
 
+// Scale last N vertices
+static void scaleVerts(Mesh& m, float radius, int N){
+	if(radius != 1.f){
+		int Ne = m.vertices().size();
+		int Nb = Ne - N;
+		for(int i=Nb; i<Ne; ++i){
+			m.vertices()[i] *= radius;
+		}
+	}
+}
+
+
 int addCube(Mesh& m, bool withNormalsAndTexcoords, float l){
 
 	m.primitive(Graphics::TRIANGLES);
@@ -126,7 +138,7 @@ int addCube(Mesh& m, bool withNormalsAndTexcoords, float l){
 }
 
 
-int addTetrahedron(Mesh& m){
+int addTetrahedron(Mesh& m, float radius){
 
 	m.primitive(Graphics::TRIANGLES);
 
@@ -145,11 +157,13 @@ int addTetrahedron(Mesh& m){
 	m.vertex(vertices, Nv);
 	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
 
+	scaleVerts(m, radius, Nv);
+
 	return Nv;
 }
 
 
-int addOctahedron(Mesh& m){
+int addOctahedron(Mesh& m, float radius){
 
 	m.primitive(Graphics::TRIANGLES);
 
@@ -168,64 +182,25 @@ int addOctahedron(Mesh& m){
 	m.vertex(vertices, Nv);
 	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
 
+	scaleVerts(m, radius, Nv);
+
 	return Nv;
 }
 
 
-int addDodecahedron(Mesh& m){
+int addDodecahedron(Mesh& m, float radius){
 
 	m.primitive(Graphics::TRIANGLES);
 
-//	float b = 1. / phi;
-//	float c = 2. - phi;
-//	float vertices[] = {
-//		 c,  0,  1,   -c,  0,  1,   -b,  b,  b,    0,  1,  c,    b,  b,  b,
-//		-c,  0,  1,    c,  0,  1,    b, -b,  b,    0, -1,  c,   -b, -b,  b,
-//		 c,  0, -1,   -c,  0, -1,   -b, -b, -b,    0, -1, -c,    b, -b, -b,
-//		-c,  0, -1,    c,  0, -1,    b,  b, -b,    0,  1, -c,   -b,  b, -b,
-//		 0,  1, -c,    0,  1,  c,    b,  b,  b,    1,  c,  0,    b,  b, -b,
-//		 0,  1,  c,    0,  1, -c,   -b,  b, -b,   -1,  c,  0,   -b,  b,  b,
-//		 0, -1, -c,    0, -1,  c,   -b, -b,  b,   -1, -c,  0,   -b, -b, -b,
-//		 0, -1,  c,    0, -1, -c,    b, -b, -b,    1, -c,  0,    b, -b,  b,
-//		 1,  c,  0,    1, -c,  0,    b, -b,  b,    c,  0,  1,    b,  b,  b,
-//		 1, -c,  0,    1,  c,  0,    b,  b, -b,    c,  0, -1,    b, -b, -b,
-//		-1,  c,  0,   -1, -c,  0,   -b, -b, -b,   -c,  0, -1,   -b,  b, -b,
-//		-1, -c,  0,   -1,  c,  0,   -b,  b,  b,   -c,  0,  1,   -b, -b,  b
-//	};
-//
-//	for(int i=0; i<Nv; i+=5){
-//		Vec3f v1(vertices[3*i+ 0], vertices[3*i+ 1], vertices[3*i+ 2]);
-//		Vec3f v2(vertices[3*i+ 3], vertices[3*i+ 4], vertices[3*i+ 5]);
-//		Vec3f v3(vertices[3*i+ 6], vertices[3*i+ 7], vertices[3*i+ 8]);
-//		Vec3f v4(vertices[3*i+ 9], vertices[3*i+10], vertices[3*i+11]);
-//		Vec3f v5(vertices[3*i+12], vertices[3*i+13], vertices[3*i+14]);
-//
-//		Vec3f vc = (v1+v2+v3+v4+v5)/5;
-//
-//		plato5.vertex(v1);
-//	}
+	static const float b = sqrt(1./3);
+	static const float a = (phi-1)*b;
+	static const float c = sqrt(1-a*a);
 
 	static const float vertices[] = {
-		-0.57735, -0.57735, 0.57735,
-		0.934172,  0.356822, 0,
-		0.934172, -0.356822, 0,
-		-0.934172, 0.356822, 0,
-		-0.934172, -0.356822, 0,
-		0,  0.934172,  0.356822,
-		0,  0.934172,  -0.356822,
-		0.356822,  0,  -0.934172,
-		-0.356822,  0,  -0.934172,
-		0,  -0.934172,  -0.356822,
-		0,  -0.934172,  0.356822,
-		0.356822,  0,  0.934172,
-		-0.356822,  0,  0.934172,
-		0.57735,  0.57735,  -0.57735,
-		0.57735,  0.57735, 0.57735,
-		-0.57735,  0.57735,  -0.57735,
-		-0.57735,  0.57735,  0.57735,
-		0.57735,  -0.57735,  -0.57735,
-		0.57735,  -0.57735,  0.57735,
-		-0.57735,  -0.57735,  -0.57735
+		-b,-b, b,	 c, a, 0,	 c,-a, 0,	-c, a, 0,	-c,-a, 0,
+		 0, c, a,	 0, c,-a,	 a, 0,-c,	-a, 0,-c,	 0,-c,-a,
+		 0,-c, a,	 a, 0, c,	-a, 0, c,	 b, b,-b,	 b, b, b,
+		-b, b,-b,	-b, b, b,	 b,-b,-b,	 b,-b, b,	-b,-b,-b
 	};
 
 	static const int indices[] = {
@@ -248,11 +223,13 @@ int addDodecahedron(Mesh& m){
 	m.vertex(vertices, Nv);
 	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
 
+	scaleVerts(m, radius, Nv);
+
 	return Nv;
 }
 
 
-int addIcosahedron(Mesh& m){
+int addIcosahedron(Mesh& m, float radius){
 
 	m.primitive(Graphics::TRIANGLES);
 
@@ -279,6 +256,8 @@ int addIcosahedron(Mesh& m){
 
 	m.vertex(vertices, Nv);
 	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
+
+	scaleVerts(m, radius, Nv);
 
 	return Nv;
 }

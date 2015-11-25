@@ -23,7 +23,6 @@ class MyApp : public App{
 public:
 	Mesh solids[5];
 	Light light;
-	Material material;
 	double angle1, angle2;
 
 	MyApp(){
@@ -35,43 +34,38 @@ public:
 			float f = float(i)/Nv;
 			solids[0].color(HSV(f*0.2+0.4,1,1));
 		}
-		solids[0].decompress();
-		solids[0].generateNormals();
 
 		Nv = addCube(solids[1]);
 		for(int i=0; i<Nv; ++i){
 			float f = float(i)/Nv;
 			solids[1].color(HSV(f*0.1+0.2,1,1));
 		}
-		solids[1].decompress();
-		solids[1].generateNormals();
 
 		Nv = addOctahedron(solids[2]);
 		for(int i=0; i<Nv; ++i){
 			float f = float(i)/Nv;
 			solids[2].color(HSV(f*0.1+0.1,1,1));
 		}
-		solids[2].decompress();
-		solids[2].generateNormals();
 
 		Nv = addDodecahedron(solids[3]);
 		for(int i=0; i<Nv; ++i){
 			float f = float(i)/Nv;
 			solids[3].color(HSV(f*0.1,1,1));
 		}
-		solids[3].decompress();
-		solids[3].generateNormals();
-
 
 		Nv = addIcosahedron(solids[4]);
 		for(int i=0; i<Nv; ++i){
 			float f = float(i)/Nv;
 			solids[4].color(HSV(f*0.1 + 0.7,1,1));
 		}
-		solids[4].decompress();
-		solids[4].generateNormals();
 
-		nav().pos(0,0,16);
+		// Create face normals
+		for(int i=0; i<5; ++i){
+			solids[i].decompress();
+			solids[i].generateNormals();
+		}
+
+		nav().pullBack(16);
 		initWindow();
 	}
 
@@ -81,7 +75,6 @@ public:
 	}
 
 	void onDraw(Graphics& g){
-		material();
 		light();
 
 		float angPos = 2*M_PI/5;
