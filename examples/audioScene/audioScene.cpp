@@ -66,7 +66,7 @@ struct Agent : SoundSource {
       // Generate a test signal with decaying envelope
       //
       if (timer()) sined.reset();
-      float sample = sined();
+      float sample = sined() * 0.15;
 
       // record the "loudest" sample from this block
       //
