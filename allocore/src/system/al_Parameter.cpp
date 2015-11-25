@@ -1,4 +1,5 @@
 
+#include <iostream>
 
 #include "allocore/system/al_Parameter.hpp"
 
@@ -10,7 +11,10 @@ Parameter::Parameter(std::string parameterName, std::string group, float default
     mParameterName(parameterName), mGroup(group), mPrefix(prefix)
 {
 	//TODO: Add better heuristics for slash handling
-	mFullAddress = mPrefix;
+	if (mPrefix.length() > 0 && mPrefix.at(0) != '/') {
+		mFullAddress = "/";
+	}
+	mFullAddress += mPrefix;
 	if (mPrefix.length() > 0 && mPrefix.at(prefix.length() - 1) != '/') {
 		mFullAddress += "/";
 	}
@@ -22,6 +26,7 @@ Parameter::Parameter(std::string parameterName, std::string group, float default
 		mFullAddress = "/";
 	}
 	mFullAddress += mParameterName;
+	mValue = defaultValue;
 }
 
 Parameter::~Parameter()
@@ -56,11 +61,9 @@ std::string Parameter::getFullAddress()
 ParameterServer::ParameterServer(std::string oscAddress, int oscPort)
     : mServer(NULL)
 {
-	if (oscAddress.length() > 0) {
-		mServer = new osc::Recv(oscPort, oscAddress.c_str());
-		mServer->handler(*this);
-		mServer->start();
-	}
+	mServer = new osc::Recv(oscPort, oscAddress.c_str());
+	mServer->handler(*this);
+	mServer->start();
 }
 
 ParameterServer::~ParameterServer()
@@ -93,6 +96,7 @@ void ParameterServer::onMessage(osc::Message &m)
 		if(m.addressPattern() == p->getFullAddress() && m.typeTags() == "f"){
 			// Extract the data out of the packet
 			p->set(val);
+//			std::cout << "ParameterServer::onMessage" << val << std::endl;
 		}
 	}
 }
