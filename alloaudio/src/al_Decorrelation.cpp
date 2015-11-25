@@ -78,7 +78,7 @@ long al::Decorrelation::getCurrentSeed()
 	return mSeed;
 }
 
-void Decorrelation::generateIRs(long seed, float maxjump)
+void Decorrelation::generateIRs(long seed, float maxjump, float phaseFactor)
 {
 	float *ampSpectrum = (float *) calloc(mSize, sizeof(float));
 	float *phsSpectrum = (float *) calloc(mSize, sizeof(float));
@@ -116,7 +116,7 @@ void Decorrelation::generateIRs(long seed, float maxjump)
 				float delta = ((rand() / ((float) RAND_MAX)) * 2.0 * maxjump) - maxjump;
 //				std::cout << "delta " << delta << std::endl;
 				float new_phase = old_phase + delta;
-				phsSpectrum[i] = new_phase;
+				phsSpectrum[i] = new_phase * phaseFactor;
 				old_phase = new_phase;
 			}
 			
@@ -218,11 +218,11 @@ void al::Decorrelation::freeIRs()
 	mIRs.clear();
 }
 
-void Decorrelation::configure(al::AudioIO &io, long seed, float maxjump)
+void Decorrelation::configure(al::AudioIO &io, long seed, float maxjump, float phaseFactor)
 {
 	mSeed = seed;
 	if (mSize > 16 && mNumOuts != 0) {
-		generateIRs(seed, maxjump);
+		generateIRs(seed, maxjump, phaseFactor);
 	} else {
 		mSize = 0;
 		cout << "Invalid size: " << mSize << " numOuts: " << mNumOuts << endl;
