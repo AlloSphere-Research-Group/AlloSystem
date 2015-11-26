@@ -49,6 +49,9 @@
 #include <vector>
 #include <string>
 #include <stdio.h>
+#include <iostream>
+
+using namespace std;
 
 namespace al{
 

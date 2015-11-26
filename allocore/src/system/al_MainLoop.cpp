@@ -3,7 +3,7 @@
 #include "allocore/system/al_Printing.hpp"
 
 #include <stdlib.h>		// exit
-#include <algorithm>	// std::find
+#include <algorithm>	// std::find std::max
 
 #include <iostream>
 
@@ -58,7 +58,7 @@ extern "C" void al_main_glfw_stop();
 			M.tick();
 			double curr_sec = glfwGetTime();
 
-			double time_left_till_next_frame = prev_sec + M.interval() - curr_sec;
+			double time_left_till_next_frame = std::min(prev_sec + M.interval() - curr_sec, M.interval());
 			if (time_left_till_next_frame > 0) al_sleep(time_left_till_next_frame);
 		}
 	}
@@ -66,6 +66,7 @@ extern "C" void al_main_glfw_stop();
 	extern "C" void al_main_glfw_stop() {
 		std::cout << "Terminating GLFW" << std::endl;
 		glfwTerminate();
+		std::cout << "Terminated GLFW" << std::endl;
 	}
 #endif
 
@@ -246,7 +247,6 @@ void Main::start() {
 				}
 				break;
 		}
-
 		// if we got here, then the mainloop was started, and then stopped:
 		// trigger exit handlers:
 		Main::exit();
@@ -258,6 +258,7 @@ void Main::stop() {
 		mActive = false;
 
 		switch(mDriver){
+			case GLFW: al_main_glfw_stop(); break;
 			case GLUT: al_main_glut_stop(); break;
 			case NATIVE: al_main_native_stop(); break;
 			default:; // Here, mActive==false stops the loop

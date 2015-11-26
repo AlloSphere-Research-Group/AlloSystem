@@ -1,13 +1,9 @@
 #ifndef INCLUDE_AL_OPENGLGLFW_HPP
 #define INCLUDE_AL_OPENGLGLFW_HPP
 
-
 #if defined AL_OSX
 	#define AL_GRAPHICS_USE_OPENGL
-	#include <OpenGL/gl.h>
 	#define GLFW_INCLUDE_GLCOREARB
-	// #define GLFW_INCLUDE_GLU
-	// #define GLFW_INCLUDE_GLEXT
 	#include <GLFW/glfw3.h>
 	#define AL_GRAPHICS_INIT_CONTEXT
 

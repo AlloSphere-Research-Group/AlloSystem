@@ -5,6 +5,9 @@
 
 #include <map>
 #include <iostream>
+#include <cmath>
+
+using namespace std;
 
 namespace al {
 
@@ -12,9 +15,12 @@ class WindowImpl : public Main::Handler {
 public:
 
 	typedef std::map<GLFWwindow*, WindowImpl*> WindowsMap;
+	typedef std::map<int, int> KeyMap;
+
 
 	WindowImpl(Window* w) : mWindow(w), mDimPrev(0) {
 		resetState();
+		initKeymap(); // set static keymapping map
 	}
 
 	~WindowImpl() {
@@ -33,22 +39,19 @@ public:
 	Window::Dim dimensionsGLFW() const {
 		Window::Dim d(0,0,0,0);
 		if(created()){
-			// glutSetWindow(id());
 			glfwMakeContextCurrent(mGLFWwindow);
-			// d.l = glutGet(GLUT_WINDOW_X);
 		}
 		return d;
 	}
 
 	void makeMainWindow(){
-		// glutSetWindow(id());
 		glfwMakeContextCurrent(mGLFWwindow);
 	}
 
 	void destroy(){
 		if(created()){
-			glfwDestroyWindow(mGLFWwindow);
 			windows().erase(mGLFWwindow);
+			glfwDestroyWindow(mGLFWwindow);
 			resetState();
 		}
 	}
@@ -77,110 +80,90 @@ public:
 		if(windows().end() != it){
 			return it->second;
 		}
+		return nullptr;
+	}
+
+	static int remapKey(int key){
+		auto search = keymap().find(key);
+    if(search != keymap().end()) return search->second;
 		return 0;
 	}
 
-	static void setModifiers(Keyboard& k){
-		// int mod = glutGetModifiers();
-		// k.alt  (mod & GLUT_ACTIVE_ALT);
-		// k.ctrl (mod & GLUT_ACTIVE_CTRL);
-		// k.shift(mod & GLUT_ACTIVE_SHIFT);
-		//printf("a:%d c:%d s:%d\n", k.alt(), k.ctrl(), k.shift());
-	}
+	static void cbKeyboard(GLFWwindow* window, int key, int scancode, int action, int mods){
+		Window* w = getWindow();
+		if (!w) return;
 
-	// An invalid key to indicate an error
-	static const int INVALID_KEY = -1;
+		// first set modifiers
+		Keyboard& k = w->mKeyboard;
+		k.alt(mods & GLFW_MOD_ALT);
+		k.ctrl(mods & GLFW_MOD_CONTROL);
+		k.shift(mods & GLFW_MOD_SHIFT);
 
-	static int remapKey(int key, bool special){
-		// !?
-		return key;
-	}
-
-	static void cbKeyboard(unsigned char key, int x, int y){
-		Window * win = getWindow();
-		if(win){
-			key = remapKey(key, false);
-			win->mKeyboard.setKey(key, true);
-			setModifiers(win->mKeyboard);
-			win->callHandlersOnKeyDown();
+		switch(action) {
+			case GLFW_PRESS:
+				k.setKey(remapKey(key), true);
+				w->callHandlersOnKeyDown();
+				break;
+			case GLFW_REPEAT:	break;
+			case GLFW_RELEASE:
+				k.setKey(remapKey(key), false);
+				w->callHandlersOnKeyUp();
+				break;
 		}
 	}
 
-	static void cbKeyboardUp(unsigned char key, int x, int y){
-		Window * win = getWindow();
-		if(win){
-			key = remapKey(key, false);
-			win->mKeyboard.setKey(key, false);
-			setModifiers(win->mKeyboard);
-			win->callHandlersOnKeyUp();
+	static void cbMouse(GLFWwindow* window, int button, int action, int mods){
+		Window * w = getWindow();
+		if(!w) return;
+
+		Mouse& m = w->mMouse;
+
+		switch(button){
+			case GLFW_MOUSE_BUTTON_LEFT: button = Mouse::LEFT; break;
+			case GLFW_MOUSE_BUTTON_RIGHT: button = Mouse::MIDDLE; break;
+			case GLFW_MOUSE_BUTTON_MIDDLE: button = Mouse::RIGHT; break;
+			default: button = Mouse::EXTRA;		// unrecognized button
+		}
+
+		Keyboard& k = w->mKeyboard;
+		k.alt(mods & GLFW_MOD_ALT);
+		k.ctrl(mods & GLFW_MOD_CONTROL);
+		k.shift(mods & GLFW_MOD_SHIFT);
+
+		if (GLFW_PRESS == action) {
+			double xpos, ypos;
+			glfwGetCursorPos (window, &xpos, &ypos);
+			m.position((int)round(xpos), (int)round(ypos));
+			m.button(button, true);
+			w->callHandlersOnMouseDown();
+		}
+		if (GLFW_RELEASE == action) {
+			double xpos, ypos;
+			glfwGetCursorPos (window, &xpos, &ypos);
+			m.position((int)round(xpos), (int)round(ypos));
+			m.button(button, false);
+			w->callHandlersOnMouseUp();
 		}
 	}
 
-	static void cbSpecial(int key, int x, int y){
+	static void cbMotion(GLFWwindow* window, double mx, double my) {
 		Window * win = getWindow();
-		if(win){
-			key = remapKey(key, true);
-			if(INVALID_KEY != key){
-				win->mKeyboard.setKey(key, true);
-				setModifiers(win->mKeyboard);
-				win->callHandlersOnKeyDown();
-			}
-		}
-	}
+		if(!win) return;
 
-	static void cbSpecialUp(int key, int x, int y){
-		Window * win = getWindow();
-		if(win){
-			key = remapKey(key, true);
-			if(INVALID_KEY != key){
-				win->mKeyboard.setKey(key, false);
-				setModifiers(win->mKeyboard);
-				win->callHandlersOnKeyUp();
-			}
-		}
-	}
+		win->mMouse.position((int)round(mx), (int)round(my));
 
-	static void cbMouse(int btn, int state, int ax, int ay){
-		Window * win = getWindow();
-		if(win){
-			// switch(btn){
-				// case GLUT_LEFT_BUTTON:		btn = Mouse::LEFT; break;
-				// case GLUT_MIDDLE_BUTTON:	btn = Mouse::MIDDLE; break;
-				// case GLUT_RIGHT_BUTTON:		btn = Mouse::RIGHT; break;
-				// default:					btn = Mouse::EXTRA;		// unrecognized button
-			// }
-
-			// update modifiers here for shift-mouse etc.
-			WindowImpl::setModifiers(win->mKeyboard);
-
-			// Mouse& m = win->mMouse;
-			// if(GLUT_DOWN == state){
-			// 	m.position(ax, ay); m.button(btn, true);
-			// 	win->callHandlersOnMouseDown();
-			// }
-			// else if(GLUT_UP == state){
-			// 	m.position(ax, ay);	m.button(btn, false);
-			// 	win->callHandlersOnMouseUp();
-			// }
-		}
-	}
-
-	static void cbMotion(int ax, int ay){
-		Window * win = getWindow();
-		if(win){
-			win->mMouse.position(ax,ay);
+		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS ||
+		    glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS ||
+		    glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_3) == GLFW_PRESS)
+		{
 			win->callHandlersOnMouseDrag();
+		std::cout << "mouse dragged" << std::endl;
+			return;
 		}
-	}
 
-	static void cbPassiveMotion(int ax, int ay){
-		Window * win = getWindow();
-		if(win){
-			win->mMouse.position(ax,ay);
-			win->callHandlersOnMouseMove();
-		}
+		win->callHandlersOnMouseMove();
+		std::cout << "mouse moved" << std::endl;
 	}
-
 
 	static void cbReshape(int w, int h){
 		Window * win = getWindow();
@@ -204,7 +187,92 @@ public:
 		}
 	}
 
-	static void registerCBs(){
+	// key mapping function, original version by Donghao Ren
+	// 
+	static void initKeymap() {
+		static bool initd = false;
+		if (initd) return;
+		initd = false;
+
+		KeyMap& km = keymap();
+
+		km[GLFW_KEY_SPACE] = ' ';
+		km[GLFW_KEY_APOSTROPHE] = '\'';
+		km[GLFW_KEY_COMMA] = ',';
+		km[GLFW_KEY_MINUS] = '-';
+		km[GLFW_KEY_PERIOD] = '.';
+		km[GLFW_KEY_SLASH] = '/';
+		km[GLFW_KEY_0] = '0';
+		km[GLFW_KEY_1] = '1';
+		km[GLFW_KEY_2] = '2';
+		km[GLFW_KEY_3] = '3';
+		km[GLFW_KEY_4] = '4';
+		km[GLFW_KEY_5] = '5';
+		km[GLFW_KEY_6] = '6';
+		km[GLFW_KEY_7] = '7';
+		km[GLFW_KEY_8] = '8';
+		km[GLFW_KEY_9] = '9';
+		km[GLFW_KEY_SEMICOLON] = ';';
+		km[GLFW_KEY_EQUAL] = '=';
+		km[GLFW_KEY_A] = 'a';
+		km[GLFW_KEY_B] = 'b';
+		km[GLFW_KEY_C] = 'c';
+		km[GLFW_KEY_D] = 'd';
+		km[GLFW_KEY_E] = 'e';
+		km[GLFW_KEY_F] = 'f';
+		km[GLFW_KEY_G] = 'g';
+		km[GLFW_KEY_H] = 'h';
+		km[GLFW_KEY_I] = 'i';
+		km[GLFW_KEY_J] = 'j';
+		km[GLFW_KEY_K] = 'k';
+		km[GLFW_KEY_L] = 'l';
+		km[GLFW_KEY_M] = 'm';
+		km[GLFW_KEY_N] = 'n';
+		km[GLFW_KEY_O] = 'o';
+		km[GLFW_KEY_P] = 'p';
+		km[GLFW_KEY_Q] = 'q';
+		km[GLFW_KEY_R] = 'r';
+		km[GLFW_KEY_S] = 's';
+		km[GLFW_KEY_T] = 't';
+		km[GLFW_KEY_U] = 'u';
+		km[GLFW_KEY_V] = 'v';
+		km[GLFW_KEY_W] = 'w';
+		km[GLFW_KEY_X] = 'x';
+		km[GLFW_KEY_Y] = 'y';
+		km[GLFW_KEY_Z] = 'z';
+		km[GLFW_KEY_LEFT_BRACKET] = '[';
+		km[GLFW_KEY_BACKSLASH] = '\\';
+		km[GLFW_KEY_RIGHT_BRACKET] = ']';
+		km[GLFW_KEY_GRAVE_ACCENT] = '`';
+		km[GLFW_KEY_ESCAPE] = Keyboard::ESCAPE;
+		km[GLFW_KEY_ENTER] = Keyboard::ENTER;
+		km[GLFW_KEY_TAB] = Keyboard::TAB;
+		km[GLFW_KEY_BACKSPACE] = Keyboard::BACKSPACE;
+		km[GLFW_KEY_INSERT] = Keyboard::INSERT;
+		km[GLFW_KEY_DELETE] = Keyboard::DELETE;
+		km[GLFW_KEY_RIGHT] = Keyboard::RIGHT;
+		km[GLFW_KEY_LEFT] = Keyboard::LEFT;
+		km[GLFW_KEY_DOWN] = Keyboard::DOWN;
+		km[GLFW_KEY_UP] = Keyboard::UP;
+		km[GLFW_KEY_PAGE_UP] = Keyboard::PAGE_UP;
+		km[GLFW_KEY_PAGE_DOWN] = Keyboard::PAGE_DOWN;
+		km[GLFW_KEY_HOME] = Keyboard::HOME;
+		km[GLFW_KEY_END] = Keyboard::END;
+		km[GLFW_KEY_F1] = Keyboard::F1;
+		km[GLFW_KEY_F2] = Keyboard::F2;
+		km[GLFW_KEY_F3] = Keyboard::F3;
+		km[GLFW_KEY_F4] = Keyboard::F4;
+		km[GLFW_KEY_F5] = Keyboard::F5;
+		km[GLFW_KEY_F6] = Keyboard::F6;
+		km[GLFW_KEY_F7] = Keyboard::F7;
+		km[GLFW_KEY_F8] = Keyboard::F8;
+		km[GLFW_KEY_F9] = Keyboard::F9;
+		km[GLFW_KEY_F10] = Keyboard::F10;
+		km[GLFW_KEY_F11] = Keyboard::F11;
+		km[GLFW_KEY_F12] = Keyboard::F12;
+  }
+
+	void registerCBs(){
 		// glutKeyboardFunc(cbKeyboard);
 		// glutKeyboardUpFunc(cbKeyboardUp);
 		// glutMouseFunc(cbMouse);
@@ -214,10 +282,22 @@ public:
 		// glutSpecialUpFunc(cbSpecialUp);
 		// glutReshapeFunc(cbReshape);
 		// glutVisibilityFunc(cbVisibility);
+
+		// glfwSetWindowUserPointer(window, this);
+		glfwSetKeyCallback(mGLFWwindow, cbKeyboard);
+		// glfwSetWindowPosCallback(window, cb_windowpos);
+		// glfwSetWindowSizeCallback(mGLFWwindow, cbReshape);
+		// glfwSetFramebufferSizeCallback(window, cb_framebuffersize);
+		// glfwSetWindowCloseCallback(window, cb_windowclose);
+		// glfwSetWindowRefreshCallback(window, cb_windowrefresh);
+		// glfwSetWindowFocusCallback(window, cb_windowfocus);
+	  // glfwSetErrorCallback(errorCallback);
+	  glfwSetMouseButtonCallback(mGLFWwindow, cbMouse);
+	  glfwSetCursorPosCallback(mGLFWwindow, cbMotion);
 	}
 
 	void onTick() {
-		std::cout << "onTick, WindowImpl" << std::endl;
+		// std::cout << "onTick, WindowImpl" << std::endl;
 		if (glfwGetCurrentContext() != mGLFWwindow) {
 			glfwMakeContextCurrent(mGLFWwindow);
 		}
@@ -245,8 +325,6 @@ private:
 			CS(GL_INVALID_FRAMEBUFFER_OPERATION, "The framebuffer object is not complete.")
 		#endif
 			CS(GL_OUT_OF_MEMORY, "There is not enough memory left to execute the command.")
-			CS(GL_STACK_OVERFLOW, "This command would cause a stack overflow.")
-			CS(GL_STACK_UNDERFLOW, "This command would cause a stack underflow.")
 		#ifdef GL_TABLE_TOO_LARGE
 			CS(GL_TABLE_TOO_LARGE, "The specified table exceeds the implementation's maximum supported table size.")
 		#endif
@@ -270,6 +348,11 @@ private:
 	static WindowsMap& windows(){
 		static WindowsMap* v = new WindowsMap;
 		return *v;
+	}
+
+	static KeyMap& keymap() {
+		static KeyMap* k = new KeyMap;
+		return *k;
 	}
 
 	Window * mWindow;
@@ -305,13 +388,31 @@ bool Window::implCreate(){
 	mDim.h = 0;
 	mImpl->mDimPrev.set(0,0,0,0);
 
+	glfwDefaultWindowHints();
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 	mImpl->mGLFWwindow = glfwCreateWindow(w, h, "title", NULL, NULL);
 	if (!mImpl->created()) {
 		return false;
 	}
+
+	glfwMakeContextCurrent(mImpl->mGLFWwindow);
+
+	std::cout << "checking versions..." << std::endl;
+	const GLubyte* renderer = glGetString(GL_RENDERER);
+  std::cout << "renderer: " << renderer << std::endl;
+  int mj = glfwGetWindowAttrib(mImpl->mGLFWwindow, GLFW_CONTEXT_VERSION_MAJOR);
+  int mn = glfwGetWindowAttrib(mImpl->mGLFWwindow, GLFW_CONTEXT_VERSION_MINOR);
+  std::cout << "opengl window version: " << mj << "." << mn << std::endl;
+  char* glsl_version = (char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
+  std::cout << "glsl version: " << glsl_version << std::endl;
+
 	Main::get().add(*mImpl);
 
-	WindowImpl::registerCBs();
+	mImpl->registerCBs();
 	WindowImpl::windows()[mImpl->mGLFWwindow] = mImpl;
 
 	AL_GRAPHICS_INIT_CONTEXT; // init glew
@@ -354,6 +455,8 @@ void Window::implSetDimensions(){
 void Window::implSetCursor(){
 	if(!mCursorHide){
 		mImpl->makeMainWindow();
+		// glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+
 		// switch(mCursor){
 			// case CROSSHAIR:	glutSetCursor(GLUT_CURSOR_CROSSHAIR); break;
 			// case POINTER:	glutSetCursor(GLUT_CURSOR_INHERIT); break;

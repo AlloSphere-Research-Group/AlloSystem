@@ -133,8 +133,6 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif()
 
 # optional dependendencies ----------------------------
-# first gl and glew
-include(modules/gl_module.cmake)
 # GLFW is default lib, if not available, use glut
 include(modules/glfw_module.cmake)
 if(GLFW_FOUND)
@@ -142,10 +140,14 @@ if(GLFW_FOUND)
   set(GL_SELECT allocore/graphics/al_OpenGLSelect.hpp)
   set(GL_SELECT_TEXT "#define USE_GLFW 1")
   file(WRITE "${BUILD_ROOT_DIR}/build/include/${GL_SELECT}" ${GL_SELECT_TEXT})
+  # for glfw use gl3.h related files
+  include(modules/gl3_module.cmake)
 else()
   set(GL_SELECT allocore/graphics/al_OpenGLSelect.hpp)
   set(GL_SELECT_TEXT "// #define USE_GLFW 1")
   file(WRITE "${BUILD_ROOT_DIR}/build/include/${GL_SELECT}" ${GL_SELECT_TEXT})
+  # for glut use gl.h files
+  include(modules/gl_module.cmake)
   include(modules/glut_module.cmake)
 endif(NOT GLFW_FOUND)
 
