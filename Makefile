@@ -73,8 +73,9 @@ clean:
 gatherexamples:
 	@install -d examples
 	@for v in $(subst /,,$(MODULE_DIRS)); do\
-		if [ -d $$v/examples/ ]; then\
+		if [ -d $$v/examples/ ] && [ $${v:0:1} != "/" ]; then\
 			cd examples/;\
+			if [ -d $$v ]; then rm -r $$v; fi;\
 			ln -s ../$$v/examples/ $$v;\
 			cd ..;\
 		fi;\
