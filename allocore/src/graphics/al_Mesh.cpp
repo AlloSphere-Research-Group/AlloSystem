@@ -605,67 +605,74 @@ Mesh& Mesh::scale(float x, float y, float z){
 }
 
 
-// Convert indexed triangle strip to triangles
-// TODO: this may be handy as a public method
-static void toTriangles(Mesh& m){
-	int prim = m.primitive();
-
-	if(Graphics::TRIANGLE_STRIP == prim){
-
-		m.primitive(Graphics::TRIANGLES);
-		int Ni = m.indices().size();
-		//int Nn = m.normals().size();
-
-		if(Ni){
-			int Ntri = Ni - 2;
-			m.indices().size(Ntri * 3);
-
-			for(int i=(Ni-2)-1, j=(Ntri*3-2)-1; i>=0; i--, j-=3){
-				int i1, i2, i3;
-
-				// Odd numbered triangles must have orientation flipped
-				if(i & 1){
-					i1 = i+2;
-					i2 = i+1;
-					i3 = i;
-				}
-				else{
-					i1 = i;
-					i2 = i+1;
-					i3 = i+2;
-				}
-				Mesh::Index idx1 = m.indices()[i1];
-				Mesh::Index idx2 = m.indices()[i2];
-				Mesh::Index idx3 = m.indices()[i3];
-				m.indices()[j  ] = idx1;
-				m.indices()[j+1] = idx2;
-				m.indices()[j+2] = idx3;
-			}
-
-			// remove degenerate triangles (modifies indices only)
-			{
-			Ni = m.indices().size();
-			int j=0;
-			for(int i=0; i<Ni; i+=3){
-				Mesh::Index i1 = m.indices()[i];
-				Mesh::Index i2 = m.indices()[i+1];
-				Mesh::Index i3 = m.indices()[i+2];
-				m.indices()[j  ] = i1;
-				m.indices()[j+1] = i2;
-				m.indices()[j+2] = i3;
-				if(i1 != i2 && i2 != i3 && i3 != i1){
-					j+=3;
-				}
-			}
-			m.indices().size(j);}
+// removes triplets with two matching values
+template <class T>
+static void removeDegenerates(Buffer<T>& buf){
+	unsigned N = buf.size();
+	unsigned j=0;
+	for(unsigned i=0; i<N; i+=3){
+		T v1 = buf[i  ];
+		T v2 = buf[i+1];
+		T v3 = buf[i+2];
+		buf[j  ] = v1;
+		buf[j+1] = v2;
+		buf[j+2] = v3;
+		if((v1 != v2) && (v2 != v3) && (v3 != v1)){
+			j+=3;
 		}
+	}
+	buf.size(j);
+}
 
-		// non-indexed not supported yet...
+template <class T>
+static void stripToTri(Buffer<T>& buf){
+	int N = buf.size();
+	int Ntri = N-2;
+	buf.size(Ntri*3);
+
+	// Iterate backwards through elements so we can operate in place
+	// strip (i): 0 1 2 3 4 5 6 7 8 ...
+	//  tris (j): 0 1 2 3 2 1 2 3 4 ...
+	for(int i=N-3, j=Ntri*3-3; i>0; i--, j-=3){
+		// Odd numbered triangles must have orientation flipped
+		if(i & 1){
+			buf[j  ] = buf[i+2];
+			buf[j+1] = buf[i+1];
+			buf[j+2] = buf[i  ];
+		}
 		else{
-
+			buf[j  ] = buf[i  ];
+			buf[j+1] = buf[i+1];
+			buf[j+2] = buf[i+2];
 		}
 	}
 }
+
+void Mesh::toTriangles(){
+
+	if(Graphics::TRIANGLE_STRIP == primitive()){
+		primitive(Graphics::TRIANGLES);
+		int Nv = vertices().size();
+		int Ni = indices().size();
+
+		// indexed:
+		if(Ni > 3){
+			stripToTri(indices());
+			removeDegenerates(indices());
+		}
+		// non-indexed:
+		// TODO: remove degenerate triangles
+		else if(Ni == 0 && Nv > 3){
+			stripToTri(vertices());
+			if(normals().size() >= Nv) stripToTri(normals());
+			if(colors().size() >= Nv) stripToTri(colors());
+			if(coloris().size() >= Nv) stripToTri(coloris());
+			if(texCoord2s().size() >= Nv) stripToTri(texCoord2s());
+			if(texCoord3s().size() >= Nv) stripToTri(texCoord3s());
+		}
+	}
+}
+
 
 bool Mesh::exportSTL(const char * path, const char * name) const {
 	int prim = primitive();
@@ -679,9 +686,7 @@ bool Mesh::exportSTL(const char * path, const char * name) const {
 	Mesh m(*this);
 
 	// Convert mesh to non-indexed triangles
-	if(prim == Graphics::TRIANGLE_STRIP){
-		toTriangles(m);
-	}
+	m.toTriangles();
 	m.decompress();
 	m.generateNormals();
 
