@@ -66,7 +66,6 @@ extern "C" void al_main_glfw_stop();
 	extern "C" void al_main_glfw_stop() {
 		std::cout << "Terminating GLFW" << std::endl;
 		glfwTerminate();
-		std::cout << "Terminated GLFW" << std::endl;
 	}
 #endif
 

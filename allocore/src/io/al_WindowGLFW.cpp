@@ -157,12 +157,10 @@ public:
 		    glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_3) == GLFW_PRESS)
 		{
 			win->callHandlersOnMouseDrag();
-		std::cout << "mouse dragged" << std::endl;
 			return;
 		}
 
 		win->callHandlersOnMouseMove();
-		std::cout << "mouse moved" << std::endl;
 	}
 
 	static void cbReshape(int w, int h){

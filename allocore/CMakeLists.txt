@@ -140,7 +140,7 @@ if(GLFW_FOUND)
   set(GL_SELECT allocore/graphics/al_OpenGLSelect.hpp)
   set(GL_SELECT_TEXT "#define USE_GLFW 1")
   file(WRITE "${BUILD_ROOT_DIR}/build/include/${GL_SELECT}" ${GL_SELECT_TEXT})
-  # for glfw use gl3.h related files
+  # for glfw, use gl3.h related files
   include(modules/gl3_module.cmake)
 else()
   set(GL_SELECT allocore/graphics/al_OpenGLSelect.hpp)
