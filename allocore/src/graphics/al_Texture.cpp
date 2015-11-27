@@ -90,7 +90,6 @@ void Texture::onCreate(){
 	glGenTextures(1, (GLuint *)&mID);
 
 	if(tryBind()){
-		shapeFromArray();
 		sendShape();
 		sendParams();
 		sendPixels();
@@ -177,6 +176,10 @@ void Texture::shapeFromArray(){
 }
 
 bool Texture::tryBind(){
+
+	// Sync shape if array is dirty
+	shapeFromArray();
+
 	// Ensure target is synchronized before bind
 	if(mDepth != 0){
 		target(TEXTURE_3D);
