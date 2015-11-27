@@ -118,7 +118,7 @@ Main::Handler :: ~Handler() {
 ////////////////////////////////////////////////////////////////
 
 Main::Main()
-:	mT0(al_time()), mT1(0),
+:	mT0(timeInSec()), mT1(0),
 	mInterval(0.01),
 	mIntervalActual(0.01),
 	mLogicalTime(0),
@@ -151,7 +151,7 @@ Main& Main::driver(Driver v) {
 }
 
 void Main::tick() {
-	al_sec t1 = al_time();
+	al_sec t1 = timeInSec();
 	mLogicalTime = t1 - mT0;
 
 	mIntervalActual = t1 - mT1;
@@ -168,7 +168,7 @@ void Main::tick() {
 	}
 
 	// measure CPU usage:
-	al_sec t2 = al_time();
+	al_sec t2 = timeInSec();
 	al_sec used = (t2-t1)/interval();
 	// running average:
 	mCPU += 0.1 * (used - mCPU);

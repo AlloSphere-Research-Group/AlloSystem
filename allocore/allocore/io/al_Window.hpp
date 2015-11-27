@@ -409,6 +409,7 @@ public:
 	static bool started();
 
 	void updateFrameTime();
+	static double timeInSec();
 
 protected:
 	friend class WindowImpl;
