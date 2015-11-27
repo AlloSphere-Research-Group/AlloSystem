@@ -67,16 +67,24 @@ extern "C" {
 #define al_time_ns2s		1.0e-9
 #define al_time_s2ns		1.0e9
 
-/**! Get current time from OS */
-extern al_sec al_time();
-extern al_nsec al_time_nsec();
+/**! Get the real (calendar) time since Jan. 1, 1970 UTC */
+extern al_sec al_system_time();
+extern al_nsec al_system_time_nsec();
+
+/**! Get monotonic time for calculating time intervals */
+extern al_sec al_steady_time();
+extern al_nsec al_steady_time_nsec();
 
 /**! Suspend calling thread's execution for dt sec/nsec */
 extern void al_sleep(al_sec dt);
 extern void al_sleep_nsec(al_nsec dt);
 
-/**! convenience function to sleep until a target wall-clock time */
+/**! Convenience function to sleep until a target wall-clock time */
 extern void al_sleep_until(al_sec target);
+
+/**! \deprecated use al_system_time */
+extern al_sec al_time();
+extern al_nsec al_time_nsec();
 
 #ifdef __cplusplus
 } /* extern "C" */
