@@ -3,14 +3,22 @@
 
 #if defined AL_OSX
 	#define AL_GRAPHICS_USE_OPENGL
-	#define GLFW_INCLUDE_GLCOREARB
+	#include <OpenGL/gl3.h>
+	// #include <OpenGL/gl3ext.h>
+	#define GLFW_INCLUDE_NONE
+	// #define GLFW_INCLUDE_GLCOREARB
+	// #define GLFW_INCLUDE_GLEXT
 	#include <GLFW/glfw3.h>
 	#define AL_GRAPHICS_INIT_CONTEXT
 
 #elif defined AL_LINUX
 	#define AL_GRAPHICS_USE_OPENGL
 	#include <GL/glew.h> // needed for certain parts of OpenGL API
-	#define GLFW_INCLUDE_GLCOREARB
+	#include <GL/glcorearb.h>
+	// #include <GL/glcoreext.h>
+	#define GLFW_INCLUDE_NONE
+	// #define GLFW_INCLUDE_GLCOREARB
+	// #define GLFW_INCLUDE_GLEXT
 	#include <GLFW/glfw3.h>
 	#define AL_GRAPHICS_INIT_CONTEXT\
 		{	GLenum err = glewInit();\
@@ -23,7 +31,11 @@
 #elif defined AL_WINDOWS
 	#define AL_GRAPHICS_USE_OPENGL
 	#include <GL/glew.h> // needed for certain parts of OpenGL API
-	#define GLFW_INCLUDE_GLCOREARB
+	#include <GL/glcorearb.h>
+	// #include <GL/glcorext.h>
+	#define GLFW_INCLUDE_NONE
+	// #define GLFW_INCLUDE_GLCOREARB
+	// #define GLFW_INCLUDE_GLEXT
 	#include <GLFW/glfw3.h>
 	#define AL_GRAPHICS_INIT_CONTEXT\
 		{	GLenum err = glewInit();\

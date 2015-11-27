@@ -2,6 +2,7 @@
 #include "allocore/system/al_Config.h"
 #include "allocore/system/al_MainLoop.hpp"
 #include "allocore/graphics/al_OpenGL.hpp"
+#include "allocore/system/al_Printing.hpp"	// warnings
 
 #include <map>
 #include <iostream>
@@ -163,30 +164,30 @@ public:
 		win->callHandlersOnMouseMove();
 	}
 
-	static void cbReshape(int w, int h){
+	static void cbReshape(GLFWwindow* window, int w, int h){
 		Window * win = getWindow();
-		if(win){
-			Window::Dim& dimCurr = win->mDim;
-			if(dimCurr.w != w || dimCurr.h != h){
-				dimCurr.w = w;
-				dimCurr.h = h;
-				win->callHandlersOnResize(w, h);
-				// needed to get title back after exiting full screen
-				// win->title(win->title());
-			}
+		if(!win) return;
+
+		Window::Dim& dimCurr = win->mDim;
+		if(dimCurr.w != w || dimCurr.h != h){
+			dimCurr.w = w;
+			dimCurr.h = h;
+			win->callHandlersOnResize(w, h);
+			// needed to get title back after exiting full screen
+			win->title(win->title());
 		}
 	}
 
-	static void cbVisibility(int v){
-		Window * win = getWindow();
-		if(win){
-			// win->mVisible = (v == GLUT_VISIBLE);
-			win->callHandlersOnVisibility(win->mVisible);
-		}
-	}
+	// TODO. but does glfw support this?
+	//
+	// static void cbVisibility(int v){
+	// 	Window * win = getWindow();
+	// 	if(win){
+	// 		// win->mVisible = (v == GLUT_VISIBLE);
+	// 		win->callHandlersOnVisibility(win->mVisible);
+	// 	}
+	// }
 
-	// key mapping function, original version by Donghao Ren
-	// 
 	static void initKeymap() {
 		static bool initd = false;
 		if (initd) return;
@@ -271,27 +272,16 @@ public:
   }
 
 	void registerCBs(){
-		// glutKeyboardFunc(cbKeyboard);
-		// glutKeyboardUpFunc(cbKeyboardUp);
-		// glutMouseFunc(cbMouse);
-		// glutMotionFunc(cbMotion);
-		// glutPassiveMotionFunc(cbPassiveMotion);
-		// glutSpecialFunc(cbSpecial);
-		// glutSpecialUpFunc(cbSpecialUp);
-		// glutReshapeFunc(cbReshape);
-		// glutVisibilityFunc(cbVisibility);
-
-		// glfwSetWindowUserPointer(window, this);
 		glfwSetKeyCallback(mGLFWwindow, cbKeyboard);
+	  glfwSetMouseButtonCallback(mGLFWwindow, cbMouse);
+		glfwSetWindowSizeCallback(mGLFWwindow, cbReshape);
+	  glfwSetCursorPosCallback(mGLFWwindow, cbMotion);
 		// glfwSetWindowPosCallback(window, cb_windowpos);
-		// glfwSetWindowSizeCallback(mGLFWwindow, cbReshape);
 		// glfwSetFramebufferSizeCallback(window, cb_framebuffersize);
 		// glfwSetWindowCloseCallback(window, cb_windowclose);
 		// glfwSetWindowRefreshCallback(window, cb_windowrefresh);
 		// glfwSetWindowFocusCallback(window, cb_windowfocus);
 	  // glfwSetErrorCallback(errorCallback);
-	  glfwSetMouseButtonCallback(mGLFWwindow, cbMouse);
-	  glfwSetCursorPosCallback(mGLFWwindow, cbMotion);
 	}
 
 	void onTick() {
@@ -323,6 +313,9 @@ private:
 			CS(GL_INVALID_FRAMEBUFFER_OPERATION, "The framebuffer object is not complete.")
 		#endif
 			CS(GL_OUT_OF_MEMORY, "There is not enough memory left to execute the command.")
+			// GL_STACK_OVERFLOW and GL_STACK_UNDEFLOW not supported in gl3.h
+			// CS(GL_STACK_OVERFLOW, "This command would cause a stack overflow.")
+			// CS(GL_STACK_UNDERFLOW, "This command would cause a stack underflow.")
 		#ifdef GL_TABLE_TOO_LARGE
 			CS(GL_TABLE_TOO_LARGE, "The specified table exceeds the implementation's maximum supported table size.")
 		#endif
@@ -332,15 +325,11 @@ private:
 	}
 
 	void onFrame(){
-		// const int winID = id();
-		// const int current = glutGetWindow();
-		// if(winID != current) glutSetWindow(winID);
-		// mWindow->callHandlersOnFrame();
-		// const char * err = errorString(true);
-		// if(err[0]){
-		// 	AL_WARN_ONCE("Error after rendering frame in window (id=%d): %s", winID, err);
-		// }
-		// glutSwapBuffers();
+		mWindow->callHandlersOnFrame();
+		const char * err = errorString(true);
+		if(err[0]){
+			AL_WARN_ONCE("Error after rendering frame in window (id=%d): %s", mGLFWwindow, err);
+		}
 	}
 
 	static WindowsMap& windows(){
@@ -392,7 +381,7 @@ bool Window::implCreate(){
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	mImpl->mGLFWwindow = glfwCreateWindow(w, h, "title", NULL, NULL);
+	mImpl->mGLFWwindow = glfwCreateWindow(w, h, mTitle.c_str(), NULL, NULL);
 	if (!mImpl->created()) {
 		return false;
 	}
@@ -408,6 +397,7 @@ bool Window::implCreate(){
   char* glsl_version = (char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
   std::cout << "glsl version: " << glsl_version << std::endl;
 
+  Main::get().interval(spf());
 	Main::get().add(*mImpl);
 
 	mImpl->registerCBs();
