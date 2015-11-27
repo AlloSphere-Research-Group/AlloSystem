@@ -92,15 +92,6 @@ void al_sleep_nsec(al_nsec v){	sleep_ms(v / 1e6); }
 /* Posix (Mac, Linux) */
 #else
 #include <sys/time.h>
-#include <time.h>
-
-//struct timeval{
-//	long int tv_sec;	/*	number of whole seconds of elapsed time. */
-//	long int tv_usec;	/*	This is the rest of the elapsed time
-//							(a fraction of a second), represented as the number
-//							of microseconds. It is always less than one million.
-//						*/
-//}
 
 al_sec  al_system_time(){
 	timeval t;
@@ -114,8 +105,61 @@ al_nsec al_system_time_nsec(){
 	return al_nsec(t.tv_sec) * al_nsec(1e9) + al_nsec(t.tv_usec) * al_nsec(1e3);
 }
 
-al_sec  al_steady_time(){		return al_system_time(); }
-al_nsec al_steady_time_nsec(){	return al_system_time_nsec(); }
+#ifdef AL_OSX
+#include <mach/mach_time.h>
+#include <stdio.h>
+
+// Code from:
+// http://stackoverflow.com/questions/23378063/how-can-i-use-mach-absolute-time-without-overflowing
+
+al_sec al_steady_time(){
+	return al_steady_time_nsec() * 1e-9;
+}
+
+al_nsec al_steady_time_nsec(){
+	uint64_t now = mach_absolute_time();
+	static struct Data {
+		Data(uint64_t bias_) : bias(bias_) {
+			mach_timebase_info(&tb);
+			if (tb.denom > 1024) {
+				double frac = (double)tb.numer/tb.denom;
+				tb.denom = 1024;
+				tb.numer = tb.denom * frac + 0.5;
+			}
+		}
+		mach_timebase_info_data_t tb;
+		uint64_t bias;
+	} data(now);
+	return (now - data.bias) * data.tb.numer / data.tb.denom;
+}
+
+// Posix timers available?
+#elif _POSIX_TIMERS > 0 && defined(_POSIX_MONOTONIC_CLOCK)
+#include <time.h>
+
+al_sec al_steady_time(){
+	struct timespec t;
+	clock_gettime(CLOCK_MONOTONIC, &t);
+	return al_sec(t.tv_sec) + al_sec(t.tv_nsec) * 1e-9;
+}
+
+al_nsec al_steady_time_nsec(){
+	struct timespec t;
+	clock_gettime(CLOCK_MONOTONIC, &t);
+	return al_nsec(t.tv_sec) * al_nsec(1e9) + al_nsec(t.tv_nsec);
+}
+
+// Otherwise fallback to system time
+#else
+al_sec  al_steady_time(){
+	return al_system_time();
+}
+
+al_nsec al_steady_time_nsec(){
+	return al_system_time_nsec();
+}
+#endif
+
 
 void al_sleep(al_sec v) {
 	time_t sec = (time_t)v;
