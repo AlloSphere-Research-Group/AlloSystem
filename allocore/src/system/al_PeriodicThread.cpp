@@ -69,14 +69,14 @@ PeriodicThread& PeriodicThread::operator= (PeriodicThread other){
 
 void PeriodicThread::go(){
 	// Note: times are al_nsec (long long int)
-	mTimeCurr = al_time_nsec();
+	mTimeCurr = al_steady_time_nsec();
 	mWait = 0;
 	mTimeBehind = 0;
 	while(mRun){
 		(*mUserFunc)();
 
 		mTimePrev = mTimeCurr + mWait;
-		mTimeCurr = al_time_nsec();
+		mTimeCurr = al_steady_time_nsec();
 		al_nsec dt = mTimeCurr - mTimePrev;
 		// dt -> t_curr - (t_prev + wait)
 
