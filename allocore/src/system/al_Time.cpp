@@ -107,7 +107,6 @@ al_nsec al_system_time_nsec(){
 
 #ifdef AL_OSX
 #include <mach/mach_time.h>
-#include <stdio.h>
 
 // Code from:
 // http://stackoverflow.com/questions/23378063/how-can-i-use-mach-absolute-time-without-overflowing
