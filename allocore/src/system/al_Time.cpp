@@ -91,7 +91,9 @@ void al_sleep_nsec(al_nsec v){	sleep_ms(v / 1e6); }
 
 /* Posix (Mac, Linux) */
 #else
-#include <sys/time.h>
+#include <time.h> // nanosleep, clock_gettime
+#include <sys/time.h> // gettimeofday
+#include <unistd.h> // _POSIX_TIMERS
 
 al_sec  al_system_time(){
 	timeval t;
@@ -134,8 +136,6 @@ al_nsec al_steady_time_nsec(){
 
 // Posix timers available?
 #elif _POSIX_TIMERS > 0 && defined(_POSIX_MONOTONIC_CLOCK)
-#include <time.h>
-
 al_sec al_steady_time(){
 	struct timespec t;
 	clock_gettime(CLOCK_MONOTONIC, &t);
