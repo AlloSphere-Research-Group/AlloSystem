@@ -286,7 +286,7 @@ public:
 
 	void setSpeakerLayout(const SpeakerLayout& sl);
 
-	void prepare(AudioIOData& io);
+	void prepare();
 
 	/// Per sample processing
 	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample);
