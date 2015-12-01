@@ -311,8 +311,7 @@ protected:
 };
 
 
-
-/// An audio scene consisting of listeners and sound sources
+/// An audio scene consisting of Listeners and Sources.
 class AudioScene {
 public:
 
@@ -354,11 +353,14 @@ public:
 	/// Perform rendering
 	void render(AudioIOData& io);
 
-	/// Set per sample processing (true by default)
-
+	/// Set per sample processing (false by default)
 	/// Per sample processing is useful for smoother doppler and gain
 	/// interpolation for high-speed sources, but uses much more CPU.
-	//  Turn off to reduce CPU for large number of sources and/or Doppler shift not required
+	/// When set to true, smoothing of the position of sources
+	/// is performed within the audio buffer using a 4 point moving average
+	/// When false, the position of a source will be static within the audio
+	/// processing block.
+	/// Turn off to reduce CPU for large number of sources and/or Doppler shift not required.
 	void usePerSampleProcessing(bool shouldUsePerSampleProcessing){
 		mPerSampleProcessing = shouldUsePerSampleProcessing;
 	}

@@ -258,6 +258,14 @@ void AmbiDecode::setSpeaker(int index, int deviceChannel, float az, float el, fl
 	setSpeakerRadians(index, deviceChannel, az * float(0.01745329252), el * float(0.01745329252), amp);
 }
 
+void AmbiDecode::setSpeakers(Speakers *spkrs) {
+	mSpeakers = spkrs;
+	for (int i = 0; i < mSpeakers->size(); i++) {
+		Speaker &spkr = mSpeakers->at(i);
+		setSpeaker(i, spkr.deviceChannel, spkr.azimuth, spkr.elevation, spkr.gain);
+	}
+}
+
 void AmbiDecode::updateChanWeights(){
 	float * wc = mWeights;
 	*wc++ = mWOrder[0];
