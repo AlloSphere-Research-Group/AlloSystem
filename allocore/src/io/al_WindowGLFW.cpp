@@ -18,7 +18,6 @@ public:
 	typedef std::map<GLFWwindow*, WindowImpl*> WindowsMap;
 	typedef std::map<int, int> KeyMap;
 
-
 	WindowImpl(Window* w) : mWindow(w), mDimPrev(0) {
 		resetState();
 		initKeymap(); // set static keymapping map
@@ -285,7 +284,6 @@ public:
 	}
 
 	void onTick() {
-		// std::cout << "onTick, WindowImpl" << std::endl;
 		if (glfwGetCurrentContext() != mGLFWwindow) {
 			glfwMakeContextCurrent(mGLFWwindow);
 		}

@@ -44,17 +44,19 @@
 #include <math.h>
 #include <string>
 #include <vector>
-#include "allocore/al_Allocore.hpp"
+// #include "allocore/al_Allocore.hpp"
 
-// #include "allocore/io/al_AudioIO.hpp"
-// #include "allocore/sound/al_AudioScene.hpp"
-// #include "allocore/types/al_Color.hpp"
-// #include "allocore/graphics/al_Lens.hpp"
-// #include "allocore/graphics/al_Stereographic.hpp"
-// #include "allocore/io/al_Window.hpp"
-// #include "allocore/io/al_ControlNav.hpp"
-// #include "allocore/protocol/al_OSC.hpp"
-// #include "allocore/system/al_MainLoop.hpp"
+#include "allocore/io/al_AudioIO.hpp"
+#include "allocore/sound/al_AudioScene.hpp"
+#include "allocore/types/al_Color.hpp"
+#include "allocore/graphics/al_Lens.hpp"
+#include "allocore/graphics/al_Stereographic.hpp"
+	#include "allocore/graphics/al_Graphics.hpp"
+#include "allocore/io/al_Window.hpp"
+#include "allocore/spatial/al_Pose.hpp"
+#include "allocore/io/al_ControlNav.hpp"
+#include "allocore/protocol/al_OSC.hpp"
+#include "allocore/system/al_MainLoop.hpp"
 
 namespace al{
 
@@ -114,7 +116,7 @@ public:
 	Viewport& viewport(){ return mViewport; }
 
 	/// Get calculated viewing frustum
-	Frustumd frustum() const;
+	Frustum frustum() const;
 
 	/// Call to update viewport using stretch/anchor amounts when parent dimensions change
 	void onParentResize(int w, int h);
