@@ -15,7 +15,7 @@ using namespace std;
 using namespace gam;
 
 #define BLOCK_SIZE (256)
-#define N_AGENTS (5)
+#define N_AGENTS (3)
 
 struct Agent : SoundSource {
   Mesh body;
@@ -79,6 +79,7 @@ struct Agent : SoundSource {
 
       ++sampleCount;
     }
+    visualLoudnessMeasure *= 1.5;
   }
 };
 
@@ -144,6 +145,7 @@ struct MyApp : App {
     listener->pose(nav());
 
     initWindow();
+    background(0.2);
   }
 
   virtual void onDraw(Graphics& g) {
