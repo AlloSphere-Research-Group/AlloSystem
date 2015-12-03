@@ -62,12 +62,14 @@
 
   QUESTIONS:
   [ ] use Graphics::Primitive or GL_[etc]?
+  [ ] placement in allosystem?
 */
 
 #include "allocore/graphics/al_Mesh.hpp"
-#include "allocore/graphics/al_Graphics.hpp"
+#include <iostream>
 
 using namespace std;
+
 namespace al{
 
 class MeshVBO : public Mesh {

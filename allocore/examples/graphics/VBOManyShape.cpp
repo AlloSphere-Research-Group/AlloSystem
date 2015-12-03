@@ -17,7 +17,7 @@ Kurt Kaminski, December 2015
 */
 
 #include "allocore/al_Allocore.hpp"
-#include "alloutil/al_MeshVBO.hpp"        
+#include "alloutil/al_MeshVBO.hpp"
 
 using namespace al;
 
@@ -89,10 +89,10 @@ public:
 
 		// draw in either immediate mode or using a VBO
 		g.pushMatrix();
-		g.translate(0,-scatterSize,-scatterSize);
-		light();
-		if (!useVBO) g.draw(shapesVBO);
-		else shapesVBO.draw(GL_TRIANGLES);
+			g.translate(0,-scatterSize,-scatterSize);
+			light();
+			if (!useVBO) g.draw(shapesVBO);
+			else shapesVBO.draw(GL_TRIANGLES);
 		g.popMatrix();
     
     frameNum++;
