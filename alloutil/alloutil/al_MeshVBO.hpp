@@ -132,10 +132,10 @@ public:
 
   // void draw(int drawMode, int first, int total);
   void draw(int drawMode);
-  void drawElements(int drawMode, int amt);
+  // void drawElements(int drawMode, int amt);
   
-  void drawInstanced(int drawMode, int first, int total, int primCount);
-  void drawElementsInstanced(int drawMode, int amt, int primCount);
+  // void drawInstanced(int drawMode, int first, int total, int primCount);
+  // void drawElementsInstanced(int drawMode, int amt, int primCount);
   
   void bind();
   void unbind();
