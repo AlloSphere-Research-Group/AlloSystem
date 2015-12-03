@@ -62,7 +62,7 @@
 
   QUESTIONS:
   [ ] use Graphics::Primitive or GL_[etc]?
-  [ ] placement in allosystem?
+  [ ] where to #include in allosystem?
 */
 
 #include "allocore/graphics/al_Mesh.hpp"
@@ -210,8 +210,7 @@ void MeshVBO::initVBO(int usage){
   }
 
   if (hasIndices) {
-    num_indices = indices().size();
-    setIndexData(indices().elems(), num_indices, usage, indexStride);
+    setIndexData(indices().elems(), indices().size(), usage, indexStride);
   }
 
   isInit = true;
@@ -280,27 +279,35 @@ void MeshVBO::updateVBO(){
   if (vertices().size() > num_verts){
     // having to do this if the vert size is bigger for some reason
     initVBO(gUsage);
-  } 
+  }
   else {
+    if (normals().size()) hasNormals = true;
+    if (colors().size()) hasColors = true;
+    if (texCoord2s().size()) hasTexCoords = true;
+    if (indices().size()) hasIndices = true;
+
     num_verts = vertices().size();
     updateVertexData(vertices().elems(), vertices().size());
 
-    if (normals().size()) {
-      updateNormalData(normals().elems(), normals().size());
-    } else { hasNormals = false; }
+    if (hasNormals) {
+      if (vertId!=0) updateNormalData(normals().elems(), normals().size());
+      else setNormalData(normals().elems(), normals().size(), gUsage, normalStride);
+    }
 
-    if (colors().size()) {
-      updateColorData(colors().elems(), colors().size());
-    } else { hasColors = false; }
+    if (hasColors) {
+      if (colorId!=0) updateColorData(colors().elems(), colors().size());
+      else setColorData(colors().elems(), colors().size(), gUsage, colorStride);
+    } 
 
-    if (texCoord2s().size()) {  
-      updateTexCoordData(texCoord2s().elems(), texCoord2s().size());
-    } else { hasTexCoords = false; }
+    if (hasTexCoords) {  
+      if (texCoordId!=0) updateTexCoordData(texCoord2s().elems(), texCoord2s().size());
+      else setTexCoordData(texCoord2s().elems(), texCoord2s().size(), gUsage, texCoordStride);
+    }
 
-    if (indices().size()) {
-      num_indices = indices().size();
-      updateIndexData(indices().elems(), indices().size());
-    } else { hasIndices = false; }
+    if (hasIndices) {
+      if (indexId!=0) updateIndexData(indices().elems(), indices().size());
+      else setIndexData(indices().elems(), indices().size(), gUsage, indexStride);
+    }
   }
 }
 
@@ -315,7 +322,6 @@ void MeshVBO::updateVertexData(const Vec3f * vert0x, int total){
 }
 
 void MeshVBO::updateNormalData(const Vec3f * normal0x, int total){
-  hasNormals = true;
   if(normalId!=0) {
     glBindBuffer(GL_ARRAY_BUFFER, normalId);
     glBufferSubData(GL_ARRAY_BUFFER, 0, total * normalStride, normal0x);
@@ -334,7 +340,6 @@ void MeshVBO::updateColorData(const Color * color0x, int total){
 }
 
 void MeshVBO::updateTexCoordData(const TexCoord2 * texCoord0x, int total){
-  hasTexCoords = true;
   if(texCoordId!=0) {
     glBindBuffer(GL_ARRAY_BUFFER, texCoordId);
     glBufferSubData(GL_ARRAY_BUFFER, 0, total * texCoordStride, texCoord0x);
@@ -345,7 +350,6 @@ void MeshVBO::updateTexCoordData(const TexCoord2 * texCoord0x, int total){
 
 void MeshVBO::updateIndexData(const uint * index0x, int total){
   if(indexId!=0) {
-    hasIndices = true;
     num_indices = total;
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexId);
     glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, total * indexStride, index0x);
