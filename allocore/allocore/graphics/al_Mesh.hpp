@@ -110,6 +110,10 @@ public:
 	/// Append buffers from another mesh:
 	void merge(const Mesh& src);
 
+	/// Convert triangle strip to triangles
+	void toTriangles();
+
+
 	/// Reset all buffers
 	Mesh& reset();
 

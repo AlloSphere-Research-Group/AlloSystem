@@ -42,6 +42,7 @@
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
+#include <vector>
 #include "allocore/graphics/al_GPUObject.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
 
@@ -105,48 +106,78 @@ public:
 	*/
 	enum BufferUsage{
 		STREAM_DRAW		= GL_STREAM_DRAW,
-//		STREAM_READ		= GL_STREAM_READ,
-//		STREAM_COPY		= GL_STREAM_COPY,
+		//STREAM_READ		= GL_STREAM_READ,
+		//STREAM_COPY		= GL_STREAM_COPY,
 		STATIC_DRAW		= GL_STATIC_DRAW,
-//		STATIC_READ		= GL_STATIC_READ,
-//		STATIC_COPY		= GL_STATIC_COPY,
+		//STATIC_READ		= GL_STATIC_READ,
+		//STATIC_COPY		= GL_STATIC_COPY,
 		DYNAMIC_DRAW	= GL_DYNAMIC_DRAW,
-//		DYNAMIC_READ	= GL_DYNAMIC_READ,
-//		DYNAMIC_COPY	= GL_DYNAMIC_COPY
+		//DYNAMIC_READ	= GL_DYNAMIC_READ,
+		//DYNAMIC_COPY	= GL_DYNAMIC_COPY
 	};
 
+	/// @param[in] bufType	buffer type (array, element, etc.)
+	/// @param[in] bufUsage	buffer usage (stream, static, etc.)
+	BufferObject(BufferType bufType, BufferUsage bufUsage);
 
-	BufferObject(BufferType bufType, BufferUsage bufUsage)
-	:	mMapMode(READ_WRITE), mType(bufType), mUsage(bufUsage),
-		mDataType(Graphics::FLOAT), mNumComps(0), mNumElems(0), mData(0)
-	{}
-
-	virtual ~BufferObject(){ destroy(); }
+	virtual ~BufferObject();
 
 
-	void bufferType(BufferType v){ mType=v; }
-	void mapMode(AccessMode v){ mMapMode=v; }
+	/// Get buffer store size, in bytes
+	int size() const;
 
-	void operator()(){
-		//data(); onPointerFunc(); unbind();
-		bind(); onPointerFunc();
-	}
-	void send() { (*this)(); }
 
-	void bind(){ validate(); glBindBuffer(mType, id()); }
-	void unbind() const { glBindBuffer(mType, 0); }
+	/// Set buffer type
+	void bufferType(BufferType v);
 
-#ifdef AL_GRAPHICS_USE_OPENGL
+	/// Set buffer usage
+	void usage(BufferUsage v);
+
+	/// Set size, in bytes, of buffer without sending data
+	void resize(int numBytes);
+
+	/// Set buffer data store and copy over client data
+	void data(const void * src, Graphics::DataType dataType, int numElems, int numComps=1);
+
+	/// Set buffer data store and copy over client data
+	template <class T>
+	void data(const T * src, int numElems, int numComps=1);
+
+	/// Set buffer data store without copying client data
+	void data(Graphics::DataType dataType, int numElems, int numComps=1);
+
+	/// Set buffer data store using cached values
+	void data();
+
+	/// Set subregion of buffer store
+	template <class T>
+	int subData(const T * src, int numElems, int byteOffset=0);
+
+
+	/// Bind buffer
+	void bind();
+
+	/// Unbind buffer
+	void unbind() const;
+
+	void operator()();
+	void send();
+
+
+	#ifdef AL_GRAPHICS_USE_OPENGL
 	/* Warning: these are not supported in OpenGL ES */
+
+	/// Set map mode
+	void mapMode(AccessMode v);
 
 	/// Map data store to client address space
 
 	/// If successful, returns a valid pointer to the data, otherwise, it returns
 	/// NULL.
 	/// After using the pointer, call unmap() as soon as possible
-	void * map(){ bind(); return glMapBuffer(mType, mMapMode); }
+	void * map();
 
-	/// Map data store to client address space.
+	/// Map data store to client address space
 
 	/// If successful, returns true and sets argument to address of data,
 	/// otherwise, returns false and leaves argument unaffected.
@@ -162,36 +193,8 @@ public:
 
 	/// Unmaps data store from client address
 	/// After unmap(), the mapped pointer is invalid
-	bool unmap(){ return glUnmapBuffer(mType)==GL_TRUE; }
-#endif
-
-	/// Set buffer data store and copy over client data
-	void data(const void * src, Graphics::DataType dataType, int numElems, int numComps=1){
-		mData = (void *)src;
-		mDataType = dataType;
-		mNumElems = numElems;
-		mNumComps = numComps;
-		data();
-	}
-
-	/// Set buffer data store and copy over client data
-	template <class T>
-	void data(const T * src, int numElems, int numComps=1){
-		data(src, Graphics::toDataType<T>(), numElems, numComps);
-	}
-
-	/// Set buffer data store without copying client data
-	void data(Graphics::DataType dataType, int numElems, int numComps=1){
-		data(0, dataType, numElems, numComps);
-	}
-
-	/// Set buffer data store using cached values
-	void data(){
-		bind();
-		glBufferData(mType, Graphics::numBytes(mDataType)*mNumElems*mNumComps, mData, mUsage);
-		unbind();
-	}
-
+	bool unmap();
+	#endif
 
 protected:
 	AccessMode mMapMode;
@@ -201,101 +204,93 @@ protected:
 	int mNumComps;
 	int mNumElems;
 	void * mData;
+	struct SubData{
+		SubData(const void * data_=NULL, unsigned size_=0, unsigned offset_=0)
+		:	data(data_), size(size_), offset(offset_){}
+		const void * data;
+		unsigned size;
+		unsigned offset;
+	};
+	std::vector<SubData> mSubData;
 
-	virtual void onCreate(){ glGenBuffers(1, (GLuint*)&mID); }
-	virtual void onDestroy(){ glDeleteBuffers(1, (GLuint*)&mID); }
+	virtual void onCreate();
+	virtual void onDestroy();
 	virtual void onPointerFunc() = 0;
 };
-
 
 
 /// Vertex buffer object
 class VBO : public BufferObject {
 public:
-	VBO(BufferUsage usage=STREAM_DRAW)
-	:	BufferObject(ARRAY_BUFFER, usage){}
+	VBO(BufferUsage usage=STREAM_DRAW);
 
-	static void enable(){ glEnableClientState(VERTEX_ARRAY); }
-	static void disable(){ glDisableClientState(VERTEX_ARRAY); }
+	static void enable();
+	static void disable();
 
 protected:
-	virtual void onPointerFunc(){ glVertexPointer(mNumComps, mDataType, 0, 0); }
+	virtual void onPointerFunc();
 };
 
 
 /// Color buffer object
 class CBO : public BufferObject {
 public:
-	CBO(BufferUsage usage=STREAM_DRAW)
-	:	BufferObject(ARRAY_BUFFER, usage){}
+	CBO(BufferUsage usage=STREAM_DRAW);
 
-	static void enable(){ glEnableClientState(COLOR_ARRAY); }
-	static void disable(){ glDisableClientState(COLOR_ARRAY); }
+	static void enable();
+	static void disable();
 
 protected:
-	virtual void onPointerFunc(){ glColorPointer(mNumComps, mDataType, 0, 0); }
+	virtual void onPointerFunc();
 };
-
 
 
 /// Pixel buffer object
 class PBO : public BufferObject {
 public:
-	PBO(bool packMode, BufferUsage usage=STREAM_DRAW)
-	:	BufferObject(packMode ? PIXEL_PACK_BUFFER : PIXEL_UNPACK_BUFFER, usage){}
-
-//	static void enable(){ glEnableClientState(ArrayType::Vertex); }
-//	static void disable(){ glDisableClientState(ArrayType::Vertex); }
+	PBO(bool packMode, BufferUsage usage=STREAM_DRAW);
 
 protected:
-	virtual void onPointerFunc(){ glVertexPointer(mNumComps, mDataType, 0, 0); }
+	virtual void onPointerFunc();
 };
-
 
 
 /// Element object buffer
 class EBO : public BufferObject {
 public:
-	EBO(Graphics::Primitive prim=Graphics::POINTS, BufferUsage usage=STATIC_DRAW)
-	:	BufferObject(ELEMENT_ARRAY_BUFFER, usage), mPrim(prim), mStart(0), mEnd(0)
-	{}
+	EBO(Graphics::Primitive prim=Graphics::POINTS, BufferUsage usage=STATIC_DRAW);
 
-	EBO& prim(Graphics::Primitive v){ mPrim=v; return *this; }
-	EBO& range(int start, int end){ mStart=start; mEnd=end; return *this; }
+	EBO& primitive(Graphics::Primitive v);
+	EBO& range(int start, int end);
 
 protected:
 	Graphics::Primitive mPrim;
 	int mStart, mEnd;
 
-	virtual void onPointerFunc(){
-		if(mEnd)	glDrawRangeElements(mPrim, mStart, mEnd, mNumElems, mDataType, 0);
-		else		glDrawRangeElements(mPrim, 0, mNumElems, mNumElems, mDataType, 0);
+	virtual void onPointerFunc();
+};
+
+
+
+// IMPLEMENTATION --------------------------------------------------------------
+
+template <class T>
+void BufferObject::data(const T * src, int numElems, int numComps){
+	data(src, Graphics::toDataType<T>(), numElems, numComps);
+}
+
+template <class T>
+int BufferObject::subData(const T * src, int numElems, int byteOffset){
+	if(numElems){
+		bind();
+		glBufferSubData(mType, byteOffset, numElems*sizeof(T), src);
+		unbind();
+		mSubData.push_back(SubData(src, numElems*sizeof(T), byteOffset));
 	}
-};
+	return numElems*sizeof(T) + byteOffset;
+}
 
-/*
-class BufferObjects : public GPUObject, public Drawable {
-public:
 
-	BufferObjects() {};
-
-	virtual ~BufferObjects() {};
-	virtual void draw(Graphics& gl);
-
-	Mesh& data() { return *mData; }
-
-protected:
-
-	virtual void onCreate() {};
-	virtual void onDestroy() {};
-
-	Mesh mData;
-
-	VBO mVBO;
-	CBO mCBO;
-	EBO mEBO;
-};
-*/
 
 } // al::
 #endif

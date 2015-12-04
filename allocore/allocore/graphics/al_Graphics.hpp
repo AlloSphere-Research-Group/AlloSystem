@@ -59,6 +59,7 @@
 	\def AL_GRAPHICS_ERROR(msg, ID)
 	Used for reporting graphics errors from source files
 */
+//#define AL_ENABLE_DEBUG
 #ifdef AL_ENABLE_DEBUG
 #define AL_GRAPHICS_ERROR(msg, ID)\
 {	const char * errStr = al::Graphics::errorString();\

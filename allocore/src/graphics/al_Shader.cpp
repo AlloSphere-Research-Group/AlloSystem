@@ -209,6 +209,12 @@ bool ShaderProgram::compile(
 	const std::string& fragSource,
 	const std::string& geomSource
 ){
+	mVertSource = vertSource;
+	mFragSource = fragSource;
+	mGeomSource = geomSource;
+
+	if(!created()) return false;
+
 	Shader mShaderV, mShaderF, mShaderG;
 	mShaderV.source(vertSource, al::Shader::VERTEX);
 	attach(mShaderV);
@@ -239,6 +245,11 @@ void ShaderProgram::onCreate(){
 	//mHandle = glCreateProgramObjectARB();
 	//mID = (long)handle();
 	mID = glCreateProgram();
+
+	// Automatically compile any code set with ShaderProgram::compile
+	if(!mVertSource.empty()){
+		compile(mVertSource, mFragSource, mGeomSource);
+	}
 }
 void ShaderProgram::onDestroy(){
 	glDeleteProgram(id());

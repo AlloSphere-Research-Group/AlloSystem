@@ -35,8 +35,8 @@ public:
 			float gainL, gainR;
 			equalPowerPan(relpos.x, gainL, gainR);
 
-			io.out(0, frameIndex) = gainL*sample;
-			io.out(1, frameIndex) = gainR*sample;
+			io.out(0, frameIndex) += gainL*sample;
+			io.out(1, frameIndex) += gainR*sample;
 		}
 		else // dont pan
 		{
@@ -59,8 +59,8 @@ public:
 
 			for(int i = 0; i < numFrames; i++)
 			{
-				bufL[i] = gainL*samples[i];
-				bufR[i] = gainR*samples[i];
+				bufL[i] += gainL*samples[i];
+				bufR[i] += gainR*samples[i];
 			}
 		}
 		else // dont pan

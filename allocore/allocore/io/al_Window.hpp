@@ -409,6 +409,7 @@ public:
 	static bool started();
 
 	void updateFrameTime();
+	static double timeInSec();
 
 protected:
 	friend class WindowImpl;
@@ -469,7 +470,10 @@ protected:
 	}
 
 	void callHandlersOnFrame() { CALL(onFrame()); }
-	void callHandlersOnCreate(){ CALL(onCreate()); }
+	void callHandlersOnCreate(){
+		contextCreate();
+		CALL(onCreate());
+	}
 	void callHandlersOnDestroy(){
 		CALL(onDestroy());
 		contextDestroy();

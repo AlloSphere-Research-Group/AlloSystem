@@ -316,6 +316,7 @@ public:
 protected:
 	Graphics::Primitive mInPrim, mOutPrim;	// IO primitives for geometry shaders
 	unsigned int mOutVertices;
+	std::string mVertSource, mFragSource, mGeomSource;
 	bool mActive;
 
 	virtual void get(int pname, void * params) const;

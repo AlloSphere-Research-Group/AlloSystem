@@ -580,7 +580,7 @@ template <class T>
 bool invert(Mat<2,T>& m){
 	T det = determinant(m);
 	if(det != 0){
-		m.set(
+		m = Mat<2,T>(
 			 m(1,1),-m(0,1),
 			-m(1,0), m(0,0)
 		) /= det;
