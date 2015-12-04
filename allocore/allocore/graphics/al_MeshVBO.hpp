@@ -53,25 +53,19 @@
 
   TO DO:
   [ ] support 3d textures
-  [ ] test 2d texture maps
-  [ ] hard to test performance as I think fpsActual() maxes out at display's refresh rate (~60fps)
-  [ ] make a way to change usage (which would require an init call)
-  [v] use mesh's "primitive" rendering mode in draw()
-	[ ] test copy operators and copyFrom
+  [ ] test 2d texture mapping
+  [ ] hard to test performance as (I think) fpsActual() maxes out at display's refresh rate (~60fps)
+  [?] make a way to change usage (which would require an init call)
+	[ ] test = operators and copyFrom
+	[v] use mesh's "primitive" rendering mode in draw()
 	[v] template setData
-
   [v] default init to dynamic draw
   [v] get rid of update(*special stuff*)
-
 	[v] move everything to /graphics so g.draw(MeshVBO) is supported
 
   QUESTIONS:
 	[ ] BufferObject?
 	[ ] move enumerations to al_Graphics? -> replace with ints here
-	[ ] Karl recommends separating setting bufferDataUsage from init(). To me this
-			implies to the user that they can change bufferDataUsage whenever they want.
-			bufferDataUsage must *always* be done before init to take effect. Simply
-			adding an init() in bufferDataUsage() is the same as init(BufferDataUsage).
 	[ ] is drawInstanced possible?
 	[ ] Best way to make a "dirty" state for Mesh?
 			true = mesh has changed; false = onDraw()?

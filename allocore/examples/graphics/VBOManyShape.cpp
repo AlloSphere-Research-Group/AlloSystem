@@ -17,7 +17,6 @@ Kurt Kaminski, December 2015
 */
 
 #include "allocore/al_Allocore.hpp"
-// #include "alloutil/al_MeshVBO.hpp"
 
 using namespace al;
 using namespace std;
