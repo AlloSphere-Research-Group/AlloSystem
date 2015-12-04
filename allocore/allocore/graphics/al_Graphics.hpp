@@ -511,7 +511,7 @@ public:
 	void draw(){ draw(mMesh); }
 
 	/// Draw MeshVBO
-	void draw(MeshVBO& m);
+	void draw(MeshVBO& meshVBO);
 
 
 	// Utility functions: converting, reporting, etc.

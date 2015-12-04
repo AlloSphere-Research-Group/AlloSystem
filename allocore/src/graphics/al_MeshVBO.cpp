@@ -3,119 +3,112 @@
 namespace al{
 
 ////////////////////////////////////////////////////////////////////////////////
-// Operators
-void MeshVBO::operator=(const Mesh& parent)
-{
-  ((Mesh&)(*this)) = parent;
-  initVBO();
+// Constructors
+MeshVBO::MeshVBO(){};
+
+// Copy
+MeshVBO::MeshVBO(Mesh& cpy){
+  copyFrom(cpy);
 }
 
-void MeshVBO::operator=(const MeshVBO& parent)
-{
-  *this = parent;
-  vertId = parent.vertId;
-  normalId = parent.normalId;
-  colorId = parent.colorId;
-  texCoordId = parent.texCoordId;
-  indexId = parent.indexId;
+////////////////////////////////////////////////////////////////////////////////
+// Copy from Mesh or MeshVBO
+void MeshVBO::copyFrom(Mesh& cpy){
+  clear();
+  ((Mesh&)(*this)) = cpy;
+  init();
+}
 
-  num_verts = parent.num_verts;
-  num_indices = parent.num_indices;
+void MeshVBO::copyFrom(MeshVBO& cpy){
+  ((Mesh&)(*this)) = cpy;
 
-  isInit = parent.isInit;
-  isBound = parent.isBound;
-  bufferUsage = parent.bufferUsage;
+  vertId = cpy.vertId;
+  normalId = cpy.normalId;
+  colorId = cpy.colorId;
+  texCoordId = cpy.texCoordId;
+  indexId = cpy.indexId;
 
-  hasNormals = parent.hasNormals;
-  hasColors = parent.hasColors;
-  hasTexCoords = parent.hasTexCoords;
-  hasIndices = parent.hasIndices;
+  num_vertices = cpy.num_vertices;
+  num_indices = cpy.num_indices;
+
+  isInit = cpy.isInit;
+  isBound = cpy.isBound;
+  bufferUsage = cpy.bufferUsage;
+
+  hasNormals = cpy.hasNormals;
+  hasColors = cpy.hasColors;
+  hasTexCoords = cpy.hasTexCoords;
+  hasIndices = cpy.hasIndices;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Operators
+void MeshVBO::operator=(Mesh& cpy) {
+  copyFrom(cpy);
+}
+
+void MeshVBO::operator=(MeshVBO& cpy) {
+  copyFrom(cpy);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize
-// void MeshVBO::initVBO(BufferDataUsage usage){
-void MeshVBO::initVBO(){
-
+/* Interleaved geometry example (not being used):
+ *    0, 1, 2 = vertex_xyz
+ *    3, 4, 5 = normal_xyz
+ *    6, 7 = tex_coord_uv
+ */
+void MeshVBO::init(BufferDataUsage usage){
   if (normals().size()) hasNormals = true;
   if (colors().size()) hasColors = true;
   if (texCoord2s().size()) hasTexCoords = true;
   if (indices().size()) hasIndices = true;
 
-  BufferDataUsage usage = STATIC_DRAW;
   bufferUsage = usage;
 
   // load vertices
-  setVertexData(vertices().elems(), vertices().size(), usage, vertStride);
+  vertStride = sizeof(vertices()[0]);
+  num_vertices = vertices().size();
+  setData(vertices().elems(), &vertId, vertices().size(), usage, GL_ARRAY_BUFFER);
 
   if (hasNormals) {
-    setNormalData(normals().elems(), normals().size(), usage, normalStride);
+    normalStride = sizeof(normals()[0]);
+    setData(normals().elems(), &normalId, normals().size(), usage, GL_ARRAY_BUFFER);
   }
 
   if (hasColors) {
-    setColorData(colors().elems(), colors().size(), usage, colorStride);
+    colorStride = sizeof(colors()[0]);
+    setData(colors().elems(), &colorId, colors().size(), usage, GL_ARRAY_BUFFER);
   }
 
   if (hasTexCoords) {
-    setTexCoordData(texCoord2s().elems(), texCoord2s().size(), usage, texCoordStride);
+    texCoordStride = sizeof(texCoord2s()[0]);
+    setData(texCoord2s().elems(), &texCoordId, texCoord2s().size(), usage, GL_ARRAY_BUFFER);
   }
 
   if (hasIndices) {
-    setIndexData(indices().elems(), indices().size(), usage, indexStride);
+    indexStride = sizeof(indices()[0]);
+    num_indices = indices().size();
+    setData(indices().elems(), &indexId, indices().size(), usage, GL_ELEMENT_ARRAY_BUFFER);
   }
 
   isInit = true;
 }
 
-void MeshVBO::setVertexData(const Vec3f * vert0x, int total, BufferDataUsage usage, int stride){
-  /* Interleaved geometry example (not being used):
-   *    0, 1, 2 = vertex_xyz
-   *    3, 4, 5 = normal_xyz
-   *    6, 7 = tex_coord_uv
-   */
-  num_verts = total;
-  glGenBuffers(1, &vertId);
-  glBindBuffer(GL_ARRAY_BUFFER, vertId);
-  glBufferData(GL_ARRAY_BUFFER, total * stride, vert0x, usage);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void MeshVBO::setNormalData(const Vec3f * normal0x, int total, BufferDataUsage usage, int stride){
-  glGenBuffers(1, &normalId);
-  glBindBuffer(GL_ARRAY_BUFFER, normalId);
-  glBufferData(GL_ARRAY_BUFFER, total * stride, normal0x, usage);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void MeshVBO::setColorData(const Color * color0x, int total, BufferDataUsage usage, int stride){
-  glGenBuffers(1, &colorId);
-  glBindBuffer(GL_ARRAY_BUFFER, colorId);
-  glBufferData(GL_ARRAY_BUFFER, total * stride, color0x, usage);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void MeshVBO::setTexCoordData(const TexCoord2 * texCoord0x, int total, BufferDataUsage usage, int stride){
-  glGenBuffers(1, &texCoordId);
-  glBindBuffer(GL_ARRAY_BUFFER, texCoordId);
-  glBufferData(GL_ARRAY_BUFFER, total * stride, texCoord0x, usage);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void MeshVBO::setIndexData(const uint * index0x, int total, BufferDataUsage usage, int stride){
-  num_indices = total;
-  glGenBuffers(1, &indexId);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexId);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, total * stride, index0x, usage);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+template <class T>
+void MeshVBO::setData(const T * src, uint * bufferId, int total, BufferDataUsage usage, int bufferTarget) {
+  glGenBuffers(1, bufferId);
+  glBindBuffer(bufferTarget, *bufferId);
+  glBufferData(bufferTarget, total * sizeof(T), src, usage);
+  glBindBuffer(bufferTarget, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Update buffers. Setting starting position to 0 writes over preexisting data
-void MeshVBO::updateVBO(){
-  //might think about states in mesh class which keep track of what has changed
-  if (vertices().size() > num_verts){
+void MeshVBO::update(){
+  if (vertices().size() > num_vertices){
     // having to do this if the vert size is bigger for some reason
-    initVBO(bufferUsage);
+    init();
   }
   else {
     if (normals().size()) hasNormals = true;
@@ -123,84 +116,44 @@ void MeshVBO::updateVBO(){
     if (texCoord2s().size()) hasTexCoords = true;
     if (indices().size()) hasIndices = true;
 
-    num_verts = vertices().size();
-    updateVertexData(vertices().elems(), vertices().size());
-
+    num_vertices = vertices().size();
+    updateData(vertices().elems(), &vertId, vertices().size(), GL_ARRAY_BUFFER);
+    //
     if (hasNormals) {
-      if (vertId!=0) updateNormalData(normals().elems(), normals().size());
-      else setNormalData(normals().elems(), normals().size(), bufferUsage, normalStride);
+      if (normalId!=0) updateData(normals().elems(), &normalId, normals().size(), GL_ARRAY_BUFFER);
+      else setData(normals().elems(), &normalId, normals().size(), bufferUsage, GL_ARRAY_BUFFER);
     }
 
     if (hasColors) {
-      if (colorId!=0) updateColorData(colors().elems(), colors().size());
-      else setColorData(colors().elems(), colors().size(), bufferUsage, colorStride);
+      if (colorId!=0) updateData(colors().elems(), &colorId, colors().size(), GL_ARRAY_BUFFER);
+      else setData(colors().elems(), &colorId, colors().size(), bufferUsage, GL_ARRAY_BUFFER);
     }
 
     if (hasTexCoords) {
-      if (texCoordId!=0) updateTexCoordData(texCoord2s().elems(), texCoord2s().size());
-      else setTexCoordData(texCoord2s().elems(), texCoord2s().size(), bufferUsage, texCoordStride);
+      if (texCoordId!=0) updateData(texCoord2s().elems(), &texCoordId, texCoord2s().size(), GL_ARRAY_BUFFER);
+      else setData(texCoord2s().elems(), &texCoordId, texCoord2s().size(), bufferUsage, GL_ARRAY_BUFFER);
     }
 
     if (hasIndices) {
-      if (indexId!=0) updateIndexData(indices().elems(), indices().size());
-      else setIndexData(indices().elems(), indices().size(), bufferUsage, indexStride);
+      num_indices = indices().size();
+      if (indexId!=0) updateData(indices().elems(), &indexId, indices().size(), GL_ARRAY_BUFFER);
+      else setData(indices().elems(), &indexId, indices().size(), bufferUsage, GL_ELEMENT_ARRAY_BUFFER);
     }
   }
 }
 
-void MeshVBO::updateVertexData(const Vec3f * vert0x, int total){
-  if (vertId!=0){
-    num_verts = total;
-    glBindBuffer(GL_ARRAY_BUFFER, vertId);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, total * vertStride, vert0x);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+template <class T>
+void MeshVBO::updateData(const T * src, uint * bufferId, int total, int bufferTarget){
+  if (*bufferId!=0){
+    glBindBuffer(bufferTarget, *bufferId);
+    glBufferSubData(bufferTarget, 0, total * sizeof(T), src);
+    glBindBuffer(bufferTarget, 0);
   }
-  // else cout << "Mesh_VBO.updateVertexData(): no vertId" << endl;
 }
-
-void MeshVBO::updateNormalData(const Vec3f * normal0x, int total){
-  if(normalId!=0) {
-    glBindBuffer(GL_ARRAY_BUFFER, normalId);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, total * normalStride, normal0x);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-  }
-  // else cout << "Mesh_VBO.updateVertexData(): no normalId" << endl;
-}
-
-void MeshVBO::updateColorData(const Color * color0x, int total){
-  if(colorId!=0) {
-    glBindBuffer(GL_ARRAY_BUFFER, colorId);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, total * colorStride, color0x);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-  }
-  // else cout << "Mesh_VBO.updateVertexData(): no colorId" << endl;
-}
-
-void MeshVBO::updateTexCoordData(const TexCoord2 * texCoord0x, int total){
-  if(texCoordId!=0) {
-    glBindBuffer(GL_ARRAY_BUFFER, texCoordId);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, total * texCoordStride, texCoord0x);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-  }
-  // else cout << "Mesh_VBO.updateVertexData(): no texCoordId" << endl;
-}
-
-void MeshVBO::updateIndexData(const uint * index0x, int total){
-  if(indexId!=0) {
-    num_indices = total;
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexId);
-    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, total * indexStride, index0x);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-  }
-  // else cout << "Mesh_VBO.updateVertexData(): no indexId" << endl;
-}
-
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
-// Bind buffer and get necessary pointer for drawing
-void MeshVBO::bindVBO(){
+// Bind buffers and get pointers
+void MeshVBO::bind(){
   glBindBuffer(GL_ARRAY_BUFFER, vertId);
   glEnableClientState(GL_VERTEX_ARRAY);
   glVertexPointer(3, GL_FLOAT, vertStride, 0);
@@ -232,10 +185,10 @@ void MeshVBO::bindVBO(){
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// UnbindVBO
-void MeshVBO::unbindVBO(){
+// Unbind
+void MeshVBO::unbind(){
   glBindBuffer(GL_ARRAY_BUFFER, 0); // clean up
-  if (hasIndices) glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+  if (hasIndices) glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   glDisableClientState(GL_VERTEX_ARRAY);
   if (hasNormals) glDisableClientState(GL_NORMAL_ARRAY);
@@ -246,30 +199,16 @@ void MeshVBO::unbindVBO(){
 
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-// Draw
-// void MeshVBO::draw(int drawMode){
-//
-//   if (!isBound) bind();
-//
-//   if (!hasIndices) glDrawArrays(drawMode, 0, num_verts);
-//   else glDrawElements(drawMode, num_indices, GL_UNSIGNED_INT, NULL);
-//
-//   if (isBound) unbindVBO();
-//
-// }
-
 ////////////////////////////////////////////////////////////////////////////////
 // Clear
-void MeshVBO::clearVBO(){
-  normalId = 0;  vertId = 0;
-
+void MeshVBO::clear(){
+  vertId = 0;
+  normalId = 0;
   colorId = 0;
   texCoordId = 0;
   indexId = 0;
 
-  num_verts = 0;
+  num_vertices = 0;
   num_indices = 0;
 
   isInit = false;

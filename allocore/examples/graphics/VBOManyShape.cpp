@@ -66,15 +66,17 @@ public:
 		shapesVBO.generateNormals();
 
 		// Update the VBO after all calculations are completed
-    // if (useVBO) shapesVBO.updateVBO();
+    if (useVBO) shapesVBO.update();
 	}
 
   void onCreate(const ViewpointWindow& win) {
+		scatterShapes();
+
 		// initialize the VBO
-		shapesVBO.initVBO();
+		shapesVBO.init();
+		shapesVBO.primitive(Graphics::TRIANGLES);
 
 		// add a bunch of shapes to the mesh
-		scatterShapes();
 
 		// print information on the mesh
 		shapesVBO.print();
@@ -92,8 +94,8 @@ public:
 		g.pushMatrix();
 			g.translate(0,-scatterSize,-scatterSize);
 			light();
-			// if (!useVBO) g.draw((Mesh&)shapesVBO);
-			// else g.draw(shapesVBO);
+			if (!useVBO) g.draw((Mesh&)shapesVBO);
+			else g.draw(shapesVBO);
 		g.popMatrix();
 
     frameNum++;
@@ -106,7 +108,7 @@ public:
     if (k.key() == 'm') {
       useVBO = !useVBO;
       if (useVBO) cout << "Using VBO" << endl;
-      else cout << "Using immediate mode" << endl;
+      else cout << "Streaming every frame" << endl;
     }
 
     // make a new scattering of points

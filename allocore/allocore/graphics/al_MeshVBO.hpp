@@ -42,7 +42,7 @@
   Kurt Kaminski, 2015, kurtoon@gmail.com
 
   Usage:
-  VBO's require a GL context to work, so initVBO() should take place in OnCreate,
+  VBO's require a GL context to work, so init() should take place in OnCreate,
   or anytime after a window has been initialized. Adding vertices and anything else
   done with a regular Mesh may be done before initWindow().
 
@@ -54,21 +54,31 @@
   TO DO:
   [ ] support 3d textures
   [ ] test 2d texture maps
-  [x] test all manners of updating and initializing, mixing mesh and meshVBO
   [ ] hard to test performance as I think fpsActual() maxes out at display's refresh rate (~60fps)
-  [x] make a way to change usage (which would require an initVBO call)
-  [x] use mesh's "primitive" rendering mode in draw()
+  [ ] make a way to change usage (which would require an init call)
+  [v] use mesh's "primitive" rendering mode in draw()
+	[ ] test copy operators and copyFrom
+	[v] template setData
 
   [v] default init to dynamic draw
   [v] get rid of update(*special stuff*)
 
-	[ ] move everything to /graphics so g.draw(MeshVBO) is supported
+	[v] move everything to /graphics so g.draw(MeshVBO) is supported
 
   QUESTIONS:
 	[ ] BufferObject?
+	[ ] move enumerations to al_Graphics? -> replace with ints here
+	[ ] Karl recommends separating setting bufferDataUsage from init(). To me this
+			implies to the user that they can change bufferDataUsage whenever they want.
+			bufferDataUsage must *always* be done before init to take effect. Simply
+			adding an init() in bufferDataUsage() is the same as init(BufferDataUsage).
+	[ ] is drawInstanced possible?
+	[ ] Best way to make a "dirty" state for Mesh?
+			true = mesh has changed; false = onDraw()?
 */
 
 #include "allocore/graphics/al_Mesh.hpp"
+#include "allocore/graphics/al_OpenGL.hpp"
 #include <iostream>
 
 // using namespace std;
@@ -97,13 +107,15 @@ public:
 		//DYNAMIC_COPY	= GL_DYNAMIC_COPY
 	};
 
+	BufferDataUsage bufferUsage = STREAM_DRAW;
+
   uint vertId = 0;
   uint normalId = 0;
   uint colorId = 0;
   uint texCoordId = 0;
   uint indexId = 0;
 
-  int num_verts = 0;
+  int num_vertices = 0;
   int num_indices = 0;
   int vertStride = sizeof(Vec3f);
   int normalStride = sizeof(Vec3f);
@@ -113,31 +125,34 @@ public:
 
   bool isInit = false;
   bool isBound = false;
-  BufferDataUsage bufferUsage = STREAM_DRAW;
 
   bool hasNormals = false;
   bool hasColors = false;
   bool hasTexCoords = false;
   bool hasIndices = false;
 
-  void operator=(const Mesh& parent);
-  void operator=(const MeshVBO& parent);
-  // void initVBO(BufferDataUsage usage = STREAM_DRAW);
-	void initVBO();
+	MeshVBO();
+	MeshVBO(Mesh& cpy);
 
-  // Should I template the pointer types?
-  void setVertexData(const Vec3f * vert0x, int total, BufferDataUsage usage, int stride=0);
-  void setNormalData(const Vec3f * normal0x, int total, BufferDataUsage usage, int stride=0);
-  void setColorData(const Color * color0x, int total, BufferDataUsage usage, int stride=0);
-  void setTexCoordData(const TexCoord2 * texCoord0x, int total, BufferDataUsage usage, int stride=0);
+	void copyFrom(Mesh& cpy);
+	void copyFrom(MeshVBO& cpy);
+
+  void operator=(Mesh& cpy);
+  void operator=(MeshVBO& cpy);
+
+  void init(BufferDataUsage usage = STREAM_DRAW);
+
   void setIndexData(const uint * indices, int total, BufferDataUsage usage, int stride=0);
 
-  void updateVBO();
-  void updateVertexData(const Vec3f * vert0x, int total);
-  void updateNormalData(const Vec3f * normal0x, int total);
-  void updateColorData(const Color * color0x, int total);
-  void updateTexCoordData(const TexCoord2 * texCoord0x, int total);
-  void updateIndexData(const uint * indices, int total);
+	template <class T>
+	void setData(const T * src, uint * bufferId, int total, BufferDataUsage usage, int bufferTarget);
+
+	void update();
+
+	template <class T>
+	void updateData(const T * src, uint * bufferId, int total, int bufferTarget);
+
+	// void autoUpdate();
 
   // void enableColors();
   // void enableNormals();
@@ -149,19 +164,31 @@ public:
   // void disableTexCoords();
   // void disableIndices();
 
-  // void draw(int drawMode, int first, int total);
-  // void draw(int drawMode);
-  // void drawElements(int drawMode, int amt);
+  void bind();
+  void unbind();
 
-  // void drawInstanced(int drawMode, int first, int total, int primCount);
-  // void drawElementsInstanced(int drawMode, int amt, int primCount);
-
-  void bindVBO();
-  void unbindVBO();
-
-  void clearVBO();
+  void clear();
 
 };
+
+// IMPLEMENTATION --------------------------------------------------------------
+
+// template <class T>
+// void MeshVBO::data(const T * src, int numElems, int numComps){
+// 	data(src, Graphics::toDataType<T>(), numElems, numComps);
+// }
+
+// template <class T>
+// int MeshVBO::subData(const T * src, int numElems, int byteOffset){
+// 	if(numElems){
+// 		bind();
+// 		glBufferSubData(mType, byteOffset, numElems*sizeof(T), src);
+// 		unbind();
+// 		mSubData.push_back(SubData(src, numElems*sizeof(T), byteOffset));
+// 	}
+// 	return numElems*sizeof(T) + byteOffset;
+// }
+
 
 } // al::
 
