@@ -54,6 +54,7 @@
 #include "allocore/graphics/al_GPUObject.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_OpenGL.hpp"
+#include "allocore/graphics/al_MeshVBO.hpp"
 
 /*!
 	\def AL_GRAPHICS_ERROR(msg, ID)
@@ -508,6 +509,9 @@ public:
 
 	/// Draw internal vertex data
 	void draw(){ draw(mMesh); }
+
+	/// Draw MeshVBO
+	void draw(MeshVBO& m);
 
 
 	// Utility functions: converting, reporting, etc.

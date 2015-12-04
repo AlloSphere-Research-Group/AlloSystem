@@ -2,10 +2,10 @@
 Allocore Example: Many Shape VBO
 
 Description:
-Modification of the meshManyShape example to render using a vertex buffer. 
+Modification of the meshManyShape example to render using a vertex buffer.
 
 Usage:
-m - switch between using the VBO and immediate rendering. They should look 
+m - switch between using the VBO and immediate rendering. They should look
 		identical, but using the VBO will run much faster.
 n - redo the scattering and get a new configuration
 p - print information on the mesh
@@ -17,7 +17,7 @@ Kurt Kaminski, December 2015
 */
 
 #include "allocore/al_Allocore.hpp"
-#include "alloutil/al_MeshVBO.hpp"
+// #include "alloutil/al_MeshVBO.hpp"
 
 using namespace al;
 
@@ -70,8 +70,8 @@ public:
 
   void onCreate(const ViewpointWindow& win) {
 		// initialize the VBO
-		shapesVBO.initVBO(GL_DYNAMIC_DRAW);
-		
+		shapesVBO.initVBO();
+
 		// add a bunch of shapes to the mesh
 		scatterShapes();
 
@@ -91,10 +91,10 @@ public:
 		g.pushMatrix();
 			g.translate(0,-scatterSize,-scatterSize);
 			light();
-			if (!useVBO) g.draw(shapesVBO);
-			else shapesVBO.draw(GL_TRIANGLES);
+			if (!useVBO) g.draw((Mesh&)shapesVBO);
+			else g.draw(shapesVBO);
 		g.popMatrix();
-    
+
     frameNum++;
     if (showFPS) {
 	    if (!(frameNum % 10)) cout<<"FPS: "<< window(0).fpsActual() << endl;
