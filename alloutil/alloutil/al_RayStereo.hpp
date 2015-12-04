@@ -113,8 +113,8 @@ public:
   void onCreate();
   void onDestroy();
   
-  void drawQuad(const ShaderProgram& shaderProgram, double eye);
-  void draw(const ShaderProgram& shaderProgram, const Lens& lens, const Viewport& vp);
+  void drawQuad(const ShaderProgram* shaderProgram, double eye);
+  void draw(const ShaderProgram* shaderProgram, const Lens& lens, const Viewport& vp);
   
 protected:
   // supports up to 4 warps/viewports

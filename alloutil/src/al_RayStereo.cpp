@@ -489,12 +489,12 @@ void RayStereo::onDestroy() {
 	mRbo = mFbo = 0;
 }
 
-inline void RayStereo::drawQuad(const ShaderProgram& shaderProgram, const double eye) {
-	shaderProgram.uniform("eyesep", eye);
+inline void RayStereo::drawQuad(const ShaderProgram* shaderProgram, const double eye) {
+	shaderProgram->uniform("eyesep", eye);
   gl.draw(mQuad);
 }
 
-void RayStereo::draw(const ShaderProgram& shaderProgram, const Lens& lens, const Viewport& vp) {
+void RayStereo::draw(const ShaderProgram* shaderProgram, const Lens& lens, const Viewport& vp) {
 	mFrame++;
 	
 	gl.viewport(vp);

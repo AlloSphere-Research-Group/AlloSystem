@@ -6,15 +6,32 @@ struct MyApp : public RayApp {
   
   MyApp()
   {
-    SearchPaths searchPaths;
-    searchPaths.addSearchPath("../../", true);
-    searchPaths.addAppPaths();
-    loadShaderFile(searchPaths.find("toroid_vert.glsl").filepath(),
-                   searchPaths.find("toroid_frag.glsl").filepath());
     nav().pos(0,0,3.0);
   }
   
   virtual ~MyApp() {
+  }
+
+  void loadShaders() {
+    mShaderManager.addShaderFile("toroid", "toroid_vert.glsl", "toroid_frag.glsl");
+    ShaderProgram *ds = mShaderManager.get("toroid");
+    ds->begin();
+    ds->uniform("pixelMap", 1);
+    ds->uniform("alphaMap", 2);
+    ds->end();
+  }
+
+  virtual void onDraw(Graphics& g) {
+    ShaderProgram *ds = mShaderManager.get("toroid");
+    ds->begin();
+    
+    sendUniforms(ds);
+
+    Viewport vp(width(), height());
+    
+    mOmni.draw(ds, lens(), vp);
+    
+    ds->end();
   }
   
   virtual void onAnimate(al_sec dt) {
@@ -26,11 +43,14 @@ struct MyApp : public RayApp {
     }
   }
   
-  virtual void sendUniforms(ShaderProgram& shaderProgram) {
-    shaderProgram.uniform("eyesep", lens().eyeSep());
-    shaderProgram.uniform("pos", nav().pos());
-    shaderProgram.uniform("quat", nav().quat());
-    shaderProgram.uniform("time", FPS::now());
+  virtual void sendUniforms(ShaderProgram* shaderProgram) {
+    // shaderProgram->uniform("pixelMap", 1);
+    // shaderProgram->uniform("alphaMap", 2);
+    
+    shaderProgram->uniform("eyesep", lens().eyeSep());
+    shaderProgram->uniform("pos", nav().pos());
+    shaderProgram->uniform("quat", nav().quat());
+    shaderProgram->uniform("time", FPS::now());
   }
   
   virtual void onMessage(osc::Message& m) {

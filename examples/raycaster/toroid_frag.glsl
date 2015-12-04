@@ -163,6 +163,7 @@ void main(){
   }
   
   color *= texture2D(alphaMap, T).rgb;
+  // color *= vec3(1.0, 0.0, 0.0);
   
   gl_FragColor = vec4(color, 1);
 }
