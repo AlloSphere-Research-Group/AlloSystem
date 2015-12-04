@@ -71,7 +71,7 @@
 #include "allocore/graphics/al_Mesh.hpp"
 #include <iostream>
 
-using namespace std;
+// using namespace std;
 
 namespace al{
 
@@ -122,7 +122,8 @@ public:
 
   void operator=(const Mesh& parent);
   void operator=(const MeshVBO& parent);
-  void initVBO(BufferDataUsage usage = STREAM_DRAW);
+  // void initVBO(BufferDataUsage usage = STREAM_DRAW);
+	void initVBO();
 
   // Should I template the pointer types?
   void setVertexData(const Vec3f * vert0x, int total, BufferDataUsage usage, int stride=0);

@@ -34,13 +34,15 @@ void MeshVBO::operator=(const MeshVBO& parent)
 
 ////////////////////////////////////////////////////////////////////////////////
 // Initialize
-void MeshVBO::initVBO(BufferDataUsage usage){
+// void MeshVBO::initVBO(BufferDataUsage usage){
+void MeshVBO::initVBO(){
 
   if (normals().size()) hasNormals = true;
   if (colors().size()) hasColors = true;
   if (texCoord2s().size()) hasTexCoords = true;
   if (indices().size()) hasIndices = true;
 
+  BufferDataUsage usage = STATIC_DRAW;
   bufferUsage = usage;
 
   // load vertices
@@ -153,7 +155,7 @@ void MeshVBO::updateVertexData(const Vec3f * vert0x, int total){
     glBufferSubData(GL_ARRAY_BUFFER, 0, total * vertStride, vert0x);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
   }
-  else cout << "Mesh_VBO.updateVertexData(): no vertId" << endl;
+  // else cout << "Mesh_VBO.updateVertexData(): no vertId" << endl;
 }
 
 void MeshVBO::updateNormalData(const Vec3f * normal0x, int total){
@@ -162,7 +164,7 @@ void MeshVBO::updateNormalData(const Vec3f * normal0x, int total){
     glBufferSubData(GL_ARRAY_BUFFER, 0, total * normalStride, normal0x);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
   }
-  else cout << "Mesh_VBO.updateVertexData(): no normalId" << endl;
+  // else cout << "Mesh_VBO.updateVertexData(): no normalId" << endl;
 }
 
 void MeshVBO::updateColorData(const Color * color0x, int total){
@@ -171,7 +173,7 @@ void MeshVBO::updateColorData(const Color * color0x, int total){
     glBufferSubData(GL_ARRAY_BUFFER, 0, total * colorStride, color0x);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
   }
-  else cout << "Mesh_VBO.updateVertexData(): no colorId" << endl;
+  // else cout << "Mesh_VBO.updateVertexData(): no colorId" << endl;
 }
 
 void MeshVBO::updateTexCoordData(const TexCoord2 * texCoord0x, int total){
@@ -180,7 +182,7 @@ void MeshVBO::updateTexCoordData(const TexCoord2 * texCoord0x, int total){
     glBufferSubData(GL_ARRAY_BUFFER, 0, total * texCoordStride, texCoord0x);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
   }
-  else cout << "Mesh_VBO.updateVertexData(): no texCoordId" << endl;
+  // else cout << "Mesh_VBO.updateVertexData(): no texCoordId" << endl;
 }
 
 void MeshVBO::updateIndexData(const uint * index0x, int total){
@@ -190,7 +192,7 @@ void MeshVBO::updateIndexData(const uint * index0x, int total){
     glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, total * indexStride, index0x);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
   }
-  else cout << "Mesh_VBO.updateVertexData(): no indexId" << endl;
+  // else cout << "Mesh_VBO.updateVertexData(): no indexId" << endl;
 }
 
 

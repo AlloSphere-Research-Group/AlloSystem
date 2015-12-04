@@ -20,6 +20,7 @@ Kurt Kaminski, December 2015
 // #include "alloutil/al_MeshVBO.hpp"
 
 using namespace al;
+using namespace std;
 
 
 struct MyApp : public App {
@@ -65,7 +66,7 @@ public:
 		shapesVBO.generateNormals();
 
 		// Update the VBO after all calculations are completed
-    if (useVBO) shapesVBO.updateVBO();
+    // if (useVBO) shapesVBO.updateVBO();
 	}
 
   void onCreate(const ViewpointWindow& win) {
@@ -91,8 +92,8 @@ public:
 		g.pushMatrix();
 			g.translate(0,-scatterSize,-scatterSize);
 			light();
-			if (!useVBO) g.draw((Mesh&)shapesVBO);
-			else g.draw(shapesVBO);
+			// if (!useVBO) g.draw((Mesh&)shapesVBO);
+			// else g.draw(shapesVBO);
 		g.popMatrix();
 
     frameNum++;

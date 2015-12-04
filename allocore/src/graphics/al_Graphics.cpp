@@ -305,12 +305,12 @@ void Graphics::draw(const Mesh& v, int count, int begin){
 
 // draw a MeshVBO
 void Graphics::draw(MeshVBO& m) {
-	if (!m.isBound) m.bindVBO();
+	// if (!m.isBound) m.bindVBO();
 
 	if (m.hasIndices) glDrawElements(m.bufferUsage, m.num_indices, GL_UNSIGNED_INT, NULL);
 	else glDrawArrays(m.bufferUsage, 0, m.num_verts);
 
-	m.unbindVBO();
+	// m.unbindVBO();
 }
 
 
