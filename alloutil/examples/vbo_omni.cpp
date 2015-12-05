@@ -96,6 +96,7 @@ struct MyApp : OmniStereoGraphicsRenderer {
     g.translate(0, -scatterSize, -scatterSize);
     g.rotate(t, 0, 1, 0);
     g.draw(shapesVBO);
+    // g.draw((Mesh&)shapesVBO); // draw a lame old mesh
   }
 };
 
