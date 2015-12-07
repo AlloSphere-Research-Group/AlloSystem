@@ -53,10 +53,10 @@ public:
 			xfm.translate(Vec3f(rnd::uniformS(scatterSize), rnd::uniformS(scatterSize), rnd::uniformS(scatterSize)));
 			shapesVBO.transform(xfm, shapesVBO.vertices().size()-Nv);
 
-			// Color newly added vertices
+			// Color shapes randomly
+			Color randc = Color(rnd::uniform(), rnd::uniform(), rnd::uniform(0.75,1.0));
 			for(int i=0; i<Nv; ++i){
-				float f = float(i)/Nv;
-				shapesVBO.color(HSV(f*0.1+0.2,1,1));
+				shapesVBO.color(randc);
 			}
 		}
 

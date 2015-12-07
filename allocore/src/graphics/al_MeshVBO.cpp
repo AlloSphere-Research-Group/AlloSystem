@@ -37,7 +37,8 @@ void MeshVBO::copyFrom(MeshVBO& cpy){
 
   hasNormals = cpy.hasNormals;
   hasColors = cpy.hasColors;
-  hasTexCoords = cpy.hasTexCoords;
+  hasTexCoord2s = cpy.hasTexCoord2s;
+  hasTexCoord3s = cpy.hasTexCoord3s;
   hasIndices = cpy.hasIndices;
 }
 
@@ -61,7 +62,8 @@ void MeshVBO::operator=(MeshVBO& cpy) {
 void MeshVBO::init(BufferDataUsage usage){
   if (normals().size()) hasNormals = true;
   if (colors().size()) hasColors = true;
-  if (texCoord2s().size()) hasTexCoords = true;
+  if (texCoord2s().size()) hasTexCoord2s = true;
+  if (texCoord3s().size()) hasTexCoord3s = true;
   if (indices().size()) hasIndices = true;
 
   bufferUsage = usage;
@@ -81,9 +83,13 @@ void MeshVBO::init(BufferDataUsage usage){
     setData(colors().elems(), &colorId, colors().size(), usage, GL_ARRAY_BUFFER);
   }
 
-  if (hasTexCoords) {
+  if (hasTexCoord2s) {
     texCoordStride = sizeof(texCoord2s()[0]);
     setData(texCoord2s().elems(), &texCoordId, texCoord2s().size(), usage, GL_ARRAY_BUFFER);
+  }
+  else if (hasTexCoord3s) {
+    texCoordStride = sizeof(texCoord3s()[0]);
+    setData(texCoord3s().elems(), &texCoordId, texCoord3s().size(), usage, GL_ARRAY_BUFFER);
   }
 
   if (hasIndices) {
@@ -95,16 +101,8 @@ void MeshVBO::init(BufferDataUsage usage){
   isInit = true;
 }
 
-template <class T>
-void MeshVBO::setData(const T * src, uint * bufferId, int total, BufferDataUsage usage, int bufferTarget) {
-  glGenBuffers(1, bufferId);
-  glBindBuffer(bufferTarget, *bufferId);
-  glBufferData(bufferTarget, total * sizeof(T), src, usage);
-  glBindBuffer(bufferTarget, 0);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
-// Update buffers. Setting starting position to 0 writes over preexisting data
+// Update buffers.
 void MeshVBO::update(){
   if (vertices().size() > num_vertices){
     // having to do this if the vert size is bigger for some reason
@@ -113,7 +111,8 @@ void MeshVBO::update(){
   else {
     if (normals().size()) hasNormals = true;
     if (colors().size()) hasColors = true;
-    if (texCoord2s().size()) hasTexCoords = true;
+    if (texCoord2s().size()) hasTexCoord2s = true;
+    if (texCoord3s().size()) hasTexCoord3s = true;
     if (indices().size()) hasIndices = true;
 
     num_vertices = vertices().size();
@@ -129,9 +128,13 @@ void MeshVBO::update(){
       else setData(colors().elems(), &colorId, colors().size(), bufferUsage, GL_ARRAY_BUFFER);
     }
 
-    if (hasTexCoords) {
+    if (hasTexCoord2s) {
       if (texCoordId!=0) updateData(texCoord2s().elems(), &texCoordId, texCoord2s().size(), GL_ARRAY_BUFFER);
       else setData(texCoord2s().elems(), &texCoordId, texCoord2s().size(), bufferUsage, GL_ARRAY_BUFFER);
+    }
+    else if (hasTexCoord3s) {
+      if (texCoordId!=0) updateData(texCoord3s().elems(), &texCoordId, texCoord3s().size(), GL_ARRAY_BUFFER);
+      else setData(texCoord3s().elems(), &texCoordId, texCoord3s().size(), bufferUsage, GL_ARRAY_BUFFER);
     }
 
     if (hasIndices) {
@@ -142,6 +145,18 @@ void MeshVBO::update(){
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Set data, creating new buffers
+template <class T>
+void MeshVBO::setData(const T * src, uint * bufferId, int total, BufferDataUsage usage, int bufferTarget) {
+  glGenBuffers(1, bufferId);
+  glBindBuffer(bufferTarget, *bufferId);
+  glBufferData(bufferTarget, total * sizeof(T), src, usage);
+  glBindBuffer(bufferTarget, 0);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Update data, resuing buffers, starting at index 0 to write over preexisting data
 template <class T>
 void MeshVBO::updateData(const T * src, uint * bufferId, int total, int bufferTarget){
   if (*bufferId!=0){
@@ -164,7 +179,12 @@ void MeshVBO::bind(){
     glNormalPointer(GL_FLOAT, normalStride, 0);
   }
 
-  if (hasTexCoords){
+  if (hasTexCoord2s){
+    glBindBuffer(GL_ARRAY_BUFFER, texCoordId);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glTexCoordPointer(2, GL_FLOAT, texCoordStride, 0);
+  }
+  else if (hasTexCoord3s){
     glBindBuffer(GL_ARRAY_BUFFER, texCoordId);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glTexCoordPointer(3, GL_FLOAT, texCoordStride, 0);
@@ -173,7 +193,7 @@ void MeshVBO::bind(){
   if (hasColors){
     glBindBuffer(GL_ARRAY_BUFFER, colorId);
     glEnableClientState(GL_COLOR_ARRAY);
-    glColorPointer(3, GL_FLOAT, colorStride, 0);
+    glColorPointer(4, GL_FLOAT, colorStride, 0);
   }
 
   if (hasIndices){
@@ -193,7 +213,7 @@ void MeshVBO::unbind(){
   glDisableClientState(GL_VERTEX_ARRAY);
   if (hasNormals) glDisableClientState(GL_NORMAL_ARRAY);
   if (hasColors) glDisableClientState(GL_COLOR_ARRAY);
-  if (hasTexCoords) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+  if (hasTexCoord2s || hasTexCoord3s) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
   isBound = false;
 
@@ -217,7 +237,8 @@ void MeshVBO::clear(){
 
   hasNormals = false;
   hasColors = false;
-  hasTexCoords = false;
+  hasTexCoord2s = false;
+  hasTexCoord3s = false;
   hasIndices = false;
 }
 

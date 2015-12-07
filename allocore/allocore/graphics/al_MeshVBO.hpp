@@ -52,20 +52,13 @@
       GL_DYNAMIC_DRAW when the data will be modified repeatedly and used many times.
 
   TO DO:
-  [ ] support 3d textures
-  [ ] test 2d texture mapping
-  [ ] hard to test performance as (I think) fpsActual() maxes out at display's refresh rate (~60fps)
-  [?] make a way to change usage (which would require an init call)
+  [ ] test texture mapping
 	[ ] test = operators and copyFrom
-	[v] use mesh's "primitive" rendering mode in draw()
-	[v] template setData
-  [v] default init to dynamic draw
-  [v] get rid of update(*special stuff*)
-	[v] move everything to /graphics so g.draw(MeshVBO) is supported
+	[ ] better performance testing. fpsActual() maxes out at display's refresh rate (~60fps)
 
   QUESTIONS:
 	[ ] BufferObject?
-	[ ] move enumerations to al_Graphics? -> replace with ints here
+	[ ] Where to put enumerations? al_Graphics? take from BufferObject? Intended for users...
 	[ ] is drawInstanced possible?
 	[ ] Best way to make a "dirty" state for Mesh?
 			true = mesh has changed; false = onDraw()?
@@ -73,9 +66,6 @@
 
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_OpenGL.hpp"
-#include <iostream>
-
-// using namespace std;
 
 namespace al{
 
@@ -122,7 +112,8 @@ public:
 
   bool hasNormals = false;
   bool hasColors = false;
-  bool hasTexCoords = false;
+  bool hasTexCoord2s = false;
+  bool hasTexCoord3s = false;
   bool hasIndices = false;
 
 	MeshVBO();
@@ -135,13 +126,10 @@ public:
   void operator=(MeshVBO& cpy);
 
   void init(BufferDataUsage usage = STREAM_DRAW);
-
-  void setIndexData(const uint * indices, int total, BufferDataUsage usage, int stride=0);
+	void update();
 
 	template <class T>
 	void setData(const T * src, uint * bufferId, int total, BufferDataUsage usage, int bufferTarget);
-
-	void update();
 
 	template <class T>
 	void updateData(const T * src, uint * bufferId, int total, int bufferTarget);
@@ -164,25 +152,6 @@ public:
   void clear();
 
 };
-
-// IMPLEMENTATION --------------------------------------------------------------
-
-// template <class T>
-// void MeshVBO::data(const T * src, int numElems, int numComps){
-// 	data(src, Graphics::toDataType<T>(), numElems, numComps);
-// }
-
-// template <class T>
-// int MeshVBO::subData(const T * src, int numElems, int byteOffset){
-// 	if(numElems){
-// 		bind();
-// 		glBufferSubData(mType, byteOffset, numElems*sizeof(T), src);
-// 		unbind();
-// 		mSubData.push_back(SubData(src, numElems*sizeof(T), byteOffset));
-// 	}
-// 	return numElems*sizeof(T) + byteOffset;
-// }
-
 
 } // al::
 
