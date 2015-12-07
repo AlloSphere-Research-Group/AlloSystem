@@ -21,10 +21,11 @@ using namespace al;
 // 1) Create a speaker layout
 SpeakerLayout speakerLayout = HeadsetSpeakerLayout();
 
-// 2) Create a panner: DBAP, VBAP, or Ambisonics
-Dbap* panner = new Dbap(speakerLayout);
+// 2) Create a panner: DBAP, VBAP, Ambisonics, or Stereo
+//Dbap* panner = new Dbap(speakerLayout);
 //Vbap* panner = new Vbap(speakerLayout);
-//AmbisonicsSpatializer* panner = new AmbisonicsSpatializer(speakerLayout, 2, 1);  // dimension and order
+AmbisonicsSpatializer* panner = new AmbisonicsSpatializer(speakerLayout, 2, 1);  // dimension and order
+//StereoPanner *panner = new StereoPanner(speakerLayout);
 
 // 3) Create an audio scene with single argument for frames per buffer
 AudioScene scene(BLOCK_SIZE);
@@ -76,8 +77,9 @@ int main (int argc, char * argv[]){
 	// 8) Add the sound source to the scene
 	scene.addSource(src);
 
-		// Optionally, enable per sample processing
-	//scene.usePerSampleProcessing(true);
+    // Optionally, disable per sample processing to save CPU. Recommended to disable Doppler in this case as well.
+	//scene.usePerSampleProcessing(false);
+    //src.dopplerType(DOPPLER_NONE);
 
 	// 9) update the listener's speaker layout and panner
 	//    call this to dynamically change a listener's speaker layout and panner

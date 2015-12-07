@@ -68,6 +68,8 @@ void frenet(const V3& p2, const V3& p1, const V3& p0, V3& t, V3& n, V3& b);
 /// is based on a right-handed coordinate system so that T = N x B, N = B x T,
 /// and B = T x N.
 /// \tparam Vec3	3-vector type
+///
+/// @ingroup allocore
 template <class Vec3>
 struct Frenet{
 

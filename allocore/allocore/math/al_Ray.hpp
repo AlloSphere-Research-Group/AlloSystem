@@ -50,7 +50,9 @@ template <class T> class Ray;
 typedef Ray<float> Rayf;
 typedef Ray<double> Rayd;
 
-// Ray for intersection tests
+/// Ray for intersection tests
+///
+/// @ingroup allocore
 template <class T>
 class Ray {
 public:

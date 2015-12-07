@@ -59,6 +59,8 @@ namespace al {
 
 
 /// Object-oriented interface to AlloArray
+///
+/// @ingroup allocore
 class Array : public AlloArray {
 public:
 

@@ -71,6 +71,7 @@ static struct MatNoInit{} MAT_NO_INIT;
 
 /// Elements are stored in column-major format.
 ///
+/// @ingroup allocore
 template <int N, class T>
 class Mat{
 public:
@@ -528,18 +529,24 @@ inline Vec<N,U> operator* (const Vec<N,U>& vRow, const Mat<N,T>& m){
 
 
 /// Get determinant
+///
+/// @ingroup allocore
 template <class T>
 T determinant(const Mat<1,T>& m){
 	return m(0,0);
 }
 
 /// Get determinant
+///
+/// @ingroup allocore
 template <class T>
 T determinant(const Mat<2,T>& m){
 	return m(0,0)*m(1,1) - m(0,1)*m(1,0);
 }
 
 /// Get determinant
+///
+/// @ingroup allocore
 template <class T>
 T determinant(const Mat<3,T>& m){
 	return
@@ -552,6 +559,8 @@ T determinant(const Mat<3,T>& m){
 
 /// This computes the determinant using cofactor (or Laplace) expansion.
 /// The algorithm operates by recursively computing determinants of submatrices.
+///
+/// @ingroup allocore
 template<int N, class T>
 T determinant(const Mat<N,T>& m){
 	T res = 0;
@@ -565,6 +574,8 @@ T determinant(const Mat<N,T>& m){
 }
 
 /// Invert matrix, returns whether matrix was able to be inverted
+///
+/// @ingroup allocore
 template <class T>
 bool invert(Mat<1,T>& m){
 	T det = determinant(m);
@@ -576,6 +587,8 @@ bool invert(Mat<1,T>& m){
 }
 
 /// Invert matrix, returns whether matrix was able to be inverted
+///
+/// @ingroup allocore
 template <class T>
 bool invert(Mat<2,T>& m){
 	T det = determinant(m);
@@ -590,6 +603,8 @@ bool invert(Mat<2,T>& m){
 }
 
 /// Invert matrix, returns whether matrix was able to be inverted
+///
+/// @ingroup allocore
 template<int N, class T>
 bool invert(Mat<N,T>& m){
 	// Get cofactor matrix, C

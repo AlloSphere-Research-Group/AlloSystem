@@ -54,6 +54,10 @@
 namespace al{
 namespace zero{
 
+///
+/// \brief The Client class
+///
+/// @ingroup allocore
 class Client {
 public:
 	class Impl;
@@ -79,6 +83,10 @@ protected:
 	Impl * mImpl;
 };
 
+///
+/// \brief The Service class
+///
+/// @ingroup allocore
 class Service {
 public:
 	class Impl;

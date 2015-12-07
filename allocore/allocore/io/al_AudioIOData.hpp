@@ -97,6 +97,8 @@ static void interleave(T * dst, const T * src, int numFrames, int numChannels){
 }
 
 /// Audio device information
+///
+/// @ingroup allocore
 class AudioDeviceInfo{
 public:
 
@@ -147,6 +149,8 @@ inline AudioDeviceInfo::StreamMode operator| (const AudioDeviceInfo::StreamMode&
 
 
 /// Abstract audio backend
+///
+/// @ingroup allocore
 class AudioBackend{
 public:
 	AudioBackend();
@@ -190,6 +194,8 @@ protected:
 /// Audio data to be sent to callback
 /// Audio buffers are guaranteed to be stored in a contiguous non-interleaved
 /// format, i.e., frames are tightly packed per channel.
+///
+/// @ingroup allocore
 class AudioIOData {
 public:
 	/// Constructor
@@ -285,6 +291,8 @@ public:
 
 
 /// Interface for objects which can be registered with an audio IO stream
+///
+/// @ingroup allocore
 class AudioCallback {
 public:
 	virtual ~AudioCallback() {}

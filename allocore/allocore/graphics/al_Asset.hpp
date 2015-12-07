@@ -84,6 +84,7 @@
 namespace al{
 
 /// A collection of related meshes, textures, and materials for a 3D scene
+/// @ingroup allocore
 class Scene {
 public:
 

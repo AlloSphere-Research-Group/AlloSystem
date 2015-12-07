@@ -48,7 +48,9 @@
 
 namespace al {
 
-// encapsulate fbo, depth buffer, and texture
+/// Encapsulates FBO, depth buffer, and texture
+/// @ingroup allocore
+///
 struct EasyFBO {
 
   int w, h;

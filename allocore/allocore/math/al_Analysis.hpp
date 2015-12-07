@@ -40,6 +40,8 @@
 namespace al {
 
 /// A way to analyse data acquired gradually:
+///
+/// @ingroup allocore
 template<typename T=double>
 class MinMeanMax {
 public:
