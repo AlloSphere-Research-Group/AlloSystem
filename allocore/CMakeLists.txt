@@ -185,7 +185,7 @@ set_target_properties(${ALLOCORE_LIB}
 include_directories(${ALLOCORE_DEP_INCLUDE_DIRS})
 target_link_libraries(${ALLOCORE_LIB} ${ALLOCORE_LINK_LIBRARIES})
 
-message(${ALLOCORE_DEP_INCLUDE_DIRS})
+#message(${ALLOCORE_DEP_INCLUDE_DIRS})
 
 # Doxygen documentation target
 add_custom_target("doc"
