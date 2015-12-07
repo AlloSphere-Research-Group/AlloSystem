@@ -195,6 +195,7 @@ public:
 private:
 	osc::Recv *mServer;
 	std::vector<Parameter *> mParameters;
+	std::mutex mParameterLock;
 };
 }
 
