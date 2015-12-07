@@ -152,6 +152,21 @@ public:
 	{}
 };
 
+/// Stereo speaker layout
+class StereoSpeakerLayout : public SpeakerLayout{
+public:
+	StereoSpeakerLayout(int deviceChannelStart=0, float angle=30.f, float distance=1.f, float gain=1.f):
+		mLeft(deviceChannelStart, angle, 0, distance, gain),
+		mRight(deviceChannelStart + 1, -angle, 0, distance, gain)
+	{
+		addSpeaker(mLeft);
+		addSpeaker(mRight);
+	}
+private:
+	Speaker mLeft;
+	Speaker mRight;
+};
+
 
 /// Octophonic ring speaker layout
 typedef SpeakerRingLayout<8> OctalSpeakerLayout;
