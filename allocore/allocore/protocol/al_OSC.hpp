@@ -55,6 +55,8 @@ namespace al{
 namespace osc{
 
 /// User-defined data
+///
+/// @ingroup allocore
 struct Blob{
     Blob(){}
     explicit Blob(const void* data_, unsigned long size_)
@@ -76,6 +78,8 @@ typedef unsigned long long TimeTag;
 
 
 /// Outbound OSC packet
+///
+/// @ingroup allocore
 class Packet{
 public:
 
@@ -176,6 +180,8 @@ protected:
 
 
 /// Inbound OSC message
+///
+/// @ingroup allocore
 class Message{
 public:
 
@@ -221,6 +227,8 @@ protected:
 
 
 /// Iterates through all messages contained within an OSC packet
+///
+/// @ingroup allocore
 class PacketHandler{
 public:
 
@@ -235,6 +243,8 @@ public:
 
 
 /// Socket for sending OSC packets
+///
+/// @ingroup allocore
 class Send : public SocketClient, public Packet{
 public:
 	Send(){}
@@ -305,6 +315,7 @@ public:
 
 /// Supports explicit polling or implicit background thread polling
 ///
+/// @ingroup allocore
 class Recv : public SocketServer{
 public:
 	Recv();

@@ -54,6 +54,7 @@ namespace al{
 
 
 /// A simple wrapper around an OpenGL Texture
+/// @ingroup allocore
 class Texture : public GPUObject {
 public:
 

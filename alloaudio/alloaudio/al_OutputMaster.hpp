@@ -87,6 +87,8 @@ typedef enum {
  * audio callback, after any synthesis and spatialization.
  *
  * It can be controlled by OSC over UDP.
+ *
+ * @ingroup alloaudio
  */
 class OutputMaster : public osc::Recv, public al::AudioCallback
 {

@@ -54,6 +54,8 @@
 namespace al {
 
 /**
+
+ * @ingroup alloaudio
  */
 class Decorrelation : public AudioCallback
 {

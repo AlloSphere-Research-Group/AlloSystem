@@ -69,6 +69,8 @@ inline static uint32_t seed(){
 
 
 /// Random distribution generator
+///
+/// @ingroup allocore
 template <class RNG=al::rnd::Tausworthe>
 class Random{
 public:
@@ -159,6 +161,8 @@ protected:
 /// 0 and 1. This generator also exhibits poor dimensional distribution,
 /// therefore it is best to have a different generator for each dimension,
 /// rather than sharing one.
+///
+/// @ingroup allocore
 class LinCon {
 public:
 	/// Default constructor uses a randomly generated seed
@@ -207,6 +211,8 @@ private:
 /// quality (less "random") results than LinCon. Because of this, it is really
 /// not appropriate for simulations, but due to its speed it is very useful for
 /// synthesizing noise for audio and graphics.
+///
+/// @ingroup allocore
 class MulLinCon{
 public:
 	/// Default constructor uses a randomly generated seed
@@ -259,6 +265,8 @@ private:
 /// P. L'Ecuyer, "Maximally Equidistributed Combined Tausworthe Generators",
 /// Mathematics of Computation, 65, 213 (1996), 203--213.
 /// http://www.iro.umontreal.ca/~lecuyer/papers.html
+///
+/// @ingroup allocore
 class Tausworthe{
 public:
 

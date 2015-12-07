@@ -6,12 +6,14 @@
 
 #define MAXSIZE 0x00100000
 
+/** @defgroup alloaudio AlloAudio */
+
+
 class Convproc;
 
 namespace al {
 
 using namespace std;
-
 
 // Number of IRs must always match the number of output channels
 // Use cases:
@@ -23,10 +25,11 @@ using namespace std;
 
     /**
      * @brief Convolver Realtime multichannel convolution class.
+	 * @ingroup alloaudio
      *
      * Built on zita convolver, which implements a realtime multithreaded multichannel convolution algorithm using non-uniform partitioning.
      *
-     */
+	 */
 class Convolver : public al::AudioCallback
 {
 
@@ -75,6 +78,7 @@ private:
 	Convproc *m_Convproc;
 };
 
+/** @} */
 }
 
 #endif // AL_CONVOLVER_H

@@ -53,6 +53,7 @@
 namespace al{
 
 /// Shader abstract base class
+/// @ingroup allocore
 class ShaderBase : public GPUObject{
 public:
 
@@ -75,6 +76,7 @@ protected:
 
 /// A shader object represents your source code. You are able to pass your
 /// source code to a shader object and compile the shader object.
+/// @ingroup allocore
 class Shader : public ShaderBase{
 public:
 
@@ -115,6 +117,7 @@ private:
 
 /// A program object represents a useable part of render pipeline.
 /// It links one or more shader units into a single program object.
+/// @ingroup allocore
 class ShaderProgram : public ShaderBase{
 public:
 

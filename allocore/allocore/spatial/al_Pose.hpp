@@ -57,6 +57,8 @@ namespace al {
 ///	A Pose is a combined position (3-vector) and orientation (quaternion).
 /// Local coordinate bases are referred to as r, u, and f which stand for
 /// right, up, and forward, respectively.
+///
+/// @ingroup allocore
 class Pose {
 public:
 
@@ -205,6 +207,8 @@ protected:
 
 /// This Pose approaches the stored target Pose exponentially
 /// with a curvature determined by psmooth and qsmooth
+///
+/// @ingroup allocore
 class SmoothPose : public Pose {
 public:
 	SmoothPose(const Pose& init=Pose(), double psmooth=0.9, double qsmooth=0.9);
@@ -254,6 +258,8 @@ protected:
 ///	This represents a Pose combined with smooth angular and positional
 /// velocities. The smoothing is done using a one-pole low-pass filter which
 /// produces an exponential ease-out type of transition.
+///
+/// @ingroup allocore
 class Nav : public Pose {
 public:
 

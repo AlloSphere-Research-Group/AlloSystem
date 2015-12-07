@@ -51,6 +51,10 @@
 
 namespace al {
 
+///
+///
+///
+/// @ingroup allocore
 template<typename T=double>
 class Crossover {
 public:

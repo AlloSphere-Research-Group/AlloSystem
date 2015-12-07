@@ -93,6 +93,8 @@ template<class T> struct VecElems<4,T>{ T x,y,z,w; };
 /// This is a fixed size array to enable better loop unrolling optimizations
 /// by the compiler and to avoid an extra 'size' data member for small-sized
 /// arrays.
+///
+/// @ingroup allocore
 template <int N, class T>
 class Vec : public VecElems<N,T>{
 public:
