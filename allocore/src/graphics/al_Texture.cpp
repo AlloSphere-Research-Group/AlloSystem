@@ -22,6 +22,29 @@ Texture::Texture()
 {}
 
 Texture :: Texture(
+	unsigned width,
+	Graphics::Format format, Graphics::DataType type,
+	bool alloc
+)
+:	mTarget(TEXTURE_1D),
+	mFormat(format),
+	mTexelFormat(0),
+	mType(type),
+	mWrapS(CLAMP_TO_EDGE),
+	mWrapT(CLAMP_TO_EDGE),
+	mWrapR(CLAMP_TO_EDGE),
+	mFilterMin(LINEAR),
+	mFilterMag(LINEAR),
+	mWidth(width),
+	mHeight(0),
+	mDepth(0),
+	mParamsUpdated(true), mShapeUpdated(true),
+	mPixelsUpdated(true), mArrayDirty(false)
+{
+	if(alloc) allocate();
+}
+
+Texture :: Texture(
 	unsigned width, unsigned height,
 	Graphics::Format format, Graphics::DataType type,
 	bool alloc
