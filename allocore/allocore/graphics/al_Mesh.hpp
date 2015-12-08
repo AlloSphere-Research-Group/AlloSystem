@@ -62,6 +62,7 @@ public:
 	typedef Vec3f			Vertex;
 	typedef Vec3f			Normal;
 	//typedef Vec4f			Color;
+	typedef float			TexCoord1;
 	typedef Vec2f			TexCoord2;
 	typedef Vec3f			TexCoord3;
 	typedef unsigned int	Index;
@@ -72,6 +73,7 @@ public:
 	typedef Buffer<Normal>		Normals;
 	typedef Buffer<Color>		Colors;
 	typedef Buffer<Colori>		Coloris;
+	typedef Buffer<TexCoord1>	TexCoord1s;
 	typedef Buffer<TexCoord2>	TexCoord2s;
 	typedef Buffer<TexCoord3>	TexCoord3s;
 	typedef Buffer<Index>		Indices;
@@ -195,6 +197,7 @@ public:
 	const Buffer<Normal>& normals() const { return mNormals; }
 	const Buffer<Color>& colors() const { return mColors; }
 	const Buffer<Colori>& coloris() const { return mColoris; }
+	const Buffer<TexCoord1>& texCoord1s() const { return mTexCoord1s; }
 	const Buffer<TexCoord2>& texCoord2s() const { return mTexCoord2s; }
 	const Buffer<TexCoord3>& texCoord3s() const { return mTexCoord3s; }
 	const Buffer<Index>& indices() const { return mIndices; }
@@ -249,6 +252,9 @@ public:
 	void normal(const Vec<2,T>& v, float z=0){ normal(v[0], v[1], z); }
 
 
+	/// Append texture coordinate to 1D texture coordinate buffer
+	void texCoord(float u){ texCoord1s().append(TexCoord1(u)); }
+
 	/// Append texture coordinate to 2D texture coordinate buffer
 	void texCoord(float u, float v){ texCoord2s().append(TexCoord2(u,v)); }
 
@@ -287,17 +293,11 @@ public:
 	}
 
 
-//	/// Get number of faces (assumes triangles or quads)
-//	int numFaces() const { return mIndices.size() / ( ( mPrimitive == Graphics::TRIANGLES ) ? 3 : 4 ); }
-//	/// Get indices as triangles
-//	TriFace& indexAsTri(){ return (TriFace*) indices(); }
-//	/// Get indices as quads
-//	QuadFace& indexAsQuad(){ return (QuadFace*) indices(); }
-
 	Vertices& vertices(){ return mVertices; }
 	Normals& normals(){ return mNormals; }
 	Colors& colors(){ return mColors; }
 	Coloris& coloris(){ return mColoris; }
+	TexCoord1s& texCoord1s(){ return mTexCoord1s; }
 	TexCoord2s& texCoord2s(){ return mTexCoord2s; }
 	TexCoord3s& texCoord3s(){ return mTexCoord3s; }
 	Indices& indices(){ return mIndices; }
@@ -326,6 +326,7 @@ protected:
 	Normals mNormals;
 	Colors mColors;
 	Coloris mColoris;
+	TexCoord1s mTexCoord1s;
 	TexCoord2s mTexCoord2s;
 	TexCoord3s mTexCoord3s;
 	Indices mIndices;

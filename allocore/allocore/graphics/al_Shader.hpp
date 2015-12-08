@@ -173,13 +173,14 @@ public:
 	/// Detach shader from program
 	const ShaderProgram& detach(const Shader& s) const;
 
-	// If dovalidate == true, immediately calls validate()
-	// you might not want to do this if you need to set uniforms before validating
-	// e.g. when using different texture sampler types in the same shader
+	/// Link attached shaders
+
+	/// @param[in] doValidate	validate program after linking;
+	///		You might not want to do this if you need to set uniforms before
+	///		validating, e.g., when using different texture sampler types in the
+	///		same shader.
 	const ShaderProgram& link(bool doValidate=true) const;
 
-	// check if compilation/linking was successful (prints an error on failure)
-	const ShaderProgram& validate_linker() const;
 
 	/// Compile and link shader sources
 	bool compile(
@@ -206,8 +207,12 @@ public:
 	/// End use of shader program
 	void end() const;
 
-	/// Returns whether program linked successfully.
+
+	/// Returns whether program linked successfully
 	bool linked() const;
+
+	/// Returns whether linked program can execute in current graphics state
+	bool validateProgram(bool printLog=false) const;
 
 
 	// These parameters must be set before attaching geometry shaders

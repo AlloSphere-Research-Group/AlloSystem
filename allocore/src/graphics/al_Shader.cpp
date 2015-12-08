@@ -188,20 +188,22 @@ const ShaderProgram& ShaderProgram::detach(const Shader& s) const {
 	//glDetachObjectARB((GLhandleARB)handle(), (GLhandleARB)s.handle());
 	return *this;
 }
-const ShaderProgram& ShaderProgram::link(bool dovalidate) const {
+const ShaderProgram& ShaderProgram::link(bool doValidate) const {
 	glLinkProgram(id());
-	if (dovalidate) validate_linker();
+	if(doValidate) validateProgram();
 	return *this;
 }
 
-const ShaderProgram& ShaderProgram::validate_linker() const {
-	int isValid;
+bool ShaderProgram::validateProgram(bool doPrintLog) const {
+	GLint isValid;
 	glValidateProgram(id());
 	glGetProgramiv(id(), GL_VALIDATE_STATUS, &isValid);
-	if (!isValid) {
+	if(GL_FALSE == isValid){
 		AL_GRAPHICS_ERROR("ShaderProgram::link", id());
+		if(doPrintLog) printLog();
+		return false;
 	}
-	return *this;
+	return true;
 }
 
 bool ShaderProgram::compile(
@@ -226,7 +228,7 @@ bool ShaderProgram::compile(
 		mShaderG.source(geomSource, al::Shader::GEOMETRY);
 		attach(mShaderG);
 	}
-	link();
+	link(false);
 	mShaderV.printLog();
 	mShaderF.printLog();
 	if(bGeom) mShaderG.printLog();

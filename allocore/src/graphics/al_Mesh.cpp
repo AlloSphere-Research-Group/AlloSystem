@@ -20,6 +20,7 @@ Mesh::Mesh(const Mesh& cpy)
 	mNormals(cpy.mNormals),
 	mColors(cpy.mColors),
 	mColoris(cpy.mColoris),
+	mTexCoord1s(cpy.mTexCoord1s),
 	mTexCoord2s(cpy.mTexCoord2s),
 	mTexCoord3s(cpy.mTexCoord3s),
 	mIndices(cpy.mIndices),
@@ -31,6 +32,7 @@ Mesh& Mesh::reset() {
 	normals().reset();
 	colors().reset();
 	coloris().reset();
+	texCoord1s().reset();
 	texCoord2s().reset();
 	texCoord3s().reset();
 	indices().reset();
@@ -54,6 +56,7 @@ void Mesh::decompress(){
 		DECOMPRESS(colors(), Color)
 		DECOMPRESS(coloris(), Colori)
 		DECOMPRESS(normals(), Normal)
+		DECOMPRESS(texCoord1s(), TexCoord1)
 		DECOMPRESS(texCoord2s(), TexCoord2)
 		DECOMPRESS(texCoord3s(), TexCoord3)
 		#undef DECOMPRESS
@@ -67,6 +70,7 @@ void Mesh::equalizeBuffers() {
 	const int Nn = normals().size();
 	const int Nc = colors().size();
 	const int Nci= coloris().size();
+	const int Nt1= texCoord1s().size();
 	const int Nt2= texCoord2s().size();
 	const int Nt3= texCoord3s().size();
 
@@ -83,6 +87,11 @@ void Mesh::equalizeBuffers() {
 	else if(Nci){
 		for(int i=Nci; i<Nv; ++i){
 			coloris().append(coloris()[Nci-1]);
+		}
+	}
+	if(Nt1){
+		for(int i=Nt1; i<Nv; ++i){
+			texCoord1s().append(texCoord1s()[Nt1-1]);
 		}
 	}
 	if(Nt2){
@@ -189,6 +198,7 @@ void Mesh::compress() {
 	int Nc = colors().size();
 	int Nci = coloris().size();
 	int Nn = normals().size();
+	int Nt1 = texCoord1s().size();
 	int Nt2 = texCoord2s().size();
 	int Nt3 = texCoord3s().size();
 
@@ -231,6 +241,7 @@ void Mesh::compress() {
 			if (Nc) color(old.colors()[i]);
 			if (Nci) colori(old.coloris()[i]);
 			if (Nn) normal(old.normals()[i]);
+			if (Nt1) texCoord(old.texCoord1s()[i]);
 			if (Nt2) texCoord(old.texCoord2s()[i]);
 			if (Nt3) texCoord(old.texCoord3s()[i]);
 			// store new index:
@@ -420,6 +431,7 @@ Mesh& Mesh::repeatLast(){
 		if(normals().size()) normals().repeatLast();
 		if(texCoord2s().size()) texCoord2s().repeatLast();
 		else if(texCoord3s().size()) texCoord3s().repeatLast();
+		else if(texCoord1s().size()) texCoord1s().repeatLast();
 	}
 	return *this;
 }
@@ -543,6 +555,7 @@ void Mesh::merge(const Mesh& src){
 	vertices().append(src.vertices());
 	normals().append(src.normals());
 	colors().append(src.colors());
+	texCoord1s().append(src.texCoord1s());
 	texCoord2s().append(src.texCoord2s());
 	texCoord3s().append(src.texCoord3s());
 }
@@ -667,6 +680,7 @@ void Mesh::toTriangles(){
 			if(normals().size() >= Nv) stripToTri(normals());
 			if(colors().size() >= Nv) stripToTri(colors());
 			if(coloris().size() >= Nv) stripToTri(coloris());
+			if(texCoord1s().size() >= Nv) stripToTri(texCoord1s());
 			if(texCoord2s().size() >= Nv) stripToTri(texCoord2s());
 			if(texCoord3s().size() >= Nv) stripToTri(texCoord3s());
 		}
@@ -723,18 +737,21 @@ void Mesh::print(FILE * dst) const {
 	if(colors().size())		fprintf(dst, "%8d Colors\n", colors().size());
 	if(coloris().size())	fprintf(dst, "%8d Coloris\n", coloris().size());
 	if(normals().size())	fprintf(dst, "%8d Normals\n", normals().size());
+	if(texCoord1s().size())	fprintf(dst, "%8d TexCoord1s\n", texCoord1s().size());
 	if(texCoord2s().size())	fprintf(dst, "%8d TexCoord2s\n", texCoord2s().size());
 	if(texCoord3s().size())	fprintf(dst, "%8d TexCoord3s\n", texCoord3s().size());
 	if(indices().size())	fprintf(dst, "%8d Indices\n", indices().size());
 
-	unsigned bytes	= vertices().size()*sizeof(Vertex)
-					+ colors().size()*sizeof(Color)
-					+ coloris().size()*sizeof(Colori)
-					+ normals().size()*sizeof(Normal)
-					+ texCoord2s().size()*sizeof(TexCoord2)
-					+ texCoord3s().size()*sizeof(TexCoord3)
-					+ indices().size()*sizeof(Index)
-					;
+	unsigned bytes
+		= vertices().size()*sizeof(Vertex)
+		+ colors().size()*sizeof(Color)
+		+ coloris().size()*sizeof(Colori)
+		+ normals().size()*sizeof(Normal)
+		+ texCoord1s().size()*sizeof(TexCoord1)
+		+ texCoord2s().size()*sizeof(TexCoord2)
+		+ texCoord3s().size()*sizeof(TexCoord3)
+		+ indices().size()*sizeof(Index)
+		;
 	fprintf(dst, "%8d bytes (%.1f kB)\n", bytes, double(bytes)/1000);
 }
 
