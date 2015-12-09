@@ -154,7 +154,6 @@ endif(BUILD_EXAMPLES)
 install(FILES ${ALLOAUDIO_INSTALL_HEADERS} DESTINATION "${CMAKE_INSTALL_PREFIX}/include")
 install(TARGETS ${ALLOAUDIO_LIBRARY} DESTINATION "${CMAKE_INSTALL_PREFIX}/lib")
 
-if(NOT TRAVIS_BUILD)
 set(TEST_ARGS "")
 
 include_directories("${CMAKE_SOURCE_DIR}/allocore/share/CATCH")
@@ -179,4 +178,3 @@ if(NOT FFTW_LIBRARY STREQUAL "")
 		  COMMAND $<TARGET_FILE:decorrelationTests> ${TEST_ARGS})
   add_memcheck_test(decorrelationTests)
 endif()
-endif(NOT TRAVIS_BUILD)
