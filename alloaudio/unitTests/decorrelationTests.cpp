@@ -3,7 +3,6 @@
 #include <cstring>
 #include <string>
 #include <sstream>
-#include <cassert>
 #include <iostream>
 #include <cmath>
 
@@ -12,14 +11,15 @@
 
 #include "Gamma/FFT.h"
 
+#define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
+#include "catch.hpp"
 
-void ut_class_test(void)
-{
+TEST_CASE( "Class tests", "[decorrelation]" ) {
 	al::AudioIO io(64, 44100, 0, 0, 2, 2, al::AudioIO::DUMMY); // Dummy Audio Backend
 	al::Decorrelation dec(32, 1, 1, false);
 	dec.configure(io, 1000);
-	assert(dec.getCurrentSeed() == 1000);
-	assert(dec.getSize() == 32);
+	REQUIRE(dec.getCurrentSeed() == 1000);
+	REQUIRE(dec.getSize() == 32);
 
 	float *ir = dec.getIR(0);
 	double expected[] = {0.65027274, -0.16738815,  0.1617437 ,  0.18901241,  0.01768662,
@@ -31,28 +31,28 @@ void ut_class_test(void)
 						 0.00549774,  0.26477413};
 	for (int i = 0; i < 32; i++) {
 //		std::cout << ir[i] << "..." << expected[i];
-		assert(fabs(ir[i] - expected[i]) < 0.000001);
+		REQUIRE(fabs(ir[i] - expected[i]) < 0.000001);
 	}
 	std::cout << std::endl;
 
 	al::Decorrelation dec2(1024, 1, 32, false);
 	dec2.configure(io, 1001);
-	assert(dec2.getCurrentSeed() == 1001);
-	assert(dec2.getSize() == 1024);
+	REQUIRE(dec2.getCurrentSeed() == 1001);
+	REQUIRE(dec2.getSize() == 1024);
 
 
 	al::Decorrelation dec3(10, 1, 8, false);
 	dec3.configure(io, 1001);
-	assert(dec3.getCurrentSeed() == 1001);
-	assert(dec3.getSize() == 0); // Size of 10 is too small
+	REQUIRE(dec3.getCurrentSeed() == 1001);
+	REQUIRE(dec3.getSize() == 0); // Size of 10 is too small
 
 	al::Decorrelation dec4(32, 1, 0);
 	dec4.configure(io, 1001);
-	assert(dec4.getSize() == 0); // Num Outs is 0
+	REQUIRE(dec4.getSize() == 0); // Num Outs is 0
 }
 
-void ut_decorrelation_test(void)
-{
+
+TEST_CASE( "Decorrelation test", "[decorrelation]" ) {
 	al::AudioIO io(64, 44100, 0, 0, 2, 2, al::AudioIO::DUMMY); // Dummy Audio Backend
 	io.channelsBus(1);
 	al::Decorrelation dec(64, 0, 1, true);
@@ -80,7 +80,7 @@ void ut_decorrelation_test(void)
 						 0.13952994,  0.06541837,  0.05971518}; //,  0.153454}; Last value goes as first value in next buffer
 	for (int i = 0; i < io.framesPerBuffer(); i++) { // Zero out input bus
 //		std::cout << outbuf[i] << " ... "<< expected[i] << std::endl;
-		assert(fabs(expected[i] - outbuf[i]) < 0.000001);
+		REQUIRE(fabs(expected[i] - outbuf[i]) < 0.000001);
 	}
 
 	input = io.busBuffer(0);
@@ -105,13 +105,13 @@ void ut_decorrelation_test(void)
 						  0.06976497,  0.03270919,  0.02985759,  0.076727};
 	for (int i = 0; i < io.framesPerBuffer(); i++) { // Zero out input bus
 //		std::cout << outbuf[i] << " ... "<< expected2[i] << std::endl;
-		assert(fabs(expected2[i] - outbuf[i]) < 0.000001);
+		REQUIRE(fabs(expected2[i] - outbuf[i]) < 0.000001);
 	}
 
 }
 
-void ut_parallel_test(void)
-{
+
+TEST_CASE( "Parallel", "[decorrelation]" ) {
 	al::AudioIO io(64, 44100, 0, 0, 2, 2, al::AudioIO::DUMMY); // Dummy Audio Backend
 	io.channelsBus(2);
 	al::Decorrelation dec(64, -1, 2, true); // -1 for input means "parallel" decorrelation
@@ -166,13 +166,13 @@ void ut_parallel_test(void)
 						   7.46189688e-03};
 	for (int i = 0; i < io.framesPerBuffer(); i++) { // Zero out input bus
 //		std::cout << outbuf0[i] << " ... "<< expected0[i] << std::endl;
-		assert(fabs(expected0[i] - outbuf0[i]) < 0.000001);
-		assert(fabs(expected1[i] - outbuf1[i]) < 0.000001);
+		REQUIRE(fabs(expected0[i] - outbuf0[i]) < 0.000001);
+		REQUIRE(fabs(expected1[i] - outbuf1[i]) < 0.000001);
 	}
 }
 
-void ut_max_jump_test(void)
-{
+
+TEST_CASE( "Max jump test", "[decorrelation]" ) {
 	al::AudioIO io(64, 44100, 0, 0, 2, 2, al::AudioIO::DUMMY); // Dummy Audio Backend
 	al::Decorrelation dec(1024, 1, 1, false);
 	for (int i = 0 ; i < 10; i++) {
@@ -187,42 +187,25 @@ void ut_max_jump_test(void)
 		for (int j = 2; j < 510; j++) {
 			float amp = 1024 * sqrt(pow(data[j*2 + 1], 2) + pow(data[j*2], 2));
 //			std::cout << amp << std::endl;
-			assert(fabs(amp - 1.0) < 0.000001);
+			REQUIRE(fabs(amp - 1.0) < 0.000001);
 			float phs = atan(data[j*2 + 1]/data[j*2]);
 			float delta = fabs(phs - prev_phase);
 //			std::cout << prev_phase << " ... " << phs << " delta " << delta << std::endl;
 			while (delta >= M_PI/2.0) {
 				delta -= M_PI;
 			}
-			assert(delta <= 0.1);
+			REQUIRE(delta <= 0.1);
 			prev_phase = phs;
 		}
 	}
 
 }
 
-void ut_deterministic_test(void)
-{
+
+TEST_CASE( "Deterministic IR", "[decorrelation]" ) {
 	al::AudioIO io(64, 44100, 0, 0, 2, 2, al::AudioIO::DUMMY); // Dummy Audio Backend
 	al::Decorrelation dec(32, 0, 8, false);
 	dec.configureDeterministic(io, 1000, 30, 10, 1.0);
 
 	float *ir = dec.getIR(0);
-}
-
-#define RUNTEST(Name)\
-	printf("%s ", #Name);\
-	ut_##Name();\
-	for(size_t i=0; i<32-strlen(#Name); ++i) printf(".");\
-	printf(" pass\n")
-
-int main()
-{
-	RUNTEST(class_test);
-	RUNTEST(decorrelation_test);
-	RUNTEST(parallel_test);
-	RUNTEST(max_jump_test);
-	RUNTEST(deterministic_test);
-
-	return 0;
 }

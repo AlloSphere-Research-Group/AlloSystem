@@ -4,24 +4,24 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
-#include <cassert>
 #include <cstring>
 
 #include "alloaudio/al_Convolver.hpp"
 #include "allocore/io/al_AudioIO.hpp"
+
+#define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
+#include "catch.hpp"
 
 #define IR_SIZE 1024
 #define BLOCK_SIZE 64 //min 64, max 8192
 
 using namespace std;
 
-
-void ut_class_construction(void)
-{
+TEST_CASE( "Class construction", "[convolver]" ) {
 	al::Convolver conv;
 	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
-	assert(io.channelsOut() == 2);
-	assert(io.framesPerSecond() == 44100.0f);
+	REQUIRE(io.channelsOut() == 2);
+	REQUIRE(io.framesPerSecond() == 44100.0f);
 	io.append(conv);
 
     //create dummy IRs
@@ -37,18 +37,18 @@ void ut_class_construction(void)
     int IRlength = IR_SIZE;
     
 	int ret = conv.configure(io, IRs, IRlength);
-	assert(ret == 0);
+	REQUIRE(ret == 0);
 	io.processAudio();
     conv.shutdown();
 }
 
 
-void ut_many_to_many(void)
-{
+
+TEST_CASE( "Many to many", "[convolver]" ) {
 	al::Convolver conv;
 	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
-	assert(io.channelsOut() == 2);
-	assert(io.framesPerSecond() == 44100.0f);
+	REQUIRE(io.channelsOut() == 2);
+	REQUIRE(io.framesPerSecond() == 44100.0f);
 	io.append(conv);
     io.channelsBus(2);
 
@@ -81,18 +81,18 @@ void ut_many_to_many(void)
 	for(int i = 0; i < BLOCK_SIZE; i++) {
         //std::cout << "Y1: " << io.out(0, i) << ", H1: " << IR1[i] << std::endl;
         //std::cout << "Y2: " << io.out(1, i) << ", H2: " << IR2[i] << std::endl;
-		assert(fabs(io.out(0, i) - IR1[i]) < 1e-07f);
-		assert(fabs(io.out(1, i) - IR2[i]) < 1e-07f);
+		REQUIRE(fabs(io.out(0, i) - IR1[i]) < 1e-07f);
+		REQUIRE(fabs(io.out(1, i) - IR2[i]) < 1e-07f);
 	}
     conv.shutdown();
 }
 
-void ut_one_to_many(void)
-{
+
+TEST_CASE( "One to many", "[convolver]" ) {
 	al::Convolver conv;
 	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
-	assert(io.channelsOut() == 2);
-	assert(io.framesPerSecond() == 44100.0f);
+	REQUIRE(io.channelsOut() == 2);
+	REQUIRE(io.framesPerSecond() == 44100.0f);
 	io.append(conv);
     io.channelsBus(1);
     
@@ -122,19 +122,18 @@ void ut_one_to_many(void)
     for(int i = 0; i < BLOCK_SIZE; i++) {
         //std::cout << "Y1: " << io.out(0, i) << ", H1: " << IR1[i] << std::endl;
         //std::cout << "Y2: " << io.out(1, i) << ", H2: " << IR2[i] << std::endl;
-		assert(fabs(io.out(0, i) - IR1[i]) < 1e-07f);
-		assert(fabs(io.out(1, i) - IR2[i]) < 1e-07f);
+		REQUIRE(fabs(io.out(0, i) - IR1[i]) < 1e-07f);
+		REQUIRE(fabs(io.out(1, i) - IR2[i]) < 1e-07f);
     }
     conv.shutdown();
 }
 
 
-void ut_disabled_channels(void)
-{
+TEST_CASE( "Disabled channels", "[convolver]" ) {
 	al::Convolver conv;
 	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
-	assert(io.channelsOut() == 2);
-	assert(io.framesPerSecond() == 44100.0f);
+	REQUIRE(io.channelsOut() == 2);
+	REQUIRE(io.framesPerSecond() == 44100.0f);
 	io.append(conv);
 
     //create dummy IRs
@@ -153,26 +152,26 @@ void ut_disabled_channels(void)
 
     int nOutputs = io.channels(true);
 	unsigned int basePartitionSize = BLOCK_SIZE, options = 0;
-    conv.configure(io, IRs, IRlength, -1, true, disabledOuts, basePartitionSize, options);
+	conv.configure(io, IRs, IRlength, -1, false, disabledOuts, basePartitionSize, options);
 	io.processAudio();
     
     std::vector<int>::iterator it;
     for(int i = 0; i < nOutputs; i++) {
         it = find (disabledOuts.begin(), disabledOuts.end(), i);
         if (it != disabledOuts.end()){
-			assert(io.out(0, i) == 0.0f);
-			assert(io.out(1, i) == 0.0f);
+			REQUIRE(io.out(0, i) == 0.0f);
+			REQUIRE(io.out(1, i) == 0.0f);
         }
     }
     conv.shutdown();
 }
 
-void ut_vector_mode(void)
-{
+
+TEST_CASE( "Vector mode", "[convolver]" ) {
 	al::Convolver conv;
 	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
-	assert(io.channelsOut() == 2);
-	assert(io.framesPerSecond() == 44100.0f);
+	REQUIRE(io.channelsOut() == 2);
+	REQUIRE(io.framesPerSecond() == 44100.0f);
 	io.append(conv);
     io.channelsBus(2);
     
@@ -203,24 +202,9 @@ void ut_vector_mode(void)
     for(int i = 0; i < BLOCK_SIZE; i++) {
         //std::cout << "Y1: " << io.out(0, i) << ", H1: " << IR1[i] << std::endl;
         //std::cout << "Y2: " << io.out(1, i) << ", H2: " << IR2[i] << std::endl;
-		assert(fabs(io.out(0, i) - IR1[i]) < 1e-07f);
-		assert(fabs(io.out(1, i) - IR2[i]) < 1e-07f);
+		REQUIRE(fabs(io.out(0, i) - IR1[i]) < 1e-07f);
+		REQUIRE(fabs(io.out(1, i) - IR2[i]) < 1e-07f);
     }
     conv.shutdown();
 }
 
-#define RUNTEST(Name)\
-	printf("%s ", #Name);\
-	ut_##Name();\
-	for(size_t i=0; i<32-strlen(#Name); ++i) printf(".");\
-	printf(" pass\n")
-
-int main()
-{
-	RUNTEST(class_construction);
-	RUNTEST(many_to_many);
-	RUNTEST(one_to_many);
-	RUNTEST(disabled_channels);
-	RUNTEST(vector_mode);
-	return 0;
-}

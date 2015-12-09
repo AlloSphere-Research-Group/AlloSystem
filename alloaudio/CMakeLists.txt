@@ -157,6 +157,8 @@ install(TARGETS ${ALLOAUDIO_LIBRARY} DESTINATION "${CMAKE_INSTALL_PREFIX}/lib")
 if(NOT TRAVIS_BUILD)
 set(TEST_ARGS "")
 
+include_directories("${CMAKE_SOURCE_DIR}/allocore/share/CATCH")
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${BUILD_ROOT_DIR}/build/bin")
 add_executable(alloaudioTests unitTests/alloaudioTests.cpp)
 target_link_libraries(alloaudioTests ${ALLOCORE_LIBRARY} ${ALLOAUDIO_LIBRARY} ${ALLOCORE_LINK_LIBRARIES})

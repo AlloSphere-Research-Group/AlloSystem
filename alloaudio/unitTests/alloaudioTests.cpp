@@ -2,30 +2,28 @@
 #include <cstdio>
 #include <string>
 #include <sstream>
-#include <cassert>
 //#include <iostream>
 
 #include "alloaudio/al_OutputMaster.hpp"
 #include "allocore/system/al_Time.hpp"
 
+#define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
+#include "catch.hpp"
 
-
-void ut_class_test(void)
-{
+TEST_CASE( "Class tests", "[alloaudio]" ) {
     al::OutputMaster outmaster(8, 44100);
-	assert(outmaster.getNumChnls() == 8);
-	assert(outmaster.background());
+	REQUIRE(outmaster.getNumChnls() == 8);
+	REQUIRE(outmaster.background());
     al::OutputMaster outmaster2(16, 44100);
-	assert(outmaster2.getNumChnls() == 16);
+	REQUIRE(outmaster2.getNumChnls() == 16);
 	al::OutputMaster outmaster3(32, 44100, "", -1);
-	assert(outmaster3.getNumChnls() == 32);
+	REQUIRE(outmaster3.getNumChnls() == 32);
 }
 
-void ut_gains(void)
-{
+TEST_CASE( "Gains", "[alloaudio]" ) {
 	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
-	assert(io.channelsOut() == 2);
-	assert(io.framesPerSecond() == 44100.0);
+	REQUIRE(io.channelsOut() == 2);
+	REQUIRE(io.framesPerSecond() == 44100.0);
 	al::OutputMaster outmaster(io.channelsOut(), io.framesPerSecond());
 	outmaster.setClipperOn(false);
 	io.append(outmaster);
@@ -38,8 +36,8 @@ void ut_gains(void)
 	float *out_0 = io.outBuffer(0);
 	float *out_1 = io.outBuffer(1);
 	for (int i = 0; i < 4; i++) {
-		assert(out_0[i] == 0.0f);
-		assert(out_1[i] == 0.0f);
+		REQUIRE(out_0[i] == 0.0f);
+		REQUIRE(out_1[i] == 0.0f);
 	}
 	outmaster.setMasterGain(0.56);
 	outmaster.setGain(0, 1.0);
@@ -53,16 +51,15 @@ void ut_gains(void)
 	out_0 = io.outBuffer(0);
 	out_1 = io.outBuffer(1);
     for (int i = 0; i < 4; i++) {
-		assert(out_0[i] - 0.56/(i + 1)  < 1e-07f);
-		assert(out_1[i] - 1.1 * 0.56* i/4.0 < 1e-07f);
+		REQUIRE(out_0[i] - 0.56/(i + 1)  < 1e-07f);
+		REQUIRE(out_1[i] - 1.1 * 0.56* i/4.0 < 1e-07f);
     }
 }
 
-void ut_meter_values(void)
-{
+TEST_CASE( "Meter values", "[alloaudio]" ) {
 	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
-	assert(io.channelsOut() == 2);
-	assert(io.framesPerSecond() == 44100.0);
+	REQUIRE(io.channelsOut() == 2);
+	REQUIRE(io.framesPerSecond() == 44100.0);
 	al::OutputMaster outmaster(io.channelsOut(), io.framesPerSecond());
 	io.append(outmaster);
 
@@ -84,15 +81,14 @@ void ut_meter_values(void)
     float meterValues[2];
     outmaster.getMeterValues(meterValues);
 
-	assert(meterValues[0] == 0.5);
-	assert(meterValues[1] == 0.75);
+	REQUIRE(meterValues[0] == 0.5);
+	REQUIRE(meterValues[1] == 0.75);
 }
 
-void ut_clipper(void)
-{
+TEST_CASE( "Clipper", "[alloaudio]" ) {
 	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
-	assert(io.channelsOut() == 2);
-	assert(io.framesPerSecond() == 44100.0);
+	REQUIRE(io.channelsOut() == 2);
+	REQUIRE(io.framesPerSecond() == 44100.0);
 	al::OutputMaster outmaster(io.channelsOut(), io.framesPerSecond());
 	io.append(outmaster);
 
@@ -112,19 +108,18 @@ void ut_clipper(void)
 	float *out_0 = io.outBuffer(0);
 	float *out_1 = io.outBuffer(1);
 
-	assert(out_0[0] - 0.4 < 1e-07f);
-	assert(out_1[0] - 0.3 < 1e-07f);
+	REQUIRE(out_0[0] - 0.4 < 1e-07f);
+	REQUIRE(out_1[0] - 0.3 < 1e-07f);
 	for (int i = 1; i < 4; i++) {
-		assert(out_0[i] - 0.5 < 1e-07f);
-		assert(out_1[i] - 0.5 < 1e-07f);
+		REQUIRE(out_0[i] - 0.5 < 1e-07f);
+		REQUIRE(out_1[i] - 0.5 < 1e-07f);
 	}
 }
 
-void ut_osc_gain(void)
-{
+TEST_CASE( "OSC gain", "[alloaudio]" ) {
 	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
-	assert(io.channelsOut() == 2);
-	assert(io.framesPerSecond() == 44100.0f);
+	REQUIRE(io.channelsOut() == 2);
+	REQUIRE(io.framesPerSecond() == 44100.0f);
 	al::OutputMaster outmaster(io.channelsOut(), io.framesPerSecond(), "localhost", 9001);
 	io.append(outmaster);
 	outmaster.setClipperOn(false);
@@ -146,8 +141,8 @@ void ut_osc_gain(void)
 	float *out_0 = io.outBuffer(0);
 	float *out_1 = io.outBuffer(1);
 	for (int i = 0; i < 4; i++) {
-		assert(out_0[i] - 0.1 * 0.9 * 0.5 * (i + 1) < 1e-07f);
-		assert(out_1[i] - 0.1 * 0.8 * 0.4 * (i + 1) < 1e-07f);
+		REQUIRE(out_0[i] - 0.1 * 0.9 * 0.5 * (i + 1) < 1e-07f);
+		REQUIRE(out_1[i] - 0.1 * 0.8 * 0.4 * (i + 1) < 1e-07f);
 	}
 
 	s.send("/Alloaudio/clipper_on", 1);
@@ -161,11 +156,11 @@ void ut_osc_gain(void)
 		in_1[i] = 1.0 * (i + 1);
 	}
 	io.processAudio();
-	assert(out_0[0] - 0.09 < 1e-07f);
-	assert(out_1[0] - 0.08 < 1e-07f);
+	REQUIRE(out_0[0] - 0.09 < 1e-07f);
+	REQUIRE(out_1[0] - 0.08 < 1e-07f);
 	for (int i = 1; i < 4; i++) {
-		assert(out_0[i] - 0.1  < 1e-07f);
-		assert(out_1[i] - 0.1  < 1e-07f);
+		REQUIRE(out_0[i] - 0.1  < 1e-07f);
+		REQUIRE(out_1[i] - 0.1  < 1e-07f);
 	}
 
 	outmaster.setClipperOn(false);
@@ -180,8 +175,8 @@ void ut_osc_gain(void)
 	}
 	io.processAudio();
 	for (int i = 0; i < 4; i++) {
-		assert(out_0[i] == 0.0);
-		assert(out_1[i] == 0.0);
+		REQUIRE(out_0[i] == 0.0);
+		REQUIRE(out_1[i] == 0.0);
 	}
 }
 
@@ -192,25 +187,25 @@ struct OSCHandler : public al::osc::PacketHandler{
 		std::string addressPattern = m.addressPattern();
 		if(m.typeTags().size() == 1) {
 			std::string patternPrefix = "/Alloaudio/meterdb/";
-			assert(addressPattern.find(patternPrefix) == 0);
-			assert(m.typeTags() == "f");
+			REQUIRE(addressPattern.find(patternPrefix) == 0);
+			REQUIRE(m.typeTags() == "f");
 			std::stringstream convert(addressPattern.substr(patternPrefix.length()));
 			int index = 0;
 			if ( !(convert >> index) ) {
 				index = -1;
 			}
-			assert(index >=0);
+			REQUIRE(index >=0);
 			float dbvalue;
 			m >> dbvalue;
 			meterValues[index - 1] = powf(10.0, dbvalue/20.0);
 			meterValues2[index - 1] = 0.0;
 		} else {
-			assert(addressPattern == "/Alloaudio/meterdb");
-			assert(m.typeTags().size() == 2);
-			assert(m.typeTags() == "if");
+			REQUIRE(addressPattern == "/Alloaudio/meterdb");
+			REQUIRE(m.typeTags().size() == 2);
+			REQUIRE(m.typeTags() == "if");
 			int index;
 			m >> index;
-			assert(index >=0);
+			REQUIRE(index >=0);
 			float dbvalue;
 			m >> dbvalue;
 			meterValues[index] = 0.0;
@@ -219,11 +214,10 @@ struct OSCHandler : public al::osc::PacketHandler{
 	}
 } handler;
 
-void ut_osc_meters()
-{
+TEST_CASE( "OSC Meters", "[alloaudio]" ) {
 	al::AudioIO io(4, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);
-	assert(io.channelsOut() == 2);
-	assert(io.framesPerSecond() == 44100.0f);
+	REQUIRE(io.channelsOut() == 2);
+	REQUIRE(io.framesPerSecond() == 44100.0f);
 	al::OutputMaster outmaster(io.channelsOut(), io.framesPerSecond(), "localhost", 9001, "localhost", 9002);
 	io.append(outmaster);
 	outmaster.setClipperOn(false);
@@ -250,10 +244,10 @@ void ut_osc_meters()
 	io.processAudio();
 	al_sleep_nsec(1000000); // Wait for messages to arrive
 	r.stop();
-	assert(meterValues[0] == 0.0);
-	assert(meterValues[1] == 0.0);
-	assert(meterValues2[0] == 0.5);
-	assert(meterValues2[1] == 0.75);
+	REQUIRE(meterValues[0] == 0.0);
+	REQUIRE(meterValues[1] == 0.0);
+	REQUIRE(meterValues2[0] == 0.5);
+	REQUIRE(meterValues2[1] == 0.75);
 
 	for (int i = 0; i < 4; i++) {
 		in_0[i] = i/4.0;
@@ -264,27 +258,8 @@ void ut_osc_meters()
 	io.processAudio();
 	al_sleep_nsec(1000000); // Wait for messages to arrive
 	r.stop();
-	assert(meterValues[0] == 0.75);
-	assert(meterValues[1] == 0.5);
-	assert(meterValues2[0] == 0.0);
-	assert(meterValues2[1] == 0.0);
-}
-
-
-#define RUNTEST(Name)\
-	printf("%s ", #Name);\
-	ut_##Name();\
-	for(size_t i=0; i<32-strlen(#Name); ++i) printf(".");\
-	printf(" pass\n")
-
-int main()
-{
-	RUNTEST(class_test);
-	RUNTEST(gains);
-	RUNTEST(meter_values);
-	RUNTEST(clipper);
-	RUNTEST(osc_gain);
-	RUNTEST(osc_meters);
-
-	return 0;
+	REQUIRE(meterValues[0] == 0.75);
+	REQUIRE(meterValues[1] == 0.5);
+	REQUIRE(meterValues2[0] == 0.0);
+	REQUIRE(meterValues2[1] == 0.0);
 }
