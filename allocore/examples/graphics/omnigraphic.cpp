@@ -11,7 +11,7 @@ Graham Wakefield 2011
 #include "allocore/al_Allocore.hpp"
 #include "allocore/graphics/al_Shader.hpp"
 
-std::string omniVS = AL_STRINGIFY(
+std::string omniVS = R"(
 
 	// distort the scene per-vertex:
 	uniform float fovy, aspect, near, far;
@@ -86,9 +86,9 @@ std::string omniVS = AL_STRINGIFY(
 		color = gl_Color;
 
 	}
-);
+)";
 
-std::string omniFS = AL_STRINGIFY(
+std::string omniFS = R"(
 	// just a typical fragment shader:
 
 	varying vec4 color;
@@ -96,7 +96,7 @@ std::string omniFS = AL_STRINGIFY(
 	void main(void) {
 		gl_FragColor = color;
 	}
-);
+)";
 
 
 using namespace al;

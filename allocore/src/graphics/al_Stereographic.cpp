@@ -3,6 +3,13 @@
 
 namespace al{
 
+Stereographic::Stereographic()
+:	mMode(ANAGLYPH), mAnaglyphMode(RED_CYAN), mClearColor(Color(0)),
+	mSlices(24), mOmniFov(360),
+	mEyeNumber(0),
+	mStereo(false), mOmni(false)
+{}
+
 /// Convert a normalized screen space position to world space
  // each component of input vector should be normalized from -1. to 1.
 // template<class T>
@@ -238,12 +245,12 @@ void Stereographic :: drawAnaglyph(Graphics& gl, const Lens& lens, const Pose& p
 
 	drawEye(RIGHT_EYE, gl, lens, pose, vp, draw, /*clear*/false, pixelaspect);
 
-	// Only clear depth buffer for second eye pass
-	if(clear){
-		gl.viewport(vp.l, vp.b, vp.w, vp.h);
-		gl.depthMask(true);
-		gl.clear(gl.DEPTH_BUFFER_BIT);
-	}
+	// Clear only depth buffer for second eye pass
+	// Note: This must be cleared regardless of the 'clear' argument since we
+	// only have one depth buffer and eye must have its own depth buffer.
+	gl.viewport(vp.l, vp.b, vp.w, vp.h);
+	gl.depthMask(true);
+	gl.clear(gl.DEPTH_BUFFER_BIT);
 
 	switch(mAnaglyphMode){
 		case RED_BLUE:	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE, GL_TRUE); break;

@@ -8,12 +8,11 @@ Author(s):
 Lance Putnam, Sept. 2011
 */
 
-#include "allocore/al_Allocore.hpp"
-#include "allocore/graphics/al_Shader.hpp"
+#include "allocore/io/al_App.hpp"
 using namespace al;
 
 // Fog vertex shader
-static const char * fogVert = AL_STRINGIFY(
+static const char * fogVert = R"(
 	/* 'fogCurve' determines the distribution of fog between the near and far planes.
 	Positive values give more dense fog while negative values give less dense
 	fog. A value of	zero results in a linear distribution. */
@@ -23,7 +22,7 @@ static const char * fogVert = AL_STRINGIFY(
 	varying float fogFactor;
 
 	void main(){
-		gl_Position = ftransform();
+		gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 		gl_FrontColor = gl_Color;
 
 		float z = gl_Position.z;
@@ -34,22 +33,21 @@ static const char * fogVert = AL_STRINGIFY(
 			fogFactor = (1. - exp(-fogCurve*fogFactor))/(1. - exp(-fogCurve));
 		}
 	}
-);
+)";
 
 // Fog fragment shader
-static const char * fogFrag = AL_STRINGIFY(
+static const char * fogFrag = R"(
 	varying float fogFactor;
 
 	void main(){
 		gl_FragColor = mix(gl_Color, gl_Fog.color, fogFactor);
 	}
-);
+)";
 
 class MyApp : public App {
 public:
 
-	Shader shaderV, shaderF;
-	ShaderProgram shaderP;
+	ShaderProgram shader;
 	Mesh geom;
 	float phase;
 
@@ -81,16 +79,8 @@ public:
 	}
 
 	void onCreate(const ViewpointWindow& win){
-		shaderV.source(fogVert, Shader::VERTEX);
-		shaderF.source(fogFrag, Shader::FRAGMENT);
-		shaderP.attach(shaderF).attach(shaderV);
-		shaderP.link();
-
-		shaderV.printLog();
-		shaderF.printLog();
-		shaderP.printLog();
+		shader.compile(fogVert, fogFrag);
 	}
-
 
 	void onAnimate(double dt){
 		phase += 0.00017; if(phase>=1) --phase;
@@ -103,10 +93,10 @@ public:
 		g.fog(lens().far(), lens().near()+2, background());
 
 		// Render
-		shaderP.begin();
-			shaderP.uniform("fogCurve", 4*cos(8*phase*6.2832));
+		shader.begin();
+			shader.uniform("fogCurve", 4*cos(8*phase*6.2832));
 			g.draw(geom);
-		shaderP.end();
+		shader.end();
 	}
 };
 

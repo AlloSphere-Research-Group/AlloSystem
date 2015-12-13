@@ -53,10 +53,10 @@ namespace al {
 class GLVControl {
 public:
 	///
-	GLVControl(glv::GLV& v): mGLV(&v){}
+	GLVControl(glv::GLV& v);
 
 	/// Set GLV controller
-	GLVControl& glv(glv::GLV& v){ mGLV=&v; return *this; }
+	GLVControl& glv(glv::GLV& v);
 
 	/// Get mutable GLV controller
 	glv::GLV& glv(){ return *mGLV; }
@@ -71,7 +71,7 @@ protected:
 class GLVInputControl : public GLVControl, public InputEventHandler {
 public:
 	///
-	GLVInputControl(glv::GLV& v): GLVControl(v){}
+	GLVInputControl(glv::GLV& v);
 	virtual ~GLVInputControl(){}
 
 	virtual bool onMouseDown(const Mouse& m);
@@ -104,7 +104,7 @@ protected:
 class GLVWindowControl : public GLVControl, public WindowEventHandler {
 public:
 	///
-	GLVWindowControl(glv::GLV& v): GLVControl(v){}
+	GLVWindowControl(glv::GLV& v);
 	virtual ~GLVWindowControl(){}
 
 	virtual bool onCreate();
@@ -186,12 +186,13 @@ private:
 
 /// Pose GLV model
 struct PoseModel : public glv::Model{
-	PoseModel(Pose& p): pose(p){}
+
+	///
+	PoseModel(Pose& p);
 
 	virtual ~PoseModel(){}
 
 	virtual const glv::Data& getData(glv::Data& d) const;
-
 	virtual void setData(const glv::Data& d);
 
 	Pose& pose;

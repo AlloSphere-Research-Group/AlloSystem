@@ -120,8 +120,8 @@ public:
 	Vec(const T& v1, const T& v2, const T& v3, const T& v4){ set(v1, v2, v3, v4); }
 
 	/// @param[in] v		vector to initialize all elements to
-	template <class T2>
-	Vec(const Vec<N, T2>& v){ set(v); }
+	template <int N2, class T2>
+	Vec(const Vec<N2, T2>& v){ set(v); }
 
 	/// @param[in] v		vector to initialize all elements to
 	/// @param[in] s		value of last element
@@ -336,7 +336,8 @@ public:
 	Vec byz(T shift) const { return by<2>(shift); }
 
 	/// Returns dot (inner) product between vectors
-	T dot(const Vec& v) const {
+	template <class U>
+	T dot(const Vec<N,U>& v) const {
 		T r = (*this)[0] * v[0];
 		for(int i=1; i<N; ++i){ r += (*this)[i] * v[i]; }
 		return r;
@@ -386,11 +387,13 @@ public:
 		return r;
 	}
 
-	/// linear interpolation
-	void lerp(const Vec& target, T amt) { set(lerp(*this, target, amt)); }
-	static Vec lerp(const Vec& input, const Vec& target, T amt) {
-		return input+amt*(target-input);
+	/// Linearly interpolate towards some target
+	Vec& lerp(const Vec& target, T amt){
+		return (*this) += (target-(*this))*amt;
 	}
+
+	/// Set magnitude (preserving direction)
+	Vec& mag(T v);
 
 	/// Negates all elements
 	Vec& negate(){
@@ -409,9 +412,24 @@ public:
 	Vec normalized(T scale=T(1)) const {
 		return Vec(*this).normalize(scale); }
 
-	/// Returns relection of vector around line
-	Vec reflect(const Vec& normal) const {
-		return (*this) - (T(2) * dot(normal) * normal);
+	/// Relect vector around normal
+	Vec& reflect(const Vec& normal){
+		return (*this) -= (T(2) * dot(normal) * normal);
+	}
+
+	/// Rotate vector on a global plane
+
+	/// @param[in] angle	angle of right-handed rotation, in radians
+	/// @param[in] dim1		dimension to rotate from
+	/// @param[in] dim2		dimension to rotate towards
+	Vec& rotate(double angle, int dim1=0, int dim2=1){
+		double a = cos(angle);
+		double b = sin(angle);
+		T t = (*this)[dim1];
+		T u = (*this)[dim2];
+		(*this)[dim1] = t*a - u*b;
+		(*this)[dim2] = t*b + u*a;
+		return *this;
 	}
 
 
@@ -509,10 +527,9 @@ void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double cosAng, double sinAng)
 /// @param[in]		normal		A normal perpendicular to the plane of rotation
 /// @param[in]		angle		The rotation angle, in radians
 template <class T>
-void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double ang){
-	rotate(vec, normal, cos(ang), sin(ang));
+void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double angle){
+	rotate(vec, normal, cos(angle), sin(angle));
 }
-
 
 
 /// Returns angle, in interval [0, pi], between two vectors
@@ -540,6 +557,11 @@ inline void centroid3(Vec<N,T>& c, const Vec<N,T>& p1, const Vec<N,T>& p2, const
 template <int N, class T, class U>
 inline T dist(const Vec<N,T>& a, const Vec<N,U>& b){
 	return (a-b).mag();
+}
+
+template <int N, class T>
+inline Vec<N,T> lerp(const Vec<N,T>& input, const Vec<N,T>& target, T amt){
+	return Vec<N,T>(input).lerp(target, amt);
 }
 
 /*! Get the normal to a triangle defined by three points
@@ -575,16 +597,21 @@ inline Vec<N,T> max(const Vec<N,T>& a, const Vec<N,T>& b){
 // Implementation --------------------------------------------------------------
 
 template <int N, class T>
-Vec<N,T>& Vec<N,T>::normalize(T scale){
+Vec<N,T>& Vec<N,T>::mag(T v){
 	T m = mag();
 	if(m > T(1e-20)){
-		(*this) *= (scale/m);
+		(*this) *= (v/m);
 	}
 	else{
 		set(T(0));
-		(*this)[0] = scale;
+		(*this)[0] = v;
 	}
 	return *this;
+}
+
+template <int N, class T>
+Vec<N,T>& Vec<N,T>::normalize(T scale){
+	return mag(scale);
 }
 
 

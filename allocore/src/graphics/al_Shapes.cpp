@@ -13,6 +13,35 @@ namespace al{
 const double phi = (1 + sqrt(5))/2; // the golden ratio
 
 
+// Complex sinusoid used for fast circle generation
+struct CSin{
+	CSin(double freq, double amp=1.)
+	:	r(amp), i(0.), dr(cos(freq)), di(sin(freq)){}
+	void operator()(){
+		double r_ = r*dr - i*di;
+		i = r*di + i*dr;
+		r = r_;
+	}
+	void ampPhase(double amp, double phs){
+		r = amp*cos(phs);
+		i = amp*sin(phs);
+	}
+	double r,i,dr,di;
+};
+
+
+// Scale last N vertices
+static void scaleVerts(Mesh& m, float radius, int N){
+	if(radius != 1.f){
+		int Ne = m.vertices().size();
+		int Nb = Ne - N;
+		for(int i=Nb; i<Ne; ++i){
+			m.vertices()[i] *= radius;
+		}
+	}
+}
+
+
 int addCube(Mesh& m, bool withNormalsAndTexcoords, float l){
 
 	m.primitive(Graphics::TRIANGLES);
@@ -109,7 +138,7 @@ int addCube(Mesh& m, bool withNormalsAndTexcoords, float l){
 }
 
 
-int addTetrahedron(Mesh& m){
+int addTetrahedron(Mesh& m, float radius){
 
 	m.primitive(Graphics::TRIANGLES);
 
@@ -128,11 +157,13 @@ int addTetrahedron(Mesh& m){
 	m.vertex(vertices, Nv);
 	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
 
+	scaleVerts(m, radius, Nv);
+
 	return Nv;
 }
 
 
-int addOctahedron(Mesh& m){
+int addOctahedron(Mesh& m, float radius){
 
 	m.primitive(Graphics::TRIANGLES);
 
@@ -151,64 +182,25 @@ int addOctahedron(Mesh& m){
 	m.vertex(vertices, Nv);
 	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
 
+	scaleVerts(m, radius, Nv);
+
 	return Nv;
 }
 
 
-int addDodecahedron(Mesh& m){
+int addDodecahedron(Mesh& m, float radius){
 
 	m.primitive(Graphics::TRIANGLES);
 
-//	float b = 1. / phi;
-//	float c = 2. - phi;
-//	float vertices[] = {
-//		 c,  0,  1,   -c,  0,  1,   -b,  b,  b,    0,  1,  c,    b,  b,  b,
-//		-c,  0,  1,    c,  0,  1,    b, -b,  b,    0, -1,  c,   -b, -b,  b,
-//		 c,  0, -1,   -c,  0, -1,   -b, -b, -b,    0, -1, -c,    b, -b, -b,
-//		-c,  0, -1,    c,  0, -1,    b,  b, -b,    0,  1, -c,   -b,  b, -b,
-//		 0,  1, -c,    0,  1,  c,    b,  b,  b,    1,  c,  0,    b,  b, -b,
-//		 0,  1,  c,    0,  1, -c,   -b,  b, -b,   -1,  c,  0,   -b,  b,  b,
-//		 0, -1, -c,    0, -1,  c,   -b, -b,  b,   -1, -c,  0,   -b, -b, -b,
-//		 0, -1,  c,    0, -1, -c,    b, -b, -b,    1, -c,  0,    b, -b,  b,
-//		 1,  c,  0,    1, -c,  0,    b, -b,  b,    c,  0,  1,    b,  b,  b,
-//		 1, -c,  0,    1,  c,  0,    b,  b, -b,    c,  0, -1,    b, -b, -b,
-//		-1,  c,  0,   -1, -c,  0,   -b, -b, -b,   -c,  0, -1,   -b,  b, -b,
-//		-1, -c,  0,   -1,  c,  0,   -b,  b,  b,   -c,  0,  1,   -b, -b,  b
-//	};
-//
-//	for(int i=0; i<Nv; i+=5){
-//		Vec3f v1(vertices[3*i+ 0], vertices[3*i+ 1], vertices[3*i+ 2]);
-//		Vec3f v2(vertices[3*i+ 3], vertices[3*i+ 4], vertices[3*i+ 5]);
-//		Vec3f v3(vertices[3*i+ 6], vertices[3*i+ 7], vertices[3*i+ 8]);
-//		Vec3f v4(vertices[3*i+ 9], vertices[3*i+10], vertices[3*i+11]);
-//		Vec3f v5(vertices[3*i+12], vertices[3*i+13], vertices[3*i+14]);
-//
-//		Vec3f vc = (v1+v2+v3+v4+v5)/5;
-//
-//		plato5.vertex(v1);
-//	}
+	static const float b = sqrt(1./3);
+	static const float a = (phi-1)*b;
+	static const float c = sqrt(1-a*a);
 
 	static const float vertices[] = {
-		-0.57735, -0.57735, 0.57735,
-		0.934172,  0.356822, 0,
-		0.934172, -0.356822, 0,
-		-0.934172, 0.356822, 0,
-		-0.934172, -0.356822, 0,
-		0,  0.934172,  0.356822,
-		0,  0.934172,  -0.356822,
-		0.356822,  0,  -0.934172,
-		-0.356822,  0,  -0.934172,
-		0,  -0.934172,  -0.356822,
-		0,  -0.934172,  0.356822,
-		0.356822,  0,  0.934172,
-		-0.356822,  0,  0.934172,
-		0.57735,  0.57735,  -0.57735,
-		0.57735,  0.57735, 0.57735,
-		-0.57735,  0.57735,  -0.57735,
-		-0.57735,  0.57735,  0.57735,
-		0.57735,  -0.57735,  -0.57735,
-		0.57735,  -0.57735,  0.57735,
-		-0.57735,  -0.57735,  -0.57735
+		-b,-b, b,	 c, a, 0,	 c,-a, 0,	-c, a, 0,	-c,-a, 0,
+		 0, c, a,	 0, c,-a,	 a, 0,-c,	-a, 0,-c,	 0,-c,-a,
+		 0,-c, a,	 a, 0, c,	-a, 0, c,	 b, b,-b,	 b, b, b,
+		-b, b,-b,	-b, b, b,	 b,-b,-b,	 b,-b, b,	-b,-b,-b
 	};
 
 	static const int indices[] = {
@@ -231,11 +223,13 @@ int addDodecahedron(Mesh& m){
 	m.vertex(vertices, Nv);
 	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
 
+	scaleVerts(m, radius, Nv);
+
 	return Nv;
 }
 
 
-int addIcosahedron(Mesh& m){
+int addIcosahedron(Mesh& m, float radius){
 
 	m.primitive(Graphics::TRIANGLES);
 
@@ -263,6 +257,8 @@ int addIcosahedron(Mesh& m){
 	m.vertex(vertices, Nv);
 	m.index(indices, sizeof(indices)/sizeof(*indices), m.vertices().size()-Nv);
 
+	scaleVerts(m, radius, Nv);
+
 	return Nv;
 }
 
@@ -273,17 +269,6 @@ int addIcosahedron(Mesh& m){
 int addSphere(Mesh& m, double radius, int slices, int stacks){
 
 	m.primitive(Graphics::TRIANGLES);
-
-	struct CSin{
-		CSin(double frq, double radius=1.)
-		:	r(radius), i(0.), dr(cos(frq)), di(sin(frq)){}
-		void operator()(){
-			double r_ = r*dr - i*di;
-			i = r*di + i*dr;
-			r = r_;
-		}
-		double r,i,dr,di;
-	};
 
 	int Nv = m.vertices().size();
 
@@ -384,7 +369,6 @@ int addSphereWithTexcoords(Mesh& m, double radius, int bands ){
 }
 
 
-
 int addWireBox(Mesh& m, float w, float h, float d){
 
 	m.primitive(Graphics::LINES);
@@ -411,6 +395,85 @@ int addWireBox(Mesh& m, float w, float h, float d){
 	m.index(I, sizeof(I)/sizeof(*I), Nv);
 
 	return m.vertices().size() - Nv;
+}
+
+
+int addCone(Mesh& m, float radius, const Vec3f& apex, unsigned slices, unsigned cycles){
+
+	m.primitive(Graphics::TRIANGLES);
+
+	unsigned Nv = m.vertices().size();
+
+	// Note: leaving base on xy plane makes it easy to construct a bicone
+	m.vertex(apex);
+
+	CSin csin(cycles * 2*M_PI/slices, radius);
+	for(unsigned i=Nv+1; i<=(Nv+slices); ++i){
+		float x = csin.r;
+		float y = csin.i;
+		csin();
+		m.vertex(x,y);
+		m.index(Nv);
+		m.index(i);
+		m.index(i+1);
+	}
+
+	m.indices().last() = Nv+1;
+
+	return 1 + slices;
+}
+
+
+int addDisc(Mesh& m, float radius, unsigned slices){
+	return addCone(m, radius, Vec3f(0,0,0), slices);
+}
+
+
+int addPrism(Mesh& m, float btmRadius, float topRadius, float height, unsigned slices, float twist){
+
+	m.primitive(Graphics::TRIANGLE_STRIP);
+	unsigned Nv = m.vertices().size();
+	float height_2 = height/2;
+
+	if(twist == 0){
+		CSin csin(2*M_PI/slices);
+		for(unsigned i=0; i<slices; ++i){
+			m.vertex(csin.r*btmRadius, csin.i*btmRadius,  height_2);
+			m.vertex(csin.r*topRadius, csin.i*topRadius, -height_2);
+			csin();
+			m.index(Nv + 2*i);
+			m.index(Nv + 2*i+1);
+		}
+	}
+	else{
+		double frq = 2*M_PI/slices;
+		CSin csinb(frq, btmRadius);
+		CSin csint = csinb;
+		csint.ampPhase(topRadius, twist*frq);
+		for(unsigned i=0; i<slices; ++i){
+			m.vertex(csinb.r, csinb.i,  height_2);
+			csinb();
+			m.vertex(csint.r, csint.i, -height_2);
+			csint();
+			m.index(Nv + 2*i);
+			m.index(Nv + 2*i+1);
+		}
+	}
+
+	m.index(Nv);
+	m.index(Nv+1);
+
+	return 2*slices;
+}
+
+
+int addAnnulus(Mesh& m, float inRadius, float outRadius, unsigned slices, float twist){
+	return addPrism(m, inRadius, outRadius, 0, slices, twist);
+}
+
+
+int addCylinder(Mesh& m, float radius, float height, unsigned slices, float twist){
+	return addPrism(m, radius, radius, height, slices, twist);
 }
 
 
@@ -465,8 +528,8 @@ int addSurfaceLoop(
 	// Number of cells along y
 	int My = loopMode==1 ? Ny - 1 : Ny;
 
-	double du = width/(Nx-1);
-	double dv = height/(My-1);
+	double du = width/Nx;
+	double dv = height/My;
 
 	// Generate positions
 	double v = y - height*0.5;
@@ -500,28 +563,25 @@ int addSurfaceLoop(
 }
 
 
-void addCylinder(Mesh& m, double r1, double r2, double height, int vertCount){
+int addTorus(
+	Mesh& m, double minRadius, double majRadius, int Nmin, int Nmaj,
+	double minPhase
+){
+	int beg = m.vertices().size();
+	int Nv = addSurfaceLoop(
+		m, Nmaj, Nmin, 2, 2*M_PI, 2*M_PI, M_PI, M_PI - minPhase*2*M_PI/Nmin
+	);
 
-  m.primitive(Graphics::TRIANGLE_STRIP);
-    
-  int indxCount = vertCount+2;
-  double theta = 0.0;
+	for(int i=beg; i<beg+Nv; ++i){
+		Mesh::Vertex& v = m.vertices()[i];
+		v = Mesh::Vertex(
+			(majRadius + minRadius*::cos(v.y)) * ::cos(v.x),
+			(majRadius + minRadius*::cos(v.y)) * ::sin(v.x),
+			minRadius*::sin(v.y)
+		);
+	}
 
-  for (int j=0; j < vertCount; j++){
-    double r = ((j % 2 == 0) ? r1 : r2);
-    double x = cos(theta);
-    double y = sin(theta);
-    float u = ((j % 2 == 0) ? 1.0 : 0.0);
-    float v = j*1.0 / vertCount;
-
-    m.normal(x,y,(r1-r2)/2.0);
-    // m.texCoord(u,v);
-    m.vertex(r*x,r*y,((j % 2 == 0) ? 0.0 : height));
-
-    theta += 2 * M_PI / (vertCount);
-  }
-
-  for(int i=0; i < indxCount; i++) m.index(i % vertCount);
+	return Nv;
 }
 
 }

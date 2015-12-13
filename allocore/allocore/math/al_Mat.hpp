@@ -285,13 +285,15 @@ public:
 	}
 
 	/// Computes product of matrix multiplied by column vector, r = m * vCol
-	static Vec<N,T>& multiply(Vec<N,T>& r, const Mat& m, const Vec<N,T>& vCol){
+	template <class U>
+	static Vec<N,U>& multiply(Vec<N,U>& r, const Mat& m, const Vec<N,U>& vCol){
 		IT(N){ r[i] = m.row(i).dot(vCol); }
 		return r;
 	}
 
 	/// Computes product of row vector multiplied by matrix, r = vRow * m
-	static Vec<N,T>& multiply(Vec<N,T>& r, const Vec<N,T>& vRow, const Mat& m){
+	template <class U>
+	static Vec<N,U>& multiply(Vec<N,U>& r, const Vec<N,U>& vRow, const Mat& m){
 		IT(N){ r[i] = vRow.dot(m.col(i)); }
 		return r;
 	}
@@ -514,14 +516,14 @@ inline Mat<N,T> operator * (const T& s, const Mat<N,T>& v){ return  v*s; }
 
 
 // Basic Vec/Mat Arithmetic
-template <int N, class T>
-inline Vec<N,T> operator* (const Mat<N,T>& m, const Vec<N,T>& vCol){
-	Vec<N,T> r; return Mat<N,T>::multiply(r, m,vCol);
+template <int N, class T, class U>
+inline Vec<N,U> operator* (const Mat<N,T>& m, const Vec<N,U>& vCol){
+	Vec<N,U> r; return Mat<N,T>::multiply(r, m,vCol);
 }
 
-template <int N, class T>
-inline Vec<N,T> operator* (const Vec<N,T>& vRow, const Mat<N,T>& m){
-	Vec<N,T> r; return Mat<N,T>::multiply(r, vRow,m);
+template <int N, class T, class U>
+inline Vec<N,U> operator* (const Vec<N,U>& vRow, const Mat<N,T>& m){
+	Vec<N,U> r; return Mat<N,T>::multiply(r, vRow,m);
 }
 
 
@@ -578,7 +580,7 @@ template <class T>
 bool invert(Mat<2,T>& m){
 	T det = determinant(m);
 	if(det != 0){
-		m.set(
+		m = Mat<2,T>(
 			 m(1,1),-m(0,1),
 			-m(1,0), m(0,0)
 		) /= det;

@@ -18,6 +18,13 @@
 
 namespace al {
 
+class OmniApp;
+
+struct OmniControls : InputEventHandler {
+  OmniApp* oa;
+  bool onKeyDown(const Keyboard& k);
+};
+
 class OmniApp : public Window,
                 public osc::PacketHandler,
                 public FPS,
@@ -102,6 +109,7 @@ class OmniApp : public Window,
   Pose pose;
   NavInputControl mNavControl;
   StandardWindowKeyControls mStdControls;
+  OmniControls mOmniControls;
   osc::Recv mOSCRecv;
   osc::Send mOSCSend;
 
@@ -146,6 +154,9 @@ inline OmniApp::OmniApp(std::string name, bool slave)
     oscRecv().handler(*this);
     sendHandshake();
   }
+
+  mOmniControls.oa = this;
+  Window::append(mOmniControls);
 }
 
 inline OmniApp::~OmniApp() {
@@ -302,7 +313,7 @@ inline void OmniApp::onMessage(osc::Message& m) {
 }
 
 inline std::string OmniApp::vertexCode() {
-  return AL_STRINGIFY(varying vec4 color; varying vec3 normal, lightDir, eyeVec;
+  return R"(varying vec4 color; varying vec3 normal, lightDir, eyeVec;
                       void main() {
     color = gl_Color;
     vec4 vertex = gl_ModelViewMatrix * gl_Vertex;
@@ -312,11 +323,11 @@ inline std::string OmniApp::vertexCode() {
     lightDir = normalize(vec3(gl_LightSource[0].position.xyz - V));
     gl_TexCoord[0] = gl_MultiTexCoord0;
     gl_Position = omni_render(vertex);
-  });
+  })";
 }
 
 inline std::string OmniApp::fragmentCode() {
-  return AL_STRINGIFY(uniform float lighting; uniform float texture;
+  return R"(uniform float lighting; uniform float texture;
                       uniform sampler2D texture0; varying vec4 color;
                       varying vec3 normal, lightDir, eyeVec; void main() {
 
@@ -338,7 +349,7 @@ inline std::string OmniApp::fragmentCode() {
     float spec = pow(max(dot(R, E), 0.0), 0.9 + 1e-20);
     final_color += gl_LightSource[0].specular * spec;
     gl_FragColor = mix(colorMixed, final_color, lighting);
-  });
+  })";
 }
 
 inline void OmniApp::AppAudioCB(AudioIOData& io) {
@@ -346,6 +357,14 @@ inline void OmniApp::AppAudioCB(AudioIOData& io) {
   io.frame(0);
   app.onSound(io);
 }
+
+inline bool OmniControls::onKeyDown(const Keyboard& k){
+  if(k.key() == 'o'){
+    oa->omniEnable(!(oa->omniEnable()));
+  }
+  return true;
+}
+
 }
 
 #endif

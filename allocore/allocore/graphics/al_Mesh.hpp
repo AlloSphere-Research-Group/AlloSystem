@@ -46,7 +46,7 @@
 
 #include <stdio.h>
 #include "allocore/math/al_Vec.hpp"
-#include "allocore/math/al_Matrix4.hpp"
+#include "allocore/math/al_Mat.hpp"
 #include "allocore/types/al_Buffer.hpp"
 #include "allocore/types/al_Color.hpp"
 
@@ -62,6 +62,7 @@ public:
 	typedef Vec3f			Vertex;
 	typedef Vec3f			Normal;
 	//typedef Vec4f			Color;
+	typedef float			TexCoord1;
 	typedef Vec2f			TexCoord2;
 	typedef Vec3f			TexCoord3;
 	typedef unsigned int	Index;
@@ -72,24 +73,16 @@ public:
 	typedef Buffer<Normal>		Normals;
 	typedef Buffer<Color>		Colors;
 	typedef Buffer<Colori>		Coloris;
+	typedef Buffer<TexCoord1>	TexCoord1s;
 	typedef Buffer<TexCoord2>	TexCoord2s;
 	typedef Buffer<TexCoord3>	TexCoord3s;
 	typedef Buffer<Index>		Indices;
 
 
 	/// @param[in] primitive	renderer-dependent primitive number
-	Mesh(int primitive=0): mPrimitive(primitive){}
+	Mesh(int primitive=0);
 
-	Mesh(const Mesh& cpy) :
-		mVertices(cpy.mVertices),
-		mNormals(cpy.mNormals),
-		mColors(cpy.mColors),
-		mColoris(cpy.mColoris),
-		mTexCoord2s(cpy.mTexCoord2s),
-		mTexCoord3s(cpy.mTexCoord3s),
-		mIndices(cpy.mIndices),
-		mPrimitive(cpy.mPrimitive)
-		{}
+	Mesh(const Mesh& cpy);
 
 
 	/// Get corners of bounding box of vertices
@@ -104,6 +97,9 @@ public:
 
 	// destructive edits to internal vertices:
 
+	/// Generates indices for a set of vertices
+	void compress();
+
 	/// Convert indices (if any) to flat vertex buffers
 	void decompress();
 
@@ -115,6 +111,10 @@ public:
 
 	/// Append buffers from another mesh:
 	void merge(const Mesh& src);
+
+	/// Convert triangle strip to triangles
+	void toTriangles();
+
 
 	/// Reset all buffers
 	Mesh& reset();
@@ -144,8 +144,6 @@ public:
 	template <class T>
 	Mesh& transform(const Mat<4,T>& m, int begin=0, int end=-1);
 
-	/// Generates indices for a set of vertices
-	void compress();
 
 	/// Generates normals for a set of vertices
 
@@ -199,6 +197,7 @@ public:
 	const Buffer<Normal>& normals() const { return mNormals; }
 	const Buffer<Color>& colors() const { return mColors; }
 	const Buffer<Colori>& coloris() const { return mColoris; }
+	const Buffer<TexCoord1>& texCoord1s() const { return mTexCoord1s; }
 	const Buffer<TexCoord2>& texCoord2s() const { return mTexCoord2s; }
 	const Buffer<TexCoord3>& texCoord3s() const { return mTexCoord3s; }
 	const Buffer<Index>& indices() const { return mIndices; }
@@ -253,17 +252,22 @@ public:
 	void normal(const Vec<2,T>& v, float z=0){ normal(v[0], v[1], z); }
 
 
-	/// Append texture coordinate to 2D texture coordinate buffer
-	void texCoord(float u, float v){ texCoord(TexCoord2(u,v)); }
+	/// Append texture coordinate to 1D texture coordinate buffer
+	void texCoord(float u){ texCoord1s().append(TexCoord1(u)); }
 
 	/// Append texture coordinate to 2D texture coordinate buffer
-	void texCoord(const TexCoord2& v){ texCoord2s().append(v); }
+	void texCoord(float u, float v){ texCoord2s().append(TexCoord2(u,v)); }
+
+	/// Append texture coordinate to 2D texture coordinate buffer
+	template <class T>
+	void texCoord(const Vec<2,T>& v){ texCoord(v[0], v[1]); }
 
 	/// Append texture coordinate to 3D texture coordinate buffer
-	void texCoord(float u, float v, float w){ texCoord(TexCoord3(u,v,w)); }
+	void texCoord(float u, float v, float w){ texCoord3s().append(TexCoord3(u,v,w)); }
 
 	/// Append texture coordinate to 3D texture coordinate buffer
-	void texCoord(const TexCoord3& v){ texCoord3s().append(v); }
+	template <class T>
+	void texCoord(const Vec<3,T>& v){ texCoord(v[0], v[1], v[2]); }
 
 
 	/// Append vertex to vertex buffer
@@ -289,17 +293,11 @@ public:
 	}
 
 
-//	/// Get number of faces (assumes triangles or quads)
-//	int numFaces() const { return mIndices.size() / ( ( mPrimitive == Graphics::TRIANGLES ) ? 3 : 4 ); }
-//	/// Get indices as triangles
-//	TriFace& indexAsTri(){ return (TriFace*) indices(); }
-//	/// Get indices as quads
-//	QuadFace& indexAsQuad(){ return (QuadFace*) indices(); }
-
 	Vertices& vertices(){ return mVertices; }
 	Normals& normals(){ return mNormals; }
 	Colors& colors(){ return mColors; }
 	Coloris& coloris(){ return mColoris; }
+	TexCoord1s& texCoord1s(){ return mTexCoord1s; }
 	TexCoord2s& texCoord2s(){ return mTexCoord2s; }
 	TexCoord3s& texCoord3s(){ return mTexCoord3s; }
 	Indices& indices(){ return mIndices; }
@@ -328,6 +326,7 @@ protected:
 	Normals mNormals;
 	Colors mColors;
 	Coloris mColoris;
+	TexCoord1s mTexCoord1s;
 	TexCoord2s mTexCoord2s;
 	TexCoord3s mTexCoord3s;
 	Indices mIndices;

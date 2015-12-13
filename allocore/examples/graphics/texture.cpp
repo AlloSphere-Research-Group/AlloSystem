@@ -54,7 +54,7 @@ public:
 		initWindow();
 	}
 
-	void onDraw(Graphics& g, const Viewpoint& vp){
+	void onDraw(Graphics& g){
 
 		// Borrow a temporary Mesh from Graphics
 		Mesh& m = g.mesh();

@@ -71,6 +71,8 @@ allocore_port_callback(){
 
 
 allocore_pacman="\
+                base-devel \
+                mingw-w64-${arch}-toolchain \
                 mingw-w64-${arch}-cmake \
                 mingw-w64-${arch}-apr \
                 mingw-w64-${arch}-apr-util \

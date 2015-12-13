@@ -36,6 +36,13 @@ void Pose::faceToward(const Vec3d& point, double amt){
 	//*/
 }
 
+void Pose::faceToward(const Vec3d& point, const Vec3d& up, double amt){
+	Vec3d target(point - pos());
+	target.normalize();
+  Quatd rot = Quatd::getBillboardRotation(-target, up);
+  quat().slerpTo(rot,amt);
+}
+
 Mat4d Pose::matrix() const {
 	Mat4d m;
 	quat().toMatrix(&m[0]);
@@ -130,6 +137,11 @@ void Nav::faceToward(const Vec3d& point, double amt){
 	updateDirectionVectors();
 }
 
+void Nav::faceToward(const Vec3d& point, const Vec3d& up, double amt){
+	Pose::faceToward(point, up, amt);
+	updateDirectionVectors();
+}
+
 void Nav::nudgeToward(const Vec3d& p, double amt){
 	Vec3d rotEuler;
 	Vec3d target(p - pos());
@@ -213,6 +225,13 @@ void Nav::step(double dt){
 	// Move according to smoothed position differential (mMove1)
 	for(int i=0; i<pos().size(); ++i){
 		pos()[i] += mMove1.dot(Vec3d(ur()[i], uu()[i], uf()[i]));
+	}
+
+	mPullBack1 = mPullBack1 + (mPullBack0-mPullBack1)*amt;
+
+	mTransformed = *this;
+	if(mPullBack1 > 1e-16){
+		mTransformed.pos() -= uf() * mPullBack1;
 	}
 }
 

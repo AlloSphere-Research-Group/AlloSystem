@@ -1,32 +1,51 @@
+#include <math.h>
+#include "allocore/io/al_File.hpp"
 #include "alloGLV/al_ProtoApp.hpp"
 
 namespace al{
 
+struct GUIKeyDownHandler : public glv::EventHandler{
+	bool onEvent(glv::View& v, glv::GLV& g){
+		switch(g.keyboard().key()){
+			case 'g': g.toggle(glv::Visible); return false;
+		}
+		return true;
+	}
+};
+static GUIKeyDownHandler mGUIKeyDownHandler;
+
+
 ProtoApp::ProtoApp()
-:	cnFOV(3,2,360,0), cnScale(2,4, 20,-20),
+:	cnNear(1,3,8,0.01), cnFar(3,2,999,1), cnFOV(3,2,360,0), cnScale(2,4, 20,-20),
 	cnGain(1,4,4,0)
 {
 	mTopBar.arrangement("<>");
+	mTopBar.paddingX(8);
 	//mTopBar.stretch(1,0);
 	//mTopBar.enable(glv::DrawBorder);
 	mTopBar << mAppLabel << mGUI.detachedButton();
+	mGUI.detachedButton().disable(glv::DrawBack);
 
+	cnNear.setValue(0.1);
+	cnFar.setValue(20);
 	cnFOV.setValue(60);
 	cnScale.setValue(1);
 	cnGain.setValue(0.5);
 
 	mParamPanel
-		.addParam(cnFOV, "FOV")
+		.addParamGroup(cnNear, "near", cnFar, "far", cnFOV, "FOV", "lens")
 		.addParam(cnScale, "scale")
 		.addParam(cnGain, "gain")
 	;
+
+	mGUI.addHandler(glv::Event::KeyDown, mGUIKeyDownHandler);
 
 	mGUITable.colors().set(glv::StyleColor::SmokyGray);
 	//mGUITable.enable(glv::DrawBack);
 	mGUITable.enable(glv::DrawBack | glv::Controllable);
 	mGUITable.addHandler(glv::Event::MouseDrag, glv::Behavior::mouseMove);
 	mGUITable.arrangement(">");
-	mGUITable << mTopBar << mParamPanel;
+	mGUITable << mTopBar << new glv::Divider(1) << mParamPanel;
 
 	mGUI.cloneStyle().colors().back.set(0,0,0,1);
 	mGUI.detachedButton().padding(4);
@@ -51,7 +70,7 @@ static bool toIdentifier(std::string& v){
 
 void ProtoApp::init(
 	const Window::Dim& dim,
-	const std::string title,
+	const std::string& title,
 	double fps,
 	Window::DisplayMode mode,
 	double sampleRate,
@@ -63,10 +82,9 @@ void ProtoApp::init(
 	initAudio(sampleRate, blockSize, chansOut, chansIn);
 
 	// setup audio
-	//if(usingAudio()){
-	//	gam::Sync::master().spu(audioIO().fps());
-	//}
-
+	if(usingAudio()){
+		//gam::Sync::master().spu(audioIO().fps());
+	}
 
 	Window * win = initWindow(dim, title, fps, mode);
 	mGUI.parentWindow(*win);
@@ -79,6 +97,26 @@ void ProtoApp::init(
 	mTopBar.arrange();
 	mParamPanel.arrange();
 	mGUITable.arrange();
+
+	// Set GUI controls from app state by default
+	cnNear.setValue(lens().near());
+	cnFar.setValue(lens().far());
+	cnFOV.setValue(lens().fovy());
+
+	// Add notifications to controls;
+	// must do it here to preserve user-specified app state, lens().far() etc.
+	struct F{
+		static void ntGUIUpdate(const glv::Notification& n){
+			ProtoApp& app = *n.receiver<ProtoApp>();
+			app.lens()
+				.near(app.cnNear.getValue())
+				.far(app.cnFar.getValue())
+				.fovy(app.cnFOV.getValue());
+		}
+	};
+	cnNear.attach(F::ntGUIUpdate, glv::Update::Value, this);
+	cnFar.attach(F::ntGUIUpdate, glv::Update::Value, this);
+	cnFOV.attach(F::ntGUIUpdate, glv::Update::Value, this);
 
 	// setup model manager
 	if(!App::name().empty()){
@@ -120,57 +158,26 @@ ProtoApp& ProtoApp::resourceDir(const std::string& dir, bool searchBack){
 	return *this;
 }
 
+ProtoApp& ProtoApp::addParam(
+	glv::View& v, const std::string& label, bool nameViewFromLabel
+){
+	paramPanel().addParam(v,label,nameViewFromLabel);
+	return *this;
+}
+
+ProtoApp& ProtoApp::addParam(
+	glv::View * v, const std::string& label, bool nameViewFromLabel
+){
+	return addParam(*v,label,nameViewFromLabel);
+}
+
+double ProtoApp::gainFactor() const {
+	float v=cnGain.getValue();
+	return v*v;
+}
+
+double ProtoApp::scaleFactor() const {
+	return ::pow(2., cnScale.getValue());
+}
+
 } // al::
-
-/*
-What should every prototyping app have?
-
-Continuous controls:
-
-graphics:
-	camera FOV
-	global scale
-	navigation position/orientation
-	brightness/contrast
-
-sound:
-	global gain
-
-
-Configuration:
-
-
-TODO:
-High-res screen grabs
-Recording?
-
-*/
-
-/*
-	std::string path = "ljp/";
-	if(!al::File::searchBack(path)){
-		printf("Could not find %s\n", path.c_str());
-		exit(0);
-	}
-	//printf("%s\n", path.c_str());
-
-	topView.refreshModels();
-	topView.modelManager().name("WrapturePresets").fileDir(path);
-	presetControl.modelManager(topView.modelManager());
-	presetControl.loadFile();
-
-	ModelManager pathEditMM;
-	pathEditMM.copyModels(topView.modelManager());
-	pathEditMM.add("pose", *new PoseModel(W.nav()));
-	//pathEditMM.name("WraptureEtDr").fileDir(path);
-	//pathEditMM.name("WraptureTemp").fileDir(path);
-	//pathEditMM.name("Wrapture000").fileDir(path);
-	pathEditMM.name("WraptureDennis").fileDir(path);
-	pathEditMM.snapshotsFromFile();
-	pathEdit.stateModelManager(pathEditMM);
-	pathEdit.pathModelManager().fileDir(path);
-
-	pathEditMM.makeClosed();
-
-*/
-

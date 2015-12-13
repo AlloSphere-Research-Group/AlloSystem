@@ -22,6 +22,7 @@ struct MySQL : App {
 
   double time;
   mysqlpp::StoreQueryResult result;
+  Font* font;
 
   MySQL() {
     time = 0;
@@ -38,6 +39,15 @@ struct MySQL : App {
       exit(1);
     }
 
+    SearchPaths searchPaths;
+    searchPaths.addSearchPath(".");
+    FilePath filePath = searchPaths.find("Inconsolata.otf");
+    if (!filePath.valid()) {
+      cerr << "Font file not found!" << endl;
+      exit(1);
+    }
+    font = new Font(filePath.filepath(), 72);
+
     initWindow();
   }
 
@@ -46,7 +56,6 @@ struct MySQL : App {
   }
 
   virtual void onDraw(Graphics& g, const Viewpoint& v) {
-    static Font font("../../examples/mysql/Inconsolata.otf", 72);
     // make a nice gray background like we're using Processing
     g.clearColor(0.1, 0.1, 0.1, 1);
 
@@ -63,7 +72,7 @@ struct MySQL : App {
         g.rotate((float)row / result.num_rows() * 360 + time, 1, 0, 0);
         g.translate(-1.0, 0, -3.2);
         g.scale(0.001);
-        font.render(g, result[row][1].c_str());
+        font->render(g, result[row][1].c_str());
       g.popMatrix();
     }
   }

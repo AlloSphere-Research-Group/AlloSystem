@@ -11,11 +11,28 @@
 
 namespace al{
 
+Mesh::Mesh(int primitive)
+:	mPrimitive(primitive)
+{}
+
+Mesh::Mesh(const Mesh& cpy)
+:	mVertices(cpy.mVertices),
+	mNormals(cpy.mNormals),
+	mColors(cpy.mColors),
+	mColoris(cpy.mColoris),
+	mTexCoord1s(cpy.mTexCoord1s),
+	mTexCoord2s(cpy.mTexCoord2s),
+	mTexCoord3s(cpy.mTexCoord3s),
+	mIndices(cpy.mIndices),
+	mPrimitive(cpy.mPrimitive)
+{}
+
 Mesh& Mesh::reset() {
 	vertices().reset();
 	normals().reset();
 	colors().reset();
 	coloris().reset();
+	texCoord1s().reset();
 	texCoord2s().reset();
 	texCoord3s().reset();
 	indices().reset();
@@ -39,6 +56,7 @@ void Mesh::decompress(){
 		DECOMPRESS(colors(), Color)
 		DECOMPRESS(coloris(), Colori)
 		DECOMPRESS(normals(), Normal)
+		DECOMPRESS(texCoord1s(), TexCoord1)
 		DECOMPRESS(texCoord2s(), TexCoord2)
 		DECOMPRESS(texCoord3s(), TexCoord3)
 		#undef DECOMPRESS
@@ -52,6 +70,7 @@ void Mesh::equalizeBuffers() {
 	const int Nn = normals().size();
 	const int Nc = colors().size();
 	const int Nci= coloris().size();
+	const int Nt1= texCoord1s().size();
 	const int Nt2= texCoord2s().size();
 	const int Nt3= texCoord3s().size();
 
@@ -68,6 +87,11 @@ void Mesh::equalizeBuffers() {
 	else if(Nci){
 		for(int i=Nci; i<Nv; ++i){
 			coloris().append(coloris()[Nci-1]);
+		}
+	}
+	if(Nt1){
+		for(int i=Nt1; i<Nv; ++i){
+			texCoord1s().append(texCoord1s()[Nt1-1]);
 		}
 	}
 	if(Nt2){
@@ -174,6 +198,7 @@ void Mesh::compress() {
 	int Nc = colors().size();
 	int Nci = coloris().size();
 	int Nn = normals().size();
+	int Nt1 = texCoord1s().size();
 	int Nt2 = texCoord2s().size();
 	int Nt3 = texCoord3s().size();
 
@@ -216,6 +241,7 @@ void Mesh::compress() {
 			if (Nc) color(old.colors()[i]);
 			if (Nci) colori(old.coloris()[i]);
 			if (Nn) normal(old.normals()[i]);
+			if (Nt1) texCoord(old.texCoord1s()[i]);
 			if (Nt2) texCoord(old.texCoord2s()[i]);
 			if (Nt3) texCoord(old.texCoord3s()[i]);
 			// store new index:
@@ -405,6 +431,7 @@ Mesh& Mesh::repeatLast(){
 		if(normals().size()) normals().repeatLast();
 		if(texCoord2s().size()) texCoord2s().repeatLast();
 		else if(texCoord3s().size()) texCoord3s().repeatLast();
+		else if(texCoord1s().size()) texCoord1s().repeatLast();
 	}
 	return *this;
 }
@@ -528,6 +555,7 @@ void Mesh::merge(const Mesh& src){
 	vertices().append(src.vertices());
 	normals().append(src.normals());
 	colors().append(src.colors());
+	texCoord1s().append(src.texCoord1s());
 	texCoord2s().append(src.texCoord2s());
 	texCoord3s().append(src.texCoord3s());
 }
@@ -590,67 +618,75 @@ Mesh& Mesh::scale(float x, float y, float z){
 }
 
 
-// Convert indexed triangle strip to triangles
-// TODO: this may be handy as a public method
-static void toTriangles(Mesh& m){
-	int prim = m.primitive();
-
-	if(Graphics::TRIANGLE_STRIP == prim){
-
-		m.primitive(Graphics::TRIANGLES);
-		int Ni = m.indices().size();
-		//int Nn = m.normals().size();
-
-		if(Ni){
-			int Ntri = Ni - 2;
-			m.indices().size(Ntri * 3);
-
-			for(int i=(Ni-2)-1, j=(Ntri*3-2)-1; i>=0; i--, j-=3){
-				int i1, i2, i3;
-
-				// Odd numbered triangles must have orientation flipped
-				if(i & 1){
-					i1 = i+2;
-					i2 = i+1;
-					i3 = i;
-				}
-				else{
-					i1 = i;
-					i2 = i+1;
-					i3 = i+2;
-				}
-				Mesh::Index idx1 = m.indices()[i1];
-				Mesh::Index idx2 = m.indices()[i2];
-				Mesh::Index idx3 = m.indices()[i3];
-				m.indices()[j  ] = idx1;
-				m.indices()[j+1] = idx2;
-				m.indices()[j+2] = idx3;
-			}
-
-			// remove degenerate triangles (modifies indices only)
-			{
-			Ni = m.indices().size();
-			int j=0;
-			for(int i=0; i<Ni; i+=3){
-				Mesh::Index i1 = m.indices()[i];
-				Mesh::Index i2 = m.indices()[i+1];
-				Mesh::Index i3 = m.indices()[i+2];
-				m.indices()[j  ] = i1;
-				m.indices()[j+1] = i2;
-				m.indices()[j+2] = i3;
-				if(i1 != i2 && i2 != i3 && i3 != i1){
-					j+=3;
-				}
-			}
-			m.indices().size(j);}
+// removes triplets with two matching values
+template <class T>
+static void removeDegenerates(Buffer<T>& buf){
+	unsigned N = buf.size();
+	unsigned j=0;
+	for(unsigned i=0; i<N; i+=3){
+		T v1 = buf[i  ];
+		T v2 = buf[i+1];
+		T v3 = buf[i+2];
+		buf[j  ] = v1;
+		buf[j+1] = v2;
+		buf[j+2] = v3;
+		if((v1 != v2) && (v2 != v3) && (v3 != v1)){
+			j+=3;
 		}
+	}
+	buf.size(j);
+}
 
-		// non-indexed not supported yet...
+template <class T>
+static void stripToTri(Buffer<T>& buf){
+	int N = buf.size();
+	int Ntri = N-2;
+	buf.size(Ntri*3);
+
+	// Iterate backwards through elements so we can operate in place
+	// strip (i): 0 1 2 3 4 5 6 7 8 ...
+	//  tris (j): 0 1 2 3 2 1 2 3 4 ...
+	for(int i=N-3, j=Ntri*3-3; i>0; i--, j-=3){
+		// Odd numbered triangles must have orientation flipped
+		if(i & 1){
+			buf[j  ] = buf[i+2];
+			buf[j+1] = buf[i+1];
+			buf[j+2] = buf[i  ];
+		}
 		else{
-
+			buf[j  ] = buf[i  ];
+			buf[j+1] = buf[i+1];
+			buf[j+2] = buf[i+2];
 		}
 	}
 }
+
+void Mesh::toTriangles(){
+
+	if(Graphics::TRIANGLE_STRIP == primitive()){
+		primitive(Graphics::TRIANGLES);
+		int Nv = vertices().size();
+		int Ni = indices().size();
+
+		// indexed:
+		if(Ni > 3){
+			stripToTri(indices());
+			removeDegenerates(indices());
+		}
+		// non-indexed:
+		// TODO: remove degenerate triangles
+		else if(Ni == 0 && Nv > 3){
+			stripToTri(vertices());
+			if(normals().size() >= Nv) stripToTri(normals());
+			if(colors().size() >= Nv) stripToTri(colors());
+			if(coloris().size() >= Nv) stripToTri(coloris());
+			if(texCoord1s().size() >= Nv) stripToTri(texCoord1s());
+			if(texCoord2s().size() >= Nv) stripToTri(texCoord2s());
+			if(texCoord3s().size() >= Nv) stripToTri(texCoord3s());
+		}
+	}
+}
+
 
 bool Mesh::exportSTL(const char * path, const char * name) const {
 	int prim = primitive();
@@ -664,9 +700,7 @@ bool Mesh::exportSTL(const char * path, const char * name) const {
 	Mesh m(*this);
 
 	// Convert mesh to non-indexed triangles
-	if(prim == Graphics::TRIANGLE_STRIP){
-		toTriangles(m);
-	}
+	m.toTriangles();
 	m.decompress();
 	m.generateNormals();
 
@@ -703,18 +737,21 @@ void Mesh::print(FILE * dst) const {
 	if(colors().size())		fprintf(dst, "%8d Colors\n", colors().size());
 	if(coloris().size())	fprintf(dst, "%8d Coloris\n", coloris().size());
 	if(normals().size())	fprintf(dst, "%8d Normals\n", normals().size());
+	if(texCoord1s().size())	fprintf(dst, "%8d TexCoord1s\n", texCoord1s().size());
 	if(texCoord2s().size())	fprintf(dst, "%8d TexCoord2s\n", texCoord2s().size());
 	if(texCoord3s().size())	fprintf(dst, "%8d TexCoord3s\n", texCoord3s().size());
 	if(indices().size())	fprintf(dst, "%8d Indices\n", indices().size());
 
-	unsigned bytes	= vertices().size()*sizeof(Vertex)
-					+ colors().size()*sizeof(Color)
-					+ coloris().size()*sizeof(Colori)
-					+ normals().size()*sizeof(Normal)
-					+ texCoord2s().size()*sizeof(TexCoord2)
-					+ texCoord3s().size()*sizeof(TexCoord3)
-					+ indices().size()*sizeof(Index)
-					;
+	unsigned bytes
+		= vertices().size()*sizeof(Vertex)
+		+ colors().size()*sizeof(Color)
+		+ coloris().size()*sizeof(Colori)
+		+ normals().size()*sizeof(Normal)
+		+ texCoord1s().size()*sizeof(TexCoord1)
+		+ texCoord2s().size()*sizeof(TexCoord2)
+		+ texCoord3s().size()*sizeof(TexCoord3)
+		+ indices().size()*sizeof(Index)
+		;
 	fprintf(dst, "%8d bytes (%.1f kB)\n", bytes, double(bytes)/1000);
 }
 

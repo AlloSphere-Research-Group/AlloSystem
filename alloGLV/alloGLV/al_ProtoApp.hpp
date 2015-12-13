@@ -41,19 +41,13 @@
 	Lance Putnam, 2012, putnam.lance@gmail.com
 */
 
-#include <math.h>
 #include <string>
 #include "allocore/io/al_App.hpp"
-#include "allocore/io/al_File.hpp"
 #include "alloGLV/al_ControlGLV.hpp"
-
 #include "GLV/glv.h"
 
-//#define GAMMA_H_INC_ALL
-//#include "Gamma/Gamma.h"
 
 namespace al{
-
 
 /// Application for audio/visual prototyping
 
@@ -63,7 +57,7 @@ namespace al{
 class ProtoApp : public App{
 public:
 
-	glv::NumberDialer cnFOV, cnScale;
+	glv::NumberDialer cnNear, cnFar, cnFOV, cnScale;
 	glv::NumberDialer cnGain;
 
 	ProtoApp();
@@ -71,7 +65,7 @@ public:
 	/// This should be called after configuring everything else with the app
 	void init(
 		const Window::Dim& dim = Window::Dim(800,600),
-		const std::string title="",
+		const std::string& title="",
 		double fps=40,
 		Window::DisplayMode mode = Window::DEFAULT_BUF,
 		double sampleRate = 44100,
@@ -83,32 +77,28 @@ public:
 	/// Set the directory for application resources
 	ProtoApp& resourceDir(const std::string& dir, bool searchBack=true);
 
+	/// Get resource directory
+	const std::string& resourceDir() const { return mResourceDir; }
+
+	/// Get GUI
+	GLVDetachable& gui(){ return mGUI; }
+
+	/// Get parameter panel GUI element
 	glv::ParamPanel& paramPanel(){ return mParamPanel; }
 
+	/// Add a parameter to GUI
 	ProtoApp& addParam(
 		glv::View& v, const std::string& label="", bool nameViewFromLabel=true
-	){
-		paramPanel().addParam(v,label,nameViewFromLabel);
-		return *this;
-	}
+	);
 
+	/// Add a parameter to GUI
 	ProtoApp& addParam(
 		glv::View * v, const std::string& label="", bool nameViewFromLabel=true
-	){
-		return addParam(*v,label,nameViewFromLabel);
-	}
-
-	double gainFactor() const { float v=cnGain.getValue(); return v*v; }
-	double scaleFactor() const { return ::pow(2., cnScale.getValue()); }
+	);
 
 
-	/// This should still be called via ProtoApp::onAnimate(dt) if overridden
-	virtual void onAnimate(double dt){
-		lens().fovy(cnFOV.getValue());
-	}
-
-//	virtual void onDraw(Graphics& g, const Viewpoint& v){}
-//	virtual void onSound(AudioIOData& io){}
+	double gainFactor() const;
+	double scaleFactor() const;
 
 protected:
 	GLVDetachable mGUI;

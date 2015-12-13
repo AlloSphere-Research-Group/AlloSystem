@@ -63,7 +63,8 @@ public:
 	enum Target {
 		TEXTURE_1D				= GL_TEXTURE_1D,
 		TEXTURE_2D				= GL_TEXTURE_2D,
-		TEXTURE_3D				= GL_TEXTURE_3D
+		TEXTURE_3D				= GL_TEXTURE_3D,
+		NO_TARGET				= 0
 	};
 
 	enum Wrap {
@@ -87,6 +88,19 @@ public:
 
 	/// Construct an unsized Texture
 	Texture();
+
+	/// Construct a 1D Texture object
+
+	/// @param[in] width		width, in pixels
+	/// @param[in] format		format of pixel data
+	/// @param[in] type			data type of pixel data
+	/// @param[in] clientAlloc	allocate data on the client
+	Texture(
+		unsigned width,
+		Graphics::Format format=Graphics::RGBA,
+		Graphics::DataType type=Graphics::UBYTE,
+		bool clientAlloc=true
+	);
 
 	/// Construct a 2D Texture object
 
@@ -132,7 +146,7 @@ public:
 
 	/// Set shape (size, format, type, etc.) from internal array
 
-	/// This call can be used to ensure that the tetxure shape matches the
+	/// This call can be used to ensure that the texture shape matches the
 	/// internal array.
 	void shapeFromArray();
 
@@ -261,7 +275,7 @@ public:
 	/// Flags resubmission of pixel data upon next bind
 
 	/// Calling this ensures that pixels get submitted on the next bind().
-	///
+	///internal array
 	Texture& dirty(){ mPixelsUpdated=true; return *this; }
 
 	/// Submit the texture to GPU using an Array as source
@@ -277,6 +291,12 @@ public:
 	/// If pixels is NULL, then the only effect is to resize the texture
 	/// remotely.
 	void submit(const void * pixels, uint32_t align=4);
+
+	/// Submit the client texture state to GPU
+
+	/// If the client pixels have been allocated, then they will be sent if
+	/// marked dirty. Otherwise, the texture is simply reconfigured on the GPU.
+	void submit();
 
 	/// Copy pixels from current frame buffer to texture texels
 
@@ -344,8 +364,7 @@ protected:
 	// send any pending shape updates to GPU or do immediately if forced
 	void sendShape(bool force=true);
 
-	// determines target (e.g. GL_TEXTURE_2D) from the dimensions
-	void determineTarget();
+	bool tryBind();
 
 	// Pattern for setting a variable that when changed sets a notification flag
 	template<class T>
@@ -356,7 +375,6 @@ protected:
 
 public:
 	Texture& updatePixels(); /// \deprecated use dirty() instead
-	void submit(); /// \deprecated use dirty() instead
 	void configure(AlloArrayHeader& header); /// \deprecated use shapeFrom() instead
 };
 

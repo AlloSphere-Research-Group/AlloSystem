@@ -100,7 +100,7 @@ public:
 
 	/// real time
 	/// (seconds since start())
-	al_sec realtime() { return al_time() - get().mT0; }
+	al_sec realtime() { return timeInSec() - get().mT0; }
 
 	/// time when main loop was created
 	al_sec T0() { return mT0; }
@@ -150,6 +150,8 @@ private:
 
 	bool mActive;
 	bool mInited[NUM_DRIVERS];
+
+	static al_sec timeInSec(){ return al_steady_time(); }
 };
 
 // deprecated; for backwards compatibility only

@@ -15,11 +15,14 @@ AUTORUN=1
 
 # Runs the program through the specified debugger if -d is passed.
 OPTIND=1
-while getopts ":d:n" opt; do
+while getopts ":d:v:n" opt; do
     case "$opt" in
     d)  debugger="$DEBUGGER"
         shift
         ;;
+    v) VERBOSE="VERBOSE=1"
+      shift
+      ;;
 	n)  AUTORUN=0
 		shift
 		;;
@@ -31,7 +34,7 @@ NPROC=$(grep --count ^processor /proc/cpuinfo 2>/dev/null || sysctl -n hw.ncpu |
 # Save one core for the gui.
 PROC_FLAG=$((NPROC - 1))
 
-if [ "$#" -eq 0 ]; then
+if [ "$#" = 0 ]; then
     echo Aborting: You must provide a source filename or a directory.
     exit 1
 fi
@@ -78,5 +81,5 @@ else
   cmake "$GENERATOR_FLAG" "$TARGET_FLAG" "$DBUILD_FLAG" -DRUN_IN_DEBUGGER=0 -DCMAKE_BUILD_TYPE=Release -Wno-dev . > cmake_log.txt
 fi
 
-make $TARGET -j$PROC_FLAG $*
+make $VERBOSE $TARGET -j$PROC_FLAG $*
 

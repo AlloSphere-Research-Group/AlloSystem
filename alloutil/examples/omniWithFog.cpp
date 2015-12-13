@@ -50,7 +50,7 @@ struct MyApp : OmniApp {
   }
 
   std::string vertexCode() {
-    return AL_STRINGIFY(
+    return R"(
       varying vec4 color;
       varying vec3 normal, lightDir, eyeVec;
 
@@ -75,11 +75,11 @@ struct MyApp : OmniApp {
 /*!*/     fogFactor = (1. - exp(-fogCurve*fogFactor))/(1. - exp(-fogCurve));
 /*!*/   }
       }
-    );
+    )";
   }
 
   std::string fragmentCode() {
-    return AL_STRINGIFY(
+    return R"(
       uniform float lighting;
       uniform float texture;
       uniform sampler2D texture0;
@@ -108,7 +108,7 @@ struct MyApp : OmniApp {
         final_color += gl_LightSource[0].specular * spec;
 /*!*/   gl_FragColor = mix(mix(colorMixed, final_color, lighting), gl_Fog.color, fogFactor);
       }
-    );
+    )";
   }
 };
 

@@ -5,7 +5,7 @@
 namespace al{
 
 Texture::Texture()
-: 	mTarget(TEXTURE_2D),
+: 	mTarget(NO_TARGET),
 	mFormat(Graphics::RGBA),
 	mTexelFormat(0),
 	mType(Graphics::UBYTE),
@@ -20,6 +20,29 @@ Texture::Texture()
 	mParamsUpdated(true), mShapeUpdated(true),
 	mPixelsUpdated(true), mArrayDirty(false)
 {}
+
+Texture :: Texture(
+	unsigned width,
+	Graphics::Format format, Graphics::DataType type,
+	bool alloc
+)
+:	mTarget(TEXTURE_1D),
+	mFormat(format),
+	mTexelFormat(0),
+	mType(type),
+	mWrapS(CLAMP_TO_EDGE),
+	mWrapT(CLAMP_TO_EDGE),
+	mWrapR(CLAMP_TO_EDGE),
+	mFilterMin(LINEAR),
+	mFilterMag(LINEAR),
+	mWidth(width),
+	mHeight(0),
+	mDepth(0),
+	mParamsUpdated(true), mShapeUpdated(true),
+	mPixelsUpdated(true), mArrayDirty(false)
+{
+	if(alloc) allocate();
+}
 
 Texture :: Texture(
 	unsigned width, unsigned height,
@@ -89,13 +112,12 @@ void Texture::onCreate(){
 	//printf("Texture onCreate\n");
 	glGenTextures(1, (GLuint *)&mID);
 
-	glBindTexture(target(), id());
-	shapeFromArray();
-	sendShape();
-	sendParams();
-	sendPixels();
-	glBindTexture(target(), 0);
-
+	if(tryBind()){
+		sendShape();
+		sendParams();
+		sendPixels();
+		glBindTexture(target(), 0);
+	}
 	AL_GRAPHICS_ERROR("creating texture", id());
 }
 
@@ -176,33 +198,60 @@ void Texture::shapeFromArray(){
 	}
 }
 
+bool Texture::tryBind(){
+
+	// Sync shape if array is dirty
+	shapeFromArray();
+
+	// Ensure target is synchronized before bind
+	if(mDepth != 0){
+		target(TEXTURE_3D);
+	}
+	else if(mHeight != 0){
+		target(TEXTURE_2D);
+	}
+	else if(mWidth != 0){
+		target(TEXTURE_1D);
+	}
+	else{
+		target(NO_TARGET);
+	}
+
+	if(target() != Texture::NO_TARGET){
+		glBindTexture(target(), id());
+		return true;
+	}
+	return false;
+}
+
 void Texture :: bind(int unit) {
 	AL_GRAPHICS_ERROR("(before Texture::bind)", id());
 
 	// Ensure texture is created
 	validate();
-		//AL_GRAPHICS_ERROR("validate binding texture", id());
+		AL_GRAPHICS_ERROR("validate binding texture", id());
 
 	// Specify multitexturing
 	glActiveTexture(GL_TEXTURE0 + unit);
-		//AL_GRAPHICS_ERROR("active texture binding texture", id());
+		AL_GRAPHICS_ERROR("active texture binding texture", id());
 
 	// Do the actual binding
-	glEnable(target());
-		//AL_GRAPHICS_ERROR("enable target binding texture", id());
-	glBindTexture(target(), id());
+	if(tryBind()){
 		AL_GRAPHICS_ERROR("binding texture", id());
 
-	shapeFromArray();
+		glEnable(target());
+			AL_GRAPHICS_ERROR("enable target binding texture", id());
 
-	// Synchronize client texture state with GPU
+		shapeFromArray();
 
-	sendShape(false);
+		// Synchronize client texture state with GPU
+		sendShape(false);
 
-	sendParams(false);
-		//AL_GRAPHICS_ERROR("sendparams binding texture", id());
-	sendPixels(false);
-		//AL_GRAPHICS_ERROR("sendpixels binding texture", id());
+		sendParams(false);
+			//AL_GRAPHICS_ERROR("sendparams binding texture", id());
+		sendPixels(false);
+			//AL_GRAPHICS_ERROR("sendpixels binding texture", id());
+	}
 }
 
 void Texture :: unbind(int unit) {
@@ -210,13 +259,6 @@ void Texture :: unbind(int unit) {
 	glActiveTexture(GL_TEXTURE0 + unit);
 	glBindTexture(target(), 0);
 	glDisable(target());
-}
-
-void Texture :: determineTarget(){
-	if(0 == mHeight)		mTarget = TEXTURE_1D;
-	else if(0 == mDepth)	mTarget = TEXTURE_2D;
-	else					mTarget = TEXTURE_3D;
-	//invalidate(); // FIXME: mPixelsUpdated flag now triggers update
 }
 
 void Texture :: resetArray(unsigned align) {
@@ -350,15 +392,17 @@ void Texture::sendPixels(const void * pixels, unsigned align){
 				const GLvoid *pixels
 			);*/
 
-			case GL_TEXTURE_1D:
+			case TEXTURE_1D:
 				glTexSubImage1D(target(), 0, 0, width(), format(), type(), pixels);
 				break;
-			case GL_TEXTURE_2D:
+			case TEXTURE_2D:
 				glTexSubImage2D(target(), 0, 0,0, width(), height(), format(), type(), pixels);
 				break;
-			case GL_TEXTURE_3D:
+			case TEXTURE_3D:
 				glTexSubImage3D(target(), 0, 0,0,0, width(), height(), depth(), format(), type(), pixels);
 				break;
+			case NO_TARGET:;
+				// Unconfigured
 			default:
 				AL_WARN("invalid texture target %d", target());
 		}
@@ -380,7 +424,7 @@ void Texture::sendPixels(bool force){
 }
 
 void Texture::sendShape(bool force){
-	if(mShapeUpdated || force){
+	if((mShapeUpdated || force)){
 
 		// Determine texel format (on GPU)
 		int intFmt;
@@ -411,15 +455,17 @@ void Texture::sendShape(bool force){
 			GLenum target, GLint level, GLenum internalformat,
 			GLsizei width, GLsizei height, GLsizei depth,
 			GLint border, GLenum format, GLenum type, const GLvoid *pixels);*/
-		case GL_TEXTURE_1D:
+		case TEXTURE_1D:
 			glTexImage1D(target(), 0, intFmt, width(), 0, format(), type(), NULL);
 			break;
-		case GL_TEXTURE_2D:
+		case TEXTURE_2D:
 			glTexImage2D(target(), 0, intFmt, width(), height(), 0, format(), type(), NULL);
 			break;
-		case GL_TEXTURE_3D:
+		case TEXTURE_3D:
 			glTexImage3D(target(), 0, intFmt, width(), height(), depth(), 0, format(), type(), NULL);
 			break;
+		case NO_TARGET:;
+			// Unconfigured
 		default:;
 		}
 		AL_GRAPHICS_ERROR("Texture::sendShape (glTexImage)", id());
@@ -437,30 +483,31 @@ void Texture :: submit(const void * pixels, uint32_t align) {
 	glActiveTexture(GL_TEXTURE0);
 		AL_GRAPHICS_ERROR("Texture::submit (glActiveTexture)", id());
 
-	glBindTexture(target(), id());
+	if(tryBind()){
 		AL_GRAPHICS_ERROR("Texture::submit (glBindTexture)", id());
 
-	// Sync client state with GPU
-	sendShape(false);
-	sendParams(false);
+		// Sync client state with GPU
+		sendShape(false);
+		sendParams(false);
 
-	// Calls glTexSubImage
-	sendPixels(pixels, align);
+		// Calls glTexSubImage
+		sendPixels(pixels, align);
 
-	/* OpenGL may have changed the internal format to one it supports:
-	GLint format;
-	glGetTexLevelParameteriv(mTarget, 0, GL_TEXTURE_INTERNAL_FORMAT, &format);
-	if (format != mInternalFormat) {
-		printf("converted from %X to %X format\n", mInternalFormat, format);
-		mInternalFormat = format;
+		/* OpenGL may have changed the internal format to one it supports:
+		GLint format;
+		glGetTexLevelParameteriv(mTarget, 0, GL_TEXTURE_INTERNAL_FORMAT, &format);
+		if (format != mInternalFormat) {
+			printf("converted from %X to %X format\n", mInternalFormat, format);
+			mInternalFormat = format;
+		}
+		//*/
+
+		//printf("submitted texture data %p\n", pixels);
+
+		// Unbind texture
+		glBindTexture(target(), 0);
+			AL_GRAPHICS_ERROR("Texture::submit (glBindTexture 0)", id());
 	}
-	//*/
-
-	//printf("submitted texture data %p\n", pixels);
-
-	// Unbind texture
-	glBindTexture(target(), 0);
-		AL_GRAPHICS_ERROR("Texture::submit (glBindTexture 0)", id());
 }
 
 
@@ -536,6 +583,11 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 	submit(src.data.ptr, src.alignment());
 }
 
+void Texture::submit(){
+	// Note: not using array() as it may flag the array as dirty
+	submit(mArray.data.ptr, mArray.alignment());
+}
+
 void Texture::copyFrameBuffer(
 	int w, int h, int fbx, int fby, int texx, int texy, int texz
 ){
@@ -557,6 +609,7 @@ void Texture::copyFrameBuffer(
 	case TEXTURE_3D:
 		glCopyTexSubImage3D(GL_TEXTURE_3D, 0, texx,texy,texz, fbx,fby, w, h);
 		break;
+	default:;
 	}
 	unbind();
 }
@@ -626,7 +679,12 @@ void Texture :: print() {
 			target = "TEXTURE_3D";
 			printf("Texture target=%s, %dx%dx%d(%dx%dx%d), ", target, width(), height(), depth(), mArray.width(), mArray.height(), mArray.depth());
 			break;
-		default:;
+		case NO_TARGET:
+			target = "NO_TARGET";
+			printf("Texture target=%s, %dx%dx%d(%dx%dx%d), ", target, width(), height(), depth(), mArray.width(), mArray.height(), mArray.depth());
+			break;
+		default:
+			printf("Texture target=(unknown), ");
 	}
 	switch (mFormat) {
 		case Graphics::DEPTH_COMPONENT: format="DEPTH_COMPONENT"; break;
@@ -668,11 +726,5 @@ Texture& Texture::updatePixels(){
 	AL_WARN_ONCE("Texture::updatePixels() deprecated, use Texture::dirty()");
 	return dirty();
 }
-
-void Texture::submit(){
-	AL_WARN_ONCE("Texture::submit() deprecated, use Texture::dirty()");
-	dirty();
-}
-
 
 } // al::

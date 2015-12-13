@@ -12,6 +12,20 @@ set(ALLOUTIL_SRC
   )
 
 # Dependencies ------------------------------
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+
+if(NOT (COMPILER_SUPPORTS_CXX11 OR COMPILER_SUPPORTS_CXX0X))
+	message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif()
+
+if(COMPILER_SUPPORTS_CXX11)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+elseif(COMPILER_SUPPORTS_CXX0X)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+endif()
+
 find_package(LuaJIT)
 
 if(LUAJIT_FOUND)
@@ -44,14 +58,22 @@ if(NOT ALLOCORE_HEADER)
     return()
 endif(NOT ALLOCORE_HEADER)
 
-get_target_property(ALLOCORE_LIBRARY allocore${DEBUG_SUFFIX} LOCATION)
+set(ALLOCORE_LIBRARY "allocore${DEBUG_SUFFIX}")
 get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore${DEBUG_SUFFIX} ALLOCORE_DEP_INCLUDE_DIRS)
 get_target_property(ALLOCORE_LINK_LIBRARIES allocore${DEBUG_SUFFIX} ALLOCORE_LINK_LIBRARIES)
+
+# Copy headers to build directory (only if header has changed)
+file(GLOB ALLOUTIL_INSTALL_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} alloutil/*.h*)
+foreach(header ${ALLOUTIL_INSTALL_HEADERS})
+	execute_process(COMMAND ${CMAKE_COMMAND} -E
+					copy_if_different "${header}" "${BUILD_ROOT_DIR}/build/include/${header}"
+					WORKING_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}")
+endforeach()
 
 # Build library ----------------------------------
 
 set(ALLOUTIL_LIB "alloutil${DEBUG_SUFFIX}")
-add_library(${ALLOUTIL_LIB} ${ALLOUTIL_SRC})
+add_library(${ALLOUTIL_LIB} ${ALLOUTIL_SRC} ${ALLOUTIL_INSTALL_HEADERS})
 
 set(ALLOUTIL_LINK_LIBRARIES ${LUA_LIBRARIES} ${Jsoncpp_LIBRARIES} ${ALLOCORE_LIBRARY})
 set(ALLOUTIL_DIRS "${BUILD_ROOT_DIR}/build/include" ${LUA_INCLUDE_DIR} ${Jsoncpp_INCLUDE_DIRS} ${ALLOCORE_DEP_INCLUDE_DIRS})
@@ -75,14 +97,6 @@ set_target_properties(${ALLOUTIL_LIB}
   PROPERTIES
   ALLOUTIL_LINK_LIBRARIES "${ALLOUTIL_LINK_LIBRARIES}"
   )
-
-# Copy headers to build directory (only if header has changed)
-file(GLOB ALLOUTIL_INSTALL_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} alloutil/*.h*)
-foreach(header ${ALLOUTIL_INSTALL_HEADERS})
-	execute_process(COMMAND ${CMAKE_COMMAND} -E
-					copy_if_different "${header}" "${BUILD_ROOT_DIR}/build/include/${header}"
-					WORKING_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}")
-endforeach()
 
 # Build Examples ------------------------------------------------------
 if(BUILD_EXAMPLES)

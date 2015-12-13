@@ -6,6 +6,7 @@ message(STATUS "Building OSC module.")
 
 set(OSC_HEADERS
     allocore/protocol/al_OSC.hpp
+    allocore/system/al_Parameter.hpp
 )
 
 # for oscpack (oscpack sources are included with AlloSystem)
@@ -22,7 +23,8 @@ list(APPEND ALLOCORE_SRC
   src/protocol/oscpack/osc/OscPrintReceivedElements.cpp
   src/protocol/oscpack/osc/OscReceivedElements.cpp
   src/protocol/oscpack/osc/OscTypes.cpp
-  src/protocol/al_OSC.cpp)
+  src/protocol/al_OSC.cpp
+  src/system/al_Parameter.cpp)
 
 list(APPEND ALLOCORE_HEADERS ${OSC_HEADERS})
 

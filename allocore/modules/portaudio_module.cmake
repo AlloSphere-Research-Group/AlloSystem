@@ -10,7 +10,10 @@ set(PORTAUDIO_HEADERS
     allocore/sound/al_Reverb.hpp
     allocore/sound/al_Speaker.hpp
     allocore/sound/al_Vbap.hpp
-
+    allocore/sound/al_Biquad.hpp
+    allocore/sound/al_Crossover.hpp
+    allocore/sound/al_Speaker.hpp
+    allocore/sound/al_StereoPanner.hpp
 )
 
 if(PORTAUDIO_LIBRARY AND PORTAUDIO_INCLUDE_DIR)
@@ -34,10 +37,11 @@ endif()
 
 list(APPEND ALLOCORE_SRC
     src/io/al_AudioIO.cpp
-	src/sound/al_AudioScene.cpp
+    src/sound/al_AudioScene.cpp
     src/sound/al_Ambisonics.cpp
     src/sound/al_Dbap.cpp
     src/sound/al_Vbap.cpp
+    src/sound/al_Biquad.cpp
 )
 
 list(APPEND ALLOCORE_HEADERS ${PORTAUDIO_HEADERS})

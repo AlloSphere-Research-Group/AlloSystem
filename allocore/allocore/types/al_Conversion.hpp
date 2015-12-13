@@ -109,6 +109,13 @@ float blockSubnormal(float v);
 /// Returns zero if argument is subnormal, otherwise returns argument
 double blockSubnormal(double v);
 
+/// Returns temporary copy-constructed object
+
+/// This function can be more convenient than calling a copy constructor since
+/// one does not need to explicitly write the type of the object.
+template <class T>
+T clone(const T& obj){ return T(obj); }
+
 /// Returns 1 if little endian, 0 if big endian
 int endian();
 

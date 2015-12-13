@@ -152,6 +152,15 @@ static ShaderProgram::Type param_type_from_gltype(GLenum gltype) {
 	}
 }
 
+ShaderProgram::ShaderProgram()
+:	mInPrim(Graphics::TRIANGLES), mOutPrim(Graphics::TRIANGLES), mOutVertices(3),
+	mActive(true)
+{}
+
+ShaderProgram::~ShaderProgram(){
+	destroy();
+}
+
 ShaderProgram& ShaderProgram::attach(Shader& s){
 	validate();
 	s.compile();
@@ -179,26 +188,70 @@ const ShaderProgram& ShaderProgram::detach(const Shader& s) const {
 	//glDetachObjectARB((GLhandleARB)handle(), (GLhandleARB)s.handle());
 	return *this;
 }
-const ShaderProgram& ShaderProgram::link(bool dovalidate) const {
+const ShaderProgram& ShaderProgram::link(bool doValidate) const {
 	glLinkProgram(id());
-	if (dovalidate) validate_linker();
+	if(doValidate) validateProgram();
 	return *this;
 }
 
-const ShaderProgram& ShaderProgram::validate_linker() const {
-	int isValid;
+bool ShaderProgram::validateProgram(bool doPrintLog) const {
+	GLint isValid;
 	glValidateProgram(id());
 	glGetProgramiv(id(), GL_VALIDATE_STATUS, &isValid);
-	if (!isValid) {
+	if(GL_FALSE == isValid){
 		AL_GRAPHICS_ERROR("ShaderProgram::link", id());
+		if(doPrintLog) printLog();
+		return false;
 	}
-	return *this;
+	return true;
+}
+
+bool ShaderProgram::compile(
+	const std::string& vertSource,
+	const std::string& fragSource,
+	const std::string& geomSource
+){
+	mVertSource = vertSource;
+	mFragSource = fragSource;
+	mGeomSource = geomSource;
+
+	if(!created()) return false;
+
+	Shader mShaderV, mShaderF, mShaderG;
+	mShaderV.source(vertSource, al::Shader::VERTEX);
+	attach(mShaderV);
+	mShaderF.source(fragSource, al::Shader::FRAGMENT);
+	attach(mShaderF);
+	
+	bool bGeom = geomSource[0];
+	if(bGeom){
+		mShaderG.source(geomSource, al::Shader::GEOMETRY);
+		attach(mShaderG);
+	}
+	link(false);
+	mShaderV.printLog();
+	mShaderF.printLog();
+	if(bGeom) mShaderG.printLog();
+	printLog();
+
+	// OpenGL.org says to detach shaders after linking:
+	//   https://www.opengl.org/wiki/Shader_Compilation
+	detach(mShaderV);
+	detach(mShaderF);
+	if(bGeom) detach(mShaderG);
+
+	return linked();
 }
 
 void ShaderProgram::onCreate(){
 	//mHandle = glCreateProgramObjectARB();
 	//mID = (long)handle();
 	mID = glCreateProgram();
+
+	// Automatically compile any code set with ShaderProgram::compile
+	if(!mVertSource.empty()){
+		compile(mVertSource, mFragSource, mGeomSource);
+	}
 }
 void ShaderProgram::onDestroy(){
 	glDeleteProgram(id());

@@ -409,6 +409,7 @@ public:
 	static bool started();
 
 	void updateFrameTime();
+	static double timeInSec();
 
 protected:
 	friend class WindowImpl;
@@ -448,12 +449,9 @@ protected:
 	Window& insert(InputEventHandler& v, int i);
 	Window& insert(WindowEventHandler& v, int i);
 
-	#define CALL(e)	{\
-		InputEventHandlers::iterator it = mInputEventHandlers.begin(); \
-		bool active = true; \
-		while(active && it != mInputEventHandlers.end()){\
-			active = (*it)->e; \
-			++it; \
+	#define CALL(e){\
+		for(unsigned i=0; i<mInputEventHandlers.size(); ++i){\
+			if(false == mInputEventHandlers[i]->e) break;\
 		}\
 	}
 
@@ -465,17 +463,17 @@ protected:
 	void callHandlersOnKeyUp(){ CALL(onKeyUp(mKeyboard)); }
 	#undef CALL
 
-	#define CALL(e)	{\
-		WindowEventHandlers::iterator it = mWindowEventHandlers.begin(); \
-		bool active = true; \
-		while(active && it != mWindowEventHandlers.end()){\
-			active = (*it)->e; \
-			++it; \
+	#define CALL(e){\
+		for(unsigned i=0; i<mWindowEventHandlers.size(); ++i){\
+			if(false == mWindowEventHandlers[i]->e) break;\
 		}\
 	}
 
 	void callHandlersOnFrame() { CALL(onFrame()); }
-	void callHandlersOnCreate(){ CALL(onCreate()); }
+	void callHandlersOnCreate(){
+		contextCreate();
+		CALL(onCreate());
+	}
 	void callHandlersOnDestroy(){
 		CALL(onDestroy());
 		contextDestroy();

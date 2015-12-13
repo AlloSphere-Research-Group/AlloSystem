@@ -133,7 +133,7 @@ inline bool OmniStereoGraphicsRenderer::onCreate() {
   mShader.attach(vert).attach(frag).link();
   mShader.printLog();
   mShader.begin();
-  mShader.uniform("lighting", 1.0);
+  mShader.uniform("lighting", 0.0);
   mShader.uniform("texture", 0.0);
   mShader.end();
 
@@ -146,10 +146,6 @@ inline bool OmniStereoGraphicsRenderer::onFrame() {
   // if running on a laptop?
   //
   nav().step();
-  Vec3d v = nav().pos();
-  Quatd q = nav().quat();
-  oscSend().send("/pose", v.x, v.y, v.z, q.x, q.y, q.z, q.w);
-  // nav().print();
 
   onAnimate(dt);
 
@@ -167,7 +163,9 @@ inline void OmniStereoGraphicsRenderer::onDrawOmni(OmniStereo& omni) {
   graphics().error("start onDraw");
   mShader.begin();
   mOmni.uniforms(mShader);
+  graphics().pushMatrix(graphics().MODELVIEW);
   onDraw(graphics());
+  graphics().popMatrix(graphics().MODELVIEW);
   mShader.end();
 }
 
