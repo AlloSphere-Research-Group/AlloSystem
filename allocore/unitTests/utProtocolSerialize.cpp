@@ -1,6 +1,8 @@
 #include "utAllocore.h"
 
-int utProtocolSerialize(){
+#include "catch.hpp"
+
+TEST_CASE( "ProtocolSerialize", "[protocol]" ) {
 
 	// Serialization
 	{	using namespace ser;
@@ -31,18 +33,18 @@ int utProtocolSerialize(){
 
 			d >> of1 >> od1 >> oh1 >> oH1 >> oi1 >> oI1 >> ot1 >> oT1 >> ou1 >> oU1 >> ob1 >> ostr;
 
-			assert(of1 == if1);
-			assert(od1 == id1);
-			assert(oh1 == ih1);
-			assert(oH1 == iH1);
-			assert(oi1 == ii1);
-			assert(oI1 == iI1);
-			assert(ot1 == it1);
-			assert(oT1 == iT1);
-			assert(ou1 == iu1);
-			assert(oU1 == iU1);
-			assert(ob1 == ib1);
-			//assert(ostr == istr);
+			REQUIRE(of1 == if1);
+			REQUIRE(od1 == id1);
+			REQUIRE(oh1 == ih1);
+			REQUIRE(oH1 == iH1);
+			REQUIRE(oi1 == ii1);
+			REQUIRE(oI1 == iI1);
+			REQUIRE(ot1 == it1);
+			REQUIRE(oT1 == iT1);
+			REQUIRE(ou1 == iu1);
+			REQUIRE(oU1 == iU1);
+			REQUIRE(ob1 == ib1);
+			//REQUIRE(ostr == istr);
 
 			//printf("\n%f, %f, %d, %s\n", of1, od1, ob1, ostr.c_str());
 		}
@@ -76,7 +78,7 @@ int utProtocolSerialize(){
 			Deserializer d(s.buf());
 			d >> ofn >> odn >> ohn >> oHn >> oin >> oIn >> otn >> oTn >> oun >> oUn;
 
-			#define ASSERT(a,b) for(int i=0; i<N; ++i) assert(a[i] == b[i]);
+			#define ASSERT(a,b) for(int i=0; i<N; ++i) REQUIRE(a[i] == b[i]);
 
 			ASSERT(ifn, ofn);
 			ASSERT(idn, odn);
@@ -90,6 +92,4 @@ int utProtocolSerialize(){
 			ASSERT(iUn, oUn);
 		}
 	}
-
-	return 0;
 }

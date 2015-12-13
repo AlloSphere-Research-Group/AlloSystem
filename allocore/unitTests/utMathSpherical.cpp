@@ -1,7 +1,9 @@
 #include <math.h>
 #include "utAllocore.h"
 
-int utMathSpherical(){
+#include "catch.hpp"
+
+TEST_CASE( "MathSpherical", "[math]" ) {
 
 	double eps = 1e-8;
 
@@ -54,11 +56,10 @@ int utMathSpherical(){
 
 			if(!al::within(ms.r-tr.r,-eps,eps) || !al::within(ms.i-tr.i,-eps,eps)){
 				printf("\nY(%d,%d,%g,%g):\n\ttr=(% g, % g)\n\tms=(% g, % g)\n", l,m,th,ph, tr.r,tr.i, ms.r,ms.i);
-				assert(false);
+				REQUIRE(false);
 			}
 		}}}}
 	}
-	return 0;
 }
 
 

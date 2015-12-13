@@ -42,8 +42,6 @@ TEST_CASE( "Class construction", "[convolver]" ) {
     conv.shutdown();
 }
 
-
-
 TEST_CASE( "Many to many", "[convolver]" ) {
 	al::Convolver conv;
 	al::AudioIO io(BLOCK_SIZE, 44100.0, NULL, NULL, 2, 2, al::AudioIO::DUMMY);

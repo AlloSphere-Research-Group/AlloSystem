@@ -12,7 +12,9 @@ struct MyThreadFunc : public ThreadFunction{
 	int& x;
 };
 
-int utThread() {
+#include "catch.hpp"
+
+TEST_CASE( "Thread", "[thread]" ) {
 
 	//UT_PRINTF("system: thread\n");
 
@@ -21,7 +23,7 @@ int utThread() {
 		int x=0;
 		Thread t(threadFunc, &x);
 		t.join();
-		assert(1 == x);
+		REQUIRE(1 == x);
 	}
 
 	// C++ style
@@ -30,7 +32,7 @@ int utThread() {
 		MyThreadFunc f(x);
 		Thread t(f);
 		t.join();
-		assert(1 == x);
+		REQUIRE(1 == x);
 	}
 
 	// Assignment
@@ -51,8 +53,6 @@ int utThread() {
 		x=0;
 		t2->start(f);
 		delete t2; // t2 should join on destruction, since t1 did
-		assert(1 == x);
+		REQUIRE(1 == x);
 	}
-
-	return 0;
 }

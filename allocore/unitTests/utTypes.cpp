@@ -2,7 +2,9 @@
 
 typedef double data_t;
 
-int utTypes(){
+#include "catch.hpp"
+
+TEST_CASE( "Types", "[types]" ) {
 
 
 	// Array
@@ -30,8 +32,8 @@ int utTypes(){
 
 		allo_array_setheader(&lat, &hdr);
 
-		assert(allo_array_elements(&lat) == size0*size1);
-		assert(allo_array_size(&lat) == sizeof(data));
+		REQUIRE(allo_array_elements(&lat) == size0*size1);
+		REQUIRE(allo_array_size(&lat) == sizeof(data));
 	}
 
 	{
@@ -45,19 +47,19 @@ int utTypes(){
 		hdr.dimcount = 2;
 
 		allo_array_setstride(&hdr, 1);
-		assert(hdr.stride[0] == 1);
-		assert(hdr.stride[1] == 7);
+		REQUIRE(hdr.stride[0] == 1);
+		REQUIRE(hdr.stride[1] == 7);
 
 		allo_array_setstride(&hdr, 4);
-		assert(hdr.stride[1] == 8);
+		REQUIRE(hdr.stride[1] == 8);
 
 		allo_array_setstride(&hdr, 8);
-		assert(hdr.stride[1] == 8);
+		REQUIRE(hdr.stride[1] == 8);
 
 		// 3D test
 		hdr.dimcount = 3;
 		allo_array_setstride(&hdr, 4);
-		assert(hdr.stride[2] == 8*7);
+		REQUIRE(hdr.stride[2] == 8*7);
 	}
 
 	{	// Basic Array usage
@@ -73,11 +75,11 @@ int utTypes(){
 //		Array field(3, Array::type<float>(), 16, 16, 16);
 
 		{	Array a;
-			assert(a.size() == 0);
-			assert(!a.hasData());
-			assert(a.type() == AlloVoidTy);
-			assert(a.isType(AlloVoidTy));
-			assert(a.isFormat(a));
+			REQUIRE(a.size() == 0);
+			REQUIRE(!a.hasData());
+			REQUIRE(a.type() == AlloVoidTy);
+			REQUIRE(a.isType(AlloVoidTy));
+			REQUIRE(a.isFormat(a));
 		}
 
 		// Run tests on Arrays with various sizes and dimensions
@@ -90,22 +92,22 @@ int utTypes(){
 
 			{	// Constructors
 				{	Array a(Nc, AlloFloat32Ty, N);
-					assert(a.hasData());
-					assert(a.type() == AlloFloat32Ty);
-					assert(a.components() == Nc);
-					assert(a.dimcount() == 1);
+					REQUIRE(a.hasData());
+					REQUIRE(a.type() == AlloFloat32Ty);
+					REQUIRE(a.components() == Nc);
+					REQUIRE(a.dimcount() == 1);
 				}
 				{	Array a(Nc, AlloFloat32Ty, N,N);
-					assert(a.hasData());
-					assert(a.type() == AlloFloat32Ty);
-					assert(a.components() == Nc);
-					assert(a.dimcount() == 2);
+					REQUIRE(a.hasData());
+					REQUIRE(a.type() == AlloFloat32Ty);
+					REQUIRE(a.components() == Nc);
+					REQUIRE(a.dimcount() == 2);
 				}
 				{	Array a(Nc, AlloFloat32Ty, N,N,N);
-					assert(a.hasData());
-					assert(a.type() == AlloFloat32Ty);
-					assert(a.components() == Nc);
-					assert(a.dimcount() == 3);
+					REQUIRE(a.hasData());
+					REQUIRE(a.type() == AlloFloat32Ty);
+					REQUIRE(a.components() == Nc);
+					REQUIRE(a.dimcount() == 3);
 				}
 			}
 
@@ -113,22 +115,22 @@ int utTypes(){
 				Array a;
 
 				a.formatAligned(Nc, AlloFloat32Ty, N, 1);
-				assert((int)a.size() == Nc*N*4);
-				assert(a.hasData());
-				assert(a.isType(AlloFloat32Ty));
-				assert(a.isType<float>());
+				REQUIRE((int)a.size() == Nc*N*4);
+				REQUIRE(a.hasData());
+				REQUIRE(a.isType(AlloFloat32Ty));
+				REQUIRE(a.isType<float>());
 
 				a.formatAligned(Nc, AlloSInt8Ty, N, N, 1);
-				assert((int)a.size() == Nc*N*N*1);
-				assert(a.hasData());
-				assert(a.isType(AlloSInt8Ty));
-				assert(a.isType<int8_t>());
+				REQUIRE((int)a.size() == Nc*N*N*1);
+				REQUIRE(a.hasData());
+				REQUIRE(a.isType(AlloSInt8Ty));
+				REQUIRE(a.isType<int8_t>());
 
 				a.formatAligned(Nc, AlloSInt16Ty, N, N, N, 1);
-				assert((int)a.size() == Nc*N*N*N*2);
-				assert(a.hasData());
-				assert(a.isType(AlloSInt16Ty));
-				assert(a.isType<int16_t>());
+				REQUIRE((int)a.size() == Nc*N*N*N*2);
+				REQUIRE(a.hasData());
+				REQUIRE(a.isType(AlloSInt16Ty));
+				REQUIRE(a.isType<int16_t>());
 			}
 
 			{	// 1-D element access
@@ -139,11 +141,11 @@ int utTypes(){
 					int8_t y[Nc] = {-1,-1,-1};
 					a.write(x, i);
 					a.read(y, i);
-					for(int c=0; c<Nc; ++c) assert(y[c] == x[c]);
+					for(int c=0; c<Nc; ++c) REQUIRE(y[c] == x[c]);
 
 					for(int c=0; c<Nc; ++c){
 						a.elem<int8_t>(c,i) = t+1;
-						assert(a.elem<int8_t>(c,i) == int8_t(t+1));
+						REQUIRE(a.elem<int8_t>(c,i) == int8_t(t+1));
 						++t;
 					}
 				}
@@ -158,11 +160,11 @@ int utTypes(){
 					int8_t y[Nc] = {-1,-1,-1};
 					a.write(x, i,j);
 					a.read(y, i,j);
-					for(int c=0; c<Nc; ++c) assert(y[c] == x[c]);
+					for(int c=0; c<Nc; ++c) REQUIRE(y[c] == x[c]);
 
 					for(int c=0; c<Nc; ++c){
 						a.elem<int8_t>(c,i,j) = t+1;
-						assert(a.elem<int8_t>(c,i,j) == int8_t(t+1));
+						REQUIRE(a.elem<int8_t>(c,i,j) == int8_t(t+1));
 						++t;
 					}
 				}}
@@ -178,11 +180,11 @@ int utTypes(){
 					int8_t y[Nc] = {-1,-1,-1};
 					a.write(x, i,j,k);
 					a.read(y, i,j,k);
-					for(int c=0; c<Nc; ++c) assert(y[c] == x[c]);
+					for(int c=0; c<Nc; ++c) REQUIRE(y[c] == x[c]);
 
 					for(int c=0; c<Nc; ++c){
 						a.elem<int8_t>(c,i,j,k) = t+1;
-						assert(a.elem<int8_t>(c,i,j,k) == int8_t(t+1));
+						REQUIRE(a.elem<int8_t>(c,i,j,k) == int8_t(t+1));
 						++t;
 					}
 				}}}
@@ -194,29 +196,29 @@ int utTypes(){
 
 	{
 		Buffer<int> a(0,2);
-		assert(a.size() == 0);
-		assert(a.capacity() == 2);
-		//assert(a.fill() == 0);
+		REQUIRE(a.size() == 0);
+		REQUIRE(a.capacity() == 2);
+		//REQUIRE(a.fill() == 0);
 
 		a.append(1);
-		assert(a[0] == 1);
-		assert(a.size() == 1);
-		assert(a.last() == 1);
+		REQUIRE(a[0] == 1);
+		REQUIRE(a.size() == 1);
+		REQUIRE(a.last() == 1);
 
 		a.append(2);
 		a.append(3);
-		assert(a.size() == 3);
-		assert(a.capacity() == 4);
-		assert(a.last() == 3);
+		REQUIRE(a.size() == 3);
+		REQUIRE(a.capacity() == 4);
+		REQUIRE(a.last() == 3);
 
 		a.reset();
-		assert(a.size() == 0);
-		assert(a.capacity() == 4);
+		REQUIRE(a.size() == 0);
+		REQUIRE(a.capacity() == 4);
 
 		a.append(7);
 		a.repeatLast();
-		assert(a[0] == 7);
-		assert(a[1] == 7);
+		REQUIRE(a[0] == 7);
+		REQUIRE(a[1] == 7);
 
 		// Appending another Buffer
 		{
@@ -230,22 +232,22 @@ int utTypes(){
 			{
 			int N = a.size() + b.size();
 			a.append(b);
-				assert(a.size() == N);
-				for(int i=0; i<N; ++i) assert(a[i] == i);
+				REQUIRE(a.size() == N);
+				for(int i=0; i<N; ++i) REQUIRE(a[i] == i);
 			}
 
 			// Append non-zero sized to zero sized
 			a.size(0);
 			a.append(b);
-				assert(a.size() == b.size());
-				for(int i=0; i<a.size(); ++i) assert(a[i] == b[i]);
+				REQUIRE(a.size() == b.size());
+				for(int i=0; i<a.size(); ++i) REQUIRE(a[i] == b[i]);
 
 			// Append zero sized to non-zero sized
 			{
 			int N = a.size();
 			b.size(0);
 			a.append(b);
-				assert(a.size() == N);
+				REQUIRE(a.size() == N);
 			}
 		}
 	}
@@ -255,38 +257,36 @@ int utTypes(){
 
 		// Test ring buffering
 		a.resize(4);
-		assert(a.size() == 4);
+		REQUIRE(a.size() == 4);
 
 		a.write(1);
 		a.write(2);
-		//assert(a.fill() == 2);
+		//REQUIRE(a.fill() == 2);
 
 		a.write(3);
 		a.write(4);
 
-		assert(a.pos() == 3);
+		REQUIRE(a.pos() == 3);
 
-		assert(a[0] == 1);
-		assert(a[1] == 2);
-		assert(a[2] == 3);
-		assert(a[3] == 4);
+		REQUIRE(a[0] == 1);
+		REQUIRE(a[1] == 2);
+		REQUIRE(a[2] == 3);
+		REQUIRE(a[3] == 4);
 
-		assert(a.read(0) == 4);
-		assert(a.read(1) == 3);
-		assert(a.read(2) == 2);
-		assert(a.read(3) == 1);
+		REQUIRE(a.read(0) == 4);
+		REQUIRE(a.read(1) == 3);
+		REQUIRE(a.read(2) == 2);
+		REQUIRE(a.read(3) == 1);
 
-		//assert(a.fill() == 4);
+		//REQUIRE(a.fill() == 4);
 		a.write(5);
-		//assert(a.fill() == 4);
-		assert(a[0] == 5);
-		assert(a.read(0) == 5);
-		assert(a.read(1) == 4);
-		assert(a.read(2) == 3);
-		assert(a.read(3) == 2);
+		//REQUIRE(a.fill() == 4);
+		REQUIRE(a[0] == 5);
+		REQUIRE(a.read(0) == 5);
+		REQUIRE(a.read(1) == 4);
+		REQUIRE(a.read(2) == 3);
+		REQUIRE(a.read(3) == 2);
 	}
-
-	return 0;
 }
 
 

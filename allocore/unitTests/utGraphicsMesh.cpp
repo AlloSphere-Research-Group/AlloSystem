@@ -1,13 +1,15 @@
 #include "utAllocore.h"
 
-int utGraphicsMesh(){
+#include "catch.hpp"
+
+TEST_CASE( "GraphicsMesh", "[graphics]" ) {
 
 	{
 		const int N = 3;
 		Vec3f verts[N] = { Vec3f(1,0,0), Vec3f(0,1,0), Vec3f(0,0,1)};
 		Color colors[N] ={ Color(1,0,0), Color(0,1,0), Color(0,0,1)};
 
-		assert(Color(0) == Color(0)); // ensure we can compare colors
+		REQUIRE(Color(0) == Color(0)); // ensure we can compare colors
 
 		{
 			Mesh m;
@@ -17,8 +19,8 @@ int utGraphicsMesh(){
 			}
 
 			for(int i=0; i<N; ++i){
-				assert(m.vertices()[i] == verts[i]);
-				assert(m.colors()[i] == colors[i]);
+				REQUIRE(m.vertices()[i] == verts[i]);
+				REQUIRE(m.colors()[i] == colors[i]);
 			}
 		}
 
@@ -36,12 +38,10 @@ int utGraphicsMesh(){
 //			}
 
 			for(int i=0; i<N; ++i){
-				assert(m.vertices()[i] == verts[i]);
-				assert(m.colors()[i] == colors[i]);
+				REQUIRE(m.vertices()[i] == verts[i]);
+				REQUIRE(m.colors()[i] == colors[i]);
 			}
 		}
 
 	}
-
-	return 0;
 }

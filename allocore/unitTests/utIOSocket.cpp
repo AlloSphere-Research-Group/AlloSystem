@@ -1,6 +1,8 @@
 #include "utAllocore.h"
 
-int utIOSocket(){
+#include "catch.hpp"
+
+TEST_CASE( "IOSocket", "[socket]" ) {
 
 	{
 		SocketClient s;
@@ -17,7 +19,7 @@ int utIOSocket(){
 	SocketClient c(port, "localhost");
 	SocketServer s(port, "", 0.1);
 
-	assert(c.port() == port);
+	REQUIRE(c.port() == port);
 
 	// Make receiver block forever until a packet is received.
 	// All packets should be received.
@@ -27,9 +29,9 @@ int utIOSocket(){
 		dataRecv[0] = '\0';
 		int ns = c.send(dataSend, sizeof dataSend);
 		int nr = s.recv(dataRecv, sizeof dataRecv);
-		assert(ns == sizeof dataSend);
-		assert(nr == sizeof dataSend);
-		assert(0 == strcmp(dataSend, dataRecv));
+		REQUIRE(ns == sizeof dataSend);
+		REQUIRE(nr == sizeof dataSend);
+		REQUIRE(0 == strcmp(dataSend, dataRecv));
 	}
 
 
@@ -44,7 +46,7 @@ int utIOSocket(){
 		if(!strcmp(dataSend, dataRecv)) ++dropped;
 	}
 	//printf("%d\n", dropped);
-	assert(dropped);
+	REQUIRE(dropped);
 
 
 	// Make receiver block for a short duration waiting for incoming packets.
@@ -55,9 +57,9 @@ int utIOSocket(){
 		dataRecv[0] = '\0';
 		int ns = c.send(dataSend, sizeof dataSend);
 		int nr = s.recv(dataRecv, sizeof dataRecv);
-		assert(ns == sizeof dataSend);
-		assert(nr == sizeof dataSend);
-		assert(0 == strcmp(dataSend, dataRecv));
+		REQUIRE(ns == sizeof dataSend);
+		REQUIRE(nr == sizeof dataSend);
+		REQUIRE(0 == strcmp(dataSend, dataRecv));
 	}
 
 	// make sure timeout works:
@@ -71,6 +73,4 @@ int utIOSocket(){
 //		printf("%s\n", Socket::hostName().c_str());
 //		printf("%s\n", Socket::hostIP().c_str());
 	}
-
-	return 0;
 }

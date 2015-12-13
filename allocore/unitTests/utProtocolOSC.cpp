@@ -12,27 +12,29 @@ struct PacketData{
 	void print() const { printf("%x %g %g %d\n", i, f, d, c); }
 };
 
-int utProtocolOSC(){
+#include "catch.hpp"
+
+TEST_CASE( "ProtocolOSC", "[protocol]" ) {
 
 	using namespace al::osc;
 
 	Packet p;
-		assert(p.size() == 0);
+		REQUIRE(p.size() == 0);
 
 	p.addMessage("/test", 1, 1.f, 1.0, '1', "1", std::string("1"), Blob("1",1));
-		assert(p.size() != 0);
-		assert(p.isMessage());
-		assert(!p.isBundle());
+		REQUIRE(p.size() != 0);
+		REQUIRE(p.isMessage());
+		REQUIRE(!p.isBundle());
 
 	p.clear();
-		assert(p.size() == 0);
+		REQUIRE(p.size() == 0);
 
 	p.beginBundle();
 	p.addMessage("/test", 1, 1.f, 1.0, '1', "1", std::string("1"), Blob("1",1));
 	p.endBundle();
-		assert(p.size() != 0);
-		assert(!p.isMessage());
-		assert(p.isBundle());
+		REQUIRE(p.size() != 0);
+		REQUIRE(!p.isMessage());
+		REQUIRE(p.isBundle());
 
 	p.clear();
 
@@ -45,8 +47,8 @@ int utProtocolOSC(){
 
 		Message m(p.data(), p.size());
 
-			assert(m.addressPattern() == "/test");
-			assert(m.typeTags() == "ifdcssb");
+			REQUIRE(m.addressPattern() == "/test");
+			REQUIRE(m.typeTags() == "ifdcssb");
 
 		int i=0; float f=0; double d=0; char c=0;
 		const char * cs; std::string ss;
@@ -54,14 +56,14 @@ int utProtocolOSC(){
 
 		m >> i >> f >> d >> c >> cs >> ss >> b;
 
-			assert( 1 == i);
-			assert( 1 == f);
-			assert( 1 == d);
-			assert('1'== c);
-			assert(strcmp(cs, str) == 0);
-			assert(ss == str);
-			assert(int(strlen(str)) == int(b.size));
-			assert(!strcmp((char *)b.data, str));
+			REQUIRE( 1 == i);
+			REQUIRE( 1 == f);
+			REQUIRE( 1 == d);
+			REQUIRE('1'== c);
+			REQUIRE(strcmp(cs, str) == 0);
+			REQUIRE(ss == str);
+			REQUIRE(int(strlen(str)) == int(b.size));
+			REQUIRE(!strcmp((char *)b.data, str));
 	}
 
 
@@ -80,8 +82,8 @@ int utProtocolOSC(){
 		p.addMessage("/message13", (int)0x56789abc);
 	p.endBundle();
 
-	assert(p.isBundle());
-	assert(!p.isMessage());
+	REQUIRE(p.isBundle());
+	REQUIRE(!p.isMessage());
 
 
 	PacketData data;
@@ -91,8 +93,8 @@ int utProtocolOSC(){
 
 //				m.print();
 
-				assert(m.typeTags() == "sifdcb");
-				assert(m.addressPattern() == "/test");
+				REQUIRE(m.typeTags() == "sifdcb");
+				REQUIRE(m.addressPattern() == "/test");
 
 				std::string s;
 				PacketData d;
@@ -101,9 +103,9 @@ int utProtocolOSC(){
 				d.clear();
 				m >> s >> d.i >> d.f >> d.d >> d.c >> b;
 
-				assert(s == "a string");
-				assert(d.valid());
-				assert(((const PacketData *)b.data)->valid());
+				REQUIRE(s == "a string");
+				REQUIRE(d.valid());
+				REQUIRE(((const PacketData *)b.data)->valid());
 			}
 		} handler;
 
@@ -129,6 +131,4 @@ int utProtocolOSC(){
 			al_sleep(0.01);
 		}
 	}
-
-	return 0;
 }

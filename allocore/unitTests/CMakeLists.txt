@@ -1,6 +1,20 @@
-#aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR} TEST_SRC_LIST ut*.cpp)
 
-file(GLOB TEST_SRC_LIST RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "ut*.cpp")
+include_directories("${CMAKE_SOURCE_DIR}/external/CATCH")
+
+set(TEST_SRC_LIST "unitTests.cpp"
+  "utMath.cpp"
+  "utMathSpherical.cpp"
+  "utTypes.cpp"
+  "utTypesConversion.cpp"
+  "utSpatial.cpp"
+  "utSystem.cpp"
+  "utProtocolOSC.cpp"
+  "utProtocolSerialize.cpp"
+  "utIOSocket.cpp"
+  "utFile.cpp"
+  "utThread.cpp"
+  "utGraphicsMesh.cpp"
+)
 
 set(TEST_ARGS "")
 
@@ -9,7 +23,7 @@ set(ALLOCORE_LIBRARY "allocore${DEBUG_SUFFIX}")
 get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore${DEBUG_SUFFIX} ALLOCORE_DEP_INCLUDE_DIRS)
 get_target_property(ALLOCORE_LINK_LIBRARIES allocore${DEBUG_SUFFIX} ALLOCORE_LINK_LIBRARIES)
 
-add_executable(allocoreTests unitTests.cpp ${TEST_SRC_LIST})
+add_executable(allocoreTests ${TEST_SRC_LIST})
 include_directories("${BUILD_ROOT_DIR}/build/include/")
 target_link_libraries(allocoreTests ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES})
 add_dependencies(allocoreTests allocore${DEBUG_SUFFIX})

@@ -1,37 +1,39 @@
 #include "utAllocore.h"
 
-int utFile() {
+#include "catch.hpp"
+
+TEST_CASE( "File", "[file]" ) {
 
 	#define DELIM AL_FILE_DELIMITER_STR
 
 	// static functions
-	assert(File::exists("."));
-	//assert(File::exists("." DELIM)); // fails under win32
+	REQUIRE(File::exists("."));
+	//REQUIRE(File::exists("." DELIM)); // fails under win32
 
-	assert(File::isDirectory("."));
-	assert(File::isDirectory(".." ));
-	assert(!File::isDirectory(".." DELIM ".." DELIM "Makefile"));
+	REQUIRE(File::isDirectory("."));
+	REQUIRE(File::isDirectory(".." ));
+	REQUIRE(!File::isDirectory(".." DELIM ".." DELIM "Makefile"));
 
-	assert(
+	REQUIRE(
 		File::conformDirectory("test")
 		== "test" DELIM
 	);
-	assert(
+	REQUIRE(
 		File::conformDirectory("test" DELIM)
 		== "test" DELIM
 	);
 
-	assert(
+	REQUIRE(
 		File::conformPathToOS("..\\../Makefile")
 		== ".." DELIM ".." DELIM "Makefile"
 	);
 
-	assert(
+	REQUIRE(
 		File::conformPathToOS("..\\../")
 		== ".." DELIM ".." DELIM
 	);
 
-	assert(
+	REQUIRE(
 		File::conformPathToOS("..\\..")
 		== ".." DELIM ".." DELIM
 	);
@@ -44,15 +46,15 @@ int utFile() {
 		std::string find = "Makefile";
 
 		bool r = File::searchBack(dir, find);
-		assert(r);
-		assert(File::exists(dir + find));
+		REQUIRE(r);
+		REQUIRE(File::exists(dir + find));
 
 		find = "allocore" DELIM + find;	// check for a file with path
 		r = File::searchBack(dir, find);
-		assert(r);
-		assert(File::exists(dir + find));
+		REQUIRE(r);
+		REQUIRE(File::exists(dir + find));
 
-		assert(!File::searchBack(dir, "thisdirectorydoesnotexist" DELIM "thisfiledoesnotexist.ext"));
+		REQUIRE(!File::searchBack(dir, "thisdirectorydoesnotexist" DELIM "thisfiledoesnotexist.ext"));
 	}
 
 	{
@@ -61,33 +63,33 @@ int utFile() {
 
 		// write data
 		File f(path, "w");
-		assert(!f.opened());
+		REQUIRE(!f.opened());
 
-		assert(f.open());
-		assert(f.opened());
-		assert(File::exists(path));
+		REQUIRE(f.open());
+		REQUIRE(f.opened());
+		REQUIRE(File::exists(path));
 
-		assert(
+		REQUIRE(
 			f.write(text, strlen(text))
 		);
 
-		assert(f.size() == (int)strlen(text));
+		REQUIRE(f.size() == (int)strlen(text));
 
 		f.close();
-		assert(!f.opened());
-		assert(File::exists(path));
+		REQUIRE(!f.opened());
+		REQUIRE(File::exists(path));
 
 
 		// read data
 		f.mode("r").open();
-		assert(f.opened());
+		REQUIRE(f.opened());
 
 		const char * read = f.readAll();
 
-		assert(f.size() == (int)strlen(text));
+		REQUIRE(f.size() == (int)strlen(text));
 
 		for(int i=0; i<f.size(); ++i){
-			assert(read[i] == text[i]);
+			REQUIRE(read[i] == text[i]);
 //			printf("%c", read[i]);
 		}
 
@@ -98,13 +100,13 @@ int utFile() {
 			"neitherdoesthisone" DELIM
 			"notafile.txt"
 		);
-		assert(!f.open());
+		REQUIRE(!f.open());
 	}
 
 
 	{
-		assert(Dir::make("utFileTestDir"));
-		assert(Dir::remove("utFileTestDir"));
+		REQUIRE(Dir::make("utFileTestDir"));
+		REQUIRE(Dir::remove("utFileTestDir"));
 
 		// For now, just make sure this compiles and doesn't crash. :)
 		Dir dir;
@@ -132,5 +134,4 @@ int utFile() {
 	}
 
 	#undef DELIM
-	return 0;
 }
