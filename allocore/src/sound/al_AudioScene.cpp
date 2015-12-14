@@ -1,4 +1,5 @@
 #include "allocore/sound/al_AudioScene.hpp"
+#include "allocore/math/al_Constants.hpp"
 
 namespace al{
 

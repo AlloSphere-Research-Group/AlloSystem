@@ -43,6 +43,7 @@
 */
 
 #include <cmath>
+#include "allocore/math/al_Constants.hpp"
 
 namespace al {
 

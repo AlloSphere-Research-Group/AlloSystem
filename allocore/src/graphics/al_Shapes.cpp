@@ -1,4 +1,5 @@
 #include <math.h>
+#include "allocore/math/al_Constants.hpp"
 #include "allocore/graphics/al_Shapes.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
 
