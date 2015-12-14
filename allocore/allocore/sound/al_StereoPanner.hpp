@@ -2,6 +2,7 @@
 #define INCLUDE_AL_PANNING_STEREO
 
 #include "allocore/sound/al_AudioScene.hpp"
+#include "allocore/math/al_Constants.hpp"
 //#include "allocore/math/al_Quat.hpp"
 ////#include "allocore/spatial/al_CoordinateFrame.hpp"
 

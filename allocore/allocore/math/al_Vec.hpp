@@ -47,7 +47,7 @@
 #include <cmath>
 #include <stdio.h>
 #include <ostream>
-
+#include "allocore/math/al_Constants.hpp"
 #include "allocore/math/al_Functions.hpp"
 
 namespace al {
