@@ -87,12 +87,14 @@ typedef enum {
  * audio callback, after any synthesis and spatialization.
  *
  * It can be controlled by OSC over UDP.
+ *
+ * @ingroup alloaudio
  */
 class OutputMaster : public osc::Recv, public al::AudioCallback
 {
     public:
     /**
-     * @brief OutputMaster
+	 * @brief OutputMaster
      * @param num_chnls number of channels that will be processed by the OutputMaster object
      * @param sampleRate the audio sampling rate
      * @param address the IP address to bind for receiving messages. For local address use "localhost"

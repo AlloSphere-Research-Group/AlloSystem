@@ -96,6 +96,8 @@
 namespace al{
 
 /// Ambisonic base class
+///
+/// @ingroup allocore
 class AmbiBase{
 public:
 
@@ -156,6 +158,8 @@ protected:
 
 
 /// Higher Order Ambisonic Decoding class
+///
+/// @ingroup allocore
 class AmbiDecode : public AmbiBase{
 public:
 
@@ -229,6 +233,8 @@ protected:
 
 
 /// Higher Order Ambisonic encoding class
+///
+/// @ingroup allocore
 class AmbiEncode : public AmbiBase{
 public:
 
@@ -269,6 +275,8 @@ public:
 
 
 /// Ambisonic coder
+///
+/// @ingroup allocore
 class AmbisonicsSpatializer : public Spatializer {
 public:
 

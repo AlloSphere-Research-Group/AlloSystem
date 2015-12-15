@@ -48,6 +48,8 @@
 namespace al{
 
 /// Accesses a human interface device (HID)
+///
+/// @ingroup allocore
 class HID{
 public:
 

@@ -66,10 +66,11 @@
 	context by default.
 */
 
-
 namespace al{
 
 /// Context for signaling resource changes to GPU objects
+///
+/// @ingroup allocore
 class GPUContext {
 public:
 	GPUContext();
@@ -93,6 +94,8 @@ protected:
 
 
 /// Base class for allocated resources on the GPU
+///
+/// @ingroup allocore
 class GPUObject{
 public:
 

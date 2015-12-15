@@ -8,6 +8,10 @@
 
 namespace al{
 
+///
+/// \brief The StereoPanner class
+///
+/// @ingroup allocore
 class StereoPanner : public Spatializer{
 public:
 	

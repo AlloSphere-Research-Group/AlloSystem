@@ -52,6 +52,8 @@ namespace al{
 
 /// Render buffer objects are used for offscreen rendering. They are a single
 /// image of a renderable internal format, such as color, depth, or stencil.
+///
+/// @ingroup allocore
 class RBO : public GPUObject{
 public:
 
@@ -112,6 +114,8 @@ public:
 /// All attachments must have the same dimensions and all color attachments
 /// must have the same pixel format. These are standard requirements of an FBO,
 /// not an implementation-imposed limitation.
+///
+/// @ingroup allocore
 class FBO : public GPUObject {
 public:
 

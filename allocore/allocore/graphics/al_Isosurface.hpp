@@ -84,6 +84,7 @@ namespace al{
 
 
 /// Isosurface generated using marching cubes
+/// @ingroup allocore
 class Isosurface : public Mesh {
 public:
 

@@ -49,6 +49,8 @@
 namespace al {
 
 /// Mapping from keyboard and mouse controls to a Nav object
+///
+/// @ingroup allocore
 class NavInputControl : public InputEventHandler {
 public:
 	NavInputControl(const NavInputControl& v);

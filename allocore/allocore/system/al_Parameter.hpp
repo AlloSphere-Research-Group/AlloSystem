@@ -82,6 +82,8 @@ namespace al
  * function. In the worst case this might incur some jitter when reading the value.
  * 
  * The ParameterServer class allows exposing Parameter objects via OSC.
+ *
+ * @ingroup allocore
  */
 class Parameter{
 public:
@@ -159,6 +161,8 @@ private:
  * 
  * Parameter objects that are registered with a ParameterServer will receive 
  * incoming messages on their OSC address.
+ *
+ * @ingroup allocore
  */
 class ParameterServer : public osc::PacketHandler
 {

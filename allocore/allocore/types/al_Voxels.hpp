@@ -156,6 +156,8 @@ struct MRCHeader {
 };
 
 /// OBJECT-oriented interface to AlloArray
+///
+/// @ingroup allocore
 class Voxels : public Array {
 public:
   Voxels() :
