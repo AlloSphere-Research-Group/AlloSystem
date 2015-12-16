@@ -416,13 +416,58 @@ RayStereo& RayStereo::loadConfig(std::string configpath, std::string configname)
   return *this;
  }
 
+void RayStereo::createTexture(GLuint* id_tex) {
+
+  // create texture:
+  glGenTextures(1, id_tex);
+
+  glBindTexture(GL_TEXTURE_2D, *id_tex);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+  
+  // filtering
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  
+  // TODO: verify?
+  // Domagoj also has:
+  glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
+  glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
+  glTexGeni( GL_R, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR );
+  float X[4] = { 1,0,0,0 };
+  float Y[4] = { 0,1,0,0 };
+  float Z[4] = { 0,0,1,0 };
+  glTexGenfv( GL_S, GL_OBJECT_PLANE, X );
+  glTexGenfv( GL_T, GL_OBJECT_PLANE, Y );
+  glTexGenfv( GL_R, GL_OBJECT_PLANE, Z );
+  
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, mResolution, mResolution, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+  
+  // clean up:
+  glBindTexture(GL_TEXTURE_2D, 0);
+  Graphics::error("creating texture");
+}
+
+void RayStereo::bindTexToFBO(GLuint id_tex) {
+  glBindFramebuffer(GL_FRAMEBUFFER, mFbo);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, id_tex, 0);
+  // glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void RayStereo::bindDepthTexToFBO(GLuint id_tex) {
+  glBindFramebuffer(GL_FRAMEBUFFER, mFbo);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, id_tex, 0);
+  // glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void RayStereo::onCreate() {
 	// force allocation of warp/blend textures:
 	for (unsigned i=0; i<4; i++) {
 		mProjections[i].onCreate();
 	}
-	
-	// create cubemap textures:
+
+	// create textures:
 	glGenTextures(2, mTex);
   for (int i=0; i<2; i++) {
     glBindTexture(GL_TEXTURE_2D, mTex[i]);
@@ -456,7 +501,6 @@ void RayStereo::onCreate() {
 	// one FBO to rule them all...
 	glGenFramebuffers(1, &mFbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, mFbo);
-	//Attach one of the faces of the Cubemap texture to this FBO
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mTex[0], 0);
 	
 	glGenRenderbuffers(1, &mRbo);
@@ -514,7 +558,7 @@ void RayStereo::draw(const ShaderProgram* shaderProgram, const Lens& lens, const
 		p.warp().bind(1);
 		
     double eye = lens.eyeSep();
-    
+
 		switch (mMode) {
       case SEQUENTIAL:
         if (mFrame & 1) {

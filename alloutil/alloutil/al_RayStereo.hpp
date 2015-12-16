@@ -103,6 +103,10 @@ public:
   // get individual projector configurations:
   Projection& projection(int i) { return mProjections[i]; }
   int numProjections() const { return mNumProjections; }
+
+  void createTexture(GLuint* id_tex);
+  void bindTexToFBO(GLuint id_tex);
+  void bindDepthTexToFBO(GLuint id_tex);
   
   // useful accessors:
   GLuint texture() const { return mTex[0]; }

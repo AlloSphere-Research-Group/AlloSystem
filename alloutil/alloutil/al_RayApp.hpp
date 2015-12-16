@@ -31,7 +31,7 @@ namespace al {
     virtual void onSound(AudioIOData& io) {}
     virtual void onMessage(osc::Message& m);
     
-    virtual void initShaderParams();
+    virtual void initShader();
     
     void initWindow(const Window::Dim& dims = Window::Dim(800, 600),
                     const std::string title = "RayApp",
@@ -247,7 +247,7 @@ namespace al {
     // // set uniforms before validating to prevent validation error
     // mShader.listParams();
     
-    // initShaderParams(); // initialize custom texture or non-default uniforms here
+    // initShader(); // initialize custom texture or non-default uniforms here
     
     // mShader.begin();
     // mShader.uniform("alphaMap", 2);
@@ -277,7 +277,7 @@ namespace al {
   }
   
   // for initializing parameters before compiling shader
-  inline void RayApp::initShaderParams() {
+  inline void RayApp::initShader() {
   }
   
   // basic uniforms used in the shader. override it on user code
@@ -286,6 +286,7 @@ namespace al {
   
   inline bool RayApp::onFrame() {
     if(!bShaderLoaded) {
+      initShader();
       loadShaders();
       bShaderLoaded = true;
     }
