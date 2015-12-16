@@ -65,7 +65,6 @@ namespace al {
     bool omniEnable() const { return bOmniEnable; }
     void omniEnable(bool b) { bOmniEnable = b; }
     
-    
     virtual void loadShaders();
     
     virtual void sendUniforms(ShaderProgram* shaderProgram);
