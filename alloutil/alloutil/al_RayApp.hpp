@@ -65,13 +65,8 @@ namespace al {
     bool omniEnable() const { return bOmniEnable; }
     void omniEnable(bool b) { bOmniEnable = b; }
     
-    // ShaderProgram& shader() { return mShader; }
     
     virtual void loadShaders();
-    // void loadShaderString();
-    // void loadShaderString(std::string vSrc, std::string fSrc);
-    // void loadShaderFile(std::string vPath, std::string fPath);
-    // void recompileShaderFile(std::string vFile, std::string fFile);
     
     virtual void sendUniforms(ShaderProgram* shaderProgram);
     
@@ -98,9 +93,6 @@ namespace al {
     
     ShaderManager mShaderManager;
 
-    // ShaderProgram mShader;
-    // Shader mVert, mFrag;
-    
     // control
     Nav mNav;
     NavInputControl mNavControl;
@@ -230,42 +222,11 @@ namespace al {
     
     mOmni.onCreate();
     
-    // if (!bShaderLoaded) {
-    //   printf("No shader file specified. Reading from vertexCode()/fragmentCode().\n");
-    //   loadShaderString();
-    // }
-    
-    // mVert.compile();
-    // mVert.printLog();
-    // mFrag.compile();
-    // mFrag.printLog();
-    
-    // mShader.attach(mVert);
-    // mShader.attach(mFrag);
-    // mShader.link(false); // do not validate yet
-    
-    // // set uniforms before validating to prevent validation error
-    // mShader.listParams();
-    
-    // initShader(); // initialize custom texture or non-default uniforms here
-    
-    // mShader.begin();
-    // mShader.uniform("alphaMap", 2);
-    // mShader.uniform("pixelMap", 1);
-    // mShader.end();
-    
-    // mShader.validate();
-    // mShader.printLog();
-    
-    // Graphics::error("shader program initialization failed");
-    
     return true;
   }
   
   inline bool RayApp::onDestroy() {
-    // mShader.destroy();
-    
-    /////// cycle through shaders and invalidate?
+    mShaderManager.destroy();
 
     return true;
   }
@@ -294,24 +255,19 @@ namespace al {
 
     FPS::onFrame();
 
+    if(frame % 60 == 0) {
+      printf("FPS: %03.6f\n", FPS::fps());
+//      nav().print();
+    }
+
     while(oscRecv().recv()) {}
     
     nav().step();
     
     onAnimate(dt);
     
-    // Viewport vp(width(), height());
-    
     onDraw(graphics());
 
-    // mShader.begin();
-    
-    // sendUniforms(mShader);
-    
-    // mOmni.draw(mShader, lens(), vp);
-    
-    // mShader.end();
-    
     return true;
   }
 

@@ -122,6 +122,12 @@ struct ShaderManager {
   bool poll() {
     return rm.poll();
   }
+
+  void destroy() {
+    for (std::map<std::string, ShaderProgram*>::iterator it = shaderMap.begin(); it != shaderMap.end(); ++it) {
+      (it->second)->invalidate();
+    }
+  }
 };
 
 #endif
