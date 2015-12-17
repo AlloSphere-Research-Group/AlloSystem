@@ -241,6 +241,9 @@ public:
 		double farBias=0, int delaySize=100000
 	);
 
+	virtual ~SoundSource(){}
+
+
 	/// Returns whether distance-based attenuation is enabled
 	bool useAttenuation() const { return mUseAtten; }
 
