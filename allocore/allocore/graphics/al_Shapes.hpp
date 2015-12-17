@@ -49,6 +49,7 @@ namespace al{
 /// Add tetrahedron as indexed triangles
 
 /// @param[in,out]	m		Mesh to add vertices and indices to
+/// @param[in]		radius	Radius of enclosing sphere
 /// \returns number of vertices added (4)
 ///
 /// @ingroup allocore
@@ -57,6 +58,7 @@ int addTetrahedron(Mesh& m, float radius=1);
 /// Add cube as indexed triangles
 
 /// @param[in,out]	m		Mesh to add vertices and indices to
+/// @param[in]		radius	Radius of enclosing sphere
 /// \returns number of vertices added (8)
 ///
 /// @ingroup allocore
@@ -65,6 +67,7 @@ int addCube(Mesh& m, bool withNormalsAndTexcoords = false, float radius=M_SQRT_1
 /// Add octahedron as triangle vertices and indices
 
 /// @param[in,out]	m		Mesh to add vertices and indices to
+/// @param[in]		radius	Radius of enclosing sphere
 /// \returns number of vertices added (6)
 ///
 /// @ingroup allocore
@@ -73,6 +76,7 @@ int addOctahedron(Mesh& m, float radius=1);
 /// Add dodecahedron as indexed triangles
 
 /// @param[in,out]	m		Mesh to add vertices and indices to
+/// @param[in]		radius	Radius of enclosing sphere
 /// \returns number of vertices added (20)
 ///
 /// @ingroup allocore
@@ -81,10 +85,20 @@ int addDodecahedron(Mesh& m, float radius=1);
 /// Add icosahedron as indexed triangles
 
 /// @param[in,out]	m		Mesh to add vertices and indices to
+/// @param[in]		radius	Radius of enclosing sphere
 /// \returns number of vertices added (12)
 ///
 /// @ingroup allocore
 int addIcosahedron(Mesh& m, float radius=1);
+
+
+/// Add sphere produced from subdivided icosahedron as indexed triangles
+
+/// @param[in,out]	m		Mesh to add vertices and indices to
+/// @param[in]		radius	Radius of sphere
+/// @param[in]		divisions Number of recursive subdivisions
+/// \returns number of vertices added
+int addIcosphere(Mesh& m, double radius=1, int divisions=2);
 
 
 /// Add sphere as indexed triangles

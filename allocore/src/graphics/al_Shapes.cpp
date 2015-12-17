@@ -1,3 +1,4 @@
+#include <map>
 #include <math.h>
 #include "allocore/math/al_Constants.hpp"
 #include "allocore/graphics/al_Shapes.hpp"
@@ -261,6 +262,83 @@ int addIcosahedron(Mesh& m, float radius){
 	scaleVerts(m, radius, Nv);
 
 	return Nv;
+}
+
+
+// Subdivides triangles
+
+// This function subdivides each triangle in the mesh into four new triangles
+// formed from the vertices and edge midpoints of the original triangle.
+// TODO: add as method to Mesh?
+void subdivide(Mesh& m, unsigned iterations, bool normalize){
+
+	typedef std::map<uint64_t, unsigned> PointToIndex;
+
+	if(m.primitive() != Graphics::TRIANGLES) return;
+
+	for(unsigned k=0; k<iterations; ++k){
+
+		PointToIndex middlePointIndexCache;
+
+		Mesh::Index newIndex = m.vertices().size();
+		Mesh::Indices oldIndices(m.indices());
+		m.indices().reset();
+
+		// Iterate through triangles
+		for(unsigned j=0; j<(unsigned)oldIndices.size(); j+=3){
+
+			//printf("%u %u\n", k, j);
+
+			Mesh::Index * corner = &oldIndices[j];
+			Mesh::Index mid[3];
+
+			for(unsigned i=0; i<3; ++i){
+				uint64_t i1 = corner[ i     ];
+				uint64_t i2 = corner[(i+1)%3];
+				uint64_t key = i1 < i2 ? (i1<<32) | i2 : (i2<<32) | i1;
+
+				PointToIndex::iterator it = middlePointIndexCache.find(key);
+				if(it != middlePointIndexCache.end()){
+					mid[i] = it->second;
+				}
+				else{
+					middlePointIndexCache.insert(std::make_pair(key, newIndex));
+					Mesh::Vertex v1 = m.vertices()[i1];
+					Mesh::Vertex v2 = m.vertices()[i2];
+					Mesh::Vertex vm;
+					if(normalize){
+						vm = v1 + v2;
+						//vm.normalize();
+						// use average magnitude to keep smooth
+						vm.normalize((v1.mag()+v2.mag())*0.5);
+					}
+					else{
+						vm = (v1 + v2)*0.5;	
+					}
+					m.vertex(vm);
+					// TODO: other attributes (colors, normals, etc.)
+					mid[i] = newIndex;
+					++newIndex;
+				}
+			}
+
+			Mesh::Index newIndices[] = {
+				corner[0], mid[0], mid[2],
+				corner[1], mid[1], mid[0],
+				corner[2], mid[2], mid[1],
+				mid[0], mid[1], mid[2]
+			};
+
+			m.index(newIndices, 12);
+		}
+	}
+}
+
+int addIcosphere(Mesh& m, double radius, int divisions){
+	int Nv = m.vertices().size();
+	addIcosahedron(m, radius);
+	subdivide(m, divisions, true);
+	return m.vertices().size() - Nv;
 }
 
 
