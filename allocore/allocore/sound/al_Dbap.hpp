@@ -47,15 +47,16 @@
 namespace al{
 
 #define DBAP_MAX_NUM_SPEAKERS 192
-#define DBAP_MAX_DIST 100
 
 /// Distance-based amplitude panner
+///
+/// @ingroup allocore
 class Dbap : public Spatializer{
 public:
 
 	/// @param[in] sl		A speaker layout
-	/// @param[in] spread	Amplitude spread to nearby speakers
-	Dbap(const SpeakerLayout &sl, float spread = 5.f);
+	/// @param[in] focus	Amplitude focus to nearby speakers
+	Dbap(const SpeakerLayout &sl, float focus = 1.f);
 
 	void compile(Listener& listener);
 
@@ -65,11 +66,11 @@ public:
 	/// Per Buffer Processing
 	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples);
 
-	/// Spread is an exponent determining the amplitude spread to nearby speakers.
+	/// focus is an exponent determining the amplitude focus to nearby speakers.
 
-	/// Values below 1.0 will widen the sound field to more speakers.
-	/// Values greater than 1 will focus the sound field to fewer speakers.
-	void setSpread(float spread) { mSpread = spread; }
+	///focus is (0, inf) with usable range typically [0.2, 5]. Default is 1.
+	///A denser speaker layout my benefit from a high focus > 1, and a sparse layout may benefit from focus < 1
+	void setFocus(float focus) { mFocus = focus; }
 
 	void print();
 
@@ -78,25 +79,8 @@ private:
 	Vec3f mSpeakerVecs[DBAP_MAX_NUM_SPEAKERS];
 	int mDeviceChannels[DBAP_MAX_NUM_SPEAKERS];
 	int mNumSpeakers;
-    float mSpread;
+	float mFocus;
 };
-
-
-
-inline void Dbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample)
-{
-	for (int i = 0; i < mNumSpeakers; ++i)
-	{
-		Vec3d vec = relpos.normalized();
-		vec -= mSpeakerVecs[i];
-		float dist = vec.mag() / 2.f; // [0, 1]
-		dist = powf(dist, mSpread);
-		float gain = 1.f / (1.f + DBAP_MAX_DIST*dist);
-
-		io.out(mDeviceChannels[i], frameIndex) += gain*sample;
-	}
-}
-
 
 
 } // al::
