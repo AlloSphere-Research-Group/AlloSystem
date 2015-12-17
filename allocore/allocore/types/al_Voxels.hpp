@@ -325,7 +325,7 @@ public:
       }
 
       // Verify XY resolution
-      if (RGBImage.width() != nx || RGBImage.height() != ny) {
+      if (int(RGBImage.width()) != nx || int(RGBImage.height()) != ny) {
       	cout << "Error:  resolution mismatch!" << endl;
       	cout << "   " << files[0] << ": " << nx << " by " << ny << endl;
       	cout << "   " << filename << ": " << RGBImage.width() << " by " << RGBImage.height() << endl;
