@@ -260,7 +260,7 @@ void AmbiDecode::setSpeaker(int index, int deviceChannel, float az, float el, fl
 
 void AmbiDecode::setSpeakers(Speakers *spkrs) {
 	mSpeakers = spkrs;
-	for (int i = 0; i < mSpeakers->size(); i++) {
+	for (unsigned i = 0; i < mSpeakers->size(); i++) {
 		Speaker &spkr = mSpeakers->at(i);
 		setSpeaker(i, spkr.deviceChannel, spkr.azimuth, spkr.elevation, spkr.gain);
 	}
