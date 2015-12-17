@@ -19,7 +19,7 @@ void Dbap::compile(Listener& listener){
 }
 
 void Dbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples){
-	for (unsigned k = 0; k < mNumSpeakers; ++k)
+	for (int k = 0; k < mNumSpeakers; ++k)
 	{
 		float gain = 1.f;
 		if(mEnabled)
@@ -39,7 +39,7 @@ void Dbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& 
 
 void Dbap::perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample)
 {
-	for (unsigned i = 0; i < mNumSpeakers; ++i)
+	for (int i = 0; i < mNumSpeakers; ++i)
 	{
 		float gain = 1.f;
 		if(mEnabled)
