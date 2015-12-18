@@ -96,6 +96,8 @@
 namespace al{
 
 /// Ambisonic base class
+///
+/// @ingroup allocore
 class AmbiBase{
 public:
 
@@ -156,6 +158,8 @@ protected:
 
 
 /// Higher Order Ambisonic Decoding class
+///
+/// @ingroup allocore
 class AmbiDecode : public AmbiBase{
 public:
 
@@ -197,7 +201,7 @@ public:
 	void setSpeaker(int index, int deviceChannel, float azimuth, float elevation=0, float amp=1.f);
 	//void zero();					///< Zeroes out internal ambisonic frame.
 
-    void setSpeakers(Speakers *spkrs) { mSpeakers = spkrs; }
+	void setSpeakers(Speakers *spkrs);
 
 //	float * azimuths();				///< Returns pointer to speaker azimuths.
 //	float * elevations();			///< Returns pointer to speaker elevations.
@@ -229,6 +233,8 @@ protected:
 
 
 /// Higher Order Ambisonic encoding class
+///
+/// @ingroup allocore
 class AmbiEncode : public AmbiBase{
 public:
 
@@ -269,39 +275,41 @@ public:
 
 
 /// Ambisonic coder
+///
+/// @ingroup allocore
 class AmbisonicsSpatializer : public Spatializer {
 public:
 
-    AmbisonicsSpatializer(SpeakerLayout &sl, int dim, int order, int flavor=1);
+	AmbisonicsSpatializer(SpeakerLayout &sl, int dim, int order, int flavor=1);
 
-    void zeroAmbi();
+	void zeroAmbi();
 
-    float * ambiChans(unsigned channel=0);
+	float * ambiChans(unsigned channel=0);
 
-    void compile(Listener& l);
+	void compile(Listener& l);
 
-    void numFrames(int v);
+	void numFrames(int v);
 
-    void numSpeakers(int num);
+	void numSpeakers(int num);
 
-    void setSpeakerLayout(const SpeakerLayout& sl);
+	void setSpeakerLayout(const SpeakerLayout& sl);
 
-    void prepare(AudioIOData& io);
+	void prepare();
 
-    /// Per sample processing
-    void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample);
+	/// Per sample processing
+	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample);
 
-    /// Per buffer processing
-    void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples);
+	/// Per buffer processing
+	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples);
 
-    void finalize(AudioIOData& io);
+	void finalize(AudioIOData& io);
 
 private:
-    AmbiDecode mDecoder;
-    AmbiEncode mEncoder;
+	AmbiDecode mDecoder;
+	AmbiEncode mEncoder;
 	std::vector<float> mAmbiDomainChannels;
-    Listener* mListener;
-    int mNumFrames;
+	Listener* mListener;
+	int mNumFrames;
 };
 
 
@@ -368,7 +376,7 @@ inline void AmbiEncode::encode(float * ambiChans, int numFrames, int timeIndex, 
 
 	// "Iterate" through spherical harmonics using Duff's device.
 	// This requires only a simple jump per time sample.
-	#define CS(c) case c: ambiChans[c*numFrames+timeIndex] += weights()[c] * timeSample;
+	#define CS(chanindex) case chanindex: ambiChans[chanindex*numFrames+timeIndex] += weights()[chanindex] * timeSample;
 	int ch = channels()-1;
 	switch(ch){
 		CS(15) CS(14) CS(13) CS(12) CS(11) CS(10) CS( 9) CS( 8)

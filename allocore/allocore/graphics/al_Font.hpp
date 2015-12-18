@@ -54,6 +54,8 @@
 namespace al{
 
 /// Interface for loading fonts and rendering text
+///
+/// @ingroup allocore
 class Font {
 public:
 

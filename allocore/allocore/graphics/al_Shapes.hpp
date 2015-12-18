@@ -49,32 +49,56 @@ namespace al{
 /// Add tetrahedron as indexed triangles
 
 /// @param[in,out]	m		Mesh to add vertices and indices to
+/// @param[in]		radius	Radius of enclosing sphere
 /// \returns number of vertices added (4)
+///
+/// @ingroup allocore
 int addTetrahedron(Mesh& m, float radius=1);
 
 /// Add cube as indexed triangles
 
 /// @param[in,out]	m		Mesh to add vertices and indices to
+/// @param[in]		radius	Radius of enclosing sphere
 /// \returns number of vertices added (8)
+///
+/// @ingroup allocore
 int addCube(Mesh& m, bool withNormalsAndTexcoords = false, float radius=M_SQRT_1_3);
 
 /// Add octahedron as triangle vertices and indices
 
 /// @param[in,out]	m		Mesh to add vertices and indices to
+/// @param[in]		radius	Radius of enclosing sphere
 /// \returns number of vertices added (6)
+///
+/// @ingroup allocore
 int addOctahedron(Mesh& m, float radius=1);
 
 /// Add dodecahedron as indexed triangles
 
 /// @param[in,out]	m		Mesh to add vertices and indices to
+/// @param[in]		radius	Radius of enclosing sphere
 /// \returns number of vertices added (20)
+///
+/// @ingroup allocore
 int addDodecahedron(Mesh& m, float radius=1);
 
 /// Add icosahedron as indexed triangles
 
 /// @param[in,out]	m		Mesh to add vertices and indices to
+/// @param[in]		radius	Radius of enclosing sphere
 /// \returns number of vertices added (12)
+///
+/// @ingroup allocore
 int addIcosahedron(Mesh& m, float radius=1);
+
+
+/// Add sphere produced from subdivided icosahedron as indexed triangles
+
+/// @param[in,out]	m		Mesh to add vertices and indices to
+/// @param[in]		radius	Radius of sphere
+/// @param[in]		divisions Number of recursive subdivisions
+/// \returns number of vertices added
+int addIcosphere(Mesh& m, double radius=1, int divisions=2);
 
 
 /// Add sphere as indexed triangles
@@ -88,6 +112,8 @@ int addIcosahedron(Mesh& m, float radius=1);
 /// @param[in]		slices	Number of slices around z axis
 /// @param[in]		stacks	Number of stacks on xy plane
 /// \returns number of vertices added
+///
+/// @ingroup allocore
 int addSphere(Mesh& m, double radius=1, int slices=16, int stacks=16);
 int addSphereWithTexcoords(Mesh& m, double radius=1, int bands=16 );
 
@@ -99,6 +125,8 @@ int addSphereWithTexcoords(Mesh& m, double radius=1, int bands=16 );
 /// @param[in]		height	Total height (along y)
 /// @param[in]		depth	Total depth (along z)
 /// \returns number of vertices added
+///
+/// @ingroup allocore
 int addWireBox(Mesh& m, float width, float height, float depth);
 inline int addWireBox(Mesh& m, float size=1){ return addWireBox(m,size,size,size); }
 
@@ -115,6 +143,8 @@ inline int addWireBox(Mesh& m, float size=1){ return addWireBox(m,size,size,size
 /// @param[in] cycles		Number of cycles to go around base
 ///							(should be relatively prime to slices)
 /// \returns number of vertices added
+///
+/// @ingroup allocore
 int addCone(
 	Mesh& m, float radius=1, const Vec3f& apex=Vec3f(0,0,2),
 	unsigned slices=16,
@@ -128,6 +158,8 @@ int addCone(
 /// @param[in] radius		Radius of disc (on xy plane)
 /// @param[in] slices		Number of points going around base
 /// \returns number of vertices added
+///
+/// @ingroup allocore
 int addDisc(Mesh& m, float radius=1, unsigned slices=16);
 
 
@@ -144,6 +176,8 @@ int addDisc(Mesh& m, float radius=1, unsigned slices=16);
 /// @param[in] twist		Rotation factor between polygons;
 ///							a value of 0.5 produces an antiprism
 /// \returns number of vertices added
+///
+/// @ingroup allocore
 int addPrism(
 	Mesh& m, float btmRadius=1, float topRadius=1, float height=2,
 	unsigned slices=16,
@@ -159,6 +193,8 @@ int addPrism(
 /// @param[in] slices		Number of polygon vertices
 /// @param[in] twist		Rotation factor between polygons
 /// \returns number of vertices added
+///
+/// @ingroup allocore
 int addAnnulus(
 	Mesh& m, float inRadius=0.5, float outRadius=1,
 	unsigned slices=16,
@@ -177,6 +213,8 @@ int addAnnulus(
 /// @param[in] slices		Number of polygon vertices
 /// @param[in] twist		Rotation factor between polygons
 /// \returns number of vertices added
+///
+/// @ingroup allocore
 int addCylinder(
 	Mesh& m, float radius=1, float height=2,
 	unsigned slices=16,
@@ -198,6 +236,8 @@ int addCylinder(
 /// @param[in]		x		Position of center along x
 /// @param[in]		y		Position of center along y
 /// \returns number of vertices added
+///
+/// @ingroup allocore
 int addSurface(
 	Mesh& m, int Nx, int Ny,
 	double width=2, double height=2, double x=0, double y=0
@@ -223,6 +263,8 @@ int addSurface(
 /// @param[in] x		Position of center along x
 /// @param[in] y		Position of center along y
 /// \returns number of vertices added
+///
+/// @ingroup allocore
 int addSurfaceLoop(
 	Mesh& m, int Nx, int Ny, int loopMode,
 	double width=2, double height=2, double x=0, double y=0
@@ -240,6 +282,8 @@ int addSurfaceLoop(
 /// @param[in] Nmaj			Number of vertices around major ring
 /// @param[in] minPhase		Starting phase along minor ring, in [0,1]
 /// \returns number of vertices added
+///
+/// @ingroup allocore
 int addTorus(
 	Mesh& m, double minRadius=0.3, double majRadius=0.7,
 	int Nmin=16, int Nmaj=16, double minPhase=0

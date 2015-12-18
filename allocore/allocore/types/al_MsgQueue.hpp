@@ -49,6 +49,10 @@
 
 namespace al {
 
+///
+/// \brief The MsgQueue class
+///
+/// @ingroup allocore
 class MsgQueue {
 public:
 
@@ -307,11 +311,6 @@ protected:
 	void growPool(int size);
 	void recycle(Msg * m);
 };
-
-
-
-
-
 
 
 } // al::

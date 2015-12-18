@@ -54,6 +54,8 @@ namespace al{
 typedef void (* audioCallback)(AudioIOData& io);
 
 /// Audio device
+///
+/// @ingroup allocore
 class AudioDevice: public AudioDeviceInfo {
 public:
 
@@ -83,6 +85,8 @@ protected:
 };
 
 /// Audio input/output streaming
+///
+/// @ingroup allocore
 class AudioIO : public AudioIOData {
 public:
 

@@ -54,6 +54,7 @@ namespace al{
 
 /// These should be set before rendering the vertices of the object they
 /// are to be applied to.
+/// @ingroup allocore
 class Material {
 public:
 
@@ -111,6 +112,7 @@ protected:
 
 
 /// Light
+/// @ingroup allocore
 class Light{
 public:
 	Light(float x=0, float y=0, float z=1);

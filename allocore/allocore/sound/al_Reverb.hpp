@@ -54,6 +54,8 @@ namespace al{
 /// can be laid out in a predictable location in memory. This can improve
 /// access speeds if many delay-lines are used within another object, like a
 /// reverb.
+///
+/// @ingroup allocore
 template <int N, class T>
 class StaticDelayLine {
 public:
@@ -127,6 +129,8 @@ protected:
 /// Dattorro, J. (1997). Effect design: Part 1: Reverberator and other filters.
 /// Journal of the Audio Engineering Society, 45(9):660–684.
 /// https://ccrma.stanford.edu/~dattorro/EffectDesignPart1.pdf
+///
+/// @ingroup allocore
 template <class T = float>
 class Reverb{
 public:

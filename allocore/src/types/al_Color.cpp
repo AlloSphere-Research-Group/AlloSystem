@@ -1,4 +1,5 @@
 #include "allocore/types/al_Color.hpp"
+#include "allocore/math/al_Constants.hpp"
 #include "allocore/math/al_Mat.hpp"
 #include <cmath>
 
