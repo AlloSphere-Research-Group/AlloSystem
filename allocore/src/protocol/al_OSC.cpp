@@ -247,7 +247,8 @@ Message& Message::operator>> (const char*& v){
 	return *this;
 }
 Message& Message::operator>> (std::string& v){
-	const char * r = '\0';
+	// const char * r = '\0';
+	const char * r = nullptr;
 	OSCTRY("Message >> string", (*mImpl)>>r;)
 	v=r;
 	return *this;

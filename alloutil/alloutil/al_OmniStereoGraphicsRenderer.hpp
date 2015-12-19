@@ -10,6 +10,13 @@
 
 namespace al {
 
+class OmniStereoGraphicsRenderer;
+
+struct OmniStereoGraphicsRendererControls : InputEventHandler {
+  OmniStereoGraphicsRenderer* o;
+  bool onKeyDown(const Keyboard& k);
+};
+
 class OmniStereoGraphicsRenderer : public Window,
                                    public FPS,
                                    public OmniStereo::Drawable {
@@ -70,6 +77,7 @@ class OmniStereoGraphicsRenderer : public Window,
   Nav mNav;
   NavInputControl mNavControl;
   StandardWindowKeyControls mStdControls;
+  OmniStereoGraphicsRendererControls mOmniControls;
 };
 
 inline void OmniStereoGraphicsRenderer::start() {
@@ -103,6 +111,9 @@ inline OmniStereoGraphicsRenderer::OmniStereoGraphicsRenderer()
 
   Window::append(mStdControls);
   Window::append(mNavControl);
+
+  mOmniControls.o = this;
+  Window::append(mOmniControls);
 }
 
 inline void OmniStereoGraphicsRenderer::initOmni(std::string path) {
@@ -214,6 +225,13 @@ void main() {
   gl_FragColor = mix(colorMixed, final_color, lighting);
 }
 )";
+}
+
+inline bool OmniStereoGraphicsRendererControls::onKeyDown(const Keyboard& k){
+  if(k.key() == 'o'){
+    o->omniEnable(!(o->omniEnable()));
+  }
+  return true;
 }
 
 }  // al
