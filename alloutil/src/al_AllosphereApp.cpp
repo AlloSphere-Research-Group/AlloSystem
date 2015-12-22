@@ -9,7 +9,7 @@ AudioRendererBaseNoState::~AudioRendererBaseNoState()
 	io.stop();
 }
 
-void AudioRendererBaseNoState::initSound()
+void AudioRendererBaseNoState::initAudio()
 {
 	io.start();
 }

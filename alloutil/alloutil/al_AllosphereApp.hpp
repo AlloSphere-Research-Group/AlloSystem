@@ -25,8 +25,11 @@ namespace al {
 
 class DummyState {};
 
-// Audio Renderer
+// Audio Renderers ----------------------------------------
 
+/// Base class for audio renderer (no state)
+/// You should inherit from this class if you don't need to receive state from the
+/// simulator. If you do, inherit from AudioRendererBase.
 class AudioRendererBaseNoState {
 public:
 	AudioRendererBaseNoState(int framesPerBuf=64, double framesPerSec=44100.0,
@@ -38,9 +41,9 @@ public:
 
 	~AudioRendererBaseNoState();
 
-	virtual void initSound();
+	virtual void initAudio();
 
-	virtual void onSound(AudioIOData & io) = 0;
+	virtual void onSound(AudioIOData & io) {}
 
 
 protected:
@@ -54,6 +57,9 @@ private:
 	}
 };
 
+/// Base class for audio renderer
+/// You should inherit from this class if you want to receive state from the
+/// simulator. Otherwise, you can inherit from AudioRendererBaseNoState
 template<typename State = DummyState, unsigned PORT = 63060>
 class AudioRendererBase : public AudioRendererBaseNoState {
 public:
@@ -65,8 +71,20 @@ public:
 		mTaker.start();
 	}
 
+	virtual void initAudio() override { AudioRendererBaseNoState::initAudio(); }
+
+	virtual void onSound(AudioIOData & io) {}
+
+	bool updateState() {
+		bool newState = false;
+		while (mTaker.get(mState) > 0) { newState = true;} // Pop all states in queue
+		return newState;
+	}
+	State &state() { return mState;}
+
 private:
-	cuttlebone::Taker<State> mTaker;
+	cuttlebone::Taker<State, 1400, PORT> mTaker;
+	State mState;
 };
 
 
@@ -88,7 +106,7 @@ public:
 
 	virtual void onDraw(Graphics &g, const Viewpoint &v) override;
 
-	virtual void onAnimate(double dt) {}
+	virtual void onAnimate(double dt) override{}
 
 	void sendState() { mMakerGraphics.set(mState); mMakerAudio.set(mState);}
 	State &state() { return mState;}
@@ -161,6 +179,11 @@ public:
 		simulatorApp.initWindow();
 		simulatorApp.start();
 #endif
+
+
+#ifdef ALLOSPHERE_BUILD_AUDIO_RENDERER
+		this->initAudio();
+#endif
 	}
 
 	virtual ~AlloSphereApp() {}
@@ -174,8 +197,10 @@ public:
 //	virtual std::string vertexCode() override {}
 //	virtual std::string fragmentCode() override {}
 
+#ifdef ALLOSPHERE_BUILD_AUDIO_RENDERER
 	//Inherited from AudioApp
-	virtual void onSound(AudioIOData & io) override {}
+//	virtual void onSound(AudioIOData & io) override = 0;
+#endif
 
 protected:
 
