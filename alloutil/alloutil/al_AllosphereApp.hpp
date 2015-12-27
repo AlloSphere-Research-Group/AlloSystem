@@ -157,7 +157,7 @@ template<typename State = DummyState,
 class AlloSphereApp : public RenderApp, public AudioRendererBaseNoState
 #endif
 #ifdef ALLOSPHERE_BUILD_AUDIO_RENDERER
-class AlloSphereApp : public OmniStereoGraphicsRenderer, public AudioApp
+class AlloSphereApp : public AudioApp, public OmniStereoGraphicsRenderer
 #endif
 #ifdef ALLOSPHERE_BUILD_SIMULATOR
 class AlloSphereApp : public OmniStereoGraphicsRenderer, public AudioRendererBaseNoState
@@ -170,21 +170,22 @@ public:
 #ifdef ALLOSPHERE_BUILD_SIMULATOR
 		SimulatorApp simulatorApp;
 		simulatorApp.initWindow();
+		simulatorApp.windows()[0]->title("Simulator");
+		std::cout << "Running Simulator" << std::endl;
 		simulatorApp.start();
 #endif
 
 
 #ifdef ALLOSPHERE_BUILD_AUDIO_RENDERER
 		this->initAudio();
+		this->title("Audio Renderer");
+		std::cout << "Running Audio Renderer" << std::endl;
 #endif
 
-#if defined(ALLOSPHERE_BUILD_SIMULATOR)
-		std::cout << "Running Simulator" << std::endl;
-#elif defined(ALLOSPHERE_BUILD_AUDIO_RENDERER)
-		std::cout << "Running Audio Renderer" << std::endl;
-#elif defined(ALLOSPHERE_BUILD_GRAPHICS_RENDERER)
+#ifdef ALLOSPHERE_BUILD_GRAPHICS_RENDERER
 		std::cout << "Running Graphics Renderer" << std::endl;
 #endif
+
 	}
 
 	virtual ~AlloSphereApp() {}
