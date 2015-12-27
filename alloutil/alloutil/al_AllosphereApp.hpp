@@ -93,7 +93,7 @@ private:
 template<typename State = DummyState, unsigned GRAPHICSPORT = 63059, unsigned AUDIOPORT = 63060>
 class SimulatorBase : public App {
 public:
-	explicit SimulatorBase(const Window::Dim& dims = Window::Dim(800,600),
+	explicit SimulatorBase(const Window::Dim& dims = Window::Dim(320, 240),
 	                          const std::string title="",
 	                          double fps=40,
 	                          Window::DisplayMode mode = Window::DEFAULT_BUF,
