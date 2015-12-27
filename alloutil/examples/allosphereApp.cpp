@@ -56,35 +56,46 @@ public:
 
 	virtual void onAnimate(double dt) override {
 		state().value += 0.01;
-		if (state().value >= 1.0) { state().value = 0; }
-		cout << "New State! " << state().value << std::endl;
+		if (state().value >= 1.0) {
+			state().value = 0;
+			cout << "State wrapped!" << std::endl;
+		}
+//		cout << "New State! " << state().value << std::endl;
 		sendState();
 	}
 };
 
 class AudioRenderer : public AudioRendererBase<State> {
 public:
-	AudioRenderer()
+	AudioRenderer() : mPhase(0), mPhaseInc(0)
 	{
-
 	}
 
-	virtual void initAudio() override
-	{
-		AudioRendererBase::initAudio();
-	}
+//	virtual void initAudio() override
+//	{
+//		AudioRendererBase::initAudio();
+//	}
 
 	virtual void onSound(AudioIOData &io) override
 	{
-		float value;
+		float frequency;
 		if (updateState()) {
-			value = state().value;
-			std::cout << "onSound : " << value << std::endl;
+			frequency = 220.0 + (state().value * 660.0);
+			mPhaseInc = 2 * M_PI * frequency / io.framesPerSecond();
+//			std::cout << "onSound : " << value << std::endl;
+		}
+		while (io()) {
+			io.out(0) = sin(mPhase);
+			mPhase += mPhaseInc;
+			while (mPhase >= 2 * M_PI) {
+				mPhase -= 2 * M_PI;
+			}
 		}
 
 	}
 private:
-
+	double mPhase;
+	double mPhaseInc;
 };
 
 

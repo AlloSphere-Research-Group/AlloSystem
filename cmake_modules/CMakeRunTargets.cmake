@@ -257,12 +257,15 @@ BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_GRAPHICS_RENDERER"
 AddRunTarget("${APP_NAME}_graphics" "${APP_NAME}_graphics")
 BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_AUDIO_RENDERER" "audio")
 AddRunTarget("${APP_NAME}_audio" "${APP_NAME}_audio")
+set(RUN_CONFIG "{ \"run_dir\" : \"${BUILD_ROOT_DIR}\" , \n  \"apps\" : [ {\"type\" : \"simulator\", \"path\" : \"build/bin/${APP_NAME}_simulator\"},  {\"type\" : \"audio\", \"path\" : \"build/bin/${APP_NAME}_audio\" }, {\"type\" : \"graphics\", \"path\" : \"build/bin/${APP_NAME}_graphics\"} ] \n}")
+file(WRITE "${BUILD_ROOT_DIR}/build/${APP_NAME}.json" ${RUN_CONFIG})
+
 add_custom_target("${APP_NAME}_run"
-  COMMAND "build/bin/${APP_NAME}_simulator; build/bin/${APP_NAME}_graphics"
+  COMMAND "python" "tools/allorun/allorun.py" "${BUILD_ROOT_DIR}/build/${APP_NAME}.json"
   DEPENDS "${APP_NAME}_simulator" "${APP_NAME}_graphics" "${APP_NAME}_audio"
   WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
   SOURCES ${${ALLO_APP_SRC}}
-  COMMENT "Running: ${APP_NAME}")
+  COMMENT "Running: ${APP_NAME} from ${CMAKE_SOURCE_DIR}")
 #  option(RUN_IN_DEBUGGER 0) # For next run
 
 else()

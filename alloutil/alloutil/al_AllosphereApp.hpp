@@ -146,6 +146,7 @@ private:
 	cuttlebone::Taker<State, 1400, PORT> mTaker;
 };
 
+
 // Allosphere App
 
 template<typename State = DummyState,
@@ -166,14 +167,6 @@ public:
 	AlloSphereApp()
 	{
 
-#if defined(ALLOSPHERE_BUILD_SIMULATOR)
-		std::cout << "Running Simulator" << std::endl;
-#elif defined(ALLOSPHERE_BUILD_AUDIO_RENDERER)
-		std::cout << "Running audio Renderer" << std::endl;
-#elif defined(ALLOSPHERE_BUILD_GRAPHICS_RENDERER)
-		std::cout << "Running Graphics Renderer" << std::endl;
-#endif
-
 #ifdef ALLOSPHERE_BUILD_SIMULATOR
 		SimulatorApp simulatorApp;
 		simulatorApp.initWindow();
@@ -183,6 +176,14 @@ public:
 
 #ifdef ALLOSPHERE_BUILD_AUDIO_RENDERER
 		this->initAudio();
+#endif
+
+#if defined(ALLOSPHERE_BUILD_SIMULATOR)
+		std::cout << "Running Simulator" << std::endl;
+#elif defined(ALLOSPHERE_BUILD_AUDIO_RENDERER)
+		std::cout << "Running Audio Renderer" << std::endl;
+#elif defined(ALLOSPHERE_BUILD_GRAPHICS_RENDERER)
+		std::cout << "Running Graphics Renderer" << std::endl;
 #endif
 	}
 
