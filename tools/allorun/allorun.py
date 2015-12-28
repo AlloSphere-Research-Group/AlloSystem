@@ -200,13 +200,18 @@ class CursesApp():
             p = Process(target=run_node, args=(i, self.stdout[i][1], self.stderr[i][1], self.item_status, node))
             processes.append(p)
             p.start()
-            sleep(0.15)
+            sleep(0.1)
 
         
         mypad = curses.newpad(self.buffer_len, 512)
         mypad_pos = 0
 
         while True:
+            y, x = stdscr.getmaxyx()
+            if mypad_pos < 0:
+                mypad_pos = 0
+            if mypad_pos > self.buffer_len - y:
+                mypad_pos = self.buffer_len - y
             self.draw_menu(stdscr, mypad_pos + 1)
             mypad.erase()
             while self.stdout[self.current_index][0].poll():
@@ -235,13 +240,6 @@ class CursesApp():
                 
             mypad.addstr(0,0, console_output, color)
             
-            y, x = stdscr.getmaxyx()
-            if mypad_pos < 0:
-                mypad_pos = 0
-            if mypad_pos > self.buffer_len - y:
-                mypad_pos = self.buffer_len - y
-            if self.chase:
-                mypad_pos = num_lines - y
             mypad.refresh(mypad_pos, 0, 2, 0, y - 4, x - 3)
             
             try:
@@ -272,6 +270,8 @@ class CursesApp():
             except:
                 pass
             
+        if self.chase:
+            mypad_pos = num_lines - y
 #        for p in processes:
 #            self.item_status
 #            p.terminate()
