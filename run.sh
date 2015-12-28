@@ -15,7 +15,7 @@ AUTORUN=1
 
 # Runs the program through the specified debugger if -d is passed.
 OPTIND=1
-while getopts ":d:v:n" opt; do
+while getopts ":d:v:n:a" opt; do
     case "$opt" in
     d)  debugger="$DEBUGGER"
         shift
@@ -23,9 +23,12 @@ while getopts ":d:v:n" opt; do
     v) VERBOSE="VERBOSE=1"
       shift
       ;;
-	n)  AUTORUN=0
-		shift
-		;;
+    n)  AUTORUN=0
+        shift
+        ;;
+    a)  ALLOSPHERE_APP_FLAG="-DBUILD_ALLOSPHERE_APP=1"
+        shift
+        ;;
     esac
 done
 
@@ -75,10 +78,12 @@ if [ "$MSYSTEM" = "MINGW64" -o "$MSYSTEM" = "MINGW32" ]; then
   GENERATOR_FLAG="-GMSYS Makefiles"
 fi
 
+FLAGS="$GENERATOR_FLAG $TARGET_FLAG $DBUILD_FLAG $ALLOSPHERE_APP_FLAG"
+
 if [ -n "$debugger" ]; then
-  cmake "$GENERATOR_FLAG" "$TARGET_FLAG" "$DBUILD_FLAG" -DRUN_IN_DEBUGGER=1 "-DALLOSYSTEM_DEBUGGER=${debugger}" -DCMAKE_BUILD_TYPE=Debug . > cmake_log.txt
+  cmake  $FLAGS -DRUN_IN_DEBUGGER=1 "-DALLOSYSTEM_DEBUGGER=${debugger}" -DCMAKE_BUILD_TYPE=Debug . > cmake_log.txt
 else
-  cmake "$GENERATOR_FLAG" "$TARGET_FLAG" "$DBUILD_FLAG" -DRUN_IN_DEBUGGER=0 -DCMAKE_BUILD_TYPE=Release -Wno-dev . > cmake_log.txt
+  cmake $FLAGS -DRUN_IN_DEBUGGER=0 -DCMAKE_BUILD_TYPE=Release -Wno-dev . > cmake_log.txt
 fi
 
 make $VERBOSE $TARGET -j$PROC_FLAG $*

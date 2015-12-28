@@ -247,8 +247,6 @@ endfunction()
 
 # --------------- Build
 
-set(BUILD_ALLOSPHERE_APP 1)
-
 if(BUILD_ALLOSPHERE_APP)
 
 BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_SIMULATOR" "simulator")
