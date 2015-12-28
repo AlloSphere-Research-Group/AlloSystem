@@ -28,8 +28,8 @@ class DummyState {};
 // Audio Renderers ----------------------------------------
 
 /// Base class for audio renderer (no state)
-/// You should inherit from this class if you don't need to receive state from the
-/// simulator. If you do, inherit from AudioRendererBase.
+/// You should only inherit from this class if you don't need to receive state from the
+/// simulator. You will usually want to inherit from AudioRendererBase.
 class AudioRendererBaseNoState {
 public:
 	AudioRendererBaseNoState(int framesPerBuf=64, double framesPerSec=44100.0,
@@ -59,7 +59,9 @@ private:
 
 /// Base class for audio renderer
 /// You should inherit from this class if you want to receive state from the
-/// simulator. Otherwise, you can inherit from AudioRendererBaseNoState
+/// simulator. Otherwise, you can inherit from AudioRendererBaseNoState.
+/// The state will be updated by a "simulator" or compute node that should
+/// inherit from SimulatorBase.
 template<typename State = DummyState, unsigned PORT = 63060>
 class AudioRendererBase : public AudioRendererBaseNoState {
 public:
@@ -73,13 +75,27 @@ public:
 
 	virtual void initAudio() override { AudioRendererBaseNoState::initAudio(); }
 
+	///
+	/// \brief Audio callback function
+	/// \param io Audio IO data
+	/// All real-time audio read/write operations will take place within this
+	/// function accessing the buffers and information provided by the io object.
 	virtual void onSound(AudioIOData & io) {}
 
+	///
+	/// \brief updateState reads the state buffer and updates current state
+	/// \return true if a new state was received
+	///
 	bool updateState() {
 		bool newState = false;
 		while (mTaker.get(mState) > 0) { newState = true;} // Pop all states in queue
 		return newState;
 	}
+
+	///
+	/// \brief state a reference to the shared state
+	/// \return
+	///
 	State &state() { return mState;}
 
 private:
@@ -104,11 +120,28 @@ public:
 
 	virtual void initWindow();
 
+	///
+	/// \brief Override the onDraw to provide a GUI for the simulator
+	///
 	virtual void onDraw(Graphics &g, const Viewpoint &v) override;
 
+	///
+	/// \brief onAnimate contains the computation for the state
+	/// \param dt the time delta since last call to onAnimate()
+	///
 	virtual void onAnimate(double dt) override{}
 
+	///
+	/// \brief Send the state to the audio and graphics renderers
+	///
 	void sendState() { mMakerGraphics.set(mState); mMakerAudio.set(mState);}
+
+	///
+	/// \brief state a reference to the shared state
+	/// \return
+	///
+	/// You need to use this reference to set the computed state, as this is
+	/// what is sent when
 	State &state() { return mState;}
 
 private:
@@ -132,6 +165,16 @@ public:
 		mTaker.start();
 	}
 
+	///
+	/// \brief override onDrawOmni() to draw graphics
+	/// \param om OmniStereo object for rendering
+	///
+	virtual void onDrawOmni(OmniStereo& om) override {}
+
+	///
+	/// \brief updateState reads the state buffer and updates current state
+	/// \return true if a new state was received
+	///
 	bool updateState() {
 		bool newState = false;
 		while (mTaker.get(mState) > 0) { newState = true;} // Pop all states in queue
@@ -147,8 +190,35 @@ private:
 };
 
 
-// Allosphere App
-
+///
+/// The AlloSphereApp class provides a convenience bundling of functionality
+/// that allow it to serve as the basis for simulator, graphics renderer and
+/// audio renderer nodes. Depending on how the build is configured, it will
+/// build the required functionality. The build should be configured
+/// through cmake and the provided run scripts. You shouldn't need to change
+/// anything in this app and the functionality should be implemented in the
+/// classes passed as template parameters. Inherit from GraphicsRendererBase,
+/// SimulatorBase and AudioRendererBase to provide the functionality.
+///
+/// Define the shared state as a class to be passed as the first template
+/// parameter.
+///
+/// This convenience class handles the network connections (local or remote)
+/// and the sending of state from the simulator to the graphics and audio
+/// rendering nodes. Bear in mind that the same state is sent to both the
+/// audio and graphics node which could create issues with bandwidth if the
+/// state is too large or updated too frequently.
+///
+/// Typical usage looks like:
+/// \code
+/// int main(int argc, char *argv[])
+/// {
+/// 	AlloSphereApp<State, GraphicsRenderer, SimulatorApp, AudioRenderer> app;
+/// 	app.start();
+/// 	return 0;
+/// }
+/// \endcode
+///
 template<typename State = DummyState,
          typename RenderApp = GraphicsRendererBase<State>,
          typename SimulatorApp = SimulatorBase<State>,
@@ -171,19 +241,22 @@ public:
 		SimulatorApp simulatorApp;
 		simulatorApp.initWindow();
 		simulatorApp.windows()[0]->title("Simulator");
-		std::cout << "Running Simulator" << std::endl;
+//		std::cout << "Running Simulator" << std::endl;
 		simulatorApp.start();
 #endif
 
 
 #ifdef ALLOSPHERE_BUILD_AUDIO_RENDERER
 		this->initAudio();
+
+Window::Dim(320, 240);
+		this->dimensions(Window::Dim(320, 240));
 		this->title("Audio Renderer");
-		std::cout << "Running Audio Renderer" << std::endl;
+//		std::cout << "Running Audio Renderer" << std::endl;
 #endif
 
 #ifdef ALLOSPHERE_BUILD_GRAPHICS_RENDERER
-		std::cout << "Running Graphics Renderer" << std::endl;
+//		std::cout << "Running Graphics Renderer" << std::endl;
 #endif
 
 	}

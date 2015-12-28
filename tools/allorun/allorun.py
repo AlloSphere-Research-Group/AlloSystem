@@ -101,6 +101,7 @@ class LocalRun:
             if stderr_cb:
                 stderr_cb(line)
         
+
         p.join()
 
         return p.returncode        
@@ -199,7 +200,7 @@ class CursesApp():
             p = Process(target=run_node, args=(i, self.stdout[i][1], self.stderr[i][1], self.item_status, node))
             processes.append(p)
             p.start()
-            sleep(0.1)
+            sleep(0.15)
 
         
         mypad = curses.newpad(self.buffer_len, 512)
