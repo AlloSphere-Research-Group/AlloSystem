@@ -93,16 +93,19 @@ class LocalRun:
                        cwd=self.run_dir)
         self.process = p
             
-        for line in iter(p.stdout.readline, ''):
-            if stdout_cb:
-                stdout_cb(line)
-            
-        for line in iter(p.stderr.readline, ''):
-            if stderr_cb:
-                stderr_cb(line)
+        if p.returncode:
+            return p.returncode
         
+        while p.poll() is None:
+            for line in iter(p.stdout.readline, ''):
+                if stdout_cb:
+                    stdout_cb(line)
+                
+            for line in iter(p.stderr.readline, ''):
+                if stderr_cb:
+                    stderr_cb(line)
 
-        p.join()
+        #p.join()
 
         return p.returncode        
 

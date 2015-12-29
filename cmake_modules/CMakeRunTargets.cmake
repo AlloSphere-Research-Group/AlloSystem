@@ -44,6 +44,8 @@ else()
 set(ALLO_APP_NAME_SUFFIX "${${ALLO_APP_NAME}}")
 endif()
 
+list(APPEND ALLOSPHERE_APPS "${ALLO_APP_NAME_SUFFIX}")
+
 add_executable("${ALLO_APP_NAME_SUFFIX}" EXCLUDE_FROM_ALL "${${ALLO_APP_SRC}}")
 
 if(NOT ${DEFINES} STREQUAL "")
@@ -137,7 +139,7 @@ else()
   if(NOT PHASESPACE_FOUND)
     set(PHASESPACE_LIBRARY "")
     set(PHASESPACE_INCLUDE_DIR "")
-    message("Not building Phasespace and no usable Phasespace binary found. Not linking application to Phasespace")
+    message(STATUS "Not building Phasespace and no usable Phasespace binary found. Not linking application to Phasespace")
   endif(NOT PHASESPACE_FOUND)
     target_link_libraries(${ALLO_APP_NAME_SUFFIX} ${PHASESPACE_LIBRARY})
     include_directories(${PHASESPACE_INCLUDE_DIR})
@@ -249,18 +251,29 @@ endfunction()
 
 if(BUILD_ALLOSPHERE_APP)
 
+set(ALLOSPHERE_APPS "")
+
 BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_SIMULATOR" "simulator")
 AddRunTarget("${APP_NAME}_simulator" "${APP_NAME}_simulator")
 BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_GRAPHICS_RENDERER" "graphics")
 AddRunTarget("${APP_NAME}_graphics" "${APP_NAME}_graphics")
+if(NOT BUILD_ALLOSPHERE_APP_NO_AUDIO_RENDERER)
 BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_AUDIO_RENDERER" "audio")
 AddRunTarget("${APP_NAME}_audio" "${APP_NAME}_audio")
-set(RUN_CONFIG "{ \"run_dir\" : \"${BUILD_ROOT_DIR}\" , \n  \"apps\" : [ {\"type\" : \"simulator\", \"path\" : \"build/bin/${APP_NAME}_simulator\"},  {\"type\" : \"audio\", \"path\" : \"build/bin/${APP_NAME}_audio\" }, {\"type\" : \"graphics\", \"path\" : \"build/bin/${APP_NAME}_graphics\"} ] \n}")
+endif()
+set(RUN_CONFIG "{ \"run_dir\" : \"${BUILD_ROOT_DIR}\" , \n  \"apps\" : [ {\"type\" : \"simulator\", \"path\" : \"build/bin/${APP_NAME}_simulator\"},")
+
+if(NOT BUILD_ALLOSPHERE_APP_NO_AUDIO_RENDERER)
+set(RUN_CONFIG "${RUN_CONFIG} {\"type\" : \"audio\", \"path\" : \"build/bin/${APP_NAME}_audio\" }, ")
+endif()
+
+set(RUN_CONFIG "${RUN_CONFIG} {\"type\" : \"graphics\", \"path\" : \"build/bin/${APP_NAME}_graphics\"} ] \n}")
+
 file(WRITE "${BUILD_ROOT_DIR}/build/${APP_NAME}.json" ${RUN_CONFIG})
 
 add_custom_target("${APP_NAME}_run"
   COMMAND "python" "tools/allorun/allorun.py" "${BUILD_ROOT_DIR}/build/${APP_NAME}.json"
-  DEPENDS "${APP_NAME}_simulator" "${APP_NAME}_graphics" "${APP_NAME}_audio"
+  DEPENDS ${ALLOSPHERE_APPS}
   WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
   SOURCES ${${ALLO_APP_SRC}}
   COMMENT "Running: ${APP_NAME} from ${CMAKE_SOURCE_DIR}")

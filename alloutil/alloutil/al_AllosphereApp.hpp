@@ -20,6 +20,16 @@
 #error More than one application type defined
 #endif
 
+#ifndef ALLOAPP_PACKET_SIZE
+#define PACKET_SIZE 1400
+#else
+#define PACKET_SIZE ALLOAPP_PACKET_SIZE
+#endif
+
+// The network ports used to communicate state from the simulator to the
+// renderers
+#define ALLOAPP_GRAPHICS_PORT 63059
+#define ALLOAPP_AUDIO_PORT 63060
 
 namespace al {
 
@@ -32,8 +42,8 @@ class DummyState {};
 /// simulator. You will usually want to inherit from AudioRendererBase.
 class AudioRendererBaseNoState {
 public:
-	AudioRendererBaseNoState(int framesPerBuf=64, double framesPerSec=44100.0,
-	                  void * userData = 0, int outChans = 2, int inChans = 0 ) :
+	AudioRendererBaseNoState(int framesPerBuf=128, double framesPerSec=44100.0,
+	                         int outChans = 2, int inChans = 0 ) :
 	    io(framesPerBuf, framesPerSec, AudioRendererBaseNoState::AppAudioCB,
 	       this, outChans, inChans)
 	{
@@ -62,12 +72,12 @@ private:
 /// simulator. Otherwise, you can inherit from AudioRendererBaseNoState.
 /// The state will be updated by a "simulator" or compute node that should
 /// inherit from SimulatorBase.
-template<typename State = DummyState, unsigned PORT = 63060>
+template<typename AudioState = DummyState, unsigned PORT = ALLOAPP_AUDIO_PORT>
 class AudioRendererBase : public AudioRendererBaseNoState {
 public:
 	AudioRendererBase(int framesPerBuf=64, double framesPerSec=44100.0,
-	                  void * userData = 0, int outChans = 2, int inChans = 0 ) :
-	    AudioRendererBaseNoState(framesPerBuf, framesPerSec, userData,
+	                  int outChans = 2, int inChans = 0 ) :
+	    AudioRendererBaseNoState(framesPerBuf, framesPerSec,
 	                             outChans, inChans)
 	{
 		mTaker.start();
@@ -80,33 +90,44 @@ public:
 	/// \param io Audio IO data
 	/// All real-time audio read/write operations will take place within this
 	/// function accessing the buffers and information provided by the io object.
-	virtual void onSound(AudioIOData & io) {}
+	virtual void onSound(AudioIOData & io) override {}
 
 	///
-	/// \brief updateState reads the state buffer and updates current state
+	/// \brief updateAudioState reads the state buffer and updates current state
 	/// \return true if a new state was received
 	///
-	bool updateState() {
+	bool updateAudioState() {
 		bool newState = false;
 		while (mTaker.get(mState) > 0) { newState = true;} // Pop all states in queue
 		return newState;
 	}
 
 	///
+	/// \brief popAudioState pops a single state from the state buffer and updates
+	/// the current state
+	/// \return Returns the number of states still pending in the buffer
+	///
+	int popAudioState() {
+		return mTaker.get(mState);
+	}
+
+	///
 	/// \brief state a reference to the shared state
 	/// \return
 	///
-	State &state() { return mState;}
+	AudioState &audioState() { return mState;}
 
 private:
-	cuttlebone::Taker<State, 1400, PORT> mTaker;
-	State mState;
+	cuttlebone::Taker<AudioState, 1400, PORT> mTaker;
+	AudioState mState;
 };
 
 
 //Simulator
 
-template<typename State = DummyState, unsigned GRAPHICSPORT = 63059, unsigned AUDIOPORT = 63060>
+template<typename State = DummyState, typename AudioState = DummyState,
+         unsigned GRAPHICSPORT = ALLOAPP_GRAPHICS_PORT,
+         unsigned AUDIOPORT = ALLOAPP_AUDIO_PORT>
 class SimulatorBase : public App {
 public:
 	explicit SimulatorBase(const Window::Dim& dims = Window::Dim(320, 240),
@@ -132,17 +153,30 @@ public:
 	virtual void onAnimate(double dt) override{}
 
 	///
-	/// \brief Send the state to the audio and graphics renderers
+	/// \brief Send the state to the graphics renderers
 	///
-	void sendState() { mMakerGraphics.set(mState); mMakerAudio.set(mState);}
+	void sendState() { mMakerGraphics.set(mState);}
+
+	///
+	/// \brief Send the state to the audio renderers
+	///
+	void sendAudioState() { mMakerAudio.set(mAudioState);}
 
 	///
 	/// \brief state a reference to the shared state
 	/// \return
 	///
 	/// You need to use this reference to set the computed state, as this is
-	/// what is sent when
+	/// what is sent when sendState() is called
 	State &state() { return mState;}
+
+	///
+	/// \brief state a reference to the shared state
+	/// \return
+	///
+	/// You need to use this reference to set the computed state, as this is
+	/// what is sent when sendAudioState() is called
+	AudioState &audioState() { return mAudioState;}
 
 private:
 	Window::Dim mDims;
@@ -153,12 +187,16 @@ private:
 
 	State mState;
 	cuttlebone::Maker<State, 1400, GRAPHICSPORT> mMakerGraphics;
-	cuttlebone::Maker<State, 1400, AUDIOPORT> mMakerAudio;
+	AudioState mAudioState;
+	cuttlebone::Maker<AudioState, 1400, AUDIOPORT> mMakerAudio;
 };
 
 // Graphics Renderer
-
-template<typename State = DummyState, unsigned PORT = 63059>
+// TODO: can we pass a State reference in on the onDraw and onAnimate calls
+// (e.g., something like void onDraw(Graphics& g, State& s)
+// and onAnimate(double dt, State&, s))?
+// this reminds the user that she must use State to communicate.
+template<typename State = DummyState, unsigned PORT = ALLOAPP_GRAPHICS_PORT>
 class GraphicsRendererBase : public OmniStereoGraphicsRenderer {
 public:
 	GraphicsRendererBase() {
@@ -179,6 +217,15 @@ public:
 		bool newState = false;
 		while (mTaker.get(mState) > 0) { newState = true;} // Pop all states in queue
 		return newState;
+	}
+
+	///
+	/// \brief popState pops a single state from the state buffer and updates
+	/// the current state
+	/// \return true if a new state was in the state buffer
+	///
+	bool popState() {
+		return mTaker.get(mState) > 0;
 	}
 
 	State &state() { return mState;}
@@ -239,17 +286,12 @@ public:
 
 #ifdef ALLOSPHERE_BUILD_SIMULATOR
 		SimulatorApp simulatorApp;
-		simulatorApp.initWindow();
-		simulatorApp.windows()[0]->title("Simulator");
-//		std::cout << "Running Simulator" << std::endl;
 		simulatorApp.start();
 #endif
 
 
 #ifdef ALLOSPHERE_BUILD_AUDIO_RENDERER
 		this->initAudio();
-
-Window::Dim(320, 240);
 		this->dimensions(Window::Dim(320, 240));
 		this->title("Audio Renderer");
 //		std::cout << "Running Audio Renderer" << std::endl;
@@ -285,16 +327,16 @@ private:
 
 // Implementations
 
-template<typename State, unsigned GRAPHICSPORT, unsigned AUDIOPORT>
-void SimulatorBase<State, GRAPHICSPORT, AUDIOPORT>::initWindow()
+template<typename State, typename AudioState, unsigned GRAPHICSPORT, unsigned AUDIOPORT>
+void SimulatorBase<State, AudioState, GRAPHICSPORT, AUDIOPORT>::initWindow()
 {
 	mMakerGraphics.start();
 	mMakerAudio.start();
 	App::initWindow(mDims, mTitle, mFps, mMode, mFlags);
 }
 
-template<typename State, unsigned GRAPHICSPORT, unsigned AUDIOPORT>
-void SimulatorBase<State, GRAPHICSPORT, AUDIOPORT>::onDraw(Graphics &g, const Viewpoint &v) {
+template<typename State, typename AudioState, unsigned GRAPHICSPORT, unsigned AUDIOPORT>
+void SimulatorBase<State, AudioState, GRAPHICSPORT, AUDIOPORT>::onDraw(Graphics &g, const Viewpoint &v) {
 	float H = v.viewport().h;
 	float W = v.viewport().w;
 	g.pushMatrix(Graphics::PROJECTION);

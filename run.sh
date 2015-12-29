@@ -15,7 +15,7 @@ AUTORUN=1
 
 # Runs the program through the specified debugger if -d is passed.
 OPTIND=1
-while getopts ":d:v:n:a" opt; do
+while getopts ":d:v:n:a:s" opt; do
     case "$opt" in
     d)  debugger="$DEBUGGER"
         shift
@@ -26,7 +26,10 @@ while getopts ":d:v:n:a" opt; do
     n)  AUTORUN=0
         shift
         ;;
-    a)  ALLOSPHERE_APP_FLAG="-DBUILD_ALLOSPHERE_APP=1"
+    a)  ALLOSPHERE_APP_FLAG="-DBUILD_ALLOSPHERE_APP=1 -DBUILD_ALLOSPHERE_APP_NO_AUDIO_RENDERER=0"
+        shift
+        ;;
+    s)  ALLOSPHERE_APP_FLAG="-DBUILD_ALLOSPHERE_APP=1 -DBUILD_ALLOSPHERE_APP_NO_AUDIO_RENDERER=1"
         shift
         ;;
     esac
