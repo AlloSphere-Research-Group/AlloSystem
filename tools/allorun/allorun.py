@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-from multiprocessing import Process, Pipe, Array
+from multiprocessing import Process, Pipe, Array, Queue
 from time import sleep
 
 import sys
@@ -83,6 +83,7 @@ class LocalRun:
             self.remote = kwargs["remote"]
             self.run_dir = kwargs["run_dir"]
             self.path = kwargs["path"]
+            self.pid_queue = kwargs["pid_queue"]
         else:
             raise ValueError("Expected 'remote' key to be false.")
             
@@ -97,12 +98,12 @@ class LocalRun:
                            stdout=subprocess.PIPE,
                            stderr=subprocess.PIPE,
                            cwd=self.run_dir)
-            self.process = p
+            self.pid_queue.put(p.pid)
+            
             if p.returncode:
                 return -1
             
-            global local_procs
-            local_procs.append(p.pid)
+            stdout_cb('PID %i\n'%(p.pid))
             
             while p.poll() is None:
                 for line in iter(p.stdout.readline, ''):
@@ -211,12 +212,17 @@ class CursesApp():
           
         processes = []
         for i, node in enumerate(self.nodes):
+            
+            q = Queue() 
+            node["pid_queue"] = q
             p = Process(target=run_node, args=(i, self.stdout[i][1], self.stderr[i][1], self.item_status, node))
             processes.append(p)
             p.start()
             sleep(0.1)
+            pid = q.get()
+            global local_procs
+            local_procs.append(pid)
 
-        
         mypad = curses.newpad(self.buffer_len, 512)
         mypad_pos = 0
 
@@ -295,10 +301,6 @@ class CursesApp():
             
     def start(self):
         curses.wrapper(self.app_loop)
-        
-        global local_procs
-        print(local_procs)
-            
 
 
 if __name__ == "__main__":
