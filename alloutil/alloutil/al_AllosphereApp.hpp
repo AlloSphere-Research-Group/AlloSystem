@@ -132,11 +132,13 @@ class SimulatorBase : public App {
 public:
 	explicit SimulatorBase(const Window::Dim& dims = Window::Dim(320, 240),
 	                          const std::string title="",
-	                          double fps=40,
+	                          double fps=60,
 	                          Window::DisplayMode mode = Window::DEFAULT_BUF,
 	                          int flags=0) :
 	    mDims(dims), mTitle(title), mFps(fps), mMode(mode), mFlags(flags)
 	{
+		mMakerGraphics.start();
+		mMakerAudio.start();
 	}
 
 	virtual void initWindow();
@@ -277,7 +279,7 @@ class AlloSphereApp : public RenderApp, public AudioRendererBaseNoState
 class AlloSphereApp : public AudioApp, public OmniStereoGraphicsRenderer
 #endif
 #ifdef ALLOSPHERE_BUILD_SIMULATOR
-class AlloSphereApp : public OmniStereoGraphicsRenderer, public AudioRendererBaseNoState
+class AlloSphereApp : public SimulatorApp
 #endif
 {
 public:
@@ -285,8 +287,11 @@ public:
 	{
 
 #ifdef ALLOSPHERE_BUILD_SIMULATOR
-		SimulatorApp simulatorApp;
-		simulatorApp.start();
+//		this->initAudio();
+
+		this->initWindow();
+		this->initAudio(44100, 1024, 2, 0);
+		std::cout << "Running Simulator" << std::endl;
 #endif
 
 
@@ -330,8 +335,6 @@ private:
 template<typename State, typename AudioState, unsigned GRAPHICSPORT, unsigned AUDIOPORT>
 void SimulatorBase<State, AudioState, GRAPHICSPORT, AUDIOPORT>::initWindow()
 {
-	mMakerGraphics.start();
-	mMakerAudio.start();
 	App::initWindow(mDims, mTitle, mFps, mMode, mFlags);
 }
 

@@ -44,12 +44,10 @@ else()
 set(ALLO_APP_NAME_SUFFIX "${${ALLO_APP_NAME}}")
 endif()
 
-list(APPEND ALLOSPHERE_APPS "${ALLO_APP_NAME_SUFFIX}")
-
 add_executable("${ALLO_APP_NAME_SUFFIX}" EXCLUDE_FROM_ALL "${${ALLO_APP_SRC}}")
 
 if(NOT ${DEFINES} STREQUAL "")
-message("Adding defines ${DEFINES}")
+#message("Adding defines ${DEFINES}")
 target_compile_definitions("${ALLO_APP_NAME_SUFFIX}" PUBLIC "${DEFINES}")
 endif()
 
@@ -251,25 +249,34 @@ endfunction()
 
 if(BUILD_ALLOSPHERE_APP)
 
-set(ALLOSPHERE_APPS "")
+list(APPEND ALLOSPHERE_APPS "")
 
 BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_SIMULATOR" "simulator")
 AddRunTarget("${APP_NAME}_simulator" "${APP_NAME}_simulator")
+list(APPEND ALLOSPHERE_APPS "${APP_NAME}_simulator")
 BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_GRAPHICS_RENDERER" "graphics")
 AddRunTarget("${APP_NAME}_graphics" "${APP_NAME}_graphics")
-if(NOT BUILD_ALLOSPHERE_APP_NO_AUDIO_RENDERER)
+list(APPEND ALLOSPHERE_APPS "${APP_NAME}_graphics")
+if(BUILD_ALLOSPHERE_APP_AUDIO_RENDERER)
 BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_AUDIO_RENDERER" "audio")
 AddRunTarget("${APP_NAME}_audio" "${APP_NAME}_audio")
+list(APPEND ALLOSPHERE_APPS "${APP_NAME}_audio")
 endif()
 set(RUN_CONFIG "{ \"run_dir\" : \"${BUILD_ROOT_DIR}\" , \n  \"apps\" : [ {\"type\" : \"simulator\", \"path\" : \"build/bin/${APP_NAME}_simulator\"},")
 
-if(NOT BUILD_ALLOSPHERE_APP_NO_AUDIO_RENDERER)
+if(BUILD_ALLOSPHERE_APP_AUDIO_RENDERER)
 set(RUN_CONFIG "${RUN_CONFIG} {\"type\" : \"audio\", \"path\" : \"build/bin/${APP_NAME}_audio\" }, ")
 endif()
 
 set(RUN_CONFIG "${RUN_CONFIG} {\"type\" : \"graphics\", \"path\" : \"build/bin/${APP_NAME}_graphics\"} ] \n}")
 
 file(WRITE "${BUILD_ROOT_DIR}/build/${APP_NAME}.json" ${RUN_CONFIG})
+
+add_custom_target("${APP_NAME}"
+  COMMAND ""
+  DEPENDS ${ALLOSPHERE_APPS}
+  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+  SOURCES ${${ALLO_APP_SRC}})
 
 add_custom_target("${APP_NAME}_run"
   COMMAND "python" "tools/allorun/allorun.py" "${BUILD_ROOT_DIR}/build/${APP_NAME}.json"

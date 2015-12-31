@@ -127,10 +127,10 @@ public:
 	{
 		if (updateAudioState()) {
 			mPhaseInc = 2 * M_PI * audioState().frequency / io.framesPerSecond();
-//			std::cout << "onSound : " << value << std::endl;
+			std::cout << "onSound : " << audioState().frequency << std::endl;
 		}
 		while (io()) {
-			io.out(0) = sin(mPhase);
+			io.out(0) = 0.1 * sin(mPhase);
 			mPhase += mPhaseInc;
 			while (mPhase >= 2 * M_PI) {
 				mPhase -= 2 * M_PI;

@@ -6,7 +6,11 @@ from multiprocessing import Process, Pipe, Array
 from time import sleep
 
 import sys
+import os
+import signal
 import subprocess
+
+local_procs = []
 
 class BuildMachine:
     def __init__(self, **kwargs):
@@ -85,28 +89,35 @@ class LocalRun:
     def run(self, stdout_cb = None, stderr_cb = None):
         command = self.path
         
-        stdout_cb("Running " + command + "\n")
-        p = subprocess.Popen([command],
-                       shell=False,
-                       stdout=subprocess.PIPE,
-                       stderr=subprocess.PIPE,
-                       cwd=self.run_dir)
-        self.process = p
+        stdout_cb("Running " + command + " from " + self.run_dir + " \n")
+       
+        try: 
+            p = subprocess.Popen([command],
+                           shell=False,
+                           stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE,
+                           cwd=self.run_dir)
+            self.process = p
+            if p.returncode:
+                return -1
             
-        if p.returncode:
-            return p.returncode
-        
-        while p.poll() is None:
-            for line in iter(p.stdout.readline, ''):
-                if stdout_cb:
-                    stdout_cb(line)
-                
-            for line in iter(p.stderr.readline, ''):
-                if stderr_cb:
-                    stderr_cb(line)
-
+            global local_procs
+            local_procs.append(p.pid)
+            
+            while p.poll() is None:
+                for line in iter(p.stdout.readline, ''):
+                    if stdout_cb:
+                        stdout_cb(line)
+                    
+                for line in iter(p.stderr.readline, ''):
+                    if stderr_cb:
+                        stderr_cb(line)
+        except:
+            import traceback
+            stderr_cb( '\n'.join(traceback.format_tb(sys.exc_info()[2])))
         #p.join()
-
+            
+        stdout_cb('Process ended.')
         return p.returncode        
 
 
@@ -272,7 +283,10 @@ class CursesApp():
 
             except:
                 pass
-            
+        
+        global local_procs
+        for pid in local_procs:
+            os.kill(pid, signal.SIGTERM)
         if self.chase:
             mypad_pos = num_lines - y
 #        for p in processes:
@@ -281,6 +295,9 @@ class CursesApp():
             
     def start(self):
         curses.wrapper(self.app_loop)
+        
+        global local_procs
+        print(local_procs)
             
 
 

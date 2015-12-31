@@ -13,6 +13,9 @@
 // you without change either on a single machine, or on the appropiate
 // machines from a cluster if a configuration file is found.
 
+// You should run this file with the command:
+// ./run.sh -s alloutil/examples/allosphereApp.cpp
+
 using namespace al;
 
 // Define a "state". This is the information that the simulator will send
@@ -28,9 +31,7 @@ public:
 // window that you can use to create a GUI or alternate display.
 class SimulatorApp : public SimulatorBase<State> {
 public:
-	SimulatorApp() : SimulatorBase<State>(Window::Dim(320, 240), "Simulator"){
-		initWindow();
-		initAudio(44100, 1024);
+	SimulatorApp() {
 	}
 
 	virtual void onAnimate(double dt) override {
@@ -38,20 +39,20 @@ public:
 		state().value += 0.01;
 		if (state().value >= 1.0) {
 			state().value = 0;
-			cout << "State wrapped!" << std::endl;
+			cout << "State wrapped! " << std::endl;
 		}
 //		cout << "New State! " << state().value << std::endl;
 		// When done and the state is ready to be updated and broadcast, call
 		// the sendState function
 		sendState();
-		mPhaseInc = 2 * M_PI * state().value / audioIO().framesPerSecond();
+		mPhaseInc.store(2 * M_PI * (state().value * 660.0 + 220) / audioIO().framesPerSecond());
 	}
 
 	virtual void onSound(AudioIOData &io) override
 	{
 		while (io()) {
-			io.out(0) = sin(mPhase);
-			mPhase += mPhaseInc;
+			io.out(0) = 0.1 * sin(mPhase);
+			mPhase += mPhaseInc.load();
 			while (mPhase >= 2 * M_PI) {
 				mPhase -= 2 * M_PI;
 			}
