@@ -49,6 +49,7 @@
 namespace al{
 
 /// Generic buffer object
+/// @ingroup allocore
 
 /**
 Vertex Buffer Objects (VBOs) create buffer memory for vertex attributes in

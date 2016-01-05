@@ -48,6 +48,8 @@
 namespace al {
 
 /// A plane in Euclidean space
+///
+/// @ingroup allocore
 template <class T>
 class Plane{
 public:

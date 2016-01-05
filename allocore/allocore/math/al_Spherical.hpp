@@ -92,6 +92,8 @@ Vec<N-1,T> sterProj(const Vec<N,T>& v);
 /// The first component, theta, is the angle on the x-y plane and the second
 /// component, phi, is the angle from the +z axis. The magnitude of theta
 /// should always be 1, while the magnitude of phi is the radius.
+///
+/// @ingroup allocore
 template <class T>
 struct SphereCoord {
 	typedef Complex<T> C;
@@ -156,6 +158,8 @@ struct SphereCoord {
 /// ball"-like (sectoral) and when m = 0, the harmonics are "target"-like
 /// (zonal). Other values of m produce a checkerboard pattern (tesseral).
 /// Th Condon-Shortley phase factor of (-1)^m is included.
+///
+/// @ingroup allocore
 template <int L_MAX=16>
 class SphericalHarmonic{
 public:

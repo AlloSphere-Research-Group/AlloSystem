@@ -8,15 +8,23 @@ using namespace std;
 struct MyApp : OmniApp {
   Mesh mesh;
   Light light;
-  Font font1;
+  Font* font;
+  SearchPaths searchPaths;
 
-  MyApp() :font1("../../allocore/share/fonts/VeraMoIt.ttf", 20) {
+  MyApp() {
+    // search for the font in the root directory
+    // in this case, our font lives here: allocore/share/fonts/
+    SearchPaths searchPaths;
+    searchPaths.addSearchPath(".");
+    FilePath filePath = searchPaths.find("VeraMoIt.ttf");
+    if (!filePath.valid()) {
+      cerr << "Font file not found! Exiting..." << endl;
+      exit(1);
+    }
+    font = new Font(filePath.filepath(), 20);
+
     mesh.primitive(Graphics::TRIANGLES);
     addSphere(mesh, 1.0, 32, 32);
-    for (int i = 0; i < mesh.vertices().size(); ++i) {
-      float f = (float)i / mesh.vertices().size();
-      mesh.color(Color(HSV(f, 1 - f, 1), 1));
-    }
   }
 
   virtual ~MyApp() {}
@@ -30,24 +38,25 @@ struct MyApp : OmniApp {
     glAlphaFunc(GL_GREATER, 0.5);
     glEnable(GL_ALPHA_TEST);
     shader().uniform("texture", 1.0);
-    
+
     for (int i = 0; i < mesh.vertices().size(); i++){
       g.pushMatrix();
         Vec3d xform = mesh.vertices()[i];
         g.translate(xform);
         g.scale(.001);
-        
+
         // getLookRotation takes a normalized vector from source to destination
         // and an up vector, in this case we want the camera's up vector
         Vec3d forward = Vec3d(pose.pos() - xform).normalize();
         Quatd rot = Quatd::getBillboardRotation(forward, pose.uu());
         g.rotate(rot);
 
+        // render the text
         stringstream sstream;
         sstream << float(i);
         string temp_str = sstream.str();
         const char* text = temp_str.c_str();
-        font1.render(g, text);
+        font->render(g, text);
       g.popMatrix();
     }
     glDisable(GL_ALPHA_TEST);

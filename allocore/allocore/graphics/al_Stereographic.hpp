@@ -51,6 +51,8 @@
 namespace al{
 
 ///	Higher-level utility class to manage various stereo rendering techniques
+///
+/// @ingroup allocore
 class Stereographic {
 public:
 

@@ -85,6 +85,9 @@ template<> inline uint8_t getType<int64_t >(){ return 'I'; }
 
 
 ///
+/// \brief The Serializer struct
+///
+/// @ingroup allocore
 struct Serializer{
 
 	template <class T>
@@ -106,6 +109,9 @@ private:
 
 
 ///
+/// \brief The Deserializer struct
+///
+/// @ingroup allocore
 struct Deserializer{
 
 	Deserializer(const std::vector<char>& b);

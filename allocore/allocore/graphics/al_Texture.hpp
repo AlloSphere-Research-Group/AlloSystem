@@ -54,6 +54,7 @@ namespace al{
 
 
 /// A simple wrapper around an OpenGL Texture
+/// @ingroup allocore
 class Texture : public GPUObject {
 public:
 
@@ -88,6 +89,19 @@ public:
 
 	/// Construct an unsized Texture
 	Texture();
+
+	/// Construct a 1D Texture object
+
+	/// @param[in] width		width, in pixels
+	/// @param[in] format		format of pixel data
+	/// @param[in] type			data type of pixel data
+	/// @param[in] clientAlloc	allocate data on the client
+	Texture(
+		unsigned width,
+		Graphics::Format format=Graphics::RGBA,
+		Graphics::DataType type=Graphics::UBYTE,
+		bool clientAlloc=true
+	);
 
 	/// Construct a 2D Texture object
 

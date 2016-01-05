@@ -42,9 +42,9 @@ int main (int argc, char * const argv[]) {
 
 #ifndef ALLOCORE_TESTS_NO_AUDIO
 	RUNTEST(IOAudioIO);
-#endif
-	
 	RUNTEST(AudioScene);
+#endif
+
 	RUNTEST(Ambisonics);
 	
 #ifndef ALLOCORE_TESTS_NO_GUI
