@@ -26,6 +26,8 @@ struct MyApp : public App {
 public:
 
 	MeshVBO shapesVBO;
+	MeshVBO sphereVBO;
+	Mesh cubeMesh;
 	Light light;
 	Material material;
 
@@ -37,6 +39,17 @@ public:
 
 	MyApp(){
 	  initWindow(Window::Dim(800, 600), "VBO Many Shape");
+
+		// add a sphere and cube to test = operators. '0' and '9' on keyboard
+		addSphere(sphereVBO);
+		sphereVBO.translate(0,100,90);
+		sphereVBO.generateNormals();
+		for (int i=0; i<sphereVBO.vertices().size(); i++) sphereVBO.color(0,1,0);
+
+		addCube(cubeMesh);
+		cubeMesh.translate(0,100,90);
+		cubeMesh.generateNormals();
+		for (int i=0; i<cubeMesh.vertices().size(); i++) cubeMesh.color(1,0,1);
 	}
 
 	void scatterShapes(){
@@ -72,10 +85,10 @@ public:
 		scatterShapes();
 
 		// initialize the VBO
-		shapesVBO.init();
+		shapesVBO.allocate();
 		shapesVBO.primitive(Graphics::TRIANGLES);
 
-		// add a bunch of shapes to the mesh
+		sphereVBO.allocate();
 
 		// print information on the mesh
 		shapesVBO.print();
@@ -112,6 +125,7 @@ public:
 
     // make a new scattering of points
     if (k.key() == 'n') {
+			shapesVBO.reset();
       scatterShapes();
     }
 
@@ -122,7 +136,14 @@ public:
     if (k.key() == 'f') {
       showFPS = !showFPS;
     }
-  }
+		if (k.key() == '0') {
+			shapesVBO = sphereVBO;
+		}
+		if (k.key() == '9') {
+			shapesVBO = cubeMesh;
+		}
+
+	}
 
 };
 

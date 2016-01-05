@@ -42,30 +42,30 @@
   Kurt Kaminski, 2015, kurtoon@gmail.com
 
   Usage:
-  VBO's require a GL context to work, so init() should take place in OnCreate,
-  or anytime after a window has been initialized. Adding vertices and anything else
-  done with a regular Mesh may be done before initWindow().
-
-  Q: What usage symbol should I use?
-  A:  GL_STREAM_DRAW when the data will be modified once and used (i.e., drawn) at most a few times.
-      GL_STATIC_DRAW when the data will be modified once and used many times.
-      GL_DYNAMIC_DRAW when the data will be modified repeatedly and used many times.
+  VBO's require a GL window context to work, so init() should take place in OnCreate,
+  onAnimate, or onDraw. After that, update() should be used when data changes.
+	BufferDataUsage must be set during init() as it's only used once when first setting
+	the buffers.
 
   TO DO:
   [ ] test texture mapping
-	[ ] test = operators and copyFrom
+	[v] test = operators and copyFrom
 	[ ] better performance testing. fpsActual() maxes out at display's refresh rate (~60fps)
-
-  QUESTIONS:
-	[ ] BufferObject?
-	[ ] Where to put enumerations? al_Graphics? take from BufferObject? Intended for users...
+	[v] throw exception if no vertices exist during allocate; or use asserts (Andres)
+	[*] move things to protected; *- changed "init" to "allocate", added get..() (Andres)
+	[v] replace uint with uint32_t and bring in cstdint (Andres)
+	[v] prefix member variables with 'm' (Andres)
+	[ ] Doxygen (Andres)
+	[ ] method for deleting underlying Mesh buffers (Andres)
+	[ ] think about making all Mesh methods into shaders or some GPU solution (Andres)
 	[ ] is drawInstanced possible?
-	[ ] Best way to make a "dirty" state for Mesh?
-			true = mesh has changed; false = onDraw()?
+	[ ] autoUpdate? dirty state for Mesh
+
 */
 
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_OpenGL.hpp"
+#include <cstdint>
 
 namespace al{
 
@@ -91,31 +91,6 @@ public:
 		//DYNAMIC_COPY	= GL_DYNAMIC_COPY
 	};
 
-	BufferDataUsage bufferUsage = STREAM_DRAW;
-
-  uint vertId = 0;
-  uint normalId = 0;
-  uint colorId = 0;
-  uint texCoordId = 0;
-  uint indexId = 0;
-
-  int num_vertices = 0;
-  int num_indices = 0;
-  int vertStride = sizeof(Vec3f);
-  int normalStride = sizeof(Vec3f);
-  int colorStride = sizeof(Color);
-  int texCoordStride = sizeof(TexCoord2);
-  int indexStride = sizeof(uint);
-
-  bool isInit = false;
-  bool isBound = false;
-
-  bool hasNormals = false;
-  bool hasColors = false;
-  bool hasTexCoord2s = false;
-  bool hasTexCoord3s = false;
-  bool hasIndices = false;
-
 	MeshVBO();
 	MeshVBO(Mesh& cpy);
 
@@ -125,14 +100,62 @@ public:
   void operator=(Mesh& cpy);
   void operator=(MeshVBO& cpy);
 
-  void init(BufferDataUsage usage = STREAM_DRAW);
+  void allocate(BufferDataUsage usage = STREAM_DRAW);
 	void update();
+	void clear();
+
+	void bind();
+  void unbind();
+
+	uint32_t getVertId();
+	uint32_t getNormalId();
+	uint32_t getColorId();
+	uint32_t getTexCoordId();
+	uint32_t getIndexId();
+
+	int getNumVertices();
+	int getNumIndices();
+
+	bool isAllocated();
+	bool isBound();
+
+	bool hasNormals();
+	bool hasColors();
+	bool hasTexCoord2s();
+	bool hasTexCoord3s();
+	bool hasIndices();
+
+protected:
+	BufferDataUsage mBufferUsage = STREAM_DRAW;
+
+	uint32_t mVertId = 0;
+	uint32_t mNormalId = 0;
+	uint32_t mColorId = 0;
+	uint32_t mTexCoordId = 0;
+	uint32_t mIndexId = 0;
+
+	int mNumVertices = 0;
+	int mNumIndices = 0;
+	int mVertStride = sizeof(Vec3f);
+	int mNormalStride = sizeof(Vec3f);
+	int mColorStride = sizeof(Color);
+	int mTexCoordStride = sizeof(TexCoord2);
+	int mIndexStride = sizeof(uint32_t);
+
+	bool mAllocated = false;
+	bool mBound = false;
+
+	bool mHasNormals = false;
+	bool mHasColors = false;
+	bool mHasTexCoord2s = false;
+	bool mHasTexCoord3s = false;
+	bool mHasIndices = false;
 
 	template <class T>
-	void setData(const T * src, uint * bufferId, int total, BufferDataUsage usage, int bufferTarget);
+	void setData(const T *src, uint32_t *bufferId, int total, BufferDataUsage usage, int bufferTarget);
 
 	template <class T>
-	void updateData(const T * src, uint * bufferId, int total, int bufferTarget);
+	void updateData(const T *src, uint32_t *bufferId, int total, int bufferTarget);
 
 	// void autoUpdate();
 
@@ -145,12 +168,6 @@ public:
   // void disableNormals();
   // void disableTexCoords();
   // void disableIndices();
-
-  void bind();
-  void unbind();
-
-  void clear();
-
 };
 
 } // al::

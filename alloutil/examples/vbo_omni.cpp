@@ -75,7 +75,7 @@ struct MyApp : OmniStereoGraphicsRenderer {
     //
     // This stuff needs to have a valid OpenGL context to run
     //
-    shapesVBO.init();
+    shapesVBO.allocate();
     shapesVBO.primitive(Graphics::TRIANGLES);
     shapesVBO.print();
   }
