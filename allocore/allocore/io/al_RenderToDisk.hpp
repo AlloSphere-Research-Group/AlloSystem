@@ -55,6 +55,8 @@ namespace al{
 
 
 /// Renders sound and/or graphics to disk
+///
+/// @ingroup allocore
 class RenderToDisk : public AudioCallback, public WindowEventHandler{
 public:
 

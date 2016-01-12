@@ -15,14 +15,33 @@ endif(NOT (GAMMA_FOUND OR GAMMA_LIBRARY))
 
 set(ALLOAUDIO_SRC
   src/al_OutputMaster.cpp
+  src/al_SoundfileBuffered.cpp
   src/butter.cpp
   )
 
 set(ALLOAUDIO_HEADERS
   alloaudio/al_OutputMaster.hpp
+  alloaudio/al_SoundfileBuffered.hpp
 )
 
 # Dependencies ------------------------------
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+
+if(NOT (COMPILER_SUPPORTS_CXX11 OR COMPILER_SUPPORTS_CXX0X))
+	message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif()
+
+if(COMPILER_SUPPORTS_CXX11)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+elseif(COMPILER_SUPPORTS_CXX0X)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+endif()
+
+if(TRAVIS_BUILD)
+add_definitions(-DTRAVIS_BUILD) # Bug in gcc. See alloaudio/al_SoundfileBuffered.hpp for details
+endif(TRAVIS_BUILD)
 
 set(ALLOCORE_LIBRARY "allocore${DEBUG_SUFFIX}")
 get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore${DEBUG_SUFFIX} ALLOCORE_DEP_INCLUDE_DIRS)

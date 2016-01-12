@@ -59,6 +59,8 @@ inline al_sec walltime(){ return al_time(); }
 inline al_sec timeNow(){ return al_time(); }
 
 /// Timer with stopwatch-like functionality for benchmarking, etc.
+///
+/// @ingroup allocore
 class Timer {
 public:
 	Timer(): mStart(0), mStop(0){}
@@ -81,6 +83,8 @@ private:
 ///	A curve mapping logical to real time can be drawn over an event period
 ///		by interpolating between t0 and t1
 ///	@see http://kokkinizita.linuxaudio.org/papers/usingdll.pdf
+///
+/// @ingroup allocore
 class DelayLockedLoop {
 public:
 
@@ -133,6 +137,7 @@ protected:
 
 /// A timing source that can be locked to realtime or driven manually
 ///
+/// @ingroup allocore
 class Clock {
 public:
 

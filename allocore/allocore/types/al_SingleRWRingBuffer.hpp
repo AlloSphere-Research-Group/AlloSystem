@@ -54,6 +54,8 @@ namespace al {
  * so it is ideal to pass data to and from a high priority thread
  * like an audio thread.
  */
+
+/// @ingroup allocore
 class SingleRWRingBuffer {
 public:
 

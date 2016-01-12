@@ -57,6 +57,8 @@ typedef Matrix4<float>	Matrix4f;	///< Single-precision 4-by-4 matrix
 
 
 /// 4x4 Matrix (Homogenous Transform)
+///
+/// @ingroup allocore
 template<typename T=double>
 class Matrix4 : public Mat<4, T> {
 public:

@@ -33,7 +33,10 @@ int utTypesConversion();
 int utThread();
 int utFile();
 int utAsset();
+int utAmbisonics();
 
 SearchPaths& getSearchPaths();
+
+bool almostEqual(float v1, float v2);
 
 #endif

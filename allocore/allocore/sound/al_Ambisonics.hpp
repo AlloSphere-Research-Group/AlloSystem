@@ -96,6 +96,8 @@
 namespace al{
 
 /// Ambisonic base class
+///
+/// @ingroup allocore
 class AmbiBase{
 public:
 
@@ -156,6 +158,8 @@ protected:
 
 
 /// Higher Order Ambisonic Decoding class
+///
+/// @ingroup allocore
 class AmbiDecode : public AmbiBase{
 public:
 
@@ -197,7 +201,7 @@ public:
 	void setSpeaker(int index, int deviceChannel, float azimuth, float elevation=0, float amp=1.f);
 	//void zero();					///< Zeroes out internal ambisonic frame.
 
-    void setSpeakers(Speakers *spkrs) { mSpeakers = spkrs; }
+	void setSpeakers(Speakers *spkrs);
 
 //	float * azimuths();				///< Returns pointer to speaker azimuths.
 //	float * elevations();			///< Returns pointer to speaker elevations.
@@ -229,6 +233,8 @@ protected:
 
 
 /// Higher Order Ambisonic encoding class
+///
+/// @ingroup allocore
 class AmbiEncode : public AmbiBase{
 public:
 
@@ -269,6 +275,8 @@ public:
 
 
 /// Ambisonic coder
+///
+/// @ingroup allocore
 class AmbisonicsSpatializer : public Spatializer {
 public:
 
@@ -368,7 +376,7 @@ inline void AmbiEncode::encode(float * ambiChans, int numFrames, int timeIndex, 
 
 	// "Iterate" through spherical harmonics using Duff's device.
 	// This requires only a simple jump per time sample.
-	#define CS(c) case c: ambiChans[c*numFrames+timeIndex] += weights()[c] * timeSample;
+	#define CS(chanindex) case chanindex: ambiChans[chanindex*numFrames+timeIndex] += weights()[chanindex] * timeSample;
 	int ch = channels()-1;
 	switch(ch){
 		CS(15) CS(14) CS(13) CS(12) CS(11) CS(10) CS( 9) CS( 8)

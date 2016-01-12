@@ -58,6 +58,14 @@
 
 namespace al {
 
+///
+/// \brief The MsgTube class
+/// A C++ class for deferred function calls
+/// Using templates for type-checked functions of variable arguments
+/// Adding a cache queue to seamlessly handle buffer overflow
+///
+/// @ingroup allocore
+
 class MsgTube {
 public:
 

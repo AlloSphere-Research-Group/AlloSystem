@@ -1,6 +1,7 @@
 #ifndef INC_AL_UTIL_ALLOSPHERE_HPP
 #define INC_AL_UTIL_ALLOSPHERE_HPP
 
+#include "allocore/math/al_Constants.hpp"
 #include "allocore/graphics/al_GraphicsOpenGL.hpp"
 
 /*!

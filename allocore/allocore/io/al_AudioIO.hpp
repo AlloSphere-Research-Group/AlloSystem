@@ -54,6 +54,8 @@ namespace al{
 typedef void (* audioCallback)(AudioIOData& io);
 
 /// Audio device
+///
+/// @ingroup allocore
 class AudioDevice: public AudioDeviceInfo {
 public:
 
@@ -94,6 +96,8 @@ inline AudioDevice::StreamMode operator| (const AudioDevice::StreamMode& a, cons
 }
 
 /// Audio input/output streaming
+///
+/// @ingroup allocore
 class AudioIO : public AudioIOData {
 public:
 

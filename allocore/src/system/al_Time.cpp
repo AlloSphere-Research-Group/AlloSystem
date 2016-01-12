@@ -1,3 +1,4 @@
+#include "allocore/math/al_Constants.hpp"
 #include "allocore/system/al_Time.hpp"
 
 /* Windows */
