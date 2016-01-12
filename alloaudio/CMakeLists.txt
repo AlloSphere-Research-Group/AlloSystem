@@ -16,12 +16,14 @@ endif(NOT (GAMMA_FOUND OR GAMMA_LIBRARY))
 set(ALLOAUDIO_SRC
   src/al_OutputMaster.cpp
   src/al_SoundfileBuffered.cpp
+  src/al_AmbiFilePlayer.cpp
   src/butter.cpp
   )
 
 set(ALLOAUDIO_HEADERS
   alloaudio/al_OutputMaster.hpp
   alloaudio/al_SoundfileBuffered.hpp
+  alloaudio/al_AmbiFilePlayer.hpp
 )
 
 # Dependencies ------------------------------
