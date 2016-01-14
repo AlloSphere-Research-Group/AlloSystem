@@ -1,8 +1,5 @@
-
-
 #include "allocore/al_Allocore.hpp"
 #include "allocore/sound/al_Vbap.hpp"
-//#include "allocore/system/al_Parameter.hpp"
 #include "allocore/sound/al_Speaker.hpp"
 #include "alloutil/al_AlloSphereSpeakerLayout.hpp"
 #include "allocore/io/al_App.hpp"
@@ -24,7 +21,7 @@ enum{
 
 bool perSampProcessing = true;
 float speedMult = 0.02;
-int layout = TEST_LAYOUT;
+int layout = ALLO_LAYOUT;
 
 SpeakerLayout speakerLayout;
 Vbap* panner;
@@ -242,7 +239,17 @@ int main (int argc, char * argv[]){
     }
 
     if(layout == ALLO_LAYOUT){
-        speakerLayout= AlloSphereSpeakerLayout();
+        //AlloSphereSpeakerLayout radius defaults to 1
+        //This changes the radius
+        SpeakerLayout tempLayout;
+        tempLayout= AlloSphereSpeakerLayout();
+        Speakers spks = tempLayout.speakers();
+
+        for(Speaker s : spks){
+            s.radius = 10.f;
+            speakerLayout.addSpeaker(s);
+
+        }
     }
 
 

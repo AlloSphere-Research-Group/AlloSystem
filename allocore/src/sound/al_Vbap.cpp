@@ -2,28 +2,8 @@
 
 namespace al{
 
-// TODO: invert in al_Mat seems wrong this is a temp. fix.
-template <class T>
-bool invert2(Mat<2,T>& m){
-    T det = determinant(m);
-    if(det != 0){
-        m.set(
-                    m(1,1)/det,-m(0,1)/det,
-                    -m(1,0)/det, m(0,0)/det
-                    );
-        return true;
-    }
-    return false;
-}
-
 bool SpeakerTriple::loadVectors(const std::vector<Speaker>& spkrs){
     bool hasInverse;
-
-
-
-    //Store speaker for getting the channel iteratively
-    //    speakers[0] = spkrs[s1];
-    //   speakers[1] = spkrs[s2];
 
     s1Vec = spkrs[s1].vec();
     s2Vec = spkrs[s2].vec();
@@ -34,7 +14,6 @@ bool SpeakerTriple::loadVectors(const std::vector<Speaker>& spkrs){
     if(s3!=-1){ // 3d Speaker layout
         s3Vec = spkrs[s3].vec();
         s3Chan = spkrs[s3].deviceChannel;
-        //  speakers[2] = spkrs[s3];
         mat.set(s1Vec[0],s1Vec[1],s1Vec[2],
                 s2Vec[0],s2Vec[1],s2Vec[2],
                 s3Vec[0],s3Vec[1],s3Vec[2]
@@ -46,7 +25,7 @@ bool SpeakerTriple::loadVectors(const std::vector<Speaker>& spkrs){
         tempMat.set(s1Vec[0],s1Vec[1],
                 s2Vec[0],s2Vec[1]
                 );
-        hasInverse = invert2(tempMat);
+        hasInverse = invert(tempMat);
 
         //insert inverted matrix into 3x3 matrix
         mat.set(tempMat(0,0),tempMat(0,1),s1Vec[2],
@@ -341,7 +320,7 @@ void Vbap::findSpeakerTriplets(const std::vector<Speaker>& spkrs){
                                 breakInner = true;
                                 crossCounter++;
                             }else{
-                              //  printf("EQUA1L Trip it %i %i %i, is equal %i %i %i lt=%f lt2=%f \n",trip.s1Chan,trip.s2Chan,trip.s3Chan,trip2.s1Chan,trip2.s2Chan,trip2.s3Chan, lt,lt2);
+
                             }
                         }
                         if(breakInner || breakOuter){break;}
