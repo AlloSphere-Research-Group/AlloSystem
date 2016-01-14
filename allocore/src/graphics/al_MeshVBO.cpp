@@ -13,10 +13,10 @@ MeshVBO::MeshVBO(Mesh& cpy){
 
 ////////////////////////////////////////////////////////////////////////////////
 // Copy from Mesh or MeshVBO
-void MeshVBO::copyFrom(Mesh& cpy){
+void MeshVBO::copyFrom(Mesh& cpy, bool _allocate){
   clear();
   ((Mesh&)(*this)) = cpy;
-  allocate();
+  if (_allocate) allocate();
 }
 
 void MeshVBO::copyFrom(MeshVBO& cpy){
@@ -112,7 +112,7 @@ void MeshVBO::allocate(BufferDataUsage usage){
 ////////////////////////////////////////////////////////////////////////////////
 // Update buffers
 void MeshVBO::update(){
-  if (vertices().size() > mNumVertices){
+  if (vertices().size() > mNumVertices || !isAllocated()){
     allocate();
   }
   else {

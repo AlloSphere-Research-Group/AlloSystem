@@ -94,7 +94,7 @@ public:
 	MeshVBO();
 	MeshVBO(Mesh& cpy);
 
-	void copyFrom(Mesh& cpy);
+	void copyFrom(Mesh& cpy, bool _allocate=true);
 	void copyFrom(MeshVBO& cpy);
 
   void operator=(Mesh& cpy);
