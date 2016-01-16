@@ -54,10 +54,7 @@ void SoundFileBuffered::readFunction(SoundFileBuffered  *obj)
 		int framesRead = obj->mSf.read(buf, framesToRead);
 		if (framesRead != framesToRead && obj->mLoop) {
 			obj->mSf.seek(0, SEEK_SET);
-			int framesRead = obj->mSf.read(buf + framesRead, framesToRead - framesRead);
-			if (framesRead == 0) {
-				// TODO: Handle IO error
-			}
+			framesRead += obj->mSf.read(buf + framesRead, framesToRead - framesRead);
 			std::atomic_fetch_add(&(obj->mRepeats), 1);
 		}
 		int written = obj->mRingBuffer->write((const char*) buf, framesRead * sizeof(float) * obj->channels());
