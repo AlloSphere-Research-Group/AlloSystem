@@ -7,49 +7,52 @@
 #include "allocore/system/al_Parameter.hpp"
 #include "alloaudio/al_SoundfileBuffered.hpp"
 #include "alloaudio/al_AmbiTunedDecoder.hpp"
+#include "alloaudio/al_AmbisonicsConfig.hpp"
 
 namespace al {
 
 using namespace std;
 
-class AmbisonicsConfig
-{
-public:
-	AmbisonicsConfig(int order = 3, int dimensions = 3, int flavor = 1)
-	    : mOrder(order), mDimensions(dimensions) , mFlavor(flavor)
-	{}
-
-	int order() const { return mOrder; }
-	int dimensions() const { return mDimensions; }
-	int flavor() const { return mFlavor; }
-
-	void setOrder(int order) { mOrder = order; }
-	void setDimensions(int dimensions) { mDimensions = dimensions; }
-	void setFlavor(int flavor) { mFlavor = flavor; }
-
-private:
-	int mOrder;
-	int mDimensions;
-	int mFlavor;
-};
-
+///
+/// \brief A class to play back Ambisonics encoded (B-format) audio files
+///
 class AmbiFilePlayer : public AudioCallback, public SoundFileBuffered
 {
 
 public:
+	///
+	/// \brief AmbiFilePlayer constructor
+	/// \param fullPath full path to the b-format audio file
+	/// \param loop true if file should start over when it reaches the end
+	/// \param bufferFrames Number of frames in the audio file read buffer. Increase if experiencing dropouts
+	/// \param layout the speaker layout for decoding
+	///
 	AmbiFilePlayer(std::string fullPath, bool loop, int bufferFrames,
 	               SpeakerLayout &layout);
+	///
+	/// \param fullPath full path to the b-format audio file
+	/// \param loop true if file should start over when it reaches the end
+	/// \param bufferFrames Number of frames in the audio file read buffer. Increase if experiencing dropouts
+	/// \param configPath path to the .ambdec ambisonics configuration file. If empty the file "Ambisonics.ambdec" is used.
+	///
+	AmbiFilePlayer(std::string fullPath, bool loop, int bufferFrames,
+	               string configPath);
 
 	~AmbiFilePlayer();
 
 	virtual void onAudioCB(AudioIOData& io) override;
 
+	///
+	/// \brief Check whether file has been played fully
+	/// \return true if file has played to the end
+	///
 	bool done() const;
 	void setDone(bool done);
 
 private:
 
-	AmbisonicsConfig fileAmbisonicsConfig();
+	int getFileDimensions();
+	int getFileOrder();
 
 	// Internal
 
