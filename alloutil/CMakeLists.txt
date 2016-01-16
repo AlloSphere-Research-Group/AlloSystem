@@ -9,6 +9,9 @@ set(ALLOUTIL_SRC
   src/al_ResourceManager.cpp
   src/al_WarpBlend.cpp
   src/al_RayStereo.cpp
+  src/al_AllosphereApp.cpp
+  src/al_InterfaceServerClient.cpp
+  src/al_Simulator.cpp
   )
 
 # Dependencies ------------------------------
@@ -51,6 +54,13 @@ if(NOT Jsoncpp_FOUND)
   return()
 endif(NOT Jsoncpp_FOUND)
 
+find_package(Cuttlebone)
+
+if(NOT CUTTLEBONE_FOUND)
+  message("Cuttlebone required to build AlloUtil. Not found!")
+  return()
+endif(NOT CUTTLEBONE_FOUND)
+
 find_path(ALLOCORE_HEADER allocore/graphics/al_Image.hpp ${BUILD_ROOT_DIR}/build/include)
 
 if(NOT ALLOCORE_HEADER)
@@ -76,7 +86,7 @@ set(ALLOUTIL_LIB "alloutil${DEBUG_SUFFIX}")
 add_library(${ALLOUTIL_LIB} ${ALLOUTIL_SRC} ${ALLOUTIL_INSTALL_HEADERS})
 
 set(ALLOUTIL_LINK_LIBRARIES ${LUA_LIBRARIES} ${Jsoncpp_LIBRARIES} ${ALLOCORE_LIBRARY})
-set(ALLOUTIL_DIRS "${BUILD_ROOT_DIR}/build/include" ${LUA_INCLUDE_DIR} ${Jsoncpp_INCLUDE_DIRS} ${ALLOCORE_DEP_INCLUDE_DIRS})
+set(ALLOUTIL_DIRS "${BUILD_ROOT_DIR}/build/include" ${LUA_INCLUDE_DIR} ${Jsoncpp_INCLUDE_DIRS} ${CUTTLEBONE_INCLUDE_DIR} ${ALLOCORE_DEP_INCLUDE_DIRS})
 
 include_directories(${ALLOUTIL_DIRS})
 target_link_libraries(${ALLOUTIL_LIB} ${ALLOUTIL_LINK_LIBRARIES})

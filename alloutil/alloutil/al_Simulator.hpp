@@ -114,15 +114,4 @@ inline Simulator::~Simulator() {
   // oscSend().send("/interface/disconnectApplication", name());
 }
 
-Simulator::Simulator(const char* deviceServerAddress, int port,
-                     int deviceServerPort)
-    : //mNavControl(mNav),
-      InterfaceServerClient(deviceServerAddress,port,deviceServerPort) {
-
-  started = false;
-  nav().smooth(0.8);
-  InterfaceServerClient::setNav(nav());
-  InterfaceServerClient::setLens(lens());
-}
-
 #endif

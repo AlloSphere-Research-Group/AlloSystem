@@ -12,6 +12,7 @@
 #include <thread>
 #include <condition_variable>
 #include <memory>
+#include <atomic>
 
 #include "Gamma/SoundFile.h"
 #include "allocore/types/al_SingleRWRingBuffer.hpp"
@@ -62,6 +63,15 @@ public:
 								 int numFrames, void * userData);
 
 	///
+	/// \brief returns how many times the file has been repeated.
+	///
+	/// This function can also be used to determine if playback is done when
+	/// loopoing is turned on.
+	/// \return Number of times the file has played back
+	///
+	int repeats();
+
+	///
 	/// \brief Set a function that will be called whenever samples are read
 	///
 	/// The function func will be called whenever the low priority reader thread
@@ -82,6 +92,7 @@ public:
 private:
 	bool mRunning;
 	bool mLoop;
+	std::atomic<int> mRepeats;
 	std::mutex mLock;
 	std::condition_variable mCondVar;
 	std::thread *mReaderThread;

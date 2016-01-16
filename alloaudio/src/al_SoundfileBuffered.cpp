@@ -5,6 +5,7 @@ using namespace al;
 SoundFileBuffered::SoundFileBuffered(std::string fullPath, bool loop, int bufferFrames) :
     mRunning(true),
     mLoop(loop),
+    mRepeats(0),
     mBufferFrames(bufferFrames),
     mReadCallback(0)
 {
@@ -32,7 +33,7 @@ int SoundFileBuffered::read(float *buffer, int numFrames)
 {
 	int bytesRead = mRingBuffer->read((char *) buffer, numFrames * channels() * sizeof(float));
 	if (bytesRead != numFrames * channels() * sizeof(float)) {
-		// TODO handle underrun
+		// TODO: handle underrun
 	}
 	mCondVar.notify_one();
 	return bytesRead / (channels() * sizeof(float));
@@ -53,7 +54,8 @@ void SoundFileBuffered::readFunction(SoundFileBuffered  *obj)
 		int framesRead = obj->mSf.read(buf, framesToRead);
 		if (framesRead != framesToRead && obj->mLoop) {
 			obj->mSf.seek(0, SEEK_SET);
-			// FIXME: Fill rest of unfinished buffer
+			framesRead += obj->mSf.read(buf + framesRead, framesToRead - framesRead);
+			std::atomic_fetch_add(&(obj->mRepeats), 1);
 		}
 		int written = obj->mRingBuffer->write((const char*) buf, framesRead * sizeof(float) * obj->channels());
 //		if (written != framesRead * sizeof(float) * obj->channels()) {
@@ -118,6 +120,11 @@ int SoundFileBuffered::samples() const
 	} else {
 		return 0;
 	}
+}
+
+int al::SoundFileBuffered::repeats()
+{
+	return mRepeats.load();
 }
 
 void SoundFileBuffered::setReadCallback(SoundFileBuffered::CallbackFunc func, void *userData)
