@@ -13,46 +13,40 @@ AmbiFilePlayer::AmbiFilePlayer(string fullPath, bool loop, int bufferFrames, Spe
       mBufferSize(bufferFrames),
       mGain("Gain", "", 0.25)
 {
-	AmbisonicsConfig config = fileAmbisonicsConfig();
 	// Create spatializer
-	mDecoder = new AmbiDecode(config.dimensions(), config.order(), layout.numSpeakers(), config.flavor());
+	mDecoder = new AmbiDecode(getFileDimensions(), getFileOrder(), layout.numSpeakers());
 	mDecoder->setSpeakers(&(layout.speakers()));
 	mReadBuffer = (float *) calloc(mBufferSize * channels(), sizeof(float));
 	mDeinterleavedBuffer = (float *) calloc(mBufferSize * channels(), sizeof(float));
 }
+
+AmbiFilePlayer::AmbiFilePlayer(std::string fullPath, bool loop, int bufferFrames, string configPath)
+    : SoundFileBuffered(fullPath, loop, bufferFrames),
+      mReadBuffer(nullptr),
+      mDone(false),
+      mBufferSize(bufferFrames),
+      mGain("Gain", "", 0.25)
+{
+	// Create spatializer
+	mDecoder = new AmbiTunedDecoder(configPath);
+	mReadBuffer = (float *) calloc(mBufferSize * channels(), sizeof(float));
+	mDeinterleavedBuffer = (float *) calloc(mBufferSize * channels(), sizeof(float));
+}
+
 
 AmbiFilePlayer::~AmbiFilePlayer()
 {
 	free(mReadBuffer);
 }
 
-AmbisonicsConfig AmbiFilePlayer::fileAmbisonicsConfig()
+int AmbiFilePlayer::getFileDimensions()
 {
-	int numChannels = channels();
-	AmbisonicsConfig config;
-	// Can the weighing flavor be determined from the audiofile?
-	switch(numChannels) {
-	case 3:
-		config.setOrder(1);
-		config.setDimensions(2);
-		break;
-	case 4:
-		config.setOrder(1);
-		config.setDimensions(3);
-		break;
-	case 9:
-		config.setOrder(2);
-		config.setDimensions(3);
-		break;
-	case 16:
-		config.setOrder(3);
-		config.setDimensions(3);
-		break;
-	default:
-		config.setOrder(-1);
-		config.setDimensions(-1);
-	}
-	return config;
+	return AmbiBase::channelsToDimensions(channels());
+}
+
+int AmbiFilePlayer::getFileOrder()
+{
+	return  AmbiBase::channelsToOrder(channels());
 }
 
 bool AmbiFilePlayer::done() const
@@ -69,7 +63,7 @@ void AmbiFilePlayer::onAudioCB(AudioIOData &io)
 {
 	int numFrames = io.framesPerBuffer();
 
-	assert(mBufferSize == numFrames);
+	assert(mBufferSize >= numFrames);
 
 	int framesRead = read(mReadBuffer, numFrames);
 
@@ -84,7 +78,7 @@ void AmbiFilePlayer::onAudioCB(AudioIOData &io)
 		}
 	}
 
-	mDecoder->decode(outs, mDeinterleavedBuffer, numFrames);
+	mDecoder->decode(outs, mDeinterleavedBuffer, framesRead);
 
 	if (repeats() > 0) {
 		mDone = true;

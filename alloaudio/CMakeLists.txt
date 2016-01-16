@@ -18,6 +18,7 @@ set(ALLOAUDIO_SRC
   src/al_SoundfileBuffered.cpp
   src/al_AmbiFilePlayer.cpp
   src/al_AmbiTunedDecoder.cpp
+#  src/al_AmbisonicsConfig.cpp
   src/butter.cpp
   )
 
@@ -26,6 +27,7 @@ set(ALLOAUDIO_HEADERS
   alloaudio/al_SoundfileBuffered.hpp
   alloaudio/al_AmbiFilePlayer.hpp
   alloaudio/al_AmbiTunedDecoder.hpp
+  alloaudio/al_AmbisonicsConfig.hpp
 )
 
 # Dependencies ------------------------------

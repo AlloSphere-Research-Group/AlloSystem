@@ -11,7 +11,6 @@
 #include "allocore/io/al_AudioIO.hpp"
 #include "alloutil/al_AlloSphereSpeakerLayout.hpp"
 #include "alloaudio/al_AmbiFilePlayer.hpp"
-#include "alloaudio/al_OutputMaster.hpp"
 #include "alloaudio/al_AmbiTunedDecoder.hpp"
 
 using namespace al;
@@ -57,14 +56,17 @@ int main(int argc, char *argv[])
 	std::string fullPath = "/media/part/Music/Ambisonics/Ambisonia/PWH_Purcell-Passacaglia_(How_Happy).amb";
 	bool loop = false;
 	int framesPerBuffer = 1024;
-	SpeakerLayout speakerLayout = OctalSpeakerLayout();
-	AmbiFilePlayer player(fullPath, loop, framesPerBuffer, speakerLayout);
-	PeakData peakData(speakerLayout.numSpeakers());
+	string decoderConfig = "alloaudio/examples/Allosphere.ambdec";
+	if (argc > 1) {
+		decoderConfig = argv[1];
+	}
+	SpeakerLayout layout = OctalSpeakerLayout();
+	AmbiFilePlayer player(fullPath, loop, framesPerBuffer * 4, layout);
+//	AmbiFilePlayer player(fullPath, loop, framesPerBuffer * 4, decoderConfig);
+	PeakData peakData(layout.numSpeakers());
 
-	AudioIO io(framesPerBuffer, 44100, NULL, (void *) &peakData, speakerLayout.numSpeakers());
-	OutputMaster master(io.channels(true), io.fps(), "", 19375, "localhost", 19376);
+	AudioIO io(framesPerBuffer, 44100, NULL, (void *) &peakData, 32);
 	MeteringCallback meterCb;
-	AmbiTunedDecoder decoder("/home/andres/Documents/src/Allostuff/adt/decoders/Allosphere-full_3h3p_allrad_5200_rE_max_1_band.ambdec");
 
 	// An AmbiFilePlayer object can be "appended" to an AudioIO object
 	// because it inherits from AudioCallback.
