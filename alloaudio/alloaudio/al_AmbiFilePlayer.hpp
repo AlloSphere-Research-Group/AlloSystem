@@ -6,6 +6,7 @@
 #include "allocore/io/al_AudioIOData.hpp"
 #include "allocore/system/al_Parameter.hpp"
 #include "alloaudio/al_SoundfileBuffered.hpp"
+#include "alloaudio/al_AmbiTunedDecoder.hpp"
 
 namespace al {
 
@@ -32,23 +33,16 @@ private:
 	int mFlavor;
 };
 
-// TODO: Do this better (remove this macro)
-#define AUDIO_BLOCK_SIZE 1024
-
 class AmbiFilePlayer : public AudioCallback, public SoundFileBuffered
 {
 
 public:
-	AmbiFilePlayer(std::string fullPath, bool loop = false, int bufferFrames = 1024,
-	               SpeakerLayout layout = OctalSpeakerLayout());
+	AmbiFilePlayer(std::string fullPath, bool loop, int bufferFrames,
+	               SpeakerLayout &layout);
 
 	~AmbiFilePlayer();
 
 	virtual void onAudioCB(AudioIOData& io) override;
-
-	// TODO implement process adding instead of process replacing
-//	bool processAdding() const;
-//	void setProcessAdding(bool processAdding);
 
 	bool done() const;
 	void setDone(bool done);
@@ -58,16 +52,16 @@ private:
 	AmbisonicsConfig fileAmbisonicsConfig();
 
 	// Internal
-//	SoundFileBuffered mSoundFile;
-	AmbisonicsSpatializer *mSpatializer;
+
+	AmbiDecode *mDecoder;
 	float *mReadBuffer;
+	float *mDeinterleavedBuffer;
 	bool mDone;
 	int mBufferSize;
 
 	//Parameters
 	Parameter mGain;
 
-//	bool mProcessAdding;
 };
 
 /** @} */

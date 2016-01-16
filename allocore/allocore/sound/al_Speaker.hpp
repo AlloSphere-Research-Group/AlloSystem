@@ -45,6 +45,7 @@
 #include <cmath>
 #include <vector>
 #include "allocore/math/al_Constants.hpp"
+#include "allocore/math/al_Vec.hpp"
 
 namespace al{
 

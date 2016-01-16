@@ -116,12 +116,11 @@ public:
 	/// Get Ambisonic channel weights
 	const float * weights() const { return mWeights; }
 
-	/// Returns total number of Ambisonic domain channels
+	/// Returns total number of Ambisonic domain (B-format) channels
 	int channels() const { return mChannels; }
 
 	/// Set the order
 	void order(int order);
-
 
 	/// Called whenever the number of Ambisonic channels changes
 	virtual void onChannelsChange(){}
