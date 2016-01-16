@@ -16,7 +16,7 @@ using namespace al;
 class MyApp : public App {
 public:
 
-	static const int Nm = 8;
+	static const int Nm = 9;
 	Mesh meshes[Nm];
 	double angle;
 	float mx, my;
@@ -47,6 +47,12 @@ public:
 			1,				// radius
 			3 + mx*16,		// slices
 			2 + my*16		// stacks
+		);
+
+		// Create an icosphere
+		addIcosphere(meshes[S++],
+			1,				// radius
+			mx*4			// subdivisions
 		);
 
 		// Create a cone/pyramid
