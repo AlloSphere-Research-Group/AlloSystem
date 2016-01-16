@@ -12,6 +12,7 @@ fi
 # You shouldn't need to touch the stuff below.
 
 AUTORUN=1
+ALLOSPHERE_APP_FLAG="-DBUILD_ALLOSPHERE_APP=0"
 
 # Runs the program through the specified debugger if -d is passed.
 OPTIND=1
