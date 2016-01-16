@@ -44,7 +44,7 @@ else()
 set(ALLO_APP_NAME_SUFFIX "${${ALLO_APP_NAME}}")
 endif()
 
-add_executable("${ALLO_APP_NAME_SUFFIX}" EXCLUDE_FROM_ALL "${${ALLO_APP_SRC}}")
+add_executable("${ALLO_APP_NAME_SUFFIX}" EXCLUDE_FROM_ALL ${${ALLO_APP_SRC}})
 
 if(NOT ${DEFINES} STREQUAL "")
 #message("Adding defines ${DEFINES}")
