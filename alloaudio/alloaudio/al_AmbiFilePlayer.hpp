@@ -13,6 +13,9 @@ namespace al {
 
 using namespace std;
 
+/// \addtogroup alloaudio
+///  @{
+
 ///
 /// \brief A class to play back Ambisonics encoded (B-format) audio files
 ///
@@ -67,7 +70,7 @@ private:
 
 };
 
-/** @} */
+/// @}
 }
 
 #endif // AL_AMBIFILEPLAYER_H

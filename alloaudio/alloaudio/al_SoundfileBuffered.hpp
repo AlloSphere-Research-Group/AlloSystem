@@ -22,6 +22,10 @@
 namespace al
 {
 
+/** \addtogroup alloaudio
+ *  @{
+ */
+
 ///
 /// \brief Read a soundfile with buffering on a low priority thread
 ///
@@ -105,6 +109,8 @@ private:
 
 	static void readFunction(SoundFileBuffered *obj);
 };
+
+/** @} */
 
 } // namespace al
 

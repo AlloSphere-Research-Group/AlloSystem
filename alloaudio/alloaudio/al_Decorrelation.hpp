@@ -53,9 +53,8 @@
 
 namespace al {
 
-/**
-
- * @ingroup alloaudio
+/** \addtogroup alloaudio
+ *  @{
  */
 class Decorrelation : public AudioCallback
 {
@@ -152,6 +151,8 @@ private:
 	Convolver mConv;
 	unsigned long mSeed;
 };
+
+/** @} */
 
 } // al::
 

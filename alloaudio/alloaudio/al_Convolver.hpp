@@ -15,6 +15,10 @@ namespace al {
 
 using namespace std;
 
+/** \addtogroup alloaudio
+ *  @{
+ */
+
 // Number of IRs must always match the number of output channels
 // Use cases:
 // - Decorrelation: many to many each with a different IR
