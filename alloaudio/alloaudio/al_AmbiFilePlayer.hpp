@@ -43,7 +43,7 @@ public:
 
 	~AmbiFilePlayer();
 
-	virtual void onAudioCB(AudioIOData& io) override;
+	virtual void onAudioCB(AudioIOData& io) /*override*/;
 
 	///
 	/// \brief Check whether file has been played fully
