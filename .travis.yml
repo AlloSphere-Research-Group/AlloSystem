@@ -17,7 +17,7 @@ before_install:
 - sudo apt-get install -y libfftw3-dev
 - ( git clone -b devel https://github.com/AlloSphere-Research-Group/Gamma /tmp/Gamma && cd /tmp/Gamma && cmake . && sudo make install )
 - ( git clone -b cmake https://github.com/AlloSphere-Research-Group/GLV /tmp/GLV && cd /tmp/GLV && cmake . && sudo make install )
-- ( git clone https://github.com/rbtsx/cuttlebone.git && cd /tmp/GLV && cmake . && sudo make install )
+- ( git clone https://github.com/rbtsx/cuttlebone.git /tmp/cuttlebone && cd /tmp/cuttlebone && cmake . && sudo make install )
 script: "./distclean && cmake . -DTRAVIS_BUILD=1 -DBUILD_EXAMPLES=1 -DCMAKE_BUILD_TYPE=Debug && make && make test ARGS=\"-V\""
 sudo: required
 notifications:
