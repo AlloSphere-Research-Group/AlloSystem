@@ -130,7 +130,7 @@ void ProtoApp::init(
 		MM.fileDir(mResourceDir);
 
 		mGUI.refreshModels();
-		MM.add("pose", *new PoseModel(nav()));
+		MM.add("nav", *new NavModel(nav()));
 
 		paramPanel().presetControl()
 			.modelManager(MM)
