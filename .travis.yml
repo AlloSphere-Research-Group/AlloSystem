@@ -22,7 +22,7 @@ addons:
     - g++-4.8
     - clang
 script: "./distclean && cmake . -DTRAVIS_BUILD=1 -DBUILD_EXAMPLES=1 -DCMAKE_BUILD_TYPE=Debug && make && make test ARGS=\"-V\""
-sudo: false
+sudo: required
 notifications:
   email:
     recipients:
