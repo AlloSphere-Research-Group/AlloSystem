@@ -3,13 +3,6 @@ compiler:
 - gcc
 - clang
 before_install:
-# Bug in CLANG GCC that affects stl mutexes
-# g++4.8.1
-- if [ "$CXX" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
-
-# clang 3.4
-- if [ "$CXX" == "clang++" ]; then sudo add-apt-repository -y ppa:h-rayflood/llvm; fi
-
 - sudo apt-get update -qq
 - sudo apt-get install -y valgrind libapr1-dev libaprutil1-dev portaudio19-dev libsndfile1-dev
   libglew-dev freeglut3-dev libavahi-client-dev libudev-dev libusb-1.0-0-dev libfreeimage-dev
@@ -18,8 +11,18 @@ before_install:
 - ( git clone -b devel https://github.com/AlloSphere-Research-Group/Gamma /tmp/Gamma && cd /tmp/Gamma && cmake . && make )
 - ( git clone -b cmake https://github.com/AlloSphere-Research-Group/GLV /tmp/GLV && cd /tmp/GLV && cmake . && make )
 - ( git clone https://github.com/rbtsx/cuttlebone.git /tmp/cuttlebone && cd /tmp/cuttlebone && cmake . && make )
+install:
+- if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - gcc-4.8
+    - g++-4.8
+    - clang
 script: "./distclean && cmake . -DTRAVIS_BUILD=1 -DBUILD_EXAMPLES=1 -DCMAKE_BUILD_TYPE=Debug && make && make test ARGS=\"-V\""
-sudo: required
+sudo: false
 notifications:
   email:
     recipients:
