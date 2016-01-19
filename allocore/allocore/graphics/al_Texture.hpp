@@ -230,10 +230,10 @@ public:
 	Texture& filter(Filter v){ return filterMin(v).filterMag(v); }
 
 	/// Set minification filter type
-	Texture& filterMin(Filter v){ return update(v, mFilterMin, mParamsUpdated); }
+	Texture& filterMin(Filter v);
 
 	/// Set magnification filter type
-	Texture& filterMag(Filter v){ return update(v, mFilterMag, mParamsUpdated); }
+	Texture& filterMag(Filter v);
 
 	/// Set wrapping mode for all dimensions
 	Texture& wrap(Wrap v){ return wrap(v,v,v); }
@@ -348,9 +348,12 @@ protected:
 	bool mPixelsUpdated;		// Flags change in pixel data
 	bool mShapeUpdated;			// Flags change in size, format, type, etc.
 	bool mArrayDirty;
+	bool mMipmap;
 
 	virtual void onCreate();
 	virtual void onDestroy();
+
+	void init();
 
 	// ensures that the internal Array format matches the texture format
 	void resetArray(unsigned align);
