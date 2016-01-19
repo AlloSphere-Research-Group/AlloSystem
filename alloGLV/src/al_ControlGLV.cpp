@@ -223,4 +223,23 @@ void PoseModel::setData(const glv::Data& d){
 	//pose.quat().fromAxisAngle(d.at<float>(3), d.at<float>(4), d.at<float>(5), d.at<float>(6));
 }
 
+
+NavModel::NavModel(Nav& n)
+:	nav(n)
+{}
+
+const glv::Data& NavModel::getData(glv::Data& d) const {
+	d.resize(glv::Data::FLOAT, 8);
+	d.assignFromArray(nav.pos().elems(), 3);
+	d.assignFromArray(&nav.quat()[0], 4, 1, 3);
+	d.assign(nav.pullBack(), 7);
+	return d;
+}
+
+void NavModel::setData(const glv::Data& d){
+	nav.pos(d.at<float>(0), d.at<float>(1), d.at<float>(2));
+	nav.quat().set(d.at<float>(3), d.at<float>(4), d.at<float>(5), d.at<float>(6));
+	nav.pullBack(d.at<float>(7));
+}
+
 } // al::
