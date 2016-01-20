@@ -311,6 +311,16 @@ void Graphics::draw(const Mesh& v, int count, int begin){
 	if(Nt1 || Nt2 || Nt3)	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
+// draw a MeshVBO
+void Graphics::draw(MeshVBO& meshVBO) {
+	if (!meshVBO.isBound()) meshVBO.bind();
+
+	if (meshVBO.hasIndices()) glDrawElements(meshVBO.primitive(), meshVBO.getNumIndices(), GL_UNSIGNED_INT, NULL);
+	else glDrawArrays(meshVBO.primitive(), 0, meshVBO.getNumVertices());
+
+	meshVBO.unbind();
+}
+
 
 void Graphics::onCreate(){
 	GPUObject::mID = 1; // must be non-zero to flag creation
