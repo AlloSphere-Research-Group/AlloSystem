@@ -199,6 +199,21 @@ struct PoseModel : public glv::Model{
 };
 
 
+/// Nav GLV model
+struct NavModel : public glv::Model{
+
+	///
+	NavModel(Nav& n);
+
+	virtual ~NavModel(){}
+
+	virtual const glv::Data& getData(glv::Data& d) const;
+	virtual void setData(const glv::Data& d);
+
+	Nav& nav;
+};
+
+
 } // al::
 
 #endif

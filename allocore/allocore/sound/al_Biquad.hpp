@@ -26,6 +26,10 @@ enum BIQUADTYPE {
     BIQUAD_HSH /* High shelf filter */
 };
 
+///
+/// \brief The BiQuad class
+///
+/// @ingroup allocore
 class BiQuad
 {
 public:
@@ -47,8 +51,10 @@ private:
     bool enabled;
 };
 
-// Cascaded Biquad to acheive steeper filters
-// Default params of numFilters = 8 and bandwidth = 0.26 work well for an anti-aliasing LPF filter @ 19k
+/// Cascaded Biquad to acheive steeper filters
+/// Default params of numFilters = 8 and bandwidth = 0.26 work well for an anti-aliasing LPF filter @ 19k
+///
+/// @ingroup allocore
 class BiQuadNX
 {
 public:

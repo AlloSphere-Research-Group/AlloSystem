@@ -20,7 +20,7 @@ namespace al {
 
 class OmniApp;
 
-struct OmniControls : InputEventHandler {
+struct OmniAppControls : InputEventHandler {
   OmniApp* oa;
   bool onKeyDown(const Keyboard& k);
 };
@@ -109,7 +109,7 @@ class OmniApp : public Window,
   Pose pose;
   NavInputControl mNavControl;
   StandardWindowKeyControls mStdControls;
-  OmniControls mOmniControls;
+  OmniAppControls mOmniControls;
   osc::Recv mOSCRecv;
   osc::Send mOSCSend;
 
@@ -358,7 +358,7 @@ inline void OmniApp::AppAudioCB(AudioIOData& io) {
   app.onSound(io);
 }
 
-inline bool OmniControls::onKeyDown(const Keyboard& k){
+inline bool OmniAppControls::onKeyDown(const Keyboard& k){
   if(k.key() == 'o'){
     oa->omniEnable(!(oa->omniEnable()));
   }

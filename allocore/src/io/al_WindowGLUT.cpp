@@ -502,7 +502,7 @@ private:
 						double timeNext = frameNext / FPS;
 
 						// Post-render frame time
-						double timePost = al_time();
+						double timePost = Window::timeInSec();
 
 						// Did rendering take less time than frame interval?
 						// If so, compute wait time...
@@ -734,6 +734,7 @@ void Window::implSetVSync(){
 		CGLSetParameter(ctx, kCGLCPSwapInterval, &VBL);
 	#elif defined AL_LINUX
 	#elif defined AL_WINDOWS
+		// see: http://stackoverflow.com/questions/21262944/trouble-with-vsync-using-glut-in-opengl
 	#endif
 }
 

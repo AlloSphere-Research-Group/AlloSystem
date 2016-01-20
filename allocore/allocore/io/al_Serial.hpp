@@ -145,6 +145,8 @@ struct Timeout {
 /*!
  * Class that provides a portable serial port interface.
  */
+
+/// @ingroup allocore
 class Serial {
 public:
   /*!

@@ -47,7 +47,7 @@
 #include <cmath>
 #include <stdio.h>
 #include <ostream>
-
+#include "allocore/math/al_Constants.hpp"
 #include "allocore/math/al_Functions.hpp"
 
 namespace al {
@@ -93,6 +93,8 @@ template<class T> struct VecElems<4,T>{ T x,y,z,w; };
 /// This is a fixed size array to enable better loop unrolling optimizations
 /// by the compiler and to avoid an extra 'size' data member for small-sized
 /// arrays.
+///
+/// @ingroup allocore
 template <int N, class T>
 class Vec : public VecElems<N,T>{
 public:
@@ -387,10 +389,9 @@ public:
 		return r;
 	}
 
-	/// linear interpolation
-	void lerp(const Vec& target, T amt) { set(lerp(*this, target, amt)); }
-	static Vec lerp(const Vec& input, const Vec& target, T amt) {
-		return input+amt*(target-input);
+	/// Linearly interpolate towards some target
+	Vec& lerp(const Vec& target, T amt){
+		return (*this) += (target-(*this))*amt;
 	}
 
 	/// Set magnitude (preserving direction)
@@ -413,9 +414,9 @@ public:
 	Vec normalized(T scale=T(1)) const {
 		return Vec(*this).normalize(scale); }
 
-	/// Returns relection of vector around line
-	Vec reflect(const Vec& normal) const {
-		return (*this) - (T(2) * dot(normal) * normal);
+	/// Relect vector around normal
+	Vec& reflect(const Vec& normal){
+		return (*this) -= (T(2) * dot(normal) * normal);
 	}
 
 	/// Rotate vector on a global plane
@@ -558,6 +559,11 @@ inline void centroid3(Vec<N,T>& c, const Vec<N,T>& p1, const Vec<N,T>& p2, const
 template <int N, class T, class U>
 inline T dist(const Vec<N,T>& a, const Vec<N,U>& b){
 	return (a-b).mag();
+}
+
+template <int N, class T>
+inline Vec<N,T> lerp(const Vec<N,T>& input, const Vec<N,T>& target, T amt){
+	return Vec<N,T>(input).lerp(target, amt);
 }
 
 /*! Get the normal to a triangle defined by three points

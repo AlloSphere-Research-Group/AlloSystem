@@ -66,6 +66,8 @@ class SceneWindowHandler;
 
 /// A viewpoint is an aggregation of a viewport (screen region), a pose
 /// (3D position and orientation), and a lens.
+///
+/// @ingroup allocore
 class Viewpoint{
 public:
 
@@ -133,6 +135,8 @@ private:
 
 
 /// A window with one or more Viewpoints
+///
+/// @ingroup allocore
 class ViewpointWindow : public Window {
 public:
 	typedef std::vector<Viewpoint *> Viewpoints;
@@ -173,6 +177,8 @@ private:
 
 
 /// Application helper class
+///
+/// @ingroup allocore
 class App {
 public:
 

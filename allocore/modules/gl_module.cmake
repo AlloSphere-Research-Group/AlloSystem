@@ -18,6 +18,7 @@ set(GL_HEADERS
     allocore/graphics/al_Slab.hpp
     allocore/graphics/al_Stereographic.hpp
     allocore/graphics/al_Texture.hpp
+    allocore/graphics/al_MeshVBO.hpp
     allocore/io/al_App.hpp
     allocore/io/al_ControlNav.hpp
     allocore/io/al_RenderToDisk.hpp
@@ -28,6 +29,7 @@ if(GLEW_LIBRARY AND OPENGL_LIBRARY)
 message(STATUS "Building OpenGL module (OpenGL + GLEW).")
 
 list(APPEND ALLOCORE_SRC
+  src/graphics/al_BufferObject.cpp
   src/graphics/al_Graphics.cpp
   src/graphics/al_FBO.cpp
   src/graphics/al_GPUObject.cpp
@@ -39,9 +41,11 @@ list(APPEND ALLOCORE_SRC
   src/graphics/al_Shapes.cpp
   src/graphics/al_Stereographic.cpp
   src/graphics/al_Texture.cpp
+  src/graphics/al_MeshVBO.cpp
   src/io/al_App.cpp
   src/io/al_RenderToDisk.cpp
-  src/io/al_Window.cpp)
+  src/io/al_Window.cpp
+  )
 
 # TODO empty  allocore/graphics/al_Slab.hpp, remove?
 

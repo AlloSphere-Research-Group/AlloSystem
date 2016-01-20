@@ -2,11 +2,16 @@
 #define INCLUDE_AL_PANNING_STEREO
 
 #include "allocore/sound/al_AudioScene.hpp"
+#include "allocore/math/al_Constants.hpp"
 //#include "allocore/math/al_Quat.hpp"
 ////#include "allocore/spatial/al_CoordinateFrame.hpp"
 
 namespace al{
 
+///
+/// \brief The StereoPanner class
+///
+/// @ingroup allocore
 class StereoPanner : public Spatializer{
 public:
 	
@@ -35,8 +40,8 @@ public:
 			float gainL, gainR;
 			equalPowerPan(relpos.x, gainL, gainR);
 
-			io.out(0, frameIndex) = gainL*sample;
-			io.out(1, frameIndex) = gainR*sample;
+			io.out(0, frameIndex) += gainL*sample;
+			io.out(1, frameIndex) += gainR*sample;
 		}
 		else // dont pan
 		{
@@ -59,8 +64,8 @@ public:
 
 			for(int i = 0; i < numFrames; i++)
 			{
-				bufL[i] = gainL*samples[i];
-				bufR[i] = gainR*samples[i];
+				bufL[i] += gainL*samples[i];
+				bufR[i] += gainR*samples[i];
 			}
 		}
 		else // dont pan

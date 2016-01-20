@@ -24,7 +24,7 @@ macro(make_dep DEP_NAME)
 
 	# message(STATUS "Using ${DEP_NAME} from: ${${DEP_NAME_UPPER}_LIBRARY}")
   else()
-    message("Allosystem: ${DEP_NAME} sources NOT found. Can't build ${DEP_NAME}.")
+    message(STATUS "Allosystem: ${DEP_NAME} sources NOT found. Can't build ${DEP_NAME}.")
 	find_package(${DEP_NAME})
   endif()
 endmacro()

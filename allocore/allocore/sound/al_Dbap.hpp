@@ -49,6 +49,8 @@ namespace al{
 #define DBAP_MAX_NUM_SPEAKERS 192
 
 /// Distance-based amplitude panner
+///
+/// @ingroup allocore
 class Dbap : public Spatializer{
 public:
 

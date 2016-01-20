@@ -54,6 +54,10 @@ if(NOT DEFINED BUILD_CUTTLEBONE)
   set(BUILD_CUTTLEBONE 1 CACHE STRING "Try to build external Cuttlebone.")
 endif(NOT DEFINED BUILD_CUTTLEBONE)
 
+if(NOT DEFINED BUILD_PHASESPACE)
+  set(BUILD_PHASESPACE 1 CACHE STRING "Try to build external phasespace.")
+endif(NOT DEFINED BUILD_PHASESPACE)
+
 set(BUILD_EXAMPLES 0 CACHE STRING "Build AlloSystem examples.")
 
 
@@ -100,6 +104,10 @@ endif(BUILD_GLV AND NOT GLV_LIBRARY)
 if(BUILD_CUTTLEBONE AND NOT CUTTLEBONE_LIBRARY)
     make_dep(cuttlebone)
 endif(BUILD_CUTTLEBONE AND NOT CUTTLEBONE_LIBRARY)
+
+if(BUILD_PHASESPACE AND NOT PHASESPACE_LIBRARY)
+    make_dep(Phasespace)
+endif(BUILD_PHASESPACE AND NOT PHASESPACE_LIBRARY)
 
 # Allocore --------------------------------
 add_subdirectory(allocore)

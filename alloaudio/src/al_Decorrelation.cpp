@@ -62,9 +62,9 @@ using namespace std;
 #endif
 
 Decorrelation::Decorrelation(int size, int inChannel, int numOuts,
-							 bool inputsAreBuses) :
-	mSize(size), mInChannel(inChannel), mNumOuts(numOuts),
-	mInputsAreBuses(inputsAreBuses)
+                             bool inputsAreBuses) :
+    mSize(size), mInChannel(inChannel), mNumOuts(numOuts),
+    mInputsAreBuses(inputsAreBuses)
 {
 }
 
@@ -78,7 +78,7 @@ long al::Decorrelation::getCurrentSeed()
 	return mSeed;
 }
 
-void Decorrelation::generateIRs(long seed, float maxjump)
+void Decorrelation::generateIRs(long seed, float maxjump, float phaseFactor)
 {
 	float *ampSpectrum = (float *) calloc(mSize, sizeof(float));
 	float *phsSpectrum = (float *) calloc(mSize, sizeof(float));
@@ -116,7 +116,7 @@ void Decorrelation::generateIRs(long seed, float maxjump)
 				float delta = ((rand() / ((float) RAND_MAX)) * 2.0 * maxjump) - maxjump;
 //				std::cout << "delta " << delta << std::endl;
 				float new_phase = old_phase + delta;
-				phsSpectrum[i] = new_phase;
+				phsSpectrum[i] = new_phase * phaseFactor;
 				old_phase = new_phase;
 			}
 			
@@ -143,7 +143,7 @@ void Decorrelation::generateIRs(long seed, float maxjump)
 }
 
 void Decorrelation::generateDeterministicIRs(long seed, float deltaFreq, float maxFreqDev,
-											 float maxTau)
+                                             float maxTau, float startPhase, float phaseDev)
 {
 	float *ampSpectrum = (float *) calloc(mSize, sizeof(float));
 	float *phsSpectrum = (float *) calloc(mSize, sizeof(float));
@@ -168,7 +168,8 @@ void Decorrelation::generateDeterministicIRs(long seed, float deltaFreq, float m
 		std::cout << "freq " << irIndex << ":" << freq << std::endl;
 		for (int i=0; i < n + 1; i++) {
 			ampSpectrum[i] = 1.0;
-			phsSpectrum[i] = maxTau * sin(2 * M_PI * i * freq / n);
+			float phaseOffset = startPhase + ((2.0 * phaseDev * rand() / (float) RAND_MAX) - phaseDev);
+			phsSpectrum[i] = maxTau * sin(phaseOffset + (2 * M_PI * i * freq / n));
 
 			complexSpectrum[i*2] = ampSpectrum[i] * cos(phsSpectrum[i]); // Real part
 			complexSpectrum[i*2 + 1] = ampSpectrum[i] * sin(phsSpectrum[i]); // Imaginary
@@ -199,7 +200,7 @@ void Decorrelation::onAudioCB(al::AudioIOData &io)
 
 float *al::Decorrelation::getIR(int index)
 {
-	if (index < 0 || index >= mSize) {
+	if (index < 0 || index >= mNumOuts) {
 		return NULL;
 	}
 	return mIRs[index];
@@ -218,11 +219,11 @@ void al::Decorrelation::freeIRs()
 	mIRs.clear();
 }
 
-void Decorrelation::configure(al::AudioIO &io, long seed, float maxjump)
+void Decorrelation::configure(al::AudioIO &io, long seed, float maxjump, float phaseFactor)
 {
 	mSeed = seed;
 	if (mSize > 16 && mNumOuts != 0) {
-		generateIRs(seed, maxjump);
+		generateIRs(seed, maxjump, phaseFactor);
 	} else {
 		mSize = 0;
 		cout << "Invalid size: " << mSize << " numOuts: " << mNumOuts << endl;
@@ -236,12 +237,12 @@ void Decorrelation::configure(al::AudioIO &io, long seed, float maxjump)
 }
 
 void Decorrelation::configureDeterministic(AudioIO &io, long seed, float deltaFreq,
-										   float deltaFreqDev, float maxTau)
+                                           float deltaFreqDev, float maxTau, float startPhase, float phaseDev)
 {
-	generateDeterministicIRs(seed, deltaFreq, deltaFreqDev, maxTau);
+	generateDeterministicIRs(seed, deltaFreq, deltaFreqDev, maxTau, startPhase, phaseDev);
 	if (mSize >= 64) {
 		int options = 2; //vector mode
 		mConv.configure(io, mIRs, mSize, mInChannel, mInputsAreBuses, vector<int>(),
-						io.framesPerBuffer(), options);
+		                io.framesPerBuffer(), options);
 	}
 }

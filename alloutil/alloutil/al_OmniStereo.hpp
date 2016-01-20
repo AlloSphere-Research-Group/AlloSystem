@@ -1,6 +1,7 @@
 #ifndef AL_OMNISTEREO_H
 #define AL_OMNISTEREO_H
 
+#include "allocore/math/al_Constants.hpp"
 #include "allocore/graphics/al_Lens.hpp"
 #include "allocore/graphics/al_Shader.hpp"
 #include "allocore/graphics/al_Texture.hpp"
