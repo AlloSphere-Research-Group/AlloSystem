@@ -152,9 +152,9 @@ else()
 endif(NOT GLFW_FOUND)
 
 # Font (freetype), freeimage and assimp modules depend on the gl module
-include(modules/font_module.cmake)
-include(modules/freeimage_module.cmake)
-include(modules/assimp_module.cmake)
+# include(modules/font_module.cmake)
+# include(modules/freeimage_module.cmake)
+# include(modules/assimp_module.cmake)
 
 include(modules/apr_module.cmake)
 include(modules/portaudio_module.cmake)

@@ -177,7 +177,7 @@ public:
 		}
 	}
 
-	// TODO. but does glfw support this?
+	// TODO. but does glfw support this? -> getWindowFocus
 	//
 	// static void cbVisibility(int v){
 	// 	Window * win = getWindow();
@@ -401,8 +401,8 @@ bool Window::implCreate(){
 	mImpl->registerCBs();
 	WindowImpl::windows()[mImpl->mGLFWwindow] = mImpl;
 
-	AL_GRAPHICS_INIT_CONTEXT; // init glew
-	vsync(mVSync);
+	AL_GRAPHICS_INIT_CONTEXT; // init glew (do we really need this?)
+	vsync(mVSync); // what was this?aaaa
 
 	callHandlersOnCreate();
 
