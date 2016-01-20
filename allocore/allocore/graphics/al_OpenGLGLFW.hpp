@@ -23,8 +23,8 @@
 	#define AL_GRAPHICS_INIT_CONTEXT\
 		{	GLenum err = glewInit();\
 			if (GLEW_OK != err){\
-  				/* Problem: glewInit failed, something is seriously wrong. */\
-  				fprintf(stderr, "GLEW Init Error: %s\n", glewGetErrorString(err));\
+					/* Problem: glewInit failed, something is seriously wrong. */\
+					fprintf(stderr, "GLEW Init Error: %s\n", glewGetErrorString(err));\
 			}\
 		}
 		

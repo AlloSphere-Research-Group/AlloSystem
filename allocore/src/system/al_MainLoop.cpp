@@ -60,6 +60,7 @@ extern "C" void al_main_glfw_stop();
 
 			double time_left_till_next_frame = std::min(prev_sec + M.interval() - curr_sec, M.interval());
 			if (time_left_till_next_frame > 0) al_sleep(time_left_till_next_frame);
+
 		}
 	}
 
