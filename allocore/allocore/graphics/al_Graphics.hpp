@@ -118,12 +118,13 @@ public:
 		NICEST					= GL_NICEST					/**< Highest quality, possibly slower render */
 	};
 
-	enum AttributeBit {
-		COLOR_BUFFER_BIT		= GL_COLOR_BUFFER_BIT,		/**< Color-buffer bit */
-		DEPTH_BUFFER_BIT		= GL_DEPTH_BUFFER_BIT,		/**< Depth-buffer bit */
-		ENABLE_BIT				= GL_ENABLE_BIT,			/**< Enable bit */
-		VIEWPORT_BIT			= GL_VIEWPORT_BIT			/**< Viewport bit */
-	};
+	// glPushAttrib deprecated in GL4
+//	enum AttributeBit {
+//		COLOR_BUFFER_BIT		= GL_COLOR_BUFFER_BIT,		/**< Color-buffer bit */
+//		DEPTH_BUFFER_BIT		= GL_DEPTH_BUFFER_BIT,		/**< Depth-buffer bit */
+//		ENABLE_BIT				= GL_ENABLE_BIT,			/**< Enable bit */
+//		VIEWPORT_BIT			= GL_VIEWPORT_BIT			/**< Viewport bit */
+//	};
 
 	enum BlendFunc {
 		SRC_ALPHA				= GL_SRC_ALPHA,				/**< */
@@ -147,16 +148,18 @@ public:
 		MAX						= GL_MAX					/**< Maximum value of source and destination */
 	};
 
+	// commenting out things deprecated in GL4
 	enum Capability {
 		BLEND					= GL_BLEND,					/**< Blend rather than replace existing colors with new colors */
-		COLOR_MATERIAL			= GL_COLOR_MATERIAL,		/**< Use vertex colors with materials */
+		// COLOR_MATERIAL			= GL_COLOR_MATERIAL,		/**< Use vertex colors with materials */
 		DEPTH_TEST				= GL_DEPTH_TEST,			/**< Test depth of incoming fragments */
-		FOG						= GL_FOG,					/**< Apply fog effect */
-		LIGHTING				= GL_LIGHTING,				/**< Use lighting */
+		// FOG						= GL_FOG,					/**< Apply fog effect */
+		// LIGHTING				= GL_LIGHTING,				/**< Use lighting */
+
 		SCISSOR_TEST			= GL_SCISSOR_TEST,			/**< Crop fragments according to scissor region */
 		CULL_FACE				= GL_CULL_FACE,				/**< Cull faces */
-		RESCALE_NORMAL			= GL_RESCALE_NORMAL,		/**< Rescale normals to counteract an isotropic modelview scaling */
-		NORMALIZE				= GL_NORMALIZE				/**< Rescale normals to counteract non-isotropic modelview scaling */
+		// RESCALE_NORMAL			= GL_RESCALE_NORMAL,		/**< Rescale normals to counteract an isotropic modelview scaling */
+		// NORMALIZE				= GL_NORMALIZE				/**< Rescale normals to counteract non-isotropic modelview scaling */
 	};
 
 	enum DataType {
@@ -166,9 +169,9 @@ public:
 		USHORT					= GL_UNSIGNED_SHORT,		/**< */
 		INT						= GL_INT,					/**< */
 		UINT					= GL_UNSIGNED_INT,			/**< */
-		BYTES_2					= GL_2_BYTES,				/**< */
-		BYTES_3					= GL_3_BYTES,				/**< */
-		BYTES_4					= GL_4_BYTES,				/**< */
+		// BYTES_2					= GL_2_BYTES,				/**< */
+		// BYTES_3					= GL_3_BYTES,				/**< */
+		// BYTES_4					= GL_4_BYTES,				/**< */
 		FLOAT					= GL_FLOAT,					/**< */
 		DOUBLE					= GL_DOUBLE					/**< */
 	};
@@ -181,8 +184,8 @@ public:
 
 	enum Format {
 		DEPTH_COMPONENT			= GL_DEPTH_COMPONENT,		/**< */
-		LUMINANCE				= GL_LUMINANCE,				/**< */
-		LUMINANCE_ALPHA			= GL_LUMINANCE_ALPHA,		/**< */
+		// LUMINANCE				= GL_LUMINANCE,				/**< */
+		// LUMINANCE_ALPHA			= GL_LUMINANCE_ALPHA,		/**< */
 		RED						= GL_RED,					/**< */
 		GREEN					= GL_GREEN,					/**< */
 		BLUE					= GL_BLUE,					/**< */
@@ -193,10 +196,10 @@ public:
 		BGRA					= GL_BGRA					/**< */
 	};
 
-	enum MatrixMode {
-		MODELVIEW				= GL_MODELVIEW,				/**< Modelview matrix */
-		PROJECTION				= GL_PROJECTION				/**< Projection matrix */
-	};
+	// enum MatrixMode {
+	// 	MODELVIEW				= GL_MODELVIEW,				/**< Modelview matrix */
+	// 	PROJECTION				= GL_PROJECTION				/**< Projection matrix */
+	// };
 
 	enum PolygonMode {
 		POINT					= GL_POINT,					/**< Render only points at each vertex */
@@ -213,14 +216,14 @@ public:
 		TRIANGLE_STRIP			= GL_TRIANGLE_STRIP,		/**< Draw triangle strip using sequential vertices */
 		TRIANGLE_FAN			= GL_TRIANGLE_FAN,			/**< Draw triangle fan using sequential vertices */
 		QUADS					= GL_QUADS,					/**< Draw quadrilaterals using sequential vertex quadruplets */
-		QUAD_STRIP				= GL_QUAD_STRIP,			/**< Draw quadrilateral strip using sequential vertices */
-		POLYGON					= GL_POLYGON				/**< Draw polygon using sequential vertices */
+		// QUAD_STRIP				= GL_QUAD_STRIP,			/**< Draw quadrilateral strip using sequential vertices */
+		// POLYGON					= GL_POLYGON				/**< Draw polygon using sequential vertices */
 	};
 
-	enum ShadeModel {
-		FLAT					= GL_FLAT,					/**< */
-		SMOOTH					= GL_SMOOTH					/**< */
-	};
+//	enum ShadeModel {
+//		FLAT					= GL_FLAT,					/**< */
+//		SMOOTH					= GL_SMOOTH					/**< */
+//	};
 
 
 
@@ -298,7 +301,7 @@ public:
 	void polygonMode(PolygonMode m, Face f=FRONT_AND_BACK);
 
 	/// Set shading model
-	void shadeModel(ShadeModel m);
+	// void shadeModel(ShadeModel m);
 
 
 	/// Set blend mode
@@ -339,7 +342,7 @@ public:
 
 
 	/// Clear frame buffer(s)
-	void clear(AttributeBit bits);
+	// void clear(AttributeBit bits);
 
 	/// Set clear color
 	void clearColor(float r, float g, float b, float a);
@@ -369,19 +372,19 @@ public:
 
 
 	/// Set current matrix
-	void matrixMode(MatrixMode mode);
+	// void matrixMode(MatrixMode mode);
 
 	/// Push current matrix stack
 	void pushMatrix();
 
 	/// Push designated matrix stack
-	void pushMatrix(MatrixMode v){ matrixMode(v); pushMatrix(); }
+	// void pushMatrix(MatrixMode v){ matrixMode(v); pushMatrix(); }
 
 	/// Pop current matrix stack
 	void popMatrix();
 
 	/// Pop designated matrix stack
-	void popMatrix(MatrixMode v){ matrixMode(v); popMatrix(); }
+	// void popMatrix(MatrixMode v){ matrixMode(v); popMatrix(); }
 
 	/// Set current matrix to identity
 	void loadIdentity();
@@ -395,12 +398,12 @@ public:
 	void multMatrix(const Matrix4f &m);
 
 	/// Set modelview matrix
-	void modelView(const Matrix4d& m){ matrixMode(MODELVIEW); loadMatrix(m); }
-	void modelView(const Matrix4f& m){ matrixMode(MODELVIEW); loadMatrix(m); }
+	// void modelView(const Matrix4d& m){ matrixMode(MODELVIEW); loadMatrix(m); }
+	// void modelView(const Matrix4f& m){ matrixMode(MODELVIEW); loadMatrix(m); }
 
 	/// Set projection matrix
-	void projection(const Matrix4d& m){ matrixMode(PROJECTION); loadMatrix(m); }
-	void projection(const Matrix4f& m){ matrixMode(PROJECTION); loadMatrix(m); }
+	// void projection(const Matrix4d& m){ matrixMode(PROJECTION); loadMatrix(m); }
+	// void projection(const Matrix4f& m){ matrixMode(PROJECTION); loadMatrix(m); }
 
 
 
@@ -575,7 +578,7 @@ public:
 
 // ============== INLINE ==============
 
-inline void Graphics::clear(AttributeBit bits){ glClear(bits); }
+// inline void Graphics::clear(AttributeBit bits){ glClear(bits); }
 inline void Graphics::clearColor(float r, float g, float b, float a){ glClearColor(r, g, b, a); }
 inline void Graphics::clearColor(const Color& c) { clearColor(c.r, c.g, c.b, c.a); }
 
@@ -600,58 +603,58 @@ inline void Graphics::colorMask(bool r, bool g, bool b, bool a){
 inline void Graphics::colorMask(bool b){ colorMask(b,b,b,b); }
 inline void Graphics::depthMask(bool b){ glDepthMask(b?GL_TRUE:GL_FALSE); }
 inline void Graphics::depthTesting(bool b){ capability(DEPTH_TEST, b); }
-inline void Graphics::lighting(bool b){ capability(LIGHTING, b); }
+// inline void Graphics::lighting(bool b){ capability(LIGHTING, b); }
 inline void Graphics::scissorTest(bool b){ capability(SCISSOR_TEST, b); }
 inline void Graphics::cullFace(bool b){ capability(CULL_FACE, b); }
 inline void Graphics::cullFace(bool b, Face face) {
 	capability(CULL_FACE, b);
 	glCullFace(face);
 }
-inline void Graphics::matrixMode(MatrixMode mode){ glMatrixMode(mode); }
-inline void Graphics::pushMatrix(){ glPushMatrix(); }
-inline void Graphics::popMatrix(){ glPopMatrix(); }
-inline void Graphics::loadIdentity(){ glLoadIdentity(); }
-inline void Graphics::loadMatrix(const Matrix4d& m){ glLoadMatrixd(m.elems()); }
-inline void Graphics::loadMatrix(const Matrix4f& m){ glLoadMatrixf(m.elems()); }
-inline void Graphics::multMatrix(const Matrix4d& m){ glMultMatrixd(m.elems()); }
-inline void Graphics::multMatrix(const Matrix4f& m){ glMultMatrixf(m.elems()); }
-inline void Graphics::translate(double x, double y, double z){ glTranslated(x,y,z); }
-inline void Graphics::rotate(double angle, double x, double y, double z){ glRotated(angle,x,y,z); }
+// inline void Graphics::matrixMode(MatrixMode mode){ glMatrixMode(mode); }
+// inline void Graphics::pushMatrix(){ glPushMatrix(); }
+// inline void Graphics::popMatrix(){ glPopMatrix(); }
+// inline void Graphics::loadIdentity(){ glLoadIdentity(); }
+// inline void Graphics::loadMatrix(const Matrix4d& m){ glLoadMatrixd(m.elems()); }
+// inline void Graphics::loadMatrix(const Matrix4f& m){ glLoadMatrixf(m.elems()); }
+// inline void Graphics::multMatrix(const Matrix4d& m){ glMultMatrixd(m.elems()); }
+// inline void Graphics::multMatrix(const Matrix4f& m){ glMultMatrixf(m.elems()); }
+// inline void Graphics::translate(double x, double y, double z){ glTranslated(x,y,z); }
+// inline void Graphics::rotate(double angle, double x, double y, double z){ glRotated(angle,x,y,z); }
 inline void Graphics::rotate(const Quatd& q) {
 	Matrix4d m;
 	q.toMatrix(m.elems());
 	multMatrix(m);
 }
-inline void Graphics::scale(double s){
-	if(mRescaleNormal < 1){
-		mRescaleNormal = 1;
-		enable(RESCALE_NORMAL);
-	}
-	glScaled(s, s, s);
-}
-inline void Graphics::scale(double x, double y, double z){
-	if(mRescaleNormal < 3){
-		mRescaleNormal = 3;
-		disable(RESCALE_NORMAL);
-		enable(NORMALIZE);
-	}
-	glScaled(x, y, z);
-}
+// inline void Graphics::scale(double s){
+// 	if(mRescaleNormal < 1){
+// 		mRescaleNormal = 1;
+// 		enable(RESCALE_NORMAL);
+// 	}
+// 	glScaled(s, s, s);
+// }
+// inline void Graphics::scale(double x, double y, double z){
+// 	if(mRescaleNormal < 3){
+// 		mRescaleNormal = 3;
+// 		disable(RESCALE_NORMAL);
+// 		enable(NORMALIZE);
+// 	}
+// 	glScaled(x, y, z);
+// }
 inline void Graphics::lineWidth(float v) { glLineWidth(v); }
 inline void Graphics::pointSize(float v) { glPointSize(v); }
-inline void Graphics::pointAtten(float c2, float c1, float c0){
-	GLfloat att[3] = {c0, c1, c2};
-	glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, att);
-}
+// inline void Graphics::pointAtten(float c2, float c1, float c0){
+// 	GLfloat att[3] = {c0, c1, c2};
+// 	glPointParameterfv(GL_POINT_DISTANCE_ATTENUATION, att);
+// }
 inline void Graphics::polygonMode(PolygonMode m, Face f){ glPolygonMode(f,m); }
-inline void Graphics::shadeModel(ShadeModel m){ glShadeModel(m); }
-inline void Graphics::currentColor(float r, float g, float b, float a){ glColor4f(r,g,b,a); }
+// inline void Graphics::shadeModel(ShadeModel m){ glShadeModel(m); }
+// inline void Graphics::currentColor(float r, float g, float b, float a){ glColor4f(r,g,b,a); }
 
-inline Graphics::AttributeBit operator| (
-	const Graphics::AttributeBit& a, const Graphics::AttributeBit& b
-){
-	return static_cast<Graphics::AttributeBit>(+a|+b);
-}
+// inline Graphics::AttributeBit operator| (
+// 	const Graphics::AttributeBit& a, const Graphics::AttributeBit& b
+// ){
+// 	return static_cast<Graphics::AttributeBit>(+a|+b);
+// }
 
 } // al::
 

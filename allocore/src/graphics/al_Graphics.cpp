@@ -22,9 +22,9 @@ int Graphics::numComponents(Format v){
 		case BGRA:				return 4;
 		case RGB:
 		case BGR:				return 3;
-		case LUMINANCE_ALPHA:	return 2;
+		// case LUMINANCE_ALPHA:	return 2;
 		case DEPTH_COMPONENT:
-		case LUMINANCE:
+		// case LUMINANCE:
 		case RED:
 		case GREEN:
 		case BLUE:
@@ -42,9 +42,9 @@ int Graphics::numBytes(DataType v){
 		CS(USHORT, GLushort)
 		CS(INT, GLint)
 		CS(UINT, GLuint)
-		CS(BYTES_2, char[2])
-		CS(BYTES_3, char[3])
-		CS(BYTES_4, char[4])
+		// CS(BYTES_2, char[2])
+		// CS(BYTES_3, char[3])
+		// CS(BYTES_4, char[4])
 		CS(FLOAT, GLfloat)
 		CS(DOUBLE, GLdouble)
 		default: return 0;
@@ -101,8 +101,8 @@ const char * Graphics::errorString(bool verbose){
 		CS(GL_INVALID_FRAMEBUFFER_OPERATION, "The framebuffer object is not complete.")
 	#endif
 		CS(GL_OUT_OF_MEMORY, "There is not enough memory left to execute the command.")
-		CS(GL_STACK_OVERFLOW, "This command would cause a stack overflow.")
-		CS(GL_STACK_UNDERFLOW, "This command would cause a stack underflow.")
+		// CS(GL_STACK_OVERFLOW, "This command would cause a stack overflow.")
+		// CS(GL_STACK_UNDERFLOW, "This command would cause a stack underflow.")
 	#ifdef GL_TABLE_TOO_LARGE
 		CS(GL_TABLE_TOO_LARGE, "The specified table exceeds the implementation's maximum supported table size.")
 	#endif
@@ -123,28 +123,28 @@ bool Graphics::error(const char * msg, int ID){
 
 
 void Graphics::antialiasing(AntiAliasMode v){
-	glHint(GL_POINT_SMOOTH_HINT, v);
+	// glHint(GL_POINT_SMOOTH_HINT, v);
 	glHint(GL_LINE_SMOOTH_HINT, v);
 	glHint(GL_POLYGON_SMOOTH_HINT, v);
 
 	if (FASTEST != v) {
 		glEnable(GL_POLYGON_SMOOTH);
 		glEnable(GL_LINE_SMOOTH);
-		glEnable(GL_POINT_SMOOTH);
+		// glEnable(GL_POINT_SMOOTH);
 	} else {
 		glDisable(GL_POLYGON_SMOOTH);
 		glDisable(GL_LINE_SMOOTH);
-		glDisable(GL_POINT_SMOOTH);
+		// glDisable(GL_POINT_SMOOTH);
 	}
 }
 
-void Graphics::fog(float end, float start, const Color& c){
-	glEnable(GL_FOG);
-	glFogi(GL_FOG_MODE, GL_LINEAR);
-	glFogf(GL_FOG_START, start); glFogf(GL_FOG_END, end);
-	float fogColor[4] = {c.r, c.g, c.b, c.a};
-	glFogfv(GL_FOG_COLOR, fogColor);
-}
+// void Graphics::fog(float end, float start, const Color& c){
+// 	glEnable(GL_FOG);
+// 	glFogi(GL_FOG_MODE, GL_LINEAR);
+// 	glFogf(GL_FOG_START, start); glFogf(GL_FOG_END, end);
+// 	float fogColor[4] = {c.r, c.g, c.b, c.a};
+// 	glFogfv(GL_FOG_COLOR, fogColor);
+// }
 
 void Graphics::viewport(int x, int y, int width, int height) {
 	glViewport(x, y, width, height);
@@ -246,77 +246,81 @@ void Graphics::draw(const Mesh& v, int count, int begin){
 	//printf("Nv %i Nc %i Nn %i Nt2 %i Nt3 %i Ni %i\n", Nv, Nc, Nn, Nt2, Nt3, Ni);
 
 	// Enable arrays and set pointers...
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(3, GL_FLOAT, 0, &v.vertices()[0]);
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// needs whole fix for GL4
+
+	// glEnableClientState(GL_VERTEX_ARRAY);
+	// glVertexPointer(3, GL_FLOAT, 0, &v.vertices()[0]);
 
 	if(Nn >= Nv){
-		glEnableClientState(GL_NORMAL_ARRAY);
-		glNormalPointer(GL_FLOAT, 0, &v.normals()[0]);
+		// glEnableClientState(GL_NORMAL_ARRAY);
+		// glNormalPointer(GL_FLOAT, 0, &v.normals()[0]);
 	}
 
 	if(Nc >= Nv){
-		glEnableClientState(GL_COLOR_ARRAY);
-		glColorPointer(4, GL_FLOAT, 0, &v.colors()[0]);
+		// glEnableClientState(GL_COLOR_ARRAY);
+		// glColorPointer(4, GL_FLOAT, 0, &v.colors()[0]);
 	}
 	else if(Nci >= Nv){
-		glEnableClientState(GL_COLOR_ARRAY);
-		glColorPointer(4, GL_UNSIGNED_BYTE, 0, &v.coloris()[0]);
+		// glEnableClientState(GL_COLOR_ARRAY);
+		// glColorPointer(4, GL_UNSIGNED_BYTE, 0, &v.coloris()[0]);
 		//printf("using integer colors\n");
 	}
 	else if(0 == Nc && 0 == Nci){
 		// just use whatever the last glColor() call used!
 	}
 	else{
-		if(Nc)
+		// if(Nc)
 			//glColor4f(v.colors()[0][0], v.colors()[0][1], v.colors()[0][2], v.colors()[0][3]);
-			glColor4fv(v.colors()[0].components);
-		else
-			glColor3ubv(v.coloris()[0].components);
+			// glColor4fv(v.colors()[0].components);
+		// else
+			// glColor3ubv(v.coloris()[0].components);
 	}
 
 	if(Nt1 >= Nv){
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(1, GL_FLOAT, 0, &v.texCoord1s()[0]);
+		// glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		// glTexCoordPointer(1, GL_FLOAT, 0, &v.texCoord1s()[0]);
 	}
 	else if(Nt2 >= Nv){
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(2, GL_FLOAT, 0, &v.texCoord2s()[0]);
+		// glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		// glTexCoordPointer(2, GL_FLOAT, 0, &v.texCoord2s()[0]);
 	}
 	else if(Nt3 >= Nv){
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer(3, GL_FLOAT, 0, &v.texCoord3s()[0]);
+		// glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		// glTexCoordPointer(3, GL_FLOAT, 0, &v.texCoord3s()[0]);
 	}
 
 	// Draw
-	if(Ni){
-		glDrawElements(
-			((Graphics::Primitive)v.primitive()),
-			count, // number of indexed elements to render
-			GL_UNSIGNED_INT,
-			&v.indices()[begin]
-		);
-	}
-	else{
-		glDrawArrays(
-			((Graphics::Primitive)v.primitive()),
-			begin,
-			count
-		);
-	}
+	// if(Ni){
+	// 	glDrawElements(
+	// 		((Graphics::Primitive)v.primitive()),
+	// 		count, // number of indexed elements to render
+	// 		GL_UNSIGNED_INT,
+	// 		&v.indices()[begin]
+	// 	);
+	// }
+	// else{
+	// 	glDrawArrays(
+	// 		((Graphics::Primitive)v.primitive()),
+	// 		begin,
+	// 		count
+	// 	);
+	// }
 
 	// Disable arrays
-	glDisableClientState(GL_VERTEX_ARRAY);
-	if(Nn)					glDisableClientState(GL_NORMAL_ARRAY);
-	if(Nc || Nci)			glDisableClientState(GL_COLOR_ARRAY);
-	if(Nt1 || Nt2 || Nt3)	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	// glDisableClientState(GL_VERTEX_ARRAY);
+	// if(Nn)					glDisableClientState(GL_NORMAL_ARRAY);
+	// if(Nc || Nci)			glDisableClientState(GL_COLOR_ARRAY);
+	// if(Nt1 || Nt2 || Nt3)	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 }
 
 // draw a MeshVBO
 void Graphics::draw(MeshVBO& meshVBO) {
 	if (!meshVBO.isBound()) meshVBO.bind();
 
-	if (meshVBO.hasIndices()) glDrawElements(meshVBO.primitive(), meshVBO.getNumIndices(), GL_UNSIGNED_INT, NULL);
-	else glDrawArrays(meshVBO.primitive(), 0, meshVBO.getNumVertices());
+	// if (meshVBO.hasIndices()) glDrawElements(meshVBO.primitive(), meshVBO.getNumIndices(), GL_UNSIGNED_INT, NULL);
+	// else glDrawArrays(meshVBO.primitive(), 0, meshVBO.getNumVertices());
 
 	meshVBO.unbind();
 }

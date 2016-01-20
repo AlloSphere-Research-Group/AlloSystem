@@ -402,15 +402,17 @@ bool Window::implCreate(){
 	WindowImpl::windows()[mImpl->mGLFWwindow] = mImpl;
 
 	AL_GRAPHICS_INIT_CONTEXT; // init glew (do we really need this?)
-	vsync(mVSync); // what was this?aaaa
+	vsync(mVSync); // what was this?
 
 	callHandlersOnCreate();
 
 	return true;
 }
 
-void Window::destroyAll(){ //printf("Window::destroyAll\n");
-	WindowImpl::WindowsMap::iterator it = WindowImpl::windows().begin();
+void Window::destroyAll(){
+	//printf("Window::destroyAll\n");
+	// WindowImpl::WindowsMap::iterator it = WindowImpl::windows().begin();
+	auto it = WindowImpl::windows().begin();
 	while(it != WindowImpl::windows().end()){
 		if(it->second && it->second->mWindow){
 			(it++)->second->mWindow->destroy();
@@ -425,7 +427,7 @@ bool Window::created() const {
 	return mImpl->created();
 }
 
-void Window::implSetDimensions(){
+void Window::implSetDimensions() {
 	mImpl->makeMainWindow();
 	// glutPositionWindow(mDim.l, mDim.t);
 
@@ -438,7 +440,7 @@ void Window::implSetDimensions(){
 	// glutReshapeWindow(w, h);
 }
 
-void Window::implSetCursor(){
+void Window::implSetCursor() {
 	if(!mCursorHide){
 		mImpl->makeMainWindow();
 		// glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
@@ -451,7 +453,7 @@ void Window::implSetCursor(){
 	}
 }
 
-void Window::implSetCursorHide(){
+void Window::implSetCursorHide() {
 	mImpl->makeMainWindow();
 	// if(mCursorHide)	glutSetCursor(GLUT_CURSOR_NONE);
 	// else			cursor(mCursor);
@@ -463,7 +465,7 @@ void Window::implSetFPS(){
 	// mImpl->scheduleDraw();
 }
 
-void Window::implSetFullScreen(){
+void Window::implSetFullScreen() {
 
 	// Note that on Linux, we must use GLUT's "game mode" to get a borderless
 	// fullscreen window.
@@ -500,14 +502,14 @@ void Window::implSetFullScreen(){
 	// }
 }
 
-void Window::implSetTitle(){
+void Window::implSetTitle() {
 	mImpl->makeMainWindow();
 	// glutSetWindowTitle(mTitle.c_str());
 	//printf("Window::title(%s)\n", mTitle.c_str());
 }
 
 // See: https://www.opengl.org/wiki/Swap_Interval
-void Window::implSetVSync(){
+void Window::implSetVSync() {
 	mImpl->makeMainWindow();
 	// #if defined AL_OSX
 	// 	GLint VBL = GLint(mVSync);
@@ -524,7 +526,7 @@ Window& Window::hide(){
 	return *this;
 }
 
-Window& Window::iconify(){
+Window& Window::iconify() {
 	mImpl->makeMainWindow();
 	// glutIconifyWindow();
 	return *this;
