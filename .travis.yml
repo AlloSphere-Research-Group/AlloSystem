@@ -6,8 +6,8 @@ before_install:
 - ( git clone -b devel https://github.com/AlloSphere-Research-Group/Gamma /tmp/Gamma )
 - ( git clone -b cmake https://github.com/AlloSphere-Research-Group/GLV /tmp/GLV )
 - ( git clone https://github.com/rbtsx/cuttlebone.git /tmp/cuttlebone )
-#install:
-#- if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+install:
+- if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
 addons:
   apt:
     sources:
