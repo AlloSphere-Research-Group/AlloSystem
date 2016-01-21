@@ -33,7 +33,7 @@ addons:
     - libassimp-dev
     - libluajit-5.1-dev
     - libjsoncpp-de
-    _ libfftw3-dev
+    - libfftw3-dev
 script: "./distclean && cmake . -DTRAVIS_BUILD=1 -DBUILD_EXAMPLES=1 -DCMAKE_BUILD_TYPE=Debug && make && make test ARGS=\"-V\""
 sudo: false
 notifications:
