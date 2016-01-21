@@ -20,7 +20,7 @@ using namespace std;
 class AmbiTunedDecoder : public AmbiDecode
 {
 public:
-	AmbiTunedDecoder(string configFile);
+	AmbiTunedDecoder(string configFile = "Allosphere.ambdec");
 
 private:
 	AmbisonicsConfig mAmbisonicsConfig;

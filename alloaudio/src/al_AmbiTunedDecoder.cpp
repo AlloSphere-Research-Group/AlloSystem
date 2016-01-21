@@ -15,7 +15,7 @@ using namespace al;
 using namespace std;
 
 
-AmbiTunedDecoder::AmbiTunedDecoder(string configFile = "Allosphere.ambdec") :
+AmbiTunedDecoder::AmbiTunedDecoder(string configFile) :
     AmbiDecode(3, 3, 8)
 {
 	std::ifstream file(configFile);

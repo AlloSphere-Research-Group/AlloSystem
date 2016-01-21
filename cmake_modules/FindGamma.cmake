@@ -27,6 +27,7 @@ else (GAMMA_LIBRARY AND GAMMA_INCLUDE_DIR)
       /usr/local/include
       /opt/local/include
       /sw/include
+      /tmp/Gamma
   )
 
   find_library(GAMMA_LIBRARY
@@ -40,6 +41,7 @@ else (GAMMA_LIBRARY AND GAMMA_INCLUDE_DIR)
       /opt/local/lib
       /usr/local/lib
       /sw/lib
+      /tmp/Gamma/build/lib
   )
 
   if (${GAMMA_LIBRARY} STREQUAL "")
