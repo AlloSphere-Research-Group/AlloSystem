@@ -8,9 +8,9 @@ before_install:
   libglew-dev freeglut3-dev libavahi-client-dev libudev-dev libusb-1.0-0-dev libfreeimage-dev
   libfreetype6-dev libxi-dev libxmu-dev libassimp-dev libluajit-5.1-dev libjsoncpp-dev
 - sudo apt-get install -y libfftw3-dev
-- ( git clone -b devel https://github.com/AlloSphere-Research-Group/Gamma /tmp/Gamma && cd /tmp/Gamma && cmake . && make )
-- ( git clone -b cmake https://github.com/AlloSphere-Research-Group/GLV /tmp/GLV && cd /tmp/GLV && cmake . && make )
-- ( git clone https://github.com/rbtsx/cuttlebone.git /tmp/cuttlebone && cd /tmp/cuttlebone && cmake . && make )
+- ( git clone -b devel https://github.com/AlloSphere-Research-Group/Gamma /tmp/Gamma)
+- ( git clone -b cmake https://github.com/AlloSphere-Research-Group/GLV /tmp/GLV)
+- ( git clone https://github.com/rbtsx/cuttlebone.git /tmp/cuttlebone && cd /tmp/cuttlebone)
 install:
 - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
 addons:
