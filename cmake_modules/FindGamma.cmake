@@ -41,7 +41,7 @@ else (GAMMA_LIBRARY AND GAMMA_INCLUDE_DIR)
       /opt/local/lib
       /usr/local/lib
       /sw/lib
-      /tmp/Gamma
+      /tmp/Gamma/build/lib
   )
 
   if (${GAMMA_LIBRARY} STREQUAL "")
