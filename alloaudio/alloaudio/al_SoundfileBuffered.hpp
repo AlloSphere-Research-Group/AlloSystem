@@ -1,12 +1,6 @@
 #ifndef SOUNDFILEBUFFERED_H
 #define SOUNDFILEBUFFERED_H
 
-// Travis uses an older version of GCC which has a bug in its GCC version for
-// clang so it fails to build when the mutex class is used.
-// See: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53841
-#ifdef TRAVIS_BUILD
-#define _GLIBCXX_USE_CLOCK_REALTIME
-#endif
 
 #include <mutex>
 #include <thread>
