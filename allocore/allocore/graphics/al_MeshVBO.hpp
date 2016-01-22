@@ -49,13 +49,6 @@
 
   TO DO:
   [ ] test texture mapping
-	[v] test = operators and copyFrom
-	[ ] better performance testing. fpsActual() maxes out at display's refresh rate (~60fps)
-	[v] throw exception if no vertices exist during allocate; or use asserts (Andres)
-	[*] move things to protected; *- changed "init" to "allocate", added get..() (Andres)
-	[v] replace uint with uint32_t and bring in cstdint (Andres)
-	[v] prefix member variables with 'm' (Andres)
-	[ ] Doxygen (Andres)
 	[ ] method for deleting underlying Mesh buffers (Andres)
 	[ ] think about making all Mesh methods into shaders or some GPU solution (Andres)
 	[ ] is drawInstanced possible?
@@ -63,12 +56,32 @@
 
 */
 
+/// MeshVBO
+///
+/// @ingroup allocore
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_OpenGL.hpp"
 #include <cstdint>
 
 namespace al{
 
+/// MeshVBO object
+
+/// MeshVBO is simply a Mesh with the ability to store its data on the GPU
+/// for faster drawing. Its usage is exactly the same as Mesh with the exception
+/// of two new methods: allocate() and update().
+///
+/// allocate() creates new buffers on the GPU and pushes any data attached to
+/// MeshVBO. A graphics context is required for allocate() to work, so it must
+/// be called from within onCreate(), onAnimate() or onDraw().
+///
+/// update() should be called whenever the data has changed and is ready to be
+/// rendered.
+///
+/// In practice, the user is only responsible for update(). An automatic check
+/// is performed in Graphics::draw() and calls allocate() if necessary.
+///
+/// See allocore/examples/graphics/VBOManyShape.cpp for a usage example.
 class MeshVBO : public Mesh {
 public:
 
@@ -91,38 +104,75 @@ public:
 		//DYNAMIC_COPY	= GL_DYNAMIC_COPY
 	};
 
+	/// Default constructor
 	MeshVBO();
+
+	/// Constructor given a Mesh allocates a VBO using data from Mesh
 	MeshVBO(Mesh& cpy);
 
+	/// Copy from Mesh and allocate GPU memory.
+
+	/// Set allocate to false if no graphics context exists yet
 	void copyFrom(Mesh& cpy, bool _allocate=true);
+
+	/// Copy from MeshVBO
 	void copyFrom(MeshVBO& cpy);
 
   void operator=(Mesh& cpy);
   void operator=(MeshVBO& cpy);
 
+	/// Create new VBO buffer IDs, bindings, and data stores.
+
+	/// Requires a graphics context to work.
   void allocate(BufferDataUsage usage = STREAM_DRAW);
+
+	/// Update old VBO buffer data with new information.
+
+	/// Does not create new buffer IDs unless the size of the new vertex buffer
+	/// is larger than the one previously allocated.
 	void update();
+
+	/// Resets member variables and buffer IDs, unbinds buffers.
 	void clear();
 
+	/// Binds available buffers and gets appropriate pointers before rendering.
+
+	/// Called by Graphics::draw()
 	void bind();
+
+	/// Unbinds buffers.
   void unbind();
 
+	/// Get vertex buffer ID
 	uint32_t getVertId();
+	/// Get normal buffer ID
 	uint32_t getNormalId();
+	/// Get color buffer ID
 	uint32_t getColorId();
+	/// Get texture coordinates buffer ID
 	uint32_t getTexCoordId();
+	/// Get index buffer ID
 	uint32_t getIndexId();
 
+	/// Get number of vertices
 	int getNumVertices();
+	/// Get number of indices
 	int getNumIndices();
 
+	/// Check if MeshVBO has been allocated
 	bool isAllocated();
+	/// Check if MeshVBO has been bound
 	bool isBound();
 
+	/// Check if normals exist
 	bool hasNormals();
+	/// Check if colors exist
 	bool hasColors();
+	/// Check if 2d texture coordinates exist
 	bool hasTexCoord2s();
+	/// Check if 3d texture coordinates exist
 	bool hasTexCoord3s();
+	/// Check if indices exist
 	bool hasIndices();
 
 protected:
