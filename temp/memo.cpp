@@ -22,3 +22,6 @@ Window& Window::show();
 
 // AL_BUFFEROBJECT
 // VBO CBP PBO object implementation commented out (cpp)
+
+// AL_DISPLAYLIST
+// erased out almost everything

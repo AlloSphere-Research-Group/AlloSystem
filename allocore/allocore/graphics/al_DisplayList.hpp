@@ -55,21 +55,21 @@ class DisplayList : public GPUObject {
 public:
 
 	/// Begin the display list's rendering commands
-	void begin(){ validate(); glNewList(id(), GL_COMPILE); }
+	void begin(){ validate(); /*glNewList(id(), GL_COMPILE);*/ }
 
 	/// End the display list's rendering commands
-	void end(){ glEndList(); }
+	void end(){ /*glEndList();*/ }
 
 	/// Draw the display list
-	void draw(){ glCallList(id()); }
+	void draw(){ /*glCallList(id());*/ }
 
 protected:
 	virtual void onCreate(){
-		mID = glGenLists(1);
+		// mID = glGenLists(1);
 	}
 
 	virtual void onDestroy(){
-		glDeleteLists(mID, 1);
+		// glDeleteLists(mID, 1);
 	}
 };
 

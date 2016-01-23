@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "allocore/io/al_Window.hpp"
 #include "allocore/system/al_MainLoop.hpp"
+#include "allocore/graphics/al_DisplayList.hpp"
 
 using namespace al;
 

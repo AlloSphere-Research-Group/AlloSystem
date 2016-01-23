@@ -13,6 +13,8 @@ set(GL_HEADERS
 
     allocore/graphics/al_Graphics.hpp
     allocore/graphics/al_BufferObject.hpp
+    allocore/graphics/al_DisplayList.hpp
+    allocore/graphics/al_FBO.hpp
 
     allocore/io/al_Window.hpp
 )
@@ -27,6 +29,7 @@ list(APPEND ALLOCORE_SRC
 
   src/graphics/al_Graphics.cpp
   src/graphics/al_BufferObject.cpp
+  src/graphics/al_FBO.cpp
 
   src/io/al_Window.cpp
   )
