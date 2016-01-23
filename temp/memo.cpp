@@ -16,3 +16,9 @@ void Window::implSetVSync();
 Window& Window::hide();
 Window& Window::iconify();
 Window& Window::show();
+
+// AL_GRAPHICS
+// enum ATTRIBUTEBIT and MATRIXMODE commented out (hpp)
+
+// AL_BUFFEROBJECT
+// VBO CBP PBO object implementation commented out (cpp)

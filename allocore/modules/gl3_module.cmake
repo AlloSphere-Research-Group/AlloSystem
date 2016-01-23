@@ -12,6 +12,7 @@ set(GL_HEADERS
     # allocore/graphics/al_OpenGLGLUT.hpp
 
     allocore/graphics/al_Graphics.hpp
+    allocore/graphics/al_BufferObject.hpp
 
     allocore/io/al_Window.hpp
 )
@@ -25,6 +26,7 @@ list(APPEND ALLOCORE_SRC
   src/graphics/al_GPUObject.cpp
 
   src/graphics/al_Graphics.cpp
+  src/graphics/al_BufferObject.cpp
 
   src/io/al_Window.cpp
   )

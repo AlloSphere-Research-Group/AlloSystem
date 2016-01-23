@@ -101,9 +101,9 @@ VBO::VBO(BufferUsage usage)
 :	BufferObject(ARRAY_BUFFER, usage)
 {}
 
-void VBO::enable(){ glEnableClientState(VERTEX_ARRAY); }
-void VBO::disable(){ glDisableClientState(VERTEX_ARRAY); }
-void VBO::onPointerFunc(){ glVertexPointer(mNumComps, mDataType, 0, 0); }
+void VBO::enable(){}// glEnableClientState(VERTEX_ARRAY); }
+void VBO::disable(){}// glDisableClientState(VERTEX_ARRAY); }
+void VBO::onPointerFunc(){}// glVertexPointer(mNumComps, mDataType, 0, 0); }
 
 
 
@@ -111,9 +111,9 @@ CBO::CBO(BufferUsage usage)
 :	BufferObject(ARRAY_BUFFER, usage)
 {}
 
-void CBO::enable(){ glEnableClientState(COLOR_ARRAY); }
-void CBO::disable(){ glDisableClientState(COLOR_ARRAY); }
-void CBO::onPointerFunc(){ glColorPointer(mNumComps, mDataType, 0, 0); }
+void CBO::enable(){}// glEnableClientState(COLOR_ARRAY); }
+void CBO::disable(){}// glDisableClientState(COLOR_ARRAY); }
+void CBO::onPointerFunc(){}// glColorPointer(mNumComps, mDataType, 0, 0); }
 
 
 
@@ -123,7 +123,7 @@ PBO::PBO(bool packMode, BufferUsage usage)
 
 //void PBO::enable(){ glEnableClientState(ArrayType::Vertex); }
 //void PBO::disable(){ glDisableClientState(ArrayType::Vertex); }
-void PBO::onPointerFunc(){ glVertexPointer(mNumComps, mDataType, 0, 0); }
+void PBO::onPointerFunc(){}// glVertexPointer(mNumComps, mDataType, 0, 0); }
 
 
 
