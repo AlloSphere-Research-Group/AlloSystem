@@ -176,53 +176,53 @@ void MeshVBO::updateData(const T *src, uint32_t *bufferId, int total, int buffer
 ////////////////////////////////////////////////////////////////////////////////
 // Bind buffers and get pointers
 void MeshVBO::bind(){
-  glBindBuffer(GL_ARRAY_BUFFER, mVertId);
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glVertexPointer(3, GL_FLOAT, mVertStride, 0);
+  // glBindBuffer(GL_ARRAY_BUFFER, mVertId);
+  // glEnableClientState(GL_VERTEX_ARRAY);
+  // glVertexPointer(3, GL_FLOAT, mVertStride, 0);
 
-  if (hasNormals()){
-    glBindBuffer(GL_ARRAY_BUFFER, mNormalId);
-    glEnableClientState(GL_NORMAL_ARRAY);
-    glNormalPointer(GL_FLOAT, mNormalStride, 0);
-  }
+  // if (hasNormals()){
+  //   glBindBuffer(GL_ARRAY_BUFFER, mNormalId);
+  //   glEnableClientState(GL_NORMAL_ARRAY);
+  //   glNormalPointer(GL_FLOAT, mNormalStride, 0);
+  // }
 
-  if (hasTexCoord2s()){
-    glBindBuffer(GL_ARRAY_BUFFER, mTexCoordId);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glTexCoordPointer(2, GL_FLOAT, mTexCoordStride, 0);
-  }
-  else if (hasTexCoord3s()){
-    glBindBuffer(GL_ARRAY_BUFFER, mTexCoordId);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glTexCoordPointer(3, GL_FLOAT, mTexCoordStride, 0);
-  }
+  // if (hasTexCoord2s()){
+  //   glBindBuffer(GL_ARRAY_BUFFER, mTexCoordId);
+  //   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  //   glTexCoordPointer(2, GL_FLOAT, mTexCoordStride, 0);
+  // }
+  // else if (hasTexCoord3s()){
+  //   glBindBuffer(GL_ARRAY_BUFFER, mTexCoordId);
+  //   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  //   glTexCoordPointer(3, GL_FLOAT, mTexCoordStride, 0);
+  // }
 
-  if (hasColors()){
-    glBindBuffer(GL_ARRAY_BUFFER, mColorId);
-    glEnableClientState(GL_COLOR_ARRAY);
-    glColorPointer(4, GL_FLOAT, mColorStride, 0);
-  }
+  // if (hasColors()){
+  //   glBindBuffer(GL_ARRAY_BUFFER, mColorId);
+  //   glEnableClientState(GL_COLOR_ARRAY);
+  //   glColorPointer(4, GL_FLOAT, mColorStride, 0);
+  // }
 
-  if (hasIndices()){
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexId);
-  }
+  // if (hasIndices()){
+  //   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexId);
+  // }
 
-  mAllocated = true;
+  // mAllocated = true;
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Unbind
 void MeshVBO::unbind(){
-  glBindBuffer(GL_ARRAY_BUFFER, 0); // clean up
-  if (hasIndices()) glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  // glBindBuffer(GL_ARRAY_BUFFER, 0); // clean up
+  // if (hasIndices()) glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-  glDisableClientState(GL_VERTEX_ARRAY);
-  if (hasNormals()) glDisableClientState(GL_NORMAL_ARRAY);
-  if (hasColors()) glDisableClientState(GL_COLOR_ARRAY);
-  if (hasTexCoord2s() || hasTexCoord3s()) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+  // glDisableClientState(GL_VERTEX_ARRAY);
+  // if (hasNormals()) glDisableClientState(GL_NORMAL_ARRAY);
+  // if (hasColors()) glDisableClientState(GL_COLOR_ARRAY);
+  // if (hasTexCoord2s() || hasTexCoord3s()) glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
-  mBound = false;
+  // mBound = false;
 
 }
 

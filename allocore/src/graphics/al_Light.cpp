@@ -23,17 +23,17 @@ void Material::operator()() const {
 	// if GL_COLOR_MATERIAL is enabled, the respective glMaterial components
 	// are ignored and vice-versa.
 	if (useColorMaterial()) {
-		glEnable(GL_COLOR_MATERIAL);	// need to enable for glColor* to work
-		glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+		// glEnable(GL_COLOR_MATERIAL);	// need to enable for glColor* to work
+		// glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	} else {
-		glDisable(GL_COLOR_MATERIAL);	// need to disable for glMaterial* to work
-		glMaterialfv(glface, GL_AMBIENT, mAmbient.components);
-		glMaterialfv(glface, GL_DIFFUSE, mDiffuse.components);
+		// glDisable(GL_COLOR_MATERIAL);	// need to disable for glMaterial* to work
+		// glMaterialfv(glface, GL_AMBIENT, mAmbient.components);
+		// glMaterialfv(glface, GL_DIFFUSE, mDiffuse.components);
 	}
 
-	glMaterialfv(glface, GL_EMISSION,	mEmission.components);
-	glMaterialfv(glface, GL_SPECULAR,	mSpecular.components);
-	glMaterialf (glface, GL_SHININESS,	mShine);
+	// glMaterialfv(glface, GL_EMISSION,	mEmission.components);
+	// glMaterialfv(glface, GL_SPECULAR,	mSpecular.components);
+	// glMaterialf (glface, GL_SHININESS,	mShine);
 }
 Material& Material::ambientAndDiffuse(const Color& v){
 	ambient(v);
@@ -66,9 +66,11 @@ struct LightPool{
 	}
 
 	static int glLightID(int i){
-		static int x[Nlights] =
-			{GL_LIGHT0,GL_LIGHT1,GL_LIGHT2,GL_LIGHT3,GL_LIGHT4,GL_LIGHT5,GL_LIGHT6,GL_LIGHT7};
-		return x[i];
+		static int x[Nlights] = {0};
+			// {GL_LIGHT0,GL_LIGHT1,GL_LIGHT2,GL_LIGHT3,GL_LIGHT4,GL_LIGHT5,GL_LIGHT6,GL_LIGHT7};
+		// }
+		return x[0];
+		// return x[i];
 	}
 
 	int nextID(){
@@ -103,17 +105,17 @@ Light::~Light(){
 }
 
 void Light::operator()() const {
-	glEnable(GL_LIGHTING);
-	int glID = lightPool.glLightID(mID);
-	glLightfv(glID, GL_AMBIENT,		mAmbient.components);
-	glLightfv(glID, GL_DIFFUSE,		mDiffuse.components);
-	glLightfv(glID, GL_SPECULAR,	mSpecular.components);
-	glLightfv(glID, GL_POSITION,	mPos);
-    glLightf (glID, GL_CONSTANT_ATTENUATION,	mAtten[0]);
-    glLightf (glID, GL_LINEAR_ATTENUATION,		mAtten[1]);
-    glLightf (glID, GL_QUADRATIC_ATTENUATION,	mAtten[2]);
+	// glEnable(GL_LIGHTING);
+	// int glID = lightPool.glLightID(mID);
+	// glLightfv(glID, GL_AMBIENT,		mAmbient.components);
+	// glLightfv(glID, GL_DIFFUSE,		mDiffuse.components);
+	// glLightfv(glID, GL_SPECULAR,	mSpecular.components);
+	// glLightfv(glID, GL_POSITION,	mPos);
+    // glLightf (glID, GL_CONSTANT_ATTENUATION,	mAtten[0]);
+    // glLightf (glID, GL_LINEAR_ATTENUATION,		mAtten[1]);
+    // glLightf (glID, GL_QUADRATIC_ATTENUATION,	mAtten[2]);
 
-	glEnable(glID); // MUST enable each light source after configuration
+	// glEnable(glID); // MUST enable each light source after configuration
 //	glShadeModel(GL_SMOOTH); // enabled by default and don't want to force...
 }
 
@@ -128,9 +130,9 @@ Light& Light::specular(const Color& v){ mSpecular=v; return *this; }
 Light& Light::spot(float xDir, float yDir, float zDir, float cutoff, float expo){
 	int glID = lightPool.glLightID(mID);
 	float direction[] = {xDir, yDir, yDir};
-	glLightfv(glID, GL_SPOT_DIRECTION, direction);
-	glLightf (glID, GL_SPOT_CUTOFF, cutoff);
-	glLightf (glID, GL_SPOT_EXPONENT, expo);
+	// glLightfv(glID, GL_SPOT_DIRECTION, direction);
+	// glLightf (glID, GL_SPOT_CUTOFF, cutoff);
+	// glLightf (glID, GL_SPOT_EXPONENT, expo);
 	return *this;
 }
 
@@ -145,15 +147,15 @@ Light& Light::pos(float x, float y, float z){
 }
 
 void Light::globalAmbient(const Color& v){
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, v.components);
+	// glLightModelfv(GL_LIGHT_MODEL_AMBIENT, v.components);
 }
 
 void Light::localViewer(bool v){
-	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, v ? GL_TRUE : GL_FALSE);
+	// glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, v ? GL_TRUE : GL_FALSE);
 }
 
 void Light::twoSided(bool v){
-	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, v ? GL_TRUE : GL_FALSE);
+	// glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, v ? GL_TRUE : GL_FALSE);
 }
 
 } // ::al

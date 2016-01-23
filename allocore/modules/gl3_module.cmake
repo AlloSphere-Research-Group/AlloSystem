@@ -6,17 +6,25 @@
 find_package(OpenGL QUIET)
 
 set(GL_HEADERS
-    allocore/graphics/al_GPUObject.hpp
-    allocore/graphics/al_OpenGL.hpp
-    allocore/graphics/al_OpenGLGLFW.hpp
-    # allocore/graphics/al_OpenGLGLUT.hpp
+  # no dep
+  allocore/graphics/al_OpenGL.hpp
+  allocore/graphics/al_OpenGLGLFW.hpp
+  allocore/graphics/al_GPUObject.hpp
+  allocore/graphics/al_Graphics.hpp
+  # 1 tier dep
+  allocore/graphics/al_BufferObject.hpp
+  allocore/graphics/al_DisplayList.hpp
+  allocore/graphics/al_FBO.hpp
+  allocore/graphics/al_Lens.hpp
+  allocore/graphics/al_Light.hpp
+  allocore/graphics/al_Mesh.hpp
+  allocore/graphics/al_MeshVBO.hpp
+  allocore/graphics/al_Shader.hpp
+  # 2 tier dep
+  allocore/graphics/al_Isosurface.hpp
 
-    allocore/graphics/al_Graphics.hpp
-    allocore/graphics/al_BufferObject.hpp
-    allocore/graphics/al_DisplayList.hpp
-    allocore/graphics/al_FBO.hpp
-
-    allocore/io/al_Window.hpp
+  # others
+  allocore/io/al_Window.hpp
 )
 
 # if(GLEW_LIBRARY AND OPENGL_LIBRARY)
@@ -24,15 +32,31 @@ if(OPENGL_LIBRARY)
 # message(STATUS "Building OpenGL module (OpenGL + GLEW).")
 message(STATUS "Building OpenGL module.")
 
-list(APPEND ALLOCORE_SRC
-  src/graphics/al_GPUObject.cpp
+# graphics things
+# al_Asset included at assimp module
+# al_Font at font module
+# al_Image at image module
 
+# easyFbo, isosurface
+
+list(APPEND ALLOCORE_SRC
+  # no dep
+  src/graphics/al_GPUObject.cpp
   src/graphics/al_Graphics.cpp
+  # 1 tier dep
   src/graphics/al_BufferObject.cpp
   src/graphics/al_FBO.cpp
+  src/graphics/al_Lens.cpp
+  src/graphics/al_Light.cpp
+  src/graphics/al_Mesh.cpp
+  src/graphics/al_MeshVBO.cpp
+  src/graphics/al_Shader.cpp
+  # 2 tier dep
+  src/graphics/al_Isosurface.cpp
 
+  # others
   src/io/al_Window.cpp
-  )
+)
 
 # TODO empty  allocore/graphics/al_Slab.hpp, remove?
 

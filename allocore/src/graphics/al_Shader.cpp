@@ -14,7 +14,8 @@ GLenum gl_shader_type(Shader::Type v) {
 	switch(v){
 		case Shader::FRAGMENT:	return GL_FRAGMENT_SHADER;
 		case Shader::VERTEX:	return GL_VERTEX_SHADER;
-		case Shader::GEOMETRY:	return GL_GEOMETRY_SHADER_EXT;
+		// case Shader::GEOMETRY:	return GL_GEOMETRY_SHADER_EXT;
+		case Shader::GEOMETRY:	return GL_GEOMETRY_SHADER;
 		default: return 0;
 	}
 }
@@ -68,7 +69,7 @@ Shader& Shader::compile(){
 bool Shader::compiled() const {
 	GLint v;
 	GLhandleARB h = (GLhandleARB)id();
-	glGetObjectParameterivARB(h, GL_COMPILE_STATUS, &v);
+	// glGetObjectParameterivARB(h, GL_COMPILE_STATUS, &v);
 	//glGetProgramiv(id(), GL_COMPILE_STATUS, &v);
 	AL_GRAPHICS_ERROR("Shader::compiled()", id());
 	return v;
@@ -143,7 +144,7 @@ static ShaderProgram::Type param_type_from_gltype(GLenum gltype) {
 
 		case GL_SAMPLER_1D:			return ShaderProgram::SAMPLER_1D;
 		case GL_SAMPLER_2D:			return ShaderProgram::SAMPLER_2D;
-		case GL_SAMPLER_2D_RECT_ARB:return ShaderProgram::SAMPLER_RECT;
+		// case GL_SAMPLER_2D_RECT_ARB:return ShaderProgram::SAMPLER_RECT;
 		case GL_SAMPLER_3D:			return ShaderProgram::SAMPLER_3D;
 		case GL_SAMPLER_CUBE:		return ShaderProgram::SAMPLER_CUBE;
 		case GL_SAMPLER_1D_SHADOW:	return ShaderProgram::SAMPLER_1D_SHADOW;
@@ -164,7 +165,7 @@ ShaderProgram::~ShaderProgram(){
 ShaderProgram& ShaderProgram::attach(Shader& s){
 	validate();
 	s.compile();
-	glAttachObjectARB((GLhandleARB)id(), (GLhandleARB)s.id());
+	// glAttachObjectARB((GLhandleARB)id(), (GLhandleARB)s.id());
 	//glAttachShader(id(), s.id());
 
 	// TODO: check for geometry shader extensions
@@ -176,9 +177,9 @@ ShaderProgram& ShaderProgram::attach(Shader& s){
 //#endif
 
 	if (s.type() == Shader::GEOMETRY) {
-		glProgramParameteriEXT(id(),GL_GEOMETRY_INPUT_TYPE_EXT, mInPrim);
-		glProgramParameteriEXT(id(),GL_GEOMETRY_OUTPUT_TYPE_EXT, mOutPrim);
-		glProgramParameteriEXT(id(),GL_GEOMETRY_VERTICES_OUT_EXT,mOutVertices);
+		// glProgramParameteriEXT(id(),GL_GEOMETRY_INPUT_TYPE_EXT, mInPrim);
+		// glProgramParameteriEXT(id(),GL_GEOMETRY_OUTPUT_TYPE_EXT, mOutPrim);
+		// glProgramParameteriEXT(id(),GL_GEOMETRY_VERTICES_OUT_EXT,mOutVertices);
 	}
 
 	return *this;

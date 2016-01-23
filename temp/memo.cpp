@@ -25,3 +25,9 @@ Window& Window::show();
 
 // AL_DISPLAYLIST
 // erased out almost everything
+
+// AL_LIGHT
+// a lot of fixed pipeline functions
+
+// AL_SHADER
+// extension related functions needs to be updated

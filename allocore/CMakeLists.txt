@@ -27,11 +27,12 @@ list(APPEND ALLOCORE_SRC
 
 list(APPEND ALLOCORE_HEADERS
     allocore/al_Allocore.hpp
-    allocore/graphics/al_Mesh.hpp
-    allocore/graphics/al_MeshVBO.hpp
-    allocore/graphics/al_Shapes.hpp
-    allocore/graphics/al_Image.hpp
-    allocore/graphics/al_EasyFBO.hpp
+    # will go in gl3 module
+    # allocore/graphics/al_Mesh.hpp
+    # allocore/graphics/al_MeshVBO.hpp
+    # allocore/graphics/al_Shapes.hpp
+    # allocore/graphics/al_Image.hpp
+    # allocore/graphics/al_EasyFBO.hpp
 	allocore/io/al_AudioIOData.hpp
     allocore/io/al_HID.hpp
     allocore/io/al_MIDI.hpp
