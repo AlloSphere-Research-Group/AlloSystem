@@ -20,25 +20,25 @@ Vec3d Stereographic::unproject(Vec3d screenPos){
 }
 
 void Stereographic::pushDrawPop(Graphics& gl, Drawable& draw){
-	gl.pushMatrix(gl.PROJECTION);
-	gl.loadMatrix(projection());
-	gl.pushMatrix(gl.MODELVIEW);
-	gl.loadMatrix(modelView());
-		draw.onDraw(gl);
-	gl.popMatrix(gl.PROJECTION);
-	gl.popMatrix(gl.MODELVIEW);
+	// gl.pushMatrix(gl.PROJECTION);
+	// gl.loadMatrix(projection());
+	// gl.pushMatrix(gl.MODELVIEW);
+	// gl.loadMatrix(modelView());
+	// 	draw.onDraw(gl);
+	// gl.popMatrix(gl.PROJECTION);
+	// gl.popMatrix(gl.MODELVIEW);
 }
 
 void Stereographic::sendViewport(Graphics& gl, const Viewport& vp){
-	glScissor(vp.l, vp.b, vp.w, vp.h);
-	gl.viewport(vp.l, vp.b, vp.w, vp.h);
-	mVP = vp;
+	// glScissor(vp.l, vp.b, vp.w, vp.h);
+	// gl.viewport(vp.l, vp.b, vp.w, vp.h);
+	// mVP = vp;
 }
 
 void Stereographic::sendClear(Graphics& gl){
-	gl.depthMask(true); // ensure writing to depth buffer is enabled
-	gl.clearColor(mClearColor);
-	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+	// gl.depthMask(true); // ensure writing to depth buffer is enabled
+	// gl.clearColor(mClearColor);
+	// gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 }
 
 void Stereographic :: draw(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect) {
@@ -225,47 +225,47 @@ void Stereographic::drawEye(StereoMode eye, Graphics& gl, const Lens& lens, cons
 
 void Stereographic :: drawAnaglyph(Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect)
 {
-	glEnable(GL_SCISSOR_TEST);
+	// glEnable(GL_SCISSOR_TEST);
 
-	// We must clear here since color masks affect glClear
-	if(clear){
-		sendViewport(gl, vp);
-		sendClear(gl);
-	}
+	// // We must clear here since color masks affect glClear
+	// if(clear){
+	// 	sendViewport(gl, vp);
+	// 	sendClear(gl);
+	// }
 
-	switch(mAnaglyphMode){
-		case RED_BLUE:
-		case RED_GREEN:
-		case RED_CYAN:	glColorMask(GL_TRUE, GL_FALSE,GL_FALSE,GL_TRUE); break;
-		case BLUE_RED:	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE, GL_TRUE); break;
-		case GREEN_RED:	glColorMask(GL_FALSE,GL_TRUE, GL_FALSE,GL_TRUE); break;
-		case CYAN_RED:	glColorMask(GL_FALSE,GL_TRUE, GL_TRUE, GL_TRUE); break;
-		default:		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE ,GL_TRUE);
-	}
+	// switch(mAnaglyphMode){
+	// 	case RED_BLUE:
+	// 	case RED_GREEN:
+	// 	case RED_CYAN:	glColorMask(GL_TRUE, GL_FALSE,GL_FALSE,GL_TRUE); break;
+	// 	case BLUE_RED:	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE, GL_TRUE); break;
+	// 	case GREEN_RED:	glColorMask(GL_FALSE,GL_TRUE, GL_FALSE,GL_TRUE); break;
+	// 	case CYAN_RED:	glColorMask(GL_FALSE,GL_TRUE, GL_TRUE, GL_TRUE); break;
+	// 	default:		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE ,GL_TRUE);
+	// }
 
-	drawEye(RIGHT_EYE, gl, lens, pose, vp, draw, /*clear*/false, pixelaspect);
+	// drawEye(RIGHT_EYE, gl, lens, pose, vp, draw, /*clear*/false, pixelaspect);
 
-	// Clear only depth buffer for second eye pass
-	// Note: This must be cleared regardless of the 'clear' argument since we
-	// only have one depth buffer and eye must have its own depth buffer.
-	gl.viewport(vp.l, vp.b, vp.w, vp.h);
-	gl.depthMask(true);
-	gl.clear(gl.DEPTH_BUFFER_BIT);
+	// // Clear only depth buffer for second eye pass
+	// // Note: This must be cleared regardless of the 'clear' argument since we
+	// // only have one depth buffer and eye must have its own depth buffer.
+	// gl.viewport(vp.l, vp.b, vp.w, vp.h);
+	// gl.depthMask(true);
+	// gl.clear(gl.DEPTH_BUFFER_BIT);
 
-	switch(mAnaglyphMode){
-		case RED_BLUE:	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE, GL_TRUE); break;
-		case RED_GREEN:	glColorMask(GL_FALSE,GL_TRUE, GL_FALSE,GL_TRUE); break;
-		case RED_CYAN:	glColorMask(GL_FALSE,GL_TRUE, GL_TRUE, GL_TRUE); break;
-		case BLUE_RED:
-		case GREEN_RED:
-		case CYAN_RED:	glColorMask(GL_TRUE, GL_FALSE,GL_FALSE,GL_TRUE); break;
-		default:		glColorMask(GL_TRUE, GL_TRUE ,GL_TRUE, GL_TRUE);
-	}
+	// switch(mAnaglyphMode){
+	// 	case RED_BLUE:	glColorMask(GL_FALSE,GL_FALSE,GL_TRUE, GL_TRUE); break;
+	// 	case RED_GREEN:	glColorMask(GL_FALSE,GL_TRUE, GL_FALSE,GL_TRUE); break;
+	// 	case RED_CYAN:	glColorMask(GL_FALSE,GL_TRUE, GL_TRUE, GL_TRUE); break;
+	// 	case BLUE_RED:
+	// 	case GREEN_RED:
+	// 	case CYAN_RED:	glColorMask(GL_TRUE, GL_FALSE,GL_FALSE,GL_TRUE); break;
+	// 	default:		glColorMask(GL_TRUE, GL_TRUE ,GL_TRUE, GL_TRUE);
+	// }
 
-	drawEye(LEFT_EYE, gl, lens, pose, vp, draw, /*clear*/false, pixelaspect);
+	// drawEye(LEFT_EYE, gl, lens, pose, vp, draw, /*clear*/false, pixelaspect);
 
-	glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
-	glDisable(GL_SCISSOR_TEST);
+	// glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
+	// glDisable(GL_SCISSOR_TEST);
 }
 
 
@@ -330,77 +330,77 @@ void Stereographic :: drawDual(Graphics& gl, const Lens& lens, const Pose& pose,
 /// @see http://local.wasp.uwa.edu.au/~pbourke/miscellaneous/stereographics/stereorender/GLUTStereo/glutStereo.cpp
 void Stereographic :: drawBlueLine(double window_width, double window_height)
 {
-	GLint i;
-	unsigned long buffer;
+	// GLint i;
+	// unsigned long buffer;
 
-	glPushAttrib(GL_ALL_ATTRIB_BITS);
+	// glPushAttrib(GL_ALL_ATTRIB_BITS);
 
-	glDisable(GL_ALPHA_TEST);
-	glDisable(GL_BLEND);
-	for(i = 0; i < 6; i++) glDisable(GL_CLIP_PLANE0 + i);
-	glDisable(GL_COLOR_LOGIC_OP);
-	glDisable(GL_COLOR_MATERIAL);
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_DITHER);
-	glDisable(GL_FOG);
-	glDisable(GL_LIGHTING);
-	glDisable(GL_LINE_SMOOTH);
-	glDisable(GL_LINE_STIPPLE);
-	glDisable(GL_SCISSOR_TEST);
-	//glDisable(GL_SHARED_TEXTURE_PALETTE_EXT); /* not in 10.5 sdk */
-	glDisable(GL_STENCIL_TEST);
-	glDisable(GL_TEXTURE_1D);
-	glDisable(GL_TEXTURE_2D);
-	glDisable(GL_TEXTURE_3D);
-	glDisable(GL_TEXTURE_CUBE_MAP);
-	glDisable(GL_TEXTURE_RECTANGLE_EXT);
-	glDisable(GL_VERTEX_PROGRAM_ARB);
+	// glDisable(GL_ALPHA_TEST);
+	// glDisable(GL_BLEND);
+	// for(i = 0; i < 6; i++) glDisable(GL_CLIP_PLANE0 + i);
+	// glDisable(GL_COLOR_LOGIC_OP);
+	// glDisable(GL_COLOR_MATERIAL);
+	// glDisable(GL_DEPTH_TEST);
+	// glDisable(GL_DITHER);
+	// glDisable(GL_FOG);
+	// glDisable(GL_LIGHTING);
+	// glDisable(GL_LINE_SMOOTH);
+	// glDisable(GL_LINE_STIPPLE);
+	// glDisable(GL_SCISSOR_TEST);
+	// //glDisable(GL_SHARED_TEXTURE_PALETTE_EXT); /* not in 10.5 sdk */
+	// glDisable(GL_STENCIL_TEST);
+	// glDisable(GL_TEXTURE_1D);
+	// glDisable(GL_TEXTURE_2D);
+	// glDisable(GL_TEXTURE_3D);
+	// glDisable(GL_TEXTURE_CUBE_MAP);
+	// glDisable(GL_TEXTURE_RECTANGLE_EXT);
+	// glDisable(GL_VERTEX_PROGRAM_ARB);
 
-	for(buffer = GL_BACK_LEFT; buffer <= GL_BACK_RIGHT; buffer++) {
-		GLint matrixMode;
-		GLint vp[4];
+	// for(buffer = GL_BACK_LEFT; buffer <= GL_BACK_RIGHT; buffer++) {
+	// 	GLint matrixMode;
+	// 	GLint vp[4];
 
-		glDrawBuffer(buffer);
+	// 	glDrawBuffer(buffer);
 
-		glGetIntegerv(GL_VIEWPORT, vp);
-		glViewport(0, 0, window_width, window_height);
+	// 	glGetIntegerv(GL_VIEWPORT, vp);
+	// 	glViewport(0, 0, window_width, window_height);
 
-		glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
-		glMatrixMode(GL_PROJECTION);
-		glPushMatrix();
-		glLoadIdentity();
+	// 	glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
+	// 	glMatrixMode(GL_PROJECTION);
+	// 	glPushMatrix();
+	// 	glLoadIdentity();
 
-		glMatrixMode(GL_MODELVIEW);
-		glPushMatrix();
-		glLoadIdentity();
-		glScalef(2.0f / window_width, -2.0f / window_height, 1.0f);
-		glTranslatef(-window_width / 2.0f, -window_height / 2.0f, 0.0f);
+	// 	glMatrixMode(GL_MODELVIEW);
+	// 	glPushMatrix();
+	// 	glLoadIdentity();
+	// 	glScalef(2.0f / window_width, -2.0f / window_height, 1.0f);
+	// 	glTranslatef(-window_width / 2.0f, -window_height / 2.0f, 0.0f);
 
-		// draw sync lines
-		glColor3d(0.0f, 0.0f, 0.0f);
-		glBegin(GL_LINES); // Draw a background line
-			glVertex3f(0.0f, window_height - 0.5f, 0.0f);
-			glVertex3f(window_width, window_height - 0.5f, 0.0f);
-		glEnd();
-		glColor3d(0.0f, 0.0f, 1.0f);
-		glBegin(GL_LINES); // Draw a line of the correct length (the cross over is about 40% across the screen from the left
-			glVertex3f(0.0f, window_height - 0.5f, 0.0f);
-			if(buffer == GL_BACK_LEFT)
-				glVertex3f(window_width * 0.30f, window_height - 0.5f, 0.0f);
-			else
-				glVertex3f(window_width * 0.80f, window_height - 0.5f, 0.0f);
-		glEnd();
+	// 	// draw sync lines
+	// 	glColor3d(0.0f, 0.0f, 0.0f);
+	// 	glBegin(GL_LINES); // Draw a background line
+	// 		glVertex3f(0.0f, window_height - 0.5f, 0.0f);
+	// 		glVertex3f(window_width, window_height - 0.5f, 0.0f);
+	// 	glEnd();
+	// 	glColor3d(0.0f, 0.0f, 1.0f);
+	// 	glBegin(GL_LINES); // Draw a line of the correct length (the cross over is about 40% across the screen from the left
+	// 		glVertex3f(0.0f, window_height - 0.5f, 0.0f);
+	// 		if(buffer == GL_BACK_LEFT)
+	// 			glVertex3f(window_width * 0.30f, window_height - 0.5f, 0.0f);
+	// 		else
+	// 			glVertex3f(window_width * 0.80f, window_height - 0.5f, 0.0f);
+	// 	glEnd();
 
-		glPopMatrix();
-		glMatrixMode(GL_PROJECTION);
-		glPopMatrix();
-		glMatrixMode(matrixMode);
+	// 	glPopMatrix();
+	// 	glMatrixMode(GL_PROJECTION);
+	// 	glPopMatrix();
+	// 	glMatrixMode(matrixMode);
 
-		glViewport(vp[0], vp[1], vp[2], vp[3]);
-	}
-	glPopAttrib();
+	// 	glViewport(vp[0], vp[1], vp[2], vp[3]);
+	// }
+	// glPopAttrib();
 
-	glDrawBuffer(GL_BACK);
+	// glDrawBuffer(GL_BACK);
 }
 
 } // al::

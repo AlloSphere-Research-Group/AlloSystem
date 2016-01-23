@@ -5,6 +5,15 @@
 
 find_package(OpenGL QUIET)
 
+# graphics things
+
+# al_Asset included at assimp module
+# al_Font at font module
+# al_Image at image module
+
+# easyFbo: later
+# slab: currently empty
+
 set(GL_HEADERS
   # no dep
   allocore/graphics/al_OpenGL.hpp
@@ -18,11 +27,14 @@ set(GL_HEADERS
   allocore/graphics/al_Lens.hpp
   allocore/graphics/al_Light.hpp
   allocore/graphics/al_Mesh.hpp
-  allocore/graphics/al_MeshVBO.hpp
   allocore/graphics/al_Shader.hpp
+  allocore/graphics/al_Texture.hpp
   # 2 tier dep
   allocore/graphics/al_Isosurface.hpp
-
+  allocore/graphics/al_MeshVBO.hpp
+  allocore/graphics/al_Shapes.hpp
+  allocore/graphics/al_Stereographic.hpp
+  
   # others
   allocore/io/al_Window.hpp
 )
@@ -31,13 +43,6 @@ set(GL_HEADERS
 if(OPENGL_LIBRARY)
 # message(STATUS "Building OpenGL module (OpenGL + GLEW).")
 message(STATUS "Building OpenGL module.")
-
-# graphics things
-# al_Asset included at assimp module
-# al_Font at font module
-# al_Image at image module
-
-# easyFbo, isosurface
 
 list(APPEND ALLOCORE_SRC
   # no dep
@@ -49,10 +54,13 @@ list(APPEND ALLOCORE_SRC
   src/graphics/al_Lens.cpp
   src/graphics/al_Light.cpp
   src/graphics/al_Mesh.cpp
-  src/graphics/al_MeshVBO.cpp
   src/graphics/al_Shader.cpp
+  src/graphics/al_Texture.cpp
   # 2 tier dep
+  src/graphics/al_MeshVBO.cpp
   src/graphics/al_Isosurface.cpp
+  src/graphics/al_Shapes.cpp
+  src/graphics/al_Stereographic.cpp
 
   # others
   src/io/al_Window.cpp

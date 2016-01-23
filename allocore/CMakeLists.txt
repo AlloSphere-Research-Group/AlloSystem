@@ -31,7 +31,7 @@ list(APPEND ALLOCORE_HEADERS
     # allocore/graphics/al_Mesh.hpp
     # allocore/graphics/al_MeshVBO.hpp
     # allocore/graphics/al_Shapes.hpp
-    # allocore/graphics/al_Image.hpp
+    # allocore/graphics/al_Image.hpp # at image module
     # allocore/graphics/al_EasyFBO.hpp
 	allocore/io/al_AudioIOData.hpp
     allocore/io/al_HID.hpp

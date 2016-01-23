@@ -143,8 +143,8 @@ void Texture::shapeFrom(const AlloArrayHeader& hdr, bool realloc){
 	// No need to change semantics of data.
 	if(Graphics::numComponents(mFormat) != hdr.components){
 		switch(hdr.components){
-			case 1:	format(Graphics::LUMINANCE); break; // alpha or luminance?
-			case 2:	format(Graphics::LUMINANCE_ALPHA); break;
+			// case 1:	format(Graphics::LUMINANCE); break; // alpha or luminance?
+			// case 2:	format(Graphics::LUMINANCE_ALPHA); break;
 			case 3:	format(Graphics::RGB); break;
 			case 4:	format(Graphics::RGBA); break;
 			default:
@@ -542,7 +542,7 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 		}
 
 		switch (format()) {
-			case Graphics::LUMINANCE:
+			// case Graphics::LUMINANCE:
 			case Graphics::DEPTH_COMPONENT:
 			case Graphics::RED:
 			case Graphics::GREEN:
@@ -553,12 +553,12 @@ void Texture :: submit(const Array& src, bool reconfigure) {
 					return;
 				}
 				break;
-			case Graphics::LUMINANCE_ALPHA:
-				if (src.components() != 2) {
-					AL_WARN("submit failed: source array component count does not match (got %d, should be 2)", src.components());
-					return;
-				}
-				break;
+			// case Graphics::LUMINANCE_ALPHA:
+			// 	if (src.components() != 2) {
+			// 		AL_WARN("submit failed: source array component count does not match (got %d, should be 2)", src.components());
+			// 		return;
+			// 	}
+			// 	break;
 			case Graphics::RGB:
 			case Graphics::BGR:
 				if (src.components() != 3) {
@@ -613,7 +613,8 @@ void Texture::copyFrameBuffer(
 
 Texture& Texture::generateMipmap(){
 	bind();
-	glGenerateMipmapEXT(target());
+	// glGenerateMipmapEXT(target());
+	glGenerateMipmap(target());
 	unbind();
 	return *this;
 }
@@ -643,16 +644,16 @@ void Texture::quadViewport(
 	Graphics& g, const Color& color,
 	double w, double h, double x, double y
 ){
-	g.pushMatrix(g.PROJECTION);
-	g.loadIdentity();
-	g.pushMatrix(g.MODELVIEW);
-	g.loadIdentity();
-	g.depthMask(0); // write only to color buffer
-		g.color(color);
-		quad(g, w,h, x,y);
-	g.depthMask(1);
-	g.popMatrix(g.PROJECTION);
-	g.popMatrix(g.MODELVIEW);
+	// g.pushMatrix(g.PROJECTION);
+	// g.loadIdentity();
+	// g.pushMatrix(g.MODELVIEW);
+	// g.loadIdentity();
+	// g.depthMask(0); // write only to color buffer
+	// 	g.color(color);
+	// 	quad(g, w,h, x,y);
+	// g.depthMask(1);
+	// g.popMatrix(g.PROJECTION);
+	// g.popMatrix(g.MODELVIEW);
 }
 
 
@@ -685,8 +686,8 @@ void Texture :: print() {
 	}
 	switch (mFormat) {
 		case Graphics::DEPTH_COMPONENT: format="DEPTH_COMPONENT"; break;
-		case Graphics::LUMINANCE: format="LUMINANCE"; break;
-		case Graphics::LUMINANCE_ALPHA: format="LUMINANCE_ALPHA"; break;
+		// case Graphics::LUMINANCE: format="LUMINANCE"; break;
+		// case Graphics::LUMINANCE_ALPHA: format="LUMINANCE_ALPHA"; break;
 		case Graphics::RED: format="RED"; break;
 		case Graphics::GREEN: format="GREEN"; break;
 		case Graphics::BLUE: format="BLUE"; break;
