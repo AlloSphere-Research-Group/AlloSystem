@@ -207,7 +207,7 @@ void MeshVBO::bind(){
   //   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexId);
   // }
 
-  // mAllocated = true;
+  mBound = true;
 }
 
 
@@ -229,6 +229,7 @@ void MeshVBO::unbind(){
 ////////////////////////////////////////////////////////////////////////////////
 // Clear
 void MeshVBO::clear(){
+  unbind();
   mVertId = 0;
   mNormalId = 0;
   mColorId = 0;
