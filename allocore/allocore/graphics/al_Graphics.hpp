@@ -119,12 +119,12 @@ public:
 	};
 
 	// glPushAttrib deprecated in GL4
-//	enum AttributeBit {
-//		COLOR_BUFFER_BIT		= GL_COLOR_BUFFER_BIT,		/**< Color-buffer bit */
-//		DEPTH_BUFFER_BIT		= GL_DEPTH_BUFFER_BIT,		/**< Depth-buffer bit */
-//		ENABLE_BIT				= GL_ENABLE_BIT,			/**< Enable bit */
-//		VIEWPORT_BIT			= GL_VIEWPORT_BIT			/**< Viewport bit */
-//	};
+	// current usage: glClearBuffer
+	enum AttributeBit {
+		COLOR_BUFFER_BIT   = GL_COLOR,
+		DEPTH_BUFFER_BIT   = GL_DEPTH,
+		STENCIL_BUFFER_BIT = GL_STENCIL
+	};
 
 	enum BlendFunc {
 		SRC_ALPHA				= GL_SRC_ALPHA,				/**< */
@@ -196,10 +196,10 @@ public:
 		BGRA					= GL_BGRA					/**< */
 	};
 
-	// enum MatrixMode {
-	// 	MODELVIEW				= GL_MODELVIEW,				/**< Modelview matrix */
-	// 	PROJECTION				= GL_PROJECTION				/**< Projection matrix */
-	// };
+	enum MatrixMode {
+		MODELVIEW,//				= GL_MODELVIEW,				/**< Modelview matrix */
+		PROJECTION//				= GL_PROJECTION				/**< Projection matrix */
+	};
 
 	enum PolygonMode {
 		POINT					= GL_POINT,					/**< Render only points at each vertex */
@@ -342,7 +342,7 @@ public:
 
 
 	/// Clear frame buffer(s)
-	// void clear(AttributeBit bits);
+	void clear(AttributeBit bits);
 
 	/// Set clear color
 	void clearColor(float r, float g, float b, float a);
@@ -372,19 +372,19 @@ public:
 
 
 	/// Set current matrix
-	// void matrixMode(MatrixMode mode);
+	void matrixMode(MatrixMode mode);
 
 	/// Push current matrix stack
 	void pushMatrix();
 
 	/// Push designated matrix stack
-	// void pushMatrix(MatrixMode v){ matrixMode(v); pushMatrix(); }
+	void pushMatrix(MatrixMode v){ matrixMode(v); pushMatrix(); }
 
 	/// Pop current matrix stack
 	void popMatrix();
 
 	/// Pop designated matrix stack
-	// void popMatrix(MatrixMode v){ matrixMode(v); popMatrix(); }
+	void popMatrix(MatrixMode v){ matrixMode(v); popMatrix(); }
 
 	/// Set current matrix to identity
 	void loadIdentity();
@@ -398,12 +398,12 @@ public:
 	void multMatrix(const Matrix4f &m);
 
 	/// Set modelview matrix
-	// void modelView(const Matrix4d& m){ matrixMode(MODELVIEW); loadMatrix(m); }
-	// void modelView(const Matrix4f& m){ matrixMode(MODELVIEW); loadMatrix(m); }
+	void modelView(const Matrix4d& m){ matrixMode(MODELVIEW); loadMatrix(m); }
+	void modelView(const Matrix4f& m){ matrixMode(MODELVIEW); loadMatrix(m); }
 
 	/// Set projection matrix
-	// void projection(const Matrix4d& m){ matrixMode(PROJECTION); loadMatrix(m); }
-	// void projection(const Matrix4f& m){ matrixMode(PROJECTION); loadMatrix(m); }
+	void projection(const Matrix4d& m){ matrixMode(PROJECTION); loadMatrix(m); }
+	void projection(const Matrix4f& m){ matrixMode(PROJECTION); loadMatrix(m); }
 
 
 
@@ -578,7 +578,9 @@ public:
 
 // ============== INLINE ==============
 
-// inline void Graphics::clear(AttributeBit bits){ glClear(bits); }
+// glClearBufferfv(GL_COLOR, 0, red);
+
+inline void Graphics::clear(AttributeBit bits){ glClear(bits); }
 inline void Graphics::clearColor(float r, float g, float b, float a){ glClearColor(r, g, b, a); }
 inline void Graphics::clearColor(const Color& c) { clearColor(c.r, c.g, c.b, c.a); }
 
@@ -610,36 +612,38 @@ inline void Graphics::cullFace(bool b, Face face) {
 	capability(CULL_FACE, b);
 	glCullFace(face);
 }
-// inline void Graphics::matrixMode(MatrixMode mode){ glMatrixMode(mode); }
-// inline void Graphics::pushMatrix(){ glPushMatrix(); }
-// inline void Graphics::popMatrix(){ glPopMatrix(); }
-// inline void Graphics::loadIdentity(){ glLoadIdentity(); }
-// inline void Graphics::loadMatrix(const Matrix4d& m){ glLoadMatrixd(m.elems()); }
-// inline void Graphics::loadMatrix(const Matrix4f& m){ glLoadMatrixf(m.elems()); }
-// inline void Graphics::multMatrix(const Matrix4d& m){ glMultMatrixd(m.elems()); }
-// inline void Graphics::multMatrix(const Matrix4f& m){ glMultMatrixf(m.elems()); }
-// inline void Graphics::translate(double x, double y, double z){ glTranslated(x,y,z); }
-// inline void Graphics::rotate(double angle, double x, double y, double z){ glRotated(angle,x,y,z); }
+// all matrix operation deprecated in gl3
+// should introduce vector math for these
+inline void Graphics::matrixMode(MatrixMode mode){ /*glMatrixMode(mode);*/ }
+inline void Graphics::pushMatrix(){ /*glPushMatrix();*/ }
+inline void Graphics::popMatrix(){ /*glPopMatrix();*/ }
+inline void Graphics::loadIdentity(){ /*glLoadIdentity();*/ }
+inline void Graphics::loadMatrix(const Matrix4d& m){ /*glLoadMatrixd(m.elems());*/ }
+inline void Graphics::loadMatrix(const Matrix4f& m){ /*glLoadMatrixf(m.elems());*/ }
+inline void Graphics::multMatrix(const Matrix4d& m){ /*glMultMatrixd(m.elems());*/ }
+inline void Graphics::multMatrix(const Matrix4f& m){ /*glMultMatrixf(m.elems());*/ }
+inline void Graphics::translate(double x, double y, double z){ /*glTranslated(x,y,z);*/ }
+inline void Graphics::rotate(double angle, double x, double y, double z){ /*glRotated(angle,x,y,z);*/ }
 inline void Graphics::rotate(const Quatd& q) {
-	Matrix4d m;
-	q.toMatrix(m.elems());
-	multMatrix(m);
+	// Matrix4d m;
+	// q.toMatrix(m.elems());
+	// multMatrix(m);
 }
-// inline void Graphics::scale(double s){
-// 	if(mRescaleNormal < 1){
-// 		mRescaleNormal = 1;
-// 		enable(RESCALE_NORMAL);
-// 	}
-// 	glScaled(s, s, s);
-// }
-// inline void Graphics::scale(double x, double y, double z){
-// 	if(mRescaleNormal < 3){
-// 		mRescaleNormal = 3;
-// 		disable(RESCALE_NORMAL);
-// 		enable(NORMALIZE);
-// 	}
-// 	glScaled(x, y, z);
-// }
+inline void Graphics::scale(double s){
+	// if(mRescaleNormal < 1){
+	// 	mRescaleNormal = 1;
+	// 	enable(RESCALE_NORMAL);
+	// }
+	// glScaled(s, s, s);
+}
+inline void Graphics::scale(double x, double y, double z){
+	// if(mRescaleNormal < 3){
+	// 	mRescaleNormal = 3;
+	// 	disable(RESCALE_NORMAL);
+	// 	enable(NORMALIZE);
+	// }
+	// glScaled(x, y, z);
+}
 inline void Graphics::lineWidth(float v) { glLineWidth(v); }
 inline void Graphics::pointSize(float v) { glPointSize(v); }
 // inline void Graphics::pointAtten(float c2, float c1, float c0){
@@ -648,7 +652,7 @@ inline void Graphics::pointSize(float v) { glPointSize(v); }
 // }
 inline void Graphics::polygonMode(PolygonMode m, Face f){ glPolygonMode(f,m); }
 // inline void Graphics::shadeModel(ShadeModel m){ glShadeModel(m); }
-// inline void Graphics::currentColor(float r, float g, float b, float a){ glColor4f(r,g,b,a); }
+inline void Graphics::currentColor(float r, float g, float b, float a){}// glColor4f(r,g,b,a); }
 
 // inline Graphics::AttributeBit operator| (
 // 	const Graphics::AttributeBit& a, const Graphics::AttributeBit& b

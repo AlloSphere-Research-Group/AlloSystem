@@ -207,7 +207,7 @@ void MeshVBO::bind(){
   //   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexId);
   // }
 
-  mBound = true;
+  // mBound = true;
 }
 
 

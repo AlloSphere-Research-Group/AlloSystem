@@ -18,10 +18,11 @@ Window& Window::iconify();
 Window& Window::show();
 
 // AL_GRAPHICS
-// enum ATTRIBUTEBIT and MATRIXMODE commented out (hpp)
+// enum ATTRIBUTEBIT commented out (hpp)
 
 // AL_BUFFEROBJECT
-// VBO CBP PBO object implementation commented out (cpp)
+// VBO CBO PBO object implementation commented out (cpp)
+// not used anywhere?
 
 // AL_DISPLAYLIST
 // erased out almost everything
@@ -31,3 +32,5 @@ Window& Window::show();
 
 // AL_SHADER
 // extension related functions needs to be updated
+
+// EasyFBO yet included

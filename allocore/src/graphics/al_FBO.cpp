@@ -37,19 +37,18 @@ bool RBO::resize(unsigned w, unsigned h){
 // static functions
 unsigned RBO::maxSize(){
 	int s;
-	// glGetIntegerv(GL_MAX_RENDERBUFFER_SIZE_EXT, &s);
+	glGetIntegerv(GL_MAX_RENDERBUFFER_SIZE, &s);
 	return s;
 }
 
 void RBO::bind(unsigned id){
-	// glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, id);
-	// glBindRenderbuffer(GL_RENDERBUFFER_EXT, id); // not verified yet
+	glBindRenderbuffer(GL_RENDERBUFFER, id);
 }
 
 bool RBO::resize(Graphics::Format format, unsigned w, unsigned h){
 	unsigned mx = maxSize();
 	if(w > mx || h > mx) return false;
-	// glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, format, w, h);
+	glRenderbufferStorage(GL_RENDERBUFFER, format, w, h);
 	return true;
 }
 
@@ -58,13 +57,13 @@ bool RBO::resize(Graphics::Format format, unsigned w, unsigned h){
 
 void FBO::onCreate(){
 	GLuint i;
-	// glGenFramebuffersEXT(1,&i);
+	glGenFramebuffers(1,&i);
 	mID=i;
 }
 
 void FBO::onDestroy(){
 	GLuint i=id();
-	// glDeleteFramebuffersEXT(1,&i);
+	glDeleteFramebuffers(1,&i);
 }
 
 FBO& FBO::attachRBO(const RBO& rbo, Attachment att){
@@ -100,7 +99,7 @@ void FBO::unbind(){ bind(0); }
 GLenum FBO::status(){
 	begin();
 	int r;
-	// r = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+	r = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	end();
 	return r;
 }
@@ -125,7 +124,7 @@ const char * FBO::statusString(GLenum stat){
 // static functions
 void FBO::bind(unsigned fboID){
 	AL_GRAPHICS_ERROR("(before FBO::bind)", fboID);
-	// glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboID);
+	glBindFramebuffer(GL_FRAMEBUFFER, fboID);
 	AL_GRAPHICS_ERROR("binding FBO", fboID);
 }
 
@@ -136,11 +135,11 @@ void FBO::end(){
 }
 
 void FBO::renderBuffer(unsigned rboID, Attachment att){
-	// glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, att, GL_RENDERBUFFER_EXT, rboID);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, att, GL_RENDERBUFFER, rboID);
 }
 
 void FBO::texture2D(GLuint texID, Attachment att, int level){
-	// glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, att, GL_TEXTURE_2D, texID, level);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, att, GL_TEXTURE_2D, texID, level);
 }
 
 } // al::

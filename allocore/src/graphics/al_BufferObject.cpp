@@ -95,7 +95,14 @@ void BufferObject::onDestroy(){
 	glDeleteBuffers(1, (GLuint*)&mID);
 }
 
-
+/*
+glEnableClientState
+is how you tell OpenGL that you're using a vertex array
+for a particular fixed-function attribute (gl_Vertex, gl_Color, etc).
+Those are all removed from core contexts.
+You should use glEnableVertexAttribArray to enable a generic vertex attribute,
+and you use glVertexAttribPointer to associate that attribute with a buffer object.
+*/
 
 VBO::VBO(BufferUsage usage)
 :	BufferObject(ARRAY_BUFFER, usage)
@@ -121,8 +128,8 @@ PBO::PBO(bool packMode, BufferUsage usage)
 :	BufferObject(packMode ? PIXEL_PACK_BUFFER : PIXEL_UNPACK_BUFFER, usage)
 {}
 
-//void PBO::enable(){ glEnableClientState(ArrayType::Vertex); }
-//void PBO::disable(){ glDisableClientState(ArrayType::Vertex); }
+// void PBO::enable(){}// glEnableClientState(ArrayType::Vertex); }
+// void PBO::disable(){}// glDisableClientState(ArrayType::Vertex); }
 void PBO::onPointerFunc(){}// glVertexPointer(mNumComps, mDataType, 0, 0); }
 
 
