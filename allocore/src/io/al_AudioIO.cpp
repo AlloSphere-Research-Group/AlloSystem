@@ -437,8 +437,8 @@ AudioIO::AudioIO(int framesPerBuf, double framesPerSec, void (* callbackA)(Audio
 		mImpl = new DummyAudioBackend;
 		break;
 	}
+	this->framesPerBuffer(framesPerBuf); // has to be called before init(), as buffer size is needed there
 	init(outChansA, inChansA);
-	this->framesPerBuffer(framesPerBuf);
 	channels(inChansA, false);
 	channels(outChansA, true);
 	this->framesPerSecond(framesPerSec);
