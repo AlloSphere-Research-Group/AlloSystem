@@ -15,7 +15,7 @@ Parameter::Parameter(std::string parameterName, std::string group, float default
 		mFullAddress = "/";
 	}
 	mFullAddress += mPrefix;
-	if (mPrefix.length() > 0 && mPrefix.at(prefix.length() - 1) != '/') {
+	if (mGroup.length() > 0 && mPrefix.at(prefix.length() - 1) != '/') {
 		mFullAddress += "/";
 	}
 	mFullAddress += mGroup;
