@@ -28,7 +28,8 @@ AmbiFilePlayer::AmbiFilePlayer(std::string fullPath, bool loop, int bufferFrames
       mGain("Gain", "", 0.25)
 {
 	// Create spatializer
-	mDecoder = new AmbiTunedDecoder(configPath);
+	mDecoder = new AmbiTunedDecoder();
+	static_cast<AmbiTunedDecoder *>(mDecoder)->setConfiguration(configPath);
 	mReadBuffer = (float *) calloc(mBufferSize * channels(), sizeof(float));
 	mDeinterleavedBuffer = (float *) calloc(mBufferSize * channels(), sizeof(float));
 }

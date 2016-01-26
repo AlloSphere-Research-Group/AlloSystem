@@ -15,8 +15,7 @@ using namespace al;
 using namespace std;
 
 
-AmbiTunedDecoder::AmbiTunedDecoder(string configFile) :
-    AmbiDecode(3, 3, 8)
+void AmbiTunedDecoder::setConfiguration(string configFile)
 {
 	std::ifstream file(configFile);
 	if (file) {

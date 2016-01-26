@@ -20,10 +20,20 @@ using namespace std;
 class AmbiTunedDecoder : public AmbiDecode
 {
 public:
-	AmbiTunedDecoder(string configFile = "Allosphere.ambdec");
+	AmbiTunedDecoder(int dim = 3, int order = 3, int numSpeakers = 8, int flavor=1) :
+	    AmbiDecode(dim, order, numSpeakers, flavor) {}
+	void setConfiguration(string configFile = "Allosphere.ambdec");
 
 private:
 	AmbisonicsConfig mAmbisonicsConfig;
+};
+
+
+class AmbisonicsTunedSpatializer : public AmbisonicsBaseSpatializer<AmbiTunedDecoder>
+{
+public:
+	AmbisonicsTunedSpatializer(SpeakerLayout sl = StereoSpeakerLayout(), int dim = 3, int order = 3, int flavor=1)
+	    :AmbisonicsBaseSpatializer(sl, dim, order, flavor) {}
 };
 
 /** @} */

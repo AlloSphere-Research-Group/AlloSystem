@@ -157,31 +157,25 @@ protected:
 	static void resize(T *& a, int n);
 };
 
-
-
-/// Higher Order Ambisonic Decoding class
+/// Ambisonic Decoding Interface class
 ///
 /// @ingroup allocore
-class AmbiDecode : public AmbiBase{
+class AmbiDecodeBase : public AmbiBase {
 public:
 
-	/// @param[in] dim			number of spatial dimensions (2 or 3)
-	/// @param[in] order		highest spherical harmonic order
-	/// @param[in] numSpeakers	number of speakers
-	/// @param[in] flavor		decoding algorithm
-	AmbiDecode(int dim, int order, int numSpeakers, int flavor=1);
-
-	virtual ~AmbiDecode();
+	AmbiDecodeBase(int dim, int order, int numSpeakers, int flav)
+	    : AmbiBase(dim, order),
+	      mNumSpeakers(0), mDecodeMatrix(0), mSpeakers(NULL)
+	{
+		resizeArrays(channels(), numSpeakers);
+		flavor(flav);
+	}
 
 
 	/// @param[out] dec				output time domain buffers (non-interleaved)
 	/// @param[in ] enc				input Ambisonic domain buffers (non-interleaved)
 	/// @param[in ] numDecFrames	number of frames in time domain buffers
-	virtual void decode(float * dec, const float * enc, int numDecFrames) const;
-
-	float decodeWeight(int speaker, int channel) const {
-		return mWeights[channel] * mDecodeMatrix[speaker * channels() + channel];
-	}
+	virtual void decode(float * dec, const float * enc, int numDecFrames) const = 0;
 
 	/// Returns decode flavor
 	int flavor() const { return mFlavor; }
@@ -190,7 +184,6 @@ public:
 	int numSpeakers() const { return mNumSpeakers; }
 
 	void print(FILE * fp = stdout, const char * append = "\n") const;
-
 
 	/// Set decoding algorithm
 	void flavor(int type);
@@ -204,10 +197,6 @@ public:
 	//void zero();					///< Zeroes out internal ambisonic frame.
 
 	void setSpeakers(Speakers *spkrs);
-
-//	float * azimuths();				///< Returns pointer to speaker azimuths.
-//	float * elevations();			///< Returns pointer to speaker elevations.
-//	float * frame() const;			///< Returns pointer to ambisonic channel frame used by decode(int)
 
 	/// Get speaker
 	Speaker& speaker(int num) { return (*mSpeakers)[num]; }
@@ -227,9 +216,36 @@ protected:
 	void updateChanWeights();
 	void resizeArrays(int numChannels, int numSpeakers);
 
-	float decode(float * encFrame, int encNumChannels, int speakerNum);	// is this useful?
+	float decodeWeight(int speaker, int channel) const {
+		return mWeights[channel] * mDecodeMatrix[speaker * channels() + channel];
+	}
+
+	virtual float decode(float * encFrame, int encNumChannels, int speakerNum);	// is this useful?
 
 	static float flavorWeights[4][5][5];
+};
+
+
+/// Higher Order Ambisonic Decoding class
+///
+/// @ingroup allocore
+class AmbiDecode : public AmbiDecodeBase {
+public:
+
+	/// @param[in] dim			number of spatial dimensions (2 or 3)
+	/// @param[in] order		highest spherical harmonic order
+	/// @param[in] numSpeakers	number of speakers
+	/// @param[in] flavor		decoding algorithm
+	AmbiDecode(int dim, int order, int numSpeakers, int flavor=1);
+
+	virtual ~AmbiDecode();
+
+
+	/// @param[out] dec				output time domain buffers (non-interleaved)
+	/// @param[in ] enc				input Ambisonic domain buffers (non-interleaved)
+	/// @param[in ] numDecFrames	number of frames in time domain buffers
+	virtual void decode(float * dec, const float * enc, int numDecFrames) const;
+
 };
 
 
@@ -279,10 +295,11 @@ public:
 /// Ambisonic coder
 ///
 /// @ingroup allocore
-class AmbisonicsSpatializer : public Spatializer {
+template<typename AmbiDecode = AmbiDecode>
+class AmbisonicsBaseSpatializer : public Spatializer {
 public:
 
-	AmbisonicsSpatializer(SpeakerLayout &sl, int dim, int order, int flavor=1);
+	AmbisonicsBaseSpatializer(SpeakerLayout &sl, int dim, int order, int flavor=1);
 
 	void zeroAmbi();
 
@@ -306,7 +323,7 @@ public:
 
 	void finalize(AudioIOData& io);
 
-private:
+protected:
 	AmbiDecode mDecoder;
 	AmbiEncode mEncoder;
 	std::vector<float> mAmbiDomainChannels;
@@ -314,7 +331,12 @@ private:
 	int mNumFrames;
 };
 
-
+class AmbisonicsSpatializer : public AmbisonicsBaseSpatializer<>
+{
+public:
+	AmbisonicsSpatializer(SpeakerLayout &sl, int dim, int order, int flavor=1)
+	    :AmbisonicsBaseSpatializer(sl, dim, order, flavor) {}
+};
 
 
 // Implementation ______________________________________________________________
@@ -377,7 +399,7 @@ void AmbiBase::resize(T *& a, int n){
 
 // AmbiDecode
 
-inline float AmbiDecode::decode(float * encFrame, int encNumChannels, int speakerNum){
+inline float AmbiDecodeBase::decode(float * encFrame, int encNumChannels, int speakerNum){
 	float smp = 0;
 	float * dec = mDecodeMatrix + speakerNum * channels();
 	float * wc = mWeights;
@@ -458,11 +480,13 @@ void AmbiEncode::encode(float * ambiChans, const XYZ * dir, const float * input,
 }
 
 
-inline float * AmbisonicsSpatializer::ambiChans(unsigned channel) {
+template<typename AmbiDecode>
+inline float * AmbisonicsBaseSpatializer<AmbiDecode>::ambiChans(unsigned channel) {
 	return &mAmbiDomainChannels[channel * mNumFrames];
 }
 
-inline void AmbisonicsSpatializer::perform(
+template<typename AmbiDecode>
+inline void AmbisonicsBaseSpatializer<AmbiDecode>::perform(
 	AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample
 ){
     // compute azimuth & elevation of relative position in current listener's coordinate frame:
@@ -484,6 +508,104 @@ inline void AmbisonicsSpatializer::perform(
     //mEncoder.direction(-rf, -rr, ru);
     mEncoder.direction(-direction[2], -direction[0], direction[1]);
     mEncoder.encode(ambiChans(), numFrames, frameIndex, sample);
+}
+
+
+template <typename AmbiDecode>
+AmbisonicsBaseSpatializer<AmbiDecode>::AmbisonicsBaseSpatializer(
+	SpeakerLayout &sl, int dim, int order, int flavor
+)
+	:	Spatializer(sl), mDecoder(dim, order, sl.numSpeakers(), flavor), mEncoder(dim,order),
+	  mListener(NULL),  mNumFrames(0)
+{
+    setSpeakerLayout(sl);
+};
+
+template <typename AmbiDecode>
+void AmbisonicsBaseSpatializer<AmbiDecode>::zeroAmbi(){
+    memset(ambiChans(), 0, mAmbiDomainChannels.size()*sizeof(ambiChans()[0]));
+}
+
+template <typename AmbiDecode>
+void AmbisonicsBaseSpatializer<AmbiDecode>::compile(Listener& l){
+    mListener = &l;
+}
+
+template <typename AmbiDecode>
+void AmbisonicsBaseSpatializer<AmbiDecode>::numFrames(int v){
+    mNumFrames = v;
+
+    if(mAmbiDomainChannels.size() != (unsigned long)(mDecoder.channels() * v)){
+		mAmbiDomainChannels.resize(mDecoder.channels() * v);
+	}
+}
+
+template <typename AmbiDecode>
+void AmbisonicsBaseSpatializer<AmbiDecode>::numSpeakers(int num){
+    mDecoder.numSpeakers(num);
+}
+
+template <typename AmbiDecode>
+void AmbisonicsBaseSpatializer<AmbiDecode>::setSpeakerLayout(const SpeakerLayout& sl){
+	mDecoder.setSpeakers(&mSpeakers);
+
+	mSpeakers.clear();
+	unsigned numSpeakers = sl.speakers().size();
+	for(unsigned i=0;i<numSpeakers;++i){
+		mSpeakers.push_back(sl.speakers()[i]);
+
+        mDecoder.setSpeakerRadians(
+			i,
+			mSpeakers[i].deviceChannel,
+			mSpeakers[i].azimuth,
+			mSpeakers[i].elevation,
+			mSpeakers[i].gain
+		);
+	}
+}
+
+template <typename AmbiDecode>
+void AmbisonicsBaseSpatializer<AmbiDecode>::prepare(){
+    zeroAmbi();
+}
+
+template <typename AmbiDecode>
+void AmbisonicsBaseSpatializer<AmbiDecode>::perform(
+	AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples
+){
+	// compute azimuth & elevation of relative position in current listener's coordinate frame:
+	Vec3d urel(relpos);
+	urel.normalize();	// unit vector in axis listener->source
+
+	/* project into listener's coordinate frame:
+	Vec3d axis;
+	l.mQuatHistory[i].toVectorX(axis);
+	double rr = urel.dot(axis);
+	l.mQuatHistory[i].toVectorY(axis);
+	double ru = urel.dot(axis);
+	l.mQuatHistory[i].toVectorZ(axis);
+	double rf = urel.dot(axis);
+	//*/
+
+	for(int i = 0; i < numFrames; i++){
+		// cheaper:
+		Vec3d direction = mListener->quatHistory()[i].rotateTransposed(urel);
+
+		//mEncoder.direction(azimuth, elevation);
+		//mEncoder.direction(-rf, -rr, ru);
+		mEncoder.direction(-direction[2], -direction[0], direction[1]);
+		mEncoder.encode(ambiChans(), numFrames, i, samples[i]);
+	}
+}
+
+template <typename AmbiDecode>
+void AmbisonicsBaseSpatializer<AmbiDecode>::finalize(AudioIOData& io){
+	//previously done in render method of audioscene
+
+	float *outs = &io.out(0,0);//io.outBuffer();
+	int numFrames = io.framesPerBuffer();
+
+	mDecoder.decode(outs, ambiChans(), numFrames);
 }
 
 
