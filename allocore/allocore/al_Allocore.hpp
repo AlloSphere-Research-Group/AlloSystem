@@ -88,6 +88,7 @@
 #include "allocore/system/al_Info.hpp"
 #include "allocore/system/al_MainLoop.hpp"
 #include "allocore/system/al_Printing.hpp"
+#include "allocore/system/al_Parameter.hpp"
 #include "allocore/system/al_Thread.hpp"
 #include "allocore/system/al_Time.hpp"
 #include "allocore/types/al_Buffer.hpp"
