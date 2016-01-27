@@ -229,7 +229,6 @@ void MeshVBO::unbind(){
 ////////////////////////////////////////////////////////////////////////////////
 // Clear
 void MeshVBO::clear(){
-  unbind();
   mVertId = 0;
   mNormalId = 0;
   mColorId = 0;
