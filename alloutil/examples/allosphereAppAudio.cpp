@@ -1,5 +1,5 @@
 
-#include "alloutil/al_AllosphereApp.hpp"
+#include "alloutil/al_AlloSphereApp.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
 
 // This exmaple shows how to use the AlloSphereApp and companion classes to

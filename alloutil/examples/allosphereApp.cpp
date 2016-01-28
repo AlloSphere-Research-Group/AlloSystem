@@ -1,5 +1,5 @@
 
-#include "alloutil/al_AllosphereApp.hpp"
+#include "alloutil/al_AlloSphereApp.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
 #include <atomic>
 
