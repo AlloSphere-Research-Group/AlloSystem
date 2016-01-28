@@ -121,9 +121,9 @@ public:
 	// glPushAttrib deprecated in GL4
 	// current usage: glClearBuffer
 	enum AttributeBit {
-		COLOR_BUFFER_BIT   = GL_COLOR,
-		DEPTH_BUFFER_BIT   = GL_DEPTH,
-		STENCIL_BUFFER_BIT = GL_STENCIL
+		COLOR_BUFFER_BIT   = GL_COLOR_BUFFER_BIT,
+		DEPTH_BUFFER_BIT   = GL_DEPTH_BUFFER_BIT,
+		STENCIL_BUFFER_BIT = GL_STENCIL_BUFFER_BIT
 	};
 
 	enum BlendFunc {
@@ -342,7 +342,10 @@ public:
 
 
 	/// Clear frame buffer(s)
-	void clear(AttributeBit bits);
+	// void clear(AttributeBit bits);
+	// should receive enum AttributBits, but if bitwise operation is done
+	// on arguments it gives error unless the parameter is declared as <int>
+	void clear(int bits);
 
 	/// Set clear color
 	void clearColor(float r, float g, float b, float a);
@@ -580,7 +583,8 @@ public:
 
 // glClearBufferfv(GL_COLOR, 0, red);
 
-inline void Graphics::clear(AttributeBit bits){ glClear(bits); }
+// inline void Graphics::clear(AttributeBit bits){ glClear(bits); }
+inline void Graphics::clear(int bits){ glClear(bits); }
 inline void Graphics::clearColor(float r, float g, float b, float a){ glClearColor(r, g, b, a); }
 inline void Graphics::clearColor(const Color& c) { clearColor(c.r, c.g, c.b, c.a); }
 

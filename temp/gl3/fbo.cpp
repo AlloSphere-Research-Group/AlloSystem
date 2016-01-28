@@ -34,8 +34,9 @@ struct MyWindow : Window{
 	bool onCreate(){
 
 		// both depth and color attachees must be valid on the GPU before use:
+
+		// resize calls bind, bind calls validate, validate calls onCreate
 		rbo.resize(w, h);
-		//fbotex.filterMin(Texture::LINEAR_MIPMAP_LINEAR);
 		fbotex.validate();
 
 		fbo.attachRBO(rbo, FBO::DEPTH_ATTACHMENT);
@@ -49,20 +50,20 @@ struct MyWindow : Window{
 
 		fbo.begin();
 
-			// capture green-world to texture:
+		// 	// capture green-world to texture:
 			gl.viewport(0, 0, fbotex.width(), fbotex.height());
 			gl.clearColor(0, 0.5, 0, 0);
-			gl.clear((Graphics::AttributeBit)(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT));
+			gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
 
-			// gl.projection(Matrix4d::perspective(45, 1, 0.1, 10));
-			// gl.modelView(Matrix4d::identity());
+		// 	// gl.projection(Matrix4d::perspective(45, 1, 0.1, 10));
+		// 	// gl.modelView(Matrix4d::identity());
 
-			// gl.begin(gl.TRIANGLES);
-			// gl.color(1, 1, 0);
-			// 	gl.vertex(rng.uniformS()*0.5, rng.uniformS()*0.5, -5);
-			// 	gl.vertex(rng.uniformS()*0.5, rng.uniformS()*0.5, -5);
-			// 	gl.vertex(rng.uniformS()*0.5, rng.uniformS()*0.5, -5);
-			// gl.end();
+		// 	// gl.begin(gl.TRIANGLES);
+		// 	// gl.color(1, 1, 0);
+		// 	// 	gl.vertex(rng.uniformS()*0.5, rng.uniformS()*0.5, -5);
+		// 	// 	gl.vertex(rng.uniformS()*0.5, rng.uniformS()*0.5, -5);
+		// 	// 	gl.vertex(rng.uniformS()*0.5, rng.uniformS()*0.5, -5);
+		// 	// gl.end();
 
 		fbo.end();
 
@@ -71,13 +72,22 @@ struct MyWindow : Window{
 		//fbotex.generateMipmap();
 
 		// show in blue-world:
-		gl.viewport(0, 0, width(), height());
+
+		/* Do not pass the window size to glViewport or
+		other pixel-based OpenGL calls. The window size is
+		in screen coordinates, not pixels. Use the framebuffer size,
+		which is in pixels, for pixel-based calls. */
+		gl.viewport(0, 0, fbWidth(), fbHeight());
 		gl.clearColor(0, 0, 0.5, 0);
-		gl.clear((Graphics::AttributeBit)(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT));
+		gl.clear(Graphics::COLOR_BUFFER_BIT | Graphics::DEPTH_BUFFER_BIT);
 
 		// gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
 		// gl.modelView(Matrix4d::identity());
 		// fbotex.quad(gl, 0.8, 0.8, 0.1, 0.1);
+		// static const GLfloat red[] = {1.0, 0.0, 0.0, 1.0};
+		// glClearBufferfv(GL_COLOR, 0, red);
+		// glClearColor(1.0, 0.0, 0.0, 1.0);
+		// glClear(GL_COLOR_BUFFER_BIT);
 
 		return true;
 	}

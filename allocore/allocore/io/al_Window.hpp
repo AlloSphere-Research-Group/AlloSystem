@@ -354,6 +354,12 @@ public:
 	int height() const { return mDim.h; } ///< Get window height, in pixels
 	int width() const { return mDim.w; } ///< Get window width, in pixels
 
+	// get frambuffer size
+	// it will be different from window widht and height
+	// if the display is a high resolution one (ex: RETINA display)
+	int fbHeight() const { return int(mDim.h * HIGHRES_FACTOR_H); };
+	int fbWidth() const { return int(mDim.w * HIGHRES_FACTOR_W); };
+
 	Window& cursor(Cursor v);			///< Set cursor type
 	Window& cursorHide(bool v);			///< Set cursor hiding
 	Window& cursorHideToggle();			///< Toggle cursor hiding
@@ -445,6 +451,10 @@ protected:
 	bool mFullScreen;
 	bool mVisible;
 	bool mVSync;
+
+	// for high pixel density monitors (RETINA, etc.)
+	float HIGHRES_FACTOR_H = 1;
+	float HIGHRES_FACTOR_W = 1;
 
 	// Must be defined in pimpl-specific file
 	void implCtor();

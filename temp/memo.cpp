@@ -34,3 +34,5 @@ Window& Window::show();
 // extension related functions needs to be updated
 
 // EasyFBO yet included
+
+// MAKE RETINA WORK!!!!!!!!!!!

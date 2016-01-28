@@ -146,6 +146,9 @@ void Graphics::antialiasing(AntiAliasMode v){
 // 	glFogfv(GL_FOG_COLOR, fogColor);
 // }
 
+/* Do not pass the window size to glViewport or other pixel-based OpenGL calls.
+The window size is in screen coordinates, not pixels. Use the framebuffer size,
+which is in pixels, for pixel-based calls. */
 void Graphics::viewport(int x, int y, int width, int height) {
 	glViewport(x, y, width, height);
 	enable(SCISSOR_TEST);

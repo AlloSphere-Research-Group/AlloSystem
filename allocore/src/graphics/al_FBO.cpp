@@ -8,15 +8,13 @@ RBO::RBO(Graphics::Format format)
 
 void RBO::onCreate(){
 	GLuint i;
-	// glGenRenderbuffersEXT(1,&i);
-	glGenRenderbuffers(1,&i); // not verified yet
+	glGenRenderbuffers(1,&i);
 	mID=i;
 }
 
 void RBO::onDestroy(){
 	GLuint i=id();
-	// glDeleteRenderbuffersEXT(1,&i);
-	glDeleteRenderbuffers(1,&i); // no tverified yet
+	glDeleteRenderbuffers(1,&i);
 }
 
 Graphics::Format RBO::format() const { return mFormat; }
@@ -109,14 +107,17 @@ const char * FBO::statusString(){ return statusString(status()); }
 const char * FBO::statusString(GLenum stat){
 	#define CS(v) case v: return #v;
 	switch(stat){
-	// CS(GL_FRAMEBUFFER_COMPLETE_EXT)
-	// CS(GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT)
-	// CS(GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT)
-	// CS(GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT)
-	// CS(GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT)
-	// CS(GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT)
-	// CS(GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT)
-	// CS(GL_FRAMEBUFFER_UNSUPPORTED_EXT)
+	CS(GL_FRAMEBUFFER_COMPLETE)
+	CS(GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT)
+	CS(GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT)
+	// CS(GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS)
+	// CS(GL_FRAMEBUFFER_INCOMPLETE_FORMATS)
+	CS(GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER)
+	CS(GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER)
+	CS(GL_FRAMEBUFFER_UNSUPPORTED)
+	CS(GL_FRAMEBUFFER_UNDEFINED)
+	CS(GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE)
+	CS(GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS)
 	default: return "GL_FRAMEBUFFER_UNKNOWN";
 	};
 }

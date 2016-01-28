@@ -369,9 +369,9 @@ bool Window::implCreate(){
 
 	int w = mDim.w;
 	int h = mDim.h;
-	mDim.w = 0;
-	mDim.h = 0;
-	mImpl->mDimPrev.set(0,0,0,0);
+	// mDim.w = 0;
+	// mDim.h = 0;
+	// mImpl->mDimPrev.set(0,0,0,0);
 
 	glfwDefaultWindowHints();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -395,14 +395,20 @@ bool Window::implCreate(){
   char* glsl_version = (char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
   std::cout << "glsl version: " << glsl_version << std::endl;
 
+  int fbw, fbh;
+	glfwGetFramebufferSize(mImpl->mGLFWwindow, &fbw, &fbh);
+	HIGHRES_FACTOR_W = fbw / float(w);
+	HIGHRES_FACTOR_H = fbh / float(h);
+	std::cout << "highres factor: " << HIGHRES_FACTOR_W << ", " << HIGHRES_FACTOR_H << std::endl;
+
   Main::get().interval(spf());
 	Main::get().add(*mImpl);
 
 	mImpl->registerCBs();
 	WindowImpl::windows()[mImpl->mGLFWwindow] = mImpl;
 
-	AL_GRAPHICS_INIT_CONTEXT; // init glew (do we really need this?)
-	vsync(mVSync); // what was this?
+	AL_GRAPHICS_INIT_CONTEXT; // init glew
+	vsync(mVSync);
 
 	callHandlersOnCreate();
 
