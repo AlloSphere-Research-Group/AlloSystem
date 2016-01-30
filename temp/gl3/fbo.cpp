@@ -83,11 +83,7 @@ struct MyWindow : Window{
 
 		// gl.projection(Matrix4d::ortho(0, 1, 1, 0, -1, 1));
 		// gl.modelView(Matrix4d::identity());
-		// fbotex.quad(gl, 0.8, 0.8, 0.1, 0.1);
-		// static const GLfloat red[] = {1.0, 0.0, 0.0, 1.0};
-		// glClearBufferfv(GL_COLOR, 0, red);
-		// glClearColor(1.0, 0.0, 0.0, 1.0);
-		// glClear(GL_COLOR_BUFFER_BIT);
+		fbotex.quad(gl, 0.8, 0.8, 0.1, 0.1);
 
 		return true;
 	}

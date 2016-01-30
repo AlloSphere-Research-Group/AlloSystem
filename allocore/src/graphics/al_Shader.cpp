@@ -166,7 +166,7 @@ ShaderProgram& ShaderProgram::attach(Shader& s){
 	validate();
 	s.compile();
 	// glAttachObjectARB((GLhandleARB)id(), (GLhandleARB)s.id());
-	//glAttachShader(id(), s.id());
+	glAttachShader(id(), s.id());
 
 	// TODO: check for geometry shader extensions
 //#ifdef GL_EXT_geometry_shader4

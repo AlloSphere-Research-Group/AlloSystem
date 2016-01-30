@@ -232,18 +232,18 @@ void Texture :: bind(int unit) {
 	if(tryBind()){
 		AL_GRAPHICS_ERROR("binding texture", id());
 
-		glEnable(target());
+		// glEnable(target());
 			AL_GRAPHICS_ERROR("enable target binding texture", id());
 
 		shapeFromArray();
 
-		// Synchronize client texture state with GPU
+	// 	// Synchronize client texture state with GPU
 		sendShape(false);
 
 		sendParams(false);
-			//AL_GRAPHICS_ERROR("sendparams binding texture", id());
+	// 		//AL_GRAPHICS_ERROR("sendparams binding texture", id());
 		sendPixels(false);
-			//AL_GRAPHICS_ERROR("sendpixels binding texture", id());
+	// 		//AL_GRAPHICS_ERROR("sendpixels binding texture", id());
 	}
 }
 
@@ -251,7 +251,7 @@ void Texture :: unbind(int unit) {
 	// multitexturing:
 	glActiveTexture(GL_TEXTURE0 + unit);
 	glBindTexture(target(), 0);
-	glDisable(target());
+	// glDisable(target());
 }
 
 void Texture :: resetArray(unsigned align) {
