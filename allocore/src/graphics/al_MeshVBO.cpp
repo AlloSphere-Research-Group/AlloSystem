@@ -176,6 +176,10 @@ void MeshVBO::updateData(const T *src, uint32_t *bufferId, int total, int buffer
 ////////////////////////////////////////////////////////////////////////////////
 // Bind buffers and get pointers
 void MeshVBO::bind(){
+  if (vertices().size() && !mAllocated) {
+    allocate();
+  }
+
   glBindBuffer(GL_ARRAY_BUFFER, mVertId);
   glEnableClientState(GL_VERTEX_ARRAY);
   glVertexPointer(3, GL_FLOAT, mVertStride, 0);
@@ -229,7 +233,6 @@ void MeshVBO::unbind(){
 ////////////////////////////////////////////////////////////////////////////////
 // Clear
 void MeshVBO::clear(){
-  unbind();
   mVertId = 0;
   mNormalId = 0;
   mColorId = 0;
