@@ -20,6 +20,7 @@ import tkFileDialog
 class Project():
     def __init__(self, log_func):
         self.use_installed_libs = False
+        self.clone_as_submodules = False
         self.dependencies = {}
         self.dependencies['GLV'] = True
         self.dependencies['Cuttlebone'] = True
@@ -69,19 +70,28 @@ class Project():
             script_text += 'wget -N https://raw.githubusercontent.com/AlloSphere-Research-Group/AlloProject/master/cmake_modules/%s\n'%module
         
         script_text += '\ncd ..\n'
+        
+        if self.clone_as_submodules:
+            repo_clone_cmd = 'git submodule add --depth 1 '   
+        else:
+            repo_clone_cmd = 'git clone -b devel --depth 1 '
+        
         if not self.use_installed_libs:
-            script_text += 'git clone -b devel --depth 1 https://github.com/AlloSphere-Research-Group/AlloSystem.git AlloSystem\n'
+            script_text += repo_clone_cmd + 'https://github.com/AlloSphere-Research-Group/AlloSystem.git AlloSystem\n'
             if self.dependencies['Cuttlebone']:
-                script_text += 'git clone --depth 1 https://github.com/rbtsx/cuttlebone.git cuttlebone\n'
+                script_text += repo_clone_cmd + 'https://github.com/rbtsx/cuttlebone.git cuttlebone\n'
             if self.dependencies['Gamma']:
-                script_text += 'git clone --depth 1 https://github.com/AlloSphere-Research-Group/Gamma.git Gamma\n'
+                script_text += repo_clone_cmd + 'https://github.com/AlloSphere-Research-Group/Gamma.git Gamma\n'
             if self.dependencies['GLV']:
-                script_text += 'git clone --depth 1 https://github.com/AlloSphere-Research-Group/GLV.git GLV\n'
+                script_text += repo_clone_cmd + 'https://github.com/AlloSphere-Research-Group/GLV.git GLV\n'
         
         script_text += '''git fat init
 git fat pull
 '''
-        
+        if self.clone_as_submodules:
+            script_text += '''git submodule init
+git submodule update
+'''
         curpath = os.getcwd()
         os.chdir(self.dir + '/' + self.project_name)
         f = open('initproject.sh', 'w')
@@ -154,18 +164,24 @@ class Application(tk.Frame):
         self.dir_label.grid(row=4, column=0)
 
         self.libs_button_value = tk.IntVar()
-        self.use_installed_libs = tk.Radiobutton(self.lib_frame,
+        self.use_installed_libs_button = tk.Radiobutton(self.lib_frame,
                                                  text='Use installed libs',
                                                  variable=self.libs_button_value,
                                                  value=1,
                                                  command=self.set_libs_status)
-        self.use_installed_libs.grid(row=5, column=0)
-        self.get_libs = tk.Radiobutton(self.lib_frame,
+        self.use_installed_libs_button.grid(row=5, column=0)
+        self.get_libs_button = tk.Radiobutton(self.lib_frame,
                                        text='Download library sources',
                                        variable=self.libs_button_value,
                                        value = 0,
                                        command=self.set_libs_status)
-        self.get_libs.grid(row=6, column=0)
+        self.get_libs_button.grid(row=6, column=0)
+        self.get_submodules_button = tk.Radiobutton(self.lib_frame,
+                                       text='Download as submodules',
+                                       variable=self.libs_button_value,
+                                       value = 2,
+                                       command=self.set_libs_status)
+        self.get_submodules_button.grid(row=7, column=0)
         
         
         self.addlib_frame = tk.Frame(self)
@@ -227,9 +243,17 @@ class Application(tk.Frame):
             
         elif self.libs_button_value.get() == 1:
             self.project.use_installed_libs = True
+            self.project.clone_as_submodules = False
             self.lib_label.grid_remove()
             for lib in self.libs:
                 lib.grid_remove()
+            
+        elif self.libs_button_value.get() == 2:
+            self.project.use_installed_libs = False
+            self.project.clone_as_submodules = True
+            self.lib_label.grid()
+            for lib in self.libs:
+                lib.grid()
         
     def make_project(self):
         name = self.project_name.get()
