@@ -8,7 +8,7 @@
 using namespace al;
 using namespace std;
 
-static const char * vLight = R"(
+static const char * vert = R"(
 #version 410
 
 in vec3 pos;
@@ -26,7 +26,7 @@ void main(){
 }
 )";
 
-static const char * fLight = R"(
+static const char * frag = R"(
 #version 410
 
 out vec4 frag_color;
@@ -44,7 +44,7 @@ struct MyWindow : Window {
 	GLuint vao;
 
 	bool onCreate() {
-		shader.compile(vLight, fLight);
+		shader.compile(vert, frag);
 
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
