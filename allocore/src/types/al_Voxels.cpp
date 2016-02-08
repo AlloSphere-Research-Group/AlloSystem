@@ -246,4 +246,171 @@ void Voxels::print(FILE * fp) {
   fprintf(fp,"  cell:   %s, %s, %s\n", printVoxWidth(0).c_str(), printVoxWidth(1).c_str(), printVoxWidth(2).c_str());
 }
 
+bool Voxels::getdir(std::string dir, vector<std::string> &files) {
+    DIR *dp;
+    struct dirent * dirp;
+    if((dp = opendir(dir.c_str())) == NULL)	{
+      //cout << "Error(" << errno << ") opening " << dir << endl;
+      return false;
+    }
+    while((dirp = readdir(dp)) != NULL) {
+      char *name = dirp->d_name;
+      if (strcmp(name, ".") && strcmp(name, "..") && strcmp(name, "info.txt") && strcmp(name, ".DS_Store")) {
+      	cout << name << endl;
+      	files.push_back(dir + "/" + string(name));
+      }
+    }
+    closedir(dp);
+    return true;
+  }
+  
+    
+bool Voxels::parseInfo(std::string dir, vector<std::string> &data) {
+    string file = dir + "/info.txt";
+    cout << file << endl;
+    ifstream infile(file.c_str());
+    if (!infile.good())
+      return false; // exit if file not found
+
+    string strOneLine;
+
+    while (infile)
+    {
+      getline(infile, strOneLine);
+      if (strOneLine.length() > 0){
+      	data.push_back(strOneLine.substr(strOneLine.find(":")+2,strOneLine.length()));
+      }
+    }
+
+    infile.close();
+
+    return true;
+  }
+
+/*
+   sliceassembler
+
+   Voxel data import aka slice assembler aka volume reconstructor 
+
+   by Matt Wright, April 2015
+   and Hannah Wolfe, July 2015
+
+   based on tiExporter.cpp from images2raw.cpp by Coby Kaufer
+   <cobykaufer@bluejayke.com>, Karl Yerkes <karl.yerkes@gmail.com>,
+   and Matt Wright <matt@create.ucsb.edu
+
+   Read in a directory full of 2D image files with some naming
+   convention, assemble them all into an al::Array or al::Voxels
+   and write the result as one huge fast-to-load raw binary data file.
+
+
+   Limitations:
+
+   - Images must contain 8-bit RGB pixels
+
+   - Ignores all but the red channel
+
+   - Chokes if directory contains anything besides "info.txt" and image files
+
+   - Creates a voxel from the data
+*/
+
+bool Voxels::loadFromDirectory(std::string dir) {
+  
+    vector<string> files;
+    vector<string> info;
+
+    // Image and Texture handle reading and displaying image files.
+    Image RGBImage; // for reading into
+    
+    if (!getdir(dir,files)) {
+      cout << "Problem reading directory " << dir << endl;
+      return false;
+    }
+
+    if (files.size() == 0) {
+      cout << "Read zero files from directory " << dir << endl;
+      return false;
+    }
+
+    cout << "Judging by " << dir << " there are " << files.size() << " images (or at least files)" << endl;
+
+
+    // Try reading the first one just to get the size
+    if (!RGBImage.load(files[0])) {
+      cout << "Couldn't read file " << files[0] << endl;
+      return false;
+    }
+
+    int nx = RGBImage.width();
+    int ny = RGBImage.height();
+    int nz = files.size();
+    float vx = 1.;
+    float vy = 1.;
+    float vz = 1.;
+    float type = VOX_NANOMETERS;
+
+    if (!parseInfo(dir,info)) {
+      if (info.size() == 4) {
+      	type = atoi(info[0].c_str());
+      	vx = atof(info[1].c_str());
+      	vy = atof(info[2].c_str());
+      	vz = atof(info[3].c_str());
+      	cout << "imported values from info.txt: " << type << ", " << vx << ", " << vy << ", " << vz << endl;
+      } else {
+      	cout << info.size() << " info.txt doesn't have enough info, using default data" << endl;
+      }
+    } else {
+      cout << "no info.txt, using default data" << endl;
+    }
+
+    cout << "Judging by " << files[0] << " each image should be " << nx << " by " << ny << endl;
+
+    // For now assume 8-bit with 1 nm cube voxels
+    format(1, AlloUInt8Ty, nx, ny, nz);
+    init(vx,vy,vz,type);
+
+
+    // Iterate through entire directory
+    int slice = 0;
+    for (vector<string>::iterator it = files.begin(); it != files.end(); ++it, ++slice) {
+      string &filename = *it;
+
+      if (RGBImage.load(filename)) {
+      	cout << "loaded " << filename << 
+      	  " (" << slice+1 << " of " << files.size() << ")" << endl;
+      } else {
+      	cout << "Failed to read image from " << filename << endl;
+      	return false;
+      }
+
+      // Verify XY resolution
+      if (int(RGBImage.width()) != nx || int(RGBImage.height()) != ny) {
+      	cout << "Error:  resolution mismatch!" << endl;
+      	cout << "   " << files[0] << ": " << nx << " by " << ny << endl;
+      	cout << "   " << filename << ": " << RGBImage.width() << " by " << RGBImage.height() << endl;
+      	return false;
+      }
+	
+
+      // Access the read-in image data
+      Array& array(RGBImage.array());
+      
+      // For now assume 8-bit RGBA
+      Image::RGBAPix<uint8_t> pixel;
+
+      // Copy it out pixel-by-pixel:
+      for (size_t row = 0; row < array.height(); ++row) {
+      	for (size_t col = 0; col < array.width(); ++col) {
+      	  array.read(&pixel, col, row);
+
+      	  // For now we'll take only the red and put it in the single component; that's lame.
+      	  elem<char>(0, col, row, slice) = (char) pixel.r;
+      	}
+      }
+    }
+    return true;
+  }
+
+ 
 }
