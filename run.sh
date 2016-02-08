@@ -85,11 +85,18 @@ fi
 
 FLAGS="$TARGET_FLAG $DBUILD_FLAG $ALLOSPHERE_APP_FLAG"
 
+if [ ! -d "build" ]; then
+  mkdir build
+fi
+
+cd build
+
+
 # GENERATOR_FLAG needs to be separated out in order to be parsed as a commandline flag with an argument with a space in it.
 if [ -n "$debugger" ]; then
-  cmake "$GENERATOR_FLAG" $FLAGS -DRUN_IN_DEBUGGER=1 "-DALLOSYSTEM_DEBUGGER=${debugger}" -DCMAKE_BUILD_TYPE=Debug . > cmake_log.txt
+  cmake "$GENERATOR_FLAG" $FLAGS -DRUN_IN_DEBUGGER=1 "-DALLOSYSTEM_DEBUGGER=${debugger}" -DCMAKE_BUILD_TYPE=Debug .. > cmake_log.txt
 else
-  cmake "$GENERATOR_FLAG" $FLAGS -DRUN_IN_DEBUGGER=0 -DCMAKE_BUILD_TYPE=Release -Wno-dev . > cmake_log.txt
+  cmake "$GENERATOR_FLAG" $FLAGS -DRUN_IN_DEBUGGER=0 -DCMAKE_BUILD_TYPE=Release -Wno-dev .. > cmake_log.txt
 fi
 
 make $VERBOSE $TARGET -j$PROC_FLAG $*
