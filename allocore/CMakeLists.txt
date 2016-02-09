@@ -32,10 +32,10 @@ list(APPEND ALLOCORE_HEADERS
     allocore/graphics/al_Shapes.hpp
     allocore/graphics/al_Image.hpp
     allocore/graphics/al_EasyFBO.hpp
-	allocore/io/al_AudioIOData.hpp
+  	allocore/io/al_AudioIOData.hpp
     allocore/io/al_HID.hpp
     allocore/io/al_MIDI.hpp
-	allocore/io/al_Serial.hpp
+  	allocore/io/al_Serial.hpp
     allocore/math/al_Analysis.hpp
     allocore/math/al_Complex.hpp
     allocore/math/al_Constants.hpp
@@ -73,6 +73,11 @@ list(APPEND ALLOCORE_HEADERS
     allocore/types/al_MsgTube.hpp
     allocore/types/al_SingleRWRingBuffer.hpp
     allocore/types/al_Voxels.hpp
+    allocore/ui/al_Gnomon.hpp
+    allocore/ui/al_BoundingBox.hpp
+    allocore/ui/al_Pickable.hpp
+    allocore/ui/al_TranslateHandle.hpp
+    allocore/ui/al_RotateHandle.hpp
 )
 
 set(ALLOCORE_DUMMY_HEADERS "")
