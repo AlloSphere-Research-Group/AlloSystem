@@ -1,7 +1,5 @@
-ALLOSYSTEM DEVELOPMENT NOTES
-===========================================================================
 
-1 CODING STYLE
+ALLOSYSTEM CODING STYLE
 ===========================================================================
 
 1.1 File Naming
@@ -178,4 +176,5 @@ external
 
 * Consider porting to C++11
 ** Consider porting to C++17
+
 
