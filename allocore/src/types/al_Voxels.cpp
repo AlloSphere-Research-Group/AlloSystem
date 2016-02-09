@@ -518,7 +518,7 @@ Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal){
   Array result = Array();// XXX
   
   if (P.size() > 1){
-    Vec2f p2D[P.size()];
+    Vec2f *p2D = new Vec2f[P.size()];
     p2D[0] = Vec2f(0,0);
     float x = sqrt(pow(P[1].x-P[0].x,2.0)+pow(P[1].y-P[0].y,2.0)+pow(P[1].z-P[0].z,2.0));
     std::cout << x << std::endl;
@@ -606,6 +606,7 @@ Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal){
 	}
       }
     }
+   delete [] p2D; 
   }
   else if (P.size() == 1) {
     //Intersects at one point, this is super easy!
