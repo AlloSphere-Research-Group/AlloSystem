@@ -72,11 +72,11 @@ class Project():
         script_text += '\ncd ..\n'
         
         if self.clone_as_submodules:
-            repo_clone_cmd = 'git submodule add --depth 1 '   
-        else:
+            script_text += '''git submodule init
+git submodule update --depth 100
+'''
+        elif not self.use_installed_libs:
             repo_clone_cmd = 'git clone -b devel --depth 1 '
-        
-        if not self.use_installed_libs:
             script_text += repo_clone_cmd + 'https://github.com/AlloSphere-Research-Group/AlloSystem.git AlloSystem\n'
             if self.dependencies['Cuttlebone']:
                 script_text += repo_clone_cmd + 'https://github.com/rbtsx/cuttlebone.git cuttlebone\n'
@@ -88,22 +88,42 @@ class Project():
         script_text += '''git fat init
 git fat pull
 '''
-        if self.clone_as_submodules:
-            script_text += '''git submodule init
-git submodule update
-'''
         curpath = os.getcwd()
         os.chdir(self.dir + '/' + self.project_name)
         f = open('initproject.sh', 'w')
         f.write(script_text)
         os.chmod('initproject.sh', stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+        if self.clone_as_submodules:
+            # write submodule initializing script that has to be run only once
+            submodule_script_text = '''#!/bin/sh
+git init
+git submodule add --depth 1 https://github.com/AlloSphere-Research-Group/AlloSystem.git AlloSystem
+git submodule add --depth 1 https://github.com/AlloSphere-Research-Group/GLV.git GLV
+git submodule add --depth 1 https://github.com/AlloSphere-Research-Group/Gamma.git Gamma
+git submodule add --depth 1 https://github.com/rbtsx/cuttlebone.git cuttlebone
+'''
+            f = open('initsubmodule.sh', 'w')
+            f.write(submodule_script_text)
+            os.chmod('initsubmodule.sh', stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+
         os.chdir(curpath)        
         
     def run_init_script(self):
         curpath = os.getcwd()
         os.chdir(self.dir + '/' + self.project_name)
-        p = Popen(['./initproject.sh'], stdout=PIPE, stderr=PIPE, stdin=PIPE)
+
         stdout = []
+
+        if self.clone_as_submodules:
+            p_submod = Popen(['./initsubmodule.sh'], stdout=PIPE, stderr=PIPE, stdin=PIPE)
+            while True:
+                line = p_submod.stdout.readline()
+                stdout.append(line)
+                print line,
+                if line == '' and p_submod.poll() != None:
+                    break
+
+        p = Popen(['./initproject.sh'], stdout=PIPE, stderr=PIPE, stdin=PIPE)
         while True:
             line = p.stdout.readline()
             stdout.append(line)
@@ -114,7 +134,7 @@ git submodule update
         os.chdir(curpath)
         
         return output
-    
+
 
 class Application(tk.Frame):
     def __init__(self, master=None):
