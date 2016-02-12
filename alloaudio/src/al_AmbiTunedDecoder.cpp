@@ -9,6 +9,7 @@
 #include <iterator>
 
 #include "allocore/sound/al_Ambisonics.hpp"
+#include "allocore/io/al_File.hpp"
 #include "alloaudio/al_AmbiTunedDecoder.hpp"
 
 using namespace al;
@@ -17,8 +18,17 @@ using namespace std;
 
 void AmbiTunedDecoder::setConfiguration(string configFile)
 {
-	std::ifstream file(configFile);
-	if (file) {
+	SearchPaths paths;
+	paths.addSearchPath("alloaudio/data");
+	paths.addSearchPath("../alloaudio/data");
+	string filepath = paths.find(configFile).filepath();
+	if (filepath.length() > 0) {
+		std::ifstream file(filepath);
+//		file.open(filepath, ios::in);
+		if (!file) {
+			std::cout << "ERROR: Could not OPEN ambdec configuration file: " << configFile << std::endl;
+//			return;
+		}
 		std::stringstream buffer;
 		buffer << file.rdbuf();
 		file.close();
@@ -128,7 +138,7 @@ void AmbiTunedDecoder::setConfiguration(string configFile)
 			}
 		}
 	} else {
-		std::cout << "ERROR: Could not open ambdec configuration file: " << configFile << std::endl;
+		std::cout << "ERROR: Could not find ambdec configuration file: " << configFile << std::endl;
 	}
 	mSpeakers = &mAmbisonicsConfig.mLayout.speakers();
 }

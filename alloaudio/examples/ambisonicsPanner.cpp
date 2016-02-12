@@ -86,10 +86,11 @@ int main (int argc, char * argv[]){
 	tunedListener = tunedScene.createListener(tunedPanner);
 	tunedListener->compile();
 
+	panner->print();
+	tunedPanner->print();
+
 	scene.addSource(src);
 	tunedScene.addSource(src);
-
-	panner->print();
 
 	paramServer.registerParameter(x);
 	paramServer.registerParameter(y);

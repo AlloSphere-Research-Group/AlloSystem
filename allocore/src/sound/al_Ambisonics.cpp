@@ -146,6 +146,17 @@ void AmbiBase::encodeWeightsFuMa16(float * ws, float x, float y, float z){
 	ws[15] = z * (2.5f * z2 - 1.5f);	// K = sin(E)(5sin2(E) - 3)/2 = Z(5Z2-3)/2
 }
 
+void AmbiBase::print(FILE *fp, const char *append) const
+{
+	fprintf(fp, "dim=%i order=%i\n", mDim, mOrder);
+	for (int i = 0; i < mChannels; i++) {
+		fprintf(fp, "weight %i:%f\n", i, mWeights[i]);
+	}
+	if (append) {
+		fprintf(fp, "%s", append);
+	}
+}
+
 
 void AmbiBase::encodeWeightsFuMa16(float * ws, float az, float el){
 	WRAP(az);
@@ -302,8 +313,16 @@ void AmbiDecodeBase::onChannelsChange(){
 }
 
 void AmbiDecodeBase::print(FILE * fp, const char * append) const {
-//	AmbiBase::print(stdout, ", ");
-//	fprintf(fp, "s:%3d%s", mNumSpeakers, append);
+	AmbiBase::print(stdout);
+	fprintf(fp, "speakers:%3d%s\n{\n", mNumSpeakers, append);
+	for (int spkr = 0; spkr < mSpeakers->size(); spkr++) {
+		fprintf(fp, "'Speaker %i': [ ", spkr + 1);
+		for (int chan = 0; chan < mChannels; chan++) {
+			fprintf(fp, "%.4f ,", mDecodeMatrix[chan + (spkr * chan)]);
+		}
+		fprintf(fp, " 0 ] ,\n", spkr + 1);
+	}
+	fprintf(fp, "\n}\n");
 }
 
 

@@ -147,6 +147,9 @@ public:
 	static int channelsToOrder(int channels);
 	static int channelsToDimensions(int channels);
 
+	/// Print details about dimensions, order and weights
+	void print(FILE * fp = stdout, const char * append = "\n") const;
+
 protected:
 	int mDim;			// dimensions - 2d or 3d
 	int mOrder;			// order - 0th, 1st, 2nd, or 3rd
@@ -183,6 +186,7 @@ public:
 	/// Returns number of speakers
 	int numSpeakers() const { return mNumSpeakers; }
 
+	/// Print details about decoder
 	void print(FILE * fp = stdout, const char * append = "\n") const;
 
 	/// Set decoding algorithm
@@ -322,6 +326,9 @@ public:
 	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, float *samples);
 
 	void finalize(AudioIOData& io);
+
+	/// Print information about the spatializer
+	virtual void print();
 
 protected:
 	AmbiDecode mDecoder;
@@ -606,6 +613,12 @@ void AmbisonicsBaseSpatializer<AmbiDecode>::finalize(AudioIOData& io){
 	int numFrames = io.framesPerBuffer();
 
 	mDecoder.decode(outs, ambiChans(), numFrames);
+}
+
+template <typename AmbiDecode>
+void AmbisonicsBaseSpatializer<AmbiDecode>::print()
+{
+	mDecoder.print();
 }
 
 

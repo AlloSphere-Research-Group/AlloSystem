@@ -21,7 +21,7 @@ class AmbiTunedDecoder : public AmbiDecode
 {
 public:
 	AmbiTunedDecoder(int dim = 3, int order = 3, int numSpeakers = 8, int flavor=1) :
-	    AmbiDecode(dim, order, numSpeakers, flavor) {}
+	    AmbiDecode(dim, order, numSpeakers, flavor) { setConfiguration();}
 	void setConfiguration(string configFile = "Allosphere.ambdec");
 
 private:
