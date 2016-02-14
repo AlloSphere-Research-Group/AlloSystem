@@ -226,6 +226,7 @@ private:
 	std::mutex mMeterCondMutex;
 	std::condition_variable mMeterCond;
 
+	BassManager mBassManager;
 
 	void initializeData();
 	void allocateChannels(int numChnls);

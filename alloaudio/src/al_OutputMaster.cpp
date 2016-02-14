@@ -16,7 +16,8 @@ OutputMaster::OutputMaster(int num_chnls, double sampleRate, const char *address
 	mNumChnls(num_chnls),
 	mMeterBuffer(1024 * sizeof(float)), mFramesPerSec(sampleRate),
 	osc::Recv(port, address, msg_timeout),
-	mSendAddress(sendAddress), mSendPort(sendPort)
+	mSendAddress(sendAddress), mSendPort(sendPort),
+    mBassManager(num_chnls, sampleRate)
 {
 	allocateChannels(mNumChnls);
 	initializeData();
@@ -80,17 +81,17 @@ void OutputMaster::setMeterUpdateFreq(double freq)
 
 void OutputMaster::setBassManagementFreq(double frequency)
 {
-	//FIXME put back bass manager
+	mBassManager.setBassManagementFreq(frequency);
 }
 
 void OutputMaster::setBassManagementMode(BassManager::bass_mgmt_mode_t mode)
 {
-	//FIXME put back bass manager
+	mBassManager.setBassManagementMode(mode);
 }
 
 void OutputMaster::setSwIndeces(int i1, int i2, int i3, int i4)
 {
-	// FIXME put back bass manager
+	mBassManager.setSwIndeces(i1, i2, i3, i4);
 }
 
 void OutputMaster::setMeterOn(bool meterOn)
@@ -134,6 +135,7 @@ void OutputMaster::onAudioCB(AudioIOData &io)
 			out++;
 		}
 	}
+	mBassManager.onAudioCB(io);
 
 	if (mMeterOn) {
 		for (chan = 0; chan < mNumChnls; chan++) {
@@ -272,7 +274,7 @@ void *OutputMaster::meterThreadFunc(void *arg) {
 				}
 			}
 		}
-		om->mMeterMutex.unlock();;
+		om->mMeterMutex.unlock();
 	}
 	return NULL;
 }
