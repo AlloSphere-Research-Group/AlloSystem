@@ -12,6 +12,8 @@
 #include "allocore/system/al_Parameter.hpp"
 #include "alloaudio/al_AmbiTunedDecoder.hpp"
 #include "alloutil/al_AlloSphereSpeakerLayout.hpp"
+#include "alloaudio/al_OutputMaster.hpp"
+#include "alloaudio/al_BassManager.hpp"
 
 using namespace al;
 
@@ -21,7 +23,6 @@ SpeakerLayout speakerLayout = AlloSphereSpeakerLayout();
 AmbisonicsTunedSpatializer* tunedPanner = new AmbisonicsTunedSpatializer(speakerLayout);
 AmbisonicsSpatializer* panner = new AmbisonicsSpatializer(speakerLayout, 3, 3);
 
-//AmbisonicsSpatializer* panner = new AmbisonicsSpatializer(speakerLayout, 3, 3);
 
 AudioScene scene(BLOCK_SIZE);
 Listener * listener;
@@ -98,15 +99,23 @@ int main (int argc, char * argv[]){
 
 	std::cout << x.getFullAddress() << std::endl;
 
+
 	// 10) Create an audio IO for the audio scene
 	//     Last 3 arguments are for user data, # out chans, and # in chans
 	AudioIO audioIO(BLOCK_SIZE, 44100, audioCB, NULL, 60, 0);
 
-  audioIO.device(AudioDevice(12));
+	audioIO.device(AudioDevice(12));
+
+	OutputMaster master(audioIO.channels(true), audioIO.fps(),
+	                    "", -1, // No OSC input to control output master
+		                "audio.mat.ucsb.edu", 26771
+	                    );
+
+	audioIO.append(master);
 	// Start the IO!
 	audioIO.start();
 
-  bool run = true;
+	bool run = true;
 	float azimuth = 0;
 	float elevation = 0;
 	float distance = 5;
