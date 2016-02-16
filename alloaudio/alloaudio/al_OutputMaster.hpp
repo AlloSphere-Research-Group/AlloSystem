@@ -179,7 +179,10 @@ public:
 	 * address and counts from 1.
 	 */
 	void setMeterAddrHasChannel(bool meterAddrHasChannel);
+
 	bool meterAddrHasChannel() const;
+
+	void setUseDb(bool use) {mUseDb = use;}
 
 	/** Sets the prefix for OSC messages. By default "/Alloaudio" is used. The address
 	 * prefix should be given without the trailing '/'.
@@ -221,6 +224,7 @@ private:
 	std::string mSendAddress;
 	int mSendPort;
 	int mRunMeterThread;
+	bool mUseDb;
 	al::Thread mMeterThread;
 	std::mutex mMeterMutex;
 	std::mutex mMeterCondMutex;
