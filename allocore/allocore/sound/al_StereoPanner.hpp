@@ -26,7 +26,7 @@ public:
 		numSpeakers = mSpeakers.size();
 		if(numSpeakers == 2)
 		{
-			printf("Stereo Panner Compiled with %d speakers\n", numSpeakers);
+//			printf("Stereo Panner Compiled with %d speakers\n", numSpeakers);
 		}
 		else
 			printf("Stereo Panner Requires exactly 2 speakers (%i used), no panning will occur!\n", numSpeakers);

@@ -40,12 +40,13 @@ int main (int argc, char * const argv[]) {
 
 	RUNTEST(GraphicsMesh);
 
+	RUNTEST(Ambisonics);
+
 #ifndef ALLOCORE_TESTS_NO_AUDIO
 	RUNTEST(IOAudioIO);
 	RUNTEST(AudioScene);
 #endif
 
-	RUNTEST(Ambisonics);
 	
 #ifndef ALLOCORE_TESTS_NO_GUI
 	// This test should always be run last since it calls exit()

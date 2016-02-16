@@ -108,7 +108,7 @@ int main (int argc, char * argv[]){
 
 	OutputMaster master(audioIO.channels(true), audioIO.fps(),
 	                    "", -1, // No OSC input to control output master
-		                "audio.mat.ucsb.edu", 26771
+		                "localhost", 26771
 	                    );
 
 	audioIO.append(master);

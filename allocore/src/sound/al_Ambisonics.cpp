@@ -1,4 +1,6 @@
-#include <string.h>
+#include <cstring>
+#include <iostream>
+
 #include "allocore/sound/al_Ambisonics.hpp"
 
 #ifdef USE_GAMMA
@@ -246,6 +248,25 @@ void AmbiDecodeBase::setSpeakers(Speakers *spkrs) {
 	}
 }
 
+void AmbiDecodeBase::setDecodeMatrix(Array &matrix)
+{
+	if (matrix.type() != AlloFloat32Ty) {
+		std::cout << "setDecodeMatrix ERROR: Type must be float (AlloFloat32Ty)" << std::endl;
+		return;
+	}
+	if (matrix.dim(0) != AmbiBase::orderToChannels(mDim, mOrder)) {
+		std::cout << "setDecodeMatrix ERROR: Decoding matrix must have " << AmbiBase::orderToChannels(mDim, mOrder) << " columns." << std::endl;
+		return;
+	}
+	if (matrix.dim(1) != mSpeakers->size()) {
+		std::cout << "setDecodeMatrix ERROR: Decoding matrix must have " << mSpeakers->size() << " rows." << std::endl;
+		return;
+	}
+
+	int numElements = mSpeakers->size() * AmbiBase::orderToChannels(mDim, mOrder);
+	memcpy(mDecodeMatrix, (const void *) matrix.data.ptr, numElements * sizeof(float));
+}
+
 void AmbiDecodeBase::updateChanWeights(){
 	float * wc = mWeights;
 	*wc++ = mWOrder[0];
@@ -320,7 +341,7 @@ void AmbiDecodeBase::print(FILE * fp, const char * append) const {
 		for (int chan = 0; chan < mChannels; chan++) {
 			fprintf(fp, "%.4f ,", mDecodeMatrix[chan + (spkr * chan)]);
 		}
-		fprintf(fp, " 0 ] ,\n", spkr + 1);
+		fprintf(fp, " 0 ] ,\n");
 	}
 	fprintf(fp, "\n}\n");
 }

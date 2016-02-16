@@ -49,6 +49,7 @@
 
 #include <stdio.h>
 #include "allocore/sound/al_AudioScene.hpp"
+#include "allocore/types/al_Array.hpp"
 
 //#define MAX_ORDER 3
 
@@ -166,6 +167,10 @@ protected:
 class AmbiDecodeBase : public AmbiBase {
 public:
 
+	/// @param[in] dim		number of spatial dimensions (2 or 3)
+	/// @param[in] order	highest spherical harmonic order
+	/// @param[in] numSpeakers	number of loudspeakers to decode to
+	/// @param[in] flav	decoder "flavor"
 	AmbiDecodeBase(int dim, int order, int numSpeakers, int flav)
 	    : AmbiBase(dim, order),
 	      mNumSpeakers(0), mDecodeMatrix(0), mSpeakers(NULL)
@@ -195,12 +200,22 @@ public:
 	/// Set number of speakers. Positions are zeroed upon resize.
 	void numSpeakers(int num);
 
+	/// Set an individual loudspeaker's characteristics using radians.
+	/// Automatically resizes the internal loudspeaker array when needed.
 	void setSpeakerRadians(int index, int deviceChannel, float azimuth, float elevation, float amp=1.f);
 
+	/// Set an individual loudspeaker's characteristics with angles in degrees.
+	/// Automatically resizes the internal loudspeaker array when needed.
 	void setSpeaker(int index, int deviceChannel, float azimuth, float elevation=0, float amp=1.f);
 	//void zero();					///< Zeroes out internal ambisonic frame.
 
+	/// Set the loudspeaker array
 	void setSpeakers(Speakers *spkrs);
+
+	/// Manually set the decode matrix.
+	/// Rows in the matrix (first dimension) correspond to the b-format channels
+	/// and columns (second dimension) correspond to the loudspeaker coeffiecients
+	void setDecodeMatrix(Array &matrix);
 
 	/// Get speaker
 	Speaker& speaker(int num) { return (*mSpeakers)[num]; }
