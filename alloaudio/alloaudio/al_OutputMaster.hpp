@@ -83,16 +83,21 @@ typedef enum {
 } parameter_t;
 
 
+/** \addtogroup alloaudio
+ *  @{
+ */
+
 /** Control of audio output. This class is designed to be used as the last class in the
  * audio callback, after any synthesis and spatialization.
  *
  * It can be controlled by OSC over UDP.
+ *
  */
 class OutputMaster : public osc::Recv, public al::AudioCallback
 {
     public:
     /**
-     * @brief OutputMaster
+	 * @brief OutputMaster
      * @param num_chnls number of channels that will be processed by the OutputMaster object
      * @param sampleRate the audio sampling rate
      * @param address the IP address to bind for receiving messages. For local address use "localhost"
@@ -245,6 +250,8 @@ private:
         void onMessage(osc::Message& m);
     } msghandler;
 };
+
+/** @} */
 
 } // al::
 

@@ -50,6 +50,8 @@ namespace al {
 /// An interval is a connected region of the real line. Geometrically, it
 /// describes a 0-sphere. Order is strongly enforced so that the endpoints will
 /// always satisfy min <= max.
+///
+/// @ingroup allocore
 template <class T>
 class Interval{
 public:

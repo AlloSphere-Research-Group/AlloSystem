@@ -44,10 +44,14 @@
 
 #include <cmath>
 #include <vector>
+#include "allocore/math/al_Constants.hpp"
+#include "allocore/math/al_Vec.hpp"
 
 namespace al{
 
 /// Spatial definition of a speaker in a listening space
+///
+/// @ingroup allocore
 class Speaker {
 public:
 
@@ -106,6 +110,8 @@ typedef std::vector<Speaker> Speakers;
 
 
 /// Base class for a configuration of multiple speakers
+///
+/// @ingroup allocore
 class SpeakerLayout{
 public:
 
@@ -129,6 +135,8 @@ protected:
 
 
 /// Generic layout of N speakers spaced equidistantly in a ring
+///
+/// @ingroup allocore
 template <int N>
 class SpeakerRingLayout : public SpeakerLayout{
 public:
@@ -145,6 +153,8 @@ public:
 };
 
 /// Headset speaker layout
+///
+/// @ingroup allocore
 class HeadsetSpeakerLayout : public SpeakerRingLayout<2>{
 public:
 	HeadsetSpeakerLayout(int deviceChannelStart=0, float radius=1.f, float gain=1.f)
@@ -152,8 +162,27 @@ public:
 	{}
 };
 
+/// Stereo speaker layout
+///
+/// @ingroup allocore
+class StereoSpeakerLayout : public SpeakerLayout{
+public:
+	StereoSpeakerLayout(int deviceChannelStart=0, float angle=30.f, float distance=1.f, float gain=1.f):
+		mLeft(deviceChannelStart, angle, 0, distance, gain),
+		mRight(deviceChannelStart + 1, -angle, 0, distance, gain)
+	{
+		addSpeaker(mLeft);
+		addSpeaker(mRight);
+	}
+private:
+	Speaker mLeft;
+	Speaker mRight;
+};
+
 
 /// Octophonic ring speaker layout
+///
+/// @ingroup allocore
 typedef SpeakerRingLayout<8> OctalSpeakerLayout;
 
 

@@ -49,6 +49,8 @@ namespace al{
 
 
 /// Display list for drawing static geometry
+///
+/// @ingroup allocore
 class DisplayList : public GPUObject {
 public:
 

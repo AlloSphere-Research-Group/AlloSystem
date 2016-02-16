@@ -225,8 +225,8 @@ void Message::print() const {
 
 Message& Message::resetStream(){ mImpl->args = mImpl->ArgumentStream(); return *this; }
 Message& Message::operator>> (int& v){
-	::osc::int32 r;
-	OSCTRY("Message::resetStream", (*mImpl)>>r;)
+	::osc::int32 r=0;
+	OSCTRY("Message >> int", (*mImpl)>>r;)
 	v=r;
 	return *this;
 }
@@ -247,7 +247,8 @@ Message& Message::operator>> (const char*& v){
 	return *this;
 }
 Message& Message::operator>> (std::string& v){
-	const char * r;
+	// const char * r = '\0';
+	const char * r = nullptr;
 	OSCTRY("Message >> string", (*mImpl)>>r;)
 	v=r;
 	return *this;
@@ -388,7 +389,7 @@ Recv::Recv(uint16_t port, const char * address, al_sec timeout)
 }
 
 int Recv::recv(){
-	int r;
+	int r = 0;
 #ifdef VERBOSE
         printf("Entering Recv::recv() - mBuffer = %p and mBuffer.size() = %d\n", &mBuffer[0], mBuffer.size());
 #endif

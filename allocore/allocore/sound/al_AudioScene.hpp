@@ -88,6 +88,8 @@ class SoundSource;
 
 
 /// Abstract class for all spatializers: Ambisonics, DBAP, VBAP, etc.
+///
+/// @ingroup allocore
 class Spatializer {
 public:
 
@@ -149,6 +151,8 @@ protected:
 /// This contains a "pose" to represent the position and orientation of a
 /// scene object and a buffer of previous positions that can be used to
 /// generate smooth, "zipper"-free trajectories at audio rate.
+///
+/// @ingroup allocore
 class AudioSceneObject{
 public:
 
@@ -182,6 +186,8 @@ protected:
 /// but instantiated using the createListener() function from the AudioScene
 /// class.
 /// A Listener is tied to a spatialization technique when it is created.
+///
+/// @ingroup allocore
 class Listener : public AudioSceneObject {
 public:
 
@@ -218,6 +224,8 @@ enum DopplerType{
 
 /// The attenuation policy may be different per source, i.e., because a bee has
 /// a different attenuation characteristic than an airplane.
+///
+/// @ingroup allocore
 class SoundSource : public AudioSceneObject, public DistAtten<double> {
 public:
 
@@ -232,6 +240,9 @@ public:
 		double nearClip=0.1, double farClip=20, AttenuationLaw law = ATTEN_INVERSE, DopplerType dopplerType = DOPPLER_SYMMETRICAL,
 		double farBias=0, int delaySize=100000
 	);
+
+	virtual ~SoundSource(){}
+
 
 	/// Returns whether distance-based attenuation is enabled
 	bool useAttenuation() const { return mUseAtten; }
@@ -312,6 +323,8 @@ protected:
 
 
 /// An audio scene consisting of Listeners and Sources.
+///
+/// @ingroup allocore
 class AudioScene {
 public:
 

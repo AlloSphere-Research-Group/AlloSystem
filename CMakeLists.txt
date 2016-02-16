@@ -42,6 +42,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 # Other defaults
+
 if(NOT DEFINED BUILD_GAMMA)
   set(BUILD_GAMMA 1 CACHE STRING "Try to build external Gamma")
 endif(NOT DEFINED BUILD_GAMMA)
@@ -57,6 +58,8 @@ endif(NOT DEFINED BUILD_CUTTLEBONE)
 if(NOT DEFINED BUILD_PHASESPACE)
   set(BUILD_PHASESPACE 1 CACHE STRING "Try to build external phasespace.")
 endif(NOT DEFINED BUILD_PHASESPACE)
+
+option(BUILD_ALLOCV "Build the AlloCV module (deprecated)")
 
 set(BUILD_EXAMPLES 0 CACHE STRING "Build AlloSystem examples.")
 
@@ -134,11 +137,12 @@ if(BUILDING_GLV)
 endif(BUILDING_GLV)
 
 # allocv ---------------------------------------
-
+if(BUILD_ALLOCV)
 add_subdirectory(allocv)
 set(ALLOCV_LIBRARY "allocv${DEBUG_SUFFIX}")
 get_target_property(ALLOCV_INCLUDE_DIR allocv${DEBUG_SUFFIX} ALLOCV_INCLUDE_DIR)
 get_target_property(ALLOCV_LINK_LIBRARIES allocv${DEBUG_SUFFIX} ALLOCV_LINK_LIBRARIES)
+endif(BUILD_ALLOCV)
 
 # alloaudio ----------------------------------
 add_subdirectory(alloaudio)

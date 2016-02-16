@@ -4,22 +4,42 @@
 
 namespace al{
 
+void Texture::init(){
+	wrap(Texture::CLAMP_TO_EDGE);
+	filter(Texture::LINEAR);
+	mTexelFormat = 0;
+	mShapeUpdated = true;
+	mPixelsUpdated = true;
+	mArrayDirty = false;
+}
+
+
 Texture::Texture()
 : 	mTarget(NO_TARGET),
 	mFormat(Graphics::RGBA),
-	mTexelFormat(0),
 	mType(Graphics::UBYTE),
-	mWrapS(CLAMP_TO_EDGE),
-	mWrapT(CLAMP_TO_EDGE),
-	mWrapR(CLAMP_TO_EDGE),
-	mFilterMin(LINEAR),
-	mFilterMag(LINEAR),
 	mWidth(0),
 	mHeight(0),
-	mDepth(0),
-	mParamsUpdated(true), mShapeUpdated(true),
-	mPixelsUpdated(true), mArrayDirty(false)
-{}
+	mDepth(0)
+{
+	init();
+}
+
+Texture :: Texture(
+	unsigned width,
+	Graphics::Format format, Graphics::DataType type,
+	bool alloc
+)
+:	mTarget(TEXTURE_1D),
+	mFormat(format),
+	mType(type),
+	mWidth(width),
+	mHeight(0),
+	mDepth(0)
+{
+	init();
+	if(alloc) allocate();
+}
 
 Texture :: Texture(
 	unsigned width, unsigned height,
@@ -28,19 +48,12 @@ Texture :: Texture(
 )
 :	mTarget(TEXTURE_2D),
 	mFormat(format),
-	mTexelFormat(0),
 	mType(type),
-	mWrapS(CLAMP_TO_EDGE),
-	mWrapT(CLAMP_TO_EDGE),
-	mWrapR(CLAMP_TO_EDGE),
-	mFilterMin(LINEAR),
-	mFilterMag(LINEAR),
 	mWidth(width),
 	mHeight(height),
-	mDepth(0),
-	mParamsUpdated(true), mShapeUpdated(true),
-	mPixelsUpdated(true), mArrayDirty(false)
+	mDepth(0)
 {
+	init();
 	if(alloc) allocate();
 }
 
@@ -51,38 +64,23 @@ Texture :: Texture(
 )
 :	mTarget(TEXTURE_3D),
 	mFormat(format),
-	mTexelFormat(0),
 	mType(type),
-	mWrapS(CLAMP_TO_EDGE),
-	mWrapT(CLAMP_TO_EDGE),
-	mWrapR(CLAMP_TO_EDGE),
-	mFilterMin(LINEAR),
-	mFilterMag(LINEAR),
 	mWidth(width),
 	mHeight(height),
-	mDepth(depth),
-	mParamsUpdated(true), mShapeUpdated(true),
-	mPixelsUpdated(true), mArrayDirty(false)
+	mDepth(depth)
 {
+	init();
 	if(alloc) allocate();
 }
 
 Texture :: Texture(AlloArrayHeader& header)
-:	mTexelFormat(0),
-	mWrapS(CLAMP_TO_EDGE),
-	mWrapT(CLAMP_TO_EDGE),
-	mWrapR(CLAMP_TO_EDGE),
-	mFilterMin(LINEAR),
-	mFilterMag(LINEAR),
-	mParamsUpdated(true), mShapeUpdated(true),
-	mPixelsUpdated(true), mArrayDirty(false)
 {
+	init();
 	shapeFrom(header, true /*reallocate*/);
 }
 
 Texture :: ~Texture() {
 }
-
 
 
 void Texture::onCreate(){
@@ -102,6 +100,24 @@ void Texture::onDestroy(){
 	glDeleteTextures(1, (GLuint *)&mID);
 }
 
+
+Texture& Texture::filterMin(Filter v){
+	switch(v){
+	case NEAREST_MIPMAP_NEAREST:
+	case LINEAR_MIPMAP_NEAREST:
+	case NEAREST_MIPMAP_LINEAR:
+	case LINEAR_MIPMAP_LINEAR:
+		mMipmap = true;
+		break;
+	default:
+		mMipmap = false;
+	}
+	return update(v, mFilterMin, mParamsUpdated);
+}
+
+Texture& Texture::filterMag(Filter v){
+	return update(v, mFilterMag, mParamsUpdated);
+}
 
 
 void Texture::shapeFrom(const AlloArrayHeader& hdr, bool realloc){
@@ -343,9 +359,10 @@ void Texture::sendParams(bool force){
 		glTexParameteri(target(), GL_TEXTURE_WRAP_S, mWrapS);
 		glTexParameteri(target(), GL_TEXTURE_WRAP_T, mWrapT);
 		glTexParameteri(target(), GL_TEXTURE_WRAP_R, mWrapR);
-		if (filterMin() != LINEAR && filterMin() != NEAREST) {
+		/*if (filterMin() != LINEAR && filterMin() != NEAREST) {
+			// deprecated in OpenGL 3.0 and above
 			glTexParameteri(target(), GL_GENERATE_MIPMAP, GL_TRUE); // automatic mipmap
-		}
+		}*/
 		mParamsUpdated = false;
 	}
 }
@@ -371,12 +388,15 @@ void Texture::sendPixels(const void * pixels, unsigned align){
 
 			case TEXTURE_1D:
 				glTexSubImage1D(target(), 0, 0, width(), format(), type(), pixels);
+				if(mMipmap) glGenerateMipmap(target());
 				break;
 			case TEXTURE_2D:
 				glTexSubImage2D(target(), 0, 0,0, width(), height(), format(), type(), pixels);
+				if(mMipmap) glGenerateMipmap(target());
 				break;
 			case TEXTURE_3D:
 				glTexSubImage3D(target(), 0, 0,0,0, width(), height(), depth(), format(), type(), pixels);
+				if(mMipmap) glGenerateMipmap(target());
 				break;
 			case NO_TARGET:;
 				// Unconfigured

@@ -62,6 +62,8 @@ namespace al{
 	See the /licenses folder in the source tree, or
 	http://freeimage.sourceforge.net/freeimage-license.txt
 */
+
+/// @ingroup allocore
 class Image {
 public:
 	/*!

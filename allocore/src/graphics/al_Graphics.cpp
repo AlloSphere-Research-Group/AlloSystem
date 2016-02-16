@@ -238,6 +238,7 @@ void Graphics::draw(const Mesh& v, int count, int begin){
 	const int Nc = v.colors().size();
 	const int Nci= v.coloris().size();
 	const int Nn = v.normals().size();
+	const int Nt1= v.texCoord1s().size();
 	const int Nt2= v.texCoord2s().size();
 	const int Nt3= v.texCoord3s().size();
 
@@ -273,10 +274,17 @@ void Graphics::draw(const Mesh& v, int count, int begin){
 			glColor3ubv(v.coloris()[0].components);
 	}
 
-	if(Nt2 || Nt3){
+	if(Nt1 >= Nv){
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		if(Nt2 >= Nv) glTexCoordPointer(2, GL_FLOAT, 0, &v.texCoord2s()[0]);
-		if(Nt3 >= Nv) glTexCoordPointer(3, GL_FLOAT, 0, &v.texCoord3s()[0]);
+		glTexCoordPointer(1, GL_FLOAT, 0, &v.texCoord1s()[0]);
+	}
+	else if(Nt2 >= Nv){
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glTexCoordPointer(2, GL_FLOAT, 0, &v.texCoord2s()[0]);
+	}
+	else if(Nt3 >= Nv){
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		glTexCoordPointer(3, GL_FLOAT, 0, &v.texCoord3s()[0]);
 	}
 
 	// Draw
@@ -297,10 +305,20 @@ void Graphics::draw(const Mesh& v, int count, int begin){
 	}
 
 	// Disable arrays
-					glDisableClientState(GL_VERTEX_ARRAY);
-	if(Nn)			glDisableClientState(GL_NORMAL_ARRAY);
-	if(Nc || Nci)	glDisableClientState(GL_COLOR_ARRAY);
-	if(Nt2 || Nt3)	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	if(Nn)					glDisableClientState(GL_NORMAL_ARRAY);
+	if(Nc || Nci)			glDisableClientState(GL_COLOR_ARRAY);
+	if(Nt1 || Nt2 || Nt3)	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+}
+
+// draw a MeshVBO
+void Graphics::draw(MeshVBO& meshVBO) {
+	if (!meshVBO.isBound()) meshVBO.bind();
+
+	if (meshVBO.hasIndices()) glDrawElements(meshVBO.primitive(), meshVBO.getNumIndices(), GL_UNSIGNED_INT, NULL);
+	else glDrawArrays(meshVBO.primitive(), 0, meshVBO.getNumVertices());
+
+	meshVBO.unbind();
 }
 
 

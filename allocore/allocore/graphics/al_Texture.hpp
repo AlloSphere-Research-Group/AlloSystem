@@ -54,6 +54,7 @@ namespace al{
 
 
 /// A simple wrapper around an OpenGL Texture
+/// @ingroup allocore
 class Texture : public GPUObject {
 public:
 
@@ -88,6 +89,19 @@ public:
 
 	/// Construct an unsized Texture
 	Texture();
+
+	/// Construct a 1D Texture object
+
+	/// @param[in] width		width, in pixels
+	/// @param[in] format		format of pixel data
+	/// @param[in] type			data type of pixel data
+	/// @param[in] clientAlloc	allocate data on the client
+	Texture(
+		unsigned width,
+		Graphics::Format format=Graphics::RGBA,
+		Graphics::DataType type=Graphics::UBYTE,
+		bool clientAlloc=true
+	);
 
 	/// Construct a 2D Texture object
 
@@ -216,10 +230,10 @@ public:
 	Texture& filter(Filter v){ return filterMin(v).filterMag(v); }
 
 	/// Set minification filter type
-	Texture& filterMin(Filter v){ return update(v, mFilterMin, mParamsUpdated); }
+	Texture& filterMin(Filter v);
 
 	/// Set magnification filter type
-	Texture& filterMag(Filter v){ return update(v, mFilterMag, mParamsUpdated); }
+	Texture& filterMag(Filter v);
 
 	/// Set wrapping mode for all dimensions
 	Texture& wrap(Wrap v){ return wrap(v,v,v); }
@@ -334,9 +348,12 @@ protected:
 	bool mPixelsUpdated;		// Flags change in pixel data
 	bool mShapeUpdated;			// Flags change in size, format, type, etc.
 	bool mArrayDirty;
+	bool mMipmap;
 
 	virtual void onCreate();
 	virtual void onDestroy();
+
+	void init();
 
 	// ensures that the internal Array format matches the texture format
 	void resetArray(unsigned align);

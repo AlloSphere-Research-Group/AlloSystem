@@ -96,6 +96,8 @@
 namespace al{
 
 /// Ambisonic base class
+///
+/// @ingroup allocore
 class AmbiBase{
 public:
 
@@ -114,12 +116,11 @@ public:
 	/// Get Ambisonic channel weights
 	const float * weights() const { return mWeights; }
 
-	/// Returns total number of Ambisonic domain channels
+	/// Returns total number of Ambisonic domain (B-format) channels
 	int channels() const { return mChannels; }
 
 	/// Set the order
 	void order(int order);
-
 
 	/// Called whenever the number of Ambisonic channels changes
 	virtual void onChannelsChange(){}
@@ -143,6 +144,9 @@ public:
 	static int orderToChannelsH(int orderH);
 	static int orderToChannelsV(int orderV);
 
+	static int channelsToOrder(int channels);
+	static int channelsToDimensions(int channels);
+
 protected:
 	int mDim;			// dimensions - 2d or 3d
 	int mOrder;			// order - 0th, 1st, 2nd, or 3rd
@@ -156,6 +160,8 @@ protected:
 
 
 /// Higher Order Ambisonic Decoding class
+///
+/// @ingroup allocore
 class AmbiDecode : public AmbiBase{
 public:
 
@@ -171,7 +177,7 @@ public:
 	/// @param[out] dec				output time domain buffers (non-interleaved)
 	/// @param[in ] enc				input Ambisonic domain buffers (non-interleaved)
 	/// @param[in ] numDecFrames	number of frames in time domain buffers
-	void decode(float * dec, const float * enc, int numDecFrames) const;
+	virtual void decode(float * dec, const float * enc, int numDecFrames) const;
 
 	float decodeWeight(int speaker, int channel) const {
 		return mWeights[channel] * mDecodeMatrix[speaker * channels() + channel];
@@ -229,6 +235,8 @@ protected:
 
 
 /// Higher Order Ambisonic encoding class
+///
+/// @ingroup allocore
 class AmbiEncode : public AmbiBase{
 public:
 
@@ -269,6 +277,8 @@ public:
 
 
 /// Ambisonic coder
+///
+/// @ingroup allocore
 class AmbisonicsSpatializer : public Spatializer {
 public:
 
@@ -318,6 +328,44 @@ inline int AmbiBase::orderToChannels(int dim, int order){
 
 inline int AmbiBase::orderToChannelsH(int orderH){ return (orderH << 1) + 1; }
 inline int AmbiBase::orderToChannelsV(int orderV){ return orderV * orderV; }
+
+inline int AmbiBase::channelsToOrder(int channels)
+{
+	int order = -1;
+	switch(channels) {
+	case 3:
+	case 4:
+		order = 1;
+		break;
+	case 9:
+		order = 2;
+		break;
+	case 16:
+		order = 3;
+		break;
+	default:
+		order = -1;
+	}
+	return order;
+}
+
+inline int AmbiBase::channelsToDimensions(int channels)
+{
+	int dim = 3;
+	switch(channels) {
+	case 3:
+		dim = 2;
+		break;
+	case 4:
+	case 9:
+	case 16:
+		dim = 3;
+		break;
+	default:
+		dim = -1;
+	}
+	return dim;
+}
 
 template<typename T>
 void AmbiBase::resize(T *& a, int n){

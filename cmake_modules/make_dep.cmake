@@ -1,6 +1,9 @@
 
 macro(make_dep DEP_NAME)
   set(${DEP_NAME}_RELATIVE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../${DEP_NAME})
+  if(NOT EXISTS "${${DEP_NAME}_RELATIVE_DIR}")
+    set(${DEP_NAME}_RELATIVE_DIR "/tmp/${DEP_NAME}")
+  endif()
   string(TOUPPER "${DEP_NAME}" DEP_NAME_UPPER)
   if(EXISTS "${${DEP_NAME}_RELATIVE_DIR}" AND IS_DIRECTORY "${${DEP_NAME}_RELATIVE_DIR}")
 	message(STATUS "Using ${DEP_NAME} from: ${DEP_NAME_RELATIVE_DIR}.")
@@ -24,7 +27,7 @@ macro(make_dep DEP_NAME)
 
 	# message(STATUS "Using ${DEP_NAME} from: ${${DEP_NAME_UPPER}_LIBRARY}")
   else()
-    message("Allosystem: ${DEP_NAME} sources NOT found. Can't build ${DEP_NAME}.")
+    message(STATUS "Allosystem: ${DEP_NAME} sources NOT found. Can't build ${DEP_NAME}.")
 	find_package(${DEP_NAME})
   endif()
 endmacro()

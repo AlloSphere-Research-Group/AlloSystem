@@ -1,7 +1,5 @@
-ALLOSYSTEM DEVELOPMENT NOTES
-===========================================================================
 
-1 CODING STYLE
+ALLOSYSTEM CODING STYLE
 ===========================================================================
 
 1.1 File Naming
@@ -26,7 +24,7 @@ All header content should be contained within a preprocessor conditional block t
 
 	#endif
 
-Please do not use '#pragma once' as this is Windows specific.
+Please do not use '#pragma once' as this is non-standard.
 
 A comment at the beginning of the file should include:
 	a. The license in its entirety
@@ -68,7 +66,33 @@ C only:
 - Function names should be prefixed with 'al_'.
 
 
-1.6 Dependencies
+1.6 C++isms
+---------------------------------------------------------------------------
+Use references instead of pointers in public interfaces. A reference cannot be NULL unlike a pointer and therefore catches many run-time errors. For example, instead of passing a pointer
+
+	void foo(Object * obj);
+
+use a reference
+
+	void foo(Object& obj);
+
+In example code, avoid dynamic memory allocation using new and delete. Instead of
+
+	Object * obj = new Object;
+	// code using obj
+	delete obj;
+
+prefer
+
+	Object obj;
+	// code using obj
+
+For more information on how not to use pointers in modern C++ see
+
+	klmr.me/slides/modern-cpp/
+
+
+1.7 Dependencies
 ---------------------------------------------------------------------------
 Try to keep the amount of code dependencies at a minimum, both internally and with regards to third-party libraries. 
 
@@ -152,4 +176,5 @@ external
 
 * Consider porting to C++11
 ** Consider porting to C++17
+
 

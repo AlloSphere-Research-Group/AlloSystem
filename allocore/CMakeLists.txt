@@ -28,6 +28,7 @@ list(APPEND ALLOCORE_SRC
 list(APPEND ALLOCORE_HEADERS
     allocore/al_Allocore.hpp
     allocore/graphics/al_Mesh.hpp
+    allocore/graphics/al_MeshVBO.hpp
     allocore/graphics/al_Shapes.hpp
     allocore/graphics/al_Image.hpp
     allocore/graphics/al_EasyFBO.hpp
@@ -109,6 +110,12 @@ if(NOT (COMPILER_SUPPORTS_CXX11 OR COMPILER_SUPPORTS_CXX0X))
 	message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
+if(COMPILER_SUPPORTS_CXX11)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ")
+elseif(COMPILER_SUPPORTS_CXX0X)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x ")
+endif()
+
 # System dependent libs
 # ---- OS X ----
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -157,12 +164,6 @@ set(EXECUTABLE_OUTPUT_PATH ${BUILD_ROOT_DIR}/build/bin)
 # Add headers to the list of source file so they appear in generated projects.
 add_library(${ALLOCORE_LIB} ${ALLOCORE_SRC} ${ALLOCORE_HEADERS})
 
-if(COMPILER_SUPPORTS_CXX11)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ")
-elseif(COMPILER_SUPPORTS_CXX0X)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-endif()
-
 # Copy headers to build directory (only if header has changed)
 foreach(header ${ALLOCORE_HEADERS})
     execute_process(COMMAND ${CMAKE_COMMAND} -E
@@ -185,7 +186,7 @@ set_target_properties(${ALLOCORE_LIB}
 include_directories(${ALLOCORE_DEP_INCLUDE_DIRS})
 target_link_libraries(${ALLOCORE_LIB} ${ALLOCORE_LINK_LIBRARIES})
 
-message(${ALLOCORE_DEP_INCLUDE_DIRS})
+#message(${ALLOCORE_DEP_INCLUDE_DIRS})
 
 # Doxygen documentation target
 add_custom_target("doc"

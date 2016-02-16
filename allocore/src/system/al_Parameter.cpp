@@ -27,6 +27,7 @@ Parameter::Parameter(std::string parameterName, std::string group, float default
 	}
 	mFullAddress += mParameterName;
 	mValue = defaultValue;
+	mValueCache = defaultValue;
 }
 
 Parameter::~Parameter()
@@ -75,23 +76,28 @@ ParameterServer::~ParameterServer()
 
 void al::ParameterServer::registerParameter(al::Parameter &param)
 {
+	mParameterLock.lock();
 	mParameters.push_back(&param);
+	mParameterLock.unlock();
 }
 
 void al::ParameterServer::unregisterParameter(al::Parameter &param)
 {
+	mParameterLock.lock();
 	std::vector<Parameter *>::iterator it = mParameters.begin();
 	for(it = mParameters.begin(); it != mParameters.end(); it++) {
 		if (*it == &param) {
 			mParameters.erase(it);
 		}
 	}
+	mParameterLock.unlock();
 }
 
 void ParameterServer::onMessage(osc::Message &m)
 {
 	float val;
 	m >> val;
+	mParameterLock.lock();
 	for (Parameter *p:mParameters) {
 		if(m.addressPattern() == p->getFullAddress() && m.typeTags() == "f"){
 			// Extract the data out of the packet
@@ -99,5 +105,6 @@ void ParameterServer::onMessage(osc::Message &m)
 //			std::cout << "ParameterServer::onMessage" << val << std::endl;
 		}
 	}
+	mParameterLock.unlock();
 }
 

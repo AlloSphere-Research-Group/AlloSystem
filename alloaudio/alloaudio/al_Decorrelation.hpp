@@ -53,7 +53,8 @@
 
 namespace al {
 
-/**
+/** \addtogroup alloaudio
+ *  @{
  */
 class Decorrelation : public AudioCallback
 {
@@ -87,21 +88,49 @@ public:
 	/**
 	 * @brief Calculates deterministic phase decorrelation IRs
 	 *
-	 * The IRs are generated using the Zotter method
+	 * The IRs are generated using the Zotter method (DAFX 2011). This method
+	 * constructs an all-pass filter whose phase traces a sinusoid. The number
+	 * of oscillations of the phase within the Nyquist band is called here
+	 * deltaFreq and the amplitude -i.e. the maximum variation of phase that
+	 * the filter creates- is called maxTau. The original paper for the technique
+	 * does not provide ideas on how to apply it for multichannel decorrelation
+	 * so what is done here is to add two ways of generating varying (but
+	 * related) impulse responses. The maxFreqDev parameter determines the
+	 * maximum deviation that each IR will have with respect to deltaFreq. The
+	 * higher this value, the more decorrelated the IRs will be. The second
+	 * method is to have a phaseDev parameter that randomizes the starting
+	 * phase of the sinuoisoidal phase response.
 	 *
-	 * @param io
-	 * @param seed
-	 * @param deltaFreq
-	 * @param maxFreqDev
-	 * @param maxTau
+	 * @param io The AudioIO object
+	 * @param seed The random seed for the creation of decorrelated IRs. seed < 0 means seed from current time.
+	 * @param deltaFreq The number of cycles in the sinusoidal phase response
+	 * @param maxFreqDev The maximum random deviation around deltaFreq for each IR.
+	 * @param maxTau The amplitude of the sinusoidal phase response. A value of 1.0 means maximum deviation before wrapping the phase around pi.
+	 * @param startPhase The phase for the sine function that determines the phase at bin 0.
+	 * @param phaseDev The maximum random deviation around startPhase.
 	 */
-	void configureDeterministic(al::AudioIO &io, long seed = -1, float deltaFreq = 20, float maxFreqDev = 10, float maxTau = 1.0);
+	void configureDeterministic(al::AudioIO &io, long seed = -1,
+	                            float deltaFreq = 20, float maxFreqDev = 10,
+	                            float maxTau = 1.0,
+	                            float startPhase = 0.0, float phaseDev = 0.0);
 
+	/**
+	 * @brief getCurrentSeed returns the randon seed used to generate the current IRs
+	 */
 	long getCurrentSeed();
 
 	virtual void onAudioCB(AudioIOData &io);
 
+	/**
+	 * @brief Get the decorration filter IR for index
+	 * @param index The index of the IR. Must be < 0 and >= mNumOuts
+	 * @return A pointer to the array containing the IR. The number of samples can be quieried with getSize(). Returns NULL when invalid
+	 */
 	float *getIR(int index);
+
+	/**
+	 * @brief Returns the size of the decorrelation filter IRs
+	 */
 	int getSize();
 
 //	void processAudio(float *inputBuffer, float* outputBuffer, int index, int numSamples);
@@ -110,7 +139,9 @@ private:
 
 	void freeIRs();
 	void generateIRs(long seed = -1, float maxjump = -1.0, float phaseFactor = 1.0);
-	void generateDeterministicIRs(long seed = -1, float deltaFreq = 30, float maxFreqDev = 10, float maxTau = 1.0);
+	void generateDeterministicIRs(long seed = -1,
+	                              float deltaFreq = 30, float maxFreqDev = 10, float maxTau = 1.0,
+	                              float startPhase = 0.0, float phaseDev = 0.0);
 
 	vector<float *>mIRs;
 	int mSize;
@@ -120,6 +151,8 @@ private:
 	Convolver mConv;
 	unsigned long mSeed;
 };
+
+/** @} */
 
 } // al::
 

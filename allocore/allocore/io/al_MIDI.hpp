@@ -49,10 +49,14 @@ namespace al{
 class MIDIIn;
 
 /// Convert note number to Hz value
+///
+/// @ingroup allocore
 double noteToHz(double noteNumber);
 
 
 /// Utilities for parsing MIDI bytes
+///
+/// @ingroup allocore
 class MIDIByte{
 public:
 
@@ -122,6 +126,8 @@ public:
 
 
 /// MIDI message
+///
+/// @ingroup allocore
 class MIDIMessage {
 public:
 	unsigned char bytes[3];
@@ -186,6 +192,8 @@ protected:
 
 
 /// Handles receipt of MIDI messages
+///
+/// @ingroup allocore
 class MIDIMessageHandler{
 public:
 	virtual ~MIDIMessageHandler(){}
@@ -210,6 +218,8 @@ protected:
 
 
 /// MIDI error reporting
+///
+/// @ingroup allocore
 class MIDIError : public std::exception
 {
  public:
@@ -252,6 +262,7 @@ class MIDIError : public std::exception
 };
 
 
+/// @ingroup allocore
 class MIDI
 {
  public:
@@ -304,6 +315,7 @@ class MIDI
 
     by Gary P. Scavone, 2003-2008.
 */
+/// @ingroup allocore
 /**********************************************************************/
 class MIDIIn : public MIDI
 {
@@ -450,6 +462,8 @@ class MIDIIn : public MIDI
 
     by Gary P. Scavone, 2003-2008.
 */
+
+/// @ingroup allocore
 /**********************************************************************/
 class MIDIOut : public MIDI
 {

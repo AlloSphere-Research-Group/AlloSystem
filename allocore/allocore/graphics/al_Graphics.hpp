@@ -54,10 +54,12 @@
 #include "allocore/graphics/al_GPUObject.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_OpenGL.hpp"
+#include "allocore/graphics/al_MeshVBO.hpp"
 
 /*!
 	\def AL_GRAPHICS_ERROR(msg, ID)
 	Used for reporting graphics errors from source files
+
 */
 //#define AL_ENABLE_DEBUG
 #ifdef AL_ENABLE_DEBUG
@@ -77,6 +79,7 @@ namespace al {
 
 
 /// A framed area on a display screen
+/// @ingroup allocore
 struct Viewport {
 	float l, b, w, h;	///< left, bottom, width, height
 
@@ -105,6 +108,7 @@ struct Viewport {
 
 ///	It also owns a Mesh, to simulate immediate mode (where it draws its own data)
 ///
+/// @ingroup allocore
 class Graphics : public GPUObject {
 public:
 
@@ -508,6 +512,9 @@ public:
 
 	/// Draw internal vertex data
 	void draw(){ draw(mMesh); }
+
+	/// Draw MeshVBO
+	void draw(MeshVBO& meshVBO);
 
 
 	// Utility functions: converting, reporting, etc.

@@ -49,6 +49,10 @@
 
 namespace al {
 
+///
+/// \brief The Main class
+///
+/// @ingroup allocore
 class Main {
 public:
 

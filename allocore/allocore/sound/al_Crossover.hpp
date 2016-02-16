@@ -48,9 +48,14 @@
 */
 #include <stdio.h>
 #include <float.h>
+#include "allocore/math/al_Constants.hpp"
 
 namespace al {
 
+///
+///
+///
+/// @ingroup allocore
 template<typename T=double>
 class Crossover {
 public:
