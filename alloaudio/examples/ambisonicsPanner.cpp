@@ -111,7 +111,9 @@ int main (int argc, char * argv[]){
 		                "localhost", 26771
 	                    );
 
-	audioIO.append(master);
+  master.setMasterGain(1.0);
+  master.setMeterOn(true);
+  audioIO.append(master);
 	// Start the IO!
 	audioIO.start();
 

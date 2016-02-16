@@ -15,6 +15,7 @@ OutputMaster::OutputMaster(int num_chnls, double sampleRate, const char *address
 						   const char *sendAddress, int sendPort, al_sec msg_timeout):
 	mNumChnls(num_chnls),
 	mMeterBuffer(1024 * sizeof(float)), mFramesPerSec(sampleRate),
+	mUseDb(false),
 	osc::Recv(port, address, msg_timeout),
 	mSendAddress(sendAddress), mSendPort(sendPort),
     mBassManager(num_chnls, sampleRate)
@@ -23,7 +24,7 @@ OutputMaster::OutputMaster(int num_chnls, double sampleRate, const char *address
 	initializeData();
 
 	if (port < 0) {
-		std::cout << "OutputMaster: Not using OSC." << std::endl;
+		std::cout << "OutputMaster: Not using OSC input." << std::endl;
 	} else {
 		msghandler.outputmaster = this;
 		if (!opened()) {
@@ -251,21 +252,25 @@ void *OutputMaster::meterThreadFunc(void *arg) {
 	while(om->mRunMeterThread) {
 		om->mMeterMutex.lock();
 		std::unique_lock<std::mutex> lk(om->mMeterCondMutex);
-	    om->mMeterCond.wait(lk);
+  	om->mMeterCond.wait(lk);
 		int bytes_read = om->mMeterBuffer.read((char *) meter_levels, om->mNumChnls * sizeof(float));
 		if (bytes_read) {
 			if (bytes_read !=  om->mNumChnls * sizeof(float)) {
 				std::cerr << "Alloaudio: Warning. Meter values underrun." << std::endl;
 			}
 			for (int i = 0; i < bytes_read/sizeof(float); i++) {
+				float value;
+				if (om->mUseDb) {
+					value = 20.0 * log10(meter_levels[i]);
+				} else {
+					value = meter_levels[i];
+				}
 				if (om->mMeterAddrHasChannel) {
 					std::stringstream addr;
 					addr << om->mAddressPrefix << "/meterdb/" <<  chanindex + 1;
-					s.send(addr.str(),
-						   (float) (20.0 * log10(meter_levels[i])));
+					s.send(addr.str(), value);
 				} else {
-					s.send(om->mAddressPrefix + "/meterdb", chanindex,
-						   (float) (20.0 * log10(meter_levels[i])));
+					s.send(om->mAddressPrefix + "/meterdb", chanindex, value);
 				}
 
 				chanindex++;
