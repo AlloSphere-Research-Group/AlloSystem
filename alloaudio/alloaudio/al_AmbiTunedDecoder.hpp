@@ -21,7 +21,7 @@ class AmbiTunedDecoder : public AmbiDecode
 {
 public:
 	AmbiTunedDecoder(int dim = 3, int order = 3, int numSpeakers = 8, int flavor=1) :
-	    AmbiDecode(dim, order, numSpeakers, flavor) { setConfiguration();}
+	    AmbiDecode(dim, order, numSpeakers, flavor) {}
 	void setConfiguration(string configFile = "Allosphere.ambdec");
 
 private:
@@ -33,7 +33,10 @@ class AmbisonicsTunedSpatializer : public AmbisonicsBaseSpatializer<AmbiTunedDec
 {
 public:
 	AmbisonicsTunedSpatializer(SpeakerLayout sl = StereoSpeakerLayout(), int dim = 3, int order = 3, int flavor=1)
-	    :AmbisonicsBaseSpatializer(sl, dim, order, flavor) {}
+	    :AmbisonicsBaseSpatializer(sl, dim, order, flavor)
+	{
+		static_cast<AmbiTunedDecoder>(mDecoder).setConfiguration();
+	}
 };
 
 /** @} */
