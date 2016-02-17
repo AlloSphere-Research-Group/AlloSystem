@@ -35,7 +35,7 @@ public:
 	AmbisonicsTunedSpatializer(SpeakerLayout sl = StereoSpeakerLayout(), int dim = 3, int order = 3, int flavor=1)
 	    :AmbisonicsBaseSpatializer(sl, dim, order, flavor)
 	{
-		static_cast<AmbiTunedDecoder>(mDecoder).setConfiguration();
+		mDecoder.setConfiguration();
 	}
 };
 

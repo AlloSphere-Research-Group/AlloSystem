@@ -34,6 +34,7 @@ void AmbiTunedDecoder::setConfiguration(string configFile)
 		file.close();
 
 		std::string line;
+		mAmbisonicsConfig.mDecodeMatrix.clear();
 
 		while(std::getline(buffer,line,'\n')){
 			if (!line.empty() && line.at(0) == '/') {
@@ -110,7 +111,7 @@ void AmbiTunedDecoder::setConfiguration(string configFile)
 									while(matst.good()) {
 										matst >> gain;
 										mAmbisonicsConfig.mOrderGains.push_back(gain);
-										mWOrder[i] = gain;
+										mWOrder[i++] = gain;
 									}
 								} else if (token == "add_row") {
 									mAmbisonicsConfig.mMatrixColumns = 0;
@@ -132,8 +133,8 @@ void AmbiTunedDecoder::setConfiguration(string configFile)
 		order(channelsToUniformOrder(mAmbisonicsConfig.mMatrixColumns));
 		resizeArrays(channels(), mAmbisonicsConfig.mLayout.numSpeakers());
 		updateChanWeights();
-		for (int channel = 0; channel < channels(); channel++) {
-			for (int speaker = 0; speaker < mAmbisonicsConfig.mLayout.numSpeakers(); speaker++) {
+		for (int speaker = 0; speaker < mAmbisonicsConfig.mLayout.numSpeakers(); speaker++) {
+			for (int channel = 0; channel < channels(); channel++) {
 				mDecodeMatrix[speaker * channels() + channel] = mAmbisonicsConfig.mDecodeMatrix[speaker * channels() + channel ];
 			}
 		}
