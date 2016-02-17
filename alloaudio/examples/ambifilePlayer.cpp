@@ -15,6 +15,7 @@
 
 using namespace al;
 
+
 class PeakData {
 public:
 	PeakData(int numChannels_) :
@@ -54,27 +55,70 @@ public:
 int main(int argc, char *argv[])
 {
 	std::string fullPath = "/media/part/Music/Ambisonics/Ambisonia/PWH_Purcell-Passacaglia_(How_Happy).amb";
+
 	bool loop = false;
 	int framesPerBuffer = 1024;
-	string decoderConfig = "alloaudio/examples/Allosphere.ambdec";
-	if (argc > 1) {
-		decoderConfig = argv[1];
-	}
-	SpeakerLayout layout = OctalSpeakerLayout();
-	AmbiFilePlayer player(fullPath, loop, framesPerBuffer * 4, layout);
-//	AmbiFilePlayer player(fullPath, loop, framesPerBuffer * 4, decoderConfig);
-	PeakData peakData(layout.numSpeakers());
 
-	AudioIO io(framesPerBuffer, 44100, NULL, (void *) &peakData, 32);
+	string decoderConfig = "alloaudio/examples/Allosphere.ambdec";
+//	if (argc > 1) {
+//		decoderConfig = argv[1];
+//	}
+//	AmbiFilePlayer(fullPath, loop, framesPerBuffer * 4, decoderConfig);
+
+	SpeakerLayout layout = HeadsetSpeakerLayout();
+	AmbiFilePlayer player(fullPath, loop, framesPerBuffer * 4, layout);
+
+	PeakData peakData(player.numDeviceChannels());
+
+	AudioIO io(framesPerBuffer, 44100, NULL, (void *) &peakData, player.numDeviceChannels(), 0);
+
 	MeteringCallback meterCb;
 
 	// An AmbiFilePlayer object can be "appended" to an AudioIO object
 	// because it inherits from AudioCallback.
 	io.append(player);
 	io.append(meterCb);
+
+	player.play(); // Start playback of the audio file
+
+	bool play = true;
+	std::cout << "Press 'q' to quit, 'p' to pause, 'c' to continue, 'r' to rewind." << std::endl;
 	if (io.start()) {
-		while (!player.done()) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(200));
+		struct timeval timeout;
+
+		fd_set rset;
+#define STDIN 0
+		int maxfpd1 = al::max(STDIN, 0) + 1;
+		while (!player.done() && play) {
+			timeout.tv_sec = 1;
+		    timeout.tv_usec = 0;
+
+			FD_ZERO(&rset);
+			FD_SET(STDIN, &rset);
+			int retval = select(maxfpd1, &rset, NULL, NULL, &timeout);
+			if (retval < 0)  {
+				play = false;
+			}
+			else if (retval > 0) {
+				std::string input;
+				std::getline(std::cin, input);
+				if (input == "q") {
+					play = false;
+				}
+				if (input == "p") {
+					player.pause();
+					std::cout << "Paused." << std::endl;
+				}
+				if (input == "c") {
+					player.play();
+					std::cout << "Unpaused." << std::endl;
+				}
+				if (input == "r") {
+					player.rewind();
+					std::cout << "Rewinded." << std::endl;
+				}
+			}
+//			std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		}
 	} else {
 		std::cout << "Error starting Audio." << std::endl;

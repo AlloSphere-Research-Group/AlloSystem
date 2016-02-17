@@ -43,14 +43,28 @@ public:
 
 	~AmbiFilePlayer();
 
-	virtual void onAudioCB(AudioIOData& io) /*override*/;
+	virtual void onAudioCB(AudioIOData& io) override;
 
 	///
 	/// \brief Check whether file has been played fully
 	/// \return true if file has played to the end
 	///
 	bool done() const;
-	void setDone(bool done);
+
+	///
+	/// \brief Start playback
+	///
+	void play();
+
+	///
+	/// \brief Pause playback
+	///
+	void pause();
+
+	///
+	/// \brief Return the number of channels required for audio device
+	/// This is estimated from the device indeces in the loudspeaker layout
+	int numDeviceChannels();
 
 private:
 
@@ -64,6 +78,7 @@ private:
 	float *mDeinterleavedBuffer;
 	bool mDone;
 	int mBufferSize;
+	bool mPlaying;
 
 	//Parameters
 	Parameter mGain;

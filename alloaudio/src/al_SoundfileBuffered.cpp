@@ -4,6 +4,7 @@ using namespace al;
 
 SoundFileBuffered::SoundFileBuffered(std::string fullPath, bool loop, int bufferFrames) :
     mRunning(true),
+    mRewind(false),
     mLoop(loop),
     mRepeats(0),
     mBufferFrames(bufferFrames),
@@ -50,6 +51,11 @@ void SoundFileBuffered::readFunction(SoundFileBuffered  *obj)
 	while (obj->mRunning) {
 		std::unique_lock<std::mutex> lk(obj->mLock);
 		obj->mCondVar.wait(lk);
+		if (obj->mRewind.load()) {
+			obj->mSf.seek(0, SEEK_SET);
+			obj->mRepeats.store(0);
+			obj->mRewind.store(false);
+		}
 		int framesToRead = obj->mRingBuffer->writeSpace() / (obj->channels() * sizeof(float));
 		int framesRead = obj->mSf.read(buf, framesToRead);
 		if (framesRead != framesToRead && obj->mLoop) {
@@ -131,4 +137,9 @@ void SoundFileBuffered::setReadCallback(SoundFileBuffered::CallbackFunc func, vo
 {
 	mReadCallback = func;
 	mCallbackData = userData;
+}
+
+void SoundFileBuffered::rewind()
+{
+	mRewind.store(true);
 }

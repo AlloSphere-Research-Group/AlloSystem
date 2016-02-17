@@ -87,10 +87,16 @@ public:
 	///
 	void setReadCallback(CallbackFunc func, void *userData);
 
+	///
+	/// \brief Rewind soundfile to the beginning
+	///
+	void rewind();
+
 private:
 	bool mRunning;
 	bool mLoop;
 	std::atomic<int> mRepeats;
+	std::atomic<bool> mRewind;
 	std::mutex mLock;
 	std::condition_variable mCondVar;
 	std::thread *mReaderThread;
