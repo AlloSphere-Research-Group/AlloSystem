@@ -39,12 +39,12 @@ int Convolver::configure(al::AudioIO &io, vector<float *> IRs, int IRlength,
 		if (m_inputsAreBuses) {
 			assert(io.channelsBus() >= m_activeChannels.size());
 		} else {
-			assert(io.channels(false) >= m_activeChannels.size());
+			assert(io.channels(true) >= m_activeChannels.size());
 		}
 		nActiveInputs = nActiveOutputs;
 	}
 	else{//one to many
-		assert(io.channels(false) >= 1);
+		assert(io.channels(true) >= 1);
 		nActiveInputs = 1;
 	}
 	assert(basePartitionSize >= Convproc::MINPART);
@@ -78,6 +78,7 @@ int Convolver::configure(al::AudioIO &io, vector<float *> IRs, int IRlength,
 
 void Convolver::onAudioCB(al::AudioIOData &io)
 {
+	assert(m_Convproc); // Check if decorrelation object has been
 	int blockSize = io.framesPerBuffer();
 
 	//fill the input buffers
@@ -92,7 +93,7 @@ void Convolver::onAudioCB(al::AudioIOData &io)
 				inbuf = io.busBuffer(*it);
 			}
 			else{
-				inbuf = io.inBuffer(*it);
+				inbuf = io.outBuffer(*it);
 			}
 			memcpy(dest, inbuf, sizeof(float) * blockSize);
 		}

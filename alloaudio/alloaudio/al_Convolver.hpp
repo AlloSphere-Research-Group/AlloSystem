@@ -40,20 +40,6 @@ class Convolver : public al::AudioCallback
 public:
     Convolver();
 
-	/**
-	 * @brief Sets up convolver. Must be called prior to processing.
-	 *
-	 * Checks for valid parameters, initializes convolver and impulse responses. Output from disabled channels is set to 0.
-	 *
-	 * The mumber of IRs must always match the number of output channels
-	 * Use cases:
-	 * - Decorrelation: many to many each with a different IR
-	 * - Auralization: one to many each with a different IR
-	 *               : many to many each with a different IR
-	 * - DRC : many to many each with different IR
-	 * - Synthesized source:
-	 */
-
 	/// @brief Sets up convolver. Must be called prior to processing.
 	///
 	/// Checks for valid parameters, initializes convolver and impulse responses. Output from disabled channels is set to 0.
@@ -64,6 +50,7 @@ public:
 	///  - Auralization: one to many each with a different IR
 	///                : many to many each with a different IR
 	///  - DRC : many to many each with different IR
+	///  - Synthesized source:
 	///
 	///	@param[in, out] io The AudioIO object.
 	/// @param[in] IRs The deinterleaved IR channels.
@@ -75,12 +62,12 @@ public:
 	/// @return Returns 0 upon success
 
 	int configure(al::AudioIO &io,
-				  vector<float *>IRs,
-                  int IRlength,
-				  int inputChannel = -1,
-				  bool inputsAreBuses = false,
-				  vector<int> disabledChannels = vector<int>(),
-				  unsigned int basePartitionSize=64, unsigned int options=0);
+	              vector<float *>IRs,
+	              int IRlength,
+	              int inputChannel = -1,
+	              bool inputsAreBuses = false,
+	              vector<int> disabledChannels = vector<int>(),
+	              unsigned int basePartitionSize=64, unsigned int options=0);
 
 	/// @brief Handles all io for the convolution
 	/// @param[in,out] io The AudioIO object from which audio data will be read from and written to.

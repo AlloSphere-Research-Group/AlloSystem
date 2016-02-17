@@ -12,6 +12,7 @@
 #include "alloutil/al_AlloSphereSpeakerLayout.hpp"
 #include "alloaudio/al_AmbiFilePlayer.hpp"
 #include "alloaudio/al_AmbiTunedDecoder.hpp"
+#include "alloaudio/al_Decorrelation.hpp"
 
 using namespace al;
 
@@ -59,11 +60,11 @@ int main(int argc, char *argv[])
 	bool loop = false;
 	int framesPerBuffer = 1024;
 
-	string decoderConfig = "alloaudio/examples/Allosphere.ambdec";
+//	string decoderConfig = "Allosphere.ambdec";
 //	if (argc > 1) {
 //		decoderConfig = argv[1];
 //	}
-//	AmbiFilePlayer(fullPath, loop, framesPerBuffer * 4, decoderConfig);
+//	AmbiFilePlayer player(fullPath, loop, framesPerBuffer * 4, decoderConfig);
 
 	SpeakerLayout layout = HeadsetSpeakerLayout();
 	AmbiFilePlayer player(fullPath, loop, framesPerBuffer * 4, layout);
@@ -73,11 +74,14 @@ int main(int argc, char *argv[])
 	AudioIO io(framesPerBuffer, 44100, NULL, (void *) &peakData, player.numDeviceChannels(), 0);
 
 	MeteringCallback meterCb;
+	Decorrelation decor(1024, -1, io.channels(true));
+	decor.configure(io);
 
 	// An AmbiFilePlayer object can be "appended" to an AudioIO object
 	// because it inherits from AudioCallback.
 	io.append(player);
 	io.append(meterCb);
+	io.append(decor);
 
 	player.play(); // Start playback of the audio file
 
