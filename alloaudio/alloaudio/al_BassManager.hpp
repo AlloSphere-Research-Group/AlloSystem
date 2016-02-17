@@ -71,10 +71,14 @@ public:
 		BASSMODE_COUNT
 	} bass_mgmt_mode_t;
 
-	BassManager(int num_chnls, double sampleRate,
-	            float frequency = 150.0, bass_mgmt_mode_t mode = BASSMODE_FULL);
+	BassManager();
 
 	~BassManager();
+
+	void configure(int numChnls, double sampleRate,
+	               int framesPerBuffer, float frequency,
+	               BassManager::bass_mgmt_mode_t mode);
+
 
 	/** Set bass management cross-over frequency. The signal from all channels will be run
 	 * through a pair of linear-phase cross-over filters, and the signal from the low pass
@@ -85,9 +89,10 @@ public:
 	void setBassManagementMode(bass_mgmt_mode_t mode);
 
 	/** Specify which channel indeces are subwoofers for the purpose of bass management.
-	 * Currently a maximum of 4 subwoofers are supported.
+	 * Currently a maximum of 4 subwoofers are supported. An index of -1 indicates no
+	 * subwoofer.
 	 */
-	void setSwIndeces(int i1, int i2, int i3, int i4);
+	void setSwIndeces(int i1, int i2 = -1, int i3 = -1, int i4 = -1);
 
 	/** Process a block of audio data.
 	 */
@@ -97,12 +102,17 @@ protected:
 
 
 private:
-	const int mNumChnls;
-	const double mFramesPerSec; // Sample rate
+	int mNumChnls;
+	double mFramesPerSec; // Sample rate
+	int mFramesPerBuffer;
 
 	/* parameters */
 	bass_mgmt_mode_t mBassManagementMode;
 	int swIndex[4]; /* support for 4 SW max */
+	double *mBass_buf;
+	double *mFilt_out;
+	double *mFilt_low;
+	double *mIn_buf;
 
 	/* bass management filters */
 	std::vector<BUTTER *> mLopass1, mLopass2, mHipass1, mHipass2;

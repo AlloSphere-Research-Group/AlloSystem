@@ -11,14 +11,15 @@
 
 using namespace al;
 
-OutputMaster::OutputMaster(int num_chnls, double sampleRate, const char *address, int port,
-						   const char *sendAddress, int sendPort, al_sec msg_timeout):
-	mNumChnls(num_chnls),
-	mMeterBuffer(1024 * sizeof(float)), mFramesPerSec(sampleRate),
-	mUseDb(false),
-	osc::Recv(port, address, msg_timeout),
-	mSendAddress(sendAddress), mSendPort(sendPort),
-    mBassManager(num_chnls, sampleRate)
+OutputMaster::OutputMaster(int numChnls, double sampleRate,
+                           const char *address, int port,
+                           const char *sendAddress, int sendPort,
+                           al_sec msg_timeout):
+    mNumChnls(numChnls),
+    mMeterBuffer(1024 * sizeof(float)), mFramesPerSec(sampleRate),
+    mUseDb(false),
+    osc::Recv(port, address, msg_timeout),
+    mSendAddress(sendAddress), mSendPort(sendPort)
 {
 	allocateChannels(mNumChnls);
 	initializeData();
@@ -28,7 +29,7 @@ OutputMaster::OutputMaster(int num_chnls, double sampleRate, const char *address
 	} else {
 		msghandler.outputmaster = this;
 		if (!opened()) {
-			std::cout << "Failed to open socket on UDP port " << port << " for OSC receipt." << std::endl;
+			std::cout << "Failed to open socket on UDP port " << port << " for OSC receive." << std::endl;
 			std::cout << "Probably another program is already listening on that port." << std::endl;
 		} else {
 			handler(OutputMaster::msghandler);
@@ -80,21 +81,6 @@ void OutputMaster::setMeterUpdateFreq(double freq)
 	mMeterUpdateSamples = (int)(mFramesPerSec/freq);
 }
 
-void OutputMaster::setBassManagementFreq(double frequency)
-{
-	mBassManager.setBassManagementFreq(frequency);
-}
-
-void OutputMaster::setBassManagementMode(BassManager::bass_mgmt_mode_t mode)
-{
-	mBassManager.setBassManagementMode(mode);
-}
-
-void OutputMaster::setSwIndeces(int i1, int i2, int i3, int i4)
-{
-	mBassManager.setSwIndeces(i1, i2, i3, i4);
-}
-
 void OutputMaster::setMeterOn(bool meterOn)
 {
 	mMeterOn = meterOn;
@@ -136,7 +122,6 @@ void OutputMaster::onAudioCB(AudioIOData &io)
 			out++;
 		}
 	}
-	mBassManager.onAudioCB(io);
 
 	if (mMeterOn) {
 		for (chan = 0; chan < mNumChnls; chan++) {
@@ -188,15 +173,6 @@ void OutputMaster::setMeterupdateFreqTimestamped(al_sec until, double freq)
 	setMeterUpdateFreq(freq);
 }
 
-void OutputMaster::setBassManagementFreqTimestamped(al_sec until, double freq)
-{
-	setBassManagementFreq(freq);
-}
-
-void OutputMaster::setBassManagementModeTimestamped(al_sec until, int mode)
-{
-	setBassManagementMode((BassManager::bass_mgmt_mode_t) mode);
-}
 std::string OutputMaster::addressPrefix() const
 {
 	return mAddressPrefix;
@@ -227,8 +203,6 @@ void OutputMaster::initializeData()
 	mMeterOn = false;
 	mMeterAddrHasChannel = false;
 
-	setBassManagementMode(BassManager::BASSMODE_NONE);
-	setBassManagementFreq(150);
 	setMeterUpdateFreq(10.0);
 }
 
@@ -373,34 +347,6 @@ void OutputMaster::OSCHandler::onMessage(osc::Message &m)
 												(double) freq);
 		} else {
 			std::cerr << "Alloaudio: Wrong type tags for " + outputmaster->mAddressPrefix + "/meter_update_freq: "
-					 << m.typeTags() << std::endl;
-		}
-	} else if (m.addressPattern() == outputmaster->mAddressPrefix + "/bass_management_mode") {
-		if (m.typeTags() == "i") {
-			int mode;
-			m >> mode;
-			outputmaster->mParameterQueue.send(outputmaster->mParameterQueue.now(),
-												outputmaster, &OutputMaster::setBassManagementModeTimestamped,
-												(int) mode);
-		} else if (m.typeTags() == "f") {
-			float mode;
-			m >> mode;
-			outputmaster->mParameterQueue.send(outputmaster->mParameterQueue.now(),
-												outputmaster, &OutputMaster::setBassManagementModeTimestamped,
-												(int) mode);
-		} else{
-			std::cerr << "Alloaudio: Wrong type tags for " + outputmaster->mAddressPrefix + "//bass_management_mode: "
-					 << m.typeTags() << std::endl;
-		}
-	} else if (m.addressPattern() == outputmaster->mAddressPrefix + "/bass_management_freq") {
-		if (m.typeTags() == "f") {
-			float freq;
-			m >> freq;
-			outputmaster->mParameterQueue.send(outputmaster->mParameterQueue.now(),
-												outputmaster, &OutputMaster::setBassManagementFreqTimestamped,
-												(double) freq);
-		} else {
-			std::cerr << "Alloaudio: Wrong type tags for " + outputmaster->mAddressPrefix + "/bass_management_freq: "
 					 << m.typeTags() << std::endl;
 		}
 	} else {

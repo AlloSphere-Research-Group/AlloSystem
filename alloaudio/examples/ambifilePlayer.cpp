@@ -13,6 +13,7 @@
 #include "alloaudio/al_AmbiFilePlayer.hpp"
 #include "alloaudio/al_AmbiTunedDecoder.hpp"
 #include "alloaudio/al_Decorrelation.hpp"
+#include "alloaudio/al_BassManager.hpp"
 
 using namespace al;
 
@@ -69,12 +70,20 @@ int main(int argc, char *argv[])
 	SpeakerLayout layout = HeadsetSpeakerLayout();
 	AmbiFilePlayer player(fullPath, loop, framesPerBuffer * 4, layout);
 
-	PeakData peakData(player.numDeviceChannels());
+	PeakData peakData(player.numDeviceChannels() + 1);
 
-	AudioIO io(framesPerBuffer, 44100, NULL, (void *) &peakData, player.numDeviceChannels(), 0);
+	AudioIO io(framesPerBuffer, 44100, NULL, (void *) &peakData, player.numDeviceChannels() + 1, 0);
 
 	MeteringCallback meterCb;
 	Decorrelation decor(1024, -1, io.channels(true));
+	BassManager bassManager;
+	bassManager.configure(io.channels(true) + 1,
+	                      io.framesPerSecond(),
+	                      io.framesPerBuffer(),
+	                      150.0,
+	                      BassManager::BASSMODE_FULL);
+	bassManager.setSwIndeces(2);
+
 	decor.configure(io);
 
 	// An AmbiFilePlayer object can be "appended" to an AudioIO object
@@ -82,6 +91,7 @@ int main(int argc, char *argv[])
 	io.append(player);
 	io.append(meterCb);
 	io.append(decor);
+	io.append(bassManager);
 
 	player.play(); // Start playback of the audio file
 

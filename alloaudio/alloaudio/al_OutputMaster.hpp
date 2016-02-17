@@ -98,7 +98,7 @@ public:
 	 * @param sendPort The port to which messages will be sent
 	 * @param msg_timeout Time out for the socket listener (see documentation for al::osc::Recv)
 	 */
-	OutputMaster(int num_chnls, double sampleRate,
+	OutputMaster(int numChnls, double sampleRate,
 	             const char * address = "", int inport = 19375,
 	             const char * sendAddress = "localhost", int sendPort = -1,
 	             al_sec msg_timeout = 0);
@@ -133,19 +133,6 @@ public:
 	 * lock-free ring buffer.
 	 */
 	void setMeterUpdateFreq(double freq);
-
-	/** Set bass management cross-over frequency. The signal from all channels will be run
-	 * through a pair of linear-phase cross-over filters, and the signal from the low pass
-	 * filters is sent to the subwoofers specified using setSwIndeces().
-	*/
-	void setBassManagementFreq(double frequency);
-
-	void setBassManagementMode(BassManager::bass_mgmt_mode_t mode);
-
-	/** Specify which channel indeces are subwoofers for the purpose of bass management.
-	 * Currently a maximum of 4 subwoofers are supported.
-	 */
-	void setSwIndeces(int i1, int i2, int i3, int i4);
 
 	/** Enable peak metering. If set to false, no meter values will be sent out via OSC,
 	 * and no values will be provided by getMeterValues()
@@ -198,8 +185,6 @@ protected:
 	void setMuteAllTimestamped(al_sec until, bool on);
 	void setMeterOnTimestamped(al_sec until, bool on);
 	void setMeterupdateFreqTimestamped(al_sec until, double freq);
-	void setBassManagementFreqTimestamped(al_sec until, double freq);
-	void setBassManagementModeTimestamped(al_sec until, int mode);
 
 private:
 	const int mNumChnls;
@@ -229,8 +214,6 @@ private:
 	std::mutex mMeterMutex;
 	std::mutex mMeterCondMutex;
 	std::condition_variable mMeterCond;
-
-	BassManager mBassManager;
 
 	void initializeData();
 	void allocateChannels(int numChnls);

@@ -68,6 +68,9 @@ public:
 	 * @param numOuts number of output channels to process
 	 * @param seed Seed for initial generation of decorrelation IRs. If -1, then
 	 * seed is taken from current time
+	 *
+	 * If inputsAreBuses is false the input to the decorrelation is read from
+	 * the output buffers of the io object.
 	 */
 	Decorrelation(int size = 1024, int inChannel = 0, int numOuts = 8,
 				  bool inputsAreBuses = false);
