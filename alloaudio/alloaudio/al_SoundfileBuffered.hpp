@@ -89,11 +89,14 @@ public:
 
     void seek(int frame);
 
+    int currentPosition();
+
 private:
 	bool mRunning;
 	bool mLoop;
 	std::atomic<int> mRepeats;
     std::atomic<int> mSeek;
+    std::atomic<int> mCurPos; // Updated once per read buffer
 	std::mutex mLock;
 	std::condition_variable mCondVar;
 	std::thread *mReaderThread;
@@ -103,6 +106,8 @@ private:
 	gam::SoundFile mSf;
 	CallbackFunc mReadCallback;
 	void *mCallbackData;
+
+	float *mFileBuffer; // Buffer to copy file samples to (in the reader thread before passing to ring buffer)
 
 	static void readFunction(SoundFileBuffered *obj);
 };
