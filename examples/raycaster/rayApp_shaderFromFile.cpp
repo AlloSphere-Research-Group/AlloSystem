@@ -3,40 +3,62 @@
 using namespace al;
 
 struct MyApp : public RayApp {
-  
+
   MyApp()
   {
-    SearchPaths searchPaths;
-    searchPaths.addSearchPath("../../", true);
-    searchPaths.addAppPaths();
-    loadShaderFile(searchPaths.find("toroid_vert.glsl").filepath(),
-                   searchPaths.find("toroid_frag.glsl").filepath());
     nav().pos(0,0,3.0);
   }
   
   virtual ~MyApp() {
   }
-  
-  virtual void onAnimate(al_sec dt) {
+
+  virtual void initShader() override {
+  }
+
+  virtual void loadShaders() override {
+    ShaderProgram *s = mShaderManager.addShaderFile("toroid", "toroid.vert", "toroid.frag");
+    s->begin();
+    s->uniform("pixelMap", 1);
+    s->uniform("alphaMap", 2);
+    s->end();
+
+    printf ("Vendor: %s\n", glGetString (GL_VENDOR));
+    printf ("Renderer: %s\n", glGetString (GL_RENDERER));
+    printf ("Version: %s\n", glGetString (GL_VERSION));
+    printf ("GLSL: %s\n", glGetString (GL_SHADING_LANGUAGE_VERSION));
+  }
+
+  virtual void onDraw(Graphics& g) override {
+
+    ShaderProgram *s = mShaderManager.get("toroid");
+    s->begin();
+    
+    sendUniforms(s);
+
+    Viewport vp(width(), height());
+    mOmni.draw(s, lens(), vp);
+    s->end();
   }
   
-  virtual void onSound(AudioIOData& io) {
+  virtual void onAnimate(al_sec dt) override {
+  }
+  
+  virtual void onSound(AudioIOData& io) override {
     while (io()) {
       io.out(0) = rnd::uniformS() * 0.02;
     }
   }
   
-  virtual void sendUniforms(ShaderProgram& shaderProgram) {
-    shaderProgram.uniform("eyesep", lens().eyeSep());
-    shaderProgram.uniform("pos", nav().pos());
-    shaderProgram.uniform("quat", nav().quat());
-    shaderProgram.uniform("time", FPS::now());
+  virtual void sendUniforms(ShaderProgram* shaderProgram) override {
+    shaderProgram->uniform("pos", nav().pos());
+    shaderProgram->uniform("quat", nav().quat());
+    shaderProgram->uniform("time", FPS::now());
   }
   
-  virtual void onMessage(osc::Message& m) {
+  virtual void onMessage(osc::Message& m) override {
   }
   
-  virtual bool onKeyDown(const Keyboard& k){
+  virtual bool onKeyDown(const Keyboard& k) override {
     if(k.ctrl()) {
       switch(k.key()) {
         case '1': mOmni.mode(RayStereo::MONO); return false;

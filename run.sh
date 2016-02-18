@@ -51,16 +51,17 @@ fi
 FILENAME=$(basename "$1" | sed 's/\.[^.]*$//')
 DIRNAME=$(dirname "$1")
 
-# Replace all forward slashes with underscores.
-TARGET=$(echo "${DIRNAME}_${FILENAME}" | sed 's/\//_/g')
+# Build name replacing all forward slashes with underscores.
+if [ "$DIRNAME" != "." ]; then
+  TARGET=$(echo "${DIRNAME}_${FILENAME}" | sed 's/\//_/g')
+    # Replace all periods with underscores.
+    TARGET=$(echo "${TARGET}" | sed 's/\./_/g')
+else
+  TARGET=$(echo "${FILENAME}" | sed 's/\//_/g')
+fi
 
 if [ "$AUTORUN" -eq 1 ]; then
   TARGET="${TARGET}_run"
-fi
-
-if [ "$DIRNAME" != "." ]; then
-  # Replace all periods with underscores.
-  TARGET=$(echo "${TARGET}" | sed 's/\./_/g')
 fi
 
 # Change behavior if the target is a file or directory.
@@ -85,12 +86,18 @@ fi
 
 FLAGS="$TARGET_FLAG $DBUILD_FLAG $ALLOSPHERE_APP_FLAG"
 
+if [ ! -d "build" ]; then
+  mkdir build
+fi
+
+cd build
+
+
 # GENERATOR_FLAG needs to be separated out in order to be parsed as a commandline flag with an argument with a space in it.
 if [ -n "$debugger" ]; then
-  cmake "$GENERATOR_FLAG" $FLAGS -DRUN_IN_DEBUGGER=1 "-DALLOSYSTEM_DEBUGGER=${debugger}" -DCMAKE_BUILD_TYPE=Debug . > cmake_log.txt
+  cmake "$GENERATOR_FLAG" $FLAGS -DRUN_IN_DEBUGGER=1 "-DALLOSYSTEM_DEBUGGER=${debugger}" -DCMAKE_BUILD_TYPE=Debug .. > cmake_log.txt
 else
-  cmake "$GENERATOR_FLAG" $FLAGS -DRUN_IN_DEBUGGER=0 -DCMAKE_BUILD_TYPE=Release -Wno-dev . > cmake_log.txt
+  cmake "$GENERATOR_FLAG" $FLAGS -DRUN_IN_DEBUGGER=0 -DCMAKE_BUILD_TYPE=Release -Wno-dev .. > cmake_log.txt
 fi
 
 make $VERBOSE $TARGET -j$PROC_FLAG $*
-

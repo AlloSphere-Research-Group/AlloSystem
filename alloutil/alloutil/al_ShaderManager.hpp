@@ -1,39 +1,25 @@
-/*
- * al_ShaderManager.hpp
- *
- * Manages shader programs loaded from files, and reloads them as shader files are changed.
- *
- * File author(s):
- *  Tim Wood, 2015, fishuyo@gmail.com
- *  Kon Hyong Kim, 2015, konhyong@gmail.com
- */
-
-#ifndef __ShaderManager_HPP__
-#define __ShaderManager_HPP__
+#ifndef INCLUDE_AL_SHADERMANAGER_HPP
+#define INCLUDE_AL_SHADERMANAGER_HPP
 
 #include "alloutil/al_ResourceManager.hpp"
-#include "allocore/graphics/al_Shader.hpp"
 #include <map>
 
-namespace al {
-struct Shaders {
-  static std::map< std::string, ShaderProgram* > shaders;
-  static std::string vertLibCode;
-  static std::string fragLibCode;
-  static al::ResourceManager rm;
-  
-  static SearchPaths& paths(){ return rm.paths;}
+using namespace std;
 
-  // get a pointer to a loaded shader program with name
-  static ShaderProgram* get(std::string name){
-    return shaders[name];
+struct ShaderManager {
+  std::map<std::string, ShaderProgram*> shaderMap;
+  std::string vertLibCode;
+  std::string fragLibCode;
+  ResourceManager rm;
+
+  ShaderProgram* get(std::string name) {
+    return shaderMap[name];
   }
 
-  // load shader from code
-  static void loadCode(std::string name, std::string vertCode, std::string fragCode){
+  ShaderProgram* addShaderString(std::string name, std::string vertCode, std::string fragCode) {
     // destroy shader if one already exists with same name
-    if(shaders.count(name)){
-      shaders[name]->destroy();
+    if(shaderMap.count(name)){
+      shaderMap[name]->destroy();
     }
 
     Shader vert, frag;
@@ -45,76 +31,103 @@ struct Shaders {
     ShaderProgram *s = new ShaderProgram();
     s->attach(vert).attach(frag).link();
     s->printLog();
+    //s->listParams();
 
-    shaders[name] = s;
+    shaderMap[name] = s;
+
+    return s;
   }
 
-  // load shader from files
-  // set hasGeo as true if it has geometry shaders
-  static void load(std::string name, bool hasGeo=false){
-    std::string vname = name + ".vert";
-    std::string fname = name + ".frag";
-    std::string gname = "";
-    if(hasGeo) gname = name + ".geom"; 
-    load(name, vname, fname, gname);
-  }
-  // load shader from files
-  // set hasGeo as true if it has geometry shaders
-  static void load(std::string name, std::string vname, std::string fname, std::string gname=""){
+  ShaderProgram* addShaderFile(std::string pName, std::string vName, std::string fName) {
     // destroy shader if one already exists with same name
-    if(shaders.count(name)){
-      shaders[name]->destroy();
+    if(shaderMap.count(pName)){
+      shaderMap[pName]->destroy();
     }
     
-    // rm.paths.addAppPaths();
+    rm.paths.addSearchPath("../../", true);
+    rm.paths.addAppPaths();
+    rm.paths.addSearchPath(".", true);
     
-    rm.add(vname, true);
-    rm.add(fname, true);
-    
-    if(gname != "")
-      rm.add(gname, true);
-    
-    Shader vert, frag, geom;
+    rm.add(vName);
+    rm.add(fName);
 
-    if(rm[vname].loaded) vert.source(vertLibCode + rm.data(vname), Shader::VERTEX).compile().printLog();
-    if(rm[fname].loaded) frag.source(fragLibCode + rm.data(fname), Shader::FRAGMENT).compile().printLog();
-    if(gname != "")
-      if(rm[gname].loaded) geom.source(rm.data(gname), Shader::GEOMETRY).compile().printLog();
+    Shader vert, frag;
+
+    if(rm[vName].loaded) vert.source(rm.data(vName), Shader::VERTEX).compile().printLog();
+    if(rm[fName].loaded) frag.source(rm.data(fName), Shader::FRAGMENT).compile().printLog();
 
     ShaderProgram *s = new ShaderProgram();
 
-    if(rm[vname].loaded) s->attach(vert);
-    if(rm[fname].loaded) s->attach(frag);
+    std::cout << "Attaching Vertex Shader: " << vName << std::endl;
+    std::cout << "Attaching Fragment Shader: " << fName << std::endl;
+    
+    if(rm[vName].loaded) s->attach(vert);
+    if(rm[fName].loaded) s->attach(frag);
 
-    if(gname != "")
-      if(rm[gname].loaded) {
-        std::cout << "Attaching Geometry Shader: " << gname << std::endl;
-        s->setGeometryInputPrimitive(Graphics::LINES);
-        s->setGeometryOutputPrimitive(Graphics::TRIANGLE_STRIP);
-        s->setGeometryOutputVertices(18);
-        s->attach(geom);
-      }
+    s->link(); 
+    s->printLog();
+    // s->listParams();
 
-    if(rm[vname].loaded){
-      s->link(); 
-      s->printLog();
+    shaderMap[pName] = s;
+
+    return s;
+  }
+
+  ShaderProgram* addShaderFile(std::string pName, std::string vName, std::string gName, std::string fName) {
+    // destroy shader if one already exists with same name
+    if(shaderMap.count(pName)){
+      shaderMap[pName]->destroy();
+    }
+    
+    rm.paths.addSearchPath("../../", true);
+    rm.paths.addAppPaths();
+    rm.paths.addSearchPath(".", true);
+    
+    rm.add(vName);
+    rm.add(fName);
+    rm.add(gName);
+    
+    Shader vert, frag, geom;
+
+    if(rm[vName].loaded) vert.source(rm.data(vName), Shader::VERTEX).compile().printLog();
+    if(rm[gName].loaded) geom.source(rm.data(gName), Shader::GEOMETRY).compile().printLog();
+    if(rm[fName].loaded) frag.source(rm.data(fName), Shader::FRAGMENT).compile().printLog();
+
+    ShaderProgram *s = new ShaderProgram();
+
+    std::cout << "Attaching Vertex Shader: " << vName << std::endl;
+    if(rm[vName].loaded) s->attach(vert);
+    
+    if(rm[gName].loaded) {
+      std::cout << "Attaching Geometry Shader: " << gName << std::endl;
+      s->setGeometryInputPrimitive(Graphics::LINES);
+      s->setGeometryOutputPrimitive(Graphics::TRIANGLE_STRIP);
+      s->setGeometryOutputVertices(18);
+      s->attach(geom);
     }
 
-    shaders[name] = s;
+    std::cout << "Attaching Fragment Shader: " << fName << std::endl;
+    if(rm[fName].loaded) s->attach(frag);
+
+    s->link(); 
+    s->printLog();
+    // s->listParams();
+
+    shaderMap[pName] = s;
+
+    return s;
   }
   
   // checks modified time tag and returns true if files in resource manager had been changed
-  static bool poll() {
+  bool poll() {
     return rm.poll();
   }
 
+  void destroy() {
+    for (std::map<std::string, ShaderProgram*>::iterator it = shaderMap.begin(); it != shaderMap.end(); ++it) {
+      (it->second)->invalidate();
+    }
+  }
 };
-
-std::map< std::string, ShaderProgram* > Shaders::shaders;
-std::string Shaders::vertLibCode;
-std::string Shaders::fragLibCode;
-al::ResourceManager Shaders::rm;
-
-}
 
 #endif
