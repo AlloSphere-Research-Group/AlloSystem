@@ -87,10 +87,13 @@ public:
 	///
 	void setReadCallback(CallbackFunc func, void *userData);
 
+    void seek(int frame);
+
 private:
 	bool mRunning;
 	bool mLoop;
 	std::atomic<int> mRepeats;
+    std::atomic<int> mSeek;
 	std::mutex mLock;
 	std::condition_variable mCondVar;
 	std::thread *mReaderThread;

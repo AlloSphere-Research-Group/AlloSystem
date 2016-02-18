@@ -6,6 +6,7 @@ SoundFileBuffered::SoundFileBuffered(std::string fullPath, bool loop, int buffer
     mRunning(true),
     mLoop(loop),
     mRepeats(0),
+    mSeek(-1),
     mBufferFrames(bufferFrames),
     mReadCallback(0)
 {
@@ -51,7 +52,12 @@ void SoundFileBuffered::readFunction(SoundFileBuffered  *obj)
 		std::unique_lock<std::mutex> lk(obj->mLock);
 		obj->mCondVar.wait(lk);
 		int framesToRead = obj->mRingBuffer->writeSpace() / (obj->channels() * sizeof(float));
-		int framesRead = obj->mSf.read(buf, framesToRead);
+        int framesRead = obj->mSf.read(buf, framesToRead);
+        int seek = obj->mSeek.load();
+        if (seek >= 0) {
+            obj->mSf.seek(seek, SEEK_SET);
+            obj->mSeek.store(-1);
+        }
 		if (framesRead != framesToRead && obj->mLoop) {
 			obj->mSf.seek(0, SEEK_SET);
 			framesRead += obj->mSf.read(buf + framesRead, framesToRead - framesRead);
@@ -130,5 +136,10 @@ int al::SoundFileBuffered::repeats()
 void SoundFileBuffered::setReadCallback(SoundFileBuffered::CallbackFunc func, void *userData)
 {
 	mReadCallback = func;
-	mCallbackData = userData;
+    mCallbackData = userData;
+}
+
+void al::SoundFileBuffered::seek(int frame)
+{
+    mSeek.store(frame);
 }
