@@ -53,8 +53,43 @@ struct ShaderManager {
 
     Shader vert, frag;
 
-    if(rm[vName].loaded) vert.source(rm.data(vName), Shader::VERTEX).compile().printLog();
-    if(rm[fName].loaded) frag.source(rm.data(fName), Shader::FRAGMENT).compile().printLog();
+    if(rm[vName].loaded) vert.source(vertLibCode + rm.data(vName), Shader::VERTEX).compile().printLog();
+    if(rm[fName].loaded) frag.source(fragLibCode + rm.data(fName), Shader::FRAGMENT).compile().printLog();
+
+    ShaderProgram *s = new ShaderProgram();
+
+    std::cout << "Attaching Vertex Shader: " << vName << std::endl;
+    std::cout << "Attaching Fragment Shader: " << fName << std::endl;
+    
+    if(rm[vName].loaded) s->attach(vert);
+    if(rm[fName].loaded) s->attach(frag);
+
+    s->link(); 
+    s->printLog();
+    // s->listParams();
+
+    shaderMap[pName] = s;
+
+    return s;
+  }
+
+  ShaderProgram* addShaderFile(std::string pName) {
+    // destroy shader if one already exists with same name
+    if(shaderMap.count(pName)){
+      shaderMap[pName]->destroy();
+    }
+    
+    rm.paths.addSearchPath("../../", true);
+    rm.paths.addAppPaths();
+    rm.paths.addSearchPath(".", true);
+    
+    std::string vName = pName + ".vert";
+    std::string fName = pName + ".frag";
+
+    Shader vert, frag;
+
+    if(rm[vName].loaded) vert.source(vertLibCode + rm.data(vName), Shader::VERTEX).compile().printLog();
+    if(rm[fName].loaded) frag.source(fragLibCode + rm.data(fName), Shader::FRAGMENT).compile().printLog();
 
     ShaderProgram *s = new ShaderProgram();
 
@@ -89,8 +124,8 @@ struct ShaderManager {
     
     Shader vert, frag, geom;
 
-    if(rm[vName].loaded) vert.source(rm.data(vName), Shader::VERTEX).compile().printLog();
-    if(rm[gName].loaded) geom.source(rm.data(gName), Shader::GEOMETRY).compile().printLog();
+    if(rm[vName].loaded) vert.source(vertLibCode + rm.data(vName), Shader::VERTEX).compile().printLog();
+    if(rm[gName].loaded) geom.source(fragLibCode + rm.data(gName), Shader::GEOMETRY).compile().printLog();
     if(rm[fName].loaded) frag.source(rm.data(fName), Shader::FRAGMENT).compile().printLog();
 
     ShaderProgram *s = new ShaderProgram();
