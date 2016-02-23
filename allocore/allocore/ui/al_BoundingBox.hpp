@@ -6,12 +6,11 @@ struct BoundingBox {
   Vec3f min, max;
   Vec3f cen, dim;
   Mesh mesh, tics, gridMesh[2];
-  Font font1;
   float glUnitLength;
 
-  BoundingBox() : font1("data/Avenir-Medium.otf", 72), glUnitLength(1.0){}
+  BoundingBox() : glUnitLength(1.0){}
 
-  BoundingBox(const Vec3f &min_, const Vec3f &max_) : min(min_), max(max_), font1("data/Avenir-Medium.otf", 72){
+  BoundingBox(const Vec3f &min_, const Vec3f &max_) : min(min_), max(max_){
     dim = max - min;
     Vec3f halfDim = dim / 2;
     cen = min + halfDim;
@@ -48,15 +47,15 @@ struct BoundingBox {
     return mesh;
   }
 
-  void drawLabels(Graphics &g, Pose cam_pose, Pose obj_pose, float obj_scale){
+  void drawLabels(Graphics &g, Font &font, Pose cam_pose, Pose obj_pose, float obj_scale){
     g.pushMatrix();
       g.color(.35,.35,.35,1);
       g.lineWidth(1);
-      drawLabelsOmni(g, cam_pose, obj_pose, obj_scale);
+      drawLabelsOmni(g, font, cam_pose, obj_pose, obj_scale);
     g.popMatrix();
   }
 
-  void drawLabelsOmni(Graphics &g, Pose cam_pose, Pose obj_pose, float obj_scale){
+  void drawLabelsOmni(Graphics &g, Font &font, Pose cam_pose, Pose obj_pose, float obj_scale){
     
     // Handle depth test so they're sorted and properly transparent
     g.polygonMode(Graphics::FILL);
@@ -101,7 +100,7 @@ struct BoundingBox {
             else if (i == 0 && axis == 0) sstream << i*10; // only draw zero once
             string temp_str = sstream.str();
             const char* text = temp_str.c_str();
-            font1.render(g, text);
+            font.render(g, text);
 
           g.popMatrix();
         }
