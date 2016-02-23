@@ -31,9 +31,8 @@ struct Pickable {
   bool hud_setup = false;
   Mesh hudMesh;
   Mesh hudLine;
-  Font font1;
 
-  Pickable() : scale(1), font1("data/Avenir-Medium.otf", 72){
+  Pickable() : scale(1){
     for (int i = 1; i <= 2; i++){
       hudLine.vertex(0,0,0);
       float Cd = (float)i/2;
@@ -42,7 +41,7 @@ struct Pickable {
     hudLine.primitive(Graphics::LINES);
   }
 
-  Pickable(Mesh &mesh) : scale(1), font1("data/Avenir-Medium.otf", 72) {
+  Pickable(Mesh &mesh) : scale(1){
     // mesh = m;
     Vec3f bbMin,bbMax;
     mesh.getBounds(bbMin,bbMax);
@@ -126,10 +125,10 @@ struct Pickable {
     popMatrix(g);
   }
 
-  void drawBBLabels(Graphics &g, Pose cam_pose){
+  void drawBBLabels(Graphics &g, Font &font, Pose cam_pose){
     if(!selected && !hover) return;
     g.pushMatrix();
-    bb.drawLabels(g, cam_pose, pose, scale);
+    bb.drawLabels(g, font, cam_pose, pose, scale);
     g.popMatrix();
   }
 
@@ -169,7 +168,7 @@ struct Pickable {
     glPopAttrib();
  }
 
-  void drawHUDText(Graphics &g, Pose& nav, Pose& target){
+  void drawHUDText(Graphics &g, Font &font, Pose& nav, Pose& target){
     g.pushMatrix();
       // Handle depth test so they're sorted and properly transparent
       g.polygonMode(Graphics::FILL);
@@ -187,7 +186,7 @@ struct Pickable {
         hudRotScale(g);
         stringstream sstream;
         sstream << "translation: ";
-        renderText(g, sstream.str());
+        renderText(g, font, sstream.str());
       g.popMatrix();
 
       // line spacing. translate by this much for each line (after the first one)
@@ -199,7 +198,7 @@ struct Pickable {
         Vec3f xyz = target.pos();
         sstream.str("");
         sstream << xyz.x << ", " << xyz.y << ", " << xyz.z;
-        renderText(g, sstream.str());
+        renderText(g, font, sstream.str());
       g.popMatrix();
 
 
@@ -209,7 +208,7 @@ struct Pickable {
         hudRotScale(g);
         sstream.str("");
         sstream << "rotation: ";
-        renderText(g, sstream.str());
+        renderText(g, font, sstream.str());
       g.popMatrix();
 
       g.translate(tx);
@@ -218,17 +217,17 @@ struct Pickable {
         Quatd euler = target.quat();
         sstream.str("");
         sstream << euler.x << ", " << euler.y << ", " << euler.z << ", " << euler.w;
-        renderText(g, sstream.str());
+        renderText(g, font, sstream.str());
       g.popMatrix();
 
     glDisable(GL_ALPHA_TEST);
     g.popMatrix();
   }
 
-  void renderText(Graphics &g, string _text){
+  void renderText(Graphics &g, Font &font, string _text){
     string temp_str = _text;
     const char* text = temp_str.c_str();
-    font1.render(g, text);
+    font.render(g, text);
   }
 
   void drawLine(Graphics &g, Pose& target, Pose& nav){

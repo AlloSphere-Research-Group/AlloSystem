@@ -9,18 +9,16 @@ struct Gnomon {
 
   static Gnomon gnomon;
 
-  // Font font1;
-  Color colors[3]; // = {RGB(1,0,0), RGB(0,1,0), RGB(0,0,1)};
-  const char* xyz_text[3]; // = {"x", "y", "z"};
+  Color colors[3];
+  const char* labels[3];
 
-
-  Gnomon() { //: font1("data/Avenir-Medium.otf", 72){
+  Gnomon() { 
     colors[0]=RGB(1,0,0);
     colors[1]=RGB(0,1,0);
     colors[2]=RGB(0,0,1);
-    xyz_text[0]="x";
-    xyz_text[1]="y";
-    xyz_text[2]="z";
+    labels[0]="x";
+    labels[1]="y";
+    labels[2]="z";
     addPrism(arrowMesh, 0.0, 0.025, .1, 10, 0);
     gnomonMesh.primitive(Graphics::LINES);
     // x line
@@ -104,7 +102,7 @@ struct Gnomon {
     }
   }
 
-  void drawLabels(Graphics &g, Font font, Pose cam_pose, float scale, Vec3f offset = Vec3f(0,0,0)){
+  void drawLabels(Graphics &g, Font &font, Pose cam_pose, float scale, Vec3f offset = Vec3f(0,0,0)){
     // XYZ labels
     g.polygonMode(Graphics::FILL);
     glEnable(GL_BLEND);
@@ -122,7 +120,7 @@ struct Gnomon {
         g.scale(scale);
 
         g.color(colors[i]);
-        font.render(g,xyz_text[i]);
+        font.render(g,labels[i]);
       g.popMatrix();
     }
     glDisable(GL_ALPHA_TEST);

@@ -90,7 +90,7 @@ struct RotateHandle {
       int minIdx = -1;
       for(int i=0; i < 3; i++){
         hover[i] = false;
-        t = r.intersectCircle(pos, Vec3f(i==0,i==1,i==2), 0.55);
+        t = r.intersectCircle(pos, Vec3f(i==0,i==1,i==2), 0.55, 0.45);
         if(t > 0 && t < min){
           min = t;
           minIdx = i;
