@@ -72,9 +72,9 @@ class Project():
         script_text += '\ncd ..\n'
         
         if self.clone_as_submodules:
-            repo_clone_cmd = 'git submodule add --depth 1 '   
+            repo_clone_cmd = 'git submodule add --depth 50 '   
         else:
-            repo_clone_cmd = 'git clone -b devel --depth 1 '
+            repo_clone_cmd = 'git clone -b devel --depth 50 '
         
         if not self.use_installed_libs:
             script_text += repo_clone_cmd + 'https://github.com/AlloSphere-Research-Group/AlloSystem.git AlloSystem\n'
@@ -84,14 +84,16 @@ class Project():
                 script_text += repo_clone_cmd + 'https://github.com/AlloSphere-Research-Group/Gamma.git Gamma\n'
             if self.dependencies['GLV']:
                 script_text += repo_clone_cmd + 'https://github.com/AlloSphere-Research-Group/GLV.git GLV\n'
-        
+
+        if self.clone_as_submodules:
+            script_text += '''git init
+git submodule init
+git submodule update
+'''
         script_text += '''git fat init
 git fat pull
 '''
-        if self.clone_as_submodules:
-            script_text += '''git submodule init
-git submodule update
-'''
+
         curpath = os.getcwd()
         os.chdir(self.dir + '/' + self.project_name)
         f = open('initproject.sh', 'w')
