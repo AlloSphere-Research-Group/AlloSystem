@@ -5,6 +5,7 @@ uniform vec3 pos;
 uniform float eyesep;
 uniform float time;
 varying vec2 T;
+// layout(location = 0) out vec3 testcolor;
 
 float accuracy = 1e-3;
 float stepsize = 0.02;
@@ -163,6 +164,7 @@ void main(){
   }
   
   color *= texture2D(alphaMap, T).rgb;
+  // color *= vec3(1.0, 0.0, 0.0);
   
   gl_FragColor = vec4(color, 1);
 }

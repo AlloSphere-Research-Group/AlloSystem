@@ -6,6 +6,7 @@
 #include "allocore/protocol/al_OSC.hpp"
 #include "alloutil/al_FPS.hpp"
 #include "alloutil/al_RayStereo.hpp"
+#include "alloutil/al_ShaderManager.hpp"
 
 #define PORT_TO_DEVICE_SERVER (12000)
 #define PORT_FROM_DEVICE_SERVER (PORT_TO_DEVICE_SERVER+1)
@@ -13,7 +14,9 @@
 
 namespace al {
   
-  class RayApp : public Window, public osc::PacketHandler, public FPS {
+  class RayApp : public Window,
+                 public FPS,
+                 public osc::PacketHandler {
   public:
     RayApp(std::string name = "rayapp", bool slave=false, unsigned int recvPort=PORT_FROM_DEVICE_SERVER);
     virtual ~RayApp();
@@ -28,7 +31,7 @@ namespace al {
     virtual void onSound(AudioIOData& io) {}
     virtual void onMessage(osc::Message& m);
     
-    virtual void initShaderParams();
+    virtual void initShader();
     
     void initWindow(const Window::Dim& dims = Window::Dim(800, 600),
                     const std::string title = "RayApp",
@@ -62,14 +65,9 @@ namespace al {
     bool omniEnable() const { return bOmniEnable; }
     void omniEnable(bool b) { bOmniEnable = b; }
     
-    ShaderProgram& shader() { return mShader; }
+    virtual void loadShaders();
     
-    void loadShaderString();
-    void loadShaderString(std::string vSrc, std::string fSrc);
-    void loadShaderFile(std::string vPath, std::string fPath);
-    void recompileShaderFile(std::string vFile, std::string fFile);
-    
-    virtual void sendUniforms(ShaderProgram& shaderProgram);
+    virtual void sendUniforms(ShaderProgram* shaderProgram);
     
     const std::string&	hostName() const { return mHostName; }
     const std::string& name() const { return mName; }
@@ -92,9 +90,8 @@ namespace al {
     Lens mLens;
     Graphics mGraphics;
     
-    ShaderProgram mShader;
-    Shader mVert, mFrag;
-    
+    ShaderManager mShaderManager;
+
     // control
     Nav mNav;
     NavInputControl mNavControl;
@@ -108,7 +105,7 @@ namespace al {
     std::string mName;
     std::string mHostName;
     
-    bool bOmniEnable, bSlave, bShaderExists;
+    bool bOmniEnable, bSlave, bShaderLoaded;
     
     static void AppAudioCB(AudioIOData& io);
   };
@@ -124,7 +121,7 @@ namespace al {
   mOmni(2048)
   {
     bOmniEnable = true;
-    bShaderExists = false;
+    bShaderLoaded = false;
     mHostName = Socket::hostName();
     mName = name;
     
@@ -154,11 +151,6 @@ namespace al {
     if (!bSlave) sendDisconnect();
   }
   
-  inline void RayApp::initOmni(std::string path) {
-    printf("Searching for config file..\n");
-    mOmni.loadConfig(path, mHostName);
-  }
-  
   inline void RayApp::initWindow(const Window::Dim& dims,
                                  const std::string title,
                                  double fps,
@@ -167,6 +159,11 @@ namespace al {
     Window::title(title);
     Window::fps(fps);
     Window::displayMode(mode);
+  }
+
+  inline void RayApp::initOmni(std::string path) {
+    printf("Searching for config file..\n");
+    mOmni.loadConfig(path, mHostName);
   }
   
   inline void RayApp::initAudio(double audioRate, int audioBlockSize) {
@@ -224,156 +221,56 @@ namespace al {
     
     mOmni.onCreate();
     
-    if (!bShaderExists) {
-      printf("No shader file specified. Reading from vertexCode()/fragmentCode().\n");
-      loadShaderString();
-    }
-    
-    mVert.compile();
-    mVert.printLog();
-    mFrag.compile();
-    mFrag.printLog();
-    
-    mShader.attach(mVert);
-    mShader.attach(mFrag);
-    mShader.link(false); // do not validate yet
-    
-    // set uniforms before validating to prevent validation error
-    mShader.listParams();
-    
-    initShaderParams(); // initialize custom texture or non-default uniforms here
-    
-    mShader.begin();
-    mShader.uniform("alphaMap", 2);
-    mShader.uniform("pixelMap", 1);
-    mShader.end();
-    
-    mShader.validate();
-    mShader.printLog();
-    
-    Graphics::error("shader program initialization failed");
-    
     return true;
   }
   
   inline bool RayApp::onDestroy() {
-    mShader.destroy();
-    
+    mShaderManager.destroy();
+
     return true;
   }
-  
-  inline void RayApp::loadShaderString() {
-    mVert.source(vertexCode(), Shader::VERTEX);
-    mFrag.source(fragmentCode(), Shader::FRAGMENT);
-    
-    bShaderExists = true;
-  }
-  
-  inline void RayApp::loadShaderString(std::string vSrc, std::string fSrc) {
-    mVert.source(vSrc, Shader::VERTEX);
-    mFrag.source(fSrc, Shader::FRAGMENT);
-    
-    bShaderExists = true;
-  }
-  
-  inline void RayApp::loadShaderFile(std::string vFile, std::string fFile) {
-    File vert_file(vFile, "r", true);
-    File frag_file(fFile, "r", true);
-    
-    printf("Reading Vertex Shader: %s\n", vert_file.path().c_str());
-    printf("Reading Fragment Shader: %s\n", frag_file.path().c_str());
-    
-    if(!vert_file.opened() || !frag_file.opened()){
-      AL_WARN("Cannot open shader files.");
-      exit(EXIT_FAILURE);
-    }
-    
-    mVert.source(vert_file.readAll(), Shader::VERTEX);
-    mFrag.source(frag_file.readAll(), Shader::FRAGMENT);
-    
-    bShaderExists = true;
-  }
-  
-  inline void RayApp::recompileShaderFile(std::string vFile, std::string fFile) {
-    File vert_file(vFile, "r", true);
-    File frag_file(fFile, "r", true);
-    
-    printf("Reading Vertex Shader: %s\n", vert_file.path().c_str());
-    printf("Reading Fragment Shader: %s\n", frag_file.path().c_str());
-    
-    if(!vert_file.opened() || !frag_file.opened()){
-      AL_WARN("Cannot open shader files.");
-      exit(EXIT_FAILURE);
-    }
-    
-    mShader.detach(mVert);
-    mShader.detach(mFrag);
-    
-    mVert.source(vert_file.readAll(), Shader::VERTEX);
-    mFrag.source(frag_file.readAll(), Shader::FRAGMENT);
-    
-    bShaderExists = true;
-    
-    mVert.compile();
-    mVert.printLog();
-    mFrag.compile();
-    mFrag.printLog();
-    
-    mShader.attach(mVert);
-    mShader.attach(mFrag);
-    mShader.link(false); // do not validate yet
-                         // set uniforms before validating to prevent validation error
-    mShader.listParams();
-    
-    initShaderParams(); // initialize custom texture or non-default uniforms here
-    
-    mShader.begin();
-    mShader.uniform("alphaMap", 2);
-    mShader.uniform("pixelMap", 1);
-    mShader.end();
-    
-    mShader.validate();
-    mShader.printLog();
-    
-    Graphics::error("shader program initialization failed");
+
+  inline void RayApp::loadShaders(){
+    std::cout << "loading Shaders" << std::endl;
+    mShaderManager.vertLibCode = "#version 120\n";
+    mShaderManager.addShaderString("default", vertexCode(), fragmentCode());
   }
   
   // for initializing parameters before compiling shader
-  inline void RayApp::initShaderParams() {
+  inline void RayApp::initShader() {
   }
   
   // basic uniforms used in the shader. override it on user code
-  inline void RayApp::sendUniforms(ShaderProgram& shaderProgram) {
+  inline void RayApp::sendUniforms(ShaderProgram* shaderProgram) {
   }
   
   inline bool RayApp::onFrame() {
+    if(!bShaderLoaded) {
+      initShader();
+      loadShaders();
+      bShaderLoaded = true;
+    }
+    if(mShaderManager.poll()) loadShaders();
+
     FPS::onFrame();
-    
+
     if(frame % 60 == 0) {
       printf("FPS: %03.6f\n", FPS::fps());
-      //      nav().print();
+//      nav().print();
     }
-    
-    //    if (mShader.id() == 0) onCreate();
-    
+
     while(oscRecv().recv()) {}
     
     nav().step();
     
     onAnimate(dt);
     
-    Viewport vp(width(), height());
-    
-    mShader.begin();
-    
-    sendUniforms(mShader);
-    
-    mOmni.draw(mShader, lens(), vp);
-    
-    mShader.end();
-    
+    onDraw(graphics());
+
     return true;
   }
+
+  
   
   inline void RayApp::onMessage(osc::Message& m) {
     float x;

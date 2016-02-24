@@ -6,6 +6,8 @@ SoundFileBuffered::SoundFileBuffered(std::string fullPath, bool loop, int buffer
     mRunning(true),
     mLoop(loop),
     mRepeats(0),
+    mSeek(-1),
+    mCurPos(0),
     mBufferFrames(bufferFrames),
     mReadCallback(0)
 {
@@ -14,6 +16,7 @@ SoundFileBuffered::SoundFileBuffered(std::string fullPath, bool loop, int buffer
 	if (mSf.opened()) {
 		mRingBuffer = new SingleRWRingBuffer(mBufferFrames * channels() * sizeof(float));
 		mReaderThread = new std::thread(readFunction, this);
+		mFileBuffer = new float[mBufferFrames * channels()];
 	}
 }
 
@@ -25,6 +28,7 @@ SoundFileBuffered::~SoundFileBuffered()
 		mReaderThread->join();
 		delete mReaderThread;
 		delete mRingBuffer;
+		delete[] mFileBuffer;
 	}
 	mSf.close();
 }
@@ -46,29 +50,36 @@ bool SoundFileBuffered::opened() const
 
 void SoundFileBuffered::readFunction(SoundFileBuffered  *obj)
 {
-	float buf[obj->mBufferFrames * obj->channels()];
 	while (obj->mRunning) {
 		std::unique_lock<std::mutex> lk(obj->mLock);
 		obj->mCondVar.wait(lk);
 		int framesToRead = obj->mRingBuffer->writeSpace() / (obj->channels() * sizeof(float));
-		int framesRead = obj->mSf.read(buf, framesToRead);
-		if (framesRead != framesToRead && obj->mLoop) {
-			obj->mSf.seek(0, SEEK_SET);
-			framesRead += obj->mSf.read(buf + framesRead, framesToRead - framesRead);
-			std::atomic_fetch_add(&(obj->mRepeats), 1);
-		}
-		int written = obj->mRingBuffer->write((const char*) buf, framesRead * sizeof(float) * obj->channels());
-//		if (written != framesRead * sizeof(float) * obj->channels()) {
-//			// TODO handle overrun
-//		}
-		if (obj->mReadCallback) {
-			obj->mReadCallback(buf, obj->mSf.channels(), framesRead, obj->mCallbackData);
-		}
-		lk.unlock();
+	int framesRead = obj->mSf.read(obj->mFileBuffer, framesToRead);
+	std::atomic_fetch_add(&(obj->mCurPos), framesRead);
+	int seek = obj->mSeek.load();
+	if (seek >= 0) { // Process seek request
+	    obj->mSf.seek(seek, SEEK_SET);
+	    obj->mSeek.store(-1);
+	}
+	if (framesRead != framesToRead) { // Final incomplete buffer in the file
+	    framesRead += obj->mSf.read(obj->mFileBuffer + framesRead, framesToRead - framesRead);
+	    if (obj->mLoop) {
+		obj->mSf.seek(0, SEEK_SET);
+		std::atomic_fetch_add(&(obj->mRepeats), 1);
+	    }
+	}
+	int written = obj->mRingBuffer->write((const char*) obj->mFileBuffer, framesRead * sizeof(float) * obj->channels());
+	//		if (written != framesRead * sizeof(float) * obj->channels()) {
+	//			// TODO handle overrun
+	//		}
+	if (obj->mReadCallback) {
+	    obj->mReadCallback(obj->mFileBuffer, obj->mSf.channels(), framesRead, obj->mCallbackData);
+	}
+	lk.unlock();
 	}
 }
 
-gam::SoundFile::EncodingType al::SoundFileBuffered::encoding() const
+gam::SoundFile::EncodingType SoundFileBuffered::encoding() const
 {
 	if (opened()) {
 		return mSf.encoding();
@@ -122,13 +133,30 @@ int SoundFileBuffered::samples() const
 	}
 }
 
-int al::SoundFileBuffered::repeats()
+int SoundFileBuffered::repeats()
 {
 	return mRepeats.load();
 }
 
 void SoundFileBuffered::setReadCallback(SoundFileBuffered::CallbackFunc func, void *userData)
 {
-	mReadCallback = func;
-	mCallbackData = userData;
+        mReadCallback = func;
+    mCallbackData = userData;
+}
+
+void SoundFileBuffered::seek(int frame)
+{
+    if (frame < 0) {
+        frame = 0;
+    }
+    if (frame >= frames()) {
+        frame = frames() - 1;
+    }
+    mSeek.store(frame);
+    mCurPos.store(frame);
+}
+
+int SoundFileBuffered::currentPosition()
+{
+    return mCurPos.load();
 }
