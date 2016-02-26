@@ -74,10 +74,10 @@ class Project():
         
         if self.clone_as_submodules:
             script_text += '''git submodule init
-git submodule update --depth 100
+git submodule update --depth 50
 '''
         elif not self.use_installed_libs:
-            repo_clone_cmd = 'git clone -b devel --depth 1 '
+            repo_clone_cmd = 'git clone -b devel --depth 50 '
             script_text += repo_clone_cmd + 'https://github.com/AlloSphere-Research-Group/AlloSystem.git AlloSystem\n'
             if self.dependencies['Cuttlebone']:
                 script_text += repo_clone_cmd + 'https://github.com/rbtsx/cuttlebone.git cuttlebone\n'
@@ -99,11 +99,11 @@ git fat pull
             # write submodule update script so useer can run this to update submodules
             submodule_script_text = '''#!/bin/sh
 git submodule init
-git submodule update --depth 100
+git submodule update --depth 50
 '''
             f = open('update_submodule.sh', 'w')
             f.write(submodule_script_text)
-            os.chmod('update_submodule.sh', stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+            # os.chmod('update_submodule.sh', stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
 
             # write submodule_readme
             submodule_readme_text = '''When you just checked out the project, run initproject.sh to initialize build scripts as well as git fat and submodules. Later, to update only submodules, run update_submodule.sh.'''
