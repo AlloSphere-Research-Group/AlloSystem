@@ -13,6 +13,7 @@ ENDIF()
 if(BUILD_DIR)
   string(REGEX REPLACE "/+$" "" ALLOSYSTEM_BUILD_APP_DIR "${ALLOSYSTEM_BUILD_APP_DIR}") # remove trailing slash
   file(GLOB ALLOSYSTEM_APP_SRC "${CMAKE_SOURCE_DIR}/${ALLOSYSTEM_BUILD_APP_DIR}/*.cpp")
+  file(GLOB ALLOSYSTEM_CUDA_SRC "${CMAKE_SOURCE_DIR}/${ALLOSYSTEM_BUILD_APP_DIR}/*.cu")
 #  file(GLOB ALLOSYSTEM_APP_SRC RELATIVE "${CMAKE_SOURCE_DIR}" "${ALLOSYSTEM_BUILD_APP_DIR}/*.cpp")
   string(REPLACE "/" "_" APP_NAME "${ALLOSYSTEM_BUILD_APP_DIR}")
   string(REGEX REPLACE "_+$" "" APP_NAME "${APP_NAME}")
@@ -36,7 +37,7 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/build/bin)
 
 # -------------------------- BuildAlloTarget
 
-function(BuildAlloTarget ALLO_APP_NAME ALLO_APP_SRC DEFINES SUFFIX)
+function(BuildAlloTarget ALLO_APP_NAME ALLO_APP_SRC ALLO_CUDA_SRC DEFINES SUFFIX)
 
 if(NOT "${SUFFIX}" STREQUAL "")
 set(ALLO_APP_NAME_SUFFIX "${${ALLO_APP_NAME}}_${SUFFIX}")
@@ -44,7 +45,33 @@ else()
 set(ALLO_APP_NAME_SUFFIX "${${ALLO_APP_NAME}}")
 endif()
 
-add_executable("${ALLO_APP_NAME_SUFFIX}" EXCLUDE_FROM_ALL ${${ALLO_APP_SRC}})
+set(BUILDING_CUDA_APP 0)
+
+if(NOT "${ALLO_CUDA_SRC}" EQUAL "")
+  message("Building CUDA application.")
+  set(BUILDING_CUDA_APP 1)
+  if(UNIX AND NOT APPLE)
+    set(CMAKE_CXX_COMPILER g++-4.8)
+    set(CMAKE_C_COMPILER gcc-4.8)
+    set(CUDA_TOOLKIT_ROOT_DIR "/usr/local/cuda-7.5")
+    find_package(CUDA REQUIRED)
+    set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -gencode arch=compute_30,code=sm_30 -ccbin /usr/bin/gcc-4.8 --std=c++11)
+    cuda_add_executable("${ALLO_APP_NAME_SUFFIX}"
+      ${${ALLO_APP_SRC}} ${ALLO_CUDA_SRC}
+      OPTIONS -DSTUFF="blah blah"
+      RELEASE -DNDEBUG
+      DEBUG -g -DDEBUG
+    )
+  else()
+  # TODO add support for CUDA on OS X
+  endif()
+
+else()
+  # No CUDA sources, build regular application
+  add_executable("${ALLO_APP_NAME_SUFFIX}" EXCLUDE_FROM_ALL ${${ALLO_APP_SRC}})
+endif(BUILDING_CUDA_APP)
+
+
 
 if(NOT ${DEFINES} STREQUAL "")
 #message("Adding defines ${DEFINES}")
@@ -251,14 +278,14 @@ if(BUILD_ALLOSPHERE_APP)
 
 list(APPEND ALLOSPHERE_APPS "")
 
-BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_SIMULATOR" "simulator")
+BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "${ALLOSYSTEM_CUDA_SRC}" "ALLOSPHERE_BUILD_SIMULATOR" "simulator")
 AddRunTarget("${APP_NAME}_simulator" "${APP_NAME}_simulator")
 list(APPEND ALLOSPHERE_APPS "${APP_NAME}_simulator")
-BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_GRAPHICS_RENDERER" "graphics")
+BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "${ALLOSYSTEM_CUDA_SRC}" "ALLOSPHERE_BUILD_GRAPHICS_RENDERER" "graphics")
 AddRunTarget("${APP_NAME}_graphics" "${APP_NAME}_graphics")
 list(APPEND ALLOSPHERE_APPS "${APP_NAME}_graphics")
 if(BUILD_ALLOSPHERE_APP_AUDIO_RENDERER)
-BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_AUDIO_RENDERER" "audio")
+BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "${ALLOSYSTEM_CUDA_SRC}" "ALLOSPHERE_BUILD_AUDIO_RENDERER" "audio")
 AddRunTarget("${APP_NAME}_audio" "${APP_NAME}_audio")
 list(APPEND ALLOSPHERE_APPS "${APP_NAME}_audio")
 endif()
@@ -287,7 +314,7 @@ add_custom_target("${APP_NAME}_run"
 #  option(RUN_IN_DEBUGGER 0) # For next run
 
 else()
-BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "" "")
+BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "${ALLOSYSTEM_CUDA_SRC}" "" "")
 AddRunTarget("${APP_NAME}" "${APP_NAME}")
 endif()
 
