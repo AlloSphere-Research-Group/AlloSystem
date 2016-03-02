@@ -279,7 +279,7 @@ add_custom_target("${APP_NAME}"
   SOURCES ${${ALLO_APP_SRC}})
 
 add_custom_target("${APP_NAME}_run"
-  COMMAND "python" "tools/allorun/allorun.py" "${BUILD_ROOT_DIR}/build/${APP_NAME}.json"
+  COMMAND "python" "${CMAKE_CURRENT_SOURCE_DIR}/tools/allorun/allorun.py" "${BUILD_ROOT_DIR}/build/${APP_NAME}.json"
   DEPENDS ${ALLOSPHERE_APPS}
   WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
   SOURCES ${${ALLO_APP_SRC}}
