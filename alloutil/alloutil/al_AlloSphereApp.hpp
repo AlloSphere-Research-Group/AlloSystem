@@ -131,11 +131,14 @@ template<typename State = DummyState, typename AudioState = DummyState,
 class SimulatorBase : public App {
 public:
 	explicit SimulatorBase(const Window::Dim& dims = Window::Dim(320, 240),
-	                          const std::string title="",
-	                          double fps=60,
-	                          Window::DisplayMode mode = Window::DEFAULT_BUF,
-	                          int flags=0) :
-	    mDims(dims), mTitle(title), mFps(fps), mMode(mode), mFlags(flags)
+	                       const std::string title="",
+	                       double fps=60,
+	                       Window::DisplayMode mode = Window::DEFAULT_BUF,
+	                       int flags=0,
+	                       const char *broadcastIP = "127.0.0.1") :
+	    mDims(dims), mTitle(title), mFps(fps), mMode(mode), mFlags(flags),
+	    mMakerAudio(broadcastIP),
+	    mMakerGraphics(broadcastIP)
 	{
 		mMakerGraphics.start();
 		mMakerAudio.start();
