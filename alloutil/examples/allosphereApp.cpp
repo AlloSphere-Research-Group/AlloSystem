@@ -86,9 +86,7 @@ public:
 		pose = nav();
 	}
 
-	virtual void onDrawOmni(OmniStereo& om) override {
-
-		Graphics g = graphics();
+	virtual void onDraw(Graphics &g) override {
 
 		// Call updateState() to process the state message queue. If there
 		// is a new state, the function will return true. You can then
