@@ -13,6 +13,7 @@ import stat
 import urllib2
 import pickle
 from subprocess import Popen, PIPE
+from shlex import split
 
 import Tkinter as tk
 import tkFileDialog
@@ -72,11 +73,11 @@ class Project():
         script_text += '\ncd ..\n'
         
         if self.clone_as_submodules:
-            repo_clone_cmd = 'git submodule add --depth 50 '   
-        else:
+            script_text += '''git submodule init
+git submodule update --depth 50
+'''
+        elif not self.use_installed_libs:
             repo_clone_cmd = 'git clone -b devel --depth 50 '
-        
-        if not self.use_installed_libs:
             script_text += repo_clone_cmd + 'https://github.com/AlloSphere-Research-Group/AlloSystem.git AlloSystem\n'
             if self.dependencies['Cuttlebone']:
                 script_text += repo_clone_cmd + 'https://github.com/rbtsx/cuttlebone.git cuttlebone\n'
@@ -84,28 +85,53 @@ class Project():
                 script_text += repo_clone_cmd + 'https://github.com/AlloSphere-Research-Group/Gamma.git Gamma\n'
             if self.dependencies['GLV']:
                 script_text += repo_clone_cmd + 'https://github.com/AlloSphere-Research-Group/GLV.git GLV\n'
-
-        if self.clone_as_submodules:
-            script_text += '''git init
-git submodule init
-git submodule update
-'''
+        
         script_text += '''git fat init
 git fat pull
 '''
-
         curpath = os.getcwd()
         os.chdir(self.dir + '/' + self.project_name)
         f = open('initproject.sh', 'w')
         f.write(script_text)
         os.chmod('initproject.sh', stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+
+        if self.clone_as_submodules:
+            # write submodule update script so useer can run this to update submodules
+            submodule_script_text = '''#!/bin/sh
+git submodule init
+git submodule update --depth 50
+'''
+            f = open('update_submodule.sh', 'w')
+            f.write(submodule_script_text)
+            # os.chmod('update_submodule.sh', stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP)
+
+            # write submodule_readme
+            submodule_readme_text = '''When you just checked out the project, run initproject.sh to initialize build scripts as well as git fat and submodules. Later, to update only submodules, run update_submodule.sh.'''
+            f = open('submodule_readme.txt', 'w')
+            f.write(submodule_readme_text)
+
         os.chdir(curpath)        
         
     def run_init_script(self):
         curpath = os.getcwd()
         os.chdir(self.dir + '/' + self.project_name)
-        p = Popen(['./initproject.sh'], stdout=PIPE, stderr=PIPE, stdin=PIPE)
+
         stdout = []
+
+        if self.clone_as_submodules:
+            # initialize submodule. "submodule add" needs to be run only once
+            # so this command doesn't get saved as file
+            # later, users can run update_submodule.sh to update them
+            p1 = Popen(split("git init"), stdout=PIPE)
+            p2 = Popen(split("git submodule add --depth 1 https://github.com/AlloSphere-Research-Group/AlloSystem.git AlloSystem"), stdout=PIPE)
+            if self.dependencies['Gamma']:
+                p3 = Popen(split("git submodule add --depth 1 https://github.com/AlloSphere-Research-Group/Gamma.git Gamma"), stdout=PIPE)
+            if self.dependencies['GLV']:
+                p4 = Popen(split("git submodule add --depth 1 https://github.com/AlloSphere-Research-Group/GLV.git GLV"), stdout=PIPE)
+            if self.dependencies['Cuttlebone']:
+                p5 = Popen(split("git submodule add --depth 1 https://github.com/rbtsx/cuttlebone.git cuttlebone"), stdout=PIPE)
+
+        p = Popen(['./initproject.sh'], stdout=PIPE, stderr=PIPE, stdin=PIPE)
         while True:
             line = p.stdout.readline()
             stdout.append(line)
@@ -116,7 +142,7 @@ git fat pull
         os.chdir(curpath)
         
         return output
-    
+
 
 class Application(tk.Frame):
     def __init__(self, master=None):
