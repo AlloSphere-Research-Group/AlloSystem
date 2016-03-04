@@ -239,6 +239,9 @@ public:
 	const ShaderProgram& uniform(int location, float v0, float v1, float v2) const;
 	const ShaderProgram& uniform(int location, float v0, float v1, float v2, float v3) const;
 
+	const ShaderProgram& uniform(const char * name, Color v) const {
+	  return uniform(name, v[0], v[1], v[2], v[3]);
+	}
 
 	template <typename T>
 	const ShaderProgram& uniform(const char * name, const Vec<2,T>& v) const {
