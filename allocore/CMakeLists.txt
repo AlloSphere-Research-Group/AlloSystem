@@ -17,6 +17,7 @@ list(APPEND ALLOCORE_SRC
   src/system/al_Info.cpp
   src/system/al_PeriodicThread.cpp
   src/system/al_Printing.cpp
+  src/system/al_ThreadNative.cpp
   src/system/al_Watcher.cpp
   src/types/al_Array.cpp
   src/types/al_Array_C.c
@@ -77,27 +78,13 @@ list(APPEND ALLOCORE_HEADERS
 
 set(ALLOCORE_DUMMY_HEADERS "")
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  list(APPEND ALLOCORE_SRC
-    src/system/al_InfoOSX.mm
-)
-endif()
+# Required for serial, hidapi, RtMidi and other externals
+INCLUDE_DIRECTORIES(external)
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  find_package(Threads QUIET)
-  if(CMAKE_THREAD_LIBS_INIT)
-  list(APPEND ALLOCORE_SRC
-    src/system/al_ThreadNative.cpp
+# RtMidi source file
+list(APPEND ALLOCORE_SRC
+    external/rtmidi-2.1.1/RtMidi.cpp
 )
-  else()
-    message("NOT building native thread Library (pthreads not found).")
-  endif()
-else()
-# Windows and OS X come with threading libraries installed.
-  list(APPEND ALLOCORE_SRC
-    src/system/al_ThreadNative.cpp
-)
-endif()
 
 # Dependencies --------------------------------------------
 set(ALLOCORE_DEP_INCLUDE_DIRS ${BUILD_ROOT_DIR}/build/include)
@@ -121,8 +108,16 @@ endif()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     # Needed by HID
   find_library(IOKIT_FM IOKit)
+  find_library(COREMIDI_FM CoreMIDI) # For RtMidi
+  find_library(COREAUDIO_FM CoreAudio) # For RtMidi
   find_library(COREFOUNDATION_FM CoreFoundation)
-  list(APPEND ALLOCORE_LINK_LIBRARIES ${IOKIT_FM} ${COREFOUNDATION_FM})
+  list(APPEND ALLOCORE_LINK_LIBRARIES ${IOKIT_FM} ${COREFOUNDATION_FM} ${COREAUDIO_FM} ${COREMIDI_FM})
+
+  add_definitions(-D__MACOSX_CORE__) # For RtMidi
+
+  list(APPEND ALLOCORE_SRC
+    src/system/al_InfoOSX.mm
+)
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 # ---- Linux ------
@@ -131,12 +126,30 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # For clock_gettime, etc.
   list(APPEND ALLOCORE_LINK_LIBRARIES rt)
 
+  find_package(Threads QUIET)
+  if(NOT CMAKE_THREAD_LIBS_INIT)
+    message(FATAL_ERROR "Pthreads required. Not found.")
+  endif()
+
   # For HID
   find_package(Udev QUIET)
   include_directories(${UDEV_INCLUDE_DIR})
   find_package(Libusb QUIET)
   list(APPEND ALLOCORE_LINK_LIBRARIES ${LIBUSB_1_LIBRARY} ${UDEV_LIBRARY})
   #message("libudev lib = ${UDEV_LIBRARY}")
+
+  # For RtMidi
+  add_definitions(-D__LINUX_ALSA__) # For RtMidi
+  list(APPEND ALLOCORE_LINK_LIBRARIES asound) # This should be added by the portaudio module but here just in case
+  # RtMidi also needs ptherads from above
+endif()
+
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+
+  add_definitions(__WINDOWS_MM__) # For RtMidi
+
+  list(APPEND ALLOCORE_LINK_LIBRARIES winmm.lib multithreaded) #Untested! Does it work..?
 endif()
 
 # optional dependendencies ----------------------------
