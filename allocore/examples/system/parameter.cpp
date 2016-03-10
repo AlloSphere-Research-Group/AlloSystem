@@ -20,23 +20,29 @@ gam::Sine<> oscil;
 
 double interval = 1.0; // time between random parameter changes
 
+float ampCallback(float ampdb, void *data) {
+	float amp = powf(10.0, ampdb/20.0);
+//	cout << " --- Amp ---- " << amp  << " ----" << endl;
+	return amp;
+}
+
 class MyThreadFunction : public ThreadFunction
 {
 	virtual void operator ()() {
 		osc::Send sender(9010, "127.0.0.1");
 		while (true) {
 			float newFreq = 440.0 * (1 + rand() /(float) RAND_MAX);
-			float newAmp = 0.2 * rand() /(float) RAND_MAX;
+			float newAmpDb = -40.0 * rand() /(float) RAND_MAX;
 			freq.set(newFreq);
-			amp.set(newAmp);
-			cout << "Setting through C++: Frequency " << newFreq << " Amplitude " << newAmp << endl;
+			amp.set(newAmpDb);
+			cout << "Setting through C++: Frequency " << newFreq << " Amplitude " << newAmpDb << endl;
 			al_sleep_nsec(interval * 1000000000.0);
 			// Now do it through OSC
 			newFreq = 440.0 * (1 + rand() /(float) RAND_MAX);
-			newAmp = 0.2 * rand() /(float) RAND_MAX;
+			newAmpDb = -40.0 * rand() /(float) RAND_MAX;
 			sender.send("/Frequency", newFreq);
-			sender.send("/Amplitude", newAmp);
-			cout << "Setting through OSC: Frequency " << newFreq << " Amplitude " << newAmp << endl;
+			sender.send("/Amplitude", newAmpDb);
+			cout << "Setting through OSC: Frequency " << newFreq << " Amplitude " << newAmpDb << endl;
 			al_sleep_nsec(interval * 1000000000.0);
 		}
 	}
@@ -63,6 +69,8 @@ int main (int argc, char * argv[])
 	MyThreadFunction func;
 	Thread th(func);
 	
+	amp.setProcessingCallback(ampCallback, nullptr);
+
 	ParameterServer paramServer;
 	paramServer.registerParameter(freq);
 	paramServer.registerParameter(amp);
