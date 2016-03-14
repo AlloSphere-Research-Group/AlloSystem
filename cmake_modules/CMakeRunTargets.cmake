@@ -32,7 +32,7 @@ else()
   set(SOURCE_DIR "${CMAKE_SOURCE_DIR}/${SOURCE_DIR}")
 endif(BUILD_DIR)
 
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/build/bin)
+set(EXECUTABLE_OUTPUT_PATH ${BUILD_ROOT_DIR}/build/bin)
 
 # -------------------------- BuildAlloTarget
 
@@ -47,7 +47,7 @@ endif()
 add_executable("${ALLO_APP_NAME_SUFFIX}" EXCLUDE_FROM_ALL ${${ALLO_APP_SRC}})
 
 if(NOT ${DEFINES} STREQUAL "")
-#message("Adding defines ${DEFINES}")
+#message("Adding defines ${DEFINES} to ${ALLO_APP_NAME_SUFFIX}")
 target_compile_definitions("${ALLO_APP_NAME_SUFFIX}" PUBLIC "${DEFINES}")
 endif()
 
@@ -58,7 +58,7 @@ endif()
 if(COMPILER_SUPPORTS_CXX11)
 	set_property(TARGET ${ALLO_APP_NAME_SUFFIX} APPEND_STRING PROPERTY COMPILE_FLAGS "-std=c++11 ")
 elseif(COMPILER_SUPPORTS_CXX0X)
-	set_property(TARGET ${ALLO_APP_NAME_SUFFIX} APPEND_STRING PROPERTY COMPILE_FLAGS "-std=c++0x")
+	set_property(TARGET ${ALLO_APP_NAME_SUFFIX} APPEND_STRING PROPERTY COMPILE_FLAGS "-std=c++0x ")
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")

@@ -10,6 +10,7 @@ import os
 import signal
 import subprocess
 
+global local_procs
 local_procs = []
 
 class BuildMachine:
@@ -198,6 +199,7 @@ class CursesApp():
         return '\n'.join(wrapped)
     
     def app_loop(self, stdscr):
+        global local_procs
         curses.halfdelay(1)
         curses.start_color()
         curses.init_pair(4, curses.COLOR_BLUE, curses.COLOR_BLACK)
@@ -215,13 +217,16 @@ class CursesApp():
             
             q = Queue() 
             node["pid_queue"] = q
-            p = Process(target=run_node, args=(i, self.stdout[i][1], self.stderr[i][1], self.item_status, node))
-            processes.append(p)
-            p.start()
-            sleep(0.1)
-            pid = q.get()
-            global local_procs
-            local_procs.append(pid)
+            full_path = node["run_dir"] + '/' + node["path"]
+            if not os.path.isfile(full_path):
+                self.stdout[i][1].send("Could not find: " + full_path)
+            else:
+                p = Process(target=run_node, args=(i, self.stdout[i][1], self.stderr[i][1], self.item_status, node))
+                processes.append(p)
+                p.start()
+                sleep(0.1)
+                pid = q.get()
+                local_procs.append(pid)
 
         mypad = curses.newpad(self.buffer_len, 512)
         mypad_pos = 0
@@ -289,8 +294,7 @@ class CursesApp():
 
             except:
                 pass
-        
-        global local_procs
+
         for pid in local_procs:
             os.kill(pid, signal.SIGTERM)
         if self.chase:
