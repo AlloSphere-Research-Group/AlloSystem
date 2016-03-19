@@ -292,6 +292,18 @@ class OmniStereo {
     }
   }
 
+  GLuint fbo() {return mFbo;}
+  GLuint tex(int i) {return mTex[i];}
+  Matrix4d& modelView() {return mModelView;}
+  int currentEye() {return mCurrentEye;}
+
+  int mFace;
+  float mSphereRadius; // The radius of the sphere in OpenGL units.
+
+  float mEyeParallax, mNear, mFar;
+  bool mStereo, mMipmap, mFullScreen;
+  int mCurrentEye = 0;
+  
  protected:
   // supports up to 4 warps/viewports
   Projection mProjections[4];
@@ -314,14 +326,12 @@ class OmniStereo {
   ShaderProgram mCubeProgram, mSphereProgram, mWarpProgram, mDemoProgram;
   Mesh mQuad;
 
+
   Graphics gl;
   Matrix4d mModelView;
   Color mClearColor;
 
   // these become shader uniforms:
-  int mFace;
-  float mSphereRadius; // The radius of the sphere in OpenGL units.
-  float mEyeParallax, mNear, mFar;
 
   unsigned mResolution;
   unsigned mNumProjections;
@@ -330,7 +340,6 @@ class OmniStereo {
   StereoMode mMode;
   AnaglyphMode mAnaglyphMode;
 
-  bool mStereo, mMipmap, mFullScreen;
 };
 
 /* inline implementation */
