@@ -43,28 +43,28 @@ struct ShaderManager {
     if(shaderMap.count(pName)){
       shaderMap[pName]->destroy();
     }
-    
+
     rm.paths.addSearchPath("../../", true);
     rm.paths.addAppPaths();
     rm.paths.addSearchPath(".", true);
-    
+
     rm.add(vName);
     rm.add(fName);
 
     Shader vert, frag;
 
-    if(rm[vName].loaded) vert.source(rm.data(vName), Shader::VERTEX).compile().printLog();
-    if(rm[fName].loaded) frag.source(rm.data(fName), Shader::FRAGMENT).compile().printLog();
+    if(rm[vName].loaded) vert.source(vertLibCode + rm.data(vName), Shader::VERTEX).compile().printLog();
+    if(rm[fName].loaded) frag.source(fragLibCode + rm.data(fName), Shader::FRAGMENT).compile().printLog();
 
     ShaderProgram *s = new ShaderProgram();
 
     std::cout << "Attaching Vertex Shader: " << vName << std::endl;
     std::cout << "Attaching Fragment Shader: " << fName << std::endl;
-    
+
     if(rm[vName].loaded) s->attach(vert);
     if(rm[fName].loaded) s->attach(frag);
 
-    s->link(); 
+    s->link();
     s->printLog();
     // s->listParams();
 
@@ -78,15 +78,15 @@ struct ShaderManager {
     if(shaderMap.count(pName)){
       shaderMap[pName]->destroy();
     }
-    
+
     rm.paths.addSearchPath("../../", true);
     rm.paths.addAppPaths();
     rm.paths.addSearchPath(".", true);
-    
+
     rm.add(vName);
     rm.add(fName);
     rm.add(gName);
-    
+
     Shader vert, frag, geom;
 
     if(rm[vName].loaded) vert.source(rm.data(vName), Shader::VERTEX).compile().printLog();
@@ -97,7 +97,7 @@ struct ShaderManager {
 
     std::cout << "Attaching Vertex Shader: " << vName << std::endl;
     if(rm[vName].loaded) s->attach(vert);
-    
+
     if(rm[gName].loaded) {
       std::cout << "Attaching Geometry Shader: " << gName << std::endl;
       s->setGeometryInputPrimitive(Graphics::LINES);
@@ -109,7 +109,7 @@ struct ShaderManager {
     std::cout << "Attaching Fragment Shader: " << fName << std::endl;
     if(rm[fName].loaded) s->attach(frag);
 
-    s->link(); 
+    s->link();
     s->printLog();
     // s->listParams();
 
@@ -117,7 +117,7 @@ struct ShaderManager {
 
     return s;
   }
-  
+
   // checks modified time tag and returns true if files in resource manager had been changed
   bool poll() {
     return rm.poll();
