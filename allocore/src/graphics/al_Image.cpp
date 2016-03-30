@@ -21,20 +21,22 @@
 
 namespace al{
 
-// Initialization singleton
-struct FreeImageInit{
-	FreeImageInit(){ FreeImage_Initialise(); }
-	~FreeImageInit(){ FreeImage_DeInitialise(); }
-};
-
-
 class FreeImageImpl : public Image::Impl {
 public:
 	FreeImageImpl()
 	:	mImage(NULL)
 	{
-		// Constructed before any other FreeImage calls, so destructed last
-		static FreeImageInit freeImageInit;
+		// Initialization singleton
+		struct Init{
+			Init(){ FreeImage_Initialise(); }
+			~Init(){ FreeImage_DeInitialise(); }
+			static Init& get(){
+				static Init * v = new Init;
+				return *v;
+			}
+		};
+
+		Init::get();
 	}
 	virtual ~FreeImageImpl() {
 		destroy();
