@@ -13,7 +13,9 @@ ENDIF()
 if(BUILD_DIR)
   string(REGEX REPLACE "/+$" "" ALLOSYSTEM_BUILD_APP_DIR "${ALLOSYSTEM_BUILD_APP_DIR}") # remove trailing slash
   file(GLOB ALLOSYSTEM_APP_SRC "${CMAKE_SOURCE_DIR}/${ALLOSYSTEM_BUILD_APP_DIR}/*.cpp")
+  file(GLOB ALLOSYSTEM_CUDA_HEADERS "${CMAKE_SOURCE_DIR}/${ALLOSYSTEM_BUILD_APP_DIR}/*.cuh")
   file(GLOB ALLOSYSTEM_CUDA_SRC "${CMAKE_SOURCE_DIR}/${ALLOSYSTEM_BUILD_APP_DIR}/*.cu")
+  list(APPEND ALLOSYSTEM_CUDA_SRC ${ALLOSYSTEM_CUDA_HEADERS})
 #  file(GLOB ALLOSYSTEM_APP_SRC RELATIVE "${CMAKE_SOURCE_DIR}" "${ALLOSYSTEM_BUILD_APP_DIR}/*.cpp")
   string(REPLACE "/" "_" APP_NAME "${ALLOSYSTEM_BUILD_APP_DIR}")
   string(REGEX REPLACE "_+$" "" APP_NAME "${APP_NAME}")
@@ -63,8 +65,19 @@ if(NOT "${ALLO_CUDA_SRC}" EQUAL "")
       RELEASE -DNDEBUG
       DEBUG -g -DDEBUG
     )
+    target_include_directories("${ALLO_APP_NAME_SUFFIX}" ""${CUDA_TOOLKIT_ROOT_DIR}/samples/common/inc/")
   else()
   # TODO add support for CUDA on OS X
+    set(CUDA_TOOLKIT_ROOT_DIR "/usr/local/cuda")
+    find_package(CUDA REQUIRED)
+    set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -gencode arch=compute_30,code=sm_30 --std=c++11)
+    cuda_add_executable("${ALLO_APP_NAME_SUFFIX}"
+      ${${ALLO_APP_SRC}} ${ALLO_CUDA_SRC}
+      OPTIONS -DSTUFF="blah blah"
+      RELEASE -DNDEBUG
+      DEBUG -g -DDEBUG
+    )
+    target_include_directories("${ALLO_APP_NAME_SUFFIX}" ""${CUDA_TOOLKIT_ROOT_DIR}/samples/common/inc/")
   endif()
 
 else()
