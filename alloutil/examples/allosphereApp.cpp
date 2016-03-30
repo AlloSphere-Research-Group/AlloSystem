@@ -103,7 +103,8 @@ public:
 
 		// You can get the current state with state(). This will return a
 		// variable of type State.
-	    omni().clearColor() = Color(state().value, 0, 0);
+	    g.clearColor(Color(state().value, 0.0, 0.0));
+		g.clear(Graphics::COLOR_BUFFER_BIT);
 
 		g.polygonMode(Graphics::FILL);
 		g.antialiasing(Graphics::NICEST);

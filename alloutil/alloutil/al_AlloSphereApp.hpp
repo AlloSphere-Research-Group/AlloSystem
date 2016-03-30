@@ -209,10 +209,10 @@ public:
 	}
 
 	///
-	/// \brief override onDrawOmni() to draw graphics
-	/// \param om OmniStereo object for rendering
+	/// \brief override onDraw() to draw graphics
+	/// \param g Graphics object for rendering
 	///
-	virtual void onDrawOmni(OmniStereo& om) override {}
+	virtual void onDraw(Graphics &g) override {}
 
 	///
 	/// \brief updateState reads the state buffer and updates current state
@@ -343,20 +343,8 @@ void SimulatorBase<State, AudioState, GRAPHICSPORT, AUDIOPORT>::initWindow()
 
 template<typename State, typename AudioState, unsigned GRAPHICSPORT, unsigned AUDIOPORT>
 void SimulatorBase<State, AudioState, GRAPHICSPORT, AUDIOPORT>::onDraw(Graphics &g, const Viewpoint &v) {
-	float H = v.viewport().h;
-	float W = v.viewport().w;
-	g.pushMatrix(Graphics::PROJECTION);
-	g.loadMatrix(Matrix4f::ortho2D(0, W, 0, H));
-	g.pushMatrix(Graphics::MODELVIEW);
-
-	g.blendAdd();
-	Font f("allocore/share/fonts/VeraMono.ttf", 40);
-	g.translate(int(W/2 - f.width("Simulator")/2), int(H/2 - f.size()/2));
-	g.currentColor(1,1,0,1);
-	f.render(g, "Simulator");
-
-	g.popMatrix();
-	g.popMatrix(Graphics::PROJECTION);
+	g.clearColor(Color(0.0, 1.0, 0.0));
+	g.clear(Graphics::COLOR_BUFFER_BIT);
 }
 
 }
