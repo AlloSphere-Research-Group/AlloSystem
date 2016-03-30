@@ -48,7 +48,8 @@ add_executable("${ALLO_APP_NAME_SUFFIX}" EXCLUDE_FROM_ALL ${${ALLO_APP_SRC}})
 
 if(NOT ${DEFINES} STREQUAL "")
 #message("Adding defines ${DEFINES} to ${ALLO_APP_NAME_SUFFIX}")
-target_compile_definitions("${ALLO_APP_NAME_SUFFIX}" PUBLIC "${DEFINES}")
+#target_compile_definitions("${ALLO_APP_NAME_SUFFIX}" PUBLIC "${DEFINES}")
+set_target_properties("${ALLO_APP_NAME_SUFFIX}" PROPERTIES COMPILE_DEFINITIONS "${DEFINES}")
 endif()
 
 if(EXISTS "${SOURCE_DIR}/flags.cmake")
