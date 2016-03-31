@@ -31,13 +31,14 @@ public:
 			Init(){ FreeImage_Initialise(); }
 			~Init(){ FreeImage_DeInitialise(); }
 			static Init& get(){
-				static Init * v = new Init;
-				return *v;
+				static Init v;
+				return v;
 			}
 		};
 
 		Init::get();
 	}
+
 	virtual ~FreeImageImpl() {
 		destroy();
 	}
