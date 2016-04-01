@@ -58,6 +58,7 @@ if(NOT "${ALLO_CUDA_SRC}" EQUAL "")
     set(CMAKE_C_COMPILER gcc-4.8)
     set(CUDA_TOOLKIT_ROOT_DIR "/usr/local/cuda")
     find_package(CUDA REQUIRED)
+    include_directories("${CUDA_TOOLKIT_ROOT_DIR}/samples/common/inc/")
     set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -gencode arch=compute_30,code=sm_30 -ccbin /usr/bin/gcc-4.8 --std=c++11)
     cuda_add_executable("${ALLO_APP_NAME_SUFFIX}"
       ${${ALLO_APP_SRC}} ${ALLO_CUDA_SRC}
@@ -65,11 +66,11 @@ if(NOT "${ALLO_CUDA_SRC}" EQUAL "")
       RELEASE -DNDEBUG
       DEBUG -g -DDEBUG
     )
-    target_include_directories("${ALLO_APP_NAME_SUFFIX}" PUBLIC "${CUDA_TOOLKIT_ROOT_DIR}/samples/common/inc/")
   else()
   # TODO add support for CUDA on OS X
     set(CUDA_TOOLKIT_ROOT_DIR "/usr/local/cuda")
     find_package(CUDA REQUIRED)
+    include_directories("${CUDA_TOOLKIT_ROOT_DIR}/samples/common/inc/")
     set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -gencode arch=compute_30,code=sm_30 --std=c++11)
     cuda_add_executable("${ALLO_APP_NAME_SUFFIX}"
       ${${ALLO_APP_SRC}} ${ALLO_CUDA_SRC}
@@ -77,7 +78,6 @@ if(NOT "${ALLO_CUDA_SRC}" EQUAL "")
       RELEASE -DNDEBUG
       DEBUG -g -DDEBUG
     )
-    target_include_directories("${ALLO_APP_NAME_SUFFIX}" PUBLIC "${CUDA_TOOLKIT_ROOT_DIR}/samples/common/inc/")
   endif()
 
 else()
