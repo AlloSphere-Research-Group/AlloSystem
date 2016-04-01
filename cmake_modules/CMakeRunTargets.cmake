@@ -259,19 +259,18 @@ BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_GRAPHICS_RENDERER"
 AddRunTarget("${APP_NAME}_graphics" "${APP_NAME}_graphics")
 list(APPEND ALLOSPHERE_APPS "${APP_NAME}_graphics")
 if(BUILD_ALLOSPHERE_APP_AUDIO_RENDERER)
-BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_AUDIO_RENDERER" "audio")
-AddRunTarget("${APP_NAME}_audio" "${APP_NAME}_audio")
-list(APPEND ALLOSPHERE_APPS "${APP_NAME}_audio")
+  BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_AUDIO_RENDERER" "audio")
+  AddRunTarget("${APP_NAME}_audio" "${APP_NAME}_audio")
+  list(APPEND ALLOSPHERE_APPS "${APP_NAME}_audio")
 endif()
-set(RUN_CONFIG "{ \"run_dir\" : \"${BUILD_ROOT_DIR}\" , \n  \"apps\" : [ {\"type\" : \"simulator\", \"path\" : \"build/bin/${APP_NAME}_simulator\"},")
+set(RUN_CONFIG "{ \"root_dir\" : \"${BUILD_ROOT_DIR}\",  \"bin_dir\" : \"build/bin/\" , \n  \"apps\" : [ {\"type\" : \"simulator\", \"path\" : \"${APP_NAME}_simulator\"},")
 
 if(BUILD_ALLOSPHERE_APP_AUDIO_RENDERER)
-set(RUN_CONFIG "${RUN_CONFIG} {\"type\" : \"audio\", \"path\" : \"build/bin/${APP_NAME}_audio\" }, ")
+set(RUN_CONFIG "${RUN_CONFIG} {\"type\" : \"audio\", \"path\" : \"${APP_NAME}_audio\" }, ")
 endif()
 
-set(RUN_CONFIG "${RUN_CONFIG} {\"type\" : \"graphics\", \"path\" : \"build/bin/${APP_NAME}_graphics\"} ] \n}")
+set(RUN_CONFIG "${RUN_CONFIG} {\"type\" : \"graphics\", \"path\" : \"${APP_NAME}_graphics\"} ] \n}")
 
-file(WRITE "${BUILD_ROOT_DIR}/build/${APP_NAME}.json" ${RUN_CONFIG})
 
 add_custom_target("${APP_NAME}"
   COMMAND ""
@@ -290,6 +289,12 @@ add_custom_target("${APP_NAME}_run"
 else()
 BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "" "")
 AddRunTarget("${APP_NAME}" "${APP_NAME}")
+
+set(RUN_CONFIG "{ \"root_dir\" : \"${BUILD_ROOT_DIR}\",  \"bin_dir\" : \"build/bin/\" , \n  \"apps\" : [ {\"type\" : \"monolithic\", \"path\" : \"${APP_NAME}\"} ] }")
+
 endif()
+
+
+file(WRITE "${BUILD_ROOT_DIR}/build/${APP_NAME}.json" ${RUN_CONFIG})
 
 
