@@ -65,7 +65,7 @@ if(NOT "${ALLO_CUDA_SRC}" EQUAL "")
       RELEASE -DNDEBUG
       DEBUG -g -DDEBUG
     )
-    target_include_directories("${ALLO_APP_NAME_SUFFIX}" ""${CUDA_TOOLKIT_ROOT_DIR}/samples/common/inc/")
+    target_include_directories("${ALLO_APP_NAME_SUFFIX}" PUBLIC "${CUDA_TOOLKIT_ROOT_DIR}/samples/common/inc/")
   else()
   # TODO add support for CUDA on OS X
     set(CUDA_TOOLKIT_ROOT_DIR "/usr/local/cuda")
@@ -77,7 +77,7 @@ if(NOT "${ALLO_CUDA_SRC}" EQUAL "")
       RELEASE -DNDEBUG
       DEBUG -g -DDEBUG
     )
-    target_include_directories("${ALLO_APP_NAME_SUFFIX}" ""${CUDA_TOOLKIT_ROOT_DIR}/samples/common/inc/")
+    target_include_directories("${ALLO_APP_NAME_SUFFIX}" PUBLIC "${CUDA_TOOLKIT_ROOT_DIR}/samples/common/inc/")
   endif()
 
 else()
@@ -331,5 +331,3 @@ else()
 BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "${ALLOSYSTEM_CUDA_SRC}" "" "")
 AddRunTarget("${APP_NAME}" "${APP_NAME}")
 endif()
-
-
