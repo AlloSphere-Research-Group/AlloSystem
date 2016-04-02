@@ -2,47 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-from multiprocessing import Process, Pipe, Array, Queue
-#from time import sleep
 
 import sys
-import os
-import signal
-
-global local_procs
-local_procs = []
 
 from appnode import BuildNode, RunNode
-
-        
-def run_node(index, stdout, stderr, status, node):
-    
-    if type(node) == BuildNode:
-        node.stdout_cb = lambda text: stdout.send(text)
-        node.stderr_cb = lambda text: stderr.send(text)
-        node.build()
-        if not build_ret == 0:
-            status[index] = 1
-        else:
-            status[index] = 2
-        
-        return build_ret
-    else:
-        m = BuildMachine(**node_conf)
-        build_ret = m.build(lambda text: stdout.send(text),
-                            lambda text: stderr.send(text))
-        if not build_ret == 0:
-            status[index] = 1
-        else:
-            status[index] = 2
-    #        
-    #        print("Output for %s:"%builder["hostname"])
-    #        print(m.stdout)
-    #        print("Errors for %s:"%builder["hostname"])
-    #        print(m.stderr)
-    #    else:
-    #        print('OK: ' + str(index) +  ' ' + str(build_ret))
-        return build_ret
 
 # Curses GUI
 import curses
@@ -50,12 +13,11 @@ import curses
 class CursesApp():
     def __init__(self, nodes, source):
         self.current_index = 0
-        self.buffer_len = 128
+        self.buffer_len = 256
         self.chase = True
         if nodes and len(nodes) > 0:
             self.nodes = nodes
 
-        self.item_status = Array('i', [4 for i in self.nodes])
         #self.item_color = { "none": 7, "error" : 1, "done" : 2, "working" : 4}
 
         self.displays = ["STDOUT", "STDERR"]
@@ -69,11 +31,11 @@ class CursesApp():
     
     def draw_menu(self, stdscr, linenum):
         pos = 1
-        for node in self.nodes:
-            color = self.item_status[self.nodes.index(node)]
-            style = curses.A_REVERSE if self.nodes.index(node) == self.current_index else curses.A_NORMAL
-            stdscr.addstr(0,pos, node.name, curses.color_pair(color) | style)
-            pos += len(node.name) + 1
+        for builder in self.builders:
+            color = 1 if builder.is_done() else 4
+            style = curses.A_REVERSE if self.builders.index(builder) == self.current_index else curses.A_NORMAL
+            stdscr.addstr(0,pos, builder.name, curses.color_pair(color) | style)
+            pos += len(builder.name) + 1
         y, x = stdscr.getmaxyx()
         stdscr.addstr(y - 1, 1, "q:Quit  space:Switch  c:Chase Output", curses.A_NORMAL)
         
@@ -85,7 +47,7 @@ class CursesApp():
     def draw_run_menu(self, stdscr, linenum):
         pos = 1
         for runner in self.runners:
-            color = 1
+            color = 1 if runner.is_done() else 4
             style = curses.A_REVERSE if self.runners.index(runner) == self.current_index else curses.A_NORMAL
             stdscr.addstr(0,pos, runner.name, curses.color_pair(color) | style)
             pos += len(runner.name) + 1
@@ -107,7 +69,6 @@ class CursesApp():
         return '\n'.join(wrapped)
     
     def app_loop(self, stdscr):
-        global local_procs
         curses.halfdelay(1)
         curses.start_color()
         curses.init_pair(4, curses.COLOR_BLUE, curses.COLOR_BLACK)
@@ -126,28 +87,20 @@ class CursesApp():
         self._start_runners(stdscr)
         
     def _run_builders(self, stdscr):
-        #processes = []
-        self.stdout  = [Pipe() for i in self.nodes]
-        self.stderr = [Pipe() for i in self.nodes]
+        self.builders = []
         self.stdoutbuf  = ['' for i in self.nodes]
         self.stderrbuf = ['' for i in self.nodes]
         for i, node in enumerate(self.nodes):
-            #if node["build"]:
-            q = Queue() 
-            node.pid_queue = q
             
             builder = node
-            # These tests assume you are running from an AlloProject directory
-            # that contains an AlloSystem repo
             configuration = {"project_dir" : '',
                             "project_src": self.source,
                             "prebuild_commands" : '',
                             "build_command" : './run.sh '
                             }
             builder.configure(**configuration)
-            builder.stdout_cb = lambda text: self.stdout[i][1].send(text)
-            builder.stderr_cb = lambda text: self.stderr[i][1].send(text)
             builder.build()
+            self.builders.append(builder)
             
         mypad_pos = 0
         num_lines = 0
@@ -160,12 +113,9 @@ class CursesApp():
             self.draw_menu(stdscr, mypad_pos + 1)
             self.pad.erase()
             
-            builder.flush_messages()
-            while self.stdout[self.current_index][0].poll():
-                self.stdoutbuf[self.current_index] += self.stdout[self.current_index][0].recv()
-                
-            while self.stderr[self.current_index][0].poll():
-                self.stderrbuf[self.current_index] += self.stderr[self.current_index][0].recv()
+            std, err = self.builders[self.current_index].read_messages()
+            self.stdoutbuf[self.current_index] += std
+            self.stderrbuf[self.current_index] += err
                
             if self.current_display == 0:
                 console_output = self.stdoutbuf[self.current_index]
@@ -189,71 +139,53 @@ class CursesApp():
             
             self.pad.refresh(mypad_pos, 0, 2, 0, y - 4, x - 3)
             
-            try:
-                event = stdscr.getch()
-                if event == ord('q'): break
-                elif event == ord('c'): self.chase = not self.chase
-                elif event == curses.KEY_LEFT:
-                    self.current_index -= 1
-                    if self.current_index < 0:
-                        self.current_index = len(self.nodes) - 1
-                elif event == curses.KEY_RIGHT:
-                    self.current_index += 1
-                    if self.current_index >= len(self.nodes) :
-                        self.current_index = 0
-                elif event == curses.KEY_DOWN:
-                    mypad_pos += 1
-                elif event == curses.KEY_UP:
-                    mypad_pos -= 1 
-                elif event == curses.KEY_PPAGE:
-                    mypad_pos -= y
-                elif event == curses.KEY_NPAGE:
-                    mypad_pos += y
-                elif event == ord(' '):
-                    self.current_display += 1
-                    if self.current_display >= len(self.displays):
+            event = stdscr.getch()
+            if event == ord('q'):
+                break
+            elif event == ord('c'):
+                self.chase = not self.chase
+            elif event == curses.KEY_LEFT:
+                self.current_index -= 1
+                if self.current_index < 0:
+                    self.current_index = len(self.nodes) - 1
+            elif event == curses.KEY_RIGHT:
+                self.current_index += 1
+                if self.current_index >= len(self.nodes) :
+                    self.current_index = 0
+            elif event == curses.KEY_DOWN:
+                mypad_pos += 1
+            elif event == curses.KEY_UP:
+                mypad_pos -= 1 
+            elif event == curses.KEY_PPAGE:
+                mypad_pos -= y
+            elif event == curses.KEY_NPAGE:
+                mypad_pos += y
+            elif event == ord(' '):
+                self.current_display += 1
+                if self.current_display >= len(self.displays):
                         self.current_display = 0
-
-            except:
-                pass
+            
+            if self.chase:
+                mypad_pos = num_lines - y
 
 
         builder.flush_messages()
-        for pid in local_procs:
-            try:
-               os.kill(pid, signal.SIGTERM)
-            except:
-               self.log("Could not kill pid: %i"%pid)
 
-        if self.chase:
-            mypad_pos = num_lines - y
-#        for p in processes:
-#            self.item_status
-#            p.terminate()
             
     def _start_runners(self, stdscr):
-                #processes = []
-        self.runstdout  = []
-        self.runstderr = []
         self.runstdoutbuf  = []
         self.runstderrbuf = []
         self.runners = []
         for i, node in enumerate(self.nodes):
-            #if node["build"]:
-            q = Queue() 
-            node.pid_queue = q
+
             build_report = 'build/' + self.source[:-4].replace('/', '_') + '.json'
             import json
             with open(build_report) as fp:
                 conf = json.load(fp)    
                 for app in conf['apps']:
-                    self.runstdout.append(Pipe())
-                    self.runstderr.append(Pipe())
                     self.runstdoutbuf.append('')
                     self.runstderrbuf.append('')
-                    runner = RunNode(app['type'] + '(local)',
-                                     lambda text: self.runstdout[-1][1].send(text),
-                                     lambda text: self.runstderr[-1][1].send(text))
+                    runner = RunNode(app['type'] + '(local)')
                     bin_path = conf['bin_dir'] + app['path']
                     runner.configure(conf['root_dir'], bin_path)
                     runner.run()
@@ -270,12 +202,9 @@ class CursesApp():
             self.draw_run_menu(stdscr, mypad_pos + 1)
             self.pad.erase()
             
-            #runner.flush_messages()
-            while self.runstdout[self.current_index][0].poll():
-                self.runstdoutbuf[self.current_index] += self.runstdout[self.current_index][0].recv()
-                
-            while self.runstderr[self.current_index][0].poll():
-                self.runstderrbuf[self.current_index] += self.runstderr[self.current_index][0].recv()
+            std, err = self.runners[self.current_index].read_messages()
+            self.runstdoutbuf[self.current_index] += std
+            self.runstderrbuf[self.current_index] += err
                
             if self.current_display == 0:
                 console_output = self.runstdoutbuf[self.current_index]
@@ -299,45 +228,43 @@ class CursesApp():
             
             self.pad.refresh(mypad_pos, 0, 2, 0, y - 4, x - 3)
             
-            try:
-                event = stdscr.getch()
-                if event == ord('q'): break
-                elif event == ord('c'): self.chase = not self.chase
-                elif event == curses.KEY_LEFT:
-                    self.current_index -= 1
-                    if self.current_index < 0:
-                        self.current_index = len(self.runners) - 1
-                elif event == curses.KEY_RIGHT:
-                    self.current_index += 1
-                    if self.current_index >= len(self.runners) :
-                        self.current_index = 0
-                elif event == curses.KEY_DOWN:
-                    mypad_pos += 1
-                elif event == curses.KEY_UP:
-                    mypad_pos -= 1 
-                elif event == curses.KEY_PPAGE:
-                    mypad_pos -= y
-                elif event == curses.KEY_NPAGE:
-                    mypad_pos += y
-                elif event == ord(' '):
-                    self.current_display += 1
-                    if self.current_display >= len(self.displays):
-                        self.current_display = 0
+            event = stdscr.getch()
+            if event == ord('q'):
+                break
+            elif event == ord('c'):
+                self.chase = not self.chase
+            elif event == curses.KEY_LEFT:
+                self.current_index -= 1
+                if self.current_index < 0:
+                    self.current_index = len(self.runners) - 1
+            elif event == curses.KEY_RIGHT:
+                self.current_index += 1
+                if self.current_index >= len(self.runners) :
+                    self.current_index = 0
+            elif event == curses.KEY_DOWN:
+                mypad_pos += 1
+            elif event == curses.KEY_UP:
+                mypad_pos -= 1 
+            elif event == curses.KEY_PPAGE:
+                mypad_pos -= y
+            elif event == curses.KEY_NPAGE:
+                mypad_pos += y
+            elif event == ord(' '):
+                self.current_display += 1
+                if self.current_display >= len(self.displays):
+                    self.current_display = 0
+            if self.chase:
+                mypad_pos = num_lines - y
 
-            except:
-                pass
+        self.stop()
 
-        for pid in local_procs:
-            try:
-               os.kill(pid, signal.SIGTERM)
-            except:
-               self.log("Could not kill pid: %i"%pid)
-
-        if self.chase:
-            mypad_pos = num_lines - y
         
     def start(self):
         curses.wrapper(self.app_loop)
+
+    def stop(self):
+        for runner in self.runners:
+            runner.terminate()
 
 
 if __name__ == "__main__":
@@ -357,7 +284,8 @@ if __name__ == "__main__":
     if len(nodes) > 0:
         app = CursesApp(nodes, project_src)
         app.start()
-        print('Output log: -------------\n' + app.log_text)
+        if not app.log_text == '':
+            print('Output log: -------------\n' + app.log_text)
     else:
         print("No nodes. Aborting.")
     

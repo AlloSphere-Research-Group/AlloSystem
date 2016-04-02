@@ -12,6 +12,22 @@ import exceptions
 import subprocess
 import os
 import sys
+from time import sleep
+
+
+from threading  import Thread
+try:
+    from Queue import Queue
+except ImportError:
+    from queue import Queue # python 3.x
+
+
+ON_POSIX = 'posix' in sys.builtin_module_names
+
+def enqueue_output(out, queue):
+    for line in iter(out.readline, b''):
+        queue.put(line)
+    out.close()
 
 class Node:
     def __init__(self,
@@ -23,18 +39,51 @@ class Node:
         self.hostname = hostname
         self.gateway = gateway
         self.login = login
-        self.pid_queue = None
         
         self.stdout = ''
         self.stderr = ''
+        
+        self.stdoutqueue = Queue()
+        self.stderrqueue = Queue()
+    
+    def read_messages(self):
+        self.flush_messages()
+        std = self.stdout
+        err = self.stderr
+        self.stdout = ''
+        self.stderr = ''
+        return std, err
+    
+    def flush_messages(self):
+        while not self.stdoutqueue.empty():
+            line = self.stdoutqueue.get() # or q.get(timeout=.1)
+            self.stdout += line
+                
+        while not self.stderrqueue.empty():
+            line = self.stderrqueue.get() # or q.get(timeout=.1)
+            self.stderr += line
+                
+    def is_done(self):
+        return self.internal_process.poll() is not None
+        
+    def wait_until_done(self):
+        self.internal_process.wait()
+        self.flush_messages()
+        self._debug_print("Done building '%s' on %s."%(self.name, self.hostname) + '\n')
+        return self.internal_process.returncode        
+        
+    def terminate(self):
+        if self.internal_process and not self.is_done():
+            self.internal_process.kill()
+    
+    def _debug_print(self, text):
+        self.stdout += text
+        return
     
 class BuildNode(Node):
-    def __init__(self, name = 'nodeb', distributed = True,
-                    stdout_cb = lambda t: print(t, end=''), stderr_cb = lambda t: print(t, end='')):
+    def __init__(self, name = 'nodeb', distributed = True):
         Node.__init__(self)
-        
-        self.stdout_cb = stdout_cb
-        self.stderr_cb = stderr_cb
+
         self.name = name
         self.build_distributed_app = distributed
         
@@ -46,61 +95,34 @@ class BuildNode(Node):
         self.configured = True
         
     def build(self):
-        command = self._get_command()
-        host = self.gateway
-        if self.remote:
-            command = 'ssh %s "%s"'%(self.hostname, command)
-            
+        # Execute pre-build commands
         for pb_command in self.prebuild_commands:
-            self._debug_print("Running:" + pb_command + '\n')
+            self._debug_print("-- Running:" + pb_command + '\n')
             ssh = subprocess.Popen(pb_command.split(),
-                       shell=False,
+                       shell=True,
                        stdout=subprocess.PIPE,
                        stderr=subprocess.PIPE)
             self._debug_print(ssh.stdout.readlines() )          
             self._debug_print("Returned: " + str(ssh.returncode) + '\n')  
             ssh.terminate()
         
+        command = self._get_build_command()
         if self.remote:
-            command_list = ["ssh", "%s@%s" % (self.login,host), ' '.join(command)]
+            command = 'ssh %s "%s"'%(self.hostname, ' '.join(command))
+            command_list = ["ssh", "%s@%s" % (self.login, self.gateway), command]
         else:
             command_list = command
             
-        self._debug_print("Building: " + ' '.join(command_list) + ' from: ' + os.getcwd() + '\n')
-        self.build_process = subprocess.Popen(' '.join(command_list),
+        self._debug_print("-- Building: " + ' '.join(command_list) + ' from: ' + os.getcwd() + '\n')
+        self.internal_process = subprocess.Popen(' '.join(command_list),
                        shell=True,
                        stdout=subprocess.PIPE,
                        stderr=subprocess.PIPE)
-        if self.pid_queue:
-            self.pid_queue.put(self.build_process.pid)
-        
-    def wait_until_done(self):
-        self.build_process.wait()
-        self.flush_messages()
-        self._debug_print("Done building '%s' on %s."%(self.name, self.hostname) + '\n')
-        return self.build_process.returncode
-        
-    def is_done(self):
-        
-        return self.build_process.poll() is not None
-        
-    def flush_messages(self):
-        p = self.build_process
-#        while p.poll() is None:
-        
-        for line in p.stdout.readlines():
-            if self.stdout_cb:
-                self.stdout_cb(line)
-            
-        for line in p.stderr.readlines():
-            if self.stderr_cb:
-                self.stderr_cb(line)
-            
-    def _debug_print(self, text):
-        self.stdout_cb(text)
-        return
+        t = Thread(target=enqueue_output, args=(self.internal_process.stdout, self.stdoutqueue))
+        t.daemon = True # thread dies with the program
+        t.start()
 
-    def _get_command(self):
+    def _get_build_command(self):
         if not self.configured:
             raise exceptions.RuntimeError("Node not configured.")
         command = []
@@ -121,61 +143,41 @@ class RemoteBuildNode(BuildNode):
                  
         self.remote = True
 
-
 class RunNode(Node):
-    def __init__(self, name = 'node',
-                    stdout_cb = lambda t: print(t, end=''), stderr_cb = lambda t: print(t, end='')):
+    def __init__(self, name = 'node'):
         Node.__init__(self)
-                    
-        self.stdout_cb = stdout_cb
-        self.stderr_cb = stderr_cb
+
         self.name = name
         
     def configure(self, run_dir = '',
-                    path = '',
-                    pid_queue = None):
+                    path = ''):
         self.run_dir = run_dir
         self.path = path
-        self.pid_queue = pid_queue
 
     def run(self):
-        command = self.path
         
-        self.stdout_cb("Running " + command + " from " + self.run_dir + " \n")
+        command = self.path
+        if self.remote:
+            command_list = ["ssh", "%s@%s" % (self.login,self.gateway), command]
+        else:
+            command_list = [command]
+        
+        self._debug_print("-- Running " + ' '.join(command_list) + " from " + self.run_dir + " \n")
         
         try: 
-            self.run_process = subprocess.Popen([command],
+            self.internal_process = subprocess.Popen(command_list,
                            shell=False,
                            stdout=subprocess.PIPE,
                            stderr=subprocess.PIPE,
                            cwd=self.run_dir)
-            if self.pid_queue:
-                self.pid_queue.put(self.run_process.pid)
-            
-#            if self.run_process.returncode:
-#                return -1
-            
-            self.stdout_cb('PID %i\n'%(self.run_process.pid))
+            t = Thread(target=enqueue_output, args=(self.internal_process.stdout, self.stdoutqueue))
+            t.daemon = True # thread dies with the program
+            t.start()
 
         except:
             import traceback
-            self.stdout_cb( '\n'.join(traceback.format_tb(sys.exc_info()[2])))
-        #p.join()
-            #exit()
-            
-#        self.stdout_cb('Process ended.\n')
-#        return p.returncode        
-    
-    def flush_messages(self):
-        p = self.run_process
-#        while p.poll() is None:
-        for line in p.stdout.readlines():
-            if self.stdout_cb:
-                self.stdout_cb(line)
-            
-        for line in p.stderr.readlines():
-            if self.stderr_cb:
-                self.stderr_cb(line)
+            self._debug_print( '\n'.join(traceback.format_tb(sys.exc_info()[2])))
+
 
 if __name__ == "__main__":
     builder = BuildNode('distributed app', False)
@@ -184,12 +186,17 @@ if __name__ == "__main__":
     source = 'AlloSystem/alloutil/examples/allosphereApp.cpp'
     configuration = {"project_dir" : '',
                     "project_src": source,
-                    "prebuild_commands" : '',
+                    "prebuild_commands" : [],
                     "build_command" : './run.sh '
                     }
     builder.configure(**configuration)
     builder.build()
-    builder.wait_until_done()
+    
+    while not builder.is_done():
+        std, err = builder.read_messages()
+        if std != '':
+            print(std)
+        sleep(1)
     
     build_report = 'build/' + source[:-4].replace('/', '_') + '.json'
     import json
@@ -200,4 +207,9 @@ if __name__ == "__main__":
             bin_path = conf['bin_dir'] + app['path']
             runner.configure(conf['root_dir'], bin_path)
             runner.run()
+            while not runner.is_done():
+                std, err = runner.read_messages()
+                if std != '':
+                    print(std)
+                sleep(1)
     print('Done.')
