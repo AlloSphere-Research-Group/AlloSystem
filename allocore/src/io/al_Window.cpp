@@ -89,7 +89,7 @@ void WindowEventHandler::removeFromWindow(){
 
 Window::Window()
 :	mDim(0,0,0,0), mDisplayMode(DEFAULT_BUF), mCursor(POINTER),
-	mFPSAvg(0), mFrameTime(0), mDeltaTime(0),
+	mFPS(0), mFPSAvg(0), mFrameTime(0), mDeltaTime(0),
 	mASAP(false), mCursorHide(false), mFullScreen(false),
 	mVisible(false), mVSync(true)
 {
