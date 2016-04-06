@@ -573,7 +573,7 @@ void AudioIO::resizeBuffer(bool forOutput){
 	float *& buffer = forOutput ? mBufO : mBufI;
 	int& chans      = forOutput ? mNumO : mNumI;
 
-	if(chans > 0){
+	if(chans > 0 && mFramesPerBuffer > 0){
 		int n = resize(buffer, chans * mFramesPerBuffer);
 		if(0 == n) chans = 0;
 	}
