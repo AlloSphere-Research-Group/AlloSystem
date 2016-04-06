@@ -32,6 +32,7 @@ public:
 class SimulatorApp : public SimulatorBase<State> {
 public:
 	SimulatorApp() {
+		initAudio();
 	}
 
 	virtual void onAnimate(double dt) override {
