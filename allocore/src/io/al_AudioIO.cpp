@@ -103,14 +103,14 @@ public:
 		mInParams.device = index;
 		const PaDeviceInfo * dInfo = Pa_GetDeviceInfo(mInParams.device);
 		if(dInfo) mInParams.suggestedLatency = dInfo->defaultLowInputLatency; // for RT
-		mInParams.sampleFormat = paFloat32;
+		mInParams.sampleFormat = paFloat32 | paNonInterleaved;
 		mInParams.hostApiSpecificStreamInfo = NULL;
 	}
 	virtual void outDevice(int index){
 		mOutParams.device = index;
 		const PaDeviceInfo * dInfo = Pa_GetDeviceInfo(mOutParams.device);
 		if(dInfo) mOutParams.suggestedLatency = dInfo->defaultLowOutputLatency; // for RT
-		mOutParams.sampleFormat = paFloat32;
+		mOutParams.sampleFormat = paFloat32 | paNonInterleaved;
 		mOutParams.hostApiSpecificStreamInfo = NULL;
 	}
 
@@ -252,18 +252,13 @@ protected:
 	){
 		AudioIO& io = *(AudioIO *)userData;
 
-		const float * paI = (const float *)input;
-		float * paO = (float *)output;
-
-		bool bDeinterleave = true;
-
-		if(bDeinterleave){
-			deinterleave(const_cast<float *>(&io.in(0,0)),  paI, frameCount, io.channelsInDevice() );
-			//deinterleave(&io.out(0,0), paO, io.framesPerBuffer(), io.channelsOutDevice());
+		assert(frameCount == io.framesPerBuffer());
+		const float **inBuffers = (const float **) input;
+		for (int i = 0; i < io.channelsInDevice(); i++) {
+			memcpy(const_cast<float *>(&io.in(i,0)),  inBuffers[i], frameCount * sizeof(float));
 		}
 
 		if(io.autoZeroOut()) io.zeroOut();
-
 
 		io.processAudio();	// call callback
 
@@ -303,8 +298,9 @@ protected:
 			}
 		}
 
-		if(bDeinterleave){
-			interleave(paO, &io.out(0,0), frameCount, io.channelsOutDevice());
+		float **outBuffers = (float **) output;
+		for (int i = 0; i < io.channelsOutDevice(); i++) {
+			memcpy(outBuffers[i], const_cast<float *>(&io.out(i,0)), frameCount * sizeof(float));
 		}
 
 		return 0;
@@ -455,19 +451,6 @@ void AudioIO::init(int outChannels, int inChannels){
 	// Choose default devices for now...
 	deviceIn(AudioDevice::defaultInput());
 	deviceOut(AudioDevice::defaultOutput());
-
-//	// Setup input stream parameters
-//	const PaDeviceInfo * dInfo = Pa_GetDeviceInfo(mInParams.device);
-//	if(dInfo) mInParams.suggestedLatency = dInfo->defaultLowInputLatency; // for RT
-//	mInParams.sampleFormat = paFloat32;// | paNonInterleaved;
-//	//mInParams.sampleFormat = paInt16;
-//	mInParams.hostApiSpecificStreamInfo = NULL;
-//
-//	// Setup output stream parameters
-//	dInfo = Pa_GetDeviceInfo(mOutParams.device);
-//	if(dInfo) mOutParams.suggestedLatency = dInfo->defaultLowOutputLatency; // for RT
-//	mOutParams.sampleFormat = paFloat32;// | paNonInterleaved;
-//	mOutParams.hostApiSpecificStreamInfo = NULL;
 
 	mImpl->setInDeviceChans(0);
 	mImpl->setOutDeviceChans(0);
