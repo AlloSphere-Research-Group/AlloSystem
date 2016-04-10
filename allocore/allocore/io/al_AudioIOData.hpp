@@ -43,6 +43,7 @@
 */
 
 #include <cstdio>
+#include <cassert>
 
 namespace al{
 
@@ -301,9 +302,26 @@ public:
 
 
 //==============================================================================
-inline float&       AudioIOData::bus(int c, int f) const { return mBufB[c*framesPerBuffer() + f]; }
-inline const float& AudioIOData::in (int c, int f) const { return mBufI[c*framesPerBuffer() + f]; }
-inline float&       AudioIOData::out(int c, int f) const { return mBufO[c*framesPerBuffer() + f]; }
+inline float&       AudioIOData::bus(int c, int f) const
+{
+	assert(c < mNumB);
+	assert(f < framesPerBuffer());
+	return mBufB[c*framesPerBuffer() + f];
+}
+
+inline const float& AudioIOData::in (int c, int f) const
+{
+	assert(c < mNumI);
+	assert(f < framesPerBuffer());
+	return mBufI[c*framesPerBuffer() + f];
+}
+
+inline float&       AudioIOData::out(int c, int f) const
+{
+	assert(c < mNumO);
+	assert(f < framesPerBuffer());
+	return mBufO[c*framesPerBuffer() + f];
+}
 inline float&       AudioIOData::temp(int f) const { return mBufT[f]; }
 
 } // al::
