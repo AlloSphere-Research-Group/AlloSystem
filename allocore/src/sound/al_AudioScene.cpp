@@ -48,13 +48,13 @@ void Listener::compile(){
 
 
 
-SoundSource::SoundSource(
-		double nearClip, double farClip, AttenuationLaw law, DopplerType dopplerType,
-		double farBias, int delaySize
-		)
+SoundSource::SoundSource(double nearClip, double farClip, AttenuationLaw law, DopplerType dopplerType,
+        double farBias, int delaySize
+        )
 	:	DistAtten<double>(nearClip, farClip, law, farBias),
-	  mSound(delaySize), mUseAtten(true), mDopplerType(dopplerType), mUsePerSampleProcessing(false)
+      mSound(delaySize), mUseAtten(true), mDopplerType(dopplerType), mUsePerSampleProcessing(false)
 {
+
 	// initialize the position history to be VERY FAR AWAY so that we don't deafen ourselves...
 	for(int i=0; i<mPosHistory.size(); ++i){
 		mPosHistory(Vec3d(1000, 0, 0));
@@ -132,8 +132,8 @@ void AudioScene::render(AudioIOData& io) {
 	for(unsigned il=0; il<mListeners.size(); ++il){
 		Listener& l = *mListeners[il];
 
-		Spatializer* spatializer = l.mSpatializer;
-		spatializer->prepare();
+        Spatializer* spatializer = l.mSpatializer;
+        spatializer->prepare();
 
 		// update listener history data:
 		l.updateHistory(numFrames);
@@ -206,9 +206,15 @@ void AudioScene::render(AudioIOData& io) {
 					// Is our delay line big enough?
 					if(samplesAgo <= src.maxIndex()){
 						double gain = src.attenuation(dist);
-						float s = src.readSample(samplesAgo) * gain;
-						//s = src.presenceFilter(s); //TODO: causing stopband ripple here, why?
-						spatializer->perform(io, src,relpos, numFrames, i, s);
+
+                        //This seemed to get the same sample per block
+                     //   float s = src.readSample(samplesAgo) * gain;
+
+                        //reading samplesAgo-i causes a discontinuity
+                        float s = src.readSample(samplesAgo-i-1) * gain;
+
+                       // s = src.presenceFilter(s); //TODO: causing stopband ripple here, why?
+                        spatializer->perform(io, src,relpos, numFrames, i, s);
 					}
 
 				} //end for each frame
