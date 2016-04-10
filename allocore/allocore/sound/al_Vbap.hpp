@@ -118,7 +118,6 @@ private:
 	std::map<int, std::vector<int> > mPhantomChannels;
 	unsigned mNumTriplets;
 	Listener* mListener;
-	//unsigned int mCachedTripletIndex;
 	bool mIs3D;
 };
 
