@@ -42,6 +42,8 @@
 	Ryan McGee, 2012, ryanmichaelmcgee@gmail.com
 */
 
+#include <map>
+
 #include "allocore/sound/al_AudioScene.hpp"
 
 #define MAX_NUM_VBAP_TRIPLETS 512
@@ -62,15 +64,15 @@ struct SpeakerTriple{
 	Vec3d s3Vec;
 	Vec3d vec[3];
 	Mat3d mat;
-    int speakerIdx[3];
+	int speakerIdx[3];
 
-   // Speaker speakers[3];
-    int speakerChan[3];
-    int s1Chan;
-    int s2Chan;
-    int s3Chan;
+	// Speaker speakers[3];
+	int speakerChan[3];
+	int s1Chan;
+	int s2Chan;
+	int s3Chan;
 
-    bool loadVectors(const std::vector<Speaker>& spkrs);
+	bool loadVectors(const std::vector<Speaker>& spkrs);
 };
 
 
@@ -86,36 +88,37 @@ public:
 	/// Add triplet of speakers
 	void addTriple(const SpeakerTriple& st);
 
-    void setIs3D(bool _is3D){mIs3D = _is3D;}
+	void setIs3D(bool is3D){mIs3D = is3D;}
 
 	Vec3d computeGains(const Vec3d& vecA, const SpeakerTriple& speak);
 
-	// 2D VBAP, find pairs of speakers.
+	/// 2D VBAP, Build internal list of speaker pairs
 	void findSpeakerPairs(const std::vector<Speaker>& spkrs);
 
-    bool isCrossing(Vec3d c, Vec3d li, Vec3d lj, Vec3d ln, Vec3d lm);
+	bool isCrossing(Vec3d c, Vec3d li, Vec3d lj, Vec3d ln, Vec3d lm);
 
-	// 3D VBAP, find triplets.
+	/// 3D VBAP, build list of internal speaker triplets
 	void findSpeakerTriplets(const std::vector<Speaker>& spkrs);
+
+	void makePhantomChannel(int channelIndex, std::vector<int> assignedSpeakers);
 
 	void compile(Listener& listener);
 
 	void perform(AudioIOData& io, SoundSource& src, Vec3d& relpos, const int& numFrames, int& frameIndex, float& sample);
 
-    void perform(AudioIOData& io,SoundSource& src,Vec3d& relpos,const int& numFrames,float *samples);
+	void perform(AudioIOData& io,SoundSource& src,Vec3d& relpos,const int& numFrames,float *samples);
 
 	void print();
 
-
-    //Returns vector of triplets
-    std::vector<SpeakerTriple> triplets() const;
-
+	//Returns vector of triplets
+	std::vector<SpeakerTriple> triplets() const;
 
 private:
-    std::vector<SpeakerTriple> mTriplets;
-    unsigned mNumTriplets;
-    Listener* mListener;
-    //unsigned int mCachedTripletIndex;
+	std::vector<SpeakerTriple> mTriplets;
+	std::map<int, std::vector<int> > mPhantomChannels;
+	unsigned mNumTriplets;
+	Listener* mListener;
+	//unsigned int mCachedTripletIndex;
 	bool mIs3D;
 };
 
