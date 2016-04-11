@@ -215,7 +215,7 @@ elif uname | grep "MINGW"; then
 			PKG=FreeImage3160Win32
 			DIR=$PWD
 			cd /tmp
-				wget http://downloads.sourceforge.net/freeimage/$PKG.zip
+				wget http://downloads.sourceforge.net/project/freeimage/Binary%20Distribution/3.16.0/$PKG.zip
 				unzip -q $PKG
 				mv FreeImage $PKG
 				cp $PKG/Dist/FreeImage.dll $DESTDIR/bin/
