@@ -30,9 +30,9 @@ enum{
 bool perSampProcessing = false;
 float speedMult = 0.05;
 
-//int layout = ALLO_LAYOUT;
+int layout = ALLO_LAYOUT;
 //int layout = TEST_LAYOUT;
-int layout = THREE_D_LAYOUT;
+//int layout = THREE_D_LAYOUT;
 //int layout = RING_LAYOUT;
 
 SpeakerLayout speakerLayout;
@@ -57,6 +57,7 @@ inline void perSample(AudioIOData& io){
 	for(int j=0; j<numFrames; j++){
 		double sec = (t / io.fps());
 		float fac = sec*2.0*M_PI;
+		float env = (22050 - (t % 22050))/22050.0;
 
 		for(int i = 0; i < NUM_SOURCES; i++){
 
@@ -66,8 +67,9 @@ inline void perSample(AudioIOData& io){
 			float y = 12.0*sin(tta);
 			float z = 4.0*sin(2.8 *tta);
 
+
 			//Calculate source sample
-			float smp = sin(fac*(880*((i/3.0)+1)))*(1.0/(i+1));
+			float smp = sin(fac*(880*((i/3.0)+1)))*(1.0/(i+1)) * env;
 
 			Vec3d pos(x,y,srcElev + z);
 			srcpos = pos;
@@ -85,12 +87,14 @@ inline void perBuffer(AudioIOData& io){
 	static unsigned int t = 0;
 	int numFrames = io.framesPerBuffer();
 	double sec;
+
 	for(int j=0; j<numFrames; j++){
 
+		float env = (22050 - (t % 22050))/22050.0;
 		sec = (t / io.fps());
 		// The audio for each source must still be computed ber sample
 		for(int i = 0; i < NUM_SOURCES; i++){
-			float smp = sin(sec*(220*(i+1))*2*M_PI)*(1.0/(i+1));
+			float smp = sin(sec*(220*(i+1))*2*M_PI)*(1.0/(i+1)) * env;
 			srcs[i].writeSample(smp);
 		}
 		++t;
@@ -331,7 +335,10 @@ int main (int argc, char * argv[]){
 	mPeaks = new std::atomic<float>[speakerLayout.speakers().size()];
 
 	int outputChannels = highestChannel + 1;
+
+	AudioDevice dev("ECHO X6");
 	AudioIO audioIO(BLOCK_SIZE, 44100, audioCB, NULL, outputChannels, 0);
+	audioIO.device(dev);
 	audioIO.start();
 
 	std::vector<SpeakerTriple> speakerTriangles = panner->triplets() ;
