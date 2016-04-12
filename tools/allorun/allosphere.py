@@ -10,7 +10,7 @@ import appnode
 nodes = []
 
 # GR01 node builds and deploys to the other GR machines
-node = appnode.BuildNode('gr01')
+node = appnode.RemoteBuildNode('gr01', '','sphere')
 nodes.append(node)
 
 # Audio machine builds 
