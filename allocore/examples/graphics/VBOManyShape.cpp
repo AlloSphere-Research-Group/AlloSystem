@@ -68,8 +68,9 @@ public:
 
 			// Color shapes randomly
 			Color randc = Color(rnd::uniform(), rnd::uniform(), rnd::uniform(0.75,1.0));
+			Colori randci = Colori(rnd::uniform()*255, rnd::uniform()*255, rnd::uniform(0.75,1.0)*255);
 			for(int i=0; i<Nv; ++i){
-				shapesVBO.color(randc);
+				shapesVBO.color(randci);
 			}
 		}
 
@@ -141,6 +142,10 @@ public:
 		}
 		if (k.key() == '9') {
 			shapesVBO = cubeMesh;
+		}
+		if (k.key() == ' ') {
+			if (shapesVBO.hasColoris()) printf("Has coloris!\n");
+			if (shapesVBO.hasColors()) printf("Has colors!\n");
 		}
 
 	}

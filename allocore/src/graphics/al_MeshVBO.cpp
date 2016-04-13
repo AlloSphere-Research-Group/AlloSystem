@@ -25,7 +25,7 @@ void MeshVBO::copyFrom(MeshVBO& cpy){
   mVertId = cpy.mVertId;
   mNormalId = cpy.mNormalId;
   mColorId = cpy.mColorId;
-  mColorisId = cpy.mColorisId;
+  mColoriId = cpy.mColoriId;
   mTexCoordId = cpy.mTexCoordId;
   mIndexId = cpy.mIndexId;
 
@@ -95,7 +95,7 @@ void MeshVBO::allocate(BufferDataUsage usage){
 
     if (hasColoris()) {
       mColoriStride = sizeof(coloris()[0]);
-      setData(coloris().elems(), &mColorisId, coloris().size(), usage, GL_ARRAY_BUFFER);
+      setData(coloris().elems(), &mColoriId, coloris().size(), usage, GL_ARRAY_BUFFER);
     }
 
     if (hasTexCoord2s()) {
@@ -145,8 +145,8 @@ void MeshVBO::update(){
     }
 
     if (hasColoris()) {
-      if (mColorisId!=0) updateData(coloris().elems(), &mColorisId, coloris().size(), GL_ARRAY_BUFFER);
-      else setData(coloris().elems(), &mColorisId, coloris().size(), mBufferUsage, GL_ARRAY_BUFFER);
+      if (mColoriId!=0) updateData(coloris().elems(), &mColoriId, coloris().size(), GL_ARRAY_BUFFER);
+      else setData(coloris().elems(), &mColoriId, coloris().size(), mBufferUsage, GL_ARRAY_BUFFER);
     }
 
     if (hasTexCoord2s()) {
@@ -196,35 +196,35 @@ void MeshVBO::bind(){
 
   glBindBuffer(GL_ARRAY_BUFFER, mVertId);
   glEnableClientState(GL_VERTEX_ARRAY);
-  glVertexPointer(3, GL_FLOAT, mVertStride, 0);
+  glVertexPointer(3, GL_FLOAT, 0, 0);
 
   if (hasNormals()){
     glBindBuffer(GL_ARRAY_BUFFER, mNormalId);
     glEnableClientState(GL_NORMAL_ARRAY);
-    glNormalPointer(GL_FLOAT, mNormalStride, 0);
+    glNormalPointer(GL_FLOAT, 0, 0);
   }
 
   if (hasTexCoord2s()){
     glBindBuffer(GL_ARRAY_BUFFER, mTexCoordId);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glTexCoordPointer(2, GL_FLOAT, mTexCoordStride, 0);
+    glTexCoordPointer(2, GL_FLOAT, 0, 0);
   }
   else if (hasTexCoord3s()){
     glBindBuffer(GL_ARRAY_BUFFER, mTexCoordId);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glTexCoordPointer(3, GL_FLOAT, mTexCoordStride, 0);
+    glTexCoordPointer(3, GL_FLOAT, 0, 0);
   }
 
   if (hasColors()){
     glBindBuffer(GL_ARRAY_BUFFER, mColorId);
     glEnableClientState(GL_COLOR_ARRAY);
-    glColorPointer(4, GL_FLOAT, mColorStride, 0);
+    glColorPointer(4, GL_FLOAT, 0, 0);
   }
 
   if (hasColoris()){
-    glBindBuffer(GL_ARRAY_BUFFER, mColorisId);
+    glBindBuffer(GL_ARRAY_BUFFER, mColoriId);
     glEnableClientState(GL_COLOR_ARRAY);
-    glColorPointer(4, GL_INT, mColoriStride, 0);
+    glColorPointer(4, GL_UNSIGNED_BYTE, 0, 0);
   }
 
   if (hasIndices()){
@@ -256,7 +256,7 @@ void MeshVBO::clear(){
   mVertId = 0;
   mNormalId = 0;
   mColorId = 0;
-  mColorisId = 0;
+  mColoriId = 0;
   mTexCoordId = 0;
   mIndexId = 0;
 
@@ -291,8 +291,8 @@ uint32_t MeshVBO::getColorId() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-uint32_t MeshVBO::getColorisId() {
-  return mColorisId;
+uint32_t MeshVBO::getColoriId() {
+  return mColoriId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
