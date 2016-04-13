@@ -32,7 +32,7 @@ else()
   set(SOURCE_DIR "${CMAKE_SOURCE_DIR}/${SOURCE_DIR}")
 endif(BUILD_DIR)
 
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/build/bin)
+set(EXECUTABLE_OUTPUT_PATH ${BUILD_ROOT_DIR}/build/bin)
 
 # -------------------------- BuildAlloTarget
 
@@ -47,8 +47,9 @@ endif()
 add_executable("${ALLO_APP_NAME_SUFFIX}" EXCLUDE_FROM_ALL ${${ALLO_APP_SRC}})
 
 if(NOT ${DEFINES} STREQUAL "")
-#message("Adding defines ${DEFINES}")
-target_compile_definitions("${ALLO_APP_NAME_SUFFIX}" PUBLIC "${DEFINES}")
+#message("Adding defines ${DEFINES} to ${ALLO_APP_NAME_SUFFIX}")
+#target_compile_definitions("${ALLO_APP_NAME_SUFFIX}" PUBLIC "${DEFINES}")
+set_target_properties("${ALLO_APP_NAME_SUFFIX}" PROPERTIES COMPILE_DEFINITIONS "${DEFINES}")
 endif()
 
 if(EXISTS "${SOURCE_DIR}/flags.cmake")
@@ -58,7 +59,7 @@ endif()
 if(COMPILER_SUPPORTS_CXX11)
 	set_property(TARGET ${ALLO_APP_NAME_SUFFIX} APPEND_STRING PROPERTY COMPILE_FLAGS "-std=c++11 ")
 elseif(COMPILER_SUPPORTS_CXX0X)
-	set_property(TARGET ${ALLO_APP_NAME_SUFFIX} APPEND_STRING PROPERTY COMPILE_FLAGS "-std=c++0x")
+	set_property(TARGET ${ALLO_APP_NAME_SUFFIX} APPEND_STRING PROPERTY COMPILE_FLAGS "-std=c++0x ")
 endif()
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
@@ -258,19 +259,18 @@ BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_GRAPHICS_RENDERER"
 AddRunTarget("${APP_NAME}_graphics" "${APP_NAME}_graphics")
 list(APPEND ALLOSPHERE_APPS "${APP_NAME}_graphics")
 if(BUILD_ALLOSPHERE_APP_AUDIO_RENDERER)
-BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_AUDIO_RENDERER" "audio")
-AddRunTarget("${APP_NAME}_audio" "${APP_NAME}_audio")
-list(APPEND ALLOSPHERE_APPS "${APP_NAME}_audio")
+  BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "ALLOSPHERE_BUILD_AUDIO_RENDERER" "audio")
+  AddRunTarget("${APP_NAME}_audio" "${APP_NAME}_audio")
+  list(APPEND ALLOSPHERE_APPS "${APP_NAME}_audio")
 endif()
-set(RUN_CONFIG "{ \"run_dir\" : \"${BUILD_ROOT_DIR}\" , \n  \"apps\" : [ {\"type\" : \"simulator\", \"path\" : \"build/bin/${APP_NAME}_simulator\"},")
+set(RUN_CONFIG "{ \"root_dir\" : \"${BUILD_ROOT_DIR}\",  \"bin_dir\" : \"build/bin/\" , \n  \"apps\" : [ {\"type\" : \"simulator\", \"path\" : \"${APP_NAME}_simulator\"},")
 
 if(BUILD_ALLOSPHERE_APP_AUDIO_RENDERER)
-set(RUN_CONFIG "${RUN_CONFIG} {\"type\" : \"audio\", \"path\" : \"build/bin/${APP_NAME}_audio\" }, ")
+set(RUN_CONFIG "${RUN_CONFIG} {\"type\" : \"audio\", \"path\" : \"${APP_NAME}_audio\" }, ")
 endif()
 
-set(RUN_CONFIG "${RUN_CONFIG} {\"type\" : \"graphics\", \"path\" : \"build/bin/${APP_NAME}_graphics\"} ] \n}")
+set(RUN_CONFIG "${RUN_CONFIG} {\"type\" : \"graphics\", \"path\" : \"${APP_NAME}_graphics\"} ] \n}")
 
-file(WRITE "${BUILD_ROOT_DIR}/build/${APP_NAME}.json" ${RUN_CONFIG})
 
 add_custom_target("${APP_NAME}"
   COMMAND ""
@@ -279,7 +279,7 @@ add_custom_target("${APP_NAME}"
   SOURCES ${${ALLO_APP_SRC}})
 
 add_custom_target("${APP_NAME}_run"
-  COMMAND "python" "tools/allorun/allorun.py" "${BUILD_ROOT_DIR}/build/${APP_NAME}.json"
+  COMMAND "python" "${CMAKE_CURRENT_SOURCE_DIR}/tools/allorun/allorun.py" "${BUILD_ROOT_DIR}/build/${APP_NAME}.json"
   DEPENDS ${ALLOSPHERE_APPS}
   WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
   SOURCES ${${ALLO_APP_SRC}}
@@ -289,6 +289,12 @@ add_custom_target("${APP_NAME}_run"
 else()
 BuildAlloTarget(APP_NAME ALLOSYSTEM_APP_SRC "" "")
 AddRunTarget("${APP_NAME}" "${APP_NAME}")
+
+set(RUN_CONFIG "{ \"root_dir\" : \"${BUILD_ROOT_DIR}\",  \"bin_dir\" : \"build/bin/\" , \n  \"apps\" : [ {\"type\" : \"monolithic\", \"path\" : \"${APP_NAME}\"} ] }")
+
 endif()
+
+
+file(WRITE "${BUILD_ROOT_DIR}/build/${APP_NAME}.json" ${RUN_CONFIG})
 
 

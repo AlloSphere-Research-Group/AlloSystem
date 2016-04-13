@@ -141,6 +141,24 @@ public:
 	 * OSC values on this address
 	 */
 	std::string getFullAddress();
+
+	typedef float (*ParameterProcessCallback)(float value, void *userData);
+
+	/**
+	 * @brief setProcessingCallback sets a callback to be called whenever the
+	 * parameter value changes
+	 *
+	 * Setting a callback can be useful when specific actions need to be taken
+	 * whenever a parameter changes, but it can also be used to modify the value
+	 * of the incoming parameter value before it is stored in the parameter.
+	 * The registered callback must return the value to be stored in the
+	 * parameter.
+	 *
+	 * @param cb The callback function
+	 * @param userData user data that is passed to the callback function
+	 */
+	void setProcessingCallback(ParameterProcessCallback cb,
+	                           void *userData = nullptr);
 	
 private:
 	float mValue;
@@ -154,6 +172,9 @@ private:
 	std::string mFullAddress;
 	
 	std::mutex mMutex;
+
+	ParameterProcessCallback mCallback;
+	void *mCallbackUdata;
 };
 
 /**

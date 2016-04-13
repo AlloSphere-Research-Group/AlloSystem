@@ -113,6 +113,7 @@ class AudioRenderer : public AudioRendererBase<AudioState> {
 public:
 	AudioRenderer() : mPhase(0), mPhaseInc(0)
 	{
+		initAudio();
 	}
 
 	// You can perform intialization operations in the initAudio() function,

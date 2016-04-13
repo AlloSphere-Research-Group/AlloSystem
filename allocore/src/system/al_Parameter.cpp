@@ -39,7 +39,11 @@ void Parameter::set(float value)
 	if (value > mMax) value = mMax;
 	if (value < mMin) value = mMin;
 	mMutex.lock();
-	mValue = value;
+	if (mCallback) {
+		mValue = mCallback(value, mCallbackUdata);
+	} else {
+		mValue = value;
+	}
 	mMutex.unlock();
 }
 
@@ -55,6 +59,12 @@ float Parameter::get()
 std::string Parameter::getFullAddress()
 {
 	return mFullAddress;
+}
+
+void al::Parameter::setProcessingCallback(al::Parameter::ParameterProcessCallback cb, void *userData)
+{
+	mCallback = cb;
+	mCallbackUdata = userData;
 }
 
 // ---- ParameterServer
@@ -95,6 +105,11 @@ void al::ParameterServer::unregisterParameter(al::Parameter &param)
 
 void ParameterServer::onMessage(osc::Message &m)
 {
+	std::string requestAddress = "/request";
+	if(m.addressPattern() == requestAddress && m.typeTags() == "s") {
+		std::string parameterAddress;
+		m >> parameterAddress;
+	}
 	float val;
 	m >> val;
 	mParameterLock.lock();

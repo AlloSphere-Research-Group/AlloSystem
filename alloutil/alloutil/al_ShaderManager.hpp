@@ -73,6 +73,13 @@ struct ShaderManager {
     return s;
   }
 
+  ShaderProgram* addShaderFile(std::string pName) {
+    std::string vName = pName + ".vert";
+    std::string fName = pName + ".frag";
+
+    return addShaderFile(pName, vName, fName);
+  }
+
   ShaderProgram* addShaderFile(std::string pName, std::string vName, std::string gName, std::string fName) {
     // destroy shader if one already exists with same name
     if(shaderMap.count(pName)){
@@ -89,8 +96,8 @@ struct ShaderManager {
 
     Shader vert, frag, geom;
 
-    if(rm[vName].loaded) vert.source(rm.data(vName), Shader::VERTEX).compile().printLog();
-    if(rm[gName].loaded) geom.source(rm.data(gName), Shader::GEOMETRY).compile().printLog();
+    if(rm[vName].loaded) vert.source(vertLibCode + rm.data(vName), Shader::VERTEX).compile().printLog();
+    if(rm[gName].loaded) geom.source(fragLibCode + rm.data(gName), Shader::GEOMETRY).compile().printLog();
     if(rm[fName].loaded) frag.source(rm.data(fName), Shader::FRAGMENT).compile().printLog();
 
     ShaderProgram *s = new ShaderProgram();

@@ -32,6 +32,7 @@ public:
 class SimulatorApp : public SimulatorBase<State> {
 public:
 	SimulatorApp() {
+		initAudio();
 	}
 
 	virtual void onAnimate(double dt) override {
@@ -86,9 +87,7 @@ public:
 		pose = nav();
 	}
 
-	virtual void onDrawOmni(OmniStereo& om) override {
-
-		Graphics g = graphics();
+	virtual void onDraw(Graphics &g) override {
 
 		// Call updateState() to process the state message queue. If there
 		// is a new state, the function will return true. You can then
@@ -105,7 +104,8 @@ public:
 
 		// You can get the current state with state(). This will return a
 		// variable of type State.
-	    omni().clearColor() = Color(state().value, 0, 0);
+	    g.clearColor(Color(state().value, 0.0, 0.0));
+		g.clear(Graphics::COLOR_BUFFER_BIT);
 
 		g.polygonMode(Graphics::FILL);
 		g.antialiasing(Graphics::NICEST);
