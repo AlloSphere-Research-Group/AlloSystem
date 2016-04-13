@@ -94,7 +94,7 @@ void MeshVBO::allocate(BufferDataUsage usage){
     }
 
     if (hasColoris()) {
-      mColorisStride = sizeof(coloris()[0]);
+      mColoriStride = sizeof(coloris()[0]);
       setData(coloris().elems(), &mColorisId, coloris().size(), usage, GL_ARRAY_BUFFER);
     }
 
@@ -224,7 +224,7 @@ void MeshVBO::bind(){
   if (hasColoris()){
     glBindBuffer(GL_ARRAY_BUFFER, mColorisId);
     glEnableClientState(GL_COLOR_ARRAY);
-    glColorPointer(4, GL_FLOAT, mColorStride, 0);
+    glColorPointer(4, GL_INT, mColoriStride, 0);
   }
 
   if (hasIndices()){
@@ -292,7 +292,7 @@ uint32_t MeshVBO::getColorId() {
 
 ////////////////////////////////////////////////////////////////////////////////
 uint32_t MeshVBO::getColorisId() {
-  return mColoroisId;
+  return mColorisId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

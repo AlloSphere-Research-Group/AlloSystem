@@ -192,7 +192,7 @@ protected:
 	int mVertStride = sizeof(Vec3f);
 	int mNormalStride = sizeof(Vec3f);
 	int mColorStride = sizeof(Color);
-	int mColorisStride = sizeof(Color);
+	int mColoriStride = sizeof(Colori);
 	int mTexCoordStride = sizeof(TexCoord2);
 	int mIndexStride = sizeof(uint32_t);
 
