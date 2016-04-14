@@ -100,7 +100,18 @@ public:
 	/// 3D VBAP, build list of internal speaker triplets
 	void findSpeakerTriplets(const std::vector<Speaker>& spkrs);
 
-	void makePhantomChannel(int channelIndex, std::vector<int> assignedSpeakers);
+	///
+	/// \brief Make an existing channel a phantom channel
+	/// \param channelIndex the channel index of the phantom channel
+	/// \param assignedOutputs the list of channel indeces for signal reassignment
+	///
+	/// Signals that should go out to phantom channels will be distributed among
+	/// the channels listed in the assignedOutputs vector. This can be useful to
+	/// force triangulation in unusual situations (e.g. three rings on a
+	/// sphere...) but it can also be used creatively to make an area in space
+	/// be reassigned somewhere else, or to a wider number of speakers.
+	///
+	void makePhantomChannel(int channelIndex, std::vector<int> assignedOutputs);
 
 	void compile(Listener& listener);
 

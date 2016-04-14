@@ -2,6 +2,7 @@
 
 
 #include <atomic>
+#include <vector>
 
 #include "allocore/al_Allocore.hpp"
 #include "allocore/sound/al_Vbap.hpp"
@@ -174,7 +175,7 @@ public:
 				mesh->vertex(coords.x,coords.y,coords.z);
 			}
 
-			Color c(rnd::uniform(1.f,0.1f), rnd::uniform(), rnd::uniform(),1.0);
+			Color c(rnd::uniform(1.f,0.1f), rnd::uniform(), rnd::uniform(),0.4);
 			for(int i = 0;i < 3;++i){
 				mesh->color(c);
 			}
@@ -252,9 +253,8 @@ int main (int argc, char * argv[]){
 		speakerLayout.addSpeaker(Speaker(1, -30, 0, rad));
 		speakerLayout.addSpeaker(Speaker(2, 110, 0, rad));
 		speakerLayout.addSpeaker(Speaker(3, -110, 0, rad));
-
 		speakerLayout.addSpeaker(Speaker(4, 0, 80, rad));
-		speakerLayout.addSpeaker(Speaker(5, 0, -80, rad));
+		speakerLayout.addSpeaker(Speaker(5, 0, -80, rad/2)); // This channel will be turned into a phantom speaker
 	}
 
 
@@ -308,12 +308,20 @@ int main (int argc, char * argv[]){
 	panner->setIs3D(layout==RING_LAYOUT ? false:true);
 	listener = scene.createListener(panner);
 
+	if(layout == THREE_D_LAYOUT){
+		std::vector<int> assignedSpeakers;
+		assignedSpeakers.push_back(0);
+		assignedSpeakers.push_back(1);
+		assignedSpeakers.push_back(2);
+		assignedSpeakers.push_back(3);
+		panner->makePhantomChannel(5, assignedSpeakers);
+	}
+
 	for(int i = 0; i < NUM_SOURCES; i++){
 		srcs[i].usePerSampleProcessing(perSampProcessing);
 		srcs[i].dopplerType(DOPPLER_NONE);
 		scene.addSource(srcs[i]);
 	}
-
 
 	scene.usePerSampleProcessing(perSampProcessing);
 	panner->setEnabled(true);
