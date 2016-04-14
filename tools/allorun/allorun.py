@@ -4,6 +4,7 @@
 from __future__ import print_function
 
 import sys
+import argparse
 
 from appnode import BuildNode, RunNode
 
@@ -93,10 +94,10 @@ class CursesApp():
         for i, node in enumerate(self.nodes):
             
             builder = node
-            configuration = {"project_dir" : '',
+            configuration = {"project_dir" : '/home/sphere/andres/adrift_new',
                             "project_src": self.source,
                             "prebuild_commands" : '',
-                            "build_command" : './run.sh '
+                            "build_command" : './run.sh -s -n'
                             }
             builder.configure(**configuration)
             builder.build()
@@ -268,15 +269,17 @@ class CursesApp():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Build and Run AlloSphere apps.')
+    parser.add_argument('source', type=str, nargs=1,
+                       help='source file or directory to build',
+                       default='AlloSystem/alloutil/examples/allosphereApp.cpp')
+    parser.add_argument('-l', '--local', help='Force local build.', action="store_true")
+    args = parser.parse_args()
+    project_src = ' '.join(args.source)
+
     import socket
-#    import json
     hostname = socket.gethostname()
-    if len(sys.argv) > 1:
-        project_src = sys.argv[1]
-    else:
-        project_src = 'AlloSystem/alloutil/examples/allosphereApp.cpp'
-    
-    if hostname == 'audio.10g':
+    if hostname == 'audio.10g' and not args.local:
         from allosphere import nodes
     else:
         from local import nodes
