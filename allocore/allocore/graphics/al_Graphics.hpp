@@ -51,14 +51,17 @@
 #include "allocore/types/al_Color.hpp"
 #include "allocore/system/al_Printing.hpp"
 
+#include "allocore/graphics/al_GPUObject.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
 #include "allocore/graphics/al_OpenGL.hpp"
-
+#include "allocore/graphics/al_MeshVBO.hpp"
 
 /*!
 	\def AL_GRAPHICS_ERROR(msg, ID)
 	Used for reporting graphics errors from source files
+
 */
+//#define AL_ENABLE_DEBUG
 #ifdef AL_ENABLE_DEBUG
 #define AL_GRAPHICS_ERROR(msg, ID)\
 {	const char * errStr = al::Graphics::errorString();\
@@ -76,6 +79,7 @@ namespace al {
 
 
 /// A framed area on a display screen
+/// @ingroup allocore
 struct Viewport {
 	float l, b, w, h;	///< left, bottom, width, height
 
@@ -104,7 +108,8 @@ struct Viewport {
 
 ///	It also owns a Mesh, to simulate immediate mode (where it draws its own data)
 ///
-class Graphics {
+/// @ingroup allocore
+class Graphics : public GPUObject {
 public:
 
 	enum AntiAliasMode {
@@ -150,7 +155,8 @@ public:
 		LIGHTING				= GL_LIGHTING,				/**< Use lighting */
 		SCISSOR_TEST			= GL_SCISSOR_TEST,			/**< Crop fragments according to scissor region */
 		CULL_FACE				= GL_CULL_FACE,				/**< Cull faces */
-		RESCALE_NORMAL			= GL_RESCALE_NORMAL			/**< Rescale normals to counteract an isotropic modelview scaling */
+		RESCALE_NORMAL			= GL_RESCALE_NORMAL,		/**< Rescale normals to counteract an isotropic modelview scaling */
+		NORMALIZE				= GL_NORMALIZE				/**< Rescale normals to counteract non-isotropic modelview scaling */
 	};
 
 	enum DataType {
@@ -418,7 +424,7 @@ public:
 		rotate(angle, axis[0],axis[1],axis[2]); }
 
 	/// Scale current matrix uniformly
-	void scale(double s){ scale(s, s, s); }
+	void scale(double s);
 
 	/// Scale current matrix along each dimension
 	void scale(double x, double y, double z=1.);
@@ -427,12 +433,20 @@ public:
 	template <class T>
 	void scale(const Vec<3,T>& v){ scale(v[0],v[1],v[2]); }
 
+	/// Scale current matrix along each dimension
+	template <class T>
+	void scale(const Vec<2,T>& v){ scale(v[0],v[1]); }
+
 	/// Translate current matrix
 	void translate(double x, double y, double z=0.);
 
 	/// Translate current matrix
 	template <class T>
 	void translate(const Vec<3,T>& v){ translate(v[0],v[1],v[2]); }
+
+	/// Translate current matrix
+	template <class T>
+	void translate(const Vec<2,T>& v){ translate(v[0],v[1]); }
 
 
 	// Immediate Mode
@@ -499,6 +513,9 @@ public:
 	/// Draw internal vertex data
 	void draw(){ draw(mMesh); }
 
+	/// Draw MeshVBO
+	void draw(MeshVBO& meshVBO);
+
 
 	// Utility functions: converting, reporting, etc.
 
@@ -536,7 +553,11 @@ public:
 
 protected:
 	Mesh mMesh;				// used for immediate mode style rendering
+	int mRescaleNormal;
 	bool mInImmediateMode;	// flag for whether or not in immediate mode
+
+	virtual void onCreate(); // GPUObject
+	virtual void onDestroy(); // GPUObject
 };
 
 
@@ -601,8 +622,21 @@ inline void Graphics::rotate(const Quatd& q) {
 	q.toMatrix(m.elems());
 	multMatrix(m);
 }
-inline void Graphics::scale(double x, double y, double z){ glScaled(x, y, z); }
-
+inline void Graphics::scale(double s){
+	if(mRescaleNormal < 1){
+		mRescaleNormal = 1;
+		enable(RESCALE_NORMAL);
+	}
+	glScaled(s, s, s);
+}
+inline void Graphics::scale(double x, double y, double z){
+	if(mRescaleNormal < 3){
+		mRescaleNormal = 3;
+		disable(RESCALE_NORMAL);
+		enable(NORMALIZE);
+	}
+	glScaled(x, y, z);
+}
 inline void Graphics::lineWidth(float v) { glLineWidth(v); }
 inline void Graphics::pointSize(float v) { glPointSize(v); }
 inline void Graphics::pointAtten(float c2, float c1, float c0){
@@ -613,7 +647,9 @@ inline void Graphics::polygonMode(PolygonMode m, Face f){ glPolygonMode(f,m); }
 inline void Graphics::shadeModel(ShadeModel m){ glShadeModel(m); }
 inline void Graphics::currentColor(float r, float g, float b, float a){ glColor4f(r,g,b,a); }
 
-inline Graphics::AttributeBit operator| (const Graphics::AttributeBit& a, const Graphics::AttributeBit& b){
+inline Graphics::AttributeBit operator| (
+	const Graphics::AttributeBit& a, const Graphics::AttributeBit& b
+){
 	return static_cast<Graphics::AttributeBit>(+a|+b);
 }
 

@@ -1,6 +1,7 @@
 #ifndef AL_RAYSTEREO_H
 #define AL_RAYSTEREO_H
 
+#include "allocore/math/al_Constants.hpp"
 #include "allocore/graphics/al_Lens.hpp"
 #include "allocore/graphics/al_Shader.hpp"
 #include "allocore/graphics/al_Texture.hpp"
@@ -103,6 +104,10 @@ public:
   // get individual projector configurations:
   Projection& projection(int i) { return mProjections[i]; }
   int numProjections() const { return mNumProjections; }
+
+  void createTexture(GLuint* id_tex);
+  void bindTexToFBO(GLuint id_tex);
+  void bindDepthTexToFBO(GLuint id_tex);
   
   // useful accessors:
   GLuint texture() const { return mTex[0]; }
@@ -113,8 +118,8 @@ public:
   void onCreate();
   void onDestroy();
   
-  void drawQuad(const ShaderProgram& shaderProgram, double eye);
-  void draw(const ShaderProgram& shaderProgram, const Lens& lens, const Viewport& vp);
+  void drawQuad(const ShaderProgram* shaderProgram, double eye);
+  void draw(const ShaderProgram* shaderProgram, const Lens& lens, const Viewport& vp);
   
 protected:
   // supports up to 4 warps/viewports

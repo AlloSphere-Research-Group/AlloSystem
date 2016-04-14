@@ -6,6 +6,7 @@ message(STATUS "==== Configuring allocore.")
 # Allocore Library
 list(APPEND ALLOCORE_SRC
   src/io/al_AudioIOData.cpp
+  src/io/al_ControlNav.cpp
   src/io/al_MIDI.cpp
   src/io/al_HID.cpp
   src/io/al_Serial.cpp
@@ -27,8 +28,10 @@ list(APPEND ALLOCORE_SRC
 list(APPEND ALLOCORE_HEADERS
     allocore/al_Allocore.hpp
     allocore/graphics/al_Mesh.hpp
+    allocore/graphics/al_MeshVBO.hpp
     allocore/graphics/al_Shapes.hpp
     allocore/graphics/al_Image.hpp
+    allocore/graphics/al_EasyFBO.hpp
 	allocore/io/al_AudioIOData.hpp
     allocore/io/al_HID.hpp
     allocore/io/al_MIDI.hpp
@@ -99,10 +102,23 @@ endif()
 # Dependencies --------------------------------------------
 set(ALLOCORE_DEP_INCLUDE_DIRS ${BUILD_ROOT_DIR}/build/include)
 
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+
+if(NOT (COMPILER_SUPPORTS_CXX11 OR COMPILER_SUPPORTS_CXX0X))
+	message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif()
+
+if(COMPILER_SUPPORTS_CXX11)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ")
+elseif(COMPILER_SUPPORTS_CXX0X)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x ")
+endif()
+
 # System dependent libs
 # ---- OS X ----
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  add_definitions(-DAL_OSX)
     # Needed by HID
   find_library(IOKIT_FM IOKit)
   find_library(COREFOUNDATION_FM CoreFoundation)
@@ -111,7 +127,6 @@ endif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 # ---- Linux ------
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  add_definitions(-DAL_LINUX)
 
   # For clock_gettime, etc.
   list(APPEND ALLOCORE_LINK_LIBRARIES rt)
@@ -122,13 +137,6 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   find_package(Libusb QUIET)
   list(APPEND ALLOCORE_LINK_LIBRARIES ${LIBUSB_1_LIBRARY} ${UDEV_LIBRARY})
   #message("libudev lib = ${UDEV_LIBRARY}")
-endif()
-
-# ---- Windows ----
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-  add_definitions(-DAL_WINDOWS)
-  # For HID
-  #list(APPEND ALLOCORE_LINK_LIBRARIES windows setupapi) # Commented out for mingw buildmaybe required for msvs?
 endif()
 
 # optional dependendencies ----------------------------
@@ -178,7 +186,7 @@ set_target_properties(${ALLOCORE_LIB}
 include_directories(${ALLOCORE_DEP_INCLUDE_DIRS})
 target_link_libraries(${ALLOCORE_LIB} ${ALLOCORE_LINK_LIBRARIES})
 
-message(${ALLOCORE_DEP_INCLUDE_DIRS})
+#message(${ALLOCORE_DEP_INCLUDE_DIRS})
 
 # Doxygen documentation target
 add_custom_target("doc"
@@ -209,6 +217,11 @@ if(BUILD_EXAMPLES)
       set_target_properties(${EXAMPLE_TARGET} PROPERTIES
 	COMPILE_FLAGS "${EXTRA_COMPILER_FLAGS}")
       target_link_libraries("${EXAMPLE_TARGET}" ${ALLOCORE_LIB} ${ALLOCORE_LINK_LIBRARIES})
+#if(COMPILER_SUPPORTS_CXX11)
+#	set_property(TARGET ${EXAMPLE_TARGET} APPEND_STRING PROPERTY COMPILE_FLAGS "-std=c++11 ")
+#elseif(COMPILER_SUPPORTS_CXX0X)
+#	set_property(TARGET ${EXAMPLE_TARGET} APPEND_STRING PROPERTY COMPILE_FLAGS "-std=c++0x")
+#endif()
       if (apple)
 	find_library(AUDIOUNIT_FM AudioUnit)
         target_link_libraries("${EXAMPLE_TARGET}" ${AUDIOUNIT_FM})
@@ -227,7 +240,8 @@ if(BUILD_EXAMPLES)
     find_package(Gamma)
   endif(NOT TARGET Gamma)
 
-  if (GAMMA_FOUND OR GAMMA_LIBRARY)
+  if (GAMMA_FOUND OR GAMMA_LIBRARY AND NOT TRAVIS_BUILD)
+    get_target_property(GAMMA_LIBRARIES Gamma GAMMA_LINK_LIBRARIES)
     include_directories(${GAMMA_INCLUDE_DIR})
     file(GLOB EXAMPLE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} examples/sound/*.cpp)
     foreach(example ${EXAMPLE_FILES})
@@ -238,11 +252,11 @@ if(BUILD_EXAMPLES)
         find_library(AUDIOUNIT_FM AudioUnit)
         target_link_libraries(allocore_sound_${EXAMPLE_NAME} ${AUDIOUNIT_FM})
       endif()
-      target_link_libraries(allocore_sound_${EXAMPLE_NAME} ${GAMMA_LIBRARIES})
+      target_link_libraries(allocore_sound_${EXAMPLE_NAME} ${GAMMA_LIBRARIES} ${GAMMA_LIBRARY})
     endforeach(example)
   else()
     message("Gamma not found. Not building allocore sound examples.")
-  endif(GAMMA_FOUND OR GAMMA_LIBRARY)
+  endif(GAMMA_FOUND OR GAMMA_LIBRARY AND NOT TRAVIS_BUILD)
 endif(BUILD_EXAMPLES)
 
 # Unit tests

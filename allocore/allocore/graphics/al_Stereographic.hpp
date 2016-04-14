@@ -51,6 +51,8 @@
 namespace al{
 
 ///	Higher-level utility class to manage various stereo rendering techniques
+///
+/// @ingroup allocore
 class Stereographic {
 public:
 
@@ -74,14 +76,7 @@ public:
 	};
 
 
-	Stereographic()
-	:	mMode(ANAGLYPH), mAnaglyphMode(RED_CYAN), mClearColor(Color(0)),
-		mSlices(24), mOmniFov(360),
-		mEyeNumber(0),
-		mStereo(false), mOmni(false)
-	{}
-
-	~Stereographic(){}
+	Stereographic();
 
 
 	/// Draw the scene according to the stored stereographic mode
@@ -192,6 +187,26 @@ public:
 	Vec3d unproject(Vec3d screenPos);
 
 
+	/// Transform a vector from world space to clip space
+	template <class T>
+	Vec<4,T> toClipSpace(const Vec<4,T>& v) const;
+
+	/// Returns origin of world space converted to clip space
+	Vec4d toClipSpace() const;
+
+	/// Transform a vector from world space to normalized device coordinate space
+
+	/// Normalized device coordinate space is the viewing frustrum normalized
+	/// to a cube with each dimension spanning [-1,1]. The x-coordinate
+	/// corresponds to [left,right], the y-coordinate to [bottom,top], and the
+	/// z-coordinate to [near,far].
+	template <class T>
+	Vec<3,T> toNDCSpace(const Vec<4,T>& v) const;
+	template <class T>
+	Vec<3,T> toNDCSpace(const Vec<3,T>& v) const;
+
+	/// Returns origin of world space converted to normalized device coordinate space
+	Vec3d toNDCSpace() const;
 
 protected:
 	StereoMode mMode;
@@ -212,6 +227,31 @@ protected:
 
 	void drawEye(StereoMode eye, Graphics& gl, const Lens& lens, const Pose& pose, const Viewport& vp, Drawable& draw, bool clear, double pixelaspect);
 };
+
+
+template <class T>
+inline Vec<4,T> Stereographic::toClipSpace(const Vec<4,T>& v) const {
+	return modelViewProjection() * v;
+}
+
+inline Vec4d Stereographic::toClipSpace() const {
+	return modelViewProjection().col(3);
+}
+
+template <class T>
+inline Vec<3,T> Stereographic::toNDCSpace(const Vec<4,T>& v) const {
+	Vec<4,T> clipSpace = toClipSpace(v);
+	return clipSpace.get(0,1,2) / clipSpace[3];
+}
+template <class T>
+inline Vec<3,T> Stereographic::toNDCSpace(const Vec<3,T>& v) const {
+	return toNDCSpace(Vec<4,T>(v,1));
+}
+
+inline Vec3d Stereographic::toNDCSpace() const {
+	Vec4d clipSpace = toClipSpace();
+	return clipSpace.get(0,1,2) / clipSpace[3];
+}
 
 } // al::
 

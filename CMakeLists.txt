@@ -42,6 +42,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 # Other defaults
+
 if(NOT DEFINED BUILD_GAMMA)
   set(BUILD_GAMMA 1 CACHE STRING "Try to build external Gamma")
 endif(NOT DEFINED BUILD_GAMMA)
@@ -54,9 +55,41 @@ if(NOT DEFINED BUILD_CUTTLEBONE)
   set(BUILD_CUTTLEBONE 1 CACHE STRING "Try to build external Cuttlebone.")
 endif(NOT DEFINED BUILD_CUTTLEBONE)
 
+if(NOT DEFINED BUILD_PHASESPACE)
+  set(BUILD_PHASESPACE 1 CACHE STRING "Try to build external phasespace.")
+endif(NOT DEFINED BUILD_PHASESPACE)
+
+option(BUILD_ALLOCV "Build the AlloCV module (deprecated)")
+
 set(BUILD_EXAMPLES 0 CACHE STRING "Build AlloSystem examples.")
 
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  add_definitions(-DAL_OSX)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  add_definitions(-DAL_LINUX)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+  add_definitions(-DAL_WINDOWS)
+endif()
+
+
 # External dependencies (Gamma and GLV)
+
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+
+
+if(NOT (COMPILER_SUPPORTS_CXX11 OR COMPILER_SUPPORTS_CXX0X))
+	message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif()
+
+if(COMPILER_SUPPORTS_CXX11)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ")
+elseif(COMPILER_SUPPORTS_CXX0X)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+endif()
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules")
 
 include(cmake_modules/make_dep.cmake) # Functions to build some dependencies like Gamma and GLV
@@ -69,19 +102,19 @@ endif(BUILD_GAMMA AND NOT GAMMA_LIBRARY)
 
 if(BUILD_GLV AND NOT GLV_LIBRARY)
     make_dep(GLV)
-	message(STATUS "Using GLV from: ${GLV_LIBRARY}.")
-	message(STATUS "GLV headers: ${GLV_INCLUDE_DIR}.")
 endif(BUILD_GLV AND NOT GLV_LIBRARY)
 
-if(NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-  make_dep(cuttlebone)
-	message(STATUS "Using Cuttlebone from: ${CUTTLEBONE_LIBRARY}.")
-	message(STATUS "Cuttlebone headers: ${CUTTLEBONE_INCLUDE_DIR}.")
-endif()
+if(BUILD_CUTTLEBONE AND NOT CUTTLEBONE_LIBRARY)
+    make_dep(cuttlebone)
+endif(BUILD_CUTTLEBONE AND NOT CUTTLEBONE_LIBRARY)
+
+if(BUILD_PHASESPACE AND NOT PHASESPACE_LIBRARY)
+    make_dep(Phasespace)
+endif(BUILD_PHASESPACE AND NOT PHASESPACE_LIBRARY)
 
 # Allocore --------------------------------
 add_subdirectory(allocore)
-get_target_property(ALLOCORE_LIBRARY "allocore${DEBUG_SUFFIX}" LOCATION)
+set(ALLOCORE_LIBRARY "allocore${DEBUG_SUFFIX}")
 get_target_property(ALLOCORE_DEP_INCLUDE_DIR "allocore${DEBUG_SUFFIX}" ALLOCORE_DEP_INCLUDE_DIR)
 get_target_property(ALLOCORE_LINK_LIBRARIES "allocore${DEBUG_SUFFIX}" ALLOCORE_LINK_LIBRARIES)
 if(BUILDING_GAMMA)
@@ -90,13 +123,13 @@ endif(BUILDING_GAMMA)
 
 # Alloutil ----------------------------------
 add_subdirectory(alloutil)
-get_target_property(ALLOUTIL_LIBRARY alloutil${DEBUG_SUFFIX} LOCATION)
+set(ALLOUTIL_LIBRARY "alloutil${DEBUG_SUFFIX}")
 get_target_property(ALLOUTIL_DEP_INCLUDE_DIR alloutil${DEBUG_SUFFIX} ALLOUTIL_DEP_INCLUDE_DIR)
 get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil${DEBUG_SUFFIX} ALLOUTIL_LINK_LIBRARIES)
 
 # alloGLV ---------------------------------------
 add_subdirectory(alloGLV)
-get_target_property(ALLOGLV_LIBRARY alloGLV${DEBUG_SUFFIX} LOCATION)
+set(ALLOGLV_LIBRARY "alloGLV${DEBUG_SUFFIX}")
 get_target_property(ALLOGLV_INCLUDE_DIR alloGLV${DEBUG_SUFFIX} ALLOGLV_INCLUDE_DIR)
 get_target_property(ALLOGLV_LINK_LIBRARIES alloGLV${DEBUG_SUFFIX} ALLOGLV_LINK_LIBRARIES)
 if(BUILDING_GLV)
@@ -104,15 +137,16 @@ if(BUILDING_GLV)
 endif(BUILDING_GLV)
 
 # allocv ---------------------------------------
-
+if(BUILD_ALLOCV)
 add_subdirectory(allocv)
-get_target_property(ALLOCV_LIBRARY allocv${DEBUG_SUFFIX} LOCATION)
+set(ALLOCV_LIBRARY "allocv${DEBUG_SUFFIX}")
 get_target_property(ALLOCV_INCLUDE_DIR allocv${DEBUG_SUFFIX} ALLOCV_INCLUDE_DIR)
 get_target_property(ALLOCV_LINK_LIBRARIES allocv${DEBUG_SUFFIX} ALLOCV_LINK_LIBRARIES)
+endif(BUILD_ALLOCV)
 
 # alloaudio ----------------------------------
 add_subdirectory(alloaudio)
-get_target_property(ALLOAUDIO_LIBRARY alloaudio${DEBUG_SUFFIX} LOCATION)
+set(ALLOAUDIO_LIBRARY "alloaudio${DEBUG_SUFFIX}")
 get_target_property(ALLOAUDIO_INCLUDE_DIR alloaudio${DEBUG_SUFFIX} ALLOAUDIO_INCLUDE_DIR)
 get_target_property(ALLOAUDIO_LINK_LIBRARIES alloaudio${DEBUG_SUFFIX} ALLOAUDIO_LINK_LIBRARIES)
 if(ALLOAUDIO_LIBRARY)

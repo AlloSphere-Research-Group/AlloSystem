@@ -1,0 +1,184 @@
+1 ALLOSYSTEM CODING STYLE
+=========================
+
+1.1 File Naming
+---------------
+For C++:
+al_[CamelCase].hpp
+al_[CamelCase].cpp
+
+For C:
+al_[CamelCase].h
+al_[CamelCase].c
+
+
+1.2 Header Files
+----------------
+All header content should be contained within a preprocessor conditional block to avoid multiple include errors.
+
+	#ifndef INCLUDE_AL_[FILE_STEM]_[FILE_EXT (H or HPP)]
+	#define INCLUDE_AL_[FILE_STEM]_[FILE_EXT (H or HPP)]
+
+	[source code...]
+
+	#endif
+
+Please do not use '#pragma once' as this is non-standard.
+
+A comment at the beginning of the file should include:
+	a. The license in its entirety
+	b. A description of the file
+	c. The primary author(s) of the file
+	d. If possible, example usage code
+
+
+1.3 Whitespace
+--------------
+Indentation should be done using tabs. Make sure your editor does not replace tabs with spaces.
+
+Make sure your editor uses Unix-like line endings "\n". This is especially relevant on Windows where many editors use "\r\n" by default.
+
+
+1.4 Macros
+----------
+Minimize use of macros as they always have global scope. Do not use macros to define constants or functions.
+
+Instead of
+	#define MIN(x,y) (x < y : x ? y)
+use
+	template<typename T>
+	inline T min(const T x, const T y) {
+  		return (x < y : x ? y);
+	}
+
+
+1.5 Naming conventions
+----------------------
+- Macros should be all uppercase with words separated by underscores, e.g. AL_NSEC_FMT.
+- enum constants should be all uppercase.
+
+C++ only:
+- Variable members in classes should be prefixed by 'm'. e.g. mSize.
+- Everything should be defined within the namespace al::.
+
+C only:
+- Function names should be prefixed with 'al_'.
+
+
+1.7 C++isms
+-----------
+Use references instead of pointers in public interfaces. A reference cannot be NULL unlike a pointer and therefore catches many run-time errors. For example, instead of passing a pointer
+
+	void foo(Object * obj);
+
+use a reference
+
+	void foo(Object& obj);
+
+In example code, avoid dynamic memory allocation using new and delete. Instead of
+
+	Object * obj = new Object;
+	// code using obj
+	delete obj;
+
+prefer
+
+	Object obj;
+	// code using obj
+
+For more information on how to not use pointers in modern C++ see
+
+	klmr.me/slides/modern-cpp/
+
+
+1.6 Class design
+----------------
+- Include a default constructor whenever possible.
+- Avoid dynamic memory allocation or resource acquisition (opening files, etc.) in constructors.
+- Place implementation code into a separate .cpp file. This make headers easier to read and speeds up compilation time for users of the library. You may, however, place the implementation in the header file for inlined functions (small, frequently-called functions) or templated functions.
+
+
+1.8 Dependencies
+----------------
+Try to keep the amount of code dependencies at a minimum, both internally and with regards to third-party libraries. 
+
+For example:
+- Only #include headers that you are actually using functionality from in a particular file. Always try to move header includes to the implementation (.cpp) file, especially those from third-party libraries.
+- If you only need a small amount of functionality from another header file or library with a large code base, consider just rewriting the functionality you need and avoiding the dependency.
+- Check that what you need is not already in the C++ standard.
+
+
+2 LIBRARY ORGANIZATION
+======================
+allocore
+	math
+		complex number
+		quaternion
+		n-vector
+		n x n matrix
+		'special' and other functions
+		interpolation functions
+		random functions
+		interval
+		geometric: frustum, plane, ray, spherical
+
+	spatial
+		pose
+		hashspace
+		distance attenuation
+		Frenet frame
+		
+	system
+		thread/mutex (*APR)
+		timing (*clock, *sleep)
+		memory mgmt.
+		main loop (GLUT)
+
+	types
+		priority queue (sorted FIFO)
+		tube (single RW, lock-free FIFO)
+		array (multidimensional, dynamic typed)
+		buffer (like std::vector)
+		color
+		voxels
+		conversion: bit twiddling, to string, etc.
+
+	io
+		audio driver (device, streams)
+		GL window, mouse, keyboard (GLUT)
+		sockets (**APR)
+		file, directory (**APR)
+		bluetooth
+		serial
+
+	graphics
+		render: OpenGL, texture, shader, FBO, light, lens, stereographic
+		mesh
+		isosurface
+		shapes
+		assets (assimp)
+		image file (freeimage)
+		font (freetype)
+
+	sound
+		audio scene
+		speaker
+		ambisonics
+		DBAP
+		VBAP
+		reverb
+		filters: biquad, crossover
+
+	protocol
+		OSC (oscpack)
+		serialize
+		zero conf
+
+allocv
+	video capture (OpenCV)
+
+external
+	sound file (libsndfile via Gamma)
+
+* Consider porting to C++11
+** Consider porting to C++17

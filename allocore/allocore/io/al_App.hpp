@@ -58,20 +58,18 @@
 
 namespace al{
 
+class SceneWindowHandler;
 
 /// Viewpoint within a scene
 
 /// A viewpoint is an aggregation of a viewport (screen region), a pose
 /// (3D position and orientation), and a lens.
+///
+/// @ingroup allocore
 class Viewpoint{
 public:
 
-	Viewpoint(const Pose& transform = Pose::identity())
-	:	mViewport(0,0,0,0),
-		mParentTransform(NULL),
-		mAnchorX(0), mAnchorY(0), mStretchX(1), mStretchY(1),
-		mLens(NULL), mClearColor(NULL)
-	{}
+	Viewpoint(const Pose& transform = Pose::identity());
 
 	float anchorX() const { return mAnchorX; }
 	float anchorY() const { return mAnchorY; }
@@ -82,40 +80,42 @@ public:
 
 	/// @param[in] ax	anchor factor relative to left edge of window, in [0,1]
 	/// @param[in] ay	anchor factor relative to bottom edge of window, in [0,1]
-	Viewpoint& anchor(float ax, float ay){
-		mAnchorX=ax; mAnchorY=ay; return *this;
-	}
+	Viewpoint& anchor(float ax, float ay);
 
 	/// Set stretch factors relative to bottom-left corner of window
 
 	/// @param[in] sx	stretch factor relative to left edge of window, in [0,1]
 	/// @param[in] sy	stretch factor relative to bottom edge of window, in [0,1]
-	Viewpoint& stretch(float sx, float sy){
-		mStretchX=sx; mStretchY=sy; return *this;
-	}
+	Viewpoint& stretch(float sx, float sy);
 
 	bool hasLens() const { return NULL != mLens; }
 	bool hasClearColor() const { return NULL != mClearColor; }
 
+	/// Get lens
 	const Lens& lens() const { return *mLens; }
 	Viewpoint& lens(Lens& v){ mLens=&v; return *this; }
 
+	/// Get clear color
 	const Color& clearColor() const { return *mClearColor; }
 	Viewpoint& clearColor(Color& v){ mClearColor=&v; return *this; }
 
+	/// Get parent transform
 	const Pose* parentTransform() const { return mParentTransform; }
 	Viewpoint& parentTransform(Pose& v){ mParentTransform =&v; return *this; }
 	Viewpoint& parentTransform(Pose* v){ mParentTransform = v; return *this; }
 
+	/// Get local transform
 	const Pose& transform() const { return mTransform; }
 	Pose& transform(){ return mTransform; }
 	Viewpoint& transform(const Pose& v){ mTransform=v; return *this; }
 
 	Pose worldTransform() const { return mParentTransform ? (*mParentTransform) * transform() : transform(); }
 
+	/// Get screen viewport
 	const Viewport& viewport() const { return mViewport; }
 	Viewport& viewport(){ return mViewport; }
 
+	/// Get calculated viewing frustum
 	Frustumd frustum() const;
 
 	/// Call to update viewport using stretch/anchor amounts when parent dimensions change
@@ -133,14 +133,14 @@ private:
 
 
 /// A window with one or more Viewpoints
+///
+/// @ingroup allocore
 class ViewpointWindow : public Window {
 public:
 	typedef std::vector<Viewpoint *> Viewpoints;
 
 	///
-	ViewpointWindow(){
-		init();
-	}
+	ViewpointWindow();
 
 	/// @param[in] dims		window dimensions
 	/// @param[in] title	window title
@@ -151,10 +151,8 @@ public:
 		const std::string title="",
 		double fps=40,
 		DisplayMode mode = DEFAULT_BUF
-	){
-		init();
-		create(dims, title, fps, mode);
-	}
+	);
+
 
 	/// Get the list of viewpoints
 	Viewpoints& viewpoints(){ return mViewpoints; }
@@ -169,12 +167,16 @@ protected:
 	virtual bool onResize(int dw, int dh);
 
 private:
+	friend class SceneWindowHandler;
 	StandardWindowKeyControls mStandardKeyControls;
-	void init(){ append(mStandardKeyControls); }
+	bool mResized;
+	void init();
 };
 
 
 /// Application helper class
+///
+/// @ingroup allocore
 class App {
 public:
 
@@ -266,6 +268,10 @@ public:
 
 	/// Called upon resize of a window
 	virtual void onResize(const ViewpointWindow& win, int w, int h){}
+
+
+	/// Called just before the app exits and before any object destructors
+	virtual void onExit(){}
 
 
 	/// Set application name

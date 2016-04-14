@@ -17,13 +17,13 @@ libfind_pkg_check_modules(GLV_PKGCONF libGLV)
 # Include dir
 find_path(GLV_INCLUDE_DIR
   NAMES GLV/glv.h
-  PATHS ${GLV_PKGCONF_INCLUDE_DIRS} ./GLV ../GLV ../../GLV /usr/include /usr/local/include /opt/local/include
+  PATHS ${GLV_PKGCONF_INCLUDE_DIRS} ./GLV ../GLV ../../GLV /usr/include /usr/local/include /opt/local/include /tmp/GLV
 )
 
 # Finally the library itself
 find_library(GLV_LIBRARY
   NAMES GLV
-  PATHS ${GLV_PKGCONF_LIBRARY_DIRS} ./GLV/build/lib ../GLV/build/lib ../../GLV/build/lib /usr/lib /usr/local/lib /opt/local/lib
+  PATHS ${GLV_PKGCONF_LIBRARY_DIRS} ./GLV/build/lib ../GLV/build/lib ../../GLV/build/lib /usr/lib /usr/local/lib /opt/local/lib /tmp/GLV
 )
 
 #/usr/include/assimp

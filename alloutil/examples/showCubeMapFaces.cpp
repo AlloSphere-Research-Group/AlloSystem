@@ -20,7 +20,7 @@ struct MyApp : OmniApp {
   // omni_face
 
   virtual std::string vertexCode() {
-    return AL_STRINGIFY(
+    return R"(
       varying vec4 vy_CubeMapFaceColor;
       varying vec4 color;
       varying vec3 normal, lightDir, eyeVec;
@@ -41,11 +41,11 @@ struct MyApp : OmniApp {
         gl_TexCoord[0] = gl_MultiTexCoord0;
         gl_Position = omni_render(vertex);
       }
-    );
+    )";
   }
 
   virtual std::string fragmentCode() {
-    return AL_STRINGIFY(
+    return R"(
       varying vec4 vy_CubeMapFaceColor;
       uniform float lighting;
       uniform float texture;
@@ -74,7 +74,7 @@ struct MyApp : OmniApp {
         //gl_FragColor = mix(colorMixed, final_color, vy_CubeMapFaceColor) ;
         gl_FragColor = vy_CubeMapFaceColor;
       }
-    );
+    )";
   }
 
   virtual ~MyApp() {}

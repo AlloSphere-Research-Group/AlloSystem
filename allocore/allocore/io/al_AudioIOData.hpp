@@ -43,6 +43,7 @@
 */
 
 #include <cstdio>
+#include <cassert>
 
 namespace al{
 
@@ -97,6 +98,8 @@ static void interleave(T * dst, const T * src, int numFrames, int numChannels){
 }
 
 /// Audio device information
+///
+/// @ingroup allocore
 class AudioDeviceInfo{
 public:
 
@@ -147,6 +150,8 @@ inline AudioDeviceInfo::StreamMode operator| (const AudioDeviceInfo::StreamMode&
 
 
 /// Abstract audio backend
+///
+/// @ingroup allocore
 class AudioBackend{
 public:
 	AudioBackend();
@@ -165,7 +170,7 @@ public:
 	virtual void inDevice(int index) = 0;
 	virtual void outDevice(int index) = 0;
 
-	virtual int channels(int num, bool forOutput) = 0;
+	virtual void channels(int num, bool forOutput) = 0;
 
 	virtual int inDeviceChans() = 0;
 	virtual int outDeviceChans() = 0;
@@ -190,6 +195,8 @@ protected:
 /// Audio data to be sent to callback
 /// Audio buffers are guaranteed to be stored in a contiguous non-interleaved
 /// format, i.e., frames are tightly packed per channel.
+///
+/// @ingroup allocore
 class AudioIOData {
 public:
 	/// Constructor
@@ -285,6 +292,8 @@ public:
 
 
 /// Interface for objects which can be registered with an audio IO stream
+///
+/// @ingroup allocore
 class AudioCallback {
 public:
 	virtual ~AudioCallback() {}
@@ -293,9 +302,26 @@ public:
 
 
 //==============================================================================
-inline float&       AudioIOData::bus(int c, int f) const { return mBufB[c*framesPerBuffer() + f]; }
-inline const float& AudioIOData::in (int c, int f) const { return mBufI[c*framesPerBuffer() + f]; }
-inline float&       AudioIOData::out(int c, int f) const { return mBufO[c*framesPerBuffer() + f]; }
+inline float&       AudioIOData::bus(int c, int f) const
+{
+	assert(c < mNumB);
+	assert(f < framesPerBuffer());
+	return mBufB[c*framesPerBuffer() + f];
+}
+
+inline const float& AudioIOData::in (int c, int f) const
+{
+	assert(c < mNumI);
+	assert(f < framesPerBuffer());
+	return mBufI[c*framesPerBuffer() + f];
+}
+
+inline float&       AudioIOData::out(int c, int f) const
+{
+	assert(c < mNumO);
+	assert(f < framesPerBuffer());
+	return mBufO[c*framesPerBuffer() + f];
+}
 inline float&       AudioIOData::temp(int f) const { return mBufT[f]; }
 
 } // al::

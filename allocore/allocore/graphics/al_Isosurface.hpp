@@ -78,11 +78,13 @@
 #include <vector>
 #include "allocore/types/al_Buffer.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
+#include "allocore/types/al_Voxels.hpp"
 
 namespace al{
 
 
 /// Isosurface generated using marching cubes
+/// @ingroup allocore
 class Isosurface : public Mesh {
 public:
 
@@ -224,6 +226,12 @@ public:
 		generate(scalarField, n,n,n, cellLength,cellLength,cellLength);
 	}
 
+	// support for building isosurface from al::Voxels class
+	void generate(const Voxels& voxels, float glUnitLength) {
+		generate((float*)voxels.data.ptr, voxels.dim(0), voxels.dim(1), voxels.dim(2),
+			voxels.getVoxWidth(0)/glUnitLength, voxels.getVoxWidth(1)/glUnitLength, voxels.getVoxWidth(2)/glUnitLength);
+	}
+
 	void vertexAction(VertexAction& a){ mVertexAction = &a; }
 
 	const bool inBox() const { return mInBox; }
@@ -315,10 +323,10 @@ void Isosurface::generate(const T * vals){
 			for(int x=0; x < mNF[0]-1; ++x){
 
 				float v8[] = {
-					vals[z0y0 + x], vals[z0y0_1 + x],
-					vals[z0y1 + x], vals[z0y1_1 + x],
-					vals[z1y0 + x], vals[z1y0_1 + x],
-					vals[z1y1 + x], vals[z1y1_1 + x]
+					float(vals[z0y0 + x]), float(vals[z0y0_1 + x]),
+					float(vals[z0y1 + x]), float(vals[z0y1_1 + x]),
+					float(vals[z1y0 + x]), float(vals[z1y0_1 + x]),
+					float(vals[z1y1 + x]), float(vals[z1y1_1 + x])
 				};
 
 				int i3[] = {x,y,z};

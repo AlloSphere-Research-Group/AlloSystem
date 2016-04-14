@@ -57,11 +57,13 @@ namespace al {
 ///	A Pose is a combined position (3-vector) and orientation (quaternion).
 /// Local coordinate bases are referred to as r, u, and f which stand for
 /// right, up, and forward, respectively.
+///
+/// @ingroup allocore
 class Pose {
 public:
 
 	/// @param[in] pos		Initial position
-	/// @parampin] ori		Initial orientation
+	/// @param[in] ori		Initial orientation
 	Pose(const Vec3d& pos=Vec3d(0), const Quatd& ori=Quatd::identity());
 
 	/// Copy constructor
@@ -87,6 +89,10 @@ public:
 
 	/// Turn to face a given world-coordinate point
 	void faceToward(const Vec3d& p, double amt = 1.);
+
+	/// Turn to face a given world-coordinate point, while maintaining an up vector
+	void faceToward(const Vec3d& point, const Vec3d& up, double amt=1.);
+
 
 
 	/// Get "position" vector
@@ -201,6 +207,8 @@ protected:
 
 /// This Pose approaches the stored target Pose exponentially
 /// with a curvature determined by psmooth and qsmooth
+///
+/// @ingroup allocore
 class SmoothPose : public Pose {
 public:
 	SmoothPose(const Pose& init=Pose(), double psmooth=0.9, double qsmooth=0.9);
@@ -250,6 +258,8 @@ protected:
 ///	This represents a Pose combined with smooth angular and positional
 /// velocities. The smoothing is done using a one-pole low-pass filter which
 /// produces an exponential ease-out type of transition.
+///
+/// @ingroup allocore
 class Nav : public Pose {
 public:
 
@@ -291,30 +301,46 @@ public:
 	/// Turn to face a given world-coordinate point
 	void faceToward(const Vec3d& p, double amt=1.);
 
+	/// Turn to face a given world-coordinate point, while maintaining an up vector
+	void faceToward(const Vec3d& point, const Vec3d& up, double amt=1.);
+
 	/// Move toward a given world-coordinate point
 	void nudgeToward(const Vec3d& p, double amt=1.);
 
+
 	/// Set linear velocity
-	void move(double dr, double du, double df) { moveR(dr); moveU(du); moveF(df); }
-	void move(Vec3d dp) { moveR(dp[0]); moveU(dp[1]); moveF(dp[2]); }
+	void move(double dr, double du, double df){ moveR(dr); moveU(du); moveF(df); }
+	template <class T>
+	void move(const Vec<3,T>& dp){ move(dp[0],dp[1],dp[2]); }
+
+	/// Set linear velocity along right vector
 	void moveR(double v){ mMove0[0] = v; }
+
+	/// Set linear velocity long up vector
 	void moveU(double v){ mMove0[1] = v; }
+
+	/// Set linear velocity long forward vector
 	void moveF(double v){ mMove0[2] = v; }
-	Vec3d& move() { return mMove0; }
 
-	/// Accelerate
-	void nudge(double ddr, double ddu, double ddf) { nudgeR(ddr); nudgeU(ddu); nudgeF(ddf); }
-	void nudge(Vec3d dp) { nudgeR(dp[0]); nudgeU(dp[1]); nudgeF(dp[2]); }
-	void nudgeR(double amount) { mNudge[0] += amount; }
-	void nudgeU(double amount) { mNudge[1] += amount; }
-	void nudgeF(double amount) { mNudge[2] += amount; }
+	Vec3d& move(){ return mMove0; }
+
+	/// Move by a single increment
+	void nudge(double dr, double du, double df){ nudgeR(dr); nudgeU(du); nudgeF(df); }
+	template <class T>
+	void nudge(const Vec<3,T>& dp){ nudge(dp[0],dp[1],dp[2]); }
+
+	void nudgeR(double amount){ mNudge[0] += amount; }
+	void nudgeU(double amount){ mNudge[1] += amount; }
+	void nudgeF(double amount){ mNudge[2] += amount; }
 
 
-	/// Set all angular velocity values from azimuth, elevation, and bank differentials, in radians
+	/// Set angular velocity from azimuth, elevation, and bank differentials, in radians
 	void spin(double da, double de, double db){ spinR(de); spinU(da); spinF(db); }
+	template <class T>
+	void spin(const Vec<3,T>& daeb){ spin(daeb[0],daeb[1],daeb[2]); }
 
 	/// Set angular velocity from a unit quaternion (versor)
-	void spin(const Quatd& v) { v.toEuler(mSpin1); }
+	void spin(const Quatd& v){ v.toEuler(mSpin1); }
 
 	/// Set angular velocity around right vector (elevation), in radians
 	void spinR(double v){ mSpin0[1] = v; }
@@ -331,6 +357,8 @@ public:
 
 	/// Turn by a single increment for one step, in radians
 	void turn(double az, double el, double ba){ turnR(el); turnU(az); turnF(ba); }
+	template <class T>
+	void turn(const Vec<3,T>& daeb){ turn(daeb[0],daeb[1],daeb[2]); }
 
 	/// Turn by a single increment, in radians, around the right vector (elevation)
 	void turnR(double v){ mTurn[1] = v;	}
@@ -361,6 +389,16 @@ public:
 	/// Accumulate pose based on velocity
 	void step(double dt=1);
 
+
+	/// Get pull-back amount
+	double pullBack() const { return mPullBack0; }
+
+	/// Set pull-back amount
+	Nav& pullBack(double v){ mPullBack0 = v>0. ? v : 0.; return *this; }
+
+	/// Get transformed pose
+	Pose& transformed(){ return mTransformed; }
+
 protected:
 	Vec3d mMove0, mMove1;	// linear velocities (raw, smoothed)
 	Vec3d mSpin0, mSpin1;	// angular velocities (raw, smoothed)
@@ -369,6 +407,8 @@ protected:
 	Vec3d mUR, mUU, mUF;	// basis vectors of local coordinate frame
 	double mSmooth;
 	double mVelScale;		// velocity scaling factor
+	double mPullBack0, mPullBack1;
+	Pose mTransformed;
 };
 
 

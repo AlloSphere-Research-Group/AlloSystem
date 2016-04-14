@@ -52,6 +52,7 @@
 namespace al {
 
 /// Stores optics settings important for rendering
+/// @ingroup allocore
 class Lens {
 public:
 
@@ -99,20 +100,16 @@ public:
 	/// Returns half the height of the frustum at the near plane
 	double heightAtNear() const { return heightAtDepth(near()); }
 
-	// calculate desired fovy, given the Y height of the border at a specified Z depth:
-	static double getFovyForHeight(double height, double depth) {
-		return 2.*M_RAD2DEG*atan(height/depth);
-	}
+
+	/// Calculate desired fovy, given the Y height of the border at a specified Z depth:
+	static double getFovyForHeight(double height, double depth);
 
 	/// Calculate required fovy to produce a specific fovx
 
 	/// @param[in] fovx		field-of-view in X axis to recreate
 	/// @param[in] aspect	aspect ratio of viewport
 	/// @return field-of-view in Y axis, usable by Lens::fovy()
-	static double getFovyForFovX(double fovx, double aspect) {
-		double farW = tan(0.5*fovx*M_DEG2RAD);
-		return 2.*M_RAD2DEG*atan(farW/aspect);
-	}
+	static double getFovyForFovX(double fovx, double aspect);
 
 protected:
 	double mFovy;				// Lens aperture (degrees)

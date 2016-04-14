@@ -4,6 +4,21 @@
 namespace al{
 //______________________________________________________________________________
 
+Viewpoint::Viewpoint(const Pose& transform)
+:	mViewport(0,0,0,0),
+	mParentTransform(NULL),
+	mAnchorX(0), mAnchorY(0), mStretchX(1), mStretchY(1),
+	mLens(NULL), mClearColor(NULL)
+{}
+
+Viewpoint& Viewpoint::anchor(float ax, float ay){
+	mAnchorX=ax; mAnchorY=ay; return *this;
+}
+
+Viewpoint& Viewpoint::stretch(float sx, float sy){
+	mStretchX=sx; mStretchY=sy; return *this;
+}
+
 Frustumd Viewpoint::frustum() const {
 	Frustumd fr;
 	lens().frustum(fr, worldTransform(), viewport().aspect());
@@ -19,6 +34,20 @@ void Viewpoint::onParentResize(int w, int h){
 
 //______________________________________________________________________________
 
+ViewpointWindow::ViewpointWindow(){
+	init();
+}
+
+ViewpointWindow::ViewpointWindow(
+	const Dim& dims,
+	const std::string title,
+	double fps,
+	DisplayMode mode
+){
+	init();
+	create(dims, title, fps, mode);
+}
+
 bool ViewpointWindow::onResize(int w, int h){
 	//printf("ViewpointWindow onResize: %d %d\n", dw, dh);
 	Viewpoints::iterator iv = mViewpoints.begin();
@@ -28,6 +57,9 @@ bool ViewpointWindow::onResize(int w, int h){
 		++iv;
 		//printf("%g %g %g %g\n", vp.viewport().l, vp.viewport().b, vp.viewport().w, vp.viewport().h);
 	}
+
+	mResized = true;
+
 	return true;
 }
 
@@ -40,6 +72,10 @@ ViewpointWindow& ViewpointWindow::add(Viewpoint& v){
 		v.onParentResize(width(), height());
 	}
 	return *this;
+}
+
+void ViewpointWindow::init(){
+	append(mStandardKeyControls);
 }
 
 //______________________________________________________________________________
@@ -109,6 +145,7 @@ bool SceneWindowHandler::onFrame(){
 
 	Graphics& g = app.graphics();
 	g.depthTesting(true);
+	g.lighting(false);
 
 	struct DrawFunc : public Drawable {
 		App& app;
@@ -133,19 +170,60 @@ bool SceneWindowHandler::onFrame(){
 		// if no camera, set to default scene camera
 		if(!vp.hasLens()) vp.lens(app.lens());
 		const Lens& lens = vp.lens();
+		Stereographic& stereo = app.stereo();
 
-		Color defaultClearColor = app.stereo().clearColor();
+		Color defaultClearColor = stereo.clearColor();
 		if(!vp.hasClearColor()){
-			vp.clearColor(const_cast<Color&>(app.stereo().clearColor()));
+			vp.clearColor(const_cast<Color&>(stereo.clearColor()));
 		}
 		else{
-			app.stereo().clearColor(vp.clearColor());
+			stereo.clearColor(vp.clearColor());
+		}
+
+		bool doClear = (stereo.clearColor().a >= 1) || win.mResized;
+
+		// Interpolate between existing color buffer and background color
+		if(!doClear){
+
+			// TODO: Not 100% sure what to do with depth buffer.
+			// If we don't clear it, then if depth testing is enabled we won't
+			// get the expected overdraw blend. By clearing it, we effectively
+			// "flatten" the previous scene.
+			glEnable(GL_SCISSOR_TEST);
+			glScissor(vp.viewport().l, vp.viewport().b, vp.viewport().w, vp.viewport().h);
+			glClear(GL_DEPTH_BUFFER_BIT);
+			glDisable(GL_SCISSOR_TEST);
+
+			if(stereo.clearColor().a != 0){
+				glViewport(vp.viewport().l, vp.viewport().b, vp.viewport().w, vp.viewport().h);
+				g.pushMatrix(g.MODELVIEW);
+				g.loadIdentity();
+				g.pushMatrix(g.PROJECTION);
+				g.loadIdentity();
+					Mesh& mesh = g.mesh();
+					mesh.reset();
+					mesh.primitive(Graphics::TRIANGLE_STRIP);
+					mesh.color(stereo.clearColor());
+					mesh.vertex(-1,-1);
+					mesh.vertex( 1,-1);
+					mesh.vertex(-1, 1);
+					mesh.vertex( 1, 1);
+					g.blendTrans();
+					//glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
+						g.draw(mesh);
+					g.blendOff();
+				g.popMatrix();
+				g.popMatrix(g.MODELVIEW);
+			}
 		}
 
 		DrawFunc drawFunc(app, vp);
-		app.stereo().draw(g, lens, vp.worldTransform(), vp.viewport(), drawFunc);
-		app.stereo().clearColor(defaultClearColor);
+		stereo.draw(g, lens, vp.worldTransform(), vp.viewport(), drawFunc, doClear);
+		stereo.clearColor(defaultClearColor);
 	}
+
+	win.mResized = false;
+
 	return true;
 }
 
@@ -232,7 +310,7 @@ ViewpointWindow * App::initWindow(
 	int last = mFacViewpoints.size()-1;
 	{
 		Viewpoint& vp = *mFacViewpoints[last];
-		vp.parentTransform(nav());
+		vp.parentTransform(nav().transformed());
 		win->add(vp);
 	}
 
@@ -292,9 +370,15 @@ void App::start(){
 			//printf("App exiting\n");
 			app.audioIO().close();
 
+			// Ensures windows get destroyed in case the user does, for example,
+			// a hard exit with exit(0).
 			for(unsigned i=0; i<app.mFacWindows.size(); ++i){
 				app.mFacWindows[i]->destroy();
 			}
+
+			// ctrl-q will destroy all windows before stopping the main loop
+			// so we call onExit last
+			app.onExit();
 		}
 	} appMainHandler(*this);
 

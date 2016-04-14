@@ -62,6 +62,8 @@ class Window;
 
 
 /// Keyboard state
+///
+/// @ingroup allocore
 class Keyboard{
 public:
 
@@ -114,6 +116,8 @@ protected:
 
 
 /// Mouse state
+///
+/// @ingroup allocore
 class Mouse{
 public:
 	enum{
@@ -157,6 +161,8 @@ protected:
 
 /// The return value of the event handlers determines whether or not
 /// the event should be propagated to other handlers.
+///
+/// @ingroup allocore
 class InputEventHandler{
 public:
 	InputEventHandler();
@@ -202,6 +208,8 @@ private:
 
 /// The return value of the event handlers determines whether or not
 /// the event should be propagated to other handlers.
+///
+/// @ingroup allocore
 class WindowEventHandler {
 public:
 	WindowEventHandler();
@@ -245,6 +253,8 @@ private:
 
 /// Upon construction, the Window will add itself to its list of input event
 /// handlers and its list of window event handlers.
+///
+/// @ingroup allocore
 class Window : public InputEventHandler, public WindowEventHandler, public GPUContext {
 public:
 
@@ -409,6 +419,7 @@ public:
 	static bool started();
 
 	void updateFrameTime();
+	static double timeInSec();
 
 protected:
 	friend class WindowImpl;
@@ -469,7 +480,10 @@ protected:
 	}
 
 	void callHandlersOnFrame() { CALL(onFrame()); }
-	void callHandlersOnCreate(){ CALL(onCreate()); }
+	void callHandlersOnCreate(){
+		contextCreate();
+		CALL(onCreate());
+	}
 	void callHandlersOnDestroy(){
 		CALL(onDestroy());
 		contextDestroy();
@@ -499,6 +513,8 @@ operator& (const Window::DisplayMode& a, const Window::DisplayMode& b){ return W
 
 
 /// Standard key controls for window
+///
+/// @ingroup allocore
 struct StandardWindowKeyControls : InputEventHandler {
 	bool onKeyDown(const Keyboard& k){
 		if(k.ctrl()){

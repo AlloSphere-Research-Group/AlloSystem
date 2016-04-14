@@ -50,7 +50,9 @@ template <class T> class Ray;
 typedef Ray<float> Rayf;
 typedef Ray<double> Rayd;
 
-// Ray for intersection tests
+/// Ray for intersection tests
+///
+/// @ingroup allocore
 template <class T>
 class Ray {
 public:
@@ -59,8 +61,12 @@ public:
 
 	Ray(){};
 	Ray(Vec<3,T> origin, Vec<3,T> direction){
+		set(origin,direction);
+	}
+
+	void set(Vec<3,T> origin, Vec<3,T> direction){
 		o.set(origin);
-		d.set(direction.normalize());
+		d.set(direction.normalized());
 	}
 
 	// return point on ray
@@ -78,11 +84,12 @@ public:
 		return n.dot(p0 - o) / den;
 	}
 
-	T intersectCircle(Vec<3,T> p0, Vec<3,T> n, T r){
+	T intersectCircle(Vec<3,T> p0, Vec<3,T> n, T rmax, T rmin = 0.0){
 		T den = n.dot(d);
 		if(den == 0) return -1;
 		T t = n.dot(p0 - o) / den;
-		if( ((*this)(t)-p0).mag() <= r) return t;
+		T r = ((*this)(t)-p0).mag();
+		if(r <= rmax && r >= rmin) return t;
 		else return -1;
 	}
 
@@ -111,7 +118,7 @@ public:
 		return intersectSphere(cen,radius) > 0.;
 	}
 
-	bool intersectsBox(Vec<3,T> cen, Vec<3,T> scl, float t0=0.f, float t1 = 9e9){
+	T intersectBox(Vec<3,T> cen, Vec<3,T> scl){
 		// courtesy of http://www.cs.utah.edu/~awilliam/box/
 	  float tmin, tmax, tymin, tymax, tzmin, tzmax;
 
@@ -132,7 +139,7 @@ public:
 	  tymin = (parameters[sign[1]].y - o.y) * inv_direction.y;
 	  tymax = (parameters[1-sign[1]].y - o.y) * inv_direction.y;
 	  if ( (tmin > tymax) || (tymin > tmax) ) 
-	    return false;
+	    return -1.0;
 	  if (tymin > tmin)
 	    tmin = tymin;
 	  if (tymax < tmax)
@@ -140,14 +147,22 @@ public:
 	  tzmin = (parameters[sign[2]].z - o.z) * inv_direction.z;
 	  tzmax = (parameters[1-sign[2]].z - o.z) * inv_direction.z;
 	  if ( (tmin > tzmax) || (tzmin > tmax) ) 
-	    return false;
+	    return -1.0;
 	  if (tzmin > tmin)
 	    tmin = tzmin;
 	  if (tzmax < tmax)
 	    tmax = tzmax;
-	  return ( (tmin < t1) && (tmax > t0) );
 
+	  if(tmin < 0.0)
+	  	if(tmax < 0.0) return -1.0;
+	  	else return tmax;
+	  else return tmin;
 	}
+
+	bool intersectsBox(Vec<3,T> cen, Vec<3,T> scl){
+		return intersectBox(cen,scl) > 0.0;
+	}
+
 
 	// intersect cylinder positioned at origin oriented with Z axis
 	T intersectCylinderXY( T radius ){

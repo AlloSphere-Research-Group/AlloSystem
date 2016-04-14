@@ -187,9 +187,11 @@ public:
 		//printf("a:%d c:%d s:%d\n", k.alt(), k.ctrl(), k.shift());
 	}
 
+	// An invalid key to indicate an error
+	static const int INVALID_KEY = -1;
 
 	// incoming GLUT keys need to be remapped in certain cases...
-	static unsigned int remapKey(unsigned int key, bool special){
+	static int remapKey(int key, bool special){
 
 		//printf("GLUT i: %3d %c\n", key, key);
 
@@ -204,6 +206,10 @@ public:
 				CS(F1) CS(F2) CS(F3) CS(F4)
 				CS(F5) CS(F6) CS(F7) CS(F8)
 				CS(F9) CS(F10)	CS(F11) CS(F12)
+
+				// Sometimes GLUT will pass an unspecified key code to the 
+				// special function. The callee should consider this an error...
+				default: key = INVALID_KEY;
 			}
 			#undef CS
 		}
@@ -295,9 +301,11 @@ public:
 		Window * win = getWindow();
 		if(win){
 			key = remapKey(key, true);
-			win->mKeyboard.setKey(key, true);
-			setModifiers(win->mKeyboard);
-			win->callHandlersOnKeyDown();
+			if(INVALID_KEY != key){
+				win->mKeyboard.setKey(key, true);
+				setModifiers(win->mKeyboard);
+				win->callHandlersOnKeyDown();
+			}
 		}
 	}
 
@@ -305,9 +313,11 @@ public:
 		Window * win = getWindow();
 		if(win){
 			key = remapKey(key, true);
-			win->mKeyboard.setKey(key, false);
-			setModifiers(win->mKeyboard);
-			win->callHandlersOnKeyUp();
+			if(INVALID_KEY != key){
+				win->mKeyboard.setKey(key, false);
+				setModifiers(win->mKeyboard);
+				win->callHandlersOnKeyUp();
+			}
 		}
 	}
 
@@ -492,7 +502,7 @@ private:
 						double timeNext = frameNext / FPS;
 
 						// Post-render frame time
-						double timePost = al_time();
+						double timePost = Window::timeInSec();
 
 						// Did rendering take less time than frame interval?
 						// If so, compute wait time...
@@ -724,6 +734,7 @@ void Window::implSetVSync(){
 		CGLSetParameter(ctx, kCGLCPSwapInterval, &VBL);
 	#elif defined AL_LINUX
 	#elif defined AL_WINDOWS
+		// see: http://stackoverflow.com/questions/21262944/trouble-with-vsync-using-glut-in-opengl
 	#endif
 }
 

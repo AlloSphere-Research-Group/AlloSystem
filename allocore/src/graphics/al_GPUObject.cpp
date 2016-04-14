@@ -20,17 +20,17 @@ ResourceMap& getResourceMap() {
 	return *instance;
 }
 
+Contexts& getContexts(){
+	static Contexts * r = new Contexts;
+	return *r;
+}
+
 int getNextContextID() {
-	static int g_next_context_id = 0;
+	static int g_next_context_id = GPUContext::defaultContextID();
 	int result = g_next_context_id;
 	++g_next_context_id;
 	//printf("GPUContext: created new context id %d\n", result);
 	return result;
-}
-
-Contexts& getContexts(){
-	static Contexts * r = new Contexts;
-	return *r;
 }
 
 
@@ -40,23 +40,30 @@ GPUContext :: GPUContext() {
 }
 
 GPUContext :: ~GPUContext(){
+	// call destroy on all registered GPUObjects
+	contextDestroy();
+
+	// remove self from global list of contexts
 	Contexts& C = getContexts();
 	Contexts::iterator it = C.find(contextID());
 	if(it != C.end()) C.erase(it);
 }
 
-int GPUContext::defaultContextID(){ return 0; }
+int GPUContext::defaultContextID(){
+	// Note: we reserve 0 for an invalid context
+	return 1;
+}
 
 /*
 Scenario:
-a. GPUObjects constructed with default context (= 0)
-b. Window 1 constructed; assigned context id 0
-c. Window 2 constructed; assigned context id 1
+a. GPUObjects constructed with default context (= 1)
+b. Window 1 constructed; assigned context id 1
+c. Window 2 constructed; assigned context id 2
 
 GPUObjects need to be handled by Window 2
 
 Problem:
-Do we change context id of GPUObjects to 1 or change Window 2 context id to 0?
+Do we change context id of GPUObjects to 2 or change Window 2 context id to 1?
 
 */
 
@@ -107,6 +114,19 @@ void GPUContext::makeDefaultContext(){
 
 		mContextID = dfID;
 		C[dfID] = this;
+	}
+}
+
+void GPUContext :: contextCreate() {
+	ContextMap& contexts = getContextMap();
+	ContextMap::iterator cit = contexts.find(mContextID);
+	if(cit != contexts.end()) {
+		ResourceSet &ctx_set = cit->second;
+		ResourceSet::iterator it = ctx_set.begin();
+		ResourceSet::iterator end = ctx_set.end();
+		for(; it != end; ++it) {
+			(*it)->create();
+		}
 	}
 }
 

@@ -1,142 +1,189 @@
+#include "allocore/math/al_Constants.hpp"
 #include "allocore/system/al_Time.hpp"
 
-#define al_nsec2sec(ns)		(((al_sec)(ns)) * al_time_ns2s)
-#define al_sec2nsec(s)		((al_nsec)(s * al_time_s2ns))
-
-#define AL_TIME_USE_APR 1
-#ifdef AL_TIME_USE_APR
-
-#ifdef AL_LINUX
-	#include "apr-1.0/apr_time.h"
-#else
-	#include "apr-1/apr_time.h"
-#endif
-	/*
-	APR API documentation
-	--------------------------------------------------------------------------------
-	typedef apr_int64_t apr_time_t
-	number of microseconds since 00:00:00 january 1, 1970 UTC
-	--------------------------------------------------------------------------------
-	void apr_sleep	(	apr_interval_time_t 	t	 )
-	Sleep for the specified number of micro-seconds.
-
-	Parameters:
-	t 	desired amount of time to sleep.
-	Warning:
-	May sleep for longer than the specified time.
-	--------------------------------------------------------------------------------
-	*/
-
-	al_sec al_time() {
-		const apr_time_t t = apr_time_now();	// microseconds
-		return ((al_sec)t) * 1.0e-6;			// 1 s / 1e6 us
-	}
-
-	al_nsec al_time_nsec() {
-		const apr_time_t t = apr_time_now();	// microseconds
-		return ((al_nsec)t) * 1e3;				// 1000 ns / 1 us
-	}
-
-	void al_sleep(al_sec v) {
-		apr_interval_time_t t = (apr_interval_time_t)(v * 1.0e6);
-		apr_sleep(t);
-	}
-
-	void al_sleep_nsec(al_nsec v) {
-		apr_interval_time_t t = v * 1e-3;
-		apr_sleep(t);
-	}
-
-
-#elif defined(AL_WINDOWS)
-	/* Windows */
-	#include <windows.h>
-
+/* Windows */
+#if defined(AL_WINDOWS)
+#include <windows.h>
 /*
-From msdn:
-DWORD timeGetTime(void);
-
-	The timeGetTime function retrieves the system time, in milliseconds.
-	The system time is the time elapsed since Windows was started.
-
-	(A DWORD is a 32-bit unsigned integer)
-
-	The default precision of the timeGetTime function can be five milliseconds or
-	more, depending on the machine. You can use the timeBeginPeriod and
-	timeEndPeriod functions to increase the precision of timeGetTime. If you do so,
-	the minimum difference between successive values returned by timeGetTime can be
-	as large as the minimum period value set using timeBeginPeriod and
-	timeEndPeriod. Use the QueryPerformanceCounter and QueryPerformanceFrequency
-	functions to measure short time intervals at a high resolution,
-
-VOID WINAPI Sleep(
-  __in  DWORD dwMilliseconds
-);
-
+Info on Windows timing:
+http://windowstimestamp.com/description
 */
+/*
+// singleton object to force init/quit of timing
+static struct TimeSingleton{
+	TimeSingleton(){ timeBeginPeriod(1); }
+	~TimeSingleton(){ timeEndPeriod(1); }
+} timeSingleton;
 
-	/* singleton object to force init/quit of timing */
-	static struct TimeSingleton{
-		TimeSingleton(){ timeBeginPeriod(1); }
-		~TimeSingleton(){ timeEndPeriod(1); }
-	} timeSingleton;
+// interface to Windows API
+static DWORD time_ms(){ return timeGetTime(); }
+static void sleep_ms(unsigned long long ms){ Sleep(DWORD(ms)); }
 
-	// interface to Windows API
-	static DWORD time_ms(){ return timeGetTime(); }
-	static void sleep_ms(unsigned int ms){ Sleep((DWORD)ms); }
+// allocore definitions
+al_sec al_time(){				return time_ms() * 1e-3; }
+al_nsec al_time_nsec(){			return al_nsec(time_ms()) * al_nsec(1e6); }
+void al_sleep(al_sec v){		sleep_ms(v * 1e3); }
+void al_sleep_nsec(al_nsec v){	sleep_ms(v / 1e6); }
+//*/
 
-	// allocore definitions
-	al_sec al_time(){				return time_ms() * 1.0e-3; }
-	al_nsec al_time_nsec(){			return (al_nsec)time_ms()) * 1e6; }
-	void al_sleep(al_sec v){		sleep_ms(v * 1.0e3); }
-	void al_sleep_nsec(al_nsec v){	sleep_ms(v / (al_nsec)1e6); }
+//*
+static void sleep_ms(unsigned long long ms){ Sleep(DWORD(ms)); }
 
+// Method to supposedly get microsecond sleep
+// From: http://blogs.msdn.com/b/cellfish/archive/2008/09/17/sleep-less-than-one-millisecond.aspx
+/*
+#include <Winsock2.h> // SOCKET
+static int sleep_us(long usec){
+	static bool first = true;
+	if(first){
+		first = false;
+		WORD wVersionRequested = MAKEWORD(1,0);
+		WSADATA wsaData;
+		WSAStartup(wVersionRequested, &wsaData);
+	}
+	struct timeval tv;
+	fd_set dummy;
+	SOCKET s = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+	FD_ZERO(&dummy);
+	FD_SET(s, &dummy);
+	tv.tv_sec = usec/1000000L;
+	tv.tv_usec = usec%1000000L;
+	return select(0, 0, 0, &dummy, &tv);
+}*/
+
+// system time as 100-nanosecond interval
+al_nsec system_time_100ns(){
+	SYSTEMTIME st;
+	GetSystemTime(&st);
+	//printf("%d/%d/%d %d:%d:%d\n", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+	FILETIME time;
+	SystemTimeToFileTime(&st, &time);
+	//GetSystemTimeAsFileTime(&time);
+	ULARGE_INTEGER timeULI = {{time.dwLowDateTime, time.dwHighDateTime}};
+	al_nsec res = timeULI.QuadPart; // in 100-nanosecond intervals
+	res -= al_nsec(116444736000000000); // convert epoch from 1601 to 1970
+	return res;
+}
+
+al_nsec steady_time_us(){
+	// Windows 10 and above
+	//PULONGLONG time;
+	//QueryInterruptTimePrecise(&time);
+
+	LARGE_INTEGER freq; // ticks/second
+	LARGE_INTEGER time; // tick count
+	QueryPerformanceFrequency(&freq);
+	QueryPerformanceCounter(&time);
+	// convert ticks to microseconds
+	time.QuadPart *= 1000000;
+	time.QuadPart /= freq.QuadPart;
+	return al_nsec(time.QuadPart);
+}
+
+al_sec  al_system_time(){		return system_time_100ns() * 1e-7; }
+al_nsec al_system_time_nsec(){	return system_time_100ns() * al_nsec(100); }
+al_sec  al_steady_time(){		return steady_time_us() * 1e-6; }
+al_nsec al_steady_time_nsec(){	return steady_time_us() * al_nsec(1e3); }
+void al_sleep(al_sec v){		sleep_ms(v * 1e3); }
+void al_sleep_nsec(al_nsec v){	sleep_ms(v / 1e6); }
+//void al_sleep(al_sec v){		sleep_us(v * 1e6); }
+//void al_sleep_nsec(al_nsec v){	sleep_us(v / 1e3); }
+//*/
+
+/* Posix (Mac, Linux) */
 #else
-	/* Posix (Mac, Linux) */
-	#include <sys/time.h>
-	#include <time.h>
+#include <time.h> // nanosleep, clock_gettime
+#include <sys/time.h> // gettimeofday
+#include <unistd.h> // _POSIX_TIMERS
 
-//struct timeval{
-//	long int tv_sec;	/*	number of whole seconds of elapsed time. */
-//	long int tv_usec;	/*	This is the rest of the elapsed time
-//							(a fraction of a second), represented as the number
-//							of microseconds. It is always less than one million.
-//						*/
-//}
+al_sec  al_system_time(){
+	timeval t;
+	gettimeofday(&t, NULL);
+	return al_sec(t.tv_sec) + al_sec(t.tv_usec) * 1e-6;
+}
 
-	al_sec al_time() {
-		timeval t;
-		gettimeofday(&t, NULL);
-		return (al_sec)t.tv_sec + (((al_sec)t.tv_usec) * 1.0e-6);
-	}
+al_nsec al_system_time_nsec(){
+	timeval t;
+	gettimeofday(&t, NULL);
+	return al_nsec(t.tv_sec) * al_nsec(1e9) + al_nsec(t.tv_usec) * al_nsec(1e3);
+}
 
-	al_nsec al_time_nsec() {
-		timeval t;
-		gettimeofday(&t, NULL);
-		return ((al_nsec)t.tv_sec * 1e9) + ((al_nsec)t.tv_usec * 1e3);
-	}
+#ifdef AL_OSX
+#include <mach/mach_time.h>
 
-	void al_sleep(al_sec v) {
-		time_t sec = (time_t)v;
-		al_nsec nsec = al_time_s2ns * (v - (al_sec)sec);
-		timespec tspec = { sec, nsec };
-		while (nanosleep(&tspec, &tspec) == -1)
-			continue;
-	}
+// Code from:
+// http://stackoverflow.com/questions/23378063/how-can-i-use-mach-absolute-time-without-overflowing
 
-	void al_sleep_nsec(al_nsec v) {
-		al_sleep((al_sec)v * al_time_ns2s);
-	}
+al_sec al_steady_time(){
+	return al_steady_time_nsec() * 1e-9;
+}
 
-#endif /* platform specific */
+al_nsec al_steady_time_nsec(){
+	uint64_t now = mach_absolute_time();
+	static struct Data {
+		Data(uint64_t bias_) : bias(bias_) {
+			mach_timebase_info(&tb);
+			if (tb.denom > 1024) {
+				double frac = (double)tb.numer/tb.denom;
+				tb.denom = 1024;
+				tb.numer = tb.denom * frac + 0.5;
+			}
+		}
+		mach_timebase_info_data_t tb;
+		uint64_t bias;
+	} data(now);
+	return (now - data.bias) * data.tb.numer / data.tb.denom;
+}
+
+// Posix timers available?
+#elif _POSIX_TIMERS > 0 && defined(_POSIX_MONOTONIC_CLOCK)
+al_sec al_steady_time(){
+	struct timespec t;
+	clock_gettime(CLOCK_MONOTONIC, &t);
+	return al_sec(t.tv_sec) + al_sec(t.tv_nsec) * 1e-9;
+}
+
+al_nsec al_steady_time_nsec(){
+	struct timespec t;
+	clock_gettime(CLOCK_MONOTONIC, &t);
+	return al_nsec(t.tv_sec) * al_nsec(1e9) + al_nsec(t.tv_nsec);
+}
+
+// Otherwise fallback to system time
+#else
+al_sec  al_steady_time(){
+	return al_system_time();
+}
+
+al_nsec al_steady_time_nsec(){
+	return al_system_time_nsec();
+}
+#endif
+
+
+void al_sleep(al_sec v) {
+	time_t sec = (time_t)v;
+	al_nsec nsec = al_time_s2ns * (v - (al_sec)sec);
+	timespec tspec = { sec, nsec };
+	while (nanosleep(&tspec, &tspec) == -1)
+		continue;
+}
+
+void al_sleep_nsec(al_nsec v) {
+	al_sleep((al_sec)v * al_time_ns2s);
+}
+
+#endif
+/* end platform specific */
+
 
 void al_sleep_until(al_sec target) {
 	al_sec dt = target - al_time();
 	if (dt > 0) al_sleep(dt);
 }
 
-
-
+al_sec  al_time(){				return al_system_time(); }
+al_nsec al_time_nsec(){			return al_system_time_nsec(); }
 
 
 

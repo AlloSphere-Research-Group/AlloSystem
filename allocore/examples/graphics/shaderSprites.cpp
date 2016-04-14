@@ -5,35 +5,34 @@ Description:
 This demonstrates how to create point sprites using a geometry shader.
 
 Author(s):
-Lance Putnam, 5/27/2011
+Lance Putnam, May 2011
 */
 
-#include "allocore/al_Allocore.hpp"
-#include "allocore/graphics/al_Shader.hpp"
+#include "allocore/io/al_App.hpp"
 using namespace al;
 
 // point sprite vertex shader
-const char * vPointSprite = AL_STRINGIFY(
+const char * vPointSprite = R"(
 uniform float spriteRadius;
 void main(){
 	gl_FrontColor = gl_Color;
 	gl_Position = gl_Vertex;
 }
-);
+)";
 
 // point sprite fragment shader
-const char * fPointSprite = AL_STRINGIFY(
+const char * fPointSprite = R"(
 uniform sampler2D texSampler0;
 void main(){
 	gl_FragColor = texture2D(texSampler0, gl_TexCoord[0].xy) * gl_Color;
 }
-);
+)";
 
 // point sprite geometry shader
 const char * gPointSprite =
 "#version 120\n"
 "#extension GL_EXT_geometry_shader4 : enable\n"
-AL_STRINGIFY(
+R"(
 uniform float spriteRadius;
 void main(){
 	//screen-aligned axes
@@ -53,23 +52,6 @@ void main(){
 	for(int i = 0; i < gl_VerticesIn; ++i){
 		// copy color
 		gl_FrontColor = gl_FrontColorIn[i];
-
-//		vec3 p = gl_PositionIn[i].xyz;
-//		gl_TexCoord[0] = vec4(1, 1, 0, 1);
-//		gl_Position = gl_ModelViewProjectionMatrix * vec4(p + axis1 + axis2, 1.);
-//		EmitVertex();
-//
-//		gl_TexCoord[0] = vec4(1, 0, 0, 1);
-//		gl_Position = gl_ModelViewProjectionMatrix * vec4(p + axis1 - axis2, 1.);
-//		EmitVertex();
-//
-//		gl_TexCoord[0] = vec4(0, 1, 0, 1);
-//		gl_Position = gl_ModelViewProjectionMatrix * vec4(p - axis1 + axis2, 1.);
-//		EmitVertex();
-//
-//		gl_TexCoord[0] = vec4(0, 0, 0, 1);
-//		gl_Position = gl_ModelViewProjectionMatrix * vec4(p - axis1 - axis2, 1.);
-//		EmitVertex();
 
 		vec4 p = gl_ModelViewProjectionMatrix * vec4(gl_PositionIn[i].xyz, 0.5);
 
@@ -95,42 +77,45 @@ void main(){
 //	EndPrimitive();
 	gl_Position = gl_PositionIn[0];
 }
-);
+)";
 
 
-struct MyWindow : Window{
+class MyApp : public App{
+public:
 
-	MyWindow()
-	:	 tex(16,16, Graphics::LUMINANCE, Graphics::FLOAT)
-	{}
-
-	Graphics gl;
-	ShaderProgram shaderP;
-	Shader shaderV, shaderF, shaderG;
+	static const int N = 16; // grid resolution
+	ShaderProgram shader;
 	Texture tex;
 	Mesh geom;
 	float angle;
 
-	bool onCreate(){
+	MyApp()
+	:	tex(16,16, Graphics::LUMINANCE, Graphics::FLOAT)
+	{
+		angle=0;
+		nav().pullBack(6);
+		initWindow();
+	}
 
-		//tex.allocate();
+	void onCreate(const ViewpointWindow& w){
+
 		int Nx = tex.width();
 		int Ny = tex.height();
-		//float * texBuf = tex.data<float>();
 		float * texBuf = new float[tex.numElems()];
 
 		for(int j=0; j<Ny; ++j){ float y = float(j)/(Ny-1)*2-1;
 		for(int i=0; i<Nx; ++i){ float x = float(i)/(Nx-1)*2-1;
 			float m = 1-al::clip(x*x + y*y);
-			texBuf[j*Nx + i] = m*=m*=m;
+			texBuf[j*Nx + i] = m; // spherical looking
+			//texBuf[j*Nx + i] = m*m; // Gaussian-like
+			//texBuf[j*Nx + i] = pow(2, 1.-1./m); // bright bump
 		}}
 
 		tex.submit(texBuf);
 		delete[] texBuf;
 
 		// create sprite positions
-		int N = 32;
-		geom.primitive(gl.POINTS);
+		geom.primitive(Graphics::POINTS);
 		for(int k=0; k<N; ++k){ float z = float(k)/(N-1)*2-1;
 		for(int j=0; j<N; ++j){ float y = float(j)/(N-1)*2-1;
 		for(int i=0; i<N; ++i){ float x = float(i)/(N-1)*2-1;
@@ -138,61 +123,34 @@ struct MyWindow : Window{
 			geom.color(x*0.1+0.1, y*0.1+0.1, z*0.1+0.1);
 		}}}
 
-		shaderV.source(vPointSprite, Shader::VERTEX).compile().printLog();
-		shaderP.attach(shaderV);
-
-		shaderF.source(fPointSprite, Shader::FRAGMENT).compile().printLog();
-		shaderP.attach(shaderF);
-
-		shaderG.source(gPointSprite, Shader::GEOMETRY).compile().printLog();
-		shaderP.setGeometryInputPrimitive(gl.POINTS);
-		shaderP.setGeometryOutputPrimitive(gl.TRIANGLE_STRIP);
-		shaderP.setGeometryOutputVertices(4);
-		shaderP.attach(shaderG);
-
-		shaderP.link().printLog();
-		return true;
+		// Geometry inputs/outputs must be specified BEFORE compiling shader
+		shader.setGeometryInputPrimitive(Graphics::POINTS);
+		shader.setGeometryOutputPrimitive(Graphics::TRIANGLE_STRIP);
+		shader.setGeometryOutputVertices(4);
+		shader.compile(vPointSprite, fPointSprite, gPointSprite);
 	}
 
-	bool onFrame(){
+	void onAnimate(double dt){
+		angle += dt*8;
+	}
 
-		gl.clearColor(0);
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		gl.viewport(0,0, width(), height());
-		gl.matrixMode(gl.PROJECTION);
-		gl.loadMatrix(Matrix4d::perspective(45, aspect(), 0.1, 100));
-		gl.matrixMode(gl.MODELVIEW);
+	void onDraw(Graphics& g){
 
-		angle += 0.001;
-		Matrix4d mvmat = Matrix4d::lookAt(Vec3d(0,0,-3), Vec3d(0,0,0), Vec3d(0,1,0));
-		mvmat.Mat4d::rotate(angle*10, 2,0).Mat4d::rotate(angle*7, 0,1);
-		gl.loadMatrix(mvmat);
+		g.blendAdd();
 
-		gl.depthTesting(0);
-		gl.blending(true);
-		gl.blendModeAdd();
-
-		shaderP.begin();
+		shader.begin();
 		tex.bind();
-
-			shaderP.uniform("spriteRadius", 1./cbrt(geom.vertices().size()));
-			//gl.pointSize(10); gl.antialiasing(gl.NICEST);
-			gl.draw(geom);
-
+			shader.uniform("spriteRadius", 1./N);
+			g.pushMatrix();
+			g.rotate(angle, 0,1,0);
+			g.draw(geom);
+			g.popMatrix();
 		tex.unbind();
-		shaderP.end();
-
-//		printf("fps: %g\n", avgFps());
-
-		return true;
+		shader.end();
 	}
 };
 
-MyWindow win;
-
 int main(){
-	win.add(new StandardWindowKeyControls);
-	win.create();
-	MainLoop::start();
-	return 0;
+	MyApp().start();
 }
+

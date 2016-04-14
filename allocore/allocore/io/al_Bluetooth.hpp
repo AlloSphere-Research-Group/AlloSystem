@@ -50,6 +50,7 @@
 
 namespace al{
 
+/// Bluetooth connection
 class Bluetooth{
 public:
 

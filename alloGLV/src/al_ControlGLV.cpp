@@ -2,6 +2,20 @@
 
 namespace al{
 
+GLVControl::GLVControl(glv::GLV& v)
+:	mGLV(&v)
+{}
+
+GLVControl& GLVControl::glv(glv::GLV& v){
+	mGLV=&v;
+	return *this;
+}
+
+
+GLVInputControl::GLVInputControl(glv::GLV& v)
+:	GLVControl(v)
+{}
+
 bool GLVInputControl::onMouseDown(const Mouse& m){
 	glv::space_t xrel=m.x(), yrel=m.y();
 	glv().setMouseDown(xrel,yrel, m.button(), 0);
@@ -33,6 +47,10 @@ bool GLVInputControl::motionToGLV(const al::Mouse& m, glv::Event::t e){
 	return glv().propagateEvent();
 }
 
+
+GLVWindowControl::GLVWindowControl(glv::GLV& v)
+:	GLVControl(v)
+{}
 
 bool GLVWindowControl::onCreate(){
 	glv().broadcastEvent(glv::Event::WindowCreate);
@@ -185,7 +203,9 @@ GLVDetachable& GLVDetachable::parentWindow(Window& v){
 }
 
 
-
+PoseModel::PoseModel(Pose& p)
+:	pose(p)
+{}
 
 const glv::Data& PoseModel::getData(glv::Data& d) const {
 	d.resize(glv::Data::FLOAT, 7);
@@ -201,6 +221,25 @@ void PoseModel::setData(const glv::Data& d){
 	pose.pos(d.at<float>(0), d.at<float>(1), d.at<float>(2));
 	pose.quat().set(d.at<float>(3), d.at<float>(4), d.at<float>(5), d.at<float>(6));
 	//pose.quat().fromAxisAngle(d.at<float>(3), d.at<float>(4), d.at<float>(5), d.at<float>(6));
+}
+
+
+NavModel::NavModel(Nav& n)
+:	nav(n)
+{}
+
+const glv::Data& NavModel::getData(glv::Data& d) const {
+	d.resize(glv::Data::FLOAT, 8);
+	d.assignFromArray(nav.pos().elems(), 3);
+	d.assignFromArray(&nav.quat()[0], 4, 1, 3);
+	d.assign(nav.pullBack(), 7);
+	return d;
+}
+
+void NavModel::setData(const glv::Data& d){
+	nav.pos(d.at<float>(0), d.at<float>(1), d.at<float>(2));
+	nav.quat().set(d.at<float>(3), d.at<float>(4), d.at<float>(5), d.at<float>(6));
+	nav.pullBack(d.at<float>(7));
 }
 
 } // al::

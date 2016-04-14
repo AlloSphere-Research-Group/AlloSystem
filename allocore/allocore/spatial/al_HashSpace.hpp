@@ -69,6 +69,8 @@ namespace al {
 	It is optimized for densely packed points and querying for nearest neighbors
 	within given radii (results will be roughly sorted by distance).
 */
+
+/// @ingroup allocore
 class HashSpace {
 public:
 

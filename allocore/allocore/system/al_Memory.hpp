@@ -66,6 +66,8 @@ namespace al {
 
 	}	// stack variable arena goes out of scope, and frees memory of x and foo
 */
+
+/// @ingroup allocore
 class Arena {
 public:
 	Arena();

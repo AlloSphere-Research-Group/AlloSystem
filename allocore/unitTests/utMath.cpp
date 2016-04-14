@@ -24,6 +24,11 @@ inline bool eq(const Vec<N,T>& a, const Vec<N,T>& b, T eps=0.000001){
 	return eq(&a[0], &b[0], N, eps);
 }
 
+template <int N, class T>
+inline bool eq(const Mat<N,T>& a, const Mat<N,T>& b, T eps=0.000001){
+	return eq(&a[0], &b[0], N*N, eps);
+}
+
 
 int utMath(){
 
@@ -244,24 +249,30 @@ int utMath(){
 
 		// test special operations
 		{
-			Mat<2,int> m(
+			Mat<2,double> m(
 				2,4,
 				0,3
 			);
 
-			assert(determinant(m) == 6);
-			assert(invert(m));
+			assert(eq(determinant(m), 6.));
+
+			Mat<2,double> inv = m;
+			assert(invert(inv));
+			assert(eq(m*inv, Mat<2,double>::identity()));
 		}
 
 		{
-			Mat<3,int> m(
+			Mat<3,double> m(
 				2,5,7,
 				0,3,6,
 				0,0,4
 			);
 
-			assert(determinant(m) == 24);
-			assert(invert(m));
+			assert(eq(determinant(m), 24.));
+
+			Mat<3,double> inv = m;
+			assert(invert(inv));
+			assert(eq(m*inv, Mat<3,double>::identity()));
 		}
 
 		#undef CHECK

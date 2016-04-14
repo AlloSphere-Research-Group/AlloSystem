@@ -38,6 +38,8 @@
 
 	The AlloCore is a cross-platform suite of C++ components for building
 	interactive multimedia tools and applications.
+
+	@defgroup allocore Allocore
 */
 
 #include "allocore/graphics/al_DisplayList.hpp"
@@ -78,6 +80,7 @@
 #include "allocore/sound/al_AudioScene.hpp"
 #include "allocore/sound/al_Ambisonics.hpp"
 #include "allocore/sound/al_Dbap.hpp"
+#include "allocore/sound/al_StereoPanner.hpp"
 #include "allocore/sound/al_Vbap.hpp"
 #include "allocore/spatial/al_Curve.hpp"
 #include "allocore/spatial/al_DistAtten.hpp"

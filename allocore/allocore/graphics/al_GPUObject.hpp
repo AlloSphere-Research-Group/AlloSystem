@@ -66,14 +66,18 @@
 	context by default.
 */
 
-
 namespace al{
 
 /// Context for signaling resource changes to GPU objects
+///
+/// @ingroup allocore
 class GPUContext {
 public:
 	GPUContext();
 	virtual ~GPUContext();
+
+	/// Triggers create handler for each GPUObject registered in a given context
+	void contextCreate();
 
 	/// Triggers destroy handler for each GPUObject registered in a given context
 	void contextDestroy();
@@ -90,6 +94,8 @@ protected:
 
 
 /// Base class for allocated resources on the GPU
+///
+/// @ingroup allocore
 class GPUObject{
 public:
 
@@ -121,7 +127,7 @@ public:
 
 	/// This will unregister any existing context registration.
 	///
-	void contextRegister(int ctx=0);
+	void contextRegister(int ctx);
 
 	/// Ensure that the GPUObject is ready to use
 

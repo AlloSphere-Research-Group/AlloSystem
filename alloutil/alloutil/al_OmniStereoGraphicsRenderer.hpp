@@ -10,6 +10,13 @@
 
 namespace al {
 
+class OmniStereoGraphicsRenderer;
+
+struct OmniStereoGraphicsRendererControls : InputEventHandler {
+  OmniStereoGraphicsRenderer* o;
+  bool onKeyDown(const Keyboard& k);
+};
+
 class OmniStereoGraphicsRenderer : public Window,
                                    public FPS,
                                    public OmniStereo::Drawable {
@@ -70,6 +77,7 @@ class OmniStereoGraphicsRenderer : public Window,
   Nav mNav;
   NavInputControl mNavControl;
   StandardWindowKeyControls mStdControls;
+  OmniStereoGraphicsRendererControls mOmniControls;
 };
 
 inline void OmniStereoGraphicsRenderer::start() {
@@ -103,6 +111,9 @@ inline OmniStereoGraphicsRenderer::OmniStereoGraphicsRenderer()
 
   Window::append(mStdControls);
   Window::append(mNavControl);
+
+  mOmniControls.o = this;
+  Window::append(mOmniControls);
 }
 
 inline void OmniStereoGraphicsRenderer::initOmni(std::string path) {
@@ -133,7 +144,7 @@ inline bool OmniStereoGraphicsRenderer::onCreate() {
   mShader.attach(vert).attach(frag).link();
   mShader.printLog();
   mShader.begin();
-  mShader.uniform("lighting", 1.0);
+  mShader.uniform("lighting", 0.0);
   mShader.uniform("texture", 0.0);
   mShader.end();
 
@@ -146,10 +157,6 @@ inline bool OmniStereoGraphicsRenderer::onFrame() {
   // if running on a laptop?
   //
   nav().step();
-  Vec3d v = nav().pos();
-  Quatd q = nav().quat();
-  oscSend().send("/pose", v.x, v.y, v.z, q.x, q.y, q.z, q.w);
-  // nav().print();
 
   onAnimate(dt);
 
@@ -167,7 +174,9 @@ inline void OmniStereoGraphicsRenderer::onDrawOmni(OmniStereo& omni) {
   graphics().error("start onDraw");
   mShader.begin();
   mOmni.uniforms(mShader);
+  graphics().pushMatrix(graphics().MODELVIEW);
   onDraw(graphics());
+  graphics().popMatrix(graphics().MODELVIEW);
   mShader.end();
 }
 
@@ -216,6 +225,13 @@ void main() {
   gl_FragColor = mix(colorMixed, final_color, lighting);
 }
 )";
+}
+
+inline bool OmniStereoGraphicsRendererControls::onKeyDown(const Keyboard& k){
+  if(k.key() == 'o'){
+    o->omniEnable(!(o->omniEnable()));
+  }
+  return true;
 }
 
 }  // al

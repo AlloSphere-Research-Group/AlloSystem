@@ -89,7 +89,7 @@ void WindowEventHandler::removeFromWindow(){
 
 Window::Window()
 :	mDim(0,0,0,0), mDisplayMode(DEFAULT_BUF), mCursor(POINTER),
-	mFPSAvg(0), mFrameTime(0), mDeltaTime(0),
+	mFPS(0), mFPSAvg(0), mFrameTime(0), mDeltaTime(0),
 	mASAP(false), mCursorHide(false), mFullScreen(false),
 	mVisible(false), mVSync(true)
 {
@@ -105,6 +105,10 @@ Window::~Window(){
 	implDtor();
 }
 
+double Window::timeInSec(){
+	return al_steady_time();
+}
+
 bool Window::create(
 	const Dim& dim, const std::string& title, double fps, DisplayMode mode
 ){
@@ -113,7 +117,7 @@ bool Window::create(
 		mTitle = title;
 		mFPS = fps;
 		mDisplayMode = mode;
-		mFrameTime = al_time();
+		mFrameTime = timeInSec();
 
 		if(implCreate()){
 			return true;
@@ -283,7 +287,7 @@ bool Window::enabled(DisplayMode v) const {
 
 
 void Window::updateFrameTime(){
-	double timeNow = al_time();
+	double timeNow = timeInSec();
 	mDeltaTime = timeNow - mFrameTime;
 	mFrameTime = timeNow;
 
@@ -381,6 +385,6 @@ void Window::stopLoop(){
 	Window::destroyAll();
 	Main::get().stop();
 }
-
+    
 
 } // al::
