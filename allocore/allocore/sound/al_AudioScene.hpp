@@ -237,9 +237,9 @@ public:
 	///							large enough for the most distant sound:
 	///							samples = sampleRate * (near + range)/speedOfSound
 	SoundSource(
-		double nearClip=0.1, double farClip=20, AttenuationLaw law = ATTEN_INVERSE, DopplerType dopplerType = DOPPLER_SYMMETRICAL,
-        double farBias=0, int delaySize=100000
-	);
+	        double nearClip=0.1, double farClip=20, AttenuationLaw law = ATTEN_INVERSE, DopplerType dopplerType = DOPPLER_SYMMETRICAL,
+	        double farBias=0, int delaySize=100000
+	        );
 
 	virtual ~SoundSource(){}
 
@@ -308,9 +308,9 @@ public:
 		mUsePerSampleProcessing = shouldUsePerSampleProcessing;
 	}
 
-    void cachedIndex(unsigned int v){ mCachedIndex = v; }
+	void cachedIndex(unsigned int v){ mCachedIndex = v; }
 
-    unsigned int cachedIndex(){ return mCachedIndex; }
+	unsigned int cachedIndex(){ return mCachedIndex; }
 
 	// calculate the buffersize needed for given samplerate, speed of sound & distance traveled (e.g. nearClip+clipRange).
 	// probably want to add io.samplesPerBuffer() to this for safety.

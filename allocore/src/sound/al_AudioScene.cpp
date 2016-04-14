@@ -132,8 +132,8 @@ void AudioScene::render(AudioIOData& io) {
 	for(unsigned il=0; il<mListeners.size(); ++il){
 		Listener& l = *mListeners[il];
 
-        Spatializer* spatializer = l.mSpatializer;
-        spatializer->prepare();
+		Spatializer* spatializer = l.mSpatializer;
+		spatializer->prepare();
 
 		// update listener history data:
 		l.updateHistory(numFrames);
@@ -207,14 +207,14 @@ void AudioScene::render(AudioIOData& io) {
 					if(samplesAgo <= src.maxIndex()){
 						double gain = src.attenuation(dist);
 
-                        //This seemed to get the same sample per block
-                     //   float s = src.readSample(samplesAgo) * gain;
+						//This seemed to get the same sample per block
+						//   float s = src.readSample(samplesAgo) * gain;
 
-                        //reading samplesAgo-i causes a discontinuity
-                        float s = src.readSample(samplesAgo-i-1) * gain;
+						//reading samplesAgo-i causes a discontinuity
+						float s = src.readSample(samplesAgo-i-1) * gain;
 
-                       // s = src.presenceFilter(s); //TODO: causing stopband ripple here, why?
-                        spatializer->perform(io, src,relpos, numFrames, i, s);
+						// s = src.presenceFilter(s); //TODO: causing stopband ripple here, why?
+						spatializer->perform(io, src,relpos, numFrames, i, s);
 					}
 
 				} //end for each frame
