@@ -190,7 +190,7 @@ if(BUILD_EXAMPLES)
   endif (NOT GAMMA_LIBRARY)
   find_library(CUTTLEBONE_LIBRARY cuttlebone)
   find_library(MYSQLPP_LIBRARY mysqlpp)
-  if (CUTTLEBONE_LIBRARY AND MYSQLPP_LIBRARY)
+  if (CUTTLEBONE_LIBRARY AND MYSQLPP_LIBRARY AND OPENCL_LIBRARY)
   subdirlist(EXAMPLE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/examples)
   #include root projects directory
   list(APPEND EXAMPLE_DIRS ".")

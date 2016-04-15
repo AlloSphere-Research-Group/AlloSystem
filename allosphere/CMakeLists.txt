@@ -14,6 +14,11 @@ message(STATUS "==== Configuring allosphere")
   endif(USE_LIB_CPP)
 ##endif(USE_CPP_11)
 
+find_package(Cuttlebone QUIET)
+if(NOT CUTTLEBONE_FOUND)
+  message("Cuttlebone required to build AlloSphere. Not found!")
+  return()
+endif(NOT CUTTLEBONE_FOUND)
 
 set(ALLOSPHERE_SRC
   "src/al_AlloSphereApp.cpp"
@@ -38,7 +43,15 @@ get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil${DEBUG_SUFFIX} ALLOUTIL_LIN
 set(ALLOSPHERE_LIB "allosphere${DEBUG_SUFFIX}")
 add_library(${ALLOSPHERE_LIB} ${ALLOSPHERE_SRC} ${ALLOSPHERE_HEADERS})
 
-set(ALLOSPHERE_LINK_LIBRARIES ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LIBRARY} ${ALLOUTIL_LINK_LIBRARIES})
+# Copy headers to build directory (only if header has changed)
+file(GLOB ALLOSPHERE_INSTALL_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} allosphere/*.h*)
+foreach(header ${ALLOSPHERE_INSTALL_HEADERS})
+	execute_process(COMMAND ${CMAKE_COMMAND} -E
+					copy_if_different "${header}" "${BUILD_ROOT_DIR}/build/include/${header}"
+					WORKING_DIRECTORY  "${CMAKE_CURRENT_SOURCE_DIR}")
+endforeach()
+
+set(ALLOSPHERE_LINK_LIBRARIES ${ALLOCORE_LIBRARY} ${ALLOCORE_LINK_LIBRARIES} ${ALLOUTIL_LIBRARY} ${ALLOUTIL_LINK_LIBRARIES} ${CUTTLBONE_LIBRARIES})
 set(ALLOSPHERE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${ALLOCORE_DEP_INCLUDE_DIRS} ${ALLOUTIL_DEP_INCLUDE_DIRS} ${CUTTLEBONE_INCLUDE_DIR})
 
 
