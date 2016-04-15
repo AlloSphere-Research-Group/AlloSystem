@@ -124,7 +124,7 @@ endif(BUILDING_GAMMA)
 # Alloutil ----------------------------------
 add_subdirectory(alloutil)
 set(ALLOUTIL_LIBRARY "alloutil${DEBUG_SUFFIX}")
-get_target_property(ALLOUTIL_DEP_INCLUDE_DIR alloutil${DEBUG_SUFFIX} ALLOUTIL_DEP_INCLUDE_DIR)
+get_target_property(ALLOUTIL_DEP_INCLUDE_DIRS alloutil${DEBUG_SUFFIX} ALLOUTIL_DEP_INCLUDE_DIRS)
 get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil${DEBUG_SUFFIX} ALLOUTIL_LINK_LIBRARIES)
 
 # alloGLV ---------------------------------------
