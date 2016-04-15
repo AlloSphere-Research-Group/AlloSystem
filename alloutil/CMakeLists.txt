@@ -9,7 +9,6 @@ set(ALLOUTIL_SRC
   src/al_ResourceManager.cpp
   src/al_WarpBlend.cpp
   src/al_RayStereo.cpp
-  src/al_AlloSphereApp.cpp
   src/al_InterfaceServerClient.cpp
   src/al_Simulator.cpp
   )

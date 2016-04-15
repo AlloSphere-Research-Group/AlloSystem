@@ -16,11 +16,11 @@ message(STATUS "==== Configuring allosphere")
 
 
 set(ALLOSPHERE_SRC
-  "src/al_AlloApp.cpp"
+  "src/al_AlloSphereApp.cpp"
 )
 
 set(ALLOSPHERE_HEADERS
-  "allosphere/al_AlloApp.hpp"
+  "allosphere/al_AlloSphereApp.hpp"
   )
 
 # Dependencies ------------------------------
@@ -29,12 +29,16 @@ get_target_property(ALLOCORE_LIBRARY allocore${DEBUG_SUFFIX} LOCATION)
 get_target_property(ALLOCORE_DEP_INCLUDE_DIRS allocore${DEBUG_SUFFIX} ALLOCORE_DEP_INCLUDE_DIRS)
 get_target_property(ALLOCORE_LINK_LIBRARIES allocore${DEBUG_SUFFIX} ALLOCORE_LINK_LIBRARIES)
 
+get_target_property(ALLOUTIL_LIBRARY alloutil${DEBUG_SUFFIX} LOCATION)
+get_target_property(ALLOUTIL_DEP_INCLUDE_DIRS alloutil${DEBUG_SUFFIX} ALLOUTIL_DEP_INCLUDE_DIRS)
+get_target_property(ALLOUTIL_LINK_LIBRARIES alloutil${DEBUG_SUFFIX} ALLOUTIL_LINK_LIBRARIES)
+
 # Build library ----------------------------------
 
 set(ALLOSPHERE_LIB "allosphere${DEBUG_SUFFIX}")
 add_library(${ALLOSPHERE_LIB} ${ALLOSPHERE_SRC} ${ALLOSPHERE_HEADERS})
 
-set(ALLOSPHERE_LINK_LIBRARIES ${ALLOCORE_LIBRARY})
+set(ALLOSPHERE_LINK_LIBRARIES ${ALLOCORE_LIBRARY} ${ALLOUTIL_LIBRARY})
 set(ALLOSPHERE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${ALLOCORE_DEP_INCLUDE_DIRS} ${CUTTLEBONE_INCLUDE_DIR})
 
 
