@@ -1,5 +1,5 @@
 
-find_package(OpenCL REQUIRED)
+find_package(OpenCL QUIET)
 
 set(OPENCL_HEADERS
     allocore/protocol/opencl/al_OpenCLCommandQueue.hpp
