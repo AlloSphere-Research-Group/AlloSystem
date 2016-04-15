@@ -1,8 +1,8 @@
 #ifndef AL_OPENCL_INTERNAL_H
 #define AL_OPENCL_INTERNAL_H 1
 
-#include <OpenCL/opencl.h>
-#include <OpenCL/cl_gl.h>
+#include <CL/opencl.h>
+#include <CL/cl_gl.h>
 #include <string>
 
 #define GET_FLAG(flag, word) (flag & word)

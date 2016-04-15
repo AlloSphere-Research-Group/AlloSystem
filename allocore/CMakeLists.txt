@@ -153,6 +153,7 @@ include(modules/libsndfile_module.cmake)
 
 include(modules/osc_module.cmake)
 include(modules/zeroconf_module.cmake)
+include(modules/opencl_module.cmake)
 
 # allocore library -----------------------
 

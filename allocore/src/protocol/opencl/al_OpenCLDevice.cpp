@@ -1,6 +1,8 @@
 #include "allocore/protocol/opencl/al_OpenCLDevice.hpp"
 #include "allocore/protocol/opencl/al_OpenCLPlatform.hpp"
 
+#include <string.h>
+
 namespace al {
 namespace cl {
 

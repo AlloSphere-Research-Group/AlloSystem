@@ -1,6 +1,6 @@
 #include "allocore/protocol/opencl/al_OpenCLInternal.hpp"
 #include <stdio.h>
-
+#include <string.h>
 
 #define ERROR_FILE (stdout)
 
