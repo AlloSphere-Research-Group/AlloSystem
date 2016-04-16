@@ -1,5 +1,5 @@
 
-#include <alloutil/al_AlloSphereApp.hpp>
+#include <allosphere/al_AlloSphereApp.hpp>
 
 using namespace al;
 
