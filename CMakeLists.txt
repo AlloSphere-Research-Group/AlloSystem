@@ -146,7 +146,7 @@ endif(BUILD_ALLOCV)
 
 # alloaudio ----------------------------------
 add_subdirectory(alloaudio)
-set(ALLOAUDIO_LIBRARY "alloaudio${DEBUG_SUFFIX}")
+get_target_property(ALLOAUDIO_LIBRARY "alloaudio${DEBUG_SUFFIX}" ALLOAUDIO_LIBRARY)
 get_target_property(ALLOAUDIO_INCLUDE_DIR alloaudio${DEBUG_SUFFIX} ALLOAUDIO_INCLUDE_DIR)
 get_target_property(ALLOAUDIO_LINK_LIBRARIES alloaudio${DEBUG_SUFFIX} ALLOAUDIO_LINK_LIBRARIES)
 if(ALLOAUDIO_LIBRARY)
