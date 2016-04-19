@@ -252,7 +252,7 @@ protected:
 	){
 		AudioIO& io = *(AudioIO *)userData;
 
-		assert(frameCount == io.framesPerBuffer());
+		assert(frameCount == (unsigned)io.framesPerBuffer());
 		const float **inBuffers = (const float **) input;
 		for (int i = 0; i < io.channelsInDevice(); i++) {
 			memcpy(const_cast<float *>(&io.in(i,0)),  inBuffers[i], frameCount * sizeof(float));
