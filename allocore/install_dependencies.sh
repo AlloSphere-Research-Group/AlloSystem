@@ -15,18 +15,20 @@ files_exist(){
 build_and_install_assimp(){
 	DIR="$PWD"
 	cd /tmp
-		PKG="assimp-3.1.1"
-		curl -LO "http://downloads.sourceforge.net/project/assimp/assimp-3.1/${PKG}_no_test_models.zip"
-		unzip -q "${PKG}*.zip"
+		#PKG="assimp-3.1.1"
+		#curl -LO http://downloads.sourceforge.net/project/assimp/assimp-3.1/${PKG}_no_test_models.zip
+		PKG="assimp-3.2"
+		curl -LO https://github.com/assimp/assimp/archive/v3.2.zip && mv v3.2.zip ${PKG}.zip
+		unzip -q "${PKG}.zip"
 		cd "$PKG"
-			cmake -DENABLE_BOOST_WORKAROUND=ON .
+			cmake -DCMAKE_BUILD_TYPE=RELEASE -DASSIMP_ENABLE_BOOST_WORKAROUND=ON .
 			make
 			sudo make install
 		cd ..
 
 		# Cleanup.
-		rm -rf /tmp/${PKG}
-		rm /tmp/${PKG}*.zip
+		#rm -rf /tmp/${PKG}
+		#rm /tmp/${PKG}*.zip
 	cd "$DIR"
 }
 # End helper functions.
@@ -101,15 +103,19 @@ elif binary_exists "port"; then
 
 	build_and_install_assimp
 
-elif uname | grep "MINGW"; then
-	echo 'Found MinGW / MSYS'
-	if ! binary_exists "wget"; then
-		echo "wget not found. Install with 'mingw-get install msys-wget'."
-		exit
-	elif ! binary_exists "unzip"; then
-		echo "unzip not found. Install with 'mingw-get install msys-unzip'."
-		exit
-	else
+elif uname -o | grep "Msys"; then
+
+	# MSYS
+	if files_exist /msys.bat; then
+		echo 'Found MinGW / MSYS'
+		if ! binary_exists "wget"; then
+			echo "wget not found. Install with 'mingw-get install msys-wget'."
+			exit
+		fi
+		if ! binary_exists "unzip"; then
+			echo "unzip not found. Install with 'mingw-get install msys-unzip'."
+			exit
+		fi
 		DESTDIR=/usr/local/
 		#DESTDIR=local/
 		install -d $DESTDIR/bin/ $DESTDIR/include/ $DESTDIR/lib/
@@ -309,8 +315,24 @@ elif uname | grep "MINGW"; then
 				rm $PKG.*
 			cd $DIR
 		fi
-	fi
 
+	# MSYS2
+	else
+		echo 'Found MinGW / MSYS2'
+		ARCH="mingw-w64-"$(uname -m)
+		LIBS="portaudio libsndfile glbinding glew freeglut freeimage freetype apr apr-util libusb"
+		PKGS=
+		for L in $LIBS
+		do
+			PKGS=$PKGS" $ARCH-$L"
+		done
+
+		# AssImp manual build w/o boost (unfortunately, not working ATM)
+		#pacman -S cmake unzip $PKGS
+		#build_and_install_assimp
+
+		pacman -S ${ARCH}-assimp
+	fi
 else
 	echo 'Error: No suitable package manager found.'
 	echo 'Error: Install apt-get, MacPorts, or Homebrew and try again.'
