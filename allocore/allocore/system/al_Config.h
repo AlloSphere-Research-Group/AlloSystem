@@ -53,13 +53,15 @@
 
 #define AL_SYSTEM_LIB_VERSION 0.01
 
-#if defined(WIN32) || defined(__WINDOWS_MM__) || defined(WIN64)
+#if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64) || defined(__WINDOWS_MM__)
+
 	#define AL_WINDOWS 1
 	#define WIN32_LEAN_AND_MEAN
 	#define VC_EXTRALEAN
 	#include <windows.h>
+	#include <mmsystem.h> /* Done here since we undef 'far' macro below*/
 
-	// undefine macros of common words
+	/* undefine macros of common words */
 	#ifdef DELETE
 	#undef DELETE
 	#endif
@@ -69,7 +71,7 @@
 	#ifdef min
 	#undef min
 	#endif
-	// windef.h defines these for backwards compatability with 16-bit compilers
+	/* windef.h defines these for backwards compatability with 16-bit compilers */
 	#ifdef near
 	#undef near
 	#endif
@@ -95,12 +97,12 @@
 /*
 	primitive typedefs
 */
-#ifdef AL_WINDOWS
-	#include <stdint.h>
-	#define AL_PRINTF_LL "I64"
-#else
+#if !defined(AL_WINDOWS) || defined(__MSYS__)
 	#include "allocore/system/pstdint.h"
 	#define AL_PRINTF_LL "ll"
+#else
+	#include <stdint.h>
+	#define AL_PRINTF_LL "I64"
 #endif
 
 
