@@ -6,8 +6,8 @@
 using namespace al;
 
 Parameter::Parameter(std::string parameterName, std::string group, float defaultValue,
-                     std::string prefix) :
-    mMin(-99999.0), mMax(99999.0),
+                     std::string prefix, float min, float max) :
+    mMin(min), mMax(max),
     mParameterName(parameterName), mGroup(group), mPrefix(prefix)
 {
 	//TODO: Add better heuristics for slash handling
@@ -59,6 +59,11 @@ float Parameter::get()
 std::string Parameter::getFullAddress()
 {
 	return mFullAddress;
+}
+
+std::string Parameter::getName()
+{
+	return mParameterName;
 }
 
 void al::Parameter::setProcessingCallback(al::Parameter::ParameterProcessCallback cb, void *userData)

@@ -88,16 +88,21 @@ namespace al
 class Parameter{
 public:
 	/**
-   * @brief Parameter
-   * 
+	* @brief Parameter
+   *
    * @param parameterName The name of the parameter
    * @param Group The group the parameter belongs to
    * @param defaultValue The initial value for the parameter
    * @param prefix An address prefix that is prepended to the parameter's OSC address
+   * @param min Minimum value for the parameter
+   * @param max Maximum value for the parameter
    */
 	Parameter(std::string parameterName, std::string Group,
 	          float defaultValue,
-	          std::string prefix ="");
+	          std::string prefix ="",
+	          float min = -99999.0,
+	          float max = 99999.0
+	        );
 	
 	~Parameter();
 	
@@ -142,6 +147,11 @@ public:
 	 */
 	std::string getFullAddress();
 
+	/**
+	 * @brief getName returns the name of the parameter
+	 */
+	std::string getName();
+
 	typedef float (*ParameterProcessCallback)(float value, void *userData);
 
 	/**
@@ -159,6 +169,16 @@ public:
 	 */
 	void setProcessingCallback(ParameterProcessCallback cb,
 	                           void *userData = nullptr);
+
+	std::vector<Parameter *> operator << (Parameter &newParam)
+	{ std::vector<Parameter *> paramList;
+		paramList.push_back(&newParam);
+		return paramList; }
+
+	std::vector<Parameter *> &operator << (std::vector<Parameter *> &paramVector)
+	{ paramVector.push_back(this);
+		return paramVector;
+	}
 	
 private:
 	float mValue;
