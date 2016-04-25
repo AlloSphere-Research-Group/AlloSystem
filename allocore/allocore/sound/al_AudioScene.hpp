@@ -237,9 +237,9 @@ public:
 	///							large enough for the most distant sound:
 	///							samples = sampleRate * (near + range)/speedOfSound
 	SoundSource(
-		double nearClip=0.1, double farClip=20, AttenuationLaw law = ATTEN_INVERSE, DopplerType dopplerType = DOPPLER_SYMMETRICAL,
-		double farBias=0, int delaySize=100000
-	);
+	        double nearClip=0.1, double farClip=20, AttenuationLaw law = ATTEN_INVERSE, DopplerType dopplerType = DOPPLER_SYMMETRICAL,
+	        double farBias=0, int delaySize=100000
+	        );
 
 	virtual ~SoundSource(){}
 
@@ -308,17 +308,23 @@ public:
 		mUsePerSampleProcessing = shouldUsePerSampleProcessing;
 	}
 
+	void cachedIndex(unsigned int v){ mCachedIndex = v; }
+
+	unsigned int cachedIndex(){ return mCachedIndex; }
+
 	// calculate the buffersize needed for given samplerate, speed of sound & distance traveled (e.g. nearClip+clipRange).
 	// probably want to add io.samplesPerBuffer() to this for safety.
 	static int bufferSize(double samplerate, double speedOfSound, double distance);
 
 	BiQuadNX presenceFilter; //used for presence filtering and spatial modulation BW control
 
+
 protected:
 	RingBuffer<float> mSound;		// spherical wave around position
 	bool mUseAtten;
 	DopplerType mDopplerType;
 	bool mUsePerSampleProcessing;
+    unsigned int mCachedIndex; // for VBAP with multiple sources
 };
 
 

@@ -88,16 +88,21 @@ namespace al
 class Parameter{
 public:
 	/**
-   * @brief Parameter
-   * 
+	* @brief Parameter
+   *
    * @param parameterName The name of the parameter
    * @param Group The group the parameter belongs to
    * @param defaultValue The initial value for the parameter
    * @param prefix An address prefix that is prepended to the parameter's OSC address
+   * @param min Minimum value for the parameter
+   * @param max Maximum value for the parameter
    */
 	Parameter(std::string parameterName, std::string Group,
 	          float defaultValue,
-	          std::string prefix ="");
+	          std::string prefix ="",
+	          float min = -99999.0,
+	          float max = 99999.0
+	        );
 	
 	~Parameter();
 	
@@ -107,6 +112,17 @@ public:
 	 * This function is thread-safe and can be called from any number of threads
 	 */
 	void set(float value);
+
+	/**
+	 * @brief set the parameter's value without calling callbacks
+	 *
+	 * This function is thread-safe and can be called from any number of threads.
+	 * The processing callback is called, but the callbacks registered with
+	 * registerChangeCallback() are not called. This is useful to avoid infinite
+	 * recursion when a widget sets the parameter that then sets the widget.
+	 */
+	void setNoCalls(float value);
+
 	/**
 	 * @brief get the parameter's value
 	 * 
@@ -142,7 +158,13 @@ public:
 	 */
 	std::string getFullAddress();
 
+	/**
+	 * @brief getName returns the name of the parameter
+	 */
+	std::string getName();
+
 	typedef float (*ParameterProcessCallback)(float value, void *userData);
+	typedef void (*ParameterChangeCallback)(float value, void *userData);
 
 	/**
 	 * @brief setProcessingCallback sets a callback to be called whenever the
@@ -153,12 +175,38 @@ public:
 	 * of the incoming parameter value before it is stored in the parameter.
 	 * The registered callback must return the value to be stored in the
 	 * parameter.
+	 * Only one callback may be registered here.
 	 *
 	 * @param cb The callback function
 	 * @param userData user data that is passed to the callback function
+	 *
+	 * @return the transformed value
 	 */
 	void setProcessingCallback(ParameterProcessCallback cb,
 	                           void *userData = nullptr);
+	/**
+	 * @brief registerChangeCallback adds a callback to be called when the value changes
+	 *
+	 * This function appends the callback to a list of callbacks to be called
+	 * whenever a value changes.
+	 *
+	 * @param cb
+	 * @param userData
+	 */
+	void registerChangeCallback(ParameterChangeCallback cb,
+	                           void *userData = nullptr);
+
+	std::vector<Parameter *> operator<< (Parameter &newParam)
+	{ std::vector<Parameter *> paramList;
+		paramList.push_back(&newParam);
+		return paramList; }
+
+	std::vector<Parameter *> &operator<< (std::vector<Parameter *> &paramVector)
+	{ paramVector.push_back(this);
+		return paramVector;
+	}
+
+	const float operator= (const float value) { this->set(value); return value; }
 	
 private:
 	float mValue;
@@ -173,8 +221,10 @@ private:
 	
 	std::mutex mMutex;
 
-	ParameterProcessCallback mCallback;
-	void *mCallbackUdata;
+	ParameterProcessCallback mProcessCallback;
+	void * mProcessUdata;
+	std::vector<ParameterChangeCallback> mCallbacks;
+	std::vector<void *> mCallbackUdata;
 };
 
 /**
@@ -199,8 +249,7 @@ public:
 	Parameter freq("Frequency", "", 440.0);
 	Parameter amp("Amplitude", "", 0.1);
 	ParameterServer paramServer;
-	paramServer.registerParameter(freq);
-	paramServer.registerParameter(amp);
+	paramServer << freq << amp;
 	 @endcode
 	 */
 	ParameterServer(std::string oscAddress = "127.0.0.1", int oscPort = 9010);
@@ -209,13 +258,27 @@ public:
 	/**
 	 * Register a parameter with the server.
 	 */
-	void registerParameter(Parameter &param);
+	ParameterServer &registerParameter(Parameter &param);
 	/**
 	 * Remove a parameter from the server.
 	 */
 	void unregisterParameter(Parameter &param);
 	
 	virtual void onMessage(osc::Message& m);
+
+	/**
+	 * @brief print prints information about the server to std::out
+	 *
+	 * The print function will print the server configuration (address and port)
+	 * and will list the parameters with their addresses.
+	 */
+	void print();
+
+	/// Register parameter using the streaming operator
+	ParameterServer &operator << (Parameter& newParam){ return registerParameter(newParam); }
+
+	/// Register parameter using the streaming operator
+	ParameterServer &operator << (Parameter* newParam){ return registerParameter(*newParam); }
 	
 private:
 	osc::Recv *mServer;
