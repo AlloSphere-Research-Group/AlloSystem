@@ -155,7 +155,7 @@ public:
 	typedef float (*ParameterProcessCallback)(float value, void *userData);
 
 	/**
-	 * @brief setProcessingCallback sets a callback to be called whenever the
+	 * @brief registerProcessingCallback adds a callback to be called whenever the
 	 * parameter value changes
 	 *
 	 * Setting a callback can be useful when specific actions need to be taken
@@ -167,7 +167,7 @@ public:
 	 * @param cb The callback function
 	 * @param userData user data that is passed to the callback function
 	 */
-	void setProcessingCallback(ParameterProcessCallback cb,
+	void registerProcessingCallback(ParameterProcessCallback cb,
 	                           void *userData = nullptr);
 
 	std::vector<Parameter *> operator << (Parameter &newParam)
@@ -193,8 +193,8 @@ private:
 	
 	std::mutex mMutex;
 
-	ParameterProcessCallback mCallback;
-	void *mCallbackUdata;
+	std::vector<ParameterProcessCallback> mCallbacks;
+	std::vector<void *> mCallbackUdata;
 };
 
 /**
@@ -219,8 +219,7 @@ public:
 	Parameter freq("Frequency", "", 440.0);
 	Parameter amp("Amplitude", "", 0.1);
 	ParameterServer paramServer;
-	paramServer.registerParameter(freq);
-	paramServer.registerParameter(amp);
+	paramServer << freq << amp;
 	 @endcode
 	 */
 	ParameterServer(std::string oscAddress = "127.0.0.1", int oscPort = 9010);
@@ -229,13 +228,27 @@ public:
 	/**
 	 * Register a parameter with the server.
 	 */
-	void registerParameter(Parameter &param);
+	ParameterServer &registerParameter(Parameter &param);
 	/**
 	 * Remove a parameter from the server.
 	 */
 	void unregisterParameter(Parameter &param);
 	
 	virtual void onMessage(osc::Message& m);
+
+	/**
+	 * @brief print prints information about the server to std::out
+	 *
+	 * The print function will print the server configuration (address and port)
+	 * and will list the parameters with their addresses.
+	 */
+	void print();
+
+	/// Register parameter using the streaming operator
+	ParameterServer &operator << (Parameter& newParam){ return registerParameter(newParam); }
+
+	/// Register parameter using the streaming operator
+	ParameterServer &operator << (Parameter* newParam){ return registerParameter(*newParam); }
 	
 private:
 	osc::Recv *mServer;
