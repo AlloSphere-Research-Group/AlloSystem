@@ -415,8 +415,7 @@ bool Voxels::loadFromDirectory(std::string dir) {
  
 }
 
-
-
+/*  //BACK-UP
 bool Voxels::linePlaneIntersection(const Vec3f &P0, const Vec3f &P1, const Vec3f &planeCenter, const Vec3f &planeNormal, Vec3f* intersection)
 {
    Vec3f P10 = P1 - P0;
@@ -439,6 +438,58 @@ bool Voxels::linePlaneIntersection(const Vec3f &P0, const Vec3f &P1, const Vec3f
    return true;
 }
 
+//back 2
+bool Voxels::linePlaneIntersection(const Vec3f &P0, const Vec3f &P1, const Vec3f &planeCenter, const Vec3f &planeNormal, Vec3f* intersection)
+{
+   Vec3f P10 = P1 - P0;
+   Vec3f P20 = planeCenter - P0;
+   float nDot10 = planeNormal.dot(P10);
+   float nDot20 = planeNormal.dot(P20);
+   Vec3f w = P0 -planeCenter;
+   float fac = -planeNormal.dot(w)/nDot10;
+   Vec3f t = P10*fac;
+
+   if (nDot10 == 0){
+     return false;
+   }
+
+   float u = nDot20/nDot10;
+
+   if (u > 1.0 or u < 0.0) {
+     return false;
+   }
+
+  *intersection = P0 +t;  //testing a new intersect calculation
+
+   return true;
+}
+*/
+
+bool Voxels::linePlaneIntersection(const Vec3f &P0, const Vec3f &P1, const Vec3f &planeCenter, const Vec3f &planeNormal, Vec3f* intersection)
+{
+   Vec3f P10 = P1 - P0;
+   Vec3f P20 = planeCenter - P0;
+   Vec3f P02 = P0 - planeCenter;
+   float nDot10 = planeNormal.dot(P10);
+   float nDot20 = planeNormal.dot(P20);
+
+   if (nDot10 == 0){
+     return false;
+   }
+
+   float u = nDot20/nDot10;
+
+   if (u > 1.0 or u < 0.0) {
+     return false;
+   }
+
+  *intersection = P0 +P10*u;  //testing a new intersect calculation
+
+   return true;
+}
+
+
+
 vector<Vec3f> Voxels::linspace( Vec3f a, Vec3f b, int n) {
   vector<Vec3f> arr;
   Vec3f ba = b-a;
@@ -457,27 +508,41 @@ Vec3f Voxels::point2Dto3D(Vec3f Q, Vec3f H, Vec3f K, float u, float v){
   return Vec3f(Q.x+u*H.x+v*K.x,Q.y+u*H.y+v*K.y,Q.z+u*H.z+v*K.z);
 }
 
-bool Voxels::parallelLinespace(Vec3f p0, Vec3f p1, Vec3f p2, Vec3f p3, vector<Vec3f> &list, vector<Vec3f> &list2, float aDirection, float oDirection){
+bool Voxels::parallelLinespace(Vec3f p0, Vec3f p1, Vec3f p2, Vec3f p3, vector<Vec3f> &list, vector<Vec3f> &list2, float aDirection, float oDirection, vector<Vec3f> &points){
   Vec3f a = p0-p1;
   Vec3f b = p2-p3;
   float t = a.dot(b)/(a.mag()*b.mag());
-  int n = ceil(oDirection);
-  if ((p0-p1).mag()/(p0-p2).mag() == aDirection/oDirection || (p0-p1).mag()/(p0-p3).mag() == aDirection/oDirection){ n = ceil(aDirection); }
+  t = round(t*10000)/10000;
+  int n = oDirection;
+  int m = aDirection;
+  if ((p0-p1).mag()/(p0-p2).mag() == aDirection/oDirection){ 
+    n = aDirection; 
+    m = oDirection; 
+  }
   std::cout.flush();
-  if (t == -1){
-    list = linspace(p0,p1,n);
+  std::cout << "t = " << t << std::endl;
+  if (t == -1.0){
+    list = linspace(p0,p1,m);
     list2 = linspace(p3,p2,n);
+    points.push_back(p0);
+    points.push_back(p1);
+    points.push_back(p3);
+    points.push_back(p2);
     return true;
-  } else if (t == 1){
-    list = linspace(p0,p1,n);
+  } else if (t == 1.0){
+    list = linspace(p0,p1,m);
     list2 = linspace(p2,p3,n);
+    points.push_back(p0);
+    points.push_back(p1);
+    points.push_back(p2);
+    points.push_back(p3);
     return true;
   } 
   return false;
 }
 
 //does this needs to be in voxels?  currently it isn't
-Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal){  
+Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal, vector<Vec3f> &finalPointList){  
  //assume point and vector are given in cell*width, cell*height, cell*depth coordinate system
  //point and vector define a plane
  // nice page on cube plane intersection
@@ -486,6 +551,8 @@ Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal){
   float xMax =  width()* m_voxWidth[0];
   float yMax =  height()* m_voxWidth[1];
   float zMax =  depth()* m_voxWidth[2];
+
+  std::cout << "values " << xMax << " " << yMax << " " << zMax << std::endl;
 //
 //calculate intersections 
   vector<Vec3f> P;
@@ -580,11 +647,12 @@ Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal){
       //Check to see if two lines intersect
       vector<Vec3f> list;
       vector<Vec3f> list2;
-      if (!parallelLinespace(p0, p1, p2, p3, list, list2, maxA2D-minA2D, maxO2D-minO2D)){
-	      if (!parallelLinespace(p0, p2, p1, p3, list, list2, maxA2D-minA2D, maxO2D-minO2D)){
-              parallelLinespace(p0, p3, p1, p2, list, list2, maxA2D-minA2D, maxO2D-minO2D );
-	      }
+      if (!parallelLinespace(p0, p1, p2, p3, list, list2, maxA2D-minA2D, maxO2D-minO2D, finalPointList)){
+	      if (!parallelLinespace(p0, p2, p1, p3, list, list2, maxA2D-minA2D, maxO2D-minO2D, finalPointList)){
+                parallelLinespace(p0, p3, p1, p2, list, list2, maxA2D-minA2D, maxO2D-minO2D, finalPointList);
+              }
       }
+      std::cout << "finalPointList Length:" << finalPointList.size() << std::endl;
       //now lets fill the results
 //      std::cout << "size 1: " << list.size() << std::endl;
       for (int i = 0; i < list.size(); i++){
@@ -619,8 +687,10 @@ Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal){
        read_interp(temp, p);
     }
     result.write(temp,0);
-  } 
-
+  }
+//  for (int i = 0; i < finalPointList.size(); i++){
+//    finalPointList[i] = finalPointList[i]/Vec3f(xMax,yMax,zMax);
+//  }
 //  std::cout << "wtf" << std::endl;
   return result;
 }
