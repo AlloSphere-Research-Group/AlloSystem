@@ -19,6 +19,9 @@ public:
 		mParameterGUI.setParentApp(this);
 		mParameterGUI << x << y << z ;
 		nav() = Vec3d(0, 0, 2);
+		mServer << x << y << z;
+		mServer.print();
+
 	}
 
 	virtual void onDraw(Graphics &g) {
@@ -32,6 +35,7 @@ public:
 
 private:
 	ParameterGUI mParameterGUI;
+	ParameterServer mServer;
 };
 
 

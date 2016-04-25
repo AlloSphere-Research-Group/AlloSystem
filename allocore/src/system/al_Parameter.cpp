@@ -38,12 +38,28 @@ void Parameter::set(float value)
 {
 	if (value > mMax) value = mMax;
 	if (value < mMin) value = mMin;
-	mMutex.lock();
-	if (mCallback) {
-		mValue = mCallback(value, mCallbackUdata);
-	} else {
-		mValue = value;
+	if (mProcessCallback) {
+		value = mProcessCallback(value, mProcessUdata);
 	}
+	mMutex.lock();
+	mValue = value;
+	mMutex.unlock();
+	for(int i = 0; i < mCallbacks.size(); ++i) {
+		if (mCallbacks[i]) {
+			mCallbacks[i](value, mCallbackUdata[i]);
+		}
+	}
+}
+
+void al::Parameter::setNoCalls(float value)
+{
+	if (value > mMax) value = mMax;
+	if (value < mMin) value = mMin;
+	if (mProcessCallback) {
+		value = mProcessCallback(value, mProcessUdata);
+	}
+	mMutex.lock();
+	mValue = value;
 	mMutex.unlock();
 }
 
@@ -66,10 +82,16 @@ std::string Parameter::getName()
 	return mParameterName;
 }
 
-void al::Parameter::setProcessingCallback(al::Parameter::ParameterProcessCallback cb, void *userData)
+void Parameter::setProcessingCallback(al::Parameter::ParameterProcessCallback cb, void *userData)
 {
-	mCallback = cb;
-	mCallbackUdata = userData;
+	mProcessCallback = cb;
+	mProcessUdata = userData;
+}
+
+void al::Parameter::registerChangeCallback(al::Parameter::ParameterChangeCallback cb, void *userData)
+{
+	mCallbacks.push_back(cb);
+	mCallbackUdata.push_back(userData);
 }
 
 // ---- ParameterServer
@@ -89,14 +111,15 @@ ParameterServer::~ParameterServer()
 	}
 }
 
-void al::ParameterServer::registerParameter(al::Parameter &param)
+ParameterServer &ParameterServer::registerParameter(Parameter &param)
 {
 	mParameterLock.lock();
 	mParameters.push_back(&param);
 	mParameterLock.unlock();
+	return *this;
 }
 
-void al::ParameterServer::unregisterParameter(al::Parameter &param)
+void ParameterServer::unregisterParameter(Parameter &param)
 {
 	mParameterLock.lock();
 	std::vector<Parameter *>::iterator it = mParameters.begin();
@@ -126,5 +149,14 @@ void ParameterServer::onMessage(osc::Message &m)
 		}
 	}
 	mParameterLock.unlock();
+}
+
+void ParameterServer::print()
+{
+	std::cout << "Parameter server listening on " << mServer->address()
+	          << ":" << mServer->port() << std::endl;
+	for (Parameter *p:mParameters) {
+		std::cout << "Parameter " << p->getName() << " : " <<  p->getFullAddress() << std::endl;
+	}
 }
 

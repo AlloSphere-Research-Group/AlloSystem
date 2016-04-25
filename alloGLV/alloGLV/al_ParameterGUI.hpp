@@ -45,6 +45,8 @@
 #include <vector>
 #include <mutex>
 #include <iostream>
+#include <algorithm>
+#include <memory>
 
 #include "alloGLV/al_ControlGLV.hpp"
 #include "allocore/system/al_Parameter.hpp"
@@ -62,6 +64,12 @@ public:
 		mGui.colors().selection.set(glv::HSV(0.67,0.5,0.5));
 		mGui.enable(glv::DrawBack | glv::DrawBorder | glv::Controllable);
 		mDetachableGUI << mGui;
+	}
+
+	~ParameterGUI() {
+		for(WidgetWrapper *w: mWrappers) {
+			delete w;
+		}
 	}
 
 	void setParentWindow(Window& win) {
@@ -82,26 +90,33 @@ public:
 		glv::NumberDialer *number  = new glv::NumberDialer(numInt, 6 - numInt,
 		                                                  parameter.max(),
 		                                                  parameter.min());
-		number->attach(ParameterGUI::widgetChangeCallback, glv::Update::Value, &parameter);
+		WidgetWrapper *wrapper = new WidgetWrapper;
+		wrapper->parameter = &parameter;
+		wrapper->lock = &mParameterGUILock;
+		wrapper->widget = static_cast<glv::Widget *>(number);
+		mWrappers.push_back(wrapper);
+		number->attach(ParameterGUI::widgetChangeCallback, glv::Update::Value, wrapper);
 		mGui << number << new glv::Label(parameter.getName());
 		mGui.arrange();
-		parameter.registerProcessingCallback(ParameterGUI::valueChangedCallback, (void *) number);
+		parameter.registerChangeCallback(ParameterGUI::valueChangedCallback, wrapper);
 		return *this;
 	}
 
 	static void widgetChangeCallback(const glv::Notification& n) {
 		glv::Widget &sender = *n.sender<glv::Widget>();
-		Parameter &receiver = *n.receiver<Parameter>();
+		WidgetWrapper &receiver = *n.receiver<WidgetWrapper>();
+		receiver.lock->lock();
 		double value = sender.getValue<double>();
-		receiver.set(value);
+		receiver.lock->unlock();
+		receiver.parameter->setNoCalls(value);
 	}
 
-	static float valueChangedCallback(float value, void *widget) {
-		glv::Widget *w = static_cast<glv::Widget *>(widget);
-		if (w->getValue<double>() != value) {
-//			w->setValue(value);
-		}
-		return value;
+	static void valueChangedCallback(float value, void *wrapper) {
+		WidgetWrapper *w = static_cast<WidgetWrapper *>(wrapper);
+		w->lock->lock();
+		glv::Data &d = w->widget->data();
+		d.assign<double>(value); // We need to assign this way to avoid triggering callbacks.
+		w->lock->unlock();
 	}
 
 	/// Add new parameter to GUI
@@ -110,9 +125,17 @@ public:
 	/// Add new parameter to GUI
 	ParameterGUI &operator << (Parameter* newParam){ return addParameter(*newParam); }
 
+	struct WidgetWrapper {
+		Parameter *parameter;
+		glv::Widget *widget;
+		std::mutex *lock;
+	};
+
 private:
 	glv::Table mGui;
 	GLVDetachable mDetachableGUI;
+	std::mutex mParameterGUILock;
+	std::vector<WidgetWrapper *> mWrappers;
 };
 
 

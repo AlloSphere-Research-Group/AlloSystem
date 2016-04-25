@@ -112,6 +112,17 @@ public:
 	 * This function is thread-safe and can be called from any number of threads
 	 */
 	void set(float value);
+
+	/**
+	 * @brief set the parameter's value without calling callbacks
+	 *
+	 * This function is thread-safe and can be called from any number of threads.
+	 * The processing callback is called, but the callbacks registered with
+	 * registerChangeCallback() are not called. This is useful to avoid infinite
+	 * recursion when a widget sets the parameter that then sets the widget.
+	 */
+	void setNoCalls(float value);
+
 	/**
 	 * @brief get the parameter's value
 	 * 
@@ -153,9 +164,10 @@ public:
 	std::string getName();
 
 	typedef float (*ParameterProcessCallback)(float value, void *userData);
+	typedef void (*ParameterChangeCallback)(float value, void *userData);
 
 	/**
-	 * @brief registerProcessingCallback adds a callback to be called whenever the
+	 * @brief setProcessingCallback sets a callback to be called whenever the
 	 * parameter value changes
 	 *
 	 * Setting a callback can be useful when specific actions need to be taken
@@ -163,22 +175,38 @@ public:
 	 * of the incoming parameter value before it is stored in the parameter.
 	 * The registered callback must return the value to be stored in the
 	 * parameter.
+	 * Only one callback may be registered here.
 	 *
 	 * @param cb The callback function
 	 * @param userData user data that is passed to the callback function
+	 *
+	 * @return the transformed value
 	 */
-	void registerProcessingCallback(ParameterProcessCallback cb,
+	void setProcessingCallback(ParameterProcessCallback cb,
+	                           void *userData = nullptr);
+	/**
+	 * @brief registerChangeCallback adds a callback to be called when the value changes
+	 *
+	 * This function appends the callback to a list of callbacks to be called
+	 * whenever a value changes.
+	 *
+	 * @param cb
+	 * @param userData
+	 */
+	void registerChangeCallback(ParameterChangeCallback cb,
 	                           void *userData = nullptr);
 
-	std::vector<Parameter *> operator << (Parameter &newParam)
+	std::vector<Parameter *> operator<< (Parameter &newParam)
 	{ std::vector<Parameter *> paramList;
 		paramList.push_back(&newParam);
 		return paramList; }
 
-	std::vector<Parameter *> &operator << (std::vector<Parameter *> &paramVector)
+	std::vector<Parameter *> &operator<< (std::vector<Parameter *> &paramVector)
 	{ paramVector.push_back(this);
 		return paramVector;
 	}
+
+	const float operator= (const float value) { this->set(value); return value; }
 	
 private:
 	float mValue;
@@ -193,7 +221,9 @@ private:
 	
 	std::mutex mMutex;
 
-	std::vector<ParameterProcessCallback> mCallbacks;
+	ParameterProcessCallback mProcessCallback;
+	void * mProcessUdata;
+	std::vector<ParameterChangeCallback> mCallbacks;
 	std::vector<void *> mCallbackUdata;
 };
 
