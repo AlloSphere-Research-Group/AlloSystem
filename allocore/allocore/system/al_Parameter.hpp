@@ -285,6 +285,39 @@ private:
 	std::vector<Parameter *> mParameters;
 	std::mutex mParameterLock;
 };
+
+
+/**
+ * @brief The PresetHandler class handles sorting and recalling of presets.
+ *
+ * Presets are saved by name with the ".preset" suffix.
+ */
+class PresetHandler
+{
+public:
+	/**
+	 * @brief PresetHandler contructor
+	 * @param verbose if true, print diagnostic messages
+	 */
+	PresetHandler(bool verbose = false);
+
+	PresetHandler &registerParameter(Parameter &parameter);
+
+	void storePreset(std::string name);
+
+	void recallPreset(std::string name);
+
+	std::vector<std::string> availablePresets();
+
+	PresetHandler &operator << (Parameter &param) { return this->registerParameter(param); }
+
+private:
+	bool mVerbose;
+	std::string mFileName;
+	std::vector<Parameter *> mParameters;
+	std::mutex mFileLock;
+};
+
 }
 
 

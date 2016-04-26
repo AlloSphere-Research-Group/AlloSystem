@@ -1,5 +1,7 @@
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 #include "allocore/system/al_Parameter.hpp"
 
@@ -16,6 +18,9 @@ Parameter::Parameter(std::string parameterName, std::string group, float default
 	}
 	mFullAddress += mPrefix;
 	if (mPrefix.length() > 0 && mPrefix.at(prefix.length() - 1) != '/') {
+		mFullAddress += "/";
+	}
+	if (mGroup.length() > 0 && mGroup.at(0) != '/') {
 		mFullAddress += "/";
 	}
 	mFullAddress += mGroup;
@@ -94,7 +99,7 @@ void al::Parameter::registerChangeCallback(al::Parameter::ParameterChangeCallbac
 	mCallbackUdata.push_back(userData);
 }
 
-// ---- ParameterServer
+// ParameterServer ------------------------------------------------------------
 
 ParameterServer::ParameterServer(std::string oscAddress, int oscPort)
     : mServer(NULL)
@@ -160,3 +165,91 @@ void ParameterServer::print()
 	}
 }
 
+// PresetHandler --------------------------------------------------------------
+
+PresetHandler::PresetHandler(bool verbose) :
+    mVerbose(verbose)
+{
+}
+
+PresetHandler &PresetHandler::registerParameter(Parameter &parameter)
+{
+	mParameters.push_back(&parameter);
+	return *this;
+}
+
+void PresetHandler::storePreset(std::string name)
+{
+	std::lock_guard<std::mutex> lock(mFileLock);
+	std::string line;
+	std::ofstream f(name + ".preset");
+	if (!f.is_open()) {
+		if (mVerbose) {
+			std::cout << "Error while opening preset file: " << mFileName << std::endl;
+		}
+		return;
+	}
+	f << "::" + name << std::endl;
+	for(Parameter *parameter: mParameters) {
+		std::string line = parameter->getFullAddress() + " f " + std::to_string(parameter->get());
+		f << line << std::endl;
+	}
+	f << "::" << std::endl;
+	if (f.bad()) {
+		if (mVerbose) {
+			std::cout << "Error while writing preset file: " << mFileName << std::endl;
+		}
+	}
+	f.close();
+}
+
+void PresetHandler::recallPreset(std::string name)
+{
+	std::lock_guard<std::mutex> lock(mFileLock);
+	std::string line;
+	std::ifstream f(name + ".preset");
+	if (!f.is_open()) {
+		if (mVerbose) {
+			std::cout << "Error while opening preset file: " << mFileName << std::endl;
+		}
+	}
+	while(getline(f, line)) {
+		if (line.substr(0, 2) == "::") {
+			if (mVerbose) {
+				std::cout << "Found preset : " << line << std::endl;
+			}
+			while (getline(f, line)) {
+				if (line.substr(0, 2) == "::") {
+					if (mVerbose) {
+						std::cout << "End preset."<< std::endl;
+					}
+					break;
+				}
+				bool parameterFound = false;
+				std::stringstream ss(line);
+				std::string address, type, value;
+				std::getline(ss, address, ' ');
+				std::getline(ss, type, ' ');
+				std::getline(ss, value, ' ');
+				for(Parameter *param: mParameters) {
+					if (param->getFullAddress() == address) {
+						if (type == "f") {
+							param->set(std::stof(value));
+							parameterFound = true;
+							break;
+						}
+					}
+				}
+				if (!parameterFound && mVerbose) {
+					std::cout << "Preset in parameter not present: " << address;
+				}
+			}
+		}
+	}
+	if (f.bad()) {
+		if (mVerbose) {
+			std::cout << "Error while writing preset file: " << mFileName << std::endl;
+		}
+	}
+	f.close();
+}
