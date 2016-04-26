@@ -513,16 +513,14 @@ bool Voxels::parallelLinespace(Vec3f p0, Vec3f p1, Vec3f p2, Vec3f p3, vector<Ve
   Vec3f b = p2-p3;
   float t = a.dot(b)/(a.mag()*b.mag());
   t = round(t*10000)/10000;
-  int n = oDirection;
-  int m = aDirection;
+  int n = aDirection;
   if ((p0-p1).mag()/(p0-p2).mag() == aDirection/oDirection){ 
-    n = aDirection; 
-    m = oDirection; 
+    n = oDirection; 
   }
   std::cout.flush();
   std::cout << "t = " << t << std::endl;
   if (t == -1.0){
-    list = linspace(p0,p1,m);
+    list = linspace(p0,p1,n);
     list2 = linspace(p3,p2,n);
     points.push_back(p0);
     points.push_back(p1);
@@ -530,7 +528,7 @@ bool Voxels::parallelLinespace(Vec3f p0, Vec3f p1, Vec3f p2, Vec3f p3, vector<Ve
     points.push_back(p2);
     return true;
   } else if (t == 1.0){
-    list = linspace(p0,p1,m);
+    list = linspace(p0,p1,n);
     list2 = linspace(p2,p3,n);
     points.push_back(p0);
     points.push_back(p1);
@@ -557,27 +555,27 @@ Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal, vector<Vec3f> &finalPo
 //calculate intersections 
   vector<Vec3f> P;
   Vec3f intersection;
-  if (linePlaneIntersection(Vec3f(0,0,0),Vec3f(xMax,0,0),planeCenter,planeNormal,&intersection))
-    P.push_back(intersection);
-  if (linePlaneIntersection(Vec3f(0,0,0),Vec3f(0,yMax,0),planeCenter,planeNormal,&intersection))
-    P.push_back(intersection);
   if (linePlaneIntersection(Vec3f(0,0,0),Vec3f(0,0,zMax),planeCenter,planeNormal,&intersection))
-    P.push_back(intersection);
-  if (linePlaneIntersection(Vec3f(0,yMax,zMax),Vec3f(xMax,yMax,zMax),planeCenter,planeNormal,&intersection))
-    P.push_back(intersection);
-  if (linePlaneIntersection(Vec3f(xMax,0,zMax),Vec3f(xMax,yMax,zMax),planeCenter,planeNormal,&intersection))
-    P.push_back(intersection);
-  if (linePlaneIntersection(Vec3f(xMax,yMax,0),Vec3f(xMax,yMax,zMax),planeCenter,planeNormal,&intersection))
-    P.push_back(intersection);
-  if (linePlaneIntersection(Vec3f(0,yMax,zMax),Vec3f(0,0,zMax),planeCenter,planeNormal,&intersection))
-    P.push_back(intersection);
-  if (linePlaneIntersection(Vec3f(xMax,0,zMax),Vec3f(0,0,zMax),planeCenter,planeNormal,&intersection))
     P.push_back(intersection);
   if (linePlaneIntersection(Vec3f(0,yMax,0),Vec3f(0,yMax,zMax),planeCenter,planeNormal,&intersection))
     P.push_back(intersection);
-  if (linePlaneIntersection(Vec3f(0,yMax,0),Vec3f(xMax,yMax,0),planeCenter,planeNormal,&intersection))
+  if (linePlaneIntersection(Vec3f(xMax,yMax,0),Vec3f(xMax,yMax,zMax),planeCenter,planeNormal,&intersection))
     P.push_back(intersection);
   if (linePlaneIntersection(Vec3f(xMax,0,0),Vec3f(xMax,0,zMax),planeCenter,planeNormal,&intersection))
+    P.push_back(intersection);
+  if (linePlaneIntersection(Vec3f(0,0,0),Vec3f(xMax,0,0),planeCenter,planeNormal,&intersection))
+    P.push_back(intersection);
+  if (linePlaneIntersection(Vec3f(0,yMax,0),Vec3f(xMax,yMax,0),planeCenter,planeNormal,&intersection))
+    P.push_back(intersection);
+  if (linePlaneIntersection(Vec3f(0,yMax,zMax),Vec3f(xMax,yMax,zMax),planeCenter,planeNormal,&intersection))
+    P.push_back(intersection);
+  if (linePlaneIntersection(Vec3f(xMax,0,zMax),Vec3f(0,0,zMax),planeCenter,planeNormal,&intersection))
+    P.push_back(intersection);
+  if (linePlaneIntersection(Vec3f(0,0,0),Vec3f(0,yMax,0),planeCenter,planeNormal,&intersection))
+    P.push_back(intersection);
+  if (linePlaneIntersection(Vec3f(0,yMax,zMax),Vec3f(0,0,zMax),planeCenter,planeNormal,&intersection))
+    P.push_back(intersection);
+  if (linePlaneIntersection(Vec3f(xMax,0,zMax),Vec3f(xMax,yMax,zMax),planeCenter,planeNormal,&intersection))
     P.push_back(intersection);
   if (linePlaneIntersection(Vec3f(xMax,0,0),Vec3f(xMax,yMax,0),planeCenter,planeNormal,&intersection))
     P.push_back(intersection);
