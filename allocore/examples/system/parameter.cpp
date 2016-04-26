@@ -21,16 +21,17 @@ Parameter freq("Frequency", "", 440.0);
 Parameter amp("Amplitude", "", 0.1);
 gam::Sine<> oscil;
 
+osc::Send sender(9010, "127.0.0.1");
 double interval = 1.0; // time between random parameter changes
 
-// This function will periodically change the parameters
+// This function running on its own thread will periodically change
+// the parameters
 class MyThreadFunction : public ThreadFunction
 {
 public:
 	bool running = true;
 
 	virtual void operator ()() override {
-		osc::Send sender(9010, "127.0.0.1");
 		while (running) {
 			// Random values
 			float newFreq = 440.0 * (1 + rand() /(float) RAND_MAX);
@@ -45,7 +46,7 @@ public:
 			newFreq = 440.0 * (1 + rand() /(float) RAND_MAX);
 			newAmpDb = -40.0 * rand() /(float) RAND_MAX;
 			sender.send("/Frequency", newFreq);
-			sender.send("/Amplitude", newAmpDb);
+//			sender.send("/Amplitude", newAmpDb);
 			cout << "Setting through OSC: Frequency " << newFreq << " Amplitude " << newAmpDb << endl;
 			al_sleep_nsec(interval * 1000000000.0);
 		}
@@ -88,7 +89,7 @@ int main (int argc, char * argv[])
 	// parameter changes
 	amp.setProcessingCallback(ampCallback, nullptr);
 
-	ParameterServer paramServer;
+	ParameterServer paramServer("127.0.0.1", 9010);
 	// You can register parameters through the registerParameter() function
 //	paramServer.registerParameter(freq);
 //	paramServer.registerParameter(amp);
