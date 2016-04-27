@@ -3,11 +3,13 @@
 
 #include "allocore/graphics/al_Font.hpp"
 
+namespace al {
+
 struct Gnomon {
   Mesh gnomonMesh;
   Mesh arrowMesh;
 
-  static Gnomon gnomon;
+  // static Gnomon gnomon;
 
   Color colors[3];
   const char* labels[3];
@@ -129,6 +131,7 @@ struct Gnomon {
 
 };
 
-Gnomon Gnomon::gnomon;
+} // ::al::
+// Gnomon Gnomon::gnomon;
 
 #endif

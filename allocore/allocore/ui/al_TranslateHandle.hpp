@@ -2,46 +2,58 @@
 #define __TRANSLATE_HANDLE_HPP__
 
 #include "allocore/ui/al_Gnomon.hpp"
+#include "allocore/ui/al_Pickable.hpp"
 
-struct TranslateHandle {
+namespace al {
 
-  Vec3f newPos;
+struct TranslateHandle : PickableBase {
+
+  Vec3f translate;
   bool hover[3] = {false,false,false};
   bool selected[3] = {false,false,false};
+
+  Gnomon gnomon;
 
   TranslateHandle(){}
 
   void set(TranslateHandle &th){
-    newPos.set(th.newPos);
+    pose.set(th.pose);
+    translate.set(th.translate);
     for(int i=0; i<3; i++){
       hover[i] = th.hover[i];
       selected[i] = th.selected[i];
     }
   }
 
-  void draw(Graphics &g, Vec3f& pos, Pose& text, float scale){
-    Gnomon::gnomon.drawAtPos(g, pos, text, 1);
+  void draw(Graphics &g, Pose& text){
+    gnomon.drawAtPos(g, pose.pos(), text, 1);
     for(int i=0; i < 3; i++){
       if(hover[i]){
         Mesh &m = g.mesh();
         m.reset();
         m.primitive(g.LINES);
-        m.vertex(pos+Vec3f(i==0,i==1,i==2)*100);
-        m.vertex(pos+Vec3f(i==0,i==1,i==2)*-100);
+        m.vertex(pose.pos()+Vec3f(i==0,i==1,i==2)*100);
+        m.vertex(pose.pos()+Vec3f(i==0,i==1,i==2)*-100);
         g.color(i==0,i==1,i==2);
         g.lineWidth(1);
         g.draw(m);
-        // Gnomon::gnomon.drawAtPos(g, pos+Vec3f(i==0,i==1,i==2), text, 0.1);
       }
-      if(selected[i]){
-        // Gnomon::gnomon.drawAtPos(g, newPos, text, 0.1);
-      }
+      // if(selected[i]){}
     }
   }
 
-  bool point(Rayd &r, Vec3f& pos){
+  double intersect(Rayd &r){
+    // for(int i=0; i < 3; i++){
+    //   double t = r.intersectSphere(pose.pos()+Vec3f(i==0,i==1,i==2), 0.1);
+    //   if(t > 0) return t;
+    // }
+    return 0;
+  };
+
+  bool onPoint(Rayd &r, double t, bool child){
+    if(child) return true;
     for(int i=0; i < 3; i++){
-      if( r.intersectsSphere(pos+Vec3f(i==0,i==1,i==2), 0.1)){
+      if( r.intersectsSphere(pose.pos()+Vec3f(i==0,i==1,i==2), 0.1)){
         hover[i] = true;
         return true;
       } else hover[i] = false;
@@ -49,9 +61,10 @@ struct TranslateHandle {
     return false;
   }
 
-  bool pick(Rayd &r, Vec3f& pos){
+  bool onPick(Rayd &r, double t, bool child){
+    if(child) return true;
     for(int i=0; i < 3; i++){
-      if( r.intersectsSphere(pos+Vec3f(i==0,i==1,i==2), 0.1)){
+      if( r.intersectsSphere(pose.pos()+Vec3f(i==0,i==1,i==2), 0.1)){
         selected[i] = true;
         return true;
       } else selected[i] = false;
@@ -59,28 +72,30 @@ struct TranslateHandle {
     return false;  
   }
 
-  bool drag(Rayd &r, Vec3f& pos, Vec3f& newP){
-    newP.set(pos);
+  bool onDrag(Rayd &r, double t, bool child){
+    if(child) return true;
     for(int i=0; i < 3; i++){
       if(selected[i]){
-        float t = r.intersectPlane(pos, Vec3f(i==1,i==2,i==0));
+        float t = r.intersectPlane(pose.pos(), Vec3f(i==1,i==2,i==0));
         if(t > 0){
-          newPos.set(pos);
-          newPos[i] = r(t)[i]-1;
-          newP.set(newPos);
+          translate.zero();
+          translate[i] = r(t)[i] - 1 - pose.pos()[i];
+
+          if(parent) parent->pose.pos()[i] += translate[i];
+          else pose.pos()[i] += translate[i];
           return true;
-          // return newPos;
         } 
       }
     }
     return false;
-    // return pos;
   }
-  void unpick(){ 
+  bool onUnpick(Rayd &r, double t, bool child){ 
     for(int i=0; i < 3; i++) selected[i] = false; 
+    return false;
   }
   
 };
 
+} // ::al::
 
 #endif

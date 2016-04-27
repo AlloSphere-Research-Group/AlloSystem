@@ -1,61 +1,106 @@
+
 #ifndef __PICKABLE_HPP__
 #define __PICKABLE_HPP__
 
+#include <vector>
+
 #include "allocore/ui/al_BoundingBox.hpp"
-#include "allocore/ui/al_Gnomon.hpp"
-#include "allocore/ui/al_TranslateHandle.hpp"
-#include "allocore/ui/al_RotateHandle.hpp"
 
-struct Pickable {
-  // Mesh *mesh;
-  BoundingBox bb; // original bounding box
-  BoundingBox aabb; // axis aligned bounding box (after pose/scale transforms)
+namespace al {
 
-  TranslateHandle handle;
-  RotateHandle rhandle;
 
-  Vec3f selectOffset;
-  float selectDist;
-
+struct PickableState {
+  bool hover, selected;
   Pose pose;
-  float scale;
-  Pose oldPose;
-  float oldScale;
+  Vec3f scale;
+  
+  PickableState(){
+    pose = Pose();
+    scale = Vec3f(1);
+    hover = selected = false;
+  }
+};
 
-  bool hover;
-  bool selected;
+struct PickableBase : PickableState {
+  PickableBase *parent = 0;
+  std::vector<PickableBase *> children;
+  bool alwaysTestChildren = true;
 
-  bool enable;
+  /// intersection test must be specified
+  virtual double intersect(Rayd &r) = 0;
 
-  // HUD
-  bool hud_setup = false;
-  Mesh hudMesh;
-  Mesh hudLine;
-
-  Pickable() : scale(1){
-    for (int i = 1; i <= 2; i++){
-      hudLine.vertex(0,0,0);
-      float Cd = (float)i/2;
-      hudLine.color(Cd, Cd, Cd);
+  /// override these callbacks
+  virtual bool onPoint(Rayd &r, double t, bool child){return false;}
+  virtual bool onPick(Rayd &r, double t, bool child){return false;}
+  virtual bool onDrag(Rayd &r, double t, bool child){return false;}
+  virtual bool onUnpick(Rayd &r, double t, bool child){return false;}
+  
+  /// do interaction on self and children, call onPoint callbacks
+  virtual bool point(Rayd &r){
+    bool child = false;  
+    double t = intersect(r);
+    if(t > 0.0 || alwaysTestChildren){
+      for(int i=0; i < children.size(); i++){
+        Rayd ray = transformRayLocal(r);
+        child |= children[i]->point(ray);
+      }
     }
-    hudLine.primitive(Graphics::LINES);
+    return onPoint(r,t,child);
   }
 
-  Pickable(Mesh &mesh) : scale(1){
-    // mesh = m;
-    Vec3f bbMin,bbMax;
-    mesh.getBounds(bbMin,bbMax);
-    bb.set(bbMin,bbMax);
-
-    for (int i = 1; i <= 2; i++){
-      hudLine.vertex(0,0,0);
-      float Cd = (float)i/2;
-      hudLine.color(Cd, Cd, Cd);
+  /// do interaction on self and children, call onPick callbacks
+  virtual bool pick(Rayd &r){
+    bool child = false;  
+    double t = intersect(r);
+    if(t > 0.0 || alwaysTestChildren){
+      for(int i=0; i < children.size(); i++){
+        Rayd ray = transformRayLocal(r);
+        child |= children[i]->pick(ray);
+      }
     }
-    hudLine.primitive(Graphics::LINES);
+    return onPick(r,t,child);
   }
 
-  ////////////////////////////////////////////////////////////////
+  /// do interaction on self and children, call onDrag callbacks
+  virtual bool drag(Rayd &r){
+    bool child = false;  
+    double t = intersect(r);
+    if(t > 0.0 || alwaysTestChildren){
+      for(int i=0; i < children.size(); i++){
+        Rayd ray = transformRayLocal(r);
+        child |= children[i]->drag(ray);
+      }
+    }
+    return onDrag(r,t,child);
+  }
+  
+  /// do interaction on self and children, call onUnpick callbacks
+  virtual bool unpick(Rayd &r){
+    bool child = false;  
+    double t = intersect(r);
+    if(t > 0.0 || alwaysTestChildren){
+      for(int i=0; i < children.size(); i++){
+        Rayd ray = transformRayLocal(r);
+        child |= children[i]->unpick(ray);
+      }
+    }
+    return onUnpick(r,t,child);
+  }
+
+  bool intersects(Rayd &r){ return intersect(r) > 0.0; }
+  bool intersectsChild(Rayd &r){
+    bool child = false;
+    for(int i=0; i < children.size(); i++){
+      Rayd ray = transformRayLocal(r);
+      child |= children[i]->intersects(ray);
+    }
+    return child;
+  }
+
+  void addChild(PickableBase &pickable){
+    pickable.parent = this;
+    children.push_back(&pickable);
+  }
 
   /// apply pickable pose transforms
   inline void pushMatrix(Graphics &g){
@@ -67,248 +112,248 @@ struct Pickable {
   /// pop matrix.
   inline void popMatrix(Graphics &g){
     g.popMatrix();
+  } 
+
+  /// transform a ray in world space to local space
+  Rayd transformRayLocal(Rayd &ray){
+    Matrix4d t,r,s;
+    Matrix4d model = t.translate(pose.pos()) * r.fromQuat(pose.quat()) * s.scale(scale);
+    Matrix4d invModel = Matrix4d::inverse(model);
+    Vec4d o = invModel.transform(Vec4d(ray.o, 1));
+    Vec4d d = invModel.transform(Vec4d(ray.d, 0));
+    return Rayd(o.sub<3>(0), d.sub<3>(0));
   }
 
-  /// draw everything, depending on hover/selected state
-  void draw(Graphics &g, Mesh& m, Pose &text){
-    pushMatrix(g);
-    glPushAttrib(GL_CURRENT_BIT);
-    if(selected){
-      g.color(0,1,1);
-      g.draw(bb.mesh);
-      g.draw(bb.tics);
-    } else if(hover){
-      g.color(1,1,1);
-      g.draw(bb.mesh);
-      g.draw(bb.tics);
-    } else {}
+  /// transfrom a vector in local space to world space
+  Vec3f transformVecWorld(Vec3f &v, float w=1){
+    Matrix4d t,r,s;
+    Matrix4d model = t.translate(pose.pos()) * r.fromQuat(pose.quat()) * s.scale(scale);
+    Vec4d o = model.transform(Vec4d(v, w));
+    return Vec3f(o.sub<3>(0));
+  }
+
+};
+
+
+
+
+struct TestPickable : PickableBase {
+
+  bool childHover;
+  
+  Vec3f selectOffset;
+  float selectDist;
+
+  TestPickable(){
+  }
+
+  double intersect(Rayd &r){
+    return r.intersectBox(pose.pos(), Vec3f(2)*scale);
+  }
+
+  TestPickable* addChild(Pose p, Vec3f scl){
+    TestPickable *pick = new TestPickable();
+    pick->pose.set(p);
+    pick->scale.set(scl);
+    children.push_back(pick);
+    return pick;
+  }
+
+  void draw(Graphics &g, PickableBase *child){
+    Mesh &m = g.mesh();
+    m.reset();
+    addWireBox(g.mesh());
+    m.primitive(g.LINES);
+    // g.pushMatrix();
+    // g.translate(pose.pos());
+    // g.rotate(pose.quat());
+    // g.scale(scale);
+    child->pushMatrix(g);
+    if(child->hover) g.color(1,0,0);
+    // else if(childHover) g.color(0,1,0);
+    else if(child->selected) g.color(0,0,1);
+    else g.color(1,1,1);
     g.draw(m);
-    glPopAttrib();
-    popMatrix(g);
-
-    Gnomon::gnomon.drawAtPose(g, pose, text, 1);
-    if(selected || hover){
-      updateAABB();
-      handle.draw(g, aabb.cen, text, 1);
-      rhandle.draw(g, aabb.cen, 0.5);
+    for(int i=0; i < child->children.size(); i++){
+      draw(g, child->children[i]);
     }
-  }
-
-  void drawGrid(Graphics &g){
-    pushMatrix(g);
-    if(selected || hover){
-      g.lineWidth(2);
-      g.draw(bb.gridMesh[1]);
-      g.lineWidth(1);
-      g.draw(bb.gridMesh[0]);
-    } else {}
-    popMatrix(g);
-  }
-
-  /// draw mesh
-  void draw(Graphics &g, Mesh& m){
-    pushMatrix(g);
-    g.draw(m);
-    popMatrix(g);
-  }
-
-  /// draw just the Bounding Box
-  void drawBB(Graphics &g){
-    if(!selected && !hover) return;
-    pushMatrix(g);
-    glPushAttrib(GL_CURRENT_BIT);
-    if(selected) g.color(0,1,1);
-    else if(hover) g.color(1,1,1);
-    g.draw(bb.mesh);
-    g.draw(bb.tics);
-    glPopAttrib();
-    popMatrix(g);
-  }
-
-  void drawBBLabels(Graphics &g, Font &font, Pose cam_pose){
-    if(!selected && !hover) return;
-    g.pushMatrix();
-    bb.drawLabels(g, font, cam_pose, pose, scale);
     g.popMatrix();
   }
 
-  /// draw only Axis Aligned Bounding Box
-  void drawAABB(Graphics &g){
-    glPushAttrib(GL_CURRENT_BIT);
-    if(!selected && !hover) return;
-    if(selected) g.color(0,1,1);
-    else if(hover) g.color(1,1,1);
-    g.draw(aabb.mesh);
-    g.draw(aabb.tics);
-    glPopAttrib();
-  }
-
-  /// draw mesh origin Gnomon
-  void drawOrigin(Graphics &g, Pose& cam_pose){
-    Gnomon::gnomon.drawAtPose(g, pose, cam_pose, 1);
-  }
-
-  /// draw center of pickable Gnomon with translate/rotate handles
-  void drawCenterHandle(Graphics &g, Pose& cam_pose){
-    if(selected || hover){
-      glPushAttrib(GL_CURRENT_BIT);
-      updateAABB();
-      handle.draw(g, aabb.cen, cam_pose, 1);
-      rhandle.draw(g, aabb.cen, 0.5);
-      glPopAttrib();
-    }
-  }
-
-  // HUD
- inline void hudRotScale(Graphics& g){
-    glPushAttrib(GL_CURRENT_BIT);
-    g.rotate(pose.quat());
-    g.scale(0.003);
-    g.color(1,1,1);
-    glPopAttrib();
- }
-
-  void drawHUDText(Graphics &g, Font &font, Pose& nav, Pose& target){
-    g.pushMatrix();
-      // Handle depth test so they're sorted and properly transparent
-      g.polygonMode(Graphics::FILL);
-      glAlphaFunc(GL_GREATER, 0.5);
-      glEnable(GL_ALPHA_TEST);
-
-      // Vec3f tx = (nav.pos() - (nav.uz()*2))*0.01; // push towards the camera slightly
-      Vec3f tx = nav.ux() * -2;  // move "left"
-      tx += nav.uy() * .35; // move "up"
-      tx += pose.pos();
-      g.translate(tx);
-
-      // render position
-      g.pushMatrix();
-        hudRotScale(g);
-        stringstream sstream;
-        sstream << "translation: ";
-        renderText(g, font, sstream.str());
-      g.popMatrix();
-
-      // line spacing. translate by this much for each line (after the first one)
-      tx = (nav.uy() * -.25);
-
-      g.translate(tx);
-      g.pushMatrix();
-        hudRotScale(g);
-        Vec3f xyz = target.pos();
-        sstream.str("");
-        sstream << xyz.x << ", " << xyz.y << ", " << xyz.z;
-        renderText(g, font, sstream.str());
-      g.popMatrix();
-
-
-      // render rotation
-      g.translate(tx);
-      g.pushMatrix();
-        hudRotScale(g);
-        sstream.str("");
-        sstream << "rotation: ";
-        renderText(g, font, sstream.str());
-      g.popMatrix();
-
-      g.translate(tx);
-      g.pushMatrix();
-        hudRotScale(g);
-        Quatd euler = target.quat();
-        sstream.str("");
-        sstream << euler.x << ", " << euler.y << ", " << euler.z << ", " << euler.w;
-        renderText(g, font, sstream.str());
-      g.popMatrix();
-
-    glDisable(GL_ALPHA_TEST);
-    g.popMatrix();
-  }
-
-  void renderText(Graphics &g, Font &font, string _text){
-    string temp_str = _text;
-    const char* text = temp_str.c_str();
-    font.render(g, text);
-  }
-
-  void drawLine(Graphics &g, Pose& target, Pose& nav){
-    g.pushMatrix();
-      Vec3f tx = (nav.ux() * -2) + (nav.uy() * 0.5);  // move to top left corner...
-      tx += pose.pos();
-      hudLine.vertices()[0] = target.pos();
-      hudLine.vertices()[1] = tx;
-      tx = Vec3f(nav.pos() - pose.pos()).normalize() * 0.01; // push away from the camera
-      g.translate(-tx);
-      g.draw(hudLine);
-    g.popMatrix();
-  }
-
-  ///////////////////////////////////////////////////////////////////////
-
-  /// handle pointer hover action
-  bool point(Rayd &r){
-    if(intersectsBB(r)){
-      hover = true;
-      handle.point(r, aabb.cen);
-      rhandle.point(r, aabb.cen);
+  bool onPoint(Rayd &r, double t, bool child){
+    if(t > 0.0){
+      if(child){
+        childHover = true;
+        hover = false;
+      } else {
+        hover = true;
+        childHover = false;
+      }
     } else hover = false;
-    return hover;
+    return hover || childHover;
   }
 
-  /// handle pointer pick action
-  bool pick(Rayd &r, Nav& nav){
-    // if intersection occured store and offset and distance for moving model
-    if(intersectsBB(r)){
-      selected = true;
-      oldPose.set(pose);
-
-      float t = (nav.pos() - pose.pos()).mag();
-      selectDist = t;
-      selectOffset = pose.pos() - r(t);
-      bool hit = handle.pick(r, aabb.cen);
-      if(hit) selected = false;
-      else{
-        hit = rhandle.pick(r, aabb.cen);
-        if(hit){
-          selected = false;
-        }
+  bool onPick(Rayd &r, double t, bool child){
+    if(t > 0.0){
+      if(child){
+        selected = false;
+        hover = false;
+      } else {
+        selectDist = t;
+        selectOffset = pose.pos() - r(t);
+        selected = true;
       }
     } else selected = false;
-    return selected;
+    return selected || child;
   }
+  
+  bool onDrag(Rayd &r, double t, bool child){
+    if(t > 0.0){
+      if(child){
+        return true;
+      } else if(selected){
+        Vec3f newPos = r(selectDist) + selectOffset;
+        pose.pos().set(newPos);
+        return true;
+      }
+    }
+    return false;
+  }
+
+};
+
+
+
+
+/// Bounding Box Pickable
+struct Pickable : PickableBase {
+  Mesh *mesh; // pointer to mesh that is wrapped
+  BoundingBox bb; // original bounding box
+  BoundingBox aabb; // axis aligned bounding box (after pose/scale transforms)
+
+  // used for moving pickable naturally
+  Vec3f selectOffset;
+  float selectDist;
+
+  // initial values, and previous values
+  Pose pose0, prevPose;
+  Vec3f scale0, prevScale;
+
+  Pickable(){}
+  Pickable(Mesh &m){set(m);}
+
+  /// initialize bounding box;
+  void set(Mesh &m){
+    mesh = &m;
+    bb.set(*mesh);
+  }
+
+  /// override base methods
+  double intersect(Rayd &r){
+    return intersectBB(r);
+  }
+
+  bool onPoint(Rayd &r, double t, bool child){
+    if(t > 0.0){
+      if(child){
+        hover = false;
+      } else {
+        hover = true;
+      }
+    } else hover = false;
+    return hover || child;
+  }
+
+  bool onPick(Rayd &r, double t, bool child){
+    if(t > 0.0){
+      if(child){
+        selected = false;
+      } else {
+        prevPose.set(pose);
+        selectDist = t;
+        selectOffset = pose.pos() - r(t);
+        selected = true;
+      }
+    } else selected = false;
+    return selected || child;
+  }
+  
+  bool onDrag(Rayd &r, double t, bool child){
+    if(t > 0.0){
+      if(child){
+        return true;
+      } else if(selected){
+        Vec3f newPos = r(selectDist) + selectOffset;
+        pose.pos().set(newPos);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool onUnpick(Rayd &r, double t, bool child){
+    if(!hover) selected = false;
+    return false;
+  }
+
+  // /// handle pointer pick action
+  // bool pick(Rayd &r){
+  //   // if intersection occured store and offset and distance for moving model
+  //   double t = intersectBB(r);
+  //   if(t > 0){
+  //     selected = true;
+  //     prevPose.set(pose);
+
+  //     // float t = (nav.pos() - pose.pos()).mag();
+  //     selectDist = t;
+  //     selectOffset = pose.pos() - r(t);
+  //     // bool hit = handle.pick(r, aabb.cen);
+  //     // if(hit) selected = false;
+  //     // else{
+  //       // hit = rhandle.pick(r, aabb.cen);
+  //       // if(hit){
+  //         // selected = false;
+  //       // }
+  //     // }
+  //   } else selected = false;
+  //   return selected;
+  // }
 
   /// handle pointer drag action
-  bool drag(Rayd &r, bool apply=true){
-    // if previously selected then move
-    if(selected){
-      Vec3f newPos = r(selectDist) + selectOffset;
-      if(apply) pose.pos().set(newPos);
-      return true;
-    } else {
-      // Vec3f newPos = handle.drag(r, aabb.cen, newPos);
-      Vec3f newPos;
-      bool hit = handle.drag(r, aabb.cen, newPos);
-      // if(hit) setCenter(newPos); // XXX this breaks why??
-      setCenter(newPos);
-      // else {
-        // Quatf quat = rhandle.drag(r, aabb.cen, quat);
-        Quatf quat;
-        hit = rhandle.drag(r, aabb.cen, quat);
-        if(hit){
-          pose.quat().set(quat*oldPose.quat());
-          newPos.set(aabb.cen);
-          setCenter(newPos);
-        }
-      // }
-      return hit;
-    }
-  }
+  // bool drag(Rayd &r){ //, bool apply=true){
+  //   // if previously selected then move
+  //   if(selected){
+  //     Vec3f newPos = r(selectDist) + selectOffset;
+  //     pose.pos().set(newPos);
+  //     // if(apply) pose.pos().set(newPos);
+  //     return true;
+  //   } //else {
+  //     // // Vec3f newPos = handle.drag(r, aabb.cen, newPos);
+  //     // Vec3f newPos;
+  //     // bool hit = handle.drag(r, aabb.cen, newPos);
+  //     // // if(hit) setCenter(newPos); // XXX this breaks why??
+  //     // setCenter(newPos);
+  //     // // else {
+  //     //   // Quatf quat = rhandle.drag(r, aabb.cen, quat);
+  //     //   Quatf quat;
+  //     //   hit = rhandle.drag(r, aabb.cen, quat);
+  //     //   if(hit){
+  //     //     pose.quat().set(quat*prevPose.quat());
+  //     //     newPos.set(aabb.cen);
+  //     //     setCenter(newPos);
+  //     //   }
+  //     // // }
+  //     // return hit;
+  //   // }
+  // }
 
   /// handle pointer unpick action
-  void unpick(){
-    selected = false;
-    handle.unpick();
-    rhandle.unpick();
-  }
+  // bool unpick(Rayd &r){
+  //   selected = false;
+  //   return false;
+  //   // handle.unpick();
+  //   // rhandle.unpick();
+  // }
 
   ////////////////////////////////////////////////////////////////////////////
 
@@ -329,23 +374,19 @@ struct Pickable {
   }
 
   /// intersect ray with pickable BoundingBox
-  bool intersectsBB(Rayd &ray){
+  double intersectBB(Rayd &ray){
     Rayd r = transformRayLocal(ray);
-    bool t = r.intersectsBox(bb.cen, bb.dim);
-    // bool t = ray.intersectsBox(transformVecWorld(bb.cen,1), transformVecWorld(bb.dim,0));
-    return t;
+    return r.intersectBox(bb.cen, bb.dim);
   }
 
   /// intersect ray with pickable AxisAlignedBoundingBox
-  bool intersectsAABB(Rayd &ray){
-    bool t = ray.intersectsBox(aabb.cen, aabb.dim);
-    return t;
+  double intersectAABB(Rayd &ray){
+    return ray.intersectBox(aabb.cen, aabb.dim);
   }
 
   /// intersect ray with bounding sphere
   float intersectBoundingSphere(Rayd &ray){
-    float t = ray.intersectSphere( transformVecWorld(bb.cen), bb.dim.mag()*scale/2);
-    return t;
+    return ray.intersectSphere( transformVecWorld(bb.cen), (bb.dim*scale).mag()/2.0);
   }
 
   /// calculate Axis aligned bounding box from mesh bounding box and current transforms
@@ -360,26 +401,8 @@ struct Pickable {
     aabb.setCenterDim(cen.sub<3>(0),dim.sub<3>(0));
   }
 
-  /// transform a ray in world space to local space
-  Rayd transformRayLocal(Rayd &ray){
-    Matrix4d t,r,s;
-    Matrix4d model = t.translate(pose.pos()) * r.fromQuat(pose.quat()) * s.scale(scale);
-    Matrix4d invModel = Matrix4d::inverse(model);
-    Vec4d o = invModel.transform(Vec4d(ray.o, 1));
-    Vec4d d = invModel.transform(Vec4d(ray.d, 0));
-    return Rayd(o.sub<3>(0), d.sub<3>(0));
-    // ray.o.set(o.sub<3>(0));
-    // ray.d.set(d.sub<3>(0).normalize());
-    // return ray;
-  }
-
-  /// transfrom a vector in local space to world space
-  Vec3f transformVecWorld(Vec3f &v, float w=1){
-    Matrix4d t,r,s;
-    Matrix4d model = t.translate(pose.pos()) * r.fromQuat(pose.quat()) * s.scale(scale);
-    Vec4d o = model.transform(Vec4d(v, w));
-    return Vec3f(o.sub<3>(0));
-  }
 };
+
+} // ::al
 
 #endif
