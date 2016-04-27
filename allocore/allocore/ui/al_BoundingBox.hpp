@@ -1,6 +1,12 @@
+
 #ifndef __BOUNDINGBOX_HPP__
 #define __BOUNDINGBOX_HPP__
+
+#include <string>
+#include <sstream>
 #include "allocore/graphics/al_Font.hpp"
+
+namespace al {
 
 struct BoundingBox {
   Vec3f min, max;
@@ -16,6 +22,13 @@ struct BoundingBox {
     cen = min + halfDim;
     getMesh();
     getTics();
+  }
+
+  // set bounds from mesh
+  void set(const Mesh &mesh){
+    Vec3f bbMin, bbMax;
+    mesh.getBounds(bbMin, bbMax);
+    set(bbMin, bbMax);
   }
 
   void set(const Vec3f &min_, const Vec3f &max_){
@@ -95,10 +108,10 @@ struct BoundingBox {
             Quatd rot = Quatd::getBillboardRotation(forward, cam_pose.uu());
             g.rotate(rot);
 
-            stringstream sstream;
+            std::stringstream sstream;
             if (i != 0) sstream << i*10; // only draw zero once
             else if (i == 0 && axis == 0) sstream << i*10; // only draw zero once
-            string temp_str = sstream.str();
+            std::string temp_str = sstream.str();
             const char* text = temp_str.c_str();
             font.render(g, text);
 
@@ -244,5 +257,7 @@ struct BoundingBox {
   }
 
 };
+
+} //::al
 
 #endif

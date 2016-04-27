@@ -1,40 +1,43 @@
+
 #ifndef __ROTATE_HANDLE_HPP__
 #define __ROTATE_HANDLE_HPP__
 
-void addCircle(Mesh &m, float r, int n){
-  double inc = M_2PI/n;
-  double phase = 0.0;
-  for(int i=0; i < n; i++){
-    float x = cos(phase)*r;
-    float y = sin(phase)*r;
-    m.vertex(x,y,0);
-    phase += inc;
-  }
-}
+namespace al {
 
-struct RotateHandle {
+struct RotateHandle : PickableBase {
 
   Vec3f downPos, newPos;
   Vec3f downDir, newDir;
-  Quatf quat;
+  Quatf rotate;
   bool hover[3] = {false,false,false};
   bool selected[3] = {false,false,false};
 
-  RotateHandle(){ quat = Quatf::identity(); }
+  RotateHandle(){ rotate = Quatf::identity(); }
+
+  void addCircle(Mesh &m, float r, int n){
+    double inc = M_2PI/n;
+    double phase = 0.0;
+    for(int i=0; i < n; i++){
+      float x = cos(phase)*r;
+      float y = sin(phase)*r;
+      m.vertex(x,y,0);
+      phase += inc;
+    }
+  }
 
   void set(RotateHandle &rh){
     downPos.set(rh.downPos);
     downDir.set(rh.downDir);
     newPos.set(rh.newPos);
     newDir.set(rh.newDir);
-    quat.set(rh.quat);
+    rotate.set(rh.rotate);
     for(int i=0; i<3; i++){
       hover[i] = rh.hover[i];
       selected[i] = rh.selected[i];
     }
   }
 
-  void draw(Graphics &g, Vec3f& pos, float scale){
+  void draw(Graphics &g, float scale=0.5){
     Mesh &m = g.mesh();
     m.primitive(g.LINE_LOOP);
     m.reset();
@@ -43,7 +46,7 @@ struct RotateHandle {
     Quatf q;
     for (int i = 0; i < 3; i++){
       g.pushMatrix();
-        g.translate(pos);
+        g.translate(pose.pos());
         g.color(i==0,i==1,i==2);
         switch(i){
           case 0: q.fromEuler(M_PI/2,0,0); break;
@@ -72,10 +75,10 @@ struct RotateHandle {
       if(selected[i]){
         m.reset();
         m.primitive(g.LINES);
-        m.vertex(pos);
-        m.vertex(pos+newDir);
-        m.vertex(pos);
-        m.vertex(pos+downDir);
+        m.vertex(pose.pos());
+        m.vertex(pose.pos()+newDir);
+        m.vertex(pose.pos());
+        m.vertex(pose.pos()+downDir);
         g.color(i==0,i==1,i==2);
         g.lineWidth(1);
         g.draw(m);
@@ -83,14 +86,17 @@ struct RotateHandle {
     }
   }
 
-  bool point(Rayd &r, Vec3f& pos){
-    if(r.intersectsSphere(pos, 0.55)){
+  double intersect(Rayd &r){return 0;}
+
+  bool onPoint(Rayd &r, double t, bool child){
+    if(child) return true;
+    if(r.intersectsSphere(pose.pos(), 0.55)){
       float t = -1;
       float min = FLT_MAX;
       int minIdx = -1;
       for(int i=0; i < 3; i++){
         hover[i] = false;
-        t = r.intersectCircle(pos, Vec3f(i==0,i==1,i==2), 0.55, 0.45);
+        t = r.intersectCircle(pose.pos(), Vec3f(i==0,i==1,i==2), 0.55, 0.45);
         if(t > 0 && t < min){
           min = t;
           minIdx = i;
@@ -104,14 +110,15 @@ struct RotateHandle {
     return false;
   }
 
-  bool pick(Rayd &r, Vec3f& pos){
-    if(r.intersectsSphere(pos, 0.55)){
+  bool onPick(Rayd &r, double t, bool child){
+    if(child) return true;
+    if(r.intersectsSphere(pose.pos(), 0.55)){
       float t = -1;
       float min = FLT_MAX;
       int minIdx = -1;
       for(int i=0; i < 3; i++){
         selected[i] = false;
-        t = r.intersectCircle(pos, Vec3f(i==0,i==1,i==2), 0.55);
+        t = r.intersectCircle(pose.pos(), Vec3f(i==0,i==1,i==2), 0.55, 0.45);
         if(t > 0 && t < min){
           min = t;
           minIdx = i;
@@ -119,35 +126,39 @@ struct RotateHandle {
       }
       if(minIdx >= 0){
         selected[minIdx] = true;
-        downDir.set(r(min)-pos);
-        newDir.set(r(min)-pos);
+        downDir.set(r(min)-pose.pos());
+        newDir.set(r(min)-pose.pos());
         return true;
       }
     }
     return false;  
   }
 
-  bool drag(Rayd &r, Vec3f& pos, Quatf& newQuat){
+  bool onDrag(Rayd &r, double t, bool child){
+    if(child) return true;
     for(int i=0; i < 3; i++){
       if(selected[i]){
-        float t = r.intersectPlane(pos, Vec3f(i==0,i==1,i==2));
+        float t = r.intersectPlane(pose.pos(), Vec3f(i==0,i==1,i==2));
         if(t > 0){
-          newDir.set(r(t)-pos);
-          quat = Quatf::getRotationTo(downDir.normalized(),newDir.normalized());
-          newQuat.set(quat);
+          newDir.set(r(t)-pose.pos());
+          rotate = Quatf::getRotationTo(downDir.normalized(),newDir.normalized());
+          if(parent){
+            parent->pose.quat().set(rotate);
+          }
           return true;
-          // return quat;
         } 
       }
     }
     return false;
-    // return Quatf::identity();
   }
-  void unpick(){ 
-    for(int i=0; i < 3; i++) selected[i] = false; 
+
+  bool onUnpick(Rayd &r, double t, bool child){ 
+    for(int i=0; i < 3; i++) selected[i] = false;
+    return false; 
   }
   
 };
 
+} // ::al::
 
 #endif
