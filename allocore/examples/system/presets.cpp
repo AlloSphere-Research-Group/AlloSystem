@@ -15,7 +15,7 @@ class MyApp : public App
 public:
 	MyApp() {
 		initWindow(Window::Dim(800,600), "Presets", 15);
-		nav() = Vec3d(0,0,-2);
+		nav().pos(Vec3d(0,0,8));
 	}
 
 	virtual void onDraw(Graphics &g) override
@@ -54,6 +54,7 @@ private:
 
 int main(int argc, char *argv[])
 {
+	std::cout << "Press 1 to store location, 2 to recall." << std::endl;
 	presets << X << Y; // Add parameters to preset handling
 	MyApp().start();
 	return 0;
