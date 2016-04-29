@@ -7,97 +7,18 @@
 
 using namespace al;
 
-Parameter::Parameter(std::string parameterName, std::string group, float defaultValue,
-                     std::string prefix, float min, float max) :
-    mMin(min), mMax(max),
-    mParameterName(parameterName), mGroup(group), mPrefix(prefix)
+
+// Parameter ------------------------------------------------------------------
+Parameter::Parameter(std::string parameterName, std::string Group,
+                     float defaultValue,
+                     std::string prefix,
+                     float min,
+                     float max) :
+    ParameterWrapper<float>(parameterName, Group, defaultValue, prefix, min, max)
 {
-	//TODO: Add better heuristics for slash handling
-	if (mPrefix.length() > 0 && mPrefix.at(0) != '/') {
-		mFullAddress = "/";
-	}
-	mFullAddress += mPrefix;
-	if (mPrefix.length() > 0 && mPrefix.at(prefix.length() - 1) != '/') {
-		mFullAddress += "/";
-	}
-	if (mGroup.length() > 0 && mGroup.at(0) != '/') {
-		mFullAddress += "/";
-	}
-	mFullAddress += mGroup;
-	if (mGroup.length() > 0 && mGroup.at(mGroup.length() - 1) != '/') {
-		mFullAddress += "/";
-	}
-	if (mFullAddress.length() == 0) {
-		mFullAddress = "/";
-	}
-	mFullAddress += mParameterName;
-	mValue = defaultValue;
-	mValueCache = defaultValue;
+
 }
 
-Parameter::~Parameter()
-{
-}
-
-void Parameter::set(float value)
-{
-	if (value > mMax) value = mMax;
-	if (value < mMin) value = mMin;
-	if (mProcessCallback) {
-		value = mProcessCallback(value, mProcessUdata);
-	}
-	mMutex.lock();
-	mValue = value;
-	mMutex.unlock();
-	for(int i = 0; i < mCallbacks.size(); ++i) {
-		if (mCallbacks[i]) {
-			mCallbacks[i](value, mCallbackUdata[i]);
-		}
-	}
-}
-
-void al::Parameter::setNoCalls(float value)
-{
-	if (value > mMax) value = mMax;
-	if (value < mMin) value = mMin;
-	if (mProcessCallback) {
-		value = mProcessCallback(value, mProcessUdata);
-	}
-	mMutex.lock();
-	mValue = value;
-	mMutex.unlock();
-}
-
-float Parameter::get()
-{
-	if (mMutex.try_lock()) {
-		mValueCache = mValue;
-		mMutex.unlock();
-	}
-	return mValueCache;
-}
-
-std::string Parameter::getFullAddress()
-{
-	return mFullAddress;
-}
-
-std::string Parameter::getName()
-{
-	return mParameterName;
-}
-
-void Parameter::setProcessingCallback(al::Parameter::ParameterProcessCallback cb, void *userData)
-{
-	mProcessCallback = cb;
-	mProcessUdata = userData;
-}
-
-void al::Parameter::registerChangeCallback(al::Parameter::ParameterChangeCallback cb, void *userData)
-{
-	mCallbacks.push_back(cb);
-	mCallbackUdata.push_back(userData);
-}
 
 // ParameterServer ------------------------------------------------------------
 
@@ -253,3 +174,4 @@ void PresetHandler::recallPreset(std::string name)
 	}
 	f.close();
 }
+

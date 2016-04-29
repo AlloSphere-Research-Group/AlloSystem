@@ -46,7 +46,7 @@ public:
 			newFreq = 440.0 * (1 + rand() /(float) RAND_MAX);
 			newAmpDb = -40.0 * rand() /(float) RAND_MAX;
 			sender.send("/Frequency", newFreq);
-//			sender.send("/Amplitude", newAmpDb);
+			sender.send("/Amplitude", newAmpDb);
 			cout << "Setting through OSC: Frequency " << newFreq << " Amplitude " << newAmpDb << endl;
 			al_sleep_nsec(interval * 1000000000.0);
 		}

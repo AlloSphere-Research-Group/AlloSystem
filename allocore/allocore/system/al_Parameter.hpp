@@ -48,44 +48,8 @@
 namespace al
 {
 
-/**
- * @brief The Parameter class
- * 
- * The Parameter class offers a convenient mechanism for safely passing 
- * parameter values from a low priority ot a high priority thread, for example
- * from a computation thread to an audio thread (i.e. the audio callback).
- * 
- * The function is thread safe and there can be any number of readers and writers.
- * 
- * Parameters are created with:
- * @code
-	Parameter freq("Frequency", "Group", default, "/path/prefix");
- * @endcode
- * 
- * Then values can be set from a low priority thread:
- * @code
-	// In a simulator thread
-	freq.set(var);
- * @endcode
- * 
- * And read back from a high priority thread:
- * @code
-	// In the audio thread
-	float curFreq = freq.get()
- * @endcode
- * 
- * The values are clamped between a minimum and maximum set using the min() and
- * max() functions.
- * 
- * The mechanism used to protect data is locking a mutex within the set() function
- * and doing try_lock() on the mutex to update a cached value in the get()
- * function. In the worst case this might incur some jitter when reading the value.
- * 
- * The ParameterServer class allows exposing Parameter objects via OSC.
- *
- * @ingroup allocore
- */
-class Parameter{
+template<class ParameterType>
+class ParameterWrapper{
 public:
 	/**
 	* @brief Parameter
@@ -97,21 +61,25 @@ public:
    * @param min Minimum value for the parameter
    * @param max Maximum value for the parameter
    */
-	Parameter(std::string parameterName, std::string Group,
-	          float defaultValue,
-	          std::string prefix ="",
-	          float min = -99999.0,
-	          float max = 99999.0
+	ParameterWrapper(std::string parameterName, std::string Group,
+	          ParameterType defaultValue,
+	          std::string prefix ="");
+
+	ParameterWrapper(std::string parameterName, std::string Group,
+	          ParameterType defaultValue,
+	          std::string prefix,
+	          ParameterType min,
+	          ParameterType max
 	        );
 	
-	~Parameter();
+	~ParameterWrapper();
 	
 	/**
 	 * @brief set the parameter's value
 	 * 
 	 * This function is thread-safe and can be called from any number of threads
 	 */
-	void set(float value);
+	virtual void set(ParameterType value);
 
 	/**
 	 * @brief set the parameter's value without calling callbacks
@@ -121,7 +89,7 @@ public:
 	 * registerChangeCallback() are not called. This is useful to avoid infinite
 	 * recursion when a widget sets the parameter that then sets the widget.
 	 */
-	void setNoCalls(float value);
+	virtual void setNoCalls(ParameterType value);
 
 	/**
 	 * @brief get the parameter's value
@@ -130,7 +98,7 @@ public:
 	 * 
 	 * @return the parameter value
 	 */
-	float get();
+	virtual ParameterType get();
 	
 	/**
 	 * @brief set the minimum value for the parameter
@@ -138,8 +106,8 @@ public:
 	 * The value returned by the get() function will be clamped and will not go
 	 * under the value set by this function.
 	 */
-	void min(float minValue) {mMin = minValue;}
-	float min() {return mMin;}
+	void min(ParameterType minValue) {mMin = minValue;}
+	float min() {ParameterType mMin;}
 	
 	/**
 	 * @brief set the maximum value for the parameter
@@ -147,8 +115,8 @@ public:
 	 * The value returned by the get() function will be clamped and will not go
 	 * over the value set by this function.
 	 */
-	void max(float maxValue) {mMax = maxValue;}
-	float max() {return mMax;}
+	void max(ParameterType maxValue) {mMax = maxValue;}
+	float max() {ParameterType mMax;}
 	
 	/**
 	 * @brief return the full OSC address for the parameter
@@ -163,8 +131,8 @@ public:
 	 */
 	std::string getName();
 
-	typedef float (*ParameterProcessCallback)(float value, void *userData);
-	typedef void (*ParameterChangeCallback)(float value, void *userData);
+	typedef float (*ParameterProcessCallback)(ParameterType value, void *userData);
+	typedef void (*ParameterChangeCallback)(ParameterType value, void *userData);
 
 	/**
 	 * @brief setProcessingCallback sets a callback to be called whenever the
@@ -196,23 +164,23 @@ public:
 	void registerChangeCallback(ParameterChangeCallback cb,
 	                           void *userData = nullptr);
 
-	std::vector<Parameter *> operator<< (Parameter &newParam)
-	{ std::vector<Parameter *> paramList;
+	std::vector<ParameterWrapper<ParameterType> *> operator<< (ParameterWrapper<ParameterType> &newParam)
+	{ std::vector<ParameterWrapper<ParameterType> *> paramList;
 		paramList.push_back(&newParam);
 		return paramList; }
 
-	std::vector<Parameter *> &operator<< (std::vector<Parameter *> &paramVector)
+	std::vector<ParameterWrapper<ParameterType> *> &operator<< (std::vector<ParameterWrapper<ParameterType> *> &paramVector)
 	{ paramVector.push_back(this);
 		return paramVector;
 	}
 
-	const float operator= (const float value) { this->set(value); return value; }
+	const ParameterType operator= (const ParameterType value) { this->set(value); return value; }
 	
 private:
-	float mValue;
-	float mValueCache;
-	float mMin;
-	float mMax;
+	ParameterType mValue;
+	ParameterType mValueCache;
+	ParameterType mMin;
+	ParameterType mMax;
 	std::string mParameterName;
 	std::string mGroup;
 	std::string mPrefix;
@@ -226,6 +194,86 @@ private:
 	std::vector<ParameterChangeCallback> mCallbacks;
 	std::vector<void *> mCallbackUdata;
 };
+
+
+
+/**
+ * @brief The ParameterWrapper class
+ *
+ * The Parameter class offers a convenient mechanism for safely passing
+ * parameter values from a low priority ot a high priority thread, for example
+ * from a computation thread to an audio thread (i.e. the audio callback).
+ *
+ * The function is thread safe and there can be any number of readers and writers.
+ *
+ * Parameters are created with:
+ * @code
+	Parameter freq("Frequency", "Group", default, "/path/prefix");
+ * @endcode
+ *
+ * Then values can be set from a low priority thread:
+ * @code
+	// In a simulator thread
+	freq.set(var);
+ * @endcode
+ *
+ * And read back from a high priority thread:
+ * @code
+	// In the audio thread
+	float curFreq = freq.get()
+ * @endcode
+ *
+ * The values are clamped between a minimum and maximum set using the min() and
+ * max() functions.
+ *
+ * The mechanism used to protect data is locking a mutex within the set() function
+ * and doing try_lock() on the mutex to update a cached value in the get()
+ * function. In the worst case this might incur some jitter when reading the value.
+ *
+ * The ParameterServer class allows exposing Parameter objects via OSC.
+ *
+ * @ingroup allocore
+ */
+
+class Parameter : public ParameterWrapper<float>
+{
+public:
+	/**
+	* @brief Parameter
+   *
+   * @param parameterName The name of the parameter
+   * @param Group The group the parameter belongs to
+   * @param defaultValue The initial value for the parameter
+   * @param prefix An address prefix that is prepended to the parameter's OSC address
+   * @param min Minimum value for the parameter
+   * @param max Maximum value for the parameter
+   *
+   * This Parameter class is designed for parameters that can be expressed as a
+   * single float and it uses atomics instead of the locking and priority
+   * mechanism of ParameterWrapper
+   */
+	Parameter(std::string parameterName, std::string Group,
+	          float defaultValue,
+	          std::string prefix = "",
+	          float min = -99999.0,
+	          float max = 99999.0
+	        );
+
+	/**
+	 * @brief set the parameter's value
+	 *
+	 * This function is thread-safe and can be called from any number of threads
+	 */
+//	virtual void set(float value) override;
+
+//	virtual void setNoCalls(float value);
+
+//	virtual float get() override;
+
+	const float operator= (const float value) { this->set(value); return value; }
+};
+
+
 
 /**
  * @brief The ParameterServer class creates an OSC server to receive parameter values
@@ -317,6 +365,109 @@ private:
 	std::vector<Parameter *> mParameters;
 	std::mutex mFileLock;
 };
+
+// Implementations -----------------------------------------------------------
+
+template<class ParameterType>
+ParameterWrapper<ParameterType>::~ParameterWrapper()
+{
+}
+
+template<class ParameterType>
+ParameterWrapper<ParameterType>::ParameterWrapper(std::string parameterName, std::string group, ParameterType defaultValue,
+                     std::string prefix, ParameterType min, ParameterType max) :
+    mMin(min), mMax(max),
+    mParameterName(parameterName), mGroup(group), mPrefix(prefix)
+{
+	//TODO: Add better heuristics for slash handling
+	if (mPrefix.length() > 0 && mPrefix.at(0) != '/') {
+		mFullAddress = "/";
+	}
+	mFullAddress += mPrefix;
+	if (mPrefix.length() > 0 && mPrefix.at(prefix.length() - 1) != '/') {
+		mFullAddress += "/";
+	}
+	if (mGroup.length() > 0 && mGroup.at(0) != '/') {
+		mFullAddress += "/";
+	}
+	mFullAddress += mGroup;
+	if (mGroup.length() > 0 && mGroup.at(mGroup.length() - 1) != '/') {
+		mFullAddress += "/";
+	}
+	if (mFullAddress.length() == 0) {
+		mFullAddress = "/";
+	}
+	mFullAddress += mParameterName;
+	mValue = defaultValue;
+	mValueCache = defaultValue;
+}
+
+template<class ParameterType>
+void ParameterWrapper<ParameterType>::set(ParameterType value)
+{
+	if (value > mMax) value = mMax;
+	if (value < mMin) value = mMin;
+	if (mProcessCallback) {
+		value = mProcessCallback(value, mProcessUdata);
+	}
+	mMutex.lock();
+	mValue = value;
+	mMutex.unlock();
+	for(int i = 0; i < mCallbacks.size(); ++i) {
+		if (mCallbacks[i]) {
+			mCallbacks[i](value, mCallbackUdata[i]);
+		}
+	}
+}
+
+template<class ParameterType>
+void ParameterWrapper<ParameterType>::setNoCalls(ParameterType value)
+{
+	if (value > mMax) value = mMax;
+	if (value < mMin) value = mMin;
+	if (mProcessCallback) {
+		value = mProcessCallback(value, mProcessUdata);
+	}
+	mMutex.lock();
+	mValue = value;
+	mMutex.unlock();
+}
+
+template<class ParameterType>
+ParameterType ParameterWrapper<ParameterType>::get()
+{
+	if (mMutex.try_lock()) {
+		mValueCache = mValue;
+		mMutex.unlock();
+	}
+	return mValueCache;
+}
+
+template<class ParameterType>
+std::string ParameterWrapper<ParameterType>::getFullAddress()
+{
+	return mFullAddress;
+}
+
+template<class ParameterType>
+std::string ParameterWrapper<ParameterType>::getName()
+{
+	return mParameterName;
+}
+
+template<class ParameterType>
+void ParameterWrapper<ParameterType>::setProcessingCallback(ParameterWrapper::ParameterProcessCallback cb, void *userData)
+{
+	mProcessCallback = cb;
+	mProcessUdata = userData;
+}
+
+template<class ParameterType>
+void ParameterWrapper<ParameterType>::registerChangeCallback(ParameterWrapper::ParameterChangeCallback cb, void *userData)
+{
+	mCallbacks.push_back(cb);
+	mCallbackUdata.push_back(userData);
+}
 
 }
 
