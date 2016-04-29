@@ -22,10 +22,12 @@ public:
 		mServer << x << y << z;
 		mServer.print();
 
+		addSphere(graphics().mesh(), 0.1);
+		graphics().mesh().generateNormals();
 	}
 
 	virtual void onDraw(Graphics &g) {
-		addSphere(g.mesh(), 0.1);
+		light();
 		g.pushMatrix();
 		g.translate(x.get(),y.get(), z.get());
 		g.draw(g.mesh());
@@ -36,6 +38,7 @@ public:
 private:
 	ParameterGUI mParameterGUI;
 	ParameterServer mServer;
+	Light light;
 };
 
 

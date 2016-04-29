@@ -43,6 +43,7 @@
 
 #include <string>
 #include <mutex>
+#include <atomic>
 #include "allocore/protocol/al_OSC.hpp"
 
 namespace al
@@ -61,7 +62,7 @@ public:
    * @param min Minimum value for the parameter
    * @param max Maximum value for the parameter
    */
-	ParameterWrapper(std::string parameterName, std::string Group,
+	ParameterWrapper(std::string parameterName, std::string group,
 	          ParameterType defaultValue,
 	          std::string prefix ="");
 
@@ -107,7 +108,7 @@ public:
 	 * under the value set by this function.
 	 */
 	void min(ParameterType minValue) {mMin = minValue;}
-	float min() {ParameterType mMin;}
+	ParameterType min() {return mMin;}
 	
 	/**
 	 * @brief set the maximum value for the parameter
@@ -116,7 +117,7 @@ public:
 	 * over the value set by this function.
 	 */
 	void max(ParameterType maxValue) {mMax = maxValue;}
-	float max() {ParameterType mMax;}
+	ParameterType max() {return mMax;}
 	
 	/**
 	 * @brief return the full OSC address for the parameter
@@ -176,25 +177,25 @@ public:
 
 	const ParameterType operator= (const ParameterType value) { this->set(value); return value; }
 	
-private:
-	ParameterType mValue;
-	ParameterType mValueCache;
+protected:
 	ParameterType mMin;
 	ParameterType mMax;
-	std::string mParameterName;
-	std::string mGroup;
-	std::string mPrefix;
 	
 	std::string mFullAddress;
-	
-	std::mutex mMutex;
 
 	ParameterProcessCallback mProcessCallback;
 	void * mProcessUdata;
 	std::vector<ParameterChangeCallback> mCallbacks;
 	std::vector<void *> mCallbackUdata;
-};
 
+private:
+	std::mutex mMutex;
+	ParameterType mValue;
+	ParameterType mValueCache;
+	std::string mParameterName;
+	std::string mGroup;
+	std::string mPrefix;
+};
 
 
 /**
@@ -264,15 +265,32 @@ public:
 	 *
 	 * This function is thread-safe and can be called from any number of threads
 	 */
-//	virtual void set(float value) override;
+	virtual void set(float value) override;
 
-//	virtual void setNoCalls(float value);
+	/**
+	 * @brief set the parameter's value without calling callbacks
+	 *
+	 * This function is thread-safe and can be called from any number of threads.
+	 * The processing callback is called, but the callbacks registered with
+	 * registerChangeCallback() are not called. This is useful to avoid infinite
+	 * recursion when a widget sets the parameter that then sets the widget.
+	 */
+	virtual void setNoCalls(float value);
 
-//	virtual float get() override;
+	/**
+	 * @brief get the parameter's value
+	 *
+	 * This function is thread-safe and can be called from any number of threads
+	 *
+	 * @return the parameter value
+	 */
+	virtual float get() override;
 
 	const float operator= (const float value) { this->set(value); return value; }
-};
 
+private:
+	std::atomic<float> mAtomicValue;
+};
 
 
 /**
@@ -374,11 +392,12 @@ ParameterWrapper<ParameterType>::~ParameterWrapper()
 }
 
 template<class ParameterType>
-ParameterWrapper<ParameterType>::ParameterWrapper(std::string parameterName, std::string group, ParameterType defaultValue,
-                     std::string prefix, ParameterType min, ParameterType max) :
-    mMin(min), mMax(max),
+ParameterWrapper<ParameterType>::ParameterWrapper(std::string parameterName, std::string group,
+          ParameterType defaultValue,
+          std::string prefix) :
     mParameterName(parameterName), mGroup(group), mPrefix(prefix)
 {
+
 	//TODO: Add better heuristics for slash handling
 	if (mPrefix.length() > 0 && mPrefix.at(0) != '/') {
 		mFullAddress = "/";
@@ -400,6 +419,17 @@ ParameterWrapper<ParameterType>::ParameterWrapper(std::string parameterName, std
 	mFullAddress += mParameterName;
 	mValue = defaultValue;
 	mValueCache = defaultValue;
+}
+
+
+template<class ParameterType>
+ParameterWrapper<ParameterType>::ParameterWrapper(std::string parameterName, std::string group, ParameterType defaultValue,
+                     std::string prefix, ParameterType min, ParameterType max) :
+    ParameterWrapper<ParameterType>::ParameterWrapper(parameterName, group,
+                                                      defaultValue, prefix)
+{
+	mMin = min;
+	mMax = max;
 }
 
 template<class ParameterType>

@@ -16,7 +16,38 @@ Parameter::Parameter(std::string parameterName, std::string Group,
                      float max) :
     ParameterWrapper<float>(parameterName, Group, defaultValue, prefix, min, max)
 {
+	mAtomicValue.store(defaultValue);
+}
 
+float Parameter::get()
+{
+	return mAtomicValue.load();
+}
+
+void Parameter::setNoCalls(float value)
+{
+	if (value > mMax) value = mMax;
+	if (value < mMin) value = mMin;
+	if (mProcessCallback) {
+		value = mProcessCallback(value, mProcessUdata);
+	}
+
+	mAtomicValue.store(value);
+}
+
+void Parameter::set(float value)
+{
+	if (value > mMax) value = mMax;
+	if (value < mMin) value = mMin;
+	if (mProcessCallback) {
+		value = mProcessCallback(value, mProcessUdata);
+	}
+	mAtomicValue.store(value);
+	for(int i = 0; i < mCallbacks.size(); ++i) {
+		if (mCallbacks[i]) {
+			mCallbacks[i](value, mCallbackUdata[i]);
+		}
+	}
 }
 
 
