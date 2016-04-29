@@ -26,6 +26,10 @@ struct PickableBase : PickableState {
   std::vector<PickableBase *> children;
   bool alwaysTestChildren = true;
 
+  // initial values, and previous values
+  Pose pose0, prevPose;
+  Vec3f scale0, prevScale;
+
   /// intersection test must be specified
   virtual double intersect(Rayd &r) = 0;
 
@@ -234,10 +238,6 @@ struct Pickable : PickableBase {
   // used for moving pickable naturally
   Vec3f selectOffset;
   float selectDist;
-
-  // initial values, and previous values
-  Pose pose0, prevPose;
-  Vec3f scale0, prevScale;
 
   Pickable(){}
   Pickable(Mesh &m){set(m);}
