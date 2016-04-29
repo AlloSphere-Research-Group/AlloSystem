@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include "allocore/system/al_Parameter.hpp"
+#include "allocore/io/al_File.hpp"
 
 using namespace al;
 
@@ -45,7 +46,7 @@ void Parameter::set(float value)
 	mAtomicValue.store(value);
 	for(int i = 0; i < mCallbacks.size(); ++i) {
 		if (mCallbacks[i]) {
-			mCallbacks[i](value, mCallbackUdata[i]);
+			mCallbacks[i](value, this, mCallbackUdata[i]);
 		}
 	}
 }
@@ -73,6 +74,10 @@ ParameterServer &ParameterServer::registerParameter(Parameter &param)
 	mParameterLock.lock();
 	mParameters.push_back(&param);
 	mParameterLock.unlock();
+	mListenerLock.lock();
+	param.registerChangeCallback(ParameterServer::changeCallback,
+	                           (void *) &param);
+	mListenerLock.unlock();
 	return *this;
 }
 
@@ -86,6 +91,15 @@ void ParameterServer::unregisterParameter(Parameter &param)
 		}
 	}
 	mParameterLock.unlock();
+}
+
+void ParameterServer::addListener(std::string oscAddress, int oscPort)
+{
+	OSCListenerInfo listener;
+	listener.OSCaddress = oscAddress;
+	listener.port = oscPort;
+	listener.lock = &mListenerLock;
+	mListeners.push_back(listener);
 }
 
 void ParameterServer::onMessage(osc::Message &m)
@@ -117,17 +131,57 @@ void ParameterServer::print()
 	}
 }
 
+void ParameterServer::changeCallback(float value, void *sender, void *userData)
+{
+	ParameterServer *server = static_cast<ParameterServer *>(userData);
+	Parameter *parameter = static_cast<Parameter *>(sender);
+	server->mListenerLock.lock();
+	for(OSCListenerInfo listener: server->mListeners) {
+		server->mOSCSender.send(parameter->getFullAddress(), value);
+	}
+	server->mListenerLock.unlock();
+}
+
 // PresetHandler --------------------------------------------------------------
 
-PresetHandler::PresetHandler(bool verbose) :
-    mVerbose(verbose)
+PresetHandler::PresetHandler(std::string rootDirectory, bool verbose) :
+    mRootDir(rootDirectory), mVerbose(verbose)
 {
+	if (!File::exists(rootDirectory)) {
+		if (!Dir::make(rootDirectory, true)) {
+			std::cout << "Error creating directory: " << rootDirectory << std::endl;
+		}
+	}
 }
 
 PresetHandler &PresetHandler::registerParameter(Parameter &parameter)
 {
 	mParameters.push_back(&parameter);
 	return *this;
+}
+
+void PresetHandler::setSubDirectory(std::string directory)
+{
+	mSubDir = directory;
+	std::string path = getCurrentPath();
+	if (!File::exists(path)) {
+		if (!Dir::make(path, true)) {
+			std::cout << "Error creating directory: " << mRootDir << std::endl;
+		}
+	}
+}
+
+std::vector<std::string> al::PresetHandler::availableSubDirectories()
+{
+	std::vector<std::string> subDirList;
+	Dir presetDir(mRootDir);
+	while(presetDir.read()) {
+		FileInfo info = presetDir.entry();
+		if (info.type() == FileInfo::DIR) {
+			subDirList.push_back(info.name());
+		}
+	}
+	return subDirList;
 }
 
 void PresetHandler::storePreset(std::string name)
@@ -204,5 +258,15 @@ void PresetHandler::recallPreset(std::string name)
 		}
 	}
 	f.close();
+}
+
+std::string al::PresetHandler::getCurrentPath()
+{
+	std::string relPath = mRootDir;
+	if (relPath.back() != '/') {
+		relPath += "/";
+	}
+	relPath += mSubDir;
+	return relPath;
 }
 

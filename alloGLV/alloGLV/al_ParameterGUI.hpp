@@ -111,7 +111,7 @@ public:
 		receiver.parameter->setNoCalls(value);
 	}
 
-	static void valueChangedCallback(float value, void *wrapper) {
+	static void valueChangedCallback(float value, void *sender, void *wrapper) {
 		WidgetWrapper *w = static_cast<WidgetWrapper *>(wrapper);
 		w->lock->lock();
 		glv::Data &d = w->widget->data();

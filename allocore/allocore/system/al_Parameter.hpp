@@ -53,7 +53,7 @@ template<class ParameterType>
 class ParameterWrapper{
 public:
 	/**
-	* @brief Parameter
+	* @brief ParameterWrapper
    *
    * @param parameterName The name of the parameter
    * @param Group The group the parameter belongs to
@@ -133,7 +133,8 @@ public:
 	std::string getName();
 
 	typedef float (*ParameterProcessCallback)(ParameterType value, void *userData);
-	typedef void (*ParameterChangeCallback)(ParameterType value, void *userData);
+	typedef void (*ParameterChangeCallback)(ParameterType value, void *sender,
+	                                        void *userData);
 
 	/**
 	 * @brief setProcessingCallback sets a callback to be called whenever the
@@ -325,10 +326,18 @@ public:
 	 * Register a parameter with the server.
 	 */
 	ParameterServer &registerParameter(Parameter &param);
+
 	/**
 	 * Remove a parameter from the server.
 	 */
 	void unregisterParameter(Parameter &param);
+
+	/**
+	 * @brief addListener enables notifiying via OSC that a parameter has changed
+	 * @param oscAddress The IP address of the listener
+	 * @param oscPort The network port so send the value changes on
+	 */
+	void addListener(std::string oscAddress, int oscPort);
 	
 	virtual void onMessage(osc::Message& m);
 
@@ -345,11 +354,26 @@ public:
 
 	/// Register parameter using the streaming operator
 	ParameterServer &operator << (Parameter* newParam){ return registerParameter(*newParam); }
-	
+
+protected:
+	static void changeCallback(float value, void *sender, void *userData);
+
 private:
+
+	struct OSCListenerInfo {
+		std::string OSCaddress;
+		int port;
+		std::mutex *lock;
+		Parameter *parameter;
+	};
+
 	osc::Recv *mServer;
+	osc::Send mOSCSender;
 	std::vector<Parameter *> mParameters;
 	std::mutex mParameterLock;
+	std::vector<OSCListenerInfo> mListeners;
+	std::mutex mListenerLock;
+
 };
 
 
@@ -365,9 +389,10 @@ public:
 	 * @brief PresetHandler contructor
 	 * @param verbose if true, print diagnostic messages
 	 */
-	PresetHandler(bool verbose = false);
+	PresetHandler(std::string rootDirectory = "presets", bool verbose = false);
 
 	PresetHandler &registerParameter(Parameter &parameter);
+
 
 	void storePreset(std::string name);
 
@@ -375,10 +400,18 @@ public:
 
 	std::vector<std::string> availablePresets();
 
+	void setSubDirectory(std::string directory);
+
+	std::vector<std::string> availableSubDirectories();
+
 	PresetHandler &operator << (Parameter &param) { return this->registerParameter(param); }
 
 private:
+	std::string getCurrentPath();
+
 	bool mVerbose;
+	std::string mRootDir;
+	std::string mSubDir;
 	std::string mFileName;
 	std::vector<Parameter *> mParameters;
 	std::mutex mFileLock;
@@ -445,7 +478,7 @@ void ParameterWrapper<ParameterType>::set(ParameterType value)
 	mMutex.unlock();
 	for(int i = 0; i < mCallbacks.size(); ++i) {
 		if (mCallbacks[i]) {
-			mCallbacks[i](value, mCallbackUdata[i]);
+			mCallbacks[i](value, (void *) this,  mCallbackUdata[i]);
 		}
 	}
 }
