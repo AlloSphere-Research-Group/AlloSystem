@@ -41,7 +41,7 @@ public:
     navControl().useMouse(false);
 
     // Create a red spheres mesh
-    addCube(mesh);
+    addTorus(mesh);
     // mesh.translate(-3,3,0);
     // addSphere(mesh,2);
     // mesh.translate(-2.7,2.7,0);
@@ -71,11 +71,12 @@ public:
 
   void onDraw(Graphics& g){
 
-    pickable.pushMatrix(g);
-    
-    // draw lit mesh
     g.lighting(true);
     light();
+
+    pickable.pushMatrix(g);
+    
+    // draw mesh
     material();
     g.color(1,1,1);
     g.draw(mesh);

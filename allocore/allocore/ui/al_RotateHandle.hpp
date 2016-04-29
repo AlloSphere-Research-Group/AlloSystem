@@ -143,7 +143,7 @@ struct RotateHandle : PickableBase {
           newDir.set(r(t)-pose.pos());
           rotate = Quatf::getRotationTo(downDir.normalized(),newDir.normalized());
           if(parent){
-            parent->pose.quat().set(rotate);
+            parent->pose.quat().set(parent->pose.quat() * rotate);
           }
           return true;
         } 
