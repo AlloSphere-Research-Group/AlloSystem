@@ -49,6 +49,69 @@
 namespace al
 {
 
+class Parameter;
+
+
+template<typename DataType = float>
+class OSCNotifier {
+public:
+	OSCNotifier();
+	~OSCNotifier();
+
+	/**
+	 * @brief addListener enables notifiying via OSC that a preset has changed
+	 * @param IPaddress The IP address of the listener
+	 * @param oscPort The network port so send the value changes on
+	 */
+	virtual void addListener(std::string IPaddress, int oscPort) {
+		mListenerLock.lock();
+		mOSCSenders.push_back(new osc::Send(oscPort, IPaddress.c_str()));
+		mListenerLock.unlock();
+	};
+
+	/**
+	 * @brief Notify the listeners of value changes
+	 * @param OSCaddress The OSC path to send the value on
+	 * @param value The value to send
+	 *
+	 * This will send all registered data to the listeners. This is useful to
+	 * force a resfresh of an interface, e.g. when it just came online and is
+	 * unaware of state. Otherwise, when calling addListener, you should
+	 * register to be notified when the data changes to only do notifications
+	 * then.
+	 *
+	 */
+	void notifyListeners(std::string OSCaddress, DataType value);
+
+protected:
+	std::mutex mListenerLock;
+private:
+	std::vector<osc::Send *> mOSCSenders;
+};
+
+// OSCNotifier implementation -------------------------------------------------
+
+template<typename DataType>
+OSCNotifier<DataType>::OSCNotifier() {}
+
+template<typename DataType>
+OSCNotifier<DataType>::~OSCNotifier() {
+	for(osc::Send *sender: mOSCSenders) {
+		delete sender;
+	}
+}
+
+template<typename DataType>
+void OSCNotifier<DataType>::notifyListeners(std::string OSCaddress, DataType value)
+{
+	mListenerLock.lock();
+	for(osc::Send *sender: mOSCSenders) {
+		sender->send(OSCaddress, value);
+	}
+	mListenerLock.unlock();
+}
+
+
 template<class ParameterType>
 class ParameterWrapper{
 public:
@@ -302,7 +365,7 @@ private:
  *
  * @ingroup allocore
  */
-class ParameterServer : public osc::PacketHandler
+class ParameterServer : public osc::PacketHandler, public OSCNotifier<float>
 {
 public:
 	/**
@@ -332,13 +395,6 @@ public:
 	 */
 	void unregisterParameter(Parameter &param);
 
-	/**
-	 * @brief addListener enables notifiying via OSC that a parameter has changed
-	 * @param oscAddress The IP address of the listener
-	 * @param oscPort The network port so send the value changes on
-	 */
-	void addListener(std::string oscAddress, int oscPort);
-	
 	virtual void onMessage(osc::Message& m);
 
 	/**
@@ -360,62 +416,12 @@ protected:
 
 private:
 
-	struct OSCListenerInfo {
-		std::string OSCaddress;
-		int port;
-		std::mutex *lock;
-		Parameter *parameter;
-	};
-
 	osc::Recv *mServer;
-	osc::Send mOSCSender;
 	std::vector<Parameter *> mParameters;
 	std::mutex mParameterLock;
-	std::vector<OSCListenerInfo> mListeners;
-	std::mutex mListenerLock;
 
 };
 
-
-/**
- * @brief The PresetHandler class handles sorting and recalling of presets.
- *
- * Presets are saved by name with the ".preset" suffix.
- */
-class PresetHandler
-{
-public:
-	/**
-	 * @brief PresetHandler contructor
-	 * @param verbose if true, print diagnostic messages
-	 */
-	PresetHandler(std::string rootDirectory = "presets", bool verbose = false);
-
-	PresetHandler &registerParameter(Parameter &parameter);
-
-
-	void storePreset(std::string name);
-
-	void recallPreset(std::string name);
-
-	std::vector<std::string> availablePresets();
-
-	void setSubDirectory(std::string directory);
-
-	std::vector<std::string> availableSubDirectories();
-
-	PresetHandler &operator << (Parameter &param) { return this->registerParameter(param); }
-
-private:
-	std::string getCurrentPath();
-
-	bool mVerbose;
-	std::string mRootDir;
-	std::string mSubDir;
-	std::string mFileName;
-	std::vector<Parameter *> mParameters;
-	std::mutex mFileLock;
-};
 
 // Implementations -----------------------------------------------------------
 

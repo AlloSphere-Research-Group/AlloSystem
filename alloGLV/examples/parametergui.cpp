@@ -17,6 +17,7 @@ public:
 	{
 		initWindow();
 		mParameterGUI.setParentApp(this);
+		mParameterGUI << new glv::Label("Parameter GUI example");
 		mParameterGUI << x << y << z ;
 		nav() = Vec3d(0, 0, 2);
 		mServer << x << y << z;
