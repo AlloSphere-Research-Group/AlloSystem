@@ -98,6 +98,8 @@ int main (int argc, char * argv[])
 
 	// Print information about the server. Shows address, port and OSC parameter addresses
 	paramServer.print();
+
+	paramServer.addListener("127.0.0.1", 13560); // Try listening for OSC on this port to check that values are being forwarded
 	
 	// Setup and start audio
 	AudioIO audioIO(AUDIO_BLOCK_SIZE, sr, audioCB, 0, 2, 0);

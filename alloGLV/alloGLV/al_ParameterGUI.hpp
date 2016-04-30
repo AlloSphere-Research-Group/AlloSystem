@@ -47,23 +47,70 @@
 #include <iostream>
 #include <algorithm>
 #include <memory>
+#include <map>
 
 #include "alloGLV/al_ControlGLV.hpp"
 #include "allocore/system/al_Parameter.hpp"
+#include "allocore/system/al_Preset.hpp"
 #include "allocore/io/al_App.hpp"
 
 #include <GLV/glv.h>
 
 namespace al {
 
+class PresetButtons : public glv::Buttons {
+public:
+	PresetButtons(const glv::Rect& r=glv::Rect(), int nx=1, int ny=1,
+	              bool momentary=false, bool mutExc=false,
+	              glv::SymbolFunc on=glv::draw::rectangle, glv::SymbolFunc off=0) :
+	    glv::Buttons(r, nx, ny, momentary, mutExc, on, off),
+	    mStore(false)
+	{
+	}
+
+	void setPresetHandler(PresetHandler &presetHandler) {
+		mPresetHandler = &presetHandler;
+		std::vector<std::string> presets = mPresetHandler->availablePresets();
+		for(int i = 0; i < presets.size(); ++i) {
+			presetMap[i] = presets.at(i);
+		}
+	}
+
+	virtual bool onAssignData(glv::Data& d, int ind1, int ind2)
+	{
+		std::cout << ind1 + (ind2 *this->sizeX())  << std::endl;
+		auto presetName = presetMap.find(ind1 + (ind2 *this->sizeX()));
+		if (presetName != presetMap.end()) {
+			if (mStore) {
+
+			} else {
+				std::cout << "Loading preset " << std::endl;
+			}
+		}
+		glv::Buttons::onAssignData(d, ind1, ind2);
+		return true;
+	}
+private:
+	PresetHandler *mPresetHandler;
+	std::map<int, std::string> presetMap;
+	bool mStore;
+};
+
+
 class ParameterGUI {
 public:
-	ParameterGUI() : mGui("><"){
-		mGui.colors().set(glv::StyleColor::SmokyGray);
-		mGui.colors().back.set(0.05, 0.95);
-		mGui.colors().selection.set(glv::HSV(0.67,0.5,0.5));
-		mGui.enable(glv::DrawBack | glv::DrawBorder | glv::Controllable);
-		mDetachableGUI << mGui;
+	ParameterGUI() :
+	    mBox(glv::Direction::S),
+	    mPresetHandler(nullptr),
+	    mPresetButtons(glv::Rect(), 10, 4, false, true)
+	{
+		mPresetButtons.enable(glv::Property::SelectOnDrag);
+		mPresetButtons.width(200);
+		mBox.colors().set(glv::StyleColor::SmokyGray);
+		mBox.colors().back.set(0.05, 0.95);
+		mBox.colors().selection.set(glv::HSV(0.67,0.5,0.5));
+		mBox.enable(glv::DrawBack | glv::DrawBorder | glv::Controllable);
+		mDetachableGUI << mBox;
 	}
 
 	~ParameterGUI() {
@@ -90,15 +137,32 @@ public:
 		glv::NumberDialer *number  = new glv::NumberDialer(numInt, 6 - numInt,
 		                                                  parameter.max(),
 		                                                  parameter.min());
+		number->setValue(parameter.get());
 		WidgetWrapper *wrapper = new WidgetWrapper;
 		wrapper->parameter = &parameter;
 		wrapper->lock = &mParameterGUILock;
 		wrapper->widget = static_cast<glv::Widget *>(number);
 		mWrappers.push_back(wrapper);
 		number->attach(ParameterGUI::widgetChangeCallback, glv::Update::Value, wrapper);
-		mGui << number << new glv::Label(parameter.getName());
-		mGui.arrange();
+		glv::Box *box = new glv::Box;
+		*box << number << new glv::Label(parameter.getName());
+		box->fit();
+		mBox << box;
+		mBox.fit();
 		parameter.registerChangeCallback(ParameterGUI::valueChangedCallback, wrapper);
+		return *this;
+	}
+
+	ParameterGUI &registerPresetHandler(PresetHandler &handler) {
+		if (mPresetHandler) {
+			std::cout << "IGNORED. Only one preset handler can be attached to a ParameterGUI class." << std::endl;
+			return *this;
+		}
+		mPresetHandler = &handler;
+		mPresetButtons.width(mBox.width());
+		mBox << new glv::Label("Presets");
+		mBox << mPresetButtons;
+		mPresetButtons.setPresetHandler(handler);
 		return *this;
 	}
 
@@ -125,6 +189,15 @@ public:
 	/// Add new parameter to GUI
 	ParameterGUI &operator << (Parameter* newParam){ return addParameter(*newParam); }
 
+	/// Add new View to GUI
+	ParameterGUI &operator << (glv::View* newView){
+		mBox << newView;
+		mBox.fit();
+		return *this;}
+	/// Add new parameter to GUI
+	ParameterGUI &operator << (PresetHandler &presetHandler){ return registerPresetHandler(presetHandler); }
+
+
 	struct WidgetWrapper {
 		Parameter *parameter;
 		glv::Widget *widget;
@@ -132,10 +205,12 @@ public:
 	};
 
 private:
-	glv::Table mGui;
+	glv::Box mBox;
+	PresetButtons mPresetButtons;
 	GLVDetachable mDetachableGUI;
 	std::mutex mParameterGUILock;
 	std::vector<WidgetWrapper *> mWrappers;
+	PresetHandler *mPresetHandler;
 };
 
 
