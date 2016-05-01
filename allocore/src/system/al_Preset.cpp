@@ -163,9 +163,16 @@ void PresetHandler::recallPreset(std::string name)
 		}
 	}
 	f.close();
+	int index = -1;
+	for (auto preset: mPresetsMap) {
+		if (preset.second == name) {
+			index = preset.first;
+			break;
+		}
+	}
 	for(int i = 0; i < mCallbacks.size(); ++i) {
 		if (mCallbacks[i]) {
-			mCallbacks[i](4, this, mCallbackUdata[i]);
+			mCallbacks[i](index, this, mCallbackUdata[i]);
 		}
 	}
 }
@@ -288,7 +295,8 @@ void PresetHandler::storePresetMap()
 
 
 
-PresetServer::PresetServer(std::string oscAddress, int oscPort) : mServer(nullptr), mPresetHandler(nullptr)
+PresetServer::PresetServer(std::string oscAddress, int oscPort) :
+    mServer(nullptr), mPresetHandler(nullptr), mOSCpath("/preset")
 {
 	mServer = new osc::Recv(oscPort, oscAddress.c_str());
 	if (mServer) {
@@ -307,9 +315,33 @@ PresetServer::~PresetServer()
 	}
 }
 
+void PresetServer::onMessage(osc::Message &m)
+{
+	if(m.addressPattern() == mOSCpath && m.typeTags() == "f"){
+		float val;
+		m >> val;
+		mPresetHandler->recallPreset((int) val);
+		//			std::cout << "ParameterServer::onMessage" << val << std::endl;
+	} else if(m.addressPattern() == mOSCpath && m.typeTags() == "i"){
+		int val;
+		m >> val;
+		mPresetHandler->recallPreset(val);
+	}
+}
+
+void PresetServer::print()
+{
+	std::cout << "Preset server listening on: " << mServer->address() << ":" << mServer->port() << std::endl;
+	std::cout << "Communicating on path: " << mOSCpath << std::endl;
+	std::cout << "Registered listeners: " << std::endl;
+	for (auto sender:mOSCSenders) {
+		std::cout << sender->address() << ":" << sender->port() << std::endl;
+	}
+}
+
 void PresetServer::changeCallback(int value, void *sender, void *userData)
 {
 	PresetServer *server = static_cast<PresetServer *>(userData);
 	Parameter *parameter = static_cast<Parameter *>(sender);
-	server->notifyListeners("/preset", value);
+	server->notifyListeners(server->mOSCpath, value);
 }

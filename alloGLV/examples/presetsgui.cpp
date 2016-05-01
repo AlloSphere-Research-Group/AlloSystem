@@ -14,6 +14,8 @@ Parameter Blue("Blue", "", 0.5, "", 0.0, 1.0);
 
 PresetHandler presets("presetsGUI");
 
+PresetServer presetServer;
+
 ParameterGUI gui;
 
 class MyApp : public App
@@ -63,6 +65,12 @@ int main(int argc, char *argv[])
 	// Adding a PresetHandler to a ParameterGUI creates a multi-button interface
 	// to control the presets.
 	gui << presets;
+
+	// The preset server will allow setting the preset via OSC
+	presetServer << presets;
+	presetServer.addListener("127.0.0.1", 13561);
+	presetServer.print();
+
 	MyApp().start();
 	return 0;
 }
