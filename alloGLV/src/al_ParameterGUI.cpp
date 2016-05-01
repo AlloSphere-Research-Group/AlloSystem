@@ -4,8 +4,8 @@
 using namespace al;
 
 ParameterGUI &ParameterGUI::addParameter(Parameter &parameter) {
-	int numInt = 1 + ceil(log10(max(fabs(parameter.max()), fabs(parameter.min()))));
-	glv::NumberDialer *number  = new glv::NumberDialer(numInt, 6 - numInt,
+	int numInt = 2 + ceil(log10(max(fabs(parameter.max()), fabs(parameter.min()))));
+	glv::NumberDialer *number  = new glv::NumberDialer(numInt, 7 - numInt,
 	                                                   parameter.max(),
 	                                                   parameter.min());
 	number->setValue(parameter.get());
