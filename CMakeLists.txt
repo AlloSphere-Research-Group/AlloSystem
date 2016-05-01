@@ -155,7 +155,7 @@ endif(ALLOAUDIO_LIBRARY)
 
 # allosphere ----------------------------------
 add_subdirectory(allosphere)
-get_target_property(ALLOSPHERE_LIBRARY allosphere${DEBUG_SUFFIX} LOCATION)
+set(ALLOSPHERE_LIBRARY allosphere${DEBUG_SUFFIX})
 get_target_property(ALLOSPHERE_INCLUDE_DIR allosphere${DEBUG_SUFFIX} ALLOSPHERE_INCLUDE_DIR)
 get_target_property(ALLOSPHERE_LINK_LIBRARIES allosphere${DEBUG_SUFFIX} ALLOSPHERE_LINK_LIBRARIES)
 if(ALLOSPHERE_LIBRARY)
