@@ -68,7 +68,11 @@ public:
 
 	void storePreset(std::string name);
 
+	void storePreset(int index, std::string name);
+
 	void recallPreset(std::string name);
+
+	std::string recallPreset(int index);
 
 	std::vector<std::string> availablePresets();
 
