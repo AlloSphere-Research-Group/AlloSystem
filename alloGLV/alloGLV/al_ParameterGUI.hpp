@@ -105,8 +105,8 @@ class ParameterGUI {
 public:
 	ParameterGUI() :
 	    mBox(glv::Direction::S),
-	    mPresetHandler(nullptr),
 	    mPresetButtons(glv::Rect(), 10, 4, false, true),
+	    mPresetHandler(nullptr),
 	    mButtonScale(1.0f)
 	{
 		mPresetButtons.enable(glv::Property::SelectOnDrag);
@@ -136,6 +136,8 @@ public:
 			std::cout << "ERROR: Can't attach to app. No windows available." << std::endl;
 		}
 	}
+
+	GLVDetachable &getDetachableView() {return mDetachableGUI;}
 
 	ParameterGUI &addParameter(Parameter &parameter);
 
