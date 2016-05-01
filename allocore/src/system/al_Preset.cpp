@@ -1,4 +1,5 @@
 
+#include <string>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -189,20 +190,9 @@ std::string PresetHandler::recallPreset(int index)
 	return "";
 }
 
-std::vector<std::string> PresetHandler::availablePresets()
+std::map<int, std::string> PresetHandler::availablePresets()
 {
-	std::vector<std::string> presets;
-	Dir presetDir(getCurrentPath());
-	while(presetDir.read()) {
-		FileInfo info = presetDir.entry();
-		if (info.type() == FileInfo::REG) {
-			std::string name = info.name();
-			if (name.substr(name.size()-7) == ".preset") {
-				presets.push_back(info.name().substr(0, name.size()-7));
-			}
-		}
-	}
-	return presets;
+	return mPresetsMap;
 }
 
 std::string PresetHandler::getCurrentPath()
@@ -225,9 +215,19 @@ void PresetHandler::loadPresetMap()
 	mPresetsMap.clear();
 	if (!File::exists(mapFileName)) {
 		std::cout << "No preset map. Creating default." << std::endl;
-		std::vector<std::string> presetList = availablePresets();
-		for(int i = 0; i < presetList.size(); ++i) {
-			mPresetsMap[i] = presetList[i];
+		std::vector<std::string> presets;
+		Dir presetDir(getCurrentPath());
+		while(presetDir.read()) {
+			FileInfo info = presetDir.entry();
+			if (info.type() == FileInfo::REG) {
+				std::string name = info.name();
+				if (name.substr(name.size()-7) == ".preset") {
+					presets.push_back(info.name().substr(0, name.size()-7));
+				}
+			}
+		}
+		for(int i = 0; i < presets.size(); ++i) {
+			mPresetsMap[i] = presets[i];
 		}
 		storePresetMap();
 	} else {
