@@ -25,8 +25,8 @@ struct TranslateHandle : PickableBase {
     }
   }
 
-  void draw(Graphics &g, Pose& text){
-    gnomon.drawAtPos(g, pose.pos(), text, 1);
+  void draw(Graphics &g){
+    gnomon.drawAtPos(g, pose.pos(), Pose(), 1);
     for(int i=0; i < 3; i++){
       if(hover[i]){
         Mesh &m = g.mesh();
@@ -81,8 +81,16 @@ struct TranslateHandle : PickableBase {
           translate.zero();
           translate[i] = r(t)[i] - 1 - pose.pos()[i];
 
-          if(parent) parent->pose.pos()[i] += translate[i];
-          else pose.pos()[i] += translate[i];
+          if(parent){
+            Vec3f dir;
+            switch(i){
+              case 0: dir = parent->pose.ux(); break;
+              case 1: dir = parent->pose.uy(); break;
+              case 2: dir = parent->pose.uz(); break;
+            }
+            parent->pose.pos() += dir*translate[i];
+
+          } else pose.pos()[i] += translate[i];
           return true;
         } 
       }

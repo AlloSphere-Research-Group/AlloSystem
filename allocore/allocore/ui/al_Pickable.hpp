@@ -4,6 +4,7 @@
 
 #include <vector>
 
+#include "allocore/ui/al_Gnomon.hpp"
 #include "allocore/ui/al_BoundingBox.hpp"
 
 namespace al {
@@ -21,7 +22,7 @@ struct PickableState {
   }
 };
 
-struct PickableBase : PickableState {
+struct PickableBase : virtual PickableState {
   PickableBase *parent = 0;
   std::vector<PickableBase *> children;
   bool alwaysTestChildren = true;
@@ -91,6 +92,15 @@ struct PickableBase : PickableState {
     return onUnpick(r,t,child);
   }
 
+  virtual void draw(Graphics &g){}
+  virtual void drawChildren(Graphics &g){
+    pushMatrix(g);
+    for(int i=0; i < children.size(); i++){
+      children[i]->draw(g);
+    }
+    popMatrix(g);
+  }
+
   bool intersects(Rayd &r){ return intersect(r) > 0.0; }
   bool intersectsChild(Rayd &r){
     bool child = false;
@@ -119,7 +129,7 @@ struct PickableBase : PickableState {
   } 
 
   /// transform a ray in world space to local space
-  Rayd transformRayLocal(Rayd &ray){
+  Rayd transformRayLocal(const Rayd &ray){
     Matrix4d t,r,s;
     Matrix4d model = t.translate(pose.pos()) * r.fromQuat(pose.quat()) * s.scale(scale);
     Matrix4d invModel = Matrix4d::inverse(model);
@@ -129,18 +139,17 @@ struct PickableBase : PickableState {
   }
 
   /// transfrom a vector in local space to world space
-  Vec3f transformVecWorld(Vec3f &v, float w=1){
+  Vec3f transformVecWorld(const Vec3f &v, float w=1){
     Matrix4d t,r,s;
     Matrix4d model = t.translate(pose.pos()) * r.fromQuat(pose.quat()) * s.scale(scale);
     Vec4d o = model.transform(Vec4d(v, w));
     return Vec3f(o.sub<3>(0));
   }
-
 };
 
 
 
-
+// delete this..
 struct TestPickable : PickableBase {
 
   bool childHover;
@@ -296,64 +305,65 @@ struct Pickable : PickableBase {
     return false;
   }
 
-  // /// handle pointer pick action
-  // bool pick(Rayd &r){
-  //   // if intersection occured store and offset and distance for moving model
-  //   double t = intersectBB(r);
-  //   if(t > 0){
-  //     selected = true;
-  //     prevPose.set(pose);
+  // draw
+  void draw(Graphics &g){
+    pushMatrix(g);
+    glPushAttrib(GL_CURRENT_BIT);
+    if(mesh) g.draw(*mesh);
 
-  //     // float t = (nav.pos() - pose.pos()).mag();
-  //     selectDist = t;
-  //     selectOffset = pose.pos() - r(t);
-  //     // bool hit = handle.pick(r, aabb.cen);
-  //     // if(hit) selected = false;
-  //     // else{
-  //       // hit = rhandle.pick(r, aabb.cen);
-  //       // if(hit){
-  //         // selected = false;
-  //       // }
-  //     // }
-  //   } else selected = false;
-  //   return selected;
-  // }
+    if(selected) g.color(0,1,1);
+    else if(hover) g.color(1,1,1);
+    g.draw(bb.mesh);
+    g.draw(bb.tics);
 
-  /// handle pointer drag action
-  // bool drag(Rayd &r){ //, bool apply=true){
-  //   // if previously selected then move
-  //   if(selected){
-  //     Vec3f newPos = r(selectDist) + selectOffset;
-  //     pose.pos().set(newPos);
-  //     // if(apply) pose.pos().set(newPos);
-  //     return true;
-  //   } //else {
-  //     // // Vec3f newPos = handle.drag(r, aabb.cen, newPos);
-  //     // Vec3f newPos;
-  //     // bool hit = handle.drag(r, aabb.cen, newPos);
-  //     // // if(hit) setCenter(newPos); // XXX this breaks why??
-  //     // setCenter(newPos);
-  //     // // else {
-  //     //   // Quatf quat = rhandle.drag(r, aabb.cen, quat);
-  //     //   Quatf quat;
-  //     //   hit = rhandle.drag(r, aabb.cen, quat);
-  //     //   if(hit){
-  //     //     pose.quat().set(quat*prevPose.quat());
-  //     //     newPos.set(aabb.cen);
-  //     //     setCenter(newPos);
-  //     //   }
-  //     // // }
-  //     // return hit;
-  //   // }
-  // }
+    // drawLabels(g);
+    drawChildren(g);
+    glPopAttrib();
+    popMatrix(g);
+  }
 
-  /// handle pointer unpick action
-  // bool unpick(Rayd &r){
-  //   selected = false;
-  //   return false;
-  //   // handle.unpick();
-  //   // rhandle.unpick();
-  // }
+  void drawMesh(Graphics &g){
+    if(!mesh) return;
+    pushMatrix(g);
+    g.draw(*mesh);
+    popMatrix(g);
+  }
+  void drawBB(Graphics &g){
+    if(!selected && !hover) return;
+    pushMatrix(g);
+    glPushAttrib(GL_CURRENT_BIT);
+    if(selected) g.color(0,1,1);
+    else if(hover) g.color(1,1,1);
+    g.draw(bb.mesh);
+    g.draw(bb.tics);
+    glPopAttrib();
+    popMatrix(g);
+  }
+  void drawGrid(Graphics &g){
+    pushMatrix(g);
+    if(selected || hover){
+      g.lineWidth(2);
+      g.draw(bb.gridMesh[1]);
+      g.lineWidth(1);
+      g.draw(bb.gridMesh[0]);
+    } else {}
+    popMatrix(g);
+  }
+
+  void drawLabels(Graphics &g, Font& font, Pose &cam_pose){
+    if(!selected && !hover) return;
+    g.pushMatrix();
+    bb.drawLabels(g, font, cam_pose, pose, scale.x);
+    g.popMatrix();
+  }
+
+  void drawOrigin(Graphics &g){
+    Gnomon gnomon;
+    pushMatrix(g);
+    gnomon.draw(g);
+    popMatrix(g);
+  }
+
 
   ////////////////////////////////////////////////////////////////////////////
 

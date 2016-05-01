@@ -12,7 +12,9 @@ struct RotateHandle : PickableBase {
   bool hover[3] = {false,false,false};
   bool selected[3] = {false,false,false};
 
-  RotateHandle(){ rotate = Quatf::identity(); }
+  RotateHandle(){ 
+    rotate = Quatf::identity();
+  }
 
   void addCircle(Mesh &m, float r, int n){
     double inc = M_2PI/n;
@@ -37,11 +39,11 @@ struct RotateHandle : PickableBase {
     }
   }
 
-  void draw(Graphics &g, float scale=0.5){
+  void draw(Graphics &g){
     Mesh &m = g.mesh();
     m.primitive(g.LINE_LOOP);
     m.reset();
-    addCircle(m,scale,30);
+    addCircle(m,0.5,30);
 
     Quatf q;
     for (int i = 0; i < 3; i++){
@@ -143,7 +145,11 @@ struct RotateHandle : PickableBase {
           newDir.set(r(t)-pose.pos());
           rotate = Quatf::getRotationTo(downDir.normalized(),newDir.normalized());
           if(parent){
+            // rotate parent around rotation handle offset, probably a better way to do this :p
+            Vec3f p1 = parent->transformVecWorld(pose.pos());
             parent->pose.quat().set(parent->pose.quat() * rotate);
+            Vec3f p2 = parent->transformVecWorld(pose.pos());
+            parent->pose.pos() += p1-p2;
           }
           return true;
         } 
