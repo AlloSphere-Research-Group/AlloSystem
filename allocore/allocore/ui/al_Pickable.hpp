@@ -144,6 +144,13 @@ struct PickableBase : virtual PickableState {
     Matrix4d model = t.translate(pose.pos()) * r.fromQuat(pose.quat()) * s.scale(scale);
     Vec4d o = model.transform(Vec4d(v, w));
     return Vec3f(o.sub<3>(0));
+  }  
+  /// transfrom a vector in world space to local space
+  Vec3f transformVecLocal(const Vec3f &v, float w=1){
+    Matrix4d t,r,s;
+    Matrix4d invModel = t.translate(pose.pos()) * r.fromQuat(pose.quat()) * s.scale(scale);
+    Vec4d o = invModel.transform(Vec4d(v, w));
+    return Vec3f(o.sub<3>(0));
   }
 };
 
@@ -198,7 +205,7 @@ struct Pickable : PickableBase {
   }
   
   bool onDrag(Rayd &r, double t, bool child){
-    if(t > 0.0){
+    // if(t > 0.0){
       if(child){
         return true;
       } else if(selected){
@@ -206,7 +213,7 @@ struct Pickable : PickableBase {
         pose.pos().set(newPos);
         return true;
       }
-    }
+    // }
     return false;
   }
 
@@ -227,9 +234,9 @@ struct Pickable : PickableBase {
     g.draw(bb.tics);
 
     // drawLabels(g);
-    drawChildren(g);
     glPopAttrib();
     popMatrix(g);
+    drawChildren(g);
   }
 
   void drawMesh(Graphics &g){
