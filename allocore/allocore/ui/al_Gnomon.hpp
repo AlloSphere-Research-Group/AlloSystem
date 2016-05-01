@@ -40,6 +40,11 @@ struct Gnomon {
     gnomonMesh.color(colors[2]);
   }
 
+  void draw(Graphics &g){
+    g.draw(gnomonMesh);
+    drawArrows(g);
+  }
+
   // floating gnomon in front of camera
   void drawFloating(Graphics &g, Pose pose, float scale){
     g.pushMatrix();

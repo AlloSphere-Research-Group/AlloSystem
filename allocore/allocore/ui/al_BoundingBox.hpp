@@ -60,6 +60,15 @@ struct BoundingBox {
     return mesh;
   }
 
+  void draw(Graphics &g, bool drawTics=false, bool drawGrid=false){
+    g.draw(mesh);
+    if(drawTics) g.draw(tics);
+    if(drawGrid){
+      g.draw(gridMesh[0]);
+      g.draw(gridMesh[1]);
+    }
+  }
+
   void drawLabels(Graphics &g, Font &font, Pose cam_pose, Pose obj_pose, float obj_scale){
     g.pushMatrix();
       g.color(.35,.35,.35,1);
