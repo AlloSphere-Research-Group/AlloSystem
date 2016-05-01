@@ -124,6 +124,10 @@ public:
    * @param prefix An address prefix that is prepended to the parameter's OSC address
    * @param min Minimum value for the parameter
    * @param max Maximum value for the parameter
+   *
+   * The mechanism used to protect data is locking a mutex within the set() function
+   * and doing try_lock() on the mutex to update a cached value in the get()
+   * function. In the worst case this might incur some jitter when reading the value.
    */
 	ParameterWrapper(std::string parameterName, std::string group,
 	          ParameterType defaultValue,
@@ -263,13 +267,11 @@ private:
 
 
 /**
- * @brief The ParameterWrapper class
+ * @brief The Parameter class
  *
- * The Parameter class offers a convenient mechanism for safely passing
- * parameter values from a low priority ot a high priority thread, for example
- * from a computation thread to an audio thread (i.e. the audio callback).
- *
- * The function is thread safe and there can be any number of readers and writers.
+ * The Parameter class offers a simple way to encapsulate float values. It is
+ * not inherently thread safe, but since floats are atomic on most platforms
+ * it is safe in practice.
  *
  * Parameters are created with:
  * @code
@@ -290,10 +292,6 @@ private:
  *
  * The values are clamped between a minimum and maximum set using the min() and
  * max() functions.
- *
- * The mechanism used to protect data is locking a mutex within the set() function
- * and doing try_lock() on the mutex to update a cached value in the get()
- * function. In the worst case this might incur some jitter when reading the value.
  *
  * The ParameterServer class allows exposing Parameter objects via OSC.
  *
@@ -353,7 +351,7 @@ public:
 	const float operator= (const float value) { this->set(value); return value; }
 
 private:
-	std::atomic<float> mAtomicValue;
+	float mFloatValue;
 };
 
 

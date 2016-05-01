@@ -16,12 +16,12 @@ Parameter::Parameter(std::string parameterName, std::string Group,
                      float max) :
     ParameterWrapper<float>(parameterName, Group, defaultValue, prefix, min, max)
 {
-	mAtomicValue.store(defaultValue);
+	mFloatValue = defaultValue;
 }
 
 float Parameter::get()
 {
-	return mAtomicValue.load();
+	return mFloatValue;
 }
 
 void Parameter::setNoCalls(float value)
@@ -32,7 +32,7 @@ void Parameter::setNoCalls(float value)
 		value = mProcessCallback(value, mProcessUdata);
 	}
 
-	mAtomicValue.store(value);
+	mFloatValue = value;
 }
 
 void Parameter::set(float value)
@@ -42,7 +42,7 @@ void Parameter::set(float value)
 	if (mProcessCallback) {
 		value = mProcessCallback(value, mProcessUdata);
 	}
-	mAtomicValue.store(value);
+	mFloatValue = value;
 	for(int i = 0; i < mCallbacks.size(); ++i) {
 		if (mCallbacks[i]) {
 			mCallbacks[i](value, this, mCallbackUdata[i]);
