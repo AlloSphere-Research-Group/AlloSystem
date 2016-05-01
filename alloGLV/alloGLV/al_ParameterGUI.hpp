@@ -73,7 +73,6 @@ public:
 
 	void setPresetHandler(PresetHandler &presetHandler) {
 		mPresetHandler = &presetHandler;
-		std::vector<std::string> presets = mPresetHandler->availablePresets();
 	}
 
 	virtual bool onAssignData(glv::Data& d, int ind1, int ind2)
@@ -115,7 +114,7 @@ public:
 		mBox.colors().set(glv::StyleColor::SmokyGray);
 		mBox.colors().back.set(0.05, 0.95);
 		mBox.colors().selection.set(glv::HSV(0.67,0.5,0.5));
-		mBox.enable(glv::DrawBack | glv::DrawBorder | glv::Controllable);
+		mBox.enable(glv::Controllable);
 		mDetachableGUI << mBox;
 	}
 
@@ -157,8 +156,9 @@ public:
 				d.assign<int>(false, x, y); // Must manually set them all off...
 			}
 		}
-
+		gui->mPresetButtons.presetName = gui->mPresetHandler->availablePresets()[index];
 		d.assign<int>(true, index); // Do it this way to avoid the GUi triggering callbacks.
+
 //		gui->mPresetButtons.setValue(index);
 		std::cout << "preset Change callback" << std::endl;
 	}

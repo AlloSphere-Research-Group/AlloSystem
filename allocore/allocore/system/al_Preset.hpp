@@ -74,7 +74,7 @@ public:
 
 	std::string recallPreset(int index);
 
-	std::vector<std::string> availablePresets();
+	std::map<int, std::string> availablePresets();
 
 	void setSubDirectory(std::string directory);
 
