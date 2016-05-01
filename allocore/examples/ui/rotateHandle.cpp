@@ -11,6 +11,7 @@ Tim Wood, April 2016
 
 #include "allocore/io/al_App.hpp"
 #include "allocore/ui/al_Pickable.hpp"
+#include "allocore/ui/al_TranslateHandle.hpp"
 #include "allocore/ui/al_RotateHandle.hpp"
 
 using namespace al;
@@ -26,6 +27,7 @@ public:
   Mesh mesh; 
 
   Pickable pickable;
+  TranslateHandle th;
   RotateHandle rh;
 
   Font font;
@@ -55,6 +57,7 @@ public:
     
     // add translate handle as child
     pickable.addChild(rh);
+    pickable.addChild(th);
 
     // pickable.bb.cen.print();
     // std::cout << std::endl; 
@@ -73,12 +76,16 @@ public:
 
     g.lighting(true);
     light();
+    material();
+    g.color(1,1,1);
+    // p.drawMesh(g);
+    // p.drawChildren(g);
+    // p.drawBB(g, true)
+    // p.drawChildren(g);
 
     pickable.pushMatrix(g);
     
     // draw mesh
-    material();
-    g.color(1,1,1);
     g.draw(mesh);
 
     // draw boundingbox
@@ -100,6 +107,7 @@ public:
     g.lighting(false);
     g.depthTesting(false);
     rh.draw(g);    
+    th.draw(g,nav());
     g.depthTesting(true);
 
 

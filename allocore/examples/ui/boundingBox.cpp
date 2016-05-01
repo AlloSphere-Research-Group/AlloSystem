@@ -63,8 +63,10 @@ public:
     // draw white boundingbox
     g.lighting(false);
     g.color(1,1,1);
-    g.draw(bb.mesh);
-    g.draw(bb.tics);
+
+    bool tics = true;
+    bool grid = true;
+    bb.draw(g, tics, grid);
 
     if(loadedFont){
       g.blendAdd();
