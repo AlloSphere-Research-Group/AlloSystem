@@ -24,7 +24,6 @@ public:
   
   Mesh mesh; 
 
-  BoundingBox bb;
   Pickable pickable;
   Font font;
 
@@ -65,33 +64,21 @@ public:
 
   void onDraw(Graphics& g){
 
-    pickable.pushMatrix(g);
-    
     // draw lit mesh
     g.lighting(true);
     light();
     material();
-    g.draw(mesh);
+    pickable.drawMesh(g);
+    
+    g.lighting(false);
+    pickable.drawBB(g);
 
-    // draw boundingbox
-    if(pickable.hover || pickable.selected){
-      g.lighting(false);
-      if(pickable.selected) g.color(0,1,1);
-      else g.color(1,1,1);
-      g.draw(pickable.bb.mesh);
-      g.draw(pickable.bb.tics);
-
-      if(loadedFont){
-        g.blendAdd();
-        g.color(1,1,1);
-        pickable.bb.drawLabels(g, font, nav(), Pose(), 1);
-        g.blendOff();
-      }
+    if(loadedFont){
+      g.blendAdd();
+      g.color(1,1,1);
+      pickable.drawLabels(g, font, nav());
+      g.blendOff();
     }
-
-    pickable.popMatrix(g);
-
-
   }
 
   virtual void onMouseMove(const ViewpointWindow& w, const Mouse& m){

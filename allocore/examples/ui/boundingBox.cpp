@@ -31,16 +31,16 @@ public:
     if(!loadedFont) std::cout << "Failed to load font. Not rendering labels.." << std::endl;
 
     // position camera
-    nav().pos(0,0,4);
+    nav().pos(0,0,20);
 
     // Create a red sphere mesh
-    addSphere(mesh,7.156);
+    addSphere(mesh,5);
     mesh.generateNormals();
     mesh.color(RGB(1,0,0));
 
     // Initialize BoundingBox
     bb.set(mesh);
-    bb.glUnitLength = 10;
+    bb.glUnitLength = 5; // ??? fix
 
     // create window
     initWindow();
