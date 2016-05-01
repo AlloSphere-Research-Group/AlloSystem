@@ -85,8 +85,8 @@ public:
 
 protected:
 	std::mutex mListenerLock;
-private:
 	std::vector<osc::Send *> mOSCSenders;
+private:
 };
 
 // OSCNotifier implementation -------------------------------------------------

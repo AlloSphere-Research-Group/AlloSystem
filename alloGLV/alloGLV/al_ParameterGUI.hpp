@@ -138,59 +138,29 @@ public:
 		}
 	}
 
-	ParameterGUI &addParameter(Parameter &parameter) {
-		int numInt = 1 + ceil(log10(max(fabs(parameter.max()), fabs(parameter.min()))));
-		glv::NumberDialer *number  = new glv::NumberDialer(numInt, 6 - numInt,
-		                                                  parameter.max(),
-		                                                  parameter.min());
-		number->setValue(parameter.get());
-		WidgetWrapper *wrapper = new WidgetWrapper;
-		wrapper->parameter = &parameter;
-		wrapper->lock = &mParameterGUILock;
-		wrapper->widget = static_cast<glv::Widget *>(number);
-		mWrappers.push_back(wrapper);
-		number->attach(ParameterGUI::widgetChangeCallback, glv::Update::Value, wrapper);
-		glv::Box *box = new glv::Box;
-		*box << number << new glv::Label(parameter.getName());
-		box->fit();
-		mBox << box;
-		mBox.fit();
-		parameter.registerChangeCallback(ParameterGUI::valueChangedCallback, wrapper);
-		return *this;
-	}
+	ParameterGUI &addParameter(Parameter &parameter);
 
-	ParameterGUI &registerPresetHandler(PresetHandler &handler) {
-		if (mPresetHandler) {
-			std::cout << "IGNORED. Only one preset handler can be attached to a ParameterGUI class." << std::endl;
-			return *this;
-		}
-		mPresetHandler = &handler;
-		mPresetButtons.width(240* mButtonScale);
-		mPresetButtons.height(96* mButtonScale);
-		mBox << new glv::Label("Presets");
-
-		glv::Box *nameBox = new glv::Box(glv::Direction::E);
-		glv::TextView *presetNameView = new glv::TextView;
-		*nameBox << new glv::Label("Name") << presetNameView;
-		mBox << nameBox;
-		mBox << mPresetButtons;
-		glv::Box *storeBox = new glv::Box(glv::Direction::E);
-		glv::Button *storeButton = new glv::Button(glv::Rect(150* mButtonScale, 24* mButtonScale));
-		*storeBox << new glv::Label("Store", glv::Place::CL, 0, 0) << storeButton;
-		mBox << storeBox;
-		mPresetButtons.attach(ParameterGUI::presetSavedInButton,
-		                    glv::Update::Value, (void *) storeButton);
-
-		mPresetButtons.setPresetHandler(handler);
-
-		storeButton->attachVariable(&mPresetButtons.mStore, 1);
-		presetNameView->attachVariable(&mPresetButtons.presetName, 1);
-		return *this;
-	}
+	ParameterGUI &registerPresetHandler(PresetHandler &handler);
 
 	static void presetSavedInButton(const glv::Notification &n) {
 		glv::Button *button = static_cast<glv::Button *>(n.receiver());
 		button->setValue(false);
+	}
+
+	static void presetChangeCallback(int index, void *sender,void *userData)
+	{
+		ParameterGUI *gui = static_cast<ParameterGUI *>(userData);
+		glv::Data &d = gui->mPresetButtons.data();
+		const int *shape = d.shape();
+		for (int x = 0; x < shape[0]; ++x) {
+			for (int y = 0; y < shape[1]; ++y) {
+				d.assign<int>(false, x, y); // Must manually set them all off...
+			}
+		}
+
+		d.assign<int>(true, index); // Do it this way to avoid the GUi triggering callbacks.
+//		gui->mPresetButtons.setValue(index);
+		std::cout << "preset Change callback" << std::endl;
 	}
 
 	static void widgetChangeCallback(const glv::Notification& n) {
@@ -204,7 +174,7 @@ public:
 
 	static void valueChangedCallback(float value, void *sender, void *wrapper) {
 		WidgetWrapper *w = static_cast<WidgetWrapper *>(wrapper);
-		w->lock->lock();
+		w->lock->lock(); // Is the setting of the value from the mouse also protected? Do we need to protect that?
 		glv::Data &d = w->widget->data();
 		d.assign<double>(value); // We need to assign this way to avoid triggering callbacks.
 		w->lock->unlock();

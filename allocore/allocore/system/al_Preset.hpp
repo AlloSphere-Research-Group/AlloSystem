@@ -121,10 +121,10 @@ public:
 	 */
 
 	PresetServer(std::string oscAddress = "127.0.0.1",
-	             int oscPort = 9010);
+	             int oscPort = 9011);
 	~PresetServer();
 
-	virtual void onMessage(osc::Message& m) {};
+	virtual void onMessage(osc::Message& m);
 
 	PresetServer &registerPresetHandler(PresetHandler &presetHandler) {
 		mPresetHandler = &presetHandler;
@@ -135,7 +135,7 @@ public:
 	/**
 	 * @brief print prints information about the server to std::out
 	 */
-	void print() {};
+	void print();
 
 	PresetServer &operator <<(PresetHandler &presetHandler) {return registerPresetHandler(presetHandler);}
 
@@ -143,10 +143,10 @@ protected:
 	static void changeCallback(int value, void *sender, void *userData);
 
 private:
-
 	osc::Recv *mServer;
 	PresetHandler *mPresetHandler;
-	std::mutex mParameterLock;
+//	std::mutex mServerLock;
+	std::string mOSCpath;
 
 };
 
