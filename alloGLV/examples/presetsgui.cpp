@@ -12,7 +12,7 @@ Parameter Red("Red", "", 0.5, "", 0.0, 1.0);
 Parameter Green("Green", "", 1.0, "", 0.0, 1.0);
 Parameter Blue("Blue", "", 0.5, "", 0.0, 1.0);
 
-PresetHandler presets;
+PresetHandler presets("presetsGUI");
 
 ParameterGUI gui;
 
@@ -42,19 +42,6 @@ public:
 		}
 	}
 
-	virtual void onKeyDown(const Keyboard &k) override
-	{
-		switch(k.key()) {
-		case '1':
-			presets.storePreset("pos");
-			std::cout << "Preset stored." << std::endl;
-			break;
-		case '2':
-			presets.recallPreset("pos");
-			std::cout << "Preset loaded." << std::endl;
-			break;
-		}
-	}
 private:
 	rnd::Random<> rng; // Random number generator
 	Light light;
@@ -63,12 +50,18 @@ private:
 
 int main(int argc, char *argv[])
 {
-	std::cout << "Press 1 to store location, 2 to recall." << std::endl;
-	presets << Number << Size << Red << Green, Blue; // Add parameters to preset handling
+	presets << Number << Size << Red << Green << Blue; // Add parameters to preset handling
+
+	// Now make control GUI
+	// You can add Parameter objects or regular GLV Widgets using the
+	// streaming operator. They will all be laid out vertically
 	gui << new glv::Label("Presets example");
 	gui << Number << Size;
 	gui << new glv::Label("Color");
 	gui << Red << Green << Blue;
+
+	// Adding a PresetHandler to a ParameterGUI creates a multi-button interface
+	// to control the presets.
 	gui << presets;
 	MyApp().start();
 	return 0;

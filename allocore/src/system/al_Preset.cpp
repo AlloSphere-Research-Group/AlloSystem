@@ -61,7 +61,26 @@ void PresetHandler::registerPresetCallback(PresetHandler::PresetChangeCallback c
 
 void PresetHandler::storePreset(std::string name)
 {
-	// TODO need to check if name contains '::' and remove as this causes
+	int index = -1;
+	for (auto preset: mPresetsMap) {
+		if (preset.second == name) {
+			index = preset.first;
+			break;
+		}
+	}
+	if (index < 0) {
+		for (auto preset: mPresetsMap) {
+			if (index <= preset.first) {
+				index = preset.first + 1;
+			}
+		} // FIXME this should look for the first "empty" preset.
+	}
+	storePreset(index, name);
+}
+
+void PresetHandler::storePreset(int index, std::string name)
+{
+	// TODO need to check if name contains ':' and remove as this causes
 	// issues with the text format for saving
 	std::lock_guard<std::mutex> lock(mFileLock);
 	std::string path = getCurrentPath();
@@ -87,7 +106,7 @@ void PresetHandler::storePreset(std::string name)
 		}
 	}
 	f.close();
-	mPresetsMap[mPresetsMap.size()] = name;
+	mPresetsMap[index] = name;
 	storePresetMap();
 }
 
@@ -151,6 +170,18 @@ void PresetHandler::recallPreset(std::string name)
 	}
 }
 
+std::string PresetHandler::recallPreset(int index)
+{
+	auto presetNameIt = mPresetsMap.find(index);
+	if (presetNameIt != mPresetsMap.end()) {
+		recallPreset(presetNameIt->second);
+		return presetNameIt->second;
+	} else {
+		std::cout << "No preset index " << index << std::endl;
+	}
+	return "";
+}
+
 std::vector<std::string> PresetHandler::availablePresets()
 {
 	std::vector<std::string> presets;
@@ -211,7 +242,7 @@ void PresetHandler::loadPresetMap()
 			std::stringstream ss(line);
 			std::string index, name;
 			std::getline(ss, index, ':');
-			std::getline(ss, name, ' ');
+			std::getline(ss, name, ':');
 			mPresetsMap[std::stoi(index)] = name;
 //			std::cout << index << ":" << name << std::endl;
 		}
@@ -240,7 +271,7 @@ void PresetHandler::storePresetMap()
 		return;
 	}
 	for(auto const &preset : mPresetsMap) {
-		std::string line = std::to_string(preset.first) + "::" + preset.second;
+		std::string line = std::to_string(preset.first) + ":" + preset.second;
 		f << line << std::endl;
 	}
 	f << "::" << std::endl;

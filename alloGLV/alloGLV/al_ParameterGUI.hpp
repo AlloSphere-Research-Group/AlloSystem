@@ -68,32 +68,37 @@ public:
 	{
 	}
 
+	~PresetButtons () {
+	}
+
 	void setPresetHandler(PresetHandler &presetHandler) {
 		mPresetHandler = &presetHandler;
 		std::vector<std::string> presets = mPresetHandler->availablePresets();
-		for(int i = 0; i < presets.size(); ++i) {
-			presetMap[i] = presets.at(i);
-		}
 	}
 
 	virtual bool onAssignData(glv::Data& d, int ind1, int ind2)
 	{
-		std::cout << ind1 + (ind2 *this->sizeX())  << std::endl;
-		auto presetName = presetMap.find(ind1 + (ind2 *this->sizeX()));
-		if (presetName != presetMap.end()) {
-			if (mStore) {
-
-			} else {
-				std::cout << "Loading preset " << std::endl;
+		d.set(true); // Always keep one button on
+		int index = ind1 + (ind2 *this->sizeX());
+		//		std::cout << index << std::endl;
+		if (mStore){
+			if (presetName == "") {
+				presetName = std::to_string(index);
 			}
+			mPresetHandler->storePreset(index, presetName);
+		} else {
+			presetName = mPresetHandler->recallPreset(index);
 		}
 		glv::Buttons::onAssignData(d, ind1, ind2);
 		return true;
 	}
+
+	bool mStore;
+	std::string presetName;
+
 private:
 	PresetHandler *mPresetHandler;
-	std::map<int, std::string> presetMap;
-	bool mStore;
+	glv::Button *mStoreButton;
 };
 
 
@@ -102,7 +107,8 @@ public:
 	ParameterGUI() :
 	    mBox(glv::Direction::S),
 	    mPresetHandler(nullptr),
-	    mPresetButtons(glv::Rect(), 10, 4, false, true)
+	    mPresetButtons(glv::Rect(), 10, 4, false, true),
+	    mButtonScale(1.0f)
 	{
 		mPresetButtons.enable(glv::Property::SelectOnDrag);
 		mPresetButtons.width(200);
@@ -159,11 +165,32 @@ public:
 			return *this;
 		}
 		mPresetHandler = &handler;
-		mPresetButtons.width(mBox.width());
+		mPresetButtons.width(240* mButtonScale);
+		mPresetButtons.height(96* mButtonScale);
 		mBox << new glv::Label("Presets");
+
+		glv::Box *nameBox = new glv::Box(glv::Direction::E);
+		glv::TextView *presetNameView = new glv::TextView;
+		*nameBox << new glv::Label("Name") << presetNameView;
+		mBox << nameBox;
 		mBox << mPresetButtons;
+		glv::Box *storeBox = new glv::Box(glv::Direction::E);
+		glv::Button *storeButton = new glv::Button(glv::Rect(150* mButtonScale, 24* mButtonScale));
+		*storeBox << new glv::Label("Store", glv::Place::CL, 0, 0) << storeButton;
+		mBox << storeBox;
+		mPresetButtons.attach(ParameterGUI::presetSavedInButton,
+		                    glv::Update::Value, (void *) storeButton);
+
 		mPresetButtons.setPresetHandler(handler);
+
+		storeButton->attachVariable(&mPresetButtons.mStore, 1);
+		presetNameView->attachVariable(&mPresetButtons.presetName, 1);
 		return *this;
+	}
+
+	static void presetSavedInButton(const glv::Notification &n) {
+		glv::Button *button = static_cast<glv::Button *>(n.receiver());
+		button->setValue(false);
 	}
 
 	static void widgetChangeCallback(const glv::Notification& n) {
@@ -182,6 +209,8 @@ public:
 		d.assign<double>(value); // We need to assign this way to avoid triggering callbacks.
 		w->lock->unlock();
 	}
+
+	void SetButtonBoxScale(float scale) {mButtonScale = scale;}
 
 	/// Add new parameter to GUI
 	ParameterGUI &operator << (Parameter& newParam){ return addParameter(newParam); }
@@ -204,6 +233,7 @@ public:
 		std::mutex *lock;
 	};
 
+
 private:
 	glv::Box mBox;
 	PresetButtons mPresetButtons;
@@ -211,6 +241,7 @@ private:
 	std::mutex mParameterGUILock;
 	std::vector<WidgetWrapper *> mWrappers;
 	PresetHandler *mPresetHandler;
+	float mButtonScale;
 };
 
 
