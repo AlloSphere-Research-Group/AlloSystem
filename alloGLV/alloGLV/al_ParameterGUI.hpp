@@ -161,8 +161,7 @@ public:
 		gui->mPresetButtons.presetName = gui->mPresetHandler->availablePresets()[index];
 		d.assign<int>(true, index); // Do it this way to avoid the GUi triggering callbacks.
 
-//		gui->mPresetButtons.setValue(index);
-		std::cout << "preset Change callback" << std::endl;
+//		std::cout << "preset Change callback" << std::endl;
 	}
 
 	static void widgetChangeCallback(const glv::Notification& n) {
