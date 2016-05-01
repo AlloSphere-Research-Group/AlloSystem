@@ -24,7 +24,6 @@ public:
   Material material; 
   
   Mesh mesh; 
-
   Pickable pickable;
   TranslateHandle th;
 
@@ -42,11 +41,6 @@ public:
 
     // Create a red spheres mesh
     addSphere(mesh,1);
-    // mesh.translate(-3,3,0);
-    // addSphere(mesh,2);
-    // mesh.translate(-2.7,2.7,0);
-    // addSphere(mesh,0.7);
-    // mesh.translate(2.7,-2.7,0);
     mesh.generateNormals();
 
     // Initialize Pickable
@@ -55,9 +49,6 @@ public:
     
     // add translate handle as child
     pickable.addChild(th);
-
-    // pickable.bb.cen.print();
-    // std::cout << std::endl; 
 
     // create window
     initWindow();
@@ -70,40 +61,26 @@ public:
   }
 
   void onDraw(Graphics& g){
-
-    pickable.pushMatrix(g);
-    
     // draw lit mesh
     g.lighting(true);
     light();
     material();
     g.color(1,1,1);
-    g.draw(mesh);
+    pickable.drawMesh(g);
+    
+    g.lighting(false);
+    pickable.drawBB(g);
 
-    // draw boundingbox
-    if(pickable.hover || pickable.selected){
-      g.lighting(false);
-      if(pickable.selected) g.color(0,1,1);
-      else g.color(1,1,1);
-      g.draw(pickable.bb.mesh);
-      g.draw(pickable.bb.tics);
-
-      if(loadedFont){
-        g.blendAdd();
-        g.color(1,1,1);
-        pickable.bb.drawLabels(g, font, nav(), Pose(), 1);
-        g.blendOff();
-      }
+    if(loadedFont){
+      g.blendAdd();
+      g.color(1,1,1);
+      pickable.drawLabels(g, font, nav());
+      g.blendOff();
     }
 
-    g.lighting(false);
     g.depthTesting(false);
-    th.draw(g,nav());    
+    pickable.drawChildren(g);
     g.depthTesting(true);
-
-
-    pickable.popMatrix(g);
-
 
   }
 

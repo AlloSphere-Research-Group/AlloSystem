@@ -42,25 +42,16 @@ public:
     nav().pos(0,0,10);
     navControl().useMouse(false);
 
-    // Create a red spheres mesh
+    // Create a torus mesh
     addTorus(mesh);
-    // mesh.translate(-3,3,0);
-    // addSphere(mesh,2);
-    // mesh.translate(-2.7,2.7,0);
-    // addSphere(mesh,0.7);
-    // mesh.translate(2.7,-2.7,0);
     mesh.generateNormals();
 
     // Initialize Pickable
     pickable.set(mesh);
-    // pickable.bb.glUnitLength = 10; // ??? this behaves weird
     
     // add translate handle as child
     pickable.addChild(rh);
     pickable.addChild(th);
-
-    // pickable.bb.cen.print();
-    // std::cout << std::endl; 
 
     // create window
     initWindow();
@@ -74,46 +65,26 @@ public:
 
   void onDraw(Graphics& g){
 
+    // draw lit mesh
     g.lighting(true);
     light();
     material();
     g.color(1,1,1);
-    // p.drawMesh(g);
-    // p.drawChildren(g);
-    // p.drawBB(g, true)
-    // p.drawChildren(g);
-
-    pickable.pushMatrix(g);
+    pickable.drawMesh(g);
     
-    // draw mesh
-    g.draw(mesh);
+    g.lighting(false);
+    pickable.drawBB(g);
 
-    // draw boundingbox
-    if(pickable.hover || pickable.selected){
-      g.lighting(false);
-      if(pickable.selected) g.color(0,1,1);
-      else g.color(1,1,1);
-      g.draw(pickable.bb.mesh);
-      g.draw(pickable.bb.tics);
-
-      if(loadedFont){
-        g.blendAdd();
-        g.color(1,1,1);
-        pickable.bb.drawLabels(g, font, nav(), Pose(), 1);
-        g.blendOff();
-      }
+    if(loadedFont){
+      g.blendAdd();
+      g.color(1,1,1);
+      pickable.drawLabels(g, font, nav());
+      g.blendOff();
     }
 
-    g.lighting(false);
     g.depthTesting(false);
-    rh.draw(g);    
-    th.draw(g,nav());
+    pickable.drawChildren(g);
     g.depthTesting(true);
-
-
-    pickable.popMatrix(g);
-
-
   }
 
   virtual void onMouseMove(const ViewpointWindow& w, const Mouse& m){
