@@ -432,7 +432,7 @@ template<class ParameterType>
 ParameterWrapper<ParameterType>::ParameterWrapper(std::string parameterName, std::string group,
           ParameterType defaultValue,
           std::string prefix) :
-    mParameterName(parameterName), mGroup(group), mPrefix(prefix)
+    mParameterName(parameterName), mGroup(group), mPrefix(prefix), mProcessCallback(nullptr)
 {
 
 	//TODO: Add better heuristics for slash handling
