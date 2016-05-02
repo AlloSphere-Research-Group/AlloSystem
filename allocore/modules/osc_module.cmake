@@ -8,6 +8,7 @@ set(OSC_HEADERS
     allocore/protocol/al_OSC.hpp
     allocore/system/al_Parameter.hpp
 	allocore/system/al_Preset.hpp
+	allocore/io/al_HtmlParameterServer.hpp
 )
 
 # for oscpack (oscpack sources are included with AlloSystem)
@@ -29,6 +30,7 @@ list(APPEND ALLOCORE_SRC
   src/protocol/al_OSC.cpp
   src/system/al_Parameter.cpp
   src/system/al_Preset.cpp
+  src/io/al_HtmlParameterServer.cpp
   )
 
 INCLUDE_DIRECTORIES("${OSCPACK_ROOT_DIR}")
