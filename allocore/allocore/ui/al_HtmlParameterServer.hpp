@@ -1,4 +1,5 @@
-
+#ifndef INCLUDE_AL_HTMLPARAMETERSERVER_HPP
+#define INCLUDE_AL_HTMLPARAMETERSERVER_HPP
 /*	Allocore --
 	Multimedia / virtual environment application class library
 
@@ -40,4 +41,63 @@
 	2016 Andres Cabrera andres@mat.ucsb.edu
 */
 
+#include <string>
+#include <iostream>
+#include <fstream>
 
+#ifndef AL_WINDOWS
+#include <stdio.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/wait.h>
+
+#define READ 0
+#define WRITE 1
+#else
+
+#endif
+
+#include "allocore/system/al_Parameter.hpp"
+
+namespace al
+{
+
+/**
+ * @brief The HtmlParameterServer class runs an html service that provides a
+ * GUI for Parameter objects. It runs interface.js in the background, so it
+ * relies on an existing working installation of interface.js and interface.simpleserver.js
+ * in particular. The class generates the html file for interface.js from
+ * the registered parameters. Because it uses Parameter obejcts, the HTML
+ * GUI can be kept in sync with other control interfaces like ParameterGUI
+ * and other devices that set the parameters via OSC.
+ */
+class HtmlParameterServer
+{
+public:
+	HtmlParameterServer(std::string pathToInterfaceJs = "../interface.js");
+	~HtmlParameterServer();
+
+	void writeHtmlFile();
+
+	HtmlParameterServer &addParameter(Parameter &param);
+
+	HtmlParameterServer &operator <<(Parameter &param) {
+		return this->addParameter(param);
+	}
+
+private:
+	void runInterfaceJs();
+	pid_t  mPid;
+	int p_stdin[2], p_stdout[2];
+
+	std::vector<Parameter *> mParameters;
+	ParameterServer mServer;
+
+	std::string mRootPath;
+};
+
+} // ::al
+
+
+
+#endif // INCLUDE_AL_HTMLPARAMETERSERVER_HPP
