@@ -3,7 +3,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "allocore/system/al_Parameter.hpp"
+#include "allocore/ui/al_Parameter.hpp"
 #include "allocore/io/al_File.hpp"
 
 using namespace al;
