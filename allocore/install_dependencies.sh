@@ -152,11 +152,25 @@ elif uname -o | grep "Msys"; then
 				wget http://www.portaudio.com/archives/$PKG.tgz
 				tar -xzf $PKG.tgz
 				mv portaudio $PKG
+				
+				DXDIR=/usr/local/dx7sdk/include
+				DXURL=https://github.com/msys2/mingw-w64/raw/master/mingw-w64-headers
+				install -d $DXDIR
+				wget --no-check-certificate $DXURL/direct-x/include/dsound.h -O $DXDIR/dsound.h
+				wget --no-check-certificate $DXURL/direct-x/include/dsconf.h -O $DXDIR/dsconf.h
+				wget --no-check-certificate $DXURL/crt/_mingw_unicode.h -O $DXDIR/_mingw_unicode.h
+				
 				cd $PKG
-					./configure --prefix=$DESTDIR
+					# MME may artificially cap channels at 2! WDMKS or DirectX is needed for multi-channel.
+					# While WDMKS is supposedly superior to DirectX, it doesn't always give us all the devices, so we just use DirectX.
+					./configure --prefix=$DESTDIR --with-winapi=wmme,directx
+					#./configure --prefix=$DESTDIR --with-winapi=wmme,wdmks
 					make install
 				cd ..
 
+				# DX7 headers only needed to build PA, so we can remove them
+				rm -rf $DXDIR/..
+				
 				# Cleanup.
 				rm -rf $PKG
 				rm $PKG.*
