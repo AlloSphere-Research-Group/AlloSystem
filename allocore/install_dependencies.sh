@@ -146,7 +146,7 @@ elif uname -o | grep "Msys"; then
 		if files_exist $DESTDIR/lib/libportaudio*; then
 			echo 'Found PortAudio'
 		else
-			PKG=pa_stable_v19_20111121
+			PKG=pa_stable_v19_20140130
 			DIR=$PWD
 			cd /tmp
 				wget http://www.portaudio.com/archives/$PKG.tgz
