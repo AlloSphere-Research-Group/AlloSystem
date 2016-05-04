@@ -1,7 +1,7 @@
 
 
 #include "allocore/io/al_App.hpp"
-#include "allocore/system/al_Parameter.hpp"
+#include "allocore/ui/al_Parameter.hpp"
 #include "alloGLV/al_ParameterGUI.hpp"
 
 using namespace al;
