@@ -1,8 +1,8 @@
 
 
 #include "allocore/io/al_App.hpp"
-#include "allocore/system/al_Parameter.hpp"
-#include "allocore/system/al_Preset.hpp"
+#include "allocore/ui/al_Parameter.hpp"
+#include "allocore/ui/al_Preset.hpp"
 
 using namespace al;
 
