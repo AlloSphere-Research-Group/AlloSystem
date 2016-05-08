@@ -56,7 +56,7 @@ void Parameter::set(float value)
 ParameterServer::ParameterServer(std::string oscAddress, int oscPort)
     : mServer(nullptr)
 {
-	mServer = new osc::Recv(oscPort, oscAddress.c_str());
+	mServer = new osc::Recv(oscPort, oscAddress.c_str(), 0.001); // Is 1ms wait OK?
 	if (mServer) {
 		mServer->handler(*this);
 		mServer->start();
