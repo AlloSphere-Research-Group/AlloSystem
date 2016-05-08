@@ -102,7 +102,7 @@ public:
 //				std::cout << (int) m.channel() << std::endl;
 				if (m.channel() == binding.channel
 				        && m.noteNumber() == binding.noteNumber) {
-					m.print();
+//					m.print();
 					mPresetHandler->recallPreset(binding.presetIndex);
 				}
 			}
