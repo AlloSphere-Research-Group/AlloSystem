@@ -10,6 +10,7 @@ set(OSC_HEADERS
 	allocore/ui/al_Preset.hpp
 	allocore/ui/al_HtmlParameterServer.hpp
 	allocore/ui/al_ParameterMIDI.hpp
+	allocore/ui/al_PresetMIDI.hpp
 )
 
 # for oscpack (oscpack sources are included with AlloSystem)

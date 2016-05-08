@@ -63,8 +63,9 @@ namespace al
  */
 class ParameterMIDI : public MIDIMessageHandler {
 public:
-	ParameterMIDI(int deviceIndex = 0) {
+	ParameterMIDI(int deviceIndex = 0, bool verbose = false) {
 		MIDIMessageHandler::bindTo(mMidiIn);
+		mVerbose = verbose;
 		mMidiIn.openPort(deviceIndex);
 		printf("Opened port to %s\n", mMidiIn.getPortName(deviceIndex).c_str());
 	}
@@ -76,7 +77,7 @@ public:
 
 	void connectControl(Parameter &param, int controlNumber, int channel,
 	                    float min, float max) {
-		ParameterBinding newBinding;
+		ControlBinding newBinding;
 		newBinding.controlNumber = controlNumber;
 		newBinding.channel = channel - 1;
 		newBinding.param = &param;
@@ -85,9 +86,39 @@ public:
 		mBindings.push_back(newBinding);
 	}
 
+	/**
+	 * @brief connectNoteToValue
+	 * @param param the parameter to bind
+	 * @param channel MIDI channel (1-16)
+	 * @param min The parameter value to map the lowest note
+	 * @param low The MIDI note number for the lowest (or only) note to map
+	 * @param max The value unto which the highest note is mapped
+	 * @param high The highest MIDI note number to map
+	 */
+	void connectNoteToValue(Parameter &param, int channel,
+	                        float min, int low,
+	                        float max = -1, int high = -1) {
+		if (high == -1) {
+			max = min;
+			high = low;
+		}
+		for (int num = low; num <= high; ++num) {
+			NoteBinding newBinding;
+			newBinding.noteNumber = num;
+			if (num != high) {
+				newBinding.value = min + (max - min) * (num - low)/(high - low);
+			} else {
+				newBinding.value = max;
+			}
+			newBinding.channel = channel - 1;
+			newBinding.param = &param;
+			mNoteBindings.push_back(newBinding);
+		}
+	}
+
 	virtual void onMIDIMessage(const MIDIMessage& m) override {
 		if (m.type() & MIDIByte::CONTROL_CHANGE ) {
-			for(ParameterBinding binding: mBindings) {
+			for(ControlBinding binding: mBindings) {
 				if (m.channel() == binding.channel
 				        && m.controlNumber() == binding.controlNumber) {
 					float newValue = binding.min + (m.controlValue() * (binding.max - binding.min));
@@ -95,19 +126,37 @@ public:
 				}
 			}
 		}
+		if (m.type() & MIDIByte::NOTE_ON && m.velocity() > 0) {
+			for(NoteBinding binding: mNoteBindings) {
+				if (m.channel() == binding.channel) {
+					binding.param->set(binding.value);
+				}
+			}
+		}
+		if (mVerbose) {
+			m.print();
+		}
 	}
 
 private:
 
-	struct ParameterBinding {
+	struct ControlBinding {
 		int controlNumber;
 		int channel;
 		Parameter *param;
 		float min, max;
 	};
+	struct NoteBinding {
+		int noteNumber;
+		int channel;
+		float value;
+		Parameter *param;
+	};
 
 	MIDIIn mMidiIn;
-	std::vector<ParameterBinding> mBindings;
+	bool mVerbose;
+	std::vector<ControlBinding> mBindings;
+	std::vector<NoteBinding> mNoteBindings;
 
 };
 
