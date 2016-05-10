@@ -604,40 +604,30 @@ Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal, vector<Vec3f> &finalPo
       }
     } else {
       //Oh noes!  It's more than a line, this is a little more complex
-      float minA2D = 0, minO2D = 0, maxA2D = x, maxO2D = 0;
-      for (int i = 0; i < P.size(); i++){
-	    std:cout << "plane intersect point " << i << ": " << P[i].x << " " << P[i].y << " " << P[i].z << std::endl;
-      }
+      float minA2D = 0, minO2D = 0, maxA2D = 0, maxO2D = 0;
       //what are all these points in 2d on a plane
-      for (int i = 2; i < P.size(); i++){
-        Vec3f c = (P[1]-P[0]).cross(P[i]-P[0]);
-        c = c/c.mag();
-        float h = sqrt(pow(P[i].x-P[0].x,2.0)+pow(P[i].y-P[0].y,2.0)+pow(P[i].z-P[0].z,2.0));
-        float a = (P[1]-P[0]).dot(P[i]-P[0])/(x);
-        float o = (h*sqrt(1-pow(a/h,2.0)))*(c.x+c.y+c.z);
-        std::cout << "c :" << c.x << " " << c.y << " " << c.z << std::endl;
-        std::cout << "a, h, o :" << a << " " << h << " " << o << std::endl;
-        minA2D = std::min(minA2D, a);
-        maxA2D = std::max(maxA2D, a);
-        minO2D = std::min(minO2D, o);
-        maxO2D = std::max(maxO2D, o);
-        p2D[i] = Vec2f(a, o);
+      //http://stackoverflow.com/questions/10702099/computing-two-vectors-that-are-perpendicular-to-third-vector-in-3d
+      Vec3f y_axis = planeNormal.cross((P[0]-planeCenter).normalize());
+      Vec3f z_axis = planeNormal.cross(y_axis);
+      //http://stackoverflow.com/questions/23472048/projecting-3d-points-to-2d-plane
+      for (int i = 0; i < P.size(); i++) {
+	Vec3f pi = P[i]-planeCenter;
+        float t_1 = y_axis.dot(pi);
+        float t_2 = z_axis.dot(pi);
+        minA2D = std::min(minA2D, t_1);
+        maxA2D = std::max(maxA2D, t_1);
+        minO2D = std::min(minO2D, t_2);
+        maxO2D = std::max(maxO2D, t_2);
+        p2D[i] = Vec2f(t_1, t_2);
       }
-      //cool now we can figure out the 4 points that define the square
       int aDirection = ceil(maxA2D - minA2D);
       int oDirection = ceil(maxO2D - minO2D);
-      std::cout << "minA2d, maxA2d, mino2D, maxo2d, aDirection, oDirection " << minA2D << " " << maxA2D << " " << minO2D << " " << maxO2D << " " << aDirection << " " << oDirection << std::endl;
+      //http://math.stackexchange.com/questions/525829/how-to-find-the-3d-coordinate-of-a-2d-point-on-a-known-plane
       result.format(1, type(), aDirection, oDirection);
-      //now what are they in 3d points
-      Vec3f Q = P[0];
-      Vec3f H = P[1]-P[0];
-      H = H/H.mag();
-      Vec3f K = planeNormal.cross(H);
-      K = K/K.mag();
-      Vec3f p0 = point2Dto3D(Q,H,K,minA2D,minO2D);
-      Vec3f p1 = point2Dto3D(Q,H,K,minA2D,maxO2D);
-      Vec3f p2 = point2Dto3D(Q,H,K,maxA2D,maxO2D);
-      Vec3f p3 = point2Dto3D(Q,H,K,maxA2D,minO2D);
+      Vec3f p0 = point2Dto3D(planeCenter,y_axis,z_axis,minA2D,minO2D);
+      Vec3f p1 = point2Dto3D(planeCenter,y_axis,z_axis,minA2D,maxO2D);
+      Vec3f p2 = point2Dto3D(planeCenter,y_axis,z_axis,maxA2D,maxO2D);
+      Vec3f p3 = point2Dto3D(planeCenter,y_axis,z_axis,maxA2D,minO2D);
       std::cout << "p0 :" << p0.x << " " << p0.y << " " << p0.z << std::endl;
       std::cout << "p1 :" << p1.x << " " << p1.y << " " << p1.z << std::endl;
       std::cout << "p2 :" << p2.x << " " << p2.y << " " << p2.z << std::endl;
@@ -646,28 +636,21 @@ Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal, vector<Vec3f> &finalPo
       vector<Vec3f> list;
       vector<Vec3f> list2;
       if (!parallelLinespace(p0, p1, p2, p3, list, list2, maxA2D-minA2D, maxO2D-minO2D, finalPointList)){
-	      if (!parallelLinespace(p0, p2, p1, p3, list, list2, maxA2D-minA2D, maxO2D-minO2D, finalPointList)){
-                parallelLinespace(p0, p3, p1, p2, list, list2, maxA2D-minA2D, maxO2D-minO2D, finalPointList);
-              }
+        if (!parallelLinespace(p0, p2, p1, p3, list, list2, maxA2D-minA2D, maxO2D-minO2D, finalPointList)){
+          parallelLinespace(p0, p3, p1, p2, list, list2, maxA2D-minA2D, maxO2D-minO2D, finalPointList);
+        }
       }
       std::cout << "finalPointList Length:" << finalPointList.size() << std::endl;
       //now lets fill the results
-//      std::cout << "size 1: " << list.size() << std::endl;
       for (int i = 0; i < list.size(); i++){
-        vector<Vec3f> space = linspace(list[i], list2[i], oDirection);
-//        std::cout << "size 2: " << space.size() << std::endl;
+        vector<Vec3f> space = linspace(list[i], list2[i], oDirection);  //XXX should this be oDirection or aDirection, please check!
         for (int j = 0; j < space.size(); j++){
-//	  std::cout << "j is " << j << std::endl;
-//	  std::cout << "space[j] is " << space[j].x << " " << space[j].y << " " << space[j].z << std::endl;
 	  Vec3f point = space[j];
    	  float temp[1] = {0};
 	  if (point.x >= 0 and point.y >= 0 and point.z >= 0 and point.x <=  width()* m_voxWidth[2] and point.y <=  height()* m_voxWidth[1] and point.z <=  depth()* m_voxWidth[2]){
- //    	    std::cout << "why not" << std::endl;
  	    Vec3f p = Vec3f(point.x/ m_voxWidth[0],point.y/ m_voxWidth[1],point.z/ m_voxWidth[2]);
   	     read_interp(temp, p);
-//  	    std::cout << "why not now" << std::endl;
 	  }
-//	  std::cout << "temp is " << temp[0] << std::endl;
 	  result.write(temp,i,j);
 	}
       }
