@@ -44,8 +44,11 @@
 #include <vector>
 #include <mutex>
 #include <map>
+#include <thread>
+#include <condition_variable>
 
-#include "allocore/system/al_Parameter.hpp"
+#include "allocore/ui/al_Parameter.hpp"
+#include "allocore/system/al_Time.hpp"
 
 namespace  al
 {
@@ -66,6 +69,8 @@ public:
 
 	PresetHandler &registerParameter(Parameter &parameter);
 
+	~PresetHandler();
+
 	void storePreset(std::string name);
 
 	void storePreset(int index, std::string name);
@@ -75,6 +80,8 @@ public:
 	std::string recallPreset(int index);
 
 	std::map<int, std::string> availablePresets();
+
+	void setMorphTime(float time);
 
 	void setSubDirectory(std::string directory);
 
@@ -95,6 +102,9 @@ private:
 	std::string getCurrentPath();
 	void loadPresetMap();
 	void storePresetMap();
+	std::map<std::string, float> loadPresetValues(std::string name);
+
+	static void morphingFunction(PresetHandler *handler);
 
 	bool mVerbose;
 	std::string mRootDir;
@@ -102,6 +112,17 @@ private:
 	std::string mFileName;
 	std::vector<Parameter *> mParameters;
 	std::mutex mFileLock;
+	bool mRunning; // To keep the morphing thread alive
+	bool mMorph; // To be able to trip and stop morphing at any time.
+	int mMorphRemainingSteps;
+	double mMorphInterval;
+	double mMorphTime;
+
+	std::mutex mTargetLock;
+	std::condition_variable mMorphConditionVar;
+	std::map<std::string, float> mTargetValues;
+
+	std::thread mMorphingThread;
 
 	std::vector<PresetChangeCallback> mCallbacks;
 	std::vector<void *> mCallbackUdata;

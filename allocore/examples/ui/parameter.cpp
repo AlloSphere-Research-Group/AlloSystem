@@ -1,7 +1,7 @@
 
 #include <iostream>
 
-#include "allocore/system/al_Parameter.hpp"
+#include "allocore/ui/al_Parameter.hpp"
 #include "allocore/system/al_PeriodicThread.hpp"
 #include "allocore/io/al_AudioIO.hpp"
 #include "allocore/system/al_MainLoop.hpp"

@@ -4,7 +4,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "allocore/system/al_Preset.hpp"
+#include "allocore/ui/al_Preset.hpp"
 #include "allocore/io/al_File.hpp"
 
 using namespace al;
@@ -13,7 +13,9 @@ using namespace al;
 // PresetHandler --------------------------------------------------------------
 
 PresetHandler::PresetHandler(std::string rootDirectory, bool verbose) :
-    mRootDir(rootDirectory), mVerbose(verbose)
+    mRootDir(rootDirectory), mVerbose(verbose),
+    mRunning(true), mMorphingThread(PresetHandler::morphingFunction, this),
+    mMorphInterval(0.05)
 {
 	if (!File::exists(rootDirectory)) {
 		if (!Dir::make(rootDirectory, true)) {
@@ -21,6 +23,14 @@ PresetHandler::PresetHandler(std::string rootDirectory, bool verbose) :
 		}
 	}
 	loadPresetMap();
+}
+
+PresetHandler::~PresetHandler()
+{
+	mRunning = false;
+//	std::lock_guard<std::mutex> lk(mTargetLock);
+	mMorphConditionVar.notify_one();
+	mMorphingThread.join();
 }
 
 PresetHandler &PresetHandler::registerParameter(Parameter &parameter)
@@ -113,57 +123,13 @@ void PresetHandler::storePreset(int index, std::string name)
 
 void PresetHandler::recallPreset(std::string name)
 {
-	std::lock_guard<std::mutex> lock(mFileLock);
-	std::string path = getCurrentPath();
-	if (path.back() != '/') {
-		path += "/";
+	{
+		std::lock_guard<std::mutex> lk(mTargetLock);
+		mTargetValues = loadPresetValues(name);
+		mMorphRemainingSteps =  1 + mMorphTime / mMorphInterval;
 	}
-	std::string line;
-	std::ifstream f(path + name + ".preset");
-	if (!f.is_open()) {
-		if (mVerbose) {
-			std::cout << "Error while opening preset file: " << mFileName << std::endl;
-		}
-	}
-	while(getline(f, line)) {
-		if (line.substr(0, 2) == "::") {
-			if (mVerbose) {
-				std::cout << "Found preset : " << line << std::endl;
-			}
-			while (getline(f, line)) {
-				if (line.substr(0, 2) == "::") {
-					if (mVerbose) {
-						std::cout << "End preset."<< std::endl;
-					}
-					break;
-				}
-				bool parameterFound = false;
-				std::stringstream ss(line);
-				std::string address, type, value;
-				std::getline(ss, address, ' ');
-				std::getline(ss, type, ' ');
-				std::getline(ss, value, ' ');
-				for(Parameter *param: mParameters) {
-					if (param->getFullAddress() == address) {
-						if (type == "f") {
-							param->set(std::stof(value));
-							parameterFound = true;
-							break;
-						}
-					}
-				}
-				if (!parameterFound && mVerbose) {
-					std::cout << "Preset in parameter not present: " << address;
-				}
-			}
-		}
-	}
-	if (f.bad()) {
-		if (mVerbose) {
-			std::cout << "Error while writing preset file: " << mFileName << std::endl;
-		}
-	}
-	f.close();
+	mMorphConditionVar.notify_one();
+
 	int index = -1;
 	for (auto preset: mPresetsMap) {
 		if (preset.second == name) {
@@ -193,6 +159,11 @@ std::string PresetHandler::recallPreset(int index)
 std::map<int, std::string> PresetHandler::availablePresets()
 {
 	return mPresetsMap;
+}
+
+void PresetHandler::setMorphTime(float time)
+{
+	mMorphTime = time;
 }
 
 std::string PresetHandler::getCurrentPath()
@@ -288,6 +259,95 @@ void PresetHandler::storePresetMap()
 		}
 	}
 	f.close();
+}
+
+void PresetHandler::morphingFunction(al::PresetHandler *handler) {
+	while(handler->mRunning) {
+		{
+			std::unique_lock<std::mutex> lk(handler->mTargetLock);
+			handler->mMorphConditionVar.wait(lk);
+//			lk.unlock();
+		}
+		while (--handler->mMorphRemainingSteps >= 0) {
+			for (Parameter *param: handler->mParameters) {
+				float paramValue = param->get();
+				if (handler->mTargetValues.find(param->getFullAddress()) != handler->mTargetValues.end()) {
+					float difference =  handler->mTargetValues[param->getFullAddress()] - paramValue;
+					if (handler->mMorphRemainingSteps == 0) {
+						difference = difference;
+					} else {
+						difference = difference/(handler->mMorphRemainingSteps + 1);
+					}
+					float newVal = paramValue + difference;
+					param->set(newVal);
+				}
+			}
+			al::wait(handler->mMorphInterval);
+		}
+//		// Set final values
+//		for (Parameter param: mParameters) {
+//			if (preset.find(param.getName()) != preset.end()) {
+//				param.set(preset[param.getName()]);
+//			}
+//		}
+	}
+}
+
+std::map<std::string, float> PresetHandler::loadPresetValues(std::string name)
+{
+	std::map<std::string, float> preset;
+	std::lock_guard<std::mutex> lock(mFileLock);
+	std::string path = getCurrentPath();
+	if (path.back() != '/') {
+		path += "/";
+	}
+	std::string line;
+	std::ifstream f(path + name + ".preset");
+	if (!f.is_open()) {
+		if (mVerbose) {
+			std::cout << "Error while opening preset file: " << mFileName << std::endl;
+		}
+	}
+	while(getline(f, line)) {
+		if (line.substr(0, 2) == "::") {
+			if (mVerbose) {
+				std::cout << "Found preset : " << line << std::endl;
+			}
+			while (getline(f, line)) {
+				if (line.substr(0, 2) == "::") {
+					if (mVerbose) {
+						std::cout << "End preset."<< std::endl;
+					}
+					break;
+				}
+				bool parameterFound = false;
+				std::stringstream ss(line);
+				std::string address, type, value;
+				std::getline(ss, address, ' ');
+				std::getline(ss, type, ' ');
+				std::getline(ss, value, ' ');
+				for(Parameter *param: mParameters) {
+					if (param->getFullAddress() == address) {
+						if (type == "f") {
+							preset.insert(std::pair<std::string,float>(address,std::stof(value)));
+							parameterFound = true;
+							break;
+						}
+					}
+				}
+				if (!parameterFound && mVerbose) {
+					std::cout << "Preset in parameter not present: " << address;
+				}
+			}
+		}
+	}
+	if (f.bad()) {
+		if (mVerbose) {
+			std::cout << "Error while writing preset file: " << mFileName << std::endl;
+		}
+	}
+	f.close();
+	return preset;
 }
 
 

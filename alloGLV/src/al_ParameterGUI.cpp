@@ -44,6 +44,16 @@ ParameterGUI &ParameterGUI::registerPresetHandler(PresetHandler &handler) {
 	glv::Button *storeButton = new glv::Button(glv::Rect(150* mButtonScale, 24* mButtonScale));
 	*storeBox << new glv::Label("Store", glv::Place::CL, 0, 0) << storeButton;
 	mBox << storeBox;
+
+	glv::NumberDialer *morphTime = new glv::NumberDialer(2,2, 20, 0);
+	mBox << morphTime;
+	morphTime->attach([](const glv::Notification &n) {
+		glv::Widget &sender = *n.sender<glv::Widget>();
+		static_cast<PresetHandler *>(n.receiver())->setMorphTime(sender.getValue<double>());
+		std::cout << sender.getValue<double>() << std::endl;},
+	glv::Update::Value, &handler);
+
+
 	mPresetButtons.attach(ParameterGUI::presetSavedInButton,
 	                      glv::Update::Value, (void *) storeButton);
 
