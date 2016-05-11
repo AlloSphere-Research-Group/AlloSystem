@@ -257,9 +257,9 @@ public:
   
   Vec3f point2Dto3D(Vec3f Q, Vec3f H, Vec3f K, float u, float v);
   
-  bool parallelLinespace(Vec3f p0, Vec3f p1, Vec3f p2, Vec3f p3, vector<Vec3f> &list, vector<Vec3f> &list2, float aDirection, float oDirection);
+  bool parallelLinespace(Vec3f p0, Vec3f p1, Vec3f p2, Vec3f p3, vector<Vec3f> &list, vector<Vec3f> &list2, float aDirection, float oDirection, vector<Vec3f> &points);
   
-  Array slice(Vec3f planeCenter, Vec3f planeNormal);
+  Array slice(Vec3f planeCenter, Vec3f planeNormal, vector<Vec3f> &finalPointList);
 
   // mostly for saving partial changes into mrc header.
   bool writeToMRC(std::string filename, MRCHeader& header);

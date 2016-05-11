@@ -376,9 +376,9 @@ void Vbap::findSpeakerTriplets(const std::vector<Speaker>& spkrs){
 	}
 }
 
-void Vbap::makePhantomChannel(int channelIndex, std::vector<int> assignedSpeakers)
+void Vbap::makePhantomChannel(int channelIndex, std::vector<int> assignedOutputs)
 {
-	mPhantomChannels[channelIndex] = assignedSpeakers;
+	mPhantomChannels[channelIndex] = assignedOutputs;
 }
 
 void Vbap::compile(Listener& listener){
@@ -437,24 +437,30 @@ void Vbap::perform(AudioIOData& io,SoundSource& src,Vec3d& relpos,const int& num
 
 			for(int i = 0; i < numFrames; ++i){
 				if (it1 != mPhantomChannels.end()) { // vertex 1 is phantom
-					float splitGain = gains[0]* gains[0] /2.0;
-					outBuff2[i] += samples[i]*splitGain;
-					outBuff3[i] += samples[i]*splitGain;
+					float splitGain = gains[0] /mPhantomChannels.size();
+					float splitGainSQ = splitGain * splitGain;
+					for(auto const &element : it1->second) { // iterate across all assigned speakers
+						io.out(element, i) += samples[i]*splitGainSQ;
+					}
 				} else {
 					outBuff1[i] += samples[i]*gains[0];
 				}
 				if (it2 != mPhantomChannels.end()) { // vertex 2 is phantom
-					float splitGain = gains[1]* gains[1] /2.0;
-					outBuff1[i] += samples[i]*splitGain;
-					outBuff3[i] += samples[i]*splitGain;
+					float splitGain = gains[1] /mPhantomChannels.size();
+					float splitGainSQ = splitGain * splitGain;
+					for(auto const &element : it2->second) {
+						io.out(element, i) += samples[i]*splitGainSQ;
+					}
 				} else {
 					outBuff2[i] += samples[i]*gains[1];
 				}
 				if(mIs3D){
-					if (it2 != mPhantomChannels.end()) {
-						float splitGain = gains[2]* gains[2] /2.0;
-						outBuff1[i] += samples[i]*splitGain;
-						outBuff2[i] += samples[i]*splitGain;
+					if (it3 != mPhantomChannels.end()) {
+						float splitGain = gains[2] /mPhantomChannels.size();
+						float splitGainSQ = splitGain * splitGain;
+						for(auto const &element : it3->second) {
+							io.out(element, i) += samples[i]*splitGainSQ;
+						}
 					} else {
 						outBuff3[i] += samples[i]*gains[2];
 					}

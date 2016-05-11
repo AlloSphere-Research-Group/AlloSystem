@@ -84,31 +84,28 @@ public:
 	}
 
 
-    void posCart2(Vec3d xyz){
-        using namespace std;
+	void posCart2(Vec3d xyz){
+		using namespace std;
 
-        radius =  sqrt((xyz[0]*xyz[0])+(xyz[1]*xyz[1])+(xyz[2]*xyz[2]));
-        float gd = sqrt((xyz[0]*xyz[0])+(xyz[1]*xyz[1]));
-        elevation = atan2(xyz[2],gd)*180.f/M_PI;
-        azimuth = atan2(xyz[0],xyz[1])*180.f/M_PI;
+		radius =  sqrt((xyz[0]*xyz[0])+(xyz[1]*xyz[1])+(xyz[2]*xyz[2]));
+		float gd = sqrt((xyz[0]*xyz[0])+(xyz[1]*xyz[1]));
+		elevation = atan2(xyz[2],gd)*180.f/M_PI;
+		azimuth = atan2(xyz[0],xyz[1])*180.f/M_PI;
 
-    }
+	}
 
 	/// Get position as Cartesian coordinate
-    Vec3d vec() const {
-
-        //TODO doxygen style commenting on coordinates like ambisonics
-
-
+	Vec3d vec() const {
+		//TODO doxygen style commenting on coordinates like ambisonics
 		double cosel = cos(toRad(elevation));
-        double x = sin(toRad(azimuth)) * cosel * radius;
-        double y = cos(toRad(azimuth)) * cosel * radius;
-        double z = sin(toRad(elevation)) * radius;
-        //Ryan: the standard conversions assume +z is up, these are correct for allocore
+		double x = sin(toRad(azimuth)) * cosel * radius;
+		double y = cos(toRad(azimuth)) * cosel * radius;
+		double z = sin(toRad(elevation)) * radius;
+		//Ryan: the standard conversions assume +z is up, these are correct for allocore
 
-//        double x = sin(toRad(azimuth)) * cosel * radius;
-//		double y = sin(toRad(elevation)) * radius;
-//        double z = -1*cos(toRad(azimuth)) * cosel * radius;
+		//        double x = sin(toRad(azimuth)) * cosel * radius;
+		//		double y = sin(toRad(elevation)) * radius;
+		//        double z = -1*cos(toRad(azimuth)) * cosel * radius;
 		return Vec3d(x,y,z);
 	}
 

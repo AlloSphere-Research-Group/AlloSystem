@@ -6,7 +6,11 @@ message(STATUS "Building OSC module.")
 
 set(OSC_HEADERS
     allocore/protocol/al_OSC.hpp
-    allocore/system/al_Parameter.hpp
+    allocore/ui/al_Parameter.hpp
+	allocore/ui/al_Preset.hpp
+	allocore/ui/al_HtmlParameterServer.hpp
+	allocore/ui/al_ParameterMIDI.hpp
+	allocore/ui/al_PresetMIDI.hpp
 )
 
 # for oscpack (oscpack sources are included with AlloSystem)
@@ -26,7 +30,10 @@ list(APPEND ALLOCORE_SRC
   ${OSCPACK_ROOT_DIR}/oscpack/osc/OscReceivedElements.cpp
   ${OSCPACK_ROOT_DIR}/oscpack/osc/OscTypes.cpp
   src/protocol/al_OSC.cpp
-  src/system/al_Parameter.cpp)
+  src/ui/al_Parameter.cpp
+  src/ui/al_Preset.cpp
+  src/ui/al_HtmlParameterServer.cpp
+  )
 
 INCLUDE_DIRECTORIES("${OSCPACK_ROOT_DIR}")
 
