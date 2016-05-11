@@ -12,7 +12,7 @@ struct RotateHandle : PickableBase {
   bool hover[3] = {false,false,false};
   bool selected[3] = {false,false,false};
 
-  RotateHandle(){ 
+  RotateHandle(){
     rotate = Quatf::identity();
   }
 
@@ -49,7 +49,7 @@ struct RotateHandle : PickableBase {
     for (int i = 0; i < 3; i++){
       g.pushMatrix();
         g.translate(pose.pos());
-        g.color(i==0,i==1,i==2);
+        // g.color(i==0,i==1,i==2); //KK: affects the rest of the draw call
         switch(i){
           case 0: q.fromEuler(M_PI/2,0,0); break;
           case 1: q.fromEuler(0,-M_PI/2,0); break;
@@ -133,7 +133,7 @@ struct RotateHandle : PickableBase {
         return true;
       }
     }
-    return false;  
+    return false;
   }
 
   bool onDrag(Rayd &r, double t, bool child){
@@ -152,17 +152,17 @@ struct RotateHandle : PickableBase {
             parent->pose.pos() += p1-p2;
           }
           return true;
-        } 
+        }
       }
     }
     return false;
   }
 
-  bool onUnpick(Rayd &r, double t, bool child){ 
+  bool onUnpick(Rayd &r, double t, bool child){
     for(int i=0; i < 3; i++) selected[i] = false;
-    return false; 
+    return false;
   }
-  
+
 };
 
 } // ::al::

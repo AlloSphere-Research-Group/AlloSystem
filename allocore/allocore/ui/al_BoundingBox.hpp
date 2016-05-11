@@ -78,11 +78,9 @@ struct BoundingBox {
   }
 
   void drawLabelsOmni(Graphics &g, Font &font, Pose cam_pose, Pose obj_pose, float obj_scale){
-    
+
     // Handle depth test so they're sorted and properly transparent
     g.polygonMode(Graphics::FILL);
-    glAlphaFunc(GL_GREATER, 0.5);
-    glEnable(GL_ALPHA_TEST);
 
     Vec3f halfDim = dim / 2;
 
@@ -99,7 +97,7 @@ struct BoundingBox {
             if (axis == 0)      xform = Vec3d(((i/glUnitLength)*10) - halfDim.x + (1/glUnitLength), -halfDim.y, 0);
             else if (axis == 1) xform = Vec3d(-halfDim.x, ((i/glUnitLength)*10) - halfDim.y - (1/glUnitLength), 0);
             else if (axis == 2) xform = Vec3d(-halfDim.x, -halfDim.y, ((i/glUnitLength)*10 + (1/glUnitLength)));
-            
+
             xform = xform + Vec3f(cen.x, cen.y, cen.z-(dim.z/2));
 
             // move number to current draw pos
@@ -111,7 +109,7 @@ struct BoundingBox {
             g.translate(xform);
             g.color(1,1,1);
             g.scale(.0028);
-            
+
             // vector from source to destination, camera up vector
             Vec3d forward = Vec3d(cam_pose.pos() - xform).normalize();
             Quatd rot = Quatd::getBillboardRotation(forward, cam_pose.uu());
@@ -129,7 +127,6 @@ struct BoundingBox {
       }
     }
 
-    glDisable(GL_ALPHA_TEST);
   }
 
   // tic marks
@@ -206,7 +203,7 @@ struct BoundingBox {
         // x tics
         for (int x = 0; x <= dim.x*glUnitLength; x++){
           for (int z = 0; z <= dim.z*glUnitLength; z++){
-            if ( x%inc==0 && z%inc==0 ) { 
+            if ( x%inc==0 && z%inc==0 ) {
               gridMesh[gridNum].vertex((x/glUnitLength)-halfDim.x, -halfDim.y, z/glUnitLength);
               gridMesh[gridNum].vertex((x/glUnitLength)-halfDim.x, halfDim.y, z/glUnitLength);
             }
@@ -224,7 +221,7 @@ struct BoundingBox {
         // y tics
         for (int y = 0; y <= dim.y*glUnitLength; y++){
           for (int z = 0; z <= dim.z*glUnitLength; z++){
-            if ( y%inc==0 && z%inc==0 ) { 
+            if ( y%inc==0 && z%inc==0 ) {
               gridMesh[gridNum].vertex(-halfDim.x, (y/glUnitLength)-halfDim.y, z/glUnitLength);
               gridMesh[gridNum].vertex(halfDim.x, (y/glUnitLength)-halfDim.y, z/glUnitLength);
             }
