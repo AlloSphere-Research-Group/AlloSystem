@@ -1,11 +1,16 @@
-#ifndef AL_WINDOWS
-#include <stdlib.h> // realpath (POSIX only)
-#endif
-
 #include <cstring>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "allocore/io/al_File.hpp"
+#include "allocore/system/al_Config.h"
+#ifndef AL_WINDOWS
+#include <stdlib.h> // realpath (POSIX only)
+#include <unistd.h> // getcwd (POSIX only)
+#define platform_getcwd getcwd
+#else
+#include <direct.h> // _getcwd
+#define platform_getcwd _getcwd
+#endif
 
 namespace al{
 
@@ -244,7 +249,7 @@ void SearchPaths::addAppPaths(int argc, char * const argv[], bool recursive) {
 
 void SearchPaths::addAppPaths(bool recursive) {
 	char cwd[4096];
-	if(getcwd(cwd, sizeof(cwd))){
+	if(platform_getcwd(cwd, sizeof(cwd))){
 		mAppPath = std::string(cwd) + "/";
 		addSearchPath(mAppPath, recursive);
 	}
