@@ -590,7 +590,7 @@ Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal, std::vector<Vec3f> &fi
       x = ceil(x);
       result.format(1, type(), x);
       std::vector<Vec3f> space = linspace(P[0], P[1], x);
-      for (int j = 0; j < space.size(); j++){
+      for (unsigned j = 0; j < space.size(); j++){
         Vec3f point = space[j];
         float temp[1] = {0};
         if (point.x >= 0 and point.y >= 0 and point.z >= 0 and point.x <=  width()* m_voxWidth[2] and point.y <=  height()* m_voxWidth[1] and point.z <=  depth()* m_voxWidth[2]){
@@ -607,7 +607,7 @@ Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal, std::vector<Vec3f> &fi
       Vec3f y_axis = planeNormal.cross((P[0]-planeCenter).normalize());
       Vec3f z_axis = planeNormal.cross(y_axis);
       //http://stackoverflow.com/questions/23472048/projecting-3d-points-to-2d-plane
-      for (int i = 0; i < P.size(); i++) {
+      for (unsigned i = 0; i < P.size(); i++) {
 	Vec3f pi = P[i]-planeCenter;
         float t_1 = y_axis.dot(pi);
         float t_2 = z_axis.dot(pi);
@@ -639,9 +639,9 @@ Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal, std::vector<Vec3f> &fi
       }
       std::cout << "finalPointList Length:" << finalPointList.size() << "\n";
       //now lets fill the results
-      for (int i = 0; i < list.size(); i++){
+      for (unsigned i = 0; i < list.size(); i++){
         std::vector<Vec3f> space = linspace(list[i], list2[i], oDirection);  //XXX should this be oDirection or aDirection, please check!
-        for (int j = 0; j < space.size(); j++){
+        for (unsigned j = 0; j < space.size(); j++){
 	  Vec3f point = space[j];
    	  float temp[1] = {0};
 	  if (point.x >= 0 and point.y >= 0 and point.z >= 0 and point.x <=  width()* m_voxWidth[2] and point.y <=  height()* m_voxWidth[1] and point.z <=  depth()* m_voxWidth[2]){
