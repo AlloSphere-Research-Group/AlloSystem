@@ -198,6 +198,14 @@ FilePath::FilePath(const std::string& fullpath) {
 }
 
 
+void FileList::print() const {
+	printf("FileList:\n");
+	std::vector<FilePath>::const_iterator it = mFiles.begin();
+	while (it != mFiles.end()) {
+		const FilePath& f = (*it++);
+		printf("%s\n", f.filepath().c_str());
+	}
+}
 
 
 SearchPaths::SearchPaths(const std::string& file) {
