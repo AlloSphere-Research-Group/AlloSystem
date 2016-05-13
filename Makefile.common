@@ -61,6 +61,9 @@ else
 endif
 
 
+CXXFLAGS += -std=c++11
+
+
 #
 USING_PUREDYNE	= 0
 
