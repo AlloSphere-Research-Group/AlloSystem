@@ -246,23 +246,23 @@ void Voxels::print(FILE * fp) {
   fprintf(fp,"  cell:   %s, %s, %s\n", printVoxWidth(0).c_str(), printVoxWidth(1).c_str(), printVoxWidth(2).c_str());
 }
 
-bool Voxels::getdir(std::string dir, vector<std::string> &files) {
-    DIR *dp;
-    struct dirent * dirp;
-    if((dp = opendir(dir.c_str())) == NULL)	{
-      //cout << "Error(" << errno << ") opening " << dir << endl;
-      return false;
-    }
-    while((dirp = readdir(dp)) != NULL) {
-      char *name = dirp->d_name;
-      if (strcmp(name, ".") && strcmp(name, "..") && strcmp(name, "info.txt") && strcmp(name, ".DS_Store")) {
-      	cout << name << endl;
-      	files.push_back(dir + "/" + string(name));
-      }
-    }
-    closedir(dp);
-    return true;
-  }
+bool Voxels::getdir(std::string path, vector<std::string> &files) {
+	al::Dir dir;
+	if(dir.open(path)){
+		while(dir.read()){
+			auto& file = dir.entry();
+			if(file.type() == al::FileInfo::REG){
+				auto& name = file.name();
+				if(name != "info.txt" && name != ".DS_Store"){
+					cout << name << endl;
+					files.push_back(path + "/" + name);
+				}
+			}
+		}
+		return true;
+	}
+	return false;
+}
   
     
 bool Voxels::parseInfo(std::string dir, vector<std::string> &data) {
