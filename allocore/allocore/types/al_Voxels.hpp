@@ -50,15 +50,13 @@
 //#include <stdlib.h>
 #include <cmath>
 #include <string>
-#include <sstream>  
-#include <dirent.h>
+#include <sstream>
 #include <cassert>
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include "allocore/types/al_Array.hpp"
 #include "allocore/types/al_Conversion.hpp"
-#include "allocore/io/al_File.hpp"
 #include "allocore/graphics/al_Image.hpp"
 
 using namespace al;
