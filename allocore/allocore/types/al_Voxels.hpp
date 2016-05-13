@@ -56,8 +56,6 @@
 #include "allocore/types/al_Array.hpp"
 #include "allocore/types/al_Conversion.hpp"
 
-using namespace al;
-using namespace std;
 
 namespace al {
 
@@ -239,22 +237,27 @@ public:
   bool loadFromMRC(std::string filename, UnitsTy ty, float voxWidthX, float voxWidthY, float voxWidthZ);
 
   //functions for loading from images
-  bool getdir(std::string dir, vector<std::string> &files);
+  bool getdir(std::string dir, std::vector<std::string> &files);
 
-  bool parseInfo(std::string dir, vector<std::string> &data);
+  bool parseInfo(std::string dir, std::vector<std::string> &data);
 
-  bool loadFromDirectory(string dir);
+  bool loadFromDirectory(std::string dir);
   
   //functions for slicing
   bool linePlaneIntersection(const Vec3f &P0, const Vec3f &P1, const Vec3f &planeCenter, const Vec3f &planeNormal, Vec3f* intersection);
   
-  vector<Vec3f> linspace( Vec3f a, Vec3f b, int n);
+  std::vector<Vec3f> linspace( Vec3f a, Vec3f b, int n);
   
   Vec3f point2Dto3D(Vec3f Q, Vec3f H, Vec3f K, float u, float v);
   
-  bool parallelLinespace(Vec3f p0, Vec3f p1, Vec3f p2, Vec3f p3, vector<Vec3f> &list, vector<Vec3f> &list2, float aDirection, float oDirection, vector<Vec3f> &points);
+  bool parallelLinespace(
+	Vec3f p0, Vec3f p1, Vec3f p2, Vec3f p3,
+	std::vector<Vec3f> &list, std::vector<Vec3f> &list2,
+	float aDirection, float oDirection,
+	std::vector<Vec3f> &points
+  );
   
-  Array slice(Vec3f planeCenter, Vec3f planeNormal, vector<Vec3f> &finalPointList);
+  Array slice(Vec3f planeCenter, Vec3f planeNormal, std::vector<Vec3f> &finalPointList);
 
   // mostly for saving partial changes into mrc header.
   bool writeToMRC(std::string filename, MRCHeader& header);
