@@ -1,3 +1,4 @@
+#include <algorithm> // std::max
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -124,7 +125,7 @@ void MsgQueue :: update(al_sec until, bool defer) {
 
 		// only call if it has data associated:
 		//if (m->args) {
-			mNow = AL_MAX(mNow, m->t);
+			mNow = std::max(mNow, m->t);
 			(m->func)(mNow, m->args());
 		//}
 
