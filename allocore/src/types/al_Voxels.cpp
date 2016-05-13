@@ -1,8 +1,8 @@
-#include <string>
-#include <iostream>
+//#include <cassert>
 #include "allocore/types/al_Voxels.hpp"
 #include "allocore/io/al_File.hpp"
 #include "allocore/system/al_Printing.hpp"
+#include "allocore/graphics/al_Image.hpp"
 
 namespace al {
 
