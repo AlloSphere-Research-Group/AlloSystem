@@ -1,4 +1,5 @@
 //#include <cassert>
+#include <algorithm> // min,max
 #include "allocore/types/al_Voxels.hpp"
 #include "allocore/io/al_File.hpp"
 #include "allocore/system/al_Printing.hpp"
@@ -476,7 +477,7 @@ bool Voxels::linePlaneIntersection(const Vec3f &P0, const Vec3f &P1, const Vec3f
 
    float u = nDot20/nDot10;
 
-   if (u > 1.0 or u < 0.0) {
+   if (u > 1.0 || u < 0.0) {
      return false;
    }
 
@@ -593,7 +594,7 @@ Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal, std::vector<Vec3f> &fi
       for (unsigned j = 0; j < space.size(); j++){
         Vec3f point = space[j];
         float temp[1] = {0};
-        if (point.x >= 0 and point.y >= 0 and point.z >= 0 and point.x <=  width()* m_voxWidth[2] and point.y <=  height()* m_voxWidth[1] and point.z <=  depth()* m_voxWidth[2]){
+        if (point.x >= 0 && point.y >= 0 && point.z >= 0 && point.x <=  width()* m_voxWidth[2] && point.y <=  height()* m_voxWidth[1] && point.z <=  depth()* m_voxWidth[2]){
           Vec3f p = Vec3f(point.x/ m_voxWidth[0],point.y/ m_voxWidth[1],point.z/ m_voxWidth[2]);
            read_interp(temp, p);
         }
@@ -644,7 +645,7 @@ Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal, std::vector<Vec3f> &fi
         for (unsigned j = 0; j < space.size(); j++){
 	  Vec3f point = space[j];
    	  float temp[1] = {0};
-	  if (point.x >= 0 and point.y >= 0 and point.z >= 0 and point.x <=  width()* m_voxWidth[2] and point.y <=  height()* m_voxWidth[1] and point.z <=  depth()* m_voxWidth[2]){
+	  if (point.x >= 0 && point.y >= 0 && point.z >= 0 && point.x <=  width()* m_voxWidth[2] && point.y <=  height()* m_voxWidth[1] && point.z <=  depth()* m_voxWidth[2]){
  	    Vec3f p = Vec3f(point.x/ m_voxWidth[0],point.y/ m_voxWidth[1],point.z/ m_voxWidth[2]);
   	     read_interp(temp, p);
 	  }
@@ -660,7 +661,7 @@ Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal, std::vector<Vec3f> &fi
     result.format(1, type(),1);
     Vec3f point = P[0];
     float temp[1] = {0};
-    if (point.x >= 0 and point.y >= 0 and point.z >= 0 and point.x <=  width()* m_voxWidth[2] and point.y <=  height()* m_voxWidth[1] and point.z <=  depth()* m_voxWidth[2]){
+    if (point.x >= 0 && point.y >= 0 && point.z >= 0 && point.x <=  width()* m_voxWidth[2] && point.y <=  height()* m_voxWidth[1] && point.z <=  depth()* m_voxWidth[2]){
       Vec3f p = Vec3f(point.x/ m_voxWidth[0],point.y/ m_voxWidth[1],point.z/ m_voxWidth[2]);
        read_interp(temp, p);
     }
