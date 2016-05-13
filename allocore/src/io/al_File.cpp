@@ -1,3 +1,7 @@
+#ifndef AL_WINDOWS
+#include <stdlib.h> // realpath (POSIX only)
+#endif
+
 #include <cstring>
 #include <sys/types.h>
 #include <sys/stat.h>

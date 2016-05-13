@@ -43,14 +43,9 @@
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
-
-#include <limits.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <string>
 #include <list>
-
 #include "allocore/system/al_Config.h"
 
 #ifndef AL_FILE_DELIMITER_STR
