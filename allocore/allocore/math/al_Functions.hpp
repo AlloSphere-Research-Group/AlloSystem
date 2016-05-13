@@ -58,7 +58,7 @@
 namespace al {
 
 /// Returns absolute value
-template<class T> T abs(const T& v){ return std::abs(v); }
+template<class T> T abs(const T& v);
 
 /// Return whether two floats are almost equal
 
@@ -503,6 +503,10 @@ namespace{
 	};
 }
 
+template<> inline float abs<float>(const float& v){ return std::abs(v); }
+template<> inline double abs<double>(const double& v){ return std::abs(v); }
+TEM inline T abs(const T& v){ return v>T(0) ? v : -v; }
+
 inline bool aeq(float a, float b, int maxULP){
 	// Make sure maxULP is non-negative and small enough that the
 	// default NAN won't compare as equal to anything.
@@ -513,7 +517,7 @@ inline bool aeq(float a, float b, int maxULP){
 	// Make ai and bi lexicographically ordered as a twos-complement int
 	if(ai < 0) ai = 0x80000000 - ai;
 	if(bi < 0) bi = 0x80000000 - bi;
-	return abs(ai - bi) <= maxULP;
+	return al::abs(ai - bi) <= maxULP;
 }
 
 inline bool aeq(double a, double b, int maxULP){
@@ -526,7 +530,7 @@ inline bool aeq(double a, double b, int maxULP){
 	// Make ai and bi lexicographically ordered as a twos-complement int
 	if(ai < 0) ai = 0x8000000000000000ULL - ai;
 	if(bi < 0) bi = 0x8000000000000000ULL - bi;
-	return abs(ai - bi) <= maxULP;
+	return al::abs(ai - bi) <= maxULP;
 }
 
 TEM inline T atLeast(const T& v, const T& e){ return (v >= T(0)) ? max(v, e) : min(v, -e); }
