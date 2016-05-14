@@ -215,12 +215,15 @@ elif uname -o | grep "Msys"; then
 		if files_exist $DESTDIR/lib/*freetype*; then
 			echo 'Found FreeType'
 		else
-			PKG=freetype-dev_2.4.2-1_win32
+			PKG=freetype-2.3.5-1-bin
 			DIR=$PWD
 			cd /tmp
-				wget http://ftp.gnome.org/pub/gnome/binaries/win32/dependencies/$PKG.zip
+				wget http://downloads.sourceforge.net/project/gnuwin32/freetype/2.3.5-1/$PKG.zip
 				unzip -q $PKG -d $PKG
-				cp $PKG/lib/* $DESTDIR/lib/
+				cp $PKG/bin/freetype*.dll $DESTDIR/bin/
+				cp $PKG/lib/libfreetype.dll.a $DESTDIR/lib/
+				cp $PKG/lib/freetype*.def $DESTDIR/lib/
+				cp $PKG/lib/freetype.lib $DESTDIR/lib/
 				cp -r $PKG/include/* $DESTDIR/include/
 
 				# Cleanup.
