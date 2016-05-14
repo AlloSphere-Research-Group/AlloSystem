@@ -3,13 +3,16 @@
 #include <sys/stat.h>
 #include "allocore/io/al_File.hpp"
 #include "allocore/system/al_Config.h"
-#ifndef AL_WINDOWS
-#include <stdlib.h> // realpath (POSIX only)
-#include <unistd.h> // getcwd (POSIX only)
-#define platform_getcwd getcwd
+#include <stdlib.h> // realpath (POSIX), _fullpath (Windows)
+#ifdef AL_WINDOWS
+	#include <direct.h> // _getcwd
+	#define platform_getcwd _getcwd
+	#ifndef PATH_MAX
+	#define PATH_MAX 260
+	#endif
 #else
-#include <direct.h> // _getcwd
-#define platform_getcwd _getcwd
+	#include <unistd.h> // getcwd (POSIX)
+	#define platform_getcwd getcwd
 #endif
 
 namespace al{
@@ -119,11 +122,16 @@ std::string File::conformPathToOS(const std::string& src){
 	return res;
 }
 
-std::string File::absolutePath(const std::string& src) {
+std::string File::absolutePath(const std::string& src){
 #ifdef AL_WINDOWS
-	char temp[_MAX_PATH];
-	char * result = _fullpath(temp, src.c_str(), sizeof(temp));
-	return result ? result : "";
+	TCHAR dirPart[4096];
+	TCHAR ** filePart={NULL};
+	GetFullPathName((LPCTSTR)src.c_str(), sizeof(dirPart), dirPart, filePart);
+	std::string result = (char *)dirPart;
+	if(filePart != NULL && *filePart != 0){
+		result += (char *)*filePart;
+	}
+	return result;
 #else
 	char temp[PATH_MAX];
 	char * result = realpath(src.c_str(), temp);
