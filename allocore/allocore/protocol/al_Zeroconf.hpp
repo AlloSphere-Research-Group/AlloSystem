@@ -43,12 +43,7 @@
 
 */
 
-
-#include <stdio.h>
 #include <string>
-#include <vector>
-#include "allocore/io/al_Socket.hpp"
-#include "allocore/system/al_Thread.hpp"
 
 namespace al{
 namespace zero{
