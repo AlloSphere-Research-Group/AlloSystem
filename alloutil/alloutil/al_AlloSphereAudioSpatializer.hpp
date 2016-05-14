@@ -102,12 +102,11 @@ inline void AlloSphereAudioSpatializer::AppAudioCB(AudioIOData& io) {
 inline AlloSphereAudioSpatializer::~AlloSphereAudioSpatializer() {}
 
 inline AlloSphereAudioSpatializer::AlloSphereAudioSpatializer() {
-  char hostname[256];
-  gethostname(hostname, 256);
-  bossa = !strncmp(hostname,"bossanova",256);
-  audio = !strncmp(hostname,"audio.10g",256);
-  std::cout << "AlloSphereAudioSpatializer at host: " << hostname << std::endl;
-  // initAudio();
+	std::string hostname = Socket::hostName();
+	bossa = hostname == "bossanova";
+	audio = hostname == "audio.10g";
+	std::cout << "AlloSphereAudioSpatializer at host: " << hostname << std::endl;
+	// initAudio();
 }
 
 }  // al

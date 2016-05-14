@@ -34,9 +34,8 @@ class Simulator : public InterfaceServerClient, public Main::Handler {
   // virtual void onMessage(osc::Message& m);
 
   static bool sim(){
-    char hostname[256];
-    gethostname(hostname, 256);
-    return (!strncmp(hostname,"gr01",256) || !strncmp(hostname,"audio.10g",256));
+	std::string hostname = Socket::hostName();
+	return (hostname == "gr01" || hostname == "audio.10g");
   }
 
   static const char* defaultBroadcastIP(){

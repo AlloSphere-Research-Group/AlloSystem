@@ -356,15 +356,24 @@ std::map<std::string, float> PresetHandler::loadPresetValues(std::string name)
 
 
 PresetServer::PresetServer(std::string oscAddress, int oscPort) :
-    mServer(nullptr), mPresetHandler(nullptr), mOSCpath("/preset")
+    mServer(nullptr), mPresetHandler(nullptr), mOSCpath("/preset"), mParamServer(nullptr)
 {
-	mServer = new osc::Recv(oscPort, oscAddress.c_str());
+	mServer = new osc::Recv(oscPort, oscAddress.c_str(), 0.001); // Is this 1ms wait OK?
 	if (mServer) {
 		mServer->handler(*this);
 		mServer->start();
 	} else {
 		std::cout << "Error starting OSC server." << std::endl;
 	}
+}
+
+
+PresetServer::PresetServer(ParameterServer &paramServer) :
+    mServer(paramServer.mServer), mPresetHandler(nullptr), mOSCpath("/preset"), mParamServer(&paramServer)
+{
+	paramServer.mServer->stop();
+	paramServer.mServer->handler(*this);
+	paramServer.mServer->start();
 }
 
 PresetServer::~PresetServer()
@@ -386,6 +395,17 @@ void PresetServer::onMessage(osc::Message &m)
 		int val;
 		m >> val;
 		mPresetHandler->recallPreset(val);
+	} else if (m.addressPattern().substr(0, mOSCpath.size() + 1) == mOSCpath + "/") {
+		int index = std::stoi(m.addressPattern().substr(mOSCpath.size() + 1));
+		if (m.typeTags() == "f") {
+			float val;
+			m >> val;
+			if (val == 1) {
+				mPresetHandler->recallPreset(index);
+			}
+		}
+	} else if (mParamServer) {
+		mParamServer->onMessage(m);
 	}
 }
 
@@ -397,6 +417,16 @@ void PresetServer::print()
 	for (auto sender:mOSCSenders) {
 		std::cout << sender->address() << ":" << sender->port() << std::endl;
 	}
+}
+
+void PresetServer::setAddress(std::string address)
+{
+	mOSCpath = address;
+}
+
+std::string al::PresetServer::getAddress()
+{
+	return mOSCpath;
 }
 
 void PresetServer::changeCallback(int value, void *sender, void *userData)

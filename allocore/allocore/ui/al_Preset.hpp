@@ -143,6 +143,18 @@ public:
 
 	PresetServer(std::string oscAddress = "127.0.0.1",
 	             int oscPort = 9011);
+	/**
+	 * @brief using this constructor reuses the existing osc::Recv server from the
+	 * ParameterServer object
+	 * @param paramServer an existing ParameterServer object
+	 *
+	 * You will want to reuse an osc::Recv server when you want to expose the
+	 * interface thorugh the same network port. Since network ports are exclusive,
+	 * once a port is bound, it can't be used. You might need to expose the
+	 * parameters on the same network port when using things like interface.simpleserver.js
+	 * That must connect all interfaces to the same network port.
+	 */
+	PresetServer(ParameterServer &paramServer);
 	~PresetServer();
 
 	virtual void onMessage(osc::Message& m);
@@ -158,16 +170,24 @@ public:
 	 */
 	void print();
 
+
 	PresetServer &operator <<(PresetHandler &presetHandler) {return registerPresetHandler(presetHandler);}
 
+	void setAddress(std::string address);
+	std::string getAddress();
+
 protected:
+	void attachPacketHandler(osc::PacketHandler *handler);
 	static void changeCallback(int value, void *sender, void *userData);
 
 private:
 	osc::Recv *mServer;
 	PresetHandler *mPresetHandler;
+	ParameterServer *mParamServer;
 //	std::mutex mServerLock;
 	std::string mOSCpath;
+	std::mutex mHandlerLock;
+	std::vector<osc::PacketHandler *> mHandlers;
 
 };
 

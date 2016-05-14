@@ -1,5 +1,5 @@
-#ifndef INCLUDE_AL_HTMLPARAMETERSERVER_HPP
-#define INCLUDE_AL_HTMLPARAMETERSERVER_HPP
+#ifndef INCLUDE_AL_HTMLINTERFACESERVER_HPP
+#define INCLUDE_AL_HTMLINTERFACESERVER_HPP
 /*	Allocore --
 	Multimedia / virtual environment application class library
 
@@ -35,7 +35,8 @@
 
 
 	File description:
-	Serve an HTML GUI to connect to a ParameterServer using interface.js
+	Serve an HTML GUI to connect to a ParameterServer and PresetServer
+    using interface.js
 
 	File author(s):
 	2016 Andres Cabrera andres@mat.ucsb.edu
@@ -58,12 +59,16 @@
 #endif
 
 #include "allocore/ui/al_Parameter.hpp"
+#include "allocore/ui/al_Preset.hpp"
 
 namespace al
 {
-
 /**
- * @brief The HtmlParameterServer class runs an html service that provides a
+ * @brief The HtmlInterfaceServer class runs an interface.simpleserver.js
+ * server and builds the html interface for the registered set of controllers
+ * and presets.
+ *
+ * The HtmlInterfaceServer class runs an html service that provides a
  * GUI for Parameter objects. It runs interface.js in the background, so it
  * relies on an existing working installation of interface.js and interface.simpleserver.js
  * in particular. The class generates the html file for interface.js from
@@ -71,33 +76,35 @@ namespace al
  * GUI can be kept in sync with other control interfaces like ParameterGUI
  * and other devices that set the parameters via OSC.
  */
-class HtmlParameterServer
-{
+class HtmlInterfaceServer {
 public:
-	HtmlParameterServer(std::string pathToInterfaceJs = "../interface.js");
-	~HtmlParameterServer();
+	HtmlInterfaceServer(std::string pathToInterfaceJs = "../interface.js");
+	~HtmlInterfaceServer();
 
-	void writeHtmlFile();
+	HtmlInterfaceServer &addParameterServer(ParameterServer &paramServer,
+	                                        std::string interfaceName = "");
+	HtmlInterfaceServer &addPresetServer(PresetServer &presetServer,
+	                                     std::string interfaceName = "");
 
-	HtmlParameterServer &addParameter(Parameter &param);
-
-	HtmlParameterServer &operator <<(Parameter &param) {
-		return this->addParameter(param);
+	HtmlInterfaceServer &operator <<(ParameterServer &paramServer) {
+		return this->addParameterServer(paramServer);
+	}
+	HtmlInterfaceServer &operator <<(PresetServer &presetServer) {
+		return this->addPresetServer(presetServer);
 	}
 
 private:
+	void writeHtmlFile(ParameterServer &paramServer, std::string interfaceName = "");
+	void writeHtmlFile(PresetServer &presetServer, std::string interfaceName = "", int numPresets = -1);
+
+	std::string mRootPath;
 	void runInterfaceJs();
 	pid_t  mPid;
 	int p_stdin[2], p_stdout[2];
-
-	std::vector<Parameter *> mParameters;
-	ParameterServer mServer;
-
-	std::string mRootPath;
 };
 
 } // ::al
 
 
 
-#endif // INCLUDE_AL_HTMLPARAMETERSERVER_HPP
+#endif // INCLUDE_AL_HTMLINTERFACESERVER_HPP

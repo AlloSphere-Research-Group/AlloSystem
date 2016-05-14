@@ -365,6 +365,7 @@ private:
  */
 class ParameterServer : public osc::PacketHandler, public OSCNotifier<float>
 {
+	friend class PresetServer; // To be able to take over the OSC server
 public:
 	/**
 	 * @brief ParameterServer constructor
@@ -393,8 +394,6 @@ public:
 	 */
 	void unregisterParameter(Parameter &param);
 
-	virtual void onMessage(osc::Message& m);
-
 	/**
 	 * @brief print prints information about the server to std::out
 	 *
@@ -403,11 +402,18 @@ public:
 	 */
 	void print();
 
+	/**
+	 * @brief Get the list of registered parameters.
+	 */
+	std::vector<Parameter *> parameters() {return mParameters;}
+
 	/// Register parameter using the streaming operator
 	ParameterServer &operator << (Parameter& newParam){ return registerParameter(newParam); }
 
 	/// Register parameter using the streaming operator
 	ParameterServer &operator << (Parameter* newParam){ return registerParameter(*newParam); }
+
+	virtual void onMessage(osc::Message& m);
 
 protected:
 	static void changeCallback(float value, void *sender, void *userData);
