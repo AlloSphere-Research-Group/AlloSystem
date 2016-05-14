@@ -5,6 +5,9 @@
 #include "allocore/system/al_Config.h"
 #include <stdlib.h> // realpath (POSIX), _fullpath (Windows)
 #ifdef AL_WINDOWS
+	#define WIN32_LEAN_AND_MEAN
+	#define VC_EXTRALEAN
+	#include <windows.h> // TCHAR, LPCTSTR
 	#include <direct.h> // _getcwd
 	#define platform_getcwd _getcwd
 	#ifndef PATH_MAX

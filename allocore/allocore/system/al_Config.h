@@ -56,28 +56,6 @@
 #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64) || defined(__WINDOWS_MM__)
 
 	#define AL_WINDOWS 1
-	#define WIN32_LEAN_AND_MEAN
-	#define VC_EXTRALEAN
-	#include <windows.h>
-	#include <mmsystem.h> /* Done here since we undef 'far' macro below*/
-
-	/* undefine macros of common words */
-	#ifdef DELETE
-	#undef DELETE
-	#endif
-	#ifdef max
-	#undef max
-	#endif
-	#ifdef min
-	#undef min
-	#endif
-	/* windef.h defines these for backwards compatability with 16-bit compilers */
-	#ifdef near
-	#undef near
-	#endif
-	#ifdef far
-	#undef far
-	#endif
 
 	#ifdef AL_EXPORTS
 		#define AL_API __declspec(dllexport)
