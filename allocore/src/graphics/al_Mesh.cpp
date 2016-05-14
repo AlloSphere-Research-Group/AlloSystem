@@ -3,10 +3,8 @@
 #include <string>
 #include <vector>
 #include <fstream>
-
-#include "allocore/system/al_Config.h"
-#include "allocore/system/al_Printing.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
+#include "allocore/system/al_Printing.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
 
 namespace al{
@@ -568,8 +566,8 @@ void Mesh::getBounds(Vertex& min, Vertex& max) const {
 		for(int v=1; v<vertices().size(); ++v){
 			const Vertex& vt = vertices()[v];
 			for(int i=0; i<3; ++i){
-				min[i] = AL_MIN(min[i], vt[i]);
-				max[i] = AL_MAX(max[i], vt[i]);
+				min[i] = std::min(min[i], vt[i]);
+				max[i] = std::max(max[i], vt[i]);
 			}
 		}
 	}
