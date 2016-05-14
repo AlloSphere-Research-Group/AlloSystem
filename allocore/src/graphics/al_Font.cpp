@@ -1,31 +1,10 @@
+#include "allocore/system/al_Config.h"
 #include "allocore/graphics/al_Font.hpp"
 
-#if defined (__APPLE__) || defined (OSX)
-
-	#include "ft2build.h"
-	#include FT_FREETYPE_H
-	#include FT_OUTLINE_H
-	#include FT_GLYPH_H
-
-	#define FONT_OSX 1
-	#define FONT_SYSTEM_FONTS 1
-
-#elif defined(__linux__)
-
-	#include <ft2build.h>
-	#include FT_FREETYPE_H
-	#include FT_OUTLINE_H
-	#include FT_GLYPH_H
-
-#elif defined WIN32
-
-	#include <windows.h>
-	#include <ft2build.h>
-	#include FT_FREETYPE_H
-	#include FT_OUTLINE_H
-	#include FT_GLYPH_H
-
-#endif
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_OUTLINE_H
+#include FT_GLYPH_H
 
 extern "C" {
 	#include <stdlib.h>
@@ -36,13 +15,6 @@ FT_Library front_freetype_library = 0;
 
 #define GLYPHS_PER_ROW 16	// number of glyphs to pack in a row
 #define PIX_TO_EM (64.f)
-
-//#ifdef FONT_SYSTEM_FONTS
-//
-//extern int font_names(lua_State *L);
-//extern int font_families(lua_State *L);
-//
-//#endif
 
 namespace al{
 
