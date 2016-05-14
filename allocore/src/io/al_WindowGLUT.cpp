@@ -7,13 +7,17 @@
 #include "allocore/system/al_Printing.hpp"	// warnings
 #include "allocore/graphics/al_OpenGL.hpp"	// OpenGL headers
 
-#ifdef AL_OSX
+#if defined AL_OSX
 	#include <GLUT/glut.h>
-#endif
-#ifdef AL_LINUX
+
+#elif defined AL_LINUX
+	#include <GL/glew.h>
 	#include <GL/glut.h>
-#endif
-#ifdef AL_WINDOWS
+
+#elif defined AL_WINDOWS
+	#define WIN32_LEAN_AND_MEAN
+	#include <windows.h> // Prevents GLUT from redefining APIENTRY
+	#include <GL/glew.h> // Needed since GLUT includes GL
 	#include <GL/glut.h>
 #endif
 
