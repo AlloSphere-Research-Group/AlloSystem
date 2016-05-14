@@ -1,7 +1,7 @@
 
 
-#include "allocore/io/al_HtmlParameterServer.hpp"
-#include "allocore/system/al_Parameter.hpp"
+#include "allocore/ui/al_HtmlInterfaceServer.hpp"
+#include "allocore/ui/al_Parameter.hpp"
 #include "allocore/io/al_App.hpp"
 
 using namespace al;
@@ -37,13 +37,29 @@ public:
 
 int main(int argc, char *argv[])
 {
-	HtmlParameterServer server;
+	HtmlInterfaceServer htmlServer;
+	ParameterServer parameterServer;
+	PresetHandler presetHandler;
+	// If we pass the parameter server, the preset server will reuse the osc server
+	// This means they are both exposed on the same OSC port.
+	PresetServer presetServer(parameterServer);
 
-	server << X << Y << Brightness;
+	// Connect parameters and presets to servers
+	parameterServer << X << Y << Brightness;
+	presetServer << presetHandler;
+
+	// Then expose the servers in the html server
+	htmlServer << parameterServer;
+	htmlServer << presetServer;
 
 	// Display value of X on stdout
 	X.registerChangeCallback(
 	            [](float value, void *sender, void *userData) {std::cout << "X = " << value << std::endl; });
+	// Display the preset change processed
+	presetHandler.registerPresetCallback(
+	            [](int index, void *sender, void *userData) {
+	                std::cout << "Preset change received: " << index << std::endl;
+	            });
 
 	MyApp().start();
 	return 0;

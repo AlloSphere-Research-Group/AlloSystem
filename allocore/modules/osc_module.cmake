@@ -8,7 +8,7 @@ set(OSC_HEADERS
     allocore/protocol/al_OSC.hpp
     allocore/ui/al_Parameter.hpp
 	allocore/ui/al_Preset.hpp
-	allocore/ui/al_HtmlParameterServer.hpp
+	allocore/ui/al_HtmlInterfaceServer.hpp
 	allocore/ui/al_ParameterMIDI.hpp
 	allocore/ui/al_PresetMIDI.hpp
 )
@@ -32,7 +32,7 @@ list(APPEND ALLOCORE_SRC
   src/protocol/al_OSC.cpp
   src/ui/al_Parameter.cpp
   src/ui/al_Preset.cpp
-  src/ui/al_HtmlParameterServer.cpp
+  src/ui/al_HtmlInterfaceServer.cpp
   )
 
 INCLUDE_DIRECTORIES("${OSCPACK_ROOT_DIR}")
