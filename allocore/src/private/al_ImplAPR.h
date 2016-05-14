@@ -28,6 +28,7 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h> // atexit
 #include "allocore/system/al_Config.h"
 
 #if defined AL_WINDOWS
