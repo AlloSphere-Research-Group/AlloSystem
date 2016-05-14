@@ -116,6 +116,16 @@ public:
 		}
 	}
 
+	void connectNoteToIncrement(Parameter &param, int channel, int note,
+	                            float increment) {
+		IncrementBinding newBinding;
+		newBinding.channel = channel - 1;
+		newBinding.noteNumber = note;
+		newBinding.increment = increment;
+		newBinding.param = &param;
+		mIncrementBindings.push_back(newBinding);
+	}
+
 	virtual void onMIDIMessage(const MIDIMessage& m) override {
 		if (m.type() & MIDIByte::CONTROL_CHANGE ) {
 			for(ControlBinding binding: mBindings) {
@@ -128,8 +138,15 @@ public:
 		}
 		if (m.type() & MIDIByte::NOTE_ON && m.velocity() > 0) {
 			for(NoteBinding binding: mNoteBindings) {
-				if (m.channel() == binding.channel) {
+				if (m.channel() == binding.channel
+				        && m.noteNumber() == binding.noteNumber) {
 					binding.param->set(binding.value);
+				}
+			}
+			for(IncrementBinding binding: mIncrementBindings) {
+				if (m.channel() == binding.channel
+				        && m.noteNumber() == binding.noteNumber) {
+					binding.param->set(binding.param->get() + binding.increment);
 				}
 			}
 		}
@@ -146,6 +163,7 @@ private:
 		Parameter *param;
 		float min, max;
 	};
+
 	struct NoteBinding {
 		int noteNumber;
 		int channel;
@@ -153,11 +171,18 @@ private:
 		Parameter *param;
 	};
 
+	struct IncrementBinding {
+		int noteNumber;
+		int channel;
+		float increment;
+		Parameter *param;
+	};
+
 	MIDIIn mMidiIn;
 	bool mVerbose;
 	std::vector<ControlBinding> mBindings;
 	std::vector<NoteBinding> mNoteBindings;
-
+	std::vector<IncrementBinding> mIncrementBindings;
 };
 
 
