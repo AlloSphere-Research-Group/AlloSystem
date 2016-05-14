@@ -55,33 +55,6 @@
 
 #ifdef AL_WINDOWS
 
-	// Experimentally not include all of windows.h .
-	// #define WIN32_LEAN_AND_MEAN
-	// #define VC_EXTRALEAN
-	// #include <windows.h>
-
-	#include <windef.h>
-	#include <mmsystem.h>
-	#include <winsock2.h>
-
-	// undefine macros of common words
-	#ifdef DELETE
-	#undef DELETE
-	#endif
-	#ifdef max
-	#undef max
-	#endif
-	#ifdef min
-	#undef min
-	#endif
-	// windef.h defines these for backwards compatability with 16-bit compilers
-	#ifdef near
-	#undef near
-	#endif
-	#ifdef far
-	#undef far
-	#endif
-
 	#ifdef AL_EXPORTS
 		#define AL_API __declspec(dllexport)
 	#else
