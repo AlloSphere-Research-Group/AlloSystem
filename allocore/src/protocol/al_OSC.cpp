@@ -271,6 +271,10 @@ Message& Message::operator>> (Blob& v){
 #endif
 
 void PacketHandler::parse(const char *packet, int size, TimeTag timeTag){
+	#ifdef VERBOSE
+	int i = 1;
+	#endif
+
 OSCTRY("PacketHandler::parse",
 	DPRINTF("PacketHandler::parse(size %d, packet %p)\n", size, packet);
 	DPRINTF("Data to parse: ");
@@ -281,7 +285,7 @@ OSCTRY("PacketHandler::parse",
 	::osc::ReceivedPacket p(packet, size);
 
 	DPRINTF("Just made an ::osc::ReceivedPacket that has contents %p and size %d\n",
-			p.Contents(), (int)p.Size());
+		p.Contents(), (int)p.Size());
 
 	// iterate through all the bundle elements (bundles or messages)
 	if(p.IsBundle()){
@@ -293,10 +297,7 @@ OSCTRY("PacketHandler::parse",
 		::osc::ReceivedBundle r(p);
 
 		//DPRINTF("Just made an ::osc::ReceivedBundle that has time tag at %p and %d elements\n", r.timeTag_, r.ElementCount() );
-		
-		#ifdef VERBOSE
-		int i = 1;
-		#endif
+
 		for(auto it = r.ElementsBegin(); it != r.ElementsEnd(); ++it){
 			const ::osc::ReceivedBundleElement& e = *it;
 
