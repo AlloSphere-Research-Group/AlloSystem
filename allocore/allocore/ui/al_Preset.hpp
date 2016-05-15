@@ -96,6 +96,15 @@ public:
 	 */
 	void registerPresetCallback(PresetChangeCallback cb, void *userData = nullptr);
 
+	typedef void (*MorphTimeChangeCallback)(float time, void *sender,
+	                                        void *userData);
+	/**
+	 * @brief Register a callback to be notified when morph time parameter is changed
+	 * @param cb The callback function
+	 * @param userData data to be passed to the callback
+	 */
+	void registerMorphTimeCallback(Parameter::ParameterChangeCallback cb, void *userData = nullptr);
+
 	PresetHandler &operator << (Parameter &param) { return this->registerParameter(param); }
 
 private:
@@ -115,8 +124,8 @@ private:
 	bool mRunning; // To keep the morphing thread alive
 	bool mMorph; // To be able to trip and stop morphing at any time.
 	int mMorphRemainingSteps;
-	double mMorphInterval;
-	double mMorphTime;
+	float mMorphInterval;
+	Parameter mMorphTime;
 
 	std::mutex mTargetLock;
 	std::condition_variable mMorphConditionVar;
@@ -163,6 +172,13 @@ public:
 		mPresetHandler = &presetHandler;
 		mPresetHandler->registerPresetCallback(PresetServer::changeCallback,
 		                                       (void *) this);
+
+		mPresetHandler->registerMorphTimeCallback(
+		            [](float value, void *sender,
+		            void *userData, void * blockSender) {
+			static_cast<PresetServer *>(userData)->notifyListeners(
+			            static_cast<PresetServer *>(userData)->mOSCpath + "/morphTime", value);
+		}, this);
 	}
 
 	/**

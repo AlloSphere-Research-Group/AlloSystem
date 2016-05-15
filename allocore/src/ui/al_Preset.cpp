@@ -15,7 +15,7 @@ using namespace al;
 PresetHandler::PresetHandler(std::string rootDirectory, bool verbose) :
     mRootDir(rootDirectory), mVerbose(verbose),
     mRunning(true), mMorphingThread(PresetHandler::morphingFunction, this),
-    mMorphInterval(0.05)
+    mMorphInterval(0.05), mMorphTime("morphTime", "", 0.0, "", 0.0, 20.0)
 {
 	if (!File::exists(rootDirectory)) {
 		if (!Dir::make(rootDirectory, true)) {
@@ -68,6 +68,12 @@ void PresetHandler::registerPresetCallback(PresetHandler::PresetChangeCallback c
 {
 	mCallbacks.push_back(cb);
 	mCallbackUdata.push_back(userData);
+}
+
+void PresetHandler::registerMorphTimeCallback(Parameter::ParameterChangeCallback cb,
+                                              void *userData)
+{
+	mMorphTime.registerChangeCallback(cb, userData);
 }
 
 void PresetHandler::storePreset(std::string name)
@@ -126,7 +132,7 @@ void PresetHandler::recallPreset(std::string name)
 	{
 		std::lock_guard<std::mutex> lk(mTargetLock);
 		mTargetValues = loadPresetValues(name);
-		mMorphRemainingSteps =  1 + mMorphTime / mMorphInterval;
+		mMorphRemainingSteps =  1 + mMorphTime.get() / mMorphInterval;
 	}
 	mMorphConditionVar.notify_one();
 
@@ -163,7 +169,7 @@ std::map<int, std::string> PresetHandler::availablePresets()
 
 void PresetHandler::setMorphTime(float time)
 {
-	mMorphTime = time;
+	mMorphTime.set(time);
 }
 
 std::string PresetHandler::getCurrentPath()
@@ -397,6 +403,10 @@ void PresetServer::onMessage(osc::Message &m)
 		int val;
 		m >> val;
 		mPresetHandler->recallPreset(val);
+	} else if (m.addressPattern() == mOSCpath + "/morphTime" && m.typeTags() == "f")  {
+		float val;
+		m >> val;
+		mPresetHandler->setMorphTime(val);
 	} else if (m.addressPattern().substr(0, mOSCpath.size() + 1) == mOSCpath + "/") {
 		int index = std::stoi(m.addressPattern().substr(mOSCpath.size() + 1));
 		if (m.typeTags() == "f") {
@@ -406,22 +416,26 @@ void PresetServer::onMessage(osc::Message &m)
 				mPresetHandler->recallPreset(index);
 			}
 		}
-	} else if (mParamServer) {
+	}
+	else if (mParamServer) {
 		mParamServer->onMessage(m);
 	}
 }
 
 void PresetServer::print()
 {
-	std::cout << "Preset server listening on: " << mServer->address() << ":" << mServer->port() << std::endl;
-	std::cout << "Communicating on path: " << mOSCpath << std::endl;
-	std::cout << "Registered listeners: " << std::endl;
+	if (mServer) {
+		std::cout << "Preset server listening on: " << mServer->address() << ":" << mServer->port() << std::endl;
+		std::cout << "Communicating on path: " << mOSCpath << std::endl;
+		std::cout << "Registered listeners: " << std::endl;
+
+	}
 	for (auto sender:mOSCSenders) {
 		std::cout << sender->address() << ":" << sender->port() << std::endl;
 	}
 }
 
-void al::PresetServer::stopServer()
+void PresetServer::stopServer()
 {
 	if (mServer) {
 		mServer->stop();
@@ -435,7 +449,7 @@ void PresetServer::setAddress(std::string address)
 	mOSCpath = address;
 }
 
-std::string al::PresetServer::getAddress()
+std::string PresetServer::getAddress()
 {
 	return mOSCpath;
 }
