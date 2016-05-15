@@ -3,6 +3,7 @@
 #include "allocore/graphics/al_Shapes.hpp"
 #include "alloGLV/al_ParameterGUI.hpp"
 #include "allocore/ui/al_ParameterMIDI.hpp"
+#include "allocore/ui/al_HtmlInterfaceServer.hpp"
 
 using namespace al;
 
@@ -25,6 +26,9 @@ public:
 		// Add parameters to OSC server
 		mServer << x << y << z;
 		mServer.print();
+
+		// Expose parameter server in html interface
+		mInterfaceServer << mServer;
 
 		addSphere(graphics().mesh(), 0.1);
 		graphics().mesh().generateNormals();
@@ -50,6 +54,7 @@ private:
 	ParameterGUI mParameterGUI;
 	ParameterServer mServer;
 	ParameterMIDI mParameterMIDI;
+	HtmlInterfaceServer mInterfaceServer;
 
 	Light light;
 };

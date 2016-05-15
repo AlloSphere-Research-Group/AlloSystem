@@ -101,6 +101,9 @@ private:
 	void runInterfaceJs();
 	pid_t  mPid;
 	int p_stdin[2], p_stdout[2];
+
+	int mInterfaceSendPort; // Interface.js sends OSC on this port
+	int mInterfaceRecvPort; // Interface.js receives OSC on this port
 };
 
 } // ::al

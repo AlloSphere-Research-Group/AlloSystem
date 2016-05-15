@@ -369,7 +369,7 @@ PresetServer::PresetServer(std::string oscAddress, int oscPort) :
 
 
 PresetServer::PresetServer(ParameterServer &paramServer) :
-    mServer(paramServer.mServer), mPresetHandler(nullptr), mOSCpath("/preset"), mParamServer(&paramServer)
+    mServer(nullptr), mPresetHandler(nullptr), mOSCpath("/preset"), mParamServer(&paramServer)
 {
 	paramServer.mServer->stop();
 	paramServer.mServer->handler(*this);

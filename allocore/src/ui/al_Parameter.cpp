@@ -24,12 +24,19 @@ float Parameter::get()
 	return mFloatValue;
 }
 
-void Parameter::setNoCalls(float value)
+void Parameter::setNoCalls(float value, void *blockReceiver)
 {
 	if (value > mMax) value = mMax;
 	if (value < mMin) value = mMin;
 	if (mProcessCallback) {
 		value = mProcessCallback(value, mProcessUdata);
+	}
+	if (blockReceiver) {
+		for(int i = 0; i < mCallbacks.size(); ++i) {
+			if (mCallbacks[i]) {
+				mCallbacks[i](value, this, mCallbackUdata[i], blockReceiver);
+			}
+		}
 	}
 
 	mFloatValue = value;
@@ -45,7 +52,7 @@ void Parameter::set(float value)
 	mFloatValue = value;
 	for(int i = 0; i < mCallbacks.size(); ++i) {
 		if (mCallbacks[i]) {
-			mCallbacks[i](value, this, mCallbackUdata[i]);
+			mCallbacks[i](value, this, mCallbackUdata[i], NULL);
 		}
 	}
 }
@@ -126,10 +133,9 @@ void ParameterServer::print()
 	}
 }
 
-void ParameterServer::changeCallback(float value, void *sender, void *userData)
+void ParameterServer::changeCallback(float value, void *sender, void *userData, void *blockThis)
 {
 	ParameterServer *server = static_cast<ParameterServer *>(userData);
 	Parameter *parameter = static_cast<Parameter *>(sender);
 	server->notifyListeners(parameter->getFullAddress(), parameter->get());
 }
-

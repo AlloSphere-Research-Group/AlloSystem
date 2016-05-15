@@ -66,8 +66,9 @@ using namespace al;
 
 HtmlInterfaceServer::HtmlInterfaceServer(std::string pathToInterfaceJs)
 {
-
 	mRootPath = pathToInterfaceJs;
+	mInterfaceSendPort = 9010; // Interface.js sends OSC on this port
+	mInterfaceRecvPort = 10010; // Interface.js receives OSC on this port
 
 #ifndef AL_WINDOWS
 
@@ -115,7 +116,10 @@ void HtmlInterfaceServer::runInterfaceJs() {
 	if (chdir(path.c_str()) < 0) {
 		std::cout << "Could not find interface.js folder" << std::endl;
 	}
-	execl("/usr/bin/nodejs", "/usr/bin/nodejs", "interface.simpleserver.js", "--oscPort=15439","--oscOutPort=9010", NULL);
+	std::string outFlag = "--oscOutPort=" + std::to_string(mInterfaceSendPort);
+	std::string inFlag = "--oscInPort=" + std::to_string(mInterfaceRecvPort);
+	execl("/usr/bin/nodejs", "/usr/bin/nodejs", "interface.simpleserver.js","--oscPort=15439",
+	      outFlag.c_str(), inFlag.c_str(), NULL);
 	perror("execl");
 	exit(1);
 #else
@@ -134,7 +138,7 @@ void HtmlInterfaceServer::writeHtmlFile(ParameterServer &paramServer, std::strin
 	for(int i = 0; i < parameters.size(); ++i) {
 		code += "var widget_" + std::to_string(i) + " = new Interface.Slider({\n";
 		code += "label: '" + parameters.at(i)->getName() + "',\n";
-		code += "bounds: [" + std::to_string(padding + ((i + padding) * width)) + ",";
+		code += "bounds: [" + std::to_string(padding + (i * (padding + width))) + ",";
 		code += std::to_string(padding) + ",";
 		code += std::to_string(width) + ",";
 		code += std::to_string(height) + "],\n";
@@ -162,6 +166,7 @@ void HtmlInterfaceServer::writeHtmlFile(ParameterServer &paramServer, std::strin
 		          << mRootPath + "/server/interfaces/" + interfaceName + ".html" << std::endl;
 	}
 	f.close();
+	paramServer.addListener("127.0.0.1", mInterfaceRecvPort);
 }
 
 void HtmlInterfaceServer::writeHtmlFile(PresetServer &presetServer, std::string interfaceName, int numPresets)
@@ -175,7 +180,7 @@ void HtmlInterfaceServer::writeHtmlFile(PresetServer &presetServer, std::string 
 	for(int i = 0; i < 20; ++i) {
 		code += "var preset_" + std::to_string(i) + " = new Interface.Button({\n";
 		code += "label: '" + std::to_string(i) + "',\n";
-		code += "bounds: [" + std::to_string(padding + ((i%buttonsPerRow + padding) * width)) + ",";
+		code += "bounds: [" + std::to_string(padding + ((i%buttonsPerRow) * (padding + width))) + ",";
 		code += std::to_string(padding + ((i/buttonsPerRow)*height)) + ",";
 		code += std::to_string(width) + ",";
 		code += std::to_string(height) + "],\n";
