@@ -133,7 +133,7 @@ void HtmlInterfaceServer::writeHtmlFile(ParameterServer &paramServer, std::strin
 	std::string code = htmlTemplateStart;
 	std::string addCode = "iface.add(";
 	float padding = 0.01;
-	float width = 0.04;
+	float width = 0.95 / parameters.size();
 	float height = 0.92;
 	for(int i = 0; i < parameters.size(); ++i) {
 		code += "var widget_" + std::to_string(i) + " = new Interface.Slider({\n";
@@ -174,14 +174,14 @@ void HtmlInterfaceServer::writeHtmlFile(PresetServer &presetServer, std::string 
 	std::string code = htmlTemplateStart;
 	std::string addCode = "iface.add(";
 	float padding = 0.01;
-	float width = 0.08;
-	float height =width;
+	float width = 0.09;
+	float height = width;
 	int buttonsPerRow = 10;
-	for(int i = 0; i < 20; ++i) {
+	for(int i = 0; i < 40; ++i) {
 		code += "var preset_" + std::to_string(i) + " = new Interface.Button({\n";
 		code += "label: '" + std::to_string(i) + "',\n";
 		code += "bounds: [" + std::to_string(padding + ((i%buttonsPerRow) * (padding + width))) + ",";
-		code += std::to_string(padding + ((i/buttonsPerRow)*height)) + ",";
+		code += std::to_string(padding + ((i/buttonsPerRow)*(padding + height))) + ",";
 		code += std::to_string(width) + ",";
 		code += std::to_string(height) + "],\n";
 		code += "mode: 'momentary', ";
@@ -189,7 +189,21 @@ void HtmlInterfaceServer::writeHtmlFile(PresetServer &presetServer, std::string 
 		code += "});\n";
 		addCode += "preset_" + std::to_string(i) + ",";
 	}
-	code += addCode.substr(0, addCode.size()-1) + ");\n";
+
+	code += R"(var morphSlider = new Interface.Slider({
+	  bounds:[.02,.65,.96,.3],
+	  min:.0, max:10,
+	  label: 'Morph time',
+	  isVertical:false,
+	  target: "OSC", key: ')" + presetServer.getAddress() + R"(/morphTime',
+	  value:0.5
+	});
+)";
+	addCode += "morphSlider";
+
+	code += addCode  + ");\n";
+
+
 	code += htmlTemplateEnd;
 
 	if (interfaceName == "") {
@@ -207,6 +221,7 @@ void HtmlInterfaceServer::writeHtmlFile(PresetServer &presetServer, std::string 
 		          << mRootPath + "/server/interfaces/" + interfaceName + ".html" << std::endl;
 	}
 	f.close();
+	presetServer.addListener("127.0.0.1", mInterfaceRecvPort);
 }
 
 
