@@ -170,6 +170,13 @@ public:
 	 */
 	void print();
 
+	/**
+	 * @brief stopServer stops the OSC server thread. Calling this function
+	 * is sometimes required when this object is destroyed abruptly and the
+	 * destructor is not called
+	 */
+	void stopServer();
+
 
 	PresetServer &operator <<(PresetHandler &presetHandler) {return registerPresetHandler(presetHandler);}
 
