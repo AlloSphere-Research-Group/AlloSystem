@@ -109,7 +109,7 @@ void OSCNotifier<DataType>::notifyListeners(std::string OSCaddress, DataType val
 	mListenerLock.lock();
 	for(osc::Send *sender: mOSCSenders) {
 		sender->send(OSCaddress, (float) value);
-		std::cout << "Notifying " << sender->address() << ":" << sender->port() << " -- " << OSCaddress << std::endl;
+//		std::cout << "Notifying " << sender->address() << ":" << sender->port() << " -- " << OSCaddress << std::endl;
 	}
 	mListenerLock.unlock();
 }
