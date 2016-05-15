@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 
 	// Display value of X on stdout
 	X.registerChangeCallback(
-	            [](float value, void *sender, void *userData) {std::cout << "X = " << value << std::endl; });
+	            [](float value, void *sender, void *userData, void *blockThis) {std::cout << "X = " << value << std::endl; });
 	// Display the preset change processed
 	presetHandler.registerPresetCallback(
 	            [](int index, void *sender, void *userData) {

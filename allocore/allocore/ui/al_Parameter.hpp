@@ -44,6 +44,7 @@
 #include <string>
 #include <mutex>
 #include <atomic>
+#include <iostream>
 #include "allocore/protocol/al_OSC.hpp"
 
 namespace al
@@ -67,6 +68,7 @@ public:
 		mListenerLock.lock();
 		mOSCSenders.push_back(new osc::Send(oscPort, IPaddress.c_str()));
 		mListenerLock.unlock();
+//		std::cout << "Registered listener " << IPaddress << ":" << oscPort<< std::endl;
 	};
 
 	/**
@@ -106,7 +108,8 @@ void OSCNotifier<DataType>::notifyListeners(std::string OSCaddress, DataType val
 {
 	mListenerLock.lock();
 	for(osc::Send *sender: mOSCSenders) {
-		sender->send(OSCaddress, value);
+		sender->send(OSCaddress, (float) value);
+		std::cout << "Notifying " << sender->address() << ":" << sender->port() << " -- " << OSCaddress << std::endl;
 	}
 	mListenerLock.unlock();
 }
@@ -157,7 +160,7 @@ public:
 	 * registerChangeCallback() are not called. This is useful to avoid infinite
 	 * recursion when a widget sets the parameter that then sets the widget.
 	 */
-	virtual void setNoCalls(ParameterType value);
+	virtual void setNoCalls(ParameterType value, void *blockReceiver = NULL);
 
 	/**
 	 * @brief get the parameter's value
@@ -201,7 +204,7 @@ public:
 
 	typedef float (*ParameterProcessCallback)(ParameterType value, void *userData);
 	typedef void (*ParameterChangeCallback)(ParameterType value, void *sender,
-	                                        void *userData);
+	                                        void *userData, void * blockSender);
 
 	/**
 	 * @brief setProcessingCallback sets a callback to be called whenever the
@@ -337,7 +340,7 @@ public:
 	 * registerChangeCallback() are not called. This is useful to avoid infinite
 	 * recursion when a widget sets the parameter that then sets the widget.
 	 */
-	virtual void setNoCalls(float value);
+	virtual void setNoCalls(float value, void *blockReceiver = NULL);
 
 	/**
 	 * @brief get the parameter's value
@@ -416,14 +419,13 @@ public:
 	virtual void onMessage(osc::Message& m);
 
 protected:
-	static void changeCallback(float value, void *sender, void *userData);
+	static void changeCallback(float value, void *sender, void *userData, void *blockThis);
 
 private:
 
 	osc::Recv *mServer;
 	std::vector<Parameter *> mParameters;
 	std::mutex mParameterLock;
-
 };
 
 
@@ -488,18 +490,26 @@ void ParameterWrapper<ParameterType>::set(ParameterType value)
 	mMutex.unlock();
 	for(int i = 0; i < mCallbacks.size(); ++i) {
 		if (mCallbacks[i]) {
-			mCallbacks[i](value, (void *) this,  mCallbackUdata[i]);
+			mCallbacks[i](value, (void *) this,  mCallbackUdata[i], NULL);
 		}
 	}
 }
 
 template<class ParameterType>
-void ParameterWrapper<ParameterType>::setNoCalls(ParameterType value)
+void ParameterWrapper<ParameterType>::setNoCalls(ParameterType value, void *blockReceiver)
 {
 	if (value > mMax) value = mMax;
 	if (value < mMin) value = mMin;
 	if (mProcessCallback) {
 		value = mProcessCallback(value, mProcessUdata);
+	}
+
+	if (blockReceiver) {
+		for(int i = 0; i < mCallbacks.size(); ++i) {
+			if (mCallbacks[i]) {
+				mCallbacks[i](value, this, mCallbackUdata[i], blockReceiver);
+			}
+		}
 	}
 	mMutex.lock();
 	mValue = value;

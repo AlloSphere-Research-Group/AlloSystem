@@ -170,15 +170,17 @@ public:
 		receiver.lock->lock();
 		double value = sender.getValue<double>();
 		receiver.lock->unlock();
-		receiver.parameter->setNoCalls(value);
+		receiver.parameter->setNoCalls(value, &sender);
 	}
 
-	static void valueChangedCallback(float value, void *sender, void *wrapper) {
+	static void valueChangedCallback(float value, void *sender, void *wrapper, void *blockThis) {
 		WidgetWrapper *w = static_cast<WidgetWrapper *>(wrapper);
-		w->lock->lock(); // Is the setting of the value from the mouse also protected? Do we need to protect that?
-		glv::Data &d = w->widget->data();
-		d.assign<double>(value); // We need to assign this way to avoid triggering callbacks.
-		w->lock->unlock();
+		if (wrapper != blockThis) {
+			w->lock->lock(); // Is the setting of the value from the mouse also protected? Do we need to protect that?
+			glv::Data &d = w->widget->data();
+			d.assign<double>(value); // We need to assign this way to avoid triggering callbacks.
+			w->lock->unlock();
+		}
 	}
 
 	void SetButtonBoxScale(float scale) {mButtonScale = scale;}
