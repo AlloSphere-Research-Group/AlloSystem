@@ -74,9 +74,11 @@ ParameterServer::ParameterServer(std::string oscAddress, int oscPort)
 
 ParameterServer::~ParameterServer()
 {
+//	std::cout << "~ParameterServer()" << std::endl;
 	if (mServer) {
 		mServer->stop();
 		delete mServer;
+		mServer = nullptr;
 	}
 }
 
@@ -130,6 +132,15 @@ void ParameterServer::print()
 	          << ":" << mServer->port() << std::endl;
 	for (Parameter *p:mParameters) {
 		std::cout << "Parameter " << p->getName() << " : " <<  p->getFullAddress() << std::endl;
+	}
+}
+
+void ParameterServer::stopServer()
+{
+	if (mServer) {
+		mServer->stop();
+		delete mServer;
+		mServer = nullptr;
 	}
 }
 

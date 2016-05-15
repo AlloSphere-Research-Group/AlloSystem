@@ -49,6 +49,9 @@ public:
 		g.popMatrix();
 	}
 
+	virtual void onExit() override {
+		mServer.stopServer(); // We need to manually stop the server to keep it from crashing.
+	}
 
 private:
 	ParameterGUI mParameterGUI;

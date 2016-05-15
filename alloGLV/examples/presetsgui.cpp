@@ -44,6 +44,10 @@ public:
 		}
 	}
 
+	virtual void onExit() override {
+		presetServer.stopServer(); // We need to manually stop the server to keep it from crashing.
+	}
+
 private:
 	rnd::Random<> rng; // Random number generator
 	Light light;

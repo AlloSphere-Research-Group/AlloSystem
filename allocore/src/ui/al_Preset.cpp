@@ -378,9 +378,11 @@ PresetServer::PresetServer(ParameterServer &paramServer) :
 
 PresetServer::~PresetServer()
 {
+//	std::cout << "~PresetServer()" << std::endl;;
 	if (mServer) {
 		mServer->stop();
 		delete mServer;
+		mServer = nullptr;
 	}
 }
 
@@ -416,6 +418,15 @@ void PresetServer::print()
 	std::cout << "Registered listeners: " << std::endl;
 	for (auto sender:mOSCSenders) {
 		std::cout << sender->address() << ":" << sender->port() << std::endl;
+	}
+}
+
+void al::PresetServer::stopServer()
+{
+	if (mServer) {
+		mServer->stop();
+		delete mServer;
+		mServer = nullptr;
 	}
 }
 
