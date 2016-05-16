@@ -49,9 +49,6 @@
 
 namespace al{
 
-class SocketStream;
-
-
 /// A network socket
 ///
 /// @ingroup allocore
