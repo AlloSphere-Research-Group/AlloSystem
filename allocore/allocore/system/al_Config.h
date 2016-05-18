@@ -90,12 +90,4 @@ typedef double al_sec;						/**< seconds type */
 #define AL_STRINGIFY(...) #__VA_ARGS__
 #define AL_DEBUGLN printf("In %s: line %d\n", __FILE__, __LINE__);
 
-#ifndef AL_MIN
-	#define AL_MIN(A,B)	({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __a : __b; })
-#endif
-
-#ifndef AL_MAX
-	#define AL_MAX(A,B)	({ __typeof__(A) __a = (A); __typeof__(B) __b = (B); __a < __b ? __b : __a; })
-#endif
-
 #endif /* INCLUDE_AL_SYSTEM_CONFIG_H */
