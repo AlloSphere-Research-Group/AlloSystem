@@ -49,7 +49,6 @@
 	#include <OpenGL/OpenGL.h>
 	#include <OpenGL/gl.h>
 	#include <OpenGL/glext.h>
-	#include <OpenGL/glu.h>
 	#define AL_GRAPHICS_INIT_CONTEXT
 //	#define AL_GRAPHICS_INIT_CONTEXT\
 //		/* prevents tearing */ \
@@ -62,7 +61,6 @@
 	#include <GL/glew.h> // needed for certain parts of OpenGL API
 	#include <GL/gl.h>
 	#include <GL/glext.h>
-	#include <GL/glu.h>
 	#include <time.h>
 	#define AL_GRAPHICS_INIT_CONTEXT\
 		{	GLenum err = glewInit();\
@@ -75,10 +73,8 @@
 	#define AL_GRAPHICS_USE_OPENGL
 	#include <GL/glew.h> // needed for certain parts of OpenGL API
 	#include <GL/gl.h>
-	#include <GL/glu.h>
 	#pragma comment( lib, "winmm.lib")
 	#pragma comment( lib, "opengl32.lib" )
-	#pragma comment( lib, "glu32.lib" )
 	#define AL_GRAPHICS_INIT_CONTEXT\
 		{	GLenum err = glewInit();\
 			if (GLEW_OK != err){\
