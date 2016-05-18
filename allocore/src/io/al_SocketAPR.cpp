@@ -96,7 +96,7 @@ struct Socket::Impl : public ImplAPR {
 
 		int sockFamily = type & (127<<16);
 		switch(sockFamily){
-		case 0: 	sockFamily = APR_UNSPEC; break;
+		case 0: // unspecified
 		case INET:  sockFamily = APR_INET; break;
 		case INET6:
 		#ifdef APR_INET6
