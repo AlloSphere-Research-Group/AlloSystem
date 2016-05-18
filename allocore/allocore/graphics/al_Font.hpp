@@ -44,8 +44,6 @@
 
 #include <string>
 #include <stdarg.h>
-
-#include "allocore/types/al_Array.hpp"
 #include "allocore/graphics/al_Texture.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
 
