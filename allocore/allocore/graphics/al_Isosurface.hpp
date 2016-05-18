@@ -165,9 +165,6 @@ public:
 	/// End cell-at-a-time mode
 	void end();
 
-	/// Clear the isosurface
-	void clear();
-
 
 	/// Add a cell from a scalar field
 
@@ -262,8 +259,6 @@ protected:
 
 	void compressTriangles();
 };
-
-
 
 
 
