@@ -15,9 +15,7 @@
 	#include <GL/glut.h>
 
 #elif defined AL_WINDOWS
-	#define WIN32_LEAN_AND_MEAN
-	#include <windows.h> // Prevents GLUT from redefining APIENTRY
-	#include <GL/glew.h> // Needed since GLUT includes GL
+	#include <GL/wglew.h> // wglSwapInterval
 	#include <GL/glut.h>
 #endif
 
@@ -738,7 +736,7 @@ void Window::implSetVSync(){
 		CGLSetParameter(ctx, kCGLCPSwapInterval, &VBL);
 	#elif defined AL_LINUX
 	#elif defined AL_WINDOWS
-		// see: http://stackoverflow.com/questions/21262944/trouble-with-vsync-using-glut-in-opengl
+		wglSwapIntervalEXT(int(mVSync));
 	#endif
 }
 
