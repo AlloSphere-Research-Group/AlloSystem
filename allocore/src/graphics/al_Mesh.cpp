@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 #include <fstream>
@@ -511,6 +512,57 @@ void Mesh::ribbonize(float * widths, int widthsStride, bool faceBinormal){
 	if(mColoris.size()) mColoris.expand<2,true>();
 }
 
+
+void Mesh::smooth(float amount, int weighting){
+	std::map<int, std::set<int>> nodes;
+
+	int Ni = indices().size();
+
+	// Build adjacency map
+	for(int i=0; i<Ni; i+=3){
+		int i0 = indices()[i  ];
+		int i1 = indices()[i+1];
+		int i2 = indices()[i+2];
+		nodes[i0].insert(i1);
+		nodes[i0].insert(i2);
+		nodes[i1].insert(i2);
+		nodes[i1].insert(i0);
+		nodes[i2].insert(i0);
+		nodes[i2].insert(i1);
+	}
+
+	Mesh::Vertices vertsCopy(vertices());
+
+	for(const auto& node: nodes){
+		Mesh::Vertex sum(0,0,0);
+		const auto& adjs = node.second;
+
+		switch(weighting){
+		case 0: { // equal weighting
+			for(auto adj : adjs){
+				sum += vertsCopy[adj];
+			}
+			sum /= adjs.size();
+		} break;
+
+		case 1: { // inverse distance weights; reduces vertex sliding
+			float sumw = 0;
+			for(auto adj : adjs){
+				const auto& v = vertsCopy[adj];
+				const auto& c = vertsCopy[node.first];
+				float dist = (v-c).mag();
+				float w = 1./dist;
+				sumw += w;
+				sum += v * w;
+			}
+			sum /= sumw;
+		} break;
+		}
+
+		auto& orig = vertices()[node.first];
+		orig = (sum-orig)*amount + orig;
+	}
+}
 
 
 void Mesh::merge(const Mesh& src){
