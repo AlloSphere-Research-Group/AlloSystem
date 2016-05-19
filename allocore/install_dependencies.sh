@@ -298,11 +298,11 @@ elif uname -o | grep "Msys"; then
 			#cp $PKG/bin/*.dll $DESTDIR/bin/
 			#cp $PKG/lib/*.lib $DESTDIR/lib/
 			#cp -r $PKG/include/* $DESTDIR/include/
-
-			PKG=glew-1.9.0
+			GLEW_VERSION=1.13.0
+			PKG=glew-$GLEW_VERSION
 			DIR=$PWD
 			cd /tmp
-				wget http://downloads.sourceforge.net/project/glew/glew/1.9.0/$PKG.zip
+				wget http://downloads.sourceforge.net/project/glew/glew/$GLEW_VERSION/$PKG.zip
 				unzip -q $PKG
 				cd $PKG
 					make install GLEW_DEST=$DESTDIR
