@@ -136,6 +136,9 @@ public:
 	template <class T>
 	Mesh& translate(const Vec<3,T>& v){ return translate(v[0],v[1],v[2]); }
 
+	template <class T>
+	Mesh& translate(const T& v){ return translate(v,v,v); }
+
 	/// Transform vertices by projective transform matrix
 
 	/// @param[in] m		projective transform matrix

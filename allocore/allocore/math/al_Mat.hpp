@@ -494,6 +494,10 @@ public:
 		return *this;
 	}
 
+	/// Translate transformation matrix by same amount in all directions
+	template<class V>
+	Mat& translate(const V& amount){ return translate(Vec<N-1,V>(amount)); }
+
 
 	/// Print to file (stream)
 	void print(FILE * file = stderr) const;
