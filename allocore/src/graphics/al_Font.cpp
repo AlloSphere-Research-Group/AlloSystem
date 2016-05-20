@@ -1,4 +1,3 @@
-#include "allocore/system/al_Config.h"
 #include "allocore/graphics/al_Font.hpp"
 
 #include <ft2build.h>

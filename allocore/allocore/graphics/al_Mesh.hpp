@@ -192,6 +192,15 @@ public:
 	///								If false, surface faces normal vector of curve.
 	void ribbonize(float * widths, int widthsStride=1, bool faceBinormal=false);
 
+	/// Smooths a triangle mesh
+
+	/// This smooths a triangle mesh using Laplacian (low-pass) filtering.
+	/// New vertex positions are a weighted sum of their nearest neighbors. 
+	/// The number of vertices is not changed.
+	/// @param[in] amount		interpolation fraction between original and smoothed result
+	/// @param[in] weighting	0 = equal weight, 1 = inverse distance weight
+	void smooth(float amount=1, int weighting=0);
+
 
 	int primitive() const { return mPrimitive; }
 	const Buffer<Vertex>& vertices() const { return mVertices; }
