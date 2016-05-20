@@ -87,6 +87,8 @@ public:
 
 	std::vector<std::string> availableSubDirectories();
 
+	std::string getCurrentPath();
+
 	typedef void (*PresetChangeCallback)(int index, void *sender,
 	                                        void *userData);
 	/**
@@ -108,7 +110,6 @@ public:
 	PresetHandler &operator << (Parameter &param) { return this->registerParameter(param); }
 
 private:
-	std::string getCurrentPath();
 	void loadPresetMap();
 	void storePresetMap();
 	std::map<std::string, float> loadPresetValues(std::string name);
