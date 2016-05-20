@@ -11,6 +11,7 @@ set(OSC_HEADERS
 	allocore/ui/al_HtmlInterfaceServer.hpp
 	allocore/ui/al_ParameterMIDI.hpp
 	allocore/ui/al_PresetMIDI.hpp
+	allocore/ui/al_PresetSequencer.hpp
 )
 
 # for oscpack (oscpack sources are included with AlloSystem)
@@ -33,6 +34,7 @@ list(APPEND ALLOCORE_SRC
   src/ui/al_Parameter.cpp
   src/ui/al_Preset.cpp
   src/ui/al_HtmlInterfaceServer.cpp
+  src/ui/al_PresetSequencer.cpp
   )
 
 INCLUDE_DIRECTORIES("${OSCPACK_ROOT_DIR}")
