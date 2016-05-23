@@ -163,14 +163,21 @@ std::string File::extension(const std::string& src){
 	return "";
 }
 
+static std::string stripEndSlash(const std::string& path){
+	if(path.back() == '\\' || path.back() == '/'){
+		return path.substr(0, path.size()-1);
+	}
+	return path;
+}
+
 bool File::exists(const std::string& path){
 	struct stat s;
-	return ::stat(path.c_str(), &s) == 0;
+	return ::stat(stripEndSlash(path).c_str(), &s) == 0;
 }
 
 bool File::isDirectory(const std::string& src){
 	struct stat s;
-	if(0 == ::stat(src.c_str(), &s)){	// exists?
+	if(0 == ::stat(stripEndSlash(src).c_str(), &s)){	// exists?
 		if(s.st_mode & S_IFDIR){		// is dir?
 			return true;
 		}
