@@ -3,6 +3,7 @@
 #include <sys/stat.h>
 #include "allocore/io/al_File.hpp"
 #include "allocore/system/al_Config.h"
+#include <unistd.h>
 #include <stdlib.h> // realpath (POSIX), _fullpath (Windows)
 #ifdef AL_WINDOWS
 	#define WIN32_LEAN_AND_MEAN
@@ -300,4 +301,3 @@ void SearchPaths::print() const {
 
 
 } // al::
-
