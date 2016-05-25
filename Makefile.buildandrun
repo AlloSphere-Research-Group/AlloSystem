@@ -1,10 +1,16 @@
 #RUN_INC_DIRS	?=
 #RUN_SRC_DIRS	?=
+
+# Include user file, if present
+RUN_DIR = $(dir $(firstword $(MAKECMDGOALS)))
+-include $(RUN_DIR)Makefile.user
+
 RUN_DIRS	+= examples/ work/
 
 VPATH += $(RUN_SRC_DIRS)
 RUN_CPPFLAGS := $(addprefix -I, $(RUN_SRC_DIRS))
 
+# Create list of all valid source files found in RUN_SRC_DIRS
 RUN_SRCS	 = $(wildcard $(addsuffix /*.cpp, $(RUN_SRC_DIRS)))
 RUN_SRCS	+= $(wildcard $(addsuffix /*.cc, $(RUN_SRC_DIRS)))
 RUN_SRCS	+= $(wildcard $(addsuffix /*.c, $(RUN_SRC_DIRS)))
