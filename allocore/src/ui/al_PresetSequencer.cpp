@@ -5,6 +5,7 @@
 #include <sstream>
 
 #include "allocore/ui/al_PresetSequencer.hpp"
+#include "allocore/io/al_File.hpp"
 
 using namespace al;
 
@@ -56,6 +57,23 @@ void PresetSequencer::stopSequence()
 {
 	mRunning = false;
 	//		mSequenceLock.lock(); // Waits until the sequencer thread is done and back at the condition variable
+}
+
+std::vector<std::string> al::PresetSequencer::getSequenceList()
+{
+	std::vector<std::string> sequenceList;
+	Dir presetDir(mDirectory);
+	while(presetDir.read()) {
+		FileInfo info = presetDir.entry();
+		if (info.type() == FileInfo::REG) {
+			std::string fileName = info.name();
+			if (fileName.find(".sequence") == fileName.size() - 9) {
+				// Should do better checks, what if '.sequence' is not at the end...
+				sequenceList.push_back(fileName.substr(0, fileName.size() - 9));
+			}
+		}
+	}
+	return sequenceList;
 }
 
 void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
