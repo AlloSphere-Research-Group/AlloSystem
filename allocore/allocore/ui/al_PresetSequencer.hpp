@@ -108,6 +108,12 @@ public:
 
 	void stopSequence();
 
+	/**
+	 * @brief getSequenceList returns a list of sequences in the current sequence directory
+	 * @return a list of sequence names without path and without the '.sequence' extension
+	 */
+	std::vector<std::string> getSequenceList();
+
 	inline bool running() { return mRunning; }
 
 	PresetSequencer &operator<< (PresetHandler &presetHandler)
