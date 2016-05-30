@@ -126,7 +126,8 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 		//int bytesPerSample = 4;
 		//mAudioBuf.resize(aio.channelsOut() * aio.framesPerBuffer() * bytesPerSample);
 
-		unsigned numBlocks = 8192/aio->framesPerBuffer();
+		unsigned ringSizeInFrames = aio->fps() * 0.25; // 1/4 second of audio
+		unsigned numBlocks = ringSizeInFrames/aio->framesPerBuffer();
 		if(numBlocks < 2) numBlocks = 2; // should buffer at least two (?) blocks
 		mAudioRing.resize(aio->channelsOut(), aio->framesPerBuffer(), numBlocks);
 	}
