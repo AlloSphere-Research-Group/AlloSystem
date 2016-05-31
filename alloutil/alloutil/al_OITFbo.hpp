@@ -160,6 +160,22 @@ public:
         unbindFBO();
     }
 
+    ShaderProgram& opaqueShader() {
+        return shader[opaque];
+    }
+
+    ShaderProgram& accumShader() {
+        return shader[accum];
+    }
+
+    ShaderProgram& revealShader() {
+        return shader[reveal];
+    }
+
+    ShaderProgram& compShader() {
+        return shader[comp];
+    }
+
     Texture& result() {
         return tex[opaque];
     }
