@@ -107,7 +107,7 @@ SmoothPose::SmoothPose(const Pose& init, double psmooth, double qsmooth)
 
 
 Nav::Nav(const Vec3d &position, double smooth)
-:	Pose(position), mSmooth(smooth), mVelScale(1)
+:	Pose(position), mSmooth(smooth), mVelScale(1), mPullBack0(0), mPullBack1(0)
 {
 	updateDirectionVectors();
 }
@@ -117,7 +117,8 @@ Nav::Nav(const Nav& nav)
 	mMove0(nav.mMove0), mMove1(nav.mMove1),	// linear velocities (raw, smoothed)
 	mSpin0(nav.mSpin0), mSpin1(nav.mSpin1),	// angular velocities (raw, smoothed)
 	mTurn(nav.mTurn), mNudge(nav.mNudge),			//
-	mSmooth(nav.smooth()), mVelScale(nav.mVelScale)
+	mSmooth(nav.smooth()), mVelScale(nav.mVelScale),
+	mPullBack0(nav.mPullBack0), mPullBack1(nav.mPullBack1)
 {
 	updateDirectionVectors();
 }

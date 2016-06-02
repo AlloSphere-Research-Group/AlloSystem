@@ -509,18 +509,8 @@ void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double cosAng, double sinAng)
 	T c = cosAng;
 	T s = sinAng;
 
-	T c12 = normal[0]*normal[1]*(T(1)-c);
-	T c23 = normal[1]*normal[2]*(T(1)-c);
-	T c31 = normal[2]*normal[0]*(T(1)-c);
-	T c11 = normal[0]*normal[0]*(T(1)-c);
-	T c22 = normal[1]*normal[1]*(T(1)-c);
-	T c33 = normal[2]*normal[2]*(T(1)-c);
-
-	vec.set(
-		Vec<3,T>(c11 + c, c12 - s*normal[2], c31 + s*normal[1]).dot(vec),
-		Vec<3,T>(c12 + s*normal[2], c22 + c, c23 - s*normal[0]).dot(vec),
-		Vec<3,T>(c31 - s*normal[1], c23 + s*normal[0], c33 + c).dot(vec)
-	);
+	// Rodrigues' rotation formula:
+	vec = vec*c + cross(normal, vec)*s + normal*(normal.dot(vec)*(T(1)-c));
 }
 
 /// Rotate a vector around a normal vector
