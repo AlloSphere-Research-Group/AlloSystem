@@ -24,6 +24,25 @@ ParameterGUI &ParameterGUI::addParameter(Parameter &parameter) {
 	return *this;
 }
 
+ParameterGUI &ParameterGUI::addParameterBool(ParameterBool &parameter)
+{
+	glv::Button *button  = new glv::Button;
+	button->setValue(parameter.get() == parameter.max());
+	WidgetWrapper *wrapper = new WidgetWrapper;
+	wrapper->parameter = &parameter;
+	wrapper->lock = &mParameterGUILock;
+	wrapper->widget = static_cast<glv::Widget *>(button);
+	mWrappers.push_back(wrapper);
+	button->attach(ParameterGUI::widgetChangeCallback, glv::Update::Value, wrapper);
+	glv::Box *box = new glv::Box;
+	*box << button << new glv::Label(parameter.getName());
+	box->fit();
+	mBox << box;
+	mBox.fit();
+	parameter.registerChangeCallback(ParameterGUI::valueChangedCallback, wrapper);
+	return *this;
+}
+
 ParameterGUI &ParameterGUI::registerPresetHandler(PresetHandler &handler) {
 	if (mPresetHandler) {
 		std::cout << "IGNORED. Only one preset handler can be attached to a ParameterGUI class." << std::endl;

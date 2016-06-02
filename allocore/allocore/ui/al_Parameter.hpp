@@ -315,8 +315,8 @@ public:
    * @param max Maximum value for the parameter
    *
    * This Parameter class is designed for parameters that can be expressed as a
-   * single float and it uses atomics instead of the locking and priority
-   * mechanism of ParameterWrapper
+   * single float. It realies on float being atomic on the platform so there
+   * is no locking. This is a safe assumption for most platforms today.
    */
 	Parameter(std::string parameterName, std::string Group,
 	          float defaultValue,
@@ -356,6 +356,63 @@ public:
 private:
 	float mFloatValue;
 };
+
+class ParameterBool : public ParameterWrapper<float>
+{
+public:
+	/**
+	* @brief ParameterBool
+   *
+   * @param parameterName The name of the parameter
+   * @param Group The group the parameter belongs to
+   * @param defaultValue The initial value for the parameter
+   * @param prefix An address prefix that is prepended to the parameter's OSC address
+   * @param min Value when off/false
+   * @param max Value when on/true
+   *
+   * This ParameterBool class is designed for boolean parameters that have
+   * float values for on or off states. It relies on floats being atomic on
+   * the platform.
+   */
+	ParameterBool(std::string parameterName, std::string Group,
+	          float defaultValue,
+	          std::string prefix = "",
+	          float min = 0,
+	          float max = 1.0
+	        );
+
+	/**
+	 * @brief set the parameter's value
+	 *
+	 * This function is thread-safe and can be called from any number of threads
+	 */
+	virtual void set(float value) override;
+
+	/**
+	 * @brief set the parameter's value without calling callbacks
+	 *
+	 * This function is thread-safe and can be called from any number of threads.
+	 * The processing callback is called, but the callbacks registered with
+	 * registerChangeCallback() are not called. This is useful to avoid infinite
+	 * recursion when a widget sets the parameter that then sets the widget.
+	 */
+	virtual void setNoCalls(float value, void *blockReceiver = NULL);
+
+	/**
+	 * @brief get the parameter's value
+	 *
+	 * This function is thread-safe and can be called from any number of threads
+	 *
+	 * @return the parameter value
+	 */
+	virtual float get() override;
+
+	const float operator= (const float value) { this->set(value); return value; }
+
+private:
+	float mFloatValue;
+};
+
 
 
 /**
@@ -423,13 +480,22 @@ public:
 	/// Register parameter using the streaming operator
 	ParameterServer &operator << (Parameter* newParam){ return registerParameter(*newParam); }
 
+	/**
+	 * @brief Append a listener to the osc server.
+	 * @param handler
+	 * OSC messages received by this server will be forwarded to all
+	 * registered listeners. This is the mechanism internally used to share a
+	 * network port between a ParameterServer, a PresetServer and a SequenceServer
+	 */
+	void registerOSCListener(osc::PacketHandler *handler);
+
 	virtual void onMessage(osc::Message& m);
 
 protected:
 	static void changeCallback(float value, void *sender, void *userData, void *blockThis);
 
 private:
-
+	std::vector<osc::PacketHandler *> mPacketHandlers;
 	osc::Recv *mServer;
 	std::vector<Parameter *> mParameters;
 	std::mutex mParameterLock;
