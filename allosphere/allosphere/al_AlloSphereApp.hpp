@@ -11,7 +11,7 @@
 #include <iostream>
 
 #if !defined(ALLOSPHERE_BUILD_SIMULATOR) && !defined(ALLOSPHERE_BUILD_GRAPHICS_RENDERER) && !defined(ALLOSPHERE_BUILD_AUDIO_RENDERER)
-#define ALLOSPHERE_BUILD_GRAPHICS_RENDERER
+#define ALLOSPHERE_BUILD_SIMULATOR
 #endif
 
 #if (defined(ALLOSPHERE_BUILD_SIMULATOR) && defined(ALLOSPHERE_BUILD_GRAPHICS_RENDERER)) || \
@@ -293,13 +293,13 @@ public:
 //		this->initAudio();
 
 		this->initWindow();
-		this->initAudio(44100, 1024, 2, 0);
+//		this->initAudio(44100, 1024, 2, 0);
 		std::cout << "Running Simulator" << std::endl;
 #endif
 
 
 #ifdef ALLOSPHERE_BUILD_AUDIO_RENDERER
-		this->initAudio();
+//		this->initAudio();
 		this->dimensions(Window::Dim(320, 240));
 		this->title("Audio Renderer");
 //		std::cout << "Running Audio Renderer" << std::endl;

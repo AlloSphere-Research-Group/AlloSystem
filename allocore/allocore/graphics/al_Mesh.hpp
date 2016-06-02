@@ -136,6 +136,9 @@ public:
 	template <class T>
 	Mesh& translate(const Vec<3,T>& v){ return translate(v[0],v[1],v[2]); }
 
+	template <class T>
+	Mesh& translate(const T& v){ return translate(v,v,v); }
+
 	/// Transform vertices by projective transform matrix
 
 	/// @param[in] m		projective transform matrix
@@ -191,6 +194,15 @@ public:
 	/// @param[in] faceBinormal		If true, surface faces binormal vector of curve.
 	///								If false, surface faces normal vector of curve.
 	void ribbonize(float * widths, int widthsStride=1, bool faceBinormal=false);
+
+	/// Smooths a triangle mesh
+
+	/// This smooths a triangle mesh using Laplacian (low-pass) filtering.
+	/// New vertex positions are a weighted sum of their nearest neighbors. 
+	/// The number of vertices is not changed.
+	/// @param[in] amount		interpolation fraction between original and smoothed result
+	/// @param[in] weighting	0 = equal weight, 1 = inverse distance weight
+	void smooth(float amount=1, int weighting=0);
 
 
 	int primitive() const { return mPrimitive; }

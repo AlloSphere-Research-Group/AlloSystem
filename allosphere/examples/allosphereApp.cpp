@@ -1,5 +1,5 @@
 
-#include "alloutil/al_AlloSphereApp.hpp"
+#include "allosphere/al_AlloSphereApp.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
 #include <atomic>
 
@@ -32,6 +32,7 @@ public:
 class SimulatorApp : public SimulatorBase<State> {
 public:
 	SimulatorApp() {
+		initAudio();
 	}
 
 	virtual void onAnimate(double dt) override {

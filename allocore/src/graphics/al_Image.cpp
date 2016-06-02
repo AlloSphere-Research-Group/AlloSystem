@@ -21,18 +21,24 @@
 
 namespace al{
 
-static int initializedFreeImage = 0;
-
 class FreeImageImpl : public Image::Impl {
 public:
 	FreeImageImpl()
 	:	mImage(NULL)
 	{
-		if (!initializedFreeImage) {
-			FreeImage_Initialise();
-			initializedFreeImage = 1;
-		}
+		// Initialization singleton
+		struct Init{
+			Init(){ FreeImage_Initialise(); }
+			~Init(){ FreeImage_DeInitialise(); }
+			static Init& get(){
+				static Init v;
+				return v;
+			}
+		};
+
+		Init::get();
 	}
+
 	virtual ~FreeImageImpl() {
 		destroy();
 	}

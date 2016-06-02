@@ -1,5 +1,5 @@
 
-#include "alloutil/al_AlloSphereApp.hpp"
+#include "allosphere/al_AlloSphereApp.hpp"
 #include "allocore/graphics/al_Mesh.hpp"
 
 // This exmaple shows how to use the AlloSphereApp and companion classes to
@@ -113,6 +113,7 @@ class AudioRenderer : public AudioRendererBase<AudioState> {
 public:
 	AudioRenderer() : mPhase(0), mPhaseInc(0)
 	{
+		initAudio();
 	}
 
 	// You can perform intialization operations in the initAudio() function,

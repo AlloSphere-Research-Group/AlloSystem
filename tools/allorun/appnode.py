@@ -81,7 +81,7 @@ class Node:
         return
     
 class BuildNode(Node):
-    def __init__(self, name = 'nodeb', distributed = True):
+    def __init__(self, name = 'b_node', distributed = True):
         Node.__init__(self)
 
         self.name = name
@@ -106,12 +106,13 @@ class BuildNode(Node):
             self._debug_print("Returned: " + str(ssh.returncode) + '\n')  
             ssh.terminate()
         
-        command = self._get_build_command()
+        command_list = self._get_build_command()
         if self.remote:
-            command = 'ssh %s "%s"'%(self.hostname, ' '.join(command))
-            command_list = ["ssh", "%s@%s" % (self.login, self.gateway), command]
-        else:
-            command_list = command
+            command_list = ['ssh', '-o StrictHostKeyChecking=no', self.hostname, '"%s"'%' '.join(command_list)]
+            if self.gateway != '' :
+                command_list = ["ssh", "-o StrictHostKeyChecking=no",
+                                "%s@%s" % (self.login, self.gateway), ' '.join(command_list)]
+
             
         self._debug_print("-- Building: " + ' '.join(command_list) + ' from: ' + os.getcwd() + '\n')
         self.internal_process = subprocess.Popen(' '.join(command_list),
@@ -129,17 +130,21 @@ class BuildNode(Node):
         if self.project_dir:
             command.append("cd %s;"%self.project_dir)
         command.append(self.build_command)
-        if self.build_distributed_app:
-            command.append('-s')
-        command.append('-n')
+#        if self.build_distributed_app:
+#            command.append('-s')
+#        command.append('-n')
         command.append(self.project_src)
         return command
 
 class RemoteBuildNode(BuildNode):
-    def __init__(self):
-        super(RemoteBuildNode, self).__init__(hostname = 'gr01',
+    def __init__(self, hostname = 'gr01',
                  gateway = "nonce.mat.ucsb.edu",
-                 login = 'sphere')
+                 login = 'sphere'):
+        BuildNode.__init__(self)
+        self.hostname = hostname
+        self.name = hostname
+        self.gateway = gateway
+        self.login = login
                  
         self.remote = True
 

@@ -1,8 +1,9 @@
-#include <string>
-#include <iostream>
+//#include <cassert>
+#include <algorithm> // min,max
 #include "allocore/types/al_Voxels.hpp"
 #include "allocore/io/al_File.hpp"
 #include "allocore/system/al_Printing.hpp"
+#include "allocore/graphics/al_Image.hpp"
 
 namespace al {
 
@@ -246,33 +247,33 @@ void Voxels::print(FILE * fp) {
   fprintf(fp,"  cell:   %s, %s, %s\n", printVoxWidth(0).c_str(), printVoxWidth(1).c_str(), printVoxWidth(2).c_str());
 }
 
-bool Voxels::getdir(std::string dir, vector<std::string> &files) {
-    DIR *dp;
-    struct dirent * dirp;
-    if((dp = opendir(dir.c_str())) == NULL)	{
-      //cout << "Error(" << errno << ") opening " << dir << endl;
-      return false;
-    }
-    while((dirp = readdir(dp)) != NULL) {
-      char *name = dirp->d_name;
-      if (strcmp(name, ".") && strcmp(name, "..") && strcmp(name, "info.txt") && strcmp(name, ".DS_Store")) {
-      	cout << name << endl;
-      	files.push_back(dir + "/" + string(name));
-      }
-    }
-    closedir(dp);
-    return true;
-  }
+bool Voxels::getdir(std::string path, std::vector<std::string> &files) {
+	al::Dir dir;
+	if(dir.open(path)){
+		while(dir.read()){
+			auto& file = dir.entry();
+			if(file.type() == al::FileInfo::REG){
+				auto& name = file.name();
+				if(name != "info.txt" && name != ".DS_Store"){
+					std::cout << name << "\n";
+					files.push_back(path + "/" + name);
+				}
+			}
+		}
+		return true;
+	}
+	return false;
+}
   
     
-bool Voxels::parseInfo(std::string dir, vector<std::string> &data) {
-    string file = dir + "/info.txt";
-    cout << file << endl;
-    ifstream infile(file.c_str());
+bool Voxels::parseInfo(std::string dir, std::vector<std::string> &data) {
+    std::string file = dir + "/info.txt";
+    std::cout << file << "\n";
+    std::ifstream infile(file.c_str());
     if (!infile.good())
       return false; // exit if file not found
 
-    string strOneLine;
+    std::string strOneLine;
 
     while (infile)
     {
@@ -317,28 +318,28 @@ bool Voxels::parseInfo(std::string dir, vector<std::string> &data) {
 
 bool Voxels::loadFromDirectory(std::string dir) {
   
-    vector<string> files;
-    vector<string> info;
+    std::vector<std::string> files;
+    std::vector<std::string> info;
 
     // Image and Texture handle reading and displaying image files.
     Image RGBImage; // for reading into
     
     if (!getdir(dir,files)) {
-      cout << "Problem reading directory " << dir << endl;
+      std::cout << "Problem reading directory " << dir << "\n";
       return false;
     }
 
     if (files.size() == 0) {
-      cout << "Read zero files from directory " << dir << endl;
+      std::cout << "Read zero files from directory " << dir << "\n";
       return false;
     }
 
-    cout << "Judging by " << dir << " there are " << files.size() << " images (or at least files)" << endl;
+    std::cout << "Judging by " << dir << " there are " << files.size() << " images (or at least files)" << "\n";
 
 
     // Try reading the first one just to get the size
     if (!RGBImage.load(files[0])) {
-      cout << "Couldn't read file " << files[0] << endl;
+      std::cout << "Couldn't read file " << files[0] << "\n";
       return false;
     }
 
@@ -356,15 +357,15 @@ bool Voxels::loadFromDirectory(std::string dir) {
       	vx = atof(info[1].c_str());
       	vy = atof(info[2].c_str());
       	vz = atof(info[3].c_str());
-      	cout << "imported values from info.txt: " << type << ", " << vx << ", " << vy << ", " << vz << endl;
+      	std::cout << "imported values from info.txt: " << type << ", " << vx << ", " << vy << ", " << vz << "\n";
       } else {
-      	cout << info.size() << " info.txt doesn't have enough info, using default data" << endl;
+      	std::cout << info.size() << " info.txt doesn't have enough info, using default data" << "\n";
       }
     } else {
-      cout << "no info.txt, using default data" << endl;
+      std::cout << "no info.txt, using default data" << "\n";
     }
 
-    cout << "Judging by " << files[0] << " each image should be " << nx << " by " << ny << endl;
+    std::cout << "Judging by " << files[0] << " each image should be " << nx << " by " << ny << "\n";
 
     // For now assume 8-bit with 1 nm cube voxels
     format(1, AlloUInt8Ty, nx, ny, nz);
@@ -373,22 +374,22 @@ bool Voxels::loadFromDirectory(std::string dir) {
 
     // Iterate through entire directory
     int slice = 0;
-    for (vector<string>::iterator it = files.begin(); it != files.end(); ++it, ++slice) {
-      string &filename = *it;
+    for (std::vector<std::string>::iterator it = files.begin(); it != files.end(); ++it, ++slice) {
+      std::string &filename = *it;
 
       if (RGBImage.load(filename)) {
-      	cout << "loaded " << filename << 
-      	  " (" << slice+1 << " of " << files.size() << ")" << endl;
+      	std::cout << "loaded " << filename <<
+      	  " (" << slice+1 << " of " << files.size() << ")" << "\n";
       } else {
-      	cout << "Failed to read image from " << filename << endl;
+      	std::cout << "Failed to read image from " << filename << "\n";
       	return false;
       }
 
       // Verify XY resolution
       if (int(RGBImage.width()) != nx || int(RGBImage.height()) != ny) {
-      	cout << "Error:  resolution mismatch!" << endl;
-      	cout << "   " << files[0] << ": " << nx << " by " << ny << endl;
-      	cout << "   " << filename << ": " << RGBImage.width() << " by " << RGBImage.height() << endl;
+      	std::cout << "Error:  resolution mismatch!" << "\n";
+      	std::cout << "   " << files[0] << ": " << nx << " by " << ny << "\n";
+      	std::cout << "   " << filename << ": " << RGBImage.width() << " by " << RGBImage.height() << "\n";
       	return false;
       }
 	
@@ -412,11 +413,7 @@ bool Voxels::loadFromDirectory(std::string dir) {
     return true;
   }
 
- 
-}
-
-
-
+/*  //BACK-UP
 bool Voxels::linePlaneIntersection(const Vec3f &P0, const Vec3f &P1, const Vec3f &planeCenter, const Vec3f &planeNormal, Vec3f* intersection)
 {
    Vec3f P10 = P1 - P0;
@@ -439,12 +436,64 @@ bool Voxels::linePlaneIntersection(const Vec3f &P0, const Vec3f &P1, const Vec3f
    return true;
 }
 
-vector<Vec3f> Voxels::linspace( Vec3f a, Vec3f b, int n) {
-  vector<Vec3f> arr;
+//back 2
+bool Voxels::linePlaneIntersection(const Vec3f &P0, const Vec3f &P1, const Vec3f &planeCenter, const Vec3f &planeNormal, Vec3f* intersection)
+{
+   Vec3f P10 = P1 - P0;
+   Vec3f P20 = planeCenter - P0;
+   float nDot10 = planeNormal.dot(P10);
+   float nDot20 = planeNormal.dot(P20);
+   Vec3f w = P0 -planeCenter;
+   float fac = -planeNormal.dot(w)/nDot10;
+   Vec3f t = P10*fac;
+
+   if (nDot10 == 0){
+     return false;
+   }
+
+   float u = nDot20/nDot10;
+
+   if (u > 1.0 or u < 0.0) {
+     return false;
+   }
+
+  *intersection = P0 +t;  //testing a new intersect calculation
+
+   return true;
+}
+*/
+
+bool Voxels::linePlaneIntersection(const Vec3f &P0, const Vec3f &P1, const Vec3f &planeCenter, const Vec3f &planeNormal, Vec3f* intersection)
+{
+   Vec3f P10 = P1 - P0;
+   Vec3f P20 = planeCenter - P0;
+   Vec3f P02 = P0 - planeCenter;
+   float nDot10 = planeNormal.dot(P10);
+   float nDot20 = planeNormal.dot(P20);
+
+   if (nDot10 == 0){
+     return false;
+   }
+
+   float u = nDot20/nDot10;
+
+   if (u > 1.0 || u < 0.0) {
+     return false;
+   }
+
+  *intersection = P0 +P10*u;  //testing a new intersect calculation
+
+   return true;
+}
+
+
+
+std::vector<Vec3f> Voxels::linspace( Vec3f a, Vec3f b, int n) {
+  std::vector<Vec3f> arr;
   Vec3f ba = b-a;
   Vec3f step = Vec3f(ba.x/(n-1.0),ba.y/(n-1.0),ba.z/(n-1.0));
-//  std::cout << ba.x << " " << ba.y << " " << ba.z << std::endl;
-//  std::cout << step.x << " " << step.y << " " << step.z << std::endl;
+//  std::cout << ba.x << " " << ba.y << " " << ba.z << "\n";
+//  std::cout << step.x << " " << step.y << " " << step.z << "\n";
 
   for (int i = 0; i < n; i++) {
     arr.push_back(a);
@@ -457,27 +506,39 @@ Vec3f Voxels::point2Dto3D(Vec3f Q, Vec3f H, Vec3f K, float u, float v){
   return Vec3f(Q.x+u*H.x+v*K.x,Q.y+u*H.y+v*K.y,Q.z+u*H.z+v*K.z);
 }
 
-bool Voxels::parallelLinespace(Vec3f p0, Vec3f p1, Vec3f p2, Vec3f p3, vector<Vec3f> &list, vector<Vec3f> &list2, float aDirection, float oDirection){
+bool Voxels::parallelLinespace(Vec3f p0, Vec3f p1, Vec3f p2, Vec3f p3, std::vector<Vec3f> &list, std::vector<Vec3f> &list2, float aDirection, float oDirection, std::vector<Vec3f> &points){
   Vec3f a = p0-p1;
   Vec3f b = p2-p3;
   float t = a.dot(b)/(a.mag()*b.mag());
-  int n = ceil(oDirection);
-  if ((p0-p1).mag()/(p0-p2).mag() == aDirection/oDirection || (p0-p1).mag()/(p0-p3).mag() == aDirection/oDirection){ n = ceil(aDirection); }
+  t = round(t*10000)/10000;
+  int n = aDirection;
+  if ((p0-p1).mag()/(p0-p2).mag() == aDirection/oDirection){ 
+    n = oDirection; 
+  }
   std::cout.flush();
-  if (t == -1){
+  std::cout << "t = " << t << "\n";
+  if (t == -1.0){
     list = linspace(p0,p1,n);
     list2 = linspace(p3,p2,n);
+    points.push_back(p0);
+    points.push_back(p1);
+    points.push_back(p3);
+    points.push_back(p2);
     return true;
-  } else if (t == 1){
+  } else if (t == 1.0){
     list = linspace(p0,p1,n);
     list2 = linspace(p2,p3,n);
+    points.push_back(p0);
+    points.push_back(p1);
+    points.push_back(p2);
+    points.push_back(p3);
     return true;
   } 
   return false;
 }
 
 //does this needs to be in voxels?  currently it isn't
-Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal){  
+Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal, std::vector<Vec3f> &finalPointList){
  //assume point and vector are given in cell*width, cell*height, cell*depth coordinate system
  //point and vector define a plane
  // nice page on cube plane intersection
@@ -486,31 +547,33 @@ Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal){
   float xMax =  width()* m_voxWidth[0];
   float yMax =  height()* m_voxWidth[1];
   float zMax =  depth()* m_voxWidth[2];
+
+  std::cout << "values " << xMax << " " << yMax << " " << zMax << "\n";
 //
 //calculate intersections 
-  vector<Vec3f> P;
+  std::vector<Vec3f> P;
   Vec3f intersection;
-  if (linePlaneIntersection(Vec3f(0,0,0),Vec3f(xMax,0,0),planeCenter,planeNormal,&intersection))
-    P.push_back(intersection);
-  if (linePlaneIntersection(Vec3f(0,0,0),Vec3f(0,yMax,0),planeCenter,planeNormal,&intersection))
-    P.push_back(intersection);
   if (linePlaneIntersection(Vec3f(0,0,0),Vec3f(0,0,zMax),planeCenter,planeNormal,&intersection))
-    P.push_back(intersection);
-  if (linePlaneIntersection(Vec3f(0,yMax,zMax),Vec3f(xMax,yMax,zMax),planeCenter,planeNormal,&intersection))
-    P.push_back(intersection);
-  if (linePlaneIntersection(Vec3f(xMax,0,zMax),Vec3f(xMax,yMax,zMax),planeCenter,planeNormal,&intersection))
-    P.push_back(intersection);
-  if (linePlaneIntersection(Vec3f(xMax,yMax,0),Vec3f(xMax,yMax,zMax),planeCenter,planeNormal,&intersection))
-    P.push_back(intersection);
-  if (linePlaneIntersection(Vec3f(0,yMax,zMax),Vec3f(0,0,zMax),planeCenter,planeNormal,&intersection))
-    P.push_back(intersection);
-  if (linePlaneIntersection(Vec3f(xMax,0,zMax),Vec3f(0,0,zMax),planeCenter,planeNormal,&intersection))
     P.push_back(intersection);
   if (linePlaneIntersection(Vec3f(0,yMax,0),Vec3f(0,yMax,zMax),planeCenter,planeNormal,&intersection))
     P.push_back(intersection);
-  if (linePlaneIntersection(Vec3f(0,yMax,0),Vec3f(xMax,yMax,0),planeCenter,planeNormal,&intersection))
+  if (linePlaneIntersection(Vec3f(xMax,yMax,0),Vec3f(xMax,yMax,zMax),planeCenter,planeNormal,&intersection))
     P.push_back(intersection);
   if (linePlaneIntersection(Vec3f(xMax,0,0),Vec3f(xMax,0,zMax),planeCenter,planeNormal,&intersection))
+    P.push_back(intersection);
+  if (linePlaneIntersection(Vec3f(0,0,0),Vec3f(xMax,0,0),planeCenter,planeNormal,&intersection))
+    P.push_back(intersection);
+  if (linePlaneIntersection(Vec3f(0,yMax,0),Vec3f(xMax,yMax,0),planeCenter,planeNormal,&intersection))
+    P.push_back(intersection);
+  if (linePlaneIntersection(Vec3f(0,yMax,zMax),Vec3f(xMax,yMax,zMax),planeCenter,planeNormal,&intersection))
+    P.push_back(intersection);
+  if (linePlaneIntersection(Vec3f(xMax,0,zMax),Vec3f(0,0,zMax),planeCenter,planeNormal,&intersection))
+    P.push_back(intersection);
+  if (linePlaneIntersection(Vec3f(0,0,0),Vec3f(0,yMax,0),planeCenter,planeNormal,&intersection))
+    P.push_back(intersection);
+  if (linePlaneIntersection(Vec3f(0,yMax,zMax),Vec3f(0,0,zMax),planeCenter,planeNormal,&intersection))
+    P.push_back(intersection);
+  if (linePlaneIntersection(Vec3f(xMax,0,zMax),Vec3f(xMax,yMax,zMax),planeCenter,planeNormal,&intersection))
     P.push_back(intersection);
   if (linePlaneIntersection(Vec3f(xMax,0,0),Vec3f(xMax,yMax,0),planeCenter,planeNormal,&intersection))
     P.push_back(intersection);
@@ -521,17 +584,17 @@ Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal){
     Vec2f *p2D = new Vec2f[P.size()];
     p2D[0] = Vec2f(0,0);
     float x = sqrt(pow(P[1].x-P[0].x,2.0)+pow(P[1].y-P[0].y,2.0)+pow(P[1].z-P[0].z,2.0));
-    std::cout << x << std::endl;
+    std::cout << x << "\n";
     p2D[1] = Vec2f(x,0);
     if(P.size() == 2){
       //super easy, it's just a line :)
       x = ceil(x);
       result.format(1, type(), x);
-      vector<Vec3f> space = linspace(P[0], P[1], x);
-      for (int j = 0; j < space.size(); j++){
+      std::vector<Vec3f> space = linspace(P[0], P[1], x);
+      for (unsigned j = 0; j < space.size(); j++){
         Vec3f point = space[j];
         float temp[1] = {0};
-        if (point.x >= 0 and point.y >= 0 and point.z >= 0 and point.x <=  width()* m_voxWidth[2] and point.y <=  height()* m_voxWidth[1] and point.z <=  depth()* m_voxWidth[2]){
+        if (point.x >= 0 && point.y >= 0 && point.z >= 0 && point.x <=  width()* m_voxWidth[2] && point.y <=  height()* m_voxWidth[1] && point.z <=  depth()* m_voxWidth[2]){
           Vec3f p = Vec3f(point.x/ m_voxWidth[0],point.y/ m_voxWidth[1],point.z/ m_voxWidth[2]);
            read_interp(temp, p);
         }
@@ -539,69 +602,53 @@ Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal){
       }
     } else {
       //Oh noes!  It's more than a line, this is a little more complex
-      float minA2D = 0, minO2D = 0, maxA2D = x, maxO2D = 0;
-      for (int i = 0; i < P.size(); i++){
-	    std:cout << "plane intersect point " << i << ": " << P[i].x << " " << P[i].y << " " << P[i].z << std::endl;
-      }
+      float minA2D = 0, minO2D = 0, maxA2D = 0, maxO2D = 0;
       //what are all these points in 2d on a plane
-      for (int i = 2; i < P.size(); i++){
-        Vec3f c = (P[1]-P[0]).cross(P[i]-P[0]);
-        c = c/c.mag();
-        float h = sqrt(pow(P[i].x-P[0].x,2.0)+pow(P[i].y-P[0].y,2.0)+pow(P[i].z-P[0].z,2.0));
-        float a = (P[1]-P[0]).dot(P[i]-P[0])/(x);
-        float o = (h*sqrt(1-pow(a/h,2.0)))*(c.x+c.y+c.z);
-        std::cout << "c :" << c.x << " " << c.y << " " << c.z << std::endl;
-        std::cout << "a, h, o :" << a << " " << h << " " << o << std::endl;
-        minA2D = std::min(minA2D, a);
-        maxA2D = std::max(maxA2D, a);
-        minO2D = std::min(minO2D, o);
-        maxO2D = std::max(maxO2D, o);
-        p2D[i] = Vec2f(a, o);
+      //http://stackoverflow.com/questions/10702099/computing-two-vectors-that-are-perpendicular-to-third-vector-in-3d
+      Vec3f y_axis = planeNormal.cross((P[0]-planeCenter).normalize());
+      Vec3f z_axis = planeNormal.cross(y_axis);
+      //http://stackoverflow.com/questions/23472048/projecting-3d-points-to-2d-plane
+      for (unsigned i = 0; i < P.size(); i++) {
+	Vec3f pi = P[i]-planeCenter;
+        float t_1 = y_axis.dot(pi);
+        float t_2 = z_axis.dot(pi);
+        minA2D = std::min(minA2D, t_1);
+        maxA2D = std::max(maxA2D, t_1);
+        minO2D = std::min(minO2D, t_2);
+        maxO2D = std::max(maxO2D, t_2);
+        p2D[i] = Vec2f(t_1, t_2);
       }
-      //cool now we can figure out the 4 points that define the square
       int aDirection = ceil(maxA2D - minA2D);
       int oDirection = ceil(maxO2D - minO2D);
-      std::cout << "minA2d, maxA2d, mino2D, maxo2d, aDirection, oDirection " << minA2D << " " << maxA2D << " " << minO2D << " " << maxO2D << " " << aDirection << " " << oDirection << std::endl;
+      //http://math.stackexchange.com/questions/525829/how-to-find-the-3d-coordinate-of-a-2d-point-on-a-known-plane
       result.format(1, type(), aDirection, oDirection);
-      //now what are they in 3d points
-      Vec3f Q = P[0];
-      Vec3f H = P[1]-P[0];
-      H = H/H.mag();
-      Vec3f K = planeNormal.cross(H);
-      K = K/K.mag();
-      Vec3f p0 = point2Dto3D(Q,H,K,minA2D,minO2D);
-      Vec3f p1 = point2Dto3D(Q,H,K,minA2D,maxO2D);
-      Vec3f p2 = point2Dto3D(Q,H,K,maxA2D,maxO2D);
-      Vec3f p3 = point2Dto3D(Q,H,K,maxA2D,minO2D);
-      std::cout << "p0 :" << p0.x << " " << p0.y << " " << p0.z << std::endl;
-      std::cout << "p1 :" << p1.x << " " << p1.y << " " << p1.z << std::endl;
-      std::cout << "p2 :" << p2.x << " " << p2.y << " " << p2.z << std::endl;
-      std::cout << "p3 :" << p3.x << " " << p3.y << " " << p3.z << std::endl;
+      Vec3f p0 = point2Dto3D(planeCenter,y_axis,z_axis,minA2D,minO2D);
+      Vec3f p1 = point2Dto3D(planeCenter,y_axis,z_axis,minA2D,maxO2D);
+      Vec3f p2 = point2Dto3D(planeCenter,y_axis,z_axis,maxA2D,maxO2D);
+      Vec3f p3 = point2Dto3D(planeCenter,y_axis,z_axis,maxA2D,minO2D);
+      std::cout << "p0 :" << p0.x << " " << p0.y << " " << p0.z << "\n";
+      std::cout << "p1 :" << p1.x << " " << p1.y << " " << p1.z << "\n";
+      std::cout << "p2 :" << p2.x << " " << p2.y << " " << p2.z << "\n";
+      std::cout << "p3 :" << p3.x << " " << p3.y << " " << p3.z << "\n";
       //Check to see if two lines intersect
-      vector<Vec3f> list;
-      vector<Vec3f> list2;
-      if (!parallelLinespace(p0, p1, p2, p3, list, list2, maxA2D-minA2D, maxO2D-minO2D)){
-	      if (!parallelLinespace(p0, p2, p1, p3, list, list2, maxA2D-minA2D, maxO2D-minO2D)){
-              parallelLinespace(p0, p3, p1, p2, list, list2, maxA2D-minA2D, maxO2D-minO2D );
-	      }
+      std::vector<Vec3f> list;
+      std::vector<Vec3f> list2;
+      if (!parallelLinespace(p0, p1, p2, p3, list, list2, maxA2D-minA2D, maxO2D-minO2D, finalPointList)){
+        if (!parallelLinespace(p0, p2, p1, p3, list, list2, maxA2D-minA2D, maxO2D-minO2D, finalPointList)){
+          parallelLinespace(p0, p3, p1, p2, list, list2, maxA2D-minA2D, maxO2D-minO2D, finalPointList);
+        }
       }
+      std::cout << "finalPointList Length:" << finalPointList.size() << "\n";
       //now lets fill the results
-//      std::cout << "size 1: " << list.size() << std::endl;
-      for (int i = 0; i < list.size(); i++){
-        vector<Vec3f> space = linspace(list[i], list2[i], oDirection);
-//        std::cout << "size 2: " << space.size() << std::endl;
-        for (int j = 0; j < space.size(); j++){
-//	  std::cout << "j is " << j << std::endl;
-//	  std::cout << "space[j] is " << space[j].x << " " << space[j].y << " " << space[j].z << std::endl;
+      for (unsigned i = 0; i < list.size(); i++){
+        std::vector<Vec3f> space = linspace(list[i], list2[i], oDirection);  //XXX should this be oDirection or aDirection, please check!
+        for (unsigned j = 0; j < space.size(); j++){
 	  Vec3f point = space[j];
    	  float temp[1] = {0};
-	  if (point.x >= 0 and point.y >= 0 and point.z >= 0 and point.x <=  width()* m_voxWidth[2] and point.y <=  height()* m_voxWidth[1] and point.z <=  depth()* m_voxWidth[2]){
- //    	    std::cout << "why not" << std::endl;
+	  if (point.x >= 0 && point.y >= 0 && point.z >= 0 && point.x <=  width()* m_voxWidth[2] && point.y <=  height()* m_voxWidth[1] && point.z <=  depth()* m_voxWidth[2]){
  	    Vec3f p = Vec3f(point.x/ m_voxWidth[0],point.y/ m_voxWidth[1],point.z/ m_voxWidth[2]);
   	     read_interp(temp, p);
-//  	    std::cout << "why not now" << std::endl;
 	  }
-//	  std::cout << "temp is " << temp[0] << std::endl;
 	  result.write(temp,i,j);
 	}
       }
@@ -614,14 +661,18 @@ Array Voxels::slice(Vec3f planeCenter, Vec3f planeNormal){
     result.format(1, type(),1);
     Vec3f point = P[0];
     float temp[1] = {0};
-    if (point.x >= 0 and point.y >= 0 and point.z >= 0 and point.x <=  width()* m_voxWidth[2] and point.y <=  height()* m_voxWidth[1] and point.z <=  depth()* m_voxWidth[2]){
+    if (point.x >= 0 && point.y >= 0 && point.z >= 0 && point.x <=  width()* m_voxWidth[2] && point.y <=  height()* m_voxWidth[1] && point.z <=  depth()* m_voxWidth[2]){
       Vec3f p = Vec3f(point.x/ m_voxWidth[0],point.y/ m_voxWidth[1],point.z/ m_voxWidth[2]);
        read_interp(temp, p);
     }
     result.write(temp,0);
-  } 
-
-//  std::cout << "wtf" << std::endl;
+  }
+//  for (int i = 0; i < finalPointList.size(); i++){
+//    finalPointList[i] = finalPointList[i]/Vec3f(xMax,yMax,zMax);
+//  }
+//  std::cout << "wtf" << "\n";
   return result;
 }
 
+
+} // al::

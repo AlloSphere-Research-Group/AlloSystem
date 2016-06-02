@@ -211,7 +211,7 @@ template <class T>
 inline Complex<T> operator * (T r, const Complex<T>& c){ return  c*r; }
 
 template <class T>
-inline Complex<T> operator / (T r, const Complex<T>& c){ return  c.conj()*(r/c.norm()); }
+inline Complex<T> operator / (T r, const Complex<T>& c){ return  c.conj()*(r/c.normSqr()); }
 
 
 template <class VecN, class T>

@@ -84,7 +84,7 @@ git submodule update --depth 50
             if self.dependencies['Gamma']:
                 script_text += repo_clone_cmd + 'https://github.com/AlloSphere-Research-Group/Gamma.git Gamma\n'
             if self.dependencies['GLV']:
-                script_text += repo_clone_cmd + 'https://github.com/AlloSphere-Research-Group/GLV.git GLV\n'
+                script_text += 'git clone -b cmake ' + 'https://github.com/AlloSphere-Research-Group/GLV.git GLV\n'
         
         script_text += '''git fat init
 git fat pull
