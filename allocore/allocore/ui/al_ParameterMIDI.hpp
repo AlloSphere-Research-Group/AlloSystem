@@ -121,6 +121,15 @@ public:
 		}
 	}
 
+	void connectNoteToToggle(ParameterBool &param, int channel, int note) {
+		ToggleBinding newBinding;
+		newBinding.noteNumber = note;
+		newBinding.toggle = true;
+		newBinding.channel = channel - 1;
+		newBinding.param = &param;
+		mToggleBindings.push_back(newBinding);
+	}
+
 	void connectNoteToIncrement(Parameter &param, int channel, int note,
 	                            float increment) {
 		IncrementBinding newBinding;
@@ -154,6 +163,29 @@ public:
 					binding.param->set(binding.param->get() + binding.increment);
 				}
 			}
+			for(ToggleBinding binding: mToggleBindings) {
+				if (m.channel() == binding.channel
+						&& m.noteNumber() == binding.noteNumber) {
+					if (binding.toggle == true) {
+						binding.param->set(
+									binding.param->get() == binding.param->max() ?
+										binding.param->min() : binding.param->max() );
+					} else {
+						binding.param->set(binding.param->max());
+					}
+				}
+			}
+		} else if (m.type() & MIDIByte::NOTE_OFF
+				   || (m.type() & MIDIByte::NOTE_ON && m.velocity() == 0)) {
+
+			for(ToggleBinding binding: mToggleBindings) {
+				if (m.channel() == binding.channel
+						&& m.noteNumber() == binding.noteNumber) {
+					if (binding.toggle != true) {
+						binding.param->set( binding.param->min() );
+					}
+				}
+			}
 		}
 		if (mVerbose) {
 			m.print();
@@ -176,6 +208,13 @@ private:
 		Parameter *param;
 	};
 
+	struct ToggleBinding {
+		int noteNumber;
+		int channel;
+		bool toggle;
+		ParameterBool *param;
+	};
+
 	struct IncrementBinding {
 		int noteNumber;
 		int channel;
@@ -187,6 +226,7 @@ private:
 	bool mVerbose;
 	std::vector<ControlBinding> mBindings;
 	std::vector<NoteBinding> mNoteBindings;
+	std::vector<ToggleBinding> mToggleBindings;
 	std::vector<IncrementBinding> mIncrementBindings;
 };
 
