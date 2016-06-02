@@ -141,6 +141,8 @@ public:
 
 	ParameterGUI &addParameter(Parameter &parameter);
 
+	ParameterGUI &addParameterBool(ParameterBool &parameter);
+
 	ParameterGUI &registerPresetHandler(PresetHandler &handler);
 
 	static void presetSavedInButton(const glv::Notification &n) {
@@ -191,6 +193,9 @@ public:
 	/// Add new parameter to GUI
 	ParameterGUI &operator << (Parameter* newParam){ return addParameter(*newParam); }
 
+	/// Add new parameter to GUI (button)
+	ParameterGUI &operator << (ParameterBool& newParam){ return addParameterBool(newParam); }
+
 	/// Add new View to GUI
 	ParameterGUI &operator << (glv::View* newView){
 		mBox << newView;
@@ -201,7 +206,7 @@ public:
 
 
 	struct WidgetWrapper {
-		Parameter *parameter;
+		ParameterWrapper<float> *parameter;
 		glv::Widget *widget;
 		std::mutex *lock;
 	};
