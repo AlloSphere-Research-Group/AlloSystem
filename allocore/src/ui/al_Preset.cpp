@@ -377,9 +377,10 @@ PresetServer::PresetServer(std::string oscAddress, int oscPort) :
 PresetServer::PresetServer(ParameterServer &paramServer) :
     mServer(nullptr), mPresetHandler(nullptr), mOSCpath("/preset"), mParamServer(&paramServer)
 {
-	paramServer.mServer->stop();
-	paramServer.mServer->handler(*this);
-	paramServer.mServer->start();
+	paramServer.registerOSCListener(this);
+//	paramServer.mServer->stop();
+//	paramServer.mServer->handler(*this);
+//	paramServer.mServer->start();
 }
 
 PresetServer::~PresetServer()
@@ -429,6 +430,8 @@ void PresetServer::print()
 		std::cout << "Communicating on path: " << mOSCpath << std::endl;
 		std::cout << "Registered listeners: " << std::endl;
 
+	} else {
+		std::cout << "Preset Server Connected to shared server." << std::endl;
 	}
 	for (auto sender:mOSCSenders) {
 		std::cout << sender->address() << ":" << sender->port() << std::endl;

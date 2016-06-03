@@ -96,3 +96,90 @@ void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
 	}
 }
 
+// SequenceServer ----------------------------------------------------------------
+
+SequenceServer::SequenceServer(std::string oscAddress, int oscPort) :
+    mServer(nullptr), mSequencer(nullptr),
+    mOSCpath("/sequence"),
+    mParamServer(nullptr)
+{
+	mServer = new osc::Recv(oscPort, oscAddress.c_str(), 0.001); // Is this 1ms wait OK?
+	if (mServer) {
+		mServer->handler(*this);
+		mServer->start();
+	} else {
+		std::cout << "Error starting OSC server." << std::endl;
+	}
+}
+
+
+SequenceServer::SequenceServer(ParameterServer &paramServer) :
+    mServer(nullptr), mSequencer(nullptr),
+    mOSCpath("/sequence"),
+    mParamServer(&paramServer)
+{
+	paramServer.registerOSCListener(this);
+}
+
+SequenceServer::~SequenceServer()
+{
+//	std::cout << "~SequenceServer()" << std::endl;;
+	if (mServer) {
+		mServer->stop();
+		delete mServer;
+		mServer = nullptr;
+	}
+}
+
+void SequenceServer::onMessage(osc::Message &m)
+{
+	if(m.addressPattern() == mOSCpath && m.typeTags() == "s"){
+		std::string val;
+		m >> val;
+		std::cout << "start sequence " << val << std::endl;
+		if (mSequencer) {
+			mSequencer->playSequence(val);
+		} else {
+			std::cout << "Sequence Server. OSC received, but PresetSequencer not registered." << std::endl;
+		}
+	}
+}
+
+void SequenceServer::print()
+{
+	if (mServer) {
+		std::cout << "Sequence server listening on: " << mServer->address() << ":" << mServer->port() << std::endl;
+		std::cout << "Communicating on path: " << mOSCpath << std::endl;
+	}
+	for (auto sender:mOSCSenders) {
+		std::cout << sender->address() << ":" << sender->port() << std::endl;
+	}
+}
+
+void SequenceServer::stopServer()
+{
+	if (mServer) {
+		mServer->stop();
+		delete mServer;
+		mServer = nullptr;
+	}
+}
+
+void SequenceServer::setAddress(std::string address)
+{
+	mOSCpath = address;
+}
+
+std::string SequenceServer::getAddress()
+{
+	return mOSCpath;
+}
+
+void SequenceServer::changeCallback(int value, void *sender, void *userData)
+{
+	SequenceServer *server = static_cast<SequenceServer *>(userData);
+	Parameter *parameter = static_cast<Parameter *>(sender);
+	server->notifyListeners(server->mOSCpath, value);
+}
+
+
