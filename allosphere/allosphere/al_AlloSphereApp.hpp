@@ -128,17 +128,17 @@ private:
 template<typename State = DummyState, typename AudioState = DummyState,
          unsigned GRAPHICSPORT = ALLOAPP_GRAPHICS_PORT,
          unsigned AUDIOPORT = ALLOAPP_AUDIO_PORT>
-class SimulatorBase : public App {
+class SimulatorBase : public App, public osc::PacketHandler {
 public:
 	explicit SimulatorBase(const Window::Dim& dims = Window::Dim(320, 240),
 	                       const std::string title="",
 	                       double fps=60,
 	                       Window::DisplayMode mode = Window::DEFAULT_BUF,
 	                       int flags=0,
-	                       const char *broadcastIP = "127.0.0.1") :
+						   const char *broadcastIP = "127.0.0.1") :
 	    mDims(dims), mTitle(title), mFps(fps), mMode(mode), mFlags(flags),
 	    mMakerAudio(broadcastIP),
-	    mMakerGraphics(broadcastIP)
+		mMakerGraphics(broadcastIP)
 	{
 		mMakerGraphics.start();
 		mMakerAudio.start();
@@ -156,6 +156,12 @@ public:
 	/// \param dt the time delta since last call to onAnimate()
 	///
 	virtual void onAnimate(double dt) override{}
+
+	///
+	/// \brief onMessage will recieve the messages from Device Server
+	/// \param m
+	///
+	virtual void onMessage(osc::Message &m) override {};
 
 	///
 	/// \brief Send the state to the graphics renderers
