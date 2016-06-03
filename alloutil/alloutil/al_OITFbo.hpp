@@ -107,6 +107,7 @@ public:
         clearDepth();
         shader[opaque].begin();
     }
+    
     void endOpaque() {
         shader[opaque].end();
         unbindFBO();
@@ -122,6 +123,7 @@ public:
         clearColor(); // but don't clear depth from opaque rendering
         shader[accum].begin();
     }
+
     void endAccum() {
         shader[accum].end();
         unbindFBO();
@@ -137,6 +139,7 @@ public:
         clearColor();
         shader[reveal].begin();
     }
+
     void endReveal() {
         shader[reveal].end();
         unbindFBO();
@@ -158,6 +161,22 @@ public:
         tex[reveal].unbind(1);
         shader[comp].end();
         unbindFBO();
+    }
+
+    ShaderProgram& opaqueShader() {
+        return shader[opaque];
+    }
+
+    ShaderProgram& accumShader() {
+        return shader[accum];
+    }
+
+    ShaderProgram& revealShader() {
+        return shader[reveal];
+    }
+
+    ShaderProgram& compShader() {
+        return shader[comp];
     }
 
     Texture& result() {
