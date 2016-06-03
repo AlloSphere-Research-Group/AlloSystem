@@ -147,7 +147,7 @@ public:
 	 * @brief PresetServer constructor
 	 *
 	 * @param oscAddress The network address on which to listen to. If empty use all available network interfaces. Defaults to "127.0.0.1".
-	 * @param oscPort The network port on which to listen. Defaults to 9010.
+	 * @param oscPort The network port on which to listen. Defaults to 9011.
 	 *
 	 */
 

@@ -15,6 +15,12 @@ Parameter Y("y", "", 0.0, "", -2, 2);
 
 PresetHandler presetHandler("sequencerDir", true);
 PresetSequencer sequencer;
+// The sequencer server triggers sequences when it receives a valid sequence
+// name on OSC path /sequence
+// If you send a message using a command like:
+// oscsend 127.0.0.1 9012 /sequence s "seq"
+// You will trigger the sequence
+SequenceServer sequencerServer; // Send OSC to 127.0.0.1:9011
 
 class MyApp :public App
 {
@@ -50,7 +56,6 @@ public:
 
 void writeExamplePresets()
 {
-
 	std::string sequence = R"(preset1:0.0:0.5
 preset2:3.0:1.0
 preset3:1.0:0.0
@@ -95,6 +100,8 @@ int main(int argc, char *argv[])
 	writeExamplePresets();
 	presetHandler << X << Y; // Register parameters with preset handler
 	sequencer << presetHandler; // Register preset handler with sequencer
+	sequencerServer << sequencer; // Register sequencer with sequence server
+	sequencerServer.print();
 	MyApp().start();
 	return 0;
 }
