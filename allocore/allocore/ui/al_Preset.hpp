@@ -80,7 +80,10 @@ public:
 	std::string recallPreset(int index);
 
 	std::map<int, std::string> availablePresets();
+	std::string getPresetName(int index);
+	std::string getCurrentPresetName() {return mCurrentPresetName; }
 
+	float getMorphTime();
 	void setMorphTime(float time);
 
 	void setSubDirectory(std::string directory);
@@ -138,6 +141,7 @@ private:
 	std::vector<void *> mCallbackUdata;
 
 	std::map<int, std::string> mPresetsMap;
+	std::string mCurrentPresetName;
 };
 
 class PresetServer : public osc::PacketHandler, public OSCNotifier<>
@@ -212,7 +216,6 @@ private:
 	std::string mOSCpath;
 	std::mutex mHandlerLock;
 	std::vector<osc::PacketHandler *> mHandlers;
-
 };
 
 
