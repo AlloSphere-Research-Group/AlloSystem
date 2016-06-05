@@ -143,6 +143,7 @@ void PresetHandler::recallPreset(std::string name)
 			break;
 		}
 	}
+	mCurrentPresetName = name;
 	for(int i = 0; i < mCallbacks.size(); ++i) {
 		if (mCallbacks[i]) {
 			mCallbacks[i](index, this, mCallbackUdata[i]);
@@ -165,6 +166,16 @@ std::string PresetHandler::recallPreset(int index)
 std::map<int, std::string> PresetHandler::availablePresets()
 {
 	return mPresetsMap;
+}
+
+std::string al::PresetHandler::getPresetName(int index)
+{
+	return mPresetsMap[index];
+}
+
+float al::PresetHandler::getMorphTime()
+{
+	return mMorphTime.get();
 }
 
 void PresetHandler::setMorphTime(float time)

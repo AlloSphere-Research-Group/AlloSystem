@@ -85,11 +85,10 @@ void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
 		}
 		while(sequencer->running() && sequencer->mSteps.size() > 0) {
 			Step &step = sequencer->mSteps.front();
-			sequencer->mSteps.pop();
 			sequencer->mPresetHandler->setMorphTime(step.delta);
 			sequencer->mPresetHandler->recallPreset(step.presetName);
-			//			std::cout << "Playing preset " << step.first << std::endl;
 			al::wait(step.delta + step.duration);
+			sequencer->mSteps.pop();
 		}
 		sequencer->mRunning = false;
 		//		std::cout << "Sequence finished." << std::endl;
