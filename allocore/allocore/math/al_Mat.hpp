@@ -52,6 +52,9 @@ namespace al {
 
 template <int N, class T> class Mat;
 
+typedef Mat<2,float>	Mat2f;	///< float 2x2 matrix
+typedef Mat<2,double>	Mat2d;	///< double 2x2 matrix
+typedef Mat<2,int>		Mat2i;	///< integer 2x2 matrix
 typedef Mat<3,float>	Mat3f;	///< float 3x3 matrix
 typedef Mat<3,double>	Mat3d;	///< double 3x3 matrix
 typedef Mat<3,int>		Mat3i;	///< integer 3x3 matrix
