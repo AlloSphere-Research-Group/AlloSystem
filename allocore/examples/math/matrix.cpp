@@ -259,7 +259,7 @@ int main(){
 		invert(a);				// Inverts matrix
 	}
 	/*
-	We can also apply transformations to create/transform homogenous matrices:
+	We can also create/transform homogenous matrices:
 	*/
 	{
 		Mat4f a;
@@ -267,5 +267,8 @@ int main(){
 		a.scale(10,20,30);		// Non-uniform scaling
 		a.scale(-2);			// Uniform scaling
 		a.translate(-1,-1,-1);	// Translate
+
+		a * Vec4f(1,1,1, 1);	// Transform 3D point:  {-21,-41,-61, 1}
+		a * Vec4f(1,1,1, 0);	// Transform 3D vector: {-20,-40,-60, 0}
 	}
 }
