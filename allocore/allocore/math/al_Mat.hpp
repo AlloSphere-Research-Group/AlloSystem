@@ -165,6 +165,11 @@ public:
 		return m;
 	}
 
+	/// Get a scaling transform matrix
+	static Mat scaling(T v){
+		return scaling(Vec<N-1,T>(v));
+	}
+
 	/// Get a translation transform matrix
 	template <class V>
 	static Mat translation(const Vec<N-1,V>& v){
