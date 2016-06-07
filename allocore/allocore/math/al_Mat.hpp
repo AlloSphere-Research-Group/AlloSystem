@@ -90,7 +90,8 @@ public:
 	Mat(){ set(T(0)); }
 
 	/// @param[in] arr	one dimensional array in column-major
-	Mat(const T * arr){ set(arr); }
+	template <class U>
+	Mat(const U * arr){ set(arr); }
 
 	/// @param[in] src	matrix with same dimension, but possibly different type
 	template <class U>
