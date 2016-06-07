@@ -170,8 +170,15 @@ public:
 	}
 
 	/// Get a scaling transform matrix
-	static Mat scaling(T v){
-		return scaling(Vec<N-1,T>(v));
+	template <class V>
+	static Mat scaling(V v){
+		return scaling(Vec<N-1,V>(v));
+	}
+
+	/// Get a scaling transform matrix
+	template <typename... Vals>
+	static Mat scaling(Vals... vals){
+		return scaling(Vec<(sizeof...(Vals)),T>(vals...));
 	}
 
 	/// Get a translation transform matrix
@@ -183,7 +190,11 @@ public:
 		return m;
 	}
 
-
+	/// Get a translation transform matrix
+	template <typename... Vals>
+	static Mat translation(Vals... vals){
+		return translation(Vec<(sizeof...(Vals)),T>(vals...));
+	}
 
 	//--------------------------------------------------------------------------
 	// Memory Operations
@@ -483,6 +494,10 @@ public:
 	template<class V>
 	Mat& scale(const V& amount){ return scale(Vec<N-1,V>(amount)); }
 
+	/// Scale transformation matrix
+	template<typename... Vals>
+	Mat& scale(Vals... vals){ return scale(Vec<(sizeof...(Vals)),T>(vals...)); }
+
 	/// Scale transformation matrix global coordinates
 	template<class V>
 	Mat& scaleGlobal(const Vec<N-1,V>& amount){
@@ -507,6 +522,9 @@ public:
 	template<class V>
 	Mat& translate(const V& amount){ return translate(Vec<N-1,V>(amount)); }
 
+	/// Translate transformation matrix
+	template<typename... Vals>
+	Mat& translate(Vals... vals){ return translate(Vec<(sizeof...(Vals)),T>(vals...)); }
 
 	/// Print to file (stream)
 	void print(FILE * file = stderr) const;
