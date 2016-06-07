@@ -54,6 +54,27 @@
 namespace al
 {
 
+/**
+ * @brief The SequenceRecorder class records preset changes in a ".sequence" file
+ *
+ * The sequences recorded can be played back using the PresetSequencer class.
+ *
+ * @code
+ * Parameter polyX("polyX", "", 0.0, "", -99, 99);
+ * Parameter polyY("polyY", "", 0.0, "", -99, 99);
+ * Parameter polyZ("polyZ", "", 0.0, "", -99, 99);
+ * PresetHandler presets("hydrogen_presets");
+ * SequenceRecorder recorder;
+ *
+ * presets << polyX << polyY <<polyZ;
+ * recorder << presets;
+ *
+ * recorder.startRecord("seqName");
+ * ...
+ * recorder.stopRecord();
+ *
+ * @endcode
+ */
 class SequenceRecorder
 {
 public:
@@ -61,16 +82,23 @@ public:
 
 	~SequenceRecorder() {}
 
-	void registerPresetHandler(PresetHandler &handler) {
-		mPresetHandler = &handler;
-		mPresetHandler->registerPresetCallback(SequenceRecorder::presetChanged, (void *) this);
-	}
-
-	void startRecord(std::string name = "");
+	/**
+	 * @brief startRecord begins recording preset changes
+	 * @param name default name is "new_seq"
+	 * @param overwrite whether to force overwrite
+	 *
+	 * By default startRecord() will not overwrite, and will append a number to
+	 * the sequence name specified.
+	 */
+	void startRecord(std::string name = "", bool overwrite = false);
 	void stopRecord();
 
 	SequenceRecorder & operator<< (PresetHandler &handler) { registerPresetHandler(handler); }
 
+	void registerPresetHandler(PresetHandler &handler) {
+		mPresetHandler = &handler;
+		mPresetHandler->registerPresetCallback(SequenceRecorder::presetChanged, (void *) this);
+	}
 private:
 
 	static void presetChanged(int index, void *sender, void *userData);
@@ -85,6 +113,7 @@ private:
 	std::string mDirectory;
 	PresetHandler *mPresetHandler;
 	std::string mPresetName;
+	bool mOverwrite;
 
 	std::mutex mSequenceLock;
 	std::condition_variable mSequenceConditionVar;

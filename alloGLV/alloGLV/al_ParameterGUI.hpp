@@ -52,6 +52,8 @@
 #include "alloGLV/al_ControlGLV.hpp"
 #include "allocore/ui/al_Parameter.hpp"
 #include "allocore/ui/al_Preset.hpp"
+#include "allocore/ui/al_PresetSequencer.hpp"
+#include "allocore/ui/al_SequenceRecorder.hpp"
 #include "allocore/io/al_App.hpp"
 
 #include <GLV/glv.h>
@@ -105,12 +107,8 @@ class ParameterGUI {
 public:
 	ParameterGUI() :
 	    mBox(glv::Direction::S),
-	    mPresetButtons(glv::Rect(), 10, 4, false, true),
-	    mPresetHandler(nullptr),
-	    mButtonScale(1.0f)
+	    mPresetHandler(nullptr)
 	{
-		mPresetButtons.enable(glv::Property::SelectOnDrag);
-		mPresetButtons.width(200);
 		mBox.colors().set(glv::StyleColor::SmokyGray);
 		mBox.colors().back.set(0.05, 0.95);
 		mBox.colors().selection.set(glv::HSV(0.67,0.5,0.5));
@@ -143,29 +141,6 @@ public:
 
 	ParameterGUI &addParameterBool(ParameterBool &parameter);
 
-	ParameterGUI &registerPresetHandler(PresetHandler &handler);
-
-	static void presetSavedInButton(const glv::Notification &n) {
-		glv::Button *button = static_cast<glv::Button *>(n.receiver());
-		button->setValue(false);
-	}
-
-	static void presetChangeCallback(int index, void *sender,void *userData)
-	{
-		ParameterGUI *gui = static_cast<ParameterGUI *>(userData);
-		glv::Data &d = gui->mPresetButtons.data();
-		const int *shape = d.shape();
-		for (int x = 0; x < shape[0]; ++x) {
-			for (int y = 0; y < shape[1]; ++y) {
-				d.assign<int>(false, x, y); // Must manually set them all off...
-			}
-		}
-		gui->mPresetButtons.presetName = gui->mPresetHandler->availablePresets()[index];
-		d.assign<int>(true, index); // Do it this way to avoid the GUi triggering callbacks.
-
-//		std::cout << "preset Change callback" << std::endl;
-	}
-
 	static void widgetChangeCallback(const glv::Notification& n) {
 		glv::Widget &sender = *n.sender<glv::Widget>();
 		WidgetWrapper &receiver = *n.receiver<WidgetWrapper>();
@@ -185,8 +160,6 @@ public:
 		}
 	}
 
-	void SetButtonBoxScale(float scale) {mButtonScale = scale;}
-
 	/// Add new parameter to GUI
 	ParameterGUI &operator << (Parameter& newParam){ return addParameter(newParam); }
 
@@ -201,9 +174,15 @@ public:
 		mBox << newView;
 		mBox.fit();
 		return *this;}
-	/// Add new parameter to GUI
-	ParameterGUI &operator << (PresetHandler &presetHandler){ return registerPresetHandler(presetHandler); }
 
+	/// Add new View to GUI
+	ParameterGUI &operator << (glv::View& newView){
+		mBox << &newView;
+		mBox.fit();
+		return *this;}
+	/// Add new PresetHandler. Creates clickable preset interface.
+	ParameterGUI &operator << (PresetHandler &presetHandler){ return registerPresetHandler(presetHandler); }
+	ParameterGUI &registerPresetHandler(PresetHandler &handler);
 
 	struct WidgetWrapper {
 		ParameterWrapper<float> *parameter;
@@ -211,15 +190,12 @@ public:
 		std::mutex *lock;
 	};
 
-
 private:
 	glv::Box mBox;
-	PresetButtons mPresetButtons;
 	GLVDetachable mDetachableGUI;
 	std::mutex mParameterGUILock;
 	std::vector<WidgetWrapper *> mWrappers;
 	PresetHandler *mPresetHandler;
-	float mButtonScale;
 };
 
 

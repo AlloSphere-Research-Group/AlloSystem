@@ -15,6 +15,7 @@ set(ALLOGLV_HEADERS
     alloGLV/al_ControlGLV.hpp
     alloGLV/al_ParameterGUI.hpp
     alloGLV/al_ProtoApp.hpp
+	alloGLV/al_SequencerGUI.hpp
 )
 
 set(LIBRARY_OUTPUT_PATH "${BUILD_ROOT_DIR}/build/lib")
