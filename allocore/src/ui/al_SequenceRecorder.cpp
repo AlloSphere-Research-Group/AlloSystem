@@ -81,12 +81,13 @@ SequenceRecorder::SequenceRecorder() :
 //	return sequenceList;
 //}
 
-void SequenceRecorder::startRecord(std::string name)
+void SequenceRecorder::startRecord(std::string name, bool overwrite)
 {
 	if (mRecorderThread) {
 		stopRecord();
 	}
 	mPresetName = "";
+	mOverwrite = overwrite;
 	mRecording = true;
 	mRecorderThread = new std::thread(SequenceRecorder::recorderFunction, this, name);
 
@@ -153,6 +154,14 @@ void SequenceRecorder::recorderFunction(SequenceRecorder *recorder, std::string 
 		path += "/";
 	}
 	std::string fileName = path + sequenceName + ".sequence";
+	if (!recorder->mOverwrite) {
+		std::string newFileName = fileName;
+		int counter = 0;
+		while (File::exists(newFileName)) {
+			newFileName = path + sequenceName + "_" + std::to_string(counter++) +  ".sequence";
+		}
+		fileName = newFileName;
+	}
 	std::ofstream f(fileName);
 	if (!f.is_open()) {
 		std::cout << "Error while opening sequence file: " << fileName << std::endl;
