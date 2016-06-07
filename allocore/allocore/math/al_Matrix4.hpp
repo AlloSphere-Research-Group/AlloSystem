@@ -128,9 +128,6 @@ public:
 	{}
 
 
-	/// Set values from another matrix
-	Matrix4& set(const Mat<4,T>& src) { Base::set(src.elems()); return *this; }
-
 	/// Get a quaternion representation
 	Quat<T> toQuat() const {
 		return Quat<T>().fromMatrix(Base::elems());
@@ -140,64 +137,6 @@ public:
 	Matrix4& fromQuat(Quat<T>& q) { q.toMatrix(Base::elems()); return *this; }
 	Matrix4& fromQuatTransposed(Quat<T>& q) { q.toMatrixTransposed(Base::elems()); return *this; }
 
-
-	static Matrix4 identity() {
-		return Matrix4(
-			1,	0,	0,	0,
-			0,	1,	0,	0,
-			0,	0,	1,	0,
-			0,	0,	0,	1
-		);
-	}
-
-	static Matrix4 translate(T x, T y, T z) {
-		return Matrix4(
-			1, 0, 0, x,
-			0, 1, 0, y,
-			0, 0, 1, z,
-			0, 0, 0, 1
-		);
-	}
-	template<typename T1>
-	static Matrix4 translate(const Vec<3, T1>& v) { return translate(v.x, v.y, v.z); }
-
-	static Matrix4 scale(T x, T y, T z) {
-		return Matrix4(
-			x,	0,	0,	0,
-			0,	y,	0,	0,
-			0,	0,	z,	0,
-			0,	0,	0,	1
-		);
-	}
-	template<typename T1>
-	static Matrix4 scale(const Vec<3, T1>& v) { return scale(v.x, v.y, v.z); }
-	template<typename T1>
-	static Matrix4 scale(const T1 v) { return scale(v, v, v); }
-
-	static Matrix4 rotateYZ(T theta) {
-		T C = cos(theta);
-		T S = sin(theta);
-		return Matrix4(	1, 0, 0, 0,
-						0, C,-S, 0,
-						0, S, C, 0,
-						0, 0, 0, 1);
-	}
-	static Matrix4 rotateZX(T theta) {
-		T C = cos(theta);
-		T S = sin(theta);
-		return Matrix4(	C, 0, S, 0,
-						0, 1, 0, 0,
-						-S,0, C, 0,
-						0, 0, 0, 1);
-	}
-	static Matrix4 rotateXY(T theta) {
-		T C = cos(theta);
-		T S = sin(theta);
-		return Matrix4(	C,-S, 0, 0,
-						S, C, 0, 0,
-						0, 0, 1, 0,
-						0, 0, 0, 1);
-	}
 
 	static Matrix4 rotate(float angle, float x, float y, float z) {
 		return Matrix4::rotate(angle, Vec3d(x, y, z));
@@ -319,7 +258,7 @@ public:
 
 		// compute orthonormal basis for the screen
 		vr = (nearBR-nearBL).normalize();	// right vector
-		vu = (nearTL-nearBL).normalize();	// upvector
+		vu = (nearTL-nearBL).normalize();	// up vector
 		cross(vn, vr, vu);	// normal(forward) vector (out from screen)
 		vn.normalize();
 
@@ -522,6 +461,25 @@ public:
 		invert(res);
 		return res;
 	}
+
+
+	// \deprecated Use Mat::translation
+	static Matrix4 translate(T x, T y, T z) {return translation(Vec<3,T>(x,y,z));}
+	// \deprecated Use Mat::translation
+	template<typename V>
+	static Matrix4 translate(const Vec<3,V>& v){return translation(v);}
+	// \deprecated Use Mat::scaling
+	static Matrix4 scale(T x, T y, T z) { return scaling(x,y,z); }
+	// \deprecated Use Mat::scaling
+	template<typename V>
+	static Matrix4 scale(const Vec<3,V>& v){return scaling(v);}
+	// \deprecated Use Mat::scaling
+	template<typename V>
+	static Matrix4 scale(const V& v) { return scaling(v); }
+	// \deprecated Use Mat::rotation
+	static Matrix4 rotateXY(T theta) { return rotation(theta,0,1); }
+	static Matrix4 rotateYZ(T theta) { return rotation(theta,1,2); }
+	static Matrix4 rotateZX(T theta) { return rotation(theta,2,0); }
 };
 
 
