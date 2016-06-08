@@ -323,11 +323,24 @@ public:
 	/// Allocate the internal Array for a client-side cache, copying from src
 	void allocate(const Array& src, bool reconfigure=true);
 
-	/// Allocate memory for a client-side copy (reconfigures the internal array)
+	/// Allocate client-side texture memory using current shape
 	void allocate(unsigned align=1);
+
+	/// Allocate client-side texture memory, copying from src
+	template <class T>
+	void allocate(const T * src, unsigned w, Graphics::Format format);
+
+	/// Allocate client-side texture memory, copying from src
+	template <class T>
+	void allocate(const T * src, unsigned w, unsigned h, Graphics::Format format);
+
+	/// Allocate client-side texture memory, copying from src
+	template <class T>
+	void allocate(const T * src, unsigned w, unsigned h, unsigned d, Graphics::Format format);
 
 	/// Deallocate any allocated client-side memory
 	void deallocate();
+
 
 	/// Print information about texture
 	void print();
@@ -354,6 +367,7 @@ protected:
 	virtual void onDestroy();
 
 	void init();
+	void deriveTarget();
 
 	// ensures that the internal Array format matches the texture format
 	void resetArray(unsigned align);
@@ -383,7 +397,27 @@ public:
 };
 
 
+// Implementation --------------------------------------------------------------
 
+template <class T>
+void Texture::allocate(const T * src, unsigned w, Graphics::Format format_ ){
+	allocate(src, w,0,0, format_);
+}
+
+template <class T>
+void Texture::allocate(const T * src, unsigned w, unsigned h, Graphics::Format format_){
+	allocate(src, w,h,0, format_);
+}
+
+template <class T>
+void Texture::allocate(const T * src, unsigned w, unsigned h, unsigned d, Graphics::Format format_){
+	type(Graphics::toDataType<T>());
+	format(format_);
+	resize(w, h, d);
+	deriveTarget();
+	allocate();
+	memcpy(mArray.data.ptr, src, mArray.size());
+}
 
 inline Texture& Texture :: wrap(Wrap S, Wrap T, Wrap R){
 	if(S!=mWrapS || T!=mWrapT || R!=mWrapR){
