@@ -250,8 +250,23 @@ public:
 	template <class T>
 	void color(const Vec<4,T>& v) { color(v[0], v[1], v[2], v[3]); }
 
+	/// Append colors from flat array
+	template <class T>
+	void color(const T * src, int numColors){
+		for(int i=0; i<numColors; ++i) color(src[4*i+0], src[4*i+1], src[4*i+2], src[4*i+3]);
+	}
+
+
 	/// Append floating-point color to integer color buffer
 	void colori(const Color& v) { coloris().append(Colori(v)); }
+
+	/// Append integer colors from flat array
+	template <class T>
+	void colori(const T * src, int numColors){
+		for(int i=0; i<numColors; ++i){
+			coloris().append(Colori(src[4*i+0], src[4*i+1], src[4*i+2], src[4*i+3]));
+		}
+	}
 
 
 	/// Append normal to normal buffer
@@ -263,6 +278,12 @@ public:
 	/// Append normal to normal buffer
 	template <class T>
 	void normal(const Vec<2,T>& v, float z=0){ normal(v[0], v[1], z); }
+
+	/// Append normals from flat array
+	template <class T>
+	void normal(const T * src, int numNormals){
+		for(int i=0; i<numNormals; ++i) normal(src[3*i+0], src[3*i+1], src[3*i+2]);
+	}
 
 
 	/// Append texture coordinate to 1D texture coordinate buffer
@@ -293,16 +314,16 @@ public:
 	template <class T>
 	void vertex(const Vec<2,T>& v, float z=0){ vertex(v[0], v[1], z); }
 
-	/// Append vertices to vertex buffer
+	/// Append vertices from flat array
 	template <class T>
-	void vertex(const T * buf, int size){
-		for(int i=0; i<size; ++i) vertex(buf[3*i+0], buf[3*i+1], buf[3*i+2]);
+	void vertex(const T * src, int numVerts){
+		for(int i=0; i<numVerts; ++i) vertex(src[3*i+0], src[3*i+1], src[3*i+2]);
 	}
 
 	/// Append vertices to vertex buffer
 	template <class T>
-	void vertex(const Vec<3,T> * buf, int size){
-		for(int i=0; i<size; ++i) vertex(buf[i][0], buf[i][1], buf[i][2]);
+	void vertex(const Vec<3,T> * src, int numVerts){
+		for(int i=0; i<numVerts; ++i) vertex(src[i][0], src[i][1], src[i][2]);
 	}
 
 
