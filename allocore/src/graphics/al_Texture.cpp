@@ -191,12 +191,7 @@ void Texture::shapeFromArray(){
 	}
 }
 
-bool Texture::tryBind(){
-
-	// Sync shape if array is dirty
-	shapeFromArray();
-
-	// Ensure target is synchronized before bind
+void Texture::deriveTarget(){
 	if(mDepth != 0){
 		target(TEXTURE_3D);
 	}
@@ -209,6 +204,15 @@ bool Texture::tryBind(){
 	else{
 		target(NO_TARGET);
 	}
+}
+
+bool Texture::tryBind(){
+
+	// Sync shape if array is dirty
+	shapeFromArray();
+
+	// Ensure target is synchronized before bind
+	deriveTarget();
 
 	if(target() != Texture::NO_TARGET){
 		glBindTexture(target(), id());
