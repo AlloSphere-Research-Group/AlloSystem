@@ -350,6 +350,16 @@ public:
 	bool exportSTL(const char * filePath, const char * solidName = "") const;
 
 
+	/// Export mesh to a PLY file
+
+	/// This implementation saves an ASCII (as opposed to binary) PLY file.
+	///
+	/// @param[in] filePath		path of file to save to
+	/// @param[in] solidName	solid name defined within the PLY file (optional)
+	/// \returns true on successful export, otherwise false
+	bool exportPLY(const char * filePath, const char * solidName = "") const;
+
+
 	/// Print information about Mesh
 	void print(FILE * dst = stderr) const;
 

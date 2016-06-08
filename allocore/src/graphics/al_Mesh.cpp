@@ -781,6 +781,94 @@ bool Mesh::exportSTL(const char * path, const char * name) const {
 	return true;
 }
 
+bool Mesh::exportPLY(const char * filePath, const char * solidName) const {
+	// Ref: http://paulbourke.net/dataformats/ply/
+
+	int prim = primitive();
+
+	if(Graphics::TRIANGLES != prim && Graphics::TRIANGLE_STRIP != prim){
+		AL_WARN("Unsupported primitive type. Must be either triangles or triangle strip.");
+		return false;
+	}
+
+	const unsigned Nv = vertices().size();
+
+	if(!Nv) return false;
+
+	std::ofstream s;
+	s.open(filePath);
+	if(s.fail()) return false;
+
+	// Use a copy to handle triangle strip;
+	// not ideal if already triangles!
+	Mesh m(*this);
+	m.toTriangles();
+
+	const unsigned Nc = m.colors().size();
+	const unsigned Nci= m.coloris().size();
+	const unsigned Ni = m.indices().size();
+
+	// Header
+	s <<
+	"ply\n"
+	"format ascii 1.0\n"
+	"comment AlloSystem\n"
+	;
+
+	if(solidName[0]){
+		s << "comment " << solidName << "\n";
+	}
+
+	s <<
+	"element vertex " << Nv << "\n"
+	"property float x\n"
+	"property float y\n"
+	"property float z\n"
+	;
+
+	bool hasColors = Nc >= Nv || Nci >= Nv;
+	if(hasColors){
+		s <<
+		"property uchar red\n"
+		"property uchar green\n"
+		"property uchar blue\n"
+		"property uchar alpha\n"
+		;
+	}
+
+	if(Ni){
+		s <<
+		"element face " << Ni/3 << "\n"
+		"property list uchar int vertex_indices\n"
+		;
+	}
+
+	s << "end_header\n";
+
+	// Vertex data
+	for(unsigned i = 0; i < Nv; ++i){
+		auto vrt = m.vertices()[i];
+		s << vrt.x << " " << vrt.y << " " << vrt.z;
+		if(hasColors){
+			auto col = Nci >= Nv ? m.coloris()[i] : Colori(m.colors()[i]);
+			s << " " << int(col.r) << " " << int(col.g) << " " << int(col.b) << " " << int(col.a);
+		}
+		s << "\n";
+	}
+
+	// Face data
+	if(Ni){
+		for(unsigned i = 0; i < Ni; i+=3){
+			auto i1 = m.indices()[i  ];
+			auto i2 = m.indices()[i+1];
+			auto i3 = m.indices()[i+2];
+			s << "3 " << i1 << " " << i2 << " " << i3 << "\n";
+		}
+	}
+
+	return true;
+}
+
 void Mesh::print(FILE * dst) const {
 	fprintf(dst, "Mesh %p (prim = %d) has:\n", this, mPrimitive);
 	if(vertices().size())	fprintf(dst, "%8d Vertices\n", vertices().size());
