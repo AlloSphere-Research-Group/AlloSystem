@@ -338,6 +338,15 @@ public:
 	Indices& indices(){ return mIndices; }
 
 
+	/// Save mesh to file
+
+	/// Currently supported are STL and PLY files.
+	///
+	/// @param[in] filePath		path of file to save to
+	/// @param[in] solidName	solid name defined within the file (optional)
+	/// \returns true on successful save, otherwise false
+	bool save(const std::string& filePath, const std::string& solidName = "", unsigned flags=0) const;
+
 	/// Save mesh to an STL file
 
 	/// STL (STereoLithography) is a file format used widely for
