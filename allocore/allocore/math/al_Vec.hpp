@@ -545,6 +545,21 @@ inline void centroid3(Vec<N,T>& c, const Vec<N,T>& p1, const Vec<N,T>& p2, const
 	c = (p1+p2+p3)*_1_3;
 }
 
+/// Get closest point on line segment ab to point p
+template <int N, class T>
+Vec<N,T> closestPointOnLineSegment(const Vec<N,T>& a, const Vec<N,T>& b, const Vec<N,T>& p){
+	auto ab = b - a;
+	auto dot = (p - a).dot(ab);	// projection of ap onto ab
+	auto magAB = ab.magSqr();
+	auto frac = dot / magAB;	// normalized distance along ab from a to the closest point  
+
+	// check if p projection is beyond endpoints of ab   
+	if(frac < 0.) return a;
+	if(frac > 1.) return b;
+
+	return a + ab * frac;
+}
+
 /// Returns distance between two vectors
 template <int N, class T, class U>
 inline T dist(const Vec<N,T>& a, const Vec<N,U>& b){
