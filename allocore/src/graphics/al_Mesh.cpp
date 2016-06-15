@@ -869,6 +869,23 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, un
 	return true;
 }
 
+bool Mesh::save(const std::string& filePath, const std::string& solidName, unsigned flags) const {
+
+	auto pos = filePath.find_last_of(".");
+	if(std::string::npos == pos) return false;
+	auto ext = filePath.substr(pos+1);
+	std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+
+	if("ply" == ext){
+		return savePLY(filePath, solidName, flags);
+	}
+	else if("stl" == ext){
+		return saveSTL(filePath, solidName, flags);
+	}
+
+	return false;
+}
+
 bool Mesh::exportSTL(const char * filePath, const char * solidName) const {
 	return saveSTL(filePath, solidName);
 }
