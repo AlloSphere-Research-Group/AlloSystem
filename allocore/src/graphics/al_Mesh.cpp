@@ -1,4 +1,5 @@
-#include <algorithm>
+#include <algorithm> // transform
+#include <cctype> // tolower
 #include <map>
 #include <set>
 #include <string>
@@ -737,8 +738,7 @@ void Mesh::toTriangles(){
 	}
 }
 
-
-bool Mesh::exportSTL(const char * path, const char * name) const {
+bool Mesh::saveSTL(const std::string& filePath, const std::string& solidName, unsigned flags) const {
 	int prim = primitive();
 
 	if(Graphics::TRIANGLES != prim && Graphics::TRIANGLE_STRIP != prim){
@@ -758,30 +758,30 @@ bool Mesh::exportSTL(const char * path, const char * name) const {
 	Vec3f vmin, vmax;
 	m.getBounds(vmin, vmax);
 
-	std::ofstream file(path);
-	if(file.fail()) return false;
-	file.flags(std::ios::scientific);
+	std::ofstream s(filePath);
+	if(s.fail()) return false;
+	s.flags(std::ios::scientific);
 
-	file << "solid " << name << "\n";
+	s << "solid " << solidName << "\n";
 	for(int i=0; i<m.vertices().size(); i+=3){
-		file << "facet normal";
-		for(int j=0; j<3; j++) file << " " << m.normals()[i][j];
-		file << "\n";
-		file << "outer loop\n";
+		s << "facet normal";
+		for(int j=0; j<3; j++) s << " " << m.normals()[i][j];
+		s << "\n";
+		s << "outer loop\n";
 		for(int j=0; j<3; ++j){
-			file << "vertex";
-			for(int k=0; k<3; k++) file << " " << m.vertices()[i+j][k] - vmin[k];
-			file << "\n";
+			s << "vertex";
+			for(int k=0; k<3; k++) s << " " << m.vertices()[i+j][k] - vmin[k];
+			s << "\n";
 		}
-		file << "endloop\n";
-		file << "endfacet\n";
+		s << "endloop\n";
+		s << "endfacet\n";
 	}
-	file << "endsolid " << name;
+	s << "endsolid " << solidName;
 
 	return true;
 }
 
-bool Mesh::exportPLY(const char * filePath, const char * solidName) const {
+bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, unsigned flags) const {
 	// Ref: http://paulbourke.net/dataformats/ply/
 
 	int prim = primitive();
@@ -868,6 +868,15 @@ bool Mesh::exportPLY(const char * filePath, const char * solidName) const {
 
 	return true;
 }
+
+bool Mesh::exportSTL(const char * filePath, const char * solidName) const {
+	return saveSTL(filePath, solidName);
+}
+
+bool Mesh::exportPLY(const char * filePath, const char * solidName) const {
+	return savePLY(filePath, solidName);
+}
+
 
 void Mesh::print(FILE * dst) const {
 	fprintf(dst, "Mesh %p (prim = %d) has:\n", this, mPrimitive);
