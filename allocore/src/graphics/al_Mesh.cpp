@@ -738,7 +738,7 @@ void Mesh::toTriangles(){
 	}
 }
 
-bool Mesh::saveSTL(const std::string& filePath, const std::string& solidName, unsigned flags) const {
+bool Mesh::saveSTL(const std::string& filePath, const std::string& solidName) const {
 	int prim = primitive();
 
 	if(Graphics::TRIANGLES != prim && Graphics::TRIANGLE_STRIP != prim){
@@ -781,7 +781,7 @@ bool Mesh::saveSTL(const std::string& filePath, const std::string& solidName, un
 	return true;
 }
 
-bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, unsigned flags) const {
+bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bool binary) const {
 	// Ref: http://paulbourke.net/dataformats/ply/
 
 	int prim = primitive();
@@ -796,7 +796,7 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, un
 	if(!Nv) return false;
 
 	std::ofstream s;
-	s.open(filePath);
+	s.open(filePath, binary ? (std::ios::out | std::ios::binary) : std::ios::out);
 	if(s.fail()) return false;
 
 	// Use a copy to handle triangle strip;
@@ -807,13 +807,15 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, un
 	const unsigned Nc = m.colors().size();
 	const unsigned Nci= m.coloris().size();
 	const unsigned Ni = m.indices().size();
+	const unsigned Bi = Nv<65536 ? 2 : 4; // max bytes/index
+
+	int bigEndian = 1;
+	if(1 == *(char *)&bigEndian) bigEndian = 0;
 
 	// Header
-	s <<
-	"ply\n"
-	"format ascii 1.0\n"
-	"comment AlloSystem\n"
-	;
+	s << "ply\n";
+	s << "format " << (binary ? (bigEndian ? "binary_big_endian" : "binary_little_endian") : "ascii 1.0") << "\n";
+	s << "comment AlloSystem\n";
 
 	if(solidName[0]){
 		s << "comment " << solidName << "\n";
@@ -837,39 +839,64 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, un
 	}
 
 	if(Ni){
-		s <<
-		"element face " << Ni/3 << "\n"
-		"property list uchar int vertex_indices\n"
-		;
+		s << "element face " << Ni/3 << "\n";
+		s << "property list uchar " << (Bi==4?"uint":"ushort") << " vertex_indices\n";
 	}
 
 	s << "end_header\n";
 
-	// Vertex data
-	for(unsigned i = 0; i < Nv; ++i){
-		auto vrt = m.vertices()[i];
-		s << vrt.x << " " << vrt.y << " " << vrt.z;
-		if(hasColors){
-			auto col = Nci >= Nv ? m.coloris()[i] : Colori(m.colors()[i]);
-			s << " " << int(col.r) << " " << int(col.g) << " " << int(col.b) << " " << int(col.a);
+	if(binary){
+		// Vertex data
+		for(unsigned i = 0; i < Nv; ++i){
+			s.write(reinterpret_cast<char*>(&m.vertices()[i][0]), sizeof(Mesh::Vertex));
+			if(hasColors){
+				auto col = Nci >= Nv ? m.coloris()[i] : Colori(m.colors()[i]);
+				s << col.r << col.g << col.b << col.a;
+			}
 		}
-		s << "\n";
+		// Face data
+		if(Ni){
+			for(unsigned i = 0; i < Ni; i+=3){
+				s << char(3);
+				if(sizeof(Mesh::Index) == Bi){
+					s.write(reinterpret_cast<char*>(&m.indices()[i]), Bi*3);
+				}
+				else{
+					unsigned short idx[3];
+					idx[0] = m.indices()[i  ];
+					idx[1] = m.indices()[i+1];
+					idx[2] = m.indices()[i+2];
+					s.write(reinterpret_cast<char*>(&idx), Bi*3);
+				}
+			}
+		}
 	}
-
-	// Face data
-	if(Ni){
-		for(unsigned i = 0; i < Ni; i+=3){
-			auto i1 = m.indices()[i  ];
-			auto i2 = m.indices()[i+1];
-			auto i3 = m.indices()[i+2];
-			s << "3 " << i1 << " " << i2 << " " << i3 << "\n";
+	else {
+		// Vertex data
+		for(unsigned i = 0; i < Nv; ++i){
+			auto vrt = m.vertices()[i];
+			s << vrt.x << " " << vrt.y << " " << vrt.z;
+			if(hasColors){
+				auto col = Nci >= Nv ? m.coloris()[i] : Colori(m.colors()[i]);
+				s << " " << int(col.r) << " " << int(col.g) << " " << int(col.b) << " " << int(col.a);
+			}
+			s << "\n";
+		}
+		// Face data
+		if(Ni){
+			for(unsigned i = 0; i < Ni; i+=3){
+				auto i1 = m.indices()[i  ];
+				auto i2 = m.indices()[i+1];
+				auto i3 = m.indices()[i+2];
+				s << "3 " << i1 << " " << i2 << " " << i3 << "\n";
+			}
 		}
 	}
 
 	return true;
 }
 
-bool Mesh::save(const std::string& filePath, const std::string& solidName, unsigned flags) const {
+bool Mesh::save(const std::string& filePath, const std::string& solidName, bool binary) const {
 
 	auto pos = filePath.find_last_of(".");
 	if(std::string::npos == pos) return false;
@@ -877,10 +904,10 @@ bool Mesh::save(const std::string& filePath, const std::string& solidName, unsig
 	std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
 
 	if("ply" == ext){
-		return savePLY(filePath, solidName, flags);
+		return savePLY(filePath, solidName, binary);
 	}
 	else if("stl" == ext){
-		return saveSTL(filePath, solidName, flags);
+		return saveSTL(filePath, solidName);
 	}
 
 	return false;
