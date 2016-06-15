@@ -45,6 +45,7 @@
 */
 
 #include <stdio.h>
+#include <string>
 #include "allocore/math/al_Vec.hpp"
 #include "allocore/math/al_Mat.hpp"
 #include "allocore/types/al_Buffer.hpp"
@@ -337,7 +338,7 @@ public:
 	Indices& indices(){ return mIndices; }
 
 
-	/// Export mesh to an STL file
+	/// Save mesh to an STL file
 
 	/// STL (STereoLithography) is a file format used widely for
 	/// rapid prototyping. It contains only surface geometry (vertices and
@@ -345,19 +346,18 @@ public:
 	/// This implementation saves an ASCII (as opposed to binary) STL file.
 	///
 	/// @param[in] filePath		path of file to save to
-	/// @param[in] solidName	solid name defined within the STL file (optional)
-	/// \returns true on successful export, otherwise false
-	bool exportSTL(const char * filePath, const char * solidName = "") const;
+	/// @param[in] solidName	solid name defined within the file (optional)
+	/// \returns true on successful save, otherwise false
+	bool saveSTL(const std::string& filePath, const std::string& solidName = "", unsigned flags=0) const;
 
-
-	/// Export mesh to a PLY file
+	/// Save mesh to a PLY file
 
 	/// This implementation saves an ASCII (as opposed to binary) PLY file.
 	///
 	/// @param[in] filePath		path of file to save to
-	/// @param[in] solidName	solid name defined within the PLY file (optional)
-	/// \returns true on successful export, otherwise false
-	bool exportPLY(const char * filePath, const char * solidName = "") const;
+	/// @param[in] solidName	solid name defined within the file (optional)
+	/// \returns true on successful save, otherwise false
+	bool savePLY(const std::string& filePath, const std::string& solidName = "", unsigned flags=0) const;
 
 
 	/// Print information about Mesh
@@ -376,6 +376,12 @@ protected:
 	Indices mIndices;
 
 	int mPrimitive;
+
+public:
+	/// \deprecated
+	bool exportSTL(const char * filePath, const char * solidName = "") const;
+	/// \deprecated
+	bool exportPLY(const char * filePath, const char * solidName = "") const;
 };
 
 
