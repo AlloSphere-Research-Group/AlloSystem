@@ -573,6 +573,10 @@ public:
 };
 
 
+const char * toString(Graphics::DataType v);
+const char * toString(Graphics::Format v);
+
+
 // ============== INLINE ==============
 
 inline void Graphics::clear(AttributeBit bits){ glClear(bits); }
