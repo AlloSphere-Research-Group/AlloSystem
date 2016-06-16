@@ -186,6 +186,9 @@ public:
 	FILE * filePointer() { return mFP; }
 
 
+	/// Quick and dirty read of all bytes from file
+	static std::string read(const std::string& path);
+
 	/// Quick and dirty write memory to file
 	static int write(const std::string& path, const void * v, int size, int items=1);
 
