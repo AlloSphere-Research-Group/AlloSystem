@@ -74,11 +74,21 @@ void File::close(){
 const char * File::readAll(){
 	if(opened() && mMode[0]=='r'){
 		int n = size();
+		//printf("reading %d bytes from %s\n", n, path().c_str());
 		allocContent(n);
 		int numRead = fread(mContent, sizeof(char), n, mFP);
-		if(numRead < n){}
+		if(numRead < n){
+			//printf("warning: only read %d bytes\n", numRead);
+		}
 	}
 	return mContent;
+}
+
+std::string File::read(const std::string& path){
+	File f(path, "rb");
+	f.open();
+	auto str = f.readAll();
+	return str ? str : "";
 }
 
 int File::write(const std::string& path, const void * v, int size, int items){
