@@ -664,8 +664,6 @@ void Texture::quadViewport(
 void Texture :: print() {
 
 	const char * target = "?";
-	const char * format = "?";
-	const char * type = "?";
 
 	switch (mTarget) {
 		case TEXTURE_1D:
@@ -687,33 +685,10 @@ void Texture :: print() {
 		default:
 			printf("Texture target=(unknown), ");
 	}
-	switch (mFormat) {
-		case Graphics::DEPTH_COMPONENT: format="DEPTH_COMPONENT"; break;
-		case Graphics::LUMINANCE: format="LUMINANCE"; break;
-		case Graphics::LUMINANCE_ALPHA: format="LUMINANCE_ALPHA"; break;
-		case Graphics::RED: format="RED"; break;
-		case Graphics::GREEN: format="GREEN"; break;
-		case Graphics::BLUE: format="BLUE"; break;
-		case Graphics::ALPHA: format="ALPHA"; break;
-		case Graphics::RGB: format="RGB"; break;
-		case Graphics::RGBA: format="RGBA"; break;
-		case Graphics::BGR: format="BGR"; break;
-		case Graphics::BGRA: format="BGRA"; break;
-		default:;
-	}
-	switch (mType) {
-		case Graphics::BYTE: type = "BYTE"; break;
-		case Graphics::UBYTE: type = "UBYTE"; break;
-		case Graphics::SHORT: type = "SHORT"; break;
-		case Graphics::USHORT: type = "USHORT"; break;
-		case Graphics::INT: type = "INT"; break;
-		case Graphics::UINT: type = "UINT"; break;
-		case Graphics::FLOAT: type = "FLOAT"; break;
-		case Graphics::DOUBLE: type = "DOUBLE"; break;
-		default:;
-	}
 
-	printf("type=%s(%s), format=%s(%d), unpack=%d)\n", type, allo_type_name(mArray.type()), format, mArray.components(), mArray.alignment());
+	printf("type=%s(%s), format=%s(%d), unpack=%d\n",
+		toString(mType), allo_type_name(mArray.type()), toString(mFormat), mArray.components(), mArray.alignment()
+	);
 	//mArray.print();
 }
 
