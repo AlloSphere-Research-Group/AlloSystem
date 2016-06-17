@@ -104,7 +104,7 @@ struct BoundingBox {
 
             // move number to current draw pos
             Matrix4d t,r,s;
-            Matrix4d model = t.translate(obj_pose.pos()) * r.fromQuat(obj_pose.quat()) * s.scale(obj_scale);
+            Matrix4d model = t.translation(obj_pose.pos()) * r.fromQuat(obj_pose.quat()) * s.scaling(obj_scale);
             Vec4d m_xform = model.transform(Vec4d(xform, 1));
             xform = Vec3d(m_xform.x, m_xform.y, m_xform.z);
 
