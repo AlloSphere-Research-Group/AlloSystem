@@ -11,39 +11,6 @@ Lance Putnam, Sept. 2011
 #include "allocore/io/al_App.hpp"
 using namespace al;
 
-// Fog vertex shader
-static const char * fogVert = R"(
-	/* 'fogCurve' determines the distribution of fog between the near and far planes.
-	Positive values give more dense fog while negative values give less dense
-	fog. A value of	zero results in a linear distribution. */
-	uniform float fogCurve;
-
-	/* The fog amount in [0,1] passed to the fragment shader. */
-	varying float fogFactor;
-
-	void main(){
-		gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-		gl_FrontColor = gl_Color;
-
-		float z = gl_Position.z;
-		//float z = gl_FragCoord.z / gl_FragCoord.w; /* per-frament fog would use this */
-		fogFactor = (z - gl_Fog.start) * gl_Fog.scale;
-		fogFactor = clamp(fogFactor, 0., 1.);
-		if(fogCurve != 0.){
-			fogFactor = (1. - exp(-fogCurve*fogFactor))/(1. - exp(-fogCurve));
-		}
-	}
-)";
-
-// Fog fragment shader
-static const char * fogFrag = R"(
-	varying float fogFactor;
-
-	void main(){
-		gl_FragColor = mix(gl_Color, gl_Fog.color, fogFactor);
-	}
-)";
-
 class MyApp : public App {
 public:
 
@@ -75,11 +42,40 @@ public:
 			geom.transform(xfm, geom.vertices().size()-Nv);
 		}
 
-		initWindow();
-	}
+		// Specify the shader program
+		shader.compile(
+		R"(
+			/* 'fogCurve' determines the distribution of fog between the near and far planes.
+			Positive values give more dense fog while negative values give less dense
+			fog. A value of	zero results in a linear distribution. */
+			uniform float fogCurve;
 
-	void onCreate(const ViewpointWindow& win){
-		shader.compile(fogVert, fogFrag);
+			/* The fog amount in [0,1] passed to the fragment shader. */
+			varying float fogFactor;
+
+			void main(){
+				gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+				gl_FrontColor = gl_Color;
+
+				float z = gl_Position.z;
+				//float z = gl_FragCoord.z / gl_FragCoord.w; /* per-frament fog would use this */
+				fogFactor = (z - gl_Fog.start) * gl_Fog.scale;
+				fogFactor = clamp(fogFactor, 0., 1.);
+				if(fogCurve != 0.){
+					fogFactor = (1. - exp(-fogCurve*fogFactor))/(1. - exp(-fogCurve));
+				}
+			}
+		)",
+		R"(
+			varying float fogFactor;
+
+			void main(){
+				gl_FragColor = mix(gl_Color, gl_Fog.color, fogFactor);
+			}
+		)"
+		);
+
+		initWindow();
 	}
 
 	void onAnimate(double dt){
