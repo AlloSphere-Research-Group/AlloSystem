@@ -219,7 +219,7 @@ protected:
 
 	virtual void onCreate();
 	virtual void onDestroy();
-	virtual void onPointerFunc() = 0;
+	virtual void onPointerFunc(){};
 };
 
 
