@@ -932,7 +932,7 @@ void OmniStereo::capture(OmniStereo::Drawable& drawable, const Lens& lens, const
 				GL_FRAMEBUFFER,
 				GL_COLOR_ATTACHMENT0 + mFace,
 				GL_TEXTURE_CUBE_MAP_POSITIVE_X + mFace,
-				mTex[i], 0);
+				mTex[mCurrentEye], 0);
 
 			gl.clearColor(mClearColor);
 			gl.depthTesting(1);
