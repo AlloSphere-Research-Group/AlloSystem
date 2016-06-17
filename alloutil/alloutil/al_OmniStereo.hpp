@@ -263,7 +263,7 @@ class OmniStereo {
 
   // the current face being rendered:
   int face() const { return mFace; }
-
+  int currentEye() const { return mCurrentEye; }
   // the current eye parallax
   // (positive for right eye, negative for left, zero for mono):
   float eye() const { return mEyeParallax; }
@@ -319,7 +319,7 @@ class OmniStereo {
   Color mClearColor;
 
   // these become shader uniforms:
-  int mFace;
+  int mFace, mCurrentEye;
   float mSphereRadius; // The radius of the sphere in OpenGL units.
   float mEyeParallax, mNear, mFar;
 
