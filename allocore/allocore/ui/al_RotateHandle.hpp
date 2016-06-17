@@ -2,6 +2,8 @@
 #ifndef __ROTATE_HANDLE_HPP__
 #define __ROTATE_HANDLE_HPP__
 
+#include <cfloat>
+
 namespace al {
 
 struct RotateHandle : PickableBase {
