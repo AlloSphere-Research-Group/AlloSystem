@@ -270,7 +270,9 @@ class OmniStereo {
   // the radius of the sphere in OpenGL units, default to 1e10, when we can ignore the effect.
   float sphereRadius() const { return mSphereRadius; }
   float sphereRadius(float value) { return mSphereRadius = value; }
-
+  float near() const { return mNear; }
+  float far() const { return mFar; }
+  
   // create GPU resources:
   void onCreate();
   void onDestroy();
