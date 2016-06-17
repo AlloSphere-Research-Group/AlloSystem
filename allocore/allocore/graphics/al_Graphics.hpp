@@ -297,6 +297,12 @@ public:
 	/// Set polygon drawing mode
 	void polygonMode(PolygonMode m, Face f=FRONT_AND_BACK);
 
+	/// Draw only edges of polygons with lines
+	void polygonLine(Face f=FRONT_AND_BACK){ polygonMode(LINE,f); }
+
+	/// Draw filled polygons
+	void polygonFill(Face f=FRONT_AND_BACK){ polygonMode(FILL,f); }
+
 	/// Set shading model
 	void shadeModel(ShadeModel m);
 
