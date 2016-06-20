@@ -127,6 +127,15 @@ public:
 	/// Get buffer store size, in bytes
 	int size() const;
 
+	/// Get data type
+	Graphics::DataType dataType() const { return mDataType; }
+
+	/// Get number of components in each data element (e.g., 4 for RGBA)
+	int numComps() const { return mNumComps; }
+
+	/// Get number of elements (e.g., colors)
+	int numElems() const { return mNumElems; }
+
 
 	/// Set buffer type
 	void bufferType(BufferType v);
