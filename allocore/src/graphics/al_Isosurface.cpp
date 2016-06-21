@@ -413,9 +413,9 @@ void Isosurface::addCell(const int * cellIdx3, const float * vals){
 		// Each triangle consists of 3 vertex indices stored in mEdgeToVertex
 		for(int i=1; i <= sTriTable[idx][0]; i+=3){
 			// Add 3 edge indices of triangle
-			index(edgeID(cID, sTriTable[idx][i  ]));
-			index(edgeID(cID, sTriTable[idx][i+1]));
 			index(edgeID(cID, sTriTable[idx][i+2]));
+			index(edgeID(cID, sTriTable[idx][i+1]));
+			index(edgeID(cID, sTriTable[idx][i  ]));
 		}
 	}
 }
