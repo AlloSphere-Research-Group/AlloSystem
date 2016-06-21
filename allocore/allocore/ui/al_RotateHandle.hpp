@@ -52,7 +52,7 @@ struct RotateHandle : PickableBase {
     for (int i = 0; i < 3; i++){
       g.pushMatrix();
         g.translate(pose.pos());
-        // g.color(i==0,i==1,i==2); //KK: affects the rest of the draw call
+        g.color(i==0,i==1,i==2);
         switch(i){
           case 0: q.fromEuler(M_PI/2,0,0); break;
           case 1: q.fromEuler(0,-M_PI/2,0); break;
