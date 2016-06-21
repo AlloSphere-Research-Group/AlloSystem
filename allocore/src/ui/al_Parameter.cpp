@@ -24,12 +24,19 @@ float Parameter::get()
 	return mFloatValue;
 }
 
-void Parameter::setNoCalls(float value)
+void Parameter::setNoCalls(float value, void *blockReceiver)
 {
 	if (value > mMax) value = mMax;
 	if (value < mMin) value = mMin;
 	if (mProcessCallback) {
 		value = mProcessCallback(value, mProcessUdata);
+	}
+	if (blockReceiver) {
+		for(int i = 0; i < mCallbacks.size(); ++i) {
+			if (mCallbacks[i]) {
+				mCallbacks[i](value, this, mCallbackUdata[i], blockReceiver);
+			}
+		}
 	}
 
 	mFloatValue = value;
@@ -45,11 +52,59 @@ void Parameter::set(float value)
 	mFloatValue = value;
 	for(int i = 0; i < mCallbacks.size(); ++i) {
 		if (mCallbacks[i]) {
-			mCallbacks[i](value, this, mCallbackUdata[i]);
+			mCallbacks[i](value, this, mCallbackUdata[i], NULL);
 		}
 	}
 }
 
+// ParameterBool ------------------------------------------------------------------
+ParameterBool::ParameterBool(std::string parameterName, std::string Group,
+                     float defaultValue,
+                     std::string prefix,
+                     float min,
+                     float max) :
+    ParameterWrapper<float>(parameterName, Group, defaultValue, prefix, min, max)
+{
+	mFloatValue = defaultValue;
+}
+
+float ParameterBool::get()
+{
+	return mFloatValue;
+}
+
+void ParameterBool::setNoCalls(float value, void *blockReceiver)
+{
+	if (value > mMax) value = mMax;
+	if (value < mMin) value = mMin;
+	if (mProcessCallback) {
+		value = mProcessCallback(value, mProcessUdata);
+	}
+	if (blockReceiver) {
+		for(int i = 0; i < mCallbacks.size(); ++i) {
+			if (mCallbacks[i]) {
+				mCallbacks[i](value, this, mCallbackUdata[i], blockReceiver);
+			}
+		}
+	}
+
+	mFloatValue = value;
+}
+
+void ParameterBool::set(float value)
+{
+	if (value > mMax) value = mMax;
+	if (value < mMin) value = mMin;
+	if (mProcessCallback) {
+		value = mProcessCallback(value, mProcessUdata);
+	}
+	mFloatValue = value;
+	for(int i = 0; i < mCallbacks.size(); ++i) {
+		if (mCallbacks[i]) {
+			mCallbacks[i](value, this, mCallbackUdata[i], NULL);
+		}
+	}
+}
 
 // ParameterServer ------------------------------------------------------------
 
@@ -67,9 +122,11 @@ ParameterServer::ParameterServer(std::string oscAddress, int oscPort)
 
 ParameterServer::~ParameterServer()
 {
+//	std::cout << "~ParameterServer()" << std::endl;
 	if (mServer) {
 		mServer->stop();
 		delete mServer;
+		mServer = nullptr;
 	}
 }
 
@@ -114,6 +171,9 @@ void ParameterServer::onMessage(osc::Message &m)
 //			std::cout << "ParameterServer::onMessage" << val << std::endl;
 		}
 	}
+	for (osc::PacketHandler *handler: mPacketHandlers) {
+		handler->onMessage(m);
+	}
 	mParameterLock.unlock();
 }
 
@@ -126,10 +186,25 @@ void ParameterServer::print()
 	}
 }
 
-void ParameterServer::changeCallback(float value, void *sender, void *userData)
+void ParameterServer::stopServer()
+{
+	if (mServer) {
+		mServer->stop();
+		delete mServer;
+		mServer = nullptr;
+	}
+}
+
+void ParameterServer::registerOSCListener(osc::PacketHandler *handler)
+{
+	mParameterLock.lock();
+	mPacketHandlers.push_back(handler);
+	mParameterLock.unlock();
+}
+
+void ParameterServer::changeCallback(float value, void *sender, void *userData, void *blockThis)
 {
 	ParameterServer *server = static_cast<ParameterServer *>(userData);
 	Parameter *parameter = static_cast<Parameter *>(sender);
 	server->notifyListeners(parameter->getFullAddress(), parameter->get());
 }
-

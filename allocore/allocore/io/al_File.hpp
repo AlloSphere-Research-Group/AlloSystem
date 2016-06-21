@@ -43,16 +43,11 @@
 	Lance Putnam, 2010, putnam.lance@gmail.com
 */
 
-
-#include <limits.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <string>
 #include <list>
 #include <vector>
 #include <algorithm>
-
 #include "allocore/system/al_Config.h"
 
 #ifndef AL_FILE_DELIMITER_STR
@@ -190,6 +185,9 @@ public:
 
 	FILE * filePointer() { return mFP; }
 
+
+	/// Quick and dirty read of all bytes from file
+	static std::string read(const std::string& path);
 
 	/// Quick and dirty write memory to file
 	static int write(const std::string& path, const void * v, int size, int items=1);

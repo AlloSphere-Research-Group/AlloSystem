@@ -60,13 +60,23 @@ public:
 	PresetMIDI(int deviceIndex = 0) {
 		mPresetHandler = NULL;
 		MIDIMessageHandler::bindTo(mMidiIn);
-		mMidiIn.openPort(deviceIndex);
-		printf("Opened port to %s\n", mMidiIn.getPortName(deviceIndex).c_str());
+		try {
+			mMidiIn.openPort(deviceIndex);
+			printf("Opened port to %s\n", mMidiIn.getPortName(deviceIndex).c_str());
+		}
+		catch (al::MIDIError error) {
+			std::cout << "PresetMIDI Warning: Could not open MIDI port " << deviceIndex << std::endl;
+		}
 	}
     PresetMIDI(int deviceIndex, PresetHandler &presetHandler) {
 		MIDIMessageHandler::bindTo(mMidiIn);
-		mMidiIn.openPort(deviceIndex);
-		printf("Opened port to %s\n", mMidiIn.getPortName(deviceIndex).c_str());
+		try {
+			mMidiIn.openPort(deviceIndex);
+			printf("Opened port to %s\n", mMidiIn.getPortName(deviceIndex).c_str());
+		}
+		catch (al::MIDIError error) {
+			std::cout << "PresetMIDI Warning: Could not open MIDI port " << deviceIndex << std::endl;
+		}
 		setPresetHandler(presetHandler);
 	}
 

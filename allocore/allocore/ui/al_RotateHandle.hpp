@@ -2,6 +2,8 @@
 #ifndef __ROTATE_HANDLE_HPP__
 #define __ROTATE_HANDLE_HPP__
 
+#include <cfloat>
+
 namespace al {
 
 struct RotateHandle : PickableBase {
@@ -40,6 +42,7 @@ struct RotateHandle : PickableBase {
   }
 
   void draw(Graphics &g){
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
     Mesh &m = g.mesh();
     m.primitive(g.LINE_LOOP);
     m.reset();
@@ -86,6 +89,7 @@ struct RotateHandle : PickableBase {
         g.draw(m);
       }
     }
+    glPopAttrib();
   }
 
   double intersect(Rayd &r){return 0;}

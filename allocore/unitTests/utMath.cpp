@@ -194,19 +194,27 @@ int utMath(){
 
 	// Mat
 	{
+		/*#define CHECK(mat, a,b,c, d,e,f, g,h,i){\
+			const auto& m = mat;\
+			assert(eq(m(0,0),a)); assert(eq(m(0,1),b)); assert(eq(m(0,2),c));\
+			assert(eq(m(1,0),d)); assert(eq(m(1,1),e)); assert(eq(m(1,2),f));\
+			assert(eq(m(2,0),g)); assert(eq(m(2,1),h)); assert(eq(m(2,2),i));\
+		}*/
+		#define CHECK(mat, a,b,c, d,e,f, g,h,i)\
+			assert(eq(mat, Mat3d(a,b,c, d,e,f, g,h,i)))
+
+		// factory functions
+		CHECK(Mat3d::identity(),				1,0,0, 0,1,0, 0,0,1);
+		CHECK(Mat3d::scaling(2),				2,0,0, 0,2,0, 0,0,1);
+		CHECK(Mat3d::scaling(2,3),				2,0,0, 0,3,0, 0,0,1);
+		CHECK(Mat3d::scaling(Vec2d(2,3)),		2,0,0, 0,3,0, 0,0,1);
+		CHECK(Mat3d::translation(2,3),			1,0,2, 0,1,3, 0,0,1);
+		CHECK(Mat3d::translation(Vec2d(2,3)),	1,0,2, 0,1,3, 0,0,1);
+		CHECK(Mat3d::rotation(M_PI/2, 0,1),		0,-1,0,1,0,0, 0,0,1);
+
 		Mat3d a;//, b;
 
-		//a(0,1) = a(1,0);
-		#define CHECK(m, a,b,c, d,e,f, g,h,i)\
-		assert(m(0,0)==a); assert(m(0,1)==b); assert(m(0,2)==c);\
-		assert(m(1,0)==d); assert(m(1,1)==e); assert(m(1,2)==f);\
-		assert(m(2,0)==g); assert(m(2,1)==h); assert(m(2,2)==i)
-
 		a.setIdentity();	CHECK(a, 1,0,0, 0,1,0, 0,0,1);
-		a.set(0);
-		a = a.identity();	CHECK(a, 1,0,0, 0,1,0, 0,0,1);
-
-
 
 		assert(a.trace() == 3);
 

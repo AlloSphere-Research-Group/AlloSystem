@@ -355,6 +355,10 @@ public:
 	 // i.e. use mouse xy
 	Rayd getPickRay(const ViewpointWindow& w, int screenX, int screenY);
 
+protected:
+	osc::Recv mOSCRecv;
+	osc::Send mOSCSend;
+
 private:
 
 	typedef std::vector<Viewpoint *> Viewpoints;
@@ -379,8 +383,6 @@ private:
 
 	// control
 	NavInputControl mNavControl;
-	osc::Recv mOSCRecv;
-	osc::Send mOSCSend;
 
 	std::string mName;
 	void * mClockAnimate;

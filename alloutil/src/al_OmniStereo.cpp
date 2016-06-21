@@ -923,7 +923,7 @@ void OmniStereo::capture(OmniStereo::Drawable& drawable, const Lens& lens, const
 	glBindFramebuffer(GL_FRAMEBUFFER, mFbo);
 	gl.viewport(0, 0, mResolution, mResolution);
 
-	for (mCurrentEye=0; mCurrentEye<(mStereo+1); mCurrentEye++) {
+	for (mCurrentEye = 0; mCurrentEye < (mStereo+1); mCurrentEye++) {
 		mEyeParallax = eyeSep * (mCurrentEye-0.5);
 		for (mFace=0; mFace<6; mFace++) {
 

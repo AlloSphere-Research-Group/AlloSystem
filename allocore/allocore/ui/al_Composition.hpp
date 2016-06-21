@@ -1,11 +1,11 @@
-#ifndef INCLUDE_AL_ZEROCONF_HPP
-#define INCLUDE_AL_ZEROCONF_HPP
+#ifndef AL_COMPOSITION_H
+#define AL_COMPOSITION_H
 
 /*	Allocore --
 	Multimedia / virtual environment application class library
 
 	Copyright (C) 2009. AlloSphere Research Group, Media Arts & Technology, UCSB.
-	Copyright (C) 2012. The Regents of the University of California.
+	Copyright (C) 2012-2016. The Regents of the University of California.
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -35,67 +35,65 @@
 	POSSIBILITY OF SUCH DAMAGE.
 
 	File description:
-	Wrapper for mDNS zeroconf discovery
+	Composition player
 
 	File author(s):
-	Charlie Roberts, 2012, charlie@charlie-roberts.com
-	Graham Wakefield, 2012, grrrwaaa@gmail.com
-
+	Andrés Cabrera mantaraya36@gmail.com
 */
 
 #include <string>
+#include <vector>
+#include <thread>
 
-namespace al{
-namespace zero{
+#include "allocore/ui/al_PresetSequencer.hpp"
+#include "allocore/ui/al_Preset.hpp"
 
-///
-/// \brief The Client class
-///
-/// @ingroup allocore
-class Client {
+namespace al
+{
+
+class CompositionStep {
 public:
-	class Impl;
-
-	Client(const std::string& type = "_osc._udp.", const std::string& domain = "local.");
-	virtual ~Client();
-
-	///! check for new services:
-	static void poll(al_sec interval = 0.01);
-
-	///! called when a new service name is added:
-	virtual void onServiceNew(const std::string& name) {}
-
-	///! usually called after onServiceNew
-	/// identifies the host/port/address(es) associated with the service name
-	virtual void onServiceResolved(const std::string& name, const std::string& host_name, uint16_t port, const std::string& address) {}
-
-	///! called when existing service name is removed:
-	virtual void onServiceRemove(const std::string& name) {}
-
-protected:
-	std::string type, domain;
-	Impl * mImpl;
+	std::string sequenceName;
+	float deltaTime;
 };
 
-///
-/// \brief The Service class
-///
-/// @ingroup allocore
-class Service {
+class Composition
+{
 public:
-	class Impl;
+	Composition(std::string fileName, std::string path);
+	~Composition();
 
-	///! create and publish a new service
-	/// the name should be unique
-	Service(const std::string& name, uint16_t port=4110, const std::string& type="_osc._udp.", const std::string& domain="local.");
+	void play();
+	void stop();
 
-	virtual ~Service();
+	int size();
+	const CompositionStep getStep(int index);
+	void insertStep(std::string name, float deltaTime, int index);
+	void deleteStep(int index);
 
-protected:
-	Impl * mImpl;
+	void write();
+
+	Composition &registerSequencer(PresetSequencer &sequencer) {
+		mSequencer = &sequencer;
+		return *this;
+	}
+	Composition &operator<< (PresetSequencer &sequencer) {
+		return registerSequencer(sequencer);
+	}
+
+private:
+	std::vector<CompositionStep> mCompositionSteps;
+	std::string mPath;
+	std::string mCompositionName;
+
+	std::thread *mPlayThread;
+	bool mPlaying;
+	PresetSequencer *mSequencer;
+
+	static void playbackThread(Composition *composition);
 };
 
-} // zero::
-} // al::
 
-#endif
+} // namespace al
+
+#endif // AL_COMPOSITION_H

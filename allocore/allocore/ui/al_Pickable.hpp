@@ -131,7 +131,7 @@ struct PickableBase : virtual PickableState {
   /// transform a ray in world space to local space
   Rayd transformRayLocal(const Rayd &ray){
     Matrix4d t,r,s;
-    Matrix4d model = t.translate(pose.pos()) * r.fromQuat(pose.quat()) * s.scale(scale);
+    Matrix4d model = t.translation(pose.pos()) * r.fromQuat(pose.quat()) * s.scaling(scale);
     Matrix4d invModel = Matrix4d::inverse(model);
     Vec4d o = invModel.transform(Vec4d(ray.o, 1));
     Vec4d d = invModel.transform(Vec4d(ray.d, 0));
@@ -141,14 +141,14 @@ struct PickableBase : virtual PickableState {
   /// transfrom a vector in local space to world space
   Vec3f transformVecWorld(const Vec3f &v, float w=1){
     Matrix4d t,r,s;
-    Matrix4d model = t.translate(pose.pos()) * r.fromQuat(pose.quat()) * s.scale(scale);
+    Matrix4d model = t.translation(pose.pos()) * r.fromQuat(pose.quat()) * s.scaling(scale);
     Vec4d o = model.transform(Vec4d(v, w));
     return Vec3f(o.sub<3>(0));
   }  
   /// transfrom a vector in world space to local space
   Vec3f transformVecLocal(const Vec3f &v, float w=1){
     Matrix4d t,r,s;
-    Matrix4d invModel = t.translate(pose.pos()) * r.fromQuat(pose.quat()) * s.scale(scale);
+    Matrix4d invModel = t.translation(pose.pos()) * r.fromQuat(pose.quat()) * s.scaling(scale);
     Vec4d o = invModel.transform(Vec4d(v, w));
     return Vec3f(o.sub<3>(0));
   }
@@ -320,7 +320,7 @@ struct Pickable : PickableBase {
   void updateAABB(){
     // thanks to http://zeuxcg.org/2010/10/17/aabb-from-obb-with-component-wise-abs/
     Matrix4d t,r,s;
-    Matrix4d model = t.translate(pose.pos()) * r.fromQuat(pose.quat()) * s.scale(scale);
+    Matrix4d model = t.translation(pose.pos()) * r.fromQuat(pose.quat()) * s.scaling(scale);
     Matrix4d absModel(model);
     for(int i=0; i<16; i++) absModel[i] = abs(absModel[i]);
     Vec4d cen = model.transform(Vec4d(bb.cen, 1));

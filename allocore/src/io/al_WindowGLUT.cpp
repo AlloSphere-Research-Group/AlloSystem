@@ -7,13 +7,15 @@
 #include "allocore/system/al_Printing.hpp"	// warnings
 #include "allocore/graphics/al_OpenGL.hpp"	// OpenGL headers
 
-#ifdef AL_OSX
+#if defined AL_OSX
 	#include <GLUT/glut.h>
-#endif
-#ifdef AL_LINUX
+
+#elif defined AL_LINUX
+	#include <GL/glew.h>
 	#include <GL/glut.h>
-#endif
-#ifdef AL_WINDOWS
+
+#elif defined AL_WINDOWS
+	#include <GL/wglew.h> // wglSwapInterval
 	#include <GL/glut.h>
 #endif
 
@@ -734,7 +736,7 @@ void Window::implSetVSync(){
 		CGLSetParameter(ctx, kCGLCPSwapInterval, &VBL);
 	#elif defined AL_LINUX
 	#elif defined AL_WINDOWS
-		// see: http://stackoverflow.com/questions/21262944/trouble-with-vsync-using-glut-in-opengl
+		wglSwapIntervalEXT(int(mVSync));
 	#endif
 }
 

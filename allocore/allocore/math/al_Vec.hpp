@@ -509,18 +509,8 @@ void rotate(Vec<3,T>& vec, const Vec<3,T>& normal, double cosAng, double sinAng)
 	T c = cosAng;
 	T s = sinAng;
 
-	T c12 = normal[0]*normal[1]*(T(1)-c);
-	T c23 = normal[1]*normal[2]*(T(1)-c);
-	T c31 = normal[2]*normal[0]*(T(1)-c);
-	T c11 = normal[0]*normal[0]*(T(1)-c);
-	T c22 = normal[1]*normal[1]*(T(1)-c);
-	T c33 = normal[2]*normal[2]*(T(1)-c);
-
-	vec.set(
-		Vec<3,T>(c11 + c, c12 - s*normal[2], c31 + s*normal[1]).dot(vec),
-		Vec<3,T>(c12 + s*normal[2], c22 + c, c23 - s*normal[0]).dot(vec),
-		Vec<3,T>(c31 - s*normal[1], c23 + s*normal[0], c33 + c).dot(vec)
-	);
+	// Rodrigues' rotation formula:
+	vec = vec*c + cross(normal, vec)*s + normal*(normal.dot(vec)*(T(1)-c));
 }
 
 /// Rotate a vector around a normal vector
@@ -553,6 +543,21 @@ template <int N, class T>
 inline void centroid3(Vec<N,T>& c, const Vec<N,T>& p1, const Vec<N,T>& p2, const Vec<N,T>& p3){
 	static const T _1_3 = T(1)/T(3);
 	c = (p1+p2+p3)*_1_3;
+}
+
+/// Get closest point on line segment ab to point p
+template <int N, class T>
+Vec<N,T> closestPointOnLineSegment(const Vec<N,T>& a, const Vec<N,T>& b, const Vec<N,T>& p){
+	auto ab = b - a;
+	auto dot = (p - a).dot(ab);	// projection of ap onto ab
+	auto magAB = ab.magSqr();
+	auto frac = dot / magAB;	// normalized distance along ab from a to the closest point  
+
+	// check if p projection is beyond endpoints of ab   
+	if(frac < 0.) return a;
+	if(frac > 1.) return b;
+
+	return a + ab * frac;
 }
 
 /// Returns distance between two vectors

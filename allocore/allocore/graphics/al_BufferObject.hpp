@@ -165,6 +165,9 @@ public:
 	void send();
 
 
+	void print() const;
+
+
 	#ifdef AL_GRAPHICS_USE_OPENGL
 	/* Warning: these are not supported in OpenGL ES */
 
@@ -216,7 +219,7 @@ protected:
 
 	virtual void onCreate();
 	virtual void onDestroy();
-	virtual void onPointerFunc() = 0;
+	virtual void onPointerFunc(){};
 };
 
 
@@ -271,7 +274,8 @@ protected:
 	virtual void onPointerFunc();
 };
 
-
+const char * toString(BufferObject::BufferType v);
+const char * toString(BufferObject::BufferUsage v);
 
 // IMPLEMENTATION --------------------------------------------------------------
 

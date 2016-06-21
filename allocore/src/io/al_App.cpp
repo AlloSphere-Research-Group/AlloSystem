@@ -231,7 +231,9 @@ bool SceneWindowHandler::onFrame(){
 App::App()
 :	mName(""),
 	mNavControl(mNav),
-	mClockAnimate(0), mClockNav(0)
+	mClockAnimate(0), mClockNav(0),
+	mOSCRecv(12001, "", 0.001),
+	mOSCSend(12000, "bossanova.mat.ucsb.edu", 0)
 {}
 
 

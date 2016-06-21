@@ -80,12 +80,17 @@ public:
 	std::string recallPreset(int index);
 
 	std::map<int, std::string> availablePresets();
+	std::string getPresetName(int index);
+	std::string getCurrentPresetName() {return mCurrentPresetName; }
 
+	float getMorphTime();
 	void setMorphTime(float time);
 
 	void setSubDirectory(std::string directory);
 
 	std::vector<std::string> availableSubDirectories();
+
+	std::string getCurrentPath();
 
 	typedef void (*PresetChangeCallback)(int index, void *sender,
 	                                        void *userData);
@@ -96,10 +101,18 @@ public:
 	 */
 	void registerPresetCallback(PresetChangeCallback cb, void *userData = nullptr);
 
+	typedef void (*MorphTimeChangeCallback)(float time, void *sender,
+	                                        void *userData);
+	/**
+	 * @brief Register a callback to be notified when morph time parameter is changed
+	 * @param cb The callback function
+	 * @param userData data to be passed to the callback
+	 */
+	void registerMorphTimeCallback(Parameter::ParameterChangeCallback cb, void *userData = nullptr);
+
 	PresetHandler &operator << (Parameter &param) { return this->registerParameter(param); }
 
 private:
-	std::string getCurrentPath();
 	void loadPresetMap();
 	void storePresetMap();
 	std::map<std::string, float> loadPresetValues(std::string name);
@@ -115,8 +128,8 @@ private:
 	bool mRunning; // To keep the morphing thread alive
 	bool mMorph; // To be able to trip and stop morphing at any time.
 	int mMorphRemainingSteps;
-	double mMorphInterval;
-	double mMorphTime;
+	float mMorphInterval;
+	Parameter mMorphTime;
 
 	std::mutex mTargetLock;
 	std::condition_variable mMorphConditionVar;
@@ -128,6 +141,7 @@ private:
 	std::vector<void *> mCallbackUdata;
 
 	std::map<int, std::string> mPresetsMap;
+	std::string mCurrentPresetName;
 };
 
 class PresetServer : public osc::PacketHandler, public OSCNotifier<>
@@ -137,12 +151,24 @@ public:
 	 * @brief PresetServer constructor
 	 *
 	 * @param oscAddress The network address on which to listen to. If empty use all available network interfaces. Defaults to "127.0.0.1".
-	 * @param oscPort The network port on which to listen. Defaults to 9010.
+	 * @param oscPort The network port on which to listen. Defaults to 9011.
 	 *
 	 */
 
 	PresetServer(std::string oscAddress = "127.0.0.1",
 	             int oscPort = 9011);
+	/**
+	 * @brief using this constructor reuses the existing osc::Recv server from the
+	 * ParameterServer object
+	 * @param paramServer an existing ParameterServer object
+	 *
+	 * You will want to reuse an osc::Recv server when you want to expose the
+	 * interface thorugh the same network port. Since network ports are exclusive,
+	 * once a port is bound, it can't be used. You might need to expose the
+	 * parameters on the same network port when using things like interface.simpleserver.js
+	 * That must connect all interfaces to the same network port.
+	 */
+	PresetServer(ParameterServer &paramServer);
 	~PresetServer();
 
 	virtual void onMessage(osc::Message& m);
@@ -151,6 +177,13 @@ public:
 		mPresetHandler = &presetHandler;
 		mPresetHandler->registerPresetCallback(PresetServer::changeCallback,
 		                                       (void *) this);
+
+		mPresetHandler->registerMorphTimeCallback(
+		            [](float value, void *sender,
+		            void *userData, void * blockSender) {
+			static_cast<PresetServer *>(userData)->notifyListeners(
+			            static_cast<PresetServer *>(userData)->mOSCpath + "/morphTime", value);
+		}, this);
 	}
 
 	/**
@@ -158,17 +191,31 @@ public:
 	 */
 	void print();
 
+	/**
+	 * @brief stopServer stops the OSC server thread. Calling this function
+	 * is sometimes required when this object is destroyed abruptly and the
+	 * destructor is not called
+	 */
+	void stopServer();
+
+
 	PresetServer &operator <<(PresetHandler &presetHandler) {return registerPresetHandler(presetHandler);}
 
+	void setAddress(std::string address);
+	std::string getAddress();
+
 protected:
+	void attachPacketHandler(osc::PacketHandler *handler);
 	static void changeCallback(int value, void *sender, void *userData);
 
 private:
 	osc::Recv *mServer;
 	PresetHandler *mPresetHandler;
+	ParameterServer *mParamServer;
 //	std::mutex mServerLock;
 	std::string mOSCpath;
-
+	std::mutex mHandlerLock;
+	std::vector<osc::PacketHandler *> mHandlers;
 };
 
 

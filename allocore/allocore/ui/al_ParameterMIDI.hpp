@@ -66,8 +66,13 @@ public:
 	ParameterMIDI(int deviceIndex = 0, bool verbose = false) {
 		MIDIMessageHandler::bindTo(mMidiIn);
 		mVerbose = verbose;
-		mMidiIn.openPort(deviceIndex);
-		printf("Opened port to %s\n", mMidiIn.getPortName(deviceIndex).c_str());
+		try {
+			mMidiIn.openPort(deviceIndex);
+			printf("Opened port to %s\n", mMidiIn.getPortName(deviceIndex).c_str());
+		}
+		catch (al::MIDIError error) {
+			std::cout << "ParameterMIDI Warning: Could not open MIDI port " << deviceIndex << std::endl;
+		}
 	}
 
 	void connectControl(Parameter &param, int controlNumber, int channel)
@@ -116,6 +121,25 @@ public:
 		}
 	}
 
+	void connectNoteToToggle(ParameterBool &param, int channel, int note) {
+		ToggleBinding newBinding;
+		newBinding.noteNumber = note;
+		newBinding.toggle = true;
+		newBinding.channel = channel - 1;
+		newBinding.param = &param;
+		mToggleBindings.push_back(newBinding);
+	}
+
+	void connectNoteToIncrement(Parameter &param, int channel, int note,
+	                            float increment) {
+		IncrementBinding newBinding;
+		newBinding.channel = channel - 1;
+		newBinding.noteNumber = note;
+		newBinding.increment = increment;
+		newBinding.param = &param;
+		mIncrementBindings.push_back(newBinding);
+	}
+
 	virtual void onMIDIMessage(const MIDIMessage& m) override {
 		if (m.type() & MIDIByte::CONTROL_CHANGE ) {
 			for(ControlBinding binding: mBindings) {
@@ -128,8 +152,38 @@ public:
 		}
 		if (m.type() & MIDIByte::NOTE_ON && m.velocity() > 0) {
 			for(NoteBinding binding: mNoteBindings) {
-				if (m.channel() == binding.channel) {
+				if (m.channel() == binding.channel
+				        && m.noteNumber() == binding.noteNumber) {
 					binding.param->set(binding.value);
+				}
+			}
+			for(IncrementBinding binding: mIncrementBindings) {
+				if (m.channel() == binding.channel
+				        && m.noteNumber() == binding.noteNumber) {
+					binding.param->set(binding.param->get() + binding.increment);
+				}
+			}
+			for(ToggleBinding binding: mToggleBindings) {
+				if (m.channel() == binding.channel
+						&& m.noteNumber() == binding.noteNumber) {
+					if (binding.toggle == true) {
+						binding.param->set(
+									binding.param->get() == binding.param->max() ?
+										binding.param->min() : binding.param->max() );
+					} else {
+						binding.param->set(binding.param->max());
+					}
+				}
+			}
+		} else if (m.type() & MIDIByte::NOTE_OFF
+				   || (m.type() & MIDIByte::NOTE_ON && m.velocity() == 0)) {
+
+			for(ToggleBinding binding: mToggleBindings) {
+				if (m.channel() == binding.channel
+						&& m.noteNumber() == binding.noteNumber) {
+					if (binding.toggle != true) {
+						binding.param->set( binding.param->min() );
+					}
 				}
 			}
 		}
@@ -146,6 +200,7 @@ private:
 		Parameter *param;
 		float min, max;
 	};
+
 	struct NoteBinding {
 		int noteNumber;
 		int channel;
@@ -153,11 +208,26 @@ private:
 		Parameter *param;
 	};
 
+	struct ToggleBinding {
+		int noteNumber;
+		int channel;
+		bool toggle;
+		ParameterBool *param;
+	};
+
+	struct IncrementBinding {
+		int noteNumber;
+		int channel;
+		float increment;
+		Parameter *param;
+	};
+
 	MIDIIn mMidiIn;
 	bool mVerbose;
 	std::vector<ControlBinding> mBindings;
 	std::vector<NoteBinding> mNoteBindings;
-
+	std::vector<ToggleBinding> mToggleBindings;
+	std::vector<IncrementBinding> mIncrementBindings;
 };
 
 

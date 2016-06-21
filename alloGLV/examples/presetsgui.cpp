@@ -2,6 +2,8 @@
 
 #include "allocore/io/al_App.hpp"
 #include "allocore/ui/al_Parameter.hpp"
+#include "allocore/ui/al_Preset.hpp"
+#include "allocore/ui/al_HtmlInterfaceServer.hpp"
 #include "alloGLV/al_ParameterGUI.hpp"
 
 using namespace al;
@@ -11,12 +13,14 @@ Parameter Size("Size", "", 0.3, "", 0.1, 2.0);
 Parameter Red("Red", "", 0.5, "", 0.0, 1.0);
 Parameter Green("Green", "", 1.0, "", 0.0, 1.0);
 Parameter Blue("Blue", "", 0.5, "", 0.0, 1.0);
+ParameterServer paramServer;
 
 PresetHandler presets("presetsGUI");
-
-PresetServer presetServer;
+PresetServer presetServer(paramServer);
 
 ParameterGUI gui;
+
+HtmlInterfaceServer interfaceServer;
 
 class MyApp : public App
 {
@@ -44,6 +48,10 @@ public:
 		}
 	}
 
+	virtual void onExit() override {
+		presetServer.stopServer(); // We need to manually stop the server to keep it from crashing.
+	}
+
 private:
 	rnd::Random<> rng; // Random number generator
 	Light light;
@@ -62,14 +70,19 @@ int main(int argc, char *argv[])
 	gui << new glv::Label("Color");
 	gui << Red << Green << Blue;
 
+	paramServer << Number << Size << Red << Green << Blue;
+
 	// Adding a PresetHandler to a ParameterGUI creates a multi-button interface
 	// to control the presets.
 	gui << presets;
 
 	// The preset server will allow setting the preset via OSC
 	presetServer << presets;
-	presetServer.addListener("127.0.0.1", 13561);
+	presetServer.addListener("127.0.0.1", 13561); // Will relay preset server data to this address and port
 	presetServer.print();
+
+	interfaceServer << presetServer;
+	interfaceServer << paramServer;
 
 	MyApp().start();
 	return 0;

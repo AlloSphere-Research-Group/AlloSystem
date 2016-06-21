@@ -2,6 +2,21 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "allocore/io/al_File.hpp"
+#include "allocore/system/al_Config.h"
+#include <stdlib.h> // realpath (POSIX), _fullpath (Windows)
+#ifdef AL_WINDOWS
+	#define WIN32_LEAN_AND_MEAN
+	#define VC_EXTRALEAN
+	#include <windows.h> // TCHAR, LPCTSTR
+	#include <direct.h> // _getcwd
+	#define platform_getcwd _getcwd
+	#ifndef PATH_MAX
+	#define PATH_MAX 260
+	#endif
+#else
+	#include <unistd.h> // getcwd (POSIX)
+	#define platform_getcwd getcwd
+#endif
 
 namespace al{
 
@@ -59,11 +74,21 @@ void File::close(){
 const char * File::readAll(){
 	if(opened() && mMode[0]=='r'){
 		int n = size();
+		//printf("reading %d bytes from %s\n", n, path().c_str());
 		allocContent(n);
 		int numRead = fread(mContent, sizeof(char), n, mFP);
-		if(numRead < n){}
+		if(numRead < n){
+			//printf("warning: only read %d bytes\n", numRead);
+		}
 	}
 	return mContent;
+}
+
+std::string File::read(const std::string& path){
+	File f(path, "rb");
+	f.open();
+	auto str = f.readAll();
+	return str ? str : "";
 }
 
 int File::write(const std::string& path, const void * v, int size, int items){
@@ -110,11 +135,16 @@ std::string File::conformPathToOS(const std::string& src){
 	return res;
 }
 
-std::string File::absolutePath(const std::string& src) {
+std::string File::absolutePath(const std::string& src){
 #ifdef AL_WINDOWS
-	char temp[_MAX_PATH];
-	char * result = _fullpath(temp, src.c_str(), sizeof(temp));
-	return result ? result : "";
+	TCHAR dirPart[4096];
+	TCHAR ** filePart={NULL};
+	GetFullPathName((LPCTSTR)src.c_str(), sizeof(dirPart), dirPart, filePart);
+	std::string result = (char *)dirPart;
+	if(filePart != NULL && *filePart != 0){
+		result += (char *)*filePart;
+	}
+	return result;
 #else
 	char temp[PATH_MAX];
 	char * result = realpath(src.c_str(), temp);
@@ -143,14 +173,21 @@ std::string File::extension(const std::string& src){
 	return "";
 }
 
+static std::string stripEndSlash(const std::string& path){
+	if(path.back() == '\\' || path.back() == '/'){
+		return path.substr(0, path.size()-1);
+	}
+	return path;
+}
+
 bool File::exists(const std::string& path){
 	struct stat s;
-	return ::stat(path.c_str(), &s) == 0;
+	return ::stat(stripEndSlash(path).c_str(), &s) == 0;
 }
 
 bool File::isDirectory(const std::string& src){
 	struct stat s;
-	if(0 == ::stat(src.c_str(), &s)){	// exists?
+	if(0 == ::stat(stripEndSlash(src).c_str(), &s)){	// exists?
 		if(s.st_mode & S_IFDIR){		// is dir?
 			return true;
 		}
@@ -240,7 +277,7 @@ void SearchPaths::addAppPaths(int argc, char * const argv[], bool recursive) {
 
 void SearchPaths::addAppPaths(bool recursive) {
 	char cwd[4096];
-	if(getcwd(cwd, sizeof(cwd))){
+	if(platform_getcwd(cwd, sizeof(cwd))){
 		mAppPath = std::string(cwd) + "/";
 		addSearchPath(mAppPath, recursive);
 	}
