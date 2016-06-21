@@ -399,6 +399,10 @@ public:
 
 // Implementation --------------------------------------------------------------
 
+const char * toString(Texture::Target v);
+const char * toString(Texture::Wrap v);
+const char * toString(Texture::Filter v);
+
 template <class T>
 void Texture::allocate(const T * src, unsigned w, Graphics::Format format_ ){
 	allocate(src, w,0,0, format_);
