@@ -461,6 +461,7 @@ void Texture::sendShape(bool force){
 			break;
 		case TEXTURE_2D:
 			glTexImage2D(target(), 0, intFmt, width(), height(), 0, format(), type(), NULL);
+			//printf("glTexImage2D(%s, 0, %s, %u, %u, 0, %s, %s, NULL)\n", toString(target()), toString(Graphics::Format(intFmt)), width(), height(), toString(format()), toString(type()));
 			break;
 		case TEXTURE_3D:
 			glTexImage3D(target(), 0, intFmt, width(), height(), depth(), 0, format(), type(), NULL);
@@ -663,30 +664,26 @@ void Texture::quadViewport(
 
 void Texture :: print() {
 
-	const char * target = "?";
+	printf("Texture ");
 
 	switch (mTarget) {
 		case TEXTURE_1D:
-			target = "TEXTURE_1D";
-			printf("Texture target=%s, %d(%d), ", target, width(), mArray.width());
+			printf("target=%s, %d(%d)", toString(mTarget), width(), mArray.width());
 			break;
 		case TEXTURE_2D:
-			target = "TEXTURE_2D";
-			printf("Texture target=%s, %dx%d(%dx%d), ", target, width(), height(), mArray.width(), mArray.height());
+			printf("target=%s, %dx%d(%dx%d)", toString(mTarget), width(), height(), mArray.width(), mArray.height());
 			break;
 		case TEXTURE_3D:
-			target = "TEXTURE_3D";
-			printf("Texture target=%s, %dx%dx%d(%dx%dx%d), ", target, width(), height(), depth(), mArray.width(), mArray.height(), mArray.depth());
+			printf("target=%s, %dx%dx%d(%dx%dx%d)", toString(mTarget), width(), height(), depth(), mArray.width(), mArray.height(), mArray.depth());
 			break;
 		case NO_TARGET:
-			target = "NO_TARGET";
-			printf("Texture target=%s, %dx%dx%d(%dx%dx%d), ", target, width(), height(), depth(), mArray.width(), mArray.height(), mArray.depth());
+			printf("target=%s, %dx%dx%d(%dx%dx%d)", toString(mTarget), width(), height(), depth(), mArray.width(), mArray.height(), mArray.depth());
 			break;
 		default:
-			printf("Texture target=(unknown), ");
+			printf("target=(unknown)");
 	}
 
-	printf("type=%s(%s), format=%s(%d), unpack=%d\n",
+	printf(", type=%s(%s), format=%s(%d), unpack=%d\n",
 		toString(mType), allo_type_name(mArray.type()), toString(mFormat), mArray.components(), mArray.alignment()
 	);
 	//mArray.print();
@@ -701,6 +698,29 @@ void Texture :: configure(AlloArrayHeader& hdr) {
 Texture& Texture::updatePixels(){
 	AL_WARN_ONCE("Texture::updatePixels() deprecated, use Texture::dirty()");
 	return dirty();
+}
+
+
+#define CS(t) case Texture::t: return #t;
+const char * toString(Texture::Target v){
+	switch(v){
+		CS(TEXTURE_1D) CS(TEXTURE_2D) CS(TEXTURE_3D) CS(NO_TARGET)
+		default: return "";
+	}
+}
+const char * toString(Texture::Wrap v){
+	switch(v){
+		CS(CLAMP) CS(CLAMP_TO_BORDER) CS(CLAMP_TO_EDGE) CS(MIRRORED_REPEAT) CS(REPEAT)
+		default: return "";
+	}
+}
+const char * toString(Texture::Filter v){
+	switch(v){
+		CS(NEAREST) CS(LINEAR)
+		CS(NEAREST_MIPMAP_NEAREST) CS(LINEAR_MIPMAP_NEAREST)
+		CS(NEAREST_MIPMAP_LINEAR) CS(LINEAR_MIPMAP_LINEAR)
+		default: return "";
+	}
 }
 
 } // al::
