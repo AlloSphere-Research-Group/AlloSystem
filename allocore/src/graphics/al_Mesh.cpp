@@ -815,7 +815,7 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 
 	// Header
 	s << "ply\n";
-	s << "format " << (binary ? (bigEndian ? "binary_big_endian" : "binary_little_endian") : "ascii 1.0") << "\n";
+	s << "format " << (binary ? (bigEndian ? "binary_big_endian" : "binary_little_endian") : "ascii") << " 1.0\n";
 	s << "comment AlloSystem\n";
 
 	if(solidName[0]){
