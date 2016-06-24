@@ -807,7 +807,8 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 	const unsigned Nc = m.colors().size();
 	const unsigned Nci= m.coloris().size();
 	const unsigned Ni = m.indices().size();
-	const unsigned Bi = Nv<65536 ? 2 : 4; // max bytes/index
+	const unsigned Bi = Nv<=65536 ? 2 : 4; // max bytes/index
+	//const unsigned Bi = 4;
 
 	int bigEndian = 1;
 	if(1 == *(char *)&bigEndian) bigEndian = 0;
@@ -848,7 +849,7 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 	if(binary){
 		// Vertex data
 		for(unsigned i = 0; i < Nv; ++i){
-			s.write(reinterpret_cast<char*>(&m.vertices()[i][0]), sizeof(Mesh::Vertex));
+			s.write(reinterpret_cast<const char*>(&m.vertices()[i][0]), sizeof(Mesh::Vertex));
 			if(hasColors){
 				auto col = Nci >= Nv ? m.coloris()[i] : Colori(m.colors()[i]);
 				s << col.r << col.g << col.b << col.a;
@@ -857,16 +858,20 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 		// Face data
 		if(Ni){
 			for(unsigned i = 0; i < Ni; i+=3){
-				s << char(3);
+				s << char(3); // 3 indices/face
 				if(sizeof(Mesh::Index) == Bi){
-					s.write(reinterpret_cast<char*>(&m.indices()[i]), Bi*3);
+					s.write(reinterpret_cast<const char*>(&m.indices()[i]), Bi*3);
 				}
 				else{
 					unsigned short idx[3];
 					idx[0] = m.indices()[i  ];
 					idx[1] = m.indices()[i+1];
 					idx[2] = m.indices()[i+2];
-					s.write(reinterpret_cast<char*>(&idx), Bi*3);
+					s.write(reinterpret_cast<const char*>(idx), Bi*3);
+					//printf("%u %u %u\n", idx[0], idx[1], idx[2]);
+					/*for(int i=0; i<Bi*3; ++i){
+						printf("%d ", reinterpret_cast<char*>(idx)[i]);
+					}printf("\n");*/
 				}
 			}
 		}
