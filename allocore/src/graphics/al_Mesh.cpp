@@ -808,6 +808,7 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 	const unsigned Nci= m.coloris().size();
 	const unsigned Ni = m.indices().size();
 	//const unsigned Bi = Nv<=65536 ? 2 : 4; // max bytes/index
+	const unsigned Bi = Nv<=32768 ? 2 : 4; // changed since assimp import not working with full ushort range up to 65536
 
 	int bigEndian = 1;
 	if(1 == *(char *)&bigEndian) bigEndian = 0;
