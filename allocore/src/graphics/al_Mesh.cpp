@@ -807,8 +807,7 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 	const unsigned Nc = m.colors().size();
 	const unsigned Nci= m.coloris().size();
 	const unsigned Ni = m.indices().size();
-	const unsigned Bi = Nv<=65536 ? 2 : 4; // max bytes/index
-	//const unsigned Bi = 4;
+	//const unsigned Bi = Nv<=65536 ? 2 : 4; // max bytes/index
 
 	int bigEndian = 1;
 	if(1 == *(char *)&bigEndian) bigEndian = 0;
@@ -828,6 +827,8 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 	"property float y\n"
 	"property float z\n"
 	;
+
+	// TODO: normals (nx,ny,nz), texcoords (s,t)
 
 	bool hasColors = Nc >= Nv || Nci >= Nv;
 	if(hasColors){
