@@ -291,23 +291,30 @@ bool ShaderProgram::linked() const {
 }
 // GLint v; glGetProgramiv(id(), GL_LINK_STATUS, &v); return v; }
 
+#define GET_LOC(map, glGetFunc)\
+	int loc;\
+	auto it = map.find(name);\
+	if(it != map.end()){\
+		loc = it->second;\
+	}\
+	else{\
+		loc = glGetFunc(id(), name);\
+		map[name] = loc;\
+	}
 
 int ShaderProgram::uniform(const char * name) const {
-	//GLint loc = glGetUniformLocationARB((GLhandleARB)handle(), name);
-	GLint loc = glGetUniformLocation(id(), name);
-	if (loc == -1)
+	GET_LOC(mUniformLocs, glGetUniformLocation);
+	if(-1 == loc)
 		AL_WARN_ONCE("No such uniform named \"%s\"", name);
 	return loc;
 }
 
 int ShaderProgram::attribute(const char * name) const {
-	//GLint loc = glGetAttribLocationARB((GLhandleARB)handle(), name);
-	GLint loc = glGetAttribLocation(id(), name);
-	if (loc == -1)
+	GET_LOC(mAttribLocs, glGetAttribLocation);
+	if(-1 == loc)
         AL_WARN_ONCE("No such attribute named \"%s\"", name);
 	return loc;
 }
-
 
 const ShaderProgram& ShaderProgram::uniform(int loc, int v) const{
 	glUniform1i(loc, v); return *this;
