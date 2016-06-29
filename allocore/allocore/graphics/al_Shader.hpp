@@ -45,6 +45,7 @@
 */
 
 #include <string>
+#include <unordered_map>
 #include "allocore/graphics/al_GPUObject.hpp"
 #include "allocore/graphics/al_Graphics.hpp"
 
@@ -356,6 +357,7 @@ protected:
 	Graphics::Primitive mInPrim, mOutPrim;	// IO primitives for geometry shaders
 	unsigned int mOutVertices;
 	std::string mVertSource, mFragSource, mGeomSource;
+	mutable std::unordered_map<std::string, int> mUniformLocs, mAttribLocs;
 	bool mActive;
 
 	virtual void get(int pname, void * params) const;
