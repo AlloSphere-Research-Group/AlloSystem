@@ -47,6 +47,7 @@
 
 */
 
+#include <string>
 #include "allocore/system/al_Time.h"
 
 namespace al{
@@ -57,6 +58,10 @@ inline void wait(al_sec dt){ al_sleep(dt); }
 /// Get current wall time in seconds
 inline al_sec walltime(){ return al_time(); }
 inline al_sec timeNow(){ return al_time(); }
+
+/// Convert nanoseconds to timecode string
+std::string toTimecode(al_nsec t, const std::string& format="D:H:M:S:m:u");
+
 
 /// Timer with stopwatch-like functionality for benchmarking, etc.
 ///
@@ -82,7 +87,6 @@ public:
 private:
 	al_nsec mStart=0, mStop=0;	// start and stop times
 };
-
 
 
 /// Self-correcting timer
