@@ -78,11 +78,15 @@ public:
 	/// Get rendering mode
 	Mode mode() const { return mMode; }
 
+	/// Get path to render files
+	const std::string& path() const { return mPath; }
+
 
 	/// Adapts frame duration used in model/animation updates
 
 	/// This will set the passed in argument to the rendering frame duration
-	/// if rendering is active.
+	/// if rendering is active. This should be called if the render mode is
+	/// NON_REAL_TIME and the application's animation depends on a delta time.
 	template <class T>
 	void adaptFrameDur(T& realtimeFrameDur) const {
 		if(mActive && mWindow) realtimeFrameDur = mFrameDur;
@@ -137,6 +141,8 @@ public:
 
 	/// Save a screenshot of a window to disk
 	void saveScreenshot(al::Window& win);
+
+	void createVideo();
 
 private:
 
@@ -197,6 +203,7 @@ private:
 	Thread mSoundFileThread;
 
 	bool mActive;
+	bool mWroteImages, mWroteAudio;
 
 	virtual void onAudioCB(AudioIOData& io);
 	virtual bool onFrame();

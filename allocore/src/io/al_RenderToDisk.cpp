@@ -1,3 +1,4 @@
+#include <cstdlib> // std::system
 #include "allocore/io/al_RenderToDisk.hpp"
 #include "allocore/io/al_File.hpp"
 #include "allocore/system/al_Time.hpp"
@@ -23,7 +24,7 @@ RenderToDisk::RenderToDisk(Mode m)
 :	mMode(m), mFrameNumber(0), mElapsedSec(0),
 	mGraphicsBuf(-1),
 	mImageExt("png"), mImageCompress(50),
-	mActive(false)
+	mActive(false), mWroteImages(false), mWroteAudio(false)
 {
 	mPBOs[0] = 0;
 	resetPBOQueue();
@@ -101,9 +102,10 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 		return false;
 	}
 
+	mWroteImages = mWroteAudio = false;
+
 	// Make path on HD
 	makePath();
-
 
 	if(aio){
 		// Open sound file for writing
@@ -203,6 +205,8 @@ void RenderToDisk::stop(){
 		for(int i=0; i<Npbos; ++i) writeImage();
 		resetPBOQueue();
 
+		mWroteImages = true;
+
 		if(0 != mPBOs[0]){
 			glDeleteBuffers(Npbos, mPBOs);
 			mPBOs[0] = 0;
@@ -224,6 +228,8 @@ void RenderToDisk::stop(){
 	if(mAudioIO){
 		mSoundFileThread.join();
 		mSoundFile.close();
+
+		mWroteAudio = true;
 
 		mAudioIO->remove(*this);
 	
@@ -407,6 +413,34 @@ void RenderToDisk::saveImage(
 	}
 }
 
+void RenderToDisk::createVideo(){
+
+	// Nothing to do without image sequence
+	if(!mWroteImages) return;
+
+	std::string prog;
+	#ifdef AL_WINDOWS
+		// Note: path must be DOS style for std::system
+		prog = "c:\\Program Files\\ffmpeg\\bin\\ffmpeg";
+	#else
+		prog = "ffmpeg";
+	#endif
+
+	std::string args;
+	args += " -r " + std::to_string(1./mFrameDur);
+	args += " -i " + path() + "/%07d." + mImageExt;
+	if(mWroteAudio){
+		args += " -i " + path() + "/output.au -c:a aac -b:a 192k";
+	}
+	args += " -crf 18 -preset veryslow";
+	args += " " + path() + "/movie.mp4";
+
+	std::string cmd = "\"" + prog + "\"" + args;
+	//printf("%s\n", cmd.c_str());
+
+	// TODO: thread this; std::system blocks until the command finishes
+	std::system(cmd.c_str());
+}
 
 
 RenderToDisk::AudioRing::AudioRing()
