@@ -54,7 +54,7 @@ RenderToDisk& RenderToDisk::mode(Mode v){
 }
 
 RenderToDisk& RenderToDisk::path(const std::string& v){
-	mPath = v;
+	mUserPath = v;
 	return *this;
 }
 
@@ -103,6 +103,7 @@ bool RenderToDisk::start(al::AudioIO * aio, al::Window * win, double fps){
 	}
 
 	mWroteImages = mWroteAudio = false;
+	mFrameNumber = 0;
 
 	// Make path on HD
 	makePath();
@@ -253,10 +254,13 @@ void RenderToDisk::saveScreenshot(al::Window& win){
 
 
 void RenderToDisk::makePath(){
-	// If no path specified, create default with time string
-	if(mPath.empty()){
+	// If no user path specified, create default with time string
+	if(mUserPath.empty()){
 		mPath = "./render";
 		mPath += al::toString((unsigned long long)(al::timeNow()*1000) % 31536000000ull);
+	}
+	else{
+		mPath = mUserPath;
 	}
 
 	// Create output directory if it doesn't exist

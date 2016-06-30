@@ -176,7 +176,7 @@ private:
 	};
 
 	Mode mMode;
-	std::string mPath;
+	std::string mUserPath, mPath;
 	unsigned mFrameNumber;
 	double mElapsedSec;
 
