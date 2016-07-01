@@ -93,7 +93,7 @@ public:
 	void startRecord(std::string name = "", bool overwrite = false);
 	void stopRecord();
 
-	SequenceRecorder & operator<< (PresetHandler &handler) { registerPresetHandler(handler); }
+	SequenceRecorder & operator<< (PresetHandler &handler) { registerPresetHandler(handler);  return *this; }
 
 	void registerPresetHandler(PresetHandler &handler) {
 		mPresetHandler = &handler;
