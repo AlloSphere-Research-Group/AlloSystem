@@ -184,6 +184,7 @@ public:
 			static_cast<PresetServer *>(userData)->notifyListeners(
 			            static_cast<PresetServer *>(userData)->mOSCpath + "/morphTime", value);
 		}, this);
+		return *this;
 	}
 
 	/**

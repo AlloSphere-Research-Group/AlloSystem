@@ -187,6 +187,7 @@ public:
 
 	SequenceServer &registerSequencer(PresetSequencer &sequencer) {
 		mSequencer = &sequencer;
+		return *this;
 //		mSequencer->registerSequenceCallback(PresetServer::changeCallback,
 //		                                       (void *) this);
 
