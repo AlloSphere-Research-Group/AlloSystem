@@ -2,6 +2,8 @@
 #ifndef __ROTATE_HANDLE_HPP__
 #define __ROTATE_HANDLE_HPP__
 
+#include <cfloat>
+
 namespace al {
 
 struct RotateHandle : PickableBase {
@@ -12,7 +14,7 @@ struct RotateHandle : PickableBase {
   bool hover[3] = {false,false,false};
   bool selected[3] = {false,false,false};
 
-  RotateHandle(){ 
+  RotateHandle(){
     rotate = Quatf::identity();
   }
 
@@ -40,6 +42,7 @@ struct RotateHandle : PickableBase {
   }
 
   void draw(Graphics &g){
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
     Mesh &m = g.mesh();
     m.primitive(g.LINE_LOOP);
     m.reset();
@@ -86,6 +89,7 @@ struct RotateHandle : PickableBase {
         g.draw(m);
       }
     }
+    glPopAttrib();
   }
 
   double intersect(Rayd &r){return 0;}
@@ -133,7 +137,7 @@ struct RotateHandle : PickableBase {
         return true;
       }
     }
-    return false;  
+    return false;
   }
 
   bool onDrag(Rayd &r, double t, bool child){
@@ -152,17 +156,17 @@ struct RotateHandle : PickableBase {
             parent->pose.pos() += p1-p2;
           }
           return true;
-        } 
+        }
       }
     }
     return false;
   }
 
-  bool onUnpick(Rayd &r, double t, bool child){ 
+  bool onUnpick(Rayd &r, double t, bool child){
     for(int i=0; i < 3; i++) selected[i] = false;
-    return false; 
+    return false;
   }
-  
+
 };
 
 } // ::al::

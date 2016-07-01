@@ -191,12 +191,7 @@ void Texture::shapeFromArray(){
 	}
 }
 
-bool Texture::tryBind(){
-
-	// Sync shape if array is dirty
-	shapeFromArray();
-
-	// Ensure target is synchronized before bind
+void Texture::deriveTarget(){
 	if(mDepth != 0){
 		target(TEXTURE_3D);
 	}
@@ -209,6 +204,15 @@ bool Texture::tryBind(){
 	else{
 		target(NO_TARGET);
 	}
+}
+
+bool Texture::tryBind(){
+
+	// Sync shape if array is dirty
+	shapeFromArray();
+
+	// Ensure target is synchronized before bind
+	deriveTarget();
 
 	if(target() != Texture::NO_TARGET){
 		glBindTexture(target(), id());
@@ -457,6 +461,7 @@ void Texture::sendShape(bool force){
 			break;
 		case TEXTURE_2D:
 			glTexImage2D(target(), 0, intFmt, width(), height(), 0, format(), type(), NULL);
+			//printf("glTexImage2D(%s, 0, %s, %u, %u, 0, %s, %s, NULL)\n", toString(target()), toString(Graphics::Format(intFmt)), width(), height(), toString(format()), toString(type()));
 			break;
 		case TEXTURE_3D:
 			glTexImage3D(target(), 0, intFmt, width(), height(), depth(), 0, format(), type(), NULL);
@@ -659,57 +664,28 @@ void Texture::quadViewport(
 
 void Texture :: print() {
 
-	const char * target = "?";
-	const char * format = "?";
-	const char * type = "?";
+	printf("Texture ");
 
 	switch (mTarget) {
 		case TEXTURE_1D:
-			target = "TEXTURE_1D";
-			printf("Texture target=%s, %d(%d), ", target, width(), mArray.width());
+			printf("target=%s, %d(%d)", toString(mTarget), width(), mArray.width());
 			break;
 		case TEXTURE_2D:
-			target = "TEXTURE_2D";
-			printf("Texture target=%s, %dx%d(%dx%d), ", target, width(), height(), mArray.width(), mArray.height());
+			printf("target=%s, %dx%d(%dx%d)", toString(mTarget), width(), height(), mArray.width(), mArray.height());
 			break;
 		case TEXTURE_3D:
-			target = "TEXTURE_3D";
-			printf("Texture target=%s, %dx%dx%d(%dx%dx%d), ", target, width(), height(), depth(), mArray.width(), mArray.height(), mArray.depth());
+			printf("target=%s, %dx%dx%d(%dx%dx%d)", toString(mTarget), width(), height(), depth(), mArray.width(), mArray.height(), mArray.depth());
 			break;
 		case NO_TARGET:
-			target = "NO_TARGET";
-			printf("Texture target=%s, %dx%dx%d(%dx%dx%d), ", target, width(), height(), depth(), mArray.width(), mArray.height(), mArray.depth());
+			printf("target=%s, %dx%dx%d(%dx%dx%d)", toString(mTarget), width(), height(), depth(), mArray.width(), mArray.height(), mArray.depth());
 			break;
 		default:
-			printf("Texture target=(unknown), ");
-	}
-	switch (mFormat) {
-		case Graphics::DEPTH_COMPONENT: format="DEPTH_COMPONENT"; break;
-		case Graphics::LUMINANCE: format="LUMINANCE"; break;
-		case Graphics::LUMINANCE_ALPHA: format="LUMINANCE_ALPHA"; break;
-		case Graphics::RED: format="RED"; break;
-		case Graphics::GREEN: format="GREEN"; break;
-		case Graphics::BLUE: format="BLUE"; break;
-		case Graphics::ALPHA: format="ALPHA"; break;
-		case Graphics::RGB: format="RGB"; break;
-		case Graphics::RGBA: format="RGBA"; break;
-		case Graphics::BGR: format="BGR"; break;
-		case Graphics::BGRA: format="BGRA"; break;
-		default:;
-	}
-	switch (mType) {
-		case Graphics::BYTE: type = "BYTE"; break;
-		case Graphics::UBYTE: type = "UBYTE"; break;
-		case Graphics::SHORT: type = "SHORT"; break;
-		case Graphics::USHORT: type = "USHORT"; break;
-		case Graphics::INT: type = "INT"; break;
-		case Graphics::UINT: type = "UINT"; break;
-		case Graphics::FLOAT: type = "FLOAT"; break;
-		case Graphics::DOUBLE: type = "DOUBLE"; break;
-		default:;
+			printf("target=(unknown)");
 	}
 
-	printf("type=%s(%s), format=%s(%d), unpack=%d)\n", type, allo_type_name(mArray.type()), format, mArray.components(), mArray.alignment());
+	printf(", type=%s(%s), format=%s(%d), unpack=%d\n",
+		toString(mType), allo_type_name(mArray.type()), toString(mFormat), mArray.components(), mArray.alignment()
+	);
 	//mArray.print();
 }
 
@@ -722,6 +698,29 @@ void Texture :: configure(AlloArrayHeader& hdr) {
 Texture& Texture::updatePixels(){
 	AL_WARN_ONCE("Texture::updatePixels() deprecated, use Texture::dirty()");
 	return dirty();
+}
+
+
+#define CS(t) case Texture::t: return #t;
+const char * toString(Texture::Target v){
+	switch(v){
+		CS(TEXTURE_1D) CS(TEXTURE_2D) CS(TEXTURE_3D) CS(NO_TARGET)
+		default: return "";
+	}
+}
+const char * toString(Texture::Wrap v){
+	switch(v){
+		CS(CLAMP) CS(CLAMP_TO_BORDER) CS(CLAMP_TO_EDGE) CS(MIRRORED_REPEAT) CS(REPEAT)
+		default: return "";
+	}
+}
+const char * toString(Texture::Filter v){
+	switch(v){
+		CS(NEAREST) CS(LINEAR)
+		CS(NEAREST_MIPMAP_NEAREST) CS(LINEAR_MIPMAP_NEAREST)
+		CS(NEAREST_MIPMAP_LINEAR) CS(LINEAR_MIPMAP_LINEAR)
+		default: return "";
+	}
 }
 
 } // al::

@@ -1,3 +1,5 @@
+#include <sstream> // ostringstream
+#include <iomanip> // std::setw
 #include "allocore/math/al_Constants.hpp"
 #include "allocore/system/al_Time.hpp"
 
@@ -188,6 +190,34 @@ al_nsec al_time_nsec(){			return al_system_time_nsec(); }
 
 
 namespace al {
+
+std::string toTimecode(al_nsec t, const std::string& format){
+	unsigned day = t/(al_nsec(1000000000) * 60 * 60 * 24); // basically for overflow
+	unsigned hrs = t/(al_nsec(1000000000) * 60 * 60) % 24;
+	unsigned min = t/(al_nsec(1000000000) * 60) % 60;
+	unsigned sec = t/(al_nsec(1000000000)) % 60;
+	unsigned msc = t/(al_nsec(1000000)) % 1000;
+	unsigned usc = t/(al_nsec(1000)) % 1000;
+
+	std::ostringstream s;
+	s.fill('0');
+
+	for(unsigned i=0; i<format.size(); ++i){
+		const auto c = format[i];
+		switch(c){
+		case 'D': s << day; break;
+		case 'H': s << std::setw(2) << hrs; break;
+		case 'M': s << std::setw(2) << min; break;
+		case 'S': s << std::setw(2) << sec; break;
+		case 'm': s << std::setw(3) << msc; break;
+		case 'u': s << std::setw(3) << usc; break;
+		default:  s << c;
+		}
+	}
+
+	return s.str();
+}
+
 
 void DelayLockedLoop :: setBandwidth(double bandwidth) {
 	double F = 1./tperiod;		// step rate

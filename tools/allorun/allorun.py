@@ -3,27 +3,38 @@
 
 from __future__ import print_function
 
-import sys
+import sys, os
 import argparse
 
-from appnode import BuildNode, RunNode
+from appnode import BuildNode, RemoteBuildNode, RunNode
 
 # Curses GUI
+
 import curses
 
 class CursesApp():
-    def __init__(self, nodes, source):
+    def __init__(self, nodes, source, verbose = True):
         self.current_index = 0
         self.buffer_len = 256
         self.chase = True
+        self.verbose = verbose
+        if self.verbose:
+            self.log_text = 'Started...\n'
+        else:
+            self.log_text = ''
         if nodes and len(nodes) > 0:
             self.nodes = nodes
+            if self.verbose:
+                for node in nodes:
+                    self.log("----- Node -----")
+                    self.log("Remote: " + str(node.remote))
+                    self.log("Hostname:" + node.hostname)
+                    self.log("Gateway: " + node.gateway)
 
         #self.item_color = { "none": 7, "error" : 1, "done" : 2, "working" : 4}
 
         self.displays = ["STDOUT", "STDERR"]
         self.current_display = 0
-        self.log_text = ''
         self.source = source
         pass
     
@@ -33,7 +44,12 @@ class CursesApp():
     def draw_menu(self, stdscr, linenum):
         pos = 1
         for builder in self.builders:
-            color = 1 if builder.is_done() else 4
+            color = 4
+            if builder.is_done():
+                if not builder.wait_until_done() == 0:
+                    color = 1
+                else:
+                    color = 2
             style = curses.A_REVERSE if self.builders.index(builder) == self.current_index else curses.A_NORMAL
             stdscr.addstr(0,pos, builder.name, curses.color_pair(color) | style)
             pos += len(builder.name) + 1
@@ -83,9 +99,10 @@ class CursesApp():
             pass
         
         self.pad = curses.newpad(self.buffer_len, 512)
-        self._run_builders(stdscr)
-
-        self._start_runners(stdscr)
+        if (self._run_builders(stdscr)) :
+            self._start_runners(stdscr)
+        else:
+            self.log("Building aborted.")
         
     def _run_builders(self, stdscr):
         self.builders = []
@@ -94,7 +111,13 @@ class CursesApp():
         for i, node in enumerate(self.nodes):
             
             builder = node
-            configuration = {"project_dir" : '/home/sphere/andres/adrift_new',
+            from os.path import expanduser
+            home = expanduser("~")
+            cwd = os.getcwd()
+            if cwd[:len(home)] == home:
+                cwd = cwd[len(home) + 1:]
+            
+            configuration = {"project_dir" : cwd,
                             "project_src": self.source,
                             "prebuild_commands" : '',
                             "build_command" : './run.sh -s -n'
@@ -105,7 +128,12 @@ class CursesApp():
             
         mypad_pos = 0
         num_lines = 0
-        while not builder.is_done():
+        done = True
+        for b in self.builders:
+            if not b.is_done():
+                done = False
+                break
+        while not done:
             y, x = stdscr.getmaxyx()
             if mypad_pos < 0:
                 mypad_pos = 0
@@ -141,10 +169,13 @@ class CursesApp():
             self.pad.refresh(mypad_pos, 0, 2, 0, y - 4, x - 3)
             
             event = stdscr.getch()
+            enter_pressed = False
             if event == ord('q'):
-                break
+                return False
             elif event == ord('c'):
                 self.chase = not self.chase
+            elif event == 10: # curses.KEY_ENTER:
+                enter_pressed = True
             elif event == curses.KEY_LEFT:
                 self.current_index -= 1
                 if self.current_index < 0:
@@ -168,10 +199,16 @@ class CursesApp():
             
             if self.chase:
                 mypad_pos = num_lines - y
-
+            done = True
+            for b in self.builders:
+                if not b.is_done():
+                    done = False
+                    break
+            if done and not enter_pressed:
+                done = False
 
         builder.flush_messages()
-
+        return True
             
     def _start_runners(self, stdscr):
         self.runstdoutbuf  = []
@@ -181,9 +218,19 @@ class CursesApp():
 
             build_report = 'build/' + self.source[:-4].replace('/', '_') + '.json'
             import json
+            if self.verbose:
+                self.log("Reading build report:" + build_report)
             with open(build_report) as fp:
                 conf = json.load(fp)    
                 for app in conf['apps']:
+                    if self.verbose:
+                        self.log("New runner    :" + app['type'])
+                        self.log("       bin dir:" + conf['bin_dir'])
+                        self.log("          path:" + app['path'])
+                        self.log("      root_dir:" + conf['root_dir'])
+                    if type(node) == RemoteBuildNode:
+                        self.runstdoutbuf.append(str(node.deploy_to))
+
                     self.runstdoutbuf.append('')
                     self.runstderrbuf.append('')
                     runner = RunNode(app['type'] + '(local)')
@@ -274,6 +321,8 @@ if __name__ == "__main__":
                        help='source file or directory to build',
                        default='AlloSystem/alloutil/examples/allosphereApp.cpp')
     parser.add_argument('-l', '--local', help='Force local build.', action="store_true")
+    parser.add_argument('-v', '--verbose', help='Verbose output.', action="store_true")
+
     args = parser.parse_args()
     project_src = ' '.join(args.source)
 
@@ -284,9 +333,16 @@ if __name__ == "__main__":
     else:
         from local import nodes
     
+    import traceback
+    
     if len(nodes) > 0:
-        app = CursesApp(nodes, project_src)
-        app.start()
+        app = CursesApp(nodes, project_src, args.verbose)
+        try:
+            app.start()
+        except:
+            print("Python exception ---")
+            traceback.print_exc()
+            print(sys.exc_info()[0])
         if not app.log_text == '':
             print('Output log: -------------\n' + app.log_text)
     else:

@@ -47,6 +47,7 @@
 
 */
 
+#include <string>
 #include "allocore/system/al_Time.h"
 
 namespace al{
@@ -58,22 +59,34 @@ inline void wait(al_sec dt){ al_sleep(dt); }
 inline al_sec walltime(){ return al_time(); }
 inline al_sec timeNow(){ return al_time(); }
 
+/// Convert nanoseconds to timecode string
+std::string toTimecode(al_nsec t, const std::string& format="D:H:M:S:m:u");
+
+
 /// Timer with stopwatch-like functionality for benchmarking, etc.
 ///
 /// @ingroup allocore
 class Timer {
 public:
-	Timer(): mStart(0), mStop(0){}
+	Timer(bool setStartTime=true){
+		if(setStartTime) start();
+	}
 
-	al_nsec elapsed(){ return mStop - mStart; }					///< Returns nsec between start() and stop() calls
-	al_sec elapsedSec(){ return al_time_ns2s * elapsed(); }		///< Returns  sec between start() and stop() calls
-	void start(){ mStart=al_time_nsec(); }							///< Set start time as current time
-	void stop(){ mStop=al_time_nsec(); }								///< Set stop time as current time
+	/// Returns nsec between start() and stop() calls
+	al_nsec elapsed() const { return mStop - mStart; }					
+
+	/// Returns seconds between start() and stop() calls
+	al_sec elapsedSec() const { return al_time_ns2s * elapsed(); }
+
+	/// Set start time to current time
+	void start(){ mStart=al_steady_time_nsec(); }
+
+	/// Set stop time to current time
+	void stop(){ mStop=al_steady_time_nsec(); }
 
 private:
-	al_nsec mStart, mStop;	// start and stop times
+	al_nsec mStart=0, mStop=0;	// start and stop times
 };
-
 
 
 /// Self-correcting timer

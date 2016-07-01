@@ -64,12 +64,17 @@ class Node:
             self.stderr += line
                 
     def is_done(self):
-        return self.internal_process.poll() is not None
-        
+        if self.internal_process:
+            return self.internal_process.poll() is not None
+        else:
+            return True
+
     def wait_until_done(self):
+        if not self.internal_process:
+            return 0
         self.internal_process.wait()
         self.flush_messages()
-        self._debug_print("Done building '%s' on %s."%(self.name, self.hostname) + '\n')
+        #self._debug_print("Done building '%s' on %s."%(self.name, self.hostname) + '\n')
         return self.internal_process.returncode        
         
     def terminate(self):
@@ -114,14 +119,19 @@ class BuildNode(Node):
                                 "%s@%s" % (self.login, self.gateway), ' '.join(command_list)]
 
             
-        self._debug_print("-- Building: " + ' '.join(command_list) + ' from: ' + os.getcwd() + '\n')
+        self._debug_print("-- Building: " + ' '.join(command_list) + '\n')
         self.internal_process = subprocess.Popen(' '.join(command_list),
                        shell=True,
                        stdout=subprocess.PIPE,
                        stderr=subprocess.PIPE)
+        if self.internal_process.pid <= 0:
+            self._debug_print("Process failed to start.")
         t = Thread(target=enqueue_output, args=(self.internal_process.stdout, self.stdoutqueue))
         t.daemon = True # thread dies with the program
         t.start()
+        terr = Thread(target=enqueue_output, args=(self.internal_process.stderr, self.stderrqueue))
+        terr.daemon = True # thread dies with the program
+        terr.start()
 
     def _get_build_command(self):
         if not self.configured:
@@ -139,13 +149,15 @@ class BuildNode(Node):
 class RemoteBuildNode(BuildNode):
     def __init__(self, hostname = 'gr01',
                  gateway = "nonce.mat.ucsb.edu",
-                 login = 'sphere'):
+                 login = 'sphere',
+                 deploy_to = []):
         BuildNode.__init__(self)
         self.hostname = hostname
         self.name = hostname
         self.gateway = gateway
         self.login = login
-                 
+        self.deploy_to = deploy_to
+        
         self.remote = True
 
 class RunNode(Node):
@@ -176,6 +188,9 @@ class RunNode(Node):
                            stderr=subprocess.PIPE,
                            cwd=self.run_dir)
             t = Thread(target=enqueue_output, args=(self.internal_process.stdout, self.stdoutqueue))
+            t.daemon = True # thread dies with the program
+            t.start()
+            t = Thread(target=enqueue_output, args=(self.internal_process.stderr, self.stderrqueue))
             t.daemon = True # thread dies with the program
             t.start()
 

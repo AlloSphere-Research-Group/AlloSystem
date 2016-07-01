@@ -291,20 +291,51 @@ bool ShaderProgram::linked() const {
 }
 // GLint v; glGetProgramiv(id(), GL_LINK_STATUS, &v); return v; }
 
-const ShaderProgram& ShaderProgram::uniform(const char * name, int v0) const{
-	return uniform(uniform(name), v0);
+#define GET_LOC(map, glGetFunc)\
+	int loc;\
+	auto it = map.find(name);\
+	if(it != map.end()){\
+		loc = it->second;\
+	}\
+	else{\
+		loc = glGetFunc(id(), name);\
+		map[name] = loc;\
+	}
+
+int ShaderProgram::uniform(const char * name) const {
+	GET_LOC(mUniformLocs, glGetUniformLocation);
+	if(-1 == loc)
+		AL_WARN_ONCE("No such uniform named \"%s\"", name);
+	return loc;
 }
-const ShaderProgram& ShaderProgram::uniform(const char * name, float v0) const{
-	return uniform(uniform(name), v0);
+
+int ShaderProgram::attribute(const char * name) const {
+	GET_LOC(mAttribLocs, glGetAttribLocation);
+	if(-1 == loc)
+        AL_WARN_ONCE("No such attribute named \"%s\"", name);
+	return loc;
 }
-const ShaderProgram& ShaderProgram::uniform(const char * name, float v0, float v1) const{
-	return uniform(uniform(name), v0,v1);
+
+const ShaderProgram& ShaderProgram::uniform(int loc, int v) const{
+	glUniform1i(loc, v); return *this;
 }
-const ShaderProgram& ShaderProgram::uniform(const char * name, float v0, float v1, float v2) const{
-	return uniform(uniform(name), v0,v1,v2);
+const ShaderProgram& ShaderProgram::uniform(int loc, float v) const{
+	glUniform1f(loc, v); return *this;
 }
-const ShaderProgram& ShaderProgram::uniform(const char * name, float v0, float v1, float v2, float v3) const{
-	return uniform(uniform(name), v0,v1,v2,v3);
+const ShaderProgram& ShaderProgram::uniform(int loc, float v0, float v1) const{
+	glUniform2f(loc, v0,v1); return *this;
+}
+const ShaderProgram& ShaderProgram::uniform(int loc, float v0, float v1, float v2) const{
+	glUniform3f(loc, v0,v1,v2); return *this;
+}
+const ShaderProgram& ShaderProgram::uniform(int loc, float v0, float v1, float v2, float v3) const{
+	glUniform4f(loc, v0,v1,v2,v3); return *this;
+}
+const ShaderProgram& ShaderProgram::uniformMatrix3(int loc, const float * v, bool transpose) const {
+	glUniformMatrix3fv(loc, 1, transpose, v); return *this;
+}
+const ShaderProgram& ShaderProgram::uniformMatrix4(int loc, const float * v, bool transpose) const {
+	glUniformMatrix4fv(loc, 1, transpose, v); return *this;
 }
 const ShaderProgram& ShaderProgram::uniform1(const char * name, const float * v, int count) const{
 	glUniform1fv(uniform(name), count, v); return *this;
@@ -318,45 +349,42 @@ const ShaderProgram& ShaderProgram::uniform3(const char * name, const float * v,
 const ShaderProgram& ShaderProgram::uniform4(const char * name, const float * v, int count) const{
 	glUniform4fv(uniform(name), count, v); return *this;
 }
-
-const ShaderProgram& ShaderProgram::uniform(int location, int v0) const{
-	glUniform1i(location, v0);	return *this;
+const ShaderProgram& ShaderProgram::uniform(const char * name, int v) const{
+	return uniform(uniform(name), v);
 }
-const ShaderProgram& ShaderProgram::uniform(int location, float v0) const{
-	glUniform1f(location, v0);	return *this;
+const ShaderProgram& ShaderProgram::uniform(const char * name, float v) const{
+	return uniform(uniform(name), v);
 }
-const ShaderProgram& ShaderProgram::uniform(int location, float v0, float v1) const{
-	glUniform2f(location, v0,v1); return *this;
+const ShaderProgram& ShaderProgram::uniform(const char * name, float v0, float v1) const{
+	return uniform(uniform(name), v0,v1);
 }
-const ShaderProgram& ShaderProgram::uniform(int location, float v0, float v1, float v2) const{
-	glUniform3f(location, v0,v1,v2); return *this;
+const ShaderProgram& ShaderProgram::uniform(const char * name, float v0, float v1, float v2) const{
+	return uniform(uniform(name), v0,v1,v2);
 }
-const ShaderProgram& ShaderProgram::uniform(int location, float v0, float v1, float v2, float v3) const{
-	glUniform4f(location, v0,v1,v2,v3); return *this;
+const ShaderProgram& ShaderProgram::uniform(const char * name, float v0, float v1, float v2, float v3) const{
+	return uniform(uniform(name), v0,v1,v2,v3);
 }
-
 const ShaderProgram& ShaderProgram::uniformMatrix3(const char * name, const float * v, bool transpose) const{
-	glUniformMatrix3fv(uniform(name), 1, transpose, v); return *this;
+	return uniformMatrix3(uniform(name), v, transpose);
 }
 const ShaderProgram& ShaderProgram::uniformMatrix4(const char * name, const float * v, bool transpose) const{
-	glUniformMatrix4fv(uniform(name), 1, transpose, v); return *this;
+	return uniformMatrix4(uniform(name), v, transpose);
 }
 
-const ShaderProgram& ShaderProgram::attribute(int location, float v0) const{
-	glVertexAttrib1f(location, v0);	return *this;
+const ShaderProgram& ShaderProgram::attribute(int loc, float v) const{
+	glVertexAttrib1f(loc, v);	return *this;
 }
-const ShaderProgram& ShaderProgram::attribute(int location, float v0, float v1) const{
-	glVertexAttrib2f(location, v0,v1); return *this;
+const ShaderProgram& ShaderProgram::attribute(int loc, float v0, float v1) const{
+	glVertexAttrib2f(loc, v0,v1); return *this;
 }
-const ShaderProgram& ShaderProgram::attribute(int location, float v0, float v1, float v2) const{
-	glVertexAttrib3f(location, v0,v1,v2); return *this;
+const ShaderProgram& ShaderProgram::attribute(int loc, float v0, float v1, float v2) const{
+	glVertexAttrib3f(loc, v0,v1,v2); return *this;
 }
-const ShaderProgram& ShaderProgram::attribute(int location, float v0, float v1, float v2, float v3) const{
-	glVertexAttrib4f(location, v0,v1,v2,v3); return *this;
+const ShaderProgram& ShaderProgram::attribute(int loc, float v0, float v1, float v2, float v3) const{
+	glVertexAttrib4f(loc, v0,v1,v2,v3); return *this;
 }
-
-const ShaderProgram& ShaderProgram::attribute(const char * name, float v0) const{
-	return attribute(attribute(name), v0);
+const ShaderProgram& ShaderProgram::attribute(const char * name, float v) const{
+	return attribute(attribute(name), v);
 }
 const ShaderProgram& ShaderProgram::attribute(const char * name, float v0, float v1) const{
 	return attribute(attribute(name), v0,v1);
@@ -379,34 +407,19 @@ const ShaderProgram& ShaderProgram::attribute3(const char * name, const float * 
 const ShaderProgram& ShaderProgram::attribute4(const char * name, const float * v) const{
 	glVertexAttrib4fv(attribute(name), v); return *this;
 }
-const ShaderProgram& ShaderProgram::attribute1(int location, const double * v) const{
-	glVertexAttrib1dv(location, v); return *this;
+const ShaderProgram& ShaderProgram::attribute1(int loc, const double * v) const{
+	glVertexAttrib1dv(loc, v); return *this;
 }
-const ShaderProgram& ShaderProgram::attribute2(int location, const double * v) const{
-	glVertexAttrib2dv(location, v); return *this;
+const ShaderProgram& ShaderProgram::attribute2(int loc, const double * v) const{
+	glVertexAttrib2dv(loc, v); return *this;
 }
-const ShaderProgram& ShaderProgram::attribute3(int location, const double * v) const{
-	glVertexAttrib3dv(location, v); return *this;
+const ShaderProgram& ShaderProgram::attribute3(int loc, const double * v) const{
+	glVertexAttrib3dv(loc, v); return *this;
 }
-const ShaderProgram& ShaderProgram::attribute4(int location, const double * v) const{
-	glVertexAttrib4dv(location, v); return *this;
-}
-
-int ShaderProgram::uniform(const char * name) const {
-	//GLint loc = glGetUniformLocationARB((GLhandleARB)handle(), name);
-	GLint loc = glGetUniformLocation(id(), name);
-	if (loc == -1)
-		AL_WARN_ONCE("No such uniform named \"%s\"", name);
-	return loc;
+const ShaderProgram& ShaderProgram::attribute4(int loc, const double * v) const{
+	glVertexAttrib4dv(loc, v); return *this;
 }
 
-int ShaderProgram::attribute(const char * name) const {
-	//GLint loc = glGetAttribLocationARB((GLhandleARB)handle(), name);
-	GLint loc = glGetAttribLocation(id(), name);
-	if (loc == -1)
-        AL_WARN_ONCE("No such attribute named \"%s\"", name);
-	return loc;
-}
 
 void ShaderProgram::get(int pname, void * params) const {
 	glGetProgramiv(id(), pname, (GLint *)params);
