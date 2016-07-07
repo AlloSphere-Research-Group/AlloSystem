@@ -414,9 +414,22 @@ public:
 	Vec normalized(T scale=T(1)) const {
 		return Vec(*this).normalize(scale); }
 
-	/// Relect vector around normal
-	Vec& reflect(const Vec& normal){
-		return (*this) -= (T(2) * dot(normal) * normal);
+	/// Get projection of vector onto a unit vector
+	Vec projection(const Vec& u) const {
+		return dot(u) * u;
+	}
+
+	/// Get rejection of vector from a unit vector
+
+	/// This also gives the projection onto a plane defined by normal 'u'.
+	///
+	Vec rejection(const Vec& u) const {
+		return (*this) - projection(u);
+	}
+
+	/// Relect vector around a unit vector
+	Vec& reflect(const Vec& u){
+		return (*this) -= ((T(2) * dot(u)) * u);
 	}
 
 	/// Rotate vector on a global plane
