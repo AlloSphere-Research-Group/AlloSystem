@@ -2,7 +2,7 @@
 What is our "Hello world!" app?
 
 An agent orbits around the origin emitting the audio line input. The camera
-view can be switched between a freely navigable keyboard/mouse controlled mode 
+view can be switched between a freely navigable keyboard/mouse controlled mode
 and a sphere follow mode.
 
 Requirements:
@@ -61,7 +61,7 @@ void audioCB(AudioIOData& io)
     if (++(ud->meters.counter) == ud->meters.numblocks) {
     	for (int i = 0; i < io.channelsOut(); i++) {
     		int db = (int) (20.0*log10(ud->meters.values[i]));
-    	
+
     		if (db < -120) {
     			std::cout << "-- ";
     		} else {
@@ -152,7 +152,7 @@ int main (int argc, char * argv[])
     for (int i = 0; i< numSpeakers; i++) {
         speakerLayout.addSpeaker(speakers[i]);
     }
-    
+
     float sr = 44100;
 
     userdata_t ud;
@@ -161,7 +161,7 @@ int main (int argc, char * argv[])
     ud.meters.counter = 0;
     ud.meters.numblocks = 1.0 * sr/AUDIO_BLOCK_SIZE;
     ud.meters.values = (float *) calloc(60, sizeof(float));
-    
+
 	std::string path = "/Users/create/code/spatial_andres/";
 //	std::string path = "/home/andres/Music/";
 
@@ -200,7 +200,7 @@ int main (int argc, char * argv[])
         }
         // TODO check sampling rate;
     }
-    
+
 //    Dbap *dbap;
 //    dbap = new Dbap();
 
@@ -208,7 +208,7 @@ int main (int argc, char * argv[])
 	audioIO.start();
 
 	while (!ud.done) {
-		sleep(0);
+		al_sleep(0);
 	}
 	return 0;
 }
