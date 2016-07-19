@@ -16,7 +16,9 @@ void PresetSequencer::playSequence(std::string sequenceName)
 	if (fullName.back() != '/') {
 		fullName += "/";
 	}
-	fullName += sequenceName + ".sequence";
+	if (sequenceName.size() < 9 || sequenceName.substr(sequenceName.size() - 9) != ".sequence") {
+		fullName += sequenceName + ".sequence";
+	}
 	std::ifstream f(fullName);
 	if (!f.is_open()) {
 		std::cout << "Could not open:" << fullName << std::endl;
