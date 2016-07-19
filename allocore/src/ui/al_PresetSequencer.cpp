@@ -87,6 +87,7 @@ void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
 			Step &step = sequencer->mSteps.front();
 			sequencer->mPresetHandler->setMorphTime(step.delta);
 			sequencer->mPresetHandler->recallPreset(step.presetName);
+//			std::cout << "PresetSequencer loading:" << step.presetName << std::endl;
 			al::wait(step.delta + step.duration);
 			sequencer->mSteps.pop();
 		}
@@ -114,8 +115,8 @@ SequenceServer::SequenceServer(std::string oscAddress, int oscPort) :
 
 SequenceServer::SequenceServer(ParameterServer &paramServer) :
     mServer(nullptr), mSequencer(nullptr),
-    mOSCpath("/sequence"),
-    mParamServer(&paramServer)
+    mParamServer(&paramServer),
+    mOSCpath("/sequence")
 {
 	paramServer.registerOSCListener(this);
 }
