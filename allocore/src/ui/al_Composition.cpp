@@ -117,7 +117,11 @@ void Composition::write()
 
 void Composition::playbackThread(Composition *composition)
 {
-	int index = 0;
+	size_t index = 0;
+	if (composition->mCompositionSteps.size() == 0) {
+		std::cout << "Composition has no steps. Done." << std::endl;
+		return;
+	}
 	while (composition->mPlaying) {
 		CompositionStep &step = composition->mCompositionSteps[index];
 		while (step.deltaTime > 1.0) { // Granularity to allow more responsive stopping of composition playback

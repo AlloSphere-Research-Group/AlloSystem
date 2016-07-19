@@ -344,6 +344,9 @@ std::map<std::string, float> PresetHandler::loadPresetValues(std::string name)
 				std::getline(ss, type, ' ');
 				std::getline(ss, value, ' ');
 				for(Parameter *param: mParameters) {
+					if (mVerbose) {
+						std::cout << "Checking for parameter match: " << param->getFullAddress() << std::endl;
+					}
 					if (param->getFullAddress() == address) {
 						if (type == "f") {
 							preset.insert(std::pair<std::string,float>(address,std::stof(value)));
@@ -353,7 +356,7 @@ std::map<std::string, float> PresetHandler::loadPresetValues(std::string name)
 					}
 				}
 				if (!parameterFound && mVerbose) {
-					std::cout << "Preset in parameter not present: " << address;
+					std::cout << "Preset in parameter not present: " << address << std::endl;
 				}
 			}
 		}
