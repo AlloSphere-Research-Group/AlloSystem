@@ -4,7 +4,7 @@
 using namespace al;
 
 ParameterGUI &ParameterGUI::addParameter(Parameter &parameter) {
-	int numInt = 2 + ceil(log10(max(fabs(parameter.max()), fabs(parameter.min()))));
+	int numInt = 2 + ceil(log10(fmax(fabs(parameter.max()), fabs(parameter.min()))));
 	glv::NumberDialer *number  = new glv::NumberDialer(numInt, 7 - numInt,
 	                                                   parameter.max(),
 	                                                   parameter.min());
@@ -41,6 +41,27 @@ ParameterGUI &ParameterGUI::addParameterBool(ParameterBool &parameter)
 	mBox.fit();
 	parameter.registerChangeCallback(ParameterGUI::valueChangedCallback, wrapper);
 	return *this;
+}
+
+glv::View *ParameterGUI::makeParameterView(Parameter &parameter)
+{
+	int numInt = 2 + ceil(log10(fmax(fabs(parameter.max()), fabs(parameter.min()))));
+	glv::NumberDialer *number  = new glv::NumberDialer(numInt, 7 - numInt,
+	                                                   parameter.max(),
+	                                                   parameter.min());
+	number->setValue(parameter.get());
+	WidgetWrapper *wrapper = new WidgetWrapper;
+	wrapper->parameter = &parameter;
+	wrapper->lock = new std::mutex;
+	wrapper->widget = static_cast<glv::Widget *>(number);
+	number->attach(ParameterGUI::widgetChangeCallback, glv::Update::Value, wrapper);
+//	number->addHandler(glv::Event::Quit, []() {});
+	glv::Box *box = new glv::Box;
+	*box << number << new glv::Label(parameter.getName());
+	box->fit();
+	parameter.registerChangeCallback(ParameterGUI::valueChangedCallback, wrapper);
+
+	return box;
 }
 
 ParameterGUI &ParameterGUI::registerPresetHandler(PresetHandler &handler) {
