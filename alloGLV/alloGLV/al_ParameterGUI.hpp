@@ -160,6 +160,13 @@ public:
 		}
 	}
 
+	static glv::View *makeParameterView(Parameter &parameter);
+
+	void setVisible(bool visible) {
+		mDetachableGUI.property(glv::Property::Visible, visible);
+		mBox.property(glv::Property::Visible, visible);
+	}
+
 	/// Add new parameter to GUI
 	ParameterGUI &operator << (Parameter& newParam){ return addParameter(newParam); }
 
