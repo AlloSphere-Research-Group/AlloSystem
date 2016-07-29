@@ -17,13 +17,19 @@ libfind_pkg_check_modules(CUTTLEBONE_PKGCONF libCuttlebone)
 # Include dir
 find_path(CUTTLEBONE_INCLUDE_DIR
   NAMES cuttlebone/Cuttlebone.h
-  PATHS ${CUTTLEBONE_PKGCONF_INCLUDE_DIRS} ./cuttlebone ../cuttlebone ../../cuttlebone /usr/include /usr/local/include /opt/local/include /tmp/cuttlebone
+  PATHS ${CUTTLEBONE_PKGCONF_INCLUDE_DIRS} ./cuttlebone ../cuttlebone ../../cuttlebone
+ 		./Cuttlebone ../Cuttlebone ../../Cuttlebone
+		 /usr/include /usr/local/include
+		 /opt/local/include /tmp/cuttlebone
 )
 
 # Finally the library itself
 find_library(CUTTLEBONE_LIBRARY
   NAMES CUTTLEBONE
-  PATHS ${CUTTLEBONE_PKGCONF_LIBRARY_DIRS} ./cuttlebone/build/lib ../cuttlebone/build/lib ../../cuttlebone/build/lib /usr/lib /usr/local/lib /opt/local/lib /tmp/cuttlebone
+  PATHS ${CUTTLEBONE_PKGCONF_LIBRARY_DIRS}
+	./cuttlebone/build/lib ../cuttlebone/build/lib ../../cuttlebone/build/lib
+	./Cuttlebone/build/lib ../Cuttlebone/build/lib ../..Ccuttlebone/build/lib
+	/usr/lib /usr/local/lib /opt/local/lib /tmp/cuttlebone
 )
 
 #/usr/include/assimp
