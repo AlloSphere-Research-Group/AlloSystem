@@ -28,7 +28,7 @@ find_library(CUTTLEBONE_LIBRARY
   NAMES CUTTLEBONE
   PATHS ${CUTTLEBONE_PKGCONF_LIBRARY_DIRS}
 	./cuttlebone/build/lib ../cuttlebone/build/lib ../../cuttlebone/build/lib
-	./Cuttlebone/build/lib ../Cuttlebone/build/lib ../..Ccuttlebone/build/lib
+	./Cuttlebone/build/lib ../Cuttlebone/build/lib ../..Cuttlebone/build/lib
 	/usr/lib /usr/local/lib /opt/local/lib /tmp/cuttlebone
 )
 
