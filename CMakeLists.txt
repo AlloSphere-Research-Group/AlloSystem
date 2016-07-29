@@ -52,7 +52,7 @@ if(NOT DEFINED BUILD_GLV)
 endif(NOT DEFINED BUILD_GLV)
 
 if(NOT DEFINED BUILD_CUTTLEBONE)
-  set(BUILD_CUTTLEBONE 1 CACHE STRING "Try to build external Cuttlebone.")
+  set(BUILD_CUTTLEBONE 0 CACHE STRING "Try to build external Cuttlebone.")
 endif(NOT DEFINED BUILD_CUTTLEBONE)
 
 if(NOT DEFINED BUILD_PHASESPACE)
@@ -155,7 +155,7 @@ endif(ALLOAUDIO_LIBRARY)
 
 # allosphere ----------------------------------
 add_subdirectory(allosphere)
-set(ALLOSPHERE_LIBRARY allosphere${DEBUG_SUFFIX})
+get_target_property(ALLOSPHERE_LIBRARY "allosphere${DEBUG_SUFFIX}" ALLOSPHERE_LIBRARY)
 get_target_property(ALLOSPHERE_INCLUDE_DIR allosphere${DEBUG_SUFFIX} ALLOSPHERE_INCLUDE_DIR)
 get_target_property(ALLOSPHERE_LINK_LIBRARIES allosphere${DEBUG_SUFFIX} ALLOSPHERE_LINK_LIBRARIES)
 if(ALLOSPHERE_LIBRARY)
