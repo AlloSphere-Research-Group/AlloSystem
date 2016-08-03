@@ -57,22 +57,38 @@ namespace al
  */
 class PresetMIDI : public MIDIMessageHandler {
 public:
-	PresetMIDI(int deviceIndex = 0) {
+
+	PresetMIDI() {}
+
+	PresetMIDI(int deviceIndex) {
 		mPresetHandler = NULL;
 		MIDIMessageHandler::bindTo(mMidiIn);
 		try {
 			mMidiIn.openPort(deviceIndex);
-			printf("Opened port to %s\n", mMidiIn.getPortName(deviceIndex).c_str());
+			printf("PresetMIDI: Opened port to %s\n", mMidiIn.getPortName(deviceIndex).c_str());
 		}
 		catch (al::MIDIError error) {
 			std::cout << "PresetMIDI Warning: Could not open MIDI port " << deviceIndex << std::endl;
 		}
 	}
-    PresetMIDI(int deviceIndex, PresetHandler &presetHandler) {
+
+	PresetMIDI(int deviceIndex, PresetHandler &presetHandler) {
 		MIDIMessageHandler::bindTo(mMidiIn);
 		try {
 			mMidiIn.openPort(deviceIndex);
-			printf("Opened port to %s\n", mMidiIn.getPortName(deviceIndex).c_str());
+			printf("PresetMIDI: Opened port to %s\n", mMidiIn.getPortName(deviceIndex).c_str());
+		}
+		catch (al::MIDIError error) {
+			std::cout << "PresetMIDI Warning: Could not open MIDI port " << deviceIndex << std::endl;
+		}
+		setPresetHandler(presetHandler);
+	}
+
+	void init(int deviceIndex, PresetHandler &presetHandler) {
+		MIDIMessageHandler::bindTo(mMidiIn);
+		try {
+			mMidiIn.openPort(deviceIndex);
+			printf("PresetMIDI: Opened port to %s\n", mMidiIn.getPortName(deviceIndex).c_str());
 		}
 		catch (al::MIDIError error) {
 			std::cout << "PresetMIDI Warning: Could not open MIDI port " << deviceIndex << std::endl;

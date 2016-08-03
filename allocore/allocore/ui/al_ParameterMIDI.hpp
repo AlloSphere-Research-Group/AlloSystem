@@ -63,12 +63,27 @@ namespace al
  */
 class ParameterMIDI : public MIDIMessageHandler {
 public:
-	ParameterMIDI(int deviceIndex = 0, bool verbose = false) {
+
+	ParameterMIDI() {}
+
+	ParameterMIDI(int deviceIndex, bool verbose = false) {
 		MIDIMessageHandler::bindTo(mMidiIn);
 		mVerbose = verbose;
 		try {
 			mMidiIn.openPort(deviceIndex);
-			printf("Opened port to %s\n", mMidiIn.getPortName(deviceIndex).c_str());
+			printf("ParameterMIDI: Opened port to %s\n", mMidiIn.getPortName(deviceIndex).c_str());
+		}
+		catch (al::MIDIError error) {
+			std::cout << "ParameterMIDI Warning: Could not open MIDI port " << deviceIndex << std::endl;
+		}
+	}
+
+	void init(int deviceIndex = 0, bool verbose = false) {
+		MIDIMessageHandler::bindTo(mMidiIn);
+		mVerbose = verbose;
+		try {
+			mMidiIn.openPort(deviceIndex);
+			printf("ParameterMIDI: Opened port to %s\n", mMidiIn.getPortName(deviceIndex).c_str());
 		}
 		catch (al::MIDIError error) {
 			std::cout << "ParameterMIDI Warning: Could not open MIDI port " << deviceIndex << std::endl;
