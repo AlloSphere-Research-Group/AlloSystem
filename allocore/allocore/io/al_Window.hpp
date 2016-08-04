@@ -541,6 +541,12 @@ struct StandardWindowKeyControls : InputEventHandler {
 				default:;
 			}
 		}
+		else if(k.modifiers() == Keyboard::ALT){
+			switch(k.key()){
+				case Keyboard::F4: Window::stopLoop(); return false;
+				default:;
+			}
+		}
 		else{
 			switch(k.key()){
 				case Keyboard::ESCAPE: window().fullScreenToggle(); return false;
