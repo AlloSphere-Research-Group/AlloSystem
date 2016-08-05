@@ -37,3 +37,4 @@ CTestTestfile.cmake
 *.suo
 *.vcproj.*
 *.wwdb
+*.pyc
