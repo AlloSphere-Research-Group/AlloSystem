@@ -252,12 +252,12 @@ public:
 	void unbind(int unit = 0);
 
 	/// Render the texture onto a quad on the XY plane
-	void quad(Graphics& gl, double w=1, double h=1, double x=0, double y=0);
+	void quad(Graphics& gl, double w=1, double h=1, double x=0, double y=0, double z=0);
 
 	/// Render the texture onto a quad filling current viewport
 	void quadViewport(
 		Graphics& g, const Color& color = Color(1),
-		double w=2, double h=2, double x=-1, double y=-1);
+		double w=2, double h=2, double x=-1, double y=-1, double z=0);
 
 	/// Get mutable reference to the internal pixel data
 	/// DO NOT MODIFY THE LAYOUT OR DIMENSIONS OF THIS ARRAY

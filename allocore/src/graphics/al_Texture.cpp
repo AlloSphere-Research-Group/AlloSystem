@@ -623,21 +623,21 @@ Texture& Texture::generateMipmap(){
 	return *this;
 }
 
-void Texture :: quad(Graphics& gl, double w, double h, double x0, double y0){
+void Texture :: quad(Graphics& gl, double w, double h, double x, double y, double z){
 	//Graphics::error(id(), "prebind quad texture");
 	bind();
 	Mesh& m = gl.mesh();
 	m.reset();
 	//Graphics::error(id(), "reset mesh quad texture");
 	m.primitive(gl.TRIANGLE_STRIP);
-		m.texCoord	( 0, 0);
-		m.vertex	(x0, y0, 0);
-		m.texCoord	( 1, 0);
-		m.vertex	(x0+w, y0, 0);
-		m.texCoord	( 0, 1);
-		m.vertex	(x0, y0+h, 0);
-		m.texCoord	( 1, 1);
-		m.vertex	(x0+w, y0+h, 0);
+		m.texCoord	(0, 0);
+		m.vertex	(x, y, z);
+		m.texCoord	(1, 0);
+		m.vertex	(x+w, y, z);
+		m.texCoord	(0, 1);
+		m.vertex	(x, y+h, z);
+		m.texCoord	(1, 1);
+		m.vertex	(x+w, y+h, z);
 	//Graphics::error(id(), "set mesh quad texture");
 	gl.draw(m);
 	//Graphics::error(id(), "draw mesh quad texture");
@@ -646,16 +646,16 @@ void Texture :: quad(Graphics& gl, double w, double h, double x0, double y0){
 
 void Texture::quadViewport(
 	Graphics& g, const Color& color,
-	double w, double h, double x, double y
+	double w, double h, double x, double y, double z
 ){
 	g.pushMatrix(g.PROJECTION);
 	g.loadIdentity();
 	g.pushMatrix(g.MODELVIEW);
 	g.loadIdentity();
-	g.depthMask(0); // write only to color buffer
+	g.depthMask(false); // write only to color buffer
 		g.color(color);
-		quad(g, w,h, x,y);
-	g.depthMask(1);
+		quad(g, w,h, x,y,z);
+	g.depthMask(true);
 	g.popMatrix(g.PROJECTION);
 	g.popMatrix(g.MODELVIEW);
 }
