@@ -39,6 +39,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     message("Using gcc debug flags")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb")
   endif((CMAKE_COMPILER_IS_GNUCC) OR (CMAKE_COMPILER_IS_GNUXX))
+  remove_definitions(-DNDEBUG)
+else()
+  add_definitions(-DNDEBUG)
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 # Other defaults
