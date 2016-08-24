@@ -192,6 +192,10 @@ public:
 		return Vec<M,T>(elems()+begin);
 	}
 
+	template <int M>
+	Vec<M,T>& sub(int begin=0){
+		return *(Vec<M,T> *)(elems()+begin);
+	}
 
 
 	//--------------------------------------------------------------------------
