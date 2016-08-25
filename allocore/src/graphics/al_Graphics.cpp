@@ -18,8 +18,9 @@ Graphics::~Graphics(){}
 #define CS(t) case Graphics::t: return #t;
 const char * toString(Graphics::DataType v){
 	switch(v){
-		CS(BYTE) CS(SHORT) CS(USHORT) CS(INT) CS(UINT)
-		CS(BYTES_2) CS(BYTES_3) CS(BYTES_4) CS(FLOAT) CS(DOUBLE)
+		CS(BYTE) CS(UBYTE) CS(SHORT) CS(USHORT) CS(INT) CS(UINT)
+		CS(BYTES_2) CS(BYTES_3) CS(BYTES_4)
+		CS(FLOAT) CS(DOUBLE)
 		default: return "";
 	}
 }
