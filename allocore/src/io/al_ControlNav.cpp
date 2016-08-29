@@ -18,6 +18,13 @@ bool NavInputControl::onKeyDown(const Keyboard& k){
 	double a = mTScale * M_DEG2RAD;	// rotational speed: rad/sec
 	double v = mVScale;				// speed: world units/sec
 
+	if(k.alt()){
+		switch(k.key()){
+		case Keyboard::UP:  nav().pullBack(nav().pullBack()*0.8); return false;
+		case Keyboard::DOWN:nav().pullBack(nav().pullBack()/0.8); return false;
+		}
+	}
+
 	if(k.alt()) v *= 10;
 	if(k.shift()) v *= 0.1;
 
