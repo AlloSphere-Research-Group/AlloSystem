@@ -270,5 +270,5 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${BUILD_ROOT_DIR}/build/bin") # Put back aft
 add_subdirectory(unitTests)
 
 # installation
-install(FILES ${ALLOCORE_HEADERS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/)
+install(DIRECTORY allocore DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 install(TARGETS ${ALLOCORE_LIB} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
