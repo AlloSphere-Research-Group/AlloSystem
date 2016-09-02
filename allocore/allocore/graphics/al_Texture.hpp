@@ -259,6 +259,7 @@ public:
 		Graphics& g, const Color& color = Color(1),
 		double w=2, double h=2, double x=-1, double y=-1, double z=0);
 
+
 	/// Get mutable reference to the internal pixel data
 	/// DO NOT MODIFY THE LAYOUT OR DIMENSIONS OF THIS ARRAY
 	Array& array() { mArrayDirty=true; return mArray; }
@@ -272,6 +273,10 @@ public:
 
 	template<class T> const T * data() const { return (const T*)(data()); }
 	const char * data() const { return array().data.ptr; }
+
+	/// Get reference to a pixel
+	template<class T> T& at(unsigned x, unsigned y){ return array().as<T>(x,y); }
+	template<class T> const T& at(unsigned x, unsigned y) const { return array().as<T>(x,y); }
 
 	/// Flags resubmission of pixel data upon next bind
 
