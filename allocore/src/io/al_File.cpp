@@ -107,21 +107,21 @@ int File::write(const std::string& path, const std::string& data){
 
 
 
-std::string File::conformDirectory(const std::string& src){
-	if(src[0]){
-		if(AL_FILE_DELIMITER != src[src.size()-1]){
-			return src + AL_FILE_DELIMITER;
+std::string File::conformDirectory(const std::string& path){
+	if(path[0]){
+		if(AL_FILE_DELIMITER != path[path.size()-1]){
+			return path + AL_FILE_DELIMITER;
 		}
-		return src;
+		return path;
 	}
 	return "." AL_FILE_DELIMITER_STR;
 }
 
-std::string File::conformPathToOS(const std::string& src){
-	std::string res(src);
+std::string File::conformPathToOS(const std::string& path){
+	std::string res(path);
 
 	// Ensure delimiters are correct
-	for(unsigned i=0; i<src.size(); ++i){
+	for(unsigned i=0; i<path.size(); ++i){
 		char c = res[i];
 		if('\\'==c || '/'==c){
 			res[i] = AL_FILE_DELIMITER;
@@ -135,11 +135,11 @@ std::string File::conformPathToOS(const std::string& src){
 	return res;
 }
 
-std::string File::absolutePath(const std::string& src){
+std::string File::absolutePath(const std::string& path){
 #ifdef AL_WINDOWS
 	TCHAR dirPart[4096];
 	TCHAR ** filePart={NULL};
-	GetFullPathName((LPCTSTR)src.c_str(), sizeof(dirPart), dirPart, filePart);
+	GetFullPathName((LPCTSTR)path.c_str(), sizeof(dirPart), dirPart, filePart);
 	std::string result = (char *)dirPart;
 	if(filePart != NULL && *filePart != 0){
 		result += (char *)*filePart;
@@ -147,28 +147,33 @@ std::string File::absolutePath(const std::string& src){
 	return result;
 #else
 	char temp[PATH_MAX];
-	char * result = realpath(src.c_str(), temp);
+	char * result = realpath(path.c_str(), temp);
 	return result ? result : "";
 #endif
 }
 
-std::string File::baseName(const std::string& src){
-	size_t pos = src.find_last_of('.');
-	return src.substr(0, pos);
+std::string File::baseName(const std::string& path, const std::string& suffix){
+	auto posSlash = path.find_last_of("/\\"); // handle '/' or '\' path delimiters
+	if(path.npos == posSlash) posSlash=0; // no slash
+	else ++posSlash;
+	auto posSuffix = suffix.empty() ? path.npos : path.find(suffix, posSlash);
+	auto len = path.npos;
+	if(path.npos != posSuffix) len = posSuffix - posSlash;
+	return path.substr(posSlash, len);
 }
 
-std::string File::directory(const std::string& src){
-	size_t pos = src.find_last_of(AL_FILE_DELIMITER);
+std::string File::directory(const std::string& path){
+	size_t pos = path.find_last_of(AL_FILE_DELIMITER);
 	if(std::string::npos != pos){
-		return src.substr(0, pos+1);
+		return path.substr(0, pos+1);
 	}
 	return "." AL_FILE_DELIMITER_STR;
 }
 
-std::string File::extension(const std::string& src){
-	size_t pos = src.find_last_of('.');
-	if(src.npos != pos){
-		return src.substr(pos);
+std::string File::extension(const std::string& path){
+	size_t pos = path.find_last_of('.');
+	if(path.npos != pos){
+		return path.substr(pos);
 	}
 	return "";
 }
@@ -185,9 +190,9 @@ bool File::exists(const std::string& path){
 	return ::stat(stripEndSlash(path).c_str(), &s) == 0;
 }
 
-bool File::isDirectory(const std::string& src){
+bool File::isDirectory(const std::string& path){
 	struct stat s;
-	if(0 == ::stat(stripEndSlash(src).c_str(), &s)){	// exists?
+	if(0 == ::stat(stripEndSlash(path).c_str(), &s)){	// exists?
 		if(s.st_mode & S_IFDIR){		// is dir?
 			return true;
 		}
