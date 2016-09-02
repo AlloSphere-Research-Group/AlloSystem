@@ -206,29 +206,30 @@ public:
 	/// This function takes a path as an argument and returns a new path with
 	/// correct platform-specific directory delimiters, '/' or '\' and
 	/// an extra delimiter at the end if the argument is a valid directory.
-	static std::string conformPathToOS(const std::string& src);
+	static std::string conformPathToOS(const std::string& path);
 
 	/// Convert relative paths to absolute paths
-	static std::string absolutePath(const std::string& src);
+	static std::string absolutePath(const std::string& path);
 
 	/// Returns the base name of path.
 
-	/// The base name is everything up to the last period.
-	///
-	static std::string baseName(const std::string& src);
+	/// The base name is everything following the last slash.
+	/// @param[in] path		The input path
+	/// @param[in] suffix	An optional suffix to strip from the end of the base name
+	static std::string baseName(const std::string& path, const std::string& suffix="");
 
 	/// Returns the directory part of path.
 
 	/// The directory part of the path is everything up through (and  including)
 	/// the last slash in it. If the path contains no slash, the directory part
 	/// is the string ‘./’. E.g., /usr/bin/man -> /usr/bin/.
-	static std::string directory(const std::string& src);
+	static std::string directory(const std::string& path);
 
 	/// Returns extension of file name.
 
 	/// The extension is everything including and after the last period.
 	/// If there is no period, an empty string is returned.
-	static std::string extension(const std::string& src);
+	static std::string extension(const std::string& path);
 
 
 	/// Returns whether a file or directory exists
@@ -240,7 +241,7 @@ public:
 	}
 
 	/// Returns true if path is a directory
-	static bool isDirectory(const std::string& src);
+	static bool isDirectory(const std::string& path);
 
 	/// Search for file or directory back from current directory
 
