@@ -143,6 +143,10 @@ public:
 	/// Returns number of elements
 	static int size(){ return N; }
 
+	/// Returns C array type punned into a vector
+	static Vec& pun(T * src){ return *(Vec*)(src); }
+	static const Vec& pun(const T * src){ return *(const Vec*)(src); }
+
 	/// Get reference to self as another type
 	template <class V>
 	V& as(){ return *(V *)(elems()); }
