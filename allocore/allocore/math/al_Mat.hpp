@@ -201,6 +201,7 @@ public:
 
 	/// Returns C array type punned into a matrix
 	static Mat& pun(T * src){ return *(Mat*)(src); }
+	static const Mat& pun(const T * src){ return *(const Mat*)(src); }
 
 	/// Returns total number of elements
 	static int size(){ return N*N; }
