@@ -58,7 +58,8 @@ void PresetSequencer::playSequence(std::string sequenceName)
 void PresetSequencer::stopSequence()
 {
 	mRunning = false;
-	//		mSequenceLock.lock(); // Waits until the sequencer thread is done and back at the condition variable
+	mSequenceLock.lock(); // Waits until the sequencer thread is done and back at the condition variable
+	mSequenceLock.unlock();
 }
 
 std::vector<std::string> al::PresetSequencer::getSequenceList()
@@ -90,7 +91,18 @@ void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
 			sequencer->mPresetHandler->setMorphTime(step.delta);
 			sequencer->mPresetHandler->recallPreset(step.presetName);
 //			std::cout << "PresetSequencer loading:" << step.presetName << std::endl;
-			al::wait(step.delta + step.duration);
+			float totalWaitTime = step.delta + step.duration;
+			while (totalWaitTime > 1.0f) {
+				al_sec before = al::timeNow();
+				al::wait(1.0);
+				if (sequencer->mRunning == false) {
+					break;
+				}
+				al_sec elapsed = al::timeNow()- before;
+	//			std::cout << "Elapsed " << elapsed << std::endl;
+				totalWaitTime -= elapsed;
+			}
+			al::wait(totalWaitTime);
 			sequencer->mSteps.pop();
 		}
 		sequencer->mRunning = false;
