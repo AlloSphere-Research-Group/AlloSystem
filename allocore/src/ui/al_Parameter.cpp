@@ -172,6 +172,7 @@ void ParameterServer::onMessage(osc::Message &m)
 		}
 	}
 	for (osc::PacketHandler *handler: mPacketHandlers) {
+		m.resetStream();
 		handler->onMessage(m);
 	}
 	mParameterLock.unlock();

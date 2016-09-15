@@ -432,9 +432,10 @@ void PresetServer::onMessage(osc::Message &m)
 			}
 		}
 	}
-	else if (mParamServer) {
-		mParamServer->onMessage(m);
-	}
+//	else if (mParamServer) {
+//		m.resetStream();
+//		mParamServer->onMessage(m);
+//	}
 }
 
 void PresetServer::print()
