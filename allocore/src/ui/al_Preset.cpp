@@ -409,6 +409,7 @@ PresetServer::~PresetServer()
 
 void PresetServer::onMessage(osc::Message &m)
 {
+	m.resetStream(); // Should be moved to the caller...
 	if(m.addressPattern() == mOSCpath && m.typeTags() == "f"){
 		float val;
 		m >> val;
