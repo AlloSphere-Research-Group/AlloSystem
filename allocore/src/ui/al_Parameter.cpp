@@ -157,6 +157,7 @@ void ParameterServer::unregisterParameter(Parameter &param)
 void ParameterServer::onMessage(osc::Message &m)
 {
 	std::string requestAddress = "/request";
+	m.resetStream(); // Needs to be moved to caller...
 	if(m.addressPattern() == requestAddress && m.typeTags() == "s") {
 		std::string parameterAddress;
 		m >> parameterAddress;
