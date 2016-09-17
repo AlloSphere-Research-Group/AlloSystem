@@ -11,7 +11,6 @@ using namespace al;
 
 void PresetSequencer::playSequence(std::string sequenceName)
 {
-	stopSequence();
 	std::string fullName = mDirectory;
 	if (fullName.back() != '/') {
 		fullName += "/";
@@ -24,6 +23,9 @@ void PresetSequencer::playSequence(std::string sequenceName)
 		std::cout << "Could not open:" << fullName << std::endl;
 		return;
 	}
+	stopSequence();
+
+	mSequenceLock.lock();
 	while (!mSteps.empty()) {
 		mSteps.pop();
 	}
@@ -43,23 +45,29 @@ void PresetSequencer::playSequence(std::string sequenceName)
 			step.delta = std::stof(delta);
 			step.duration = std::stof(duration);
 			mSteps.push(step);
-			std::cout << name  << ":" << delta << ":" << duration << std::endl;
+			// std::cout << name  << ":" << delta << ":" << duration << std::endl;
 		}
 	}
 	if (f.bad()) {
 		std::cout << "Error reading:" << sequenceName << std::endl;
 		return;
 	}
-	mSequenceConditionVar.notify_one();
-	//		mSequenceLock.unlock();
 	mRunning = true;
+	mSequencerThread = new std::thread(PresetSequencer::sequencerFunction, this);
+	mSequenceLock.unlock();
+
+	std::thread::id seq_thread_id = mSequencerThread->get_id();
+	std::cout << "Preset Sequencer thread id: " << std::hex << seq_thread_id << std::endl;
 }
 
 void PresetSequencer::stopSequence()
 {
 	mRunning = false;
-	mSequenceLock.lock(); // Waits until the sequencer thread is done and back at the condition variable
-	mSequenceLock.unlock();
+	if (mSequencerThread) {
+		mSequencerThread->join();
+		delete mSequencerThread;
+		mSequencerThread = nullptr;
+	}
 }
 
 std::vector<std::string> al::PresetSequencer::getSequenceList()
@@ -81,33 +89,31 @@ std::vector<std::string> al::PresetSequencer::getSequenceList()
 
 void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
 {
-	while(sequencer->mSequencerActive) {
-		{
-			std::unique_lock<std::mutex> lk(sequencer->mSequenceLock);
-			sequencer->mSequenceConditionVar.wait(lk);
-		}
-		while(sequencer->running() && sequencer->mSteps.size() > 0) {
-			Step &step = sequencer->mSteps.front();
-			sequencer->mPresetHandler->setMorphTime(step.delta);
-			sequencer->mPresetHandler->recallPreset(step.presetName);
-//			std::cout << "PresetSequencer loading:" << step.presetName << std::endl;
-			float totalWaitTime = step.delta + step.duration;
-			while (totalWaitTime > 1.0f) {
-				al_sec before = al::timeNow();
-				al::wait(1.0);
-				if (sequencer->mRunning == false) {
-					break;
-				}
-				al_sec elapsed = al::timeNow()- before;
-	//			std::cout << "Elapsed " << elapsed << std::endl;
-				totalWaitTime -= elapsed;
+	sequencer->mSequenceLock.lock();
+	while(sequencer->running() && sequencer->mSteps.size() > 0) {
+		Step &step = sequencer->mSteps.front();
+		sequencer->mPresetHandler->setMorphTime(step.delta);
+		sequencer->mPresetHandler->recallPreset(step.presetName);
+		// std::cout << "PresetSequencer loading:" << step.presetName << std::endl;
+		float totalWaitTime = step.delta + step.duration;
+		while (totalWaitTime > 0.3f) {
+			al_sec before = al::timeNow();
+			al::wait(0.25);
+			if (sequencer->mRunning == false) {
+				totalWaitTime = 0;
+				break;
 			}
-			al::wait(totalWaitTime);
-			sequencer->mSteps.pop();
+			al_sec elapsed = al::timeNow()- before;
+			// std::cout << "Elapsed " << elapsed << std::endl;
+			totalWaitTime -= elapsed;
 		}
-		sequencer->mRunning = false;
-		//		std::cout << "Sequence finished." << std::endl;
+		al::wait(totalWaitTime);
+		sequencer->mSteps.pop();
 	}
+	sequencer->mPresetHandler->stopMorph();
+	std::cout << "Sequence finished." << std::endl;
+	sequencer->mRunning = false;
+	sequencer->mSequenceLock.unlock();
 }
 
 // SequenceServer ----------------------------------------------------------------
