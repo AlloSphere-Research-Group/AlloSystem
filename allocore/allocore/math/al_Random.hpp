@@ -133,6 +133,10 @@ public:
 	/// Returns triangle distribution variate, in (-1,1)
 	float triangle();
 
+	/// Returns triangle distribution variate, in (-hi,hi)
+	template <class T>
+	T triangle(const T& hi){ return hi*triangle(); }
+
 	/// Returns argument with sign randomly flipped
 	float sign(float x=1.f);
 
