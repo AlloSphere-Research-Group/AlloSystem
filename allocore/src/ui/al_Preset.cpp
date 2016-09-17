@@ -14,8 +14,8 @@ using namespace al;
 
 PresetHandler::PresetHandler(std::string rootDirectory, bool verbose) :
     mRootDir(rootDirectory), mVerbose(verbose),
-    mRunning(true), mMorphingThread(PresetHandler::morphingFunction, this),
-    mMorphInterval(0.05), mMorphTime("morphTime", "", 0.0, "", 0.0, 20.0)
+    mRunning(true), mMorphRemainingSteps(-1),
+    mMorphInterval(0.05), mMorphTime("morphTime", "", 0.0, "", 0.0, 20.0), mMorphingThread(PresetHandler::morphingFunction, this)
 {
 	if (!File::exists(rootDirectory)) {
 		if (!Dir::make(rootDirectory, true)) {
@@ -130,9 +130,12 @@ void PresetHandler::storePreset(int index, std::string name)
 void PresetHandler::recallPreset(std::string name)
 {
 	{
-		std::lock_guard<std::mutex> lk(mTargetLock);
+		if (mMorphRemainingSteps.load() >= 0) {
+			mMorphRemainingSteps.store(-1);
+			std::lock_guard<std::mutex> lk(mTargetLock);
+		}
 		mTargetValues = loadPresetValues(name);
-		mMorphRemainingSteps =  1 + mMorphTime.get() / mMorphInterval;
+		mMorphRemainingSteps.store(1 + mMorphTime.get() / mMorphInterval);
 	}
 	mMorphConditionVar.notify_one();
 
@@ -181,6 +184,17 @@ float al::PresetHandler::getMorphTime()
 void PresetHandler::setMorphTime(float time)
 {
 	mMorphTime.set(time);
+}
+
+void PresetHandler::stopMorph()
+{
+	{
+		if (mMorphRemainingSteps.load() >= 0) {
+			mMorphRemainingSteps.store(-1);
+			std::lock_guard<std::mutex> lk(mTargetLock);
+		}
+	}
+	mMorphConditionVar.notify_one();
 }
 
 std::string PresetHandler::getCurrentPath()
@@ -280,20 +294,17 @@ void PresetHandler::storePresetMap()
 
 void PresetHandler::morphingFunction(al::PresetHandler *handler) {
 	while(handler->mRunning) {
-		{
-			std::unique_lock<std::mutex> lk(handler->mTargetLock);
-			handler->mMorphConditionVar.wait(lk);
-//			lk.unlock();
-		}
-		while (--handler->mMorphRemainingSteps >= 0) {
+		std::unique_lock<std::mutex> lk(handler->mTargetLock);
+		handler->mMorphConditionVar.wait(lk);
+		while (std::atomic_fetch_sub(&(handler->mMorphRemainingSteps), 1) > 0) {
 			for (Parameter *param: handler->mParameters) {
 				float paramValue = param->get();
 				if (handler->mTargetValues.find(param->getFullAddress()) != handler->mTargetValues.end()) {
 					float difference =  handler->mTargetValues[param->getFullAddress()] - paramValue;
-					if (handler->mMorphRemainingSteps == 0) {
+					if (handler->mMorphRemainingSteps.load() == 0) {
 						difference = difference;
 					} else {
-						difference = difference/(handler->mMorphRemainingSteps + 1);
+						difference = difference/(handler->mMorphRemainingSteps.load() + 1);
 					}
 					float newVal = paramValue + difference;
 					param->set(newVal);

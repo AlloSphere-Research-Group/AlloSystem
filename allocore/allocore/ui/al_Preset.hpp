@@ -45,6 +45,7 @@
 #include <mutex>
 #include <map>
 #include <thread>
+#include <atomic>
 #include <condition_variable>
 
 #include "allocore/ui/al_Parameter.hpp"
@@ -85,6 +86,7 @@ public:
 
 	float getMorphTime();
 	void setMorphTime(float time);
+	void stopMorph();
 
 	void setSubDirectory(std::string directory);
 
@@ -127,7 +129,7 @@ private:
 	std::mutex mFileLock;
 	bool mRunning; // To keep the morphing thread alive
 	bool mMorph; // To be able to trip and stop morphing at any time.
-	int mMorphRemainingSteps;
+	std::atomic<int> mMorphRemainingSteps;
 	float mMorphInterval;
 	Parameter mMorphTime;
 

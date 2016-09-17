@@ -34,7 +34,7 @@ Composition::Composition(std::string fileName, std::string path) :
 			step.sequenceName = name;
 			step.deltaTime = std::stof(delta);
 			mCompositionSteps.push_back(step);
-			std::cout << name  << ":" << delta << std::endl;
+			// std::cout << name  << ":" << delta << std::endl;
 		}
 	}
 	if (f.bad()) {
@@ -122,25 +122,28 @@ void Composition::playbackThread(Composition *composition)
 		std::cout << "Composition has no steps. Done." << std::endl;
 		return;
 	}
+	std::cout << "Composition started." << std::endl;
 	while (composition->mPlaying) {
-		CompositionStep &step = composition->mCompositionSteps[index];
-		while (step.deltaTime > 1.0) { // Granularity to allow more responsive stopping of composition playback
+		CompositionStep step = composition->mCompositionSteps[index];
+		while (step.deltaTime > 0.3) { // Granularity to allow more responsive stopping of composition playback
 			al_sec before = al::timeNow();
-			al::wait(1.0);
 			if (composition->mPlaying == false) {
 				step.deltaTime = 0.0;
 				break;
 			}
+			al::wait(0.25);
 			al_sec elapsed = al::timeNow()- before;
-//			std::cout << "Elapsed " << elapsed << std::endl;
+			// std::cout << "Elapsed " << elapsed << std::endl;
 			step.deltaTime -= elapsed;
 		}
 		al::wait(step.deltaTime);
+		// std::cout << "Composition step:" << step.sequenceName << ":" << step.deltaTime << std::endl;
 		composition->mSequencer->playSequence(step.sequenceName);
 		index++;
 		if (index == composition->mCompositionSteps.size()) {
 			composition->mPlaying = false;
 		}
 	}
+	composition->mSequencer->stopSequence();
 	std::cout << "Composition done." << std::endl;
 }

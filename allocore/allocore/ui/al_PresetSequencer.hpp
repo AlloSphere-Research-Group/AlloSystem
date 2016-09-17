@@ -93,15 +93,18 @@ public:
 	PresetSequencer() :
 	    mSequencerActive(true),
 	    mRunning(false),
-	    mSequencerThread(PresetSequencer::sequencerFunction, this)
-	{ }
+	    mSequencerThread(NULL)
+	{
+	}
 
 	~PresetSequencer()
 	{
 		mSequencerActive = false;
 		mRunning = false;
-		mSequenceConditionVar.notify_one();
-		mSequencerThread.join();
+		if (mSequencerThread != NULL) {
+			// mSequenceConditionVar.notify_one();
+			mSequencerThread->join();
+		}
 	}
 
 	/**
@@ -146,11 +149,10 @@ private:
 	PresetHandler *mPresetHandler;
 
 	std::mutex mSequenceLock;
-	std::condition_variable mSequenceConditionVar;
 
 	bool mSequencerActive;
 	bool mRunning;
-	std::thread mSequencerThread;
+	std::thread *mSequencerThread;
 };
 
 
