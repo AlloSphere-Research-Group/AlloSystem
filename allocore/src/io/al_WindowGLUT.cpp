@@ -280,6 +280,7 @@ public:
 	}
 
 	static void cbKeyboard(unsigned char key, int x, int y){
+		//printf("GLUT: key down %d (%c)\n", key,key);
 		Window * win = getWindow();
 		if(win){
 			key = remapKey(key, false);
@@ -290,6 +291,7 @@ public:
 	}
 
 	static void cbKeyboardUp(unsigned char key, int x, int y){
+		//printf("GLUT: key up %d (%c)\n", key,key);
 		Window * win = getWindow();
 		if(win){
 			key = remapKey(key, false);
