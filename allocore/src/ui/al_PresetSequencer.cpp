@@ -89,25 +89,28 @@ std::vector<std::string> al::PresetSequencer::getSequenceList()
 
 void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
 {
+	const int granularity = 10; // milliseconds
 	sequencer->mSequenceLock.lock();
+	auto sequenceStart = std::chrono::high_resolution_clock::now();
+	auto targetTime = sequenceStart;
 	while(sequencer->running() && sequencer->mSteps.size() > 0) {
 		Step &step = sequencer->mSteps.front();
 		sequencer->mPresetHandler->setMorphTime(step.delta);
 		sequencer->mPresetHandler->recallPreset(step.presetName);
-		// std::cout << "PresetSequencer loading:" << step.presetName << std::endl;
+		std::cout << "PresetSequencer loading:" << step.presetName << std::endl;
+		std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - sequenceStart).count()/1000.0 << std::endl;
 		float totalWaitTime = step.delta + step.duration;
-		while (totalWaitTime > 0.3f) {
-			al_sec before = al::timeNow();
-			al::wait(0.25);
+		targetTime += std::chrono::microseconds((int) (totalWaitTime*1e6 - (granularity * 1.5 * 1000.0)));
+
+		while (std::chrono::high_resolution_clock::now() < targetTime) { // Granularity to allow more responsive stopping of composition playback
+			std::this_thread::sleep_for(std::chrono::milliseconds(granularity));
 			if (sequencer->mRunning == false) {
-				totalWaitTime = 0;
+				targetTime = std::chrono::high_resolution_clock::now();
 				break;
 			}
-			al_sec elapsed = al::timeNow()- before;
-			// std::cout << "Elapsed " << elapsed << std::endl;
-			totalWaitTime -= elapsed;
 		}
-		al::wait(totalWaitTime);
+		std::this_thread::sleep_until(targetTime);
+		// std::this_thread::sleep_for(std::chrono::duration<float>(totalWaitTime));
 		sequencer->mSteps.pop();
 	}
 	sequencer->mPresetHandler->stopMorph();

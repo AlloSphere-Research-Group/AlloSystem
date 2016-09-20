@@ -123,20 +123,23 @@ void Composition::playbackThread(Composition *composition)
 		return;
 	}
 	std::cout << "Composition started." << std::endl;
+
+	const int granularity = 10; // milliseconds
+	auto sequenceStart = std::chrono::high_resolution_clock::now();
+	auto targetTime = sequenceStart;
 	while (composition->mPlaying) {
-		CompositionStep step = composition->mCompositionSteps[index];
-		while (step.deltaTime > 0.3) { // Granularity to allow more responsive stopping of composition playback
-			al_sec before = al::timeNow();
+		CompositionStep &step = composition->mCompositionSteps[index];
+		//auto duration = //std::chrono::time_point_cast<std::chrono::nanoseconds>(step.deltaTime/1e9);
+		targetTime += std::chrono::microseconds((int) (step.deltaTime*1e6 - (granularity * 1.5 * 1000.0)));
+		while (std::chrono::high_resolution_clock::now() < targetTime) { // Granularity to allow more responsive stopping of composition playback
+			std::this_thread::sleep_for(std::chrono::milliseconds(granularity));
 			if (composition->mPlaying == false) {
-				step.deltaTime = 0.0;
+				targetTime = std::chrono::high_resolution_clock::now();
 				break;
 			}
-			al::wait(0.25);
-			al_sec elapsed = al::timeNow()- before;
-			// std::cout << "Elapsed " << elapsed << std::endl;
-			step.deltaTime -= elapsed;
 		}
-		al::wait(step.deltaTime);
+		std::this_thread::sleep_until(targetTime);
+		std::cout << "Composition step:" << step.sequenceName << ":" << step.deltaTime << std::endl;
 		// std::cout << "Composition step:" << step.sequenceName << ":" << step.deltaTime << std::endl;
 		composition->mSequencer->playSequence(step.sequenceName);
 		index++;
@@ -144,6 +147,5 @@ void Composition::playbackThread(Composition *composition)
 			composition->mPlaying = false;
 		}
 	}
-	composition->mSequencer->stopSequence();
 	std::cout << "Composition done." << std::endl;
 }
