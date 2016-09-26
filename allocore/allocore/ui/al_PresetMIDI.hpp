@@ -60,8 +60,7 @@ public:
 
 	PresetMIDI() {}
 
-	PresetMIDI(int deviceIndex) {
-		mPresetHandler = NULL;
+	PresetMIDI(int deviceIndex) : mPresetHandler(nullptr) {
 		MIDIMessageHandler::bindTo(mMidiIn);
 		try {
 			mMidiIn.openPort(deviceIndex);
@@ -70,18 +69,14 @@ public:
 		catch (al::MIDIError error) {
 			std::cout << "PresetMIDI Warning: Could not open MIDI port " << deviceIndex << std::endl;
 		}
+		mMorphBinding.channel = mMorphBinding.controlNumber = -1;
 	}
 
-	PresetMIDI(int deviceIndex, PresetHandler &presetHandler) {
-		MIDIMessageHandler::bindTo(mMidiIn);
-		try {
-			mMidiIn.openPort(deviceIndex);
-			printf("PresetMIDI: Opened port to %s\n", mMidiIn.getPortName(deviceIndex).c_str());
-		}
-		catch (al::MIDIError error) {
-			std::cout << "PresetMIDI Warning: Could not open MIDI port " << deviceIndex << std::endl;
-		}
-		setPresetHandler(presetHandler);
+	PresetMIDI(int deviceIndex, PresetHandler &presetHandler) :
+	    PresetMIDI(deviceIndex)
+	{
+		mPresetHandler = &presetHandler;
+		setPresetHandler(*mPresetHandler);
 	}
 
 	void init(int deviceIndex, PresetHandler &presetHandler) {
@@ -102,38 +97,11 @@ public:
 
 	void connectNoteToPreset(int channel,
 	                         float presetLow, int noteLow,
-	                         float presetHigh = -1, int noteHigh = -1) {
-		if (noteHigh == -1) {
-			presetHigh = presetLow;
-			noteHigh = noteLow;
-		}
-		if (noteHigh - noteLow != presetHigh - presetLow) {
-			std::cout << "PresetMIDI warning different ranges for preset and note ranges." << std::endl;
-		}
-		for (int num = noteLow; num <= noteHigh; ++num) {
-			NoteBinding newBinding;
-			newBinding.channel = channel - 1;
-			newBinding.noteNumber = num;
-			newBinding.presetIndex = presetLow - noteLow + num;
-			mBindings.push_back(newBinding);
-//			std::cout << channel << " " << num << " " << newBinding.presetIndex << std::endl;
-		}
-	}
+	                         float presetHigh = -1, int noteHigh = -1);
 
-	virtual void onMIDIMessage(const MIDIMessage& m) override {
-		if (m.type() == MIDIByte::NOTE_ON
-		        && m.velocity() > 0 ) {
-			for(NoteBinding binding: mBindings) {
-//				std::cout << binding.channel << " " << binding.noteNumber << " " << binding.presetIndex << std::endl;
-//				std::cout << (int) m.channel() << std::endl;
-				if (m.channel() == binding.channel
-				        && m.noteNumber() == binding.noteNumber) {
-//					m.print();
-					mPresetHandler->recallPreset(binding.presetIndex);
-				}
-			}
-		}
-	}
+	void setMorphControl(int controlNumber, int channel, float min, float max);
+
+	virtual void onMIDIMessage(const MIDIMessage& m) override;
 
 private:
 
@@ -142,6 +110,15 @@ private:
 		int channel;
 		int presetIndex;
 	};
+
+	struct MorphBinding {
+		int controlNumber;
+		int channel;
+		float min;
+		float max;
+	};
+
+	MorphBinding mMorphBinding;
 
 	PresetHandler *mPresetHandler;
 
