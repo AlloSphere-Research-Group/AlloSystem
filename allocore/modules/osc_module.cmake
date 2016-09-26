@@ -35,6 +35,7 @@ list(APPEND ALLOCORE_SRC
   src/protocol/al_OSC.cpp
   src/ui/al_Parameter.cpp
   src/ui/al_Preset.cpp
+  src/ui/al_PresetMIDI.cpp
   src/ui/al_HtmlInterfaceServer.cpp
   src/ui/al_PresetSequencer.cpp
   src/ui/al_SequenceRecorder.cpp
