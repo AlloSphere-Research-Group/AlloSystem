@@ -52,7 +52,8 @@ SoundSource::SoundSource(double nearClip, double farClip, AttenuationLaw law, Do
         double farBias, int delaySize
         )
 	:	DistAtten<double>(nearClip, farClip, law, farBias),
-      mSound(delaySize), mUseAtten(true), mDopplerType(dopplerType), mUsePerSampleProcessing(false)
+      mSound(delaySize), mUseAtten(true), mDopplerType(dopplerType), mUsePerSampleProcessing(false),
+      mCachedIndex(0)
 {
 
 	// initialize the position history to be VERY FAR AWAY so that we don't deafen ourselves...
@@ -321,5 +322,3 @@ struct AmbiSource{
 		}
 	}
 */
-
-

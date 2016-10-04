@@ -133,7 +133,7 @@ public:
 	const Speakers& speakers() const { return mSpeakers; }
 
 	/// Add speaker
-	SpeakerLayout& addSpeaker(const Speaker& spkr){
+	SpeakerLayout& addSpeaker(const Speaker spkr){
 		mSpeakers.push_back(spkr);
 		return *this;
 	}
