@@ -64,7 +64,11 @@ class PresetHandler
 public:
 	/**
 	 * @brief PresetHandler contructor
+	 *
+	 * @param rootDirectory sets the root directory for preset and preset map storage
 	 * @param verbose if true, print diagnostic messages
+	 *
+	 * The
 	 */
 	PresetHandler(std::string rootDirectory = "presets", bool verbose = false);
 
@@ -72,9 +76,31 @@ public:
 
 	~PresetHandler();
 
+	/**
+	 * @brief Stores preset
+	 * @param name the name of the preset
+	 *
+	 * Since all presets are assinged an index, calling this function will give
+	 * the preset a free index and then call storePreset(index, name). If the
+	 * preset name already exists, it will overwrite the existing preset without
+	 * assigning a new index.
+	 */
 	void storePreset(std::string name);
 
-	void storePreset(int index, std::string name);
+	/**
+	 * @brief Store preset at index. The name argument specifies the preset name
+	 *
+	 * @param index
+	 * @param name
+	 *
+	 * The preset name also determines the filename under which the preset is saved, so
+	 * it must be unique. If name is empty, a unique name is generated. If name
+	 * exists, a number is appended to the preset name. The link between preset
+	 * index and preset name is store within the _presetMap.txt file that is
+	 * stored in the path for the PresetHandler, see getCurrentPath()
+	 *
+	 */
+	void storePreset(int index, std::string name = "");
 
 	void recallPreset(std::string name);
 
@@ -173,6 +199,20 @@ public:
 	PresetServer(ParameterServer &paramServer);
 	~PresetServer();
 
+	/**
+	 * @brief print prints information about the server to std::out
+	 */
+	void print();
+
+	/**
+	 * @brief stopServer stops the OSC server thread. Calling this function
+	 * is sometimes required when this object is destroyed abruptly and the
+	 * destructor is not called
+	 */
+	void stopServer();
+
+	void allowStore(bool allow) {mAllowStore = allow;}
+
 	virtual void onMessage(osc::Message& m);
 
 	PresetServer &registerPresetHandler(PresetHandler &presetHandler) {
@@ -188,19 +228,6 @@ public:
 		}, this);
 		return *this;
 	}
-
-	/**
-	 * @brief print prints information about the server to std::out
-	 */
-	void print();
-
-	/**
-	 * @brief stopServer stops the OSC server thread. Calling this function
-	 * is sometimes required when this object is destroyed abruptly and the
-	 * destructor is not called
-	 */
-	void stopServer();
-
 
 	PresetServer &operator <<(PresetHandler &presetHandler) {return registerPresetHandler(presetHandler);}
 
@@ -219,6 +246,7 @@ private:
 	std::string mOSCpath;
 	std::mutex mHandlerLock;
 	std::vector<osc::PacketHandler *> mHandlers;
+	bool mAllowStore;
 };
 
 
