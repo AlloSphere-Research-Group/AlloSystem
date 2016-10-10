@@ -97,14 +97,30 @@ void PresetHandler::storePreset(std::string name)
 
 void PresetHandler::storePreset(int index, std::string name)
 {
-	// TODO need to check if name contains ':' and remove as this causes
-	// issues with the text format for saving
 	std::lock_guard<std::mutex> lock(mFileLock);
+	// ':' causes issues with the text format for saving, so replace
+	while (name.find(":")) {
+		name.replace(name.find(":"), 1, "_");
+	}
 	std::string path = getCurrentPath();
 	if (path.back() != '/') {
 		path += "/";
 	}
-	std::ofstream f(path + name + ".preset");
+	if (name == "") {
+		name = "default";
+	}
+	// First check if file exists. If it does, append a number to it
+	std::string fileName = path + name + ".preset";
+	std::ifstream infile(fileName);
+	int number = 0;
+	while (infile.good()) {
+		fileName = path + name + "_" + std::to_string(number) + ".preset";
+		infile.close();
+		infile.open(fileName);
+		number++;
+	}
+	infile.close();
+	std::ofstream f(fileName);
 	if (!f.is_open()) {
 		if (mVerbose) {
 			std::cout << "Error while opening preset file: " << mFileName << std::endl;
@@ -424,7 +440,7 @@ void PresetServer::onMessage(osc::Message &m)
 	if(m.addressPattern() == mOSCpath && m.typeTags() == "f"){
 		float val;
 		m >> val;
-		mPresetHandler->recallPreset((int) val);
+		mPresetHandler->recallPreset(static_cast<int>(val));
 		//			std::cout << "ParameterServer::onMessage" << val << std::endl;
 	} else if(m.addressPattern() == mOSCpath && m.typeTags() == "i"){
 		int val;
@@ -439,9 +455,15 @@ void PresetServer::onMessage(osc::Message &m)
 		if (m.typeTags() == "f") {
 			float val;
 			m >> val;
-			if (val == 1) {
+			if (static_cast<int>(val) == 1) {
 				mPresetHandler->recallPreset(index);
 			}
+		}
+	} else if (m.addressPattern() == mOSCpath + "/store" && m.typeTags() == "i")  {
+		int val;
+		m >> val;
+		if (this->mAllowStore) {
+			mPresetHandler->storePreset(val);
 		}
 	}
 //	else if (mParamServer) {
