@@ -317,10 +317,9 @@ void PresetHandler::morphingFunction(al::PresetHandler *handler) {
 				float paramValue = param->get();
 				if (handler->mTargetValues.find(param->getFullAddress()) != handler->mTargetValues.end()) {
 					float difference =  handler->mTargetValues[param->getFullAddress()] - paramValue;
-					if (handler->mMorphRemainingSteps.load() == 0) {
-						difference = difference;
-					} else {
-						difference = difference/(handler->mMorphRemainingSteps.load() + 1);
+					int steps = handler->mMorphRemainingSteps.load();
+					if (steps > 0) {
+						difference = difference/(steps + 1);
 					}
 					float newVal = paramValue + difference;
 					param->set(newVal);

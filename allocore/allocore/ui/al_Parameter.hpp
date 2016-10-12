@@ -340,7 +340,7 @@ public:
 	 * registerChangeCallback() are not called. This is useful to avoid infinite
 	 * recursion when a widget sets the parameter that then sets the widget.
 	 */
-	virtual void setNoCalls(float value, void *blockReceiver = NULL);
+	virtual void setNoCalls(float value, void *blockReceiver = NULL) override;
 
 	/**
 	 * @brief get the parameter's value
@@ -351,7 +351,7 @@ public:
 	 */
 	virtual float get() override;
 
-	const float operator= (const float value) { this->set(value); return value; }
+	float operator= (const float value) { this->set(value); return value; }
 
 private:
 	float mFloatValue;
@@ -396,7 +396,7 @@ public:
 	 * registerChangeCallback() are not called. This is useful to avoid infinite
 	 * recursion when a widget sets the parameter that then sets the widget.
 	 */
-	virtual void setNoCalls(float value, void *blockReceiver = NULL);
+	virtual void setNoCalls(float value, void *blockReceiver = NULL) override;
 
 	/**
 	 * @brief get the parameter's value
@@ -407,7 +407,7 @@ public:
 	 */
 	virtual float get() override;
 
-	const float operator= (const float value) { this->set(value); return value; }
+	float operator= (const float value) { this->set(value); return value; }
 
 private:
 	float mFloatValue;
