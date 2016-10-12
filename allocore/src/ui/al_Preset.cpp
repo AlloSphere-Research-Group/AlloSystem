@@ -170,6 +170,33 @@ void PresetHandler::recallPreset(std::string name)
 	}
 }
 
+void PresetHandler::setInterpolatedPreset(int index1, int index2, double factor)
+{
+	auto presetNameIt1 = mPresetsMap.find(index1);
+	auto presetNameIt2 = mPresetsMap.find(index2);
+	if (presetNameIt1 != mPresetsMap.end()
+	        && presetNameIt2 != mPresetsMap.end()) {
+
+		std::map<std::string, float> values1 = loadPresetValues(presetNameIt1->second);
+		std::map<std::string, float> values2 = loadPresetValues(presetNameIt2->second);
+		{
+			if (mMorphRemainingSteps.load() >= 0) {
+				mMorphRemainingSteps.store(-1);
+				std::lock_guard<std::mutex> lk(mTargetLock);
+			}
+			mTargetValues.clear();
+			for(auto value: values1) {
+				if (values2.count(value.first) > 0) {
+					mTargetValues[value.first] = value.second + ((values2[value.first] - value.second)* factor);
+				}
+			}
+		}
+		mMorphConditionVar.notify_one();
+	} else {
+		std::cout << "Invalid indeces for preset interpolation: " << index1 << "," << index2 << std::endl;
+	}
+}
+
 std::string PresetHandler::recallPreset(int index)
 {
 	auto presetNameIt = mPresetsMap.find(index);
@@ -402,7 +429,8 @@ std::map<std::string, float> PresetHandler::loadPresetValues(std::string name)
 
 
 PresetServer::PresetServer(std::string oscAddress, int oscPort) :
-    mServer(nullptr), mPresetHandler(nullptr), mOSCpath("/preset"), mParamServer(nullptr)
+    mServer(nullptr), mPresetHandler(nullptr), mOSCpath("/preset"), mParamServer(nullptr),
+    mAllowStore(true), mStoreMode(false)
 {
 	mServer = new osc::Recv(oscPort, oscAddress.c_str(), 0.001); // Is this 1ms wait OK?
 	if (mServer) {
@@ -415,7 +443,8 @@ PresetServer::PresetServer(std::string oscAddress, int oscPort) :
 
 
 PresetServer::PresetServer(ParameterServer &paramServer) :
-    mServer(nullptr), mPresetHandler(nullptr), mOSCpath("/preset"), mParamServer(&paramServer)
+    mServer(nullptr), mPresetHandler(nullptr), mOSCpath("/preset"), mParamServer(&paramServer),
+    mAllowStore(true), mStoreMode(false)
 {
 	paramServer.registerOSCListener(this);
 //	paramServer.mServer->stop();
@@ -439,12 +468,22 @@ void PresetServer::onMessage(osc::Message &m)
 	if(m.addressPattern() == mOSCpath && m.typeTags() == "f"){
 		float val;
 		m >> val;
-		mPresetHandler->recallPreset(static_cast<int>(val));
+		if (!this->mStoreMode) {
+			mPresetHandler->recallPreset(static_cast<int>(val));
+		} else {
+			mPresetHandler->storePreset(static_cast<int>(val));
+			this->mStoreMode = false;
+		}
 		//			std::cout << "ParameterServer::onMessage" << val << std::endl;
 	} else if(m.addressPattern() == mOSCpath && m.typeTags() == "i"){
 		int val;
 		m >> val;
-		mPresetHandler->recallPreset(val);
+		if (!this->mStoreMode) {
+			mPresetHandler->recallPreset(val);
+		} else {
+			mPresetHandler->storePreset(val);
+			this->mStoreMode = false;
+		}
 	} else if (m.addressPattern() == mOSCpath + "/morphTime" && m.typeTags() == "f")  {
 		float val;
 		m >> val;
@@ -463,6 +502,10 @@ void PresetServer::onMessage(osc::Message &m)
 		m >> val;
 		if (this->mAllowStore) {
 			mPresetHandler->storePreset(val);
+		}
+	} else if (m.addressPattern() == mOSCpath + "/store" && m.typeTags() == "")  {
+		if (this->mAllowStore) {
+			this->mStoreMode = true;
 		}
 	}
 //	else if (mParamServer) {

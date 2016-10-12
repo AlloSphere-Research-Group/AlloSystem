@@ -104,6 +104,17 @@ public:
 
 	void recallPreset(std::string name);
 
+	/**
+	 * @brief Set parameters to values interpolated between two presets
+	 * @param index1 index of the first preset
+	 * @param index2 index of the second preset
+	 * @param factor A value between 0-1 to determine interpolation
+	 *
+	 * A factor of 0 uses preset 1 and a factor of 1 uses preset 2. Values
+	 * in between result in linear interpolation of the values.
+	 */
+	void setInterpolatedPreset(int index1, int index2, double factor);
+
 	std::string recallPreset(int index);
 
 	std::map<int, std::string> availablePresets();
@@ -247,6 +258,7 @@ private:
 	std::mutex mHandlerLock;
 	std::vector<osc::PacketHandler *> mHandlers;
 	bool mAllowStore;
+	bool mStoreMode;
 };
 
 
