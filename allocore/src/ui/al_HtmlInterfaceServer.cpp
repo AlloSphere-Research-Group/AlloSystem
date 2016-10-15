@@ -41,6 +41,7 @@
 */
 
 #include "allocore/ui/al_HtmlInterfaceServer.hpp"
+#include "allocore/io/al_File.hpp"
 #include <string>
 #include <algorithm>
 
@@ -70,6 +71,11 @@ HtmlInterfaceServer::HtmlInterfaceServer(std::string pathToInterfaceJs)
 	mRootPath = pathToInterfaceJs;
 	mInterfaceSendPort = 9010; // Interface.js sends OSC on this port
 	mInterfaceRecvPort = 10010; // Interface.js receives OSC on this port
+  mNodeJsPath = "/usr/bin/nodejs";
+  if (!File::exists(mNodeJsPath)) {
+    mNodeJsPath = "/usr/local/bin/node"; // TODO: Try to find node.js in a more robust way.
+  }
+	std::cout << "Using node: " << mNodeJsPath << std::endl;
 
 #ifndef AL_WINDOWS
 
@@ -119,7 +125,7 @@ void HtmlInterfaceServer::runInterfaceJs() {
 	}
 	std::string outFlag = "--oscOutPort=" + std::to_string(mInterfaceSendPort);
 	std::string inFlag = "--oscInPort=" + std::to_string(mInterfaceRecvPort);
-	execl("/usr/bin/nodejs", "/usr/bin/nodejs", "interface.simpleserver.js","--oscPort=15439",
+	execl(mNodeJsPath.c_str(), mNodeJsPath.c_str(), "interface.simpleserver.js","--oscPort=15439","--serverPort=8080",
 	      outFlag.c_str(), inFlag.c_str(), NULL);
 	perror("execl");
 	exit(1);
