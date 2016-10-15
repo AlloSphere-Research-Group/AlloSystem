@@ -156,7 +156,8 @@ public:
 
 	static glv::View *makeSequencerView(PresetSequencer &sequencer)
 	{
-
+		// TODO implement
+		return new glv::View; // For now to avoid compiler warnings.
 	}
 
 	static glv::View *makeRecorderView(SequenceRecorder &recorder)

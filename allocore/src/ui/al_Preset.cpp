@@ -99,9 +99,8 @@ void PresetHandler::storePreset(int index, std::string name)
 {
 	std::lock_guard<std::mutex> lock(mFileLock);
 	// ':' causes issues with the text format for saving, so replace
-	while (name.find(":")) {
-		name.replace(name.find(":"), 1, "_");
-	}
+	std::replace( name.begin(), name.end(), ':', '_');
+
 	std::string path = getCurrentPath();
 	if (path.back() != '/') {
 		path += "/";
@@ -429,7 +428,7 @@ std::map<std::string, float> PresetHandler::loadPresetValues(std::string name)
 
 
 PresetServer::PresetServer(std::string oscAddress, int oscPort) :
-    mServer(nullptr), mPresetHandler(nullptr), mOSCpath("/preset"), mParamServer(nullptr),
+    mServer(nullptr), mPresetHandler(nullptr), mParamServer(nullptr), mOSCpath("/preset"),
     mAllowStore(true), mStoreMode(false)
 {
 	mServer = new osc::Recv(oscPort, oscAddress.c_str(), 0.001); // Is this 1ms wait OK?
@@ -443,7 +442,7 @@ PresetServer::PresetServer(std::string oscAddress, int oscPort) :
 
 
 PresetServer::PresetServer(ParameterServer &paramServer) :
-    mServer(nullptr), mPresetHandler(nullptr), mOSCpath("/preset"), mParamServer(&paramServer),
+    mServer(nullptr), mPresetHandler(nullptr), mParamServer(&paramServer), mOSCpath("/preset"),
     mAllowStore(true), mStoreMode(false)
 {
 	paramServer.registerOSCListener(this);
@@ -465,6 +464,8 @@ PresetServer::~PresetServer()
 void PresetServer::onMessage(osc::Message &m)
 {
 	m.resetStream(); // Should be moved to the caller...
+	std::cout << "PresetServer::onMessage " << std::endl;
+	m.print();
 	if(m.addressPattern() == mOSCpath && m.typeTags() == "f"){
 		float val;
 		m >> val;
@@ -474,7 +475,6 @@ void PresetServer::onMessage(osc::Message &m)
 			mPresetHandler->storePreset(static_cast<int>(val));
 			this->mStoreMode = false;
 		}
-		//			std::cout << "ParameterServer::onMessage" << val << std::endl;
 	} else if(m.addressPattern() == mOSCpath && m.typeTags() == "i"){
 		int val;
 		m >> val;
@@ -488,24 +488,33 @@ void PresetServer::onMessage(osc::Message &m)
 		float val;
 		m >> val;
 		mPresetHandler->setMorphTime(val);
+	} else if (m.addressPattern() == mOSCpath + "/store" && m.typeTags() == "f")  {
+		float val;
+		m >> val;
+		if (this->mAllowStore) {
+			mPresetHandler->storePreset(static_cast<int>(val));
+		}
+	} else if (m.addressPattern() == mOSCpath + "/storeMode" && m.typeTags() == "f")  {
+		float val;
+		m >> val;
+		if (this->mAllowStore) {
+			this->mStoreMode = (val != 0.0f);
+		} else {
+			std::cout << "Remote storing disabled" << std::endl;
+		}
 	} else if (m.addressPattern().substr(0, mOSCpath.size() + 1) == mOSCpath + "/") {
 		int index = std::stoi(m.addressPattern().substr(mOSCpath.size() + 1));
 		if (m.typeTags() == "f") {
 			float val;
 			m >> val;
 			if (static_cast<int>(val) == 1) {
-				mPresetHandler->recallPreset(index);
+				if (!this->mStoreMode) {
+					mPresetHandler->recallPreset(index);
+				} else {
+					mPresetHandler->storePreset(index);
+					this->mStoreMode = false;
+				}
 			}
-		}
-	} else if (m.addressPattern() == mOSCpath + "/store" && m.typeTags() == "i")  {
-		int val;
-		m >> val;
-		if (this->mAllowStore) {
-			mPresetHandler->storePreset(val);
-		}
-	} else if (m.addressPattern() == mOSCpath + "/store" && m.typeTags() == "")  {
-		if (this->mAllowStore) {
-			this->mStoreMode = true;
 		}
 	}
 //	else if (mParamServer) {
