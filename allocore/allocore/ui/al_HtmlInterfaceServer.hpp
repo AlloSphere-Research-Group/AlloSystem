@@ -98,6 +98,7 @@ private:
 	void writeHtmlFile(PresetServer &presetServer, std::string interfaceName = "", int numPresets = -1);
 
 	std::string mRootPath;
+	std::string mNodeJsPath;
 	void runInterfaceJs();
 	pid_t  mPid;
 	int p_stdin[2], p_stdout[2];
