@@ -223,7 +223,7 @@ public:
 	void stopServer();
 
 	void allowStore(bool allow) {mAllowStore = allow;}
-	bool allowStore() {return mAllowStore}
+	bool allowStore() {return mAllowStore;}
 
 	virtual void onMessage(osc::Message& m);
 
