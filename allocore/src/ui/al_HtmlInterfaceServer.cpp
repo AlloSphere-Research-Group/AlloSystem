@@ -42,6 +42,7 @@
 
 #include "allocore/ui/al_HtmlInterfaceServer.hpp"
 #include <string>
+#include <algorithm>
 
 std::string htmlTemplateStart = R"(
 <html>
@@ -133,7 +134,7 @@ void HtmlInterfaceServer::writeHtmlFile(ParameterServer &paramServer, std::strin
 	std::string code = htmlTemplateStart;
 	std::string addCode = "iface.add(";
 	float padding = 0.01;
-	float width = 0.95 / parameters.size();
+	float width = (1.0- (padding * (parameters.size() + 1)))/parameters.size();
 	float height = 0.92;
 	for(int i = 0; i < parameters.size(); ++i) {
 		code += "var widget_" + std::to_string(i) + " = new Interface.Slider({\n";
@@ -152,7 +153,7 @@ void HtmlInterfaceServer::writeHtmlFile(ParameterServer &paramServer, std::strin
 	code += htmlTemplateEnd;
 
 	if (interfaceName == "") {
-		interfaceName = "AlloParameters";
+		interfaceName = "Parameters";
 	}
 	std::ofstream f(mRootPath + "/server/interfaces/" + interfaceName + ".html");
 	if (!f.is_open()) {
@@ -173,10 +174,10 @@ void HtmlInterfaceServer::writeHtmlFile(PresetServer &presetServer, std::string 
 {
 	std::string code = htmlTemplateStart;
 	std::string addCode = "iface.add(";
-	float padding = 0.01;
-	float width = 0.09;
-	float height = width;
 	int buttonsPerRow = 10;
+	float padding = 0.01;
+	float width = (1.0- (padding * (buttonsPerRow + 1)))/buttonsPerRow;
+	float height = width;
 	for(int i = 0; i < 40; ++i) {
 		code += "var preset_" + std::to_string(i) + " = new Interface.Button({\n";
 		code += "label: '" + std::to_string(i) + "',\n";
@@ -190,8 +191,19 @@ void HtmlInterfaceServer::writeHtmlFile(PresetServer &presetServer, std::string 
 		addCode += "preset_" + std::to_string(i) + ",";
 	}
 
+	if (presetServer.allowStore()) {
+		code += R"(var storeButton = new Interface.Button({
+	  bounds:[.02,.55,.96,.2],
+	  label: 'Store',
+	  mode: 'latch',
+	  target: "OSC", key: ')" + presetServer.getAddress() + R"(/storeMode',
+	});
+)";
+		addCode += "storeButton, ";
+	}
+
 	code += R"(var morphSlider = new Interface.Slider({
-	  bounds:[.02,.65,.96,.3],
+	  bounds:[.02,.8,.96,.15],
 	  min:.0, max:10,
 	  label: 'Morph time',
 	  isVertical:false,
@@ -207,7 +219,9 @@ void HtmlInterfaceServer::writeHtmlFile(PresetServer &presetServer, std::string 
 	code += htmlTemplateEnd;
 
 	if (interfaceName == "") {
-		interfaceName = "AlloPresets";
+		std::string serverAddress = presetServer.getAddress();
+		std::replace( serverAddress.begin(), serverAddress.end(), '/', '_');
+		interfaceName = "Presets" + serverAddress;
 	}
 	std::ofstream f(mRootPath + "/server/interfaces/" + interfaceName + ".html");
 	if (!f.is_open()) {
