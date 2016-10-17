@@ -3,6 +3,9 @@
 #include <iostream>
 #include "alloLithe/alloLithe.hpp"
 #include "Gamma/Oscillator.h"
+#include "SoundEngine.hpp"
+
+#define MODULE_NAME "Oscillator"
 
 enum OscillatorParams 
 {
@@ -25,6 +28,9 @@ public:
 	enum OscillatorOutlets
 	{
 		SINE,
+		SQUARE, 
+		SAW, 
+		TRIANGLE,
 		NUM_OUTLETS
 	};
 
@@ -43,19 +49,42 @@ public:
 
 	void updateFreqs(float frequency)
 	{
-		sine.freq(parameters[OSCILLATOR_FREQUENCY]->get());
+		float new_freq = parameters[OSCILLATOR_FREQUENCY]->get();
+		sine.freq(new_freq);
+		square.freq(new_freq);
+		saw.freq(new_freq);
+		dwo.freq(new_freq);
 	}
 
 	virtual void DSP(void) override
 	{
+		/// TODO: Add modulation code here. 
 		getOutlet(SINE).setSample( lithe::Sample( sine(), parameters[OSCILLATOR_AZ]->get(), parameters[OSCILLATOR_EL]->get(), parameters[OSCILLATOR_DIST]->get()) );
+		getOutlet(SQUARE).setSample( lithe::Sample( square(), parameters[OSCILLATOR_AZ]->get(), parameters[OSCILLATOR_EL]->get(), parameters[OSCILLATOR_DIST]->get()) );
+		getOutlet(SAW).setSample( lithe::Sample( saw(), parameters[OSCILLATOR_AZ]->get(), parameters[OSCILLATOR_EL]->get(), parameters[OSCILLATOR_DIST]->get()) );
+		getOutlet(TRIANGLE).setSample( lithe::Sample( dwo(), parameters[OSCILLATOR_AZ]->get(), parameters[OSCILLATOR_EL]->get(), parameters[OSCILLATOR_DIST]->get()) );
 	}
+
+	static int moduleID;
+	static std::string moduleName;
 
 private:
 	gam::Sine<> sine;
-	// gam::Square<> square;
-	// gam::Saw<> saw;
-	// gam::DWO<> dwo; /// For triangle wave
+	gam::Square<> square;
+	gam::Saw<> saw;
+	gam::DWO<> dwo; /// For triangle wave
 };
+
+/// Factory for Oscillators. Returns the lithe nodeID
+int OscillatorFactory(void)
+{
+	Oscillator* new_instance = new Oscillator;
+	return new_instance->getID();
+}
+
+std::string Oscillator::moduleName = MODULE_NAME;
+int Oscillator::moduleID = REGISTER_MODULE(Oscillator::moduleName, OscillatorFactory);
+
+#undef MODULE_NAME
 
 #endif // OSCILLATOR
