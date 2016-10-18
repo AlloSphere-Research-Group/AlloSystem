@@ -250,7 +250,7 @@ struct Color{
 	}
 
 private:
-	float tof(uint8_t v){ return float(v)/255.f; }
+	float tof(uint8_t v){ return float(v)*(1.f/255.f); }
 };
 
 
