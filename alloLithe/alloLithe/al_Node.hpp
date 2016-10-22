@@ -4,24 +4,20 @@
 
 namespace al{
 
-template<int NParams>
 class Node : public lithe::Node
 {
 public:
-	const int numParameters = NParams;
-	al::Parameter* parameters[NParams];
+	std::vector<al::Parameter*> parameters;
 
-	Node(int numInlets, int numOutlets) : lithe::Node(numInlets, numOutlets) {	}
+	Node(int numInlets, int numOutlets, int numParams);
 	
-	~Node(void)
-	{
-		for(int i=0; i<numParameters; ++i)
-		{
-			delete parameters[i];
-		}
-	}
+	~Node(void);
+
+	static al::Node* getNodeRef(int nodeID);
 	
-	virtual void init_parameters() = 0;
+	virtual void init_parameters(void);
+
+	const int numParameters;
 };
 
 

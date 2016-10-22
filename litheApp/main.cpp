@@ -1,5 +1,5 @@
 // #include "LitheModules/LitheModules.h"
-#include "alloLithe/alloLithe.hpp"
+#include "allolithe/allolithe.hpp"
 #include "Oscillator_GUI.hpp"
 #include "PatcherGUI.hpp"
 
@@ -12,8 +12,8 @@ int main()
 
 	PatcherGUI gui;
 
-	gui << osc;
-	gui.openWindow();
+	// gui << osc;
+	// gui.openWindow();
 
     return 0;
 }

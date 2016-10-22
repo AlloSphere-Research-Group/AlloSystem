@@ -267,4 +267,4 @@ if(BUILD_EXAMPLES)
 
 endif(BUILD_EXAMPLES)
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/alloLithe)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/allolithe)

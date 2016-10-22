@@ -5,6 +5,8 @@
 #include <vector>
 #include <string>
 
+namespace al {
+
 typedef int (*ModuleFactoryFunction)(void);
 
 class SoundEngine
@@ -22,7 +24,7 @@ public:
 
 	friend int REGISTER_MODULE(std::string module_name, ModuleFactoryFunction module_factory_function);
 
-private:
+
     static std::vector<std::string> ModuleNames;
   	static std::vector<ModuleFactoryFunction> ModuleConstructors;
 };
@@ -40,6 +42,8 @@ int REGISTER_MODULE(std::string module_name, ModuleFactoryFunction module_factor
 	int module_id = SoundEngine::ModuleConstructors.size() - 1;
 	return module_id;
 }
+
+} // namespace al
 
 
 #endif // SOUNDENGINE_HPP

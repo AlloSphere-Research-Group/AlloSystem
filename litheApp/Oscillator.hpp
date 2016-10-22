@@ -3,22 +3,21 @@
 #include <iostream>
 #include "alloLithe/alloLithe.hpp"
 #include "Gamma/Oscillator.h"
-#include "SoundEngine.hpp"
+#include "allolithe/allolithe.hpp"
 
 #define MODULE_NAME "Oscillator"
 
-enum OscillatorParams 
-{
-	OSCILLATOR_FREQUENCY,
-	OSCILLATOR_AZ,
-	OSCILLATOR_EL,
-	OSCILLATOR_DIST,
-	OSCILLATOR_NUM_PARAMS
-};
-
-class Oscillator : public al::Node<OSCILLATOR_NUM_PARAMS>
+class Oscillator : public al::Node
 {
 public:
+	enum OscillatorParams 
+	{
+		OSCILLATOR_FREQUENCY,
+		OSCILLATOR_AZ,
+		OSCILLATOR_EL,
+		OSCILLATOR_DIST,
+		OSCILLATOR_NUM_PARAMS
+	};
 	enum OscillatorInlets
 	{
 		FM, 
@@ -34,7 +33,7 @@ public:
 		NUM_OUTLETS
 	};
 
-	Oscillator(void) : al::Node<OSCILLATOR_NUM_PARAMS>(NUM_INLETS, NUM_OUTLETS) 
+	Oscillator(void) : al::Node(NUM_INLETS, NUM_OUTLETS, OSCILLATOR_NUM_PARAMS) 
 	{
 		init_parameters();
 	}
@@ -83,8 +82,7 @@ int OscillatorFactory(void)
 }
 
 std::string Oscillator::moduleName = MODULE_NAME;
-int Oscillator::moduleID = REGISTER_MODULE(Oscillator::moduleName, OscillatorFactory);
+int Oscillator::moduleID = al::REGISTER_MODULE(Oscillator::moduleName, OscillatorFactory);
 
 #undef MODULE_NAME
-
 #endif // OSCILLATOR
