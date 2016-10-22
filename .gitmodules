@@ -1,7 +1,6 @@
 [submodule "allonect/libfreenect"]
 	path = allonect/libfreenect
     url = https://github.com/OpenKinect/libfreenect.git
-
 [submodule "allolithe/Lithe"]
-    path = allolithe/Lithe
-    url = https://github.com/akshay1992/Lithe.git
+	path = allolithe/Lithe
+	url = git@github.com:akshay1992/Lithe
