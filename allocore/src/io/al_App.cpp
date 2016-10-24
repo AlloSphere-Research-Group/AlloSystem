@@ -150,12 +150,14 @@ bool SceneWindowHandler::onFrame(){
 	struct DrawFunc : public Drawable {
 		App& app;
 		Viewpoint& vp;
+		ViewpointWindow& win;
 
-		DrawFunc(App& a, Viewpoint& v)
-		:	app(a), vp(v){}
+		DrawFunc(App& a, Viewpoint& v, ViewpointWindow& w)
+		:	app(a), vp(v), win(w){}
 
 		void onDraw(Graphics& g){
 			g.pushMatrix(g.MODELVIEW);
+			for(auto& drawCall : win.drawCalls()) drawCall();
 			app.onDraw(g,vp);
 			g.popMatrix(g.MODELVIEW);
 		}
@@ -217,7 +219,7 @@ bool SceneWindowHandler::onFrame(){
 			}
 		}
 
-		DrawFunc drawFunc(app, vp);
+		DrawFunc drawFunc(app, vp, win);
 		stereo.draw(g, lens, vp.worldTransform(), vp.viewport(), drawFunc, doClear);
 		stereo.clearColor(defaultClearColor);
 	}
