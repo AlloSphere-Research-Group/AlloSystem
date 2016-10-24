@@ -325,20 +325,23 @@ public:
 	/// Set blend mode to transparent (asymmetric)
 	void blendModeTrans(){ blendMode(SRC_ALPHA, ONE_MINUS_SRC_ALPHA, FUNC_ADD); }
 
+	/// Turn blending states on (without setting mode)
+	void blendOn(){ depthMask(false); blending(true); }
+
 	/// Set states for additive blending
-	void blendAdd(){ depthMask(false); blending(true); blendModeAdd(); }
+	void blendAdd(){ blendOn(); blendModeAdd(); }
 
 	/// Set states for subtractive blending
-	void blendSub(){ depthMask(false); blending(true); blendModeSub(); }
+	void blendSub(){ blendOn(); blendModeSub(); }
 
 	/// Set states for screen blending
-	void blendScreen(){ depthMask(false); blending(true); blendModeScreen(); }
+	void blendScreen(){ blendOn(); blendModeScreen(); }
 
 	/// Set states for multiplicative blending
-	void blendMul(){ depthMask(false); blending(true); blendModeMul(); }
+	void blendMul(){ blendOn(); blendModeMul(); }
 
 	/// Set states for transparent blending
-	void blendTrans(){ depthMask(false); blending(true); blendModeTrans(); }
+	void blendTrans(){ blendOn(); blendModeTrans(); }
 
 	/// Turn blending states off (opaque rendering)
 	void blendOff(){ depthMask(true); blending(false); }
