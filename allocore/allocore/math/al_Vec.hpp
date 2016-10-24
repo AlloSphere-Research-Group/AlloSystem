@@ -160,6 +160,11 @@ public:
 	/// Get read-write pointer to elements
 	T * elems(){ return &x; }
 
+	T * begin(){ return elems(); }
+	const T * begin() const { return elems(); }
+	T * end(){ return elems() + N; }
+	const T * end() const { return elems() + N; }
+
 	/// Set element at index with no bounds checking
 	T& operator[](int i){ return elems()[i];}
 
