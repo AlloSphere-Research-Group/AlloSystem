@@ -18,7 +18,7 @@ public:
 	const int numParameters;
 	
 private:
-	void instantiate_parameters(void);
+	// void default_instantiate_parameters(void);
 };
 
 

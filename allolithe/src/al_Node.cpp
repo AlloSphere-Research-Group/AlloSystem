@@ -6,7 +6,7 @@ Node::Node(int numInlets, int numOutlets, int numParams) :
 	lithe::Node(numInlets, numOutlets), 
 	numParameters(numParams) 
 	{
-		instantiate_parameters();
+		// instantiate_parameters();
 	}
 
 Node::~Node(void)
@@ -33,13 +33,13 @@ al::Node* Node::getNodeRef(int nodeID)
 	}
 }
 
-void Node::instantiate_parameters() 
-{
-	for(int i=0; i<numParameters; ++i)
-	{
-		std::string param_name = "parameter"+std::to_string(i);
-		parameters.push_back( new Parameter(param_name, "group", 0.0) );
-	}
-}
+// void Node::instantiate_parameters() 
+// {
+// 	for(int i=0; i<numParameters; ++i)
+// 	{
+// 		std::string param_name = "parameter"+std::to_string(i);
+// 		parameters.push_back( new Parameter(param_name, "group", 0.0) );
+// 	}
+// }
 
 } // namespace al

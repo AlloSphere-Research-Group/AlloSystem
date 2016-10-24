@@ -10,22 +10,22 @@
 class Oscillator : public al::Node
 {
 public:
-	enum OscillatorParams 
+	enum OscillatorParams : int
 	{
-		OSCILLATOR_FREQUENCY,
-		OSCILLATOR_AZ,
-		OSCILLATOR_EL,
-		OSCILLATOR_DIST,
-		OSCILLATOR_NUM_PARAMS
+		FREQUENCY,
+		AZ,
+		EL,
+		DIST,
+		NUM_PARAMS
 	};
-	enum OscillatorInlets
+	
+	enum OscillatorInlets : int
 	{
 		FM, 
 		NUM_INLETS
 	};
 
-	enum OscillatorOutlets
-	{
+	enum OscillatorOutlets : int {
 		SINE,
 		SQUARE, 
 		SAW, 
@@ -33,22 +33,22 @@ public:
 		NUM_OUTLETS
 	};
 
-	Oscillator(void) : al::Node(NUM_INLETS, NUM_OUTLETS, OSCILLATOR_NUM_PARAMS) 
+	Oscillator(void) : al::Node(NUM_INLETS, NUM_OUTLETS, NUM_PARAMS) 
 	{
 		init_parameters();
 	}
 
 	void init_parameters(void)
 	{
-		parameters[OSCILLATOR_FREQUENCY] = new al::Parameter("frequency", std::to_string(getID()), 440.0, "", 0.0, 20000.0 );
-		parameters[OSCILLATOR_AZ] = new al::Parameter("az", std::to_string(getID()), 0, "", -1.0, +1.0 );
-		parameters[OSCILLATOR_EL] = new al::Parameter("el", std::to_string(getID()), 0, "", -1.0, +1.0 );
-		parameters[OSCILLATOR_DIST] = new al::Parameter("dist", std::to_string(getID()), 0, "", -1.0, +1.0 );
+		parameters.push_back( new al::Parameter("frequency", std::to_string(getID()), 440.0, "", 0.0, 20000.0 ));
+		parameters.push_back( new al::Parameter("az", std::to_string(getID()), 0, "", -1.0, +1.0 ));
+		parameters.push_back( new al::Parameter("el", std::to_string(getID()), 0, "", -1.0, +1.0 ));
+		parameters.push_back( new al::Parameter("dist", std::to_string(getID()), 0, "", -1.0, +1.0 ));
 	}
 
 	void updateFreqs(float frequency)
 	{
-		float new_freq = parameters[OSCILLATOR_FREQUENCY]->get();
+		float new_freq = parameters[FREQUENCY]->get();
 		sine.freq(new_freq);
 		square.freq(new_freq);
 		saw.freq(new_freq);
@@ -58,10 +58,10 @@ public:
 	virtual void DSP(void) override
 	{
 		/// TODO: Add modulation code here. 
-		getOutlet(SINE).setSample( lithe::Sample( sine(), parameters[OSCILLATOR_AZ]->get(), parameters[OSCILLATOR_EL]->get(), parameters[OSCILLATOR_DIST]->get()) );
-		getOutlet(SQUARE).setSample( lithe::Sample( square(), parameters[OSCILLATOR_AZ]->get(), parameters[OSCILLATOR_EL]->get(), parameters[OSCILLATOR_DIST]->get()) );
-		getOutlet(SAW).setSample( lithe::Sample( saw(), parameters[OSCILLATOR_AZ]->get(), parameters[OSCILLATOR_EL]->get(), parameters[OSCILLATOR_DIST]->get()) );
-		getOutlet(TRIANGLE).setSample( lithe::Sample( dwo(), parameters[OSCILLATOR_AZ]->get(), parameters[OSCILLATOR_EL]->get(), parameters[OSCILLATOR_DIST]->get()) );
+		getOutlet(SINE).setSample( lithe::Sample( sine(), parameters[AZ]->get(), parameters[EL]->get(), parameters[DIST]->get()) );
+		getOutlet(SQUARE).setSample( lithe::Sample( square(), parameters[AZ]->get(), parameters[EL]->get(), parameters[DIST]->get()) );
+		getOutlet(SAW).setSample( lithe::Sample( saw(), parameters[AZ]->get(), parameters[EL]->get(), parameters[DIST]->get()) );
+		getOutlet(TRIANGLE).setSample( lithe::Sample( dwo(), parameters[AZ]->get(), parameters[EL]->get(), parameters[DIST]->get()) );
 	}
 
 	static int moduleID;

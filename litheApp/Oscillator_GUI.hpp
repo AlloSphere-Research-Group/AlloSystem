@@ -1,8 +1,9 @@
 #ifndef OSCILLATOR_GUI_HPP
 #define OSCILLATOR_GUI_HPP
 
-#include "GLV/glv.h"
-#include  "GLV/glv_binding.h"
+// #include "GLV/glv.h"
+// #include  "GLV/glv_binding.h"
+#include "alloGLV/al_ParameterGUI.hpp"
 // #include "GLV/glv_util.h"
 
 #include "allolithe/allolithe.hpp"
@@ -24,11 +25,11 @@ public:
 		}
 
 		glv::View(glv::Rect(100,100, 600,400));
-		// al::Node* node_ref = al::Node::getNodeRef(nodeID);
-		// for(int i=0; i< node_ref->parameters.size(); ++i )
-		// {
-		// 	(*this) << node_ref->parameters;
-		// }
+		al::Node* node_ref = al::Node::getNodeRef(nodeID);
+		for(int i=0; i< node_ref->parameters.size(); ++i )
+		{
+			// (*this) << *node_ref->parameters[i];
+		}
 	}
 
 	virtual bool onEvent(glv::Event::t e, glv::GLV& glv)
