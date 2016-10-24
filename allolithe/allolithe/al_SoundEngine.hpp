@@ -4,6 +4,7 @@
 #include "Lithe/LitheCore.h"
 #include <vector>
 #include <string>
+#include <algorithm>
 
 namespace al {
 
@@ -19,20 +20,34 @@ public:
 		if( moduleID >= ModuleNames.size() ) 
 			throw std::range_error("Module with id: " + std::to_string(moduleID) + " not registered");
 		else
-			return ModuleConstructors[moduleID]();
+		{
+			instantiatedNodeIDs.push_back(ModuleConstructors[moduleID]());
+			return instantiatedNodeIDs.back();
+		}
 	}
 
-	friend int REGISTER_MODULE(std::string module_name, ModuleFactoryFunction module_factory_function);
+	static void deleteModuleInstance(int nodeID)
+	{
+		for(int i=0; i<instantiatedNodeIDs.size(); ++i)
+		{
+			if( instantiatedNodeIDs[i] == nodeID )
+			{
+				instantiatedNodeIDs.erase(instantiatedNodeIDs.begin()+i);
+				delete al::Node::getNodeRef(nodeID);
+				return;
+			}
+		}
+		throw std::runtime_error("Unable to find node with ID:"+std::to_string(nodeID));
+	}
 
-
+	static std::vector<int> instantiatedNodeIDs;
     static std::vector<std::string> ModuleNames;
   	static std::vector<ModuleFactoryFunction> ModuleConstructors;
 };
 
+std::vector<int> SoundEngine::instantiatedNodeIDs;
 std::vector<std::string> SoundEngine::ModuleNames;
 std::vector<ModuleFactoryFunction> SoundEngine::ModuleConstructors;
-
-#include <iostream>
 
 int REGISTER_MODULE(std::string module_name, ModuleFactoryFunction module_factory_function) 
 {

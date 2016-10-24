@@ -6,7 +6,7 @@ Node::Node(int numInlets, int numOutlets, int numParams) :
 	lithe::Node(numInlets, numOutlets), 
 	numParameters(numParams) 
 	{
-
+		instantiate_parameters();
 	}
 
 Node::~Node(void)
@@ -22,7 +22,10 @@ al::Node* Node::getNodeRef(int nodeID)
 	try
 	{
 		al::Node* node_ref = static_cast<al::Node*>(lithe::Node::getNodeRef(nodeID));
-		return node_ref;
+		if(node_ref == NULL)
+			throw std::runtime_error("Node not found or instance was destroyed");
+		else
+			return node_ref;
 	}
 	catch(const char * str)
 	{
@@ -30,7 +33,7 @@ al::Node* Node::getNodeRef(int nodeID)
 	}
 }
 
-void Node::init_parameters() 
+void Node::instantiate_parameters() 
 {
 	for(int i=0; i<numParameters; ++i)
 	{

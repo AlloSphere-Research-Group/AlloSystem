@@ -5,7 +5,7 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 ADD_EXECUTABLE(testTemplate ${SRCS})
 
 TARGET_LINK_LIBRARIES(testTemplate
-	lithe_core
+	allolithe
 	libgtest
 	libgmock
 )

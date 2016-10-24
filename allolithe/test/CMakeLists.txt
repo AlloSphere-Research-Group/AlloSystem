@@ -55,3 +55,4 @@ endif()
 
 # Adding the tests individually here using add_subdirectory()
 add_subdirectory(testNode)
+add_subdirectory(testSoundEngine)

@@ -3,21 +3,20 @@
 
 #include "allolithe/allolithe.hpp"
 
-#define numInlets 2
-#define numOutlets 2
-#define numParams 4
+#define inherited_numInlets 2
+#define inherited_numOutlets 2
+#define inherited_numParams 4
 
 class InheritedNode : public al::Node
-{
-	InheritedNode(void) : al::Node(numInlets, numOutlets, numParams)
+{ 
+public:
+	InheritedNode(void) : al::Node(inherited_numInlets, inherited_numOutlets, inherited_numParams)
 	{
 
 	}
 
 	virtual void DSP(void)
 	{
-		// lithe::Sample 
-
 	}
 };
 

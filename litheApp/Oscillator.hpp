@@ -38,7 +38,7 @@ public:
 		init_parameters();
 	}
 
-	virtual void init_parameters(void) override
+	void init_parameters(void)
 	{
 		parameters[OSCILLATOR_FREQUENCY] = new al::Parameter("frequency", std::to_string(getID()), 440.0, "", 0.0, 20000.0 );
 		parameters[OSCILLATOR_AZ] = new al::Parameter("az", std::to_string(getID()), 0, "", -1.0, +1.0 );

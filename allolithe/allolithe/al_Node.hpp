@@ -14,10 +14,11 @@ public:
 	~Node(void);
 
 	static al::Node* getNodeRef(int nodeID);
-	
-	virtual void init_parameters(void);
 
 	const int numParameters;
+	
+private:
+	void instantiate_parameters(void);
 };
 
 
