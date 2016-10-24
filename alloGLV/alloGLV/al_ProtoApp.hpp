@@ -96,6 +96,8 @@ public:
 		glv::View * v, const std::string& label="", bool nameViewFromLabel=true
 	);
 
+	ProtoApp& showAxes(bool v){ mShowAxes=v; return *this; }
+	ProtoApp& toggleAxes(){ return showAxes(!mShowAxes); }
 
 	double gainFactor() const;
 	double scaleFactor() const;
@@ -107,6 +109,7 @@ protected:
 	glv::Table mTopBar;
 	glv::Label mAppLabel;
 	std::string mResourceDir;
+	bool mShowAxes = false;
 };
 
 } // al::
