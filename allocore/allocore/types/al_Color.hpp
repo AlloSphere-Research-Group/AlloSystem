@@ -250,7 +250,7 @@ struct Color{
 	}
 
 private:
-	float tof(uint8_t v){ return float(v)/255.f; }
+	float tof(uint8_t v){ return float(v)*(1.f/255.f); }
 };
 
 
@@ -381,6 +381,13 @@ struct Colori {
 
 	/// Set from gray value and alpha
 	Colori& set(uint8_t v, uint8_t al){ return set(v,al); }
+
+
+	/// Returns inverted color
+	Colori inverse() const { return Colori(*this).invert(); }
+
+	/// Invert RGB components
+	Colori& invert(){ return set(255-r, 255-g, 255-b); }
 
 private:
 	uint8_t toi(float v){ return uint8_t(v*255.f); }

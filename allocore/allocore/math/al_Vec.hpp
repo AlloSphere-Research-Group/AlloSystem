@@ -143,6 +143,10 @@ public:
 	/// Returns number of elements
 	static int size(){ return N; }
 
+	/// Returns C array type punned into a vector
+	static Vec& pun(T * src){ return *(Vec*)(src); }
+	static const Vec& pun(const T * src){ return *(const Vec*)(src); }
+
 	/// Get reference to self as another type
 	template <class V>
 	V& as(){ return *(V *)(elems()); }
@@ -155,6 +159,11 @@ public:
 
 	/// Get read-write pointer to elements
 	T * elems(){ return &x; }
+
+	T * begin(){ return elems(); }
+	const T * begin() const { return elems(); }
+	T * end(){ return elems() + N; }
+	const T * end() const { return elems() + N; }
 
 	/// Set element at index with no bounds checking
 	T& operator[](int i){ return elems()[i];}
