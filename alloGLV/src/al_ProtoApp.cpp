@@ -154,6 +154,8 @@ void ProtoApp::init(
 			.modelManager(MM)
 			.loadFile()
 		;
+
+		MM.zeroSmallValues();
 	}
 }
 
