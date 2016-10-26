@@ -15,7 +15,7 @@
 
 using namespace al;
 
-class MyApp : public App{
+class MyApp : public App {
 public:
 
 	Mesh mesh;
@@ -41,6 +41,9 @@ public:
 		double period = 10;
 		phase += dt / period;
 		if(phase >= 1.) phase -= 1.;
+
+
+        actor->RotateX(2);
 	}
 
     virtual void onCreate(const ViewpointWindow& win) override {
@@ -66,7 +69,6 @@ public:
 	virtual void onDraw(Graphics& g) override {
 
         // Draw VTK stuff
-        actor->RotateX(2);
         externalVTKWidget->GetRenderWindow()->Render();
 
         // Draw Allosystem stuff
