@@ -1,5 +1,5 @@
 
-#include "allocore/io/al_App.hpp"
+#include "alloutil/al_OmniApp.hpp"
 
 // VTK includes
 #include <ExternalVTKWidget.h>
@@ -15,12 +15,11 @@
 
 using namespace al;
 
-class MyApp : public App {
+class MyApp : public OmniApp {
 public:
 
 	Mesh mesh;
     Light light;
-	double phase;
 
     // An ExternalVTKWidget and vtkExternalOpenGLRenderWindow are needed
     vtkNew<ExternalVTKWidget> externalVTKWidget;
@@ -29,24 +28,31 @@ public:
 	vtkNew<vtkActor> actor;
 	vtkNew<vtkPolyDataMapper> mapper;
 
-	MyApp(): phase(0){
+    MyApp() {
+      mesh.primitive(Graphics::TRIANGLES);
+      addSphere(mesh);
+      nav().pos(0,0,2);
+    }
 
-		addSphere(mesh);
-		nav().pos(0,0,4);
-		initWindow(Window::Dim(0,0, 600,400), "VTK example", 40);
-		background(HSV(0.5, 1, 0.5));
-	}
+    virtual ~MyApp() {}
 
-	virtual void onAnimate(double dt) override {
-		double period = 10;
-		phase += dt / period;
-		if(phase >= 1.) phase -= 1.;
+    virtual void onDraw(Graphics& g) {
+    // Draw VTK stuff
+      externalVTKWidget->GetRenderWindow()->Render();
+      glPopAttrib();
+      light();
+      // say how much lighting you want
+      shader().uniform("lighting", 1.0);
+      g.polygonMode(Graphics::LINE); // wireframe mode
+      g.pushMatrix();
+    //   g.rotate(phase*360, 0,1,0);
+      g.draw(mesh);
+      g.popMatrix();
+    }
 
+    virtual bool onCreate() override {
+        OmniApp::onCreate();
 
-        actor->RotateX(2);
-	}
-
-    virtual void onCreate(const ViewpointWindow& win) override {
         // configure the external VTK widget
         externalVTKWidget->SetRenderWindow(renWin.GetPointer());
 
@@ -64,21 +70,13 @@ public:
         actor->RotateX(45.0);
         actor->RotateY(45.0);
 
+        return true;
     }
 
-	virtual void onDraw(Graphics& g) override {
-
-        // Draw VTK stuff
-        externalVTKWidget->GetRenderWindow()->Render();
-
-        // Draw Allosystem stuff
-        light();
-        g.polygonMode(Graphics::LINE); // wireframe mode
-		g.pushMatrix();
-		g.rotate(phase*360, 0,1,0);
-		g.draw(mesh);
-		g.popMatrix();
-	}
+    virtual void onAnimate(al_sec dt) {
+      actor->RotateX(2);
+      pose = nav();
+    }
 };
 
 
