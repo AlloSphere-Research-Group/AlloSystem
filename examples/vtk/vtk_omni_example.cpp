@@ -28,7 +28,28 @@ public:
 	vtkNew<vtkActor> actor;
 	vtkNew<vtkPolyDataMapper> mapper;
 
-    //
+    MyApp() {
+      mesh.primitive(Graphics::TRIANGLES);
+      addSphere(mesh);
+      nav().pos(0,0,2);
+    }
+
+    virtual ~MyApp() {}
+
+    virtual void onDraw(Graphics& g) {
+    // Draw VTK stuff
+      externalVTKWidget->GetRenderWindow()->Render();
+      glPopAttrib();
+      light();
+      // say how much lighting you want
+      shader().uniform("lighting", 1.0);
+      g.polygonMode(Graphics::LINE); // wireframe mode
+      g.pushMatrix();
+    //   g.rotate(phase*360, 0,1,0);
+      g.draw(mesh);
+      g.popMatrix();
+    }
+
     virtual bool onCreate() override {
         OmniApp::onCreate();
 
@@ -51,55 +72,10 @@ public:
 
         return true;
     }
-    //
-	// virtual void onDraw(Graphics& g) override {
-    //
-    //     // Draw VTK stuff
-    //     externalVTKWidget->GetRenderWindow()->Render();
-    //
-    //     // Draw Allosystem stuff
-    //     shader().uniform("lighting", 1.0);
-    //     light();
-
-	// }
-
-    MyApp() {
-      mesh.primitive(Graphics::TRIANGLES);
-      addSphere(mesh);
-      nav().pos(0,0,4);
-    //   for (int i = 0; i < mesh.vertices().size(); ++i) {
-    //     float f = (float)i / mesh.vertices().size();
-    //     mesh.color(Color(HSV(f, 1 - f, 1), 1));
-    //   }
-    //   mesh.generateNormals();
-    //   light.ambient(Color(0.4, 0.4, 0.4, 1.0));
-    //   light.pos(5, 5, 5);
-    //   initAudio();
-    }
-
-    virtual ~MyApp() {}
-
-    virtual void onDraw(Graphics& g) {
-    // Draw VTK stuff
-    glPushAttrib(GL_VIEWPORT_BIT);
-      externalVTKWidget->GetRenderWindow()->Render();
-      glPopAttrib();
-      light();
-      // say how much lighting you want
-      shader().uniform("lighting", 1.0);
-      g.polygonMode(Graphics::LINE); // wireframe mode
-      g.pushMatrix();
-    //   g.rotate(phase*360, 0,1,0);
-      g.draw(mesh);
-      g.popMatrix();
-    }
 
     virtual void onAnimate(al_sec dt) {
-      // light.pos(nav().pos());
-
       actor->RotateX(2);
       pose = nav();
-      // std::cout << dt << std::endl;
     }
 };
 
