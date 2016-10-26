@@ -92,6 +92,7 @@ public:
 	 *
 	 * @param index
 	 * @param name
+	 * @param overwrite if false, and preset file exists it is not overwritten and a number is appended
 	 *
 	 * The preset name also determines the filename under which the preset is saved, so
 	 * it must be unique. If name is empty, a unique name is generated. If name
@@ -100,7 +101,7 @@ public:
 	 * stored in the path for the PresetHandler, see getCurrentPath()
 	 *
 	 */
-	void storePreset(int index, std::string name = "");
+	void storePreset(int index, std::string name = "", bool overwrite = true);
 
 	void recallPreset(std::string name);
 
@@ -130,6 +131,11 @@ public:
 	std::vector<std::string> availableSubDirectories();
 
 	std::string getCurrentPath();
+
+	/** Display information about preset handler, including path and
+	 * registered parameters.
+	 */
+	void print();
 
 	typedef void (*PresetChangeCallback)(int index, void *sender,
 	                                        void *userData);

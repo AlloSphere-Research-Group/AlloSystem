@@ -95,7 +95,7 @@ void PresetHandler::storePreset(std::string name)
 	storePreset(index, name);
 }
 
-void PresetHandler::storePreset(int index, std::string name)
+void PresetHandler::storePreset(int index, std::string name, bool overwrite)
 {
 	std::lock_guard<std::mutex> lock(mFileLock);
 	// ':' causes issues with the text format for saving, so replace
@@ -112,7 +112,7 @@ void PresetHandler::storePreset(int index, std::string name)
 	std::string fileName = path + name + ".preset";
 	std::ifstream infile(fileName);
 	int number = 0;
-	while (infile.good()) {
+	while (infile.good() && !overwrite) {
 		fileName = path + name + "_" + std::to_string(number) + ".preset";
 		infile.close();
 		infile.open(fileName);
@@ -247,6 +247,14 @@ std::string PresetHandler::getCurrentPath()
 	}
 	relPath += mSubDir;
 	return relPath;
+}
+
+void PresetHandler::print()
+{
+	std::cout << "Path: " << getCurrentPath() << std::endl;
+	for (auto preset: mParameters) {
+		std::cout << preset->getFullAddress() << std::endl;
+	}
 }
 
 void PresetHandler::loadPresetMap()
