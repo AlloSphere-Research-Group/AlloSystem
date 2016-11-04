@@ -569,5 +569,5 @@ void PresetServer::changeCallback(int value, void *sender, void *userData)
 {
 	PresetServer *server = static_cast<PresetServer *>(userData);
 	Parameter *parameter = static_cast<Parameter *>(sender);
-	server->notifyListeners(server->mOSCpath, value);
+	server->notifyListeners(server->mOSCpath + "/" + std::to_string((int)value), 1.0);
 }
