@@ -646,8 +646,8 @@ struct RGB{
 	/// Invert RGB components
 	RGB& invert(){ return set(1.f-r, 1.f-g, 1.f-b); }
 
-	/// Returns luminance value
-	float luminance() const { return r*0.3f + g*0.59f + b*0.11f; }
+	/// Returns luminance value (following ITU-R BT.601)
+	float luminance() const { return r*0.299f + g*0.587f + b*0.114f; }
 
 	/// Returns self linearly mixed with another color (0 = none)
 	RGB mix(const RGB& v, float amt=0.5f) const {
