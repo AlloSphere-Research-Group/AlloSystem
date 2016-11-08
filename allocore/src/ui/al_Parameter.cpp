@@ -63,7 +63,7 @@ ParameterBool::ParameterBool(std::string parameterName, std::string Group,
                      std::string prefix,
                      float min,
                      float max) :
-    ParameterWrapper<float>(parameterName, Group, defaultValue, prefix, min, max)
+    Parameter(parameterName, Group, defaultValue, prefix, min, max)
 {
 	mFloatValue = defaultValue;
 }

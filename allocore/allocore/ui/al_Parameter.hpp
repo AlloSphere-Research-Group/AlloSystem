@@ -69,7 +69,7 @@ public:
 		mOSCSenders.push_back(new osc::Send(oscPort, IPaddress.c_str()));
 		mListenerLock.unlock();
 //		std::cout << "Registered listener " << IPaddress << ":" << oscPort<< std::endl;
-	};
+	}
 
 	/**
 	 * @brief Notify the listeners of value changes
@@ -357,7 +357,7 @@ private:
 	float mFloatValue;
 };
 
-class ParameterBool : public ParameterWrapper<float>
+class ParameterBool : public Parameter
 {
 public:
 	/**
