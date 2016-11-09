@@ -93,6 +93,10 @@ public:
 	void startRecord(std::string name = "", bool overwrite = false);
 	void stopRecord();
 
+	void setMaxRecordTime(al_sec maxTime) { mMaxRecordTime = maxTime; }
+
+	std::string lastSequenceName();
+
 	SequenceRecorder & operator<< (PresetHandler &handler) { registerPresetHandler(handler);  return *this; }
 
 	void registerPresetHandler(PresetHandler &handler) {
@@ -114,12 +118,15 @@ private:
 	PresetHandler *mPresetHandler;
 	std::string mPresetName;
 	bool mOverwrite;
+	std::string mLastSequenceName;
 
 	std::mutex mSequenceLock;
 	std::condition_variable mSequenceConditionVar;
 
 	bool mRecording;
 	std::thread *mRecorderThread;
+
+	al_sec mMaxRecordTime;
 };
 
 
