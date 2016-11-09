@@ -184,7 +184,10 @@ void HtmlInterfaceServer::writeHtmlFile(PresetServer &presetServer, std::string 
 	float padding = 0.01;
 	float width = (1.0- (padding * (buttonsPerRow + 1)))/buttonsPerRow;
 	float height = width;
-	for(int i = 0; i < 40; ++i) {
+	if (numPresets < 0) {
+		numPresets = 40;
+	}
+	for(int i = 0; i < numPresets; ++i) {
 		code += "var preset_" + std::to_string(i) + " = new Interface.Button({\n";
 		code += "label: '" + std::to_string(i) + "',\n";
 		code += "bounds: [" + std::to_string(padding + ((i%buttonsPerRow) * (padding + width))) + ",";
