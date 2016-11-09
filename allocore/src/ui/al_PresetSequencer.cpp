@@ -190,6 +190,13 @@ void SequenceServer::onMessage(osc::Message &m)
 		} else {
 			std::cout << "Sequence Server. OSC received, but PresetSequencer not registered." << std::endl;
 		}
+	} else if(m.addressPattern() == mOSCpath && m.typeTags() == ""){
+		std::cout << "start last recorder sequence " << std::endl;
+		if (mSequencer) {
+			mSequencer->playSequence(mRecorder->lastSequenceName());
+		} else {
+			std::cout << "Sequence Server. OSC received, but PresetSequencer not registered." << std::endl;
+		}
 	} else if(m.addressPattern() == mOSCpath + "/startRecord" && m.typeTags() == "s"){
 		std::string val;
 		m >> val;

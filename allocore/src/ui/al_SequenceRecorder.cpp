@@ -11,7 +11,7 @@
 using namespace al;
 
 SequenceRecorder::SequenceRecorder() :
-    mRecorderThread(nullptr)
+    mRecorderThread(nullptr), mMaxRecordTime(60.0)
 {
 }
 
@@ -115,7 +115,8 @@ void SequenceRecorder::presetChanged(int index, void *sender, void *userData)
 void SequenceRecorder::recorderFunction(SequenceRecorder *recorder, std::string sequenceName)
 {
 	std::vector<Step> steps;
-	while(recorder->mRecording) {
+	al_sec startTime = al::timeNow();
+	while(recorder->mRecording && (al::timeNow() - startTime) < recorder->mMaxRecordTime) {
 		al_sec previousTime = al::timeNow();
 		{
 			std::unique_lock<std::mutex> lk(recorder->mSequenceLock);
@@ -157,10 +158,11 @@ void SequenceRecorder::recorderFunction(SequenceRecorder *recorder, std::string 
 	if (!recorder->mOverwrite) {
 		std::string newFileName = fileName;
 		int counter = 0;
+		std::string newSequenceName = sequenceName;
 		while (File::exists(newFileName)) {
-			newFileName = path + sequenceName + "_" + std::to_string(counter++) +  ".sequence";
+			newSequenceName = sequenceName + "_" + std::to_string(counter++);
 		}
-		fileName = newFileName;
+		fileName =  path + newSequenceName + ".sequence";
 	}
 	std::ofstream f(fileName);
 	if (!f.is_open()) {
@@ -172,6 +174,12 @@ void SequenceRecorder::recorderFunction(SequenceRecorder *recorder, std::string 
 		std::cout << "Error while writing sequence file: " << fileName << std::endl;
 	}
 	f.close();
+	recorder->mLastSequenceName = fileName;
 }
 
 
+
+std::string SequenceRecorder::lastSequenceName()
+{
+	return mLastSequenceName;
+}
