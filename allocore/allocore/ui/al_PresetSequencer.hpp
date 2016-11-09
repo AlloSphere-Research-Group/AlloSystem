@@ -49,9 +49,12 @@
 #include <utility>
 
 #include "allocore/ui/al_Preset.hpp"
+#include "allocore/ui/al_SequenceRecorder.hpp"
 
 namespace al
 {
+
+class SequenceRecorder;
 
 /**
  * @brief The PresetSequencer class allows triggering presets from a PresetHandler over time.
@@ -201,6 +204,11 @@ public:
 //		}, this);
 	}
 
+	SequenceServer &registerRecorder(SequenceRecorder &recorder) {
+		mRecorder = &recorder;
+		return *this;
+	}
+
 	/**
 	 * @brief print prints information about the server to std::out
 	 */
@@ -214,6 +222,7 @@ public:
 	void stopServer();
 
 	SequenceServer &operator <<(PresetSequencer &sequencer) {return registerSequencer(sequencer);}
+	SequenceServer &operator <<(SequenceRecorder &recorder) {return registerRecorder(recorder);}
 
 	void setAddress(std::string address);
 	std::string getAddress();
@@ -225,6 +234,7 @@ protected:
 private:
 	osc::Recv *mServer;
 	PresetSequencer *mSequencer;
+	SequenceRecorder *mRecorder;
 	ParameterServer *mParamServer;
 //	std::mutex mServerLock;
 	std::string mOSCpath;
