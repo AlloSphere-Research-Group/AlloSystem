@@ -122,9 +122,9 @@ void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
 // SequenceServer ----------------------------------------------------------------
 
 SequenceServer::SequenceServer(std::string oscAddress, int oscPort) :
-    mServer(nullptr), mSequencer(nullptr),
-    mOSCpath("/sequence"),
-    mParamServer(nullptr)
+    mServer(nullptr), mSequencer(nullptr), mRecorder(nullptr),
+    mParamServer(nullptr),
+    mOSCpath("/sequence")
 {
 	mServer = new osc::Recv(oscPort, oscAddress.c_str(), 0.001); // Is this 1ms wait OK?
 	if (mServer) {
@@ -164,6 +164,36 @@ void SequenceServer::onMessage(osc::Message &m)
 			mSequencer->playSequence(val);
 		} else {
 			std::cout << "Sequence Server. OSC received, but PresetSequencer not registered." << std::endl;
+		}
+	} else if(m.addressPattern() == mOSCpath + "/startRecord" && m.typeTags() == "s"){
+		std::string val;
+		m >> val;
+		std::cout << "/startRecord" << val << std::endl;
+		if (mRecorder) {
+			mRecorder->startRecord(val);
+		} else {
+			std::cout << "SequenceServer: /startRecord received but no recorder registered." << std::endl;
+		}
+	} else if(m.addressPattern() == mOSCpath + "/stopRecord") {
+		std::cout << "/stopRecord" << std::endl;
+		if (mRecorder) {
+			mRecorder->stopRecord();
+		} else {
+			std::cout << "SequenceServer: /stopRecord received but no recorder registered." << std::endl;
+		}
+	} else if(m.addressPattern() == mOSCpath + "/record" && m.typeTags() == "f"){
+		float val;
+		m >> val;
+		std::cout << "start sequence " << val << std::endl;
+		if (mRecorder) {
+			if (val == 0.0f) {
+				mRecorder->stopRecord();
+			} else {
+				bool overwrite = (val > 0.0f);
+				mRecorder->startRecord("NewSequence", overwrite);
+			}
+		} else {
+			std::cout << "SequenceServer: /record received but no recorder registered." << std::endl;
 		}
 	}
 }
