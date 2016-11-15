@@ -161,8 +161,9 @@ void SequenceRecorder::recorderFunction(SequenceRecorder *recorder, std::string 
 		std::string newSequenceName = sequenceName;
 		while (File::exists(newFileName)) {
 			newSequenceName = sequenceName + "_" + std::to_string(counter++);
+			newFileName =  path + newSequenceName + ".sequence";
 		}
-		fileName =  path + newSequenceName + ".sequence";
+		fileName = newFileName;
 	}
 	std::ofstream f(fileName);
 	if (!f.is_open()) {
