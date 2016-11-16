@@ -1,7 +1,9 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
 \begin_document
 \begin_header
+\save_transient_properties true
+\origin unavailable
 \textclass article
 \begin_preamble
 \usepackage{color}
@@ -30,16 +32,16 @@ framexleftmargin=1em,
 \language_package default
 \inputencoding auto
 \fontencoding global
-\font_roman default
-\font_sans default
-\font_typewriter default
-\font_math auto
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
 \font_default_family sfdefault
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
-\font_sf_scale 100
-\font_tt_scale 100
+\font_sf_scale 100 100
+\font_tt_scale 100 100
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -187,7 +189,7 @@ Mac OS X 10.5 (Leopard) / 10.6 (Snow Leopard) / 10.7 (Lion) / 10.8 (Mountain
 \end_layout
 
 \begin_layout Itemize
-Windows 7 / 8
+Windows 7 / 8 / 10
 \end_layout
 
 \begin_layout Standard
@@ -293,6 +295,10 @@ Install Development Tools
 \begin_layout Standard
 Open the App Store application and search for ``xcode''.
  On the result screen, select and install the Xcode application:
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -444,7 +450,7 @@ status open
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="2">
-<features rotate="0" booktabs="true" tabularvalignment="middle">
+<features booktabs="true" tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top">
 <row>
@@ -1026,6 +1032,10 @@ msys.bat
 \family default
 .
  The MSYS shell looks like this:
+\begin_inset Separator latexpar
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -1045,7 +1055,7 @@ If your user name (the text before the @ symbol) has spaces in it, then
  see section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:MinGW/MSYS:-Spaces-in-user-name"
+reference "subsec:MinGW/MSYS:-Spaces-in-user-name"
 
 \end_inset
 
@@ -1053,10 +1063,14 @@ reference "sub:MinGW/MSYS:-Spaces-in-user-name"
 \end_layout
 
 \begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
 At the command prompt, run the command
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 \begin_inset listings
 inline false
 status open
@@ -1078,6 +1092,11 @@ C:/MinGW
  (note the direction of the slash!).
  When done, restart MSYS.
  At this point, installation of MinGW/MSYS is complete.
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Subsubsection
@@ -1198,11 +1217,11 @@ $ sudo apt-get install git
 \end_layout
 
 \begin_layout Plain Layout
-$ git config --global color.ui true
+$ git config –global color.ui true
 \end_layout
 
 \begin_layout Plain Layout
-$ git config --global user.name 
+$ git config –global user.name 
 \begin_inset Quotes eld
 \end_inset
 
@@ -1214,7 +1233,7 @@ username
 \end_layout
 
 \begin_layout Plain Layout
-$ git config --global user.email 
+$ git config –global user.email 
 \begin_inset Quotes eld
 \end_inset
 
@@ -1399,7 +1418,7 @@ deactivate all virus checkers and antispyware programs, such as Windows
  See also 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:MinGW/MSYS Freezes"
+reference "subsec:MinGW/MSYS Freezes"
 
 \end_inset
 
@@ -1437,32 +1456,20 @@ $ make allocore
 
 \end_inset
 
-To check if everything installed successfully you can build an example by
- first running
+To check if everything installed successfully, build and run an example
+ using the command
 \begin_inset listings
 inline false
 status open
 
 \begin_layout Plain Layout
 
-$ make gatherexamples
+$ ./run.sh allocore/examples/io/appSimple.cpp
 \end_layout
 
 \end_inset
 
-and then
-\begin_inset listings
-inline false
-status open
-
-\begin_layout Plain Layout
-
-$ make examples/allocore/io/appSimple.cpp
-\end_layout
-
-\end_inset
-
-If you see a window with animated graphics, then your system is configured
+If you see a window with animated graphics, then AlloSystem is installed
  correctly.
 \end_layout
 
@@ -1474,13 +1481,71 @@ Build-and-Run Applications
 While AlloSystem is intended to be used mainly as a library, it does provide
  a simple means of building and running custom applications that link to
  AlloSystem.
- It is flexible enough to be used all the way from building simple prototypes
+ This is accomplished through the 
+\family typewriter
+run.sh
+\family default
+ shell script.
+ You can build and run any source (
+\family typewriter
+.cpp
+\family default
+) files having a 
+\family typewriter
+main()
+\family default
+ function using a command with the format
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ ./run.sh path/to/file/myfile.cpp
+\end_layout
+
+\end_inset
+
+The executable binary is placed in 
+\family typewriter
+build/bin/
+\family default
+ and has the same name as the source file.
+ If you would only like to build the application, without also running it,
+ then you can append 
+\family typewriter
+AUTORUN=0
+\family default
+ to the line above, i.e.,
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ ./run.sh path/to/file/myfile.cpp AUTORUN=0
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status open
+
+\begin_layout Plain Layout
+It is flexible enough to be used all the way from building simple prototypes
  to creating complex applications.
  This section describes how to setup and use AlloSystem's ``build-and-run''
  capability.
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 By default, there are two directories recognized by the AlloSystem build-and-run
  facility: 
 \family typewriter
@@ -1518,7 +1583,7 @@ work/
  with the command
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 \begin_inset listings
 inline false
 status open
@@ -1557,6 +1622,11 @@ status open
 \begin_layout Plain Layout
 
 $ make work/myfile.cpp AUTORUN=0
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -1693,7 +1763,7 @@ Advanced Configuration
 Custom Project Directories
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Custom-Project-Directories"
+name "subsec:Custom-Project-Directories"
 
 \end_inset
 
@@ -2090,7 +2160,7 @@ The installation process involves many steps and if there is an error in
 \begin_layout Plain Layout
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="3">
-<features rotate="0" tabularvalignment="middle">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="25col%">
 <column alignment="left" valignment="top" width="25col%">
 <column alignment="left" valignment="top" width="50col%">
@@ -2356,7 +2426,7 @@ work/
  or one of your build-and-run user directories (
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Custom-Project-Directories"
+reference "subsec:Custom-Project-Directories"
 
 \end_inset
 
@@ -2400,7 +2470,7 @@ make
  Commands
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MinGW/MSYS Freezes"
+name "subsec:MinGW/MSYS Freezes"
 
 \end_inset
 
@@ -2428,7 +2498,7 @@ http://cygwin.com/faq/faq.html#faq.using.bloda
 MinGW/MSYS: Spaces in User Name
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:MinGW/MSYS:-Spaces-in-user-name"
+name "subsec:MinGW/MSYS:-Spaces-in-user-name"
 
 \end_inset
 
