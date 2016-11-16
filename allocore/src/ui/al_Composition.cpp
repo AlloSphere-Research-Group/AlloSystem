@@ -70,6 +70,11 @@ void Composition::stop()
 	mSequencer->stopSequence();
 }
 
+std::string Composition::getName()
+{
+  return mCompositionName;
+}
+
 int Composition::size()
 {
 	return mCompositionSteps.size();

@@ -66,6 +66,8 @@ public:
 	void play();
 	void stop();
 
+	std::string getName();
+
 	int size();
 	const CompositionStep getStep(int index);
 	void insertStep(std::string name, float deltaTime, int index);

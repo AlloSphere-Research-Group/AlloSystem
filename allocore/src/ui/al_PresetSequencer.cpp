@@ -5,6 +5,7 @@
 #include <sstream>
 
 #include "allocore/ui/al_PresetSequencer.hpp"
+#include "allocore/ui/al_Composition.hpp"
 #include "allocore/io/al_File.hpp"
 
 using namespace al;
@@ -239,6 +240,25 @@ void SequenceServer::onMessage(osc::Message &m)
 			}
 		} else {
 			std::cout << "SequenceServer: /record received but no recorder registered." << std::endl;
+		}
+	} else if(m.addressPattern() == mOSCpath + "/composition" && m.typeTags() == "s"){
+		std::string val;
+		m >> val;
+		std::cout << "play composition " << val << std::endl;
+		for(Composition *composition:mCompositions) {
+			std::cout << composition->getName() << std::endl;
+			if (val == composition->getName()) {
+				composition->play();
+			}
+		}
+	} else if(m.addressPattern() == mOSCpath + "/composition/stop" && m.typeTags() == "s"){
+		std::string val;
+		m >> val;
+		std::cout << "play composition " << val << std::endl;
+		for(Composition *composition:mCompositions) {
+			if (val == composition->getName()) {
+				composition->stop();
+			}
 		}
 	}
 }

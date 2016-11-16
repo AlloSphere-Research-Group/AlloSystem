@@ -292,6 +292,9 @@ void PresetHandler::loadPresetMap(std::string mapFileName)
 		}
 		std::string line;
 		while (getline(f, line)) {
+            if (line == "") {
+                continue;
+            }
 			if (line.substr(0, 2) == "::") {
 				if (mVerbose) {
 					std::cout << "End preset map."<< std::endl;
