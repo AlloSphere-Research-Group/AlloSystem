@@ -17,13 +17,6 @@ PeriodicThread::PeriodicThread(const PeriodicThread& o)
 	mRun(o.mRun)
 {}
 
-
-
-void * PeriodicThread::sPeriodicFunc(void * userData){
-	static_cast<PeriodicThread *>(userData)->go();
-	return NULL;
-}
-
 PeriodicThread& PeriodicThread::autocorrect(float factor){
 	mAutocorrect=factor;
 	return *this;
@@ -38,10 +31,10 @@ double PeriodicThread::period() const {
 	return mPeriod * 1e-9;
 }
 
-void PeriodicThread::start(ThreadFunction& func){
-	mUserFunc = &func;
+void PeriodicThread::start(std::function<void (void)> func){
+	mUserFunc = func;
 	mRun = true;
-	Thread::start(sPeriodicFunc, this);
+	Thread::start([this](){go();});
 }
 
 void PeriodicThread::stop(){
@@ -73,7 +66,7 @@ void PeriodicThread::go(){
 	mWait = 0;
 	mTimeBehind = 0;
 	while(mRun){
-		(*mUserFunc)();
+		mUserFunc();
 
 		mTimePrev = mTimeCurr + mWait;
 		mTimeCurr = al_steady_time_nsec();
