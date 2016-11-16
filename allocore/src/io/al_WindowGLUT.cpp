@@ -513,15 +513,17 @@ private:
 						if(timePost < timeNext){
 							double wait = timeNext - timePost;
 							waitMsec = unsigned(wait * 1000. + 0.5);
-							//printf("num=%llu, wait=%5.3f frames, %2u ms, dt=%5.3f, fps=%5.2f (avg=%5.2f)\n", (unsigned long long)(timePost*FPS), wait*FPS, waitMsec, win->mDeltaTime, win->fpsActual(), win->fpsAvg());
+							//printf("num=%lu, wait=%5.3f frames, %2u ms, dt=%5.3f, fps=%5.2f (avg=%5.2f)\n", (unsigned long)(timePost*FPS), wait*FPS, waitMsec, win->mDeltaTime, win->fpsActual(), win->fpsAvg());
 						}
 						else{
 							//printf("dropped frame!\n");
 						}
 					}
-
+					#ifdef AL_WINDOWS
+						// Passing 0 ms wait to glutTimerFunc may cause lockup on Windows
+						if(0==waitMsec) waitMsec=1;
+					#endif
 					glutTimerFunc(waitMsec, scheduleDrawStaticGLUT, winID);
-
 				}
 				else {
 					impl->mScheduled = false;
