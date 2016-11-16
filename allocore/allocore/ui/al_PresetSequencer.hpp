@@ -55,6 +55,7 @@ namespace al
 {
 
 class SequenceRecorder;
+class Composition;
 
 /**
  * @brief The PresetSequencer class allows triggering presets from a PresetHandler over time.
@@ -209,6 +210,12 @@ public:
 		return *this;
 	}
 
+	SequenceServer &registerComposition(Composition &composition) {
+		mCompositions.push_back(&composition);
+		return *this;
+	}
+
+
 	/**
 	 * @brief print prints information about the server to std::out
 	 */
@@ -223,6 +230,7 @@ public:
 
 	SequenceServer &operator <<(PresetSequencer &sequencer) {return registerSequencer(sequencer);}
 	SequenceServer &operator <<(SequenceRecorder &recorder) {return registerRecorder(recorder);}
+	SequenceServer &operator <<(Composition &composition) {return registerComposition(composition);}
 
 	void setAddress(std::string address);
 	std::string getAddress();
@@ -236,6 +244,7 @@ private:
 	PresetSequencer *mSequencer;
 	SequenceRecorder *mRecorder;
 	ParameterServer *mParamServer;
+	std::vector<Composition *> mCompositions;
 //	std::mutex mServerLock;
 	std::string mOSCpath;
 	std::string mOSCQueryPath;
