@@ -138,7 +138,7 @@ public:
 	class Impl;
 
 private:
-	std::auto_ptr<Impl> mImpl;
+	std::unique_ptr<Impl> mImpl;
 
 	std::string mName;
 	std::string mAddr;
