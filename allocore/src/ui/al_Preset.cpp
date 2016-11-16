@@ -436,7 +436,7 @@ std::map<std::string, float> PresetHandler::loadPresetValues(std::string name)
 
 
 PresetServer::PresetServer(std::string oscAddress, int oscPort) :
-    mServer(nullptr), mPresetHandler(nullptr), mParamServer(nullptr), mOSCpath("/preset"),
+    mServer(nullptr), mParamServer(nullptr), mOSCpath("/preset"),
     mAllowStore(true), mStoreMode(false)
 {
 	mServer = new osc::Recv(oscPort, oscAddress.c_str(), 0.001); // Is this 1ms wait OK?
@@ -450,7 +450,7 @@ PresetServer::PresetServer(std::string oscAddress, int oscPort) :
 
 
 PresetServer::PresetServer(ParameterServer &paramServer) :
-    mServer(nullptr), mPresetHandler(nullptr), mParamServer(&paramServer), mOSCpath("/preset"),
+    mServer(nullptr), mParamServer(&paramServer), mOSCpath("/preset"),
     mAllowStore(true), mStoreMode(false)
 {
 	paramServer.registerOSCListener(this);
@@ -478,29 +478,41 @@ void PresetServer::onMessage(osc::Message &m)
 		float val;
 		m >> val;
 		if (!this->mStoreMode) {
-			mPresetHandler->recallPreset(static_cast<int>(val));
+      for (PresetHandler *handler: mPresetHandlers) {
+			  handler->recallPreset(static_cast<int>(val));
+      }
 		} else {
-			mPresetHandler->storePreset(static_cast<int>(val));
+      for (PresetHandler *handler: mPresetHandlers) {
+			  handler->storePreset(static_cast<int>(val));
+      }
 			this->mStoreMode = false;
 		}
 	} else if(m.addressPattern() == mOSCpath && m.typeTags() == "i"){
 		int val;
 		m >> val;
 		if (!this->mStoreMode) {
-			mPresetHandler->recallPreset(val);
+      for (PresetHandler *handler: mPresetHandlers) {
+			  handler->recallPreset(val);
+      }
 		} else {
-			mPresetHandler->storePreset(val);
+      for (PresetHandler *handler: mPresetHandlers) {
+  		  handler->storePreset(val);
+      }
 			this->mStoreMode = false;
 		}
 	} else if (m.addressPattern() == mOSCpath + "/morphTime" && m.typeTags() == "f")  {
 		float val;
 		m >> val;
-		mPresetHandler->setMorphTime(val);
+    for (PresetHandler *handler: mPresetHandlers) {
+		  handler->setMorphTime(val);
+    }
 	} else if (m.addressPattern() == mOSCpath + "/store" && m.typeTags() == "f")  {
 		float val;
 		m >> val;
 		if (this->mAllowStore) {
-			mPresetHandler->storePreset(static_cast<int>(val));
+      for (PresetHandler *handler: mPresetHandlers) {
+  		  handler->storePreset(static_cast<int>(val));
+      }
 		}
 	} else if (m.addressPattern() == mOSCpath + "/storeMode" && m.typeTags() == "f")  {
 		float val;
@@ -517,9 +529,13 @@ void PresetServer::onMessage(osc::Message &m)
 			m >> val;
 			if (static_cast<int>(val) == 1) {
 				if (!this->mStoreMode) {
-					mPresetHandler->recallPreset(index);
+          for (PresetHandler *handler: mPresetHandlers) {
+      		  handler->recallPreset(index);
+          }
 				} else {
-					mPresetHandler->storePreset(index);
+          for (PresetHandler *handler: mPresetHandlers) {
+      		  handler->storePreset(index);
+          }
 					this->mStoreMode = false;
 				}
 			}
