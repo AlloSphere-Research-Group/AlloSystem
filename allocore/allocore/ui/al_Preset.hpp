@@ -158,8 +158,8 @@ public:
 	PresetHandler &operator << (Parameter &param) { return this->registerParameter(param); }
 
 private:
-	void loadPresetMap();
-	void storePresetMap();
+	void loadPresetMap(std::string mapFileName = "_presetMap.txt");
+	void storePresetMap(std::string mapFileName = "_presetMap.txt");
 	std::map<std::string, float> loadPresetValues(std::string name);
 
 	static void morphingFunction(PresetHandler *handler);

@@ -14,6 +14,7 @@ set(OSC_HEADERS
 	allocore/ui/al_PresetSequencer.hpp
 	allocore/ui/al_SequenceRecorder.hpp
 	allocore/ui/al_Composition.hpp
+	allocore/ui/al_PresetMapper.hpp
 )
 
 # for oscpack (oscpack sources are included with AlloSystem)
