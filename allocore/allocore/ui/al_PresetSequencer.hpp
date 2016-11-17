@@ -123,6 +123,17 @@ public:
 	void stopSequence();
 
 	/**
+	 * @brief Stores a copy of a sequence with its associated presets
+	 * @param sequenceName Name of sequence without extension. Searched for in mDirectory
+	 * @param overwrite if directory exists, delete it before writing if overwrite is true.
+	 *
+	 * Stores a copy of the sequence and all its associated presets in a new folder.
+	 * A PresetHandler must be registered for this to work as this sets the current
+	 * Sequence and preset directory.
+	 */
+	void archiveSequence(std::string sequenceName, bool overwrite = true);
+
+	/**
 	 * @brief getSequenceList returns a list of sequences in the current sequence directory
 	 * @return a list of sequence names without path and without the '.sequence' extension
 	 */
@@ -140,12 +151,17 @@ public:
 
 private:
 
-	static void sequencerFunction(PresetSequencer *sequencer);
 	struct Step {
 		std::string presetName;
 		float delta; // The time to get to the preset
 		float duration; // The time to stay in the preset before the next step
 	};
+
+	static void sequencerFunction(PresetSequencer *sequencer);
+
+	std::queue<Step> loadSequence(std::string sequenceName);
+
+	std::string buildFullPath(std::string sequenceName);
 
 	std::queue<Step> mSteps;
 	std::string mDirectory;

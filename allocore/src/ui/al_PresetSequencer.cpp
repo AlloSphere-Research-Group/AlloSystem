@@ -11,53 +11,20 @@ using namespace al;
 
 void PresetSequencer::playSequence(std::string sequenceName)
 {
-	std::string fullName = mDirectory;
-	if (fullName.back() != '/') {
-		fullName += "/";
-	}
-	if (sequenceName.size() < 9 || sequenceName.substr(sequenceName.size() - 9) != ".sequence") {
-		fullName += sequenceName + ".sequence";
-	}
-	std::ifstream f(fullName);
-	if (!f.is_open()) {
-		std::cout << "Could not open:" << fullName << std::endl;
-		return;
-	}
+	std::queue<Step> steps = loadSequence(sequenceName);
 	stopSequence();
-
-	mSequenceLock.lock();
-	while (!mSteps.empty()) {
-		mSteps.pop();
-	}
-	std::string line;
-	while (getline(f, line)) {
-		if (line.substr(0, 2) == "::") {
-			break;
+	if (steps.size() > 0) {
+		mSequenceLock.lock();
+		while (!mSteps.empty()) {
+			mSteps.pop();
 		}
-		std::stringstream ss(line);
-		std::string name, delta,duration;
-		std::getline(ss, name, ':');
-		std::getline(ss, delta, ':');
-		std::getline(ss, duration, ':');
-		if (name.size() > 0 && name[0] != '#') {
-			Step step;
-			step.presetName = name;
-			step.delta = std::stof(delta);
-			step.duration = std::stof(duration);
-			mSteps.push(step);
-			// std::cout << name  << ":" << delta << ":" << duration << std::endl;
-		}
-	}
-	if (f.bad()) {
-		std::cout << "Error reading:" << sequenceName << std::endl;
-		return;
-	}
-	mRunning = true;
-	mSequencerThread = new std::thread(PresetSequencer::sequencerFunction, this);
-	mSequenceLock.unlock();
+		mRunning = true;
+		mSequencerThread = new std::thread(PresetSequencer::sequencerFunction, this);
+		mSequenceLock.unlock();
 
-	std::thread::id seq_thread_id = mSequencerThread->get_id();
-	std::cout << "Preset Sequencer thread id: " << std::hex << seq_thread_id << std::endl;
+		std::thread::id seq_thread_id = mSequencerThread->get_id();
+		std::cout << "Preset Sequencer thread id: " << std::hex << seq_thread_id << std::endl;
+	}
 }
 
 void PresetSequencer::stopSequence()
@@ -68,6 +35,16 @@ void PresetSequencer::stopSequence()
 		delete mSequencerThread;
 		mSequencerThread = nullptr;
 	}
+}
+
+void PresetSequencer::archiveSequence(std::string sequenceName, bool overwrite)
+{
+	std::queue<Step> steps = loadSequence(sequenceName);
+	std::string fullPath = buildFullPath(sequenceName);
+	if(File::isDirectory(sequenceName)) {
+
+	}
+
 }
 
 std::vector<std::string> al::PresetSequencer::getSequenceList()
@@ -117,6 +94,54 @@ void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
 	std::cout << "Sequence finished." << std::endl;
 	sequencer->mRunning = false;
 	sequencer->mSequenceLock.unlock();
+}
+
+std::queue<PresetSequencer::Step> PresetSequencer::loadSequence(std::string sequenceName)
+{
+	std::queue<Step> steps;
+	std::string fullName = buildFullPath(sequenceName);
+	std::ifstream f(fullName);
+	if (!f.is_open()) {
+		std::cout << "Could not open:" << fullName << std::endl;
+		return steps;
+	}
+
+	std::string line;
+	while (getline(f, line)) {
+		if (line.substr(0, 2) == "::") {
+			break;
+		}
+		std::stringstream ss(line);
+		std::string name, delta,duration;
+		std::getline(ss, name, ':');
+		std::getline(ss, delta, ':');
+		std::getline(ss, duration, ':');
+		if (name.size() > 0 && name[0] != '#') {
+			Step step;
+			step.presetName = name;
+			step.delta = std::stof(delta);
+			step.duration = std::stof(duration);
+			steps.push(step);
+			// std::cout << name  << ":" << delta << ":" << duration << std::endl;
+		}
+	}
+	if (f.bad()) {
+		std::cout << "Error reading:" << sequenceName << std::endl;
+	}
+	return steps;
+}
+
+
+std::string al::PresetSequencer::buildFullPath(std::string sequenceName)
+{
+	std::string fullName = mDirectory;
+	if (fullName.back() != '/') {
+		fullName += "/";
+	}
+	if (sequenceName.size() < 9 || sequenceName.substr(sequenceName.size() - 9) != ".sequence") {
+		fullName += sequenceName + ".sequence";
+	}
+	return fullName;
 }
 
 // SequenceServer ----------------------------------------------------------------
@@ -234,5 +259,3 @@ void SequenceServer::changeCallback(int value, void *sender, void *userData)
 	Parameter *parameter = static_cast<Parameter *>(sender);
 	server->notifyListeners(server->mOSCpath, value);
 }
-
-
