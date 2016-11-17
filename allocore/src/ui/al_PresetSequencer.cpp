@@ -5,6 +5,7 @@
 #include <sstream>
 
 #include "allocore/ui/al_PresetSequencer.hpp"
+#include "allocore/ui/al_Composition.hpp"
 #include "allocore/io/al_File.hpp"
 
 using namespace al;
@@ -80,6 +81,8 @@ void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
 		targetTime += std::chrono::microseconds((int) (totalWaitTime*1e6 - (granularity * 1.5 * 1000.0)));
 
 		while (std::chrono::high_resolution_clock::now() < targetTime) { // Granularity to allow more responsive stopping of composition playback
+		  //std::cout << std::chrono::high_resolution_clock::to_time_t(targetTime) 
+		//	    << "---" << std::chrono::high_resolution_clock::to_time_t(std::chrono::high_resolution_clock::now()) << std::endl;
 			std::this_thread::sleep_for(std::chrono::milliseconds(granularity));
 			if (sequencer->mRunning == false) {
 				targetTime = std::chrono::high_resolution_clock::now();
@@ -190,6 +193,22 @@ void SequenceServer::onMessage(osc::Message &m)
 		} else {
 			std::cout << "Sequence Server. OSC received, but PresetSequencer not registered." << std::endl;
 		}
+	} else if(m.addressPattern() == mOSCpath + "/stop" ){
+			std::cout << "stop sequence " << std::endl;
+			if (mSequencer) {
+				mSequencer->stopSequence();
+			} else {
+				std::cout << "Sequence Server. OSC received, but PresetSequencer not registered." << std::endl;
+			}
+		} else if(m.addressPattern() == mOSCpath && m.typeTags() == "N"){
+		std::cout << "start last recorder sequence " << std::endl;
+	} else if(m.addressPattern() == mOSCpath + "/last"){
+	  std::cout << "start last recorder sequence " << mRecorder->lastSequenceName() << std::endl;
+		if (mSequencer) {
+			mSequencer->playSequence(mRecorder->lastSequenceName());
+		} else {
+			std::cout << "Sequence Server. OSC received, but PresetSequencer not registered." << std::endl;
+		}
 	} else if(m.addressPattern() == mOSCpath + "/startRecord" && m.typeTags() == "s"){
 		std::string val;
 		m >> val;
@@ -209,16 +228,36 @@ void SequenceServer::onMessage(osc::Message &m)
 	} else if(m.addressPattern() == mOSCpath + "/record" && m.typeTags() == "f"){
 		float val;
 		m >> val;
-		std::cout << "start sequence " << val << std::endl;
+		std::cout << "record sequence " << val << std::endl;
 		if (mRecorder) {
 			if (val == 0.0f) {
 				mRecorder->stopRecord();
+				std::cout << "record sequence " << val << std::endl;
 			} else {
 				bool overwrite = (val > 0.0f);
 				mRecorder->startRecord("NewSequence", overwrite);
 			}
 		} else {
 			std::cout << "SequenceServer: /record received but no recorder registered." << std::endl;
+		}
+	} else if(m.addressPattern() == mOSCpath + "/composition" && m.typeTags() == "s"){
+		std::string val;
+		m >> val;
+		std::cout << "play composition " << val << std::endl;
+		for(Composition *composition:mCompositions) {
+			std::cout << composition->getName() << std::endl;
+			if (val == composition->getName()) {
+				composition->play();
+			}
+		}
+	} else if(m.addressPattern() == mOSCpath + "/composition/stop" && m.typeTags() == "s"){
+		std::string val;
+		m >> val;
+		std::cout << "play composition " << val << std::endl;
+		for(Composition *composition:mCompositions) {
+			if (val == composition->getName()) {
+				composition->stop();
+			}
 		}
 	}
 }

@@ -234,11 +234,11 @@ public:
 	virtual void onMessage(osc::Message& m);
 
 	PresetServer &registerPresetHandler(PresetHandler &presetHandler) {
-		mPresetHandler = &presetHandler;
-		mPresetHandler->registerPresetCallback(PresetServer::changeCallback,
+		mPresetHandlers.push_back(&presetHandler);
+		presetHandler.registerPresetCallback(PresetServer::changeCallback,
 		                                       (void *) this);
 
-		mPresetHandler->registerMorphTimeCallback(
+		presetHandler.registerMorphTimeCallback(
 		            [](float value, void *sender,
 		            void *userData, void * blockSender) {
 			static_cast<PresetServer *>(userData)->notifyListeners(
@@ -258,7 +258,7 @@ protected:
 
 private:
 	osc::Recv *mServer;
-	PresetHandler *mPresetHandler;
+	std::vector<PresetHandler *> mPresetHandlers;
 	ParameterServer *mParamServer;
 //	std::mutex mServerLock;
 	std::string mOSCpath;
