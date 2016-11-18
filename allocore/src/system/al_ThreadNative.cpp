@@ -14,10 +14,6 @@ namespace al {
 #ifdef USE_PTHREAD
 #include <pthread.h>
 
-//typedef pthread_t ThreadHandle;
-//typedef void * (*ThreadFunction)(void *);
-//#define THREAD_FUNCTION(name) void * name(void * user)
-
 struct Thread::Impl{
 	Impl()
 	:	mHandle(0)
@@ -30,13 +26,6 @@ struct Thread::Impl{
 
 	~Impl(){ //printf("Thread::~Impl(): %p\n", this);
 		pthread_attr_destroy(&mAttr);
-	}
-
-
-	bool start(ThreadFunction& func){
-		if(mHandle) return false;
-		//return 0 == pthread_create(&mHandle, NULL, cThreadFunc, &func);
-		return 0 == pthread_create(&mHandle, &mAttr, cThreadFunc, &func);
 	}
 
 	bool start(std::function<void(void)>& func){
@@ -88,12 +77,6 @@ struct Thread::Impl{
 
 	pthread_t mHandle;
 	pthread_attr_t mAttr;
-
-	static void * cThreadFunc(void * user){
-		ThreadFunction& tfunc = *((ThreadFunction*)user);
-		tfunc();
-		return NULL;
-	}
 };
 
 
