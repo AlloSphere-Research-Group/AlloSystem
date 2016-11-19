@@ -231,6 +231,12 @@ public:
 	void index(const Tindex * buf, int size, Tindex indexOffset=0){
 		for(int i=0; i<size; ++i) index((Index)(buf[i] + indexOffset)); }
 
+	template <class...Indices>
+	void index(unsigned i, Indices... indices){
+		index(i);
+		index(indices...);
+	}
+
 
 	/// Append color to color buffer
 	void color(const Color& v) { colors().append(v); }
