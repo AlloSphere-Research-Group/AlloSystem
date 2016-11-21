@@ -1,5 +1,6 @@
 #include <sstream> // ostringstream
 #include <iomanip> // std::setw
+#include <stdio.h> // printf
 #include "allocore/math/al_Constants.hpp"
 #include "allocore/system/al_Time.hpp"
 
@@ -216,6 +217,14 @@ std::string toTimecode(al_nsec t, const std::string& format){
 	}
 
 	return s.str();
+}
+
+
+void Timer::print() const {
+	auto t = getTime();
+	auto dt = t-mStart;
+	double dtSec = al_time_ns2s * dt;
+	printf("%g sec (%g ms) elapsed\n", dtSec, dtSec*1000.);
 }
 
 

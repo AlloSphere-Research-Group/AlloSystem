@@ -79,13 +79,17 @@ public:
 	al_sec elapsedSec() const { return al_time_ns2s * elapsed(); }
 
 	/// Set start time to current time
-	void start(){ mStart=al_steady_time_nsec(); }
+	void start(){ mStart = getTime(); }
 
 	/// Set stop time to current time
-	void stop(){ mStop=al_steady_time_nsec(); }
+	void stop(){ mStop = getTime(); }
+
+	/// Print current elapsed time
+	void print() const;
 
 private:
 	al_nsec mStart=0, mStop=0;	// start and stop times
+	static al_nsec getTime(){ return al_steady_time_nsec(); }
 };
 
 
@@ -147,6 +151,8 @@ protected:
 	double mB, mC;	// 1st & 2nd order weights
 	bool mReset;
 };
+
+
 
 /// A timing source that can be locked to realtime or driven manually
 ///
@@ -221,9 +227,6 @@ protected:
 	bool bUseRT;
 };
 
-
-
 } // al::
 
 #endif /* INCLUDE_AL_TIME_CPP_H */
-
