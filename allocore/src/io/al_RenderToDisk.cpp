@@ -431,7 +431,7 @@ void RenderToDisk::createVideo(){
 	#endif
 
 	std::string args;
-	args += " -r " + std::to_string(1./mFrameDur);
+	args += " -r " + al::toString(1./mFrameDur);
 	args += " -i " + path() + "/%07d." + mImageExt;
 	if(mWroteAudio){
 		args += " -i " + path() + "/output.au -c:a aac -b:a 192k";

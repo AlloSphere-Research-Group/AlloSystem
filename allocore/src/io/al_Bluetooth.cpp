@@ -271,7 +271,7 @@ typedef struct _SOCKADDR_BTH {
 
 struct al::Bluetooth::Impl{
 	
-	int mSocket;
+	SOCKET mSocket;
 	SOCKADDR_BTH mSockAddr;
 
 
@@ -400,7 +400,7 @@ struct al::Bluetooth::Impl{
 
 		// Create a reliable, stream-based connection (like TCP)
 		mSocket = ::socket(AF_BTH, SOCK_STREAM, BTHPROTO_RFCOMM);
-		if(INVALID_SOCKET == unsigned(mSocket)){
+		if(INVALID_SOCKET == mSocket){
 			fprintf(stderr, "Can't open RFCOMM socket:\n");
 			printLastError();
 			return -1;
