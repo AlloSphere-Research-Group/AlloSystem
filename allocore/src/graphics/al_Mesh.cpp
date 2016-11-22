@@ -728,6 +728,10 @@ void Mesh::toTriangles(){
 		// TODO: remove degenerate triangles
 		else if(Ni == 0 && Nv > 3){
 			stripToTri(vertices());
+			for (unsigned int i = 0; i < vertices().size() - 2; i+=2){
+				index(i); index(i+1); index(i+2);
+				index(i+2); index(i+1); index(i+3);
+			}
 			if(normals().size() >= Nv) stripToTri(normals());
 			if(colors().size() >= Nv) stripToTri(colors());
 			if(coloris().size() >= Nv) stripToTri(coloris());
@@ -791,7 +795,7 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 		return false;
 	}
 
-	const unsigned Nv = vertices().size();
+	unsigned Nv = vertices().size();
 
 	if(!Nv) return false;
 
@@ -803,7 +807,7 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 	// not ideal if already triangles!
 	Mesh m(*this);
 	m.toTriangles();
-
+	Nv = m.vertices().size();
 	const unsigned Nc = m.colors().size();
 	const unsigned Nci= m.coloris().size();
 	const unsigned Ni = m.indices().size();
@@ -816,7 +820,7 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 	// Header
 	s << "ply\n";
 	s << "format " << (binary ? (bigEndian ? "binary_big_endian" : "binary_little_endian") : "ascii") << " 1.0\n";
-	s << "comment AlloSystem\n";
+	s << "comment Exported by AlloSystem\n";
 
 	if(solidName[0]){
 		s << "comment " << solidName << "\n";
@@ -853,7 +857,7 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 		for(unsigned i = 0; i < Nv; ++i){
 			s.write(reinterpret_cast<const char*>(&m.vertices()[i][0]), sizeof(Mesh::Vertex));
 			if(hasColors){
-				auto col = Nci >= Nv ? m.coloris()[i] : Colori(m.colors()[i]);
+				auto col = Nci >= Nv ? m.coloris()[i] : Colori(m.colors()[i].clamp(1.0));
 				s << col.r << col.g << col.b << col.a;
 			}
 		}
@@ -865,11 +869,20 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 					s.write(reinterpret_cast<const char*>(&m.indices()[i]), Bi*3);
 				}
 				else{
-					unsigned short idx[3];
-					idx[0] = m.indices()[i  ];
-					idx[1] = m.indices()[i+1];
-					idx[2] = m.indices()[i+2];
-					s.write(reinterpret_cast<const char*>(idx), Bi*3);
+					if (Bi == 4) {
+						u_int32_t idx[3];
+						idx[0] = m.indices()[i  ];
+						idx[1] = m.indices()[i+1];
+						idx[2] = m.indices()[i+2];
+						s.write(reinterpret_cast<const char*>(idx), sizeof(int32_t)*3);
+					} else {
+						u_int16_t idx[3];
+						idx[0] = m.indices()[i  ];
+						idx[1] = m.indices()[i+1];
+						idx[2] = m.indices()[i+2];
+						s.write(reinterpret_cast<const char*>(idx), sizeof(u_int16_t)*3);
+
+					}
 					//printf("%u %u %u\n", idx[0], idx[1], idx[2]);
 					/*for(int i=0; i<Bi*3; ++i){
 						printf("%d ", reinterpret_cast<char*>(idx)[i]);
