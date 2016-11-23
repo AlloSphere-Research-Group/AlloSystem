@@ -39,14 +39,57 @@ void PresetSequencer::stopSequence()
 	}
 }
 
-void PresetSequencer::archiveSequence(std::string sequenceName, bool overwrite)
+bool PresetSequencer::archiveSequence(std::string sequenceName, bool overwrite)
 {
+	bool ok = true;
+	std::string fullPath = buildFullPath(sequenceName) + "_archive";
+	if (overwrite) {
+		if(File::isDirectory(fullPath)) {
+			if (!Dir::removeRecursively(fullPath)) {
+				std::cout << "Error removing directory: " << fullPath << " aborting sequence archiving." << std::endl;
+				return false;
+			}
+		} else {
+			if (File::remove(fullPath) != 0) {
+				std::cout << "Error removing file: " << fullPath << " aborting sequence archiving." << std::endl;
+				return false;
+			}
+		}
+		if (!Dir::make(fullPath)) {
+			std::cout << "Error creating sequence archive directory " << fullPath << std::endl;
+			return false;
+		}
+	} else {
+		int counter = 0;
+		while (File::isDirectory(fullPath)) {
+			std::string newName = sequenceName + std::to_string(counter++);
+			fullPath = buildFullPath(newName);
+			if (counter == 0) { // We've wrapped and run out of names...
+				std::cout << "Out of names for sequence archive." << std::endl;
+				return false;
+			}
+		}
+		if (!Dir::make(fullPath)) {
+			std::cout << "Error creating sequence archive directory " << fullPath << std::endl;
+			return false;
+		}
+	}
 	std::queue<Step> steps = loadSequence(sequenceName);
-	std::string fullPath = buildFullPath(sequenceName);
-	if(File::isDirectory(sequenceName)) {
-
+	while(steps.size() > 0) {
+		Step &step = steps.front();
+		std::string presetFilename = mPresetHandler->getCurrentPath() + step.presetName + ".preset";
+		if (!File::copy(presetFilename, fullPath)) {
+			std::cout << "Error copying preset " << presetFilename << " when archiving." << std::endl;
+			ok = false;
+		}
+		steps.pop();
+	}
+	if (!File::copy(buildFullPath(sequenceName), fullPath)) {
+		std::cout << "Error copying sequence " << sequenceName << " when archiving." << std::endl;
+		ok = false;
 	}
 
+	return ok;
 }
 
 std::vector<std::string> al::PresetSequencer::getSequenceList()

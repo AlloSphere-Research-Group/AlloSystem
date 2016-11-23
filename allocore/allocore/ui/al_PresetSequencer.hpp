@@ -127,12 +127,13 @@ public:
 	 * @brief Stores a copy of a sequence with its associated presets
 	 * @param sequenceName Name of sequence without extension. Searched for in mDirectory
 	 * @param overwrite if directory exists, delete it before writing if overwrite is true.
+	 * @return returns false if there was any error archiving sequence
 	 *
 	 * Stores a copy of the sequence and all its associated presets in a new folder.
 	 * A PresetHandler must be registered for this to work as this sets the current
 	 * Sequence and preset directory.
 	 */
-	void archiveSequence(std::string sequenceName, bool overwrite = true);
+	bool archiveSequence(std::string sequenceName, bool overwrite = true);
 
 	/**
 	 * @brief getSequenceList returns a list of sequences in the current sequence directory
