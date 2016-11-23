@@ -1,6 +1,7 @@
 #include <cstring>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <memory>
 #include "allocore/io/al_File.hpp"
 #include "allocore/system/al_Config.h"
 #include <stdlib.h> // realpath (POSIX), _fullpath (Windows)
@@ -103,6 +104,46 @@ int File::write(const std::string& path, const void * v, int size, int items){
 
 int File::write(const std::string& path, const std::string& data){
 	return File::write(path, &data[0], data.size());
+}
+
+bool File::remove(const std::string &path)
+{
+	if (!File::isDirectory(path)) {
+		return ::remove(path.c_str()) == 0;
+	}
+	return false;
+}
+
+bool File::copy(const std::string &srcPath, const std::string &dstPath, unsigned int bufferSize)
+{
+	std::unique_ptr<char> buffer(new char[bufferSize]);
+	if (!File::exists(srcPath) || File::isDirectory(srcPath)) {
+		return false;
+	}
+	std::string outPath = dstPath;
+	if (File::isDirectory(outPath)) {
+		outPath += "/" + File::baseName(srcPath);
+	}
+	outPath = File::conformPathToOS(outPath);
+	File srcFile(srcPath);
+	if (!srcFile.open()) {
+		return false;
+	}
+	File dstFile(outPath, "w");
+	if (!dstFile.open()) {
+		return false;
+	}
+	int bytesRead = 0;
+	unsigned int totalBytes = 0;
+	while ((bytesRead = srcFile.read(buffer.get(), 1, bufferSize)) > 0) {
+		dstFile.write(buffer.get(), bytesRead);
+		totalBytes += bytesRead;
+	}
+	bool writeComplete = (totalBytes == srcFile.size());
+	srcFile.close();
+	dstFile.close();
+
+	return writeComplete;
 }
 
 
