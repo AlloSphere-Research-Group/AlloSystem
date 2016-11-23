@@ -195,6 +195,14 @@ public:
 	/// Quick and dirty write character string to file
 	static int write(const std::string& path, const std::string& data);
 
+	/// Copy a file in srcPath to a new location. dstPath can be the new file name or the
+	/// directory where the file is copied.
+	/// Returns true when sucessful.
+	static bool copy(const std::string& srcPath, const std::string& dstPath, unsigned int bufferSize = 1e6);
+
+	/// Delete file from file system
+	static bool remove(const std::string& path);
+
 	/// Returns string ensured to having an ending delimiter
 
 	/// The directory string argument is not checked to actually exist in
@@ -331,12 +339,14 @@ public:
 	/// Go back to first entry in directory
 	bool rewind();
 
-
 	/// Make a directory
 	static bool make(const std::string& path, bool recursive=true);
 
 	/// Remove a directory
 	static bool remove(const std::string& path);
+
+	/// Remove a directory recursively
+	static bool removeRecursively(const std::string& path);
 
 private:
 	class Impl; Impl * mImpl;

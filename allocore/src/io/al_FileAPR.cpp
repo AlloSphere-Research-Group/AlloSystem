@@ -158,6 +158,30 @@ struct Dir::Impl : public ImplAPR{
 		return APR_SUCCESS == check_apr(apr_dir_remove(path.c_str(), mPool));
 	}
 
+	bool removeRecursively(const std::string& path){
+		Dir dir(path);
+		bool ok = true;
+		while(dir.read()) {
+			FileInfo entryInfo = dir.entry();
+			if (entryInfo.type() == FileInfo::DIR &&
+			        entryInfo.name() != ".." &&
+			        entryInfo.name() != "." ) {
+				if (!Dir::remove(path + "/" + entryInfo.name())) {
+					ok = false;
+					break;
+				}
+			} else if (entryInfo.type() == FileInfo::REG) {
+				if (!File::remove(path + "/" + entryInfo.name())) {
+					ok = false;
+					break;
+				}
+			}
+		}
+		if (!Dir::remove(path)) {
+			ok = false;
+		}
+		return ok;
+	}
 };
 
 
@@ -185,6 +209,11 @@ bool Dir::make(const std::string& path, bool recursive){
 
 bool Dir::remove(const std::string& path){
 	return Impl().remove(path);
+}
+
+bool Dir::removeRecursively(const std::string &path)
+{
+	return Impl().removeRecursively(path);
 }
 
 /*
