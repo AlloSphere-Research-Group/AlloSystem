@@ -116,6 +116,15 @@ public:
 	 */
 	void setInterpolatedPreset(int index1, int index2, double factor);
 
+	/**
+	 * @brief Recall a preset by index number
+	 * @param index
+	 * @return the name of the preset corresponding to index. Empty if index not valid.
+	 *
+	 * The _presetMap.txt file is used to map preset names on disk to indeces. You can
+	 * set alternative preset map files using loadPresetMap(). See also PresetMapper for
+	 * handling and archiving preset maps.
+	 */
 	std::string recallPreset(int index);
 
 	std::map<int, std::string> availablePresets();
