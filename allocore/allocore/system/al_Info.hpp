@@ -46,6 +46,12 @@
 
 namespace al{
 
+/// Get name of computer
+std::string computerName();
+
+/// Get name of current user
+std::string userName();
+
 /// Returns the number of processors available
 ///
 /// @ingroup allocore
