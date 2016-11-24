@@ -1,5 +1,4 @@
-#include <stdlib.h>
-
+#include <cstdlib> // getenv
 #include "allocore/system/al_Config.h"
 #include "allocore/system/al_Info.hpp"
 
@@ -13,6 +12,27 @@
 #endif
 
 namespace al{
+
+std::string getEnvString(const char * var){
+	char * str = std::getenv(var);
+	return str ? std::string(str) : "";
+};
+
+std::string computerName(){
+	#ifdef AL_WINDOWS
+	return getEnvString("COMPUTERNAME");
+	#else
+	return getEnvString("HOSTNAME");
+	#endif
+}
+
+std::string userName(){
+	#ifdef AL_WINDOWS
+	return getEnvString("USERNAME");
+	#else
+	return getEnvString("USER");
+	#endif
+}
 
 int numProcessors(){
 #ifdef AL_WINDOWS
