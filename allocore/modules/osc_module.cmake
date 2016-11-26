@@ -41,6 +41,7 @@ list(APPEND ALLOCORE_SRC
   src/ui/al_PresetSequencer.cpp
   src/ui/al_SequenceRecorder.cpp
   src/ui/al_Composition.cpp
+  src/ui/al_PresetMapper.cpp
   )
 
 INCLUDE_DIRECTORIES("${OSCPACK_ROOT_DIR}")

@@ -22,7 +22,7 @@ PresetHandler::PresetHandler(std::string rootDirectory, bool verbose) :
 			std::cout << "Error creating directory: " << rootDirectory << std::endl;
 		}
 	}
-	loadPresetMap();
+	setCurrentPresetMap("default");
 }
 
 PresetHandler::~PresetHandler()
@@ -48,7 +48,7 @@ void PresetHandler::setSubDirectory(std::string directory)
 			std::cout << "Error creating directory: " << mRootDir << std::endl;
 		}
 	}
-	loadPresetMap();
+	setCurrentPresetMap("default");
 }
 
 std::vector<std::string> PresetHandler::availableSubDirectories()
@@ -74,6 +74,20 @@ void PresetHandler::registerMorphTimeCallback(Parameter::ParameterChangeCallback
                                               void *userData)
 {
 	mMorphTime.registerChangeCallback(cb, userData);
+}
+
+std::string PresetHandler::buildMapPath(std::string mapName)
+{
+	std::string currentPath = getCurrentPath();
+	if (currentPath.back() != '/') {
+		currentPath += "/";
+	}
+	if ( !(mapName.size() > 4 && mapName.substr(mapName.size() - 4) == ".txt")
+	     && !(mapName.size() > 10 && mapName.substr(mapName.size() - 10) == ".presetMap")) {
+		mapName = mapName + ".presetMap";
+	}
+
+	return currentPath + mapName;
 }
 
 void PresetHandler::storePreset(std::string name)
@@ -139,7 +153,7 @@ void PresetHandler::storePreset(int index, std::string name, bool overwrite)
 	}
 	f.close();
 	mPresetsMap[index] = name;
-	storePresetMap();
+	storeCurrentPresetMap();
 }
 
 void PresetHandler::recallPreset(std::string name)
@@ -257,15 +271,48 @@ void PresetHandler::print()
 	}
 }
 
-void PresetHandler::loadPresetMap(std::string mapFileName)
+std::map<int, std::string> PresetHandler::readPresetMap(std::string mapName)
 {
-	std::string currentPath = getCurrentPath();
-	if (currentPath.back() != '/') {
-		currentPath += "/";
+	std::map<int, std::string> presetsMap;
+	std::string mapFullPath = buildMapPath(mapName);
+	std::ifstream f(mapFullPath);
+	if (!f.is_open()) {
+		if (mVerbose) {
+			std::cout << "Error while opening preset map file for reading: " << mapFullPath << std::endl;
+		}
+		return presetsMap;
 	}
-	std::string mapFullPath = currentPath + mapFileName;
-	mPresetsMap.clear();
-	if (!File::exists(mapFullPath)) {
+	std::string line;
+	while (getline(f, line)) {
+		if (line == "") {
+			continue;
+		}
+		if (line.substr(0, 2) == "::") {
+			if (mVerbose) {
+				std::cout << "End preset map."<< std::endl;
+			}
+			break;
+		}
+		std::stringstream ss(line);
+		std::string index, name;
+		std::getline(ss, index, ':');
+		std::getline(ss, name, ':');
+		presetsMap[std::stoi(index)] = name;
+		//			std::cout << index << ":" << name << std::endl;
+	}
+	if (f.bad()) {
+		if (mVerbose) {
+			std::cout << "Error while writing preset map file for reading: " << mFileName << std::endl;
+		}
+	}
+	return presetsMap;
+}
+
+void PresetHandler::setCurrentPresetMap(std::string mapName)
+{
+	std::string mapFullPath = buildMapPath(mapName);
+	if (!File::exists(mapFullPath) &&
+	        !File::isDirectory(mapFullPath)) {
 		std::cout << "No preset map. Creating default." << std::endl;
 		std::vector<std::string> presets;
 		Dir presetDir(getCurrentPath());
@@ -281,50 +328,18 @@ void PresetHandler::loadPresetMap(std::string mapFileName)
 		for(int i = 0; i < presets.size(); ++i) {
 			mPresetsMap[i] = presets[i];
 		}
-		storePresetMap();
+		mCurrentMapName = mapName;
+		storeCurrentPresetMap();
 	} else {
-		std::ifstream f(mapFullPath);
-		if (!f.is_open()) {
-			if (mVerbose) {
-				std::cout << "Error while opening preset map file for reading: " << mapFullPath << std::endl;
-			}
-			return;
-		}
-		std::string line;
-		while (getline(f, line)) {
-            if (line == "") {
-                continue;
-            }
-			if (line.substr(0, 2) == "::") {
-				if (mVerbose) {
-					std::cout << "End preset map."<< std::endl;
-				}
-				break;
-			}
-			std::stringstream ss(line);
-			std::string index, name;
-			std::getline(ss, index, ':');
-			std::getline(ss, name, ':');
-			mPresetsMap[std::stoi(index)] = name;
-//			std::cout << index << ":" << name << std::endl;
-		}
-		if (f.bad()) {
-			if (mVerbose) {
-				std::cout << "Error while writing preset map file for reading: " << mFileName << std::endl;
-			}
-		}
-
-		std::cout << "Reading preset map." << std::endl;
+		std::cout << "Set " << mapName << std::endl;
+		mPresetsMap = readPresetMap(mapName);
+		mCurrentMapName = mapName;
 	}
 }
 
-void PresetHandler::storePresetMap(std::string mapFileName)
+void PresetHandler::storeCurrentPresetMap()
 {
-	std::string currentPath = getCurrentPath();
-	if (currentPath.back() != '/') {
-		currentPath += "/";
-	}
-	std::string mapFullPath = currentPath + mapFileName;
+	std::string mapFullPath = buildMapPath(mCurrentMapName);
 	std::ofstream f(mapFullPath);
 	if (!f.is_open()) {
 		if (mVerbose) {
