@@ -50,26 +50,42 @@
 namespace al
 {
 
+/**
+ * @brief The PresetMapper class allows archiving and recalling preset maps
+ *
+ * Preset maps are saved as a directory containing the presets as well as a
+ * preset map file that lists the presets in the map as well as assigning
+ * an index to each.
+ *
+ * The preset map file is a text file, where each line looks like:
+ *
+ * @code
+ * 0:preset_name
+ * @endcode
+ *
+ * The index of the preset is separated by the preset name by a semi-colon. The
+ * preset name should correspond to a file on disk called "preset_name.preset".
+ * These files are located either within a preset map archive or a PresetHandler's
+ * root directory.
+ *
+ * To archive a preset map, it's necessary to first register a PresetHandler
+ * with registerPresetHandler() and then call archive().
+ */
 class PresetMapper
 {
 public:
 	PresetMapper(bool findAutomatically = true) :
 	    mFindAutomatically(findAutomatically)
-	{
-	}
+	{ }
 
-	virtual ~PresetMapper()
-	{
+	virtual ~PresetMapper();
 
-	}
+	PresetMapper &registerPresetHandler(PresetHandler &handler);
 
-	PresetMapper &registerPresetHandler(PresetHandler &handler) {
-		mPresetHandler = &handler;
-		if (mFindAutomatically) {
-			findPresetMaps();
-		}
-	}
+	bool archive(std::string mapName = "default", bool overwrite = true);
 
+	/// Restore a preset map from a preset map archive directory
+	bool restore(std::string mapName = "default", bool overwrite = true);
 
 	std::vector<std::string> listAvailableMaps();
 
@@ -80,37 +96,7 @@ private:
 
 	bool mFindAutomatically;
 	PresetHandler *mPresetHandler;
-	std::vector<std::string> mPresetMapPaths; // full path to the preset map file (including preset map name e.g. _presetMap.txt)
 };
-
-void PresetMapper::findPresetMaps() {
-	std::string presetsPath = mPresetHandler->getCurrentPath();
-
-	Dir presetDir(presetsPath);
-	while (presetDir.read()) {
-		FileInfo entry = presetDir.entry();
-		if (entry.name().size() > 4 && entry.name().substr(entry.name().size() - 4) == ".txt") {
-			std::cout << "Found map: " << entry.name() << std::endl;
-		}
-	}
-}
-
-void PresetMapper::readEntries(std::string path)
-{
-	Dir presetDir(path);
-	while (presetDir.read()) {
-		FileInfo entry = presetDir.entry();
-		if (entry.type() == FileInfo::DIR) {
-			readEntries(entry.name());
-		} else if (entry.type() == FileInfo::REG) {
-			if (entry.name().size() > 4 && entry.name().substr(entry.name().size() - 4) == ".txt") {
-				std::cout << "Found map: " << entry.name();
-			}
-		}
-	}
-}
-
-
 
 
 } // namespace al

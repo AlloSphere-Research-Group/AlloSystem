@@ -62,8 +62,8 @@ bool PresetSequencer::archiveSequence(std::string sequenceName, bool overwrite)
 	} else {
 		int counter = 0;
 		while (File::isDirectory(fullPath)) {
-			std::string newName = sequenceName + std::to_string(counter++);
-			fullPath = buildFullPath(newName);
+			std::string newName = sequenceName + "_" + std::to_string(counter++);
+			fullPath = buildFullPath(newName) + "_archive";
 			if (counter == 0) { // We've wrapped and run out of names...
 				std::cout << "Out of names for sequence archive." << std::endl;
 				return false;

@@ -97,7 +97,7 @@ public:
 	 * The preset name also determines the filename under which the preset is saved, so
 	 * it must be unique. If name is empty, a unique name is generated. If name
 	 * exists, a number is appended to the preset name. The link between preset
-	 * index and preset name is store within the _presetMap.txt file that is
+	 * index and preset name is store within the preset map file that is
 	 * stored in the path for the PresetHandler, see getCurrentPath()
 	 *
 	 */
@@ -121,9 +121,10 @@ public:
 	 * @param index
 	 * @return the name of the preset corresponding to index. Empty if index not valid.
 	 *
-	 * The _presetMap.txt file is used to map preset names on disk to indeces. You can
-	 * set alternative preset map files using loadPresetMap(). See also PresetMapper for
-	 * handling and archiving preset maps.
+	 * The preset map file (by default called default.presetMap)
+	 * is used to map preset names on disk to indeces. You can
+	 * set alternative preset map files using setCurrentPresetMap().
+	 * See also PresetMapper for handling and archiving preset maps.
 	 */
 	std::string recallPreset(int index);
 
@@ -166,9 +167,15 @@ public:
 
 	PresetHandler &operator << (Parameter &param) { return this->registerParameter(param); }
 
+	std::string buildMapPath(std::string mapName);
+
+	std::map<int, std::string> readPresetMap(std::string mapName = "default");
+
+	void setCurrentPresetMap(std::string mapName = "default");
+
 private:
-	void loadPresetMap(std::string mapFileName = "_presetMap.txt");
-	void storePresetMap(std::string mapFileName = "_presetMap.txt");
+	void storeCurrentPresetMap();
+
 	std::map<std::string, float> loadPresetValues(std::string name);
 
 	static void morphingFunction(PresetHandler *handler);
@@ -177,6 +184,7 @@ private:
 	std::string mRootDir;
 	std::string mSubDir;
 	std::string mFileName;
+	std::string mCurrentMapName;
 	std::vector<Parameter *> mParameters;
 	std::mutex mFileLock;
 	bool mRunning; // To keep the morphing thread alive
