@@ -185,22 +185,18 @@ Lab& Lab::operator= (const CIEXYZ& v){
 Lab& Lab::operator=(const HCLab& v){
 	l = v.l * 100.0f;
 	static const float TAU = 2 * M_PI;
-	a = (v.c * 133.419f) * cos((v.h * TAU) - M_PI);
-	b = (v.c * 133.419f) * sin((v.h * TAU) - M_PI);
+	a = (v.c * 133.419f) * cos(v.h * TAU);
+	b = (v.c * 133.419f) * sin(v.h * TAU);
 	//cout << "Lab from HCLab: {" << l << ", " << a << ", " << b << "}" << endl;
 	return *this;
 }
 
 //HCLab operators
 HCLab& HCLab::operator= (const Lab& v){
-	static const float TAU = 2 * M_PI;
 	float L = v.l, a = v.a, b = v.b;
 	//calculate hue angle from 0 to 1
-	h = (atan2(b, a) + M_PI) / TAU;
-
-	//wrap hue angle
-	if(h < 0.f) h += 1.f;
-	if(h >= 1.f) h -= 1.f;
+	h = atan2(b, a) * (1.f / (2.f*M_PI));	// hue in [-0.5, 0.5]
+	if(h < 0.f) h += 1.f;					// wrap hue angle into [0, 1]
 
 	c = sqrt(a * a + b * b) / 133.419f; //range determined empirically using
 										//16million RGB color image from http://brucelindbloom.com
@@ -235,21 +231,18 @@ Luv& Luv::operator= (const CIEXYZ& w){
 Luv& Luv::operator=(const HCLuv& w){
 	l = w.l * 100.0f;
 	static const float TAU = 2 * M_PI;
-	u = (w.c * 178.387f) * cos((w.h * TAU) - M_PI);
-	v = (w.c * 178.387f) * sin((w.h * TAU) - M_PI);
+	u = (w.c * 178.387f) * cos(w.h * TAU);
+	v = (w.c * 178.387f) * sin(w.h * TAU);
 	//cout << "Luv from HCLuv: {" << l << ", " << u << ", " << v << "}" << endl;
 	return *this;
 }
 
 //HCLuv operators
 HCLuv& HCLuv::operator= (const Luv& w){
-	static const float TAU = 2 * M_PI;
 	float L = w.l, u = w.u, v = w.v;
 	//calculate hue angle from 0 to 1
-	h = (atan2(v, u) + M_PI) / TAU;
-	//wrap hue angle
-	if(h < 0.f) h += 1.f;
-	if(h >= 1.f) h -= 1.f;
+	h = atan2(v, u) * (1.f / (2.f*M_PI));	// hue in [-0.5, 0.5]
+	if(h < 0.f) h += 1.f;					// wrap hue angle into [0, 1]
 
 	c = sqrt(u * u + v * v) / 178.387f; //range determined empirically using
 										//16million RGB color image from http://brucelindbloom.com
