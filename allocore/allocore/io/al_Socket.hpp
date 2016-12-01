@@ -136,11 +136,14 @@ public:
 
 	/// @param[in] buffer	A buffer to copy the received data into
 	/// @param[in] maxlen	The maximum length, in bytes, of data to copy
+	/// @param[out] from	The sender's IP address is copied here if pointer not null
 	/// \returns bytes read
 	//
 	/// Note: to ensure receipt of all messages in the queue, use
 	/// while(recv()){}
-	size_t recv(char * buffer, size_t maxlen);
+	///
+	/// The from pointer should be at least the size of Message::mSenderAddr
+	size_t recv(char * buffer, size_t maxlen, char *from = nullptr);
 
 	/// Send data over a network
 
