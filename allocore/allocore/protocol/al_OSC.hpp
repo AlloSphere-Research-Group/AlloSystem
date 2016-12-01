@@ -241,7 +241,7 @@ public:
 	/// Called for each message contained in packet
 	virtual void onMessage(Message& m) = 0;
 
-	/// For backwards compatibility
+	// FIXME: For backwards compatibility. Remove when updating API
 	void parse(const char *packet, int size, TimeTag timeTag=1) {
 		parse(packet, size, timeTag, nullptr);
 	}

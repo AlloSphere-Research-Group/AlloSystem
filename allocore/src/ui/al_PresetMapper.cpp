@@ -100,7 +100,19 @@ std::vector<std::string> PresetMapper::listAvailableMaps()
 	return mapList;
 }
 
-bool PresetMapper::restore(std::string mapName, bool overwrite)
+bool PresetMapper::consumeMessage(osc::Message &m, std::string rootOSCPath)
+{
+	if(m.addressPattern() == rootOSCPath + "/map" && m.typeTags() == "s"){
+		std::string val;
+		m >> val;
+		std::cout << "OSC: Recall preset map: " << val << std::endl;
+		this->restore(val);
+		return true;
+	}
+	return false;
+}
+
+bool PresetMapper::restore(std::string mapName, bool overwrite, bool autoCreate)
 {
 	bool ok = true;
 	if (mapName.size() > 18 && mapName.substr(mapName.size() - 18) == ".presetMap_archive") { // restore from archive
@@ -132,7 +144,7 @@ bool PresetMapper::restore(std::string mapName, bool overwrite)
 			}
 		}
 	} else { // set preset map directly
-		mPresetHandler->setCurrentPresetMap(mapName);
+		mPresetHandler->setCurrentPresetMap(mapName, autoCreate);
 	}
 	return ok;
 }

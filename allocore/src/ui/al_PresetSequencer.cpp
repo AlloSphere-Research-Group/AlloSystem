@@ -303,6 +303,12 @@ void SequenceServer::onMessage(osc::Message &m)
 				composition->stop();
 			}
 		}
+	} else {
+		for(osc::MessageConsumer *consumer: mConsumers) {
+			if (consumer->consumeMessage(m, mOSCpath)) {
+				break;
+			}
+		}
 	}
 }
 

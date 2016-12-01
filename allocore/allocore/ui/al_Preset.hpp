@@ -171,7 +171,7 @@ public:
 
 	std::map<int, std::string> readPresetMap(std::string mapName = "default");
 
-	void setCurrentPresetMap(std::string mapName = "default");
+	void setCurrentPresetMap(std::string mapName = "default", bool autoCreate = false);
 
 private:
 	void storeCurrentPresetMap();
