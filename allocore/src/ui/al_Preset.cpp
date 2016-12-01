@@ -308,11 +308,12 @@ std::map<int, std::string> PresetHandler::readPresetMap(std::string mapName)
 	return presetsMap;
 }
 
-void PresetHandler::setCurrentPresetMap(std::string mapName)
+void PresetHandler::setCurrentPresetMap(std::string mapName, bool autoCreate)
 {
 	std::string mapFullPath = buildMapPath(mapName);
-	if (!File::exists(mapFullPath) &&
-	        !File::isDirectory(mapFullPath)) {
+	if (autoCreate
+	        && !File::exists(mapFullPath)
+	        && !File::isDirectory(mapFullPath)) {
 		std::cout << "No preset map. Creating default." << std::endl;
 		std::vector<std::string> presets;
 		Dir presetDir(getCurrentPath());

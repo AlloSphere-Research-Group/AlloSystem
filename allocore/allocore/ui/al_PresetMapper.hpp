@@ -44,6 +44,7 @@
 #include <vector>
 #include <string>
 
+#include "allocore/protocol/al_OSC.hpp"
 #include "allocore/ui/al_Preset.hpp"
 #include "allocore/io/al_File.hpp"
 
@@ -71,7 +72,7 @@ namespace al
  * To archive a preset map, it's necessary to first register a PresetHandler
  * with registerPresetHandler() and then call archive().
  */
-class PresetMapper
+class PresetMapper : public osc::MessageConsumer
 {
 public:
 	PresetMapper(bool findAutomatically = true) :
@@ -85,9 +86,11 @@ public:
 	bool archive(std::string mapName = "default", bool overwrite = true);
 
 	/// Restore a preset map from a preset map archive directory
-	bool restore(std::string mapName = "default", bool overwrite = true);
+	bool restore(std::string mapName = "default", bool overwrite = true, bool autoCreate = false);
 
 	std::vector<std::string> listAvailableMaps();
+
+	virtual bool consumeMessage(osc::Message &m, std::string rootOSCPath) override;
 
 private:
 

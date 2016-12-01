@@ -232,6 +232,10 @@ public:
 		return *this;
 	}
 
+	SequenceServer &registerMessageConsumer(osc::MessageConsumer &consumer) {
+		mConsumers.push_back(&consumer);
+	}
+
 
 	/**
 	 * @brief print prints information about the server to std::out
@@ -248,12 +252,13 @@ public:
 	SequenceServer &operator <<(PresetSequencer &sequencer) {return registerSequencer(sequencer);}
 	SequenceServer &operator <<(SequenceRecorder &recorder) {return registerRecorder(recorder);}
 	SequenceServer &operator <<(Composition &composition) {return registerComposition(composition);}
+	SequenceServer &operator <<(osc::MessageConsumer &consumer) {return registerMessageConsumer(consumer);}
 
 	void setAddress(std::string address);
 	std::string getAddress();
 
 protected:
-	void attachPacketHandler(osc::PacketHandler *handler);
+//	void attachPacketHandler(osc::PacketHandler *handler);
 	static void changeCallback(int value, void *sender, void *userData);
 
 private:
@@ -266,8 +271,8 @@ private:
 	std::string mOSCpath;
 	std::string mOSCQueryPath;
 	std::mutex mHandlerLock;
-	std::vector<osc::PacketHandler *> mHandlers;
-
+//	std::vector<osc::PacketHandler *> mHandlers;
+	std::vector<osc::MessageConsumer *> mConsumers;
 };
 
 
