@@ -188,7 +188,7 @@ public:
 	::osc::ReceivedMessageArgumentStream args;
 };
 
-Message::Message(const char * message, int size, const TimeTag& timeTag)
+Message::Message(const char * message, int size, const TimeTag& timeTag, const char *senderAddr)
 :	mImpl(new Impl(message, size)), mTimeTag(timeTag)
 {
 	OSCTRY("Message()",
@@ -196,6 +196,11 @@ Message::Message(const char * message, int size, const TimeTag& timeTag)
 		mTypeTags = mImpl->ArgumentCount() ? mImpl->TypeTags() : "";
 		resetStream();
 	)
+	if (senderAddr != nullptr) {
+		strncpy(mSenderAddr, senderAddr, 32);
+	} else {
+		mSenderAddr[0] = '\0';
+	}
 }
 
 Message::~Message() {
@@ -204,8 +209,8 @@ Message::~Message() {
 
 void Message::print() const {
 	OSCTRY("Message::print",
-		printf("%s, %s %" AL_PRINTF_LL "d\n",
-			addressPattern().c_str(), typeTags().c_str(), timeTag());
+		printf("%s, %s %" AL_PRINTF_LL "d from %s\n",
+			addressPattern().c_str(), typeTags().c_str(), timeTag(), mSenderAddr);
 
 		::osc::ReceivedMessageArgumentIterator it = mImpl->ArgumentsBegin();
 
@@ -270,7 +275,7 @@ Message& Message::operator>> (Blob& v){
 #include <netinet/in.h>  // for ntohl
 #endif
 
-void PacketHandler::parse(const char *packet, int size, TimeTag timeTag){
+void PacketHandler::parse(const char *packet, int size, TimeTag timeTag, const char *senderAddr){
 	#ifdef VERBOSE
 	int i = 1;
 	#endif
@@ -309,12 +314,12 @@ OSCTRY("PacketHandler::parse",
 			DPRINTF("\ttimeTag %lu\n", (unsigned long)r.TimeTag());
 			DPRINTF("\tLet's try to parse it...\n");
 
-			parse(e.Contents(), e.Size(), r.TimeTag());
+			parse(e.Contents(), e.Size(), r.TimeTag(), senderAddr);
 		}
 	}
 	else if(p.IsMessage()){
 		DPRINTF("Parsing a message\n");
-		Message m(packet, size, timeTag);
+		Message m(packet, size, timeTag, senderAddr);
 		onMessage(m);
 	}
 ) // OSCTRY
@@ -376,10 +381,11 @@ int Recv::recv(){
 	*/
 
 	OSCTRY("Packet::endMessage",
-		r = Socket::recv(&mBuffer[0], mBuffer.size());
+		char sender[16] = "";
+		r = Socket::recv(&mBuffer[0], mBuffer.size(), sender);
 		if(r && mHandler){
-			DPRINTF("Recv:recv() Received %d bytes; parsing...\n", r);
-			mHandler->parse(&mBuffer[0], r);
+			DPRINTF("Recv:recv() Received %d bytes from %s; parsing...\n", r, sender);
+			mHandler->parse(&mBuffer[0], r, 1, sender);
 		}
 	)
 
