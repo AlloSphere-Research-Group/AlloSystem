@@ -164,9 +164,7 @@ private:
 		Thread mThread;
 		Image mImage;
 		std::string mPath;
-		bool mBusy;
-
-		ImageWriter();
+		bool mBusy = false;
 
 		bool run(
 			const std::string& path,
@@ -186,12 +184,12 @@ private:
 	std::vector<unsigned char> mPixels;
 	GLenum mGraphicsBuf;
 
-	enum { Npbos = 2 };
+	enum { Npbos = 3 };
 	GLuint mPBOs[Npbos];
 	int mPBOIdx;
 	bool mReadPBO;
 
-	enum { Nthreads = 4 };
+	enum { Nthreads = 8 };
 	ImageWriter mImageWriters[Nthreads];
 	std::string mImageExt;
 	unsigned mImageCompress;
