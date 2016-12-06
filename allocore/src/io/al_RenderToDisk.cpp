@@ -327,7 +327,7 @@ void RenderToDisk::resetPBOQueue(){
 void RenderToDisk::saveImage(
 	unsigned w, unsigned h, unsigned l, unsigned b, bool usePBO
 ){
-	unsigned numBytes = w*h*3;
+	const auto numBytes = w*h*3;
 	if(numBytes > mPixels.size()) mPixels.resize(numBytes);
 
 	unsigned char * pixs = &mPixels[0];
@@ -358,26 +358,27 @@ void RenderToDisk::saveImage(
 	if(usePBO){
 		if(0 == mPBOs[0]){ // create PBOs
 			glGenBuffers(Npbos, mPBOs);
-			for(int i=0; i<Npbos; ++i){
-				glBindBuffer(GL_PIXEL_PACK_BUFFER, mPBOs[i]);
+			for(auto& pbo : mPBOs){
+				glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo);
 				glBufferData(GL_PIXEL_PACK_BUFFER, numBytes, NULL, GL_STREAM_READ);
 			}
 			glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 		}
 
 		//printf("PBO %d %s\n", mPBOIdx, mReadPBO ? "(read back)" : "");
-		GLuint pbo = mPBOs[mPBOIdx];
+		auto pbo = mPBOs[mPBOIdx];
 		glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo);
 
 		if(mReadPBO){
-			// This will block until glReadPixels from previous frame finishes
-			void *ptr = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
+			// Get pointer to data in currently bound PBO
+			// (This will block until glReadPixels finishes from last time the PBO was bound)
+			auto * ptr = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
 			memcpy(pixs, ptr, numBytes);
 			glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
 			readPixels = true;
 		}
 
-		// This will not block
+		// This will perform asynchronously into the bound PBO
 		glReadPixels(l,b,w,h, GL_RGB, GL_UNSIGNED_BYTE, 0);
 
 		glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
@@ -386,6 +387,7 @@ void RenderToDisk::saveImage(
 		mReadPBO = mReadPBO || (mPBOIdx == 0); // written to all PBOs at least once
 	}
 	else{
+		// This will block until all draw commands finish
 		glReadPixels(l,b,w,h, GL_RGB, GL_UNSIGNED_BYTE, pixs);
 		readPixels = true;
 	}
@@ -393,23 +395,25 @@ void RenderToDisk::saveImage(
 
 	// Launch thread to write pixels out to an image file
 	if(readPixels){
-		//printf("Writing frame %d\n", mFrameNumber);
+		//printf("----\nWriting frame %d\n", mFrameNumber);
 
 		// At 40 FPS: 60 x 60 x 40 = 144000 frames/hour
 		std::string name = mPath + "/" + al::toString("%07u", mFrameNumber) + "." + mImageExt;
 		Image::Format format = Image::RGB;
 
+		CHECK_THREADS:
 		int i=0;
 		for(; i<Nthreads; ++i){
+			//printf("Checking if image writer %d is free ...\n", i);
 			if(mImageWriters[i].run(name, mPixels, w,h, format, mImageCompress)){
 				//printf("Running image writer %d\n", i);
 				break;
 			}
-			//printf("Error: all image writers are busy...\n");
 		}
-		//printf("%d\n", i);
-		// All threaded image writers were busy, so use main thread
+		// All threaded image writers were busy
 		if(i == Nthreads){
+			//printf("Error: all image writers are busy...\n");
+			// Use main thread---this will definitely stall
 			al::Image::save(name, pixs, w,h, format, mImageCompress);
 		}
 	
@@ -524,10 +528,6 @@ unsigned RenderToDisk::AudioRing::blockSizeInSamples() const {
 }
 
 
-
-RenderToDisk::ImageWriter::ImageWriter()
-: mBusy(false)
-{}
 
 bool RenderToDisk::ImageWriter::run(
 	const std::string& path,
