@@ -413,8 +413,10 @@ void RenderToDisk::saveImage(
 		// All threaded image writers were busy
 		if(i == Nthreads){
 			//printf("Error: all image writers are busy...\n");
+			al::wait(1./1e3); // wait 1 ms for disk i/o to finish up (hopefully)
+			goto CHECK_THREADS;
 			// Use main thread---this will definitely stall
-			al::Image::save(name, pixs, w,h, format, mImageCompress);
+			//al::Image::save(name, pixs, w,h, format, mImageCompress);
 		}
 	
 		++mFrameNumber;
