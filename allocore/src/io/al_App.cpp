@@ -301,26 +301,25 @@ ViewpointWindow * App::initWindow(
 	Window::DisplayMode mode,
 	int flags
 ){
-	//ViewpointWindow * win = new ViewpointWindow(dims, title, fps, mode);
-
-	ViewpointWindow * win = new ViewpointWindow;
-	win->dimensions(dims);
-	win->title(title);
-	win->fps(fps);
-	win->displayMode(mode);
-
-	mFacViewpoints.push_back(new Viewpoint);
-
-	int last = mFacViewpoints.size()-1;
-	{
-		Viewpoint& vp = *mFacViewpoints[last];
-		vp.parentTransform(nav().transformed());
-		win->add(vp);
+	auto& win = *new ViewpointWindow;
+	win.dimensions(dims);
+	if(title.empty()){ // if no title, use app name, if any
+		if(!name().empty()) win.title(name());
+	} else {
+		win.title(title);
 	}
 
-	mFacWindows.push_back(win);
-	add(*win);
-	return win;
+	win.fps(fps);
+	win.displayMode(mode);
+	
+	auto& newVP = *new Viewpoint;
+	mFacViewpoints.push_back(&newVP);
+	newVP.parentTransform(nav().transformed());
+	win.add(newVP);
+
+	mFacWindows.push_back(&win);
+	add(win);
+	return &win;
 }
 
 
