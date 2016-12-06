@@ -248,7 +248,7 @@ App::~App(){
 		delete mFacViewpoints[i];
 	}
 
-	if(name()!="" && oscSend().opened()) sendDisconnect();
+	if(oscSend().opened() && !name().empty()) sendDisconnect();
 }
 
 
@@ -344,7 +344,7 @@ void App::start(){
 		clockAnimate(mWindows[0]);
 	}
 	if(usingAudio()) mAudioIO.start();
-	if(name()!="" && oscSend().opened()) sendHandshake();
+	if(oscSend().opened() && !name().empty()) sendHandshake();
 
 //	// factories OKAY
 //	for(unsigned i=0; i<mFacViewpoints.size(); ++i)
@@ -391,9 +391,7 @@ void App::start(){
 
 	if(windows().size()){
 		// create the windows
-		for(unsigned i=0; i<windows().size(); ++i){
-			windows()[i]->create();
-		}
+		for(auto& w : windows()) w->create();
 
 		// start the main loop
 		Main::get().start();
