@@ -14,10 +14,6 @@ namespace al {
 #ifdef USE_PTHREAD
 #include <pthread.h>
 
-//typedef pthread_t ThreadHandle;
-//typedef void * (*ThreadFunction)(void *);
-//#define THREAD_FUNCTION(name) void * name(void * user)
-
 struct Thread::Impl{
 	Impl()
 	:	mHandle(0)
@@ -32,14 +28,18 @@ struct Thread::Impl{
 		pthread_attr_destroy(&mAttr);
 	}
 
-
-	bool start(ThreadFunction& func){
+	bool start(std::function<void(void)>& func){
 		if(mHandle) return false;
-		//return 0 == pthread_create(&mHandle, NULL, cThreadFunc, &func);
-		return 0 == pthread_create(&mHandle, &mAttr, cThreadFunc, &func);
+		struct F{
+			static void * cFunc(void * user){
+				(*((std::function<void(void)> *)user))();
+				return NULL;
+			}
+		};
+		return 0 == pthread_create(&mHandle, &mAttr, F::cFunc, &func);
 	}
 
-	bool join(){
+	bool join(double timeout){
 		if(pthread_join(mHandle, NULL) == 0){
 			mHandle = 0;
 			return true;
@@ -73,14 +73,10 @@ struct Thread::Impl{
 //		pthread_testcancel();
 //	}
 
+	void * handle(){ return &mHandle; }
+
 	pthread_t mHandle;
 	pthread_attr_t mAttr;
-
-	static void * cThreadFunc(void * user){
-		ThreadFunction& tfunc = *((ThreadFunction*)user);
-		tfunc();
-		return NULL;
-	}
 };
 
 
@@ -98,28 +94,32 @@ void * Thread::current(){
 #include <windows.h>
 #include <process.h>
 
-//typedef unsigned long ThreadHandle;
-//typedef unsigned (__stdcall *ThreadFunction)(void *);
-//#define THREAD_FUNCTION(name) unsigned _stdcall * name(void * user)
-
 class Thread::Impl{
 public:
-	Impl(): mHandle(0){}
+	Impl(): mHandle(NULL){}
 
-	bool start(ThreadFunction& func){
-		if(mHandle) return false;
-		unsigned thread_id;
-		mHandle = _beginthreadex(NULL, 0, cThreadFunc, &func, 0, &thread_id);
-		if(mHandle) return true;
-		return false;
+	bool start(std::function<void(void)>& func){
+		if(NULL==mHandle){
+			struct F{
+				static unsigned _stdcall cFunc(void * user){
+					(*((std::function<void(void)> *)user))();
+					return 0;
+				}
+			};
+			mHandle = (HANDLE)_beginthreadex(NULL, 0, F::cFunc, &func, 0, NULL);
+		}
+		return NULL!=mHandle;
 	}
 
-	bool join(){
-		long retval = WaitForSingleObject((HANDLE)mHandle, INFINITE);
-		if(retval == WAIT_OBJECT_0){
-			CloseHandle((HANDLE)mHandle);
-			mHandle = 0;
-			return true;
+	bool join(double timeout){
+		if(mHandle){
+			DWORD waitms = timeout>=0. ? (DWORD)(timeout*1e3 + 0.5) : INFINITE;
+			long retval = WaitForSingleObject(mHandle, waitms);
+			if(retval == WAIT_OBJECT_0){
+				CloseHandle(mHandle);
+				mHandle = NULL;
+				return true;
+			}
 		}
 		return false;
 	}
@@ -136,15 +136,9 @@ public:
 //	void testCancel(){
 //	}
 
-	unsigned long mHandle;
-//	ThreadFunction mRoutine;
+	void * handle(){ return &mHandle; }
 
-	static unsigned cThreadFunc(void * user){
-	// static unsigned _stdcall cThreadFunc(void * user){
-		ThreadFunction& tfunc = *((ThreadFunction*)user);
-		tfunc();
-		return 0;
-	}
+	HANDLE mHandle;
 };
 
 #endif
@@ -168,7 +162,7 @@ Thread::Thread(void * (*cThreadFunc)(void * userData), void * userData)
 }
 
 Thread::Thread(const Thread& other)
-:	mImpl(new Impl), mCFunc(other.mCFunc), mJoinOnDestroy(other.mJoinOnDestroy)
+:	mImpl(new Impl), mFunc(other.mFunc), mJoinOnDestroy(other.mJoinOnDestroy)
 {
 }
 
@@ -181,7 +175,7 @@ Thread::~Thread(){
 void swap(Thread& a, Thread& b){
 	using std::swap;
 	swap(a.mImpl, b.mImpl);
-	swap(a.mCFunc, b.mCFunc);
+	swap(a.mFunc, b.mFunc);
 	swap(a.mJoinOnDestroy, b.mJoinOnDestroy);
 }
 
@@ -211,12 +205,26 @@ Thread& Thread::priority(int v){
 	return *this;
 }
 
-bool Thread::start(ThreadFunction& func){
-	return mImpl->start(func);
+bool Thread::start(void * (*threadFunc)(void * userData), void * userData){
+	// FIXME: this can cause crash!!! since pointers are copied???
+	return start([&](){ threadFunc(userData); });
 }
 
-bool Thread::join(){
-	return mImpl->join();
+bool Thread::start(std::function<void (void)> func){
+	mFunc = func;
+	return mImpl->start(mFunc);
+}
+
+bool Thread::start(ThreadFunction& func){
+	return start([&func](){ func(); });
+}
+
+bool Thread::join(double timeout){
+	return mImpl->join(timeout);
+}
+
+void * Thread::nativeHandle(){
+	return mImpl->handle();
 }
 
 } // al::
