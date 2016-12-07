@@ -141,8 +141,13 @@ bool SceneWindowHandler::onFrame(){
 		app.onAnimate(win.spfActual());
 	}
 
+	// Quatd accumulated rotations are very precise, so we should rarely need
+	// to normalize it
+	if(app.nav().quat().magSqr() > 1.0000001){
+		app.nav().quat().normalize();
+	}
+
 	app.navDraw() = app.nav();
-	app.navDraw().quat().normalize();
 
 	Graphics& g = app.graphics();
 	g.depthTesting(true);
