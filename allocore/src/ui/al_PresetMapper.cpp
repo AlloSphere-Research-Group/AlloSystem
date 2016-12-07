@@ -65,7 +65,7 @@ bool PresetMapper::archive(std::string mapName, bool overwrite)
 	}
 	std::map<int, std::string> presetMap = mPresetHandler->readPresetMap(mapName);
 	for(auto const &preset : presetMap) {
-		std::string presetFilename = mPresetHandler->getCurrentPath() + "/" + preset.second + ".preset";
+		std::string presetFilename = mPresetHandler->getCurrentPath() + preset.second + ".preset";
 		if (!File::copy(presetFilename, fullPath)) {
 			std::cout << "Error copying preset " << presetFilename << " when archiving preset map." << std::endl;
 			ok = false;
@@ -79,7 +79,20 @@ bool PresetMapper::archive(std::string mapName, bool overwrite)
 	return ok;
 }
 
-std::vector<std::string> PresetMapper::listAvailableMaps()
+bool PresetMapper::load(std::string archiveName)
+{
+	std::string fullPath = mPresetHandler->buildMapPath(archiveName) + "_archive";
+	if (File::isDirectory(fullPath)) {
+		mPresetHandler->setSubDirectory(archiveName + "_archive");
+		mPresetHandler->setCurrentPresetMap("default");
+	} else {
+		std::cout << "Error loading archive: " << archiveName;
+		return false;
+	}
+	return true;
+}
+
+std::vector<std::string> PresetMapper::listAvailableMaps(bool showArchives)
 {
 	std::vector<std::string> mapList;
 	Dir mapperDir(mPresetHandler->getCurrentPath());
@@ -87,9 +100,12 @@ std::vector<std::string> PresetMapper::listAvailableMaps()
 	// TODO it makes more sense to sort entries alphabetically
 	while(mapperDir.read()) {
 		const FileInfo &info = mapperDir.entry();
-		if (info.type() == FileInfo::DIR) {
-
-		} else if (info.type() == FileInfo::REG) {
+		if (info.type() == FileInfo::DIR && showArchives) {
+			std::string name = info.name();
+			if ( (name.size() > 18 && name.substr(name.size() - 18) == ".presetMap_archive")) {
+				mapList.push_back(name);
+			}
+		} else if (info.type() == FileInfo::REG && !showArchives) {
 			std::string name = info.name();
 			if ( (name.size() > 4 && name.substr(name.size() - 4) == ".txt")
 			     || (name.size() > 10 && name.substr(name.size() - 10) == ".presetMap")) {
@@ -116,33 +132,38 @@ bool PresetMapper::restore(std::string mapName, bool overwrite, bool autoCreate)
 {
 	bool ok = true;
 	if (mapName.size() > 18 && mapName.substr(mapName.size() - 18) == ".presetMap_archive") { // restore from archive
-		Dir mapDirectory(mPresetHandler->getCurrentPath() + "/" + mapName);
+		std::cout << "Restoring archive " << mapName << std::endl;
+		Dir mapDirectory(mPresetHandler->getCurrentPath() + mapName);
+		std::string mapNewName = mapName.substr(0, mapName.size() - sizeof("_archive") + 1);
 		while (mapDirectory.read()) {
 			const FileInfo &entry = mapDirectory.entry();
 			if (entry.type() == FileInfo::REG) {
 				if (entry.name().substr(entry.name().size() - 7) == ".preset") {
 					if (overwrite && File::exists(mPresetHandler->getCurrentPath() + "/" + entry.name())) {
-						File::remove(mPresetHandler->getCurrentPath() + "/" + entry.name());
+						File::remove(mPresetHandler->getCurrentPath() + entry.name());
 					}
-					if (!File::copy(mPresetHandler->getCurrentPath() + "/" + mapName + "/" + entry.name(),
-					                mPresetHandler->getCurrentPath() + "/" + entry.name())) {
+					if (!File::copy(mPresetHandler->getCurrentPath() + mapName + "/" + entry.name(),
+					                mPresetHandler->getCurrentPath() + entry.name())) {
 						std::cout << "Error restoring preset " << entry.name() << " for " << mapName << std::endl;
 						ok = false;
 					}
-				} else if (entry.name() == "default.preset") {
-					std::string mapNewName = mapName.substr(0, mapName.size() - sizeof("_archive"));
+				} else if (entry.name() == "default.presetMap") {
+
 					if (overwrite && File::exists(mPresetHandler->getCurrentPath() + "/" + mapNewName)) {
 						File::remove(mPresetHandler->getCurrentPath() + "/" + entry.name());
 					}
 
-					if (!File::copy(mPresetHandler->getCurrentPath() + "/" + mapName + "/default.preset",
+					if (!File::copy(mPresetHandler->getCurrentPath() + "/" + mapName + "/default.presetMap",
 					                mPresetHandler->getCurrentPath() + "/" + mapNewName)) {
 						std::cout << "Error restoring preset map " << mapNewName << " for " << mapName << std::endl;
 						ok = false;
 					}
+				} else {
+					std::cout << "PresetMapper::restore() invalid file: " << entry.name() << std::endl;
 				}
 			}
 		}
+		mPresetHandler->setCurrentPresetMap(mapNewName, autoCreate);
 	} else { // set preset map directly
 		mPresetHandler->setCurrentPresetMap(mapName, autoCreate);
 	}

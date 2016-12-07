@@ -48,20 +48,6 @@ void PresetHandler::setSubDirectory(std::string directory)
 			std::cout << "Error creating directory: " << mRootDir << std::endl;
 		}
 	}
-	setCurrentPresetMap("default");
-}
-
-std::vector<std::string> PresetHandler::availableSubDirectories()
-{
-	std::vector<std::string> subDirList;
-	Dir presetDir(mRootDir);
-	while(presetDir.read()) {
-		FileInfo info = presetDir.entry();
-		if (info.type() == FileInfo::DIR) {
-			subDirList.push_back(info.name());
-		}
-	}
-	return subDirList;
 }
 
 void PresetHandler::registerPresetCallback(PresetHandler::PresetChangeCallback cb, void *userData)
@@ -78,7 +64,7 @@ void PresetHandler::registerMorphTimeCallback(Parameter::ParameterChangeCallback
 
 std::string PresetHandler::buildMapPath(std::string mapName)
 {
-	std::string currentPath = getCurrentPath();
+	std::string currentPath = getRootPath();
 	if (currentPath.back() != '/') {
 		currentPath += "/";
 	}
@@ -116,9 +102,6 @@ void PresetHandler::storePreset(int index, std::string name, bool overwrite)
 	std::replace( name.begin(), name.end(), ':', '_');
 
 	std::string path = getCurrentPath();
-	if (path.back() != '/') {
-		path += "/";
-	}
 	if (name == "") {
 		name = "default";
 	}
@@ -255,11 +238,19 @@ void PresetHandler::stopMorph()
 
 std::string PresetHandler::getCurrentPath()
 {
+	std::string relPath = getRootPath() + mSubDir;
+	if (relPath.back() != '/') {
+		relPath += "/";
+	}
+	return relPath;
+}
+
+std::string al::PresetHandler::getRootPath()
+{
 	std::string relPath = mRootDir;
 	if (relPath.back() != '/') {
 		relPath += "/";
 	}
-	relPath += mSubDir;
 	return relPath;
 }
 
