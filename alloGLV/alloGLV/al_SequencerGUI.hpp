@@ -61,7 +61,7 @@ public:
 
 	static glv::View *makeRecorderView(SequenceRecorder &recorder);
 
-	static glv::View *makePresetMapperView(PresetMapper &presetMapper);
+	static glv::View *makePresetMapperView(PresetMapper &presetMapper, bool showArchives = true);
 
 private:
 	struct PresetViewData {
