@@ -152,7 +152,7 @@ glv::View *SequencerGUI::makePresetMapperView(PresetMapper &presetMapper, bool s
 		glv::DropDown &dd = *n.sender<glv::DropDown>();
 		PresetMapper &mapper = *n.receiver<PresetMapper>();
 		std::cout << dd.getValue() << std::endl;
-		mapper.restore(dd.getValue());
+		mapper.load(dd.getValue());
 	}, glv::Update::Value, &presetMapper);
 
 	glv::Table *layout = new glv::Table("><");

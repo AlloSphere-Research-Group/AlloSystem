@@ -81,12 +81,15 @@ bool PresetMapper::archive(std::string mapName, bool overwrite)
 
 bool PresetMapper::load(std::string archiveName)
 {
-	std::string fullPath = mPresetHandler->buildMapPath(archiveName) + "_archive";
-	if (File::isDirectory(fullPath)) {
-		mPresetHandler->setSubDirectory(archiveName + "_archive");
+	if (! (archiveName.size() > 8 && archiveName.substr(archiveName.size() - 8) == "_archive") ) {
+		archiveName +="_ archive";
+	}
+	std::string mapPath = mPresetHandler->buildMapPath(archiveName);
+	if (File::isDirectory(mapPath)) {
+		mPresetHandler->setSubDirectory(archiveName);
 		mPresetHandler->setCurrentPresetMap("default");
 	} else {
-		std::cout << "Error loading archive: " << archiveName;
+		std::cout << "Error loading archive: " << archiveName << std::endl;
 		return false;
 	}
 	return true;

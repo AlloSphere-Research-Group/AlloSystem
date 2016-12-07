@@ -43,6 +43,10 @@ bool PresetSequencer::archiveSequence(std::string sequenceName, bool overwrite)
 {
 	bool ok = true;
 	std::string fullPath = buildFullPath(sequenceName) + "_archive";
+	if (mPresetHandler == nullptr) {
+		std::cerr << "A Preset Handler must be registered to store sequences. Aborting." << std::endl;
+		return false;
+	}
 	if (overwrite) {
 		if(File::isDirectory(fullPath)) {
 			if (!Dir::removeRecursively(fullPath)) {
@@ -115,6 +119,11 @@ void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
 	sequencer->mSequenceLock.lock();
 	auto sequenceStart = std::chrono::high_resolution_clock::now();
 	auto targetTime = sequenceStart;
+	if (sequencer->mPresetHandler == nullptr) {
+		std::cerr << "No preset handler registered. Can't run sequencer." << std::endl;
+		sequencer->mSequenceLock.unlock();
+		return;
+	}
 	while(sequencer->running() && sequencer->mSteps.size() > 0) {
 		Step &step = sequencer->mSteps.front();
 		sequencer->mPresetHandler->setMorphTime(step.delta);
