@@ -84,7 +84,7 @@ bool PresetMapper::load(std::string archiveName)
 	if (! (archiveName.size() > 8 && archiveName.substr(archiveName.size() - 8) == "_archive") ) {
 		archiveName +="_ archive";
 	}
-	std::string mapPath = mPresetHandler->buildMapPath(archiveName);
+	std::string mapPath = mPresetHandler->getRootPath() + archiveName;
 	if (File::isDirectory(mapPath)) {
 		mPresetHandler->setSubDirectory(archiveName);
 		mPresetHandler->setCurrentPresetMap("default");
