@@ -139,10 +139,10 @@ glv::View *SequencerGUI::makeRecorderView(SequenceRecorder &recorder)
 	return layout;
 }
 
-glv::View *SequencerGUI::makePresetMapperView(PresetMapper &presetMapper)
+glv::View *SequencerGUI::makePresetMapperView(PresetMapper &presetMapper, bool showArchives)
 {
 	glv::DropDown *mapperSelector = new glv::DropDown;
-	std::vector<std::string> mapList = presetMapper.listAvailableMaps();
+	std::vector<std::string> mapList = presetMapper.listAvailableMaps(showArchives);
 
 	for(std::string map: mapList) {
 		mapperSelector->addItem(map);
