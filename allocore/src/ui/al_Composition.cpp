@@ -105,7 +105,8 @@ bool Composition::archiveComposition()
 		}
 		while(sequenceSteps.size() > 0) {
 			PresetSequencer::Step &sequenceStep = sequenceSteps.front();
-			if (!File::copy(path + sequenceStep.presetName + ".preset",
+			if (!File::exists(archivePath + "/" + sequenceStep.presetName + ".preset")
+			        && !File::copy(path + sequenceStep.presetName + ".preset",
 			                archivePath + "/" + sequenceStep.presetName + ".preset")) {
 				std::cerr << "Error copying preset: " << sequenceStep.presetName << " when archiving composition." << std::endl;
 				ok = false;
