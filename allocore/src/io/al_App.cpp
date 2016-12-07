@@ -252,7 +252,7 @@ App::~App(){
 		delete mFacViewpoints[i];
 	}
 
-	if(name()!="" && oscSend().opened()) sendDisconnect();
+	if(oscSend().opened() && !name().empty()) sendDisconnect();
 }
 
 
@@ -305,26 +305,25 @@ ViewpointWindow * App::initWindow(
 	Window::DisplayMode mode,
 	int flags
 ){
-	//ViewpointWindow * win = new ViewpointWindow(dims, title, fps, mode);
-
-	ViewpointWindow * win = new ViewpointWindow;
-	win->dimensions(dims);
-	win->title(title);
-	win->fps(fps);
-	win->displayMode(mode);
-
-	mFacViewpoints.push_back(new Viewpoint);
-
-	int last = mFacViewpoints.size()-1;
-	{
-		Viewpoint& vp = *mFacViewpoints[last];
-		vp.parentTransform(nav().transformed());
-		win->add(vp);
+	auto& win = *new ViewpointWindow;
+	win.dimensions(dims);
+	if(title.empty()){ // if no title, use app name, if any
+		if(!name().empty()) win.title(name());
+	} else {
+		win.title(title);
 	}
 
-	mFacWindows.push_back(win);
-	add(*win);
-	return win;
+	win.fps(fps);
+	win.displayMode(mode);
+	
+	auto& newVP = *new Viewpoint;
+	mFacViewpoints.push_back(&newVP);
+	newVP.parentTransform(nav().transformed());
+	win.add(newVP);
+
+	mFacWindows.push_back(&win);
+	add(win);
+	return &win;
 }
 
 
@@ -348,7 +347,7 @@ void App::start(){
 		clockAnimate(mWindows[0]);
 	}
 	if(usingAudio()) mAudioIO.start();
-	if(name()!="" && oscSend().opened()) sendHandshake();
+	if(oscSend().opened() && !name().empty()) sendHandshake();
 
 //	// factories OKAY
 //	for(unsigned i=0; i<mFacViewpoints.size(); ++i)
@@ -395,9 +394,7 @@ void App::start(){
 
 	if(windows().size()){
 		// create the windows
-		for(unsigned i=0; i<windows().size(); ++i){
-			windows()[i]->create();
-		}
+		for(auto& w : windows()) w->create();
 
 		// start the main loop
 		Main::get().start();
