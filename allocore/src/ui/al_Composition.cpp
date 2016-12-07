@@ -9,7 +9,7 @@
 using namespace al;
 
 Composition::Composition(std::string fileName, std::string path) :
-    mPath(path), mCompositionName(fileName), mPlayThread(nullptr),
+    mPath(path), mSubDirectory(""), mCompositionName(fileName), mPlayThread(nullptr),
     mSequencer(nullptr)
 {
 	mCompositionSteps = loadCompositionSteps(mCompositionName);
@@ -26,9 +26,11 @@ Composition::~Composition()
 
 void Composition::play()
 {
+	mPlayerLock.lock();
 	stop();
 	mPlaying = true;
 	mPlayThread = new std::thread(Composition::playbackThread, this);
+	mPlayerLock.unlock();
 }
 
 void Composition::stop()
@@ -44,7 +46,23 @@ void Composition::stop()
 
 bool Composition::playArchive(std::string archiveName)
 {
+	std::string compositionName = archiveName;
+	if (compositionName.size() > 8 && compositionName.substr(compositionName.size() - 8) == "_archive") {
+		compositionName = compositionName.substr(0, compositionName.size() - 8);
+	} else {
+		archiveName += "_archive";
+	}
+	if (File::isDirectory(archiveName) && File::exists(compositionName + ".composition")) {
+		mPlayerLock.lock();
+		stop();
+		setSubDirectory(archiveName);
+		mCompositionName = compositionName;
 
+		mCompositionSteps = loadCompositionSteps(mCompositionName);
+		mPlayerLock.unlock();
+		play();
+	}
+	return true;
 }
 
 std::string Composition::getName()
@@ -54,13 +72,10 @@ std::string Composition::getName()
 
 bool Composition::archiveComposition()
 {
-	std::string path = mPath;
+	std::string path = getCurrentPath();
 	std::string compositionName = mCompositionName;
 	bool ok = true;
 
-	if (path.back() != '/' && path.size() > 0) {
-		path += "/";
-	}
 	std::string fullPath = path;
 	fullPath += compositionName + ".composition";
 
@@ -125,6 +140,9 @@ bool Composition::archiveComposition()
 
 bool Composition::archive(std::string compositionName, std::string path, bool overwrite)
 {
+	std::cout << "archive() not implemented" <<std::endl;
+	// TODO implement
+	return false;
 
 }
 
@@ -137,12 +155,21 @@ bool Composition::restore(std::string compositionName, std::string path, bool ov
 
 int Composition::size()
 {
-	return mCompositionSteps.size();
+	mPlayerLock.lock();
+	int size = mCompositionSteps.size();
+	mPlayerLock.unlock();
+	return size;
 }
 
 const CompositionStep Composition::getStep(int index)
 {
-	return mCompositionSteps[index];
+	mPlayerLock.lock();
+	CompositionStep step;
+	if (index > 0 && index < size()) {
+		step = mCompositionSteps[index];
+	}
+	mPlayerLock.unlock();
+	return step;
 }
 
 void Composition::insertStep(std::string name, float deltaTime, int index)
@@ -163,10 +190,7 @@ void Composition::write()
 	}
 //	std::cout << fileText << std::endl;
 
-	std::string path = mPath;
-	if (path.back() != '/') {
-		path += "/";
-	}
+	std::string path = getCurrentPath();
 	std::string fileName = path + mCompositionName + ".composition";
 	std::ofstream f(fileName);
 	if (!f.is_open()) {
@@ -183,10 +207,8 @@ void Composition::write()
 std::vector<al::CompositionStep> Composition::loadCompositionSteps(std::string compositionName)
 {
 	std::vector<al::CompositionStep> steps;
-	std::string fullName = mPath;
-	if (fullName.back() != '/') {
-		fullName += "/";
-	}
+	std::string fullName = getCurrentPath();
+
 	if (fullName.size() > 12 && !(fullName.substr(fullName.size() - 12) == ".composition") ) {
 		fullName += compositionName + ".composition";
 	}
@@ -216,6 +238,20 @@ std::vector<al::CompositionStep> Composition::loadCompositionSteps(std::string c
 		std::cout << "Error reading:" << mCompositionName << std::endl;
 	}
 	return steps;
+}
+
+std::string Composition::getCurrentPath()
+{
+	std::string path = mPath;
+
+	if (path.back() != '/' && path.size() > 0) {
+		path += "/";
+	}
+	path += mSubDirectory;
+	if (path.back() != '/' && path.size() > 0) {
+		path += "/";
+	}
+	return path;
 }
 
 void Composition::playbackThread(Composition *composition)

@@ -66,12 +66,14 @@ public:
 	void play();
 	void stop();
 
-	static bool playArchive(std::string archiveName);
+	bool playArchive(std::string archiveName);
 
 	std::string getName();
 
 	/// Archive current compostion
 	bool archiveComposition();
+
+	void setSubDirectory(std::string subDir) { mSubDirectory = subDir; }
 
 	static bool archive(std::string compositionName, std::string path = "", bool overwrite = true);
 	static bool restore(std::string compositionName, std::string path = "",  bool overwrite = true);
@@ -94,14 +96,17 @@ public:
 private:
 
 	std::vector<CompositionStep> loadCompositionSteps(std::string compositionSteps);
+	std::string getCurrentPath();
 
 	std::vector<CompositionStep> mCompositionSteps;
 	std::string mPath;
+	std::string mSubDirectory;
 	std::string mCompositionName;
 
 	std::thread *mPlayThread;
 	bool mPlaying;
 	PresetSequencer *mSequencer;
+	std::mutex mPlayerLock;
 
 	static void playbackThread(Composition *composition);
 };
