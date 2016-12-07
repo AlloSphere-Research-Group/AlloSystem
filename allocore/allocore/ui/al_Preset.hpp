@@ -101,19 +101,15 @@ public:
 	 *
 	 */
 	void storePreset(int index, std::string name = "", bool overwrite = true);
-
-	void recallPreset(std::string name);
-
 	/**
-	 * @brief Set parameters to values interpolated between two presets
-	 * @param index1 index of the first preset
-	 * @param index2 index of the second preset
-	 * @param factor A value between 0-1 to determine interpolation
+	 * @brief Recall a preset by name
+	 * @param name
 	 *
-	 * A factor of 0 uses preset 1 and a factor of 1 uses preset 2. Values
-	 * in between result in linear interpolation of the values.
+	 * The preset should be a file on disk in the PresetHandler's root
+	 * directory and should have the ".preset" extension. See also
+	 * setSubDirectory().
 	 */
-	void setInterpolatedPreset(int index1, int index2, double factor);
+	void recallPreset(std::string name);
 
 	/**
 	 * @brief Recall a preset by index number
@@ -126,6 +122,17 @@ public:
 	 * See also PresetMapper for handling and archiving preset maps.
 	 */
 	std::string recallPreset(int index);
+
+	/**
+	 * @brief Set parameters to values interpolated between two presets
+	 * @param index1 index of the first preset
+	 * @param index2 index of the second preset
+	 * @param factor A value between 0-1 to determine interpolation
+	 *
+	 * A factor of 0 uses preset 1 and a factor of 1 uses preset 2. Values
+	 * in between result in linear interpolation of the values.
+	 */
+	void setInterpolatedPreset(int index1, int index2, double factor);
 
 	std::map<int, std::string> availablePresets();
 	std::string getPresetName(int index);
@@ -168,7 +175,7 @@ public:
 
 	PresetHandler &operator << (Parameter &param) { return this->registerParameter(param); }
 
-	std::string buildMapPath(std::string mapName);
+	std::string buildMapPath(std::string mapName, bool useSubDirectory = false);
 
 	std::map<int, std::string> readPresetMap(std::string mapName = "default");
 

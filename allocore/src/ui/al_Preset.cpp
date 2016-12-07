@@ -41,13 +41,14 @@ PresetHandler &PresetHandler::registerParameter(Parameter &parameter)
 
 void PresetHandler::setSubDirectory(std::string directory)
 {
-	mSubDir = directory;
 	std::string path = getCurrentPath();
-	if (!File::exists(path)) {
-		if (!Dir::make(path, true)) {
+	if (!File::exists(path + directory)) {
+		if (!Dir::make(path + directory, true)) {
 			std::cout << "Error creating directory: " << mRootDir << std::endl;
+			return;
 		}
 	}
+	mSubDir = directory;
 }
 
 void PresetHandler::registerPresetCallback(PresetHandler::PresetChangeCallback cb, void *userData)
@@ -62,14 +63,21 @@ void PresetHandler::registerMorphTimeCallback(Parameter::ParameterChangeCallback
 	mMorphTime.registerChangeCallback(cb, userData);
 }
 
-std::string PresetHandler::buildMapPath(std::string mapName)
+std::string PresetHandler::buildMapPath(std::string mapName, bool useSubDirectory)
 {
 	std::string currentPath = getRootPath();
 	if (currentPath.back() != '/') {
 		currentPath += "/";
 	}
+	if (useSubDirectory) {
+		currentPath += mSubDir;
+	}
+	if (currentPath.back() != '/') {
+		currentPath += "/";
+	}
 	if ( !(mapName.size() > 4 && mapName.substr(mapName.size() - 4) == ".txt")
-	     && !(mapName.size() > 10 && mapName.substr(mapName.size() - 10) == ".presetMap")) {
+	     && !(mapName.size() > 10 && mapName.substr(mapName.size() - 10) == ".presetMap")
+	     && !(mapName.size() > 18 && mapName.substr(mapName.size() - 18) == ".presetMap_archive")) {
 		mapName = mapName + ".presetMap";
 	}
 
@@ -265,7 +273,7 @@ void PresetHandler::print()
 std::map<int, std::string> PresetHandler::readPresetMap(std::string mapName)
 {
 	std::map<int, std::string> presetsMap;
-	std::string mapFullPath = buildMapPath(mapName);
+	std::string mapFullPath = buildMapPath(mapName, true);
 	std::ifstream f(mapFullPath);
 	if (!f.is_open()) {
 		if (mVerbose) {
@@ -301,7 +309,7 @@ std::map<int, std::string> PresetHandler::readPresetMap(std::string mapName)
 
 void PresetHandler::setCurrentPresetMap(std::string mapName, bool autoCreate)
 {
-	std::string mapFullPath = buildMapPath(mapName);
+	std::string mapFullPath = buildMapPath(mapName, true);
 	if (autoCreate
 	        && !File::exists(mapFullPath)
 	        && !File::isDirectory(mapFullPath)) {

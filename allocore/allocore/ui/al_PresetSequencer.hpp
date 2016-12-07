@@ -111,6 +111,12 @@ public:
 		}
 	}
 
+	struct Step {
+		std::string presetName;
+		float delta; // The time to get to the preset
+		float duration; // The time to stay in the preset before the next step
+	};
+
 	/**
 	 * @brief Start playing the sequence specified
 	 * @param sequenceName
@@ -141,6 +147,17 @@ public:
 	 */
 	std::vector<std::string> getSequenceList();
 
+	/**
+	 * @brief setDirectory sets the working directory for the PresetSequencer
+	 * @param directory
+	 *
+	 * This function can be used in cases where the actual sequencer is not
+	 * needed, because preset recall and morphing is done by the PresetHandler.
+	 * This is useful for instance if you need to query the step of a sequence
+	 * for a different purpose.
+	 */
+	void setDirectory(std::string directory) { mDirectory = directory; }
+
 	inline bool running() { return mRunning; }
 
 	PresetSequencer &operator<< (PresetHandler &presetHandler)
@@ -151,17 +168,12 @@ public:
 		return *this;
 	}
 
-private:
+	std::queue<Step> loadSequence(std::string sequenceName);
 
-	struct Step {
-		std::string presetName;
-		float delta; // The time to get to the preset
-		float duration; // The time to stay in the preset before the next step
-	};
+private:
 
 	static void sequencerFunction(PresetSequencer *sequencer);
 
-	std::queue<Step> loadSequence(std::string sequenceName);
 
 	std::string buildFullPath(std::string sequenceName);
 

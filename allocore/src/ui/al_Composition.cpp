@@ -1,8 +1,10 @@
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 #include "allocore/ui/al_Composition.hpp"
 #include "allocore/system/al_Time.hpp"
+#include "allocore/io/al_File.hpp"
 
 using namespace al;
 
@@ -10,37 +12,7 @@ Composition::Composition(std::string fileName, std::string path) :
     mPath(path), mCompositionName(fileName), mPlayThread(nullptr),
     mSequencer(nullptr)
 {
-	std::string fullName = mPath;
-	if (fullName.back() != '/') {
-		fullName += "/";
-	}
-	fullName += mCompositionName + ".composition";
-	std::ifstream f(fullName);
-	if (!f.is_open()) {
-		std::cout << "Could not open:" << fullName << std::endl;
-		return;
-	}
-	std::string line;
-	while (getline(f, line)) {
-		if (line.substr(0, 2) == "::") {
-			break;
-		}
-		std::stringstream ss(line);
-		std::string name, delta;
-		std::getline(ss, name, ':');
-		std::getline(ss, delta, ':');
-		if (name.size() > 0) {
-			CompositionStep step;
-			step.sequenceName = name;
-			step.deltaTime = std::stof(delta);
-			mCompositionSteps.push_back(step);
-			// std::cout << name  << ":" << delta << std::endl;
-		}
-	}
-	if (f.bad()) {
-		std::cout << "Error reading:" << mCompositionName << std::endl;
-		return;
-	}
+	mCompositionSteps = loadCompositionSteps(mCompositionName);
 }
 
 Composition::~Composition()
@@ -70,9 +42,96 @@ void Composition::stop()
 	mSequencer->stopSequence();
 }
 
+bool Composition::playArchive(std::string archiveName)
+{
+
+}
+
 std::string Composition::getName()
 {
-  return mCompositionName;
+	return mCompositionName;
+}
+
+bool Composition::archiveComposition()
+{
+	std::string path = mPath;
+	std::string compositionName = mCompositionName;
+	bool ok = true;
+
+	if (path.back() != '/' && path.size() > 0) {
+		path += "/";
+	}
+	std::string fullPath = path;
+	fullPath += compositionName + ".composition";
+
+	std::string archivePath = fullPath;
+	if (archivePath.size() > 8 && archivePath.substr(archivePath.size() - 8) != "_archive") {
+		archivePath += "_archive";
+	}
+
+	if (File::isDirectory(archivePath) ) {
+		if (!Dir::removeRecursively(archivePath)) {
+			std::cerr << "Error removing directory: " << fullPath << " aborting composition archiving." << std::endl;
+			return false;
+		}
+		if (!Dir::make(archivePath)) {
+			std::cerr << "Error creating composition archive directory " << fullPath << std::endl;
+			return false;
+		}
+
+	} else if (!File::exists(archivePath)) {
+		if (!Dir::make(archivePath)) {
+			std::cerr << "Error creating compostion archive directory " << archivePath << std::endl;
+			return false;
+		}
+
+	} else {
+		// TODO generate new name instead of error
+		std::cerr << "compostion directory name taken by file: " << archivePath << std::endl;
+		return false;
+	}
+
+	auto steps = loadCompositionSteps(compositionName);
+
+	for (auto step: steps) {
+		std::cout << step.sequenceName << ":" << step.deltaTime << std::endl;
+		PresetSequencer sequencer;
+		sequencer.setDirectory(path);
+		std::queue<PresetSequencer::Step> sequenceSteps = sequencer.loadSequence(step.sequenceName);
+		if (!File::copy(path + step.sequenceName + ".sequence",
+		                archivePath + "/" + step.sequenceName + ".sequence")) {
+			std::cerr << "Error copying sequence: " << step.sequenceName << " when archiving composition." << std::endl;
+			ok = false;
+		}
+		while(sequenceSteps.size() > 0) {
+			PresetSequencer::Step &sequenceStep = sequenceSteps.front();
+			if (!File::copy(path + sequenceStep.presetName + ".preset",
+			                archivePath + "/" + sequenceStep.presetName + ".preset")) {
+				std::cerr << "Error copying preset: " << sequenceStep.presetName << " when archiving composition." << std::endl;
+				ok = false;
+			}
+			sequenceSteps.pop();
+		}
+	}
+	if (!File::copy(fullPath,
+	                archivePath + "/" + compositionName + ".composition")) {
+		 std::cerr << "Error copying composition: " << compositionName << " when archiving composition." << std::endl;
+		 ok = false;
+	 }
+
+	return true;
+}
+
+bool Composition::archive(std::string compositionName, std::string path, bool overwrite)
+{
+
+}
+
+bool Composition::restore(std::string compositionName, std::string path, bool overwrite)
+{
+	std::cout << "restore() not implemented" <<std::endl;
+	// TODO implement
+	return false;
 }
 
 int Composition::size()
@@ -118,6 +177,44 @@ void Composition::write()
 		std::cout << "Error while writing composition file: " << fileName << std::endl;
 	}
 	f.close();
+}
+
+std::vector<al::CompositionStep> Composition::loadCompositionSteps(std::string compositionName)
+{
+	std::vector<al::CompositionStep> steps;
+	std::string fullName = mPath;
+	if (fullName.back() != '/') {
+		fullName += "/";
+	}
+	if (fullName.size() > 12 && !(fullName.substr(fullName.size() - 12) == ".composition") ) {
+		fullName += compositionName + ".composition";
+	}
+	std::ifstream f(fullName);
+	if (!f.is_open()) {
+		std::cout << "Could not open:" << fullName << std::endl;
+		return steps;
+	}
+	std::string line;
+	while (getline(f, line)) {
+		if (line.substr(0, 2) == "::") {
+			break;
+		}
+		std::stringstream ss(line);
+		std::string name, delta;
+		std::getline(ss, name, ':');
+		std::getline(ss, delta, ':');
+		if (name.size() > 0) {
+			CompositionStep step;
+			step.sequenceName = name;
+			step.deltaTime = std::stof(delta);
+			steps.push_back(step);
+			// std::cout << name  << ":" << delta << std::endl;
+		}
+	}
+	if (f.bad()) {
+		std::cout << "Error reading:" << mCompositionName << std::endl;
+	}
+	return steps;
 }
 
 void Composition::playbackThread(Composition *composition)

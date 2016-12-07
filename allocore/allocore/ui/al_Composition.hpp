@@ -66,7 +66,15 @@ public:
 	void play();
 	void stop();
 
+	static bool playArchive(std::string archiveName);
+
 	std::string getName();
+
+	/// Archive current compostion
+	bool archiveComposition();
+
+	static bool archive(std::string compositionName, std::string path = "", bool overwrite = true);
+	static bool restore(std::string compositionName, std::string path = "",  bool overwrite = true);
 
 	int size();
 	const CompositionStep getStep(int index);
@@ -84,6 +92,9 @@ public:
 	}
 
 private:
+
+	std::vector<CompositionStep> loadCompositionSteps(std::string compositionSteps);
+
 	std::vector<CompositionStep> mCompositionSteps;
 	std::string mPath;
 	std::string mCompositionName;
