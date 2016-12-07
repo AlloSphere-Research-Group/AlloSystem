@@ -68,7 +68,6 @@ public:
 	 * @param rootDirectory sets the root directory for preset and preset map storage
 	 * @param verbose if true, print diagnostic messages
 	 *
-	 * The
 	 */
 	PresetHandler(std::string rootDirectory = "presets", bool verbose = false);
 
@@ -138,9 +137,11 @@ public:
 
 	void setSubDirectory(std::string directory);
 
-	std::vector<std::string> availableSubDirectories();
-
+	/// Path including subdirectory if any
 	std::string getCurrentPath();
+
+	/// Base path without appending sub directory
+	std::string getRootPath();
 
 	/** Display information about preset handler, including path and
 	 * registered parameters.
@@ -182,7 +183,7 @@ private:
 
 	bool mVerbose;
 	std::string mRootDir;
-	std::string mSubDir;
+	std::string mSubDir; // Optional sub directory, e.g. for preset map archives
 	std::string mFileName;
 	std::string mCurrentMapName;
 	std::vector<Parameter *> mParameters;

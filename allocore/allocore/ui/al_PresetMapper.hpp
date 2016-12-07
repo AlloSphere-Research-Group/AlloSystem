@@ -85,10 +85,17 @@ public:
 
 	bool archive(std::string mapName = "default", bool overwrite = true);
 
+	bool load(std::string mapName);
+
 	/// Restore a preset map from a preset map archive directory
+	/// This copies all the files back to the preset root directory
+	/// If you don't want this copy use load()
 	bool restore(std::string mapName = "default", bool overwrite = true, bool autoCreate = false);
 
-	std::vector<std::string> listAvailableMaps();
+	/// Return a list with the name of availble preset maps for use in restore() or archive().
+	/// if listArchives is true, only archive directories are listed, otherwise only preset map
+	/// files are.
+	std::vector<std::string> listAvailableMaps(bool listArchives = true);
 
 	virtual bool consumeMessage(osc::Message &m, std::string rootOSCPath) override;
 
