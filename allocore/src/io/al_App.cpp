@@ -130,18 +130,19 @@ bool SceneWindowHandler::onFrame(){
 
 	if(app.clockNav() == &win){
 		double dt = win.spfActual();
+		//double dt = win.spf(); // use theoretical dt for smooth control
 		app.nav().smooth(::pow(0.0001, dt));
 		app.nav().step(dt * 40./*FPS*/);
 		//app.nav().smooth(0.8);
 		//app.nav().step(1.);
 	}
 
-	app.navDraw() = app.nav();
-	app.navDraw().quat().normalize();
-
 	if(app.clockAnimate() == &win){
 		app.onAnimate(win.spfActual());
 	}
+
+	app.navDraw() = app.nav();
+	app.navDraw().quat().normalize();
 
 	Graphics& g = app.graphics();
 	g.depthTesting(true);
