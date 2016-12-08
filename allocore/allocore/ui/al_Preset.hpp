@@ -181,6 +181,8 @@ public:
 
 	void setCurrentPresetMap(std::string mapName = "default", bool autoCreate = false);
 
+	void forwardToListeners(bool forward) { mForwardToListeners = forward; }
+
 private:
 	void storeCurrentPresetMap();
 
@@ -189,6 +191,7 @@ private:
 	static void morphingFunction(PresetHandler *handler);
 
 	bool mVerbose;
+	bool mForwardToListeners;
 	std::string mRootDir;
 	std::string mSubDir; // Optional sub directory, e.g. for preset map archives
 	std::string mFileName;
