@@ -81,8 +81,8 @@ bool PresetMapper::archive(std::string mapName, bool overwrite)
 
 bool PresetMapper::load(std::string archiveName)
 {
-	if (! (archiveName.size() > 8 && archiveName.substr(archiveName.size() - 8) == "_archive") ) {
-		archiveName +="_ archive";
+	if (! (archiveName.size() > 18 && archiveName.substr(archiveName.size() - 18) == ".presetMap_archive") ) {
+		archiveName +=".presetMap_archive";
 	}
 	std::string mapPath = mPresetHandler->getRootPath() + archiveName;
 	if (File::isDirectory(mapPath)) {
