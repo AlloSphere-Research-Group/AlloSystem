@@ -125,7 +125,7 @@ bool PresetMapper::consumeMessage(osc::Message &m, std::string rootOSCPath)
 		std::string val;
 		m >> val;
 		std::cout << "OSC: Recall preset map: " << val << std::endl;
-		this->restore(val);
+		this->load(val);
 		return true;
 	}
 	return false;
