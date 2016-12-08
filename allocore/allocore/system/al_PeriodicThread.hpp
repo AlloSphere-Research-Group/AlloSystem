@@ -42,7 +42,6 @@
 	Lance Putnam, 2013, putnam.lance@gmail.com
 */
 
-#include <functional> // std::function
 #include "allocore/system/al_Thread.hpp"
 #include "allocore/system/al_Time.hpp"
 
@@ -84,7 +83,7 @@ public:
 	double period() const;
 
 	/// Start calling the supplied function periodically
-	void start(std::function<void (void)> func);
+	void start(ThreadFunction& func);
 
 	/// Stop the thread
 	void stop();
@@ -95,6 +94,7 @@ public:
 	PeriodicThread& operator= (PeriodicThread other);
 
 private:
+	static void * sPeriodicFunc(void * userData);
 	void go();
 
 	al_nsec mPeriod;
@@ -102,7 +102,7 @@ private:
 	al_nsec mWait;					// actual time to sleep between frames
 	al_nsec mTimeBehind;
 	float mAutocorrect;
-	std::function<void(void)> mUserFunc;
+	ThreadFunction * mUserFunc;
 	bool mRun;
 };
 
