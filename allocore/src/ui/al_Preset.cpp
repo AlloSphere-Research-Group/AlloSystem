@@ -167,9 +167,11 @@ void PresetHandler::recallPreset(std::string name)
 		}
 	}
 	mCurrentPresetName = name;
-	for(int i = 0; i < mCallbacks.size(); ++i) {
-		if (mCallbacks[i]) {
-			mCallbacks[i](index, this, mCallbackUdata[i]);
+	if (mForwardToListeners) {
+		for(int i = 0; i < mCallbacks.size(); ++i) {
+			if (mCallbacks[i]) {
+				mCallbacks[i](index, this, mCallbackUdata[i]);
+			}
 		}
 	}
 }
