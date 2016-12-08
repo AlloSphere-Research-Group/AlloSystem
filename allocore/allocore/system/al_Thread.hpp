@@ -44,8 +44,6 @@
 */
 
 
-#include <functional> // std::function
-
 namespace al{
 
 
@@ -71,18 +69,6 @@ struct CThreadFunction : public ThreadFunction{
 	{}
 
 	void operator()(){ func(user); }
-
-	/*template <class Function>
-	void assign(Function& f){
-		struct F{
-			static void * cfunc(void * user){
-				(*(Function *)(user))();
-				return NULL;
-			}
-		};
-		func = F::cfunc;
-		user = &f;
-	}*/
 
 	CFunc func;		///< Thread execution function
 	void * user;	///< User data passed into thread execution function
@@ -121,9 +107,11 @@ public:
 	Thread& priority(int v);
 
 
-	/// Start executing function
-	bool start(std::function<void (void)> func);
+	/// Start executing thread function
+	bool start(ThreadFunction& func);
 
+	/// Start executing thread C function with user data
+	bool start(void * (*threadFunc)(void * userData), void * userData);
 
 	/// Block the calling routine indefinitely until the thread terminates
 
@@ -131,10 +119,7 @@ public:
 	///	terminated.  It will return immediately if the thread was already
 	///	terminated.  A \e true return value signifies successful termination.
 	///	A \e false return value indicates a problem with the wait call.
-	bool join(double timeoutSec=-1);
-
-	/// Returns pointer to implementation-specific thread handle
-	void * nativeHandle();
+	bool join();
 
 	/// Return pointer to current OS thread object
 
@@ -145,18 +130,11 @@ public:
 	// Stuff for assignment
 	friend void swap(Thread& a, Thread& b);
 	Thread& operator= (Thread other);
-
 protected:
 	class Impl;
 	Impl * mImpl;
-	std::function<void(void)> mFunc;
+	CThreadFunction mCFunc;
 	bool mJoinOnDestroy;
-
-public:
-	/// \deprecated
-	bool start(ThreadFunction& func);
-	/// \deprecated
-	bool start(void * (*threadFunc)(void * userData), void * userData);
 };
 
 
@@ -206,18 +184,7 @@ public:
 
 	/// Join all worker threads
 	void join(){
-		//*
-		int joined=0;
-		int i=0;
-		while(joined < size()){
-			//printf("trying to join %d\n", i);
-			if(thread(i).join(0.)){
-				//printf("\tjoined %d\n", i);
-				++joined;
-			}
-			(++i) %= size();
-		}//*/
-		//for(int i=0; i<size(); ++i) thread(i).join(0.);
+		for(int i=0; i<size(); ++i) thread(i).join();
 	}
 
 	/// Get a worker
@@ -259,6 +226,18 @@ protected:
 
 	void clear(){ if(mWorkers) delete[] mWorkers; }
 };
+
+
+
+
+// -----------------------------------------------------------------------------
+// Inline implementation
+
+inline bool Thread::start(void * (*threadFunc)(void * userData), void * userData){
+	mCFunc.func = threadFunc;
+	mCFunc.user = userData;
+	return start(mCFunc);
+}
 
 } // al::
 
