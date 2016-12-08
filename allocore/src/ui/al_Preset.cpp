@@ -159,6 +159,7 @@ void PresetHandler::recallPreset(std::string name)
 	}
 	mMorphConditionVar.notify_one();
 
+	setSubDirectory("");
 	int index = -1;
 	for (auto preset: mPresetsMap) {
 		if (preset.second == name) {
