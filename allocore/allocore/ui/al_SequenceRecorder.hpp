@@ -75,7 +75,7 @@ namespace al
  *
  * @endcode
  */
-class SequenceRecorder
+class SequenceRecorder : public osc::MessageConsumer
 {
 public:
 	SequenceRecorder();
@@ -103,6 +103,10 @@ public:
 		mPresetHandler = &handler;
 		mPresetHandler->registerPresetCallback(SequenceRecorder::presetChanged, (void *) this);
 	}
+
+protected:
+	virtual bool consumeMessage(osc::Message &m, std::string rootOSCPath) override;
+
 private:
 
 	static void presetChanged(int index, void *sender, void *userData);

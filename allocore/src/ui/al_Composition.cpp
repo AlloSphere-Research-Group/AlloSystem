@@ -204,6 +204,28 @@ void Composition::write()
 	f.close();
 }
 
+bool Composition::consumeMessage(osc::Message &m, std::string rootOSCPath)
+{
+	if(m.addressPattern() == rootOSCPath + "/composition" && m.typeTags() == "s"){
+		std::string val;
+		m >> val;
+		if (val == getName()) {
+			std::cout << "play composition " << val << std::endl;
+			play();
+			return true;
+		}
+	} else if(m.addressPattern() == rootOSCPath + "/composition/stop" && m.typeTags() == "s"){
+		std::string val;
+		m >> val;
+		if (val == getName()) {
+			std::cout << "stop composition " << val << std::endl;
+			stop();
+			return true;
+		}
+	}
+	return false;
+}
+
 std::vector<al::CompositionStep> Composition::loadCompositionSteps(std::string compositionName)
 {
 	std::vector<al::CompositionStep> steps;

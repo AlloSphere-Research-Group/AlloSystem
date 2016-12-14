@@ -97,6 +97,12 @@ public:
 	/// files are.
 	std::vector<std::string> listAvailableMaps(bool listArchives = true);
 
+	PresetMapper &operator<<(PresetHandler &handler){
+		registerPresetHandler(handler);
+		return *this;
+	}
+
+protected:
 	virtual bool consumeMessage(osc::Message &m, std::string rootOSCPath) override;
 
 private:

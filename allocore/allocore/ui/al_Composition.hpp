@@ -57,7 +57,7 @@ public:
 	float deltaTime;
 };
 
-class Composition
+class Composition : public osc::MessageConsumer
 {
 public:
 	Composition(std::string fileName, std::string path);
@@ -92,6 +92,9 @@ public:
 	Composition &operator<< (PresetSequencer &sequencer) {
 		return registerSequencer(sequencer);
 	}
+
+protected:
+	virtual bool consumeMessage(osc::Message &m, std::string rootOSCPath) override;
 
 private:
 
