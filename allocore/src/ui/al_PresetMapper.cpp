@@ -98,7 +98,7 @@ bool PresetMapper::load(std::string archiveName)
 std::vector<std::string> PresetMapper::listAvailableMaps(bool showArchives)
 {
 	std::vector<std::string> mapList;
-	Dir mapperDir(mPresetHandler->getCurrentPath());
+	Dir mapperDir(mPresetHandler->getRootPath());
 
 	// TODO it makes more sense to sort entries alphabetically
 	while(mapperDir.read()) {
