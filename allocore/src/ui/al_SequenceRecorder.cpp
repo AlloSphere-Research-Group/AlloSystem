@@ -184,3 +184,31 @@ std::string SequenceRecorder::lastSequenceName()
 {
 	return mLastSequenceName;
 }
+
+bool SequenceRecorder::consumeMessage(osc::Message &m, std::string rootOSCPath)
+{
+	if(m.addressPattern() == rootOSCPath + "/startRecord" && m.typeTags() == "s"){
+		std::string val;
+		m >> val;
+		std::cout << "/startRecord" << val << std::endl;
+		startRecord(val);
+		return true;
+	} else if(m.addressPattern() == rootOSCPath + "/stopRecord") {
+		std::cout << "/stopRecord" << std::endl;
+		stopRecord();
+		return true;
+	} else if(m.addressPattern() == rootOSCPath + "/record" && m.typeTags() == "f"){
+		float val;
+		m >> val;
+		std::cout << "record sequence " << val << std::endl;
+		if (val == 0.0f) {
+			stopRecord();
+			std::cout << "record sequence " << val << std::endl;
+		} else {
+			bool overwrite = (val > 0.0f);
+			startRecord("NewSequence", overwrite);
+		}
+		return true;
+	}
+	return false;
+}

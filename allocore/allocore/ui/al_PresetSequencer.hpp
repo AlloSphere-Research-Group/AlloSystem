@@ -48,8 +48,8 @@
 #include <condition_variable>
 #include <utility>
 
+#include "allocore/protocol/al_OSC.hpp"
 #include "allocore/ui/al_Preset.hpp"
-#include "allocore/ui/al_SequenceRecorder.hpp"
 
 namespace al
 {
@@ -91,7 +91,7 @@ class Composition;
  * object registered with the sequencer.
  *
  */
-class PresetSequencer
+class PresetSequencer : public osc::MessageConsumer
 {
 public:
 	PresetSequencer() :
@@ -170,6 +170,9 @@ public:
 
 	std::queue<Step> loadSequence(std::string sequenceName);
 
+protected:
+	virtual bool consumeMessage(osc::Message &m, std::string rootOSCPath) override;
+
 private:
 
 	static void sequencerFunction(PresetSequencer *sequencer);
@@ -220,34 +223,9 @@ public:
 
 	virtual void onMessage(osc::Message& m);
 
-	SequenceServer &registerSequencer(PresetSequencer &sequencer) {
-		mSequencer = &sequencer;
-		return *this;
-//		mSequencer->registerSequenceCallback(PresetServer::changeCallback,
-//		                                       (void *) this);
-
-//		mSequencer->registerMorphTimeCallback(
-//		            [](float value, void *sender,
-//		            void *userData, void * blockSender) {
-//			static_cast<PresetServer *>(userData)->notifyListeners(
-//			            static_cast<PresetServer *>(userData)->mOSCpath + "/morphTime", value);
-//		}, this);
-	}
-
-	SequenceServer &registerRecorder(SequenceRecorder &recorder) {
-		mRecorder = &recorder;
-		return *this;
-	}
-
-	SequenceServer &registerComposition(Composition &composition) {
-		mCompositions.push_back(&composition);
-		return *this;
-	}
-
-	SequenceServer &registerMessageConsumer(osc::MessageConsumer &consumer) {
-		mConsumers.push_back(&consumer);
-	}
-
+	SequenceServer &registerSequencer(PresetSequencer &sequencer);
+	SequenceServer &registerRecorder(SequenceRecorder &recorder);
+	SequenceServer &registerMessageConsumer(osc::MessageConsumer &consumer);
 
 	/**
 	 * @brief print prints information about the server to std::out
@@ -263,7 +241,6 @@ public:
 
 	SequenceServer &operator <<(PresetSequencer &sequencer) {return registerSequencer(sequencer);}
 	SequenceServer &operator <<(SequenceRecorder &recorder) {return registerRecorder(recorder);}
-	SequenceServer &operator <<(Composition &composition) {return registerComposition(composition);}
 	SequenceServer &operator <<(osc::MessageConsumer &consumer) {return registerMessageConsumer(consumer);}
 
 	void setAddress(std::string address);
