@@ -53,7 +53,7 @@ class SequencerGUI
 {
 public:
 
-	static glv::View *makePresetHandlerView(PresetHandler &handler, float buttonScale = 1.0f);
+	static glv::View *makePresetHandlerView(PresetHandler &handler, float buttonScale = 1.0f, int numColumns = 10, int numRows = 4);
 
 	static glv::View *makeSequencerPlayerView(PresetSequencer &sequencer);
 
