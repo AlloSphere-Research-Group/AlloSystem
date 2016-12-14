@@ -4,10 +4,10 @@
 using namespace al;
 
 
-glv::View *SequencerGUI::makePresetHandlerView(PresetHandler &handler, float buttonScale)
+glv::View *SequencerGUI::makePresetHandlerView(PresetHandler &handler, float buttonScale, int numColumns, int numRows)
 {
 	glv::Box *box = new glv::Box(glv::Direction::S);
-	PresetButtons *presetButtons = new PresetButtons(glv::Rect(), 10, 4, false, true);
+	PresetButtons *presetButtons = new PresetButtons(glv::Rect(), numColumns, numRows, false, true);
 
 	PresetViewData *viewData = new PresetViewData;
 	viewData->presetButtons= presetButtons;
