@@ -135,7 +135,7 @@ void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
 		targetTime += std::chrono::microseconds((int) (totalWaitTime*1.0e6 - (granularity * 1.5 * 1.0e3)));
 
 		while (std::chrono::high_resolution_clock::now() < targetTime) { // Granularity to allow more responsive stopping of composition playback
-		  //std::cout << std::chrono::high_resolution_clock::to_time_t(targetTime) 
+		  //std::cout << std::chrono::high_resolution_clock::to_time_t(targetTime)
 		//	    << "---" << std::chrono::high_resolution_clock::to_time_t(std::chrono::high_resolution_clock::now()) << std::endl;
 			std::this_thread::sleep_for(std::chrono::milliseconds(granularity));
 			if (sequencer->mRunning == false) {
@@ -257,6 +257,7 @@ void SequenceServer::onMessage(osc::Message &m)
 	if(m.addressPattern() == mOSCpath + "/last"){
 		if (mSequencer && mRecorder) {
 			std::cout << "start last recorder sequence " << mRecorder->lastSequenceName() << std::endl;
+			mSequencer->setDirectory(mRecorder->getCurrentPath());
 			mSequencer->playSequence( mRecorder->lastSequenceName());
 		} else {
 			std::cerr << "SequenceRecorder and PresetSequencer must be registered to enable /*/last." << std::endl;

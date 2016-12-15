@@ -47,12 +47,13 @@ void Composition::stop()
 bool Composition::playArchive(std::string archiveName)
 {
 	std::string compositionName = archiveName;
-	if (compositionName.size() > 8 && compositionName.substr(compositionName.size() - 8) == "_archive") {
-		compositionName = compositionName.substr(0, compositionName.size() - 8);
+	if (compositionName.size() > 20 && compositionName.substr(compositionName.size() - 20) == ".composition_archive") {
+		compositionName = compositionName.substr(0, compositionName.size() - 20);
 	} else {
-		archiveName += "_archive";
+		archiveName += ".composition_archive";
 	}
-	if (File::isDirectory(archiveName) && File::exists(compositionName + ".composition")) {
+	std::cout << getCurrentPath() + archiveName << "--" << getCurrentPath() + archiveName + "/" + compositionName << std::endl;
+	if (File::isDirectory(getCurrentPath() + archiveName) && File::exists(getCurrentPath() + archiveName + "/" + compositionName + ".composition")) {
 		mPlayerLock.lock();
 		stop();
 		setSubDirectory(archiveName);

@@ -148,17 +148,17 @@ void SequenceRecorder::recorderFunction(SequenceRecorder *recorder, std::string 
 	for(Step step: steps) {
 		fileText += step.presetName + ":" +  std::to_string(step.delta) + ":" + std::to_string(step.duration) + "\n";
 	}
-//	std::cout << fileText << std::endl;
 
 	std::string path = recorder->mPresetHandler->getCurrentPath();
 	if (path.back() != '/') {
 		path += "/";
 	}
 	std::string fileName = path + sequenceName + ".sequence";
+
+	std::string newSequenceName = sequenceName;
 	if (!recorder->mOverwrite) {
 		std::string newFileName = fileName;
 		int counter = 0;
-		std::string newSequenceName = sequenceName;
 		while (File::exists(newFileName)) {
 			newSequenceName = sequenceName + "_" + std::to_string(counter++);
 			newFileName =  path + newSequenceName + ".sequence";
@@ -175,7 +175,9 @@ void SequenceRecorder::recorderFunction(SequenceRecorder *recorder, std::string 
 		std::cout << "Error while writing sequence file: " << fileName << std::endl;
 	}
 	f.close();
-	recorder->mLastSequenceName = fileName;
+
+	std::cout << "Recorded: " << fileName << std::endl;
+	recorder->mLastSequenceName = newSequenceName;
 }
 
 
@@ -200,7 +202,7 @@ bool SequenceRecorder::consumeMessage(osc::Message &m, std::string rootOSCPath)
 	} else if(m.addressPattern() == rootOSCPath + "/record" && m.typeTags() == "f"){
 		float val;
 		m >> val;
-		std::cout << "record sequence " << val << std::endl;
+//		std::cout << "record sequence " << val << std::endl;
 		if (val == 0.0f) {
 			stopRecord();
 			std::cout << "record sequence " << val << std::endl;
