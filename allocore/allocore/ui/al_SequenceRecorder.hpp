@@ -97,6 +97,8 @@ public:
 
 	std::string lastSequenceName();
 
+	std::string getCurrentPath() { return mPresetHandler->getCurrentPath(); }
+
 	SequenceRecorder & operator<< (PresetHandler &handler) { registerPresetHandler(handler);  return *this; }
 
 	void registerPresetHandler(PresetHandler &handler) {

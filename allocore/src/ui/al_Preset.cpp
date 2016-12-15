@@ -13,7 +13,7 @@ using namespace al;
 // PresetHandler --------------------------------------------------------------
 
 PresetHandler::PresetHandler(std::string rootDirectory, bool verbose) :
-    mRootDir(rootDirectory), mVerbose(verbose),
+	mRootDir(rootDirectory), mVerbose(verbose), mForwardToListeners(true),
     mRunning(true), mMorphRemainingSteps(-1),
     mMorphInterval(0.05), mMorphTime("morphTime", "", 0.0, "", 0.0, 20.0), mMorphingThread(PresetHandler::morphingFunction, this)
 {
