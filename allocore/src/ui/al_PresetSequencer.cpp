@@ -198,13 +198,17 @@ std::queue<PresetSequencer::Step> PresetSequencer::loadSequence(std::string sequ
 
 bool PresetSequencer::consumeMessage(osc::Message &m, std::string rootOSCPath)
 {
-	if(m.addressPattern() == rootOSCPath && m.typeTags() == "s"){
+	std::string basePath = rootOSCPath;
+	if (mOSCsubPath.size() > 0) {
+		basePath += "/" + mOSCsubPath;
+	}
+	if(m.addressPattern() == basePath && m.typeTags() == "s"){
 		std::string val;
 		m >> val;
 		std::cout << "start sequence " << val << std::endl;
 		playSequence(val);
 		return true;
-	} else if(m.addressPattern() == rootOSCPath + "/stop" ){
+	} else if(m.addressPattern() == basePath + "/stop" ){
 		std::cout << "stop sequence " << std::endl;
 		stopSequence();
 		return true;

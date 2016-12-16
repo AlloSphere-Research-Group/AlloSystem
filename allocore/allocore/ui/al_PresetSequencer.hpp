@@ -172,6 +172,8 @@ public:
 
 	std::queue<Step> loadSequence(std::string sequenceName);
 
+	void setOSCSubPath(std::string subPath) { mOSCsubPath = subPath; }
+
 	/**
 	 * @brief registerEndCallback
 	 *
@@ -194,6 +196,7 @@ private:
 	std::queue<Step> mSteps;
 	std::string mDirectory;
 	PresetHandler *mPresetHandler;
+	std::string mOSCsubPath;
 
 	std::mutex mSequenceLock;
 
