@@ -149,8 +149,12 @@ void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
 	}
 	sequencer->mPresetHandler->stopMorph();
 	std::cout << "Sequence finished." << std::endl;
+	bool finished = sequencer->mRunning;
 	sequencer->mRunning = false;
 	sequencer->mSequenceLock.unlock();
+	if (sequencer->mStopCallback != nullptr) {
+		sequencer->mStopCallback(finished);
+	}
 }
 
 std::queue<PresetSequencer::Step> PresetSequencer::loadSequence(std::string sequenceName)
