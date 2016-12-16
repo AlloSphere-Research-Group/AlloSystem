@@ -176,12 +176,13 @@ std::queue<PresetSequencer::Step> PresetSequencer::loadSequence(std::string sequ
 		if (line.substr(0, 2) == "::") {
 			break;
 		}
+		//FIXME here and in other sequencers white space should be stripped out
 		std::stringstream ss(line);
 		std::string name, delta,duration;
 		std::getline(ss, name, ':');
 		std::getline(ss, delta, ':');
 		std::getline(ss, duration, ':');
-		if (name.size() > 0 && name[0] != '#') {
+		if (name.size() > 1 && name[0] != '#') {
 			Step step;
 			step.presetName = name;
 			step.delta = std::stof(delta);
