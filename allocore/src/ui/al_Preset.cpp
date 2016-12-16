@@ -13,7 +13,7 @@ using namespace al;
 // PresetHandler --------------------------------------------------------------
 
 PresetHandler::PresetHandler(std::string rootDirectory, bool verbose) :
-	mRootDir(rootDirectory), mVerbose(verbose), mForwardToListeners(true),
+	mRootDir(rootDirectory), mVerbose(verbose), mUseCallbacks(true),
     mRunning(true), mMorphRemainingSteps(-1),
     mMorphInterval(0.05), mMorphTime("morphTime", "", 0.0, "", 0.0, 20.0), mMorphingThread(PresetHandler::morphingFunction, this)
 {
@@ -51,10 +51,18 @@ void PresetHandler::setSubDirectory(std::string directory)
 	mSubDir = directory;
 }
 
-void PresetHandler::registerPresetCallback(PresetHandler::PresetChangeCallback cb, void *userData)
+void PresetHandler::registerPresetCallback(std::function<void (int, void *, void *)> cb,
+                                           void *userData)
 {
 	mCallbacks.push_back(cb);
 	mCallbackUdata.push_back(userData);
+}
+
+
+void PresetHandler::registerStoreCallback(std::function<void (int, std::string, void *)> cb, void *userData)
+{
+	mStoreCallbacks.push_back(cb);
+	mStoreCallbackUdata.push_back(userData);
 }
 
 void PresetHandler::registerMorphTimeCallback(Parameter::ParameterChangeCallback cb,
@@ -105,46 +113,37 @@ void PresetHandler::storePreset(std::string name)
 
 void PresetHandler::storePreset(int index, std::string name, bool overwrite)
 {
-	std::lock_guard<std::mutex> lock(mFileLock);
+	mFileLock.lock();
 	// ':' causes issues with the text format for saving, so replace
 	std::replace( name.begin(), name.end(), ':', '_');
 
-	std::string path = getCurrentPath();
 	if (name == "") {
-		name = "default";
-	}
-	// First check if file exists. If it does, append a number to it
-	std::string fileName = path + name + ".preset";
-	std::ifstream infile(fileName);
-	int number = 0;
-	while (infile.good() && !overwrite) {
-		fileName = path + name + "_" + std::to_string(number) + ".preset";
-		infile.close();
-		infile.open(fileName);
-		number++;
-	}
-	infile.close();
-	std::ofstream f(fileName);
-	if (!f.is_open()) {
-		if (mVerbose) {
-			std::cout << "Error while opening preset file: " << mFileName << std::endl;
+		for (auto preset: mPresetsMap) {
+			if (preset.first == index) {
+				name = preset.second;
+				break;
+			}
 		}
-		return;
+		if (name == "") {
+			name = "default";
+		}
 	}
-	f << "::" + name << std::endl;
+	std::map<std::string, float> values;
 	for(Parameter *parameter: mParameters) {
-		std::string line = parameter->getFullAddress() + " f " + std::to_string(parameter->get());
-		f << line << std::endl;
+		values[parameter->getFullAddress()] = parameter->get();
 	}
-	f << "::" << std::endl;
-	if (f.bad()) {
-		if (mVerbose) {
-			std::cout << "Error while writing preset file: " << mFileName << std::endl;
-		}
-	}
-	f.close();
+	savePresetValues(values, name, overwrite);
 	mPresetsMap[index] = name;
 	storeCurrentPresetMap();
+	mFileLock.unlock();
+
+	if (mUseCallbacks) {
+		for(int i = 0; i < mStoreCallbacks.size(); ++i) {
+			if (mStoreCallbacks[i]) {
+				mStoreCallbacks[i](index, name, mStoreCallbackUdata[i]);
+			}
+		}
+	}
 }
 
 void PresetHandler::recallPreset(std::string name)
@@ -166,7 +165,7 @@ void PresetHandler::recallPreset(std::string name)
 		}
 	}
 	mCurrentPresetName = name;
-	if (mForwardToListeners) {
+	if (mUseCallbacks) {
 		for(int i = 0; i < mCallbacks.size(); ++i) {
 			if (mCallbacks[i]) {
 				mCallbacks[i](index, this, mCallbackUdata[i]);
@@ -219,12 +218,12 @@ std::map<int, std::string> PresetHandler::availablePresets()
 	return mPresetsMap;
 }
 
-std::string al::PresetHandler::getPresetName(int index)
+std::string PresetHandler::getPresetName(int index)
 {
 	return mPresetsMap[index];
 }
 
-float al::PresetHandler::getMorphTime()
+float PresetHandler::getMorphTime()
 {
 	return mMorphTime.get();
 }
@@ -338,6 +337,19 @@ void PresetHandler::setCurrentPresetMap(std::string mapName, bool autoCreate)
 	}
 }
 
+void PresetHandler::changeParameterValue(std::string presetName,
+                                         std::string parameterPath,
+                                         float newValue)
+{
+	std::map<std::string, float> parameters = loadPresetValues(presetName);
+	for (auto &parameter:parameters) {
+		if (parameter.first == parameterPath) {
+			parameter.second = newValue;
+		}
+	}
+	savePresetValues(parameters, presetName, true);
+}
+
 void PresetHandler::storeCurrentPresetMap()
 {
 	std::string mapFullPath = buildMapPath(mCurrentMapName);
@@ -447,6 +459,44 @@ std::map<std::string, float> PresetHandler::loadPresetValues(std::string name)
 	}
 	f.close();
 	return preset;
+}
+
+bool PresetHandler::savePresetValues(const std::map<std::string, float> &values, std::string presetName,
+                                      bool overwrite)
+{
+	bool ok = true;
+	std::string path = getCurrentPath();
+	std::string fileName = path + presetName + ".preset";
+	std::ifstream infile(fileName);
+	int number = 0;
+	while (infile.good() && !overwrite) {
+		fileName = path + presetName + "_" + std::to_string(number) + ".preset";
+		infile.close();
+		infile.open(fileName);
+		number++;
+	}
+	infile.close();
+	std::ofstream f(fileName);
+	if (!f.is_open()) {
+		if (mVerbose) {
+			std::cout << "Error while opening preset file: " << mFileName << std::endl;
+		}
+		return false;
+	}
+	f << "::" + presetName << std::endl;
+	for(auto value: values) {
+		std::string line = value.first + " f " + std::to_string(value.second);
+		f << line << std::endl;
+	}
+	f << "::" << std::endl;
+	if (f.bad()) {
+		if (mVerbose) {
+			std::cout << "Error while writing preset file: " << mFileName << std::endl;
+		}
+		ok = false;
+	}
+	f.close();
+	return ok;
 }
 
 
@@ -613,5 +663,6 @@ void PresetServer::changeCallback(int value, void *sender, void *userData)
 {
 	PresetServer *server = static_cast<PresetServer *>(userData);
 	Parameter *parameter = static_cast<Parameter *>(sender);
+
 	server->notifyListeners(server->mOSCpath + "/" + std::to_string((int)value), 1.0);
 }
