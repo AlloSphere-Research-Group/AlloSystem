@@ -455,7 +455,7 @@ std::map<std::string, float> PresetHandler::loadPresetValues(std::string name)
 
 
 PresetServer::PresetServer(std::string oscAddress, int oscPort) :
-    mServer(nullptr), mParamServer(nullptr), mOSCpath("/preset"),
+    mServer(nullptr), mOSCpath("/preset"),
     mAllowStore(true), mStoreMode(false)
 {
 	mServer = new osc::Recv(oscPort, oscAddress.c_str(), 0.001); // Is this 1ms wait OK?
@@ -469,13 +469,10 @@ PresetServer::PresetServer(std::string oscAddress, int oscPort) :
 
 
 PresetServer::PresetServer(ParameterServer &paramServer) :
-    mServer(nullptr), mParamServer(&paramServer), mOSCpath("/preset"),
+    mServer(nullptr), mOSCpath("/preset"),
     mAllowStore(true), mStoreMode(false)
 {
 	paramServer.registerOSCListener(this);
-//	paramServer.mServer->stop();
-//	paramServer.mServer->handler(*this);
-//	paramServer.mServer->start();
 }
 
 PresetServer::~PresetServer()
@@ -493,6 +490,8 @@ void PresetServer::onMessage(osc::Message &m)
 	m.resetStream(); // Should be moved to the caller...
 	std::cout << "PresetServer::onMessage " << std::endl;
 	m.print();
+	mPresetChangeLock.lock();
+	mPresetChangeSenderAddr = m.senderAddress();
 	if(m.addressPattern() == mOSCpath && m.typeTags() == "f"){
 		float val;
 		m >> val;
@@ -573,10 +572,7 @@ void PresetServer::onMessage(osc::Message &m)
 			}
 		}
 	}
-//	else if (mParamServer) {
-//		m.resetStream();
-//		mParamServer->onMessage(m);
-//	}
+	mPresetChangeLock.unlock();
 }
 
 void PresetServer::print()

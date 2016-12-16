@@ -48,6 +48,7 @@
 #include <atomic>
 #include <condition_variable>
 
+#include "allocore/protocol/al_OSC.hpp"
 #include "allocore/ui/al_Parameter.hpp"
 #include "allocore/system/al_Time.hpp"
 
@@ -287,13 +288,17 @@ protected:
 private:
 	osc::Recv *mServer;
 	std::vector<PresetHandler *> mPresetHandlers;
-	ParameterServer *mParamServer;
 //	std::mutex mServerLock;
 	std::string mOSCpath;
 	std::mutex mHandlerLock;
 	std::vector<osc::PacketHandler *> mHandlers;
 	bool mAllowStore;
 	bool mStoreMode;
+
+	std::mutex mPresetChangeLock;
+	std::string mPresetChangeSenderAddr;
+
+	std::vector<std::string> mDisabledListeners;
 };
 
 
