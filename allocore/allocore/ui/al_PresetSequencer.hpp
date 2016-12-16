@@ -155,7 +155,8 @@ public:
 	 * This function can be used in cases where the actual sequencer is not
 	 * needed, because preset recall and morphing is done by the PresetHandler.
 	 * This is useful for instance if you need to query the step of a sequence
-	 * for a different purpose.
+	 * for a different purpose. If a PresetHandler is registered, this value
+	 * is ignored.
 	 */
 	void setDirectory(std::string directory) { mDirectory = directory; }
 

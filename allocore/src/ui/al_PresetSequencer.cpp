@@ -100,7 +100,11 @@ bool PresetSequencer::archiveSequence(std::string sequenceName, bool overwrite)
 std::vector<std::string> al::PresetSequencer::getSequenceList()
 {
 	std::vector<std::string> sequenceList;
-	Dir presetDir(mDirectory);
+	std::string path = mDirectory;
+	if (mPresetHandler) {
+		path = mPresetHandler->getCurrentPath();
+	}
+	Dir presetDir(path);
 	while(presetDir.read()) {
 		FileInfo info = presetDir.entry();
 		if (info.type() == FileInfo::REG) {
@@ -211,6 +215,9 @@ bool PresetSequencer::consumeMessage(osc::Message &m, std::string rootOSCPath)
 std::string al::PresetSequencer::buildFullPath(std::string sequenceName)
 {
 	std::string fullName = mDirectory;
+	if (mPresetHandler) {
+		fullName = mPresetHandler->getCurrentPath();
+	}
 	if (fullName.back() != '/') {
 		fullName += "/";
 	}
