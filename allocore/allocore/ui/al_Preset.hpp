@@ -47,6 +47,7 @@
 #include <thread>
 #include <atomic>
 #include <condition_variable>
+#include <functional>
 
 #include "allocore/protocol/al_OSC.hpp"
 #include "allocore/ui/al_Parameter.hpp"
@@ -156,17 +157,22 @@ public:
 	 */
 	void print();
 
-	typedef void (*PresetChangeCallback)(int index, void *sender,
-	                                        void *userData);
 	/**
 	 * @brief Register a callback to be notified when a preset is loaded
 	 * @param cb The callback function
 	 * @param userData data to be passed to the callback
 	 */
-	void registerPresetCallback(PresetChangeCallback cb, void *userData = nullptr);
+	void registerPresetCallback(std::function<void(int index, void *sender, void *userData)> cb,
+	                            void *userData = nullptr);
 
-	typedef void (*MorphTimeChangeCallback)(float time, void *sender,
-	                                        void *userData);
+	/**
+	 * @brief Register a callback to be notified when a preset is stored
+	 * @param cb The callback function
+	 * @param userData data to be passed to the callback
+	 */
+	void registerStoreCallback(std::function<void(int index, std::string name, void *userData)> cb,
+	                           void *userData = nullptr);
+
 	/**
 	 * @brief Register a callback to be notified when morph time parameter is changed
 	 * @param cb The callback function
@@ -182,17 +188,29 @@ public:
 
 	void setCurrentPresetMap(std::string mapName = "default", bool autoCreate = false);
 
-	void forwardToListeners(bool forward) { mForwardToListeners = forward; }
+	/**
+	 * @brief useCallbacks determines whether to call the internal callbacks
+	 * @param use
+	 *
+	 * The callbacks set by registerStoreCallback() and registerPresetCallback()
+	 * are only called if this is set to true. The value is true by default.
+	 */
+	void useCallbacks(bool use) { mUseCallbacks = use; }
+
+	void changeParameterValue(std::string presetName, std::string parameterPath,
+	                          float newValue);
 
 private:
 	void storeCurrentPresetMap();
 
 	std::map<std::string, float> loadPresetValues(std::string name);
+	bool savePresetValues(const std::map<std::string, float> &values, std::string presetName,
+	                       bool overwrite = true);
 
 	static void morphingFunction(PresetHandler *handler);
 
 	bool mVerbose;
-	bool mForwardToListeners;
+	bool mUseCallbacks;
 	std::string mRootDir;
 	std::string mSubDir; // Optional sub directory, e.g. for preset map archives
 	std::string mFileName;
@@ -211,8 +229,10 @@ private:
 
 	std::thread mMorphingThread;
 
-	std::vector<PresetChangeCallback> mCallbacks;
+	std::vector<std::function<void(int index, void *sender, void *userData)>> mCallbacks;
 	std::vector<void *> mCallbackUdata;
+	std::vector<std::function<void(int index, std::string name, void *userData)>> mStoreCallbacks;
+	std::vector<void *> mStoreCallbackUdata;
 
 	std::map<int, std::string> mPresetsMap;
 	std::string mCurrentPresetName;
