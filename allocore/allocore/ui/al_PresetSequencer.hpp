@@ -47,6 +47,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <utility>
+#include <functional>
 
 #include "allocore/protocol/al_OSC.hpp"
 #include "allocore/ui/al_Preset.hpp"
@@ -170,6 +171,15 @@ public:
 
 	std::queue<Step> loadSequence(std::string sequenceName);
 
+	/**
+	 * @brief registerEndCallback
+	 *
+	 * The callback provides a finished argument. If the sequence reached the end naturally,
+	 * this argument will be passed as true. If it was stopped by the user prematurely, it
+	 * will send false.
+	 */
+	void registerEndCallback(std::function<void(bool finished)> stopCallback) { mStopCallback = stopCallback; }
+
 protected:
 	virtual bool consumeMessage(osc::Message &m, std::string rootOSCPath) override;
 
@@ -189,6 +199,7 @@ private:
 	bool mSequencerActive;
 	bool mRunning;
 	std::thread *mSequencerThread;
+	std::function<void(bool)> mStopCallback;
 };
 
 
