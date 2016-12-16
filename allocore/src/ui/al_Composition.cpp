@@ -223,6 +223,9 @@ bool Composition::consumeMessage(osc::Message &m, std::string rootOSCPath)
 			stop();
 			return true;
 		}
+	} else if(m.addressPattern() == rootOSCPath + "/composition/stop"){
+		stop();
+		return true;
 	}
 	return false;
 }
