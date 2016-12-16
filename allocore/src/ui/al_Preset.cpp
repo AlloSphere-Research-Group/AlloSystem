@@ -41,7 +41,7 @@ PresetHandler &PresetHandler::registerParameter(Parameter &parameter)
 
 void PresetHandler::setSubDirectory(std::string directory)
 {
-	std::string path = getCurrentPath();
+	std::string path = getRootPath();
 	if (!File::exists(path + directory)) {
 		if (!Dir::make(path + directory, true)) {
 			std::cout << "Error creating directory: " << mRootDir << std::endl;
