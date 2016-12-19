@@ -200,7 +200,7 @@ public:
 	void registerBeginCallback(std::function<void(PresetSequencer *sender, void *userData)> beginCallback,
 	                           void *userData = nullptr);
 
-	void callBeginCallback(bool call) { mBeginCallbackEnabled = call; }
+	void enableBeginCallback(bool enable) { mBeginCallbackEnabled = enable; }
 
 	/**
 	 * @brief registerEndCallback
@@ -212,7 +212,11 @@ public:
 	void registerEndCallback(std::function<void(bool finished, PresetSequencer *sender, void *userData)> endCallback,
 	                         void *userData = nullptr);
 
-	void callEndCallback(bool call) { mEndCallbackEnabled = call; }
+	void enableEndCallback(bool enable) { mEndCallbackEnabled = enable; }
+
+	void clearSteps();
+
+	void appendStep(Step &newStep);
 
 protected:
 	virtual bool consumeMessage(osc::Message &m, std::string rootOSCPath) override;

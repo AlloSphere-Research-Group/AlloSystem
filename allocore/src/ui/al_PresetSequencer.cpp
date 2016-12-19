@@ -13,21 +13,21 @@ using namespace al;
 
 void PresetSequencer::playSequence(std::string sequenceName)
 {
-	std::queue<Step> steps = loadSequence(sequenceName);
 	stopSequence();
-	if (steps.size() > 0) {
-		mSequenceLock.lock();
-//		while (!mSteps.empty()) {
-//			mSteps.pop();
-//		}
+	mSequenceLock.lock();
+	//		while (!mSteps.empty()) {
+	//			mSteps.pop();
+	//		}
+	if (sequenceName.size() > 0) {
+		std::queue<Step> steps = loadSequence(sequenceName);
 		mSteps = steps;
-		mRunning = true;
-		mSequencerThread = new std::thread(PresetSequencer::sequencerFunction, this);
-		mSequenceLock.unlock();
-
-		std::thread::id seq_thread_id = mSequencerThread->get_id();
-		std::cout << "Preset Sequencer thread id: " << std::hex << seq_thread_id << std::endl;
 	}
+	mRunning = true;
+	mSequencerThread = new std::thread(PresetSequencer::sequencerFunction, this);
+	mSequenceLock.unlock();
+
+	std::thread::id seq_thread_id = mSequencerThread->get_id();
+	std::cout << "Preset Sequencer thread id: " << std::hex << seq_thread_id << std::endl;
 }
 
 void PresetSequencer::stopSequence()
@@ -154,7 +154,7 @@ void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
 		sequencer->mSteps.pop();
 	}
 	sequencer->mPresetHandler->stopMorph();
-	std::cout << "Sequence finished." << std::endl;
+//	std::cout << "Sequence finished." << std::endl;
 	bool finished = sequencer->mRunning;
 	sequencer->mRunning = false;
 	sequencer->mSequenceLock.unlock();
@@ -225,6 +225,23 @@ void PresetSequencer::registerEndCallback(std::function<void (bool, al::PresetSe
 	mEndCallbackEnabled = true;
 }
 
+void PresetSequencer::clearSteps()
+{
+	stopSequence();
+	mSequenceLock.lock();
+	while (!mSteps.empty()) {
+		mSteps.pop();
+	}
+	mSequenceLock.unlock();
+}
+
+void PresetSequencer::appendStep(PresetSequencer::Step &newStep)
+{
+	mSequenceLock.lock();
+	mSteps.push(newStep);
+	mSequenceLock.unlock();
+}
+
 bool PresetSequencer::consumeMessage(osc::Message &m, std::string rootOSCPath)
 {
 	std::string basePath = rootOSCPath;
@@ -245,7 +262,7 @@ bool PresetSequencer::consumeMessage(osc::Message &m, std::string rootOSCPath)
 	return false;
 }
 
-std::string al::PresetSequencer::buildFullPath(std::string sequenceName)
+std::string PresetSequencer::buildFullPath(std::string sequenceName)
 {
 	std::string fullName = mDirectory;
 	if (mPresetHandler) {
