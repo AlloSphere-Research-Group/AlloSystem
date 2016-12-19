@@ -42,6 +42,7 @@ void Composition::stop()
 		delete mPlayThread;
 		mPlayThread = nullptr;
 	}
+	mSequencer->stopSequence(); // Sequencer should also stop if in the middle of a sequence.
 }
 
 bool Composition::playArchive(std::string archiveName)
@@ -344,8 +345,6 @@ void Composition::playbackThread(Composition *composition)
 			composition->mPlaying = false;
 		}
 	}
-
-	composition->mSequencer->stopSequence();
 	if (composition->mEndCallbackEnabled && composition->mEndCallback != nullptr) {
 		bool finished = index == composition->mCompositionSteps.size();
 		composition->mEndCallback(finished, composition, composition->mEndCallbackData);
