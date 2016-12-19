@@ -225,6 +225,18 @@ void PresetSequencer::registerEndCallback(std::function<void (bool, al::PresetSe
 	mEndCallbackEnabled = true;
 }
 
+float PresetSequencer::getSequenceTotalDuration(std::string sequenceName)
+{
+	std::queue<Step> steps = loadSequence(sequenceName);
+	float duration = 0.0f;
+	while (steps.size() > 0) {
+		const Step &step = steps.front();
+		duration += step.delta + step.duration;
+		steps.pop();
+	}
+	return duration;
+}
+
 void PresetSequencer::clearSteps()
 {
 	stopSequence();

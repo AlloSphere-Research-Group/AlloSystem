@@ -131,6 +131,11 @@ private:
 	std::function<void(bool,Composition *, void *userData)> mEndCallback;
 	void *mEndCallbackData;
 
+	std::function<void(bool,PresetSequencer *, void *userData)> mSequencerEndCallbackCache;
+	void *mSequencerEndCallbackDataCache;
+
+	static void waitForSequencerCallback(bool finished,PresetSequencer *seq, void *userData);
+
 	static void playbackThread(Composition *composition);
 };
 
