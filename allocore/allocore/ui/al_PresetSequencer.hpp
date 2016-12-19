@@ -94,6 +94,7 @@ class Composition;
  */
 class PresetSequencer : public osc::MessageConsumer
 {
+	friend class Composition;
 public:
 	PresetSequencer() :
 	    mSequencerActive(true),
@@ -216,6 +217,8 @@ public:
 
 	void enableEndCallback(bool enable) { mEndCallbackEnabled = enable; }
 	void toggleEnableEndCallback() { mEndCallbackEnabled = !mEndCallbackEnabled; }
+
+	float getSequenceTotalDuration(std::string sequenceName);
 
 	void clearSteps();
 

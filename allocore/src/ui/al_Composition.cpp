@@ -308,8 +308,21 @@ std::string Composition::getCurrentPath()
 	return path;
 }
 
+void Composition::waitForSequencerCallback(bool finished, PresetSequencer *, void *userData)
+{
+	Composition *comp = static_cast<Composition *>(userData);
+	comp->mSequencer->mEndCallback = comp->mSequencerEndCallbackCache;
+	comp->mSequencer->mEndCallbackData = comp->mSequencerEndCallbackDataCache;
+
+	if (comp->mEndCallbackEnabled && comp->mEndCallback != nullptr) {
+		comp->mEndCallback(finished, comp, comp->mEndCallbackData);
+	}
+
+}
+
 void Composition::playbackThread(Composition *composition)
 {
+	composition->mPlayerLock.lock();
 	size_t index = 0;
 	if (composition->mCompositionSteps.size() == 0) {
 		std::cout << "Composition has no steps. Done." << std::endl;
@@ -345,11 +358,21 @@ void Composition::playbackThread(Composition *composition)
 			composition->mPlaying = false;
 		}
 	}
-	if (composition->mEndCallbackEnabled && composition->mEndCallback != nullptr) {
-		bool finished = index == composition->mCompositionSteps.size();
-		composition->mEndCallback(finished, composition, composition->mEndCallbackData);
-	}
+	composition->mSequencerEndCallbackCache = composition->mSequencer->mEndCallback;
+	composition->mSequencerEndCallbackDataCache = composition->mSequencer->mEndCallbackData;
+
 	composition->mSequencer->toggleEnableBeginCallback();
 	composition->mSequencer->toggleEnableEndCallback();
+
+	if (composition->mSequencer->running()) { // TODO There is a very small risk of a run condition here is playback stops between the check and the branches
+		composition->mSequencer->registerEndCallback(Composition::waitForSequencerCallback, composition);
+	} else {
+		if (composition->mEndCallbackEnabled && composition->mEndCallback != nullptr) {
+			bool finished = index == composition->mCompositionSteps.size();
+			composition->mEndCallback(finished, composition, composition->mEndCallbackData);
+		}
+	}
+
+	composition->mPlayerLock.unlock();
 	std::cout << "Composition done." << std::endl;
 }
