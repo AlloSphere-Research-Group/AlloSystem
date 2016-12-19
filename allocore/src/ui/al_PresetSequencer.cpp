@@ -121,14 +121,16 @@ std::vector<std::string> al::PresetSequencer::getSequenceList()
 void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
 {
 	const int granularity = 10; // milliseconds
-	sequencer->mSequenceLock.lock();
-	auto sequenceStart = std::chrono::high_resolution_clock::now();
-	auto targetTime = sequenceStart;
 	if (sequencer->mPresetHandler == nullptr) {
 		std::cerr << "No preset handler registered. Can't run sequencer." << std::endl;
-		sequencer->mSequenceLock.unlock();
 		return;
 	}
+	sequencer->mSequenceLock.lock();
+	if (sequencer->mBeginCallbackEnabled && sequencer->mBeginCallback != nullptr) {
+		sequencer->mBeginCallback(sequencer, sequencer->mBeginCallbackData);
+	}
+	auto sequenceStart = std::chrono::high_resolution_clock::now();
+	auto targetTime = sequenceStart;
 	while(sequencer->running() && sequencer->mSteps.size() > 0) {
 		Step &step = sequencer->mSteps.front();
 		sequencer->mPresetHandler->setMorphTime(step.delta);
@@ -156,8 +158,18 @@ void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
 	bool finished = sequencer->mRunning;
 	sequencer->mRunning = false;
 	sequencer->mSequenceLock.unlock();
-	if (sequencer->mStopCallback != nullptr) {
-		sequencer->mStopCallback(finished);
+	if (sequencer->mEndCallbackEnabled && sequencer->mEndCallback != nullptr) {
+		sequencer->mEndCallback(finished, sequencer, sequencer->mEndCallbackData);
+	}
+}
+
+
+void PresetSequencer::setHandlerSubDirectory(std::string subDir)
+{
+	if (mPresetHandler) {
+		mPresetHandler->setSubDirectory(subDir);
+	} else {
+		std::cerr << "Error in PresetSequencer::setHandlerSubDirectory. PresetHandler not registered." << std::endl;
 	}
 }
 
@@ -195,6 +207,22 @@ std::queue<PresetSequencer::Step> PresetSequencer::loadSequence(std::string sequ
 		std::cout << "Error reading:" << sequenceName << std::endl;
 	}
 	return steps;
+}
+
+void PresetSequencer::registerBeginCallback(std::function<void(PresetSequencer *sender, void *userData)> beginCallback,
+                                            void *userData)
+{
+	mBeginCallback = beginCallback;
+	mBeginCallbackData = userData;
+	mBeginCallbackEnabled = true;
+}
+
+void PresetSequencer::registerEndCallback(std::function<void (bool, al::PresetSequencer *, void *)> endCallback,
+                                          void *userData)
+{
+	mEndCallback = endCallback;
+	mEndCallbackData = userData;
+	mEndCallbackEnabled = true;
 }
 
 bool PresetSequencer::consumeMessage(osc::Message &m, std::string rootOSCPath)
@@ -273,7 +301,7 @@ void SequenceServer::onMessage(osc::Message &m)
 	if(m.addressPattern() == mOSCpath + "/last"){
 		if (mSequencer && mRecorder) {
 			std::cout << "start last recorder sequence " << mRecorder->lastSequenceName() << std::endl;
-			mSequencer->setDirectory(mRecorder->getCurrentPath());
+			mSequencer->setHandlerSubDirectory(mRecorder->lastSequenceSubDir());
 			mSequencer->playSequence( mRecorder->lastSequenceName());
 		} else {
 			std::cerr << "SequenceRecorder and PresetSequencer must be registered to enable /*/last." << std::endl;

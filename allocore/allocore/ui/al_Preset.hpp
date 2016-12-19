@@ -145,6 +145,7 @@ public:
 	void stopMorph();
 
 	void setSubDirectory(std::string directory);
+	std::string getSubDirectory() {return mSubDir;}
 
 	/// Path including subdirectory if any
 	std::string getCurrentPath();
