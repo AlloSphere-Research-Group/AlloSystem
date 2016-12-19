@@ -202,6 +202,8 @@ public:
 
 	void enableBeginCallback(bool enable) { mBeginCallbackEnabled = enable; }
 
+	void toggleEnableBeginCallback() { mBeginCallbackEnabled = !mBeginCallbackEnabled; }
+
 	/**
 	 * @brief registerEndCallback
 	 *
@@ -213,6 +215,7 @@ public:
 	                         void *userData = nullptr);
 
 	void enableEndCallback(bool enable) { mEndCallbackEnabled = enable; }
+	void toggleEnableEndCallback() { mEndCallbackEnabled = !mEndCallbackEnabled; }
 
 	void clearSteps();
 

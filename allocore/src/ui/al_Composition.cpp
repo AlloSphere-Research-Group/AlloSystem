@@ -28,6 +28,7 @@ void Composition::play()
 {
 	mPlayerLock.lock();
 	stop();
+	mCompositionSteps = loadCompositionSteps(mCompositionName);
 	mPlaying = true;
 	mPlayThread = new std::thread(Composition::playbackThread, this);
 	mPlayerLock.unlock();
@@ -41,7 +42,6 @@ void Composition::stop()
 		delete mPlayThread;
 		mPlayThread = nullptr;
 	}
-	mSequencer->stopSequence();
 }
 
 bool Composition::playArchive(std::string archiveName)
@@ -52,8 +52,8 @@ bool Composition::playArchive(std::string archiveName)
 	} else {
 		archiveName += ".composition_archive";
 	}
-	std::cout << getCurrentPath() + archiveName << "--" << getCurrentPath() + archiveName + "/" + compositionName << std::endl;
-	if (File::isDirectory(getCurrentPath() + archiveName) && File::exists(getCurrentPath() + archiveName + "/" + compositionName + ".composition")) {
+	std::cout << getRootPath() + archiveName << "--" << getRootPath() + archiveName + "/" + compositionName << std::endl;
+	if (File::isDirectory(getRootPath() + archiveName) && File::exists(getRootPath() + archiveName + "/" + compositionName + ".composition")) {
 		mPlayerLock.lock();
 		stop();
 		setSubDirectory(archiveName);
@@ -205,9 +205,31 @@ void Composition::write()
 	f.close();
 }
 
+void Composition::registerBeginCallback(std::function<void (Composition *, void *)> beginCallback,
+                                        void *userData)
+{
+
+	mBeginCallback = beginCallback;
+	mBeginCallbackData = userData;
+	mBeginCallbackEnabled = true;
+}
+
+void Composition::registerEndCallback(std::function<void (bool, Composition *, void *)> endCallback,
+                                      void *userData)
+{
+	mEndCallback = endCallback;
+	mEndCallbackData = userData;
+	mEndCallbackEnabled = true;
+}
+
 bool Composition::consumeMessage(osc::Message &m, std::string rootOSCPath)
 {
-	if(m.addressPattern() == rootOSCPath + "/composition" && m.typeTags() == "s"){
+	if(m.addressPattern() == rootOSCPath + "/composition/playArchive" && m.typeTags() == "s"){
+		std::string val;
+		m >> val;std::cout << "play composition archive" << val << std::endl;
+		playArchive(val);
+		return true;
+	} else if(m.addressPattern() == rootOSCPath + "/composition" && m.typeTags() == "s"){
 		std::string val;
 		m >> val;
 		if (val == getName()) {
@@ -266,13 +288,18 @@ std::vector<al::CompositionStep> Composition::loadCompositionSteps(std::string c
 	return steps;
 }
 
-std::string Composition::getCurrentPath()
+std::string Composition::getRootPath()
 {
 	std::string path = mPath;
-
 	if (path.back() != '/' && path.size() > 0) {
 		path += "/";
 	}
+	return path;
+}
+
+std::string Composition::getCurrentPath()
+{
+	std::string path = getRootPath();
 	path += mSubDirectory;
 	if (path.back() != '/' && path.size() > 0) {
 		path += "/";
@@ -289,6 +316,11 @@ void Composition::playbackThread(Composition *composition)
 	}
 	std::cout << "Composition started." << std::endl;
 
+	composition->mSequencer->toggleEnableBeginCallback();
+	composition->mSequencer->toggleEnableEndCallback();
+	if (composition->mBeginCallbackEnabled && composition->mBeginCallback != nullptr) {
+		composition->mBeginCallback(composition, composition->mBeginCallbackData);
+	}
 	const int granularity = 10; // milliseconds
 	auto sequenceStart = std::chrono::high_resolution_clock::now();
 	auto targetTime = sequenceStart;
@@ -312,5 +344,13 @@ void Composition::playbackThread(Composition *composition)
 			composition->mPlaying = false;
 		}
 	}
+
+	composition->mSequencer->stopSequence();
+	if (composition->mEndCallbackEnabled && composition->mEndCallback != nullptr) {
+		bool finished = index == composition->mCompositionSteps.size();
+		composition->mEndCallback(finished, composition, composition->mEndCallbackData);
+	}
+	composition->mSequencer->toggleEnableBeginCallback();
+	composition->mSequencer->toggleEnableEndCallback();
 	std::cout << "Composition done." << std::endl;
 }

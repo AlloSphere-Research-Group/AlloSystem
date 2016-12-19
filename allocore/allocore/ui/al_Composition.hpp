@@ -85,6 +85,17 @@ public:
 
 	void write();
 
+	void registerBeginCallback(std::function<void(Composition *sender, void *userData)> beginCallback,
+	                           void *userData = nullptr);
+
+	void enableBeginCallback(bool enable) { mBeginCallbackEnabled = enable; }
+
+	void registerEndCallback(std::function<void(bool finished, Composition *sender, void *userData)> endCallback,
+	                         void *userData = nullptr);
+
+	void enableEndCallback(bool enable) { mEndCallbackEnabled = enable; }
+
+
 	Composition &registerSequencer(PresetSequencer &sequencer) {
 		mSequencer = &sequencer;
 		return *this;
@@ -99,6 +110,7 @@ protected:
 private:
 
 	std::vector<CompositionStep> loadCompositionSteps(std::string compositionSteps);
+	std::string getRootPath();
 	std::string getCurrentPath();
 
 	std::vector<CompositionStep> mCompositionSteps;
@@ -110,6 +122,14 @@ private:
 	bool mPlaying;
 	PresetSequencer *mSequencer;
 	std::mutex mPlayerLock;
+
+	// This interface is shared with PresetSequencer, perhaps this should be abstracted?
+	bool mBeginCallbackEnabled;
+	std::function<void(Composition *, void *userData)> mBeginCallback;
+	void *mBeginCallbackData;
+	bool mEndCallbackEnabled;
+	std::function<void(bool,Composition *, void *userData)> mEndCallback;
+	void *mEndCallbackData;
 
 	static void playbackThread(Composition *composition);
 };
