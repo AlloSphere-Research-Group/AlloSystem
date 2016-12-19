@@ -178,6 +178,7 @@ void SequenceRecorder::recorderFunction(SequenceRecorder *recorder, std::string 
 
 	std::cout << "Recorded: " << fileName << std::endl;
 	recorder->mLastSequenceName = newSequenceName;
+	recorder->mLastSequenceSubDir = recorder->mPresetHandler->getSubDirectory();
 }
 
 
@@ -185,6 +186,11 @@ void SequenceRecorder::recorderFunction(SequenceRecorder *recorder, std::string 
 std::string SequenceRecorder::lastSequenceName()
 {
 	return mLastSequenceName;
+}
+
+std::string SequenceRecorder::lastSequenceSubDir()
+{
+	return mLastSequenceSubDir;
 }
 
 bool SequenceRecorder::consumeMessage(osc::Message &m, std::string rootOSCPath)

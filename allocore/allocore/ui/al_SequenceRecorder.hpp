@@ -96,6 +96,7 @@ public:
 	void setMaxRecordTime(al_sec maxTime) { mMaxRecordTime = maxTime; }
 
 	std::string lastSequenceName();
+	std::string lastSequenceSubDir();
 
 	std::string getCurrentPath() { return mPresetHandler->getCurrentPath(); }
 
@@ -125,6 +126,7 @@ private:
 	std::string mPresetName;
 	bool mOverwrite;
 	std::string mLastSequenceName;
+	std::string mLastSequenceSubDir;
 
 	std::mutex mSequenceLock;
 	std::condition_variable mSequenceConditionVar;

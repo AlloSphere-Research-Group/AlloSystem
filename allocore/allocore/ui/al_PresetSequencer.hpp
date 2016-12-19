@@ -98,7 +98,9 @@ public:
 	PresetSequencer() :
 	    mSequencerActive(true),
 	    mRunning(false),
-	    mSequencerThread(NULL)
+	    mSequencerThread(NULL),
+	    mBeginCallbackEnabled(false),
+	    mEndCallbackEnabled(false)
 	{
 	}
 
@@ -160,6 +162,14 @@ public:
 	 */
 	void setDirectory(std::string directory) { mDirectory = directory; }
 
+	/**
+	 * @brief Sets the sub-directory for the registered PresetHandler.
+	 *
+	 * Useful when you need to set the sub-dir but don't have easy access
+	 * to the PresetHandler object.
+	 */
+	void setHandlerSubDirectory(std::string subDir);
+
 	inline bool running() { return mRunning; }
 
 	PresetSequencer &operator<< (PresetHandler &presetHandler)
@@ -169,10 +179,28 @@ public:
 //		std::cout << "Path set to:" << mDirectory << std::endl;
 		return *this;
 	}
-
+	/**
+	 * @brief Load steps from a sequence file
+	 * @param sequenceName The name of the sequence
+	 * @return the steps
+	 *
+	 * The sequence is searched in the PresetHandler current path or the
+	 *  PresetSequencer's directory if PresetHandler not registered.
+	 */
 	std::queue<Step> loadSequence(std::string sequenceName);
 
 	void setOSCSubPath(std::string subPath) { mOSCsubPath = subPath; }
+
+	/**
+	 * @brief registerBeginCallback
+	 *
+	 * When registered this function is called from the playback thread as soon
+	 * as it is ready to start playing before calling the first step.
+	 */
+	void registerBeginCallback(std::function<void(PresetSequencer *sender, void *userData)> beginCallback,
+	                           void *userData = nullptr);
+
+	void callBeginCallback(bool call) { mBeginCallbackEnabled = call; }
 
 	/**
 	 * @brief registerEndCallback
@@ -181,15 +209,16 @@ public:
 	 * this argument will be passed as true. If it was stopped by the user prematurely, it
 	 * will send false.
 	 */
-	void registerEndCallback(std::function<void(bool finished)> stopCallback) { mStopCallback = stopCallback; }
+	void registerEndCallback(std::function<void(bool finished, PresetSequencer *sender, void *userData)> endCallback,
+	                         void *userData = nullptr);
+
+	void callEndCallback(bool call) { mEndCallbackEnabled = call; }
 
 protected:
 	virtual bool consumeMessage(osc::Message &m, std::string rootOSCPath) override;
 
 private:
-
 	static void sequencerFunction(PresetSequencer *sequencer);
-
 
 	std::string buildFullPath(std::string sequenceName);
 
@@ -203,7 +232,12 @@ private:
 	bool mSequencerActive;
 	bool mRunning;
 	std::thread *mSequencerThread;
-	std::function<void(bool)> mStopCallback;
+	bool mBeginCallbackEnabled;
+	std::function<void(PresetSequencer *, void *userData)> mBeginCallback;
+	void *mBeginCallbackData;
+	bool mEndCallbackEnabled;
+	std::function<void(bool,PresetSequencer *, void *userData)> mEndCallback;
+	void *mEndCallbackData;
 };
 
 
@@ -238,6 +272,7 @@ public:
 
 	virtual void onMessage(osc::Message& m);
 
+	// Special cases of objects that are handled in specific ways
 	SequenceServer &registerSequencer(PresetSequencer &sequencer);
 	SequenceServer &registerRecorder(SequenceRecorder &recorder);
 	SequenceServer &registerMessageConsumer(osc::MessageConsumer &consumer);
@@ -278,8 +313,6 @@ private:
 //	std::vector<osc::PacketHandler *> mHandlers;
 	std::vector<osc::MessageConsumer *> mConsumers;
 };
-
-
 
 
 } // namespace al
