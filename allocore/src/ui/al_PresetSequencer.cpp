@@ -149,16 +149,16 @@ void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
 				break;
 			}
 		}
+		sequencer->mSteps.pop();
 		std::this_thread::sleep_until(targetTime);
 		// std::this_thread::sleep_for(std::chrono::duration<float>(totalWaitTime));
-		sequencer->mSteps.pop();
 	}
 	sequencer->mPresetHandler->stopMorph();
 //	std::cout << "Sequence finished." << std::endl;
-	bool finished = sequencer->mRunning;
 	sequencer->mRunning = false;
 	sequencer->mSequenceLock.unlock();
 	if (sequencer->mEndCallbackEnabled && sequencer->mEndCallback != nullptr) {
+		bool finished = sequencer->mSteps.size() == 0;
 		sequencer->mEndCallback(finished, sequencer, sequencer->mEndCallbackData);
 	}
 }
