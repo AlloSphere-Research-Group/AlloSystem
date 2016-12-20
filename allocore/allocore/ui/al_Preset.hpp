@@ -302,6 +302,8 @@ public:
 	void setAddress(std::string address);
 	std::string getAddress();
 
+	void notifyPresetChange(bool notify) {mNotifyPresetChange = notify;}
+
 protected:
 	void attachPacketHandler(osc::PacketHandler *handler);
 	static void changeCallback(int value, void *sender, void *userData);
@@ -315,6 +317,7 @@ private:
 	std::vector<osc::PacketHandler *> mHandlers;
 	bool mAllowStore;
 	bool mStoreMode;
+	bool mNotifyPresetChange;
 
 	std::mutex mPresetChangeLock;
 	std::string mPresetChangeSenderAddr;

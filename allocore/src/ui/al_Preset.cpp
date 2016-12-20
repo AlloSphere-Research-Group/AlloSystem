@@ -506,7 +506,8 @@ bool PresetHandler::savePresetValues(const std::map<std::string, float> &values,
 
 PresetServer::PresetServer(std::string oscAddress, int oscPort) :
     mServer(nullptr), mOSCpath("/preset"),
-    mAllowStore(true), mStoreMode(false)
+    mAllowStore(true), mStoreMode(false),
+    mNotifyPresetChange(true)
 {
 	mServer = new osc::Recv(oscPort, oscAddress.c_str(), 0.001); // Is this 1ms wait OK?
 	if (mServer) {
@@ -520,7 +521,8 @@ PresetServer::PresetServer(std::string oscAddress, int oscPort) :
 
 PresetServer::PresetServer(ParameterServer &paramServer) :
     mServer(nullptr), mOSCpath("/preset"),
-    mAllowStore(true), mStoreMode(false)
+    mAllowStore(true), mStoreMode(false),
+    mNotifyPresetChange(true)
 {
 	paramServer.registerOSCListener(this);
 }
@@ -662,7 +664,9 @@ std::string PresetServer::getAddress()
 void PresetServer::changeCallback(int value, void *sender, void *userData)
 {
 	PresetServer *server = static_cast<PresetServer *>(userData);
-	Parameter *parameter = static_cast<Parameter *>(sender);
+//	Parameter *parameter = static_cast<Parameter *>(sender);
 
-	server->notifyListeners(server->mOSCpath + "/" + std::to_string((int)value), 1.0);
+	if (server->mNotifyPresetChange) {
+		server->notifyListeners(server->mOSCpath, value);
+	}
 }
