@@ -57,6 +57,7 @@ bool Composition::playArchive(std::string archiveName)
 	if (File::isDirectory(getRootPath() + archiveName) && File::exists(getRootPath() + archiveName + "/" + compositionName + ".composition")) {
 		mPlayerLock.lock();
 		stop();
+		mSequencer->setHandlerSubDirectory(archiveName);
 		setSubDirectory(archiveName);
 		mCompositionName = compositionName;
 
