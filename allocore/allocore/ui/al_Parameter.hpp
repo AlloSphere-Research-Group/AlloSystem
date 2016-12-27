@@ -469,6 +469,8 @@ public:
 	 */
 	void stopServer();
 
+	bool serverRunning() { return (mServer != nullptr); }
+
 	/**
 	 * @brief Get the list of registered parameters.
 	 */
