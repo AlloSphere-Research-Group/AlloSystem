@@ -278,6 +278,8 @@ public:
 	 */
 	void stopServer();
 
+	bool serverRunning();
+
 	void allowStore(bool allow) {mAllowStore = allow;}
 	bool allowStore() {return mAllowStore;}
 
@@ -319,10 +321,13 @@ private:
 	bool mStoreMode;
 	bool mNotifyPresetChange;
 
+
 	std::mutex mPresetChangeLock;
 	std::string mPresetChangeSenderAddr;
 
 	std::vector<std::string> mDisabledListeners;
+
+	ParameterServer *mParameterServer;
 };
 
 
