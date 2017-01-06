@@ -306,8 +306,9 @@ public:
 
 	void notifyPresetChange(bool notify) {mNotifyPresetChange = notify;}
 
-protected:
 	void attachPacketHandler(osc::PacketHandler *handler);
+
+protected:
 	static void changeCallback(int value, void *sender, void *userData);
 
 private:

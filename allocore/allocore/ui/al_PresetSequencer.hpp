@@ -319,7 +319,7 @@ private:
 //	std::mutex mServerLock;
 	std::string mOSCpath;
 	std::string mOSCQueryPath;
-	std::mutex mHandlerLock;
+//	std::mutex mHandlerLock;
 //	std::vector<osc::PacketHandler *> mHandlers;
 	std::vector<osc::MessageConsumer *> mConsumers;
 };

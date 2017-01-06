@@ -627,6 +627,12 @@ void PresetServer::onMessage(osc::Message &m)
 		}
 	}
 	mPresetChangeLock.unlock();
+	mHandlerLock.lock();
+	for(osc::PacketHandler *handler: mHandlers) {
+		m.resetStream();
+		handler->onMessage(m);
+	}
+	mHandlerLock.unlock();
 }
 
 void PresetServer::print()
@@ -672,8 +678,16 @@ std::string PresetServer::getAddress()
 	return mOSCpath;
 }
 
+void PresetServer::attachPacketHandler(osc::PacketHandler *handler)
+{
+	mHandlerLock.lock();
+	mHandlers.push_back(handler);
+	mHandlerLock.unlock();
+}
+
 void PresetServer::changeCallback(int value, void *sender, void *userData)
 {
+	(void) sender; // remove compiler warnings
 	PresetServer *server = static_cast<PresetServer *>(userData);
 //	Parameter *parameter = static_cast<Parameter *>(sender);
 
