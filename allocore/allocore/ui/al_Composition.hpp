@@ -109,10 +109,6 @@ protected:
 
 private:
 
-	std::vector<CompositionStep> loadCompositionSteps(std::string compositionSteps);
-	std::string getRootPath();
-	std::string getCurrentPath();
-
 	std::vector<CompositionStep> mCompositionSteps;
 	std::string mPath;
 	std::string mSubDirectory;
@@ -133,6 +129,10 @@ private:
 
 	std::function<void(bool,PresetSequencer *, void *userData)> mSequencerEndCallbackCache;
 	void *mSequencerEndCallbackDataCache;
+
+	std::vector<CompositionStep> loadCompositionSteps(std::string compositionSteps);
+	std::string getRootPath();
+	std::string getCurrentPath();
 
 	static void waitForSequencerCallback(bool finished,PresetSequencer *seq, void *userData);
 
