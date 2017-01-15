@@ -870,17 +870,17 @@ bool Mesh::savePLY(const std::string& filePath, const std::string& solidName, bo
 				}
 				else{
 					if (Bi == 4) {
-						u_int32_t idx[3];
+						uint32_t idx[3];
 						idx[0] = m.indices()[i  ];
 						idx[1] = m.indices()[i+1];
 						idx[2] = m.indices()[i+2];
 						s.write(reinterpret_cast<const char*>(idx), sizeof(int32_t)*3);
 					} else {
-						u_int16_t idx[3];
+						uint16_t idx[3];
 						idx[0] = m.indices()[i  ];
 						idx[1] = m.indices()[i+1];
 						idx[2] = m.indices()[i+2];
-						s.write(reinterpret_cast<const char*>(idx), sizeof(u_int16_t)*3);
+						s.write(reinterpret_cast<const char*>(idx), sizeof(uint16_t)*3);
 
 					}
 					//printf("%u %u %u\n", idx[0], idx[1], idx[2]);
