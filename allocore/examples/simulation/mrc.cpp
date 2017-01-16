@@ -139,86 +139,6 @@ struct MyWindow : public Window {
 
 MyWindow win;
 
-
-enum MRCMode {
-	MRC_IMAGE_SINT8 = 0,		//image : signed 8-bit bytes range -128 to 127
-	MRC_IMAGE_SINT16 = 1,		//image : 16-bit halfwords
-	MRC_IMAGE_FLOAT32 = 2,		//image : 32-bit reals
-	MRC_TRANSFORM_INT16 = 3,	//transform : complex 16-bit integers
-	MRC_TRANSFORM_FLOAT32 = 4,  //transform : complex 32-bit reals
-	MRC_IMAGE_UINT16 = 6        //image : unsigned 16-bit range 0 to 65535
-};
-
-struct MRCHeader {
-	// @see http://ami.scripps.edu/software/mrctools/mrc_specification.php
-	// or http://bio3d.colorado.edu/imod/doc/mrc_format.txt
-
-	int32_t   nx;         /*  # of Columns                  */
-	int32_t   ny;         /*  # of Rows                     */
-	int32_t   nz;         /*  # of Sections.                */
-	int32_t   mode;       /*  given by #define MRC_MODE...  */
-
-	int32_t   startx;    /*  Starting point of sub image.  */
-	int32_t   starty;
-	int32_t   startz;
-
-	int32_t   mx;         /* Number of rows to read.        */
-	int32_t   my;
-	int32_t   mz;
-
-	float_t   xlen;       /* length of x element in um.     */
-	float_t   ylen;       /* get scale = xlen/nx ...        */
-	float_t   zlen;
-
-	float_t   alpha;      /* cell angles, ignore */
-	float_t   beta;
-	float_t   gamma;
-
-	int32_t   mapx;       /* map coloumn 1=x,2=y,3=z.       */
-	int32_t   mapy;       /* map row     1=x,2=y,3=z.       */
-	int32_t   mapz;       /* map section 1=x,2=y,3=z.       */
-
-	float_t   amin;
-	float_t   amax;
-	float_t   amean;
-
-	int16_t   ispg;       /* image type */
-	int16_t   nsymbt;     /* space group number */
-
-	/* IMOD-SPECIFIC */
-	int32_t   next;
-	int16_t   creatid;  /* Used to be creator id, hvem = 1000, now 0 */
-	char    blank[30];
-	int16_t   nint;
-	int16_t   nreal;
-	int16_t   sub;
-	int16_t   zfac;
-	float_t   min2;
-	float_t   max2;
-	float_t   min3;
-	float_t   max3;
-	int32_t   imodStamp;
-	int32_t   imodFlags;
-	int16_t   idtype;
-	int16_t   lens;
-	int16_t   nd1;     /* Devide by 100 to get float value. */
-	int16_t   nd2;
-	int16_t   vd1;
-	int16_t   vd2;
-	float_t   tiltangles[6];  /* 0,1,2 = original:  3,4,5 = current */
-
-	/* MRC 2000 standard */
-	float_t   origin[3];
-	char    cmap[4];
-	char    machinestamp[4];
-	float_t   rms;
-
-	int32_t nlabl;	// number of labels
-	char  labels[10][80];
-} MrcHeader;
-
-
-
 MRCHeader& mrcParse(const char * data, Array& array) {
 	MRCHeader& header = *(MRCHeader *)data;
 
@@ -252,7 +172,7 @@ MRCHeader& mrcParse(const char * data, Array& array) {
 
 	printf("NX %d NY %d NZ %d\n", header.nx, header.ny, header.nz);
 	printf("mode %d\n", header.mode);
-	printf("startX %d startY %d startZ %d\n", header.startx, header.starty, header.startz);
+	printf("startX %d startY %d startZ %d\n", header.nxstart, header.nystart, header.nzstart);
 	printf("intervals X %d intervals Y %d intervals Z %d\n", header.mx, header.my, header.mz);
 	printf("angstroms X %f angstroms Y %f angstroms Z %f\n", header.xlen, header.ylen, header.zlen);
 	printf("axis X %d axis Y %d axis Z %d\n", header.mapx, header.mapy, header.mapz);
