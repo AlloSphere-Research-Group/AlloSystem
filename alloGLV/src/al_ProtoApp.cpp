@@ -98,9 +98,9 @@ void ProtoApp::init(
 				m.vertex(1,0,0); m.vertex(0,0,0);
 				m.vertex(0,1,0); m.vertex(0,0,0);
 				m.vertex(0,0,1); m.vertex(0,0,0);
-				for(int i=0;i<2;++i) m.color(RGB(0.8,0,0));
-				for(int i=0;i<2;++i) m.color(RGB(0,0.8,0));
-				for(int i=0;i<2;++i) m.color(RGB(0,0,0.8));
+				for(int i=0;i<2;++i) m.color(0.8,0,0);
+				for(int i=0;i<2;++i) m.color(0,0.8,0);
+				for(int i=0;i<2;++i) m.color(0,0,0.8);
 				graphics().lineWidth(2);
 				graphics().draw(m);
 			}
