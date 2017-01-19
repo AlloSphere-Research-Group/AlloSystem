@@ -219,6 +219,9 @@ std::string toTimecode(al_nsec t, const std::string& format){
 	return s.str();
 }
 
+std::string timecodeNow(const std::string& format){
+	return toTimecode(al_system_time_nsec(), format);
+}
 
 void Timer::print() const {
 	auto t = getTime();
