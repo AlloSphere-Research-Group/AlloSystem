@@ -55,12 +55,15 @@ namespace al{
 /// Sleep for an interval of seconds
 inline void wait(al_sec dt){ al_sleep(dt); }
 
-/// Get current wall time in seconds
+/// Get current system time in seconds
 inline al_sec walltime(){ return al_time(); }
 inline al_sec timeNow(){ return al_time(); }
 
 /// Convert nanoseconds to timecode string
 std::string toTimecode(al_nsec t, const std::string& format="D:H:M:S:m:u");
+
+/// Get timecode of current system time
+std::string timecodeNow(const std::string& format="D:H:M:S:m:u");
 
 
 /// Timer with stopwatch-like functionality for benchmarking, etc.
