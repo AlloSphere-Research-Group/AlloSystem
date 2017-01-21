@@ -142,7 +142,13 @@ public:
 	/// Save a screenshot of a window to disk
 	void saveScreenshot(al::Window& win);
 
-	void createVideo();
+	/// Create a video from last captured image frames and audio
+	///
+	/// @param[in] videoCompress		video compression amount in [0,51];
+	///									inversely related to quality
+	/// @param[in] videoEncodeSpeed		video encode speed amount in [0,9];
+	///									inversely related to file size
+	void createVideo(int videoCompress=23, int videoEncodeSpeed=4);
 
 private:
 

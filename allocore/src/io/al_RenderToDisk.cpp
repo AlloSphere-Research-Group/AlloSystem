@@ -423,7 +423,7 @@ void RenderToDisk::saveImage(
 	}
 }
 
-void RenderToDisk::createVideo(){
+void RenderToDisk::createVideo(int videoCompress, int videoEncodeSpeed){
 
 	// Nothing to do without image sequence
 	if(!mWroteImages) return;
@@ -442,7 +442,10 @@ void RenderToDisk::createVideo(){
 	if(mWroteAudio){
 		args += " -i " + path() + "/output.au -c:a aac -b:a 192k";
 	}
-	args += " -crf 18 -preset veryslow";
+	//args += " -crf 20 -preset slower";
+	args += " -crf " + al::toString(videoCompress);
+	static const std::string speedStrings[] = {"placebo","veryslow","slower","slow","medium","fast","faster","veryfast","superfast","ultrafast"};
+	args += " -preset " + speedStrings[videoEncodeSpeed];
 	args += " " + path() + "/movie.mp4";
 
 	std::string cmd = "\"" + prog + "\"" + args;
