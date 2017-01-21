@@ -23,6 +23,7 @@ void PresetSequencer::playSequence(std::string sequenceName)
 		mSteps = steps;
 	}
 	mRunning = true;
+	mCurrentSequence = sequenceName;
 	mSequencerThread = new std::thread(PresetSequencer::sequencerFunction, this);
 	mSequenceLock.unlock();
 
