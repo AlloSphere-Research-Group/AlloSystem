@@ -331,8 +331,11 @@ void Composition::playbackThread(Composition *composition)
 	}
 	std::cout << "Composition started." << std::endl;
 
-	composition->mSequencer->toggleEnableBeginCallback();
-	composition->mSequencer->toggleEnableEndCallback();
+	//FIXME we should remember previous state of callbackd for sequencer to reset when composition is done
+	//TODO this should be an optional parameter whether to disable sequence callbacks
+//	composition->mSequencer->enableBeginCallback(false);
+//	composition->mSequencer->enableEndCallback(false);
+	composition->mSequencer->enableEndCallback(true);
 	if (composition->mBeginCallbackEnabled && composition->mBeginCallback != nullptr) {
 		composition->mBeginCallback(composition, composition->mBeginCallbackData);
 	}
@@ -362,10 +365,9 @@ void Composition::playbackThread(Composition *composition)
 	composition->mSequencerEndCallbackCache = composition->mSequencer->mEndCallback;
 	composition->mSequencerEndCallbackDataCache = composition->mSequencer->mEndCallbackData;
 
-	composition->mSequencer->toggleEnableBeginCallback();
-	composition->mSequencer->toggleEnableEndCallback();
 
-	if (composition->mSequencer->running()) { // TODO There is a very small risk of a run condition here is playback stops between the check and the branches
+	// Defer end callback to sequencer end callback
+	if (composition->mSequencer->running()) { // TODO There is a very small risk of a run condition here if playback stops between the check and the branches
 		composition->mSequencer->registerEndCallback(Composition::waitForSequencerCallback, composition);
 	} else {
 		if (composition->mEndCallbackEnabled && composition->mEndCallback != nullptr) {
@@ -373,6 +375,8 @@ void Composition::playbackThread(Composition *composition)
 			composition->mEndCallback(finished, composition, composition->mEndCallbackData);
 		}
 	}
+	composition->mSequencer->enableBeginCallback(true);
+	composition->mSequencer->enableEndCallback(true);
 
 	composition->mPlayerLock.unlock();
 	std::cout << "Composition done." << std::endl;
