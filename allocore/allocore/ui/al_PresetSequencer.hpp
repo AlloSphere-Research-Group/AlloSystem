@@ -190,6 +190,8 @@ public:
 	 */
 	std::queue<Step> loadSequence(std::string sequenceName);
 
+	std::string currentSequence() { return mCurrentSequence; }
+
 	void setOSCSubPath(std::string subPath) { mOSCsubPath = subPath; }
 
 	/**
@@ -236,6 +238,7 @@ private:
 	std::string mDirectory;
 	PresetHandler *mPresetHandler;
 	std::string mOSCsubPath;
+	std::string mCurrentSequence;
 
 	std::mutex mSequenceLock;
 
