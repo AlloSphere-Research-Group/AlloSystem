@@ -220,6 +220,7 @@ void PresetSequencer::registerBeginCallback(std::function<void(PresetSequencer *
 void PresetSequencer::registerEndCallback(std::function<void (bool, al::PresetSequencer *, void *)> endCallback,
                                           void *userData)
 {
+	// FIXME this data needs to be protected with a mutex
 	mEndCallback = endCallback;
 	mEndCallbackData = userData;
 	mEndCallbackEnabled = true;
