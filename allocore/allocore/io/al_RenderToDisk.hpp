@@ -142,7 +142,13 @@ public:
 	/// Save a screenshot of a window to disk
 	void saveScreenshot(al::Window& win);
 
-	void createVideo();
+	/// Create a video from last captured image frames and audio
+	///
+	/// @param[in] videoCompress		video compression amount in [0,51];
+	///									inversely related to quality
+	/// @param[in] videoEncodeSpeed		video encode speed amount in [0,9];
+	///									inversely related to file size
+	void createVideo(int videoCompress=23, int videoEncodeSpeed=4);
 
 private:
 
@@ -164,9 +170,7 @@ private:
 		Thread mThread;
 		Image mImage;
 		std::string mPath;
-		bool mBusy;
-
-		ImageWriter();
+		bool mBusy = false;
 
 		bool run(
 			const std::string& path,
@@ -186,12 +190,12 @@ private:
 	std::vector<unsigned char> mPixels;
 	GLenum mGraphicsBuf;
 
-	enum { Npbos = 2 };
+	enum { Npbos = 3 };
 	GLuint mPBOs[Npbos];
 	int mPBOIdx;
 	bool mReadPBO;
 
-	enum { Nthreads = 4 };
+	enum { Nthreads = 8 };
 	ImageWriter mImageWriters[Nthreads];
 	std::string mImageExt;
 	unsigned mImageCompress;
