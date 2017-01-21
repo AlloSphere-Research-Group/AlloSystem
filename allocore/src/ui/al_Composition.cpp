@@ -333,9 +333,8 @@ void Composition::playbackThread(Composition *composition)
 
 	//FIXME we should remember previous state of callbackd for sequencer to reset when composition is done
 	//TODO this should be an optional parameter whether to disable sequence callbacks
-//	composition->mSequencer->enableBeginCallback(false);
-//	composition->mSequencer->enableEndCallback(false);
-	composition->mSequencer->enableEndCallback(true);
+	composition->mSequencer->enableBeginCallback(false);
+	composition->mSequencer->enableEndCallback(false);
 	if (composition->mBeginCallbackEnabled && composition->mBeginCallback != nullptr) {
 		composition->mBeginCallback(composition, composition->mBeginCallbackData);
 	}
@@ -355,16 +354,18 @@ void Composition::playbackThread(Composition *composition)
 		}
 		std::this_thread::sleep_until(targetTime);
 		std::cout << "Composition step:" << step.sequenceName << ":" << step.deltaTime << std::endl;
-		// std::cout << "Composition step:" << step.sequenceName << ":" << step.deltaTime << std::endl;
 		composition->mSequencer->playSequence(step.sequenceName);
 		index++;
 		if (index == composition->mCompositionSteps.size()) {
 			composition->mPlaying = false;
 		}
+//		int counter = 0;
+//		while(!composition->mSequencer->running() && counter < 100) {
+//			counter++; // FIXME Artificial wait. Wait synchronously
+//		}
 	}
 	composition->mSequencerEndCallbackCache = composition->mSequencer->mEndCallback;
 	composition->mSequencerEndCallbackDataCache = composition->mSequencer->mEndCallbackData;
-
 
 	// Defer end callback to sequencer end callback
 	if (composition->mSequencer->running()) { // TODO There is a very small risk of a run condition here if playback stops between the check and the branches
