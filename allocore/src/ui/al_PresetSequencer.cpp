@@ -24,8 +24,12 @@ void PresetSequencer::playSequence(std::string sequenceName)
 	}
 	mRunning = true;
 	mCurrentSequence = sequenceName;
+	mPlayWaitLock.lock();
 	mSequencerThread = new std::thread(PresetSequencer::sequencerFunction, this);
 	mSequenceLock.unlock();
+
+	mPlayWaitLock.lock();
+	mPlayWaitLock.unlock();
 
 	std::thread::id seq_thread_id = mSequencerThread->get_id();
 	std::cout << "Preset Sequencer thread id: " << std::hex << seq_thread_id << std::endl;
@@ -126,12 +130,13 @@ void PresetSequencer::sequencerFunction(al::PresetSequencer *sequencer)
 		std::cerr << "No preset handler registered. Can't run sequencer." << std::endl;
 		return;
 	}
-	sequencer->mSequenceLock.lock();
 	if (sequencer->mBeginCallbackEnabled && sequencer->mBeginCallback != nullptr) {
 		sequencer->mBeginCallback(sequencer, sequencer->mBeginCallbackData);
 	}
 	auto sequenceStart = std::chrono::high_resolution_clock::now();
 	auto targetTime = sequenceStart;
+	sequencer->mPlayWaitLock.unlock();
+	sequencer->mSequenceLock.lock();
 	while(sequencer->running() && sequencer->mSteps.size() > 0) {
 		Step &step = sequencer->mSteps.front();
 		sequencer->mPresetHandler->setMorphTime(step.delta);

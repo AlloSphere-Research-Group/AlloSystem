@@ -241,6 +241,7 @@ private:
 	std::string mCurrentSequence;
 
 	std::mutex mSequenceLock;
+	std::mutex mPlayWaitLock;
 
 	bool mSequencerActive;
 	bool mRunning;
