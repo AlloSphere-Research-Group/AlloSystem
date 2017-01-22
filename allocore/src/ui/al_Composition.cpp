@@ -338,6 +338,9 @@ void Composition::playbackThread(Composition *composition)
 	if (composition->mBeginCallbackEnabled && composition->mBeginCallback != nullptr) {
 		composition->mBeginCallback(composition, composition->mBeginCallbackData);
 	}
+
+	composition->mSequencerEndCallbackCache = composition->mSequencer->mEndCallback;
+	composition->mSequencerEndCallbackDataCache = composition->mSequencer->mEndCallbackData;
 	const int granularity = 10; // milliseconds
 	auto sequenceStart = std::chrono::high_resolution_clock::now();
 	auto targetTime = sequenceStart;
@@ -355,6 +358,7 @@ void Composition::playbackThread(Composition *composition)
 		std::this_thread::sleep_until(targetTime);
 		std::cout << "Composition step:" << step.sequenceName << ":" << step.deltaTime << std::endl;
 		composition->mSequencer->playSequence(step.sequenceName);
+
 		index++;
 		if (index == composition->mCompositionSteps.size()) {
 			composition->mPlaying = false;
@@ -364,8 +368,6 @@ void Composition::playbackThread(Composition *composition)
 //			counter++; // FIXME Artificial wait. Wait synchronously
 //		}
 	}
-	composition->mSequencerEndCallbackCache = composition->mSequencer->mEndCallback;
-	composition->mSequencerEndCallbackDataCache = composition->mSequencer->mEndCallbackData;
 
 	// Defer end callback to sequencer end callback
 	if (composition->mSequencer->running()) { // TODO There is a very small risk of a run condition here if playback stops between the check and the branches
