@@ -11,6 +11,8 @@ struct ShaderManager {
   std::string fragLibCode;
   al::ResourceManager rm;
 
+  al::SearchPaths& paths(){ return rm.paths;}
+
   al::ShaderProgram* get(std::string name) {
     return shaderMap[name];
   }
