@@ -452,6 +452,17 @@ void RayStereo::createTexture(GLuint* id_tex) {
 void RayStereo::bindTexToFBO(GLuint id_tex) {
   glBindFramebuffer(GL_FRAMEBUFFER, mFbo);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, id_tex, 0);
+  // glBindRenderbuffer(GL_RENDERBUFFER, mRbo);
+  // glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mResolution, mResolution);
+  // glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mRbo);
+
+  // GLenum status;
+  // status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+  // if (status != GL_FRAMEBUFFER_COMPLETE) {
+  //   printf("GPU does not support required FBO configuration\n");
+  //   exit(0);
+  // }
+  
   // glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -533,7 +544,7 @@ void RayStereo::onDestroy() {
 	mRbo = mFbo = 0;
 }
 
-inline void RayStereo::drawQuad(const ShaderProgram* shaderProgram, const double eye) {
+void RayStereo::drawQuad(const ShaderProgram* shaderProgram, const double eye) {
 	shaderProgram->uniform("eyesep", eye);
   gl.draw(mQuad);
 }

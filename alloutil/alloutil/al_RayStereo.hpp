@@ -113,6 +113,8 @@ public:
   GLuint texture() const { return mTex[0]; }
   GLuint textureLeft() const { return mTex[0]; }
   GLuint textureRight() const { return mTex[1]; }
+
+  GLuint fbo() const { return mFbo; }
   
   // create GPU resources:
   void onCreate();
