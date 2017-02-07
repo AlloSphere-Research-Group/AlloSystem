@@ -26,12 +26,12 @@ Composition::~Composition()
 
 void Composition::play()
 {
-	mPlayerLock.lock();
 	stop();
+	mPlayerLock.lock();
 	mCompositionSteps = loadCompositionSteps(mCompositionName);
 	mPlaying = true;
-	mPlayThread = new std::thread(Composition::playbackThread, this);
 	mPlayerLock.unlock();
+	mPlayThread = new std::thread(Composition::playbackThread, this);
 }
 
 void Composition::stop()
