@@ -154,7 +154,7 @@ void PresetHandler::recallPreset(std::string name)
 			std::lock_guard<std::mutex> lk(mTargetLock);
 		}
 		mTargetValues = loadPresetValues(name);
-		mMorphRemainingSteps.store(1 + mMorphTime.get() / mMorphInterval);
+		mMorphRemainingSteps.store(1 + ceil(mMorphTime.get() / mMorphInterval));
 	}
 	mMorphConditionVar.notify_one();
 	int index = -1;
@@ -199,6 +199,35 @@ void PresetHandler::setInterpolatedPreset(int index1, int index2, double factor)
 	} else {
 		std::cout << "Invalid indeces for preset interpolation: " << index1 << "," << index2 << std::endl;
 	}
+}
+
+void PresetHandler::morphTo(ParameterStates &parameterStates, float morphTime)
+{
+	{
+		if (mMorphRemainingSteps.load() >= 0) {
+			mMorphRemainingSteps.store(-1);
+			std::lock_guard<std::mutex> lk(mTargetLock);
+		}
+		mMorphTime.set(morphTime);
+		mTargetValues = parameterStates;
+		mMorphRemainingSteps.store(1 + ceil(mMorphTime.get() / mMorphInterval));
+	}
+	mMorphConditionVar.notify_one();
+//	int index = -1;
+//	for (auto preset: mPresetsMap) {
+//		if (preset.second == name) {
+//			index = preset.first;
+//			break;
+//		}
+//	}
+	mCurrentPresetName = "";
+//	if (mUseCallbacks) {
+//		for(int i = 0; i < mCallbacks.size(); ++i) {
+//			if (mCallbacks[i]) {
+//				mCallbacks[i](index, this, mCallbackUdata[i]);
+//			}
+//		}
+//	}
 }
 
 std::string PresetHandler::recallPreset(int index)
@@ -401,7 +430,7 @@ void PresetHandler::morphingFunction(al::PresetHandler *handler) {
 	}
 }
 
-std::map<std::string, float> PresetHandler::loadPresetValues(std::string name)
+PresetHandler::ParameterStates PresetHandler::loadPresetValues(std::string name)
 {
 	std::map<std::string, float> preset;
 	std::lock_guard<std::mutex> lock(mFileLock);
@@ -461,7 +490,7 @@ std::map<std::string, float> PresetHandler::loadPresetValues(std::string name)
 	return preset;
 }
 
-bool PresetHandler::savePresetValues(const std::map<std::string, float> &values, std::string presetName,
+bool PresetHandler::savePresetValues(const ParameterStates &values, std::string presetName,
                                       bool overwrite)
 {
 	bool ok = true;

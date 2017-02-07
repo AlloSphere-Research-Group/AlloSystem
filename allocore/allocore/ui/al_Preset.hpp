@@ -64,6 +64,8 @@ namespace  al
 class PresetHandler
 {
 public:
+
+	typedef std::map<std::string, float> ParameterStates;
 	/**
 	 * @brief PresetHandler contructor
 	 *
@@ -136,6 +138,9 @@ public:
 	 */
 	void setInterpolatedPreset(int index1, int index2, double factor);
 
+
+	void morphTo(ParameterStates &parameterStates, float morphTime);
+
 	std::map<int, std::string> availablePresets();
 	std::string getPresetName(int index);
 	std::string getCurrentPresetName() {return mCurrentPresetName; }
@@ -204,8 +209,8 @@ public:
 private:
 	void storeCurrentPresetMap();
 
-	std::map<std::string, float> loadPresetValues(std::string name);
-	bool savePresetValues(const std::map<std::string, float> &values, std::string presetName,
+	ParameterStates loadPresetValues(std::string name);
+	bool savePresetValues(const ParameterStates &values, std::string presetName,
 	                       bool overwrite = true);
 
 	static void morphingFunction(PresetHandler *handler);
